@@ -1,0 +1,187 @@
+# Section 1.1 Inverse Functions -- storyboard (2nd-gen format).
+#
+# Source: chapters/ch01_foundations.tex, Section 1.1.
+# This file is a FORMAT DEMO for the redesign: it shows the three scene kinds
+# (intro / content / outro), the single `say` narration field with inline
+# {show ...} reveal markers, LaTeX written directly into narration (Gemini TTS
+# reads it), and `accent` replacing the old `content_type`.
+#
+# It is intentionally short (one real content scene) -- once the format is
+# signed off, the remaining ~17 scenes get authored the same way.
+
+meta:
+  id: ch01_inverse_functions
+  chapter: "Chapter 1"
+  chapter_title: "Inverse Functions and Limits"
+  section: "1.1"
+  title: "Inverse Functions"
+  language: en
+  theme: midnight
+  voice: Kore                     # Gemini preset voice (PLACEHOLDER); TTS wired last
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "1.1", title: "Inverse Functions" }
+    - { id: "1.2", title: "Inverse Trigonometric Functions" }
+    - { id: "1.3", title: "The Limit of a Function" }
+    - { id: "1.4", title: "One-Sided and Infinite Limits" }
+    - { id: "1.5", title: "Limit Laws and Computational Techniques" }
+    - { id: "1.6", title: "The Precise Definition of a Limit" }
+
+scenes:
+
+  # ---- INTRO (first-class, reusable) ---------------------------------------
+  # No `say`: pure-animation section opener. The template shows the chapter map,
+  # focuses meta.section, resolves into the Section Gate title slate, then hands
+  # off to the dark teaching ground.
+  - id: intro
+    kind: intro
+    tagline: "When can a function be run backwards?"
+    bgm: soft_intro
+    duration: 5.8
+
+  # ---- CONTENT ------------------------------------------------------------
+  # `say` is the single source of narration. LaTeX ($...$) is written directly
+  # -- no spoken-math rewrite table. {show math.0} fires the reveal of math[0]
+  # at that point in the spoken audio. The text BETWEEN two {show} markers is
+  # one beat: it is synthesized as one Gemini clip, its measured duration sets
+  # how long that reveal holds before the next.
+  - id: one_to_one
+    kind: content
+    template: definition_math
+    accent: definition            # replaces old content_type
+    title: "One-to-One Functions"
+    say: |
+      The property we need is called one-to-one. A function is one-to-one
+      when different inputs always give different outputs.
+      {show math.0} No two distinct inputs ever land on the same output.
+      {show math.1} Equivalently, if $f(x_1) = f(x_2)$ then $x_1 = x_2$ —
+      the form that is easier to use inside a proof.
+    statement: "A function is one-to-one if different inputs give different outputs."
+    math:
+      - "$f(x_1) \\ne f(x_2)$ whenever $x_1 \\ne x_2$"
+      - { tex: "$f(x_1) = f(x_2) \\implies x_1 = x_2$", anim: highlight }
+
+  # ---- EXAMPLE (two-column: reasoning | worked math) ----------------------
+  - id: testing_with_algebra
+    kind: content
+    template: example_walkthrough
+    accent: example
+    title: "Testing with Algebra"
+    say: |
+      Let us test two functions. {show math.0} The identity on the unit
+      interval gives distinct outputs every time.
+      {show math.1} But x squared collides: a half and minus a half both map
+      to one quarter.
+      {show math.2} Two inputs, one output -- so it is not one-to-one.
+      {show takeaway} A single colliding pair is enough to disprove one-to-one.
+    steps:
+      - { text: "$f(x)=x$ on $[0,1]$ gives\\\\ distinct outputs.", math: "f(x)=x,\\ 0\\le x\\le 1", mark: ok }
+      - { text: "Test $g(x)=x^2$ at $x=1/2$\\\\ against $x=-1/2$.", math: "g\\!\\left(\\tfrac12\\right)=\\tfrac14=g\\!\\left(-\\tfrac12\\right)", hot: true }
+      - { text: "Two inputs collide,\\\\ so $g$ is not one-to-one.", math: "\\tfrac12 \\neq -\\tfrac12", mark: bad }
+    takeaway: "To disprove one-to-one, a single colliding pair of inputs is enough."
+
+  # ---- GRAPH FOCUS (full-frame visual counterexample) ---------------------
+  - id: why_x_squared_fails
+    kind: content
+    template: graph_focus
+    accent: example
+    title: "Why $g(x)=x^2$ cannot be inverted on $[-1,1]$"
+    say: |
+      The collision is visible on the graph. The horizontal line
+      $y=\tfrac14$ hits the parabola twice, at $x=-\tfrac12$ and
+      $x=\tfrac12$.
+      {show annotation.0} One output would have to choose two different inputs,
+      so the inverse is not a function on this interval.
+    axes:
+      x_range: [-1.45, 1.45, 0.5]
+      y_range: [-0.28, 1.55, 0.25]
+      x_length: 6.35
+      y_length: 3.65
+    plots:
+      - kind: function
+        expression: "x**2"
+        x_range: [-1.45, 1.45]
+        color_role: secondary
+        label: "$g(x)=x^2$"
+        label_point: [0.08, 1.30]
+      - kind: line
+        start: [-1.45, 0.25]
+        end: [1.45, 0.25]
+        dashed: true
+        color_role: warning
+        label: "$y=1/4$"
+        label_side: right
+      - kind: point
+        point: [-0.5, 0.25]
+        hollow: true
+        color_role: accent
+      - kind: point
+        point: [0.5, 0.25]
+        hollow: true
+        color_role: accent
+    annotations:
+      - "Two inputs share the same output -- $g^{-1}(\\{\\tfrac14\\})$ is not well-defined."
+
+  # ---- PROCEDURE (big numerals + worked strip) ----------------------------
+  - id: finding_an_inverse
+    kind: content
+    template: procedure_steps
+    accent: procedure
+    title: "Finding an Inverse"
+    say: |
+      Here is the recipe. {show math.0} First, write the rule as an equation.
+      {show math.1} Then solve for the input in terms of the output.
+      {show math.2} Finally, swap the symbols to name the inverse.
+      {show worked} Here it is on a concrete linear function.
+    steps:
+      - { text: "Write the rule as an equation.", math: "y = f(x)" }
+      - { text: "Solve for the input in terms of the output.", math: "x = \\dfrac{y-3}{2}" }
+      - { text: "Swap the symbols to name the inverse.", math: "f^{-1}(x) = \\dfrac{x-3}{2}" }
+    worked: ["f(x)=2x+3", "y=2x+3", "f^{-1}(x)=\\tfrac{x-3}{2}"]
+
+  # ---- THEOREM + PROOF ----------------------------------------------------
+  - id: strictly_increasing
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    title: "Strictly Increasing implies One-to-One"
+    say: |
+      Here is a clean sufficient condition.
+      {show proof.0} Take any two inputs with x one less than x two.
+      {show proof.1} Strictly increasing means f of x one is below f of x two.
+      {show proof.2} So the outputs can never coincide.
+      {show qed} Therefore f is one-to-one.
+    statement: "If $f$ is strictly increasing on an interval $I$, then $f$ is one-to-one on $I$."
+    proof:
+      - "Take any $x_1 < x_2$ in the interval $I$."
+      - "Strictly increasing gives $f(x_1) < f(x_2)$."
+      - "So the outputs never coincide: $f(x_1) \\neq f(x_2)$."
+    qed: "Therefore $f$ is one-to-one."
+
+  # ---- RECAP (dark, in-content: points | formulas) ------------------------
+  - id: recap
+    kind: content
+    template: recap_cards
+    accent: recap
+    title: "Section 1.1 — Recap"
+    say: |
+      Let us gather the thread.
+      {show point.0} One-to-one means inputs never collide on the same output.
+      {show point.1} The horizontal line test is the visual version of that check.
+      {show point.2} And an inverse exists exactly when the function is one-to-one.
+      {show formula.0} {show formula.1} These two identities are worth remembering.
+    points:
+      - "One-to-one means inputs never collide on the same output."
+      - "The Horizontal Line Test is the visual version of that check."
+      - "An inverse exists exactly when the function is one-to-one."
+    formulas:
+      - "f(x_1)=f(x_2)\\ \\Longrightarrow\\ x_1=x_2"
+      - "\\bigl(f^{-1}\\!\\circ f\\bigr)(x)=x"
+
+  # ---- OUTRO (first-class, reusable) ---------------------------------------
+  # No `say`: pure-animation section closer. Two stages: dark-to-light bridge,
+  # then the final brand slate. Takeaways live in the preceding recap scene.
+  - id: outro
+    kind: outro
+    bgm: soft_outro
+    duration: 8.0

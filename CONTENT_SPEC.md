@@ -40,8 +40,9 @@ Most rules are followed by a **Rationale** paragraph that explains why the rule 
 ### Relationship to other files
 
 - [`README.md`](README.md) — repository layout, preamble structure, build instructions.
-- [`MANIM_REFERENCE.md`](MANIM_REFERENCE.md), [`MANIM_STORYBOARD.md`](MANIM_STORYBOARD.md), [`MANIM_CHECKLIST.md`](MANIM_CHECKLIST.md) — Manim animation pipeline (primary media path).
-- [`LEGACY_SLIDE_PIPELINE.md`](LEGACY_SLIDE_PIPELINE.md) — frozen static-slide/PDF path (reference only).
+- [`video/README.md`](video/README.md) — current (second-generation) video pipeline (primary media path).
+- [`legacy/MANIM_REFERENCE.md`](legacy/MANIM_REFERENCE.md), [`legacy/MANIM_STORYBOARD.md`](legacy/MANIM_STORYBOARD.md), [`legacy/MANIM_CHECKLIST.md`](legacy/MANIM_CHECKLIST.md) — first-generation Manim animation pipeline (frozen; archived under `legacy/`).
+- [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md) — frozen static-slide/PDF path (reference only).
 - [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md) — short daily-reference companion to this file.
 - [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) — course arc, chapter order, prerequisites, core skills per chapter.
 - [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md) — minimum exercise skeleton ahead of the full deferred design round.

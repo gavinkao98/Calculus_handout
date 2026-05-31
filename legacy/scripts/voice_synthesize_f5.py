@@ -24,7 +24,6 @@ from shared_runtime_bootstrap import (
     require_path,
 )
 from slides_script_workflow import final_script_path, load_slide_scripts
-from tts_pronunciation import normalize_tts_pronunciation
 
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
@@ -191,7 +190,7 @@ def default_output_suffix(reference_mode: str) -> str:
 
 
 def normalize_script(text: str) -> str:
-    return normalize_tts_pronunciation(text)
+    return re.sub(r"\s+", " ", text).strip()
 
 
 def silence(sample_rate: int, seconds: float) -> np.ndarray:
@@ -267,9 +266,8 @@ def synthesize_slide_beats(
     timeline = 0.0
 
     for beat_index, beat in enumerate(beats, start=1):
-        tts_text = normalize_script(beat["text"])
         audio, current_sample_rate = synthesize_f5_text(
-            script=tts_text,
+            script=beat["text"],
             processed_reference_wav=processed_reference_wav,
             processed_reference_text=processed_reference_text,
             model_obj=model_obj,
@@ -296,7 +294,6 @@ def synthesize_slide_beats(
             {
                 "id": beat["id"],
                 "text": beat["text"],
-                "tts_text": tts_text,
                 "reveal": beat.get("reveal", []),
                 "audio_file": str(beat_wav),
                 "audio_seconds": round(beat_audio_seconds, 3),
@@ -404,9 +401,8 @@ def main() -> int:
                 device=device,
             )
         else:
-            script_text = normalize_script(script)
             audio, sample_rate = synthesize_f5_text(
-                script=script_text,
+                script=script,
                 processed_reference_wav=processed_reference_wav,
                 processed_reference_text=processed_reference_text,
                 model_obj=model_obj,

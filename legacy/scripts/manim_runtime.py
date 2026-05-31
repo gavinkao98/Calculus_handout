@@ -48,14 +48,27 @@ def render_storyboard_scene(
     output_path: Path,
     quality: str,
     audio_timing: dict[str, Any] | None = None,
+    audio_manifest_path: Path | None = None,
+    audio_dir: Path | None = None,
+    timeline_path: Path | None = None,
 ) -> Path:
+    """Render a single storyboard scene to a silent MP4.
+
+    When ``audio_manifest_path`` and ``audio_dir`` are supplied, the scene is
+    instantiated as a :class:`BookmarkBeatScene` and its ``add_sound`` is
+    suppressed so the rendered video stays silent — the audio is muxed in
+    a separate ffmpeg pass via :func:`mux_scene_video_with_audio`. The
+    bookmark trigger times are written to ``timeline_path`` if provided so
+    downstream tools can introspect what the renderer saw.
+
+    Without audio context the function falls back to the legacy
+    :class:`StoryboardTemplateScene` for plain preview renders.
+    """
     ensure_manim_available()
     ensure_miktex_env()
     ensure_ffmpeg_env()
     patch_manim_tex_runtime()
     from manim import tempconfig
-
-    from manim_templates.scene_player import StoryboardTemplateScene
 
     settings = quality_video_settings(storyboard["video"], quality)
     ensure_directory(output_path.parent)
@@ -90,16 +103,35 @@ def render_storyboard_scene(
         "ffmpeg_loglevel": "ERROR",
     }
 
-    StoryboardTemplateScene.scene_spec = scene_spec
-    StoryboardTemplateScene.render_context = context
+    use_voiceover = audio_manifest_path is not None and audio_dir is not None
+    if use_voiceover:
+        from manim_templates.voiceover_scene import BookmarkBeatScene
+        from manim_templates.voiceover_service import ManifestAudioService
+
+        scene_class = _build_bookmark_scene_class(
+            scene_spec=scene_spec,
+            context=context,
+            manifest_path=audio_manifest_path,
+            audio_dir=audio_dir,
+            timeline_path=timeline_path,
+        )
+    else:
+        from manim_templates.scene_player import StoryboardTemplateScene
+
+        scene_class = StoryboardTemplateScene
+        StoryboardTemplateScene.scene_spec = scene_spec
+        StoryboardTemplateScene.render_context = context
+
     try:
         with tempconfig(config):
-            player = StoryboardTemplateScene()
+            player = scene_class()
             player.render()
             movie_path = Path(player.renderer.file_writer.movie_file_path).resolve()
     finally:
-        StoryboardTemplateScene.scene_spec = None
-        StoryboardTemplateScene.render_context = None
+        if not use_voiceover:
+            from manim_templates.scene_player import StoryboardTemplateScene
+            StoryboardTemplateScene.scene_spec = None
+            StoryboardTemplateScene.render_context = None
 
     if not movie_path.exists():
         raise FileNotFoundError(f"Manim render completed without an output file: {movie_path}")
@@ -108,6 +140,46 @@ def render_storyboard_scene(
         output_path.unlink()
     shutil.copy2(movie_path, output_path)
     return output_path.resolve()
+
+
+def _build_bookmark_scene_class(
+    *,
+    scene_spec: dict[str, Any],
+    context: dict[str, Any],
+    manifest_path: Path,
+    audio_dir: Path,
+    timeline_path: Path | None,
+):
+    """Return a fresh BookmarkBeatScene subclass configured for one scene.
+
+    We build a one-shot subclass per render so each scene gets a clean
+    ``construct`` closure and there is no global mutable state to clean up.
+    """
+    from manim_templates.registry import render_scene_template
+    from manim_templates.animations import scene_exit
+    from manim_templates.voiceover_scene import BookmarkBeatScene
+    from manim_templates.voiceover_service import ManifestAudioService
+
+    audio_dir = Path(audio_dir)
+    manifest_path = Path(manifest_path)
+
+    class _ConfiguredBookmarkScene(BookmarkBeatScene):
+        def construct(self):  # type: ignore[override]
+            self.camera.background_color = context["theme"]["colors"]["background"]
+            self.set_speech_service(
+                ManifestAudioService(manifest_path, audio_dir),
+                create_subcaption=False,
+            )
+            if timeline_path is not None:
+                self.timeline_path = Path(timeline_path)
+            render_scene_template(self, scene_spec, context)
+            scene_exit(
+                self,
+                scene_spec.get("scene_exit", "fade"),
+                theme=context.get("theme"),
+            )
+
+    return _ConfiguredBookmarkScene
 
 
 def resolve_ffmpeg_tool(tool_name: str) -> str:

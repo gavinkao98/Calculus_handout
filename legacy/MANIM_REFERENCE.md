@@ -407,6 +407,86 @@ theme:
     example: "highlight"
 ```
 
+## Reveal Strategy (動畫顯示時機)
+
+每個場景的「靜態元素一次顯示、動態元素講到才出現」由 **reveal strategy** 決定。系統提供四種策略；多數場景吃 template 預設值即可，作者只在邊界情況下覆寫。
+
+### 四種策略
+
+| 策略 | 行為 | 何時用 |
+|------|------|--------|
+| `all_at_once` | 全部元素場景開始時一次淡入；narration 純朗讀 | 文字密度高、無推導：`title_bullets`、`section_transition` |
+| `beat_paced` | 每個動態元素都等 bookmark 觸發 | 整段都是推導：`example_walkthrough`、`procedure_steps` |
+| `hybrid`（預設多數 template） | 靜態一次顯示，動態元素遇 bookmark 觸發；無 bookmark 時均分 narration 時間 | 多數場景 |
+| `hybrid_auto` | 同 hybrid，但無 bookmark 時改用 anchor 啟發式自動推斷觸發時刻 | 作者不想寫 bookmark、希望系統自動安排 |
+
+### Template 預設靜/動分類
+
+預設值來自 [`tools/manim_templates/reveal_strategy.py:TEMPLATE_REVEAL_DEFAULTS`](tools/manim_templates/reveal_strategy.py)：
+
+| Template | 預設策略 | 靜態 | 動態 |
+|----------|---------|------|------|
+| `title_bullets` | `all_at_once` | title, bullet_* | — |
+| `section_transition` | `all_at_once` | title, subtitle, rule, upcoming_* | — |
+| `definition_math` | `hybrid` | header, statement, support_* | math_line_* |
+| `theorem_proof` | `hybrid` | header, statement, proof_label | proof_step_*, qed |
+| `example_walkthrough` | `beat_paced` | header | step_*, math_line_*, takeaway |
+| `procedure_steps` | `beat_paced` | header | step_*, equation_* |
+| `graph_focus` | `hybrid` | title, rule, axes, plot_*, label_* | annotation_* |
+| `recap_cards` | `hybrid` | header, point_* | identity_* |
+| `comparison` | `hybrid` | title, rule, left_label, right_label | left_math_*, right_math_* |
+
+`graph_focus` 把 plot/label 設為靜態：圖跟著 axes 一起出現作為視覺背景，narration 提到「here is the parabola」時整張圖已就位；只有 callout（annotation）會等講到才畫。
+
+### Scene 層覆寫
+
+```yaml
+# 一般場景：完全不寫，吃 template 預設
+- scene_id: reflection_intuition
+  template: definition_math
+  voiceover: "..."
+
+# 強制全部一次顯示（適用於只是回顧、不再導出新式子的 definition）
+- scene_id: short_recap
+  template: definition_math
+  reveal_strategy: all_at_once
+
+# 微調靜/動分類：把 math_line_0 從動態提升到靜態
+- scene_id: definition_with_anchor
+  template: definition_math
+  reveal_static: [header, statement, math_line_0]
+  reveal_dynamic: [math_line_1, math_line_2]
+```
+
+### Bookmark 寫法
+
+當你想要動態元素**正好**在某個句子之後出現，在 `voiceover` 字串中插 bookmark：
+
+```yaml
+voiceover: |
+  Given a positive epsilon, start from the expression we need to control.
+  <bookmark mark='math_line_0'/> The absolute value simplifies to four times the distance.
+  <bookmark mark='math_line_1'/> Dividing by four gives a delta candidate.
+```
+
+`mark` 必須對應 reveal element 的 id（`math_line_0`、`step_2`、`takeaway` 等）。Lint 會驗證 mark 是否合法。
+
+### Hybrid Auto 啟發式
+
+`reveal_strategy: hybrid_auto` 在你不想寫 bookmark 時嘗試從 narration 推測動態元素的觸發時刻。原理：
+
+1. 對每個動態元素提取 **anchor token 候選**（例如 `\\[y = x^3 + 2\\]` → `["y = x^3 + 2", "x cubed plus two", "x cubed", ...]`）
+2. 在 narration 中找最早出現的 anchor，按宣告順序單調遞增
+3. 命中位置插入隱式 bookmark
+4. 未命中：均分 narration 剩餘時間（fallback）
+
+對 `ch01_inverse_functions` + `ch01_precise_limit` 的實測命中率約 70%（推導步驟 step_* 達 82.5%、純文字 annotation 約 50%）。命中率回報於 [`artifacts/manim/<deck_id>/auto_reveal_plan.json`](artifacts/manim/)，可審查。命中不到時 fallback 仍提供合理時序，不是渲染失敗。
+
+跑命中率評估：
+```powershell
+python .\artifacts\manim\manim_voiceover_experiment\evaluate_hybrid_auto.py
+```
+
 ## Editing Rules
 
 Use these ownership rules to keep the workflow easy to maintain:
@@ -588,20 +668,6 @@ python .\tools\voice_synthesize_f5.py `
   --manifest artifacts\audio\ch01_inverse_functions_manim\manifest.json `
   --reference-mode clone
 ```
-
-### TTS pronunciation normalization
-
-Both Coqui and F5 pass narration through `tools/tts_pronunciation.py` before synthesis. This layer is intentionally TTS-only: it does not edit storyboard YAML, `narration.md`, or on-screen math.
-
-Current math-symbol pronunciation rules include:
-
-- variable `a` in math contexts becomes `ayyy`, so `x approaches a`, `x minus a`, `f of a`, and `limit at a` are pronounced as a clearly audible letter name instead of the English article
-- English article uses remain unchanged, e.g. `a function`, `a positive delta`, `a specific number`
-- common function letters become `eff`, `gee`, `aitch` in contexts such as `f of x`, `g inverse`, and `h is`
-- limit/threshold letters become `ell`, `em`, `en` for `L`, `M`, `N`
-- `y equals c`-style constants become `C`
-
-Adjust `_VARIABLE_A_TTS` in `tools/tts_pronunciation.py` if the variable-`a` pronunciation is too short or too exaggerated for a chosen voice model, then regenerate TTS audio.
 
 Maintenance rule:
 

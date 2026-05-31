@@ -200,7 +200,11 @@ Output: `artifacts/audio/<DECK_ID>_manim/01_<scene_id>.wav` through `NN_<scene_i
 Play individual WAV files. If a scene sounds wrong, adjust `voiceover` in the YAML, re-export bridge files (repeat 5a), and re-run TTS for that scene with `--max-slides N`.
 Narration-only edits now reuse the cached silent Manim scene video, so you should not need to re-render the visuals unless the scene's visual data changed.
 
-Before synthesis, Coqui and F5 both apply `tools/tts_pronunciation.py`. This TTS-only pass makes math symbols clearer, including variable `a` as `ayyy` in contexts such as `x approaches a`, `x minus a`, `f of a`, and `limit at a`, while leaving article uses such as `a function` unchanged. If the voice model needs a shorter or longer variable-`a` sound, adjust `_VARIABLE_A_TTS` there and regenerate TTS.
+### 5d. Proofread narration with reveal markers
+
+`narration.md` now contains 〔顯示式子〕 / 〔顯示步驟〕 / 〔顯示註記〕 / 〔顯示總結〕 markers wherever the rendered scene will pause for a dynamic reveal. They tell the proofreader exactly where the animation will trigger. **Do not delete or move the markers** — keep your edits to the prose between them. The hidden `<!-- bookmark-marks: ... -->` comment is the sync tool's ground truth; leaving both intact lets `manim_sync_narration_back.py` translate the markers back to `<bookmark .../>` form when writing to YAML.
+
+If you accidentally drop a marker, the sync command refuses to write and prints which scene is inconsistent. Fix the markdown (re-add the missing 〔顯示...〕) and re-run.
 
 ---
 

@@ -28,6 +28,17 @@ from shared_media_paths import DEFAULT_DECK_ID
 from shared_runtime_bootstrap import REPO_ROOT
 from shared_simple_yaml import load_yaml_path
 
+try:
+    from manim_templates.narration_compiler import compile_narration, list_bookmarks
+    from manim_templates.reveal_strategy import (
+        TEMPLATE_REVEAL_DEFAULTS,
+        VALID_STRATEGIES,
+        expand_patterns,
+    )
+    _STRATEGY_AVAILABLE = True
+except ImportError:
+    _STRATEGY_AVAILABLE = False
+
 ERROR = "error"
 WARNING = "warning"
 
@@ -237,6 +248,9 @@ def lint_storyboard(
                     "voiceover_beats pace the template renderer; custom hook animations still run after the template unless the hook handles beats itself",
                 ))
 
+        if _STRATEGY_AVAILABLE:
+            findings.extend(_lint_reveal_strategy(scene, raw_scene, voiceover))
+
         if META_OPENING.match(voiceover):
             findings.append((
                 sid,
@@ -366,6 +380,100 @@ def lint_storyboard(
                             ERROR,
                             f"axes.equal_scale=true but x_length/x_span ({x_unit:.4f}) != y_length/y_span ({y_unit:.4f}); adjust lengths so the ratios match",
                         ))
+
+    return findings
+
+
+def _lint_reveal_strategy(
+    scene: dict[str, Any],
+    raw_scene: dict[str, Any],
+    voiceover: str,
+) -> list[tuple[str, str, str, str]]:
+    """Validate reveal_strategy / reveal_static / reveal_dynamic / bookmark
+    references against the template's reveal contract.
+    """
+    findings: list[tuple[str, str, str, str]] = []
+    sid = scene.get("scene_id", "<unknown>")
+    template = scene.get("template", "")
+
+    explicit_strategy = raw_scene.get("reveal_strategy")
+    if explicit_strategy is not None:
+        if explicit_strategy not in VALID_STRATEGIES:
+            findings.append((
+                sid,
+                "reveal-strategy-invalid",
+                ERROR,
+                f"reveal_strategy '{explicit_strategy}' is not one of {list(VALID_STRATEGIES)}",
+            ))
+
+    valid_reveals = reveal_ids_for_scene(scene)
+
+    static_patterns = raw_scene.get("reveal_static") or []
+    if static_patterns:
+        if not isinstance(static_patterns, list):
+            findings.append((
+                sid,
+                "reveal-static-must-be-list",
+                ERROR,
+                "reveal_static must be a YAML list of element ids or wildcard patterns",
+            ))
+        else:
+            resolved = expand_patterns(static_patterns, valid_reveals)
+            if not resolved and any(not p.endswith("*") for p in static_patterns):
+                # All patterns were exact ids and none matched.
+                findings.append((
+                    sid,
+                    "reveal-static-no-match",
+                    WARNING,
+                    f"reveal_static {static_patterns} does not match any element produced by template '{template}'",
+                ))
+
+    dynamic_patterns = raw_scene.get("reveal_dynamic") or []
+    if dynamic_patterns:
+        if not isinstance(dynamic_patterns, list):
+            findings.append((
+                sid,
+                "reveal-dynamic-must-be-list",
+                ERROR,
+                "reveal_dynamic must be a YAML list of element ids or wildcard patterns",
+            ))
+
+    # Bookmarks declared inline in voiceover must resolve to a dynamic id.
+    narration = compile_narration(scene)
+    inline_marks = set(list_bookmarks(narration))
+    if inline_marks:
+        defaults = TEMPLATE_REVEAL_DEFAULTS.get(template, {})
+        candidate_dynamic = expand_patterns(
+            raw_scene.get("reveal_dynamic") or defaults.get("dynamic", []),
+            valid_reveals,
+        )
+        candidate_dynamic_set = set(candidate_dynamic) | set(valid_reveals)
+        unknown = sorted(m for m in inline_marks if m not in candidate_dynamic_set)
+        if unknown:
+            findings.append((
+                sid,
+                "bookmark-unknown-reveal",
+                ERROR,
+                f"<bookmark mark=...> references id(s) the template will not produce: {unknown[:6]}",
+            ))
+
+    # hybrid_auto sanity: if the strategy is hybrid_auto AND voiceover has no
+    # bookmarks AND the narration is non-trivial, warn that the renderer will
+    # rely on anchor heuristics (whose hit rate the author should sanity-check
+    # via evaluate_hybrid_auto.py).
+    effective_strategy = explicit_strategy or TEMPLATE_REVEAL_DEFAULTS.get(template, {}).get("strategy")
+    if (
+        effective_strategy == "hybrid_auto"
+        and not inline_marks
+        and not scene.get("voiceover_beats")
+        and len((voiceover or "").split()) > 12
+    ):
+        findings.append((
+            sid,
+            "hybrid-auto-no-bookmarks",
+            WARNING,
+            "reveal_strategy=hybrid_auto with no bookmarks: anchor heuristics will run; verify with evaluate_hybrid_auto.py",
+        ))
 
     return findings
 

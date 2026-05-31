@@ -45,6 +45,10 @@ SKIP_DIRS = {
     ".deps_f5",
     ".cache",
     "node_modules",
+    # Frozen gen-0/gen-1 media pipelines, archived verbatim. Their docs keep
+    # original ``tools/<name>.py`` command examples and cross-links that point
+    # at the pre-archive layout; we do not re-lint reference material.
+    "legacy",
 }
 
 # Pattern: ``python tools/X.py`` or ``python .\tools\X.py`` (with either slash).

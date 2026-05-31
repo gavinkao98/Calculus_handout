@@ -132,7 +132,7 @@ Chapter 1 is the **foundations** phase of the course arc. It sets up the two fou
 **Handout self-sufficiency vs. video reinforcement**
 - The handout alone carries every definition, every theorem statement, every worked example, and every strategy box.
 - The companion videos (one per section, currently exemplified by §1.1) add animated reflection-across-$y=x$ demonstrations, animated $\varepsilon$–$\delta$ tubes that the printed page cannot convey, and a slower verbal walkthrough of notation traps.
-- Nothing in the video substitutes for reading the handout — video scenes are marked as reinforcement in [`MANIM_STORYBOARD.md`](MANIM_STORYBOARD.md).
+- Nothing in the video substitutes for reading the handout — video scenes are marked as reinforcement in [`legacy/MANIM_STORYBOARD.md`](legacy/MANIM_STORYBOARD.md).
 
 **Strategy boxes present**
 - finding an inverse function (§1.1).

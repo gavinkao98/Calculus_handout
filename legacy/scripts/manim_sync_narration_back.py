@@ -39,6 +39,17 @@ from manim_storyboard_workflow import normalize_narration_text, voiceover_conten
 from shared_media_paths import manim_narration_path, manim_storyboard_path
 from shared_runtime_bootstrap import REPO_ROOT
 
+try:
+    from manim_templates.narration_markers import (
+        MarkerCountMismatch,
+        has_descriptor_comment,
+        has_markers,
+        parse_marked_narration,
+    )
+    _MARKERS_AVAILABLE = True
+except ImportError:
+    _MARKERS_AVAILABLE = False
+
 
 _SLIDE_HEADER_RE = re.compile(r"^## Slide \d+:\s+.+$")
 _SLIDE_ID_RE = re.compile(r"^Slide ID:\s*`([^`]+)`")
@@ -268,10 +279,24 @@ def main() -> None:
 
     changes: dict[str, str] = {}
     conflicts: list[dict[str, Any]] = []
+    marker_errors: list[tuple[str, str]] = []
     for scene_id, entry in md_narrations.items():
         if scene_id in beat_scene_ids:
             continue
-        new_text = normalize_narration_text(entry["narration"] or "")
+        raw_md = entry["narration"] or ""
+        # Reverse 〔顯示...〕 markers back into <bookmark .../> form before
+        # comparing or writing. If the markers and the hidden descriptor
+        # comment disagree we abort: the proofreader needs to fix one of
+        # the two before sync can proceed safely.
+        if _MARKERS_AVAILABLE and (has_markers(raw_md) or has_descriptor_comment(raw_md)):
+            try:
+                restored = parse_marked_narration(raw_md)
+            except MarkerCountMismatch as exc:
+                marker_errors.append((scene_id, str(exc)))
+                continue
+            new_text = normalize_narration_text(restored)
+        else:
+            new_text = normalize_narration_text(raw_md)
         current_text = current_voiceovers.get(scene_id, "")
         if not new_text:
             print(f"ERROR: narration for scene '{scene_id}' is empty after editing.", file=sys.stderr)
@@ -294,6 +319,13 @@ def main() -> None:
             continue
 
         changes[scene_id] = new_text
+
+    if marker_errors:
+        print("ERROR: narration sync aborted because some scenes have inconsistent reveal markers.", file=sys.stderr)
+        print("Reconcile the 〔顯示...〕 markers and the hidden bookmark-marks comment before re-running.\n", file=sys.stderr)
+        for scene_id, msg in marker_errors:
+            print(f"  [{scene_id}] {msg}", file=sys.stderr)
+        sys.exit(1)
 
     if conflicts and not args.force:
         print("ERROR: narration sync aborted because the storyboard changed after narration.md was exported.", file=sys.stderr)

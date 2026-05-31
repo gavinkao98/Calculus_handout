@@ -80,6 +80,7 @@ def main() -> int:
             args.force,
             args.dry_run,
             audio_timing,
+            audio_dir=audio_dir,
         )
         if not args.dry_run:
             write_render_manifest(storyboard["deck_id"], manifest)
@@ -134,8 +135,15 @@ def render_scenes(
     force: bool,
     dry_run: bool,
     audio_timing: dict[str, dict],
+    audio_dir: Path | None = None,
 ) -> list[Path]:
     rendered_scene_paths: list[Path] = []
+    audio_manifest_path = audio_dir / "manifest.json" if audio_dir else None
+    bookmark_dir = (
+        Path(REPO_ROOT) / "artifacts" / "manim" / storyboard["deck_id"] / "bookmark_timelines"
+        if audio_dir
+        else None
+    )
     for scene in scenes:
         output_path = manim_scene_output_path(
             REPO_ROOT, storyboard["deck_id"], scene["scene_number"], scene["scene_id"]
@@ -162,6 +170,11 @@ def render_scenes(
             rendered_scene_paths.append(output_path)
             continue
 
+        timeline_path = (
+            bookmark_dir / f"{scene['scene_number']:02d}_{scene['scene_id']}.json"
+            if bookmark_dir is not None
+            else None
+        )
         rendered = render_storyboard_scene(
             storyboard_path,
             storyboard,
@@ -169,6 +182,9 @@ def render_scenes(
             output_path,
             quality,
             audio_timing=scene_audio_timing,
+            audio_manifest_path=audio_manifest_path,
+            audio_dir=audio_dir,
+            timeline_path=timeline_path,
         )
         manifest["scenes"][scene["scene_id"]] = {
             "fingerprint": fingerprint,

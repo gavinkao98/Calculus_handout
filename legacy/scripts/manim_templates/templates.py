@@ -101,19 +101,21 @@ def _has_voiceover_beats(spec: dict[str, Any]) -> bool:
     return bool(spec.get("voiceover_beats"))
 
 
+def _should_use_strategy(scene, spec: dict[str, Any]) -> bool:
+    """True iff this scene should drive its reveal via the strategy layer.
+
+    The strategy path is taken whenever (a) the scene was set up with a
+    Manim Voiceover speech service — i.e. final / with-audio render — or
+    (b) the scene has voiceover_beats. Plain preview renders without TTS
+    fall through to the legacy hard-coded animation in each template.
+    """
+    return _scene_has_voiceover(scene) or _has_voiceover_beats(spec)
+
+
 def _estimate_spoken_seconds(text: str) -> float:
     words = re.findall(r"[A-Za-z0-9']+", text)
     # Roughly 150 words per minute, with a small floor for short transition beats.
     return max(len(words) / 2.5, 0.8)
-
-
-def _beat_duration(beat: dict[str, Any], timing_by_id: dict[str, dict[str, Any]]) -> float:
-    exact = timing_by_id.get(beat["id"], {})
-    audio_seconds = exact.get("audio_seconds", beat.get("duration_seconds"))
-    if audio_seconds is None:
-        audio_seconds = _estimate_spoken_seconds(beat["text"])
-    hold_after = exact.get("hold_after_seconds", beat.get("hold_after_seconds", 0.0))
-    return max(float(audio_seconds), 0.0) + max(float(hold_after), 0.0)
 
 
 def _run_voiceover_beats(
@@ -122,19 +124,55 @@ def _run_voiceover_beats(
     ctx: dict[str, Any],
     revealers: dict[str, RevealFn],
 ) -> None:
-    timing_by_id = {
-        beat["id"]: beat
-        for beat in (ctx.get("scene_audio_timing") or {}).get("beats", [])
-        if isinstance(beat, dict) and beat.get("id")
-    }
+    """Drive scene reveal via the strategy layer.
+
+    Two paths:
+
+    - Final / with-audio render: the scene is a BookmarkBeatScene with a
+      Manim Voiceover speech service set, so the strategy plays the WAV
+      timeline (via bookmarks or even time-slicing) and the renderer
+      records the bookmark trigger times for the downstream mux step.
+
+    - Preview render without TTS: the strategy machinery would block on
+      `self.voiceover(...)` because there is no speech service. We fall
+      back to a lightweight estimate-driven sequence so authors can scrub
+      a beat-paced storyboard without first running the TTS bridge.
+    """
+    if _scene_has_voiceover(scene):
+        from .reveal_strategy import (
+            get_strategy,
+            resolve_static_dynamic,
+            resolve_strategy_name,
+        )
+        from .narration_compiler import compile_narration
+
+        narration = compile_narration(spec)
+        static_ids, dynamic_ids = resolve_static_dynamic(
+            spec, spec["template"], revealers
+        )
+        strategy = get_strategy(resolve_strategy_name(spec, spec["template"]))
+        strategy.render(
+            scene,
+            spec,
+            ctx,
+            revealers,
+            narration,
+            static_ids,
+            dynamic_ids,
+        )
+        return
+
+    # Preview-mode fallback: no TTS, no speech service. Reveal beat
+    # elements in declared order, holding for a word-count estimate so the
+    # scrubbing experience approximates the final render.
     revealed: set[str] = set()
     lead_in = float(spec.get("timing", {}).get("lead_in_seconds", 0.0))
     if lead_in > 0:
         scene.wait(lead_in)
 
-    for beat in spec.get("voiceover_beats", []):
+    for beat in spec.get("voiceover_beats", []) or []:
         consumed = 0.0
-        for element_id in beat.get("reveal", []):
+        for element_id in beat.get("reveal", []) or []:
             if element_id in revealed:
                 continue
             reveal = revealers.get(element_id)
@@ -142,12 +180,17 @@ def _run_voiceover_beats(
                 raise ValueError(
                     f"Scene '{spec['scene_id']}' beat '{beat['id']}' references unknown reveal element '{element_id}'."
                 )
-            consumed += max(float(reveal()), 0.0)
+            consumed += max(float(reveal() or 0.0), 0.0)
             revealed.add(element_id)
             revealed.update(getattr(reveal, "_reveals", set()))
-        wait_time = _beat_duration(beat, timing_by_id) - consumed
+        wait_time = _estimate_spoken_seconds(beat["text"]) - consumed
         if wait_time > 0:
             scene.wait(wait_time)
+
+
+def _scene_has_voiceover(scene) -> bool:
+    """True iff the scene was set up with a Manim Voiceover speech service."""
+    return hasattr(scene, "speech_service") and hasattr(scene, "voiceover")
 
 
 def _play_fade_in(scene, mob, *, shift=None, run_time: float = 0.4) -> float:
@@ -320,7 +363,7 @@ def render_title_bullets(scene, spec: dict[str, Any], ctx: dict[str, Any]) -> No
     group = VGroup(*bullets).arrange(DOWN, aligned_edge=LEFT, buff=0.4)
     lay.place_primary(group, title, buff=0.7)
 
-    if _has_voiceover_beats(spec):
+    if _should_use_strategy(scene, spec):
         revealers: dict[str, RevealFn] = {
             "title": lambda: _play_fade_in(scene, title, shift=0.15 * DOWN, run_time=0.5),
         }
@@ -397,7 +440,7 @@ def render_definition_math(scene, spec: dict[str, Any], ctx: dict[str, Any]) -> 
         support_group.align_to(stmt, LEFT)
 
     # ── Animate ──
-    if _has_voiceover_beats(spec):
+    if _should_use_strategy(scene, spec):
         revealers: dict[str, RevealFn] = {
             "title": lambda: _play_fade_in(scene, title, shift=0.15 * DOWN, run_time=0.5),
             "label": lambda: _play_fade_in(scene, lbl, shift=0.08 * LEFT, run_time=0.3),
@@ -509,7 +552,7 @@ def render_example_walkthrough(scene, spec: dict[str, Any], ctx: dict[str, Any])
     takeaway.align_to([lay.left_edge + 0.3, 0, 0], LEFT)
 
     # ── Animate ──
-    if _has_voiceover_beats(spec):
+    if _should_use_strategy(scene, spec):
         state = {"active_step": None, "active_math": None}
         decay_previous = data.get("decay_previous", True)
 
@@ -745,7 +788,7 @@ def render_graph_focus(scene, spec: dict[str, Any], ctx: dict[str, Any]) -> None
         _clamp_to_frame(ann_group)
 
     # ── Animate ──
-    if _has_voiceover_beats(spec):
+    if _should_use_strategy(scene, spec):
         revealers: dict[str, RevealFn] = {
             "title": lambda: _play_fade_in(scene, title, shift=0.15 * DOWN, run_time=0.5),
             "axes": lambda: _play_create(scene, axes, run_time=0.8),
@@ -844,7 +887,7 @@ def render_procedure_steps(scene, spec: dict[str, Any], ctx: dict[str, Any]) -> 
         eq_group.align_to(step_group, LEFT)
 
     # ── Animate ──
-    if _has_voiceover_beats(spec):
+    if _should_use_strategy(scene, spec):
         revealers: dict[str, RevealFn] = {
             "title": lambda: _play_fade_in(scene, title, shift=0.15 * DOWN, run_time=0.5),
             "rule": lambda: _play_create(scene, rule, run_time=quick),
@@ -924,7 +967,7 @@ def render_recap_cards(scene, spec: dict[str, Any], ctx: dict[str, Any]) -> None
         id_group.next_to(pts_group, DOWN, buff=0.5)
 
     # ── Animate ──
-    if _has_voiceover_beats(spec):
+    if _should_use_strategy(scene, spec):
         revealers: dict[str, RevealFn] = {
             "title": lambda: _play_fade_in(scene, title, shift=0.15 * DOWN, run_time=0.5),
             "rule": lambda: _play_create(scene, rule, run_time=0.3),
@@ -1006,7 +1049,7 @@ def render_section_transition(scene, spec: dict[str, Any], ctx: dict[str, Any]) 
         ug.next_to(ref, DOWN, buff=0.5)
 
     # ── Animate ──
-    if _has_voiceover_beats(spec):
+    if _should_use_strategy(scene, spec):
         revealers: dict[str, RevealFn] = {
             "title": lambda: _play_fade_in(scene, title, shift=0.12 * DOWN, run_time=0.6),
             "rule": lambda: _play_create(scene, rule, run_time=0.3),
@@ -1094,7 +1137,7 @@ def render_theorem_proof(scene, spec: dict[str, Any], ctx: dict[str, Any]) -> No
         qed.align_to(pg, RIGHT)
 
     # ── Animate ──
-    if _has_voiceover_beats(spec):
+    if _should_use_strategy(scene, spec):
         revealers: dict[str, RevealFn] = {
             "title": lambda: _play_fade_in(scene, title, shift=0.15 * DOWN, run_time=0.5),
             "label": lambda: _play_fade_in(scene, lbl, shift=0.08 * LEFT, run_time=0.3),
@@ -1188,7 +1231,7 @@ def render_comparison(scene, spec: dict[str, Any], ctx: dict[str, Any]) -> None:
     pair = VGroup(left_col, divider, right_col).arrange(RIGHT, buff=0.8)
     pair.next_to(rule, DOWN, buff=0.55)
 
-    if _has_voiceover_beats(spec):
+    if _should_use_strategy(scene, spec):
         revealers: dict[str, RevealFn] = {
             "title": lambda: _play_fade_in(scene, title, shift=0.15 * DOWN, run_time=0.5),
             "rule": lambda: _play_create(scene, rule, run_time=0.3),

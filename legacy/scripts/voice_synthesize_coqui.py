@@ -14,7 +14,6 @@ from shared_media_paths import (
 )
 from shared_runtime_bootstrap import REPO_ROOT, bootstrap_repo_deps, ensure_directory, require_path
 from slides_script_workflow import final_script_path, load_slide_scripts
-from tts_pronunciation import normalize_tts_pronunciation
 
 bootstrap_repo_deps()
 
@@ -92,7 +91,7 @@ def model_needs_coqui_tos(model_name: str) -> bool:
 
 
 def normalize_script(text: str) -> str:
-    return normalize_tts_pronunciation(text)
+    return re.sub(r"\s+", " ", text).strip()
 
 
 def split_long_clause(clause: str, max_chars: int) -> list[str]:
@@ -219,10 +218,9 @@ def synthesize_slide_beats(
     timeline = 0.0
 
     for beat_index, beat in enumerate(beats, start=1):
-        tts_text = normalize_script(beat["text"])
         audio, current_sample_rate, chunks = synthesize_chunks(
             api=api,
-            text=tts_text,
+            text=beat["text"],
             split_sentences=split_sentences,
             max_chars_per_chunk=max_chars_per_chunk,
             inter_chunk_pause_ms=inter_chunk_pause_ms,
@@ -246,7 +244,6 @@ def synthesize_slide_beats(
             {
                 "id": beat["id"],
                 "text": beat["text"],
-                "tts_text": tts_text,
                 "reveal": beat.get("reveal", []),
                 "audio_file": str(beat_wav),
                 "audio_seconds": round(beat_audio_seconds, 3),
@@ -353,10 +350,9 @@ def main() -> int:
             )
             chunks = [chunk for beat in beat_manifest for chunk in beat["chunks"]]
         else:
-            script_text = normalize_script(text)
             audio, sample_rate, chunks = synthesize_chunks(
                 api=api,
-                text=script_text,
+                text=text,
                 split_sentences=args.split_sentences,
                 max_chars_per_chunk=args.max_chars_per_chunk,
                 inter_chunk_pause_ms=args.inter_chunk_pause_ms,

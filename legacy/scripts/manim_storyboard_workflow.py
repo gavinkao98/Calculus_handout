@@ -795,6 +795,13 @@ def voiceover_content_hash(text: str) -> str:
 
 
 def render_storyboard_script_markdown(storyboard: dict[str, Any], storyboard_path: Path) -> str:
+    try:
+        from manim_templates.narration_compiler import compile_narration as _compile_narration
+        from manim_templates.narration_markers import render_marked_narration
+    except ImportError:
+        _compile_narration = None
+        render_marked_narration = None  # type: ignore
+
     sections = [
         f"# {storyboard['deck_id']} Final Narration",
         "",
@@ -802,8 +809,9 @@ def render_storyboard_script_markdown(storyboard: dict[str, Any], storyboard_pat
         f"Deck ID: `{storyboard['deck_id']}`",
         "",
         "You may edit the narration text below each **Narration:** heading.",
+        "Inline 〔顯示...〕 markers correspond to dynamic reveal elements — please leave them and the hidden bookmark-marks comment in place; the sync tool relies on them to restore bookmark positions.",
         "For scenes with **Voiceover Beats**, edit the beat text/reveal map in the storyboard YAML; the joined beat text is exported here for proofreading.",
-        "Do NOT change the hidden hash comment lines either — they are used for stale-file conflict detection.",
+        "Do NOT change the hidden hash comment lines — they are used for stale-file conflict detection.",
         "Do NOT change the Slide ID lines — they are used to match edits back to the correct scene.",
         "After editing, run `python tools/manim_sync_narration_back.py --deck-id "
         + storyboard["deck_id"]
@@ -811,6 +819,13 @@ def render_storyboard_script_markdown(storyboard: dict[str, Any], storyboard_pat
         "",
     ]
     for scene in enabled_scenes(storyboard):
+        if _compile_narration is not None and render_marked_narration is not None:
+            compiled = _compile_narration(scene)
+            display_narration = (
+                render_marked_narration(compiled) if compiled else normalize_narration_text(scene["voiceover"])
+            )
+        else:
+            display_narration = normalize_narration_text(scene["voiceover"])
         sections.extend(
             [
                 f"## Slide {scene['scene_number']}: {scene['title']}",
@@ -821,7 +836,7 @@ def render_storyboard_script_markdown(storyboard: dict[str, Any], storyboard_pat
                 "",
                 "Narration:",
                 "",
-                normalize_narration_text(scene["voiceover"]),
+                display_narration,
                 "",
             ]
         )

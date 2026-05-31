@@ -1,247 +1,257 @@
-# Calculus Handout Project
+# 微積分講義專案
 
-A single-sided A4 **calculus handout** for high-school students self-studying toward college calculus, paired with companion teaching videos. The handout is self-sufficient; the video is reinforcement.
+一份單面 A4 的**微積分講義**，供準備銜接大學微積分的高中生自學使用，並搭配輔助教學影片。講義本身自給自足；影片是強化補充。
 
-This file is the **repository hub**. It is authoritative for repo layout, preamble structure, and build instructions. Content-authoring rules and media-pipeline rules live in their own files, linked below.
-
----
-
-## Start here
-
-Pick the task you have, open the linked file.
-
-- **Writing or revising a chapter.** Start with [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md). Fall back to [`CONTENT_SPEC.md`](CONTENT_SPEC.md) when the quickstart does not answer your question. Check [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) before starting a new chapter.
-- **Producing a video** (primary path — Manim animations). Start with [`MANIM_CHECKLIST.md`](MANIM_CHECKLIST.md) for step-by-step, then [`MANIM_STORYBOARD.md`](MANIM_STORYBOARD.md) for how to translate a finalised section into a YAML storyboard, and [`MANIM_REFERENCE.md`](MANIM_REFERENCE.md) for templates, field contracts, and render commands.
-- **Static-slide MP4** (frozen legacy path). Use [`LEGACY_SLIDE_PIPELINE.md`](LEGACY_SLIDE_PIPELINE.md). No new development on this path — use Manim for new work.
-- **Designing end-of-section exercises.** [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md) (minimum skeleton until the full design round opens).
+本檔案是**儲存庫樞紐（repository hub）**。它對儲存庫結構、preamble 結構與建置指令具有權威性。內容撰寫規則與媒體產線規則各自獨立成檔，連結列於下方。
 
 ---
 
-## Authoring workflow
+## 從這裡開始
 
-Chapters originate as **manuscripts written by different teachers** who have split the book between them. Claude interacts with those manuscripts in three distinct modes; the rules differ by mode. Get the mode right before acting.
+依你手上的任務，開啟對應的連結檔案。
 
-The modes form a small state machine, not a fixed pipeline:
+- **撰寫或修訂章節。** 先看 [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)。當快速指南無法回答你的問題時，再回頭查 [`CONTENT_SPEC.md`](CONTENT_SPEC.md)。開始新的一章前，先看 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)。
+- **製作影片**（目前的主要路徑：第二代 Manim 產線）。先看 [`video/README.md`](video/README.md)，再看 [`video/DESIGN.md`](video/DESIGN.md) 了解分鏡契約與目前的模板決策。較舊的 `MANIM_*` 文件已封存於 [`legacy/`](legacy/)，保留作為第一代參考資料。
+- **靜態投影片 MP4**（已凍結的舊路徑）。使用 [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md)。此路徑不再有新開發——新工作請改用 Manim。
+- **設計章末習題。** [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md)（在完整設計回合開始前，僅為最小骨架）。
 
-- **New manuscript arrives.** Run **Mode A** (drafting). Mode A produces a textbook draft from the manuscript and closes with an amplification audit.
-- **Mode A draft, before user sign-off.** **Mode B** (curation review) may run as a ready-for-review audit on the draft.
-- **Sign-off complete; chapter committed to `main`.** No further mode runs without an explicit user invocation.
-- **An already-signed-off chapter needs more depth.** Run **Mode C** (enrichment pass). Mode C only adds, never restructures.
-- **After Mode C.** **Mode B must run**, scoped to the new `[pass: enrichment]` markers Mode C produced.
+---
 
-In short: A drafts, C enriches an existing draft, B audits — B is the only mode that runs as a follow-up to another mode. The valid transitions are A → (optional B) → sign-off → (optional C → required B) → ….
+## 撰稿工作流程
 
-### Mode A — Manuscript-to-textbook drafting (Claude converts a new manuscript to LaTeX)
+各章源自**由不同老師撰寫的手稿**，他們彼此分工分攤了整本書。Claude 以三種不同的模式與這些手稿互動；規則因模式而異。動手前先確認模式正確。
 
-Use this mode when the user forwards a manuscript and asks Claude to produce a chapter file. Claude's role:
+這些模式構成一個小型狀態機，而非固定管線：
 
-1. Receive the manuscript from the user.
-2. Convert it into project-compliant LaTeX at `chapters/chNN_<slug>.tex`, following [`CONTENT_SPEC.md`](CONTENT_SPEC.md) and [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md).
-3. Expand around the manuscript where completeness or the Stewart / Rogawski self-study register benefits from it. The expansion policy below describes what kinds of additions are in-policy and how they must be marked.
-4. Update [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) to reflect what the manuscript actually decided, replacing any pre-manuscript working-hypothesis entries.
+- **新手稿送達。** 執行 **Mode A**（草擬）。Mode A 從手稿產出一份教科書草稿，並以一次擴增稽核（amplification audit）作結。
+- **Mode A 草稿，使用者簽核前。** **Mode B**（審訂審查）可作為一次「待審」稽核在草稿上執行。
+- **簽核完成；章節提交至 `main`。** 在沒有使用者明確呼叫的情況下，不再執行任何模式。
+- **一個已簽核的章節需要更多深度。** 執行 **Mode C**（充實增補回合）。Mode C 只增添，絕不重構。
+- **Mode C 之後。** **Mode B 必須執行**，範圍限定於 Mode C 所產生的新 `[pass: enrichment]` 標記。
 
-#### The manuscript is the main axis
+簡言之：A 草擬，C 對既有草稿做充實，B 稽核——B 是唯一作為另一模式後續而執行的模式。有效的轉移路徑為 A →（可選 B）→ 簽核 →（可選 C → 必要 B）→ ……。
 
-Every manuscript topic, example, remark, proof, and figure idea appears in the chapter in the order the manuscript presents them, rewritten into project-compliant LaTeX. Claude does **not** skip manuscript content, does **not** reorder it without reason, and does **not** rewrite its mathematical substance. Expansions wrap around manuscript content; they never replace it.
+### Mode A — 手稿轉教科書草擬（Claude 將新手稿轉成 LaTeX）
 
-If a reorder or structural regroup is genuinely useful, record it in the chapter's roadmap entry under *Open questions* so the user can sign off during review.
+當使用者轉來一份手稿並要求 Claude 產出章節檔時，使用此模式。Claude 的職責：
 
-#### Expansion policy — liberal in scope, visible by marker
+1. 自使用者處接收手稿。
+2. 依 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 與 [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)，將其轉成符合專案規範的 LaTeX，置於 `chapters/chNN_<slug>.tex`。
+3. 在完整性或 Stewart／Rogawski 自學語域有助益之處，圍繞手稿加以擴充。下方的擴充政策說明哪些增添屬於政策範圍內，以及必須如何標記。
+4. 更新 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) 以反映手稿實際的決定，取代任何手稿到達前的暫定工作假設條目。
 
-Claude may expand around the manuscript without pre-authorisation, on the condition that **every expansion is marked** in the LaTeX source so post-hoc review is tractable. The marker takes the form
+#### 手稿是主軸
+
+每一個手稿主題、範例、註解、證明與圖示構想，都依手稿呈現的順序出現在章節中，並改寫為符合專案規範的 LaTeX。Claude **不**跳過手稿內容，**不**無故重排其順序，也**不**改寫其數學實質。擴充內容包裹在手稿內容之外；絕不取代手稿內容。
+
+若某個重排或結構重組確實有用，請記錄在該章 roadmap 條目的 *Open questions* 之下，讓使用者可於審查時簽核。
+
+#### 擴充政策——範圍寬鬆，但以標記呈現
+
+Claude 可在未事先授權的情況下圍繞手稿擴充，條件是 LaTeX 原始碼中**每一處擴充都加上標記**，使事後審查可行。標記的形式為
 
 ```latex
 % expansion:<category> [pass: <pass-id>] [source: <brief source>] — <one-line description>
 ```
 
-placed on the line immediately preceding the expansion content. The bracket hints are optional individually but obey strict rules when present:
+置於擴充內容緊接的前一行。方括號提示各自為選用，但出現時須遵守嚴格規則：
 
-- `<category>` is required and must be drawn from the table below.
-- `[pass: <pass-id>]` identifies which mode-pass introduced the expansion. Omit it in Mode A — an `% expansion:` marker without a `[pass: ...]` hint is taken to be original Mode A drafting (the marker itself is still required, only the `[pass: ...]` hint is optional). **Required** for Mode C, with the literal value `[pass: enrichment]`, so post-hoc review can distinguish original drafting from later enrichment.
-- `[source: <brief source>]` cites the reference an expansion draws on. Optional in general; **required** for `history`-category named content per the Named-content rule below, and recommended for any expansion whose accuracy depends on a specific reference.
-- When both hints are present, **`[pass: ...]` precedes `[source: ...]`**. The order is fixed so `book_style_lint` can detect malformed markers; markers in the wrong order are a lint error.
-- Unknown bracket keys are a lint error — only `pass` and `source` are recognised. A typo like `[soure: …]` would otherwise silently strip the hint from review.
+- `<category>` 為必填，且須取自下方表格。
+- `[pass: <pass-id>]` 標示是哪一個模式回合引入了該擴充。在 Mode A 中省略它——沒有 `[pass: ...]` 提示的 `% expansion:` 標記，視為 Mode A 原始草擬（標記本身仍為必要，只有 `[pass: ...]` 提示是選用）。在 Mode C 中**必填**，值固定為 `[pass: enrichment]`，使事後審查能區分原始草擬與後續充實。
+- `[source: <brief source>]` 註明擴充所依據的參考來源。一般情況下選用；依下方「具名內容」規則，`history` 類具名內容**必填**，且任何正確性取決於特定參考的擴充均建議填寫。
+- 當兩個提示同時存在時，**`[pass: ...]` 在 `[source: ...]` 之前**。順序固定，使 `book_style_lint` 能偵測格式錯誤的標記；順序錯誤的標記為 lint 錯誤。
+- 未知的方括號鍵為 lint 錯誤——僅 `pass` 與 `source` 被承認。像 `[soure: …]` 這樣的錯字，否則會悄悄使該提示在審查中被剝除。
 
-Recognised categories (the `book_style_lint` check enforces this list):
+承認的類別（`book_style_lint` 檢查會強制此清單）：
 
-| Category | Purpose |
+| 類別 | 用途 |
 |---|---|
-| `history` | math-history context: how the concept was developed, why the notation was chosen |
-| `application` | real-world connection: physics, economics, geometry, engineering tie-in |
-| `formula` | derived identity / corollary that follows from what the manuscript proved or defined |
-| `summary` | synthesis paragraph tying a block of examples or a proof back together |
-| `figure` | figure idea the manuscript implies via prose but does not draw |
-| `example` | supplementary `workedexample` illustrating a technique the manuscript introduced |
-| `intuition` | motivation paragraph before a formal statement, or an *Informally, ...* gloss |
-| `strategy` | `strategy` box distilling a method shared by multiple manuscript examples |
-| `caution` | `caution` box for subtle restrictions, notation traps, or common errors |
+| `history` | 數學史脈絡：概念如何發展、為何選用該記號 |
+| `application` | 真實世界連結：物理、經濟、幾何、工程的關聯 |
+| `formula` | 由手稿已證明或定義者推得的衍生恆等式／系理 |
+| `summary` | 將一組範例或一個證明收束在一起的綜合段落 |
+| `figure` | 手稿以文字暗示但未繪出的圖示構想 |
+| `example` | 闡明手稿所引入技巧的補充 `workedexample` |
+| `intuition` | 形式陳述前的動機段落，或一段 *Informally, ...* 的白話注解 |
+| `strategy` | 提煉多個手稿範例共用方法的 `strategy` 方塊 |
+| `caution` | 針對微妙限制、記號陷阱或常見錯誤的 `caution` 方塊 |
 
-The category list is intentionally small; when a durable new type appears, grow this table in the same commit that introduces the first marker of the new category, and the lint will accept it going forward.
+此類別清單刻意精簡；當出現一個值得長存的新類型時，在引入該新類別第一個標記的同一次提交中擴充此表，lint 便會自此接受它。
 
-Post-hoc review then becomes
+事後審查於是變成
 
 ```powershell
 grep "^% expansion:" chapters/chNN_*.tex
 ```
 
-— the user sees every non-manuscript addition at a glance and decides *keep*, *rewrite*, or *remove* per marker, without having to diff the full chapter against the manuscript.
+——使用者一眼看盡每一處非手稿的增添，逐一標記決定*保留*、*改寫*或*移除*，無須將整章與手稿全文比對。
 
-#### Named-content: mark with a source, do not self-censor
+#### 具名內容：標上來源，不要自我審查
 
-Named content — specific historical figures, dates, centuries, proper-name attributions, named results — is **permitted** in drafting mode. The user has indicated they will manually verify names and dates during post-hoc review, so Claude's job is to include the content when it fits the Stewart / Rogawski register and to mark a source (or the nearest standard reference) so review is efficient.
+具名內容——特定歷史人物、日期、世紀、專名歸屬、具名結果——在草擬模式中是**允許的**。使用者已表明會在事後審查時手動查核姓名與日期，因此 Claude 的工作是在內容契合 Stewart／Rogawski 語域時納入它，並標上來源（或最接近的標準參考），使審查有效率。
 
-Pattern:
+格式：
 
 ```latex
 % expansion:history [source: <specific source OR "standard calculus-textbook historical note">] — <description>
 ```
 
-- If Claude can identify a specific source (e.g. *Stewart 8e §2.4 historical note*, *Rogawski 4e Ch 2*, *Wikipedia "History of calculus"*), cite it in the marker. That lets the user verify against one place rather than guessing.
-- If the content is a common textbook-register passage that most calculus books share — the Newton / Leibniz origin, the nineteenth-century ε-δ resolution, Archimedes and the method of exhaustion — use `[source: standard calculus-textbook historical note]` with a short description of what Claude drew on. The user treats this as *"I will check the claim is non-controversial"* rather than *"I will look up one specific page."*
-- **Direct quotations** still require a specific source. Quoting a mathematician verbatim is the highest-risk subclass; if no specific source is available, paraphrase instead of quote.
+- 若 Claude 能指出特定來源（例如 *Stewart 8e §2.4 historical note*、*Rogawski 4e Ch 2*、*Wikipedia "History of calculus"*），就在標記中引用它。這讓使用者能對照單一處查核，而非猜測。
+- 若內容是多數微積分書共有的常見教科書語域段落——牛頓／萊布尼茲的起源、十九世紀 ε-δ 的釐清、阿基米德與窮竭法——使用 `[source: standard calculus-textbook historical note]`，並簡述 Claude 所依據的內容。使用者會將此視為*「我會確認該主張並無爭議」*，而非*「我會去查某一特定頁面」*。
+- **直接引文**仍需特定來源。逐字引用一位數學家是風險最高的子類；若無特定來源可用，請改用釋義而非引文。
 
-The spirit: Claude should err toward **including** pedagogically helpful named content rather than self-censoring to be safe. The marker makes the content reviewable; the source tag makes review efficient. Self-censorship produces thin chapters; over-inclusion produces chapters the user quickly trims at review. The cost of the first is much higher than the cost of the second.
+精神：Claude 應傾向**納入**對教學有益的具名內容，而非為求保險而自我審查。標記使內容可被審查；來源標籤使審查有效率。自我審查產出單薄的章節；過度納入產出使用者在審查時能快速修剪的章節。前者的代價遠高於後者。
 
-#### Expansion density calibration
+#### 擴充密度的校準
 
-The correct density target is **Stewart / Rogawski self-study textbook**, not minimalist manuscript translation. Concretely that means:
+正確的密度目標是 **Stewart／Rogawski 自學教科書**，而非極簡的手稿翻譯。具體而言：
 
-- multiple `example` expansions per major technique are welcome when they illustrate different angles;
-- synthesis prose (connecting paragraphs, summarising conclusions, pulling threads together) should be generous, not sparse;
-- historical openings, applied tie-ins, and intuitive framing for the opening of each section are the default, not the exception;
-- `strategy` and `caution` boxes for standard pitfalls are part of the house voice.
+- 當多個 `example` 擴充能從不同角度闡明同一主要技巧時，是受歡迎的；
+- 綜合性的散文（連接段落、總結結論、收束各條線索）應慷慨而非稀疏；
+- 每一節開頭的歷史開場、應用關聯與直覺鋪陳是預設，而非例外；
+- 針對標準陷阱的 `strategy` 與 `caution` 方塊是本書語氣的一部分。
 
-The committed Chapter 1 before the fresh Mode A pass (commit `f701c02`) is a useful density reference — that draft, written by the user, shows the intended richness. When in doubt, Claude should lean toward more expansion (with markers) rather than less. Under-expansion is harder to fix after the fact than over-expansion, because users can always delete a marked expansion during review but rarely write additional expansion during review.
+在這次全新 Mode A 回合之前所提交的第一章（提交 `f701c02`）是有用的密度參考——那份由使用者撰寫的草稿，展現了所欲達到的豐富度。拿不準時，Claude 應傾向更多擴充（帶標記）而非更少。擴充不足比擴充過度更難事後補救，因為使用者在審查時隨時能刪除一處帶標記的擴充，卻鮮少在審查時親自補寫擴充。
 
-#### Volumetric sanity check (soft, not enforced)
+#### 體量合理性檢查（軟性，不強制）
 
-No hard rule on expansion-to-manuscript ratio, just a self-check: if a section's `% expansion:` markers dominate to the point where the manuscript content is hard to find amid the expansions, something has drifted. Flag it in the chapter's roadmap *Open questions* so the ratio can be reviewed during sign-off. Otherwise, amplify freely.
+擴充對手稿的比例沒有硬性規定，只做一次自我檢查：若某一節的 `% expansion:` 標記多到使手稿內容淹沒在擴充之中、難以辨識，那就是某處飄移了。在該章 roadmap 的 *Open questions* 中標註，以便於簽核時檢視比例。否則，自由擴充。
 
-#### Non-repetition rule: different depth, different framing
+#### 不重複規則：不同深度、不同切入
 
-Pedagogical repetition (a key concept returning at chapter open, section open, and Summary) is fine and often helpful — but **only if each resurface is at a different depth or with a different frame**. The same-depth rehash is what produces the "didn't we just read this?" feeling. Four concrete mechanisms keep expansions from stepping on each other:
+教學性的重複（一個關鍵概念在章首、節首與總結再度出現）是無妨的、且常有助益——但**唯有當每次再現都處於不同深度或以不同切入呈現時**。同深度的炒冷飯才是製造「我們剛剛不是讀過這個？」感受的元兇。四個具體機制可避免擴充彼此踩線：
 
-1. **Per-category role clauses.** Each expansion category has a narrow job and explicitly avoids the jobs of neighboring categories:
-   - **Chapter overview** (`intuition`): describes the chapter's arc — which two or three themes it develops and how they connect. Does **not** predict what each section will teach; that is the job of the learning-outcomes list and of each section's own opener.
-   - **Learning outcomes** (`summary`): a verb-first bullet list of operational skills (*decide*, *compute*, *apply*). Does **not** explain the concepts or give their motivation; that is the body's job.
-   - **Section opener** (`intuition` or `application`): motivates *this* section specifically, including how it builds on the previous section. Does **not** restate the chapter overview, and does **not** list what the next section will cover.
-   - **Informally gloss** (`intuition`, inside a `definition`): one vernacular sentence. Does **not** become a motivation paragraph, an example, or a preview of the surrounding theorem.
-   - **Strategy box** (`strategy`): distils a method already demonstrated by two or more worked examples in the same section. Does **not** repeat the worked examples' prose; it names the steps.
-   - **Caution** (`caution`): one specific trap or subtle restriction. Does **not** restate the definition or theorem it attaches to; readers still have those nearby.
-   - **Summary** (`summary`, chapter end): one-line reminders per item (a definition by its one-clause essence, a theorem by its condition-and-conclusion, a formula as the bare identity). Does **not** reprove, re-derive, or re-motivate.
+1. **各類別的角色條款。** 每個擴充類別都有狹窄的職責，並明確迴避鄰近類別的職責：
+   - **章節總覽**（`intuition`）：描述本章的脈絡——它發展哪兩三個主題、它們如何連結。**不**預告每一節將教什麼；那是學習成果清單與每節自己開場的職責。
+   - **學習成果**（`summary`）：以動詞起首的可操作技能項目清單（*判斷*、*計算*、*應用*）。**不**解釋概念或給出其動機；那是內文的職責。
+   - **節首開場**（`intuition` 或 `application`）：專為*這一*節做動機鋪陳，包括它如何承接上一節。**不**重述章節總覽，也**不**列出下一節將涵蓋什麼。
+   - **Informally 白話注解**（`intuition`，置於 `definition` 內）：一句白話。**不**膨脹成動機段落、範例，或周圍定理的預告。
+   - **Strategy 方塊**（`strategy`）：提煉同一節中已由兩個以上 worked example 示範過的方法。**不**重述 worked example 的散文；它只點出步驟。
+   - **Caution**（`caution`）：一個特定陷阱或微妙限制。**不**重述它所附著的定義或定理；讀者就近仍有那些內容。
+   - **總結**（`summary`，章末）：每個項目一行提醒（定義以其一句精要、定理以其條件與結論、公式以其裸恆等式）。**不**重新證明、重新推導或重新鋪陳動機。
 
-2. **Point, don't repeat.** When a concept introduced earlier returns, use an explicit cross-reference (`\cref{sec:foo}`, *"as introduced in §1.3, the limit of..."*) rather than restating the content. A cross-reference is honest: it signals "we have this, here is where." A restatement is dishonest: it pretends the concept is new.
+2. **指向，不重述。** 當較早引入的概念再度出現時，使用明確的交叉參照（`\cref{sec:foo}`、*「如 §1.3 所介紹，……的極限」*）而非重述內容。交叉參照是誠實的：它表明「我們有這個，它在這裡」。重述是不誠實的：它假裝該概念是新的。
 
-3. **Depth-layered resurfacing.** The same concept may appear three times (chapter open, section open, Summary) if each appearance is at a different depth:
-   - chapter open: one sentence placing the concept in the arc;
-   - section open: one paragraph on why this section sharpens the concept;
-   - Summary: one-line reminder.
-   Three occurrences at the same depth = repetition; three at different depths = spiral review.
+3. **深度分層的再現。** 同一概念可出現三次（章首、節首、總結），條件是每次出現處於不同深度：
+   - 章首：一句話將概念安置於脈絡之中；
+   - 節首：一段說明本節為何使概念更加精確；
+   - 總結：一行提醒。
+   同深度出現三次＝重複；不同深度出現三次＝螺旋複習。
 
-4. **Drafting-end self-check.** After the chapter is drafted, scan the first sentence after each `% expansion:` marker in order. If any two consecutive expansions open with the same claim or concept, collapse one into a cross-reference. In particular, scan chapter overview against §1 opener, each section opener against the previous section's closing, and Summary items against learning outcomes — those are the three places where same-depth rehash most often slips in.
+4. **草擬收尾的自我檢查。** 章節草擬完成後，依序掃描每一個 `% expansion:` 標記後的第一句。若任兩個連續擴充以相同的主張或概念開頭，將其一收束為交叉參照。特別要掃描章節總覽對 §1 開場、各節開場對前一節結尾、總結項目對學習成果——那是三處最常溜進同深度炒冷飯的地方。
 
-If an expansion does not have a job that the other expansions are not already doing, it should either be rewritten to carve out a distinct role or deleted.
+若一處擴充並沒有其他擴充尚未在做的職責，它就應該被改寫以劃出獨特角色，或被刪除。
 
-#### Mode A closes with an amplification audit
+#### Mode A 以一次擴增稽核作結
 
-A Mode A pass is not finished when the manuscript has been converted into LaTeX. Before handing the chapter back, Claude walks each section against the per-section checklist below and, for every item that is not satisfied, **either fills the gap or records the deliberate omission in the chapter's roadmap entry under *Open questions***. This audit is what turns a typeset manuscript into a textbook draft; without it, the density-calibration target above is aspirational rather than enforced.
+Mode A 回合並非在手稿轉成 LaTeX 後就算完成。在把章節交回之前，Claude 依下方的逐節檢查表逐節走查，並對每一個未滿足的項目，**要不補上缺口，要不在該章 roadmap 條目的 *Open questions* 中記錄這個刻意的省略**。這次稽核正是把一份排版好的手稿變成一份教科書草稿的關鍵；少了它，上述密度校準目標只是理想而非有效規範。
 
-Per-section checklist (each item is *fill or record* — silently skipping is what the rule exists to prevent):
+逐節檢查表（每一項都是*補上或記錄*——悄悄略過正是此規則存在要防止的事）：
 
-1. **Section opener.** Does the section open with a motivation paragraph that ties back to the previous section or the chapter arc? (`intuition` or `application`)
-2. **Definition glosses.** Does each new definition have at least one informal gloss or intuition pass before the formal statement? (`intuition`)
-3. **Worked-example density.** Does each new technique have at least one supplementary `workedexample` beyond what the manuscript supplied? (`example`) — *exception when the manuscript already supplies multiple worked examples per technique; record this in roadmap if it applies.*
-4. **Boundary case or counterexample.** Does the section include at least one boundary case, counterexample, or non-example showing where the technique fails? (`example` or `caution`)
-5. **Caution boxes.** Are common errors, sign traps, or notational pitfalls captured as `caution` boxes? (`caution`)
-6. **Strategy distillation.** When two or more examples in the section share a method, is the method distilled into a `strategy` box? (`strategy`)
-7. **Visual reasoning.** Are concepts that benefit from a picture carried by at least a `figure` idea (the asset itself can be deferred to media work)? (`figure`)
-8. **Closing synthesis.** Does the section close with synthesis prose that pulls the examples and theorems back to the section's headline result? (`summary`)
+1. **節首開場。** 該節是否以一段承接上一節或章節脈絡的動機段落開場？（`intuition` 或 `application`）
+2. **定義注解。** 每個新定義在形式陳述之前，是否至少有一次白話注解或直覺鋪陳？（`intuition`）
+3. **worked-example 密度。** 每個新技巧是否至少有一個超出手稿所提供的補充 `workedexample`？（`example`）——*當手稿本身已為每個技巧提供多個 worked example 時為例外；若適用，請在 roadmap 中記錄。*
+4. **邊界情況或反例。** 該節是否包含至少一個邊界情況、反例，或顯示技巧何時失效的非範例？（`example` 或 `caution`）
+5. **Caution 方塊。** 常見錯誤、正負號陷阱或記號陷阱是否被捕捉為 `caution` 方塊？（`caution`）
+6. **Strategy 提煉。** 當該節有兩個以上範例共用一個方法時，該方法是否被提煉為 `strategy` 方塊？（`strategy`）
+7. **視覺推理。** 受益於圖像的概念，是否至少由一個 `figure` 構想承載（素材本身可延後至媒體工作再做）？（`figure`）
+8. **收尾綜合。** 該節是否以綜合性散文作結，將範例與定理收束回該節的標題結果？（`summary`）
 
-A *no* on any item is acceptable provided the deliberate omission is recorded — the rule is **fill or record**, not "every section must score 8/8". Recording the omission in roadmap *Open questions* lets the user agree, push back, or supply the missing piece during sign-off; silently skipping the item produces the "translated handout" feel the textbook density target exists to prevent.
+任何一項給出*否*都是可接受的，前提是該刻意省略有被記錄——規則是**補上或記錄**，而非「每一節都必須拿 8/8」。在 roadmap 的 *Open questions* 中記錄省略，讓使用者能於簽核時同意、反駁，或補上缺失的部分；悄悄略過該項則會產生教科書密度目標所要防止的「翻譯講義」感。
 
-#### Still forbidden in drafting mode
+#### 草擬模式中仍然禁止的事
 
-- skipping manuscript content (the manuscript is the axis);
-- rewriting the mathematical substance of a manuscript claim (method of proof, choice of variable, definition form);
-- inventing exercises — exercise inventories come from the manuscript (see [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md));
-- unmarked expansions — every non-translation addition takes an `% expansion:` marker;
-- named content that violates the Named-content guardrail above.
+- 跳過手稿內容（手稿是主軸）；
+- 改寫手稿主張的數學實質（證明方法、變數選擇、定義形式）；
+- 自創習題——習題庫來自手稿（見 [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md)）；
+- 未標記的擴充——每一處非翻譯的增添都要加上 `% expansion:` 標記；
+- 違反上述「具名內容」防護欄的具名內容。
 
-Supplying a proof the manuscript omitted is a borderline case: per [`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5 proofs are optional and omission is the default. Claude **may** add a proof as an `expansion:formula` (for a short derivation) or `expansion:example` (for a worked case) when the proof is short, standard, and illustrative; multi-page proofs or proofs that require material the chapter has not introduced need explicit user authorisation.
+補上手稿省略的證明是個邊界案例：依 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5，證明為選用且預設省略。當證明簡短、標準且具闡明性時，Claude **可**將其作為 `expansion:formula`（簡短推導）或 `expansion:example`（worked case）加入；多頁的證明，或需要章節尚未引入之材料的證明，則需使用者明確授權。
 
-### Mode B — Curation review (Claude audits existing content)
+### Mode B — 審訂審查（Claude 稽核既有內容）
 
-Use this mode when Claude is asked to audit existing chapter content against the manuscript, the spec, or the current draft state. Per the workflow state machine above, Mode B has three valid entry points:
+當 Claude 被要求對照手稿、規格或目前草稿狀態來稽核既有章節內容時，使用此模式。依上方的工作流程狀態機，Mode B 有三個有效的進入點：
 
-- a Mode A draft, before user sign-off (ready-for-review audit);
-- a chapter that has been committed to `main` (recurring spec-compliance or accuracy review);
-- the output of a Mode C enrichment pass (**required** follow-up scoped to the new `[pass: enrichment]` markers).
+- 一份 Mode A 草稿，使用者簽核前（待審稽核）；
+- 一個已提交至 `main` 的章節（週期性的規格合規或正確性審查）；
+- 一次 Mode C 充實回合的產出（**必要**的後續，範圍限定於新的 `[pass: enrichment]` 標記）。
 
-**Committed content is authorised content.** The user has signed off on what landed in `main`; Claude must **not** treat pre-existing expansions beyond the manuscript as "hallucination" just because they are not verbatim in the manuscript — the user may have authored the expansion themselves during the original drafting pass.
+**已提交的內容即已授權的內容。** 使用者已對落入 `main` 的內容簽核；Claude **不得**僅因某些超出手稿的既有擴充未逐字見於手稿，就將其視為「幻覺」——使用者很可能是在原始草擬回合中自己撰寫了該擴充。
 
-#### Per-marker verdict (Keep / Rewrite / Move / Cut)
+#### 逐標記裁決（Keep／Rewrite／Move／Cut）
 
-For chapters that carry `% expansion:` markers, Mode B walks every marker in the file and assigns one of four verdicts. Verdicts are **reported to the user per marker**; Claude does not act on them unilaterally.
+對帶有 `% expansion:` 標記的章節，Mode B 走查檔案中每一個標記，並指派四種裁決之一。裁決**逐標記回報給使用者**；Claude 不會擅自據以行動。
 
-| Verdict | Meaning | What Claude does |
+| 裁決 | 含義 | Claude 的作為 |
 |---|---|---|
-| **Keep** | Correct, in the right place, register matches Stewart / Rogawski, not duplicating a neighbouring expansion. | Note as Keep; no change. |
-| **Rewrite** | Direction is right but execution needs work — register slip, redundancy with a neighbour, awkward phrasing, accuracy nit. | Propose the rewrite inline so the user can accept or revise. |
-| **Move** | Content has value but belongs elsewhere — earlier section, end-of-chapter Summary, a `strategy` box instead of an `example`, or even a later chapter where it would have proper setup. | **Propose only.** Describe the move, do not execute it. |
-| **Cut** | Correct but not pedagogically load-bearing here — duplicates a neighbour at the same depth, or restates content that is already clear from the body. | Propose deletion with one sentence on why. |
+| **Keep** | 正確、位置適當、語域契合 Stewart／Rogawski、未與鄰近擴充重複。 | 記為 Keep；不做變更。 |
+| **Rewrite** | 方向正確但執行需要改善——語域滑落、與鄰近者冗餘、措辭笨拙、正確性的小瑕疵。 | 就地提出改寫，讓使用者能接受或再修。 |
+| **Move** | 內容有價值但該放別處——較前的節、章末總結、改用 `strategy` 方塊而非 `example`，甚至放到一個能有適當鋪陳的後續章節。 | **僅提議。** 描述該搬移，不要執行它。 |
+| **Cut** | 正確但在此處不承載教學重量——與鄰近者同深度重複，或重述內文已清楚說明的內容。 | 提議刪除，附一句說明理由。 |
 
-**`Move` is propose-only.** This is the verdict most likely to be misused. A Mode B run that quietly relocates expansions across sections under cover of "moves" defeats the audit's purpose: every cross-section restructure is a structural decision the user must enact. Even within a single section, a Move that changes ordering or environment type (e.g., `example` → `strategy`) is a proposal, not an action.
+**`Move` 是僅提議。** 這是最容易被誤用的裁決。一次 Mode B 回合若以「搬移」為名悄悄跨節重置擴充，便破壞了稽核的目的：每一次跨節重構都是使用者必須親自落實的結構決定。即使在單一節之內，改變順序或環境類型（例如 `example` → `strategy`）的搬移也是提議，而非行動。
 
-When Mode B runs as the required follow-up to Mode C, scope the verdict pass to the new `[pass: enrichment]` markers — the original Mode A markers were already audited at sign-off and re-auditing them would invite churn.
+當 Mode B 作為 Mode C 的必要後續而執行時，將裁決回合的範圍限定於新的 `[pass: enrichment]` 標記——原本的 Mode A 標記已在簽核時稽核過，再次稽核它們只會招致無謂的變動。
 
-#### Other Mode B findings (alongside the verdicts)
+#### 其他 Mode B 發現（與裁決並行）
 
-Independently of the per-marker verdict, Claude flags:
+獨立於逐標記裁決之外，Claude 另行標示：
 
-- **Spec compliance** — rule violations against [`CONTENT_SPEC.md`](CONTENT_SPEC.md): disallowed display helpers, `\textbf` / `\textit` in prose, ASCII quotes, manual cross-reference prefixes, `\newcommand` in chapter files, missing chapter opening structure, etc. These are definite defects; propose fixes. Spec compliance also includes **pattern-level rules that require cross-comparison within the chapter** — e.g., whether all definitions in the chapter follow §3's gloss decision rule consistently, whether all figures follow §10's placement rule, whether parallel structures (definitions of similar weight, propositions stated in similar form) are formatted alike. A single-line lint pass is necessary but not sufficient; pattern-level audits require explicitly walking each SPEC rule that has a decision criterion and checking the chapter as a whole.
-- **Notation drift** from the manuscript — e.g., the manuscript uses `[x]` and the `.tex` silently uses `\lfloor x \rfloor`. Surface this as a question for the user, not as a hallucination. The user may have intentionally upgraded the notation, or may want to realign to the manuscript.
-- **Mathematical correctness** — if a statement looks wrong, surface it as *"please verify X"*, not as *"I'm removing X because it's not in the manuscript."*
-- **Missing content from the manuscript** — if the manuscript covers a topic the `.tex` skips, flag the gap so the user can decide whether the omission was intentional.
-- **Structural decisions** — section splits, theorem names, and similar editorial choices. Surface as questions; do not change unilaterally.
+- **規格合規**——對照 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 的規則違反：不允許的顯示輔助巨集、散文中的 `\textbf`／`\textit`、ASCII 引號、手動交叉參照前綴、章節檔中的 `\newcommand`、缺少章節開頭結構等。這些是明確的缺陷；提出修正。規格合規也包含**需要章內交叉比對的模式層級規則**——例如，章內所有定義是否一致遵循 §3 的注解決策規則、所有圖是否遵循 §10 的擺放規則、平行結構（份量相近的定義、形式相近的命題）是否格式一致。單行 lint 掃描是必要但不充分的；模式層級的稽核需要明確走查每一條帶有決策準則的 SPEC 規則，並就整章加以檢查。
+- 相對於手稿的**記號飄移**——例如手稿用 `[x]` 而 `.tex` 悄悄用了 `\lfloor x \rfloor`。將此作為一個問題提給使用者，而非作為幻覺。使用者可能是有意升級了記號，或可能想重新對齊回手稿。
+- **數學正確性**——若某陳述看似有誤，將其作為*「請查核 X」*提出，而非*「我因為 X 不在手稿中而移除它」*。
+- **手稿中缺漏的內容**——若手稿涵蓋了某主題而 `.tex` 跳過了，標示這個缺口，讓使用者能決定該省略是否為有意。
+- **結構決定**——分節、定理命名及類似的編輯抉擇。作為問題提出；不要擅自變更。
 
-#### What Claude must not do in Mode B
+#### Claude 在 Mode B 中不得做的事
 
-- treat content in the `.tex` that is absent from the manuscript as hallucination by default;
-- silently remove or rewrite user-authored expansions on the grounds that they lack a manuscript anchor;
-- act on a `Move` verdict — `Move` is always propose-only, including within a single section;
-- propose deletion of historical notes, extra worked examples, or extra remarks without first asking whether they were user-authored expansion or drafting-mode hallucination;
-- re-audit `% expansion:` markers without `[pass: enrichment]` when the entry point was a Mode C follow-up — those are out of scope for that run.
+- 預設將 `.tex` 中手稿沒有的內容視為幻覺；
+- 以缺乏手稿依據為由，悄悄移除或改寫使用者撰寫的擴充；
+- 對 `Move` 裁決據以行動——`Move` 永遠僅提議，單一節之內亦然；
+- 在未先詢問歷史註解、額外 worked example 或額外註解是使用者撰寫的擴充還是草擬模式的幻覺之前，就提議刪除它們；
+- 當進入點為 Mode C 後續時，去稽核沒有 `[pass: enrichment]` 的 `% expansion:` 標記——那些不在該回合的範圍內。
 
-The operative question in Mode B is *"is this content correct, compliant, and in the right place?"* — not *"is this content in the manuscript?"* Only in Mode A does the second question become load-bearing.
+Mode B 中的關鍵問題是*「這段內容是否正確、合規、位置適當？」*——而非*「這段內容是否在手稿中？」*。唯有在 Mode A 中，第二個問題才承載重量。
 
-### Mode C — Enrichment pass (Claude adds depth to a signed-off chapter)
+### Mode C — 充實增補回合（Claude 為已簽核的章節增添深度）
 
-Use this mode when an already-signed-off chapter would benefit from additional textbook depth and the user explicitly asks Claude to enrich it. Mode C exists because the natural place to "amplify a chapter" is *after* the manuscript axis has been settled at sign-off, not by re-entering Mode A and risking changes to the axis itself.
+當一個已簽核的章節將受益於額外的教科書深度，且使用者明確要求 Claude 充實它時，使用此模式。Mode C 之所以存在，是因為「放大一個章節」的自然時機是*在*手稿主軸於簽核時定下*之後*，而非重新進入 Mode A 並冒著改動主軸本身的風險。
 
-#### What Mode C may do
+#### Mode C 可以做的事
 
-- add `intuition`, `example`, `figure`, `caution`, `strategy`, `application`, `formula`, `history`, or `summary` expansions, each marked exactly as in Mode A (`% expansion:<category> …`) **but with the required `[pass: enrichment]` hint** so post-hoc review can distinguish original drafting from enrichment;
-- close with the same per-section amplification audit Mode A uses — walk each section against the checklist, fill any gap that is now visible, or record the gap in roadmap *Open questions*. The audit is what makes Mode C an enrichment pass rather than a scattered top-up.
+- 加入 `intuition`、`example`、`figure`、`caution`、`strategy`、`application`、`formula`、`history` 或 `summary` 擴充，每一處的標記方式與 Mode A 完全相同（`% expansion:<category> …`），**但帶有必要的 `[pass: enrichment]` 提示**，使事後審查能區分原始草擬與充實；
+- 以 Mode A 所用的同一份逐節擴增稽核作結——依檢查表逐節走查，補上現在可見的任何缺口，或在 roadmap 的 *Open questions* 中記錄缺口。這次稽核正是使 Mode C 成為一次充實回合、而非零散補強的關鍵。
 
-#### What Mode C must not do
+#### Mode C 不得做的事
 
-- alter the manuscript's main axis: no reordering of sections, no rewriting of definitions or theorem statements, no replacement or deletion of existing expansions (those are Mode B's `Move` and `Cut` verdicts, and stay propose-only);
-- add `% expansion:` lines without `[pass: enrichment]` — that pretends the addition is original drafting and pollutes the audit trail;
-- run as a final step. Every Mode C run **must be followed by a Mode B audit scoped to the new `[pass: enrichment]` markers**. The state machine above is non-negotiable on this point: a Mode C pass that ships without a Mode B follow-up is incomplete.
+- 改動手稿的主軸：不重排各節、不改寫定義或定理陳述、不取代或刪除既有擴充（那些是 Mode B 的 `Move` 與 `Cut` 裁決，且維持僅提議）；
+- 加入沒有 `[pass: enrichment]` 的 `% expansion:` 行——那假裝該增添是原始草擬，並污染稽核軌跡；
+- 作為最後一個步驟而執行。每一次 Mode C 回合**都必須接著一次範圍限定於新 `[pass: enrichment]` 標記的 Mode B 稽核**。上方的狀態機在這一點上不容妥協：一次未接 Mode B 後續就出貨的 Mode C 回合是不完整的。
 
-The non-repetition rule, the named-content rule, and the density-calibration target apply to Mode C exactly as they do to Mode A — the only thing Mode C changes is the marker hint and the prohibition on touching the existing axis.
+不重複規則、具名內容規則與密度校準目標，皆與 Mode A 一樣適用於 Mode C——Mode C 唯一改變的是標記提示，以及禁止觸碰既有主軸。
 
-### When manuscript and spec disagree (applies in any mode)
+### 當手稿與規格相牴觸時（適用於任何模式）
 
-- **Formatting**: [`CONTENT_SPEC.md`](CONTENT_SPEC.md) wins. Rewrite the manuscript's phrasing to comply (e.g., `\textbf{...}` → `\emph{...}` in prose, ASCII quotes → TeX quotes, manual cross-reference prefixes → `\cref{}`). The mathematics is unchanged.
-- **Mathematical content**: the manuscript wins. If the manuscript proves a theorem a particular way, preserve the method; if the manuscript defines a term in a specific form, preserve that form. Notational differences from §9 of the spec get reconciled to the house convention, with a `caution` note if the reconciliation is non-trivial.
-- **Genuine conflicts** (manuscript insists on a rule the spec forbids for editorial reasons, not mathematical ones): ask the user. Record the decision in the chapter's roadmap entry under *Open questions*.
+- **格式**：[`CONTENT_SPEC.md`](CONTENT_SPEC.md) 勝出。改寫手稿的措辭以求合規（例如散文中 `\textbf{...}` → `\emph{...}`、ASCII 引號 → TeX 引號、手動交叉參照前綴 → `\cref{}`）。數學內容不變。
+- **數學內容**：手稿勝出。若手稿以特定方式證明一個定理，保留該方法；若手稿以特定形式定義一個詞，保留該形式。與規格 §9 的記號差異，以 `caution` 註解（若調和並非無關緊要時）調和為本書慣例。
+- **真正的衝突**（手稿堅持一條規格基於編輯理由而非數學理由所禁止的規則）：詢問使用者。將決定記錄在該章 roadmap 條目的 *Open questions* 之下。
 
-Per-chapter manuscript tracking — who wrote it, when it was received, conversion status, and any user-authored expansion notes — lives in each chapter's entry in [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) under **Manuscript source**.
+逐章手稿追蹤——誰寫的、何時收到、轉換狀態,以及任何使用者撰寫的擴充註記——存於 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) 中每一章條目的 **Manuscript source** 之下。
 
 ---
 
-## Golden path
+## Golden path（黃金路徑）
+
+目前的影片工作位於 `video/` 下的第二代產線：
+
+```text
+chapters/*.tex  -->  video/storyboards/<section_id>.yml
+                  -->  video/pipeline/build.py silent previews
+                  -->  video/output/...
+```
+
+下方較舊的 `legacy/inputs/manim_storyboards` / `legacy/artifacts/video` 路徑（已封存於 `legacy/`）保留作為第一代參考資料，並非目前的活躍開發路徑。
 
 ```
   chapters/*.tex  ──▶  inputs/manim_storyboards/<deck_id>.yml
@@ -255,105 +265,106 @@ Per-chapter manuscript tracking — who wrote it, when it was received, conversi
                        artifacts/video/<deck_id>_manim.mp4
 ```
 
-Finalize the chapter content first. Hand-write the storyboard from the finalized LaTeX. Preview scenes one at a time. Render audio and final MP4 once scenes feel right.
+先定稿章節內容。再從定稿的 LaTeX 手寫分鏡。逐一預覽場景。待場景感覺對了，再產出音訊與最終 MP4。
 
 ---
 
-## Document map
+## 文件地圖
 
-| Layer | File | Purpose |
+| 層級 | 檔案 | 用途 |
 |---|---|---|
-| hub | `README.md` | repo layout, preamble map, build rules |
-| content spec | [`CONTENT_SPEC.md`](CONTENT_SPEC.md) | authoritative textbook writing rules |
-| content daily | [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md) | 1-2 page author cheat sheet |
-| content arc | [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) | chapter order, prereqs, per-chapter core skills |
-| content exercises | [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md) | minimum exercise skeleton |
-| manim operational | [`MANIM_CHECKLIST.md`](MANIM_CHECKLIST.md) | phase-by-phase pipeline checklist |
-| manim reference | [`MANIM_REFERENCE.md`](MANIM_REFERENCE.md) | field contracts, templates, render commands |
-| manim methodology | [`MANIM_STORYBOARD.md`](MANIM_STORYBOARD.md) | LaTeX-to-YAML translation playbook |
-| frozen legacy | [`LEGACY_SLIDE_PIPELINE.md`](LEGACY_SLIDE_PIPELINE.md) | static-slide/PDF + TTS + MP4 (no new development) |
+| 樞紐 | `README.md` | 儲存庫結構、preamble 對照、建置規則 |
+| 內容規格 | [`CONTENT_SPEC.md`](CONTENT_SPEC.md) | 權威性的教科書撰寫規則 |
+| 內容日用 | [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md) | 1–2 頁的作者速查表 |
+| 內容脈絡 | [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) | 章節順序、先備知識、各章核心技能 |
+| 內容習題 | [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md) | 最小習題骨架 |
+| 影片產線 | [`video/README.md`](video/README.md) | 目前第二代 Manim 產線的狀態、指令、交接註記 |
+| 影片設計 | [`video/DESIGN.md`](video/DESIGN.md) | 目前的分鏡契約、場景種類、模板決策 |
+| manim v1 操作 | [`legacy/MANIM_CHECKLIST.md`](legacy/MANIM_CHECKLIST.md) | 第一代參考檢查表（已封存） |
+| manim v1 參考 | [`legacy/MANIM_REFERENCE.md`](legacy/MANIM_REFERENCE.md) | 第一代欄位契約、模板、render 指令（已封存） |
+| manim v1 方法論 | [`legacy/MANIM_STORYBOARD.md`](legacy/MANIM_STORYBOARD.md) | 第一代 LaTeX 轉 YAML 翻譯手冊（已封存） |
+| 凍結舊版 | [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md) | 靜態投影片／PDF + TTS + MP4（已封存，不再有新開發） |
+| 封存總覽 | [`legacy/README.md`](legacy/README.md) | gen-0／gen-1 凍結產線的封存索引與還原說明 |
 
 ---
 
-## Repository Layout
+## 儲存庫結構
 
-- `main.tex` — LaTeX entry point for the book.
-- `chapters/` — chapter source files.
-  - `chapters/_chapter_template.tex` — starter skeleton for a new chapter.
-  - `chapters/_scratch.tex` — optional local scratch chapter, gated by `\ifincludescratchchapter`.
-- `preamble/` — shared LaTeX setup (see *Preamble Map* below).
-- `preamble_smoketest.tex` — minimal regression document for preamble-only layout checks.
-- `refs/` — bibliography data.
-- `tools/` — media-generation scripts plus book-source utilities (`book_style_lint.py`, `book_preamble_smoketest.py`, and vendored helpers).
-- `schemas/` — JSON schema files for generated deck data.
-- `inputs/` — reusable raw inputs: voice recordings, section media plans, Manim storyboards.
-- `artifacts/` — mostly generated slides, narration, audio, video. Tracked exceptions: `artifacts/scripts/*_final.md`, `artifacts/slides/*.tex`, and `artifacts/manim/*/narration.md`.
-- `.github/workflows/` — CI checks.
+- `main.tex` — 全書的 LaTeX 進入點。
+- `chapters/` — 章節源檔。
+  - `chapters/_chapter_template.tex` — 新章節的起始骨架。
+  - `chapters/_scratch.tex` — 選用的本機暫存章節，由 `\ifincludescratchchapter` 控制。
+- `preamble/` — 共用的 LaTeX 設定（見下方 *Preamble 對照*）。
+- `preamble_smoketest.tex` — 僅供 preamble 版面檢查的最小回歸文件。
+- `refs/` — 參考書目資料。
+- `tools/` — 書籍源碼工具（`book_style_lint.py`、`book_preamble_smoketest.py`、`book_docs_lint.py`）。第一代媒體產生腳本已封存至 `legacy/scripts/`。
+- `legacy/` — 已封存的凍結媒體產線（gen-0 投影片、gen-1 Manim 及其橋接實驗）：`legacy/scripts/`（腳本）、`legacy/MANIM_*.md` 與 `legacy/LEGACY_SLIDE_PIPELINE.md`（方法論文件）、`legacy/schemas/`、`legacy/inputs/`、`legacy/artifacts/`（gitignored 的大型算繪輸出仍存於磁碟，git 追蹤的例外為 narration／final／tex）。詳見 [`legacy/README.md`](legacy/README.md)。
+- `.github/workflows/` — CI 檢查。
 
----
+額外的活躍媒體工作區：
 
-## Preamble Map
-
-`preamble/` is split by responsibility so layout and template behavior can be found quickly:
-
-- `preamble/packages.tex` — package loading: Times text/math fonts (`newtxtext` + `newtxmath`), `microtype`, `amsmath` / `amsthm` / `mathtools`, `graphicx` / `tikz` / `pgfplots`, `float` / `flafter`, `needspace`, `enumitem`, page geometry (3.3 cm margins), headers, `hyperref` / `cleveref`, `mdframed` with `framemethod=TikZ` for `caution` / `strategy`, `xcolor`, and the house inverse-trig operators (`\arccsc`, `\arcsec`, `\arccot`).
-- `preamble/colors.tex` — the three-role semantic palette (`colorprimary` blue, `colorcaution` red, `colorauxiliary` gray) driving figures and accent bars on `caution` / `strategy`.
-- `preamble/layout.tex` — paragraph indentation and spacing, list spacing, global `\linespread{1.05}`, float placement, running headers and footers, `\Needspace` hooks, shared short-formula helpers (`aligneddisplay`, `conditiondisplay`, `\pairdisplay`), and `\newdisplayenv{name}{begin}{end}` for any new wrapper around `\[...\]` (installs the kernel `\@doendpe` hook via `\AfterEndEnvironment` to suppress stray indents after the environment).
-- `preamble/theorem_setup.tex` — per-env chapter-scoped counters for `definition` / `theorem` / `proposition` / `corollary`; the `solution` environment; `caution` and `strategy` (left-colour-bar `\newmdtheoremenv`); page-flow protection hooks; and the `workedexample` semantic wrapper that reserves space for an `example` + `solution` pair as a single unit.
-- `preamble/numbering.tex` — equation numbering by chapter.
-- `preamble/bibliography.tex` — bibliography backend and source file.
+- `video/` — 目前第二代 Manim 課程影片產線，包含分鏡、可重用模板、設計註記，以及 gitignored 的預覽輸出。
 
 ---
 
-## Output Format
+## Preamble 對照
 
-Single-sided A4 PDF, meant to be printed one page per sheet and distributed as a handout rather than bound.
+`preamble/` 依職責拆分，使版面與模板行為可被快速找到：
 
-- `\documentclass[a4paper,12pt,oneside]{book}` — same margin rule on every page.
-- `margin=3.3cm` symmetric; text block near the 66–72 characters-per-line comfort range for 12 pt Times.
-- `\linespread{1.05}` — modest extra leading for math-dense prose without sparse pages.
-- `\fancyhead[L]` / `\fancyhead[R]` / `\fancyfoot[R]` (not the twoside `[LE]`/`[RO]` pattern).
-- `main.tex` wraps `\maketitle` in `\begingroup\hypersetup{pageanchor=false}...\endgroup` to avoid duplicate-destination warnings on the title page.
-- `main.tex` keeps `\ifprintbibliography` and `\ifincludescratchchapter` toggles near the top so the bibliography and the scratch chapter stay opt-in.
-
-If the project ever needs a bound-book edition later, minimum changes: switch to `\documentclass[a4paper,12pt,twoside,openright]{book}`, rework `\fancyhead`/`\fancyfoot` to use `[LE]`/`[RO]` pairs, and consider asymmetric `inner`/`outer` margins with a `bindingoffset`.
+- `preamble/packages.tex` — 套件載入：Times 內文／數學字型（`newtxtext` + `newtxmath`）、`microtype`、`amsmath` / `amsthm` / `mathtools`、`graphicx` / `tikz` / `pgfplots`、`float` / `flafter`、`needspace`、`enumitem`、頁面幾何（3.3 cm 邊界）、headers、`hyperref` / `cleveref`、為 `caution` / `strategy` 而設的 `mdframed`（`framemethod=TikZ`）、`xcolor`，以及本書的反三角運算子（`\arccsc`、`\arcsec`、`\arccot`）。
+- `preamble/colors.tex` — 三角色語意調色盤（`colorprimary` 藍、`colorcaution` 紅、`colorauxiliary` 灰），驅動圖示以及 `caution` / `strategy` 上的強調色條。
+- `preamble/layout.tex` — 段落縮排與間距、清單間距、全域 `\linespread{1.05}`、浮動體擺放、running headers 與 footers、`\Needspace` 掛勾、共用的短公式輔助巨集（`aligneddisplay`、`conditiondisplay`、`\pairdisplay`），以及供任何 `\[...\]` 包裝器使用的 `\newdisplayenv{name}{begin}{end}`（透過 `\AfterEndEnvironment` 安裝核心 `\@doendpe` 掛勾，以抑制環境後的多餘縮排）。
+- `preamble/theorem_setup.tex` — `definition` / `theorem` / `proposition` / `corollary` 的逐環境、章內計數器；`solution` 環境；`caution` 與 `strategy`（左側色條的 `\newmdtheoremenv`）；頁面流保護掛勾；以及將 `example` + `solution` 一對作為單一單元保留空間的 `workedexample` 語意包裝器。
+- `preamble/numbering.tex` — 依章編列方程式編號。
+- `preamble/bibliography.tex` — 參考書目後端與來源檔案。
 
 ---
 
-## Build and CI
+## 輸出格式
 
-Local build:
+單面 A4 PDF，設計為單張單頁列印、作為講義發送，而非裝訂成冊。
+
+- `\documentclass[a4paper,12pt,oneside]{book}` — 每一頁採同一邊界規則。
+- `margin=3.3cm` 對稱；文字區塊接近 12 pt Times 每行 66–72 字元的舒適範圍。
+- `\linespread{1.05}` — 為數學密集的散文提供適度的額外行距，又不致頁面稀疏。
+- `\fancyhead[L]` / `\fancyhead[R]` / `\fancyfoot[R]`（非 twoside 的 `[LE]`/`[RO]` 模式）。
+- `main.tex` 將 `\maketitle` 包在 `\begingroup\hypersetup{pageanchor=false}...\endgroup` 中，以避免標題頁出現重複目的地的警告。
+- `main.tex` 在檔首附近保留 `\ifprintbibliography` 與 `\ifincludescratchchapter` 開關，使參考書目與暫存章節維持選用。
+
+若專案日後需要裝訂書版本，最小變更為：改用 `\documentclass[a4paper,12pt,twoside,openright]{book}`、將 `\fancyhead`/`\fancyfoot` 改用 `[LE]`/`[RO]` 配對，並考慮使用帶 `bindingoffset` 的非對稱 `inner`/`outer` 邊界。
+
+---
+
+## 建置與 CI
+
+本機建置：
 
 ```powershell
 latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main.tex
 ```
 
-Before committing a chapter, also run:
+提交一個章節之前，另須執行：
 
 ```powershell
 python tools/book_style_lint.py
 python tools/book_preamble_smoketest.py
 python tools/book_docs_lint.py
-python tools/manim_storyboard_lint.py --all
 ```
 
-All five checks (the four above plus the `latexmk` build) run on every push and PR via [`.github/workflows/latex-checks.yml`](.github/workflows/latex-checks.yml). `book_docs_lint.py` scans markdown for stale `tools/<name>.py` command references and broken relative links, so doc-rename drift cannot slip through review unnoticed. `manim_storyboard_lint.py` enforces the mechanically verifiable subset of the [`MANIM_STORYBOARD.md`](MANIM_STORYBOARD.md) pre-render checklist (template / scene_id contracts, voiceover sentence count and spoken-math compliance, opening / closing scene shape, `cbrt` for cube roots) so storyboard regressions surface before review.
+全部四項檢查（上述三項加上 `latexmk` 建置）會在每一次 push 與 PR 時透過 [`.github/workflows/latex-checks.yml`](.github/workflows/latex-checks.yml) 執行。`book_docs_lint.py` 掃描 markdown 中過時的 `tools/<name>.py` 指令引用與失效的相對連結，使文件改名造成的飄移無法在審查時悄悄溜過。（第一代的 `manim_storyboard_lint.py` 已隨 Manim v1 產線封存至 `legacy/scripts/`，不再納入 CI；其方法論文件見 `legacy/`。）
 
-Authority: when repository layout or preamble decisions change, **this file** is authoritative; when writing or typesetting rules change, [`CONTENT_SPEC.md`](CONTENT_SPEC.md) is authoritative.
-
----
-
-## Media scope note
-
-End-of-section `\subsection*{Exercises}` blocks are for the printed handout only. They are **not** included in slide decks, narration scripts, Manim storyboards, synthesized audio, or rendered video. When planning section media, ignore the exercise block of the source section and build from definitions, theorems, examples, and exposition prose.
-
-## TTS pronunciation normalization
-
-Manim narration passes through `tools/tts_pronunciation.py` before Coqui or F5 synthesis. This is a TTS-only cleanup layer: it does not change storyboard text or on-screen math. The current rules make single-letter mathematical variables more audible, including variable `a` as `ayyy` in math contexts (`x approaches a`, `x minus a`, `f of a`, `limit at a`) while leaving English articles such as `a function` and `a positive delta` unchanged. The same pass also spells common function and limit letters as `eff`, `gee`, `aitch`, `ell`, `em`, and `en` where context indicates they are mathematical symbols.
+權威性：當儲存庫結構或 preamble 決策變更時，**以本檔案**為權威；當撰寫或排版規則變更時，以 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 為權威。
 
 ---
 
-## Notes
+## 媒體範圍說明
 
-- Local caches, virtual environments, and vendored dependencies live in hidden repo folders such as `.cache/`, `.venv/`, `.deps/`, and `.deps_f5/`.
-- The checked-in media exemplars are two deliberately contrasting Manim storyboards used to calibrate [`MANIM_STORYBOARD.md`](MANIM_STORYBOARD.md): Section 1.1 *Inverse Functions* ([`inputs/manim_storyboards/ch01_inverse_functions.yml`](inputs/manim_storyboards/ch01_inverse_functions.yml)), graph-heavy with light symbolic content, and Section 1.6 *The Precise Definition of a Limit* ([`inputs/manim_storyboards/ch01_precise_limit.yml`](inputs/manim_storyboards/ch01_precise_limit.yml)), symbol-heavy with two anchor graphs. Sec. 1.1 was the original v1.0-v1.3 reference; Sec. 1.6 was added as the v1.4 stress-test exemplar to surface rules that did not appear when the methodology was calibrated on graph-heavy content alone. New storyboards should consult both -- methodology rules that hold across the pair are the ones meant to generalise. The frozen slide plan for Sec. 1.1 lives at [`inputs/media_plans/ch01_inverse_functions.json`](inputs/media_plans/ch01_inverse_functions.json); the legacy slide path is not extended to Sec. 1.6.
+章末的 `\subsection*{Exercises}` 區塊僅供列印講義之用。它們**不**納入投影片 deck、旁白腳本、Manim 分鏡、合成音訊或 render 的影片。規劃各節媒體時，忽略來源節的習題區塊，從定義、定理、範例與闡述散文來建構。
+
+## 備註
+
+- 本機快取、虛擬環境與內嵌依賴存於隱藏的儲存庫資料夾，例如 `.cache/`、`.venv/`、`.deps/` 與 `.deps_f5/`。
+- 目前的影片開發在 `video/`，而非已封存的 `legacy/inputs/manim_storyboards`。目前的檢查點是 Section 1.1
+  [`video/storyboards/ch01_inverse_functions.yml`](video/storyboards/ch01_inverse_functions.yml)，
+  附有可重用的 intro/outro 模板、`graph_focus`，以及 `video/output/` 下的低畫質無聲預覽。
+- 已封存的第一代媒體範本是兩份刻意對比的 Manim 分鏡，曾用於校準 [`legacy/MANIM_STORYBOARD.md`](legacy/MANIM_STORYBOARD.md)：Section 1.1 *Inverse Functions*（[`legacy/inputs/manim_storyboards/ch01_inverse_functions.yml`](legacy/inputs/manim_storyboards/ch01_inverse_functions.yml)），圖形為主、符號內容輕量；以及 Section 1.6 *The Precise Definition of a Limit*（[`legacy/inputs/manim_storyboards/ch01_precise_limit.yml`](legacy/inputs/manim_storyboards/ch01_precise_limit.yml)），符號為主、帶兩個錨定圖形。Sec. 1.1 是原本的 v1.0–v1.3 參考；Sec. 1.6 作為 v1.4 壓力測試範本加入。Sec. 1.1 的凍結投影片計畫位於 [`legacy/inputs/media_plans/ch01_inverse_functions.json`](legacy/inputs/media_plans/ch01_inverse_functions.json)；以上皆為第一代凍結資料，新的 gen-2 分鏡改放於 `video/storyboards/`。

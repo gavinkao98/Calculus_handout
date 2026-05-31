@@ -1,0 +1,236 @@
+# Video Pipeline — Design (2nd generation)
+
+This is the redesigned LaTeX-handout → lesson-video pipeline. It supersedes the
+first-generation system (`tools/manim_*`, `MANIM_STORYBOARD.md`,
+`MANIM_REFERENCE.md`, `MANIM_CHECKLIST.md`), which is frozen, not deleted.
+
+Status: **scaffolding**. This document is the contract being built toward, not a
+description of finished code. Sections marked (TODO) are not implemented yet.
+
+---
+
+## Why a redesign
+
+The first generation worked but accreted three sources of friction:
+
+1. **Two reveal mechanisms coexisting.** A timing-based path (`_run_voiceover_beats`,
+   hand-estimated seconds) and a bookmark path (`reveal_strategy` + manim-voiceover)
+   ran side by side, gated at render time. Authors had to know both.
+2. **A heavy spoken-math rewrite layer.** Every `f(x_1)` had to be hand-rewritten to
+   "f of x one" in a separate `voiceover` field, governed by a large rules table,
+   because the old TTS could not read LaTeX.
+3. **Three overlapping narration fields.** `voiceover` + `voiceover_beats` +
+   `bookmark`/`reveal_groups` all encoded "what is said" and "when things appear",
+   kept in sync by hand.
+
+Two decisions collapse all three:
+
+- **Gemini TTS reads LaTeX directly** using the model's preset voice names
+  (`meta.voice` / `--voice`). No voice cloning or reference audio is used. The
+  spoken-math rewrite layer is deleted. Narration is written once, with LaTeX inline.
+- **One narration field with inline reveal markers.** `say` carries both the words and
+  the timing cues. No separate beats/bookmark/reveal arrays.
+
+Plus a new product requirement: **every section gets an intro and an outro animation**,
+so scene `kind` is first-class and silent (no-narration) scenes are supported.
+
+---
+
+## Carried over vs rewritten
+
+| Ported verbatim (validated, no gain in rewriting) | Rewritten from scratch |
+|---|---|
+| `visuals/theme.py` (Midnight Canvas palette + typography + layout metrics) | storyboard schema + format |
+| `visuals/graph_utils.py` (safe expr eval + sampling) | narration → beats compiler |
+| `visuals/layout.py` (16:9 zone layout) | scene templates |
+| ffmpeg mux/concat logic *(TODO: port from `manim_runtime.py`)* | TTS backend (Gemini) |
+| Midnight Canvas visual philosophy + animation language | CLI / orchestration |
+
+Ported assets were copied key-for-key from the real source dicts
+(`DEFAULT_THEME` in `legacy/scripts/manim_render_lesson.py`, `SceneLayout` in
+`legacy/scripts/manim_templates/layout.py`, `safe_eval_expression` in
+`legacy/scripts/manim_templates/graph_utils.py`), not reconstructed from the docs.
+
+The methodology *spirit* of `MANIM_STORYBOARD.md` (one teaching idea per scene,
+detail over compression, conversational narration, visual over textual, symbol-heavy
+exception) carries forward. Its mechanical rules (spoken-math table, sentence-count
+carve-outs, bookmark syntax) do not — they were artifacts of the old constraints.
+
+---
+
+## Storyboard format
+
+One YAML file per section. Top-level: `meta` + `scenes`.
+
+```yaml
+meta:
+  id: ch01_inverse_functions      # deck id, also output dir name
+  section: "1.1"                  # shown by intro/outro templates
+  title: "Inverse Functions"
+  language: en
+  theme: midnight
+  voice: Kore                     # Gemini preset voice name
+  video: { w: 1920, h: 1080, fps: 30 }
+
+scenes:
+  - id: <unique snake_case>
+    kind: intro | content | outro
+    ...
+```
+
+### Scene kinds
+
+- **`content`** — a teaching scene. Has `template`, `say`, and visual data. This is
+  the workhorse; everything below about `say`/reveal applies to it.
+- **`intro`** — section opener. **No `say`** (pure animation). Consumes
+  `meta.chapter`, `meta.chapter_title`, `meta.sections`, `meta.section`,
+  `meta.title`, an optional `tagline`, optional `bgm`, `duration`. The reusable
+  template is a Section Gate: first show the chapter map, focus the current
+  section, resolve into the logo / section / title / tagline slate, then add a
+  short dark handoff so the first teaching scene does not feel like an abrupt
+  color cut.
+- **`outro`** — section closer. **No `say`**. Consumes `recap` (list of takeaways),
+  an optional `next` (one-line forward pointer), optional `bgm`, `duration`.
+  The template is always three-stage: a short dark-to-light bridge from the
+  teaching ground, a logo-free Key Takeaways recap, then a final centered logo
+  slate so the viewer clearly feels the video has ended. The end slate defaults
+  to `meta.section` + `meta.title`; use optional `end_slate.label`,
+  `end_slate.title`, or `end_slate.logo_height` only when a section needs to
+  override the standard ending.
+
+`intro`/`outro` are defined **once** as parameterized templates and reused for every
+section — authors never hand-build them per section.
+
+Minimal reusable outro:
+
+```yaml
+- id: outro
+  kind: outro
+  recap:
+    - "First takeaway."
+    - "Second takeaway."
+  next: "Up next: the next section."
+  duration: 8.0
+```
+
+Minimal reusable intro:
+
+```yaml
+meta:
+  chapter: "Chapter 1"
+  chapter_title: "Inverse Functions and Limits"
+  section: "1.1"
+  title: "Inverse Functions"
+  sections:
+    - { id: "1.1", title: "Inverse Functions" }
+    - { id: "1.2", title: "Inverse Trigonometric Functions" }
+
+scenes:
+  - id: intro
+    kind: intro
+    tagline: "When can a function be run backwards?"
+    duration: 6.0
+```
+
+### `content` scene fields
+
+| Field | Required | Meaning |
+|---|---|---|
+| `template` | yes | which scene template (see catalog, TODO) |
+| `accent` | for definition-family | colour role: `definition` / `theorem` / `proposition` / `example` / `warning` / `procedure` / `recap`. Replaces old `content_type`. |
+| `title` | yes | on-screen scene title; `$...$` allowed for math |
+| `say` | yes | the single narration field (see below) |
+| `statement`, `math`, `steps`, `plots`, … | per template | the on-screen visual payload |
+| `hook` | no | dotted path to a custom animation fn (escape hatch, unchanged concept) |
+
+### `say`: narration + inline reveal (the core change)
+
+`say` is **what is spoken**, with **LaTeX written inline** (`$f(x_1)$`), and **reveal
+markers** `{show <target>}` interleaved.
+
+```yaml
+say: |
+  The property we need is called one-to-one. A function is one-to-one
+  when different inputs always give different outputs.
+  {show math.0} No two distinct inputs ever land on the same output.
+  {show math.1} Equivalently, if $f(x_1) = f(x_2)$ then $x_1 = x_2$.
+```
+
+Rules:
+
+- **`{show <target>}`** marks "reveal this element now". Targets name an element in the
+  scene's visual payload: `math.0`, `math.1`, `step.0`, `bullet.0`, `plot.0`,
+  `statement`, `takeaway`, … (the index is into the corresponding list).
+- A **beat** is the run of text from one marker (or scene start) up to the next marker.
+- Static elements (title, axes, statement) appear at scene start by default; only
+  elements named by a `{show ...}` wait for their beat. (This is the old static/dynamic
+  split, now expressed inline instead of in a per-template table.)
+- LaTeX in `say` is passed to Gemini TTS as-is. **No spoken-math rewrite.** If a specific
+  phrase reads better a particular way, just write it that way in `say`.
+
+### `math` and other visual payload
+
+```yaml
+math:
+  - "$f(x_1) \\ne f(x_2)$ whenever $x_1 \\ne x_2$"     # plain string
+  - { tex: "$f(x_1)=f(x_2)\\implies x_1=x_2$", anim: highlight }   # with animation
+```
+
+`anim` options (carried over): `write` (default), `highlight`, `transform_from_previous`.
+The *when* (reveal timing) lives in `say` via `{show math.N}`; the *how* (animation
+style) lives here. Clean separation.
+
+---
+
+## Data flow (target)
+
+```
+chapters/<ch>.tex
+   │  (author reads section, writes storyboard by hand — NOT auto-generated)
+   ▼
+video/storyboards/<id>.yml
+   │
+   ├─ schema.py            validate format, list reveal targets, lint            (TODO)
+   │
+   ▼
+compile.py                 split each `say` into beats at {show} markers          (TODO)
+   │                        → ordered (beat_text, reveal_target) list per scene
+   ▼
+tts.py                    synthesize each beat as one clip; measure duration
+   │                        → audio/<id>/<scene>.<beat>.wav + manifest.json
+   ▼
+render.py                  Manim renders each scene; a reveal fires at the start  (TODO)
+   │                        of its beat; beat duration drives the hold.
+   │                        Silent MP4 per scene + timeline.
+   ▼
+   ffmpeg mux + concat      stitch beats' audio under the video, concat scenes;   (TODO, port)
+   │                        intro/outro carry bgm instead of narration.
+   ▼
+video/output/<id>.mp4
+```
+
+**Orchestrator:** `pipeline/build.py` (TODO) — one CLI entry that runs
+validate → compile → tts → render → mux, with per-stage caching keyed on the visual
+payload (so editing `say` re-synthesizes audio but does not re-render Manim).
+
+### Alignment, restated (so it is not lost in the rewrite)
+
+The first-gen insight survives: alignment does **not** depend on TTS returning
+word-level timestamps. We synthesize **one clip per beat**, measure its real duration,
+and that duration *is* the reveal hold. Gemini changes the synthesizer, not the
+alignment model. (Caveat to validate: confirm Gemini returns raw audio we can measure;
+TODO in the spike.)
+
+---
+
+## Open questions / not yet decided
+
+- Template catalog for gen-2: keep the old 9 names, or reshape now that intro/outro are
+  separate kinds? (Leaning: keep the content templates, drop nothing yet.)
+- BGM: source, ducking, licensing.
+- `{show ...}` target grammar: dotted (`math.0`) vs bracketed (`math[0]`). Currently dotted.
+- Gemini specifics: model id is CLI-configurable and defaults to
+  `gemini-3.1-flash-tts-preview`; voice defaults to `meta.voice` / `Kore` and is passed
+  as a built-in/prebuilt voice name; output is wrapped as 24 kHz mono WAV and
+  measured locally. Remaining: key provisioning, rate/quota, and confirming the
+  production model id against the enabled account.
