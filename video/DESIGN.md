@@ -4,8 +4,9 @@ This is the redesigned LaTeX-handout → lesson-video pipeline. It supersedes th
 first-generation system (`tools/manim_*`, `MANIM_STORYBOARD.md`,
 `MANIM_REFERENCE.md`, `MANIM_CHECKLIST.md`), which is frozen, not deleted.
 
-Status: **scaffolding**. This document is the contract being built toward, not a
-description of finished code. Sections marked (TODO) are not implemented yet.
+Status: **partially implemented**. The storyboard → TTS → audio-driven render → mux
+path now works end-to-end (validated on §1.1); the remaining sections marked (TODO)
+are not implemented yet.
 
 ---
 
@@ -43,7 +44,7 @@ so scene `kind` is first-class and silent (no-narration) scenes are supported.
 | `visuals/theme.py` (Midnight Canvas palette + typography + layout metrics) | storyboard schema + format |
 | `visuals/graph_utils.py` (safe expr eval + sampling) | narration → beats compiler |
 | `visuals/layout.py` (16:9 zone layout) | scene templates |
-| ffmpeg mux/concat logic *(TODO: port from `manim_runtime.py`)* | TTS backend (Gemini) |
+| ffmpeg mux/concat logic *(done fresh as `pipeline/mux.py`)* | TTS backend (Gemini) |
 | Midnight Canvas visual philosophy + animation language | CLI / orchestration |
 
 Ported assets were copied key-for-key from the real source dicts
@@ -193,33 +194,35 @@ video/storyboards/<id>.yml
    ├─ schema.py            validate format, list reveal targets, lint            (TODO)
    │
    ▼
-compile.py                 split each `say` into beats at {show} markers          (TODO)
+narration.parse_say        split each `say` into beats at {show} markers          (DONE)
    │                        → ordered (beat_text, reveal_target) list per scene
    ▼
 tts.py                    synthesize each beat as one clip; measure duration
    │                        → audio/<id>/<scene>.<beat>.wav + manifest.json
    ▼
-render.py                  Manim renders each scene; a reveal fires at the start  (TODO)
-   │                        of its beat; beat duration drives the hold.
-   │                        Silent MP4 per scene + timeline.
+build.py + scene.py        Manim renders each scene; a reveal fires at the start  (DONE)
+   │                        of its beat; the beat's measured audio duration drives
+   │                        the hold (build.py reads manifest.json). Silent MP4/scene.
    ▼
-   ffmpeg mux + concat      stitch beats' audio under the video, concat scenes;   (TODO, port)
-   │                        intro/outro carry bgm instead of narration.
+   mux.py (ffmpeg)          stitch each scene's narration under its video (delayed  (DONE)
+   │                        to the first reveal), silent track for intro/outro, concat.
    ▼
 video/output/<id>.mp4
 ```
 
-**Orchestrator:** `pipeline/build.py` (TODO) — one CLI entry that runs
-validate → compile → tts → render → mux, with per-stage caching keyed on the visual
-payload (so editing `say` re-synthesizes audio but does not re-render Manim).
+**Orchestrator:** the stages run today as three CLIs in sequence — `tts.py`
+(synthesize) → `build.py` (render with audio-driven timing) → `mux.py` (mux + concat).
+A single entry point with per-stage caching keyed on the visual payload (so editing
+`say` re-synthesizes audio but does not re-render Manim) is still (TODO).
 
 ### Alignment, restated (so it is not lost in the rewrite)
 
 The first-gen insight survives: alignment does **not** depend on TTS returning
 word-level timestamps. We synthesize **one clip per beat**, measure its real duration,
 and that duration *is* the reveal hold. Gemini changes the synthesizer, not the
-alignment model. (Caveat to validate: confirm Gemini returns raw audio we can measure;
-TODO in the spike.)
+alignment model. (Confirmed: Gemini returns 24 kHz mono 16-bit raw PCM, wrapped to
+WAV and measured locally; validated end-to-end on §1.1 — each reveal lands within
+~1 frame of its narration beat.)
 
 ---
 
@@ -229,8 +232,8 @@ TODO in the spike.)
   separate kinds? (Leaning: keep the content templates, drop nothing yet.)
 - BGM: source, ducking, licensing.
 - `{show ...}` target grammar: dotted (`math.0`) vs bracketed (`math[0]`). Currently dotted.
-- Gemini specifics: model id is CLI-configurable and defaults to
-  `gemini-3.1-flash-tts-preview`; voice defaults to `meta.voice` / `Kore` and is passed
-  as a built-in/prebuilt voice name; output is wrapped as 24 kHz mono WAV and
-  measured locally. Remaining: key provisioning, rate/quota, and confirming the
-  production model id against the enabled account.
+- Gemini specifics (resolved): model id `gemini-3.1-flash-tts-preview` (CLI-configurable);
+  voice `meta.voice` / `Kore` as a prebuilt voice name; output is 24 kHz mono 16-bit raw
+  PCM wrapped to WAV and measured locally. Paid tier confirmed working; the free tier is
+  capped at ~10 requests/day for this model, so batch synthesis needs paid billing. `tts.py`
+  honors the per-minute 429 `retryDelay` and fails fast on the per-day cap.

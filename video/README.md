@@ -19,11 +19,12 @@ video/
     templates/         Direction B 場景模板
     blocks.py          可揭示的 Block 抽象 + 動畫派發
     brand.py           grid、字體排印、卡片、logo 與 motif
-    narration.py       `{show ...}` 解析器 + 暫時的時長估計
+    narration.py       `{show ...}` 解析器 + 後備時長估計（無 manifest 時）
     audio.py           供 PCM 輸出、時長與串接用的 WAV 輔助程式
     tts.py             分鏡 beat 的 TTS CLI（Gemini 或離線 mock 後端）
-    scene.py           所有模板共用的 Manim player
-    build.py           無聲預覽的 render CLI
+    scene.py           所有模板共用的 Manim player（reveal 時序由音訊時長驅動）
+    build.py           render CLI（讀 manifest，以每 beat 音長驅動 reveal 時序）
+    mux.py             最終組裝 CLI：把旁白混進各場景、concat 成有聲成片
   storyboards/
     ch01_inverse_functions.yml   可運作的 8 場景 Section 1.1 預覽
   output/              render 出的成品（gitignored）
@@ -31,8 +32,10 @@ video/
 
 ## 狀態
 
-目前檢查點（2026-05-31）：Direction B 無聲預覽路徑可透過 `pipeline/build.py`
-render 出全部八個 Section 1.1 場景。
+目前檢查點（2026-05-31）：端到端有聲路徑打通。Section 1.1 八個場景可
+render，並經 `pipeline/tts.py` → `pipeline/build.py` → `pipeline/mux.py`
+產出一支整節真旁白（Gemini TTS）的成片 `output/ch01_inverse_functions.mp4`；
+旁白與揭示動畫對齊（每 beat 影片長度＝該 beat 音檔長度）。
 
 可運作的分鏡：
 
@@ -104,8 +107,25 @@ video/output/audio/<storyboard-id>/
 ```
 
 manifest 為每個 reveal beat 記錄一個 WAV，並為每個內容場景記錄一個串接
-後的旁白 WAV。intro/outro 目前仍為無聲條目；其 `bgm` 欄位是占位符，
-直到 BGM/mux 回合完成。
+後的旁白 WAV。intro/outro 為無聲條目；其 `bgm` 欄位是占位符，待 BGM 回合。
+
+組裝成有聲成片（旁白混進各場景、concat 成一支）：
+
+```powershell
+python video\pipeline\mux.py --storyboard video\storyboards\ch01_inverse_functions.yml
+```
+
+`mux.py` 把每個內容場景的旁白用 `-itsoffset` 延遲、對齊到首次揭示，混到該場景
+影片底下；intro/outro 給靜音軌；再 concat 成 `output/<storyboard-id>.mp4`。
+`build.py` 會自動讀 manifest 的每 beat 音長來驅動 reveal 時序，所以三步接起來
+就是完整有聲產線：
+
+```powershell
+# 完整一節有聲影片（合成 → render → 組裝）
+python video\pipeline\tts.py   --storyboard video\storyboards\ch01_inverse_functions.yml --scene all --backend gemini --reuse-existing
+python video\pipeline\build.py --storyboard video\storyboards\ch01_inverse_functions.yml --scene all --quality low
+python video\pipeline\mux.py   --storyboard video\storyboards\ch01_inverse_functions.yml
+```
 
 最近檢查過的預覽存於：
 
@@ -113,16 +133,19 @@ manifest 為每個 reveal beat 記錄一個 WAV，並為每個內容場景記錄
 video/output/_media/videos/480p15/
 ```
 
-`video/output/` 為 gitignored。最新的低畫質 intro 預覽約 10.07 秒；最新的
-低畫質 outro 預覽約 15.40 秒。這些數字比分鏡的 `duration` 值長，因為 Manim
-動畫執行時間目前是累加的。待視覺模式核可後，節奏可再收緊。
+`video/output/` 為 gitignored。內容場景的長度由旁白音訊驅動（每 beat 影片
+長度＝該 beat 音檔長度）；intro/outro 無旁白，長度由 `duration` 加動畫累加
+時間決定，故預覽可能比 `duration` 略長，待視覺模式核可後再收緊。
+
+已完成：
+
+- ✅ 以音訊時長驅動的 reveal 時序（`build.py` 讀 manifest、`scene.py` 以每 beat 音長為牆鐘）；
+- ✅ 以 ffmpeg mux/concat 成一支有聲最終 MP4（`mux.py`）。
 
 仍待處理：
 
 - schema/lint 作為獨立指令；
-- 以音訊時長驅動的 reveal 時序；
 - intro/outro 的 BGM 來源／授權／ducking；
-- 以 ffmpeg mux/concat 成一支最終 MP4；
 - 製作畫質的 1080p 匯出；
 - 視覺方向確定後，為可重用的 intro/outro 做最終節奏調整。
 
@@ -136,9 +159,9 @@ video/output/_media/videos/480p15/
 
 Render 註記：
 
-- 目前的 Manim 預覽為無聲。在 ffmpeg mux 階段接上之前，TTS 輸出會另行
-  產生於 `video/output/audio/`。
-- 分鏡中的 `bgm` 欄位是占位符。
+- `build.py` 算出的每場景 MP4（在 `output/_media/`）為無聲；`mux.py` 才把
+  `output/audio/` 的旁白混進去、concat 成有聲成片 `output/<id>.mp4`。
+- intro/outro 仍為無聲；分鏡中的 `bgm` 欄位是占位符，待 BGM 回合。
 - 無聲預覽 render 期間可能出現 `SoX could not be found` 警告；對目前的
   檢查點而言它是無害的。
 - 若 sandbox 阻擋了對內嵌依賴的存取，請以正常的專案權限重新執行 Manim

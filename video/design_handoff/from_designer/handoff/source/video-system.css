@@ -1,0 +1,151 @@
+/* =====================================================================
+   CALCULUS VIDEO SYSTEM — shared visual tokens
+   16:9 / 1920×1080 dark canvas. Sans UI text + LaTeX (serif) math.
+   Math is rendered via KaTeX (Computer Modern). UI type is grotesque.
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  /* ---- 9 semantic colors (Midnight Canvas, re-grounded in NTU navy) ---- */
+  --bg:        #0a0e1a;   /* deep navy-black (derived from 藏青 #16294E) */
+  --bg-soft:   #121a2e;   /* elevated panel / sidebar block    */
+  --primary:   #eef0f7;   /* headings, neutral display (off-white, cool) */
+  --secondary: #4cc9f0;   /* definitions, propositions (cool cyan) */
+  --accent:    #f4b13a;   /* theorems, key emphasis (warm gold, nudged toward brand) */
+  --math:      #7df9ff;   /* math expressions (electric blue)  */
+  --warning:   #ff6b6b;   /* counter-examples, traps (coral)   */
+  --success:   #06d6a0;   /* verification, QED (emerald)       */
+  --text:      #c8ccdb;   /* body narration (light slate)      */
+  --muted:     #7e8497;   /* retired / faded prior content     */
+
+  /* ---- NTU brand layer (logo, intro/outro, section markers) ---- */
+  --brand-red:  #BA0C2F;  /* 校門紅 — brand emphasis, section blocks */
+  --brand-red-bright: #e23a57; /* legible red for dark bg text  */
+  --brand-navy: #16294E;  /* 藏青 — brand fields, blocks       */
+  --brand-gold: #B6892B;  /* 點綴金 — summit star, brand accent */
+
+  /* ---- support tones ---- */
+  --hairline:  #243049;   /* faint rules, ticks                */
+  --grid-line: rgba(120,150,210,0.05); /* background graph grid */
+
+  /* ---- type families ---- */
+  --font-display: 'Space Grotesk', system-ui, sans-serif; /* headings, numerals, eyebrows */
+  --font-body:    'Hanken Grotesk', system-ui, sans-serif; /* narration, captions */
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace; /* tags, axis labels, eyebrows */
+
+  /* ---- type scale (px @ 1920×1080 canvas) ---- */
+  --t-display: 104px;  /* intro / transition headline   */
+  --t-h1:      62px;   /* scene heading (top-left)       */
+  --t-h2:      46px;   /* secondary headline             */
+  --t-math:    46px;   /* KaTeX display math             */
+  --t-math-sm: 36px;   /* inline / step math             */
+  --t-body:    38px;   /* narration                      */
+  --t-step:    32px;   /* list / step text               */
+  --t-eyebrow: 24px;   /* mono uppercase tag             */
+  --t-label:   28px;   /* figure / axis label            */
+
+  /* ---- layout grid (1920×1080) ---- */
+  --safe:    96px;   /* outer safe margin              */
+  --gutter:  220px;  /* side gutter → content col 77%  */
+  --rule-w:  3px;    /* heading hairline thickness     */
+}
+
+/* =====================================================================
+   FRAME — every scene is a 1920×1080 stage
+   ===================================================================== */
+.frame{
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* faint coordinate-grid backdrop (the math-plane motif) */
+.frame--grid::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 80px 80px;
+  z-index:0;
+}
+/* radial vignette to focus the centre */
+.frame--vignette::after{
+  content:"";
+  position:absolute; inset:0;
+  background: radial-gradient(120% 120% at 50% 42%, transparent 55%, rgba(0,0,0,0.45) 100%);
+  pointer-events:none; z-index:0;
+}
+.frame > *{ position: relative; z-index:1; }
+
+/* =====================================================================
+   TYPE HELPERS
+   ===================================================================== */
+.eyebrow{
+  font-family: var(--font-mono);
+  font-size: var(--t-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+.display{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--t-display);
+  letter-spacing: -0.015em;
+  color: var(--primary);
+  line-height: 1.02;
+}
+.h1{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--t-h1);
+  letter-spacing: -0.01em;
+  color: var(--primary);
+  line-height: 1.05;
+}
+.body{
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: 1.5;
+  color: var(--text);
+}
+.step{
+  font-family: var(--font-body);
+  font-size: var(--t-step);
+  line-height: 1.45;
+  color: var(--text);
+}
+
+/* color roles as utility classes */
+.c-primary{color:var(--primary);} .c-secondary{color:var(--secondary);}
+.c-accent{color:var(--accent);}   .c-math{color:var(--math);}
+.c-warning{color:var(--warning);} .c-success{color:var(--success);}
+.c-text{color:var(--text);}       .c-muted{color:var(--muted);}
+
+/* =====================================================================
+   KATEX sizing — math inherits container color
+   ===================================================================== */
+.katex{ font-size: 1em; }
+.math-display .katex{ font-size: var(--t-math); }
+.math-sm .katex{ font-size: var(--t-math-sm); }
+.math-display, .math-sm{ color: var(--math); }
+
+/* retired / faded prior step */
+.retired{ color: var(--muted) !important; }
+.retired .katex{ color: var(--muted) !important; }
+
+/* gold glow used to mark an emphasized key line (static stand-in for
+   Manim's flash) */
+.glow-accent{
+  text-shadow: 0 0 22px rgba(249,168,37,0.55), 0 0 6px rgba(249,168,37,0.35);
+}
+.glow-math{
+  text-shadow: 0 0 22px rgba(125,249,255,0.40), 0 0 6px rgba(125,249,255,0.25);
+}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Direction B — Blueprint Grid · Template Library</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"/>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="video-system.css"/>
+<style>
+  html,body{ margin:0; background:#0d0f14; }
+  .katex { color: inherit; }
+</style>
+</head>
+<body>
+<template id="__bundler_thumbnail">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<rect width="100" height="100" fill="#16294E"/>
+<g transform="translate(38,30)">
+<rect x="0" y="22" width="3.5" height="8" rx="1.7" fill="#BA0C2F"/>
+<rect x="5" y="16" width="3.5" height="14" rx="1.7" fill="#BA0C2F"/>
+<rect x="10" y="10" width="3.5" height="20" rx="1.7" fill="#BA0C2F"/>
+<rect x="15" y="4" width="3.5" height="26" rx="1.7" fill="#eef1f6"/>
+<rect x="20" y="10" width="3.5" height="20" rx="1.7" fill="#BA0C2F"/>
+<rect x="25" y="16" width="3.5" height="14" rx="1.7" fill="#BA0C2F"/>
+<path d="M16.7,-6 L18,-1 L23,0 L18,1 L16.7,6 L15.4,1 L10.4,0 L15.4,-1 Z" fill="#B6892B"/>
+</g>
+</svg>
+</template>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="lib.jsx"></script>
+<script type="text/babel" src="graph.jsx"></script>
+<script type="text/babel" src="overview.jsx"></script>
+<script type="text/babel" src="dir-b.jsx"></script>
+<script type="text/babel" src="dir-b-templates.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const Canvas = window.DesignCanvas, Section = window.DCSection, Artboard = window.DCArtboard;
+
+function App(){
+  return (
+    <Canvas>
+      <Section id="system" title="Global Visual System" subtitle="Palette · type · grid · emphasis · motif">
+        <Artboard id="overview" label="System spec" width={1920} height={1820}><Overview/></Artboard>
+      </Section>
+
+      <Section id="brand" title="Brand frames" subtitle="Intro · Outro — most expressive, brand-forward">
+        <Artboard id="intro" label="intro" width={1920} height={1080}><B_IntroLight/></Artboard>
+        <Artboard id="outro" label="outro" width={1920} height={1080}><B_OutroLight/></Artboard>
+      </Section>
+
+      <Section id="content" title="Content templates" subtitle="The teaching workhorses — math stays LaTeX, key line glows">
+        <Artboard id="definition" label="definition_math" width={1920} height={1080}><B_Definition/></Artboard>
+        <Artboard id="example" label="example_walkthrough" width={1920} height={1080}><B_Example/></Artboard>
+        <Artboard id="procedure" label="procedure_steps" width={1920} height={1080}><B_Procedure/></Artboard>
+        <Artboard id="theorem" label="theorem_proof" width={1920} height={1080}><B_Theorem/></Artboard>
+        <Artboard id="recap" label="recap_cards" width={1920} height={1080}><B_Recap/></Artboard>
+      </Section>
+
+      <Section id="graph" title="Graph focus" subtitle="Full-frame plot — axis / curve / hollow points / dashed guide">
+        <Artboard id="graph" label="graph_focus" width={1920} height={1080}><B_Graph/></Artboard>
+      </Section>
+    </Canvas>
+  );
+}
+
+function mount(){
+  if(!window.DesignCanvas || !window.katex || !window.B_Intro || !window.B_Example){ return setTimeout(mount, 60); }
+  ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+}
+mount();
+</script>
+</body>
+</html>
