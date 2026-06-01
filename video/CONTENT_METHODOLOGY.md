@@ -146,7 +146,7 @@ gen-2 用 **Gemini TTS 直讀 LaTeX**，所以 narration 裡可以**直接內嵌
 
 ## 5. 視覺與動畫：內容層的決策
 
-本節只做**內容層決策**（要不要視覺、要什麼、演示哪個教學點），**不做工程實作**（座標、plot、manim code 都屬第二階段或你手畫的動畫）。
+本節只做**內容層決策**（要不要視覺、要什麼、演示哪個教學點），**不做工程實作**（座標、plot、manim code 都屬第二階段——含 Claude 依 `animation_cue` 生成的客製動畫）。
 
 - **Redraw, don't reproduce。** 書本圖是「**要顯示什麼**」的權威，不是「**怎麼顯示**」。內容稿描述要顯示的數學物件與教學目的即可。
 - **Animate, not just display。** 書本圖是靜態一頁；影片能讓曲線 trace 出來、測試線 sweep 進來、交點 flash、圖形對 `y=x` 翻摺、極限逐步逼近。**會動的概念就讓它動，讓動態承載一個教學點。**
@@ -159,9 +159,9 @@ gen-2 用 **Gemini TTS 直讀 LaTeX**，所以 narration 裡可以**直接內嵌
 
 ### 動畫的分工（重要）
 
-內容稿**只提動畫建議（自然語言）**，**MUST NOT 寫 manim code**。**動畫由你親自設計並實作**，完成後加入。這對應 gen-1 的 `hook`（客製動畫 escape hatch）——模板畫不出來的、需要手控時序的動畫，由你手寫。
+內容稿**只提動畫建議（自然語言）**，**MUST NOT 寫 manim code**——內容層與工程層的分離不變。但**客製動畫的 manim code 由 Claude 依 `animation_cue` 的自然語言生成**（不再由使用者手畫），生成後接入工程層的 hook 接入點（工程稿的 `# HOOK` 處）。這對應 gen-1 的 `hook`（客製動畫 escape hatch）——模板畫不出來的、需要手控時序的動畫，現由 Claude 從自然語言規格生成。生成的動畫 code 視同 narration：**SHOULD 經使用者過目認可**再定版。
 
-動畫建議的寫法 **SHOULD** 聚焦**教學意圖**而非實作細節：
+於是 `animation_cue` 是使用者／內容稿作者交給 Claude 的**動畫規格**，也是 Claude 生成 code 的依據；它的寫法 **SHOULD** 聚焦**教學意圖**而非實作細節（實作細節由 Claude 在生成時決定）：
 
 - 好：「水平線從畫面上方緩緩下移、掃過 parabola；落到 $y=\tfrac14$ 時停住，同時閃示兩個交點 $x=\pm\tfrac12$，凸顯『一個輸出對應兩個輸入』。」
 - 不好：寫座標數值、寫 manim 物件名、寫 `run_time`。
@@ -190,7 +190,7 @@ gen-2 用 **Gemini TTS 直讀 LaTeX**，所以 narration 裡可以**直接內嵌
 | `kind` | 教學角色：`motivation` / `definition` / `theorem` / `proof` / `proposition` / `example` / `counterexample` / `procedure` / `visual` / `recap` / `forward_ref` … |
 | `narration` | 口語完整稿（英文；數學依 §4 口語化原則；intro／outro 無此欄）。 |
 | `visual_need` | 此單元需要的**靜態視覺**（內容層描述，不指定 template／payload）。 |
-| `animation_cue` | （選用）概念適合**動態演示**時的自然語言動畫建議 → 標記為**客製 manim，使用者自畫**，設計完再加入。 |
+| `animation_cue` | （選用）概念適合**動態演示**時的自然語言動畫建議（＝交給 Claude 的教學意圖規格）→ **Claude 依此生成客製 manim code**，認可後接入工程稿 `# HOOK`。 |
 
 > 刻意**不含** `template` / `{show}` marker / `accent` / 視覺 payload——那些是第二階段把內容稿「模板化」時才填。
 
