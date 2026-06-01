@@ -16,7 +16,7 @@ meta:
   language: en
   theme: midnight
   voice: Kore
-  video: { w: 1920, h: 1080, fps: 30 }
+  video: { w: 3840, h: 2160, fps: 60 }   # 交付標準：4K60 (manim fourk_quality)
   tagline: "When can a process be run backwards?"
   sections:
     - { id: "1.1", title: "Inverse Functions" }
@@ -111,9 +111,9 @@ scenes:
       {show math.2} Two different inputs, the same output, so $g$ is not one-to-one.
       {show takeaway} A single colliding pair is all it takes to fail.
     steps:
-      - { text: "$f(x)=x$ on $[0,1]$:\\\\ distinct outputs.", math: "f(x)=x,\\ 0\\le x\\le 1", mark: ok }
-      - { text: "Test $g(x)=x^2$\\\\ at $x=\\pm\\tfrac12$.", math: "g\\!\\left(\\tfrac12\\right)=\\tfrac14=g\\!\\left(-\\tfrac12\\right)", hot: true }
-      - { text: "Two inputs collide,\\\\ $g$ not one-to-one.", math: "\\tfrac12 \\ne -\\tfrac12", mark: bad }
+      - { text: "$f(x)=x$ on $[0,1]$: distinct outputs.", math: "f(x)=x,\\ 0\\le x\\le 1", mark: ok }
+      - { text: "Test $g(x)=x^2$ at $x=\\pm\\tfrac12$.", math: "g\\!\\left(\\tfrac12\\right)=\\tfrac14=g\\!\\left(-\\tfrac12\\right)", hot: true }
+      - { text: "Two inputs collide, $g$ not one-to-one.", math: "\\tfrac12 \\ne -\\tfrac12", mark: bad }
     takeaway: "A single colliding pair of inputs is enough to disprove one-to-one."
 
   # 6 ------------------------------------------ counterexample: why x^2 fails (graph)
@@ -138,8 +138,8 @@ scenes:
     plots:
       - { kind: function, expression: "x**2", x_range: [-1.45, 1.45], color_role: secondary, label: "$g(x)=x^2$", label_point: [0.08, 1.30] }
       - { kind: line, start: [-1.45, 0.25], end: [1.45, 0.25], dashed: true, color_role: warning, label: "$y=1/4$", label_side: right }
-      - { kind: point, point: [-0.5, 0.25], hollow: true, color_role: accent }
-      - { kind: point, point: [0.5, 0.25], hollow: true, color_role: accent }
+      - { kind: point, point: [-0.5, 0.25], hollow: false, color_role: accent }   # g(-1/2)=1/4 exists -> solid
+      - { kind: point, point: [0.5, 0.25], hollow: false, color_role: accent }    # g(1/2)=1/4 exists -> solid
     annotations:
       - "Two inputs share one output -- $g^{-1}(\\tfrac14)$ is not well-defined."
 
@@ -225,8 +225,8 @@ scenes:
       that $g$ of $g$-inverse of $x$ is $x$.
       {show takeaway} The cube and the cube root undo each other, as an inverse should.
     steps:
-      - { text: "Identity is its\\\\ own inverse.", math: "f^{-1}(x)=x", mark: ok }
-      - { text: "Solve $y=x^3$\\\\ for $x$.", math: "x=\\sqrt[3]{y}", hot: true }
+      - { text: "Identity is its own inverse.", math: "f^{-1}(x)=x", mark: ok }
+      - { text: "Solve $y=x^3$ for $x$.", math: "x=\\sqrt[3]{y}", hot: true }
       - { text: "Rename and check.", math: "g^{-1}(x)=\\sqrt[3]{x}", mark: ok }
     takeaway: "Cube and cube root undo each other."
 

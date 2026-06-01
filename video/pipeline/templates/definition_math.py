@@ -40,14 +40,16 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     eyebrow.move_to([left + eyebrow.width / 2, top - eyebrow.height / 2, 0])
     blocks.append(Block("eyebrow", eyebrow, anim="fade", static=True))
 
-    title = brand.heading(spec.get("title", ""), ground, role="primary", size="h1")
+    title = brand.heading_rich(spec.get("title", ""), ground, role="primary", size="h1")
     title.next_to(eyebrow, DOWN, buff=0.28).align_to(eyebrow, LEFT)
     blocks.append(Block("title", title, anim="fade", static=True))
 
     ref = title
     if spec.get("statement"):
-        statement = brand.body_text(spec["statement"], ground, size="body",
-                                    max_width=content_w, align="CENTER")
+        # prose() routes on content: inline $math$ / a \\ break -> Tex (so it
+        # never prints "$f$" literally); plain prose -> wrapped, centred Text.
+        statement = brand.prose(spec["statement"], ground, size="body",
+                                max_width=content_w, align="CENTER")
         statement.move_to([0, title.get_bottom()[1] - 0.95, 0])
         blocks.append(Block("statement", statement, anim="fade", static=True))
         ref = statement
@@ -69,8 +71,6 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     if math_mobs:
         stack = VGroup(*math_mobs).arrange(DOWN, buff=0.5)
         stack.move_to([0, (ref.get_bottom()[1] - 3.3) / 2, 0])
-        card = brand.math_card(stack, ground, pad=0.55)
-        blocks.append(Block("card", card, anim="fade", static=True))
         for i, (mob, anim) in enumerate(zip(math_mobs, anims)):
             blocks.append(Block(f"math.{i}", mob, anim=anim, static=False))
 

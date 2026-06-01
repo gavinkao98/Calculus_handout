@@ -3,8 +3,14 @@
 Ports the handoff's B_Graph / ParabolaPlot into Manim primitives:
 mixed math title, a centered plot with axes only (no reference gridlines --
 grids are disabled project-wide, see theme.SHOW_GRID), glowing cyan function
-curves, coral dashed guides, hollow/solid points, math labels, and a bottom
-annotation reveal.
+curves, coral dashed guides, points, math labels, and a bottom annotation reveal.
+
+Point convention (`hollow` flag) -- this is mathematical notation, not styling:
+  hollow: false (SOLID ●) -- the value IS attained here (default; intersections,
+                            points that lie on the curve).
+  hollow: true  (OPEN ○)  -- the value is NOT attained here (excluded endpoint of
+                            a half-open domain, a removed point / hole).
+Using an open dot for an attained point misleads students -- pick by the math.
 """
 from __future__ import annotations
 
@@ -224,12 +230,15 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks.extend(plot_blocks)
 
     annotations = []
+    max_w = T.FRAME_W - 2 * T.SIDE_GUTTER
     for entry in spec.get("annotations", []):
         text = entry.get("text", "") if isinstance(entry, dict) else str(entry)
-        ann = _label(text, ground, role="muted", size="step")
-        max_w = T.FRAME_W - 2 * T.SIDE_GUTTER
-        if ann.width > max_w:
-            ann.scale_to_fit_width(max_w)
+        # prose() wraps an over-wide annotation instead of shrinking it, so two
+        # annotations of different lengths keep the same size (the recap mismatch
+        # class). _label stays for the tight curve/point labels.
+        # role="text" (not "muted"): an annotation is a teaching takeaway students
+        # must read; "muted" is for de-emphasised/retired content, too faint here.
+        ann = brand.prose(text, ground, role="text", size="step", max_width=max_w, align="CENTER")
         annotations.append(ann)
 
     if annotations:

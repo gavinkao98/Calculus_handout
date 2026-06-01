@@ -8,6 +8,7 @@ newlines ONLY at spaces, so words never break mid-glyph (the recurring bug).
 """
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from pathlib import Path
 
@@ -178,6 +179,120 @@ def glyph(name: str, ground: str, *, role: str, size: str = "math"):
     Modern, which has them, so they always appear.
     """
     return MathTex(_GLYPH_TEX[name], color=T.color(ground, role), font_size=T.fs(size))
+
+
+def prose_tex(text: str, ground: str, *, role: str = "text", size: str = "body"):
+    """Prose that may carry LaTeX markup -- inline ``$math$`` and/or a ``\\\\``
+    line break -- rendered in Tex *text mode*.
+
+    Use this (not ``body_text``) whenever a prose field can contain ``$...$`` or
+    ``\\\\``: plain ``Text`` shows that markup literally (the ``$f$`` / ``\\\\``
+    garble). Unlike ``math_line``, this never routes to MathTex, so a markup-free
+    word like "Identity" stays upright text, not math italics.
+
+    font_size is scaled by ``TEX_TEXT_SCALE`` so this sits at the same visual size
+    as ``body_text`` (Text and Tex render the same font_size differently). Prefer
+    the ``prose()`` router below over calling this directly.
+    """
+    return Tex(text, color=T.color(ground, role), font_size=T.fs(size) * T.TEX_TEXT_SCALE)
+
+
+def _wrap_prose_tex(text: str, ground: str, role: str, size: str, max_width: float):
+    """Greedily word-wrap markup prose into prose_tex lines that each fit max_width.
+
+    ``$...$`` spans are atomic tokens, so a wrap never lands inside math (which
+    would split a span and break the LaTeX). Returns a list of prose_tex mobjects.
+    """
+    tokens: list[str] = []
+    for part in re.split(r"(\$[^$]*\$)", text):
+        if part.startswith("$") and part.endswith("$") and len(part) >= 2:
+            tokens.append(part)
+        else:
+            tokens.extend(part.split())
+
+    lines: list = []
+    cur: list[str] = []
+    for tok in tokens:
+        if cur and prose_tex(" ".join(cur + [tok]), ground, role=role, size=size).width > max_width:
+            lines.append(prose_tex(" ".join(cur), ground, role=role, size=size))
+            cur = [tok]
+        else:
+            cur.append(tok)
+    if cur:
+        lines.append(prose_tex(" ".join(cur), ground, role=role, size=size))
+    return lines
+
+
+def prose(text: str, ground: str, *, role: str = "text", size: str = "body",
+          max_width: float | None = None, align: str = "LEFT"):
+    """Render an author prose field, routing by content so markup never garbles.
+
+    The ONE place that decides Text-vs-Tex for prose: markup-free text goes to
+    ``body_text`` (plain Text, wraps at *max_width*); text with LaTeX markup
+    (inline ``$math$`` or a ``\\\\`` break) goes to ``prose_tex`` (Tex text-mode,
+    size-matched). Templates call this for statements, step text, takeaways,
+    recap points -- any field an author might put ``$`` / ``\\`` into.
+
+    Tex can't word-wrap natively, so an over-wide *inline-math* line is wrapped at
+    word boundaries into stacked lines at full size (matching the plain prose
+    beside it -- NOT shrunk, which used to make a math-bearing recap point look
+    smaller than its neighbours). Text with explicit ``\\\\`` breaks is left as
+    authored (only scaled down if a line still overflows).
+    """
+    if "$" not in text and "\\" not in text:
+        return _mark_prose(body_text(text, ground, role=role, size=size,
+                                     max_width=max_width, align=align))
+
+    mob = prose_tex(text, ground, role=role, size=size)
+    if max_width is None or mob.width <= max_width or "\\" in text:
+        if max_width is not None and mob.width > max_width:
+            mob.scale_to_fit_width(max_width)   # explicit-break line still too wide
+        return _mark_prose(mob)
+
+    # inline math, over-wide, no explicit breaks: wrap at word boundaries
+    lines = _wrap_prose_tex(text, ground, role, size, max_width)
+    group = VGroup(*lines)
+    if align == "LEFT":
+        group.arrange(DOWN, buff=0.2, aligned_edge=LEFT)
+    else:
+        group.arrange(DOWN, buff=0.2)
+    return _mark_prose(group)
+
+
+def _mark_prose(mob):
+    """Tag the Text/Tex nodes a prose() call produced, so sizecheck.py can find
+    the prose lines in a built scene and compare their (scale-aware) font_size
+    across stacked siblings. The tag rides through any later .scale()."""
+    if isinstance(mob, (Text, Tex, MathTex)):
+        mob._brand_prose = True
+    else:
+        for sub in mob.submobjects:
+            _mark_prose(sub)
+    return mob
+
+
+def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "h1"):
+    """A display heading that may carry inline ``$math$``.
+
+    Plain headings go through ``heading`` (Text, SEMIBOLD). When the title has
+    ``$...$`` (e.g. "Worked Example: $f(x)=x^3+2$"), split on ``$`` and alternate
+    SEMIBOLD Text with MathTex so the math renders instead of printing literally.
+    Callers clamp width themselves (titles vary a lot in length).
+    """
+    if "$" not in text:
+        return heading(text, ground, role=role, size=size)
+    fsz = T.fs(size)
+    col = T.color(ground, role)
+    mobs = []
+    for i, part in enumerate(text.split("$")):
+        if not part:
+            continue
+        if i % 2:  # odd segments are the spans that were between $...$
+            mobs.append(MathTex(part, color=col, font_size=fsz))
+        else:
+            mobs.append(Text(part, font=T.FONT_DISPLAY, font_size=fsz,
+                             color=col, weight="SEMIBOLD"))
+    return VGroup(*mobs).arrange(RIGHT, buff=0.24, aligned_edge=DOWN)
 
 
 def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math"):

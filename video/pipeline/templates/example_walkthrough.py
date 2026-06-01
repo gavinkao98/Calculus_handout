@@ -51,11 +51,11 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     for i, st in enumerate(steps):
         # left: 0N index + reasoning text
         idx = brand.eyebrow(f"0{i+1}", ground, role="secondary")
-        raw = st.get("text", "")
-        if "$" in raw:
-            txt = brand.math_line(raw, ground, role="text", size="step")
-        else:
-            txt = brand.body_text(raw, ground, size="step", max_width=4.7, align="LEFT")
+        # prose() routes markup ($math$ / \\ break) to Tex, plain text to wrapped
+        # Text -- so a step like "Identity is its\\ own inverse." breaks instead
+        # of printing the "\\" literally.
+        txt = brand.prose(st.get("text", ""), ground, role="text", size="step",
+                          max_width=4.7, align="LEFT")
         idx.next_to(txt, LEFT, buff=0.3, aligned_edge=UP)
         left_rows.append(VGroup(idx, txt))
 
@@ -96,8 +96,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     take = spec.get("takeaway")
     if take:
         rule = brand.hrule(0.5, ground, role="warning", stroke=2.5)
-        cap = brand.body_text(take, ground, role="warning", size="step",
-                              max_width=T.FRAME_W - 2 * T.SIDE_GUTTER - 0.8)
+        cap = brand.prose(take, ground, role="warning", size="step",
+                          max_width=T.FRAME_W - 2 * T.SIDE_GUTTER - 0.8)
         rule.next_to(cap, LEFT, buff=0.25)
         grp = VGroup(rule, cap)
         grp.move_to([left_x, -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.3, 0], aligned_edge=LEFT)

@@ -46,7 +46,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     for i, t in enumerate(points):
         idx = brand.eyebrow(f"0{i+1}", ground, role="accent")
         dot = brand.plot_dot(ground, role="accent", r=0.06)
-        txt = brand.body_text(t, ground, size="step", max_width=5.0, align="LEFT")
+        txt = brand.prose(t, ground, size="step", max_width=5.0, align="LEFT")
         dot.next_to(txt, LEFT, buff=0.25, aligned_edge=UP)
         idx.next_to(dot, LEFT, buff=0.25, aligned_edge=UP)
         row = VGroup(idx, dot, txt)

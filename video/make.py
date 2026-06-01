@@ -42,7 +42,10 @@ import yaml  # noqa: E402
 from pipeline.audio import concat_wavs, silence_pcm, wav_duration, write_pcm_wav  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 
-QUALITY = {"low": "low_quality", "medium": "medium_quality", "high": "production_quality"}
+# Preview tiers map to manim presets (fast iteration). "high" is the delivery
+# tier, special-cased in render() to the project standard 4K@60 (fourk_quality),
+# overridable per storyboard via meta.video.
+QUALITY = {"low": "low_quality", "medium": "medium_quality"}
 LEAD_SECONDS = 0.3  # matches LessonScene's initial self.wait(0.3) before beat 1
 
 
@@ -175,17 +178,31 @@ def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, qualit
         LessonScene.spec = scene
         LessonScene.meta = meta
         LessonScene.beat_durations = durations.get(sid)
+        cfg = {
+            "media_dir": str(media_dir),
+            "output_file": output_file,
+            "disable_caching": True,
+            "verbosity": "ERROR",
+        }
+        if quality == "high":
+            # final quality = the project delivery standard: 4K @ 60fps
+            # (manim fourk_quality). A storyboard's meta.video overrides if set;
+            # the 3840x2160@60 default enforces the standard when it is omitted.
+            v = meta.get("video", {}) or {}
+            cfg["pixel_width"] = int(v.get("w", 3840))
+            cfg["pixel_height"] = int(v.get("h", 2160))
+            cfg["frame_rate"] = int(v.get("fps", 60))
+        else:
+            cfg["quality"] = QUALITY[quality]
         try:
-            with tempconfig({
-                "quality": QUALITY[quality],
-                "media_dir": str(media_dir),
-                "output_file": output_file,
-                "disable_caching": True,
-                "verbosity": "ERROR",
-            }):
+            with tempconfig(cfg):
                 LessonScene().render()
-            matches = sorted(media_dir.rglob(f"{output_file}.mp4"))
-            rendered[sid] = matches[-1] if matches else None
+            # _media keeps a per-resolution subdir (480p15/, 1080p30/, ...) across
+            # runs, so several matches can exist. Take the freshest (the one this
+            # render just wrote) -- sorting by name would pick "480p15" over
+            # "1080p30" and mux a stale low-res clip.
+            matches = list(media_dir.rglob(f"{output_file}.mp4"))
+            rendered[sid] = max(matches, key=lambda p: p.stat().st_mtime) if matches else None
             if rendered[sid] is None:
                 print(f"[render] !! no mp4 for {output_file}", flush=True)
                 failures += 1
@@ -278,17 +295,56 @@ def main() -> int:
     parser.add_argument("--storyboard", required=True, type=Path)
     parser.add_argument("--backend", default="mock", choices=("mock", "gemini"))
     parser.add_argument("--scene", default="all", help="id, 'a,b,c', or 'all'")
-    parser.add_argument("--quality", default="low", choices=sorted(QUALITY))
+    parser.add_argument("--quality", default="low", choices=("low", "medium", "high"))
     parser.add_argument("--lead", type=float, default=LEAD_SECONDS)
     parser.add_argument("--audio-bitrate", default="192k")
     parser.add_argument("--empty-beat-seconds", type=float, default=0.45)
+    parser.add_argument("--skip-lint", action="store_true",
+                        help="skip the pre-render storyboard garble lint")
+    parser.add_argument("--skip-sizecheck", action="store_true",
+                        help="skip the pre-render stacked-prose size-consistency guard")
     args = parser.parse_args()
 
     data = load_storyboard(args.storyboard)
+
+    # lint before doing any work -- catches render-garble ($f$ / \\ printed
+    # literally, unbalanced $) statically, so it never reaches the video.
+    if not args.skip_lint:
+        from pipeline.lint import lint_storyboard
+        issues = lint_storyboard(data)
+        errors = [m for s, m in issues if s == "error"]
+        warns = [m for s, m in issues if s == "warn"]
+        for msg in warns:
+            print(f"  WARN   {msg}", flush=True)
+        if errors:
+            print(f"[lint] {len(errors)} error(s) -- aborting (use --skip-lint to bypass):", flush=True)
+            for msg in errors:
+                print(f"  ERROR  {msg}", flush=True)
+            return 2
+        print("[lint] clean" + (f" ({len(warns)} warning(s))" if warns else ""), flush=True)
+
     meta = data["meta"]
     all_scenes = data["scenes"]
     scene_numbers = {s["id"]: i for i, s in enumerate(all_scenes, start=1)}
     scenes = select_scenes(all_scenes, args.scene)
+
+    # size guard: stacked prose siblings (recap points, proof steps, ...) must
+    # render at one size. Checks only the scenes about to render (builds blocks,
+    # no video), so a regression of "wrap, don't shrink" is caught before render.
+    if not args.skip_sizecheck:
+        from pipeline.sizecheck import check_scenes
+        issues = check_scenes(meta, scenes)
+        errors = [m for s, m in issues if s == "error"]
+        warns = [m for s, m in issues if s == "warn"]
+        for msg in warns:
+            print(f"  WARN   {msg}", flush=True)
+        if errors:
+            print(f"[sizecheck] {len(errors)} error(s) -- aborting (use --skip-sizecheck to bypass):", flush=True)
+            for msg in errors:
+                print(f"  SIZE   {msg}", flush=True)
+            return 2
+        print("[sizecheck] consistent" + (f" ({len(warns)} warning(s))" if warns else ""), flush=True)
+
     out_dir = _bootstrap.REPO_ROOT / "video" / "output"
     audio_dir = out_dir / "audio" / meta["id"]
     print(f"[parse] {meta['id']}: {len(scenes)}/{len(all_scenes)} scene(s)", flush=True)

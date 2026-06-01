@@ -22,7 +22,18 @@ FONT_MONO = "CMU Typewriter Text"
 # -- type scale -----------------------------------------------------------
 # tokens.json gives px @ 1920x1080. manim font_size is its own unit; PX_TO_FS
 # converts. Calibrated so design h1 (62px) -> ~45 manim fs. One global knob.
+# NOTE: PX_TO_FS was tuned against the *Text* (Pango) path, which is what FONT_*
+# headings/body use.
 PX_TO_FS = 0.72
+
+# manim renders Text (Pango) and Tex/MathTex (LaTeX) at *different* visual sizes
+# for the same font_size: a Text is ~1.34x taller than a Tex at equal font_size
+# (measured, CMU Serif vs LaTeX Computer Modern). So prose rendered via Tex must
+# be scaled up by this factor to sit at the same size as body_text beside it --
+# otherwise a markup row (Tex) looks smaller than a plain row (Text) in the same
+# column. Applied in brand.prose_tex; math (brand.math_line) is intentionally its
+# own size role and is left unscaled. One global knob -- retune if fonts change.
+TEX_TEXT_SCALE = 1.34
 
 _SCALE_PX = {
     "display": 104, "h1": 62, "h2": 46, "math": 46, "math_sm": 36,

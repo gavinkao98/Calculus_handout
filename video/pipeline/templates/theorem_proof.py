@@ -38,11 +38,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
 
     # -- statement card with gold left bar --
-    statement = brand.math_line(spec.get("statement", ""), ground,
-                                role="primary", size="h2")
-    # math_line auto-routes to Tex when it sees '$', so a mixed sentence renders.
-    if statement.width > content_w - 0.6:
-        statement.scale_to_fit_width(content_w - 0.6)
+    # prose(): a pure-prose statement (no $) must NOT go to math_line -- that
+    # routes to MathTex and renders the whole sentence as run-together math
+    # italic ("Afunction...one-to-one"). prose() sends it to Text instead, and
+    # still handles a statement that does carry inline $math$.
+    statement = brand.prose(spec.get("statement", ""), ground,
+                            role="primary", size="h2", max_width=content_w - 0.6)
     bar = brand.vrule(statement.height + 0.3, ground, role="accent", width=6)
     bar.next_to(statement, LEFT, buff=0.35)
     card = VGroup(bar, statement)
@@ -55,14 +56,15 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
 
     steps = spec.get("proof", [])
-    step_gap = 0.85
+    step_gap = 0.95
     proof_top = -0.4
     for i, p in enumerate(steps):
         dot = brand.plot_dot(ground, role="secondary", r=0.06)
-        txt = brand.math_line(p, ground, role="text", size="step")
-        if txt.width > content_w - 1.0:
-            txt.scale_to_fit_width(content_w - 1.0)
-        dot.next_to(txt, LEFT, buff=0.3)
+        # prose() wraps a long step instead of shrinking it, so the steps keep a
+        # uniform size -- a scaled-down long step beside a short one is the same
+        # mismatch class as the recap points.
+        txt = brand.prose(p, ground, role="text", size="step", max_width=content_w - 1.0)
+        dot.next_to(txt, LEFT, buff=0.3, aligned_edge=UP)
         row = VGroup(dot, txt)
         row.move_to([left + 0.4, proof_top - i * step_gap, 0], aligned_edge=LEFT)
         blocks.append(Block(f"proof.{i}", row, anim="fade", static=False))
@@ -70,7 +72,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # -- QED line --
     qed_text = spec.get("qed")
     if qed_text:
-        line = brand.math_line(qed_text, ground, role="success", size="step")
+        line = brand.prose(qed_text, ground, role="success", size="step")
         box = Square(side_length=0.42, color=T.color(ground, "success"), stroke_width=3)
         mark = brand.glyph("qed", ground, role="success", size="math_sm")
         mark.scale_to_fit_height(box.height * 0.5)

@@ -45,8 +45,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         numeral = Text(str(i + 1), font=T.FONT_DISPLAY, weight="BOLD",
                        font_size=T.fs(72), color=T.color(ground, "secondary"))
         rule = brand.vrule(0.9, ground, role="hairline", width=2)
-        txt = brand.body_text(st.get("text", ""), ground, size="step",
-                              max_width=4.6, align="LEFT")
+        txt = brand.prose(st.get("text", ""), ground, size="step",
+                          max_width=4.6, align="LEFT")
         # numeral | rule | text as one left-anchored row (move_to+aligned_edge,
         # the proven pattern); the step's math sits at a fixed right column, same y.
         row = VGroup(numeral, rule, txt).arrange(RIGHT, buff=0.5)

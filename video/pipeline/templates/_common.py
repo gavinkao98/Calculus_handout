@@ -32,7 +32,7 @@ def scene_head(spec: dict[str, Any], ctx: dict[str, Any], *, label: str) -> list
     eyebrow.move_to([left + eyebrow.width / 2, top - eyebrow.height / 2, 0])
     blocks.append(Block("eyebrow", eyebrow, anim="fade", static=True))
 
-    title = brand.heading(spec.get("title", ""), ground, role="primary", size="h1")
+    title = brand.heading_rich(spec.get("title", ""), ground, role="primary", size="h1")
     title.next_to(eyebrow, DOWN, buff=0.28).align_to(eyebrow, LEFT)
     blocks.append(Block("title", title, anim="fade", static=True))
 
