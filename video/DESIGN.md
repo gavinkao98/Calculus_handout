@@ -71,13 +71,21 @@ meta:
   language: en
   theme: midnight
   voice: Kore                     # Gemini preset voice name
-  video: { w: 1920, h: 1080, fps: 30 }
+  video: { w: 3840, h: 2160, fps: 60 }   # delivery standard: 4K60 (manim fourk_quality)
 
 scenes:
   - id: <unique snake_case>
     kind: intro | content | outro
     ...
 ```
+
+**Delivery standard: 4K60.** `meta.video` declares the final resolution/fps;
+`make.py --quality high` renders to it. The project standard is `3840×2160@60`
+(manim `fourk_quality`) for every section, and `make.py` defaults to 4K60 when
+`meta.video` is omitted. Preview tiers `--quality low`/`medium` (480p/720p) are
+for fast iteration only; the layout is resolution-independent (the manim frame is
+a fixed 14.222×8 units), so a preview and the 4K master are pixel-for-pixel the
+same composition — only the sampling density and render time differ.
 
 ### Scene kinds
 
@@ -181,6 +189,93 @@ math:
 The *when* (reveal timing) lives in `say` via `{show math.N}`; the *how* (animation
 style) lives here. Clean separation.
 
+### Text rendering: prose vs math (no garble)
+
+On-screen text takes one of two render paths. Both are Computer Modern, but manim
+sizes them differently for the same `font_size`, and only one understands LaTeX:
+
+| Path | Engine | Understands `$math$` / `\\`? | Used by |
+|---|---|---|---|
+| `Text` | Pango (OTF font) | **No** — markup prints literally (the garble) | `brand.body_text`, `brand.heading` |
+| `Tex` / `MathTex` | LaTeX | Yes | `brand.prose`, `brand.heading_rich`, `brand.math_line` |
+
+A `Text` is ~1.34× taller than a `Tex` at equal `font_size`, so prose rendered via
+Tex is scaled up by `theme.TEX_TEXT_SCALE` to sit at the same size as `body_text`
+beside it. Math (`math_line`) keeps its own size role and is left unscaled.
+
+**The rule (templates must follow it):** any field an author might put `$` or `\`
+into — `title`, `statement`, step `text`, `takeaway`, recap `points` — is rendered
+through **`brand.prose`** (body prose) or **`brand.heading_rich`** (titles). These
+are the single decision point for Text-vs-Tex: markup → Tex, otherwise → wrapped
+Text. Never call `body_text` / `heading` directly on an author prose field. Pure
+math fields (`math`, `formulas`, `proof`, `worked`) go through `brand.math_line`.
+
+Plain-Text-only fields are the intro/outro brand labels (`meta.chapter`,
+`meta.chapter_title`, `meta.section`, `meta.title`, `meta.tagline`,
+`meta.sections[].title`) — keep markup out of these. `pipeline/lint.py` enforces
+all of the above statically (see Data flow) and runs before every render.
+
+**Sizing rule — wrap, don't shrink (for stacked prose).** When a prose line is
+too wide, `brand.prose` *wraps* it to more lines at full size; it never
+`scale_to_fit_width`s a single line down. This matters for **stacked siblings**
+(recap points, proof steps, graph annotations, example steps): if one long line
+were shrunk while its short neighbours were not, they would render at visibly
+different sizes (this was a real bug). So any group of prose lines that sit
+together must go through `brand.prose` with a `max_width` — not `math_line` +
+`scale_to_fit_width`. `$...$` spans are atomic to the wrapper, so a wrap never
+splits math. The only place `scale_to_fit_width` is acceptable is a **standalone
+display line with no siblings to match** — a `heading`/`heading_rich` title — and
+even there, prefer wrapping when it reads well. Math grids (`math`, `formulas`,
+`worked`) are their own size role and are exempt.
+
+Enforced automatically: `pipeline/sizecheck.py` builds each scene (no render),
+finds the `brand.prose`-tagged lines in every stacked-sibling group (`point`,
+`proof`, `step`, `annotation`, `row`) and flags a group whose lines render at
+different (scale-aware) font sizes. `make.py` runs it before rendering the
+selected scenes (`--skip-sizecheck` to bypass), alongside the garble `lint.py`.
+
+**Colour / readability.** Text that carries teaching content uses `text`/`primary`
+or a semantic accent — never `muted`. This covers prose (statements, step text,
+graph annotations, recap points) **and direct `MathTex`/`Text` value labels** —
+e.g. the numbers on a mapping diagram (`½`, `−½`, `¼`) or point coordinates are
+content, so `text`, not `muted` (both were real misses, faint at video distance).
+`muted` (`#7e8497`) is for *decoration and de-emphasis only*: the summit-bars
+motif, non-current section-map entries, retired content, and pure reference labels
+(a `y=x` guide line, set `A`/`B` tags).
+
+> Guard blind spot: `sizecheck` flags `muted` only on `brand.prose` text. A
+> **directly-constructed `MathTex`/`Text` label in `muted` is NOT caught** —
+> because some such labels (the reference/decoration ones above) are legitimately
+> muted, so a blanket rule would false-positive. For direct labels this is
+> convention + review, not an automated guard.
+
+**No manual line breaks in prose.** Author a step/point/annotation/statement as a
+plain sentence — do **not** insert a LaTeX `\\` to force a line break. `brand.prose`
+wraps automatically at the column `max_width`: a short line stays on one line, a
+long line wraps at a word boundary. A manual `\\` forces an arbitrary break (e.g.
+"Solve $y=x^3$\\ for $x$." snapped a one-line phrase into two) — that is an
+authoring artifact, not layout. Reserve `\\` for a *deliberate* stylistic break,
+which is rare here.
+
+---
+
+### Authoring checklist — recurring mistakes, do not repeat
+
+Each of these shipped as a real bug this project already paid for. When writing a
+storyboard or a template, hold to them. Severity: **error** aborts the render
+(definitely broken); **warn** prints but does not block (has rare legitimate
+exceptions). Both run in `make.py` before render.
+
+| Don't | Do | Why / guard |
+|---|---|---|
+| `$math$` or `\` in a plain-Text field (`title`, `meta.*` labels) | put math only in markup-capable fields | prints literally; **lint error** |
+| odd number of `$` | balance every `$…$` | LaTeX crash; **lint error** |
+| `body_text`/`heading` on a field that may hold `$`/`\` | `brand.prose` / `brand.heading_rich` | garble; routing is centralised there |
+| `math_line` + `scale_to_fit_width` on stacked prose | `brand.prose(..., max_width=…)` (wraps) | size mismatch; **sizecheck error** |
+| manual `\\` break in prose | plain sentence, let prose wrap | arbitrary break; **lint warn** |
+| `muted` for teaching content (prose **or** direct `MathTex`/`Text` value labels) | `text`/`primary` or a semantic accent | too faint; **sizecheck warn** on prose only — direct labels are convention |
+| hollow `○` dot for an attained value (point on a curve / intersection) | solid `●` (`hollow: false`) | `○` means *value absent*; **lint warn** (hollow on an interior curve point) |
+
 ---
 
 ## Data flow (target)
@@ -191,7 +286,11 @@ chapters/<ch>.tex
    ▼
 video/storyboards/<id>.yml
    │
-   ├─ schema.py            validate format, list reveal targets, lint            (TODO)
+   ├─ lint.py              errors: markup in plain-Text fields, unbalanced $;    (DONE)
+   │                       warns: manual \\ in prose, hollow point on a curve
+   ├─ sizecheck.py         builds scenes (no render). error: stacked siblings    (DONE)
+   │                       at different sizes; warn: teaching prose in muted
+   ├─ schema.py            validate format, list reveal targets                  (TODO)
    │
    ▼
 narration.parse_say        split each `say` into beats at {show} markers          (DONE)

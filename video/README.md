@@ -141,21 +141,75 @@ video/output/_media/videos/480p15/
 
 - ✅ 以音訊時長驅動的 reveal 時序（`build.py` 讀 manifest、`scene.py` 以每 beat 音長為牆鐘）；
 - ✅ 以 ffmpeg mux/concat 成一支有聲最終 MP4（`mux.py`）。
+- ✅ 自動守門員（`make.py` render 前執行,兩級:**error 擋下 / warn 只提示**）:
+  - `pipeline/lint.py` — error:純文字欄含標記、`$` 不平衡;warn:散文手動 `\\`、空心點畫在曲線上。
+  - `pipeline/sizecheck.py` — error:並排散文字級不一致;warn:教學散文用 `muted`(太淡)。
+- ✅ 製作畫質匯出：`make.py --quality high` 依 `meta.video` render。**交付標準＝4K60（3840×2160@60，manim fourk_quality）**；`meta.video` 未設時亦預設 4K60。
 
 仍待處理：
 
-- schema/lint 作為獨立指令；
+- schema 驗證作為獨立指令（lint 已完成，見下方「文字渲染」）；
 - intro/outro 的 BGM 來源／授權／ducking；
-- 製作畫質的 1080p 匯出；
 - 視覺方向確定後，為可重用的 intro/outro 做最終節奏調整。
+
+## 文字渲染（避免亂碼）
+
+畫面上的字走兩條渲染路徑，**兩者都是 Computer Modern，但 manim 對相同 `font_size`
+的呈現大小不同**（`Text` 約比 `Tex` 大 1.34 倍，已由 `theme.TEX_TEXT_SCALE` 校準對齊）：
+
+- **`Text`（Pango，OTF 字型）** —— 純文字，**不認得 LaTeX**。`$f$`、`\\` 會被原樣印出（亂碼）。
+- **`Tex` / `MathTex`（LaTeX）** —— 認得 inline `$math$` 與 `\\` 換行。
+
+> **鐵則:任何作者可能填入 `$` 或 `\` 的散文／標題欄位，模板一律用 `brand.prose`
+> 或 `brand.heading_rich` 渲染，不要直接用 `body_text` / `heading`。**
+
+這兩個共用渲染器會依內容自動路由（有標記→Tex，否則→可換行的 Text），是「Text vs Tex」
+判斷的**唯一**決策點。`math:` / `formulas:` 等純數學欄位仍走 `brand.math_line`。
+
+render 前會自動跑 lint 擋下亂碼（純文字欄位含標記、不平衡的 `$`）；也可獨立執行：
+
+```powershell
+python video\pipeline\lint.py video\storyboards\ch01_inverse_functions.yml
+# make.py 預設自動 lint；--skip-lint 可跳過
+```
 
 ## 環境
 
-重量級依賴（manim 等）內嵌於儲存庫的 `.deps*` 下，並由
-`pipeline/_bootstrap.py` 接上 `sys.path`。Gemini TTS 透過 `--voice` 使用
-模型的預設語音；它不使用語音克隆或參考音訊。Gemini 後端另需安裝
-`google-genai` 並具備 API 金鑰。TTS CLI 亦有 `--backend mock`，它不需要
-網路／API 金鑰，適合用於驗證 manifest。
+重量級依賴（`manim` 0.20.1、`PyYAML`）內嵌於儲存庫根目錄的
+`.deps_voiceover` / `.deps`，由 `pipeline/_bootstrap.py` 接上 `sys.path`。
+
+> ⚠️ **這兩個 `.deps*` 目錄是 gitignored —— 新 clone 的機器不會有它們。**
+> 換電腦時 `import manim/yaml` 會直接失敗。若它們不在,改建一個本機 venv
+> （與 `.deps*` 互不影響,`_bootstrap` 找不到 `.deps*` 時就用 venv 的套件）。
+
+**換新電腦的一次性設定**（`.deps*` 不存在時）:
+
+```powershell
+# 1) 建 venv 並裝 pinned 依賴
+python -m venv .venv
+.venv\Scripts\python -m pip install -r video\requirements.txt
+
+# 2) make.py 的 compose 階段直接呼叫 `ffmpeg`,需在 PATH 上。若無系統 ffmpeg,
+#    用 imageio-ffmpeg 自帶的二進位做一個 shim（一次即可）:
+$src = .venv\Scripts\python -c "import imageio_ffmpeg as f; print(f.get_ffmpeg_exe())"
+New-Item -ItemType Directory -Force .venv\ffmpeg_shim | Out-Null
+Copy-Item $src .venv\ffmpeg_shim\ffmpeg.exe
+```
+
+**之後每次執行**（把 shim 加進 PATH,用 venv 的 python）:
+
+```powershell
+$env:PATH=".venv\ffmpeg_shim;$env:PATH"
+.venv\Scripts\python video\make.py --storyboard video\storyboards\ch01_inverse_functions.yml --backend mock --quality low
+```
+
+（系統若已有 `ffmpeg` 在 PATH,可略過 shim。`.venv` 與 `.venv\ffmpeg_shim`
+本身不進版控。）
+
+Gemini TTS 透過 `--voice` 使用模型的預設語音；它不使用語音克隆或參考音訊。
+Gemini 後端另需安裝 `google-genai` 並具備 API 金鑰（計費，依 CLAUDE.md 需逐次
+核可）。TTS CLI 亦有 `--backend mock`，它不需要網路／API 金鑰，適合用於驗證
+manifest 與改模板時的快速無聲預覽。
 
 Render 註記：
 

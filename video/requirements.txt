@@ -1,0 +1,16 @@
+# Local fallback deps for the video/ pipeline.
+#
+# The pipeline normally loads heavy deps from the vendored .deps_voiceover / .deps
+# dirs at repo root (see pipeline/_bootstrap.py). Those are gitignored, so a fresh
+# clone on a new machine does NOT have them. When they are absent, create a venv
+# and install this file instead:
+#
+#   python -m venv .venv
+#   .venv\Scripts\python -m pip install -r video\requirements.txt
+#
+# See README.md "## 環境" for the ffmpeg shim + run command.
+
+manim==0.20.1        # vendored as .deps_voiceover
+pyyaml               # vendored as .deps
+imageio-ffmpeg       # ships an ffmpeg binary (make.py's compose stage calls ffmpeg)
+# google-genai       # ONLY for real Gemini TTS (--backend gemini); mock needs none
