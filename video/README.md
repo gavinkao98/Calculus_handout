@@ -145,8 +145,8 @@ video/output/_media/videos/480p15/
 - ✅ 以 ffmpeg mux/concat 成一支有聲最終 MP4（`mux.py`）。
 - ✅ 自動守門員（`make.py` render 前執行,兩級:**error 擋下 / warn 只提示**）:
   - `pipeline/lint.py` — error:純文字欄含標記、`$` 不平衡;warn:散文手動 `\\`、空心點畫在曲線上。
-  - `pipeline/sizecheck.py` — error:並排散文字級不一致;warn:教學散文用 `muted`(太淡)。
-- ✅ 製作畫質匯出：`make.py --quality high` 依 `meta.video` render。**交付標準＝4K60（3840×2160@60，manim fourk_quality）**；`meta.video` 未設時亦預設 4K60。
+  - `pipeline/sizecheck.py` — error:並排散文字級不一致、元素出框;warn:教學散文用 `muted`(太淡)、超出安全邊界、兩個 content 區塊重疊。
+- ✅ 解析度慣例：**測試／預覽用 1080p**（`make.py --quality high`，預設），**正式交付才用 4K**（`--quality 4k`，依 `meta.video`，未設時預設 4K60＝3840×2160@60，manim fourk_quality）。版面與解析度無關，1080p 測試與 4K master 構圖逐像素相同，只差取樣密度與 render 時間。
 
 仍待處理：
 

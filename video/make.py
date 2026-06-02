@@ -42,9 +42,10 @@ import yaml  # noqa: E402
 from pipeline.audio import concat_wavs, silence_pcm, wav_duration, write_pcm_wav  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 
-# Preview tiers map to manim presets (fast iteration). "high" is the delivery
-# tier, special-cased in render() to the project standard 4K@60 (fourk_quality),
-# overridable per storyboard via meta.video.
+# Render tiers (convention in DESIGN.md): TESTING/preview renders use 1080p
+# ("high", the default) -- crisp enough for visual QA / VLM frame critique without
+# 4K's cost; only the FINAL delivery uses 4K ("4k"). low/medium are fast scratch
+# previews (manim presets); high/4k set explicit dims in render() to control fps.
 QUALITY = {"low": "low_quality", "medium": "medium_quality"}
 LEAD_SECONDS = 0.3  # matches LessonScene's initial self.wait(0.3) before beat 1
 
@@ -185,9 +186,16 @@ def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, qualit
             "verbosity": "ERROR",
         }
         if quality == "high":
-            # final quality = the project delivery standard: 4K @ 60fps
-            # (manim fourk_quality). A storyboard's meta.video overrides if set;
-            # the 3840x2160@60 default enforces the standard when it is omitted.
+            # TESTING standard: 1080p @ 30fps -- crisp for visual QA / VLM frame
+            # critique, ~half the render time of 60fps, and fps is irrelevant to
+            # the stills the critic extracts.
+            cfg["pixel_width"] = 1920
+            cfg["pixel_height"] = 1080
+            cfg["frame_rate"] = 30
+        elif quality == "4k":
+            # FINAL delivery: the project standard 4K @ 60fps (manim fourk_quality).
+            # A storyboard's meta.video overrides if set; the 3840x2160@60 default
+            # enforces the standard when it is omitted.
             v = meta.get("video", {}) or {}
             cfg["pixel_width"] = int(v.get("w", 3840))
             cfg["pixel_height"] = int(v.get("h", 2160))
@@ -295,7 +303,9 @@ def main() -> int:
     parser.add_argument("--storyboard", required=True, type=Path)
     parser.add_argument("--backend", default="mock", choices=("mock", "gemini"))
     parser.add_argument("--scene", default="all", help="id, 'a,b,c', or 'all'")
-    parser.add_argument("--quality", default="low", choices=("low", "medium", "high"))
+    parser.add_argument("--quality", default="high", choices=("low", "medium", "high", "4k"),
+                        help="low/medium = fast scratch (480p/720p); high = 1080p testing "
+                             "standard (default); 4k = final delivery")
     parser.add_argument("--lead", type=float, default=LEAD_SECONDS)
     parser.add_argument("--audio-bitrate", default="192k")
     parser.add_argument("--empty-beat-seconds", type=float, default=0.45)

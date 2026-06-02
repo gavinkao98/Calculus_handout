@@ -79,13 +79,14 @@ scenes:
     ...
 ```
 
-**Delivery standard: 4K60.** `meta.video` declares the final resolution/fps;
-`make.py --quality high` renders to it. The project standard is `3840×2160@60`
-(manim `fourk_quality`) for every section, and `make.py` defaults to 4K60 when
-`meta.video` is omitted. Preview tiers `--quality low`/`medium` (480p/720p) are
-for fast iteration only; the layout is resolution-independent (the manim frame is
-a fixed 14.222×8 units), so a preview and the 4K master are pixel-for-pixel the
-same composition — only the sampling density and render time differ.
+**Resolution convention.** Testing and preview renders use **1080p**
+(`make.py --quality high`, the default) — crisp enough for visual QA and VLM frame
+critique without 4K's render cost. **Only the final delivery uses 4K**
+(`--quality 4k`): the project standard `3840×2160@60` (manim `fourk_quality`),
+declared per section in `meta.video` and defaulted when omitted. `--quality low` /
+`medium` (480p/720p) are fast scratch previews. The layout is resolution-independent
+(the manim frame is a fixed 14.222×8 units), so a 1080p test and the 4K master are
+pixel-for-pixel the same composition — only sampling density and render time differ.
 
 ### Scene kinds
 
