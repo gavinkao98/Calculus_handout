@@ -298,9 +298,35 @@ table doubles as the rubric for a future VLM critic (see
 | **Visual Consistency** | Accent role is consistent (definition = cyan, theorem = gold, example = electric blue, …); one font and size scale throughout; intro and outro match the brand bookends. |
 | **Accuracy & Depth** | Faithful to the handout, the math is correct, and each scene's `learning_goal` (content script, methodology §6) is actually delivered — on screen *and* in narration. |
 
-This pass is human-run today. A VLM critic that drafts it as a **report** (proposals
-for a human to act on, never an auto-fix) is the P1 proposal in `CODE2VIDEO_STUDY.md`,
-kept advisory on purpose so the human stays the layout authority.
+This pass is run by the **VLM critic** (`pipeline/critic.py`, the Code2Video P1
+adoption): it extracts the fullest frame of each scene and has a vision model
+(MiMo-V2.5) score it against these five dimensions and list concrete defects. It is
+**advisory** — it writes a report (`output/critic/<deck>/critique.{json,md}`), never
+edits the storyboard; the human stays the layout authority. Commands and the cost
+gate are in [`README.md`](README.md) (§ VLM 視覺批改).
+
+**The review loop.** A finding is an opinion to weigh, not a command. Run it as an
+iteration, not a one-shot:
+
+1. **Critique** — run the critic over the scene/section; read its scores, defects,
+   and suggestions.
+2. **Judge & adopt** — decide which to act on. Adopt anything that, *in your
+   judgement, makes the video better* — **not only outright bugs**. A suggestion that
+   improves clarity, pacing, or teaching is worth taking even when nothing was
+   "wrong". Decline one only when it would *hurt* (e.g. break cross-scene
+   consistency) or conflict with a deliberate house decision (the flat, no-grid
+   aesthetic; a declined typesetting choice). The VLM proposes; you decide.
+3. **Modify** — apply the adopted changes (storyboard / template), re-render the
+   affected scene.
+4. **Re-verify** — run the critic again on the changed frame: confirm the defect is
+   gone and no new one appeared. The judge that raised it confirms the fix — your own
+   eyes are not enough (this rule was set after a fix was eyeballed but not re-checked).
+5. **Final check** — your own read of the result.
+6. **Iterate** — repeat until the critic surfaces nothing further worth adopting.
+
+Vet every suggestion: the critic has proposed off-screen coordinates and, against the
+house style, gradients/grids. Apply judgement, never blind — the prompt already tells
+the model the style is deliberately flat to damp that bias.
 
 ---
 
