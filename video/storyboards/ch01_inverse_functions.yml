@@ -277,6 +277,12 @@ scenes:
       - { kind: function, expression: "x**3", x_range: [-1.3, 1.3], color_role: secondary, label: "$f(x)=x^3$", label_point: [1.05, 1.75] }
       - { kind: function, expression: "cbrt(x)", x_range: [-2.0, 2.0], color_role: accent, label: "$f^{-1}(x)=\\sqrt[3]{x}$", label_point: [1.75, 1.0] }
       - { kind: line, start: [-2.0, -2.0], end: [2.0, 2.0], dashed: true, color_role: muted, label: "$y=x$", label_point: [-1.5, -1.85] }
+      # mark (a,b) on f and its mirror (b,a) on f^-1; the dashed connector is
+      # perpendicular to y=x, making the reflection concrete (P1: the narration
+      # names the (a,b)->(b,a) correspondence but no point anchored it on screen).
+      - { kind: line, start: [1.1, 1.331], end: [1.331, 1.1], dashed: true, color_role: muted }
+      - { kind: point, point: [1.1, 1.331], hollow: false, color_role: secondary }
+      - { kind: point, point: [1.331, 1.1], hollow: false, color_role: accent }
     annotations:
       - "$(a,b)$ on $f$ corresponds to $(b,a)$ on $f^{-1}$ -- reflection across $y=x$."
 
