@@ -316,30 +316,37 @@ video/storyboards/<id>.yml
    │                       (a point with hollow_reason: <why> is exempt)
    ├─ sizecheck.py         builds scenes (no render). error: stacked siblings    (DONE)
    │                       at different sizes, or an element clipped off-frame;
-   │                       warn: teaching prose in muted, or a spill past safe margin
+   │                       warn: teaching prose in muted, a spill past the safe
+   │                       margin, or two content blocks overlapping
    ├─ schema.py            validate format, list reveal targets                  (TODO)
    │
    ▼
 narration.parse_say        split each `say` into beats at {show} markers          (DONE)
    │                        → ordered (beat_text, reveal_target) list per scene
    ▼
-tts.py                    synthesize each beat as one clip; measure duration
-   │                        → audio/<id>/<scene>.<beat>.wav + manifest.json
+synth                      one clip per beat; mock = silence sized by word count   (DONE)
+   │                        (real billed Gemini = pipeline/tts.py); measure
+   │                        duration → audio/<id>/… + manifest.json
    ▼
-build.py + scene.py        Manim renders each scene; a reveal fires at the start  (DONE)
-   │                        of its beat; the beat's measured audio duration drives
-   │                        the hold (build.py reads manifest.json). Silent MP4/scene.
+render (scene.py)          Manim renders each scene silent; a reveal fires at the  (DONE)
+   │                        start of its beat; the measured audio duration drives
+   │                        the hold (reads manifest.json). Silent MP4 per scene.
    ▼
-   mux.py (ffmpeg)          stitch each scene's narration under its video (delayed  (DONE)
-   │                        to the first reveal), silent track for intro/outro, concat.
+compose (ffmpeg)           lay each scene's narration under its video (delayed to  (DONE)
+   │                        the first reveal), silent track for intro/outro, concat.
    ▼
 video/output/<id>.mp4
 ```
 
-**Orchestrator:** the stages run today as three CLIs in sequence — `tts.py`
-(synthesize) → `build.py` (render with audio-driven timing) → `mux.py` (mux + concat).
-A single entry point with per-stage caching keyed on the visual payload (so editing
-`say` re-synthesizes audio but does not re-render Manim) is still (TODO).
+**Orchestrator:** `make.py` is the single entry point — one command runs
+parse → synth → render → compose in one process (`make.py --storyboard <yml>
+--backend mock`), the pre-render `lint.py` / `sizecheck.py` guards included. It is
+**offline only**: mock synthesis (silent clips sized by word count), no billing. Real
+Gemini TTS is billed and intentionally NOT wired into make.py (see CLAUDE.md), so a
+narrated master still runs through the retained lower-level chain `pipeline/tts.py` →
+`build.py` → `mux.py` — superseded by make.py for offline work but kept, not deleted.
+Per-stage caching keyed on the visual payload (so editing `say` re-synthesizes audio
+but does not re-render Manim) is still (TODO).
 
 ### Alignment, restated (so it is not lost in the rewrite)
 
