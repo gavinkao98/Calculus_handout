@@ -33,6 +33,7 @@ import argparse
 import base64
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -246,20 +247,24 @@ def _image_data_url(path: str) -> str:
 
 def _extract_json(text: str) -> dict:
     """The model returns a JSON object, sometimes wrapped in a ```json fence or
-    with prose around it. Be lenient: strip the fence, else take the outer {...}."""
+    with prose around it. Be lenient: strip the fence, take the outer {...}, and
+    repair invalid escapes -- MiMo writes LaTeX ($\\sqrt[3]{x}$, $\\to$) inside the
+    string values, and a lone backslash is an illegal JSON escape that breaks
+    json.loads."""
     s = text.strip()
     if s.startswith("```"):
         s = s.split("```", 2)[1]
         if s.lstrip().startswith("json"):
             s = s.lstrip()[4:]
-        s = s.strip().rstrip("`").strip()
+    i, j = s.find("{"), s.rfind("}")
+    if 0 <= i < j:
+        s = s[i:j + 1]
     try:
         return json.loads(s)
     except Exception:  # noqa: BLE001
-        i, j = s.find("{"), s.rfind("}")
-        if 0 <= i < j:
-            return json.loads(s[i:j + 1])
-        raise
+        # double any backslash that is not a legal JSON escape, so \sqrt -> \\sqrt
+        # (decodes to a literal backslash) instead of crashing the parse
+        return json.loads(re.sub(r'\\(?![\\"/bfnrtu])', r'\\\\', s))
 
 
 def critique_frame(item: dict, *, base_url: str, api_key: str, model: str,
