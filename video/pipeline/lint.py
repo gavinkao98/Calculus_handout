@@ -123,6 +123,8 @@ def _hollow_on_curve(data: dict) -> "list[tuple[str, str]]":
         for p in plots:
             if p.get("kind") != "point" or not p.get("hollow"):
                 continue
+            if p.get("hollow_reason"):
+                continue  # author declared a legitimate reason (excluded value); not a miss
             try:
                 px, py = float(p["point"][0]), float(p["point"][1])
             except Exception:

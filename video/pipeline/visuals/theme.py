@@ -1,16 +1,23 @@
 """Design system: NTU Calculus Video System -- Direction B (Blueprint Grid).
 
-Faithful port of the designer handoff (video/design_handoff/from_designer):
-tokens.json + video-system.css are the source of truth for every value here.
+Port of the designer handoff (video/design_handoff/from_designer): tokens.json +
+video-system.css are the source of truth for colour, type scale and layout
+metrics. TWO values intentionally deviate from the tokens, by settled project
+decision: the text fonts (see "Fonts" below) and the coordinate grid (see
+SHOW_GRID). Everything else tracks the tokens.
 
 Two grounds:
 - DARK  -> teaching frames (definition/example/procedure/theorem/recap/graph)
 - LIGHT -> brand frames (intro / outro), paper ground with the NTU lockup
 
-All non-math text uses Computer Modern Unicode (CMU Serif / CMU Typewriter Text),
-registered at runtime by _bootstrap.register_design_fonts from the vendored OTF
-files in assets/fonts/. Math (MathTex/Tex) is also Computer Modern via LaTeX.
-CJK text in the NTU logo uses Noto Sans TC (system font, not vendored).
+Fonts (DEVIATION from tokens, settled): all non-math text uses Computer Modern
+Unicode (CMU Serif / CMU Typewriter Text), NOT the sans token families (Space
+Grotesk / Hanken / JetBrains Mono). Chosen so prose and LaTeX math share one
+family, the OTF embeds in-repo (no Google Fonts fetch), and the glyphs the sans
+body font lacked (checkmark/times/QED) never tofu. Registered at runtime by
+_bootstrap.register_design_fonts from the vendored OTF files in assets/fonts/.
+Math (MathTex/Tex) is also Computer Modern via LaTeX. CJK text in the NTU logo
+uses Noto Sans TC (system font, not vendored).
 """
 from __future__ import annotations
 
@@ -102,9 +109,11 @@ HEADING_RULE_W = 3.0
 
 FONTS = {"display": FONT_DISPLAY, "body": FONT_BODY, "mono": FONT_MONO}
 
-# Design decision: coordinate grids are disabled across all templates
-# (intro, outro, and all content scenes). grid_line colors kept in
-# palettes for reference but no template emits a grid Block.
+# Settled decision: the "Blueprint Grid" coordinate grid is NOT rendered on any
+# template (intro, outro, and all content scenes) -- the deep-navy engineering
+# ground carries the aesthetic without it. The name is kept; grid_line colours
+# stay in the palettes as a latent motif (re-enable by emitting
+# brand.coordinate_grid), but no template emits a grid Block today.
 SHOW_GRID = False
 
 

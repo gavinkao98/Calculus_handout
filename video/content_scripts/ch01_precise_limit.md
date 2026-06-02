@@ -170,8 +170,8 @@ next:          Up next — Derivatives
 - **learning_goal:** —（純品牌收尾）
 - **kind:** `outro`
 - **narration:** —（outro 無旁白）
-- **visual_need:** Key Takeaways（取 recap 重點）→ 結尾 logo 字卡；`next:` Derivatives（章末，預告下一章主題；**不報章號**）。
-- **animation_cue:** —（用 gen-2 既有 outro 模板）
+- **visual_need:** 純品牌收尾字卡（暗轉亮橋接 → 最終 logo 字卡）。**不含 Key Takeaways**——重點在 unit 15 recap（有旁白的 `recap_cards` 場景）。（向前預告 `next:` 目前 outro 模板未渲染，故省略。）
+- **animation_cue:** —（用 gen-2 既有 outro 模板，兩段式）
 
 ---
 

@@ -5,7 +5,12 @@
 ## ✅ 已完成
 
 ### 設計 brief 同步
-- [`design_handoff/DESIGN_BRIEF.md`](design_handoff/DESIGN_BRIEF.md):從舊「Midnight Canvas（全暗）」同步成現行 **Direction B（雙 ground:暗底教學 / 淺底品牌）**,真實 tokens、8 模板對應、SummitBars/logo 規則。**標出兩個 token-vs-實作分歧待定案**(見待辦)。
+- [`design_handoff/DESIGN_BRIEF.md`](design_handoff/DESIGN_BRIEF.md):從舊「Midnight Canvas（全暗）」同步成現行 **Direction B（雙 ground:暗底教學 / 淺底品牌）**,真實 tokens、8 模板對應、SummitBars/logo 規則。原標的兩個 token-vs-實作分歧(字體、格線)**已定案**——見下。
+
+### 設計分歧定案(2026-06-02)
+- ✅ **字體**:全 **Computer Modern**(`CMU Serif`/`CMU Typewriter Text`),刻意不採 tokens 的 sans 提案(Space Grotesk/Hanken/JetBrains)。理由:body 與 math 同族、字型可內嵌免連網、無 `✓✗∎` tofu。
+- ✅ **格線**:不露出(`theme.py` `SHOW_GRID=False`),要乾淨深藍底;`grid_line` 色留作潛在 motif。「Blueprint Grid」名字保留為調性,非字面格線。
+- 文件已同步:`DESIGN_BRIEF.md`(§3、§5、§7)、`theme.py` 與 `brand.py` docstring。`tokens.json` 為設計師交付原件,不改;偏離由本專案文件記錄。
 
 ### 第一階段:內容方法論
 - [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md):萃取 gen-1 `legacy/MANIM_STORYBOARD.md` 教學精神、剝離 gen-1 工程、適配 gen-2。決議:**內容/範圍緊跟講義,但場景順序為教學自由重排**;Gemini 直讀 LaTeX(無 spoken-math 表);動畫 code 由 Claude 依內容稿的自然語言 `animation_cue` 生成(內容稿本身只給自然語言、不寫 manim)。含**內容稿格式**(`id/source/learning_goal/kind/narration/visual_need/animation_cue`)。
@@ -22,16 +27,16 @@
 - [`content_scripts/ch01_precise_limit.md`](content_scripts/ch01_precise_limit.md):§1.6 內容稿(16 單元)。**narration 已認可。** 套 §5 symbol-heavy 例外(~90% 符號 → 只 2 視覺:ε-δ 管狀圖 anchor + 動機圖);首次實跑 theorem/proof 拆單元、repeat-pattern、對齊鏈 narration。
 - [`storyboards/ch01_precise_limit.yml`](storyboards/ch01_precise_limit.yml):§1.6 工程稿(16 場景)。ε-δ 管狀圖用 4 條 dashed line + function + hollow point 重現(忠於講義 fig:precise-limit,書本亦用虛線界線);收緊 ε 動畫以 `# HOOK` 註記待接入。
 - **mock 成片產出**:`output/ch01_precise_limit.mp4`(16 場景,≈9'18",靜音、動畫模板頂著版)。8 張關鍵 frame 已逐一目視驗收(anchor/定義/證明/procedure/recap/例題)。
-- **render 階段抓到 2 個 lint+sizecheck 都漏的 bug**(已修,詳見內容稿校準筆記 §7-8):(a) prose sibling 內嵌 math 被縮小觸發 sizecheck → step text/points 改純英文;(b) recap formula 過寬靜默出框 → 改短(ε-δ 兩半式)。**建議 DESIGN.md checklist 增一列:formula/recap card 不 wrap、過寬會靜默出框。**
+- **render 階段抓到 2 個 lint+sizecheck 都漏的 bug**(已修,詳見內容稿校準筆記 §7-8):(a) prose sibling 內嵌 math 被縮小觸發 sizecheck → step text/points 改純英文;(b) recap formula 過寬靜默出框 → 改短(ε-δ 兩半式)。✅ **已實作 overflow guard**:`sizecheck` 對每個 scene 量 bbox(off-frame=error／超安全區=warn,見 `sizecheck.py`),DESIGN.md checklist 亦增一列;guard 一上線就抓到 `ch01_inverse_functions` recap formula 出框,已用 `recap_cards` 右欄左移修掉。
 
 ## ⬜ 待辦
 
 ### 待你定案(視覺 / 內容)
 - **看 mock 成片** `output/ch01_inverse_functions.mp4`:確認視覺/順序/版面。
-- **字體分歧**:tokens 指定 sans(Space Grotesk/Hanken)vs 實作用 Computer Modern serif。
-- **grid 分歧**:tokens 有 blueprint grid motif,但 `theme.py` `SHOW_GRID=False` 全停用。
+- (字體、格線分歧已定案,移至上方「設計分歧定案」。)
 
 ### 重建後續(工程)
+- 🕒 **review #8(hook 接入)—— 使用者決定晚點做(deferred 2026-06-02)。** 把客製 ε-δ／approach 曲線動畫經正式 hook 機制接進 `make.py` 成片(即下面的 task #6 ＋「客製動畫生成＋接入」,不重複細節)。**前置(blocker)**:使用者曾說 §1.6 ε-δ 動畫「還是有點問題」(具體未明)——接入前先請使用者講清楚要調什麼(見下方「待討論」§1.6 動畫)。**現況**:review #1–#7 已於 2026-06-02 處理完(8 條只剩本條);靜態 scene 7 已升級成 teaching-mode(ε/δ 半透明帶＋`a`/`L` 刻度,函數仍線性 $2x-1$),wiring 後由凸函數 $\tfrac12x^2$ 曲線動畫([`animations/ch01_precise_limit_hooks.py`](animations/ch01_precise_limit_hooks.py))取代。
 - **task #6 介面精煉**(唯一未完成的里程碑 task):templates 加 `reveal_targets()` 驗 `{show}`、正式 hook 機制、`scene.py` 去 class-attribute 副作用。
 - **客製動畫生成＋接入**(Claude 負責,依 `animation_cue` 自然語言生成 manim、認可後於工程稿 `# HOOK` 接入):
   - §1.1：5 個 cue(motivation 兩進一出、why-x²-fails 水平線掃描、line-test 並排 sweep、composition 往返、reflection 翻摺)—— ✅ **已於先前 session 完成**。
@@ -54,6 +59,6 @@
 今天進度已 commit;以下為**換新電腦後從這裡接**（新機先依 [`README.md`](README.md) §環境 建 `.venv` + ffmpeg shim，`output/`/`.venv`/`.deps*` 都不進版控、需重建）：
 
 - **§1.6 動畫待續（最高優先）**:ε-δ tube（凸函數 $\tfrac12x^2$、逃脫→收回紅/綠端點）與 unit 3 逼近圖已生成獨立可 render scene（[`animations/ch01_precise_limit_hooks.py`](animations/ch01_precise_limit_hooks.py)）、8 frame 驗收過,但使用者表示**「還是有點問題」（具體未明說）**。下次續:**先請使用者講清楚動畫哪裡有問題**,再調。
-- **動畫整合**:gen-2 正式 hook 機制(task #6)未建,曲線動畫尚未接進 `make.py` 成片;靜態 storyboard scene 7 仍頂著線性版,整合時由曲線動畫取代。
+- **動畫整合**:gen-2 正式 hook 機制(task #6)未建,曲線動畫尚未接進 `make.py` 成片;靜態 storyboard scene 7 現為 teaching-mode 線性版(ε/δ 帶＋`a`/`L` 刻度,2026-06-02 升級),整合時由凸函數曲線動畫取代。詳見「待辦 → 重建後續」的 review #8 條(使用者已決定晚點做)。
 - **下一節候選**:§1.3（極限＋數值表＋帶洞圖）——壓 pipeline 不同面向（可能缺 table scene 型態）。
 - 動畫分工新規則已生效（Claude 依 `animation_cue` 生成 manim;見 CONTENT_METHODOLOGY §5）。

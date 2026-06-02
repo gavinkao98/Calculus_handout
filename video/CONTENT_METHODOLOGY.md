@@ -40,7 +40,7 @@
 - **一節 = 一支影片。**（gen-2：一節一片；小節之間不另做過場片。）
 - **每支必有 intro 與 outro**（gen-2 first-class，純動畫、**無 narration**）：
   - **intro** — Section Gate 開場（章節地圖 → 聚焦本節 → 標題字卡）。內容稿只需提供本節在章內的定位：章、章名、節、節標題，以及一句引導問題 `tagline`。
-  - **outro** — 收尾（Key Takeaways 回顧 + 結尾 logo 字卡）。內容稿提供 takeaway 清單（通常即 recap 單元的重點）。
+  - **outro** — 收尾的品牌字卡（暗轉亮橋接 → 最終 logo 字卡，**無 takeaways**）。Key Takeaways 是獨立的 recap 單元（→ `recap_cards` 場景，有旁白），不在 outro。
 - **一定納入（MUST）：** 每個 `definition` / `theorem` / `proposition` / `example`（+`solution`）；書本明確編號的 procedure／strategy；承載教學的圖。
 - **一定略過（MUST NOT 進影片）：** `exercise`（習題只屬書本）、`\index`、指向本節**外**的 `\cref`（改用白話轉述——觀眾沒有頁可翻）、純裝飾的圖。
 - **視情況納入：** `proof`（短、有啟發、或書本已寫就收；冗長或純技術就略）、`remark`（升格為**具名規則**如「水平線測試」才獨立成單元，否則併入鄰段 narration）。

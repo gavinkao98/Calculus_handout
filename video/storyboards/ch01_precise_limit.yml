@@ -88,7 +88,7 @@ scenes:
       y_length: 3.7
     plots:
       - { kind: function, expression: "2*x - 1", x_range: [0.5, 4.5], color_role: secondary, label: "$y=2x-1$", label_point: [1.15, 2.35] }
-      - { kind: point, point: [3, 5], hollow: true, color_role: accent }              # limit value 5: NOT attained -> hollow
+      - { kind: point, point: [3, 5], hollow: true, color_role: accent, hollow_reason: "limit value 5 is not attained (f(3)=6 instead)" }   # excluded value -> legitimately hollow
       - { kind: point, point: [3, 6], hollow: false, color_role: warning, label: "$f(3)=6$", label_side: right }   # actual value 6: attained -> solid
     annotations:
       - "The actual value $f(3)=6$ is irrelevant; the approach decides the limit, and that gives $5$."
@@ -183,13 +183,20 @@ scenes:
       y_range: [0, 8, 1]
       x_length: 6.6
       y_length: 4.0
+      label_size: step                      # teaching mode: larger curve / boundary labels
+      x_ticks: [{ at: 3, label: "a" }]      # anchor the scale: a on x, L on y
+      y_ticks: [{ at: 5, label: "L" }]
     plots:
+      # teaching-mode tube: translucent epsilon (coral, horizontal) + delta (cyan,
+      # vertical) bands behind the curve; dashed boundaries + labels kept on the edges.
+      - { kind: band, orientation: horizontal, from: 4, to: 6, color_role: warning, opacity: 0.10 }
+      - { kind: band, orientation: vertical, from: 2.5, to: 3.5, color_role: secondary, opacity: 0.10 }
       - { kind: function, expression: "2*x - 1", x_range: [0.5, 4.3], color_role: secondary, label: "$y=f(x)$", label_point: [1.2, 2.3] }
       - { kind: line, start: [0, 6], end: [4.5, 6], dashed: true, color_role: warning, label: "$L+\\varepsilon$", label_side: left }
       - { kind: line, start: [0, 4], end: [4.5, 4], dashed: true, color_role: warning, label: "$L-\\varepsilon$", label_side: left }
-      - { kind: line, start: [2.5, 0], end: [2.5, 8], dashed: true, color_role: warning, label: "$a-\\delta$", label_side: down }
-      - { kind: line, start: [3.5, 0], end: [3.5, 8], dashed: true, color_role: warning, label: "$a+\\delta$", label_side: down }
-      - { kind: point, point: [3, 5], hollow: true, color_role: accent }   # x=a excluded (0<|x-a|): the punctured centre
+      - { kind: line, start: [2.5, 0], end: [2.5, 8], dashed: true, color_role: secondary, label: "$a-\\delta$", label_side: down, label_role: secondary }
+      - { kind: line, start: [3.5, 0], end: [3.5, 8], dashed: true, color_role: secondary, label: "$a+\\delta$", label_side: down, label_role: secondary }
+      - { kind: point, point: [3, 5], hollow: true, color_role: accent, hollow_reason: "x=a excluded by 0<|x-a|<delta (punctured centre)" }   # excluded value -> legitimately hollow
     annotations:
       - "Inputs within $\\delta$ of $a$ land within $\\varepsilon$ of $L$ -- and $\\delta$ must shrink as $\\varepsilon$ does."
 

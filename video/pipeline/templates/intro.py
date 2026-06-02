@@ -89,7 +89,8 @@ def _section_gate(spec: dict[str, Any], meta: dict[str, Any], ground: str) -> li
 
     logo = brand.logo_lockup(height=1.45)
     eyebrow = brand.eyebrow(f"// section {section}", ground, role="accent")
-    headline = brand.heading(title, ground, role="heading", size="intro_headline")
+    headline = brand.heading(title, ground, role="heading", size="intro_headline",
+                             max_width=content_w)
 
     items = [logo, eyebrow, headline]
     if tagline:
@@ -118,7 +119,8 @@ def _dark_handoff(meta: dict[str, Any]) -> list[Block]:
     )
     dark_grid = dark_bg
     eyebrow = brand.eyebrow(f"section {section}", ground, role="secondary")
-    headline = brand.heading(title, ground, role="primary", size="h1")
+    headline = brand.heading(title, ground, role="primary", size="h1",
+                             max_width=T.FRAME_W - 2 * T.SIDE_GUTTER)
     rule = brand.heading_rule(2.4, ground, role="secondary")
     marker = VGroup(eyebrow, headline, rule).arrange(DOWN, buff=0.22)
     marker.move_to([0, 0.08, 0])

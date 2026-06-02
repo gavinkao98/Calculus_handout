@@ -120,9 +120,17 @@ def eyebrow(label: str, ground: str, *, role: str = "secondary") -> Text:
                 color=T.color(ground, role), weight="MEDIUM")
 
 
-def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1") -> Text:
-    return Text(text, font=T.FONT_DISPLAY, font_size=T.fs(size),
-                color=T.color(ground, role), weight="SEMIBOLD")
+def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",
+            max_width: float | None = None) -> Text:
+    """Display heading (plain Text, SEMIBOLD). If *max_width* is given and the
+    rendered line is wider, scale it down to fit -- the standalone-display-line
+    exception to "wrap, don't shrink" (a hero title has no siblings to size-match,
+    and manim Text does not centre multi-line cleanly, so a clamp beats a wrap)."""
+    mob = Text(text, font=T.FONT_DISPLAY, font_size=T.fs(size),
+               color=T.color(ground, role), weight="SEMIBOLD")
+    if max_width is not None and mob.width > max_width:
+        mob.scale_to_fit_width(max_width)
+    return mob
 
 
 def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
@@ -174,9 +182,11 @@ _GLYPH_TEX = {"check": r"\checkmark", "cross": r"\times", "qed": r"\blacksquare"
 def glyph(name: str, ground: str, *, role: str, size: str = "math"):
     """Render a special symbol via LaTeX, not a font character.
 
-    ✓ ✗ ∎ are absent from the sans body font (Hanken) and render as tofu boxes.
-    Drawing them as MathTex (\\checkmark / \\times / \\blacksquare) uses Computer
-    Modern, which has them, so they always appear.
+    ✓ ✗ ∎ are drawn as MathTex (\\checkmark / \\times / \\blacksquare) so they
+    always render in Computer Modern alongside the math, regardless of the body
+    Text font's glyph coverage. (Originated in the sans body-font era, when Hanken
+    lacked these and they tofu'd; the body font is Computer Modern now, but routing
+    through LaTeX keeps them uniform and font-change-proof.)
     """
     return MathTex(_GLYPH_TEX[name], color=T.color(ground, role), font_size=T.fs(size))
 

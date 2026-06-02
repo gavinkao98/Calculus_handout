@@ -54,7 +54,11 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         blocks.append(Block(f"point.{i}", row, anim="fade", static=False))
 
     # -- right column: "Remember" + formula cards --
-    right_x = 2.2
+    # right_x sets the cards' left edge. Kept left enough that a full-width
+    # two-term formula card (e.g. "f(x_1)=f(x_2) => x_1=x_2") clears the
+    # broadcast-safe edge -- at 2.2 it spilled off-frame (caught by the overflow
+    # guard); the points column ends near x=0.5, so this still reads as two columns.
+    right_x = 1.15
     rem = brand.eyebrow("remember", ground, role="secondary")
     rem.move_to([right_x, 2.0, 0], aligned_edge=LEFT)
     blocks.append(Block("remember", rem, anim="fade", static=True))

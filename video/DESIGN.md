@@ -98,14 +98,16 @@ same composition — only the sampling density and render time differ.
   section, resolve into the logo / section / title / tagline slate, then add a
   short dark handoff so the first teaching scene does not feel like an abrupt
   color cut.
-- **`outro`** — section closer. **No `say`**. Consumes `recap` (list of takeaways),
-  an optional `next` (one-line forward pointer), optional `bgm`, `duration`.
-  The template is always three-stage: a short dark-to-light bridge from the
-  teaching ground, a logo-free Key Takeaways recap, then a final centered logo
-  slate so the viewer clearly feels the video has ended. The end slate defaults
-  to `meta.section` + `meta.title`; use optional `end_slate.label`,
-  `end_slate.title`, or `end_slate.logo_height` only when a section needs to
-  override the standard ending.
+- **`outro`** — section closer. **No `say`**. Consumes optional `bgm`, `duration`,
+  and an optional `end_slate` override. The template is two-stage: a short
+  dark-to-light bridge from the teaching ground, then a final centered logo slate
+  so the viewer clearly feels the video has ended. **Key Takeaways are NOT in the
+  outro** — they live in the preceding `recap_cards` content scene, which carries
+  narration (a silent takeaways slate read weaker than a narrated recap). The end
+  slate defaults to `meta.section` + `meta.title`; use optional `end_slate.label`,
+  `end_slate.title`, or `end_slate.logo_height` only when a section overrides the
+  standard ending. (Any `recap`/`next` keys on an outro are vestigial — the
+  template ignores them.)
 
 `intro`/`outro` are defined **once** as parameterized templates and reused for every
 section — authors never hand-build them per section.
@@ -115,11 +117,9 @@ Minimal reusable outro:
 ```yaml
 - id: outro
   kind: outro
-  recap:
-    - "First takeaway."
-    - "Second takeaway."
-  next: "Up next: the next section."
   duration: 8.0
+  # optional: bgm, and an end_slate override (label / title / logo_height)
+  # Key Takeaways are a separate recap_cards scene, not the outro.
 ```
 
 Minimal reusable intro:
@@ -274,7 +274,8 @@ exceptions). Both run in `make.py` before render.
 | `math_line` + `scale_to_fit_width` on stacked prose | `brand.prose(..., max_width=…)` (wraps) | size mismatch; **sizecheck error** |
 | manual `\\` break in prose | plain sentence, let prose wrap | arbitrary break; **lint warn** |
 | `muted` for teaching content (prose **or** direct `MathTex`/`Text` value labels) | `text`/`primary` or a semantic accent | too faint; **sizecheck warn** on prose only — direct labels are convention |
-| hollow `○` dot for an attained value (point on a curve / intersection) | solid `●` (`hollow: false`) | `○` means *value absent*; **lint warn** (hollow on an interior curve point) |
+| hollow `○` dot for an attained value (point on a curve / intersection) | solid `●` (`hollow: false`); for a deliberately excluded value, add `hollow_reason: <why>` to the point | `○` means *value absent*; **lint warn** (hollow on an interior curve point), suppressed when `hollow_reason` is set |
+| an element wider/taller than the frame (formula/recap card, long statement, unclamped headline) | shorten it, clamp the width, or split it | silently clipped off-frame; **sizecheck error** (off-frame) / **warn** (spills past the safe margin) |
 
 ---
 
@@ -288,8 +289,10 @@ video/storyboards/<id>.yml
    │
    ├─ lint.py              errors: markup in plain-Text fields, unbalanced $;    (DONE)
    │                       warns: manual \\ in prose, hollow point on a curve
+   │                       (a point with hollow_reason: <why> is exempt)
    ├─ sizecheck.py         builds scenes (no render). error: stacked siblings    (DONE)
-   │                       at different sizes; warn: teaching prose in muted
+   │                       at different sizes, or an element clipped off-frame;
+   │                       warn: teaching prose in muted, or a spill past safe margin
    ├─ schema.py            validate format, list reveal targets                  (TODO)
    │
    ▼

@@ -61,32 +61,34 @@ render，並經 `pipeline/tts.py` → `pipeline/build.py` → `pipeline/mux.py`
 - **`graph_focus`**：供以圖形為中心的解說使用的暗色教學框。它支援繪製
   函數、輔助線、點、標籤、註解，以及 safe-zone 適配，使圖形不與標題或文字
   碰撞。
-- **`outro`**：可重用的節末模板。流程：暗轉亮的橋接、無 logo 的 Key
-  Takeaways 回顧，接著由 `meta.section` 與 `meta.title` 產生的最終 logo
-  字卡。僅在需要時透過 `end_slate` 覆寫。
+- **`outro`**：可重用的節末模板。**兩段式**：暗轉亮的橋接，接著由
+  `meta.section` 與 `meta.title` 產生的最終 logo 字卡。**Key Takeaways 不在
+  outro**——它在前一個 `recap_cards` 教學場景（有旁白）。僅在需要時透過
+  `end_slate` 覆寫。
 
 目前生效的設計決策：
 
 - intro/outro 使用淺色紙張底；教學場景使用暗色藍圖底。
 - 因為底色變化在視覺上很大，intro 以一段暗場交接作結，outro 以一段暗轉亮
   的橋接開場。
-- Key Takeaways 刻意不放 logo。logo 只出現在最終的結尾字卡上。
+- 節末回顧（`recap_cards`）刻意不放 logo；logo 只出現在 intro/outro 的品牌字卡上。
 - 章節地圖在 Section Gate 之前。地圖讓學生定位；gate 宣告當前的節。
 - 預期沒有章節會超過 10 節，因此目前的地圖版面是圍繞該上限設計的。
 
-render 一份低畫質預覽：
+**最快：用 `make.py` 跑一支 mock 成片**（單一 orchestrator：parse → synth（mock 靜音）→ render → compose，全程不計費）：
 
 ```powershell
-python video\pipeline\build.py --storyboard video\storyboards\ch01_inverse_functions.yml --scene all --quality low
+python video\make.py --storyboard video\storyboards\ch01_inverse_functions.yml --scene all --quality low --backend mock
 ```
 
-render 單一場景：
+只跑部分場景（`--scene` 接單一 id、`a,b,c` 或 `all`）：
 
 ```powershell
-python video\pipeline\build.py --storyboard video\storyboards\ch01_inverse_functions.yml --scene intro --quality low
-python video\pipeline\build.py --storyboard video\storyboards\ch01_inverse_functions.yml --scene why_x_squared_fails --quality low
-python video\pipeline\build.py --storyboard video\storyboards\ch01_inverse_functions.yml --scene outro --quality low
+python video\make.py --storyboard video\storyboards\ch01_inverse_functions.yml --scene intro --quality low --backend mock
+python video\make.py --storyboard video\storyboards\ch01_inverse_functions.yml --scene why_x_squared_fails --quality low --backend mock
 ```
+
+> 下面的 `tts.py` / `build.py` / `mux.py` 是 gen-2 的底層三步，已被 `make.py` 取代（保留未刪）。**只有真 Gemini 旁白（計費）仍走這三步**——`make.py` 刻意不接計費路徑（見 [`CLAUDE.md`](../CLAUDE.md)）。
 
 合成 beat 音訊：
 

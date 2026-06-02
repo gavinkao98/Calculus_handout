@@ -27,6 +27,7 @@ from manim import (
     Dot,
     Line,
     MathTex,
+    Polygon,
     Text,
     VGroup,
 )
@@ -53,6 +54,44 @@ def _role_color(ground: str, spec: dict[str, Any], default_role: str) -> str:
     if "color" in spec:
         return str(spec["color"])
     return T.color(ground, str(spec.get("color_role", default_role)))
+
+
+def _fmt_num(v: float) -> str:
+    f = float(v)
+    return str(int(f)) if f == int(f) else str(f)
+
+
+def _tick_at_label(item: Any) -> "tuple[float, str]":
+    """A tick spec is a bare number or {at, label}. The label defaults to the
+    number and is rendered as math, so 'a'/'L' come out italic like the algebra."""
+    if isinstance(item, dict):
+        at = float(item["at"])
+        return at, str(item.get("label", _fmt_num(at)))
+    return float(item), _fmt_num(item)
+
+
+def _axis_ticks(axes: Axes, ac: dict[str, Any], ground: str):
+    """Optional teaching ticks: a few key marks (e.g. a on x, L on y) so an
+    otherwise number-less plot keeps a sense of scale. Returns a VGroup to fold
+    into the graph group (so it scales with the axes), or None when unused."""
+    col = T.color(ground, "text")
+    tlen = 0.11
+    mobs: list[Any] = []
+    for item in ac.get("x_ticks", []) or []:
+        at, lab = _tick_at_label(item)
+        base = axes.x_axis.number_to_point(at)
+        mark = Line(base + UP * tlen, base + DOWN * tlen, color=col, stroke_width=2.0)
+        text = brand.math_line(lab, ground, role="text", size="math_sm")
+        text.next_to(base, DOWN, buff=0.14)
+        mobs += [mark, text]
+    for item in ac.get("y_ticks", []) or []:
+        at, lab = _tick_at_label(item)
+        base = axes.y_axis.number_to_point(at)
+        mark = Line(base + LEFT * tlen, base + RIGHT * tlen, color=col, stroke_width=2.0)
+        text = brand.math_line(lab, ground, role="text", size="math_sm")
+        text.next_to(base, LEFT, buff=0.14)
+        mobs += [mark, text]
+    return VGroup(*mobs) if mobs else None
 
 
 def _title(text: str, ground: str):
@@ -106,6 +145,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
     ac = spec["axes"]
     x_range = _range(ac["x_range"], 0.5)
     y_range = _range(ac["y_range"], 0.25)
+    default_label_size = str(ac.get("label_size", "label"))
 
     for i, plot in enumerate(spec.get("plots", [])):
         kind = plot.get("kind")
@@ -126,10 +166,27 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
 
             if plot.get("label"):
                 lab = _label(plot["label"], ground, role=plot.get("label_role", "primary"),
-                             size=plot.get("label_size", "label"))
+                             size=plot.get("label_size", default_label_size))
                 _place_function_label(lab, graph, axes, plot)
                 labels.append(lab)
                 blocks.append(Block(f"label.{len(labels)-1}", lab, anim="fade", static=True))
+
+        elif kind == "band":
+            # Translucent strip across the plotting area -- the epsilon tube
+            # (orientation: horizontal, y in [from,to]) or the delta tube
+            # (vertical, x in [from,to]). Sits behind the curve/lines, so list it
+            # before them in `plots`; folds into the graph group and scales with
+            # the axes in _fit_graph_to_safe_zone.
+            lo, hi = float(plot["from"]), float(plot["to"])
+            if str(plot.get("orientation", "horizontal")).lower().startswith("h"):
+                corners = [axes.c2p(x_range[0], lo), axes.c2p(x_range[1], lo),
+                           axes.c2p(x_range[1], hi), axes.c2p(x_range[0], hi)]
+            else:
+                corners = [axes.c2p(lo, y_range[0]), axes.c2p(hi, y_range[0]),
+                           axes.c2p(hi, y_range[1]), axes.c2p(lo, y_range[1])]
+            band = Polygon(*corners, stroke_width=0, color=col, fill_color=col,
+                           fill_opacity=float(plot.get("opacity", 0.14)))
+            blocks.append(Block(f"plot.{i}", band, anim="fade", static=True))
 
         elif kind == "line":
             start = plot["start"]
@@ -145,7 +202,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
 
             if plot.get("label"):
                 lab = _label(plot["label"], ground, role=plot.get("label_role", "warning"),
-                             size=plot.get("label_size", "label"))
+                             size=plot.get("label_size", default_label_size))
                 side = _SIDE.get(str(plot.get("label_side", "right")).lower(), RIGHT)
                 lab.next_to(line, side, buff=0.13)
                 labels.append(lab)
@@ -164,7 +221,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
 
             if plot.get("label"):
                 lab = _label(plot["label"], ground, role=plot.get("label_role", "text"),
-                             size=plot.get("label_size", "label"))
+                             size=plot.get("label_size", default_label_size))
                 side = _SIDE.get(str(plot.get("label_side", "up")).lower(), UP)
                 lab.next_to(dot, side, buff=0.1)
                 labels.append(lab)
@@ -227,6 +284,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks.append(Block("axes", axes, anim="create", static=True))
 
     plot_blocks, _ = _plot_blocks(spec, axes, ground)
+    ticks = _axis_ticks(axes, ac, ground)
+    if ticks is not None:
+        plot_blocks.append(Block("ticks", ticks, anim="fade", static=True))
     blocks.extend(plot_blocks)
 
     annotations = []
