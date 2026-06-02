@@ -84,7 +84,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     if steps:
         div = brand.vrule(row_gap * len(steps) - 0.2, ground, role="hairline")
         div.move_to([(left_x + 4.9 + right_x) / 2 - 0.2, col_top - (len(steps) - 1) * row_gap / 2, 0])
-        blocks.append(Block("divider", div, anim="fade", static=True))
+        blocks.append(Block("divider", div, anim="fade", static=True, layer="decoration"))
 
     # left rows are static (the frame); right math reveals per beat
     for i, lr in enumerate(left_rows):

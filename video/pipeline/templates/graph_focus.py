@@ -281,12 +281,18 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         axes.x_axis.add_tip(tip_length=0.16, tip_width=0.16)
         axes.y_axis.add_tip(tip_length=0.16, tip_width=0.16)
     axes.move_to([0, -0.2, 0])
-    blocks.append(Block("axes", axes, anim="create", static=True))
+    blocks.append(Block("axes", axes, anim="create", static=True, layer="graph"))
 
     plot_blocks, _ = _plot_blocks(spec, axes, ground)
     ticks = _axis_ticks(axes, ac, ground)
     if ticks is not None:
         plot_blocks.append(Block("ticks", ticks, anim="fade", static=True))
+    # Axes-space geometry: coincidence here is intentional (a point sitting on a
+    # curve, a coral guide crossing an intersection, a label hugging its curve).
+    # Exempt the whole graph group from the screen-space overlap guard; its clash
+    # with the title / annotation is already prevented by _fit_graph_to_safe_zone.
+    for b in plot_blocks:
+        b.layer = "graph"
     blocks.extend(plot_blocks)
 
     annotations = []

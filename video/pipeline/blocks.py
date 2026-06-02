@@ -26,6 +26,13 @@ class Block:
     mobject: Any
     anim: str = "write"      # write|fade|create|grow|slide|highlight|flash_in|write_glow|slide_pop
     static: bool = False
+    # Overlap-guard scope (sizecheck._overlap_issues): only "content" blocks are
+    # tested for screen-space collision against each other. "graph" = axes-space
+    # geometry whose coincidence is intentional (point on a curve, guide through
+    # an intersection, label hugging its curve); "decoration" = motif / column
+    # rules / reference guides that deliberately sit beside content; "background"
+    # = a full card behind content. The last three are exempt from the check.
+    layer: str = "content"   # content|graph|decoration|background
 
 
 ACCENT_ROLE = {

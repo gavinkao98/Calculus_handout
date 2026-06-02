@@ -31,6 +31,7 @@ from pathlib import Path
 # (math grids -- math/formula/worked -- and tight curve labels are exempt.)
 SIBLING_PREFIXES = ("point", "proof", "step", "annotation", "row")
 TOLERANCE = 1.06   # max allowed max/min scale-aware-font_size ratio within a group
+OVERLAP_FRAC = 0.20  # warn when two content blocks intersect over this fraction of the smaller
 
 
 def _prose_nodes(mob) -> list:
@@ -106,12 +107,86 @@ def _overflow_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     return out
 
 
+def _aabb(mob) -> "tuple[float, float, float, float] | None":
+    """Axis-aligned bounding box (x0, x1, y0, y1) in manim units, or None for a
+    degenerate/measureless mob. Same accessors _overflow_issues already trusts."""
+    try:
+        x0, x1 = float(mob.get_left()[0]), float(mob.get_right()[0])
+        y0, y1 = float(mob.get_bottom()[1]), float(mob.get_top()[1])
+    except Exception:  # noqa: BLE001
+        return None
+    if x1 - x0 <= 1e-6 or y1 - y0 <= 1e-6:
+        return None
+    return (x0, x1, y0, y1)
+
+
+def _box_area(a) -> float:
+    return (a[1] - a[0]) * (a[3] - a[2])
+
+
+def _box_inter(a, b) -> float:
+    ix = max(0.0, min(a[1], b[1]) - max(a[0], b[0]))
+    iy = max(0.0, min(a[3], b[3]) - max(a[2], b[2]))
+    return ix * iy
+
+
+def _overlap_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
+    """Layout guard: two on-screen CONTENT blocks must not collide.
+
+    Where _overflow_issues checks each block against the frame and the sibling
+    check compares fonts, this checks blocks against *each other*. A content
+    scene's reveal is additive -- every revealed block stays on screen (see
+    scene.py _play_content) -- so the union of all content blocks is the fullest
+    final frame, and pairwise AABB intersection there is the worst case. Only
+    "content"-layer blocks take part: axes-space graph geometry (coincidence
+    intentional), decoration (motifs, column rules, reference guides) and full
+    backgrounds are exempt by Block.layer. Occupancy-style overlap detection in
+    the spirit of Code2Video's anchor/occupancy table, but kept deterministic and
+    continuous -- no grid quantisation. See video/CODE2VIDEO_STUDY.md (P0)."""
+    sid = scene.get("id")
+    items: list[tuple[str, tuple]] = []
+    for b in blocks:
+        if getattr(b, "layer", "content") != "content":
+            continue
+        mob = getattr(b, "mobject", None)
+        if mob is None:
+            continue
+        box = _aabb(mob)
+        if box is not None:
+            items.append((str(b.id), box))
+
+    out: list[tuple[str, str]] = []
+    for i in range(len(items)):
+        id_a, a = items[i]
+        for j in range(i + 1, len(items)):
+            id_b, bx = items[j]
+            inter = _box_inter(a, bx)
+            if inter <= 0.0:
+                continue
+            area_a, area_b = _box_area(a), _box_area(bx)
+            sm, lg = min(area_a, area_b), max(area_a, area_b)
+            if sm <= 1e-9:
+                continue
+            # Containment: a much larger block almost wholly covering a smaller one
+            # is layering (a card behind text, a highlight box), not a clash.
+            if inter >= 0.95 * sm and lg > 4.0 * sm:
+                continue
+            frac = inter / sm
+            if frac > OVERLAP_FRAC:
+                out.append(("warn",
+                    f"{sid}: blocks '{id_a}' and '{id_b}' overlap "
+                    f"({frac * 100:.0f}% of the smaller) -- they may collide on "
+                    f"screen; reposition or split them."))
+    return out
+
+
 def check_scenes(meta: dict, scenes: list[dict]) -> list[str]:
     """Return (severity, message) tuples for the given scenes.
     'error' = stacked-prose size mismatch, or an element clipped off-frame (both
-    abort the render); 'warn' = teaching prose in muted, or an element spilling
-    past the broadcast-safe margin. Overflow is checked on every scene kind; the
-    prose size/muted checks apply to content scenes only."""
+    abort the render); 'warn' = teaching prose in muted, an element spilling past
+    the broadcast-safe margin, or two content blocks overlapping. Overflow is
+    checked on every scene kind; the prose size / muted / overlap checks apply to
+    content scenes only."""
     from pipeline.templates import build_blocks
     from pipeline.visuals import theme as T
 
@@ -133,6 +208,11 @@ def check_scenes(meta: dict, scenes: list[dict]) -> list[str]:
         # prose size + muted checks are about stacked prose -- content scenes only
         if kind != "content":
             continue
+
+        # -- warn: two on-screen content blocks colliding. Additive reveal means
+        # the union of revealed blocks is the fullest frame; screen-space layout
+        # layer only (graph/decoration/background exempt by Block.layer). --
+        issues += _overlap_issues(scene, blocks)
 
         # -- error: stacked siblings at different sizes (shrunk not wrapped) --
         groups: dict[str, list[tuple[str, float]]] = {}

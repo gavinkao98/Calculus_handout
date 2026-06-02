@@ -43,4 +43,4 @@ def motif_corner(ground: str) -> Block:
     motif = brand.summit_bars(ground, height=0.45, color_role="muted", opacity=0.4)
     motif.move_to([T.FRAME_W / 2 - T.SAFE_MARGIN - motif.width / 2,
                    -T.FRAME_H / 2 + T.SAFE_MARGIN + motif.height / 2, 0])
-    return Block("motif", motif, anim="fade", static=True)
+    return Block("motif", motif, anim="fade", static=True, layer="decoration")
