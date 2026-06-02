@@ -8,10 +8,9 @@ Matches screenshots/03-example_walkthrough.png + B_Example in dir-b-templates:
             with a trailing  marker per step;
   bottom: a one-line takeaway with a short coral/accent rule.
 
-Each step's right-hand math is a dynamic block (math.0, math.1, ...) so the
-narration reveals the algebra line by line via {show math.N}. The left text and
-the markers come in with their row (static frame), matching the reveal model of
-the other templates.
+Each step (its reasoning text + worked math + marker) is ONE dynamic block
+(math.0, math.1, ...) revealed via {show math.N}, so a step -- including the
+final conclusion -- appears only when the narration reaches it, never upfront.
 
 YAML shape:
   template: example_walkthrough
@@ -86,11 +85,14 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         div.move_to([(left_x + 4.9 + right_x) / 2 - 0.2, col_top - (len(steps) - 1) * row_gap / 2, 0])
         blocks.append(Block("divider", div, anim="fade", static=True, layer="decoration"))
 
-    # left rows are static (the frame); right math reveals per beat
-    for i, lr in enumerate(left_rows):
-        blocks.append(Block(f"step.{i}", lr, anim="fade", static=True))
-    for i, rr in enumerate(right_rows):
-        blocks.append(Block(f"math.{i}", rr, anim="write", static=False))
+    # Each step's reasoning text + its worked math reveal TOGETHER on one beat, so
+    # the conclusion is never shown before the algebra that earns it. (Was: the
+    # left column was static -- the whole list, the punchline included, sat on
+    # screen from frame 1; VLM critique flagged the spoiled pacing.) Bundled under
+    # the existing math.{i} id, so the storyboards' {show math.N} markers are
+    # unchanged and both columns reveal in lockstep.
+    for i, (lr, rr) in enumerate(zip(left_rows, right_rows)):
+        blocks.append(Block(f"math.{i}", VGroup(lr, rr), anim="fade", static=False))
 
     # bottom takeaway
     take = spec.get("takeaway")

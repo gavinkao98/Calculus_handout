@@ -135,7 +135,12 @@ scenes:
       y_range: [-0.28, 1.55, 0.25]
       x_length: 6.35
       y_length: 3.65
+      x_ticks: [-1, 1]   # mark the domain endpoints on the axis
     plots:
+      # faint dashed walls at x = +/-1 make the domain [-1,1] (the whole point of
+      # the title) visible; listed first so they sit behind the curve and points.
+      - { kind: line, start: [-1, -0.28], end: [-1, 1.05], dashed: true, color_role: muted }
+      - { kind: line, start: [1, -0.28], end: [1, 1.05], dashed: true, color_role: muted }
       - { kind: function, expression: "x**2", x_range: [-1.45, 1.45], color_role: secondary, label: "$g(x)=x^2$", label_point: [0.08, 1.30] }
       - { kind: line, start: [-1.45, 0.25], end: [1.45, 0.25], dashed: true, color_role: warning, label: "$y=1/4$", label_side: right }
       - { kind: point, point: [-0.5, 0.25], hollow: false, color_role: accent }   # g(-1/2)=1/4 exists -> solid
