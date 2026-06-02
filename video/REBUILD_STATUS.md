@@ -29,6 +29,16 @@
 - **mock 成片產出**:`output/ch01_precise_limit.mp4`(16 場景,≈9'18",靜音、動畫模板頂著版)。8 張關鍵 frame 已逐一目視驗收(anchor/定義/證明/procedure/recap/例題)。
 - **render 階段抓到 2 個 lint+sizecheck 都漏的 bug**(已修,詳見內容稿校準筆記 §7-8):(a) prose sibling 內嵌 math 被縮小觸發 sizecheck → step text/points 改純英文;(b) recap formula 過寬靜默出框 → 改短(ε-δ 兩半式)。✅ **已實作 overflow guard**:`sizecheck` 對每個 scene 量 bbox(off-frame=error／超安全區=warn,見 `sizecheck.py`),DESIGN.md checklist 亦增一列;guard 一上線就抓到 `ch01_inverse_functions` recap formula 出框,已用 `recap_cards` 右欄左移修掉。
 
+### pipeline-hardening 線（2026-06-02）：守門員 + VLM 視覺批改
+
+mock 成片之後,在 `video/pipeline-hardening` 分支做了一輪產線加固（採納 Code2Video 機制,見 [`CODE2VIDEO_STUDY.md`](CODE2VIDEO_STUDY.md)）,皆已 commit：
+
+- **P0 重疊偵測 guard（`bfbbc04`）**：`sizecheck.py` 加 `_overlap_issues()`——確定性、零 API,測兩個螢幕空間 content block 有沒有撞。`Block` 多了 `layer` 欄位（content|graph|decoration|background），只有 content 參與。**新模板規則**：graph 場景的 axes/plot/label/ticks 標 `layer="graph"`、motif/分隔線標 `decoration`,否則誤報。
+- **M1 文件（`5392017`）**：P2 修補階梯寫進 [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md) §5、P3 AES 五維 QA 表寫進 [`DESIGN.md`](DESIGN.md)。
+- **解析度慣例（`b38200f`）**：測試／預覽用 1080p（`make.py --quality high`,預設）、正式交付才 4K（`--quality 4k`）。⚠️ make.py tier 語義變了：`high` 從 4K 改成 1080p@30、新增 `4k`。
+- **P1 VLM 視覺批改（`8b722dd`、`2a2e752`）**：`pipeline/critic.py`——抽每場景最滿幀 → MiMo-V2.5 → `output/critic/<id>/critique.{json,md}`（純建議、計費,key 走 env `MIMO_API_KEY`）。用法見 [`README.md`](README.md)「VLM 視覺批改」、**迭代流程見 [`DESIGN.md`](DESIGN.md)「The review loop」**。MiMo 接入：小米官方 `api.xiaomimimo.com/v1`（OpenAI 相容、`mimo-v2.5`、auth header `api-key`）。兩個雷：① 推理模型,`max_completion_tokens` 要設大（8000）否則 content 空;② 回的 JSON 內含 LaTeX,反斜線非法 escape,parser 要容錯。其餘坑見 README「踩過的坑」。
+- **§1.1 review loop 實戰**：VLM 抓到並修掉 4 個 lint/sizecheck/P0 看不到的語意/位置缺陷,每條都 VLM 複驗過：example 結論提前曝光（`d4f1af1`,左右欄綁一起漸進揭示）、graph 定義域沒畫（`d4f1af1`）、y=x 標籤跑到 y 軸頂（`04a56ce`,graph_focus line 加 `label_point` 支援）、reflection 缺 (a,b)→(b,a) 對應點（`a35b873`,加兩點+鏡射連接器）。
+
 ## ⬜ 待辦
 
 ### 待你定案(視覺 / 內容)

@@ -315,7 +315,10 @@ iteration, not a one-shot:
    improves clarity, pacing, or teaching is worth taking even when nothing was
    "wrong". Decline one only when it would *hurt* (e.g. break cross-scene
    consistency) or conflict with a deliberate house decision (the flat, no-grid
-   aesthetic; a declined typesetting choice). The VLM proposes; you decide.
+   aesthetic; a declined typesetting choice). When a suggestion is genuinely
+   **contentious** — arguable either way, or a design call that is the author's to
+   make — surface it for the human to decide rather than settling it yourself. The
+   VLM proposes; you decide, and escalate the close calls.
 3. **Modify** — apply the adopted changes (storyboard / template), re-render the
    affected scene.
 4. **Re-verify** — run the critic again on the changed frame: confirm the defect is
