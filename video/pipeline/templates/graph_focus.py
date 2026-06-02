@@ -203,8 +203,15 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
             if plot.get("label"):
                 lab = _label(plot["label"], ground, role=plot.get("label_role", "warning"),
                              size=plot.get("label_size", default_label_size))
-                side = _SIDE.get(str(plot.get("label_side", "right")).lower(), RIGHT)
-                lab.next_to(line, side, buff=0.13)
+                if plot.get("label_point") is not None:
+                    # Explicit axes point -- for a sloped/diagonal guide, next_to(line,
+                    # side) lands on the bbox edge (a y=x label asking for 'up' ended
+                    # up pinned to the top of the y-axis). Mirrors the function path.
+                    p = plot["label_point"]
+                    lab.move_to(axes.c2p(float(p[0]), float(p[1])), aligned_edge=LEFT)
+                else:
+                    side = _SIDE.get(str(plot.get("label_side", "right")).lower(), RIGHT)
+                    lab.next_to(line, side, buff=0.13)
                 labels.append(lab)
                 blocks.append(Block(f"label.{len(labels)-1}", lab, anim="fade", static=True))
 
