@@ -279,6 +279,30 @@ exceptions). Both run in `make.py` before render.
 
 ---
 
+### Visual QA — the whole-video acceptance pass
+
+The authoring checklist above catches *known per-element mistakes* statically. This
+is its complement: a **five-dimension pass over the finished video** (or its key
+frames), watched end-to-end before a section ships. The dimensions are adapted from
+Code2Video's AES rubric; in that study aesthetic score correlated **r ≈ 0.97** with
+measured learning gain, so visual clarity is teaching efficacy, not polish. The same
+table doubles as the rubric for a future VLM critic (see
+[`CODE2VIDEO_STUDY.md`](CODE2VIDEO_STUDY.md) P1/P3).
+
+| Dimension | Concrete check for this pipeline |
+|---|---|
+| **Element Layout** | No two content blocks overlap (now caught automatically by `sizecheck._overlap_issues`); everything sits inside `SAFE_MARGIN`; the frame reads balanced, not lopsided. |
+| **Attractiveness** | Each animation earns its place — it *animates* a concept (a sweep, a trace, a reflection across `y=x`), not just a static slide reveal (methodology §5, "Animate, not just display"). |
+| **Logic Flow** | Reveal order tracks the narration beats; one teaching idea per scene; nothing appears on screen before the narration speaks to it. |
+| **Visual Consistency** | Accent role is consistent (definition = cyan, theorem = gold, example = electric blue, …); one font and size scale throughout; intro and outro match the brand bookends. |
+| **Accuracy & Depth** | Faithful to the handout, the math is correct, and each scene's `learning_goal` (content script, methodology §6) is actually delivered — on screen *and* in narration. |
+
+This pass is human-run today. A VLM critic that drafts it as a **report** (proposals
+for a human to act on, never an auto-fix) is the P1 proposal in `CODE2VIDEO_STUDY.md`,
+kept advisory on purpose so the human stays the layout authority.
+
+---
+
 ## Data flow (target)
 
 ```

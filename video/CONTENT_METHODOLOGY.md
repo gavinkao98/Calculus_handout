@@ -166,6 +166,24 @@ gen-2 用 **Gemini TTS 直讀 LaTeX**，所以 narration 裡可以**直接內嵌
 - 好：「水平線從畫面上方緩緩下移、掃過 parabola；落到 $y=\tfrac14$ 時停住，同時閃示兩個交點 $x=\pm\tfrac12$，凸顯『一個輸出對應兩個輸入』。」
 - 不好：寫座標數值、寫 manim 物件名、寫 `run_time`。
 
+### 生成 code 的修補紀律（render 失敗時）
+
+Claude 依 `animation_cue` 生成的客製動畫 code 偶爾 render 失敗。此時 **SHOULD 由小到大逐層修補**，**MUST NOT** 一失敗就整支重生——重生會丟掉已被使用者認可的部分，還得從頭重審。修補階梯：
+
+1. 讀 manim traceback，定位失敗落在生成 code 的哪一行。
+2. **局部修**：只動失敗行與其緊鄰上下文，重跑。
+3. 連續數次局部修仍失敗 → **放大到整個 hook 函式**重寫。
+4. 仍失敗 → **才**從 `animation_cue` 整支重生（回到自然語言規格重新生成）。
+5. 每次修補 **SHOULD** 小到能被使用者**重新過目**——維持「生成 code 視同 narration、經認可才定版」的不變量（見上「動畫的分工」）。
+
+緊迴路用既有的 per-scene mock render（離線、不計費；`make.py` 的 `render()` 已逐場景捕捉例外並印 traceback）：
+
+```powershell
+python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --quality low
+```
+
+（這條是**工程層**的修補節奏，render 機制本身屬第二階段，見 [`DESIGN.md`](DESIGN.md)；§5 在此只定「先局部、保認可、小步可審」這條紀律。借鏡 Code2Video 的 ScopeRefine 分層除錯，細節見 [`CODE2VIDEO_STUDY.md`](CODE2VIDEO_STUDY.md) P2。）
+
 ### symbol-heavy 例外
 
 若一節的教學重量 **≥ 70%** 是符號／邏輯／量詞（`\varepsilon`-`\delta`、收斂判別、Riemann sum、形式連續性、歸納證明），視覺**條件化**而非放棄：
