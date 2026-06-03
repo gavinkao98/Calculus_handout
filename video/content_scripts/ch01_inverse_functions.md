@@ -56,7 +56,7 @@ next:          Up next — Inverse Trigonometric Functions
 - **learning_goal:** 先在日常情境套定義，建立「看對應、別急著看符號」的習慣。
 - **kind:** `example`
 - **narration:**
-  > Before any algebra, here is the idea in plain terms. Assign each student in a class an ID number, with no two students sharing a number. Is the rule from student to ID one-to-one? Yes — distinct students always get distinct numbers, exactly the condition we just wrote down. The habit to build early: ask whether one output could trace back to two different inputs.
+  > Before any algebra, here is the idea in plain terms. Assign each student in a class an ID number, with no two students sharing a number. Is the rule from student to ID one-to-one? Yes — distinct students always get distinct numbers, which is exactly what one-to-one means. The habit to build early: ask whether one output could trace back to two different inputs.
 - **visual_need:** 學生 → ID 的一對一對應（幾名學生各連到不同號碼，連線互不交會）。
 - **animation_cue:** —（靜態即可；連線可逐條畫出）
 
@@ -119,7 +119,7 @@ next:          Up next — Inverse Trigonometric Functions
 - **learning_goal:** 記住認證反函數的兩個合成恆等式。
 - **kind:** `proposition`
 - **narration:**
-  > The defining relation gives two identities worth remembering. Apply $f$ then $f^{-1}$ and you return to the start: $f^{-1}(f(x))=x$ for every $x$ in $A$. Apply them the other way and the same thing happens: $f(f^{-1}(y))=y$ for every $y$ in $B$. Going out and coming back lands you exactly where you began — that round trip is what 'inverse' really means.
+  > The definition of the inverse gives two identities worth remembering. Apply $f$ then $f^{-1}$ and you return to the start: $f^{-1}(f(x))=x$ for every $x$ in $A$. Apply them the other way and the same thing happens: $f(f^{-1}(y))=y$ for every $y$ in $B$. Going out and coming back lands you exactly where you began — that round trip is what 'inverse' really means.
 - **visual_need:** 兩式 $f^{-1}(f(x))=x$、$f(f^{-1}(y))=y$；映射圖：$A\leftrightarrow B$，$f$ 與 $f^{-1}$ 反向箭頭。
 - **animation_cue:** 客製 manim：$x\in A$ 沿 $f$ 箭頭走到 $f(x)\in B$，再沿 $f^{-1}$ 箭頭走回原本的 $x$（回到原位時閃一下）；另一組 $y\in B$ 同理往返，凸顯「出去再回來、回到原點」。
 

@@ -200,6 +200,44 @@ python video\pipeline\critic.py --storyboard video\storyboards\ch01_inverse_func
 5. **最後檢查** —— 你自己看一遍。
 6. **迭代** —— 重複到 critic 沒有值得採納的建議為止。
 
+## 內容 cross-review（review_pack.py）
+
+critic.py 的**文字版姊妹**：critic.py 把 render 出來的**幀**送 VLM 抓視覺缺陷；
+review_pack.py 把**撰寫脈絡**（`.tex` 原文、narration、單元拆解、生成的 hook code）
+送另一個文字模型（DeepSeek），抓守門員與 VLM 結構上看不到的東西——忠實度漂移、
+旁白書面腔、拆解問題、生成動畫 code 的數學／慣例錯。四個 lens：
+
+| lens | 每次送什麼 | 對到 |
+|---|---|---|
+| `faithfulness` | 每單元 `.tex` 原文切片 ↔ narration | CONTENT_METHODOLOGY §1、§3 |
+| `register` | 每單元 narration | CONTENT_METHODOLOGY §4 |
+| `decomposition` | 整節單元的 kind/learning_goal | CONTENT_METHODOLOGY §3、§5 |
+| `engineering` | 生成 hook code + animation_cue + `.tex` 數學 | DESIGN authoring checklist |
+
+成本閘門與 critic.py 相同：免費組 packet + `--dry-run`（寫 packet、印 token 估算、不連網）；
+計費呼叫走 `--confirm`，key 從環境變數 `DEEPSEEK_API_KEY` 讀——**不當參數、不寫檔、不進 git**。
+**純建議**：寫報告 `output/review/<id>/review.{json,md}`，不改 content script／storyboard，採納與否由人判斷。
+
+```powershell
+# 免費：組四層 packet、寫到 output/review/<id>/packets/、印估算，不呼叫 API
+python video\pipeline\review_pack.py --storyboard video\storyboards\ch01_inverse_functions.yml --dry-run
+
+# 計費：真送 DeepSeek。key 走環境變數（依 CLAUDE.md 須先估算經同意）。
+$env:DEEPSEEK_API_KEY = "<your key>"
+python video\pipeline\review_pack.py --storyboard video\storyboards\ch01_inverse_functions.yml --confirm
+python video\pipeline\review_pack.py --storyboard <yml> --confirm --smoke          # 只送第一個 packet（驗一發）
+python video\pipeline\review_pack.py --storyboard <yml> --layers register,faithfulness   # 選 lens
+```
+
+- **provider**＝DeepSeek 官方 `api.deepseek.com`（OpenAI 相容、model `deepseek-v4-pro`、Bearer auth）。
+- **`deepseek-v4-pro` 是推理模型**：completion 多半是 reasoning token（首跑實測 ~2.5k／call），故 out ≫ in、成本由 reasoning 驅動；`max_tokens` 設大（8000）避免截斷，計費看實際用量。
+- **prompt 餵 house rules**（各 lens 的方法論 rubric）+ CLAUDE.md 四級 finding 紀律，壓掉「拿通用 prior 來審」的噪音。
+- **engineering lens 需要 `video/animations/<deck>_hooks.py`**；沒有生成 code 的節（如 §1.1）自動跳過該 lens。
+
+**過濾紀律（實測重要）**：模型的自我 triage 不可盡信——§1.1 首跑 28 calls、7 條 actionable，
+人依四級紀律過濾後真正可動約 1.5 條（其餘過度 triage 成 L1、甚至 1 條幻覺）；decomposition 正確回 0。
+所以**沿用 critic.py 的 review loop**：模型提案 → 你（或 Claude 在你簽核下）裁決 → 改 content script + storyboard（**同步**）→ 有爭議往上拋。推理模型 run-to-run 會飄，單跑一次不窮盡。
+
 ## 踩過的坑（接 VLM 批改學到的）
 
 - **MiMo-V2.5 是推理模型**：completion token 先被隱藏 reasoning 吃掉，`max_completion_tokens`
