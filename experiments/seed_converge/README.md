@@ -60,6 +60,24 @@ python experiments/seed_converge/run.py --drafter openai:gpt-5.1 --auditor gemin
 約 $0.10–0.60（placeholder 價）。先 `--dry-run` 看精確估算、再 `--smoke`
 驗一發、最後才整迴圈。
 
+## 視覺層：figure_critic.py（多模態圖檢查）
+
+文字審（run.py 的 DeepSeek）看不到 render 後的視覺缺陷。`figure_critic.py` 是
+[`critic.py`](../../video/pipeline/critic.py) 的講義版：pymupdf 把含圖的 PDF 頁轉
+PNG → 多模態模型（Gemini，`image_url`）→ 依 CONTENT_SPEC §10 圖規則出 defects（label
+碰撞／出界／只靠顏色編碼／灰階存活）→ 人 triage。閘門同 run.py。
+
+```powershell
+python experiments/seed_converge/figure_critic.py --pdf <pdf> --pages 2,6 --dry-run
+python experiments/seed_converge/figure_critic.py --pdf <pdf> --pages 2,6 --confirm
+```
+
+§1.1 preview 實跑（pages 2,6、~$0.005/run）：**穩定抓到 `h(x)` 標籤撞 y 軸（每跑
+必中）** 與灰階只靠顏色編碼等真缺陷，但次要缺陷（子圖未對齊、紅標壓點、缺刻度）
+**run-to-run 飄移**——跟文字審同病，需**多跑取聯集＋人 triage**；單跑為 advisory、
+非窮舉。用 `json_schema` 強制結構化（裸 `json_object` 會讓模型脫稿成 bbox／空 list；
+numeric scores 不可靠、已移除）。
+
 ## 範圍外（刻意不做）
 
 不碰正式講義流程、不碰 `chapters/*.tex`、不碰凍結中的 `video/`。不寫 parser／
