@@ -4,9 +4,9 @@
 大幅擴寫，另一個模型自動二次審核、兩者無人介入地來回收斂，結果是抓掉幻覺、
 還是替一個雙方都同意的幻覺背書？**
 
-定案配置：**GPT 起草 ↔ Gemini 審核**（兩個都外部模型）。Claude **不進迴圈**，
-跑完後當中立第三方，對照已簽核的 §1.1（[`chapters/ch01_foundations.tex`](../../chapters/ch01_foundations.tex) 第 16–268 行）評分，
-寫進 `RESULT.md`。
+陣容可切換（`--drafter`/`--auditor`）。**§1.1 首跑用 Gemini 起草 ↔ DeepSeek 審核**，
+結果見 [`RESULT.md`](RESULT.md)。Claude **不進迴圈**，跑完後當中立第三方，對照已簽核的
+§1.1（[`chapters/ch01_foundations.tex`](../../chapters/ch01_foundations.tex) 第 16–268 行）評分。
 
 ## 檔案
 

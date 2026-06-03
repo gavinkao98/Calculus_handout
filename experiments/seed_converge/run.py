@@ -47,13 +47,18 @@ PROVIDERS = {
         "env": "GEMINI_API_KEY",
         "token_param": "max_tokens",
     },
+    "deepseek": {  # OpenAI-compatible; same endpoint as video/pipeline/review_pack.py
+        "base_url": "https://api.deepseek.com",
+        "env": "DEEPSEEK_API_KEY",
+        "token_param": "max_tokens",
+    },
 }
 # Defaults are OVERRIDABLE via --drafter/--auditor and printed at --dry-run for
 # confirmation; the exact current model ids may differ from these guesses.
-DEFAULT_MODELS = {"openai": "gpt-5.1", "gemini": "gemini-2.5-pro"}
+DEFAULT_MODELS = {"openai": "gpt-5.1", "gemini": "gemini-2.5-pro", "deepseek": "deepseek-v4-pro"}
 
 # PLACEHOLDER prices, USD per 1M tokens (input, output) -- estimate only.
-PRICE = {"openai": (1.25, 10.0), "gemini": (1.25, 5.0)}
+PRICE = {"openai": (1.25, 10.0), "gemini": (1.25, 5.0), "deepseek": (0.28, 1.10)}
 CHARS_PER_TOKEN = 3.2
 EST_OUTPUT_TOKENS = 4000  # rough per-call output for the dry-run estimate
 
@@ -113,8 +118,8 @@ def call(provider: str, model: str, system: str, user: str, *,
                 time.sleep((2 ** attempt) * 2)
                 continue
             raise
-    content = data["choices"][0]["message"]["content"]
-    return content, data.get("usage", {})
+    choice = data["choices"][0]
+    return choice["message"]["content"], data.get("usage", {}), choice.get("finish_reason")
 
 
 # --------------------------------------------------------------------------- #
@@ -172,11 +177,12 @@ def auditor_prompt(seed: str, rules: str, draft: str):
 # --------------------------------------------------------------------------- #
 # Convergence loop
 # --------------------------------------------------------------------------- #
-def _usage(used: dict, provider: str, model: str) -> dict:
+def _usage(used: dict, provider: str, model: str, finish=None) -> dict:
     pin, pout = int(used.get("prompt_tokens", 0)), int(used.get("completion_tokens", 0))
     cin, cout = PRICE[provider]
     return {"provider": provider, "model": model, "prompt_tokens": pin,
-            "completion_tokens": pout, "usd": round(pin / 1e6 * cin + pout / 1e6 * cout, 4)}
+            "completion_tokens": pout, "finish_reason": finish,
+            "usd": round(pin / 1e6 * cin + pout / 1e6 * cout, 4)}
 
 
 def _actionable(findings):
@@ -189,17 +195,17 @@ def run_loop(seed, rules, *, drafter, auditor, keys, out_dir, max_rounds, max_to
     usage_log, trace = [], []
 
     s, u = drafter_prompt(seed, rules)
-    draft, used = call(dp, dm, s, u, api_key=keys[dp], max_tokens=max_tokens)
-    usage_log.append({"role": "drafter", "round": 0, **_usage(used, dp, dm)})
+    draft, used, fin = call(dp, dm, s, u, api_key=keys[dp], max_tokens=max_tokens)
+    usage_log.append({"role": "drafter", "round": 0, **_usage(used, dp, dm, fin)})
     (out_dir / "round_00_draft.tex").write_text(draft, encoding="utf-8")
-    trace.append(f"Round 0: drafter ({dp}:{dm}) produced {len(draft)} chars.")
+    trace.append(f"Round 0: drafter ({dp}:{dm}) produced {len(draft)} chars (finish={fin}).")
 
     converged, rounds_run = False, 0
     for k in range(1, max_rounds + 1):
         rounds_run = k
         s, u = auditor_prompt(seed, rules, draft)
-        raw, used = call(ap, am, s, u, api_key=keys[ap], max_tokens=max_tokens)
-        usage_log.append({"role": "auditor", "round": k, **_usage(used, ap, am)})
+        raw, used, fin = call(ap, am, s, u, api_key=keys[ap], max_tokens=max_tokens)
+        usage_log.append({"role": "auditor", "round": k, **_usage(used, ap, am, fin)})
         try:
             verdict = _extract_json(raw)
         except Exception as e:  # noqa: BLE001
@@ -225,8 +231,8 @@ def run_loop(seed, rules, *, drafter, auditor, keys, out_dir, max_rounds, max_to
             break
 
         s, u = drafter_prompt(seed, rules, prev_draft=draft, findings=verdict.get("findings", []))
-        new_draft, used = call(dp, dm, s, u, api_key=keys[dp], max_tokens=max_tokens)
-        usage_log.append({"role": "drafter", "round": k, **_usage(used, dp, dm)})
+        new_draft, used, fin = call(dp, dm, s, u, api_key=keys[dp], max_tokens=max_tokens)
+        usage_log.append({"role": "drafter", "round": k, **_usage(used, dp, dm, fin)})
         (out_dir / f"round_{k:02d}_draft.tex").write_text(new_draft, encoding="utf-8")
         if new_draft.strip() == draft.strip():
             trace.append(f"Round {k}: draft unchanged -> stop.")
@@ -275,7 +281,8 @@ def dry_run(seed, rules, drafter, auditor, out_dir, max_rounds, max_tokens):
     print(f"  worst case: {n_draft} drafter + {n_audit} auditor calls")
     print(f"  rough estimate: ${usd:.2f}   (PLACEHOLDER prices; confirm the model ids above)")
     print(f"  prompts written to {pdir}")
-    print("  to run billed: set OPENAI_API_KEY / GEMINI_API_KEY, then --confirm (add --smoke first).")
+    envs = " / ".join(sorted({PROVIDERS[dp]["env"], PROVIDERS[ap]["env"]}))
+    print(f"  to run billed: set {envs}, then --confirm (add --smoke first).")
 
 
 # --------------------------------------------------------------------------- #
