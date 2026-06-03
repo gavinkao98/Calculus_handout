@@ -101,6 +101,8 @@ _SCHEMA = {
     "required": ["defects", "overall"],
     "additionalProperties": False,
 }
+_CRIT_RF = {"type": "json_schema",
+            "json_schema": {"name": "figure_critique", "strict": True, "schema": _SCHEMA}}
 
 
 def _extract_json(text: str) -> dict:
@@ -135,7 +137,8 @@ def _image_data_url(png_path: Path) -> str:
 
 
 def call_vlm(provider: str, model: str, prompt: str, png_path: Path, *,
-             api_key: str, max_tokens: int, timeout: int = 180, retries: int = 3):
+             api_key: str, max_tokens: int, response_format=_CRIT_RF,
+             timeout: int = 180, retries: int = 3):
     spec = PROVIDERS[provider]
     payload = {
         "model": model,
@@ -146,10 +149,10 @@ def call_vlm(provider: str, model: str, prompt: str, png_path: Path, *,
                 {"type": "image_url", "image_url": {"url": _image_data_url(png_path)}},
             ],
         }],
-        "response_format": {"type": "json_schema",  # pin exact shape (bare json_object went rogue)
-                            "json_schema": {"name": "figure_critique", "strict": True, "schema": _SCHEMA}},
         spec["token_param"]: max_tokens,
     }
+    if response_format is not None:  # critique pins json_schema; fix passes None for free text
+        payload["response_format"] = response_format
     req = urllib.request.Request(
         f"{spec['base_url'].rstrip('/')}/chat/completions",
         data=json.dumps(payload).encode("utf-8"), method="POST",

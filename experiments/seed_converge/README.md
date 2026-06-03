@@ -78,6 +78,22 @@ python experiments/seed_converge/figure_critic.py --pdf <pdf> --pages 2,6 --conf
 非窮舉。用 `json_schema` 強制結構化（裸 `json_object` 會讓模型脫稿成 bbox／空 list；
 numeric scores 不可靠、已移除）。
 
+### figure_fix.py：視覺自動修圖（閉環實驗）
+
+`figure_critic` 只挑錯不動手；[`figure_fix.py`](figure_fix.py) 把它閉環：render →
+視覺 critique → 多模態模型重寫 TikZ（看著圖＋舊 code＋defects、數學不動）→ 再 render
+→ 再 critique，直到無缺陷或 `--max-rounds`。是 run.py 收斂迴圈的視覺版。
+
+```powershell
+python experiments/seed_converge/figure_fix.py --fig <one-figure.tex> --confirm
+```
+
+reflection 圖實跑：**真碰撞（`y=x³` 標籤撞 y 軸）被自動修掉、紅曲線還順手改虛線
+（灰階加分）**——證明圖能自動改好。但**不可靠**：三跑三樣——視覺審 run-to-run 飄
+（1/3 跑準、其餘漏真缺陷或把彩色曲線幻覺成黑）、thinking model 不給足 `--max-tokens`
+會截斷出壞 LaTeX、API 偶發 timeout／503（已加 graceful 處理、不再讓整跑崩掉）。
+結論同文字審：**能用，但要多跑取聯集＋人 triage，不能盲目無人迴圈。**
+
 ## 範圍外（刻意不做）
 
 不碰正式講義流程、不碰 `chapters/*.tex`、不碰凍結中的 `video/`。不寫 parser／
