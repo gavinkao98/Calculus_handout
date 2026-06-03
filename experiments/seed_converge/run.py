@@ -143,7 +143,8 @@ def drafter_prompt(seed: str, rules: str, prev_draft=None, findings=None):
         parts.append(
             "=== AUDITOR FINDINGS ===\n"
             + json.dumps(findings, ensure_ascii=False, indent=2)
-            + "\n\nRevise to resolve the level-1 and level-2 findings. Do NOT "
+            + "\n\nResolve every finding with blocking=true (math / faithfulness); "
+            "also fix advisory formatting/house-rule findings where easy. Do NOT "
             "blindly cut correct, useful richness. Return the FULL revised LaTeX.")
     else:
         parts.append("Write the full section draft now. Return ONLY LaTeX.")
@@ -157,16 +158,23 @@ def auditor_prompt(seed: str, rules: str, draft: str):
         "findings for a human. Hunt especially for: (a) mathematical errors, "
         "fabricated theorems/identities, or over-generalized claims; (b) drift "
         "from the seed's mathematics; (c) house-rule / register violations.\n"
-        "Classify EVERY finding into exactly one level (do not inflate):\n"
-        "  1 real-conflict   -- wrong math or a stated-rule violation (must fix)\n"
-        "  2 discoverability -- not wrong, under-specified / worth a note\n"
-        "  3 editorial-drift -- low-priority style risk, not a defect\n"
-        "  4 non-finding     -- e.g. wording differs but is mathematically equivalent\n"
-        "Only levels 1-2 are actionable; over-reporting dilutes the real findings. "
-        'Set "converged": true ONLY when there are zero level-1 AND zero level-2 '
-        "findings. Return STRICT JSON only, no prose around it:\n"
-        '{"converged":bool,"findings":[{"level":int,"severity":"low|med|high",'
-        '"where":str,"issue":str,"evidence":str,"suggestion":str}],"summary":str}'
+        "Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):\n"
+        "  category: math | faithfulness | house_rule | register | other\n"
+        "  blocking: true ONLY for a real MATH ERROR, a fabricated or "
+        "over-generalized claim, or DRIFT from the seed's mathematics (category "
+        "must be math or faithfulness). Everything else MUST be blocking=false.\n"
+        "Formatting / house-rule items -- missing `% expansion:` comment, missing "
+        "\\index{}, register or style nits, discoverability notes -- are caught by a "
+        "downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); "
+        "they MUST NOT block convergence. Also give each finding a level for human "
+        "triage (1 real-conflict, 2 discoverability, 3 editorial-drift, 4 non-finding); "
+        "a mathematically equivalent paraphrase is NOT a finding.\n"
+        'Set "converged": true when there are ZERO blocking findings (math correct and '
+        "faithful to the seed), even if advisory formatting nits remain. Return STRICT "
+        "JSON only, no prose:\n"
+        '{"converged":bool,"findings":[{"category":str,"blocking":bool,"level":int,'
+        '"severity":"low|med|high","where":str,"issue":str,"evidence":str,'
+        '"suggestion":str}],"summary":str}'
     )
     user = (f"=== HOUSE RULES ===\n{rules}\n\n"
             f"=== SEED (the intended mathematical scope, section 1.1) ===\n{seed}\n\n"
@@ -185,8 +193,9 @@ def _usage(used: dict, provider: str, model: str, finish=None) -> dict:
             "usd": round(pin / 1e6 * cin + pout / 1e6 * cout, 4)}
 
 
-def _actionable(findings):
-    return [f for f in findings if int(f.get("level", 9)) in (1, 2)]
+def _blocking(findings):
+    # only math / faithfulness errors block convergence; formatting is advisory
+    return [f for f in findings if f.get("blocking")]
 
 
 def run_loop(seed, rules, *, drafter, auditor, keys, out_dir, max_rounds, max_tokens, smoke):
@@ -213,24 +222,22 @@ def run_loop(seed, rules, *, drafter, auditor, keys, out_dir, max_rounds, max_to
                        "summary": f"PARSE_FAIL: {e}", "_raw": raw}
         (out_dir / f"round_{k:02d}_findings.json").write_text(
             json.dumps(verdict, ensure_ascii=False, indent=2), encoding="utf-8")
-        acts = _actionable(verdict.get("findings", []))
+        findings = verdict.get("findings", [])
+        blocking = _blocking(findings)
         trace.append(
-            f"Round {k}: auditor ({ap}:{am}) converged={verdict.get('converged')}, "
-            f"{len(acts)} actionable / {len(verdict.get('findings', []))} total. "
+            f"Round {k}: auditor ({ap}:{am}) blocking={len(blocking)}, "
+            f"advisory={len(findings) - len(blocking)}, total={len(findings)}. "
             f"{verdict.get('summary', '')}")
 
-        if verdict.get("converged") and not acts:
+        if not blocking:  # math + faithfulness clean -> converged; advisory nits are the linter's job
             converged = True
             break
-        if not acts:
-            converged = True
-            trace.append(f"Round {k}: no actionable findings -> treat as converged.")
-            break
-        if smoke:
-            trace.append("smoke: stopping after one audit round.")
+        if smoke or k == max_rounds:  # stop ON an audit; never leave a final un-audited revise
+            trace.append("smoke: stopped after one audit round." if smoke
+                         else f"Round {k}: hit max_rounds with {len(blocking)} blocking finding(s).")
             break
 
-        s, u = drafter_prompt(seed, rules, prev_draft=draft, findings=verdict.get("findings", []))
+        s, u = drafter_prompt(seed, rules, prev_draft=draft, findings=findings)
         new_draft, used, fin = call(dp, dm, s, u, api_key=keys[dp], max_tokens=max_tokens)
         usage_log.append({"role": "drafter", "round": k, **_usage(used, dp, dm, fin)})
         (out_dir / f"round_{k:02d}_draft.tex").write_text(new_draft, encoding="utf-8")

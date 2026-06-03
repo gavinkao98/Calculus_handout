@@ -46,10 +46,13 @@ python experiments/seed_converge/run.py --drafter openai:gpt-5.1 --auditor gemin
 
 ## 收斂與終止
 
-每輪：審核模型對草稿出 strict-JSON findings（四級分類 + `converged` 旗標）。
-無 level-1/2 actionable（或 auditor 自宣 `converged`、或達 `--max-rounds`、或
-草稿不再變動）即停。每輪的 `round_NN_draft.tex` 與 `round_NN_findings.json`
-全部落檔；`trace.md` 是人讀的收斂敘事，`usage.json` 記 token 與估算成本。
+每輪：審核模型對草稿出 strict-JSON findings，每條標 `category` + `blocking`
+（**只有 math／faithfulness 錯誤 blocking=true**；`% expansion:`／`\index`／register
+等格式 house-rule 屬 advisory、交給下游 linter，不擋收斂）＋ `level`（四級供人 triage）。
+**無 blocking finding 即視為收斂**（數學正確、忠於種子，縱有格式 nit 仍收斂）。
+迴圈**停在一次 audit**（達 `--max-rounds` 時不再多做一版未經審核的 revise），
+或草稿不再變動。每輪 `round_NN_draft.tex` 與 `round_NN_findings.json` 全落檔；
+`trace.md` 人讀敘事，`usage.json` 記 token／成本。
 
 ## 計費（CLAUDE.md）
 
