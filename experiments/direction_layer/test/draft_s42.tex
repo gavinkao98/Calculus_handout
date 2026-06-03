@@ -1,0 +1,199 @@
+% ============================================================
+% DRAFT — §4.2 Continuity and the Exponent Law for e^x
+% stage ④ expansion toward test/brief_s42.md (direction layer test).
+% EXPERIMENT ARTIFACT — NOT for chapters/*.tex.
+% Assumes §4.1 labels as if integrated: thm:exp-series-converges-positive,
+%   thm:completeness, prop:polynomial-limit, ex:partial-sum-e.
+% % expansion: markers = additions beyond the manuscript seed (seed_s42.md).
+% ③ decision = 折衷: Cauchy<=>convergent is STATED, the forward (easy) direction
+%   is proved, and a remark points the reverse to completeness — NO full
+%   Bolzano–Weierstrass / monotone-subsequence proof (that diverges from the
+%   signed-off §4.2 on purpose).
+% ============================================================
+
+\section{Continuity and the Exponent Law for \texorpdfstring{$e^{x}$}{e\^{}x}}\label{sec:continuity-and-exponent-law}
+
+% expansion:intuition — section opener pivoting from §4.1's three open questions
+\Cref{sec:construction-of-exp} defined \(e^{x}\) by its power series and showed that the series converges for \(x > 0\). Three questions are still open. Does the series converge when \(x < 0\), where the alternating signs spoil the simple tail bound? Is \(e^{x}\) continuous? And does the familiar rule \(e^{x} e^{y} = e^{x + y}\) survive the passage from rational to real exponents? All three rest on one flexible tool --- a series converges whenever the series of its absolute values does --- together with a careful multiplication of two infinite series. The exponent law carries most of the technical weight, and we build toward it.
+
+\subsection{Continuity of \(e^{x}\) on the positive reals}
+
+We first show \(e^{x}\) is continuous for \(x > 0\). The idea is to approximate both \(e^{x}\) and \(e^{x_{0}}\) by the \emph{same} partial-sum polynomial and let the polynomial's own continuity do the work.
+
+\begin{theorem}\label{thm:exp-continuous-positive}\index{exponential function!continuity}
+The function \(e^{x}\) is continuous at every \(x_{0} > 0\); that is, \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\).
+\end{theorem}
+
+\begin{proof}
+Let \(P_{k}(x) = \sum_{n = 0}^{k} x^{n}/n!\). From the proof of \cref{thm:exp-series-converges-positive}, for \(0 < x < L\) and \(k > n_{0} > 2L\),
+\[
+0 \le e^{x} - P_{k}(x) \le \frac{L^{n_{0}}}{n_{0}!} \left(\tfrac{1}{2}\right)^{k - n_{0}}.
+\]
+Given \(\varepsilon > 0\), set \(L = x_{0} + 1\) and choose \(k > n_{0} > 2(x_{0} + 1)\) large enough that \(\dfrac{(x_{0} + 1)^{n_{0}}}{n_{0}!}\left(\tfrac{1}{2}\right)^{k - n_{0}} < \varepsilon\). The polynomial \(P_{k}\) is continuous (by \cref{prop:polynomial-limit}), so there is a \(\delta > 0\), with \(\delta \le \min\{x_{0}/2,\, 1/2\}\), such that \(\lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon\) whenever \(\lvert x - x_{0} \rvert < \delta\). For such \(x\) we have \(0 < x < x_{0} + 1 = L\), so the tail bound applies to both \(e^{x}\) and \(e^{x_{0}}\), and
+\begin{aligneddisplay}
+\lvert e^{x} - e^{x_{0}} \rvert
+&\le \lvert e^{x} - P_{k}(x) \rvert + \lvert P_{k}(x) - P_{k}(x_{0}) \rvert + \lvert P_{k}(x_{0}) - e^{x_{0}} \rvert \\
+&< \varepsilon + \varepsilon + \varepsilon = 3\varepsilon.
+\end{aligneddisplay}
+Since \(\varepsilon > 0\) was arbitrary, \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\).
+\end{proof}
+
+% expansion:intuition — name the workhorse technique (brief: load-bearing intuition)
+\begin{remark}[The polynomial-approximation technique]
+The proof just given is the workhorse of this chapter: approximate \(e^{x}\) and \(e^{x_{0}}\) by a single polynomial \(P_{k}\) chosen so that the tail errors are small, then lean on the continuity of \(P_{k}\) to control the remaining difference. Every continuity-style claim that follows uses the same template --- three error pieces, two of them tails and one a polynomial difference.
+\end{remark}
+
+\subsection{Cauchy sequences and absolute convergence}
+
+To reach \(x < 0\), where the terms alternate and the partial sums are no longer monotone, we need a way to deduce convergence from the absolute values of the terms. The bridge is the notion of a \emph{Cauchy sequence}.
+
+\begin{definition}\label{def:cauchy-sequence}\index{Cauchy sequence}\index{sequence!Cauchy}
+A sequence \(\{a_{n}\}_{n = 1}^{\infty}\) of real numbers is a \emph{Cauchy sequence} if for every \(\varepsilon > 0\) there exists \(N_{0} \in \mathbb{N}\) such that
+\[
+\lvert a_{m} - a_{n} \rvert < \varepsilon \qquad \text{for all } m, n \ge N_{0}.
+\]
+
+% expansion:intuition — Informally gloss (definition body is symbol-dense)
+\emph{Informally, the terms of a Cauchy sequence eventually all lie within an arbitrarily small window of one another --- the tail bunches up, without our having to name the number it bunches around.}
+\end{definition}
+
+\begin{theorem}\label{thm:cauchy-iff-convergent}\index{Cauchy sequence!equivalence with convergence}
+A sequence of real numbers converges if and only if it is a Cauchy sequence.
+\end{theorem}
+
+% expansion:formula — the forward direction is short, standard, and illustrative; proved per ③ (折衷)
+\begin{proof}[Proof that a convergent sequence is Cauchy]
+Suppose \(a_{n} \to L\). Given \(\varepsilon > 0\), pick \(N\) with \(\lvert a_{n} - L \rvert < \varepsilon/2\) for all \(n \ge N\). Then for \(m, n \ge N\),
+\[
+\lvert a_{m} - a_{n} \rvert = \lvert (a_{m} - L) - (a_{n} - L) \rvert \le \lvert a_{m} - L \rvert + \lvert a_{n} - L \rvert < \tfrac{\varepsilon}{2} + \tfrac{\varepsilon}{2} = \varepsilon. \qedhere
+\]
+\end{proof}
+
+% expansion:intuition — 折衷 per ③: state and use the reverse, locate it in completeness, do NOT prove Bolzano–Weierstrass
+\begin{remark}
+The reverse implication --- that every Cauchy sequence converges --- is the substantive half, and it is exactly where the \emph{completeness} of \(\mathbb{R}\) (\cref{thm:completeness}) enters: the Cauchy condition says the tail bunches up, and completeness supplies a real number for it to bunch up around. For real sequences the Cauchy criterion is itself a form of completeness, and we take its reverse implication as one more of the completeness facts we rely on for \(\mathbb{R}\). A self-contained proof routes through the Bolzano--Weierstrass theorem and belongs to a first course in real analysis; we will use \cref{thm:cauchy-iff-convergent} freely from here, exactly as we already use \cref{thm:completeness}.
+\end{remark}
+
+The next proposition is the tool that lets us extend \(e^{x}\) past \(x = 0\).
+
+\begin{proposition}[Absolute convergence implies convergence]\label{prop:abs-conv-implies-conv}\index{convergence!absolute}\index{series!absolute convergence}
+If \(\{a_{n}\}_{n = 1}^{\infty}\) satisfies \(\sum_{n = 1}^{\infty} \lvert a_{n} \rvert < \infty\), then \(\sum_{n = 1}^{\infty} a_{n}\) converges.
+\end{proposition}
+
+\begin{proof}
+Let \(S_{n} = \sum_{k = 1}^{n} a_{k}\) and \(T_{n} = \sum_{k = 1}^{n} \lvert a_{k} \rvert\). The sequence \(\{T_{n}\}\) is non-decreasing and bounded above, so it converges by \cref{thm:completeness}; being convergent, it is Cauchy. Hence for every \(\varepsilon > 0\) there is an \(N_{0}\) with \(\lvert T_{m} - T_{n} \rvert < \varepsilon\) for all \(m, n \ge N_{0}\). Then for \(m > n \ge N_{0}\),
+\[
+\lvert S_{m} - S_{n} \rvert = \left\lvert \sum_{k = n + 1}^{m} a_{k} \right\rvert \le \sum_{k = n + 1}^{m} \lvert a_{k} \rvert = T_{m} - T_{n} < \varepsilon.
+\]
+So \(\{S_{n}\}\) is Cauchy, and by \cref{thm:cauchy-iff-convergent} it converges.
+\end{proof}
+
+% expansion:example — manuscript has no examples; an on-topic absolute-convergence anchor
+\begin{workedexample}
+\begin{example}
+Show that \(\displaystyle \sum_{n = 0}^{\infty} \frac{(-1)^{n}}{n!}\) converges.
+\end{example}
+
+\begin{solution}
+The series of absolute values is \(\sum_{n = 0}^{\infty} \frac{1}{n!}\), which is the series defining \(e^{1}\) and converges by \cref{thm:exp-series-converges-positive}. By \cref{prop:abs-conv-implies-conv}, the alternating series \(\sum_{n = 0}^{\infty} (-1)^{n}/n!\) therefore converges. (Once \(e^{x}\) is available for \(x < 0\) below, we will recognise its sum as \(e^{-1}\).)
+\end{solution}
+\end{workedexample}
+
+\subsection{Convergence of \(e^{x}\) for negative \(x\)}
+
+For \(x < 0\), write \(y = -x > 0\). Then \(\sum_{n = 0}^{\infty} \lvert x^{n}/n! \rvert = \sum_{n = 0}^{\infty} y^{n}/n!\), which is finite by \cref{thm:exp-series-converges-positive}. By \cref{prop:abs-conv-implies-conv}, the series \(\sum x^{n}/n!\) itself converges.
+
+\begin{corollary}\label{cor:exp-defined-on-R}
+The series \(\sum_{n = 0}^{\infty} x^{n}/n!\) converges for every \(x \in \mathbb{R}\), so \(e^{x}\) is defined on all of \(\mathbb{R}\).
+\end{corollary}
+
+The continuity proof extends from the positive reals to all of \(\mathbb{R}\).
+
+\begin{theorem}\label{thm:exp-continuous}\index{exponential function!continuity (full)}
+The function \(e^{x}\) is continuous at every \(x_{0} \in \mathbb{R}\).
+\end{theorem}
+
+\begin{proof}[Sketch]
+For \(\lvert x \rvert < L\) and \(k > n_{0} > 2L\), the same geometric tail applied to \(\sum \lvert x \rvert^{n}/n!\) gives \(\lvert e^{x} - P_{k}(x) \rvert \le \dfrac{L^{n_{0}}}{n_{0}!}\left(\tfrac{1}{2}\right)^{k - n_{0}}\), and the three-term decomposition in the proof of \cref{thm:exp-continuous-positive} goes through unchanged.
+\end{proof}
+
+\subsection{The exponent law}
+
+The most important algebraic property of \(e^{x}\) --- and the source of its name --- is that multiplying exponentials adds the exponents.
+
+\begin{theorem}[Exponent law]\label{thm:exponent-law}\index{exponent law}\index{exponential function!exponent law}
+For every \(x, y \in \mathbb{R}\),
+\[
+e^{x} e^{y} = e^{x + y}.
+\]
+\end{theorem}
+
+% expansion:caution — notation: manuscript writes C^n_k; the book uses \binom (per brief, ROADMAP notation thread)
+\begin{caution}\index{binomial coefficient@$\binom{n}{k}$}
+We write the binomial coefficient as \(\binom{n}{k} = \dfrac{n!}{k!\,(n - k)!}\). Some books and notes write the same quantity as \(C^{n}_{k}\); the two notations denote the same number.
+\end{caution}
+
+\begin{proof}
+Fix \(L > 0\) and take \(x, y \in [-L, L]\); the general case follows by enlarging \(L\). Pick \(n_{0} \in \mathbb{N}\) with \(n_{0} > 8L\) and consider \(P_{k}(x) = \sum_{n = 0}^{k} x^{n}/n!\) for \(k > n_{0}\).
+
+\emph{Step 1: expand the product and split by total degree.} Multiplying out,
+\[
+P_{k}(x)\, P_{k}(y) = \sum_{m = 0}^{k} \sum_{n = 0}^{k} \frac{x^{m} y^{n}}{m!\, n!}.
+\]
+Grouping the pairs \((m, n)\) by their total degree \(\ell = m + n\) separates the terms with \(\ell \le k\) from those with \(\ell > k\):
+\[
+P_{k}(x)\, P_{k}(y)
+= \underbrace{\sum_{\ell = 0}^{k} \sum_{m = 0}^{\ell} \frac{x^{m} y^{\ell - m}}{m!\,(\ell - m)!}}_{\text{(I)}}
+\; + \; \underbrace{\sum_{j = 1}^{k} \sum_{m = j}^{k} \frac{x^{m} y^{k + j - m}}{m!\,(k + j - m)!}}_{\text{(II)}}.
+\]
+
+\emph{Step 2: piece (\textup{I}) is \(P_{k}(x + y)\).} Factoring out \(1/\ell!\) and applying the binomial theorem \((x + y)^{\ell} = \sum_{m = 0}^{\ell} \binom{\ell}{m} x^{m} y^{\ell - m}\),
+\begin{aligneddisplay}
+\text{(I)} &= \sum_{\ell = 0}^{k} \frac{1}{\ell!} \sum_{m = 0}^{\ell} \binom{\ell}{m} x^{m} y^{\ell - m} \\
+&= \sum_{\ell = 0}^{k} \frac{(x + y)^{\ell}}{\ell!} = P_{k}(x + y).
+\end{aligneddisplay}
+
+\emph{Step 3: bound piece (\textup{II}).} Every term of (II) has total degree between \(k + 1\) and \(2k\); enlarging the index set to all \(m \in \{0, \dots, \ell\}\) (the extra terms are non-negative) and reversing Step 2 with \(\lvert x \rvert, \lvert y \rvert\) in place of \(x, y\),
+\[
+\lvert \text{(II)} \rvert
+\le \sum_{\ell = k + 1}^{2k} \frac{(\lvert x \rvert + \lvert y \rvert)^{\ell}}{\ell!}
+\le \sum_{\ell = k + 1}^{2k} \frac{(2L)^{\ell}}{\ell!}.
+\]
+Since \(n_{0} > 8L\) gives \(2L/(n_{0} + 1) < 1/2\), the geometric-tail estimate of \cref{thm:exp-series-converges-positive} applied to \(\sum (2L)^{\ell}/\ell!\) yields
+\[
+\lvert \text{(II)} \rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\tfrac{1}{2}\right)^{k - n_{0}}.
+\]
+Combining Steps 2 and 3, \(\bigl\lvert P_{k}(x) P_{k}(y) - P_{k}(x + y) \bigr\rvert \le \dfrac{(2L)^{n_{0}}}{n_{0}!}\left(\tfrac{1}{2}\right)^{k - n_{0}}\).
+
+\emph{Step 4: pass to the limit.} Write
+\begin{aligneddisplay}
+e^{x} e^{y} - e^{x + y}
+&= \bigl(e^{x} - P_{k}(x)\bigr) e^{y} + P_{k}(x) \bigl(e^{y} - P_{k}(y)\bigr) \\
+&\quad + \bigl(P_{k}(x) P_{k}(y) - P_{k}(x + y)\bigr) + \bigl(P_{k}(x + y) - e^{x + y}\bigr).
+\end{aligneddisplay}
+Each exponential is bounded by \(\lvert e^{y} \rvert \le \sum \lvert y \rvert^{n}/n! \le e^{L}\), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\). Using the tail bounds for \(e^{x} - P_{k}(x)\), \(e^{y} - P_{k}(y)\), \(e^{x + y} - P_{k}(x + y)\), and Step 3,
+\[
+\bigl\lvert e^{x} e^{y} - e^{x + y} \bigr\rvert \le \left[\frac{2 e^{L} L^{n_{0}} + 2 (2L)^{n_{0}}}{n_{0}!}\right] \left(\tfrac{1}{2}\right)^{k - n_{0}}.
+\]
+The bracket is independent of \(k\), and \((1/2)^{k - n_{0}} \to 0\) as \(k \to \infty\), while the left-hand side does not depend on \(k\). Hence \(e^{x} e^{y} = e^{x + y}\) for \(x, y \in [-L, L]\). Letting \(L \to \infty\) gives the identity for all real \(x, y\).
+\end{proof}
+
+% expansion:example — numerical exponent-law check (brief: low-risk anchor)
+\begin{workedexample}
+\begin{example}\label{ex:exponent-law-numerical}
+Check the exponent law numerically at \(x = y = 1\) by comparing \(e^{1} \cdot e^{1}\) with \(e^{2}\).
+\end{example}
+
+\begin{solution}
+From \cref{ex:partial-sum-e}, \(e \approx 2.71828\), so \(e \cdot e \approx 7.38906\). Summing the series for \(e^{2}\) directly,
+\[
+e^{2} = 1 + 2 + 2 + \tfrac{4}{3} + \tfrac{2}{3} + \tfrac{4}{15} + \dots \approx 7.38906,
+\]
+agreeing to five figures. \Cref{thm:exponent-law} guarantees the agreement is exact, up to the truncation error in the partial sums.
+\end{solution}
+\end{workedexample}
+
+% expansion:summary — closing synthesis linking to §4.3
+With \(e^{x}\) now defined on all of \(\mathbb{R}\), continuous, and obeying the exponent law, every property of the exponential used informally in earlier chapters is a theorem. The one piece left is the derivative: the next section re-derives \((e^{x})' = e^{x}\) rigorously, with an explicit bound on \((e^{h} - 1)/h - 1\).
+
+% TODO: add \subsection*{Exercises} block with end-of-section problems for Section 4.2, following CONTENT_SPEC.md §14 and CONTENT_EXERCISES.md.
