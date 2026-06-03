@@ -1,0 +1,21 @@
+% Preview build wrapper for the direction-layer Ch1 run (EXPERIMENT ARTIFACT).
+% Compiles the §1.1 + §1.2 drafts with the REAL project preamble so the user can
+% review the visual effect (figures, environments, numbering). NOT for chapters/.
+% Compile from REPO ROOT:
+%   pdflatex -interaction=nonstopmode -output-directory=experiments/direction_layer/ch01 \
+%            experiments/direction_layer/ch01/cmp_s11_s12.tex
+% (run twice so \cref cross-references resolve). bibliography.tex is intentionally
+% skipped (no \cite here) to avoid invoking biber for a preview.
+\documentclass[a4paper,12pt,oneside]{book}
+\input{preamble/packages}
+\input{preamble/colors}
+\input{preamble/layout}
+\input{preamble/theorem_setup}
+\input{preamble/numbering}
+\makeindex
+\begin{document}
+\mainmatter
+\chapter{Inverse Functions and Limits}
+\input{experiments/direction_layer/ch01/draft_s11.tex}
+\input{experiments/direction_layer/ch01/draft_s12.tex}
+\end{document}

@@ -1,0 +1,204 @@
+% ============================================================
+% DRAFT — §1.1 Inverse Functions
+% stage ④ expansion toward ch01/brief_s11.md (direction layer, Ch1 full run).
+% EXPERIMENT ARTIFACT — NOT for chapters/*.tex.
+% % expansion: markers = additions beyond the manuscript seed (seed_s11.md).
+% ③ decisions baked in:
+%   (A) ADD the reflection-across-y=x figure (manuscript omits it).
+%   (B) after the x^2 collision, BRIEFLY note the [0,∞)→√x restriction with a
+%       forward-ref to §1.2 — do NOT develop domain-restriction here.
+%   + diagnostic worked example added; ID-number one-to-one anchor added;
+%     horizontal line test STATED with a one-line geometric justification
+%     (manuscript depth, no heavy proof); history skipped.
+% Forward labels assumed as if integrated: sec:inverse-trig-functions (§1.2).
+% ============================================================
+
+\section{Inverse Functions}\label{sec:inverse-functions}
+
+% expansion:intuition — section opener framing the central question
+Many operations in calculus come in pairs that undo one another: adding and subtracting, squaring and taking square roots, exponentiating and taking logarithms. This section makes the idea of ``undoing'' a function precise. Given a rule \(f\) that turns an input \(x\) into an output \(y\), we ask whether we can run the rule backward --- recover the \(x\) we started from, knowing only \(y\). The answer is not always yes, and the heart of the section is understanding exactly when it is.
+
+\subsection{One-to-one functions}
+
+Recall that a function \(f\) assigns to every input \(x\) in its domain a single value \(f(x)\). To run \(f\) backward we would start from an output and ask which input produced it. Two simple examples show that this backward question can have a clean answer or none at all.
+
+% expansion:example — manuscript's two recall examples (f=x, g=x^2), repackaged as a comparison that surfaces the collision
+\begin{workedexample}
+\begin{example}\label{ex:onetoone-vs-collision}
+Compare \(f(x) = x\) on \([0, 1]\) with \(g(x) = x^{2}\) on \([-1, 1]\).
+\end{example}
+
+\begin{solution}
+For \(f(x) = x\) we have \(f(0) = 0\), \(f(\tfrac{1}{2}) = \tfrac{1}{2}\), and \(f(\tfrac{1}{8}) = \tfrac{1}{8}\): distinct inputs always give distinct outputs, so knowing the output pins down the input. For \(g(x) = x^{2}\), by contrast, \(g(0) = 0\), \(g(\tfrac{1}{2}) = \tfrac{1}{4}\), and \(g(-\tfrac{1}{2}) = \tfrac{1}{4}\). The two inputs \(\tfrac{1}{2}\) and \(-\tfrac{1}{2}\) collide at the same output \(\tfrac{1}{4}\), so the question ``which input gave \(\tfrac{1}{4}\)?'' has no single answer.
+\end{solution}
+\end{workedexample}
+
+The collision in \cref{ex:onetoone-vs-collision} is the entire obstruction. If we want a backward rule \(f^{-1}\) that sends each output to \emph{the} input that produced it, then no output may come from two different inputs. Functions with this property earn a name.
+
+\begin{definition}\label{def:one-to-one}\index{one-to-one function}\index{function!one-to-one}
+A function \(f\) is \emph{one-to-one} if \(f(x_{1}) \ne f(x_{2})\) whenever \(x_{1} \ne x_{2}\); equivalently, \(f(x_{1}) = f(x_{2})\) forces \(x_{1} = x_{2}\).
+\end{definition}
+
+% expansion:application — real-world one-to-one anchor (manuscript margin note: 身分證 number ↦ student)
+\begin{remark}
+A national identification number is a one-to-one assignment from people to numbers: distinct people receive distinct numbers, which is exactly what lets a number be decoded back to a unique person. A rule that is \emph{not} one-to-one --- recording only each person's birth year, say --- cannot be reversed, because many people share a year.
+\end{remark}
+
+Whether a function is one-to-one can be read off its graph. If a horizontal line \(y = c\) meets the graph of \(f\) at two points \((x_{1}, c)\) and \((x_{2}, c)\) with \(x_{1} \ne x_{2}\), then \(f(x_{1}) = c = f(x_{2})\) --- a collision, so \(f\) is not one-to-one. Conversely, a collision produces two such points on a single horizontal line.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.85]
+  \draw[->] (-0.3,0) -- (3.4,0) node[right] {\(x\)};
+  \draw[->] (0,-0.3) -- (0,3.3) node[above] {\(y\)};
+  \draw[thick, colorprimary, domain=0.15:3, smooth] plot (\x, {0.22*\x*\x + 0.35});
+  \draw[colorcaution] (-0.2,1.8) -- (3.4,1.8);
+  \node[colorprimary] at (2.7,2.7) {\(f_{1}\)};
+\end{tikzpicture}
+\hspace{1.2cm}
+\begin{tikzpicture}[scale=0.85]
+  \draw[->] (-0.3,0) -- (3.4,0) node[right] {\(x\)};
+  \draw[->] (0,-0.3) -- (0,3.3) node[above] {\(y\)};
+  \draw[thick, colorprimary, domain=0.2:3, smooth, samples=120]
+        plot (\x, {1.0 + 1.4*sin(180*(\x-0.2)/2.8)});
+  \draw[colorcaution] (-0.2,1.8) -- (3.4,1.8) node[right] {\(y = c\)};
+  \draw[dotted] (0.743,0) -- (0.743,1.8);
+  \draw[dotted] (2.457,0) -- (2.457,1.8);
+  \filldraw (0.743,1.8) circle (0.9pt);
+  \filldraw (2.457,1.8) circle (0.9pt);
+  \node[below] at (0.743,0) {\(a\)};
+  \node[below] at (2.457,0) {\(b\)};
+  \node[colorprimary] at (1.6,2.75) {\(f_{2}\)};
+\end{tikzpicture}
+\caption{The horizontal line test. The increasing graph \(f_{1}\) is one-to-one --- every horizontal line meets it at most once --- while \(f_{2}\) is not, since the line \(y = c\) meets it at the two distinct inputs \(a\) and \(b\), where \(f_{2}(a) = f_{2}(b) = c\).}
+\label{fig:horizontal-line-test}
+\end{figure}
+
+\begin{proposition}[The horizontal line test]\label{prop:horizontal-line-test}\index{horizontal line test}
+A function is one-to-one if and only if no horizontal line meets its graph more than once.
+\end{proposition}
+
+% expansion:formula — one-line geometric justification folded into prose (③: state + one sentence, not a formal proof)
+This is just the paragraph above read as a criterion: a horizontal line \(y = c\) meets the graph exactly at the points \((x, c)\) with \(f(x) = c\), so two intersection points on one horizontal line are the same thing as two inputs sharing an output.
+
+% expansion:example — diagnostic example (manuscript has no example of this type)
+\begin{workedexample}
+\begin{example}\label{ex:diagnose-one-to-one}
+Is \(f(x) = x^{2}\) one-to-one on \(\mathbb{R}\)? On \([0, \infty)\)?
+\end{example}
+
+\begin{solution}
+On \(\mathbb{R}\) it is not: the line \(y = 1\) meets \(y = x^{2}\) at \((-1, 1)\) and \((1, 1)\), and indeed \((-1)^{2} = 1^{2}\). Restricted to \([0, \infty)\), however, \(x^{2}\) is increasing, so every horizontal line \(y = c\) with \(c \ge 0\) meets the graph exactly once; there it \emph{is} one-to-one.
+\end{solution}
+\end{workedexample}
+
+% expansion:intuition — brief √x note + forward-ref (③ fork B: point to it, do not develop domain-restriction here)
+The second half of \cref{ex:diagnose-one-to-one} is worth keeping in mind: a function that fails to be one-to-one can often be \emph{made} one-to-one by shrinking its domain. On \([0, \infty)\) the function \(x^{2}\) is one-to-one, and its backward rule is the square root \(\sqrt{x}\). We will exploit this domain-restriction idea systematically in \cref{sec:inverse-trig-functions} to invert the trigonometric functions, which are badly non-one-to-one on their full domains.
+
+\subsection{Inverse functions}
+
+When \(f\) is one-to-one, the backward rule is unambiguous, so we can give it a name together with a precise domain and range.
+
+\begin{definition}\label{def:inverse-function}\index{inverse function}\index{function!inverse}
+Let \(f\) be a one-to-one function with domain \(A\) and range \(B\). Its \emph{inverse function} \(f^{-1}\) has domain \(B\) and range \(A\), and is defined by
+\[
+f^{-1}(y) = x \quad\Longleftrightarrow\quad f(x) = y \qquad \text{for } y \in B.
+\]
+
+% expansion:intuition — informal gloss permitted at the end of a definition
+\emph{Informally, if \(f\) sends \(x\) to \(y\), then \(f^{-1}\) sends \(y\) back to \(x\); the inverse reads the same input--output pairing in the opposite direction.}
+\end{definition}
+
+% expansion:caution — notation trap, flagged at the first occurrence of the f^{-1} notation
+\begin{caution}\index{inverse function!notation}
+The superscript in \(f^{-1}\) denotes the inverse function, \emph{not} a reciprocal: \(f^{-1}(x)\) does not mean \(1/f(x)\). When the reciprocal is intended we write \(1/f\) or \(\bigl(f(x)\bigr)^{-1}\).
+\end{caution}
+
+\begin{workedexample}
+\begin{example}\label{ex:inverse-id-cube}
+Find the inverse of (i) \(f(x) = x\) and (ii) \(f(x) = x^{3}\).
+\end{example}
+
+\begin{solution}
+(i) The identity is its own inverse: from \(f(x) = x\) we get \(f^{-1}(x) = x\).
+
+(ii) For \(f(x) = x^{3}\), solving \(y = x^{3}\) gives \(x = y^{1/3}\), so \(f^{-1}(y) = y^{1/3}\); that is, \(f^{-1}(x) = x^{1/3}\). This matches the defining equivalence, since \(f^{-1}(x) = x^{1/3}\) corresponds to \(f(x^{1/3}) = (x^{1/3})^{3} = x\).
+\end{solution}
+\end{workedexample}
+
+\begin{remark}\index{inverse function!variable convention}
+Once we treat \(f^{-1}\) as a function in its own right, it is customary to call its input \(x\) again --- like any function, \(f^{-1}\) takes an \(x\) and returns a \(y\). In this convention the defining relation reads \(f^{-1}(x) = y \Leftrightarrow f(y) = x\).
+\end{remark}
+
+Reading the defining equivalence in both directions yields two identities that record precisely the sense in which \(f\) and \(f^{-1}\) undo each other.
+
+\begin{proposition}[Cancellation equations]\label{prop:cancellation-equations}\index{inverse function!cancellation equations}
+Let \(f\) be one-to-one with domain \(A\) and range \(B\). Then
+\[
+f^{-1}\bigl(f(x)\bigr) = x \ \text{ for every } x \in A,
+\qquad
+f\bigl(f^{-1}(x)\bigr) = x \ \text{ for every } x \in B.
+\]
+\end{proposition}
+
+% expansion:formula — one-line justification (manuscript states these as properties without proof)
+\begin{proof}
+If \(x \in A\) and we set \(y = f(x)\), the definition of \(f^{-1}\) gives \(f^{-1}(y) = x\), i.e.\ \(f^{-1}(f(x)) = x\). The second identity is the same equivalence read with the roles of \(f\) and \(f^{-1}\) exchanged.
+\end{proof}
+
+% expansion:figure — reflection across y=x (③ fork A: ADD; manuscript omits this figure)
+% expansion:intuition — geometric reading of the inverse, leading into the figure
+There is a vivid geometric picture behind these identities. The point \((a, b)\) lies on the graph of \(f\) exactly when \(f(a) = b\), which by definition is exactly when \(f^{-1}(b) = a\) --- that is, when \((b, a)\) lies on the graph of \(f^{-1}\). Since \((a, b)\) and \((b, a)\) are mirror images across the line \(y = x\), the two graphs are reflections of each other.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.05]
+  \draw[->] (-0.3,0) -- (3.2,0) node[right] {\(x\)};
+  \draw[->] (0,-0.3) -- (0,3.2) node[above] {\(y\)};
+  \draw[dashed] (-0.1,-0.1) -- (3.0,3.0) node[above right] {\(y = x\)};
+  \draw[thick, colorprimary, domain=0:1.65, smooth] plot (\x, {0.9*\x*\x + 0.2}) node[right] {\(f\)};
+  \draw[thick, colorcaution, domain=0:1.65, smooth] plot ({0.9*\x*\x + 0.2}, \x) node[above] {\(f^{-1}\)};
+  \filldraw (1.2,1.496) circle (1.1pt) node[above left] {\((a, b)\)};
+  \filldraw (1.496,1.2) circle (1.1pt) node[below right] {\((b, a)\)};
+\end{tikzpicture}
+\caption{The graph of \(f^{-1}\) is the mirror image of the graph of \(f\) across the line \(y = x\): each point \((a, b)\) on \(f\) corresponds to \((b, a)\) on \(f^{-1}\).}
+\label{fig:reflection-y-equals-x}
+\end{figure}
+
+% expansion:intuition — name the takeaway the figure delivers
+This reflection picture is the geometric content of ``running the rule backward,'' and it is the quickest way to sketch \(f^{-1}\) once the graph of \(f\) is known.
+
+\subsection{Finding the inverse of a function}
+
+There is in general no formula for \(f^{-1}\). But when \(f\) is given by an equation we can often solve for the inverse directly, simply by making the symmetry of the defining relation \(y = f(x)\) mechanical. The procedure presumes we have already checked that \(f\) is one-to-one.
+
+\begin{strategy}[Finding the inverse of a one-to-one function]\label{strat:find-inverse}
+\begin{enumerate}
+  \item Write \(y = f(x)\).
+  \item Solve this equation for \(x\) in terms of \(y\).
+  \item To express \(f^{-1}\) as a function of \(x\), interchange \(x\) and \(y\).
+\end{enumerate}
+\end{strategy}
+
+\begin{workedexample}
+\begin{example}\label{ex:inverse-cubic-plus-two}
+Find the inverse of \(f(x) = x^{3} + 2\).
+\end{example}
+
+\begin{solution}
+\emph{Step 1.} Write \(y = x^{3} + 2\).
+
+\emph{Step 2.} Solve for \(x\): from \(x^{3} = y - 2\) we get \(x = (y - 2)^{1/3}\).
+
+\emph{Step 3.} Interchange \(x\) and \(y\) to write \(y = (x - 2)^{1/3}\), hence
+\[
+f^{-1}(x) = (x - 2)^{1/3}.
+\]
+As a check, the cancellation equation holds: \(f\bigl(f^{-1}(x)\bigr) = \bigl((x - 2)^{1/3}\bigr)^{3} + 2 = (x - 2) + 2 = x\).
+\end{solution}
+\end{workedexample}
+
+% expansion:summary — closing synthesis + forward pointer to §1.2
+With a test for invertibility (one-to-oneness), the definition of \(f^{-1}\), the reflection picture, and a recipe for computing inverses now in hand, we are ready for the functions that motivate pairing inverses with limits in this chapter. The trigonometric functions are periodic, hence far from one-to-one on their full domains; the next section restricts their domains to principal intervals and builds the inverse trigonometric functions on exactly the foundation laid here.
+
+% TODO: add \subsection*{Exercises} block for §1.1, following CONTENT_SPEC.md §14 and CONTENT_EXERCISES.md.
