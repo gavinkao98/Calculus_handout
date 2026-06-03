@@ -2,6 +2,8 @@
 
 > 本檔是跨對話的進度錨。完整施工計畫在 `.claude/plans/`(gitignored,撈不回),故重點留存於此。
 
+> ⚠️ **狀態（2026-06-03）：整條 gen-2 影片產線與 cross-review 工具（[`pipeline/review_pack.py`](pipeline/review_pack.py)）目前皆為實驗性質。** 使用者計畫**重構「講義生成流程」**,屆時內容稿／storyboard／`.tex` 來源等格式與契約可能變動——本檔已完成項與現行工具**勿當定案**。`review_pack.py` 的 parser 與 `source:` 行號切片貼著現行格式,格式一變就得改;真正留得下的是「四 lens ＋ advisory ＋ 四級人工過濾 ＋ 計費閘門」的**做法**,而非 parser。後續內容工作將轉往講義內容分支。
+
 ## ✅ 已完成
 
 ### 設計 brief 同步
