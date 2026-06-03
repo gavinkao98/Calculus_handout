@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-本檔案為本儲存庫提供給 Claude Code 的專案層級指引。儲存庫的完整結構、preamble 與建置規則以權威性文件 [`README.md`](README.md) 為準；內容撰寫規則以 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 為準。
+本檔案為本儲存庫提供給 AI 代理（Claude Code、Codex 等）的專案層級指引，是這份指引的**權威版本**；[`AGENTS.md`](AGENTS.md) 僅為指向本檔的指標,內容不重複。儲存庫的完整結構、preamble 與建置規則以權威性文件 [`README.md`](README.md) 為準；內容撰寫規則以 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 為準。
 
 ## 文件撰寫語言
 
