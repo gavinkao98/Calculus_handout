@@ -25,6 +25,8 @@
 
 ## 2. 查證到的事實（2026-06-03）
 
+> ✅ **已於 2026-06-03 上網覆核**（OpenAI 官方文件 + GitHub），結論與修訂見 [§8](#8-查證與修訂2026-06-03-claude-code-上網覆核)：地基成立、Windows 可放寬、另有實作改善與一條新 caveat。
+
 1. **Codex CLI 支援 ChatGPT 訂閱登入**（Plus/Pro/Business/Edu/Enterprise）：
    `codex login` → 「Sign in with ChatGPT」，**不需要 API key、不按 token 計費**。
 2. **`codex exec`（非互動、腳本化）也吃訂閱**：官方明寫「With your ChatGPT Plus
@@ -103,3 +105,57 @@ Claude Code（Claude 訂閱，唯一寫手）
   `rules.md`、`seed_s11.md`、本檔。
 - ⚠️ 沿用 `SYNTHESIS.md` 的提醒：曾貼進對話的 API key 若還沒 rotate，先撤銷重發
   （本路線改走訂閱後，文字審不再需要 `DEEPSEEK_API_KEY`／`OPENAI_API_KEY`）。
+
+## 8. 查證與修訂（2026-06-03，Claude Code 上網覆核）
+
+針對 §2 的命門事實做了線上覆核（OpenAI 官方 developers／help 文件 + `openai/codex`
+GitHub issues，2026-06）。**結論：地基成立，且 Windows 比原本設想的好；另發現幾個直接
+改善實作路徑的事實，與一條新 caveat。**
+
+**§2 事實覆核：**
+
+- ✅ **`codex exec` 走訂閱**：CLI 登入可選「Sign in with ChatGPT account or API key」
+  （Plus/Pro/Business/Edu/Enterprise）；官方有 `exec` 腳本化與 non-interactive 專頁；
+  用量計入 plan 的 agentic usage limit（不另計 token 費）。
+- ✅ **Windows 原生（比原設想好）**：官方明文「Use Codex on Windows with the native …
+  CLI」，原生兩種 sandbox（elevated 優先／unelevated fallback，`config.toml` 設）；
+  **WSL2 改列「可選 fallback」非必須**。→ §2.3 與 §5 的「Windows 要 WSL／最差走 WSL」
+  hedge 可放寬：原生為預設路徑，WSL 只在原生 sandbox 不合用時才需要。
+
+**實作路徑因此更穩（直接解掉先前疑慮）：**
+
+- **唯讀是預設**：「By default, `codex exec` runs in a read-only sandbox」，並可
+  `--sandbox read-only` 明示；要寫檔才需 `--sandbox workspace-write`。→ §5 的
+  single-writer 紀律幾乎零成本，預設就成立。
+- **prompt 走 stdin／檔案**：`cat prompt.txt | codex exec -`（或 `codex exec -` 讀
+  stdin）。→ 解掉「幾千字含 LaTeX 的 auditor prompt 不能當 shell argv 傳」的脆弱點，
+  不必硬塞參數。
+- **findings JSON 可強制結構化**：`codex exec --output-schema ./schema.json` 依 JSON
+  Schema 約束輸出；`-o`／`--output-last-message <path>` 把最終訊息落檔。→ 比靠
+  `run.py:_extract_json` 從聒噪 stdout 刮 JSON 更可靠；步驟 6.2(c) 的解析風險大幅
+  降低（`_extract_json` 留作保險）。
+
+**新增 caveat（補進 §5）：**
+
+- **撞配額後，CLI 內回退 API key 不可靠**（`openai/codex` issue #5823）：ChatGPT Plus
+  用量上限是硬牆，且 CLI 在撞牆後切換到 API key 有 bug。→ 別把架構建立在「撞牆就無縫切
+  API」的假設上；配額管理（per-section 限次、人在收斂閘）是唯一可靠防線。
+
+**方法論修訂（原計畫未提，補記）：**
+
+- **「只換嘴」低估了改動範圍**：舊 `run.py` 是一支 Python `run_loop` 同時驅動 drafter
+  （API）與 auditor（API）。新形狀中 **drafter＝Claude 這個 agent 本身**，`run_loop`
+  的「drafter 半邊＋無人迴圈」是被 Claude 取代、非照用。真正沿用的是 `auditor_prompt`
+  ＋ `_extract_json` ＋ blocking/advisory 四級契約。換的是整個 orchestration 模型，不是
+  一行 transport swap（§3「只換嘴」、§6.4「其餘照用」據此修正理解）。
+- **丟了「中立第三方評分」這層**：`SYNTHESIS.md` 原設計讓 Claude 在迴圈外當中立評分者
+  （"Claude 不進迴圈"）。新計畫把 Claude 拉進迴圈當寫手後，迴圈產出的中立裁判只剩
+  「人」。原設計多一層外部裁判的安全網沒了——不致命（人本在收斂閘），但需明列為已知
+  取捨。可考慮偶爾請第三模型（如 Gemini）對成稿抽查，補回外部視角。
+
+**注意：本次轉向與「核心幻覺假說」正交。** 換訂閱 transport 只省了錢／配額，沒讓你更接近
+`SYNTHESIS.md §4` 的關鍵 open question（兩模型會不會一起替幻覺背書）。步驟 6.5（高風險節
+壓測）才是決定「這條線要不要併進正式講義流程」的真正關卡。
+
+**來源：** `developers.openai.com/codex/cli`、`/codex/windows`、`/codex/noninteractive`；
+`help.openai.com` article 11369540；`github.com/openai/codex` issue #5823。
