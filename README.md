@@ -312,7 +312,7 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
 `preamble/` 依職責拆分，使版面與模板行為可被快速找到：
 
 - `preamble/packages.tex` — 套件載入：Times 內文／數學字型（`newtxtext` + `newtxmath`）、`microtype`、`amsmath` / `amsthm` / `mathtools`、`graphicx` / `tikz` / `pgfplots`、`float` / `flafter`、`needspace`、`enumitem`、頁面幾何（3.3 cm 邊界）、headers、`hyperref` / `cleveref`、為 `caution` / `strategy` 而設的 `mdframed`（`framemethod=TikZ`）、`xcolor`，以及本書的反三角運算子（`\arccsc`、`\arcsec`、`\arccot`）。
-- `preamble/colors.tex` — 三角色語意調色盤（`colorprimary` 藍、`colorcaution` 紅、`colorauxiliary` 灰），驅動圖示以及 `caution` / `strategy` 上的強調色條。
+- `preamble/colors.tex` — 三角色語意調色盤（`colorprimary` 藍、`colorcaution` 紅、`colorauxiliary` 灰），驅動圖示以及 `caution` / `strategy` 上的強調色條與其同色淺底（`colorcautionbg`／`colorprimarybg`，各為 7% 淡化）。
 - `preamble/layout.tex` — 段落縮排與間距、清單間距、全域 `\linespread{1.05}`、浮動體擺放、running headers 與 footers、`\Needspace` 掛勾、共用的短公式輔助巨集（`aligneddisplay`、`conditiondisplay`、`\pairdisplay`），以及供任何 `\[...\]` 包裝器使用的 `\newdisplayenv{name}{begin}{end}`（透過 `\AfterEndEnvironment` 安裝核心 `\@doendpe` 掛勾，以抑制環境後的多餘縮排）。
 - `preamble/theorem_setup.tex` — `definition` / `theorem` / `proposition` / `corollary` 的逐環境、章內計數器；`solution` 環境；`caution` 與 `strategy`（左側色條的 `\newmdtheoremenv`）；頁面流保護掛勾；以及將 `example` + `solution` 一對作為單一單元保留空間的 `workedexample` 語意包裝器。
 - `preamble/numbering.tex` — 依章編列方程式編號。

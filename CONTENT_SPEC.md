@@ -635,12 +635,12 @@ Rationale: a single emphasis mechanism means the reader learns one visual cue. M
 
 ### Visual label of new environments
 
-The `caution` and `strategy` environments use a **left-side coloured accent bar plus a text label**, no icons.
+The `caution` and `strategy` environments use a **left-side coloured accent bar, a light same-hue background fill, and a text label**, no icons.
 
-- `caution` — red (`\colorcaution` from `preamble/colors.tex`) accent bar, "Caution." label.
-- `strategy` — blue (`\colorprimary`) accent bar, "Strategy." label.
+- `caution` — red (`\colorcaution` from `preamble/colors.tex`) accent bar over a light red fill (`colorcautionbg`, a 7% tint of the same hue), "Caution." label.
+- `strategy` — blue (`\colorprimary`) accent bar over a light blue fill (`colorprimarybg`, a 7% tint), "Strategy." label.
 
-Rationale: Unicode icons (`⚠`, `🔑`) create font-compatibility issues under `newtxtext` + `pdflatex` and are not worth the added complexity for a text-first handout. A coloured accent bar is visually sufficient to distinguish the environment and matches the colour convention in §10.
+Rationale: Unicode icons (`⚠`, `🔑`) create font-compatibility issues under `newtxtext` + `pdflatex` and are not worth the added complexity for a text-first handout. A coloured accent bar plus a faint same-hue fill is visually sufficient to distinguish the environment and matches the colour convention in §10. The fill is a tint of the role's own colour, so it introduces no new colour role, and under grayscale it degrades to a faint grey panel — leaving the accent bar and the text label as the load-bearing distinctions per §10's redundant-encoding rule.
 
 ### Math spacing
 
