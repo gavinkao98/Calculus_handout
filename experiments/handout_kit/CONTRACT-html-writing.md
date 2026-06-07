@@ -134,6 +134,13 @@ Placeholder in the fragment, drawing registered in the chapter's `figures.js`:
 (see `example-ch01/sec-1-1.html` Figure 1.2). A section with no figures may omit `figures.js`
 (the loader degrades gracefully).
 
+**Keep figures label-light.** Put only the minimum on the drawing — axis/dimension labels, curve
+labels, and at most one short anchor — and name the regions, areas, formulas, and any extended
+explanation in the caption and the body prose instead. A figure whose interior reads like a
+paragraph is over-labelled; move the detail into the surrounding text. (Authoritative rule:
+[`../../CONTENT_SPEC.md`](../../CONTENT_SPEC.md) §10 "Label economy"; established by §2.5 Figure 2.4,
+whose rectangle keeps only its side lengths and an `fg` anchor.)
+
 ## Correctness (hard constraint, identical to `rules.md`)
 
 Every mathematical claim MUST be correct and standard. Do NOT invent theorems, identities, named

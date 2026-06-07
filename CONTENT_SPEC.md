@@ -714,6 +714,15 @@ Callout text **SHOULD** be a complete sentence or a complete noun phrase; senten
 
 Rationale: self-study readers absorb information from annotated figures significantly faster than from unannotated ones. Stewart-style callouts are the single highest-leverage visual element for the target register.
 
+### Label economy
+
+A figure carries only the labels needed to *read* it: axis names, the dimensions or points the reader must identify, curve labels (see "Redundant encoding" below), and short callouts. Everything else — naming each region or area, restating a formula, spelling out a construction — belongs in the **caption and the body prose**, not crammed onto the drawing.
+
+- **SHOULD** keep in-figure text to the minimum that makes the picture legible. When a label would carry a clause's worth of explanation, move that explanation into the surrounding text and leave only a short anchor on the figure.
+- A diagram whose interior reads like a paragraph is over-labelled. Prefer a clean drawing plus a sentence of prose to a drawing dense with formulas.
+
+Rationale: an uncluttered figure is scanned faster, and the body prose is where a self-study reader expects the reasoning to live. (Worked instance: a product-rule area rectangle is labelled only with its side lengths and one anchor for the original area; the strip and corner areas are named in the text, not on the figure.)
+
 ### Colour convention
 
 The project uses a three-colour palette, defined once in `preamble/colors.tex` and referenced by macro throughout:
