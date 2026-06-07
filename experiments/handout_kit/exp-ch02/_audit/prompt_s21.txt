@@ -1,0 +1,339 @@
+You are an ADVISORY adversarial reviewer of a calculus handout section (HTML format) that was expanded from the SEED below, following an approved DIRECTION BRIEF. You do NOT rewrite; you surface findings for a human.
+
+Hunt especially for:
+(a) mathematical errors, fabricated theorems/identities, or over-generalized claims;
+(b) drift from the seed's mathematics (the seed IS the manuscript's mathematical backbone);
+(c) direction-conformance violations: did the draft cover what the brief specifies? did it include anything from the brief's "do-not-write" list?
+
+Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):
+  category: math | faithfulness | direction-conformance | house_rule | register | other
+  blocking: true ONLY for:
+    - a real MATH ERROR or fabricated/over-generalized claim (category=math)
+    - DRIFT from the seed's mathematics (category=faithfulness)
+    - VIOLATION of direction-conformance: missing a brief-mandated item OR including a brief-forbidden item (category=direction-conformance)
+  Everything else MUST be blocking=false.
+
+Formatting / house-rule items (missing expansion comments, register/style nits) are caught by a downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); they MUST NOT block convergence.
+
+Also give each finding a level for human triage:
+  1 = real conflict (must fix)
+  2 = discoverability gap (add doc/comment)
+  3 = editorial drift (low priority)
+  4 = non-finding (mathematically equivalent paraphrase, stylistic preference)
+
+A mathematically equivalent paraphrase is NOT a finding.
+
+Set "converged": true when there are ZERO blocking findings (math correct, faithful to seed, conforms to direction brief), even if advisory formatting nits remain.
+
+Return STRICT JSON only, no prose outside the JSON.
+
+=== SEED (manuscript transcription) ===
+
+# Seed — §2.1 The Tangent Line and the Derivative at a Point
+
+> Transcribed from the handwritten manuscript (pp. 1–3 of 13).
+> Faithful to the manuscript: structure, order, notation, and deliberate omissions preserved.
+
+---
+
+## Opening motivation
+
+Consider `y = f(x)`; we want the tangent line to this curve at the point `(a, f(a)) ≡ P`.
+
+[Figure: a curve with a tangent line at a marked point `a`.]
+
+(Finding the tangent line is important and useful — many applications, e.g. approximation …)
+
+Since the line passes through `(a, f(a))`, we only need its slope. So, how to find the slope?
+
+## Secant line and limiting slope
+
+Let `x` be near `a`, so that `(x, f(x))` is near `(a, f(a))`.
+
+[Figure: curve with two nearby points, secant line through them.]
+
+The ratio `m_PQ = (f(x) − f(a)) / (x − a)` is the slope of the secant line `PQ`. Hence when `Q` approaches `P` along the curve, the limiting value is the slope at `P`.
+
+Thus if `m_PQ` has a limit as `Q → P` (i.e. `x → a`), we define that value to be the slope of the tangent line.
+
+## Definition (tangent line)
+
+The tangent line to `y = f(x)` at `(a, f(a))` is the line through `P` with slope
+`lim_{x→a} (f(x) − f(a))/(x − a)`, provided the limit exists.
+
+## Remark (zoom-in interpretation)
+
+If we zoom in far enough at `P`, the curve looks like a straight line — so it is useful to find that line.
+
+## Equivalent form (h-substitution)
+
+The limit `(f(x) − f(a))/(x − a)` has an equivalent form used more often. Since `x` is near `a`, write `x = a + h`; then the slope is `lim_{h→0} (f(a + h) − f(a))/h`.
+
+## Example
+
+Curve `y = 3/x`, `x > 0`. Find the tangent line at `(3, 1)`.
+
+**Solution.** `m = lim_{h→0} (f(3 + h) − f(3))/h`
+`= lim_{h→0} ( 3/(3+h) − 1 )/h = lim_{h→0} ( −h/(3+h) )/h`
+`= lim_{h→0} −1/(3+h) = −1/3`.
+
+So the tangent line is `y − 1 = (−1/3)(x − 3)`, i.e. `x + 3y − 6 = 0`.
+
+=== END SEED ===
+
+=== DIRECTION BRIEF (approved at gate ③) ===
+
+## 手稿盤點
+- 切線定義（極限形式 lim_{x→a} (f(x)−f(a))/(x−a)）
+- h-form 替代寫法 lim_{h→0} (f(a+h)−f(a))/h
+- f'(a) 記號引入（作為斜率別名，非函數）
+- Worked example: y = 3/x at (3, 1)（有理函數，通分化簡）
+- Exercise: y = √x at (1, 1)（根式）——NOTE: manuscript says "exercise" for √x; the draft repurposed this as Remark 2.2's bookend and added separate exercises
+- 一行備注：zoom-in 後曲線看起來像直線
+
+## 薄度剖析
+| 區塊 | 狀態 |
+|---|---|
+| 動機／為何要切線 | **薄**（手稿直接跳定義，沒鋪墊 0/0 碰撞） |
+| 割線→切線直覺 + 圖 | **薄→無**（有文字但沒有 convergence 圖） |
+| Worked examples | **薄**（1 worked + 1 exercise，教科書密度不足） |
+| f'(a) 的詮釋 | **薄**（一行帶過） |
+| 應用／具體錨 | **無** |
+
+## 範圍與深度
+- 只到「一點的導數 f'(a)」（一個數字）；不進「導函數 f'(x)」（→ §2.2 forward-ref）
+- 不證極限存在性；不給 ε-δ 嚴格定義
+
+## 承重直覺
+0/0 碰撞：天真地「用一個點算斜率」→ (f(a)−f(a))/(a−a) = 0/0 → 需要割線的 workaround → 再取極限。先用碰撞打臉、再形式化。
+
+## worked example 清單
+- Ex 2.1: y = x²−3x at (2, −2) — 多項式展開 [expansion:example, 新增]
+- Ex 2.2: y = 3/x at (3, 1) — 有理函數通分 [手稿]
+- Ex 2.3: y = √(x+1) at (3, 2) — 根式共軛 [expansion:example, 新增]
+- Exercise 2.1–2.3: 各配一題 your-turn [expansion:example, 新增]
+
+## history / application
+- 開場錨（application）：「估算 √4.01」——真實、具體、串 local linearity
+- 收尾 bookend：Remark 2.2 回到 √4.01，用切線近似得 2.0025
+- 歷史：無自然觸發，留白
+
+## 強調 / takeaway
+- 概念樞紐：切線斜率 = 差商的極限
+- 可攜技能：用定義算切線斜率的三步法——展開→化簡消h→取極限
+
+## 刻意不寫
+| 不寫什麼 | 理由 |
+|---|---|
+| 導函數 f'(x) 作為函數 | 本節 f'(a) 只是一個數（→ §2.2） |
+| 微分法則（power/product/quotient） | 未引入（→ §2.4–§2.5） |
+| ε-δ 極限嚴格定義 | 超出本節深度 |
+| 一般 differentiability 判準 | 需要導函數概念（→ §2.3） |
+| Leibniz/Newton 歷史 | 無自然觸發，留白 |
+
+## 篇幅帶
+3–5 A4 頁
+
+=== END DIRECTION BRIEF ===
+
+=== DRAFT (HTML fragment to review) ===
+
+<!-- §2.1 The Tangent Line and the Derivative at a Point.
+     Generated from exp-ch02/seed_ch02_s1.md (manuscript pp. 1–3),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references
+     are plain prose. -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.1</span>The Tangent Line and the Derivative at a Point</h2>
+  </header>
+
+  <!-- expansion:application — tangent-as-approximation anchor to open the section -->
+  <p>Suppose you need a quick estimate of \(\sqrt{4.01}\) without a calculator. The function \(f(x) = \sqrt{x}\) passes through the convenient point \((4, 2)\), and near that point the curve is almost straight — so a well-chosen line through \((4, 2)\) should give a good approximation. But which line? The answer is the <em>tangent line</em>: intuitively, the line that grazes the curve at that point, matching its direction. To pin down this line we need to determine its slope, and that quest leads directly to the central idea of differential calculus.</p>
+
+  <!-- expansion:intuition — "why can't we just measure the slope?" collision -->
+  <h3 class="subsec-head">The problem with tangent lines</h3>
+
+  <p>Given a curve \(y = f(x)\) and a point \(P = (a,\, f(a))\) on it, we want the tangent line at \(P\). Since the line passes through \(P\), all we need is its slope. For a line through <em>two</em> points the slope is the familiar rise-over-run ratio — but for the tangent line at \(P\) we start with only the single point \(P\) itself. With no second point there is no rise and no run; trying to compute "slope \(= (f(a) - f(a))/(a - a)\)" gives the meaningless expression \(0/0\). We need a different strategy.</p>
+
+  <h3 class="subsec-head">Secant lines and the limiting slope</h3>
+
+  <p>The idea is to use a nearby point as a temporary stand-in. Pick a second point \(Q = (x,\, f(x))\) on the curve, with \(x \ne a\). The line through \(P\) and \(Q\) is called a <em>secant line</em>, and its slope is the <em>difference quotient</em></p>
+
+  <p>\[ m_{PQ} \;=\; \frac{f(x) - f(a)}{x - a}. \]</p>
+
+  <p>As \(Q\) slides along the curve toward \(P\) — that is, as \(x \to a\) — the secant line rotates and approaches a limiting position. If that limiting position exists, it is the tangent line we are after, and its slope is the limit of the difference quotients.</p>
+
+  <figure class="figure" data-fig="secant-to-tangent">
+    <figcaption><span class="fig-no">Figure 2.1</span> Secant lines \(PQ\) converging to the tangent line at \(P\) as the second point \(Q\) approaches \(P\) along the curve.</figcaption>
+  </figure>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">2.1</span><span class="env-name">Tangent line</span></p>
+    <div class="env-body">
+      <p>The <em>tangent line</em> to the curve \(y = f(x)\) at the point \(P = (a,\, f(a))\) is the line through \(P\) with slope
+      \[ m \;=\; \lim_{x \to a} \frac{f(x) - f(a)}{x - a}, \]
+      provided this limit exists.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The \(h\)-form of the slope</h3>
+
+  <p>Since \(x\) is near \(a\), we can write \(x = a + h\), where \(h\) is a small increment (\(h \ne 0\)). Then \(x - a = h\) and \(x \to a\) becomes \(h \to 0\), so the tangent slope takes the equivalent form</p>
+
+  <p>\[ m \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]</p>
+
+  <p>This "\(h\)-form" is often more convenient for computation: expand \(f(a + h)\), subtract \(f(a)\), cancel the factor of \(h\) from the denominator, then let \(h \to 0\).</p>
+
+  <!-- expansion:formula — name the limit as "derivative at a point"; brief: introduce f'(a) as slope alias -->
+  <p>When this limit exists, the slope of the tangent line at \((a, f(a))\) is called the <em>derivative of \(f\) at \(a\)</em> and is written \(f'(a)\) (read "\(f\) prime of \(a\)"). Thus</p>
+
+  <p>\[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]</p>
+
+  <p>For now, \(f'(a)\) is simply a number — the slope of one tangent line at one specific point. In §2.2 we will let \(a\) vary and study \(f'\) as a function in its own right.</p>
+
+  <!-- expansion:intuition — expand the seed's one-line zoom-in remark into local linearity -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.1</span><span class="env-name">Local linearity</span></p>
+    <div class="env-body">
+      <p>If you zoom in on the curve at \(P\), the curve looks increasingly like a straight line — the tangent line. In other words, near \(P\) the function \(f\) behaves almost like the linear function \(f(a) + f'(a)(x - a)\). This is the principle of <em>local linearity</em>: a differentiable curve can be approximated by its tangent line near the point of tangency. The closer \(x\) is to \(a\), the better the approximation. We will return to this idea at the end of the section.</p>
+    </div>
+  </section>
+
+  <p>We now practise computing tangent lines from the definition. The routine is the same each time: form the difference quotient, simplify algebraically until the factor that makes the denominator zero cancels, then take the limit.</p>
+
+  <!-- expansion:example — polynomial example; simplest type first (brief) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.1</span></p>
+      <div class="env-body">
+        <p>Find the equation of the tangent line to \(y = x^{2} - 3x\) at the point \((2,\, -2)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(f(x) = x^{2} - 3x\) and \(a = 2\). The slope is</p>
+        <p>\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{f(2 + h) - f(2)}{h} \\
+            &= \lim_{h \to 0} \frac{\bigl[(2+h)^{2} - 3(2+h)\bigr] - [4 - 6]}{h} \\
+            &= \lim_{h \to 0} \frac{(4 + 4h + h^{2} - 6 - 3h) - (-2)}{h} \\
+            &= \lim_{h \to 0} \frac{h + h^{2}}{h}
+             = \lim_{h \to 0} (1 + h) = 1.
+        \end{aligned} \]</p>
+        <p>The tangent line passes through \((2, -2)\) with slope \(1\):
+        \[ y - (-2) = 1 \cdot (x - 2), \quad \text{i.e.} \quad y = x - 4. \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — your-turn for polynomial type -->
+  <section class="env env-exercise">
+    <p class="env-head"><span class="env-kicker">Exercise</span><span class="env-num">2.1</span></p>
+    <div class="env-body">
+      <p>Find the equation of the tangent line to \(y = x^{2} + x\) at the point \((1,\, 2)\).</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.2</span></p>
+      <div class="env-body">
+        <p>Find the equation of the tangent line to \(y = \dfrac{3}{x}\), \(x > 0\), at the point \((3,\, 1)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>With \(f(x) = 3/x\) and \(a = 3\),</p>
+        <p>\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{f(3 + h) - f(3)}{h}
+             = \lim_{h \to 0} \frac{\dfrac{3}{3 + h} - 1}{h} \\[6pt]
+            &= \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h}
+             = \lim_{h \to 0} \frac{-1}{3 + h} = -\frac{1}{3}.
+        \end{aligned} \]</p>
+        <p>The tangent line through \((3, 1)\) with slope \(-\tfrac{1}{3}\) is
+        \[ y - 1 = -\tfrac{1}{3}(x - 3), \quad \text{i.e.} \quad x + 3y - 6 = 0. \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — your-turn for rational type -->
+  <section class="env env-exercise">
+    <p class="env-head"><span class="env-kicker">Exercise</span><span class="env-num">2.2</span></p>
+    <div class="env-body">
+      <p>Find the equation of the tangent line to \(y = \dfrac{1}{x + 1}\) at the point \(\bigl(1,\, \tfrac{1}{2}\bigr)\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — root example with conjugate technique (brief) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.3</span></p>
+      <div class="env-body">
+        <p>Find the equation of the tangent line to \(y = \sqrt{x + 1}\) at the point \((3,\, 2)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(f(x) = \sqrt{x + 1}\) and \(a = 3\). To handle the square root, we multiply numerator and denominator by the conjugate:</p>
+        <p>\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{\sqrt{(3+h)+1} - \sqrt{3+1}}{h}
+             = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} \\[6pt]
+            &= \lim_{h \to 0}
+               \frac{(\sqrt{4+h}-2)(\sqrt{4+h}+2)}
+                    {h\,(\sqrt{4+h}+2)}
+             = \lim_{h \to 0}
+               \frac{(4+h)-4}{h\,(\sqrt{4+h}+2)} \\[6pt]
+            &= \lim_{h \to 0} \frac{1}{\sqrt{4+h}+2}
+             = \frac{1}{4}.
+        \end{aligned} \]</p>
+        <p>The tangent line is
+        \[ y - 2 = \tfrac{1}{4}(x - 3), \quad \text{i.e.} \quad y = \tfrac{1}{4}x + \tfrac{5}{4}. \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — your-turn for root type -->
+  <section class="env env-exercise">
+    <p class="env-head"><span class="env-kicker">Exercise</span><span class="env-num">2.3</span></p>
+    <div class="env-body">
+      <p>Find the equation of the tangent line to \(y = \sqrt{2x + 1}\) at the point \((4,\, 3)\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:application — return to the opening approximation question (bookend) -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.2</span><span class="env-name">Tangent-line approximation</span></p>
+    <div class="env-body">
+      <p>We can now answer the opening question. The tangent line to \(y = \sqrt{x}\) at \((4,\, 2)\) has slope
+      \[ f'(4) = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} = \frac{1}{4} \]
+      (the same conjugate technique as Example 2.3), so the tangent line is \(y = 2 + \tfrac{1}{4}(x - 4) = \tfrac{1}{4}x + 1\). Substituting \(x = 4.01\) gives
+      \[ \sqrt{4.01} \;\approx\; \tfrac{1}{4}(4.01) + 1 = 2.0025. \]
+      A calculator confirms \(\sqrt{4.01} = 2.00249844\ldots\), so the tangent-line estimate is accurate to four decimal places. This is the principle of local linearity (Remark 2.1) at work.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — forward-ref to §2.2 -->
+  <p>In the next section we turn the slope formula into a <em>function</em>: instead of computing the tangent slope at one fixed point \(a\), we let \(a\) vary and obtain a new function \(f'(x)\) that records the slope at every point where the limit exists.</p>
+
+</article>
+
+=== END DRAFT ===
+
+=== IMPORTANT: FIGURE RENDERING NOTE ===
+Figures use `<figure data-fig="id">` placeholders. The actual SVG diagrams are injected at RUNTIME by a JavaScript file (figures.js + hydrateFigures()). The static HTML intentionally contains only the `<figcaption>` — the visual content appears when rendered in a browser. A `data-fig` element with a matching entry in figures.js is NOT a missing figure. Do NOT flag these as direction-conformance violations.
+
+=== KEY HTML WRITING RULES (advisory — for house_rule findings) ===
+- Semantic env classes: env-definition, env-theorem, env-proposition, env-corollary, env-example (inside .workedexample with env-solution), env-exercise, env-remark, env-proof, env-caution, env-strategy
+- Math: inline \(…\), display \[…\], multi-line \begin{aligned}…\end{aligned}
+- Manual numbering: env-num for definitions/theorems/examples etc., fig-no for figures, sec-no for section numbers
+- Cross-references: plain prose ("by Theorem 2.3", "see §2.2")
+- Expansion markers: <!-- expansion:category --> HTML comment before each non-seed addition
+- No \cref, no auto-numbering, no \index
+=== END HTML WRITING RULES ===
+
+Now review the DRAFT against the SEED, DIRECTION BRIEF, and HTML WRITING RULES. Return strict JSON.

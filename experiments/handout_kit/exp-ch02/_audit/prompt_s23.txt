@@ -1,0 +1,355 @@
+You are an ADVISORY adversarial reviewer of a calculus handout section (HTML format) that was expanded from the SEED below, following an approved DIRECTION BRIEF. You do NOT rewrite; you surface findings for a human.
+
+Hunt especially for:
+(a) mathematical errors, fabricated theorems/identities, or over-generalized claims;
+(b) drift from the seed's mathematics (the seed IS the manuscript's mathematical backbone);
+(c) direction-conformance violations: did the draft cover what the brief specifies? did it include anything from the brief's "do-not-write" list?
+
+Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):
+  category: math | faithfulness | direction-conformance | house_rule | register | other
+  blocking: true ONLY for:
+    - a real MATH ERROR or fabricated/over-generalized claim (category=math)
+    - DRIFT from the seed's mathematics (category=faithfulness)
+    - VIOLATION of direction-conformance: missing a brief-mandated item OR including a brief-forbidden item (category=direction-conformance)
+  Everything else MUST be blocking=false.
+
+Formatting / house-rule items (missing expansion comments, register/style nits) are caught by a downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); they MUST NOT block convergence.
+
+Also give each finding a level for human triage:
+  1 = real conflict (must fix)
+  2 = discoverability gap (add doc/comment)
+  3 = editorial drift (low priority)
+  4 = non-finding (mathematically equivalent paraphrase, stylistic preference)
+
+A mathematically equivalent paraphrase is NOT a finding.
+
+Set "converged": true when there are ZERO blocking findings (math correct, faithful to seed, conforms to direction brief), even if advisory formatting nits remain.
+
+Return STRICT JSON only, no prose outside the JSON.
+
+=== SEED (manuscript transcription) ===
+
+# Seed — §2.3 Differentiability, Continuity, and Higher Derivatives
+
+> Transcribed from the handwritten manuscript (pp. 6–7 of 13).
+> Faithful to the manuscript: structure, order, notation, and deliberate omissions preserved.
+> seed 語法＝輕量可讀（反引號行內＋Unicode；見 RULE.md ①）。
+
+---
+
+## Differentiability
+
+In general, for `f(x)`, the limit `lim_{h→0} (f(a + h) − f(a))/h` may or may not exist. Hence the definition.
+
+### Definition (differentiable)
+
+`f` is differentiable at `a` if `f'(a)` exists. When we say `f` is differentiable on an interval `(a, b)`, it means `f` is differentiable at every point of the interval.
+
+## Example (non-differentiability)
+
+An `f` not differentiable at a point: `f(x) = |x|`, looking at its derivative at `x = 0`.
+`lim_{h→0} (|0 + h| − |0|)/h = lim_{h→0} |h|/h`, where `lim_{h→0⁺} = 1` and `lim_{h→0⁻} = −1` — so the limit does not exist.
+
+[Figure: V-shaped graph of `|x|`.]
+
+## Differentiable implies continuous
+
+A basic but important result on the relationship of continuity and differentiability.
+
+### Theorem
+
+If `f` is differentiable at `a`, then `f` is continuous at `a`.
+(Converse `⇐` not true, as `f(x) = |x|` at `x = 0` shows.)
+
+**Proof.** Goal: prove `lim_{x→a} f(x) = f(a)`, i.e. `lim_{x→a} (f(x) − f(a)) = 0`.
+Write `f(x) − f(a) = ( (f(x) − f(a))/(x − a) ) · (x − a)`.
+Both `lim_{x→a} (f(x) − f(a))/(x − a)` and `lim_{x→a} (x − a)` exist, so
+`lim_{x→a} (f(x) − f(a)) = lim_{x→a} (f(x) − f(a))/(x − a) · lim_{x→a} (x − a) = f'(a) · 0 = 0`.
+(By assumption `f'(a) = lim_{x→a} (f(x) − f(a))/(x − a)`.) Hence `lim_{x→a} (f(x) − f(a)) = 0`. ∎
+
+## Higher derivatives
+
+Start with `f(x)`; its derivative `f'(x)` is again a function. So we can ask whether `f'` is differentiable; if it is, `(f')' = f''`, the second derivative. Similarly we continue to `f'''`, …, `f^(n)(x)` — the derivative taken `n` times.
+
+=== END SEED ===
+
+=== DIRECTION BRIEF (approved at gate ③) ===
+
+# Direction Brief — §2.3 Differentiability, Continuity, and Higher Derivatives
+
+> 待 ③ direction gate 核可。輸入：`seed_ch02_s3.md`（手稿 pp. 6–7）＋ §2.1–§2.2 成品（校準基準）＋ `CONTENT_ROADMAP.md` Ch2 條目。
+> **ROADMAP 對齊（引用、不複述）：** core skill「recognise where a function fails to be differentiable (e.g. corners) and connect differentiability to continuity; compute higher-order derivatives」；key figure「non-differentiability at a corner (§2.3): the graph of |x| near 0, with the left and right secant slopes labelled to show the one-sided limits disagree」；pitfall「Differentiable implies continuous, but not conversely」；Open question「Higher derivatives placement: subsection of §2.3 vs standalone section」。
+
+---
+
+## 手稿盤點
+（照原順序）
+- 開場引言：`lim_{h→0} (f(a+h)−f(a))/h` may or may not exist → hence the definition
+- Definition (differentiable)：`f` is differentiable at `a` if `f'(a)` exists；differentiable on `(a, b)` = differentiable at every point of the interval
+- Example (non-differentiability)：`f(x) = |x|` at `x = 0`；`lim_{h→0} |h|/h`，左極限 `−1`、右極限 `+1` → limit DNE
+- Figure：V-shaped graph of `|x|`（手稿標註）
+- Theorem（無命名）：differentiable at `a` ⇒ continuous at `a`；converse not true（|x| at 0）
+- Proof：goal `lim_{x→a} (f(x)−f(a)) = 0`；分解 `f(x)−f(a) = [(f(x)−f(a))/(x−a)] · (x−a)`；兩個極限分別存在 → 乘積 = `f'(a) · 0 = 0`
+- Higher derivatives（短段落）：`f'` 本身是函數 → 可再求導 → `f'' = (f')'`；同理 `f'''`、…、`f^(n)(x)`
+- **無**：worked example（除 `|x|` 反例）、exercise、strategy box、歷史、應用
+
+## 薄度剖析
+| 區塊 | 狀態 | 指向 |
+|---|---|---|
+| 「為何需要 differentiability 概念」的動機 | **薄** | 手稿一句帶過「limit may or may not exist, hence the definition」；可補 1 段 |
+| Definition (differentiable) | **夠** | 手稿已清楚 |
+| 不可微的判別（|x| 例子＋圖） | **夠** | 手稿有完整推演 |
+| Theorem + Proof | **夠** | 手稿有標準完整證明 |
+| Converse 反例說明 | **薄** | 用 env-caution 強調「⇒ 是單向」（ROADMAP pitfall） |
+| Higher derivatives 記號 | **薄** | 引入 Leibniz 記號 `d²y/dx²`、`dⁿy/dxⁿ` |
+| Worked example（計算 higher derivative）| **無** | 最低限度 1 例 |
+| 應用／歷史 | **無** | 無自然觸發 |
+
+## 範圍與深度
+- 吃 seed 這叢：differentiable 的定義 → 不可微判別（|x|）→ differentiable ⇒ continuous（定理＋證明）→ higher derivatives 子節（記號＋1 例）。
+- 嚴謹度：本節有且僅有一個定理及其證明（Theorem 2.1）——照手稿方法走，不另創引理、不換證法。
+- forward-fence：Weierstrass → 後章；單邊可微 → 後節；高階導數應用 → 後章；微分法則 → §2.4–§2.5。
+
+## 承重直覺
+「有切線（可微）≠ 連續，但可微保證了連續——保險槓桿只朝一邊倒。」
+
+## worked example 清單
+| # | 內容 | 技巧 | 來源 |
+|---|---|---|---|
+| Ex 2.11 | `f(x) = |x|` at `x = 0`：用定義判不可微 | 分左右極限 → 不等 → limit DNE | 手稿 |
+| Ex 2.12 | `f(x) = x² + 4x − 2`：求 `f''(x)` | 已知 `f'(x) = 2x + 4`（Ex 2.6）→ 再用定義得 `f''(x) = 2`；附 `f'''(x) = 0` | expansion:example（新增；不同題型）|
+
+## history / application
+- 歷史：留白。
+- 應用：留白。
+
+## 強調 / takeaway
+- 概念樞紐：differentiable ⇒ continuous 是單向蘊含。
+- 可攜技能：分左右極限判不可微；形成 f''、f^(n)。
+
+## 刻意不寫
+| 不寫 | 理由 | 去哪 |
+|---|---|---|
+| 處處連續處處不可微的函數（Weierstrass） | 超出本節 | 後章 |
+| 一般 piecewise 函數的分段可微性判準 | 非手稿 | 後節 |
+| 高階導數的應用（Taylor、曲率、加速度） | 未引入工具 | 後章 |
+| 微分法則（power/product/quotient） | 未證 | §2.4–§2.5 |
+| 除 |x| 以外的不可微例子（cusp、vertical tangent） | 手稿只用 |x| | 選配 |
+| ε-δ 形式的連續性證明 | 不開 ε-δ | Ch1 / 附錄 |
+| bare your-turn exercise | 習題設計 deferred | 習題設計回合 |
+
+## 篇幅帶
+- 軟帶 2.5–3.5 print 頁。
+
+### Numbering 銜接
+- Definition 2.3; Example 2.11, 2.12; Figure 2.3; Theorem 2.1; Remark 2.5; Caution (no number).
+
+=== END DIRECTION BRIEF ===
+
+=== DRAFT (HTML fragment to review) ===
+
+<!-- §2.3 Differentiability, Continuity, and Higher Derivatives.
+     Generated from exp-ch02/seed_ch02_s3.md (manuscript pp. 6–7),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief brief_s23.md approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references are
+     plain prose. Counters continue from §2.2:
+       Definition 2.2 → 2.3;  Theorem: first → 2.1;  Figure 2.2 → 2.3;
+       Example 2.10 → 2.11, 2.12;  Remark 2.4 → 2.5.
+     No exercises: self-authored problems are written as worked examples
+     (see brief_s23.md "題目政策"). -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.3</span>Differentiability, Continuity, and Higher Derivatives</h2>
+  </header>
+
+  <!-- expansion:intuition — motivation: §2.2 assumed the limit always exists; it need not -->
+  <p>Throughout §2.2 we freely computed \(f'(x)\) by taking the limit of the difference quotient — but we never stopped to ask whether that limit <em>exists</em>. For the polynomial, root, and rational functions we worked with, it always did, and we might be tempted to believe that every function has a derivative at every point of its domain. This section shows that the temptation is wrong: at certain points the limit can fail, and recognising those failures is an essential part of understanding what the derivative means. Along the way we prove the first theorem of the chapter — differentiability guarantees continuity — and extend the derivative idea to second, third, and higher orders.</p>
+
+  <h3 class="subsec-head">When does the derivative exist?</h3>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">2.3</span><span class="env-name">Differentiable</span></p>
+    <div class="env-body">
+      <p>A function \(f\) is <em>differentiable at \(a\)</em> if the limit
+      \[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} \]
+      exists (as a finite number). We say \(f\) is <em>differentiable on an open interval \((a, b)\)</em> if it is differentiable at every point of that interval.</p>
+      <p class="informal">Informally, differentiability at a point means the graph has a single, well-defined tangent direction there — no sharp corner, no vertical spike, and no break.</p>
+    </div>
+  </section>
+
+  <p>The definition asks exactly what we have been computing: can the difference quotient settle on a single value as \(h \to 0\)? When it can, the function is differentiable and the derivative equals that value. When it cannot — because the left-hand and right-hand limits disagree, or because the quotient blows up — the function is <em>not</em> differentiable at that point. The simplest failure mode is a corner.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.11</span><span class="env-name">A corner: \(f(x) = \lvert x \rvert\) at \(x = 0\)</span></p>
+      <div class="env-body">
+        <p>Show that \(f(x) = \lvert x \rvert\) is not differentiable at \(x = 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We form the difference quotient at \(a = 0\):</p>
+        <p>\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{\lvert h \rvert - 0}{h} \;=\; \frac{\lvert h \rvert}{h}. \]</p>
+        <p>Now examine the one-sided limits separately. For \(h > 0\) we have \(\lvert h \rvert = h\), so</p>
+        <p>\[ \lim_{h \to 0^{+}} \frac{\lvert h \rvert}{h} = \lim_{h \to 0^{+}} \frac{h}{h} = 1. \]</p>
+        <p>For \(h < 0\) we have \(\lvert h \rvert = -h\), so</p>
+        <p>\[ \lim_{h \to 0^{-}} \frac{\lvert h \rvert}{h} = \lim_{h \to 0^{-}} \frac{-h}{h} = -1. \]</p>
+        <p>Since the right-hand limit (\(1\)) and the left-hand limit (\(-1\)) are not equal, the two-sided limit \(\lim_{h \to 0} \lvert h \rvert / h\) does not exist. By Definition 2.3, \(f(x) = \lvert x \rvert\) is <em>not</em> differentiable at \(x = 0\).<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure — |x| corner with left/right secant slopes (ROADMAP key figure) -->
+  <figure class="figure" data-fig="abs-corner">
+    <figcaption><span class="fig-no">Figure 2.3</span> The graph of \(f(x) = \lvert x \rvert\) near the origin, with secant lines from each side.</figcaption>
+  </figure>
+
+  <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.3). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line — exactly the geometric meaning of non-differentiability.</p>
+
+  <h3 class="subsec-head">Differentiability and continuity</h3>
+
+  <!-- expansion:intuition — set up the theorem: differentiable is a stronger condition than continuous -->
+  <p>We now ask: what does differentiability <em>give</em> us beyond just having a tangent line? The answer is a clean logical relationship with continuity.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.1</span><span class="env-name">Differentiable implies continuous</span></p>
+    <div class="env-body">
+      <p>If \(f\) is differentiable at \(a\), then \(f\) is continuous at \(a\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>We must show \(\displaystyle\lim_{x \to a} f(x) = f(a)\), which is equivalent to showing \(\displaystyle\lim_{x \to a} \bigl[f(x) - f(a)\bigr] = 0\).</p>
+      <p>For \(x \ne a\), write</p>
+      <p>\[ f(x) - f(a) \;=\; \frac{f(x) - f(a)}{x - a} \;\cdot\; (x - a). \]</p>
+      <p>As \(x \to a\), both factors on the right have limits that exist:</p>
+      <ul>
+        <li>\(\displaystyle\lim_{x \to a} \frac{f(x) - f(a)}{x - a} = f'(a)\) (by hypothesis, since \(f\) is differentiable at \(a\));</li>
+        <li>\(\displaystyle\lim_{x \to a} (x - a) = 0\).</li>
+      </ul>
+      <p>By the product rule for limits,</p>
+      <p>\[ \lim_{x \to a} \bigl[f(x) - f(a)\bigr] = f'(a) \cdot 0 = 0. \]</p>
+      <p>Hence \(\lim_{x \to a} f(x) = f(a)\), so \(f\) is continuous at \(a\).<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The converse of Theorem 2.1 is <em>false</em>: continuity does <em>not</em> imply differentiability. The function \(f(x) = \lvert x \rvert\) is continuous at \(x = 0\) (the left and right limits both equal \(f(0) = 0\)), yet Example 2.11 shows it is not differentiable there. Differentiability is a strictly stronger condition than continuity.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Higher derivatives</h3>
+
+  <p>If \(f\) is differentiable, then its derivative \(f'\) is itself a function — and we can ask whether \(f'\) is differentiable. When it is, the derivative of \(f'\) is called the <em>second derivative</em> of \(f\), written \(f''\). Repeating the process gives the third derivative \(f'''\), the fourth derivative \(f^{(4)}\), and in general the \(n\)-th derivative \(f^{(n)}\):</p>
+
+  <p>\[ f,\quad f',\quad f'',\quad f''',\quad f^{(4)},\quad \ldots,\quad f^{(n)},\quad \ldots \]</p>
+
+  <p>Each is obtained by differentiating the previous one. By convention, \(f^{(0)} = f\) and \(f^{(1)} = f'\).</p>
+
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.5</span><span class="env-name">Higher-derivative notation</span></p>
+    <div class="env-body">
+      <p>In Leibniz notation the second derivative of \(y = f(x)\) is written</p>
+      <p>\[ f''(x) \;=\; \frac{d^{2}y}{dx^{2}} \;=\; \frac{d^{2}f}{dx^{2}} \;=\; \frac{d^{2}}{dx^{2}}\,f(x), \]</p>
+      <p>and in general the \(n\)-th derivative is</p>
+      <p>\[ f^{(n)}(x) \;=\; \frac{d^{n}y}{dx^{n}}. \]</p>
+      <p>The superscript in \(d^{n}y/dx^{n}\) is <em>not</em> an exponent — it records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesised form \(f^{(n)}\) avoids a forest of primes.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — higher-derivative computation using §2.2 result (approved in brief; new type) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.12</span></p>
+      <div class="env-body">
+        <p>Find \(f''(x)\) and \(f'''(x)\) for \(f(x) = x^{2} + 4x - 2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>In Example 2.6 we found \(f'(x) = 2x + 4\). To get the second derivative, we differentiate \(f'\) from the definition:</p>
+        <p>\[ \begin{aligned}
+          f''(x) &= \lim_{h \to 0} \frac{f'(x + h) - f'(x)}{h} \\[2pt]
+                 &= \lim_{h \to 0} \frac{\bigl[2(x + h) + 4\bigr] - \bigl[2x + 4\bigr]}{h} \\[2pt]
+                 &= \lim_{h \to 0} \frac{2h}{h} = 2.
+        \end{aligned} \]</p>
+        <p>The second derivative is the constant \(2\) — the slope of the linear function \(f'(x) = 2x + 4\). Differentiating once more,</p>
+        <p>\[ f'''(x) = \lim_{h \to 0} \frac{f''(x + h) - f''(x)}{h} = \lim_{h \to 0} \frac{2 - 2}{h} = 0. \]</p>
+        <p>Every subsequent derivative is likewise \(0\): once we reach a constant function, further differentiation produces zero. In Leibniz notation, \(\dfrac{d^{2}y}{dx^{2}} = 2\) and \(\dfrac{d^{3}y}{dx^{3}} = 0\).<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — forward-ref to differentiation rules -->
+  <p>With the concepts of differentiability, its tie to continuity, and higher-order derivatives in hand, we turn in the next sections to the rules that make differentiation <em>efficient</em> — systematic shortcuts that bypass the limit computation entirely.</p>
+
+</article>
+
+=== END DRAFT ===
+
+=== IMPORTANT: FIGURE RENDERING NOTE ===
+Figures use `<figure data-fig="id">` placeholders. The actual SVG diagrams are injected at RUNTIME by JavaScript (figures.js + hydrateFigures()). The static HTML intentionally contains only the `<figcaption>`; the visual content appears when rendered in a browser. A `data-fig` element with a matching entry in figures.js is NOT a missing figure. Do NOT flag these as direction-conformance violations.
+
+Figure 2.3 (data-fig="abs-corner") IS defined in figures.js; its source is included below so you can judge whether it conforms to the brief's mandated "|x| corner with left/right secant slopes" figure. The author has visually verified it renders correctly: a V-shaped graph of |x| with secant lines from the left (slope −1) and right (slope +1), labeled, meeting at a corner dot at the origin.
+
+--- figures.js entry for "abs-corner" ---
+    /* §2.3 — Non-differentiability at a corner: |x| near 0.
+       Design: V-shape of |x|, two secant lines from the right (slope +1)
+       and two from the left (slope −1), labeled to show disagreement.
+       A dot at the origin marks the corner. */
+    "abs-corner": () => {
+      var f = function (x) { return Math.abs(x); };
+      var dom = [-4, 4];
+      var rPts = [3, 1.5];
+      var lPts = [-3, -1.5];
+      var items = [
+        { type: "curve", fn: function (x) { return x; },
+          domain: [-0.5, 4.2], samples: 10, cls: "refline" },
+        { type: "curve", fn: function (x) { return -x; },
+          domain: [-4.2, 0.5], samples: 10, cls: "refline" },
+        { type: "curve", fn: f, domain: dom, samples: 200, cls: "curve" },
+        { type: "dot", x: 3, y: 3, r: 2.5 },
+        { type: "dot", x: 1.5, y: 1.5, r: 2.5 },
+        { type: "dot", x: -3, y: 3, r: 2.5 },
+        { type: "dot", x: -1.5, y: 1.5, r: 2.5 },
+        { type: "dot", x: 0, y: 0, r: 3.5 },
+        { type: "text", x: 3.2, y: 1.8,
+          tex: "\\text{slope}=+1", cls: "a-pt", anchor: "start", size: 12 },
+        { type: "text", x: -3.2, y: 1.8,
+          tex: "\\text{slope}=-1", cls: "a-pt", anchor: "end", size: 12 },
+        { type: "text", x: 3.8, y: 4.1,
+          tex: "y\\!=\\!|x|", cls: "a-curve", anchor: "start" },
+      ];
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 420, h: 280, xmin: -5, xmax: 5, ymin: -1, ymax: 5,
+            xlabel: "x", ylabel: "y",
+            xticks: [{ x: 0, tex: "0" }],
+            aria: "V-shaped graph of |x| with secant lines ...",
+            items: items,
+          }),
+        }],
+      };
+    },
+--- end figures.js entry ---
+
+=== KEY HTML WRITING RULES (advisory — for house_rule findings) ===
+- Semantic env classes: env-definition, env-theorem, env-proposition, env-corollary, env-example (inside .workedexample with env-solution), env-exercise, env-remark, env-proof, env-caution, env-strategy
+- Math: inline \(…\), display \[…\], multi-line \begin{aligned}…\end{aligned}
+- Manual numbering: env-num for definitions/theorems/examples etc., fig-no for figures, sec-no for section numbers
+- Cross-references: plain prose ("by Theorem 2.3", "see §2.2")
+- Expansion markers: <!-- expansion:category --> HTML comment before each non-seed addition
+- No \cref, no auto-numbering, no \index
+=== END HTML WRITING RULES ===
+
+Now review the DRAFT against the SEED, DIRECTION BRIEF, and HTML WRITING RULES. Return strict JSON.

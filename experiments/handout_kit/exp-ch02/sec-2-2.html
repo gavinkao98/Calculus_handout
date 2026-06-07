@@ -1,0 +1,209 @@
+<!-- §2.2 The Derivative as a Function.
+     Generated from exp-ch02/seed_ch02_s2.md (manuscript pp. 4–5),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief brief_s22.md approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references are
+     plain prose. Counters continue from §2.1:
+       Definition 2.1 → 2.2;  Figure 2.1 → 2.2;  Remark 2.2 → 2.3, 2.4;
+       Example 2.5 → 2.6, 2.7, 2.8, 2.9, 2.10;  Strategy box: first → 2.1.
+     No exercises: self-authored problems are written as worked examples
+     (see brief_s22.md "題目政策"). -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.2</span>The Derivative as a Function</h2>
+  </header>
+
+  <!-- expansion:application — velocity-as-a-function anchor to open the section -->
+  <p>Imagine a car moving along a straight road, its position at time \(t\) recorded as \(s(t)\). Over the short interval from \(t\) to \(t + h\), the car's <em>average</em> velocity is the change in position divided by the elapsed time, \(\bigl(s(t+h) - s(t)\bigr)/h\) — exactly the difference quotient of §2.1. Letting \(h \to 0\) gives the <em>instantaneous</em> velocity at the single instant \(t\). But we rarely care about one instant in isolation; we want to know the velocity at <em>every</em> instant — that is, we want velocity as a <em>function</em> of time. Making this shift, from the derivative at one point to the derivative as a function, is the work of this section.</p>
+
+  <h3 class="subsec-head">From a number to a function</h3>
+
+  <!-- expansion:intuition — load-bearing collision: point-by-point is endless; keep the point symbolic -->
+  <p>In §2.1 we fixed a point \(a\) and computed the derivative \(f'(a)\), a single number recording the slope of the tangent line — equivalently, the instantaneous rate of change of \(f\) — at that one point. To find the slope at a <em>different</em> point we would have to run the entire limit again, and to know the slope at <em>every</em> point we would have to repeat the computation infinitely many times. Worse, a table of separate values \(f'(2),\, f'(3),\, f'(\tfrac{7}{2}),\, \ldots\) never reveals the underlying <em>pattern</em>.</p>
+
+  <p>There is a far better way. Instead of substituting a specific number for the point, we leave it <em>symbolic</em> — call it \(x\) — and carry out the limit just once. The outcome is no longer a single number but a formula in \(x\): a brand-new function that returns the slope at every point at once. This function is called the <em>derivative of \(f\)</em>.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">2.2</span><span class="env-name">The derivative as a function</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be a function. The <em>derivative of \(f\)</em> is the function \(f'\) defined by
+      \[ f'(x) \;=\; \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}, \]
+      whose domain is the set of all \(x\) for which this limit exists. The value \(f'(x)\) is the slope of the tangent line to \(y = f(x)\) at \(\bigl(x,\, f(x)\bigr)\) — equivalently, the instantaneous rate of change of \(f\) at \(x\).</p>
+      <!-- expansion:intuition — "slope machine" informal gloss -->
+      <p class="informal">Informally, \(f'\) is the “slope machine” of \(f\): feed it any input \(x\), and it returns the slope of \(f\) there.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — the x→a form was established in §2.1; recall it, don't reprove -->
+  <p>This is the same limit we met in §2.1: the substitution \(x = a + h\) turns it into \(\lim_{x \to a}\bigl(f(x) - f(a)\bigr)/(x - a)\) with the fixed point renamed. The \(h\)-form above is usually the more convenient one to compute with, and the recipe is the same one we used at a single point — only now the point stays symbolic.</p>
+
+  <!-- expansion:strategy — ROADMAP places the 3-step limit-definition procedure in §2.2 -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">2.1</span><span class="env-name">Computing a derivative from the definition</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Form the difference quotient \(\dfrac{f(x + h) - f(x)}{h}\), expanding \(f(x + h)\).</li>
+        <li>Simplify the quotient algebraically — by expanding, rationalising, or combining fractions — until the \(h\) that makes the denominator vanish cancels.</li>
+        <li>Evaluate the limit as \(h \to 0\) in the simplified expression.</li>
+      </ol>
+      <p>These are the same three steps we used at a fixed point in §2.1; the only change is that \(x\) now stays symbolic, so the answer emerges as a function rather than a number. The algebra in step 2 takes a different form for each function — expansion, conjugates, common denominators — but its job is always to clear the \(0/0\); for the polynomial, root, and rational functions of this chapter a factor of \(h\) always cancels and leaves a limit we can evaluate.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.6</span></p>
+      <div class="env-body">
+        <p>Find the derivative of \(f(x) = x^{2} + 4x - 2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Following the three steps,</p>
+        <p>\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{\bigl[(x + h)^{2} + 4(x + h) - 2\bigr] - \bigl[x^{2} + 4x - 2\bigr]}{h} \\[2pt]
+            &= \frac{\bigl(x^{2} + 2xh + h^{2} + 4x + 4h - 2\bigr) - \bigl(x^{2} + 4x - 2\bigr)}{h} \\[2pt]
+            &= \frac{2xh + h^{2} + 4h}{h} \;=\; 2x + h + 4.
+        \end{aligned} \]</p>
+        <p>Hence
+        \[ f'(x) = \lim_{h \to 0} (2x + h + 4) = 2x + 4. \]
+        Nothing in this computation relied on \(x\) being any particular number, so the single formula \(f'(x) = 2x + 4\) delivers the slope at every point: for instance \(f'(0) = 4\), while \(f'(-2) = 0\), signalling a horizontal tangent at \(x = -2\).<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.7</span></p>
+      <div class="env-body">
+        <p>Find the derivative of \(f(x) = \sqrt{x}\), \(x > 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The difference quotient contains a difference of square roots, which we clear by multiplying by the conjugate \(\sqrt{x + h} + \sqrt{x}\):</p>
+        <p>\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{\sqrt{x + h} - \sqrt{x}}{h}
+             = \frac{\bigl(\sqrt{x + h} - \sqrt{x}\bigr)\bigl(\sqrt{x + h} + \sqrt{x}\bigr)}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)} \\[4pt]
+            &= \frac{(x + h) - x}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)}
+             = \frac{1}{\sqrt{x + h} + \sqrt{x}}.
+        \end{aligned} \]</p>
+        <p>The denominator no longer vanishes as \(h \to 0\), so
+        \[ f'(x) = \lim_{h \to 0} \frac{1}{\sqrt{x + h} + \sqrt{x}} = \frac{1}{2\sqrt{x}}. \]
+        As a check, at \(x = 4\) this gives \(f'(4) = 1/(2 \cdot 2) = \tfrac{1}{4}\) — precisely the slope we found for \(\sqrt{x}\) at \((4, 2)\) in §2.1 (Remark 2.2). The function \(f'(x) = 1/(2\sqrt{x})\) packages that slope, and the slope at every other positive \(x\), into one formula.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — rational 1/x from the definition (approved 2026-06-07; new type: combine fractions, completes the polynomial/root/rational trio) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.8</span></p>
+      <div class="env-body">
+        <p>Find the derivative of \(f(x) = \dfrac{1}{x}\), \(x \ne 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This time the difference quotient is a difference of fractions, which we combine over a common denominator:</p>
+        <p>\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{1}{h}\left( \frac{1}{x + h} - \frac{1}{x} \right)
+             = \frac{1}{h} \cdot \frac{x - (x + h)}{x(x + h)} \\[4pt]
+            &= \frac{1}{h} \cdot \frac{-h}{x(x + h)}
+             = \frac{-1}{x(x + h)}.
+        \end{aligned} \]</p>
+        <p>Letting \(h \to 0\),
+        \[ f'(x) = \lim_{h \to 0} \frac{-1}{x(x + h)} = -\frac{1}{x^{2}}. \]
+        The manipulation is new — clear the fractions, then cancel the \(h\) — yet the three-step pattern is unchanged, and the result \(f'(x) = -1/x^{2}\) is once more a function, defined for all \(x \ne 0\). We will recover it in one line from the power and quotient rules of §2.4–§2.5.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — the domain of f' may be smaller than that of f; one-line fence to §2.3 -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.3</span><span class="env-name">The domain of \(f'\)</span></p>
+    <div class="env-body">
+      <p>Being a function in its own right, \(f'\) has its own domain, which may be <em>smaller</em> than that of \(f\). Although Example 2.7 worked with \(x > 0\), the square-root function is defined for all \(x \ge 0\), whereas its derivative \(f'(x) = 1/(2\sqrt{x})\) is defined only for \(x > 0\) — so the domain of \(f'\) can be a proper subset of the domain of \(f\). Precisely when a derivative fails to exist is taken up in §2.3.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — using the derivative function: solve f'(x)=given slope (approved 2026-06-07; new type: apply/invert f', not compute it) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.9</span></p>
+      <div class="env-body">
+        <p>For \(f(x) = x^{2} + 4x - 2\), find the point on the curve at which the tangent line has slope \(2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The slope of the tangent at \(x\) is the value of the derivative there, and from Example 2.6 we already have the derivative function \(f'(x) = 2x + 4\). We therefore want the input \(x\) at which</p>
+        <p>\[ f'(x) = 2 \quad\Longrightarrow\quad 2x + 4 = 2 \quad\Longrightarrow\quad x = -1. \]</p>
+        <p>The point on the curve is \(\bigl(-1,\, f(-1)\bigr) = (-1,\, -5)\). Note the change of viewpoint: we did not compute a derivative here — we already had \(f'\) as a function and <em>solved</em> it for the input producing a prescribed slope. Being able to run \(f'\) forward (input \(\to\) slope) and backward (slope \(\to\) input) is precisely what having the derivative as a function buys us.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Notation</h3>
+
+  <!-- expansion:formula — Leibniz / operator notation; ROADMAP assigns it to Ch2, and §2.4–§2.5 use d/dx -->
+  <p>So far we have written the derivative as \(f'(x)\), the compact <em>prime notation</em>. When \(y = f(x)\), the same derivative is also written</p>
+
+  <p>\[ f'(x) \;=\; y' \;=\; \frac{dy}{dx} \;=\; \frac{df}{dx} \;=\; \frac{d}{dx}\,f(x), \]</p>
+
+  <p>the last three being <em>Leibniz notation</em>. Here \(\dfrac{d}{dx}\) is an <em>operator</em> — it acts on a function and returns its derivative — and the symbol deliberately echoes the difference quotient \(\Delta y / \Delta x\), which becomes \(dy/dx\) as the increment \(\Delta x\) (our \(h\)) shrinks to zero. Leibniz notation has the merit of displaying the variable we differentiate with respect to, which becomes valuable once a problem involves more than one variable; prime notation is lighter when the variable is understood. We will use whichever is clearer, and we state the rules of the coming sections most often with \(\dfrac{d}{dx}\). Thus the two results above may equally be written \(\dfrac{d}{dx}(x^{2} + 4x - 2) = 2x + 4\) and \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\).</p>
+
+  <h3 class="subsec-head">Reading \(f'\) from the graph of \(f\)</h3>
+
+  <!-- expansion:figure — derivative-as-a-function: f above, f' below on a common x-axis (ROADMAP key figure) -->
+  <figure class="figure" data-fig="f-and-fprime">
+    <figcaption><span class="fig-no">Figure 2.2</span> The function \(f(x) = x^{2} + 4x - 2\) (top) and its derivative \(f'(x) = 2x + 4\) (bottom), aligned along the common vertical line \(x = -2\). To the left of \(x = -2\) the tangent lines of \(f\) slope downward and \(f' < 0\); to the right they slope upward and \(f' > 0\); at the lowest point, where the tangent is horizontal, \(f' = 0\).</figcaption>
+  </figure>
+
+  <!-- expansion:intuition — the sign-correspondence reading principle -->
+  <p>Drawing a derivative as a function in its own right exposes a vivid link between the graphs of \(f\) and \(f'\). Figure 2.2 places the parabola \(f(x) = x^{2} + 4x - 2\) of Example 2.6 directly above its derivative \(f'(x) = 2x + 4\). Since \(f'(x)\) is by definition the <em>slope of the tangent line</em> at \(x\), we can read its sign straight off the graph of \(f\):</p>
+
+  <ul>
+    <li>where the tangent line slopes upward, \(f' > 0\);</li>
+    <li>where the tangent line slopes downward, \(f' < 0\);</li>
+    <li>where the tangent line is horizontal, \(f' = 0\) — as at the lowest point of the parabola, \(x = -2\).</li>
+  </ul>
+
+  <p>The link runs the other way too: where \(f' > 0\) the graph of \(f\) rises, and where \(f' < 0\) it falls. So we can sketch the shape of \(f'\) straight from the graph of \(f\), with no formula at all.</p>
+
+  <!-- expansion:example — read f' signs/zeros directly from Figure 2.2's f-graph, then verify against the f'-panel (brief: 由 Figure 2.2 的 f 圖判讀) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.10</span></p>
+      <div class="env-body">
+        <p>Cover the lower panel of Figure 2.2 and look only at the graph of \(f\) on top. Using its shape alone — not the formula — say where \(f'\) is positive, where it is negative, and where it is zero. Then uncover the lower panel and check.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Reading the top graph: \(f\) falls until \(x = -2\), so its tangents slope downward and \(f' < 0\) there; the curve is momentarily flat at its lowest point \(x = -2\), so \(f'(-2) = 0\); and \(f\) rises for \(x > -2\), so \(f' > 0\). Uncovering the lower panel confirms it exactly — the line \(f'(x) = 2x + 4\) lies below the axis for \(x < -2\), crosses zero at \(x = -2\), and lies above it for \(x > -2\). We recovered the sign of \(f'\) everywhere from the <em>shape</em> of \(f\) alone.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:application — bookend: the rate-of-change reading of f', back to velocity -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.4</span><span class="env-name">Derivative as rate of change</span></p>
+    <div class="env-body">
+      <p>Return to the moving car of the opening. If \(s(t)\) is its position, the derivative function \(s'(t)\) is its <em>velocity</em> \(v(t)\) at every time \(t\). The slope reading and the rate-of-change reading are two faces of the same limit: \(f'(x)\) measures how fast the output of \(f\) changes per unit change in the input — whether that output is read as a height (slope) or a position (velocity). This is why the derivative function is one of the central objects of calculus: it turns any varying quantity into a record of how fast it varies.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — forward-ref to §2.3 -->
+  <p>Throughout this section we assumed the defining limit exists. It need not: at some points a function may have no well-defined slope at all. In the next section we ask precisely when \(f'\) exists — the question of <em>differentiability</em> — uncover its close tie to continuity, and form the derivative of a derivative.</p>
+
+</article>

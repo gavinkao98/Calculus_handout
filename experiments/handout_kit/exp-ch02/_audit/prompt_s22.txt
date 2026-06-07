@@ -1,0 +1,438 @@
+You are an ADVISORY adversarial reviewer of a calculus handout section (HTML format) that was expanded from the SEED below, following an approved DIRECTION BRIEF. You do NOT rewrite; you surface findings for a human.
+
+Hunt especially for:
+(a) mathematical errors, fabricated theorems/identities, or over-generalized claims;
+(b) drift from the seed's mathematics (the seed IS the manuscript's mathematical backbone);
+(c) direction-conformance violations: did the draft cover what the brief specifies? did it include anything from the brief's "do-not-write" list?
+
+Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):
+  category: math | faithfulness | direction-conformance | house_rule | register | other
+  blocking: true ONLY for:
+    - a real MATH ERROR or fabricated/over-generalized claim (category=math)
+    - DRIFT from the seed's mathematics (category=faithfulness)
+    - VIOLATION of direction-conformance: missing a brief-mandated item OR including a brief-forbidden item (category=direction-conformance)
+  Everything else MUST be blocking=false.
+
+Formatting / house-rule items (missing expansion comments, register/style nits) are caught by a downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); they MUST NOT block convergence.
+
+Also give each finding a level for human triage:
+  1 = real conflict (must fix)
+  2 = discoverability gap (add doc/comment)
+  3 = editorial drift (low priority)
+  4 = non-finding (mathematically equivalent paraphrase, stylistic preference)
+
+A mathematically equivalent paraphrase is NOT a finding.
+
+Set "converged": true when there are ZERO blocking findings (math correct, faithful to seed, conforms to direction brief), even if advisory formatting nits remain.
+
+Return STRICT JSON only, no prose outside the JSON.
+
+=== SEED (manuscript transcription) ===
+
+# Seed — §2.2 The Derivative as a Function
+
+> Transcribed from the handwritten manuscript (pp. 4–5 of 13).
+> Faithful to the manuscript: structure, order, notation, and deliberate omissions preserved.
+> seed 語法＝輕量可讀（反引號行內＋Unicode；見 RULE.md ①）。
+
+---
+
+## The derivative at a point (general definition)
+
+In general, for `f(x)`, define the derivative of `f` at `a` by `lim_{h→0} (f(a + h) − f(a))/h`, provided the limit exists. We write `f'(a) = lim_{h→0} (f(a + h) − f(a))/h`.
+
+(Equivalent: `f'(a) = lim_{x→a} (f(x) − f(a))/(x − a)`.)
+
+## Example
+
+`f(x) = x² + 4x − 2`. Find the derivative of `f` at `a`.
+
+**Solution.**
+`(f(a + h) − f(a))/h = ( ((a + h)² + 4(a + h) − 2) − (a² + 4a − 2) )/h`
+`= ( (a² + 2ah + h² + 4a + 4h − 2) − (a² + 4a − 2) )/h`
+`= (2ah + h² + 4h)/h = 2a + h + 4`.
+
+Thus `lim_{h→0} (f(a + h) − f(a))/h = 2a + 4`, i.e. the derivative of `f` at `a` `= 2a + 4`.
+
+## The derivative as a function
+
+For each point `a`, the derivative of `f` at `x` is `lim_{h→0} (f(x + h) − f(x))/h`. Using the variable `x` (in place of `a`), we write
+`f'(x) = lim_{h→0} (f(x + h) − f(x))/h`,
+i.e. `f'(x)` is itself a function of `x` (where the limit exists). We call `f'(x)` the derivative of `f`.
+
+## Example
+
+`f(x) = √x`, `x > 0`. Find `f'(x)`.
+
+**Solution.** `f'(x) = lim_{h→0} (√(x + h) − √x)/h`; rationalise:
+`(√(x + h) − √x)/h = ( (√(x + h) − √x)(√(x + h) + √x) ) / ( h(√(x + h) + √x) ) = 1/(√(x + h) + √x)`.
+Thus `lim_{h→0} 1/(√(x + h) + √x) = 1/(2√x)`, i.e. `f'(x) = 1/(2√x)`.
+
+=== END SEED ===
+
+=== DIRECTION BRIEF (approved at gate ③) ===
+
+# Direction Brief — §2.2 The Derivative as a Function
+
+> 待 ③ direction gate 核可。輸入：`seed_ch02_s2.md`（手稿 pp. 4–5）＋ §2.1 成品（`sec-2-1.html`，校準基準）＋ `CONTENT_ROADMAP.md` Ch2 條目。
+> **ROADMAP 對齊（引用、不複述）：** core skill「state the limit definition … apply … polynomial and root functions」；key figure「derivative as a function: f above / f′ below, aligned x-axis」；strategy box「computing a derivative from the limit definition (3-step)」；notation「`f'(x), dy/dx, df/dx, d/dx[f(x)]`」。
+
+---
+
+## 手稿盤點
+（照原順序）
+- 「導數於一點」一般定義 `f'(a) = lim_{h→0} (f(a+h)−f(a))/h`，附等價式 `lim_{x→a} (f(x)−f(a))/(x−a)`
+- Worked example（多項式）：`f(x)=x²+4x−2`，求在 `a` 的導數 → `2a+4`
+- 「導函數」`f'(x) = lim_{h→0} (f(x+h)−f(x))/h`，明說 `f'(x)` 本身是 `x` 的函數
+- Worked example（根式，rationalise）：`f(x)=√x, x>0` → `f'(x)=1/(2√x)`
+- **無**：圖、exercise、Leibniz/operator 記號（純 prime）、應用、strategy box
+- 具名結果／歷史：無
+
+## 薄度剖析
+| 區塊 | 狀態 | 指向 |
+|---|---|---|
+| `f'(a)` 一般定義（變化率） | **夠（但與 §2.1 重疊）** | 不重證；散文 recall §2.1 並 reframe 為「瞬時變化率」，一段帶過 |
+| 「為何要 `f'(x)` 函數」的動機 | **無** | 補承重直覺：逐點重算 vs 留符號算一次 |
+| `f'(x)` 作為函數（定義＋圖像關係） | **薄** | 補 Definition 2.2 ＋ f/f′ 堆疊圖 |
+| f ↔ f′ 圖像關係＋圖 | **無** | 新增 Figure 2.2（f 上、f′ 下、x 軸對齊；ROADMAP key figure）|
+| worked examples | **薄**（2 例、0 exercise）| 保留兩例；新增 graphical worked example；rational `1/x` 選配（未納入）。**不自創 exercise**（見「刻意不寫」）|
+| 記號 `dy/dx`、`d/dx[·]` | **無** | 新增記號小節（ROADMAP；§2.4–§2.5 seed 已在用 `d/dx`，卻無處引入）— flag |
+| strategy（3 步定義法） | **無** | 新增 strategy box（ROADMAP 指派本節）|
+| 應用／rate of change | **無** | 開場 velocity 錨（expansion:application）— flag |
+| `f'` 的定義域 | **無** | 一句（√x → f′ 僅 x>0；f′ 定義域可比 f 小）|
+
+## 範圍與深度
+- 吃 seed 這叢：一點導數一般定義（recall）→ 導函數 `f'(x)` → 由定義求 `f'`（多項式／根式／有理）→ 使用 f′（解 `f'=k`）→ 由 f 圖讀 f′ → 記號。
+- 嚴謹度：§2.2 **無定理可證**；「證明」即 worked example 的極限計算。兩種極限式（`h→0` 與 `x→a`）等價已在 §2.1 示，recall 不重證。
+- forward-fence（各一行）：微分法則（power/sum/product/quotient/`e^x`）→ §2.4–§2.5「先用定義，捷徑稍後」；不可微／f′ 何時不存在（`|x|` corner）→ §2.3；高階導數 `f''`、`f^(n)` → §2.3。
+- **嚴守**：§2.2 一律 first principles，不得用任何尚未證的法則算導數。
+
+## 承重直覺
+**一個承重直覺領頭：「一次計算，無窮多斜率。」**
+- 失敗例先打臉：§2.1 只能逐點求斜率，每點都要重跑極限——「算 `f'(2)`，再算 `f'(3)`，再算 `f'(3.5)`… 永遠算不完」，而且逐點算只給孤立數字、看不出**規律**。
+- 關鍵動作：把點留成符號 `x`，極限只跑**一次**，輸出是一條公式＝一個**新函數** `f'`，同時給出每一點的斜率（也揭露規律）。
+- 為它服務的次要心像：`f'` 是有自己圖形／定義域的真函數（Figure 2.2 把回報視覺化）。
+- Ex 2.4 把此動作具體化：在一般 `a` 算得 `2a+4` → 因 `a` 任意，replace `a→x` → `f'(x)=2x+4`。
+
+## worked example 清單
+| # | 函數 | 技巧 | 來源 |
+|---|---|---|---|
+| Ex 2.4 | `f(x)=x²+4x−2` | 多項式（展開）→ `f'(x)=2x+4` | 手稿 |
+| Ex 2.5 | `f(x)=√x` (x>0) | 根式共軛 → `1/(2√x)`；f′ 定義域 x>0；連 §2.1 Remark 2.2 的 `f'(4)=1/4` | 手稿 |
+| Ex 2.6 | `f(x)=1/x` → `−1/x²` | 有理（通分）；補齊 poly/root/rational 三型；伏筆 §2.4/§2.5 | expansion:example（新增，批准 2026-06-07）|
+| Ex 2.7 | `f(x)=x²+4x−2`：求切線斜率=2 之點 → `(−1,−5)` | **使用** f′（解 `f'(x)=k`，非計算 f′）——不同題型 | expansion:example（新增，批准 2026-06-07）|
+| Ex 2.8 | 由 Figure 2.2 的 f 圖判讀 f′ 正負／零 | 圖像判讀（ROADMAP core skill）| expansion:example（新增）|
+
+> **題目政策（使用者 2026-06-07 修定）：** 不寫 bare your-turn（無解練習題）——習題設計仍 deferred（README §防護欄、`CONTENT_SPEC.md` §14）。**但**可**自創新題、經使用者批准**後，當成 **worked example**（含完整 solution＋講解）寫入；硬條件：**題型須與既有 example 不同**（非改數字／係數）。
+
+序：computation（poly → root）建立 routine → graphical（讀 f′）強化「f′ 是函數」→ 選配 rational 補型。同型不重講已建立的 setup。
+
+## history / application
+- **開場錨**（expansion:application）：rate of change / velocity——「若知道每一刻的位置 `s(t)`，每一刻的速度 `v(t)=s'(t)` 本身是一個函數」。這是「導數即函數」最忠實的真實實例（速度＝位置的導數，bedrock，非杜撰）。**保持概念性框架，不展成數值題**（數值應用屬後續「微分應用」章）。— flag 待核。
+- **歷史**：無自然可考人物史觸發 → 留白。Leibniz `dy/dx` 的記號由來可在記號小節一句帶過（標 `[source: standard calculus-textbook historical note]`），不展開。
+
+## 強調 / takeaway
+- **概念樞紐**：導數是一個**函數**——把極限以符號點跑一次製造出來；`f'` 有自己的圖、定義域與行為。
+- **可攜技能**：3 步 first-principles（寫差商 → 化簡消 `h` → 取 `h→0`），輸出**`x` 的公式**；外加由 f 圖之斜率正負／零讀出 f′。
+
+## 刻意不寫
+| 不寫 | 理由 | 去哪 |
+|---|---|---|
+| 微分法則（power/const/sum/product/quotient/`e^x`）| §2.2 嚴守定義法；法則未證 | §2.4–§2.5 |
+| 一般指數冪法則（負／分數冪）| 未證 | §2.4＋後章 |
+| 不可微／f′ 不存在（`|x|` corner）| 屬可微性 | §2.3 |
+| differentiable ⇒ continuous | 屬可微性定理 | §2.3 |
+| 高階導數 `f''`、`f^(n)` 與其記號 | 手稿置於 §2.3 | §2.3 |
+| `Δx ≡ h` 的正式 caution | `Δx` 在 §2.5 才出現；§2.2 僅一句提「增量也寫 `Δx`」 | §2.5 caution（ROADMAP pitfall）|
+| ε-δ 嚴格極限 | 超出本節 | Ch1／附錄 |
+| 切線幾何當主敘事 | §2.1 已建立；§2.2 僅 recall | §2.1 |
+| **bare your-turn exercise（無 solution 的練習題）** | README §防護欄「自創習題」deferred 到習題設計回合——§2.2 不放無解練習題。（自創新題若經批准，一律當 worked example 寫，含 solution；見上方「題目政策」） | 習題設計回合 |
+
+> 餵 auditor：以上即 direction-conformance 的反向檢查——寫進任一項＝違反方向（多寫）；漏掉承重直覺／指定例子／strategy／圖＝違反方向（漏寫）。
+
+## 篇幅帶
+- 軟帶 **5–6 print 頁**（加入 2 個經批准的新型 worked example 後）。含 1 Definition、1 strategy box、1 figure、**5 worked example**（2.4–2.8）、記號小節、velocity 錨。bare your-turn exercise 無（自創題一律當 worked example）。
+- 明顯超出 → 回查：rate-of-change 是否展成數值題、或誤入法則／可微性（皆應 fence）。
+
+---
+
+### Numbering 銜接（承 §2.1，手動；已回填為實際成品）
+Definition **2.2**（the derivative as a function）；Strategy box **2.1**（本章首個，3 步定義法）；Figure **2.2**（f／f′ 堆疊，單圖；未用選配第二圖）；**Notation 為 `subsec-head` 小節**（非 remark）；Remark **2.3**（f′ 的定義域）、**2.4**（derivative as rate of change／velocity bookend）；Example **2.4**（多項式）、**2.5**（根式）、**2.6**（有理 `1/x`）、**2.7**（使用 f′）、**2.8**（圖像判讀）。**無 bare exercise**（自創題經批准後一律當 worked example，見上方「題目政策」）。
+
+=== END DIRECTION BRIEF ===
+
+=== DRAFT (HTML fragment to review) ===
+
+<!-- §2.2 The Derivative as a Function.
+     Generated from exp-ch02/seed_ch02_s2.md (manuscript pp. 4–5),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief brief_s22.md approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references are
+     plain prose. Counters continue from §2.1:
+       Definition 2.1 → 2.2;  Figure 2.1 → 2.2;  Remark 2.2 → 2.3, 2.4;
+       Example 2.3 → 2.4, 2.5, 2.6, 2.7, 2.8;  Strategy box: first → 2.1.
+     No exercises: self-authored problems are written as worked examples
+     (see brief_s22.md "題目政策"). -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.2</span>The Derivative as a Function</h2>
+  </header>
+
+  <!-- expansion:application — velocity-as-a-function anchor to open the section -->
+  <p>Imagine a car moving along a straight road, its position at time \(t\) recorded as \(s(t)\). Over the short interval from \(t\) to \(t + h\), the car's <em>average</em> velocity is the change in position divided by the elapsed time, \(\bigl(s(t+h) - s(t)\bigr)/h\) — exactly the difference quotient of §2.1. Letting \(h \to 0\) gives the <em>instantaneous</em> velocity at the single instant \(t\). But we rarely care about one instant in isolation; we want to know the velocity at <em>every</em> instant — that is, we want velocity as a <em>function</em> of time. Making this shift, from the derivative at one point to the derivative as a function, is the work of this section.</p>
+
+  <h3 class="subsec-head">From a number to a function</h3>
+
+  <!-- expansion:intuition — load-bearing collision: point-by-point is endless; keep the point symbolic -->
+  <p>In §2.1 we fixed a point \(a\) and computed the derivative \(f'(a)\), a single number recording the slope of the tangent line — equivalently, the instantaneous rate of change of \(f\) — at that one point. To find the slope at a <em>different</em> point we would have to run the entire limit again, and to know the slope at <em>every</em> point we would have to repeat the computation infinitely many times. Worse, a table of separate values \(f'(2),\, f'(3),\, f'(\tfrac{7}{2}),\, \ldots\) never reveals the underlying <em>pattern</em>.</p>
+
+  <p>There is a far better way. Instead of substituting a specific number for the point, we leave it <em>symbolic</em> — call it \(x\) — and carry out the limit just once. The outcome is no longer a single number but a formula in \(x\): a brand-new function that returns the slope at every point at once. This function is called the <em>derivative of \(f\)</em>.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">2.2</span><span class="env-name">The derivative as a function</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be a function. The <em>derivative of \(f\)</em> is the function \(f'\) defined by
+      \[ f'(x) \;=\; \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}, \]
+      whose domain is the set of all \(x\) for which this limit exists. The value \(f'(x)\) is the slope of the tangent line to \(y = f(x)\) at \(\bigl(x,\, f(x)\bigr)\) — equivalently, the instantaneous rate of change of \(f\) at \(x\).</p>
+      <!-- expansion:intuition — "slope machine" informal gloss -->
+      <p class="informal">Informally, \(f'\) is the “slope machine” of \(f\): feed it any input \(x\), and it returns the slope of \(f\) there.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — the x→a form was established in §2.1; recall it, don't reprove -->
+  <p>This is the same limit we met in §2.1: the substitution \(x = a + h\) turns it into \(\lim_{x \to a}\bigl(f(x) - f(a)\bigr)/(x - a)\) with the fixed point renamed. The \(h\)-form above is usually the more convenient one to compute with, and the recipe is the same one we used at a single point — only now the point stays symbolic.</p>
+
+  <!-- expansion:strategy — ROADMAP places the 3-step limit-definition procedure in §2.2 -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">2.1</span><span class="env-name">Computing a derivative from the definition</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Form the difference quotient \(\dfrac{f(x + h) - f(x)}{h}\), expanding \(f(x + h)\).</li>
+        <li>Simplify the quotient algebraically — by expanding, rationalising, or combining fractions — until the \(h\) that makes the denominator vanish cancels.</li>
+        <li>Evaluate the limit as \(h \to 0\) in the simplified expression.</li>
+      </ol>
+      <p>These are the same three steps we used at a fixed point in §2.1; the only change is that \(x\) now stays symbolic, so the answer emerges as a function rather than a number. The algebra in step 2 takes a different form for each function — expansion, conjugates, common denominators — but its job is always to clear the \(0/0\); for the polynomial, root, and rational functions of this chapter a factor of \(h\) always cancels and leaves a limit we can evaluate.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.4</span></p>
+      <div class="env-body">
+        <p>Find the derivative of \(f(x) = x^{2} + 4x - 2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Following the three steps,</p>
+        <p>\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{\bigl[(x + h)^{2} + 4(x + h) - 2\bigr] - \bigl[x^{2} + 4x - 2\bigr]}{h} \\[2pt]
+            &= \frac{\bigl(x^{2} + 2xh + h^{2} + 4x + 4h - 2\bigr) - \bigl(x^{2} + 4x - 2\bigr)}{h} \\[2pt]
+            &= \frac{2xh + h^{2} + 4h}{h} \;=\; 2x + h + 4.
+        \end{aligned} \]</p>
+        <p>Hence
+        \[ f'(x) = \lim_{h \to 0} (2x + h + 4) = 2x + 4. \]
+        Nothing in this computation relied on \(x\) being any particular number, so the single formula \(f'(x) = 2x + 4\) delivers the slope at every point: for instance \(f'(0) = 4\), while \(f'(-2) = 0\), signalling a horizontal tangent at \(x = -2\).<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.5</span></p>
+      <div class="env-body">
+        <p>Find the derivative of \(f(x) = \sqrt{x}\), \(x > 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The difference quotient contains a difference of square roots, which we clear by multiplying by the conjugate \(\sqrt{x + h} + \sqrt{x}\):</p>
+        <p>\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{\sqrt{x + h} - \sqrt{x}}{h}
+             = \frac{\bigl(\sqrt{x + h} - \sqrt{x}\bigr)\bigl(\sqrt{x + h} + \sqrt{x}\bigr)}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)} \\[4pt]
+            &= \frac{(x + h) - x}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)}
+             = \frac{1}{\sqrt{x + h} + \sqrt{x}}.
+        \end{aligned} \]</p>
+        <p>The denominator no longer vanishes as \(h \to 0\), so
+        \[ f'(x) = \lim_{h \to 0} \frac{1}{\sqrt{x + h} + \sqrt{x}} = \frac{1}{2\sqrt{x}}. \]
+        As a check, at \(x = 4\) this gives \(f'(4) = 1/(2 \cdot 2) = \tfrac{1}{4}\) — precisely the slope we found for \(\sqrt{x}\) at \((4, 2)\) in §2.1 (Remark 2.2). The function \(f'(x) = 1/(2\sqrt{x})\) packages that slope, and the slope at every other positive \(x\), into one formula.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — rational 1/x from the definition (approved 2026-06-07; new type: combine fractions, completes the polynomial/root/rational trio) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.6</span></p>
+      <div class="env-body">
+        <p>Find the derivative of \(f(x) = \dfrac{1}{x}\), \(x \ne 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This time the difference quotient is a difference of fractions, which we combine over a common denominator:</p>
+        <p>\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{1}{h}\left( \frac{1}{x + h} - \frac{1}{x} \right)
+             = \frac{1}{h} \cdot \frac{x - (x + h)}{x(x + h)} \\[4pt]
+            &= \frac{1}{h} \cdot \frac{-h}{x(x + h)}
+             = \frac{-1}{x(x + h)}.
+        \end{aligned} \]</p>
+        <p>Letting \(h \to 0\),
+        \[ f'(x) = \lim_{h \to 0} \frac{-1}{x(x + h)} = -\frac{1}{x^{2}}. \]
+        The manipulation is new — clear the fractions, then cancel the \(h\) — yet the three-step pattern is unchanged, and the result \(f'(x) = -1/x^{2}\) is once more a function, defined for all \(x \ne 0\). We will recover it in one line from the power and quotient rules of §2.4–§2.5.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — the domain of f' may be smaller than that of f; one-line fence to §2.3 -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.3</span><span class="env-name">The domain of \(f'\)</span></p>
+    <div class="env-body">
+      <p>Being a function in its own right, \(f'\) has its own domain, which may be <em>smaller</em> than that of \(f\). Although Example 2.5 worked with \(x > 0\), the square-root function is defined for all \(x \ge 0\), whereas its derivative \(f'(x) = 1/(2\sqrt{x})\) is defined only for \(x > 0\) — so the domain of \(f'\) can be a proper subset of the domain of \(f\). Precisely when a derivative fails to exist is taken up in §2.3.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — using the derivative function: solve f'(x)=given slope (approved 2026-06-07; new type: apply/invert f', not compute it) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.7</span></p>
+      <div class="env-body">
+        <p>For \(f(x) = x^{2} + 4x - 2\), find the point on the curve at which the tangent line has slope \(2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The slope of the tangent at \(x\) is the value of the derivative there, and from Example 2.4 we already have the derivative function \(f'(x) = 2x + 4\). We therefore want the input \(x\) at which</p>
+        <p>\[ f'(x) = 2 \quad\Longrightarrow\quad 2x + 4 = 2 \quad\Longrightarrow\quad x = -1. \]</p>
+        <p>The point on the curve is \(\bigl(-1,\, f(-1)\bigr) = (-1,\, -5)\). Note the change of viewpoint: we did not compute a derivative here — we already had \(f'\) as a function and <em>solved</em> it for the input producing a prescribed slope. Being able to run \(f'\) forward (input \(\to\) slope) and backward (slope \(\to\) input) is precisely what having the derivative as a function buys us.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Notation</h3>
+
+  <!-- expansion:formula — Leibniz / operator notation; ROADMAP assigns it to Ch2, and §2.4–§2.5 use d/dx -->
+  <p>So far we have written the derivative as \(f'(x)\), the compact <em>prime notation</em>. When \(y = f(x)\), the same derivative is also written</p>
+
+  <p>\[ f'(x) \;=\; y' \;=\; \frac{dy}{dx} \;=\; \frac{df}{dx} \;=\; \frac{d}{dx}\,f(x), \]</p>
+
+  <p>the last three being <em>Leibniz notation</em>. Here \(\dfrac{d}{dx}\) is an <em>operator</em> — it acts on a function and returns its derivative — and the symbol deliberately echoes the difference quotient \(\Delta y / \Delta x\), which becomes \(dy/dx\) as the increment \(\Delta x\) (our \(h\)) shrinks to zero. Leibniz notation has the merit of displaying the variable we differentiate with respect to, which becomes valuable once a problem involves more than one variable; prime notation is lighter when the variable is understood. We will use whichever is clearer, and we state the rules of the coming sections most often with \(\dfrac{d}{dx}\). Thus the two results above may equally be written \(\dfrac{d}{dx}(x^{2} + 4x - 2) = 2x + 4\) and \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\).</p>
+
+  <h3 class="subsec-head">Reading \(f'\) from the graph of \(f\)</h3>
+
+  <!-- expansion:figure — derivative-as-a-function: f above, f' below on a common x-axis (ROADMAP key figure) -->
+  <figure class="figure" data-fig="f-and-fprime">
+    <figcaption><span class="fig-no">Figure 2.2</span> The function \(f(x) = x^{2} + 4x - 2\) (top) and its derivative \(f'(x) = 2x + 4\) (bottom), aligned along the common vertical line \(x = -2\). To the left of \(x = -2\) the tangent lines of \(f\) slope downward and \(f' < 0\); to the right they slope upward and \(f' > 0\); at the lowest point, where the tangent is horizontal, \(f' = 0\).</figcaption>
+  </figure>
+
+  <!-- expansion:intuition — the sign-correspondence reading principle -->
+  <p>Drawing a derivative as a function in its own right exposes a vivid link between the graphs of \(f\) and \(f'\). Figure 2.2 places the parabola \(f(x) = x^{2} + 4x - 2\) of Example 2.4 directly above its derivative \(f'(x) = 2x + 4\). Since \(f'(x)\) is by definition the <em>slope of the tangent line</em> at \(x\), we can read its sign straight off the graph of \(f\):</p>
+
+  <ul>
+    <li>where the tangent line slopes upward, \(f' > 0\);</li>
+    <li>where the tangent line slopes downward, \(f' < 0\);</li>
+    <li>where the tangent line is horizontal, \(f' = 0\) — as at the lowest point of the parabola, \(x = -2\).</li>
+  </ul>
+
+  <p>The link runs the other way too: where \(f' > 0\) the graph of \(f\) rises, and where \(f' < 0\) it falls. So we can sketch the shape of \(f'\) straight from the graph of \(f\), with no formula at all.</p>
+
+  <!-- expansion:example — read f' signs/zeros directly from Figure 2.2's f-graph, then verify against the f'-panel (brief: 由 Figure 2.2 的 f 圖判讀) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.8</span></p>
+      <div class="env-body">
+        <p>Cover the lower panel of Figure 2.2 and look only at the graph of \(f\) on top. Using its shape alone — not the formula — say where \(f'\) is positive, where it is negative, and where it is zero. Then uncover the lower panel and check.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Reading the top graph: \(f\) falls until \(x = -2\), so its tangents slope downward and \(f' < 0\) there; the curve is momentarily flat at its lowest point \(x = -2\), so \(f'(-2) = 0\); and \(f\) rises for \(x > -2\), so \(f' > 0\). Uncovering the lower panel confirms it exactly — the line \(f'(x) = 2x + 4\) lies below the axis for \(x < -2\), crosses zero at \(x = -2\), and lies above it for \(x > -2\). We recovered the sign of \(f'\) everywhere from the <em>shape</em> of \(f\) alone.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:application — bookend: the rate-of-change reading of f', back to velocity -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.4</span><span class="env-name">Derivative as rate of change</span></p>
+    <div class="env-body">
+      <p>Return to the moving car of the opening. If \(s(t)\) is its position, the derivative function \(s'(t)\) is its <em>velocity</em> \(v(t)\) at every time \(t\). The slope reading and the rate-of-change reading are two faces of the same limit: \(f'(x)\) measures how fast the output of \(f\) changes per unit change in the input — whether that output is read as a height (slope) or a position (velocity). This is why the derivative function is one of the central objects of calculus: it turns any varying quantity into a record of how fast it varies.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — forward-ref to §2.3 -->
+  <p>Throughout this section we assumed the defining limit exists. It need not: at some points a function may have no well-defined slope at all. In the next section we ask precisely when \(f'\) exists — the question of <em>differentiability</em> — uncover its close tie to continuity, and form the derivative of a derivative.</p>
+
+</article>
+
+=== END DRAFT ===
+
+=== IMPORTANT: FIGURE RENDERING NOTE ===
+Figures use `<figure data-fig="id">` placeholders. The actual SVG diagrams are injected at RUNTIME by JavaScript (figures.js + hydrateFigures()). The static HTML intentionally contains only the `<figcaption>`; the visual content appears when rendered in a browser. A `data-fig` element with a matching entry in figures.js is NOT a missing figure. Do NOT flag these as direction-conformance violations.
+
+Figure 2.2 (data-fig="f-and-fprime") IS defined in figures.js; its source is included below so you can judge whether it conforms to the brief's mandated "f above / f' below on a common x-axis" figure. The author has visually verified it renders correctly: two vertically stacked panels (parabola f on top, line f' below) with their x-axes aligned along the dashed vertical at x = -2.
+
+--- figures.js entry for "f-and-fprime" ---
+/* §2.2 — The derivative as a function: f above, f' below, drawn on a
+       common x-axis. Top: parabola f(x)=x²+4x−2 (minimum at x=−2, f=−6).
+       Bottom: line f'(x)=2x+4 (zero at x=−2). A shared dashed vertical at
+       x=−2 links the minimum of f to the zero of f'. Both SVGs use the same
+       w / pad / xmin / xmax, so a given x maps to the same horizontal pixel;
+       returned as ONE panel whose .fig-panel column layout stacks them
+       centred → the x-axes line up. Uses only the in-section result. */
+    "f-and-fprime": () => {
+      var f  = function (x) { return x * x + 4 * x - 2; };
+      var fp = function (x) { return 2 * x + 4; };
+      var dom = [-6.4, 2.4];
+      var common = { w: 460, xmin: -6.8, xmax: 2.8, xlabel: "x", ylabel: "y" };
+
+      // --- top panel: f ---
+      var top = buildPlot(Object.assign({}, common, {
+        h: 250, ymin: -8, ymax: 14,
+        xticks: [{ x: -2, tex: "-2" }],
+        aria: "Graph of f(x)=x^2+4x-2, a parabola with its minimum at x=-2 where f=-6.",
+        items: [
+          { type: "vline", x: -2, cls: "refline" },
+          { type: "curve", fn: f, domain: dom, samples: 200, cls: "curve" },
+          { type: "dot", x: -2, y: -6, r: 3 },
+          { type: "text", x: 2.45, y: 12, tex: "y\\!=\\!f(x)", cls: "a-curve", anchor: "start" },
+          { type: "text", x: -2.35, y: -6, tex: "\\text{min}", cls: "a-pt", anchor: "end" },
+        ],
+      }));
+
+      // --- bottom panel: f' (same horizontal scale as the top) ---
+      var bot = buildPlot(Object.assign({}, common, {
+        h: 210, ymin: -9, ymax: 9,
+        xticks: [{ x: -2, tex: "-2" }],
+        aria: "Graph of f'(x)=2x+4, a line crossing zero at x=-2; negative to the left, positive to the right.",
+        items: [
+          { type: "vline", x: -2, cls: "refline" },
+          { type: "curve", fn: fp, domain: dom, samples: 12, cls: "curve" },
+          { type: "dot", x: -2, y: 0, r: 3 },
+          { type: "text", x: 2.45, y: 7, tex: "y\\!=\\!f'(x)", cls: "a-curve", anchor: "start" },
+          { type: "text", x: -5.6, y: -4.5, tex: "f'<0", cls: "a-pt", anchor: "start" },
+          { type: "text", x: -1.4, y: 4.5, tex: "f'>0", cls: "a-pt", anchor: "start" },
+        ],
+      }));
+
+      return { layout: "stack", panels: [{ svg: top + bot }] };
+--- end figures.js entry ---
+
+=== KEY HTML WRITING RULES (advisory — for house_rule findings) ===
+- Semantic env classes: env-definition, env-theorem, env-proposition, env-corollary, env-example (inside .workedexample with env-solution), env-exercise, env-remark, env-proof, env-caution, env-strategy
+- Math: inline \(…\), display \[…\], multi-line \begin{aligned}…\end{aligned}
+- Manual numbering: env-num for definitions/theorems/examples etc., fig-no for figures, sec-no for section numbers
+- Cross-references: plain prose ("by Theorem 2.3", "see §2.2")
+- Expansion markers: <!-- expansion:category --> HTML comment before each non-seed addition
+- No \cref, no auto-numbering, no \index
+=== END HTML WRITING RULES ===
+
+Now review the DRAFT against the SEED, DIRECTION BRIEF, and HTML WRITING RULES. Return strict JSON.
