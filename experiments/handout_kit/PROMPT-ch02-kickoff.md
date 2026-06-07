@@ -41,7 +41,10 @@ ch02 的真來源是老師 2026-04-27 的 13 頁手寫手稿（見 ROADMAP）。
 內容真理來自「手稿→seed ＋ ROADMAP」。
 
 ## 流程：每節跑 direction_layer 六階；先做 §2.1 當「校準首跑」
-① intake：手稿→seed（逐節）→ 我核對（①-verify）
+① intake：手稿→seed（逐節）→ 我核對（①-verify）。**seed 用輕量可讀語法**：反引號行內＋Unicode
+   （`lim_{h→0} (f(a+h)−f(a))/h`、`x²`、`x^(n−1)`、`√x`、`≤ ⟺ →`），**不要 `$$…$$`／`\[…\]`／
+   `\frac` 等 LaTeX 顯示語法**；seed 是稀疏骨架（漂亮 KaTeX 留給 ④ 輸出）。風格範本：
+   experiments/direction_layer/test/seed_s42.md；完整規則見 RULE.md ①。
 ② 方向 brief：依 seed＋薄度剖析＋ch02 ROADMAP 條目，填 brief（RULE.md §2 九欄模板）
 ③ 方向閘：我改／核可 brief ← 在此停下等我
 ④ 擴寫：你是唯一寫手，把該節寫成 experiments/handout_kit/exp-ch02/sec-2-1.html，照
