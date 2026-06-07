@@ -1,0 +1,195 @@
+<!-- §1.2 Inverse Trigonometric Functions. Content verbatim from ch01_foundations.tex. -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">1.2</span>Inverse Trigonometric Functions</h2>
+  </header>
+
+  <p>The trigonometric functions are not one-to-one on all of \(\mathbb{R}\), so they do not have inverse functions on their full domains. Inverse trigonometric functions arise whenever we know a ratio and want to recover an angle: from the slope of a ramp, we get an angle of inclination via \(\arctan\); from a ratio of sides in a right triangle, we get an angle via \(\arcsin\) or \(\arccos\). To build these inverses, we must first restrict the domain of each trigonometric function to an interval on which it is one-to-one.</p>
+
+  <p>Consider the sine function on \(\mathbb{R}\). As Figure 1.3 shows, a horizontal line can intersect the graph of \(y = \sin x\) more than once, so \(\sin\) is not one-to-one on \(\mathbb{R}\).</p>
+
+  <figure class="figure" data-fig="sine-not-1to1">
+    <figcaption><span class="fig-no">Figure 1.3</span> The sine function on \(\mathbb{R}\) is not one-to-one.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">The inverse sine function</h3>
+
+  <p>To define the inverse sine, we restrict \(\sin x\) to the interval
+  \[ -\tfrac{\pi}{2} \le x \le \tfrac{\pi}{2}. \]
+  On this interval, \(\sin x\) is one-to-one and its values cover the range \([-1, 1]\). The restricted branch is shown in Figure 1.4.</p>
+
+  <figure class="figure" data-fig="restricted-sine">
+    <figcaption><span class="fig-no">Figure 1.4</span> Restricted branch of the sine function used to define \(\arcsin x\).</figcaption>
+  </figure>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.3</span></p>
+    <div class="env-body">
+      <p>The <em>inverse sine function</em>, denoted \(\arcsin x\) or \(\sin^{-1} x\), is defined by
+      \[ \arcsin x = y \quad \Longleftrightarrow \quad \sin y = x \ \text{ and } \ -\tfrac{\pi}{2} \le y \le \tfrac{\pi}{2}. \]
+      Its domain is \([-1, 1]\) and its range is \(\left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\).</p>
+    </div>
+  </section>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.1</span></p>
+    <div class="env-body">
+      <p>The notation \(\sin^{-1} x\) is also used for \(\arcsin x\). It does <em>not</em> mean the reciprocal \(\bigl(\sin x\bigr)^{-1} = 1 / \sin x\). When reading a source that uses \(\sin^{-1}\), check the context to decide which is meant.</p>
+    </div>
+  </section>
+
+  <p>The composition identities for \(\arcsin\) take the following form.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.2</span><span class="env-name">Inverse sine identities</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} \sin(\arcsin x) = x, &\qquad -1 \le x \le 1,\\ \arcsin(\sin x) = x, &\qquad -\tfrac{\pi}{2} \le x \le \tfrac{\pi}{2}. \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.2</span></p>
+    <div class="env-body">
+      <p>The identity \(\arcsin(\sin x) = x\) holds only when \(x \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\). Outside this interval, the right-hand side is replaced by the unique value in \(\left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\) with the same sine; for instance,
+      \[ \arcsin(\sin \pi) = \arcsin(0) = 0 \neq \pi. \]</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.5</span></p>
+      <div class="env-body">
+        <p>Evaluate the following expressions.</p>
+        <ol class="prompt-list">
+          <li>\(\arcsin\!\left(\tfrac{1}{2}\right)\).</li>
+          <li>\(\tan\!\bigl(\arcsin\!\left(\tfrac{1}{3}\right)\bigr)\).</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>We need the angle \(y \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\) with \(\sin y = \tfrac{1}{2}\). Since \(\sin(\pi/6) = \tfrac{1}{2}\), we have \(\arcsin\!\left(\tfrac{1}{2}\right) = \tfrac{\pi}{6}\).</li>
+          <li>Let \(\theta = \arcsin\!\left(\tfrac{1}{3}\right)\), so \(\sin\theta = \tfrac{1}{3}\) with \(\theta \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\). Because \(\sin\theta > 0\), the angle \(\theta\) lies in the first quadrant, and in a right triangle with hypotenuse \(3\) and opposite side \(1\), the adjacent side is
+          \[ a = \sqrt{3^{2} - 1^{2}} = \sqrt{8} = 2\sqrt{2}. \]
+          <figure class="figure" data-fig="arcsin-triangle"></figure>
+          Therefore \(\tan\!\bigl(\arcsin\!\left(\tfrac{1}{3}\right)\bigr) = \tan\theta = \tfrac{1}{2\sqrt{2}}\).</li>
+        </ol>
+        <span class="qed"></span>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">The inverse cosine function</h3>
+
+  <p>The cosine function is one-to-one on the interval \(0 \le x \le \pi\), shown in Figure 1.5.</p>
+
+  <figure class="figure" data-fig="restricted-cosine">
+    <figcaption><span class="fig-no">Figure 1.5</span> Restricted branch of the cosine function used to define \(\arccos x\).</figcaption>
+  </figure>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.4</span></p>
+    <div class="env-body">
+      <p>The <em>inverse cosine function</em>, denoted \(\arccos x\) or \(\cos^{-1} x\), is defined by
+      \[ \arccos x = y \quad \Longleftrightarrow \quad \cos y = x \ \text{ and } \ 0 \le y \le \pi. \]
+      Its domain is \([-1, 1]\) and its range is \([0, \pi]\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.3</span><span class="env-name">Inverse cosine identities</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} \cos(\arccos x) = x, &\qquad -1 \le x \le 1,\\ \arccos(\cos x) = x, &\qquad 0 \le x \le \pi. \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The inverse tangent function</h3>
+
+  <p>The tangent function is one-to-one on the interval \(-\tfrac{\pi}{2} < x < \tfrac{\pi}{2}\), shown in Figure 1.6.</p>
+
+  <figure class="figure" data-fig="restricted-tangent">
+    <figcaption><span class="fig-no">Figure 1.6</span> Restricted branch of the tangent function used to define \(\arctan x\).</figcaption>
+  </figure>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.5</span></p>
+    <div class="env-body">
+      <p>The <em>inverse tangent function</em>, denoted \(\arctan x\) or \(\tan^{-1} x\), is defined by
+      \[ \arctan x = y \quad \Longleftrightarrow \quad \tan y = x \ \text{ and } \ -\tfrac{\pi}{2} < y < \tfrac{\pi}{2}. \]
+      Its domain is \(\mathbb{R}\) and its range is \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.4</span><span class="env-name">Inverse tangent identities</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} \tan(\arctan x) = x, &\qquad x \in \mathbb{R},\\ \arctan(\tan x) = x, &\qquad -\tfrac{\pi}{2} < x < \tfrac{\pi}{2}. \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.6</span></p>
+      <div class="env-body">
+        <p>Simplify the expression \(\cos(\arctan x)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Let \(y = \arctan x\), so \(\tan y = x\) with \(-\tfrac{\pi}{2} < y < \tfrac{\pi}{2}\). We want \(\cos y\). Using the identity \(1 + \tan^{2} y = \sec^{2} y\),
+        \[ \sec^{2} y = 1 + x^{2}. \]
+        Since \(y \in \left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\) we have \(\cos y > 0\) and hence \(\sec y > 0\), so \(\sec y = \sqrt{1 + x^{2}}\). Therefore
+        \[ \cos(\arctan x) = \cos y = \frac{1}{\sec y} = \frac{1}{\sqrt{1 + x^{2}}}. \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">The remaining inverse trigonometric functions</h3>
+
+  <p>The remaining inverse trigonometric functions are used less frequently, but they are defined in the same spirit.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.6</span></p>
+    <div class="env-body">
+      <p>The <em>inverse cosecant function</em>, denoted \(\arccsc x\) or \(\csc^{-1} x\), is defined by
+      \[ \arccsc x = y \quad \Longleftrightarrow \quad \csc y = x \ \text{ and } \ y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.7</span></p>
+    <div class="env-body">
+      <p>The <em>inverse secant function</em>, denoted \(\arcsec x\) or \(\sec^{-1} x\), is defined by
+      \[ \arcsec x = y \quad \Longleftrightarrow \quad \sec y = x \ \text{ and } \ y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right). \]</p>
+    </div>
+  </section>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.8</span></p>
+    <div class="env-body">
+      <p>The <em>inverse cotangent function</em>, denoted \(\arccot x\) or \(\cot^{-1} x\), is defined by
+      \[ \arccot x = y \quad \Longleftrightarrow \quad \cot y = x \ \text{ and } \ y \in (0, \pi). \]</p>
+    </div>
+  </section>
+
+  <p>The domains of \(\arccsc\) and \(\arcsec\) are \((-\infty, -1] \cup [1, \infty)\), while the domain of \(\arccot\) is \(\mathbb{R}\). The principal ranges are the intervals specified in the definitions above.</p>
+
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.3</span></p>
+    <div class="env-body">
+      <p>For \(\arcsec x\), another common choice of principal range is \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left(\tfrac{\pi}{2}, \pi\right]\). In this text we use \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right)\) because it makes the differentiation formulas for the inverse secant simpler. When consulting other sources or software, always check which convention is in use, since different branch choices can lead to different values.</p>
+    </div>
+  </section>
+
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.4</span></p>
+    <div class="env-body">
+      <p>For \(\arccsc x\), another common choice of principal range is \(y \in \left[-\tfrac{\pi}{2}, 0\right) \cup \left(0, \tfrac{\pi}{2}\right]\). In this text we use \(y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]\) so that the chosen branch parallels the one selected for \(\arcsec x\). Once the principal range is fixed consistently, either convention gives a valid inverse function.</p>
+    </div>
+  </section>
+
+</article>

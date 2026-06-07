@@ -1,0 +1,83 @@
+/* ============================================================
+   figs.css — Chapter-1 figure panel layouts + booktabs tables.
+   Loaded after skin-hs.css. Generated SVGs already inherit
+   .axis/.curve/.refline/.dot/.axlab/.lab-curve/.lab-ref/.ptlab.
+   ============================================================ */
+
+/* each plot carries its native pixel width (style="width:Npx" from plot.js);
+   it never upscales, and shrinks to fit a narrow column via max-width:100%.
+   So a small diagram stays small (no forced page-break gaps) while wide/complex
+   plots fill the column. */
+.paper .fig-svg { height: auto; max-width: 100%; overflow: visible; }
+
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper .figure-art--grid { gap: 20px 16px; }
+.paper .figure-art--grid .fig-panel { flex: 1 1 150px; max-width: 210px; }
+
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note .katex { font-size: .98em; }
+
+/* ---------- KaTeX label overlay (positioned HTML inside foreignObject) ---------- */
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr {
+  position: relative; width: 100%; height: 100%;
+  font-family: var(--serif);
+}
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  /* ── overlap strategy ──────────────────────────────────────────────────
+     Labels are POSITIONED in clear space so they never sit on the curve — no
+     opaque plate hiding the graphics. This soft paper halo is only insurance:
+     it gently softens the meeting point if a label edge grazes a line, without
+     drawing a visible box over the blue curve. */
+  text-shadow:
+    0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl .katex { font-size: 1em; }
+/* colour roles — KaTeX inherits via currentColor; never override math italics */
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+
+/* ---------- booktabs-style tables (limit value tables) ---------- */
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl .katex { font-size: .98em; }
+
+/* ---------- chapter-level structure ---------- */
+/* sections are concatenated <article class="sec"> blocks */
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+
+/* chapter opener */
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+
+/* alignment override (Tweak: Justified / Left) */
+.align-left .skin-hs p,
+.align-left .skin-hs li { text-align: left; }
+

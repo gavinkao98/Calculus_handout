@@ -1,0 +1,155 @@
+<!-- §1.4 One-Sided and Infinite Limits. Content verbatim from ch01_foundations.tex. -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">1.4</span>One-Sided and Infinite Limits</h2>
+  </header>
+
+  <p>Near a point \(a\), a function can behave differently depending on which side \(x\) approaches from, and in some cases the values of the function do not approach any finite number at all. These two observations lead to one-sided limits and infinite limits.</p>
+
+  <h3 class="subsec-head">One-sided limits</h3>
+
+  <p>Sometimes we only want to consider one side of the approach to \(a\) — for instance because the function is defined by different formulas on the two sides, or because the graph jumps at \(a\).</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.10</span></p>
+    <div class="env-body">
+      <p>We write
+      \[ \lim_{x \to a^{-}} f(x) = L \]
+      and say that the <em>left-hand limit</em> of \(f(x)\) as \(x\) approaches \(a\) is \(L\) if \(f(x)\) approaches \(L\) as \(x\) approaches \(a\) through values less than \(a\). Similarly,
+      \[ \lim_{x \to a^{+}} f(x) = L \]
+      is the <em>right-hand limit</em>, describing the approach through values greater than \(a\).</p>
+    </div>
+  </section>
+
+  <figure class="figure" data-fig="one-sided-limits">
+    <figcaption><span class="fig-no">Figure 1.8</span> A function whose left-hand and right-hand limits at \(a\) are different.</figcaption>
+  </figure>
+
+  <p>The two one-sided limits together determine the two-sided limit.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.5</span><span class="env-name">Criterion for a two-sided limit</span></p>
+    <div class="env-body">
+      <p>\[ \lim_{x \to a} f(x) = L \quad \Longleftrightarrow \quad \lim_{x \to a^{-}} f(x) = L \ \text{ and } \ \lim_{x \to a^{+}} f(x) = L. \]</p>
+    </div>
+  </section>
+
+  <p>If the two one-sided limits differ, then the two-sided limit does not exist.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.9</span></p>
+      <div class="env-body">
+        <p>Let
+        \[ f(x) = \begin{cases} x + 1, & x < 2,\\[4pt] 4 - x, & x \ge 2. \end{cases} \]
+        Evaluate \(\displaystyle\lim_{x \to 2^{-}} f(x)\) and \(\displaystyle\lim_{x \to 2^{+}} f(x)\), and determine whether \(\displaystyle\lim_{x \to 2} f(x)\) exists.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>From the left we use the branch \(f(x) = x + 1\), so \(\displaystyle\lim_{x \to 2^{-}} f(x) = 3\).</p>
+        <p>From the right we use the branch \(f(x) = 4 - x\), so \(\displaystyle\lim_{x \to 2^{+}} f(x) = 2\).</p>
+        <p>Since the left-hand and right-hand limits differ, \(\displaystyle\lim_{x \to 2} f(x)\) does not exist.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Infinite limits</h3>
+
+  <p>In some cases, the values of \(f(x)\) do not approach any finite number as \(x \to a\). Instead, they grow arbitrarily large positive or arbitrarily large negative.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.10</span></p>
+      <div class="env-body">
+        <p>Consider \(f(x) = \dfrac{1}{x^{2}}\). What happens to \(f(x)\) as \(x \to 0\)?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>If \(x\) is close to \(0\), then \(x^{2}\) is a very small positive number, so \(\dfrac{1}{x^{2}}\) is very large. For instance,
+        \[ \frac{1}{(0.1)^{2}} = 100, \qquad \frac{1}{(0.01)^{2}} = 10{,}000. \]
+        The values of \(\dfrac{1}{x^{2}}\) grow without bound as \(x \to 0\), so no finite \(L\) satisfies the informal definition of the limit; the limit does not exist.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <p>To capture this behavior, we introduce the notation
+  \[ \lim_{x \to 0} \frac{1}{x^{2}} = \infty. \]
+  The symbol \(\infty\) does not represent a real number; it records that the function's values grow without bound.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.11</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be defined on both sides of \(a\), except possibly at \(a\) itself. We write
+      \[ \lim_{x \to a} f(x) = \infty \]
+      if the values of \(f(x)\) can be made arbitrarily large by taking \(x\) sufficiently close to \(a\), with \(x \neq a\). We call such a limit an <em>infinite limit</em>. Similarly,
+      \[ \lim_{x \to a} f(x) = -\infty \]
+      if the values of \(f(x)\) can be made arbitrarily large negative by taking \(x\) sufficiently close to \(a\), with \(x \neq a\).</p>
+    </div>
+  </section>
+
+  <p>One-sided versions,
+  \[ \lim_{x \to a^{-}} f(x) = \infty,\quad \lim_{x \to a^{+}} f(x) = \infty,\quad \lim_{x \to a^{-}} f(x) = -\infty,\quad \lim_{x \to a^{+}} f(x) = -\infty, \]
+  are defined analogously. The four cases are illustrated in Figure 1.9.</p>
+
+  <figure class="figure" data-fig="one-sided-infinite">
+    <figcaption><span class="fig-no">Figure 1.9</span> The four typical one-sided infinite limits.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">Vertical asymptotes</h3>
+
+  <p>Infinite limits are closely related to vertical asymptotes.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.12</span></p>
+    <div class="env-body">
+      <p>The vertical line \(x = a\) is called a <em>vertical asymptote</em> of the curve \(y = f(x)\) if at least one of the following holds:
+      \[ \lim_{x \to a^{-}} f(x) = \pm\infty \qquad \text{or} \qquad \lim_{x \to a^{+}} f(x) = \pm\infty. \]</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.11</span></p>
+      <div class="env-body">
+        <p>Does the curve \(y = \dfrac{2x}{x - 3}\) have a vertical asymptote?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The denominator is zero only at \(x = 3\), so \(x = 3\) is the only candidate. As \(x \to 3^{+}\), the denominator \(x - 3\) is a small positive number while the numerator \(2x\) is close to \(6\), so
+        \[ \lim_{x \to 3^{+}} \frac{2x}{x - 3} = \infty. \]
+        As \(x \to 3^{-}\), the denominator is a small negative number while the numerator is still close to \(6\), so
+        \[ \lim_{x \to 3^{-}} \frac{2x}{x - 3} = -\infty. \]
+        At least one one-sided limit is infinite, so the line \(x = 3\) is a vertical asymptote, as shown in Figure 1.10.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <figure class="figure" data-fig="vertical-asymptote">
+    <figcaption><span class="fig-no">Figure 1.10</span> The graph of \(y = \dfrac{2x}{x - 3}\) has a vertical asymptote at \(x = 3\).</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.12</span></p>
+      <div class="env-body">
+        <p>Guess the value of \(\displaystyle \lim_{x \to 0^{+}} \ln x\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>As \(x \to 0^{+}\), the values of \(\ln x\) decrease without bound, so
+        \[ \lim_{x \to 0^{+}} \ln x = -\infty. \]
+        Therefore \(x = 0\) is a vertical asymptote of the graph of \(y = \ln x\).<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+</article>

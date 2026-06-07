@@ -1,0 +1,94 @@
+/* ============================================================
+   theme.css — tweak-driven layer for the §1.1 reading page.
+   Loaded AFTER skins.css. JS sets the theme/density/figure classes
+   and --accent on #doc, and --fs-base / --lh-user / --serif on .paper.
+   Everything else derives here so dark-mode overrides keep working.
+   ============================================================ */
+
+#doc {
+  --accent: #1f4e79;
+  --stage-bg: #e9e6df;
+  background: var(--stage-bg);
+  min-height: 100vh;
+  transition: background .25s ease;
+}
+#doc.theme-dark { --stage-bg: #07080b; }
+
+.paper {
+  --c-primary: var(--accent);
+  --c-primary-bg: color-mix(in srgb, var(--accent) 9%, #fff);
+  --lh-base: var(--lh-user, 1.62);
+  transition: background .25s ease, color .25s ease;
+}
+
+/* strategy/caution panel borders track the accent in skin C */
+.skin-c .env-strategy { border-color: color-mix(in srgb, var(--c-primary) 28%, var(--rule)); }
+.skin-c .env-caution  { border-color: color-mix(in srgb, var(--c-caution) 28%, var(--rule)); }
+
+/* ---------- Dark theme (Midnight-leaning) ---------- */
+.theme-dark .paper {
+  --c-primary: color-mix(in srgb, var(--accent) 42%, #dce8ff);
+  --c-primary-bg: color-mix(in srgb, var(--accent) 30%, #0e1118);
+  --c-caution: #e8786a;
+  --c-caution-bg: color-mix(in srgb, #e8786a 22%, #0e1118);
+  --c-aux: #7e8598;
+  --c-axis: #5c6276;
+  --ink: #e9eaf1;
+  --ink-soft: #aab0c0;
+  --ink-faint: #6d7488;
+  --paper: #0d0f15;
+  --rule: #2a3142;
+  --rule-soft: #1d2331;
+  --panel: #161a24;
+  --panel-2: #12151d;
+  --panel-fig: #0f121a;
+}
+/* chips: keep label legible on whatever the spine color resolves to */
+.theme-dark .env-kicker { color: #0c0e13; }
+.theme-dark .env-solution .env-kicker,
+.theme-dark .env-proof .env-kicker { color: var(--ink-soft); }
+.theme-dark em { color: var(--ink); }
+
+/* ---------- Density: compact ---------- */
+.density-compact .paper { --lh-base: calc(var(--lh-user, 1.62) - 0.1); }
+.density-compact .skin-c .env-definition,
+.density-compact .skin-c .env-theorem,
+.density-compact .skin-c .env-proposition,
+.density-compact .skin-c .env-corollary,
+.density-compact .skin-c .workedexample,
+.density-compact .skin-c .env-remark,
+.density-compact .skin-c .env-strategy,
+.density-compact .skin-c .env-caution {
+  padding: 11px 15px; margin: 11px 0;
+}
+.density-compact .skin-c .env-proof { margin: 10px 0; }
+.density-compact .figure { margin: 1.05em 0; }
+.density-compact .paper p { margin-bottom: .6em; }
+.density-compact .subsec-head { margin: 1.3em 0 .5em; }
+
+/* ---------- skin-hs: dark-mode family accents ---------- */
+.theme-dark .skin-hs {
+  --a-concept:  #4fd0c3;   /* teal, lightened for dark paper */
+  --a-practice: #57c98a;   /* green */
+  --a-aside:    #8b91a3;   /* gray */
+  --a-strategy: #b79cf0;   /* violet */
+  --a-caution:  var(--c-caution);
+}
+/* outlined chips (transparent bg) must keep light text in dark mode */
+.theme-dark .skin-hs .env-remark .env-kicker,
+.theme-dark .skin-hs .env-exercise .env-kicker { color: var(--accent, var(--ink-soft)); }
+.theme-dark .skin-hs .env-remark .env-kicker { color: var(--a-aside); }
+
+/* ---------- skin-hs: compact density ---------- */
+.density-compact .skin-hs .env,
+.density-compact .skin-hs .workedexample { margin: .85em 0; }
+.density-compact .skin-hs .env-caution,
+.density-compact .skin-hs .env-strategy { padding: 12px 16px; margin: 1.05em 0; }
+.density-compact .skin-hs.tint-all .env-definition,
+.density-compact .skin-hs.tint-all .env-theorem,
+.density-compact .skin-hs.tint-all .env-proposition,
+.density-compact .skin-hs.tint-all .env-corollary,
+.density-compact .skin-hs.tint-all .env-remark { padding: 11px 15px; }
+
+/* ---------- Figures off ---------- */
+.hide-figures .figure { display: none; }

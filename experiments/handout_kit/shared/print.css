@@ -1,0 +1,72 @@
+/* ============================================================
+   print.css — fixed-sheet A4 handout. No pagination engine:
+   a small deterministic JS paginator packs content blocks into
+   .sheet elements; page numbers are real .sheet-footer nodes, so
+   they print in every browser. Loaded by "Chapter 1 (Print).html"
+   AFTER skin-hs.css + figs.css.
+   ============================================================ */
+
+/* one printed page = one fixed A4 sheet */
+@page { size: A4; margin: 0; }
+
+.sheet {
+  position: relative;
+  box-sizing: border-box;
+  width: 210mm;
+  height: 297mm;
+  /* top  outer-right  bottom  binding-left — wider left edge for hole-punch /
+     staple binding; content width = 210 − 24 − 18 = 168mm */
+  padding: 20mm 18mm 20mm 24mm;
+  background: #fff;
+  overflow: hidden;          /* guard; paginator keeps blocks within body */
+}
+.sheet-header {
+  position: absolute; top: 11mm; left: 24mm; right: 18mm;
+  font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
+}
+.sheet-footer {
+  position: absolute; bottom: 8.5mm; left: 0; right: 0;
+  text-align: center; font: 500 9pt "Inter", sans-serif; color: #82868f;
+}
+/* the body IS the paper surface; skin-hs descendant selectors match here */
+.sheet-body {
+  height: 100%;
+  --accent: #1f4e79;
+}
+.sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
+.sheet-body .page { padding: 0; max-width: none; margin: 0; }
+
+/* typographic scale for paper */
+.sheet-body.paper { font-size: 11pt; line-height: 1.55; }
+
+/* exact colour in print (tints, chips, label halos) */
+.sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* the first block on a sheet shouldn't carry its on-screen top margin */
+.sheet-body > :first-child { margin-top: 0 !important; }
+/* drop inter-section rule/padding — a new heading is separation enough */
+.sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
+
+/* QED: inline, never floated (float belongs to the screen skin) */
+.sheet-body .qed { float: none; display: inline-block; margin: 0 0 0 .4em; }
+.sheet-body .qed::after { margin-top: 0; vertical-align: -.02em; }
+.sheet-body .env-body::after { display: none; content: none; }
+
+/* split-block continuations (paginator): same left accent, no chip, hug the
+   piece above so a broken solution/proof still reads as one block */
+.sheet-body .env-cont { margin-top: 0; }
+.sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+
+/* ---------- on-screen preview of the sheets ---------- */
+@media screen {
+  body { background: #6f727b; margin: 0; }
+  .sheet { box-shadow: 0 3px 18px rgba(0, 0, 0, .3); margin: 9mm auto; }
+}
+
+/* ---------- real print ---------- */
+@media print {
+  body { background: #fff; margin: 0; }
+  .sheet { box-shadow: none; margin: 0; break-after: page; }
+  .sheet:last-child { break-after: auto; }
+  .print-toolbar, #boot { display: none !important; }
+}
