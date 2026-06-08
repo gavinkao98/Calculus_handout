@@ -130,10 +130,10 @@
 
 | 節 | ① seed | ①-verify | ② brief | ③ gate | ④ draft (sec-3-X.html) | ⑤ audit | ⑥ |
 |---|---|---|---|---|---|---|---|
-| §3.1 Sine & Cosine | ✅ `seed_ch03_s1.md` | ✅ p.3 掃描校對 | ✅ `brief_s31.md` | ✅ 2026-06-08 | ✅ `sec-3-1.html`＋章 opener＋`figures.js`（render 0 KaTeX err、print 7 頁；Claude 4-dim 對抗審 blocking=0） | ✅ Codex 2 runs（`_audit/result_s31*.json`；run1 2 blocking 修正→run2 **converged**，1 advisory 已套）| ⏳ 待使用者 |
+| §3.1 Sine & Cosine | ✅ `seed_ch03_s1.md` | ✅ p.3 掃描校對 | ✅ `brief_s31.md` | ✅ 2026-06-08 | ✅ `sec-3-1.html`＋章 opener＋`figures.js`（render 0 KaTeX err、print 7 頁；Claude 4-dim 對抗審 blocking=0） | ✅ Codex 2 runs（`_audit/result_s31*.json`；run1 2 blocking 修正→run2 **converged**，1 advisory 已套）| ✅ 2026-06-08 使用者簽核 |
 | §3.2 Chain Rule | ✅ `seed_ch03_s2.md`（手稿 pp.11,14–20） | ✅ 對掃描校對（3-lens 忠實度檢查＋使用者核；remainder-form 下標逐格對） | ✅ `brief_s32.md`（3-lens design panel 綜合） | ✅ 2026-06-08（Def Option B、intuition-first、收 Fig 3.2、批准 Ex 3.4+3.5） | ✅ `sec-3-2.html`＋Fig 3.2（composed-mapping）＋chapter fragments；render 驗證 screen 370 KaTeX/**0 err**、2 圖 hydrated；print 13 頁/0 overflow（§3.2 ≈6 頁） | ✅ **converged（兩模型 0 blocking）**。Claude 4-lens 對抗審 0 blocking（1 advisory `R₂(0)=0` 已修）＋ Codex gpt-5.5 ×2 runs（xhigh，`result_s32.json`/`_r2.json`）皆 `converged`：run1 0 findings、run2 1 advisory house_rule（level2 marker gap）已補 2 個 expansion 標記。幻覺未穿過任一模型。render 複驗 373 KaTeX/0 err | ✅ 2026-06-08 使用者簽核 |
 | §3.3 Applications | ⏳ | | | | | | |
 
-**下一步（換機／換 session 接續）**：§3.1 ④ 草稿已落地、Claude 4-dim 對抗審 blocking=0、render 乾淨，**待使用者 ⑥ 收斂閘**（並決定是否加跑 Codex ⑤，配額需同意）。⑥ 簽核後接 §3.2：開新 session 貼 [`PROMPT-s32-kickoff.md`](PROMPT-s32-kickoff.md)（從 ① intake 起，seed 尚未轉錄；續編起點見 §5 表「§3.2 起」欄：Theorem 3.3、Proposition 3.3、Example 3.4、Figure 3.2、Remark 3.2）。§3.3 之後再接 [`PROMPT-s33-kickoff.md`](PROMPT-s33-kickoff.md)（注意 sec′ 已併入 §3.1、D9 清單已更新）。
+**下一步（換機／換 session 接續）**：§3.1、§3.2 皆已過 ⑥ 收斂閘（2026-06-08 使用者簽核）。**接 §3.3 Applications**：開新 session 貼 [`PROMPT-s33-kickoff.md`](PROMPT-s33-kickoff.md)（從 ① intake 起，seed 待轉錄——手稿 pp.12–14 應用①②③ ＋ pp.21–22 HW 升格項；注意 sec′ 已併入 §3.1 Example 3.2(b)、D9 清單已移除 sec′）。續編起點見 §5 表「§3.3 起」欄：Theorem 3.4、Proposition 3.4、Definition 3.2、Example 3.6、Figure 3.3、Remark 3.3、Strategy 3.2（logarithmic differentiation）。
 
 **ROADMAP 回填**：各節 ⑥ resolved 的方向叉路（尤其 D3/D4 squeeze 與連續性處理、D5 Def2 placement、D10 implicit-diff）回填 [`../../../CONTENT_ROADMAP.md`](../../../CONTENT_ROADMAP.md) ch03 條目的「Open questions」。全章三節收斂後，經使用者確認可把 ch03 status 由 `draft` 標為「manuscript coverage complete（§3.1–§3.3 全數落地）」。
