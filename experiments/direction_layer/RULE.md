@@ -1,9 +1,9 @@
 # 擴寫方向準則（Expansion Direction Rule）—— 從手稿到一節的「方向層」
 
-> **狀態：v0.1 draft，2026-06-03，分支 `experiment/seed-converge`。設計稿，未經實機測試。**
+> **狀態：分支 `experiment/seed-converge`。** v0.1 設計（2026-06-03）已在 ch01 §1.1–§1.2、§4.2、ch02 §2.1–§2.5 端到端跑過六階並收斂（committed）；**尚未「畢業」成頂層正式 doc／落工具**（見 §6）。
 > 一句話定位：在「老師掃描手稿 → 完整講義一節」之間補上**方向層**，讓「**這是不是我要的方向**」從不可檢核變可檢核。
 >
-> **適用範圍：** 每節、每章同一套，治理講義內容的擴寫。**不碰** `chapters/*.tex`、**不碰** pipeline、未測前**不進**正式流程。
+> **適用範圍：** 每節、每章同一套，治理講義內容的擴寫。**不碰** `chapters/*.tex`、**不碰** pipeline、**畢業前**（見 §6）不進正式流程。
 >
 > **與既有文件的關係（引用、不複述）：**
 > - [`../../README.md`](../../README.md) §撰稿工作流程 —— Mode A/B/C、`% expansion:` 標記與類別、具名內容政策、密度校準、擴增稽核。本準則**保留**這些零件，只在頂層改寫流程敘事（見 §4）。
@@ -27,7 +27,7 @@
 | **軸一 擴寫自由度** | 手稿當「數學主軸」(wrap-around) ↔ 當「可自由改寫的種子」 | **hybrid：手稿是數學主軸，加法旋鈕轉大。** 新的具名結果／歷史／微妙證明一律人工查核。 |
 | **軸二 審查自動化** | 人單獨審 ↔ 模型 advisory 迴圈 | **advisory 迴圈 ＋ 人在閘**（折入實驗驗過的契約）。 |
 
-> 把手稿降為「可自由改寫的種子」是比「補例題」更大、也更危險的改動（放大幻覺風險，且核心幻覺假說尚未壓測）。而你要補的例題／應用是**低幻覺的加法**——不管手稿是主軸或種子都一樣安全。所以**種子化沒換到對應好處，卻付了風險**；本準則不採用。
+> 把手稿降為「可自由改寫的種子」是比「補例題」更大、也更危險的改動（放大幻覺風險，且核心幻覺假說壓測樣本仍有限，見 §5）。而你要補的例題／應用是**低幻覺的加法**——不管手稿是主軸或種子都一樣安全。所以**種子化沒換到對應好處，卻付了風險**；本準則不採用。
 
 **核心機制：** 把實驗已驗過的「**模型提案、人定奪**」契約，套到「**方向**」層，而且**前置到擴寫之前**——
 Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由人定死）→ 才擴寫 → 審查時對照 brief 查「**方向符合度**」。
@@ -50,7 +50,7 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
    你改／核可 brief ← 方向在此由人定死，先於任何擴寫
    ↓
 ④ expansion 擴寫
-   Claude 朝「已核可方向」寫 §X.tex；手稿數學＝主軸、加法全標 % expansion:
+   Claude 朝「已核可方向」寫該節草稿（目前 handout_kit sec-N-M.html）；手稿數學＝主軸、加法全標 expansion: 標記
    ↓
 ⑤ advisory review loop 審查迴圈                        [Codex advisory + Claude 改]
    Codex（訂閱·唯讀）審 → blocking = ｛數學／忠實度／★方向符合度★｝
@@ -70,6 +70,31 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
 - **④ 擴寫：** Claude 是**唯一寫手**，朝已核可方向擴寫；手稿數學為主軸，每一處非翻譯的增添都加 `% expansion:` 標記（沿用 README 的類別與政策）。
 - **⑤ advisory 審查迴圈：** Codex CLI（走訂閱、唯讀 reviewer）出 findings。**blocking 只留數學／忠實度／方向符合度**〔方向符合度＝blocking，流程選擇乙〕；格式（`% expansion:`／`\index`／register）一律 advisory、交 deterministic linter、**不准擋收斂**。停在**一次乾淨 audit**（別停在未經審核的 revise）。reasoning 模型 run-to-run 會飄 → 重要判斷**多跑取聯集**。（Codex 接法、訂閱認證、`codex exec`／schema、配額 caveat 的**具體實作**見 [`../seed_converge/PLAN_codex_subscription_loop.md`](../seed_converge/PLAN_codex_subscription_loop.md)。）
 - **⑥ 收斂閘：** 使用者最終裁決；格式 nit 交 linter。
+
+---
+
+## 1.5 跨 session 操作：per-chapter 編排檔（PLAN ＋ kickoff）
+
+§1 講「**一節**怎麼跑」；本節講「**一整章、跨多個 session 怎麼編排著跑**」。實證沿用：ch01 §1.1–§1.2、ch02 §2.1–§2.5、ch03（全套範本）。
+
+**工作模型：** 每節各開一個**新 session**（fresh context、無前對話記憶）。Claude 是**唯一寫手**（single-writer）；使用者只在三道人閘介入：`①-verify`（seed 忠實度）、`③`（方向閘）、`⑥`（收斂閘）。新 session 靠下列**版控編排檔**自帶脈絡、不靠對話記憶——這正是 root [`../../CLAUDE.md`](../../CLAUDE.md)「跨對話知識寫進會 git 的文檔、不寫本地 memory」的落地。
+
+**每章兩類編排檔**（住在 [`../handout_kit/`](../handout_kit/) 的 `exp-chNN/`；輸出目前走 handout_kit HTML，但本編排與輸出格式無關）：
+
+| 檔 | 是什麼 | 誰讀 |
+|---|---|---|
+| `PLAN-chNN.md` | **章層方向錨＋跨 session 狀態**：手稿↔ROADMAP 對應、逐節範圍、章層方向決策（提案、待各節 ③）、**編號 ledger**、章基礎建設、工程坑、逐節狀態表 | 每個新 session **第一個讀** |
+| `PROMPT-sNM-kickoff.md` | **每節一份的 bootstrap 提示詞**，整段貼進新 session 即自帶脈絡：讀檔清單（首為 PLAN）、該節從第幾階起、編號接續、內容範圍、章層決策提醒、題目政策、渲染、⑤ Codex、硬約束、起手 | 該節的新 session（使用者貼上） |
+
+**章層 intake（一次性、先於逐節）：** 手稿的**自有分節未必 = ROADMAP 分節**。開章先做一次「**手稿 → ROADMAP §X.M 對應**」寫進 PLAN：哪段去哪節、哪段已在別章（只 cross-ref、不重寫）、哪段在 Homework（待升格 worked example）。（ch03 即典型：手稿把 product rule 重證了一遍（已是 Ch2 §2.5）、tan′ 藏在 Homework、應用置於證明之前——照手稿頁序直切就會重複／漏接。）
+
+**該節從第幾階起：** seed 已轉錄（如 ch03 §3.1）→ kickoff 從 `②` 起；seed 未轉錄 → 從 `①` intake 起（kickoff 內含「讀手稿 pp.X–Y → seed → `①-verify`」）。
+
+**編號跨 session 交接（kit 無 auto-counter，最大風險點）：** 章內每型獨立 counter、跨節連續（Theorem 3.1, 3.2…）。後節 session **讀前節成品 HTML 末尾**確認各型 counter 用到哪、再續編；實際號回填 PLAN 的 ledger 表。交叉引用一律純文字，寫完**自查每個引用都對得到一個存在的 `env-num`**。
+
+**新章怎麼起：** 抄 ch02／ch03 範本，改章號／節號／ROADMAP 行號／手稿頁範圍即可——
+- master kickoff 範本：[`../handout_kit/PROMPT-ch02-kickoff.md`](../handout_kit/PROMPT-ch02-kickoff.md)（明示「ch03/ch04 換章號即可重用」）；
+- per-section 範本：`../handout_kit/exp-ch02/PROMPT-s2*-kickoff.md`；含 PLAN 的全套範本：`../handout_kit/exp-ch03/PLAN-ch03.md` ＋ `PROMPT-s3*-kickoff.md`。
 
 ---
 
@@ -141,17 +166,19 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
 
 ## 5. 已知取捨與開放問題
 
-- **核心幻覺假說未壓測（最關鍵）：** §1.1 太簡單（初等、無歷史、無微妙證明），驗不出「兩模型會不會一起替同一個幻覺背書」。要驗須換**高風險節**（具名結果／微妙證明，如 Bolzano–Weierstrass、Cauchy 收斂）。見 `seed_converge/SYNTHESIS.md §4`。
+- **核心幻覺假說：樣本仍少（最關鍵 open question）：** 「兩模型會不會一起替同一個幻覺背書」尚未在最硬的具名結果上窮盡。已跑的高風險節（§4.2 eˣ 連續＋指數律、ch02 §2.3 首個定理＋證明）中 auditor 都抓到真問題、**未見幻覺穿過**——正面但**樣本有限**的證據。仍待更多高風險節（如 Ch4 Bolzano–Weierstrass、Cauchy 收斂）持續壓測。見 `seed_converge/SYNTHESIS.md §4`。
 - **丟了「中立第三方評分」那層：** 實驗原讓 Claude 在迴圈外當中立評分；新流程把 Claude 拉進當寫手後，外部裁判只剩「人」。不致命（人本在閘），但可考慮**偶爾請第三模型（如 Gemini）對成稿抽查**，補回外部視角。
 - **配額管理：** 訂閱用量上限（per-5h／每週）是硬牆，且 CLI 撞牆後回退 API key 不可靠。per-section 限次、人在收斂閘是唯一可靠防線。別把架構建立在「撞牆無縫切 API」上。
-- **首跑已驗（§4.2，詳見 [`test/RESULT_s42.md`](test/RESULT_s42.md)）：** 流程在一個高風險節端到端跑通、收斂到 `blocking=0`，且第二模型抓到一處擴寫引入的過度推廣（正面數據點，**一個樣本**）。仍需**低風險對照節**與**更多高風險節**驗證，通過再把本檔「**畢業**」成頂層正式 doc（如 `CONTENT_DIRECTION.md`）並接上 linter／slash command。
+- **已多節端到端驗證（詳見 [`ch01/RESULT_ch01.md`](ch01/RESULT_ch01.md)、[`test/RESULT_s42.md`](test/RESULT_s42.md)、[`../handout_kit/exp-ch02/`](../handout_kit/exp-ch02/)）：** ch01 §1.1（低風險對照節）、§1.2（中風險，direction-conformance 抓到一個真 blocking＝漏畫 brief 指定的圖）、§4.2（高風險，第二模型抓到一處擴寫引入的過度推廣）、ch02 §2.1–§2.5（全數收斂 `blocking=0`）皆跑完六階。低風險對照與高風險節都已具備；唯一剩下的是把本檔「**畢業**」成頂層正式 doc（如 `CONTENT_DIRECTION.md`）並接上 linter／slash command（見 §6）。
 - **工程坑（§4.2 首跑實證）：** 組 ⑤ 的 prompt 時，非 ASCII（中文／Unicode 數學符號）會被 `Get-Content`（ANSI 預設）＋ PowerShell pipe 重編碼成亂碼，auditor 收到糊掉的 seed/brief。修法：`[IO.File]::ReadAllText` 讀 UTF-8 ＋ `cmd /c "codex exec - … < prompt"` 餵原始 bytes ＋ 一道 CJK 護欄。
 
 ---
 
-## 6. 下一步（驗收）
+## 6. 驗收進度與下一步
 
-1. 挑 2–3 節真手稿，跑完整六階流程（含 ③ 人方向閘、⑤ Codex advisory）。
-2. 至少含**一個高風險節**，正面壓測幻覺假說。
-3. 驗收門檻：方向 brief 輕到願意每節過；④ 擴寫朝向 brief；⑤ 能 audit→fix→re-audit 到 `blocking=0`、且 `direction-conformance` 真能擋住「漏寫／多寫」。
-4. 過了再把本檔畢業成頂層 doc、落工具。
+驗收門檻 1–3 **已達**，憑 ch01 §1.1–§1.2、§4.2、ch02 §2.1–§2.5 的端到端跑（committed）：
+
+1. ✅ 已跑 7 節真手稿的完整六階（含 ③ 人方向閘、⑤ Codex advisory）。
+2. ✅ 含高風險節（§4.2、ch02 §2.3 首個定理＋證明）正面壓測幻覺假說——auditor 抓到真問題、未見幻覺穿過（樣本仍少，見 §5）。
+3. ✅ 方向 brief 輕到每節都過；④ 擴寫朝向 brief；⑤ audit→fix→re-audit 收斂到 `blocking=0`；`direction-conformance` 擋下過真 blocking（§1.2 漏圖）。
+4. ⏳ **唯一剩下的**：把本檔**畢業**成頂層正式 doc（如 `CONTENT_DIRECTION.md`）並接上 linter／slash command（如 `/audit-section`）。
