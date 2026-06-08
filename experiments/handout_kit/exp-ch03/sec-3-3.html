@@ -1,0 +1,238 @@
+<!-- §3.3 Applications of the Chain Rule. Authored into handout-kit semantic
+     markup per CONTRACT-html-writing.md from exp-ch03/seed_ch03_s3.md
+     (manuscript pp. 12-14 applications ①②③ + pp. 21-22 Homework; seed
+     ①-verified 2026-06-08). Direction brief brief_s33.md approved at ③
+     (2026-06-08). Numbering is MANUAL (the kit has no auto-counter);
+     cross-references are plain prose. §3.3 is Chapter 3's FINAL section and
+     carries the chapter summary. It continues Chapter 3's per-type counters
+     from §3.2:
+
+       Example 3.6 (ln'), 3.7 (x^x), 3.8 (2^x), 3.9 ((x ln x − x)'),
+         3.10 (arcsin'), 3.11 (arccos'), 3.12 (arctan');
+       Strategy 3.2 (logarithmic differentiation);
+       Remark 3.3 (one lever, six derivatives);
+       Caution is unnumbered (arcsin/arccos domain).
+     Theorem 3.4, Proposition 3.4, Definition 3.2, Figure 3.3 are NOT minted
+     (left for later): §3.3's results are framed as worked examples, per the
+     manuscript and the PLAN ledger.
+
+     ③ decisions (2026-06-08): (1) arctan' Example 3.12 is self-authored,
+     approved to honor the Ch3 opener (sec-3-1) + §3.2 closing forward-ref +
+     ROADMAP core skill; same composition-identity method as arcsin/arccos.
+     (2) Results framed as worked examples, not Propositions (citability via
+     the chapter-summary recap). (3) No figure — the sin↔arcsin reflection is
+     Chapter 1 §1.2 definition material, recalled in prose. (4) All three
+     Homework promotions approved (arccos' 3.11, 2^x 3.8, (x ln x − x)' 3.9).
+     D8: ln is informal here (inverse of e^x via e^{ln x}=x); the rigorous
+     construction is deferred to Ch4 §4.5 — flagged once, in Example 3.6.
+     D10: no implicit-differentiation framework/vocabulary; the manuscript's
+     composition-identity route is used throughout. tan'/sec' are NOT redone
+     (done in §3.1 Example 3.2); arctan' only USES tan'=sec^2. The cross-ref
+     to Chapter 1 §1.2 (arcsin/arccos/arctan definitions) is generic prose —
+     Ch1 HTML is not yet drafted, so it resolves to no env-num by design (not
+     a dangling-reference defect). -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">3.3</span>Applications of the Chain Rule</h2>
+  </header>
+
+  <!-- expansion:intuition — load-bearing intuition: the chain rule run BACKWARD on a known identity extracts a derivative no direct rule reaches; concrete hook = ln, x^x, arcsin have nothing to attack head-on -->
+  <p>Sections 3.1 and 3.2 built the machinery; this section spends it. The chain rule (Theorem 3.3) was advertised as the tool that completes the differentiation toolkit, and here we see why: it reaches a whole family of derivatives that no rule of Chapter 2 can touch directly. We have no formula for \(\ln x\) to differentiate — it is known only as the function that undoes \(e^{x}\). The expression \(x^{x}\) carries its variable in <em>both</em> the base and the exponent, so neither the power rule nor the rule for \(e^{x}\) applies to it. And \(\arcsin\) has no elementary formula at all. Each of these functions is, in a sense, defined only indirectly.</p>
+
+  <p>Yet each one satisfies an <em>identity</em> assembled from functions we already know how to differentiate: \(e^{\ln x} = x\), or \(\ln(x^{x}) = x\ln x\), or \(\arcsin(\sin x) = x\) for \(x \in \bigl[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr]\). That is the whole idea of this section, used over and over: <em>to differentiate a function you cannot attack head-on, differentiate an identity it satisfies, then solve for the derivative you want.</em> It is the chain rule run backward — instead of pushing a known derivative forward through a composition (Strategy 3.1), we apply the chain rule to a known relation and read off the one derivative we do not yet have. The same move handles the inverse functions \(\ln\), \(\arcsin\), \(\arccos\), and \(\arctan\), and, through the closely related trick of <em>logarithmic differentiation</em>, awkward powers like \(x^{x}\).</p>
+
+  <h3 class="subsec-head">The logarithm and logarithmic differentiation</h3>
+
+  <!-- expansion:intuition — D8 forward fence: ln used informally as the inverse of e^x; rigorous construction deferred to Ch4 §4.5 -->
+  <p>We begin with the natural logarithm. Throughout this section we use \(\ln x\) informally, as the inverse of the exponential function — the number whose exponential is \(x\), so that \(e^{\ln x} = x\) for every \(x > 0\). This relation is all we need to find its derivative. The rigorous construction of \(\ln x\) as the inverse of \(e^{x}\), together with a proof that it is differentiable, is deferred to Chapter 4 (§4.5), which re-derives the formula below from the ground up.</p>
+
+  <!-- Example 3.6 — manuscript application ① (seed): d/dx ln x = 1/x via the identity e^{ln x}=x -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.6</span></p>
+      <div class="env-body">
+        <p>Show that \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) for \(x > 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Start from the identity that defines the logarithm, \(e^{\ln x} = x\), and differentiate both sides with respect to \(x\). The left side is a composition — the outer function is \(\exp\), the inner is \(\ln x\) — so by the chain rule (Theorem 3.3), using \(\dfrac{d}{du}e^{u} = e^{u}\) (Chapter 2, §2.4, Theorem 2.5),</p>
+        <p>\[ \frac{d}{dx}\,e^{\ln x} = e^{\ln x}\cdot\frac{d}{dx}\ln x = x\cdot\frac{d}{dx}\ln x, \]</p>
+        <p>where the last step uses \(e^{\ln x} = x\) once more. The right side is simply \(\dfrac{d}{dx}x = 1\). Equating the two,</p>
+        <p>\[ x\cdot\frac{d}{dx}\ln x = 1, \qquad\text{so}\qquad \frac{d}{dx}\ln x = \frac{1}{x} \quad (x > 0). \]</p>
+        <p>The unknown derivative was trapped inside a relation we could differentiate; one application of the chain rule and a division set it free.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — bridge: ln' is not just a formula, it powers a technique for variable exponents -->
+  <p>The derivative of the logarithm is more than one more entry in a table — it powers a technique. When a function carries its variable in the exponent, or is a sprawling product and quotient of many factors, taking its logarithm first turns powers into products and products into sums, all of which we can already differentiate. Applying \(\dfrac{d}{dx}\ln\) to both sides and then solving is called <em>logarithmic differentiation</em>.</p>
+
+  <!-- expansion:strategy — logarithmic differentiation (ROADMAP-assigned); the chapter's second Strategy box -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">3.2</span><span class="env-name">Logarithmic differentiation</span></p>
+    <div class="env-body">
+      <p>To differentiate a complicated positive expression \(y = f(x)\) — especially one with the variable in an exponent:</p>
+      <ol class="steps">
+        <li>Take natural logarithms of both sides: \(\ln y = \ln f(x)\).</li>
+        <li>Simplify the right side with the laws of logarithms — \(\ln(ab) = \ln a + \ln b\), \(\ln\frac{a}{b} = \ln a - \ln b\), \(\ln(a^{b}) = b\ln a\) — until only sums of simple terms remain.</li>
+        <li>Differentiate both sides with respect to \(x\). Since \(y\) is a function of \(x\), the left side is \(\dfrac{d}{dx}\ln y = \dfrac{y'}{y}\) by the chain rule.</li>
+        <li>Solve for \(y'\) and substitute \(y = f(x)\) back in: \(y' = f(x)\cdot\dfrac{d}{dx}\bigl[\ln f(x)\bigr]\).</li>
+      </ol>
+      <p>In particular this differentiates any power-of-a-function \(f(x)^{g(x)}\) (with \(f(x) > 0\)): its logarithm is \(g(x)\ln f(x)\); differentiate that, then multiply back by \(f(x)^{g(x)}\). The next example is the cleanest case.</p>
+    </div>
+  </section>
+
+  <!-- Example 3.7 — manuscript application ② (seed): d/dx x^x by logarithmic differentiation -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.7</span></p>
+      <div class="env-body">
+        <p>Differentiate \(W(x) = x^{x}\) for \(x > 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>There is no rule for a variable raised to a variable power, so we take logarithms. With \(W = x^{x} > 0\),</p>
+        <p>\[ \ln W = \ln\bigl(x^{x}\bigr) = x\ln x. \]</p>
+        <p>Differentiate both sides with respect to \(x\). On the left, the chain rule gives \(\dfrac{d}{dx}\ln W = \dfrac{W'}{W}\). On the right, the product rule (Chapter 2, §2.5, Theorem 2.6) together with \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) (Example 3.6) gives</p>
+        <p>\[ \frac{d}{dx}\bigl(x\ln x\bigr) = 1\cdot\ln x + x\cdot\frac{1}{x} = \ln x + 1. \]</p>
+        <p>Therefore \(\dfrac{W'}{W} = \ln x + 1\), and solving for \(W'\),</p>
+        <p>\[ \frac{d}{dx}x^{x} = W'(x) = W\,(\ln x + 1) = (1 + \ln x)\,x^{x} \quad (x > 0). \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — D9 promotion of manuscript Homework 2(iv): d/dx 2^x. Approved at ③ (2026-06-08). Short: reuses the rewrite-via-e idea. -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.8</span></p>
+      <div class="env-body">
+        <p>Differentiate \(2^{x}\) for \(x \in \mathbb{R}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Rewrite the base through \(e\). Since \(2 = e^{\ln 2}\), we have \(2^{x} = e^{x\ln 2}\) — a composition with inner function \(x\ln 2\) (a constant times \(x\)) and outer function \(\exp\). By the chain rule, with \(\dfrac{d}{du}e^{u} = e^{u}\),</p>
+        <p>\[ \frac{d}{dx}2^{x} = \frac{d}{dx}e^{x\ln 2} = e^{x\ln 2}\cdot\ln 2 = 2^{x}\ln 2. \]</p>
+        <p>The same rewrite gives \(\dfrac{d}{dx}a^{x} = a^{x}\ln a\) for any base \(a > 0\). This is also why \(e\) is the <em>natural</em> base: because \(\ln e = 1\), the extra factor disappears, and \(e^{x}\) alone among exponentials is its own derivative.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — D9 promotion of manuscript Homework 2(iii): d/dx (x ln x − x). Approved at ③ (2026-06-08). Short: reuses Example 3.7's (x ln x)' computation. -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.9</span></p>
+      <div class="env-body">
+        <p>Differentiate \(x\ln x - x\) for \(x > 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We met the first term inside Example 3.7: by the product rule and \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), we have \(\dfrac{d}{dx}(x\ln x) = \ln x + 1\). The second term has derivative \(1\). Hence</p>
+        <p>\[ \frac{d}{dx}\bigl(x\ln x - x\bigr) = (\ln x + 1) - 1 = \ln x \quad (x > 0). \]</p>
+        <p>The derivative is exactly \(\ln x\) — so \(x\ln x - x\) is an <em>antiderivative</em> of \(\ln x\), a fact worth filing away for when we turn to integration.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Derivatives of the inverse trigonometric functions</h3>
+
+  <!-- expansion:intuition — bridge: the same lever, now the identity comes from trigonometry -->
+  <p>The logarithm gave way because it is the inverse of \(e^{x}\): we differentiated the relation \(e^{\ln x} = x\). The inverse trigonometric functions yield to exactly the same lever — only now the identity comes from trigonometry. Each inverse function composes with its parent to give an identity, and differentiating that identity by the chain rule isolates the derivative we are after.</p>
+
+  <!-- Example 3.10 — manuscript application ③ (seed): d/dy arcsin y via the composition identity arcsin(sin x)=x; cos x ≥ 0 on the branch fixes the sign of the root -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.10</span></p>
+      <div class="env-body">
+        <p>Show that \(\dfrac{d}{dy}\arcsin y = \dfrac{1}{\sqrt{1 - y^{2}}}\) for \(y \in (-1, 1)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Recall from Chapter 1 that \(\arcsin\) is the inverse of sine restricted to the branch \(\bigl[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr]\): for \(-1 \le y \le 1\), \(\arcsin y\) is the unique angle \(x\) in that interval with \(\sin x = y\). On this branch the two functions undo each other, so in particular \(\arcsin(\sin x) = x\).</p>
+        <p>Differentiate this identity with respect to \(x\). Reading \(x = \arcsin(\sin x)\) as a composition and applying the chain rule (Theorem 3.3), with \(\dfrac{d}{dx}\sin x = \cos x\) (Theorem 3.1),</p>
+        <p>\[ 1 = \frac{d}{dx}\arcsin(\sin x) = (\arcsin)'(\sin x)\cdot\cos x, \]</p>
+        <p>so \((\arcsin)'(\sin x) = \dfrac{1}{\cos x}\), valid where \(\cos x \neq 0\) — that is, on the <em>open</em> interior \(x \in \bigl(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr)\), where \(\cos x > 0\). Writing \(y = \sin x\), this interior corresponds exactly to \(y \in (-1, 1)\), and there \(\cos x = \sqrt{1 - \sin^{2} x} = \sqrt{1 - y^{2}}\) — the positive root selected by \(\cos x > 0\). Therefore</p>
+        <p>\[ \frac{d}{dy}\arcsin y = \frac{1}{\sqrt{1 - y^{2}}} \quad (y \in (-1, 1)). \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:caution — arcsin/arccos derivative domain (ROADMAP pitfall): valid only on the OPEN interval (−1,1); endpoints are vertical tangents -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The formula \(\dfrac{1}{\sqrt{1 - y^{2}}}\) is valid only on the <em>open</em> interval \((-1, 1)\). At the endpoints \(y = \pm 1\) the denominator vanishes: the graph of \(\arcsin\) (and of \(\arccos\) below) has a vertical tangent there, so the derivative does not exist. Report these derivatives on the open interval, never the closed one.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — D9 promotion of manuscript Homework 1: d/dy arccos y, by the same method as Example 3.10. Approved at ③ (2026-06-08). Short, skip-setup; uses the correct identity arccos(cos x)=x (not the manuscript's loose cos⁻¹(cos y)=y). -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.11</span></p>
+      <div class="env-body">
+        <p>Show that \(\dfrac{d}{dy}\arccos y = \dfrac{-1}{\sqrt{1 - y^{2}}}\) for \(y \in (-1, 1)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The method is exactly that of Example 3.10, now applied to cosine. Recall that \(\arccos\) is the inverse of cosine on the branch \([0, \pi]\), so \(\arccos(\cos x) = x\) there. Differentiating with respect to \(x\), with \(\dfrac{d}{dx}\cos x = -\sin x\) (Theorem 3.2),</p>
+        <p>\[ 1 = (\arccos)'(\cos x)\cdot(-\sin x). \]</p>
+        <p>Writing \(y = \cos x\): on the <em>open</em> interior \(x \in (0, \pi)\) we have \(\sin x > 0\), so the division by \(-\sin x\) is legitimate and \(\sin x = \sqrt{1 - \cos^{2} x} = \sqrt{1 - y^{2}}\); this interior corresponds to \(y \in (-1, 1)\). Hence</p>
+        <p>\[ \frac{d}{dy}\arccos y = \frac{1}{-\sin x} = \frac{-1}{\sqrt{1 - y^{2}}} \quad (y \in (-1, 1)). \]</p>
+        <p>The only change from \(\arcsin\) is the minus sign, inherited from \(\cos' = -\sin\); the open-interval restriction of the Caution applies here unchanged.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — self-authored (③ 2026-06-08): d/dy arctan y, honoring the Ch3 opener + §3.2 forward-ref + ROADMAP core skill; same composition-identity method, using tan'=sec^2 from §3.1 Example 3.2 and the Pythagorean identity -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.12</span></p>
+      <div class="env-body">
+        <p>Show that \(\dfrac{d}{dy}\arctan y = \dfrac{1}{1 + y^{2}}\) for all \(y \in \mathbb{R}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Once more the same lever. Recall that \(\arctan\) is the inverse of tangent on the branch \(\bigl(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr)\), so \(\arctan(\tan x) = x\). Differentiating with respect to \(x\), and using \(\dfrac{d}{dx}\tan x = \sec^{2} x\) (Example 3.2),</p>
+        <p>\[ 1 = (\arctan)'(\tan x)\cdot\sec^{2} x, \qquad\text{so}\qquad (\arctan)'(\tan x) = \frac{1}{\sec^{2} x}. \]</p>
+        <p>Now write \(y = \tan x\) and use the Pythagorean identity \(\sec^{2} x = 1 + \tan^{2} x = 1 + y^{2}\):</p>
+        <p>\[ \frac{d}{dy}\arctan y = \frac{1}{1 + y^{2}}. \]</p>
+        <p>Here there is no domain restriction to worry about: as \(x\) ranges over \(\bigl(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr)\), \(y = \tan x\) ranges over all of \(\mathbb{R}\), and \(1 + y^{2}\) never vanishes. Unlike \(\arcsin\) and \(\arccos\), the arctangent is differentiable everywhere.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — unifying takeaway: one lever produced every derivative in the section -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.3</span><span class="env-name">One lever for many derivatives</span></p>
+    <div class="env-body">
+      <p>Look back at what just happened. We never differentiated \(\ln x\), \(x^{x}\), or an inverse trigonometric function <em>directly</em> — there was no rule to do so. In every case we found a known identity the function satisfies — \(e^{\ln x} = x\), \(\ln(x^{x}) = x\ln x\), \(\arcsin(\sin x) = x\) on its branch, and their kin — differentiated it by the chain rule, and solved for the one unknown. The chain rule is not only a tool for pushing derivatives forward through a composition; turned on an identity, it is a lever that pries loose derivatives we could reach in no other way.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <!-- expansion:summary — chapter-level summary (ch03's final section): derivative recap + arc of §3.1–§3.3 + forward fence to Ch4 §4.3/§4.5 and the MVT -->
+  <p>This section adds the following derivatives to our running table:</p>
+  <p>\[ \frac{d}{dx}\ln x = \frac{1}{x}, \qquad \frac{d}{dx}x^{x} = (1 + \ln x)\,x^{x}, \qquad \frac{d}{dx}a^{x} = a^{x}\ln a, \]</p>
+  <p>\[ \frac{d}{dy}\arcsin y = \frac{1}{\sqrt{1 - y^{2}}}, \qquad \frac{d}{dy}\arccos y = \frac{-1}{\sqrt{1 - y^{2}}}, \qquad \frac{d}{dy}\arctan y = \frac{1}{1 + y^{2}}. \]</p>
+  <p>(The logarithmic and power formulas hold for \(x > 0\), the \(a^{x}\) formula for any base \(a > 0\) and all \(x\), and the \(\arcsin\) and \(\arccos\) formulas only on the open interval \(-1 < y < 1\); \(\arctan\) is differentiable for every \(y\).)</p>
+  <p>With these, Chapter 3 is complete. It opened by breaking the one limit algebra could not touch, \(\lim_{\theta \to 0}\dfrac{\sin\theta}{\theta}\), with a piece of unit-circle geometry, and read off \(\sin' = \cos\) and \(\cos' = -\sin\) (§3.1). It then proved the chain rule, the rule for compositions that Chapter 2 had been missing (§3.2). Here that rule was turned loose to reach the derivatives of the logarithmic, exponential, and inverse trigonometric functions (§3.3). Together with the algebraic rules of Chapter 2, we can now differentiate essentially every function built by combining and composing the elementary ones.</p>
+
+  <p>Two debts remain, and both were taken on informally. We have used \(\dfrac{d}{dx}e^{x} = e^{x}\) from the casual series argument of Chapter 2, and we have treated \(\ln x\) as the inverse of \(e^{x}\) without ever constructing it. Chapter 4 settles both: it builds \(e^{x}\) rigorously and re-derives its derivative (§4.3), and it proves the Mean Value Theorem — the result that finally lets us define \(\ln x\) as the inverse of the strictly increasing exponential and recover \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) on solid ground (§4.5).</p>
+
+</article>

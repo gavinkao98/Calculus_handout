@@ -96,21 +96,22 @@
 
 - **規則**：章內**每型獨立 counter、跨節連續**（Theorem 3.1, 3.2, …；Example 3.1, 3.2, …；Figure 3.1, …）。Caution **無編號**（比照 ch02）。交叉引用**一律純文字**（"by Theorem 3.2"、"§3.1 的 `sinθ/θ→1`"、"Ch2 §2.5 的 product rule"）——無 `\cref`／`\eqref`。
 - **接續機制**：§3.2／§3.3 的 session **先讀前一節成品 HTML 末尾**（`sec-3-1.html`／`sec-3-2.html`）確認各型 counter 用到哪，再續編。寫完**自查每個編號引用都對得到一個存在的 `env-num`**（kit 唯一的真結構性稅，ch02 最大錯誤來源）。
-- **§3.1 已落定（④ 回填，2026-06-08）。§3.2／§3.3 以「§3.2 起」欄為續編起點：**
+- **§3.1／§3.2／§3.3 皆已落定（④/⑥ 回填，2026-06-08）。下表為各節實際用到的編號：**
 
-  | 型別 | §3.1 實際用到 | §3.2 實際用到 | §3.3 起 |
+  | 型別 | §3.1 實際用到 | §3.2 實際用到 | §3.3 實際用到 |
   |---|---|---|---|
-  | Theorem | `3.1`= sin′=cos、`3.2`= cos′=−sin | `3.3`= chain rule | **`3.4` 起**（讀 sec-3-2 末尾） |
-  | Proposition | `3.1`= sin & cos 連續、`3.2`= `lim sinθ/θ=1` | `3.3`= Def1⇔Def2 等價 | **`3.4` 起** |
-  | Definition | （§3.1 無；連續/odd-even cross-ref Ch1） | **`3.1`= remainder form（只此一個；Option B：limit form 的 Def 1 cross-ref §2.2、不另編號）** | **`3.2` 起** |
-  | Example | `3.1`= companion limit、`3.2`= tan′ & sec′（兩 part）、`3.3`= SHM | `3.4`= √(1+x²)&sin(x²)、`3.5`= √(1+sin²x) 巢狀 | **`3.6` 起**（ln/xˣ/arcsin/…） |
-  | Figure | `3.1`= 扇形不等式 | `3.2`= composed-mapping（inline SVG） | **`3.3` 起** |
-  | Remark | `3.1`= 導數四循環 | `3.2`= Leibniz form | **`3.3` 起** |
-  | Caution | 無編號（radian 慣例） | 無編號（忘內層導數） | 無編號 |
+  | Theorem | `3.1`= sin′=cos、`3.2`= cos′=−sin | `3.3`= chain rule | —（§3.3 無新定理；`3.4` 未用） |
+  | Proposition | `3.1`= sin & cos 連續、`3.2`= `lim sinθ/θ=1` | `3.3`= Def1⇔Def2 等價 | —（§3.3 無；`3.4` 未用） |
+  | Definition | （§3.1 無；連續/odd-even cross-ref Ch1） | **`3.1`= remainder form（只此一個；Option B：limit form 的 Def 1 cross-ref §2.2、不另編號）** | —（§3.3 無；arcsin/arccos/arctan 定義 cross-ref Ch1；`3.2` 未用） |
+  | Example | `3.1`= companion limit、`3.2`= tan′ & sec′（兩 part）、`3.3`= SHM | `3.4`= √(1+x²)&sin(x²)、`3.5`= √(1+sin²x) 巢狀 | `3.6`= ln′、`3.7`= xˣ、`3.8`= 2ˣ、`3.9`= (x ln x−x)′、`3.10`= arcsin′、`3.11`= arccos′、`3.12`= arctan′ |
+  | Figure | `3.1`= 扇形不等式 | `3.2`= composed-mapping（inline SVG） | —（§3.3 無圖；`3.3` 未用） |
+  | Remark | `3.1`= 導數四循環 | `3.2`= Leibniz form | `3.3`= one lever for many derivatives |
+  | Caution | 無編號（radian 慣例） | 無編號（忘內層導數） | 無編號（arcsin/arccos 域 `(−1,1)`） |
   | Strategy | （§3.1 無） | `3.1`= chain-rule decomposition | `3.2`= logarithmic differentiation |
 
   > **出入 PLAN 原提案（③ 核可）**：tan′ 採 Example（非 Theorem 3.3）→ §3.2 自 Theorem **3.3** 起；新增 **Proposition** 型（承載連續性與基本極限）；**sec′ 由 §3.3 移入 §3.1** Example 3.2(b)（同 quotient-rule 技巧）→ §3.3 的 D9 清單移除 sec′。交叉引用已自查（DOM audit 確認 0 dangling）。
   > **§3.2 落定（④/⑥ 回填，2026-06-08）**：採 **Option B**——limit form 的 Def 1 cross-ref §2.2、不另編號，§3.2 只用 **Definition 3.1**（remainder form）；等價收 **Proposition 3.3**。chain rule = **Theorem 3.3**；composed-mapping = **Figure 3.2**；Leibniz = **Remark 3.2**；decomposition = **Strategy 3.1**；worked example **3.4/3.5**（皆自創、③ 批准、§3.2 導數庫內）。⑤ 兩模型（Claude 4-lens＋Codex gpt-5.5 ×2 runs）皆 converged、0 blocking。交叉引用自查 0 dangling、render screen 0 KaTeX err／print 13 頁。
+  > **§3.3 落定（④/⑥ 回填，2026-06-08）**：applications 全寫 **worked example**（手稿/ledger framing）→ §3.3 **不 mint** 新 Theorem/Proposition/Definition/Figure（`3.4`/`3.4`/`3.2`/`3.3` 留給後續）。Example **3.6–3.12**（ln′/xˣ/2ˣ/(x ln x−x)′/arcsin′/arccos′/arctan′）；Strategy **3.2**（log diff）；Remark **3.3**；Caution 無編號（arcsin/arccos 域）。**arctan′（3.12）為 ③ 核可的自創**，補齊 §3.1 opener＋§3.2 收尾已 shipped 的 arctan 承諾（同 composition-identity 技巧、只用 §3.1 tan′=sec²）。**arccos 用正確 identity `arccos(cos x)=x`**（非手稿 loose 形，①-verify 經使用者授權更正）。⑤ 兩模型（Claude 5-lens＋Codex gpt-5.5 ×4 runs，xhigh，`result_s33{,_r2,_r3,_r4}.json`）：run1 1 blocking（`arcsin(sin x)=x` 未標分支，係我 ⑤ 編輯引入→**獨立 Codex 擋下**）＋advisory 皆修，run2/3/4 連三次 `converged` 0 blocking；幻覺未穿過任一模型。render screen 545 KaTeX/0 err、print 18 頁/0 overflow（§3.3 ≈5 頁）；交叉引用 0 dangling（Ch1/Ch2/Ch4 跨章 ref 為 generic prose、非 defect）。**本機無 node/codex 於 PATH**：render 走 Claude_Preview MCP；Codex 由 `%LOCALAPPDATA%\OpenAI\Codex\bin\codex.exe` 絕對路徑叫（MSIX WindowsApps 版受 ACL 鎖、不可直叫）。
 
 ---
 
@@ -132,8 +133,8 @@
 |---|---|---|---|---|---|---|---|
 | §3.1 Sine & Cosine | ✅ `seed_ch03_s1.md` | ✅ p.3 掃描校對 | ✅ `brief_s31.md` | ✅ 2026-06-08 | ✅ `sec-3-1.html`＋章 opener＋`figures.js`（render 0 KaTeX err、print 7 頁；Claude 4-dim 對抗審 blocking=0） | ✅ Codex 2 runs（`_audit/result_s31*.json`；run1 2 blocking 修正→run2 **converged**，1 advisory 已套）| ✅ 2026-06-08 使用者簽核 |
 | §3.2 Chain Rule | ✅ `seed_ch03_s2.md`（手稿 pp.11,14–20） | ✅ 對掃描校對（3-lens 忠實度檢查＋使用者核；remainder-form 下標逐格對） | ✅ `brief_s32.md`（3-lens design panel 綜合） | ✅ 2026-06-08（Def Option B、intuition-first、收 Fig 3.2、批准 Ex 3.4+3.5） | ✅ `sec-3-2.html`＋Fig 3.2（composed-mapping）＋chapter fragments；render 驗證 screen 370 KaTeX/**0 err**、2 圖 hydrated；print 13 頁/0 overflow（§3.2 ≈6 頁） | ✅ **converged（兩模型 0 blocking）**。Claude 4-lens 對抗審 0 blocking（1 advisory `R₂(0)=0` 已修）＋ Codex gpt-5.5 ×2 runs（xhigh，`result_s32.json`/`_r2.json`）皆 `converged`：run1 0 findings、run2 1 advisory house_rule（level2 marker gap）已補 2 個 expansion 標記。幻覺未穿過任一模型。render 複驗 373 KaTeX/0 err | ✅ 2026-06-08 使用者簽核 |
-| §3.3 Applications | ⏳ | | | | | | |
+| §3.3 Applications | ✅ `seed_ch03_s3.md`（手稿 pp.12–14＋21–22；3 份獨立轉錄對賬） | ✅ 對掃描校對（HW(4) 筆誤→`(x−1)⁴`、HW(1) arccos 恆等式逐字確認） | ✅ `brief_s33.md`（3-lens design panel 綜合） | ✅ 2026-06-08（補 arctan′、omit figure、D9 三項全收、results＝worked example） | ✅ `sec-3-3.html`＋chapter fragments（無圖）；render screen 545 KaTeX/**0 err**、print 18 頁/0 overflow（§3.3 ≈5 頁） | ✅ **converged（兩模型 0 blocking）**。Claude 5-lens 0 blocking（2 advisory 已修）＋Codex gpt-5.5 ×4 runs（xhigh，`result_s33{,_r2,_r3,_r4}.json`）：run1 1 blocking（`arcsin(sin x)=x` 未標分支，⑤ 編輯引入→Codex 擋下）＋advisory 皆修，run2/3/4 連三次 `converged`。幻覺未穿過任一模型 | ✅ 2026-06-08 使用者簽核 |
 
-**下一步（換機／換 session 接續）**：§3.1、§3.2 皆已過 ⑥ 收斂閘（2026-06-08 使用者簽核）。**接 §3.3 Applications**：開新 session 貼 [`PROMPT-s33-kickoff.md`](PROMPT-s33-kickoff.md)（從 ① intake 起，seed 待轉錄——手稿 pp.12–14 應用①②③ ＋ pp.21–22 HW 升格項；注意 sec′ 已併入 §3.1 Example 3.2(b)、D9 清單已移除 sec′）。續編起點見 §5 表「§3.3 起」欄：Theorem 3.4、Proposition 3.4、Definition 3.2、Example 3.6、Figure 3.3、Remark 3.3、Strategy 3.2（logarithmic differentiation）。
+**狀態（2026-06-08）**：§3.1／§3.2／§3.3 **三節皆過 ⑥ 收斂閘**（使用者簽核）——**ch03 手稿涵蓋完成**（§3.1–§3.3 全數落地）。編號 ledger（§5）與 ROADMAP ch03 open questions（D8 ln-informal／D10 implicit-diff）已回填。**唯一待辦**：ROADMAP ch03 status 由 `draft` 改標「manuscript coverage complete」——待使用者最終確認後執行（kickoff 約定「三節全收斂後經使用者確認」）。
 
 **ROADMAP 回填**：各節 ⑥ resolved 的方向叉路（尤其 D3/D4 squeeze 與連續性處理、D5 Def2 placement、D10 implicit-diff）回填 [`../../../CONTENT_ROADMAP.md`](../../../CONTENT_ROADMAP.md) ch03 條目的「Open questions」。全章三節收斂後，經使用者確認可把 ch03 status 由 `draft` 標為「manuscript coverage complete（§3.1–§3.3 全數落地）」。
