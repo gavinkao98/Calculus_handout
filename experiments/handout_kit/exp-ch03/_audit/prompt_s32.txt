@@ -1,0 +1,774 @@
+You are an ADVISORY adversarial reviewer of a calculus handout section (HTML format) that was expanded from the SEED below, following an approved DIRECTION BRIEF. You do NOT rewrite; you surface findings for a human.
+
+This section, §3.2 "The Chain Rule", is the chapter's HIGHEST-RISK section: it contains a remainder-form proof of the chain rule (epsilon-delta tail bound). Scrutinize the mathematics hard.
+
+Hunt especially for:
+(a) mathematical errors, fabricated theorems/identities, or over-generalized claims;
+(b) drift from the seed's mathematics (the seed IS the manuscript's mathematical backbone; the chain-rule proof must follow the manuscript's remainder-form chaining m1=g', m2=f'(g(x)), R3=m2*R1+R2(m1*h+R1(h)), NOT a substituted standard proof);
+(c) direction-conformance violations: did the draft cover what the brief specifies? did it include anything from the brief's "do-not-write" (kept under the heading 刻意不寫) list?
+
+Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):
+  category: math | faithfulness | direction-conformance | house_rule | register | other
+  blocking: true ONLY for:
+    - a real MATH ERROR or fabricated/over-generalized claim (category=math)
+    - DRIFT from the seed's mathematics (category=faithfulness)
+    - VIOLATION of direction-conformance: missing a brief-mandated item OR including a brief-forbidden item (category=direction-conformance)
+  Everything else MUST be blocking=false.
+
+Formatting / house-rule items (missing expansion comments, register/style nits) are caught by a downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); they MUST NOT block convergence.
+
+Also give each finding a level for human triage:
+  1 = real conflict (must fix)
+  2 = discoverability gap (add doc/comment)
+  3 = editorial drift (low priority)
+  4 = non-finding (mathematically equivalent paraphrase, stylistic preference)
+
+A mathematically equivalent paraphrase is NOT a finding. Numbering note: this is §3.2, the chapter's SECOND section; per-type counters CONTINUE from §3.1 (Theorem 3.3, Proposition 3.3, Example 3.4/3.5, Figure 3.2, Remark 3.2), while Definition 3.1 and Strategy 3.1 are the chapter's FIRST of their type (correct, not a discontinuity, because §3.1 used no Definition and no Strategy).
+
+Set "converged": true when there are ZERO blocking findings (math correct, faithful to seed, conforms to direction brief), even if advisory formatting nits remain.
+
+Return STRICT JSON only, no prose outside the JSON.
+
+=== SEED (manuscript transcription) ===
+
+# Seed — §3.2 The Chain Rule
+
+> Transcribed from the handwritten manuscript `2023-10-28-chainRule`
+> (manuscript pp. 11, 14–20; the chain-rule statement sits at the foot of p.11,
+> the differentiation Def 1 / Def 2 and the remainder-form proof on pp.14–20).
+> Manuscript's own section title: 「§ 乘法規則與連鎖規則」(Product rule and chain rule),
+> which spans pp.9–20 — but its product-rule and diff⇒continuous material (pp.9–11)
+> is already Ch2 (see "Cross-ref only" below; decision **D6**), and its applications
+> (ln x, xˣ, arcsin, pp.12–14) are routed to §3.3 (**D7**). Only the chain-rule
+> statement + the two definitions of differentiability + the proof belong to §3.2.
+> Faithful to the manuscript: structure, order, notation, subscripts, and the
+> deliberate "easy to see" gloss preserved.
+> seed 語法＝輕量可讀（反引號行內＋Unicode；見 RULE.md ①）。漂亮 KaTeX 留給 ④。
+> 可疑／非標準／手稿留白處標 **[請查核]**。
+
+---
+
+## Cross-ref only — NOT transcribed into §3.2 body (D6)
+
+The manuscript section opens (pp.9–11, before the chain rule) by **re-stating and
+re-proving** two results that Chapter 2 already owns. Per **D6** these are *not*
+transcribed into §3.2; §3.2 only cites them. Confirmed against the scan so the
+cross- references are accurate:
+
+- **Product rule** (p.9 statement, pp.10–11 proof): `d/dx(f g)|_{x₀} = f′(x₀)g(x₀) + f(x₀)g′(x₀)`.
+  Manuscript proof sets `P=fg`, splits the difference quotient as
+  `[f(x₀+h)(g(x₀+h)−g(x₀)) + g(x₀)(f(x₀+h)−f(x₀))]/h`, then takes limits.
+  → **Ch2 §2.5** (product rule). §3.2 does **not** re-prove.
+  - (The same `Example ①` here re-derives `d/dx xⁿ = n xⁿ⁻¹` inductively from the
+    product rule — also Ch2 material, not §3.2.)
+- **Lemma: differentiable ⟹ continuous** (p.10): proof
+  `lim_{x→x₀}(f(x)−f(x₀)) = lim ((f(x)−f(x₀))/(x−x₀))·(x−x₀) = f′(x₀)·0 = 0`.
+  (手稿首行下標寫 `lim_{x→0}`、餘行 `lim_{x→x₀}`——首行係明顯筆誤；此為 cross-ref-only 摘要、不入正文。)
+  → **Ch2 §2.3 Theorem 2.1** (differentiable ⟹ continuous). §3.2's chain-rule
+    discussion may cite it, but does **not** re-prove. **[請查核 cross-ref 號]** 確切
+    Ch2 節號／定理號（§2.5、§2.3 Thm 2.1）取自 `PLAN-ch03.md`；④ 寫 cross-ref 時對 Ch2 成品再核一次。
+
+> Manuscript applications on pp.12–14 (`d/dx ln x = 1/x`; `d/dx xˣ = (1+ln x)xˣ`;
+> `d/dy arcsin y = 1/√(1−y²)`) physically sit *between* the chain-rule statement
+> (p.11) and the proof (pp.14–20), i.e. the manuscript computes **before** it proves.
+> Per **D7** the handout reorders: §3.2 states + proves; the applications go to **§3.3**.
+> They are **not** transcribed in this seed.
+
+---
+
+## Chain rule — statement (manuscript p.11)
+
+**Chain rule.** Suppose `g(x)` is differentiable at `x₀`, and `f(y)` is differentiable
+at `y = g(x₀)`. Then `P(x) = f(g(x))` is differentiable at `x₀`, and
+
+`P′(x₀) = f′(g(x₀))·g′(x₀)`.
+
+> (記號正規化：手稿在**陳述與 Def 1／Def 2** 把固定點寫成大寫 `X₀`，在**證明**裡寫小寫 `x₀`／`x`；
+> 同一點，seed 一律用 `x₀`／`x`（與 §3.1 及全章一致）——純大小寫差異、無數學影響。)
+
+---
+
+## Two definitions of differentiability (manuscript pp.14–15)
+
+The proof is preceded by a 「Concept: Differentiation」 box giving **two** definitions
+of "differentiable at `x₀`" and asserting their equivalence.
+
+**Def 1 (limit form, p.14).** `f(x)` is differentiable at `x₀` if there **exists** a real
+number `m` such that
+
+`lim_{x→x₀} (f(x) − f(x₀))/(x − x₀) = m`.
+
+(手稿在 `∃` 旁有紅字「存在」標注。此 `m` 即 `f′(x₀)`。)
+
+**Def 2 (remainder form, p.15).** `f(x)` is differentiable at `x₀` if
+
+`f(x₀+h) = f(x₀) + mh + R(h)`
+
+for some function `R(h)` such that `lim_{h→0} R(h)/h = 0`. (此 `m` 亦即 `f′(x₀)`。)
+
+**Equivalence (p.15).** Manuscript states only: *"It is easy to see that Def 1 and
+Def 2 are equivalent."* — and gives **no** argument.
+> **[④ expansion]** 手稿只說 "easy to see"。④ 補一個忠實、簡短的**雙向**論證
+> （標 `expansion:formula`）：Def1⟹Def2 取 `R(h)=f(x₀+h)−f(x₀)−mh`、`R(h)/h→0`；
+> Def2⟹Def1 由 `(f(x₀+h)−f(x₀))/h = m + R(h)/h → m`。seed 不展開（忠於手稿留白）。
+
+> **方向**：Def 2 (remainder form) 是 chain rule 證明的工具（線性近似可串接）。
+> ROADMAP open question 確認 Def1/Def2 放此節（**D5**）。
+
+---
+
+## Chain rule — proof (manuscript pp.15–20, remainder form)
+
+> 手稿在證明裡以 `x` 代表那個固定點（即陳述中的 `x₀`）；下標 `m₁,m₂` 為兩段斜率、
+> `R₁,R₂,R₃` 為三段餘項。逐格對掃描核過。
+
+**Setup (p.15).** Start from `P(x+h) = f(g(x+h))`. Apply **Def 2 to `g` at `x`**:
+
+`g(x+h) = g(x) + m₁h + R₁(h)`,  where `m₁ = g′(x)` and `lim_{h→0} R₁(h)/h = 0`.
+
+So `P(x+h) = f( g(x) + m₁h + R₁(h) )`.
+
+**Apply Def 2 to `f` at `g(x)` (p.16).** With the increment `m₁h + R₁(h)` playing the
+role of `h`:
+
+`P(x+h) = f(g(x)) + m₂·[ m₁h + R₁(h) ] + R₂( m₁h + R₁(h) )`,
+
+where `m₂ = f′(g(x))` and `lim_{y→0} R₂(y)/y = 0`.
+
+**Collect terms (p.16).** Regroup the linear part and the leftover:
+
+`P(x+h) = f(g(x)) + m₁m₂·h + [ m₂R₁(h) + R₂(m₁h + R₁(h)) ]`
+
+`        = P(x) + ( g′(x)·f′(g(x)) )·h + R₃(h)`,
+
+where `R₃(h) = m₂R₁(h) + R₂(m₁h + R₁(h))`.
+> (手稿在中括號 `[ m₂R₁(h) + R₂(…) ]` 旁有紅字 `m₃` 標注，隨即正式命名為 `R₃(h)`；
+> 即此括號＝餘項 `R₃`。`m₁m₂ = g′(x)f′(g(x))`，`f(g(x)) = P(x)`。**[請查核]** 手稿係數
+> 順序寫成 `(g′(x)f′(g(x)))h`，與陳述 `f′(g(x))g′(x)` 同值（交換律），④ 保留手稿順序或統一即可。)
+
+So `P(x+h) − P(x) = (g′(x)f′(g(x)))h + R₃(h)`. By **Def 2**, `P` is differentiable at `x`
+with `P′(x) = g′(x)f′(g(x))` **provided** `lim_{h→0} R₃(h)/h = 0` — which is what remains
+to prove.
+
+**Goal (p.17):** prove `lim_{h→0} R₃(h)/h = 0`, where `R₃(h) = m₂R₁(h) + R₂(m₁h + R₁(h))`.
+
+**Step ① — the easy facts (p.17).** By differentiability of `g` at `x`:
+
+`lim_{h→0} R₁(h)/h = 0`,  and hence  `lim_{h→0} ( m₁h + R₁(h) ) = 0`.
+
+> (`m₂R₁(h)/h = m₂·(R₁(h)/h) → m₂·0 = 0`，`m₂` 為常數。**[請查核]** 手稿把 ε-δ 火力
+> 集中在較難的 `R₂(m₁h+R₁(h))/h` 項；`m₂R₁(h)/h → 0` 這一項手稿**未明寫**、由 ① 的
+> `R₁(h)/h→0` 隱含。④ 可一句點明（標 `expansion:formula`），不算改手稿。)
+
+**Step ② — the composed remainder term (pp.17–19), ε–δ.**
+
+- **(i)** Since `lim_{y→0} R₂(y)/y = 0`: for given `ε > 0`, there exists `δ > 0` such that
+  `| R₂(y)/y | < ε`  for  `0 < |y| < δ`.
+- **(ii)** Since `lim_{h→0} ( m₁h + R₁(h) ) = 0`: there exists `α > 0` such that
+  `| m₁h + R₁(h) | < δ`  for  `0 < |h| < α`.
+
+Then for `0 < |h| < α`, the manuscript splits into two cases (writing `m₁h+R₁(h)` out **in full**,
+no shorthand):
+
+`| R₂(m₁h+R₁(h)) | / |h| = 0`  if `m₁h+R₁(h) = 0`;
+
+`| R₂(m₁h+R₁(h)) | / |h| = ( |m₁h+R₁(h)|/|h| )·( |R₂(m₁h+R₁(h))|/|m₁h+R₁(h)| )`  if `m₁h+R₁(h) ≠ 0`.
+
+From here the manuscript jumps **directly** to (p.19, opening line):
+
+`| R₂(m₁h + R₁(h)) | / |h|  ≤  ( |m₁| + |R₁(h)|/|h| )·ε`.
+
+> **[④ expansion]** 手稿從上方乘積式**直接**寫出此下界，略去兩個標準補步（seed **不**靜默補、忠於手稿跳步）：
+> (a) 第二情形 `0 < |m₁h+R₁(h)| < δ`（由 (ii)），故由 (i) 得 `|R₂(m₁h+R₁(h))|/|m₁h+R₁(h)| < ε`；
+> (b) `|m₁h+R₁(h)|/|h| = |m₁ + R₁(h)/h| ≤ |m₁| + |R₁(h)|/|h|`（三角不等式）。④ 補這兩步時標 `expansion:formula`。
+
+Since `lim_{h→0} R₁(h)/h = 0`, there exists `α₁ ∈ (0, α)` such that `|R₁(h)|/|h| < 1` for
+`0 < |h| < α₁`. Therefore for `|h| ∈ (0, α₁)`:
+
+`| R₂(m₁h + R₁(h)) | / |h|  <  ( |m₁| + 1 )·ε`.
+
+**Conclude (p.20).** 手稿由 `| R₂(m₁h+R₁(h)) | / |h| < (|m₁|+1)ε`（`ε` 任意）**直接**收尾:
+
+`lim_{h→0} R₃(h)/h = 0`.
+
+This completes the proof of the chain rule.
+
+> (seed 補充組裝說明，**非手稿明文**——手稿在 p.20 直接寫出結論：
+> `R₃(h)/h = m₂·R₁(h)/h + R₂(m₁h+R₁(h))/h`；第一項 `→ m₂·0 = 0`（Step ① 的 `R₁(h)/h→0`），
+> 第二項由上界 `< (|m₁|+1)ε`、`ε` 任意而 `→ 0`；故和 `→ 0`。此層組裝即前面 `m₂R₁/h` 的 [請查核] 所指的手稿留白。)
+
+---
+
+## 手稿盤點摘要 / 刻意省略（給 ②③，非手稿正文）
+
+手稿 §3.2 區塊（「乘法規則與連鎖規則」pp.9–20）**有**：product rule（陳述＋證，pp.9–11）→
+diff⇒continuous lemma（陳述＋證，p.10）→ **chain rule 陳述**（p.11）→ 應用①②③（ln/xˣ/arcsin，
+pp.12–14）→ Concept: Differentiation 的 **Def 1／Def 2** ＋「easy to see」等價（pp.14–15）→
+**chain rule 證明**（remainder-form 串接 `m₁m₂` ＋ ε-δ 推 `R₃(h)/h→0`，pp.15–20）。
+
+**§3.2 正文只取**（手稿主軸，照原順序、原記號）：chain rule 陳述、Def 1／Def 2＋等價、remainder-form 證明。
+
+**§3.2 刻意不取**（餵 ②③／auditor 作 direction-conformance 反向檢查）：
+- product rule 的重新陳述／重證（手稿 pp.9–11）→ **cross-ref Ch2 §2.5**，不重證（**D6**）。
+- diff⇒continuous lemma 的重新陳述／重證（手稿 p.10）→ **cross-ref Ch2 §2.3 Theorem 2.1**，不重證（**D6**）。
+- 應用 ln x／xˣ／arcsin y（手稿 pp.12–14，置於證明之前）→ 全移 **§3.3**；§3.2 至多一句 forward 帶到 §3.3（**D7**）。
+- implicit-diff 框架：手稿 arcsin 走 composition-identity（`sin(sin⁻¹y)=y` 取導）→ 照手稿，不引入 implicit-diff（**D10**，且該段本就屬 §3.3）。
+
+**手稿留白／待 ④ 處理：**
+- Def1⇔Def2 等價：手稿只「easy to see」→ ④ 補忠實簡短雙向論證（`expansion:formula`），見上。
+- `m₂R₁(h)/h → 0`：手稿未明寫（由 ① 隱含）→ ④ 可一句點明（`expansion:formula`）。
+
+> **轉錄忠實度待你核對（①-verify）**：請逐字對掃描 pp.11、14–20，**特別** remainder-form 證明
+> 每一步的下標 `m₁/m₂/R₁/R₂/R₃`、`R₃=m₂R₁+R₂(m₁h+R₁(h))`、ε-δ 的 `δ/α/α₁` 與
+> `(|m₁|+1)ε` 收尾。上方 **[請查核]** 三處（cross-ref 號、係數順序、`m₂R₁/h` 留白）一併確認。
+> 通過後才進 ② 方向 brief。
+</content>
+</invoke>
+
+=== END SEED ===
+
+=== DIRECTION BRIEF (approved at gate 3) ===
+
+# Direction Brief — §3.2 The Chain Rule
+
+> ② 方向提案（RULE.md §2 九欄）。輸入：[`seed_ch03_s2.md`](seed_ch03_s2.md)（手稿 pp.11,14–20，①-verify ✅）
+> ＋ [`PLAN-ch03.md`](PLAN-ch03.md) 章層決策 D5/D6/D7/D10 ＋ ROADMAP「Chapter 3」條目。
+> 設計經 3-lens design panel（pedagogy／faithfulness+numbering／ROADMAP-alignment）壓測、本檔為綜合稿。
+> **③ 方向閘已核可（2026-06-08）**——本檔為 ④/⑤ 契約。§3.1 已過六階，為風格／密度／編號基準；§3.2 不負責章基礎建設（§3.1 已建）。
+> **③ 四項裁示（皆採建議案）：** (1) Definition＝**Option B**（limit form cross-ref §2.2、只編 Definition 3.1＝remainder form）；
+> (2) 敘事順序＝**intuition-first**（見結構草圖）；(3) **收 Figure 3.2**（composed mapping，inline SVG）；
+> (4) **批准 Example 3.4＋3.5**（自創、含解、§3.2 導數庫內）。低風險預設全照 B 末段。
+
+---
+
+## 手稿盤點（照原順序）
+- **chain rule 陳述**（p.11）：`g` 在 `x₀` 可微、`f` 在 `y=g(x₀)` 可微 ⟹ `P=f∘g` 在 `x₀` 可微、`P′(x₀)=f′(g(x₀))·g′(x₀)`。
+- **Def 1**（limit form，p.14）＝§2.2 既有定義之重述；**Def 2**（remainder form，p.15）`f(x₀+h)=f(x₀)+mh+R(h)`, `R(h)/h→0`。
+- **等價**：手稿只「easy to see」，**無論證**。
+- **chain rule 證明**（pp.15–20）：remainder-form 串接（`m₁=g′`、`m₂=f′(g(x))`、`R₃=m₂R₁+R₂(m₁h+R₁(h))`）＋ ε-δ 推 `R₃(h)/h→0`。
+- 具名人物／史實：**無**。§3.2 區塊內 worked example：**無**（手稿的應用 ln/xˣ/arcsin 置於證明前，已由 D7 移 §3.3）。
+- 手稿 pp.9–11 重證 product rule＋diff⇒cont：D6 只 cross-ref Ch2、**不轉正文**。
+
+## 薄度剖析
+| 區塊 | 狀態 |
+|---|---|
+| chain rule 陳述＋證明 | **夠**（手稿全證、remainder-form 串接標準且具啟發） |
+| 承重直覺（為何答案是乘積、naive 證法為何壞） | **薄**（手稿直接進 Def2 串接，沒點破「rates multiply＝linear approximations compose」、也沒講 naive 除以 `g(x+h)−g(x)` 遇增量為零會壞） |
+| Def1⇔Def2 等價 | **薄**（手稿「easy to see」留白）→ 補忠實雙向短證 |
+| composed-mapping 圖 | **無**（ROADMAP key figure、手稿無圖）→ expansion 候選 |
+| 用 chain rule 的 worked example | **無**（手稿 §3.2 區塊無；應用在 §3.3）→ decomposition example 候選 |
+| Leibniz form／decomposition strategy | **無**（ROADMAP 指派）→ expansion |
+| ε-δ 尾段的兩個跳步 | **薄**（手稿跳步）→ 補標準補步（`expansion:formula`），seed 已標 |
+
+## 範圍與深度
+- **吃手稿這一叢**：chain rule 陳述、Def2（remainder form）、Def1⇔Def2 等價、remainder-form 證明（ε-δ tail）。深度＝手稿的**直覺-嚴謹層**（只跑手稿那一個 tail bound 估計，**不**額外 ε-δ 化）。
+- **cross-ref 不重述（D6）**：product rule→Ch2 §2.5；diff⇒continuous→Ch2 §2.3 Theorem 2.1。開節一句帶過、不重證。
+- **forward-fence（一行、D7）**：ln/xˣ/arcsin/arctan → §3.3（含 logarithmic differentiation）。不做任何應用、不引入 implicit-diff（D10）。
+- **加法（待 ③）**：composed-mapping **Figure 3.2**、**Strategy 3.1**（decomposition）、**Example 3.4–3.5**（decomposition worked examples）、**Remark 3.2**（Leibniz form）、**Caution**（忘內層導數）。
+
+## 承重直覺（一節一個，領頭）
+**Rates multiply, because local linear approximations compose.** 在一點附近，可微函數≈其切線（把增量乘上斜率），誤差比增量更快趨零（這正是 remainder form）。把 `g` 餵進 `f`：`g` 把 `h` 放大 `g′(x)` 倍，`f` 再把 `g` 的輸出增量放大 `f′(g(x))` 倍——兩段放大相乘＝`f′(g(x))·g′(x)`。整個證明就是「兩段誤差 R 串接後仍比 `h` 更快趨零（`R₃(h)/h→0`）」的記帳。此單一心像**三用**：(a) 解釋答案為何是乘積、(b) 預先解釋 Leibniz `dy/dx=dy/du·du/dx`、(c) 即 remainder-form 證明的策略（R＝線性近似忽略的誤差）。Leibniz「約掉 du」看似證明其實不是——這是**警示**（收 Remark），不當領頭。
+
+## worked example 清單（**待 ③ 批准**；皆自創 worked example、含解；數學已核）
+| # | 內容 | 技巧 | 來源／範圍 |
+|---|---|---|---|
+| **Example 3.4** | (a) `√(1+x²)`、(b) `sin(x²)` | 單層 composition（Strategy 3.1）：outer-at-inner × inner。(a) `½(1+x²)^(−1/2)·2x = x/√(1+x²)`；(b) `cos(x²)·2x = 2x cos(x²)` | 自創；兌現章 opener／§3.1 收尾承諾的 `√(1+x²)`、`sin(x²)`。(b) 即「忘內層導數」陷阱現場。只用 power（Ch2）＋sin′（§3.1） |
+| **Example 3.5** | `√(1+sin²x)`（三層巢狀） | iterated chain rule（Strategy 3.1 step 5）：`½(1+sin²x)^(−1/2)·2sin x·cos x = (sin x cos x)/√(1+sin²x)` | 自創；**不同題型**（≥3 層巢狀，兌現 ROADMAP core skill「f(g(h(x)))」）。只用 sqrt/power（Ch2）＋sin′（§3.1） |
+- 序：單層（兌現承諾＋陷阱）→ 三層巢狀（迭代）。皆嚴格在 **§3.2 導數庫**內（sin/cos §3.1、power/product/quotient/eˣ Ch2）——**零** ln/arcsin/xˣ 滲漏（D7）。
+- 自創題政策（2026-06-07）：須 ③ 批准、題型與既有 example 不同、寫成含解 worked example、**不產 bare exercise**。**兩例皆待你 ③ 批准。**
+- 替代選項（待 ③）：Example 3.4 也可改 `sin(x²+1)`／`(x²+1)⁵`；Example 3.5 也可改 `cos((x²+1)⁴)`／`sin³(2x)`。
+
+## history / application
+- **history**：chain rule 的 Leibniz 記號可一句帶（`dy/dx=dy/du·du/dx`），但屬記號非可考史實 → 把它當 **Remark 3.2 的工作記號**處理（非 history）。**留白勝 padding**（同 §3.1）。
+- **application**：chain rule 本身即工具，worked example 即其應用；無另設真實情境錨之需。**留白**。
+
+## 強調 / takeaway
+- **概念樞紐**：chain rule＝「rates multiply」，由 **remainder form** 嚴格化（線性近似可串接）。remainder form 把「可微」轉成「可線性近似且誤差受控」，而線性近似乾淨地串接。
+- **可攜技能**：把任何 composition 拆成 outer∘inner、微分為 `f′(g(x))·g′(x)`、巢狀則迭代；認得野生的 composition、**永不漏內層導數**。
+
+## 刻意不寫（餵 auditor 作 direction-conformance 反向檢查）
+| 不寫什麼 | 理由 | 它該去哪 |
+|---|---|---|
+| product rule 重新陳述／重證 | 已 Ch2 §2.5；手稿 pp.9–11 重證了，我們只一句 cross-ref（D6） | Ch2 §2.5 |
+| diff⇒continuous 重新陳述／重證 | 已 Ch2 §2.3 Thm 2.1；證明用到時只 cross-ref（D6） | Ch2 §2.3 Thm 2.1 |
+| ln x／xˣ／arcsin/arctan 的**任何**應用 | chain rule 的應用屬下一節（D7） | §3.3（至多一句 forward） |
+| logarithmic differentiation | 同上（D7） | §3.3 |
+| implicit-differentiation 框架／詞彙 | 照手稿 composition-identity，不引入（D10） | 未來專章 |
+| 另創 chain rule 證法（如 naive 乘除 `g(x+h)−g(x)`，遇增量為零會壞） | 須照手稿 remainder-form 串接（m₁/m₂/R₁/R₂/R₃），忠實 | — |
+| 重新編號 limit form 為 Ch3 新 Definition | §2.2 已有；只 cross-ref（見 A. Option B） | §2.2 |
+| 額外 ε-δ 化（等價、極限律） | 超出手稿/本節深度（只跑手稿那個 tail bound） | Ch1 §1.6／附錄 |
+| bare your-turn exercise | README §防護欄禁、deferred | 自創一律含解 worked example |
+| 高階／多變數 chain rule、Faà di Bruno | 過度推廣 | — |
+
+## 篇幅帶（護欄非預算）
+**4–6 A4 print 頁**（無章 opener，比 §3.1 的 7 頁輕：1 Theorem＋1 長證明＋1 Definition＋1 Proposition（短證）＋1 Figure＋1 Strategy＋2 worked example＋1 Remark＋1 Caution）。密度風險＝chain rule 證明的 ε-δ tail（≈1–1.5 頁）；明顯超出 → 回查 tail 是否過度展開、或 §3.3 應用滲漏。砍 Example 3.5 → 約 4 頁低端。
+
+---
+
+## A. 編號 ledger 提案（§3.2；④ 落定後回填 PLAN §5）
+> 續編自 §3.1 末尾（讀 `sec-3-1.html` header ledger 確認）。**與 PLAN §5 一處出入**，請 ③ 裁示（見 B.1）：
+
+| 型別 | §3.2 提案 | 說明 |
+|---|---|---|
+| **Theorem** | `3.3`＝chain rule | headline；接 §3.1 Theorem 3.2 |
+| **Proposition** | `3.3`＝Def1⇔Def2 等價 | 接 §3.1 Proposition 3.2；編號讓證明可引用 |
+| **Definition** | `3.1`＝remainder form（**只此一個**） | **出入**：PLAN §5 暫列「Def 3.1/3.2（Def1/Def2）」；本提案採 **Option B**——limit form 只 cross-ref §2.2、不重新編號，只把 remainder form 編 Definition 3.1。理由：ROADMAP 註明 Def 1 已建於 §2.2，重編＝複製既有結果（違 D6 精神）。**待 ③ 裁 A/B。** |
+| **Example** | `3.4`＝單層、`3.5`＝三層巢狀 | 接 §3.1 Example 3.3；皆自創、待 ③ 批准 |
+| **Figure** | `3.2`＝composed mapping | 接 §3.1 Figure 3.1；待 ③ 取捨 |
+| **Remark** | `3.2`＝Leibniz form | 接 §3.1 Remark 3.1 |
+| **Strategy** | `3.1`＝chain-rule decomposition | 本章首個 Strategy（ROADMAP 指派） |
+| **Caution** | 無編號＝忘內層導數 | 沿用 ch02 慣例 |
+
+- 交叉引用一律純文字（"by Theorem 3.3"、"§2.2 的 limit 定義"、"Ch2 §2.5 product rule"、"Ch2 §2.3 Theorem 2.1"、"§3.1 的 sin′"）；④ 寫完自查每個引用都對得到存在 `env-num`。seed 已標 [請查核] cross-ref 確切號（§2.2/§2.3/§2.5），④ 對 Ch2 成品再核。
+
+## B. 待 ③ 裁示（design panel 三視角綜合；附建議）
+> **✅ ③ 已核可（2026-06-08）：四項皆採建議案——B.1 Option B、B.2 intuition-first、B.3 收 Figure 3.2、B.4 批准 3.4+3.5；低風險預設全照末段。**
+
+1. **Definition 處理（A/B）**：**建議 Option B**（limit form cross-ref §2.2、只編 Definition 3.1＝remainder form），替代 Option A（兩個 Definition 3.1 limit／3.2 remainder＝PLAN §5 原列）。三視角一致選 B。
+2. **敘事順序**：**建議「intuition-first」**——opener →（**Thm 3.3 陳述 → Figure → Remark → Strategy**，先讓規則可用）→ bridge →（**Def 3.1 → Prop 3.3 → Proof**，把 ε-δ tail 隔離）→（**Ex 3.4＋Caution → Ex 3.5**，練習）→ forward。手稿 statement→def→proof 主軸保持**連續**（忠實），usability（圖/記號/recipe）前置、練習殿後。替代＝§3.1 嚴格式（def＋proof 全先、其餘後）。
+3. **Figure 3.2（composed mapping）**：**建議收**（ROADMAP key figure、畫出承重直覺；inline SVG，比照 §3.1 Fig 3.1／§2.5 Fig 2.4，`buildPlot` 無三軸放大原語）。替代＝純散文（rules 節可無圖，如 §2.5 原本、後經你 override 加 Fig 2.4）。
+4. **Worked examples**：**建議批准 Example 3.4（`√(1+x²)`, `sin(x²)`）＋ 3.5（`√(1+sin²x)` 巢狀）**，皆自創、皆在 §3.2 導數庫內。或只留 3.4（§3.2 更輕）。
+
+**低風險預設（如你不另指，④ 照此走）：** 等價收 **Proposition 3.3**（非 inline）；Leibniz 收 **Remark 3.2**（非 Caution）；ε-δ tail **補手稿略去的兩步**（`expansion:formula`、自足）；陳述用 `f′(g(x))·g′(x)` 序、證明保手稿 `(g′(x)f′(g(x)))` 序並一句註交換律；Example 3.4 **先寫錯解 `cos(x²)` 再更正**以釘陷阱。
+
+## C. 章層決策 D5/D6/D7/D10 落地（確認）
+- **D5**：Def2（remainder form）在 §3.2 引入（chain rule 證明所需）、證 Def1⇔Def2 等價後只用 Def2 證 chain rule。→ 落 Definition 3.1＋Proposition 3.3。ROADMAP open question「Def2 placement」於此 **resolved**（⑥ 回填）。
+- **D6**：product rule（§2.5）／diff⇒continuous（§2.3 Thm 2.1）只 cross-ref、**不重證**。→ 開節一句、刻意不寫第 1–2 條。
+- **D7**：應用（ln/xˣ/arcsin）留 §3.3，§3.2 至多一句 forward。→ 刻意不寫第 3–4 條。
+- **D10**：不引入 implicit-diff 框架。→ 刻意不寫第 5 條。
+
+---
+
+## 結構草圖（④ 照此寫；待 ③ 定案；以下為 B.2 建議的 intuition-first 序）
+opener（composition wall＋rates-multiply 直覺；一句 D6 cross-ref §2.5/§2.3；一句 D7 forward §3.3）
+→ **Thm 3.3** chain rule 陳述（`P′(x₀)=f′(g(x₀))·g′(x₀)`）
+→ **Figure 3.2** composed mapping（三軸：小 h 經 `g′` 再經 `f′` 放大，斜率相乘）
+→ **Remark 3.2** Leibniz form `dy/dx=(dy/du)(du/dx)`（＋「約 du 是助記非證明」）
+→ **Strategy 3.1** chain-rule decomposition（5 步：認外層→寫 f(g(x))→`f′(g(x))`→×`g′(x)`→巢狀迭代）
+→ bridge（「規則已可用；接下來賺到它——需要可乾淨相乘的 differentiable 形式」）
+→ **Def 3.1** remainder form（一句 cross-ref §2.2 limit form，不重編）
+→ **Prop 3.3** Def1⇔Def2 等價（雙向短證，`expansion:formula`）
+→ **Proof of Thm 3.3**（remainder-form 串接 S1–S6：expand g→expand f→collect R₃→Step① `m₂R₁/h→0`→Step② ε-δ→conclude；補兩跳步）
+→ **Ex 3.4** 單層（`√(1+x²)`, `sin(x²)`）＋ **Caution** 忘內層導數
+→ **Ex 3.5** 三層巢狀（`√(1+sin²x)`）
+→ 收尾 forward §3.3（ln/arcsin/xˣ 解鎖）。
+> **替代序（§3.1 嚴格式，待 ③）**：opener →（Def 3.1＋Prop 3.3）→ Thm 3.3 → Strategy → Proof → Figure → Ex 3.4/3.5 → Remark/Caution → forward。
+
+=== END DIRECTION BRIEF ===
+
+=== DRAFT (HTML fragment to review) ===
+
+<!-- §3.2 The Chain Rule. Authored into handout-kit semantic markup per
+     CONTRACT-html-writing.md from exp-ch03/seed_ch03_s2.md (manuscript
+     pp. 11, 14–20). Direction brief brief_s32.md approved at ③ (2026-06-08).
+     Numbering is MANUAL (the kit has no auto-counter); cross-references are
+     plain prose. §3.2 continues Chapter 3's per-type counters from §3.1:
+
+       Theorem 3.3 (chain rule); Proposition 3.3 (Def1⇔Def2 equivalence);
+       Definition 3.1 (remainder form — the chapter's first Definition);
+       Example 3.4 (single composition), 3.5 (nested composition);
+       Figure 3.2 (composed mapping); Remark 3.2 (Leibniz form);
+       Strategy 3.1 (chain-rule decomposition — the chapter's first Strategy);
+       Caution is unnumbered (per ch02). §3.3 continues from Theorem 3.4,
+       Proposition 3.4, Definition 3.2, Example 3.6, Figure 3.3, Remark 3.3,
+       Strategy 3.2.
+
+     ③ decisions: Definition treatment = Option B (the §2.2 limit definition
+     is cross-referenced in prose, NOT re-numbered; only the remainder form is
+     minted, as Definition 3.1, with equivalence as Proposition 3.3) — D5.
+     Narrative order = intuition-first (statement + figure + remark + strategy
+     make the rule usable, then definition + equivalence + the ε-δ proof, then
+     worked examples). Figure 3.2 (composed mapping) included as inline SVG in
+     figures.js. Examples 3.4 + 3.5 approved (self-authored, in §3.2's
+     derivative inventory: sin/cos from §3.1, power from Ch2 — no ln/arcsin/x^x,
+     which are §3.3 per D7). Product rule and differentiable⇒continuous are
+     cross-referenced to Ch2 §2.5 / §2.3 Theorem 2.1, never re-proven (D6). No
+     implicit differentiation (D10). The proof follows the manuscript's
+     remainder-form chaining exactly; the few steps the manuscript leaves
+     implicit (m₂R₁(h)/h → 0; the ε-δ sub-steps) are filled and marked
+     expansion:formula. No exercises: self-authored problems are worked examples. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">3.2</span>The Chain Rule</h2>
+  </header>
+
+  <!-- expansion:intuition — load-bearing intuition: rates multiply because local linear approximations compose; this carries the statement, the Leibniz mnemonic, and the proof strategy at once -->
+  <p>Section 3.1 gave us the derivatives of the trigonometric functions, but only in their bare form. We can differentiate \(\sin x\), yet nothing so far reaches \(\sin(x^{2})\) or \(\sqrt{1 + x^{2}}\), where one function is fed <em>into</em> another. Chapter 2 supplied rules for sums, products, and quotients — but not for <em>composition</em>, the operation of applying one function to the output of another. The chain rule fills exactly this gap, and it is the rule that finally completes the differentiation toolkit.</p>
+
+  <p>The idea behind it fits in a single image. Near a point, a differentiable function behaves like its tangent line: it takes a small change in its input and scales it by its slope, up to an error that shrinks faster than the change itself. Now chain two such functions together. If \(g\) scales a small increment \(h\) by \(g'(x)\), and \(f\) then scales <em>that</em> by \(f'(g(x))\), the two magnifications stack — the composite scales \(h\) by the product \(f'(g(x))\,g'(x)\). That product is the chain rule, and the proof at the end of this section is nothing more than the careful check that the two error terms, once chained, are still negligible.</p>
+
+  <p>The manuscript this chapter follows develops the chain rule alongside two results that already belong to Chapter 2 — the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1). We take both as established and use them freely, without re-proving them here.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.3</span><span class="env-name">The chain rule</span></p>
+    <div class="env-body">
+      <p>Let \(g\) be differentiable at \(x_{0}\), and let \(f\) be differentiable at \(g(x_{0})\). Then the composition \(P = f \circ g\), given by \(P(x) = f(g(x))\), is differentiable at \(x_{0}\), and</p>
+      <p>\[ P'(x_{0}) = f'(g(x_{0}))\, g'(x_{0}). \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:figure — chain rule as composed mapping (ROADMAP key figure; registered in exp-ch03/figures.js as "composed-mapping") -->
+  <figure class="figure" data-fig="composed-mapping">
+    <figcaption><span class="fig-no">Figure 3.2</span> The chain rule as a composed mapping. A small input increment \(h\) at \(x_{0}\) is carried by \(g\) to an increment of about \(g'(x_{0})\,h\) at \(u_{0} = g(x_{0})\), and then by \(f\) to about \(f'(g(x_{0}))\,g'(x_{0})\,h\) at \(y_{0} = f(g(x_{0}))\). The two local slopes multiply — which is why the composite's derivative is their product.</figcaption>
+  </figure>
+
+  <!-- expansion:intuition — the Leibniz form (the working notation), with the mnemonic-not-proof caveat folded in (ROADMAP pitfall) -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.2</span><span class="env-name">The Leibniz form</span></p>
+    <div class="env-body">
+      <p>Writing \(u = g(x)\) for the inner variable and \(y = f(u)\) for the output, the chain rule takes the memorable Leibniz shape</p>
+      <p>\[ \frac{dy}{dx} = \frac{dy}{du}\cdot\frac{du}{dx}. \]</p>
+      <p>This is the form most often used in practice, and it reads as “the rate of \(y\) per \(x\) equals the rate of \(y\) per \(u\) times the rate of \(u\) per \(x\).” The apparent cancellation of \(du\) is a useful memory aid, but it is <em>not</em> a proof: \(\dfrac{dy}{du}\) and \(\dfrac{du}{dx}\) are limits, not fractions with a common factor to strike out. What actually makes the rule true is the argument given below, where the controlled error terms — not a literal \(du/du = 1\) — do the work.</p>
+    </div>
+  </section>
+
+  <!-- expansion:strategy — chain-rule decomposition (ROADMAP-assigned; the chapter's first Strategy box) -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">3.1</span><span class="env-name">Differentiating a composition</span></p>
+    <div class="env-body">
+      <p>To differentiate a composite expression, work from the outside in.</p>
+      <ol class="steps">
+        <li>Identify the <em>outermost</em> operation — the last thing you would carry out if you evaluated the expression at a number. Call it the outer function \(f\).</li>
+        <li>Whatever that operation is applied to is the inner function \(u = g(x)\).</li>
+        <li>Differentiate the outer function at the inner one, forming \(f'(g(x))\) — treat the inside as a single block and leave it untouched for now.</li>
+        <li>Multiply by the derivative of the inside: the answer is \(f'(g(x))\cdot g'(x)\).</li>
+        <li>If the inside is itself a composition, repeat steps 1–4 on it. Every layer contributes one slope factor, and the factors multiply.</li>
+      </ol>
+      <p>For \(\sqrt{1 + x^{2}}\), the last operation is the square root, so \(f(u) = \sqrt{u}\) and \(g(x) = 1 + x^{2}\); for \(\sin(x^{2})\), the outer function is \(\sin\) and the inner is \(x^{2}\).</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Why the rule is true</h3>
+
+  <!-- expansion:intuition — bridge: the rule is usable; to prove it we need the remainder form, which packages differentiability as a linear approximation that composes -->
+  <p>The rule is already usable — the rest of this section earns it. To prove that the two slopes really do multiply, we need to handle both functions' linear approximations at once, and for that it helps to repackage what “differentiable” means. Chapter 2 defined \(f\) to be differentiable at \(x_{0}\) when the difference quotient \(\dfrac{f(x_{0}+h) - f(x_{0})}{h}\) has a limit as \(h \to 0\) (§2.2); that limit is \(f'(x_{0})\). The following form says the same thing, but as a statement about approximation by a straight line.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">3.1</span><span class="env-name">Differentiability, remainder form</span></p>
+    <div class="env-body">
+      <p>A function \(f\) is <em>differentiable</em> at \(x_{0}\) if there is a number \(m\) and a function \(R\) such that</p>
+      <p>\[ f(x_{0} + h) = f(x_{0}) + m h + R(h), \qquad \lim_{h \to 0}\frac{R(h)}{h} = 0. \]</p>
+      <p>The number \(m\) is the derivative \(f'(x_{0})\).</p>
+      <p class="informal">Informally, \(f(x_{0}+h)\) equals its tangent-line value \(f(x_{0}) + m h\) plus an error \(R(h)\) that dies away faster than \(h\) does — the tangent line is a good fit to first order.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — frame the equivalence: the remainder form is not a new notion of derivative, just a repackaging of §2.2 -->
+  <p>This is not a new notion of derivative, only a new way of writing the old one.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.3</span><span class="env-name">Equivalence of the two forms</span></p>
+    <div class="env-body">
+      <p>The limit form of differentiability (§2.2) and the remainder form (Definition 3.1) are equivalent: \(f\) satisfies one at \(x_{0}\) if and only if it satisfies the other, and the number \(m\) is the same in both — namely \(f'(x_{0})\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:formula — the manuscript states only "it is easy to see that Def 1 and Def 2 are equivalent"; we supply the faithful short bidirectional argument -->
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Suppose first that the limit form holds, with \(\lim_{h \to 0}\dfrac{f(x_{0}+h) - f(x_{0})}{h} = m\). Define \(R(h) = f(x_{0}+h) - f(x_{0}) - m h\). Then</p>
+      <p>\[ \frac{R(h)}{h} = \frac{f(x_{0}+h) - f(x_{0})}{h} - m \;\longrightarrow\; m - m = 0, \]</p>
+      <p>so the remainder form holds with this same \(m\). Conversely, suppose the remainder form holds: \(f(x_{0}+h) = f(x_{0}) + m h + R(h)\) with \(R(h)/h \to 0\). Dividing by \(h\),</p>
+      <p>\[ \frac{f(x_{0}+h) - f(x_{0})}{h} = m + \frac{R(h)}{h} \;\longrightarrow\; m + 0 = m, \]</p>
+      <p>so the limit form holds, again with the same \(m\). The two forms therefore describe the same property and the same derivative.<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — orient the proof before the symbols: write both functions in remainder form, substitute, watch the linear parts multiply, collect the rest into one remainder -->
+  <p>With the remainder form available, the chain rule comes out by substitution. We expand \(g\) near \(x_{0}\) and \(f\) near \(g(x_{0})\), each as a linear part plus a small remainder; feeding one into the other, the linear parts multiply to give \(g'(x_{0})f'(g(x_{0}))\,h\), and everything left over gathers into a single remainder. The whole proof is then the one estimate that this leftover still vanishes faster than \(h\).</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Theorem 3.3</span></p>
+    <div class="env-body">
+      <p>We use the remainder form of differentiability (Definition 3.1), which by Proposition 3.3 is available for any differentiable function. Because \(g\) is differentiable at \(x_{0}\),</p>
+      <p>\[ g(x_{0} + h) = g(x_{0}) + m_{1} h + R_{1}(h), \qquad m_{1} = g'(x_{0}), \quad \lim_{h \to 0}\frac{R_{1}(h)}{h} = 0. \]</p>
+      <p>Because \(f\) is differentiable at \(g(x_{0})\), we may apply the remainder form to \(f\) with the increment \(m_{1} h + R_{1}(h)\) playing the role of \(h\):</p>
+      <p>\[ P(x_{0}+h) = f\bigl(g(x_{0}+h)\bigr) = f(g(x_{0})) + m_{2}\bigl[m_{1} h + R_{1}(h)\bigr] + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr), \]</p>
+      <p>where \(m_{2} = f'(g(x_{0}))\) and \(\lim_{y \to 0} R_{2}(y)/y = 0\). Collecting the term linear in \(h\) and bundling the rest into a single remainder \(R_{3}\),</p>
+      <p>\[ P(x_{0}+h) = P(x_{0}) + \bigl(g'(x_{0})\,f'(g(x_{0}))\bigr) h + R_{3}(h), \qquad R_{3}(h) = m_{2} R_{1}(h) + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr), \]</p>
+      <p>using \(f(g(x_{0})) = P(x_{0})\) and \(m_{1} m_{2} = g'(x_{0})f'(g(x_{0})) = f'(g(x_{0}))g'(x_{0})\), the same product in either order. By the remainder form, this says precisely that \(P\) is differentiable at \(x_{0}\) with \(P'(x_{0}) = f'(g(x_{0}))g'(x_{0})\) — <em>provided</em> we show</p>
+      <p>\[ \lim_{h \to 0}\frac{R_{3}(h)}{h} = 0. \]</p>
+      <!-- expansion:formula — the manuscript leaves the splitting and the easy term m₂R₁(h)/h → 0 implicit; we make it explicit -->
+      <p>Split the quotient into its two pieces, \(\dfrac{R_{3}(h)}{h} = m_{2}\dfrac{R_{1}(h)}{h} + \dfrac{R_{2}(m_{1} h + R_{1}(h))}{h}\). The first piece is easy: \(m_{2}\) is a constant and \(R_{1}(h)/h \to 0\), so \(m_{2} R_{1}(h)/h \to 0\). We also note for later that \(m_{1} h + R_{1}(h) \to 0\) as \(h \to 0\), since \(m_{1} h \to 0\) and \(R_{1}(h) \to 0\) (the latter because \(R_{1}(h)/h \to 0\)).</p>
+      <p>The second piece, \(R_{2}(m_{1} h + R_{1}(h))/h\), is the delicate one. Fix \(\varepsilon > 0\).</p>
+      <ul>
+        <li>Since \(R_{2}(y)/y \to 0\), there is a \(\delta > 0\) with \(\left\lvert R_{2}(y)/y \right\rvert < \varepsilon\) whenever \(0 < \lvert y \rvert < \delta\).</li>
+        <li>Since \(m_{1} h + R_{1}(h) \to 0\), there is an \(\alpha > 0\) with \(\lvert m_{1} h + R_{1}(h) \rvert < \delta\) whenever \(0 < \lvert h \rvert < \alpha\).</li>
+      </ul>
+      <p>Now fix \(h\) with \(0 < \lvert h \rvert < \alpha\). If \(m_{1} h + R_{1}(h) = 0\), then \(R_{2}(m_{1} h + R_{1}(h)) = R_{2}(0) = 0\) — the remainder relation \(f(g(x_{0}) + y) = f(g(x_{0})) + m_{2} y + R_{2}(y)\) at \(y = 0\) forces \(R_{2}(0) = 0\) — and the quotient is \(0\). Otherwise \(0 < \lvert m_{1} h + R_{1}(h) \rvert < \delta\), and we factor</p>
+      <p>\[ \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert h \rvert} = \frac{\lvert m_{1} h + R_{1}(h) \rvert}{\lvert h \rvert} \cdot \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert m_{1} h + R_{1}(h) \rvert}. \]</p>
+      <!-- expansion:formula — the manuscript jumps straight to the next bound; we supply the two standard steps (the ε bound from the first bullet, and the triangle inequality) it skips -->
+      <p>By the first bullet the second factor is less than \(\varepsilon\); and by the triangle inequality the first factor satisfies \(\dfrac{\lvert m_{1} h + R_{1}(h) \rvert}{\lvert h \rvert} = \left\lvert m_{1} + \dfrac{R_{1}(h)}{h} \right\rvert \le \lvert m_{1} \rvert + \dfrac{\lvert R_{1}(h) \rvert}{\lvert h \rvert}\). Hence, in either case,</p>
+      <p>\[ \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert h \rvert} \le \left( \lvert m_{1} \rvert + \frac{\lvert R_{1}(h) \rvert}{\lvert h \rvert} \right)\varepsilon. \]</p>
+      <p>Finally, since \(R_{1}(h)/h \to 0\), there is an \(\alpha_{1} \in (0, \alpha)\) with \(\lvert R_{1}(h) \rvert/\lvert h \rvert < 1\) for \(0 < \lvert h \rvert < \alpha_{1}\). For such \(h\),</p>
+      <p>\[ \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert h \rvert} < \bigl( \lvert m_{1} \rvert + 1 \bigr)\varepsilon. \]</p>
+      <p>As \(\varepsilon > 0\) was arbitrary and \(\lvert m_{1} \rvert + 1\) is a fixed constant, this second piece tends to \(0\) as well. Combining the two pieces, \(R_{3}(h)/h \to 0\), and the chain rule is proved.<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Using the rule</h3>
+
+  <!-- expansion:example — single composition; pays off √(1+x²) and sin(x²) promised in the chapter opener; part (b) stages the inner-derivative pitfall -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.4</span></p>
+      <div class="env-body">
+        <p>Differentiate (a) \(\sqrt{1 + x^{2}}\) and (b) \(\sin(x^{2})\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>For (a), the outermost operation is the square root, so \(f(u) = \sqrt{u} = u^{1/2}\) and \(g(x) = 1 + x^{2}\). By the power rule (Chapter 2), \(f'(u) = \tfrac12 u^{-1/2}\), and \(g'(x) = 2x\). By the chain rule,</p>
+        <p>\[ \frac{d}{dx}\sqrt{1 + x^{2}} = \frac{1}{2\sqrt{1 + x^{2}}}\cdot 2x = \frac{x}{\sqrt{1 + x^{2}}}. \]</p>
+        <p>For (b), the outer function is sine and the inner is \(x^{2}\), so with \(f'(u) = \cos u\) (Theorem 3.1) and \(g'(x) = 2x\),</p>
+        <p>\[ \frac{d}{dx}\sin(x^{2}) = \cos(x^{2})\cdot 2x = 2x\cos(x^{2}). \]</p>
+        <p>The factor \(2x\) is the inner derivative; dropping it and writing just \(\cos(x^{2})\) is the single most common chain-rule error, which the Caution below isolates.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:caution — the chapter's #1 pitfall (ROADMAP): forgetting the inner derivative -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The most common mistake with the chain rule is to differentiate the outer function and forget the inner derivative — writing \(\dfrac{d}{dx}\sin(g(x)) = \cos(g(x))\) instead of the correct \(\cos(g(x))\cdot g'(x)\). The inner factor \(g'(x)\) — the \(2x\) in \(\sin(x^{2})\) above — is never optional.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — a three-layer nested composition (ROADMAP core skill f(g(h(x)))); shows Strategy 3.1 iterated, slopes multiplying down the chain -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.5</span></p>
+      <div class="env-body">
+        <p>Differentiate \(\sqrt{1 + \sin^{2} x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This is a composition three layers deep: the square root of \(1 + \sin^{2} x\), in which \(\sin^{2} x = (\sin x)^{2}\) is itself a composition. Peeling from the outside in, the outer function is \(\sqrt{\,\cdot\,}\) applied to \(u = 1 + \sin^{2} x\); inside, \(\sin^{2} x\) is the square of \(v = \sin x\). Differentiating one layer at a time,</p>
+        <p>\[ \begin{aligned}
+          \frac{d}{dx}\sqrt{1 + \sin^{2} x}
+            &= \frac{1}{2\sqrt{1 + \sin^{2} x}}\cdot \frac{d}{dx}\bigl(1 + \sin^{2} x\bigr) \\[2pt]
+            &= \frac{1}{2\sqrt{1 + \sin^{2} x}}\cdot 2\sin x\cdot \cos x \\[2pt]
+            &= \frac{\sin x \cos x}{\sqrt{1 + \sin^{2} x}}.
+        \end{aligned} \]</p>
+        <p>Each layer contributes exactly one factor: \(\tfrac12 u^{-1/2}\) from the square root, \(2\sin x\) from squaring, and \(\cos x\) from the sine. Their product is the derivative — the slopes multiply down the chain, just as Figure 3.2 pictures.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — forward-ref to §3.3: the chain rule unlocks inverse-function and logarithmic derivatives (D7: named, none worked here) -->
+  <p>With the chain rule in hand the differentiation toolkit is essentially complete: any function assembled by composing the elementary functions of Chapters 2 and 3 can now be differentiated mechanically. In the next section the rule does something new — it becomes the key that unlocks derivatives we could not otherwise reach, those of the inverse functions \(\ln x\), \(\arcsin x\), and \(\arctan x\), and, through logarithmic differentiation, of expressions such as \(x^{x}\).</p>
+
+</article>
+
+=== END DRAFT ===
+
+=== FIGURE RENDERING NOTE ===
+This section HAS one figure, Figure 3.2 (the chain rule as a composed mapping), rendered from the entry "composed-mapping" in exp-ch03/figures.js. The figure source is embedded below so you can review it as if rendered. Do NOT report "figure missing": the figure exists and renders (verified live in the kit: 0 KaTeX errors, SVG hydrated with all axes, arrows, and labels). Plain SVG <text> labels in the figure are accepted house style (CONTENT_SPEC label-economy + the §3.1/§2.5 schematic-SVG precedent) and must NOT be flagged.
+
+WHAT Figure 3.2 SHOWS (a schematic, NOT a function plot): three stacked horizontal axes -- input x (top), intermediate u = g(x) (middle), output y = f(u) (bottom) -- drawn with their base points x0, u0, y0 aligned. A small increment h on the input axis is carried by g to a wider increment (about g'(x0)*h) on the u-axis, then by f to a wider one still (about f'(g(x0))*g'(x0)*h) on the y-axis: the increment widths GROW down the stack, picturing the two local slopes multiplying. The display stretch ratios drawn in the SVG are ILLUSTRATIVE ("about"); the exact algebra (net stretch = f'(g(x0))*g'(x0)*h) lives in the caption + body prose, which is correct first-order linear-approximation reasoning, NOT a false exactness claim. On-drawing labels are single symbols (x, u, y, h, x0, u0, y0) plus the two arrow factors (x g'(x0), x f'(g(x0))) -- label-economy compliant; do NOT flag as over- or under-labelled.
+
+--- BEGIN exp-ch03/figures.js (full; contains the §3.1 "sector-inequality" entry AND the §3.2 "composed-mapping" entry used by Figure 3.2) ---
+/* ============================================================
+   figures.js — Chapter 3 figure registry.
+   Each entry returns { layout, panels:[{svg, note}] }.
+   Most chapter figures use buildPlot() (shared/plot.js) for
+   function graphs. buildPlot has NO fill/sector primitive, so
+   region-area schematics (e.g. the §3.1 sector inequality) are
+   hand-built raw SVG here, inheriting the figure vocabulary
+   (.fig-svg, .ptlab, var(--c-primary)/--ink…) from skin-hs.css.
+   Labels are kept to single symbols (O, A, B, C, θ, 1); the
+   areas and the inequality live in the caption and body prose
+   (CONTENT_SPEC §10 "Label economy").
+   Appended across sections — never overwrite.
+   ============================================================ */
+(function () {
+
+  const FIGS = {
+
+    /* §3.1 — Sector inequality on the unit circle.
+       Three nested regions in the first quadrant ground the bound
+       cos θ ≤ (sin θ)/θ ≤ 1:
+         · triangle OAB  (inscribed)         = ½ sin θ
+         · sector  OAB   (pie slice)         = ½ θ
+         · triangle OAC  (out to tangent A)  = ½ tan θ,   C = (1, tan θ)
+       Drawn as three non-overlapping fills (triangle OAB, the
+       circular segment chord→arc, the corner arc→tangent) so the
+       eye reads OAB ⊆ sector ⊆ OAC directly. The manuscript names
+       the corner triangle ABC ( = OAC − OAB ); B lies on segment OC. */
+    "sector-inequality": () => {
+      const T = 40 * Math.PI / 180;            // display angle θ = 40°
+      const R = 120, Ox = 130, Oy = 170;       // circle radius / centre (SVG px, y down)
+      const c = Math.cos(T), s = Math.sin(T), t = Math.tan(T);
+      const Ax = Ox + R,        Ay = Oy;                 // A = (1, 0)
+      const Bx = Ox + R * c,    By = Oy - R * s;         // B = (cos θ, sin θ)
+      const Cx = Ox + R,        Cy = Oy - R * t;         // C = (1, tan θ), on tangent at A
+      const f1 = (n) => n.toFixed(1);
+      const rT = 30;                                     // angle-arc radius near O
+      const aEx = Ox + rT, aEy = Oy;                     // angle arc: start on OA
+      const aBx = Ox + rT * c, aBy = Oy - rT * s;        //            end toward OB
+      const mx = (Ox + Bx) / 2, my = (Oy + By) / 2;      // midpoint of OB (radius "1")
+
+      const svg =
+        `<svg viewBox="0 0 300 300" style="width:300px" class="fig-svg" role="img"` +
+        ` aria-label="First-quadrant wedge of the unit circle centred at O. The inscribed triangle OAB sits inside the sector OAB, which sits inside the larger triangle OAC reaching the tangent line at A, so that one half sine theta is at most one half theta is at most one half tangent theta.">` +
+        // --- region 3: corner outside the circle (arc → tangent), neutral slack ---
+        `<path d="M${f1(Ax)},${f1(Ay)} L${f1(Cx)},${f1(Cy)} L${f1(Bx)},${f1(By)} ` +
+          `A${R},${R} 0 0 1 ${f1(Ax)},${f1(Ay)} Z" fill="var(--ink)" fill-opacity="0.05" stroke="none"/>` +
+        // --- region 2: circular segment (chord AB → arc), lighter primary ---
+        `<path d="M${f1(Ax)},${f1(Ay)} A${R},${R} 0 0 0 ${f1(Bx)},${f1(By)} Z" ` +
+          `fill="var(--c-primary)" fill-opacity="0.09" stroke="none"/>` +
+        // --- region 1: inscribed triangle OAB, primary ---
+        `<polygon points="${f1(Ox)},${f1(Oy)} ${f1(Ax)},${f1(Ay)} ${f1(Bx)},${f1(By)}" ` +
+          `fill="var(--c-primary)" fill-opacity="0.17" stroke="none"/>` +
+        // --- unit circle (context) ---
+        `<circle cx="${Ox}" cy="${Oy}" r="${R}" fill="none" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        // --- tangent segment A→C (vertical tangent at A) ---
+        `<line x1="${f1(Ax)}" y1="${f1(Ay)}" x2="${f1(Cx)}" y2="${f1(Cy)}" stroke="var(--ink)" stroke-width="1.4"/>` +
+        // --- ray O→B→C (radius OB extended to the tangent at C) ---
+        `<line x1="${f1(Ox)}" y1="${f1(Oy)}" x2="${f1(Cx)}" y2="${f1(Cy)}" stroke="var(--ink)" stroke-width="1.4"/>` +
+        // --- radius OA ---
+        `<line x1="${f1(Ox)}" y1="${f1(Oy)}" x2="${f1(Ax)}" y2="${f1(Ay)}" stroke="var(--ink)" stroke-width="1.4"/>` +
+        // --- chord AB (edge of the inscribed triangle) ---
+        `<line x1="${f1(Ax)}" y1="${f1(Ay)}" x2="${f1(Bx)}" y2="${f1(By)}" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        // --- right-angle tick at A (tangent ⊥ radius) ---
+        `<path d="M${f1(Ax - 9)},${f1(Ay)} L${f1(Ax - 9)},${f1(Ay - 9)} L${f1(Ax)},${f1(Ay - 9)}" ` +
+          `fill="none" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        // --- angle θ arc at O ---
+        `<path d="M${f1(aEx)},${f1(aEy)} A${rT},${rT} 0 0 0 ${f1(aBx)},${f1(aBy)}" ` +
+          `fill="none" stroke="var(--ink)" stroke-width="1.1"/>` +
+        // --- dots at O, A, B, C ---
+        `<circle cx="${f1(Ox)}" cy="${f1(Oy)}" r="2.5" class="dot"/>` +
+        `<circle cx="${f1(Ax)}" cy="${f1(Ay)}" r="2.5" class="dot"/>` +
+        `<circle cx="${f1(Bx)}" cy="${f1(By)}" r="2.5" class="dot"/>` +
+        `<circle cx="${f1(Cx)}" cy="${f1(Cy)}" r="2.5" class="dot"/>` +
+        // --- labels (single symbols; areas/inequality in caption + prose) ---
+        `<text x="${f1(Ox - 9)}" y="${f1(Oy + 5)}" text-anchor="end" class="ptlab" font-style="italic">O</text>` +
+        `<text x="${f1(Ax + 8)}" y="${f1(Ay + 16)}" text-anchor="middle" class="ptlab" font-style="italic">A</text>` +
+        `<text x="${f1(Bx - 10)}" y="${f1(By - 6)}" text-anchor="end" class="ptlab" font-style="italic">B</text>` +
+        `<text x="${f1(Cx + 9)}" y="${f1(Cy + 4)}" text-anchor="start" class="ptlab" font-style="italic">C</text>` +
+        `<text x="${f1(Ox + rT + 9)}" y="${f1(Oy - 7)}" text-anchor="start" class="ptlab" font-style="italic">θ</text>` +
+        `<text x="${f1(mx - 11)}" y="${f1(my - 3)}" text-anchor="end" class="ptlab">1</text>` +
+        `</svg>`;
+
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §3.2 — The chain rule as a composed mapping.
+       Three stacked horizontal axes (input x, intermediate u = g(x),
+       output y = f(u)). A small increment h at the aligned base point is
+       carried by g to a wider increment at u₀, then by f to a wider one
+       still at y₀: the increment widths grow because the two local slopes
+       g'(x₀), f'(g(x₀)) multiply. Single-symbol labels (x, u, y, h, x₀, u₀,
+       y₀) plus the two arrow factors; the algebra (net stretch f'·g'·h)
+       lives in the caption and body prose (CONTENT_SPEC §10). buildPlot has
+       no multi-axis / propagation-arrow primitive, so this is raw SVG. */
+    "composed-mapping": () => {
+      const ax1 = 34, ax2 = 276;                 // axis horizontal extent
+      const yIn = 46, yMid = 140, yOut = 234;    // input / intermediate / output axes (SVG px, y down)
+      const bx = 92;                             // base points x₀, u₀, y₀ (drawn aligned)
+      const inEnd = bx + 26;                     // input increment width = h
+      const midEnd = bx + 42;                    // stretched by g'(x₀)   (display ratio ≈ 1.6)
+      const outEnd = bx + 63;                    // stretched again by f'(g(x₀))  (≈ 1.5)
+      const f1 = (n) => n.toFixed(1);
+
+      const axis = (y) =>                        // axis line with a right arrowhead
+        `<line x1="${ax1}" y1="${y}" x2="${ax2}" y2="${y}" stroke="var(--ink)" stroke-width="1.3"/>` +
+        `<polygon points="${ax2},${y} ${ax2 - 7},${y - 3.5} ${ax2 - 7},${y + 3.5}" fill="var(--ink)"/>`;
+      const inc = (y, xe) =>                      // increment highlight bx → xe
+        `<line x1="${bx}" y1="${y}" x2="${f1(xe)}" y2="${y}" stroke="var(--c-primary)" stroke-width="3.6" stroke-linecap="round"/>`;
+      const arrow = (x1, y1, x2, y2) =>          // downward map arrow with arrowhead
+        `<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="var(--ink-soft)" stroke-width="1.3"/>` +
+        `<polygon points="${f1(x2)},${f1(y2)} ${f1(x2 - 3.4)},${f1(y2 - 6.5)} ${f1(x2 + 3.4)},${f1(y2 - 6.5)}" fill="var(--ink-soft)"/>`;
+
+      const svg =
+        `<svg viewBox="0 0 300 275" style="width:300px" class="fig-svg" role="img"` +
+        ` aria-label="Three stacked horizontal axes: an input axis x, an intermediate axis u equal to g of x, and an output axis y equal to f of u. A small increment h at the base point x-zero is carried by g to a wider increment at u-zero, and by f to a wider increment still at y-zero, so the two slopes multiply.">` +
+        // base-point alignment guide
+        `<line x1="${bx}" y1="${yIn}" x2="${bx}" y2="${yOut}" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>` +
+        // three axes
+        axis(yIn) + axis(yMid) + axis(yOut) +
+        // increment highlights (growing widths show the magnification)
+        inc(yIn, inEnd) + inc(yMid, midEnd) + inc(yOut, outEnd) +
+        // map arrows: g (x → u) and f (u → y)
+        arrow(inEnd, yIn + 7, midEnd, yMid - 7) +
+        arrow(midEnd, yMid + 7, outEnd, yOut - 7) +
+        // 'h' bracket above the input increment
+        `<path d="M${bx},${yIn - 7} L${bx},${yIn - 11} L${f1(inEnd)},${yIn - 11} L${f1(inEnd)},${yIn - 7}" ` +
+          `fill="none" stroke="var(--ink)" stroke-width="1"/>` +
+        // base-point dots
+        `<circle cx="${bx}" cy="${yIn}" r="2.5" class="dot"/>` +
+        `<circle cx="${bx}" cy="${yMid}" r="2.5" class="dot"/>` +
+        `<circle cx="${bx}" cy="${yOut}" r="2.5" class="dot"/>` +
+        // axis variable labels
+        `<text x="${ax2 - 4}" y="${yIn - 8}" text-anchor="end" class="ptlab" font-style="italic">x</text>` +
+        `<text x="${ax2 - 4}" y="${yMid - 8}" text-anchor="end" class="ptlab" font-style="italic">u</text>` +
+        `<text x="${ax2 - 4}" y="${yOut - 8}" text-anchor="end" class="ptlab" font-style="italic">y</text>` +
+        // 'h' label
+        `<text x="${f1((bx + inEnd) / 2)}" y="${yIn - 15}" text-anchor="middle" class="ptlab" font-style="italic">h</text>` +
+        // base-point labels
+        `<text x="${bx - 7}" y="${yIn + 16}" text-anchor="end" class="ptlab" font-style="italic">x₀</text>` +
+        `<text x="${bx - 7}" y="${yMid + 16}" text-anchor="end" class="ptlab" font-style="italic">u₀</text>` +
+        `<text x="${bx - 7}" y="${yOut + 16}" text-anchor="end" class="ptlab" font-style="italic">y₀</text>` +
+        // magnification factors on the arrows
+        `<text x="${f1(midEnd) + 9}" y="${f1((yIn + yMid) / 2) + 3}" text-anchor="start" class="ptlab">× g′(x₀)</text>` +
+        `<text x="${f1(outEnd) + 9}" y="${f1((yMid + yOut) / 2) + 3}" text-anchor="start" class="ptlab">× f′(g(x₀))</text>` +
+        `</svg>`;
+
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+  };
+
+  /* ---- hydrateFigures: fills every <figure data-fig="id"> ---- */
+  function hydrateFigures(root) {
+    (root || document).querySelectorAll("[data-fig]").forEach(function (el) {
+      var def = FIGS[el.dataset.fig];
+      if (!def || el.dataset.figDone) return;
+      var r = def();
+      var layout = r.layout, panels = r.panels;
+      var html;
+      if (layout === "single" && panels.length === 1 && !panels[0].note) {
+        html = '<div class="figure-art">' + panels[0].svg + '</div>';
+      } else {
+        var cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
+        html = '<div class="figure-art ' + cls + '">' +
+          panels.map(function (p) {
+            return '<div class="fig-panel">' + p.svg + (p.note ? '<div class="fig-note">' + p.note + '</div>' : '') + '</div>';
+          }).join("") + '</div>';
+      }
+      el.insertAdjacentHTML("afterbegin", html);
+      el.dataset.figDone = "1";
+    });
+  }
+  window.hydrateFigures = hydrateFigures;
+})();
+--- END exp-ch03/figures.js ---
+=== END FIGURE NOTE ===
+
+=== KEY HTML WRITING RULES (advisory -- for house_rule findings) ===
+- Semantic env classes: env-definition, env-theorem, env-proposition, env-corollary, env-example (inside .workedexample with env-solution), env-exercise, env-remark, env-proof, env-caution, env-strategy
+- Math: inline \(...\), display \[...\], multi-line \begin{aligned}...\end{aligned}
+- Manual numbering: env-num for theorems/propositions/definitions/examples etc., fig-no for figures, sec-no for section numbers
+- Per-type counters CONTINUE across Chapter 3: §3.2 has Theorem 3.3, Proposition 3.3, Definition 3.1 (the chapter's FIRST Definition -- §3.1 used none, so 3.1 is correct), Example 3.4/3.5, Figure 3.2, Remark 3.2, Strategy 3.1 (the chapter's FIRST Strategy); Caution is unnumbered
+- Cross-references: plain prose ("by Theorem 3.1", "the limit definition of §2.2", "Chapter 2", "§2.3 Theorem 2.1", "Figure 3.2") -- NO \cref, NO hyperlinks
+- Expansion markers: <!-- expansion:category --> HTML comment before each non-seed addition
+- The seed-derived statement and proof are NOT seed-expansions and correctly carry no expansion marker; only additions beyond the seed do
+- No \cref, no auto-numbering, no \index
+
+=== APPROVED DIRECTION DECISIONS (do NOT mis-flag these as errors or omissions) ===
+- DEFINITION TREATMENT = Option B (approved at gate 3): the §2.2 limit definition of the derivative is INTENTIONALLY cross-referenced in prose and NOT re-stated as a new numbered Definition; only the remainder form is minted, as Definition 3.1. The equivalence of the two is Proposition 3.3. This is deliberate, not a missing definition.
+- D6: the product rule (Ch2 §2.5) and "differentiable implies continuous" (Ch2 §2.3 Theorem 2.1) are INTENTIONALLY cross-referenced and NOT re-stated or re-proven (the manuscript re-proves them, but Chapter 2 already owns them). A one-sentence cross-ref is correct; do NOT flag the absence of these proofs.
+- D7: applications (d/dx ln x, d/dx x^x, d/dy arcsin y, logarithmic differentiation) are INTENTIONALLY deferred to §3.3; §3.2 contains only a one-line forward reference NAMING them, with nothing computed. Do NOT flag these as missing.
+- D10: implicit differentiation is INTENTIONALLY not introduced.
+- The remainder-form proof INTENTIONALLY fills three gaps the manuscript leaves implicit -- (i) the m2*R1(h)/h -> 0 term, (ii) the two skipped epsilon-delta sub-steps (the epsilon bound from bullet (i) and the triangle inequality), (iii) the Def1<=>Def2 "easy to see" equivalence (now Proposition 3.3) -- each marked expansion:formula. These are APPROVED expansions faithful to the manuscript's method; do NOT flag them as either drift or as fabrication.
+- Worked Examples 3.4 and 3.5 are self-authored (approved at gate 3), use ONLY derivatives available by §3.2 (sin/cos from §3.1, power rule from Ch2), and are written with full solutions. This is intended.
+=== END HTML WRITING RULES ===
+
+Now review the DRAFT against the SEED, DIRECTION BRIEF, FIGURE NOTE, and HTML WRITING RULES. Return strict JSON.

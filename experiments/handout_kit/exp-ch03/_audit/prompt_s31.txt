@@ -1,0 +1,703 @@
+You are an ADVISORY adversarial reviewer of a calculus handout section (HTML format) that was expanded from the SEED below, following an approved DIRECTION BRIEF. You do NOT rewrite; you surface findings for a human.
+
+Hunt especially for:
+(a) mathematical errors, fabricated theorems/identities, or over-generalized claims;
+(b) drift from the seed's mathematics (the seed IS the manuscript's mathematical backbone);
+(c) direction-conformance violations: did the draft cover what the brief specifies? did it include anything from the brief's "do-not-write" (kept under the heading 刻意不寫) list?
+
+Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):
+  category: math | faithfulness | direction-conformance | house_rule | register | other
+  blocking: true ONLY for:
+    - a real MATH ERROR or fabricated/over-generalized claim (category=math)
+    - DRIFT from the seed's mathematics (category=faithfulness)
+    - VIOLATION of direction-conformance: missing a brief-mandated item OR including a brief-forbidden item (category=direction-conformance)
+  Everything else MUST be blocking=false.
+
+Formatting / house-rule items (missing expansion comments, register/style nits) are caught by a downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); they MUST NOT block convergence.
+
+Also give each finding a level for human triage:
+  1 = real conflict (must fix)
+  2 = discoverability gap (add doc/comment)
+  3 = editorial drift (low priority)
+  4 = non-finding (mathematically equivalent paraphrase, stylistic preference)
+
+A mathematically equivalent paraphrase is NOT a finding. Numbering note: this is Chapter 3's first section, so all per-type counters start fresh at 3.1 (that is correct, not a discontinuity).
+
+Set "converged": true when there are ZERO blocking findings (math correct, faithful to seed, conforms to direction brief), even if advisory formatting nits remain.
+
+Return STRICT JSON only, no prose outside the JSON.
+
+=== SEED (manuscript transcription) ===
+
+# Seed — §3.1 Derivatives of the Sine and Cosine Functions
+
+> Transcribed from the handwritten manuscript `2023-10-28-chainRule` (pp. 1–9, up to
+> "This proves `d/dx cos x = −sin x`"; the next section 「§ 乘法規則與連鎖規則」= §3.2 starts mid-p.9).
+> Manuscript's own section title: 「§ 三角函數的微分」(Differentiation of trigonometric functions).
+> Faithful to the manuscript: structure, order, notation, and deliberate omissions preserved.
+> seed 語法＝輕量可讀（反引號行內＋Unicode；見 RULE.md ①）。漂亮 KaTeX 留給 ④。可疑／非標準處標 **[請查核]**。
+
+---
+
+## Opening — the difference quotient for sin
+
+Recall `f'(x₀) := lim_{h→0} (f(x₀+h) − f(x₀))/h`, if the limit exists.
+
+Formal calculation. Consider the difference quotient [差分商] for `sin`:
+`(sin(x+h) − sin(x))/h = 2 sin(h/2) cos(x + h/2) / h = (sin(h/2)/(h/2)) · cos(x + h/2)`.
+
+To evaluate `lim_{h→0} (sin(x+h) − sin(x))/h`, we must calculate
+- (i) `lim_{h→0} sin(h/2)/(h/2)`
+- (ii) `lim_{h→0} cos(x + h/2)`
+
+## Part (i) — even function reduction + the Squeezing Lemma
+
+Set `θ = h/2`. Since `g(θ) := sin θ / θ` (θ≠0) is an even function, to evaluate `lim_{θ→0} g(θ)`
+we only need the case `θ > 0`, `θ ↘ 0`.
+
+**Squeezing Lemma [夾擠原理].** Suppose `g₁(x) ≤ g(x) ≤ g₂(x)` for either
+- (1) `x > M`, or
+- (2) `x ∈ (x₀ − r, x₀ + r)`, `r > 0`;
+
+and either
+- (1) `lim_{x→∞} g₁(x) = lim_{x→∞} g₂(x) = L`, or
+- (2) `lim_{x↘x₀} g₁(x) = lim_{x↘x₀} g₂(x) = Q`.
+
+then
+- (1) `lim_{x→∞} g(x) = L`, or
+- (2) `lim_{x↘x₀} g(x) = Q`.
+
+> 手稿在此**完整重述**夾擠原理（兩種形式：`x→∞` 與 `x↘x₀`）。[ROADMAP open question：§1.5 已有 squeeze 定理 → 是否重述／只 cross-ref，待 ③ 決定]
+
+**Geometric inequality (unit circle).** Figure: unit circle centered `O`, radius `1`; `A` on the
+circle at the x-axis; `B` on the circle at angle `θ`; `C` on the tangent line at `A`. The line
+⟷AB is the tangent that contacts circle `O` at `A` [AB 是圓 O 的切線]. Denote areas
+`a_{sector OAB}`, `a_{△ABC}`, `a_{△OAB}`.
+
+From the nesting of the three regions:
+`½ sin θ ≤ ½ θ ≤ ½ tan θ = ½ · (sin θ / cos θ)`
+`⟹ 0 ≤ cos θ ≤ sin θ / θ ≤ 1` ... (1)
+
+> **[請查核]** 手稿把面積關係寫成 `△ABC ⊃ Sector OAB ⊃ △OAB`，並列 `a_{△ABC} ≤ a_{sector OAB} ≤ a_{△OAB}`。
+> 但「包含」方向與 `≤` 方向、以及哪個三角形對應 `½ sin θ`／哪個對應 `½ tan θ`，標示看來**不一致**
+> （標準是：內接 `△OAB = ½ sin θ` ≤ 扇形 `½ θ` ≤ 含切線的外三角形 `½ tan θ`）。**最終不等式
+> `cos θ ≤ sin θ / θ ≤ 1` 為標準且正確。** 請你對掃描核對三角形命名與面積排序的書寫。
+
+In particular: `0 ≤ |sin θ| ≤ |θ|`.
+
+## A continuity example (squeeze)
+
+**Example.** Show that `lim_{x→0} sin x = 0`.
+Set `g₁(x) = 0`, `g(x) = |sin x|`, `g₂(x) = |x|`. Since `lim_{x→0} |x| = 0` and `lim_{x→0} 0 = 0`,
+by the squeezing lemma `lim_{x→0} |sin x| = 0`. Hence `lim_{x→0} sin x = 0`.
+
+## [Concept] Continuous function
+
+We say `f(x)` is **continuous at `x₀`** if `lim_{x→x₀} f(x) = f(x₀)`.
+
+Examples:
+- ① `f(x) = 1 if x ∈ ℚ, 0 if x ∉ ℚ` (ℚ = 有理數) is **nowhere continuous** (對任何實數點 `x₀`，`f` 在 `x₀` 都不連續).
+- ② `f(x) = x` is continuous at every `x₀ ∈ ℝ`.
+- ③ `f(x) = cos x` is continuous at every `x₀ ∈ ℝ`.
+
+**Proof of ③.** `cos x − cos x₀ = −2 sin((x − x₀)/2) sin((x + x₀)/2)`
+`⟹ |cos x − cos x₀| ≤ |−2 sin((x − x₀)/2) sin((x + x₀)/2)| ≤ 2 |sin((x − x₀)/2)|`.
+Set `θ = (x − x₀)/2`: `lim_{x→x₀} |sin((x − x₀)/2)| = lim_{θ→0} |sin θ| = 0`.
+By the squeezing lemma `lim_{x→x₀} |cos x − cos x₀| = 0`, so `lim_{x→x₀} cos x = cos x₀` for any
+`x₀ ∈ ℝ`. Hence `cos x` is continuous for all `x ∈ ℝ`.
+
+## Back to (1) — the fundamental limit `sin θ / θ → 1`
+
+Back to (1): `cos θ ≤ sin θ / θ ≤ 1` for `θ ∈ (0, π/2)`.
+
+> Note: `sin θ / θ` is an even function, since both `θ` and `sin θ` are odd.
+
+**[Concept] odd / even function.** `f` is odd if `f(−x) = −f(x)`; `f` is even if `f(−x) = f(x)`.
+
+By the continuity of cosine, `lim_{θ→0} cos θ = cos 0 = 1`. Again by the squeezing lemma:
+`lim_{θ→0} sin θ / θ = 1`.
+
+## Assemble `d/dx sin x`
+
+`lim_{h→0} (sin(x+h) − sin(x))/h = lim_{h→0} (sin(h/2)/(h/2)) · cos(x + h/2) = 1 · cos x = cos x`,
+where we used `lim_{θ→0} sin θ / θ = 1` and that `cos x` is continuous at every `x ∈ ℝ`.
+
+To sum up: **`d/dx sin x = cos x`** for all `x ∈ ℝ`.
+
+## `d/dx cos x`
+
+Consider `(cos(x+h) − cos x)/h = −2 sin(h/2) sin(x + h/2) / h = −(sin(h/2)/(h/2)) · sin(x + h/2)`.
+
+**Claim: `sin x` is continuous at every `x ∈ ℝ`.**
+Proof. `sin(x+h) − sin x = 2 sin(h/2) cos(x + h/2)`
+`0 ≤ |sin(x+h) − sin x| ≤ 2 |sin(h/2)| |cos(x + h/2)| ≤ 2 |sin(h/2)|`.
+Note `lim_{h→0} |sin(h/2)| = 0`. By the squeezing lemma `lim_{h→0} |sin(x+h) − sin x| = 0`. This
+proves `sin x` is continuous at every `x ∈ ℝ`.
+
+Now
+`lim_{h→0} (cos(x+h) − cos x)/h = lim_{h→0} −(sin(h/2)/(h/2)) · sin(x + h/2)`
+`= −lim_{h→0} sin(h/2)/(h/2) · lim_{h→0} sin(x + h/2) = −1 · sin x = −sin x`.
+
+This proves **`d/dx cos x = −sin x`**.
+
+---
+
+## 手稿盤點摘要 / 刻意省略（給 ②③，非手稿正文）
+
+手稿 §3.1 **有**：sin 差分商 → 夾擠原理（全述）→ 扇形/三角形幾何不等式 `(1)` → `lim sin x = 0` 例 →
+連續定義＋三例（Dirichlet 處處不連續、`x`、`cos x` 含證明）→ odd/even 定義 → `lim sin θ/θ = 1`
+→ `sin′ = cos` → sin 連續性 Claim ＋證 → `cos′ = −sin`。
+
+手稿 §3.1 正文**無**（待 ③ 決定是否補；詳見 `PLAN-ch03.md` D1/D2）：
+- **`d/dx tan x`** —— §3.1 正文無，但**手稿 Homework (2)(i) 有**（`d/dx tan x`, `x ∈ [0, π/2)`）。ROADMAP 列為 §3.1 core skill「derive d/dx tan x using the quotient rule」→ 把手稿 HW 的 tan′ **升格為 §3.1 worked example**（manuscript-faithful、非杜撰）。
+- **`lim_{θ→0} (1 − cos θ)/θ = 0`** —— 全手稿（含 HW）皆無；ROADMAP 學習目標列了 → 真 expansion 候選。
+- worked example（除上述極限/連續證明外，無「給函數求導」型例題）、strategy box、`sin(g(x))` 等鏈鎖應用（屬 §3.2）、具名人物／歷史。
+
+> **轉錄忠實度待你核對（①-verify）**：請逐字對掃描 pp.1–9，特別是上面 **[請查核]** 的面積排序。確認後才進 ② 方向 brief。
+
+=== END SEED ===
+
+=== DIRECTION BRIEF (approved at gate 3) ===
+
+# Direction Brief — §3.1 Derivatives of the Sine and Cosine Functions
+
+> ② 方向提案（RULE.md §2 九欄）。**③ 方向閘已核可（含調整），2026-06-08**——本 brief 為 ④/⑤ 契約。
+> 輸入：`seed_ch03_s1.md`（手稿 pp.1–9）＋ `PLAN-ch03.md` 章層決策 D1–D4 ＋ ROADMAP「Chapter 3」條目。
+> §3.1 是 ch03 **首節**：另負責建章基礎建設（見 §B）。
+> ✅ ①-verify 已收（p.3 掃描）：Figure 3.1 構造／面積排序定案見 §C①。**③ 八項裁示**：tan′ 採 Example；引入 Proposition 型；面積排序見 §C①；Ch1 cross-ref 用泛指；`(1−cosθ)/θ→0` 以標準 companion limit 收；**sec′ 連帶拉進 §3.1**；Example 3.3（SHM）核准；Remark 3.1（導數四循環）收入。
+
+---
+
+## 手稿盤點（照原順序）
+- sin 差分商 → 用 sum-to-product 化為 `(sin(h/2)/(h/2))·cos(x+h/2)`，拆成兩個子極限 (i)(ii)
+- 偶函數約化（`θ=h/2`，`sinθ/θ` 為偶）→ 只需 `θ↘0`
+- 夾擠原理（squeezing lemma）—— 手稿**完整重述兩形式**（`x→∞`、`x↘x₀`）
+- 單位圓扇形幾何不等式 → `cosθ ≤ sinθ/θ ≤ 1` … (1)〔含 **[請查核]** 面積排序，見 §C①〕
+- Example：`lim_{x→0} sin x = 0`（squeeze，`g₁=0 ≤ |sin x| ≤ |x|=g₂`）
+- 連續定義 ＋ 三例：① Dirichlet 處處不連續、② `f(x)=x`、③ `f(x)=cos x`（**含證明**）
+- odd/even 定義
+- `lim_{θ→0} sinθ/θ = 1`（用 cos 連續 + squeeze）
+- **`d/dx sin x = cos x`**（組裝）
+- Claim：`sin x` 連續（**含證明**）→ **`d/dx cos x = −sin x`**
+- 具名人物／史實：**無**。worked example（給函數求導型）：**無**（手稿只有上述極限/連續證明）
+
+## 薄度剖析
+| 區塊 | 狀態 |
+|---|---|
+| sin′／cos′ 推導與證明 | **夠**（手稿全證、標準、具啟發） |
+| 承重直覺（為何代數失效、需幾何） | **薄**（手稿直接進 sum-to-product，沒點破「`sinθ/θ` 是代數破不了的 0/0」） |
+| 扇形不等式圖 | **無→薄**（手稿只用文字描述圖、無實圖，且面積排序書寫不一致待查） |
+| squeezing lemma | **夠**（完整重述）→ 但與 §1.5 重疊 → cross-ref（D4） |
+| 連續性素材 | **過滿**（Dirichlet／`f=x`／連續定義／odd-even 定義皆 Ch1 風味）→ 瘦身（D3） |
+| `d/dx tan x` | **無**（僅手稿 HW(2)(i)）→ 升格 worked example（D1） |
+| `(1−cosθ)/θ → 0` | **無**（全手稿含 HW 皆無）→ expansion（D2，見 §C③ 依據存疑） |
+| 用導數做計算的 worked example | **無**（無「微分這個函數」型）→ tan′ ＋（選配）一個組合計算 |
+| application／takeaway 錨 | **無**（手稿純推導）→ 選配 SHM／導數循環 bookend |
+
+## 範圍與深度
+- **吃手稿這一叢**：sin′、cos′ 兩個基本三角導數，連同其所需的 `sinθ/θ→1` 與 sin/cos 連續性；加 tan′（D1）、companion limit（D2）。
+- **保留證明**（短、標準、具啟發，屬 §3.1 主軸）：扇形不等式、`sinθ/θ→1`、sin/cos 連續、sin′、cos′。深度＝手稿的**直覺-嚴謹層**（幾何 squeeze，非 ε-δ）。
+- **cross-ref 不重述**：squeezing lemma → §1.5（D4，只帶用到的 `θ↘0` 形式一句）；連續性「定義」與 odd/even「定義」→ Ch1（D3，不重新定義）；quotient rule（tan′ 用）→ §2.5。
+- **forward-fence（一行帶過、不 preview-creep）**：`sin(g(x))`／chain rule → §3.2；`sec′`／`arcsin′`／`arctan′` → §3.3。
+- **首節基礎建設**（見 §B）：章 opener、`chapter3-screen/print.html`、`figures.js` 起手。
+
+## 承重直覺（一節一個，領頭）
+**代數失效 → 幾何破局。** 多項式差分商可展開消 `h`、`eˣ` 靠級數，但 sin 差分商經 sum-to-product 後，命運全壓在 `lim_{θ→0} sinθ/θ` 上——這是個**純代數無從化簡的 `0/0`**（`sinθ` 對 `θ` 沒有可約的代數形）。要破它，必須引入**全新工具：單位圓的扇形面積夾擠**（Figure 3.1）。整節即圍繞「這道牆，與翻牆的幾何」組織：先用「代數到此為止」打臉，再用扇形不等式 + squeeze 翻過去。
+
+## worked example 清單（③ 定案）
+| # | 內容 | 技巧 | 來源 |
+|---|---|---|---|
+| **Example 3.1** | `lim_{θ→0} (1−cosθ)/θ = 0` | 乘 `(1+cosθ)` 共軛 → `(sinθ/θ)·(sinθ/(1+cosθ))→1·0` | **expansion（D2，標準 companion limit）** |
+| **Example 3.2** | (a) `d/dx tan x = sec²x`、(b) `d/dx sec x = sec x tan x`（`x≠π/2+kπ`） | quotient rule（§2.5）on `sin/cos`、`1/cos`；(b) 重用 (a) 的 setup | **手稿 HW 升格：tan′=D1、sec′=③ 拉進** |
+| **Example 3.3** | `s(t)=sin t` 簡諧運動：速度 `s′=cos t`、加速度 `s″=−sin t = −s` | sin′/cos′（只用 §3.1 導數，無 chain rule） | **expansion（③ 核准；不同題型，含解）** |
+- 序：companion limit（接 `sinθ/θ→1`，同屬三角極限）→ tan & sec′（延伸導數表）→ SHM 組合（用導數）。
+- tan′／sec′／companion limit 屬**忠實內容/低風險**（tan′、sec′ 皆手稿 HW）；Example 3.3 為自創 worked example（③ 已批准）。
+- Example 3.2 收尾一句點明 `csc′=−csc·cot`、`cot′=−csc²` 同技巧可得（**僅敘述結果、不展開**；非手稿，避免杜撰式 worked derivation）。
+- 連續性與 `sinθ/θ→1` **不**寫成 worked example，走 Proposition（見 §A 編號）。
+
+## history / application
+- **history**：無可考起源／記號故事自然觸發 → **留白**（不為 padding 硬塞；扇形 squeeze 若要一句「古典標準路徑」須帶 `[source: standard calculus-textbook]`，傾向不放）。
+- **application**：選配 **bookend Remark 3.1**——sin/cos 的**導數四循環** `sin → cos → −sin → −cos → sin`，繫到簡諧運動 `s=sin t ⟹ 加速度 = −s`（**只用 §3.1 導數、不需 chain rule**；與 §2.4「eˣ 自我複製」Remark 同手法）。低風險、標準、具動機。**待 ③ 取捨**。
+
+## 強調 / takeaway
+- **概念樞紐**：`lim_{θ→0} sinθ/θ = 1` 是整節基石——所有三角導數都壓在它上，而它是**幾何（扇形面積夾擠）掙來的、非代數**。
+- **可攜技能**：微分 sin、cos、tan（`→ cos, −sin, sec²`）並與 Ch2 規則組合；遇三角差分商會 reach for `sinθ/θ→1` 這個標準極限。
+
+## 刻意不寫（餵 auditor 作 direction-conformance 反向檢查）
+| 不寫什麼 | 理由 | 它該去哪 |
+|---|---|---|
+| `sin(g(x))`／`cos(g(x))` 等 chain-rule 應用 | chain rule 未引入（本章下一節才 state＋prove） | §3.2 |
+| `sec′`／`csc′`／`cot′` | 同 tan′ 技巧但 PLAN 配置於 §3.3（D9）；§3.1 只示範 tan′ 一個 | §3.3（見 §C④） |
+| `arcsin′`／`arctan′`／`ln′` | 反函數＋chain rule | §3.3 |
+| 重新**定義**連續性／odd-even | Ch1 已建立 → cross-ref，不重定義（D3） | Ch1 |
+| Dirichlet 處處不連續例 | Ch1 風味離題，與 §3.1 主軸無關（D3） | 降一句 remark 或略 |
+| 完整重貼 squeezing lemma 兩形式 | 與 §1.5 重疊（D4） | cross-ref §1.5 |
+| ε-δ 嚴格化各極限 | 超出手稿/本節深度 | Ch1 §1.6／附錄 |
+| 自創 bare your-turn exercise | 受 README §防護欄禁、deferred | —（自創一律寫成含解 worked example） |
+| sin/cos 高階導數做成系統小節 | 過度推廣 | 至多 Remark 3.1 的循環一句帶過 |
+
+## 篇幅帶（護欄非預算）
+**5–7 A4 print 頁**（含章 opener ≈0.5 頁）。§3.1 是全章最密（2 Prop + 2 Thm + 5–6 證明 + 1 圖 + 2–3 例 + 1 Caution + 選配 Remark），與 §2.4 同量級。明顯超出 → 回查是否某證明過度展開或漏 fence 的 forward 主題。
+
+---
+
+## A. 編號 ledger 提案（§3.1；④ 落定後回填 PLAN §5）
+> 與 PLAN §5 提案的**兩處出入**，請 ③ 一併裁示：
+
+| 型別 | §3.1 提案 | 說明 |
+|---|---|---|
+| **Theorem** | `3.1`= sin′=cos、`3.2`= cos′=−sin | Theorem 保留給本節**標題級成品**（節名即「sin/cos 導數」） |
+| **Proposition** | `3.1`= sin & cos 連續於 ℝ、`3.2`= `lim sinθ/θ=1` | **新型別**（PLAN §5 ledger 無 Proposition 列）。連續性與基本極限屬**支撐結果**→ Proposition，不佔 Theorem。需在 PLAN §5 加一列。 |
+| **Example** | `3.1`= companion limit、`3.2`= tan′ & sec′（兩 part）、`3.3`= SHM 組合計算 | sec′ ③ 拉進、SHM ③ 核准 |
+| **Figure** | `3.1`= 扇形不等式 | |
+| **Remark** | `3.1`= 導數四循環/SHM bookend | ③ 收入 |
+| **Caution** | 無編號：**radian 慣例**——`sinθ/θ→1` 與 sin′=cos **只在弧度制成立**；度數制 `d/dx sin(x°)=(π/180)cos(x°)` | 標準高價值陷阱（手稿默認弧度） |
+| Definition / Strategy / Corollary | §3.1 無 | 連續/odd-even 走 cross-ref（D3）；Strategy 留 §3.2/§3.3 |
+
+- **出入①**：PLAN §5 把 tan′ 列為「(`Theorem 3.3`? 視 D1)」；本 brief 採 **Example（非 Theorem）**——忠於 D1「worked example」與手稿（HW 計算，非陳述定理）。⟹ §3.2 自 **Theorem 3.3** 起。
+- **出入②**：本 brief 引入 **Proposition** 型別承載連續性與基本極限。若 ③ 不採，退路＝把兩者併入證明流程當 inline lemma（但失去可引用編號）。
+- 交叉引用一律純文字；④ 寫完自查每個「Proposition/Theorem N.M」都對得到存在 `env-num`。
+
+## B. 首節基礎建設（§3.1 session 建一次，後續節沿用；PLAN §4）
+1. **`chapter3-screen.html` / `chapter3-print.html`**：複製 `template-screen/print.html`，改 CHAPTER 區塊（`dir:"exp-ch03"`、`fragments:["sec-3-1"]`、brand/runningHead＝「Chapter 3 · Chain Rule and Trigonometric Derivatives」）。`macros:{}` 視需要加 `\sec`（KaTeX 內建 `\sec`/`\tan` 有，多半免）。**PowerShell `[IO.File]::WriteAllText` UTF-8 無 BOM**。
+2. **章 opener**（併入 `sec-3-1.html` 開頭，`chapter-head`+`.lead`+learning objectives）。**learning objectives 涵蓋全章**（對齊 ROADMAP core skills），草案待 ③ 核可：
+   - differentiate `sin`, `cos`, `tan` and combine them with the rules of Chapter 2;
+   - state the chain rule and use it to differentiate compositions `f(g(x))`, including nested ones;〔§3.2〕
+   - apply logarithmic differentiation to `xˣ` and similar expressions;〔§3.3〕
+   - derive the derivatives of `arcsin`, `arctan`, and `ln` from inverse-function relations via the chain rule.〔§3.3〕
+   - lead 段：本章從 Ch2 的基本規則，推進到**合成**（chain rule）與其在三角／反函數導數上的應用。
+3. **`exp-ch03/figures.js`** 起手：Figure 3.1 扇形不等式（inline SVG 較合適——`buildPlot` 無填充/扇形原語，比照 §2.5 Figure 2.4 schematic SVG）。label economy：圖內只留 `O, A, B`、半徑 `1`、角 `θ`、切線交點；面積/不等式進 caption 與散文。
+
+## C. 待核對／存疑（**③ 已回覆，定案**）
+1. **p.3 扇形面積排序（①-verify ✅）**：使用者提供 p.3 掃描。**定案構造**：O 圓心、`A=(1,0)`（圓∩x 軸）、`B=(cosθ,sinθ)`（圓上張角 θ）、`C=(1,tanθ)`（A 點切線 `x=1` 上，`OB` 延伸交此點，故 B 在線段 OC 上）；半徑 `OB=1`。**三面積**：`a_{△OAB}=½sinθ`、`a_{sector OAB}=½θ`、`a_{△ABC}=½(tanθ−sinθ)`（弦/弧與切線間的角落片）；整外三角 `a_{△OAC}=½tanθ=a_{△OAB}+a_{△ABC}`。**正確排序**：`½sinθ ≤ ½θ ≤ ½tanθ ⟹ cosθ ≤ sinθ/θ ≤ 1`。seed 轉錄的 `a_{△ABC} ≤ a_{sector} ≤ a_{△OAB}` **為筆誤/轉錄滑誤**（會推出 `½θ≤½sinθ`，錯）；正解 `a_{△OAB} ≤ a_{sector} ≤ a_{△OAB}+a_{△ABC}`。④ Figure 3.1 保留手稿 O,A,B,C 與 △ABC 命名，散文用標準排序（外界用 △OAC=△OAB+△ABC，或等價地「圓弓形 segment ⊆ △ABC」）。
+2. **Ch1 cross-ref 目標**：③ 同意 ④ 以「**Chapter 1**」泛指（連續性定義／odd-even），不寫確切節號，待 Ch1 HTML 落地再補。
+3. **D2 依據**：③ 拍板以「**標準 companion limit、低風險 expansion**」為由收錄（不引「ROADMAP 要求」）。
+4. **sec′ 配置**：③ 拍板**把 sec′ 連帶拉進 §3.1**（與 tan′ 同 quotient-rule 技巧）→ Example 3.2(b)。連帶：§3.3 的 D9 清單移除 sec′（PLAN §7／§3.3 kickoff 待此 session ⑥ 後同步註記）。csc′/cot′ 非手稿、不展開，僅 Example 3.2 收尾敘述結果。
+
+## D. 章層決策 D1–D4 落地（提案＋理由，待 ③ 拍板）
+- **D1 tan′ → 收（Example 3.2a）。** ROADMAP core skill 明列「derive `d/dx tan x` using the quotient rule」；手稿 HW(2)(i) 有。寫成 worked example（`tan=sin/cos`、quotient rule、`=sec²x`），作 Example 而非 Theorem（§A 出入①，③ 核可）。**③ 加：sec′ 連帶收為 Example 3.2b**（`sec=1/cos`，手稿 HW）。
+- **D2 `(1−cosθ)/θ→0` → 收（Example 3.1）。** 標準短證（共軛 `1+cosθ`）。**提案：收**；唯依據措辭見 §C③。
+- **D3 連續性瘦身 → 瘦。** 保留 cos/sin 連續性**證明**（sin′/cos′ 的極限真的需要）；連續性「定義」與 odd/even「定義」**cross-ref Ch1、不重定義**；**Dirichlet 例略去（或降一句 remark）**。**提案：如述瘦身**（連續性合併為 Proposition 3.1，一次證、兩處用，避免重貼近乎相同的證明）。
+- **D4 squeeze → cross-ref §1.5。** 不整段重貼夾擠原理兩形式；只在用到處一句「by the squeeze theorem (§1.5), as `θ↘0` …」。**提案：cross-ref。**
+
+---
+
+### 結構草圖（④ 照此寫；③ 定案）
+章 opener → 開場直覺（代數失效→需幾何）→ sin 差分商拆兩子極限 → **Figure 3.1** 扇形不等式 `cosθ≤sinθ/θ≤1` ＋ `|sinθ|≤|θ|` →（squeeze cross-ref §1.5）→ **Prop 3.1** sin & cos 連續（證）→ **Prop 3.2** `lim sinθ/θ=1`（證，squeeze 收口）→ **Caution** radian 慣例 → **Thm 3.1** sin′=cos（證）→ **Thm 3.2** cos′=−sin（證）→ **Ex 3.1** companion limit `(1−cosθ)/θ→0`（D2）→ **Ex 3.2** tan′ & sec′（D1＋③ 拉進）→ **Ex 3.3** SHM 組合計算（③ 核准）→ **Remark 3.1** sin/cos 導數四循環 bookend（③ 收入）→ forward-ref §3.2 chain rule。
+
+=== END DIRECTION BRIEF ===
+
+=== DRAFT (HTML fragment to review) ===
+
+<!-- Chapter 3 opener + §3.1 Derivatives of the Sine and Cosine Functions.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from exp-ch03/seed_ch03_s1.md (manuscript pp. 1–9). Direction brief
+     brief_s31.md approved at ③ (2026-06-08). Numbering is MANUAL (the kit
+     has no auto-counter); cross-references are plain prose. §3.1 is the
+     chapter's first section, so it carries the chapter opener (a second
+     <article>) and starts exp-ch03/figures.js (Figure 3.1).
+
+     Counters start fresh for Chapter 3:
+       Proposition 3.1 (sin, cos continuous), 3.2 (lim sinθ/θ = 1);
+       Theorem 3.1 (sin' = cos), 3.2 (cos' = −sin);
+       Example 3.1 (companion limit), 3.2 (tan' & sec'), 3.3 (SHM);
+       Figure 3.1 (sector inequality); Remark 3.1 (derivative cycle).
+       Caution is unnumbered (per ch02). §3.2 continues from Theorem 3.3,
+       Proposition 3.3, Example 3.4, Figure 3.2, Remark 3.2.
+
+     ③ decisions D1–D4: tan' as a worked example, not a theorem (D1); sec'
+     pulled into §3.1 beside tan' (same quotient-rule technique); the
+     companion limit (1−cosθ)/θ → 0 added as a standard limit (D2);
+     continuity slimmed (D3) — the cos/sin continuity PROOF is kept (the
+     derivative limits need it), but the definitions of continuity and of
+     even/odd are cross-referenced to Chapter 1 (not restated) and the
+     Dirichlet example is dropped; the squeeze theorem is cross-referenced
+     to §1.5, not re-stated (D4). Figure 3.1 uses the standard nesting
+     △OAB ⊆ sector OAB ⊆ △OAC (½sinθ ≤ ½θ ≤ ½tanθ); the manuscript's
+     transcribed middle inequality on p.3 was a slip (①-verify). No
+     exercises: self-authored problems are written as worked examples. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Chapter 3</div>
+    <h1 class="ch-title">Chain Rule and Trigonometric Derivatives</h1>
+  </header>
+
+  <p class="lead">Chapter 2 built the derivative from the ground up — as the limit of a difference quotient — and turned it into a working toolkit: rules for constants, powers, sums, products, quotients, and the exponential. Yet a whole world of functions still lies just out of reach. How fast does \(\sin x\) change? And what is the derivative of a <em>composition</em> such as \(\sqrt{1 + x^{2}}\) or \(\sin(x^{2})\), where one function is fed into another? This chapter supplies the two ideas that complete the differentiation toolkit. First we differentiate the trigonometric functions, which forces us to confront a limit no algebra can crack and to break through it with a piece of geometry. Then we prove the <em>chain rule</em>, the single rule that differentiates any composition, and use it to unlock the derivatives of inverse and implicitly defined functions.</p>
+
+  <p class="para-head">By the end of this chapter, you will be able to:</p>
+  <ul>
+    <li>differentiate \(\sin x\), \(\cos x\), \(\tan x\), and the other trigonometric functions, and combine them with the rules of Chapter 2;</li>
+    <li>state the chain rule and use it to differentiate compositions \(f(g(x))\), including nested ones;</li>
+    <li>apply logarithmic differentiation to handle expressions such as \(x^{x}\) and \(f(x)^{g(x)}\);</li>
+    <li>derive the derivatives of \(\arcsin x\), \(\arctan x\), and \(\ln x\) from their inverse-function relations.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">3.1</span>Derivatives of the Sine and Cosine Functions</h2>
+  </header>
+
+  <!-- expansion:intuition — load-bearing intuition: the trig difference quotient collapses to lim sinθ/θ, a 0/0 algebra cannot touch; geometry breaks it -->
+  <p>So far every derivative has yielded to algebra. For a polynomial we expanded \((x + h)^{n}\) and cancelled the factor of \(h\); for \(e^{x}\) the power series did the same job. The trigonometric functions are different in kind. Consider the difference quotient for \(\sin x\),
+  \[ \frac{\sin(x + h) - \sin x}{h}. \]
+  No algebraic identity cancels the \(h\) in the denominator against the numerator — \(\sin(x + h)\) does not break into pieces that conveniently subtract. As we are about to see, the entire computation funnels down to a single limit,
+  \[ \lim_{\theta \to 0} \frac{\sin \theta}{\theta}, \]
+  which has the indeterminate form \(0/0\) and which no amount of algebra will resolve. To evaluate it we need a genuinely new tool: a geometric comparison of areas on the unit circle, squeezed to a limit. That one limit, once secured, unlocks the derivatives of <em>both</em> \(\sin\) and \(\cos\) — and through them the rest of the trigonometric functions. Throughout this section angles are measured in radians; this assumption turns out to be essential, as we note below.</p>
+
+  <h3 class="subsec-head">The difference quotient for sine</h3>
+
+  <p>Fix \(x\) and form the difference quotient for \(f(x) = \sin x\). The decisive algebraic step is the sum-to-product identity \(\sin A - \sin B = 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}\), applied with \(A = x + h\) and \(B = x\):
+  \[ \sin(x + h) - \sin x = 2 \cos\Bigl(x + \tfrac{h}{2}\Bigr) \sin\frac{h}{2}. \]
+  Dividing by \(h\) and writing the denominator as \(h = 2 \cdot \tfrac{h}{2}\), to match the \(\tfrac{h}{2}\) inside the sine, gives</p>
+
+  <p>\[ \frac{\sin(x + h) - \sin x}{h} = \cos\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}. \]</p>
+
+  <p>As \(h \to 0\), two things happen at once. The factor \(\cos\bigl(x + \tfrac{h}{2}\bigr)\) ought to tend to \(\cos x\) — provided \(\cos\) is continuous — and the factor \(\dfrac{\sin(h/2)}{h/2}\) is exactly \(\dfrac{\sin\theta}{\theta}\) with \(\theta = h/2 \to 0\). So the derivative rests on two facts: that sine and cosine are continuous, and the value of \(\lim_{\theta \to 0}\sin\theta/\theta\). We secure both now.</p>
+
+  <h3 class="subsec-head">A geometric inequality on the unit circle</h3>
+
+  <!-- expansion:intuition — motivate the area comparison before carrying it out -->
+  <p>To get a grip on \(\sin\theta/\theta\) for small \(\theta\), we compare three areas on a circle of radius \(1\). Because both \(\theta\) and \(\sin\theta\) reverse sign when \(\theta\) is replaced by \(-\theta\), the ratio \(\sin\theta/\theta\) is unchanged — it is an <em>even</em> function (Chapter 1) — so it is enough to treat \(\theta > 0\), shrinking to \(0\). Take \(0 < \theta < \tfrac{\pi}{2}\) and look at Figure 3.1.</p>
+
+  <!-- expansion:figure — sector inequality on the unit circle (ROADMAP key figure; registered in exp-ch03/figures.js as "sector-inequality") -->
+  <figure class="figure" data-fig="sector-inequality">
+    <figcaption><span class="fig-no">Figure 3.1</span> On the unit circle, the triangle \(OAB\) sits inside the sector \(OAB\), which in turn sits inside the triangle \(OAC\) reaching the tangent at \(A\). Comparing the three areas gives \(\tfrac12 \sin\theta \le \tfrac12 \theta \le \tfrac12 \tan\theta\).</figcaption>
+  </figure>
+
+  <p>Here \(A = (1, 0)\) lies on the circle, \(B = (\cos\theta, \sin\theta)\) is the point at angle \(\theta\), and \(C = (1, \tan\theta)\) is where the radius \(OB\), extended, meets the vertical tangent line at \(A\). Three nested regions appear, and their areas are easy to read off:</p>
+
+  <ul>
+    <li>the inscribed triangle \(OAB\) has base \(OA = 1\) and height \(\sin\theta\), so its area is \(\tfrac12 \sin\theta\);</li>
+    <li>the circular sector \(OAB\) is the fraction \(\theta / (2\pi)\) of a disc of area \(\pi\), so its area is \(\tfrac12 \theta\);</li>
+    <li>the larger triangle \(OAC\) has base \(OA = 1\) and height \(AC = \tan\theta\), so its area is \(\tfrac12 \tan\theta\).</li>
+  </ul>
+
+  <p>The triangle \(OAB\) lies inside the sector, which lies inside the triangle \(OAC\), so their areas increase in that order:
+  \[ \tfrac12 \sin\theta \;\le\; \tfrac12 \theta \;\le\; \tfrac12 \tan\theta. \]
+  (The manuscript reads the same picture by splitting the outer triangle as \(OAC = OAB \cup ABC\); the corner piece \(ABC\) is what \(OAC\) adds to the inscribed triangle \(OAB\), and it contains the circular segment between the chord \(AB\) and the arc.) Multiplying through by \(2\) gives \(\sin\theta \le \theta \le \tan\theta\). Dividing by \(\sin\theta > 0\) and using \(\tan\theta = \sin\theta/\cos\theta\) turns this into \(1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}\), and taking reciprocals of these positive quantities reverses the inequalities:
+  \[ \cos\theta \;\le\; \frac{\sin\theta}{\theta} \;\le\; 1, \qquad 0 < \theta < \tfrac{\pi}{2}. \tag{1} \]
+  In particular \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) for \(\lvert \theta \rvert < \tfrac{\pi}{2}\) — a bound we lean on repeatedly below.</p>
+
+  <h3 class="subsec-head">Continuity of sine and cosine</h3>
+
+  <!-- expansion:intuition — why continuity is needed here; cross-ref the Ch1 notion of continuity, do not restate its definition (D3) -->
+  <p>The bound \(\lvert \sin\theta \rvert \le \lvert \theta \rvert\) does more than help with the fundamental limit: it is also what makes sine and cosine continuous, in the sense introduced in Chapter 1. Continuity is exactly what the two factors of the difference quotient need in order to settle to their values as \(h \to 0\), so we establish it now.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.1</span><span class="env-name">Continuity of sine and cosine</span></p>
+    <div class="env-body">
+      <p>The functions \(\sin x\) and \(\cos x\) are continuous at every \(x_{0} \in \mathbb{R}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Everything rests on one bound: \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) near \(\theta = 0\), from inequality (1). Since \(\lvert \theta \rvert \to 0\) as \(\theta \to 0\), the squeeze theorem (§1.5) forces \(\lvert \sin\theta \rvert \to 0\), so</p>
+      <p>\[ \lim_{\theta \to 0} \sin\theta = 0. \]</p>
+      <p>Now fix \(x_{0}\). The sum-to-product identities give</p>
+      <p>\[ \begin{aligned}
+        \cos x - \cos x_{0} &= -2 \sin\frac{x - x_{0}}{2}\, \sin\frac{x + x_{0}}{2}, \\
+        \sin x - \sin x_{0} &= \phantom{-}2 \cos\frac{x + x_{0}}{2}\, \sin\frac{x - x_{0}}{2}.
+      \end{aligned} \]</p>
+      <p>In each line the factor with argument \(\tfrac{x + x_{0}}{2}\) has absolute value at most \(1\), so</p>
+      <p>\[ \lvert \cos x - \cos x_{0} \rvert \le 2\Bigl\lvert \sin\tfrac{x - x_{0}}{2} \Bigr\rvert, \qquad \lvert \sin x - \sin x_{0} \rvert \le 2\Bigl\lvert \sin\tfrac{x - x_{0}}{2} \Bigr\rvert. \]</p>
+      <p>As \(x \to x_{0}\) the angle \(\tfrac{x - x_{0}}{2} \to 0\), so by the limit just established both right-hand sides tend to \(0\). The squeeze theorem then gives \(\cos x \to \cos x_{0}\) and \(\sin x \to \sin x_{0}\); that is, cosine and sine are continuous at \(x_{0}\).<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The fundamental limit</h3>
+
+  <!-- expansion:intuition — frame the squeeze payoff -->
+  <p>We can finally squeeze \(\sin\theta/\theta\) to its limit: inequality (1) traps it between \(\cos\theta\) and \(1\), and both ends head for the same place.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.2</span><span class="env-name">The fundamental trigonometric limit</span></p>
+    <div class="env-body">
+      <p>\[ \lim_{\theta \to 0} \frac{\sin\theta}{\theta} = 1. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>For \(0 < \theta < \tfrac{\pi}{2}\), inequality (1) reads \(\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1\). As \(\theta \to 0^{+}\) the upper bound is the constant \(1\), while the lower bound satisfies \(\cos\theta \to \cos 0 = 1\) by the continuity of cosine (Proposition 3.1). The squeeze theorem (§1.5) pins the quantity between them: \(\lim_{\theta \to 0^{+}} \sin\theta/\theta = 1\). Finally \(\sin\theta/\theta\) is even, so its left-hand limit at \(0\) equals its right-hand limit, and the two-sided limit is \(1\) as well.<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the radian convention is essential: sinθ/θ→1, and hence sin'=cos, fails in degrees -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Everything here depends on measuring angles in <em>radians</em>. The sector area \(\tfrac12\theta\) — and with it the limit \(\sin\theta/\theta \to 1\) — uses the radian measure, for which the arc cut off on the unit circle has length exactly \(\theta\). In degrees the limit is not \(1\): since \(x^{\circ} = \tfrac{\pi}{180}x\) radians, one finds \(\lim_{x \to 0}\dfrac{\sin(x^{\circ})}{x} = \dfrac{\pi}{180}\), and so \(\dfrac{d}{dx}\sin(x^{\circ}) = \dfrac{\pi}{180}\cos(x^{\circ})\). The clean formulas of this section, \(\sin' = \cos\) and \(\cos' = -\sin\), hold only in radians.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The derivatives of sine and cosine</h3>
+
+  <!-- expansion:intuition — assemble the pieces -->
+  <p>With continuity and the fundamental limit in hand, the difference quotient for \(\sin\) all but evaluates itself.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.1</span><span class="env-name">Derivative of sine</span></p>
+    <div class="env-body">
+      <p>\[ \frac{d}{dx}\sin x = \cos x \qquad \text{for all } x \in \mathbb{R}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Using the form of the difference quotient found above,</p>
+      <p>\[ \begin{aligned}
+        \frac{d}{dx}\sin x &= \lim_{h \to 0} \frac{\sin(x + h) - \sin x}{h} \\[2pt]
+          &= \lim_{h \to 0} \cos\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}.
+      \end{aligned} \]</p>
+      <p>As \(h \to 0\), the first factor tends to \(\cos x\) because cosine is continuous (Proposition 3.1), and the second tends to \(1\) by the fundamental limit (Proposition 3.2), with \(\theta = h/2 \to 0\). The product therefore tends to \(\cos x \cdot 1 = \cos x\).<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — same machinery, second function -->
+  <p>Cosine yields to the very same machinery, this time through the companion identity \(\cos A - \cos B = -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}\).</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.2</span><span class="env-name">Derivative of cosine</span></p>
+    <div class="env-body">
+      <p>\[ \frac{d}{dx}\cos x = -\sin x \qquad \text{for all } x \in \mathbb{R}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>With \(A = x + h\) and \(B = x\), the identity gives \(\cos(x + h) - \cos x = -2 \sin\bigl(x + \tfrac{h}{2}\bigr) \sin\tfrac{h}{2}\), so</p>
+      <p>\[ \frac{\cos(x + h) - \cos x}{h} = -\sin\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}. \]</p>
+      <p>Letting \(h \to 0\), the factor \(\sin\bigl(x + \tfrac{h}{2}\bigr) \to \sin x\) by continuity (Proposition 3.1) and \(\dfrac{\sin(h/2)}{h/2} \to 1\) by Proposition 3.2, so</p>
+      <p>\[ \frac{d}{dx}\cos x = -\sin x \cdot 1 = -\sin x. \]<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:example — companion fundamental limit (1−cosθ)/θ → 0 (D2; standard companion to Proposition 3.2) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.1</span></p>
+      <div class="env-body">
+        <p>Establish the companion limit \(\displaystyle \lim_{\theta \to 0} \frac{1 - \cos\theta}{\theta} = 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This is again of the form \(0/0\). Multiplying numerator and denominator by \(1 + \cos\theta\) converts the numerator into something \(\sin\) can handle:</p>
+        <p>\[ \begin{aligned}
+          \frac{1 - \cos\theta}{\theta}
+            &= \frac{(1 - \cos\theta)(1 + \cos\theta)}{\theta\,(1 + \cos\theta)}
+             = \frac{1 - \cos^{2}\theta}{\theta\,(1 + \cos\theta)} \\[2pt]
+            &= \frac{\sin^{2}\theta}{\theta\,(1 + \cos\theta)}
+             = \frac{\sin\theta}{\theta} \cdot \frac{\sin\theta}{1 + \cos\theta}.
+        \end{aligned} \]</p>
+        <p>As \(\theta \to 0\), the first factor tends to \(1\) by Proposition 3.2, while the second tends to \(\dfrac{0}{1 + 1} = 0\) by the continuity of sine and cosine (Proposition 3.1). The product tends to \(1 \cdot 0 = 0\).<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — tan' (D1, manuscript HW) and sec' (③ pull-in, manuscript HW), both via the quotient rule of §2.5 -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.2</span></p>
+      <div class="env-body">
+        <p>Using \(\sin' = \cos\) and \(\cos' = -\sin\) together with the quotient rule (§2.5), differentiate (a) \(\tan x\) and (b) \(\sec x\), wherever \(\cos x \ne 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>For (a), write \(\tan x = \dfrac{\sin x}{\cos x}\) and apply the quotient rule:</p>
+        <p>\[ \begin{aligned}
+          \frac{d}{dx}\tan x
+            &= \frac{(\cos x)(\cos x) - (\sin x)(-\sin x)}{\cos^{2} x} \\[2pt]
+            &= \frac{\cos^{2} x + \sin^{2} x}{\cos^{2} x}
+             = \frac{1}{\cos^{2} x} = \sec^{2} x,
+        \end{aligned} \]</p>
+        <p>where the Pythagorean identity \(\cos^{2} x + \sin^{2} x = 1\) collapses the numerator.</p>
+        <p>For (b), write \(\sec x = \dfrac{1}{\cos x}\). The quotient rule, with the constant numerator \(1\), gives</p>
+        <p>\[ \frac{d}{dx}\sec x = \frac{0 \cdot \cos x - 1 \cdot (-\sin x)}{\cos^{2} x} = \frac{\sin x}{\cos^{2} x} = \frac{1}{\cos x}\cdot\frac{\sin x}{\cos x} = \sec x \tan x. \]</p>
+        <p>The same technique applied to \(\cot x = \dfrac{\cos x}{\sin x}\) and \(\csc x = \dfrac{1}{\sin x}\) gives \(\dfrac{d}{dx}\cot x = -\csc^{2} x\) and \(\dfrac{d}{dx}\csc x = -\csc x \cot x\), completing the derivatives of all six trigonometric functions.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — simple harmonic motion uses only sin'/cos' (no chain rule); sets up Remark 3.1 (approved at ③, new type: application) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.3</span></p>
+      <div class="env-body">
+        <p>A weight bobbing on a spring has height \(s(t) = \sin t\) above its rest level at time \(t\). Find its velocity \(s'(t)\) and acceleration \(s''(t)\), and describe how the acceleration is related to the height.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Velocity is the derivative of height, and acceleration the derivative of velocity. Differentiating with Theorems 3.1 and 3.2,</p>
+        <p>\[ s'(t) = \cos t, \qquad s''(t) = \frac{d}{dt}\cos t = -\sin t. \]</p>
+        <p>Thus \(s''(t) = -\sin t = -s(t)\): at every instant the weight accelerates back toward its rest level, by an amount proportional to how far it has strayed. This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em>, and it is no accident that sine and cosine — the functions whose second derivative is their own negative — are precisely the ones that describe oscillation.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — the four-fold derivative cycle, a bookend echoing the e^x self-replication remark of §2.4 -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.1</span><span class="env-name">The derivative cycle of sine and cosine</span></p>
+    <div class="env-body">
+      <p>Differentiation sends sine and cosine into each other, with a sign that turns over every second step. Writing \(\to\) for one application of \(\dfrac{d}{dx}\),</p>
+      <p>\[ \sin x \;\to\; \cos x \;\to\; -\sin x \;\to\; -\cos x \;\to\; \sin x. \]</p>
+      <p>After four derivatives we are back where we started, so \(\dfrac{d^{4}}{dx^{4}}\sin x = \sin x\), and likewise for cosine. Where \(e^{x}\) reproduces itself in a single step (§2.4), sine and cosine reproduce themselves in a cycle of four — the same self-renewal that lets \(s'' = -s\) describe an oscillation that never winds down.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — forward-ref to §3.2 (the chain rule), which is what makes sin(g(x)) etc. accessible -->
+  <p>We can now differentiate every trigonometric function — but only in its bare form, \(\sin x\) rather than \(\sin(x^{2})\) or \(\sin(3x + 1)\). To reach a function tucked <em>inside</em> another we need a rule for differentiating compositions. That rule, the chain rule, is the business of the next section; with it, the derivatives found here become the seeds of a vast family of new ones.</p>
+
+</article>
+
+=== END DRAFT ===
+
+=== FIGURE RENDERING NOTE ===
+This section HAS one figure, Figure 3.1 (the sector inequality on the unit circle), rendered from the entry "sector-inequality" in exp-ch03/figures.js. The figure source is embedded below so you can review it as if rendered. Do NOT report "figure missing": the figure exists and renders (verified: 0 KaTeX errors). Plain SVG <text> labels in the figure are accepted house style (CONTENT_SPEC label-economy + the §2.5 precedent) and must NOT be flagged.
+
+GROUND TRUTH for Figure 3.1 (verified by the user against the manuscript scan, p.3):
+  O = circle centre; A = (1,0) on the circle and the x-axis; B = (cos T, sin T) at angle T;
+  C = (1, tan T), where radius OB extended meets the vertical tangent at A (so B lies on segment OC).
+  Areas: triangle OAB = (1/2) sin T;  sector OAB = (1/2) T;  triangle OAC = (1/2) tan T  ( = OAB + corner ABC ).
+  Correct ordering:  (1/2) sin T  <=  (1/2) T  <=  (1/2) tan T   ==>   cos T <= (sin T)/T <= 1.
+  IMPORTANT: the seed's transcribed middle inequality "a_(triangle ABC) <= a_sector <= a_(triangle OAB)" was a manuscript / transcription SLIP. The draft deliberately uses the standard correct ordering above (approved at gate 3, see brief section C item 1). Do NOT flag the draft for departing from that slipped line; the departure is correct and intended.
+
+--- BEGIN exp-ch03/figures.js (full; the only entry is sector-inequality used by Figure 3.1) ---
+/* ============================================================
+   figures.js — Chapter 3 figure registry.
+   Each entry returns { layout, panels:[{svg, note}] }.
+   Most chapter figures use buildPlot() (shared/plot.js) for
+   function graphs. buildPlot has NO fill/sector primitive, so
+   region-area schematics (e.g. the §3.1 sector inequality) are
+   hand-built raw SVG here, inheriting the figure vocabulary
+   (.fig-svg, .ptlab, var(--c-primary)/--ink…) from skin-hs.css.
+   Labels are kept to single symbols (O, A, B, C, θ, 1); the
+   areas and the inequality live in the caption and body prose
+   (CONTENT_SPEC §10 "Label economy").
+   Appended across sections — never overwrite.
+   ============================================================ */
+(function () {
+
+  const FIGS = {
+
+    /* §3.1 — Sector inequality on the unit circle.
+       Three nested regions in the first quadrant ground the bound
+       cos θ ≤ (sin θ)/θ ≤ 1:
+         · triangle OAB  (inscribed)         = ½ sin θ
+         · sector  OAB   (pie slice)         = ½ θ
+         · triangle OAC  (out to tangent A)  = ½ tan θ,   C = (1, tan θ)
+       Drawn as three non-overlapping fills (triangle OAB, the
+       circular segment chord→arc, the corner arc→tangent) so the
+       eye reads OAB ⊆ sector ⊆ OAC directly. The manuscript names
+       the corner triangle ABC ( = OAC − OAB ); B lies on segment OC. */
+    "sector-inequality": () => {
+      const T = 40 * Math.PI / 180;            // display angle θ = 40°
+      const R = 120, Ox = 130, Oy = 170;       // circle radius / centre (SVG px, y down)
+      const c = Math.cos(T), s = Math.sin(T), t = Math.tan(T);
+      const Ax = Ox + R,        Ay = Oy;                 // A = (1, 0)
+      const Bx = Ox + R * c,    By = Oy - R * s;         // B = (cos θ, sin θ)
+      const Cx = Ox + R,        Cy = Oy - R * t;         // C = (1, tan θ), on tangent at A
+      const f1 = (n) => n.toFixed(1);
+      const rT = 30;                                     // angle-arc radius near O
+      const aEx = Ox + rT, aEy = Oy;                     // angle arc: start on OA
+      const aBx = Ox + rT * c, aBy = Oy - rT * s;        //            end toward OB
+      const mx = (Ox + Bx) / 2, my = (Oy + By) / 2;      // midpoint of OB (radius "1")
+
+      const svg =
+        `<svg viewBox="0 0 300 300" style="width:300px" class="fig-svg" role="img"` +
+        ` aria-label="First-quadrant wedge of the unit circle centred at O. The inscribed triangle OAB sits inside the sector OAB, which sits inside the larger triangle OAC reaching the tangent line at A, so that one half sine theta is at most one half theta is at most one half tangent theta.">` +
+        // --- region 3: corner outside the circle (arc → tangent), neutral slack ---
+        `<path d="M${f1(Ax)},${f1(Ay)} L${f1(Cx)},${f1(Cy)} L${f1(Bx)},${f1(By)} ` +
+          `A${R},${R} 0 0 1 ${f1(Ax)},${f1(Ay)} Z" fill="var(--ink)" fill-opacity="0.05" stroke="none"/>` +
+        // --- region 2: circular segment (chord AB → arc), lighter primary ---
+        `<path d="M${f1(Ax)},${f1(Ay)} A${R},${R} 0 0 0 ${f1(Bx)},${f1(By)} Z" ` +
+          `fill="var(--c-primary)" fill-opacity="0.09" stroke="none"/>` +
+        // --- region 1: inscribed triangle OAB, primary ---
+        `<polygon points="${f1(Ox)},${f1(Oy)} ${f1(Ax)},${f1(Ay)} ${f1(Bx)},${f1(By)}" ` +
+          `fill="var(--c-primary)" fill-opacity="0.17" stroke="none"/>` +
+        // --- unit circle (context) ---
+        `<circle cx="${Ox}" cy="${Oy}" r="${R}" fill="none" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        // --- tangent segment A→C (vertical tangent at A) ---
+        `<line x1="${f1(Ax)}" y1="${f1(Ay)}" x2="${f1(Cx)}" y2="${f1(Cy)}" stroke="var(--ink)" stroke-width="1.4"/>` +
+        // --- ray O→B→C (radius OB extended to the tangent at C) ---
+        `<line x1="${f1(Ox)}" y1="${f1(Oy)}" x2="${f1(Cx)}" y2="${f1(Cy)}" stroke="var(--ink)" stroke-width="1.4"/>` +
+        // --- radius OA ---
+        `<line x1="${f1(Ox)}" y1="${f1(Oy)}" x2="${f1(Ax)}" y2="${f1(Ay)}" stroke="var(--ink)" stroke-width="1.4"/>` +
+        // --- chord AB (edge of the inscribed triangle) ---
+        `<line x1="${f1(Ax)}" y1="${f1(Ay)}" x2="${f1(Bx)}" y2="${f1(By)}" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        // --- right-angle tick at A (tangent ⊥ radius) ---
+        `<path d="M${f1(Ax - 9)},${f1(Ay)} L${f1(Ax - 9)},${f1(Ay - 9)} L${f1(Ax)},${f1(Ay - 9)}" ` +
+          `fill="none" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        // --- angle θ arc at O ---
+        `<path d="M${f1(aEx)},${f1(aEy)} A${rT},${rT} 0 0 0 ${f1(aBx)},${f1(aBy)}" ` +
+          `fill="none" stroke="var(--ink)" stroke-width="1.1"/>` +
+        // --- dots at O, A, B, C ---
+        `<circle cx="${f1(Ox)}" cy="${f1(Oy)}" r="2.5" class="dot"/>` +
+        `<circle cx="${f1(Ax)}" cy="${f1(Ay)}" r="2.5" class="dot"/>` +
+        `<circle cx="${f1(Bx)}" cy="${f1(By)}" r="2.5" class="dot"/>` +
+        `<circle cx="${f1(Cx)}" cy="${f1(Cy)}" r="2.5" class="dot"/>` +
+        // --- labels (single symbols; areas/inequality in caption + prose) ---
+        `<text x="${f1(Ox - 9)}" y="${f1(Oy + 5)}" text-anchor="end" class="ptlab" font-style="italic">O</text>` +
+        `<text x="${f1(Ax + 8)}" y="${f1(Ay + 16)}" text-anchor="middle" class="ptlab" font-style="italic">A</text>` +
+        `<text x="${f1(Bx - 10)}" y="${f1(By - 6)}" text-anchor="end" class="ptlab" font-style="italic">B</text>` +
+        `<text x="${f1(Cx + 9)}" y="${f1(Cy + 4)}" text-anchor="start" class="ptlab" font-style="italic">C</text>` +
+        `<text x="${f1(Ox + rT + 9)}" y="${f1(Oy - 7)}" text-anchor="start" class="ptlab" font-style="italic">θ</text>` +
+        `<text x="${f1(mx - 11)}" y="${f1(my - 3)}" text-anchor="end" class="ptlab">1</text>` +
+        `</svg>`;
+
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+  };
+
+  /* ---- hydrateFigures: fills every <figure data-fig="id"> ---- */
+  function hydrateFigures(root) {
+    (root || document).querySelectorAll("[data-fig]").forEach(function (el) {
+      var def = FIGS[el.dataset.fig];
+      if (!def || el.dataset.figDone) return;
+      var r = def();
+      var layout = r.layout, panels = r.panels;
+      var html;
+      if (layout === "single" && panels.length === 1 && !panels[0].note) {
+        html = '<div class="figure-art">' + panels[0].svg + '</div>';
+      } else {
+        var cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
+        html = '<div class="figure-art ' + cls + '">' +
+          panels.map(function (p) {
+            return '<div class="fig-panel">' + p.svg + (p.note ? '<div class="fig-note">' + p.note + '</div>' : '') + '</div>';
+          }).join("") + '</div>';
+      }
+      el.insertAdjacentHTML("afterbegin", html);
+      el.dataset.figDone = "1";
+    });
+  }
+  window.hydrateFigures = hydrateFigures;
+})();
+--- END exp-ch03/figures.js ---
+=== END FIGURE NOTE ===
+
+=== KEY HTML WRITING RULES (advisory -- for house_rule findings) ===
+- Semantic env classes: env-definition, env-theorem, env-proposition, env-corollary, env-example (inside .workedexample with env-solution), env-exercise, env-remark, env-proof, env-caution, env-strategy
+- Math: inline \(...\), display \[...\], multi-line \begin{aligned}...\end{aligned}
+- Manual numbering: env-num for theorems/propositions/examples etc., fig-no for figures, sec-no for section numbers
+- Per-type counters start fresh for Chapter 3: Proposition 3.1/3.2, Theorem 3.1/3.2, Example 3.1/3.2/3.3, Figure 3.1, Remark 3.1; Caution is unnumbered
+- Cross-references: plain prose ("by Proposition 3.2", "the squeeze theorem (§1.5)", "Chapter 1") -- NO \cref, NO hyperlinks
+- Expansion markers: <!-- expansion:category --> HTML comment before each non-seed addition
+- The chapter opener (a separate <article>) and seed-derived theorems/proofs are NOT seed-expansions and correctly carry no expansion marker
+- No \cref, no auto-numbering, no \index
+=== END HTML WRITING RULES ===
+
+Now review the DRAFT against the SEED, DIRECTION BRIEF, FIGURE NOTE, and HTML WRITING RULES. Return strict JSON.
