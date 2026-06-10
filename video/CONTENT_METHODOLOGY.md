@@ -6,7 +6,7 @@
 >
 > **血統與定位：** 萃取自 [`legacy/MANIM_STORYBOARD.md`](../legacy/MANIM_STORYBOARD.md)（gen-1, v1.6）的教學精神，**剝離**其 gen-1 工程約束（spoken-math 改寫大表、reveal 策略、9-template catalog、lint／schema），**適配** gen-2（Gemini TTS 直讀 LaTeX、intro／outro first-class）。它是 gen-1 方法論在 gen-2 的繼任者。
 >
-> **相關文件：** 視覺系統見 [`design_handoff/`](design_handoff/)（Direction B）；教科書撰寫規則見 [`../CONTENT_SPEC.md`](../CONTENT_SPEC.md)（`.tex` 來源的權威）；本產線總覽見 [`README.md`](README.md) 與 [`DESIGN.md`](DESIGN.md)。
+> **相關文件：** 視覺系統見 [`design_handoff/`](design_handoff/)（Direction B）；講義（HTML handout kit）的撰寫契約與環境詞彙見 [`../experiments/handout_kit/CONTRACT-html-writing.md`](../experiments/handout_kit/CONTRACT-html-writing.md)；本產線總覽見 [`README.md`](README.md) 與 [`DESIGN.md`](DESIGN.md)。
 >
 > **交付物：** 每節一份**內容稿**（格式見 §6）。
 
@@ -31,7 +31,7 @@
 兩條貫穿全篇的硬規則：
 
 - **一個單元一個教學重點（one teaching idea per unit）。** 一段 narration 若需要兩個主題句，就拆成兩個單元。
-- **內容忠實於講義（faithful to the handout）。** 數學內容與範圍跟著 `chapters/*.tex` 這一節走——不漏環境、不加入新的數學、不脫離；每個承載數學的單元 MUST 可回溯到講義的某個環境／行。**但呈現為教學服務**：場景**順序可為教學自由重排**（見 §3），且 MAY 增補書本沒有的單元（intro／outro、把散文裡的幾何主張變成視覺／動畫單元）。重排與增補的是**呈現**，不是內容——不因重排而增刪任何數學。
+- **內容忠實於講義（faithful to the handout）。** 數學內容與範圍跟著講義 HTML（handout kit；各章權威檔見 [`README.md`](README.md)「輸入」）這一節走——不漏環境、不加入新的數學、不脫離；每個承載數學的單元 MUST 可回溯到講義的某個環境／手寫編號。**但呈現為教學服務**：場景**順序可為教學自由重排**（見 §3），且 MAY 增補書本沒有的單元（intro／outro、把散文裡的幾何主張變成視覺／動畫單元）。重排與增補的是**呈現**，不是內容——不因重排而增刪任何數學。
 
 ---
 
@@ -42,7 +42,7 @@
   - **intro** — Section Gate 開場（章節地圖 → 聚焦本節 → 標題字卡）。內容稿只需提供本節在章內的定位：章、章名、節、節標題，以及一句引導問題 `tagline`。
   - **outro** — 收尾的品牌字卡（暗轉亮橋接 → 最終 logo 字卡，**無 takeaways**）。Key Takeaways 是獨立的 recap 單元（→ `recap_cards` 場景，有旁白），不在 outro。
 - **一定納入（MUST）：** 每個 `definition` / `theorem` / `proposition` / `example`（+`solution`）；書本明確編號的 procedure／strategy；承載教學的圖。
-- **一定略過（MUST NOT 進影片）：** `exercise`（習題只屬書本）、`\index`、指向本節**外**的 `\cref`（改用白話轉述——觀眾沒有頁可翻）、純裝飾的圖。
+- **一定略過（MUST NOT 進影片）：** `env-exercise`（習題只屬書本）、指向本節**外**的交叉引用（kit 為手寫編號的 prose 引用，如 “by Theorem 4.2”——改用白話轉述，觀眾沒有頁可翻）、純裝飾的圖。
 - **視情況納入：** `proof`（短、有啟發、或書本已寫就收；冗長或純技術就略）、`remark`（升格為**具名規則**如「水平線測試」才獨立成單元，否則併入鄰段 narration）。
 
 ---
@@ -51,23 +51,24 @@
 
 ### 環境 → 教學單元對應
 
-第一刀照下表切；邊角看註解。（講義環境定義在 [`../preamble/theorem_setup.tex`](../preamble/theorem_setup.tex)。）**注意：下表給的是教學單元的 `kind`（教學角色），不是工程 template——template 是第二階段的事。**
+第一刀照下表切；邊角看註解。（講義環境詞彙定義在 [`../experiments/handout_kit/CONTRACT-html-writing.md`](../experiments/handout_kit/CONTRACT-html-writing.md)。）**注意：下表給的是教學單元的 `kind`（教學角色），不是工程 template——template 是第二階段的事。**
 
-| 講義環境 | 單元 `kind` | 處理 |
+| 講義環境（kit class） | 單元 `kind` | 處理 |
 |---|---|---|
-| `definition` | `definition` | 一個定義一個單元。螢幕上的 statement 收斂成一句宣告句，符號內容照搬。 |
-| `theorem` + `proof` | `theorem`（+`proof`） | statement + 證明邏輯鏈。證明若超過 ~4 步，拆成「statement 單元」+「proof 單元」，讓學生能在陳述後暫停。 |
-| `theorem`／`proposition`（無證明） | `theorem`／`proposition` | 同定義的處理，教學角色不同而已。 |
-| `example` + `solution` | `example` | 每個邏輯動作一個 step。**同型的第二個例子 MUST 跳過第一個已建立的 setup**，直接進新內容。 |
-| `strategy`／編號 procedure | `procedure` | 步驟用祈使句。判斷型 strategy（含條件分支）**MUST NOT** 因分支而拆成多個單元——讓 narration 承載條件邏輯。 |
-| `remark`（具名規則） | `proposition`／`definition` | 當輕量命題處理。 |
-| `remark`（短附註） | —（併入鄰段 narration） | 2 句的提醒不需要自己的單元。 |
-| 書本 `figure`（函數圖） | `visual` | **Redraw, don't reproduce**（見 §5）；多半值得做成動畫。 |
-| 散文裡的幾何主張 | `visual`（補充） | 書本只用散文講鏡射／相交／形狀時，**SHOULD** 加一個視覺單元（symbol-heavy 例外見 §5）。 |
+| `env-definition` | `definition` | 一個定義一個單元。螢幕上的 statement 收斂成一句宣告句，符號內容照搬；`informal` gloss 是現成的白話句。 |
+| `env-theorem` + `env-proof` | `theorem`（+`proof`） | statement + 證明邏輯鏈。證明若超過 ~4 步，拆成「statement 單元」+「proof 單元」，讓學生能在陳述後暫停。 |
+| `env-theorem`／`env-proposition`／`env-corollary`（無證明） | `theorem`／`proposition` | 同定義的處理，教學角色不同而已。 |
+| `env-example` + `env-solution`（`workedexample` 配對） | `example` | 每個邏輯動作一個 step。**同型的第二個例子 MUST 跳過第一個已建立的 setup**，直接進新內容。 |
+| `env-strategy`（`ol.steps`） | `procedure` | 步驟用祈使句。判斷型 strategy（含條件分支）**MUST NOT** 因分支而拆成多個單元——讓 narration 承載條件邏輯。 |
+| `env-remark`（具 `env-name` 的具名規則） | `proposition`／`definition` | 當輕量命題處理。 |
+| `env-remark`（短附註） | —（併入鄰段 narration） | 2 句的提醒不需要自己的單元。 |
+| `env-caution`（1–3 句陷阱警示） | —（併入其警示對象的單元） | 用警示語氣融進該單元 narration；自成教學點（如標準反例）才獨立，多為 `counterexample`。 |
+| `figure`（`data-fig` 註冊於 figures.js，或 inline SVG） | `visual` | **Redraw, don't reproduce**（見 §5）；多半值得做成動畫。 |
+| 散文裡的幾何主張 | `visual`（補充） | 講義只用散文講鏡射／相交／形狀時，**SHOULD** 加一個視覺單元（symbol-heavy 例外見 §5）。 |
 
 ### 邊角：具名規則 + 其演示圖
 
-一個具名規則（如水平線測試）與「讀它的那張圖」往往是**同一個教學重點**——此時 **SHOULD** 合為**一個**單元（規則寫進 `narration`，圖寫進 `visual_need`／`animation_cue`），不必拆成「規則單元 + 圖單元」。只有當 narration 過載、或那張圖另有獨立的教學點時才拆。（校準來源：§1.1 內容稿單元 7。）
+一個具名規則（如水平線測試）與「讀它的那張圖」往往是**同一個教學重點**——此時 **SHOULD** 合為**一個**單元（規則寫進 `narration`，圖寫進 `visual_need`／`animation_cue`），不必拆成「規則單元 + 圖單元」。只有當 narration 過載、或那張圖另有獨立的教學點時才拆。（校準來源：§1.1 內容稿的水平線測試單元。）
 
 ### 環境之間的散文（prose-only）
 
@@ -150,7 +151,7 @@ gen-2 用 **Gemini TTS 直讀 LaTeX**，所以 narration 裡可以**直接內嵌
 
 - **Redraw, don't reproduce。** 書本圖是「**要顯示什麼**」的權威，不是「**怎麼顯示**」。內容稿描述要顯示的數學物件與教學目的即可。
 - **Animate, not just display。** 書本圖是靜態一頁；影片能讓曲線 trace 出來、測試線 sweep 進來、交點 flash、圖形對 `y=x` 翻摺、極限逐步逼近。**會動的概念就讓它動，讓動態承載一個教學點。**
-- **散文的一般主張 MAY 用具體函數示範。** 當講義只用散文陳述一個**一般**的幾何主張（如「$f$ 與 $f^{-1}$ 的圖對 $y=x$ 鏡射」），視覺單元 **MAY** 挑一個**具體函數**把它畫出來（如用 $x^3/\sqrt[3]{x}$ 示範鏡射），最好呼應本節已出現的例子。這是**增補呈現、不增刪內容**——畫的是已述主張的一個實例，不是新的數學。（校準來源：§1.1 內容稿單元 12。）
+- **散文的一般主張 MAY 用具體函數示範。** 當講義只用散文陳述一個**一般**的幾何主張（如「$f$ 與 $f^{-1}$ 的圖對 $y=x$ 鏡射」），視覺單元 **MAY** 挑一個**具體函數**把它畫出來（如用 $x^3/\sqrt[3]{x}$ 示範鏡射），最好呼應本節已出現的例子。這是**增補呈現、不增刪內容**——畫的是已述主張的一個實例，不是新的數學。（校準來源：§1.1 內容稿的 reflection 視覺單元。）
 
 ### 靜態視覺 vs 動畫（內容稿的兩個欄位）
 
@@ -203,7 +204,7 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 | 欄位 | 內容 |
 |---|---|
 | `id` | 單元識別碼。snake_case、描述**教學重點**而非書本結構（好：`why_square_fails`；壞：`scene_3`）。本節內唯一。 |
-| `source` | 對應講義環境 + 行號（緊跟講義的可追溯性）。 |
+| `source` | 對應講義環境＋手寫編號（如 `chapter1-standalone.html §1.1 · Definition 1.1`；prose 段落用就近環境錨點描述、圖用 `data-fig` id 或 `Figure N.M`）。 |
 | `learning_goal` | 一句話：學生看完此單元學會什麼。 |
 | `kind` | 教學角色：`motivation` / `definition` / `theorem` / `proof` / `proposition` / `example` / `counterexample` / `procedure` / `visual` / `recap` / `forward_ref` … |
 | `narration` | 口語完整稿（英文；數學依 §4 口語化原則；intro／outro 無此欄）。 |
@@ -216,7 +217,7 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 
 ```
 id: one_to_one_definition
-source: ch01_foundations.tex §1.1.1 \begin{definition} (≈ L33–45)
+source: chapter1-standalone.html §1.1 · Definition 1.1（one-to-one）
 learning_goal: 認得讓函數可逆的形式條件——one-to-one。
 kind: definition
 narration: |
@@ -233,7 +234,7 @@ animation_cue: （無——靜態即可）
 
 ```
 id: why_square_fails
-source: ch01_foundations.tex §1.1 remark + figure (≈ L87–134)
+source: chapter1-standalone.html §1.1 · Remark 1.1（Horizontal line test）+ Figure 1.1（data-fig: hlt）
 learning_goal: 看見「重複的輸出」如何讓反函數無法定義。
 kind: counterexample
 narration: |
@@ -243,7 +244,7 @@ narration: |
   so $g$ has no inverse on this interval.
 visual_need: parabola $y=x^2$ 於 $[-1,1]$；水平線 $y=\tfrac14$；兩交點 $x=\pm\tfrac12$。
 animation_cue: |
-  建議動畫（我自畫）：水平線從畫面上方緩緩下移、掃過 parabola；落到
+  建議動畫：水平線從畫面上方緩緩下移、掃過 parabola；落到
   $y=\tfrac14$ 時停住，同時在 $x=-\tfrac12$、$x=\tfrac12$ 閃示兩個實心點，
   各拉一條虛線回 x 軸，凸顯「同一個輸出 → 兩個不同輸入」。
 ```
@@ -261,7 +262,7 @@ animation_cue: |
 - [ ] 每段環境之間的散文都歸類過（Incorporative／Bridge／Forward-pointing），fold 或 promote，無 silently drop。
 - [ ] 每段 narration：3–7 句（依 `kind` 調整）、開頭是 hook、結尾是 takeaway、未犯 §4 禁則、同型第二例不重述 setup。
 - [ ] 數學在 narration 裡讀得順（直讀 LaTeX 或白話；對齊鏈不重念 LHS）。
-- [ ] 動畫建議用自然語言、聚焦教學意圖、標記為使用者自畫。
+- [ ] 動畫建議用自然語言、聚焦教學意圖（manim code 由 Claude 依此生成、經認可定版，見 §5）。
 - [ ] 每個 `id` 唯一、snake_case、描述教學重點。
 - [ ] **通讀整份 narration**，任何一段聽起來像教科書就重寫。
 
@@ -269,7 +270,7 @@ animation_cue: |
 
 ## 8. 講義變動時的維護
 
-當 `chapters/*.tex` 改動已寫過內容稿的一節：
+當講義 HTML 改動已寫過內容稿的一節：
 
 1. **Diff 這一節**，認出哪些環境被加／刪／改寫。
 2. **外科式修改**受影響的單元，不要整份重寫。

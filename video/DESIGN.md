@@ -1,6 +1,8 @@
 # Video Pipeline — Design (2nd generation)
 
-This is the redesigned LaTeX-handout → lesson-video pipeline. It supersedes the
+This is the redesigned handout → lesson-video pipeline. Input is the HTML handout
+kit (`../experiments/handout_kit/`; per-chapter authoritative file listed in
+[README.md](README.md) — switched from `chapters/*.tex` on 2026-06-10). It supersedes the
 first-generation system (`tools/manim_*`, `MANIM_STORYBOARD.md`,
 `MANIM_REFERENCE.md`, `MANIM_CHECKLIST.md`), which is frozen, not deleted.
 
@@ -336,7 +338,7 @@ the model the style is deliberately flat to damp that bias.
 ## Data flow (target)
 
 ```
-chapters/<ch>.tex
+handout-kit HTML  (per-chapter authoritative file, see README「輸入」)
    │  (author reads section, writes storyboard by hand — NOT auto-generated)
    ▼
 video/storyboards/<id>.yml

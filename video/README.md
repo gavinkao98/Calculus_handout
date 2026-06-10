@@ -4,7 +4,7 @@
 `tools/manim_*` 產線（現已凍結）。
 
 - **改了什麼、為什麼：** [DESIGN.md](DESIGN.md)
-- **輸入：** `../chapters/*.tex` 中的各節（由人閱讀、手寫產出）
+- **輸入：** HTML 講義（handout kit，[`../experiments/handout_kit/`](../experiments/handout_kit/)）的各節（由人閱讀、手寫產出內容稿）。**各章權威檔**——ch01：[`chapter1-standalone.html`](../experiments/handout_kit/chapter1-standalone.html)（2026-06-10 拍板）；ch02+ 屆時在此補。2026-06-10 前的輸入源為 `../chapters/*.tex`（已換源，§1.1/§1.6 原型基於它）。
 - **輸出：** `output/`（gitignored）
 
 ## 結構
@@ -35,7 +35,12 @@ video/
 
 ## 狀態
 
-目前檢查點（2026-06-02）：端到端產線打通，並加上 render 前守門員（lint /
+**目前檢查點（2026-06-10）：輸入換源至 HTML 講義**（見上方「輸入」；決策記錄見
+[REBUILD_STATUS.md](REBUILD_STATUS.md)「2026-06-10 輸入換源」）。§1.1 正以新源
+**從零重走**（內容稿 v2；舊 §1.1 成品為方法論校準原型、已棄用）。以下 2026-06-02
+檢查點所述的工具鏈與 mock 成片仍有效。
+
+前一檢查點（2026-06-02）：端到端產線打通，並加上 render 前守門員（lint /
 sizecheck）與 render 後的 VLM 視覺批改（critic.py）。兩節皆可端到端 render：
 
 - `storyboards/ch01_inverse_functions.yml` —— §1.1（16 場景）

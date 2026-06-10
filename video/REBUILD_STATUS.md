@@ -2,7 +2,27 @@
 
 > 本檔是跨對話的進度錨。完整施工計畫在 `.claude/plans/`(gitignored,撈不回),故重點留存於此。
 
-> ⚠️ **狀態（2026-06-03）：整條 gen-2 影片產線與 cross-review 工具（[`pipeline/review_pack.py`](pipeline/review_pack.py)）目前皆為實驗性質。** 使用者計畫**重構「講義生成流程」**,屆時內容稿／storyboard／`.tex` 來源等格式與契約可能變動——本檔已完成項與現行工具**勿當定案**。`review_pack.py` 的 parser 與 `source:` 行號切片貼著現行格式,格式一變就得改;真正留得下的是「四 lens ＋ advisory ＋ 四級人工過濾 ＋ 計費閘門」的**做法**,而非 parser。後續內容工作將轉往講義內容分支。
+> ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`experiments/handout_kit/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢待改 HTML，「四 lens ＋ advisory ＋ 四級人工過濾 ＋ 計費閘門」的**做法**不變。
+
+## 🔄 2026-06-10 輸入換源（HTML 講義）＋ §1.1 正式版啟動
+
+**研究結論（流程體檢）：** gen-2 產線主體（make.py／lint／sizecheck／音訊驅動對齊／intro·outro 模板／Direction B／critic.py／narration 方法論）皆與輸入格式無關，**不需重建**；需要改的只有輸入契約層，已同步：[`README.md`](README.md)「輸入」、[`DESIGN.md`](DESIGN.md) data flow 首格、[`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md)（§1 忠實對象、§2 略過清單、§3 對應表換鍵成 kit 語意 class＋新增 `env-caution` 列、§6 `source` 欄格式、§8）。
+
+**使用者拍板（2026-06-10）三項：**
+1. **§1.1 從零重走全流程**——不繼承校準原型的 16 段已認可 narration；內容稿 v2 以 HTML 權威檔重新拆解、重寫、重新認可。連帶：`output/audio/ch01_inverse_functions/` 的舊真旁白 WAV 不可重用，真 TTS 屆時全節重新計費（先報價徵求）。
+2. **本輪先靜態版成片，客製動畫第二輪接入**——先出模板靜態 mock 驗收格局，認可後再建正式 hook 機制（task #6）＋生成動畫。
+3. **ch01 內容權威檔 = [`chapter1-standalone.html`](../experiments/handout_kit/chapter1-standalone.html)**（非 example-ch01/ 片段；ch02+ 權威檔屆時另定）。
+
+**現況事實核對：** ch01 HTML 與 `ch01_foundations.tex` 內容 verbatim 同源（抽查多處逐字一致；HTML 僅剝 `\index`、交叉引用改手寫編號）。§1.1 的 5 個動畫 hook code **未落檔**（repo 無檔、工程稿全標 `# HOOK(待補)`——下方舊待辦「已於先前 session 完成」實為 cue 層面，code 未進版控），第二輪需重新生成。
+
+**§1.1 v2 進度（同日完成至 mock）：**
+- ✅ 內容稿 v2（[`content_scripts/ch01_inverse_functions.md`](content_scripts/ch01_inverse_functions.md) 覆寫，沿用 deck id）：17 單元（v1 為 16；Remark 1.2 變數改名升格獨立單元，有偏離註記）、4 個 animation_cue（u2 兩進一出、u6 水平線 sweep、u12 往返、u13 翻摺）。**15 段 narration 已於 2026-06-10 經使用者認可。**
+- ✅ 工程稿 v2（[`storyboards/ch01_inverse_functions.yml`](storyboards/ch01_inverse_functions.yml) 覆寫）：17 場景，say＝認可 narration 原文＋`{show}` 標記；4 處 `# HOOK(第二輪)` 註記動畫接入點；graph 場景座標沿用 v1 已調校資產（工程層經驗，非內容繼承）。
+- ✅ 守門員＋mock 成片：lint clean、sizecheck consistent，480p mock 全 17 場景 compose 成功（`output/ch01_inverse_functions.mp4`，≈8'42"）。1080p 預覽版同日 render。
+- ⚠️ 踩坑記錄：make.py 背景 render 時**不可並行**再跑 sizecheck/manim——兩程序搶 `media\Tex\` 快取，會互相打出 PermissionError／dvisvgm ValueError 假錯（單跑即消失）。
+- ⬜ 下一步：使用者看 1080p mock 驗收格局 → 第二輪（hook 機制 task #6＋4 動畫生成接入）→ 真旁白 TTS（計費，先報價）→ VLM critic（計費）→ 4K 定版。
+
+**待辦（換源遺留）：** `review_pack.py` faithfulness lens parser 改吃 HTML（§1.1 v2 先人工對照，parser 後補）。
 
 ## ✅ 已完成
 

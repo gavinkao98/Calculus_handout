@@ -1,11 +1,12 @@
-# Section 1.1 Inverse Functions -- 工程稿（storyboard, gen-2 格式）
+# Section 1.1 Inverse Functions -- 工程稿 v2（storyboard, gen-2 格式）
 #
-# 從 content_scripts/ch01_inverse_functions.md（16 單元內容稿）映射而來。
-# 第二階段「模板化」產物:每單元配 template + accent、narration→say 插 {show}、
-# visual_need→視覺 payload。`source` 欄回溯內容稿/講義(承自內容方法論的可追溯性)。
+# 從 content_scripts/ch01_inverse_functions.md（內容稿 v2,17 單元,narration 已認可
+# 2026-06-10）映射而來。講義權威:experiments/handout_kit/chapter1-standalone.html §1.1。
+# 第二階段「模板化」產物:每單元配 template + accent、認可的 narration→say 插 {show}、
+# visual_need→視覺 payload。`source` 欄回溯內容稿單元 id（單元內有講義錨點）。
 #
-# 動畫頂著:內容稿有 5 個 animation_cue(客製 manim,使用者自畫)。此版先用模板
-# 靜態/內建版頂著,各場景以 `# HOOK(待補):...` 註記待接入點。先落地一支 mock 成片。
+# 動畫頂著（2026-06-10 拍板:先靜態版、動畫第二輪）:內容稿有 4 個 animation_cue,
+# 各場景以 `# HOOK(第二輪):...` 註記待接入點;本版以模板靜態/內建版頂著。
 
 meta:
   id: ch01_inverse_functions
@@ -17,7 +18,7 @@ meta:
   theme: midnight
   voice: Kore
   video: { w: 3840, h: 2160, fps: 60 }   # 交付標準：4K60 (manim fourk_quality)
-  tagline: "When can a process be run backwards?"
+  tagline: "When can a function be undone?"
   sections:
     - { id: "1.1", title: "Inverse Functions" }
     - { id: "1.2", title: "Inverse Trigonometric Functions" }
@@ -31,324 +32,370 @@ scenes:
   # 1 ----------------------------------------------------------------- intro
   - id: intro
     kind: intro
-    source: "§1.1 + chapter context"
-    tagline: "When can a process be run backwards?"
+    source: "內容稿 u1 intro"
+    tagline: "When can a function be undone?"
     bgm: soft_intro
     duration: 5.8
 
-  # 2 -------------------------------------------- motivation (definition_math 頂著)
-  # HOOK(待補):左 f(x)=x 各輸入射向相異輸出;右 x^2 的 ±1/2 兩箭頭匯聚到 1/4。
-  - id: why_reverse_needs_one_to_one
+  # 2 ------------------------------------------- motivation (definition_math 頂著)
+  # HOOK(第二輪):左 f(x)=x 各輸入箭頭依序亮起、各入各位;右 x² 的 ±1/2 兩箭頭
+  # 匯聚到同一個 1/4,匯聚瞬間頓一下並強調該點(「兩進一出——回不去」)。
+  - id: can_we_go_backwards
     kind: content
     template: definition_math
     accent: definition
-    source: "§1.1 opener prose + warm-ups (L18-27)"
-    title: "When Can a Process Be Reversed?"
+    source: "內容稿 u2 can_we_go_backwards"
+    title: "Can We Go Backwards?"
     say: |
-      We begin with a simple question: when can a process be run backwards?
-      If a rule turns each input into an output, we often want to recover the
-      input from the output.
-      {show math.0} For $f(x)=x$ on $[0,1]$, every input keeps its own value,
-      so each output came from exactly one input.
-      {show math.1} But for $f(x)=x^2$ on $[-1,1]$, both one half and minus one
-      half produce one quarter -- one output from two inputs. Reversing only
-      makes sense in the first case, and that is the property we must pin down.
-    statement: "Reversing a process needs each output to come from exactly one input."
+      Every function is a one-way machine: feed it an input, and it hands you
+      an output. This section asks the reverse question -- starting from the
+      output, can we recover the input that produced it? Watch two quick cases.
+      {show math.0} For $f(x)=x$ on $[0,1]$, every input keeps its own value:
+      $0$ stays at $0$, one half stays at one half.
+      {show math.1} But for $f(x)=x^2$ on $[-1,1]$, something breaks: both
+      $\tfrac12$ and $-\tfrac12$ are sent to $\tfrac14$. In the first case,
+      each output points back to exactly one input; in the second, the output
+      $\tfrac14$ cannot tell us which input it came from -- and that difference
+      is the whole story of this section.
+    statement: "Going backwards needs each output to come from exactly one input."
     math:
-      - "$f(x)=x$ on $[0,1]$: distinct inputs give distinct outputs"
-      - { tex: "$f(x)=x^2$ on $[-1,1]$: $\\tfrac12,\\,-\\tfrac12 \\mapsto \\tfrac14$", anim: highlight }
+      - "$f(x)=x$ on $[0,1]$: every input keeps its own value"
+      - { tex: "$f(x)=x^2$ on $[-1,1]$: $\\tfrac12,\\ -\\tfrac12 \\mapsto \\tfrac14$", anim: highlight }
 
   # 3 ------------------------------------------------------ definition: one-to-one
   - id: one_to_one_definition
     kind: content
     template: definition_math
     accent: definition
-    source: "§1.1.1 definition (L33-45)"
+    source: "內容稿 u3 one_to_one_definition"
     title: "One-to-One Functions"
     say: |
-      The property is called one-to-one. A function is one-to-one when
-      different inputs always give different outputs.
-      {show math.0} In symbols, $f(x_1)\ne f(x_2)$ whenever $x_1\ne x_2$.
-      {show math.1} There is an equivalent form that is easier to use inside a
-      proof: if $f(x_1)=f(x_2)$, then $x_1=x_2$. Both say the same thing -- no
-      two distinct inputs can ever land on the same output.
-    statement: "A function is one-to-one if different inputs always give different outputs."
+      The property that separates the two cases has a name: one-to-one.
+      {show math.0} A function $f$ is one-to-one if $f(x_1) \ne f(x_2)$
+      whenever $x_1 \ne x_2$ -- different inputs always produce different
+      outputs.
+      {show math.1} The same condition can be turned around: if
+      $f(x_1) = f(x_2)$, then $x_1 = x_2$. Both forms say the same thing, but
+      the second one is the workhorse in computations: assume two outputs
+      agree, and deduce that the inputs were equal all along.
+    statement: "A function is one-to-one if different inputs always produce different outputs."
     math:
       - "$f(x_1) \\ne f(x_2)$ whenever $x_1 \\ne x_2$"
       - { tex: "$f(x_1) = f(x_2) \\implies x_1 = x_2$", anim: highlight }
 
-  # 4 --------------------------------------- example: student-ID (definition_math 頂著)
-  - id: student_id_is_one_to_one
+  # 4 --------------------------------------- example: student IDs (definition_math 頂著)
+  - id: ids_before_algebra
     kind: content
     template: definition_math
     accent: example
-    source: "§1.1.1 workedexample (L48-60)"
-    title: "A Plain-Language Test"
+    source: "內容稿 u4 ids_before_algebra"
+    title: "One-to-One Without Algebra"
     say: |
-      Before any algebra, here is the idea in plain terms. Assign each student
-      in a class an ID number, with no two students sharing a number. Is the
-      rule from student to ID one-to-one?
-      {show math.0} Yes -- distinct students always get distinct numbers,
-      which is exactly what one-to-one means. The habit to build early: ask
-      whether one output could trace back to two different inputs.
-    statement: "Assign each student a unique ID number -- no two share one."
+      Here is the definition at work in a setting with no formulas at all.
+      {show math.0} Assign every student in a class an identification number,
+      making sure no two students share one. Is the rule sending each student
+      to their ID number one-to-one?
+      {show math.1} Yes -- distinct students always receive distinct numbers,
+      which is precisely the defining condition. The habit worth keeping:
+      one-to-one is a question about the matching itself, not about algebra.
+    statement: "Each student gets an ID number; no two students share one."
     math:
-      - "distinct students $\\Rightarrow$ distinct IDs (one-to-one)"
+      - "student $\\longmapsto$ ID number"
+      - { tex: "distinct students $\\Rightarrow$ distinct IDs (one-to-one)", anim: highlight }
 
-  # 5 ------------------------------------------------ example: algebraic test
-  - id: testing_x_and_x_squared
+  # 5 ------------------------------------------------ example: algebraic check
+  - id: checking_with_algebra
     kind: content
     template: example_walkthrough
     accent: example
-    source: "§1.1.1 workedexample (L64-83)"
-    title: "Testing with Algebra"
+    source: "內容稿 u5 checking_with_algebra"
+    title: "Checking with Algebra"
     say: |
-      Now test two functions algebraically.
-      {show math.0} On $[0,1]$, $f(x)=x$ sends each input to itself, so distinct
-      inputs give distinct outputs -- one-to-one.
-      {show math.1} Now take $g(x)=x^2$ on $[-1,1]$: we get $g$ of one half and
-      $g$ of minus one half both equal to one quarter.
-      {show math.2} Two different inputs, the same output, so $g$ is not one-to-one.
-      {show takeaway} A single colliding pair is all it takes to fail.
+      Now back to the two functions from the opening, this time as a formal
+      check.
+      {show math.0} On $[0,1]$, the function $f(x)=x$ sends every input to
+      itself, so distinct inputs automatically give distinct outputs --
+      one-to-one.
+      {show math.1} For $g(x)=x^2$ on $[-1,1]$, compute both values:
+      $g(\tfrac12)=\tfrac14$, and $g(-\tfrac12)=\tfrac14$ as well.
+      {show math.2} Two different inputs share one output, so $g$ is not
+      one-to-one.
+      {show takeaway} And the consequence matters: no rule can send $\tfrac14$
+      back to a single input, so $g$ cannot be reversed on this interval.
     steps:
-      - { text: "$f(x)=x$ on $[0,1]$: distinct outputs.", math: "f(x)=x,\\ 0\\le x\\le 1", mark: ok }
-      - { text: "Test $g(x)=x^2$ at $x=\\pm\\tfrac12$.", math: "g\\!\\left(\\tfrac12\\right)=\\tfrac14=g\\!\\left(-\\tfrac12\\right)", hot: true }
-      - { text: "Two inputs collide, $g$ not one-to-one.", math: "\\tfrac12 \\ne -\\tfrac12", mark: bad }
-    takeaway: "A single colliding pair of inputs is enough to disprove one-to-one."
+      - { text: "On $[0,1]$, $f(x)=x$ keeps every input distinct.", math: "f(x)=x,\\ 0\\le x\\le 1", mark: ok }
+      - { text: "Evaluate $g(x)=x^2$ at $x=\\pm\\tfrac12$.", math: "g\\!\\left(\\tfrac12\\right)=\\tfrac14=g\\!\\left(-\\tfrac12\\right)", hot: true }
+      - { text: "Two different inputs share one output.", math: "\\tfrac12 \\ne -\\tfrac12", mark: bad }
+    takeaway: "No rule can send $\\tfrac14$ back to a single input -- $g$ has no inverse on $[-1,1]$."
 
-  # 6 ------------------------------------------ counterexample: why x^2 fails (graph)
-  # HOOK(待補):水平線從上方下移掃過 parabola,落到 y=1/4 停住、閃示兩交點 ±1/2、各拉虛線回 x 軸。
-  - id: why_square_cannot_invert
-    kind: content
-    template: graph_focus
-    accent: example
-    source: "§1.1.1 prose (L85)"
-    title: "Why $g(x)=x^2$ Cannot Be Inverted on $[-1,1]$"
-    say: |
-      Why does that collision matter so much? The output $y=\tfrac14$ is
-      reached at two places on the parabola.
-      {show annotation.0} If we ran $g$ backwards, one quarter would have to
-      return two inputs, one half and minus one half -- a function cannot do
-      that, so no inverse exists on this interval.
-    axes:
-      x_range: [-1.45, 1.45, 0.5]
-      y_range: [-0.28, 1.55, 0.25]
-      x_length: 6.35
-      y_length: 3.65
-      x_ticks: [-1, 1]   # mark the domain endpoints on the axis
-    plots:
-      # faint dashed walls at x = +/-1 make the domain [-1,1] (the whole point of
-      # the title) visible; listed first so they sit behind the curve and points.
-      - { kind: line, start: [-1, -0.28], end: [-1, 1.05], dashed: true, color_role: muted }
-      - { kind: line, start: [1, -0.28], end: [1, 1.05], dashed: true, color_role: muted }
-      - { kind: function, expression: "x**2", x_range: [-1.45, 1.45], color_role: secondary, label: "$g(x)=x^2$", label_point: [0.08, 1.30] }
-      - { kind: line, start: [-1.45, 0.25], end: [1.45, 0.25], dashed: true, color_role: warning, label: "$y=1/4$", label_side: right }
-      - { kind: point, point: [-0.5, 0.25], hollow: false, color_role: accent }   # g(-1/2)=1/4 exists -> solid
-      - { kind: point, point: [0.5, 0.25], hollow: false, color_role: accent }    # g(1/2)=1/4 exists -> solid
-    annotations:
-      - "Two inputs share one output -- $g^{-1}(\\tfrac14)$ is not well-defined."
-
-  # 7 -------------------------------------- proposition: horizontal line test (graph)
-  # HOOK(待補):並排兩圖,各放水平線從上往下 sweep;左圖恆一個交點(通過)、右圖兩交點(失敗)。
+  # 6 -------------------------------------- proposition: horizontal line test (graph)
+  # HOOK(第二輪):兩圖並排(單調遞增 vs parabola),同一條水平線同步由上往下 sweep;
+  # 左圖任何高度只一交點(綠色短暫強調),右圖掃到某高度出現兩交點(紅色強調)停住,
+  # 兩交點各拉虛線落回 x 軸標出兩個不同輸入。靜態頂著版只畫 parabola 單圖。
   - id: horizontal_line_test
     kind: content
     template: graph_focus
     accent: proposition
-    source: "§1.1.1 remark + figure (L89-134)"
+    source: "內容稿 u6 horizontal_line_test"
     title: "The Horizontal Line Test"
     say: |
-      Here is the graphical version. A horizontal line $y=c$ meets the graph
-      wherever $f(x)=c$.
-      {show annotation.0} So a function is one-to-one exactly when no horizontal
-      line crosses its graph more than once. This parabola fails: the line hits
-      twice, so two inputs share an output.
+      There is a way to read one-to-one straight off the graph. A horizontal
+      line $y=c$ crosses the graph of $f$ wherever $f(x)=c$, so every crossing
+      is one input that produces the output $c$.
+      {show annotation.0} That gives the test: a function is one-to-one exactly
+      when no horizontal line meets its graph more than once. Two crossings on
+      one line would mean two inputs with the same output -- exactly the
+      failure we saw with $x^2$. So sweep horizontal lines down the graph and
+      count: at most one crossing at every height is what passing looks like.
     axes:
       x_range: [-1.6, 1.6, 0.5]
       y_range: [-0.3, 1.7, 0.5]
       x_length: 6.0
       y_length: 3.6
     plots:
-      - { kind: function, expression: "x**2", x_range: [-1.5, 1.5], color_role: secondary, label: "$y=f(x)$", label_point: [0.1, 1.45] }
+      - { kind: function, expression: "x**2", x_range: [-1.5, 1.5], color_role: secondary, label: "$y=x^2$", label_point: [0.1, 1.45] }
       - { kind: line, start: [-1.6, 0.64], end: [1.6, 0.64], dashed: true, color_role: warning, label: "$y=c$", label_side: right }
       - { kind: point, point: [-0.8, 0.64], hollow: false, color_role: accent }
       - { kind: point, point: [0.8, 0.64], hollow: false, color_role: accent }
     annotations:
-      - "One-to-one if and only if no horizontal line meets the graph more than once."
+      - "One-to-one $\\iff$ no horizontal line meets the graph more than once."
 
-  # 8 ----------------------------------------------- definition: inverse function
-  - id: inverse_function_definition
+  # 7 ----------------------------------------------- definition: inverse function
+  - id: inverse_definition
     kind: content
     template: definition_math
     accent: definition
-    source: "§1.1.2 definition + remark (L140-152)"
+    source: "內容稿 u7 inverse_definition"
     title: "The Inverse Function"
     say: |
-      Once $f$ is one-to-one, we can define its inverse.
-      {show math.0} With domain $A$ and range $B$, the inverse $f^{-1}$ has
-      domain $B$ and range $A$, defined by $f^{-1}(y)=x$ exactly when $f(x)=y$.
-      {show math.1} Domain and range swap roles. Sometimes we relabel and write
-      $x$ as the input of $f^{-1}$, but that is only renaming -- the inverse
-      reverses the original correspondence.
-    statement: "If $f$ is one-to-one, $f^{-1}$ sends each output back to its unique input."
+      For a one-to-one function, every output traces back to exactly one input
+      -- so the backwards assignment is itself a function. We call it the
+      inverse of $f$, written $f^{-1}$.
+      {show math.0} If $f$ has domain $A$ and range $B$, then $f^{-1}$ has
+      domain $B$ and range $A$, and its rule is the defining relation:
+      $f^{-1}(y) = x$ exactly when $f(x) = y$.
+      {show math.1} Note the trade: the outputs of $f$ become the inputs of
+      $f^{-1}$, and domain and range swap places.
+    statement: "The inverse $f^{-1}$ sends each output of $f$ back to the unique input that produced it."
     math:
       - "$f^{-1}(y)=x \\iff f(x)=y$"
-      - { tex: "$\\operatorname{dom} f^{-1}=B,\\ \\ \\operatorname{ran} f^{-1}=A$", anim: highlight }
+      - { tex: "$\\operatorname{dom} f^{-1}=B,\\quad \\operatorname{ran} f^{-1}=A$", anim: highlight }
 
-  # 9 ----------------------------------------------- theorem + proof: existence
-  - id: inverse_exists_iff_one_to_one
+  # 8 ---------------------------------------------- notation: renaming the variable
+  - id: reading_the_notation
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "內容稿 u8 reading_the_notation"
+    title: "Reading the Notation"
+    say: |
+      One notational habit before we continue.
+      {show math.0} We usually prefer $x$ as the input letter of whatever
+      function we are currently studying -- including $f^{-1}$ itself.
+      {show math.1} After renaming the variables, the defining relation reads:
+      $f^{-1}(x) = y$ exactly when $f(y) = x$. Same statement, new letters --
+      and this renaming is the reason the procedure at the end of this section
+      will ask us to interchange $x$ and $y$.
+    statement: "We may rename the variables so that $x$ is the input of $f^{-1}$ too."
+    math:
+      - "$f^{-1}(y)=x \\iff f(x)=y$"
+      - { tex: "$f^{-1}(x)=y \\iff f(y)=x$", anim: highlight }
+
+  # 9 ------------------------------------------------- theorem: existence (statement)
+  - id: inverse_iff_one_to_one
+    kind: content
+    template: definition_math
+    accent: theorem
+    source: "內容稿 u9 inverse_iff_one_to_one"
+    title: "When Does an Inverse Exist?"
+    say: |
+      We introduced one-to-one as the property that makes reversing possible;
+      the theorem pins that down.
+      {show math.0} A function has an inverse if and only if it is one-to-one.
+      There are no hidden conditions: the property we can already check -- by
+      the definition or by horizontal lines -- is the complete story of
+      invertibility. Let us walk through why both directions hold.
+    statement: "A function has an inverse if and only if it is one-to-one."
+    math:
+      - { tex: "$f\\ \\text{has an inverse} \\iff f\\ \\text{is one-to-one}$", anim: highlight }
+
+  # 10 ---------------------------------------------------- proof: both directions
+  - id: proof_both_directions
     kind: content
     template: theorem_proof
     accent: theorem
-    source: "§1.1.2 theorem + proof (L154-165)"
-    title: "Existence of an Inverse"
+    source: "內容稿 u10 proof_both_directions"
+    title: "Proof: Both Directions"
     say: |
-      This theorem ties it together: a function has an inverse if and only if it
-      is one-to-one.
-      {show proof.0} If $f$ has an inverse and $f(x_1)=f(x_2)$, apply $f^{-1}$ to
-      both sides to get $x_1=x_2$ -- so $f$ is one-to-one.
-      {show proof.1} Conversely, if $f$ is one-to-one, every output $y$ comes
-      from exactly one input $x$, and sending $y$ back to that $x$ defines the inverse.
-      {show qed} So the property we studied is exactly the right condition.
+      First, suppose $f$ has an inverse.
+      {show proof.0} If $f(x_1) = f(x_2)$, apply $f^{-1}$ to both sides --
+      $f^{-1}(f(x_1)) = f^{-1}(f(x_2))$ -- and by the defining relation each
+      side collapses back to its input, so $x_1 = x_2$. Equal outputs force
+      equal inputs: $f$ is one-to-one.
+      {show proof.1} Now the converse. Let $f$ be one-to-one with domain $A$
+      and range $B$. Every $y$ in $B$ is hit by at least one $x$ in $A$ --
+      that is what being the range means -- and one-to-one guarantees at most
+      one.
+      {show qed} Exactly one input for each output: sending each $y$ to that
+      unique $x$ is a well-defined function from $B$ to $A$, and it is
+      precisely the inverse of $f$.
     statement: "A function has an inverse if and only if it is one-to-one."
     proof:
-      - "($\\Rightarrow$) If $f(x_1)=f(x_2)$, apply $f^{-1}$: $x_1=x_2$."
-      - "($\\Leftarrow$) One-to-one gives each $y\\in B$ a unique $x$; then $y\\mapsto x$ is $f^{-1}$."
-    qed: "Therefore an inverse exists iff $f$ is one-to-one."
+      - "($\\Rightarrow$) $f(x_1)=f(x_2) \\;\\Rightarrow\\; f^{-1}\\!\\bigl(f(x_1)\\bigr)=f^{-1}\\!\\bigl(f(x_2)\\bigr) \\;\\Rightarrow\\; x_1=x_2$"
+      - "($\\Leftarrow$) each $y\\in B$ has exactly one $x$ with $f(x)=y$; set $f^{-1}(y)=x$"
+    qed: "An inverse exists exactly when $f$ is one-to-one."
 
-  # 10 ------------------------------------------------ example: first inverses
-  - id: first_inverses_x_and_cube
+  # 11 ------------------------------------------------ example: first inverses
+  - id: first_inverses
     kind: content
     template: example_walkthrough
     accent: example
-    source: "§1.1.2 workedexample (L167-187)"
+    source: "內容稿 u11 first_inverses"
     title: "First Inverses"
     say: |
-      Two quick inverses.
-      {show math.0} The identity $f(x)=x$ is its own inverse: $f^{-1}(x)=x$.
-      {show math.1} For $g(x)=x^3$, set $y=x^3$ and solve to get $x=\sqrt[3]{y}$.
-      {show math.2} Rename to $g^{-1}(x)=\sqrt[3]{x}$, and check by composition
-      that $g$ of $g$-inverse of $x$ is $x$.
-      {show takeaway} The cube and the cube root undo each other, as an inverse should.
+      Time to find actual inverses, starting small.
+      {show math.0} The identity function $f(x)=x$ leaves every input
+      untouched, so reversing it changes nothing either: $f$ is its own
+      inverse, $f^{-1}(x) = x$.
+      {show math.1} Next, $g(x)=x^3$. Write $y = x^3$ and solve for the input:
+      $x = \sqrt[3]{y}$,
+      {show math.2} so after renaming the variable, $g^{-1}(x) = \sqrt[3]{x}$.
+      {show takeaway} And the answer checks out: $g(g^{-1}(x)) =
+      (\sqrt[3]{x})^3 = x$ -- feeding the inverse's output back into $g$
+      returns exactly where we started.
     steps:
-      - { text: "Identity is its own inverse.", math: "f^{-1}(x)=x", mark: ok }
-      - { text: "Solve $y=x^3$ for $x$.", math: "x=\\sqrt[3]{y}", hot: true }
-      - { text: "Rename and check.", math: "g^{-1}(x)=\\sqrt[3]{x}", mark: ok }
-    takeaway: "Cube and cube root undo each other."
+      - { text: "The identity is its own inverse.", math: "f^{-1}(x)=x", mark: ok }
+      - { text: "Solve $y=x^3$ for the input.", math: "x=\\sqrt[3]{y}", hot: true }
+      - { text: "Rename the variable.", math: "g^{-1}(x)=\\sqrt[3]{x}", mark: ok }
+    takeaway: "Check by composing: $g(g^{-1}(x))=(\\sqrt[3]{x})^3=x$."
 
-  # 11 ------------------------------------ proposition: composition identities
-  # HOOK(待補):x∈A 沿 f 箭頭到 f(x)∈B,再沿 f⁻¹ 箭頭走回原 x(回到原位閃一下);另一組同理。
+  # 12 ------------------------------------ proposition: composition identities
+  # HOOK(第二輪):點 x 沿上弧(f)走到 B 中的 f(x),再沿下弧(f⁻¹)走回原處、原點閃一下
+  # 示意「回到自己」;第二趟由 B 中的 y 出發反向走一輪,對應第二條恆等式。
   - id: composition_identities
     kind: content
     template: definition_math
     accent: proposition
-    source: "§1.1.2 proposition + figure (L189-230)"
+    source: "內容稿 u12 composition_identities"
     title: "Composition Identities"
     say: |
-      The definition of the inverse gives two identities worth remembering.
-      {show math.0} Apply $f$ then $f^{-1}$ and you return to the start:
-      $f^{-1}(f(x))=x$ for every $x$ in $A$.
-      {show math.1} The other way round, $f(f^{-1}(y))=y$ for every $y$ in $B$.
-      Going out and coming back lands you exactly where you began -- that round
-      trip is what inverse means.
-    statement: "Inverse composition returns you to where you started."
+      That final check was not a coincidence -- it is a law that every inverse
+      obeys.
+      {show math.0} Because $f^{-1}(y) = x$ means exactly the same thing as
+      $f(x) = y$, going forward and then backwards always lands you where you
+      started: $f^{-1}(f(x)) = x$ for every $x$ in $A$,
+      {show math.1} and in the other direction, $f(f^{-1}(y)) = y$ for every
+      $y$ in $B$. In words: $f$ and $f^{-1}$ undo each other, in both orders.
+      These two identities are also the practical test -- to certify that a
+      claimed inverse is correct, compose the two and watch everything cancel.
+    statement: "$f$ and $f^{-1}$ undo each other, in both orders."
     math:
-      - "$f^{-1}\\!\\bigl(f(x)\\bigr)=x,\\quad x\\in A$"
-      - { tex: "$f\\!\\bigl(f^{-1}(y)\\bigr)=y,\\quad y\\in B$", anim: highlight }
+      - "$f^{-1}\\!\\bigl(f(x)\\bigr)=x \\quad\\text{for every } x\\in A$"
+      - { tex: "$f\\!\\bigl(f^{-1}(y)\\bigr)=y \\quad\\text{for every } y\\in B$", anim: highlight }
 
-  # 12 ------------------------------------------- visual: reflection across y=x
-  # HOOK(待補):畫 f(x)=x^3、畫對角虛線 y=x,讓曲線對 y=x 翻摺生成 ∛x;標 (a,b)→(b,a)。
-  - id: reflection_across_y_equals_x
+  # 13 ------------------------------------------- visual: reflection across y=x
+  # HOOK(第二輪):先畫 y=x³ 與虛線 y=x;曲線沿 y=x「翻摺」生成 ∛x;一組具體點對
+  # (a,b)→(b,a) 以連接線跨過鏡線對應閃示;收在兩曲線＋鏡線並存的全圖。
+  - id: graphs_mirror_across_y_x
     kind: content
     template: graph_focus
     accent: example
-    source: "§1.1.2 prose (L232-233)"
-    title: "Reflection Across $y=x$"
+    source: "內容稿 u13 graphs_mirror_across_y_x"
+    title: "Mirror Images Across $y=x$"
     say: |
-      There is a clean picture behind all of this. Draw $f$ and its inverse together.
-      {show annotation.0} The two graphs are mirror images across the line
-      $y=x$: a point $(a,b)$ on $f$ corresponds to $(b,a)$ on $f^{-1}$. The
-      inverse's graph is the original, flipped over the diagonal.
+      The algebra of inverses leaves a picture behind. If the point $(a,b)$
+      lies on the graph of $f$, then $f(a) = b$, which is the same as
+      $f^{-1}(b) = a$ -- so the point $(b,a)$ lies on the graph of $f^{-1}$.
+      {show annotation.0} Swapping the two coordinates of a point is exactly a
+      reflection across the line $y = x$. So the two graphs are mirror images:
+      take $g(x) = x^3$ and its inverse $\sqrt[3]{x}$, fold the plane along
+      $y = x$, and each curve lands precisely on the other.
     axes:
       x_range: [-2.2, 2.2, 1]
       y_range: [-2.2, 2.2, 1]
       x_length: 4.6
       y_length: 4.6
     plots:
-      - { kind: function, expression: "x**3", x_range: [-1.3, 1.3], color_role: secondary, label: "$f(x)=x^3$", label_point: [1.05, 1.75] }
-      - { kind: function, expression: "cbrt(x)", x_range: [-2.0, 2.0], color_role: accent, label: "$f^{-1}(x)=\\sqrt[3]{x}$", label_point: [1.75, 1.0] }
+      - { kind: function, expression: "x**3", x_range: [-1.3, 1.3], color_role: secondary, label: "$g(x)=x^3$", label_point: [1.05, 1.75] }
+      - { kind: function, expression: "cbrt(x)", x_range: [-2.0, 2.0], color_role: accent, label: "$g^{-1}(x)=\\sqrt[3]{x}$", label_point: [1.75, 1.0] }
       - { kind: line, start: [-2.0, -2.0], end: [2.0, 2.0], dashed: true, color_role: muted, label: "$y=x$", label_point: [-1.5, -1.85] }
-      # mark (a,b) on f and its mirror (b,a) on f^-1; the dashed connector is
-      # perpendicular to y=x, making the reflection concrete (P1: the narration
-      # names the (a,b)->(b,a) correspondence but no point anchored it on screen).
       - { kind: line, start: [1.1, 1.331], end: [1.331, 1.1], dashed: true, color_role: muted }
       - { kind: point, point: [1.1, 1.331], hollow: false, color_role: secondary }
       - { kind: point, point: [1.331, 1.1], hollow: false, color_role: accent }
     annotations:
-      - "$(a,b)$ on $f$ corresponds to $(b,a)$ on $f^{-1}$ -- reflection across $y=x$."
+      - "$(a,b)$ on $g$ $\\leftrightarrow$ $(b,a)$ on $g^{-1}$: reflection across $y=x$."
 
-  # 13 ----------------------------------------------- procedure: find an inverse
-  - id: procedure_find_inverse
+  # 14 ----------------------------------------------- procedure: find an inverse
+  - id: the_procedure
     kind: content
     template: procedure_steps
     accent: procedure
-    source: "§1.1.3 strategy (L239-245)"
-    title: "Finding an Inverse"
+    source: "內容稿 u14 the_procedure"
+    title: "Finding an Inverse: The Procedure"
     say: |
-      When $f$ is one-to-one, a short recipe finds the inverse.
-      {show math.0} Step one: write $y=f(x)$.
-      {show math.1} Step two: solve that equation for $x$ in terms of $y$.
-      {show math.2} Step three: interchange the names $x$ and $y$, giving
-      $y=f^{-1}(x)$. That last swap rewrites the answer as a function of $x$.
+      The cube-root computations secretly followed a recipe, and it works for
+      any one-to-one function.
+      {show math.0} Step one: write $y = f(x)$.
+      {show math.1} Step two: solve this equation for $x$ in terms of $y$.
+      {show math.2} Step three: interchange the names $x$ and $y$ -- the
+      result reads $y = f^{-1}(x)$. All the real work lives in step two; the
+      final swap is just the variable-naming habit we set up earlier.
     steps:
       - { text: "Write the rule as an equation.", math: "y=f(x)" }
-      - { text: "Solve for the input in terms of the output.", math: "x=\\text{(expr in }y)" }
-      - { text: "Swap the names to name the inverse.", math: "y=f^{-1}(x)" }
+      - { text: "Solve this equation for $x$ in terms of $y$.", math: "x=\\text{(expression in } y)" }
+      - { text: "Interchange the names $x$ and $y$.", math: "y=f^{-1}(x)" }
 
-  # 14 ------------------------------------- example: inverse of x^3+2 (procedure)
-  - id: worked_inverse_cubic_shift
+  # 15 ------------------------------------- example: inverse of x^3+2 (procedure)
+  - id: procedure_in_action
     kind: content
     template: procedure_steps
     accent: example
-    source: "§1.1.3 workedexample (L247-266)"
+    source: "內容稿 u15 procedure_in_action"
     title: "Worked Example: $f(x)=x^3+2$"
     say: |
-      Apply the recipe to $f(x)=x^3+2$.
-      {show math.0} Write $y=x^3+2$.
-      {show math.1} Solve: $x^3=y-2$, so $x=\sqrt[3]{y-2}$.
-      {show math.2} Interchange the names to get $f^{-1}(x)=\sqrt[3]{x-2}$.
-      {show worked} Always check: $f$ of $f$-inverse of $x$ is the cube of the
-      cube root of $x-2$, plus two, which is $x-2$ plus two, which is $x$.
+      Same recipe, one notch up: $f(x) = x^3 + 2$.
+      {show math.0} From $y = x^3 + 2$, isolate the input --
+      {show math.1} $x^3 = y - 2$, then $x = \sqrt[3]{y - 2}$.
+      {show math.2} Interchange the names, and the inverse appears:
+      $f^{-1}(x) = \sqrt[3]{x - 2}$.
+      {show worked} Finally the certificate: $f(f^{-1}(x)) =
+      (\sqrt[3]{x-2})^3 + 2 = (x-2) + 2 = x$. Everything cancels back to $x$,
+      so this really is the inverse.
     steps:
       - { text: "Write the equation.", math: "y=x^3+2" }
-      - { text: "Solve for $x$.", math: "x=\\sqrt[3]{y-2}" }
+      - { text: "Solve for $x$.", math: "x^3=y-2,\\ \\ x=\\sqrt[3]{y-2}" }
       - { text: "Swap the names.", math: "f^{-1}(x)=\\sqrt[3]{x-2}" }
-    worked: ["f(x)=x^3+2", "x=\\sqrt[3]{\\,y-2\\,}", "f\\!\\bigl(f^{-1}(x)\\bigr)=x"]
+    worked: ["f\\!\\bigl(f^{-1}(x)\\bigr)=\\bigl(\\sqrt[3]{x-2}\\bigr)^{3}+2", "=(x-2)+2", "=x"]
 
-  # 15 ---------------------------------------------------------------- recap
+  # 16 ---------------------------------------------------------------- recap
   - id: recap
     kind: content
     template: recap_cards
     accent: recap
-    source: "全節綜合"
+    source: "內容稿 u16 recap"
     title: "Section 1.1 -- Recap"
     say: |
-      Let us gather the thread.
-      {show point.0} One-to-one means no two inputs collide on the same output.
-      {show point.1} The horizontal line test is the visual version of that check.
-      {show point.2} A function has an inverse exactly when it is one-to-one.
-      {show formula.0} {show formula.1} Keep these two identities -- and remember
-      the inverse's graph is the original reflected across $y=x$.
+      Here is the whole section in four moves.
+      {show point.0} A function is one-to-one when different inputs never
+      share an output -- and on a graph, horizontal lines detect exactly that.
+      {show point.1} A function has an inverse precisely when it is
+      one-to-one, with domain and range trading places.
+      {show formula.0} {show formula.1} The inverse undoes the original --
+      $f^{-1}(f(x)) = x$ and $f(f^{-1}(y)) = y$ -- and graphically the two
+      curves mirror across $y = x$.
+      {show point.2} And to compute one: write $y = f(x)$, solve for $x$,
+      then swap the names.
     points:
-      - "One-to-one: no two inputs share an output."
-      - "The Horizontal Line Test is the visual check."
-      - "An inverse exists exactly when $f$ is one-to-one."
+      - "One-to-one: different inputs never share an output -- horizontal lines detect it."
+      - "An inverse exists exactly when $f$ is one-to-one; domain and range trade places."
+      - "To compute an inverse: write $y=f(x)$, solve for $x$, then swap the names."
     formulas:
-      - "f(x_1)=f(x_2)\\ \\Longrightarrow\\ x_1=x_2"
       - "f^{-1}\\!\\bigl(f(x)\\bigr)=x"
+      - "f\\!\\bigl(f^{-1}(y)\\bigr)=y"
 
-  # 16 ---------------------------------------------------------------- outro
+  # 17 ---------------------------------------------------------------- outro
   - id: outro
     kind: outro
-    source: "全節收尾"
+    source: "內容稿 u17 outro"
     bgm: soft_outro
     duration: 8.0
