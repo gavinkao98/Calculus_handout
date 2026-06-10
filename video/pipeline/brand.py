@@ -220,6 +220,18 @@ def _wrap_prose_tex(text: str, ground: str, role: str, size: str, max_width: flo
         else:
             tokens.extend(part.split())
 
+    # Re-attach punctuation that directly followed an inline span in the source
+    # ("...$y$." / "...$x$, then"): the split above isolates it as its own token
+    # ("$y$", "."), and the " ".join below would render "y ." with a floating
+    # period / comma -- a recurring visual nit across step text and recap points.
+    merged: list[str] = []
+    for tok in tokens:
+        if merged and re.fullmatch(r"[,.;:!?]+", tok):
+            merged[-1] += tok
+        else:
+            merged.append(tok)
+    tokens = merged
+
     lines: list = []
     cur: list[str] = []
     for tok in tokens:
@@ -298,7 +310,10 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
         if not part:
             continue
         if i % 2:  # odd segments are the spans that were between $...$
-            mobs.append(MathTex(part, color=col, font_size=fsz))
+            # TEX_TEXT_SCALE: a MathTex at the Text's font_size renders ~25%
+            # smaller (Pango vs LaTeX sizing), which visibly shrank the math in
+            # titles like "Worked Example: $f(x)=x^3+2$".
+            mobs.append(MathTex(part, color=col, font_size=fsz * T.TEX_TEXT_SCALE))
         else:
             mobs.append(Text(part, font=T.FONT_DISPLAY, font_size=fsz,
                              color=col, weight="SEMIBOLD"))

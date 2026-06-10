@@ -44,6 +44,7 @@ scenes:
     kind: content
     template: definition_math
     accent: definition
+    kicker: motivation   # motivation 場景沿用 definition 色系,但 eyebrow 標實情
     source: "內容稿 u2 can_we_go_backwards"
     title: "Can We Go Backwards?"
     say: |
@@ -127,6 +128,7 @@ scenes:
       - { text: "Evaluate $g(x)=x^2$ at $x=\\pm\\tfrac12$.", math: "g\\!\\left(\\tfrac12\\right)=\\tfrac14=g\\!\\left(-\\tfrac12\\right)", hot: true }
       - { text: "Two different inputs share one output.", math: "\\tfrac12 \\ne -\\tfrac12", mark: bad }
     takeaway: "No rule can send $\\tfrac14$ back to a single input -- $g$ has no inverse on $[-1,1]$."
+    takeaway_tone: warn   # 負面結論(不可逆)→ warning 紅
 
   # 6 -------------------------------------- proposition: horizontal line test (graph)
   # HOOK(第二輪):兩圖並排(單調遞增 vs parabola),同一條水平線同步由上往下 sweep;
@@ -153,7 +155,9 @@ scenes:
       x_length: 6.0
       y_length: 3.6
     plots:
-      - { kind: function, expression: "x**2", x_range: [-1.5, 1.5], color_role: secondary, label: "$y=x^2$", label_point: [0.1, 1.45] }
+      # x_range 收到 ±1.3:±1.5 時曲線頂超出 y_range 1.7 被硬裁成平頭。
+      # label_point 右移離 y 軸(label 以左緣錨定)。
+      - { kind: function, expression: "x**2", x_range: [-1.3, 1.3], color_role: secondary, label: "$y=x^2$", label_point: [0.55, 1.42] }
       - { kind: line, start: [-1.6, 0.64], end: [1.6, 0.64], dashed: true, color_role: warning, label: "$y=c$", label_side: right }
       - { kind: point, point: [-0.8, 0.64], hollow: false, color_role: accent }
       - { kind: point, point: [0.8, 0.64], hollow: false, color_role: accent }
@@ -268,6 +272,7 @@ scenes:
       - { text: "Solve $y=x^3$ for the input.", math: "x=\\sqrt[3]{y}", hot: true }
       - { text: "Rename the variable.", math: "g^{-1}(x)=\\sqrt[3]{x}", mark: ok }
     takeaway: "Check by composing: $g(g^{-1}(x))=(\\sqrt[3]{x})^3=x$."
+    takeaway_tone: ok   # 正面驗證結論→ success 綠(原模板固定 warning 紅,語意錯)
 
   # 12 ------------------------------------ proposition: composition identities
   # HOOK(第二輪):點 x 沿上弧(f)走到 B 中的 f(x),再沿下弧(f⁻¹)走回原處、原點閃一下
@@ -316,12 +321,16 @@ scenes:
       x_length: 4.6
       y_length: 4.6
     plots:
-      - { kind: function, expression: "x**3", x_range: [-1.3, 1.3], color_role: secondary, label: "$g(x)=x^3$", label_point: [1.05, 1.75] }
+      # 標籤移位(v2 幀批改):g(x)=x³ 原 [1.05,1.75] 被自己的曲線穿過→移到曲線左側;
+      # y=x 原 [-1.5,-1.85] 撞 x³ 下臂→移到虛線左下端點下方,並補 label_role: muted
+      # (line label 預設 warning 紅,reference 線應為 muted 灰)。
+      - { kind: function, expression: "x**3", x_range: [-1.3, 1.3], color_role: secondary, label: "$g(x)=x^3$", label_point: [-0.55, 1.85] }
       - { kind: function, expression: "cbrt(x)", x_range: [-2.0, 2.0], color_role: accent, label: "$g^{-1}(x)=\\sqrt[3]{x}$", label_point: [1.75, 1.0] }
-      - { kind: line, start: [-2.0, -2.0], end: [2.0, 2.0], dashed: true, color_role: muted, label: "$y=x$", label_point: [-1.5, -1.85] }
+      - { kind: line, start: [-2.0, -2.0], end: [2.0, 2.0], dashed: true, color_role: muted, label: "$y=x$", label_point: [-1.88, -2.1], label_role: muted }
       - { kind: line, start: [1.1, 1.331], end: [1.331, 1.1], dashed: true, color_role: muted }
-      - { kind: point, point: [1.1, 1.331], hollow: false, color_role: secondary }
-      - { kind: point, point: [1.331, 1.1], hollow: false, color_role: accent }
+      # narration 點名 (a,b)/(b,a),圖上補座標名(value label→text 色,左/下避開曲線)
+      - { kind: point, point: [1.1, 1.331], hollow: false, color_role: secondary, label: "$(a,b)$", label_side: left }
+      - { kind: point, point: [1.331, 1.1], hollow: false, color_role: accent, label: "$(b,a)$", label_side: down }
     annotations:
       - "$(a,b)$ on $g$ $\\leftrightarrow$ $(b,a)$ on $g^{-1}$: reflection across $y=x$."
 

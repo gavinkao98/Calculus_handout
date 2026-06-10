@@ -103,7 +103,10 @@ def _title(text: str, ground: str):
             if not part:
                 continue
             if i % 2:
-                mobs.append(MathTex(part, color=T.color(ground, "primary"), font_size=title_fs))
+                # TEX_TEXT_SCALE: same Pango-vs-LaTeX size mismatch as
+                # brand.heading_rich -- unscaled, the title's math ran small.
+                mobs.append(MathTex(part, color=T.color(ground, "primary"),
+                                    font_size=title_fs * T.TEX_TEXT_SCALE))
             else:
                 mobs.append(Text(part, font=T.FONT_DISPLAY, font_size=title_fs,
                                  color=T.color(ground, "primary"), weight="SEMIBOLD"))

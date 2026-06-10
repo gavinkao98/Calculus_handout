@@ -20,6 +20,7 @@
 - ✅ 工程稿 v2（[`storyboards/ch01_inverse_functions.yml`](storyboards/ch01_inverse_functions.yml) 覆寫）：17 場景，say＝認可 narration 原文＋`{show}` 標記；4 處 `# HOOK(第二輪)` 註記動畫接入點；graph 場景座標沿用 v1 已調校資產（工程層經驗，非內容繼承）。
 - ✅ 守門員＋mock 成片：lint clean、sizecheck consistent，480p mock 全 17 場景 compose 成功（`output/ch01_inverse_functions.mp4`，≈8'42"）。1080p 預覽版同日 render。
 - ⚠️ 踩坑記錄：make.py 背景 render 時**不可並行**再跑 sizecheck/manim——兩程序搶 `media\Tex\` 快取，會互相打出 PermissionError／dvisvgm ValueError 假錯（單跑即消失）。
+- ✅ **視覺批改第一輪（2026-06-10，Claude 親自當 critic）**：用 `critic.py --dry-run` 免費抽幀、Claude 直接讀幀（不送外部 VLM、零計費），依 DESIGN 五維提 7 findings，使用者全採納並已修复重渲複驗：①`definition_math` statement+math 改整組垂直置中（原錨點式佈局內容少時拉出大片死帶，影響 7 場景）②`recap_cards` bullet 間距改按實際 wrap 高度累進（原固定 pitch 1.2 三行條目擠壓黏連，sizecheck 盲區）③`example_walkthrough` takeaway 色改語意制（`takeaway_tone: warn|ok|neutral`，原固定 warning 紅把正面驗證染成錯誤色）④`heading_rich`／graph_focus `_title` 的標題 inline math 補乘 `TEX_TEXT_SCALE`（原縮水 ~25%）⑤`brand._wrap_prose_tex` 把 math span 後的標點黏回（原「$y$ .」「$x$ ,」浮標點）⑥模板 `kicker` 覆寫欄（motivation 場景不再掛 DEFINITION eyebrow）⑦場景 06/13 圖元修正（parabola 平頭、兩標籤撞線、`y=x` 標籤 label_role 改 muted——line label 預設 warning 是個坑、(a,b)/(b,a) 點補名）。
 - ⬜ 下一步：使用者看 1080p mock 驗收格局 → 第二輪（hook 機制 task #6＋4 動畫生成接入）→ 真旁白 TTS（計費，先報價）→ VLM critic（計費）→ 4K 定版。
 
 **待辦（換源遺留）：** `review_pack.py` faithfulness lens parser 改吃 HTML（§1.1 v2 先人工對照，parser 後補）。

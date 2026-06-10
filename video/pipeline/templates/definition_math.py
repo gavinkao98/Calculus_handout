@@ -35,8 +35,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
     blocks: list[Block] = []
 
-    eyebrow = brand.eyebrow(LABEL.get(spec.get("accent", "definition"), "[ definition ]"),
-                            ground, role=role)
+    # `kicker` overrides the accent-derived eyebrow word -- e.g. a motivation
+    # scene keeps the definition colour family but reads "[ MOTIVATION ]".
+    kicker = spec.get("kicker")
+    label = f"[ {kicker} ]" if kicker else LABEL.get(spec.get("accent", "definition"),
+                                                     "[ definition ]")
+    eyebrow = brand.eyebrow(label, ground, role=role)
     eyebrow.move_to([left + eyebrow.width / 2, top - eyebrow.height / 2, 0])
     blocks.append(Block("eyebrow", eyebrow, anim="fade", static=True))
 
@@ -44,15 +48,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     title.next_to(eyebrow, DOWN, buff=0.28).align_to(eyebrow, LEFT)
     blocks.append(Block("title", title, anim="fade", static=True))
 
-    ref = title
+    statement = None
     if spec.get("statement"):
         # prose() routes on content: inline $math$ / a \\ break -> Tex (so it
         # never prints "$f$" literally); plain prose -> wrapped, centred Text.
         statement = brand.prose(spec["statement"], ground, size="body",
                                 max_width=content_w, align="CENTER")
-        statement.move_to([0, title.get_bottom()[1] - 0.95, 0])
-        blocks.append(Block("statement", statement, anim="fade", static=True))
-        ref = statement
 
     math_mobs, anims = [], []
     for entry in spec.get("math", []):
@@ -68,11 +69,25 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
                                          role="accent" if is_key else "math"))
         anims.append(anim)
 
+    # Statement + math stack centre as ONE group in the zone between the title
+    # and the bottom safe margin. (Was: statement pinned just under the title and
+    # the stack anchored at the midpoint of "statement bottom .. y=-3.3", which
+    # tore a huge dead band between them whenever a scene carried only a line or
+    # two -- the biggest finding of the v2 frame critique.)
+    parts = []
+    if statement is not None:
+        parts.append(statement)
     if math_mobs:
-        stack = VGroup(*math_mobs).arrange(DOWN, buff=0.5)
-        stack.move_to([0, (ref.get_bottom()[1] - 3.3) / 2, 0])
-        for i, (mob, anim) in enumerate(zip(math_mobs, anims)):
-            blocks.append(Block(f"math.{i}", mob, anim=anim, static=False))
+        parts.append(VGroup(*math_mobs).arrange(DOWN, buff=0.5))
+    if parts:
+        content = VGroup(*parts).arrange(DOWN, buff=0.9)
+        zone_top = title.get_bottom()[1] - 0.55
+        zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.45
+        content.move_to([0, (zone_top + zone_bottom) / 2, 0])
+    if statement is not None:
+        blocks.append(Block("statement", statement, anim="fade", static=True))
+    for i, (mob, anim) in enumerate(zip(math_mobs, anims)):
+        blocks.append(Block(f"math.{i}", mob, anim=anim, static=False))
 
     motif = brand.summit_bars(ground, height=0.45, color_role="muted", opacity=0.4)
     motif.move_to([T.FRAME_W / 2 - T.SAFE_MARGIN - motif.width / 2,

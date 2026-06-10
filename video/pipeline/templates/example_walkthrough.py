@@ -94,11 +94,16 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     for i, (lr, rr) in enumerate(zip(left_rows, right_rows)):
         blocks.append(Block(f"math.{i}", VGroup(lr, rr), anim="fade", static=False))
 
-    # bottom takeaway
+    # bottom takeaway -- colour follows the takeaway's SEMANTICS, not a fixed
+    # warning coral: a positive verification line ("Check by composing: ... = x")
+    # rendered blood-red read as an error (v2 frame critique). Authors set
+    # `takeaway_tone: warn | ok | neutral` in the storyboard; default neutral.
     take = spec.get("takeaway")
     if take:
-        rule = brand.hrule(0.5, ground, role="warning", stroke=2.5)
-        cap = brand.prose(take, ground, role="warning", size="step",
+        tone = str(spec.get("takeaway_tone", "neutral"))
+        trole = {"warn": "warning", "ok": "success", "neutral": "text"}.get(tone, "text")
+        rule = brand.hrule(0.5, ground, role=trole, stroke=2.5)
+        cap = brand.prose(take, ground, role=trole, size="step",
                           max_width=T.FRAME_W - 2 * T.SIDE_GUTTER - 0.8)
         rule.next_to(cap, LEFT, buff=0.25)
         grp = VGroup(rule, cap)

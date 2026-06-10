@@ -28,6 +28,10 @@ def scene_head(spec: dict[str, Any], ctx: dict[str, Any], *, label: str) -> list
 
     blocks = []
 
+    # `kicker` overrides the template's default eyebrow word (e.g. a motivation
+    # scene reading "[ MOTIVATION ]" while keeping its accent colour family).
+    if spec.get("kicker"):
+        label = f"[ {spec['kicker']} ]"
     eyebrow = brand.eyebrow(label, ground, role=role)
     eyebrow.move_to([left + eyebrow.width / 2, top - eyebrow.height / 2, 0])
     blocks.append(Block("eyebrow", eyebrow, anim="fade", static=True))

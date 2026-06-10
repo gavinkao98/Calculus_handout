@@ -23,7 +23,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, UP, VGroup
+from manim import DOWN, LEFT, RIGHT, UL, UP, VGroup
 
 from .. import brand
 from ..blocks import Block
@@ -41,8 +41,11 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     formulas = spec.get("formulas", [])
 
     # -- left column: numbered points --
-    pt_gap = 1.2
-    pt_top = 1.3
+    # Advance by each row's REAL height (top-anchored), not a fixed row pitch:
+    # with pitch 1.2 a point that wrapped to three lines overran the slot and
+    # visually fused with the next bullet (v2 frame critique, recap scene).
+    pt_gap = 0.5
+    y_cursor = 1.75
     for i, t in enumerate(points):
         idx = brand.eyebrow(f"0{i+1}", ground, role="accent")
         dot = brand.plot_dot(ground, role="accent", r=0.06)
@@ -50,7 +53,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         dot.next_to(txt, LEFT, buff=0.25, aligned_edge=UP)
         idx.next_to(dot, LEFT, buff=0.25, aligned_edge=UP)
         row = VGroup(idx, dot, txt)
-        row.move_to([left, pt_top - i * pt_gap, 0], aligned_edge=LEFT)
+        row.move_to([left, y_cursor, 0], aligned_edge=UL)
+        y_cursor -= row.height + pt_gap
         blocks.append(Block(f"point.{i}", row, anim="fade", static=False))
 
     # -- right column: "Remember" + formula cards --
