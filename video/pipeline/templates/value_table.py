@@ -105,12 +105,16 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     for r in row_mobs:
         for j, m in enumerate(r):
             col_w[j] = max(col_w[j], m.width)
-    col_x = []  # centre x of each column, table laid out from 0 then centred
-    x = 0.0
-    for j in range(n_cols):
-        col_x.append(x + col_w[j] / 2)
-        x += col_w[j] + _COL_GAP
-    table_w = x - _COL_GAP if n_cols else 0.0
+    # equal centre-to-centre pitch so visual rhythm stays even when one
+    # column (e.g. the accent punchline) is wider than the rest
+    if n_cols <= 1:
+        col_x = [col_w[0] / 2] if n_cols == 1 else []
+        table_w = col_w[0] if n_cols == 1 else 0.0
+    else:
+        pitch = max(col_w[j] / 2 + col_w[j + 1] / 2
+                    for j in range(n_cols - 1)) + _COL_GAP
+        col_x = [col_w[0] / 2 + j * pitch for j in range(n_cols)]
+        table_w = col_x[-1] + col_w[-1] / 2
 
     # rows top-anchored on real heights (the fused-rows lesson)
     table_parts: list[Any] = []
