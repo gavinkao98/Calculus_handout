@@ -1,79 +1,77 @@
-# Video Pipeline — Design (2nd generation)
+# 影片產線——設計（第二代）
 
-This is the redesigned handout → lesson-video pipeline. Input is the HTML handout
-kit (`../experiments/handout_kit/`; per-chapter authoritative file listed in
-[README.md](README.md) — switched from `chapters/*.tex` on 2026-06-10). It supersedes the
-first-generation system (`tools/manim_*`, `MANIM_STORYBOARD.md`,
-`MANIM_REFERENCE.md`, `MANIM_CHECKLIST.md`), which is frozen, not deleted.
+這是重新設計的 handout → lesson-video 產線。輸入為 HTML handout
+kit（`../experiments/handout_kit/`；per-chapter authoritative file 列於
+[README.md](README.md)——2026-06-10 從 `chapters/*.tex` 切換）。它取代第一代系統
+（`tools/manim_*`、`MANIM_STORYBOARD.md`、`MANIM_REFERENCE.md`、
+`MANIM_CHECKLIST.md`），第一代被凍結、不刪除。
 
-Status: **partially implemented**. The storyboard → TTS → audio-driven render → mux
-path now works end-to-end (validated on §1.1); the remaining sections marked (TODO)
-are not implemented yet.
-
----
-
-## Why a redesign
-
-The first generation worked but accreted three sources of friction:
-
-1. **Two reveal mechanisms coexisting.** A timing-based path (`_run_voiceover_beats`,
-   hand-estimated seconds) and a bookmark path (`reveal_strategy` + manim-voiceover)
-   ran side by side, gated at render time. Authors had to know both.
-2. **A heavy spoken-math rewrite layer.** Every `f(x_1)` had to be hand-rewritten to
-   "f of x one" in a separate `voiceover` field, governed by a large rules table,
-   because the old TTS could not read LaTeX.
-3. **Three overlapping narration fields.** `voiceover` + `voiceover_beats` +
-   `bookmark`/`reveal_groups` all encoded "what is said" and "when things appear",
-   kept in sync by hand.
-
-Two decisions collapse all three:
-
-- **Gemini TTS reads LaTeX directly** using the model's preset voice names
-  (`meta.voice` / `--voice`). No voice cloning or reference audio is used. The
-  spoken-math rewrite layer is deleted. Narration is written once, with LaTeX inline.
-- **One narration field with inline reveal markers.** `say` carries both the words and
-  the timing cues. No separate beats/bookmark/reveal arrays.
-
-Plus a new product requirement: **every section gets an intro and an outro animation**,
-so scene `kind` is first-class and silent (no-narration) scenes are supported.
+狀態：**partially implemented**。storyboard → TTS → audio-driven render → mux
+的路徑現在已端到端可運作（在 §1.1 上驗證）；標記為 (TODO) 的其餘部分尚未實作。
 
 ---
 
-## Carried over vs rewritten
+## 為何重新設計
 
-| Ported verbatim (validated, no gain in rewriting) | Rewritten from scratch |
+第一代可以運作，但累積了三個摩擦源：
+
+1. **兩套 reveal mechanism 並存。** 一個 timing-based path（`_run_voiceover_beats`，
+   手動估計秒數）和一個 bookmark path（`reveal_strategy` + manim-voiceover）
+   並行運作，在 render time 切換。作者必須兩套都懂。
+2. **繁重的 spoken-math rewrite layer。** 每個 `f(x_1)` 都得手動改寫為
+   "f of x one"，放在獨立的 `voiceover` 欄位中，受一張大規則表管制——因為舊
+   TTS 無法直讀 LaTeX。
+3. **三個重疊的 narration 欄位。** `voiceover` + `voiceover_beats` +
+   `bookmark`/`reveal_groups` 同時編碼「說什麼」和「何時顯示」，靠手動保持同步。
+
+兩個決策解消了全部三個問題：
+
+- **Gemini TTS 直讀 LaTeX**，使用模型的 preset voice name
+  （`meta.voice` / `--voice`）。不使用 voice cloning 或 reference audio。
+  spoken-math rewrite layer 刪除。Narration 只寫一次，LaTeX 直接 inline。
+- **一個 narration 欄位搭配 inline reveal marker。** `say` 同時承載文字和
+  timing cue。不再有獨立的 beats/bookmark/reveal array。
+
+另加一個新的 product requirement：**每節都有 intro 和 outro animation**，因此
+scene `kind` 是 first-class 的，且支援 silent（no-narration）scene。
+
+---
+
+## 沿用 vs 重寫
+
+| 原封沿用（已驗證，重寫無收益） | 從零重寫 |
 |---|---|
-| `visuals/theme.py` (Midnight Canvas palette + Times typography + layout metrics) | storyboard schema + format |
-| `visuals/graph_utils.py` (safe expr eval + sampling) | narration → beats compiler |
-| `visuals/layout.py` (16:9 zone layout) | scene templates |
-| ffmpeg mux/concat logic *(done fresh as `pipeline/mux.py`)* | TTS backend (Gemini) |
+| `visuals/theme.py`（Midnight Canvas palette + Times typography + layout metrics） | storyboard schema + format |
+| `visuals/graph_utils.py`（safe expr eval + sampling） | narration → beats compiler |
+| `visuals/layout.py`（16:9 zone layout） | scene templates |
+| ffmpeg mux/concat logic *（以 `pipeline/mux.py` 重新實作）* | TTS backend（Gemini） |
 | Midnight Canvas visual philosophy + animation language | CLI / orchestration |
 
-Ported assets were copied key-for-key from the real source dicts
-(`DEFAULT_THEME` in `legacy/scripts/manim_render_lesson.py`, `SceneLayout` in
-`legacy/scripts/manim_templates/layout.py`, `safe_eval_expression` in
-`legacy/scripts/manim_templates/graph_utils.py`), not reconstructed from the docs.
+沿用的資產是逐 key 從真正的 source dict 複製的
+（`DEFAULT_THEME` in `legacy/scripts/manim_render_lesson.py`、`SceneLayout` in
+`legacy/scripts/manim_templates/layout.py`、`safe_eval_expression` in
+`legacy/scripts/manim_templates/graph_utils.py`），不是從文件重建的。
 
-The methodology *spirit* of `MANIM_STORYBOARD.md` (one teaching idea per scene,
-detail over compression, conversational narration, visual over textual, symbol-heavy
-exception) carries forward. Its mechanical rules (spoken-math table, sentence-count
-carve-outs, bookmark syntax) do not — they were artifacts of the old constraints.
+`MANIM_STORYBOARD.md` 的方法論*精神*沿用（每場景一個教學概念、detail over
+compression、conversational narration、visual over textual、symbol-heavy
+exception）。其機械規則（spoken-math table、sentence-count carve-out、bookmark
+syntax）不沿用——它們是舊約束的產物。
 
 ---
 
-## Storyboard format
+## Storyboard 格式
 
-One YAML file per section. Top-level: `meta` + `scenes`.
+每節一個 YAML 檔。Top-level：`meta` + `scenes`。
 
 ```yaml
 meta:
-  id: ch01_inverse_functions      # deck id, also output dir name
-  section: "1.1"                  # shown by intro/outro templates
+  id: ch01_inverse_functions      # deck id，也是 output dir name
+  section: "1.1"                  # intro/outro template 顯示
   title: "Inverse Functions"
   language: en
   theme: midnight
   voice: Kore                     # Gemini preset voice name
-  video: { w: 3840, h: 2160, fps: 60 }   # delivery standard: 4K60 (manim fourk_quality)
+  video: { w: 3840, h: 2160, fps: 60 }   # 交付標準：4K60（manim fourk_quality）
 
 scenes:
   - id: <unique snake_case>
@@ -81,51 +79,49 @@ scenes:
     ...
 ```
 
-**Resolution convention.** Testing and preview renders use **1080p**
-(`make.py --quality high`, the default) — crisp enough for visual QA and VLM frame
-critique without 4K's render cost. **Only the final delivery uses 4K**
-(`--quality 4k`): the project standard `3840×2160@60` (manim `fourk_quality`),
-declared per section in `meta.video` and defaulted when omitted. `--quality low` /
-`medium` (480p/720p) are fast scratch previews. The layout is resolution-independent
-(the manim frame is a fixed 14.222×8 units), so a 1080p test and the 4K master are
-pixel-for-pixel the same composition — only sampling density and render time differ.
+**解析度慣例。** 測試和預覽 render 使用 **1080p**
+（`make.py --quality high`，預設值）——足以做 visual QA 和 VLM frame
+critique，不需要 4K 的 render 成本。**只有最終交付使用 4K**
+（`--quality 4k`）：專案標準 `3840×2160@60`（manim `fourk_quality`），
+在 `meta.video` 中 per section 宣告，省略時使用預設值。`--quality low` /
+`medium`（480p/720p）是快速 scratch preview。Layout 是 resolution-independent 的
+（manim frame 為固定的 14.222×8 units），因此 1080p 測試和 4K master 是
+pixel-for-pixel 相同的 composition——只有 sampling density 和 render time 不同。
 
-### Scene kinds
+### Scene kind
 
-- **`content`** — a teaching scene. Has `template`, `say`, and visual data. This is
-  the workhorse; everything below about `say`/reveal applies to it.
-- **`intro`** — section opener. **No `say`** (pure animation). Consumes
-  `meta.chapter`, `meta.chapter_title`, `meta.sections`, `meta.section`,
-  `meta.title`, an optional `tagline`, optional `bgm`, `duration`. The reusable
-  template is a Section Gate: first show the chapter map, focus the current
-  section, resolve into the logo / section / title / tagline slate, then add a
-  short dark handoff so the first teaching scene does not feel like an abrupt
-  color cut.
-- **`outro`** — section closer. **No `say`**. Consumes optional `bgm`, `duration`,
-  and an optional `end_slate` override. The template is two-stage: a short
-  dark-to-light bridge from the teaching ground, then a final centered logo slate
-  so the viewer clearly feels the video has ended. **Key Takeaways are NOT in the
-  outro** — they live in the preceding `recap_cards` content scene, which carries
-  narration (a silent takeaways slate read weaker than a narrated recap). The end
-  slate defaults to `meta.section` + `meta.title`; use optional `end_slate.label`,
-  `end_slate.title`, or `end_slate.logo_height` only when a section overrides the
-  standard ending. (Any `recap`/`next` keys on an outro are vestigial — the
-  template ignores them.)
+- **`content`**——教學場景。有 `template`、`say` 和 visual data。這是
+  workhorse；以下關於 `say`/reveal 的一切都適用於它。
+- **`intro`**——section opener。**沒有 `say`**（純 animation）。讀取
+  `meta.chapter`、`meta.chapter_title`、`meta.sections`、`meta.section`、
+  `meta.title`，以及 optional `tagline`、optional `bgm`、`duration`。可重用的
+  template 是 Section Gate：先顯示 chapter map，focus 當前 section，resolve 成
+  logo / section / title / tagline slate，然後加一段短暫的 dark handoff，使第一個
+  教學場景不會感覺像突然的色彩切換。
+- **`outro`**——section closer。**沒有 `say`**。讀取 optional `bgm`、`duration`
+  和 optional `end_slate` override。Template 為兩階段：從 teaching ground 到
+  light 的 short dark-to-light bridge，然後是最終的 centered logo slate，讓觀眾
+  清楚感到影片已結束。**Key Takeaways 不在 outro 中**——它們在前面的
+  `recap_cards` content scene 中，該場景帶有 narration（一個 silent 的
+  takeaways slate 讀起來比 narrated recap 弱）。end slate 預設為
+  `meta.section` + `meta.title`；僅在某節覆蓋標準結尾時才使用 optional
+  `end_slate.label`、`end_slate.title` 或 `end_slate.logo_height`。（outro 上的
+  任何 `recap`/`next` key 都是 vestigial——template 會忽略它們。）
 
-`intro`/`outro` are defined **once** as parameterized templates and reused for every
-section — authors never hand-build them per section.
+`intro`/`outro` 作為參數化 template **只定義一次**，每節重用——作者永遠不需要
+per section 手建它們。
 
-Minimal reusable outro:
+最小可重用 outro：
 
 ```yaml
 - id: outro
   kind: outro
   duration: 8.0
   # optional: bgm, and an end_slate override (label / title / logo_height)
-  # Key Takeaways are a separate recap_cards scene, not the outro.
+  # Key Takeaways 是獨立的 recap_cards scene，不是 outro。
 ```
 
-Minimal reusable intro:
+最小可重用 intro：
 
 ```yaml
 meta:
@@ -144,75 +140,70 @@ scenes:
     duration: 6.0
 ```
 
-### `content` scene fields
+### `content` scene 欄位
 
-| Field | Required | Meaning |
+| 欄位 | 必填 | 意義 |
 |---|---|---|
-| `template` | yes | which scene template (see "Template catalog" below) |
-| `accent` | for definition-family | colour role: `definition` / `theorem` / `proposition` / `example` / `warning` / `procedure` / `recap`. Replaces old `content_type`. |
-| `title` | yes | on-screen scene title; `$...$` allowed for math |
-| `say` | yes | the single narration field (see below) |
-| `statement`, `math`, `steps`, `plots`, … | per template | the on-screen visual payload |
-| `hook` | no | `"<module>:<fn>"` custom-animation factory importable from `video/` (e.g. `"animations.ch01_inverse_functions_hooks:can_we_go_backwards"`). The factory receives `(spec, ctx, template_blocks)` and returns the final block list: replace a block's mobject **keeping its reveal id** (so `{show ...}` markers and approved narration stay untouched), defer static elements into a beat, or attach a callable anim `(scene, mobject, ground) -> seconds spent` (`pipeline/blocks.py`). The template payload in the storyboard stays as the no-hook fallback — deleting the `hook:` line restores the stock scene. Wired in `pipeline/templates/__init__.py:_apply_hook`. |
+| `template` | yes | 使用哪個 scene template（見下方 "Template catalog"） |
+| `accent` | definition-family 必填 | 色彩角色：`definition` / `theorem` / `proposition` / `example` / `warning` / `procedure` / `recap`。取代舊的 `content_type`。 |
+| `title` | yes | 螢幕上的 scene title；可使用 `$...$` 表示數學 |
+| `say` | yes | 單一 narration 欄位（見下方） |
+| `statement`、`math`、`steps`、`plots`、… | per template | 螢幕上的 visual payload |
+| `hook` | no | `"<module>:<fn>"` custom-animation factory，可從 `video/` import（例如 `"animations.ch01_inverse_functions_hooks:can_we_go_backwards"`）。Factory 接收 `(spec, ctx, template_blocks)` 並回傳最終的 block list：替換 block 的 mobject **但保留其 reveal id**（使 `{show ...}` marker 和已核准的 narration 不受影響）、將 static element defer 到一個 beat、或附加一個 callable anim `(scene, mobject, ground) -> seconds spent`（`pipeline/blocks.py`）。Storyboard 中的 template payload 保留為 no-hook fallback——刪掉 `hook:` 行即恢復 stock scene。在 `pipeline/templates/__init__.py:_apply_hook` 中接線。 |
 
-### Template catalog (content scenes)
+### Template catalog（content scene）
 
-One line per template — teaching shape, payload, and what `{show ...}` can
-target. Demo storyboards live in `storyboards/_demo_*.yml`.
+每個 template 一行——教學形狀、payload 和 `{show ...}` 可指向的目標。
+Demo storyboard 在 `storyboards/_demo_*.yml`。
 
-| template | teaching shape | payload fields | reveal targets |
+| template | 教學形狀 | payload 欄位 | reveal target |
 |---|---|---|---|
-| `definition_math` | definition / theorem statement / note / motivation: statement + math lines | `statement`, `math[]`, `kicker` | `math.N` |
-| `theorem_proof` | statement card + dot-led proof steps + QED | `statement`, `proof[]`, `qed` | `proof.N`, `qed` |
-| `example_walkthrough` | discrete worked steps, reasoning beside math, ✓/✗ marks | `steps[{text,math,mark,hot}]`, `takeaway`, `takeaway_tone` | `math.N`, `takeaway` |
-| `procedure_steps` | numbered procedure + bottom worked strip | `steps[{text,math}]`, `worked[]` | `math.N`, `worked` |
-| `derivation` | full-width continuous transformation chain | `statement`, `lines[]`, `align_on` | `line.N` |
-| `graph_focus` | one full-frame plot | `axes`, `plots[]`, `annotations[]` | `annotation.N`; opt-in `plot.N` (`reveal: true`) |
-| `graph_compare` | two graph panels side by side — the comparison is the lesson (HLT, f vs f′, converges vs diverges) | `left`/`right` `{axes, plots, caption, verdict}`, `annotations[]` | `caption.left/right`, `left.plot.N`/`right.plot.N` (`reveal: true`), `annotation.N` |
-| `value_table` | numeric limit table / formula grid / property comparison | `header[]`, `rows[][]`, `reveal: rows\|cols`, `accent_col`/`accent_row`, `statement` | `row.N` or `col.N` |
-| `sign_chart` | number line + signed interval rows (monotonicity, curve sketching) | `points[]` (`excluded: true` for a break), `rows[{label, marks}]`, `statement` | `mark.R.I` (row R, interval I) |
-| `recap_cards` | key points + remember-formula cards | `points[]`, `formulas[]` | `point.N`, `formula.N` |
+| `definition_math` | definition / theorem statement / note / motivation：statement + math lines | `statement`、`math[]`、`kicker` | `math.N` |
+| `theorem_proof` | statement card + dot-led proof steps + QED | `statement`、`proof[]`、`qed` | `proof.N`、`qed` |
+| `example_walkthrough` | 離散的 worked steps，reasoning 在 math 旁邊，✓/✗ mark | `steps[{text,math,mark,hot}]`、`takeaway`、`takeaway_tone` | `math.N`、`takeaway` |
+| `procedure_steps` | 編號步驟 + 底部 worked strip | `steps[{text,math}]`、`worked[]` | `math.N`、`worked` |
+| `derivation` | 全寬連續推導鏈 | `statement`、`lines[]`、`align_on` | `line.N` |
+| `graph_focus` | 一張全幅 plot | `axes`、`plots[]`、`annotations[]` | `annotation.N`；opt-in `plot.N`（`reveal: true`） |
+| `graph_compare` | 兩張並排的圖表——比較本身即是課程（HLT、f vs f′、converges vs diverges） | `left`/`right` `{axes, plots, caption, verdict}`、`annotations[]` | `caption.left/right`、`left.plot.N`/`right.plot.N`（`reveal: true`）、`annotation.N` |
+| `value_table` | 數值 limit 表 / formula grid / property comparison | `header[]`、`rows[][]`、`reveal: rows\|cols`、`accent_col`/`accent_row`、`statement` | `row.N` 或 `col.N` |
+| `sign_chart` | number line + signed interval rows（monotonicity、curve sketching） | `points[]`（`excluded: true` 表示 break）、`rows[{label, marks}]`、`statement` | `mark.R.I`（row R, interval I） |
+| `recap_cards` | key point + remember-formula card | `points[]`、`formulas[]` | `point.N`、`formula.N` |
 
-### Template selection: discrete steps vs a derivation chain
+### Template 選擇：離散步驟 vs 推導鏈
 
-Computation scenes come in two shapes, and picking the wrong template is how a
-long formula runs out of room — the two-column templates' math column tops out
-around ~5 manim units, while a real chain line (the ch02 slope-from-definition
-computation) needs 7–9:
+計算場景有兩種形狀，選錯 template 就是長公式跑出空間的原因——兩欄 template
+的 math column 上限約 ~5 manim units，而真正的 chain line（ch02 的
+slope-from-definition computation）需要 7–9：
 
-- **`example_walkthrough` / `procedure_steps`** — DISCRETE steps: each step is
-  a short formula whose reasoning text is worth *reading* beside it. Capacity:
-  3–4 rows, math column ~5 units.
-- **`derivation`** — a CONTINUOUS transformation chain (derivative from the
-  definition, limit-law rewrites, identity proofs): one aligned full-width
-  chain (~11 units), revealed line by line via `{show line.N}`; the per-step
-  "why" lives in the narration, not on screen. Line 0 carries the LHS; later
-  lines written in the "= ..." continuation style x-align their relation
-  symbol under line 0's (`align_on`, default `=`). `anim: highlight` marks the
-  result line (accent colour). An optional centred `statement` states the
-  problem — but a full-capacity chain should hand that job to the narration's
-  first beat instead (measured: statement + four fraction-height lines +
-  result line overflows the zone by ~0.5).
-- **Capacity before SPLITTING the scene** (a content-layer decision, same
-  spirit as methodology §3's proof split): ~5 fraction-height lines without a
-  statement, ~4 with one; ~7 single-height lines. `sizecheck` flags the
-  overflow; the fix is a split, not a squeeze. Demo / reference storyboard:
-  `storyboards/_demo_derivation.yml` (the real ch02 chain + a 6-line probe).
-- **Row pitch in the step templates is a minimum, not a constant.**
-  `example_walkthrough` / `procedure_steps` / `theorem_proof` place rows on
-  their designed rhythm (1.25 / 1.4 / 0.95) but expand the pitch when adjacent
-  rows are tall (wrapped step text, fraction math), keeping ≥0.35 of air — so
-  rows never collide (the recap_cards fused-rows class, fixed at the template
-  layer 2026-06-11). A tall first row / statement also pushes *down* off the
-  title instead of growing into it. Consequence for authoring: tall content
-  eats rows — the 3–4 step capacity assumes single-line steps; with stacked
-  fractions expect ~3. Overflow now exits the bottom (sizecheck catches it);
-  the fix is still a split. Stress demo: `storyboards/_demo_tall_rows.yml`.
+- **`example_walkthrough` / `procedure_steps`**——離散步驟：每步是一條短公式，
+  其 reasoning text 值得*在旁邊閱讀*。容量：3–4 行，math column ~5 units。
+- **`derivation`**——連續推導鏈（derivative from the definition、limit-law
+  rewrite、identity proof）：一條 aligned 全寬 chain（~11 units），透過
+  `{show line.N}` 逐行揭示；per-step 的 "why" 在 narration 中，不在螢幕上。
+  Line 0 帶 LHS；後續行以 "= ..." continuation style 將其 relation symbol
+  x-align 到 line 0 的下方（`align_on`，預設 `=`）。`anim: highlight` 標記
+  result line（accent colour）。Optional 的 centred `statement` 陳述問題——但
+  滿容量的 chain 應將該工作交給 narration 的第一個 beat（實測：statement + 四行
+  fraction-height lines + result line 超出 zone ~0.5）。
+- **分割場景前的容量**（content-layer 決策，與 methodology §3 的 proof split
+  精神相同）：沒有 statement 時 ~5 行 fraction-height lines，有 statement 時
+  ~4 行；~7 行 single-height lines。`sizecheck` 標記 overflow；修復方法是
+  split，不是 squeeze。Demo / reference storyboard：
+  `storyboards/_demo_derivation.yml`（真正的 ch02 chain + 6 行探針）。
+- **Step template 中的 row pitch 是最小值，不是常數。**
+  `example_walkthrough` / `procedure_steps` / `theorem_proof` 以其設計的
+  rhythm（1.25 / 1.4 / 0.95）放置 row，但當相鄰 row 較高（wrapped step text、
+  fraction math）時會擴大 pitch，保持 ≥0.35 的空氣——因此 row 永遠不會碰撞
+  （recap_cards fused-rows class，2026-06-11 在 template layer 修正）。較高的
+  first row / statement 也會向下*推離* title 而非長入其中。對 authoring 的影響：
+  高內容吃 row——3–4 step 的容量假設 single-line step；有 stacked fraction 時
+  預期 ~3 行。Overflow 現在從底部溢出（sizecheck 會抓）；修復仍是 split。
+  Stress demo：`storyboards/_demo_tall_rows.yml`。
 
-### `say`: narration + inline reveal (the core change)
+### `say`：narration + inline reveal（核心變更）
 
-`say` is **what is spoken**, with **LaTeX written inline** (`$f(x_1)$`), and **reveal
-markers** `{show <target>}` interleaved.
+`say` 是**被朗讀的內容**，**LaTeX inline 書寫**（`$f(x_1)$`），以及**reveal
+marker** `{show <target>}` 穿插其中。
 
 ```yaml
 say: |
@@ -222,253 +213,242 @@ say: |
   {show math.1} Equivalently, if $f(x_1) = f(x_2)$ then $x_1 = x_2$.
 ```
 
-Rules:
+規則：
 
-- **`{show <target>}`** marks "reveal this element now". Targets name an element in the
-  scene's visual payload: `math.0`, `math.1`, `step.0`, `bullet.0`, `plot.0`,
-  `statement`, `takeaway`, … (the index is into the corresponding list).
-- A **beat** is the run of text from one marker (or scene start) up to the next marker.
-- Static elements (title, axes, statement) appear at scene start by default; only
-  elements named by a `{show ...}` wait for their beat. (This is the old static/dynamic
-  split, now expressed inline instead of in a per-template table.)
-- **`graph_focus` plots are static by default** (the whole graph is on screen from
-  frame 1). Mark a plot entry `reveal: true` to make it wait for `{show plot.N}` —
-  the teaching order (curve first, *then* the ε-band, *then* the δ-band) becomes a
-  beat decision in `say`, no hook needed. A revealed plot's `label` folds into the
-  same block, so one marker brings the element and its name together. Demo:
-  `storyboards/_demo_graph_reveal.yml`.
-- LaTeX in `say` is passed to Gemini TTS as-is. **No spoken-math rewrite.** If a specific
-  phrase reads better a particular way, just write it that way in `say`.
+- **`{show <target>}`** 標記「現在揭示此元素」。Target 命名場景 visual payload
+  中的一個元素：`math.0`、`math.1`、`step.0`、`bullet.0`、`plot.0`、
+  `statement`、`takeaway`、…（index 指向對應 list）。
+- 一個 **beat** 是從一個 marker（或 scene 開始）到下一個 marker 之間的文字段。
+- Static element（title、axes、statement）預設在 scene 開始時出現；只有被
+  `{show ...}` 命名的元素才會等待其 beat。（這是舊的 static/dynamic 分類，現在
+  以 inline 方式表達，而非 per-template table。）
+- **`graph_focus` 的 plot 預設是 static 的**（整張圖從 frame 1 就在螢幕上）。
+  將 plot entry 標記 `reveal: true` 使其等待 `{show plot.N}`——教學順序
+  （curve first、*然後* ε-band、*然後* δ-band）變成 `say` 中的 beat 決策，
+  不需要 hook。Revealed plot 的 `label` 折入同一個 block，因此一個 marker 同時
+  帶出元素和它的名稱。Demo：`storyboards/_demo_graph_reveal.yml`。
+- `say` 中的 LaTeX 原樣傳給 Gemini TTS。**不做 spoken-math rewrite。** 如果某個
+  特定短語以特定方式朗讀更好，直接在 `say` 中如此撰寫即可。
 
-### `math` and other visual payload
+### `math` 和其他 visual payload
 
 ```yaml
 math:
-  - "$f(x_1) \\ne f(x_2)$ whenever $x_1 \\ne x_2$"     # plain string
-  - { tex: "$f(x_1)=f(x_2)\\implies x_1=x_2$", anim: highlight }   # with animation
+  - "$f(x_1) \\ne f(x_2)$ whenever $x_1 \\ne x_2$"     # 純字串
+  - { tex: "$f(x_1)=f(x_2)\\implies x_1=x_2$", anim: highlight }   # 帶 animation
 ```
 
-`anim` options (carried over): `write` (default), `highlight`, `transform_from_previous`.
-The *when* (reveal timing) lives in `say` via `{show math.N}`; the *how* (animation
-style) lives here. Clean separation.
+`anim` 選項（沿用）：`write`（預設）、`highlight`、`transform_from_previous`。
+*何時*（reveal timing）在 `say` 中透過 `{show math.N}`；*如何*（animation
+style）在此。乾淨分離。
 
-### Text rendering: prose vs math (no garble)
+### Text rendering：prose vs math（no garble）
 
-On-screen text takes one of two render paths. Both are Times (matching the LaTeX
-handout's newtxtext/newtxmath), but manim sizes them differently for the same
-`font_size`, and only one understands LaTeX:
+螢幕文字走兩條 render path 之一。兩者都是 Times（匹配 LaTeX handout 的
+newtxtext/newtxmath），但 manim 在相同 `font_size` 下 size 不同，且只有一條
+理解 LaTeX：
 
-| Path | Engine | Understands `$math$` / `\\`? | Used by |
+| Path | Engine | 理解 `$math$` / `\\`？ | 使用者 |
 |---|---|---|---|
-| `Text` | Pango (Times New Roman) | **No** — markup prints literally (the garble) | `brand.heading`, `brand.eyebrow` |
-| `Tex` / `MathTex` | LaTeX (newtxtext + newtxmath) | Yes | `brand.body_text`, `brand.prose`, `brand.heading_rich`, `brand.math_line` |
+| `Text` | Pango（Times New Roman） | **否**——markup 會 literally 印出（garble） | `brand.heading`、`brand.eyebrow` |
+| `Tex` / `MathTex` | LaTeX（newtxtext + newtxmath） | 是 | `brand.body_text`、`brand.prose`、`brand.heading_rich`、`brand.math_line` |
 
-`brand.body_text` renders via `Tex(r'\text{...}')` (not Pango `Text`) so body prose
-gets LaTeX-quality kerning — matching the handout. Headings still use Pango `Text`
-(SEMIBOLD weight, which Tex cannot express); at display sizes and bold weight the
-Pango kerning difference is not perceptible.
+`brand.body_text` 透過 `Tex(r'\text{...}')` render（不是 Pango `Text`），讓
+body prose 取得 LaTeX-quality kerning——匹配 handout。Heading 仍使用 Pango
+`Text`（SEMIBOLD weight，Tex 無法表達）；在 display size 和 bold weight 下
+Pango kerning 差異不可感知。
 
-A `Text` is ~1.36× taller than a `Tex` at equal `font_size`, so prose rendered via
-Tex is scaled up by `theme.TEX_TEXT_SCALE` to sit at the same size as headings
-beside it. Math (`math_line`) keeps its own size role and is left unscaled.
+`Text` 在相同 `font_size` 下比 `Tex` 高 ~1.36×，因此透過 Tex render 的 prose
+以 `theme.TEX_TEXT_SCALE` 放大，使其與旁邊的 heading 相同大小。Math
+（`math_line`）保持其自身的 size role，不放大。
 
-**The rule (templates must follow it):** any field an author might put `$` or `\`
-into — `title`, `statement`, step `text`, `takeaway`, recap `points` — is rendered
-through **`brand.prose`** (body prose) or **`brand.heading_rich`** (titles). These
-are the single decision point for markup routing: markup → Tex text-mode,
-otherwise → `body_text` (also Tex, for kerning). Never call `heading` directly on
-an author prose field. Pure math fields (`math`, `formulas`, `proof`, `worked`) go
-through `brand.math_line`.
+**規則（template 必須遵循）：** 作者可能放入 `$` 或 `\` 的任何欄位——`title`、
+`statement`、step `text`、`takeaway`、recap `points`——透過 **`brand.prose`**
+（body prose）或 **`brand.heading_rich`**（title）render。這是 markup routing
+的唯一決策點：有 markup → Tex text-mode，否則 → `body_text`（也是 Tex，為了
+kerning）。永遠不要在 author prose 欄位上直接呼叫 `heading`。純 math 欄位
+（`math`、`formulas`、`proof`、`worked`）走 `brand.math_line`。
 
-Plain-Text-only fields are the intro/outro brand labels (`meta.chapter`,
-`meta.chapter_title`, `meta.section`, `meta.title`, `meta.tagline`,
-`meta.sections[].title`) — keep markup out of these. `pipeline/lint.py` enforces
-all of the above statically (see Data flow) and runs before every render.
+Plain-Text-only 欄位是 intro/outro brand label（`meta.chapter`、
+`meta.chapter_title`、`meta.section`、`meta.title`、`meta.tagline`、
+`meta.sections[].title`）——不要在這些中放 markup。`pipeline/lint.py` 靜態地
+強制執行以上全部（見 Data flow），在每次 render 前執行。
 
-**Sizing rule — wrap, don't shrink (for stacked prose).** When a prose line is
-too wide, `brand.prose` *wraps* it to more lines at full size; it never
-`scale_to_fit_width`s a single line down. This matters for **stacked siblings**
-(recap points, proof steps, graph annotations, example steps): if one long line
-were shrunk while its short neighbours were not, they would render at visibly
-different sizes (this was a real bug). So any group of prose lines that sit
-together must go through `brand.prose` with a `max_width` — not `math_line` +
-`scale_to_fit_width`. `$...$` spans are atomic to the wrapper, so a wrap never
-splits math. The only place `scale_to_fit_width` is acceptable is a **standalone
-display line with no siblings to match** — a `heading`/`heading_rich` title — and
-even there, prefer wrapping when it reads well. Math grids (`math`, `formulas`,
-`worked`) are their own size role and are exempt.
+**Sizing 規則——wrap, don't shrink（針對 stacked prose）。** 當一行 prose
+太寬時，`brand.prose` 在 full size 下*換行*到更多行；它永遠不
+`scale_to_fit_width` 單行縮小。這對 **stacked siblings** 很重要（recap point、
+proof step、graph annotation、example step）：如果一行長的被縮小而旁邊的短行
+沒有，它們會以明顯不同的大小 render（這是一個真實的 bug）。因此任何一組並排的
+prose line 必須走 `brand.prose` 帶 `max_width`——不是 `math_line` +
+`scale_to_fit_width`。`$...$` span 對 wrapper 是 atomic 的，所以換行永遠不會
+拆斷 math。唯一允許 `scale_to_fit_width` 的地方是**沒有 sibling 需要匹配的
+standalone display line**——`heading`/`heading_rich` title——即使在那裡，換行
+讀起來好時也優先。Math grid（`math`、`formulas`、`worked`）是自己的 size role，
+免除此規則。
 
-Enforced automatically: `pipeline/sizecheck.py` builds each scene (no render),
-finds the `brand.prose`-tagged lines in every stacked-sibling group (`point`,
-`proof`, `step`, `annotation`, `row`) and flags a group whose lines render at
-different (scale-aware) font sizes. `make.py` runs it before rendering the
-selected scenes (`--skip-sizecheck` to bypass), alongside the garble `lint.py`.
+自動強制：`pipeline/sizecheck.py` build 每個 scene（不 render），在每個
+stacked-sibling group（`point`、`proof`、`step`、`annotation`、`row`）中找到
+`brand.prose`-tagged lines，並標記一組 lines 在 scale-aware font size 上不同的
+group。`make.py` 在 render 所選 scene 之前執行它（`--skip-sizecheck` 可略過），
+與 garble `lint.py` 並行。
 
-**Colour / readability.** Text that carries teaching content uses `text`/`primary`
-or a semantic accent — never `muted`. This covers prose (statements, step text,
-graph annotations, recap points) **and direct `MathTex`/`Text` value labels** —
-e.g. the numbers on a mapping diagram (`½`, `−½`, `¼`) or point coordinates are
-content, so `text`, not `muted` (both were real misses, faint at video distance).
-`muted` (`#7e8497`) is for *decoration and de-emphasis only*: the summit-bars
-motif, non-current section-map entries, retired content, and pure reference labels
-(a `y=x` guide line, set `A`/`B` tags).
+**色彩／可讀性。** 承載教學內容的文字使用 `text`/`primary` 或 semantic
+accent——永遠不用 `muted`。這涵蓋 prose（statement、step text、graph
+annotation、recap point）**以及直接的 `MathTex`/`Text` value label**——例如
+mapping diagram 上的數字（`½`、`−½`、`¼`）或 point coordinate 是 content，
+因此用 `text`，不用 `muted`（兩者都是真實的 miss，在影片觀看距離下太淡）。
+`muted`（`#7e8497`）**僅用於裝飾和 de-emphasis**：summit-bars motif、non-current
+section-map entry、retired content、以及純 reference label（`y=x` guide line、
+set `A`/`B` tag）。
 
-> Guard blind spot: `sizecheck` flags `muted` only on `brand.prose` text. A
-> **directly-constructed `MathTex`/`Text` label in `muted` is NOT caught** —
-> because some such labels (the reference/decoration ones above) are legitimately
-> muted, so a blanket rule would false-positive. For direct labels this is
-> convention + review, not an automated guard.
+> Guard blind spot：`sizecheck` 只在 `brand.prose` text 上標記 `muted`。**直接
+> 構造的 `MathTex`/`Text` label 使用 `muted` 不會被抓到**——因為某些這樣的
+> label（上述的 reference/decoration 類）確實合理地使用 muted，blanket rule 會
+> false-positive。對直接 label 這是 convention + review，不是 automated guard。
 
-**No manual line breaks in prose.** Author a step/point/annotation/statement as a
-plain sentence — do **not** insert a LaTeX `\\` to force a line break. `brand.prose`
-wraps automatically at the column `max_width`: a short line stays on one line, a
-long line wraps at a word boundary. A manual `\\` forces an arbitrary break (e.g.
-"Solve $y=x^3$\\ for $x$." snapped a one-line phrase into two) — that is an
-authoring artifact, not layout. Reserve `\\` for a *deliberate* stylistic break,
-which is rare here.
+**Prose 中不使用手動換行。** 將 step/point/annotation/statement 撰寫為
+plain sentence——**不要**插入 LaTeX `\\` 強制換行。`brand.prose` 在 column
+`max_width` 處自動換行：短行留在一行，長行在 word boundary 換行。手動 `\\`
+強制一個 arbitrary break（例如 "Solve $y=x^3$\\ for $x$." 把一個單行短語
+斷成兩行）——那是 authoring artifact，不是 layout。將 `\\` 保留給*刻意的*
+stylistic break，在此處極少見。
 
 ---
 
-### Authoring checklist — recurring mistakes, do not repeat
+### Authoring checklist——反覆出現的錯誤，不要重蹈覆轍
 
-Each of these shipped as a real bug this project already paid for. When writing a
-storyboard or a template, hold to them. Severity: **error** aborts the render
-(definitely broken); **warn** prints but does not block (has rare legitimate
-exceptions). Both run in `make.py` before render.
+以下每一項都曾作為真實 bug 出貨，本專案已為此付出代價。撰寫 storyboard 或
+template 時請遵守。嚴重度：**error** 中止 render（確定壞了）；**warn** 印出但
+不阻擋（有罕見的合理例外）。兩者都在 `make.py` render 前執行。
 
-| Don't | Do | Why / guard |
+| Don't | Do | 原因／guard |
 |---|---|---|
-| `$math$` or `\` in a plain-Text field (`title`, `meta.*` labels) | put math only in markup-capable fields | prints literally; **lint error** |
-| odd number of `$` | balance every `$…$` | LaTeX crash; **lint error** |
-| `heading` on a field that may hold `$`/`\` | `brand.prose` / `brand.heading_rich` | garble; routing is centralised there |
-| `math_line` + `scale_to_fit_width` on stacked prose | `brand.prose(..., max_width=…)` (wraps) | size mismatch; **sizecheck error** |
-| manual `\\` break in prose | plain sentence, let prose wrap | arbitrary break; **lint warn** |
-| `muted` for teaching content (prose **or** direct `MathTex`/`Text` value labels) | `text`/`primary` or a semantic accent | too faint; **sizecheck warn** on prose only — direct labels are convention |
-| hollow `○` dot for an attained value (point on a curve / intersection) | solid `●` (`hollow: false`); for a deliberately excluded value, add `hollow_reason: <why>` to the point | `○` means *value absent*; **lint warn** (hollow on an interior curve point), suppressed when `hollow_reason` is set |
-| an element wider/taller than the frame (formula/recap card, long statement, unclamped headline) | shorten it, clamp the width, or split it | silently clipped off-frame; **sizecheck error** (off-frame) / **warn** (spills past the safe margin) |
+| 在 plain-Text 欄位（`title`、`meta.*` label）中使用 `$math$` 或 `\` | 只在 markup-capable 欄位放 math | 會 literally 印出；**lint error** |
+| 奇數個 `$` | 平衡每個 `$…$` | LaTeX crash；**lint error** |
+| 在可能包含 `$`/`\` 的欄位上用 `heading` | `brand.prose` / `brand.heading_rich` | garble；routing 集中在那裡 |
+| 在 stacked prose 上用 `math_line` + `scale_to_fit_width` | `brand.prose(..., max_width=…)`（wrap） | size mismatch；**sizecheck error** |
+| prose 中的手動 `\\` break | plain sentence，讓 prose wrap | arbitrary break；**lint warn** |
+| 教學內容使用 `muted`（prose **或**直接 `MathTex`/`Text` value label） | `text`/`primary` 或 semantic accent | 太淡；prose 上 **sizecheck warn**——直接 label 靠 convention |
+| 用空心 `○` dot 表示 attained value（curve 上的點／交點） | 實心 `●`（`hollow: false`）；刻意 excluded 的值加 `hollow_reason: <why>` | `○` 意味著*值不存在*；**lint warn**（interior curve point 上的 hollow），有 `hollow_reason` 時抑制 |
+| 元素寬於/高於 frame（formula/recap card、長 statement、unclamped headline） | 縮短、clamp width、或 split | 被 silently clip 出 frame；**sizecheck error**（off-frame）/ **warn**（spill past safe margin） |
 
 ---
 
-### Visual QA — the whole-video acceptance pass
+### Visual QA——全影片驗收通過
 
-The authoring checklist above catches *known per-element mistakes* statically. This
-is its complement: a **five-dimension pass over the finished video** (or its key
-frames), watched end-to-end before a section ships. The dimensions are adapted from
-Code2Video's AES rubric; in that study aesthetic score correlated **r ≈ 0.97** with
-measured learning gain, so visual clarity is teaching efficacy, not polish. The same
-table doubles as the rubric for a future VLM critic (see
-[`CODE2VIDEO_STUDY.md`](CODE2VIDEO_STUDY.md) P1/P3).
+上方的 authoring checklist 靜態地抓*已知的 per-element 錯誤*。以下是其補充：
+一個**五維度的成品影片通過**（或其 key frame），在一節出貨前端到端觀看。維度
+改編自 Code2Video 的 AES rubric；在該研究中 aesthetic score 與測量的 learning
+gain 相關 **r ≈ 0.97**，因此 visual clarity 就是 teaching efficacy，不是 polish。
+同一張表也兼作未來 VLM critic 的 rubric（見
+[`CODE2VIDEO_STUDY.md`](CODE2VIDEO_STUDY.md) P1/P3）。
 
-| Dimension | Concrete check for this pipeline |
+| 維度 | 本產線的具體檢查 |
 |---|---|
-| **Element Layout** | No two content blocks overlap (now caught automatically by `sizecheck._overlap_issues`); everything sits inside `SAFE_MARGIN`; the frame reads balanced, not lopsided. |
-| **Attractiveness** | Each animation earns its place — it *animates* a concept (a sweep, a trace, a reflection across `y=x`), not just a static slide reveal (methodology §5, "Animate, not just display"). |
-| **Logic Flow** | Reveal order tracks the narration beats; one teaching idea per scene; nothing appears on screen before the narration speaks to it. |
-| **Visual Consistency** | Accent role is consistent (definition = cyan, theorem = gold, example = electric blue, …); one font and size scale throughout; intro and outro match the brand bookends. |
-| **Accuracy & Depth** | Faithful to the handout, the math is correct, and each scene's `learning_goal` (content script, methodology §6) is actually delivered — on screen *and* in narration. |
+| **Element Layout** | 沒有兩個 content block 重疊（現由 `sizecheck._overlap_issues` 自動抓到）；一切都在 `SAFE_MARGIN` 內；frame 讀起來平衡、不歪斜。 |
+| **Attractiveness** | 每個 animation 都值得存在——它*animate*一個概念（sweep、trace、reflection across `y=x`），不只是 static slide reveal（methodology §5, "Animate, not just display"）。 |
+| **Logic Flow** | Reveal 順序追蹤 narration beat；每場景一個教學概念；narration 說到之前，螢幕上什麼都不該出現。 |
+| **Visual Consistency** | Accent role 一致（definition = cyan、theorem = gold、example = electric blue、…）；全片一套 font 和 size scale；intro 和 outro 匹配 brand bookend。 |
+| **Accuracy & Depth** | 忠實於 handout，數學正確，且每場景的 `learning_goal`（content script，methodology §6）確實被 deliver——在螢幕上*且*在 narration 中。 |
 
-This pass is run by the **VLM critic** (`pipeline/critic.py`, the Code2Video P1
-adoption): it extracts the fullest frame of each scene and has a vision model
-(MiMo-V2.5) score it against these five dimensions and list concrete defects. It is
-**advisory** — it writes a report (`output/critic/<deck>/critique.{json,md}`), never
-edits the storyboard; the human stays the layout authority. Commands and the cost
-gate are in [`README.md`](README.md) (§ VLM 視覺批改).
+此通過由 **VLM critic**（`pipeline/critic.py`，Code2Video P1 adoption）執行：
+它提取每場景的 fullest frame，讓 vision model（MiMo-V2.5）對照這五個維度打分並
+列出具體缺陷。它是 **advisory**——它寫 report
+（`output/critic/<deck>/critique.{json,md}`），永遠不編輯 storyboard；human
+仍是 layout 的 authority。指令和 cost gate 在 [`README.md`](README.md)
+（§ VLM 視覺批改）。
 
-**The review loop.** A finding is an opinion to weigh, not a command. Run it as an
-iteration, not a one-shot:
+**Review loop。** 一個 finding 是一個要衡量的意見，不是命令。以迭代方式而非
+one-shot 運行：
 
-1. **Critique** — run the critic over the scene/section; read its scores, defects,
-   and suggestions.
-2. **Judge & adopt** — decide which to act on. Adopt anything that, *in your
-   judgement, makes the video better* — **not only outright bugs**. A suggestion that
-   improves clarity, pacing, or teaching is worth taking even when nothing was
-   "wrong". Decline one only when it would *hurt* (e.g. break cross-scene
-   consistency) or conflict with a deliberate house decision (the flat, no-grid
-   aesthetic; a declined typesetting choice). When a suggestion is genuinely
-   **contentious** — arguable either way, or a design call that is the author's to
-   make — surface it for the human to decide rather than settling it yourself. The
-   VLM proposes; you decide, and escalate the close calls.
-3. **Modify** — apply the adopted changes (storyboard / template), re-render the
-   affected scene.
-4. **Re-verify** — run the critic again on the changed frame: confirm the defect is
-   gone and no new one appeared. The judge that raised it confirms the fix — your own
-   eyes are not enough (this rule was set after a fix was eyeballed but not re-checked).
-5. **Final check** — your own read of the result.
-6. **Iterate** — repeat until the critic surfaces nothing further worth adopting.
+1. **Critique**——在 scene/section 上跑 critic；讀取其 score、defect 和
+   suggestion。
+2. **Judge & adopt**——決定哪些要採納。採納任何*依你的判斷能讓影片更好*的——
+   **不僅限於明顯的 bug**。一個改善 clarity、pacing 或 teaching 的 suggestion
+   即使沒有什麼「錯」也值得採納。只在 suggestion 會*傷害*（例如破壞跨場景
+   consistency）或與刻意的 house decision 衝突（flat, no-grid aesthetic；一個被
+   declined 的 typesetting choice）時才拒絕。當一個 suggestion 真正**有爭議**——
+   兩面都說得通，或是作者該做的 design call——提交給 human 決定而非自行定奪。
+   VLM 提議；你決定，對 close call 上報。
+3. **Modify**——套用已採納的變更（storyboard / template），重新 render 受影響的
+   scene。
+4. **Re-verify**——在變更後的 frame 上再次跑 critic：確認 defect 已消失且沒有
+   新的出現。提出它的 judge 確認修復——你自己的肉眼不夠（此規則是在一個修復被
+   目測但未複驗後設立的）。
+5. **Final check**——你自己讀一遍結果。
+6. **Iterate**——重複直到 critic 不再提出值得採納的東西。
 
-Vet every suggestion: the critic has proposed off-screen coordinates and, against the
-house style, gradients/grids. Apply judgement, never blind — the prompt already tells
-the model the style is deliberately flat to damp that bias.
+審查每個 suggestion：critic 曾提議過 off-screen coordinate，以及違反 house style
+的 gradient/grid。運用判斷力，永遠不要盲從——prompt 已告訴 model style 是
+deliberately flat 以抑制該偏差。
 
 ---
 
-## Data flow (target)
+## Data flow（目標）
 
 ```
 handout-kit HTML  (per-chapter authoritative file, see README「輸入」)
-   │  (author reads section, writes storyboard by hand — NOT auto-generated)
+   │  (作者閱讀該節，手動撰寫 storyboard——非自動生成)
    ▼
 video/storyboards/<id>.yml
    │
-   ├─ lint.py              errors: markup in plain-Text fields, unbalanced $;    (DONE)
-   │                       warns: manual \\ in prose, hollow point on a curve
-   │                       (a point with hollow_reason: <why> is exempt)
-   ├─ sizecheck.py         builds scenes (no render). error: stacked siblings    (DONE)
-   │                       at different sizes, or an element clipped off-frame;
-   │                       warn: teaching prose in muted, a spill past the safe
-   │                       margin, or two content blocks overlapping
-   ├─ schema.py            validate format, list reveal targets                  (TODO)
+   ├─ lint.py              error: plain-Text 欄位中有 markup、unbalanced $；    (DONE)
+   │                       warn: prose 中的手動 \\、curve 上的 hollow point
+   │                       （帶 hollow_reason: <why> 的 point 免除）
+   ├─ sizecheck.py         build scene（不 render）。error: stacked sibling     (DONE)
+   │                       size 不同、或元素被 clip 出 frame；
+   │                       warn: 教學 prose 使用 muted、spill past safe
+   │                       margin、或兩個 content block 重疊
+   ├─ schema.py            validate format, list reveal target                   (TODO)
    │
    ▼
-narration.parse_say        split each `say` into beats at {show} markers          (DONE)
-   │                        → ordered (beat_text, reveal_target) list per scene
+narration.parse_say        將每個 `say` 在 {show} marker 處拆成 beat              (DONE)
+   │                        → 每場景的 ordered (beat_text, reveal_target) list
    ▼
-synth                      one clip per beat; mock = silence sized by word count   (DONE)
-   │                        (real billed Gemini = pipeline/tts.py); measure
+synth                      每個 beat 一個 clip；mock = 依 word count 的靜音        (DONE)
+   │                        （billed Gemini = pipeline/tts.py）；測量
    │                        duration → audio/<id>/… + manifest.json
    ▼
-render (scene.py)          Manim renders each scene silent; a reveal fires at the  (DONE)
-   │                        start of its beat; the measured audio duration drives
-   │                        the hold (reads manifest.json). Silent MP4 per scene.
+render (scene.py)          Manim render 每場景（silent）；reveal 在其 beat        (DONE)
+   │                        開始時觸發；audio duration 驅動 hold（讀
+   │                        manifest.json）。每場景一個 silent MP4。
    ▼
-compose (ffmpeg)           lay each scene's narration under its video (delayed to  (DONE)
-   │                        the first reveal), silent track for intro/outro, concat.
+compose (ffmpeg)           將每場景的 narration 鋪在其 video 下（delayed to       (DONE)
+   │                        第一個 reveal），intro/outro 為 silent track，concat。
    ▼
 video/output/<id>.mp4
 ```
 
-**Orchestrator:** `make.py` is the single entry point — one command runs
-parse → synth → render → compose in one process (`make.py --storyboard <yml>
---backend mock`), the pre-render `lint.py` / `sizecheck.py` guards included. It is
-**offline only**: mock synthesis (silent clips sized by word count), no billing. Real
-Gemini TTS is billed and intentionally NOT wired into make.py (see CLAUDE.md), so a
-narrated master still runs through the retained lower-level chain `pipeline/tts.py` →
-`build.py` → `mux.py` — superseded by make.py for offline work but kept, not deleted.
-Per-stage caching keyed on the visual payload (so editing `say` re-synthesizes audio
-but does not re-render Manim) is still (TODO).
+**Orchestrator：** `make.py` 是唯一入口點——一條指令跑完 parse → synth →
+render → compose（`make.py --storyboard <yml> --backend mock`），包含
+pre-render 的 `lint.py` / `sizecheck.py` guard。它是 **offline only**：mock
+synthesis（依 word count 的 silent clip），不計費。Real Gemini TTS 是計費的，
+刻意**不**接入 make.py（見 CLAUDE.md），因此 narrated master 仍走保留的
+lower-level chain `pipeline/tts.py` → `build.py` → `mux.py`——被 make.py
+取代用於 offline 工作但保留、不刪除。以 visual payload 為 key 的 per-stage
+caching（使得編輯 `say` 會重新 synthesize audio 但不重新 render Manim）仍為
+(TODO)。
 
-### Alignment, restated (so it is not lost in the rewrite)
+### Alignment，重述（避免在重寫中遺失）
 
-The first-gen insight survives: alignment does **not** depend on TTS returning
-word-level timestamps. We synthesize **one clip per beat**, measure its real duration,
-and that duration *is* the reveal hold. Gemini changes the synthesizer, not the
-alignment model. (Confirmed: Gemini returns 24 kHz mono 16-bit raw PCM, wrapped to
-WAV and measured locally; validated end-to-end on §1.1 — each reveal lands within
-~1 frame of its narration beat.)
+第一代的洞見沿用：alignment **不依賴** TTS 回傳 word-level timestamp。我們
+**每個 beat 合成一個 clip**，測量其真實 duration，該 duration *就是* reveal
+hold。Gemini 換了 synthesizer，不換 alignment model。（已確認：Gemini 回傳
+24 kHz mono 16-bit raw PCM，wrap 成 WAV 後 locally 測量；在 §1.1 上 end-to-end
+驗證——每個 reveal 落在其 narration beat 的 ~1 frame 之內。）
 
 ---
 
-## Open questions / not yet decided
+## Open question／尚未決定
 
-- ~~Template catalog for gen-2~~ — resolved 2026-06-11: the catalog above. The
-  ported content templates all stayed; gen-2 added `derivation` (2026-06-11),
-  then `value_table` / `graph_compare` / `sign_chart` (built ahead of §1.3 /
-  ch02 / §4.5 per user call — static templates first, hooks stay the animation
-  layer).
-- BGM: source, ducking, licensing.
-- `{show ...}` target grammar: dotted (`math.0`) vs bracketed (`math[0]`). Currently dotted.
-- Gemini specifics (resolved): model id `gemini-3.1-flash-tts-preview` (CLI-configurable);
-  voice `meta.voice` / `Kore` as a prebuilt voice name; output is 24 kHz mono 16-bit raw
-  PCM wrapped to WAV and measured locally. Paid tier confirmed working; the free tier is
-  capped at ~10 requests/day for this model, so batch synthesis needs paid billing. `tts.py`
-  honors the per-minute 429 `retryDelay` and fails fast on the per-day cap.
+- ~~Template catalog for gen-2~~——resolved 2026-06-11：即上方的 catalog。沿用的
+  content template 全部保留；gen-2 新增 `derivation`（2026-06-11），接著
+  `value_table` / `graph_compare` / `sign_chart`（依使用者指示提前為 §1.3 /
+  ch02 / §4.5 建構——先做 static template，hook 仍為 animation layer）。
+- BGM：source、ducking、licensing。
+- `{show ...}` target grammar：dotted（`math.0`）vs bracketed（`math[0]`）。目前為 dotted。
+- Gemini specifics（resolved）：model id `gemini-3.1-flash-tts-preview`（CLI-configurable）；
+  voice `meta.voice` / `Kore` 作為 prebuilt voice name；output 為 24 kHz mono 16-bit raw
+  PCM，wrap 成 WAV 後 locally 測量。Paid tier 確認可運作；free tier 對此 model
+  限制 ~10 requests/day，因此 batch synthesis 需 paid billing。`tts.py`
+  遵循 per-minute 429 `retryDelay` 並在 per-day cap 時 fail fast。

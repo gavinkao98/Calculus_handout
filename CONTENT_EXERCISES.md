@@ -1,111 +1,111 @@
-# Exercises: Minimum Skeleton
+# 習題：最低骨架
 
-Full exercise-system design is deferred until the book's main content is largely complete (see [`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14). This file is the **minimum skeleton** — the decisions that should be locked before chapters start accumulating real exercises, so that later work does not have to retrofit every section.
+完整的習題系統設計延後至本書主要內容大致完成後進行（見 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14）。本檔案是**最低骨架**——在各章開始累積正式習題之前就應鎖定的決策，以免日後每一節都得回頭改造。
 
-Anything in this file marked *(TBD)* is explicitly open. Anything not marked *(TBD)* is a working decision that authors should follow until this file revises it.
-
----
-
-## What lives in the spec vs. here
-
-[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5 (`exercise` environment) + §14 (deferred design) establish:
-
-- every section end **MUST** carry either a real `\subsection*{Exercises}` block or the TODO placeholder comment `% TODO: add \subsection*{Exercises} block with end-of-section problems for Section N.M.`
-- exercises are **book-only** — they do not flow into slides, narration, or Manim storyboards (see [`README.md`](README.md) *Media scope*).
-- the full exercise system (difficulty markers, answer appendix, inline self-check variants, hint format) is **deferred**.
-
-This file sits between the placeholder rule and the full deferred design. It pins down the minimum so that when the full design opens, it is refining existing structure, not inventing from scratch.
+本檔案中標記為 *(TBD)* 的項目是明確開放的。未標記 *(TBD)* 的項目是 working decision，作者應遵循直到本檔修訂為止。
 
 ---
 
-## Per-section budget *(working decision — default band, coverage is authoritative)*
+## Spec 與本檔的分工
 
-- **Default band: 8–12 exercises per section.** Short single-skill sections naturally land lower (5–6); strongly computational sections may go as high as 15.
-- The band is a calibration default, **not a quota**. The authoritative criterion is the section's **coverage matrix** (see *Sourcing workflow* below): every definition, theorem, and strategy the section teaches gets exercised at the depth its learning outcomes demand.
-- **Compliance is matrix-based, not count-based.** A section is out of compliance when a taught item has no exercise, or when the block pads with near-duplicates to reach the band — not when a genuinely covered section sits at 6, nor when a five-skill section needs 16.
-- A section landing outside the band needs no separate exception comment during the skeleton stage; its coverage matrix is the justification.
+[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5（`exercise` environment）+ §14（延後設計）已確立：
 
-Rationale: section content varies too much for one fixed count — a one-technique section and a five-skill section should not share a quota. The band survives as the default because most sections do land in it and it remains the right sanity check during gap-fill (enough repeated practice for self-study readers, few enough that working every exercise does not burn a weekend). The matrix is authoritative whenever the count would force the wrong call, mirroring the remark-target idiom in [`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5 ("a target, not a production quota").
+- 每節結尾 **MUST** 有一個正式的 `\subsection*{Exercises}` 區塊，或者 TODO placeholder 註解 `% TODO: add \subsection*{Exercises} block with end-of-section problems for Section N.M.`
+- 習題為 **book-only**——它們不會進入投影片、旁白或 Manim storyboard（見 [`README.md`](README.md) *Media scope*）。
+- 完整的習題系統（difficulty marker、answer appendix、inline self-check variant、hint format）是**延後的**。
+
+本檔案處於 placeholder 規則和完整延後設計之間。它釘住最低限度，使得未來正式設計開啟時，是在精煉既有結構，而非從零發明。
 
 ---
 
-## Type taxonomy and mix *(working decision — taxonomy fixed, per-section mix content-driven)*
+## 每節預算 *（working decision——預設區間，coverage 為權威）*
 
-The four-type taxonomy is fixed; every exercise belongs to one of:
+- **預設區間：每節 8–12 題。** 短小的單一技能節自然會偏低（5–6 題）；計算密集的節可高達 15 題。
+- 此區間是校準用的預設值，**不是配額**。權威判準是該節的**覆蓋矩陣**（見下方*選題流程*）：該節教授的每個 definition、theorem 和 strategy 都必須以其學習目標所要求的深度被練習到。
+- **合規判定以矩陣為準，不以數量為準。** 一節不合規的情況是：某個教學項目沒有對應習題，或者用近乎重複的題目灌數以達到區間——而不是一個已充分覆蓋的節只有 6 題，也不是一個五技能的節需要 16 題。
+- 在骨架階段，落在區間外的節不需要另寫 exception comment；其覆蓋矩陣即為理由。
 
-| Type | Purpose |
+原理：各節內容差異太大，無法用同一個固定數字——一技能的節和五技能的節不該共用同一個配額。區間之所以保留為預設值，是因為多數節確實落在此範圍內，而且在 gap-fill 階段它仍是合理的 sanity check（自學讀者需要足夠的反覆練習，但做完全部習題不該耗掉一整個週末）。矩陣在數量會導致錯誤決策時具有權威性，呼應 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5 中 remark-target 的慣用語（"a target, not a production quota"）。
+
+---
+
+## 題型分類與組合 *（working decision——分類固定，每節組合由內容決定）*
+
+四種題型的分類是固定的；每道習題歸屬其中之一：
+
+| 類型 | 目的 |
 |---|---|
-| `conceptual` | "why" or "what fails if" — forces the reader to state a definition or decide whether a condition holds. |
-| `computational` | direct application of a method to a clean input. |
-| `reasoning` | short proofs, counterexample construction, "for which inputs does this identity hold?" |
-| `applied` *(optional)* | physics / economics / geometry setup where applicable. |
+| `conceptual` | "why" 或 "what fails if"——迫使讀者陳述一個 definition 或判斷某個條件是否成立。 |
+| `computational` | 直接將方法應用於乾淨的輸入。 |
+| `reasoning` | 短證明、反例構造、"for which inputs does this identity hold?" |
+| `applied` *（選用）* | physics / economics / geometry 的應用情境（適用時才加）。 |
 
-**Per-section mix is content-driven, not quota-driven.** The coverage matrix decides: an ε-δ section is legitimately reasoning-heavy, a techniques section legitimately computational-heavy, and early chapters naturally skew conceptual + computational. A section includes a type only when its content gives that type real work to do.
+**每節組合由內容驅動，不由配額驅動。** 覆蓋矩陣決定一切：ε-δ 的節合理地偏重 reasoning，技巧型的節合理地偏重 computational，早期章節自然偏向 conceptual + computational。一個類型只有在該節的內容確實賦予它有意義的工作時才會出現。
 
-**Book-level default priors** — the starting distribution the gap-fill step aims for, and the chapter-level sanity check:
+**全書預設先驗分布**——gap-fill 步驟的目標分布，也是章節層級的 sanity check：
 
 > `conceptual` ≥ 20% · `computational` 40–60% · `reasoning` ≥ 10% · `applied` 0–20%
 
-Audit these shares **per chapter, not per section**: chapter-wide totals should land near the priors even while individual sections skew. A chapter missing the priors overall usually signals under-provisioned conceptual / reasoning work (the recurring failure mode), not a content-driven skew.
+以**每章**為單位審計這些比例，而非每節：章級總計應接近先驗值，即使個別節有所偏斜。整章未達先驗值通常意味著 conceptual / reasoning 的供給不足（這是反覆出現的失敗模式），而非由內容驅動的偏斜。
 
-The type marker inside the `exercise` environment itself is *(TBD)* — possible options include a `type=` key-value argument, a `\begin{exercise}[conceptual]` optional label, or no in-source marker (type enforced only by author judgment). Pick one in the full design round.
-
----
-
-## Sourcing workflow *(working decision — manuscript first, bank fill, AI fallback)*
-
-Exercises enter a section from three sources, in priority order, with provenance tracked per exercise.
-
-1. **Manuscript problems — mandatory core.** Every problem in the instructor's manuscript ships. They seed the coverage matrix.
-2. **Open problem banks — gap fill.** After the section's main content is drafted:
-   1. Build the **coverage matrix**: rows = every definition / theorem / strategy the section teaches; columns = the four types. Mark which cells the manuscript problems already cover.
-   2. Search the local banks ([`problem_banks/README.md`](problem_banks/README.md)) for candidates filling the empty cells; produce a candidate list for human curation. Bank taxonomies are a **search index only** — gaps are defined by the section's own content, never by what a bank happens to contain.
-   3. Adapt accepted problems to house register and notation ([`CONTENT_SPEC.md`](CONTENT_SPEC.md) §3, §9).
-3. **AI-authored problems — fallback.** Only for cells no bank fills (typically extensions tightly coupled to a manuscript running example). Human review required, as before.
-
-### Provenance and licensing
-
-- Every non-manuscript exercise carries a source marker at import time: `[source: CLP-1 §1.3 #2]`, `[source: APEX §6.1 #14]`, `[source: AI]`. Until the full design round decides whether/how markers appear in shipped output, keep them as comments next to the exercise in source.
-- The banks in `problem_banks/` are all CC BY / CC BY-NC / CC BY-NC-SA — they compose legally into a handout distributed **free of charge under CC BY-NC-SA 4.0** with a credits page. Do not import from share-alike-only sources (CC BY-SA, e.g. Active Calculus) or "free to view but not openly licensed" sources (e.g. Paul's Online Math Notes).
-- **Capture the bank's official hint / answer / solution at import time** into the chapter's import record (`exercise-imports.md` beside the chapter source). This is raw material for the future answer appendix, not the appendix itself — losing it at import means re-deriving every solution later.
+`exercise` environment 內部的 type marker 本身是 *(TBD)*——可能的選項包括 `type=` key-value argument、`\begin{exercise}[conceptual]` optional label、或不在原始碼中做標記（type 僅由作者判斷執行）。在完整設計輪次中擇一。
 
 ---
 
-## Answers and hints *(working decision)*
+## 選題流程 *（working decision——manuscript 優先、bank 填補、AI fallback）*
 
-Two decisions are load-bearing:
+習題從三個來源進入一節，按優先順序，每題追蹤 provenance。
 
-- **do exercises carry an answer at all?**
-  Working default: **selected computational exercises carry a final numerical or symbolic answer** at the end of the book, so a self-study reader can check their work without seeing a full solution. Conceptual and reasoning exercises default to no answer key.
-- **do exercises carry hints?**
-  Working default: **no inline hints for exercises**. If an exercise needs a hint to be approachable, it is probably set up wrong, and a preceding worked example should carry the idea instead.
+1. **Manuscript 習題——必要核心。** 教師手稿中的每一道題目都出貨。它們為覆蓋矩陣播種。
+2. **開放題庫——gap fill。** 當該節的主要內容寫好之後：
+   1. 建立**覆蓋矩陣**：列 = 該節教授的每一個 definition / theorem / strategy；欄 = 四種題型。標記 manuscript 習題已覆蓋的格子。
+   2. 在本地題庫（[`problem_banks/README.md`](problem_banks/README.md)）中搜尋填補空格的候選題；產生候選清單供人工篩選。題庫的分類法是**搜索索引**——gap 由該節自身的內容定義，不由題庫碰巧包含什麼來定義。
+   3. 將被接受的題目適配為本書的語域與記號（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §3、§9）。
+3. **AI 出題——fallback。** 僅用於沒有題庫能填補的格子（通常是與 manuscript running example 緊密耦合的擴展題）。需人工審核，同前。
 
-The answer-appendix format (end of chapter vs. end of book, selection criterion, encoding in source) is *(TBD)*.
+### Provenance 與授權
 
----
-
-## Difficulty markers *(deferred)*
-
-Deliberately not decided yet. The full design round will choose between:
-
-- no markers at all (simplest — order within section carries difficulty).
-- ⭐ / ⭐⭐ / ⭐⭐⭐ inline markers.
-- letter codes (`A`, `B`, `C`).
-- separate `\subsection*{Exercises}` and `\subsection*{Challenge Problems}` blocks.
-
-Until that decision lands, **do not** encode difficulty in exercise sources. Ordering within the block is the only allowed difficulty signal.
+- 每道非 manuscript 習題在匯入時帶有來源標記：`[source: CLP-1 §1.3 #2]`、`[source: APEX §6.1 #14]`、`[source: AI]`。在完整設計輪次決定標記是否、以何種方式出現在出貨產出之前，先以註解形式保留在原始碼中習題旁邊。
+- `problem_banks/` 中的題庫全為 CC BY / CC BY-NC / CC BY-NC-SA——合法地組合為一份**以 CC BY-NC-SA 4.0 免費發行的講義**，附 credits page。不要從 share-alike-only 來源（CC BY-SA，如 Active Calculus）或「free to view but not openly licensed」來源（如 Paul's Online Math Notes）匯入。
+- **在匯入時擷取題庫的官方 hint / answer / solution**，存入章節的 import record（`exercise-imports.md`，放在章節原始碼旁邊）。這是未來 answer appendix 的原始素材，不是 appendix 本身——匯入時遺失就得日後重新推導每個 solution。
 
 ---
 
-## Numbering and labels *(working decision)*
+## 答案與提示 *（working decision）*
 
-- exercises are numbered per section: `1`, `2`, ..., restart at each new section.
-- labels follow the project label convention in [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md): `ex:sectionslug-descriptor`. Example: `ex:limits-squeeze-1`.
-- labels **SHOULD** appear on exercises that later sections will cite. Most exercises do not need labels.
+兩個承重決策：
+
+- **習題是否附帶答案？**
+  Working default：**精選的 computational 習題附一個最終的數值或符號答案**，放在書末，讓自學讀者能檢查自己的結果而不必看完整 solution。Conceptual 和 reasoning 習題預設不附答案。
+- **習題是否附帶提示？**
+  Working default：**習題不附 inline hint。** 如果一道題需要提示才能入手，那它可能設計有問題，前方的 worked example 應該承載那個想法。
+
+Answer-appendix 的格式（章末 vs. 書末、選取準則、在原始碼中的編碼方式）是 *(TBD)*。
 
 ---
 
-## Format inside `\subsection*{Exercises}` *(working decision)*
+## Difficulty marker *（延後）*
+
+刻意尚未決定。完整設計輪次將從以下選項中擇一：
+
+- 完全不標記（最簡單——節內順序即難度）。
+- ⭐ / ⭐⭐ / ⭐⭐⭐ inline marker。
+- 字母代碼（`A`、`B`、`C`）。
+- 分為 `\subsection*{Exercises}` 和 `\subsection*{Challenge Problems}` 兩個區塊。
+
+在該決策落地之前，**不要**在習題原始碼中編碼難度。區塊內的排列順序是唯一允許的難度信號。
+
+---
+
+## 編號與 label *（working decision）*
+
+- 習題按節編號：`1`、`2`、...，每進入新的節重新開始。
+- label 遵循 [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md) 中的專案 label 慣例：`ex:sectionslug-descriptor`。例：`ex:limits-squeeze-1`。
+- label **SHOULD** 出現在後續章節會引用的習題上。大多數習題不需要 label。
+
+---
+
+## `\subsection*{Exercises}` 內的格式 *（working decision）*
 
 ```latex
 \subsection*{Exercises}
@@ -120,31 +120,31 @@ Until that decision lands, **do not** encode difficulty in exercise sources. Ord
 \end{exercise}
 ```
 
-Multi-part exercises use `enumerate` inside the `exercise` body. Do not invent new environments for sub-parts until the full design round.
+多部分的習題在 `exercise` body 內使用 `enumerate`。在完整設計輪次之前不要為 sub-part 發明新的 environment。
 
 ---
 
-## What NOT to do before the full design round
+## 完整設計輪次之前 NOT to do 的事
 
-These are the traps we want to avoid accumulating before the exercise system is designed properly:
+以下是我們想避免在習題系統正式設計之前累積的陷阱：
 
-- **do not** invent per-chapter exercise macros. If a shortcut seems helpful, note it in the chapter's open-questions list in [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) rather than adding a `\newcommand`.
-- **do not** mix slide or narration content into exercise prompts — exercises are book-only.
-- **do not** seed the answer appendix until the selection criterion and format are locked. (Capturing bank-provided solutions in a chapter's `exercise-imports.md` is fine — that is import raw material, not the appendix.)
-- **do not** mark difficulty in the source.
-- **do not** include hints inline.
+- **不要**發明 per-chapter exercise macro。如果某個捷徑看起來有用，記錄在 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) 中該章的 open-questions 清單，而不是加一個 `\newcommand`。
+- **不要**把投影片或旁白內容混進 exercise prompt——習題是 book-only。
+- **不要**在選取準則和格式鎖定之前開始建 answer appendix。（將題庫提供的 solution 擷取到章節的 `exercise-imports.md` 是可以的——那是匯入原始素材，不是 appendix。）
+- **不要**在原始碼中標記難度。
+- **不要**加 inline hint。
 
 ---
 
-## When this file is upgraded
+## 本檔案何時升級
 
-Trigger: **a solid majority of chapters have complete main content** (per spec §14).
+觸發條件：**大多數章節的主要內容已完成**（依 spec §14）。
 
-At that point, the dedicated exercise design round will:
+屆時，專門的習題設計輪次將：
 
-1. audit what's already in the TODO placeholders and the real exercise blocks that have accumulated.
-2. decide the deferred items: difficulty markers, answer appendix format, hint policy, in-source type taxonomy, environment variants (self-check, challenge).
-3. replace this skeleton file with the full spec, bumping a version number.
-4. retrofit existing exercise blocks to the new spec, one chapter at a time.
+1. 審計現有 TODO placeholder 和已累積的正式 exercise 區塊。
+2. 決定延後的項目：difficulty marker、answer appendix 格式、hint 策略、原始碼內 type taxonomy、environment variant（self-check、challenge）。
+3. 以完整 spec 取代本骨架檔案，並增加版本號。
+4. 逐章改造既有的 exercise 區塊以符合新 spec。
 
-Until then, anything not covered here should err on the side of **simple and reversible** — treat exercises as prose-with-a-frame rather than as a domain-specific sub-system.
+在此之前，本檔案未涵蓋的事項應偏向**簡單且可逆**——將習題視為「帶框的散文」而非一個 domain-specific 子系統。
