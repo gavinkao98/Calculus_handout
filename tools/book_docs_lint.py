@@ -49,6 +49,9 @@ SKIP_DIRS = {
     # original ``tools/<name>.py`` command examples and cross-links that point
     # at the pre-archive layout; we do not re-lint reference material.
     "legacy",
+    # Third-party problem-bank clones (gitignored vendored repos with their own
+    # internal READMEs; see problem_banks/README.md).
+    "problem_banks",
 }
 
 # Pattern: ``python tools/X.py`` or ``python .\tools\X.py`` (with either slash).

@@ -297,6 +297,7 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
 - `preamble/` — 共用的 LaTeX 設定（見下方 *Preamble 對照*）。
 - `preamble_smoketest.tex` — 僅供 preamble 版面檢查的最小回歸文件。
 - `refs/` — 參考書目資料。
+- `problem_banks/` — 開放授權題庫的本地 clone 區（內容 gitignored，僅 README 進版控）。選題工作流程見 [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md) §Sourcing workflow。
 - `tools/` — 書籍源碼工具（`book_style_lint.py`、`book_preamble_smoketest.py`、`book_docs_lint.py`）。第一代媒體產生腳本已封存至 `legacy/scripts/`。
 - `legacy/` — 已封存的凍結媒體產線（gen-0 投影片、gen-1 Manim 及其橋接實驗）：`legacy/scripts/`（腳本）、`legacy/MANIM_*.md` 與 `legacy/LEGACY_SLIDE_PIPELINE.md`（方法論文件）、`legacy/schemas/`、`legacy/inputs/`、`legacy/artifacts/`（gitignored 的大型算繪輸出仍存於磁碟，git 追蹤的例外為 narration／final／tex）。詳見 [`legacy/README.md`](legacy/README.md)。
 - `.github/workflows/` — CI 檢查。
