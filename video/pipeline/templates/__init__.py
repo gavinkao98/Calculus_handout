@@ -16,6 +16,7 @@ from typing import Any, Callable
 from ..blocks import Block
 from . import (
     definition_math,
+    derivation,
     example_walkthrough,
     graph_focus,
     intro,
@@ -29,6 +30,7 @@ Builder = Callable[[dict[str, Any], dict[str, Any]], "list[Block]"]
 
 REGISTRY: dict[str, Builder] = {
     "definition_math": definition_math.build,
+    "derivation": derivation.build,
     "example_walkthrough": example_walkthrough.build,
     "graph_focus": graph_focus.build,
     "procedure_steps": procedure_steps.build,

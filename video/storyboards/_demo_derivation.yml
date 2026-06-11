@@ -1,0 +1,72 @@
+# derivation 模板 demo／驗證稿（非正式節,檔名底線前綴）
+#
+# 目的:驗證新 derivation 模板(全寬推導鏈)的版面與容量——
+#   scene 1: ch02 sec-2-1 的真實導數定義計算鏈(4 行,含分數行,「未來壓力源」實例);
+#   scene 2: 6 行混合高度容量壓測(逼近模板容量上限,看觀感與 sizecheck)。
+# 內容取自 experiments/handout_kit/exp-ch02/sec-2-1.html(slope at (2,-2))。
+# demo 專用,不屬任何正式節;驗證後可整檔刪除或留作模板範例。
+
+meta:
+  id: demo_derivation
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Derivation Template Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Derivation Template Demo" }
+
+scenes:
+
+  # 1 -------------------------- 真實壓力源:ch02 導數定義計算鏈(4 行)
+  - id: slope_chain
+    kind: content
+    template: derivation
+    accent: example
+    source: "exp-ch02/sec-2-1.html · Example(slope at (2,-2)) -- demo 取材"
+    title: "Slope at a Point, from the Definition"
+    say: |
+      Let us compute the slope of $y=x^2-3x$ at the point two, minus two,
+      straight from the definition.
+      {show line.0} The slope is the limit of the difference quotient as $h$
+      goes to zero.
+      {show line.1} Substitute the function: expand $f$ at two plus $h$, and
+      subtract its value at two.
+      {show line.2} Open the brackets and collect terms in the numerator.
+      {show line.3} A factor of $h$ cancels, and the limit is now harmless.
+      {show line.4} Let $h$ go to zero: the slope is one.
+    # 無 statement:題目由 narration 首句承載(derivation 哲學——敘述進旁白)。
+    # demo 實測:statement+4 分數行+結果行=超載 0.5u(上下皆溢);滿載鏈把
+    # statement 讓給旁白正是本模板的用法。容量指引見 DESIGN.md。
+    lines:
+      - "m = \\lim_{h \\to 0} \\frac{f(2+h)-f(2)}{h}"
+      - "= \\lim_{h \\to 0} \\frac{\\bigl[(2+h)^2 - 3(2+h)\\bigr] - [4-6]}{h}"
+      - "= \\lim_{h \\to 0} \\frac{(4 + 4h + h^2 - 6 - 3h) - (-2)}{h}"
+      - "= \\lim_{h \\to 0} \\frac{h + h^2}{h} = \\lim_{h \\to 0}\\,(1 + h)"
+      - { tex: "= 1", anim: highlight }
+
+  # 2 ------------------------------ 容量壓測:6 行混合高度(2 分數+4 單高)
+  - id: capacity_probe
+    kind: content
+    template: derivation
+    accent: proposition
+    source: "容量壓測(合成例,非講義內容)"
+    title: "Capacity Probe: Six Lines"
+    say: |
+      This scene probes the template's vertical capacity.
+      {show line.0} Start from a fraction-height line.
+      {show line.1} A second fraction-height line.
+      {show line.2} Then four single-height lines.
+      {show line.3} Three.
+      {show line.4} Two.
+      {show line.5} And the final result line, highlighted.
+    lines:
+      - "S = \\frac{(a+b)^2 - (a-b)^2}{4ab} \\cdot \\frac{a^2 - b^2}{a+b}"
+      - "= \\frac{4ab}{4ab} \\cdot \\frac{(a+b)(a-b)}{a+b}"
+      - "= 1 \\cdot (a - b)"
+      - "= a - b + 0"
+      - "= a - b"
+      - { tex: "= a - b \\quad (a \\ne -b,\\ ab \\ne 0)", anim: highlight }

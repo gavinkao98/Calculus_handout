@@ -155,6 +155,32 @@ scenes:
 | `statement`, `math`, `steps`, `plots`, … | per template | the on-screen visual payload |
 | `hook` | no | dotted path to a custom animation fn (escape hatch, unchanged concept) |
 
+### Template selection: discrete steps vs a derivation chain
+
+Computation scenes come in two shapes, and picking the wrong template is how a
+long formula runs out of room — the two-column templates' math column tops out
+around ~5 manim units, while a real chain line (the ch02 slope-from-definition
+computation) needs 7–9:
+
+- **`example_walkthrough` / `procedure_steps`** — DISCRETE steps: each step is
+  a short formula whose reasoning text is worth *reading* beside it. Capacity:
+  3–4 rows, math column ~5 units.
+- **`derivation`** — a CONTINUOUS transformation chain (derivative from the
+  definition, limit-law rewrites, identity proofs): one aligned full-width
+  chain (~11 units), revealed line by line via `{show line.N}`; the per-step
+  "why" lives in the narration, not on screen. Line 0 carries the LHS; later
+  lines written in the "= ..." continuation style x-align their relation
+  symbol under line 0's (`align_on`, default `=`). `anim: highlight` marks the
+  result line (accent colour). An optional centred `statement` states the
+  problem — but a full-capacity chain should hand that job to the narration's
+  first beat instead (measured: statement + four fraction-height lines +
+  result line overflows the zone by ~0.5).
+- **Capacity before SPLITTING the scene** (a content-layer decision, same
+  spirit as methodology §3's proof split): ~5 fraction-height lines without a
+  statement, ~4 with one; ~7 single-height lines. `sizecheck` flags the
+  overflow; the fix is a split, not a squeeze. Demo / reference storyboard:
+  `storyboards/_demo_derivation.yml` (the real ch02 chain + a 6-line probe).
+
 ### `say`: narration + inline reveal (the core change)
 
 `say` is **what is spoken**, with **LaTeX written inline** (`$f(x_1)$`), and **reveal
