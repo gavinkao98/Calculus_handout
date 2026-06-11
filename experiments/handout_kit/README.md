@@ -15,7 +15,12 @@
 | | 檔 | 來源 |
 |---|---|---|
 | **designer 原樣** | `讀我-排版指南.md`、`template-screen.html`、`template-print.html`、`new-chapter-preview.html`、`shared/`、`new-chapter/`、`example-ch01/` | 解壓自 `latex.zip`，**未改動** |
-| **本實驗新增** | `exp-ch04/sec-4-2.html`、`poc-screen.html`、`poc-print.html`、`CONTRACT-html-writing.md`、`RESULT-s42-html-poc.md`、`README.md`、`_render/` | 見下 |
+| **寫作契約** | [`CONTRACT-html-writing.md`](CONTRACT-html-writing.md)、[`RESULT-s42-html-poc.md`](RESULT-s42-html-poc.md) | POC 驗證後制訂 |
+| **standalone 產線** | `gen_standalone.py`、`chapter{1,2,3}-standalone.html`、`chapter{1,2,3}-print-standalone.html` | ch1 手工製作為範本；ch2/ch3 由 `gen_standalone.py` 從 ch1 範本生成 |
+| **章節內容** | `exp-ch02/`（§2.1–§2.5 + figures.js）、`exp-ch03/`（§3.1–§3.3 + figures.js） | seed → direction → 六階收斂 |
+
+> 舊的範本版 HTML（`chapter*-screen.html`、`chapter*-print.html`、`poc-*.html`）已移除，
+> 統一使用 standalone 版。
 
 ## 跑到哪了（狀態）
 
@@ -24,39 +29,67 @@
 2. **真內容壓測 ✅** — 把 §4.2（e^x 連續＋指數律，高風險證明節）**從 seed 直接生成** kit 的語意
    HTML（非轉 `.tex`），渲染兩版。**244 個 KaTeX、0 錯誤、8 頁 A4**。
    完整發現見 [`RESULT-s42-html-poc.md`](RESULT-s42-html-poc.md)。
-   - 結論：標記詞彙對 proof-dense 內容夠用；唯一結構性代價是 LaTeX 的自動編號／交叉引用沒了
-     （`\cref`→ 全手動）。
+3. **Standalone 化 ✅** — Ch 1–3 全部產出 standalone 版（MathJax 3、自帶 CSS/JS、零依賴），
+   舊範本版 HTML 已移除。
 
 權威產物：
 - **[`CONTRACT-html-writing.md`](CONTRACT-html-writing.md)** —— 讓模型「直接生 HTML」要遵的寫作契約
   （`../seed_converge/rules.md` 的 HTML 版）。是把生成步驟接到這套 kit 的那根槓桿。
-- **[`RESULT-s42-html-poc.md`](RESULT-s42-html-poc.md)** —— POC 的完整 findings 與下一步。
+- **[`gen_standalone.py`](gen_standalone.py)** —— 從 ch1 範本自動生成各章 standalone HTML 的腳本。
 
-## 怎麼渲染（零安裝）
+## 怎麼渲染（零設定）
 
-螢幕版要 HTTP 伺服（template 用 `fetch()` 載片段）；兩版都要瀏覽器跑 JS（KaTeX／字體走 CDN、
-列印版有 client-side 分頁器）。本機已有 Python 3.12 + 系統 Chrome，無需下載任何東西。
+Standalone 版已把所有 CSS/JS/內容內嵌，**雙擊 HTML 檔用瀏覽器開就能看**（需連網載 MathJax CDN）。
+不需要 HTTP server、不需要 `shared/`。
 
 ```powershell
-# 1) 在本資料夾起 HTTP server
-python -m http.server 8753 --bind 127.0.0.1
-# 2) 螢幕版概覽（Chrome headless）
-& "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless=new --hide-scrollbars `
-  --window-size=1000,6200 --virtual-time-budget=30000 --screenshot="_render\poc-screen-full.png" `
-  "http://127.0.0.1:8753/poc-screen.html"
-# 3) 列印版逐 A4 頁 2x 截圖（CDP，等分頁器跑完）
-node _render\shot.mjs "http://127.0.0.1:8753/poc-print.html" "_render\poc-print" sheets `
-  '(()=>{const b=document.getElementById("printBtn");return !!b && b.disabled===false;})()'
+# 重新生成（改了小節內容或 figures.js 之後）
+cd handout_kit
+python gen_standalone.py
 ```
-
-互動檢視：瀏覽器直接開 `http://127.0.0.1:8753/poc-screen.html`（右下角 Tweaks 可即時調樣式）或
-`poc-print.html`（右上 Print / Save as PDF）。
 
 > `_render/` 的 PNG 是可重生的截圖，已 `.gitignore`；`_render/shot.mjs` 工具有進版控。
 
+## Standalone HTML（正式產物）
+
+每一章產出兩個 standalone 檔：
+
+| 檔案 | 用途 |
+|---|---|
+| `chapterN-standalone.html` | **螢幕閱讀版**：React + Babel 客端 JSX、MathJax 3、Tweaks 面板 |
+| `chapterN-print-standalone.html` | **A4 列印版**：vanilla JS 分頁器、MathJax 3、Print 按鈕 |
+
+### 產生方式
+
+用 [`gen_standalone.py`](gen_standalone.py) 一次產生全部章節。
+腳本以 `chapter1-standalone.html` / `chapter1-print-standalone.html` 為骨架範本，
+把每章的 `<template>` 區塊、`figures.js`、`CHAPTER` 設定替換後寫出。
+
+### 新增章節的步驟
+
+1. **寫好小節 HTML**：在 `exp-chNN/` 下照 [`CONTRACT-html-writing.md`](CONTRACT-html-writing.md)
+   撰寫 `sec-N-1.html`、`sec-N-2.html` ……
+2. **寫好 figures.js**：在同一資料夾放 `figures.js`，匯出 `hydrateFigures()`。
+3. **在 `gen_standalone.py` 加章節定義**：在 `CHAPTERS` dict 裡加一筆，填好：
+   - `title_screen` / `title_print`：`<title>` 標籤內容
+   - `brand`：螢幕版導覽列顯示的章名
+   - `running_head`：列印版頁首的 running head
+   - `dir`：該章資料夾名（如 `"exp-ch04"`）
+   - `fragments`：小節檔名列表（不含 `.html`）
+   - `fig_css_vars`：列印版圖片寬度 CSS 變數（`:root { --fig-N-M: ... }`）
+4. **跑 `python gen_standalone.py`**，自動產生該章的螢幕版＋列印版。
+5. **驗證**：用瀏覽器開檔確認——小節載入、數學式渲染（MathJax 3）、圖片 hydrate、
+   螢幕版 Tweaks 面板、列印版 A4 分頁器皆正常。
+
+### 現有章節
+
+| 章 | 螢幕版 | 列印版 | 小節數 | 圖數 |
+|---|---|---|---|---|
+| Ch 1 | `chapter1-standalone.html` | `chapter1-print-standalone.html` | 8（含 intro + summary） | 11 |
+| Ch 2 | `chapter2-standalone.html` | `chapter2-print-standalone.html` | 5（§2.1–§2.5） | 3 |
+| Ch 3 | `chapter3-standalone.html` | `chapter3-print-standalone.html` | 4（opener + §3.1–§3.3） | 2 |
+
 ## 下一步（待使用者定）
 
-見 [`RESULT-s42-html-poc.md`](RESULT-s42-html-poc.md) 末節：補編號／交叉引用 linter、試一節**含圖**
-的、為 ch02/ch03 備 seed、或把這份 HTML 草稿丟進既有的**訂閱制審查迴圈**（`codex exec` 唯讀
-auditor，見 [`../seed_converge/PLAN_codex_subscription_loop.md`](../seed_converge/PLAN_codex_subscription_loop.md)）
-閉環——寫手半邊（Claude Code）這次已示範，走訂閱非付費 API。
+見 [`RESULT-s42-html-poc.md`](RESULT-s42-html-poc.md) 末節：補編號／交叉引用 linter、
+或把 HTML 草稿丟進既有的**訂閱制審查迴圈**閉環。

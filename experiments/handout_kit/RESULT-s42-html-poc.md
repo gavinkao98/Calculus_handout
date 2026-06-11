@@ -20,10 +20,13 @@ directly in the kit markup — no paid API, no `.tex`.
 - **Authoring target:** [`CONTRACT-html-writing.md`](CONTRACT-html-writing.md) (the HTML analog of
   `rules.md`, written alongside this POC).
 - **Correctness anchor:** math cross-checked against the human-signed
-  [`../direction_layer/test/signed_s42_body.tex`](../direction_layer/test/signed_s42_body.tex) so no
-  proof step was invented. Generated **from the seed**, not transliterated from the `.tex`.
-- **Output:** [`exp-ch04/sec-4-2.html`](exp-ch04/sec-4-2.html), rendered via
-  [`poc-screen.html`](poc-screen.html) and [`poc-print.html`](poc-print.html).
+  `signed_s42_body.tex` (local working file, never committed; the committed trail of that audit is
+  [`../direction_layer/test/draft_s42.tex`](../direction_layer/test/draft_s42.tex) plus its
+  `audit_findings_s42*.txt`) so no proof step was invented. Generated **from the seed**, not
+  transliterated from the `.tex`.
+- **Output:** [`exp-ch04/sec-4-2.html`](exp-ch04/sec-4-2.html), rendered via `poc-screen.html` and
+  `poc-print.html` (template-era render shells, since removed in the standalone consolidation — see
+  [`README.md`](README.md)).
 
 ## How it was rendered (zero-install recipe)
 

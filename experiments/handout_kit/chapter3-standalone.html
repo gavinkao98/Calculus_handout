@@ -1,0 +1,1586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chapter 3 — Chain Rule and Trigonometric Derivatives</title>
+
+<!-- Google Fonts: Inter for UI -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- MathJax 3 (STIX-compatible CHTML output, replaces KaTeX) -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    macros: {
+      arccsc: '\\operatorname{arccsc}',
+      arcsec: '\\operatorname{arcsec}',
+      arccot: '\\operatorname{arccot}'
+    }
+  },
+  chtml: {
+    mtextInheritFont: true,
+    matchFontHeight: true
+  },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+<!-- React + Babel (client-side JSX) -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<style>
+/* ============================================================
+   skin-hs.css — inlined + modified: Times New Roman + MathJax
+   ============================================================ */
+.paper {
+  --c-primary: #1f4e79;
+  --c-caution: #b23a2e;
+  --c-aux: #7f7f7f;
+  --c-axis: #474b54;
+  --ink: #1b1c1f;
+  --ink-soft: #565a63;
+  --ink-faint: #8a8e98;
+  --paper: #ffffff;
+  --rule: #e7e3da;
+  --serif: "Times New Roman", Times, Georgia, serif;
+  --ui: "Inter", -apple-system, system-ui, sans-serif;
+  --a-concept:  #0f766e;
+  --a-result:   var(--c-primary, #1f4e79);
+  --a-practice: #15803d;
+  --a-aside:    #6b7280;
+  --a-caution:  #b23a2e;
+  --a-strategy: #6d28d9;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-base, 17.5px);
+  line-height: var(--lh-base, 1.62);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+.paper *, .paper *::before, .paper *::after { box-sizing: border-box; }
+.paper .page { padding: 52px 58px 64px; max-width: 760px; margin: 0 auto; }
+.skin-hs .page { hyphens: auto; -webkit-hyphens: auto; }
+.skin-hs p, .skin-hs li { text-align: justify; text-justify: inter-word; }
+.paper p { margin: 0 0 .85em; text-wrap: pretty; }
+.paper em { font-style: italic; }
+.paper .informal { font-style: italic; color: var(--ink-soft); }
+.paper ol { margin: .2em 0 .9em; padding-left: 1.5em; }
+.paper li { margin: .35em 0; text-wrap: pretty; }
+.paper .warmup { counter-reset: wu; list-style: none; padding-left: 0; }
+.paper .warmup > li { counter-increment: wu; position: relative; padding-left: 2.1em; }
+.paper .warmup > li::before {
+  content: "(" counter(wu, lower-alpha) ")";
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
+}
+.paper mjx-container[display="true"] { margin: .7em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
+.paper .qed { float: right; margin: .15em 0 0 0; }
+.paper .qed::after {
+  content: ""; display: inline-block; width: .56em; height: .56em;
+  border: 1.3px solid var(--ink-soft); margin-top: .25em;
+}
+.paper .env-body::after { content: ""; display: block; clear: both; }
+.paper .sec-head {
+  margin-top: 2.7em; padding-top: 1.35em;
+  border-top: 1px solid var(--rule); margin-bottom: 1.5em;
+}
+.sheet-body > .sec-head:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.paper .sec-kicker {
+  font-family: var(--ui); font-size: .7rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--c-primary); font-weight: 700; margin-bottom: .55em;
+}
+.paper .sec-title { font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -.012em; margin: 0; }
+.paper .sec-no { color: var(--c-primary); margin-right: .5em; font-weight: 600; }
+.paper .subsec-head {
+  font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
+  display: flex; align-items: center; gap: .55em; color: var(--ink);
+}
+.paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
+.paper .figure { margin: 1.7em 0; text-align: center; }
+.paper .figure-art { display: flex; justify-content: center; }
+.paper .figure-art--pair { gap: 26px; }
+.paper .fig-svg { width: 100%; max-width: 250px; height: auto; }
+.paper .figure-art:not(.figure-art--pair) .fig-svg { max-width: 100%; }
+.paper figcaption {
+  font-family: var(--ui); font-size: .8em; line-height: 1.5;
+  color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
+  max-width: 460px; margin-left: auto; margin-right: auto;
+}
+.paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
+.paper figcaption mjx-container { font-size: .95em; }
+.paper .axis { stroke: var(--c-axis); stroke-width: 1.25; fill: none; stroke-linecap: round; }
+.paper .curve { stroke: var(--c-primary); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .dot { fill: var(--ink); }
+.paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
+.paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
+.paper .arrow-bwd { stroke: var(--c-caution); stroke-width: 2; fill: none; }
+.paper .fig-svg text { font-family: var(--ui); font-size: 13px; }
+.paper .axlab { fill: var(--c-aux); font-style: italic; }
+.paper .lab-curve { fill: var(--c-primary); font-style: italic; }
+.paper .lab-ref, .paper .lab-ref-b { fill: var(--c-caution); }
+.paper .ptlab { fill: var(--ink-soft); font-size: 12px; }
+.paper .setlab { fill: var(--ink); font-weight: 600; font-size: 14.5px; text-anchor: middle; }
+
+/* env blocks */
+.skin-hs .env {
+  --accent: var(--a-aside);
+  margin: 1.2em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--accent) 38%, var(--paper));
+}
+.skin-hs .env-definition  { --accent: var(--a-concept); }
+.skin-hs .env-theorem, .skin-hs .env-proposition, .skin-hs .env-corollary { --accent: var(--a-result); }
+.skin-hs .env-example, .skin-hs .env-solution, .skin-hs .env-exercise { --accent: var(--a-practice); }
+.skin-hs .env-remark { --accent: var(--a-aside); }
+.skin-hs .env-head {
+  display: flex; align-items: baseline; gap: .5em; flex-wrap: wrap;
+  margin: 0 0 .55em; font-family: var(--ui);
+}
+.skin-hs .env-kicker {
+  font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--accent); padding: 3px 10px; border-radius: 999px; line-height: 1.5;
+}
+.skin-hs .env-num { font-weight: 700; color: var(--accent); font-size: .94em; }
+.skin-hs .env-name { font-style: italic; font-weight: 400; color: var(--ink-soft); font-family: var(--serif); font-size: 1em; }
+.skin-hs .env-body > p:first-child { margin-top: 0; }
+.skin-hs .env-body > :last-child { margin-bottom: 0; }
+.skin-hs .env-theorem .env-body, .skin-hs .env-proposition .env-body { font-style: italic; }
+.skin-hs .env-theorem .env-body mjx-container, .skin-hs .env-proposition .env-body mjx-container { font-style: normal; }
+.skin-hs .env-definition em { font-style: italic; }
+.skin-hs .env-remark { color: var(--ink-soft); font-size: .97em; }
+.skin-hs .env-remark .env-kicker { background: transparent; color: var(--a-aside); border: 1px solid color-mix(in srgb, var(--a-aside) 45%, var(--paper)); }
+.skin-hs .env-proof { --accent: var(--a-result); border-left-color: var(--rule); }
+.skin-hs .env-proof .env-kicker {
+  background: transparent; color: var(--ink-soft); font-style: italic; letter-spacing: .04em;
+  border: 1px solid var(--rule);
+}
+.skin-hs .qed-proof::after { border-color: var(--ink); }
+.skin-hs .workedexample {
+  margin: 1.3em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--a-practice) 38%, var(--paper));
+}
+.skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
+.skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
+.skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; }
+.skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
+.skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
+.skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
+.skin-hs .env-exercise .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid var(--a-practice); }
+.skin-hs .env-caution, .skin-hs .env-strategy {
+  padding: 15px 20px; border-radius: 8px; margin: 1.4em 0;
+  border-left-width: 4px; border-left-style: solid;
+}
+.skin-hs .env-caution {
+  --accent: var(--a-caution);
+  background: color-mix(in srgb, var(--a-caution) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-caution) 22%, var(--paper));
+  border-left-color: var(--a-caution);
+}
+.skin-hs .env-strategy {
+  --accent: var(--a-strategy);
+  background: color-mix(in srgb, var(--a-strategy) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-strategy) 22%, var(--paper));
+  border-left-color: var(--a-strategy);
+}
+.skin-hs .env-caution .env-name, .skin-hs .env-strategy .env-name { color: var(--ink-soft); }
+.skin-hs .env-strategy .steps { margin-bottom: 0; }
+.skin-hs.vivid .env { border-left-color: color-mix(in srgb, var(--accent) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .workedexample { border-left-color: color-mix(in srgb, var(--a-practice) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .env-kicker { font-size: .64rem; padding: 3.5px 11px; }
+.skin-hs.vivid .env-proof { border-left-color: var(--rule); }
+
+/* ============================================================
+   theme.css — inlined
+   ============================================================ */
+#doc {
+  --accent: #1f4e79;
+  --stage-bg: #e9e6df;
+  background: var(--stage-bg);
+  min-height: 100vh;
+  transition: background .25s ease;
+}
+#doc.theme-dark { --stage-bg: #07080b; }
+.paper {
+  --c-primary: var(--accent);
+  --c-primary-bg: color-mix(in srgb, var(--accent) 9%, #fff);
+  --lh-base: var(--lh-user, 1.62);
+  transition: background .25s ease, color .25s ease;
+}
+.theme-dark .paper {
+  --c-primary: color-mix(in srgb, var(--accent) 42%, #dce8ff);
+  --c-primary-bg: color-mix(in srgb, var(--accent) 30%, #0e1118);
+  --c-caution: #e8786a;
+  --c-caution-bg: color-mix(in srgb, #e8786a 22%, #0e1118);
+  --c-aux: #7e8598;
+  --c-axis: #5c6276;
+  --ink: #e9eaf1;
+  --ink-soft: #aab0c0;
+  --ink-faint: #6d7488;
+  --paper: #0d0f15;
+  --rule: #2a3142;
+  --rule-soft: #1d2331;
+  --panel: #161a24;
+  --panel-2: #12151d;
+  --panel-fig: #0f121a;
+}
+.theme-dark .env-kicker { color: #0c0e13; }
+.theme-dark .env-solution .env-kicker, .theme-dark .env-proof .env-kicker { color: var(--ink-soft); }
+.theme-dark em { color: var(--ink); }
+.density-compact .paper { --lh-base: calc(var(--lh-user, 1.62) - 0.1); }
+.density-compact .figure { margin: 1.05em 0; }
+.density-compact .paper p { margin-bottom: .6em; }
+.density-compact .subsec-head { margin: 1.3em 0 .5em; }
+.theme-dark .skin-hs {
+  --a-concept:  #4fd0c3;
+  --a-practice: #57c98a;
+  --a-aside:    #8b91a3;
+  --a-strategy: #b79cf0;
+  --a-caution:  var(--c-caution);
+}
+.theme-dark .skin-hs .env-remark .env-kicker, .theme-dark .skin-hs .env-exercise .env-kicker { color: var(--accent, var(--ink-soft)); }
+.theme-dark .skin-hs .env-remark .env-kicker { color: var(--a-aside); }
+.density-compact .skin-hs .env, .density-compact .skin-hs .workedexample { margin: .85em 0; }
+.density-compact .skin-hs .env-caution, .density-compact .skin-hs .env-strategy { padding: 12px 16px; margin: 1.05em 0; }
+.hide-figures .figure { display: none; }
+
+/* ============================================================
+   figs.css — inlined + modified for MathJax
+   ============================================================ */
+.paper .fig-svg { height: auto; max-width: 100%; overflow: visible; }
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper .figure-art--grid { gap: 20px 16px; }
+.paper .figure-art--grid .fig-panel { flex: 1 1 150px; max-width: 210px; }
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note mjx-container { font-size: .98em; }
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr { position: relative; width: 100%; height: 100%; font-family: var(--serif); }
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl mjx-container { font-size: 1em; }
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl mjx-container { font-size: .98em; }
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+.align-left .skin-hs p, .align-left .skin-hs li { text-align: left; }
+
+/* ============================================================
+   page-level layout
+   ============================================================ */
+html, body { margin: 0; }
+#root { min-height: 100vh; }
+.chbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 9px 18px; background: rgba(233,230,223,.93); backdrop-filter: blur(8px);
+  border-bottom: 1px solid #d8d2c6; font-family: "Inter", system-ui, sans-serif;
+}
+.theme-dark .chbar { background: rgba(10,12,16,.86); border-color: rgba(255,255,255,.08); }
+.chbar .brand { font-size: 12.5px; font-weight: 700; color: #1f4e79; margin-right: 8px; letter-spacing: .01em; }
+.theme-dark .chbar .brand { color: #9db8e0; }
+.chbar a {
+  font-size: 12px; font-weight: 600; color: #565a63; text-decoration: none;
+  padding: 4px 9px; border-radius: 999px;
+}
+.chbar a:hover { background: rgba(31,78,121,.1); color: #1f4e79; }
+.theme-dark .chbar a { color: #aab0c0; }
+.theme-dark .chbar a:hover { background: rgba(157,184,224,.14); color: #cdddf6; }
+.reader { max-width: 840px; margin: 0 auto; padding: 30px 34px 140px; }
+.reader .paper.skin-hs {
+  border-radius: 6px;
+  box-shadow: 0 6px 44px rgba(20, 24, 40, .12), 0 1px 3px rgba(0,0,0,.06);
+  height: auto;
+}
+.theme-dark .reader .paper.skin-hs {
+  box-shadow: 0 10px 60px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255,255,255,.04);
+}
+.paper .sec-head, .paper .chapter-head { scroll-margin-top: 64px; }
+.hint {
+  position: fixed; right: 16px; bottom: 14px; z-index: 20;
+  font-family: "Inter", system-ui, sans-serif; font-size: 12px;
+  color: #8a8e98; background: rgba(255,255,255,.7); backdrop-filter: blur(6px);
+  padding: 6px 11px; border-radius: 999px; border: 1px solid rgba(0,0,0,.06);
+  pointer-events: none;
+}
+.theme-dark .hint { color: #8a8fa2; background: rgba(20,24,32,.6); border-color: rgba(255,255,255,.08); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Section fragments (inlined) -->
+
+<template id="frag-sec-3-1">
+<!-- Chapter 3 opener + §3.1 Derivatives of the Sine and Cosine Functions.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from exp-ch03/seed_ch03_s1.md (manuscript pp. 1–9). Direction brief
+     brief_s31.md approved at ③ (2026-06-08). Numbering is MANUAL (the kit
+     has no auto-counter); cross-references are plain prose. §3.1 is the
+     chapter's first section, so it carries the chapter opener (a second
+     <article>) and starts exp-ch03/figures.js (Figure 3.1).
+
+     Counters start fresh for Chapter 3:
+       Proposition 3.1 (sin, cos continuous), 3.2 (lim sinθ/θ = 1);
+       Theorem 3.1 (sin' = cos), 3.2 (cos' = −sin);
+       Example 3.1 (companion limit), 3.2 (tan' & sec'), 3.3 (SHM);
+       Figure 3.1 (sector inequality); Remark 3.1 (derivative cycle).
+       Caution is unnumbered (per ch02). §3.2 continues from Theorem 3.3,
+       Proposition 3.3, Example 3.4, Figure 3.2, Remark 3.2.
+
+     ③ decisions D1–D4: tan' as a worked example, not a theorem (D1); sec'
+     pulled into §3.1 beside tan' (same quotient-rule technique); the
+     companion limit (1−cosθ)/θ → 0 added as a standard limit (D2);
+     continuity slimmed (D3) — the cos/sin continuity PROOF is kept (the
+     derivative limits need it), but the definitions of continuity and of
+     even/odd are cross-referenced to Chapter 1 (not restated) and the
+     Dirichlet example is dropped; the squeeze theorem is cross-referenced
+     to §1.5, not re-stated (D4). Figure 3.1 uses the standard nesting
+     △OAB ⊆ sector OAB ⊆ △OAC (½sinθ ≤ ½θ ≤ ½tanθ); the manuscript's
+     transcribed middle inequality on p.3 was a slip (①-verify). No
+     exercises: self-authored problems are written as worked examples. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Chapter 3</div>
+    <h1 class="ch-title">Chain Rule and Trigonometric Derivatives</h1>
+  </header>
+
+  <p class="lead">Chapter 2 built the derivative from the ground up — as the limit of a difference quotient — and turned it into a working toolkit: rules for constants, powers, sums, products, quotients, and the exponential. Yet a whole world of functions still lies just out of reach. How fast does \(\sin x\) change? And what is the derivative of a <em>composition</em> such as \(\sqrt{1 + x^{2}}\) or \(\sin(x^{2})\), where one function is fed into another? This chapter supplies the two ideas that complete the differentiation toolkit. First we differentiate the trigonometric functions, which forces us to confront a limit no algebra can crack and to break through it with a piece of geometry. Then we prove the <em>chain rule</em>, the single rule that differentiates any composition, and use it to unlock the derivatives of inverse and implicitly defined functions.</p>
+
+  <p class="para-head">By the end of this chapter, you will be able to:</p>
+  <ul>
+    <li>differentiate \(\sin x\), \(\cos x\), \(\tan x\), and the other trigonometric functions, and combine them with the rules of Chapter 2;</li>
+    <li>state the chain rule and use it to differentiate compositions \(f(g(x))\), including nested ones;</li>
+    <li>apply logarithmic differentiation to handle expressions such as \(x^{x}\) and \(f(x)^{g(x)}\);</li>
+    <li>derive the derivatives of \(\arcsin x\), \(\arctan x\), and \(\ln x\) from their inverse-function relations.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">3.1</span>Derivatives of the Sine and Cosine Functions</h2>
+  </header>
+
+  <!-- expansion:intuition — load-bearing intuition: the trig difference quotient collapses to lim sinθ/θ, a 0/0 algebra cannot touch; geometry breaks it -->
+  <p>So far every derivative has yielded to algebra. For a polynomial we expanded \((x + h)^{n}\) and cancelled the factor of \(h\); for \(e^{x}\) the power series did the same job. The trigonometric functions are different in kind. Consider the difference quotient for \(\sin x\),
+  \[ \frac{\sin(x + h) - \sin x}{h}. \]
+  No algebraic identity cancels the \(h\) in the denominator against the numerator — \(\sin(x + h)\) does not break into pieces that conveniently subtract. As we are about to see, the entire computation funnels down to a single limit,
+  \[ \lim_{\theta \to 0} \frac{\sin \theta}{\theta}, \]
+  which has the indeterminate form \(0/0\) and which no amount of algebra will resolve. To evaluate it we need a genuinely new tool: a geometric comparison of areas on the unit circle, squeezed to a limit. That one limit, once secured, unlocks the derivatives of <em>both</em> \(\sin\) and \(\cos\) — and through them the rest of the trigonometric functions. Throughout this section angles are measured in radians; this assumption turns out to be essential, as we note below.</p>
+
+  <h3 class="subsec-head">The difference quotient for sine</h3>
+
+  <p>Fix \(x\) and form the difference quotient for \(f(x) = \sin x\). The decisive algebraic step is the sum-to-product identity \(\sin A - \sin B = 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}\), applied with \(A = x + h\) and \(B = x\):
+  \[ \sin(x + h) - \sin x = 2 \cos\Bigl(x + \tfrac{h}{2}\Bigr) \sin\frac{h}{2}. \]
+  Dividing by \(h\) and writing the denominator as \(h = 2 \cdot \tfrac{h}{2}\), to match the \(\tfrac{h}{2}\) inside the sine, gives</p>
+
+  <p>\[ \frac{\sin(x + h) - \sin x}{h} = \cos\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}. \]</p>
+
+  <p>As \(h \to 0\), two things happen at once. The factor \(\cos\bigl(x + \tfrac{h}{2}\bigr)\) ought to tend to \(\cos x\) — provided \(\cos\) is continuous — and the factor \(\dfrac{\sin(h/2)}{h/2}\) is exactly \(\dfrac{\sin\theta}{\theta}\) with \(\theta = h/2 \to 0\). So the derivative rests on two facts: that sine and cosine are continuous, and the value of \(\lim_{\theta \to 0}\sin\theta/\theta\). We secure both now.</p>
+
+  <h3 class="subsec-head">A geometric inequality on the unit circle</h3>
+
+  <!-- expansion:intuition — motivate the area comparison before carrying it out -->
+  <p>To get a grip on \(\sin\theta/\theta\) for small \(\theta\), we compare three areas on a circle of radius \(1\). Because both \(\theta\) and \(\sin\theta\) reverse sign when \(\theta\) is replaced by \(-\theta\), the ratio \(\sin\theta/\theta\) is unchanged — it is an <em>even</em> function (Chapter 1) — so it is enough to treat \(\theta > 0\), shrinking to \(0\). Take \(0 < \theta < \tfrac{\pi}{2}\) and look at Figure 3.1.</p>
+
+  <!-- expansion:figure — sector inequality on the unit circle (ROADMAP key figure; registered in exp-ch03/figures.js as "sector-inequality") -->
+  <figure class="figure" data-fig="sector-inequality">
+    <figcaption><span class="fig-no">Figure 3.1</span> On the unit circle, the triangle \(OAB\) sits inside the sector \(OAB\), which in turn sits inside the triangle \(OAC\) reaching the tangent at \(A\). Comparing the three areas gives \(\tfrac12 \sin\theta \le \tfrac12 \theta \le \tfrac12 \tan\theta\).</figcaption>
+  </figure>
+
+  <p>Here \(A = (1, 0)\) lies on the circle, \(B = (\cos\theta, \sin\theta)\) is the point at angle \(\theta\), and \(C = (1, \tan\theta)\) is where the radius \(OB\), extended, meets the vertical tangent line at \(A\). Three nested regions appear, and their areas are easy to read off:</p>
+
+  <ul>
+    <li>the inscribed triangle \(OAB\) has base \(OA = 1\) and height \(\sin\theta\), so its area is \(\tfrac12 \sin\theta\);</li>
+    <li>the circular sector \(OAB\) is the fraction \(\theta / (2\pi)\) of a disc of area \(\pi\), so its area is \(\tfrac12 \theta\);</li>
+    <li>the larger triangle \(OAC\) has base \(OA = 1\) and height \(AC = \tan\theta\), so its area is \(\tfrac12 \tan\theta\).</li>
+  </ul>
+
+  <p>The triangle \(OAB\) lies inside the sector, which lies inside the triangle \(OAC\), so their areas increase in that order:
+  \[ \tfrac12 \sin\theta \;\le\; \tfrac12 \theta \;\le\; \tfrac12 \tan\theta. \]
+  (The manuscript reads the same picture by splitting the outer triangle as \(OAC = OAB \cup ABC\); the corner piece \(ABC\) is what \(OAC\) adds to the inscribed triangle \(OAB\), and it contains the circular segment between the chord \(AB\) and the arc.) Multiplying through by \(2\) gives \(\sin\theta \le \theta \le \tan\theta\). Dividing by \(\sin\theta > 0\) and using \(\tan\theta = \sin\theta/\cos\theta\) turns this into \(1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}\), and taking reciprocals of these positive quantities reverses the inequalities:
+  \[ \cos\theta \;\le\; \frac{\sin\theta}{\theta} \;\le\; 1, \qquad 0 < \theta < \tfrac{\pi}{2}. \tag{1} \]
+  In particular \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) for \(\lvert \theta \rvert < \tfrac{\pi}{2}\) — a bound we lean on repeatedly below.</p>
+
+  <h3 class="subsec-head">Continuity of sine and cosine</h3>
+
+  <!-- expansion:intuition — why continuity is needed here; cross-ref the Ch1 notion of continuity, do not restate its definition (D3) -->
+  <p>The bound \(\lvert \sin\theta \rvert \le \lvert \theta \rvert\) does more than help with the fundamental limit: it is also what makes sine and cosine continuous, in the sense introduced in Chapter 1. Continuity is exactly what the two factors of the difference quotient need in order to settle to their values as \(h \to 0\), so we establish it now.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.1</span><span class="env-name">Continuity of sine and cosine</span></p>
+    <div class="env-body">
+      <p>The functions \(\sin x\) and \(\cos x\) are continuous at every \(x_{0} \in \mathbb{R}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Everything rests on one bound: \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) near \(\theta = 0\), from inequality (1). Since \(\lvert \theta \rvert \to 0\) as \(\theta \to 0\), the squeeze theorem (§1.5) forces \(\lvert \sin\theta \rvert \to 0\), so</p>
+      <p>\[ \lim_{\theta \to 0} \sin\theta = 0. \]</p>
+      <p>Now fix \(x_{0}\). The sum-to-product identities give</p>
+      <p>\[ \begin{aligned}
+        \cos x - \cos x_{0} &= -2 \sin\frac{x - x_{0}}{2}\, \sin\frac{x + x_{0}}{2}, \\
+        \sin x - \sin x_{0} &= \phantom{-}2 \cos\frac{x + x_{0}}{2}\, \sin\frac{x - x_{0}}{2}.
+      \end{aligned} \]</p>
+      <p>In each line the factor with argument \(\tfrac{x + x_{0}}{2}\) has absolute value at most \(1\), so</p>
+      <p>\[ \lvert \cos x - \cos x_{0} \rvert \le 2\Bigl\lvert \sin\tfrac{x - x_{0}}{2} \Bigr\rvert, \qquad \lvert \sin x - \sin x_{0} \rvert \le 2\Bigl\lvert \sin\tfrac{x - x_{0}}{2} \Bigr\rvert. \]</p>
+      <p>As \(x \to x_{0}\) the angle \(\tfrac{x - x_{0}}{2} \to 0\), so by the limit just established both right-hand sides tend to \(0\). The squeeze theorem then gives \(\cos x \to \cos x_{0}\) and \(\sin x \to \sin x_{0}\); that is, cosine and sine are continuous at \(x_{0}\).<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The fundamental limit</h3>
+
+  <!-- expansion:intuition — frame the squeeze payoff -->
+  <p>We can finally squeeze \(\sin\theta/\theta\) to its limit: inequality (1) traps it between \(\cos\theta\) and \(1\), and both ends head for the same place.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.2</span><span class="env-name">The fundamental trigonometric limit</span></p>
+    <div class="env-body">
+      <p>\[ \lim_{\theta \to 0} \frac{\sin\theta}{\theta} = 1. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>For \(0 < \theta < \tfrac{\pi}{2}\), inequality (1) reads \(\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1\). As \(\theta \to 0^{+}\) the upper bound is the constant \(1\), while the lower bound satisfies \(\cos\theta \to \cos 0 = 1\) by the continuity of cosine (Proposition 3.1). The squeeze theorem (§1.5) pins the quantity between them: \(\lim_{\theta \to 0^{+}} \sin\theta/\theta = 1\). Finally \(\sin\theta/\theta\) is even, so its left-hand limit at \(0\) equals its right-hand limit, and the two-sided limit is \(1\) as well.<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the radian convention is essential: sinθ/θ→1, and hence sin'=cos, fails in degrees -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Everything here depends on measuring angles in <em>radians</em>. The sector area \(\tfrac12\theta\) — and with it the limit \(\sin\theta/\theta \to 1\) — uses the radian measure, for which the arc cut off on the unit circle has length exactly \(\theta\). In degrees the limit is not \(1\): since \(x^{\circ} = \tfrac{\pi}{180}x\) radians, one finds \(\lim_{x \to 0}\dfrac{\sin(x^{\circ})}{x} = \dfrac{\pi}{180}\), and so \(\dfrac{d}{dx}\sin(x^{\circ}) = \dfrac{\pi}{180}\cos(x^{\circ})\). The clean formulas of this section, \(\sin' = \cos\) and \(\cos' = -\sin\), hold only in radians.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The derivatives of sine and cosine</h3>
+
+  <!-- expansion:intuition — assemble the pieces -->
+  <p>With continuity and the fundamental limit in hand, the difference quotient for \(\sin\) all but evaluates itself.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.1</span><span class="env-name">Derivative of sine</span></p>
+    <div class="env-body">
+      <p>\[ \frac{d}{dx}\sin x = \cos x \qquad \text{for all } x \in \mathbb{R}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Using the form of the difference quotient found above,</p>
+      <p>\[ \begin{aligned}
+        \frac{d}{dx}\sin x &= \lim_{h \to 0} \frac{\sin(x + h) - \sin x}{h} \\[2pt]
+          &= \lim_{h \to 0} \cos\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}.
+      \end{aligned} \]</p>
+      <p>As \(h \to 0\), the first factor tends to \(\cos x\) because cosine is continuous (Proposition 3.1), and the second tends to \(1\) by the fundamental limit (Proposition 3.2), with \(\theta = h/2 \to 0\). The product therefore tends to \(\cos x \cdot 1 = \cos x\).<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — same machinery, second function -->
+  <p>Cosine yields to the very same machinery, this time through the companion identity \(\cos A - \cos B = -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}\).</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.2</span><span class="env-name">Derivative of cosine</span></p>
+    <div class="env-body">
+      <p>\[ \frac{d}{dx}\cos x = -\sin x \qquad \text{for all } x \in \mathbb{R}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>With \(A = x + h\) and \(B = x\), the identity gives \(\cos(x + h) - \cos x = -2 \sin\bigl(x + \tfrac{h}{2}\bigr) \sin\tfrac{h}{2}\), so</p>
+      <p>\[ \frac{\cos(x + h) - \cos x}{h} = -\sin\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}. \]</p>
+      <p>Letting \(h \to 0\), the factor \(\sin\bigl(x + \tfrac{h}{2}\bigr) \to \sin x\) by continuity (Proposition 3.1) and \(\dfrac{\sin(h/2)}{h/2} \to 1\) by Proposition 3.2, so</p>
+      <p>\[ \frac{d}{dx}\cos x = -\sin x \cdot 1 = -\sin x. \]<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:example — companion fundamental limit (1−cosθ)/θ → 0 (D2; standard companion to Proposition 3.2) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.1</span></p>
+      <div class="env-body">
+        <p>Establish the companion limit \(\displaystyle \lim_{\theta \to 0} \frac{1 - \cos\theta}{\theta} = 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This is again of the form \(0/0\). Multiplying numerator and denominator by \(1 + \cos\theta\) converts the numerator into something \(\sin\) can handle:</p>
+        <p>\[ \begin{aligned}
+          \frac{1 - \cos\theta}{\theta}
+            &= \frac{(1 - \cos\theta)(1 + \cos\theta)}{\theta\,(1 + \cos\theta)}
+             = \frac{1 - \cos^{2}\theta}{\theta\,(1 + \cos\theta)} \\[2pt]
+            &= \frac{\sin^{2}\theta}{\theta\,(1 + \cos\theta)}
+             = \frac{\sin\theta}{\theta} \cdot \frac{\sin\theta}{1 + \cos\theta}.
+        \end{aligned} \]</p>
+        <p>As \(\theta \to 0\), the first factor tends to \(1\) by Proposition 3.2, while the second tends to \(\dfrac{0}{1 + 1} = 0\) by the continuity of sine and cosine (Proposition 3.1). The product tends to \(1 \cdot 0 = 0\).<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — tan' (D1, manuscript HW) and sec' (③ pull-in, manuscript HW), both via the quotient rule of §2.5 -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.2</span></p>
+      <div class="env-body">
+        <p>Using \(\sin' = \cos\) and \(\cos' = -\sin\) together with the quotient rule (§2.5), differentiate (a) \(\tan x\) and (b) \(\sec x\), wherever \(\cos x \ne 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>For (a), write \(\tan x = \dfrac{\sin x}{\cos x}\) and apply the quotient rule:</p>
+        <p>\[ \begin{aligned}
+          \frac{d}{dx}\tan x
+            &= \frac{(\cos x)(\cos x) - (\sin x)(-\sin x)}{\cos^{2} x} \\[2pt]
+            &= \frac{\cos^{2} x + \sin^{2} x}{\cos^{2} x}
+             = \frac{1}{\cos^{2} x} = \sec^{2} x,
+        \end{aligned} \]</p>
+        <p>where the Pythagorean identity \(\cos^{2} x + \sin^{2} x = 1\) collapses the numerator.</p>
+        <p>For (b), write \(\sec x = \dfrac{1}{\cos x}\). The quotient rule, with the constant numerator \(1\), gives</p>
+        <p>\[ \frac{d}{dx}\sec x = \frac{0 \cdot \cos x - 1 \cdot (-\sin x)}{\cos^{2} x} = \frac{\sin x}{\cos^{2} x} = \frac{1}{\cos x}\cdot\frac{\sin x}{\cos x} = \sec x \tan x. \]</p>
+        <p>The same technique applied to \(\cot x = \dfrac{\cos x}{\sin x}\) and \(\csc x = \dfrac{1}{\sin x}\) gives \(\dfrac{d}{dx}\cot x = -\csc^{2} x\) and \(\dfrac{d}{dx}\csc x = -\csc x \cot x\) (where \(\sin x \ne 0\)), completing the derivatives of all six trigonometric functions.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — simple harmonic motion uses only sin'/cos' (no chain rule); sets up Remark 3.1 (approved at ③, new type: application) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.3</span></p>
+      <div class="env-body">
+        <p>A weight bobbing on a spring has height \(s(t) = \sin t\) above its rest level at time \(t\). Find its velocity \(s'(t)\) and acceleration \(s''(t)\), and describe how the acceleration is related to the height.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Velocity is the derivative of height, and acceleration the derivative of velocity. Differentiating with Theorems 3.1 and 3.2,</p>
+        <p>\[ s'(t) = \cos t, \qquad s''(t) = \frac{d}{dt}\cos t = -\sin t. \]</p>
+        <p>Thus \(s''(t) = -\sin t = -s(t)\): at every instant the weight accelerates back toward its rest level, by an amount proportional to how far it has strayed. This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em>, and it is no accident that sine and cosine — the functions whose second derivative is their own negative — are precisely the ones that describe oscillation.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — the four-fold derivative cycle, a bookend echoing the e^x self-replication remark of §2.4 -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.1</span><span class="env-name">The derivative cycle of sine and cosine</span></p>
+    <div class="env-body">
+      <p>Differentiation sends sine and cosine into each other, with a sign that turns over every second step. Writing \(\to\) for one application of \(\dfrac{d}{dx}\),</p>
+      <p>\[ \sin x \;\to\; \cos x \;\to\; -\sin x \;\to\; -\cos x \;\to\; \sin x. \]</p>
+      <p>After four derivatives we are back where we started, so \(\dfrac{d^{4}}{dx^{4}}\sin x = \sin x\), and likewise for cosine. Where \(e^{x}\) reproduces itself in a single step (§2.4), sine and cosine reproduce themselves in a cycle of four — the same self-renewal that lets \(s'' = -s\) describe an oscillation that never winds down.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — forward-ref to §3.2 (the chain rule), which is what makes sin(g(x)) etc. accessible -->
+  <p>We can now differentiate every trigonometric function — but only in its bare form, \(\sin x\) rather than \(\sin(x^{2})\) or \(\sin(3x + 1)\). To reach a function tucked <em>inside</em> another we need a rule for differentiating compositions. That rule, the chain rule, is the business of the next section; with it, the derivatives found here become the seeds of a vast family of new ones.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-3-2">
+<!-- §3.2 The Chain Rule. Authored into handout-kit semantic markup per
+     CONTRACT-html-writing.md from exp-ch03/seed_ch03_s2.md (manuscript
+     pp. 11, 14–20). Direction brief brief_s32.md approved at ③ (2026-06-08).
+     Numbering is MANUAL (the kit has no auto-counter); cross-references are
+     plain prose. §3.2 continues Chapter 3's per-type counters from §3.1:
+
+       Theorem 3.3 (chain rule); Proposition 3.3 (Def1⇔Def2 equivalence);
+       Definition 3.1 (remainder form — the chapter's first Definition);
+       Example 3.4 (single composition), 3.5 (nested composition);
+       Figure 3.2 (composed mapping); Remark 3.2 (Leibniz form);
+       Strategy 3.1 (chain-rule decomposition — the chapter's first Strategy);
+       Caution is unnumbered (per ch02). §3.3 continues from Theorem 3.4,
+       Proposition 3.4, Definition 3.2, Example 3.6, Figure 3.3, Remark 3.3,
+       Strategy 3.2.
+
+     ③ decisions: Definition treatment = Option B (the §2.2 limit definition
+     is cross-referenced in prose, NOT re-numbered; only the remainder form is
+     minted, as Definition 3.1, with equivalence as Proposition 3.3) — D5.
+     Narrative order = intuition-first (statement + figure + remark + strategy
+     make the rule usable, then definition + equivalence + the ε-δ proof, then
+     worked examples). Figure 3.2 (composed mapping) included as inline SVG in
+     figures.js. Examples 3.4 + 3.5 approved (self-authored, in §3.2's
+     derivative inventory: sin/cos from §3.1, power from Ch2 — no ln/arcsin/x^x,
+     which are §3.3 per D7). Product rule and differentiable⇒continuous are
+     cross-referenced to Ch2 §2.5 / §2.3 Theorem 2.1, never re-proven (D6). No
+     implicit differentiation (D10). The proof follows the manuscript's
+     remainder-form chaining exactly; the few steps the manuscript leaves
+     implicit (m₂R₁(h)/h → 0; the ε-δ sub-steps) are filled and marked
+     expansion:formula. No exercises: self-authored problems are worked examples. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">3.2</span>The Chain Rule</h2>
+  </header>
+
+  <!-- expansion:intuition — load-bearing intuition: rates multiply because local linear approximations compose; this carries the statement, the Leibniz mnemonic, and the proof strategy at once -->
+  <p>Section 3.1 gave us the derivatives of the trigonometric functions, but only in their bare form. We can differentiate \(\sin x\), yet nothing so far reaches \(\sin(x^{2})\) or \(\sqrt{1 + x^{2}}\), where one function is fed <em>into</em> another. Chapter 2 supplied rules for sums, products, and quotients — but not for <em>composition</em>, the operation of applying one function to the output of another. The chain rule fills exactly this gap, and it is the rule that finally completes the differentiation toolkit.</p>
+
+  <p>The idea behind it fits in a single image. Near a point, a differentiable function behaves like its tangent line: it takes a small change in its input and scales it by its slope, up to an error that shrinks faster than the change itself. Now chain two such functions together. If \(g\) scales a small increment \(h\) by \(g'(x)\), and \(f\) then scales <em>that</em> by \(f'(g(x))\), the two magnifications stack — the composite scales \(h\) by the product \(f'(g(x))\,g'(x)\). That product is the chain rule, and the proof at the end of this section is nothing more than the careful check that the two error terms, once chained, are still negligible.</p>
+
+  <p>The manuscript this chapter follows develops the chain rule alongside two results that already belong to Chapter 2 — the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1). We take both as established and use them freely, without re-proving them here.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.3</span><span class="env-name">The chain rule</span></p>
+    <div class="env-body">
+      <p>Let \(g\) be differentiable at \(x_{0}\), and let \(f\) be differentiable at \(g(x_{0})\). Then the composition \(P = f \circ g\), given by \(P(x) = f(g(x))\), is differentiable at \(x_{0}\), and</p>
+      <p>\[ P'(x_{0}) = f'(g(x_{0}))\, g'(x_{0}). \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:figure — chain rule as composed mapping (ROADMAP key figure; registered in exp-ch03/figures.js as "composed-mapping") -->
+  <figure class="figure" data-fig="composed-mapping">
+    <figcaption><span class="fig-no">Figure 3.2</span> The chain rule as a composed mapping. A small input increment \(h\) at \(x_{0}\) is carried by \(g\) to an increment of about \(g'(x_{0})\,h\) at \(u_{0} = g(x_{0})\), and then by \(f\) to about \(f'(g(x_{0}))\,g'(x_{0})\,h\) at \(y_{0} = f(g(x_{0}))\). The two local slopes multiply — which is why the composite's derivative is their product.</figcaption>
+  </figure>
+
+  <!-- expansion:intuition — the Leibniz form (the working notation), with the mnemonic-not-proof caveat folded in (ROADMAP pitfall) -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.2</span><span class="env-name">The Leibniz form</span></p>
+    <div class="env-body">
+      <p>Writing \(u = g(x)\) for the inner variable and \(y = f(u)\) for the output, the chain rule takes the memorable Leibniz shape</p>
+      <p>\[ \frac{dy}{dx} = \frac{dy}{du}\cdot\frac{du}{dx}. \]</p>
+      <p>This is the form most often used in practice, and it reads as “the rate of \(y\) per \(x\) equals the rate of \(y\) per \(u\) times the rate of \(u\) per \(x\).” The apparent cancellation of \(du\) is a useful memory aid, but it is <em>not</em> a proof: \(\dfrac{dy}{du}\) and \(\dfrac{du}{dx}\) are limits, not fractions with a common factor to strike out. What actually makes the rule true is the argument given below, where the controlled error terms — not a literal \(du/du = 1\) — do the work.</p>
+    </div>
+  </section>
+
+  <!-- expansion:strategy — chain-rule decomposition (ROADMAP-assigned; the chapter's first Strategy box) -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">3.1</span><span class="env-name">Differentiating a composition</span></p>
+    <div class="env-body">
+      <p>To differentiate a composite expression, work from the outside in.</p>
+      <ol class="steps">
+        <li>Identify the <em>outermost</em> operation — the last thing you would carry out if you evaluated the expression at a number. Call it the outer function \(f\).</li>
+        <li>Whatever that operation is applied to is the inner function \(u = g(x)\).</li>
+        <li>Differentiate the outer function at the inner one, forming \(f'(g(x))\) — treat the inside as a single block and leave it untouched for now.</li>
+        <li>Multiply by the derivative of the inside: the answer is \(f'(g(x))\cdot g'(x)\).</li>
+        <li>If the inside is itself a composition, repeat steps 1–4 on it. Every layer contributes one slope factor, and the factors multiply.</li>
+      </ol>
+      <p>For \(\sqrt{1 + x^{2}}\), the last operation is the square root, so \(f(u) = \sqrt{u}\) and \(g(x) = 1 + x^{2}\); for \(\sin(x^{2})\), the outer function is \(\sin\) and the inner is \(x^{2}\).</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Why the rule is true</h3>
+
+  <!-- expansion:intuition — bridge: the rule is usable; to prove it we need the remainder form, which packages differentiability as a linear approximation that composes -->
+  <p>The rule is already usable — the rest of this section earns it. To prove that the two slopes really do multiply, we need to handle both functions' linear approximations at once, and for that it helps to repackage what “differentiable” means. Chapter 2 defined \(f\) to be differentiable at \(x_{0}\) when the difference quotient \(\dfrac{f(x_{0}+h) - f(x_{0})}{h}\) has a limit as \(h \to 0\) (§2.2); that limit is \(f'(x_{0})\). The following form says the same thing, but as a statement about approximation by a straight line.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">3.1</span><span class="env-name">Differentiability, remainder form</span></p>
+    <div class="env-body">
+      <p>A function \(f\) is <em>differentiable</em> at \(x_{0}\) if there is a number \(m\) and a function \(R\) such that</p>
+      <p>\[ f(x_{0} + h) = f(x_{0}) + m h + R(h), \qquad \lim_{h \to 0}\frac{R(h)}{h} = 0. \]</p>
+      <p>The number \(m\) is the derivative \(f'(x_{0})\).</p>
+      <!-- expansion:intuition — informal gloss on the remainder form; the seed's bare Def 2 carries no such gloss -->
+      <p class="informal">Informally, \(f(x_{0}+h)\) equals its tangent-line value \(f(x_{0}) + m h\) plus an error \(R(h)\) that dies away faster than \(h\) does — the tangent line is a good fit to first order.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — frame the equivalence: the remainder form is not a new notion of derivative, just a repackaging of §2.2 -->
+  <p>This is not a new notion of derivative, only a new way of writing the old one.</p>
+
+  <!-- expansion:formula — the equivalence the manuscript only asserts ("easy to see"), here stated as a citable Proposition (proof below) -->
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.3</span><span class="env-name">Equivalence of the two forms</span></p>
+    <div class="env-body">
+      <p>The limit form of differentiability (§2.2) and the remainder form (Definition 3.1) are equivalent: \(f\) satisfies one at \(x_{0}\) if and only if it satisfies the other, and the number \(m\) is the same in both — namely \(f'(x_{0})\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:formula — the manuscript states only "it is easy to see that Def 1 and Def 2 are equivalent"; we supply the faithful short bidirectional argument -->
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Suppose first that the limit form holds, with \(\lim_{h \to 0}\dfrac{f(x_{0}+h) - f(x_{0})}{h} = m\). Define \(R(h) = f(x_{0}+h) - f(x_{0}) - m h\). Then</p>
+      <p>\[ \frac{R(h)}{h} = \frac{f(x_{0}+h) - f(x_{0})}{h} - m \;\longrightarrow\; m - m = 0, \]</p>
+      <p>so the remainder form holds with this same \(m\). Conversely, suppose the remainder form holds: \(f(x_{0}+h) = f(x_{0}) + m h + R(h)\) with \(R(h)/h \to 0\). Dividing by \(h\),</p>
+      <p>\[ \frac{f(x_{0}+h) - f(x_{0})}{h} = m + \frac{R(h)}{h} \;\longrightarrow\; m + 0 = m, \]</p>
+      <p>so the limit form holds, again with the same \(m\). The two forms therefore describe the same property and the same derivative.<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — orient the proof before the symbols: write both functions in remainder form, substitute, watch the linear parts multiply, collect the rest into one remainder -->
+  <p>With the remainder form available, the chain rule comes out by substitution. We expand \(g\) near \(x_{0}\) and \(f\) near \(g(x_{0})\), each as a linear part plus a small remainder; feeding one into the other, the linear parts multiply to give \(g'(x_{0})f'(g(x_{0}))\,h\), and everything left over gathers into a single remainder. The whole proof is then the one estimate that this leftover still vanishes faster than \(h\).</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Theorem 3.3</span></p>
+    <div class="env-body">
+      <p>We use the remainder form of differentiability (Definition 3.1), which by Proposition 3.3 is available for any differentiable function. Because \(g\) is differentiable at \(x_{0}\),</p>
+      <p>\[ g(x_{0} + h) = g(x_{0}) + m_{1} h + R_{1}(h), \qquad m_{1} = g'(x_{0}), \quad \lim_{h \to 0}\frac{R_{1}(h)}{h} = 0. \]</p>
+      <p>Because \(f\) is differentiable at \(g(x_{0})\), we may apply the remainder form to \(f\) with the increment \(m_{1} h + R_{1}(h)\) playing the role of \(h\):</p>
+      <p>\[ P(x_{0}+h) = f\bigl(g(x_{0}+h)\bigr) = f(g(x_{0})) + m_{2}\bigl[m_{1} h + R_{1}(h)\bigr] + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr), \]</p>
+      <p>where \(m_{2} = f'(g(x_{0}))\) and \(\lim_{y \to 0} R_{2}(y)/y = 0\). Collecting the term linear in \(h\) and bundling the rest into a single remainder \(R_{3}\),</p>
+      <p>\[ P(x_{0}+h) = P(x_{0}) + \bigl(g'(x_{0})\,f'(g(x_{0}))\bigr) h + R_{3}(h), \qquad R_{3}(h) = m_{2} R_{1}(h) + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr), \]</p>
+      <p>using \(f(g(x_{0})) = P(x_{0})\) and \(m_{1} m_{2} = g'(x_{0})f'(g(x_{0})) = f'(g(x_{0}))g'(x_{0})\), the same product in either order. By the remainder form, this says precisely that \(P\) is differentiable at \(x_{0}\) with \(P'(x_{0}) = f'(g(x_{0}))g'(x_{0})\) — <em>provided</em> we show</p>
+      <p>\[ \lim_{h \to 0}\frac{R_{3}(h)}{h} = 0. \]</p>
+      <!-- expansion:formula — the manuscript leaves the splitting and the easy term m₂R₁(h)/h → 0 implicit; we make it explicit -->
+      <p>Split the quotient into its two pieces, \(\dfrac{R_{3}(h)}{h} = m_{2}\dfrac{R_{1}(h)}{h} + \dfrac{R_{2}(m_{1} h + R_{1}(h))}{h}\). The first piece is easy: \(m_{2}\) is a constant and \(R_{1}(h)/h \to 0\), so \(m_{2} R_{1}(h)/h \to 0\). We also note for later that \(m_{1} h + R_{1}(h) \to 0\) as \(h \to 0\), since \(m_{1} h \to 0\) and \(R_{1}(h) \to 0\) (the latter because \(R_{1}(h)/h \to 0\)).</p>
+      <p>The second piece, \(R_{2}(m_{1} h + R_{1}(h))/h\), is the delicate one. Fix \(\varepsilon > 0\).</p>
+      <ul>
+        <li>Since \(R_{2}(y)/y \to 0\), there is a \(\delta > 0\) with \(\left\lvert R_{2}(y)/y \right\rvert < \varepsilon\) whenever \(0 < \lvert y \rvert < \delta\).</li>
+        <li>Since \(m_{1} h + R_{1}(h) \to 0\), there is an \(\alpha > 0\) with \(\lvert m_{1} h + R_{1}(h) \rvert < \delta\) whenever \(0 < \lvert h \rvert < \alpha\).</li>
+      </ul>
+      <p>Now fix \(h\) with \(0 < \lvert h \rvert < \alpha\). If \(m_{1} h + R_{1}(h) = 0\), then \(R_{2}(m_{1} h + R_{1}(h)) = R_{2}(0) = 0\) — the remainder relation \(f(g(x_{0}) + y) = f(g(x_{0})) + m_{2} y + R_{2}(y)\) at \(y = 0\) forces \(R_{2}(0) = 0\) — and the quotient is \(0\). Otherwise \(0 < \lvert m_{1} h + R_{1}(h) \rvert < \delta\), and we factor</p>
+      <p>\[ \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert h \rvert} = \frac{\lvert m_{1} h + R_{1}(h) \rvert}{\lvert h \rvert} \cdot \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert m_{1} h + R_{1}(h) \rvert}. \]</p>
+      <!-- expansion:formula — the manuscript jumps straight to the next bound; we supply the two standard steps (the ε bound from the first bullet, and the triangle inequality) it skips -->
+      <p>By the first bullet the second factor is less than \(\varepsilon\); and by the triangle inequality the first factor satisfies \(\dfrac{\lvert m_{1} h + R_{1}(h) \rvert}{\lvert h \rvert} = \left\lvert m_{1} + \dfrac{R_{1}(h)}{h} \right\rvert \le \lvert m_{1} \rvert + \dfrac{\lvert R_{1}(h) \rvert}{\lvert h \rvert}\). Hence, in either case,</p>
+      <p>\[ \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert h \rvert} \le \left( \lvert m_{1} \rvert + \frac{\lvert R_{1}(h) \rvert}{\lvert h \rvert} \right)\varepsilon. \]</p>
+      <p>Finally, since \(R_{1}(h)/h \to 0\), there is an \(\alpha_{1} \in (0, \alpha)\) with \(\lvert R_{1}(h) \rvert/\lvert h \rvert < 1\) for \(0 < \lvert h \rvert < \alpha_{1}\). For such \(h\),</p>
+      <p>\[ \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert h \rvert} < \bigl( \lvert m_{1} \rvert + 1 \bigr)\varepsilon. \]</p>
+      <p>As \(\varepsilon > 0\) was arbitrary and \(\lvert m_{1} \rvert + 1\) is a fixed constant, this second piece tends to \(0\) as well. Combining the two pieces, \(R_{3}(h)/h \to 0\), and the chain rule is proved.<span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Using the rule</h3>
+
+  <!-- expansion:example — single composition; pays off √(1+x²) and sin(x²) promised in the chapter opener; part (b) stages the inner-derivative pitfall -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.4</span></p>
+      <div class="env-body">
+        <p>Differentiate (a) \(\sqrt{1 + x^{2}}\) and (b) \(\sin(x^{2})\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>For (a), the outermost operation is the square root, so \(f(u) = \sqrt{u} = u^{1/2}\) and \(g(x) = 1 + x^{2}\). By the power rule (Chapter 2), \(f'(u) = \tfrac12 u^{-1/2}\), and \(g'(x) = 2x\). By the chain rule,</p>
+        <p>\[ \frac{d}{dx}\sqrt{1 + x^{2}} = \frac{1}{2\sqrt{1 + x^{2}}}\cdot 2x = \frac{x}{\sqrt{1 + x^{2}}}. \]</p>
+        <p>For (b), the outer function is sine and the inner is \(x^{2}\), so with \(f'(u) = \cos u\) (Theorem 3.1) and \(g'(x) = 2x\),</p>
+        <p>\[ \frac{d}{dx}\sin(x^{2}) = \cos(x^{2})\cdot 2x = 2x\cos(x^{2}). \]</p>
+        <p>The factor \(2x\) is the inner derivative; dropping it and writing just \(\cos(x^{2})\) is the single most common chain-rule error, which the Caution below isolates.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:caution — the chapter's #1 pitfall (ROADMAP): forgetting the inner derivative -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The most common mistake with the chain rule is to differentiate the outer function and forget the inner derivative — writing \(\dfrac{d}{dx}\sin(g(x)) = \cos(g(x))\) instead of the correct \(\cos(g(x))\cdot g'(x)\). The inner factor \(g'(x)\) — the \(2x\) in \(\sin(x^{2})\) above — is never optional.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — a three-layer nested composition (ROADMAP core skill f(g(h(x)))); shows Strategy 3.1 iterated, slopes multiplying down the chain -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.5</span></p>
+      <div class="env-body">
+        <p>Differentiate \(\sqrt{1 + \sin^{2} x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This is a composition three layers deep: the square root of \(1 + \sin^{2} x\), in which \(\sin^{2} x = (\sin x)^{2}\) is itself a composition. Peeling from the outside in, the outer function is \(\sqrt{\,\cdot\,}\) applied to \(u = 1 + \sin^{2} x\); inside, \(\sin^{2} x\) is the square of \(v = \sin x\). Differentiating one layer at a time,</p>
+        <p>\[ \begin{aligned}
+          \frac{d}{dx}\sqrt{1 + \sin^{2} x}
+            &= \frac{1}{2\sqrt{1 + \sin^{2} x}}\cdot \frac{d}{dx}\bigl(1 + \sin^{2} x\bigr) \\[2pt]
+            &= \frac{1}{2\sqrt{1 + \sin^{2} x}}\cdot 2\sin x\cdot \cos x \\[2pt]
+            &= \frac{\sin x \cos x}{\sqrt{1 + \sin^{2} x}}.
+        \end{aligned} \]</p>
+        <p>Each layer contributes exactly one factor: \(\tfrac12 u^{-1/2}\) from the square root, \(2\sin x\) from squaring, and \(\cos x\) from the sine. Their product is the derivative — the slopes multiply down the chain, just as Figure 3.2 pictures.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — forward-ref to §3.3: the chain rule unlocks inverse-function and logarithmic derivatives (D7: named, none worked here) -->
+  <p>With the chain rule in hand the differentiation toolkit is essentially complete: any function assembled by composing the elementary functions of Chapters 2 and 3 can now be differentiated mechanically. In the next section the rule does something new — it becomes the key that unlocks derivatives we could not otherwise reach, those of the inverse functions \(\ln x\), \(\arcsin x\), and \(\arctan x\), and, through logarithmic differentiation, of expressions such as \(x^{x}\).</p>
+
+</article>
+</template>
+
+<template id="frag-sec-3-3">
+<!-- §3.3 Applications of the Chain Rule. Authored into handout-kit semantic
+     markup per CONTRACT-html-writing.md from exp-ch03/seed_ch03_s3.md
+     (manuscript pp. 12-14 applications ①②③ + pp. 21-22 Homework; seed
+     ①-verified 2026-06-08). Direction brief brief_s33.md approved at ③
+     (2026-06-08). Numbering is MANUAL (the kit has no auto-counter);
+     cross-references are plain prose. §3.3 is Chapter 3's FINAL section and
+     carries the chapter summary. It continues Chapter 3's per-type counters
+     from §3.2:
+
+       Example 3.6 (ln'), 3.7 (x^x), 3.8 (2^x), 3.9 ((x ln x − x)'),
+         3.10 (arcsin'), 3.11 (arccos'), 3.12 (arctan');
+       Strategy 3.2 (logarithmic differentiation);
+       Remark 3.3 (one lever, six derivatives);
+       Caution is unnumbered (arcsin/arccos domain).
+     Theorem 3.4, Proposition 3.4, Definition 3.2, Figure 3.3 are NOT minted
+     (left for later): §3.3's results are framed as worked examples, per the
+     manuscript and the PLAN ledger.
+
+     ③ decisions (2026-06-08): (1) arctan' Example 3.12 is self-authored,
+     approved to honor the Ch3 opener (sec-3-1) + §3.2 closing forward-ref +
+     ROADMAP core skill; same composition-identity method as arcsin/arccos.
+     (2) Results framed as worked examples, not Propositions (citability via
+     the chapter-summary recap). (3) No figure — the sin↔arcsin reflection is
+     Chapter 1 §1.2 definition material, recalled in prose. (4) All three
+     Homework promotions approved (arccos' 3.11, 2^x 3.8, (x ln x − x)' 3.9).
+     D8: ln is informal here (inverse of e^x via e^{ln x}=x); the rigorous
+     construction is deferred to Ch4 §4.5 — flagged once, in Example 3.6.
+     D10: no implicit-differentiation framework/vocabulary; the manuscript's
+     composition-identity route is used throughout. tan'/sec' are NOT redone
+     (done in §3.1 Example 3.2); arctan' only USES tan'=sec^2. The cross-ref
+     to Chapter 1 §1.2 (arcsin/arccos/arctan definitions) is generic prose —
+     Ch1 HTML is not yet drafted, so it resolves to no env-num by design (not
+     a dangling-reference defect). -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">3.3</span>Applications of the Chain Rule</h2>
+  </header>
+
+  <!-- expansion:intuition — load-bearing intuition: the chain rule run BACKWARD on a known identity extracts a derivative no direct rule reaches; concrete hook = ln, x^x, arcsin have nothing to attack head-on -->
+  <p>Sections 3.1 and 3.2 built the machinery; this section spends it. The chain rule (Theorem 3.3) was advertised as the tool that completes the differentiation toolkit, and here we see why: it reaches a whole family of derivatives that no rule of Chapter 2 can touch directly. We have no formula for \(\ln x\) to differentiate — it is known only as the function that undoes \(e^{x}\). The expression \(x^{x}\) carries its variable in <em>both</em> the base and the exponent, so neither the power rule nor the rule for \(e^{x}\) applies to it. And \(\arcsin\) has no elementary formula at all. Each of these functions is, in a sense, defined only indirectly.</p>
+
+  <p>Yet each one satisfies an <em>identity</em> assembled from functions we already know how to differentiate: \(e^{\ln x} = x\), or \(\ln(x^{x}) = x\ln x\), or \(\arcsin(\sin x) = x\) for \(x \in \bigl[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr]\). That is the whole idea of this section, used over and over: <em>to differentiate a function you cannot attack head-on, differentiate an identity it satisfies, then solve for the derivative you want.</em> It is the chain rule run backward — instead of pushing a known derivative forward through a composition (Strategy 3.1), we apply the chain rule to a known relation and read off the one derivative we do not yet have. The same move handles the inverse functions \(\ln\), \(\arcsin\), \(\arccos\), and \(\arctan\), and, through the closely related trick of <em>logarithmic differentiation</em>, awkward powers like \(x^{x}\).</p>
+
+  <h3 class="subsec-head">The logarithm and logarithmic differentiation</h3>
+
+  <!-- expansion:intuition — D8 forward fence: ln used informally as the inverse of e^x; rigorous construction deferred to Ch4 §4.5 -->
+  <p>We begin with the natural logarithm. Throughout this section we use \(\ln x\) informally, as the inverse of the exponential function — the number whose exponential is \(x\), so that \(e^{\ln x} = x\) for every \(x > 0\). This relation is all we need to find its derivative. The rigorous construction of \(\ln x\) as the inverse of \(e^{x}\), together with a proof that it is differentiable, is deferred to Chapter 4 (§4.5), which re-derives the formula below from the ground up.</p>
+
+  <!-- Example 3.6 — manuscript application ① (seed): d/dx ln x = 1/x via the identity e^{ln x}=x -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.6</span></p>
+      <div class="env-body">
+        <p>Show that \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) for \(x > 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Start from the identity that defines the logarithm, \(e^{\ln x} = x\), and differentiate both sides with respect to \(x\). The left side is a composition — the outer function is \(\exp\), the inner is \(\ln x\) — so by the chain rule (Theorem 3.3), using \(\dfrac{d}{du}e^{u} = e^{u}\) (Chapter 2, §2.4, Theorem 2.5),</p>
+        <p>\[ \frac{d}{dx}\,e^{\ln x} = e^{\ln x}\cdot\frac{d}{dx}\ln x = x\cdot\frac{d}{dx}\ln x, \]</p>
+        <p>where the last step uses \(e^{\ln x} = x\) once more. The right side is simply \(\dfrac{d}{dx}x = 1\). Equating the two,</p>
+        <p>\[ x\cdot\frac{d}{dx}\ln x = 1, \qquad\text{so}\qquad \frac{d}{dx}\ln x = \frac{1}{x} \quad (x > 0). \]</p>
+        <p>The unknown derivative was trapped inside a relation we could differentiate; one application of the chain rule and a division set it free.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — bridge: ln' is not just a formula, it powers a technique for variable exponents -->
+  <p>The derivative of the logarithm is more than one more entry in a table — it powers a technique. When a function carries its variable in the exponent, or is a sprawling product and quotient of many factors, taking its logarithm first turns powers into products and products into sums, all of which we can already differentiate. Applying \(\dfrac{d}{dx}\ln\) to both sides and then solving is called <em>logarithmic differentiation</em>.</p>
+
+  <!-- expansion:strategy — logarithmic differentiation (ROADMAP-assigned); the chapter's second Strategy box -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">3.2</span><span class="env-name">Logarithmic differentiation</span></p>
+    <div class="env-body">
+      <p>To differentiate a complicated positive expression \(y = f(x)\) — especially one with the variable in an exponent:</p>
+      <ol class="steps">
+        <li>Take natural logarithms of both sides: \(\ln y = \ln f(x)\).</li>
+        <li>Simplify the right side with the laws of logarithms — \(\ln(ab) = \ln a + \ln b\), \(\ln\frac{a}{b} = \ln a - \ln b\), \(\ln(a^{b}) = b\ln a\) — until only sums of simple terms remain.</li>
+        <li>Differentiate both sides with respect to \(x\). Since \(y\) is a function of \(x\), the left side is \(\dfrac{d}{dx}\ln y = \dfrac{y'}{y}\) by the chain rule.</li>
+        <li>Solve for \(y'\) and substitute \(y = f(x)\) back in: \(y' = f(x)\cdot\dfrac{d}{dx}\bigl[\ln f(x)\bigr]\).</li>
+      </ol>
+      <p>In particular this differentiates any power-of-a-function \(f(x)^{g(x)}\) (with \(f(x) > 0\)): its logarithm is \(g(x)\ln f(x)\); differentiate that, then multiply back by \(f(x)^{g(x)}\). The next example is the cleanest case.</p>
+    </div>
+  </section>
+
+  <!-- Example 3.7 — manuscript application ② (seed): d/dx x^x by logarithmic differentiation -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.7</span></p>
+      <div class="env-body">
+        <p>Differentiate \(W(x) = x^{x}\) for \(x > 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>There is no rule for a variable raised to a variable power, so we take logarithms. With \(W = x^{x} > 0\),</p>
+        <p>\[ \ln W = \ln\bigl(x^{x}\bigr) = x\ln x. \]</p>
+        <p>Differentiate both sides with respect to \(x\). On the left, the chain rule gives \(\dfrac{d}{dx}\ln W = \dfrac{W'}{W}\). On the right, the product rule (Chapter 2, §2.5, Theorem 2.6) together with \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) (Example 3.6) gives</p>
+        <p>\[ \frac{d}{dx}\bigl(x\ln x\bigr) = 1\cdot\ln x + x\cdot\frac{1}{x} = \ln x + 1. \]</p>
+        <p>Therefore \(\dfrac{W'}{W} = \ln x + 1\), and solving for \(W'\),</p>
+        <p>\[ \frac{d}{dx}x^{x} = W'(x) = W\,(\ln x + 1) = (1 + \ln x)\,x^{x} \quad (x > 0). \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — D9 promotion of manuscript Homework 2(iv): d/dx 2^x. Approved at ③ (2026-06-08). Short: reuses the rewrite-via-e idea. -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.8</span></p>
+      <div class="env-body">
+        <p>Differentiate \(2^{x}\) for \(x \in \mathbb{R}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Rewrite the base through \(e\). Since \(2 = e^{\ln 2}\), we have \(2^{x} = e^{x\ln 2}\) — a composition with inner function \(x\ln 2\) (a constant times \(x\)) and outer function \(\exp\). By the chain rule, with \(\dfrac{d}{du}e^{u} = e^{u}\),</p>
+        <p>\[ \frac{d}{dx}2^{x} = \frac{d}{dx}e^{x\ln 2} = e^{x\ln 2}\cdot\ln 2 = 2^{x}\ln 2. \]</p>
+        <p>The same rewrite gives \(\dfrac{d}{dx}a^{x} = a^{x}\ln a\) for any base \(a > 0\). This is also why \(e\) is the <em>natural</em> base: because \(\ln e = 1\), the extra factor disappears, and \(e^{x}\) alone among exponentials is its own derivative.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — D9 promotion of manuscript Homework 2(iii): d/dx (x ln x − x). Approved at ③ (2026-06-08). Short: reuses Example 3.7's (x ln x)' computation. -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.9</span></p>
+      <div class="env-body">
+        <p>Differentiate \(x\ln x - x\) for \(x > 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We met the first term inside Example 3.7: by the product rule and \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), we have \(\dfrac{d}{dx}(x\ln x) = \ln x + 1\). The second term has derivative \(1\). Hence</p>
+        <p>\[ \frac{d}{dx}\bigl(x\ln x - x\bigr) = (\ln x + 1) - 1 = \ln x \quad (x > 0). \]</p>
+        <p>The derivative is exactly \(\ln x\) — so \(x\ln x - x\) is an <em>antiderivative</em> of \(\ln x\), a fact worth filing away for when we turn to integration.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Derivatives of the inverse trigonometric functions</h3>
+
+  <!-- expansion:intuition — bridge: the same lever, now the identity comes from trigonometry -->
+  <p>The logarithm gave way because it is the inverse of \(e^{x}\): we differentiated the relation \(e^{\ln x} = x\). The inverse trigonometric functions yield to exactly the same lever — only now the identity comes from trigonometry. Each inverse function composes with its parent to give an identity, and differentiating that identity by the chain rule isolates the derivative we are after.</p>
+
+  <!-- Example 3.10 — manuscript application ③ (seed): d/dy arcsin y via the composition identity arcsin(sin x)=x; cos x ≥ 0 on the branch fixes the sign of the root -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.10</span></p>
+      <div class="env-body">
+        <p>Show that \(\dfrac{d}{dy}\arcsin y = \dfrac{1}{\sqrt{1 - y^{2}}}\) for \(y \in (-1, 1)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Recall from Chapter 1 that \(\arcsin\) is the inverse of sine restricted to the branch \(\bigl[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr]\): for \(-1 \le y \le 1\), \(\arcsin y\) is the unique angle \(x\) in that interval with \(\sin x = y\). On this branch the two functions undo each other, so in particular \(\arcsin(\sin x) = x\).</p>
+        <p>Differentiate this identity with respect to \(x\). Reading \(x = \arcsin(\sin x)\) as a composition and applying the chain rule (Theorem 3.3), with \(\dfrac{d}{dx}\sin x = \cos x\) (Theorem 3.1),</p>
+        <p>\[ 1 = \frac{d}{dx}\arcsin(\sin x) = (\arcsin)'(\sin x)\cdot\cos x, \]</p>
+        <p>so \((\arcsin)'(\sin x) = \dfrac{1}{\cos x}\), valid where \(\cos x \neq 0\) — that is, on the <em>open</em> interior \(x \in \bigl(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr)\), where \(\cos x > 0\). Writing \(y = \sin x\), this interior corresponds exactly to \(y \in (-1, 1)\), and there \(\cos x = \sqrt{1 - \sin^{2} x} = \sqrt{1 - y^{2}}\) — the positive root selected by \(\cos x > 0\). Therefore</p>
+        <p>\[ \frac{d}{dy}\arcsin y = \frac{1}{\sqrt{1 - y^{2}}} \quad (y \in (-1, 1)). \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:caution — arcsin/arccos derivative domain (ROADMAP pitfall): valid only on the OPEN interval (−1,1); endpoints are vertical tangents -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The formula \(\dfrac{1}{\sqrt{1 - y^{2}}}\) is valid only on the <em>open</em> interval \((-1, 1)\). At the endpoints \(y = \pm 1\) the denominator vanishes: the graph of \(\arcsin\) (and of \(\arccos\) below) has a vertical tangent there, so the derivative does not exist. Report these derivatives on the open interval, never the closed one.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — D9 promotion of manuscript Homework 1: d/dy arccos y, by the same method as Example 3.10. Approved at ③ (2026-06-08). Short, skip-setup; uses the correct identity arccos(cos x)=x (not the manuscript's loose cos⁻¹(cos y)=y). -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.11</span></p>
+      <div class="env-body">
+        <p>Show that \(\dfrac{d}{dy}\arccos y = \dfrac{-1}{\sqrt{1 - y^{2}}}\) for \(y \in (-1, 1)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The method is exactly that of Example 3.10, now applied to cosine. Recall that \(\arccos\) is the inverse of cosine on the branch \([0, \pi]\), so \(\arccos(\cos x) = x\) there. Differentiating with respect to \(x\), with \(\dfrac{d}{dx}\cos x = -\sin x\) (Theorem 3.2),</p>
+        <p>\[ 1 = (\arccos)'(\cos x)\cdot(-\sin x). \]</p>
+        <p>Writing \(y = \cos x\): on the <em>open</em> interior \(x \in (0, \pi)\) we have \(\sin x > 0\), so the division by \(-\sin x\) is legitimate and \(\sin x = \sqrt{1 - \cos^{2} x} = \sqrt{1 - y^{2}}\); this interior corresponds to \(y \in (-1, 1)\). Hence</p>
+        <p>\[ \frac{d}{dy}\arccos y = \frac{1}{-\sin x} = \frac{-1}{\sqrt{1 - y^{2}}} \quad (y \in (-1, 1)). \]</p>
+        <p>The only change from \(\arcsin\) is the minus sign, inherited from \(\cos' = -\sin\); the open-interval restriction of the Caution applies here unchanged.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — self-authored (③ 2026-06-08): d/dy arctan y, honoring the Ch3 opener + §3.2 forward-ref + ROADMAP core skill; same composition-identity method, using tan'=sec^2 from §3.1 Example 3.2 and the Pythagorean identity -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.12</span></p>
+      <div class="env-body">
+        <p>Show that \(\dfrac{d}{dy}\arctan y = \dfrac{1}{1 + y^{2}}\) for all \(y \in \mathbb{R}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Once more the same lever. Recall that \(\arctan\) is the inverse of tangent on the branch \(\bigl(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr)\), so \(\arctan(\tan x) = x\). Differentiating with respect to \(x\), and using \(\dfrac{d}{dx}\tan x = \sec^{2} x\) (Example 3.2),</p>
+        <p>\[ 1 = (\arctan)'(\tan x)\cdot\sec^{2} x, \qquad\text{so}\qquad (\arctan)'(\tan x) = \frac{1}{\sec^{2} x}. \]</p>
+        <p>Now write \(y = \tan x\) and use the Pythagorean identity \(\sec^{2} x = 1 + \tan^{2} x = 1 + y^{2}\):</p>
+        <p>\[ \frac{d}{dy}\arctan y = \frac{1}{1 + y^{2}}. \]</p>
+        <p>Here there is no domain restriction to worry about: as \(x\) ranges over \(\bigl(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr)\), \(y = \tan x\) ranges over all of \(\mathbb{R}\), and \(1 + y^{2}\) never vanishes. Unlike \(\arcsin\) and \(\arccos\), the arctangent is differentiable everywhere.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — unifying takeaway: one lever produced every derivative in the section -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.3</span><span class="env-name">One lever for many derivatives</span></p>
+    <div class="env-body">
+      <p>Look back at what just happened. We never differentiated \(\ln x\), \(x^{x}\), or an inverse trigonometric function <em>directly</em> — there was no rule to do so. In every case we found a known identity the function satisfies — \(e^{\ln x} = x\), \(\ln(x^{x}) = x\ln x\), \(\arcsin(\sin x) = x\) on its branch, and their kin — differentiated it by the chain rule, and solved for the one unknown. The chain rule is not only a tool for pushing derivatives forward through a composition; turned on an identity, it is a lever that pries loose derivatives we could reach in no other way.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <!-- expansion:summary — chapter-level summary (ch03's final section): derivative recap + arc of §3.1–§3.3 + forward fence to Ch4 §4.3/§4.5 and the MVT -->
+  <p>This section adds the following derivatives to our running table:</p>
+  <p>\[ \frac{d}{dx}\ln x = \frac{1}{x}, \qquad \frac{d}{dx}x^{x} = (1 + \ln x)\,x^{x}, \qquad \frac{d}{dx}a^{x} = a^{x}\ln a, \]</p>
+  <p>\[ \frac{d}{dy}\arcsin y = \frac{1}{\sqrt{1 - y^{2}}}, \qquad \frac{d}{dy}\arccos y = \frac{-1}{\sqrt{1 - y^{2}}}, \qquad \frac{d}{dy}\arctan y = \frac{1}{1 + y^{2}}. \]</p>
+  <p>(The logarithmic and power formulas hold for \(x > 0\), the \(a^{x}\) formula for any base \(a > 0\) and all \(x\), and the \(\arcsin\) and \(\arccos\) formulas only on the open interval \(-1 < y < 1\); \(\arctan\) is differentiable for every \(y\).)</p>
+  <p>With these, Chapter 3 is complete. It opened by breaking the one limit algebra could not touch, \(\lim_{\theta \to 0}\dfrac{\sin\theta}{\theta}\), with a piece of unit-circle geometry, and read off \(\sin' = \cos\) and \(\cos' = -\sin\) (§3.1). It then proved the chain rule, the rule for compositions that Chapter 2 had been missing (§3.2). Here that rule was turned loose to reach the derivatives of the logarithmic, exponential, and inverse trigonometric functions (§3.3). Together with the algebraic rules of Chapter 2, we can now differentiate essentially every function built by combining and composing the elementary ones.</p>
+
+  <p>Two debts remain, and both were taken on informally. We have used \(\dfrac{d}{dx}e^{x} = e^{x}\) from the casual series argument of Chapter 2, and we have treated \(\ln x\) as the inverse of \(e^{x}\) without ever constructing it. Chapter 4 settles both: it builds \(e^{x}\) rigorously and re-derives its derivative (§4.3), and it proves the Mean Value Theorem — the result that finally lets us define \(\ln x\) as the inverse of the strictly increasing exponential and recover \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) on solid ground (§4.5).</p>
+
+</article>
+</template>
+
+
+
+<!-- ============================================================
+     plot.js — inlined (figure-plotting engine)
+     ============================================================ -->
+<script>
+(function () {
+  let uid = 0;
+  const PI = Math.PI;
+  function piTex(v) {
+    const map = {
+      [(-2 * PI).toFixed(4)]: "-2\\pi",
+      [(-PI).toFixed(4)]: "-\\pi",
+      [(-PI / 2).toFixed(4)]: "-\\tfrac{\\pi}{2}",
+      [(PI / 2).toFixed(4)]: "\\tfrac{\\pi}{2}",
+      [PI.toFixed(4)]: "\\pi",
+      [(2 * PI).toFixed(4)]: "2\\pi",
+      [(0).toFixed(4)]: "0",
+    };
+    return map[v.toFixed(4)];
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function anchorTransform(anchor, vAnchor) {
+    const tx = anchor === "start" ? "0" : anchor === "end" ? "-100%" : "-50%";
+    const ty = vAnchor === "top" ? "0" : vAnchor === "bottom" ? "-100%" : "-50%";
+    return "translate(" + tx + "," + ty + ")";
+  }
+  function buildPlot(cfg) {
+    const w = cfg.w, h = cfg.h;
+    const pad = Object.assign({ t: 16, r: 18, b: 20, l: 22 }, cfg.pad || {});
+    const xmin = cfg.xmin, xmax = cfg.xmax, ymin = cfg.ymin, ymax = cfg.ymax;
+    const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    const SX = function(x) { return pad.l + ((x - xmin) / (xmax - xmin)) * iw; };
+    const SY = function(y) { return h - pad.b - ((y - ymin) / (ymax - ymin)) * ih; };
+    const id = "pl" + (++uid);
+    const parts = [];
+    const labels = [];
+    function pushLabel(o) { labels.push(o); }
+    parts.push('<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:' + w + 'px" class="fig-svg" role="img" aria-label="' + esc(cfg.aria || "graph") + '" preserveAspectRatio="xMidYMid meet">');
+    parts.push('<defs><marker id="' + id + 'a" markerWidth="8" markerHeight="8" refX="5.4" refY="2.8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5.4,2.8 L0,5.6" fill="none" stroke="var(--c-axis)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>');
+    if (cfg.axes !== false) {
+      var x0 = Math.min(Math.max(0, xmin), xmax);
+      var y0 = Math.min(Math.max(0, ymin), ymax);
+      var ax0 = SX(xmin), ax1 = SX(xmax), ayBase = SY(y0);
+      parts.push('<path d="M' + ax0.toFixed(1) + ',' + ayBase.toFixed(1) + ' H' + (ax1 - 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      var ay0 = SY(ymin), ay1 = SY(ymax), axBase = SX(x0);
+      parts.push('<path d="M' + axBase.toFixed(1) + ',' + ay0.toFixed(1) + ' V' + (ay1 + 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      if (cfg.xlabel) pushLabel({ px: ax1 + 1, py: ayBase + 4, tex: cfg.xlabel, anchor: "start", vAnchor: "top", cls: "a-ax", size: 13 });
+      if (cfg.ylabel) pushLabel({ px: axBase - 5, py: ay1 + 1, tex: cfg.ylabel, anchor: "end", vAnchor: "top", cls: "a-ax", size: 13 });
+      (cfg.xticks || []).forEach(function(t) {
+        var px = SX(t.x);
+        parts.push('<line x1="' + px.toFixed(1) + '" y1="' + (ayBase - 3).toFixed(1) + '" x2="' + px.toFixed(1) + '" y2="' + (ayBase + 3).toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.x));
+        if (tex != null) pushLabel({ px: px, py: ayBase + 6, tex: tex, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: px, py: ayBase + 6, text: t.label, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+      });
+      (cfg.yticks || []).forEach(function(t) {
+        var py = SY(t.y);
+        parts.push('<line x1="' + (axBase - 3).toFixed(1) + '" y1="' + py.toFixed(1) + '" x2="' + (axBase + 3).toFixed(1) + '" y2="' + py.toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.y));
+        if (tex != null) pushLabel({ px: axBase - 6, py: py, tex: tex, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: axBase - 6, py: py, text: t.label, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+      });
+    }
+    (cfg.items || []).forEach(function(it) {
+      if (it.type === "curve") {
+        var cls = it.cls || "curve", n = it.samples || 240, a = it.domain[0], b = it.domain[1];
+        var d = "", pen = false;
+        for (var i = 0; i <= n; i++) {
+          var x = a + (b - a) * (i / n), y = it.fn(x);
+          if (!isFinite(y) || y < ymin - (ymax - ymin) * 0.04 || y > ymax + (ymax - ymin) * 0.04) { pen = false; continue; }
+          var px = SX(x).toFixed(2), py = SY(y).toFixed(2);
+          d += (pen ? "L" : "M") + px + "," + py + " "; pen = true;
+        }
+        if (d) parts.push('<path d="' + d.trim() + '" class="' + cls + '"/>');
+      } else if (it.type === "vline") {
+        parts.push('<line x1="' + SX(it.x).toFixed(1) + '" y1="' + SY(ymin).toFixed(1) + '" x2="' + SX(it.x).toFixed(1) + '" y2="' + SY(ymax).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "hline") {
+        var ha = it.from != null ? it.from : xmin, hb = it.to != null ? it.to : xmax;
+        parts.push('<line x1="' + SX(ha).toFixed(1) + '" y1="' + SY(it.y).toFixed(1) + '" x2="' + SX(hb).toFixed(1) + '" y2="' + SY(it.y).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "seg") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="' + (it.cls || "curve") + '"/>');
+      } else if (it.type === "dot") {
+        var r = it.r || 3.0;
+        if (it.hollow) parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/>');
+        else parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" class="dot"/>');
+      } else if (it.type === "arrow") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      } else if (it.type === "text") {
+        pushLabel({ px: SX(it.x), py: SY(it.y), tex: it.tex, text: it.tex == null ? it.text : null, anchor: it.anchor || "middle", vAnchor: it.vAnchor || "middle", dx: it.dx || 0, dy: it.dy || 0, cls: it.cls || "a-pt", size: it.size });
+      }
+    });
+    if (labels.length) {
+      var M = 52;
+      var spans = labels.map(function(L) {
+        var left = (L.px + (L.dx || 0) + M).toFixed(1);
+        var top = (L.py + (L.dy || 0) + M).toFixed(1);
+        var tf = anchorTransform(L.anchor, L.vAnchor);
+        var fs = L.size ? "font-size:" + L.size + "px;" : "";
+        var body = L.tex != null ? "\\(" + L.tex + "\\)" : esc(L.text == null ? "" : L.text);
+        return '<span class="fig-lbl ' + (L.cls || "") + '" style="left:' + left + 'px;top:' + top + 'px;transform:' + tf + ';' + fs + '">' + body + '</span>';
+      }).join("");
+      parts.push('<foreignObject x="' + (-M) + '" y="' + (-M) + '" width="' + (w + 2 * M) + '" height="' + (h + 2 * M) + '" class="fig-fo" requiredExtensions="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml" class="fig-lyr">' + spans + '</div></foreignObject>');
+    }
+    parts.push('</svg>');
+    return parts.join("");
+  }
+  window.buildPlot = buildPlot;
+  window.PIVAL = PI;
+})();
+</script>
+
+<!-- ============================================================
+     figures.js — inlined (Chapter 3 figure registry)
+     ============================================================ -->
+<script>
+/* ============================================================
+   figures.js — Chapter 3 figure registry.
+   Each entry returns { layout, panels:[{svg, note}] }.
+   Most chapter figures use buildPlot() (shared/plot.js) for
+   function graphs. buildPlot has NO fill/sector primitive, so
+   region-area schematics (e.g. the §3.1 sector inequality) are
+   hand-built raw SVG here, inheriting the figure vocabulary
+   (.fig-svg, .ptlab, var(--c-primary)/--ink…) from skin-hs.css.
+   Labels are kept to single symbols (O, A, B, C, θ, 1); the
+   areas and the inequality live in the caption and body prose
+   (CONTENT_SPEC §10 "Label economy").
+   Appended across sections — never overwrite.
+   ============================================================ */
+(function () {
+
+  const FIGS = {
+
+    /* §3.1 — Sector inequality on the unit circle.
+       Three nested regions in the first quadrant ground the bound
+       cos θ ≤ (sin θ)/θ ≤ 1:
+         · triangle OAB  (inscribed)         = ½ sin θ
+         · sector  OAB   (pie slice)         = ½ θ
+         · triangle OAC  (out to tangent A)  = ½ tan θ,   C = (1, tan θ)
+       Drawn as three non-overlapping fills (triangle OAB, the
+       circular segment chord→arc, the corner arc→tangent) so the
+       eye reads OAB ⊆ sector ⊆ OAC directly. The manuscript names
+       the corner triangle ABC ( = OAC − OAB ); B lies on segment OC. */
+    "sector-inequality": () => {
+      const T = 40 * Math.PI / 180;            // display angle θ = 40°
+      const R = 120, Ox = 130, Oy = 170;       // circle radius / centre (SVG px, y down)
+      const c = Math.cos(T), s = Math.sin(T), t = Math.tan(T);
+      const Ax = Ox + R,        Ay = Oy;                 // A = (1, 0)
+      const Bx = Ox + R * c,    By = Oy - R * s;         // B = (cos θ, sin θ)
+      const Cx = Ox + R,        Cy = Oy - R * t;         // C = (1, tan θ), on tangent at A
+      const f1 = (n) => n.toFixed(1);
+      const rT = 30;                                     // angle-arc radius near O
+      const aEx = Ox + rT, aEy = Oy;                     // angle arc: start on OA
+      const aBx = Ox + rT * c, aBy = Oy - rT * s;        //            end toward OB
+      const mx = (Ox + Bx) / 2, my = (Oy + By) / 2;      // midpoint of OB (radius "1")
+
+      const svg =
+        `<svg viewBox="0 0 300 300" style="width:300px" class="fig-svg" role="img"` +
+        ` aria-label="First-quadrant wedge of the unit circle centred at O. The inscribed triangle OAB sits inside the sector OAB, which sits inside the larger triangle OAC reaching the tangent line at A, so that one half sine theta is at most one half theta is at most one half tangent theta.">` +
+        // --- region 3: corner outside the circle (arc → tangent), neutral slack ---
+        `<path d="M${f1(Ax)},${f1(Ay)} L${f1(Cx)},${f1(Cy)} L${f1(Bx)},${f1(By)} ` +
+          `A${R},${R} 0 0 1 ${f1(Ax)},${f1(Ay)} Z" fill="var(--ink)" fill-opacity="0.05" stroke="none"/>` +
+        // --- region 2: circular segment (chord AB → arc), lighter primary ---
+        `<path d="M${f1(Ax)},${f1(Ay)} A${R},${R} 0 0 0 ${f1(Bx)},${f1(By)} Z" ` +
+          `fill="var(--c-primary)" fill-opacity="0.09" stroke="none"/>` +
+        // --- region 1: inscribed triangle OAB, primary ---
+        `<polygon points="${f1(Ox)},${f1(Oy)} ${f1(Ax)},${f1(Ay)} ${f1(Bx)},${f1(By)}" ` +
+          `fill="var(--c-primary)" fill-opacity="0.17" stroke="none"/>` +
+        // --- unit circle (context) ---
+        `<circle cx="${Ox}" cy="${Oy}" r="${R}" fill="none" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        // --- tangent segment A→C (vertical tangent at A) ---
+        `<line x1="${f1(Ax)}" y1="${f1(Ay)}" x2="${f1(Cx)}" y2="${f1(Cy)}" stroke="var(--ink)" stroke-width="1.4"/>` +
+        // --- ray O→B→C (radius OB extended to the tangent at C) ---
+        `<line x1="${f1(Ox)}" y1="${f1(Oy)}" x2="${f1(Cx)}" y2="${f1(Cy)}" stroke="var(--ink)" stroke-width="1.4"/>` +
+        // --- radius OA ---
+        `<line x1="${f1(Ox)}" y1="${f1(Oy)}" x2="${f1(Ax)}" y2="${f1(Ay)}" stroke="var(--ink)" stroke-width="1.4"/>` +
+        // --- chord AB (edge of the inscribed triangle) ---
+        `<line x1="${f1(Ax)}" y1="${f1(Ay)}" x2="${f1(Bx)}" y2="${f1(By)}" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        // --- right-angle tick at A (tangent ⊥ radius) ---
+        `<path d="M${f1(Ax - 9)},${f1(Ay)} L${f1(Ax - 9)},${f1(Ay - 9)} L${f1(Ax)},${f1(Ay - 9)}" ` +
+          `fill="none" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        // --- angle θ arc at O ---
+        `<path d="M${f1(aEx)},${f1(aEy)} A${rT},${rT} 0 0 0 ${f1(aBx)},${f1(aBy)}" ` +
+          `fill="none" stroke="var(--ink)" stroke-width="1.1"/>` +
+        // --- dots at O, A, B, C ---
+        `<circle cx="${f1(Ox)}" cy="${f1(Oy)}" r="2.5" class="dot"/>` +
+        `<circle cx="${f1(Ax)}" cy="${f1(Ay)}" r="2.5" class="dot"/>` +
+        `<circle cx="${f1(Bx)}" cy="${f1(By)}" r="2.5" class="dot"/>` +
+        `<circle cx="${f1(Cx)}" cy="${f1(Cy)}" r="2.5" class="dot"/>` +
+        // --- labels (single symbols; areas/inequality in caption + prose) ---
+        `<text x="${f1(Ox - 9)}" y="${f1(Oy + 5)}" text-anchor="end" class="ptlab" font-style="italic">O</text>` +
+        `<text x="${f1(Ax + 8)}" y="${f1(Ay + 16)}" text-anchor="middle" class="ptlab" font-style="italic">A</text>` +
+        `<text x="${f1(Bx - 10)}" y="${f1(By - 6)}" text-anchor="end" class="ptlab" font-style="italic">B</text>` +
+        `<text x="${f1(Cx + 9)}" y="${f1(Cy + 4)}" text-anchor="start" class="ptlab" font-style="italic">C</text>` +
+        `<text x="${f1(Ox + rT + 9)}" y="${f1(Oy - 7)}" text-anchor="start" class="ptlab" font-style="italic">θ</text>` +
+        `<text x="${f1(mx - 11)}" y="${f1(my - 3)}" text-anchor="end" class="ptlab">1</text>` +
+        `</svg>`;
+
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §3.2 — The chain rule as a composed mapping.
+       Three stacked horizontal axes (input x, intermediate u = g(x),
+       output y = f(u)). A small increment h at the aligned base point is
+       carried by g to a wider increment at u₀, then by f to a wider one
+       still at y₀: the increment widths grow because the two local slopes
+       g'(x₀), f'(g(x₀)) multiply. Single-symbol labels (x, u, y, h, x₀, u₀,
+       y₀) plus the two arrow factors; the algebra (net stretch f'·g'·h)
+       lives in the caption and body prose (CONTENT_SPEC §10). buildPlot has
+       no multi-axis / propagation-arrow primitive, so this is raw SVG. */
+    "composed-mapping": () => {
+      const ax1 = 34, ax2 = 276;                 // axis horizontal extent
+      const yIn = 46, yMid = 140, yOut = 234;    // input / intermediate / output axes (SVG px, y down)
+      const bx = 92;                             // base points x₀, u₀, y₀ (drawn aligned)
+      const inEnd = bx + 26;                     // input increment width = h
+      const midEnd = bx + 42;                    // stretched by g'(x₀)   (display ratio ≈ 1.6)
+      const outEnd = bx + 63;                    // stretched again by f'(g(x₀))  (≈ 1.5)
+      const f1 = (n) => n.toFixed(1);
+
+      const axis = (y) =>                        // axis line with a right arrowhead
+        `<line x1="${ax1}" y1="${y}" x2="${ax2}" y2="${y}" stroke="var(--ink)" stroke-width="1.3"/>` +
+        `<polygon points="${ax2},${y} ${ax2 - 7},${y - 3.5} ${ax2 - 7},${y + 3.5}" fill="var(--ink)"/>`;
+      const inc = (y, xe) =>                      // increment highlight bx → xe
+        `<line x1="${bx}" y1="${y}" x2="${f1(xe)}" y2="${y}" stroke="var(--c-primary)" stroke-width="3.6" stroke-linecap="round"/>`;
+      const arrow = (x1, y1, x2, y2) =>          // downward map arrow with arrowhead
+        `<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="var(--ink-soft)" stroke-width="1.3"/>` +
+        `<polygon points="${f1(x2)},${f1(y2)} ${f1(x2 - 3.4)},${f1(y2 - 6.5)} ${f1(x2 + 3.4)},${f1(y2 - 6.5)}" fill="var(--ink-soft)"/>`;
+
+      const svg =
+        `<svg viewBox="0 0 300 275" style="width:300px" class="fig-svg" role="img"` +
+        ` aria-label="Three stacked horizontal axes: an input axis x, an intermediate axis u equal to g of x, and an output axis y equal to f of u. A small increment h at the base point x-zero is carried by g to a wider increment at u-zero, and by f to a wider increment still at y-zero, so the two slopes multiply.">` +
+        // base-point alignment guide
+        `<line x1="${bx}" y1="${yIn}" x2="${bx}" y2="${yOut}" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>` +
+        // three axes
+        axis(yIn) + axis(yMid) + axis(yOut) +
+        // increment highlights (growing widths show the magnification)
+        inc(yIn, inEnd) + inc(yMid, midEnd) + inc(yOut, outEnd) +
+        // map arrows: g (x → u) and f (u → y)
+        arrow(inEnd, yIn + 7, midEnd, yMid - 7) +
+        arrow(midEnd, yMid + 7, outEnd, yOut - 7) +
+        // 'h' bracket above the input increment
+        `<path d="M${bx},${yIn - 7} L${bx},${yIn - 11} L${f1(inEnd)},${yIn - 11} L${f1(inEnd)},${yIn - 7}" ` +
+          `fill="none" stroke="var(--ink)" stroke-width="1"/>` +
+        // base-point dots
+        `<circle cx="${bx}" cy="${yIn}" r="2.5" class="dot"/>` +
+        `<circle cx="${bx}" cy="${yMid}" r="2.5" class="dot"/>` +
+        `<circle cx="${bx}" cy="${yOut}" r="2.5" class="dot"/>` +
+        // axis variable labels
+        `<text x="${ax2 - 4}" y="${yIn - 8}" text-anchor="end" class="ptlab" font-style="italic">x</text>` +
+        `<text x="${ax2 - 4}" y="${yMid - 8}" text-anchor="end" class="ptlab" font-style="italic">u</text>` +
+        `<text x="${ax2 - 4}" y="${yOut - 8}" text-anchor="end" class="ptlab" font-style="italic">y</text>` +
+        // 'h' label
+        `<text x="${f1((bx + inEnd) / 2)}" y="${yIn - 15}" text-anchor="middle" class="ptlab" font-style="italic">h</text>` +
+        // base-point labels
+        `<text x="${bx - 7}" y="${yIn + 16}" text-anchor="end" class="ptlab" font-style="italic">x₀</text>` +
+        `<text x="${bx - 7}" y="${yMid + 16}" text-anchor="end" class="ptlab" font-style="italic">u₀</text>` +
+        `<text x="${bx - 7}" y="${yOut + 16}" text-anchor="end" class="ptlab" font-style="italic">y₀</text>` +
+        // magnification factors on the arrows
+        `<text x="${f1(midEnd) + 9}" y="${f1((yIn + yMid) / 2) + 3}" text-anchor="start" class="ptlab">× g′(x₀)</text>` +
+        `<text x="${f1(outEnd) + 9}" y="${f1((yMid + yOut) / 2) + 3}" text-anchor="start" class="ptlab">× f′(g(x₀))</text>` +
+        `</svg>`;
+
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+  };
+
+  /* ---- hydrateFigures: fills every <figure data-fig="id"> ---- */
+  function hydrateFigures(root) {
+    (root || document).querySelectorAll("[data-fig]").forEach(function (el) {
+      var def = FIGS[el.dataset.fig];
+      if (!def || el.dataset.figDone) return;
+      var r = def();
+      var layout = r.layout, panels = r.panels;
+      var html;
+      if (layout === "single" && panels.length === 1 && !panels[0].note) {
+        html = '<div class="figure-art">' + panels[0].svg + '</div>';
+      } else {
+        var cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
+        html = '<div class="figure-art ' + cls + '">' +
+          panels.map(function (p) {
+            return '<div class="fig-panel">' + p.svg + (p.note ? '<div class="fig-note">' + p.note + '</div>' : '') + '</div>';
+          }).join("") + '</div>';
+      }
+      el.insertAdjacentHTML("afterbegin", html);
+      el.dataset.figDone = "1";
+    });
+  }
+  window.hydrateFigures = hydrateFigures;
+})();
+</script>
+
+<!-- ============================================================
+     tweaks-panel.jsx — inlined
+     ============================================================ -->
+<script type="text/babel" src="data:text/plain,void(0)"></script>
+<script type="text/babel">
+/* tweaks-panel — inlined verbatim */
+const __TWEAKS_STYLE = `.twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;background:rgba(250,249,247,.78);color:#29261b;-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);border:.5px solid rgba(255,255,255,.6);border-radius:14px;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}.twk-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 10px 14px;cursor:move;user-select:none}.twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}.twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}.twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}.twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;overflow-x:hidden;min-height:0;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}.twk-row{display:flex;flex-direction:column;gap:5px}.twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}.twk-lbl{display:flex;justify-content:space-between;align-items:baseline;color:rgba(41,38,27,.72)}.twk-lbl>span:first-child{font-weight:500}.twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}.twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(41,38,27,.45);padding:10px 0 0}.twk-sect:first-child{padding-top:0}.twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;border-radius:999px;background:rgba(0,0,0,.12);outline:none}.twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}.twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}.twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;background:rgba(0,0,0,.06);user-select:none}.twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}.twk-seg.dragging .twk-seg-thumb{transition:none}.twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2;overflow-wrap:anywhere}.twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}.twk-toggle[data-on="1"]{background:#34c759}.twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}.twk-toggle[data-on="1"] i{transform:translateX(14px)}.twk-chips{display:flex;gap:6px}.twk-chip{position:relative;appearance:none;flex:1;min-width:0;height:46px;padding:0;border:0;border-radius:6px;overflow:hidden;cursor:default;box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);transition:transform .12s cubic-bezier(.3,.7,.4,1),box-shadow .12s}.twk-chip:hover{transform:translateY(-1px);box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.12)}.twk-chip[data-on="1"]{box-shadow:0 0 0 1.5px rgba(0,0,0,.85),0 2px 6px rgba(0,0,0,.15)}`;
+
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null ? keyOrEdits : { [keyOrEdits]: val };
+    setValues(prev => ({ ...prev, ...edits }));
+  }, []);
+  return [values, setTweak];
+}
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current; if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const maxR = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxB = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = { x: Math.min(maxR, Math.max(PAD, offsetRef.current.x)), y: Math.min(maxB, Math.max(PAD, offsetRef.current.y)) };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+  React.useEffect(() => { if (!open) return; clampToViewport(); const h = () => clampToViewport(); window.addEventListener('resize', h); return () => window.removeEventListener('resize', h); }, [open, clampToViewport]);
+  const dismiss = () => setOpen(false);
+  const toggle = () => setOpen(v => !v);
+  React.useEffect(() => { window.__toggleTweaks = toggle; }, []);
+  const onDragStart = (e) => {
+    const panel = dragRef.current; if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startR = window.innerWidth - r.right, startB = window.innerHeight - r.bottom;
+    const move = ev => { offsetRef.current = { x: startR - (ev.clientX - sx), y: startB - (ev.clientY - sy) }; clampToViewport(); };
+    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+  };
+  if (!open) return null;
+  return (<><style>{__TWEAKS_STYLE}</style>
+    <div ref={dragRef} className="twk-panel" style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+      <div className="twk-hd" onMouseDown={onDragStart}><b>{title}</b><button className="twk-x" aria-label="Close" onMouseDown={e => e.stopPropagation()} onClick={dismiss}>&#x2715;</button></div>
+      <div className="twk-body">{children}</div>
+    </div></>);
+}
+function TweakSection({ label }) { return <div className="twk-sect">{label}</div>; }
+function TweakRow({ label, value, children }) { return (<div className="twk-row"><div className="twk-lbl"><span>{label}</span>{value != null && <span className="twk-val">{value}</span>}</div>{children}</div>); }
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (<TweakRow label={label} value={`${value}${unit}`}><input type="range" className="twk-slider" min={min} max={max} step={step} value={value} onChange={e => onChange(Number(e.target.value))} /></TweakRow>);
+}
+function TweakToggle({ label, value, onChange }) {
+  return (<div className="twk-row twk-row-h"><div className="twk-lbl"><span>{label}</span></div><button type="button" className="twk-toggle" data-on={value ? '1' : '0'} onClick={() => onChange(!value)}><i /></button></div>);
+}
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  const valueRef = React.useRef(value); valueRef.current = value;
+  const opts = options.map(o => typeof o === 'object' ? o : { value: o, label: o });
+  const idx = Math.max(0, opts.findIndex(o => o.value === value));
+  const n = opts.length;
+  const segAt = cx => { const r = trackRef.current.getBoundingClientRect(); const i = Math.floor(((cx - r.left - 2) / (r.width - 4)) * n); return opts[Math.max(0, Math.min(n-1, i))].value; };
+  const onPointerDown = e => { setDragging(true); const v0 = segAt(e.clientX); if (v0 !== valueRef.current) onChange(v0);
+    const move = ev => { const v = segAt(ev.clientX); if (v !== valueRef.current) onChange(v); };
+    const up = () => { setDragging(false); window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up); };
+  return (<TweakRow label={label}><div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown} className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+    <div className="twk-seg-thumb" style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`, width: `calc((100% - 4px) / ${n})` }} />
+    {opts.map(o => <button key={o.value} type="button" role="radio" aria-checked={o.value === value}>{o.label}</button>)}
+  </div></TweakRow>);
+}
+function TweakColor({ label, value, options, onChange }) {
+  const key = o => String(JSON.stringify(o)).toLowerCase();
+  const cur = key(value);
+  return (<TweakRow label={label}><div className="twk-chips" role="radiogroup">
+    {options.map((o, i) => { const colors = Array.isArray(o) ? o : [o]; const on = key(o) === cur;
+      return (<button key={i} type="button" className="twk-chip" role="radio" data-on={on?'1':'0'} style={{ background: colors[0] }} onClick={() => onChange(o)}>
+        {on && <svg viewBox="0 0 14 14"><path d="M3 7.2 5.8 10 11 4.2" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" stroke="#fff"/></svg>}
+      </button>); })}
+  </div></TweakRow>);
+}
+
+/* ============================================================
+   Main App
+   ============================================================ */
+const { useState, useEffect, useRef } = React;
+
+const CHAPTER = {
+  brand: "Chapter 3 — Chain Rule and Trigonometric Derivatives",
+  fragments: ["sec-3-1", "sec-3-2", "sec-3-3"],
+};
+
+const TWEAK_DEFAULTS = {
+  "theme": "Light",
+  "accent": "#1f4e79",
+  "textSize": 17,
+  "lineHeight": 1.62,
+  "align": "Justified",
+  "density": "Comfortable",
+  "figures": true
+};
+const ACCENTS = ["#1f4e79", "#176b6b", "#5b4b8a", "#9a5b2e"];
+
+function renderMath(root) {
+  if (!root) return;
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    MathJax.typesetPromise([root]).catch(function(e) { console.warn("mathjax", e); });
+  } else {
+    setTimeout(function() { renderMath(root); }, 150);
+  }
+}
+
+function buildNav(page, navEl) {
+  if (!navEl) return;
+  navEl.innerHTML = "";
+  var brand = document.createElement("span");
+  brand.className = "brand"; brand.textContent = CHAPTER.brand;
+  navEl.appendChild(brand);
+  [...page.querySelectorAll(".sec")].forEach(function(s, i) {
+    var head = s.querySelector(".sec-head, .chapter-head");
+    if (!head) return;
+    head.id = "sec-" + i;
+    var no = s.querySelector(".sec-no");
+    var chTitle = s.querySelector(".ch-title");
+    var secTitle = s.querySelector(".sec-title");
+    var label = null;
+    if (chTitle) label = "Overview";
+    else if (no) label = "§" + no.textContent.trim();
+    else if (secTitle && /summary/i.test(secTitle.textContent)) label = "Summary";
+    if (!label) return;
+    var a = document.createElement("a");
+    a.href = "#sec-" + i; a.textContent = label;
+    navEl.appendChild(a);
+  });
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [html, setHtml] = useState(null);
+  const paperRef = useRef(null);
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    const parts = CHAPTER.fragments.map(id => {
+      const tpl = document.getElementById("frag-" + id);
+      return tpl ? tpl.innerHTML : "";
+    });
+    setHtml(parts.join("\n"));
+  }, []);
+
+  useEffect(() => {
+    if (!html) return;
+    let cancelled = false;
+    const run = () => {
+      if (cancelled || !paperRef.current) return;
+      if (window.hydrateFigures) window.hydrateFigures(paperRef.current);
+      buildNav(paperRef.current, navRef.current);
+      renderMath(paperRef.current);
+    };
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(run);
+    return () => { cancelled = true; };
+  }, [html]);
+
+  const docClass = [
+    t.theme === "Dark" ? "theme-dark" : "",
+    t.align === "Left" ? "align-left" : "",
+    t.density === "Compact" ? "density-compact" : "",
+    t.figures ? "" : "hide-figures",
+  ].filter(Boolean).join(" ");
+
+  const paperStyle = {
+    "--fs-base": t.textSize + "px",
+    "--lh-user": t.lineHeight,
+  };
+
+  return (
+    <div id="doc" className={docClass} style={{ "--accent": t.accent }}>
+      <nav className="chbar" ref={navRef}></nav>
+      <div className="reader">
+        <div className="paper skin-hs vivid" style={paperStyle} ref={paperRef}>
+          {html
+            ? <div className="page" dangerouslySetInnerHTML={{ __html: html }} />
+            : <div className="page" style={{ padding: 80, color: "#999" }}>Loading…</div>}
+        </div>
+      </div>
+      <div className="hint" onClick={() => { if (window.__toggleTweaks) window.__toggleTweaks(); }} style={{ cursor: "pointer", pointerEvents: "auto" }}>Open <b>Tweaks</b> to restyle</div>
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Theme" />
+        <TweakRadio label="Mode" value={t.theme} options={["Light", "Dark"]} onChange={v => setTweak("theme", v)} />
+        <TweakColor label="Accent" value={t.accent} options={ACCENTS} onChange={v => setTweak("accent", v)} />
+        <TweakSection label="Typography" />
+        <TweakSlider label="Text size" value={t.textSize} min={15} max={21} step={0.5} unit="px" onChange={v => setTweak("textSize", v)} />
+        <TweakSlider label="Line height" value={t.lineHeight} min={1.45} max={1.85} step={0.01} onChange={v => setTweak("lineHeight", v)} />
+        <TweakRadio label="Alignment" value={t.align} options={["Justified", "Left"]} onChange={v => setTweak("align", v)} />
+        <TweakSection label="Layout" />
+        <TweakRadio label="Density" value={t.density} options={["Comfortable", "Compact"]} onChange={v => setTweak("density", v)} />
+        <TweakToggle label="Show figures" value={t.figures} onChange={v => setTweak("figures", v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
