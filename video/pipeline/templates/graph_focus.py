@@ -11,6 +11,15 @@ Point convention (`hollow` flag) -- this is mathematical notation, not styling:
   hollow: true  (OPEN ○)  -- the value is NOT attained here (excluded endpoint of
                             a half-open domain, a removed point / hole).
 Using an open dot for an attained point misleads students -- pick by the math.
+
+Progressive reveal (`reveal` flag): plots are STATIC by default (the whole
+graph is on screen from frame 1). Mark a plot `reveal: true` to make it wait
+for `{show plot.N}` in the narration -- the teaching order (curve first, THEN
+the epsilon band, THEN the delta band) becomes a beat decision in `say`, no
+hook needed. A revealed plot's `label` folds into the same block, so one
+marker brings the element and its name together (a separate label.N block
+would otherwise pop unrevealed at scene end). Demo:
+storyboards/_demo_graph_reveal.yml.
 """
 from __future__ import annotations
 
@@ -153,6 +162,9 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
     for i, plot in enumerate(spec.get("plots", [])):
         kind = plot.get("kind")
         col = _role_color(ground, plot, "secondary")
+        # reveal: true -> dynamic block, waits for {show plot.N}; its label is
+        # folded into the same block so one marker reveals both (see docstring).
+        static = not bool(plot.get("reveal"))
 
         if kind == "function":
             xr = _range(plot.get("x_range", x_range[:2]), x_range[2])
@@ -165,13 +177,17 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
             )
             glow = graph.copy().set_stroke(col, width=12, opacity=0.16)
             group = VGroup(glow, graph)
-            blocks.append(Block(f"plot.{i}", group, anim="create", static=True))
 
             if plot.get("label"):
                 lab = _label(plot["label"], ground, role=plot.get("label_role", "primary"),
                              size=plot.get("label_size", default_label_size))
                 _place_function_label(lab, graph, axes, plot)
-                labels.append(lab)
+                if static:
+                    labels.append(lab)
+                else:
+                    group.add(lab)
+            blocks.append(Block(f"plot.{i}", group, anim="create", static=static))
+            if plot.get("label") and static:
                 blocks.append(Block(f"label.{len(labels)-1}", lab, anim="fade", static=True))
 
         elif kind == "band":
@@ -189,7 +205,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                            axes.c2p(hi, y_range[1]), axes.c2p(lo, y_range[1])]
             band = Polygon(*corners, stroke_width=0, color=col, fill_color=col,
                            fill_opacity=float(plot.get("opacity", 0.14)))
-            blocks.append(Block(f"plot.{i}", band, anim="fade", static=True))
+            blocks.append(Block(f"plot.{i}", band, anim="fade", static=static))
 
         elif kind == "line":
             start = plot["start"]
@@ -201,8 +217,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                 color=col,
                 stroke_width=float(plot.get("stroke_width", 2.5)),
             )
-            blocks.append(Block(f"plot.{i}", line, anim="fade", static=True))
-
+            line_group = line
             if plot.get("label"):
                 lab = _label(plot["label"], ground, role=plot.get("label_role", "warning"),
                              size=plot.get("label_size", default_label_size))
@@ -215,7 +230,12 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                 else:
                     side = _SIDE.get(str(plot.get("label_side", "right")).lower(), RIGHT)
                     lab.next_to(line, side, buff=0.13)
-                labels.append(lab)
+                if static:
+                    labels.append(lab)
+                else:
+                    line_group = VGroup(line, lab)
+            blocks.append(Block(f"plot.{i}", line_group, anim="fade", static=static))
+            if plot.get("label") and static:
                 blocks.append(Block(f"label.{len(labels)-1}", lab, anim="fade", static=True))
 
         elif kind == "point":
@@ -227,14 +247,18 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                 dot.move_to(point)
             else:
                 dot = Dot(point, color=col, radius=radius)
-            blocks.append(Block(f"plot.{i}", dot, anim="grow", static=True))
-
+            dot_group = dot
             if plot.get("label"):
                 lab = _label(plot["label"], ground, role=plot.get("label_role", "text"),
                              size=plot.get("label_size", default_label_size))
                 side = _SIDE.get(str(plot.get("label_side", "up")).lower(), UP)
                 lab.next_to(dot, side, buff=0.1)
-                labels.append(lab)
+                if static:
+                    labels.append(lab)
+                else:
+                    dot_group = VGroup(dot, lab)
+            blocks.append(Block(f"plot.{i}", dot_group, anim="grow", static=static))
+            if plot.get("label") and static:
                 blocks.append(Block(f"label.{len(labels)-1}", lab, anim="fade", static=True))
 
         else:

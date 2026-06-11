@@ -1,0 +1,54 @@
+# graph_focus 漸進揭示 demo／驗證稿（非正式節,檔名底線前綴）
+#
+# 目的:驗證 graph_focus 的 `reveal: true`——plot 預設 static(第一幀全亮),
+# 標了 reveal 的 plot 改為等 narration 的 {show plot.N} 才出現;其 label 併入
+# 同一 block,一個 marker 連圖元帶名字一起亮。教學情境取 ε-δ 管狀圖:曲線先在,
+# ε-帶 → δ-帶 → 標註點按旁白順序進場(這正是 §1.6 的教學節奏,先前只能靠 hook)。
+# demo 專用,不屬任何正式節;驗證後留作模板範例。
+
+meta:
+  id: demo_graph_reveal
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Graph Reveal Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Graph Reveal Demo" }
+
+scenes:
+
+  # 1 ---------------- ε-帶 → δ-帶 → 點,跟著旁白逐拍進場(曲線與導線 static)
+  - id: tube_progressive
+    kind: content
+    template: graph_focus
+    accent: definition
+    source: "合成例(取 §1.6 ε-δ 管狀圖的教學節奏)"
+    title: "The Tube, One Beat at a Time"
+    say: |
+      The curve and its target lines are on screen from the start, the way a
+      static frame would be.
+      {show plot.3} First the epsilon band: every output we are allowed to hit.
+      {show plot.4} Then the delta band: the inputs we get to use. Watch the
+      order -- epsilon makes the demand, delta answers it.
+      {show plot.5} And the point where the promise is kept, labelled the
+      moment it appears.
+      {show annotation.0} The reveal order is now a narration decision, not a
+      hook.
+    axes:
+      x_range: [0, 5, 1]
+      y_range: [0, 8, 2]
+      x_length: 6.2
+      y_length: 3.7
+    plots:
+      - { kind: function, expression: "2*x - 1", x_range: [0.5, 4.3], color_role: secondary, label: "$y=f(x)$", label_point: [1.2, 2.3] }
+      - { kind: line, start: [0, 5], end: [4.5, 5], dashed: true, color_role: muted, label: "$L$", label_side: left, label_role: muted }
+      - { kind: line, start: [3, 0], end: [3, 8], dashed: true, color_role: muted, label: "$a$", label_side: down, label_role: muted }
+      - { kind: band, orientation: horizontal, from: 4, to: 6, color_role: warning, opacity: 0.12, reveal: true }
+      - { kind: band, orientation: vertical, from: 2.5, to: 3.5, color_role: secondary, opacity: 0.12, reveal: true }
+      - { kind: point, point: [3, 5], hollow: false, color_role: accent, label: "$(a, L)$", label_side: right, reveal: true }
+    annotations:
+      - "The reveal order of the bands is a narration decision."

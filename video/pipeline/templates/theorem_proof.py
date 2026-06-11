@@ -33,6 +33,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
     blocks += scene_head(spec, ctx, label="[ theorem ]")
+    title = blocks[1].mobject
 
     left = -T.FRAME_W / 2 + T.SIDE_GUTTER
     content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
@@ -47,17 +48,26 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     bar = brand.vrule(statement.height + 0.3, ground, role="accent", width=6)
     bar.next_to(statement, LEFT, buff=0.35)
     card = VGroup(bar, statement)
-    card.move_to([left, 1.4, 0], aligned_edge=LEFT)
+    # The card sits at its designed y; a tall (wrapped) statement grows upward,
+    # so cap its top below the title -- the label/steps/qed cascade follows.
+    card_y = min(1.4, title.get_bottom()[1] - 0.2 - card.height / 2)
+    card.move_to([left, card_y, 0], aligned_edge=LEFT)
     blocks.append(Block("statement", card, anim="fade", static=True))
 
     # -- proof label + steps --
+    # The label sits at its designed y unless a tall (wrapped) statement card
+    # reaches down into it -- then label and steps shift down together.
     proof_label = brand.eyebrow("proof", ground, role="muted")
-    proof_label.move_to([left + 0.4, 0.3, 0], aligned_edge=LEFT)
+    label_y = min(0.3, card.get_bottom()[1] - 0.35)
+    proof_label.move_to([left + 0.4, label_y, 0], aligned_edge=LEFT)
     blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
 
     steps = spec.get("proof", [])
-    step_gap = 0.95
-    proof_top = -0.4
+    step_gap = 0.95     # designed rhythm = MINIMUM pitch
+    min_clear = 0.35    # air kept between tall (wrapped) steps -- pitch expands,
+    #                     steps never collide (the recap_cards fused-rows class)
+    y = label_y - 0.7
+    prev_half = None
     for i, p in enumerate(steps):
         dot = brand.plot_dot(ground, role="secondary", r=0.06)
         # prose() wraps a long step instead of shrinking it, so the steps keep a
@@ -66,8 +76,15 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         txt = brand.prose(p, ground, role="text", size="step", max_width=content_w - 1.0)
         dot.next_to(txt, LEFT, buff=0.3, aligned_edge=UP)
         row = VGroup(dot, txt)
-        row.move_to([left + 0.4, proof_top - i * step_gap, 0], aligned_edge=LEFT)
+        half = row.height / 2
+        if prev_half is None:
+            # first step: clear the label too, if the step wraps tall
+            y = min(y, label_y - (0.2 + proof_label.height / 2 + half))
+        else:
+            y -= max(step_gap, prev_half + min_clear + half)
+        row.move_to([left + 0.4, y, 0], aligned_edge=LEFT)
         blocks.append(Block(f"proof.{i}", row, anim="fade", static=False))
+        prev_half = half
 
     # -- QED line --
     qed_text = spec.get("qed")
@@ -80,7 +97,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         qbox = VGroup(box, mark)
         qbox.next_to(line, RIGHT, buff=0.3)
         row = VGroup(line, qbox)
-        row.move_to([left + 0.4, proof_top - len(steps) * step_gap - 0.1, 0], aligned_edge=LEFT)
+        half = row.height / 2
+        if prev_half is None:
+            y_qed = y - 0.1  # no steps: legacy position below the label zone
+        else:
+            y_qed = y - max(step_gap, prev_half + min_clear + half) - 0.1
+        row.move_to([left + 0.4, y_qed, 0], aligned_edge=LEFT)
         blocks.append(Block("qed", row, anim="flash_in", static=False))
 
     blocks.append(motif_corner(ground))

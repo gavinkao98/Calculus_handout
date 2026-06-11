@@ -39,12 +39,15 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks: list[Block] = []
 
     blocks += scene_head(spec, ctx, label="[ example ]")
+    title = blocks[1].mobject
 
     steps = spec.get("steps", [])
     left_x = -T.FRAME_W / 2 + T.SIDE_GUTTER          # left column anchor
     right_x = 1.2                                      # right column anchor
     col_top = 1.4                                      # below the header
-    row_gap = 1.25
+    row_gap = 1.25                                     # designed rhythm = MINIMUM pitch
+    min_clear = 0.35                                   # air kept between tall rows
+    title_clear = 0.2                                  # air a tall first row keeps below the title
 
     left_rows, right_rows = [], []
     for i, st in enumerate(steps):
@@ -74,15 +77,30 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # vertically place rows in lockstep so left text & right math share a baseline.
     # move_to(..., aligned_edge=LEFT) is the positioning pattern proven to work in
     # definition_math/intro/outro; set_y/align_to combos were the failing path.
-    for i, (lr, rr) in enumerate(zip(left_rows, right_rows)):
-        y = col_top - i * row_gap
+    # Pitch: the designed rhythm (row_gap) is a MINIMUM -- when adjacent rows are
+    # tall (wrapped text, fraction math) the pitch expands to keep min_clear of
+    # air, so rows never collide (the recap_cards fused-rows class). Rows that
+    # fit the rhythm keep their exact legacy position.
+    ys: list[float] = []
+    y = col_top
+    prev_half = None
+    for lr, rr in zip(left_rows, right_rows):
+        half = max(lr.height, rr.height) / 2
+        if prev_half is None:
+            # a tall FIRST row also grows upward -- keep it clear of the title
+            y = min(y, title.get_bottom()[1] - title_clear - half)
+        else:
+            y -= max(row_gap, prev_half + min_clear + half)
         lr.move_to([left_x, y, 0], aligned_edge=LEFT)
         rr.move_to([right_x, y, 0], aligned_edge=LEFT)
+        ys.append(y)
+        prev_half = half
 
-    # centre divider between the columns
+    # centre divider between the columns (spans the real row extent; for
+    # rhythm-pitched rows this equals the legacy row_gap*len formula)
     if steps:
-        div = brand.vrule(row_gap * len(steps) - 0.2, ground, role="hairline")
-        div.move_to([(left_x + 4.9 + right_x) / 2 - 0.2, col_top - (len(steps) - 1) * row_gap / 2, 0])
+        div = brand.vrule((ys[0] - ys[-1]) + row_gap - 0.2, ground, role="hairline")
+        div.move_to([(left_x + 4.9 + right_x) / 2 - 0.2, (ys[0] + ys[-1]) / 2, 0])
         blocks.append(Block("divider", div, anim="fade", static=True, layer="decoration"))
 
     # Each step's reasoning text + its worked math reveal TOGETHER on one beat, so

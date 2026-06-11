@@ -18,12 +18,15 @@ from . import (
     definition_math,
     derivation,
     example_walkthrough,
+    graph_compare,
     graph_focus,
     intro,
     outro,
     procedure_steps,
     recap_cards,
+    sign_chart,
     theorem_proof,
+    value_table,
 )
 
 Builder = Callable[[dict[str, Any], dict[str, Any]], "list[Block]"]
@@ -32,10 +35,13 @@ REGISTRY: dict[str, Builder] = {
     "definition_math": definition_math.build,
     "derivation": derivation.build,
     "example_walkthrough": example_walkthrough.build,
+    "graph_compare": graph_compare.build,
     "graph_focus": graph_focus.build,
     "procedure_steps": procedure_steps.build,
+    "sign_chart": sign_chart.build,
     "theorem_proof": theorem_proof.build,
     "recap_cards": recap_cards.build,
+    "value_table": value_table.build,
     "intro": intro.build,
     "outro": outro.build,
 }

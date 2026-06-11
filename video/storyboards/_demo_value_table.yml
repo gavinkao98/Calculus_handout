@@ -1,0 +1,68 @@
+# value_table 模板 demo／驗證稿（非正式節,檔名底線前綴）
+#
+# 目的:驗證新 value_table 模板的兩個 reveal 軸——
+#   scene 1: 極限數值逼近表(§1.3 的招牌節奏),reveal: cols 逐欄進場,
+#            accent_col 標 punchline 欄("→ 3");
+#   scene 2: 公式總表(ch02-03 的導數規則型),reveal: rows 逐列進場,
+#            header 靜態、accent_row 標關鍵列。
+# demo 專用,不屬任何正式節;驗證後留作模板範例。
+
+meta:
+  id: demo_value_table
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Value Table Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Value Table Demo" }
+
+scenes:
+
+  # 1 -------------------- 極限數值表:逐欄 reveal(每拍逼近一步)
+  - id: limit_table
+    kind: content
+    template: value_table
+    accent: example
+    source: "合成例(取 §1.3 數值逼近表的型)"
+    title: "Closing In on $x=2$"
+    reveal: cols
+    say: |
+      We cannot plug two into this function -- the denominator vanishes. So
+      we sneak up on it instead.
+      {show col.0} Track two quantities: the input $x$, and the output $f(x)$.
+      {show col.1} At $x=1.9$, the output is $2.9$.
+      {show col.2} At $1.99$, we get $2.99$.
+      {show col.3} At $1.999$ -- three digits closer -- the output is $2.999$.
+      {show col.4} The pattern is unmistakable: as $x$ closes in on $2$, the
+      outputs close in on $3$. That number is the limit.
+    statement: "What happens to $f(x)=\\dfrac{x^2-x-2}{x-2}$ as $x$ approaches $2$?"
+    header: ["$x$", "$1.9$", "$1.99$", "$1.999$", "$x \\to 2$"]
+    rows:
+      - ["$f(x)$", "$2.9$", "$2.99$", "$2.999$", "$f(x) \\to 3$"]
+    accent_col: 4
+
+  # 2 -------------------- 公式總表:逐列 reveal(header 靜態框架)
+  - id: derivative_rules
+    kind: content
+    template: value_table
+    accent: recap
+    source: "合成例(取 ch02-03 導數規則總表的型)"
+    title: "Derivatives Worth Memorising"
+    say: |
+      Here are the building-block derivatives collected in one place.
+      {show row.0} Powers: bring the exponent down, lower it by one.
+      {show row.1} Sine differentiates to cosine.
+      {show row.2} And the exponential function is its own derivative --
+      the property that makes $e$ special.
+      {show row.3} The natural logarithm rounds out the list.
+    header: ["Function", "Derivative"]
+    rows:
+      - ["$x^n$", "$n\\,x^{n-1}$"]
+      - ["$\\sin x$", "$\\cos x$"]
+      - ["$e^x$", "$e^x$"]
+      - ["$\\ln x$", "$\\dfrac{1}{x}$"]
+    accent_row: 2

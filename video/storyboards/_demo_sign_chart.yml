@@ -1,0 +1,73 @@
+# sign_chart 模板 demo／驗證稿（非正式節,檔名底線前綴）
+#
+# 目的:驗證新 sign_chart 模板——數線符號表(ch04 §4.5 單調性與之後
+# curve sketching 的 workhorse):
+#   scene 1: 標準雙列表(f' 正負 + f 增減箭頭),逐區間 {show mark.R.I} 進場,
+#            +/- 自動著色(success/warning)、箭頭用 dict 指定 role;
+#   scene 2: excluded point(垂直漸近線,空心圈)+ 兩區間最小型。
+# demo 專用,不屬任何正式節;驗證後留作模板範例。
+
+meta:
+  id: demo_sign_chart
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Sign Chart Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Sign Chart Demo" }
+
+scenes:
+
+  # 1 ----------------- 標準型:f' 正負三區間 + f 增減,逐區間走
+  - id: cubic_monotonicity
+    kind: content
+    template: sign_chart
+    accent: procedure
+    source: "合成例(取 ch04 §4.5 Monotonicity 的型)"
+    title: "Where Is $f$ Increasing?"
+    say: |
+      The derivative factors cleanly, so its sign is decided by the two
+      critical points, minus one and one. Walk the line left to right.
+      {show mark.0.0} Left of minus one, both factors agree: the derivative
+      is positive.
+      {show mark.1.0} So $f$ increases there.
+      {show mark.0.1} Between the critical points the factors disagree, and
+      the derivative turns negative.
+      {show mark.1.1} The function falls.
+      {show mark.0.2} Past one, both factors are positive again,
+      {show mark.1.2} and $f$ rises. Increasing, decreasing, increasing --
+      read straight off the chart.
+    statement: "$f(x)=x^3-3x$, so $f'(x)=3(x-1)(x+1)$."
+    points: ["-1", "1"]
+    rows:
+      - { label: "f'(x)", marks: ["+", "-", "+"] }
+      - { label: "f", marks: [{ tex: "\\nearrow", role: success },
+                              { tex: "\\searrow", role: warning },
+                              { tex: "\\nearrow", role: success }] }
+
+  # 2 ----------------- excluded point:漸近線空心圈 + 兩區間
+  - id: reciprocal_chart
+    kind: content
+    template: sign_chart
+    accent: procedure
+    source: "合成例(倒數函數,垂直漸近線)"
+    title: "Decreasing on Both Sides"
+    say: |
+      The reciprocal function is not even defined at zero -- the hollow ring
+      marks the break.
+      {show mark.0.0} To the left, the derivative is negative,
+      {show mark.0.1} and to the right, negative again.
+      {show mark.1.0} So the function falls on each side of the break --
+      {show mark.1.1} but it is NOT decreasing across it: the two branches
+      are separate.
+    statement: "$f(x)=\\dfrac{1}{x}$ has $f'(x)=-\\dfrac{1}{x^2}$, negative wherever it is defined."
+    points:
+      - { label: "0", excluded: true }
+    rows:
+      - { label: "f'(x)", marks: ["-", "-"] }
+      - { label: "f", marks: [{ tex: "\\searrow", role: warning },
+                              { tex: "\\searrow", role: warning }] }

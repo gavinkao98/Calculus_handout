@@ -1,0 +1,80 @@
+# 列高撐開（tall rows）壓測稿（非正式節,檔名底線前綴）
+#
+# 目的:驗證 example_walkthrough / procedure_steps / theorem_proof 的列距語義
+# 「固定節奏為最小 pitch,內容變高才撐開」——修繕前這三個模板用純固定 pitch,
+# 換行步驟文字／高分數式會與下一列黏連(recap_cards 2026-06-10 已付過學費的
+# 同類 bug;當時 sizecheck 的 overlap guard 抓得到,但修法落在作者改短文字)。
+# 本稿的內容刻意又長又高:修繕前 sizecheck 必報 overlap,修繕後應 clean。
+# demo 專用,不屬任何正式節;驗證後留作回歸測試樣本。
+
+meta:
+  id: demo_tall_rows
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Tall Rows Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Tall Rows Demo" }
+
+scenes:
+
+  # 1 ------------- example_walkthrough:換行長文字 + 疊式分數,逼列距撐開
+  - id: walkthrough_tall
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "列高壓測(合成例,非講義內容)"
+    title: "Walkthrough With Tall Rows"
+    say: |
+      Each step here is deliberately tall, so the rows must expand.
+      {show math.0} A long wrapped reasoning sentence beside a stacked fraction.
+      {show math.1} Another tall pair right below it.
+      {show math.2} And a short closing step.
+      {show takeaway} Rows expanded, nothing collided.
+    steps:
+      - { text: "Write the difference quotient for the function and keep every term visible so nothing is lost along the way.", math: "\\dfrac{\\dfrac{1}{2+h} - \\dfrac{1}{2}}{h}" }
+      - { text: "Combine the two fractions in the numerator over a common denominator before any cancellation is attempted.", math: "\\dfrac{\\dfrac{-h}{2(2+h)}}{h}", hot: true }
+      - { text: "Cancel the factor of h.", math: "-\\dfrac{1}{2(2+h)}", mark: ok }
+    takeaway: "Tall rows push the next row down instead of colliding with it."
+
+  # 2 --------------------- procedure_steps:超長步驟文字(換行 4-5 行)
+  - id: procedure_tall
+    kind: content
+    template: procedure_steps
+    accent: procedure
+    source: "列高壓測(合成例,非講義內容)"
+    title: "Procedure With a Wrapped Step"
+    say: |
+      Step text in this template is narrow, so a long sentence wraps tall.
+      {show math.0} The first step wraps to many lines and the next row keeps
+      clear of it.
+      {show math.1} The second step is short.
+      {show math.2} So is the third.
+    steps:
+      - { text: "Replace the function value with the limit definition and write out every intermediate expression in full, keeping the entire difference quotient visible on the line.", math: "\\dfrac{f(a+h)-f(a)}{h}" }
+      - { text: "Simplify the numerator.", math: "4ah + 2h^2" }
+      - { text: "Let h go to zero.", math: "f'(a) = 4a" }
+
+  # 3 ------------- theorem_proof:兩行 statement(頂著 title clamp)+ 換行證明步驟 + QED
+  - id: proof_tall
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    source: "列高壓測(合成例,非講義內容)"
+    title: "Proof With Wrapped Steps"
+    say: |
+      The wrapped statement keeps clear of the title, and the proof rows
+      below expand to fit their content.
+      {show proof.0} The first proof step is a long sentence that wraps and
+      must not touch the step below.
+      {show proof.1} The second step wraps as well.
+      {show qed} The closing line still lands cleanly.
+    statement: "If a function is differentiable at a point, then it is continuous there."
+    proof:
+      - "Write the difference of function values as the difference quotient multiplied by the increment, both factors explicit."
+      - "The first factor tends to the derivative while the second tends to zero, so their product tends to zero."
+    qed: "Therefore differentiability implies continuity."

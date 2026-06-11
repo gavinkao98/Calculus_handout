@@ -43,7 +43,7 @@ so scene `kind` is first-class and silent (no-narration) scenes are supported.
 
 | Ported verbatim (validated, no gain in rewriting) | Rewritten from scratch |
 |---|---|
-| `visuals/theme.py` (Midnight Canvas palette + typography + layout metrics) | storyboard schema + format |
+| `visuals/theme.py` (Midnight Canvas palette + Times typography + layout metrics) | storyboard schema + format |
 | `visuals/graph_utils.py` (safe expr eval + sampling) | narration → beats compiler |
 | `visuals/layout.py` (16:9 zone layout) | scene templates |
 | ffmpeg mux/concat logic *(done fresh as `pipeline/mux.py`)* | TTS backend (Gemini) |
@@ -148,12 +148,30 @@ scenes:
 
 | Field | Required | Meaning |
 |---|---|---|
-| `template` | yes | which scene template (see catalog, TODO) |
+| `template` | yes | which scene template (see "Template catalog" below) |
 | `accent` | for definition-family | colour role: `definition` / `theorem` / `proposition` / `example` / `warning` / `procedure` / `recap`. Replaces old `content_type`. |
 | `title` | yes | on-screen scene title; `$...$` allowed for math |
 | `say` | yes | the single narration field (see below) |
 | `statement`, `math`, `steps`, `plots`, … | per template | the on-screen visual payload |
 | `hook` | no | `"<module>:<fn>"` custom-animation factory importable from `video/` (e.g. `"animations.ch01_inverse_functions_hooks:can_we_go_backwards"`). The factory receives `(spec, ctx, template_blocks)` and returns the final block list: replace a block's mobject **keeping its reveal id** (so `{show ...}` markers and approved narration stay untouched), defer static elements into a beat, or attach a callable anim `(scene, mobject, ground) -> seconds spent` (`pipeline/blocks.py`). The template payload in the storyboard stays as the no-hook fallback — deleting the `hook:` line restores the stock scene. Wired in `pipeline/templates/__init__.py:_apply_hook`. |
+
+### Template catalog (content scenes)
+
+One line per template — teaching shape, payload, and what `{show ...}` can
+target. Demo storyboards live in `storyboards/_demo_*.yml`.
+
+| template | teaching shape | payload fields | reveal targets |
+|---|---|---|---|
+| `definition_math` | definition / theorem statement / note / motivation: statement + math lines | `statement`, `math[]`, `kicker` | `math.N` |
+| `theorem_proof` | statement card + dot-led proof steps + QED | `statement`, `proof[]`, `qed` | `proof.N`, `qed` |
+| `example_walkthrough` | discrete worked steps, reasoning beside math, ✓/✗ marks | `steps[{text,math,mark,hot}]`, `takeaway`, `takeaway_tone` | `math.N`, `takeaway` |
+| `procedure_steps` | numbered procedure + bottom worked strip | `steps[{text,math}]`, `worked[]` | `math.N`, `worked` |
+| `derivation` | full-width continuous transformation chain | `statement`, `lines[]`, `align_on` | `line.N` |
+| `graph_focus` | one full-frame plot | `axes`, `plots[]`, `annotations[]` | `annotation.N`; opt-in `plot.N` (`reveal: true`) |
+| `graph_compare` | two graph panels side by side — the comparison is the lesson (HLT, f vs f′, converges vs diverges) | `left`/`right` `{axes, plots, caption, verdict}`, `annotations[]` | `caption.left/right`, `left.plot.N`/`right.plot.N` (`reveal: true`), `annotation.N` |
+| `value_table` | numeric limit table / formula grid / property comparison | `header[]`, `rows[][]`, `reveal: rows\|cols`, `accent_col`/`accent_row`, `statement` | `row.N` or `col.N` |
+| `sign_chart` | number line + signed interval rows (monotonicity, curve sketching) | `points[]` (`excluded: true` for a break), `rows[{label, marks}]`, `statement` | `mark.R.I` (row R, interval I) |
+| `recap_cards` | key points + remember-formula cards | `points[]`, `formulas[]` | `point.N`, `formula.N` |
 
 ### Template selection: discrete steps vs a derivation chain
 
@@ -180,6 +198,16 @@ computation) needs 7–9:
   statement, ~4 with one; ~7 single-height lines. `sizecheck` flags the
   overflow; the fix is a split, not a squeeze. Demo / reference storyboard:
   `storyboards/_demo_derivation.yml` (the real ch02 chain + a 6-line probe).
+- **Row pitch in the step templates is a minimum, not a constant.**
+  `example_walkthrough` / `procedure_steps` / `theorem_proof` place rows on
+  their designed rhythm (1.25 / 1.4 / 0.95) but expand the pitch when adjacent
+  rows are tall (wrapped step text, fraction math), keeping ≥0.35 of air — so
+  rows never collide (the recap_cards fused-rows class, fixed at the template
+  layer 2026-06-11). A tall first row / statement also pushes *down* off the
+  title instead of growing into it. Consequence for authoring: tall content
+  eats rows — the 3–4 step capacity assumes single-line steps; with stacked
+  fractions expect ~3. Overflow now exits the bottom (sizecheck catches it);
+  the fix is still a split. Stress demo: `storyboards/_demo_tall_rows.yml`.
 
 ### `say`: narration + inline reveal (the core change)
 
@@ -203,6 +231,12 @@ Rules:
 - Static elements (title, axes, statement) appear at scene start by default; only
   elements named by a `{show ...}` wait for their beat. (This is the old static/dynamic
   split, now expressed inline instead of in a per-template table.)
+- **`graph_focus` plots are static by default** (the whole graph is on screen from
+  frame 1). Mark a plot entry `reveal: true` to make it wait for `{show plot.N}` —
+  the teaching order (curve first, *then* the ε-band, *then* the δ-band) becomes a
+  beat decision in `say`, no hook needed. A revealed plot's `label` folds into the
+  same block, so one marker brings the element and its name together. Demo:
+  `storyboards/_demo_graph_reveal.yml`.
 - LaTeX in `say` is passed to Gemini TTS as-is. **No spoken-math rewrite.** If a specific
   phrase reads better a particular way, just write it that way in `say`.
 
@@ -220,24 +254,31 @@ style) lives here. Clean separation.
 
 ### Text rendering: prose vs math (no garble)
 
-On-screen text takes one of two render paths. Both are Computer Modern, but manim
-sizes them differently for the same `font_size`, and only one understands LaTeX:
+On-screen text takes one of two render paths. Both are Times (matching the LaTeX
+handout's newtxtext/newtxmath), but manim sizes them differently for the same
+`font_size`, and only one understands LaTeX:
 
 | Path | Engine | Understands `$math$` / `\\`? | Used by |
 |---|---|---|---|
-| `Text` | Pango (OTF font) | **No** — markup prints literally (the garble) | `brand.body_text`, `brand.heading` |
-| `Tex` / `MathTex` | LaTeX | Yes | `brand.prose`, `brand.heading_rich`, `brand.math_line` |
+| `Text` | Pango (Times New Roman) | **No** — markup prints literally (the garble) | `brand.heading`, `brand.eyebrow` |
+| `Tex` / `MathTex` | LaTeX (newtxtext + newtxmath) | Yes | `brand.body_text`, `brand.prose`, `brand.heading_rich`, `brand.math_line` |
 
-A `Text` is ~1.34× taller than a `Tex` at equal `font_size`, so prose rendered via
-Tex is scaled up by `theme.TEX_TEXT_SCALE` to sit at the same size as `body_text`
+`brand.body_text` renders via `Tex(r'\text{...}')` (not Pango `Text`) so body prose
+gets LaTeX-quality kerning — matching the handout. Headings still use Pango `Text`
+(SEMIBOLD weight, which Tex cannot express); at display sizes and bold weight the
+Pango kerning difference is not perceptible.
+
+A `Text` is ~1.36× taller than a `Tex` at equal `font_size`, so prose rendered via
+Tex is scaled up by `theme.TEX_TEXT_SCALE` to sit at the same size as headings
 beside it. Math (`math_line`) keeps its own size role and is left unscaled.
 
 **The rule (templates must follow it):** any field an author might put `$` or `\`
 into — `title`, `statement`, step `text`, `takeaway`, recap `points` — is rendered
 through **`brand.prose`** (body prose) or **`brand.heading_rich`** (titles). These
-are the single decision point for Text-vs-Tex: markup → Tex, otherwise → wrapped
-Text. Never call `body_text` / `heading` directly on an author prose field. Pure
-math fields (`math`, `formulas`, `proof`, `worked`) go through `brand.math_line`.
+are the single decision point for markup routing: markup → Tex text-mode,
+otherwise → `body_text` (also Tex, for kerning). Never call `heading` directly on
+an author prose field. Pure math fields (`math`, `formulas`, `proof`, `worked`) go
+through `brand.math_line`.
 
 Plain-Text-only fields are the intro/outro brand labels (`meta.chapter`,
 `meta.chapter_title`, `meta.section`, `meta.title`, `meta.tagline`,
@@ -299,7 +340,7 @@ exceptions). Both run in `make.py` before render.
 |---|---|---|
 | `$math$` or `\` in a plain-Text field (`title`, `meta.*` labels) | put math only in markup-capable fields | prints literally; **lint error** |
 | odd number of `$` | balance every `$…$` | LaTeX crash; **lint error** |
-| `body_text`/`heading` on a field that may hold `$`/`\` | `brand.prose` / `brand.heading_rich` | garble; routing is centralised there |
+| `heading` on a field that may hold `$`/`\` | `brand.prose` / `brand.heading_rich` | garble; routing is centralised there |
 | `math_line` + `scale_to_fit_width` on stacked prose | `brand.prose(..., max_width=…)` (wraps) | size mismatch; **sizecheck error** |
 | manual `\\` break in prose | plain sentence, let prose wrap | arbitrary break; **lint warn** |
 | `muted` for teaching content (prose **or** direct `MathTex`/`Text` value labels) | `text`/`primary` or a semantic accent | too faint; **sizecheck warn** on prose only — direct labels are convention |
@@ -419,8 +460,11 @@ WAV and measured locally; validated end-to-end on §1.1 — each reveal lands wi
 
 ## Open questions / not yet decided
 
-- Template catalog for gen-2: keep the old 9 names, or reshape now that intro/outro are
-  separate kinds? (Leaning: keep the content templates, drop nothing yet.)
+- ~~Template catalog for gen-2~~ — resolved 2026-06-11: the catalog above. The
+  ported content templates all stayed; gen-2 added `derivation` (2026-06-11),
+  then `value_table` / `graph_compare` / `sign_chart` (built ahead of §1.3 /
+  ch02 / §4.5 per user call — static templates first, hooks stay the animation
+  layer).
 - BGM: source, ducking, licensing.
 - `{show ...}` target grammar: dotted (`math.0`) vs bracketed (`math[0]`). Currently dotted.
 - Gemini specifics (resolved): model id `gemini-3.1-flash-tts-preview` (CLI-configurable);

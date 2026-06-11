@@ -10,21 +10,20 @@ Two grounds:
 - DARK  -> teaching frames (definition/example/procedure/theorem/recap/graph)
 - LIGHT -> brand frames (intro / outro), paper ground with the NTU lockup
 
-Fonts (DEVIATION from tokens, settled): all non-math text uses Computer Modern
-Unicode (CMU Serif / CMU Typewriter Text), NOT the sans token families (Space
-Grotesk / Hanken / JetBrains Mono). Chosen so prose and LaTeX math share one
-family, the OTF embeds in-repo (no Google Fonts fetch), and the glyphs the sans
-body font lacked (checkmark/times/QED) never tofu. Registered at runtime by
-_bootstrap.register_design_fonts from the vendored OTF files in assets/fonts/.
-Math (MathTex/Tex) is also Computer Modern via LaTeX. CJK text in the NTU logo
-uses Noto Sans TC (system font, not vendored).
+Fonts (DEVIATION from tokens, settled): body text uses LaTeX \text{} (newtxtext)
+for typographically correct kerning; headings use Pango Times New Roman SEMIBOLD
+(Tex cannot express font weight). NOT the sans token families (Space Grotesk /
+Hanken / JetBrains Mono). Chosen to match the LaTeX handout (newtxtext +
+newtxmath). Math (MathTex/Tex) uses newtxmath via a global TeX template set by
+_bootstrap._set_tex_template. CJK text in the NTU logo uses Noto Sans TC (system
+font, not vendored).
 """
 from __future__ import annotations
 
-# -- fonts (family names as registered by manimpango) ---------------------
-FONT_DISPLAY = "CMU Serif"
-FONT_BODY = "CMU Serif"
-FONT_MONO = "CMU Typewriter Text"
+# -- fonts (Pango family names) -------------------------------------------
+FONT_DISPLAY = "Times New Roman"
+FONT_BODY = "Times New Roman"
+FONT_MONO = "Courier New"
 
 # -- type scale -----------------------------------------------------------
 # tokens.json gives px @ 1920x1080. manim font_size is its own unit; PX_TO_FS
@@ -34,13 +33,13 @@ FONT_MONO = "CMU Typewriter Text"
 PX_TO_FS = 0.72
 
 # manim renders Text (Pango) and Tex/MathTex (LaTeX) at *different* visual sizes
-# for the same font_size: a Text is ~1.34x taller than a Tex at equal font_size
-# (measured, CMU Serif vs LaTeX Computer Modern). So prose rendered via Tex must
-# be scaled up by this factor to sit at the same size as body_text beside it --
-# otherwise a markup row (Tex) looks smaller than a plain row (Text) in the same
-# column. Applied in brand.prose_tex; math (brand.math_line) is intentionally its
-# own size role and is left unscaled. One global knob -- retune if fonts change.
-TEX_TEXT_SCALE = 1.34
+# for the same font_size: a Text is ~1.36x taller than a Tex at equal font_size
+# (measured, Times New Roman vs newtx). So prose rendered via Tex must be scaled
+# up by this factor to sit at the same size as body_text beside it -- otherwise a
+# markup row (Tex) looks smaller than a plain row (Text) in the same column.
+# Applied in brand.prose_tex; math (brand.math_line) is intentionally its own
+# size role and is left unscaled. One global knob -- retune if fonts change.
+TEX_TEXT_SCALE = 1.36
 
 _SCALE_PX = {
     "display": 104, "h1": 62, "h2": 46, "math": 46, "math_sm": 36,

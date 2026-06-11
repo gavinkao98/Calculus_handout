@@ -33,14 +33,19 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
     blocks += scene_head(spec, ctx, label="[ procedure ]")
+    title = blocks[1].mobject
 
     left = -T.FRAME_W / 2 + T.SIDE_GUTTER
     steps = spec.get("steps", [])
-    row_gap = 1.4
+    row_gap = 1.4        # designed rhythm = MINIMUM pitch
+    min_clear = 0.35     # air kept between tall rows (pitch expands, never collides)
+    title_clear = 0.2    # air a tall FIRST row keeps below the title
     top = 1.5
 
     from manim import Text
     math_rows = []
+    y = top
+    prev_half = None
     for i, st in enumerate(steps):
         numeral = Text(str(i + 1), font=T.FONT_DISPLAY, weight="BOLD",
                        font_size=T.fs(72), color=T.color(ground, "secondary"))
@@ -50,11 +55,17 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         # numeral | rule | text as one left-anchored row (move_to+aligned_edge,
         # the proven pattern); the step's math sits at a fixed right column, same y.
         row = VGroup(numeral, rule, txt).arrange(RIGHT, buff=0.5)
-        y = top - i * row_gap
-        row.move_to([left, y, 0], aligned_edge=LEFT)
-
         m = brand.math_line(st.get("math", ""), ground, role="math", size="math")
+
+        half = max(row.height, m.height) / 2
+        if prev_half is None:
+            # a tall FIRST row also grows upward -- keep it clear of the title
+            y = min(y, title.get_bottom()[1] - title_clear - half)
+        else:
+            y -= max(row_gap, prev_half + min_clear + half)
+        row.move_to([left, y, 0], aligned_edge=LEFT)
         m.move_to([T.FRAME_W / 2 - T.SIDE_GUTTER - 1.4, y, 0])
+        prev_half = half
 
         blocks.append(Block(f"row.{i}", row, anim="fade", static=True))
         math_rows.append(m)

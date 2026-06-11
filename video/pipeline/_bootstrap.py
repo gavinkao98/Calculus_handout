@@ -1,9 +1,7 @@
-"""Put vendored deps (manim, yaml) on sys.path and register design fonts.
+"""Put vendored deps (manim, yaml) on sys.path and configure design fonts.
 
 manim/yaml are not in .venv; they live under .deps_voiceover (manim 0.20.1) and
-.deps (PyYAML). The CMU fonts (Computer Modern Unicode, OTF) are registered with
-manimpango at runtime from assets/fonts/ -- no system install needed. Call
-bootstrap() before importing manim or yaml.
+.deps (PyYAML). Call bootstrap() before importing manim or yaml.
 """
 from __future__ import annotations
 
@@ -21,6 +19,7 @@ def bootstrap() -> None:
         if dep.exists() and str(dep) not in sys.path:
             sys.path.insert(0, str(dep))
     register_design_fonts()
+    _set_tex_template()
 
 
 def register_design_fonts() -> list[str]:
@@ -42,3 +41,21 @@ def register_design_fonts() -> list[str]:
             pass
     _FONTS_REGISTERED = True
     return registered
+
+
+_TEX_TEMPLATE_SET = False
+
+
+def _set_tex_template() -> None:
+    """Set the global manim TeX template to use newtxtext + newtxmath (Times)."""
+    global _TEX_TEMPLATE_SET
+    if _TEX_TEMPLATE_SET:
+        return
+    try:
+        from manim import config, TexTemplate
+    except Exception:
+        return
+    tpl = TexTemplate()
+    tpl.add_to_preamble(r"\usepackage{newtxtext}" "\n" r"\usepackage{newtxmath}")
+    config.tex_template = tpl
+    _TEX_TEMPLATE_SET = True

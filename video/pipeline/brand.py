@@ -3,8 +3,9 @@
 Builds the recurring design elements templates compose. Colours come from the
 active ground's palette (light/dark) via theme.py -- no hex literals here.
 
-Key helper: wrap_text() greedily wraps a string to a max width by inserting
-newlines ONLY at spaces, so words never break mid-glyph (the recurring bug).
+Key helper: body_text() renders body prose via LaTeX \\text{} (newtxtext) for
+typographically correct kerning. wrap_text() is kept as a utility for callers
+that still need Pango Text wrapping (headings, labels).
 """
 from __future__ import annotations
 
@@ -45,15 +46,15 @@ _BRAND = (
 # out empty -> "ParseError: no element found". The estimate removes that whole
 # class of failure (and is much faster -- no SVG per trial).
 #
-# Calibration (manim units per char*font_size), measured with CMU Serif:
-#   "Inverse fx 0123"       (15 latin) @ fs48 -> width 4.336 => K = 0.00602
-#   "Distinct outputs always." (24)    @ fs23 -> width 3.400 => K = 0.00616
-#   "Testing with Algebra"  (20 latin) @ fs45 -> width 5.686 => K = 0.00632
+# Calibration (manim units per char*font_size), measured with Times New Roman:
+#   "Inverse fx 0123"       (15 latin) @ fs48 -> width 4.111 => K = 0.00571
+#   "Distinct outputs always." (24)    @ fs23 -> width 3.102 => K = 0.00562
+#   "Testing with Algebra"  (20 latin) @ fs45 -> width 5.057 => K = 0.00562
 # CJK glyphs are full-width, so they count as ~2x a latin advance.
-# Upper bound of measurements is 0.00632; use 0.0064 as a small safety margin
+# Upper bound of measurements is 0.00571; use 0.0058 as a small safety margin
 # (overflow is worse than a slightly short line).
 
-_WIDTH_K = 0.0064
+_WIDTH_K = 0.0058
 
 
 def _char_weight(ch: str) -> float:
@@ -133,18 +134,58 @@ def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",
     return mob
 
 
-def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
-              max_width: float | None = None, align: str = "LEFT") -> Text:
-    """CMU Serif body text. If max_width given, wraps at spaces (never mid-word).
+def _escape_tex(text: str) -> str:
+    """Escape characters that are special in LaTeX text mode."""
+    text = text.replace("\\", r"\textbackslash{}")
+    for ch in "&%$#_{}":
+        text = text.replace(ch, "\\" + ch)
+    text = text.replace("~", r"\textasciitilde{}")
+    text = text.replace("^", r"\textasciicircum{}")
+    return text
 
-    NOTE: *align* is accepted for caller intent but multi-line justification is
-    not yet applied (manim Text defaults to left). TODO: centre multi-line when
-    align == "CENTER". Single-line text is unaffected.
+
+def _body_tex(text: str, ground: str, role: str, size: str) -> Tex:
+    """Single-line body text via LaTeX \\text{} for correct kerning."""
+    return Tex(r"\text{" + _escape_tex(text) + "}",
+               color=T.color(ground, role),
+               font_size=T.fs(size) * T.TEX_TEXT_SCALE)
+
+
+def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
+              max_width: float | None = None, align: str = "LEFT"):
+    """Body text rendered via LaTeX \\text{} (newtxtext) for correct kerning.
+
+    If *max_width* given, wraps at word boundaries (never mid-word). Returns a
+    single Tex for one line, or a VGroup of Tex lines for multi-line.
     """
-    fsz = T.fs(size)
-    content = wrap_text(text, T.FONT_BODY, fsz, max_width) if max_width else text
-    return Text(content, font=T.FONT_BODY, font_size=fsz,
-                color=T.color(ground, role), line_spacing=1.0)
+    if max_width is None:
+        return _body_tex(text, ground, role, size)
+
+    words = text.split()
+    if not words:
+        return _body_tex("", ground, role, size)
+
+    lines: list[Tex] = []
+    cur: list[str] = []
+    for w in words:
+        trial = " ".join(cur + [w])
+        if cur and _body_tex(trial, ground, role, size).width > max_width:
+            lines.append(_body_tex(" ".join(cur), ground, role, size))
+            cur = [w]
+        else:
+            cur.append(w)
+    if cur:
+        lines.append(_body_tex(" ".join(cur), ground, role, size))
+
+    if len(lines) == 1:
+        return lines[0]
+
+    group = VGroup(*lines)
+    if align == "LEFT":
+        group.arrange(DOWN, buff=0.2, aligned_edge=LEFT)
+    else:
+        group.arrange(DOWN, buff=0.2)
+    return group
 
 
 def heading_rule(width: float, ground: str, *, role: str = "secondary") -> Line:

@@ -1,0 +1,61 @@
+# graph_compare 模板 demo／驗證稿（非正式節,檔名底線前綴）
+#
+# 目的:驗證新 graph_compare 模板——雙圖並排對照,§1.1 水平線測試場景重建:
+# 先前這個版面要在 hook 裡手寫 ~90 行(animations/ch01_inverse_functions_hooks.py
+# 的 horizontal_line_test),現在 panel 是 payload、hook 只剩動畫本體。
+# 同場驗證:panel 內 plot 沿用 graph_focus 全套機制(含 reveal: true 漸進揭示)、
+# caption + verdict(✓/✗)、底部 annotation。
+# demo 專用,不屬任何正式節;驗證後留作模板範例。
+
+meta:
+  id: demo_graph_compare
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Graph Compare Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Graph Compare Demo" }
+
+scenes:
+
+  # 1 ------------- 水平線測試:左 x³(過) vs 右 x²(不過),測試線逐拍進場
+  - id: line_test_compare
+    kind: content
+    template: graph_compare
+    accent: example
+    source: "合成例(取 §1.1 Remark 1.1 水平線測試的型)"
+    title: "The Horizontal Line Test"
+    say: |
+      Two graphs, one question: does any horizontal line cross more than once?
+      {show left.plot.1} On the cube, a test line at any height crosses
+      exactly one point.
+      {show caption.left} Every output is hit by exactly one input -- the cube
+      passes.
+      {show right.plot.1} Now the square. The same test line at one quarter --
+      {show right.plot.2} crosses here,
+      {show right.plot.3} and here again. Two inputs share one output.
+      {show caption.right} The square fails the test.
+      {show annotation.0} Only a graph that passes can be run backwards.
+    left:
+      axes: { x_range: [-1.45, 1.45, 0.5], y_range: [-1.95, 1.95, 0.5] }
+      plots:
+        - { kind: function, expression: "x**3", x_range: [-1.22, 1.22], color_role: secondary, label: "$y=x^3$", label_point: [-1.05, 1.45] }
+        - { kind: line, start: [-1.4, 0.5], end: [1.4, 0.5], dashed: true, color_role: warning, reveal: true }
+      caption: "One crossing at every height."
+      verdict: ok
+    right:
+      axes: { x_range: [-1.55, 1.55, 0.5], y_range: [-0.35, 2.05, 0.5] }
+      plots:
+        - { kind: function, expression: "x**2", x_range: [-1.4, 1.4], color_role: secondary, label: "$y=x^2$", label_point: [-1.32, 1.55] }
+        - { kind: line, start: [-1.5, 0.25], end: [1.5, 0.25], dashed: true, color_role: warning, reveal: true }
+        - { kind: point, point: [-0.5, 0.25], hollow: false, color_role: accent, reveal: true }
+        # 點不掛標籤——panel 縮放後 label 字級過小且壓在虛線上(首渲發現);x=±1/2 由旁白承載
+        - { kind: point, point: [0.5, 0.25], hollow: false, color_role: accent, reveal: true }
+      caption: "Two inputs share one output."
+      verdict: bad
+    annotations:
+      - "Only a graph that passes the test can be run backwards."
