@@ -24,7 +24,12 @@ from .visuals import theme as T
 class Block:
     id: str
     mobject: Any
-    anim: str = "write"      # write|fade|create|grow|slide|highlight|flash_in|write_glow|slide_pop
+    # A string picks a stock reveal below; a CALLABLE is a custom hook
+    # animation: anim(scene, mobject, ground) -> seconds consumed. Hook
+    # factories (video/animations/, wired via the scene's `hook:` field)
+    # use this to choreograph bespoke manim while keeping the audio-driven
+    # beat alignment -- play_block just reports what the animation spent.
+    anim: Any = "write"      # write|fade|create|grow|slide|highlight|flash_in|write_glow|slide_pop|callable
     static: bool = False
     # Overlap-guard scope (sizecheck._overlap_issues): only "content" blocks are
     # tested for screen-space collision against each other. "graph" = axes-space
@@ -60,6 +65,9 @@ def play_block(scene, block: Block, ground: str) -> float:
     mob = block.mobject
     anim = block.anim
     accent = T.color(ground, "accent")
+
+    if callable(anim):
+        return float(anim(scene, mob, ground) or 0.0)
 
     if anim == "fade":
         scene.play(FadeIn(mob, shift=0.1 * UP), run_time=0.5)

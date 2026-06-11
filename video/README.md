@@ -35,8 +35,15 @@ video/
 
 ## 狀態
 
-**目前檢查點（2026-06-10）：輸入換源至 HTML 講義**（見上方「輸入」；決策記錄見
-[REBUILD_STATUS.md](REBUILD_STATUS.md)「2026-06-10 輸入換源」）。§1.1 正以新源
+**目前檢查點（2026-06-11）：正式 hook 機制落地＋§1.1 四個客製動畫接入。**
+場景級 `hook:` 欄（契約見 [DESIGN.md](DESIGN.md) content scene fields）讓客製
+manim 動畫接進 make.py 產線、與音訊驅動的 beat 對齊共存；§1.1 的四段動畫
+（兩進一出映射、雙圖水平線 sweep、A↔B 往返、沿 $y=x$ 翻摺）已生成接入
+（[animations/ch01_inverse_functions_hooks.py](animations/ch01_inverse_functions_hooks.py)），
+待使用者過目認可。全寬推導鏈模板 `derivation` 同期上線（見上方模板清單）。
+
+前一檢查點（2026-06-10）：輸入換源至 HTML 講義（見上方「輸入」；決策記錄見
+[REBUILD_STATUS.md](REBUILD_STATUS.md)「2026-06-10 輸入換源」）。§1.1 以新源
 **從零重走**（內容稿 v2；舊 §1.1 成品為方法論校準原型、已棄用）。以下 2026-06-02
 檢查點所述的工具鏈與 mock 成片仍有效。
 

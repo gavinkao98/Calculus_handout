@@ -51,4 +51,29 @@ def build_blocks(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             f"Scene '{spec.get('id')}' uses unknown template '{template}'. "
             f"Known: {sorted(REGISTRY)}"
         )
-    return REGISTRY[template](spec, ctx)
+    blocks = REGISTRY[template](spec, ctx)
+    return _apply_hook(spec, ctx, blocks)
+
+
+def _apply_hook(spec: dict[str, Any], ctx: dict[str, Any], blocks: "list[Block]") -> "list[Block]":
+    """Scene-level custom-animation escape hatch (the gen-1 `hook` concept,
+    formalised). `hook: "<module>:<fn>"` names a factory importable from the
+    video/ root (e.g. "animations.ch01_inverse_functions_hooks:can_we_go_backwards").
+
+    The factory receives the TEMPLATE's blocks and returns the final list --
+    it may replace a block's mobject (keeping its reveal id, so storyboard
+    {show ...} markers and narration stay untouched), flip static to dynamic,
+    or attach a callable anim (see blocks.Block). The template remains the
+    no-hook fallback: deleting the `hook:` line restores the stock scene."""
+    hook_path = spec.get("hook")
+    if not hook_path:
+        return blocks
+    import importlib
+
+    module_name, _, attr = str(hook_path).partition(":")
+    if not attr:
+        raise ValueError(
+            f"Scene '{spec.get('id')}': hook '{hook_path}' must be '<module>:<function>'."
+        )
+    fn = getattr(importlib.import_module(module_name), attr)
+    return fn(spec, ctx, blocks)

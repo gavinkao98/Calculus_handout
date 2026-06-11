@@ -37,14 +37,16 @@ scenes:
     bgm: soft_intro
     duration: 5.8
 
-  # 2 ------------------------------------------- motivation (definition_math 頂著)
-  # HOOK(第二輪):左 f(x)=x 各輸入箭頭依序亮起、各入各位;右 x² 的 ±1/2 兩箭頭
-  # 匯聚到同一個 1/4,匯聚瞬間頓一下並強調該點(「兩進一出——回不去」)。
+  # 2 ------------------------------------------- motivation(hook 已接線)
+  # hook 動畫:左 f(x)=x 各輸入箭頭依序亮起、各入各位;右 x² 的 ±1/2 兩箭頭
+  # 匯聚到同一個 1/4,匯聚瞬間頓一下強調(「兩進一出——回不去」)。
+  # 下方 math 欄為無 hook 時的 fallback(刪 hook 行即回靜態版)。
   - id: can_we_go_backwards
     kind: content
     template: definition_math
     accent: definition
     kicker: motivation   # motivation 場景沿用 definition 色系,但 eyebrow 標實情
+    hook: "animations.ch01_inverse_functions_hooks:can_we_go_backwards"
     source: "內容稿 u2 can_we_go_backwards"
     title: "Can We Go Backwards?"
     say: |
@@ -130,14 +132,15 @@ scenes:
     takeaway: "No rule can send $\\tfrac14$ back to a single input -- $g$ has no inverse on $[-1,1]$."
     takeaway_tone: warn   # 負面結論(不可逆)→ warning 紅
 
-  # 6 -------------------------------------- proposition: horizontal line test (graph)
-  # HOOK(第二輪):兩圖並排(單調遞增 vs parabola),同一條水平線同步由上往下 sweep;
-  # 左圖任何高度只一交點(綠色短暫強調),右圖掃到某高度出現兩交點(紅色強調)停住,
-  # 兩交點各拉虛線落回 x 軸標出兩個不同輸入。靜態頂著版只畫 parabola 單圖。
+  # 6 -------------------------------------- proposition: horizontal line test(hook 已接線)
+  # hook 動畫:兩圖並排(單調 x³ vs x²),同一條水平線同步由上往下 sweep;左圖任何
+  # 高度只一交點(綠),右圖掃到 y=c 兩交點(紅)停住、拉虛線回 x 軸。
+  # 下方 axes/plots 為無 hook 時的單圖 fallback(刪 hook 行即回靜態版)。
   - id: horizontal_line_test
     kind: content
     template: graph_focus
     accent: proposition
+    hook: "animations.ch01_inverse_functions_hooks:horizontal_line_test"
     source: "內容稿 u6 horizontal_line_test"
     title: "The Horizontal Line Test"
     say: |
@@ -274,13 +277,15 @@ scenes:
     takeaway: "Check by composing: $g(g^{-1}(x))=(\\sqrt[3]{x})^3=x$."
     takeaway_tone: ok   # 正面驗證結論→ success 綠(原模板固定 warning 紅,語意錯)
 
-  # 12 ------------------------------------ proposition: composition identities
-  # HOOK(第二輪):點 x 沿上弧(f)走到 B 中的 f(x),再沿下弧(f⁻¹)走回原處、原點閃一下
-  # 示意「回到自己」;第二趟由 B 中的 y 出發反向走一輪,對應第二條恆等式。
+  # 12 ------------------------------------ proposition: composition identities(hook 已接線)
+  # hook 動畫:A/B 兩集合與往返弧;點 x 沿上弧(f)到 f(x)、沿下弧(f⁻¹)回原點閃一下;
+  # 第二趟由 B 的 f(x) 反向走一輪。兩恆等式逐拍寫出於圖下方。
+  # 下方 math 欄為無 hook 時的 fallback(刪 hook 行即回靜態版)。
   - id: composition_identities
     kind: content
     template: definition_math
     accent: proposition
+    hook: "animations.ch01_inverse_functions_hooks:composition_identities"
     source: "內容稿 u12 composition_identities"
     title: "Composition Identities"
     say: |
@@ -298,13 +303,15 @@ scenes:
       - "$f^{-1}\\!\\bigl(f(x)\\bigr)=x \\quad\\text{for every } x\\in A$"
       - { tex: "$f\\!\\bigl(f^{-1}(y)\\bigr)=y \\quad\\text{for every } y\\in B$", anim: highlight }
 
-  # 13 ------------------------------------------- visual: reflection across y=x
-  # HOOK(第二輪):先畫 y=x³ 與虛線 y=x;曲線沿 y=x「翻摺」生成 ∛x;一組具體點對
-  # (a,b)→(b,a) 以連接線跨過鏡線對應閃示;收在兩曲線＋鏡線並存的全圖。
+  # 13 ------------------------------------------- visual: reflection(hook 已接線)
+  # hook 動畫:場景開於 x³＋y=x 虛線＋(a,b) 點;beat 內 x³ 鏡影沿 y=x「翻摺」
+  # 生成 ∛x,接著連接線、(b,a) 點與標籤逐一進場,收在全圖。
+  # plots 全列為終態(無 hook 時即靜態版;hook 把 ∛x/連接線/(b,a) 延後進場)。
   - id: graphs_mirror_across_y_x
     kind: content
     template: graph_focus
     accent: example
+    hook: "animations.ch01_inverse_functions_hooks:graphs_mirror_across_y_x"
     source: "內容稿 u13 graphs_mirror_across_y_x"
     title: "Mirror Images Across $y=x$"
     say: |

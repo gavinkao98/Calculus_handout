@@ -153,7 +153,7 @@ scenes:
 | `title` | yes | on-screen scene title; `$...$` allowed for math |
 | `say` | yes | the single narration field (see below) |
 | `statement`, `math`, `steps`, `plots`, … | per template | the on-screen visual payload |
-| `hook` | no | dotted path to a custom animation fn (escape hatch, unchanged concept) |
+| `hook` | no | `"<module>:<fn>"` custom-animation factory importable from `video/` (e.g. `"animations.ch01_inverse_functions_hooks:can_we_go_backwards"`). The factory receives `(spec, ctx, template_blocks)` and returns the final block list: replace a block's mobject **keeping its reveal id** (so `{show ...}` markers and approved narration stay untouched), defer static elements into a beat, or attach a callable anim `(scene, mobject, ground) -> seconds spent` (`pipeline/blocks.py`). The template payload in the storyboard stays as the no-hook fallback — deleting the `hook:` line restores the stock scene. Wired in `pipeline/templates/__init__.py:_apply_hook`. |
 
 ### Template selection: discrete steps vs a derivation chain
 
