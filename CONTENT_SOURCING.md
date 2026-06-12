@@ -24,7 +24,8 @@ HTML 線為 `env-example`＋`env-solution`，見 [`experiments/handout_kit/CONTR
       （走 ChatGPT 訂閱配額——動用前徵得使用者同意）對照課文片段覆核：缺口判定是否成立、
       候選是否對症且程度合適、自寫／改作之解的數學正確性、來源與授權標示是否屬實。
       契約沿用 [`experiments/direction_layer/RULE.md`](experiments/direction_layer/RULE.md) ⑤
-      （數學／忠實度／對症性為 blocking；格式為 advisory），收斂到 blocking=0 再交使用者裁決。
+      （數學／忠實度／對症性為 blocking；格式為 advisory），**含圖的數學正確性與視覺可讀性**
+      （`figures.js` 的 JS 函式、domain、特殊點、標記文字 vs 課文描述；viewing window 是否讓教學特徵可辨識——range 過大壓縮曲線形狀等同圖畫錯），收斂到 blocking=0 再交使用者裁決。
       **findings 必須留版控**：Codex 原始輸出落在 `.tmp/`（gitignored、換機即失、使用者看不到），
       因此每輪稽核的 findings 原文＋Claude 的 triage 處置要存進該章旁的
       `chNN_<artifact>-audit.md`（範例：`ch01_example-supplement-audit.md`），不可只留在 commit message 摘要。

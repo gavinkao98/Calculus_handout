@@ -97,7 +97,7 @@
         svg: buildPlot({
           w: 380, h: 260, xmin: -1.95, xmax: 1.95, ymin: -1.25, ymax: 1.25,
           xlabel: "x", ylabel: "y", aria: "Restricted branch of sine.",
-          xticks: [{ x: -P() / 2 }, { x: P() / 2 }], yticks: [{ y: -1 }, { y: 1 }],
+          xticks: [{ x: -P() / 2 }, { x: P() / 2 }], yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
           items: [
             { type: "curve", fn: (x) => Math.sin(x), domain: [-P() / 2, P() / 2], cls: "curve" },
             { type: "text", x: 1.02, y: 1.12, tex: "\\sin x", cls: "a-curve", anchor: "start" },
@@ -111,7 +111,7 @@
         svg: buildPlot({
           w: 380, h: 200, xmin: -0.4, xmax: 3.6, ymin: -1.35, ymax: 1.75,
           xlabel: "x", ylabel: "y", aria: "Restricted branch of cosine.",
-          xticks: [{ x: P() }], yticks: [{ y: -1 }, { y: 1 }],
+          xticks: [{ x: P() }], yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
           items: [
             { type: "curve", fn: (x) => Math.cos(x), domain: [0, P()], cls: "curve" },
             { type: "text", x: 1.25, y: 0.8, tex: "\\cos x", cls: "a-curve", anchor: "start" },
@@ -202,9 +202,11 @@
           w: 460, h: 280, xmin: -3.3, xmax: 2.9, ymin: -2.7, ymax: 2.8,
           xlabel: "x", ylabel: "y",
           aria: "A function with limit 1 at x = -2, limit 0 at x = 0, and limit 2 at x = 2, although f(2) = -2.",
-          xticks: [{ x: -2 }, { x: 2 }],
+          xticks: [{ x: -2, tex: "-2" }, { x: 2, tex: "2" }],
+          yticks: [{ y: -2, tex: "-2" }, { y: 1, tex: "1" }, { y: 2, tex: "2" }],
           items: [
             { type: "curve", fn: (x) => -0.0375 * x * x * x + 0.375 * x * x + 0.4 * x, domain: [-2.8, 1.98], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -0.0375 * x * x * x + 0.375 * x * x + 0.4 * x, domain: [2.02, 2.7], samples: 50, cls: "curve" },
             { type: "dot", x: 2, y: 2, hollow: true },
             { type: "dot", x: 2, y: -2 },
             { type: "text", x: -2.7, y: 1.55, tex: "y=f(x)", cls: "a-curve", anchor: "start" },
@@ -251,9 +253,9 @@
       layout: "single",
       panels: [{
         svg: buildPlot({
-          w: 420, h: 260, xmin: -1, xmax: 7, ymin: -66, ymax: 66,
+          w: 420, h: 260, xmin: -1, xmax: 7, ymin: -20, ymax: 20,
           xlabel: "x", ylabel: "y", aria: "Graph with a vertical asymptote at x = 3.",
-          xticks: [{ x: 3, tex: "3" }],
+          xticks: [{ x: 3, tex: "3" }], yticks: [{ y: 2, tex: "2" }],
           items: [
             { type: "vline", x: 3, cls: "refline" },
             { type: "curve", fn: (x) => (2 * x) / (x - 3), domain: [-0.8, 2.9], samples: 200, cls: "curve" },
@@ -265,7 +267,7 @@
 
     /* ---------------- §1.6 ---------------- */
     "precise-limit": () => {
-      const Lm = 6.498019, Lp = 9.849155;
+      const Lm = 6.150845, Lp = 9.849155;
       return {
         layout: "single",
         panels: [{
@@ -282,7 +284,6 @@
               { type: "vline", x: 3.3, cls: "refline" },
               { type: "dot", x: 3, y: 8, hollow: true },
               { type: "dot", x: 3, y: 11.6 },
-              { type: "dot", x: 2.7, y: Lm, r: 1.8 },
               { type: "dot", x: 3.3, y: Lp, r: 1.8 },
               { type: "text", x: 2.7, y: 0, tex: "a-\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
               { type: "text", x: 3.02, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
