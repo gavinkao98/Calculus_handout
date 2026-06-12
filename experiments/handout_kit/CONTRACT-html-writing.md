@@ -51,7 +51,7 @@ Color = teaching role, applied automatically by `shared/skin-hs.css`. The full v
 | `env-definition` | concept (teal) | defined term in `<em>`; optional `<p class="informal">` gloss |
 | `env-theorem` / `env-proposition` / `env-corollary` | result (blue) | body **auto-italic** (theorem/proposition; see caveat in RESULT for corollary), math stays upright |
 | `env-example` + `env-solution` | practice (green) | always paired inside `<div class="workedexample">` — no solo example |
-| `env-exercise` | practice (green) | “your turn” chip |
+| `env-exercise` | — (do not emit) | the handout ships **no exercises** (separate workbook; user decision 2026-06-12, `CONTENT_SPEC.md` §14). The kit CSS still styles this class, but fragments must not use it. |
 | `env-remark` | aside (gray) | lighter, smaller |
 | `env-proof` | subordinate | end body with `<span class="qed qed-proof"></span>` |
 | `env-caution` | ⚠ red **solid box** | one trap, 1–3 sentences |

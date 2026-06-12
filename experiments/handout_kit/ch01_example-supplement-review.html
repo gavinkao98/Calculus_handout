@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 1 課文範例補充——審核文件（2026-06-12）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.75;
+         max-width: 52rem; margin: 2rem auto 6rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.5rem; }
+  h3 { font-size: 1.02rem; margin: 1.8rem 0 .4rem; }
+  .badge { display: inline-block; font-size: .72rem; padding: .05rem .5rem; border-radius: 999px;
+           vertical-align: middle; margin-left: .45rem; font-weight: 600; }
+  .core { background: #e3efe3; color: #20602a; }
+  .optb { background: #fdf2dd; color: #8a5b00; }
+  .ai   { background: #f3e3f5; color: #7a2585; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .1rem 0 .6rem; }
+  .meta code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  .why  { font-size: .92rem; background: #f2f6fa; border-left: 4px solid #8aa6c0; padding: .5rem .8rem; margin: .6rem 0; }
+  .ex   { border: 1px solid #bcd6bc; border-left: 5px solid #2e7d32; border-radius: 6px;
+          background: #f6faf6; padding: .7rem 1rem; margin: .7rem 0 0; }
+  .sol  { border: 1px solid #d7dde3; border-left: 5px solid #90a0b0; border-radius: 6px;
+          background: #f7f8f9; padding: .7rem 1rem; margin: .35rem 0 .8rem; }
+  .ex::before  { content: "Example"; font-weight: 700; color: #2e7d32; display: block; font-size: .8rem; letter-spacing: .06em; }
+  .sol::before { content: "Solution"; font-weight: 700; color: #5b6b7b; display: block; font-size: .8rem; letter-spacing: .06em; }
+  .note { font-size: .9rem; background: #fff8e8; border-left: 4px solid #d9a514; padding: .5rem .8rem; margin: .5rem 0 1rem; }
+  pre.verdict { background: #102536; color: #e8eef4; padding: 1rem 1.2rem; border-radius: 8px;
+                font-size: .88rem; line-height: 1.7; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: .8rem 0 1.2rem; }
+  th, td { border: 1px solid #c9d3dd; padding: .35rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #e9eff5; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+</style>
+</head>
+<body>
+
+<h1>Ch 1 課文範例補充——審核文件</h1>
+<p class="meta">2026-06-12 ・ 框架：題庫補的是<strong>課文內的 worked examples</strong>（講義不收習題，習題另出獨立習題本）。
+工作流程契約：<code>CONTENT_SOURCING.md</code>。每筆附完整擬改寫的 Example＋Solution——你審的就是會印出來的內容。</p>
+
+<h2>怎麼回覆（裁決表）</h2>
+<pre class="verdict">核心 15 個（E 編號）：照單 / 去掉 ___ / 重議
+選收 6 個：O1.1-d ___   O1.2-d ___   O1.3-b ___   O1.5-d ___   O1.6-c ___   O1.6-d(AI) ___
+          （每個填：收 / 不收；O1.6-d 為 AI 出題，收＝授權我出、你再審）
+build：gen_standalone.py 支援 Ch 1 重生（建議；不回則照此做） / 手改 standalone</pre>
+
+<h2>既有範例盤點（缺口分析的基準）</h2>
+<table>
+<tr><th>節</th><th>既有</th><th>內容</th><th>本批擬補</th></tr>
+<tr><td>§1.1</td><td>4</td><td>學號一對一；x 與 x² 判一對一；x、x³ 求反函數；x³+2 求反函數（單向驗證）</td><td>+3（→7）</td></tr>
+<tr><td>§1.2</td><td>2</td><td>arcsin(1/2)、tan(arcsin ⅓)；cos(arctan x)</td><td>+3（→5）</td></tr>
+<tr><td>§1.3</td><td>2</td><td>兩個列表法猜極限</td><td>+1（→3）</td></tr>
+<tr><td>§1.4</td><td>4</td><td>分段單側極限；1/x²；漸近線符號分析；ln x</td><td>+3（→7）</td></tr>
+<tr><td>§1.5</td><td>7</td><td>直接代入；因式分解；有理化；|x|；[x]；squeeze ×2</td><td>+3（→10）</td></tr>
+<tr><td>§1.6</td><td>3</td><td>容差暖身；線性 ε-δ；二次 ε-δ</td><td>+2（→5）</td></tr>
+</table>
+<p class="small">系統性薄點：§1.1 只示範「會失敗」沒示範「怎麼修」；§1.2 除 arcsin 外零數值範例；§1.5 的 limit laws 從未抽象演示；§1.6 缺「定義邏輯結構」的辨錯示範。新附圖僅 2 幅（E1.1-b、E1.3-a）。</p>
+
+<!-- ===================== 1.1 ===================== -->
+<h2>§1.1 Inverse Functions（補 3）</h2>
+
+<h3>E1.1-a　代數判定一對一——直覺會失效的例子<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: Mooculus digInInversesOfFunctions L293]</code>（CC BY-NC 3.0）・插入：Example 1.2 之後</p>
+<div class="why">既有的 x 與 x² 都「看一眼就知道」；缺一個需要動手、且「三次方≈單調」直覺會翻車的例子。</div>
+<div class="ex"><p>Determine whether each function is one-to-one on \(\mathbb{R}\):
+\[ h(x) = x^{3} - 4x, \qquad k(x) = x^{3} + 4. \]</p></div>
+<div class="sol"><p>For \(h\), we look for two different inputs with the same output. Since
+\(h(x) = x(x^{2}-4) = x(x-2)(x+2)\), we have \(h(0) = h(2) = 0\) with \(0 \ne 2\), so \(h\) is
+<em>not</em> one-to-one — even though its formula looks similar to \(x^{3}\).
+For \(k\), suppose \(k(x_{1}) = k(x_{2})\). Then \(x_{1}^{3} + 4 = x_{2}^{3} + 4\), so
+\(x_{1}^{3} = x_{2}^{3}\), and taking cube roots gives \(x_{1} = x_{2}\). Therefore \(k\)
+<em>is</em> one-to-one. The lesson: two formulas of the same general shape can behave differently;
+when in doubt, test the definition directly.</p></div>
+
+<h3>E1.1-b　限制定義域修復不可逆函數（x² → √x）<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: Mooculus L407–453]</code>・插入：y=x 鏡射段落之後・<strong>需新圖 1 幅</strong></p>
+<div class="why">全節反覆說 x² 不可逆，但從未示範「怎麼修」。限制定義域是 §1.2 反三角函數的前置觀念，目前在 §1.2 開頭憑空出現——這個範例把兩節縫起來。</div>
+<div class="ex"><p>The function \(f(x) = x^{2}\) is not one-to-one on \(\mathbb{R}\). Restrict its
+domain so that the restricted function is one-to-one, and find the inverse of the restricted
+function.</p></div>
+<div class="sol"><p>On the interval \([0, \infty)\) the function \(f(x) = x^{2}\) is one-to-one:
+if \(x_{1}^{2} = x_{2}^{2}\) with \(x_{1}, x_{2} \ge 0\), then \(x_{1} = x_{2}\). To find the
+inverse, write \(x = \bigl(f^{-1}(x)\bigr)^{2}\); since \(f^{-1}(x) \ge 0\), taking the positive
+square root gives
+\[ f^{-1}(x) = \sqrt{x}, \qquad x \ge 0. \]
+This is exactly why \(\sqrt{x}\) means the <em>positive</em> square root: the convention makes the
+square root the inverse of the restricted squaring function. The figure shows the restricted
+parabola, its inverse, and the mirror line \(y = x\). The same idea — restrict first, then
+invert — is the key to the inverse trigonometric functions of the next section.</p></div>
+
+<h3>E1.1-c　有理函數求反＋雙向驗證<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: APEX §2.7 #7]</code>（CC BY-NC 4.0；APEX 僅給題與指示，解為本次撰寫）・插入：Example 1.4 之後（節末）</p>
+<div class="why">Example 1.4 只驗證了單向；Proposition 1.1 的雙向恆等式沒有完整示範；Strategy 1.1 沒在非多項式上跑過。</div>
+<div class="ex"><p>Find the inverse of \(f(x) = \dfrac{3}{x-5}\) (for \(x \ne 5\)), and verify
+your answer by computing both \(f\bigl(f^{-1}(x)\bigr)\) and \(f^{-1}\bigl(f(x)\bigr)\).</p></div>
+<div class="sol"><p>Let \(y = \dfrac{3}{x-5}\). Solving for \(x\): \(x - 5 = \dfrac{3}{y}\), so
+\(x = 5 + \dfrac{3}{y}\). Interchanging the variables,
+\[ f^{-1}(x) = 5 + \frac{3}{x} = \frac{5x+3}{x}, \qquad x \ne 0. \]
+Verification, in both directions:
+\[ f\bigl(f^{-1}(x)\bigr) = \frac{3}{\bigl(5 + \tfrac{3}{x}\bigr) - 5} = \frac{3}{3/x} = x,
+\qquad
+f^{-1}\bigl(f(x)\bigr) = 5 + \frac{3}{3/(x-5)} = 5 + (x - 5) = x. \]
+Both compositions return the input, confirming Proposition 1.1. Note how the domains pair up:
+\(f\) excludes \(x = 5\) and \(f^{-1}\) excludes \(x = 0\), matching the fact that \(f\) never
+takes the value \(0\) and \(f^{-1}\) never takes the value \(5\).</p></div>
+
+<h3>O1.1-d　應用：攝氏 ↔ 華氏<span class="badge optb">選收</span></h3>
+<p class="meta">來源 <code>[source: Mooculus L181–227]</code>・插入：§1.1 節末</p>
+<div class="ex"><p>The function \(f(t)=\tfrac95 t+32\) converts a temperature of \(t\) degrees
+Celsius into degrees Fahrenheit. What practical question does \(f^{-1}\) answer? Find a formula
+for \(f^{-1}(t)\), and verify your formula by computing \(f^{-1}(f(t))\).</p></div>
+<div class="sol"><p>\(f^{-1}\) converts Fahrenheit back to Celsius. Writing
+\(t = \tfrac95 f^{-1}(t) + 32\) and solving gives \(f^{-1}(t) = \tfrac59 (t-32)\); composing,
+\(f^{-1}(f(t)) = \tfrac59\bigl(\tfrac95 t + 32 - 32\bigr) = t\).</p></div>
+
+<!-- ===================== 1.2 ===================== -->
+<h2>§1.2 Inverse Trigonometric Functions（補 3）</h2>
+
+<h3>E1.2-a　arccos／arctan 的精確值（負輸入、鈍角主值、三角形法）<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: Stitz-Zeager via Mooculus 10_06_ex_131-154]</code>（CC BY-NC-SA）・插入：Proposition 1.4 之後</p>
+<div class="why">數值範例只有 arcsin；arccos 的鈍角主值、arctan 的三角形、負輸入的符號處理全無示範。</div>
+<div class="ex"><p>Find the exact value of each expression.</p>
+<p>(a) \(\sin\bigl(\arccos(-\tfrac{1}{2})\bigr)\) &emsp;
+(b) \(\sec(\arctan 10)\) &emsp;
+(c) \(\tan\bigl(\arcsin(-\tfrac{2\sqrt5}{5})\bigr)\)</p></div>
+<div class="sol"><p>(a) \(\arccos(-\tfrac12)\) is the angle in \([0,\pi]\) whose cosine is
+\(-\tfrac12\): that is \(\tfrac{2\pi}{3}\), and \(\sin\tfrac{2\pi}{3} = \tfrac{\sqrt3}{2}\). Note
+the principal value lands in the <em>second</em> quadrant — negative inputs to \(\arccos\) always
+do.</p>
+<p>(b) Let \(\theta = \arctan 10\), so \(\tan\theta = 10\) with \(\theta \in (0, \tfrac{\pi}{2})\).
+In a right triangle with opposite side \(10\) and adjacent side \(1\), the hypotenuse is
+\(\sqrt{101}\), so \(\sec(\arctan 10) = \sqrt{101}\).</p>
+<p>(c) Let \(\theta = \arcsin\bigl(-\tfrac{2\sqrt5}{5}\bigr)\), so
+\(\sin\theta = -\tfrac{2}{\sqrt5}\) with \(\theta \in [-\tfrac{\pi}{2}, \tfrac{\pi}{2}]\). Because
+\(\sin\theta \lt 0\), the angle lies in the fourth quadrant, where cosine is positive:
+\(\cos\theta = \sqrt{1-\tfrac45} = \tfrac{1}{\sqrt5}\). Therefore
+\(\tan\theta = \dfrac{-2/\sqrt5}{1/\sqrt5} = -2\). The sign came from the <em>range</em> of
+\(\arcsin\), not from guessing.</p></div>
+
+<h3>E1.2-b　複合函數的定義域<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §2.12 #1 (a)(c)]</code>（CC BY-NC-SA 4.0，官方詳解完整）・插入：Proposition 1.3 之後</p>
+<div class="why">本節建立了六張 domain／range 表，但沒有任何範例「使用」它們——「值域餵進定義域」的鏈式思考零示範。</div>
+<div class="ex"><p>Find the domain of each function.</p>
+<p>(a) \(f(x) = \arcsin(\cos x)\) &emsp; (b) \(h(x) = \sin(\arccos x)\)</p></div>
+<div class="sol"><p>(a) Whatever \(x\) is, \(\cos x\) lies in \([-1,1]\), and \([-1,1]\) is exactly
+the domain of \(\arcsin\). So every real \(x\) is allowed: the domain of \(f\) is \(\mathbb{R}\).</p>
+<p>(b) The inner function \(\arccos x\) requires \(x \in [-1,1]\); its output is an angle, and
+\(\sin\) accepts any angle. So the domain of \(h\) is \([-1,1]\). The pattern in both parts: the
+domain of a composition is governed by what the <em>inner</em> function accepts and what its
+outputs feed the <em>outer</em> function.</p></div>
+
+<h3>E1.2-c　其餘反三角函數的定義域＋本書分支約定的實際後果<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §2.12 #5，依本書 arccsc 主值改作]</code>・插入：域/值域總結段之後、Remark 1.3 之前</p>
+<div class="why">「remaining functions」小節零範例；Remark 1.3/1.4 說分支約定會影響值，但沒有例子展示。<strong>全批改作幅度最大的一筆，請特別過目</strong>：CLP 原解用標準主值得 \(f(-1)=-\pi\)；本書的 arccsc 主值（Definition 1.6）給 \(\arccsc(-1)=\tfrac{3\pi}{2}\)，重算得 \(f(-1)=\pi\)，並把差異本身做成教學點。</div>
+<div class="ex"><p>Let \(f(x) = \arcsin x + \arccsc x\). Find the domain of \(f\), and evaluate
+\(f\) at every point of its domain.</p></div>
+<div class="sol"><p>\(\arcsin\) requires \(|x| \le 1\) while \(\arccsc\) requires \(|x| \ge 1\),
+so the domain is just the two points \(x = \pm 1\). At \(x = 1\): \(\arcsin 1 = \tfrac{\pi}{2}\)
+and \(\arccsc 1 = \tfrac{\pi}{2}\) (the angle in \(\bigl(0,\tfrac{\pi}{2}\bigr]\) with cosecant
+\(1\)), so \(f(1) = \pi\). At \(x = -1\): \(\arcsin(-1) = -\tfrac{\pi}{2}\), and under this
+text's principal range for \(\arccsc\) the angle with cosecant \(-1\) is
+\(\arccsc(-1) = \tfrac{3\pi}{2}\), so \(f(-1) = -\tfrac{\pi}{2} + \tfrac{3\pi}{2} = \pi\). So
+\(f\) is the constant \(\pi\) on its two-point domain. <em>Under the alternative convention of
+Remark 1.4</em> (\(\arccsc(-1) = -\tfrac{\pi}{2}\)) one gets \(f(-1) = -\pi\) instead — a concrete
+instance of branch conventions changing answers, which is why this text fixes its conventions
+explicitly.</p></div>
+
+<h3>O1.2-d　主值的應用陷阱（粒子與 arccos(1)）<span class="badge optb">選收</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §2.12 #2]</code>・插入：兩個 Caution 之後</p>
+<div class="ex"><p>A particle starts moving at time \(t=10\), and it bobs up and down so that its
+height at time \(t \ge 10\) is \(\cos t\). True or false: the particle has height \(1\) at time
+\(t = \arccos(1)\).</p></div>
+<div class="sol"><p>False. \(\cos t = 1\) for infinitely many \(t\), but \(\arccos\) returns only
+the principal value \(t = 0\) — and the particle is not even moving at \(t=0\) (its motion starts
+at \(t = 10\)). The particle has height \(1\) at the times \(2\pi n\) for integers
+\(n \ge 2\).</p></div>
+
+<!-- ===================== 1.3 ===================== -->
+<h2>§1.3 The Limit of a Function（補 1）</h2>
+
+<h3>E1.3-a　從圖讀極限（含 lim ≠ f(a) 的點）<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §1.3 #1]</code>（官方詳解完整）・插入：Figure 1.7 之後、Example 1.7 之前・<strong>需新圖 1 幅</strong>（連續波形，\((2,2)\) 空心、\((2,-2)\) 實心）</p>
+<div class="why">Figure 1.7 畫了「同極限、不同函數值」但沒有讀圖的 worked example；兩個既有範例都是列表法。</div>
+<div class="ex"><p>The graph of a function \(f\) is shown. Evaluate the following, or state that
+the limit does not exist:</p>
+<p>(a) \(\lim_{x \to -2} f(x)\) &emsp; (b) \(\lim_{x \to 0} f(x)\) &emsp; (c) \(\lim_{x \to 2} f(x)\)</p></div>
+<div class="sol"><p>(a) As \(x\) approaches \(-2\) from either side, the curve approaches height
+\(1\), so the limit is \(1\). (b) As \(x\) approaches \(0\), the curve approaches height \(0\),
+so the limit is \(0\). (c) As \(x\) approaches \(2\), the curve approaches height \(2\) — the
+open dot at \((2,2)\) and the solid dot at \((2,-2)\) tell us \(f(2) = -2\), but the limit ignores
+the value <em>at</em> the point: the limit is \(2\), even though \(f(2) = -2\).</p></div>
+
+<h3>O1.3-b　構造：畫一條 lim=10 而 f(3)=0 的曲線<span class="badge optb">選收</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §1.3 #5]</code>・插入：E1.3-a 之後・學生自己畫，無附圖成本</p>
+<div class="ex"><p>Draw the graph of a function \(f\) with \(\lim_{x \to 3} f(x) = 10\) and
+\(f(3) = 0\).</p></div>
+<div class="sol"><p>Many answers are possible: take any curve passing through height \(10\) at
+\(x = 3\), then move the single point at \(x=3\) down to height \(0\) (an open dot at \((3,10)\),
+a solid dot at \((3,0)\)). Near — but not at — \(x = 3\) the values approach \(10\), so the limit
+is \(10\), while \(f(3) = 0\).</p></div>
+
+<!-- ===================== 1.4 ===================== -->
+<h2>§1.4 One-Sided and Infinite Limits（補 3）</h2>
+
+<h3>E1.4-a　1/x 與 1/x²：DNE 和 ∞ 的分界<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §1.3 #13–15]</code>（官方詳解互相對照）・插入：Example 1.10 之後</p>
+<div class="why">手稿有 \(1/x^2 \to \infty\) 但沒有 \(1/x\)——「左右一正一負所以 DNE、且不寫成 ±∞」這個經典對照完全缺席。</div>
+<div class="ex"><p>Evaluate \(\lim_{x \to 0^{-}} \dfrac{1}{x}\),
+\(\lim_{x \to 0^{+}} \dfrac{1}{x}\), and \(\lim_{x \to 0} \dfrac{1}{x}\), and contrast the
+results with \(\lim_{x \to 0} \dfrac{1}{x^{2}}\).</p></div>
+<div class="sol"><p>As \(x\) approaches \(0\) from the left, \(\tfrac1x\) is negative with larger
+and larger magnitude, so \(\lim_{x \to 0^{-}} \tfrac1x = -\infty\). From the right, \(\tfrac1x\)
+is positive and grows without bound, so \(\lim_{x \to 0^{+}} \tfrac1x = \infty\). Because the two
+one-sided behaviors disagree, the two-sided limit does not exist — and since the values do not all
+grow in the <em>same</em> signed direction, we do <strong>not</strong> write
+\(\lim_{x \to 0} \tfrac1x = \infty\). Contrast \(\tfrac{1}{x^{2}}\): both sides grow positively,
+so there we do write \(\lim_{x \to 0} \tfrac{1}{x^{2}} = \infty\).</p></div>
+
+<h3>E1.4-b　由部分資訊推論：判準的雙向使用<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §1.3 #8, #9]</code>（官方詳解完整）・插入：Proposition 1.5 之後、Example 1.9 之前</p>
+<div class="why">兩側判準只在「算出兩側→判定雙側」方向用過；「已知雙側→推單側」與「只知單側→資訊不足」從未演示。</div>
+<div class="ex"><p>Suppose \(f\) is defined on all of \(\mathbb{R}\).</p>
+<p>(a) If \(\lim_{x \to -2} f(x) = 16\), what is \(\lim_{x \to -2^{-}} f(x)\)?<br>
+(b) If instead all we know is \(\lim_{x \to -2^{-}} f(x) = 16\), what can we say about
+\(\lim_{x \to -2} f(x)\)?</p></div>
+<div class="sol"><p>(a) For the two-sided limit to equal \(16\), <em>both</em> one-sided limits
+must equal \(16\); in particular \(\lim_{x \to -2^{-}} f(x) = 16\).</p>
+<p>(b) Not enough information. If the right-hand limit also equals \(16\), then
+\(\lim_{x \to -2} f(x) = 16\); if it differs (or fails to exist), the two-sided limit does not
+exist. The criterion transfers information from the two-sided limit to each side, but only
+<em>both</em> sides together determine the two-sided limit.</p></div>
+
+<h3>E1.4-c　分母為零不保證鉛直漸近線<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §3.6.1 #1]</code>（官方詳解完整）・插入：Example 1.11／Figure 1.10 之後</p>
+<div class="why">Example 1.11 只示範「候選點成功變成漸近線」；「候選點失敗」（洞）從未出現，而這是最常見的誤判。</div>
+<div class="ex"><p>Suppose \(f(x) = \dfrac{g(x)}{x^{2}-9}\) for some function \(g\). Must the line
+\(x = -3\) be a vertical asymptote of \(y = f(x)\)?</p></div>
+<div class="sol"><p>No. The denominator does vanish at \(x = -3\), so \(x = -3\) is a
+<em>candidate</em> — but whether it is an asymptote depends on the numerator. If \(g(x) = 1\),
+then \(f(x) = \tfrac{1}{x^{2}-9}\) blows up near \(-3\), and \(x = -3\) is a vertical asymptote.
+But if \(g(x) = x^{2}-9\), then \(f(x) = 1\) at every point of its domain, and there is no
+asymptote at all. A zero denominator marks a place to <em>investigate</em> with one-sided limits,
+not a guaranteed asymptote.</p></div>
+
+<!-- ===================== 1.5 ===================== -->
+<h2>§1.5 Limit Laws and Computational Techniques（補 3）</h2>
+
+<h3>E1.5-a　抽象地使用 limit laws<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §1.4 #42]</code>（官方解完整）・插入：Theorem 1.2 口頭重述段之後、「Direct substitution」之前</p>
+<div class="why">Theorem 1.2 之後直接跳到具體多項式；「不知道 \(f\) 是什麼、只知道它的極限」的抽象使用零示範——而這正是 laws 的本義。</div>
+<div class="ex"><p>Suppose \(\lim_{x \to -1} f(x) = -1\). Evaluate
+\[ \lim_{x \to -1} \frac{x\,f(x) + 3}{2 f(x) + 1}. \]</p></div>
+<div class="sol"><p>We never need a formula for \(f\). By the product law,
+\(\lim_{x \to -1} x f(x) = (-1)(-1) = 1\); by the sum and constant-multiple laws the numerator
+tends to \(1 + 3 = 4\) and the denominator tends to \(2(-1) + 1 = -1\). The denominator's limit
+is nonzero, so the quotient law applies:
+\[ \lim_{x \to -1} \frac{x f(x) + 3}{2 f(x) + 1} = \frac{4}{-1} = -4. \]</p></div>
+
+<h3>E1.5-b　0/0 可以是任何值<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §1.4 #2, #5]</code>（官方解完整）・插入：「Algebraic simplification」首段之後、Example 1.14 之前</p>
+<div class="why">「indeterminate」一詞出現了，但「為什麼」不定（可以是任何值）沒有示範；學生普遍誤信 0/0 必為 1 或 0。</div>
+<div class="ex"><p>(a) Find functions \(f\) and \(g\) with
+\(\lim_{x \to 3} f(x) = \lim_{x \to 3} g(x) = 0\) and
+\(\lim_{x \to 3} \dfrac{f(x)}{g(x)} = 10\).<br>
+(b) What are the possible values of \(\lim_{x \to 3} \dfrac{f(x)}{g(x)}\), given only that both
+\(f\) and \(g\) tend to \(0\)?</p></div>
+<div class="sol"><p>(a) Take \(f(x) = 10(x-3)\) and \(g(x) = x - 3\). Both tend to \(0\) at \(3\),
+yet \(\dfrac{f(x)}{g(x)} = 10\) wherever it is defined, so the quotient's limit is \(10\).</p>
+<p>(b) Replacing \(10\) by any constant \(c\) gives limit \(c\); choices such as \(f(x) = x-3\),
+\(g(x) = (x-3)^{3}\) give \(\infty\); swapping signs gives \(-\infty\); and \(f(x) = x-3\),
+\(g(x) = |x-3|\) makes the limit fail to exist. A \(\tfrac00\) form can therefore equal
+<em>anything</em> — which is exactly why it is called indeterminate, and why we must simplify
+before judging.</p></div>
+
+<h3>E1.5-c　反推常數使極限存在（壓軸綜合）<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §1.4 #43]</code>（官方解完整）・插入：Strategy 1.2 之後（節末）</p>
+<div class="why">所有既有範例都「正向計算」；缺一個先推理（分母趨 0 ⟹ 分子必須趨 0）再計算的綜合示範，收束全節。</div>
+<div class="ex"><p>Find the value of the constant \(a\) for which
+\(\lim_{x \to -2} \dfrac{x^{2} + a x + 3}{x^{2} + x - 2}\) exists, and evaluate the limit for
+that value of \(a\).</p></div>
+<div class="sol"><p>The denominator factors as \((x+2)(x-1)\) and tends to \(0\) as \(x \to -2\).
+If the numerator tended to a nonzero number, the quotient would blow up and the limit could not
+exist; so the numerator must also tend to \(0\): \(4 - 2a + 3 = 0\), giving \(a = \tfrac{7}{2}\).
+With this \(a\),
+\[ \lim_{x \to -2} \frac{x^{2} + \tfrac{7}{2}x + 3}{x^{2} + x - 2}
+ = \lim_{x \to -2} \frac{(x+2)\bigl(x + \tfrac{3}{2}\bigr)}{(x+2)(x-1)}
+ = \lim_{x \to -2} \frac{x + \tfrac{3}{2}}{x - 1}
+ = \frac{-\tfrac12}{-3} = \frac{1}{6}. \]
+Notice the flow of reasoning: the <em>existence</em> of the limit forced the value of \(a\), and
+then the techniques of this section finished the computation.</p></div>
+
+<h3>O1.5-d　通分化簡<span class="badge optb">選收</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §1.4 extra（prob_s1.4.tex:751）]</code>（官方解完整）・插入：Example 1.15 之後</p>
+<div class="why">Strategy 1.2 第 2 步點名了「combine fractions」但沒有範例做過。代數較重，由你定奪。</div>
+<div class="ex"><p>Evaluate \(\displaystyle\lim_{t \to \frac{1}{2}}
+\frac{\frac{1}{3t^{2}}+\frac{1}{t^{2}-1}}{2t-1}\).</p></div>
+<div class="sol"><p>Combining the fractions over the common denominator \(3t^{2}(t^{2}-1)\) turns
+the numerator into \(\dfrac{4t^{2}-1}{3t^{2}(t^{2}-1)} = \dfrac{(2t+1)(2t-1)}{3t^{2}(t^{2}-1)}\);
+the factor \(2t-1\) cancels with the denominator, leaving
+\(\lim_{t \to 1/2} \dfrac{2t+1}{3t^{2}(t^{2}-1)} = \dfrac{2}{\tfrac34 \cdot (-\tfrac34)}
+= -\dfrac{32}{9}\).</p></div>
+
+<!-- ===================== 1.6 ===================== -->
+<h2>§1.6 The Precise Definition of a Limit（補 2）</h2>
+
+<h3>E1.6-a　診斷一個寫錯的定義<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: APEX §1.2 #1, #2]</code>（官方解完整）・插入：Definition 1.13 解說段之後、uniqueness 之前</p>
+<div class="why">定義的「量詞順序與蘊含方向」只靠 prose 講；沒有讓學生主動辨錯的示範——這是 ε-δ 最高頻的誤解。</div>
+<div class="ex"><p>What is wrong with the following attempted definition of
+\(\lim_{x \to a} f(x) = L\)?</p>
+<p><em>“Given any \(\delta \gt 0\), there exists \(\varepsilon \gt 0\) such that whenever
+\(|f(x) - L| \lt \varepsilon\), we have \(0 \lt |x - a| \lt \delta\).”</em></p></div>
+<div class="sol"><p>Two things are reversed. First, the <em>order of the tolerances</em>: the
+challenge must come on the \(y\)-side — “given any \(\varepsilon\)” — and \(\delta\) is our
+response; the attempted version lets us pick the easy quantity after seeing the hard one. Second,
+the <em>direction of the implication</em>: the definition must say that closeness of \(x\) to
+\(a\) <strong>forces</strong> closeness of \(f(x)\) to \(L\), i.e.
+\(0 \lt |x-a| \lt \delta\) implies \(|f(x) - L| \lt \varepsilon\) — not the other way around.
+Keeping both corrections gives exactly Definition 1.13.</p></div>
+
+<h3>E1.6-b　用已知不等式餵 ε-δ：lim sin x = 0<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: APEX §1.2 #8]</code>（官方解完整）・插入：Example 1.22 之後、Definition 1.14 之前</p>
+<div class="why">既有兩個證明都是「代數整理型」；「借一個已知不等式直接餵進定義」是第三種典型套路，並為 squeeze 式思維鋪路。</div>
+<div class="ex"><p>Using the fact that \(|\sin x| \le |x|\) for all \(x\), show from the
+definition that \(\lim_{x \to 0} \sin x = 0\).</p></div>
+<div class="sol"><p>Given \(\varepsilon \gt 0\), choose \(\delta = \varepsilon\). If
+\(0 \lt |x - 0| \lt \delta\), then
+\[ |\sin x - 0| = |\sin x| \le |x| \lt \delta = \varepsilon. \]
+Therefore \(\lim_{x \to 0} \sin x = 0\). The borrowed inequality did all the work: no factoring,
+no auxiliary bound — Step 2 of Strategy 1.3 was handed to us for free.</p></div>
+
+<h3>O1.6-c　常數函數：任何 δ 都行<span class="badge optb">選收</span></h3>
+<p class="meta">來源 <code>[source: APEX §1.2 #3]</code>・插入：Example 1.21 之前</p>
+<div class="why">「δ 可以隨便選」是個小而亮的觀念點（學生常以為 δ 必須是 ε 的某個函數）。</div>
+<div class="ex"><p>Show from the definition that \(\lim_{x \to 2} 5 = 5\).</p></div>
+<div class="sol"><p>Given \(\varepsilon \gt 0\), we need \(|5 - 5| \lt \varepsilon\) whenever
+\(0 \lt |x-2| \lt \delta\) — but \(|5-5| = 0 \lt \varepsilon\) is <em>always</em> true, no matter
+what \(x\) does. So any choice works; we may simply take \(\delta = \varepsilon\) (or
+\(\delta = 1\), or anything else).</p></div>
+
+<h3>O1.6-d　Definition 1.14 的 M-δ 示範<span class="badge ai">AI 出題</span><span class="badge optb">選收</span></h3>
+<p class="meta">來源 <code>[source: AI]</code>（題庫無乾淨候選）・插入：Definition 1.14 解說段之後</p>
+<div class="why">無限極限的精確定義目前零示範。收＝授權我出以下這題、你再審。</div>
+<div class="ex"><p>Show from the precise definition that \(\lim_{x \to 0} \dfrac{1}{x^{2}} = \infty\).</p></div>
+<div class="sol"><p>Given \(M \gt 0\), choose \(\delta = \dfrac{1}{\sqrt{M}}\). If
+\(0 \lt |x| \lt \delta\), then \(x^{2} \lt \delta^{2} = \dfrac{1}{M}\), so
+\(\dfrac{1}{x^{2}} \gt M\). Since every threshold \(M\) is eventually exceeded,
+\(\lim_{x \to 0} \tfrac{1}{x^{2}} = \infty\) — the rigorous counterpart of Example 1.10.</p></div>
+
+<!-- ===================== import ===================== -->
+<h2>裁決後的 import pass（預告）</h2>
+<ol>
+<li><code>gen_standalone.py</code> 增 Ch 1 重生支援（除非你選手改 standalone）。</li>
+<li>依各 E 編號的插入點寫入 <code>example-ch01/sec-*.html</code>：<code>workedexample</code> 包
+<code>env-example</code>＋<code>env-solution</code>，每筆前加
+<code>&lt;!-- expansion:example — … [source: …] --&gt;</code> 註解。</li>
+<li><strong>手動重編號稅</strong>：插入使後續 example 的編號全部位移、新圖使 Figure 1.7+ 位移，
+prose 內的「Figure 1.x」引用需同步；import 後以 grep 核對一致（kit 無自動編號）。</li>
+<li>新附圖 2 幅（E1.1-b、E1.3-a）進 <code>figures.js</code>，遵 redundant encoding。</li>
+<li>建 <code>ch01_example-imports.md</code>：每筆收錄題源官方解全文、授權標記、改寫差異說明
+（特別是 E1.2-c 的主值重算）。</li>
+<li>重生 standalone 兩版，瀏覽器驗渲染。</li>
+</ol>
+
+<p class="small">授權核驗：CLP-1＝CC BY-NC-SA 4.0、APEX＝CC BY-NC 4.0、Mooculus 逐題＝CC BY-NC 3.0、
+Stitz-Zeager（經 Mooculus 轉收）＝CC BY-NC-SA——全部 NC 家族，可 remix 進免費發布、
+掛 CC BY-NC-SA 4.0 的講義（<code>CONTENT_SOURCING.md</code>）。</p>
+
+</body>
+</html>

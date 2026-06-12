@@ -13,7 +13,7 @@
 - **撰寫或修訂章節。** 先看 [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)。當快速指南無法回答你的問題時，再回頭查 [`CONTENT_SPEC.md`](CONTENT_SPEC.md)。開始新的一章前，先看 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)。
 - **製作影片**（目前的主要路徑：第二代 Manim 產線）。先看 [`video/README.md`](video/README.md)，再看 [`video/DESIGN.md`](video/DESIGN.md) 了解分鏡契約與目前的模板決策。較舊的 `MANIM_*` 文件已封存於 [`legacy/`](legacy/)，保留作為第一代參考資料。
 - **靜態投影片 MP4**（已凍結的舊路徑）。使用 [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md)。此路徑不再有新開發——新工作請改用 Manim。
-- **設計章末習題。** [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md)（在完整設計回合開始前，僅為最小骨架）。
+- **為課文補教學範例（從開放題庫選題）。** 見 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md)。講義本體不收習題——習題將以獨立習題本呈現（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14，2026-06-12 定案）。
 
 ---
 
@@ -163,7 +163,7 @@ Mode A 回合並非在手稿轉成 LaTeX 後就算完成。在把章節交回之
 
 - 跳過手稿內容（手稿是主軸）；
 - 改寫手稿主張的數學實質（證明方法、變數選擇、定義形式）；
-- 自創習題——習題庫來自手稿（見 [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md)）；
+- 自創習題或在講義中放任何習題區塊——講義本體不收習題（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14）；補課文範例一律走 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md) 的題庫選題流程；
 - 未標記的擴充——每一處非翻譯的增添都要加上 `% expansion:` 標記；
 - 違反上述「具名內容」防護欄的具名內容。
 
@@ -277,7 +277,7 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
 | 內容規格 | [`CONTENT_SPEC.md`](CONTENT_SPEC.md) | 權威性的教科書撰寫規則 |
 | 內容日用 | [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md) | 1–2 頁的作者速查表 |
 | 內容脈絡 | [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) | 章節順序、先備知識、各章核心技能 |
-| 內容習題 | [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md) | 最小習題骨架 |
+| 內容題源 | [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md) | 課文範例的題源與選題流程（題庫、provenance、授權） |
 | 影片產線 | [`video/README.md`](video/README.md) | 目前第二代 Manim 產線的狀態、指令、交接註記 |
 | 影片設計 | [`video/DESIGN.md`](video/DESIGN.md) | 目前的分鏡契約、場景種類、模板決策 |
 | manim v1 操作 | [`legacy/MANIM_CHECKLIST.md`](legacy/MANIM_CHECKLIST.md) | 第一代參考檢查表（已封存） |
@@ -297,7 +297,7 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
 - `preamble/` — 共用的 LaTeX 設定（見下方 *Preamble 對照*）。
 - `preamble_smoketest.tex` — 僅供 preamble 版面檢查的最小回歸文件。
 - `refs/` — 參考書目資料。
-- `problem_banks/` — 開放授權題庫的本地 clone 區（內容 gitignored，僅 README 進版控）。選題工作流程見 [`CONTENT_EXERCISES.md`](CONTENT_EXERCISES.md) §選題流程。
+- `problem_banks/` — 開放授權題庫的本地 clone 區（內容 gitignored，僅 README 進版控）。選題工作流程見 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md)。
 - `tools/` — 書籍源碼工具（`book_style_lint.py`、`book_preamble_smoketest.py`、`book_docs_lint.py`）。第一代媒體產生腳本已封存至 `legacy/scripts/`。
 - `legacy/` — 已封存的凍結媒體產線（gen-0 投影片、gen-1 Manim 及其橋接實驗）：`legacy/scripts/`（腳本）、`legacy/MANIM_*.md` 與 `legacy/LEGACY_SLIDE_PIPELINE.md`（方法論文件）、`legacy/schemas/`、`legacy/inputs/`、`legacy/artifacts/`（gitignored 的大型算繪輸出仍存於磁碟，git 追蹤的例外為 narration／final／tex）。詳見 [`legacy/README.md`](legacy/README.md)。
 - `.github/workflows/` — CI 檢查。
