@@ -1,4 +1,6 @@
-<!-- §1.6 The Precise Definition of a Limit. Content verbatim from ch01_foundations.tex. -->
+<!-- §1.6 The Precise Definition of a Limit. Content verbatim from ch01_foundations.tex;
+     worked examples E1.6-a/b + O1.6-c/d supplemented from open banks + one AI-authored
+     (O1.6-d), 2026-06-12, audit-approved. Figure 1.11 -> 1.13. -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -15,7 +17,7 @@
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.20</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.37</span></p>
       <div class="env-body">
         <p>For the function above, how close must \(x\) be to \(3\) so that \(f(x)\) differs from \(5\) by less than \(0.1\)?</p>
       </div>
@@ -42,13 +44,30 @@
     </div>
   </section>
 
-  <p>Figure 1.11 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
+  <p>Figure 1.13 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
 
   <figure class="figure" data-fig="precise-limit">
-    <figcaption><span class="fig-no">Figure 1.11</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.13</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
   </figure>
 
   <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\).</p>
+
+  <!-- expansion:example — diagnose a wrong definition: order of tolerances and direction of implication [source: APEX §1.2 #1, #2] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.38</span></p>
+      <div class="env-body">
+        <p>What is wrong with the following attempted definition of \(\displaystyle\lim_{x \to a} f(x) = L\)?</p>
+        <p><em>“Given any \(\delta > 0\), there exists \(\varepsilon > 0\) such that whenever \(|f(x) - L| < \varepsilon\), we have \(0 < |x - a| < \delta\).”</em></p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Two things are reversed. First, the <em>order of the tolerances</em>: the challenge must come on the \(y\)-side — “given any \(\varepsilon\)” — and \(\delta\) is our response; the attempted version lets us pick the easy quantity after seeing the hard one. Second, the <em>direction of the implication</em>: the definition must say that closeness of \(x\) to \(a\) forces closeness of \(f(x)\) to \(L\), that is, \(0 < |x - a| < \delta\) implies \(|f(x) - L| < \varepsilon\) — not the other way around. Correcting both gives exactly Definition 1.13.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
 
   <p>A first payoff of the \(\varepsilon\)-\(\delta\) definition is that the value of a limit, when it exists, is unambiguous.</p>
 
@@ -87,9 +106,25 @@
     </div>
   </section>
 
+  <!-- expansion:example — a constant function: any δ works (δ need not be a function of ε) [source: APEX §1.2 #3] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.21</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.39</span></p>
+      <div class="env-body">
+        <p>Show from the definition that \(\displaystyle \lim_{x \to 2} 5 = 5\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(\varepsilon > 0\), we need \(|5 - 5| < \varepsilon\) whenever \(0 < |x - 2| < \delta\). But \(|5 - 5| = 0 < \varepsilon\) is <em>always</em> true, no matter what \(x\) does. So any choice of \(\delta\) works; we may simply take \(\delta = \varepsilon\) (or \(\delta = 1\), or anything else). This is the one situation where \(\delta\) need not depend on \(\varepsilon\) at all.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.40</span></p>
       <div class="env-body">
         <p>Show from the definition that \(\displaystyle \lim_{x \to 3} (4x - 5) = 7\).</p>
       </div>
@@ -110,7 +145,7 @@
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.22</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.41</span></p>
       <div class="env-body">
         <p>Show from the definition that \(\displaystyle \lim_{x \to 1} (x^{2} - 5x + 6) = 2\).</p>
       </div>
@@ -133,6 +168,24 @@
     </section>
   </div>
 
+  <!-- expansion:example — feed a known inequality into the definition: lim sin x = 0 [source: APEX §1.2 #8] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.42</span></p>
+      <div class="env-body">
+        <p>Using the fact that \(|\sin x| \le |x|\) for all \(x\), show from the definition that \(\displaystyle\lim_{x \to 0} \sin x = 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(\varepsilon > 0\), choose \(\delta = \varepsilon\). If \(0 < |x - 0| < \delta\), then
+        \[ |\sin x - 0| = |\sin x| \le |x| < \delta = \varepsilon. \]
+        Therefore \(\displaystyle\lim_{x \to 0} \sin x = 0\). The borrowed inequality did all the work: no factoring, no auxiliary bound — Step 2 of Strategy 1.3 was handed to us for free.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <p>The \(\varepsilon\)-\(\delta\) machinery also gives precise meaning to the informal definitions of infinite limits from Definition 1.11.</p>
 
   <section class="env env-definition">
@@ -150,6 +203,24 @@
   </section>
 
   <p>Intuitively, \(M\) may be any large positive threshold (such as \(100\), \(100^{100}\), or \(1000^{1000}\)): no matter how large the threshold, \(f(x)\) eventually exceeds it once \(x\) is close enough to \(a\). Likewise, \(N\) may be any negative threshold (such as \(-100\), \(-100^{100}\), or \(-1000^{1000}\)), below which \(f(x)\) is eventually forced.</p>
+
+  <!-- expansion:example — M-δ proof of an infinite limit, the rigorous counterpart of Example 1.21 [source: AI, audit-approved] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.43</span></p>
+      <div class="env-body">
+        <p>Show from the precise definition that \(\displaystyle \lim_{x \to 0} \frac{1}{x^{2}} = \infty\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(M > 0\), choose \(\delta = \dfrac{1}{\sqrt{M}}\). If \(0 < |x| < \delta\), then \(x^{2} < \delta^{2} = \dfrac{1}{M}\), so
+        \[ \frac{1}{x^{2}} > M. \]
+        Since every threshold \(M\) is eventually exceeded once \(x\) is close enough to \(0\), we have \(\displaystyle \lim_{x \to 0} \frac{1}{x^{2}} = \infty\) — the rigorous counterpart of the informal argument in Example 1.21.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
 
   <p>Finally, the \(\varepsilon\)-\(\delta\) definition gives a precise meaning to a property of functions that recurs throughout later chapters. If \(f\) is defined at every point near \(a\), including at \(a\), and if
   \[ \lim_{x \to a} f(x) = f(a), \]

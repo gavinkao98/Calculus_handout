@@ -11,18 +11,19 @@
      ════════════════════════════════════════════════════════════════ -->
 <style>
 :root {
-  --fig-1-1:  250px;   /* Figure 1.1  水平線測試（並排 2 張，每張寬） */
-  --fig-1-2:  340px;   /* Figure 1.2  一對一函數與反函數映射圖 */
-  --fig-1-3:  100%;    /* Figure 1.3  sin 在 ℝ 上非一對一 */
-  --fig-1-4:  100%;    /* Figure 1.4  sin 受限分支 */
-  --fig-1-4-aux: 100%; /* Figure 1.4 附圖  arcsin 輔助三角形 */
-  --fig-1-5:  100%;    /* Figure 1.5  cos 受限分支 */
-  --fig-1-6:  100%;    /* Figure 1.6  tan 受限分支 */
-  --fig-1-7:  100%;    /* Figure 1.7  三個函數同極限（3 格） */
-  --fig-1-8:  100%;    /* Figure 1.8  左右極限不同 */
-  --fig-1-9:  100%;    /* Figure 1.9  四種單邊無窮極限（4 格） */
-  --fig-1-10: 100%;    /* Figure 1.10 垂直漸近線 */
-  --fig-1-11: 100%;    /* Figure 1.11 ε-δ 定義幾何圖 */
+  --fig-1-1:  250px;   /* Figure 1.1  horizontal line test (pair) */
+  --fig-1-2:  340px;   /* Figure 1.2  inverse mapping diagram */
+  --fig-1-3:  280px;   /* Figure 1.3  restricted x^2, sqrt x, y=x */
+  --fig-1-4:  100%;    /* Figure 1.4  sine not one-to-one */
+  --fig-1-5:  100%;    /* Figure 1.5  restricted sine */
+  --fig-1-6:  100%;    /* Figure 1.6  restricted cosine */
+  --fig-1-7:  100%;    /* Figure 1.7  restricted tangent */
+  --fig-1-8:  100%;    /* Figure 1.8  three functions, same limit (triple) */
+  --fig-1-9:  100%;    /* Figure 1.9  read-off-the-graph example */
+  --fig-1-10: 100%;    /* Figure 1.10 left/right limits differ */
+  --fig-1-11: 100%;    /* Figure 1.11 four one-sided infinite limits (grid) */
+  --fig-1-12: 100%;    /* Figure 1.12 vertical asymptote */
+  --fig-1-13: 100%;    /* Figure 1.13 epsilon-delta geometry */
 }
 </style>
 
@@ -348,15 +349,18 @@ window.MathJax = {
 <div id="source"><div class="paper skin-hs vivid"><div class="page" id="page"></div></div></div>
 <div id="pages"></div>
 
-<!-- Section fragments as templates (identical to screen version) -->
+<!-- Section fragments (inlined) -->
 
 <template id="frag-sec-intro">
+<!-- Chapter 1 opener — overview + learning outcomes. Content verbatim from ch01_foundations.tex. -->
 <article class="sec" lang="en">
   <header class="chapter-head">
     <div class="ch-kicker">Chapter 1</div>
     <h1 class="ch-title">Inverse Functions and Limits</h1>
   </header>
+
   <p class="lead">This chapter develops two ideas that together form the starting point of calculus. The first is the inverse of a function: when a function sends each input to a distinct output, we can ask how to recover the input from the output. This leads to one-to-one functions, inverse functions, and the inverse trigonometric functions. The second is the limit of a function. Many quantities of interest in calculus — the instantaneous rate of change of a moving object, the slope of a tangent line, the behavior of a function near a hole in its graph — depend not on the value of the function at a single point but on its behavior as the input approaches that point. We study limits first informally through tables and graphs, then through algebraic laws that let us compute them systematically, and finally through the precise \(\varepsilon\)-\(\delta\) definition that places every preceding argument on a rigorous footing.</p>
+
   <p class="para-head">By the end of this chapter, you will be able to:</p>
   <ul>
     <li>decide when a function is one-to-one and find its inverse when it exists;</li>
@@ -369,18 +373,28 @@ window.MathJax = {
 </template>
 
 <template id="frag-sec-1-1">
+<!-- §1.1 Inverse Functions. Content verbatim from ch01_foundations.tex;
+     worked examples E1.1-a/b/c + O1.1-d supplemented from open banks (2026-06-12),
+     audit-approved (ch01_example-supplement-audit.md). -->
 <article class="sec" lang="en">
+
   <header class="sec-head">
     <h2 class="sec-title"><span class="sec-no">1.1</span>Inverse Functions</h2>
   </header>
+
   <p>Recall that a function \(f\) assigns a value to every input in its domain. The reverse machinery — how to recover the input from the output — was named in the chapter overview; this section works it out. We proceed in three stages: identify which functions admit inversion (the one-to-one property), define the inverse function for those that do, and give an explicit procedure for constructing it. Before the formal definitions, two simple examples show when inversion is possible and when it is not.</p>
+
   <ol class="warmup">
     <li>\(f(x) = x\) on \([0, 1]\). Here \(f(0) = 0\), \(f(\tfrac{1}{2}) = \tfrac{1}{2}\), \(f(\tfrac{1}{8}) = \tfrac{1}{8}\); each input produces its own distinct output.</li>
     <li>\(f(x) = x^{2}\) on \([-1, 1]\). Here \(f(0) = 0\), \(f(\tfrac{1}{2}) = \tfrac{1}{4}\), and \(f(-\tfrac{1}{2}) = \tfrac{1}{4}\); two different inputs produce the same output.</li>
   </ol>
+
   <p>The difference between these two cases is the central point. In the first, every output corresponds to exactly one input. In the second, the output \(\tfrac{1}{4}\) corresponds to both \(\tfrac{1}{2}\) and \(-\tfrac{1}{2}\), so there is no unambiguous way to go backwards from output to input.</p>
+
   <h3 class="subsec-head">One-to-one functions</h3>
+
   <p>A function can be reversed only when each output comes from exactly one input. This motivates the following definition.</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.1</span></p>
     <div class="env-body">
@@ -391,17 +405,24 @@ window.MathJax = {
       <p class="informal">Informally, a function is one-to-one when different inputs always produce different outputs.</p>
     </div>
   </section>
+
   <div class="workedexample">
     <section class="env env-example">
       <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.1</span></p>
-      <div class="env-body"><p>A class of students is assigned identification numbers, arranged so that no two students share a number. Define \(f(\text{student})\) to be that student's identification number. Is \(f\) one-to-one?</p></div>
+      <div class="env-body">
+        <p>A class of students is assigned identification numbers, arranged so that no two students share a number. Define \(f(\text{student})\) to be that student's identification number. Is \(f\) one-to-one?</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
-      <div class="env-body"><p>By construction, no two students share a number, so distinct students always produce distinct identification numbers. Therefore \(f\) is one-to-one.<span class="qed"></span></p></div>
+      <div class="env-body">
+        <p>By construction, no two students share a number, so distinct students always produce distinct identification numbers. Therefore \(f\) is one-to-one.<span class="qed"></span></p>
+      </div>
     </section>
   </div>
+
   <p>Now we return to the two mathematical examples from the opening.</p>
+
   <div class="workedexample">
     <section class="env env-example">
       <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.2</span></p>
@@ -420,19 +441,44 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
+  <!-- expansion:example — algebraic one-to-one test where the cubic-like shape misleads [source: Mooculus digInInversesOfFunctions L293] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.3</span></p>
+      <div class="env-body">
+        <p>Determine whether each function is one-to-one on \(\mathbb{R}\):
+        \[ h(x) = x^{3} - 4x, \qquad k(x) = x^{3} + 4. \]</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>For \(h\), we look for two different inputs with the same output. Since \(h(x) = x(x^{2} - 4) = x(x - 2)(x + 2)\), we have \(h(0) = h(2) = 0\) with \(0 \neq 2\), so \(h\) is <em>not</em> one-to-one — even though its formula looks similar to \(x^{3}\).</p>
+        <p>For \(k\), suppose \(k(x_{1}) = k(x_{2})\). Then \(x_{1}^{3} + 4 = x_{2}^{3} + 4\), so \(x_{1}^{3} = x_{2}^{3}\), and taking cube roots gives \(x_{1} = x_{2}\). Therefore \(k\) <em>is</em> one-to-one. The lesson: two formulas of the same general shape can behave differently; when in doubt, test the definition directly.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <p>The function \(g(x) = x^{2}\) on \([-1, 1]\) illustrates why not every function can be reversed: the value \(\tfrac{1}{4}\) is produced by both \(\tfrac{1}{2}\) and \(-\tfrac{1}{2}\), so no single rule can take \(\tfrac{1}{4}\) back to a uniquely determined input.</p>
+
   <p>Looking at the graph of a function gives a quick way to decide whether it is one-to-one.</p>
+
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.1</span><span class="env-name">Horizontal line test</span></p>
     <div class="env-body">
       <p>A horizontal line \(y = c\) meets the graph of \(f\) at a point \((x, c)\) exactly when \(f(x) = c\). Therefore, <em>a function is one-to-one if and only if no horizontal line intersects its graph more than once</em>. If the line \(y = c\) meets the graph at two distinct points \((x_{1}, c)\) and \((x_{2}, c)\), then \(f(x_{1}) = c = f(x_{2})\) with \(x_{1} \neq x_{2}\), so \(f\) fails to be one-to-one; conversely, if every horizontal line meets the graph at most once, each output corresponds to at most one input. Figure 1.1 shows the two situations.</p>
     </div>
   </section>
-  <figure class="figure" data-fig="hlt" style="--fig-w: var(--fig-1-1)">
+
+  <figure class="figure" data-fig="hlt">
     <figcaption><span class="fig-no">Figure 1.1</span> Geometric interpretation of the horizontal line test.</figcaption>
   </figure>
+
   <h3 class="subsec-head">Inverse functions</h3>
+
   <p>If \(f\) is one-to-one, then we can define a second function that undoes \(f\): given an output of \(f\), it returns the unique input that produced it.</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.2</span></p>
     <div class="env-body">
@@ -440,6 +486,7 @@ window.MathJax = {
       \[ f^{-1}(y) = x \quad \Longleftrightarrow \quad f(x) = y \ \text{ for any } y \in B. \]</p>
     </div>
   </section>
+
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.2</span></p>
     <div class="env-body">
@@ -447,10 +494,14 @@ window.MathJax = {
       \[ f^{-1}(x) = y \quad \Longleftrightarrow \quad f(y) = x. \]</p>
     </div>
   </section>
+
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">1.1</span></p>
-    <div class="env-body"><p>A function has an inverse if and only if it is one-to-one.</p></div>
+    <div class="env-body">
+      <p>A function has an inverse if and only if it is one-to-one.</p>
+    </div>
   </section>
+
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
@@ -459,9 +510,10 @@ window.MathJax = {
       so \(x_{1} = x_{2}\). Therefore \(f\) is one-to-one. Conversely, suppose \(f\) is one-to-one with domain \(A\) and range \(B\). For each \(y \in B\) there exists some \(x \in A\) with \(f(x) = y\), and the one-to-one property forces this \(x\) to be unique. The correspondence \(y \mapsto x\) therefore defines an inverse function \(f^{-1} : B \to A\).<span class="qed qed-proof"></span></p>
     </div>
   </section>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.3</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.4</span></p>
       <div class="env-body">
         <p>Find the inverse of each function.</p>
         <ol class="prompt-list"><li>\(f(x) = x\).</li><li>\(g(x) = x^{3}\).</li></ol>
@@ -478,9 +530,11 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <p>The defining relation
   \[ f^{-1}(y) = x \Longleftrightarrow f(x) = y \]
   yields two composition identities.</p>
+
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.1</span></p>
     <div class="env-body">
@@ -488,10 +542,12 @@ window.MathJax = {
       \[ f^{-1}\!\bigl(f(x)\bigr) = x \ \text{ for every } x \in A, \qquad f\!\bigl(f^{-1}(y)\bigr) = y \ \text{ for every } y \in B. \]</p>
     </div>
   </section>
+
   <p>Figure 1.2 illustrates both identities: \(f\) and \(f^{-1}\) travel between \(A\) and \(B\) in opposite directions, and composing them recovers the original input.</p>
-  <figure class="figure" id="fig-map" style="--fig-w: var(--fig-1-2)">
+
+  <figure class="figure" id="fig-map">
     <div class="figure-art">
-      <svg viewBox="0 0 360 200" style="width:var(--fig-w,340px)" class="fig-svg" role="img" aria-label="A one-to-one function and its inverse mapping between sets A and B.">
+      <svg viewBox="0 0 360 200" style="width:340px" class="fig-svg" role="img" aria-label="A one-to-one function and its inverse mapping between sets A and B.">
         <defs>
           <marker id="ahf" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6.5,3 L0,6" fill="none" stroke="var(--c-primary)" stroke-width="1.4"/></marker>
           <marker id="ahb" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6.5,3 L0,6" fill="none" stroke="var(--c-caution)" stroke-width="1.4"/></marker>
@@ -507,14 +563,41 @@ window.MathJax = {
         <path d="M82,86 Q180,40 278,86" class="arrow-fwd" marker-end="url(#ahf)"/>
         <path d="M278,98 Q180,144 82,98" class="arrow-bwd" marker-end="url(#ahb)"/>
         <text x="180" y="46" class="lab-curve">f</text>
-        <text x="180" y="150" class="lab-ref-b">f&#x207B;&#xB9;</text>
+        <text x="180" y="150" class="lab-ref-b">f⁻¹</text>
       </svg>
     </div>
     <figcaption><span class="fig-no">Figure 1.2</span> A one-to-one function and its inverse. Going forward by \(f\) and back by \(f^{-1}\) recovers the input: \(f^{-1}\!\bigl(f(x)\bigr) = x\).</figcaption>
   </figure>
+
   <p>Graphically, if the graph of \(f^{-1}\) is drawn in the same coordinate plane as the graph of \(f\), the two graphs are reflections of one another across the line \(y = x\). The point \((a, b)\) lies on the graph of \(f\) exactly when \((b, a)\) lies on the graph of \(f^{-1}\).</p>
+
+  <!-- expansion:example — restrict the domain to repair a non-invertible function (x^2 to sqrt x), the bridge to the next section [source: Mooculus digInInversesOfFunctions L407-453] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.5</span></p>
+      <div class="env-body">
+        <p>The function \(f(x) = x^{2}\) is not one-to-one on \(\mathbb{R}\). Restrict its domain so that the restricted function is one-to-one, and find the inverse of the restricted function.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>On the interval \([0, \infty)\) the function \(f(x) = x^{2}\) is one-to-one: if \(x_{1}^{2} = x_{2}^{2}\) with \(x_{1}, x_{2} \ge 0\), then \(x_{1} = x_{2}\). To find the inverse, write \(x = \bigl(f^{-1}(x)\bigr)^{2}\); since \(f^{-1}(x) \ge 0\), taking the positive square root gives
+        \[ f^{-1}(x) = \sqrt{x}, \qquad x \ge 0. \]
+        This is exactly why \(\sqrt{x}\) means the <em>positive</em> square root: the convention makes the square root the inverse of the restricted squaring function. Figure 1.3 shows the restricted parabola, its inverse, and the mirror line \(y = x\). The same idea — restrict first, then invert — is the key to the inverse trigonometric functions of the next section.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure — restricted x^2, its inverse sqrt x, and the line y=x [companion to Example 1.5] -->
+  <figure class="figure" data-fig="restrict-x2">
+    <figcaption><span class="fig-no">Figure 1.3</span> The squaring function restricted to \([0, \infty)\), its inverse \(\sqrt{x}\), and the mirror line \(y = x\).</figcaption>
+  </figure>
+
   <h3 class="subsec-head">Finding the inverse of a function</h3>
+
   <p>When \(f\) is one-to-one, we can usually construct its inverse by a short procedure.</p>
+
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.1</span><span class="env-name">Finding the inverse of a one-to-one function</span></p>
     <div class="env-body">
@@ -525,10 +608,13 @@ window.MathJax = {
       </ol>
     </div>
   </section>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.4</span></p>
-      <div class="env-body"><p>Find the inverse of \(f(x) = x^{3} + 2\).</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.6</span></p>
+      <div class="env-body">
+        <p>Find the inverse of \(f(x) = x^{3} + 2\).</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -541,27 +627,77 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
+  <!-- expansion:example — invert a rational function and verify both compositions (Proposition 1.1 in action on a non-polynomial) [source: APEX §2.7 #7, solution authored] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.7</span></p>
+      <div class="env-body">
+        <p>Find the inverse of \(f(x) = \dfrac{3}{x - 5}\) (for \(x \neq 5\)), and verify your answer by computing both \(f\!\bigl(f^{-1}(x)\bigr)\) and \(f^{-1}\!\bigl(f(x)\bigr)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Let \(y = \dfrac{3}{x - 5}\). Solving for \(x\): \(x - 5 = \dfrac{3}{y}\), so \(x = 5 + \dfrac{3}{y}\). Interchanging the variables,
+        \[ f^{-1}(x) = 5 + \frac{3}{x} = \frac{5x + 3}{x}, \qquad x \neq 0. \]
+        Verification, in both directions:
+        \[ f\!\bigl(f^{-1}(x)\bigr) = \frac{3}{\bigl(5 + \tfrac{3}{x}\bigr) - 5} = \frac{3}{3/x} = x, \qquad f^{-1}\!\bigl(f(x)\bigr) = 5 + \frac{3}{3/(x - 5)} = 5 + (x - 5) = x. \]
+        Both compositions return the input, confirming Proposition 1.1. Note how the domains pair up: \(f\) excludes \(x = 5\) and \(f^{-1}\) excludes \(x = 0\), matching the fact that \(f\) never takes the value \(0\) and \(f^{-1}\) never takes the value \(5\).<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — applied inverse: Celsius to Fahrenheit and back [source: Mooculus digInInversesOfFunctions L181-227] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.8</span></p>
+      <div class="env-body">
+        <p>The function \(f(t) = \tfrac{9}{5} t + 32\) converts a temperature of \(t\) degrees Celsius into degrees Fahrenheit. What practical question does \(f^{-1}\) answer? Find a formula for \(f^{-1}(t)\), and verify your formula by computing \(f^{-1}\!\bigl(f(t)\bigr)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Since \(f\) converts Celsius to Fahrenheit, its inverse \(f^{-1}\) converts a Fahrenheit reading back into Celsius. Writing \(t = \tfrac{9}{5} f^{-1}(t) + 32\) and solving,
+        \[ f^{-1}(t) = \tfrac{5}{9}\,(t - 32). \]
+        As a check,
+        \[ f^{-1}\!\bigl(f(t)\bigr) = \tfrac{5}{9}\!\left(\tfrac{9}{5} t + 32 - 32\right) = \tfrac{5}{9}\cdot\tfrac{9}{5}\,t = t. \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
 </article>
 </template>
 
-<!-- Sections 1.2–Summary: use same content as screen version via shared script -->
 <template id="frag-sec-1-2">
+<!-- §1.2 Inverse Trigonometric Functions. Content verbatim from ch01_foundations.tex;
+     worked examples E1.2-a/b/c + O1.2-d supplemented from open banks (2026-06-12),
+     audit-approved. Figures renumbered 1.3-1.6 -> 1.4-1.7 (new Fig 1.3 added in §1.1). -->
 <article class="sec" lang="en">
+
   <header class="sec-head">
     <h2 class="sec-title"><span class="sec-no">1.2</span>Inverse Trigonometric Functions</h2>
   </header>
+
   <p>The trigonometric functions are not one-to-one on all of \(\mathbb{R}\), so they do not have inverse functions on their full domains. Inverse trigonometric functions arise whenever we know a ratio and want to recover an angle: from the slope of a ramp, we get an angle of inclination via \(\arctan\); from a ratio of sides in a right triangle, we get an angle via \(\arcsin\) or \(\arccos\). To build these inverses, we must first restrict the domain of each trigonometric function to an interval on which it is one-to-one.</p>
-  <p>Consider the sine function on \(\mathbb{R}\). As Figure 1.3 shows, a horizontal line can intersect the graph of \(y = \sin x\) more than once, so \(\sin\) is not one-to-one on \(\mathbb{R}\).</p>
-  <figure class="figure" data-fig="sine-not-1to1" style="--fig-w: var(--fig-1-3)">
-    <figcaption><span class="fig-no">Figure 1.3</span> The sine function on \(\mathbb{R}\) is not one-to-one.</figcaption>
+
+  <p>Consider the sine function on \(\mathbb{R}\). As Figure 1.4 shows, a horizontal line can intersect the graph of \(y = \sin x\) more than once, so \(\sin\) is not one-to-one on \(\mathbb{R}\).</p>
+
+  <figure class="figure" data-fig="sine-not-1to1">
+    <figcaption><span class="fig-no">Figure 1.4</span> The sine function on \(\mathbb{R}\) is not one-to-one.</figcaption>
   </figure>
+
   <h3 class="subsec-head">The inverse sine function</h3>
+
   <p>To define the inverse sine, we restrict \(\sin x\) to the interval
   \[ -\tfrac{\pi}{2} \le x \le \tfrac{\pi}{2}. \]
-  On this interval, \(\sin x\) is one-to-one and its values cover the range \([-1, 1]\). The restricted branch is shown in Figure 1.4.</p>
-  <figure class="figure" data-fig="restricted-sine" style="--fig-w: var(--fig-1-4)">
-    <figcaption><span class="fig-no">Figure 1.4</span> Restricted branch of the sine function used to define \(\arcsin x\).</figcaption>
+  On this interval, \(\sin x\) is one-to-one and its values cover the range \([-1, 1]\). The restricted branch is shown in Figure 1.5.</p>
+
+  <figure class="figure" data-fig="restricted-sine">
+    <figcaption><span class="fig-no">Figure 1.5</span> Restricted branch of the sine function used to define \(\arcsin x\).</figcaption>
   </figure>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.3</span></p>
     <div class="env-body">
@@ -570,19 +706,23 @@ window.MathJax = {
       Its domain is \([-1, 1]\) and its range is \(\left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\).</p>
     </div>
   </section>
+
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.1</span></p>
     <div class="env-body">
       <p>The notation \(\sin^{-1} x\) is also used for \(\arcsin x\). It does <em>not</em> mean the reciprocal \(\bigl(\sin x\bigr)^{-1} = 1 / \sin x\). When reading a source that uses \(\sin^{-1}\), check the context to decide which is meant.</p>
     </div>
   </section>
+
   <p>The composition identities for \(\arcsin\) take the following form.</p>
+
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.2</span><span class="env-name">Inverse sine identities</span></p>
     <div class="env-body">
       <p>\[ \begin{aligned} \sin(\arcsin x) = x, &\qquad -1 \le x \le 1,\\ \arcsin(\sin x) = x, &\qquad -\tfrac{\pi}{2} \le x \le \tfrac{\pi}{2}. \end{aligned} \]</p>
     </div>
   </section>
+
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.2</span></p>
     <div class="env-body">
@@ -590,9 +730,10 @@ window.MathJax = {
       \[ \arcsin(\sin \pi) = \arcsin(0) = 0 \neq \pi. \]</p>
     </div>
   </section>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.5</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.9</span></p>
       <div class="env-body">
         <p>Evaluate the following expressions.</p>
         <ol class="prompt-list">
@@ -608,18 +749,22 @@ window.MathJax = {
           <li>We need the angle \(y \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\) with \(\sin y = \tfrac{1}{2}\). Since \(\sin(\pi/6) = \tfrac{1}{2}\), we have \(\arcsin\!\left(\tfrac{1}{2}\right) = \tfrac{\pi}{6}\).</li>
           <li>Let \(\theta = \arcsin\!\left(\tfrac{1}{3}\right)\), so \(\sin\theta = \tfrac{1}{3}\) with \(\theta \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\). Because \(\sin\theta > 0\), the angle \(\theta\) lies in the first quadrant, and in a right triangle with hypotenuse \(3\) and opposite side \(1\), the adjacent side is
           \[ a = \sqrt{3^{2} - 1^{2}} = \sqrt{8} = 2\sqrt{2}. \]
-          <figure class="figure" data-fig="arcsin-triangle" style="--fig-w: var(--fig-1-4-aux)"></figure>
+          <figure class="figure" data-fig="arcsin-triangle"></figure>
           Therefore \(\tan\!\bigl(\arcsin\!\left(\tfrac{1}{3}\right)\bigr) = \tan\theta = \tfrac{1}{2\sqrt{2}}\).</li>
         </ol>
         <span class="qed"></span>
       </div>
     </section>
   </div>
+
   <h3 class="subsec-head">The inverse cosine function</h3>
-  <p>The cosine function is one-to-one on the interval \(0 \le x \le \pi\), shown in Figure 1.5.</p>
-  <figure class="figure" data-fig="restricted-cosine" style="--fig-w: var(--fig-1-5)">
-    <figcaption><span class="fig-no">Figure 1.5</span> Restricted branch of the cosine function used to define \(\arccos x\).</figcaption>
+
+  <p>The cosine function is one-to-one on the interval \(0 \le x \le \pi\), shown in Figure 1.6.</p>
+
+  <figure class="figure" data-fig="restricted-cosine">
+    <figcaption><span class="fig-no">Figure 1.6</span> Restricted branch of the cosine function used to define \(\arccos x\).</figcaption>
   </figure>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.4</span></p>
     <div class="env-body">
@@ -628,17 +773,62 @@ window.MathJax = {
       Its domain is \([-1, 1]\) and its range is \([0, \pi]\).</p>
     </div>
   </section>
+
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.3</span><span class="env-name">Inverse cosine identities</span></p>
     <div class="env-body">
       <p>\[ \begin{aligned} \cos(\arccos x) = x, &\qquad -1 \le x \le 1,\\ \arccos(\cos x) = x, &\qquad 0 \le x \le \pi. \end{aligned} \]</p>
     </div>
   </section>
+
+  <!-- expansion:example — domain of a composition: range of inner feeds domain of outer [source: CLP-1 §2.12 #1 (a)(c)] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.10</span></p>
+      <div class="env-body">
+        <p>Find the domain of each function.</p>
+        <ol class="prompt-list">
+          <li>\(f(x) = \arcsin(\cos x)\).</li>
+          <li>\(h(x) = \sin(\arccos x)\).</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>Whatever \(x\) is, \(\cos x\) lies in \([-1, 1]\), and \([-1, 1]\) is exactly the domain of \(\arcsin\). So every real \(x\) is allowed: the domain of \(f\) is \(\mathbb{R}\).</li>
+          <li>The inner function \(\arccos x\) requires \(x \in [-1, 1]\); its output is an angle, and \(\sin\) accepts any angle. So the domain of \(h\) is \([-1, 1]\).</li>
+        </ol>
+        <p>The pattern in both parts: the domain of a composition is governed by what the <em>inner</em> function accepts and what its outputs feed the <em>outer</em> function.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — principal value as an applied trap (arccos returns one value, not all) [source: CLP-1 §2.12 #2] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.11</span></p>
+      <div class="env-body">
+        <p>A particle starts moving at time \(t = 10\), and it bobs up and down so that its height at time \(t \ge 10\) is \(\cos t\). True or false: the particle has height \(1\) at time \(t = \arccos(1)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>False. The equation \(\cos t = 1\) holds for infinitely many \(t\), but \(\arccos\) returns only the principal value \(t = 0\) — and the particle is not even moving at \(t = 0\), since its motion starts at \(t = 10\). The particle does reach height \(1\) at the times \(t = 2\pi n\) for integers \(n \ge 2\), but \(\arccos(1) = 0\) is not one of them.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <h3 class="subsec-head">The inverse tangent function</h3>
-  <p>The tangent function is one-to-one on the interval \(-\tfrac{\pi}{2} < x < \tfrac{\pi}{2}\), shown in Figure 1.6.</p>
-  <figure class="figure" data-fig="restricted-tangent" style="--fig-w: var(--fig-1-6)">
-    <figcaption><span class="fig-no">Figure 1.6</span> Restricted branch of the tangent function used to define \(\arctan x\).</figcaption>
+
+  <p>The tangent function is one-to-one on the interval \(-\tfrac{\pi}{2} < x < \tfrac{\pi}{2}\), shown in Figure 1.7.</p>
+
+  <figure class="figure" data-fig="restricted-tangent">
+    <figcaption><span class="fig-no">Figure 1.7</span> Restricted branch of the tangent function used to define \(\arctan x\).</figcaption>
   </figure>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.5</span></p>
     <div class="env-body">
@@ -647,16 +837,46 @@ window.MathJax = {
       Its domain is \(\mathbb{R}\) and its range is \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\).</p>
     </div>
   </section>
+
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.4</span><span class="env-name">Inverse tangent identities</span></p>
     <div class="env-body">
       <p>\[ \begin{aligned} \tan(\arctan x) = x, &\qquad x \in \mathbb{R},\\ \arctan(\tan x) = x, &\qquad -\tfrac{\pi}{2} < x < \tfrac{\pi}{2}. \end{aligned} \]</p>
     </div>
   </section>
+
+  <!-- expansion:example — exact values with negative inputs, obtuse principal value, and the triangle method [source: Stitz-Zeager via Mooculus 10_06_ex_131-154] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.6</span></p>
-      <div class="env-body"><p>Simplify the expression \(\cos(\arctan x)\).</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.12</span></p>
+      <div class="env-body">
+        <p>Find the exact value of each expression.</p>
+        <ol class="prompt-list">
+          <li>\(\sin\!\bigl(\arccos(-\tfrac{1}{2})\bigr)\).</li>
+          <li>\(\sec(\arctan 10)\).</li>
+          <li>\(\tan\!\bigl(\arcsin(-\tfrac{2\sqrt{5}}{5})\bigr)\).</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>\(\arccos(-\tfrac{1}{2})\) is the angle in \([0, \pi]\) whose cosine is \(-\tfrac{1}{2}\): that is \(\tfrac{2\pi}{3}\), and \(\sin\tfrac{2\pi}{3} = \tfrac{\sqrt{3}}{2}\). Note the principal value lands in the <em>second</em> quadrant — negative inputs to \(\arccos\) always do.</li>
+          <li>Let \(\theta = \arctan 10\), so \(\tan\theta = 10\) with \(\theta \in \left(0, \tfrac{\pi}{2}\right)\). In a right triangle with opposite side \(10\) and adjacent side \(1\), the hypotenuse is \(\sqrt{101}\), so \(\sec(\arctan 10) = \sqrt{101}\).</li>
+          <li>Let \(\theta = \arcsin\!\bigl(-\tfrac{2\sqrt{5}}{5}\bigr)\), so \(\sin\theta = -\tfrac{2}{\sqrt{5}}\) with \(\theta \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\). Because \(\sin\theta < 0\), the angle lies in the fourth quadrant, where cosine is positive: \(\cos\theta = \sqrt{1 - \tfrac{4}{5}} = \tfrac{1}{\sqrt{5}}\). Therefore \(\tan\theta = \dfrac{-2/\sqrt{5}}{1/\sqrt{5}} = -2\). The sign came from the <em>range</em> of \(\arcsin\), not from guessing.</li>
+        </ol>
+        <span class="qed"></span>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.13</span></p>
+      <div class="env-body">
+        <p>Simplify the expression \(\cos(\arctan x)\).</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -668,8 +888,11 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <h3 class="subsec-head">The remaining inverse trigonometric functions</h3>
+
   <p>The remaining inverse trigonometric functions are used less frequently, but they are defined in the same spirit.</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.6</span></p>
     <div class="env-body">
@@ -677,6 +900,7 @@ window.MathJax = {
       \[ \arccsc x = y \quad \Longleftrightarrow \quad \csc y = x \ \text{ and } \ y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]. \]</p>
     </div>
   </section>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.7</span></p>
     <div class="env-body">
@@ -684,6 +908,7 @@ window.MathJax = {
       \[ \arcsec x = y \quad \Longleftrightarrow \quad \sec y = x \ \text{ and } \ y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right). \]</p>
     </div>
   </section>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.8</span></p>
     <div class="env-body">
@@ -691,32 +916,58 @@ window.MathJax = {
       \[ \arccot x = y \quad \Longleftrightarrow \quad \cot y = x \ \text{ and } \ y \in (0, \pi). \]</p>
     </div>
   </section>
+
   <p>The domains of \(\arccsc\) and \(\arcsec\) are \((-\infty, -1] \cup [1, \infty)\), while the domain of \(\arccot\) is \(\mathbb{R}\). The principal ranges are the intervals specified in the definitions above.</p>
+
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.3</span></p>
     <div class="env-body">
       <p>For \(\arcsec x\), another common choice of principal range is \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left(\tfrac{\pi}{2}, \pi\right]\). In this text we use \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right)\) because it makes the differentiation formulas for the inverse secant simpler. When consulting other sources or software, always check which convention is in use, since different branch choices can lead to different values.</p>
     </div>
   </section>
+
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.4</span></p>
     <div class="env-body">
       <p>For \(\arccsc x\), another common choice of principal range is \(y \in \left[-\tfrac{\pi}{2}, 0\right) \cup \left(0, \tfrac{\pi}{2}\right]\). In this text we use \(y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]\) so that the chosen branch parallels the one selected for \(\arcsec x\). Once the principal range is fixed consistently, either convention gives a valid inverse function.</p>
     </div>
   </section>
+
+  <!-- expansion:example — domains of the remaining inverse trig functions + the branch convention has visible consequences [source: CLP-1 §2.12 #5, recomputed for this text's arccsc principal range] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.14</span></p>
+      <div class="env-body">
+        <p>Let \(f(x) = \arcsin x + \arccsc x\). Find the domain of \(f\), and evaluate \(f\) at every point of its domain.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>\(\arcsin\) requires \(|x| \le 1\) while \(\arccsc\) requires \(|x| \ge 1\), so the domain is just the two points \(x = \pm 1\). At \(x = 1\): \(\arcsin 1 = \tfrac{\pi}{2}\) and \(\arccsc 1 = \tfrac{\pi}{2}\) (the angle in \(\left(0, \tfrac{\pi}{2}\right]\) with cosecant \(1\)), so \(f(1) = \pi\). At \(x = -1\): \(\arcsin(-1) = -\tfrac{\pi}{2}\), and under this text's principal range for \(\arccsc\) the angle with cosecant \(-1\) is \(\arccsc(-1) = \tfrac{3\pi}{2}\), so \(f(-1) = -\tfrac{\pi}{2} + \tfrac{3\pi}{2} = \pi\). So \(f\) is the constant \(\pi\) on its two-point domain. Under the alternative convention of Remark 1.4 (\(\arccsc(-1) = -\tfrac{\pi}{2}\)) one gets \(f(-1) = -\pi\) instead — a concrete instance of branch conventions changing answers, which is why this text fixes its conventions explicitly.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
 </article>
 </template>
 
 <template id="frag-sec-1-3">
+<!-- §1.3 The Limit of a Function. Content verbatim from ch01_foundations.tex;
+     worked examples E1.3-a + O1.3-b supplemented from open banks (2026-06-12),
+     audit-approved. Figure 1.7 -> 1.8; new Fig 1.9 (read-from-graph). -->
 <article class="sec" lang="en">
+
   <header class="sec-head">
     <h2 class="sec-title"><span class="sec-no">1.3</span>The Limit of a Function</h2>
   </header>
+
   <p>A frequent setting in calculus is the need to study a ratio of changes. If \(s(t)\) is the position of a moving object at time \(t\), the ratio
   \[ \frac{s(t + h) - s(t)}{h} \]
   is the <em>average velocity</em> of the object from time \(t\) to time \(t + h\). Very often we want the <em>instantaneous velocity</em> — how fast the object is moving at a single moment — rather than the average. To describe this, we let \(h\) shrink toward zero and ask what value the ratio approaches. More generally, for any function \(f\), the ratio
   \[ \frac{f(y) - f(x)}{y - x} \]
   measures how \(f\) changes between two inputs. We may want to know what this ratio does as \(y\) gets closer and closer to \(x\), without ever equalling \(x\). This is the motivation for the concept of a limit.</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.9</span></p>
     <div class="env-body">
@@ -725,16 +976,67 @@ window.MathJax = {
       and say that the <em>limit</em> of \(f(x)\) as \(x\) approaches \(a\) is \(L\) if \(f(x)\) can be made arbitrarily close to \(L\) whenever \(x\) is sufficiently close to \(a\) but not equal to \(a\).</p>
     </div>
   </section>
+
   <p>An alternative notation for the same idea is
   \[ f(x) \to L \qquad \text{as } x \to a, \]
-  read "\(f(x)\) tends to \(L\) as \(x\) tends to \(a\)."</p>
-  <p>When we consider \(\lim_{x \to a} f(x)\), we are concerned with the values of \(f(x)\) for \(x\) near \(a\), not with the value of \(f(a)\). In particular, \(f(a)\) need not be defined at all. Figure 1.7 shows three functions whose values at \(a\) are different (and one is undefined), yet which all share the same limit as \(x \to a\).</p>
-  <figure class="figure" data-fig="limit-same-near-a" style="--fig-w: var(--fig-1-7)">
-    <figcaption><span class="fig-no">Figure 1.7</span> Three functions with the same limit as \(x \to a\).</figcaption>
+  read “\(f(x)\) tends to \(L\) as \(x\) tends to \(a\).”</p>
+
+  <p>When we consider \(\lim_{x \to a} f(x)\), we are concerned with the values of \(f(x)\) for \(x\) near \(a\), not with the value of \(f(a)\). In particular, \(f(a)\) need not be defined at all. Figure 1.8 shows three functions whose values at \(a\) are different (and one is undefined), yet which all share the same limit as \(x \to a\).</p>
+
+  <figure class="figure" data-fig="limit-same-near-a">
+    <figcaption><span class="fig-no">Figure 1.8</span> Three functions with the same limit as \(x \to a\).</figcaption>
   </figure>
+
+  <!-- expansion:figure — graph for the read-off-the-graph example (continuous wave; (2,2) hollow, (2,-2) solid) [companion to Example 1.15] -->
+  <figure class="figure" data-fig="read-limit-graph">
+    <figcaption><span class="fig-no">Figure 1.9</span> A function whose limit at \(x = 2\) differs from its value there.</figcaption>
+  </figure>
+
+  <!-- expansion:example — read limits off a graph, including a point where the limit differs from f(a) [source: CLP-1 §1.3 #1] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.7</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.15</span></p>
+      <div class="env-body">
+        <p>The graph of a function \(f\) is shown in Figure 1.9. Evaluate the following, or state that the limit does not exist:</p>
+        <ol class="prompt-list">
+          <li>\(\displaystyle\lim_{x \to -2} f(x)\).</li>
+          <li>\(\displaystyle\lim_{x \to 0} f(x)\).</li>
+          <li>\(\displaystyle\lim_{x \to 2} f(x)\).</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>As \(x\) approaches \(-2\) from either side, the curve approaches height \(1\), so \(\displaystyle\lim_{x \to -2} f(x) = 1\).</li>
+          <li>As \(x\) approaches \(0\), the curve approaches height \(0\), so \(\displaystyle\lim_{x \to 0} f(x) = 0\).</li>
+          <li>As \(x\) approaches \(2\), the curve approaches height \(2\). The open dot at \((2, 2)\) and the solid dot at \((2, -2)\) tell us \(f(2) = -2\), but the limit ignores the value <em>at</em> the point: \(\displaystyle\lim_{x \to 2} f(x) = 2\), even though \(f(2) = -2\).</li>
+        </ol>
+        <span class="qed"></span>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — construct a curve with a prescribed limit/value mismatch (the reverse skill) [source: CLP-1 §1.3 #5] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.16</span></p>
+      <div class="env-body">
+        <p>Sketch the graph of a function \(f\) with \(\displaystyle\lim_{x \to 3} f(x) = 10\) and \(f(3) = 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Many answers are possible. Take any curve that approaches height \(10\) as \(x \to 3\) — for instance a straight line through \((3, 10)\) — and then move the single point at \(x = 3\) down to height \(0\), marking an open dot at \((3, 10)\) and a solid dot at \((3, 0)\). Near \(x = 3\), but not at it, the values approach \(10\), so \(\displaystyle\lim_{x \to 3} f(x) = 10\); the relocated point makes \(f(3) = 0\). The limit and the value at the point are independent, so nothing prevents this mismatch.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.17</span></p>
       <div class="env-body">
         <p>Guess the value of
         \[ \lim_{x \to 1} \frac{x - 1}{x^{2} - 1}. \]</p>
@@ -746,8 +1048,12 @@ window.MathJax = {
         <p>The expression is not defined at \(x = 1\), but we can examine its values for \(x\) near \(1\):</p>
         <div class="tbl-wrap">
           <table class="tbl">
-            <thead><tr><th>\(x\)</th><th>0.9</th><th>0.99</th><th>0.999</th><th>1.001</th><th>1.01</th><th>1.1</th></tr></thead>
-            <tbody><tr><td class="rowlab">\(\dfrac{x - 1}{x^{2} - 1}\)</td><td>0.5263</td><td>0.5025</td><td>0.5003</td><td>0.4998</td><td>0.4975</td><td>0.4762</td></tr></tbody>
+            <thead>
+              <tr><th>\(x\)</th><th>0.9</th><th>0.99</th><th>0.999</th><th>1.001</th><th>1.01</th><th>1.1</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="rowlab">\(\dfrac{x - 1}{x^{2} - 1}\)</td><td>0.5263</td><td>0.5025</td><td>0.5003</td><td>0.4998</td><td>0.4975</td><td>0.4762</td></tr>
+            </tbody>
           </table>
         </div>
         <p>The values are getting close to \(\tfrac{1}{2}\) as \(x\) approaches \(1\), so we guess
@@ -755,9 +1061,10 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.8</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.18</span></p>
       <div class="env-body">
         <p>Guess the value of
         \[ \lim_{t \to 0} \frac{\sqrt{t^{2} + 9} - 3}{t^{2}}. \]</p>
@@ -769,8 +1076,12 @@ window.MathJax = {
         <p>We evaluate the expression for values of \(t\) close to \(0\):</p>
         <div class="tbl-wrap">
           <table class="tbl">
-            <thead><tr><th>\(t\)</th><th>\(-0.1\)</th><th>\(-0.01\)</th><th>0.01</th><th>0.1</th></tr></thead>
-            <tbody><tr><td class="rowlab">\(\dfrac{\sqrt{t^{2} + 9} - 3}{t^{2}}\)</td><td>0.166620</td><td>0.166666</td><td>0.166666</td><td>0.166620</td></tr></tbody>
+            <thead>
+              <tr><th>\(t\)</th><th>\(-0.1\)</th><th>\(-0.01\)</th><th>0.01</th><th>0.1</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="rowlab">\(\dfrac{\sqrt{t^{2} + 9} - 3}{t^{2}}\)</td><td>0.166620</td><td>0.166666</td><td>0.166666</td><td>0.166620</td></tr>
+            </tbody>
           </table>
         </div>
         <p>These values are close to \(\tfrac{1}{6} = 0.166666\dots\), so we guess
@@ -778,18 +1089,28 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <p>The limits above were guessed by looking at function values near the point of interest. In the following sections, we will develop systematic methods for evaluating limits and study more subtle behavior such as one-sided limits and infinite limits.</p>
+
 </article>
 </template>
 
 <template id="frag-sec-1-4">
+<!-- §1.4 One-Sided and Infinite Limits. Content verbatim from ch01_foundations.tex;
+     worked examples E1.4-a/b/c supplemented from open banks (2026-06-12), audit-approved.
+     Figures 1.8-1.10 -> 1.10-1.12 (two new figures added upstream in §1.1, §1.3). -->
 <article class="sec" lang="en">
+
   <header class="sec-head">
     <h2 class="sec-title"><span class="sec-no">1.4</span>One-Sided and Infinite Limits</h2>
   </header>
+
   <p>Near a point \(a\), a function can behave differently depending on which side \(x\) approaches from, and in some cases the values of the function do not approach any finite number at all. These two observations lead to one-sided limits and infinite limits.</p>
+
   <h3 class="subsec-head">One-sided limits</h3>
+
   <p>Sometimes we only want to consider one side of the approach to \(a\) — for instance because the function is defined by different formulas on the two sides, or because the graph jumps at \(a\).</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.10</span></p>
     <div class="env-body">
@@ -800,20 +1121,49 @@ window.MathJax = {
       is the <em>right-hand limit</em>, describing the approach through values greater than \(a\).</p>
     </div>
   </section>
-  <figure class="figure" data-fig="one-sided-limits" style="--fig-w: var(--fig-1-8)">
-    <figcaption><span class="fig-no">Figure 1.8</span> A function whose left-hand and right-hand limits at \(a\) are different.</figcaption>
+
+  <figure class="figure" data-fig="one-sided-limits">
+    <figcaption><span class="fig-no">Figure 1.10</span> A function whose left-hand and right-hand limits at \(a\) are different.</figcaption>
   </figure>
+
   <p>The two one-sided limits together determine the two-sided limit.</p>
+
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.5</span><span class="env-name">Criterion for a two-sided limit</span></p>
     <div class="env-body">
       <p>\[ \lim_{x \to a} f(x) = L \quad \Longleftrightarrow \quad \lim_{x \to a^{-}} f(x) = L \ \text{ and } \ \lim_{x \to a^{+}} f(x) = L. \]</p>
     </div>
   </section>
+
   <p>If the two one-sided limits differ, then the two-sided limit does not exist.</p>
+
+  <!-- expansion:example — use the criterion in both directions, including the "not enough information" case [source: CLP-1 §1.3 #8, #9] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.9</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.19</span></p>
+      <div class="env-body">
+        <p>Suppose \(f\) is defined on all of \(\mathbb{R}\).</p>
+        <ol class="prompt-list">
+          <li>If \(\displaystyle\lim_{x \to -2} f(x) = 16\), what is \(\displaystyle\lim_{x \to -2^{-}} f(x)\)?</li>
+          <li>If instead all we know is \(\displaystyle\lim_{x \to -2^{-}} f(x) = 16\), what can we say about \(\displaystyle\lim_{x \to -2} f(x)\)?</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>For the two-sided limit to equal \(16\), <em>both</em> one-sided limits must equal \(16\); in particular \(\displaystyle\lim_{x \to -2^{-}} f(x) = 16\).</li>
+          <li>Not enough information. If the right-hand limit also equals \(16\), then \(\displaystyle\lim_{x \to -2} f(x) = 16\); if it differs or fails to exist, the two-sided limit does not exist.</li>
+        </ol>
+        <p>The criterion transfers information from the two-sided limit to each side, but only <em>both</em> sides together determine the two-sided limit.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.20</span></p>
       <div class="env-body">
         <p>Let
         \[ f(x) = \begin{cases} x + 1, & x < 2,\\[4pt] 4 - x, & x \ge 2. \end{cases} \]
@@ -829,12 +1179,17 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <h3 class="subsec-head">Infinite limits</h3>
+
   <p>In some cases, the values of \(f(x)\) do not approach any finite number as \(x \to a\). Instead, they grow arbitrarily large positive or arbitrarily large negative.</p>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.10</span></p>
-      <div class="env-body"><p>Consider \(f(x) = \dfrac{1}{x^{2}}\). What happens to \(f(x)\) as \(x \to 0\)?</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.21</span></p>
+      <div class="env-body">
+        <p>Consider \(f(x) = \dfrac{1}{x^{2}}\). What happens to \(f(x)\) as \(x \to 0\)?</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -845,9 +1200,27 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
+  <!-- expansion:example — 1/x versus 1/x^2: the boundary between DNE and ∞ [source: CLP-1 §1.3 #13, #14, #15] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.22</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\lim_{x \to 0^{-}} \frac{1}{x}\), \(\displaystyle\lim_{x \to 0^{+}} \frac{1}{x}\), and \(\displaystyle\lim_{x \to 0} \frac{1}{x}\), and contrast the results with \(\displaystyle\lim_{x \to 0} \frac{1}{x^{2}}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>As \(x\) approaches \(0\) from the left, \(\dfrac{1}{x}\) is negative with larger and larger magnitude, so \(\displaystyle\lim_{x \to 0^{-}} \frac{1}{x} = -\infty\). From the right, \(\dfrac{1}{x}\) is positive and grows without bound, so \(\displaystyle\lim_{x \to 0^{+}} \frac{1}{x} = \infty\). Because the two one-sided behaviors disagree, the two-sided limit does not exist — and since the values do not all grow in the <em>same</em> signed direction, we do <strong>not</strong> write \(\displaystyle\lim_{x \to 0} \frac{1}{x} = \infty\). Contrast \(\dfrac{1}{x^{2}}\): both sides grow positively, so there we do write \(\displaystyle\lim_{x \to 0} \frac{1}{x^{2}} = \infty\).<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <p>To capture this behavior, we introduce the notation
   \[ \lim_{x \to 0} \frac{1}{x^{2}} = \infty. \]
   The symbol \(\infty\) does not represent a real number; it records that the function's values grow without bound.</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.11</span></p>
     <div class="env-body">
@@ -858,14 +1231,19 @@ window.MathJax = {
       if the values of \(f(x)\) can be made arbitrarily large negative by taking \(x\) sufficiently close to \(a\), with \(x \neq a\).</p>
     </div>
   </section>
+
   <p>One-sided versions,
   \[ \lim_{x \to a^{-}} f(x) = \infty,\quad \lim_{x \to a^{+}} f(x) = \infty,\quad \lim_{x \to a^{-}} f(x) = -\infty,\quad \lim_{x \to a^{+}} f(x) = -\infty, \]
-  are defined analogously. The four cases are illustrated in Figure 1.9.</p>
-  <figure class="figure" data-fig="one-sided-infinite" style="--fig-w: var(--fig-1-9)">
-    <figcaption><span class="fig-no">Figure 1.9</span> The four typical one-sided infinite limits.</figcaption>
+  are defined analogously. The four cases are illustrated in Figure 1.11.</p>
+
+  <figure class="figure" data-fig="one-sided-infinite">
+    <figcaption><span class="fig-no">Figure 1.11</span> The four typical one-sided infinite limits.</figcaption>
   </figure>
+
   <h3 class="subsec-head">Vertical asymptotes</h3>
+
   <p>Infinite limits are closely related to vertical asymptotes.</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.12</span></p>
     <div class="env-body">
@@ -873,10 +1251,13 @@ window.MathJax = {
       \[ \lim_{x \to a^{-}} f(x) = \pm\infty \qquad \text{or} \qquad \lim_{x \to a^{+}} f(x) = \pm\infty. \]</p>
     </div>
   </section>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.11</span></p>
-      <div class="env-body"><p>Does the curve \(y = \dfrac{2x}{x - 3}\) have a vertical asymptote?</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.23</span></p>
+      <div class="env-body">
+        <p>Does the curve \(y = \dfrac{2x}{x - 3}\) have a vertical asymptote?</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -885,17 +1266,37 @@ window.MathJax = {
         \[ \lim_{x \to 3^{+}} \frac{2x}{x - 3} = \infty. \]
         As \(x \to 3^{-}\), the denominator is a small negative number while the numerator is still close to \(6\), so
         \[ \lim_{x \to 3^{-}} \frac{2x}{x - 3} = -\infty. \]
-        At least one one-sided limit is infinite, so the line \(x = 3\) is a vertical asymptote, as shown in Figure 1.10.<span class="qed"></span></p>
+        At least one one-sided limit is infinite, so the line \(x = 3\) is a vertical asymptote, as shown in Figure 1.12.<span class="qed"></span></p>
       </div>
     </section>
   </div>
-  <figure class="figure" data-fig="vertical-asymptote" style="--fig-w: var(--fig-1-10)">
-    <figcaption><span class="fig-no">Figure 1.10</span> The graph of \(y = \dfrac{2x}{x - 3}\) has a vertical asymptote at \(x = 3\).</figcaption>
+
+  <figure class="figure" data-fig="vertical-asymptote">
+    <figcaption><span class="fig-no">Figure 1.12</span> The graph of \(y = \dfrac{2x}{x - 3}\) has a vertical asymptote at \(x = 3\).</figcaption>
   </figure>
+
+  <!-- expansion:example — a zero denominator does not guarantee a vertical asymptote (the failure case) [source: CLP-1 §3.6.1 #1] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.12</span></p>
-      <div class="env-body"><p>Guess the value of \(\displaystyle \lim_{x \to 0^{+}} \ln x\).</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.24</span></p>
+      <div class="env-body">
+        <p>Suppose \(f(x) = \dfrac{g(x)}{x^{2} - 9}\) for some function \(g\). Must the line \(x = -3\) be a vertical asymptote of \(y = f(x)\)?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>No. The denominator does vanish at \(x = -3\), so \(x = -3\) is a <em>candidate</em> — but whether it is an asymptote depends on the numerator. If \(g(x) = 1\), then \(f(x) = \dfrac{1}{x^{2} - 9}\) blows up near \(-3\), and \(x = -3\) is a vertical asymptote. But if \(g(x) = x^{2} - 9\), then \(f(x) = 1\) at every point of its domain, and there is no asymptote at all. A zero denominator marks a place to <em>investigate</em> with one-sided limits, not a guaranteed asymptote.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.25</span></p>
+      <div class="env-body">
+        <p>Guess the value of \(\displaystyle \lim_{x \to 0^{+}} \ln x\).</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -906,16 +1307,23 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
 </article>
 </template>
 
 <template id="frag-sec-1-5">
+<!-- §1.5 Limit Laws and Computational Techniques. Content verbatim from ch01_foundations.tex;
+     worked examples E1.5-a/b/c + O1.5-d supplemented from open banks (2026-06-12), audit-approved. -->
 <article class="sec" lang="en">
+
   <header class="sec-head">
     <h2 class="sec-title"><span class="sec-no">1.5</span>Limit Laws and Computational Techniques</h2>
   </header>
+
   <p>In the previous sections we used tables and graphs to guess the values of limits. We now record algebraic properties that let us compute limits more systematically. These properties can be justified rigorously once we have the precise definition of a limit (see the next section); for now, they provide a reliable tool-kit.</p>
+
   <h3 class="subsec-head">The limit laws</h3>
+
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">1.2</span><span class="env-name">Limit laws</span></p>
     <div class="env-body">
@@ -927,10 +1335,33 @@ window.MathJax = {
       \[ \lim_{x \to a} \bigl[f(x)\bigr]^{n} = \left[\lim_{x \to a} f(x)\right]^{n}. \]</p>
     </div>
   </section>
+
   <p>Verbally: the limit of a sum / difference / constant multiple / product / integer power is the corresponding combination of the limits, and the limit of a quotient is the quotient of the limits whenever the denominator's limit is not zero.</p>
+
   <p>These laws will be proved rigorously in the next section once we have the \(\varepsilon\)-\(\delta\) definition; for now, they let us evaluate many limits directly.</p>
+
+  <!-- expansion:example — apply the limit laws abstractly, with no formula for f [source: CLP-1 §1.4 #42] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.26</span></p>
+      <div class="env-body">
+        <p>Suppose \(\displaystyle\lim_{x \to -1} f(x) = -1\). Evaluate
+        \[ \lim_{x \to -1} \frac{x\,f(x) + 3}{2 f(x) + 1}. \]</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We never need a formula for \(f\). By the product law, \(\displaystyle\lim_{x \to -1} x f(x) = (-1)(-1) = 1\); by the sum and constant-multiple laws the numerator tends to \(1 + 3 = 4\) and the denominator tends to \(2(-1) + 1 = -1\). The denominator's limit is nonzero, so the quotient law applies:
+        \[ \lim_{x \to -1} \frac{x f(x) + 3}{2 f(x) + 1} = \frac{4}{-1} = -4. \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <h3 class="subsec-head">Direct substitution</h3>
+
   <p>A first consequence of the limit laws is that polynomials and rational functions behave in the easiest way possible.</p>
+
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.6</span></p>
     <div class="env-body">
@@ -942,10 +1373,12 @@ window.MathJax = {
       \[ \lim_{x \to a} r(x) = r(a). \]</p>
     </div>
   </section>
+
   <p>For polynomials and rational functions where the denominator does not vanish at \(a\), direct substitution is therefore the fastest route to the limit.</p>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.13</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.27</span></p>
       <div class="env-body">
         <p>Evaluate
         \[ \lim_{x \to 1} \frac{x^{3} + 2x^{2} - 1}{5 - 3x}. \]</p>
@@ -961,11 +1394,37 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <h3 class="subsec-head">Algebraic simplification</h3>
+
   <p>When direct substitution produces an indeterminate form such as \(\tfrac{0}{0}\), we first simplify the expression and then take the limit.</p>
+
+  <!-- expansion:example — why 0/0 is indeterminate: it can equal anything [source: CLP-1 §1.4 #2, #5] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.14</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.28</span></p>
+      <div class="env-body">
+        <ol class="prompt-list">
+          <li>Find functions \(f\) and \(g\) with \(\displaystyle\lim_{x \to 3} f(x) = \lim_{x \to 3} g(x) = 0\) and \(\displaystyle\lim_{x \to 3} \frac{f(x)}{g(x)} = 10\).</li>
+          <li>What are the possible values of \(\displaystyle\lim_{x \to 3} \frac{f(x)}{g(x)}\), given only that both \(f\) and \(g\) tend to \(0\)?</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>Take \(f(x) = 10(x - 3)\) and \(g(x) = x - 3\). Both tend to \(0\) at \(3\), yet \(\dfrac{f(x)}{g(x)} = 10\) wherever it is defined, so the quotient's limit is \(10\).</li>
+          <li>Replacing \(10\) by any constant \(c\) gives limit \(c\); choices such as \(f(x) = x - 3\), \(g(x) = (x - 3)^{3}\) give \(\infty\); swapping signs gives \(-\infty\); and \(f(x) = x - 3\), \(g(x) = |x - 3|\) makes the limit fail to exist.</li>
+        </ol>
+        <p>A \(\tfrac{0}{0}\) form can therefore equal <em>anything</em> — which is exactly why it is called indeterminate, and why we must simplify before judging.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.29</span></p>
       <div class="env-body">
         <p>Evaluate
         \[ \lim_{x \to 1} \frac{x - 1}{x^{2} - 1}. \]</p>
@@ -981,9 +1440,10 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.15</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.30</span></p>
       <div class="env-body">
         <p>Evaluate
         \[ \lim_{t \to 0} \frac{\sqrt{t^{2} + 9} - 3}{t^{2}}. \]</p>
@@ -999,12 +1459,37 @@ window.MathJax = {
       </div>
     </section>
   </div>
-  <h3 class="subsec-head">Limits of piecewise-defined functions</h3>
-  <p>Some limits are easiest to analyse by splitting into cases.</p>
+
+  <!-- expansion:example — combine fractions before taking the limit (Strategy step 2 in action) [source: CLP-1 §1.4 extra, prob_s1.4.tex:751] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.16</span></p>
-      <div class="env-body"><p>Evaluate \(\displaystyle \lim_{x \to 0} |x|\).</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.31</span></p>
+      <div class="env-body">
+        <p>Evaluate
+        \[ \lim_{t \to \frac{1}{2}} \frac{\frac{1}{3t^{2}} + \frac{1}{t^{2} - 1}}{2t - 1}. \]</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Direct substitution gives \(\tfrac{0}{0}\). Combining the two fractions in the numerator over the common denominator \(3t^{2}(t^{2} - 1)\),
+        \[ \frac{1}{3t^{2}} + \frac{1}{t^{2} - 1} = \frac{(t^{2} - 1) + 3t^{2}}{3t^{2}(t^{2} - 1)} = \frac{4t^{2} - 1}{3t^{2}(t^{2} - 1)} = \frac{(2t - 1)(2t + 1)}{3t^{2}(t^{2} - 1)}. \]
+        Dividing by \(2t - 1\) cancels the troublesome factor, so
+        \[ \lim_{t \to \frac{1}{2}} \frac{\frac{1}{3t^{2}} + \frac{1}{t^{2} - 1}}{2t - 1} = \lim_{t \to \frac{1}{2}} \frac{2t + 1}{3t^{2}(t^{2} - 1)} = \frac{2}{\tfrac{3}{4}\bigl(-\tfrac{3}{4}\bigr)} = -\frac{32}{9}. \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Limits of piecewise-defined functions</h3>
+
+  <p>Some limits are easiest to analyse by splitting into cases.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.32</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle \lim_{x \to 0} |x|\).</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -1017,10 +1502,13 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.17</span></p>
-      <div class="env-body"><p>The greatest integer function \([x]\) is the largest integer less than or equal to \(x\), so that \([4] = 4\), \([4.1] = 4\), and \([4.8] = 4\). Determine whether \(\displaystyle \lim_{x \to 3} [x]\) exists.</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.33</span></p>
+      <div class="env-body">
+        <p>The greatest integer function \([x]\) is the largest integer less than or equal to \(x\), so that \([4] = 4\), \([4.1] = 4\), and \([4.8] = 4\). Determine whether \(\displaystyle \lim_{x \to 3} [x]\) exists.</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -1029,8 +1517,11 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <h3 class="subsec-head">The squeeze theorem</h3>
+
   <p>The limit laws require that both constituent limits exist, but sometimes one of the factors has no limit at all. A useful technique is to trap the expression between two simpler functions whose limits agree.</p>
+
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">1.3</span><span class="env-name">Squeeze theorem</span></p>
     <div class="env-body">
@@ -1041,9 +1532,10 @@ window.MathJax = {
       then \(\displaystyle \lim_{x \to a} f(x) = L\).</p>
     </div>
   </section>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.18</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.34</span></p>
       <div class="env-body">
         <p>Evaluate
         \[ \lim_{x \to 0} x^{2} \sin\!\left(\frac{1}{x}\right). \]</p>
@@ -1061,9 +1553,10 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.19</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.35</span></p>
       <div class="env-body">
         <p>Evaluate
         \[ \lim_{x \to 0} x \cos\!\left(\frac{1}{x}\right). \]</p>
@@ -1081,6 +1574,7 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.2</span><span class="env-name">Computing a limit \(\lim_{x \to a} f(x)\)</span></p>
     <div class="env-body">
@@ -1093,23 +1587,52 @@ window.MathJax = {
       </ol>
     </div>
   </section>
+
+  <!-- expansion:example — synthesis: force a constant so the limit exists, then compute it [source: CLP-1 §1.4 #43] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.36</span></p>
+      <div class="env-body">
+        <p>Find the value of the constant \(a\) for which \(\displaystyle\lim_{x \to -2} \frac{x^{2} + a x + 3}{x^{2} + x - 2}\) exists, and evaluate the limit for that value of \(a\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The denominator factors as \((x + 2)(x - 1)\) and tends to \(0\) as \(x \to -2\). If the numerator tended to a nonzero number, the quotient would blow up and the limit could not exist; so the numerator must also tend to \(0\): \(4 - 2a + 3 = 0\), giving \(a = \tfrac{7}{2}\). With this \(a\),
+        \[ \lim_{x \to -2} \frac{x^{2} + \tfrac{7}{2}x + 3}{x^{2} + x - 2} = \lim_{x \to -2} \frac{(x + 2)\bigl(x + \tfrac{3}{2}\bigr)}{(x + 2)(x - 1)} = \lim_{x \to -2} \frac{x + \tfrac{3}{2}}{x - 1} = \frac{-\tfrac{1}{2}}{-3} = \frac{1}{6}. \]
+        Notice the flow of reasoning: the <em>existence</em> of the limit forced the value of \(a\), and then the techniques of this section finished the computation.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
 </article>
 </template>
 
 <template id="frag-sec-1-6">
+<!-- §1.6 The Precise Definition of a Limit. Content verbatim from ch01_foundations.tex;
+     worked examples E1.6-a/b + O1.6-c/d supplemented from open banks + one AI-authored
+     (O1.6-d), 2026-06-12, audit-approved. Figure 1.11 -> 1.13. -->
 <article class="sec" lang="en">
+
   <header class="sec-head">
     <h2 class="sec-title"><span class="sec-no">1.6</span>The Precise Definition of a Limit</h2>
   </header>
+
   <p>From the time of Newton and Leibniz, calculus was remarkably successful at solving problems in geometry, mechanics, and astronomy. For a long time, however, there was also controversy about its logical foundations. Early arguments often relied on infinitesimals — quantities thought of as being extremely small but not described in a fully precise way — and mathematicians continued to ask what it really means to say that \(x\) approaches \(a\) or that \(f(x)\) approaches \(L\). The modern resolution, developed in the nineteenth century, is the \(\varepsilon\)-\(\delta\) definition of a limit, which gave calculus the level of rigor used in modern mathematics.</p>
-  <p>In the previous sections we used graphs, tables, and algebraic techniques to study limits, and we stated the limit laws without proof. Those arguments rested on informal phrases such as "\(f(x)\) is close to \(L\)" and "\(x\) is close to \(a\)." To make the arguments rigorous — and, eventually, to prove the limit laws — we need a definition that replaces "close" with numerical precision.</p>
+
+  <p>In the previous sections we used graphs, tables, and algebraic techniques to study limits, and we stated the limit laws without proof. Those arguments rested on informal phrases such as “\(f(x)\) is close to \(L\)” and “\(x\) is close to \(a\).” To make the arguments rigorous — and, eventually, to prove the limit laws — we need a definition that replaces “close” with numerical precision.</p>
+
   <p>To motivate the definition, consider the function
   \[ f(x) = \begin{cases} 2x - 1, & x \neq 3,\\[4pt] 6, & x = 3. \end{cases} \]
-  When \(x\) is close to \(3\) but \(x \neq 3\), the value \(f(x) = 2x - 1\) is close to \(5\). Intuitively, we expect \(\displaystyle \lim_{x \to 3} f(x) = 5\). But how close, exactly? We begin by making the informal phrase "close" numerically precise.</p>
+  When \(x\) is close to \(3\) but \(x \neq 3\), the value \(f(x) = 2x - 1\) is close to \(5\). Intuitively, we expect \(\displaystyle \lim_{x \to 3} f(x) = 5\). But how close, exactly? We begin by making the informal phrase “close” numerically precise.</p>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.20</span></p>
-      <div class="env-body"><p>For the function above, how close must \(x\) be to \(3\) so that \(f(x)\) differs from \(5\) by less than \(0.1\)?</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.37</span></p>
+      <div class="env-body">
+        <p>For the function above, how close must \(x\) be to \(3\) so that \(f(x)\) differs from \(5\) by less than \(0.1\)?</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -1120,7 +1643,9 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <p>Tightening the tolerance from \(0.1\) to \(0.01\), the same reasoning gives \(|f(x) - 5| < 0.01\) whenever \(0 < |x - 3| < 0.005\). As the tolerance shrinks, so must the neighborhood of \(3\). More generally, for any \(\varepsilon > 0\), the same manipulation gives \(|f(x) - 5| < \varepsilon\) whenever \(|x - 3| < \tfrac{\varepsilon}{2}\); we may therefore take \(\delta = \tfrac{\varepsilon}{2}\). The word <em>arbitrarily</em> in the informal definition means precisely: we can answer the question for <em>every</em> \(\varepsilon > 0\), not just for a few specific tolerances.</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.13</span></p>
     <div class="env-body">
@@ -1130,16 +1655,41 @@ window.MathJax = {
       \[ |f(x) - L| < \varepsilon \qquad \text{whenever} \qquad 0 < |x - a| < \delta. \]</p>
     </div>
   </section>
-  <p>Figure 1.11 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
-  <figure class="figure" data-fig="precise-limit" style="--fig-w: var(--fig-1-11)">
-    <figcaption><span class="fig-no">Figure 1.11</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
+
+  <p>Figure 1.13 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
+
+  <figure class="figure" data-fig="precise-limit">
+    <figcaption><span class="fig-no">Figure 1.13</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
   </figure>
-  <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is "for every \(\varepsilon > 0\)": no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\).</p>
+
+  <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\).</p>
+
+  <!-- expansion:example — diagnose a wrong definition: order of tolerances and direction of implication [source: APEX §1.2 #1, #2] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.38</span></p>
+      <div class="env-body">
+        <p>What is wrong with the following attempted definition of \(\displaystyle\lim_{x \to a} f(x) = L\)?</p>
+        <p><em>“Given any \(\delta > 0\), there exists \(\varepsilon > 0\) such that whenever \(|f(x) - L| < \varepsilon\), we have \(0 < |x - a| < \delta\).”</em></p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Two things are reversed. First, the <em>order of the tolerances</em>: the challenge must come on the \(y\)-side — “given any \(\varepsilon\)” — and \(\delta\) is our response; the attempted version lets us pick the easy quantity after seeing the hard one. Second, the <em>direction of the implication</em>: the definition must say that closeness of \(x\) to \(a\) forces closeness of \(f(x)\) to \(L\), that is, \(0 < |x - a| < \delta\) implies \(|f(x) - L| < \varepsilon\) — not the other way around. Correcting both gives exactly Definition 1.13.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <p>A first payoff of the \(\varepsilon\)-\(\delta\) definition is that the value of a limit, when it exists, is unambiguous.</p>
+
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.7</span><span class="env-name">Uniqueness of limits</span></p>
-    <div class="env-body"><p>If \(\displaystyle\lim_{x \to a} f(x)\) exists, then it is unique.</p></div>
+    <div class="env-body">
+      <p>If \(\displaystyle\lim_{x \to a} f(x)\) exists, then it is unique.</p>
+    </div>
   </section>
+
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
@@ -1154,6 +1704,7 @@ window.MathJax = {
       which is impossible. Therefore \(L = M\).<span class="qed qed-proof"></span></p>
     </div>
   </section>
+
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.3</span><span class="env-name">Verifying a limit from the \(\varepsilon\)-\(\delta\) definition</span></p>
     <div class="env-body">
@@ -1166,10 +1717,29 @@ window.MathJax = {
       </ol>
     </div>
   </section>
+
+  <!-- expansion:example — a constant function: any δ works (δ need not be a function of ε) [source: APEX §1.2 #3] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.21</span></p>
-      <div class="env-body"><p>Show from the definition that \(\displaystyle \lim_{x \to 3} (4x - 5) = 7\).</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.39</span></p>
+      <div class="env-body">
+        <p>Show from the definition that \(\displaystyle \lim_{x \to 2} 5 = 5\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(\varepsilon > 0\), we need \(|5 - 5| < \varepsilon\) whenever \(0 < |x - 2| < \delta\). But \(|5 - 5| = 0 < \varepsilon\) is <em>always</em> true, no matter what \(x\) does. So any choice of \(\delta\) works; we may simply take \(\delta = \varepsilon\) (or \(\delta = 1\), or anything else). This is the one situation where \(\delta\) need not depend on \(\varepsilon\) at all.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.40</span></p>
+      <div class="env-body">
+        <p>Show from the definition that \(\displaystyle \lim_{x \to 3} (4x - 5) = 7\).</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -1184,10 +1754,13 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.22</span></p>
-      <div class="env-body"><p>Show from the definition that \(\displaystyle \lim_{x \to 1} (x^{2} - 5x + 6) = 2\).</p></div>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.41</span></p>
+      <div class="env-body">
+        <p>Show from the definition that \(\displaystyle \lim_{x \to 1} (x^{2} - 5x + 6) = 2\).</p>
+      </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
@@ -1206,7 +1779,27 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
+  <!-- expansion:example — feed a known inequality into the definition: lim sin x = 0 [source: APEX §1.2 #8] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.42</span></p>
+      <div class="env-body">
+        <p>Using the fact that \(|\sin x| \le |x|\) for all \(x\), show from the definition that \(\displaystyle\lim_{x \to 0} \sin x = 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(\varepsilon > 0\), choose \(\delta = \varepsilon\). If \(0 < |x - 0| < \delta\), then
+        \[ |\sin x - 0| = |\sin x| \le |x| < \delta = \varepsilon. \]
+        Therefore \(\displaystyle\lim_{x \to 0} \sin x = 0\). The borrowed inequality did all the work: no factoring, no auxiliary bound — Step 2 of Strategy 1.3 was handed to us for free.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <p>The \(\varepsilon\)-\(\delta\) machinery also gives precise meaning to the informal definitions of infinite limits from Definition 1.11.</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.14</span></p>
     <div class="env-body">
@@ -1220,18 +1813,42 @@ window.MathJax = {
       \[ f(x) < N \qquad \text{whenever} \qquad 0 < |x - a| < \delta. \]</p>
     </div>
   </section>
+
   <p>Intuitively, \(M\) may be any large positive threshold (such as \(100\), \(100^{100}\), or \(1000^{1000}\)): no matter how large the threshold, \(f(x)\) eventually exceeds it once \(x\) is close enough to \(a\). Likewise, \(N\) may be any negative threshold (such as \(-100\), \(-100^{100}\), or \(-1000^{1000}\)), below which \(f(x)\) is eventually forced.</p>
+
+  <!-- expansion:example — M-δ proof of an infinite limit, the rigorous counterpart of Example 1.21 [source: AI, audit-approved] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.43</span></p>
+      <div class="env-body">
+        <p>Show from the precise definition that \(\displaystyle \lim_{x \to 0} \frac{1}{x^{2}} = \infty\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(M > 0\), choose \(\delta = \dfrac{1}{\sqrt{M}}\). If \(0 < |x| < \delta\), then \(x^{2} < \delta^{2} = \dfrac{1}{M}\), so
+        \[ \frac{1}{x^{2}} > M. \]
+        Since every threshold \(M\) is eventually exceeded once \(x\) is close enough to \(0\), we have \(\displaystyle \lim_{x \to 0} \frac{1}{x^{2}} = \infty\) — the rigorous counterpart of the informal argument in Example 1.21.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <p>Finally, the \(\varepsilon\)-\(\delta\) definition gives a precise meaning to a property of functions that recurs throughout later chapters. If \(f\) is defined at every point near \(a\), including at \(a\), and if
   \[ \lim_{x \to a} f(x) = f(a), \]
   then \(f\) is said to be <em>continuous at \(a\)</em>. A systematic study of continuity belongs to a later chapter; we mention the term here because it is expressed directly in terms of limits.</p>
+
 </article>
 </template>
 
 <template id="frag-sec-summary">
+<!-- Chapter 1 Summary. Content verbatim from ch01_foundations.tex. -->
 <article class="sec" lang="en">
+
   <header class="sec-head">
     <h2 class="sec-title">Summary</h2>
   </header>
+
   <p class="para-head">Key definitions.</p>
   <ul>
     <li><em>One-to-one function</em> — different inputs always produce different outputs.</li>
@@ -1243,6 +1860,7 @@ window.MathJax = {
     <li><em>Vertical asymptote</em> at \(x = a\) — at least one of the one-sided limits at \(a\) is infinite.</li>
     <li><em>Continuity at a point</em> — \(\lim_{x \to a} f(x) = f(a)\); studied systematically in a later chapter.</li>
   </ul>
+
   <p class="para-head">Key theorems, propositions, and corollaries.</p>
   <ul>
     <li><em>Horizontal line test</em> — a function is one-to-one if and only if no horizontal line meets its graph more than once.</li>
@@ -1252,6 +1870,7 @@ window.MathJax = {
     <li><em>Limit laws</em> — limits respect sums, differences, products, quotients with nonzero denominator limit, and integer powers.</li>
     <li><em>Squeeze theorem</em> — if \(g(x) \le f(x) \le h(x)\) near \(a\) and \(g\) and \(h\) share a common limit \(L\) there, then so does \(f\).</li>
   </ul>
+
   <p class="para-head">Key formulas and identities.</p>
   <ul>
     <li>Inverse composition: \(f^{-1}(f(x)) = x\) for \(x\) in the domain of \(f\), and \(f(f^{-1}(y)) = y\) for \(y\) in the range of \(f\).</li>
@@ -1260,8 +1879,11 @@ window.MathJax = {
     <li>Two-sided criterion: \(\lim_{x \to a} f(x) = L\) exactly when \(\lim_{x \to a^{\pm}} f(x) = L\).</li>
     <li>Precise \(\varepsilon\)-\(\delta\) statement: \(\lim_{x \to a} f(x) = L\) means that for every \(\varepsilon > 0\) there exists \(\delta > 0\) such that \(|f(x) - L| < \varepsilon\) whenever \(0 < |x - a| < \delta\).</li>
   </ul>
+
 </article>
 </template>
+
+
 
 
 <!-- plot.js — inlined -->
@@ -1369,173 +1991,328 @@ window.MathJax = {
 })();
 </script>
 
-<!-- figures.js — inlined (Chapter 1 figure registry) -->
+<!-- ============================================================
+     figures.js — inlined (Chapter 1 figure registry)
+     ============================================================ -->
 <script>
+/* ============================================================
+   figures.js — Chapter 1 figure registry.
+   Each entry returns { layout, panels:[{svg, note}] } (note may
+   carry \( \) math, rendered by the page's KaTeX pass afterward).
+   In-figure labels also carry TeX via { type:"text", tex:"…" } and
+   are typeset by the same KaTeX pass — so every glyph in the graphs
+   matches the body equations (Computer Modern).
+   hydrateFigures(root) fills every <figure data-fig="id"> before
+   its <figcaption>.
+   ============================================================ */
 (function () {
-  var P = function() { return window.PIVAL; };
-  var pow2 = function(x) { return Math.pow(2, x); };
-  var FIGS = {
-    "hlt": function() { return { layout: "pair", panels: [
-      { svg: buildPlot({ w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3, xlabel: "x", ylabel: "y", aria: "A one-to-one line crossed once by a horizontal line.", items: [
-        { type: "curve", fn: function(x){return x;}, domain: [-1.5, 1.45], cls: "curve" },
-        { type: "hline", y: 1, from: -2.1, to: 1.3, cls: "refline" },
-        { type: "dot", x: 1, y: 1 },
-        { type: "text", x: 1.55, y: 1.62, tex: "f", cls: "a-curve" },
-        { type: "text", x: 1.42, y: 1.0, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -2 },
-        { type: "text", x: 1.06, y: 0.46, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "start" }
-      ]}), note: "One-to-one — a line meets the graph at most once." },
-      { svg: buildPlot({ w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3, xlabel: "x", ylabel: "y", aria: "A parabola crossed twice by a horizontal line.", items: [
-        { type: "curve", fn: function(x){return 1.15*x*x;}, domain: [-1.4, 1.4], cls: "curve" },
-        { type: "hline", y: 1.25, from: -1.85, to: 1.85, cls: "refline" },
-        { type: "dot", x: -1.043, y: 1.25 }, { type: "dot", x: 1.043, y: 1.25 },
-        { type: "text", x: 1.5, y: 2.18, tex: "f", cls: "a-curve" },
-        { type: "text", x: 1.9, y: 1.25, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 },
-        { type: "text", x: -1.2, y: 0.98, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "end" },
-        { type: "text", x: 1.2, y: 0.98, tex: "(x_2,\\,c)", cls: "a-pt", anchor: "start" }
-      ]}), note: "Not one-to-one — a line meets the graph more than once." }
-    ]}; },
-    "sine-not-1to1": function() { return { layout: "single", panels: [{ svg: buildPlot({
-      w: 620, h: 220, xmin: -6.9, xmax: 7.4, ymin: -1.35, ymax: 1.35, pad: { t: 16, r: 18, b: 26, l: 18 },
-      xlabel: "x", ylabel: "y", aria: "The sine function on the real line is not one-to-one.",
-      xticks: [{ x: -2*P() }, { x: -P() }, { x: P() }, { x: 2*P() }], yticks: [{ y: -1 }, { y: 1 }],
-      items: [
-        { type: "curve", fn: function(x){return Math.sin(x);}, domain: [-6.8, 6.8], samples: 360, cls: "curve" },
-        { type: "hline", y: 0.5, from: -6.8, to: 6.8, cls: "refline" },
-        { type: "dot", x: 0.5236, y: 0.5, r: 2.6 }, { type: "dot", x: 2.618, y: 0.5, r: 2.6 },
-        { type: "dot", x: 6.807, y: 0.5, r: 2.6 }, { type: "dot", x: -3.6652, y: 0.5, r: 2.6 },
-        { type: "dot", x: -5.7596, y: 0.5, r: 2.6 },
-        { type: "text", x: 3.25, y: 1.0, tex: "\\sin x", cls: "a-curve", anchor: "start" },
-        { type: "text", x: 6.95, y: 0.5, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 }
-      ]
-    })}]}; },
-    "restricted-sine": function() { return { layout: "single", panels: [{ svg: buildPlot({
-      w: 380, h: 260, xmin: -1.95, xmax: 1.95, ymin: -1.25, ymax: 1.25,
-      xlabel: "x", ylabel: "y", aria: "Restricted branch of sine.",
-      xticks: [{ x: -P()/2 }, { x: P()/2 }], yticks: [{ y: -1 }, { y: 1 }],
-      items: [{ type: "curve", fn: function(x){return Math.sin(x);}, domain: [-P()/2, P()/2], cls: "curve" },
-        { type: "text", x: 1.02, y: 1.12, tex: "\\sin x", cls: "a-curve", anchor: "start" }]
-    })}]}; },
-    "restricted-cosine": function() { return { layout: "single", panels: [{ svg: buildPlot({
-      w: 380, h: 200, xmin: -0.4, xmax: 3.6, ymin: -1.35, ymax: 1.75,
-      xlabel: "x", ylabel: "y", aria: "Restricted branch of cosine.",
-      xticks: [{ x: P() }], yticks: [{ y: -1 }, { y: 1 }],
-      items: [{ type: "curve", fn: function(x){return Math.cos(x);}, domain: [0, P()], cls: "curve" },
-        { type: "text", x: 1.25, y: 0.8, tex: "\\cos x", cls: "a-curve", anchor: "start" }]
-    })}]}; },
-    "restricted-tangent": function() { return { layout: "single", panels: [{ svg: buildPlot({
-      w: 320, h: 320, xmin: -1.95, xmax: 1.95, ymin: -5, ymax: 5,
-      xlabel: "x", ylabel: "y", aria: "Restricted branch of tangent.",
-      xticks: [{ x: -P()/2 }, { x: P()/2 }],
-      items: [
-        { type: "vline", x: -P()/2, cls: "refline" }, { type: "vline", x: P()/2, cls: "refline" },
-        { type: "curve", fn: function(x){return Math.tan(x);}, domain: [-1.37, 1.37], samples: 300, cls: "curve" },
-        { type: "text", x: 0.35, y: 2.8, tex: "\\tan x", cls: "a-curve", anchor: "start" }]
-    })}]}; },
-    "arcsin-triangle": function() { return { layout: "single", panels: [{ svg: buildPlot({
-      w: 300, h: 130, xmin: -0.3, xmax: 3.5, ymin: -0.35, ymax: 1.45, axes: false,
-      aria: "Right triangle with angle theta, opposite 1, adjacent 2 root 2, hypotenuse 3.",
-      items: [
-        { type: "seg", x1: 0, y1: 0, x2: 3, y2: 0, cls: "curve" },
-        { type: "seg", x1: 3, y1: 0, x2: 3, y2: 1, cls: "curve" },
-        { type: "seg", x1: 3, y1: 1, x2: 0, y2: 0, cls: "curve" },
-        { type: "seg", x1: 2.78, y1: 0, x2: 2.78, y2: 0.22, cls: "axis" },
-        { type: "seg", x1: 2.78, y1: 0.22, x2: 3, y2: 0.22, cls: "axis" },
-        { type: "text", x: 0.74, y: 0.085, tex: "\\theta", cls: "a-pt", anchor: "start" },
-        { type: "text", x: 1.5, y: 0, tex: "2\\sqrt{2}", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
-        { type: "text", x: 3, y: 0.5, tex: "1", cls: "a-pt", anchor: "start", dx: 4 },
-        { type: "text", x: 1.25, y: 0.62, tex: "3", cls: "a-pt", anchor: "end" }]
-    })}]}; },
-    "limit-same-near-a": function() {
-      var base = function(extra) { return buildPlot(Object.assign({
+  const P = () => window.PIVAL;
+  const pow2 = (x) => Math.pow(2, x);
+
+  const FIGS = {
+    /* ---------------- §1.1 ---------------- */
+    "hlt": () => ({
+      layout: "pair",
+      panels: [
+        {
+          svg: buildPlot({
+            w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3,
+            xlabel: "x", ylabel: "y", aria: "A one-to-one line crossed once by a horizontal line.",
+            items: [
+              { type: "curve", fn: (x) => x, domain: [-1.5, 1.45], cls: "curve" },
+              { type: "hline", y: 1, from: -2.1, to: 1.3, cls: "refline" },
+              { type: "dot", x: 1, y: 1 },
+              { type: "text", x: 1.55, y: 1.62, tex: "f", cls: "a-curve" },
+              { type: "text", x: 1.42, y: 1.0, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -2 },
+              { type: "text", x: 1.06, y: 0.46, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "start" },
+            ],
+          }),
+          note: "One-to-one \u2014 a line meets the graph at most once.",
+        },
+        {
+          svg: buildPlot({
+            w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3,
+            xlabel: "x", ylabel: "y", aria: "A parabola crossed twice by a horizontal line.",
+            items: [
+              { type: "curve", fn: (x) => 1.15 * x * x, domain: [-1.4, 1.4], cls: "curve" },
+              { type: "hline", y: 1.25, from: -1.85, to: 1.85, cls: "refline" },
+              { type: "dot", x: -1.043, y: 1.25 },
+              { type: "dot", x: 1.043, y: 1.25 },
+              { type: "text", x: 1.5, y: 2.18, tex: "f", cls: "a-curve" },
+              { type: "text", x: 1.9, y: 1.25, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 },
+              { type: "text", x: -1.2, y: 0.98, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "end" },
+              { type: "text", x: 1.2, y: 0.98, tex: "(x_2,\\,c)", cls: "a-pt", anchor: "start" },
+            ],
+          }),
+          note: "Not one-to-one \u2014 a line meets the graph more than once.",
+        },
+      ],
+    }),
+
+    "restrict-x2": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 300, h: 300, xmin: -0.4, xmax: 2.7, ymin: -0.4, ymax: 2.7,
+          xlabel: "x", ylabel: "y",
+          aria: "The squaring function restricted to the nonnegative reals, its inverse square root, and the mirror line y equals x.",
+          items: [
+            { type: "curve", fn: (x) => x, domain: [0, 2.5], cls: "refline" },
+            { type: "curve", fn: (x) => x * x, domain: [0, 1.6], cls: "curve" },
+            { type: "curve", fn: (x) => Math.sqrt(x), domain: [0, 2.5], cls: "curve" },
+            { type: "text", x: 1.02, y: 2.25, tex: "f(x)=x^{2}", cls: "a-curve", anchor: "end" },
+            { type: "text", x: 2.5, y: 1.5, tex: "f^{-1}(x)=\\sqrt{x}", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 2.32, y: 2.5, tex: "y=x", cls: "a-ref", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.2 ---------------- */
+    "sine-not-1to1": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 620, h: 220, xmin: -6.9, xmax: 7.4, ymin: -1.35, ymax: 1.35,
+          pad: { t: 16, r: 18, b: 26, l: 18 },
+          xlabel: "x", ylabel: "y", aria: "The sine function on the real line is not one-to-one.",
+          xticks: [{ x: -2 * P() }, { x: -P() }, { x: P() }, { x: 2 * P() }],
+          yticks: [{ y: -1 }, { y: 1 }],
+          items: [
+            { type: "curve", fn: (x) => Math.sin(x), domain: [-6.8, 6.8], samples: 360, cls: "curve" },
+            { type: "hline", y: 0.5, from: -6.8, to: 6.8, cls: "refline" },
+            ...[0.5236, 2.618, 6.807, -3.6652, -5.7596].map((x) => ({ type: "dot", x, y: 0.5, r: 2.6 })),
+            { type: "text", x: 3.25, y: 1.0, tex: "\\sin x", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 6.95, y: 0.5, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 },
+          ],
+        }),
+      }],
+    }),
+    "restricted-sine": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 380, h: 260, xmin: -1.95, xmax: 1.95, ymin: -1.25, ymax: 1.25,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of sine.",
+          xticks: [{ x: -P() / 2 }, { x: P() / 2 }], yticks: [{ y: -1 }, { y: 1 }],
+          items: [
+            { type: "curve", fn: (x) => Math.sin(x), domain: [-P() / 2, P() / 2], cls: "curve" },
+            { type: "text", x: 1.02, y: 1.12, tex: "\\sin x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "restricted-cosine": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 380, h: 200, xmin: -0.4, xmax: 3.6, ymin: -1.35, ymax: 1.75,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of cosine.",
+          xticks: [{ x: P() }], yticks: [{ y: -1 }, { y: 1 }],
+          items: [
+            { type: "curve", fn: (x) => Math.cos(x), domain: [0, P()], cls: "curve" },
+            { type: "text", x: 1.25, y: 0.8, tex: "\\cos x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "restricted-tangent": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 320, h: 320, xmin: -1.95, xmax: 1.95, ymin: -5, ymax: 5,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of tangent.",
+          xticks: [{ x: -P() / 2 }, { x: P() / 2 }],
+          items: [
+            { type: "vline", x: -P() / 2, cls: "refline" },
+            { type: "vline", x: P() / 2, cls: "refline" },
+            { type: "curve", fn: (x) => Math.tan(x), domain: [-1.37, 1.37], samples: 300, cls: "curve" },
+            { type: "text", x: 0.35, y: 2.8, tex: "\\tan x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "arcsin-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 300, h: 130, xmin: -0.3, xmax: 3.5, ymin: -0.35, ymax: 1.45, axes: false,
+          aria: "Right triangle with angle theta, opposite 1, adjacent 2 root 2, hypotenuse 3.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 3, y2: 0, cls: "curve" },
+            { type: "seg", x1: 3, y1: 0, x2: 3, y2: 1, cls: "curve" },
+            { type: "seg", x1: 3, y1: 1, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2.78, y1: 0, x2: 2.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 2.78, y1: 0.22, x2: 3, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.74, y: 0.085, tex: "\\theta", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1.5, y: 0, tex: "2\\sqrt{2}", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 3, y: 0.5, tex: "1", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 1.25, y: 0.62, tex: "3", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.3 ---------------- */
+    "limit-same-near-a": () => {
+      const base = (extra) => buildPlot(Object.assign({
         w: 250, h: 200, xmin: 0, xmax: 3.7, ymin: 0, ymax: 14,
         pad: { t: 14, r: 16, b: 20, l: 18 }, xlabel: "x", ylabel: "y",
-        aria: "A function approaching L as x approaches a."
-      }, extra)); };
-      var labels = [
+        aria: "A function approaching L as x approaches a.",
+      }, extra));
+      const labels = [
         { type: "hline", y: 8, from: 0, to: 3, cls: "refline" },
         { type: "text", x: 3, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
-        { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 }
+        { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
       ];
-      return { layout: "triple", panels: [
-        { svg: base({ items: [{ type: "curve", fn: pow2, domain: [0.45, 3.45], cls: "curve" }].concat(labels, [{ type: "dot", x: 3, y: 8 }]) }), note: "\\(f(a) = L\\)" },
-        { svg: base({ items: [{ type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" }, { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" }].concat(labels, [{ type: "dot", x: 3, y: 8, hollow: true }, { type: "dot", x: 3, y: 5 }]) }), note: "\\(f(a) \\neq L\\)" },
-        { svg: base({ items: [{ type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" }, { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" }].concat(labels, [{ type: "dot", x: 3, y: 8, hollow: true }]) }), note: "\\(f(a)\\) is undefined" }
-      ]};
+      return {
+        layout: "triple",
+        panels: [
+          {
+            svg: base({ items: [{ type: "curve", fn: pow2, domain: [0.45, 3.45], cls: "curve" }, ...labels, { type: "dot", x: 3, y: 8 }] }),
+            note: "\\(f(a) = L\\)",
+          },
+          {
+            svg: base({ items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              ...labels, { type: "dot", x: 3, y: 8, hollow: true }, { type: "dot", x: 3, y: 5 },
+            ] }),
+            note: "\\(f(a) \\neq L\\)",
+          },
+          {
+            svg: base({ items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              ...labels, { type: "dot", x: 3, y: 8, hollow: true },
+            ] }),
+            note: "\\(f(a)\\) is undefined",
+          },
+        ],
+      };
     },
-    "one-sided-limits": function() { return { layout: "single", panels: [{ svg: buildPlot({
-      w: 420, h: 260, xmin: -0.5, xmax: 4.5, ymin: -0.5, ymax: 3.2,
-      xlabel: "x", ylabel: "y", aria: "Different left and right limits at a.",
-      xticks: [{ x: 2, tex: "a" }], yticks: [{ y: 1, tex: "L_1" }, { y: 2, tex: "L_2" }],
-      items: [
-        { type: "curve", fn: function(x){return 1+0.25*(x-2)*(x-2);}, domain: [0.2, 1.95], cls: "curve" },
-        { type: "curve", fn: function(x){return 2+0.2*(x-2)*(x-2);}, domain: [2.05, 4.2], cls: "curve" },
-        { type: "dot", x: 2, y: 1, hollow: true }, { type: "dot", x: 2, y: 2, hollow: true }]
-    })}]}; },
-    "one-sided-infinite": function() {
-      var mk = function(fn, dom, ymin, ymax) { return buildPlot({
-        w: 240, h: 210, xmin: -0.2, xmax: 3.2, ymin: ymin, ymax: ymax,
+
+    "read-limit-graph": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 460, h: 280, xmin: -3.3, xmax: 2.9, ymin: -2.7, ymax: 2.8,
+          xlabel: "x", ylabel: "y",
+          aria: "A function with limit 1 at x = -2, limit 0 at x = 0, and limit 2 at x = 2, although f(2) = -2.",
+          xticks: [{ x: -2 }, { x: 2 }],
+          items: [
+            { type: "curve", fn: (x) => -0.0375 * x * x * x + 0.375 * x * x + 0.4 * x, domain: [-2.8, 1.98], samples: 200, cls: "curve" },
+            { type: "dot", x: 2, y: 2, hollow: true },
+            { type: "dot", x: 2, y: -2 },
+            { type: "text", x: -2.7, y: 1.55, tex: "y=f(x)", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.4 ---------------- */
+    "one-sided-limits": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 260, xmin: -0.5, xmax: 4.5, ymin: -0.5, ymax: 3.2,
+          xlabel: "x", ylabel: "y", aria: "Different left and right limits at a.",
+          xticks: [{ x: 2, tex: "a" }], yticks: [{ y: 1, tex: "L_1" }, { y: 2, tex: "L_2" }],
+          items: [
+            { type: "curve", fn: (x) => 1 + 0.25 * (x - 2) * (x - 2), domain: [0.2, 1.95], cls: "curve" },
+            { type: "curve", fn: (x) => 2 + 0.2 * (x - 2) * (x - 2), domain: [2.05, 4.2], cls: "curve" },
+            { type: "dot", x: 2, y: 1, hollow: true }, { type: "dot", x: 2, y: 2, hollow: true },
+          ],
+        }),
+      }],
+    }),
+    "one-sided-infinite": () => {
+      const mk = (fn, dom, ymin, ymax) => buildPlot({
+        w: 240, h: 210, xmin: -0.2, xmax: 3.2, ymin, ymax,
         pad: { t: 14, r: 14, b: 20, l: 16 }, xlabel: "x", ylabel: "y",
-        aria: "A one-sided infinite limit.", xticks: [{ x: 2, tex: "a" }],
-        items: [{ type: "vline", x: 2, cls: "refline" }, { type: "curve", fn: fn, domain: dom, samples: 200, cls: "curve" }]
-      }); };
-      return { layout: "grid", panels: [
-        { svg: mk(function(x){return 1/(2-x);}, [0.25, 1.68], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{-}} f(x)=\\infty\\)" },
-        { svg: mk(function(x){return 1/(x-2);}, [2.32, 3.0], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{+}} f(x)=\\infty\\)" },
-        { svg: mk(function(x){return -1/(2-x);}, [0.25, 1.68], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{-}} f(x)=-\\infty\\)" },
-        { svg: mk(function(x){return -1/(x-2);}, [2.32, 3.0], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{+}} f(x)=-\\infty\\)" }
-      ]};
+        aria: "A one-sided infinite limit.",
+        xticks: [{ x: 2, tex: "a" }],
+        items: [{ type: "vline", x: 2, cls: "refline" }, { type: "curve", fn, domain: dom, samples: 200, cls: "curve" }],
+      });
+      return {
+        layout: "grid",
+        panels: [
+          { svg: mk((x) => 1 / (2 - x), [0.25, 1.68], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{-}} f(x)=\\infty\\)" },
+          { svg: mk((x) => 1 / (x - 2), [2.32, 3.0], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{+}} f(x)=\\infty\\)" },
+          { svg: mk((x) => -1 / (2 - x), [0.25, 1.68], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{-}} f(x)=-\\infty\\)" },
+          { svg: mk((x) => -1 / (x - 2), [2.32, 3.0], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{+}} f(x)=-\\infty\\)" },
+        ],
+      };
     },
-    "vertical-asymptote": function() { return { layout: "single", panels: [{ svg: buildPlot({
-      w: 420, h: 260, xmin: -1, xmax: 7, ymin: -66, ymax: 66,
-      xlabel: "x", ylabel: "y", aria: "Graph with a vertical asymptote at x = 3.",
-      xticks: [{ x: 3, tex: "3" }],
-      items: [
-        { type: "vline", x: 3, cls: "refline" },
-        { type: "curve", fn: function(x){return (2*x)/(x-3);}, domain: [-0.8, 2.9], samples: 200, cls: "curve" },
-        { type: "curve", fn: function(x){return (2*x)/(x-3);}, domain: [3.1, 6.8], samples: 200, cls: "curve" }]
-    })}]}; },
-    "precise-limit": function() {
-      var Lm = 6.498019, Lp = 9.849155;
-      return { layout: "single", panels: [{ svg: buildPlot({
-        w: 460, h: 300, xmin: 0, xmax: 3.8, ymin: 0, ymax: 14,
-        pad: { t: 16, r: 18, b: 24, l: 58 }, xlabel: "x", ylabel: "y",
-        aria: "Geometric interpretation of the epsilon-delta definition.",
-        items: [
-          { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
-          { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
-          { type: "hline", y: Lm, from: 0, to: 3.8, cls: "refline" },
-          { type: "hline", y: Lp, from: 0, to: 3.8, cls: "refline" },
-          { type: "vline", x: 2.7, cls: "refline" }, { type: "vline", x: 3.3, cls: "refline" },
-          { type: "dot", x: 3, y: 8, hollow: true }, { type: "dot", x: 3, y: 11.6 },
-          { type: "dot", x: 2.7, y: Lm, r: 1.8 }, { type: "dot", x: 3.3, y: Lp, r: 1.8 },
-          { type: "text", x: 2.7, y: 0, tex: "a-\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
-          { type: "text", x: 3.02, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
-          { type: "text", x: 3.32, y: 0, tex: "a+\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
-          { type: "text", x: 0, y: Lm, tex: "L-\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 },
-          { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
-          { type: "text", x: 0, y: Lp, tex: "L+\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 }]
-      })}]};
-    }
+    "vertical-asymptote": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 260, xmin: -1, xmax: 7, ymin: -66, ymax: 66,
+          xlabel: "x", ylabel: "y", aria: "Graph with a vertical asymptote at x = 3.",
+          xticks: [{ x: 3, tex: "3" }],
+          items: [
+            { type: "vline", x: 3, cls: "refline" },
+            { type: "curve", fn: (x) => (2 * x) / (x - 3), domain: [-0.8, 2.9], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => (2 * x) / (x - 3), domain: [3.1, 6.8], samples: 200, cls: "curve" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.6 ---------------- */
+    "precise-limit": () => {
+      const Lm = 6.498019, Lp = 9.849155;
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 460, h: 300, xmin: 0, xmax: 3.8, ymin: 0, ymax: 14,
+            pad: { t: 16, r: 18, b: 24, l: 58 }, xlabel: "x", ylabel: "y",
+            aria: "Geometric interpretation of the epsilon-delta definition.",
+            items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              { type: "hline", y: Lm, from: 0, to: 3.8, cls: "refline" },
+              { type: "hline", y: Lp, from: 0, to: 3.8, cls: "refline" },
+              { type: "vline", x: 2.7, cls: "refline" },
+              { type: "vline", x: 3.3, cls: "refline" },
+              { type: "dot", x: 3, y: 8, hollow: true },
+              { type: "dot", x: 3, y: 11.6 },
+              { type: "dot", x: 2.7, y: Lm, r: 1.8 },
+              { type: "dot", x: 3.3, y: Lp, r: 1.8 },
+              { type: "text", x: 2.7, y: 0, tex: "a-\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 3.02, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 3.32, y: 0, tex: "a+\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 0, y: Lm, tex: "L-\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 },
+              { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+              { type: "text", x: 0, y: Lp, tex: "L+\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 },
+            ],
+          }),
+        }],
+      };
+    },
   };
+
   function hydrateFigures(root) {
-    (root || document).querySelectorAll("[data-fig]").forEach(function(el) {
-      var def = FIGS[el.dataset.fig];
+    (root || document).querySelectorAll("[data-fig]").forEach((el) => {
+      const def = FIGS[el.dataset.fig];
       if (!def || el.dataset.figDone) return;
-      var result = def();
-      var layout = result.layout, panels = result.panels;
-      var html;
+      const { layout, panels } = def();
+      let html;
       if (layout === "single" && panels.length === 1 && !panels[0].note) {
-        html = '<div class="figure-art">' + panels[0].svg + '</div>';
+        html = `<div class="figure-art">${panels[0].svg}</div>`;
       } else {
-        var cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
-        html = '<div class="figure-art ' + cls + '">' +
-          panels.map(function(p) { return '<div class="fig-panel">' + p.svg + (p.note ? '<div class="fig-note">' + p.note + '</div>' : "") + '</div>'; }).join("") +
-          '</div>';
+        const cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
+        html = `<div class="figure-art ${cls}">` +
+          panels.map((p) => `<div class="fig-panel">${p.svg}${p.note ? `<div class="fig-note">${p.note}</div>` : ""}</div>`).join("") +
+          `</div>`;
       }
       el.insertAdjacentHTML("afterbegin", html);
       el.dataset.figDone = "1";
     });
   }
+
   window.hydrateFigures = hydrateFigures;
 })();
 </script>
@@ -1545,7 +2322,7 @@ window.MathJax = {
 var CHAPTER = {
   brand: "Chapter 1",
   runningHead: "Chapter 1 · Inverse Functions and Limits",
-  fragments: ["sec-intro","sec-1-1","sec-1-2","sec-1-3","sec-1-4","sec-1-5","sec-1-6","sec-summary"],
+  fragments: ["sec-intro", "sec-1-1", "sec-1-2", "sec-1-3", "sec-1-4", "sec-1-5", "sec-1-6", "sec-summary"],
 };
 var FRAGMENTS = CHAPTER.fragments;
 var RUNNING_HEAD = CHAPTER.runningHead;

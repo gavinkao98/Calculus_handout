@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
-"""Generate standalone HTML files for chapters 2 and 3,
-modeled after chapter 1's standalone (screen) and print-standalone files.
+"""Generate standalone HTML files for chapters 1, 2 and 3.
+
+Chapter 1's own standalone files serve as the chrome skeleton (page CSS, the
+print paginator, the MathJax config); for ch1 the generation is a self-rebuild
+that re-inlines the example-ch01/ fragments + figures.js and rewrites the config.
+Chapters 2 and 3 reuse the same chrome.
+
+Note: per-figure ``--fig-w`` overrides are NOT carried in the source fragments,
+so on rebuild ch1 figures fall back to the print defaults (--fig-w-pair /
+--fig-w-single). That is intended: the hlt pair defaults to 250px, the mapping
+SVG carries its own inline width:340px, and every other figure renders at 100%.
 
 Usage:  python gen_standalone.py
-Output: chapter2-standalone.html, chapter2-print-standalone.html,
-        chapter3-standalone.html, chapter3-print-standalone.html
+Output: chapter{1,2,3}-standalone.html, chapter{1,2,3}-print-standalone.html
 """
 import re, pathlib
 
@@ -13,6 +21,32 @@ HERE = pathlib.Path(__file__).resolve().parent
 # ── Chapter definitions ──────────────────────────────────────────────
 
 CHAPTERS = {
+    1: {
+        "title_screen": "Chapter 1 — Inverse Functions and Limits",
+        "title_print":  "Chapter 1 — Print build",
+        "brand":        "Chapter 1",
+        "running_head": "Chapter 1 · Inverse Functions and Limits",
+        "dir":          "example-ch01",
+        "fragments":    ["sec-intro", "sec-1-1", "sec-1-2", "sec-1-3",
+                         "sec-1-4", "sec-1-5", "sec-1-6", "sec-summary"],
+        "fig_css_vars": (
+            ':root {\n'
+            '  --fig-1-1:  250px;   /* Figure 1.1  horizontal line test (pair) */\n'
+            '  --fig-1-2:  340px;   /* Figure 1.2  inverse mapping diagram */\n'
+            '  --fig-1-3:  280px;   /* Figure 1.3  restricted x^2, sqrt x, y=x */\n'
+            '  --fig-1-4:  100%;    /* Figure 1.4  sine not one-to-one */\n'
+            '  --fig-1-5:  100%;    /* Figure 1.5  restricted sine */\n'
+            '  --fig-1-6:  100%;    /* Figure 1.6  restricted cosine */\n'
+            '  --fig-1-7:  100%;    /* Figure 1.7  restricted tangent */\n'
+            '  --fig-1-8:  100%;    /* Figure 1.8  three functions, same limit (triple) */\n'
+            '  --fig-1-9:  100%;    /* Figure 1.9  read-off-the-graph example */\n'
+            '  --fig-1-10: 100%;    /* Figure 1.10 left/right limits differ */\n'
+            '  --fig-1-11: 100%;    /* Figure 1.11 four one-sided infinite limits (grid) */\n'
+            '  --fig-1-12: 100%;    /* Figure 1.12 vertical asymptote */\n'
+            '  --fig-1-13: 100%;    /* Figure 1.13 epsilon-delta geometry */\n'
+            '}'
+        ),
+    },
     2: {
         "title_screen": "Chapter 2 — Derivatives",
         "title_print":  "Chapter 2 — Print build",

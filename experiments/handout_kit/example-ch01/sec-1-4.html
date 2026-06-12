@@ -1,4 +1,6 @@
-<!-- §1.4 One-Sided and Infinite Limits. Content verbatim from ch01_foundations.tex. -->
+<!-- §1.4 One-Sided and Infinite Limits. Content verbatim from ch01_foundations.tex;
+     worked examples E1.4-a/b/c supplemented from open banks (2026-06-12), audit-approved.
+     Figures 1.8-1.10 -> 1.10-1.12 (two new figures added upstream in §1.1, §1.3). -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -23,7 +25,7 @@
   </section>
 
   <figure class="figure" data-fig="one-sided-limits">
-    <figcaption><span class="fig-no">Figure 1.8</span> A function whose left-hand and right-hand limits at \(a\) are different.</figcaption>
+    <figcaption><span class="fig-no">Figure 1.10</span> A function whose left-hand and right-hand limits at \(a\) are different.</figcaption>
   </figure>
 
   <p>The two one-sided limits together determine the two-sided limit.</p>
@@ -37,9 +39,33 @@
 
   <p>If the two one-sided limits differ, then the two-sided limit does not exist.</p>
 
+  <!-- expansion:example — use the criterion in both directions, including the "not enough information" case [source: CLP-1 §1.3 #8, #9] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.9</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.19</span></p>
+      <div class="env-body">
+        <p>Suppose \(f\) is defined on all of \(\mathbb{R}\).</p>
+        <ol class="prompt-list">
+          <li>If \(\displaystyle\lim_{x \to -2} f(x) = 16\), what is \(\displaystyle\lim_{x \to -2^{-}} f(x)\)?</li>
+          <li>If instead all we know is \(\displaystyle\lim_{x \to -2^{-}} f(x) = 16\), what can we say about \(\displaystyle\lim_{x \to -2} f(x)\)?</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>For the two-sided limit to equal \(16\), <em>both</em> one-sided limits must equal \(16\); in particular \(\displaystyle\lim_{x \to -2^{-}} f(x) = 16\).</li>
+          <li>Not enough information. If the right-hand limit also equals \(16\), then \(\displaystyle\lim_{x \to -2} f(x) = 16\); if it differs or fails to exist, the two-sided limit does not exist.</li>
+        </ol>
+        <p>The criterion transfers information from the two-sided limit to each side, but only <em>both</em> sides together determine the two-sided limit.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.20</span></p>
       <div class="env-body">
         <p>Let
         \[ f(x) = \begin{cases} x + 1, & x < 2,\\[4pt] 4 - x, & x \ge 2. \end{cases} \]
@@ -62,7 +88,7 @@
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.10</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.21</span></p>
       <div class="env-body">
         <p>Consider \(f(x) = \dfrac{1}{x^{2}}\). What happens to \(f(x)\) as \(x \to 0\)?</p>
       </div>
@@ -73,6 +99,22 @@
         <p>If \(x\) is close to \(0\), then \(x^{2}\) is a very small positive number, so \(\dfrac{1}{x^{2}}\) is very large. For instance,
         \[ \frac{1}{(0.1)^{2}} = 100, \qquad \frac{1}{(0.01)^{2}} = 10{,}000. \]
         The values of \(\dfrac{1}{x^{2}}\) grow without bound as \(x \to 0\), so no finite \(L\) satisfies the informal definition of the limit; the limit does not exist.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — 1/x versus 1/x^2: the boundary between DNE and ∞ [source: CLP-1 §1.3 #13, #14, #15] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.22</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\lim_{x \to 0^{-}} \frac{1}{x}\), \(\displaystyle\lim_{x \to 0^{+}} \frac{1}{x}\), and \(\displaystyle\lim_{x \to 0} \frac{1}{x}\), and contrast the results with \(\displaystyle\lim_{x \to 0} \frac{1}{x^{2}}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>As \(x\) approaches \(0\) from the left, \(\dfrac{1}{x}\) is negative with larger and larger magnitude, so \(\displaystyle\lim_{x \to 0^{-}} \frac{1}{x} = -\infty\). From the right, \(\dfrac{1}{x}\) is positive and grows without bound, so \(\displaystyle\lim_{x \to 0^{+}} \frac{1}{x} = \infty\). Because the two one-sided behaviors disagree, the two-sided limit does not exist — and since the values do not all grow in the <em>same</em> signed direction, we do <strong>not</strong> write \(\displaystyle\lim_{x \to 0} \frac{1}{x} = \infty\). Contrast \(\dfrac{1}{x^{2}}\): both sides grow positively, so there we do write \(\displaystyle\lim_{x \to 0} \frac{1}{x^{2}} = \infty\).<span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -94,10 +136,10 @@
 
   <p>One-sided versions,
   \[ \lim_{x \to a^{-}} f(x) = \infty,\quad \lim_{x \to a^{+}} f(x) = \infty,\quad \lim_{x \to a^{-}} f(x) = -\infty,\quad \lim_{x \to a^{+}} f(x) = -\infty, \]
-  are defined analogously. The four cases are illustrated in Figure 1.9.</p>
+  are defined analogously. The four cases are illustrated in Figure 1.11.</p>
 
   <figure class="figure" data-fig="one-sided-infinite">
-    <figcaption><span class="fig-no">Figure 1.9</span> The four typical one-sided infinite limits.</figcaption>
+    <figcaption><span class="fig-no">Figure 1.11</span> The four typical one-sided infinite limits.</figcaption>
   </figure>
 
   <h3 class="subsec-head">Vertical asymptotes</h3>
@@ -114,7 +156,7 @@
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.11</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.23</span></p>
       <div class="env-body">
         <p>Does the curve \(y = \dfrac{2x}{x - 3}\) have a vertical asymptote?</p>
       </div>
@@ -126,18 +168,34 @@
         \[ \lim_{x \to 3^{+}} \frac{2x}{x - 3} = \infty. \]
         As \(x \to 3^{-}\), the denominator is a small negative number while the numerator is still close to \(6\), so
         \[ \lim_{x \to 3^{-}} \frac{2x}{x - 3} = -\infty. \]
-        At least one one-sided limit is infinite, so the line \(x = 3\) is a vertical asymptote, as shown in Figure 1.10.<span class="qed"></span></p>
+        At least one one-sided limit is infinite, so the line \(x = 3\) is a vertical asymptote, as shown in Figure 1.12.<span class="qed"></span></p>
       </div>
     </section>
   </div>
 
   <figure class="figure" data-fig="vertical-asymptote">
-    <figcaption><span class="fig-no">Figure 1.10</span> The graph of \(y = \dfrac{2x}{x - 3}\) has a vertical asymptote at \(x = 3\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.12</span> The graph of \(y = \dfrac{2x}{x - 3}\) has a vertical asymptote at \(x = 3\).</figcaption>
   </figure>
+
+  <!-- expansion:example — a zero denominator does not guarantee a vertical asymptote (the failure case) [source: CLP-1 §3.6.1 #1] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.24</span></p>
+      <div class="env-body">
+        <p>Suppose \(f(x) = \dfrac{g(x)}{x^{2} - 9}\) for some function \(g\). Must the line \(x = -3\) be a vertical asymptote of \(y = f(x)\)?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>No. The denominator does vanish at \(x = -3\), so \(x = -3\) is a <em>candidate</em> — but whether it is an asymptote depends on the numerator. If \(g(x) = 1\), then \(f(x) = \dfrac{1}{x^{2} - 9}\) blows up near \(-3\), and \(x = -3\) is a vertical asymptote. But if \(g(x) = x^{2} - 9\), then \(f(x) = 1\) at every point of its domain, and there is no asymptote at all. A zero denominator marks a place to <em>investigate</em> with one-sided limits, not a guaranteed asymptote.<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.12</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.25</span></p>
       <div class="env-body">
         <p>Guess the value of \(\displaystyle \lim_{x \to 0^{+}} \ln x\).</p>
       </div>
