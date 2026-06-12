@@ -1,7 +1,7 @@
 # problem_banks —— 開放授權題庫（本地 clone 區）
 
 選題流程（manuscript first → bank fill → AI fallback）的搜題資料來源。
-工作流程契約見 [`CONTENT_EXERCISES.md`](../CONTENT_EXERCISES.md) §Sourcing workflow。
+工作流程契約見 [`CONTENT_EXERCISES.md`](../CONTENT_EXERCISES.md) §選題流程。
 
 **除本 README 外，整個資料夾 gitignored**——題庫是第三方 repo 的 shallow clone，
 不進本專案版控。換機器後照下方指令重新抓取即可。
