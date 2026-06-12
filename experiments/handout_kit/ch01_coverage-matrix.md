@@ -239,6 +239,11 @@ Notes:
 
 ## Proposed next review pass
 
+> **2026-06-12 update:** the full-text review document for this pass is
+> [`ch01_candidate-review.md`](ch01_candidate-review.md) — per-candidate original text,
+> official-solution status, proposed adaptations, and the reply form. Three matrix errata
+> (duplicate #39 assignment, §1.3-#3 section fit, C1.2-D source attribution) are recorded there.
+
 For each section, choose one of:
 
 - `accept shortlist`: select candidate IDs to adapt into the first exercise block.
