@@ -4,6 +4,15 @@
 
 本檔案中標記為 *(TBD)* 的項目是明確開放的。未標記 *(TBD)* 的項目是 working decision，作者應遵循直到本檔修訂為止。
 
+> **適用範圍修正（2026-06-12，使用者定案）：講義本體不收節末習題。** 習題改由日後**獨立的
+> 習題本**處理（屆時的設計輪次沿用本檔的預算、題型分類與答案／提示決策）。本檔的「選題流程」
+> 一節是格式無關的共用工作流程，**當前的應用對象是課文內的 worked examples**（`example`＋
+> `solution`，見 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5；HTML 線為 `env-example`＋
+> `env-solution`）——矩陣的欄判準從「四類題型覆蓋」改讀為「每個教學點有無示範」，且官方
+> solution 為硬性條件（worked example 必須附完整解）。[`CONTENT_SPEC.md`](CONTENT_SPEC.md)
+> §14「每節結尾 MUST 有 Exercises 區塊或 TODO placeholder」與本定案衝突，**待依 spec 的
+> 修訂協議提案處理**；在那之前 placeholder 留在原處不動。
+
 ---
 
 ## Spec 與本檔的分工

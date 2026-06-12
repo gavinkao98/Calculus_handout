@@ -239,10 +239,15 @@ Notes:
 
 ## Proposed next review pass
 
-> **2026-06-12 update:** the full-text review document for this pass is
-> [`ch01_candidate-review.md`](ch01_candidate-review.md) — per-candidate original text,
-> official-solution status, proposed adaptations, and the reply form. Three matrix errata
-> (duplicate #39 assignment, §1.3-#3 section fit, C1.2-D source attribution) are recorded there.
+> **2026-06-12 update (framing corrected):** the pilot's target changed — bank problems
+> supplement **in-body worked examples**, not end-of-section exercises (the handout ships no
+> exercise blocks; exercises move to a future separate workbook, per user decision recorded in
+> `CONTENT_EXERCISES.md`). This matrix's taught-item rows remain valid; its exercise-specific
+> assumptions (no-exercise baseline, env-exercise insertion model, per-section exercise targets)
+> are superseded. Live documents: [`ch01_candidate-review.md`](ch01_candidate-review.md) =
+> full-text source pantry (C-ID index; three matrix errata recorded there), and
+> [`ch01_example-supplement-review.md`](ch01_example-supplement-review.md) = the decision
+> document (existing-example inventory, gaps, proposed insertions).
 
 For each section, choose one of:
 
