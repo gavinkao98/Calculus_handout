@@ -14,9 +14,10 @@
 
 | | 檔 | 來源 |
 |---|---|---|
-| **designer 原樣** | `讀我-排版指南.md`、`template-screen.html`、`template-print.html`、`new-chapter-preview.html`、`shared/`、`new-chapter/`、`example-ch01/` | 解壓自 `latex.zip`，**未改動** |
+| **designer 原樣** | `讀我-排版指南.md`、`template-screen.html`、`template-print.html`、`new-chapter-preview.html`、`shared/`、`new-chapter/` | 解壓自 `latex.zip`，**未改動** |
+| **Ch1 內容** | `example-ch01/`（`sec-*.html` + `figures.js`） | 原為 designer 的 ch01 內容；2026-06-12 起另含題庫補入的 21 筆課文範例（見 [`ch01_example-imports.md`](ch01_example-imports.md)） |
 | **寫作契約** | [`CONTRACT-html-writing.md`](CONTRACT-html-writing.md)、[`RESULT-s42-html-poc.md`](RESULT-s42-html-poc.md) | POC 驗證後制訂 |
-| **standalone 產線** | `gen_standalone.py`、`chapter{1,2,3}-standalone.html`、`chapter{1,2,3}-print-standalone.html` | ch1 手工製作為範本；ch2/ch3 由 `gen_standalone.py` 從 ch1 範本生成 |
+| **standalone 產線** | `gen_standalone.py`、`chapter{1,2,3}-standalone.html`、`chapter{1,2,3}-print-standalone.html` | 三章皆由 `gen_standalone.py` 生成；以 `chapter1-standalone.html` 的 chrome 為骨架，Ch1 為自重生（從 `example-ch01/` 重新 inline） |
 | **章節內容** | `exp-ch02/`（§2.1–§2.5 + figures.js）、`exp-ch03/`（§3.1–§3.3 + figures.js） | seed → direction → 六階收斂 |
 
 > 舊的範本版 HTML（`chapter*-screen.html`、`chapter*-print.html`、`poc-*.html`）已移除，
@@ -35,7 +36,7 @@
 權威產物：
 - **[`CONTRACT-html-writing.md`](CONTRACT-html-writing.md)** —— 讓模型「直接生 HTML」要遵的寫作契約
   （`../seed_converge/rules.md` 的 HTML 版）。是把生成步驟接到這套 kit 的那根槓桿。
-- **[`gen_standalone.py`](gen_standalone.py)** —— 從 ch1 範本自動生成各章 standalone HTML 的腳本。
+- **[`gen_standalone.py`](gen_standalone.py)** —— 自動生成各章（含 Ch1 自重生）standalone HTML 的腳本。
 
 ## 怎麼渲染（零設定）
 
@@ -61,9 +62,11 @@ python gen_standalone.py
 
 ### 產生方式
 
-用 [`gen_standalone.py`](gen_standalone.py) 一次產生全部章節。
-腳本以 `chapter1-standalone.html` / `chapter1-print-standalone.html` 為骨架範本，
-把每章的 `<template>` 區塊、`figures.js`、`CHAPTER` 設定替換後寫出。
+用 [`gen_standalone.py`](gen_standalone.py) 一次產生全部章節（Ch1/2/3）。
+腳本以 `chapter1-standalone.html` / `chapter1-print-standalone.html` 的 chrome（頁面 CSS、
+分頁器、MathJax 設定）為骨架，把每章的 `<template>` 區塊、`figures.js`、`CHAPTER` 設定替換後寫出。
+Ch1 也在 `CHAPTERS` dict 內，為**自重生**（讀自身 standalone 為骨架、再從 `example-ch01/` 重新 inline）；
+因 source 片段不帶 per-figure `--fig-w`，Ch1 圖重生後落列印預設寬度（hlt pair 250px、mapping SVG 自帶 340px、其餘 100%），屬無害。
 
 ### 新增章節的步驟
 
@@ -85,7 +88,7 @@ python gen_standalone.py
 
 | 章 | 螢幕版 | 列印版 | 小節數 | 圖數 |
 |---|---|---|---|---|
-| Ch 1 | `chapter1-standalone.html` | `chapter1-print-standalone.html` | 8（含 intro + summary） | 11 |
+| Ch 1 | `chapter1-standalone.html` | `chapter1-print-standalone.html` | 8（含 intro + summary） | 13 |
 | Ch 2 | `chapter2-standalone.html` | `chapter2-print-standalone.html` | 5（§2.1–§2.5） | 3 |
 | Ch 3 | `chapter3-standalone.html` | `chapter3-print-standalone.html` | 4（opener + §3.1–§3.3） | 2 |
 

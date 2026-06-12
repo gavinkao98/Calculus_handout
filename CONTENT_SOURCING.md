@@ -55,6 +55,28 @@ HTML 線為 `env-example`＋`env-solution`，見 [`experiments/handout_kit/CONTR
   約定重算）必須在審核文件中單獨點名請使用者過目。
 - **附圖成本**：同等教學價值下，不需新圖者優先；需新圖者計入成本一併揭露。
 
+## Import pass（裁決通過後的落地步驟）
+
+選題稽核 blocking=0、使用者裁決後，照此把範例寫進 HTML kit（Ch1 已實作一輪，2026-06-12；
+下一章照走）：
+
+1. **插入範例**：在審核文件指定的錨點（緊跟相關 definition／theorem／strategy）寫入
+   `workedexample`（`env-example`＋`env-solution`），每筆前加 expansion-marker（見下節）。
+2. **手動重編號（kit 無自動編號，這是最大錯誤來源）**：example 與 figure 計數器章內連續，
+   任一插入都會 cascade 位移其後所有編號。**先建完整編號地圖再動手**；改完用
+   `grep` 核對：① example/figure 編號連續無跳號無重複 ② 每個 prose 內的「Figure N.M」／
+   「Example N.M」交叉引用都解析到存在的編號。definition/theorem/proposition/remark/
+   caution/strategy 不受影響（除非也插入該類環境）。
+3. **新圖入 `figures.js`**：每幅新圖加 `FIGS` 條目（`buildPlot` payload），遵 redundant
+   encoding（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §10）。
+4. **重生 standalone**：`python gen_standalone.py`（三章皆生；機制見
+   [`experiments/handout_kit/README.md`](experiments/handout_kit/README.md)）。
+5. **渲染驗證**：本機可能無 Node（CDP 截圖工具跑不動）→ 用 Preview MCP（`preview_start`
+   起 `python -m http.server` → `preview_eval` 檢查 example 數、`[data-fig]` 是否 hydrate、
+   `mjx-merror` 數、殘留未渲染 `\(`／`\[`；`preview_screenshot` 目視新圖）。驗收線：
+   範例數正確、圖全 hydrate、0 MathJax 錯誤、0 未渲染數學式。
+6. **寫 import record**（見下節）。
+
 ## Provenance 與標記
 
 - 沿用既有的 expansion-marker 慣例：每筆題庫來源的範例前加註
