@@ -25,6 +25,9 @@ HTML 線為 `env-example`＋`env-solution`，見 [`experiments/handout_kit/CONTR
       候選是否對症且程度合適、自寫／改作之解的數學正確性、來源與授權標示是否屬實。
       契約沿用 [`experiments/direction_layer/RULE.md`](experiments/direction_layer/RULE.md) ⑤
       （數學／忠實度／對症性為 blocking；格式為 advisory），收斂到 blocking=0 再交使用者裁決。
+      **findings 必須留版控**：Codex 原始輸出落在 `.tmp/`（gitignored、換機即失、使用者看不到），
+      因此每輪稽核的 findings 原文＋Claude 的 triage 處置要存進該章旁的
+      `chNN_<artifact>-audit.md`（範例：`ch01_example-supplement-audit.md`），不可只留在 commit message 摘要。
    5. 通過裁決後改寫為本書語域與記號（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §3、§9），
       插入課文中教學上正確的位置（緊跟相關 definition／theorem／strategy）。
 3. **AI 出題——備援。** 僅用於題庫填不了的缺口（如緊扣手稿 running example 的延伸、
