@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, FadeIn, FadeOut, Scene
+from manim import DOWN, UP, FadeIn, FadeOut, Rectangle, Scene
 
 from .blocks import play_block
 from .narration import estimate_seconds, parse_say
@@ -88,43 +88,65 @@ class LessonScene(Scene):
         self.wait(max(duration - gap * len(dynamic), 1.2))
 
     def _play_intro(self, blocks, ground, duration: float) -> None:
-        chapter_map = [b for b in blocks if not b.static and b.id.startswith("map.")]
-        gate = [b for b in blocks if not b.static and b.id.startswith("gate.")]
-        transition = [b for b in blocks if not b.static and b.id.startswith("transition.")]
-        other = [
-            b for b in blocks
-            if not b.static and not b.id.startswith(("map.", "gate.", "transition."))
-        ]
+        brand_blocks = [b for b in blocks if not b.static and b.id.startswith("brand.")]
+        timeline_blocks = [b for b in blocks if not b.static and b.id.startswith("timeline.")]
+        transition = [b for b in blocks if b.id.startswith("transition.")]
+        transition_dynamic = [b for b in transition if not b.static]
+        by_id = {b.id: b for b in blocks}
 
-        for block in chapter_map or other:
+        # stage 1: brand opening
+        for block in brand_blocks:
             play_block(self, block, ground)
             self.wait(0.08)
+        self.wait(max(duration * 0.07, 0.55))
 
-        self.wait(max(duration * 0.07, 0.45))
-
-        if chapter_map:
+        # stage 2: brand out -> timeline sequence
+        if timeline_blocks:
             self.play(
-                *[FadeOut(block.mobject, shift=0.08 * DOWN) for block in chapter_map],
+                *[FadeOut(block.mobject, shift=0.05 * DOWN) for block in brand_blocks],
                 run_time=0.65,
             )
             self.wait(0.08)
 
-        for block in gate:
-            play_block(self, block, ground)
-            self.wait(0.08)
+            play_block(self, by_id["timeline.header"], ground)
+            self.wait(0.06)
+            play_block(self, by_id["timeline.rail"], ground)
+            self.wait(0.3)
 
-        self.wait(max(duration * 0.08, 0.55))
+            if "timeline.pulse" in by_id:
+                play_block(self, by_id["timeline.pulse"], ground)
+                self.wait(0.2)
 
+            if "timeline.activate" in by_id:
+                play_block(self, by_id["timeline.activate"], ground)
+                self.wait(0.2)
+
+            if "timeline.title" in by_id:
+                play_block(self, by_id["timeline.title"], ground)
+
+            self.wait(max(duration * 0.08, 0.55))
+
+        # stage 3: timeline out -> gradual crossfade to dark
         if transition:
-            gate_mobs = [block.mobject for block in gate]
+            fade_out_blocks = timeline_blocks if timeline_blocks else brand_blocks
+            dark_bg = Rectangle(
+                width=T.FRAME_W,
+                height=T.FRAME_H,
+                stroke_width=0,
+                fill_color=T.color("dark", "bg"),
+                fill_opacity=1.0,
+            )
             self.play(
-                *[FadeOut(mob, shift=0.05 * DOWN) for mob in gate_mobs],
-                FadeIn(transition[0].mobject),
-                run_time=0.75,
+                *[FadeOut(block.mobject, shift=0.05 * DOWN) for block in fade_out_blocks],
+                FadeIn(dark_bg),
+                run_time=1.0,
             )
             self.camera.background_color = T.color("dark", "bg")
-            self.add(transition[0].mobject)
-            for block in transition[1:]:
+            self.remove(dark_bg)
+
+            for block in transition_dynamic:
+                if block.id == "transition.ground":
+                    continue
                 play_block(self, block, "dark")
                 self.wait(0.06)
 
@@ -141,11 +163,20 @@ class LessonScene(Scene):
                 play_block(self, block, "dark")
                 self.wait(0.06)
             self.wait(max(duration * 0.1, 0.8))
+            light_bg = Rectangle(
+                width=T.FRAME_W,
+                height=T.FRAME_H,
+                stroke_width=0,
+                fill_color=T.color("light", "bg"),
+                fill_opacity=1.0,
+            )
             self.play(
                 *[FadeOut(block.mobject, shift=0.05 * DOWN) for block in transition],
-                run_time=0.85,
+                FadeIn(light_bg),
+                run_time=1.0,
             )
             self.camera.background_color = T.color("light", "bg")
+            self.remove(light_bg)
             self.wait(0.25)
 
         for block in end_slate:

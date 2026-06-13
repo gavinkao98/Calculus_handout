@@ -63,7 +63,7 @@ def _end_slate_stage(spec: dict[str, Any], ctx: dict[str, Any], ground: str) -> 
     title = _format_meta(str(end.get("title", "{title}")), meta)
     logo_height = float(end.get("logo_height", 1.55))
 
-    logo = brand.logo_lockup(height=logo_height)
+    logo = brand.logo_lockup_outlined(height=logo_height)
     end_label = brand.eyebrow(label, ground, role="accent")
     end_title = brand.heading(title, ground, role="heading", size="h2")
     end_rule = brand.heading_rule(2.8, ground, role="accent")

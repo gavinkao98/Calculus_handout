@@ -424,70 +424,32 @@ def summit_bars(ground: str, *, height: float = 0.5, color_role: str = "muted",
 
 # -- logo -----------------------------------------------------------------
 #
-# The official lockup SVG places its Chinese name in <text> elements, which
-# manim's SVGMobject does NOT render (it only draws <rect>/<path>/<line>), so
-# loading it dropped the whole wordmark. Instead we rebuild the lockup from
-# manim primitives + a system CJK font (Noto Sans TC, the family the design
-# specifies and which is present on this machine). Brand colours are fixed here
-# -- this is the one place hard-coded hex is correct, because it's the logo.
+# The official lockup SVG has Chinese text in <text> elements which manim's
+# SVGMobject drops. _outline_text.py (in assets/) converts text to <path>
+# outlines using fonttools; the result is lockup-color-outlined.svg which
+# SVGMobject loads as pure vector geometry.
 
-_NAVY = "#16294E"
-_RED = "#BA0C2F"
-_GOLD = "#B6892B"
-_GREY = "#6B7280"
-_CJK = "Noto Sans TC"
+_ASSETS = Path(__file__).resolve().parent / "assets"
 
 
-def _summit_logo_mark(unit: float) -> VGroup:
-    """The summit-bars + gold-star mark in brand colours (centre bar = navy)."""
-    heights = [0.244, 0.467, 0.689, 1.0, 0.689, 0.467, 0.244]
-    bw = unit * 0.144
-    gap = unit * 0.056
-    bars = [
-        RoundedRectangle(corner_radius=bw * 0.45, width=bw, height=h * unit,
-                         stroke_width=0, fill_color=(_NAVY if i == 3 else _RED),
-                         fill_opacity=1.0)
-        for i, h in enumerate(heights)
-    ]
-    row = VGroup(*bars).arrange(RIGHT, buff=gap, aligned_edge=DOWN)
-    star = _four_point_star(unit * 0.2, _GOLD, 1.0)
-    star.next_to(row[3], UP, buff=unit * 0.12)
-    return VGroup(row, star)
+def logo_lockup_outlined(*, height: float = 1.7) -> SVGMobject:
+    """Official NTU lockup from outlined SVG (all text converted to paths).
 
-
-def logo_lockup(*, height: float = 1.7) -> VGroup:
-    """Full NTU lockup: summit mark | divider | 3-line Chinese wordmark + pill.
-
-    Rebuilt from primitives so the Chinese renders (see note above). Scaled to
-    *height* at the end so callers size it in manim units.
+    Loads the designer-provided SVG with text elements pre-converted to vector
+    path outlines via fonttools, so every detail matches the brand guide exactly
+    while rendering at native vector resolution (no bitmap blur).
     """
-    mark = _summit_logo_mark(1.0)
-
-    divider = Line([0, 0.62, 0], [0, -0.62, 0], stroke_color=_NAVY, stroke_width=2)
-    divider.set_opacity(0.3)
-
-    small = Text("國立臺灣大學 ｜ NTU", font=_CJK, font_size=15, color=_GREY)
-    line1 = Text("北區高中學生科學研究", font=_CJK, weight="BOLD", font_size=28, color=_NAVY)
-    line2 = Text("人才培育計畫", font=_CJK, weight="BOLD", font_size=28, color=_NAVY)
-
-    pill_label = Text("數學組", font=_CJK, weight="BOLD", font_size=17, color="#FFFFFF")
-    pill = RoundedRectangle(corner_radius=0.08, width=pill_label.width + 0.34,
-                            height=pill_label.height + 0.22, stroke_width=0,
-                            fill_color=_RED, fill_opacity=1.0)
-    pill_label.move_to(pill.get_center())
-    pill_group = VGroup(pill, pill_label)
-
-    words = VGroup(small, line1, line2, pill_group).arrange(DOWN, aligned_edge=LEFT, buff=0.16)
-    lockup = VGroup(mark, divider, words).arrange(RIGHT, buff=0.34)
-    lockup.scale_to_fit_height(height)
-    return lockup
+    path = _ASSETS / "lockup-color-outlined.svg"
+    svg = SVGMobject(str(path))
+    svg.height = height
+    return svg
 
 
 def logo_svg(name: str, *, height: float = 1.4) -> SVGMobject | None:
     """Load an icon SVG (pure geometry, no <text>) -- e.g. 'icon-color'.
 
     Safe only for the icon marks, which are all rect/path. Do NOT use for the
-    lockup (its <text> wordmark would be dropped); use logo_lockup() instead.
+    lockup (its <text> wordmark would be dropped); use logo_lockup_outlined().
     """
     path = _BRAND / f"{name}.svg"
     if not path.exists():
