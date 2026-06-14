@@ -1,0 +1,949 @@
+Reading prompt from stdin...
+OpenAI Codex v0.136.0
+--------
+workdir: C:\Users\Kao\Downloads\Calculus_handout
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019ec3f2-fd7d-7f23-80a6-966a5df1e55d
+--------
+user
+You are a **Mode B reviewer (審訂審查)** for a calculus teaching-video narration. You AUDIT and report findings; you do NOT edit any files.
+
+# What you are reviewing
+
+Section 1.3 (The Limit of a Function), dual-version narration route. From one narration source, two derived versions:
+
+1. **Source narration:** `video/content_scripts/ch01_limit_of_function.md` — the `narration:` field of each unit (English + inline LaTeX). Content was user-approved: **no**.
+2. **Version A — HTML reading:** `video/content_scripts/ch01_limit_of_function_narration.html` — renders the math via MathJax.
+3. **Version B — spoken (MiMo):** `video/content_scripts/ch01_limit_of_function_narration_spoken.md` — every LaTeX expression spelled into spoken English (no symbols) for a TTS that cannot read LaTeX.
+
+Read all three. Silent units (intro/outro) have no narration — audit only the spoken units.
+
+# Framing (project review norms — follow strictly)
+
+- Separate four tiers; report only tiers 1–2: (1) real error / faithfulness break / would-not-render / math wrong; (2) genuine ambiguity or readability defect introduced by the transformation; (3) pure style/editorial drift → at most one line, low-priority; (4) non-findings (semantic-equivalent wording) → omit.
+- Do NOT over-report; over-reporting dilutes real findings.
+- CONTENT_APPROVED is "no": D7 (math-content correctness) is REQUIRED.
+
+# Audit dimensions
+
+**D1 — Faithfulness of Version A (HTML).** Each unit's narration text matches the source verbatim (markdown `*x*` → `<em>x</em>` ok); no dropped/added/altered words; no malformed LaTeX; correct kind badge; all units present, right ids/order.
+
+**D2 — Faithfulness of Version B (spoken).** English prose word-for-word identical to source, only math notation converted to spoken words; flag any paraphrase/drop/addition or changed teaching content. NOTE: the spoken doc's own header documents two deliberate collapses in `the_limit_defined` (where spelling `$\lim_{x\to a}f(x)=L$` and the "read ..." clause would duplicate the adjacent prose word-for-word) — judge whether those collapses are acceptable spoken adaptation or a faithfulness break, and whether any OTHER unit dropped/changed prose without justification.
+
+**D3 — Math naturalization correctness in Version B (HIGH PRIORITY).** Every spoken math rendering is (a) mathematically equivalent to the written math and (b) unambiguous to a listener with no symbols. Hunt: radical/power/fraction grouping scope (e.g. "the square root of t squared plus nine, minus three, all over t squared"); subscripts; coordinates read as "the point with coordinates a and b"; decimals; anything mis-hearable as a different expression. Quote source LaTeX + spoken form per issue.
+
+**D4 — Register / readability of Version B.** Reads naturally aloud in a calm lecture register; no awkwardness from the spell-out; disambiguators like "the quantity …" used only where grouping truly needs it.
+
+**D5 — Convention decisions.** Recommend one option (with a one-line reason) for any open reading-convention choice the spoken doc flags.
+
+**D6 — TTS setup factual sanity.** The documented synth config (model/voice/format/sample rate/message shape) is internally consistent and plausible. Flag only clear internal inconsistencies.
+
+**D7 — Math-content correctness (REQUIRED, CONTENT_APPROVED=no).** Independently re-derive every numeric value, sign, interval endpoint, and final result in the narration; confirm each matches the mathematics (not merely the spoken-vs-written equivalence of D3). In particular re-check: the two limit tables (x−1)/(x²−1)→½ at x=0.9,0.99,0.999,1.001,1.01,1.1 giving 0.5263,0.5025,0.5003,0.4998,0.4975,0.4762; and (√(t²+9)−3)/t² →⅙ at t=±0.1,±0.01 giving 0.166620,0.166666; the read-a-graph limits 1,0,2 at x=−2,0,2 with f(2)=−2; the build-a-graph limit 10 with f(3)=0. Quote any discrepancy.
+
+# Output (final message; write no files)
+
+First line: `VERDICT: <X> blocking, <Y> advisory`.
+Then findings: `- [Blocking|Advisory] [D#] unit-id — issue (quote exact text) → Verdict: Keep|Rewrite|Cut → exact replacement if Rewrite`.
+Then `## Convention recommendations (D5)`, `## TTS sanity (D6)`, and `## Math-content check (D7)`.
+Be terse; quote locations; if a dimension is clean, say so in one line.
+
+codex
+I’ll audit only and won’t write files. First I’m reading the project-level `CLAUDE.md`, then I’ll compare the three narration artifacts and independently check the math values.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -LiteralPath .\\CLAUDE.md" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 399ms:
+# CLAUDE.md
+
+?祆?獢?砍摮澈??蝯?AI 隞??嚗laude Code?odex 蝑???獢惜蝝?撘??舫遢????*甈??**嚗`AGENTS.md`](AGENTS.md) ????祆???璅??批捆銝?銴摮澈???渡?瑽reamble ?遣蝵株??誑甈??扳?隞?[`README.md`](README.md) ?箸?嚗摰寞撖怨??誑 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) ?箸???
+
+## ?辣?啣神隤?
+
+- **README 銝敺誑蝜?銝剜??詨神??* ???急?桅???[`README.md`](README.md) 隞亙?摮??冗銝剖惇?潭撠???README嚗?憒?[`video/README.md`](video/README.md)嚗憓?靽格 README ?瘥颲衣???
+- **敹?銋?靽???嚗?蝧餉陌嚗?* 蝔?蝣澆?憛?獢楝敺?????hell ?誘?憓??詻??亦Ⅳ嚗cene id?xport ?迂??雿?嚗誑????閰??銵?隤?Manim?aTeX?emini?TS?I?R?ode A/B/C 蝑???
+- ?園??????憿”?潛?隤芣???銝敺蝙?函?擃葉??
+- 蝚砌??嫣?鞈湛?`.deps/`?.deps_f5/`?.deps_voiceover/`嚗? git 撌乩?璅對?`.claude/worktrees/`嚗葉??README 銝甇方????嚗?閬??
+
+## 敶梁?皜脫?閫??摨?
+
+- **?日?雿輻??亥?瘙??血?銝敺誑 1080p 皜脫?**嚗make.py --quality high`嚗?閬銵蝙??`--quality low`嚗?80p嚗? `--quality 4k`??
+- 4K 皜脫?嚗--quality 4k`嚗??其蝙?刻?蝣箸?摰?K???迤撘漱隞?雿輻??
+
+## 隞祥 API 隤輻??蝬???
+
+- **瘥活隤輻隞颱?閮祥????API嚗? Gemini TTS?emini ??嚗蔣????嚗????賢?????雿輻??蝣箏???銝?芾?隤輻??* ?寞活??嚗?憒蝭? TTS?蝡?頝?銝敺?隤芣?嚗活閬矽?其?暻潭芋??隡啁??beat ?賂??唾?蝘嚗??嚗???敺??瑁???
+- 銝?鞎颯???雯?蝺楝敺??冽迨???舫??瑁???憒?`tts.py --backend mock`嚗神? WAV 撽?manifest嚗?摨????Manim render?fmpeg mux/concat??
+- ??銝甈∪??隞?”閰脫活?Ⅱ隤芣??極雿????蝭?霈嚗?璅∪????湔??頝???敺萄?????
+
+## 頝典?閰梯??嗅神?脩??扳?瑼?銝神?砍 memory嚗?
+
+- **?蜇蝯?蝑???隞颱?頝典?閰梧?頝冽??函??亥???銝敺神?脫? git 銝??瑼?*嚗?*銝??芾??冽?啁? Claude memory**嚗~/.claude/.../memory/`嚗 `MEMORY.md`嚗?
+- **??嚗?* 雿輻?虜??虫?璆哨??砍 memory 銝 repo 韏啜?璈停瘨仃嚗???扳?瑼?頝? git ?唳??唳??具?
+- **撖怠鋆∴?** ?脣漲嚗??神?脰府?Ｙ???`REBUILD_STATUS.md`嚗??頝典?閰梢脣漲?剁?嚗極?瑞瘜??神?脣??? `README.md`嚗撘?鞈?瘚?蝝神??`DESIGN.md`嚗摰寞瘜?撖恍?`CONTENT_METHODOLOGY.md`?銝????瑼?嚗??蝙?刻??曉嚗?閬?暺閮脫??memory??
+
+## ?啣神嚗祟?亦??Ｘ????嚗?摮?砍 memory嚗?銝?閬??祇脩??改?
+
+- **?蝙?刻?閰曹?敺蝜?銝剜?**嚗aTeX嚗?撘Ⅳ??隞嗅?????銵?隤????璅????
+- **??doc嚗ode review ??皜?蝝?銝?瘛瑞銝隢?** ????蝒????Ｗ?閬?嚗?靽殷???discoverability gap嚗??辣?喳嚗??嚗 editorial drift 憸券嚗??芸?嚗???finding嚗 ??finding嚗?蝷箔?閬??Ｗ榆?堆???*Framing嚗?* 敺?◤ review ?邦?瘜?潘?銝???session ?扳 commit嚗 merge ???渡?Ｘ?鈭祕嚗?蝢拍??寧??刻?撌桃銝? inconsistency?ver-reporting ????甇???芸???
+- **銝?mode ?啣神瘚?嚗oot [`README.md`](README.md) 禮Mode B嚗?嚗ode B ?里?貉?瘙箄??潛撖恍脰府甈∩耨甇?commit ??message body**嚗ubject ??0 摮ody ??嚗??祆隞暻潦雿?憒乓鈭?暻潦??刻???嚗末霈靘?閰梁 `git log --grep="Mode B"` ??????commit嚗112aa5c`?0ef06ee`?? Mode A ??銵?bugfix 銝?具?
+- **隞乩??? preamble嚗tyle ?曄??臭蝙?刻?2026-04-21 撖拇敺????嚗??箸???嚗?* 銝? `showonlyrefs`?雁??`\raggedbottom`+`[H]`??蝯 `exercise` ?啣?嚗??衣? `problems` newlist嚗???`csquotes autostyle`嚗??? `style_lint.py`嚗?憓?霈???閰?銝行?雓??砌??豢?靽?嚗??曉 X??閮鳴?2026-06-12 韏瑁?蝢拇擃??嗥?憿exercise` ?啣???氯? `CONTENT_SPEC.md` 禮14嚗洵銝???甇瑕?儔??
+- **蝯虫蝙?刻祟?貊?鈭支??抵??具??停?質???敶Ｗ?嚗?026-06-12 雿輻??瘙?嚗?* ?急摮詨??祟?豢?隞?*銝?**鈭文?皛輻? LaTeX ??`.md`嚗?Ｗ standalone HTML嚗athJax/KaTeX CDN嚗???摮詨皜脫?嚗??嗡??舐?仿霈?耦撘??抒??扯釭??瑼??冽迨???～?雿輻???株?瘙箝??梯正銝敺甇方齒??
+- **撖拇 finding 靽桀?敺???甇詨祟?賂?2026-06-12 雿輻??瘙?嚗?* 靽桀? blocking嚗dvisory finding 敺?銝?湔摰??摰?????靽格????頝?頛芸祟?賂?Codex ????撠??荔?嚗Ⅱ隤耨?寞頨急????交????甇詨祟?貊?蝯???里?豢?瑼葉閮???
+
+## 蝔?嚗極蝔遙??銵皞?嚗arpathy guidelines嚗?
+
+皞 [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)嚗ndrej Karpathy 撠?LLM 撖怎?撘虜閬???閫撖???*?嚗?* ??雓寞??芸??潮漲嚗蝣遙?銵???*?拍蝭?隞?`video/` ?Ｙ??uild 撌亙??祉?蝔?嚗極蝔極雿??銝?冽雓儔?批捆?啣神**?ode A ???撖漲隞誑?refer richness?? `[source:]`???芣?撖拇?皞?閬?[`video/CONTENT_METHODOLOGY.md`](video/CONTENT_METHODOLOGY.md)嚗?銝蝚?2 璇???撠?撘Ⅳ?? code嚗??摰寧?撟?
+
+- **1. ?單?璆???嚗hink Before Coding嚗?閬?皜研?閬?韏瑕????日?雓?*
+  - ?Ⅱ隤芸?身嚗?蝣箏?撠勗?嚗?閬?暺???
+  - ??蝔株圾霈??典??箔?嚗?閬?暺銝??
+  - ?蝪∪??瘜停雓?敹??????准?
+  - ?∩?撠勗?銝????芾ㄐ銝?璆??嗅???
+- **2. 蝪∪?芸?嚗implicity First嚗?撠? code 閫?捱??嚗?撖急?璈抒??梯正??*嚗???撘Ⅳ嚗??批捆蝭?嚗?
+  - 銝?瘝◤閬????踝?銝銝甈⊥?code 撱箸鞊∪惜??
+  - 銝?瘝◤閬????改??航身摰扼?銝銝?賜???撖恍隤方???
+  - 撖思? 200 銵? 50 銵停憭停?神?????瘛勗極蝔葦????摰?摨西?????
+- **3. 憭???撘耨?對?Surgical Changes嚗?????舐??唳嚗皜撌梯ˊ???摮?*
+  - 銝??????啁? code?酉閫????嚗?閬?瑽?憯??梯正??
+  - 瘥?Ｘ?憸冽嚗雿蹂???亦?撖急???
+  - ??⊿???dead code嚗??箔???閬??芸嚗蝘駁??雿??孵??????典??import嚗??賂??賢???
+  - 瑼ａ?嚗?銝銵??賜?亥蕭皞臬?雿輻??閬?嚗?銝??? review?? over-report 銝?湛???
+- **4. ?格?撽??瑁?嚗oal-Driven Execution嚗?摰儔??璅?嚗?餈游??圈?霅???*
+  - ?遙???撽??璅???撽??????粹?瘜撓?亙神皜祈岫??摰????耨 bug????撖怨??葫閰血?霈?????瑽?X???Ⅱ靽?敺葫閰阡??
+  - 憭郊撽遙??蝯虫??陛?剛??恬?甇仿? ??撽?暺?????皞?撘瑕停?質銵艘?????啗?車撘望?皞???琿?閬?皜?
+
+
+codex
+`CLAUDE.md` is readable only as mojibake in this shell, but the project-level review norm that matters here is clear from your prompt: Mode B audit, no edits, report only real issues and genuine ambiguity. I’m loading the three target files now.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function.md" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration_spoken.md" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration.html" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 438ms:
+# Section 1.3 The Limit of a Function ???批捆蝔選?甇????
+
+> **?扯釭嚗迤撘蝺摰寧阮**?? REBUILD_STATUS??026-06-13 ?函?敶梁?閮?hase 2 蝚砌?蝡?禮1.3嚗誑 HTML 雓儔甈?瑼??圾?撖恬?narration **敺蝙?刻???*嚗??臬?銝脣極蝔阮嚗?> **靘?嚗?憡?嚗?* [`../../experiments/handout_kit/chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) 禮1.3嚗sec-no` 1.3嚗he Limit of a Function嚗?> **?澆?嚗?* 蝝摰孵惜嚗??桀? `id / source / learning_goal / kind / narration / visual_need / animation_cue`嚗?*銝** template / `{show}` / accent / 閬死 payload嚗洵鈭?畾菜?憛恬??narration` ?箄???隤?嚗?`visual_need` / `animation_cue` ?箔葉???批捆皞嚗恥鋆賢??怎 Claude 靘?`animation_cue` ????隤敺?亙極蝔阮 `# HOOK`嚗蝭?詨潸”?憭???`value_table` 璅⊥??`reveal: cols` ???輯?嚗?> **銴?摨血?雿?REBUILD_STATUS嚗?** 雿??漲?45% 蝚西??遣霅?10??4 ?桀?嚗蝭?箝閬箔?靚瑯??耦嚗?潸”?箸?摮訾蜓擃?*銝?*憟?禮5 symbol-heavy 靘???
+---
+
+## Deck meta嚗ntro / outro ?剁?
+
+```
+chapter:       Chapter 1
+chapter_title: Inverse Functions and Limits
+section:       1.3
+title:         The Limit of a Function
+tagline:       What value does a function approach?
+sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
+                1.3 The Limit of a Function, 1.4 One-Sided and Infinite Limits,
+                1.5 Limit Laws and Computational Techniques,
+                1.6 The Precise Definition of a Limit]
+```
+
+---
+
+## ?飛?桀?
+
+### 1. intro
+- **source:** 禮1.3 ?渡? + 蝡?雿?standalone `<title>`嚗hapter 1 ??Inverse Functions and Limits嚗?- **learning_goal:** ??蝝????湛?
+- **kind:** `intro`
+- **narration:** ??intro ?⊥??踝?
+- **visual_need:** Section Gate嚗??啣?? 禮1.3 ??璅? ?he Limit of a Function??+ tagline ?hat value does a function approach???- **animation_cue:** ????gen-2 ?Ｘ? intro 璅⊥嚗?
+### 2. ratio_of_changes
+- **source:** chapter1-print-standalone.html 禮1.3 繚 opening prose嚗verage velocity $\frac{s(t+h)-s(t)}{h}$ ??instantaneous velocity嚗??祆???$\frac{f(y)-f(x)}{y-x}$ as $y\to x$嚗?- **learning_goal:** 敺像???? ???祆?霈????箸扔??????憿??嗡??撓?交??銝??雿??貊?嚗?嚗??潸隅餈?暻潦?- **kind:** `motivation`
+- **narration:**
+  > Calculus keeps circling back to one question: how fast is something changing right now? Suppose $s(t)$ is the position of a moving object at time $t$. Over the stretch from $t$ to $t+h$, its average velocity is the ratio $\frac{s(t+h)-s(t)}{h}$ ??change in position divided by change in time. But the average speed across an interval is not the speed at a single instant. To pin down that instantaneous velocity, we let $h$ shrink toward zero and watch what the ratio settles on. The same move works for any function: the ratio $\frac{f(y)-f(x)}{y-x}$ measures how $f$ changes between two inputs, and we ask what it approaches as $y$ slides toward $x$ without ever reaching it. That question ??what a quantity approaches ??is the idea of a limit.
+- **visual_need:** 銝璇蝺??拚? $(x,f(x))$??(y,f(y))$ ??摰??脩?嚗???rise $f(y)-f(x)$ ??run $y-x$????$\frac{f(y)-f(x)}{y-x}$??- **animation_cue:** ?脩?銝?湧? $(y,f(y))$ 瘝踵蝺楨蝺拇??椰?游摰? $(x,f(x))$嚗蝺銋???靘??哨?皛???雿??賊＊??y\to x$ ???潸隅餈??潦?*銝?圈???*嚗?y\ne x$嚗?扔?餈?銝??潦???- **?酉嚗?嚗?嚗?** ???? promote ??motivation ?桀?嚗??質店雓?璆?敶Ｗ?????蝢拇迨?????芷??詨?嚗? 禮5 ?其?璇擃蝺????潮 $y\to x$ 頞刻??????徉?鋆??整?憓?批捆嚗???賢? tangent嚗惇敺?嚗?
+### 3. the_limit_defined
+- **source:** chapter1-print-standalone.html 禮1.3 繚 Definition 1.9 + ?蹂誨閮? prose嚗?f(x)\to L$ as $x\to a$嚗?- **learning_goal:** ?璆菟????迤撘?摰儔?蝔株?瘜?銝行?雿??萄???x$ 頞刻? $a$ 雿?蝑 $a$??- **kind:** `definition`
+- **narration:**
+  > Here is the definition that captures ?hat a function approaches.??We say the limit of $f(x)$ as $x$ approaches $a$ equals $L$, written $\lim_{x\to a} f(x) = L$, if $f(x)$ can be made arbitrarily close to $L$ whenever $x$ is sufficiently close to $a$ but not equal to $a$. That last clause is the entire personality of a limit: we care about inputs near $a$, never about $a$ itself. The same idea has a lighter notation ??$f(x)\to L$ as $x\to a$ ??read ??f(x)$ tends to $L$ as $x$ tends to $a$.??Keep the picture in mind: $x$ creeping toward $a$ along the horizontal axis, while the heights $f(x)$ home in on $L$.
+- **visual_need:** 摰儔摰????$\lim_{x\to a}f(x)=L$ + 銝?亦閰梧?$f(x)$ 隞餅??亥? $L$ ??$x$ 頞喳??亥? $a$ 雿?$\ne a$嚗? ?蹂誨閮? $f(x)\to L$ as $x\to a$嚗?\ne a$??閬箏撥隤踴?- **animation_cue:** ?????喳嚗潸?????蝯虫?銝?桀?????
+- **?酉嚗?嚗?** ?蹂誨閮? prose ??1?? ??bridge嚗old ?脫摰儔?桀? narration??
+### 4. limit_vs_value
+- **source:** chapter1-print-standalone.html 禮1.3 繚 prose嚗oncerned with values of $f(x)$ for $x$ near $a$, not $f(a)$ ??$f(a)$ need not be defined??+ Figure 1.11嚗ata-fig: limit-same-near-a嚗?- **learning_goal:** ?圾璆菟??芰? $a$ ???潦? $f(a)$ ?⊿???f(a)$ ?臭誑蝑??蝑???寞瘝?蝢抬?璆菟??賭?璅??- **kind:** `visual`
+- **narration:**
+  > Now the subtle part, and it is the heart of this section. A limit looks only at the neighborhood of $a$, never at the single point $a$ itself ??so the value $f(a)$ gets no vote. Look at three functions side by side, all approaching the same height $L$ as $x\to a$. In the first, the point sits right where you expect, with $f(a) = L$. In the second, someone has lifted that one point off the curve, so $f(a)\ne L$. In the third, the point is missing entirely and $f(a)$ is undefined. Three different situations at $a$, yet the limit is the same $L$ in every case ??because near $a$, and near is all that counts, the three curves are identical.
+- **visual_need:** 銝蒂??????璇隅餈?$L$ ?蝺?銝璇?蝺?$y=L$ ??$x=a$ 璅?嚗?蹂?撖血?暺?$(a,L)$ ?冽蝺?嚗?f(a)=L$嚗??Ｘ鈭蝺 $a$ ??征敹???雿祕敹?蝘餃?亥?嚗?f(a)\ne L$嚗??Ｘ銝?$a$ ??拍征敹?嚗?f(a)$ undefined嚗?蝜芾?蝢?Figure 1.11??- **animation_cue:** 銝??郊嚗??舀?閮? $a$ 撌血?拙瘝?x 頠豢???$a$嚗??????脩?擃漲?賣???璇?$y=L$ ??嚗?恍?鈭?$L$嚗?撘瑁矽?∟? $a$ ?銝暺蝺?嚗◤蝘餉粥嚗?摮???潸???摨阡銝璅??- **?酉嚗? ??嚗?** ???撟曆?銝餃撐?瞍內??Figure 1.11嚗???飛??嚗?銝?桀???
+### 5. reading_a_graph
+- **source:** chapter1-print-standalone.html 禮1.3 繚 Example 1.15 + Solution + Figure 1.12嚗ata-fig: read-limit-graph嚗?- **learning_goal:** ???耦?拙霈?箸扔??銝西扛?潛Ⅱ隤?$x=2$ ?扔??$2$嚗??賣??$f(2)=-2$ ?臭誑銝???- **kind:** `example`
+- **narration:**
+  > Let us read limits straight off a graph. Three inputs to inspect: $x=-2$, $x=0$, and $x=2$. As $x$ approaches $-2$ from either side, the curve rises toward height $1$, so the limit there is $1$. Approaching $0$, the curve heads to height $0$ ??the limit is zero. Now $x=2$ is the interesting one: from both sides the curve climbs toward height $2$, and yet the graph marks a solid dot down at $(2,-2)$ and a hollow dot up at $(2,2)$. So $f(2)$ is $-2$, but the limit ignores the value at the point and reports where the curve was heading. The limit as $x\to 2$ is $2$, even though $f(2)$ equals $-2$.
+- **visual_need:** ?桐??賣???鼓 Figure 1.12嚗?$x=-2$ 頞刻?擃漲 $1$??x=0$ 頞刻?擃漲 $0$??x=2$ 頞刻?擃漲 $2$嚗?x=2$ ?征敹? $(2,2)$嚗祕敹? $(2,-2)$嚗? $y=f(x)$??- **animation_cue:** 靘???銝?$x$ ?潘???$-2$??0$??2$ ?銝?臬??拙瘝踵蝺??府??璅?嚗潸?擃漲?刻?蝺???y 頠豢??綽?$1$??0$??2$嚗???$x=2$ ??亙??潸???? $y=2$嚗征敹?嚗????內銝 $y=-2$ ?祕敹?嚗憿胯扔??頞典???銝暺?- **?酉嚗?嚗?** ?琿? worked example 蝺 limit_vs_value 銋?嚗??質情銝餃撐??銝撘萄霈??銝?
+### 6. build_one_yourself
+- **source:** chapter1-print-standalone.html 禮1.3 繚 Example 1.16 + Solution
+- **learning_goal:** ?????策摰璅扔???賣?潘??芸楛?怠銝璇泵???脩?嚗??箝扔???賣?澆??芰蝡?- **kind:** `example`
+- **narration:**
+  > The same idea, now run backwards: instead of reading a graph, we build one. The task is a function with limit $10$ as $x\to 3$, but with $f(3) = 0$. Start with any curve that approaches height $10$ at $x=3$ ??a straight line through $(3,10)$ will do. Then take that single point and drag it down to height $0$: a hollow dot at $(3,10)$ to mark where the curve is heading, and a solid dot at $(3,0)$ for the actual value. Near $x=3$ the curve still approaches $10$, while the relocated point sets $f(3) = 0$. Because the limit and the value are independent, nothing stops us from choosing them separately.
+- **visual_need:** 銝璇? $(3,10)$ ?蝺?頞刻?擃漲 $10$嚗?$x=3$ ?征敹? $(3,10)$嚗祕敹? $(3,0)$嚗? $\lim_{x\to3}f(x)=10$??f(3)=0$??- **animation_cue:** ???$(3,10)$ ?蝺???$x=3$ ?征敹?嚗??亥??府暺?銝?????敺?$(3,10)$ ?銝宏??$(3,0)$ 霈祕敹?雿?蝛箏?暺??拇????撘 $y=10$嚗imit嚗? $y=0$嚗alue嚗?銝血?璅內?抵?銝撟脯?- **?酉嚗?嚗?** ??reading_a_graph ???扔??vs ?賣?潦?雿惇**?????*嚗璇辣瑽?嚗?霈???葆靘隤??嚗??? drill嚗蝡??桀???
+### 7. estimate_from_a_table
+- **source:** chapter1-print-standalone.html 禮1.3 繚 Example 1.17 + Solution嚗?潸” $\lim_{x\to1}\frac{x-1}{x^2-1}$嚗?- **learning_goal:** ?函?銝蝑????具 $a$ ???澆?銵具摯閮扔??霈??$\frac{x-1}{x^2-1}\to\tfrac12$??- **kind:** `example`
+- **narration:**
+  > What if there is no graph to read? Then we make our own data. Take $\lim_{x\to 1}\frac{x-1}{x^2-1}$. Substituting $x=1$ gives zero over zero ??undefined, no answer there. So instead we sample inputs creeping toward $1$ from both sides: $0.9$, $0.99$, $0.999$, and then $1.001$, $1.01$, $1.1$. Evaluate the expression at each, and the outputs march steadily toward one number ??$0.5263$, $0.5025$, $0.5003$ from the left, and $0.4998$, $0.4975$ closing in from the right. They are squeezing in on one half, so we read the limit as $\tfrac12$.
+- **visual_need:** value_table嚗?.3 ?詨潮潸???嚗”??$x$ 嚗?0.9, 0.99, 0.999, 1.001, 1.01, 1.1嚗? $\frac{x-1}{x^2-1}$ 嚗?0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762嚗?隢? $\lim_{x\to1}\frac{x-1}{x^2-1}=\tfrac12$??- **animation_cue:** 銵冽甈??勗蝡臬?銝剝????剔內嚗?憭 0.9嚗?.1 ?漁嚗? $x=1$ ?塚?嚗??凋?甈??賣?澆?甇乩漁?綽??詨??郊?潸? $\tfrac12$嚗摰?鈭柴隅餈?$\tfrac12$??- **?酉嚗?嚗極蝔?嚗?* ?詨潸”?箸蝭???唳?撌改?撠? `value_table` 璅⊥??`reveal: cols`嚗?.3 蝭憟?REBUILD_STATUS 撌脣?嚗??剔內??望芋?踹??頛?銝撖?hook??
+### 8. when_algebra_is_hard
+- **source:** chapter1-print-standalone.html 禮1.3 繚 Example 1.18 + Solution嚗?潸” $\lim_{t\to0}\frac{\sqrt{t^2+9}-3}{t^2}$嚗?- **learning_goal:** ???詨潭??具誨?訾??潛?銝忽??銝?撩嚗???$\to\tfrac16$??- **kind:** `example`
+- **narration:**
+  > One more, where the table really earns its keep. Consider $\lim_{t\to 0}\frac{\sqrt{t^2+9}-3}{t^2}$. This time you cannot just factor your way to the answer ??the square root hides what is going on, and at $t=0$ it is once again zero over zero. So we let the numbers talk. Sampling $t = -0.1$, $-0.01$, $0.01$, and $0.1$, the expression returns about $0.16662$, then $0.166666$, and back out symmetrically. That is closing in on $0.16666\ldots$, which we recognize as $\tfrac16$. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.
+- **visual_need:** value_table嚗???嚗”??$t$ 嚗???.1, ??.01, 0.01, 0.1嚗? $\frac{\sqrt{t^2+9}-3}{t^2}$ 嚗?0.166620, 0.166666, 0.166666, 0.166620嚗?隢? $\lim_{t\to0}=\tfrac16$??- **animation_cue:** ??estimate_from_a_table ???剔內嚗蝡臬? $t=0$ ?塚?嚗?詨澆?蝔梢潸? $0.16666\ldots$嚗摰?鈭?$\tfrac16$??- **?酉嚗? repeat-pattern嚗?嚗?** ??蝚砌???潸”靘?嚗誑?ne more???亥??氬?*銝?餈啣?銵冽? setup**嚗?嚗?*靽??嚗誨銵典?瘨菔? 禮2嚗?** 1.17 ?臬???圾????嚗飛??其誨?賊?霅?獢?嚗?.18 ?撘敺圾??0/0$ 敶Ｗ??迤銝??憿舀?潭??其誨?詨仃????*銝?撩**嚗葆靘?飛暺?method is essential嚗???convenient嚗???擗?drill??
+### 9. what_comes_next
+- **source:** chapter1-print-standalone.html 禮1.3 繚 ?嗅偏 prose嚗uessed by looking at function values ??develop systematic methods ??one-sided limits and infinite limits??
+- **learning_goal:** ?仿????潦?航絲暺??乩?靘?摮貊頂蝯勗???璆菟??寞?嚗誑??湛??∠狙璆菟?蝑蝝啁溶???箝?- **kind:** `forward_ref`
+- **narration:**
+  > Notice what we have been doing: guessing limits by peeking at nearby values, whether off a graph or out of a table. Guessing is a fine start, but it is not a proof, and tables can occasionally mislead. So next we build systematic methods ??rules that compute limits exactly, with no sampling at all. And we sharpen the idea itself: what happens when a function approaches different values from the left and from the right, or grows without bound near a point. The estimate you can make today becomes a calculation you can trust.
+- **visual_need:** 蝪∠???∴?from guessing ??to computing嚗??箏撠靘?銝駁?嚗ystematic methods?ne-sided limits?nfinite limits嚗?**銝蝭??*??- **animation_cue:** ?????喳嚗?- **?酉嚗?嚗?** forward-pointing prose 瘞賊??函????蝵格?祉?銝餃摰寡? recap **銋?**嚗UST NOT ?梁????ext?ater???誨嚗?
+### 10. recap
+- **source:** 禮1.3 ?渡?嚗ecap ?箏?鋆??
+- **learning_goal:** ?撣嗉粥?渡?嚗扔??頞刻??潦? $f(a)$ ?⊿??敺?霈??冽?潸”隡啜?- **kind:** `recap`
+- **narration:**
+  > Here is the whole section in four ideas. A limit asks what value $f(x)$ approaches as $x$ heads toward $a$ ??written $\lim_{x\to a}f(x)=L$. It depends only on the behavior near $a$, never on $f(a)$ itself, which may not even be defined. You can read a limit off a graph by following the curve inward from both sides. And when there is no graph, a table of values at inputs creeping toward $a$ will reveal the number the function is approaching.
+- **visual_need:** ?撐 takeaway ?∴???璆菟?嚗隅餈?$\lim_{x\to a}f(x)=L$嚗 ?芰? $a$ ???? $f(a)$ ?⊿?嚗 undefined嚗???敺??拙霈嚗 ?詨潸”隡啗???- **animation_cue:** ????gen-2 ?Ｘ? recap_cards 璅⊥嚗?
+### 11. outro
+- **source:** ?????嗅偏嚗?- **learning_goal:** ??- **kind:** `outro`
+- **narration:** ??outro ?⊥??踝?
+- **visual_need:** ??鈭格??????蝯?logo 摮嚗meta.section` + `meta.title` ?身?喳嚗 end_slate 閬神嚗?- **animation_cue:** ????gen-2 ?Ｘ? outro 璅⊥嚗?
+---
+
+## ?批捆撅斗炎?賂?禮7嚗?亥???
+- **?啣?閬?嚗?* Definition 1.9嚗3嚗igure 1.11嚗4嚗xample 1.15嚗igure 1.12嚗5嚗xample 1.16嚗6嚗xample 1.17嚗7嚗xample 1.18嚗8嚗?*?刻???*?蝭 HTML **??* theorem嚗roposition嚗orollary嚗trategy嚗emark嚗aution嚗nv-exercise嚗rep ?詨祕嚗??撠??桀???*??exercise 瘣拙**??- **靘?隞?”撘項??禮2嚗?** ??example ?惇?車銝?璅∪?????1.15嚗?????1.16嚗?潸”繚??撘?1.17嚗?潸”繚?孵?嚗?.18嚗?.17嚗?.18 ???箝?潸”??雿?1.18 撣嗡??誨?詨仃???詨潭?銝?撩???唳?摮賊?嚗?靽???repeat-pattern 蝚砌?靘?u8嚗? setup嚗?????擗?drill??*??silently drop??*
+- **?啣???prose 甇賊?嚗?* opening prose嚗romote ??motivation u2嚗??蹂誨閮? prose嚗old ??u3嚗??oncerned with values near $a$?色?u4 body嚗? Figure 1.11 ??嚗??嗅偏 prose嚗romote ??forward_ref u9嚗?*??silently drop**??- **forward-pointing嚗?* ?嗅偏 prose ??u9嚗誑?ext嚗ater??餈堆?**?芸隞颱?蝭??*嚗? 蝳?嚗?- **symbol-heavy ?文?嚗?* 雿??漲??敶ｇ??詨潸”?箸?摮訾蜓擃?閬死?桀? u2/u4/u5/u6/u7/u8嚗?蝚西?瘥?????70%??*銝?*憟?禮5 璇辣??憭?- **? cue ??5 ??*嚗2 ?脩?皛??4 銝??郊?潸??5 霈??$x=2$ punchline?7嚗8 ?詨潸”???剔內嚗??芰隤????行?摮豢??7嚗8 ??`value_table` 璅⊥ `reveal: cols` ???輯?嚗2嚗4/u5 ?箏恥鋆?hook ?嚗洵鈭憚?????臬??亙嚗?- **narration ?芣嚗?* ?挾 3?? ?乓???hook??撠?takeaway嚗敹菔撟?憿?璇?嚗????芰?ee嚗s shown嚗elow??u8 隞乓ne more???氬??膩 setup嚗? repeat-pattern嚗??詨潛霈?嚗aTeX ?渲?撌脤?霅???- **瘥?`id` ?臭??nake_case??餈唳?摮賊?暺?*
+
+### 蝔賣蝝??2026-06-14嚗??臬?撠?撘里?賂?
+
+?祉阮?勗?銝??session ?啣神雿?*?芰?撠?撘里??*嚗? 禮1.2 stage-1 銝???.2 ?-lens 蝔賣蝝???祉阮?瘝?嚗撣嗅???隤?????啁阮敺?頝?頛?*??lens 撠?撘里??*嚗aithfulness嚗ecomposition嚗egister嚗o-repeat嚗ath-accuracy嚗ompleteness嚗orkflow `w2ammaffw`嚗?瘥? actionable finding ???函?撠?撘?霅?瘥 禮1.2嚗review_pack.py` 蝝敺??身?岫 refute??瞈暸?摨?triage嚗?
+
+- **蝯?嚗? 璇?confirmed actionable finding??* 鈭?lens嚗aithfulness嚗ecomposition嚗egister嚗o-repeat嚗ath-accuracy嚗 PASS? L1/L2嚗ompleteness lens ??agent ?芸?蝯??撓?綽??嗥?炎?交?曹犖撌亦?交撖佗?閬?嚗??隞?lens ??閬???- **math-accuracy嚗? ??*?撘菜?潸”?函???嚗python`嚗?雓儔嚗蝔輸?銝?湛?Ex 1.17 `(x-1)/(x^2-1)=1/(x+1)` ??`0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762`?imit $\tfrac12$嚗x 1.18 `(\sqrt{t^2+9}-3)/t^2` ??`0.166620, 0.166666, 0.166666, 0.166620`?imit $\tfrac16=0.16666\ldots$?5 霈??limits $1,0,2$嚗?f(2)=-2$?征敹?$(2,2)$嚗祕敹?$(2,-2)$嚗6 瑽?$(3,10)$嚗?(3,0)$嚗2 瘥澆??3 摰儔撘???蝢?Example 1.15嚗?.16 ??銝?氬?- **faithfulness嚗ecomposition嚗 L1/L2**?? ?飛?桀??典?滲 禮1.3 ?啣?嚗2?pening prose?3?ef 1.9嚗隞??瘜4?alues near $a$??prose嚗ig 1.11?5?x 1.15嚗ig 1.12?6?x 1.16?7?x 1.17?8?x 1.18?9?撠?prose嚗??啣???prose ?冽甇賊???silent drop嚗?.17嚗?.18 ??潸”隞乓誨?詨仃???詨潭?銝?撩?? 禮2 ??靽?嚗8 ?ne more?? setup嚗???擗?drill??- **register嚗 L1/L2**??畾萇????望????? ?伐?recap 5嚗ook?ody?akeaway嚗 禮4 蝳?嚗敹菜?憿?敹菜????梁??????ee???s shown???n this scene??嚗??????箇?券????`source`嚗visual_need`嚗?閮餅???- **no-repeat嚗lean**?4嚗5嚗6嚗扔?? $f(a)$ ?⊿???銝車銝?隤??嚗bstract 銝?摰??嚗?????瑽?嚗7嚗8 spiral 甇?Ⅱ嚗8 ??setup嚗?飛暺?嚗ecap ?粹???????- **completeness嚗犖撌亦?交撖佗?嚗?* grep 禮1.3 皞?HTML L984??114嚗Ⅱ隤?*??* 1 Definition嚗?.9嚗?4 Example嚗?.15??.18嚗?2 Figure嚗?.11/1.12嚗?*??* theorem嚗roposition嚗orollary嚗trategy嚗emark嚗aution嚗xercise嚗? 禮7 ?芣??grep 銝餃撐銝?氬?*??exercise 瘣拙**嚗ntro嚗1嚗agline嚗?摰?嚗?outro嚗11嚗???forward_ref嚗9嚗??潔蜓?批捆??recap **銋?**?arration 隞乓ext嚗ater??餈啜?*?芸蝭??*??- **?芸?嚗3/L4嚗?靘??臬???嚗?* u9?ables can occasionally mislead??敹雓儔?uessing ??provisional??隤?隢酉?喉?L4嚗???詨飛嚗?recap?he whole section????抒隤??梁???L4嚗?u4嚗5 ?eart of the section???嗡??銝?瘛勗漲???楛摨衣??琿ㄞ嚗3 drift嚗? finding嚗?
+**蝯?嚗蝔踹摰孵惜??蝔賣嚗ath 0 ?胯 L1嚗? 禮1.2 ??隤?瑼颯?* ?敺蝙?刻??荔?隤???脣極蝔阮嚗?
+---
+
+## 敺齒嚗??臬??脣極蝔阮嚗?
+1. **雿輻????narration**嚗2?10 ??9 畾蛛????臬?銝脣極蝔阮?祟?貊?閬???standalone HTML嚗ch01_limit_of_function_narration.html`嚗摮詨皜脫????????2. 撌亦?蝔?`storyboards/ch01_limit_of_function.yml`嚗?1 ?湔嚗芋?輸?剁?intro嚗otivation ??definition嚗???visual嚗raph_focus 霈??graph_focus 瑽?**value_table ?2**嚗orward_ref ???∴?recap_cards嚗utro嚗?`say`嚗???narration ??嚗{show}`嚗2/u4/u5 璅?`# HOOK(蝚砌?頛?`??3. lint嚗izecheck 摰? ??mock ??嚗蝺?閮祥嚗? ?賢??株???4. 鋆撩璅⊥嚗lot-kind 閰摯嚗value_table` 撌脣?嚗Ⅱ隤?graph_focus ?賢???/?垢暺??拙?潸?璅?????禮1.4 jump plot 蝻箏?典???嚗閰脩??????閰摯嚗?5. 蝚砌?頛芸??恬?u2/u4/u5 hook ??嚗? 隤 ??critic 銴 ????TTS嚗?鞎鳴???對???4K??
+
+ succeeded in 422ms:
+# 禮1.3 The Limit of a Function ????????? B 繚 MiMo-V2.5-TTS 摰Ｚˊ嚗?
+
+> **甇斗??箇???嚗O NOT EDIT嚗?* ??`content_scripts/ch01_limit_of_function.spoken.yml`嚗隤銝皞? 蝬?`pipeline/derive_spoken.py` ?????寞??質???`.spoken.yml` 敺???
+> **?扯釭嚗???B嚗隤?TTS ????* ?望??????敹?批捆蝔踹歇隤 `narration`嚗?*?芣??詨飛?斗????**嚗 LaTeX嚗?靘??賜霈 LaTeX ??TTS嚗iMo嚗敹萸??折霈??? A嚗摮豢葡??嚗?`ch01_limit_of_function_narration.html`??
+> **Mode B 蝔賣???** 閬?`content_scripts/_audit/`嚗?蝭?閮?嚗?
+
+---
+
+## 銝?iMo ??閮剖?嚗?剁?
+
+| ? | ??|
+|------|----|
+| `model` | `mimo-v2.5-tts` |
+| `audio.voice` | `Mia`嚗?戊?莎?嚗???Dean繚Milo繚Chloe |
+| `audio.format` | `wav`嚗?4kHz/mono/PCM16嚗??Ｙ? `write_pcm_wav` ?詨捆嚗eat WAV ?芸?鋆撠暸??喉? |
+
+**?典?憸冽?誘嚗瘥活?澆??`user` 閮嚗?YouTube 蝘憸具迤撣貉???**
+
+```
+Read like the narrator of a polished YouTube science explainer: clear, engaging,
+and conversational, at a normal talking pace ??natural momentum, not slow or drawn
+out, and no long dramatic pauses, just ordinary pauses at sentence ends. Warm and
+lightly energetic, curious rather than solemn, like explaining an idea to a smart
+friend. Pronounce every mathematical expression clearly and correctly.
+```
+
+**Audio tag嚗?* 蝬剜??身**銝???*嚗隤阮蝝?摮?蝭憟?憸冽?誘嚗?暺???
+
+## 鈭摮詨艙瘜靘??函??嚗ode B 鋆?嚗?
+
+| ?詨飛 | ???敹菜? | ?酉 |
+|------|---------|------|
+| $f^{-1}$嚗??賣閮?嚗?| **? inverse??* | 蝯?敹?? to the minus one??憭??亥玨??*?餅?撠?** $\sin^{-1}$ 閮???$1/\sin$嚗府?摮敹??ine to the minus one??銝西?皜??臬??|
+| $x_1,\ x_2$嚗?璅? | **? sub one?? ? sub two??* | 甇??摰儔嚗???憓??⊥郁蝢押?|
+| $x^2,\ x^3$ | ? squared?? ? cubed??| |
+| $\sqrt[3]{x}$ / $\sqrt[3]{y-2}$ | ?he cube root of x??/ ?她f **the quantity** y minus two??| ??撌格?? ?he quantity??瘨郁蝢押?|
+| $(\sqrt[3]{x-2})^3$ / $(f^{-1}(x))^2$ | ?? **all cubed**??/ ?? **all squared**??| 憭惜甈⊥?擃?|
+| ? $\tfrac{a}{b}$ | ? over b??蝪∪?敹??ne half / one quarter / nine-fifths?佗? | |
+| ???$[a,b]$ / $(a,b)$ | ?he (open) interval from a to b??| |
+| 摨扳?暺?$(a,b)$ | **?he point with coordinates a and b??* | ?∟?閬箇泵???皜???|
+| $\pi/2$??\arcsin$??| ?i over two?rcsine of ?色?| ??閫?亙艙 arc-??|
+| domain $A$ / range $B$ | ?omain A / range B??| |
+
+## 銝挾???蝔?
+
+> 瘥挾 `uNN 繚 id` ?唾府?桀? `assistant` 閮?批捆嚗{show}` 撌脩宏?歹??ntro/outro ?⊥??踝?銝???
+
+### u2 繚 ratio_of_changes
+Calculus keeps circling back to one question: how fast is something changing right now? Suppose s of t is the position of a moving object at time t. Over the stretch from t to t plus h, its average velocity is the ratio s of t plus h, minus s of t, all over h -- change in position divided by change in time. But the average speed across an interval is not the speed at a single instant. To pin down that instantaneous velocity, we let h shrink toward zero and watch what the ratio settles on. The same move works for any function: the ratio f of y minus f of x, all over y minus x, measures how f changes between two inputs, and we ask what it approaches as y slides toward x without ever reaching it. That question -- what a quantity approaches -- is the idea of a limit.
+
+### u3 繚 the_limit_defined
+Here is the definition that captures "what a function approaches." We say the limit of f of x as x approaches a equals L if f of x can be made arbitrarily close to L whenever x is sufficiently close to a but not equal to a. That last clause is the entire personality of a limit: we care about inputs near a, never about a itself. The same idea has a lighter notation: f of x tends to L as x tends to a. Keep the picture in mind: x creeping toward a along the horizontal axis, while the heights f of x home in on L.
+
+### u4 繚 limit_vs_value
+Now the subtle part, and it is the heart of this section. A limit looks only at the neighborhood of a, never at the single point a itself -- so the value f of a gets no vote. Look at three functions side by side, all approaching the same height L as x approaches a. In the first, the point sits right where you expect, with f of a equals L. In the second, someone has lifted that one point off the curve, so f of a is not equal to L. In the third, the point is missing entirely and f of a is undefined. Three different situations at a, yet the limit is the same L in every case -- because near a, and near is all that counts, the three curves are identical.
+
+### u5 繚 reading_a_graph
+Let us read limits straight off a graph. Three inputs to inspect: x equals negative two, x equals zero, and x equals two. As x approaches negative two from either side, the curve rises toward height one, so the limit there is one. Approaching zero, the curve heads to height zero -- the limit is zero. Now x equals two is the interesting one: from both sides the curve climbs toward height two, and yet the graph marks a solid dot down at the point with coordinates two and negative two, and a hollow dot up at the point with coordinates two and two. So f of two is negative two, but the limit ignores the value at the point and reports where the curve was heading. The limit as x approaches two is two, even though f of two equals negative two.
+
+### u6 繚 build_one_yourself
+The same idea, now run backwards: instead of reading a graph, we build one. The task is a function with limit ten as x approaches three, but with f of three equals zero. Start with any curve that approaches height ten at x equals three -- a straight line through the point with coordinates three and ten will do. Then take that single point and drag it down to height zero: a hollow dot at the point with coordinates three and ten to mark where the curve is heading, and a solid dot at the point with coordinates three and zero for the actual value. Near x equals three the curve still approaches ten, while the relocated point sets f of three equals zero. Because the limit and the value are independent, nothing stops us from choosing them separately.
+
+### u7 繚 estimate_from_a_table
+What if there is no graph to read? Then we make our own data. Take the limit as x approaches one of f of x equals x minus one over x squared minus one. Substituting x equals one gives zero over zero -- undefined, no answer there. So instead we sample inputs creeping toward one from both sides: 0.9, 0.99, 0.999, and then 1.001, 1.01, 1.1. Evaluate the expression at each, and the outputs march steadily toward one number -- 0.5263, 0.5025, 0.5003 from the left, and 0.4998, 0.4975 closing in from the right. They are squeezing in on one half, so we read the limit as one half.
+
+### u8 繚 when_algebra_is_hard
+One more, where the table really earns its keep. Consider the limit as t approaches zero of the square root of t squared plus nine, minus three, all over t squared. This time you cannot just factor your way to the answer -- the square root hides what is going on, and at t equals zero it is once again zero over zero. So we let the numbers talk. Sampling t equals negative 0.1, negative 0.01, 0.01, and 0.1, the expression returns about 0.16662, then 0.166666, and back out symmetrically. That is closing in on 0.16666 and so on, which we recognize as one sixth. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.
+
+### u9 繚 what_comes_next
+Notice what we have been doing: guessing limits by peeking at nearby values, whether off a graph or out of a table. Guessing is a fine start, but it is not a proof, and tables can occasionally mislead. So next we build systematic methods -- rules that compute limits exactly, with no sampling at all. And we sharpen the idea itself: what happens when a function approaches different values from the left and from the right, or grows without bound near a point. The estimate you can make today becomes a calculation you can trust.
+
+### u10 繚 recap
+Here is the whole section in four ideas. A limit asks what value f of x approaches as x heads toward a -- written the limit of f of x as x approaches a equals L. It depends only on the behavior near a, never on f of a itself, which may not even be defined. You can read a limit off a graph by following the curve inward from both sides. And when there is no graph, a table of values at inputs creeping toward a will reveal the number the function is approaching.
+
+---
+
+## ??敹?
+
+- ??????桐?皞? `content_scripts/ch01_limit_of_function.spoken.yml`嚗瑼? `storyboards/ch01_limit_of_function_mimo.yml` ? `derive_spoken.py` ????
+- `{show}` beat ???迤??storyboard 撠?嚗derive_spoken.py --check` 摰?嚗?
+- 閮祥嚗iMo ?祆葫??雿惇憭 API嚗甈∪???靘?`CLAUDE.md` ?梁?噩????
+
+
+ succeeded in 403ms:
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>禮1.3 The Limit of a Function ???撖拇蝔?/title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --ink:#1c2230; --ink-soft:#5c6678; --paper:#f7f5ef; --card:#ffffff;
+    --line:#e3ddd0; --accent:#2f6f6a; --accent-soft:#e7f0ef;
+    --kicker:#9a6a3a; --warn:#a23b2c; --rule:#c9c1b1;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:48px 28px 96px}
+  header.top{border-bottom:2px solid var(--ink); padding-bottom:20px; margin-bottom:8px}
+  .eyebrow{font-size:.82rem; letter-spacing:.14em; text-transform:uppercase; color:var(--kicker); font-weight:700}
+  h1{font-size:2rem; margin:.25em 0 .15em; line-height:1.15}
+  .tagline{font-style:italic; color:var(--ink-soft); font-size:1.12rem; margin:0}
+  .meta-note{font-size:.92rem; color:var(--ink-soft); margin-top:14px; padding:12px 16px; background:var(--accent-soft); border-radius:8px; border:1px solid #d3e2e0}
+  .meta-note strong{color:var(--accent)}
+  .flow{font-size:.86rem; color:var(--ink-soft); margin:18px 0 0; padding-left:1.1em}
+  .flow li{margin:.15em 0}
+  section.unit{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:22px 26px; margin:26px 0; box-shadow:0 1px 2px rgba(0,0,0,.03)
+  }
+  .uhead{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:14px}
+  .unum{font-weight:700; color:var(--accent); font-size:1.05rem}
+  .uid{font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:.92rem; color:var(--ink)}
+  .kind{margin-left:auto; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .kind.intro,.kind.outro{background:var(--ink-soft)}
+  .kind.recap{background:var(--kicker)}
+  .kind.forward_ref{background:#586a8a}
+  .kind.visual{background:#6a7d4a}
+  .goal{font-size:.92rem; color:var(--ink-soft); margin:0 0 14px}
+  .goal::before{content:"?飛?格??"; font-weight:700; color:var(--ink); letter-spacing:.04em}
+  .narr-label{font-size:.74rem; letter-spacing:.12em; text-transform:uppercase; color:var(--kicker); font-weight:700; margin-bottom:6px}
+  .narration{font-size:1.12rem; line-height:1.72; padding:4px 0 6px}
+  .silent{color:var(--ink-soft); font-style:italic; font-size:1rem}
+  details{margin-top:14px; border-top:1px dashed var(--rule); padding-top:12px}
+  summary{cursor:pointer; font-size:.82rem; color:var(--ink-soft); letter-spacing:.04em; user-select:none}
+  summary:hover{color:var(--accent)}
+  .vnote{font-size:.92rem; color:var(--ink); margin:.5em 0}
+  .vnote b{color:var(--accent)}
+  .anim{font-size:.92rem; color:var(--ink); margin:.5em 0}
+  .anim b{color:var(--kicker)}
+  .vnote.empty,.anim.empty{color:var(--ink-soft); font-style:italic}
+  footer{margin-top:40px; padding-top:20px; border-top:2px solid var(--ink); font-size:.9rem; color:var(--ink-soft)}
+  .count{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Chapter 1 繚 Section 1.3 繚 ?撖拇蝔?/div>
+    <h1>The Limit of a Function</h1>
+    <p class="tagline">What value does a function approach?</p>
+    <div class="meta-note">
+      ? 禮1.3 ?飛敶梁???strong>敺??舀???/strong>嚗摰寧阮 <code>ch01_limit_of_function.md</code> ?霈????      ??<strong>9 畾?/strong>??嚗ntro嚗utro 蝝??怎?嚗??挾撖拚嚗閰隤??摮豢?血艙敺???摮詨??具?      隤敺??脣極蝔阮嚗芋?踹?嚗?????撘萄???孵撅?閰脣??<strong>閬死嚗??恍?瘙?/strong>??    </div>
+    <ol class="flow">
+      <li>??嚗???? ??璆菟???憿?</li>
+      <li>璆菟???蝢抬??迤撘?嚗?瘜?/li>
+      <li>璆菟? vs ?賣?潘?銝?嚗?f(a)=L$嚗?\neq L$嚗ndefined嚗?/li>
+      <li>霈??璆菟?嚗?x=2$嚗扔??$2 \neq f(2)=-2$嚗?/li>
+      <li>??瑽?蝯血? limit ??value ?怠?嚗?/li>
+      <li>?詨潸”隡啗?嚗??? ??$\tfrac12$嚗?/li>
+      <li>?詨潸”隡啗?嚗撘???$\tfrac16$嚗誨?詨仃??銝?撩嚗?/li>
+      <li>?踹???嚗頂蝯勗??寞???湛??∠狙璆菟?嚗?/li>
+      <li>Recap嚗??亙葆韏堆?</li>
+    </ol>
+  </header>
+
+  <!-- 1 intro -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">1</span><span class="uid">intro</span><span class="kind intro">intro</span></div>
+    <p class="narration silent">蝝????湛?Section Gate嚗??啣?? 禮1.3 ??璅? + tagline嚗???/p>
+  </section>
+
+  <!-- 2 ratio_of_changes -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">2</span><span class="uid">ratio_of_changes</span><span class="kind motivation">motivation</span></div>
+    <p class="goal">敺像???? ???祆?霈????箸扔??????憿??嗡??撓?交??銝??雿??貊?嚗?嚗??潸隅餈?暻潦?/p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Calculus keeps circling back to one question: how fast is something changing right now? Suppose $s(t)$ is the position of a moving object at time $t$. Over the stretch from $t$ to $t+h$, its average velocity is the ratio $\frac{s(t+h)-s(t)}{h}$ ??change in position divided by change in time. But the average speed across an interval is not the speed at a single instant. To pin down that instantaneous velocity, we let $h$ shrink toward zero and watch what the ratio settles on. The same move works for any function: the ratio $\frac{f(y)-f(x)}{y-x}$ measures how $f$ changes between two inputs, and we ask what it approaches as $y$ slides toward $x$ without ever reaching it. That question ??what a quantity approaches ??is the idea of a limit.</p>
+    <details><summary>閬死嚗??恍?瘙?/summary>
+      <p class="vnote"><b>??嚗?/b>銝璇蝺??拚? $(x,f(x))$??(y,f(y))$ ???蝺?璅 rise $f(y)-f(x)$?un $y-x$????$\frac{f(y)-f(x)}{y-x}$??/p>
+      <p class="anim"><b>?嚗?/b>?喳暺?$(y,f(y))$ 瘝踵蝺楨蝺拇??椰?游摰? $(x,f(x))$嚗蝺銋???靘??哨?皛???嚗憿胯?y\to x$ 瘥潸隅餈??潦??怠??嚗?y\ne x$嚗???賢? tangent嚗惇敺?嚗?/p>
+    </details>
+  </section>
+
+  <!-- 3 the_limit_defined -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">3</span><span class="uid">the_limit_defined</span><span class="kind definition">definition</span></div>
+    <p class="goal">?璆菟????迤撘?摰儔?蝔株?瘜?銝行?雿??萄???x$ 頞刻? $a$ 雿?蝑 $a$??/p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Here is the definition that captures ?hat a function approaches.??We say the limit of $f(x)$ as $x$ approaches $a$ equals $L$, written $\lim_{x\to a} f(x) = L$, if $f(x)$ can be made arbitrarily close to $L$ whenever $x$ is sufficiently close to $a$ but not equal to $a$. That last clause is the entire personality of a limit: we care about inputs near $a$, never about $a$ itself. The same idea has a lighter notation ??$f(x)\to L$ as $x\to a$ ??read ??f(x)$ tends to $L$ as $x$ tends to $a$.??Keep the picture in mind: $x$ creeping toward $a$ along the horizontal axis, while the heights $f(x)$ home in on $L$.</p>
+    <details><summary>閬死嚗??恍?瘙?/summary>
+      <p class="vnote"><b>??嚗?/b>摰儔摰????$\lim_{x\to a}f(x)=L$ + 銝?亦閰梧?$f(x)$ 隞餅??亥? $L$ ??$x$ 頞喳??亥? $a$ 雿?$\ne a$嚗? ?蹂誨閮? $f(x)\to L$嚗?\ne a$??閬箏撥隤踴?/p>
+      <p class="anim empty"><b>?嚗?/b>?﹦???荔??潸????策銝??桀?銝?嚗?/p>
+    </details>
+  </section>
+
+  <!-- 4 limit_vs_value -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">4</span><span class="uid">limit_vs_value</span><span class="kind visual">visual</span></div>
+    <p class="goal">?圾璆菟??芰? $a$ ???潦? $f(a)$ ?⊿???f(a)$ ?臭誑蝑??蝑???寞瘝?蝢抬?璆菟??賭?璅??/p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Now the subtle part, and it is the heart of this section. A limit looks only at the neighborhood of $a$, never at the single point $a$ itself ??so the value $f(a)$ gets no vote. Look at three functions side by side, all approaching the same height $L$ as $x\to a$. In the first, the point sits right where you expect, with $f(a) = L$. In the second, someone has lifted that one point off the curve, so $f(a)\ne L$. In the third, the point is missing entirely and $f(a)$ is undefined. Three different situations at $a$, yet the limit is the same $L$ in every case ??because near $a$, and near is all that counts, the three curves are identical.</p>
+    <details><summary>閬死嚗??恍?瘙?/summary>
+      <p class="vnote"><b>??嚗?/b>銝蒂??????璇隅餈?$L$ ?蝺?璇?蝺?$y=L$ ??$x=a$嚗? 撖血? $(a,L)$ ?冽蝺?嚗 $a$ ??征敹???雿祕敹?蝘颱?????$a$ ??拍征敹?嚗ndefined嚗?蝜?Figure 1.11??/p>
+      <p class="anim"><b>?嚗?/b>銝??郊嚗?閮? $a$ 撌血?拙瘝?x 頠豢???$a$嚗???摨阡?嗆??啣?銝璇?$y=L$嚗?恍?鈭?$L$嚗?撘瑁矽銝????暺蝺?嚗◤蝘餉粥嚗?摮???潸?擃漲?賭?璅??/p>
+    </details>
+  </section>
+
+  <!-- 5 reading_a_graph -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">5</span><span class="uid">reading_a_graph</span><span class="kind example">example</span></div>
+    <p class="goal">???耦?拙霈?箸扔??銝西扛?潛Ⅱ隤?$x=2$ ?扔??$2$嚗??賣??$f(2)=-2$ ?臭誑銝???/p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Let us read limits straight off a graph. Three inputs to inspect: $x=-2$, $x=0$, and $x=2$. As $x$ approaches $-2$ from either side, the curve rises toward height $1$, so the limit there is $1$. Approaching $0$, the curve heads to height $0$ ??the limit is zero. Now $x=2$ is the interesting one: from both sides the curve climbs toward height $2$, and yet the graph marks a solid dot down at $(2,-2)$ and a hollow dot up at $(2,2)$. So $f(2)$ is $-2$, but the limit ignores the value at the point and reports where the curve was heading. The limit as $x\to 2$ is $2$, even though $f(2)$ equals $-2$.</p>
+    <details><summary>閬死嚗??恍?瘙?/summary>
+      <p class="vnote"><b>??嚗?/b>?桐??賣???鼓 Figure 1.12嚗?$x=-2$ 頞刻? $1$??x=0$ 頞刻? $0$??x=2$ 頞刻? $2$嚗?x=2$ ?征敹?$(2,2)$嚗祕敹?$(2,-2)$嚗? $y=f(x)$??/p>
+      <p class="anim"><b>?嚗?/b>靘??? $-2$??0$??2$嚗??曉?湔??亦?璅???蝺???y 頠豢?擃漲嚗?x=2$ ???潸???? $y=2$嚗征敹?嚗???蝷?$y=-2$嚗祕敹?嚗憿胯扔??頞典???銝暺?/p>
+    </details>
+  </section>
+
+  <!-- 6 build_one_yourself -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">6</span><span class="uid">build_one_yourself</span><span class="kind example">example</span></div>
+    <p class="goal">?????策摰璅扔???賣?潘??芸楛?怠銝璇泵???脩?嚗??箝扔???賣?澆??芰蝡?/p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">The same idea, now run backwards: instead of reading a graph, we build one. The task is a function with limit $10$ as $x\to 3$, but with $f(3) = 0$. Start with any curve that approaches height $10$ at $x=3$ ??a straight line through $(3,10)$ will do. Then take that single point and drag it down to height $0$: a hollow dot at $(3,10)$ to mark where the curve is heading, and a solid dot at $(3,0)$ for the actual value. Near $x=3$ the curve still approaches $10$, while the relocated point sets $f(3) = 0$. Because the limit and the value are independent, nothing stops us from choosing them separately.</p>
+    <details><summary>閬死嚗??恍?瘙?/summary>
+      <p class="vnote"><b>??嚗?/b>??$(3,10)$ ?蝺?頞刻? $10$嚗?$x=3$ ?征敹?$(3,10)$嚗祕敹?$(3,0)$嚗? $\lim_{x\to3}f(x)=10$??f(3)=0$??/p>
+      <p class="anim"><b>?嚗?/b>???$(3,10)$ ?蝺?$x=3$ ?征敹?嚗?閰脤???銝????港?蝘餃 $(3,0)$ 霈祕敹?雿?蝛箏?嚗??????$y=10$嚗imit嚗? $y=0$嚗alue嚗?銝血?蝷箏??銝撟脯?/p>
+    </details>
+  </section>
+
+  <!-- 7 estimate_from_a_table -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">7</span><span class="uid">estimate_from_a_table</span><span class="kind example">example</span></div>
+    <p class="goal">?函?銝蝑????具 $a$ ???澆?銵具摯閮扔??霈??$\frac{x-1}{x^2-1}\to\tfrac12$??/p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">What if there is no graph to read? Then we make our own data. Take $\lim_{x\to 1}\frac{x-1}{x^2-1}$. Substituting $x=1$ gives zero over zero ??undefined, no answer there. So instead we sample inputs creeping toward $1$ from both sides: $0.9$, $0.99$, $0.999$, and then $1.001$, $1.01$, $1.1$. Evaluate the expression at each, and the outputs march steadily toward one number ??$0.5263$, $0.5025$, $0.5003$ from the left, and $0.4998$, $0.4975$ closing in from the right. They are squeezing in on one half, so we read the limit as $\tfrac12$.</p>
+    <details><summary>閬死嚗??恍?瘙?/summary>
+      <p class="vnote"><b>??嚗?/b><code>value_table</code> ?詨潮潸???$x$ 嚗?0.9, 0.99, 0.999, 1.001, 1.01, 1.1嚗?\frac{x-1}{x^2-1}$ 嚗?0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762嚗?隢?$=\tfrac12$??/p>
+      <p class="anim"><b>?嚗?/b>甈??勗蝡臬?銝剝????剔內嚗?憭?0.9嚗?.1 ?漁嚗? $x=1$ ?塚?嚗?詨澆?甇乩漁?粹潸? $\tfrac12$? <code>value_table</code> 璅⊥ <code>reveal: cols</code> ???輯???/p>
+    </details>
+  </section>
+
+  <!-- 8 when_algebra_is_hard -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">8</span><span class="uid">when_algebra_is_hard</span><span class="kind example">example</span></div>
+    <p class="goal">???詨潭??具誨?訾??潛?銝忽??銝?撩嚗???$\to\tfrac16$??/p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">One more, where the table really earns its keep. Consider $\lim_{t\to 0}\frac{\sqrt{t^2+9}-3}{t^2}$. This time you cannot just factor your way to the answer ??the square root hides what is going on, and at $t=0$ it is once again zero over zero. So we let the numbers talk. Sampling $t = -0.1$, $-0.01$, $0.01$, and $0.1$, the expression returns about $0.16662$, then $0.166666$, and back out symmetrically. That is closing in on $0.16666\ldots$, which we recognize as $\tfrac16$. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.</p>
+    <details><summary>閬死嚗??恍?瘙繚?禮4 repeat-pattern嚗??膩 setup嚗?/summary>
+      <p class="vnote"><b>??嚗?/b><code>value_table</code>嚗???嚗?t$ 嚗???.1, ??.01, 0.01, 0.1嚗?\frac{\sqrt{t^2+9}-3}{t^2}$ 嚗?0.166620, 0.166666, 0.166666, 0.166620嚗?隢?$=\tfrac16$??/p>
+      <p class="anim"><b>?嚗?/b>??#7 ???剔內嚗蝡臬? $t=0$ ?塚?嚗澆?蝔梢潸? $0.16666\ldots$嚗摰?鈭?$\tfrac16$??/p>
+      <p class="vnote"><b>靽??嚗?/b>1.17 ?臬?撘?閫??摮貊??賭誨?賊?霅???.18 ?孵??∪??圾?憿舀?潭??其誨?詨仃????b>銝?撩</b>嚗??? drill??/p>
+    </details>
+  </section>
+
+  <!-- 9 what_comes_next -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">9</span><span class="uid">what_comes_next</span><span class="kind forward_ref">forward_ref</span></div>
+    <p class="goal">?仿????潦?航絲暺??乩?靘?摮貊頂蝯勗???璆菟??寞?嚗誑??湛??∠狙璆菟?蝑蝝啁溶???箝?/p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Notice what we have been doing: guessing limits by peeking at nearby values, whether off a graph or out of a table. Guessing is a fine start, but it is not a proof, and tables can occasionally mislead. So next we build systematic methods ??rules that compute limits exactly, with no sampling at all. And we sharpen the idea itself: what happens when a function approaches different values from the left and from the right, or grows without bound near a point. The estimate you can make today becomes a calculation you can trust.</p>
+    <details><summary>閬死嚗??恍?瘙?/summary>
+      <p class="vnote"><b>??嚗?/b>蝪∠???∴?from guessing ??to computing嚗??喳??唬??蜓憿?systematic methods?ne-sided limits?nfinite limits嚗?<b>銝蝭??/b>??/p>
+      <p class="anim empty"><b>?嚗?/b>?﹦???胯?/p>
+    </details>
+  </section>
+
+  <!-- 10 recap -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">10</span><span class="uid">recap</span><span class="kind recap">recap</span></div>
+    <p class="goal">?撣嗉粥?渡?嚗扔??頞刻??潦? $f(a)$ ?⊿??敺?霈??冽?潸”隡啜?/p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Here is the whole section in four ideas. A limit asks what value $f(x)$ approaches as $x$ heads toward $a$ ??written $\lim_{x\to a}f(x)=L$. It depends only on the behavior near $a$, never on $f(a)$ itself, which may not even be defined. You can read a limit off a graph by following the curve inward from both sides. And when there is no graph, a table of values at inputs creeping toward $a$ will reveal the number the function is approaching.</p>
+    <details><summary>閬死嚗??恍?瘙?/summary>
+      <p class="vnote"><b>??嚗?/b>?撐 takeaway ?∴???璆菟?嚗隅餈?$\lim_{x\to a}f(x)=L$嚗 ?芰? $a$ ???? $f(a)$ ?⊿?嚗 undefined嚗???敺??拙霈嚗 ?詨潸”隡啗???/p>
+      <p class="anim empty"><b>?嚗?/b>??gen-2 ?Ｘ? <code>recap_cards</code> 璅⊥??/p>
+    </details>
+  </section>
+
+  <!-- 11 outro -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">11</span><span class="uid">outro</span><span class="kind outro">outro</span></div>
+    <p class="narration silent">???嗅偏嚗?頧漁璈 ???蝯?logo 摮嚗???/p>
+  </section>
+
+  <footer>
+    靘?甈?瑼?<code>experiments/handout_kit/chapter1-print-standalone.html</code> 禮1.3?繚??批捆蝔選?<code>video/content_scripts/ch01_limit_of_function.md</code><br>
+    ?函??啣?嚗efinition 1.9?igure 1.11?xample 1.15嚗?Figure 1.12嚗xample 1.16?xample 1.17?xample 1.18?繚?<span class="count">9 畾?/span>敺??舀???  </footer>
+
+</div>
+</body>
+</html>
+
+
+codex
+The loaded files show the spoken units clearly, but the HTML contains suspicious malformed closing tags in the raw text, including the page title. I’m checking whether those are actual file contents and then I’ll do a structured diff of source narration vs HTML/spoken text.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration.html -Pattern '<title|/title|</p>|\\?/p>|</div>|\\?/div>|</li>|\\?/li>' -AllMatches | Select-Object -First 40 | Format-Table -AutoSize" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration.html -Pattern '<p class=\"narration\"|<section class=\"unit\"|<span class=\"uid\"|<span class=\"kind' | Format-Table -AutoSize" in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration.html -Pattern '<title|/title|</p>|\\?/p>|</div>|\\?/div>|</li>|\\?/li>' -AllMatches | Select-Object -First 40 | Format-Table -AutoSize"` rejected: blocked by policy
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration.html -Pattern '<p class=\"narration\"|<section class=\"unit\"|<span class=\"uid\"|<span class=\"kind' | Format-Table -AutoSize"` rejected: blocked by policy
+2026-06-14T02:26:22.179656Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration.html -Pattern '<title|/title|</p>|\\?/p>|</div>|\\?/div>|</li>|\\?/li>' -AllMatches | Select-Object -First 40 | Format-Table -AutoSize"` rejected: blocked by policy
+2026-06-14T02:26:22.181078Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration.html -Pattern '<p class=\"narration\"|<section class=\"unit\"|<span class=\"uid\"|<span class=\"kind' | Format-Table -AutoSize"` rejected: blocked by policy
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration_spoken.md -Pattern '"'^### u|model|audio'"\\.voice|audio\\.format|mimo|format|sample|message|user' | Format-Table -AutoSize" in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration_spoken.md -Pattern '"'^### u|model|audio'"\\.voice|audio\\.format|mimo|format|sample|message|user' | Format-Table -AutoSize"` rejected: blocked by policy
+2026-06-14T02:26:22.206794Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -LiteralPath .\\video\\content_scripts\\ch01_limit_of_function_narration_spoken.md -Pattern '"'^### u|model|audio'"\\.voice|audio\\.format|mimo|format|sample|message|user' | Format-Table -AutoSize"` rejected: blocked by policy
+codex
+The last inspection command was rejected by the sandbox policy, so I’m switching to `rg`-based reads. This is still read-only.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"<title|/title|</p>|\\?/p>|</div>|\\?/div>|</li>|\\?/li>\" .\\video\\content_scripts\\ch01_limit_of_function_narration.html" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"<p class=\\\"narration\\\"|<section class=\\\"unit\\\"|<span class=\\\"uid\\\"|<span class=\\\"kind\" .\\video\\content_scripts\\ch01_limit_of_function_narration.html" in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"<p class=\\\"narration\\\"|<section class=\\\"unit\\\"|<span class=\\\"uid\\\"|<span class=\\\"kind\" .\\video\\content_scripts\\ch01_limit_of_function_narration.html"` rejected: blocked by policy
+2026-06-14T02:26:32.982802Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"<p class=\\\"narration\\\"|<section class=\\\"unit\\\"|<span class=\\\"uid\\\"|<span class=\\\"kind\" .\\video\\content_scripts\\ch01_limit_of_function_narration.html"` rejected: blocked by policy
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n "''^### u|model|audio'"\\.voice|audio\\.format|mimo|format|sample|message|user\" .\\video\\content_scripts\\ch01_limit_of_function_narration_spoken.md" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 351ms:
+13:| `model` | `mimo-v2.5-tts` |
+14:| `audio.voice` | `Mia`（英文女聲）／備選 Dean·Milo·Chloe |
+15:| `audio.format` | `wav`（24kHz/mono/PCM16，與產線 `write_pcm_wav` 相容；beat WAV 自動裁頭尾靜音） |
+17:**全域風格指令（放每次呼叫的 `user` 訊息）— YouTube 科普風、正常語速：**
+48:### u2 · ratio_of_changes
+51:### u3 · the_limit_defined
+54:### u4 · limit_vs_value
+57:### u5 · reading_a_graph
+60:### u6 · build_one_yourself
+63:### u7 · estimate_from_a_table
+64:What if there is no graph to read? Then we make our own data. Take the limit as x approaches one of f of x equals x minus one over x squared minus one. Substituting x equals one gives zero over zero -- undefined, no answer there. So instead we sample inputs creeping toward one from both sides: 0.9, 0.99, 0.999, and then 1.001, 1.01, 1.1. Evaluate the expression at each, and the outputs march steadily toward one number -- 0.5263, 0.5025, 0.5003 from the left, and 0.4998, 0.4975 closing in from the right. They are squeezing in on one half, so we read the limit as one half.
+66:### u8 · when_algebra_is_hard
+69:### u9 · what_comes_next
+72:### u10 · recap
+79:- 口語文字單一源＝ `content_scripts/ch01_limit_of_function.spoken.yml`；本檔與 `storyboards/ch01_limit_of_function_mimo.yml` 皆由 `derive_spoken.py` 生成。
+
+ succeeded in 389ms:
+6:<title>§1.3 The Limit of a Function — 旁白審核稿</title>
+68:    <div class="eyebrow">Chapter 1 · Section 1.3 · 旁白審核稿</div>
+70:    <p class="tagline">What value does a function approach?</p>
+75:    </div>
+77:      <li>動機（瞬時變化率 → 極限的問題）</li>
+78:      <li>極限的定義（非正式）＋記法</li>
+79:      <li>極限 vs 函數值（三圖：$f(a)=L$／$\neq L$／undefined）</li>
+80:      <li>讀圖求極限（$x=2$：極限 $2 \neq f(2)=-2$）</li>
+81:      <li>反向構造（給定 limit 與 value 畫圖）</li>
+82:      <li>數值表估計（有理式 → $\tfrac12$）</li>
+83:      <li>數值表估計（根式 → $\tfrac16$；代數失效時不可或缺）</li>
+84:      <li>承先啟後（系統化方法、單側／無窮極限）</li>
+85:      <li>Recap（四句帶走）</li>
+91:    <div class="uhead"><span class="unum">1</span><span class="uid">intro</span><span class="kind intro">intro</span></div>
+92:    <p class="narration silent">純品牌開場（Section Gate：章地圖聚焦 §1.3 → 標題 + tagline）。無旁白。</p>
+97:    <div class="uhead"><span class="unum">2</span><span class="uid">ratio_of_changes</span><span class="kind motivation">motivation</span></div>
+98:    <p class="goal">從「平均變化率 → 瞬時變化率」看出極限要回答的問題：當一個輸入滑向另一個（但不相等）時，比值趨近什麼。</p>
+99:    <div class="narr-label">Narration</div>
+100:    <p class="narration">Calculus keeps circling back to one question: how fast is something changing right now? Suppose $s(t)$ is the position of a moving object at time $t$. Over the stretch from $t$ to $t+h$, its average velocity is the ratio $\frac{s(t+h)-s(t)}{h}$ — change in position divided by change in time. But the average speed across an interval is not the speed at a single instant. To pin down that instantaneous velocity, we let $h$ shrink toward zero and watch what the ratio settles on. The same move works for any function: the ratio $\frac{f(y)-f(x)}{y-x}$ measures how $f$ changes between two inputs, and we ask what it approaches as $y$ slides toward $x$ without ever reaching it. That question — what a quantity approaches — is the idea of a limit.</p>
+102:      <p class="vnote"><b>靜態：</b>一條曲線上兩點 $(x,f(x))$、$(y,f(y))$ 與連接的割線；標出 rise $f(y)-f(x)$、run $y-x$、比值 $\frac{f(y)-f(x)}{y-x}$。</p>
+103:      <p class="anim"><b>動畫：</b>右側點 $(y,f(y))$ 沿曲線緩緩滑向左側固定點 $(x,f(x))$，割線隨之轉動、愈來愈短；滑近頓住，凸顯「$y\to x$ 比值趨近某值」——不畫到重合（$y\ne x$）。刻意不命名 tangent（屬後章）。</p>
+109:    <div class="uhead"><span class="unum">3</span><span class="uid">the_limit_defined</span><span class="kind definition">definition</span></div>
+110:    <p class="goal">掌握極限的（非正式）定義與兩種記法，並抓住關鍵字「$x$ 趨近 $a$ 但不等於 $a$」。</p>
+111:    <div class="narr-label">Narration</div>
+112:    <p class="narration">Here is the definition that captures “what a function approaches.” We say the limit of $f(x)$ as $x$ approaches $a$ equals $L$, written $\lim_{x\to a} f(x) = L$, if $f(x)$ can be made arbitrarily close to $L$ whenever $x$ is sufficiently close to $a$ but not equal to $a$. That last clause is the entire personality of a limit: we care about inputs near $a$, never about $a$ itself. The same idea has a lighter notation — $f(x)\to L$ as $x\to a$ — read “$f(x)$ tends to $L$ as $x$ tends to $a$.” Keep the picture in mind: $x$ creeping toward $a$ along the horizontal axis, while the heights $f(x)$ home in on $L$.</p>
+114:      <p class="vnote"><b>靜態：</b>定義宣告句 $\lim_{x\to a}f(x)=L$ + 一句白話（$f(x)$ 任意接近 $L$ ⟸ $x$ 足夠接近 $a$ 但 $\ne a$）+ 替代記法 $f(x)\to L$；「$\ne a$」視覺強調。</p>
+115:      <p class="anim empty"><b>動畫：</b>無——靜態即可（逼近動態留給下一單元三圖）。</p>
+121:    <div class="uhead"><span class="unum">4</span><span class="uid">limit_vs_value</span><span class="kind visual">visual</span></div>
+122:    <p class="goal">理解極限只看 $a$ 附近的值、與 $f(a)$ 無關——$f(a)$ 可以等於、不等於、或根本沒定義，極限都一樣。</p>
+123:    <div class="narr-label">Narration</div>
+124:    <p class="narration">Now the subtle part, and it is the heart of this section. A limit looks only at the neighborhood of $a$, never at the single point $a$ itself — so the value $f(a)$ gets no vote. Look at three functions side by side, all approaching the same height $L$ as $x\to a$. In the first, the point sits right where you expect, with $f(a) = L$. In the second, someone has lifted that one point off the curve, so $f(a)\ne L$. In the third, the point is missing entirely and $f(a)$ is undefined. Three different situations at $a$, yet the limit is the same $L$ in every case — because near $a$, and near is all that counts, the three curves are identical.</p>
+126:      <p class="vnote"><b>靜態：</b>三並排小圖，同一條趨近 $L$ 的曲線、同條虛線 $y=L$ 與 $x=a$；① 實心 $(a,L)$ 在曲線上；② $a$ 處斷開、空心點留原位、實心點移他處；③ $a$ 處只剩空心點（undefined）。重繪 Figure 1.11。</p>
+127:      <p class="anim"><b>動畫：</b>三圖同步：標記從 $a$ 左右兩側沿 x 軸滑向 $a$，三圖高度都收斂到同一條 $y=L$（短暫高亮 $L$）；強調不論那一點「在線上／被移走／不存在」，逼近高度都一樣。</p>
+133:    <div class="uhead"><span class="unum">5</span><span class="uid">reading_a_graph</span><span class="kind example">example</span></div>
+134:    <p class="goal">會從圖形兩側讀出極限，並親眼確認 $x=2$ 處極限（$2$）與函數值 $f(2)=-2$ 可以不同。</p>
+135:    <div class="narr-label">Narration</div>
+136:    <p class="narration">Let us read limits straight off a graph. Three inputs to inspect: $x=-2$, $x=0$, and $x=2$. As $x$ approaches $-2$ from either side, the curve rises toward height $1$, so the limit there is $1$. Approaching $0$, the curve heads to height $0$ — the limit is zero. Now $x=2$ is the interesting one: from both sides the curve climbs toward height $2$, and yet the graph marks a solid dot down at $(2,-2)$ and a hollow dot up at $(2,2)$. So $f(2)$ is $-2$, but the limit ignores the value at the point and reports where the curve was heading. The limit as $x\to 2$ is $2$, even though $f(2)$ equals $-2$.</p>
+138:      <p class="vnote"><b>靜態：</b>單一函數圖（重繪 Figure 1.12）：$x=-2$ 趨近 $1$、$x=0$ 趨近 $0$、$x=2$ 趨近 $2$；$x=2$ 處空心 $(2,2)$＋實心 $(2,-2)$；標 $y=f(x)$。</p>
+139:      <p class="anim"><b>動畫：</b>依序處理 $-2$、$0$、$2$，各放兩側滑入的標記、虛線引到 y 軸標高度；$x=2$ 停頓——逼近虛線停在 $y=2$（空心），同時閃示 $y=-2$（實心），凸顯「極限看趨勢、不看那一點」。</p>
+145:    <div class="uhead"><span class="unum">6</span><span class="uid">build_one_yourself</span><span class="kind example">example</span></div>
+146:    <p class="goal">反向操作——給定目標極限與函數值，自己畫出一條符合的曲線，鞏固「極限與函數值各自獨立」。</p>
+147:    <div class="narr-label">Narration</div>
+148:    <p class="narration">The same idea, now run backwards: instead of reading a graph, we build one. The task is a function with limit $10$ as $x\to 3$, but with $f(3) = 0$. Start with any curve that approaches height $10$ at $x=3$ — a straight line through $(3,10)$ will do. Then take that single point and drag it down to height $0$: a hollow dot at $(3,10)$ to mark where the curve is heading, and a solid dot at $(3,0)$ for the actual value. Near $x=3$ the curve still approaches $10$, while the relocated point sets $f(3) = 0$. Because the limit and the value are independent, nothing stops us from choosing them separately.</p>
+150:      <p class="vnote"><b>靜態：</b>過 $(3,10)$ 的直線（趨近 $10$）；$x=3$ 處空心 $(3,10)$＋實心 $(3,0)$；標 $\lim_{x\to3}f(x)=10$、$f(3)=0$。</p>
+151:      <p class="anim"><b>動畫：</b>先畫過 $(3,10)$ 的直線（$x=3$ 留空心）；把該點「抓下來」垂直下移到 $(3,0)$ 變實心、原位留空心；兩虛線分引到 $y=10$（limit）與 $y=0$（value），並列示兩者互不相干。</p>
+157:    <div class="uhead"><span class="unum">7</span><span class="uid">estimate_from_a_table</span><span class="kind example">example</span></div>
+158:    <p class="goal">在看不出答案時，用「在 $a$ 附近取值列表」估計極限；讀出 $\frac{x-1}{x^2-1}\to\tfrac12$。</p>
+159:    <div class="narr-label">Narration</div>
+160:    <p class="narration">What if there is no graph to read? Then we make our own data. Take $\lim_{x\to 1}\frac{x-1}{x^2-1}$. Substituting $x=1$ gives zero over zero — undefined, no answer there. So instead we sample inputs creeping toward $1$ from both sides: $0.9$, $0.99$, $0.999$, and then $1.001$, $1.01$, $1.1$. Evaluate the expression at each, and the outputs march steadily toward one number — $0.5263$, $0.5025$, $0.5003$ from the left, and $0.4998$, $0.4975$ closing in from the right. They are squeezing in on one half, so we read the limit as $\tfrac12$.</p>
+162:      <p class="vnote"><b>靜態：</b><code>value_table</code> 數值逼近型：$x$ ＝ 0.9, 0.99, 0.999, 1.001, 1.01, 1.1；$\frac{x-1}{x^2-1}$ ＝ 0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762；結論 $=\tfrac12$。</p>
+163:      <p class="anim"><b>動畫：</b>欄位由兩端向中間逐欄揭示（最外 0.9／1.1 先亮，往 $x=1$ 收），函數值同步亮出逼近 $\tfrac12$。由 <code>value_table</code> 模板 <code>reveal: cols</code> 原生承載。</p>
+169:    <div class="uhead"><span class="unum">8</span><span class="uid">when_algebra_is_hard</span><span class="kind example">example</span></div>
+170:    <p class="goal">看見數值法在「代數一眼看不穿」時不可或缺；讀出 $\to\tfrac16$。</p>
+171:    <div class="narr-label">Narration</div>
+172:    <p class="narration">One more, where the table really earns its keep. Consider $\lim_{t\to 0}\frac{\sqrt{t^2+9}-3}{t^2}$. This time you cannot just factor your way to the answer — the square root hides what is going on, and at $t=0$ it is once again zero over zero. So we let the numbers talk. Sampling $t = -0.1$, $-0.01$, $0.01$, and $0.1$, the expression returns about $0.16662$, then $0.166666$, and back out symmetrically. That is closing in on $0.16666\ldots$, which we recognize as $\tfrac16$. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.</p>
+174:      <p class="vnote"><b>靜態：</b><code>value_table</code>（同型）：$t$ ＝ −0.1, −0.01, 0.01, 0.1；$\frac{\sqrt{t^2+9}-3}{t^2}$ ＝ 0.166620, 0.166666, 0.166666, 0.166620；結論 $=\tfrac16$。</p>
+175:      <p class="anim"><b>動畫：</b>同 #7 逐欄揭示（兩端向 $t=0$ 收），值對稱逼近 $0.16666\ldots$，揭完高亮 $\tfrac16$。</p>
+176:      <p class="vnote"><b>保留理由：</b>1.17 可因式分解（學生能代數驗證）、1.18 根式無從速解——凸顯數值法在代數失效時的<b>不可或缺</b>，非冗餘 drill。</p>
+182:    <div class="uhead"><span class="unum">9</span><span class="uid">what_comes_next</span><span class="kind forward_ref">forward_ref</span></div>
+183:    <p class="goal">知道「猜值」只是起點，接下來會學系統化的求極限方法，以及單側／無窮極限等更細緻的行為。</p>
+184:    <div class="narr-label">Narration</div>
+185:    <p class="narration">Notice what we have been doing: guessing limits by peeking at nearby values, whether off a graph or out of a table. Guessing is a fine start, but it is not a proof, and tables can occasionally mislead. So next we build systematic methods — rules that compute limits exactly, with no sampling at all. And we sharpen the idea itself: what happens when a function approaches different values from the left and from the right, or grows without bound near a point. The estimate you can make today becomes a calculation you can trust.</p>
+187:      <p class="vnote"><b>靜態：</b>簡短文字卡：from guessing → to computing；列即將到來的主題（systematic methods、one-sided limits、infinite limits），<b>不報節號</b>。</p>
+188:      <p class="anim empty"><b>動畫：</b>無——靜態即可。</p>
+194:    <div class="uhead"><span class="unum">10</span><span class="uid">recap</span><span class="kind recap">recap</span></div>
+195:    <p class="goal">四句帶走整節：極限＝趨近值、與 $f(a)$ 無關、可從圖讀、可用數值表估。</p>
+196:    <div class="narr-label">Narration</div>
+197:    <p class="narration">Here is the whole section in four ideas. A limit asks what value $f(x)$ approaches as $x$ heads toward $a$ — written $\lim_{x\to a}f(x)=L$. It depends only on the behavior near $a$, never on $f(a)$ itself, which may not even be defined. You can read a limit off a graph by following the curve inward from both sides. And when there is no graph, a table of values at inputs creeping toward $a$ will reveal the number the function is approaching.</p>
+199:      <p class="vnote"><b>靜態：</b>四張 takeaway 卡：① 極限＝趨近值 $\lim_{x\to a}f(x)=L$；② 只看 $a$ 附近、與 $f(a)$ 無關（可 undefined）；③ 從圖兩側讀；④ 數值表估計。</p>
+200:      <p class="anim empty"><b>動畫：</b>用 gen-2 既有 <code>recap_cards</code> 模板。</p>
+206:    <div class="uhead"><span class="unum">11</span><span class="uid">outro</span><span class="kind outro">outro</span></div>
+207:    <p class="narration silent">品牌收尾（暗轉亮橋接 → 最終 logo 字卡）。無旁白。</p>
+215:</div>
+
+codex
+The main transformation risk I’m seeing so far is in spoken math grouping, especially fractions/radicals. I’m also checking whether any prose was silently changed versus the source, so I can avoid reporting harmless rewordings.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"collapse|collapsed|duplicate|the_limit_defined|written|read|lim|f of x tends|spoken|口語|折|重複\" .\\video\\content_scripts\\ch01_limit_of_function_narration_spoken.md" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n "''^### [0-9]|'"\\*\\*narration:\\*\\*|"'^  >|''^### u|''^#|''^##" .'"\\video\\content_scripts\\ch01_limit_of_function.md .\\video\\content_scripts\\ch01_limit_of_function_narration_spoken.md" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"0\\.5263|0\\.5025|0\\.5003|0\\.4998|0\\.4975|0\\.4762|0\\.166620|0\\.166666|0\\.16662|one half|one sixth|sqrt|square root|x minus one\" .\\video\\content_scripts\\ch01_limit_of_function.md .\\video\\content_scripts\\ch01_limit_of_function_narration.html .\\video\\content_scripts\\ch01_limit_of_function_narration_spoken.md" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 392ms:
+1:# §1.3 The Limit of a Function — 旁白口語版（版本 B · MiMo-V2.5-TTS 客製）
+3:> **此檔為生成檔（DO NOT EDIT）。** 由 `content_scripts/ch01_limit_of_function.spoken.yml`（口語單一源） 經 `pipeline/derive_spoken.py` 生成。要改旁白請改 `.spoken.yml` 後重生。
+4:> **性質：版本 B（口語 TTS 版）。** 英文散文逐字忠於內容稿已認可 `narration`，**只把數學攤成口語**（無 LaTeX），供不能直讀 LaTeX 的 TTS（MiMo）照念。對照閱讀版（版本 A，數學渲染）＝ `ch01_limit_of_function_narration.html`。
+27:**Audio tag：** 維持預設**不啟用**（口語稿純文字，節奏靠風格指令＋標點）。
+31:| 數學 | 口語念法 | 備註 |
+44:## 三、逐段口語稿
+49:Calculus keeps circling back to one question: how fast is something changing right now? Suppose s of t is the position of a moving object at time t. Over the stretch from t to t plus h, its average velocity is the ratio s of t plus h, minus s of t, all over h -- change in position divided by change in time. But the average speed across an interval is not the speed at a single instant. To pin down that instantaneous velocity, we let h shrink toward zero and watch what the ratio settles on. The same move works for any function: the ratio f of y minus f of x, all over y minus x, measures how f changes between two inputs, and we ask what it approaches as y slides toward x without ever reaching it. That question -- what a quantity approaches -- is the idea of a limit.
+51:### u3 · the_limit_defined
+52:Here is the definition that captures "what a function approaches." We say the limit of f of x as x approaches a equals L if f of x can be made arbitrarily close to L whenever x is sufficiently close to a but not equal to a. That last clause is the entire personality of a limit: we care about inputs near a, never about a itself. The same idea has a lighter notation: f of x tends to L as x tends to a. Keep the picture in mind: x creeping toward a along the horizontal axis, while the heights f of x home in on L.
+54:### u4 · limit_vs_value
+55:Now the subtle part, and it is the heart of this section. A limit looks only at the neighborhood of a, never at the single point a itself -- so the value f of a gets no vote. Look at three functions side by side, all approaching the same height L as x approaches a. In the first, the point sits right where you expect, with f of a equals L. In the second, someone has lifted that one point off the curve, so f of a is not equal to L. In the third, the point is missing entirely and f of a is undefined. Three different situations at a, yet the limit is the same L in every case -- because near a, and near is all that counts, the three curves are identical.
+57:### u5 · reading_a_graph
+58:Let us read limits straight off a graph. Three inputs to inspect: x equals negative two, x equals zero, and x equals two. As x approaches negative two from either side, the curve rises toward height one, so the limit there is one. Approaching zero, the curve heads to height zero -- the limit is zero. Now x equals two is the interesting one: from both sides the curve climbs toward height two, and yet the graph marks a solid dot down at the point with coordinates two and negative two, and a hollow dot up at the point with coordinates two and two. So f of two is negative two, but the limit ignores the value at the point and reports where the curve was heading. The limit as x approaches two is two, even though f of two equals negative two.
+61:The same idea, now run backwards: instead of reading a graph, we build one. The task is a function with limit ten as x approaches three, but with f of three equals zero. Start with any curve that approaches height ten at x equals three -- a straight line through the point with coordinates three and ten will do. Then take that single point and drag it down to height zero: a hollow dot at the point with coordinates three and ten to mark where the curve is heading, and a solid dot at the point with coordinates three and zero for the actual value. Near x equals three the curve still approaches ten, while the relocated point sets f of three equals zero. Because the limit and the value are independent, nothing stops us from choosing them separately.
+64:What if there is no graph to read? Then we make our own data. Take the limit as x approaches one of f of x equals x minus one over x squared minus one. Substituting x equals one gives zero over zero -- undefined, no answer there. So instead we sample inputs creeping toward one from both sides: 0.9, 0.99, 0.999, and then 1.001, 1.01, 1.1. Evaluate the expression at each, and the outputs march steadily toward one number -- 0.5263, 0.5025, 0.5003 from the left, and 0.4998, 0.4975 closing in from the right. They are squeezing in on one half, so we read the limit as one half.
+67:One more, where the table really earns its keep. Consider the limit as t approaches zero of the square root of t squared plus nine, minus three, all over t squared. This time you cannot just factor your way to the answer -- the square root hides what is going on, and at t equals zero it is once again zero over zero. So we let the numbers talk. Sampling t equals negative 0.1, negative 0.01, 0.01, and 0.1, the expression returns about 0.16662, then 0.166666, and back out symmetrically. That is closing in on 0.16666 and so on, which we recognize as one sixth. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.
+70:Notice what we have been doing: guessing limits by peeking at nearby values, whether off a graph or out of a table. Guessing is a fine start, but it is not a proof, and tables can occasionally mislead. So next we build systematic methods -- rules that compute limits exactly, with no sampling at all. And we sharpen the idea itself: what happens when a function approaches different values from the left and from the right, or grows without bound near a point. The estimate you can make today becomes a calculation you can trust.
+73:Here is the whole section in four ideas. A limit asks what value f of x approaches as x heads toward a -- written the limit of f of x as x approaches a equals L. It depends only on the behavior near a, never on f of a itself, which may not even be defined. You can read a limit off a graph by following the curve inward from both sides. And when there is no graph, a table of values at inputs creeping toward a will reveal the number the function is approaching.
+79:- 口語文字單一源＝ `content_scripts/ch01_limit_of_function.spoken.yml`；本檔與 `storyboards/ch01_limit_of_function_mimo.yml` 皆由 `derive_spoken.py` 生成。
+80:- `{show}` beat 切分與正典 storyboard 對齊（`derive_spoken.py --check` 守門）。
+
+ succeeded in 397ms:
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:1:# §1.3 The Limit of a Function — 旁白口語版（版本 B · MiMo-V2.5-TTS 客製）
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:9:## 一、MiMo 合成設定（現用）
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:29:## 二、數學念法慣例（全節通用；Mode B 裁定）
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:44:## 三、逐段口語稿
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:48:### u2 · ratio_of_changes
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:51:### u3 · the_limit_defined
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:54:### u4 · limit_vs_value
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:57:### u5 · reading_a_graph
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:60:### u6 · build_one_yourself
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:63:### u7 · estimate_from_a_table
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:66:### u8 · when_algebra_is_hard
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:69:### u9 · what_comes_next
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:72:### u10 · recap
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:77:## 四、備忘
+.\video\content_scripts\ch01_limit_of_function.md:1:# Section 1.3 The Limit of a Function — 內容稿（正式版）
+.\video\content_scripts\ch01_limit_of_function.md:10:## Deck meta（intro / outro 用）
+.\video\content_scripts\ch01_limit_of_function.md:26:## 教學單元
+.\video\content_scripts\ch01_limit_of_function.md:28:### 1. intro
+.\video\content_scripts\ch01_limit_of_function.md:32:- **narration:** —（intro 無旁白）
+.\video\content_scripts\ch01_limit_of_function.md:36:### 2. ratio_of_changes
+.\video\content_scripts\ch01_limit_of_function.md:40:- **narration:**
+.\video\content_scripts\ch01_limit_of_function.md:41:  > Calculus keeps circling back to one question: how fast is something changing right now? Suppose $s(t)$ is the position of a moving object at time $t$. Over the stretch from $t$ to $t+h$, its average velocity is the ratio $\frac{s(t+h)-s(t)}{h}$ — change in position divided by change in time. But the average speed across an interval is not the speed at a single instant. To pin down that instantaneous velocity, we let $h$ shrink toward zero and watch what the ratio settles on. The same move works for any function: the ratio $\frac{f(y)-f(x)}{y-x}$ measures how $f$ changes between two inputs, and we ask what it approaches as $y$ slides toward $x$ without ever reaching it. That question — what a quantity approaches — is the idea of a limit.
+.\video\content_scripts\ch01_limit_of_function.md:46:### 3. the_limit_defined
+.\video\content_scripts\ch01_limit_of_function.md:50:- **narration:**
+.\video\content_scripts\ch01_limit_of_function.md:51:  > Here is the definition that captures “what a function approaches.” We say the limit of $f(x)$ as $x$ approaches $a$ equals $L$, written $\lim_{x\to a} f(x) = L$, if $f(x)$ can be made arbitrarily close to $L$ whenever $x$ is sufficiently close to $a$ but not equal to $a$. That last clause is the entire personality of a limit: we care about inputs near $a$, never about $a$ itself. The same idea has a lighter notation — $f(x)\to L$ as $x\to a$ — read “$f(x)$ tends to $L$ as $x$ tends to $a$.” Keep the picture in mind: $x$ creeping toward $a$ along the horizontal axis, while the heights $f(x)$ home in on $L$.
+.\video\content_scripts\ch01_limit_of_function.md:56:### 4. limit_vs_value
+.\video\content_scripts\ch01_limit_of_function.md:60:- **narration:**
+.\video\content_scripts\ch01_limit_of_function.md:61:  > Now the subtle part, and it is the heart of this section. A limit looks only at the neighborhood of $a$, never at the single point $a$ itself — so the value $f(a)$ gets no vote. Look at three functions side by side, all approaching the same height $L$ as $x\to a$. In the first, the point sits right where you expect, with $f(a) = L$. In the second, someone has lifted that one point off the curve, so $f(a)\ne L$. In the third, the point is missing entirely and $f(a)$ is undefined. Three different situations at $a$, yet the limit is the same $L$ in every case — because near $a$, and near is all that counts, the three curves are identical.
+.\video\content_scripts\ch01_limit_of_function.md:66:### 5. reading_a_graph
+.\video\content_scripts\ch01_limit_of_function.md:70:- **narration:**
+.\video\content_scripts\ch01_limit_of_function.md:71:  > Let us read limits straight off a graph. Three inputs to inspect: $x=-2$, $x=0$, and $x=2$. As $x$ approaches $-2$ from either side, the curve rises toward height $1$, so the limit there is $1$. Approaching $0$, the curve heads to height $0$ — the limit is zero. Now $x=2$ is the interesting one: from both sides the curve climbs toward height $2$, and yet the graph marks a solid dot down at $(2,-2)$ and a hollow dot up at $(2,2)$. So $f(2)$ is $-2$, but the limit ignores the value at the point and reports where the curve was heading. The limit as $x\to 2$ is $2$, even though $f(2)$ equals $-2$.
+.\video\content_scripts\ch01_limit_of_function.md:76:### 6. build_one_yourself
+.\video\content_scripts\ch01_limit_of_function.md:80:- **narration:**
+.\video\content_scripts\ch01_limit_of_function.md:81:  > The same idea, now run backwards: instead of reading a graph, we build one. The task is a function with limit $10$ as $x\to 3$, but with $f(3) = 0$. Start with any curve that approaches height $10$ at $x=3$ — a straight line through $(3,10)$ will do. Then take that single point and drag it down to height $0$: a hollow dot at $(3,10)$ to mark where the curve is heading, and a solid dot at $(3,0)$ for the actual value. Near $x=3$ the curve still approaches $10$, while the relocated point sets $f(3) = 0$. Because the limit and the value are independent, nothing stops us from choosing them separately.
+.\video\content_scripts\ch01_limit_of_function.md:86:### 7. estimate_from_a_table
+.\video\content_scripts\ch01_limit_of_function.md:90:- **narration:**
+.\video\content_scripts\ch01_limit_of_function.md:91:  > What if there is no graph to read? Then we make our own data. Take $\lim_{x\to 1}\frac{x-1}{x^2-1}$. Substituting $x=1$ gives zero over zero — undefined, no answer there. So instead we sample inputs creeping toward $1$ from both sides: $0.9$, $0.99$, $0.999$, and then $1.001$, $1.01$, $1.1$. Evaluate the expression at each, and the outputs march steadily toward one number — $0.5263$, $0.5025$, $0.5003$ from the left, and $0.4998$, $0.4975$ closing in from the right. They are squeezing in on one half, so we read the limit as $\tfrac12$.
+.\video\content_scripts\ch01_limit_of_function.md:96:### 8. when_algebra_is_hard
+.\video\content_scripts\ch01_limit_of_function.md:100:- **narration:**
+.\video\content_scripts\ch01_limit_of_function.md:101:  > One more, where the table really earns its keep. Consider $\lim_{t\to 0}\frac{\sqrt{t^2+9}-3}{t^2}$. This time you cannot just factor your way to the answer — the square root hides what is going on, and at $t=0$ it is once again zero over zero. So we let the numbers talk. Sampling $t = -0.1$, $-0.01$, $0.01$, and $0.1$, the expression returns about $0.16662$, then $0.166666$, and back out symmetrically. That is closing in on $0.16666\ldots$, which we recognize as $\tfrac16$. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.
+.\video\content_scripts\ch01_limit_of_function.md:106:### 9. what_comes_next
+.\video\content_scripts\ch01_limit_of_function.md:110:- **narration:**
+.\video\content_scripts\ch01_limit_of_function.md:111:  > Notice what we have been doing: guessing limits by peeking at nearby values, whether off a graph or out of a table. Guessing is a fine start, but it is not a proof, and tables can occasionally mislead. So next we build systematic methods — rules that compute limits exactly, with no sampling at all. And we sharpen the idea itself: what happens when a function approaches different values from the left and from the right, or grows without bound near a point. The estimate you can make today becomes a calculation you can trust.
+.\video\content_scripts\ch01_limit_of_function.md:116:### 10. recap
+.\video\content_scripts\ch01_limit_of_function.md:120:- **narration:**
+.\video\content_scripts\ch01_limit_of_function.md:121:  > Here is the whole section in four ideas. A limit asks what value $f(x)$ approaches as $x$ heads toward $a$ — written $\lim_{x\to a}f(x)=L$. It depends only on the behavior near $a$, never on $f(a)$ itself, which may not even be defined. You can read a limit off a graph by following the curve inward from both sides. And when there is no graph, a table of values at inputs creeping toward $a$ will reveal the number the function is approaching.
+.\video\content_scripts\ch01_limit_of_function.md:125:### 11. outro
+.\video\content_scripts\ch01_limit_of_function.md:129:- **narration:** —（outro 無旁白）
+.\video\content_scripts\ch01_limit_of_function.md:135:## 內容層檢核（§7）自查記錄
+.\video\content_scripts\ch01_limit_of_function.md:146:### 稽核紀錄（2026-06-14，認可前對抗式稽核）
+.\video\content_scripts\ch01_limit_of_function.md:162:## 待辦（認可後進工程稿）
+
+ succeeded in 415ms:
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:36:| $\sqrt[3]{x}$ / $\sqrt[3]{y-2}$ | “the cube root of x” / “…of **the quantity** y minus two” | 和/差根號加 “the quantity” 消歧義。 |
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:37:| $(\sqrt[3]{x-2})^3$ / $(f^{-1}(x))^2$ | “…, **all cubed**” / “…, **all squared**” | 外層次方蓋整體。 |
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:38:| 分數 $\tfrac{a}{b}$ | “a over b”（簡單分數念 “one half / one quarter / nine-fifths”…） | |
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:64:What if there is no graph to read? Then we make our own data. Take the limit as x approaches one of f of x equals x minus one over x squared minus one. Substituting x equals one gives zero over zero -- undefined, no answer there. So instead we sample inputs creeping toward one from both sides: 0.9, 0.99, 0.999, and then 1.001, 1.01, 1.1. Evaluate the expression at each, and the outputs march steadily toward one number -- 0.5263, 0.5025, 0.5003 from the left, and 0.4998, 0.4975 closing in from the right. They are squeezing in on one half, so we read the limit as one half.
+.\video\content_scripts\ch01_limit_of_function_narration_spoken.md:67:One more, where the table really earns its keep. Consider the limit as t approaches zero of the square root of t squared plus nine, minus three, all over t squared. This time you cannot just factor your way to the answer -- the square root hides what is going on, and at t equals zero it is once again zero over zero. So we let the numbers talk. Sampling t equals negative 0.1, negative 0.01, 0.01, and 0.1, the expression returns about 0.16662, then 0.166666, and back out symmetrically. That is closing in on 0.16666 and so on, which we recognize as one sixth. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.
+.\video\content_scripts\ch01_limit_of_function_narration.html:160:    <p class="narration">What if there is no graph to read? Then we make our own data. Take $\lim_{x\to 1}\frac{x-1}{x^2-1}$. Substituting $x=1$ gives zero over zero — undefined, no answer there. So instead we sample inputs creeping toward $1$ from both sides: $0.9$, $0.99$, $0.999$, and then $1.001$, $1.01$, $1.1$. Evaluate the expression at each, and the outputs march steadily toward one number — $0.5263$, $0.5025$, $0.5003$ from the left, and $0.4998$, $0.4975$ closing in from the right. They are squeezing in on one half, so we read the limit as $\tfrac12$.</p>
+.\video\content_scripts\ch01_limit_of_function_narration.html:162:      <p class="vnote"><b>靜態：</b><code>value_table</code> 數值逼近型：$x$ ＝ 0.9, 0.99, 0.999, 1.001, 1.01, 1.1；$\frac{x-1}{x^2-1}$ ＝ 0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762；結論 $=\tfrac12$。</p>
+.\video\content_scripts\ch01_limit_of_function_narration.html:172:    <p class="narration">One more, where the table really earns its keep. Consider $\lim_{t\to 0}\frac{\sqrt{t^2+9}-3}{t^2}$. This time you cannot just factor your way to the answer — the square root hides what is going on, and at $t=0$ it is once again zero over zero. So we let the numbers talk. Sampling $t = -0.1$, $-0.01$, $0.01$, and $0.1$, the expression returns about $0.16662$, then $0.166666$, and back out symmetrically. That is closing in on $0.16666\ldots$, which we recognize as $\tfrac16$. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.</p>
+.\video\content_scripts\ch01_limit_of_function_narration.html:174:      <p class="vnote"><b>靜態：</b><code>value_table</code>（同型）：$t$ ＝ −0.1, −0.01, 0.01, 0.1；$\frac{\sqrt{t^2+9}-3}{t^2}$ ＝ 0.166620, 0.166666, 0.166666, 0.166620；結論 $=\tfrac16$。</p>
+.\video\content_scripts\ch01_limit_of_function.md:91:  > What if there is no graph to read? Then we make our own data. Take $\lim_{x\to 1}\frac{x-1}{x^2-1}$. Substituting $x=1$ gives zero over zero — undefined, no answer there. So instead we sample inputs creeping toward $1$ from both sides: $0.9$, $0.99$, $0.999$, and then $1.001$, $1.01$, $1.1$. Evaluate the expression at each, and the outputs march steadily toward one number — $0.5263$, $0.5025$, $0.5003$ from the left, and $0.4998$, $0.4975$ closing in from the right. They are squeezing in on one half, so we read the limit as $\tfrac12$.
+.\video\content_scripts\ch01_limit_of_function.md:92:- **visual_need:** value_table（§1.3 數值逼近型）：表頭 $x$ ＝ 0.9, 0.99, 0.999, 1.001, 1.01, 1.1；列 $\frac{x-1}{x^2-1}$ ＝ 0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762；結論列 $\lim_{x\to1}\frac{x-1}{x^2-1}=\tfrac12$。
+.\video\content_scripts\ch01_limit_of_function.md:97:- **source:** chapter1-print-standalone.html §1.3 · Example 1.18 + Solution（數值表 $\lim_{t\to0}\frac{\sqrt{t^2+9}-3}{t^2}$）
+.\video\content_scripts\ch01_limit_of_function.md:101:  > One more, where the table really earns its keep. Consider $\lim_{t\to 0}\frac{\sqrt{t^2+9}-3}{t^2}$. This time you cannot just factor your way to the answer — the square root hides what is going on, and at $t=0$ it is once again zero over zero. So we let the numbers talk. Sampling $t = -0.1$, $-0.01$, $0.01$, and $0.1$, the expression returns about $0.16662$, then $0.166666$, and back out symmetrically. That is closing in on $0.16666\ldots$, which we recognize as $\tfrac16$. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.
+.\video\content_scripts\ch01_limit_of_function.md:102:- **visual_need:** value_table（同型）：表頭 $t$ ＝ −0.1, −0.01, 0.01, 0.1；列 $\frac{\sqrt{t^2+9}-3}{t^2}$ ＝ 0.166620, 0.166666, 0.166666, 0.166620；結論列 $\lim_{t\to0}=\tfrac16$。
+.\video\content_scripts\ch01_limit_of_function.md:151:- **math-accuracy：0 錯**——兩張數值表獨立重算（`python`）與講義／本稿逐位一致：Ex 1.17 `(x-1)/(x^2-1)=1/(x+1)` → `0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762`、limit $\tfrac12$；Ex 1.18 `(\sqrt{t^2+9}-3)/t^2` → `0.166620, 0.166666, 0.166666, 0.166620`、limit $\tfrac16=0.16666\ldots$。u5 讀圖（limits $1,0,2$；$f(2)=-2$、空心 $(2,2)$／實心 $(2,-2)$）、u6 構造（$(3,10)$／$(3,0)$）、u2 比值式、u3 定義式皆與講義 Example 1.15／1.16 逐項一致。
+
+codex
+The HTML structure and unit order look intact after switching to `rg`; the earlier malformed tags were just the shell’s character rendering. I’m doing one final automated pass for exact unit extraction and numeric recomputation.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "@'
+import re, html, math
+from pathlib import Path
+root = Path(r'C:\\Users\\Kao\\Downloads\\Calculus_handout')
+source = (root/'video/content_scripts/ch01_limit_of_function.md').read_text(encoding='utf-8')
+html_text = (root/'video/content_scripts/ch01_limit_of_function_narration.html').read_text(encoding='utf-8')
+spoken = (root/'video/content_scripts/ch01_limit_of_function_narration_spoken.md').read_text(encoding='utf-8')
+
+# Source units: id, kind, narration
+src_units = []
+for m in re.finditer(r'"'^### ('"\\d+)\\. (["'^'"\\n]+)\\n(?P<body>.*?)(?="'^### |''^---|''^## |'"\\Z)', source, re.S|re.M):
+    num, uid, body = m.group(1), m.group(2).strip(), m.group('body')
+    kind = re.search(r'"'^- '"\\*\\*kind:\\*\\* "'`([''^`]+)`'"', body, re.M)
+    narr_block = re.search(r'"'^- '"\\*\\*narration:\\*\\*\\n(?:  > (.*))', body, re.M)
+    silent = re.search(r'"'^- '"\\*\\*narration:\\*\\* (.*)', body, re.M)
+    narr = narr_block.group(1) if narr_block else (silent.group(1).strip() if silent else None)
+    src_units.append((num, uid, kind.group(1) if kind else None, narr))
+
+html_units = []
+for m in re.finditer(r'<section class=\"unit\">(?P<body>.*?)</section>', html_text, re.S):
+    body = m.group('body')
+    num = re.search(r'<span class=\"unum\">(.*?)</span>', body, re.S).group(1)
+    uid = re.search(r'<span class=\"uid\">(.*?)</span>', body, re.S).group(1)
+    kind = re.search(r'<span class=\"kind(?: ["'^"]+)?">(.*?)</span>'"', body, re.S).group(1)
+    narr_m = re.search(r'<p class=\"narration(?: silent)?\">(.*?)</p>', body, re.S)
+    narr = html.unescape(re.sub(r'<["'^>]+>'"', '', narr_m.group(1))).strip() if narr_m else None
+    html_units.append((num, uid, kind, narr))
+
+spoken_units = []
+for m in re.finditer(r'"'^### u('"\\d+) · (["'^'"\\n]+)\\n(?P<body>.*?)(?="'^### u|''^---|''^## |'"\\Z)', spoken, re.S|re.M):
+    spoken_units.append((m.group(1), m.group(2).strip(), ' '.join(m.group('body').strip().split())))
+
+print('source units:', [(n,u,k) for n,u,k,_ in src_units])
+print('html units:', [(n,u,k) for n,u,k,_ in html_units])
+print('spoken units:', [(n,u) for n,u,_ in spoken_units])
+print('html narration mismatches:')
+for (n,u,k,narr), (hn,hu,hk,hnarr) in zip(src_units, html_units):
+    if narr and narr.startswith('—'):
+        continue
+    if narr "'!= hnarr:
+        print(n, u, '"'SOURCE:', narr, '\\nHTML:', hnarr)
+print('calc table 1:')
+for x in [0.9,0.99,0.999,1.001,1.01,1.1]:
+    print(x, round((x-1)/(x*x-1), 6), format((x-1)/(x*x-1), '.4f'))
+print('calc table 2:')
+for t in [-0.1,-0.01,0.01,0.1]:
+    v = (math.sqrt(t*t+9)-3)/(t*t)
+    print(t, format(v,'.6f'))
+'@ | python -" in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "@'
+import re, html, math
+from pathlib import Path
+root = Path(r'C:\\Users\\Kao\\Downloads\\Calculus_handout')
+source = (root/'video/content_scripts/ch01_limit_of_function.md').read_text(encoding='utf-8')
+html_text = (root/'video/content_scripts/ch01_limit_of_function_narration.html').read_text(encoding='utf-8')
+spoken = (root/'video/content_scripts/ch01_limit_of_function_narration_spoken.md').read_text(encoding='utf-8')
+
+# Source units: id, kind, narration
+src_units = []
+for m in re.finditer(r'"'^### ('"\\d+)\\. (["'^'"\\n]+)\\n(?P<body>.*?)(?="'^### |''^---|''^## |'"\\Z)', source, re.S|re.M):
+    num, uid, body = m.group(1), m.group(2).strip(), m.group('body')
+    kind = re.search(r'"'^- '"\\*\\*kind:\\*\\* "'`([''^`]+)`'"', body, re.M)
+    narr_block = re.search(r'"'^- '"\\*\\*narration:\\*\\*\\n(?:  > (.*))', body, re.M)
+    silent = re.search(r'"'^- '"\\*\\*narration:\\*\\* (.*)', body, re.M)
+    narr = narr_block.group(1) if narr_block else (silent.group(1).strip() if silent else None)
+    src_units.append((num, uid, kind.group(1) if kind else None, narr))
+
+html_units = []
+for m in re.finditer(r'<section class=\"unit\">(?P<body>.*?)</section>', html_text, re.S):
+    body = m.group('body')
+    num = re.search(r'<span class=\"unum\">(.*?)</span>', body, re.S).group(1)
+    uid = re.search(r'<span class=\"uid\">(.*?)</span>', body, re.S).group(1)
+    kind = re.search(r'<span class=\"kind(?: ["'^"]+)?">(.*?)</span>'"', body, re.S).group(1)
+    narr_m = re.search(r'<p class=\"narration(?: silent)?\">(.*?)</p>', body, re.S)
+    narr = html.unescape(re.sub(r'<["'^>]+>'"', '', narr_m.group(1))).strip() if narr_m else None
+    html_units.append((num, uid, kind, narr))
+
+spoken_units = []
+for m in re.finditer(r'"'^### u('"\\d+) · (["'^'"\\n]+)\\n(?P<body>.*?)(?="'^### u|''^---|''^## |'"\\Z)', spoken, re.S|re.M):
+    spoken_units.append((m.group(1), m.group(2).strip(), ' '.join(m.group('body').strip().split())))
+
+print('source units:', [(n,u,k) for n,u,k,_ in src_units])
+print('html units:', [(n,u,k) for n,u,k,_ in html_units])
+print('spoken units:', [(n,u) for n,u,_ in spoken_units])
+print('html narration mismatches:')
+for (n,u,k,narr), (hn,hu,hk,hnarr) in zip(src_units, html_units):
+    if narr and narr.startswith('—'):
+        continue
+    if narr "'!= hnarr:
+        print(n, u, '"'SOURCE:', narr, '\\nHTML:', hnarr)
+print('calc table 1:')
+for x in [0.9,0.99,0.999,1.001,1.01,1.1]:
+    print(x, round((x-1)/(x*x-1), 6), format((x-1)/(x*x-1), '.4f'))
+print('calc table 2:')
+for t in [-0.1,-0.01,0.01,0.1]:
+    v = (math.sqrt(t*t+9)-3)/(t*t)
+    print(t, format(v,'.6f'))
+'@ | python -"` rejected: blocked by policy
+2026-06-14T02:27:48.807102Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "@'
+import re, html, math
+from pathlib import Path
+root = Path(r'C:\\Users\\Kao\\Downloads\\Calculus_handout')
+source = (root/'video/content_scripts/ch01_limit_of_function.md').read_text(encoding='utf-8')
+html_text = (root/'video/content_scripts/ch01_limit_of_function_narration.html').read_text(encoding='utf-8')
+spoken = (root/'video/content_scripts/ch01_limit_of_function_narration_spoken.md').read_text(encoding='utf-8')
+
+# Source units: id, kind, narration
+src_units = []
+for m in re.finditer(r'"'^### ('"\\d+)\\. (["'^'"\\n]+)\\n(?P<body>.*?)(?="'^### |''^---|''^## |'"\\Z)', source, re.S|re.M):
+    num, uid, body = m.group(1), m.group(2).strip(), m.group('body')
+    kind = re.search(r'"'^- '"\\*\\*kind:\\*\\* "'`([''^`]+)`'"', body, re.M)
+    narr_block = re.search(r'"'^- '"\\*\\*narration:\\*\\*\\n(?:  > (.*))', body, re.M)
+    silent = re.search(r'"'^- '"\\*\\*narration:\\*\\* (.*)', body, re.M)
+    narr = narr_block.group(1) if narr_block else (silent.group(1).strip() if silent else None)
+    src_units.append((num, uid, kind.group(1) if kind else None, narr))
+
+html_units = []
+for m in re.finditer(r'<section class=\"unit\">(?P<body>.*?)</section>', html_text, re.S):
+    body = m.group('body')
+    num = re.search(r'<span class=\"unum\">(.*?)</span>', body, re.S).group(1)
+    uid = re.search(r'<span class=\"uid\">(.*?)</span>', body, re.S).group(1)
+    kind = re.search(r'<span class=\"kind(?: ["'^"]+)?">(.*?)</span>'"', body, re.S).group(1)
+    narr_m = re.search(r'<p class=\"narration(?: silent)?\">(.*?)</p>', body, re.S)
+    narr = html.unescape(re.sub(r'<["'^>]+>'"', '', narr_m.group(1))).strip() if narr_m else None
+    html_units.append((num, uid, kind, narr))
+
+spoken_units = []
+for m in re.finditer(r'"'^### u('"\\d+) · (["'^'"\\n]+)\\n(?P<body>.*?)(?="'^### u|''^---|''^## |'"\\Z)', spoken, re.S|re.M):
+    spoken_units.append((m.group(1), m.group(2).strip(), ' '.join(m.group('body').strip().split())))
+
+print('source units:', [(n,u,k) for n,u,k,_ in src_units])
+print('html units:', [(n,u,k) for n,u,k,_ in html_units])
+print('spoken units:', [(n,u) for n,u,_ in spoken_units])
+print('html narration mismatches:')
+for (n,u,k,narr), (hn,hu,hk,hnarr) in zip(src_units, html_units):
+    if narr and narr.startswith('—'):
+        continue
+    if narr "'!= hnarr:
+        print(n, u, '"'SOURCE:', narr, '\\nHTML:', hnarr)
+print('calc table 1:')
+for x in [0.9,0.99,0.999,1.001,1.01,1.1]:
+    print(x, round((x-1)/(x*x-1), 6), format((x-1)/(x*x-1), '.4f'))
+print('calc table 2:')
+for t in [-0.1,-0.01,0.01,0.1]:
+    v = (math.sqrt(t*t+9)-3)/(t*t)
+    print(t, format(v,'.6f'))
+'@ | python -"` rejected: blocked by policy
+codex
+The sandbox rejects inline scripting in this workspace, so I’m keeping verification to direct read commands plus manual recomputation. The arithmetic here is simple enough to rederive explicitly.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Write-Output ((0.9-1)/(0.9*0.9-1))' in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Write-Output ((0.9-1)/(0.9*0.9-1))'` rejected: blocked by policy
+2026-06-14T02:28:00.948045Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Write-Output ((0.9-1)/(0.9*0.9-1))'` rejected: blocked by policy
+codex
+VERDICT: 1 blocking, 3 advisory
+
+- [Blocking] [D2/D3] estimate_from_a_table — source `$\lim_{x\to 1}\frac{x-1}{x^2-1}$` became “the limit as x approaches one of f of x equals x minus one over x squared minus one”; it adds `f(x)=` and loses fraction grouping → Verdict: Rewrite → “Take the limit, as x approaches one, of the quantity x minus one, all over the quantity x squared minus one.”
+- [Advisory] [D3] ratio_of_changes — `s(t+h)` in `$\frac{s(t+h)-s(t)}{h}$` is spoken as “s of t plus h,” which can sound like `s(t)+h`; `$\frac{f(y)-f(x)}{y-x}$` also leaves denominator grouping light → Verdict: Rewrite → use “the ratio whose numerator is s of the quantity t plus h, minus s of t, and whose denominator is h” and “the ratio whose numerator is f of y minus f of x, and whose denominator is y minus x.”
+- [Advisory] [D3] when_algebra_is_hard — source `$\lim_{t\to 0}\frac{\sqrt{t^2+9}-3}{t^2}$` became “the square root of t squared plus nine, minus three, all over t squared”; radical/numerator scope is hearable wrong → Verdict: Rewrite → “Consider the limit, as t approaches zero, of the fraction whose numerator is the square root of the quantity t squared plus nine, minus three, and whose denominator is t squared.”
+- [Advisory] [D7] estimate_from_a_table — narration samples six inputs but reports only five outputs: “$1.001$, $1.01$, $1.1$” but only “$0.4998$, $0.4975$ closing in from the right”; missing `$0.4762$` and right-side order does not “close in” → Verdict: Rewrite → source/HTML: “$1.1$, $1.01$, $1.001$ … $0.4762$, $0.4975$, $0.4998$ from the right.” Spoken equivalent: “1.1, 1.01, 1.001 … 0.4762, 0.4975, 0.4998 from the right.”
+
+Clean checks: D1 passes; Version A units, ids, order, kinds, narration text, and LaTeX render path are clean. D2 passes except the u7 formula issue; the documented u3 collapses are acceptable spoken adaptation. D4 has no separate register defect beyond the D3 grouping fixes.
+
+## Convention recommendations (D5)
+Add one convention: for compound spoken fractions, prefer “the fraction whose numerator is … and whose denominator is …” when either side contains a sum, difference, radical, or function argument. It is clearer than stacking repeated “the quantity.”
+
+## TTS sanity (D6)
+Clean. `model=mimo-v2.5-tts`, `audio.voice=Mia`, `audio.format=wav`, 24kHz/mono/PCM16, style instruction in the `user` message, and no audio tag are internally consistent and plausible.
+
+## Math-content check (D7)
+`(x-1)/(x^2-1)=1/(x+1)`: values are `0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762`; limit is `1/2`. The only issue is the narration omission/order noted above.
+
+`(\sqrt(t^2+9)-3)/t^2 = 1/(\sqrt(t^2+9)+3)`: at `t=±0.1` gives `0.166620`; at `t=±0.01` gives `0.166666`; limit is `1/6`.
+
+Graph/build checks pass: read-a-graph limits `1, 0, 2` with `f(2)=-2`; build-a-graph limit `10` with `f(3)=0`.
+tokens used
+85,832
+VERDICT: 1 blocking, 3 advisory
+
+- [Blocking] [D2/D3] estimate_from_a_table — source `$\lim_{x\to 1}\frac{x-1}{x^2-1}$` became “the limit as x approaches one of f of x equals x minus one over x squared minus one”; it adds `f(x)=` and loses fraction grouping → Verdict: Rewrite → “Take the limit, as x approaches one, of the quantity x minus one, all over the quantity x squared minus one.”
+- [Advisory] [D3] ratio_of_changes — `s(t+h)` in `$\frac{s(t+h)-s(t)}{h}$` is spoken as “s of t plus h,” which can sound like `s(t)+h`; `$\frac{f(y)-f(x)}{y-x}$` also leaves denominator grouping light → Verdict: Rewrite → use “the ratio whose numerator is s of the quantity t plus h, minus s of t, and whose denominator is h” and “the ratio whose numerator is f of y minus f of x, and whose denominator is y minus x.”
+- [Advisory] [D3] when_algebra_is_hard — source `$\lim_{t\to 0}\frac{\sqrt{t^2+9}-3}{t^2}$` became “the square root of t squared plus nine, minus three, all over t squared”; radical/numerator scope is hearable wrong → Verdict: Rewrite → “Consider the limit, as t approaches zero, of the fraction whose numerator is the square root of the quantity t squared plus nine, minus three, and whose denominator is t squared.”
+- [Advisory] [D7] estimate_from_a_table — narration samples six inputs but reports only five outputs: “$1.001$, $1.01$, $1.1$” but only “$0.4998$, $0.4975$ closing in from the right”; missing `$0.4762$` and right-side order does not “close in” → Verdict: Rewrite → source/HTML: “$1.1$, $1.01$, $1.001$ … $0.4762$, $0.4975$, $0.4998$ from the right.” Spoken equivalent: “1.1, 1.01, 1.001 … 0.4762, 0.4975, 0.4998 from the right.”
+
+Clean checks: D1 passes; Version A units, ids, order, kinds, narration text, and LaTeX render path are clean. D2 passes except the u7 formula issue; the documented u3 collapses are acceptable spoken adaptation. D4 has no separate register defect beyond the D3 grouping fixes.
+
+## Convention recommendations (D5)
+Add one convention: for compound spoken fractions, prefer “the fraction whose numerator is … and whose denominator is …” when either side contains a sum, difference, radical, or function argument. It is clearer than stacking repeated “the quantity.”
+
+## TTS sanity (D6)
+Clean. `model=mimo-v2.5-tts`, `audio.voice=Mia`, `audio.format=wav`, 24kHz/mono/PCM16, style instruction in the `user` message, and no audio tag are internally consistent and plausible.
+
+## Math-content check (D7)
+`(x-1)/(x^2-1)=1/(x+1)`: values are `0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762`; limit is `1/2`. The only issue is the narration omission/order noted above.
+
+`(\sqrt(t^2+9)-3)/t^2 = 1/(\sqrt(t^2+9)+3)`: at `t=±0.1` gives `0.166620`; at `t=±0.01` gives `0.166666`; limit is `1/6`.
+
+Graph/build checks pass: read-a-graph limits `1, 0, 2` with `f(2)=-2`; build-a-graph limit `10` with `f(3)=0`.

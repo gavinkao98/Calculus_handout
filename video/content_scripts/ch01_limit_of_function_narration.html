@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§1.3 The Limit of a Function — 旁白審核稿</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --ink:#1c2230; --ink-soft:#5c6678; --paper:#f7f5ef; --card:#ffffff;
+    --line:#e3ddd0; --accent:#2f6f6a; --accent-soft:#e7f0ef;
+    --kicker:#9a6a3a; --warn:#a23b2c; --rule:#c9c1b1;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:48px 28px 96px}
+  header.top{border-bottom:2px solid var(--ink); padding-bottom:20px; margin-bottom:8px}
+  .eyebrow{font-size:.82rem; letter-spacing:.14em; text-transform:uppercase; color:var(--kicker); font-weight:700}
+  h1{font-size:2rem; margin:.25em 0 .15em; line-height:1.15}
+  .tagline{font-style:italic; color:var(--ink-soft); font-size:1.12rem; margin:0}
+  .meta-note{font-size:.92rem; color:var(--ink-soft); margin-top:14px; padding:12px 16px; background:var(--accent-soft); border-radius:8px; border:1px solid #d3e2e0}
+  .meta-note strong{color:var(--accent)}
+  .flow{font-size:.86rem; color:var(--ink-soft); margin:18px 0 0; padding-left:1.1em}
+  .flow li{margin:.15em 0}
+  section.unit{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:22px 26px; margin:26px 0; box-shadow:0 1px 2px rgba(0,0,0,.03)
+  }
+  .uhead{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:14px}
+  .unum{font-weight:700; color:var(--accent); font-size:1.05rem}
+  .uid{font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:.92rem; color:var(--ink)}
+  .kind{margin-left:auto; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .kind.intro,.kind.outro{background:var(--ink-soft)}
+  .kind.recap{background:var(--kicker)}
+  .kind.forward_ref{background:#586a8a}
+  .kind.visual{background:#6a7d4a}
+  .goal{font-size:.92rem; color:var(--ink-soft); margin:0 0 14px}
+  .goal::before{content:"教學目標　"; font-weight:700; color:var(--ink); letter-spacing:.04em}
+  .narr-label{font-size:.74rem; letter-spacing:.12em; text-transform:uppercase; color:var(--kicker); font-weight:700; margin-bottom:6px}
+  .narration{font-size:1.12rem; line-height:1.72; padding:4px 0 6px}
+  .silent{color:var(--ink-soft); font-style:italic; font-size:1rem}
+  details{margin-top:14px; border-top:1px dashed var(--rule); padding-top:12px}
+  summary{cursor:pointer; font-size:.82rem; color:var(--ink-soft); letter-spacing:.04em; user-select:none}
+  summary:hover{color:var(--accent)}
+  .vnote{font-size:.92rem; color:var(--ink); margin:.5em 0}
+  .vnote b{color:var(--accent)}
+  .anim{font-size:.92rem; color:var(--ink); margin:.5em 0}
+  .anim b{color:var(--kicker)}
+  .vnote.empty,.anim.empty{color:var(--ink-soft); font-style:italic}
+  footer{margin-top:40px; padding-top:20px; border-top:2px solid var(--ink); font-size:.9rem; color:var(--ink-soft)}
+  .count{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Chapter 1 · Section 1.3 · 旁白審核稿</div>
+    <h1>The Limit of a Function</h1>
+    <p class="tagline">What value does a function approach?</p>
+    <div class="meta-note">
+      這是 §1.3 教學影片的<strong>待認可旁白</strong>（內容稿 <code>ch01_limit_of_function.md</code> 的可讀版）。
+      共 <strong>9 段</strong>有聲旁白（intro／outro 純動畫無旁白）。請逐段審閱：用詞、口語感、數學是否念得順、教學取捨。
+      認可後才進工程稿（模板化＋成片）。每張卡片下方可展開該單元的<strong>視覺／動畫需求</strong>。
+    </div>
+    <ol class="flow">
+      <li>動機（瞬時變化率 → 極限的問題）</li>
+      <li>極限的定義（非正式）＋記法</li>
+      <li>極限 vs 函數值（三圖：$f(a)=L$／$\neq L$／undefined）</li>
+      <li>讀圖求極限（$x=2$：極限 $2 \neq f(2)=-2$）</li>
+      <li>反向構造（給定 limit 與 value 畫圖）</li>
+      <li>數值表估計（有理式 → $\tfrac12$）</li>
+      <li>數值表估計（根式 → $\tfrac16$；代數失效時不可或缺）</li>
+      <li>承先啟後（系統化方法、單側／無窮極限）</li>
+      <li>Recap（四句帶走）</li>
+    </ol>
+  </header>
+
+  <!-- 1 intro -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">1</span><span class="uid">intro</span><span class="kind intro">intro</span></div>
+    <p class="narration silent">純品牌開場（Section Gate：章地圖聚焦 §1.3 → 標題 + tagline）。無旁白。</p>
+  </section>
+
+  <!-- 2 ratio_of_changes -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">2</span><span class="uid">ratio_of_changes</span><span class="kind motivation">motivation</span></div>
+    <p class="goal">從「平均變化率 → 瞬時變化率」看出極限要回答的問題：當一個輸入滑向另一個（但不相等）時，比值趨近什麼。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Calculus keeps circling back to one question: how fast is something changing right now? Suppose $s(t)$ is the position of a moving object at time $t$. Over the stretch from $t$ to $t+h$, its average velocity is the ratio $\frac{s(t+h)-s(t)}{h}$ — change in position divided by change in time. But the average speed across an interval is not the speed at a single instant. To pin down that instantaneous velocity, we let $h$ shrink toward zero and watch what the ratio settles on. The same move works for any function: the ratio $\frac{f(y)-f(x)}{y-x}$ measures how $f$ changes between two inputs, and we ask what it approaches as $y$ slides toward $x$ without ever reaching it. That question — what a quantity approaches — is the idea of a limit.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>一條曲線上兩點 $(x,f(x))$、$(y,f(y))$ 與連接的割線；標出 rise $f(y)-f(x)$、run $y-x$、比值 $\frac{f(y)-f(x)}{y-x}$。</p>
+      <p class="anim"><b>動畫：</b>右側點 $(y,f(y))$ 沿曲線緩緩滑向左側固定點 $(x,f(x))$，割線隨之轉動、愈來愈短；滑近頓住，凸顯「$y\to x$ 比值趨近某值」——不畫到重合（$y\ne x$）。刻意不命名 tangent（屬後章）。</p>
+    </details>
+  </section>
+
+  <!-- 3 the_limit_defined -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">3</span><span class="uid">the_limit_defined</span><span class="kind definition">definition</span></div>
+    <p class="goal">掌握極限的（非正式）定義與兩種記法，並抓住關鍵字「$x$ 趨近 $a$ 但不等於 $a$」。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Here is the definition that captures “what a function approaches.” We say the limit of $f(x)$ as $x$ approaches $a$ equals $L$, written $\lim_{x\to a} f(x) = L$, if $f(x)$ can be made arbitrarily close to $L$ whenever $x$ is sufficiently close to $a$ but not equal to $a$. That last clause is the entire personality of a limit: we care about inputs near $a$, never about $a$ itself. The same idea has a lighter notation — $f(x)\to L$ as $x\to a$ — read “$f(x)$ tends to $L$ as $x$ tends to $a$.” Keep the picture in mind: $x$ creeping toward $a$ along the horizontal axis, while the heights $f(x)$ home in on $L$.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>定義宣告句 $\lim_{x\to a}f(x)=L$ + 一句白話（$f(x)$ 任意接近 $L$ ⟸ $x$ 足夠接近 $a$ 但 $\ne a$）+ 替代記法 $f(x)\to L$；「$\ne a$」視覺強調。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態即可（逼近動態留給下一單元三圖）。</p>
+    </details>
+  </section>
+
+  <!-- 4 limit_vs_value -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">4</span><span class="uid">limit_vs_value</span><span class="kind visual">visual</span></div>
+    <p class="goal">理解極限只看 $a$ 附近的值、與 $f(a)$ 無關——$f(a)$ 可以等於、不等於、或根本沒定義，極限都一樣。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Now the subtle part, and it is the heart of this section. A limit looks only at the neighborhood of $a$, never at the single point $a$ itself — so the value $f(a)$ gets no vote. Look at three functions side by side, all approaching the same height $L$ as $x\to a$. In the first, the point sits right where you expect, with $f(a) = L$. In the second, someone has lifted that one point off the curve, so $f(a)\ne L$. In the third, the point is missing entirely and $f(a)$ is undefined. Three different situations at $a$, yet the limit is the same $L$ in every case — because near $a$, and near is all that counts, the three curves are identical.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>三並排小圖，同一條趨近 $L$ 的曲線、同條虛線 $y=L$ 與 $x=a$；① 實心 $(a,L)$ 在曲線上；② $a$ 處斷開、空心點留原位、實心點移他處；③ $a$ 處只剩空心點（undefined）。重繪 Figure 1.11。</p>
+      <p class="anim"><b>動畫：</b>三圖同步：標記從 $a$ 左右兩側沿 x 軸滑向 $a$，三圖高度都收斂到同一條 $y=L$（短暫高亮 $L$）；強調不論那一點「在線上／被移走／不存在」，逼近高度都一樣。</p>
+    </details>
+  </section>
+
+  <!-- 5 reading_a_graph -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">5</span><span class="uid">reading_a_graph</span><span class="kind example">example</span></div>
+    <p class="goal">會從圖形兩側讀出極限，並親眼確認 $x=2$ 處極限（$2$）與函數值 $f(2)=-2$ 可以不同。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Let us read limits straight off a graph. Three inputs to inspect: $x=-2$, $x=0$, and $x=2$. As $x$ approaches $-2$ from either side, the curve rises toward height $1$, so the limit there is $1$. Approaching $0$, the curve heads to height $0$ — the limit is zero. Now $x=2$ is the interesting one: from both sides the curve climbs toward height $2$, and yet the graph marks a solid dot down at $(2,-2)$ and a hollow dot up at $(2,2)$. So $f(2)$ is $-2$, but the limit ignores the value at the point and reports where the curve was heading. The limit as $x\to 2$ is $2$, even though $f(2)$ equals $-2$.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>單一函數圖（重繪 Figure 1.12）：$x=-2$ 趨近 $1$、$x=0$ 趨近 $0$、$x=2$ 趨近 $2$；$x=2$ 處空心 $(2,2)$＋實心 $(2,-2)$；標 $y=f(x)$。</p>
+      <p class="anim"><b>動畫：</b>依序處理 $-2$、$0$、$2$，各放兩側滑入的標記、虛線引到 y 軸標高度；$x=2$ 停頓——逼近虛線停在 $y=2$（空心），同時閃示 $y=-2$（實心），凸顯「極限看趨勢、不看那一點」。</p>
+    </details>
+  </section>
+
+  <!-- 6 build_one_yourself -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">6</span><span class="uid">build_one_yourself</span><span class="kind example">example</span></div>
+    <p class="goal">反向操作——給定目標極限與函數值，自己畫出一條符合的曲線，鞏固「極限與函數值各自獨立」。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">The same idea, now run backwards: instead of reading a graph, we build one. The task is a function with limit $10$ as $x\to 3$, but with $f(3) = 0$. Start with any curve that approaches height $10$ at $x=3$ — a straight line through $(3,10)$ will do. Then take that single point and drag it down to height $0$: a hollow dot at $(3,10)$ to mark where the curve is heading, and a solid dot at $(3,0)$ for the actual value. Near $x=3$ the curve still approaches $10$, while the relocated point sets $f(3) = 0$. Because the limit and the value are independent, nothing stops us from choosing them separately.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>過 $(3,10)$ 的直線（趨近 $10$）；$x=3$ 處空心 $(3,10)$＋實心 $(3,0)$；標 $\lim_{x\to3}f(x)=10$、$f(3)=0$。</p>
+      <p class="anim"><b>動畫：</b>先畫過 $(3,10)$ 的直線（$x=3$ 留空心）；把該點「抓下來」垂直下移到 $(3,0)$ 變實心、原位留空心；兩虛線分引到 $y=10$（limit）與 $y=0$（value），並列示兩者互不相干。</p>
+    </details>
+  </section>
+
+  <!-- 7 estimate_from_a_table -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">7</span><span class="uid">estimate_from_a_table</span><span class="kind example">example</span></div>
+    <p class="goal">在看不出答案時，用「在 $a$ 附近取值列表」估計極限；讀出 $\frac{x-1}{x^2-1}\to\tfrac12$。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">What if there is no graph to read? Then we make our own data. Take $\lim_{x\to 1}\frac{x-1}{x^2-1}$. Substituting $x=1$ gives zero over zero — undefined, no answer there. So instead we sample inputs creeping toward $1$ from both sides: $0.9$, $0.99$, $0.999$, and then $1.001$, $1.01$, $1.1$. Evaluate the expression at each, and the outputs march steadily toward one number — $0.5263$, $0.5025$, $0.5003$ from the left, and $0.4762$, $0.4975$, $0.4998$ closing in from the right. They are squeezing in on one half, so we read the limit as $\tfrac12$.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b><code>value_table</code> 數值逼近型：$x$ ＝ 0.9, 0.99, 0.999, 1.001, 1.01, 1.1；$\frac{x-1}{x^2-1}$ ＝ 0.5263, 0.5025, 0.5003, 0.4998, 0.4975, 0.4762；結論 $=\tfrac12$。</p>
+      <p class="anim"><b>動畫：</b>欄位由兩端向中間逐欄揭示（最外 0.9／1.1 先亮，往 $x=1$ 收），函數值同步亮出逼近 $\tfrac12$。由 <code>value_table</code> 模板 <code>reveal: cols</code> 原生承載。</p>
+    </details>
+  </section>
+
+  <!-- 8 when_algebra_is_hard -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">8</span><span class="uid">when_algebra_is_hard</span><span class="kind example">example</span></div>
+    <p class="goal">看見數值法在「代數一眼看不穿」時不可或缺；讀出 $\to\tfrac16$。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">One more, where the table really earns its keep. Consider $\lim_{t\to 0}\frac{\sqrt{t^2+9}-3}{t^2}$. This time you cannot just factor your way to the answer — the square root hides what is going on, and at $t=0$ it is once again zero over zero. So we let the numbers talk. Sampling $t = -0.1$, $-0.01$, $0.01$, and $0.1$, the expression returns about $0.16662$, then $0.166666$, and back out symmetrically. That is closing in on $0.16666\ldots$, which we recognize as $\tfrac16$. When the algebra is not obvious, a table of nearby values is a perfectly good way to see where a function is headed.</p>
+    <details><summary>視覺／動畫需求　·　§4 repeat-pattern（不重述 setup）</summary>
+      <p class="vnote"><b>靜態：</b><code>value_table</code>（同型）：$t$ ＝ −0.1, −0.01, 0.01, 0.1；$\frac{\sqrt{t^2+9}-3}{t^2}$ ＝ 0.166620, 0.166666, 0.166666, 0.166620；結論 $=\tfrac16$。</p>
+      <p class="anim"><b>動畫：</b>同 #7 逐欄揭示（兩端向 $t=0$ 收），值對稱逼近 $0.16666\ldots$，揭完高亮 $\tfrac16$。</p>
+      <p class="vnote"><b>保留理由：</b>1.17 可因式分解（學生能代數驗證）、1.18 根式無從速解——凸顯數值法在代數失效時的<b>不可或缺</b>，非冗餘 drill。</p>
+    </details>
+  </section>
+
+  <!-- 9 what_comes_next -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">9</span><span class="uid">what_comes_next</span><span class="kind forward_ref">forward_ref</span></div>
+    <p class="goal">知道「猜值」只是起點，接下來會學系統化的求極限方法，以及單側／無窮極限等更細緻的行為。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Notice what we have been doing: guessing limits by peeking at nearby values, whether off a graph or out of a table. Guessing is a fine start, but it is not a proof, and tables can occasionally mislead. So next we build systematic methods — rules that compute limits exactly, with no sampling at all. And we sharpen the idea itself: what happens when a function approaches different values from the left and from the right, or grows without bound near a point. The estimate you can make today becomes a calculation you can trust.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>簡短文字卡：from guessing → to computing；列即將到來的主題（systematic methods、one-sided limits、infinite limits），<b>不報節號</b>。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態即可。</p>
+    </details>
+  </section>
+
+  <!-- 10 recap -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">10</span><span class="uid">recap</span><span class="kind recap">recap</span></div>
+    <p class="goal">四句帶走整節：極限＝趨近值、與 $f(a)$ 無關、可從圖讀、可用數值表估。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Here is the whole section in four ideas. A limit asks what value $f(x)$ approaches as $x$ heads toward $a$ — written $\lim_{x\to a}f(x)=L$. It depends only on the behavior near $a$, never on $f(a)$ itself, which may not even be defined. You can read a limit off a graph by following the curve inward from both sides. And when there is no graph, a table of values at inputs creeping toward $a$ will reveal the number the function is approaching.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>四張 takeaway 卡：① 極限＝趨近值 $\lim_{x\to a}f(x)=L$；② 只看 $a$ 附近、與 $f(a)$ 無關（可 undefined）；③ 從圖兩側讀；④ 數值表估計。</p>
+      <p class="anim empty"><b>動畫：</b>用 gen-2 既有 <code>recap_cards</code> 模板。</p>
+    </details>
+  </section>
+
+  <!-- 11 outro -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">11</span><span class="uid">outro</span><span class="kind outro">outro</span></div>
+    <p class="narration silent">品牌收尾（暗轉亮橋接 → 最終 logo 字卡）。無旁白。</p>
+  </section>
+
+  <footer>
+    來源權威檔：<code>experiments/handout_kit/chapter1-print-standalone.html</code> §1.3　·　內容稿：<code>video/content_scripts/ch01_limit_of_function.md</code><br>
+    全節環境：Definition 1.9、Figure 1.11、Example 1.15（+Figure 1.12）、Example 1.16、Example 1.17、Example 1.18　·　<span class="count">9 段</span>待認可旁白
+  </footer>
+
+</div>
+</body>
+</html>
