@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import base64
-import hashlib
 import json
 import os
 import re
@@ -27,15 +26,31 @@ _bootstrap.bootstrap()
 
 import yaml  # noqa: E402
 
-from pipeline.audio import concat_wavs, silence_pcm, wav_duration, write_pcm_wav  # noqa: E402
+from pipeline.audio import concat_wavs, pcm_duration, silence_pcm, trim_silence, wav_duration, write_pcm_wav  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
+from pipeline.timing import text_hash  # noqa: E402
 
 
 DEFAULT_MODEL = "gemini-3.1-flash-tts-preview"
-DEFAULT_VOICE = "Kore"
+DEFAULT_VOICE = "Charon"
 DEFAULT_STYLE = (
-    "Read exactly as written in a clear, calm calculus lecture voice. "
-    "Keep the pacing steady and pronounce inline LaTeX naturally."
+    "Read in a clear, calm calculus lecture voice. Keep the pacing steady. "
+    "Read inline LaTeX in natural language."
+)
+
+# MiMo platform (Xiaomi): OpenAI-compatible /chat/completions, same as the vision
+# critic (see pipeline/critic.py). MiMo-V2.5-TTS does NOT read LaTeX -- callers
+# must pass spoken-form text (the *_narration_spoken.md versions).
+MIMO_BASE_URL = "https://api.xiaomimimo.com/v1"
+MIMO_MODEL = "mimo-v2.5-tts"
+MIMO_VOICE = "Mia"
+MIMO_STYLE = (
+    "Read like the narrator of a polished YouTube science explainer: clear, "
+    "engaging, and conversational, at a normal talking pace -- natural momentum, "
+    "not slow or drawn out, and no long dramatic pauses, just ordinary pauses at "
+    "sentence ends. Warm and lightly energetic, curious rather than solemn, like "
+    "explaining an idea to a smart friend. Pronounce every mathematical "
+    "expression clearly and correctly."
 )
 
 
@@ -53,6 +68,17 @@ class TTSResult:
     sample_rate: int = 24_000
     channels: int = 1
     sample_width: int = 2
+    raw_audio_seconds: float | None = None
+    trimmed_audio_seconds: float | None = None
+    trimmed_silence_seconds: float | None = None
+
+
+@dataclass(frozen=True)
+class SynthesizedBeat:
+    duration: float
+    raw_audio_seconds: float | None = None
+    trimmed_audio_seconds: float | None = None
+    trimmed_silence_seconds: float | None = None
 
 
 class TTSBackend(Protocol):
@@ -195,14 +221,137 @@ class GeminiTTSBackend:
         raise RuntimeError("Gemini TTS response did not contain inline audio data.")
 
 
+class MimoTTSBackend:
+    """Xiaomi MiMo-V2.5-TTS backend (OpenAI-compatible /chat/completions).
+
+    Mirrors the auth + retry shape pipeline/critic.py already uses for the MiMo
+    vision model: custom ``api-key`` header (Bearer also sent, harmless if
+    ignored), stdlib ``urllib`` so no extra deps. Text to speak goes in the
+    ``assistant`` message; the style instruction goes in the ``user`` message.
+    Unlike Gemini, MiMo does NOT read LaTeX -- callers must pass spoken-form text.
+    """
+
+    name = "mimo"
+
+    def __init__(self, *, base_url: str, api_key: str, max_retries: int = 4,
+                 timeout: int = 180, trim: bool = True, trim_pad: float = 0.08) -> None:
+        self._base_url = base_url.rstrip("/")
+        self._api_key = api_key
+        self._max_retries = max_retries
+        self._timeout = timeout
+        self._trim = trim          # MiMo pads each clip with ~0.4s trailing silence
+        self._trim_pad = trim_pad
+
+    def synthesize(self, request: TTSRequest) -> TTSResult:
+        import urllib.error
+        import urllib.request
+
+        messages: list[dict[str, str]] = []
+        if request.style:
+            messages.append({"role": "user", "content": request.style})
+        messages.append({"role": "assistant", "content": request.text})
+        body = json.dumps(
+            {
+                "model": request.model,
+                "messages": messages,
+                "audio": {"format": "wav", "voice": request.voice},
+            }
+        ).encode("utf-8")
+        req = urllib.request.Request(
+            f"{self._base_url}/chat/completions", data=body, method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "api-key": self._api_key,                   # MiMo platform custom header
+                "Authorization": f"Bearer {self._api_key}",  # also send Bearer (harmless)
+            },
+        )
+        data: Any = None
+        for attempt in range(self._max_retries + 1):
+            try:
+                with urllib.request.urlopen(req, timeout=self._timeout) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                break
+            except urllib.error.HTTPError as exc:
+                if exc.code in (429, 500, 502, 503, 504) and attempt < self._max_retries:
+                    wait = (2 ** attempt) * 2
+                    print(
+                        f"[tts] mimo {exc.code}; waiting {wait}s then retrying "
+                        f"(attempt {attempt + 1}/{self._max_retries})",
+                        flush=True,
+                    )
+                    time.sleep(wait)
+                    continue
+                raise
+            except (urllib.error.URLError, TimeoutError):
+                if attempt < self._max_retries:
+                    time.sleep((2 ** attempt) * 2)
+                    continue
+                raise
+        result = self._extract_audio(data)
+        raw_seconds = pcm_duration(
+            result.pcm, sample_rate=result.sample_rate, channels=result.channels,
+            sample_width=result.sample_width,
+        )
+        trimmed_seconds = raw_seconds
+        if self._trim:
+            pcm = trim_silence(
+                result.pcm, sample_rate=result.sample_rate, channels=result.channels,
+                sample_width=result.sample_width, pad_seconds=self._trim_pad,
+            )
+            trimmed_seconds = pcm_duration(
+                pcm, sample_rate=result.sample_rate, channels=result.channels,
+                sample_width=result.sample_width,
+            )
+            result = TTSResult(pcm=pcm, sample_rate=result.sample_rate,
+                               channels=result.channels, sample_width=result.sample_width,
+                               raw_audio_seconds=raw_seconds,
+                               trimmed_audio_seconds=trimmed_seconds,
+                               trimmed_silence_seconds=max(raw_seconds - trimmed_seconds, 0.0))
+        else:
+            result = TTSResult(pcm=result.pcm, sample_rate=result.sample_rate,
+                               channels=result.channels, sample_width=result.sample_width,
+                               raw_audio_seconds=raw_seconds,
+                               trimmed_audio_seconds=trimmed_seconds,
+                               trimmed_silence_seconds=0.0)
+        return result
+
+    @staticmethod
+    def _extract_audio(data: Any) -> TTSResult:
+        import io
+        import wave
+
+        message = ((data or {}).get("choices") or [{}])[0].get("message") or {}
+        audio = message.get("audio")
+        b64 = None
+        if isinstance(audio, dict):
+            b64 = audio.get("data")
+        elif isinstance(audio, list) and audio:
+            b64 = (audio[0] or {}).get("data")
+        if not b64:
+            raise RuntimeError(
+                "MiMo TTS response did not contain audio data "
+                f"(message keys: {list(message.keys())}); raw head: {str(data)[:300]}"
+            )
+        wav_bytes = base64.b64decode(b64)
+        with wave.open(io.BytesIO(wav_bytes), "rb") as wav:
+            return TTSResult(
+                pcm=wav.readframes(wav.getnframes()),
+                sample_rate=wav.getframerate(),
+                channels=wav.getnchannels(),
+                sample_width=wav.getsampwidth(),
+            )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--storyboard", required=True, type=Path)
     parser.add_argument("--scene", default="all", help="id, comma-separated ids, or 'all'")
-    parser.add_argument("--backend", choices=("gemini", "mock"), default="gemini")
+    parser.add_argument("--backend", choices=("gemini", "mimo", "mock"), default="gemini")
     parser.add_argument("--model", default=os.environ.get("GEMINI_TTS_MODEL", DEFAULT_MODEL))
     parser.add_argument("--voice", default=os.environ.get("GEMINI_TTS_VOICE"))
     parser.add_argument("--style", default=os.environ.get("GEMINI_TTS_STYLE", DEFAULT_STYLE))
+    parser.add_argument("--base-url", default=os.environ.get("MIMO_BASE_URL", MIMO_BASE_URL),
+                        help="MiMo platform base URL (--backend mimo)")
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--empty-beat-seconds", type=float, default=0.45)
@@ -238,13 +387,16 @@ def safe_stem(value: str) -> str:
     return safe or "beat"
 
 
-def text_hash(text: str) -> str:
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
-
-
 def build_backend(args: argparse.Namespace) -> TTSBackend:
     if args.backend == "mock":
         return MockTTSBackend(args.empty_beat_seconds)
+    if args.backend == "mimo":
+        api_key = os.environ.get("MIMO_API_KEY")
+        if not api_key:
+            raise SystemExit("[tts] --backend mimo needs the API key in env MIMO_API_KEY.")
+        return MimoTTSBackend(
+            base_url=args.base_url, api_key=api_key, max_retries=args.max_retries
+        )
     return GeminiTTSBackend(
         max_retries=args.max_retries,
         min_interval=args.min_request_interval,
@@ -272,9 +424,9 @@ def synthesize_beat(
     *,
     reuse_existing: bool,
     empty_seconds: float,
-) -> float:
+) -> SynthesizedBeat:
     if output_path.exists() and reuse_existing:
-        return wav_duration(output_path)
+        return SynthesizedBeat(duration=wav_duration(output_path))
 
     if not request.text:
         result = TTSResult(silence_pcm(empty_seconds))
@@ -287,7 +439,12 @@ def synthesize_beat(
         channels=result.channels,
         sample_width=result.sample_width,
     )
-    return wav_duration(output_path)
+    return SynthesizedBeat(
+        duration=wav_duration(output_path),
+        raw_audio_seconds=result.raw_audio_seconds,
+        trimmed_audio_seconds=result.trimmed_audio_seconds,
+        trimmed_silence_seconds=result.trimmed_silence_seconds,
+    )
 
 
 def synthesize_scene(
@@ -327,7 +484,7 @@ def synthesize_scene(
 
     for beat in beats:
         beat_path = beat_dir / f"{beat['index']:02d}_{safe_stem(beat['reveal'] or beat['id'])}.wav"
-        duration = synthesize_beat(
+        synth = synthesize_beat(
             backend,
             TTSRequest(
                 text=beat["text"],
@@ -339,17 +496,23 @@ def synthesize_scene(
             reuse_existing=args.reuse_existing,
             empty_seconds=args.empty_beat_seconds,
         )
+        duration = synth.duration
         beat_paths.append(beat_path)
-        manifest_beats.append(
-            {
-                **beat,
-                "audio_file": str(beat_path.resolve()),
-                "audio_seconds": round(duration, 3),
-                "start_seconds": round(timeline, 3),
-                "end_seconds": round(timeline + duration, 3),
-                "text_hash": text_hash(beat["text"]),
-            }
-        )
+        beat_entry = {
+            **beat,
+            "audio_file": str(beat_path.resolve()),
+            "audio_seconds": round(duration, 3),
+            "start_seconds": round(timeline, 3),
+            "end_seconds": round(timeline + duration, 3),
+            "text_hash": text_hash(beat["text"]),
+        }
+        if synth.raw_audio_seconds is not None:
+            beat_entry["raw_audio_seconds"] = round(synth.raw_audio_seconds, 3)
+        if synth.trimmed_audio_seconds is not None:
+            beat_entry["trimmed_audio_seconds"] = round(synth.trimmed_audio_seconds, 3)
+        if synth.trimmed_silence_seconds is not None:
+            beat_entry["trimmed_silence_seconds"] = round(synth.trimmed_silence_seconds, 3)
+        manifest_beats.append(beat_entry)
         timeline += duration
 
     scene_seconds = concat_wavs(beat_paths, scene_audio)
@@ -373,12 +536,20 @@ def write_manifest(path: Path, manifest: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
+    if args.backend == "mimo":
+        # the --model/--style defaults are Gemini's; use MiMo's unless overridden.
+        if args.model == DEFAULT_MODEL:
+            args.model = MIMO_MODEL
+        if args.style == DEFAULT_STYLE:
+            args.style = MIMO_STYLE
     data = load_storyboard(args.storyboard)
     meta = data["meta"]
     scenes = wanted_scenes(data["scenes"], args.scene)
+    sec_dir = _bootstrap.section_output_dir(meta)
+    default_audio_subdir = "audio_mimo" if meta["id"].endswith("_mimo") else "audio"
     output_dir = (
         args.output_dir
-        or (_bootstrap.REPO_ROOT / "video" / "output" / "audio" / meta["id"])
+        or (sec_dir / default_audio_subdir)
     ).resolve()
     manifest_path = (args.manifest or (output_dir / "manifest.json")).resolve()
     voice = args.voice or meta.get("voice") or DEFAULT_VOICE

@@ -1,6 +1,6 @@
 # Section 1.3 The Limit of a Function — 內容稿（正式版）
 
-> **性質：正式產線內容稿**。依 REBUILD_STATUS「2026-06-13 全章影片計畫」Phase 2 第一站（§1.3）。以 HTML 講義權威檔逐節拆解、撰寫；narration **待使用者認可**（認可前不進工程稿）。
+> **性質：正式產線內容稿**。依 REBUILD_STATUS「2026-06-13 全章影片計畫」Phase 2 第一站（§1.3）。以 HTML 講義權威檔逐節拆解、撰寫；內容層已通過六-lens 稽核。2026-06-14 依「先影片後旁白」路線已先落地工程稿／mock preview／MiMo spoken Step 1–3；narration **仍待使用者正式認可**。
 > **來源（權威）：** [`../../experiments/handout_kit/chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.3（`sec-no` 1.3，The Limit of a Function）。
 > **格式：** 純內容層，每單元 `id / source / learning_goal / kind / narration / visual_need / animation_cue`；**不含** template / `{show}` / accent / 視覺 payload（第二階段才填）。`narration` 為英文（旁白語言）；`visual_need` / `animation_cue` 為中文（內容溝通用）。客製動畫由 Claude 依 `animation_cue` 生成、經認可後接入工程稿 `# HOOK`（本節數值表動畫多半由 `value_table` 模板的 `reveal: cols` 原生承載）。
 > **複雜度定位（REBUILD_STATUS）：** 低複雜度、~45% 符號、建議 10–14 單元；本節為「直覺低谷」，圖形／數值表為教學主體——**不**套 §5 symbol-heavy 例外。
@@ -155,14 +155,14 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **completeness（人工直接核實）：** grep §1.3 源（HTML L984–1114）確認**僅** 1 Definition（1.9）＋4 Example（1.15–1.18）＋2 Figure（1.11/1.12）——**無** theorem／proposition／corollary／strategy／remark／caution／exercise，與 §7 自查的 grep 主張一致、**無 exercise 洩入**；intro（u1，tagline＋章定位）／outro（u11）齊備；forward_ref（u9）位於主內容與 recap **之間**、narration 以「next／later」轉述、**未報節號**。
 - **未動（L3/L4，列供認可參考）：** u9「tables can occasionally mislead」＝忠於講義「guessing 是 provisional」的認識論註腳（L4，非杜撰數學）；recap「the whole section」為指涉性用語、非報節號（L4）；u4／u5 皆借「heart of the section」框架但處於不同深度、非同深度炒冷飯（L3 drift，非 finding）。
 
-**結論：本稿內容層通過稽核，math 0 錯、無 L1，達 §1.2 同級認可門檻。** 旁白待使用者認可（認可前不進工程稿）。
+**結論：本稿內容層通過稽核，math 0 錯、無 L1，達 §1.2 同級認可門檻。** 旁白本體仍待使用者正式認可；工程稿與 mock preview 已依放寬閘門先行完成，後續改字成本低、可重渲 mock 免費。
 
 ---
 
-## 待辦（認可後進工程稿）
+## 待辦／工程現況
 
-1. **使用者認可 narration**（u2–u10 共 9 段）——認可前不進工程稿。審核版見同名 standalone HTML（`ch01_limit_of_function_narration.html`，數學即渲染、雙擊即開）。
-2. 工程稿 `storyboards/ch01_limit_of_function.yml`：11 場景，模板選用（intro／motivation 圖／definition／三圖 visual／graph_focus 讀圖／graph_focus 構造／**value_table ×2**／forward_ref 文字卡／recap_cards／outro），`say`＝認可 narration 原文＋`{show}`，u2/u4/u5 標 `# HOOK(第二輪)`。
-3. lint／sizecheck 守門 → mock 成片（離線、不計費）→ 抽幀目視。
-4. 補缺模板／plot-kind 評估：`value_table` 已備；確認 graph_focus 能吃「開/閉端點＋兩側逼近標記」（與 §1.4 jump plot 缺口部分重疊，到該節再補的可提前評估）。
-5. 第二輪動畫（u2/u4/u5 hook 生成）→ 認可 → critic 複核 → 真 TTS（計費，先報價）→ 4K。
+1. **使用者認可 narration**（u2–u10 共 9 段）——審核版見同名 standalone HTML（`ch01_limit_of_function_narration.html`，數學即渲染、雙擊即開）。Mode B 已把 canonical 表格值修正到 `.md`／HTML／storyboard／spoken。
+2. ✅ **工程稿已完成並 commit（`cb98ebf`）：** `storyboards/ch01_limit_of_function.yml`，11 場景，`say`＝narration 原文＋`{show}`，u2/u4/u5 標 `# HOOK(第二輪)`；u4 三圖以 `graph_compare` 兩 panel＋annotation 頂著，真三圖 hook 留第二輪。
+3. ✅ **守門／mock preview 已過：** lint clean、sizecheck 0-error、11/11 mock render 抽幀驗收；`output/ch01_limit_of_function.mp4` 為 480p mock preview（約 6:59，gitignored）。
+4. ✅ **MiMo spoken Step 1–3 已完成：** `ch01_limit_of_function.spoken.yml` → `_mimo.yml`＋`_narration_spoken.md`，derive parity OK；Mode B round 2 剩 1 個 taste advisory（是否把 nested radical fraction 念成 numerator/denominator 顯式形式），目前依使用者裁定維持輕量慣例。
+5. **下一步：** 使用者拍板旁白／taste advisory → 第二輪動畫（u2/u4/u5 hook）→ 報用量徵同意後 MiMo TTS（或其他 TTS）→ critic 複核 → 4K。

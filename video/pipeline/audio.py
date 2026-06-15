@@ -44,6 +44,61 @@ def silence_pcm(
     return b"\x00" * frame_count * channels * sample_width
 
 
+def pcm_duration(
+    pcm: bytes,
+    *,
+    sample_rate: int = DEFAULT_SAMPLE_RATE,
+    channels: int = DEFAULT_CHANNELS,
+    sample_width: int = DEFAULT_SAMPLE_WIDTH,
+) -> float:
+    """Measure raw PCM bytes in seconds."""
+    frame_bytes = channels * sample_width
+    if frame_bytes <= 0:
+        return 0.0
+    return (len(pcm) / frame_bytes) / float(sample_rate)
+
+
+def trim_silence(
+    pcm: bytes,
+    *,
+    sample_rate: int = DEFAULT_SAMPLE_RATE,
+    channels: int = DEFAULT_CHANNELS,
+    sample_width: int = DEFAULT_SAMPLE_WIDTH,
+    threshold: int = 80,
+    pad_seconds: float = 0.25,
+) -> bytes:
+    """Trim leading/trailing near-silence from 16-bit PCM, leaving a small pad.
+
+    Some TTS providers (e.g. MiMo) pad each clip with ~0.4s of trailing silence;
+    across dozens of reveal beats that dead air both bloats runtime and delays the
+    next reveal. Keep ``pad_seconds`` of breath on each side. 16-bit only; other
+    widths pass through unchanged. All-silence clips pass through unchanged.
+    """
+    import array
+
+    if sample_width != 2 or not pcm:
+        return pcm
+    samples = array.array("h")
+    samples.frombytes(pcm)
+    mono = samples[::channels] if channels > 1 else samples
+    n = len(mono)
+    if n == 0:
+        return pcm
+    first = 0
+    while first < n and abs(mono[first]) < threshold:
+        first += 1
+    if first == n:  # entirely below threshold -- leave as-is
+        return pcm
+    last = n - 1
+    while last > first and abs(mono[last]) < threshold:
+        last -= 1
+    pad = int(round(pad_seconds * sample_rate))
+    start = max(first - pad, 0)
+    end = min(last + 1 + pad, n)
+    frame_bytes = channels * sample_width
+    return pcm[start * frame_bytes : end * frame_bytes]
+
+
 def wav_duration(path: Path) -> float:
     """Measure a WAV file duration in seconds."""
     with wave.open(str(path), "rb") as handle:

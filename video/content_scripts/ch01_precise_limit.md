@@ -1,9 +1,9 @@
 # Section 1.6 The Precise Definition of a Limit — 內容稿
 
 > **性質：symbol-heavy 壓力測試節**（產線第二節，繼 §1.1 校準樣本之後）。目的是壓測 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) 的 **§5 symbol-heavy 例外路徑**、theorem/proof 拆單元、repeat-pattern、對齊鏈 narration——對應 [`../REBUILD_STATUS.md`](../REBUILD_STATUS.md) 標記的「§1.6 symbol-heavy 第二校準節」。
-> **來源：** [`../../chapters/ch01_foundations.tex`](../../chapters/ch01_foundations.tex) §1.6（L1332–1588）。
+> **來源：** [`chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.6（L1655–1884）。**（2026-06-14 漂移修復：原指 `chapters/ch01_foundations.tex` §1.6 L1332–1588，已重指定稿 HTML 權威檔；環境現行編號見各單元 `source:`，新增例題見文末漂移修復筆記。）**
 > **格式：** 純內容層，每單元 `id / source / learning_goal / kind / narration / visual_need / animation_cue`；**不含** template / `{show}` / accent / 視覺 payload（第二階段才填）。`narration` 為英文（旁白語言）；`visual_need` / `animation_cue` 為中文（內容溝通用）。動畫一律**客製 manim，由 Claude 依 `animation_cue` 自然語言生成**（認可後接入工程稿 `# HOOK`）——內容稿本身只給自然語言、不寫 code。
-> **視覺預算（§5 symbol-heavy 例外）：** 本節教學重量 ~90% 落在符號／邏輯／量詞，故**只配兩個視覺**——unit 7 的 ε-δ 管狀圖（**anchor**）與 unit 3 的動機圖（line + 挖空點）。定義、定理、證明、procedure、兩個 ε-δ 例題、無窮極限定義、forward-ref、recap **皆純符號，不配圖**（符號本身就是 beat）。
+> **視覺預算（§5 symbol-heavy 例外）：** 本節教學重量 ~90% 落在符號／邏輯／量詞，故**只配兩個圖形視覺**——unit 7 的 ε-δ 管狀圖（**anchor**）與 unit 3 的動機圖（line + 挖空點）。其餘所有定義／定理／證明／procedure／例題（含定義診斷與 M-δ 無窮極限驗證）／無窮極限定義／forward-ref／recap **皆純符號，不配圖**（符號本身就是 beat；診斷單元用符號 compare、驗證例題用推導鏈呈現）。
 
 ---
 
@@ -29,7 +29,7 @@ next:          Up next — Derivatives
 ## 教學單元
 
 ### 1. intro
-- **source:** §1.6 整節 + 章定位（L1–13, 1332）
+- **source:** §1.6 整節 + 章定位
 - **learning_goal:** —（純品牌開場）
 - **kind:** `intro`
 - **narration:** —（intro 無旁白）
@@ -37,7 +37,7 @@ next:          Up next — Derivatives
 - **animation_cue:** —（用 gen-2 既有 intro 模板）
 
 ### 2. why_close_is_not_enough
-- **source:** §1.6 opener prose（L1334–1337）
+- **source:** `chapter1-print-standalone.html` §1.6 · opener prose（history／foundations + 「close」須精確化，L1664–1666）
 - **learning_goal:** 體會「f(x) 靠近 L」這種口語不夠用，本節要把「靠近」換成可量的距離。
 - **kind:** `motivation`
 - **narration:**
@@ -46,7 +46,7 @@ next:          Up next — Derivatives
 - **animation_cue:** —（靜態即可）
 
 ### 3. the_broken_function
-- **source:** §1.6 motivating function prose（L1339–1347）
+- **source:** `chapter1-print-standalone.html` §1.6 · motivating function prose（the broken function $f$，L1668–1670）
 - **learning_goal:** 看見極限只看「逼近的行為」、不理會 $f$ 在該點的實際值。
 - **kind:** `motivation`
 - **narration:**
@@ -55,7 +55,7 @@ next:          Up next — Derivatives
 - **animation_cue:** —（靜態即可；可讓 $x$ 沿線從兩側滑向 3、輸出滑向 5，但非必要——留待動畫階段定。）
 
 ### 4. tolerance_game_point_one
-- **source:** §1.6 `workedexample`（tolerance 0.1, L1349–1363）
+- **source:** `chapter1-print-standalone.html` §1.6 · Example 1.37（tolerance 0.1，L1672–1687）
 - **learning_goal:** 把「夠近」當成一個附帶數字的挑戰，用代數算出對應的輸入半徑。
 - **kind:** `example`
 - **narration:**
@@ -64,7 +64,7 @@ next:          Up next — Derivatives
 - **animation_cue:** —（靜態即可；對齊鏈逐行揭示）
 
 ### 5. every_tolerance_at_once
-- **source:** §1.6 generalization prose（L1365）
+- **source:** `chapter1-print-standalone.html` §1.6 · generalization prose（0.01 → every $\varepsilon$ → $\delta=\varepsilon/2$，L1689）
 - **learning_goal:** 跨過關鍵概念跳躍——不是回答某個容差，而是回答**每一個** $\varepsilon>0$。
 - **kind:** `motivation`
 - **narration:**
@@ -73,7 +73,7 @@ next:          Up next — Derivatives
 - **animation_cue:** —（靜態即可）
 
 ### 6. precise_limit_definition
-- **source:** §1.6 `\begin{definition}` def:limit-precise（L1367–1376）
+- **source:** `chapter1-print-standalone.html` §1.6 · Definition 1.13（ε-δ limit，L1691–1699）
 - **learning_goal:** 認得 ε-δ 定義，並把它讀成「你出 ε、我給 δ」的挑戰—應答結構。
 - **kind:** `definition`
 - **narration:**
@@ -82,7 +82,7 @@ next:          Up next — Derivatives
 - **animation_cue:** —（靜態即可，定義逐句揭示；幾何在下一單元）
 
 ### 7. epsilon_delta_tube
-- **source:** §1.6 geometric reading prose + `figure` fig:precise-limit + restatement（L1378–1451）
+- **source:** `chapter1-print-standalone.html` §1.6 · geometric-reading prose + Figure 1.21（fig:precise-limit，L1701–1707）
 - **learning_goal:** 把定義看成一張圖：δ-區間「餵進」ε-帶，且 **δ 隨 ε 而變**。
 - **kind:** `visual`（**anchor**——本節唯一核心幾何視覺）
 - **narration:**
@@ -90,10 +90,19 @@ next:          Up next — Derivatives
 - **visual_need:** 用本節 running example $f(x)=2x-1$（$a=3$、$L=5$）當具體載體畫定義圖：水平帶 $L-\varepsilon \le y \le L+\varepsilon$（目標帶）、垂直帶 $a-\delta \le x \le a+\delta$（輸入帶），$x=a$ 處挖空；軸上標 $a-\delta,\ a,\ a+\delta$ 與 $L-\varepsilon,\ L,\ L+\varepsilon$。（以具體 line 示範書本散文的一般定義圖——§5「視覺單元 MAY 用具體函數示範一般主張」，增補呈現、不增刪內容。）
 - **animation_cue:** |
   客製 manim（**anchor，本節最關鍵動畫**）：先畫水平 ε-帶與垂直 δ-帶、在交會處框出中央矩形；接著**收緊 ε**——ε-帶從上下向 $L$ 收窄，δ-帶隨之向 $a$ 收窄（兩者連動），曲線始終被夾在框內；換兩三個遞減的 ε 重複，凸顯「ε 你定、δ 來應」與「δ 隨 ε 而變」。這支動畫獨力承載整個定義的量詞直覺，是本節視覺的重心。
-- **anim 實作（已生成）：** [`../animations/ch01_precise_limit_hooks.py`](../animations/ch01_precise_limit_hooks.py) `EpsilonDeltaTube`。實作改用**凸函數 $f(x)=\tfrac12x^2$**（非靜態頂著版的直線）——直線時框角恆落在線上、δ 擬合不可見；凸曲線才演得出「ε 縮 → 舊 δ 失守、曲線戳出帶子 → 縮 δ 收回」，端點以紅／綠示「出框／收住」。靜態 storyboard 仍頂著線性版，整合時由本動畫取代。
+- **anim 實作（已生成）：** [`../animations/ch01_precise_limit_hooks.py`](../animations/ch01_precise_limit_hooks.py) `EpsilonDeltaTube`。實作改用**凸函數 $f(x)=\tfrac12x^2$**（非靜態頂著版的直線）——直線時框角恆落在線上、δ 擬合不可見；凸曲線才演得出「ε 縮 → 舊 δ 失守、曲線戳出帶子 → 縮 δ 收回」，端點以紅／綠示「出框／收住」。靜態 storyboard 仍頂著線性版，整合時由本動畫取代。（注：HTML Figure 1.21 亦用拋物線；2026-06-14 動畫診斷出三項待修——挖空點誤導、曲線/參數與 running example 不連貫、ε 過小時構圖擁擠，見 [`../REBUILD_STATUS.md`](../REBUILD_STATUS.md)。）
 
-### 8. uniqueness_statement_and_trap
-- **source:** §1.6 `proposition`[Uniqueness] statement + 反證 setup（L1456–1466）
+### 8. diagnose_wrong_definition
+- **source:** `chapter1-print-standalone.html` §1.6 · Example 1.38（diagnose a wrong definition，L1709–1724；import expansion，audit-approved）
+- **learning_goal:** 透過抓出一個寫錯的定義，鞏固「ε 先出、δ 回應」的量詞順序，以及「x 近 a ⟹ f(x) 近 L」的蘊含方向。
+- **kind:** `counterexample`
+- **narration:**
+  > Before we put the definition to work, let us make sure we can recognize a broken one — that is the surest test of whether we have really understood it. Here is a tempting but wrong attempt: given any $\delta>0$, there exists an $\varepsilon>0$ such that whenever $|f(x)-L|<\varepsilon$, we have $0<|x-a|<\delta$. Two things are reversed. First, the order of the challenge: the tolerance $\varepsilon$ must come first, on the output side — you name $\varepsilon$, and $\delta$ is the response — but this version hands us the easy quantity only after we have seen the hard one. Second, the implication points the wrong way: the definition must say that closeness of $x$ to $a$ forces closeness of $f(x)$ to $L$, that is $0<|x-a|<\delta$ implies $|f(x)-L|<\varepsilon$, not the other way around. Repair both, and you land exactly on the definition we just wrote.
+- **visual_need:** 並排對比兩版定義——**錯誤版**（標紅兩處：量詞順序 $\forall\delta\,\exists\varepsilon$、蘊含方向 $|f(x)-L|<\varepsilon \Rightarrow 0<|x-a|<\delta$）vs **正確版**（$\forall\varepsilon\,\exists\delta$、$0<|x-a|<\delta \Rightarrow |f(x)-L|<\varepsilon$）。純符號 compare（§5 不另配圖；邏輯結構本身就是 beat）。
+- **animation_cue:** —（選用：把錯誤版兩處「翻正」——量詞 $\forall\delta\exists\varepsilon$ 對調成 $\forall\varepsilon\exists\delta$、蘊含箭頭反轉——動態演出「兩處都反了」；靜態並排亦可，留待動畫階段定。）
+
+### 9. uniqueness_statement_and_trap
+- **source:** `chapter1-print-standalone.html` §1.6 · Proposition 1.7 [Uniqueness of limits] statement + 反證 setup（L1726–1740）
 - **learning_goal:** 知道極限一旦存在就唯一；看懂反證法的關鍵布局：取 $\varepsilon=\tfrac{|L-M|}{2}$。
 - **kind:** `theorem`
 - **narration:**
@@ -101,8 +110,8 @@ next:          Up next — Derivatives
 - **visual_need:** 命題陳述「If $\lim_{x\to a}f(x)$ exists, it is unique」；反證 setup：assume $L\ne M$、令 $\varepsilon=\tfrac{|L-M|}{2}>0$。（純符號）
 - **animation_cue:** —（靜態即可；陳述與 setup 兩段揭示）
 
-### 9. uniqueness_proof_triangle
-- **source:** §1.6 `proof`（L1474–1483）
+### 10. uniqueness_proof_triangle
+- **source:** `chapter1-print-standalone.html` §1.6 · Proof（triangle-inequality contradiction，L1740–1746）
 - **learning_goal:** 用三角不等式把 $|L-M|$ 逼成「嚴格小於自己」，得出矛盾、收掉唯一性。
 - **kind:** `proof`
 - **narration:**
@@ -110,26 +119,36 @@ next:          Up next — Derivatives
 - **visual_need:** 對齊推導鏈：$|L-M| = |L-f(x)+f(x)-M| \le |L-f(x)|+|f(x)-M| < 2\varepsilon = |L-M|$；末行回到 $|L-M|$ 標「矛盾」。（純符號；不配圖）
 - **animation_cue:** —（靜態即可；推導逐行、矛盾收尾那行強調）
 
-### 10. epsilon_delta_recipe
-- **source:** §1.6 `strategy`[Verifying a limit from the ε-δ definition]（L1486–1494）
+### 11. epsilon_delta_recipe
+- **source:** `chapter1-print-standalone.html` §1.6 · Strategy 1.3 [Verifying a limit from the ε-δ definition]（L1750–1761）
 - **learning_goal:** 掌握 ε-δ 驗證的通用四步，含「雜散因子→取 min」的條件分支。
 - **kind:** `procedure`
 - **narration:**
-  > Every verification that follows runs on one recipe. Start from a generic $\varepsilon>0$ — that is the challenge, and your job is to manufacture a $\delta$. Take the quantity $|f(x)-L|$ and bound it above by something times $|x-a|$, because $|x-a|$ is the thing $\delta$ controls. Then choose $\delta$ to drive that bound below $\varepsilon$. One wrinkle decides the difficulty: if the bound still carries a stray factor depending on $x$, first pen $x$ into a small interval around $a$ to cap that factor, then take $\delta$ to be the minimum of that interval's radius and your $\varepsilon$-based bound. The next two examples are exactly this recipe — once without the wrinkle, once with it.
+  > Every verification that follows runs on one recipe. Start from a generic $\varepsilon>0$ — that is the challenge, and your job is to manufacture a $\delta$. Take the quantity $|f(x)-L|$ and bound it above by something times $|x-a|$, because $|x-a|$ is the thing $\delta$ controls. Then choose $\delta$ to drive that bound below $\varepsilon$. One wrinkle decides the difficulty: if the bound still carries a stray factor depending on $x$, first pen $x$ into a small interval around $a$ to cap that factor, then take $\delta$ to be the minimum of that interval's radius and your $\varepsilon$-based bound. The examples that follow run exactly this recipe — first a degenerate case where any $\delta$ works, then a clean linear one, then a quadratic where a stray factor must be tamed.
 - **visual_need:** 四步驟編號列：1. start from generic $\varepsilon>0$；2. bound $|f(x)-L| \le (\text{factor})\cdot|x-a|$；3. choose $\delta$（雜散因子時：先框住 $x$ 上界、再取 $\delta=\min\{\text{radius},\ \varepsilon\text{-bound}\}$）；4. conclude $0<|x-a|<\delta \Rightarrow |f(x)-L|<\varepsilon$。（判斷型 strategy 不因分支拆單元——條件邏輯由 narration 承載。）
 - **animation_cue:** —（靜態即可，四步逐一揭示）
 
-### 11. verify_linear_limit
-- **source:** §1.6 `workedexample`（$\lim_{x\to 3}(4x-5)=7$, L1496–1519）
+### 12. verify_constant_limit
+- **source:** `chapter1-print-standalone.html` §1.6 · Example 1.39（constant function, any $\delta$，L1763–1777；import expansion，audit-approved）
+- **learning_goal:** 看見 ε-δ 的退化極端——常數函數 gap 恆為 0，任何 δ 都成立，δ 不必依賴 ε。
+- **kind:** `example`
+- **narration:**
+  > Start with the easiest case the recipe will ever meet: show that $\lim_{x\to 2}5=5$. Given any $\varepsilon>0$, we need $|5-5|<\varepsilon$ whenever $0<|x-2|<\delta$. But that gap is simply $0$, and $0$ is below every positive $\varepsilon$, no matter where $x$ sits. So any $\delta$ at all does the job — take $\delta=\varepsilon$, or $\delta=1$, it makes no difference. This is the one situation where $\delta$ need not depend on $\varepsilon$ at all: when the output never moves, there is nothing for $\delta$ to control.
+- **visual_need:** 推導：$|5-5|=0<\varepsilon$ always ⟹ any $\delta$ works（$\delta=\varepsilon$ 或 $\delta=1$）。（純符號；§5 不配圖）
+- **animation_cue:** —（靜態即可）
+
+### 13. verify_linear_limit
+- **source:** `chapter1-print-standalone.html` §1.6 · Example 1.40（$\lim_{x\to3}(4x-5)=7$，L1779–1798）
 - **learning_goal:** 在線性函數上跑完整的 ε-δ 驗證——無雜散因子，δ 直接落出。
 - **kind:** `example`
 - **narration:**
-  > Take the clean case first: show $\lim_{x\to 3}(4x-5)=7$. Given a tolerance $\varepsilon$, measure the gap: $|(4x-5)-7|$ is $|4x-12|$, which factors as $4|x-3|$. We want that under $\varepsilon$, so we demand $|x-3|<\tfrac{\varepsilon}{4}$ — which hands us the choice $\delta=\tfrac{\varepsilon}{4}$. Check it: whenever $0<|x-3|<\delta$, the gap $4|x-3|$ is below $4\cdot\tfrac{\varepsilon}{4}$, which is exactly $\varepsilon$. The function is linear, there is no stray factor, and $\delta$ falls straight out of the algebra.
+  > Now the recipe earns its keep — take the clean linear case: show $\lim_{x\to 3}(4x-5)=7$. Given a tolerance $\varepsilon$, measure the gap: $|(4x-5)-7|$ is $|4x-12|$, which factors as $4|x-3|$. We want that under $\varepsilon$, so we demand $|x-3|<\tfrac{\varepsilon}{4}$ — which hands us the choice $\delta=\tfrac{\varepsilon}{4}$. Check it: whenever $0<|x-3|<\delta$, the gap $4|x-3|$ is below $4\cdot\tfrac{\varepsilon}{4}$, which is exactly $\varepsilon$. The function is linear, there is no stray factor, and $\delta$ falls straight out of the algebra.
 - **visual_need:** 對齊推導：$|(4x-5)-7|=|4x-12|=4|x-3|$；choose $\delta=\tfrac{\varepsilon}{4}$；verify $0<|x-3|<\delta \Rightarrow 4|x-3|<\varepsilon$。（純符號；§5 不配圖）
 - **animation_cue:** —（靜態即可）
+- **fold（代表式涵蓋，§2）：** **Example 1.42**（$\lim_{x\to0}\sin x=0$，借已知不等式 $|\sin x|\le|x|$ 得 $\delta=\varepsilon$，L1825–1841）與本線性例**同型**（無雜散因子、δ 直接落出；差別只在 bound 來源是「借來的不等式」而非代數因式分解）。依代表式涵蓋折疊於此、不另立單元；其 drill 留講義。若要在影片補一句口語指涉（如「有時 bound 由已知不等式白送、Step 2 免費」），於旁白認可時加入線性單元收尾。
 
-### 12. verify_quadratic_limit
-- **source:** §1.6 `workedexample`（$\lim_{x\to 1}(x^2-5x+6)=2$, L1521–1556）
+### 14. verify_quadratic_limit
+- **source:** `chapter1-print-standalone.html` §1.6 · Example 1.41（$\lim_{x\to1}(x^2-5x+6)=2$，L1800–1823）
 - **learning_goal:** 在帶雜散因子的二次例上用「框住 + 取 min」化解 procedure 的條件分支。
 - **kind:** `example`（**repeat-pattern：第二個同型例，MUST NOT 重述 ε-δ setup**）
 - **narration:**
@@ -137,8 +156,8 @@ next:          Up next — Derivatives
 - **visual_need:** 推導：$|x^2-5x+4|=|x-1||x-4|$；框住 $|x-1|<1 \Rightarrow 0<x<2 \Rightarrow |x-4|<4$；故 $<4|x-1|$；再要 $|x-1|<\tfrac{\varepsilon}{4}$；$\delta=\min\{1,\tfrac{\varepsilon}{4}\}$（強調 $\min$）。（純符號）
 - **animation_cue:** —（靜態即可；$\min$ 與「框住 $x$」那步可閃示）
 
-### 13. precise_infinite_limit
-- **source:** §1.6 `\begin{definition}` def:infinite-limit-precise + 直覺散文（L1558–1579）
+### 15. precise_infinite_limit
+- **source:** `chapter1-print-standalone.html` §1.6 · Definition 1.14（infinite limit）+ 直覺散文（L1843–1859）
 - **learning_goal:** 看出同一套 ε-δ 機器如何改寫無窮極限——量詞只是把目標換成「超過任意高度」。
 - **kind:** `definition`
 - **narration:**
@@ -147,8 +166,18 @@ next:          Up next — Derivatives
 - **animation_cue:** —（靜態即可）
 - **note:** 講義此處 `\cref` 回指 §1.4 的非正式無窮極限定義——跨節 cref，narration **MUST NOT** 報節號，已轉述為 “a little earlier”。
 
-### 14. continuity_preview
-- **source:** §1.6 continuity prose（L1581–1586）
+### 16. verify_infinite_limit
+- **source:** `chapter1-print-standalone.html` §1.6 · Example 1.43（M-δ proof $\lim_{x\to0}\tfrac{1}{x^2}=\infty$，L1861–1880；import expansion，AI-authored、audit-approved）
+- **learning_goal:** 在無窮極限上跑一次 M-δ 驗證——選 $\delta=\tfrac{1}{\sqrt{M}}$ 讓 $\tfrac{1}{x^2}$ 超過任意高度 $M$，把 Definition 1.14 落到具體。
+- **kind:** `example`（**repeat-pattern：承 unit 15 的 M-δ 定義，跳過量詞 setup、直接驗證**）
+- **narration:**
+  > The infinite-limit definition deserves a worked case of its own. Let us prove that $\lim_{x\to 0}\tfrac{1}{x^2}=\infty$. Now the challenge is a height $M$, however large, and our job is to force $\tfrac{1}{x^2}$ above it. Work backwards: $\tfrac{1}{x^2}>M$ exactly when $x^2<\tfrac{1}{M}$, which is when $|x|<\tfrac{1}{\sqrt{M}}$. So choose $\delta=\tfrac{1}{\sqrt{M}}$; then whenever $0<|x|<\delta$, we have $x^2<\tfrac{1}{M}$, and so $\tfrac{1}{x^2}$ clears $M$. Every height, no matter how enormous, is beaten once $x$ is close enough to $0$ — the rigorous version of the infinite limit we could only sketch earlier.
+- **visual_need:** 對齊推導鏈：$\tfrac{1}{x^2}>M \iff x^2<\tfrac{1}{M} \iff |x|<\tfrac{1}{\sqrt{M}}$；choose $\delta=\tfrac{1}{\sqrt{M}}$；verify $0<|x|<\delta \Rightarrow x^2<\tfrac{1}{M} \Rightarrow \tfrac{1}{x^2}>M$。（純符號；§5 不配圖。）
+- **animation_cue:** —（靜態即可；M-δ 對齊鏈逐行揭示）
+- **note:** 講義此例 prose 回指 §1.4 的非正式 Example（無窮極限）——跨節引用，narration 轉述為 “we could only sketch earlier”、**不報例號**（§4）。
+
+### 17. continuity_preview
+- **source:** `chapter1-print-standalone.html` §1.6 · continuity prose（L1882–1884）
 - **learning_goal:** 認得「連續」的定義雛形（$\lim_{x\to a}f(x)=f(a)$），知道它是極限語言的直接產物。
 - **kind:** `forward_ref`（向前預告——獨立成單元，置於主內容與 recap 之間，**不報章號**）
 - **narration:**
@@ -156,7 +185,7 @@ next:          Up next — Derivatives
 - **visual_need:** 一條字卡：$f$ continuous at $a \iff \lim_{x\to a}f(x)=f(a)$；一句回扣 unit 3 的 broken function（limit $5\ne$ value $6$ → 不連續）。（純符號 + 回扣，不另畫圖）
 - **animation_cue:** —（靜態即可）
 
-### 15. recap
+### 18. recap
 - **source:** 全節綜合（書本 §1.6 無獨立 Summary；recap 為必有單元）
 - **learning_goal:** 收攏本節主線：定義、圖像、唯一性、驗證 recipe。
 - **kind:** `recap`
@@ -165,12 +194,12 @@ next:          Up next — Derivatives
 - **visual_need:** 重點 4 條 + 要記公式：定義式 $\forall\varepsilon\,\exists\delta:\ |f(x)-L|<\varepsilon$ when $0<|x-a|<\delta$；$\delta=\min\{\dots\}$（驗證時）。
 - **animation_cue:** —（靜態即可）
 
-### 16. outro
+### 19. outro
 - **source:** 全節收尾（章末——§1.6 為 Chapter 1 最後一節）
 - **learning_goal:** —（純品牌收尾）
 - **kind:** `outro`
 - **narration:** —（outro 無旁白）
-- **visual_need:** 純品牌收尾字卡（暗轉亮橋接 → 最終 logo 字卡）。**不含 Key Takeaways**——重點在 unit 15 recap（有旁白的 `recap_cards` 場景）。（向前預告 `next:` 目前 outro 模板未渲染，故省略。）
+- **visual_need:** 純品牌收尾字卡（暗轉亮橋接 → 最終 logo 字卡）。**不含 Key Takeaways**——重點在 unit 18 recap（有旁白的 `recap_cards` 場景）。（向前預告 `next:` 目前 outro 模板未渲染，故省略。）
 - **animation_cue:** —（用 gen-2 既有 outro 模板，兩段式）
 
 ---
@@ -179,17 +208,17 @@ next:          Up next — Derivatives
 
 本節是 **symbol-heavy 路徑的第一次實跑**（§1.1 約 40% 符號、七視覺；§1.6 約 90% 符號）。浮現幾點：
 
-1. **§5 視覺預算如預期落地。** 16 單元只配 **2 個視覺**（anchor ε-δ 管狀圖 + 動機圖），正中 §5 校準註記預言的「§1.6 只有 anchor + 一個動機圖」。所有定義／定理／證明／procedure／兩個 ε-δ 例題／無窮極限定義／forward-ref/recap **皆純符號**——印證「不為每個代數例題配圖，符號本身就是 beat」。**建議方法論 §5 加一句明示：symbol-heavy 節的兩視覺通常是 (a) 核心定義的 anchor、(b) 一個動機／反差圖；代數驗證單元預設不配圖。**
+1. **§5 視覺預算如預期落地。** 16 單元只配 **2 個視覺**（anchor ε-δ 管狀圖 + 動機圖），正中 §5 校準註記預言的「§1.6 只有 anchor + 一個動機圖」。所有定義／定理／證明／procedure／兩個 ε-δ 例題／無窮極限定義／forward-ref/recap **皆純符號**——印證「不為每個代數例題配圖，符號本身就是 beat」。**建議方法論 §5 加一句明示：symbol-heavy 節的兩視覺通常是 (a) 核心定義的 anchor、(b) 一個動機／反差圖；代數驗證單元預設不配圖。**（2026-06-14 漂移修復新增的 3 個例題單元同樣全純符號，§5 結論不變——見文末漂移修復筆記。）
 
-2. **theorem/proof 拆單元（§3）首次實跑。** §1.1 的 iff 證明只有 2 行、留在單一單元；§1.6 的唯一性證明是多步反證（取 $\varepsilon=\tfrac{|L-M|}{2}$ → 三角不等式 → $|L-M|<|L-M|$ 矛盾），依 §3「證明 >~4 步就拆」拆成 **unit 8（陳述＋反證布局）+ unit 9（三角不等式收尾）**，讓學生在「設好陷阱」後能暫停。這正是選 §1.6 要壓測的 theorem_proof 路徑。
+2. **theorem/proof 拆單元（§3）首次實跑。** §1.1 的 iff 證明只有 2 行、留在單一單元；§1.6 的唯一性證明是多步反證（取 $\varepsilon=\tfrac{|L-M|}{2}$ → 三角不等式 → $|L-M|<|L-M|$ 矛盾），依 §3「證明 >~4 步就拆」拆成 **unit 9（陳述＋反證布局）+ unit 10（三角不等式收尾）**，讓學生在「設好陷阱」後能暫停。這正是選 §1.6 要壓測的 theorem_proof 路徑。
 
-3. **repeat-pattern（§4）首次實跑於 canonical 案例。** 兩個 ε-δ 例題：unit 11（線性、無雜散因子）建立 setup，unit 12（二次、$\delta=\min\{1,\varepsilon/4\}$）**以「Same goal, but now the algebra fights back」開場、跳過 setup**。ε-δ 雙例正是 §4 repeat-pattern 的教科書場景。
+3. **repeat-pattern（§4）首次實跑於 canonical 案例。** 兩個 ε-δ 例題：unit 13（線性、無雜散因子）建立 setup，unit 14（二次、$\delta=\min\{1,\varepsilon/4\}$）**以「Same goal, but now the algebra fights back」開場、跳過 setup**。ε-δ 雙例正是 §4 repeat-pattern 的教科書場景。
 
 4. **對齊鏈 narration（§4）吃重。** 唯一性證明與兩例題都用對齊推導；narration 一律「首行念全式、中段只念連接詞＋RHS」，唯一性結尾回到 $|L-M|$ 時明白點出「strictly less than itself — impossible」（§4 規定的矛盾收尾點名）。symbol-heavy 節是這條規則的主要受力點。
 
-5. **running example 當「定義的脊梁」。** unit 3→4→5→6→7 全用同一條 $f(x)=2x-1$（$a=3,L=5$）：動機（值 6≠極限 5）→ 容差遊戲（0.1）→ 推廣到每個 ε → 定義 → anchor 圖。**單一具體函數貫穿多單元**，給抽象 ε-δ 一根具體脊梁；unit 14 forward-ref 再回扣同一函數示範「不連續」。**建議方法論補：symbol-heavy 節 SHOULD 選一個 running example 串起動機→定義→圖，避免定義懸空。** （比 §1.1 unit 12 的孤立鏡射例更進一步。）
+5. **running example 當「定義的脊梁」。** unit 3→4→5→6→7 全用同一條 $f(x)=2x-1$（$a=3,L=5$）：動機（值 6≠極限 5）→ 容差遊戲（0.1）→ 推廣到每個 ε → 定義 → anchor 圖。**單一具體函數貫穿多單元**，給抽象 ε-δ 一根具體脊梁；unit 17 forward-ref 再回扣同一函數示範「不連續」。**建議方法論補：symbol-heavy 節 SHOULD 選一個 running example 串起動機→定義→圖，避免定義懸空。** （比 §1.1 unit 12 的孤立鏡射例更進一步。）
 
-6. **跨節 cref 轉述。** unit 13 講義 `\cref` 回指 §1.4 的非正式無窮極限，narration 轉述為 “a little earlier”、不報節號——確認 §4「不報 cref 目標」不只適用跨章，跨節亦然。
+6. **跨節 cref 轉述。** unit 15 講義 `\cref` 回指 §1.4 的非正式無窮極限，narration 轉述為 “a little earlier”、不報節號——確認 §4「不報 cref 目標」不只適用跨章，跨節亦然。
 
 ### render 階段實跑發現（第二階段工程，補記）
 
@@ -200,3 +229,30 @@ next:          Up next — Derivatives
 8. **recap formula card 過寬 → 靜默出框被裁，lint 與 sizecheck 都不擋。** recap formula 走 `math_line`（不 wrap、不 width-fit），右欄又窄，長公式直接溢出畫面右緣；lint 只查標記/`$` 平衡、sizecheck 只比 sibling 字級，**出框寬度無任何守門員**——只有看 frame 才發現。**修法：沿 §1.1 慣例「recap formula 必須短」，把 ε-δ 拆成兩個短半式（`0<|x-a|<δ`、`|f(x)-L|<ε`）。建議 DESIGN.md Authoring checklist 增一列：recap/formula card 不 wrap、過寬會靜默出框；保持短或工程上加 width guard。**
 
 9. **graph_focus 無填色帶狀，但 dashed-line 重現足矣（無 template 缺口）。** ε-δ 管狀圖 anchor 用 4 條 dashed `line`（兩水平 ε、兩垂直 δ）+ `function` + hollow `point` 重現，忠於講義 fig:precise-limit（書本本身也用虛線界線、非填色）。確認 §5 的 anchor 不需要新增 template 能力，現有 3 種 plot kind（function/line/point）已足夠。兩個 hollow-point lint warn（值不存在的洞）為正當例外，非錯誤。
+
+### 漂移修復（2026-06-14，內容權威換源 HTML §1.6）
+
+依 [`../REBUILD_STATUS.md`](../REBUILD_STATUS.md) 標記的 §1.6 significant drift，本節內容稿由舊 `ch01_foundations.tex` 重指定稿 HTML [`chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.6（L1655–1884）：
+
+10. **provenance 全面重指＋記錄環境編號。** 14 個既有單元的 `source:` 自 `.tex` 行號改指 HTML §1.6＋手寫編號：**Definition 1.13**（ε-δ limit）、**Definition 1.14**（infinite limit）、**Proposition 1.7**（Uniqueness of limits）、**Strategy 1.3**、**Figure 1.21**（fig:precise-limit）、**Example 1.37/1.40/1.41**。narration 主幹零刪改（既有單元逐字保留）。
+
+11. **採納 HTML import 的 3 個新例題（代表式涵蓋，§2；三者皆 audit-approved）：**
+    - **Example 1.38**（診斷寫錯的定義）→ 新 **unit 8 `diagnose_wrong_definition`**：新概念模式（量詞順序＋蘊含方向），緊接定義／anchor 之後鞏固結構。
+    - **Example 1.39**（常數函數、任意 δ）→ 新 **unit 12 `verify_constant_limit`**：補「δ 不必依賴 ε」的退化極端，置於 recipe 之後、線性例之前（最簡 warm-up）。
+    - **Example 1.43**（$\tfrac{1}{x^2}=\infty$ 的 M-δ 證）→ 新 **unit 16 `verify_infinite_limit`**：補 Definition 1.14 唯一 worked example，緊接無窮極限定義。
+    recipe（unit 11）收尾原述「next two examples」改述為「退化／線性／二次」三例，以容納新增的常數例；連帶 unit 13 線性例開場由「Take the clean case first」改為「Now the recipe earns its keep — take the clean linear case」（六-lens 稽核抓到的序位 stale，見下節）。**這兩處是唯一改動到既有單元 narration 之處，需重新認可。**
+
+12. **折疊 Example 1.42**（$\lim\sin x=0$ via $|\sin x|\le|x|$）於 unit 13 線性例（同型：無雜散因子、δ 直接落出，差別僅 bound 來源）；就近 fold 註見 unit 13。
+
+13. **§5 視覺預算不變。** 三個新單元皆純符號（診斷用 compare、兩驗證用推導鏈），**未新增任何圖形視覺**；anchor（unit 7）＋動機圖（unit 3）仍是僅有的兩個圖形視覺。
+
+> **待辦：** 新增單元（u8/u12/u16）旁白＋兩處改動的既有旁白（u11 recipe 收尾、u13 線性例開場）**待使用者認可**（§6 交付形式：重編 `ch01_precise_limit_narration.html` 審核稿）。認可後才進第二階段工程（storyboard 同步重指＋新場景＋scene 7 凸曲線）。本次修復**未動**動畫與計費 API。
+
+### 六-lens 對抗式稽核（2026-06-14，Workflow `wfjunb6w2`，6 lens 並行）
+
+Scoped 到漂移修復的新材料（u8/u12/u16＋Ex 1.42 fold＋recipe reword），對照定稿 HTML §1.6＋方法論。結果：
+
+- **clean：** math-accuracy（**0 錯**，獨立重推 u8 兩處反轉、u12 `|5-5|=0<ε` 任意 δ、u16 `δ=1/√M ⟹ x²<1/M ⟹ 1/x²>M` 皆通過）、register（§4 無違規、u16 確走 repeat-pattern、未報例號）、faithfulness（新單元忠於 HTML、Ex 1.42 折疊判定 defensible）、no-repeat、completeness（§1.6 全環境覆蓋、無缺漏無雙覆）。
+- **1 條 tier-2 actionable（decomposition）：** u13 線性例開場「Take the clean case **first**」在插入常數例（u12）＋recipe 改述三例後變 stale、序位自相矛盾 → **已改**為「Now the recipe earns its keep — take the clean linear case」。
+- **tier-3 editorial（不改，均判 defensible）：** u16 backward-derivation 改寫（與 HTML forward 證等價、更適口語）；u12／u13 皆述 ε-δ setup（u12 退化 warm-up、u13 才首建機制供 u14 repeat-pattern 繼承，深度不同）；running example $2x-1$ 不另行正式 ε-δ 驗證（其角色為錨定定義／圖，且 u4/u5 已 informally 處理 tolerance 遊戲）。
+- **回歸：** 僅改 u13 開場一句，未觸及 `{show}`／數學內容，未引入新問題。原始 finding 見 Workflow 結果。

@@ -1,0 +1,92 @@
+# graph_focus y_clip 驗證稿（非正式節,檔名底線前綴）
+#
+# 目的:驗證 §1.4 的 plot-kind 缺口——漸近線/blow-up 曲線（y_clip）＋開/閉端點跳斷。
+# 三場景壓測:
+#   1. 1/x^2 blow-up（y_clip: true，極點在 x=0，兩支沿 y 軸衝上、中間斷開）
+#   2. 2x/(x-3) 垂直漸近線（兩支各自 y_clip、夾著 x=3 虛線，右支 +∞、左支 -∞）
+#   3. 分段跳斷（x+1 / 4-x，左支終點空心 (2,3)、右支起點實心 (2,2)）
+# 驗收點:極點不當機、無橫跨漸近線的假連接線、branch 在 clip 邊界乾淨出框、
+#         bbox 不被 ±∞ 撐爆、跳斷端點 hollow/solid 正確。
+# demo 專用,不屬任何正式節;驗證後留作 plot-kind 範例。
+
+meta:
+  id: demo_asymptote
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Asymptote / Blow-up Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Asymptote Demo" }
+
+scenes:
+
+  # 1 -------------------- 1/x^2 blow-up（y_clip，極點 x=0）
+  - id: blow_up_inverse_square
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "demo（§1.4 u7 型）"
+    title: "$y=\\dfrac{1}{x^2}$ Blows Up at $0$"
+    say: |
+      As $x$ approaches zero, $\frac{1}{x^2}$ grows without bound.
+      {show annotation.0} The two branches climb the same way, off the top.
+    axes:
+      x_range: [-2.2, 2.2, 1]
+      y_range: [-0.6, 8.0, 2]
+      x_length: 5.4
+      y_length: 4.0
+    plots:
+      - { kind: function, expression: "1/x**2", x_range: [-2.2, 2.2], y_clip: true, color_role: secondary, label: "$y=1/x^2$", label_point: [1.05, 5.4] }
+    annotations:
+      - "$\\dfrac{1}{(0.1)^2}=100,\\quad \\dfrac{1}{(0.01)^2}=10{,}000$ -- no ceiling."
+
+  # 2 -------------------- 2x/(x-3) 垂直漸近線 x=3（兩支 y_clip + 虛線）
+  - id: vertical_asymptote
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "demo（§1.4 u12 型）"
+    title: "Vertical Asymptote of $\\dfrac{2x}{x-3}$"
+    say: |
+      The denominator vanishes at $x=3$.
+      {show annotation.0} From the right the curve races to $+\infty$; from the
+      left it plunges to $-\infty$.
+    axes:
+      x_range: [-3.0, 9.0, 3]
+      y_range: [-8.0, 12.0, 4]
+      x_length: 6.2
+      y_length: 4.0
+    plots:
+      - { kind: line, start: [3, -8.0], end: [3, 12.0], dashed: true, color_role: warning, label: "$x=3$", label_point: [3.15, 11.0], label_role: muted }
+      - { kind: function, expression: "2*x/(x-3)", x_range: [-3.0, 2.95], y_clip: true, color_role: secondary, label: "$y=\\dfrac{2x}{x-3}$", label_point: [-2.8, -3.0] }
+      - { kind: function, expression: "2*x/(x-3)", x_range: [3.05, 9.0], y_clip: true, color_role: secondary }
+    annotations:
+      - "$\\lim_{x\\to 3^+}=+\\infty,\\quad \\lim_{x\\to 3^-}=-\\infty$: the line $x=3$ is a vertical asymptote."
+
+  # 3 -------------------- 分段跳斷（開/閉端點）
+  - id: jump_discontinuity
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "demo（§1.4 u6 型）"
+    title: "A Jump at $x=2$"
+    say: |
+      Two formulas, split at $x=2$.
+      {show annotation.0} The left piece ends at height $3$; the right piece
+      starts at height $2$ -- a jump.
+    axes:
+      x_range: [-1.0, 5.0, 1]
+      y_range: [-0.5, 5.0, 1]
+      x_length: 5.6
+      y_length: 4.0
+    plots:
+      - { kind: function, expression: "x+1", x_range: [-1.0, 2.0], color_role: secondary, label: "$x+1$", label_point: [-0.9, 1.4] }
+      - { kind: function, expression: "4-x", x_range: [2.0, 4.0], color_role: accent, label: "$4-x$", label_point: [3.1, 2.6] }
+      - { kind: point, point: [2.0, 3.0], hollow: true, hollow_reason: "left branch is x<2 (open endpoint)", color_role: secondary }
+      - { kind: point, point: [2.0, 2.0], hollow: false, color_role: accent }
+    annotations:
+      - "$\\lim_{x\\to 2^-}=3,\\ \\lim_{x\\to 2^+}=2$: the two-sided limit does not exist."

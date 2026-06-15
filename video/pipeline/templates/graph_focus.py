@@ -23,6 +23,7 @@ storyboards/_demo_graph_reveal.yml.
 """
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from manim import (
@@ -39,6 +40,7 @@ from manim import (
     Polygon,
     Text,
     VGroup,
+    VMobject,
 )
 
 from .. import brand
@@ -151,6 +153,46 @@ def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any]) -> Non
     label.next_to(graph, side, buff=0.13)
 
 
+def _clipped_function_curve(axes: Axes, expression: str, xr: list[float],
+                            y_lo: float, y_hi: float, col: str,
+                            stroke_width: float, samples: int) -> VGroup:
+    """Sample ``expression`` over ``xr`` and build the curve as one or more
+    segments, breaking the path wherever a sample is non-finite (a pole) or
+    falls outside ``[y_lo, y_hi]`` (off-frame). This is the asymptote/blow-up
+    path for §1.4-style plots ($1/x^2$, $2x/(x-3)$, $\\ln x$): the bare
+    ``axes.plot`` lambda crashes on a pole sample (ZeroDivisionError) and draws
+    a spurious near-vertical connector across the asymptote, while an
+    unclamped excursion to $\\pm\\infty$ blows up the graph bbox and squashes
+    the whole figure under _fit_graph_to_safe_zone. Breaking into in-range runs
+    fixes all three: the pole becomes a natural gap, and each branch exits
+    cleanly at the clip boundary. Opt-in via a plot's ``y_clip`` -- without it
+    the original ``axes.plot`` path is unchanged (so §1.1/§1.6 are untouched)."""
+    n = max(int(samples), 2)
+    step = (xr[1] - xr[0]) / n
+    runs: list[list[Any]] = []
+    cur: list[Any] = []
+    for i in range(n + 1):
+        x = xr[0] + step * i
+        try:
+            y = safe_eval_expression(expression, x)
+        except Exception:
+            y = None
+        if y is None or not math.isfinite(y) or y < y_lo or y > y_hi:
+            if len(cur) >= 2:
+                runs.append(cur)
+            cur = []
+            continue
+        cur.append(axes.c2p(x, y))
+    if len(cur) >= 2:
+        runs.append(cur)
+    segs = VGroup()
+    for pts in runs:
+        seg = VMobject(stroke_color=col, stroke_width=stroke_width)
+        seg.set_points_as_corners(pts)   # dense sampling -> visually smooth, no overshoot past clip
+        segs.add(seg)
+    return segs
+
+
 def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Block], list[Any]]:
     blocks: list[Block] = []
     labels = []
@@ -168,13 +210,23 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
 
         if kind == "function":
             xr = _range(plot.get("x_range", x_range[:2]), x_range[2])
-            step = abs(xr[1] - xr[0]) / float(plot.get("samples", 900))
-            graph = axes.plot(
-                lambda x, expr=plot["expression"]: safe_eval_expression(expr, x),
-                x_range=[xr[0], xr[1], step],
-                color=col,
-                stroke_width=float(plot.get("stroke_width", 3.5)),
-            )
+            sw = float(plot.get("stroke_width", 3.5))
+            samples = int(plot.get("samples", 900))
+            y_clip = plot.get("y_clip")
+            if y_clip:
+                # asymptote / blow-up path: sample + break at poles and off-frame
+                # excursions (see _clipped_function_curve). y_clip: true -> axes
+                # y_range; y_clip: [lo, hi] -> explicit bound.
+                ylo, yhi = (y_range[0], y_range[1]) if y_clip is True else (float(y_clip[0]), float(y_clip[1]))
+                graph = _clipped_function_curve(axes, plot["expression"], xr, ylo, yhi, col, sw, samples)
+            else:
+                step = abs(xr[1] - xr[0]) / float(samples)
+                graph = axes.plot(
+                    lambda x, expr=plot["expression"]: safe_eval_expression(expr, x),
+                    x_range=[xr[0], xr[1], step],
+                    color=col,
+                    stroke_width=sw,
+                )
             glow = graph.copy().set_stroke(col, width=12, opacity=0.16)
             group = VGroup(glow, graph)
 

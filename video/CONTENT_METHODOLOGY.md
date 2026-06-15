@@ -8,7 +8,7 @@
 >
 > **相關文件：** 視覺系統見 [`design_handoff/`](design_handoff/)（Direction B）；講義（HTML handout kit）的撰寫契約與環境詞彙見 [`../experiments/handout_kit/CONTRACT-html-writing.md`](../experiments/handout_kit/CONTRACT-html-writing.md)；本產線總覽見 [`README.md`](README.md) 與 [`DESIGN.md`](DESIGN.md)。
 >
-> **交付物：** 每節一份**內容稿**（格式見 §6）。
+> **交付物：** 每節一份**內容稿**（格式見 §6）——`.md` 為 source of truth，且**一律附上編譯後的 standalone HTML 審核稿**供使用者閱讀（見 §6「交付形式」，2026-06-14 使用者指示）。
 
 ## 一致性關鍵字
 
@@ -41,7 +41,8 @@
 - **每支必有 intro 與 outro**（gen-2 first-class，純動畫、**無 narration**）：
   - **intro** — Section Gate 開場（章節地圖 → 聚焦本節 → 標題字卡）。內容稿只需提供本節在章內的定位：章、章名、節、節標題，以及一句引導問題 `tagline`。
   - **outro** — 收尾的品牌字卡（暗轉亮橋接 → 最終 logo 字卡，**無 takeaways**）。Key Takeaways 是獨立的 recap 單元（→ `recap_cards` 場景，有旁白），不在 outro。
-- **一定納入（MUST）：** 每個 `definition` / `theorem` / `proposition` / `example`（+`solution`）；書本明確編號的 procedure／strategy；承載教學的圖。
+- **一定納入（MUST）：** 每個 `definition` / `theorem` / `proposition`；書本明確編號的 procedure／strategy；承載教學的圖。
+- **例題：代表式涵蓋（MUST cover every distinct pattern; MAY fold repeats）。** 每個**不同教學模式**的 `example`（+`solution`）——帶來新技巧、新陷阱、或新情形的——MUST 有代表單元；**同型重複**的例題（同一手法的第二、三個 drill）MAY 折疊成一個代表＋一句「同手法，留給你在講義練」，並在內容稿就近**註明折疊了哪個、為何**（MUST NOT silently drop）。判準是「這個例題有沒有帶來新東西」，不是固定數量——影片是線性計時的一堂課、講義是隨機存取的參考書，忠實靠「涵蓋每個概念／技巧且不牴觸」達成，不必把每個 drill 重演。保留的同型第二例仍套 §4 repeat-pattern 省 setup。（2026-06-13 使用者拍板，取代原「每個 example 一律 MUST 納入」。）
 - **一定略過（MUST NOT 進影片）：** `env-exercise`（習題只屬書本）、指向本節**外**的交叉引用（kit 為手寫編號的 prose 引用，如 “by Theorem 4.2”——改用白話轉述，觀眾沒有頁可翻）、純裝飾的圖。
 - **視情況納入：** `proof`（短、有啟發、或書本已寫就收；冗長或純技術就略）、`remark`（升格為**具名規則**如「水平線測試」才獨立成單元，否則併入鄰段 narration）。
 
@@ -204,7 +205,7 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 | 欄位 | 內容 |
 |---|---|
 | `id` | 單元識別碼。snake_case、描述**教學重點**而非書本結構（好：`why_square_fails`；壞：`scene_3`）。本節內唯一。 |
-| `source` | 對應講義環境＋手寫編號（如 `chapter1-standalone.html §1.1 · Definition 1.1`；prose 段落用就近環境錨點描述、圖用 `data-fig` id 或 `Figure N.M`）。 |
+| `source` | 對應講義環境＋手寫編號（如 `chapter1-print-standalone.html §1.1 · Definition 1.1`；prose 段落用就近環境錨點描述、圖用 `data-fig` id 或 `Figure N.M`）。 |
 | `learning_goal` | 一句話：學生看完此單元學會什麼。 |
 | `kind` | 教學角色：`motivation` / `definition` / `theorem` / `proof` / `proposition` / `example` / `counterexample` / `procedure` / `visual` / `recap` / `forward_ref` … |
 | `narration` | 口語完整稿（英文；數學依 §4 口語化原則；intro／outro 無此欄）。 |
@@ -213,11 +214,20 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 
 > 刻意**不含** `template` / `{show}` marker / `accent` / 視覺 payload——那些是第二階段把內容稿「模板化」時才填。
 
+### 交付形式：`.md` 為源、編譯 HTML 為審核稿（2026-06-14 使用者指示）
+
+內容稿以**兩種形式並存**交付，缺一不可：
+
+- **`content_scripts/<deck-id>.md`——source of truth。** 純內容中間產物、可 diff／版控；上表欄位的權威版本。後續維護（§8）一律改這裡。
+- **`content_scripts/<deck-id>_narration.html`——給使用者審核的可讀稿（一律附上）。** standalone HTML（MathJax/KaTeX CDN，雙擊即開、數學即渲染），逐單元列 `narration`，並把 `learning_goal`／`visual_need`／`animation_cue` 收進可展開區。**每次交付內容稿（新撰或修訂）都 MUST 同時編譯出這份 HTML**——生 `.md` 裡的 inline LaTeX 不好讀，渲染後才方便逐段審旁白。
+
+**規則：** 旁白認可在 HTML 上進行，但 `.md` 仍是 source of truth；兩者 narration 內容 MUST 一致（改 `.md` 就重編 HTML，不可只改一邊）。這是根目錄 [`../CLAUDE.md`](../CLAUDE.md)「給使用者審核的交付物要用『打開就能讀』的形式」對內容稿的具體落實。**範本**（head／CSS 可直接沿用）：[`content_scripts/ch01_inverse_trig_narration.html`](content_scripts/ch01_inverse_trig_narration.html)（§1.2）、[`content_scripts/ch01_limit_of_function_narration.html`](content_scripts/ch01_limit_of_function_narration.html)（§1.3）。
+
 ### 範例 A：一個 `definition` 單元（靜態即可）
 
 ```
 id: one_to_one_definition
-source: chapter1-standalone.html §1.1 · Definition 1.1（one-to-one）
+source: chapter1-print-standalone.html §1.1 · Definition 1.1（one-to-one）
 learning_goal: 認得讓函數可逆的形式條件——one-to-one。
 kind: definition
 narration: |
@@ -234,7 +244,7 @@ animation_cue: （無——靜態即可）
 
 ```
 id: why_square_fails
-source: chapter1-standalone.html §1.1 · Remark 1.1（Horizontal line test）+ Figure 1.1（data-fig: hlt）
+source: chapter1-print-standalone.html §1.1 · Remark 1.1（Horizontal line test）+ Figure 1.1（data-fig: hlt）
 learning_goal: 看見「重複的輸出」如何讓反函數無法定義。
 kind: counterexample
 narration: |
@@ -255,7 +265,7 @@ animation_cue: |
 
 定稿一節內容稿前，逐項過（**只列內容層；工程檢核屬第二階段**）：
 
-- [ ] 每個 `definition` / `theorem` / `proposition` / `example` 都有單元覆蓋。
+- [ ] 每個 `definition` / `theorem` / `proposition` 都有單元覆蓋；每個**不同模式**的 `example` 有代表單元，折疊掉的同型重複都就近註明（§2 代表式涵蓋）。
 - [ ] 沒有 `exercise` 內容洩入。
 - [ ] intro 與 outro 齊備（intro 有定位資訊 + tagline；outro 有 takeaway 清單）。
 - [ ] 每個散文裡的幾何主張都有視覺單元（或就近註明刻意略過）；symbol-heavy 節套 §5 例外。
@@ -265,6 +275,16 @@ animation_cue: |
 - [ ] 動畫建議用自然語言、聚焦教學意圖（manim code 由 Claude 依此生成、經認可定版，見 §5）。
 - [ ] 每個 `id` 唯一、snake_case、描述教學重點。
 - [ ] **通讀整份 narration**，任何一段聽起來像教科書就重寫。
+- [ ] **散文潤稿 pass**：鎖稿前跑過 redundancy／贅字／讀順度 rubric（[`content_scripts/_audit/PROMPT-narration-copyedit.template.md`](content_scripts/_audit/PROMPT-narration-copyedit.template.md)），冗餘與贅字在 derive 前處理掉（鎖稿後忠實性 Mode B 不再動措辭）。
+- [ ] **已編譯出 `<deck-id>_narration.html` 審核稿**（§6「交付形式」）：數學渲染正確、與 `.md` narration 一致——交付給使用者審核的是這份 HTML。
+
+### 散文潤稿 pass（鎖稿前；與忠實性 Mode B 的分工）
+
+narration 草稿成形、**鎖稿並 derive 成 HTML／口語版之前**，跑一輪**散文潤稿**（[`content_scripts/_audit/PROMPT-narration-copyedit.template.md`](content_scripts/_audit/PROMPT-narration-copyedit.template.md)）：抓 local redundancy（同詞在一兩句內重述，如「has a name: one-to-one. A function $f$ is one-to-one if…」）、贅字、讀順度、句長、跨單元 echo。它**可以動源稿措辭**，但只改「怎麼說」、不改「教什麼」與任何數學。
+
+**為何在這裡、而非 Mode B：** 忠實性 Mode B（[`content_scripts/_audit/PROMPT-narration-modeB.template.md`](content_scripts/_audit/PROMPT-narration-modeB.template.md)）在鎖稿**之後**跑，且其 framing 明令「不 re-litigate 已認可內容」、忠實維度（D2）更要求口語版逐字照源稿——所以冗餘／贅字一旦進了認可源稿就改不動了（去重會被當成 D2 違規）。**冗餘與贅字只能在鎖稿前的這個 pass 攔下。** 分工：潤稿管 *how*（鎖稿前、可改源稿），Mode B 管 *faithful + 數學正確*（鎖稿後、不改源稿）。
+
+**已鎖稿的節要補潤稿**屬例外：使用者明確授權為一次 Mode A 編修；若改到已合成的 beat，要重新 derive ＋ 重新 TTS（計費）。
 
 ---
 

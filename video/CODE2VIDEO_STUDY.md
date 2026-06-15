@@ -246,7 +246,7 @@ P0 用確定性方法吃掉**幾何重疊**那個子集；剩下需要**判斷**
 ### 設計
 - **不分析整支影片，只抽關鍵幀。** 每個 beat 結束時（該拍的 reveal 都落定）是構圖最滿的一刻，最容易暴露缺陷。用 `manifest.json` 的 `beats[].end_seconds` 當時間戳，`ffmpeg -ss` 從各場景 mp4（`output/_media/.../<meta_id>__<sid>.mp4`，見 `make.py` render()）抽幀。一節幾十張靜圖，遠比逐幀分析便宜。
 - **給 VLM 的 context：** 幀圖 + 該場景 `title` + 該 beat 的 narration 文字（`beats[].text`）+ 該拍應已出現的元素清單。可選加 `learning_goal`（在內容稿 `.md`，非 storyboard）。
-- **輸出：** 結構化 JSON（defects[] + 五維分數 + 修改建議），存 `output/critic/<id>/<scene>.json`，另產一份人讀的 `.md` 摘要。**純建議，不改 storyboard。**
+- **輸出：** 結構化 JSON（defects[] + 五維分數 + 修改建議），存 `output/<chNN>/<sX.Y>/critic/<scene>.json`，另產一份人讀的 `.md` 摘要。**純建議，不改 storyboard。**
 - **評分用 A.4 的 AES 五維**，但裁成單幀可判的（EL/AT/AD 靠單幀；LF/VC 要餵連續幀序列）。
 
 ### 成本閘門（依 [`CLAUDE.md`](../CLAUDE.md) 必須做）

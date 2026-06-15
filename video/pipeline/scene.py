@@ -18,10 +18,11 @@ from manim import DOWN, UP, FadeIn, FadeOut, Rectangle, Scene
 from .blocks import play_block
 from .narration import estimate_seconds, parse_say
 from .templates import build_blocks
+from .timing import MIN_BEAT_HOLD_SECONDS, SCENE_LEAD_SECONDS, SCENE_TAIL_SECONDS
 from .visuals import theme as T
 
 LIGHT_KINDS = {"intro", "outro"}
-MIN_HOLD = 0.3  # floor so a long reveal animation never yields a negative wait
+MIN_HOLD = MIN_BEAT_HOLD_SECONDS  # floor so long reveal animation never yields negative wait
 
 
 class LessonScene(Scene):
@@ -45,7 +46,7 @@ class LessonScene(Scene):
             if block.static:
                 self.add(block.mobject)
 
-        self.wait(0.3)
+        self.wait(SCENE_LEAD_SECONDS)
 
         if kind == "content":
             self._play_content(blocks, by_id, ground)
@@ -56,7 +57,7 @@ class LessonScene(Scene):
         else:
             self._play_timed(blocks, ground, float(self.spec.get("duration", 3.0)))
 
-        self.wait(0.6)
+        self.wait(SCENE_TAIL_SECONDS)
 
     def _play_content(self, blocks, by_id, ground) -> None:
         revealed: set[str] = set()

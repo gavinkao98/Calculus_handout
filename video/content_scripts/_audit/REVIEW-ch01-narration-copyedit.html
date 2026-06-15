@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 旁白散文潤稿 — 審核稿（first pass）</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$']],
+      macros: {
+        arccsc: ['\\operatorname{arccsc}'],
+        arcsec: ['\\operatorname{arcsec}'],
+        arccot: ['\\operatorname{arccot}']
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+  table.sum th{background:var(--chip)}
+  .clean{color:var(--new);font-weight:600}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.tier{background:#e9f6ec;color:#1a7f37}
+  .chip.user{background:#ffe6e6;color:#a11}
+  .chip.cost{background:var(--warnbg);color:var(--warn)}
+  .issue{color:var(--muted);font-size:.92rem;margin:2px 0 10px}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:42px;font-weight:700;font-size:.78rem;
+    vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  .none{color:var(--muted);font-style:italic;padding:8px 2px}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 1 旁白散文潤稿 — 審核稿（first pass）</h1>
+  <p class="lede">§1.1 / 1.2 / 1.3 / 1.6 已認可旁白，跑 C1–C5 潤稿 rubric（<code>PROMPT-narration-copyedit.template.md</code>）＋逐條對抗式複驗後的確認項。2026-06-14。</p>
+
+  <div class="note">
+    <b>怎麼用：</b>每條只改「怎麼說」、不動數學與教學內容；<del>紅</del> 為原文、<ins>綠</ins> 為建議。逐條告訴我「收／不收」即可。<br>
+    <b>成本：</b>標 <span class="chip cost">重 TTS</span> 的，採納後要重新 derive 口語版並重新 TTS 受影響 beat（MiMo／Gemini 計費）；其餘可先改源稿、下次合成自然帶上。<span class="chip cost">跨 beat</span> 代表會動到 beat 邊界（影響該場景切點與 reveal 對位）。
+  </div>
+
+  <table class="sum">
+    <tr><th>節</th><th>候選 → 確認</th><th>確認維度</th><th>乾淨維度</th></tr>
+    <tr><td>§1.1 Inverse Functions</td><td>2 → 1 <span style="color:var(--muted)">(+1 使用者標記)</span></td><td>C4（＋C1 手動補）</td><td class="clean">C1·C2·C5</td></tr>
+    <tr><td>§1.2 Inverse Trig Functions</td><td>4 → 4</td><td>C1 ×1, C4 ×3</td><td class="clean">C2·C5</td></tr>
+    <tr><td>§1.3 The Limit of a Function</td><td>3 → 0</td><td>—（全數複驗剔除）</td><td class="clean">C1·C4·C5（整節乾淨）</td></tr>
+    <tr><td>§1.6 Precise Definition of a Limit</td><td>4 → 2</td><td>C4 ×2</td><td class="clean">C1·C5</td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：<b>C1</b> 局部冗餘 · <b>C2</b> 贅字 · <b>C3</b> 讀順度 · <b>C4</b> 句長／可聽性 · <b>C5</b> 跨單元 echo。</p>
+
+  <!-- ============ §1.1 ============ -->
+  <h2>§1.1 Inverse Functions <span style="font-weight:400;font-size:.8rem;color:var(--muted)">— ch01_inverse_functions.md</span></h2>
+
+  <div class="card">
+    <div class="chips">
+      <span class="chip user">使用者標記</span>
+      <span class="chip unit">one_to_one_definition</span>
+      <span class="chip dim">C1 局部冗餘</span>
+      <span class="chip cost">重 TTS · 跨 beat</span>
+    </div>
+    <div class="issue">「one-to-one」在相鄰兩句各說一次（命名句尾＋定義句頭）；name-then-define 是好教學，但兩次都在一口氣內念到就成了冗餘。折成只說一次、保留命名→定義結構與全部數學。<br><span style="color:var(--warn)">注意：命名句尾正是 beat 01 收尾、定義句正是 beat 02 開頭——合併會動到 beat 01/02 邊界，需重排該場景。</span></div>
+    <div class="row old"><span class="tag">原文</span>The property that separates the two cases has a name: <del>one-to-one. A function $f$ is one-to-one if</del> $f(x_1) \ne f(x_2)$ whenever $x_1 \ne x_2$ — different inputs always produce different outputs.</div>
+    <div class="row new"><span class="tag">建議</span>The property that separates the two cases has a name: <ins>a function $f$ is <b>one-to-one</b> if</ins> $f(x_1) \ne f(x_2)$ whenever $x_1 \ne x_2$ — different inputs always produce different outputs.</div>
+  </div>
+
+  <div class="card">
+    <div class="chips">
+      <span class="chip unit">horizontal_line_test</span>
+      <span class="chip dim">C4 句長</span>
+      <span class="chip tier">tier 2</span>
+      <span class="chip cost">重 TTS</span>
+    </div>
+    <div class="issue">動作＋判準塞過一口氣，冒號後「…is what passing looks like」主謂倒裝，唸起來卡。拆兩句。</div>
+    <div class="row old"><span class="tag">原文</span>So sweep horizontal lines down the graph and count<del>:</del> at most one crossing at every height<del> is what passing looks like</del>.</div>
+    <div class="row new"><span class="tag">建議</span>So sweep horizontal lines down the graph and count<ins> the crossings. Passing means</ins> at most one crossing at every height.</div>
+  </div>
+
+  <!-- ============ §1.2 ============ -->
+  <h2>§1.2 Inverse Trigonometric Functions <span style="font-weight:400;font-size:.8rem;color:var(--muted)">— ch01_inverse_trig.md</span></h2>
+
+  <div class="card">
+    <div class="chips">
+      <span class="chip unit">restrict_sine</span>
+      <span class="chip dim">C1 局部冗餘</span>
+      <span class="chip tier">tier 2</span>
+      <span class="chip cost">重 TTS</span>
+    </div>
+    <div class="issue">「centred on the origin」與「symmetric about zero」對 $[-\tfrac{\pi}{2},\tfrac{\pi}{2}]$ 是同一件事，背靠背重述。留一個即可。</div>
+    <div class="row old"><span class="tag">原文</span>Other intervals would serve in principle, but this one is centred on the origin<del> and symmetric about zero</del>, which is why it became the standard choice.</div>
+    <div class="row new"><span class="tag">建議</span>Other intervals would serve in principle, but this one is centred on the origin, which is why it became the standard choice.</div>
+  </div>
+
+  <div class="card">
+    <div class="chips">
+      <span class="chip unit">arcsin_evaluate</span>
+      <span class="chip dim">C4 句長</span>
+      <span class="chip tier">tier 2</span>
+      <span class="chip cost">重 TTS</span>
+    </div>
+    <div class="issue">em-dash 插語擋在主詞與動詞之間，唸到「is the workhorse」前要憋一口長氣。把插語移到句末。</div>
+    <div class="row old"><span class="tag">原文</span>That triangle move<del> — turn the inverse trig value into a labelled right triangle, then read off whatever ratio you need —</del> is the workhorse of this whole section<del>.</del></div>
+    <div class="row new"><span class="tag">建議</span>That triangle move is the workhorse of this whole section<ins>: turn the inverse trig value into a labelled right triangle, then read off whatever ratio you need.</ins></div>
+  </div>
+
+  <div class="card">
+    <div class="chips">
+      <span class="chip unit">principal_value_trap</span>
+      <span class="chip dim">C4 句長</span>
+      <span class="chip tier">tier 2</span>
+      <span class="chip cost">重 TTS</span>
+    </div>
+    <div class="issue">句中插入清單再轉到對比（but …），一句太長。在 but 處斷句。</div>
+    <div class="row old"><span class="tag">原文</span>The object really is up at height $1$ <del>—</del> at $t = 4\pi$, $6\pi$, and the multiples of $2\pi$ that fall after it starts moving<del> —</del> but $\arccos(1) = 0$ is none of those.</div>
+    <div class="row new"><span class="tag">建議</span>The object really is up at height $1$ at $t = 4\pi$, $6\pi$, and the multiples of $2\pi$ that fall after it starts moving<ins>.</ins> <ins>B</ins>ut $\arccos(1) = 0$ is none of those.</div>
+  </div>
+
+  <div class="card">
+    <div class="chips">
+      <span class="chip unit">branch_conventions</span>
+      <span class="chip dim">C4 句長</span>
+      <span class="chip tier">tier 2</span>
+      <span class="chip cost">重 TTS</span>
+    </div>
+    <div class="issue">四個子句串成一句。在「— so」處斷句。</div>
+    <div class="row old"><span class="tag">原文</span>At $x = -1$, under this text's convention $\arccsc(-1) = \tfrac{3\pi}{2}$, and with $\arcsin(-1) = -\tfrac{\pi}{2}$ we again get $f(-1) = \pi$ <del>— so</del> $f$ is the constant $\pi$ on its two-point domain.</div>
+    <div class="row new"><span class="tag">建議</span>At $x = -1$, under this text's convention $\arccsc(-1) = \tfrac{3\pi}{2}$, and with $\arcsin(-1) = -\tfrac{\pi}{2}$ we again get $f(-1) = \pi$<ins>. So</ins> $f$ is the constant $\pi$ on its two-point domain.</div>
+  </div>
+
+  <!-- ============ §1.3 ============ -->
+  <h2>§1.3 The Limit of a Function <span style="font-weight:400;font-size:.8rem;color:var(--muted)">— ch01_limit_of_function.md</span></h2>
+  <p class="none">整節乾淨——3 條候選（皆 C4 長句）經對抗式複驗，判為刻意鋪陳／斷句後反而打散教學節奏，全數剔除。無建議。</p>
+
+  <!-- ============ §1.6 ============ -->
+  <h2>§1.6 The Precise Definition of a Limit <span style="font-weight:400;font-size:.8rem;color:var(--muted)">— ch01_precise_limit.md</span></h2>
+
+  <div class="card">
+    <div class="chips">
+      <span class="chip unit">diagnose_wrong_definition</span>
+      <span class="chip dim">C4 句長</span>
+      <span class="chip tier">tier 2</span>
+      <span class="chip cost">重 TTS</span>
+    </div>
+    <div class="issue">長句中夾 em-dash 插語後再接「but …」對比，太長。在 but 處斷句。</div>
+    <div class="row old"><span class="tag">原文</span>First, the order of the challenge: the tolerance $\varepsilon$ must come first, on the output side — you name $\varepsilon$, and $\delta$ is the response <del>—</del> but this version hands us the easy quantity only after we have seen the hard one.</div>
+    <div class="row new"><span class="tag">建議</span>First, the order of the challenge: the tolerance $\varepsilon$ must come first, on the output side — you name $\varepsilon$, and $\delta$ is the response<ins>. B</ins>ut this version hands us the easy quantity only after we have seen the hard one.</div>
+  </div>
+
+  <div class="card">
+    <div class="chips">
+      <span class="chip unit">epsilon_delta_recipe</span>
+      <span class="chip dim">C4 句長</span>
+      <span class="chip tier">tier 2</span>
+      <span class="chip cost">重 TTS</span>
+    </div>
+    <div class="issue">一句扛整個條件分支（if …）再接兩段動作（first … then …），單一口氣太長。在 then 前斷句。</div>
+    <div class="row old"><span class="tag">原文</span>One wrinkle decides the difficulty: if the bound still carries a stray factor depending on $x$, first pen $x$ into a small interval around $a$ to cap that factor<del>, then</del> take $\delta$ to be the minimum of that interval's radius and your $\varepsilon$-based bound.</div>
+    <div class="row new"><span class="tag">建議</span>One wrinkle decides the difficulty: if the bound still carries a stray factor depending on $x$, first pen $x$ into a small interval around $a$ to cap that factor<ins>. Then</ins> take $\delta$ to be the minimum of that interval's radius and your $\varepsilon$-based bound.</div>
+  </div>
+
+  <footer>
+    稽核：narration-copyedit rubric（C1–C5）＋ 對抗式逐條複驗（剔除主題詞必然重現／刻意教學／語意等價／改動意義者）。<br>
+    源稿為 source of truth；採納後我改 <code>.md</code>、重編審核 HTML，並逐條確認哪些需重 derive＋重 TTS（計費）。
+  </footer>
+</div>
+</body>
+</html>

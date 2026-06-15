@@ -307,7 +307,12 @@ def prose(text: str, ground: str, *, role: str = "text", size: str = "body",
                                      max_width=max_width, align=align))
 
     mob = prose_tex(text, ground, role=role, size=size)
-    if max_width is None or mob.width <= max_width or "\\" in text:
+    # Skip wrapping (and scale-to-fit if still too wide) ONLY for a literal `\\`
+    # line break the author put in. Match the double-backslash, NOT any backslash:
+    # `"\\" in text` also matched inline LaTeX commands (\arcsin, \tfrac), which
+    # silently scaled a long step/point down instead of wrapping it -- breaking the
+    # "wrap, don't shrink" rule and making it smaller than its stacked siblings.
+    if max_width is None or mob.width <= max_width or "\\\\" in text:
         if max_width is not None and mob.width > max_width:
             mob.scale_to_fit_width(max_width)   # explicit-break line still too wide
         return _mark_prose(mob)

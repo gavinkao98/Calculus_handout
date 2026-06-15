@@ -40,7 +40,9 @@ def _load_beat_durations(meta) -> dict[str, list[float]]:
     Returns {} when nothing has been synthesized yet, so render still works
     standalone (falling back to word-count estimates inside the scene player).
     """
-    manifest = _bootstrap.REPO_ROOT / "video" / "output" / "audio" / meta["id"] / "manifest.json"
+    sec_dir = _bootstrap.section_output_dir(meta)
+    audio_subdir = "audio_mimo" if meta["id"].endswith("_mimo") else "audio"
+    manifest = sec_dir / audio_subdir / "manifest.json"
     if not manifest.exists():
         return {}
     data = json.loads(manifest.read_text(encoding="utf-8"))
@@ -63,13 +65,14 @@ def _render_one(meta, spec, out_dir, quality, durations=None) -> str:
         "disable_caching": True,
     }):
         LessonScene().render()
-    matches = sorted((out_dir / "_media").rglob(f"{output_file}.mp4"))
-    return str(matches[-1]) if matches else f"!! no mp4 for {output_file}"
+    matches = list((out_dir / "_media").rglob(f"{output_file}.mp4"))
+    return str(max(matches, key=lambda p: p.stat().st_mtime)) if matches else f"!! no mp4 for {output_file}"
 
 
 def _scene_mp4(out_dir: Path, meta, sid: str) -> Path | None:
-    matches = sorted((out_dir / "_media").rglob(f"{meta['id']}__{sid}.mp4"))
-    return matches[-1] if matches else None
+    # freshest by mtime, not name -- see _render_one / mux._scene_mp4 (stale-res trap)
+    matches = list((out_dir / "_media").rglob(f"{meta['id']}__{sid}.mp4"))
+    return max(matches, key=lambda p: p.stat().st_mtime) if matches else None
 
 
 def _concat(out_dir: Path, meta, ordered_ids: list[str]) -> int:
@@ -82,7 +85,9 @@ def _concat(out_dir: Path, meta, ordered_ids: list[str]) -> int:
             return 1
         segments.append(mp4)
 
-    output = out_dir / f"{meta['id']}.mp4"
+    sec_dir = _bootstrap.section_output_dir(meta)
+    sec_dir.mkdir(parents=True, exist_ok=True)
+    output = sec_dir / f"{meta['id']}.mp4"
     list_file = out_dir / "_concat_list.txt"
     # ffmpeg is a native Windows exe: feed it Windows-style ('C:/...') paths via
     # as_posix(), NOT MSYS '/c/...' paths (which it cannot open).

@@ -1,0 +1,542 @@
+# Section 1.5 Limit Laws and Computational Techniques -- 工程稿（storyboard, gen-2 格式）
+#
+# 從 content_scripts/ch01_limit_laws.md（內容稿,19 單元;narration 2026-06-14 經使用者認可,
+# 含 Ex 1.35 拆為獨立 u15＋u15 口語收尾兩項採納）映射而來。
+# 講義權威:experiments/handout_kit/chapter1-print-standalone.html §1.5。
+# 第二階段「模板化」產物:每單元配 template + accent、認可的 narration→say 插 {show}、
+# visual_need→視覺 payload。`source` 欄回溯內容稿單元 id。
+#
+# ~75% 符號 → 套 §5 symbol-heavy 條件化視覺:anchor=squeeze(u13)＋其 in-action x²sin(u14);
+# 唯一對比視覺=floor 跳斷(u12);代數例題(u4/u6/u8/u9/u10/u15/u17)一律不配圖、符號即 beat。
+# 動畫頂著(第二輪):cue 在 u2/u7/u12/u13/u14,各以 `# HOOK(第二輪)` 註記待接入點;本版靜態頂著。
+
+meta:
+  id: ch01_limit_laws
+  chapter: "Chapter 1"
+  chapter_title: "Inverse Functions and Limits"
+  section: "1.5"
+  title: "Limit Laws and Computational Techniques"
+  language: en
+  theme: midnight
+  voice: Charon
+  video: { w: 3840, h: 2160, fps: 60 }   # 交付標準：4K60 (manim fourk_quality)
+  tagline: "Which limits can we just compute -- and what do we do when substitution fails?"
+  sections:
+    - { id: "1.1", title: "Inverse Functions" }
+    - { id: "1.2", title: "Inverse Trigonometric Functions" }
+    - { id: "1.3", title: "The Limit of a Function" }
+    - { id: "1.4", title: "One-Sided and Infinite Limits" }
+    - { id: "1.5", title: "Limit Laws and Computational Techniques" }
+    - { id: "1.6", title: "The Precise Definition of a Limit" }
+
+scenes:
+
+  # 1 ----------------------------------------------------------------- intro
+  - id: intro
+    kind: intro
+    source: "內容稿 u1 intro"
+    tagline: "Which limits can we just compute -- and what do we do when substitution fails?"
+    bgm: soft_intro
+    duration: 5.8
+
+  # 2 ------------------------------------------- motivation: guess -> compute
+  # HOOK(第二輪): 左數值表逐列填、停問號;箭頭亮起後右邊一行代數一筆到底落定確定答案。
+  - id: from_guessing_to_computing
+    kind: content
+    template: definition_math
+    accent: definition
+    kicker: motivation
+    source: "內容稿 u2 from_guessing_to_computing"
+    title: "From Guessing to Computing"
+    say: |
+      Up to now, every limit we have found came from a guess. We built a table
+      of values, or we read a graph, and we inferred where the function seemed
+      to be heading.
+      {show math.0} That works, but it is slow, and it is never quite certain.
+      In this section we change tactics:
+      {show math.1} we collect a handful of algebraic rules that let us compute
+      limits directly, with no table and no graph. These rules can be justified
+      rigorously once we have the precise definition of a limit -- that comes a
+      little later -- but even now, before any proof, they give us a dependable
+      tool-kit for the limits we meet in practice.
+    statement: "We trade guessing from tables and graphs for computing limits by algebra."
+    math:
+      - "tables, graphs $\\Rightarrow$ estimate (slow, uncertain)"
+      - { tex: "limit laws $\\Rightarrow$ compute directly", anim: highlight }
+
+  # 3 ----------------------------------------------- theorem: the limit laws
+  - id: limit_laws
+    kind: content
+    template: value_table
+    accent: theorem
+    source: "內容稿 u3 limit_laws"
+    title: "The Limit Laws"
+    reveal: rows
+    say: |
+      Here is the heart of the tool-kit. Suppose both $\lim_{x \to a} f(x)$ and
+      $\lim_{x \to a} g(x)$ exist. Then the limit slips straight through the
+      basic operations.
+      {show row.0} The limit of a sum is the sum of the limits, and a difference
+      works the same way.
+      {show row.1} A constant times a function pulls the constant outside.
+      {show row.2} The limit of a product is the product of the limits.
+      {show row.3} The limit of a quotient is the quotient of the limits -- with
+      one proviso: the denominator's limit must not be zero.
+      {show row.4} And raising to a positive integer power behaves the same way,
+      the limit of $[f(x)]^n$ being just $[\lim_{x \to a} f(x)]^n$. In plain
+      words: every operation you already know commutes with taking the limit, as
+      long as the individual pieces have limits to begin with.
+    statement: "If $\\lim_{x\\to a} f$ and $\\lim_{x\\to a} g$ exist, the limit passes through each operation."
+    header: ["Operation", "Limit law"]
+    rows:
+      - ["Sum / difference", "$\\lim (f \\pm g) = \\lim f \\pm \\lim g$"]
+      - ["Constant multiple", "$\\lim (c\\,f) = c \\lim f$"]
+      - ["Product", "$\\lim (fg) = (\\lim f)(\\lim g)$"]
+      - ["Quotient $(\\lim g \\ne 0)$", "$\\lim \\frac{f}{g} = \\frac{\\lim f}{\\lim g}$"]
+      - ["Power", "$\\lim f^{\\,n} = (\\lim f)^{n}$"]
+    accent_row: 3
+
+  # 4 ------------------------------------- example: apply the laws abstractly
+  - id: apply_laws_abstractly
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u4 apply_laws_abstractly"
+    title: "The Laws Without a Formula"
+    say: |
+      Let us put the laws to work in a case where we are handed almost nothing.
+      Suppose all we know is that $f(x) \to -1$ as $x \to -1$ -- no formula,
+      just that one limit. Can we still evaluate
+      $\lim_{x \to -1} \frac{x f(x) + 3}{2 f(x) + 1}$? We can, entirely through
+      the laws.
+      {show math.0} By the product law, $x f(x)$ tends to $(-1)(-1)$, which is
+      $1$, so the numerator tends to $1 + 3 = 4$.
+      {show math.1} The denominator tends to $2(-1) + 1$, which is $-1$ -- and,
+      crucially, that is not zero, so the quotient law is allowed.
+      {show math.2} The whole expression tends to $4$ over $-1$, or $-4$.
+      {show takeaway} Notice we never needed to know what $f$ actually is; the
+      laws carried the entire computation.
+    steps:
+      - { text: "Numerator, by the product and sum laws.", math: "x f(x) + 3 \\,\\to\\, (-1)(-1) + 3 = 4" }
+      - { text: "Denominator -- and it is nonzero.", math: "2 f(x) + 1 \\,\\to\\, 2(-1) + 1 = -1", hot: true }
+      - { text: "Quotient law applies.", math: "\\frac{x f(x) + 3}{2 f(x) + 1} \\,\\to\\, \\frac{4}{-1} = -4", mark: ok }
+    takeaway: "We never needed a formula for $f$ -- the laws did everything."
+    takeaway_tone: ok
+
+  # 5 -------------------------------------- proposition: direct substitution
+  - id: direct_substitution
+    kind: content
+    template: definition_math
+    accent: proposition
+    source: "內容稿 u5 direct_substitution"
+    title: "Direct Substitution"
+    say: |
+      The laws have one immediate, very useful payoff.
+      {show math.0} Begin with two facts that are almost self-evident: as $x$
+      approaches $a$, the function $x$ approaches $a$, and therefore $x^n$
+      approaches $a^n$. Feed those into the sum and product laws, and a whole
+      class of functions falls into line.
+      {show math.1} For any polynomial $p$, the limit as $x \to a$ is simply
+      $p(a)$; and for a rational function it is $r(a)$, wherever the denominator
+      is not zero at $a$. So for polynomials and well-behaved rational
+      functions, finding a limit is nothing more than plugging in the number.
+      We call that direct substitution, and it should always be the first thing
+      you try.
+    statement: "For polynomials and rational functions (nonzero denominator), the limit is the value at $a$."
+    math:
+      - "$\\lim_{x\\to a} x = a, \\qquad \\lim_{x\\to a} x^{n} = a^{n}$"
+      - { tex: "$\\lim_{x\\to a} p(x) = p(a), \\qquad \\lim_{x\\to a} r(x) = r(a)$", anim: highlight }
+
+  # 6 ----------------------------------- example: direct substitution in action
+  - id: direct_sub_in_action
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u6 direct_sub_in_action"
+    title: "Substitution in Action"
+    say: |
+      Take it for a spin on $\lim_{x \to 1} \frac{x^3 + 2x^2 - 1}{5 - 3x}$.
+      {show math.0} Top and bottom are both polynomials, so each we evaluate by
+      substitution. The numerator at $x = 1$ is $1 + 2 - 1$, which is $2$;
+      {show math.1} the denominator is $5 - 3$, also $2$.
+      {show math.2} The denominator's limit is two, not zero, so the quotient
+      law applies and the answer is $2$ over $2$ -- simply $1$.
+      {show takeaway} No table, no graph: one substitution and a glance at the
+      denominator.
+    steps:
+      - { text: "Numerator by substitution.", math: "x^3 + 2x^2 - 1 \\,\\to\\, 1 + 2 - 1 = 2" }
+      - { text: "Denominator by substitution.", math: "5 - 3x \\,\\to\\, 5 - 3 = 2" }
+      - { text: "Nonzero denominator -- quotient law.", math: "\\frac{2}{2} = 1", mark: ok }
+    takeaway: "One substitution and a glance at the denominator."
+    takeaway_tone: ok
+
+  # 7 ----------------------------- counterexample: why 0/0 is indeterminate
+  # HOOK(第二輪): 中央 0/0 迸出四分支,各落不同結局(c / +inf / -inf / DNE)依序亮起。
+  - id: why_zero_over_zero
+    kind: content
+    template: value_table
+    accent: warning
+    source: "內容稿 u7 why_zero_over_zero"
+    title: "Why $\\tfrac{0}{0}$ Is Indeterminate"
+    reveal: rows
+    say: |
+      Substitution is not always so kind. Very often the top and the bottom both
+      head to zero, and you are left staring at zero over zero. The temptation is
+      to call that one, or maybe zero -- but neither is right. Suppose $f$ and
+      $g$ both tend to zero as $x \to 3$; what can their ratio do?
+      {show row.0} If $f$ is ten times $g$, the ratio is ten everywhere, so the
+      limit is ten -- and replacing ten by any constant gives that constant.
+      {show row.1} Make the bottom shrink faster and the ratio blows up to
+      infinity;
+      {show row.2} flip a sign and it runs to minus infinity;
+      {show row.3} pit $x - 3$ against $|x - 3|$ and the limit fails to exist at
+      all. So zero over zero can come out as anything -- which is precisely what
+      indeterminate means. It is not an answer; it is a signal that we must
+      reshape the expression before the limit will reveal itself.
+    statement: "If $f, g \\to 0$ as $x \\to 3$, what can $\\frac{f}{g}$ do? Anything."
+    header: ["$f,\\ g$ -- both $\\to 0$", "$\\lim \\frac{f}{g}$"]
+    rows:
+      - ["$f = 10(x-3),\\ g = x-3$", "$10$ (any constant $c$)"]
+      - ["$f = x-3,\\ g = (x-3)^3$", "$+\\infty$"]
+      - ["$f = -(x-3),\\ g = (x-3)^3$", "$-\\infty$"]
+      - ["$f = x-3,\\ g = |x-3|$", "does not exist"]
+    accent_row: 3
+
+  # 8 ------------------------------------- example: factor and cancel (derivation)
+  - id: factor_and_cancel
+    kind: content
+    template: derivation
+    accent: example
+    source: "內容稿 u8 factor_and_cancel"
+    title: "Simplify, Then Substitute: Factoring"
+    say: |
+      So when substitution gives zero over zero, our job is to rewrite the
+      expression into a form substitution can handle -- and the cleanest tool is
+      factoring. Take $\lim_{x \to 1} \frac{x - 1}{x^2 - 1}$. Put in one and you
+      get zero over zero, so factor the bottom:
+      {show line.0} $x^2 - 1$ is $(x - 1)(x + 1)$.
+      {show line.1} Now the troublesome $x - 1$ cancels top and bottom, and away
+      from $x = 1$ the expression is just $\frac{1}{x + 1}$ -- a form that agrees
+      with the original at every point near one, which is all a limit looks at.
+      {show line.2} So substitute: $\frac{1}{1 + 1}$, one half. The factor that
+      was forcing the zero is gone, and the limit simply appears.
+    statement: "$\\lim_{x\\to1}\\dfrac{x-1}{x^2-1}$ -- substitution gives $\\tfrac00$."
+    lines:
+      - "\\frac{x-1}{x^2-1} = \\frac{x-1}{(x-1)(x+1)}"
+      - "= \\frac{1}{x+1} \\qquad (x \\ne 1)"
+      - { tex: "\\lim_{x\\to1}\\frac{1}{x+1} = \\frac{1}{2}", anim: highlight }
+    align_on: "="
+
+  # 9 -------------------------------- example: rationalise the numerator (derivation)
+  - id: rationalize_numerator
+    kind: content
+    template: derivation
+    accent: example
+    source: "內容稿 u9 rationalize_numerator"
+    title: "Simplify, Then Substitute: Rationalising"
+    say: |
+      Factoring is not the only way to break a zero over zero. When a square root
+      is in the way, the move is to rationalise. Consider
+      $\lim_{t \to 0} \frac{\sqrt{t^2 + 9} - 3}{t^2}$ -- again zero over zero.
+      {show line.0} Multiply top and bottom by the conjugate,
+      $\sqrt{t^2 + 9} + 3$. The numerator becomes a difference of squares,
+      $t^2 + 9 - 9$, which is just $t^2$ --
+      {show line.1} and that $t^2$ cancels the one downstairs, leaving
+      $\frac{1}{\sqrt{t^2 + 9} + 3}$.
+      {show line.2} Now substitution is harmless: at $t = 0$ the root is three,
+      giving $\frac{1}{3 + 3}$, one sixth. The conjugate did the same job the
+      factoring did -- it exposed the hidden factor and let it cancel away.
+    lines:
+      - "\\frac{\\sqrt{t^2+9}-3}{t^2} \\cdot \\frac{\\sqrt{t^2+9}+3}{\\sqrt{t^2+9}+3}"
+      - "= \\frac{t^2+9-9}{t^2\\bigl(\\sqrt{t^2+9}+3\\bigr)} = \\frac{1}{\\sqrt{t^2+9}+3} \\qquad (t \\ne 0)"
+      - { tex: "\\lim_{t\\to0}\\frac{1}{\\sqrt{t^2+9}+3} = \\frac{1}{6}", anim: highlight }
+    align_on: "="
+
+  # 10 ----------------------------------- example: combine fractions (derivation)
+  - id: combine_fractions
+    kind: content
+    template: derivation
+    accent: example
+    source: "內容稿 u10 combine_fractions"
+    title: "Simplify, Then Substitute: Combining"
+    say: |
+      One more flavour of the same idea, for when the expression is a pile of
+      fractions. Look at the limit as $t$ approaches one half of
+      $\frac{\frac{1}{3t^2} + \frac{1}{t^2 - 1}}{2t - 1}$. Substitution gives zero
+      over zero once again. The fix is to tidy the numerator first:
+      {show line.0} put the two inner fractions over the common denominator
+      $3t^2(t^2 - 1)$, and the top collects into $4t^2 - 1$, which factors as
+      $(2t - 1)(2t + 1)$.
+      {show line.1} There is our cancelling factor: the $2t - 1$ on top kills the
+      $2t - 1$ in the main denominator.
+      {show line.2} Substitute $t = \tfrac12$ into what remains, and the limit
+      works out to minus thirty-two ninths. Three examples, one lesson: reshape
+      by algebra until the factor forcing the zero cancels away.
+    lines:
+      - "\\frac{1}{3t^2} + \\frac{1}{t^2-1} = \\frac{4t^2-1}{3t^2(t^2-1)} = \\frac{(2t-1)(2t+1)}{3t^2(t^2-1)}"
+      - "\\text{divide by } (2t-1): \\quad \\frac{2t+1}{3t^2(t^2-1)}"
+      - { tex: "\\lim_{t\\to\\frac12}\\frac{2t+1}{3t^2(t^2-1)} = -\\frac{32}{9}", anim: highlight }
+    align_on: "="
+
+  # 11 ---------------------------- example: piecewise, one-sided limits agree
+  - id: piecewise_limits_agree
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u11 piecewise_limits_agree"
+    title: "Piecewise: Take Each Side"
+    say: |
+      Not every function comes as a single formula. Some are defined in pieces,
+      with different rules on different sides -- and there the trick is to take
+      the limit one side at a time. The plainest example is the absolute value,
+      $|x|$, as $x$ approaches zero.
+      {show math.0} To its right, $|x|$ is just $x$, which heads to zero.
+      {show math.1} To its left, $|x|$ is $-x$, which also heads to zero.
+      {show math.2} The two one-sided limits agree -- both are zero -- so the
+      full two-sided limit exists and equals zero.
+      {show takeaway} The recipe is general: take the limit from each side, and
+      the ordinary limit exists exactly when those two answers match.
+    steps:
+      - { text: "From the right, $|x| = x$.", math: "\\lim_{x\\to0^+} |x| = \\lim_{x\\to0^+} x = 0" }
+      - { text: "From the left, $|x| = -x$.", math: "\\lim_{x\\to0^-} |x| = \\lim_{x\\to0^-} (-x) = 0" }
+      - { text: "Both sides agree.", math: "\\lim_{x\\to0} |x| = 0", mark: ok }
+    takeaway: "Take each side; the limit exists exactly when they match."
+    takeaway_tone: ok
+
+  # 12 ------------------------ example: floor function jump (graph; 唯一對比視覺)
+  # HOOK(第二輪): 兩動點同時逼近 x=3(右沿 y=3 階到實心(3,3)、左沿 y=2 階到空心(3,2)),
+  # 停住時兩水平虛線夾出大小 1 縫隙閃示「跨不過跳階」。本版靜態頂著。
+  - id: floor_function_jump
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "內容稿 u12 floor_function_jump · Figure 1.18 (data-fig: floor-function)"
+    title: "A Jump: the Greatest Integer Function"
+    say: |
+      The same one-sided approach also tells us when a limit does not exist. Meet
+      the greatest integer function, written $[x]$: it rounds down to the nearest
+      integer, so $[4]$, $[4.1]$, and $[4.8]$ are all four. Ask for its limit as
+      $x$ approaches three. Coming from the right, $x$ sits just above three, so
+      $[x]$ is three. Coming from the left, $x$ sits just below three -- not yet
+      arrived -- so $[x]$ is only two.
+      {show annotation.0} The two sides give different answers, three and two, so
+      the limit at three does not exist. And the staircase shows you why: at
+      every integer the function leaps up by a whole step, and no single value
+      can bridge a jump.
+    axes:
+      x_range: [-0.4, 4.6, 1]
+      y_range: [-0.5, 4.5, 1]
+      x_length: 5.2
+      y_length: 4.4
+    plots:
+      - { kind: line, start: [0, 0], end: [1, 0], color_role: muted }
+      - { kind: line, start: [1, 1], end: [2, 1], color_role: muted }
+      - { kind: line, start: [2, 2], end: [3, 2], color_role: secondary }
+      - { kind: line, start: [3, 3], end: [4, 3], color_role: accent, label: "$y=[x]$", label_side: right }
+      - { kind: point, point: [0, 0], hollow: false, color_role: muted }
+      - { kind: point, point: [1, 0], hollow: true, hollow_reason: "open end of step", color_role: muted }
+      - { kind: point, point: [1, 1], hollow: false, color_role: muted }
+      - { kind: point, point: [2, 1], hollow: true, hollow_reason: "open end of step", color_role: muted }
+      - { kind: point, point: [2, 2], hollow: false, color_role: secondary }
+      - { kind: point, point: [3, 2], hollow: true, hollow_reason: "$[x]=3$ at $x=3$, not $2$", color_role: secondary }
+      - { kind: point, point: [3, 3], hollow: false, color_role: accent }
+      - { kind: point, point: [4, 3], hollow: true, hollow_reason: "open end of step", color_role: accent }
+    annotations:
+      - "Left limit $2$, right limit $3$: they differ, so $\\lim_{x\\to3}[x]$ does not exist."
+
+  # 13 ----------------------------------- theorem: squeeze (graph; §5 anchor)
+  # HOOK(第二輪): h 與 g 自兩側朝 (a,L) 收攏、像鉗子般夾近;夾縫中的 f 被擠得越來越窄、
+  # 最後釘在 (a,L);交會點短暫高亮。本版靜態頂著(三曲線＋交會點全顯)。
+  - id: squeeze_theorem
+    kind: content
+    template: graph_focus
+    accent: theorem
+    source: "內容稿 u13 squeeze_theorem · Figure 1.19 (data-fig: squeeze-theorem)"
+    title: "The Squeeze Theorem"
+    say: |
+      Here is a technique for limits the laws simply cannot reach. Sometimes a
+      function is built from a piece that has no limit at all, so the product or
+      quotient laws are off the table. The squeeze theorem rescues exactly these
+      cases, and the picture is the whole idea. Suppose our function $f$ is
+      trapped between a lower function $g$ and an upper function $h$ for all $x$
+      near $a$.
+      {show annotation.0} If $g$ and $h$ are themselves both heading to the same
+      value $L$ as $x \to a$, then $f$, caught between them, has nowhere else to
+      go -- it is squeezed to $L$ as well. The two outer functions close in like
+      a vice, and whatever is pinned between them is dragged to the same limit.
+    axes:
+      x_range: [0.2, 4.8, 1]
+      y_range: [0, 4, 1]
+      x_length: 6.0
+      y_length: 3.8
+    plots:
+      - { kind: function, expression: "2 + 0.4*(x-2.5)**2", x_range: [0.5, 4.5], color_role: secondary, label: "$h$", label_point: [4.35, 3.55] }
+      - { kind: function, expression: "2 - 0.4*(x-2.5)**2", x_range: [0.5, 4.5], color_role: secondary, label: "$g$", label_point: [4.35, 0.35] }
+      - { kind: function, expression: "2 + 0.3*(x-2.5)**2*sin(5*x)", x_range: [0.5, 4.5], color_role: accent, label: "$f$", label_point: [3.55, 2.7] }
+      - { kind: line, start: [2.5, 0], end: [2.5, 2], dashed: true, color_role: muted, label: "$x=a$", label_side: down }
+      - { kind: point, point: [2.5, 2], hollow: false, color_role: accent }
+    annotations:
+      - "$g \\le f \\le h$ near $a$, and $\\lim_{x\\to a} g = \\lim_{x\\to a} h = L$, so $\\lim_{x\\to a} f = L$."
+
+  # 14 ----------------------- example: squeeze in action, x^2 sin(1/x) (graph)
+  # HOOK(第二輪): 先畫 ±x² 包絡;x²sin(1/x) 由外向 0 trace、振盪越收越密;包絡朝原點夾合、
+  # 把曲線捏到 (0,0)。本版靜態頂著(包絡＋振盪曲線＋原點全顯)。
+  - id: squeeze_in_action
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "內容稿 u14 squeeze_in_action · Figure 1.20 (data-fig: squeeze-x2sin)"
+    title: "The Squeeze in Action"
+    say: |
+      Let us watch the squeeze catch a genuinely wild function:
+      $\lim_{x \to 0} x^2 \sin\frac{1}{x}$. The factor $\sin\frac1x$ oscillates
+      faster and faster as $x$ nears zero -- it has no limit, so the product law
+      is useless. But it never escapes the band between minus one and one.
+      Multiply that bound by $x^2$, which is never negative, and we get
+      $-x^2 \le x^2 \sin\frac1x \le x^2$.
+      {show annotation.0} Now both bounding functions, $-x^2$ and $x^2$, go to
+      zero as $x \to 0$ -- so the squeeze theorem pins our function to zero as
+      well. The parabola $x^2$ and its mirror $-x^2$ form a closing envelope, and
+      the frantic wiggling of the curve is trapped inside it, forced right down
+      to the origin.
+    axes:
+      x_range: [-1.1, 1.1, 0.5]
+      y_range: [-0.85, 1.2, 0.5]
+      x_length: 5.6
+      y_length: 4.0
+    plots:
+      - { kind: function, expression: "x**2", x_range: [-1.05, 1.05], color_role: secondary, label: "$y=x^2$", label_point: [0.62, 0.9] }
+      - { kind: function, expression: "-x**2", x_range: [-1.05, 1.05], color_role: secondary, label: "$y=-x^2$", label_point: [0.5, -0.78] }
+      - { kind: function, expression: "x**2*sin(1/x)", x_range: [-1.05, -0.02], color_role: accent }
+      - { kind: function, expression: "x**2*sin(1/x)", x_range: [0.02, 1.05], color_role: accent, label: "$y=x^2\\sin\\frac1x$", label_point: [-1.05, 0.62] }
+      - { kind: point, point: [0, 0], hollow: false, color_role: accent }
+    annotations:
+      - "$-x^2 \\le x^2\\sin\\frac1x \\le x^2$, and $\\pm x^2 \\to 0$, so the limit is $0$."
+
+  # 15 -------------------- example: squeeze second case, |x| bound (使用者認可拆分)
+  - id: squeeze_abs_value_bound
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u15 squeeze_abs_value_bound · Example 1.35"
+    title: "Same Method, Different Bound"
+    say: |
+      Let us run the squeeze once more, on $\lim_{x \to 0} x \cos\frac1x$, because
+      it hides one subtlety worth seeing. Cosine, like sine, stays between minus
+      one and one.
+      {show math.0} But here is the twist: last time the bound was multiplied by
+      $x^2$, which is never negative, so the inequality kept its direction. This
+      time the multiplier is plain $x$, which can be negative -- and multiplying
+      an inequality by a negative number flips it.
+      {show math.1} The clean way around that is to bound the size instead: since
+      $|\cos\frac1x| \le 1$, we have $-|x| \le x \cos\frac1x \le |x|$.
+      {show math.2} Both $\pm|x|$ go to zero, and you can check it for yourself --
+      it runs exactly the same way, squeezing $x \cos\frac1x$ down to zero.
+      {show takeaway} Same method as before; only the envelope changed -- reach
+      for $|x|$ whenever the factor out front might be negative.
+    steps:
+      - { text: "The multiplier $x$ can be negative -- direction is not safe.", math: "-1 \\le \\cos\\tfrac1x \\le 1" }
+      - { text: "Bound the size instead.", math: "-|x| \\le x\\cos\\tfrac1x \\le |x|", hot: true }
+      - { text: "Both $\\pm|x| \\to 0$, so squeeze.", math: "\\lim_{x\\to0} x\\cos\\tfrac1x = 0", mark: ok }
+    takeaway: "Same method, different envelope: use $|x|$ when the factor can be negative."
+    takeaway_tone: ok
+
+  # 16 ----------------------------------- procedure: computing a limit (Strategy 1.2)
+  - id: strategy_computing_limits
+    kind: content
+    template: value_table
+    accent: procedure
+    source: "內容稿 u16 strategy_computing_limits · Strategy 1.2"
+    title: "A Game Plan for Any Limit"
+    reveal: rows
+    say: |
+      We now have enough tools to lay out a game plan for almost any limit you
+      will meet.
+      {show row.0} First, always try direct substitution -- for a polynomial,
+      or a rational function with a nonzero denominator, you are finished on the
+      spot.
+      {show row.1} If substitution gives an indeterminate form like zero over
+      zero, simplify before you judge: factor and cancel, rationalise a root, or
+      combine fractions.
+      {show row.2} If the function is piecewise, take the limit from each side
+      and check that the two agree.
+      {show row.3} If it is trapped between two functions that share a limit,
+      reach for the squeeze theorem.
+      {show row.4} And if the values simply grow without bound, the limit is
+      plus or minus infinity, and the line $x = a$ is a vertical asymptote. Run
+      down that list in order, and most limits will tell you which tool they
+      need.
+    statement: "Run down the list in order -- most limits will tell you which tool they need."
+    header: ["If the limit is...", "...reach for"]
+    rows:
+      - ["Polynomial / rational, denom $\\ne 0$", "direct substitution"]
+      - ["Indeterminate $\\tfrac00$", "factor / rationalise / combine"]
+      - ["Piecewise", "both one-sided limits, then check"]
+      - ["Trapped $g \\le f \\le h$", "squeeze theorem"]
+      - ["Grows without bound", "$\\pm\\infty$, asymptote $x=a$"]
+
+  # 17 -------------------------- example: forcing existence (synthesis capstone)
+  - id: forcing_existence
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u17 forcing_existence · Example 1.36"
+    title: "Make the Limit Exist"
+    say: |
+      Let us finish with a problem that turns the whole section on its head. We
+      want the limit $\lim_{x \to -2} \frac{x^2 + a x + 3}{x^2 + x - 2}$ to exist,
+      and we get to choose the constant $a$ to make that happen.
+      {show math.0} The denominator factors as $(x + 2)(x - 1)$, which goes to
+      zero at $x = -2$. If the numerator went to anything other than zero there,
+      the fraction would blow up and the limit would fail -- so the numerator is
+      forced to vanish at $x = -2$ as well.
+      {show math.1} Setting it to zero, $4 - 2a + 3 = 0$, pins down
+      $a = \tfrac{7}{2}$.
+      {show math.2} With that value the numerator factors as
+      $(x + 2)(x + \tfrac{3}{2})$, the common $x + 2$ cancels, and substituting
+      $x = -2$ gives one sixth.
+      {show takeaway} Look at the shape of the reasoning: the bare demand that
+      the limit exist fixed the constant, and the section's techniques finished
+      the job.
+    steps:
+      - { text: "Denominator vanishes at $x=-2$.", math: "x^2 + x - 2 = (x+2)(x-1)" }
+      - { text: "So the numerator must vanish too.", math: "4 - 2a + 3 = 0 \\;\\Rightarrow\\; a = \\tfrac{7}{2}", hot: true }
+      - { text: "Factor, cancel, substitute.", math: "\\frac{(x+2)(x+\\frac32)}{(x+2)(x-1)} \\,\\to\\, \\frac{-\\frac12}{-3} = \\frac{1}{6}", mark: ok }
+    takeaway: "Existence forced the constant; the section's techniques finished the limit."
+    takeaway_tone: ok
+
+  # 18 ---------------------------------------------------------------- recap
+  - id: recap
+    kind: content
+    template: recap_cards
+    accent: recap
+    source: "內容稿 u18 recap"
+    title: "Section 1.5 -- Recap"
+    say: |
+      Here is the whole tool-kit in one breath.
+      {show point.0} First, when the limits exist they pass through sums,
+      products, quotients, and powers {show formula.0} -- and for polynomials and
+      honest rational functions that just means you substitute the number.
+      {show point.1} Second, when substitution gives zero over zero, do not
+      panic: factor, rationalise, or combine fractions until the troublesome
+      factor cancels, then substitute.
+      {show point.2} Third, for a function built in pieces, take the limit from
+      each side and check they agree -- when they disagree, as they do across a
+      jump, the limit does not exist.
+      {show point.3} And fourth, when a function is pinned between two others
+      that share a limit, the squeeze theorem hands you that limit for free.
+      Reach for them roughly in that order, and very few limits will hold out.
+    points:
+      - "Limit laws: polynomials and rationals just substitute."
+      - "Hit $\\tfrac00$? Simplify, then substitute."
+      - "Piecewise: take both sides; a jump means no limit."
+      - "Trapped with a shared bound: use the squeeze theorem."
+    formulas:
+      - "\\lim \\frac{f}{g} = \\frac{\\lim f}{\\lim g}"
+
+  # 19 ---------------------------------------------------------------- outro
+  - id: outro
+    kind: outro
+    source: "內容稿 u19 outro"
+    bgm: soft_outro
+    duration: 8.0

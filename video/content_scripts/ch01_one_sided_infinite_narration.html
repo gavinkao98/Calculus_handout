@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§1.4 One-Sided and Infinite Limits — 旁白審核稿</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --ink:#1c2230; --ink-soft:#5c6678; --paper:#f7f5ef; --card:#ffffff;
+    --line:#e3ddd0; --accent:#2f6f6a; --accent-soft:#e7f0ef;
+    --kicker:#9a6a3a; --warn:#a23b2c; --rule:#c9c1b1;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:48px 28px 96px}
+  header.top{border-bottom:2px solid var(--ink); padding-bottom:20px; margin-bottom:8px}
+  .eyebrow{font-size:.82rem; letter-spacing:.14em; text-transform:uppercase; color:var(--kicker); font-weight:700}
+  h1{font-size:2rem; margin:.25em 0 .15em; line-height:1.15}
+  .tagline{font-style:italic; color:var(--ink-soft); font-size:1.12rem; margin:0}
+  .meta-note{font-size:.92rem; color:var(--ink-soft); margin-top:14px; padding:12px 16px; background:var(--accent-soft); border-radius:8px; border:1px solid #d3e2e0}
+  .meta-note strong{color:var(--accent)}
+  .flow{font-size:.86rem; color:var(--ink-soft); margin:18px 0 0; padding-left:1.1em}
+  .flow li{margin:.15em 0}
+  section.unit{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:22px 26px; margin:26px 0; box-shadow:0 1px 2px rgba(0,0,0,.03)
+  }
+  .uhead{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:14px}
+  .unum{font-weight:700; color:var(--accent); font-size:1.05rem}
+  .uid{font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:.92rem; color:var(--ink)}
+  .kind{margin-left:auto; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .kind.intro,.kind.outro{background:var(--ink-soft)}
+  .kind.recap{background:var(--kicker)}
+  .kind.forward_ref{background:#586a8a}
+  .kind.proposition{background:#586a8a}
+  .kind.visual{background:#6a7d4a}
+  .kind.counterexample{background:var(--warn)}
+  .goal{font-size:.92rem; color:var(--ink-soft); margin:0 0 14px}
+  .goal::before{content:"教學目標　"; font-weight:700; color:var(--ink); letter-spacing:.04em}
+  .narr-label{font-size:.74rem; letter-spacing:.12em; text-transform:uppercase; color:var(--kicker); font-weight:700; margin-bottom:6px}
+  .narration{font-size:1.12rem; line-height:1.72; padding:4px 0 6px}
+  .narration em{font-style:italic; color:var(--warn)}
+  .silent{color:var(--ink-soft); font-style:italic; font-size:1rem}
+  details{margin-top:14px; border-top:1px dashed var(--rule); padding-top:12px}
+  summary{cursor:pointer; font-size:.82rem; color:var(--ink-soft); letter-spacing:.04em; user-select:none}
+  summary:hover{color:var(--accent)}
+  .vnote{font-size:.92rem; color:var(--ink); margin:.5em 0}
+  .vnote b{color:var(--accent)}
+  .anim{font-size:.92rem; color:var(--ink); margin:.5em 0}
+  .anim b{color:var(--kicker)}
+  .vnote.empty,.anim.empty{color:var(--ink-soft); font-style:italic}
+  footer{margin-top:40px; padding-top:20px; border-top:2px solid var(--ink); font-size:.9rem; color:var(--ink-soft)}
+  .count{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Chapter 1 · Section 1.4 · 旁白審核稿</div>
+    <h1>One-Sided and Infinite Limits</h1>
+    <p class="tagline">What if the two sides disagree, or the values blow up?</p>
+    <div class="meta-note">
+      這是 §1.4 教學影片的<strong>待認可旁白</strong>（內容稿 <code>ch01_one_sided_infinite.md</code> 的可讀版）。
+      共 <strong>14 段</strong>有聲旁白（intro／outro 純動畫無旁白）。請逐段審閱：用詞、口語感、數學是否念得順、教學取捨。
+      認可後才進工程稿（模板化＋成片）。每張卡片下方可展開該單元的<strong>視覺／動畫需求</strong>。
+      <br><br>
+      <strong>稽核已過：</strong>本稿經對抗式六-lens 稽核（忠實／拆解／語域／不重複／數學正確／完整），
+      逐 finding 獨立驗證——六個內容維度全 clean（math 0 錯、無 L1、無幻覺）。
+    </div>
+    <ol class="flow">
+      <li>動機（極限破裂的兩種方式：兩側不一致／值無界）</li>
+      <li>單邊極限定義（$a^-$／$a^+$ 記號，Def 1.10）</li>
+      <li>雙邊判準（Prop 1.5：雙邊 $\iff$ 兩單邊一致）</li>
+      <li>判準雙向操作（雙邊 → 單邊 ✓；單邊 → 雙邊資訊不足）</li>
+      <li>跳斷例（分段函數，左 $3$ 右 $2$ → DNE）</li>
+      <li>值無界增長（$1/x^2\to\infty$，數值表）</li>
+      <li>方向決定 $\infty$（$1/x$ 兩側反向 vs $1/x^2$ 同向）</li>
+      <li>無限極限定義（$=\pm\infty$；$\infty$ 非數，Def 1.11）</li>
+      <li>四型單邊無限（Figure 1.15）</li>
+      <li>垂直漸近線定義（Def 1.12）</li>
+      <li>找漸近線（$\frac{2x}{x-3}$，$x=3$）</li>
+      <li>零分母不保證漸近線（反例）</li>
+      <li>對數漸近線（$\ln x$，$x=0$，單邊即足）</li>
+      <li>Recap（四句帶走）</li>
+    </ol>
+  </header>
+
+  <!-- 1 intro -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">1</span><span class="uid">intro</span><span class="kind intro">intro</span></div>
+    <p class="narration silent">純品牌開場（Section Gate：章地圖聚焦 §1.4 → 標題 “One-Sided and Infinite Limits” + tagline）。無旁白。</p>
+  </section>
+
+  <!-- 2 two_ways_limits_break -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">2</span><span class="uid">two_ways_limits_break</span><span class="kind motivation">motivation</span></div>
+    <p class="goal">看出 §1.3 的「極限＝單一有限數」會以兩種方式破裂——左右兩側不一致、以及值無界增長——並知道本節先談前者。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">So far, a limit has been a single number that a function settles toward as $x$ approaches a point. Now we meet two ways that clean picture can break down. First, a function can behave differently depending on which side we approach from — sliding in from the left it may head one way, and from the right another. Second, the values might not approach any finite number at all; they can climb without bound. One-sided behavior and runaway values — those are the two new ideas of this section, and we take them in that order.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>一句話的雙主題路線圖：左/右兩側方向不同的小示意 ＋「值衝出畫面」的小示意，點明本節兩條主線。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態即可（roadmap 性質，動態重點留給後續具體單元）。</p>
+    </details>
+  </section>
+
+  <!-- 3 one_sided_definition -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">3</span><span class="uid">one_sided_definition</span><span class="kind definition">definition</span></div>
+    <p class="goal">認得單邊極限的記號與意義：$a^-$＝從小於 $a$ 那側逼近，$a^+$＝從大於 $a$ 那側逼近；兩側可落在不同高度。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">When the two sides disagree, we need language for each side on its own. The left-hand limit, written $\lim_{x \to a^{-}} f(x) = L$, describes what happens as $x$ approaches $a$ through values <em>less</em> than $a$ — the approach from the left. The right-hand limit, $\lim_{x \to a^{+}} f(x) = L$, is the mirror image: $x$ approaches $a$ through values <em>greater</em> than $a$, coming in from the right. The little minus and plus riding on $a$ are the whole notation — they record which side of $a$ you are arriving from. And on a graph that jumps, the left approach can settle at one height while the right approach settles at another.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>一條在 $a$ 處有跳斷的函數圖；左側分支逼近 $a$ 落在高度 $L^-$（空心點）、右側分支落在不同高度 $L^+$（空心點）；標出 $\lim_{x\to a^-}$、$\lim_{x\to a^+}$ 記號。（重繪講義 Figure 1.13 的數學內容。）</p>
+      <p class="anim"><b>動畫：</b>一個點沿左側分支由遠而近滑向 $a$、停在 $L^-$（空心圈標出），再一個點沿右側分支滑向 $a$、停在不同高度 $L^+$（空心圈）；兩高度以淡色水平虛線延伸到 $y$ 軸標出 $L^-\ne L^+$，凸顯「同一個 $a$、兩側落點不同」。</p>
+    </details>
+  </section>
+
+  <!-- 4 two_sided_criterion -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">4</span><span class="uid">two_sided_criterion</span><span class="kind proposition">proposition</span></div>
+    <p class="goal">掌握判準：雙邊極限存在且等於 $L$ ⟺ 兩個單邊極限都等於 $L$；兩側一不合，雙邊極限即不存在。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">How do the two one-sided limits relate to the ordinary, two-sided limit from before? Exactly as you would hope: the two-sided limit equals $L$ if and only if <em>both</em> one-sided limits equal $L$. For the full limit to exist, the function has to approach the same value from both directions. So the moment the left and right limits disagree, the two-sided limit simply does not exist — there is no single number the function is heading toward. This is how one-sided limits earn their keep: they diagnose whether the two-sided limit is there at all.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>判準式卡：$\lim_{x\to a} f = L \iff \lim_{x\to a^-} f = L \text{ and } \lim_{x\to a^+} f = L$；旁註一行「differ $\Rightarrow$ two-sided DNE」。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態即可（可選回放 u3 跳斷圖一拍、標 $L^-\ne L^+ \Rightarrow$ 雙邊 DNE，非必要）。</p>
+    </details>
+  </section>
+
+  <!-- 5 criterion_both_directions -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">5</span><span class="uid">criterion_both_directions</span><span class="kind example">example</span></div>
+    <p class="goal">雙向操作判準：雙邊極限 $\Rightarrow$ 每個單邊（資訊由整體流向兩側）；單一單邊 $\not\Rightarrow$ 雙邊（資訊不足）。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Let us put the criterion to work in both directions. Suppose the two-sided limit of $f$ at $-2$ equals $16$. What must the left-hand limit be? Since the full limit exists, both sides are forced to match it, so the left-hand limit is $16$ as well — information flows from the two-sided limit outward to each side. Now reverse it: suppose all we are told is that the left-hand limit at $-2$ is $16$. Can we name the two-sided limit? No — not enough information. The right side might agree, making the two-sided limit $16$, or it might do something else entirely, in which case the two-sided limit fails to exist. One side alone never settles the question; only both sides together do.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>兩小題並排：(1) given $\lim_{x\to -2} f = 16 \Rightarrow \lim_{x\to -2^-} f = 16$（箭頭：整體 → 單邊）；(2) given $\lim_{x\to -2^-} f = 16 \Rightarrow$ 雙邊「not enough information」（兩種結局：右側合則 $=16$、右側不合則 DNE）。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態逐步揭示即可（此例純邏輯、無函數圖）。</p>
+    </details>
+  </section>
+
+  <!-- 6 jump_example -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">6</span><span class="uid">jump_example</span><span class="kind example">example</span></div>
+    <p class="goal">對具體分段函數算出左右極限（$3$ 與 $2$）、由判準斷定雙邊 DNE，並把它扣回跳斷圖。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Here is a function built from two different formulas, with the split exactly at $x = 2$: it is $x + 1$ when $x$ is below $2$, and $4 - x$ from $2$ onward. Approaching from the left, we are on the first piece, $x + 1$, which heads toward $2 + 1$, that is $3$. Approaching from the right, we are on the second piece, $4 - x$, heading toward $4 - 2$, that is $2$. The left limit is $3$, the right limit is $2$ — they disagree, so by our criterion the two-sided limit at $2$ does not exist. The graph shows the break plainly: the curve jumps at $x = 2$, the left piece ending at height $3$ and the right piece starting at height $2$.</p>
+    <details><summary>視覺／動畫需求　·　§2 代表式涵蓋（保留理由）</summary>
+      <p class="vnote"><b>靜態：</b>分段函數圖 $f(x)=x+1\,(x<2)$、$4-x\,(x\ge2)$；$x=2$ 處跳斷——左支終點 $(2,3)$ 空心圈、右支起點 $(2,2)$ 實心點；標 $\lim_{x\to2^-}=3$、$\lim_{x\to2^+}=2$。（重繪講義 Figure 1.14。）</p>
+      <p class="anim"><b>動畫：</b>兩條直線分支依序畫出；一個點沿左支滑向 $x=2$ 停在 $(2,3)$（空心圈閃出），再一個點沿右支滑向 $x=2$ 停在 $(2,2)$（實心點閃出）；兩高度差以短雙箭頭標出「跳了一格」，凸顯左右落點不同 $\Rightarrow$ 雙邊不存在。</p>
+      <p class="vnote"><b>保留理由：</b>同樣套 u4 判準，但屬不同教學模式（u5 純邏輯推理、本單元具體分段函數計算＋圖），依代表式涵蓋（§2）兩者皆保留。</p>
+    </details>
+  </section>
+
+  <!-- 7 values_blow_up -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">7</span><span class="uid">values_blow_up</span><span class="kind example">example</span></div>
+    <p class="goal">看見 $1/x^2$ 在 $x\to0$ 無界增長：嚴格意義下極限不存在，但「有秩序地衝高」這個失敗模式值得專屬記號。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Now the second kind of breakdown: values that refuse to settle anywhere finite. Take $f(x) = \frac{1}{x^{2}}$ and push $x$ toward $0$. Squaring makes the denominator a tiny positive number, and one over a tiny positive number is huge. Watch the scale: at $x = 0.1$ the value is $100$; at $x = 0.01$ it has already jumped to ten thousand. The closer $x$ gets to $0$, the larger $\frac{1}{x^{2}}$ becomes, with no ceiling at all. There is no finite number $L$ that these values approach, so in the strict sense the limit does not exist — but notice <em>how</em> it fails. The function is not wandering aimlessly; it is climbing without bound, and that orderly blow-up deserves a notation of its own.</p>
+    <details><summary>視覺／動畫需求　·　§3 prose（incorporative lead-in）</summary>
+      <p class="vnote"><b>靜態：</b>$y=1/x^2$ 圖（兩支皆向上衝、夾著 $y$ 軸）；旁附小數值表 $\dfrac{1}{(0.1)^2}=100$、$\dfrac{1}{(0.01)^2}=10{,}000$ 凸顯增速。</p>
+      <p class="anim"><b>動畫：</b>曲線從外側往 $x=0$ 描繪、兩支沿 $y$ 軸節節攀高、衝出畫面頂端；同步數值表逐列亮出（$100 \to 10{,}000$），數字越跳越大，演出「逼近 $0$、值無上限」。</p>
+      <p class="vnote"><b>備註：</b>「Infinite limits」subsec 的 incorporative lead-in 併入本單元開場（§3）。</p>
+    </details>
+  </section>
+
+  <!-- 8 sign_decides_infinity -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">8</span><span class="uid">sign_decides_infinity</span><span class="kind example">example</span></div>
+    <p class="goal">看出「衝向無限」必須兩側同向：$1/x$ 左 $-\infty$、右 $+\infty$ 兩側反向 $\Rightarrow$ 不寫 $=\infty$；$1/x^2$ 兩側同向上 $\Rightarrow$ 可寫 $=\infty$。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">But that orderly blow-up needs the values all running the <em>same</em> way, and $\frac{1}{x}$ shows why. Approach $0$ from the left, where $x$ is negative: $\frac{1}{x}$ is negative and grows huge in magnitude, diving toward minus infinity. Approach from the right, where $x$ is positive: $\frac{1}{x}$ shoots up toward positive infinity. The two sides race off in <em>opposite</em> directions, so there is no single tendency to record — and here we do <em>not</em> write that the limit is infinity. Contrast $\frac{1}{x^{2}}$, where both sides climb the same way, upward: there we are entitled to write that the limit equals infinity. So it comes down to agreement in direction — a same-signed runaway on both sides earns the infinity symbol; a split between the sides does not.</p>
+    <details><summary>視覺／動畫需求　·　§4 repeat-pattern（不重述 setup）</summary>
+      <p class="vnote"><b>靜態：</b>$y=1/x$ 圖：左支沉向 $-\infty$、右支衝向 $+\infty$（兩側反向）；旁並列 $1/x^2$ 縮圖（兩側同向上）。標 $\lim_{x\to0^-}\tfrac1x=-\infty$、$\lim_{x\to0^+}\tfrac1x=+\infty$、雙邊 DNE；$1/x^2$ 標 $=\infty$。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態並排對比即可（兩圖反向 vs 同向的對照本身即教學點，過度動畫反稀釋）。</p>
+      <p class="vnote"><b>備註：</b>緊接 u7 同以 $1/x^n$ 談無限增長，但教學點不同（u7＝無界增長本身、本單元＝方向是否一致決定能否寫 $\infty$）；以一句轉場直接進新內容、不重述 setup（§4）。$\infty$ 記號此處先口語使用，下一單元 u9 才形式定義（忠於書序：先建直覺再形式化）。</p>
+    </details>
+  </section>
+
+  <!-- 9 infinite_limit_definition -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">9</span><span class="uid">infinite_limit_definition</span><span class="kind definition">definition</span></div>
+    <p class="goal">形式化無限極限記號 $\lim_{x\to a} f=\infty$／$=-\infty$，並牢記 $\infty$ 不是數、等式是「無界增長」的速記而非賦值。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Let us make the notation official. When the values of $f$ can be made arbitrarily large by taking $x$ sufficiently close to $a$, we write $\lim_{x \to a} f(x) = \infty$, and we call this an infinite limit. If instead the values grow arbitrarily large in the negative direction, we write $\lim_{x \to a} f(x) = -\infty$. One caution that genuinely matters: the symbol infinity is not a number, and this equation is not claiming the limit <em>is</em> some value. It is shorthand — a compact way to record that the function's values grow without bound, in one definite direction.</p>
+    <details><summary>視覺／動畫需求　·　§3 prose（∞-notation lead-in）</summary>
+      <p class="vnote"><b>靜態：</b>定義卡：$\lim_{x\to a} f(x) = \infty$（值可任意大）／$\lim_{x\to a} f(x) = -\infty$（值任意大負）；醒目附註「$\infty$ is not a number — it records unbounded growth」。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態即可。</p>
+    </details>
+  </section>
+
+  <!-- 10 four_one_sided_cases -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">10</span><span class="uid">four_one_sided_cases</span><span class="kind visual">visual</span></div>
+    <p class="goal">認得單邊無限極限的四種基本型（左/右 × $+\infty$/$-\infty$），每一型都是曲線沿 $x=a$ 衝出畫面上下緣。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Everything we just did has one-sided versions too. The values can run off to infinity as $x$ approaches $a$ from the left alone, or from the right alone, and in either the positive or the negative direction. That gives four basic shapes — left-side up, left-side down, right-side up, right-side down — each one a curve hugging the vertical line at $a$ and sprinting off the top or the bottom of the frame. These four little pictures are the whole vocabulary of how a function can explode on just one side of a point.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>四格小圖（panel）：每格一條曲線貼著垂直線 $x=a$、分別從左/右側衝向 $+\infty$/$-\infty$；標題對應四式 $\lim_{x\to a^\mp} f = \pm\infty$。（重繪講義 Figure 1.15。）</p>
+      <p class="anim"><b>動畫：</b>四格依序亮出，每格曲線沿 $x=a$ 那條虛線快速描繪、衝出該格上緣或下緣，配合該格的單邊記號逐一點亮——把「四型」當成一組詞彙一次建立。</p>
+    </details>
+  </section>
+
+  <!-- 11 vertical_asymptote_definition -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">11</span><span class="uid">vertical_asymptote_definition</span><span class="kind definition">definition</span></div>
+    <p class="goal">掌握垂直漸近線定義：$x=a$ 處至少一個單邊極限為 $\pm\infty$，即稱 $x=a$ 為 $y=f(x)$ 的垂直漸近線——它是無限極限的幾何身影。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">These infinite limits have a familiar geometric name. When a function blows up near $x = a$ — on either side, toward either infinity — the vertical line $x = a$ is called a vertical asymptote of the curve. The graph runs closer and closer to that line without ever touching it, shooting upward or downward right alongside it. So a vertical asymptote is simply the visual signature of an infinite limit: a wall the curve chases but never reaches.</p>
+    <details><summary>視覺／動畫需求　·　§3 prose（bridge lead-in）</summary>
+      <p class="vnote"><b>靜態：</b>定義卡：$x=a$ 為垂直漸近線 $\iff$ $\lim_{x\to a^-} f=\pm\infty$ 或 $\lim_{x\to a^+} f=\pm\infty$（至少一個成立）；附一條垂直虛線與貼線衝高的曲線小圖示意。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態即可（漸近線的「動態貼牆」留給下一單元的具體例子演示）。</p>
+    </details>
+  </section>
+
+  <!-- 12 finding_an_asymptote -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">12</span><span class="uid">finding_an_asymptote</span><span class="kind example">example</span></div>
+    <p class="goal">完整跑一遍「找垂直漸近線」：定位分母零點為候選 $x=3$，左右側各做符號分析得 $\pm\infty$，據定義斷定 $x=3$ 為漸近線。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Let us hunt for an asymptote. Consider $y = \frac{2x}{x - 3}$. A vertical asymptote can only happen where the function misbehaves, and for a fraction that means where the denominator hits zero — here, $x = 3$. So $3$ is our one candidate; now we test it from each side. Coming in from the right, $x - 3$ is a small <em>positive</em> number while the top stays near $6$, and $6$ divided by something tiny and positive is enormous and positive — the limit is plus infinity. From the left, $x - 3$ is small and <em>negative</em>, so the same near-$6$ top over a tiny negative gives minus infinity. Either one-sided infinity is enough on its own, so the line $x = 3$ is a vertical asymptote: the curve rockets up on one side of it and plunges down on the other.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>$y=\frac{2x}{x-3}$ 圖；$x=3$ 處垂直虛線（漸近線）；右支沿線衝 $+\infty$、左支沿線墜 $-\infty$；標 $\lim_{x\to3^+}=\infty$、$\lim_{x\to3^-}=-\infty$。（重繪講義 Figure 1.16。）</p>
+      <p class="anim"><b>動畫：</b>先畫垂直虛線 $x=3$；曲線兩支分別描繪——右支沿虛線右側往上飆出畫面、左支沿虛線左側往下墜出畫面；逼近時各閃示 $x-3$ 的「小正／小負」標記與對應的 $+\infty$／$-\infty$，演出「分母趨零、值沿牆衝走」。</p>
+    </details>
+  </section>
+
+  <!-- 13 zero_denominator_not_enough -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">13</span><span class="uid">zero_denominator_not_enough</span><span class="kind counterexample">counterexample</span></div>
+    <p class="goal">破除「分母為零 $\Rightarrow$ 必有垂直漸近線」的誤解：零分母只是「待查候選」，結果取決於分子（$g=1$ 有漸近線；$g=x^2-9$ 則 $f\equiv1$ 無漸近線）。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">But be careful — a zero in the denominator is only a <em>candidate</em>, not a verdict. Suppose $f(x) = \frac{g(x)}{x^{2} - 9}$ for some function $g$ we have not pinned down, and ask whether $x = -3$ must be an asymptote. The denominator does vanish at $-3$, so it is certainly worth investigating. But the answer hinges on the top. If $g$ is just $1$, then $f = \frac{1}{x^{2} - 9}$ genuinely blows up near $-3$, and yes, there is an asymptote. But if $g$ is itself $x^{2} - 9$, the whole fraction collapses to $1$ everywhere it is defined — a flat line, no asymptote at all. Same zero denominator, opposite outcomes. So a vanishing denominator marks a spot to <em>check</em> with one-sided limits; it is never a guarantee on its own.</p>
+    <details><summary>視覺／動畫需求　·　§2／§3（反例獨立單元）</summary>
+      <p class="vnote"><b>靜態：</b>對照兩列：候選 $x=-3$（$x^2-9=0$）；分支 A $g=1\Rightarrow f=\frac{1}{x^2-9}$ 在 $-3$ 暴增（有漸近線、✓）；分支 B $g=x^2-9\Rightarrow f\equiv1$ 平直（無漸近線、✗）。凸顯「同分母零點、結果相反」。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態對照即可（兩分支「同前提、相反結論」的並列本身即教學點）。</p>
+      <p class="vnote"><b>備註：</b>Example 1.24 是標準「破除誤解」反例，依方法論定為 <code>counterexample</code> 獨立單元；緊接 u12 正例（有漸近線）後，正反相映。</p>
+    </details>
+  </section>
+
+  <!-- 14 log_asymptote -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">14</span><span class="uid">log_asymptote</span><span class="kind example">example</span></div>
+    <p class="goal">看見漸近線不限於有理函數：$\ln x$ 因定義域只在右側、$\lim_{x\to0^+}\ln x=-\infty$，故 $x=0$ 為其垂直漸近線（單邊即足）。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Asymptotes are not just a rational-function story. Take the natural logarithm, $\ln x$. It is only defined for positive inputs, so we can only approach $0$ from the right — and as $x$ slides down toward $0$ from above, $\ln x$ falls without bound, off toward minus infinity. That single one-sided infinite limit is all the definition asks for, so $x = 0$ is a vertical asymptote of the logarithm. Here the curve presses against the $y$-axis from the right, sinking lower and lower the closer it gets.</p>
+    <details><summary>視覺／動畫需求　·　§4 repeat-pattern（不重述 setup）</summary>
+      <p class="vnote"><b>靜態：</b>$y=\ln x$ 圖（僅 $x>0$）；$x=0$（$y$ 軸）為垂直虛線漸近線；曲線右側貼軸下沉；標 $\lim_{x\to0^+}\ln x=-\infty$。（重繪講義 Figure 1.17。）</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態即可（可選曲線沿 $y$ 軸右側往下描繪、貼線下沉的輕動畫，非必要）。</p>
+      <p class="vnote"><b>保留理由：</b>第二個漸近線例，以一句轉場、不重述 setup（§4）；帶來新 flavor（超越函數＋僅單邊可逼近的漸近線），非同型 drill，依代表式涵蓋（§2）保留。</p>
+    </details>
+  </section>
+
+  <!-- 15 recap -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">15</span><span class="uid">recap</span><span class="kind recap">recap</span></div>
+    <p class="goal">四句帶走整節：單邊極限記號、雙邊判準、無限極限與 $\infty$ 記號（同向才寫）、垂直漸近線（候選→單邊極限確認）。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Four ideas to carry out of this section. First, one-sided limits: the left-hand and right-hand limits describe the approach to $a$ from below and from above, written with a little minus or plus riding on $a$. Second, the criterion that ties them together — the two-sided limit exists exactly when both one-sided limits exist and agree; let them disagree, and the limit is gone. Third, infinite limits: when values grow without bound in a single direction we write the limit as plus or minus infinity, always remembering that infinity is not a number but a description of runaway growth. And fourth, vertical asymptotes: a line $x = a$ that the graph chases toward infinity — found by spotting where a function can blow up, then confirming with one-sided limits.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>四張 takeaway 卡：① 單邊極限 $a^-$／$a^+$；② 判準（雙邊 $\iff$ 兩單邊一致；differ $\Rightarrow$ DNE）；③ 無限極限＋$\infty$ 非數（同向才寫 $=\infty$）；④ 垂直漸近線（零分母候選 → 單邊極限確認）。</p>
+      <p class="anim empty"><b>動畫：</b>用 gen-2 既有 <code>recap_cards</code> 模板。</p>
+    </details>
+  </section>
+
+  <!-- 16 outro -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">16</span><span class="uid">outro</span><span class="kind outro">outro</span></div>
+    <p class="narration silent">品牌收尾（暗轉亮橋接 → 最終 logo 字卡）。無旁白。</p>
+  </section>
+
+  <footer>
+    來源權威檔：<code>experiments/handout_kit/chapter1-print-standalone.html</code> §1.4　·　內容稿：<code>video/content_scripts/ch01_one_sided_infinite.md</code><br>
+    全節環境：Definition 1.10、Figure 1.13、Proposition 1.5（Criterion）、Example 1.19、Example 1.20（+Figure 1.14）、Example 1.21、Example 1.22、Definition 1.11、Figure 1.15、Definition 1.12、Example 1.23（+Figure 1.16）、Example 1.24、Example 1.25（+Figure 1.17）　·　<span class="count">14 段</span>待認可旁白
+  </footer>
+
+</div>
+</body>
+</html>

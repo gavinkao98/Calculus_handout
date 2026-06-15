@@ -571,8 +571,9 @@ def main() -> int:
         raise SystemExit(f"Unknown layer(s) {bad}. Choose from {list(_RUBRIC)}.")
 
     storyboard = load_storyboard(args.storyboard)
-    deck_id = storyboard["meta"]["id"]
-    out_dir = _bootstrap.REPO_ROOT / "video" / "output" / "review" / deck_id
+    meta = storyboard["meta"]
+    deck_id = meta["id"]
+    out_dir = _bootstrap.section_output_dir(meta) / "review"
 
     _, packets = build_packets(args.storyboard, layers, args.tex)
     if not packets:

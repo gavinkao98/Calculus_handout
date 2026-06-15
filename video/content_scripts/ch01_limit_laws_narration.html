@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§1.5 Limit Laws and Computational Techniques — 旁白審核稿</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --ink:#1c2230; --ink-soft:#5c6678; --paper:#f7f5ef; --card:#ffffff;
+    --line:#e3ddd0; --accent:#2f6f6a; --accent-soft:#e7f0ef;
+    --kicker:#9a6a3a; --warn:#a23b2c; --rule:#c9c1b1;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:48px 28px 96px}
+  header.top{border-bottom:2px solid var(--ink); padding-bottom:20px; margin-bottom:8px}
+  .eyebrow{font-size:.82rem; letter-spacing:.14em; text-transform:uppercase; color:var(--kicker); font-weight:700}
+  h1{font-size:2rem; margin:.25em 0 .15em; line-height:1.15}
+  .tagline{font-style:italic; color:var(--ink-soft); font-size:1.12rem; margin:0}
+  .meta-note{font-size:.92rem; color:var(--ink-soft); margin-top:14px; padding:12px 16px; background:var(--accent-soft); border-radius:8px; border:1px solid #d3e2e0}
+  .meta-note strong{color:var(--accent)}
+  .flow{font-size:.86rem; color:var(--ink-soft); margin:18px 0 0; padding-left:1.1em}
+  .flow li{margin:.15em 0}
+  section.unit{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:22px 26px; margin:26px 0; box-shadow:0 1px 2px rgba(0,0,0,.03)
+  }
+  .uhead{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:14px}
+  .unum{font-weight:700; color:var(--accent); font-size:1.05rem}
+  .uid{font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:.92rem; color:var(--ink)}
+  .kind{margin-left:auto; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .kind.intro,.kind.outro{background:var(--ink-soft)}
+  .kind.recap{background:var(--kicker)}
+  .kind.counterexample{background:var(--warn)}
+  .kind.proposition{background:#586a8a}
+  .kind.theorem{background:#7a5aa0}
+  .kind.example{background:#3a6ea2}
+  .kind.procedure{background:#2f6f6a}
+  .goal{font-size:.92rem; color:var(--ink-soft); margin:0 0 14px}
+  .goal::before{content:"教學目標　"; font-weight:700; color:var(--ink); letter-spacing:.04em}
+  .narr-label{font-size:.74rem; letter-spacing:.12em; text-transform:uppercase; color:var(--kicker); font-weight:700; margin-bottom:6px}
+  .narration{font-size:1.12rem; line-height:1.72; padding:4px 0 6px}
+  .silent{color:var(--ink-soft); font-style:italic; font-size:1rem}
+  details{margin-top:14px; border-top:1px dashed var(--rule); padding-top:12px}
+  summary{cursor:pointer; font-size:.82rem; color:var(--ink-soft); letter-spacing:.04em; user-select:none}
+  summary:hover{color:var(--accent)}
+  .vnote{font-size:.92rem; color:var(--ink); margin:.5em 0}
+  .vnote b{color:var(--accent)}
+  .anim{font-size:.92rem; color:var(--ink); margin:.5em 0}
+  .anim b{color:var(--kicker)}
+  .vnote.empty,.anim.empty{color:var(--ink-soft); font-style:italic}
+  footer{margin-top:40px; padding-top:20px; border-top:2px solid var(--ink); font-size:.9rem; color:var(--ink-soft)}
+  .count{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Chapter 1 · Section 1.5 · 旁白審核稿</div>
+    <h1>Limit Laws and Computational Techniques</h1>
+    <p class="tagline">Which limits can we just compute — and what do we do when substitution fails?</p>
+    <div class="meta-note">
+      這是 §1.5 教學影片的<strong>旁白稿（✅ 使用者 2026-06-14 認可）</strong>（內容稿 <code>ch01_limit_laws.md</code> 的可讀版）。
+      共 <strong>17 段</strong>有聲旁白（intro／outro 純動畫無旁白）。下一步進工程稿（模板化＋成片）。每張卡片下方可展開該單元的<strong>視覺／動畫需求</strong>。
+      <br><br>本節 ~75% 符號，套 <strong>§5 symbol-heavy 條件化視覺</strong>：squeeze 幾何＝anchor（#13）＋其 in-action $x^2\sin(1/x)$（#14）；floor 跳斷＝唯一對比視覺（#12）；
+      代數例題（#4／#6／#8／#9／#10／#17）與 squeeze 第二例（#15，$|x|$ 變體）<strong>一律不配圖</strong>，符號本身就是 beat。
+      <br><br>撰稿後已過<strong>六-lens 對抗式稽核</strong>（faithfulness／decomposition／register／no-repeat／math-accuracy／completeness，11 agents）＋逐 finding 獨立對抗式驗證：
+      <strong>math 0 錯、0 blocking、0 L1、0 幻覺</strong>。兩條 author's-call advisory <strong>已依使用者裁決採納</strong>——
+      ① Ex 1.35 拆回獨立 <strong>#15</strong> squeeze 第二例（$x\cos\frac1x$、$|x|$ 變體，共 19 單元）；② #15 末句採口語收尾「you can check it for yourself — it runs exactly the same way」。詳見內容稿 §7 稽核紀錄。
+    </div>
+    <ol class="flow">
+      <li>動機：從「猜」極限（表格／圖）轉向「算」極限（代數規則）</li>
+      <li>極限律（Theorem 1.2）：和／差／常數倍／積／商／次方</li>
+      <li>抽象套律：無 $f$ 公式仍能算（$\to -4$）</li>
+      <li>直接代入（Prop 1.6）：多項式／有理函數代進去就好</li>
+      <li>直接代入實作（$\to 1$）</li>
+      <li>為何 $\tfrac00$ 不定：可以是任何值 → 必須先化簡</li>
+      <li>化簡①因式分解約去（$\tfrac{x-1}{x^2-1}\to\tfrac12$）</li>
+      <li>化簡②有理化（$\tfrac{\sqrt{t^2+9}-3}{t^2}\to\tfrac16$）</li>
+      <li>化簡③通分合併（$\to-\tfrac{32}{9}$）</li>
+      <li>Piecewise 兩側一致（$\lim|x|=0$）</li>
+      <li>Piecewise 兩側相異 → DNE（floor $[x]$ 跳階）</li>
+      <li>夾擠定理（Theorem 1.3）：被夾在同極限兩函數間</li>
+      <li>夾擠 in-action（$x^2\sin\tfrac1x\to0$，包絡捏到原點）</li>
+      <li>夾擠第二例（$x\cos\tfrac1x\to0$；$|x|$ 變體、同手法不同界）</li>
+      <li>Strategy 1.2：五步決策流程</li>
+      <li>綜合：用「極限存在」反推常數 $a=\tfrac72$（$\to\tfrac16$）</li>
+      <li>Recap（四句帶走工具箱）</li>
+    </ol>
+  </header>
+
+  <!-- 1 intro -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">1</span><span class="uid">intro</span><span class="kind intro">intro</span></div>
+    <p class="narration silent">純品牌開場（Section Gate：章地圖聚焦 §1.5 → 標題 “Limit Laws and Computational Techniques” + tagline）。無旁白。</p>
+  </section>
+
+  <!-- 2 from_guessing_to_computing -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">2</span><span class="uid">from_guessing_to_computing</span><span class="kind motivation">motivation</span></div>
+    <p class="goal">理解本節的轉向——從用表格／圖像「猜」極限，改為用一組代數規則「算」極限。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Up to now, every limit we have found came from a guess. We built a table of values, or we read a graph, and we inferred where the function seemed to be heading. That works, but it is slow, and it is never quite certain. In this section we change tactics: we collect a handful of algebraic rules that let us compute limits directly, with no table and no graph. These rules can be justified rigorously once we have the precise definition of a limit — that comes a little later — but even now, before any proof, they give us a dependable tool-kit for the limits we meet in practice.</p>
+    <details><summary>視覺／動畫需求　·　向前語意 fold（不報節號）</summary>
+      <p class="vnote"><b>靜態：</b>左側帶洞數值表／粗草圖（標「guess」），右側一行代數運算直達答案（標「compute」），中間箭頭由表格指向算式。</p>
+      <p class="anim"><b>動畫：</b>左邊數值表逐列填、停在問號；箭頭亮起後右邊一行代數一筆寫到底、落在確定答案，凸顯「不再靠猜」。</p>
+    </details>
+  </section>
+
+  <!-- 3 limit_laws -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">3</span><span class="uid">limit_laws</span><span class="kind theorem">theorem</span></div>
+    <p class="goal">掌握極限律——只要兩個極限都存在，和／差／常數倍／積／商／整數次方的極限就等於各別極限的相同組合（商需分母極限非零）。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Here is the heart of the tool-kit. Suppose both $\lim_{x \to a} f(x)$ and $\lim_{x \to a} g(x)$ exist. Then the limit slips straight through the basic operations. The limit of a sum is the sum of the limits; the same holds for a difference, and for a constant times a function. The limit of a product is the product of the limits. The limit of a quotient is the quotient of the limits — with one proviso: the denominator's limit must not be zero. And raising to a positive integer power behaves the same way, the limit of $[f(x)]^n$ being just $[\lim_{x \to a} f(x)]^n$. In plain words: every operation you already know commutes with taking the limit, as long as the individual pieces have limits to begin with.</p>
+    <details><summary>視覺／動畫需求　·　不逐字念表（§4）</summary>
+      <p class="vnote"><b>靜態：</b>極限律總表（六條：sum／difference／constant multiple／product／quotient〔標 “if $\lim g\ne0$”〕／power〔$n$ 正整數〕），左欄式、右欄白話。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態表即可（逐條揭示由模板承載）。</p>
+    </details>
+  </section>
+
+  <!-- 4 apply_laws_abstractly -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">4</span><span class="uid">apply_laws_abstractly</span><span class="kind example">example</span></div>
+    <p class="goal">看出極限律是「結構性」的——只知道一個極限值、沒有 $f$ 的公式，仍能算出一整個組合式的極限。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Let us put the laws to work in a case where we are handed almost nothing. Suppose all we know is that $f(x) \to -1$ as $x \to -1$ — no formula, just that one limit. Can we still evaluate $\lim_{x \to -1} \frac{x f(x) + 3}{2 f(x) + 1}$? We can, entirely through the laws. By the product law, $x f(x)$ tends to $(-1)(-1)$, which is $1$, so the numerator tends to $1 + 3 = 4$. The denominator, $2 f(x) + 1$, tends to $2(-1) + 1$, which is $-1$ — and, crucially, that is not zero, so the quotient law is allowed. The whole expression tends to $4$ over $-1$, or $-4$. Notice we never needed to know what $f$ actually is; the laws carried the entire computation.</p>
+    <details><summary>視覺／動畫需求　·　§5 純符號不配圖</summary>
+      <p class="vnote"><b>靜態：</b>已知 $\lim_{x\to-1}f=-1$；分子 $xf(x)\to(-1)(-1)=1$、$+3\to4$；分母 $2f(x)+1\to-1$（標「$\ne0$ ✓ → quotient law」）；結論 $\tfrac{4}{-1}=-4$。</p>
+      <p class="anim empty"><b>動畫：</b>無——符號推理本身就是 beat。</p>
+    </details>
+  </section>
+
+  <!-- 5 direct_substitution -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">5</span><span class="uid">direct_substitution</span><span class="kind proposition">proposition</span></div>
+    <p class="goal">知道極限律的直接推論——多項式、以及分母在 $a$ 不為零的有理函數，求極限就是把數字代進去（直接代入）。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">The laws have one immediate, very useful payoff. Begin with two facts that are almost self-evident: as $x$ approaches $a$, the function $x$ approaches $a$, and therefore $x^n$ approaches $a^n$. Feed those into the sum and product laws, and a whole class of functions falls into line. For any polynomial $p$, the limit as $x \to a$ is simply $p(a)$ — you get it by substitution. And for a rational function, a ratio of two polynomials, the same is true wherever the denominator is not zero at $a$: the limit is just the function's value there. So for polynomials and well-behaved rational functions, finding a limit is nothing more than plugging in the number. We call that direct substitution, and it should always be the first thing you try.</p>
+    <details><summary>視覺／動畫需求</summary>
+      <p class="vnote"><b>靜態：</b>基石 $\lim_{x\to a}x=a$、$\lim_{x\to a}x^n=a^n$；推論 $\lim p(x)=p(a)$、$\lim r(x)=r(a)$（標「if $r(a)$ defined」）；底部標語「direct substitution — try this first」。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態即可。</p>
+    </details>
+  </section>
+
+  <!-- 6 direct_sub_in_action -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">6</span><span class="uid">direct_sub_in_action</span><span class="kind example">example</span></div>
+    <p class="goal">在分母不為零的有理函數上實際執行直接代入。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Take it for a spin on $\lim_{x \to 1} \frac{x^3 + 2x^2 - 1}{5 - 3x}$. Top and bottom are both polynomials, so each we evaluate by substitution. The numerator at $x = 1$ is $1 + 2 - 1$, which is $2$; the denominator is $5 - 3$, also $2$. The denominator's limit is two, not zero, so the quotient law applies and the answer is $2$ over $2$ — simply $1$. No table, no graph: one substitution and a glance at the denominator.</p>
+    <details><summary>視覺／動畫需求　·　§4 repeat-pattern 不重述 setup</summary>
+      <p class="vnote"><b>靜態：</b>$\lim_{x\to1}\tfrac{x^3+2x^2-1}{5-3x}$；分子 $\to1+2-1=2$、分母 $\to5-3=2$（標「$\ne0$」）；結論 $\tfrac{2}{2}=1$。</p>
+      <p class="anim empty"><b>動畫：</b>無——§5 純符號不配圖。</p>
+    </details>
+  </section>
+
+  <!-- 7 why_zero_over_zero -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">7</span><span class="uid">why_zero_over_zero</span><span class="kind counterexample">counterexample</span></div>
+    <p class="goal">理解 $\tfrac00$ 為何叫「不定式」——上下都趨零並不能決定比值，它可以是任何結果——因此判斷前必須先化簡。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Substitution is not always so kind. Very often the top and the bottom both head to zero, and you are left staring at zero over zero. The temptation is to call that one, or maybe zero — but neither is right, and here is why. Suppose $f$ and $g$ both tend to zero as $x \to 3$; what can their ratio do? If $f$ is ten times $g$ — say $f(x) = 10(x - 3)$ and $g(x) = x - 3$ — the ratio is ten everywhere, so the limit is ten. Replace ten by any constant you please, and the limit is that constant. Make the bottom shrink faster and the ratio blows up to infinity; flip a sign and it runs to minus infinity; pit $x - 3$ against $|x - 3|$ and the limit fails to exist at all. So zero over zero can come out as anything — which is precisely what indeterminate means. It is not an answer; it is a signal that we must reshape the expression before the limit will reveal itself.</p>
+    <details><summary>視覺／動畫需求　·　概念反例（§7）</summary>
+      <p class="vnote"><b>靜態：</b>中央大字 $\tfrac00$ 標「indeterminate」；四分岔卡：$\tfrac{10(x-3)}{x-3}\to10$（任意 $c$）、$\to+\infty$、$\to-\infty$、$\tfrac{x-3}{|x-3|}$ → DNE；底部「$\tfrac00$ = a signal to simplify, not an answer」。</p>
+      <p class="anim"><b>動畫：</b>中央 $\tfrac00$ 迸出四分支，各落不同結局（$c$／$+\infty$／$-\infty$／DNE）依序亮起，凸顯「同是 $\tfrac00$、答案卻可任何」。</p>
+    </details>
+  </section>
+
+  <!-- 8 factor_and_cancel -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">8</span><span class="uid">factor_and_cancel</span><span class="kind example">example</span></div>
+    <p class="goal">用「因式分解、約去」處理 $\tfrac00$ 不定式——消掉製造零的公因式後再代入。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">So when substitution gives zero over zero, our job is to rewrite the expression into a form substitution can handle — and the cleanest tool is factoring. Take $\lim_{x \to 1} \frac{x - 1}{x^2 - 1}$. Put in one and you get zero over zero, so factor the bottom: $x^2 - 1$ is $(x - 1)(x + 1)$. Now the troublesome $x - 1$ cancels top and bottom, and away from $x = 1$ the expression is just $\frac{1}{x + 1}$. That cancelled form agrees with the original at every point near one — which is all a limit ever looks at — so we substitute into it: $\frac{1}{1 + 1}$, one half. The factor that was forcing the zero is gone, and the limit simply appears.</p>
+    <details><summary>視覺／動畫需求　·　$x\ne1$ 忠實保留</summary>
+      <p class="vnote"><b>靜態：</b>$\tfrac{x-1}{x^2-1}\xrightarrow{\text{sub}}\tfrac00$；分解 $x^2-1=(x-1)(x+1)$；約去 $x-1$ → $\tfrac{1}{x+1}$（標「$x\ne1$」）；代入 $\tfrac{1}{1+1}=\tfrac12$。</p>
+      <p class="anim empty"><b>動畫：</b>無——§5 純符號（<code>derivation</code> 模板逐行揭示）。</p>
+    </details>
+  </section>
+
+  <!-- 9 rationalize_numerator -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">9</span><span class="uid">rationalize_numerator</span><span class="kind example">example</span></div>
+    <p class="goal">用「有理化（乘共軛）」處理含根號的 $\tfrac00$——清掉根號、逼出可約的公因式。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Factoring is not the only way to break a zero over zero. When a square root is in the way, the move is to rationalise. Consider $\lim_{t \to 0} \frac{\sqrt{t^2 + 9} - 3}{t^2}$ — again zero over zero. Multiply top and bottom by the conjugate, $\sqrt{t^2 + 9} + 3$. The numerator becomes a difference of squares, $t^2 + 9 - 9$, which is just $t^2$ — and that $t^2$ cancels the one downstairs. What is left is $\frac{1}{\sqrt{t^2 + 9} + 3}$, and now substitution is harmless: at $t = 0$ the root is three, giving $\frac{1}{3 + 3}$, one sixth. The conjugate did the same job the factoring did — it exposed the hidden factor and let it cancel away.</p>
+    <details><summary>視覺／動畫需求　·　§4 repeat-pattern</summary>
+      <p class="vnote"><b>靜態：</b>$\tfrac{\sqrt{t^2+9}-3}{t^2}\xrightarrow{\text{sub}}\tfrac00$；乘共軛 $\tfrac{\sqrt{t^2+9}+3}{\sqrt{t^2+9}+3}$；分子 $t^2+9-9=t^2$ 約去 → $\tfrac{1}{\sqrt{t^2+9}+3}$；代入 $\tfrac{1}{3+3}=\tfrac16$。</p>
+      <p class="anim empty"><b>動畫：</b>無——§5 純符號不配圖。</p>
+    </details>
+  </section>
+
+  <!-- 10 combine_fractions -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">10</span><span class="uid">combine_fractions</span><span class="kind example">example</span></div>
+    <p class="goal">用「先通分合併內層分數」處理複合分數的 $\tfrac00$——合併後浮現可約的公因式。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">One more flavour of the same idea, for when the expression is a pile of fractions. Look at the limit as $t$ approaches one half of $\frac{\frac{1}{3t^2} + \frac{1}{t^2 - 1}}{2t - 1}$. Substitution gives zero over zero once again. The fix is to tidy the numerator first: put the two inner fractions over the common denominator $3t^2(t^2 - 1)$, and the top collects into $4t^2 - 1$ — which factors as $(2t - 1)(2t + 1)$. There is our cancelling factor: the $2t - 1$ on top kills the $2t - 1$ in the main denominator. Substitute $t = \tfrac12$ into what remains, and the limit works out to $-\tfrac{32}{9}$. Three examples, one lesson: before a stubborn limit will budge, reshape it by algebra until the factor forcing the zero cancels away.</p>
+    <details><summary>視覺／動畫需求　·　三例綜合 takeaway</summary>
+      <p class="vnote"><b>靜態：</b>$\tfrac{\frac{1}{3t^2}+\frac{1}{t^2-1}}{2t-1}\xrightarrow{\text{sub}}\tfrac00$；通分 $=\tfrac{4t^2-1}{3t^2(t^2-1)}=\tfrac{(2t-1)(2t+1)}{3t^2(t^2-1)}$；約去 $2t-1$ → $\tfrac{2t+1}{3t^2(t^2-1)}$；代入 $t=\tfrac12$ → $-\tfrac{32}{9}$。</p>
+      <p class="anim empty"><b>動畫：</b>無——§5 純符號不配圖。</p>
+    </details>
+  </section>
+
+  <!-- 11 piecewise_limits_agree -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">11</span><span class="uid">piecewise_limits_agree</span><span class="kind example">example</span></div>
+    <p class="goal">用「兩個單側極限，各在自己的分支上算，再檢查是否一致」處理 piecewise 函數的極限。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Not every function comes as a single formula. Some are defined in pieces, with different rules on different sides — and there the trick is to take the limit one side at a time. The plainest example is the absolute value, $|x|$, as $x$ approaches zero. To its right, $|x|$ is just $x$, which heads to zero. To its left, $|x|$ is $-x$, which also heads to zero. The two one-sided limits agree — both are zero — so the full two-sided limit exists and equals zero. The recipe is general: for a piecewise function, work out the limit from each side on the branch that applies there, and the ordinary limit exists exactly when those two answers match.</p>
+    <details><summary>視覺／動畫需求　·　§1.4 callback（不報節號）</summary>
+      <p class="vnote"><b>靜態：</b>$|x|=\begin{cases}x,&amp;x\ge0\\-x,&amp;x&lt;0\end{cases}$；$\lim_{x\to0^+}|x|=0$、$\lim_{x\to0^-}|x|=0$；兩側相等 → $\lim_{x\to0}|x|=0$。</p>
+      <p class="anim empty"><b>動畫：</b>無——簡單對稱，真跳斷動態留給 #12。</p>
+    </details>
+  </section>
+
+  <!-- 12 floor_function_jump -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">12</span><span class="uid">floor_function_jump</span><span class="kind example">example</span></div>
+    <p class="goal">看一個兩側單側極限相異的 piecewise 情形——最大整數函數在每個整數跳一階——所以極限不存在。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">The same one-sided approach also tells us when a limit does not exist. Meet the greatest integer function, written $[x]$: it rounds down to the nearest integer, so $[4]$, $[4.1]$, and $[4.8]$ are all four. Ask for its limit as $x$ approaches three. Coming from the right, $x$ sits just above three, so $[x]$ is three. Coming from the left, $x$ sits just below three — not yet arrived — so $[x]$ is only two. The two sides give different answers, three and two, so the limit at three does not exist. And the staircase shows you why: at every integer the function leaps up by a whole step, and no single value can bridge a jump.</p>
+    <details><summary>視覺／動畫需求　·　§5 唯一對比視覺（Figure 1.18）</summary>
+      <p class="vnote"><b>靜態：</b>$y=[x]$ 階梯圖（每整數一階、左實心右空心端點）；focus $x=3$：右側階值 $3$（實心 $(3,3)$）、左側階值 $2$（空心 $(3,2)$）；兩虛線拉到 $y$ 軸標 $3$、$2$；標「jump $=1$ → limit DNE」。（重繪 Figure 1.18。）</p>
+      <p class="anim"><b>動畫：</b>兩動點同時逼近 $x=3$：右沿 $y=3$ 階滑近 $(3,3)$（實心）、左沿 $y=2$ 階滑近 $(3,2)$（空心）；停住時兩水平虛線夾出大小 $1$ 縫隙閃示，凸顯「跨不過跳階 → 不存在」。</p>
+    </details>
+  </section>
+
+  <!-- 13 squeeze_theorem -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">13</span><span class="uid">squeeze_theorem</span><span class="kind theorem">theorem</span></div>
+    <p class="goal">掌握夾擠定理——若一函數被夾在兩個有共同極限 $L$ 的函數之間，它被迫趨於同一個 $L$——用於極限律無法施力的情形。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Here is a technique for limits the laws simply cannot reach. Sometimes a function is built from a piece that has no limit at all, so the product or quotient laws are off the table. The squeeze theorem rescues exactly these cases, and the picture is the whole idea. Suppose our function $f$ is trapped between a lower function $g$ and an upper function $h$ for all $x$ near $a$. If $g$ and $h$ are themselves both heading to the same value $L$ as $x \to a$, then $f$, caught between them, has nowhere else to go — it is squeezed to $L$ as well. The two outer functions close in like a vice, and whatever is pinned between them is dragged to the same limit.</p>
+    <details><summary>視覺／動畫需求　·　§5 anchor 視覺（Figure 1.19）</summary>
+      <p class="vnote"><b>靜態：</b>上界 $h$、下界 $g$ 在 $x=a$ 處交會於高度 $L$；中間 $f$（可帶輕微擺動）被夾住、同抵 $(a,L)$；標 $g\le f\le h$、$\lim g=\lim h=L$。（重繪 Figure 1.19。）</p>
+      <p class="anim"><b>動畫：</b>$h$ 與 $g$ 自兩側朝 $(a,L)$ 收攏、像鉗子般夾近；夾縫中的 $f$ 被擠得越來越窄、最後釘在 $(a,L)$；交會點短暫高亮。</p>
+    </details>
+  </section>
+
+  <!-- 14 squeeze_in_action -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">14</span><span class="uid">squeeze_in_action</span><span class="kind example">example</span></div>
+    <p class="goal">把夾擠定理套到 $x^2\sin(1/x)$——用 $\pm x^2$ 夾住狂震的振盪、兩界皆趨零——並看見包絡把它捏到原點。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Let us watch the squeeze catch a genuinely wild function: $\lim_{x \to 0} x^2 \sin\!\frac{1}{x}$. The factor $\sin\frac1x$ oscillates faster and faster as $x$ nears zero — it has no limit, so the product law is useless. But it never escapes the band between minus one and one. Multiply that bound by $x^2$, which is never negative, and we get $-x^2 \le x^2 \sin\frac1x \le x^2$. Now both bounding functions, $-x^2$ and $x^2$, go to zero as $x \to 0$ — so the squeeze theorem pins our function to zero as well. The parabola $x^2$ and its mirror $-x^2$ form a closing envelope, and the frantic wiggling of the curve is trapped inside it, forced right down to the origin.</p>
+    <details><summary>視覺／動畫需求　·　§5 anchor 的 in-action（Figure 1.20；Ex 1.35 已拆為 #15）</summary>
+      <p class="vnote"><b>靜態：</b>$y=x^2$、$y=-x^2$ 兩拋物線包絡；$y=x^2\sin(1/x)$ 在其間越近 $0$ 振盪越密、被夾向原點；標 $-x^2\le x^2\sin\frac1x\le x^2$、$\lim(\pm x^2)=0$ → 夾擠 $\to0$。（重繪 Figure 1.20。）</p>
+      <p class="anim"><b>動畫：</b>先畫 $\pm x^2$ 包絡；$x^2\sin(1/x)$ 由外向 $0$ trace、振盪越收越密；包絡朝原點夾合、把曲線捏到 $(0,0)$。</p>
+    </details>
+  </section>
+
+  <!-- 15 squeeze_abs_value_bound -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">15</span><span class="uid">squeeze_abs_value_bound</span><span class="kind example">example</span></div>
+    <p class="goal">把夾擠再用一次，但抓住關鍵差異——前面的因式可能為負時，包絡要用 $\pm|x|$（而非 $\pm x^2$）：同手法、不同界。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Let us run the squeeze once more, on $\lim_{x \to 0} x \cos\frac1x$, because it hides one subtlety worth seeing. Cosine, like sine, stays between minus one and one. But here is the twist: last time the bound was multiplied by $x^2$, which is never negative, so the inequality kept its direction. This time the multiplier is plain $x$, which can be negative — and multiplying an inequality by a negative number flips it. The clean way around that is to bound the size instead: since $|\cos\frac1x| \le 1$, we have $|x \cos\frac1x| \le |x|$, that is, $-|x| \le x \cos\frac1x \le |x|$. Both $\pm|x|$ go to zero, and you can check it for yourself — it runs exactly the same way, squeezing $x \cos\frac1x$ down to zero. Same method as before; only the envelope changed — reach for $|x|$ whenever the factor out front might be negative.</p>
+    <details><summary>視覺／動畫需求　·　§2 拆回獨立第二例（使用者 2026-06-14 認可）</summary>
+      <p class="vnote"><b>靜態：</b>與 #14 並列「同手法、不同界」：$|\cos\frac1x|\le1$ → $-|x|\le x\cos\frac1x\le|x|$；包絡由 $\pm x^2$（#14）換成 $\pm|x|$（因 $x$ 可負、不能直接乘 $x$）；$\lim(\pm|x|)=0$ → 夾擠 $\to0$。</p>
+      <p class="anim empty"><b>動畫：</b>無——§5 純符號，教學點是「界的選擇」。可選對比 $\pm|x|$ 的 V 形包絡 vs #14 的 $\pm x^2$ 拋物線包絡並置（講義未繪、預設不加）。</p>
+    </details>
+  </section>
+
+  <!-- 16 strategy_computing_limits -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">16</span><span class="uid">strategy_computing_limits</span><span class="kind procedure">procedure</span></div>
+    <p class="goal">擁有一套「遇到任何極限該怎麼下手」的決策流程——依序試：直接代入 → 化簡 → 單側 → 夾擠 → 無界判 $\pm\infty$／漸近線。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">We now have enough tools to lay out a game plan for almost any limit you will meet. First, always try direct substitution — for a polynomial, or a rational function with a nonzero denominator, you are finished on the spot. If substitution gives an indeterminate form like zero over zero, simplify before you judge: factor and cancel, rationalise a root, or combine fractions until the troublesome factor disappears. If the function is piecewise, take the limit from each side and check that the two agree. If it is trapped between two functions that share a limit, reach for the squeeze theorem. And if the values simply grow without bound, the limit is plus or minus infinity, and the line $x = a$ is a vertical asymptote. Run down that list in order, and most limits will tell you which tool they need.</p>
+    <details><summary>視覺／動畫需求　·　判斷型 strategy 不拆分（§3）</summary>
+      <p class="vnote"><b>靜態：</b>編號決策清單（五步，祈使句）：① direct substitution；② indeterminate → simplify（factor／rationalise／combine）；③ piecewise → one-sided, check agreement；④ trapped → squeeze；⑤ unbounded → $\pm\infty$, vertical asymptote $x=a$。</p>
+      <p class="anim empty"><b>動畫：</b>無——靜態編號清單（逐步揭示由 <code>procedure_steps</code> 模板承載）。</p>
+    </details>
+  </section>
+
+  <!-- 17 forcing_existence -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">17</span><span class="uid">forcing_existence</span><span class="kind example">example</span></div>
+    <p class="goal">一個綜合題——用「極限必須存在」這個要求反推未知常數（分母趨零處分子也須趨零），再用本節技巧把極限算出來。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Let us finish with a problem that turns the whole section on its head. We want the limit $\lim_{x \to -2} \frac{x^2 + a x + 3}{x^2 + x - 2}$ to exist, and we get to choose the constant $a$ to make that happen. The denominator factors as $(x + 2)(x - 1)$, which goes to zero at $x = -2$. If the numerator went to anything other than zero there, the fraction would blow up and the limit would fail — so the numerator is forced to vanish at $x = -2$ as well. Setting it to zero, $4 - 2a + 3 = 0$, pins down $a = \tfrac{7}{2}$. With that value the numerator factors as $(x + 2)(x + \tfrac{3}{2})$, the common $x + 2$ cancels, and substituting $x = -2$ into what is left gives $\frac{-\frac{1}{2}}{-3}$, or one sixth. Look at the shape of the reasoning: the bare demand that the limit exist fixed the constant, and then the routine techniques of this section finished the job.</p>
+    <details><summary>視覺／動畫需求　·　全節綜合收束（§5 純符號不配圖）</summary>
+      <p class="vnote"><b>靜態：</b>目標「$\lim_{x\to-2}\tfrac{x^2+ax+3}{x^2+x-2}$ exists」；分母 $(x+2)(x-1)\to0$；推理「分子也須 $\to0$」→ $4-2a+3=0$ → $a=\tfrac72$；代回 $(x+2)(x+\tfrac32)$ 約去 $x+2$ → $\tfrac{x+\frac32}{x-1}$ → $\tfrac{-\frac12}{-3}=\tfrac16$。</p>
+      <p class="anim empty"><b>動畫：</b>無——推理鏈本身就是 beat（<code>derivation</code> 模板）。</p>
+    </details>
+  </section>
+
+  <!-- 18 recap -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">18</span><span class="uid">recap</span><span class="kind recap">recap</span></div>
+    <p class="goal">四句帶走整個工具箱：極限律＋直接代入、$\tfrac00$ 則化簡、piecewise 則單側、被夾則夾擠。</p>
+    <div class="narr-label">Narration</div>
+    <p class="narration">Here is the whole tool-kit in one breath. First, when the limits exist they pass through sums, products, quotients, and powers — and for polynomials and honest rational functions that just means you substitute the number. Second, when substitution gives zero over zero, do not panic: factor, rationalise, or combine fractions until the troublesome factor cancels, then substitute. Third, for a function built in pieces, take the limit from each side and check they agree — when they disagree, as they do across a jump, the limit does not exist. And fourth, when a function is pinned between two others that share a limit, the squeeze theorem hands you that limit for free. Reach for them roughly in that order, and very few limits will hold out.</p>
+    <details><summary>視覺／動畫需求　·　與 #16 分層（concepts vs procedure）</summary>
+      <p class="vnote"><b>靜態：</b>四張 takeaway 卡：① 極限律 → 多項式／有理函數直接代入；② $\tfrac00$ → 化簡（factor／rationalise／combine）再代入；③ piecewise → 兩側單側，相異則 DNE；④ 被夾且兩界同極限 → squeeze。</p>
+      <p class="anim empty"><b>動畫：</b>用 gen-2 既有 <code>recap_cards</code> 模板。</p>
+    </details>
+  </section>
+
+  <!-- 19 outro -->
+  <section class="unit">
+    <div class="uhead"><span class="unum">19</span><span class="uid">outro</span><span class="kind outro">outro</span></div>
+    <p class="narration silent">品牌收尾（暗轉亮橋接 → 最終 logo 字卡）。無旁白。</p>
+  </section>
+
+  <footer>
+    來源權威檔：<code>experiments/handout_kit/chapter1-print-standalone.html</code> §1.5　·　內容稿：<code>video/content_scripts/ch01_limit_laws.md</code><br>
+    全節環境：Theorem 1.2–1.3、Proposition 1.6、Example 1.26–1.36、Strategy 1.2、Figure 1.18–1.20　·　<span class="count">17 段</span>已認可旁白（19 單元）
+  </footer>
+
+</div>
+</body>
+</html>

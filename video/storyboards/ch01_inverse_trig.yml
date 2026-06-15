@@ -1,0 +1,534 @@
+# Section 1.2 Inverse Trigonometric Functions -- 工程稿（storyboard, gen-2 格式）
+#
+# 從 content_scripts/ch01_inverse_trig.md（內容稿,18 單元＝16 教學＋intro/outro）映射而來。
+# 講義權威:experiments/handout_kit/chapter1-print-standalone.html §1.2。
+# 第二階段「模板化」產物:每單元配 template + accent、認可的 narration→say 插 {show}、
+# visual_need→視覺 payload。`source` 欄回溯內容稿單元 id（單元內有講義錨點）。
+#
+# say = 內容稿 narration 逐字（僅插入 {show} reveal marker,不改字)——MiMo 路線的
+# .spoken.yml 會 mirror 這些 {show} 位置、derive_spoken --check 守 parity。
+#
+# 第二階段缺口（本版以既有模板靜態頂著,標 STAGE-2 待補）:
+#   * reference-triangle 圖（u8/u13/u14）:graph_focus 無三角形/角弧 primitive 且強制畫軸,
+#     故本版以 example_walkthrough 的建構步驟承載；標籤化直角三角形圖待新模板或 hook。
+#   * 客製動畫（u2 ramp 反向、u3 水平線 sweep、u4 限定恢復一對一、u7 單位圓拉回、
+#     u11 主值單點）標 # HOOK(第二輪)；本版模板靜態頂著。
+#   * 限定分支圖:sine 已以 graph_focus 演（u3/u4）；cosine（u9）／tangent（u12）的分支圖
+#     內容稿刻意壓縮（「same idea / usual pattern」),本版定義走 definition_math、分支圖延後。
+
+meta:
+  id: ch01_inverse_trig
+  chapter: "Chapter 1"
+  chapter_title: "Inverse Functions and Limits"
+  section: "1.2"
+  title: "Inverse Trigonometric Functions"
+  language: en
+  theme: midnight
+  voice: Charon
+  video: { w: 3840, h: 2160, fps: 60 }   # 交付標準：4K60 (manim fourk_quality)
+  tagline: "If we know the ratio, which angle gives it back?"
+  sections:
+    - { id: "1.1", title: "Inverse Functions" }
+    - { id: "1.2", title: "Inverse Trigonometric Functions" }
+    - { id: "1.3", title: "The Limit of a Function" }
+    - { id: "1.4", title: "One-Sided and Infinite Limits" }
+    - { id: "1.5", title: "Limit Laws and Computational Techniques" }
+    - { id: "1.6", title: "The Precise Definition of a Limit" }
+
+scenes:
+
+  # 1 ----------------------------------------------------------------- intro
+  - id: intro
+    kind: intro
+    source: "內容稿 u1 intro"
+    tagline: "If we know the ratio, which angle gives it back?"
+    bgm: soft_intro
+    duration: 5.8
+
+  # 2 -------------------------------------------- motivation: ratio -> angle
+  # HOOK(第二輪): 斜坡升起、比值 1:2 標出後底角 θ 閃問號;一箭頭由 ratio 端反向指回
+  # angle 端,示意反向運算。本版以 forward/inverse 對照 math 靜態頂著。
+  - id: angle_from_ratio
+    kind: content
+    template: definition_math
+    accent: definition
+    kicker: motivation
+    source: "內容稿 u2 angle_from_ratio"
+    title: "From a Ratio Back to the Angle"
+    say: |
+      Picture a ramp rising at a steady slope, and suppose you know that slope
+      exactly — it climbs one unit for every two it runs forward. A natural
+      question follows: what angle does the ramp make with the ground? You know
+      the ratio; you want the angle back. That is the whole job of the inverse
+      trigonometric functions.
+      {show math.0} The ordinary trig functions turn an angle into a ratio —
+      feed in an angle, read off a sine or a tangent.
+      {show math.1} The inverse functions run that backwards: hand them a ratio,
+      and they return the angle that produced it. From the slope of a ramp we
+      recover its inclination; from the sides of a right triangle we recover its
+      angles. Before we can build these inverses, though, there is one obstacle
+      to clear.
+    statement: "Knowing a ratio, recover the angle that produced it."
+    math:
+      - "forward: angle $\\longrightarrow$ ratio  ($\\sin,\\ \\cos,\\ \\tan$)"
+      - { tex: "inverse: ratio $\\longrightarrow$ angle  ($\\arcsin,\\ \\arccos,\\ \\arctan$)", anim: highlight }
+
+  # 3 ----------------------------------- counterexample: trig not one-to-one
+  # HOOK(第二輪): 水平線由上往下 sweep,每個高度掃出多個交點同步閃示,凸顯非一對一。
+  # 本版靜態:整條 sine 波 + 一條水平線 + 多交點。
+  - id: trig_not_one_to_one
+    kind: content
+    template: graph_focus
+    accent: warning
+    source: "內容稿 u3 trig_not_one_to_one"
+    title: "Sine Repeats Every Value"
+    say: |
+      The obstacle is that none of the trig functions is one-to-one. Look at the
+      sine curve running across the whole number line: it rises and falls
+      forever, so a single horizontal line slices through it again and again.
+      {show annotation.0} Many different angles share the very same sine — and a
+      function whose outputs each come from many inputs simply cannot be run
+      backwards. The cure is one we have seen before for functions that fail
+      this way: cut the domain down to a single stretch on which the function
+      never repeats a value. On that restricted piece the function is
+      one-to-one, so it has an inverse. We will make this one move — restrict,
+      then invert — for each trig function in turn.
+    axes:
+      x_range: [-7.2, 7.2, 1.5708]
+      y_range: [-1.5, 1.5, 0.5]
+      x_length: 10.5
+      y_length: 3.1
+    plots:
+      - { kind: function, expression: "sin(x)", x_range: [-6.9, 6.9], color_role: secondary, label: "$y=\\sin x$", label_point: [4.7, 1.18] }
+      - { kind: line, start: [-7.2, 0.5], end: [7.2, 0.5], dashed: true, color_role: warning, label: "$y=c$", label_side: right }
+      - { kind: point, point: [-5.7596, 0.5], hollow: false, color_role: accent }
+      - { kind: point, point: [-3.6652, 0.5], hollow: false, color_role: accent }
+      - { kind: point, point: [0.5236, 0.5], hollow: false, color_role: accent }
+      - { kind: point, point: [2.6180, 0.5], hollow: false, color_role: accent }
+    annotations:
+      - "Many angles share one sine — so sine, as it stands, cannot be run backwards."
+
+  # 4 -------------------------------------- motivation: restrict sine branch
+  # HOOK(第二輪): 承 u3——水平線 sweep 停後,限定區間外曲線轉灰淡出,只留單調分支實色;
+  # 分支上任一水平線只剩一交點（短暫綠強調）。本版靜態:只畫限定分支 + 端點 + 灰色其餘段。
+  - id: restrict_sine
+    kind: content
+    template: graph_focus
+    accent: definition
+    source: "內容稿 u4 restrict_sine"
+    title: "The Branch We Keep: $[-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2}]$"
+    say: |
+      Let us carry that out for sine. The standard branch to keep is the
+      interval from $-\tfrac{\pi}{2}$ to $\tfrac{\pi}{2}$. On that piece the sine
+      curve climbs steadily from $-1$ up to $1$, hitting every value in between
+      exactly once — so it is one-to-one there, and its outputs fill the range
+      $[-1,1]$.
+      {show annotation.0} That restricted, well-behaved branch is the sine we
+      will actually invert. Other intervals would serve in principle, but this
+      one is centred on the origin and symmetric about zero, which is why it
+      became the standard choice.
+    axes:
+      x_range: [-3.4, 3.4, 1.5708]
+      y_range: [-1.4, 1.4, 0.5]
+      x_length: 7.4
+      y_length: 3.4
+    plots:
+      - { kind: function, expression: "sin(x)", x_range: [-3.3, -1.5708], color_role: muted, stroke_width: 2.0 }
+      - { kind: function, expression: "sin(x)", x_range: [1.5708, 3.3], color_role: muted, stroke_width: 2.0 }
+      - { kind: function, expression: "sin(x)", x_range: [-1.5708, 1.5708], color_role: accent, label: "$y=\\sin x$", label_point: [0.35, 1.18] }
+      - { kind: point, point: [-1.5708, -1.0], hollow: false, color_role: accent, label: "$(-\\tfrac{\\pi}{2},-1)$", label_side: down }
+      - { kind: point, point: [1.5708, 1.0], hollow: false, color_role: accent, label: "$(\\tfrac{\\pi}{2},1)$", label_side: up }
+    annotations:
+      - "On $[-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2}]$ sine is one-to-one, sweeping through every value in $[-1,1]$ once."
+
+  # 5 ---------------------------------------------- definition: arcsin (+ caution)
+  - id: arcsin_definition
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "內容稿 u5 arcsin_definition"
+    title: "The Inverse Sine"
+    say: |
+      Now we can name the inverse. The inverse sine function, written
+      $\arcsin x$, takes a number between $-1$ and $1$ and returns the angle on
+      our restricted branch whose sine is that number.
+      {show math.0} Stated precisely: $\arcsin x = y$ means exactly that
+      $\sin y = x$ and $y$ lies in $[-\tfrac{\pi}{2}, \tfrac{\pi}{2}]$.
+      {show math.1} So its domain is $[-1,1]$ — the only ratios a sine can
+      produce — and its range is that restricted interval of angles.
+      {show math.2} One warning about notation: $\arcsin x$ is often written
+      $\sin^{-1} x$, but that superscript $-1$ does not mean a reciprocal.
+      $\sin^{-1} x$ is an angle; $1/\sin x$ is a number. Whenever a source
+      writes $\sin^{-1}$, read the context to see which one is meant.
+    statement: "$\\arcsin x$ returns the angle in $[-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2}]$ whose sine is $x$."
+    math:
+      - "$\\arcsin x = y \\iff \\sin y = x,\\quad -\\tfrac{\\pi}{2}\\le y\\le \\tfrac{\\pi}{2}$"
+      - "domain $[-1,1]$,\\quad range $[-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2}]$"
+      - { tex: "$\\sin^{-1}x \\ne \\dfrac{1}{\\sin x}$  (an angle, not a number)", anim: highlight }
+
+  # 6 ----------------------------------------- proposition: arcsin identities
+  - id: arcsin_identities
+    kind: content
+    template: definition_math
+    accent: proposition
+    source: "內容稿 u6 arcsin_identities"
+    title: "Composition Identities for $\\arcsin$"
+    say: |
+      Because $\arcsin$ undoes the restricted sine, the two compose back to give
+      the input — but watch the fine print on where each holds.
+      {show math.0} One way, $\sin(\arcsin x) = x$ for every $x$ in $[-1,1]$:
+      take a ratio, find its angle, take the sine, and you are back to the
+      ratio.
+      {show math.1} The other way, $\arcsin(\sin x) = x$ — but only when $x$
+      already lives in the restricted range $[-\tfrac{\pi}{2}, \tfrac{\pi}{2}]$.
+      That asymmetry between the two is not a slip of the pen, and the next case
+      shows exactly why it is there.
+    statement: "$\\arcsin$ and the restricted sine undo each other — mind where each holds."
+    math:
+      - "$\\sin(\\arcsin x) = x \\quad\\text{for } x\\in[-1,1]$"
+      - { tex: "$\\arcsin(\\sin x) = x \\quad\\text{only for } x\\in[-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2}]$", anim: highlight }
+
+  # 7 ------------------------------ counterexample: when arcsin(sin x) breaks
+  # HOOK(第二輪,可選): 單位圓上 π 角的 sin 投影落在 0,arcsin 把它「拉回」到 0 角而非 π 角。
+  # 本版以計算步驟承載（單位圓非 graph_focus primitive,圖留第二輪）。
+  - id: when_arcsin_sin_breaks
+    kind: content
+    template: example_walkthrough
+    accent: warning
+    source: "內容稿 u7 when_arcsin_sin_breaks"
+    title: "When $\\arcsin(\\sin x)$ Is Not $x$"
+    say: |
+      Here is what happens when the inner angle sits outside the restricted
+      range. Take $x = \pi$.
+      {show math.0} Its sine is zero, so $\arcsin(\sin \pi) = \arcsin(0)$ — and
+      $\arcsin$ always hands back the angle in $[-\tfrac{\pi}{2},
+      \tfrac{\pi}{2}]$, which is $0$, not $\pi$.
+      {show math.1} So $\arcsin(\sin \pi) = 0$.
+      {show math.2} The reason is structural: $\arcsin$ can only ever return an
+      angle from its own narrow range, so feed it the sine of a far-away angle
+      and it gives back the one angle in range that shares that sine.
+      {show takeaway} The habit to build: before simplifying $\arcsin(\sin x)$,
+      check whether $x$ is already in the range — if it is not, the answer is the
+      in-range angle with the same sine, not $x$ itself.
+    steps:
+      - { text: "Take $x=\\pi$ and read its sine.", math: "\\sin\\pi = 0" }
+      - { text: "$\\arcsin$ returns the in-range angle with that sine.", math: "\\arcsin(\\sin\\pi)=\\arcsin 0 = 0", hot: true }
+      - { text: "The result is the principal value, not the original angle.", math: "0 \\ne \\pi", mark: bad }
+    takeaway: "Before simplifying $\\arcsin(\\sin x)$, check that $x$ lies in $[-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2}]$."
+    takeaway_tone: warn
+
+  # 8 ----------------------------------- example: evaluate arcsin (reference triangle)
+  # STAGE-2(reference-triangle 圖): visual_need 要直角三角形 opp 1/hyp 3/adj 2√2;
+  # 本版以 example_walkthrough 建構步驟承載,標籤化三角形圖待新模板或 hook（內容稿待辦 2）。
+  - id: arcsin_evaluate
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u8 arcsin_evaluate"
+    title: "Evaluating $\\arcsin$"
+    say: |
+      Let us evaluate two expressions. First, $\arcsin(\tfrac12)$: we want the
+      angle in $[-\tfrac{\pi}{2}, \tfrac{\pi}{2}]$ whose sine is one half.
+      {show math.0} That is $\tfrac{\pi}{6}$, so $\arcsin(\tfrac12) =
+      \tfrac{\pi}{6}$. The second is more telling: $\tan(\arcsin(\tfrac13))$. We
+      are not asked for the angle itself, only for its tangent — so let us draw a
+      right triangle.
+      {show math.1} Call the angle $\theta$, with $\sin\theta = \tfrac13$; that
+      puts the side opposite $\theta$ at $1$ and the hypotenuse at $3$.
+      {show math.2} By the Pythagorean theorem the adjacent side is
+      $\sqrt{9 - 1} = 2\sqrt{2}$.
+      {show math.3} Now tangent is opposite over adjacent, so
+      $\tan(\arcsin(\tfrac13)) = \tfrac{1}{2\sqrt{2}}$.
+      {show takeaway} That triangle move — turn the inverse trig value into a
+      labelled right triangle, then read off whatever ratio you need — is the
+      workhorse of this whole section.
+    steps:
+      - { text: "(a) The in-range angle whose sine is $\\tfrac12$.", math: "\\arcsin\\!\\left(\\tfrac12\\right)=\\tfrac{\\pi}{6}" }
+      - { text: "(b) Set $\\theta=\\arcsin\\tfrac13$: opposite $1$, hypotenuse $3$.", math: "\\sin\\theta=\\tfrac13" }
+      - { text: "Pythagoras gives the adjacent side.", math: "\\text{adj}=\\sqrt{9-1}=2\\sqrt{2}", hot: true }
+      - { text: "Read tangent as opposite over adjacent.", math: "\\tan\\!\\left(\\arcsin\\tfrac13\\right)=\\tfrac{1}{2\\sqrt{2}}" }
+    takeaway: "Turn an inverse-trig value into a right triangle, then read off the ratio."
+    takeaway_tone: ok
+
+  # 9 ------------------------------- definition: arccos (+ identities, same idea)
+  # STAGE-2(可選): restricted-cosine 分支圖。內容稿刻意壓縮限定理由（「same idea」),
+  # 故定義/恆等式走 definition_math,分支圖延後。
+  - id: arccos_definition
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "內容稿 u9 arccos_definition"
+    title: "The Inverse Cosine"
+    say: |
+      Cosine needs the same repair, but on a different stretch. Cosine is not
+      one-to-one either, and the branch we keep is the interval from $0$ to $\pi$
+      — where the curve runs steadily downhill from $1$ to $-1$. On that branch
+      every value is hit once, so we can invert it.
+      {show math.0} The inverse cosine, $\arccos x$, is defined by
+      $\arccos x = y$ exactly when $\cos y = x$ and $0 \le y \le \pi$;
+      {show math.1} its domain is again $[-1,1]$ and its range is $[0, \pi]$.
+      {show math.2} The composition identities read just like the ones for sine:
+      $\cos(\arccos x) = x$ on $[-1,1]$, and $\arccos(\cos x) = x$ as long as $x$
+      stays in $[0,\pi]$. Same idea as before — only the interval of angles has
+      moved.
+    statement: "Cosine is one-to-one on $[0,\\pi]$ (downhill from $1$ to $-1$); invert that branch."
+    math:
+      - "$\\arccos x = y \\iff \\cos y = x,\\quad 0\\le y\\le \\pi$"
+      - "domain $[-1,1]$,\\quad range $[0,\\pi]$"
+      - { tex: "$\\cos(\\arccos x)=x$;\\quad $\\arccos(\\cos x)=x$ on $[0,\\pi]$", anim: highlight }
+
+  # 10 ------------------------------------ example: domain of a composition
+  - id: domain_of_composition
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u10 domain_of_composition"
+    title: "Domains of Compositions"
+    say: |
+      When inverse trig functions get composed with ordinary ones, the
+      interesting question is often the domain. Take $f(x) = \arcsin(\cos x)$.
+      Whatever $x$ is, $\cos x$ always lands in $[-1,1]$ — and $[-1,1]$ is
+      exactly what $\arcsin$ accepts.
+      {show math.0} So every real number is allowed: the domain of $f$ is all
+      real numbers. Now flip the order: $h(x) = \sin(\arccos x)$. Here the inner
+      function $\arccos$ demands an input in $[-1,1]$, and its output is an
+      angle, which $\sin$ is happy to take.
+      {show math.1} So the domain of $h$ is $[-1,1]$.
+      {show takeaway} The rule worth keeping: the domain of a composition is set
+      by what the inner function accepts and whether its outputs are legal for
+      the outer one.
+    steps:
+      - { text: "$f(x)=\\arcsin(\\cos x)$: $\\cos x$ always lands in $[-1,1]$, which $\\arcsin$ accepts.", math: "\\operatorname{dom} f = \\mathbb{R}" }
+      - { text: "$h(x)=\\sin(\\arccos x)$: $\\arccos$ needs input in $[-1,1]$; $\\sin$ takes any angle.", math: "\\operatorname{dom} h = [-1,1]" }
+    takeaway: "A composition's domain: what the inner accepts and the outer allows."
+    takeaway_tone: neutral
+
+  # 11 ------------------------------ counterexample: principal value vs all solutions
+  # HOOK(第二輪): cos t 波與 y=1 相切多點依序閃,arccos「指針」只停 t=0;起動 t=10 落下,
+  # 其左 t=0,2π 變灰、t=4π,6π 對比色亮起。本版靜態:cos 波 + y=1 線 + 相切點 + 兩 annotation。
+  - id: principal_value_trap
+    kind: content
+    template: graph_focus
+    accent: warning
+    source: "內容稿 u11 principal_value_trap"
+    title: "One Angle, Not All Solutions"
+    say: |
+      One more trap, and it carries the single most important idea about these
+      functions. An object starts moving at time $t = 10$, bobbing so that its
+      height afterwards is $\cos t$. True or false: it is at height $1$ at the
+      time $t = \arccos(1)$? The answer is false. The equation $\cos t = 1$ holds
+      at infinitely many times — $t = 0$, $2\pi$, $4\pi$, and so on — but
+      $\arccos$ does not return all of them.
+      {show annotation.0} It returns only its single principal value in
+      $[0, \pi]$, which is $t = 0$. And $t = 0$ is before the object is even
+      moving. An inverse trig function hands back one angle, never the whole
+      family of solutions. The object really is up at height $1$ — at $t = 4\pi$,
+      $6\pi$, and the multiples of $2\pi$ that fall after it starts moving — but
+      $\arccos(1) = 0$ is none of those.
+    axes:
+      x_range: [-0.6, 14.0, 3.14159]
+      y_range: [-1.4, 1.5, 0.5]
+      x_length: 10.5
+      y_length: 3.0
+    plots:
+      - { kind: function, expression: "cos(x)", x_range: [0, 13.7], color_role: secondary, label: "$y=\\cos t$", label_point: [9.6, 1.2] }
+      - { kind: line, start: [-0.6, 1.0], end: [14.0, 1.0], dashed: true, color_role: muted, label: "$y=1$", label_side: right }
+      - { kind: point, point: [0.0, 1.0], hollow: false, color_role: warning, label: "$\\arccos 1=0$", label_side: up }
+      - { kind: point, point: [6.2832, 1.0], hollow: false, color_role: accent }
+      - { kind: point, point: [12.5664, 1.0], hollow: false, color_role: accent }
+    annotations:
+      - "$\\arccos(1)=0$ returns one principal value, not the whole family."
+
+  # 12 ------------------------------ definition: arctan (domain R, open range)
+  # STAGE-2(可選): restricted-tangent 分支圖 + 漸近線。內容稿以「usual pattern」壓縮,
+  # 差異點（domain R、開區間、漸近線）以 statement/math 承載,分支圖延後。
+  - id: arctan_definition
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "內容稿 u12 arctan_definition"
+    title: "The Inverse Tangent"
+    say: |
+      Tangent is the third we invert, and it brings a new twist. We restrict it
+      to the open interval from $-\tfrac{\pi}{2}$ to $\tfrac{\pi}{2}$, where it
+      climbs without ever repeating — but unlike sine and cosine, tangent shoots
+      off toward infinity at the ends, so it takes every real value.
+      {show math.0} That flips the domain story: $\arctan x = y$ means
+      $\tan y = x$ with $y$ strictly between $-\tfrac{\pi}{2}$ and
+      $\tfrac{\pi}{2}$, and its domain is all real numbers — any ratio at all
+      has an angle.
+      {show math.1} Its range is the open interval $(-\tfrac{\pi}{2},
+      \tfrac{\pi}{2})$, which it approaches but never reaches.
+      {show math.2} The identities follow the usual pattern:
+      $\tan(\arctan x) = x$ for every real $x$, and $\arctan(\tan x) = x$ on the
+      open restricted interval. So $\arctan$ takes the entire number line and
+      gently squeezes it into a band less than half a turn wide.
+    statement: "Tangent is one-to-one on $(-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2})$ and takes every real value."
+    math:
+      - "$\\arctan x = y \\iff \\tan y = x,\\quad -\\tfrac{\\pi}{2}< y< \\tfrac{\\pi}{2}$"
+      - "domain $\\mathbb{R}$,\\quad range $(-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2})$ (open: approached, never reached)"
+      - { tex: "$\\tan(\\arctan x)=x$ for all $x$;\\quad $\\arctan(\\tan x)=x$ on the open interval", anim: highlight }
+
+  # 13 ------------------------------- example: signs from the range (negative inputs)
+  # STAGE-2(reference-triangle 圖): (b) sec(arctan 10) 用三角形 opp 10/adj 1/hyp √101;
+  # 本版以建構步驟承載,三角形圖待新模板或 hook。
+  - id: signs_from_range
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u13 signs_from_range"
+    title: "Signs Come From the Range"
+    say: |
+      When the inputs go negative, signs are where people slip — but the range of
+      the inverse function settles every sign for you. Start with
+      $\sin(\arccos(-\tfrac12))$.
+      {show math.0} Since $\arccos$ always lands in $[0,\pi]$, a negative input
+      forces the angle into the second quadrant: $\arccos(-\tfrac12) =
+      \tfrac{2\pi}{3}$, and its sine is $\tfrac{\sqrt{3}}{2}$.
+      {show math.1} The same triangle method handles $\sec(\arctan 10)$:
+      opposite $10$, adjacent $1$, hypotenuse $\sqrt{101}$, so the secant is
+      $\sqrt{101}$.
+      {show math.2} Now the delicate one: $\tan(\arcsin(-\tfrac{2\sqrt5}{5}))$.
+      Here $\arcsin$ of a negative number lands in the fourth quadrant, where
+      cosine is positive — so $\cos\theta = \tfrac{1}{\sqrt5}$ and
+      $\tan\theta = -2$.
+      {show takeaway} Notice we never guessed a sign: each one came straight
+      from the range of the inverse function.
+    steps:
+      - { text: "(a) $\\arccos(-\\tfrac12)$ lands in $[0,\\pi]$ — the second quadrant.", math: "\\arccos\\!\\left(-\\tfrac12\\right)=\\tfrac{2\\pi}{3},\\ \\ \\sin=\\tfrac{\\sqrt{3}}{2}" }
+      - { text: "(b) Triangle for $\\arctan 10$: opp $10$, adj $1$, hyp $\\sqrt{101}$.", math: "\\sec(\\arctan 10)=\\sqrt{101}", hot: true }
+      - { text: "(c) $\\arcsin$ of a negative lands in QIV, where cosine is positive.", math: "\\tan\\!\\left(\\arcsin\\!\\left(-\\tfrac{2\\sqrt5}{5}\\right)\\right)=-2" }
+    takeaway: "Never guess a sign — the inverse's range fixes the quadrant."
+    takeaway_tone: ok
+
+  # 14 ----------------------- example: simplify cos(arctan x) (variable input)
+  # STAGE-2(reference-triangle 圖): 一般三角形 opp x/adj 1/hyp √(1+x²);本版以
+  # Pythagorean-identity 步驟承載（忠於講義以 1+tan²=sec² 為主、三角形佐證）。
+  - id: simplify_cos_arctan
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u14 simplify_cos_arctan"
+    title: "Simplifying $\\cos(\\arctan x)$"
+    say: |
+      The triangle method really shines when the input is a variable instead of
+      a number. Let us simplify $\cos(\arctan x)$ for any $x$.
+      {show math.0} Set $y = \arctan x$, so $\tan y = x$ with $y$ in the open
+      interval $(-\tfrac{\pi}{2}, \tfrac{\pi}{2})$.
+      {show math.1} One route is the Pythagorean identity $1 + \tan^2 y =
+      \sec^2 y$, which gives $\sec^2 y = 1 + x^2$; since $y$ is in that interval,
+      cosine is positive, so $\sec y = \sqrt{1 + x^2}$ and $\cos y =
+      \tfrac{1}{\sqrt{1+x^2}}$. The triangle says the same thing at a glance:
+      opposite side $x$, adjacent side $1$, hypotenuse $\sqrt{1+x^2}$, and cosine
+      is adjacent over hypotenuse.
+      {show math.2} Either way, $\cos(\arctan x) = \tfrac{1}{\sqrt{1+x^2}}$ —
+      {show takeaway} a messy composition collapsing to one clean expression in
+      $x$, the kind of simplification you will reach for constantly once
+      derivatives enter the picture.
+    steps:
+      - { text: "Set $y=\\arctan x$, so $\\tan y=x$ on $(-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2})$.", math: "y=\\arctan x" }
+      - { text: "Pythagorean identity, with cosine positive on that interval.", math: "1+\\tan^2 y=\\sec^2 y", hot: true }
+      - { text: "Cosine is adjacent over hypotenuse.", math: "\\cos(\\arctan x)=\\dfrac{1}{\\sqrt{1+x^2}}" }
+    takeaway: "A messy composition collapses to one clean expression in $x$."
+    takeaway_tone: ok
+
+  # 15 ------------------------------ definition: the remaining three (table)
+  # 六函數 domain/range 對照表（內容稿指定 value_table）。csc/sec domain 用 |x|>=1
+  # （≡ (-∞,-1]∪[1,∞),保表格單行不出框;narration 仍念出 union 形式）。reveal: rows。
+  - id: remaining_inverses
+    kind: content
+    template: value_table
+    accent: recap
+    source: "內容稿 u15 remaining_inverses"
+    title: "All Six, Side by Side"
+    reveal: rows
+    say: |
+      Three inverse trig functions remain — inverse cosecant, inverse secant,
+      and inverse cotangent — and they are built in exactly the same spirit,
+      just used less often. {show row.0} {show row.1} {show row.2} Each one
+      inverts its trig function on a chosen branch.
+      {show row.3} {show row.4} Inverse cosecant and inverse secant take inputs
+      whose absolute value is at least $1$ — that is, $(-\infty, -1] \cup [1,
+      \infty)$ — because cosecant and secant never produce values strictly
+      between $-1$ and $1$.
+      {show row.5} Inverse cotangent, like inverse tangent, accepts every real
+      number. Rather than memorize six separate boxes, it is cleaner to lay all
+      six inverse functions side by side and compare what they accept and what
+      interval of angles they return.
+    header: ["Function", "Domain", "Principal range"]
+    rows:
+      - ["$\\arcsin$", "$[-1,1]$", "$[-\\pi/2,\\ \\pi/2]$"]
+      - ["$\\arccos$", "$[-1,1]$", "$[0,\\ \\pi]$"]
+      - ["$\\arctan$", "$\\mathbb{R}$", "$(-\\pi/2,\\ \\pi/2)$"]
+      - ["$\\arccsc$", "$|x|\\ge 1$", "$(0,\\ \\pi/2]\\cup(\\pi,\\ 3\\pi/2]$"]
+      - ["$\\arcsec$", "$|x|\\ge 1$", "$[0,\\ \\pi/2)\\cup[\\pi,\\ 3\\pi/2)$"]
+      - ["$\\arccot$", "$\\mathbb{R}$", "$(0,\\ \\pi)$"]
+
+  # 16 -------------------------- example: branch is a choice (conventions differ)
+  - id: branch_conventions
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u16 branch_conventions"
+    title: "A Branch Is a Choice"
+    say: |
+      There is a subtlety hiding in those last three definitions: the branch we
+      pick is a choice, not a law, and different texts choose differently. This
+      text picks the branches that make the later differentiation formulas come
+      out simplest, but you will meet other conventions in the wild — and the
+      choice has visible consequences. Consider $f(x) = \arcsin x + \arccsc x$.
+      {show math.0} Arcsine needs $|x| \le 1$ while arccosecant needs
+      $|x| \ge 1$, so the only inputs satisfying both are $x = 1$ and $x = -1$.
+      {show math.1} At $x = 1$, both terms equal $\tfrac{\pi}{2}$, so
+      $f(1) = \pi$.
+      {show math.2} At $x = -1$, under this text's convention $\arccsc(-1) =
+      \tfrac{3\pi}{2}$, and with $\arcsin(-1) = -\tfrac{\pi}{2}$ we again get
+      $f(-1) = \pi$ — so $f$ is the constant $\pi$ on its two-point domain.
+      {show math.3} But under a different common convention, $\arccsc(-1)$ would
+      be $-\tfrac{\pi}{2}$, which makes $f(-1) = -\pi$ instead.
+      {show takeaway} Same expression, different answer — which is exactly why a
+      text fixes its conventions explicitly, and why you should always check the
+      one in front of you.
+    steps:
+      - { text: "Both terms restrict the domain: $|x|\\le 1$ and $|x|\\ge 1$.", math: "\\operatorname{dom} f = \\{-1,\\ 1\\}" }
+      - { text: "At $x=1$, both terms are $\\tfrac{\\pi}{2}$.", math: "f(1)=\\tfrac{\\pi}{2}+\\tfrac{\\pi}{2}=\\pi" }
+      - { text: "At $x=-1$, this text's convention $\\arccsc(-1)=\\tfrac{3\\pi}{2}$.", math: "f(-1)=-\\tfrac{\\pi}{2}+\\tfrac{3\\pi}{2}=\\pi" }
+      - { text: "A different convention $\\arccsc(-1)=-\\tfrac{\\pi}{2}$ flips it.", math: "f(-1)=-\\pi" }
+    takeaway: "Same expression, different convention, different answer."
+    takeaway_tone: warn
+
+  # 17 ---------------------------------------------------------------- recap
+  - id: recap
+    kind: content
+    template: recap_cards
+    accent: recap
+    source: "內容稿 u17 recap"
+    title: "Section 1.2 — Recap"
+    say: |
+      Here is the whole section in four moves.
+      {show point.0} First, a trig function is not one-to-one, so we restrict it
+      to a single branch and invert that — sine on $[-\tfrac{\pi}{2},
+      \tfrac{\pi}{2}]$, cosine on $[0, \pi]$, tangent on the open interval
+      between.
+      {show point.1} Second, each inverse returns just one angle, the principal
+      value inside its range — never the whole family of solutions.
+      {show formula.0} {show formula.1} Third, the composition identities undo
+      the functions, but $\arcsin(\sin x)$ and its cousins only give back $x$
+      when $x$ already sits in the restricted range.
+      {show point.2} And fourth, to evaluate a composition, build a right
+      triangle from the inverse trig value and read off the ratio you need — and
+      let the range of the inverse fix every sign.
+    points:
+      - "Restrict, then invert: cut each trig function to a single one-to-one branch, then reverse it."
+      - "Each inverse returns one angle — the principal value in its range, never the whole family of solutions."
+      - "Build a right triangle from the inverse-trig value, read off the ratio — and let the range fix every sign."
+    formulas:
+      - "\\arcsin(\\sin x)=x \\ \\text{ on } [-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2}]"
+      - "\\sin(\\arcsin x)=x \\ \\text{ on } [-1,1]"
+
+  # 18 ---------------------------------------------------------------- outro
+  - id: outro
+    kind: outro
+    source: "內容稿 u18 outro"
+    bgm: soft_outro
+    duration: 8.0

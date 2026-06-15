@@ -1,7 +1,7 @@
 # Section 1.1 Inverse Functions -- 工程稿 v2（storyboard, gen-2 格式）
 #
-# 從 content_scripts/ch01_inverse_functions.md（內容稿 v2,17 單元,narration 已認可
-# 2026-06-10）映射而來。講義權威:experiments/handout_kit/chapter1-standalone.html §1.1。
+# 從 content_scripts/ch01_inverse_functions.md（內容稿 v2,19 單元;原 17 單元 narration 已認可、u14/u17 為 2026-06-13 代表式涵蓋新增並同日認可
+# 2026-06-10）映射而來。講義權威:experiments/handout_kit/chapter1-print-standalone.html §1.1。
 # 第二階段「模板化」產物:每單元配 template + accent、認可的 narration→say 插 {show}、
 # visual_need→視覺 payload。`source` 欄回溯內容稿單元 id（單元內有講義錨點）。
 #
@@ -16,7 +16,7 @@ meta:
   title: "Inverse Functions"
   language: en
   theme: midnight
-  voice: Kore
+  voice: Charon
   video: { w: 3840, h: 2160, fps: 60 }   # 交付標準：4K60 (manim fourk_quality)
   tagline: "When can a function be undone?"
   sections:
@@ -103,7 +103,7 @@ scenes:
       one-to-one is a question about the matching itself, not about algebra.
     statement: "Each student gets an ID number; no two students share one."
     math:
-      - "student $\\longmapsto$ ID number"
+      - "student $\\longrightarrow$ ID number"
       - { tex: "distinct students $\\Rightarrow$ distinct IDs (one-to-one)", anim: highlight }
 
   # 5 ------------------------------------------------ example: algebraic check
@@ -271,9 +271,9 @@ scenes:
       (\sqrt[3]{x})^3 = x$ -- feeding the inverse's output back into $g$
       returns exactly where we started.
     steps:
-      - { text: "The identity is its own inverse.", math: "f^{-1}(x)=x", mark: ok }
+      - { text: "The identity is its own inverse.", math: "f^{-1}(x)=x" }
       - { text: "Solve $y=x^3$ for the input.", math: "x=\\sqrt[3]{y}", hot: true }
-      - { text: "Rename the variable.", math: "g^{-1}(x)=\\sqrt[3]{x}", mark: ok }
+      - { text: "Rename the variable.", math: "g^{-1}(x)=\\sqrt[3]{x}" }
     takeaway: "Check by composing: $g(g^{-1}(x))=(\\sqrt[3]{x})^3=x$."
     takeaway_tone: ok   # 正面驗證結論→ success 綠(原模板固定 warning 紅,語意錯)
 
@@ -341,12 +341,49 @@ scenes:
     annotations:
       - "$(a,b)$ on $g$ $\\leftrightarrow$ $(b,a)$ on $g^{-1}$: reflection across $y=x$."
 
-  # 14 ----------------------------------------------- procedure: find an inverse
+  # 14 ------------------------- visual: repair x² by restricting (static; 動畫第二輪)
+  # HOOK(第二輪): x² 先整條淡畫,左半 x<0 轉灰退場只留 [0,∞);限定曲線沿 y=x 翻摺生成 √x;
+  # 對應點 (2,4)→(4,2) 跨鏡線閃示。本版靜態頂著(限定後曲線＋√x＋y=x 全顯)。
+  - id: repair_by_restricting
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "內容稿 u14 repair_by_restricting"
+    title: "Repairing $x^2$ by Restricting"
+    say: |
+      Remember $x^2$ -- the very first function that failed us, because
+      $\tfrac12$ and $-\tfrac12$ both land on $\tfrac14$. We can repair it.
+      Restrict the domain to $[0,\infty)$, keeping only the non-negative
+      inputs, and the collision is gone: if $x_1^2 = x_2^2$ with
+      $x_1, x_2 \ge 0$, then $x_1 = x_2$.
+      {show annotation.0} The restricted function is one-to-one, so now it has
+      an inverse. Solving $x = (f^{-1}(x))^2$ and keeping the non-negative root
+      gives $f^{-1}(x) = \sqrt{x}$ -- which is exactly why the square-root
+      symbol means the positive root: it is defined to undo the restricted
+      squaring function. And the move we just made -- restrict first, then
+      invert -- is exactly what makes the inverse trigonometric functions
+      possible, since sine and cosine are not one-to-one on their own either.
+    axes:
+      x_range: [-0.5, 4.4, 1]
+      y_range: [-0.5, 4.4, 1]
+      x_length: 4.6
+      y_length: 4.6
+    plots:
+      - { kind: function, expression: "x**2", x_range: [0, 2.0], color_role: secondary, label: "$y=x^2,\\ x\\ge 0$", label_point: [0.45, 3.6] }
+      - { kind: function, expression: "sqrt(x)", x_range: [0, 4.2], color_role: accent, label: "$y=\\sqrt{x}$", label_point: [3.5, 1.25] }
+      - { kind: line, start: [-0.5, -0.5], end: [4.4, 4.4], dashed: true, color_role: muted, label: "$y=x$", label_point: [4.0, 4.2], label_role: muted }
+      - { kind: line, start: [2.0, 4.0], end: [4.0, 2.0], dashed: true, color_role: muted }
+      - { kind: point, point: [2.0, 4.0], hollow: false, color_role: secondary, label: "$(2,4)$", label_side: left }
+      - { kind: point, point: [4.0, 2.0], hollow: false, color_role: accent, label: "$(4,2)$", label_side: down }
+    annotations:
+      - "Restrict $x^2$ to $[0,\\infty)$ and it is one-to-one; its inverse is $\\sqrt{x}$."
+
+  # 15 ----------------------------------------------- procedure: find an inverse
   - id: the_procedure
     kind: content
     template: procedure_steps
     accent: procedure
-    source: "內容稿 u14 the_procedure"
+    source: "內容稿 u15 the_procedure"
     title: "Finding an Inverse: The Procedure"
     say: |
       The cube-root computations secretly followed a recipe, and it works for
@@ -361,12 +398,12 @@ scenes:
       - { text: "Solve this equation for $x$ in terms of $y$.", math: "x=\\text{(expression in } y)" }
       - { text: "Interchange the names $x$ and $y$.", math: "y=f^{-1}(x)" }
 
-  # 15 ------------------------------------- example: inverse of x^3+2 (procedure)
+  # 16 ------------------------------------- example: inverse of x^3+2 (procedure)
   - id: procedure_in_action
     kind: content
     template: procedure_steps
     accent: example
-    source: "內容稿 u15 procedure_in_action"
+    source: "內容稿 u16 procedure_in_action"
     title: "Worked Example: $f(x)=x^3+2$"
     say: |
       Same recipe, one notch up: $f(x) = x^3 + 2$.
@@ -383,12 +420,40 @@ scenes:
       - { text: "Swap the names.", math: "f^{-1}(x)=\\sqrt[3]{x-2}" }
     worked: ["f\\!\\bigl(f^{-1}(x)\\bigr)=\\bigl(\\sqrt[3]{x-2}\\bigr)^{3}+2", "=(x-2)+2", "=x"]
 
-  # 16 ---------------------------------------------------------------- recap
+  # 17 --------------------------------- example: temperature conversion (applied inverse)
+  - id: temperature_conversion
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u17 temperature_conversion"
+    title: "An Inverse in the Real World"
+    say: |
+      One last inverse, and this one means something outside the page. The
+      function $f(t) = \tfrac{9}{5}t + 32$ takes a Celsius temperature and
+      returns the Fahrenheit reading.
+      {show math.0} So what does its inverse do? It runs the conversion
+      backwards -- hand it a Fahrenheit number and it gives you the Celsius.
+      {show math.1} The recipe is unchanged: solve
+      $t = \tfrac{9}{5}f^{-1}(t) + 32$ for the inverse, which gives
+      $f^{-1}(t) = \tfrac{5}{9}(t - 32)$.
+      {show math.2} And the check is reassuring -- go to Fahrenheit and back,
+      $f^{-1}(f(t)) = \tfrac{5}{9}\bigl(\tfrac{9}{5}t + 32 - 32\bigr) = t$,
+      landing exactly where we began.
+      {show takeaway} Here an inverse is not an abstraction; it is the formula
+      on the other side of the thermometer.
+    steps:
+      - { text: "$f$ converts Celsius to Fahrenheit; its inverse runs backwards.", math: "f(t)=\\tfrac{9}{5}t+32" }
+      - { text: "Solve $t=\\tfrac{9}{5}f^{-1}(t)+32$ for the inverse.", math: "f^{-1}(t)=\\tfrac{5}{9}(t-32)", hot: true }
+      - { text: "Check by composing back.", math: "f^{-1}\\!\\bigl(f(t)\\bigr)=\\tfrac{5}{9}\\bigl(\\tfrac{9}{5}t\\bigr)=t", mark: ok }
+    takeaway: "$f^{-1}$ is the thermometer read backwards: Fahrenheit in, Celsius out."
+    takeaway_tone: ok
+
+  # 18 ---------------------------------------------------------------- recap
   - id: recap
     kind: content
     template: recap_cards
     accent: recap
-    source: "內容稿 u16 recap"
+    source: "內容稿 u18 recap"
     title: "Section 1.1 -- Recap"
     say: |
       Here is the whole section in four moves.
@@ -409,9 +474,9 @@ scenes:
       - "f^{-1}\\!\\bigl(f(x)\\bigr)=x"
       - "f\\!\\bigl(f^{-1}(y)\\bigr)=y"
 
-  # 17 ---------------------------------------------------------------- outro
+  # 19 ---------------------------------------------------------------- outro
   - id: outro
     kind: outro
-    source: "內容稿 u17 outro"
+    source: "內容稿 u19 outro"
     bgm: soft_outro
     duration: 8.0

@@ -49,7 +49,9 @@ _bootstrap.bootstrap()
 
 import yaml  # noqa: E402
 
-LEAD_SECONDS = 0.3      # matches scene.py's initial self.wait(0.3) before beat 1
+from pipeline.timing import SCENE_LEAD_SECONDS  # noqa: E402
+
+LEAD_SECONDS = SCENE_LEAD_SECONDS
 BEAT_BACKOFF = 0.20     # grab this far before a beat boundary: reveal has settled,
                         # next beat not yet started (fullest frame for THIS beat)
 
@@ -76,8 +78,13 @@ def load_storyboard(path: Path) -> dict:
     return yaml.safe_load(path.resolve().read_text(encoding="utf-8"))
 
 
-def load_manifest(deck_id: str) -> dict:
-    mpath = _bootstrap.REPO_ROOT / "video" / "output" / "audio" / deck_id / "manifest.json"
+def load_manifest(deck_id: str, meta: dict | None = None) -> dict:
+    if meta:
+        sec_dir = _bootstrap.section_output_dir(meta)
+        audio_subdir = "audio_mimo" if deck_id.endswith("_mimo") else "audio"
+        mpath = sec_dir / audio_subdir / "manifest.json"
+    else:
+        mpath = _bootstrap.REPO_ROOT / "video" / "output" / "audio" / deck_id / "manifest.json"
     if not mpath.exists():
         raise SystemExit(
             f"No manifest at {mpath}. Render the deck first "
@@ -191,7 +198,8 @@ def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
 # ---- prompt -------------------------------------------------------------
 
 RUBRIC = (
-    "- Element Layout: overlap, crowding, spilling past the safe margin, balance.\n"
+    "- Element Layout: overlap, crowding, spilling past the safe margin, balance; "
+    "graph labels must not sit on top of curves, points, hollow points, guide lines, or markers.\n"
     "- Attractiveness: clear and purposeful, not a flat text slide.\n"
     "- Logic Flow: does what is shown match this narration beat.\n"
     "- Visual Consistency: consistent accent colours, font sizes, spacing.\n"
@@ -449,10 +457,13 @@ def main() -> int:
     args = parser.parse_args()
 
     storyboard = load_storyboard(args.storyboard)
-    deck_id = storyboard["meta"]["id"]
-    manifest = load_manifest(deck_id)
+    meta = storyboard["meta"]
+    deck_id = meta["id"]
+    manifest = load_manifest(deck_id, meta)
 
-    out_dir = _bootstrap.REPO_ROOT / "video" / "output" / "critic" / deck_id
+    sec_dir = _bootstrap.section_output_dir(meta)
+    critic_subdir = "critic_mimo" if deck_id.endswith("_mimo") else "critic"
+    out_dir = sec_dir / critic_subdir
     plan = plan_frames(storyboard, manifest, args.scene, per=args.per)
     if not plan:
         print("[critic] no content beats selected.", flush=True)

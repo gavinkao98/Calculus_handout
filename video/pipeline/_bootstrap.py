@@ -43,6 +43,18 @@ def register_design_fonts() -> list[str]:
     return registered
 
 
+def section_output_dir(meta: dict) -> Path:
+    """Derive per-section output directory from storyboard meta.
+
+    e.g. meta.section="1.3" → <REPO_ROOT>/video/output/ch01/s1.3
+    """
+    section = meta.get("section", "")
+    ch_num = section.split(".")[0] if section else "00"
+    return (
+        REPO_ROOT / "video" / "output" / f"ch{int(ch_num):02d}" / f"s{section}"
+    )
+
+
 _TEX_TEMPLATE_SET = False
 
 
@@ -56,6 +68,15 @@ def _set_tex_template() -> None:
     except Exception:
         return
     tpl = TexTemplate()
-    tpl.add_to_preamble(r"\usepackage{newtxtext}" "\n" r"\usepackage{newtxmath}")
+    tpl.add_to_preamble(
+        r"\usepackage{newtxtext}" "\n"
+        r"\usepackage{newtxmath}" "\n"
+        # Inverse-trig operators the book preamble defines but manim's default
+        # template lacks. \arcsin/\arccos/\arctan are LaTeX-kernel operators;
+        # these three are not, so on-screen math using them failed to compile.
+        r"\DeclareMathOperator{\arccsc}{arccsc}" "\n"
+        r"\DeclareMathOperator{\arcsec}{arcsec}" "\n"
+        r"\DeclareMathOperator{\arccot}{arccot}"
+    )
     config.tex_template = tpl
     _TEX_TEMPLATE_SET = True

@@ -1,7 +1,7 @@
 # Section 1.1 Inverse Functions — 內容稿 v2（正式版）
 
-> **性質：正式產線內容稿（v2）**。依 2026-06-10 拍板**從零重走**：不繼承 v1 校準樣本的 narration，全文以 HTML 講義權威檔重新拆解、重新撰寫（v1 為方法論校準原型，已隨本檔覆寫棄用）。**15 段 narration 已於 2026-06-10 經使用者認可。**
-> **來源（權威）：** [`../../experiments/handout_kit/chapter1-standalone.html`](../../experiments/handout_kit/chapter1-standalone.html) §1.1（`sec-no` 1.1，Inverse Functions）。
+> **性質：正式產線內容稿（v2）**。依 2026-06-10 拍板**從零重走**：不繼承 v1 校準樣本的 narration，全文以 HTML 講義權威檔重新拆解、重新撰寫（v1 為方法論校準原型，已隨本檔覆寫棄用）。**原 15 段 narration 已於 2026-06-10 經使用者認可；u14 `repair_by_restricting`、u17 `temperature_conversion` 為 2026-06-13 依代表式涵蓋（§2）新增（Example 1.5／1.8），narration 同日經使用者認可。**
+> **來源（權威）：** [`../../experiments/handout_kit/chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.1（`sec-no` 1.1，Inverse Functions）。
 > **格式：** 純內容層，每單元 `id / source / learning_goal / kind / narration / visual_need / animation_cue`；**不含** template / `{show}` / accent / 視覺 payload（第二階段才填）。`narration` 為英文（旁白語言）；`visual_need` / `animation_cue` 為中文（內容溝通用）。客製動畫由 Claude 依 `animation_cue` 生成（本節依拍板**第二輪**才接入；本輪工程稿以模板靜態頂著）。
 
 ---
@@ -42,7 +42,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **animation_cue:** 左圖幾條箭頭依序亮起、各入各位；右圖 $\tfrac12$ 與 $-\tfrac12$ 兩條箭頭匯聚到同一個 $\tfrac14$，匯聚瞬間頓一下並強調該點，凸顯「兩進一出——回不去」。
 
 ### 3. one_to_one_definition
-- **source:** chapter1-standalone.html §1.1 · Definition 1.1（含 `informal` gloss）
+- **source:** chapter1-print-standalone.html §1.1 · Definition 1.1（含 `informal` gloss）
 - **learning_goal:** 認得 one-to-one 的形式定義與其等價形式，知道後者是計算裡實際用的。
 - **kind:** `definition`
 - **narration:**
@@ -51,7 +51,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **animation_cue:** —（靜態即可）
 
 ### 4. ids_before_algebra
-- **source:** chapter1-standalone.html §1.1 · Example 1.1 + Solution（student ID）
+- **source:** chapter1-print-standalone.html §1.1 · Example 1.1 + Solution（student ID）
 - **learning_goal:** 在無公式的日常情境先套用定義，建立「一對一是對應問題、不是代數問題」的直覺。
 - **kind:** `example`
 - **narration:**
@@ -60,7 +60,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **animation_cue:** —（靜態即可）
 
 ### 5. checking_with_algebra
-- **source:** chapter1-standalone.html §1.1 · Example 1.2 + Solution + 例後 prose（“illustrates why not every function can be reversed”）
+- **source:** chapter1-print-standalone.html §1.1 · Example 1.2 + Solution + 例後 prose（“illustrates why not every function can be reversed”）
 - **learning_goal:** 會用定義對具體函數做正式驗證，並看到 not one-to-one 直接堵死「回推」。
 - **kind:** `example`
 - **narration:**
@@ -69,7 +69,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **animation_cue:** —（靜態即可；動態重點留給下一單元的水平線測試）
 
 ### 6. horizontal_line_test
-- **source:** chapter1-standalone.html §1.1 · Remark 1.1（env-name: Horizontal line test）+ Figure 1.1（data-fig: hlt）
+- **source:** chapter1-print-standalone.html §1.1 · Remark 1.1（env-name: Horizontal line test）+ Figure 1.1（data-fig: hlt）
 - **learning_goal:** 會用水平線測試從圖形直接判讀一對一，並理解它為何成立。
 - **kind:** `proposition`
 - **narration:**
@@ -79,7 +79,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **備註（§3 邊角）：** 具名規則與其演示圖為同一教學重點，合一單元。
 
 ### 7. inverse_definition
-- **source:** chapter1-standalone.html §1.1 · Definition 1.2 + 其前一句鋪陳 prose（“a second function that undoes $f$”）
+- **source:** chapter1-print-standalone.html §1.1 · Definition 1.2 + 其前一句鋪陳 prose（“a second function that undoes $f$”）
 - **learning_goal:** 掌握反函數的定義：定義關係 $f^{-1}(y)=x \iff f(x)=y$，以及 domain／range 互換。
 - **kind:** `definition`
 - **narration:**
@@ -88,7 +88,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **animation_cue:** —（靜態即可；往返動態留給 composition_identities 單元）
 
 ### 8. reading_the_notation
-- **source:** chapter1-standalone.html §1.1 · Remark 1.2（變數改名）
+- **source:** chapter1-print-standalone.html §1.1 · Remark 1.2（變數改名）
 - **learning_goal:** 看懂 $f^{-1}(x)=y \iff f(y)=x$ 的變數改名，為之後 procedure 的「互換 $x$、$y$」鋪路。
 - **kind:** `definition`
 - **narration:**
@@ -98,7 +98,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **備註（偏離註記）：** Remark 1.2 僅 2 句，照 §3 預設應併入鄰段；此處 promote 成獨立單元，理由：變數互換是學生高頻混淆點，且 Strategy 1.1 第 3 步的根據在此——值得單獨停留一拍。
 
 ### 9. inverse_iff_one_to_one
-- **source:** chapter1-standalone.html §1.1 · Theorem 1.1
+- **source:** chapter1-print-standalone.html §1.1 · Theorem 1.1
 - **learning_goal:** 記住可逆性的完整刻畫：有反函數 ⟺ 一對一。
 - **kind:** `theorem`
 - **narration:**
@@ -108,7 +108,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **備註（§3 拆分）：** 證明兩方向合計超過 ~4 步，依 §3 拆成 statement 單元＋proof 單元。
 
 ### 10. proof_both_directions
-- **source:** chapter1-standalone.html §1.1 · Proof（Theorem 1.1）
+- **source:** chapter1-print-standalone.html §1.1 · Proof（Theorem 1.1）
 - **learning_goal:** 走通兩個方向：有反函數 ⇒ 一對一（兩邊作用 $f^{-1}$）；一對一 ⇒ 可構造反函數（唯一原像）。
 - **kind:** `proof`
 - **narration:**
@@ -117,7 +117,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **animation_cue:** —（靜態逐步揭示即可）
 
 ### 11. first_inverses
-- **source:** chapter1-standalone.html §1.1 · Example 1.3 + Solution（`prompt-list`／`sol-list` 兩小題）
+- **source:** chapter1-print-standalone.html §1.1 · Example 1.4 + Solution（`prompt-list`／`sol-list` 兩小題）
 - **learning_goal:** 算出第一批具體反函數（$f(x)=x$ 自反；$g(x)=x^3 \to \sqrt[3]{x}$），並第一次見到「compose 驗證」。
 - **kind:** `example`
 - **narration:**
@@ -126,7 +126,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **animation_cue:** —（靜態逐步揭示即可）
 
 ### 12. composition_identities
-- **source:** chapter1-standalone.html §1.1 · Proposition 1.1 + 其前 bridge prose（“The defining relation … yields two composition identities”）+ Figure 1.2（inline SVG：$A \leftrightarrow B$ 往返）
+- **source:** chapter1-print-standalone.html §1.1 · Proposition 1.1 + 其前 bridge prose（“The defining relation … yields two composition identities”）+ Figure 1.2（inline SVG：$A \leftrightarrow B$ 往返）
 - **learning_goal:** 掌握兩條 composition identities，理解「互相抵銷」是反函數的代數本質、也是驗證工具。
 - **kind:** `proposition`
 - **narration:**
@@ -136,7 +136,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **備註（§3 邊角）：** 命題與其演示圖（Figure 1.2）為同一教學重點，合一單元。
 
 ### 13. graphs_mirror_across_y_x
-- **source:** chapter1-standalone.html §1.1 · Figure 1.2 後的 prose 幾何主張（“reflections of one another across the line $y=x$；$(a,b)$ ↔ $(b,a)$”）
+- **source:** chapter1-print-standalone.html §1.1 · Figure 1.2 後的 prose 幾何主張（“reflections of one another across the line $y=x$；$(a,b)$ ↔ $(b,a)$”）
 - **learning_goal:** 理解「$(a,b)$ 在 $f$ 上 ⟺ $(b,a)$ 在 $f^{-1}$ 上」如何給出兩圖對 $y=x$ 鏡射。
 - **kind:** `visual`
 - **narration:**
@@ -145,8 +145,18 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **animation_cue:** 先畫 $y=x^3$ 與虛線 $y=x$；曲線沿 $y=x$「翻摺」生成 $\sqrt[3]{x}$；接著一組具體點對（如 $(a,b) \to (b,a)$）以連接線跨過鏡線對應閃示；收在兩曲線＋鏡線並存的全圖。
 - **備註（§5）：** 講義此處為散文一般主張、無書圖；依 §5 用具體函數（$x^3$／$\sqrt[3]{x}$，呼應 first_inverses 單元）示範——增補呈現、不增刪內容。
 
-### 14. the_procedure
-- **source:** chapter1-standalone.html §1.1 · Strategy 1.1（env-name: Finding the inverse of a one-to-one function；`ol.steps` 三步）
+### 14. repair_by_restricting
+- **source:** chapter1-print-standalone.html §1.1 · Example 1.5 + Solution + Figure 1.3（data-fig: restrict-x2）
+- **learning_goal:** 看見「限定定義域」如何把不可逆的 $x^2$ 修成一對一、得到 $f^{-1}(x)=\sqrt{x}$，並認出「先限定、再求逆」就是反三角函數的關鍵手法。
+- **kind:** `example`
+- **narration:**
+  > Remember $x^2$ — the very first function that failed us, because $\tfrac12$ and $-\tfrac12$ both land on $\tfrac14$. We can repair it. Restrict the domain to $[0,\infty)$, keeping only the non-negative inputs, and the collision is gone: if $x_1^2 = x_2^2$ with $x_1, x_2 \ge 0$, then $x_1 = x_2$. The restricted function is one-to-one, so now it has an inverse. Solving $x = (f^{-1}(x))^2$ and keeping the non-negative root gives $f^{-1}(x) = \sqrt{x}$ — which is exactly why the square-root symbol means the *positive* root: it is defined to undo the restricted squaring function. And the move we just made — restrict first, then invert — is exactly what makes the inverse trigonometric functions possible, since sine and cosine are not one-to-one on their own either.
+- **visual_need:** 同一座標系：限定在 $[0,\infty)$ 的拋物線 $y=x^2$、其反函數 $y=\sqrt{x}$、虛線鏡線 $y=x$；標一組對應點 $(2,4)\leftrightarrow(4,2)$，凸顯兩曲線對 $y=x$ 互為鏡射。（重繪講義 Figure 1.3 的數學內容。）
+- **animation_cue:** 先畫完整拋物線 $y=x^2$（淡）；左半 $x<0$ 轉灰退場、只留 $[0,\infty)$ 右半實色——演出「砍掉一半定義域以消除重複輸出」；限定後的曲線沿虛線 $y=x$ 翻摺生成 $\sqrt{x}$；對應點 $(2,4)\to(4,2)$ 跨鏡線閃示對應。
+- **備註（§3 placement／§5／§2）：** 書序在 reflection prose 後、Strategy 前，置於 u13 與 u15 之間；回收開場 $x^2$ 反例（callback）。單一前向概念橋接（→反三角）摺進 takeaway，不獨立成 `forward_ref`、不報節號。為**代表式涵蓋**（§2，2026-06-13）新增：帶來「域限定修復可逆性」新教學點＋新圖，非同型 drill。
+
+### 15. the_procedure
+- **source:** chapter1-print-standalone.html §1.1 · Strategy 1.1（env-name: Finding the inverse of a one-to-one function；`ol.steps` 三步）
 - **learning_goal:** 把找反函數定型成三步 procedure，並知道工作量集中在「解 $x$」。
 - **kind:** `procedure`
 - **narration:**
@@ -154,8 +164,8 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **visual_need:** 三步驟卡（祈使句），step 2 視覺強調為核心步。
 - **animation_cue:** —（靜態逐步揭示即可）
 
-### 15. procedure_in_action
-- **source:** chapter1-standalone.html §1.1 · Example 1.4 + Solution（$f(x)=x^3+2$）
+### 16. procedure_in_action
+- **source:** chapter1-print-standalone.html §1.1 · Example 1.6 + Solution（$f(x)=x^3+2$）
 - **learning_goal:** 完整跑一遍 procedure（解 $x$ 兩步、互換、compose 驗證）。
 - **kind:** `example`
 - **narration:**
@@ -164,7 +174,17 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **animation_cue:** —（靜態逐步揭示即可）
 - **備註（§4 repeat-pattern）：** 同型第二例，跳過 first_inverses 已建立的 setup，一句轉場直接進演算。
 
-### 16. recap
+### 17. temperature_conversion
+- **source:** chapter1-print-standalone.html §1.1 · Example 1.8 + Solution（攝氏↔華氏）
+- **learning_goal:** 看見反函數回答一個真實問題（華氏→攝氏），並把三步 procedure 套在線性應用函數上、確認 $f^{-1}$ 的「意義」而不只是公式。
+- **kind:** `example`
+- **narration:**
+  > One last inverse, and this one means something outside the page. The function $f(t) = \tfrac{9}{5}t + 32$ takes a Celsius temperature and returns the Fahrenheit reading. So what does its inverse do? It runs the conversion backwards — hand it a Fahrenheit number and it gives you the Celsius. The recipe is unchanged: solve $t = \tfrac{9}{5}f^{-1}(t) + 32$ for the inverse, which gives $f^{-1}(t) = \tfrac{5}{9}(t - 32)$. And the check is reassuring — go to Fahrenheit and back, $f^{-1}(f(t)) = \tfrac{5}{9}\bigl(\tfrac{9}{5}t + 32 - 32\bigr) = t$, landing exactly where we began. Here an inverse is not an abstraction; it is the formula on the other side of the thermometer.
+- **visual_need:** example_walkthrough 風格：題目一句（$f(t)=\tfrac95 t+32$，C→F，問 $f^{-1}$ 意義）；求解兩步（$t=\tfrac95 f^{-1}(t)+32 \to f^{-1}(t)=\tfrac59(t-32)$）；check 式一行收斂到 $t$；takeaway「$f^{-1}$＝把溫度計反過來讀（F→C）」。
+- **animation_cue:** —（靜態逐步揭示即可；可選 $0^\circ\text{C}=32^\circ\text{F}$、$100^\circ\text{C}=212^\circ\text{F}$ 雙溫標對照小圖，非必要）
+- **備註（§4 repeat-pattern／§2）：** 同走三步 procedure，但 narration 以「The recipe is unchanged」一句轉場、不重述 setup（§4）。為**代表式涵蓋**新增：帶來「真實世界應用＋詮釋 $f^{-1}$ 意義」新 flavor，非冗餘代數 drill；置於 u16 procedure_in_action 後、recap 前作收束。
+
+### 18. recap
 - **source:** §1.1 整節（recap 為增補單元）
 - **learning_goal:** 四句帶走整節：定義＋測試、存在性定理、composition identities＋鏡射、procedure。
 - **kind:** `recap`
@@ -173,7 +193,7 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 - **visual_need:** 四張 takeaway 卡：① one-to-one ＋水平線測試；② 存在性（iff）＋ domain/range 互換；③ 兩條恆等式＋鏡射；④ 三步 procedure。
 - **animation_cue:** —（用 gen-2 既有 recap_cards 模板）
 
-### 17. outro
+### 19. outro
 - **source:** —（品牌收尾）
 - **learning_goal:** —
 - **kind:** `outro`
@@ -185,7 +205,8 @@ sections:      [1.1 Inverse Functions, 1.2 Inverse Trigonometric Functions,
 
 ## 內容層檢核（§7）自查記錄
 
-- 環境覆蓋：Definition 1.1（u3）、Example 1.1（u4）、Example 1.2（u5）、Remark 1.1＋Figure 1.1（u6）、Definition 1.2（u7）、Remark 1.2（u8）、Theorem 1.1（u9）、Proof（u10）、Example 1.3（u11）、Proposition 1.1＋Figure 1.2（u12）、reflection prose（u13）、Strategy 1.1（u14）、Example 1.4（u15）——**全覆蓋，無 exercise 洩入**（本節 HTML 無 `env-exercise`）。
+- 環境覆蓋：Definition 1.1（u3）、Example 1.1（u4）、Example 1.2（u5）、Remark 1.1＋Figure 1.1（u6）、Definition 1.2（u7）、Remark 1.2（u8）、Theorem 1.1（u9）、Proof（u10）、Example 1.4（u11）、Proposition 1.1＋Figure 1.2（u12）、reflection prose（u13）、Example 1.5＋Figure 1.3（u14）、Strategy 1.1（u15）、Example 1.6（u16）、Example 1.8（u17）——**全覆蓋，無 exercise 洩入**（本節 HTML 無 `env-exercise`）。
+- 注（2026-06-13 import 後）：HTML §1.1 經 commit `eb5c53e` 新增 Example 1.3（一對一判別 $h=x^3-4x$）、1.5（限定 $x^2$ 域＋新 Figure 1.3）、1.7（有理函數雙向驗證）、1.8（攝氏↔華氏），既有例題重編號——本稿 u11（$g\to\sqrt[3]{x}$）現為 **Example 1.4**、u15（$x^3+2$）現為 **Example 1.6**，source 已更新。依**代表式涵蓋**（方法論 §2，2026-06-13 拍板）：1.3／1.7 屬同型 drill（折疊、不另開單元）；1.5（帶新圖、橋接反三角）與 1.8（真實世界應用）**已採納為新單元 u14／u17**（2026-06-13 使用者拍板），narration 同日認可；1.3／1.7 仍折疊。
 - 環境間 prose 歸類：opening prose＋warmup（u2 lead-in／body）；“Now we return…”（u5 lead-in）；Example 1.2 例後 prose（u5 takeaway）；“Looking at the graph…”（u6 lead-in）；“a second function that undoes…”（u7 lead-in）；“The defining relation … yields…”（u12 lead-in）；reflection prose（promote → u13，§5 具體函數示範）；“When $f$ is one-to-one … short procedure”（u14 lead-in）——**無 silently drop**。
 - forward-pointing prose：本節 HTML 無向後章預告，無 `forward_ref` 單元。
 - symbol-heavy 判定：幾何／對應比重高（視覺單元 u2/u4/u5/u6/u12/u13），**不**套 §5 條件化例外。

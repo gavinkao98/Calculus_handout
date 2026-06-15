@@ -1,0 +1,467 @@
+# Section 1.4 One-Sided and Infinite Limits -- 工程稿（storyboard, gen-2 格式）
+#
+# 從 content_scripts/ch01_one_sided_infinite.md（內容稿,16 單元；narration 經六-lens 對抗
+# 稽核全 clean、待使用者認可旁白）映射而來。講義權威:
+# experiments/handout_kit/chapter1-print-standalone.html §1.4。
+# 第二階段「模板化」產物:每單元配 template + accent、草稿 narration→say 插 {show}、
+# visual_need→視覺 payload。`source` 欄回溯內容稿單元 id（單元內有講義錨點）。
+#
+# 動畫頂著(先靜態無聲版、動畫第二輪):內容稿有 5 個 animation_cue(u3/u6/u7/u10/u12),
+# 各場景以 `# HOOK(第二輪):...` 註記待接入點;本版以模板靜態/內建版頂著。
+#
+# §1.4 plot-kind:漸近線/blow-up 曲線用 graph_focus 的 `y_clip`(極點斷段、乾淨出框,
+# 見 templates/graph_focus.py._clipped_function_curve；demo storyboards/_demo_asymptote.yml)；
+# 跳斷用開/閉端點 point(hollow + hollow_reason)。
+
+meta:
+  id: ch01_one_sided_infinite
+  chapter: "Chapter 1"
+  chapter_title: "Inverse Functions and Limits"
+  section: "1.4"
+  title: "One-Sided and Infinite Limits"
+  language: en
+  theme: midnight
+  voice: Charon
+  video: { w: 3840, h: 2160, fps: 60 }   # 交付標準：4K60 (manim fourk_quality)
+  tagline: "What if the two sides disagree, or the values blow up?"
+  sections:
+    - { id: "1.1", title: "Inverse Functions" }
+    - { id: "1.2", title: "Inverse Trigonometric Functions" }
+    - { id: "1.3", title: "The Limit of a Function" }
+    - { id: "1.4", title: "One-Sided and Infinite Limits" }
+    - { id: "1.5", title: "Limit Laws and Computational Techniques" }
+    - { id: "1.6", title: "The Precise Definition of a Limit" }
+
+scenes:
+
+  # 1 ----------------------------------------------------------------- intro
+  - id: intro
+    kind: intro
+    source: "內容稿 u1 intro"
+    tagline: "What if the two sides disagree, or the values blow up?"
+    bgm: soft_intro
+    duration: 5.8
+
+  # 2 ------------------------------------------------- motivation: two breakdowns
+  - id: two_ways_limits_break
+    kind: content
+    template: definition_math
+    accent: definition
+    kicker: motivation   # motivation 場景沿用 definition 色系,但 eyebrow 標實情
+    source: "內容稿 u2 two_ways_limits_break"
+    title: "Two Ways a Limit Breaks"
+    say: |
+      So far, a limit has been a single number that a function settles toward
+      as $x$ approaches a point. Now we meet two ways that clean picture can
+      break down.
+      {show math.0} First, a function can behave differently depending on which
+      side we approach from -- sliding in from the left it may head one way,
+      and from the right another.
+      {show math.1} Second, the values might not approach any finite number at
+      all; they can climb without bound. One-sided behavior and runaway values
+      -- those are the two new ideas of this section, and we take them in that
+      order.
+    statement: "A limit can break down in two ways."
+    math:
+      - "Two sides disagree: $\\lim_{x\\to a^-}f(x) \\ne \\lim_{x\\to a^+}f(x)$"
+      - { tex: "Values run away: $f(x)$ grows without bound", anim: highlight }
+
+  # 3 ----------------------------- definition: one-sided limits (graph; hook 第二輪)
+  # HOOK(第二輪): 一點沿左支滑向 a 停在 L^-(空心)、再一點沿右支滑向 a 停在 L^+(空心),
+  # 兩高度以水平虛線標出 L^- != L^+。本版靜態頂著(兩支+兩空心點全顯)。
+  - id: one_sided_definition
+    kind: content
+    template: graph_focus
+    accent: definition
+    source: "內容稿 u3 one_sided_definition · Definition 1.10 + Figure 1.13"
+    title: "Left-Hand and Right-Hand Limits"
+    say: |
+      When the two sides disagree, we need language for each side on its own.
+      The left-hand limit, written $\lim_{x \to a^{-}} f(x) = L$, describes what
+      happens as $x$ approaches $a$ through values less than $a$ -- the approach
+      from the left. The right-hand limit, $\lim_{x \to a^{+}} f(x) = L$, is the
+      mirror image: $x$ approaches $a$ through values greater than $a$, coming
+      in from the right.
+      {show annotation.0} The little minus and plus riding on $a$ are the whole
+      notation -- they record which side of $a$ you are arriving from. And on a
+      graph that jumps, the left approach can settle at one height while the
+      right approach settles at another.
+    axes:
+      x_range: [-3.5, 3.5, 1]
+      y_range: [-0.5, 4.5, 1]
+      x_length: 6.0
+      y_length: 3.8
+      x_ticks: [{ at: 0, label: "a" }]
+      y_ticks: [{ at: 2, label: "L^{-}" }, { at: 3, label: "L^{+}" }]
+    plots:
+      - { kind: function, expression: "2+0.3*x", x_range: [-3.0, 0.0], color_role: secondary, label: "$y=f(x)$", label_point: [-3.3, 1.15] }
+      - { kind: function, expression: "3-0.2*x", x_range: [0.0, 3.0], color_role: secondary }
+      - { kind: point, point: [0.0, 2.0], hollow: true, hollow_reason: "left-hand limit value; f(a) itself is unspecified", color_role: secondary }
+      - { kind: point, point: [0.0, 3.0], hollow: true, hollow_reason: "right-hand limit value; f(a) itself is unspecified", color_role: accent }
+    annotations:
+      - "$\\lim_{x\\to a^-}f(x)=L^-$ and $\\lim_{x\\to a^+}f(x)=L^+$: the minus and plus mark the side."
+
+  # 4 --------------------------------------- proposition: two-sided criterion
+  - id: two_sided_criterion
+    kind: content
+    template: definition_math
+    accent: proposition
+    source: "內容稿 u4 two_sided_criterion · Proposition 1.5"
+    title: "Criterion for a Two-Sided Limit"
+    say: |
+      How do the two one-sided limits relate to the ordinary, two-sided limit
+      from before? Exactly as you would hope:
+      {show math.0} the two-sided limit equals $L$ if and only if both
+      one-sided limits equal $L$. For the full limit to exist, the function has
+      to approach the same value from both directions.
+      {show math.1} So the moment the left and right limits disagree, the
+      two-sided limit simply does not exist -- there is no single number the
+      function is heading toward. This is how one-sided limits earn their keep:
+      they diagnose whether the two-sided limit is there at all.
+    statement: "The two one-sided limits together determine the two-sided limit."
+    math:
+      - "$\\lim_{x\\to a}f(x)=L \\iff \\lim_{x\\to a^-}f(x)=L \\ \\text{ and } \\ \\lim_{x\\to a^+}f(x)=L$"
+      - { tex: "If the one-sided limits differ, $\\lim_{x\\to a}f(x)$ does not exist.", anim: highlight }
+
+  # 5 ----------------------------------- example: criterion in both directions
+  - id: criterion_both_directions
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "內容稿 u5 criterion_both_directions · Example 1.19"
+    title: "Using the Criterion Both Ways"
+    say: |
+      Let us put the criterion to work in both directions.
+      {show math.0} Suppose the two-sided limit of $f$ at $-2$ equals $16$.
+      What must the left-hand limit be? Since the full limit exists, both sides
+      are forced to match it, so the left-hand limit is $16$ as well --
+      information flows from the two-sided limit outward to each side.
+      {show math.1} Now reverse it: suppose all we are told is that the
+      left-hand limit at $-2$ is $16$. Can we name the two-sided limit? No --
+      not enough information. The right side might agree, making the two-sided
+      limit $16$, or it might do something else entirely, in which case the
+      two-sided limit fails to exist.
+      {show takeaway} One side alone never settles the question; only both
+      sides together do.
+    steps:
+      - { text: "Given the two-sided limit, each side is forced to match it.", math: "\\lim_{x\\to-2}f=16 \\;\\Rightarrow\\; \\lim_{x\\to-2^-}f=16" }
+      - { text: "Given just one side, the two-sided limit is undetermined.", math: "\\lim_{x\\to-2^-}f=16 \\;\\Rightarrow\\; \\lim_{x\\to-2}f=\\ ?", hot: true }
+    takeaway: "One side alone never settles it; only both sides together do."
+    takeaway_tone: neutral
+
+  # 6 --------------------------------- example: a piecewise jump (graph; hook 第二輪)
+  # HOOK(第二輪): 兩支依序畫出,一點沿左支滑向 x=2 停 (2,3) 空心、一點沿右支滑向 x=2
+  # 停 (2,2) 實心,短雙箭頭標「跳了一格」。本版靜態頂著。
+  - id: jump_example
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "內容稿 u6 jump_example · Example 1.20 + Figure 1.14"
+    title: "A Function That Jumps"
+    say: |
+      Here is a function built from two different formulas, with the split
+      exactly at $x = 2$: it is $x + 1$ when $x$ is below $2$, and $4 - x$ from
+      $2$ onward. Approaching from the left, we are on the first piece,
+      $x + 1$, which heads toward $2 + 1$, that is $3$. Approaching from the
+      right, we are on the second piece, $4 - x$, heading toward $4 - 2$, that
+      is $2$.
+      {show annotation.0} The left limit is $3$, the right limit is $2$ -- they
+      disagree, so by our criterion the two-sided limit at $2$ does not exist.
+      The graph shows the break plainly: the curve jumps at $x = 2$, the left
+      piece ending at height $3$ and the right piece starting at height $2$.
+    axes:
+      x_range: [-1.0, 5.0, 1]
+      y_range: [-0.5, 5.0, 1]
+      x_length: 5.6
+      y_length: 3.8
+    plots:
+      - { kind: function, expression: "x+1", x_range: [-1.0, 2.0], color_role: secondary, label: "$y=x+1$", label_point: [-0.95, 1.5] }
+      - { kind: function, expression: "4-x", x_range: [2.0, 4.0], color_role: accent, label: "$y=4-x$", label_point: [3.15, 2.7] }
+      - { kind: point, point: [2.0, 3.0], hollow: true, hollow_reason: "left piece is x<2 (open endpoint)", color_role: secondary }
+      - { kind: point, point: [2.0, 2.0], hollow: false, color_role: accent }
+    annotations:
+      - "$\\lim_{x\\to 2^-}f=3,\\ \\lim_{x\\to 2^+}f=2$: they differ, so $\\lim_{x\\to 2}f$ does not exist."
+
+  # 7 ----------------------------------- example: values blow up (graph; hook 第二輪)
+  # HOOK(第二輪): 曲線從外往 x=0 描繪、兩支沿 y 軸節節攀高衝出畫面頂;同步數值表逐列亮。
+  # 本版靜態頂著(整條 1/x^2 + 數值 annotation)。
+  - id: values_blow_up
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "內容稿 u7 values_blow_up · Example 1.21"
+    title: "When Values Blow Up"
+    say: |
+      Now the second kind of breakdown: values that refuse to settle anywhere
+      finite. Take $f(x) = \frac{1}{x^{2}}$ and push $x$ toward $0$. Squaring
+      makes the denominator a tiny positive number, and one over a tiny
+      positive number is huge. Watch the scale: at $x = 0.1$ the value is
+      $100$; at $x = 0.01$ it has already jumped to ten thousand.
+      {show annotation.0} The closer $x$ gets to $0$, the larger
+      $\frac{1}{x^{2}}$ becomes, with no ceiling at all. There is no finite
+      number $L$ that these values approach, so in the strict sense the limit
+      does not exist -- but notice how it fails. The function is not wandering
+      aimlessly; it is climbing without bound, and that orderly blow-up
+      deserves a notation of its own.
+    axes:
+      x_range: [-2.2, 2.2, 1]
+      y_range: [-0.6, 8.0, 2]
+      x_length: 5.2
+      y_length: 3.9
+    plots:
+      - { kind: function, expression: "1/x**2", x_range: [-2.2, 2.2], y_clip: true, color_role: secondary, label: "$y=\\dfrac{1}{x^2}$", label_point: [1.1, 5.4] }
+    annotations:
+      - "$x=0.1\\to 100$, then $x=0.01\\to 10{,}000$: no ceiling."
+
+  # 8 -------------------------- example: sign decides infinity (compare 1/x vs 1/x^2)
+  - id: sign_decides_infinity
+    kind: content
+    template: graph_compare
+    accent: example
+    source: "內容稿 u8 sign_decides_infinity · Example 1.22"
+    title: "Which Way Do the Values Go?"
+    say: |
+      But that orderly blow-up needs the values all running the same way, and
+      $\frac{1}{x}$ shows why. Approach $0$ from the left, where $x$ is
+      negative: $\frac{1}{x}$ is negative and grows huge in magnitude, diving
+      toward minus infinity. Approach from the right, where $x$ is positive:
+      $\frac{1}{x}$ shoots up toward positive infinity.
+      {show caption.left} The two sides race off in opposite directions, so
+      there is no single tendency to record -- and here we do not write that
+      the limit is infinity.
+      {show caption.right} Contrast $\frac{1}{x^{2}}$, where both sides climb
+      the same way, upward: there we are entitled to write that the limit
+      equals infinity.
+      {show annotation.0} So it comes down to agreement in direction -- a
+      same-signed runaway on both sides earns the infinity symbol; a split
+      between the sides does not.
+    left:
+      axes: { x_range: [-3.0, 3.0, 1], y_range: [-8.0, 8.0, 4] }
+      plots:
+        - { kind: function, expression: "1/x", x_range: [-3.0, -0.13], y_clip: true, color_role: secondary, label: "$y=\\dfrac{1}{x}$", label_point: [-2.9, -3.0] }
+        - { kind: function, expression: "1/x", x_range: [0.13, 3.0], y_clip: true, color_role: secondary }
+      caption: "Sides disagree -- no $\\infty$."
+      verdict: bad
+    right:
+      axes: { x_range: [-3.0, 3.0, 1], y_range: [-1.0, 8.0, 2] }
+      plots:
+        - { kind: function, expression: "1/x**2", x_range: [-3.0, 3.0], y_clip: true, color_role: accent, label: "$y=\\dfrac{1}{x^2}$", label_point: [1.0, 5.4] }
+      caption: "Both sides up -- $=\\infty$."
+      verdict: ok
+    annotations:
+      - "A same-signed runaway on both sides earns $\\infty$; a split does not."
+
+  # 9 ------------------------------------------- definition: infinite limit notation
+  - id: infinite_limit_definition
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "內容稿 u9 infinite_limit_definition · Definition 1.11"
+    title: "Infinite Limits"
+    say: |
+      Let us make the notation official.
+      {show math.0} When the values of $f$ can be made arbitrarily large by
+      taking $x$ sufficiently close to $a$, we write
+      $\lim_{x \to a} f(x) = \infty$, and we call this an infinite limit.
+      {show math.1} If instead the values grow arbitrarily large in the
+      negative direction, we write $\lim_{x \to a} f(x) = -\infty$.
+      {show math.2} One caution that genuinely matters: the symbol infinity is
+      not a number, and this equation is not claiming the limit is some value.
+      It is shorthand -- a compact way to record that the function's values
+      grow without bound, in one definite direction.
+    statement: "An infinite limit records unbounded growth, in one direction."
+    math:
+      - "$\\lim_{x\\to a}f(x)=\\infty$: values can be made arbitrarily large"
+      - "$\\lim_{x\\to a}f(x)=-\\infty$: arbitrarily large and negative"
+      - { tex: "$\\infty$ is not a number -- the equation is shorthand for runaway growth", anim: highlight }
+
+  # 10 ------------------------ visual: four one-sided infinite cases (compare; hook 第二輪)
+  # HOOK(第二輪): 四格 panel 各一條曲線沿 x=a 衝出上/下緣,逐格亮出對應單邊記號。
+  # 本版靜態頂著:graph_compare 兩代表格(右側 +∞ / 左側 -∞)+ annotation 點明四型。
+  - id: four_one_sided_cases
+    kind: content
+    template: graph_compare
+    accent: example
+    source: "內容稿 u10 four_one_sided_cases · Figure 1.15"
+    title: "Four One-Sided Infinite Limits"
+    say: |
+      Everything we just did has one-sided versions too. The values can run off
+      to infinity as $x$ approaches $a$ from the left alone, or from the right
+      alone, and in either the positive or the negative direction.
+      {show caption.left} That gives four basic shapes -- here the curve
+      approaches $a$ from the right and sprints off the top,
+      {show caption.right} and here it approaches from the left and drops off
+      the bottom.
+      {show annotation.0} Left-side up, left-side down, right-side up,
+      right-side down -- each one a curve hugging the vertical line at $a$.
+      These four little pictures are the whole vocabulary of how a function can
+      explode on just one side of a point.
+    left:
+      axes: { x_range: [-1.0, 3.0, 1], y_range: [-1.0, 8.0, 2] }
+      plots:
+        - { kind: line, start: [1.0, -1.0], end: [1.0, 8.0], dashed: true, color_role: warning, label: "$x=a$", label_point: [1.12, 7.0], label_role: muted }
+        - { kind: function, expression: "0.7/(x-1)", x_range: [1.1, 3.0], y_clip: true, color_role: secondary }
+      caption: "$\\lim_{x\\to a^+}f=+\\infty$"
+    right:
+      axes: { x_range: [-1.0, 3.0, 1], y_range: [-8.0, 1.0, 2] }
+      plots:
+        - { kind: line, start: [1.0, -8.0], end: [1.0, 1.0], dashed: true, color_role: warning, label: "$x=a$", label_point: [1.12, -7.0], label_role: muted }
+        - { kind: function, expression: "0.7/(x-1)", x_range: [-1.0, 0.9], y_clip: true, color_role: secondary }
+      caption: "$\\lim_{x\\to a^-}f=-\\infty$"
+    annotations:
+      - "Four cases in all: each side ($a^-$, $a^+$) can run to $+\\infty$ or to $-\\infty$."
+
+  # 11 ------------------------------------------ definition: vertical asymptote
+  - id: vertical_asymptote_definition
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "內容稿 u11 vertical_asymptote_definition · Definition 1.12"
+    title: "Vertical Asymptotes"
+    say: |
+      These infinite limits have a familiar geometric name.
+      {show math.0} When a function blows up near $x = a$ -- on either side,
+      toward either infinity -- the vertical line $x = a$ is called a vertical
+      asymptote of the curve.
+      {show math.1} The graph runs closer and closer to that line without ever
+      touching it. So a vertical asymptote is simply the visual signature of an
+      infinite limit: a wall the curve chases but never reaches.
+    statement: "A vertical asymptote is the geometric signature of an infinite limit."
+    math:
+      - "$x=a$ is a vertical asymptote of $y=f(x)$ when at least one side blows up:"
+      - { tex: "$\\lim_{x\\to a^-}f(x)=\\pm\\infty \\quad\\text{or}\\quad \\lim_{x\\to a^+}f(x)=\\pm\\infty$", anim: highlight }
+
+  # 12 ----------------------------- example: finding an asymptote (graph; hook 第二輪)
+  # HOOK(第二輪): 先畫虛線 x=3,兩支分別沿虛線飆出/墜出,逼近時閃示 x-3 的小正/小負 + ±∞。
+  # 本版靜態頂著(兩支 y_clip + 虛線 + annotation)。
+  - id: finding_an_asymptote
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "內容稿 u12 finding_an_asymptote · Example 1.23 + Figure 1.16"
+    title: "Finding a Vertical Asymptote"
+    say: |
+      Let us hunt for an asymptote. Consider $y = \frac{2x}{x - 3}$. A vertical
+      asymptote can only happen where the function misbehaves, and for a
+      fraction that means where the denominator hits zero -- here, $x = 3$. So
+      $3$ is our one candidate; now we test it from each side. Coming in from
+      the right, $x - 3$ is a small positive number while the top stays near
+      $6$, and $6$ divided by something tiny and positive is enormous and
+      positive -- the limit is plus infinity. From the left, $x - 3$ is small
+      and negative, so the same near-$6$ top over a tiny negative gives minus
+      infinity.
+      {show annotation.0} Either one-sided infinity is enough on its own, so
+      the line $x = 3$ is a vertical asymptote: the curve rockets up on one
+      side of it and plunges down on the other.
+    axes:
+      x_range: [-3.0, 9.0, 3]
+      y_range: [-8.0, 12.0, 4]
+      x_length: 6.2
+      y_length: 3.9
+    plots:
+      - { kind: line, start: [3.0, -8.0], end: [3.0, 12.0], dashed: true, color_role: warning, label: "$x=3$", label_point: [3.2, 10.5], label_role: muted }
+      - { kind: function, expression: "2*x/(x-3)", x_range: [-3.0, 2.95], y_clip: true, color_role: secondary, label: "$y=\\dfrac{2x}{x-3}$", label_point: [-2.8, -3.2] }
+      - { kind: function, expression: "2*x/(x-3)", x_range: [3.05, 9.0], y_clip: true, color_role: secondary }
+    annotations:
+      - "$\\lim_{x\\to 3^+}=+\\infty,\\ \\lim_{x\\to 3^-}=-\\infty$: the line $x=3$ is a vertical asymptote."
+
+  # 13 ------------------- counterexample: zero denominator is only a candidate (compare)
+  - id: zero_denominator_not_enough
+    kind: content
+    template: graph_compare
+    accent: warning
+    source: "內容稿 u13 zero_denominator_not_enough · Example 1.24"
+    title: "A Zero Denominator Is Only a Candidate"
+    say: |
+      But be careful -- a zero in the denominator is only a candidate, not a
+      verdict. Suppose $f(x) = \frac{g(x)}{x^{2} - 9}$ for some function $g$ we
+      have not pinned down, and ask whether $x = -3$ must be an asymptote. The
+      denominator does vanish at $-3$, so it is certainly worth investigating.
+      But the answer hinges on the top.
+      {show caption.left} If $g$ is just $1$, then $f = \frac{1}{x^{2} - 9}$
+      genuinely blows up near $-3$, and yes, there is an asymptote.
+      {show caption.right} But if $g$ is itself $x^{2} - 9$, the whole fraction
+      collapses to $1$ everywhere it is defined -- a flat line, no asymptote at
+      all.
+      {show annotation.0} Same zero denominator, opposite outcomes. So a
+      vanishing denominator marks a spot to check with one-sided limits; it is
+      never a guarantee on its own.
+    left:
+      axes: { x_range: [-6.0, 0.0, 2], y_range: [-5.0, 5.0, 2] }
+      plots:
+        - { kind: line, start: [-3.0, -5.0], end: [-3.0, 5.0], dashed: true, color_role: warning, label: "$x=-3$", label_point: [-2.9, 4.2], label_role: muted }
+        - { kind: function, expression: "1/(x**2-9)", x_range: [-6.0, -3.06], y_clip: true, color_role: secondary, label: "$g=1$", label_point: [-5.7, 1.4] }
+        - { kind: function, expression: "1/(x**2-9)", x_range: [-2.94, 0.0], y_clip: true, color_role: secondary }
+      caption: "$g=1$: blows up at $-3$."
+    right:
+      axes: { x_range: [-6.0, 0.0, 2], y_range: [-5.0, 5.0, 2] }
+      plots:
+        - { kind: line, start: [-3.0, -5.0], end: [-3.0, 5.0], dashed: true, color_role: warning, label: "$x=-3$", label_point: [-2.9, 4.2], label_role: muted }
+        - { kind: function, expression: "0*x+1", x_range: [-6.0, 0.0], color_role: accent, label: "$g=x^2-9$", label_point: [-5.7, 1.5] }
+      caption: "$g=x^2-9$: collapses to $1$."
+    annotations:
+      - "Same zero at $x=-3$, opposite outcomes -- always confirm with one-sided limits."
+
+  # 14 ------------------------------- example: a logarithmic asymptote (graph)
+  - id: log_asymptote
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "內容稿 u14 log_asymptote · Example 1.25 + Figure 1.17"
+    title: "The Logarithm's Asymptote"
+    say: |
+      Asymptotes are not just a rational-function story. Take the natural
+      logarithm, $\ln x$. It is only defined for positive inputs, so we can
+      only approach $0$ from the right -- and as $x$ slides down toward $0$
+      from above, $\ln x$ falls without bound, off toward minus infinity.
+      {show annotation.0} That single one-sided infinite limit is all the
+      definition asks for, so $x = 0$ is a vertical asymptote of the logarithm.
+      Here the curve presses against the $y$-axis from the right, sinking lower
+      and lower the closer it gets.
+    axes:
+      x_range: [-0.5, 6.0, 1]
+      y_range: [-5.0, 2.5, 1]
+      x_length: 5.8
+      y_length: 3.8
+    plots:
+      - { kind: function, expression: "log(x)", x_range: [0.012, 6.0], y_clip: true, color_role: secondary, label: "$y=\\ln x$", label_point: [3.6, 1.2] }
+    annotations:
+      - "$\\lim_{x\\to 0^+}\\ln x=-\\infty$: the line $x=0$ is a vertical asymptote."
+
+  # 15 ---------------------------------------------------------------- recap
+  - id: recap
+    kind: content
+    template: recap_cards
+    accent: recap
+    source: "內容稿 u15 recap"
+    title: "Section 1.4 -- Recap"
+    say: |
+      Four ideas to carry out of this section.
+      {show point.0} First, one-sided limits: the left-hand and right-hand
+      limits describe the approach to $a$ from below and from above, written
+      with a little minus or plus riding on $a$.
+      {show point.1} {show formula.0} Second, the criterion that ties them
+      together -- the two-sided limit exists exactly when both one-sided limits
+      exist and agree; let them disagree, and the limit is gone.
+      {show point.2} {show formula.1} Third, infinite limits: when values grow
+      without bound in a single direction we write the limit as plus or minus
+      infinity, always remembering that infinity is not a number but a
+      description of runaway growth.
+      {show point.3} And fourth, vertical asymptotes: a line $x = a$ that the
+      graph chases toward infinity -- found by spotting where a function can
+      blow up, then confirming with one-sided limits.
+    points:
+      - "One-sided limits: the approach to $a$ from below and from above."
+      - "The two-sided limit exists exactly when both one-sided limits agree."
+      - "Infinite limits: unbounded growth -- infinity is not a number."
+      - "Vertical asymptote: where $f$ blows up; confirm with one-sided limits."
+    formulas:
+      - "\\lim_{x\\to a^-}f=\\lim_{x\\to a^+}f"
+      - "\\lim_{x\\to a}f=\\pm\\infty"
+
+  # 16 ---------------------------------------------------------------- outro
+  - id: outro
+    kind: outro
+    source: "內容稿 u16 outro"
+    bgm: soft_outro
+    duration: 8.0
