@@ -33,6 +33,7 @@
 - **三-mode 撰寫流程（root [`README.md`](README.md) §Mode B）下，Mode B 的稽核裁決與發現寫進該次修正 commit 的 message body**（subject ≤70 字、body 逐條：原本是什麼、為何不妥、改了什麼、引用證據），好讓未來對話用 `git log --grep="Mode B"` 撈回。參考 commit：`112aa5c`、`0ef06ee`。純 Mode A 或例行 bugfix 不適用。
 - **以下四項 preamble／style 現狀是使用者 2026-04-21 審查後刻意保留的，勿再當遺漏重提：** 不開 `showonlyrefs`、維持 `\raggedbottom`+`[H]`、題組用 `exercise` 環境（不另立 `problems` newlist）、不加 `csquotes autostyle`（引號靠 `style_lint.py`）。情境真變了再重評，並明講「原本你選擇保留，但現在 X」。（註：2026-06-12 起講義本體不收習題、`exercise` 環境退場——見 `CONTENT_SPEC.md` §14；第三項僅餘歷史意義。註：2026-06-13 起 LaTeX 講義整套搬進 `legacy/tex_handout/`、live 講義改為 `handout/` 的 HTML 版（MathJax/KaTeX＋JS paginator），故第 1／2／4 項的 LaTeX preamble 機制亦不再適用於 live 講義、與第 3 項同屬歷史性質；引號 linter 即 `legacy/tex_handout/tools/book_style_lint.py`，不在 HTML 產線上跑。）
 - **給使用者審核的交付物要用「打開就能讀」的形式（2026-06-12 使用者要求）：** 含數學式的審核文件**不要**交塞滿生 LaTeX 的 `.md`，改產出 standalone HTML（MathJax/KaTeX CDN，雙擊即開、數學即渲染）或其他可直接閱讀的形式。版控紀錄性質的文檔不在此限；凡「等使用者過目裁決」的東西一律照此辦理。
+- **每完成一輪撰寫後也要產 HTML 報告（2026-06-15 使用者要求）：** 不只「待裁決」的候選／findings 要 HTML——**凡完成一輪內容撰寫（Mode A／C 等），都要對實際寫入的內容另產一份 standalone HTML 報告**（MathJax/KaTeX CDN、雙擊即開、數學即渲染），逐條呈現所寫段落＋locus＋`[source:]`＋該輪 Mode B 結果，供使用者過目，不要只在對話裡給文字摘要。比照 [`handout/_audit/REVIEW-ch01-modec-candidates.html`](handout/_audit/REVIEW-ch01-modec-candidates.html) 的形式，檔名用 `REVIEW-…-applied.html` 之類，與「候選／裁決稿」分開。
 - **審核 finding 修完後必須回歸審核（2026-06-12 使用者要求）：** 修完 blocking／advisory finding 後，不可直接宣告完成——必須對修改過的項目重新跑一輪審核（Codex 或手動比對均可），確認修改本身沒有引入新問題。回歸審核的結果附在原稽核文檔中記錄。
 
 ## 程式／工程任務的行為準則（Karpathy guidelines）

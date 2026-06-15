@@ -494,11 +494,22 @@ window.MathJax = {
 
   <p>If \(f\) is one-to-one, then we can define a second function that undoes \(f\): given an output of \(f\), it returns the unique input that produced it.</p>
 
+  <!-- expansion:intuition — role-swap gloss motivating why domain and range trade places [pass: enrichment] -->
+  <p>The idea is simply that the inverse trades the roles of input and output. Where \(f\) reads as a question — “given the input \(x\), what is the output?” — the inverse reads the same correspondence in reverse: “given that output, which input produced it?” This is why the domain and range change places: the outputs of \(f\) are exactly the inputs of \(f^{-1}\), and the inputs of \(f\) are its outputs.</p>
+
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.2</span></p>
     <div class="env-body">
       <p>Let \(f\) be a one-to-one function with domain \(A\) and range \(B\). The <em>inverse function</em> of \(f\), denoted by \(f^{-1}\), has domain \(B\) and range \(A\), and is defined, for every \(y \in B\), by
       \[ f^{-1}(y) = x \quad \Longleftrightarrow \quad f(x) = y. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — f^{-1} is the inverse function, not the reciprocal [pass: enrichment] [source: Mooculus digInInversesOfFunctions L95-101] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.1</span></p>
+    <div class="env-body">
+      <p>The superscript \(-1\) in \(f^{-1}\) denotes the <em>inverse function</em>, not a reciprocal. That is, \(f^{-1}(x)\) is the inverse evaluated at \(x\), whereas \(\bigl(f(x)\bigr)^{-1} = 1 / f(x)\) is the reciprocal of the value \(f(x)\); these are generally different. The same warning applies to the inverse trigonometric notation \(\sin^{-1} x\) in the next section.</p>
     </div>
   </section>
 
@@ -721,7 +732,7 @@ window.MathJax = {
   </section>
 
   <section class="env env-caution">
-    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.1</span></p>
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.2</span></p>
     <div class="env-body">
       <p>The notation \(\sin^{-1} x\) is also used for \(\arcsin x\). It does <em>not</em> mean the reciprocal \(\bigl(\sin x\bigr)^{-1} = 1 / \sin x\). When reading a source that uses \(\sin^{-1}\), check the context to decide which is meant.</p>
     </div>
@@ -737,7 +748,7 @@ window.MathJax = {
   </section>
 
   <section class="env env-caution">
-    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.2</span></p>
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.3</span></p>
     <div class="env-body">
       <p>The identity \(\arcsin(\sin x) = x\) holds only when \(x \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\). Outside this interval, the right-hand side is replaced by the unique value in \(\left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\) with the same sine; for instance,
       \[ \arcsin(\sin \pi) = \arcsin(0) = 0 \neq \pi. \]</p>
@@ -772,6 +783,9 @@ window.MathJax = {
   </div>
 
   <h3 class="subsec-head">The inverse cosine function</h3>
+
+  <!-- expansion:intuition — why [0,π] is the natural restriction for cosine [pass: enrichment] -->
+  <p>As with sine, we first choose an interval on which the function is one-to-one and still runs through all of its values. Cosine decreases steadily from \(1\) to \(-1\) as the angle goes from \(0\) to \(\pi\), so the interval \([0, \pi]\) sweeps the entire range \([-1, 1]\) exactly once — the natural analogue of the choice \(\left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\) made for sine.</p>
 
   <p>The cosine function is one-to-one on the interval \(0 \le x \le \pi\), shown in Figure 1.7.</p>
 
@@ -837,6 +851,9 @@ window.MathJax = {
 
   <h3 class="subsec-head">The inverse tangent function</h3>
 
+  <!-- expansion:intuition — why arctan accepts all of R, tying the open interval to the unbounded domain [pass: enrichment] -->
+  <p>On the open interval \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\), the tangent function climbs continuously from \(-\infty\) to \(+\infty\), taking each real number as a value exactly once. This is why the inverse tangent, unlike \(\arcsin\) and \(\arccos\), accepts <em>every</em> real number as input: its domain is all of \(\mathbb{R}\).</p>
+
   <p>The tangent function is one-to-one on the interval \(-\tfrac{\pi}{2} < x < \tfrac{\pi}{2}\), shown in Figure 1.8.</p>
 
   <figure class="figure" data-fig="restricted-tangent">
@@ -856,6 +873,15 @@ window.MathJax = {
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.4</span><span class="env-name">Inverse tangent identities</span></p>
     <div class="env-body">
       <p>\[ \begin{aligned} \tan(\arctan x) = x, &\qquad x \in \mathbb{R},\\ \arctan(\tan x) = x, &\qquad -\tfrac{\pi}{2} < x < \tfrac{\pi}{2}. \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the arccos/arctan analogues of the arcsin(sin x) domain restriction [pass: enrichment] [source: parallels CLP-1 §2.12; mirrors the sine-case caution above] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.4</span></p>
+    <div class="env-body">
+      <p>As with the sine case, the “cancellation” identities hold only on each principal range. That is, \(\arccos(\cos x) = x\) only when \(x \in [0, \pi]\), and \(\arctan(\tan x) = x\) only when \(x \in \left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\). Outside these intervals the left-hand side returns the equivalent angle that <em>does</em> lie in the principal range; for instance,
+      \[ \arccos(\cos 2\pi) = \arccos(1) = 0 \neq 2\pi, \qquad \arctan(\tan \pi) = \arctan(0) = 0 \neq \pi. \]</p>
     </div>
   </section>
 
@@ -1108,6 +1134,21 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:caution — a finite table can suggest a limit that does not exist [pass: enrichment] [source: Mooculus digInWhatIsALimit, sin(pi/x) two-table example] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.5</span></p>
+    <div class="env-body">
+      <p>A table of values can only ever <em>suggest</em> a limit; it can never confirm one, and it can actively mislead. Consider \(f(x) = \sin(\pi / x)\) as \(x \to 0\). Sampling \(x = 0.1, 0.01, 0.001, \dots\) gives \(\sin(10\pi), \sin(100\pi), \dots = 0\) every time, suggesting the limit is \(0\). But sampling \(x = 0.3, 0.03, 0.003, \dots\) gives \(\sin\!\left(\tfrac{10\pi}{3}\right), \sin\!\left(\tfrac{100\pi}{3}\right), \dots = -\tfrac{\sqrt{3}}{2}\) every time, suggesting \(-\tfrac{\sqrt{3}}{2}\). In truth \(f\) runs through every value in \([-1, 1]\) infinitely often as \(x \to 0\), so the limit does not exist. The definition requires \(f(x)\) to be close to a single \(L\) for <em>all</em> \(x\) sufficiently near \(a\) — not merely for a convenient list of samples.</p>
+    </div>
+  </section>
+
+  <!-- expansion:application — close the instantaneous-velocity thread opened at the start of the section [pass: enrichment] [source: Mooculus digInInstantaneousVelocity, s(t)=40t-16t^2 ball example] -->
+  <p>We can now close the loop opened at the start of the section. Suppose a ball thrown upward has height \(s(t) = 40t - 16t^{2}\) feet at time \(t\) seconds. Its average velocity over the interval from \(t\) to \(2\) is
+  \[ \frac{s(2) - s(t)}{2 - t} = \frac{16 - (40t - 16t^{2})}{2 - t} = \frac{8(2t - 1)(t - 2)}{2 - t} = 8 - 16t, \qquad t \neq 2. \]
+  The <em>instantaneous</em> velocity at \(t = 2\) is the value this average approaches as the interval shrinks to nothing:
+  \[ v(2) = \lim_{t \to 2} \frac{s(2) - s(t)}{2 - t} = \lim_{t \to 2} (8 - 16t) = -24 \text{ ft/s}. \]
+  Notice that the original ratio has the indeterminate form \(\tfrac{0}{0}\) at \(t = 2\) — both \(s(2) - s(t)\) and \(2 - t\) tend to \(0\) — so the cancellation that produced \(8 - 16t\) was what made the limit accessible.</p>
+
   <p>The limits above were guessed by looking at function values near the point of interest. In the following sections, we will develop systematic methods for evaluating limits and study more subtle behavior such as one-sided limits and infinite limits.</p>
 
 </article>
@@ -1259,6 +1300,14 @@ window.MathJax = {
     </div>
   </section>
 
+  <!-- expansion:caution — "lim = ∞" records unbounded growth; it does not assert the limit exists [pass: enrichment] [source: Mooculus digInLimitsOfTheFormNonZeroOverZero] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.6</span></p>
+    <div class="env-body">
+      <p>Writing \(\lim_{x \to a} f(x) = \infty\) does <em>not</em> mean that the limit exists in the ordinary sense. It is shorthand recording a particular way the limit <em>fails</em> to exist: the values of \(f\) grow without bound. The symbol \(\infty\) is not a real number, and it cannot be added, multiplied, or otherwise manipulated like one. Reading “\(= \infty\)” as though it were an ordinary limit value is a common slip.</p>
+    </div>
+  </section>
+
   <p>One-sided versions,
   \[ \begin{aligned} &\lim_{x \to a^{-}} f(x) = \infty, \qquad \lim_{x \to a^{+}} f(x) = \infty, \\ &\lim_{x \to a^{-}} f(x) = -\infty, \qquad \lim_{x \to a^{+}} f(x) = -\infty, \end{aligned} \]
   are defined analogously. The four cases are illustrated in Figure 1.15.</p>
@@ -1276,6 +1325,18 @@ window.MathJax = {
     <div class="env-body">
       <p>The vertical line \(x = a\) is called a <em>vertical asymptote</em> of the curve \(y = f(x)\) if at least one of the following holds:
       \[ \lim_{x \to a^{-}} f(x) = \pm\infty \qquad \text{or} \qquad \lim_{x \to a^{+}} f(x) = \pm\infty. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:strategy — a reusable recipe for locating vertical asymptotes [pass: enrichment] [source: Mooculus digInVerticalAsymptotes] -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.2</span><span class="env-name">Locating vertical asymptotes</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Find the candidate points: the places not in the domain that can still be approached from within it. For a rational function, these are the zeros of the denominator.</li>
+        <li>At each candidate \(x = a\), examine the one-sided limits. When the expression has the form \(\frac{\text{nonzero}}{0}\), determine the sign of the small denominator on each side to decide between \(+\infty\) and \(-\infty\).</li>
+        <li>If at least one one-sided limit is \(+\infty\) or \(-\infty\), the line \(x = a\) is a vertical asymptote. If instead the denominator's zero is cancelled by the numerator and no infinity appears, there is no asymptote there.</li>
+      </ol>
     </div>
   </section>
 
@@ -1353,6 +1414,9 @@ window.MathJax = {
 
   <h3 class="subsec-head">The limit laws</h3>
 
+  <!-- expansion:intuition — why the limit laws are believable, before the formal statement [pass: enrichment] -->
+  <p>Each of these laws says something we already expect. If \(f(x)\) is settling toward \(L\) and \(g(x)\) toward \(M\) as \(x\) nears \(a\), then \(f(x) + g(x)\) ought to settle toward \(L + M\), the product \(f(x)\,g(x)\) toward \(LM\), and so on. In short, the laws assert that combining the functions first and then taking the limit gives the same result as taking the limits first and then combining.</p>
+
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">1.2</span><span class="env-name">Limit laws</span></p>
     <div class="env-body">
@@ -1366,6 +1430,14 @@ window.MathJax = {
   </section>
 
   <p>In words, the limit of a sum / difference / constant multiple / product / integer power is the corresponding combination of the limits, and the limit of a quotient is the quotient of the limits whenever the denominator's limit is not zero.</p>
+
+  <!-- expansion:caution — the quotient law needs a nonzero denominator limit; 0/0 is a signal to simplify, not a verdict [pass: enrichment] [source: CLP-1 §1.4 arithmetic of limits] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.7</span></p>
+    <div class="env-body">
+      <p>The quotient law applies only when the denominator's limit is <em>nonzero</em>. If \(\lim_{x \to a} g(x) = 0\), the law says nothing, and you may not conclude that the quotient's limit fails to exist or that it takes any particular value. A resulting \(\tfrac{0}{0}\) is a signal to do more work — usually algebraic simplification, as in the examples below — not a verdict about the limit.</p>
+    </div>
+  </section>
 
   <p>For now, the laws let us evaluate many limits directly.</p>
 
@@ -1615,7 +1687,7 @@ window.MathJax = {
   </div>
 
   <section class="env env-strategy">
-    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.2</span><span class="env-name">Computing a limit \(\lim_{x \to a} f(x)\)</span></p>
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.3</span><span class="env-name">Computing a limit \(\lim_{x \to a} f(x)\)</span></p>
     <div class="env-body">
       <ol class="steps">
         <li><em>Try direct substitution first.</em> If \(f(a)\) is defined and the expression is a polynomial or rational function with a nonzero denominator at \(a\), then the limit equals \(f(a)\).</li>
@@ -1664,6 +1736,9 @@ window.MathJax = {
 
   <p>In the previous sections we used graphs, tables, and algebraic techniques to study limits, and we stated the limit laws without proof. Those arguments rested on informal phrases such as “\(f(x)\) is close to \(L\)” and “\(x\) is close to \(a\).” To make the arguments rigorous — and, eventually, to prove the limit laws — we need a definition that replaces “close” with numerical precision.</p>
 
+  <!-- expansion:application — read ε and δ as engineering tolerances, a concrete why-it-matters [pass: enrichment] [source: APEX §1.2, x-tolerance = delta, y-tolerance = epsilon] -->
+  <p>It helps to read \(\varepsilon\) and \(\delta\) as <em>tolerances</em>. In engineering and manufacturing one specifies how far a finished quantity may stray from its target: an output tolerance \(\varepsilon\) around the desired value \(L\). One then asks how tightly the input must be controlled near \(a\) to keep the result within that tolerance — an input tolerance \(\delta\). The definition below is the mathematical backbone of the everyday promise “control the input closely enough, and the output stays within specification.”</p>
+
   <p>To motivate the definition, consider the function
   \[ f(x) = \begin{cases} 2x - 1, & x \neq 3,\\[4pt] 6, & x = 3. \end{cases} \]
   When \(x\) is close to \(3\) but \(x \neq 3\), the value \(f(x) = 2x - 1\) is close to \(5\). Intuitively, we expect \(\lim_{x \to 3} f(x) = 5\). But how close, exactly? We begin by making the informal phrase “close” numerically precise.</p>
@@ -1705,6 +1780,9 @@ window.MathJax = {
   </figure>
 
   <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\).</p>
+
+  <!-- expansion:intuition — the ε-δ definition read as a challenge-and-response game [pass: enrichment] [source: CLP-1 clp_limits_notes §1.7] -->
+  <p>It is useful to picture the definition as a challenge-and-response game. A skeptic names a tolerance \(\varepsilon > 0\) — how close to \(L\) they insist \(f(x)\) must be — and our job is to respond with a \(\delta > 0\) that meets the demand: every \(x\) within \(\delta\) of \(a\) (but not equal to \(a\)) is sent to within \(\varepsilon\) of \(L\). The limit equals \(L\) precisely when we can answer <em>every</em> challenge, no matter how small the \(\varepsilon\). This is why \(\varepsilon\) comes first and \(\delta\) second: \(\delta\) is chosen in reply to \(\varepsilon\).</p>
 
   <!-- expansion:example — diagnose a wrong definition: order of tolerances and direction of implication [source: APEX §1.2 #1, #2] -->
   <div class="workedexample">
@@ -1832,7 +1910,7 @@ window.MathJax = {
   <p>The four examples above share a common pattern, which we record as a general strategy.</p>
 
   <section class="env env-strategy">
-    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.3</span><span class="env-name">Verifying a limit from the \(\varepsilon\)-\(\delta\) definition</span></p>
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.4</span><span class="env-name">Verifying a limit from the \(\varepsilon\)-\(\delta\) definition</span></p>
     <div class="env-body">
       <p>To show that \(\lim_{x \to a} f(x) = L\):</p>
       <ol class="steps">

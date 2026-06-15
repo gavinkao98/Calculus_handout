@@ -56,3 +56,14 @@ gate 2（Codex 獨立複核）已於 2026-06-15 對 ch01 整章執行，**亦 0 
 - **第一章散文稽核：完成。** 兩道閘整章 0 blocking；gate-1（G1-1…G1-9 ＋ A）與 gate-2（G2-1…G2-4）所有 advisory 已逐條裁決、套用進 `fragments/ch01/sec-*.html`，並 `python build.py ch01` 重組進 `chapter1-print-standalone.html`。逐條紀錄（old→new）見 [`REVIEW-ch01-prose-audit-gate1.html`](REVIEW-ch01-prose-audit-gate1.html)／[`REVIEW-ch01-prose-audit-gate2.html`](REVIEW-ch01-prose-audit-gate2.html)。
 - **閘的基建：完成並接進流程。** rubric（含 U2／U4 refinement、`G1-/G2-` 編號慣例、HTML 交付物規定）、gate-1 subagent（`.claude/agents/handout-prose-audit.md`，因 `.claude/` 被 gitignore 故以 `git add -f` 強制納入版控）、gate-2 Codex 模板（含 `-c service_tier=fast` 實測坑）；已接進 README Mode B、CONTENT_SPEC §15、CONTENT_SOURCING 2.4、audit-dimensions dimension F。
 - **下一步：把閘推到 ch02／ch03。** gate 1（Claude subagent）免費、隨時可跑；gate 2（Codex）需 ChatGPT 訂閱配額、跑前先徵使用者同意。每章各產 gate-1／gate-2 兩份 `REVIEW-chNN-prose-audit-gate{1,2}.html`。
+
+## Mode C 第一輪（ch01 軟深度充實，2026-06-15）
+
+第一章主軸於 2026-06-15 凍結（見 [`../../CONTENT_ROADMAP.md`](../../CONTENT_ROADMAP.md) Ch 1 entry）後，執行首次 Mode C 充實回合，範圍限定軟深度（intuition／application／caution／strategy）。
+
+- **偵察：** 7 節並行 gap-walk，產 38 條候選；裁決稿 [`REVIEW-ch01-modec-candidates.html`](REVIEW-ch01-modec-candidates.html)。使用者裁定「13 條 high-confidence 動手，其餘待研究」。
+- **已寫入（13 條，皆帶 `[pass: enrichment]` 標記）：** §1.1 Caution 1.1（\(f^{-1}\)≠倒數）＋ role-swap intuition；§1.2 arccos \([0,\pi]\)／arctan \(\mathbb{R}\) 兩條 why-intuition ＋ Caution 1.4（arccos/arctan 域限）；§1.3 Caution 1.5（表格陷阱 \(\sin(\pi/x)\)）＋ velocity application（\(v(2)=-24\)）；§1.4 Caution 1.6（\(\lim=\infty\)≠存在）＋ Strategy 1.2（找垂直漸近線）；§1.5 limit-laws intuition ＋ Caution 1.7（商定律須分母非零）；§1.6 ε-δ tolerance application ＋ challenge-response intuition。
+- **連號維護：** Caution 全章重排為 1.1–1.7、Strategy 新增 1.2（原 1.2／1.3 → 1.3／1.4）。build.py 不自動編號；grep 確認無散文以編號交叉引用這些環境，重排安全。
+- **Mode B 收尾（gate-1，範圍限定新 `[pass: enrichment]`）：** 6 節並行盲審，**整輪 0 blocking** → Mode C 通過。advisory 裁決：§1.4「suspect factor」用詞不一致 → 改為「the denominator's zero … cancelled by the numerator」；§1.6 容差長句 → 拆兩句；其餘 optional（§1.2 principal-range 順序、§1.4 step-1 子句、§1.6 輕度回響）裁定保留。修正後 `python build.py ch01` 重組。
+- **figure 閘（新基建，與 prose 閘對稱）：** [`FIGURE-AUDIT-RUBRIC.md`](FIGURE-AUDIT-RUBRIC.md)（維度 D1–D8）＋ gate-1 subagent `.claude/agents/handout-figure-audit.md`（看 render 後 PNG、唯讀，`git add -f` 納版控）＋ render harness [`../_render/shot.mjs`](../_render/shot.mjs)（Node CDP 截圖；本機已裝 Node v24）。gate-2＝Codex `-i` 看圖、定稿前複核（計費、徵同意）。視覺審 run-to-run drift 為先前誤判已撤（見 `authoring/seed_converge/SYNTHESIS.md`）。
+- **下一步：** ① gate-2（Codex）對這 13 條新散文獨立複核（計費、需同意）；② 其餘 25 條候選（figure-notes、medium、history 待驗源等）待使用者研究後再議。

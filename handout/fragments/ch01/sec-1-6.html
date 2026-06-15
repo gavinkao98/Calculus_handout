@@ -11,6 +11,9 @@
 
   <p>In the previous sections we used graphs, tables, and algebraic techniques to study limits, and we stated the limit laws without proof. Those arguments rested on informal phrases such as “\(f(x)\) is close to \(L\)” and “\(x\) is close to \(a\).” To make the arguments rigorous — and, eventually, to prove the limit laws — we need a definition that replaces “close” with numerical precision.</p>
 
+  <!-- expansion:application — read ε and δ as engineering tolerances, a concrete why-it-matters [pass: enrichment] [source: APEX §1.2, x-tolerance = delta, y-tolerance = epsilon] -->
+  <p>It helps to read \(\varepsilon\) and \(\delta\) as <em>tolerances</em>. In engineering and manufacturing one specifies how far a finished quantity may stray from its target: an output tolerance \(\varepsilon\) around the desired value \(L\). One then asks how tightly the input must be controlled near \(a\) to keep the result within that tolerance — an input tolerance \(\delta\). The definition below is the mathematical backbone of the everyday promise “control the input closely enough, and the output stays within specification.”</p>
+
   <p>To motivate the definition, consider the function
   \[ f(x) = \begin{cases} 2x - 1, & x \neq 3,\\[4pt] 6, & x = 3. \end{cases} \]
   When \(x\) is close to \(3\) but \(x \neq 3\), the value \(f(x) = 2x - 1\) is close to \(5\). Intuitively, we expect \(\lim_{x \to 3} f(x) = 5\). But how close, exactly? We begin by making the informal phrase “close” numerically precise.</p>
@@ -52,6 +55,9 @@
   </figure>
 
   <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\).</p>
+
+  <!-- expansion:intuition — the ε-δ definition read as a challenge-and-response game [pass: enrichment] [source: CLP-1 clp_limits_notes §1.7] -->
+  <p>It is useful to picture the definition as a challenge-and-response game. A skeptic names a tolerance \(\varepsilon > 0\) — how close to \(L\) they insist \(f(x)\) must be — and our job is to respond with a \(\delta > 0\) that meets the demand: every \(x\) within \(\delta\) of \(a\) (but not equal to \(a\)) is sent to within \(\varepsilon\) of \(L\). The limit equals \(L\) precisely when we can answer <em>every</em> challenge, no matter how small the \(\varepsilon\). This is why \(\varepsilon\) comes first and \(\delta\) second: \(\delta\) is chosen in reply to \(\varepsilon\).</p>
 
   <!-- expansion:example — diagnose a wrong definition: order of tolerances and direction of implication [source: APEX §1.2 #1, #2] -->
   <div class="workedexample">
@@ -179,7 +185,7 @@
   <p>The four examples above share a common pattern, which we record as a general strategy.</p>
 
   <section class="env env-strategy">
-    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.3</span><span class="env-name">Verifying a limit from the \(\varepsilon\)-\(\delta\) definition</span></p>
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.4</span><span class="env-name">Verifying a limit from the \(\varepsilon\)-\(\delta\) definition</span></p>
     <div class="env-body">
       <p>To show that \(\lim_{x \to a} f(x) = L\):</p>
       <ol class="steps">

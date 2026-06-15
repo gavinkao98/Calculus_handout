@@ -10,6 +10,9 @@
 
   <h3 class="subsec-head">The limit laws</h3>
 
+  <!-- expansion:intuition — why the limit laws are believable, before the formal statement [pass: enrichment] -->
+  <p>Each of these laws says something we already expect. If \(f(x)\) is settling toward \(L\) and \(g(x)\) toward \(M\) as \(x\) nears \(a\), then \(f(x) + g(x)\) ought to settle toward \(L + M\), the product \(f(x)\,g(x)\) toward \(LM\), and so on. In short, the laws assert that combining the functions first and then taking the limit gives the same result as taking the limits first and then combining.</p>
+
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">1.2</span><span class="env-name">Limit laws</span></p>
     <div class="env-body">
@@ -23,6 +26,14 @@
   </section>
 
   <p>In words, the limit of a sum / difference / constant multiple / product / integer power is the corresponding combination of the limits, and the limit of a quotient is the quotient of the limits whenever the denominator's limit is not zero.</p>
+
+  <!-- expansion:caution — the quotient law needs a nonzero denominator limit; 0/0 is a signal to simplify, not a verdict [pass: enrichment] [source: CLP-1 §1.4 arithmetic of limits] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.7</span></p>
+    <div class="env-body">
+      <p>The quotient law applies only when the denominator's limit is <em>nonzero</em>. If \(\lim_{x \to a} g(x) = 0\), the law says nothing, and you may not conclude that the quotient's limit fails to exist or that it takes any particular value. A resulting \(\tfrac{0}{0}\) is a signal to do more work — usually algebraic simplification, as in the examples below — not a verdict about the limit.</p>
+    </div>
+  </section>
 
   <p>For now, the laws let us evaluate many limits directly.</p>
 
@@ -272,7 +283,7 @@
   </div>
 
   <section class="env env-strategy">
-    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.2</span><span class="env-name">Computing a limit \(\lim_{x \to a} f(x)\)</span></p>
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.3</span><span class="env-name">Computing a limit \(\lim_{x \to a} f(x)\)</span></p>
     <div class="env-body">
       <ol class="steps">
         <li><em>Try direct substitution first.</em> If \(f(a)\) is defined and the expression is a polynomial or rational function with a nonzero denominator at \(a\), then the limit equals \(f(a)\).</li>

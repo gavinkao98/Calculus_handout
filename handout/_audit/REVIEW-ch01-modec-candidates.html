@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 Mode C — 充實候選裁決稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.6; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .strong { background: #fff7ed; border-left: 3px solid #e0a106; padding: .5rem .8rem; border-radius: 4px;
+            font-size: .9rem; color: #7a5b00; margin: .3rem 0 1rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem;
+          margin: .6rem 0; }
+  .card.hi { border-left: 4px solid var(--blue); }
+  .card.med { border-left: 4px solid var(--gray); }
+  .card.lo { border-left: 4px solid var(--line); opacity: .92; }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+  .b-int { background:#e7f0fb; color:var(--blue); } .b-cau { background:#fdeceb; color:var(--red); }
+  .b-app { background:#e9f7ef; color:#1a7f47; } .b-str { background:#f3e8fd; color:#6c2bd9; }
+  .b-fig { background:#eef1f4; color:var(--gray); } .b-his { background:#fef0e7; color:#9a5b00; }
+  .conf { font-size:.72rem; color:var(--gray); float:right; }
+  .conf.hi { color:var(--blue); font-weight:700; }
+  .loc { font-size:.82rem; color:var(--gray); margin:.25rem 0; }
+  .prop { margin:.35rem 0; }
+  .src { font-size:.78rem; color:var(--gray); margin-top:.3rem; }
+  .src code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .why { font-size:.84rem; color:#475467; margin:.25rem 0 0; }
+  code.kw { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; font-size:.85em; }
+  .legend { font-size:.82rem; color:var(--gray); margin:.5rem 0 0; }
+  .tier { font-weight:700; color:var(--blue); }
+</style>
+</head>
+<body>
+<h1>Chapter 1 — Mode C 充實候選裁決稿</h1>
+<p class="sub">2026-06-15　gap-walk（7 節並行偵察）產出　·　範圍＝軟深度（intuition／application／caution／strategy）　·　主軸已凍結，全為「新增」、不動既有內容</p>
+
+<p class="strong"><b>怎麼用：</b>逐條看，告訴我要寫哪些（用左邊的 ID，如「寫 1.1-1、1.1-2、1.3-2…」或「全部 high＋指定的 medium」）。<b>figure-note</b> 這輪不寫（軟深度為主），且多半要靠 figure 閘 render 後才能確認真假——見末段。<b>history</b>（1.6-6）需先驗證來源才動筆。</p>
+
+<p class="legend">徽章：<span class="badge b-int">intuition</span><span class="badge b-cau">caution</span><span class="badge b-app">application</span><span class="badge b-str">strategy</span><span class="badge b-fig">figure-note</span><span class="badge b-his">history</span>　·　左框色：<span style="color:var(--blue)">藍＝high</span> / 灰＝medium / 淡＝low confidence。</p>
+
+<h2>導論 sec-intro</h2>
+<div class="card lo"><span class="conf">low</span><span class="id">intro-1</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：lead 段內，加一個子句（不另起 block）</div>
+<div class="prop">把本章接回讀者的 precalculus 背景——one-to-one、composition、三角圖形都是已學過概念的「磨利版」，讓開章從熟悉地面起步。</div>
+<div class="why">why：§4 要求概述連結先備知識；目前 lead 只預告將學什麼，沒點出讀者立足的 precalc 基礎。</div>
+<div class="src">source：authored</div></div>
+
+<h2>§1.1 Inverse Functions</h2>
+<p class="sub">已飽和：worked-example（E1.1–1.8 剛審過）、反射對稱／domain 配對直覺。</p>
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.1-1</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Def 1.2 之後、Remark 1.2 之前（\(f^{-1}\) 記號首次出現處）</div>
+<div class="prop">警告 \(f^{-1}\) 的上標 \(-1\) 是<b>反函數</b>不是倒數：\(f^{-1}(x)\) 是反函數在 \(x\) 的值，而 \((f(x))^{-1}=1/f(x)\)，兩者不同。（同一陷阱在 §1.2 的 \(\sin^{-1}\) 再現。）</div>
+<div class="why">why：反函數最常見記號陷阱；§5 把它列為 <code class="kw">caution</code> 的典型例，而本節目前 0 個 caution。</div>
+<div class="src">source：<code>[source: Mooculus digInInversesOfFunctions L95-101]</code></div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.1-2</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：Def 1.2 前的動機散文（line 103 單句處）</div>
+<div class="prop">在形式定義前加一句「角色互換」直覺：反函數把輸入／輸出對調——\(f\) 問「給定 \(x\)，輸出是多少？」，\(f^{-1}\) 反著問「哪個輸入產生這個輸出？」，這就是 domain／range 對調的原因。</div>
+<div class="why">why：Def 1.2 機械地給出集合對調；一句白話 gloss 讓自學者先有畫面（§3「直覺先於 formal」）。</div>
+<div class="src">source：authored（cf. Mooculus L27-30）</div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.1-3</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Strategy 1.1 之後、Example 1.6 之前</div>
+<div class="prop">提醒「swap-and-solve」流程預設 \(f\) 已是一對一：盲套到非一對一函數（如 \(y=x^2\) 解出 \(x=\pm\sqrt{y}\) 兩值）會得到非函數。先驗一對一或限制定義域。</div>
+<div class="why">why：Strategy 1.1 的 step 2「解 \(x\)」在有兩解時無聲失敗；接回 Example 1.5 的 domain restriction。</div>
+<div class="src">source：authored（grounded：Mooculus L390-404）</div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.1-4</span><span class="badge b-app">application</span>
+<div class="loc">locus：Example 1.8（攝氏–華氏）附近的 remark，或開章動機</div>
+<div class="prop">在溫度換算外再給 1–2 個日常「undo」情境：貨幣換算與其逆、編碼／解碼（密碼與金鑰）——都是人們真正要的就是反運算。2–3 句。</div>
+<div class="why">why：本節 0 個應用味 remark（既有兩個都是記號／機械）；§5 目標每節約 2–3 remark。</div>
+<div class="src">source：authored（溫度本身＝Mooculus L181-227）</div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.1-5</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：Def 1.1（一對一）之後，接 runner 例</div>
+<div class="prop">給一對一一句真實情境 gloss：時間→（前進跑者的）位置是一對一（每個位置只來自一個時間）；人→生日是函數但<b>非</b>一對一（多人同生日）。具體分開「函數」與「一對一函數」。</div>
+<div class="why">why：Def 1.1 後只接抽象的學號例；一組對照例錨定整節樞紐的區分。</div>
+<div class="src">source：<code>[source: Mooculus L268-291]</code></div></div>
+
+<div class="card lo"><span class="conf">low</span><span class="id">1.1-6</span><span class="badge b-fig">figure-note</span>
+<div class="loc">locus：Figure 1.1（line 97-99）、Figure 1.3（line 210-212）</div>
+<div class="prop">偵察員回報這兩圖在 fragment 裡是空 <code>&lt;figure&gt;</code> 殼、無 SVG。<b>⚠ 很可能是誤報</b>：fragment 本來就只放空 <code>&lt;figure data-fig&gt;</code>，繪圖在 standalone 的 <code>FIGS</code> 裡 hydrate（偵察員只讀 fragment、沒讀 standalone）。要真確認得跑 figure 閘 render 後看。</div>
+<div class="src">source：authored（架構觀察，待 figure 閘驗證）</div></div>
+
+<h2>§1.2 Inverse Trigonometric Functions</h2>
+<p class="sub">已飽和：arcsin 的 caution（1.1 倒數、1.2 域）、開章「從比值還原角」動機。</p>
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.2-1</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：「The inverse cosine function」子節開頭前</div>
+<div class="prop">加一句說明<b>為何</b> \([0,\pi]\) 是 cosine 的自然限制：cosine 在 \([0,\pi]\) 已單調地從 \(1\) 降到 \(-1\)，是恰好掃過整個值域 \([-1,1]\) 一次的最短區間（呼應 sine 選 \([-\tfrac{\pi}{2},\tfrac{\pi}{2}]\)）。</div>
+<div class="why">why：arccos／arctan 目前冷開場（只斷言一對一、不給選區間的理由）；§3 要求形式環境前有直覺。</div>
+<div class="src">source：authored</div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.2-2</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：「The inverse tangent function」子節開頭前</div>
+<div class="prop">加一句：tangent 在 \((-\tfrac{\pi}{2},\tfrac{\pi}{2})\) 連續地從 \(-\infty\) 爬到 \(+\infty\)，每個實數恰被取到一次——這就是<b>為何 arctan 的定義域是全體 \(\mathbb{R}\)</b>（不像 arcsin／arccos 限於 \([-1,1]\)），把開區間與無界定義域綁在一起。</div>
+<div class="why">why：補同樣的冷開場缺口，並解釋 Def 1.5 只隱含的事實。</div>
+<div class="src">source：authored</div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.2-3</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Proposition 1.3（arccos 恆等式）／1.4（arctan 恆等式）之後</div>
+<div class="prop">補 Caution 1.2 的 arccos／arctan 類比：\(\arccos(\cos x)=x\) 僅當 \(x\in[0,\pi]\)、\(\arctan(\tan x)=x\) 僅當 \(x\in(-\tfrac{\pi}{2},\tfrac{\pi}{2})\)；超出則折回主值，如 \(\arccos(\cos 2\pi)=0\ne2\pi\)。</div>
+<div class="why">why：目前只有 sine 版被 caution（1.2），arccos／arctan 同型陷阱留給讀者自行推斷——discoverability gap。</div>
+<div class="src">source：<code>[source: 平行 CLP-1 §2.12；鏡像既有 Caution 1.2]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.2-4</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Example 1.12（arccos 負輸入落第二象限）之後</div>
+<div class="prop">把例子裡的旁白升成獨立 caution：arccos 值域 \([0,\pi]\)，故負輸入逼出鈍角；arcsin 負輸入則逼出負（第四象限）角——兩者把負號放在相反側。</div>
+<div class="why">why：可重用的 sign／象限規則，目前埋在單一例子的散文裡、查不到。</div>
+<div class="src">source：<code>[source: Example 1.12 解答內既有]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.2-5</span><span class="badge b-str">strategy</span>
+<div class="loc">locus：Example 1.9 前，或首個三角形法例子旁</div>
+<div class="prop">命名 Ex 1.9(b)/1.12/1.13 反覆用的技巧（可作 <code class="kw">strategy</code> 盒）：求「反三角表達式的三角函數值」→ 設 \(\theta=\) 該反三角式 → 畫實現已知比值的直角三角形 → 用畢氏求缺邊 → 讀出所求比值；<b>符號由主值區間定，不由圖</b>。</div>
+<div class="why">why：三角形法是三個例子的支柱技巧卻從未命名，自學者當未解釋的把戲遇到。§5 最高槓桿處。</div>
+<div class="src">source：<code>[source: CLP-1 §2.12; Stewart §1.6 標準技巧]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.2-6</span><span class="badge b-app">application</span>
+<div class="loc">locus：開章段後，或早段的應用 remark</div>
+<div class="prop">把開章已點名的斜坡例做成一個具體實例：無障礙坡道每 \(12\) 單位水平上升 \(1\) 單位，傾角 \(\arctan(1/12)\approx4.76^\circ\)，示範 arctan 把量到的斜率轉成角度。1–2 句。</div>
+<div class="why">why：開章承諾真實應用（坡度、三角比）但本文只給抽象求值；§3 要應用動機，目前 0 個具體實例。</div>
+<div class="src">source：authored</div></div>
+
+<div class="card lo"><span class="conf">low</span><span class="id">1.2-7</span><span class="badge b-fig">figure-note</span>
+<div class="loc">locus：Def 1.6–1.8（arccsc/arcsec/arccot）與主值摘要段</div>
+<div class="prop">視覺缺口：三個冷門反三角的分段主值區間（如 \((0,\tfrac{\pi}{2}]\cup(\pi,\tfrac{3\pi}{2}]\)）純符號難讀，小圖標在數線／受限分支圖上有助理解。建議放 <code>&lt;!-- [FIGURE-OPPORTUNITY] --&gt;</code> 佔位即可。</div>
+<div class="src">source：authored（figure 閘待辦，非本輪）</div></div>
+
+<h2>§1.3 The Limit of a Function</h2>
+<p class="sub">已飽和：速度／差商開場動機、Def 1.9 自帶 informal gloss、「關心 \(a\) 附近而非 \(f(a)\)」拆解。</p>
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.3-1</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：表格型 Example 1.18 解答後、收尾段（line 135）前</div>
+<div class="prop">警告「表格會騙人」：\(f(x)=\sin(\pi/x)\) 在 \(x=0.1,0.01,\dots\) 給 \(0\)（看似極限 \(0\)），但在 \(x=0.3,0.03,\dots\) 給 \(-0.866\)；其實 \([-1,1]\) 每個值都在 \(0\) 附近被取到，極限不存在。定義要求對<b>所有</b>夠近的 \(x\) 都近 \(L\)，不只取樣幾列。</div>
+<div class="why">why：Ex 1.17–1.18 教「從表格猜極限」卻從不警告有限表格不證明任何事——常見初學陷阱。</div>
+<div class="src">source：<code>[source: Mooculus digInWhatIsALimit, sin(π/x) 雙表]</code></div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.3-2</span><span class="badge b-app">application</span>
+<div class="loc">locus：收尾段（line 135）後，閉合開場的速度線</div>
+<div class="prop">閉合開場拋出的速度：球高 \(s(t)=40t-16t^2\)，\([t,2]\) 平均速度 \(=8-16t\)；令 \(t\to2\) 得瞬時速度 \(v(2)=\lim_{t\to2}(8-16t)=-24\) ft/s。即開場那個差商極限、現在有數字了，並點出 \(0/0\) 形預告後面的工作。</div>
+<div class="why">why：開場用瞬時速度動機卻從未回來給具體數字——應用情境被提起又丟下。</div>
+<div class="src">source：<code>[source: Mooculus digInInstantaneousVelocity, v(2)=−24]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.3-3</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Def 1.9（line 23）後，或介紹 \(f(x)\to L\) 記號的段內</div>
+<div class="prop">簡短警告：\(\lim_{x\to a}f(x)=L\) 是斷言「值存在」；若沒有單一數被趨近就說極限不存在（如 \(\lfloor x\rfloor\) 在整數處，左趨 \(1\)、右趨 \(2\)）。寫「\(\lim\dots=\)」本身不保證右邊有數可填。</div>
+<div class="why">why：本節只展示存在的極限；讀者可能誤以為每個 \(\lim\) 都命名一個數。</div>
+<div class="src">source：<code>[source: Mooculus digInWhatIsALimit, ⌊x⌋ at x=2]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.3-4</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Example 1.15(c) 解答（line 57）內或後，首次讀 open/solid dot 處</div>
+<div class="prop">一句圖示慣例 caution：實心點 ● 標實際函數值 \(f(a)\)（該處有值），空心點 ○ 標曲線趨近但不取到的點；極限看曲線往哪去（空心點），與實心點位置無關。</div>
+<div class="why">why：Ex 1.15(c)、1.16 都靠這慣例卻從未說明；自學者冷遇會錯讀哪個是 \(f(a)\)、哪個是極限。</div>
+<div class="src">source：authored</div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.3-5</span><span class="badge b-fig">figure-note</span>
+<div class="loc">locus：Figure 1.11（line 31-33）三函數同極限佔位圖</div>
+<div class="prop">此圖被引述為「三函數在 \(a\) 的值不同（一個未定義）卻同極限」，建議畫成 3-panel 對照（極限＝\(f(a)\)／極限存在但 \(f(a)\) 不同／極限存在但 \(f(a)\) 未定義），每格標註，讓「極限無視 \(f(a)\)」一眼可見。</div>
+<div class="src">source：<code>[source: §10.3 多面板對照]</code>（figure 閘待辦）</div></div>
+
+<h2>§1.4 One-Sided and Infinite Limits</h2>
+<p class="sub">已飽和：DNE-vs-∞ 邊界（Ex 1.21–1.22 對比 \(1/x\)、\(1/x^2\)）、「兩側合定雙側極限」直覺。</p>
+<div class="card med"><span class="conf">medium</span><span class="id">1.4-1</span><span class="badge b-app">application</span>
+<div class="loc">locus：開章首段（line 10）後、「One-sided limits」子標前</div>
+<div class="prop">加 1–2 句具體動機：單側極限出現在只能從一個物理方向逼近處（時間從過去逼近某刻、濃度從下方逼近閾值）；無窮極限出現在模型爆掉處（重力／庫侖力當距離 \(\to0\)、電流當電阻 \(\to0\)）。informal 動機散文。</div>
+<div class="why">why：§3/§15 要每節 1–2 段動機；現開場僅一句抽象陳述。</div>
+<div class="src">source：authored（物理情境為通用、非特定出處）</div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.4-2</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Def 1.11 後那段（line 133「∞ 不是實數」）之後</div>
+<div class="prop">把陷阱做成可掃描的 caution：寫 \(\lim=\infty\) <b>不</b>代表極限存在——它是「值無界增長」的速記，\(\infty\) 不是能做算術的數。略讀者易把「\(=\infty\)」讀成普通極限值。</div>
+<div class="why">why：經典記號陷阱，§5/§9 正是為此保留 caution；目前埋在散文（line 104、133），掃彩色盒找不到。</div>
+<div class="src">source：<code>[source: Mooculus digInLimitsOfTheFormNonZeroOverZero]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.4-3</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：「Vertical asymptotes」子節 Def 1.12（line 164）後</div>
+<div class="prop">一句 caution：垂直漸近線用<b>垂直線的方程式</b> \(x=a\) 命名（一條線），不是一個數或點——寫「漸近線是 \(x=3\)」而非「漸近線是 \(3\)」。</div>
+<div class="why">why：常見記號錯誤，Mooculus 來源用 <code>\begin{warning}</code> 明標；trap-shaped → §5 路由到 caution。</div>
+<div class="src">source：<code>[source: Mooculus digInVerticalAsymptotes warning]</code></div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.4-4</span><span class="badge b-str">strategy</span>
+<div class="loc">locus：「Vertical asymptotes」子節開頭（line 156）後、Example 1.23 附近（<code class="kw">strategy</code> 盒）</div>
+<div class="prop">找垂直漸近線的 strategy 盒：(1) 找不在定義域但可從域內逼近的點（有理函數＝分母零點）；(2) 各候選點取單側極限；(3) 若是非零／零形，定兩側分數符號決定 \(+\infty\) vs \(-\infty\)；(4) 至少一個無窮單側極限 → \(x=a\) 是垂直漸近線。</div>
+<div class="why">why：Ex 1.23–1.25 都套這程序卻從未寫成可重用配方；本節 0 個 strategy 盒。（schema 無 strategy enum，偵察員暫記為 other。）</div>
+<div class="src">source：<code>[source: Mooculus digInVerticalAsymptotes]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.4-5</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：「Vertical asymptotes」子節 Ex 1.23–1.25 附近 remark</div>
+<div class="prop">一句直覺：本子節每個無窮極限的「非零／零」機制——分子趨非零、分母趨 \(0\)，商的大小必爆；小分母在各側的<b>符號</b>定 \(+\infty\) vs \(-\infty\)。命名後讀者能先預測答案。</div>
+<div class="why">why：三個 VA 例子都默默靠此符號分析，但共同機制從未命名。</div>
+<div class="src">source：<code>[source: Mooculus digInLimitsOfTheFormNonZeroOverZero]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.4-6</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：Example 1.25（\(\ln x\)，line 213-216）旁</div>
+<div class="prop">一句解釋為何 \(\ln x\) 只取右極限：\(x=0\) 在定義域 \((0,\infty)\) 邊緣，只能從域內（右側）逼近——而 Def 1.12 下單一無窮單側極限已足以使 \(x=0\) 成垂直漸近線。</div>
+<div class="why">why：Ex 1.25 默默只用右極限，會困惑期待兩側（如 Ex 1.23）的自學者；域邊緣推理是留白的真概念點。</div>
+<div class="src">source：<code>[source: Mooculus digInVerticalAsymptotes, ln(x) 例]</code></div></div>
+
+<div class="card lo"><span class="conf">low</span><span class="id">1.4-7</span><span class="badge b-fig">figure-note</span>
+<div class="loc">locus：Figure 1.13（one-sided-limits, line 27）與「One-sided limits」子節</div>
+<div class="prop">Def 1.10 引入左／右極限，但鄰近唯一的圖（1.13）展的是「單側不等」的後果。一張區分「從 \(x<a\) 趨近」vs「從 \(x>a\) 趨近」（兩側箭頭）的小圖能視覺化定義本身。僅記錄。</div>
+<div class="src">source：authored（figure 閘待辦）</div></div>
+
+<h2>§1.5 Limit Laws and Computational Techniques</h2>
+<p class="sub">已飽和：Strategy 1.2 盒、Ex 1.28 的 \(0/0\) 不定型深度、squeeze 前的動機段。</p>
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.5-1</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：Theorem 1.2（limit laws）前，擴開場段（line 9/13）</div>
+<div class="prop">一句直覺說明為何這些定律可信：若 \(f(x)\) 趨 \(L\)、\(g(x)\) 趨 \(M\)，則 \(f+g\) 趨 \(L+M\)、\(fg\) 趨 \(LM\)……定律只是說「先合併再取極限」＝「先取極限再合併」。形式陳述前的 informal。</div>
+<div class="why">why：§3 要形式環境前有直覺；本節從「我們記下代數性質」直接跳進定理，無白話理由。</div>
+<div class="src">source：authored</div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.5-2</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：商定律句（line 25）後，或 Direct substitution 子節前</div>
+<div class="prop">caution：商定律<b>僅</b>當分母極限非零時適用；若為零，不可據此斷言極限不存在或等於某值——須先化簡（前指 Ex 1.29–1.31）。\(0/0\) 是「再做工」的訊號，不是判決。</div>
+<div class="why">why：本節最常見學生陷阱、目前無任何 caution。與 Ex 1.28（\(0/0\) 可為任何值）不同——這條警告商定律本身的程序性誤用。</div>
+<div class="src">source：<code>[source: CLP-1 §1.4 arithmetic of limits]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.5-3</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：squeeze 開場段（line 212「定律要求兩個極限都存在」）內／後</div>
+<div class="prop">把「兩極限都須存在」從散文升成 caution：當某因子無極限時不能拆 \(\lim(fg)=(\lim f)(\lim g)\)——如 \(\lim x^2\cdot\lim\sin(1/x)\) 非法（\(\lim\sin(1/x)\) 不存在），這正是 Ex 1.34 要改用 squeeze 的原因。</div>
+<div class="why">why：trap-shaped，§3/§9 偏好 caution；前提「兩極限存在」正是學生會漏的假設，且本節已有完美反例（1.34）。</div>
+<div class="src">source：authored</div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.5-4</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Example 1.33 引入最大整數函數 \([x]\)（line 196-202）後</div>
+<div class="prop">記號 caution：最大整數（floor）的 \([x]\) 別與區間／閉括號 \([a,b]\) 混淆；許多書寫 \(\lfloor x\rfloor\) 正為避此衝突，讀者別處可能遇到。</div>
+<div class="why">why：§9 把記號陷阱（及讀者別處會遇到不同寫法的慣例）路由到首次使用處的 caution；\([x]\) vs \([a,b]\) 對自學高中生是真衝突。</div>
+<div class="src">source：<code>[source: APEX Calculus V5 §1.5 用 floor 記號]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.5-5</span><span class="badge b-app">application</span>
+<div class="loc">locus：squeeze 例子後（Ex 1.35 後、Strategy 1.2 前）的前指 remark</div>
+<div class="prop">2–4 句說明 squeeze 為何重要：它是建立基本三角極限 \(\lim_{x\to0}\frac{\sin x}{x}=1\) 的標準工具（夾在幾何面積界之間），而這又解鎖 Ch 3 的 \(\sin\)、\(\cos\) 導數。給技巧一個 payoff 與前向鉤。</div>
+<div class="why">why：squeeze 是本節唯一「為何要學」薄弱的技巧（除了人造的 \(x^2\sin(1/x)\)）；CLP-1 正是把它框成通往 \(\sin x/x\) 的路。</div>
+<div class="src">source：<code>[source: CLP-1 §1.4 squeeze；sin(x)/x 標準應用]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.5-6</span><span class="badge b-fig">figure-note</span>
+<div class="loc">locus：Example 1.29（\(\frac{x-1}{x^2-1}\) 化簡, line 111-128）／代數化簡子節</div>
+<div class="prop">FIGURE-OPPORTUNITY：化簡子節（Ex 1.29-1.31）無圖，但「可去洞」很視覺——把 \(y=\frac{x-1}{x^2-1}\) 畫成 \(y=\frac{1}{x+1}\) 並在 \(x=1\) 開洞，具體顯示消去不改極限、只移除一個缺點。</div>
+<div class="src">source：authored（figure 閘待辦）</div></div>
+
+<h2>§1.6 The Precise (ε–δ) Definition of a Limit</h2>
+<p class="sub">已飽和：Newton/Leibniz 史開場、容差級數 \(0.1\to0.01\to\varepsilon\) 進 Def 1.13、inline「Informally…」、診斷型錯誤定義 Ex 1.38、Strategy 1.3、幾何圖 Fig 1.21。</p>
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.6-1</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：Fig 1.21 下、Example 1.38 前那段（「…必須找到對應的 \(\delta\)」結尾後）</div>
+<div class="prop">給量詞順序一個「挑戰–回應」gloss：質疑者報一個容差 \(\varepsilon\)（要 \(f(x)\) 多接近 \(L\)），我們須回以滿足要求的 \(\delta\)；極限存在＝無論多小的挑戰都能應答。把「\(\forall\varepsilon\,\exists\delta\)」讀成一場可想像的遊戲。</div>
+<div class="why">why：巢狀量詞是這裡最難的觀念；散文給了順序卻沒給「行動者／回應」的畫面，讓不對稱（ε 先、δ 後回應）顯得必然而非任意。</div>
+<div class="src">source：<code>[source: CLP1 clp_limits_notes §1.7]</code></div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">1.6-2</span><span class="badge b-app">application</span>
+<div class="loc">locus：開章附近（第二段後）或 Def 1.13 前的 remark</div>
+<div class="prop">一段把 \(\varepsilon\)、\(\delta\) 讀成<b>容差</b>的應用：工程／製造指定輸出容差（\(\varepsilon\)，成品可偏離目標 \(L\) 多遠），須找輸入容差（\(\delta\)，設定須在 \(a\) 附近控多緊）保證達標。定義就是「把輸入控得夠緊、輸出就在規格內」的數學骨幹。</div>
+<div class="why">why：本節異常抽象；具體 why-it-matters 錨給自學者投入的理由（§3/§15 動機）。容差是 ε-δ 的標準真實鉤。</div>
+<div class="src">source：<code>[source: APEX §1.2, x-tolerance=δ, y-tolerance=ε]</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.6-3</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Example 1.40／1.41（首次選定具體 \(\delta\)）後</div>
+<div class="prop">caution：\(\delta\) 從不唯一——一旦找到可用的 \(\delta\)，任何更小的正 \(\delta\) 同樣有效（縮小輸入鄰域只會收緊結論）。目標是<b>展示一個</b>有效 \(\delta\)，不是「那個」\(\delta\)；Ex 1.40 中 \(\delta=\varepsilon/4\) 與 \(\varepsilon/5\) 都對。</div>
+<div class="why">why：初學者常把算出的 delta 當唯一必需值，看到別人不同就慌；fragment 選了具體 delta 卻從未點出這自由度。</div>
+<div class="src">source：authored</div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">1.6-4</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：Example 1.41 解答內／後，\(\delta=\min\{1,\varepsilon/4\}\) 處</div>
+<div class="prop">一句拆解 min 為何出現：\(\delta\) 須同時滿足兩個要求——把 \(x\) 留在輔助因子 \(|x-4|\) 有界的鄰域（\(|x-1|<1\)），<b>且</b>使 \(\varepsilon\) 界成立（\(|x-1|<\varepsilon/4\))——取較小半徑自動同時滿足。</div>
+<div class="why">why：min 步是 Ex 1.41 與簡單線性例的分水嶺；Strategy 1.3 抽象提過，但例子直接斷言、沒說為何是 min。</div>
+<div class="src">source：authored</div></div>
+
+<div class="card lo"><span class="conf">low</span><span class="id">1.6-5</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：Example 1.38（錯誤定義診斷）解答後</div>
+<div class="prop">把方向不對稱蒸餾成可重用規則 caution：蘊含永遠是輸入→輸出（\(0<|x-a|<\delta\Rightarrow|f(x)-L|<\varepsilon\)），不可反；\(\varepsilon\) 永遠先於 \(\delta\) 給定。憑記憶寫定義時反任一者是最常見錯誤。</div>
+<div class="why">why：Ex 1.38 已在散文診斷兩種反向，但教訓埋在解答內；<b>與「已飽和」邊界（1.38 已覆蓋）有重疊，low——若判 1.38 已足可略。</b></div>
+<div class="src">source：<code>[source: APEX §1.2]</code></div></div>
+
+<div class="card lo"><span class="conf">low</span><span class="id">1.6-6</span><span class="badge b-his">history</span>
+<div class="loc">locus：首段「…十九世紀發展出的 ε-δ 定義」處的 history remark</div>
+<div class="prop">2–3 句史註點名：Bolzano、Cauchy 於十九世紀初走向極限的算術化定義，Weierstrass 在柏林講課給出今日基本沿用的 ε-δ 形式，完成把微積分置於嚴格基礎的「分析算術化」。</div>
+<div class="why">why：開場提「十九世紀發展的現代解決」卻未具名，留了明顯史鉤；§5 列史註為 remark 典型用途。</div>
+<div class="src"><b>⚠ source 待驗：</b><code>需先查史源（Stewart 史註或 Boyer）再寫，不可憑記憶斷言人名／年代。</code></div></div>
+
+</body>
+</html>
