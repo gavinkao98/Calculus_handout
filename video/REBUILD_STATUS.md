@@ -4,6 +4,26 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢待改 HTML，「四 lens ＋ advisory ＋ 四級人工過濾 ＋ 計費閘門」的**做法**不變。
 
+## 🔬 2026-06-16 新 rubric 實跑：§1.6 六鏡＋§1.1 視覺 dogfood
+
+用上一輪建好的四份 SSOT rubric 實跑兩個閘，順帶驗證 rubric 能當 SSOT。
+
+**§1.6 全節六鏡（`CONTENT-SIXLENS` 首次規模實跑）：** Workflow `wf_5a8ec085-4ef`，全 19 單元（六鏡並行→refute-by-default 複驗）。**1 blocking＋2 advisory（去重自跨鏡重複；1 refuted）**；L3 語域／L4 不重複／**L5 數學 clean（0 錯，每條 ε-δ 獨立盲算過）**。
+- **SL-1**（blocking｜工程公差 enrichment 散文 silent-drop）→ 使用者選方案 (a)，已折進 u2 一句 symbol-free Incorporative lead-in（不用 ε/δ、避前向引用）。
+- **SL-2**（advisory｜u11 `Strategy 1.3`→`1.4`，與 §1.5 真實 Strategy 1.3 撞號）→ 已修。
+- **refuted**：u9 `kind: theorem`（Prop 1.7 帶證明、適用 §3 theorem+proof 列，標 theorem 正確）。
+- 紀錄：內容稿 §「六-lens 全節稽核（2026-06-16）」＋審核稿 [`_audit/REVIEW-ch01_precise_limit-sixlens.html`](content_scripts/_audit/REVIEW-ch01_precise_limit-sixlens.html)。**§1.6 內容已過六鏡閘、卡在「旁白 sign-off」人工閘。**
+
+**§1.1 視覺閘 dogfood（`VISUAL-FRAME` gate1 首次規模實跑）：** Workflow `wf_b5e31d1e-5ed`，17 幀（`critic.py --dry-run` 抽每場景最滿幀 → 每幀一個 Claude subagent 對照 V1–V8＋A1–A7）。**0 blocking、9 advisory**，A 分均值 89–93。抽驗 2 幀（scene 14 `y=x` label 被虛線穿過、scene 5 紅色 callout 置中）確認屬實、定位準、正確判 advisory 而非 blocking。**結論：VISUAL-FRAME 當 gate1 可用——不 over-report、escalation/non-findings 正確；惟 §1.1 太乾淨，detection（抓真 blocking）那面尚未驗。**
+
+### 待辦清單（接續用）
+
+1. **§1.6 旁白 sign-off（使用者）：** 讀 [`content_scripts/ch01_precise_limit_narration.html`](content_scripts/ch01_precise_limit_narration.html)（重點看 u2「SL-1 補」、u8/u12/u16「新增」）。認可後才進第二階段工程：storyboard 同步成 19 場景、scene 7 凸曲線整合、3 個 ε-δ 動畫修正（挖空點誤導／曲線與 running example 不連貫／ε 過小擁擠）。
+2. **視覺 polish punch-list（重跑影片時套用）：** §1.1 那 9 條（`y=x` label 挪離虛線、scene 5 callout 與 scene 15 右欄數學左對齊、scene 13 鏡射點精確化＋減交會擁擠、recap 補「mirror across y=x」子點）。
+3. **模板對齊補掃：** `example_walkthrough`（callout 置中）與 `procedure_steps`（右欄數學鋸齒）——先前 `CENTER`→`LEFT` 那輪未掃到這兩個模板，視覺閘撈出，待查改。
+4. **code 回報層 normalize（redesign 待續）：** `critic.py` 接 VISUAL-FRAME（runtime verbatim-inject rubric＋schema 補 A6/A7 與 V 維）＋**修抽幀新鮮度**（`--dry-run` 曾端出舊 `final.png`，視覺閘需新鮮幀才準）；`review_pack` 工程鏡待 `.tex` parser 重寫；critic/review_pack 的 PLACEHOLDER 定價。
+5. **VISUAL-FRAME detection 驗證：** 挑粗節（§1.6 舊 mock，有已知 3 個 ε-δ 動畫問題）跑視覺閘，補驗「抓得到真 blocking」那面。
+
 ## 🧭 2026-06-15 審核模式重構落地（minimal-unify，部分採用）
 
 **觸發：** 參考講義審核模式，把 video 五閘的零散（零收斂判準、severity 詞彙不一、命名衝突）收斂。決策與全圖見 [`REVIEW_REDESIGN.md`](REVIEW_REDESIGN.md)（已標部分採用）、地圖見 [`REVIEW_GATES.md`](REVIEW_GATES.md)。**本輪已落地：**
