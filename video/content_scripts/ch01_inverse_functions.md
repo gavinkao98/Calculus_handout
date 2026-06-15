@@ -1,7 +1,7 @@
 # Section 1.1 Inverse Functions — 內容稿 v2（正式版）
 
 > **性質：正式產線內容稿（v2）**。依 2026-06-10 拍板**從零重走**：不繼承 v1 校準樣本的 narration，全文以 HTML 講義權威檔重新拆解、重新撰寫（v1 為方法論校準原型，已隨本檔覆寫棄用）。**原 15 段 narration 已於 2026-06-10 經使用者認可；u14 `repair_by_restricting`、u17 `temperature_conversion` 為 2026-06-13 依代表式涵蓋（§2）新增（Example 1.5／1.8），narration 同日經使用者認可。**
-> **來源（權威）：** [`../../experiments/handout_kit/chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.1（`sec-no` 1.1，Inverse Functions）。
+> **來源（權威）：** [`../../handout/chapter1-print-standalone.html`](../../handout/chapter1-print-standalone.html) §1.1（`sec-no` 1.1，Inverse Functions）。
 > **格式：** 純內容層，每單元 `id / source / learning_goal / kind / narration / visual_need / animation_cue`；**不含** template / `{show}` / accent / 視覺 payload（第二階段才填）。`narration` 為英文（旁白語言）；`visual_need` / `animation_cue` 為中文（內容溝通用）。客製動畫由 Claude 依 `animation_cue` 生成（本節依拍板**第二輪**才接入；本輪工程稿以模板靜態頂著）。
 
 ---

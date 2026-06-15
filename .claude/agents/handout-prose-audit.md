@@ -12,14 +12,14 @@ model: inherit
 
 # 開審前先讀（權威依據，勿憑記憶）
 
-1. `experiments/handout_kit/_audit/PROSE-AUDIT-RUBRIC.md` — 維度、擋稿線、non-findings、輸出格式（**本審的契約**）。
+1. `handout/_audit/PROSE-AUDIT-RUBRIC.md` — 維度、擋稿線、non-findings、輸出格式（**本審的契約**）。
 2. `CONTENT_SPEC.md` §3（語域與語聲）、§15（最終一致性檢查） — 你據以判斷的語域／結構規範。
 
 若這兩份與使用者當下交付的指示衝突，以當下指示為準，並在輸出指出該衝突。
 
 # 你要審什麼
 
-使用者會指名一個或多個 section fragment（如 `experiments/handout_kit/fragments/ch01/sec-1-1.html`）。讀其中的英文散文（`<p>` 等說明文字）；math（`\( \)`、`\[ \]`）只當語境、**不審其正確性**。
+使用者會指名一個或多個 section fragment（如 `handout/fragments/ch01/sec-1-1.html`）。讀其中的英文散文（`<p>` 等說明文字）；math（`\( \)`、`\[ \]`）只當語境、**不審其正確性**。
 
 # 怎麼做
 

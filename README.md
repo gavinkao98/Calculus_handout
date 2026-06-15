@@ -2,7 +2,7 @@
 
 一份單面 A4 的**微積分講義**，供準備銜接大學微積分的高中生自學使用，並搭配輔助教學影片。講義本身自給自足；影片是強化補充。
 
-本檔案是**儲存庫樞紐（repository hub）**。它對儲存庫結構、preamble 結構與建置指令具有權威性。內容撰寫規則與媒體產線規則各自獨立成檔，連結列於下方。
+本檔案是**儲存庫樞紐（repository hub）**。它對儲存庫結構與建置指令具有權威性——生產用講義是 `handout/` 下的 HTML 版（以 fragment 撰稿、`build.py` 組版），下方所載的 LaTeX／preamble／建置描述現為 legacy（已搬至 `legacy/tex_handout/`）。內容撰寫規則與媒體產線規則各自獨立成檔，連結列於下方。
 
 ---
 
@@ -10,7 +10,7 @@
 
 依你手上的任務，開啟對應的連結檔案。
 
-- **撰寫或修訂章節。** 先看 [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)。當快速指南無法回答你的問題時，再回頭查 [`CONTENT_SPEC.md`](CONTENT_SPEC.md)。開始新的一章前，先看 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)。
+- **撰寫或修訂章節。** 先看 [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)。當快速指南無法回答你的問題時，再回頭查 [`CONTENT_SPEC.md`](CONTENT_SPEC.md)。開始新的一章前，先看 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)。每節內容的方向流程（方向 brief ＋ 六階方向層）見 [`CONTENT_DIRECTION.md`](CONTENT_DIRECTION.md)。
 - **製作影片**（目前的主要路徑：第二代 Manim 產線）。先看 [`video/README.md`](video/README.md)，再看 [`video/DESIGN.md`](video/DESIGN.md) 了解分鏡契約與目前的模板決策。較舊的 `MANIM_*` 文件已封存於 [`legacy/`](legacy/)，保留作為第一代參考資料。
 - **靜態投影片 MP4**（已凍結的舊路徑）。使用 [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md)。此路徑不再有新開發——新工作請改用 Manim。
 - **為課文補教學範例（從開放題庫選題）。** 見 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md)。講義本體不收習題——習題將以獨立習題本呈現（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14，2026-06-12 定案）。
@@ -31,38 +31,38 @@
 
 簡言之：A 草擬，C 對既有草稿做充實，B 稽核——B 是唯一作為另一模式後續而執行的模式。有效的轉移路徑為 A →（可選 B）→ 簽核 →（可選 C → 必要 B）→ ……。
 
-### Mode A — 手稿轉教科書草擬（Claude 將新手稿轉成 LaTeX）
+### Mode A — 手稿轉教科書草擬（Claude 將新手稿轉成 HTML 片段）
 
 當使用者轉來一份手稿並要求 Claude 產出章節檔時，使用此模式。Claude 的職責：
 
 1. 自使用者處接收手稿。
-2. 依 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 與 [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)，將其轉成符合專案規範的 LaTeX，置於 `chapters/chNN_<slug>.tex`。
+2. 依 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 與 [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)，將其轉成符合專案規範的 HTML 片段，置於 `handout/fragments/chNN/sec-*.html`（每節一個 fragment）。
 3. 在完整性或 Stewart／Rogawski 自學語域有助益之處，圍繞手稿加以擴充。下方的擴充政策說明哪些增添屬於政策範圍內，以及必須如何標記。
 4. 更新 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) 以反映手稿實際的決定，取代任何手稿到達前的暫定工作假設條目。
 
 #### 手稿是主軸
 
-每一個手稿主題、範例、註解、證明與圖示構想，都依手稿呈現的順序出現在章節中，並改寫為符合專案規範的 LaTeX。Claude **不**跳過手稿內容，**不**無故重排其順序，也**不**改寫其數學實質。擴充內容包裹在手稿內容之外；絕不取代手稿內容。
+每一個手稿主題、範例、註解、證明與圖示構想，都依手稿呈現的順序出現在章節中，並改寫為符合專案規範的 HTML 片段。Claude **不**跳過手稿內容，**不**無故重排其順序，也**不**改寫其數學實質。擴充內容包裹在手稿內容之外；絕不取代手稿內容。
 
 若某個重排或結構重組確實有用，請記錄在該章 roadmap 條目的 *Open questions* 之下，讓使用者可於審查時簽核。
 
 #### 擴充政策——範圍寬鬆，但以標記呈現
 
-Claude 可在未事先授權的情況下圍繞手稿擴充，條件是 LaTeX 原始碼中**每一處擴充都加上標記**，使事後審查可行。標記的形式為
+Claude 可在未事先授權的情況下圍繞手稿擴充，條件是 HTML 片段中**每一處擴充都加上標記**，使事後審查可行。標記的形式為
 
-```latex
-% expansion:<category> [pass: <pass-id>] [source: <brief source>] — <one-line description>
+```html
+<!-- expansion:<category> [pass: <pass-id>] [source: <brief source>] — <one-line description> -->
 ```
 
 置於擴充內容緊接的前一行。方括號提示各自為選用，但出現時須遵守嚴格規則：
 
 - `<category>` 為必填，且須取自下方表格。
-- `[pass: <pass-id>]` 標示是哪一個模式回合引入了該擴充。在 Mode A 中省略它——沒有 `[pass: ...]` 提示的 `% expansion:` 標記，視為 Mode A 原始草擬（標記本身仍為必要，只有 `[pass: ...]` 提示是選用）。在 Mode C 中**必填**，值固定為 `[pass: enrichment]`，使事後審查能區分原始草擬與後續充實。
+- `[pass: <pass-id>]` 標示是哪一個模式回合引入了該擴充。在 Mode A 中省略它——沒有 `[pass: ...]` 提示的 `<!-- expansion:` 標記，視為 Mode A 原始草擬（標記本身仍為必要，只有 `[pass: ...]` 提示是選用）。在 Mode C 中**必填**，值固定為 `[pass: enrichment]`，使事後審查能區分原始草擬與後續充實。
 - `[source: <brief source>]` 註明擴充所依據的參考來源。一般情況下選用；依下方「具名內容」規則，`history` 類具名內容**必填**，且任何正確性取決於特定參考的擴充均建議填寫。
-- 當兩個提示同時存在時，**`[pass: ...]` 在 `[source: ...]` 之前**。順序固定，使 `book_style_lint` 能偵測格式錯誤的標記；順序錯誤的標記為 lint 錯誤。
-- 未知的方括號鍵為 lint 錯誤——僅 `pass` 與 `source` 被承認。像 `[soure: …]` 這樣的錯字，否則會悄悄使該提示在審查中被剝除。
+- 當兩個提示同時存在時，**`[pass: ...]` 在 `[source: ...]` 之前**。順序固定，使格式錯誤的標記可被偵測；順序錯誤的標記視為錯誤（目前 HTML 片段的標記檢查為人工進行）。
+- 未知的方括號鍵視為錯誤——僅 `pass` 與 `source` 被承認。像 `[soure: …]` 這樣的錯字，否則會悄悄使該提示在審查中被剝除。
 
-承認的類別（`book_style_lint` 檢查會強制此清單）：
+承認的類別（此清單為標記檢查的依據）：
 
 | 類別 | 用途 |
 |---|---|
@@ -76,12 +76,12 @@ Claude 可在未事先授權的情況下圍繞手稿擴充，條件是 LaTeX 原
 | `strategy` | 提煉多個手稿範例共用方法的 `strategy` 方塊 |
 | `caution` | 針對微妙限制、記號陷阱或常見錯誤的 `caution` 方塊 |
 
-此類別清單刻意精簡；當出現一個值得長存的新類型時，在引入該新類別第一個標記的同一次提交中擴充此表，lint 便會自此接受它。
+此類別清單刻意精簡；當出現一個值得長存的新類型時，在引入該新類別第一個標記的同一次提交中擴充此表，標記檢查便會自此接受它。
 
 事後審查於是變成
 
 ```powershell
-grep "^% expansion:" chapters/chNN_*.tex
+grep "<!-- expansion:" handout/fragments/chNN/*.html
 ```
 
 ——使用者一眼看盡每一處非手稿的增添，逐一標記決定*保留*、*改寫*或*移除*，無須將整章與手稿全文比對。
@@ -92,8 +92,8 @@ grep "^% expansion:" chapters/chNN_*.tex
 
 格式：
 
-```latex
-% expansion:history [source: <specific source OR "standard calculus-textbook historical note">] — <description>
+```html
+<!-- expansion:history [source: <specific source OR "standard calculus-textbook historical note">] — <description> -->
 ```
 
 - 若 Claude 能指出特定來源（例如 *Stewart 8e §2.4 historical note*、*Rogawski 4e Ch 2*、*Wikipedia "History of calculus"*），就在標記中引用它。這讓使用者能對照單一處查核，而非猜測。
@@ -115,7 +115,7 @@ grep "^% expansion:" chapters/chNN_*.tex
 
 #### 體量合理性檢查（軟性，不強制）
 
-擴充對手稿的比例沒有硬性規定，只做一次自我檢查：若某一節的 `% expansion:` 標記多到使手稿內容淹沒在擴充之中、難以辨識，那就是某處飄移了。在該章 roadmap 的 *Open questions* 中標註，以便於簽核時檢視比例。否則，自由擴充。
+擴充對手稿的比例沒有硬性規定，只做一次自我檢查：若某一節的 `<!-- expansion:` 標記多到使手稿內容淹沒在擴充之中、難以辨識，那就是某處飄移了。在該章 roadmap 的 *Open questions* 中標註，以便於簽核時檢視比例。否則，自由擴充。
 
 #### 不重複規則：不同深度、不同切入
 
@@ -130,7 +130,7 @@ grep "^% expansion:" chapters/chNN_*.tex
    - **Caution**（`caution`）：一個特定陷阱或微妙限制。**不**重述它所附著的定義或定理；讀者就近仍有那些內容。
    - **總結**（`summary`，章末）：每個項目一行提醒（定義以其一句精要、定理以其條件與結論、公式以其裸恆等式）。**不**重新證明、重新推導或重新鋪陳動機。
 
-2. **指向，不重述。** 當較早引入的概念再度出現時，使用明確的交叉參照（`\cref{sec:foo}`、*「如 §1.3 所介紹，……的極限」*）而非重述內容。交叉參照是誠實的：它表明「我們有這個，它在這裡」。重述是不誠實的：它假裝該概念是新的。
+2. **指向，不重述。** 當較早引入的概念再度出現時，使用明確的交叉參照（指向手寫編號的散文引用，例如 *「由定理 4.2」*、*「如 §1.3 所介紹，……的極限」*；HTML 片段中為指向手寫編號的純散文引用，無 `\cref`、無超連結，見 [`handout/_dev-archive/general/CONTRACT-html-writing.md`](handout/_dev-archive/general/CONTRACT-html-writing.md)）而非重述內容。交叉參照是誠實的：它表明「我們有這個，它在這裡」。重述是不誠實的：它假裝該概念是新的。
 
 3. **深度分層的再現。** 同一概念可出現三次（章首、節首、總結），條件是每次出現處於不同深度：
    - 章首：一句話將概念安置於脈絡之中；
@@ -138,13 +138,13 @@ grep "^% expansion:" chapters/chNN_*.tex
    - 總結：一行提醒。
    同深度出現三次＝重複；不同深度出現三次＝螺旋複習。
 
-4. **草擬收尾的自我檢查。** 章節草擬完成後，依序掃描每一個 `% expansion:` 標記後的第一句。若任兩個連續擴充以相同的主張或概念開頭，將其一收束為交叉參照。特別要掃描章節總覽對 §1 開場、各節開場對前一節結尾、總結項目對學習成果——那是三處最常溜進同深度炒冷飯的地方。
+4. **草擬收尾的自我檢查。** 章節草擬完成後，依序掃描每一個 `<!-- expansion:` 標記後的第一句。若任兩個連續擴充以相同的主張或概念開頭，將其一收束為交叉參照。特別要掃描章節總覽對 §1 開場、各節開場對前一節結尾、總結項目對學習成果——那是三處最常溜進同深度炒冷飯的地方。
 
 若一處擴充並沒有其他擴充尚未在做的職責，它就應該被改寫以劃出獨特角色，或被刪除。
 
 #### Mode A 以一次擴增稽核作結
 
-Mode A 回合並非在手稿轉成 LaTeX 後就算完成。在把章節交回之前，Claude 依下方的逐節檢查表逐節走查，並對每一個未滿足的項目，**要不補上缺口，要不在該章 roadmap 條目的 *Open questions* 中記錄這個刻意的省略**。這次稽核正是把一份排版好的手稿變成一份教科書草稿的關鍵；少了它，上述密度校準目標只是理想而非有效規範。
+Mode A 回合並非在手稿轉成 HTML 片段後就算完成。在把章節交回之前，Claude 依下方的逐節檢查表逐節走查，並對每一個未滿足的項目，**要不補上缺口，要不在該章 roadmap 條目的 *Open questions* 中記錄這個刻意的省略**。這次稽核正是把一份排版好的手稿變成一份教科書草稿的關鍵；少了它，上述密度校準目標只是理想而非有效規範。
 
 逐節檢查表（每一項都是*補上或記錄*——悄悄略過正是此規則存在要防止的事）：
 
@@ -164,7 +164,7 @@ Mode A 回合並非在手稿轉成 LaTeX 後就算完成。在把章節交回之
 - 跳過手稿內容（手稿是主軸）；
 - 改寫手稿主張的數學實質（證明方法、變數選擇、定義形式）；
 - 自創習題或在講義中放任何習題區塊——講義本體不收習題（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14）；補課文範例一律走 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md) 的題庫選題流程；
-- 未標記的擴充——每一處非翻譯的增添都要加上 `% expansion:` 標記；
+- 未標記的擴充——每一處非翻譯的增添都要加上 `<!-- expansion:` 標記；
 - 違反上述「具名內容」防護欄的具名內容。
 
 補上手稿省略的證明是個邊界案例：依 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5，證明為選用且預設省略。當證明簡短、標準且具闡明性時，Claude **可**將其作為 `expansion:formula`（簡短推導）或 `expansion:example`（worked case）加入；多頁的證明，或需要章節尚未引入之材料的證明，則需使用者明確授權。
@@ -181,7 +181,7 @@ Mode A 回合並非在手稿轉成 LaTeX 後就算完成。在把章節交回之
 
 #### 逐標記裁決（Keep／Rewrite／Move／Cut）
 
-對帶有 `% expansion:` 標記的章節，Mode B 走查檔案中每一個標記，並指派四種裁決之一。裁決**逐標記回報給使用者**；Claude 不會擅自據以行動。
+對帶有 `<!-- expansion:` 標記的章節，Mode B 走查檔案中每一個標記，並指派四種裁決之一。裁決**逐標記回報給使用者**；Claude 不會擅自據以行動。
 
 | 裁決 | 含義 | Claude 的作為 |
 |---|---|---|
@@ -198,20 +198,20 @@ Mode A 回合並非在手稿轉成 LaTeX 後就算完成。在把章節交回之
 
 獨立於逐標記裁決之外，Claude 另行標示：
 
-- **規格合規**——對照 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 的規則違反：不允許的顯示輔助巨集、散文中的 `\textbf`／`\textit`、ASCII 引號、手動交叉參照前綴、章節檔中的 `\newcommand`、缺少章節開頭結構等。這些是明確的缺陷；提出修正。規格合規也包含**需要章內交叉比對的模式層級規則**——例如，章內所有定義是否一致遵循 §3 的注解決策規則、所有圖是否遵循 §10 的擺放規則、平行結構（份量相近的定義、形式相近的命題）是否格式一致。單行 lint 掃描是必要但不充分的；模式層級的稽核需要明確走查每一條帶有決策準則的 SPEC 規則，並就整章加以檢查。
-- **散文易懂性與流暢性**——走查整節主線散文（不限 `% expansion:` 標記行）的可讀性，依 [`experiments/handout_kit/_audit/PROSE-AUDIT-RUBRIC.md`](experiments/handout_kit/_audit/PROSE-AUDIT-RUBRIC.md)：易懂性缺陷（動機缺位、重型形式無白話重述、未解釋的邏輯跳躍、術語先用後定義且讀者被晾住）為 **blocking**，流暢性 polish 為 advisory。此為兩道閘的第一道（gate 1：Claude `handout-prose-audit` subagent，唯讀、免費）；定稿前再經 gate 2（Codex 獨立複核，吃配額、先徵同意）。裁決沿用 `Rewrite`——其既有準則（措辭笨拙、語域滑落）即適用，唯範圍擴及整節主線散文，而非僅帶 `% expansion:` 標記者。
-- 相對於手稿的**記號飄移**——例如手稿用 `[x]` 而 `.tex` 悄悄用了 `\lfloor x \rfloor`。將此作為一個問題提給使用者，而非作為幻覺。使用者可能是有意升級了記號，或可能想重新對齊回手稿。
+- **規格合規**——對照 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 的規則違反：不允許的結構或元件、散文中以 `<b>`／`<strong>` 代替 `<em>` 做強調、ASCII 直引號、未指向手寫編號的交叉參照、缺少章節開頭結構等（HTML 標記細節見 [`handout/_dev-archive/general/CONTRACT-html-writing.md`](handout/_dev-archive/general/CONTRACT-html-writing.md) 與 [`handout/TYPESETTING_GUIDE.md`](handout/TYPESETTING_GUIDE.md)）。這些是明確的缺陷；提出修正。規格合規也包含**需要章內交叉比對的模式層級規則**——例如，章內所有定義是否一致遵循 §3 的注解決策規則、所有圖是否遵循 §10 的擺放規則、平行結構（份量相近的定義、形式相近的命題）是否格式一致。單行 lint 掃描是必要但不充分的；模式層級的稽核需要明確走查每一條帶有決策準則的 SPEC 規則，並就整章加以檢查。
+- **散文易懂性與流暢性**——走查整節主線散文（不限 `<!-- expansion:` 標記行）的可讀性，依 [`handout/_audit/PROSE-AUDIT-RUBRIC.md`](handout/_audit/PROSE-AUDIT-RUBRIC.md)：易懂性缺陷（動機缺位、重型形式無白話重述、未解釋的邏輯跳躍、術語先用後定義且讀者被晾住）為 **blocking**，流暢性 polish 為 advisory。此為兩道閘的第一道（gate 1：Claude `handout-prose-audit` subagent，唯讀、免費）；定稿前再經 gate 2（Codex 獨立複核，吃配額、先徵同意）。裁決沿用 `Rewrite`——其既有準則（措辭笨拙、語域滑落）即適用，唯範圍擴及整節主線散文，而非僅帶 `<!-- expansion:` 標記者。
+- 相對於手稿的**記號飄移**——例如手稿用 `[x]` 而 HTML 片段悄悄用了 `\lfloor x \rfloor`。將此作為一個問題提給使用者，而非作為幻覺。使用者可能是有意升級了記號，或可能想重新對齊回手稿。
 - **數學正確性**——若某陳述看似有誤，將其作為*「請查核 X」*提出，而非*「我因為 X 不在手稿中而移除它」*。
-- **手稿中缺漏的內容**——若手稿涵蓋了某主題而 `.tex` 跳過了，標示這個缺口，讓使用者能決定該省略是否為有意。
+- **手稿中缺漏的內容**——若手稿涵蓋了某主題而 HTML 片段跳過了，標示這個缺口，讓使用者能決定該省略是否為有意。
 - **結構決定**——分節、定理命名及類似的編輯抉擇。作為問題提出；不要擅自變更。
 
 #### Claude 在 Mode B 中不得做的事
 
-- 預設將 `.tex` 中手稿沒有的內容視為幻覺；
+- 預設將 HTML 片段中手稿沒有的內容視為幻覺；
 - 以缺乏手稿依據為由，悄悄移除或改寫使用者撰寫的擴充；
 - 對 `Move` 裁決據以行動——`Move` 永遠僅提議，單一節之內亦然；
 - 在未先詢問歷史註解、額外 worked example 或額外註解是使用者撰寫的擴充還是草擬模式的幻覺之前，就提議刪除它們；
-- 當進入點為 Mode C 後續時，去稽核沒有 `[pass: enrichment]` 的 `% expansion:` 標記——那些不在該回合的範圍內。
+- 當進入點為 Mode C 後續時，去稽核沒有 `[pass: enrichment]` 的 `<!-- expansion:` 標記——那些不在該回合的範圍內。
 
 Mode B 中的關鍵問題是*「這段內容是否正確、合規、位置適當？」*——而非*「這段內容是否在手稿中？」*。唯有在 Mode A 中，第二個問題才承載重量。
 
@@ -221,20 +221,20 @@ Mode B 中的關鍵問題是*「這段內容是否正確、合規、位置適當
 
 #### Mode C 可以做的事
 
-- 加入 `intuition`、`example`、`figure`、`caution`、`strategy`、`application`、`formula`、`history` 或 `summary` 擴充，每一處的標記方式與 Mode A 完全相同（`% expansion:<category> …`），**但帶有必要的 `[pass: enrichment]` 提示**，使事後審查能區分原始草擬與充實；
+- 加入 `intuition`、`example`、`figure`、`caution`、`strategy`、`application`、`formula`、`history` 或 `summary` 擴充，每一處的標記方式與 Mode A 完全相同（`<!-- expansion:<category> … -->`），**但帶有必要的 `[pass: enrichment]` 提示**，使事後審查能區分原始草擬與充實；
 - 以 Mode A 所用的同一份逐節擴增稽核作結——依檢查表逐節走查，補上現在可見的任何缺口，或在 roadmap 的 *Open questions* 中記錄缺口。這次稽核正是使 Mode C 成為一次充實回合、而非零散補強的關鍵。
 
 #### Mode C 不得做的事
 
 - 改動手稿的主軸：不重排各節、不改寫定義或定理陳述、不取代或刪除既有擴充（那些是 Mode B 的 `Move` 與 `Cut` 裁決，且維持僅提議）；
-- 加入沒有 `[pass: enrichment]` 的 `% expansion:` 行——那假裝該增添是原始草擬，並污染稽核軌跡；
+- 加入沒有 `[pass: enrichment]` 的 `<!-- expansion:` 行——那假裝該增添是原始草擬，並污染稽核軌跡；
 - 作為最後一個步驟而執行。每一次 Mode C 回合**都必須接著一次範圍限定於新 `[pass: enrichment]` 標記的 Mode B 稽核**。上方的狀態機在這一點上不容妥協：一次未接 Mode B 後續就出貨的 Mode C 回合是不完整的。
 
 不重複規則、具名內容規則與密度校準目標，皆與 Mode A 一樣適用於 Mode C——Mode C 唯一改變的是標記提示，以及禁止觸碰既有主軸。
 
 ### 當手稿與規格相牴觸時（適用於任何模式）
 
-- **格式**：[`CONTENT_SPEC.md`](CONTENT_SPEC.md) 勝出。改寫手稿的措辭以求合規（例如散文中 `\textbf{...}` → `\emph{...}`、ASCII 引號 → TeX 引號、手動交叉參照前綴 → `\cref{}`）。數學內容不變。
+- **格式**：[`CONTENT_SPEC.md`](CONTENT_SPEC.md) 勝出。改寫手稿的措辭以求合規（例如散文中強調改用 `<em>`（不用 `<b>`／`<strong>`）、ASCII 直引號 → 智慧引號、交叉參照改指向手寫編號的純散文引用，無超連結）。數學內容不變。
 - **數學內容**：手稿勝出。若手稿以特定方式證明一個定理，保留該方法；若手稿以特定形式定義一個詞，保留該形式。與規格 §9 的記號差異，以 `caution` 註解（若調和並非無關緊要時）調和為本書慣例。
 - **真正的衝突**（手稿堅持一條規格基於編輯理由而非數學理由所禁止的規則）：詢問使用者。將決定記錄在該章 roadmap 條目的 *Open questions* 之下。
 
@@ -247,7 +247,7 @@ Mode B 中的關鍵問題是*「這段內容是否正確、合規、位置適當
 目前的影片工作位於 `video/` 下的第二代產線：
 
 ```text
-chapters/*.tex  -->  video/storyboards/<section_id>.yml
+handout/fragments/chNN/*.html  -->  video/storyboards/<section_id>.yml
                   -->  video/pipeline/build.py silent previews
                   -->  video/output/...
 ```
@@ -266,7 +266,7 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
                        artifacts/video/<deck_id>_manim.mp4
 ```
 
-先定稿章節內容。再從定稿的 LaTeX 手寫分鏡。逐一預覽場景。待場景感覺對了，再產出音訊與最終 MP4。
+先定稿章節內容。再從定稿的 HTML 講義手寫分鏡。逐一預覽場景。待場景感覺對了，再產出音訊與最終 MP4。
 
 ---
 
@@ -274,11 +274,12 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
 
 | 層級 | 檔案 | 用途 |
 |---|---|---|
-| 樞紐 | `README.md` | 儲存庫結構、preamble 對照、建置規則 |
+| 樞紐 | `README.md` | 儲存庫結構、HTML 講義建置規則（LaTeX preamble 對照現為 legacy） |
 | 內容規格 | [`CONTENT_SPEC.md`](CONTENT_SPEC.md) | 權威性的教科書撰寫規則 |
 | 內容日用 | [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md) | 1–2 頁的作者速查表 |
 | 內容脈絡 | [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) | 章節順序、先備知識、各章核心技能 |
 | 內容題源 | [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md) | 課文範例的題源與選題流程（題庫、provenance、授權） |
+| 內容方向 | [`CONTENT_DIRECTION.md`](CONTENT_DIRECTION.md) | 每節擴寫的方向層：方向 brief、六階流程、人閘（驗證紀錄在 `authoring/direction_layer/`） |
 | 影片產線 | [`video/README.md`](video/README.md) | 目前第二代 Manim 產線的狀態、指令、交接註記 |
 | 影片設計 | [`video/DESIGN.md`](video/DESIGN.md) | 目前的分鏡契約、場景種類、模板決策 |
 | manim v1 操作 | [`legacy/MANIM_CHECKLIST.md`](legacy/MANIM_CHECKLIST.md) | 第一代參考檢查表（已封存） |
@@ -291,15 +292,14 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
 
 ## 儲存庫結構
 
-- `main.tex` — 全書的 LaTeX 進入點。
-- `chapters/` — 章節源檔。
-  - `chapters/_chapter_template.tex` — 新章節的起始骨架。
-  - `chapters/_scratch.tex` — 選用的本機暫存章節，由 `\ifincludescratchchapter` 控制。
-- `preamble/` — 共用的 LaTeX 設定（見下方 *Preamble 對照*）。
-- `preamble_smoketest.tex` — 僅供 preamble 版面檢查的最小回歸文件。
-- `refs/` — 參考書目資料。
+- `handout/` — **生產用講義（HTML 版）**。內容以 fragment 撰稿，`build.py` 組版。
+  - `handout/fragments/chNN/sec-*.html` — 章節源檔，每節一個 fragment。
+  - `handout/build.py` — 組版器：產出 `handout/chapterN-print-standalone.html`（僅列印版；螢幕版已移除）。
+  - `handout/TYPESETTING_GUIDE.md` — HTML 排版指南；`handout/_dev-archive/general/CONTRACT-html-writing.md` — 權威性 HTML 標記契約。
+  - `handout/_audit/PROSE-AUDIT-RUBRIC.md` — 散文稽核 rubric（gate 1 契約）；`handout/_dev-archive/chNN/` — 各章編排檔（`PLAN-chNN.md`、`PROMPT-sNM-kickoff.md`、`brief_sNM.md`、`seed_chNN.md`）。
+- `authoring/` — 撰稿方法論與機制 R&D。六階方向層流程已畢業為頂層 [`CONTENT_DIRECTION.md`](CONTENT_DIRECTION.md)；`authoring/direction_layer/` 保留其端到端驗證紀錄（`ch01/`、`test/`），`authoring/seed_converge/` 為機制 R&D（`SYNTHESIS.md`、`PLAN_codex_subscription_loop.md`、`run.py`、`figure_critic.py`、`figure_fix.py`、`rules.md`）。
 - `problem_banks/` — 開放授權題庫的本地 clone 區（內容 gitignored，僅 README 進版控）。選題工作流程見 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md)。
-- `tools/` — 書籍源碼工具（`book_style_lint.py`、`book_preamble_smoketest.py`、`book_docs_lint.py`）。第一代媒體產生腳本已封存至 `legacy/scripts/`。
+- `legacy/tex_handout/` — 已凍結的 **LaTeX 講義樹**（`main.tex`、`preamble/`、`chapters/*.tex`、`refs/references.bib`，以及 `tools/book_style_lint.py`／`book_preamble_smoketest.py`／`book_docs_lint.py`）。此樹不再是生產路徑，僅供歷史參考；下方的 *Preamble 對照* 節描述的即是這棵 legacy 樹（*輸出格式*、*建置與 CI* 各節則以 HTML 講義為主、另附 legacy 註記）。（根目錄遺留的 `chapters/` 僅含 `.aux` 等建置殘留物。）
 - `legacy/` — 已封存的凍結媒體產線（gen-0 投影片、gen-1 Manim 及其橋接實驗）：`legacy/scripts/`（腳本）、`legacy/MANIM_*.md` 與 `legacy/LEGACY_SLIDE_PIPELINE.md`（方法論文件）、`legacy/schemas/`、`legacy/inputs/`、`legacy/artifacts/`（gitignored 的大型算繪輸出仍存於磁碟，git 追蹤的例外為 narration／final／tex）。詳見 [`legacy/README.md`](legacy/README.md)。
 - `.github/workflows/` — CI 檢查。
 
@@ -309,9 +309,11 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
 
 ---
 
-## Preamble 對照
+## Preamble 對照（legacy LaTeX 講義）
 
-`preamble/` 依職責拆分，使版面與模板行為可被快速找到：
+> 以下描述的是已凍結的 LaTeX 講義樹（現位於 `legacy/tex_handout/preamble/`），僅供歷史參考。生產用的 HTML 講義沒有 LaTeX preamble——它以 MathJax／KaTeX CDN 與 JS paginator 排版，相關設定見 [`handout/TYPESETTING_GUIDE.md`](handout/TYPESETTING_GUIDE.md)。
+
+`legacy/tex_handout/preamble/` 依職責拆分，使版面與模板行為可被快速找到：
 
 - `preamble/packages.tex` — 套件載入：Times 內文／數學字型（`newtxtext` + `newtxmath`）、`microtype`、`amsmath` / `amsthm` / `mathtools`、`graphicx` / `tikz` / `pgfplots`、`float` / `flafter`、`needspace`、`enumitem`、頁面幾何（3.3 cm 邊界）、headers、`hyperref` / `cleveref`、為 `caution` / `strategy` 而設的 `mdframed`（`framemethod=TikZ`）、`xcolor`，以及本書的反三角運算子（`\arccsc`、`\arcsec`、`\arccot`）。
 - `preamble/colors.tex` — 三角色語意調色盤（`colorprimary` 藍、`colorcaution` 紅、`colorauxiliary` 灰），驅動圖示以及 `caution` / `strategy` 上的強調色條。
@@ -324,16 +326,9 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
 
 ## 輸出格式
 
-單面 A4 PDF，設計為單張單頁列印、作為講義發送，而非裝訂成冊。
+生產用講義的輸出是 `handout/chapterN-print-standalone.html`——由 `handout/build.py` 將各 fragment 組裝而成的列印用 standalone HTML，A4 分頁透過 JS paginator（`place()`）達成；數學以 MathJax／KaTeX CDN 渲染。設計為單張單頁列印、作為講義發送，而非裝訂成冊。版面與排版細節見 [`handout/TYPESETTING_GUIDE.md`](handout/TYPESETTING_GUIDE.md)。
 
-- `\documentclass[a4paper,12pt,oneside]{book}` — 每一頁採同一邊界規則。
-- `margin=3.3cm` 對稱；文字區塊接近 12 pt Times 每行 66–72 字元的舒適範圍。
-- `\linespread{1.05}` — 為數學密集的散文提供適度的額外行距，又不致頁面稀疏。
-- `\fancyhead[L]` / `\fancyhead[R]` / `\fancyfoot[R]`（非 twoside 的 `[LE]`/`[RO]` 模式）。
-- `main.tex` 將 `\maketitle` 包在 `\begingroup\hypersetup{pageanchor=false}...\endgroup` 中，以避免標題頁出現重複目的地的警告。
-- `main.tex` 在檔首附近保留 `\ifprintbibliography` 與 `\ifincludescratchchapter` 開關，使參考書目與暫存章節維持選用。
-
-若專案日後需要裝訂書版本，最小變更為：改用 `\documentclass[a4paper,12pt,twoside,openright]{book}`、將 `\fancyhead`/`\fancyfoot` 改用 `[LE]`/`[RO]` 配對，並考慮使用帶 `bindingoffset` 的非對稱 `inner`/`outer` 邊界。
+> **Legacy（LaTeX 講義）：** 已凍結的 LaTeX 版（`legacy/tex_handout/`）以 `\documentclass[a4paper,12pt,oneside]{book}` 產出單面 A4 PDF：`margin=3.3cm` 對稱、`\linespread{1.05}`、`\fancyhead`/`\fancyfoot` 單面 header／footer，並由 `main.tex` 以 `\ifprintbibliography` 與 `\ifincludescratchchapter` 開關控制參考書目與暫存章節。此路徑不再用於生產。
 
 ---
 
@@ -342,29 +337,26 @@ chapters/*.tex  -->  video/storyboards/<section_id>.yml
 本機建置：
 
 ```powershell
-latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main.tex
+python handout/build.py
 ```
 
-提交一個章節之前，另須執行：
+產出 `handout/chapterN-print-standalone.html`（列印用 standalone，A4 分頁由 JS paginator 達成）。每次 push 與 PR 由 [`.github/workflows/handout-checks.yml`](.github/workflows/handout-checks.yml) 自動執行此 build，並檢查 committed standalone 與 fragment 同步。
 
-```powershell
-python tools/book_style_lint.py
-python tools/book_preamble_smoketest.py
-python tools/book_docs_lint.py
-```
+內容閘採兩道：gate 1 為 Claude `handout-prose-audit` subagent（唯讀、免費，依 [`handout/_audit/PROSE-AUDIT-RUBRIC.md`](handout/_audit/PROSE-AUDIT-RUBRIC.md)）；gate 2 為 Codex 獨立複核（吃配額、先徵同意）。HTML 標記與排版細節見 [`handout/_dev-archive/general/CONTRACT-html-writing.md`](handout/_dev-archive/general/CONTRACT-html-writing.md) 與 [`handout/TYPESETTING_GUIDE.md`](handout/TYPESETTING_GUIDE.md)。
 
-全部四項檢查（上述三項加上 `latexmk` 建置）會在每一次 push 與 PR 時透過 [`.github/workflows/latex-checks.yml`](.github/workflows/latex-checks.yml) 執行。`book_docs_lint.py` 掃描 markdown 中過時的 `tools/<name>.py` 指令引用與失效的相對連結，使文件改名造成的飄移無法在審查時悄悄溜過。（第一代的 `manim_storyboard_lint.py` 已隨 Manim v1 產線封存至 `legacy/scripts/`，不再納入 CI；其方法論文件見 `legacy/`。）
+> **Legacy（LaTeX 講義 CI）：** 舊的 LaTeX 路徑以 `latexmk -pdf … main.tex` 建置，並以 `tools/book_style_lint.py`、`book_preamble_smoketest.py`、`book_docs_lint.py` 三項檢查加 `latexmk` 建置經 `.github/workflows/latex-checks.yml` 把關。其中三項 `book_*.py` 工具已隨 LaTeX 樹搬至 `legacy/tex_handout/tools/`，原 `latex-checks.yml` 已移除（HTML 講義改由上述 `handout-checks.yml` 把關），皆不再是 HTML 講義的閘（其中 `book_docs_lint.py` 原用於掃描 markdown 中過時的 `tools/<name>.py` 指令引用與失效的相對連結）。第一代的 `manim_storyboard_lint.py` 則隨 Manim v1 產線封存至 `legacy/scripts/`。
 
-權威性：當儲存庫結構或 preamble 決策變更時，**以本檔案**為權威；當撰寫或排版規則變更時，以 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 為權威。
+權威性：當儲存庫結構或 HTML 講義建置規則變更時，**以本檔案**為權威；當撰寫或排版規則變更時，以 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 為權威。
 
 ---
 
 ## 媒體範圍說明
 
-章末的 `\subsection*{Exercises}` 區塊僅供列印講義之用。它們**不**納入投影片 deck、旁白腳本、Manim 分鏡、合成音訊或 render 的影片。規劃各節媒體時，忽略來源節的習題區塊，從定義、定理、範例與闡述散文來建構。
+講義本體不收習題（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14，2026-06-12 定案），故規劃各節媒體時無習題區塊需要排除；一律從定義、定理、範例與闡述散文來建構投影片 deck、旁白腳本、Manim 分鏡、合成音訊與 render 的影片。
 
 ## 備註
 
+- **2026-06-15 結構遷移：** HTML 講義自 `experiments/handout_kit/` 升格為頂層 `handout/`（正式版）；撰稿方法論 `direction_layer`／`seed_converge` 移入 `authoring/`；`legacy_slide_deck` 移入 `legacy/`；`experiments/` 資料夾就此解散。LaTeX 講義樹早於 2026-06-13（commit `b0a89cf`）即移入 `legacy/tex_handout/`，本次同步更新所有指引文檔與路徑引用、並把 CI 由（已移除的）`latex-checks.yml` 改為 `handout-checks.yml`（建置 `handout/build.py`）。
 - 本機快取、虛擬環境與內嵌依賴存於隱藏的儲存庫資料夾，例如 `.cache/`、`.venv/`、`.deps/` 與 `.deps_f5/`。
 - 目前的影片開發在 `video/`，而非已封存的 `legacy/inputs/manim_storyboards`。目前的檢查點是 Section 1.1
   [`video/storyboards/ch01_inverse_functions.yml`](video/storyboards/ch01_inverse_functions.yml)，

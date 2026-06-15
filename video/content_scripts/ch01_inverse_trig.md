@@ -1,7 +1,7 @@
 # Section 1.2 Inverse Trigonometric Functions — 內容稿（正式版）
 
 > **性質：正式產線內容稿／工程稿已先行**。依 REBUILD_STATUS「2026-06-13 全章影片計畫」啟動 §1.2（使用者 2026-06-13 指示先做本節）。以 HTML 講義權威檔逐節拆解、撰寫；content audit 已通過，storyboard／MiMo spoken／Mode B 已依「先建工程、旁白另審」先行完成。narration **仍待使用者正式認可**；MiMo TTS 尚未執行，現有 `output/ch01_inverse_trig.mp4` 約 51 秒且缺 `when_arcsin_sin_breaks`，不可視為正式預覽。
-> **來源（權威）：** [`../../experiments/handout_kit/chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.2（`sec-no` 1.2，Inverse Trigonometric Functions；編輯源 `fragments/ch01/sec-1-2.html`）。
+> **來源（權威）：** [`../../handout/chapter1-print-standalone.html`](../../handout/chapter1-print-standalone.html) §1.2（`sec-no` 1.2，Inverse Trigonometric Functions；編輯源 `fragments/ch01/sec-1-2.html`）。
 > **deck id：** `ch01_inverse_trig`（沿 §1.1 `ch01_inverse_functions`／§1.6 `ch01_precise_limit` 命名慣例）。
 > **格式：** 純內容層，每單元 `id / source / learning_goal / kind / narration / visual_need / animation_cue`；**不含** template / `{show}` / accent / 視覺 payload（第二階段才填）。`narration` 為英文（旁白語言）；`visual_need` / `animation_cue` 為中文（內容溝通用）。客製動畫由 Claude 依 `animation_cue` 生成、經認可後接入工程稿 `# HOOK`。
 > **複雜度定位（REBUILD_STATUS）：** 高複雜度、~55% 符號、建議 18–22 單元；幾何（限定分支、參考三角形、鏡射）比重高——**不**套 §5 symbol-heavy 例外。**新工程缺口（lazy build，第二階段）：reference-triangle 視覺（新模板或 hook）。**

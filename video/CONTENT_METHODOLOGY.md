@@ -6,7 +6,7 @@
 >
 > **血統與定位：** 萃取自 [`legacy/MANIM_STORYBOARD.md`](../legacy/MANIM_STORYBOARD.md)（gen-1, v1.6）的教學精神，**剝離**其 gen-1 工程約束（spoken-math 改寫大表、reveal 策略、9-template catalog、lint／schema），**適配** gen-2（Gemini TTS 直讀 LaTeX、intro／outro first-class）。它是 gen-1 方法論在 gen-2 的繼任者。
 >
-> **相關文件：** 視覺系統見 [`design_handoff/`](design_handoff/)（Direction B）；講義（HTML handout kit）的撰寫契約與環境詞彙見 [`../experiments/handout_kit/CONTRACT-html-writing.md`](../experiments/handout_kit/CONTRACT-html-writing.md)；本產線總覽見 [`README.md`](README.md) 與 [`DESIGN.md`](DESIGN.md)。
+> **相關文件：** 視覺系統見 [`design_handoff/`](design_handoff/)（Direction B）；講義（HTML handout kit）的撰寫契約與環境詞彙見 [`../handout/_dev-archive/general/CONTRACT-html-writing.md`](../handout/_dev-archive/general/CONTRACT-html-writing.md)；本產線總覽見 [`README.md`](README.md) 與 [`DESIGN.md`](DESIGN.md)。
 >
 > **交付物：** 每節一份**內容稿**（格式見 §6）——`.md` 為 source of truth，且**一律附上編譯後的 standalone HTML 審核稿**供使用者閱讀（見 §6「交付形式」，2026-06-14 使用者指示）。
 
@@ -24,7 +24,7 @@
 
 **影片是一堂課，不是把課本念出來。** 三個承諾：
 
-1. **Detail over compression（細節優先）。** 寧可多開一個教學單元，也不要把兩個重點塞進一個。一節 ~300 行 LaTeX 開成十幾、二十個單元是正常的；做 4 分鐘精華片**不是**目標。
+1. **Detail over compression（細節優先）。** 寧可多開一個教學單元，也不要把兩個重點塞進一個。一節 HTML fragment 開成十幾、二十個單元是正常的；做 4 分鐘精華片**不是**目標。
 2. **Conversational（口語優先）。** narration 是**說出來**的英文，為耳朵寫，不是印在紙上的句子。書本說「Determine which of these functions are one-to-one」；影片說「Now let us test two functions」。
 3. **Visual／animation over textual（視覺、動畫優先）。** 能在圖上展示的概念就給它視覺；會「動」的概念（過程／變化／對應／掃描）就給它動畫。**例外**見 §5 的 symbol-heavy 規則。
 
@@ -52,7 +52,7 @@
 
 ### 環境 → 教學單元對應
 
-第一刀照下表切；邊角看註解。（講義環境詞彙定義在 [`../experiments/handout_kit/CONTRACT-html-writing.md`](../experiments/handout_kit/CONTRACT-html-writing.md)。）**注意：下表給的是教學單元的 `kind`（教學角色），不是工程 template——template 是第二階段的事。**
+第一刀照下表切；邊角看註解。（講義環境詞彙定義在 [`../handout/_dev-archive/general/CONTRACT-html-writing.md`](../handout/_dev-archive/general/CONTRACT-html-writing.md)。）**注意：下表給的是教學單元的 `kind`（教學角色），不是工程 template——template 是第二階段的事。**
 
 | 講義環境（kit class） | 單元 `kind` | 處理 |
 |---|---|---|
@@ -140,7 +140,7 @@ gen-2 用 **Gemini TTS 直讀 LaTeX**，所以 narration 裡可以**直接內嵌
 
 - 念出螢幕標題。
 - 逐字念螢幕上的條列（改用轉述或延伸）。
-- 報節號／圖號／式號，或書本的 `\cref` 目標。
+- 報節號／圖號／式號，或書本手寫編號的 prose 交叉引用目標（如「by Theorem 4.2」）。
 - 用「see」「as shown」「in the diagram above／below」。
 - 用「In this scene we will…」開頭——直接開始教。
 
@@ -267,7 +267,7 @@ animation_cue: |
 
 - [ ] 每個 `definition` / `theorem` / `proposition` 都有單元覆蓋；每個**不同模式**的 `example` 有代表單元，折疊掉的同型重複都就近註明（§2 代表式涵蓋）。
 - [ ] 沒有 `exercise` 內容洩入。
-- [ ] intro 與 outro 齊備（intro 有定位資訊 + tagline；outro 有 takeaway 清單）。
+- [ ] intro 與 outro 齊備（intro 有定位資訊 + tagline；recap 單元有 takeaway 清單；outro 無 takeaways）。
 - [ ] 每個散文裡的幾何主張都有視覺單元（或就近註明刻意略過）；symbol-heavy 節套 §5 例外。
 - [ ] 每段環境之間的散文都歸類過（Incorporative／Bridge／Forward-pointing），fold 或 promote，無 silently drop。
 - [ ] 每段 narration：3–7 句（依 `kind` 調整）、開頭是 hook、結尾是 takeaway、未犯 §4 禁則、同型第二例不重述 setup。

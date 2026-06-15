@@ -1,7 +1,7 @@
 # Section 1.4 One-Sided and Infinite Limits — 內容稿（正式版）
 
 > **性質：正式產線內容稿／no-audio preview 已先行**。依方法論（[`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md)）從 HTML 講義權威檔逐節拆解、撰寫；content audit clean，storyboard 與 16 段 480p mock preview 已依「先影片後旁白」先行完成。**narration 仍待使用者認可**；正式 MiMo spoken／TTS 尚未開始。
-> **來源（權威）：** [`../../experiments/handout_kit/chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.4（`sec-no` 1.4，One-Sided and Infinite Limits）。環境／圖編號已核實：Def 1.10/1.11/1.12、Prop 1.5、Example 1.19–1.25、Figure 1.13–1.17。
+> **來源（權威）：** [`../../handout/chapter1-print-standalone.html`](../../handout/chapter1-print-standalone.html) §1.4（`sec-no` 1.4，One-Sided and Infinite Limits）。環境／圖編號已核實：Def 1.10/1.11/1.12、Prop 1.5、Example 1.19–1.25、Figure 1.13–1.17。
 > **格式：** 純內容層，每單元 `id / source / learning_goal / kind / narration / visual_need / animation_cue`；**不含** template / `{show}` / accent / 視覺 payload（第二階段才填）。`narration` 為英文（旁白語言）；`visual_need` / `animation_cue` 為中文（內容溝通用）。客製動畫由 Claude 依 `animation_cue` 生成，認可後接入工程稿 `# HOOK`。
 > **複雜度（盤點表）：** 中、符號 ~50% → 全視覺處理，**不**套 §5 symbol-heavy 例外（本節幾何份量重：跳斷、漸近線、四型無限圖）。
 

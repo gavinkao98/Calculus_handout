@@ -1,0 +1,29 @@
+name: Handout Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # build.py is stdlib-only (pathlib/re); no pip install needed.
+      - name: Assemble handout (fragments -> print standalone)
+        run: python handout/build.py
+
+      # The print standalones are committed; a fresh build must reproduce them
+      # byte-for-byte. A diff here means a fragment was edited without re-running
+      # build.py (or build is out of sync). Run `python handout/build.py` locally
+      # and commit the regenerated chapterN-print-standalone.html.
+      - name: Verify committed standalones are in sync with fragments
+        run: git diff --exit-code -- 'handout/chapter*-print-standalone.html'

@@ -1,7 +1,7 @@
 # Section 1.5 Limit Laws and Computational Techniques — 內容稿（正式版）
 
 > **性質：正式產線內容稿**。依 REBUILD_STATUS「2026-06-13 全章影片計畫」啟動 §1.5（Phase 2 難度遞增序列 §1.3 → §1.4 → §1.2 → §1.5 → §1.6 之第四節）。以 HTML 講義權威檔逐節拆解、撰寫；narration **已於 2026-06-14 經使用者認可**（採 19 單元＋u15 口語收尾），工程稿已落地為 `storyboards/ch01_limit_laws.yml`。
-> **來源（權威）：** [`../../experiments/handout_kit/chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.5（`sec-no` 1.5，Limit Laws and Computational Techniques；編輯源 `fragments/ch01/sec-1-5.html`）。
+> **來源（權威）：** [`../../handout/chapter1-print-standalone.html`](../../handout/chapter1-print-standalone.html) §1.5（`sec-no` 1.5，Limit Laws and Computational Techniques；編輯源 `fragments/ch01/sec-1-5.html`）。
 > **deck id：** `ch01_limit_laws`（沿 §1.1 `ch01_inverse_functions`／§1.2 `ch01_inverse_trig`／§1.3 `ch01_limit_of_function`／§1.4 `ch01_one_sided_infinite`／§1.6 `ch01_precise_limit` 命名慣例）。
 > **格式：** 純內容層，每單元 `id / source / learning_goal / kind / narration / visual_need / animation_cue`；**不含** template / `{show}` / accent / 視覺 payload（第二階段才填）。`narration` 為英文（旁白語言）；`visual_need` / `animation_cue` 為中文（內容溝通用）。客製動畫由 Claude 依 `animation_cue` 生成、經認可後接入工程稿 `# HOOK`。
 > **複雜度定位（REBUILD_STATUS）：** 高複雜度、~75% 符號、建議 20–24 單元；教學重量主體為代數操作（極限律、直接代入、化簡不定式），幾何只在兩個子題目（piecewise 跳斷、squeeze 夾擠）為真——**套 §5 symbol-heavy 條件化例外**：squeeze 幾何＝anchor、$x^2\sin(1/x)$ 演示＝其 in-action、floor 跳斷＝唯一對比視覺；代數例題（u4/u6/u8/u9/u10/u17）與 squeeze 第二例（u15，$|x|$ 變體）**一律不配圖**，符號本身就是 beat。**新工程缺口（lazy build，第二階段）：floor 階梯／squeeze 三曲線／$x^2\sin(1/x)$ 包絡（多半 `graph_focus` 可吃）。**

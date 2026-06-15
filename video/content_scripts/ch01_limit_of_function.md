@@ -1,7 +1,7 @@
 # Section 1.3 The Limit of a Function — 內容稿（正式版）
 
 > **性質：正式產線內容稿**。依 REBUILD_STATUS「2026-06-13 全章影片計畫」Phase 2 第一站（§1.3）。以 HTML 講義權威檔逐節拆解、撰寫；內容層已通過六-lens 稽核。2026-06-14 依「先影片後旁白」路線已先落地工程稿／mock preview／MiMo spoken Step 1–3；narration **仍待使用者正式認可**。
-> **來源（權威）：** [`../../experiments/handout_kit/chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.3（`sec-no` 1.3，The Limit of a Function）。
+> **來源（權威）：** [`../../handout/chapter1-print-standalone.html`](../../handout/chapter1-print-standalone.html) §1.3（`sec-no` 1.3，The Limit of a Function）。
 > **格式：** 純內容層，每單元 `id / source / learning_goal / kind / narration / visual_need / animation_cue`；**不含** template / `{show}` / accent / 視覺 payload（第二階段才填）。`narration` 為英文（旁白語言）；`visual_need` / `animation_cue` 為中文（內容溝通用）。客製動畫由 Claude 依 `animation_cue` 生成、經認可後接入工程稿 `# HOOK`（本節數值表動畫多半由 `value_table` 模板的 `reveal: cols` 原生承載）。
 > **複雜度定位（REBUILD_STATUS）：** 低複雜度、~45% 符號、建議 10–14 單元；本節為「直覺低谷」，圖形／數值表為教學主體——**不**套 §5 symbol-heavy 例外。
 

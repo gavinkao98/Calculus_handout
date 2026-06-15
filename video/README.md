@@ -1,10 +1,10 @@
 # video/ 課程影片產線（第二代）
 
-將一節 LaTeX 講義轉成一支帶旁白課程影片的單一進入點。取代第一代的
+將一節 HTML 講義（handout kit）轉成一支帶旁白課程影片的單一進入點。取代第一代的
 `tools/manim_*` 產線（現已凍結）。
 
 - **改了什麼、為什麼：** [DESIGN.md](DESIGN.md)
-- **輸入：** HTML 講義（handout kit，[`../experiments/handout_kit/`](../experiments/handout_kit/)）的各節（由人閱讀、手寫產出內容稿）。**各章權威檔**——ch01：[`chapter1-print-standalone.html`](../experiments/handout_kit/chapter1-print-standalone.html)（2026-06-10 拍板；原 `chapter1-standalone.html`，2026-06-13 重組後改此名，編輯源在 `fragments/ch01/sec-*.html`）；ch02+ 屆時在此補。2026-06-10 前的輸入源為 `../chapters/*.tex`（已換源，§1.1/§1.6 原型基於它）。
+- **輸入：** HTML 講義（handout kit，[`../handout/`](../handout/)）的各節（由人閱讀、手寫產出內容稿）。**各章權威檔**——ch01：[`chapter1-print-standalone.html`](../handout/chapter1-print-standalone.html)（2026-06-10 拍板；原 `chapter1-standalone.html`，2026-06-13 重組後改此名，編輯源在 `fragments/ch01/sec-*.html`）；ch02+ 屆時在此補。2026-06-10 前的輸入源為 `../chapters/*.tex`（已換源，§1.1/§1.6 原型基於它）。
 - **輸出：** `output/`（gitignored）
 
 ## 結構
@@ -274,16 +274,16 @@ python video\pipeline\critic.py --storyboard video\storyboards\ch01_inverse_func
 ## 內容 cross-review（review_pack.py）
 
 critic.py 的**文字版姊妹**：critic.py 把 render 出來的**幀**送 VLM 抓視覺缺陷；
-review_pack.py 把**撰寫脈絡**（`.tex` 原文、narration、單元拆解、生成的 hook code）
+review_pack.py 把**撰寫脈絡**（HTML 講義原文（節切片）、narration、單元拆解、生成的 hook code）
 送另一個文字模型（DeepSeek），抓守門員與 VLM 結構上看不到的東西——忠實度漂移、
 旁白書面腔、拆解問題、生成動畫 code 的數學／慣例錯。四個 lens：
 
 | lens | 每次送什麼 | 對到 |
 |---|---|---|
-| `faithfulness` | 每單元 `.tex` 原文切片 ↔ narration | CONTENT_METHODOLOGY §1、§3 |
+| `faithfulness` | 每單元 HTML 講義原文切片 ↔ narration | CONTENT_METHODOLOGY §1、§3 |
 | `register` | 每單元 narration | CONTENT_METHODOLOGY §4 |
 | `decomposition` | 整節單元的 kind/learning_goal | CONTENT_METHODOLOGY §3、§5 |
-| `engineering` | 生成 hook code + animation_cue + `.tex` 數學 | DESIGN authoring checklist |
+| `engineering` | 生成 hook code + animation_cue + HTML 講義數學 | DESIGN authoring checklist |
 
 成本閘門與 critic.py 相同：免費組 packet + `--dry-run`（寫 packet、印 token 估算、不連網）；
 計費呼叫走 `--confirm`，key 從環境變數 `DEEPSEEK_API_KEY` 讀——**不當參數、不寫檔、不進 git**。
@@ -303,7 +303,7 @@ python video\pipeline\review_pack.py --storyboard <yml> --layers register,faithf
 - **provider**＝DeepSeek 官方 `api.deepseek.com`（OpenAI 相容、model `deepseek-v4-pro`、Bearer auth）。
 - **`deepseek-v4-pro` 是推理模型**：completion 多半是 reasoning token（首跑實測 ~2.5k／call），故 out ≫ in、成本由 reasoning 驅動；`max_tokens` 設大（8000）避免截斷，計費看實際用量。
 - **prompt 餵 house rules**（各 lens 的方法論 rubric）+ CLAUDE.md 四級 finding 紀律，壓掉「拿通用 prior 來審」的噪音。
-- **engineering lens 需要 `video/animations/<deck>_hooks.py`**；沒有生成 code 的節（如 §1.1）自動跳過該 lens。
+- **engineering lens 需要 `video/animations/<deck>_hooks.py`**；沒有生成 code 的節（如 §1.2）自動跳過該 lens。
 
 **過濾紀律（實測重要）**：模型的自我 triage 不可盡信——§1.1 首跑 28 calls、7 條 actionable，
 人依四級紀律過濾後真正可動約 1.5 條（其餘過度 triage 成 L1、甚至 1 條幻覺）；decomposition 正確回 0。

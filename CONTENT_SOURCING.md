@@ -1,7 +1,7 @@
 # 題源與選題流程（課文範例）
 
 服務對象：**講義課文內的 worked examples**（`example`＋`solution`，[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5；
-HTML 線為 `env-example`＋`env-solution`，見 [`experiments/handout_kit/CONTRACT-html-writing.md`](experiments/handout_kit/CONTRACT-html-writing.md)）。
+HTML 線為 `env-example`＋`env-solution`，見 [`handout/_dev-archive/general/CONTRACT-html-writing.md`](handout/_dev-archive/general/CONTRACT-html-writing.md)）。
 
 > **講義本體不收習題**（使用者 2026-06-12 定案，[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14）。
 > 習題將以**獨立的習題本**呈現，屆時另立規格、沿用本檔的題源與授權框架；
@@ -23,14 +23,14 @@ HTML 線為 `env-example`＋`env-solution`，見 [`experiments/handout_kit/CONTR
    4. **裁決前先過一輪選題稽核（2026-06-12 新增）**：以 `codex exec` 唯讀 auditor
       （走 ChatGPT 訂閱配額——動用前徵得使用者同意）對照課文片段覆核：缺口判定是否成立、
       候選是否對症且程度合適、自寫／改作之解的數學正確性、來源與授權標示是否屬實。
-      契約沿用 [`experiments/direction_layer/RULE.md`](experiments/direction_layer/RULE.md) ⑤
+      契約沿用 [`CONTENT_DIRECTION.md`](CONTENT_DIRECTION.md) ⑤
       （數學／忠實度／對症性為 blocking；格式為 advisory），**含圖的數學正確性與視覺可讀性**
-      （`figures.js` 的 JS 函式、domain、特殊點、標記文字 vs 課文描述；viewing window 是否讓教學特徵可辨識——range 過大壓縮曲線形狀等同圖畫錯），收斂到 blocking=0 再交使用者裁決。
+      （standalone HTML 內 `FIGS` 物件的繪圖函式、domain、特殊點、標記文字 vs 課文描述；viewing window 是否讓教學特徵可辨識——range 過大壓縮曲線形狀等同圖畫錯），收斂到 blocking=0 再交使用者裁決。
       **findings 必須留版控**：Codex 原始輸出落在 `.tmp/`（gitignored、換機即失、使用者看不到），
-      因此每輪稽核的 findings 原文＋Claude 的 triage 處置要存進該章旁的
-      `chNN_<artifact>-audit.md`（範例：`ch01_example-supplement-audit.md`），不可只留在 commit message 摘要。
+      因此每輪稽核的 findings 原文＋Claude 的 triage 處置要存進 `handout/_dev-archive/chNN/`
+      下的 `chNN_<artifact>-audit.md`（範例：`handout/_dev-archive/ch01/ch01_example-supplement-audit.md`），不可只留在 commit message 摘要。
 
-      **本選題稽核只審例題候選**（數學／來源／圖）；該節**手寫說明散文**的易懂性／流暢性由**獨立的一道散文稽核**負責（gate 1 Claude `handout-prose-audit` subagent ＋ gate 2 Codex，契約見 [`experiments/handout_kit/_audit/PROSE-AUDIT-RUBRIC.md`](experiments/handout_kit/_audit/PROSE-AUDIT-RUBRIC.md)），與本稽核平行、互不重疊。
+      **本選題稽核只審例題候選**（數學／來源／圖）；該節**手寫說明散文**的易懂性／流暢性由**獨立的一道散文稽核**負責（gate 1 Claude `handout-prose-audit` subagent ＋ gate 2 Codex，契約見 [`handout/_audit/PROSE-AUDIT-RUBRIC.md`](handout/_audit/PROSE-AUDIT-RUBRIC.md)），與本稽核平行、互不重疊。
    5. 通過裁決後改寫為本書語域與記號（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §3、§9），
       插入課文中教學上正確的位置（緊跟相關 definition／theorem／strategy）。
 3. **AI 出題——備援。** 僅用於題庫填不了的缺口（如緊扣手稿 running example 的延伸、
@@ -64,17 +64,18 @@ HTML 線為 `env-example`＋`env-solution`，見 [`experiments/handout_kit/CONTR
 下一章照走）：
 
 1. **插入範例**：在審核文件指定的錨點（緊跟相關 definition／theorem／strategy）寫入
-   `workedexample`（`env-example`＋`env-solution`），每筆前加 expansion-marker（見下節）。
+   `env-example`＋`env-solution`（即原 LaTeX 線的 `workedexample`），每筆前加 expansion-marker（見下節）。
 2. **手動重編號（kit 無自動編號，這是最大錯誤來源）**：example 與 figure 計數器章內連續，
    任一插入都會 cascade 位移其後所有編號。**先建完整編號地圖再動手**；改完用
    `grep` 核對：① example/figure 編號連續無跳號無重複 ② 每個 prose 內的「Figure N.M」／
    「Example N.M」交叉引用都解析到存在的編號。definition/theorem/proposition/remark/
    caution/strategy 不受影響（除非也插入該類環境）。
-3. **新圖入 `figures.js`**：每幅新圖加 `FIGS` 條目（`buildPlot` payload），遵 redundant
+3. **新圖兩處同改**：在 fragment 加 `<figure data-fig="id">` 標記，並在 print standalone HTML 的
+   `const FIGS` 物件加對應條目（`buildPlot` payload），遵 redundant
    encoding（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §10）。
-4. **重生 standalone**：`python gen_standalone.py`（三章皆生；機制見
-   [`experiments/handout_kit/README.md`](experiments/handout_kit/README.md)）。
-5. **渲染驗證**：本機可能無 Node（CDP 截圖工具跑不動）→ 用 Preview MCP（`preview_start`
+4. **重生 standalone**：`python build.py`（從 `handout/` 執行，三章皆生；機制見
+   [`handout/README.md`](handout/README.md)）。
+5. **渲染驗證**（驗的是 print standalone，螢幕版已移除）：本機可能無 Node（CDP 截圖工具跑不動）→ 用 Preview MCP（`preview_start`
    起 `python -m http.server` → `preview_eval` 檢查 example 數、`[data-fig]` 是否 hydrate、
    `mjx-merror` 數、殘留未渲染 `\(`／`\[`；`preview_screenshot` 目視新圖）。驗收線：
    範例數正確、圖全 hydrate、0 MathJax 錯誤、0 未渲染數學式。
@@ -85,8 +86,8 @@ HTML 線為 `env-example`＋`env-solution`，見 [`experiments/handout_kit/CONTR
 - 沿用既有的 expansion-marker 慣例：每筆題庫來源的範例前加註
   `% expansion:example — <一行說明> [source: CLP-1 §1.4 #25]`（LaTeX）或
   `<!-- expansion:example — … [source: …] -->`（HTML）。三分類：手稿／`[source: 題庫…]`／`[source: AI]`。
-- **匯入當下**把題源的官方 hint／answer／solution 全文、授權標記、改寫差異說明存入該章旁的
-  `chNN_example-imports.md`（如 `experiments/handout_kit/ch01_example-imports.md`）。
+- **匯入當下**把題源的官方 hint／answer／solution 全文、授權標記、改寫差異說明存入
+  `handout/_dev-archive/chNN/` 下的 `chNN_example-imports.md`（如 `handout/_dev-archive/ch01/ch01_example-imports.md`）。
   改寫若更動數學實質（例如依本書 principal-range 約定重算），必須在 import record 中逐筆說明。
 
 ## 授權

@@ -1,7 +1,7 @@
 # 影片產線——設計（第二代）
 
 這是重新設計的 handout → lesson-video 產線。輸入為 HTML handout
-kit（`../experiments/handout_kit/`；per-chapter authoritative file 列於
+kit（`../handout/`；per-chapter authoritative file 列於
 [README.md](README.md)——2026-06-10 從 `chapters/*.tex` 切換）。它取代第一代系統
 （`tools/manim_*`、`MANIM_STORYBOARD.md`、`MANIM_REFERENCE.md`、
 `MANIM_CHECKLIST.md`），第一代被凍結、不刪除。
@@ -244,9 +244,9 @@ style）在此。乾淨分離。
 
 ### Text rendering：prose vs math（no garble）
 
-螢幕文字走兩條 render path 之一。兩者都是 Times（匹配 LaTeX handout 的
-newtxtext/newtxmath），但 manim 在相同 `font_size` 下 size 不同，且只有一條
-理解 LaTeX：
+螢幕文字走兩條 render path 之一。兩者都是 Times（匹配 HTML handout 的 Times
+serif——`"Times New Roman", Times, Georgia, serif` + MathJax），但 manim 在相同
+`font_size` 下 size 不同，且只有一條理解 LaTeX：
 
 | Path | Engine | 理解 `$math$` / `\\`？ | 使用者 |
 |---|---|---|---|

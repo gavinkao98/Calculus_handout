@@ -1,7 +1,7 @@
 # Section 1.6 The Precise Definition of a Limit — 內容稿
 
 > **性質：symbol-heavy 壓力測試節**（產線第二節，繼 §1.1 校準樣本之後）。目的是壓測 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) 的 **§5 symbol-heavy 例外路徑**、theorem/proof 拆單元、repeat-pattern、對齊鏈 narration——對應 [`../REBUILD_STATUS.md`](../REBUILD_STATUS.md) 標記的「§1.6 symbol-heavy 第二校準節」。
-> **來源：** [`chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.6（L1655–1884）。**（2026-06-14 漂移修復：原指 `chapters/ch01_foundations.tex` §1.6 L1332–1588，已重指定稿 HTML 權威檔；環境現行編號見各單元 `source:`，新增例題見文末漂移修復筆記。）**
+> **來源：** [`chapter1-print-standalone.html`](../../handout/chapter1-print-standalone.html) §1.6（L1655–1884）。**（2026-06-14 漂移修復：原指 `chapters/ch01_foundations.tex` §1.6 L1332–1588，已重指定稿 HTML 權威檔；環境現行編號見各單元 `source:`，新增例題見文末漂移修復筆記。）**
 > **格式：** 純內容層，每單元 `id / source / learning_goal / kind / narration / visual_need / animation_cue`；**不含** template / `{show}` / accent / 視覺 payload（第二階段才填）。`narration` 為英文（旁白語言）；`visual_need` / `animation_cue` 為中文（內容溝通用）。動畫一律**客製 manim，由 Claude 依 `animation_cue` 自然語言生成**（認可後接入工程稿 `# HOOK`）——內容稿本身只給自然語言、不寫 code。
 > **視覺預算（§5 symbol-heavy 例外）：** 本節教學重量 ~90% 落在符號／邏輯／量詞，故**只配兩個圖形視覺**——unit 7 的 ε-δ 管狀圖（**anchor**）與 unit 3 的動機圖（line + 挖空點）。其餘所有定義／定理／證明／procedure／例題（含定義診斷與 M-δ 無窮極限驗證）／無窮極限定義／forward-ref／recap **皆純符號，不配圖**（符號本身就是 beat；診斷單元用符號 compare、驗證例題用推導鏈呈現）。
 
@@ -232,7 +232,7 @@ next:          Up next — Derivatives
 
 ### 漂移修復（2026-06-14，內容權威換源 HTML §1.6）
 
-依 [`../REBUILD_STATUS.md`](../REBUILD_STATUS.md) 標記的 §1.6 significant drift，本節內容稿由舊 `ch01_foundations.tex` 重指定稿 HTML [`chapter1-print-standalone.html`](../../experiments/handout_kit/chapter1-print-standalone.html) §1.6（L1655–1884）：
+依 [`../REBUILD_STATUS.md`](../REBUILD_STATUS.md) 標記的 §1.6 significant drift，本節內容稿由舊 `ch01_foundations.tex` 重指定稿 HTML [`chapter1-print-standalone.html`](../../handout/chapter1-print-standalone.html) §1.6（L1655–1884）：
 
 10. **provenance 全面重指＋記錄環境編號。** 14 個既有單元的 `source:` 自 `.tex` 行號改指 HTML §1.6＋手寫編號：**Definition 1.13**（ε-δ limit）、**Definition 1.14**（infinite limit）、**Proposition 1.7**（Uniqueness of limits）、**Strategy 1.3**、**Figure 1.21**（fig:precise-limit）、**Example 1.37/1.40/1.41**。narration 主幹零刪改（既有單元逐字保留）。
 
