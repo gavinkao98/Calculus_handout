@@ -7,7 +7,7 @@
 **前提（重要）：** 此路線需要該節的**正典 storyboard** `video/storyboards/<deck>.yml`（含 `say` ＋ `{show}`）。
 目前只有 §1.1（`ch01_inverse_functions`）、§1.6（`ch01_precise_limit`）有 storyboard；
 §1.2/1.3/1.4/1.5 仍在「內容稿＋narration HTML、待認可、**尚無 storyboard**」階段——
-那些節**先別跑本路線的影片步驟**，可先用下方「念法慣例」＋ Mode B 把口語版納入認可包，
+那些節**先別跑本路線的影片步驟**，可先用下方「念法慣例」＋ NFA（旁白忠實稽核，原 Mode B）把口語版納入認可包，
 storyboard 落地後再走完整流程。
 
 ---
@@ -40,13 +40,16 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   python video/pipeline/derive_spoken.py --deck <deck>           # 生成 _mimo.yml + _narration_spoken.md
   （這兩個生成檔標 DO NOT EDIT；要改旁白改 .spoken.yml 後重生。）
 
-步驟 3 — Mode B（codex 稽核，read-only）：
-- cp content_scripts/_audit/PROMPT-narration-modeB.template.md → _audit/PROMPT-<deck>-narration-modeB.md，填 {{...}}。
+步驟 3 — NFA 旁白忠實稽核（原 Mode B；read-only）：
+  契約＝ content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md（維度 D1–D7、收斂線、reader 拆法）。
+  gate1（Claude subagent，免費）迭代到 blocking==0：1 個 narration reader 跑 D1–D6；CONTENT_APPROVED=no 時
+  另開 1 個隔離盲 reader 跑 D7（獨立重算）。收斂後再跑 gate2（Codex，計費、需同意）單次確認。
+- cp content_scripts/_audit/PROMPT-narration-faithfulness.template.md → _audit/PROMPT-<deck>-narration-faithfulness.md，填 {{...}}。
   該節旁白「尚未經使用者認可」就把 CONTENT_APPROVED 設為 no（會打開 D7 數學內容正確性維度）。
-  codex exec -s read-only < video/content_scripts/_audit/PROMPT-<deck>-narration-modeB.md \
-      > video/content_scripts/_audit/REPORT-<deck>-narration-modeB.raw.txt 2>&1
+  gate2 範例：codex exec -s read-only < video/content_scripts/_audit/PROMPT-<deck>-narration-faithfulness.md \
+      > video/content_scripts/_audit/REPORT-<deck>-narration-faithfulness.raw.txt 2>&1
 - 收斂：依 Keep/Rewrite/Cut 改 <deck>.spoken.yml → 重跑 derive --check → 回歸審核 →
-  寫乾淨的 REPORT-<deck>-narration-modeB.md。Mode B 裁決寫進該次修正 commit 的 message body（CLAUDE.md）。
+  寫乾淨的 REPORT-<deck>-narration-faithfulness.md。NFA 裁決寫進該次修正 commit 的 message body（CLAUDE.md，`git log --grep="NFA"`）。
 
 步驟 4 —（須先徵得使用者同意：MiMo 雖免費仍屬外部 API）合成＋render：
 - 確認 .env 有 MIMO_API_KEY。先 smoke（mimo_preview.py --smoke）確認回應形狀，報用量、徵同意後：

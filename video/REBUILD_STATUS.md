@@ -4,6 +4,19 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢待改 HTML，「四 lens ＋ advisory ＋ 四級人工過濾 ＋ 計費閘門」的**做法**不變。
 
+## 🧭 2026-06-15 審核模式重構落地（minimal-unify，部分採用）
+
+**觸發：** 參考講義審核模式，把 video 五閘的零散（零收斂判準、severity 詞彙不一、命名衝突）收斂。決策與全圖見 [`REVIEW_REDESIGN.md`](REVIEW_REDESIGN.md)（已標部分採用）、地圖見 [`REVIEW_GATES.md`](REVIEW_GATES.md)。**本輪已落地：**
+
+- **「Mode B」→「NFA」（旁白忠實稽核）改名**：解與講義 Mode B 的同名異義衝突。維度 D1–D7 原封不動；template `PROMPT-narration-modeB.template.md` → `PROMPT-narration-faithfulness.template.md`；commit-grep 分流（video 用 `git log --grep="NFA"`、講義保留 `Mode B`）。
+- **抽 SSOT rubric＋thin prompt**：新增 [`_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)、[`_audit/NARRATION-COPYEDIT-RUBRIC.md`](content_scripts/_audit/NARRATION-COPYEDIT-RUBRIC.md)，兩支 prompt template 改成「引用 rubric、不複述」。
+- **每判斷閘一條收斂線**＝blocking==0；**散文閘兩讀者** gate1 Claude（免費迭代）→gate2 Codex（收斂後單次、需同意），gate2 只套 copyedit／NFA。
+- **NFA reader 拆法**：穩態 1 個 narration reader（D1–D6）；`CONTENT_APPROVED=no` 才 +1 個隔離盲 reader 跑 D7 獨立重算。
+- **視覺層改 figure-audit 鏡像**：gate1 Claude 抽幀 subagent（免費、每次 render）＋gate2 外部 VLM（MiMo-V2.5，間歇、計費），0–100 留當 magnitude、收斂＝視覺 blocking==0。
+- **撰稿兩階段命名 DRAFT/LOCKED phase**（非 mode；「Mode」專留講義 A/B/C）；§4 Register 放寬為偏口語（允許縮寫＋引導語，守 lecture 底線）。
+
+**待續（下一輪再做）：** code 回報層 normalize（`review_pack`/`critic` buckets 與 PLACEHOLDER 定價、critic.py 接 `VISUAL-FRAME-RUBRIC` 並加 A6/A7、抽幀新鮮度、`review_pack` 工程鏡待 `.tex` parser 修）。**講義已再次修訂——舊片全屬練習，將用本流程整批重跑。**（**四份判斷閘 SSOT rubric 已齊：NFA／copyedit／six-lens／VISUAL-FRAME**，均 2026-06-15～16 落地。`VISUAL-FRAME`＝V1–V8 blocking＋A1–A7 magnitude；`CONTENT-SIXLENS`＝六鏡 L1–L6、無 gate2、收斂 blocking==0。brand.prose 句子級散文已從多處 `align="CENTER"` 改回 `LEFT`、修「續行置中」、抽幀實測左對齊。）
+
 ## 🗣️ 2026-06-14 MiMo 旁白雙版路線落地（§1.1，已可規模化）
 
 **觸發：** 使用者要試新路線——旁白做兩版（HTML 閱讀版＋口語 TTS 版）＋Mode B 給 codex 審＋收斂拍板，並改用 **MiMo TTS**（小米 `mimo-v2.5-tts`，公測免費）。§1.1 已 end-to-end 走通並出 1080p MiMo 成片。
@@ -16,12 +29,12 @@
 - **P1 單一真相源：** [`content_scripts/<deck>.spoken.yml`](content_scripts/ch01_inverse_functions.spoken.yml)＝口語唯一源；[`pipeline/derive_spoken.py`](pipeline/derive_spoken.py)` --deck <deck>` 生成 `storyboards/<deck>_mimo.yml`＋`<deck>_narration_spoken.md`（皆標 DO NOT EDIT）；退役一次性 `_gen_mimo_storyboard.py`。
 - **P2 驗證：** `derive_spoken.py --check` 守 scene/`{show}`/無 `$` parity；render 後抽幀驗 reveal 同步（我用多模態看圖）。
 - **P3 音訊：** [`audio.py`](pipeline/audio.py) 加 `trim_silence`；`MimoTTSBackend` 預設裁 beat 頭尾靜音（實測 0.42s→0.08s）。
-- **P4 footgun/模板：** [`make.py`](make.py) 加 `--reuse-audio`（render 讀 `tts.py` 真 manifest）＋**拒絕用 mock 覆蓋真 manifest**；Mode B 可重用模板 [`_audit/PROMPT-narration-modeB.template.md`](content_scripts/_audit/PROMPT-narration-modeB.template.md)（含「數學內容正確性」維度，**未認可內容的章節必跑**）。
+- **P4 footgun/模板：** [`make.py`](make.py) 加 `--reuse-audio`（render 讀 `tts.py` 真 manifest）＋**拒絕用 mock 覆蓋真 manifest**；NFA（旁白忠實稽核，原 Mode B；2026-06-15 改名）可重用模板 [`_audit/PROMPT-narration-faithfulness.template.md`](content_scripts/_audit/PROMPT-narration-faithfulness.template.md)、契約 [`_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)（含「數學內容正確性」維度，**未認可內容的章節必跑**）。
 - **P5 同步 guard（2026-06-14，Codex 本輪）：** 新增 [`pipeline/timing.py`](pipeline/timing.py) 作為 scene lead/tail、最小 beat hold、hash 與短 beat 計算的單一來源；`scene.py`、`make.py`、`mux.py`、`critic.py` 共用 `SCENE_LEAD_SECONDS`，避免 mux offset／critic 抽幀時間漂移。`make.py --reuse-audio` 現在 fail-fast 驗 manifest freshness（deck id、scene、beat count、`{show}` target、`text_hash`、WAV 存在與 WAV 時長），render 前警告短/reveal-only beat，render 後用 ffprobe 做 video duration vs `lead + narration (+ tail)` audit。`tts.py` 新 manifest 會記錄每 beat `raw_audio_seconds`／`trimmed_audio_seconds`／`trimmed_silence_seconds` 供 MiMo padding debug。離線驗證：compileall OK；§1.1/§1.2/§1.3 derive parity OK；stale hash 測試能擋；現有 §1.1 `recap beat 04 (formula.0)` 被 sync warning 抓出（0.450s audio vs 0.500s reveal anim，約 +0.350s padding）。未呼叫外部 API。
 
 **關鍵發現：MiMo 非決定性**——同文字每次合成是不同 take（±~10% 長度），重跑不保證同長度；要定版就別重合成。
 
-**規模化到其他節（前提：該節已有 storyboard `<deck>.yml`）：** 寫 `<deck>.spoken.yml`（依念法慣例把已認可 narration 的數學攤成口語、`{show}` 對齊正典）→ `derive_spoken.py --deck <deck>` → Mode B（codex，未認可內容打開 D7 數學維度）→ 收斂 → `tts.py --backend mimo` → `make.py --reuse-audio`。命令見 [`README.md`](README.md)「MiMo 旁白／影片路線」、契約見 [`DESIGN.md`](DESIGN.md)。**MiMo TTS 雖免費仍屬外部 API，批次合成前依 CLAUDE.md 報用量徵同意。** 注：與 2026-06-13 的 Gemini/Charon 路線並存（`make.py` mock 與 `tts.py→build.py→mux.py` Gemini 路徑不變）；MiMo 是評估中的替代音源。
+**規模化到其他節（前提：該節已有 storyboard `<deck>.yml`）：** 寫 `<deck>.spoken.yml`（依念法慣例把已認可 narration 的數學攤成口語、`{show}` 對齊正典）→ `derive_spoken.py --deck <deck>` → NFA（旁白忠實稽核，原 Mode B；gate1 Claude→gate2 Codex，未認可內容打開 D7 隔離重算 reader）→ 收斂 → `tts.py --backend mimo` → `make.py --reuse-audio`。命令見 [`README.md`](README.md)「MiMo 旁白／影片路線」、契約見 [`DESIGN.md`](DESIGN.md) 與 [`_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)。**MiMo TTS 雖免費仍屬外部 API，批次合成前依 CLAUDE.md 報用量徵同意。** 注：與 2026-06-13 的 Gemini/Charon 路線並存（`make.py` mock 與 `tts.py→build.py→mux.py` Gemini 路徑不變）；MiMo 是評估中的替代音源。
 
 ## 🎬 2026-06-13 第一章 HTML 定稿 → 全章影片計畫
 

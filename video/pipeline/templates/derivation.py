@@ -85,7 +85,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     statement = None
     if spec.get("statement"):
         statement = brand.prose(spec["statement"], ground, size="body",
-                                max_width=content_w, align="CENTER")
+                                max_width=content_w, align="LEFT")
 
     rel = str(spec.get("align_on", "="))
     line_mobs: list[MathTex] = []

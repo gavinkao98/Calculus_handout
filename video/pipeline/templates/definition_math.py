@@ -51,9 +51,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     statement = None
     if spec.get("statement"):
         # prose() routes on content: inline $math$ / a \\ break -> Tex (so it
-        # never prints "$f$" literally); plain prose -> wrapped, centred Text.
+        # never prints "$f$" literally); plain prose -> wrapped, left-aligned Text.
         statement = brand.prose(spec["statement"], ground, size="body",
-                                max_width=content_w, align="CENTER")
+                                max_width=content_w, align="LEFT")
 
     math_mobs, anims = [], []
     for entry in spec.get("math", []):

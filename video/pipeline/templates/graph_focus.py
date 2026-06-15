@@ -390,7 +390,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         # class). _label stays for the tight curve/point labels.
         # role="text" (not "muted"): an annotation is a teaching takeaway students
         # must read; "muted" is for de-emphasised/retired content, too faint here.
-        ann = brand.prose(text, ground, role="text", size="step", max_width=max_w, align="CENTER")
+        ann = brand.prose(text, ground, role="text", size="step", max_width=max_w, align="LEFT")
         annotations.append(ann)
 
     if annotations:

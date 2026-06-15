@@ -216,7 +216,7 @@ python video\make.py          --storyboard video\storyboards\ch01_inverse_functi
 - 同步常數集中在 `pipeline/timing.py`：`SCENE_LEAD_SECONDS` 同時供 `scene.py`、`make.py`、`mux.py`、`critic.py` 使用，避免 mux offset / critic 抽幀時間與實際場景 lead 漂移。
 - 只想聽聲音不要影片：`python video\pipeline\mimo_preview.py --spoken <..._narration_spoken.md>`（逐單元串成 `preview.wav`；`--dry-run` 不呼叫 API、`--smoke` 只合首段）。
 - **MiMo 非決定性**：同文字每次合成是不同 take（±~10% 長度），重跑不保證同長度；要鎖定某 take 就別重合成。
-- 念法慣例（`f inverse` 不念 reciprocal、`x sub one`、和/差根號加 “the quantity”、座標 “the point with coordinates a and b”…）見生成的 `_narration_spoken.md` §2，或 Mode B 模板 `content_scripts/_audit/PROMPT-narration-modeB.template.md`。
+- 念法慣例（`f inverse` 不念 reciprocal、`x sub one`、和/差根號加 “the quantity”、座標 “the point with coordinates a and b”…）見生成的 `_narration_spoken.md` §2，或 NFA 契約 `content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`（旁白忠實稽核，原 Mode B）。
 
 ## 文字渲染（避免亂碼）
 

@@ -78,7 +78,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     statement = None
     if spec.get("statement"):
         statement = brand.prose(spec["statement"], ground, size="body",
-                                max_width=content_w, align="CENTER")
+                                max_width=content_w, align="LEFT")
 
     header = [str(c) for c in spec.get("header", [])]
     rows = [[str(c) for c in r] for r in spec.get("rows", [])]

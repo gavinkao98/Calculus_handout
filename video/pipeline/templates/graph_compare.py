@@ -111,7 +111,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     for entry in spec.get("annotations", []):
         text = entry.get("text", "") if isinstance(entry, dict) else str(entry)
         ann = brand.prose(text, ground, role="text", size="step",
-                          max_width=content_w, align="CENTER")
+                          max_width=content_w, align="LEFT")
         annotations.append(ann)
     ann_group = None
     if annotations:
