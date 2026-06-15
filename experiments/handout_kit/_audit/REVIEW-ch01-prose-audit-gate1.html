@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 散文稽核 — gate 1（Claude）審核稿</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: {
+        arccsc: ['\\operatorname{arccsc}'],
+        arcsec: ['\\operatorname{arcsec}'],
+        arccot: ['\\operatorname{arccot}']
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.done{background:#e6f7ea;color:#1a7f37}
+  .issue{color:var(--muted);font-size:.92rem;margin:2px 0 10px}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:54px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  .none{color:var(--muted);font-style:italic;padding:8px 2px}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 1 散文稽核 — gate 1（Claude）審核稿</h1>
+  <p class="lede">第一道閘：Claude <code>handout-prose-audit</code> subagent（唯讀）對 ch01 全 7 節散文跑易懂性 U1–U5＋流暢性 F1–F5。契約見 <code>PROSE-AUDIT-RUBRIC.md</code>。2026-06-15。</p>
+
+  <div class="note pass"><b>狀態：整章 0 blocking；全部 advisory（G1-1…G1-9）已裁決並套用。</b> 本稿轉為紀錄（old→new），fragment 已改、print-standalone 已重組。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>Blocking</th><th>處置</th></tr>
+    <tr><td>sec-intro</td><td class="zero">0</td><td>乾淨，無 finding</td></tr>
+    <tr><td>§1.1 Inverse Functions</td><td class="zero">0</td><td>G1-1·G1-2·G1-3 已套用（＋A）</td></tr>
+    <tr><td>§1.2 Inverse Trig</td><td class="zero">0</td><td>G1-4 已套用</td></tr>
+    <tr><td>§1.3 Limit of a Function</td><td class="zero">0</td><td>乾淨，無 finding</td></tr>
+    <tr><td>§1.4 One-Sided &amp; Infinite</td><td class="zero">0</td><td>G1-5 已套用</td></tr>
+    <tr><td>§1.5 Limit Laws</td><td class="zero">0</td><td>G1-6·G1-7 已套用</td></tr>
+    <tr><td>§1.6 Precise Definition</td><td class="zero">0</td><td>G1-8·G1-9 已套用</td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：<b>易懂性</b> U1 動機缺位 · U2 重型形式無 gloss · U3 未解釋的跳躍 · U4 術語先用後定義 · U5 定義後未拆解 ／ <b>流暢性</b> F1 局部冗餘 · F2 贅字 · F3 句構可解析 · F4 句長／負荷 · F5 語域。</p>
+
+  <h2>§1.1 Inverse Functions</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-1</span><span class="chip unit">開場</span><span class="chip dim">F2 贅字</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">去掉指向章首的結構性 meta。</div>
+    <div class="row old"><span class="tag">原文</span>The reverse machinery <del>— how to recover the input from the output — was named in the chapter overview; this section works it out.</del></div>
+    <div class="row new"><span class="tag">已改</span>The reverse <ins>process — recovering the input from the output — is the subject of this section.</ins></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2</span><span class="chip unit">Remark 1.1 水平線檢驗</span><span class="chip dim">F4 句長</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">一句塞雙向 biconditional；在分號處斷成兩句。</div>
+    <div class="row old"><span class="tag">原文</span>…so \(f\) fails to be one-to-one<del>;</del> <del>c</del>onversely, if every horizontal line meets the graph at most once…</div>
+    <div class="row new"><span class="tag">已改</span>…so \(f\) fails to be one-to-one<ins>.</ins> <ins>C</ins>onversely, if every horizontal line meets the graph at most once…</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-3</span><span class="chip unit">line 88 段落</span><span class="chip dim">F1 局部冗餘</span><span class="chip done">✓ 已刪除</span></div>
+    <div class="issue">\(x^2\) 的 1/4 collision 第三次重述（warmup、Example 1.2 已述）；整段刪除。</div>
+    <div class="row old"><span class="tag">已刪</span><del>The function \(g(x)=x^2\) on \([-1,1]\) illustrates why not every function can be reversed: the value \(\tfrac14\) is produced by both \(\tfrac12\) and \(-\tfrac12\)…</del></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">A</span><span class="chip unit">Example 1.5（restrict x²→√x）</span><span class="chip dim">框架增強</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">把你喜歡的「不是每個函數都能反轉、但限制定義域可修」框架，加在 Example 1.5 solution 開頭（這裡才是 restrict-domain 的正確位置——在反函數定義之後）。</div>
+    <div class="row new"><span class="tag">新增</span><ins>This example illustrates why not every function can be reversed — and how restricting the domain repairs it.</ins> On the interval \([0,\infty)\) the function \(f(x)=x^2\) is one-to-one…</div>
+  </div>
+
+  <h2>§1.2 Inverse Trigonometric Functions</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-4</span><span class="chip unit">Example 1.10 solution</span><span class="chip dim">F3 句構可解析</span><span class="chip done">✓ 已套用（你的措辭）</span></div>
+    <div class="issue">冒號片語改成兩句程序句（採用你給的文字）。</div>
+    <div class="row old"><span class="tag">原文</span><del>The pattern in both parts: the domain of a composition is governed by what the inner function accepts and what its outputs feed the outer function.</del></div>
+    <div class="row new"><span class="tag">已改</span><ins>To find the domain of a composition, first make sure the input is allowed by the <em>inner</em> function. Then make sure the output of the inner function is allowed by the <em>outer</em> function.</ins></div>
+  </div>
+
+  <h2>§1.3 The Limit of a Function</h2>
+  <p class="none">乾淨（0／0／0），無 finding。</p>
+
+  <h2>§1.4 One-Sided and Infinite Limits</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-5</span><span class="chip unit">Example 1.22 solution 末句</span><span class="chip dim">F4 句長</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">兩個推理子句以 em-dash 相接；斷成兩句。</div>
+    <div class="row old"><span class="tag">原文</span>…the two-sided limit does not exist <del>— and since</del> the values do not all grow in the <em>same</em> signed direction…</div>
+    <div class="row new"><span class="tag">已改</span>…the two-sided limit does not exist<ins>. Since</ins> the values do not all grow in the <em>same</em> signed direction…</div>
+  </div>
+
+  <h2>§1.5 Limit Laws and Computational Techniques</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-6</span><span class="chip unit">開場後</span><span class="chip dim">F1 局部冗餘</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">重複的 ε-δ 前向承諾（line 9 已述）；折成單句 pivot。</div>
+    <div class="row old"><span class="tag">原文</span><del>These laws will be proved rigorously in the next section once we have the \(\varepsilon\)-\(\delta\) definition; for now, they let us evaluate many limits directly.</del></div>
+    <div class="row new"><span class="tag">已改</span><ins>For now, the laws let us evaluate many limits directly.</ins></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-7</span><span class="chip unit">line 25</span><span class="chip dim">F5 語域</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">「Verbally:」改成 §3 鼓勵的連接詞。</div>
+    <div class="row old"><span class="tag">原文</span><del>Verbally:</del> the limit of a sum / difference / …</div>
+    <div class="row new"><span class="tag">已改</span><ins>In words,</ins> the limit of a sum / difference / …</div>
+  </div>
+
+  <h2>§1.6 The Precise Definition of a Limit</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-8</span><span class="chip unit">Strategy 1.3 step 3</span><span class="chip dim">F4 句長</span><span class="chip done">✓ 已套用（你的措辭）</span></div>
+    <div class="issue">一句拆兩句、程序前景化（採用你給的文字）。</div>
+    <div class="row old"><span class="tag">原文</span>…<del>When</del> the bound <del>carries</del> an auxiliary factor depending on \(x\), <del>restrict</del> \(x\) … to bound that factor<del>; then</del> take \(\delta\) to be the <del>minimum</del>…</div>
+    <div class="row new"><span class="tag">已改</span>…<ins>If</ins> the bound <ins>contains</ins> an auxiliary factor depending on \(x\), <ins>first restrict</ins> \(x\) … <ins>so that this factor is bounded. Then</ins> take \(\delta\) to be the <ins>smaller</ins>…</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-9</span><span class="chip unit">Definition 1.13（ε-δ）</span><span class="chip dim">U2 重型形式無 gloss</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">定義框尾補一句 inline gloss（方便跳讀者；§3 對 ε-δ 鼓勵此 gloss）。</div>
+    <div class="row new"><span class="tag">新增</span><ins>Informally, we can force \(f(x)\) as close to \(L\) as we like by taking \(x\) close enough to \(a\) (but not equal to \(a\)).</ins></div>
+  </div>
+
+  <footer>
+    gate 1：Claude <code>handout-prose-audit</code> subagent（唯讀）。整章 comprehensibility blocking = 0；G1-1…G1-9＋A 全數套用，已 <code>python build.py ch01</code> 重組進 <code>chapter1-print-standalone.html</code>。gate 2 紀錄見 <code>REVIEW-ch01-prose-audit-gate2.html</code>。
+  </footer>
+</div>
+</body>
+</html>

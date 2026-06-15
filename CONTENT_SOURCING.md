@@ -29,6 +29,8 @@ HTML 線為 `env-example`＋`env-solution`，見 [`experiments/handout_kit/CONTR
       **findings 必須留版控**：Codex 原始輸出落在 `.tmp/`（gitignored、換機即失、使用者看不到），
       因此每輪稽核的 findings 原文＋Claude 的 triage 處置要存進該章旁的
       `chNN_<artifact>-audit.md`（範例：`ch01_example-supplement-audit.md`），不可只留在 commit message 摘要。
+
+      **本選題稽核只審例題候選**（數學／來源／圖）；該節**手寫說明散文**的易懂性／流暢性由**獨立的一道散文稽核**負責（gate 1 Claude `handout-prose-audit` subagent ＋ gate 2 Codex，契約見 [`experiments/handout_kit/_audit/PROSE-AUDIT-RUBRIC.md`](experiments/handout_kit/_audit/PROSE-AUDIT-RUBRIC.md)），與本稽核平行、互不重疊。
    5. 通過裁決後改寫為本書語域與記號（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §3、§9），
       插入課文中教學上正確的位置（緊跟相關 definition／theorem／strategy）。
 3. **AI 出題——備援。** 僅用於題庫填不了的缺口（如緊扣手稿 running example 的延伸、

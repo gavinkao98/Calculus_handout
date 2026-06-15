@@ -1,0 +1,273 @@
+<!-- Chapter 3 opener + §3.1 Derivatives of the Sine and Cosine Functions.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from exp-ch03/seed_ch03_s1.md (manuscript pp. 1–9). Direction brief
+     brief_s31.md approved at ③ (2026-06-08). Numbering is MANUAL (the kit
+     has no auto-counter); cross-references are plain prose. §3.1 is the
+     chapter's first section, so it carries the chapter opener (a second
+     <article>) and starts exp-ch03/figures.js (Figure 3.1).
+
+     Counters start fresh for Chapter 3:
+       Proposition 3.1 (sin, cos continuous), 3.2 (lim sinθ/θ = 1);
+       Theorem 3.1 (sin' = cos), 3.2 (cos' = −sin);
+       Example 3.1 (companion limit), 3.2 (tan' & sec'), 3.3 (SHM);
+       Figure 3.1 (sector inequality); Remark 3.1 (derivative cycle).
+       Caution is unnumbered (per ch02). §3.2 continues from Theorem 3.3,
+       Proposition 3.3, Example 3.4, Figure 3.2, Remark 3.2.
+
+     ③ decisions D1–D4: tan' as a worked example, not a theorem (D1); sec'
+     pulled into §3.1 beside tan' (same quotient-rule technique); the
+     companion limit (1−cosθ)/θ → 0 added as a standard limit (D2);
+     continuity slimmed (D3) — the cos/sin continuity PROOF is kept (the
+     derivative limits need it), but the definitions of continuity and of
+     even/odd are cross-referenced to Chapter 1 (not restated) and the
+     Dirichlet example is dropped; the squeeze theorem is cross-referenced
+     to §1.5, not re-stated (D4). Figure 3.1 uses the standard nesting
+     △OAB ⊆ sector OAB ⊆ △OAC (½sinθ ≤ ½θ ≤ ½tanθ); the manuscript's
+     transcribed middle inequality on p.3 was a slip (①-verify). No
+     exercises: self-authored problems are written as worked examples. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Chapter 3</div>
+    <h1 class="ch-title">Chain Rule and Trigonometric Derivatives</h1>
+  </header>
+
+  <p class="lead">Chapter 2 built the derivative from the ground up — as the limit of a difference quotient — and turned it into a working toolkit: rules for constants, powers, sums, products, quotients, and the exponential. Yet a whole world of functions still lies just out of reach. How fast does \(\sin x\) change? And what is the derivative of a <em>composition</em> such as \(\sqrt{1 + x^{2}}\) or \(\sin(x^{2})\), where one function is fed into another? This chapter supplies the two ideas that complete the differentiation toolkit. First we differentiate the trigonometric functions, which forces us to confront a limit no algebra can crack and to break through it with a piece of geometry. Then we prove the <em>chain rule</em>, the single rule that differentiates any composition, and use it to unlock the derivatives of inverse and implicitly defined functions.</p>
+
+  <p class="para-head">By the end of this chapter, you will be able to:</p>
+  <ul>
+    <li>differentiate \(\sin x\), \(\cos x\), \(\tan x\), and the other trigonometric functions, and combine them with the rules of Chapter 2;</li>
+    <li>state the chain rule and use it to differentiate compositions \(f(g(x))\), including nested ones;</li>
+    <li>apply logarithmic differentiation to handle expressions such as \(x^{x}\) and \(f(x)^{g(x)}\);</li>
+    <li>derive the derivatives of \(\arcsin x\), \(\arctan x\), and \(\ln x\) from their inverse-function relations.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">3.1</span>Derivatives of the Sine and Cosine Functions</h2>
+  </header>
+
+  <!-- expansion:intuition — load-bearing intuition: the trig difference quotient collapses to lim sinθ/θ, a 0/0 algebra cannot touch; geometry breaks it -->
+  <p>So far every derivative has yielded to algebra. For a polynomial we expanded \((x + h)^{n}\) and cancelled the factor of \(h\); for \(e^{x}\) the power series did the same job. The trigonometric functions are different in kind. Consider the difference quotient for \(\sin x\),
+  \[ \frac{\sin(x + h) - \sin x}{h}. \]
+  No algebraic identity cancels the \(h\) in the denominator against the numerator — \(\sin(x + h)\) does not break into pieces that conveniently subtract. As we are about to see, the entire computation funnels down to a single limit,
+  \[ \lim_{\theta \to 0} \frac{\sin \theta}{\theta}, \]
+  which has the indeterminate form \(0/0\) and which no amount of algebra will resolve. To evaluate it we need a genuinely new tool: a geometric comparison of areas on the unit circle, squeezed to a limit. That one limit, once secured, unlocks the derivatives of <em>both</em> \(\sin\) and \(\cos\) — and through them the rest of the trigonometric functions. Throughout this section angles are measured in radians; this assumption turns out to be essential, as we note below.</p>
+
+  <h3 class="subsec-head">The difference quotient for sine</h3>
+
+  <p>Fix \(x\) and form the difference quotient for \(f(x) = \sin x\). The decisive algebraic step is the sum-to-product identity \(\sin A - \sin B = 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}\), applied with \(A = x + h\) and \(B = x\):
+  \[ \sin(x + h) - \sin x = 2 \cos\Bigl(x + \tfrac{h}{2}\Bigr) \sin\frac{h}{2}. \]
+  Dividing by \(h\) and writing the denominator as \(h = 2 \cdot \tfrac{h}{2}\), to match the \(\tfrac{h}{2}\) inside the sine, gives</p>
+
+  <p>\[ \frac{\sin(x + h) - \sin x}{h} = \cos\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}. \]</p>
+
+  <p>As \(h \to 0\), two things happen at once. The factor \(\cos\bigl(x + \tfrac{h}{2}\bigr)\) ought to tend to \(\cos x\) — provided \(\cos\) is continuous — and the factor \(\dfrac{\sin(h/2)}{h/2}\) is exactly \(\dfrac{\sin\theta}{\theta}\) with \(\theta = h/2 \to 0\). So the derivative rests on two facts: that sine and cosine are continuous, and the value of \(\lim_{\theta \to 0}\sin\theta/\theta\). We secure both now.</p>
+
+  <h3 class="subsec-head">A geometric inequality on the unit circle</h3>
+
+  <!-- expansion:intuition — motivate the area comparison before carrying it out -->
+  <p>To get a grip on \(\sin\theta/\theta\) for small \(\theta\), we compare three areas on a circle of radius \(1\). Because both \(\theta\) and \(\sin\theta\) reverse sign when \(\theta\) is replaced by \(-\theta\), the ratio \(\sin\theta/\theta\) is unchanged — it is an <em>even</em> function (Chapter 1) — so it is enough to treat \(\theta > 0\), shrinking to \(0\). Take \(0 < \theta < \tfrac{\pi}{2}\) and look at Figure 3.1.</p>
+
+  <!-- expansion:figure — sector inequality on the unit circle (ROADMAP key figure; registered in exp-ch03/figures.js as "sector-inequality") -->
+  <figure class="figure" data-fig="sector-inequality">
+    <figcaption><span class="fig-no">Figure 3.1</span> On the unit circle, the triangle \(OAB\) sits inside the sector \(OAB\), which in turn sits inside the triangle \(OAC\) reaching the tangent at \(A\). Comparing the three areas gives \(\tfrac12 \sin\theta \le \tfrac12 \theta \le \tfrac12 \tan\theta\).</figcaption>
+  </figure>
+
+  <p>Here \(A = (1, 0)\) lies on the circle, \(B = (\cos\theta, \sin\theta)\) is the point at angle \(\theta\), and \(C = (1, \tan\theta)\) is where the radius \(OB\), extended, meets the vertical tangent line at \(A\). Three nested regions appear, and their areas are easy to read off:</p>
+
+  <ul>
+    <li>the inscribed triangle \(OAB\) has base \(OA = 1\) and height \(\sin\theta\), so its area is \(\tfrac12 \sin\theta\);</li>
+    <li>the circular sector \(OAB\) is the fraction \(\theta / (2\pi)\) of a disc of area \(\pi\), so its area is \(\tfrac12 \theta\);</li>
+    <li>the larger triangle \(OAC\) has base \(OA = 1\) and height \(AC = \tan\theta\), so its area is \(\tfrac12 \tan\theta\).</li>
+  </ul>
+
+  <p>The triangle \(OAB\) lies inside the sector, which lies inside the triangle \(OAC\), so their areas increase in that order:
+  \[ \tfrac12 \sin\theta \;\le\; \tfrac12 \theta \;\le\; \tfrac12 \tan\theta. \]
+  (The manuscript reads the same picture by splitting the outer triangle as \(OAC = OAB \cup ABC\); the corner piece \(ABC\) is what \(OAC\) adds to the inscribed triangle \(OAB\), and it contains the circular segment between the chord \(AB\) and the arc.) Multiplying through by \(2\) gives \(\sin\theta \le \theta \le \tan\theta\). Dividing by \(\sin\theta > 0\) and using \(\tan\theta = \sin\theta/\cos\theta\) turns this into \(1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}\), and taking reciprocals of these positive quantities reverses the inequalities:
+  \[ \cos\theta \;\le\; \frac{\sin\theta}{\theta} \;\le\; 1, \qquad 0 < \theta < \tfrac{\pi}{2}. \tag{1} \]
+  In particular \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) for \(\lvert \theta \rvert < \tfrac{\pi}{2}\) — a bound we lean on repeatedly below.</p>
+
+  <h3 class="subsec-head">Continuity of sine and cosine</h3>
+
+  <!-- expansion:intuition — why continuity is needed here; cross-ref the Ch1 notion of continuity, do not restate its definition (D3) -->
+  <p>The bound \(\lvert \sin\theta \rvert \le \lvert \theta \rvert\) does more than help with the fundamental limit: it is also what makes sine and cosine continuous, in the sense introduced in Chapter 1. Continuity is exactly what the two factors of the difference quotient need in order to settle to their values as \(h \to 0\), so we establish it now.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.1</span><span class="env-name">Continuity of sine and cosine</span></p>
+    <div class="env-body">
+      <p>The functions \(\sin x\) and \(\cos x\) are continuous at every \(x_{0} \in \mathbb{R}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Everything rests on one bound: \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) near \(\theta = 0\), from inequality (1). Since \(\lvert \theta \rvert \to 0\) as \(\theta \to 0\), the squeeze theorem (§1.5) forces \(\lvert \sin\theta \rvert \to 0\), so</p>
+      <p>\[ \lim_{\theta \to 0} \sin\theta = 0. \]</p>
+      <p>Now fix \(x_{0}\). The sum-to-product identities give</p>
+      <p>\[ \begin{aligned}
+        \cos x - \cos x_{0} &= -2 \sin\frac{x - x_{0}}{2}\, \sin\frac{x + x_{0}}{2}, \\
+        \sin x - \sin x_{0} &= \phantom{-}2 \cos\frac{x + x_{0}}{2}\, \sin\frac{x - x_{0}}{2}.
+      \end{aligned} \]</p>
+      <p>In each line the factor with argument \(\tfrac{x + x_{0}}{2}\) has absolute value at most \(1\), so</p>
+      <p>\[ \lvert \cos x - \cos x_{0} \rvert \le 2\Bigl\lvert \sin\tfrac{x - x_{0}}{2} \Bigr\rvert, \qquad \lvert \sin x - \sin x_{0} \rvert \le 2\Bigl\lvert \sin\tfrac{x - x_{0}}{2} \Bigr\rvert. \]</p>
+      <p>As \(x \to x_{0}\) the angle \(\tfrac{x - x_{0}}{2} \to 0\), so by the limit just established both right-hand sides tend to \(0\). The squeeze theorem then gives \(\cos x \to \cos x_{0}\) and \(\sin x \to \sin x_{0}\); that is, cosine and sine are continuous at \(x_{0}\).</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The fundamental limit</h3>
+
+  <!-- expansion:intuition — frame the squeeze payoff -->
+  <p>We can finally squeeze \(\sin\theta/\theta\) to its limit: inequality (1) traps it between \(\cos\theta\) and \(1\), and both ends head for the same place.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.2</span><span class="env-name">The fundamental trigonometric limit</span></p>
+    <div class="env-body">
+      <p>\[ \lim_{\theta \to 0} \frac{\sin\theta}{\theta} = 1. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>For \(0 < \theta < \tfrac{\pi}{2}\), inequality (1) reads \(\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1\). As \(\theta \to 0^{+}\) the upper bound is the constant \(1\), while the lower bound satisfies \(\cos\theta \to \cos 0 = 1\) by the continuity of cosine (Proposition 3.1). The squeeze theorem (§1.5) pins the quantity between them: \(\lim_{\theta \to 0^{+}} \sin\theta/\theta = 1\). Finally \(\sin\theta/\theta\) is even, so its left-hand limit at \(0\) equals its right-hand limit, and the two-sided limit is \(1\) as well.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the radian convention is essential: sinθ/θ→1, and hence sin'=cos, fails in degrees -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Everything here depends on measuring angles in <em>radians</em>. The sector area \(\tfrac12\theta\) — and with it the limit \(\sin\theta/\theta \to 1\) — uses the radian measure, for which the arc cut off on the unit circle has length exactly \(\theta\). In degrees the limit is not \(1\): since \(x^{\circ} = \tfrac{\pi}{180}x\) radians, one finds \(\lim_{x \to 0}\dfrac{\sin(x^{\circ})}{x} = \dfrac{\pi}{180}\), and so \(\dfrac{d}{dx}\sin(x^{\circ}) = \dfrac{\pi}{180}\cos(x^{\circ})\). The clean formulas of this section, \(\sin' = \cos\) and \(\cos' = -\sin\), hold only in radians.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The derivatives of sine and cosine</h3>
+
+  <!-- expansion:intuition — assemble the pieces -->
+  <p>With continuity and the fundamental limit in hand, the difference quotient for \(\sin\) all but evaluates itself.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.1</span><span class="env-name">Derivative of sine</span></p>
+    <div class="env-body">
+      <p>\[ \frac{d}{dx}\sin x = \cos x \qquad \text{for all } x \in \mathbb{R}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Using the form of the difference quotient found above,</p>
+      <p>\[ \begin{aligned}
+        \frac{d}{dx}\sin x &= \lim_{h \to 0} \frac{\sin(x + h) - \sin x}{h} \\[2pt]
+          &= \lim_{h \to 0} \cos\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}.
+      \end{aligned} \]</p>
+      <p>As \(h \to 0\), the first factor tends to \(\cos x\) because cosine is continuous (Proposition 3.1), and the second tends to \(1\) by the fundamental limit (Proposition 3.2), with \(\theta = h/2 \to 0\). The product therefore tends to \(\cos x \cdot 1 = \cos x\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — same machinery, second function -->
+  <p>Cosine yields to the very same machinery, this time through the companion identity \(\cos A - \cos B = -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}\).</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.2</span><span class="env-name">Derivative of cosine</span></p>
+    <div class="env-body">
+      <p>\[ \frac{d}{dx}\cos x = -\sin x \qquad \text{for all } x \in \mathbb{R}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>With \(A = x + h\) and \(B = x\), the identity gives \(\cos(x + h) - \cos x = -2 \sin\bigl(x + \tfrac{h}{2}\bigr) \sin\tfrac{h}{2}\), so</p>
+      <p>\[ \frac{\cos(x + h) - \cos x}{h} = -\sin\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}. \]</p>
+      <p>Letting \(h \to 0\), the factor \(\sin\bigl(x + \tfrac{h}{2}\bigr) \to \sin x\) by continuity (Proposition 3.1) and \(\dfrac{\sin(h/2)}{h/2} \to 1\) by Proposition 3.2, so</p>
+      <p>\[ \frac{d}{dx}\cos x = -\sin x \cdot 1 = -\sin x. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — companion fundamental limit (1−cosθ)/θ → 0 (D2; standard companion to Proposition 3.2) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.1</span></p>
+      <div class="env-body">
+        <p>Establish the companion limit \(\displaystyle \lim_{\theta \to 0} \frac{1 - \cos\theta}{\theta} = 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This is again of the form \(0/0\). Multiplying numerator and denominator by \(1 + \cos\theta\) converts the numerator into something \(\sin\) can handle:</p>
+        <p>\[ \begin{aligned}
+          \frac{1 - \cos\theta}{\theta}
+            &= \frac{(1 - \cos\theta)(1 + \cos\theta)}{\theta\,(1 + \cos\theta)}
+             = \frac{1 - \cos^{2}\theta}{\theta\,(1 + \cos\theta)} \\[2pt]
+            &= \frac{\sin^{2}\theta}{\theta\,(1 + \cos\theta)}
+             = \frac{\sin\theta}{\theta} \cdot \frac{\sin\theta}{1 + \cos\theta}.
+        \end{aligned} \]</p>
+        <p>As \(\theta \to 0\), the first factor tends to \(1\) by Proposition 3.2, while the second tends to \(\dfrac{0}{1 + 1} = 0\) by the continuity of sine and cosine (Proposition 3.1). The product tends to \(1 \cdot 0 = 0\).</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — tan' (D1, manuscript HW) and sec' (③ pull-in, manuscript HW), both via the quotient rule of §2.5 -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.2</span></p>
+      <div class="env-body">
+        <p>Using \(\sin' = \cos\) and \(\cos' = -\sin\) together with the quotient rule (§2.5), differentiate (a) \(\tan x\) and (b) \(\sec x\), wherever \(\cos x \ne 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>For (a), write \(\tan x = \dfrac{\sin x}{\cos x}\) and apply the quotient rule:</p>
+        <p>\[ \begin{aligned}
+          \frac{d}{dx}\tan x
+            &= \frac{(\cos x)(\cos x) - (\sin x)(-\sin x)}{\cos^{2} x} \\[2pt]
+            &= \frac{\cos^{2} x + \sin^{2} x}{\cos^{2} x}
+             = \frac{1}{\cos^{2} x} = \sec^{2} x,
+        \end{aligned} \]</p>
+        <p>where the Pythagorean identity \(\cos^{2} x + \sin^{2} x = 1\) collapses the numerator.</p>
+        <p>For (b), write \(\sec x = \dfrac{1}{\cos x}\). The quotient rule, with the constant numerator \(1\), gives</p>
+        <p>\[ \frac{d}{dx}\sec x = \frac{0 \cdot \cos x - 1 \cdot (-\sin x)}{\cos^{2} x} = \frac{\sin x}{\cos^{2} x} = \frac{1}{\cos x}\cdot\frac{\sin x}{\cos x} = \sec x \tan x. \]</p>
+        <p>The same technique applied to \(\cot x = \dfrac{\cos x}{\sin x}\) and \(\csc x = \dfrac{1}{\sin x}\) gives \(\dfrac{d}{dx}\cot x = -\csc^{2} x\) and \(\dfrac{d}{dx}\csc x = -\csc x \cot x\) (where \(\sin x \ne 0\)), completing the derivatives of all six trigonometric functions.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — simple harmonic motion uses only sin'/cos' (no chain rule); sets up Remark 3.1 (approved at ③, new type: application) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.3</span></p>
+      <div class="env-body">
+        <p>A weight bobbing on a spring has height \(s(t) = \sin t\) above its rest level at time \(t\). Find its velocity \(s'(t)\) and acceleration \(s''(t)\), and describe how the acceleration is related to the height.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Velocity is the derivative of height, and acceleration the derivative of velocity. Differentiating with Theorems 3.1 and 3.2,</p>
+        <p>\[ s'(t) = \cos t, \qquad s''(t) = \frac{d}{dt}\cos t = -\sin t. \]</p>
+        <p>Thus \(s''(t) = -\sin t = -s(t)\): at every instant the weight accelerates back toward its rest level, by an amount proportional to how far it has strayed. This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em>, and it is no accident that sine and cosine — the functions whose second derivative is their own negative — are precisely the ones that describe oscillation.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — the four-fold derivative cycle, a bookend echoing the e^x self-replication remark of §2.4 -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.1</span><span class="env-name">The derivative cycle of sine and cosine</span></p>
+    <div class="env-body">
+      <p>Differentiation sends sine and cosine into each other, with a sign that turns over every second step. Writing \(\to\) for one application of \(\dfrac{d}{dx}\),</p>
+      <p>\[ \sin x \;\to\; \cos x \;\to\; -\sin x \;\to\; -\cos x \;\to\; \sin x. \]</p>
+      <p>After four derivatives we are back where we started, so \(\dfrac{d^{4}}{dx^{4}}\sin x = \sin x\), and likewise for cosine. Where \(e^{x}\) reproduces itself in a single step (§2.4), sine and cosine reproduce themselves in a cycle of four — the same self-renewal that lets \(s'' = -s\) describe an oscillation that never winds down.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — forward-ref to §3.2 (the chain rule), which is what makes sin(g(x)) etc. accessible -->
+  <p>We can now differentiate every trigonometric function — but only in its bare form, \(\sin x\) rather than \(\sin(x^{2})\) or \(\sin(3x + 1)\). To reach a function tucked <em>inside</em> another we need a rule for differentiating compositions. That rule, the chain rule, is the business of the next section; with it, the derivatives found here become the seeds of a vast family of new ones.</p>
+
+</article>

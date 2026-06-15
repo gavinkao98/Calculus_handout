@@ -1,0 +1,208 @@
+<!-- §2.1 The Tangent Line and the Derivative at a Point.
+     Generated from exp-ch02/seed_ch02_s1.md (manuscript pp. 1–3),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references
+     are plain prose. -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.1</span>The Tangent Line and the Derivative at a Point</h2>
+  </header>
+
+  <!-- expansion:application — tangent-as-approximation anchor to open the section -->
+  <p>Suppose you need a quick estimate of \(\sqrt{4.01}\) without a calculator. The function \(f(x) = \sqrt{x}\) passes through the convenient point \((4, 2)\), and near that point the curve is almost straight — so a well-chosen line through \((4, 2)\) should give a good approximation. But which line? The answer is the <em>tangent line</em>: intuitively, the line that grazes the curve at that point, matching its direction. To pin down this line we need to determine its slope, and that quest leads directly to the central idea of differential calculus.</p>
+
+  <!-- expansion:intuition — "why can't we just measure the slope?" collision -->
+  <h3 class="subsec-head">The problem with tangent lines</h3>
+
+  <p>Given a curve \(y = f(x)\) and a point \(P = (a,\, f(a))\) on it, we want the tangent line at \(P\). Since the line passes through \(P\), all we need is its slope. For a line through <em>two</em> points the slope is the familiar rise-over-run ratio — but for the tangent line at \(P\) we start with only the single point \(P\) itself. With no second point there is no rise and no run; trying to compute "slope \(= (f(a) - f(a))/(a - a)\)" gives the meaningless expression \(0/0\). We need a different strategy.</p>
+
+  <h3 class="subsec-head">Secant lines and the limiting slope</h3>
+
+  <p>The idea is to use a nearby point as a temporary stand-in. Pick a second point \(Q = (x,\, f(x))\) on the curve, with \(x \ne a\). The line through \(P\) and \(Q\) is called a <em>secant line</em>, and its slope is the <em>difference quotient</em></p>
+
+  <p>\[ m_{PQ} \;=\; \frac{f(x) - f(a)}{x - a}. \]</p>
+
+  <p>As \(Q\) slides along the curve toward \(P\) — that is, as \(x \to a\) — the secant line rotates and approaches a limiting position. If that limiting position exists, it is the tangent line we are after, and its slope is the limit of the difference quotients.</p>
+
+  <!-- expansion:figure — secant-to-tangent convergence diagram (seed had placeholder, no art) -->
+  <figure class="figure" data-fig="secant-to-tangent">
+    <figcaption><span class="fig-no">Figure 2.1</span> Secant lines \(PQ\) converging to the tangent line at \(P\) as the second point \(Q\) approaches \(P\) along the curve.</figcaption>
+  </figure>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">2.1</span><span class="env-name">Tangent line</span></p>
+    <div class="env-body">
+      <p>The <em>tangent line</em> to the curve \(y = f(x)\) at the point \(P = (a,\, f(a))\) is the line through \(P\) with slope
+      \[ m \;=\; \lim_{x \to a} \frac{f(x) - f(a)}{x - a}, \]
+      provided this limit exists.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The \(h\)-form of the slope</h3>
+
+  <p>Since \(x\) is near \(a\), we can write \(x = a + h\), where \(h\) is a small increment (\(h \ne 0\)). Then \(x - a = h\) and \(x \to a\) becomes \(h \to 0\), so the tangent slope takes the equivalent form</p>
+
+  <p>\[ m \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]</p>
+
+  <p>This "\(h\)-form" is often more convenient for computation: expand \(f(a + h)\), subtract \(f(a)\), cancel the factor of \(h\) from the denominator, then let \(h \to 0\).</p>
+
+  <!-- expansion:formula — name the limit as "derivative at a point"; brief: introduce f'(a) as slope alias -->
+  <p>When this limit exists, the slope of the tangent line at \((a, f(a))\) is called the <em>derivative of \(f\) at \(a\)</em> and is written \(f'(a)\) (read "\(f\) prime of \(a\)"). Thus</p>
+
+  <p>\[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]</p>
+
+  <p>For now, \(f'(a)\) is simply a number — the slope of one tangent line at one specific point. In §2.2 we will let \(a\) vary and study \(f'\) as a function in its own right.</p>
+
+  <!-- expansion:intuition — expand the seed's one-line zoom-in remark into local linearity -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.1</span><span class="env-name">Local linearity</span></p>
+    <div class="env-body">
+      <p>If you zoom in on the curve at \(P\), the curve looks increasingly like a straight line — the tangent line. In other words, near \(P\) the function \(f\) behaves almost like the linear function \(f(a) + f'(a)(x - a)\). This is the principle of <em>local linearity</em>: a differentiable curve can be approximated by its tangent line near the point of tangency. The closer \(x\) is to \(a\), the better the approximation. We will return to this idea at the end of the section.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — transition paragraph setting up the computation pattern -->
+  <p>We now practise computing tangent lines from the definition. The routine is the same each time: form the difference quotient, simplify algebraically until the factor that makes the denominator zero cancels, then take the limit.</p>
+
+  <!-- expansion:example — polynomial example; simplest type first (brief) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.1</span></p>
+      <div class="env-body">
+        <p>Find the equation of the tangent line to \(y = x^{2} - 3x\) at the point \((2,\, -2)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(f(x) = x^{2} - 3x\) and \(a = 2\). The slope is</p>
+        <p>\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{f(2 + h) - f(2)}{h} \\
+            &= \lim_{h \to 0} \frac{\bigl[(2+h)^{2} - 3(2+h)\bigr] - [4 - 6]}{h} \\
+            &= \lim_{h \to 0} \frac{(4 + 4h + h^{2} - 6 - 3h) - (-2)}{h} \\
+            &= \lim_{h \to 0} \frac{h + h^{2}}{h}
+             = \lim_{h \to 0} (1 + h) = 1.
+        \end{aligned} \]</p>
+        <p>The tangent line passes through \((2, -2)\) with slope \(1\):
+        \[ y - (-2) = 1 \cdot (x - 2), \quad \text{i.e.} \quad y = x - 4. \]</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.2</span></p>
+      <div class="env-body">
+        <p>Find the equation of the tangent line to \(y = \dfrac{3}{x}\), \(x > 0\), at the point \((3,\, 1)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>With \(f(x) = 3/x\) and \(a = 3\),</p>
+        <p>\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{f(3 + h) - f(3)}{h}
+             = \lim_{h \to 0} \frac{\dfrac{3}{3 + h} - 1}{h} \\[6pt]
+            &= \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h}
+             = \lim_{h \to 0} \frac{-1}{3 + h} = -\frac{1}{3}.
+        \end{aligned} \]</p>
+        <p>The tangent line through \((3, 1)\) with slope \(-\tfrac{1}{3}\) is
+        \[ y - 1 = -\tfrac{1}{3}(x - 3), \quad \text{i.e.} \quad x + 3y - 6 = 0. \]</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — root example with conjugate technique (brief) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.3</span></p>
+      <div class="env-body">
+        <p>Find the equation of the tangent line to \(y = \sqrt{x + 1}\) at the point \((3,\, 2)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(f(x) = \sqrt{x + 1}\) and \(a = 3\). To handle the square root, we multiply numerator and denominator by the conjugate:</p>
+        <p>\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{\sqrt{(3+h)+1} - \sqrt{3+1}}{h}
+             = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} \\[6pt]
+            &= \lim_{h \to 0}
+               \frac{(\sqrt{4+h}-2)(\sqrt{4+h}+2)}
+                    {h\,(\sqrt{4+h}+2)}
+             = \lim_{h \to 0}
+               \frac{(4+h)-4}{h\,(\sqrt{4+h}+2)} \\[6pt]
+            &= \lim_{h \to 0} \frac{1}{\sqrt{4+h}+2}
+             = \frac{1}{4}.
+        \end{aligned} \]</p>
+        <p>The tangent line is
+        \[ y - 2 = \tfrac{1}{4}(x - 3), \quad \text{i.e.} \quad y = \tfrac{1}{4}x + \tfrac{5}{4}. \]</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — numerical secant→tangent: watch the difference quotient converge (approved 2026-06-07; new type: numerical/tabular limit, reinforces Figure 2.1) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.4</span></p>
+      <div class="env-body">
+        <p>For \(y = x^{2}\) and \(P = (1, 1)\), compute the slope of the secant line through \(P\) and the nearby point \(\bigl(1 + h,\, (1 + h)^{2}\bigr)\) for \(h = 0.5,\ 0.1,\ 0.01\). What value do the secant slopes approach, and what is the slope of the tangent at \(P\)?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The secant slope is the difference quotient, which simplifies even before we take a limit:</p>
+        <p>\[ \frac{(1 + h)^{2} - 1}{h} = \frac{2h + h^{2}}{h} = 2 + h. \]</p>
+        <p>Tabulating \(2 + h\) as \(h\) shrinks:</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>\(h\)</th><th>\(0.5\)</th><th>\(0.1\)</th><th>\(0.01\)</th></tr></thead>
+            <tbody><tr><td class="rowlab">secant slope \(\,2 + h\)</td><td>\(2.5\)</td><td>\(2.1\)</td><td>\(2.01\)</td></tr></tbody>
+          </table>
+        </div>
+        <p>The secant slopes march toward \(2\), and indeed \(\lim_{h \to 0}(2 + h) = 2\). The tangent slope at \(P\) is therefore \(2\) — the value the secants converge to, exactly the rotation of secants into the tangent pictured in Figure 2.1.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — tangent-line (linear) approximation: use the tangent to estimate a value (approved 2026-06-07; new type: apply local linearity, not find the tangent) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.5</span></p>
+      <div class="env-body">
+        <p>Use the tangent line to \(y = \dfrac{1}{x}\) at \(\bigl(2,\, \tfrac{1}{2}\bigr)\) to estimate \(\dfrac{1}{2.05}\) without a calculator.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>First find the slope at \(x = 2\). With \(f(x) = 1/x\),
+        \[ f'(2) = \lim_{h \to 0} \frac{\dfrac{1}{2 + h} - \dfrac{1}{2}}{h} = \lim_{h \to 0} \frac{-1}{2(2 + h)} = -\frac{1}{4}, \]
+        so the tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\) is \(y = \tfrac{1}{2} - \tfrac{1}{4}(x - 2)\). Near \(x = 2\) the curve hugs this line (local linearity, Remark 2.1), so substituting \(x = 2.05\) gives</p>
+        <p>\[ \frac{1}{2.05} \;\approx\; \tfrac{1}{2} - \tfrac{1}{4}(0.05) = 0.5 - 0.0125 = 0.4875. \]</p>
+        <p>A calculator gives \(1/2.05 = 0.48780\ldots\), so the estimate is accurate to three decimal places.</p>
+      </div>
+    </section>
+  </div>
+
+  <figure class="figure" data-fig="tangent-approx"></figure>
+
+  <!-- expansion:application — return to the opening approximation question (bookend) -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.2</span><span class="env-name">Tangent-line approximation</span></p>
+    <div class="env-body">
+      <p>We can now answer the opening question. The tangent line to \(y = \sqrt{x}\) at \((4,\, 2)\) has slope
+      \[ f'(4) = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} = \frac{1}{4} \]
+      (the same conjugate technique as Example 2.3), so the tangent line is \(y = 2 + \tfrac{1}{4}(x - 4) = \tfrac{1}{4}x + 1\). Substituting \(x = 4.01\) gives
+      \[ \sqrt{4.01} \;\approx\; \tfrac{1}{4}(4.01) + 1 = 2.0025. \]
+      A calculator confirms \(\sqrt{4.01} = 2.00249844\ldots\), so the tangent-line estimate is accurate to four decimal places. This is the tangent-line approximation of Example 2.5 — the principle of local linearity (Remark 2.1) — applied to the question we opened the section with.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — forward-ref to §2.2 -->
+  <p>In the next section we turn the slope formula into a <em>function</em>: instead of computing the tangent slope at one fixed point \(a\), we let \(a\) vary and obtain a new function \(f'(x)\) that records the slope at every point where the limit exists.</p>
+
+</article>

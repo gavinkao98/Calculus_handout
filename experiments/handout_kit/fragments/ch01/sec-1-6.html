@@ -1,0 +1,237 @@
+<!-- §1.6 The Precise Definition of a Limit. Content verbatim from ch01_foundations.tex;
+     worked examples E1.6-a/b + O1.6-c/d supplemented from open banks + one AI-authored
+     (O1.6-d), 2026-06-12, audit-approved. Figure 1.11 -> 1.13. -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">1.6</span>The Precise Definition of a Limit</h2>
+  </header>
+
+  <p>From the time of Newton and Leibniz, calculus was remarkably successful at solving problems in geometry, mechanics, and astronomy. For a long time, however, there was also controversy about its logical foundations. Early arguments often relied on infinitesimals — quantities thought of as being extremely small but not described in a fully precise way — and mathematicians continued to ask what it really means to say that \(x\) approaches \(a\) or that \(f(x)\) approaches \(L\). The modern resolution, developed in the nineteenth century, is the \(\varepsilon\)-\(\delta\) definition of a limit, which gave calculus the level of rigor used in modern mathematics.</p>
+
+  <p>In the previous sections we used graphs, tables, and algebraic techniques to study limits, and we stated the limit laws without proof. Those arguments rested on informal phrases such as “\(f(x)\) is close to \(L\)” and “\(x\) is close to \(a\).” To make the arguments rigorous — and, eventually, to prove the limit laws — we need a definition that replaces “close” with numerical precision.</p>
+
+  <p>To motivate the definition, consider the function
+  \[ f(x) = \begin{cases} 2x - 1, & x \neq 3,\\[4pt] 6, & x = 3. \end{cases} \]
+  When \(x\) is close to \(3\) but \(x \neq 3\), the value \(f(x) = 2x - 1\) is close to \(5\). Intuitively, we expect \(\lim_{x \to 3} f(x) = 5\). But how close, exactly? We begin by making the informal phrase “close” numerically precise.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.37</span></p>
+      <div class="env-body">
+        <p>For the function above, how close must \(x\) be to \(3\) so that \(f(x)\) differs from \(5\) by less than \(0.1\)?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We want \(|f(x) - 5| < 0.1\). For \(x \neq 3\),
+        \[ \begin{aligned} |f(x) - 5| &= |(2x - 1) - 5|\\ &= |2x - 6|\\ &= 2 |x - 3|. \end{aligned} \]
+        Requiring \(2 |x - 3| < 0.1\) is equivalent to \(|x - 3| < 0.05\). Therefore, if \(0 < |x - 3| < 0.05\), then \(|f(x) - 5| < 0.1\).</p>
+      </div>
+    </section>
+  </div>
+
+  <p>Tightening the tolerance from \(0.1\) to \(0.01\), the same reasoning gives \(|f(x) - 5| < 0.01\) whenever \(0 < |x - 3| < 0.005\). As the tolerance shrinks, so must the neighborhood of \(3\). More generally, for any \(\varepsilon > 0\), the same manipulation gives \(|f(x) - 5| < \varepsilon\) whenever \(|x - 3| < \tfrac{\varepsilon}{2}\); we may therefore take \(\delta = \tfrac{\varepsilon}{2}\). The word <em>arbitrarily</em> in the informal definition means precisely: we can answer the question for <em>every</em> \(\varepsilon > 0\), not just for a few specific tolerances.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.13</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be a function defined on an open interval containing \(a\), except possibly at \(a\) itself. We say that
+      \[ \lim_{x \to a} f(x) = L \]
+      if for every \(\varepsilon > 0\) there exists a \(\delta > 0\) such that
+      \[ |f(x) - L| < \varepsilon \qquad \text{whenever} \qquad 0 < |x - a| < \delta. \]</p>
+      <p class="informal">Informally, we can force \(f(x)\) as close to \(L\) as we like by taking \(x\) close enough to \(a\) (but not equal to \(a\)).</p>
+    </div>
+  </section>
+
+  <p>Figure 1.21 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
+
+  <figure class="figure" data-fig="precise-limit">
+    <figcaption><span class="fig-no">Figure 1.21</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
+  </figure>
+
+  <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\).</p>
+
+  <!-- expansion:example — diagnose a wrong definition: order of tolerances and direction of implication [source: APEX §1.2 #1, #2] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.38</span></p>
+      <div class="env-body">
+        <p>What is wrong with the following attempted definition of \(\lim_{x \to a} f(x) = L\)?</p>
+        <p><em>“Given any \(\delta > 0\), there exists \(\varepsilon > 0\) such that whenever \(|f(x) - L| < \varepsilon\), we have \(0 < |x - a| < \delta\).”</em></p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Two things are reversed. First, the <em>order of the tolerances</em>: the challenge must come on the \(y\)-side — “given any \(\varepsilon\)” — and \(\delta\) is our response; the attempted version lets us pick the easy quantity after seeing the hard one. Second, the <em>direction of the implication</em>: the definition must say that closeness of \(x\) to \(a\) forces closeness of \(f(x)\) to \(L\), that is, \(0 < |x - a| < \delta\) implies \(|f(x) - L| < \varepsilon\) — not the other way around. Correcting both gives exactly Definition 1.13.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>A first payoff of the \(\varepsilon\)-\(\delta\) definition is that the value of a limit, when it exists, is unambiguous.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.7</span><span class="env-name">Uniqueness of limits</span></p>
+    <div class="env-body">
+      <p>If \(\lim_{x \to a} f(x)\) exists, then it is unique.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Suppose that
+      \[ \begin{aligned} \lim_{x \to a} f(x) &= L,\\ \lim_{x \to a} f(x) &= M, \end{aligned} \]
+      and that \(L \neq M\). Let \(\varepsilon = \tfrac{|L - M|}{2}\). By the definition of the limit, there exist \(\delta_{1}, \delta_{2} > 0\) such that
+      \[ |f(x) - L| < \varepsilon \quad \text{whenever} \quad 0 < |x - a| < \delta_{1}, \]
+      and
+      \[ |f(x) - M| < \varepsilon \quad \text{whenever} \quad 0 < |x - a| < \delta_{2}. \]
+      If \(0 < |x - a| < \min\{\delta_{1}, \delta_{2}\}\), both inequalities hold. By the triangle inequality,
+      \[ \begin{aligned} |L - M| &= |L - f(x) + f(x) - M|\\ &\le |L - f(x)| + |f(x) - M|\\ &< 2\varepsilon\\ &= |L - M|, \end{aligned} \]
+      which is impossible. Therefore \(L = M\).</p>
+    </div>
+  </section>
+
+  <p>We now verify several limits directly from the definition, building from the simplest case to one that requires an extra step.</p>
+
+  <!-- expansion:example — a constant function: any δ works (δ need not be a function of ε) [source: APEX §1.2 #3] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.39</span></p>
+      <div class="env-body">
+        <p>Show from the definition that \(\lim_{x \to 2} 5 = 5\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(\varepsilon > 0\), we need \(|5 - 5| < \varepsilon\) whenever \(0 < |x - 2| < \delta\). But \(|5 - 5| = 0 < \varepsilon\) is <em>always</em> true, no matter what \(x\) does. So any choice of \(\delta\) works; we may simply take \(\delta = \varepsilon\) (or \(\delta = 1\), or anything else). This is the one situation where \(\delta\) need not depend on \(\varepsilon\) at all.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.40</span></p>
+      <div class="env-body">
+        <p>Show from the definition that \(\lim_{x \to 3} (4x - 5) = 7\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(\varepsilon > 0\), we seek \(\delta > 0\) with
+        \[ |(4x - 5) - 7| < \varepsilon \quad \text{whenever} \quad 0 < |x - 3| < \delta. \]
+        Since
+        \[ \begin{aligned} |(4x - 5) - 7| &= |4x - 12|\\ &= 4 |x - 3|, \end{aligned} \]
+        it is enough to require \(4 |x - 3| < \varepsilon\), i.e. \(|x - 3| < \tfrac{\varepsilon}{4}\). We choose \(\delta = \tfrac{\varepsilon}{4}\); then whenever \(0 < |x - 3| < \delta\),
+        \[ \begin{aligned} |(4x - 5) - 7| &= 4 |x - 3|\\ &< 4 \cdot \tfrac{\varepsilon}{4}\\ &= \varepsilon. \end{aligned} \]
+        Therefore \(\lim_{x \to 3} (4x - 5) = 7\).</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.41</span></p>
+      <div class="env-body">
+        <p>Show from the definition that \(\lim_{x \to 1} (x^{2} - 5x + 6) = 2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(\varepsilon > 0\), we seek \(\delta > 0\) with
+        \[ |(x^{2} - 5x + 6) - 2| < \varepsilon \quad \text{whenever} \quad 0 < |x - 1| < \delta. \]
+        We first simplify:
+        \[ \begin{aligned} |(x^{2} - 5x + 6) - 2| &= |x^{2} - 5x + 4|\\ &= |(x - 1)(x - 4)|. \end{aligned} \]
+        The factor \(|x - 4|\) depends on \(x\). To control it, first assume \(|x - 1| < 1\). Then
+        \[ \begin{aligned} |x - 1| < 1 &\implies -1 < x - 1 < 1\\ &\implies 0 < x < 2\\ &\implies -4 < x - 4 < -2\\ &\implies |x - 4| < 4. \end{aligned} \]
+        So whenever \(|x - 1| < 1\), we have \(|(x - 1)(x - 4)| < 4 |x - 1|\). To force this below \(\varepsilon\), we also require \(4 |x - 1| < \varepsilon\), i.e. \(|x - 1| < \tfrac{\varepsilon}{4}\). Choosing
+        \[ \delta = \min\!\left\{1, \tfrac{\varepsilon}{4}\right\}, \]
+        we get both inequalities at once, and so
+        \[ \begin{aligned} |(x^{2} - 5x + 6) - 2| &= |(x - 1)(x - 4)|\\ &< 4 |x - 1|\\ &< 4 \cdot \tfrac{\varepsilon}{4}\\ &= \varepsilon. \end{aligned} \]
+        Therefore \(\lim_{x \to 1} (x^{2} - 5x + 6) = 2\).</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — feed a known inequality into the definition: lim sin x = 0 [source: APEX §1.2 #8] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.42</span></p>
+      <div class="env-body">
+        <p>Using the fact that \(|\sin x| \le |x|\) for all \(x\), show from the definition that \(\lim_{x \to 0} \sin x = 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(\varepsilon > 0\), choose \(\delta = \varepsilon\). If \(0 < |x - 0| < \delta\), then
+        \[ |\sin x - 0| = |\sin x| \le |x| < \delta = \varepsilon. \]
+        Therefore \(\lim_{x \to 0} \sin x = 0\). The borrowed inequality did all the work: no factoring, no auxiliary bound — the bounding step was handed to us for free.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The four examples above share a common pattern, which we record as a general strategy.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.3</span><span class="env-name">Verifying a limit from the \(\varepsilon\)-\(\delta\) definition</span></p>
+    <div class="env-body">
+      <p>To show that \(\lim_{x \to a} f(x) = L\):</p>
+      <ol class="steps">
+        <li>Start with a generic \(\varepsilon > 0\). The task is to find a \(\delta > 0\) (which may depend on \(\varepsilon\)) that makes the definition work.</li>
+        <li>Work with the quantity \(|f(x) - L|\) and bound it above by an expression involving \(|x - a|\).</li>
+        <li>Choose \(\delta\) so that the bound above is less than \(\varepsilon\) whenever \(|x - a| < \delta\). If the bound contains an auxiliary factor depending on \(x\), first restrict \(x\) to a small neighborhood of \(a\) so that this factor is bounded. Then take \(\delta\) to be the smaller of the neighborhood radius and the \(\varepsilon\)-based bound.</li>
+        <li>Conclude that \(0 < |x - a| < \delta\) implies \(|f(x) - L| < \varepsilon\).</li>
+      </ol>
+    </div>
+  </section>
+
+  <p>The \(\varepsilon\)-\(\delta\) machinery also gives precise meaning to the informal definitions of infinite limits from Definition 1.11.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.14</span></p>
+    <div class="env-body">
+      <p>We write
+      \[ \lim_{x \to a} f(x) = \infty \]
+      if for every positive number \(M\) there exists \(\delta > 0\) such that
+      \[ f(x) > M \qquad \text{whenever} \qquad 0 < |x - a| < \delta. \]
+      Similarly,
+      \[ \lim_{x \to a} f(x) = -\infty \]
+      if for every negative number \(N\) there exists \(\delta > 0\) such that
+      \[ f(x) < N \qquad \text{whenever} \qquad 0 < |x - a| < \delta. \]</p>
+    </div>
+  </section>
+
+  <p>Intuitively, \(M\) may be any large positive threshold (such as \(100\), \(100^{100}\), or \(1000^{1000}\)): no matter how large the threshold, \(f(x)\) eventually exceeds it once \(x\) is close enough to \(a\). Likewise, \(N\) may be any negative threshold (such as \(-100\), \(-100^{100}\), or \(-1000^{1000}\)), below which \(f(x)\) is eventually forced.</p>
+
+  <!-- expansion:example — M-δ proof of an infinite limit, the rigorous counterpart of Example 1.21 [source: AI, audit-approved] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.43</span></p>
+      <div class="env-body">
+        <p>Show from the precise definition that
+        \[ \lim_{x \to 0} \frac{1}{x^{2}} = \infty. \]</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Given \(M > 0\), choose
+        \[ \delta = \frac{1}{\sqrt{M}}. \]
+        If \(0 < |x| < \delta\), then \(x^{2} < \delta^{2} = 1/M\), so
+        \[ \frac{1}{x^{2}} > M. \]
+        Since every threshold \(M\) is eventually exceeded once \(x\) is close enough to \(0\), we have \(\lim_{x \to 0} \frac{1}{x^{2}} = \infty\) — the rigorous counterpart of the informal argument in Example 1.21.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>Finally, the \(\varepsilon\)-\(\delta\) definition gives a precise meaning to a property of functions that recurs throughout later chapters. If \(f\) is defined at every point near \(a\), including at \(a\), and if
+  \[ \lim_{x \to a} f(x) = f(a), \]
+  then \(f\) is said to be <em>continuous at \(a\)</em>. A systematic study of continuity belongs to a later chapter; we mention the term here because it is expressed directly in terms of limits.</p>
+
+</article>

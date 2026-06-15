@@ -1,0 +1,278 @@
+<!-- §4.2 Continuity and the Exponent Law for e^x.
+     POC: generated from experiments/direction_layer/test/seed_s42.md (the manuscript
+     spine), authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Math cross-checked against the human-signed ground truth
+     (experiments/direction_layer/test/signed_s42_body.tex) so no proof step is invented.
+     Numbering is MANUAL (kit has no auto-counter); \cref{...} from the source becomes
+     manual prose references, since the kit has no cross-reference system. -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">4.2</span>Continuity and the Exponent Law for \(e^{x}\)</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener pivoting from §4.1's three open questions -->
+  <p>Section 4.1 defined \(e^{x}\) by its power series and proved the series converges for \(x > 0\). Three claims remain: that the series converges for \(x < 0\) (where the alternating signs prevent the simple tail-bound argument), that \(e^{x}\) is continuous on all of \(\mathbb{R}\), and that \(e^{x} e^{y} = e^{x + y}\) holds for every pair of real numbers \(x, y\). All three follow from a more flexible convergence tool — <em>absolute convergence implies convergence</em> — and a careful series-multiplication argument. The exponent law, in particular, requires multiplying out two infinite series and matching the result against the series for \(e^{x + y}\), which is where most of the technical work of this section sits.</p>
+
+  <h3 class="subsec-head">Continuity of \(e^{x}\) on the positive reals</h3>
+
+  <p>The continuity of \(e^{x}\) at a positive base point \(x_{0}\) is proved by approximating \(e^{x}\) and \(e^{x_{0}}\) by the same partial-sum polynomial \(P_{k}(x) = \sum_{n = 0}^{k} x^{n}/n!\), then using the continuity of \(P_{k}\) (every polynomial is continuous) to control the remaining error.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.1</span></p>
+    <div class="env-body">
+      <p>The function \(e^{x}\) is continuous at every \(x_{0} > 0\): \(\displaystyle\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Let \(P_{k}(x) = \sum_{n = 0}^{k} x^{n}/n!\) be the \(k\)-th partial sum. From the convergence proof of §4.1, for any \(L > 0\), \(0 < x < L\), and \(k > n_{0} > 2L\),
+      \[ 0 \leq e^{x} - P_{k}(x) \leq \frac{x^{n_{0}}}{n_{0}!} \cdot \left(\frac{1}{2}\right)^{k - n_{0}} \leq \frac{L^{n_{0}}}{n_{0}!} \cdot \left(\frac{1}{2}\right)^{k - n_{0}}. \]
+      Given \(\varepsilon > 0\), choose \(L = x_{0} + 1\) (so \(0 < x_{0} < L\)) and pick \(k > n_{0} > 2(x_{0} + 1)\) large enough that
+      \[ \frac{(x_{0} + 1)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} < \varepsilon. \]
+      The polynomial \(P_{k}(x)\) is continuous, so there is a \(\delta > 0\) (with \(\delta \leq \min\{x_{0}/2,\, 1/2\}\)) such that
+      \[ \lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon \quad \text{whenever } \lvert x - x_{0} \rvert < \delta. \]
+      For \(\lvert x - x_{0} \rvert < \delta\) we then have \(0 < x < x_{0} + 1 = L\), so the tail bound applies to both \(e^{x} - P_{k}(x)\) and \(e^{x_{0}} - P_{k}(x_{0})\). Combining,
+      \[ \begin{aligned} \lvert e^{x} - e^{x_{0}} \rvert &\leq \lvert e^{x} - P_{k}(x) \rvert + \lvert P_{k}(x) - P_{k}(x_{0}) \rvert + \lvert P_{k}(x_{0}) - e^{x_{0}} \rvert \\ &< \varepsilon + \varepsilon + \varepsilon = 3\varepsilon. \end{aligned} \]
+      Since \(\varepsilon > 0\) was arbitrary, \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — name the technique used in the proof; it reappears throughout the chapter -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.1</span><span class="env-name">The polynomial-approximation technique</span></p>
+    <div class="env-body">
+      <p>The proof above is the workhorse of this chapter: approximate \(e^{x}\) and \(e^{x_{0}}\) by a single polynomial \(P_{k}\) chosen so the tail errors are small, then use the continuity of \(P_{k}\) to bound the polynomial difference. Every continuity-style claim in this section follows the same template. The cost is a little bookkeeping (track three error pieces); the payoff is rigour without circularity.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Cauchy sequences and absolute convergence</h3>
+
+  <p>To extend the series convergence to \(x < 0\), where the terms alternate in sign and the partial sums are not monotone, we need a tool that allows convergence to be deduced from a property of the absolute values of the terms. The relevant property is <em>absolute convergence</em>.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.1</span></p>
+    <div class="env-body">
+      <p>A sequence \(\{a_{n}\}_{n = 1}^{\infty}\) of real numbers is a <em>Cauchy sequence</em> if for every \(\varepsilon > 0\), there exists \(N_{0} \in \mathbb{N}\) such that
+      \[ \lvert a_{m} - a_{n} \rvert < \varepsilon \quad \text{for all } m, n \geq N_{0}. \]</p>
+      <!-- expansion:intuition — informal gloss -->
+      <p class="informal">Informally, a Cauchy sequence is one whose terms eventually all lie within an arbitrarily small window of each other — the sequence's tail bunches up. Convergence requires the tail to bunch up around a specific real number; the Cauchy condition asks for the bunching alone, without naming the limit.</p>
+    </div>
+  </section>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>A sequence of real numbers is convergent if and only if it is a Cauchy sequence.</p>
+    </div>
+  </section>
+
+  <p>The proof requires more setup than the completeness theorem of §4.1: the easy direction (convergent \(\Rightarrow\) Cauchy) is a quick triangle-inequality argument, but the reverse direction (Cauchy \(\Rightarrow\) convergent) needs to manufacture a limit out of a sequence that is only known to be self-consistent. We extract the limit through a convergent subsequence, which exists by the Bolzano–Weierstrass theorem; the latter rests on a clever combinatorial fact about monotone subsequences.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Theorem 4.2 (\(\Rightarrow\) direction)</span></p>
+    <div class="env-body">
+      <p>Suppose \(a_{n} \to L\). Given \(\varepsilon > 0\), pick \(N\) such that \(\lvert a_{n} - L \rvert < \varepsilon/2\) for all \(n \geq N\). Then for \(m, n \geq N\),
+      \[ \lvert a_{m} - a_{n} \rvert = \lvert (a_{m} - L) - (a_{n} - L) \rvert \leq \lvert a_{m} - L \rvert + \lvert a_{n} - L \rvert < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon. \]
+      Hence \(\{a_{n}\}\) is Cauchy.</p>
+    </div>
+  </section>
+
+  <p>The reverse direction is harder. We pick up two lemmas first.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">4.1</span></p>
+    <div class="env-body">
+      <p>A Cauchy sequence is bounded.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Let \(\{a_{n}\}\) be Cauchy. Apply the Cauchy condition with \(\varepsilon = 1\) to get an index \(N_{0}\) such that \(\lvert a_{m} - a_{N_{0}} \rvert < 1\) for all \(m \geq N_{0}\). Then \(\lvert a_{m} \rvert \leq \lvert a_{N_{0}} \rvert + 1\) for \(m \geq N_{0}\). Setting
+      \[ M = \max\bigl\{\lvert a_{1} \rvert, \lvert a_{2} \rvert, \dots, \lvert a_{N_{0} - 1} \rvert,\, \lvert a_{N_{0}} \rvert + 1\bigr\}, \]
+      we have \(\lvert a_{n} \rvert \leq M\) for every \(n \geq 1\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">4.2</span><span class="env-name">Monotone subsequence</span></p>
+    <div class="env-body">
+      <p>Every sequence of real numbers has a monotone (non-decreasing or non-increasing) subsequence.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Call an index \(n\) a <em>peak</em> of the sequence \(\{a_{n}\}\) if \(a_{n} \geq a_{m}\) for every \(m > n\). Two cases.</p>
+      <p><em>Case 1: there are infinitely many peaks.</em> List them in order: \(n_{1} < n_{2} < n_{3} < \dots\). For each \(k\), \(n_{k}\) is a peak, so \(a_{n_{k}} \geq a_{m}\) for every \(m > n_{k}\); in particular \(a_{n_{k}} \geq a_{n_{k + 1}}\). The subsequence \(\{a_{n_{k}}\}\) is non-increasing.</p>
+      <p><em>Case 2: there are finitely many peaks.</em> Let \(N\) be greater than the index of every peak. Then no \(n > N\) is a peak, which means: for every \(n > N\) there exists \(m > n\) with \(a_{m} > a_{n}\). Build a subsequence by setting \(n_{1} = N + 1\) and recursively choosing \(n_{k + 1} > n_{k}\) with \(a_{n_{k + 1}} > a_{n_{k}}\). The subsequence \(\{a_{n_{k}}\}\) is strictly increasing, hence non-decreasing.</p>
+    </div>
+  </section>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.3</span><span class="env-name">Bolzano–Weierstrass</span></p>
+    <div class="env-body">
+      <p>Every bounded sequence of real numbers has a convergent subsequence.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By Proposition 4.2, the sequence has a monotone subsequence; the subsequence is bounded (any subsequence of a bounded sequence is bounded). A bounded monotone sequence converges by the completeness theorem of §4.1.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Theorem 4.2 (\(\Leftarrow\) direction)</span></p>
+    <div class="env-body">
+      <p>Let \(\{a_{n}\}\) be Cauchy. By Proposition 4.1 it is bounded; by Theorem 4.3 (Bolzano–Weierstrass) it has a convergent subsequence \(\{a_{n_{k}}\}\) with limit \(L\) for some \(L \in \mathbb{R}\). We claim the full sequence converges to \(L\).</p>
+      <p>Given \(\varepsilon > 0\), apply the Cauchy condition to find \(N_{1}\) such that \(\lvert a_{m} - a_{n} \rvert < \varepsilon/2\) for all \(m, n \geq N_{1}\). Apply the subsequence convergence to find \(K\) such that \(\lvert a_{n_{K}} - L \rvert < \varepsilon/2\) and \(n_{K} \geq N_{1}\) (the second condition is automatic for \(K\) large enough since \(n_{K} \to \infty\)). Then for every \(n \geq N_{1}\),
+      \[ \lvert a_{n} - L \rvert \leq \lvert a_{n} - a_{n_{K}} \rvert + \lvert a_{n_{K}} - L \rvert < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon, \]
+      where the first term is bounded by the Cauchy condition (since both \(n\) and \(n_{K}\) are at least \(N_{1}\)). Hence \(a_{n} \to L\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — flag the dependency on Bolzano–Weierstrass and completeness -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">4.1</span></p>
+    <div class="env-body">
+      <p>The reverse direction of Theorem 4.2 depends on the Bolzano–Weierstrass theorem (Theorem 4.3), which in turn rests on the monotone-bounded form of completeness. The chain of dependencies makes Theorem 4.2 <em>logically equivalent</em> to completeness: any complete ordered field has the Cauchy criterion, and conversely. We will use the theorem freely from this point on, the way completeness itself is used.</p>
+    </div>
+  </section>
+
+  <p>The next proposition is the bridge between absolute and ordinary convergence; it is the tool that lets us extend \(e^{x}\) from \(x > 0\) to all of \(\mathbb{R}\).</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">4.3</span><span class="env-name">Absolute convergence implies convergence</span></p>
+    <div class="env-body">
+      <p>Suppose \(\{a_{n}\}_{n = 1}^{\infty}\) is a sequence of real numbers with \(\sum_{n = 1}^{\infty} \lvert a_{n} \rvert < \infty\). Then \(\sum_{n = 1}^{\infty} a_{n}\) converges.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Let \(S_{n} = \sum_{k = 1}^{n} a_{k}\) be the partial sums of the original series, and \(T_{n} = \sum_{k = 1}^{n} \lvert a_{k} \rvert\) the partial sums of the absolute series. By assumption \(\{T_{n}\}\) converges (it is non-decreasing and bounded, so completeness gives the limit). A convergent sequence is Cauchy, so for every \(\varepsilon > 0\) there is some \(N_{0}\) with \(\lvert T_{m} - T_{n} \rvert < \varepsilon\) for all \(m, n \geq N_{0}\). Then for \(m > n \geq N_{0}\),
+      \[ \lvert S_{m} - S_{n} \rvert = \left\lvert \sum_{k = n + 1}^{m} a_{k} \right\rvert \leq \sum_{k = n + 1}^{m} \lvert a_{k} \rvert = T_{m} - T_{n} < \varepsilon. \]
+      Hence \(\{S_{n}\}\) is also Cauchy, and by Theorem 4.2 it converges.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Convergence of \(e^{x}\) for negative \(x\)</h3>
+
+  <p>For \(x < 0\), set \(y = -x > 0\). The series \(\sum y^{n}/n!\) converges by the §4.1 convergence theorem, so \(\sum \lvert x^{n}/n! \rvert = \sum y^{n}/n!\) is finite. By Proposition 4.3, the series \(\sum x^{n}/n!\) itself converges. Combined with the §4.1 result for \(x > 0\) and direct evaluation at \(x = 0\):</p>
+
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">4.1</span></p>
+    <div class="env-body">
+      <p>The series \(\sum_{n = 0}^{\infty} x^{n}/n!\) converges to a finite real number for every \(x \in \mathbb{R}\); the function \(e^{x}\) is therefore defined on all of \(\mathbb{R}\).</p>
+    </div>
+  </section>
+
+  <p>The continuity proof from Theorem 4.1 also extends: the same polynomial-approximation argument works for \(x_{0} \leq 0\) once the tail bound is replaced by an absolute-value version.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.4</span></p>
+    <div class="env-body">
+      <p>The function \(e^{x}\) is continuous at every \(x_{0} \in \mathbb{R}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">sketch</span></p>
+    <div class="env-body">
+      <p>For \(x_{0} > 0\) the proof of Theorem 4.1 applies directly. For \(x_{0} \leq 0\), pick \(L\) with \(\lvert x_{0} \rvert < L\), and observe that for \(\lvert x \rvert < L\) and \(k > n_{0} > 2L\),
+      \[ \left\lvert e^{x} - P_{k}(x) \right\rvert \leq \sum_{n = k + 1}^{\infty} \frac{\lvert x \rvert^{n}}{n!} \leq \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} \]
+      by the same geometric-tail argument as in §4.1 but applied to \(\sum \lvert x \rvert^{n}/n!\). The three-term decomposition from the proof of Theorem 4.1 then proceeds unchanged.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The exponent law</h3>
+
+  <p>The most important algebraic property of \(e^{x}\) — and the source of its name — is that multiplication of exponentials corresponds to addition of exponents.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.5</span><span class="env-name">Exponent law</span></p>
+    <div class="env-body">
+      <p>For every \(x, y \in \mathbb{R}\),
+      \[ e^{x} e^{y} = e^{x + y}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(L > 0\) and assume \(x, y \in [-L, L]\); the result for arbitrary real \(x, y\) follows by taking \(L\) large enough. Pick \(n_{0} \in \mathbb{N}\) with \(n_{0} > 8L\), and consider partial-sum truncations \(P_{k}(x) = \sum_{n = 0}^{k} x^{n}/n!\) for \(k > n_{0}\).</p>
+
+      <p><em>Step 1: expand and split the product of partial sums.</em> Multiplying out,
+      \[ P_{k}(x) \cdot P_{k}(y) = \left(\sum_{m = 0}^{k} \frac{x^{m}}{m!}\right) \left(\sum_{n = 0}^{k} \frac{y^{n}}{n!}\right) = \sum_{m = 0}^{k} \sum_{n = 0}^{k} \frac{x^{m} y^{n}}{m! \, n!}. \]
+      Reorganise the double sum by total exponent \(\ell = m + n\). The pairs \((m, n)\) with \(m, n \in \{0, 1, \dots, k\}\) and \(m + n = \ell\) range over \(0 \leq \ell \leq 2k\). For \(\ell \leq k\), \(m\) ranges over \(\{0, 1, \dots, \ell\}\); for \(\ell > k\) (i.e., \(\ell = k + j\) with \(j \in \{1, \dots, k\}\)), the constraint \(n = \ell - m \leq k\) forces \(m \geq j\), so \(m\) ranges over \(\{j, j + 1, \dots, k\}\). Therefore
+      \[ P_{k}(x) \cdot P_{k}(y) = \underbrace{\sum_{\ell = 0}^{k} \sum_{m = 0}^{\ell} \frac{x^{m} y^{\ell - m}}{m! (\ell - m)!}}_{\text{(I)}} + \underbrace{\sum_{j = 1}^{k} \sum_{m = j}^{k} \frac{x^{m} y^{k + j - m}}{m! (k + j - m)!}}_{\text{(II)}}. \]</p>
+
+      <p><em>Step 2: piece (I) equals \(P_{k}(x + y)\).</em> Pull out a factor of \(1/\ell!\) and use the binomial theorem \((x + y)^{\ell} = \sum_{m = 0}^{\ell} \binom{\ell}{m} x^{m} y^{\ell - m}\):
+      \[ \begin{aligned} \text{(I)} &= \sum_{\ell = 0}^{k} \frac{1}{\ell!} \sum_{m = 0}^{\ell} \frac{\ell!}{m! (\ell - m)!} x^{m} y^{\ell - m} \\ &= \sum_{\ell = 0}^{k} \frac{1}{\ell!} \sum_{m = 0}^{\ell} \binom{\ell}{m} x^{m} y^{\ell - m} \\ &= \sum_{\ell = 0}^{k} \frac{(x + y)^{\ell}}{\ell!} = P_{k}(x + y). \end{aligned} \]</p>
+
+      <p><em>Step 3: bound piece (II).</em> Take absolute values and reindex. Each term in (II) has total exponent \(m + (k + j - m) = k + j\), so it ranges over \(\{k + 1, \dots, 2k\}\). Writing \(\ell = k + j\), for fixed \(\ell\) the inner sum runs over \(m \in \{\ell - k, \dots, k\} \subseteq \{0, 1, \dots, \ell\}\). Therefore
+      \[ \begin{aligned} \lvert \text{(II)} \rvert &\leq \sum_{j = 1}^{k} \sum_{m = j}^{k} \frac{\lvert x \rvert^{m} \lvert y \rvert^{k + j - m}}{m! (k + j - m)!} \\ &\leq \sum_{\ell = k + 1}^{2k} \sum_{m = 0}^{\ell} \frac{\lvert x \rvert^{m} \lvert y \rvert^{\ell - m}}{m! (\ell - m)!} \\ &= \sum_{\ell = k + 1}^{2k} \frac{(\lvert x \rvert + \lvert y \rvert)^{\ell}}{\ell!} \leq \sum_{\ell = k + 1}^{2k} \frac{(2L)^{\ell}}{\ell!}, \end{aligned} \]
+      where the second inequality enlarges the index set (the missing terms are non-negative), the equality reverses Step 2 with \(\lvert x \rvert, \lvert y \rvert\) in place of \(x, y\), and the last inequality uses \(\lvert x \rvert + \lvert y \rvert \leq 2L\).</p>
+
+      <p>For \(n_{0} > 8L\) we have \((2L)/(n_{0} + 1) < 1/4 < 1/2\), so the geometric-tail argument from §4.1 applied to \(\sum (2L)^{\ell}/\ell!\) gives
+      \[ \sum_{\ell = k + 1}^{2k} \frac{(2L)^{\ell}}{\ell!} \leq \sum_{\ell = n_{0} + 1}^{\infty} \frac{(2L)^{\ell}}{\ell!} \leq \frac{(2L)^{n_{0}}}{n_{0}!} \cdot \left(\frac{1}{2}\right)^{k - n_{0}} \quad \text{for } k > n_{0}. \]
+      Combining Steps 2 and 3,
+      \[ \bigl\lvert P_{k}(x) P_{k}(y) - P_{k}(x + y) \bigr\rvert = \lvert \text{(II)} \rvert \leq \frac{(2L)^{n_{0}}}{n_{0}!} \cdot \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$*$} \]</p>
+
+      <p><em>Step 4: bound \(\lvert e^{x} - P_{k}(x) \rvert\) and similarly for \(y\) and \(x + y\).</em> The proof of Theorem 4.4 applied to absolute values gives
+      \[ \bigl\lvert e^{x} - P_{k}(x) \bigr\rvert \leq \frac{L^{n_{0}}}{n_{0}!} \cdot \left(\frac{1}{2}\right)^{k - n_{0}} \]
+      for \(\lvert x \rvert \leq L\), and analogously for \(y\). For \(x + y\), \(\lvert x + y \rvert \leq 2L\), so the same template gives
+      \[ \bigl\lvert e^{x + y} - P_{k}(x + y) \bigr\rvert \leq \frac{(2L)^{n_{0}}}{n_{0}!} \cdot \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$**$} \]</p>
+
+      <p><em>Step 5: combine the bounds.</em> Telescope the difference:
+      \[ \begin{aligned} e^{x} e^{y} - e^{x + y} &= \bigl(e^{x} - P_{k}(x)\bigr) e^{y} + P_{k}(x) \bigl(e^{y} - P_{k}(y)\bigr) \\ &\quad + \bigl(P_{k}(x) P_{k}(y) - P_{k}(x + y)\bigr) + \bigl(P_{k}(x + y) - e^{x + y}\bigr). \end{aligned} \]
+      Use the absolute-value bound
+      \[ \lvert e^{y} \rvert = \left\lvert \sum_{n = 0}^{\infty} \frac{y^{n}}{n!} \right\rvert \leq \sum_{n = 0}^{\infty} \frac{\lvert y \rvert^{n}}{n!} = e^{\lvert y \rvert} \leq e^{L}, \]
+      where the last inequality uses \(\lvert y \rvert \leq L\). The same argument applied to the partial sum gives \(\lvert P_{k}(x) \rvert \leq P_{k}(\lvert x \rvert) \leq e^{L}\). Then by the bounds above,
+      \[ \begin{aligned} \bigl\lvert e^{x} e^{y} - e^{x + y} \bigr\rvert &\leq \bigl\lvert e^{x} - P_{k}(x) \bigr\rvert \cdot e^{L} + e^{L} \cdot \bigl\lvert e^{y} - P_{k}(y) \bigr\rvert \\ &\quad + \bigl\lvert P_{k}(x) P_{k}(y) - P_{k}(x + y) \bigr\rvert + \bigl\lvert P_{k}(x + y) - e^{x + y} \bigr\rvert \\ &\leq \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} \cdot e^{L} + e^{L} \cdot \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} \\ &\quad + \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} + \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} \\ &= \left[\frac{2 e^{L} L^{n_{0}} + 2 (2L)^{n_{0}}}{n_{0}!}\right] \cdot \left(\frac{1}{2}\right)^{k - n_{0}}. \end{aligned} \]
+      The bracket is a fixed constant (independent of \(k\)), and \((1/2)^{k - n_{0}} \to 0\) as \(k \to \infty\). Therefore the right-hand side goes to \(0\), and since the left-hand side is independent of \(k\),
+      \[ \bigl\lvert e^{x} e^{y} - e^{x + y} \bigr\rvert = 0, \]
+      i.e., \(e^{x} e^{y} = e^{x + y}\) for every \(x, y \in [-L, L]\).</p>
+
+      <p><em>Step 6: extend to all of \(\mathbb{R}\).</em> For arbitrary \(x, y \in \mathbb{R}\), pick \(L > 0\) large enough that \(\lvert x \rvert, \lvert y \rvert \leq L\) (e.g., \(L = \max\{\lvert x \rvert, \lvert y \rvert\} + 1\)). Step 5 then gives \(e^{x} e^{y} = e^{x + y}\). Since \(L\) was arbitrary, the identity holds for every pair of real numbers.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the proof outline hides a lot of bookkeeping; flag the load-bearing facts -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>The proof of Theorem 4.5 is the most computationally heavy result in the chapter, and it relies on three tools we have already developed: the partial-sum machinery from §4.1, the binomial theorem (used when collecting coefficients of \(x^{m} y^{n}\) with fixed sum), and the continuity of \(e^{x}\) (to take the limit of products through the partial sums). Each is doing real work; if any failed, the exponent law would too. The result itself is the algebraic backbone of every later property of \(e^{x}\) — including the strict-monotonicity argument that makes \(\ln x\) well defined.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — numerical sanity-check of the exponent law (the manuscript had no worked examples) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.1</span></p>
+      <div class="env-body">
+        <p>Verify the exponent law numerically at \(x = 1\), \(y = 1\): compare \(e^{1} \cdot e^{1}\) and \(e^{2}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>An earlier partial-sum estimate gave \(e^{1} \approx 2.71828\), so \(e^{1} \cdot e^{1} \approx (2.71828)^{2} \approx 7.38906\). Direct evaluation of the series for \(e^{2}\):
+        \[ e^{2} = 1 + 2 + 2 + \frac{4}{3} + \frac{2}{3} + \frac{4}{15} + \dots \approx 7.38906, \]
+        matching to all four decimal places. Theorem 4.5 guarantees that the agreement is exact (modulo the truncation error in the partial-sum approximations).</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — closing synthesis paragraph linking to the next section -->
+  <p>With \(e^{x}\) defined on \(\mathbb{R}\), continuous, and satisfying the exponent law, every claim about the exponential made informally in earlier chapters is now a theorem. The remaining piece is the derivative: an earlier chapter proved \((e^{x})' = e^{x}\) by a casual term-by-term argument that took the convergence and continuity for granted. The next section re-derives the derivative rigorously, this time with an explicit error bound on \((e^{h} - 1)/h - 1\) that locks the limit at \(1\) without circularity.</p>
+
+</article>

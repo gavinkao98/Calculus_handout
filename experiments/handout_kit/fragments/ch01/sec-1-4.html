@@ -1,0 +1,224 @@
+<!-- §1.4 One-Sided and Infinite Limits. Content verbatim from ch01_foundations.tex;
+     worked examples E1.4-a/b/c supplemented from open banks (2026-06-12), audit-approved.
+     Figures 1.8-1.10 -> 1.10-1.12 (two new figures added upstream in §1.1, §1.3). -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">1.4</span>One-Sided and Infinite Limits</h2>
+  </header>
+
+  <p>Near a point \(a\), a function can behave differently depending on which side \(x\) approaches from, and in some cases the values of the function do not approach any finite number at all. These two observations lead to one-sided limits and infinite limits.</p>
+
+  <h3 class="subsec-head">One-sided limits</h3>
+
+  <p>Sometimes we only want to consider one side of the approach to \(a\) — for instance because the function is defined by different formulas on the two sides, or because the graph jumps at \(a\).</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.10</span></p>
+    <div class="env-body">
+      <p>We write
+      \[ \lim_{x \to a^{-}} f(x) = L \]
+      and say that the <em>left-hand limit</em> of \(f(x)\) as \(x\) approaches \(a\) is \(L\) if \(f(x)\) approaches \(L\) as \(x\) approaches \(a\) through values less than \(a\). Similarly,
+      \[ \lim_{x \to a^{+}} f(x) = L \]
+      is the <em>right-hand limit</em>, describing the approach through values greater than \(a\).</p>
+    </div>
+  </section>
+
+  <figure class="figure" data-fig="one-sided-limits">
+    <figcaption><span class="fig-no">Figure 1.13</span> A function whose left-hand and right-hand limits at \(a\) are different.</figcaption>
+  </figure>
+
+  <p>The two one-sided limits together determine the two-sided limit.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.5</span><span class="env-name">Criterion for a two-sided limit</span></p>
+    <div class="env-body">
+      <p>\[ \lim_{x \to a} f(x) = L \quad \Longleftrightarrow \quad \lim_{x \to a^{-}} f(x) = L \ \text{ and } \ \lim_{x \to a^{+}} f(x) = L. \]</p>
+    </div>
+  </section>
+
+  <p>If the two one-sided limits differ, then the two-sided limit does not exist.</p>
+
+  <!-- expansion:example — use the criterion in both directions, including the "not enough information" case [source: CLP-1 §1.3 #8, #9] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.19</span></p>
+      <div class="env-body">
+        <p>Suppose \(f\) is defined on all of \(\mathbb{R}\).</p>
+        <ol class="prompt-list">
+          <li>If \(\lim_{x \to -2} f(x) = 16\), what is \(\lim_{x \to -2^{-}} f(x)\)?</li>
+          <li>If instead all we know is \(\lim_{x \to -2^{-}} f(x) = 16\), what can we say about \(\lim_{x \to -2} f(x)\)?</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>For the two-sided limit to equal \(16\), <em>both</em> one-sided limits must equal \(16\); in particular \(\lim_{x \to -2^{-}} f(x) = 16\).</li>
+          <li>Not enough information. If the right-hand limit also equals \(16\), then \(\lim_{x \to -2} f(x) = 16\); if it differs or fails to exist, the two-sided limit does not exist.</li>
+        </ol>
+        <p>The criterion transfers information from the two-sided limit to each side, but only <em>both</em> sides together determine the two-sided limit.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.20</span></p>
+      <div class="env-body">
+        <p>Let
+        \[ f(x) = \begin{cases} x + 1, & x < 2,\\[4pt] 4 - x, & x \ge 2. \end{cases} \]
+        Evaluate \(\lim_{x \to 2^{-}} f(x)\) and \(\lim_{x \to 2^{+}} f(x)\), and determine whether \(\lim_{x \to 2} f(x)\) exists.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>From the left we use the branch \(f(x) = x + 1\), so \(\lim_{x \to 2^{-}} f(x) = 3\).</p>
+        <p>From the right we use the branch \(f(x) = 4 - x\), so \(\lim_{x \to 2^{+}} f(x) = 2\).</p>
+        <p>Since the left-hand and right-hand limits differ, \(\lim_{x \to 2} f(x)\) does not exist.</p>
+        <figure class="figure" data-fig="piecewise-jump">
+          <figcaption><span class="fig-no">Figure 1.14</span> Graph of the piecewise function of Example 1.20, showing a jump at \(x = 2\).</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Infinite limits</h3>
+
+  <p>In some cases, the values of \(f(x)\) do not approach any finite number as \(x \to a\). Instead, they grow arbitrarily large positive or arbitrarily large negative.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.21</span></p>
+      <div class="env-body">
+        <p>Consider \(f(x) = \frac{1}{x^{2}}\). What happens to \(f(x)\) as \(x \to 0\)?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>If \(x\) is close to \(0\), then \(x^{2}\) is a very small positive number, so \(\frac{1}{x^{2}}\) is very large. For instance,
+        \[ \frac{1}{(0.1)^{2}} = 100, \qquad \frac{1}{(0.01)^{2}} = 10{,}000. \]
+        The values of \(\frac{1}{x^{2}}\) grow without bound as \(x \to 0\), so no finite \(L\) satisfies the informal definition of the limit; the limit does not exist.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — 1/x versus 1/x^2: the boundary between DNE and ∞ [source: CLP-1 §1.3 #13, #14, #15] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.22</span></p>
+      <div class="env-body">
+        <p>Evaluate
+        \[ \lim_{x \to 0^{-}} \frac{1}{x}, \qquad \lim_{x \to 0^{+}} \frac{1}{x}, \qquad\text{and}\qquad \lim_{x \to 0} \frac{1}{x}, \]
+        and contrast the results with \(\lim_{x \to 0} 1/x^{2}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>As \(x\) approaches \(0\) from the left, \(1/x\) is negative with larger and larger magnitude, so
+        \[ \lim_{x \to 0^{-}} \frac{1}{x} = -\infty. \]
+        From the right, \(1/x\) is positive and grows without bound, so
+        \[ \lim_{x \to 0^{+}} \frac{1}{x} = \infty. \]
+        Because the two one-sided behaviors disagree, the two-sided limit does not exist. Since the values do not all grow in the <em>same</em> signed direction, we do <strong>not</strong> write \(\lim_{x \to 0} \frac{1}{x} = \infty\). Contrast \(1/x^{2}\): both sides grow positively, so there we do write \(\lim_{x \to 0} \frac{1}{x^{2}} = \infty\).</p>
+      </div>
+    </section>
+  </div>
+
+  <p>To capture this behavior, we introduce the notation
+  \[ \lim_{x \to 0} \frac{1}{x^{2}} = \infty. \]
+  The symbol \(\infty\) does not represent a real number; it records that the function's values grow without bound.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.11</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be defined on both sides of \(a\), except possibly at \(a\) itself. We write
+      \[ \lim_{x \to a} f(x) = \infty \]
+      if the values of \(f(x)\) can be made arbitrarily large by taking \(x\) sufficiently close to \(a\), with \(x \neq a\). We call such a limit an <em>infinite limit</em>. Similarly,
+      \[ \lim_{x \to a} f(x) = -\infty \]
+      if the values of \(f(x)\) can be made arbitrarily large negative by taking \(x\) sufficiently close to \(a\), with \(x \neq a\).</p>
+    </div>
+  </section>
+
+  <p>One-sided versions,
+  \[ \begin{aligned} &\lim_{x \to a^{-}} f(x) = \infty, \qquad \lim_{x \to a^{+}} f(x) = \infty, \\ &\lim_{x \to a^{-}} f(x) = -\infty, \qquad \lim_{x \to a^{+}} f(x) = -\infty, \end{aligned} \]
+  are defined analogously. The four cases are illustrated in Figure 1.15.</p>
+
+  <figure class="figure" data-fig="one-sided-infinite">
+    <figcaption><span class="fig-no">Figure 1.15</span> The four typical one-sided infinite limits.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">Vertical asymptotes</h3>
+
+  <p>Infinite limits are closely related to vertical asymptotes.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.12</span></p>
+    <div class="env-body">
+      <p>The vertical line \(x = a\) is called a <em>vertical asymptote</em> of the curve \(y = f(x)\) if at least one of the following holds:
+      \[ \lim_{x \to a^{-}} f(x) = \pm\infty \qquad \text{or} \qquad \lim_{x \to a^{+}} f(x) = \pm\infty. \]</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.23</span></p>
+      <div class="env-body">
+        <p>Does the curve \(y = \frac{2x}{x - 3}\) have a vertical asymptote?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The denominator is zero only at \(x = 3\), so \(x = 3\) is the only candidate. As \(x \to 3^{+}\), the denominator \(x - 3\) is a small positive number while the numerator \(2x\) is close to \(6\), so
+        \[ \lim_{x \to 3^{+}} \frac{2x}{x - 3} = \infty. \]
+        As \(x \to 3^{-}\), the denominator is a small negative number while the numerator is still close to \(6\), so
+        \[ \lim_{x \to 3^{-}} \frac{2x}{x - 3} = -\infty. \]
+        At least one one-sided limit is infinite, so the line \(x = 3\) is a vertical asymptote, as shown in Figure 1.16.</p>
+        <figure class="figure" data-fig="vertical-asymptote">
+          <figcaption><span class="fig-no">Figure 1.16</span> The graph of \(y = \frac{2x}{x - 3}\) has a vertical asymptote at \(x = 3\).</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — a zero denominator does not guarantee a vertical asymptote (the failure case) [source: CLP-1 §3.6.1 #1] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.24</span></p>
+      <div class="env-body">
+        <p>Suppose \(f(x) = \frac{g(x)}{x^{2} - 9}\) for some function \(g\). Must the line \(x = -3\) be a vertical asymptote of \(y = f(x)\)?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>No. The denominator does vanish at \(x = -3\), so \(x = -3\) is a <em>candidate</em> — but whether it is an asymptote depends on the numerator. If \(g(x) = 1\), then \(f(x) = \frac{1}{x^{2} - 9}\) blows up near \(-3\), and \(x = -3\) is a vertical asymptote. But if \(g(x) = x^{2} - 9\), then \(f(x) = 1\) at every point of its domain, and there is no asymptote at all. A zero denominator marks a place to <em>investigate</em> with one-sided limits, not a guaranteed asymptote.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.25</span></p>
+      <div class="env-body">
+        <p>Guess the value of \(\lim_{x \to 0^{+}} \ln x\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>As \(x \to 0^{+}\), the values of \(\ln x\) decrease without bound, so
+        \[ \lim_{x \to 0^{+}} \ln x = -\infty. \]
+        Therefore \(x = 0\) is a vertical asymptote of the graph of \(y = \ln x\).</p>
+        <figure class="figure" data-fig="ln-asymptote">
+          <figcaption><span class="fig-no">Figure 1.17</span> The graph of \(y = \ln x\) has a vertical asymptote at \(x = 0\).</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+</article>

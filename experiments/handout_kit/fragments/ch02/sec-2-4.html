@@ -1,0 +1,240 @@
+<!-- §2.4 Derivatives of Polynomials and the Exponential Function.
+     Generated from exp-ch02/seed_ch02_s4.md (manuscript pp. 8–10),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief brief_s24.md approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references are
+     plain prose. Counters continue from §2.3:
+       Theorem 2.1 → 2.2, 2.3, 2.4, 2.5;  Corollary: first → 2.1;
+       Example 2.12 → 2.13, 2.14;  Remark 2.5 → 2.6.
+     Power rule proved for positive integer n with TWO proofs (manuscript's
+     teaching choice); the negative-integer case is flagged in an unnumbered
+     Caution and the full real-exponent version deferred (ROADMAP pitfall).
+     The e^x derivative follows the manuscript's series argument at intuitive
+     level; the rigorous construction is deferred to Ch4 §4.3.
+     No figure this section. No exercises: self-authored problems are written
+     as worked examples (see brief_s24.md "題目政策"). -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.4</span>Derivatives of Polynomials and the Exponential Function</h2>
+  </header>
+
+  <!-- expansion:intuition — load-bearing intuition: prove each rule once, reuse it as algebra; the limit→shortcut payoff -->
+  <p>In the previous sections every derivative was earned the hard way — by forming the difference quotient and grinding the limit down to a value. That is bearable for one function, but imagine differentiating \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\) straight from the definition: we would expand \((x + h)^{4}\), cancel, and take a limit, only to face the same labour for the next polynomial, and the next. This section ends the drudgery. We prove, once and for all, a short list of differentiation <em>rules</em> — for constants, powers, sums, and constant multiples — each established from the limit definition but thereafter usable as a purely algebraic shortcut. With them, differentiating any polynomial collapses to a one-line, mechanical operation, and we never touch a limit again for these functions. We then turn the same lens on the natural exponential \(e^{x}\) and uncover its remarkable signature: it is its own derivative.</p>
+
+  <h3 class="subsec-head">The constant and power rules</h3>
+
+  <!-- expansion:intuition — motivate the constant rule geometrically before stating it -->
+  <p>The simplest function of all is a constant, \(f(x) = c\), whose graph is a horizontal line. A horizontal line has slope zero everywhere, so we should expect its derivative to vanish identically. The definition confirms it immediately.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.2</span><span class="env-name">Derivative of a constant</span></p>
+    <div class="env-body">
+      <p>If \(f(x) = c\) for a constant \(c\), then \(f\) is differentiable everywhere and \(f'(x) = 0\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Straight from the definition,</p>
+      <p>\[ f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} = \lim_{h \to 0} \frac{c - c}{h} = \lim_{h \to 0} 0 = 0. \]</p>
+      <p>The difference quotient is identically zero before we even take the limit.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — set up the power rule as the single formula behind the one-off cases of §2.2 -->
+  <p>Next come the power functions \(x^{n}\). We met a few of their derivatives one exponent at a time in §2.2 — for example \(\dfrac{d}{dx}x^{2} = 2x\) — but a single formula governs them all. For now we prove it for a positive integer exponent; the case of other exponents is discussed in the caution that follows.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.3</span><span class="env-name">The power rule</span></p>
+    <div class="env-body">
+      <p>For every positive integer \(n = 1, 2, 3, \ldots\),
+      \[ \frac{d}{dx}\,x^{n} = n\,x^{n-1}. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — frame the manuscript's deliberate two-proof choice for the power rule -->
+  <p>The manuscript records two proofs, each lighting the result from a different angle; we give both.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">factorisation</span></p>
+    <div class="env-body">
+      <p>We use the equivalent \(x \to a\) form of the derivative (§2.1) together with the algebraic factorisation</p>
+      <p>\[ x^{n} - a^{n} = (x - a)\bigl(x^{n-1} + a\,x^{n-2} + a^{2}x^{n-3} + \cdots + a^{n-1}\bigr). \]</p>
+      <p>Dividing by \(x - a\) cancels the factor that would make the quotient \(0/0\), and letting \(x \to a\),</p>
+      <p>\[ \begin{aligned}
+        f'(a) &= \lim_{x \to a} \frac{x^{n} - a^{n}}{x - a} \\[2pt]
+              &= \lim_{x \to a} \bigl(x^{n-1} + a\,x^{n-2} + \cdots + a^{n-1}\bigr) \\[2pt]
+              &= \underbrace{a^{n-1} + a^{n-1} + \cdots + a^{n-1}}_{n \text{ equal terms}} = n\,a^{n-1}.
+      \end{aligned} \]</p>
+      <p>Since the point \(a\) was arbitrary, \(f'(x) = n\,x^{n-1}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">alternative — binomial expansion</span></p>
+    <div class="env-body">
+      <p>This time we use the \(h\)-form together with the binomial theorem (a precalculus prerequisite), which expands</p>
+      <p>\[ (x + h)^{n} = x^{n} + \binom{n}{1} x^{n-1} h + \binom{n}{2} x^{n-2} h^{2} + \cdots + h^{n}. \]</p>
+      <p>Subtracting \(x^{n}\) and dividing by \(h\),</p>
+      <p>\[ \frac{(x + h)^{n} - x^{n}}{h} = \binom{n}{1} x^{n-1} + \binom{n}{2} x^{n-2} h + \cdots + h^{n-1}. \]</p>
+      <p>Every term after the first carries a factor of \(h\), so all of them vanish as \(h \to 0\), leaving</p>
+      <p>\[ f'(x) = \binom{n}{1} x^{n-1} = n\,x^{n-1}, \]</p>
+      <p>since \(\binom{n}{1} = n\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — quick inline illustrations of the power rule -->
+  <p>The rule is now a reflex. For instance,</p>
+  <p>\[ \frac{d}{dx}\,x^{5} = 5x^{4}, \qquad \frac{d}{dx}\,x^{10} = 10x^{9}, \qquad \frac{d}{dx}\,x = 1, \]</p>
+  <p>the last because \(x = x^{1}\) has derivative \(1 \cdot x^{0} = 1\) — the slope of the line \(y = x\), as it must be.</p>
+
+  <!-- expansion:caution — ROADMAP pitfall: power-rule domain (positive integer proved; negative integer = manuscript exercise; full real exponent deferred) -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>So far the power rule is proved only for <em>positive integer</em> exponents. For a <em>negative</em> integer \(n = -1, -2, \ldots\) the identical formula \(\dfrac{d}{dx}x^{n} = n\,x^{n-1}\) still holds wherever \(x \ne 0\) — the manuscript leaves this as an exercise, and it can be checked by applying the same factorisation idea to \(1/x^{m}\). The fully general statement \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for an <em>arbitrary real</em> exponent \(r\) holds as well — for \(x > 0\), where \(x^{r}\) is defined through the logarithm — but its proof needs the chain rule, so we defer it to a later chapter.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The sum, constant-multiple, and polynomial rules</h3>
+
+  <!-- expansion:intuition — motivate the two linearity rules as what lets us assemble building blocks into polynomials -->
+  <p>Constants and powers are the building blocks; to assemble them into polynomials we need to know how differentiation interacts with addition and with multiplication by a constant. Both behave as nicely as we could hope, and both follow at once from the matching limit laws of Chapter 1.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.4</span><span class="env-name">The sum and constant-multiple rules</span></p>
+    <div class="env-body">
+      <p>If \(f\) and \(g\) are differentiable and \(c\) is a constant, then \(f + g\) and \(cf\) are differentiable, and</p>
+      <p>\[ (f + g)'(x) = f'(x) + g'(x), \qquad (cf)'(x) = c\,f'(x). \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Both are read straight off the limit laws. For the sum rule, the difference quotient of \(f + g\) splits into two:</p>
+      <p>\[ \begin{aligned}
+        (f + g)'(x) &= \lim_{h \to 0} \frac{\bigl[f(x+h) + g(x+h)\bigr] - \bigl[f(x) + g(x)\bigr]}{h} \\[2pt]
+        &= \lim_{h \to 0} \left( \frac{f(x+h) - f(x)}{h} + \frac{g(x+h) - g(x)}{h} \right) \\[2pt]
+        &= f'(x) + g'(x),
+      \end{aligned} \]</p>
+      <p>using the law that the limit of a sum is the sum of the limits. For the constant-multiple rule, the constant factors out of the quotient and then out of the limit:</p>
+      <p>\[ (cf)'(x) = \lim_{h \to 0} \frac{c\,f(x+h) - c\,f(x)}{h} = c \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} = c\,f'(x). \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — one-line forward fence: addition is clean, multiplication is not; full product-rule caution lives in §2.5 -->
+  <p>Notice how cleanly differentiation distributes over addition and slips past constant factors. Multiplication is not so docile — in general \((fg)' \ne f'g'\) — and finding the correct rule for a product takes more care; that is the business of §2.5.</p>
+
+  <!-- expansion:intuition — the three rules combine into term-by-term polynomial differentiation -->
+  <p>Combining the three rules just proved, we can differentiate any polynomial in a single pass.</p>
+
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">2.1</span><span class="env-name">Derivative of a polynomial</span></p>
+    <div class="env-body">
+      <p>If \(f(x) = a_{n}x^{n} + a_{n-1}x^{n-1} + \cdots + a_{1}x + a_{0}\), then</p>
+      <p>\[ f'(x) = n\,a_{n}x^{n-1} + (n-1)\,a_{n-1}x^{n-2} + \cdots + a_{1}. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:formula — justify the corollary by naming which rule does what -->
+  <p>The reasoning is exactly the three rules acting in concert: the sum rule lets the derivative act term by term; the constant-multiple rule carries each coefficient \(a_{k}\) along untouched; and the power rule turns each \(x^{k}\) into \(k\,x^{k-1}\). The constant term \(a_{0}\) contributes \(0\), and the linear term \(a_{1}x\) contributes \(a_{1}\). Assembling the pieces gives the stated formula.</p>
+
+  <!-- expansion:example — apply power + constant-multiple + sum to a polynomial (approved 2026-06-08; new type: rule-application, not first-principles) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.13</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We apply the power rule to each term, letting the sum and constant-multiple rules split the expression and carry the coefficients; the constant \(-7\) differentiates to \(0\):</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= 3\cdot\frac{d}{dx}x^{4} \;-\; 5\cdot\frac{d}{dx}x^{2} \;+\; 2\cdot\frac{d}{dx}x \;-\; \frac{d}{dx}\,7 \\[2pt]
+                &= 3(4x^{3}) - 5(2x) + 2(1) - 0 \\[2pt]
+                &= 12x^{3} - 10x + 2.
+        \end{aligned} \]</p>
+        <p>Not a single limit was computed — the rules did all the work, exactly the shortcut this section was built to deliver.</p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">The derivative of the exponential function</h3>
+
+  <!-- expansion:intuition — recall the series definition (seed Note) and fence its rigorous construction to Ch4 -->
+  <p>We close with a function of a different stripe: the natural exponential \(e^{x}\). Recall that it is defined by the power series</p>
+
+  <p>\[ e^{x} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots + \frac{x^{n}}{n!} + \cdots, \]</p>
+
+  <p>a definition we take as given here; the convergence of this series and the careful construction of \(e^{x}\) are developed in a later chapter. Granting the series, the derivative falls out beautifully.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.5</span><span class="env-name">Derivative of the natural exponential</span></p>
+    <div class="env-body">
+      <p>The natural exponential function is its own derivative:
+      \[ \frac{d}{dx}\,e^{x} = e^{x}. \]
+      Consequently every higher derivative is \(e^{x}\) as well: \(f^{(n)}(x) = e^{x}\) for all \(n\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>From the definition, and factoring out \(e^{x}\) (which does not depend on \(h\)),</p>
+      <p>\[ \frac{d}{dx}\,e^{x} = \lim_{h \to 0} \frac{e^{x+h} - e^{x}}{h} = \lim_{h \to 0} \frac{e^{x}\bigl(e^{h} - 1\bigr)}{h} = e^{x} \lim_{h \to 0} \frac{e^{h} - 1}{h}. \]</p>
+      <p>It remains to evaluate that last limit. Using the series for \(e^{h}\),</p>
+      <p>\[ e^{h} - 1 = h + \frac{h^{2}}{2!} + \frac{h^{3}}{3!} + \cdots, \qquad\text{so}\qquad \frac{e^{h} - 1}{h} = 1 + \frac{h}{2!} + \frac{h^{2}}{3!} + \cdots. \]</p>
+      <p>Every term past the first carries a factor of \(h\), so as \(h \to 0\) they all vanish and the limit equals \(1\). Therefore</p>
+      <p>\[ \frac{d}{dx}\,e^{x} = e^{x} \cdot 1 = e^{x}. \]</p>
+      <p>Differentiating again returns \(e^{x}\) unchanged, so \(f''(x) = e^{x}\), and by repetition \(f^{(n)}(x) = e^{x}\) for every \(n\).</p>
+    </div>
+  </section>
+
+  <figure class="figure" data-fig="exp-self-derivative"></figure>
+
+  <!-- expansion:intuition — the takeaway: self-replication is what makes e^x "natural" -->
+  <p>This self-replicating property is exactly what singles \(e^{x}\) out among all exponential functions and earns it the name <em>natural</em> exponential: at every point its rate of change equals its current value.</p>
+
+  <!-- expansion:example — e^x with the linearity rules, plus higher derivatives showing e^x persists while the polynomial dies (approved 2026-06-08; new type) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.14</span></p>
+      <div class="env-body">
+        <p>Let \(g(x) = 4e^{x} - x^{3} + 2x\). Find \(g'(x)\), and then compute \(g''(x)\), \(g'''(x)\), and \(g^{(4)}(x)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The sum and constant-multiple rules let us differentiate term by term, using \(\dfrac{d}{dx}e^{x} = e^{x}\) for the exponential and the power rule for the rest:</p>
+        <p>\[ g'(x) = 4e^{x} - 3x^{2} + 2. \]</p>
+        <p>Differentiating repeatedly, the polynomial part erodes by one degree each time while the exponential part is untouched:</p>
+        <p>\[ \begin{aligned}
+          g''(x)   &= 4e^{x} - 6x, \\[2pt]
+          g'''(x)  &= 4e^{x} - 6, \\[2pt]
+          g^{(4)}(x) &= 4e^{x}.
+        \end{aligned} \]</p>
+        <p>From the fourth derivative onward every \(g^{(n)}(x) = 4e^{x}\): the polynomial has been differentiated away to nothing, while the \(e^{x}\) term survives every round — a vivid reminder that \(e^{x}\) is its own derivative.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — Remark on b^x (seed) plus a tie-back to why base e is the natural one -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.6</span><span class="env-name">Derivative of \(b^{x}\)</span></p>
+    <div class="env-body">
+      <p>For a general base \(b > 1\), the exponential \(b^{x}\) is differentiable too, with</p>
+      <p>\[ \frac{d}{dx}\,b^{x} = b^{x}\,\ln b, \]</p>
+      <p>where \(\ln b = \log_{e} b\). We will be able to derive this cleanly once the chain rule is available (Chapter 3). Notice that the extra factor \(\ln b\) equals \(1\) precisely when \(b = e\) — yet another way of seeing why base \(e\) is the natural choice: only for it does the derivative arrive with no stray constant attached.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — forward-ref to §2.5 (product and quotient rules) -->
+  <p>We now have fast, limit-free derivatives for every polynomial and for the natural exponential. What we still lack are <em>general</em> rules for products and quotients of functions — and, as we saw, the naive guess \((fg)' = f'g'\) is wrong. Supplying those rules is the task of the next section.</p>
+
+</article>
