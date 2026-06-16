@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 數學正確性稽核 — gate 1（Claude）審核稿</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: {
+        arccsc: ['\\operatorname{arccsc}'],
+        arcsec: ['\\operatorname{arcsec}'],
+        arccot: ['\\operatorname{arccot}']
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.adv{background:var(--warnbg);color:var(--warn)}
+  .chip.drop{background:#eef0f4;color:#444;text-decoration:line-through}
+  .chip.done{background:#e6f7ea;color:#1a7f37}
+  .issue{color:var(--muted);font-size:.92rem;margin:2px 0 10px}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:62px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .raised{background:#fff6e3} .raised .tag{color:var(--warn)}
+  .claim{background:#f4f5f7} .claim .tag{color:#33343a}
+  .verdict{background:#eaf6ed} .verdict .tag{color:var(--new)}
+  .none{color:var(--muted);font-style:italic;padding:8px 2px}
+  code{background:#eef0f4;padding:.5px 5px;border-radius:5px;font-size:.9em}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 1 數學正確性稽核 — gate 1（Claude）審核稿</h1>
+  <p class="lede">首道閘：以 <code>MATH-CORRECTNESS-RUBRIC.md</code>（維度 M1–M8）對 ch01 六個內容節（§1.1–§1.6）跑數學正確性稽核，再對每條 finding 做<b>對抗式複核</b>（blocking 三票／advisory 一票，預設反駁）。本輪為 rubric v0 的首次實證 dry-run，兼作校準。2026-06-16。</p>
+
+  <div class="note pass"><b>狀態：整章 math gate 通過 — 0 confirmed blocking、0 confirmed advisory。</b> auditor 共提 3 條 advisory（皆 M5／M6），對抗式複核一致判為 rubric-protected non-finding，全數撤回（Drop）。下方逐條保留「提出 → 撤回理由」作為校準紀錄，無任何 fragment 需改動。</div>
+
+  <div class="note"><b>手稿不在 repo 的處置：</b> ch01 手稿未隨 repo（僅 ch02／ch03 有 <code>brief_*</code>／<code>seed_*</code>）。故 M1–M5／M7／M8 對照數學真理正常審、可給 blocking；M6 僅對照 <code>CONTENT_SPEC §9</code> canonical list 與節內一致性，凡「與手稿是否一致」之點降為 advisory「請對照手稿查核」，不擋稿。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>主題</th><th>raw findings</th><th>確認 blocking</th><th>確認 advisory</th><th>處置</th></tr>
+    <tr><td>§1.1</td><td>Inverse Functions</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td>乾淨，M1–M8 全過</td></tr>
+    <tr><td>§1.2</td><td>Inverse Trig Functions</td><td>1</td><td class="zero">0</td><td class="zero">0</td><td>1-2-a（M6）撤回</td></tr>
+    <tr><td>§1.3</td><td>Limit of a Function</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td>乾淨，M1–M8 全過</td></tr>
+    <tr><td>§1.4</td><td>One-Sided &amp; Infinite Limits</td><td>1</td><td class="zero">0</td><td class="zero">0</td><td>1-4-a（M5）撤回</td></tr>
+    <tr><td>§1.5</td><td>Limit Laws &amp; Techniques</td><td>1</td><td class="zero">0</td><td class="zero">0</td><td>1-5-a（M5）撤回</td></tr>
+    <tr><td>§1.6</td><td>Precise Definition (ε-δ)</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td>乾淨，M1–M8 全過</td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：<b>陳述正確</b> M1 定義 · M2 定理陳述 · M3 量詞／邏輯 ／ <b>推演正確</b> M4 推導／計算 · M5 邊界／定義域／特例 ／ <b>一致與完備</b> M6 記號一致 · M7 跨陳述一致 · M8 隱性假設。</p>
+
+  <h2>§1.1 Inverse Functions</h2>
+  <p class="none">乾淨（raw 0／blocking 0／advisory 0），M1–M8 全數通過。主審另行人工複讀：Theorem 1.1（反函數 ⇔ 一對一）及其證明、Proposition 1.1 兩條組合恆等式、八個 worked examples（含 \(f(x)=\tfrac{3}{x-5}\) 雙向驗證、攝氏⇄華氏）皆查核無誤。</p>
+
+  <h2>§1.2 Inverse Trigonometric Functions</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">1-2-a</span><span class="chip unit">Def 1.6/1.7 · Remark 1.3/1.4</span><span class="chip dim">M6 記號一致</span><span class="chip adv">Advisory</span><span class="chip drop">→ Drop</span><span class="chip done">✓ 撤回</span></div>
+    <div class="row claim"><span class="tag">原文</span>為 \(\arcsec\) 採 principal range \(y\in[0,\tfrac{\pi}{2})\cup[\pi,\tfrac{3\pi}{2})\)、為 \(\arccsc\) 採 \(y\in(0,\tfrac{\pi}{2}]\cup(\pi,\tfrac{3\pi}{2}]\)；Remark 1.3/1.4 另列常見慣例 \([0,\tfrac{\pi}{2})\cup(\tfrac{\pi}{2},\pi]\) 等。</div>
+    <div class="row raised"><span class="tag">提出</span>此為非標準的 principal-range 慣例（多數教材對 arcsec 用 \((\tfrac{\pi}{2},\pi]\) 分支）。手稿不在 repo，無法確認是與手稿一致、抑或 HTML 化時的有意升級 → 依 M6 程序以 advisory 提出。</div>
+    <div class="row verdict"><span class="tag">複核 Drop</span>獨立查證（high confidence）：此分支數學完全成立——驗為對 \((-\infty,-1]\cup[1,\infty)\) 的雙射，且開／閉端已排除 \(\cos y=0\)／\(\sin y=0\) 之點，故 sec／csc 處處有定義。Remark 1.3 宣稱「此分支使 \(\tfrac{d}{dx}\arcsec x=\tfrac{1}{x\sqrt{x^2-1}}\) 免絕對值」亦獲驗證：所選 range 上 \(\tan y\ge 0\)（\([0,\tfrac{\pi}{2})\) 與 \([\pi,\tfrac{3\pi}{2})\) 上 \(\sin,\cos\) 同號），即公認的 calculus-friendly 慣例。<code>CONTENT_SPEC §9</code> 明文允許「非標準但合理之 principal range，保留並以 caution／remark 標註替代方案」——本節以 Caution 1.2＋Remark 1.3/1.4＋Example 1.14 完整照辦。屬 rubric non-finding（手稿刻意的定義形式／記號升級），手稿不在 repo 不能把一個明確、自洽、自我記錄的合法定義升格成 finding。撤回。</div>
+  </div>
+
+  <h2>§1.3 The Limit of a Function</h2>
+  <p class="none">乾淨（raw 0／blocking 0／advisory 0），M1–M8 全數通過。</p>
+
+  <h2>§1.4 One-Sided and Infinite Limits</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">1-4-a</span><span class="chip unit">Def 1.11 · Example 1.25</span><span class="chip dim">M5 邊界／定義域</span><span class="chip adv">Advisory</span><span class="chip drop">→ Drop</span><span class="chip done">✓ 撤回</span></div>
+    <div class="row claim"><span class="tag">原文</span>Def 1.11 開頭要求「Let \(f\) be defined on both sides of \(a\), except possibly at \(a\) itself.」其後單側無窮極限僅說「are defined analogously」；Example 1.25 用 \(\lim_{x\to 0^{+}}\ln x=-\infty\)，而 \(\ln x\) 只定義於 \((0,\infty)\)，\(a=0\) 處無左側。</div>
+    <div class="row raised"><span class="tag">提出</span>單側無窮極限只需函數在「該側」有定義，但本節未在 analogous 子句明言放寬「both sides」前提；讀者若把它逐字套到 \(\ln x\) 可能短暫困惑 → advisory 建議補一句。</div>
+    <div class="row verdict"><span class="tag">複核 Drop</span>獨立查證（high confidence）：「both sides」前提作用域僅止於<b>雙側</b>無窮極限的定義；「defined analogously」標準上指「比照單側極限該有的半鄰域定義」，單側無窮極限本就只需對應半鄰域有定義、不繼承雙側前提。陳述無任何偽命題；Example 1.25 三項結論（\(\ln x\) 定義域、右半鄰域在域內、單側無窮極限即構成 VA）全部正確。更關鍵：例 1.25 內文已自寫「\(x=0\) sits at the boundary of the domain \((0,\infty)\) and can only be approached from within it — that is, from the right」，主動化解唯一可能的困惑。M5 擋稿要件是「遺漏使陳述變偽」——此處無偽陳述；「analogous 定義／節層級範圍假設」屬 rubric 保護項。依「不確定降級、寧缺勿濫」撤回。</div>
+  </div>
+
+  <h2>§1.5 Limit Laws and Computational Techniques</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">1-5-a</span><span class="chip unit">Strategy 1.4 第 5 步</span><span class="chip dim">M5 邊界／定義域</span><span class="chip adv">Advisory</span><span class="chip drop">→ Drop</span><span class="chip done">✓ 撤回</span></div>
+    <div class="row claim"><span class="tag">原文</span>「If the values grow without bound, the limit is \(\pm\infty\) and the line \(x=a\) is a vertical asymptote.」</div>
+    <div class="row raised"><span class="tag">提出</span>把「無界成長」直接等同「極限為 \(\pm\infty\)」。若雙側異號（如 \(\lim_{x\to 0}\tfrac{1}{x}\)，左 \(-\infty\)、右 \(+\infty\)），則無單一雙側 \(\pm\infty\) 極限，但 \(x=a\) 仍是 vertical asymptote → advisory 提醒可補區分。</div>
+    <div class="row verdict"><span class="tag">複核 Drop</span>獨立查證（high confidence）：auditor 引文與 locus 正確、所指 edge case 屬實，但不構成缺陷。(1) 陳述未變偽——即便異號情形，該步結論「\(x=a\) 是 vertical asymptote」仍正確，帶號 \(\pm\infty\) 已編碼正負不確定。(2) 此為 <code>env-strategy</code> 啟發式程序盒，rubric non-finding 明列「啟發式 gloss 不必扛完整嚴謹度」「語意等價的表述差異」——把無界成長寫成 \(\lim=\pm\infty\) 是 Stewart／Rogawski／CLP 一致的標準簡寫。(3) auditor 自己已言「屬可接受的簡寫…不擋稿」。在快速參考 checklist 硬塞「或一側 \(+\infty\) 另一側 \(-\infty\)」反而過度負擔。至多 tier-3 品味級，非可落地 advisory，撤回。</div>
+  </div>
+
+  <h2>§1.6 The Precise Definition of a Limit</h2>
+  <p class="none">乾淨（raw 0／blocking 0／advisory 0），M1–M8 全數通過。ε-δ 定義、極限唯一性、ε-δ 驗證、無窮極限的 \(M\)-\(\delta\) 形式皆查核無誤。</p>
+
+  <footer>
+    產線：MATH-CORRECTNESS-RUBRIC.md gate 1（Claude）·對抗式複核 9 agents／~425k tokens·2026-06-16。<br>
+    本輪 0 confirmed defect，無 fragment 改動，故無回歸審核需求。3 條撤回項保留作 rubric v0 的實證校準：non-findings 護欄＋對抗式複核成功攔下 3 條 over-report（2×M5 啟發式／特例、1×M6 手稿飄移），擋稿線無需鬆動。定稿前可另經 gate 2（Codex 獨立複核，計費需同意）。
+  </footer>
+
+</div>
+</body>
+</html>
