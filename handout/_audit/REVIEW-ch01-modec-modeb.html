@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 Mode C → Mode B 稽核（回歸）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#b7791f; --purple:#6c2bd9; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.65; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .summary { background:#f0f6ff; border:1px solid #cfe0fb; border-radius:8px; padding:.9rem 1.1rem; font-size:.92rem; margin:0 0 1.4rem; }
+  .summary b { color: var(--blue); }
+  .pass { color: var(--green); font-weight: 700; }
+  .warn { color: var(--amber); font-weight: 700; }
+  table.tally { border-collapse: collapse; width: 100%; font-size: .86rem; margin: .6rem 0 .4rem; }
+  table.tally th, table.tally td { border: 1px solid var(--line); padding: .35rem .6rem; text-align: center; }
+  table.tally th { background: #f3f6fb; }
+  table.tally td.sec { text-align: left; font-weight: 600; }
+  table.tally td.keep { color: var(--green); font-weight: 700; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem 1rem; margin: .7rem 0; }
+  .card.defect { border-left: 4px solid var(--red); }
+  .card.tighten { border-left: 4px solid var(--amber); }
+  .card.optional { border-left: 4px solid var(--gray); }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+  .b-defect { background:#fdeceb; color:var(--red); } .b-tighten { background:#fbf3e3; color:var(--amber); }
+  .b-optional { background:#eef0f2; color:var(--gray); } .b-spec { background:#fdeceb; color:var(--red); }
+  .b-f { background:#eef2f7; color:#475467; font-family: ui-monospace, monospace; }
+  .loc { font-size:.82rem; color:var(--gray); margin:.3rem 0 .55rem; }
+  .loc code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .content { background:#fcfcfd; border:1px dashed var(--line); border-radius:6px; padding:.55rem .9rem; font-size:.92rem; }
+  .issue { margin:.55rem 0 .2rem; }
+  del { background:#fdeceb; text-decoration: line-through; color:#7a271a; padding:0 .15rem; border-radius:3px; }
+  ins { background:#e9f7ef; text-decoration: none; color:#0f5132; padding:0 .15rem; border-radius:3px; }
+  .sug { background:#fff7ed; border-left:3px solid var(--amber); padding:.3rem .65rem; border-radius:4px; font-size:.85rem; margin-top:.45rem; }
+  .keepnote { font-size:.85rem; color:var(--gray); }
+  .src { font-size:.78rem; color:var(--gray); margin-top:.5rem; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  a { color: var(--blue); }
+</style>
+</head>
+<body>
+<h1>Chapter 1 — Mode C 之後的 Mode B 稽核（回歸）</h1>
+<p class="sub">2026-06-16　·　範圍：6 節共 <b>14 個 <code>[pass: enrichment]</code> 標記</b>（§1.1–§1.6）　·　獨立重跑：gate-1 散文稽核（6 個 <code>handout-prose-audit</code> subagent 並行盲審）＋ 逐標記裁決（Keep／Rewrite／Move／Cut）＋ 規格合規／正確性平行檢查</p>
+
+<div class="summary">
+<b>逐標記裁決：<span class="pass">14 Keep · 0 Rewrite · 0 Move · 0 Cut</span>。</b>
+14 處充實散文皆正確、位置適當、語域契合 Stewart／Rogawski，且與相鄰既有散文無重複——主軸未被觸碰。<br>
+<b>gate-1 散文閘：<span class="pass">易懂性 blocking = 0 → 通過</span></b>（advisory：2 tighten ＋ 5 optional，純 polish，逐條交裁決）。<br>
+<b>規格合規：<span class="warn">1 處明確缺陷</span></b> — §1.6 Caution 1.8 用了 ASCII 直引號（違反 §8 彎引號規則）。建議修正。<br>
+<span style="font-size:.86rem;color:var(--gray)">本輪佐證 <a href="REVIEW-ch01-modec-applied.html">已寫入報告</a> 所記的兩輪 Mode B（2026-06-15 gate-1＋2026-06-16 self-review，皆 0 blocking）；惟上述直引號缺陷與 §1.4 的局部冗餘為本次回歸新捕獲，前兩輪未標。</span>
+</div>
+
+<h2>一、逐標記裁決總表（14 Keep）</h2>
+<table class="tally">
+<thead><tr><th>節</th><th>標記</th><th>類別／環境</th><th>locus</th><th>裁決</th><th>gate-1</th></tr></thead>
+<tbody>
+<tr><td class="sec" rowspan="2">§1.1</td><td>1.1-2</td><td>intuition</td><td>Def 1.2 之前（角色互換動機）</td><td class="keep">Keep</td><td>clean</td></tr>
+<tr><td>1.1-1</td><td>caution / Caution 1.1</td><td>Def 1.2 之後（\(f^{-1}\) 非倒數）</td><td class="keep">Keep</td><td>clean</td></tr>
+<tr><td class="sec" rowspan="3">§1.2</td><td>1.2-1</td><td>intuition</td><td>arccos 子節開頭（\([0,\pi]\) 動機）</td><td class="keep">Keep</td><td>clean</td></tr>
+<tr><td>1.2-2</td><td>intuition</td><td>arctan 子節開頭（domain \(\mathbb{R}\) 動機）</td><td class="keep">Keep</td><td>clean</td></tr>
+<tr><td>1.2-3</td><td>caution / Caution 1.4</td><td>Prop 1.4 之後（cancellation 限制）</td><td class="keep">Keep</td><td>clean</td></tr>
+<tr><td class="sec" rowspan="2">§1.3</td><td>1.3-1</td><td>caution / Caution 1.5</td><td>Ex 1.18 之後（表格可能誤導）</td><td class="keep">Keep</td><td>1 tighten ＋ 1 opt</td></tr>
+<tr><td>1.3-2</td><td>application</td><td>節末（收束瞬時速度線）</td><td class="keep">Keep</td><td>1 opt</td></tr>
+<tr><td class="sec" rowspan="2">§1.4</td><td>1.4-2</td><td>caution / Caution 1.6</td><td>Def 1.11 之後（\(=\infty\) 非存在）</td><td class="keep">Keep</td><td>1 tighten</td></tr>
+<tr><td>1.4-4</td><td>strategy / Strategy 1.3</td><td>Def 1.12 之後（找垂直漸近線）</td><td class="keep">Keep</td><td>1 opt</td></tr>
+<tr><td class="sec" rowspan="2">§1.5</td><td>1.5-1</td><td>intuition</td><td>Thm 1.2 之前（極限律可信）</td><td class="keep">Keep</td><td>clean</td></tr>
+<tr><td>1.5-2</td><td>caution / Caution 1.7</td><td>商定律之後（\(0/0\) 是信號）</td><td class="keep">Keep</td><td>clean</td></tr>
+<tr><td class="sec" rowspan="3">§1.6</td><td>1.6-2</td><td>application</td><td>Def 1.13 之前（ε／δ 當容差）</td><td class="keep">Keep</td><td>1 opt</td></tr>
+<tr><td>1.6-1</td><td>intuition</td><td>Fig 1.21 段後（挑戰—回應賽局）</td><td class="keep">Keep</td><td>1 opt</td></tr>
+<tr><td>1.6-3</td><td>caution / Caution 1.8</td><td>Ex 1.41 之後（δ 不唯一）</td><td class="keep">Keep<sup>*</sup></td><td><b style="color:var(--red)">1 缺陷</b></td></tr>
+</tbody>
+</table>
+<p class="keepnote"><sup>*</sup> 1.6-3 的<b>內容</b>判 Keep（正確、位置適當）；其攜帶的直引號缺陷屬規格合規問題，獨立列於下方 <code>SPEC-1</code>，修字形即可，不動內容。</p>
+
+<h2>二、待裁決項（1 缺陷 ＋ 2 tighten ＋ 5 optional）</h2>
+
+<div class="card defect">
+<span class="id">SPEC-1</span><span class="badge b-spec">規格缺陷 · §8</span><span class="badge b-f">U/F 外</span>
+<div class="loc">§1.6 · Caution 1.8 · <code>sec-1-6.html:179</code>（locus：Ex 1.41 之後）</div>
+<div class="content">The goal of an \(\varepsilon\)-\(\delta\) proof is to exhibit <em>one</em> working \(\delta\), not <del>&quot;the&quot;</del> \(\delta\).</div>
+<div class="issue">本節其餘散文一律用彎引號（cf. L10 <code>&ldquo;f(x) is close to L&rdquo;</code>、L27、L65），唯獨此處 <code>&quot;the&quot;</code> 用了 ASCII 直引號，違反 CONTENT_SPEC §8；在 MathJax／列印輸出會露出不一致的引號字形。</div>
+<div class="sug">建議：改彎引號 → <ins>not &ldquo;the&rdquo; \(\delta\)</ins>。純字形修正，不動語意。（同 gate-1 <code>G1-S6-1</code>）</div>
+</div>
+
+<div class="card tighten">
+<span class="id">G1-S4-1</span><span class="badge b-tighten">tighten</span><span class="badge b-f">F1 局部冗餘</span>
+<div class="loc">§1.4 · Caution 1.6 · <code>sec-1-4.html:150</code></div>
+<div class="content">It is shorthand recording a particular way the limit <em>fails</em> to exist as a finite real number: the values of \(f\) grow without bound. <del>The symbol \(\infty\) is not a real number, and it cannot be added, multiplied, or otherwise manipulated like one.</del></div>
+<div class="issue">「\(\infty\) 不是實數」與緊鄰前文 <code>L133</code>「The symbol \(\infty\) does not represent a real number」局部重複（相距僅一個 Definition），第二次出現未帶新意。</div>
+<div class="sug">建議：略去「is not a real number」重述，保留增量資訊（不可運算） → <ins>Nor can \(\infty\) be added, multiplied, or otherwise manipulated like an ordinary number.</ins></div>
+</div>
+
+<div class="card tighten">
+<span class="id">G1-S3-1</span><span class="badge b-tighten">tighten</span><span class="badge b-f">F4 認知負荷</span>
+<div class="loc">§1.3 · Caution 1.5 · <code>sec-1-3.html:139</code></div>
+<div class="content">…suggesting \(-\tfrac{\sqrt{3}}{2}\). <b>‖切點‖</b> In truth, near \(0\) the graph keeps oscillating between \(-1\) and \(1\)…</div>
+<div class="issue">Caution 1.5 為單一 <code>&lt;p&gt;</code> 連續長段（約 8 句：兩組取樣推導＋振盪解釋＋回扣定義），單段一次承載四個概念，逼近自學讀者上限。</div>
+<div class="sug">建議：在「In truth, near 0 …」前切段，讓「兩張誤導表」與「為何 DNE＋回扣定義」分兩段。語意不動，純切點。</div>
+</div>
+
+<div class="card optional">
+<span class="id">G1-S3-2</span><span class="badge b-optional">optional</span><span class="badge b-f">F2 贅字</span>
+<div class="loc">§1.3 · Caution 1.5 · <code>sec-1-3.html:139</code></div>
+<div class="content">…it can never confirm one, and it can <del>actively</del> mislead.</div>
+<div class="sug">建議（可選）：刪 <code>actively</code>，零語意損失。</div>
+</div>
+
+<div class="card optional">
+<span class="id">G1-S3-3</span><span class="badge b-optional">optional</span><span class="badge b-f">F1 概念回聲</span>
+<div class="loc">§1.3 · application · <code>sec-1-3.html:144,146</code></div>
+<div class="content">「close the loop opened at the start」與「the value this average approaches as the interval shrinks to nothing」兩處皆在重述「逼近／收束」意象。</div>
+<div class="sug">輕度概念回聲，服務 clarity（§3 允許），<b>傾向保留</b>；若要收緊可擇一弱化。</div>
+</div>
+
+<div class="card optional">
+<span class="id">G1-S4-2</span><span class="badge b-optional">optional</span><span class="badge b-f">F4 認知負荷</span>
+<div class="loc">§1.4 · Strategy 1.3 · <code>sec-1-4.html:179</code>（Step 1）</div>
+<div class="content">Find the candidate points: places where the formula is undefined, discontinuous, or otherwise suspect<del>, but which can still be approached from within the domain</del>. For a rational function…</div>
+<div class="sug">Step 1 單句疊三層；可把但書獨立為破折號子句降載 → <ins>…or otherwise suspect — though still approachable from within the domain.</ins> 純 polish，不擋稿。</div>
+</div>
+
+<div class="card optional">
+<span class="id">G1-S6-2</span><span class="badge b-optional">optional</span><span class="badge b-f">F4 認知負荷</span>
+<div class="loc">§1.6 · application · <code>sec-1-6.html:23</code>（末句）</div>
+<div class="content">The definition below is the mathematical backbone of the everyday promise &ldquo;control the input closely enough, and the output stays within specification.&rdquo;</div>
+<div class="sug">why-it-matters 收束句稠密；可給切點 → <ins>The definition below makes this everyday promise precise: control the input closely enough, and the output stays within specification.</ins> 語意完整，不擋讀。</div>
+</div>
+
+<div class="card optional">
+<span class="id">G1-S6-3</span><span class="badge b-optional">optional</span><span class="badge b-f">F1 刻意回呼</span>
+<div class="loc">§1.6 · intuition · <code>sec-1-6.html:68</code> → Ex 1.38（<code>L82</code>）</div>
+<div class="content">賽局隱喻「ε first, δ second / δ in reply to ε」與 Example 1.38 解答「challenge on the y-side, δ is our response」概念相鄰重疊。</div>
+<div class="sug">兩處功能不同（直覺鋪陳 vs 診斷錯誤定義）且屬刻意回呼，非無新意重述——<b>傾向保留</b>。</div>
+</div>
+
+<h2 style="border-top:3px solid var(--green);">三、收斂判準</h2>
+<p style="font-size:.92rem;">
+gate-1 prose gate 通過判準 = <b>易懂性 blocking = 0</b>。本輪 6 節全數 0 blocking，<span class="pass">收斂</span>。<br>
+逐標記裁決 14 Keep、無 Move／Cut——主軸未動，符合 Mode C「只增添、不重構」契約。<br>
+<b>唯一非 advisory 的待修項是 <code>SPEC-1</code>（直引號）</b>；其餘 7 條為 advisory polish，由使用者逐條裁決，不強制歸零。<br>
+修完 <code>SPEC-1</code>（與任何獲採納的 advisory）後，依流程需 ① <code>python build.py ch01</code> 重組 ② 對改動處跑一輪回歸審核 ③ 裁決與修正寫進該 commit 的 body（<code>git log --grep="Mode B"</code> 可撈回）。
+</p>
+
+<h2 style="border-top:3px solid var(--green);">四、回歸結果（2026-06-16，採納 6 條／保留 2 條）</h2>
+<p style="font-size:.92rem;">採納 <b>6 條</b>（1 缺陷 ＋ 2 tighten ＋ 3 optional），餘 2 條 optional 保留。已落地並回歸驗證：</p>
+<table class="tally">
+<thead><tr><th>項</th><th>節／locus</th><th>改動</th><th>驗證</th></tr></thead>
+<tbody>
+<tr><td><code>SPEC-1</code></td><td>§1.6 Caution 1.8</td><td>ASCII 直引號 <code>"the"</code> → 彎引號 <code>&ldquo;the&rdquo;</code></td><td class="keep">✓ fragment＋standalone</td></tr>
+<tr><td><code>G1-S4-1</code></td><td>§1.4 Caution 1.6</td><td>刪「is not a real number」重述；保留增量「cannot be … manipulated like an ordinary number」<sup>†</sup></td><td class="keep">✓ fragment＋standalone</td></tr>
+<tr><td><code>G1-S3-1</code></td><td>§1.3 Caution 1.5</td><td>單長段切兩段（「In truth…」前），第二段沿用 <code>class="ragged"</code></td><td class="keep">✓ 2 段</td></tr>
+<tr><td><code>G1-S3-2</code></td><td>§1.3 Caution 1.5</td><td>刪贅字 <code>actively</code>（「can actively mislead」→「can mislead」）</td><td class="keep">✓ fragment＋standalone</td></tr>
+<tr><td><code>G1-S4-2</code></td><td>§1.4 Strategy 1.3 Step 1</td><td>但書改破折號子句降載（「, but which can still be approached…」→「 — though still approachable…」）</td><td class="keep">✓ fragment＋standalone</td></tr>
+<tr><td><code>G1-S6-2</code></td><td>§1.6 application</td><td>長收束句重寫（「is the mathematical backbone of … promise &ldquo;…&rdquo;」→「makes this everyday promise precise: …」）</td><td class="keep">✓ fragment＋standalone</td></tr>
+</tbody>
+</table>
+<p style="font-size:.86rem;color:var(--gray);">
+<sup>†</sup> 實際採用「<code>The symbol \(\infty\) cannot be added, multiplied, or otherwise manipulated like an ordinary number.</code>」——較報告原擬「Nor can…」更順（「Nor」需否定前句承接，此處前句為肯定，故改此寫法），語意等價。<br>
+回歸檢查：<b>六處改動皆不觸碰任何 LaTeX／數學</b>（零 render 風險，純散文／字形）；<code>python build.py ch01</code> 兩次重組成功並帶入 standalone；§8 直引號全節掃描 = 鋪陳散文 0 處（餘 2 處為 <code>&lt;!-- expansion: --&gt;</code> 標記註解，inert 不 render）。<b>回歸 clean，無新引入問題。</b><br>
+2 條 optional（<code>G1-S3-3</code> 收束意象回聲、<code>G1-S6-3</code> 賽局隱喻回呼）依裁定保留，未動。
+</p>
+
+</body>
+</html>

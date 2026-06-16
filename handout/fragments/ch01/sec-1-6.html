@@ -9,10 +9,18 @@
 
   <p>From the time of Newton and Leibniz, calculus was remarkably successful at solving problems in geometry, mechanics, and astronomy. For a long time, however, there was also controversy about its logical foundations. Early arguments often relied on infinitesimals — quantities thought of as being extremely small but not described in a fully precise way — and mathematicians continued to ask what it really means to say that \(x\) approaches \(a\) or that \(f(x)\) approaches \(L\). The modern resolution, developed in the nineteenth century, is the \(\varepsilon\)-\(\delta\) definition of a limit, which gave calculus the level of rigor used in modern mathematics.</p>
 
+  <!-- expansion:history — the arithmetisation of analysis: Bolzano, Cauchy, Weierstrass [source: Boyer, A History of the Calculus; Kline, Mathematical Thought from Ancient to Modern Times] -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.6</span><span class="env-name">Historical note</span></p>
+    <div class="env-body">
+      <p>The drive to replace intuitive arguments with arithmetic precision is known as the <em>arithmetisation of analysis</em>. Bolzano anticipated a more rigorous, inequality-based treatment of continuity and convergence, while Cauchy gave limits and continuity a more systematic analytic form. Weierstrass, lecturing at Berlin from the 1860s onward, refined these ideas into the \(\varepsilon\text{-}\delta\) formulation that is essentially the one presented here.</p>
+    </div>
+  </section>
+
   <p>In the previous sections we used graphs, tables, and algebraic techniques to study limits, and we stated the limit laws without proof. Those arguments rested on informal phrases such as “\(f(x)\) is close to \(L\)” and “\(x\) is close to \(a\).” To make the arguments rigorous — and, eventually, to prove the limit laws — we need a definition that replaces “close” with numerical precision.</p>
 
   <!-- expansion:application — read ε and δ as engineering tolerances, a concrete why-it-matters [pass: enrichment] [source: APEX §1.2, x-tolerance = delta, y-tolerance = epsilon] -->
-  <p>It helps to read \(\varepsilon\) and \(\delta\) as <em>tolerances</em>. In engineering and manufacturing one specifies how far a finished quantity may stray from its target: an output tolerance \(\varepsilon\) around the desired value \(L\). One then asks how tightly the input must be controlled near \(a\) to keep the result within that tolerance — an input tolerance \(\delta\). The definition below is the mathematical backbone of the everyday promise “control the input closely enough, and the output stays within specification.”</p>
+  <p>It helps to read \(\varepsilon\) and \(\delta\) as <em>tolerances</em>. In engineering and manufacturing one specifies how far a finished quantity may stray from its target: an output tolerance \(\varepsilon\) around the desired value \(L\). One then asks how tightly the input must be controlled near \(a\) to keep the result within that tolerance — an input tolerance \(\delta\). The definition below makes this everyday promise precise: control the input closely enough, and the output stays within specification.</p>
 
   <p>To motivate the definition, consider the function
   \[ f(x) = \begin{cases} 2x - 1, & x \neq 3,\\[4pt] 6, & x = 3. \end{cases} \]
@@ -164,6 +172,14 @@
     </section>
   </div>
 
+  <!-- expansion:caution — δ is never unique; any smaller positive value also works [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.8</span></p>
+    <div class="env-body">
+      <p>The value of \(\delta\) is never unique. Once a valid \(\delta\) has been found, any smaller positive value also works, because shrinking the input neighborhood can only tighten the conclusion. The goal of an \(\varepsilon\text{-}\delta\) proof is to exhibit <em>one</em> working \(\delta\), not “the” \(\delta\). In Example 1.40, for instance, \(\delta = \varepsilon/5\) works just as well as \(\delta = \varepsilon/4\).</p>
+    </div>
+  </section>
+
   <!-- expansion:example — feed a known inequality into the definition: lim sin x = 0 [source: APEX §1.2 #8] -->
   <div class="workedexample">
     <section class="env env-example">
@@ -185,7 +201,7 @@
   <p>The four examples above share a common pattern, which we record as a general strategy.</p>
 
   <section class="env env-strategy">
-    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.4</span><span class="env-name">Verifying a limit from the \(\varepsilon\)-\(\delta\) definition</span></p>
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">1.5</span><span class="env-name">Verifying a limit from the \(\varepsilon\)-\(\delta\) definition</span></p>
     <div class="env-body">
       <p>To show that \(\lim_{x \to a} f(x) = L\):</p>
       <ol class="steps">
