@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 圖稽核 — gate 2（Codex 獨立視覺複核）審核稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  :root { --ink:#1a1a1a; --mut:#6b6b6b; --line:#e2e2e2; --bg:#fafafa; --card:#fff;
+          --blue:#1f5fbf; --red:#b3261e; --amber:#a86400; --green:#137333; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", "Microsoft JhengHei", system-ui, sans-serif;
+         color: var(--ink); background: var(--bg); line-height: 1.65; margin: 0; padding: 2rem 1.2rem 5rem; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 1.7rem; margin: 0 0 .2rem; }
+  h2 { font-size: 1.25rem; margin: 2.4rem 0 .8rem; padding-bottom: .3rem; border-bottom: 2px solid var(--line); }
+  h3 { font-size: 1.05rem; margin: 1.4rem 0 .4rem; }
+  .lede { color: var(--mut); margin: .2rem 0 1.4rem; }
+  code { background: #f0f0f0; padding: .1em .35em; border-radius: 4px; font-size: .9em;
+         font-family: "SF Mono", "Cascadia Code", Consolas, monospace; }
+  .note { border-radius: 8px; padding: .8rem 1rem; margin: 1rem 0; border: 1px solid var(--line); background: var(--card); }
+  .pass { border-left: 5px solid var(--green); background: #f1f8f3; }
+  .warn { border-left: 5px solid var(--amber); background: #fdf7ec; }
+  .fail { border-left: 5px solid var(--red); background: #fef2f1; }
+  .info { border-left: 5px solid var(--blue); background: #f0f5fc; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .92rem; background: var(--card); }
+  th, td { border: 1px solid var(--line); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #f3f3f3; }
+  .tag { display: inline-block; font-size: .76rem; font-weight: 700; padding: .08em .5em; border-radius: 10px; white-space: nowrap; }
+  .t-clean { background: #e3f3e8; color: var(--green); }
+  .t-block { background: #fbe4e2; color: var(--red); }
+  .t-adv   { background: #fbf0d8; color: var(--amber); }
+  .t-new   { background: #efe6f7; color: #6a3fa0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-left-width: 5px; border-radius: 8px;
+          padding: 1rem 1.1rem; margin: 1rem 0; }
+  .card.block { border-left-color: var(--red); }
+  .card.adv { border-left-color: var(--amber); }
+  .card h3 { margin-top: 0; }
+  .kv { margin: .35rem 0; }
+  .kv b { color: var(--mut); font-weight: 600; }
+  .small { font-size: .85rem; color: var(--mut); }
+  ul { margin: .4rem 0; }
+  pre { background: #f0f0f0; padding: .7rem; border-radius: 6px; overflow: auto; font-size: .82rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Chapter 1 圖稽核 — gate 2（Codex 獨立視覺複核）審核稿</h1>
+<p class="lede">第二道閘：Codex（gpt-5.5, xhigh reasoning）獨立視覺審查。與 gate 1 各自獨立、互不參照。依 <code>FIGURE-AUDIT-RUBRIC.md</code>（維度 D1–D8）逐圖核對 <code>FIGS</code> 原始碼＋<code>sec-1-*.html</code> 語境＋列印 PNG。2026-06-16。</p>
+
+<div class="note pass">
+<b>狀態：gate 2 通過。1 blocking 已修＋回歸、1 advisory 使用者裁定不動。</b><br>
+Codex 獨立審查 20 張圖，18 張全乾淨；Fig 1.20 <code>squeeze-x2sin</code> D6 Blocking（原點實心點）已採方案 A 刪除並回歸通過；Fig 1.18 <code>floor-function</code> D4 Advisory（tick 字級）使用者裁定不需動作。
+</div>
+
+<h2>方法</h2>
+<ul>
+  <li><b>審查者：</b>Codex（gpt-5.5, reasoning effort: xhigh），read-only sandbox，<code>-i</code> 附上 19 張 A4 列印頁 PNG（headless Chrome 2× 截圖），另可讀 repo 內的 <code>FIGS</code> 原始碼與 fragment 語境。</li>
+  <li><b>獨立性：</b>prompt 明確指示「不要假設任何先前審查的結論」「不要去找或參照任何其他審核報告」。gate 1 報告不在其可見範圍。</li>
+  <li><b>輸入：</b>gate 1 修正（Fig 1.18 D4 補 tick <code>tex</code>、Fig 1.4 D4 補 <code>tex</code>）<b>已套用</b>後的最新版本。</li>
+  <li><b>token 用量：</b>約 465k tokens。</li>
+</ul>
+
+<h2>彙總</h2>
+<table>
+  <tr><th>項目</th><th>數</th><th>說明</th></tr>
+  <tr><td>稽核圖數</td><td>20</td><td>Fig 1.1–1.21（無 1.2）</td></tr>
+  <tr><td><span class="tag t-block">blocking</span></td><td>1</td><td>Fig 1.20 D6</td></tr>
+  <tr><td><span class="tag t-adv">advisory</span></td><td>1</td><td>Fig 1.18 D4</td></tr>
+  <tr><td><span class="tag t-clean">全乾淨</span></td><td>18 / 20</td><td></td></tr>
+</table>
+
+<h2>逐圖結果</h2>
+<table>
+  <tr><th>Fig</th><th>id</th><th>頁</th><th>gate 2 結果</th></tr>
+  <tr><td>1.1</td><td><code>hlt</code></td><td>3</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.3</td><td><code>restrict-x2</code></td><td>6</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.4</td><td><code>sine-not-1to1</code></td><td>8</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.5</td><td><code>restricted-sine</code></td><td>9</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.6</td><td><code>arcsin-triangle</code></td><td>11</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.7</td><td><code>restricted-cosine</code></td><td>11</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.8</td><td><code>restricted-tangent</code></td><td>13</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.9</td><td><code>arctan10-triangle</code></td><td>14</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.10</td><td><code>arctan-general-triangle</code></td><td>15</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.11</td><td><code>limit-same-near-a</code></td><td>17</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.12</td><td><code>read-limit-graph</code></td><td>18</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.13</td><td><code>one-sided-limits</code></td><td>21</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.14</td><td><code>piecewise-jump</code></td><td>22</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.15</td><td><code>one-sided-infinite</code></td><td>24</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.16</td><td><code>vertical-asymptote</code></td><td>26</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.17</td><td><code>ln-asymptote</code></td><td>27</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.18</td><td><code>floor-function</code></td><td>32</td><td><span class="tag t-adv">1 advisory</span></td></tr>
+  <tr><td>1.19</td><td><code>squeeze-theorem</code></td><td>33</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.20</td><td><code>squeeze-x2sin</code></td><td>34</td><td><span class="tag t-block">1 blocking</span> → <span class="tag t-clean">已修</span></td></tr>
+  <tr><td>1.21</td><td><code>precise-limit</code></td><td>37</td><td><span class="tag t-clean">clean</span></td></tr>
+</table>
+
+<h2>① Blocking — 已修＋回歸</h2>
+
+<div class="card block">
+<h3>Fig 1.20 <code>squeeze-x2sin</code> · D6 · Blocking</h3>
+<div class="kv"><b>Codex 指控：</b>PNG p34 在原點畫出<b>實心點</b>。<code>FIGS</code> 於 <code>chapter1-print-standalone.html:2524</code> 將曲線分成 \([-1.1,-0.01]\)、\([0.01,1.1]\) 後又加入 <code>{ type: "dot", x: 0, y: 0 }</code>（實心）。fragment <code>sec-1-5.html:252–255</code> 說明 bound valid for all \(x \neq 0\)，caption 稱此為 \(y = x^{2}\sin(1/x)\) 的 graph。</div>
+<div class="kv"><b>Codex 論點：</b>函數 \(x^{2}\sin(1/x)\) 在 \(x = 0\) 未定義。實心點按本講義慣例（如 Fig 1.11/1.12/1.21）表示「函數值存在且等於此值」，與數學對象矛盾。</div>
+<div class="kv"><b>Codex 建議：</b>移除實心點；若要標示極限值，改用空心點。</div>
+
+<div class="note info" style="margin-top:.8rem;">
+<b>交叉比對與分析：</b>
+<ul>
+  <li><b>慣例一致性：</b>本講義確立的慣例——Fig 1.11 <code>limit-same-near-a</code> 中空心點 = 極限值但 \(f(a)\) 未定義或不等、實心點 = \(f(a)\) 存在；Fig 1.21 <code>precise-limit</code> 同。若套用同一慣例，Fig 1.20 原點的實心點暗示 \(f(0) = 0\) 已定義。</li>
+  <li><b>數學面：</b>原式 \(x^{2}\sin(1/x)\) 在 \(x=0\) 確實無定義。但許多教科書在此例會自然地令 \(f(0)=0\)（夾擠定理的結論正好保證極限為 0，延拓後連續）。這是一個<b>教學意圖的選擇</b>而非純然的數學錯誤。</li>
+  <li><b>prose 語境：</b>fragment 的 caption 寫「The graph of \(y = x^{2}\sin(1/x)\)」，未定義 \(f(0)\)；prose 說 bound 對「all \(x \neq 0\)」成立。以 prose 為準，\(x=0\) 不在定義域，實心點確實不一致。</li>
+</ul>
+<b>結論：</b>finding 有理。但修法不只有「刪點」一種——也可以在 prose 中明確定義 \(f(0) = 0\) 使之連續（許多教材的做法），此時實心點即正確。<b>兩種修法都合理，須使用者裁決教學意圖。</b>
+</div>
+
+<div class="note pass" style="margin-top:.6rem;">
+<b>使用者裁決：方案 A — 刪除實心點。</b><br>
+已從 <code>FIGS["squeeze-x2sin"]</code> 移除 <code>{ type: "dot", x: 0, y: 0 }</code>（<code>chapter1-print-standalone.html:2524</code>）。曲線仍分兩段 \([-1.1,-0.01]\)、\([0.01,1.1]\)，從兩側趨向原點但不標記函數值，與 prose「for all \(x \neq 0\)」一致。
+</div>
+<div class="note pass" style="margin-top:.6rem;">
+<b>回歸審核：</b>
+<ul style="margin:.3rem 0;">
+  <li><b>D6：</b>原點不再有任何 dot 元素，不暗示 \(f(0)\) 已定義。<span class="tag t-clean">clean</span></li>
+  <li><b>D5：</b>圖與 caption「graph of \(y = x^{2}\sin(1/x)\)」一致（未定義點無標記）。<span class="tag t-clean">clean</span></li>
+  <li><b>D1–D4, D7–D8：</b>刪一個 dot 不影響其餘維度，仍乾淨。</li>
+</ul>
+<b>本圖視覺 blocking 已歸零。</b>
+</div>
+</div>
+
+<h2>② Advisory</h2>
+
+<div class="card adv">
+<h3>Fig 1.18 <code>floor-function</code> · D4 · Advisory</h3>
+<div class="kv"><b>Codex 觀察：</b>PNG p32 中正向整數 tick marks 可見，但 \(1,2,3,4\) 標籤不易辨讀。</div>
+<div class="kv"><b>Codex 判定：</b>此圖輔助說明跳躍位置，非唯一讀值來源，故不升 blocking。</div>
+<div class="kv"><b>Codex 建議：</b>放大或重定位整數 tick labels，至少讓 \(x=3\) 清楚可讀。</div>
+
+<div class="note info" style="margin-top:.8rem;">
+<b>交叉比對：</b>
+<ul>
+  <li>gate 1 已修復此圖的 tick <code>tex</code>（原本缺失），並經回歸審核確認 label dump 含 <code>["−1","1","2","3","4"]</code>，重 render 驗證通過。</li>
+  <li>Codex 看到的是<b>修後版本</b>，承認 <code>FIGS</code> 已設定 tick labels。其 finding 指的是<b>渲染後的視覺字級</b>在列印 PNG 中偏小，非程式碼缺失。</li>
+  <li>此為字級美學層面的觀察，且 Codex 自行判定為 advisory、非承載讀值。gate 1 回歸已驗證 D4 clean（「兩軸整數刻度皆顯示可讀數字」）。</li>
+</ul>
+<b>結論：</b>可接受為低優先 advisory。<br>
+<b>使用者裁定：不動作。</b>gate 1 已修復根因（補 <code>tex</code>）並回歸通過；殘餘字級問題不影響教學。
+</div>
+</div>
+
+<h2>gate 1 ↔ gate 2 交叉比較</h2>
+
+<table>
+  <tr><th>圖</th><th>gate 1</th><th>gate 2</th><th>交集</th></tr>
+  <tr>
+    <td>Fig 1.18 <code>floor-function</code></td>
+    <td>D4 Blocking（缺 <code>tex</code>）→ <b>已修</b></td>
+    <td>D4 Advisory（字級偏小）</td>
+    <td>同一圖的 D4，gate 1 抓到根因（缺 <code>tex</code>）並修復；gate 2 在修後仍覺字級偏小，屬殘餘 cosmetic。</td>
+  </tr>
+  <tr>
+    <td>Fig 1.20 <code>squeeze-x2sin</code></td>
+    <td>D3 + D1 advisory → <b>撤回</b>（non-finding）</td>
+    <td>D6 Blocking（實心點）</td>
+    <td>gate 1 看的是 window/label 層面（判 non-finding），gate 2 看的是數學正確性（實心 vs 空心），維度不同、不矛盾。gate 2 的 D6 finding 是 gate 1 未覆蓋到的新發現。</td>
+  </tr>
+  <tr>
+    <td>Fig 1.15 <code>one-sided-infinite</code></td>
+    <td>D5 raw Blocking → <b>撤回</b>（false positive）</td>
+    <td><span class="tag t-clean">clean</span></td>
+    <td>gate 2 獨立判定四面板與 prose 一致。gate 1 的 false positive 在 gate 2 不復現，佐證 gate 1 撤回正確。</td>
+  </tr>
+  <tr>
+    <td>其餘 17 張</td>
+    <td><span class="tag t-clean">clean</span></td>
+    <td><span class="tag t-clean">clean</span></td>
+    <td>雙閘一致乾淨。</td>
+  </tr>
+</table>
+
+<h2>結論</h2>
+
+<div class="note pass">
+<b>Figure gate 2 通過：blocking 已全數歸零。</b><br>
+唯一 blocking（Fig 1.20 D6）已採方案 A 修正並回歸通過；唯一 advisory（Fig 1.18 D4）使用者裁定不動作。全 20 張圖雙閘（gate 1 + gate 2）視覺 blocking 均歸零。
+</div>
+
+<div class="note info">
+<b>gate 2 的增量價值：</b>Fig 1.20 的 D6 實心點問題確實是 gate 1 未抓到的新 finding，屬數學正確性層面（而非視覺層面），體現了獨立第二讀者的互補效果。
+</div>
+
+<p class="small" style="margin-top:2rem;">
+  本稿依據 <code>REPORT-ch01-figure-gate2-raw.md</code>（Codex 原始輸出）整理。
+  審查者：Codex（gpt-5.5, read-only, xhigh reasoning）；報告整理：Claude（Opus 4.6）。
+  raw output 中兩份重複的逐圖結論完全一致，本報告合併處理。
+</p>
+
+</div>
+</body>
+</html>
