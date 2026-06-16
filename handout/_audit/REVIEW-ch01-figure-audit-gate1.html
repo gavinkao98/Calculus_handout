@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 圖稽核 — gate 1（視覺層）審核稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  :root { --ink:#1a1a1a; --mut:#6b6b6b; --line:#e2e2e2; --bg:#fafafa; --card:#fff;
+          --blue:#1f5fbf; --red:#b3261e; --amber:#a86400; --green:#137333; --brown:#7a4a1e; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", "Microsoft JhengHei", system-ui, sans-serif;
+         color: var(--ink); background: var(--bg); line-height: 1.65; margin: 0; padding: 2rem 1.2rem 5rem; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 1.7rem; margin: 0 0 .2rem; }
+  h2 { font-size: 1.25rem; margin: 2.4rem 0 .8rem; padding-bottom: .3rem; border-bottom: 2px solid var(--line); }
+  h3 { font-size: 1.05rem; margin: 1.4rem 0 .4rem; }
+  .lede { color: var(--mut); margin: .2rem 0 1.4rem; }
+  code { background: #f0f0f0; padding: .1em .35em; border-radius: 4px; font-size: .9em;
+         font-family: "SF Mono", "Cascadia Code", Consolas, monospace; }
+  .note { border-radius: 8px; padding: .8rem 1rem; margin: 1rem 0; border: 1px solid var(--line); background: var(--card); }
+  .pass { border-left: 5px solid var(--green); background: #f1f8f3; }
+  .fixed { border-left: 5px solid var(--blue); background: #f0f5fc; }
+  .warn { border-left: 5px solid var(--amber); background: #fdf7ec; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .92rem; background: var(--card); }
+  th, td { border: 1px solid var(--line); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #f3f3f3; }
+  .tag { display: inline-block; font-size: .76rem; font-weight: 700; padding: .08em .5em; border-radius: 10px; white-space: nowrap; }
+  .t-clean { background: #e3f3e8; color: var(--green); }
+  .t-block { background: #fbe4e2; color: var(--red); }
+  .t-adv   { background: #fbf0d8; color: var(--amber); }
+  .t-wd    { background: #ececec; color: var(--mut); }
+  .t-fixed { background: #e1ecfb; color: var(--blue); }
+  .t-new   { background: #efe6f7; color: #6a3fa0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-left-width: 5px; border-radius: 8px;
+          padding: 1rem 1.1rem; margin: 1rem 0; }
+  .card.block { border-left-color: var(--red); }
+  .card.adv { border-left-color: var(--amber); }
+  .card.wd { border-left-color: #b8b8b8; }
+  .card h3 { margin-top: 0; }
+  .kv { margin: .35rem 0; }
+  .kv b { color: var(--mut); font-weight: 600; }
+  .verdict { background: #f7f7f7; border-radius: 6px; padding: .6rem .8rem; margin-top: .6rem; font-size: .92rem; }
+  figure { margin: 1rem 0; }
+  figure img { max-width: 100%; border: 1px solid var(--line); border-radius: 6px; background:#fff; }
+  figcaption { color: var(--mut); font-size: .85rem; margin-top: .3rem; }
+  .small { font-size: .85rem; color: var(--mut); }
+  ul { margin: .4rem 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Chapter 1 圖稽核 — gate 1（視覺層）審核稿</h1>
+<p class="lede">第一道閘：Claude <code>handout-figure-audit</code> subagent，對 <b>render 後的 PNG</b> 逐圖視覺稽核。依 <code>FIGURE-AUDIT-RUBRIC.md</code>（維度 D1–D8）。2026-06-16。被審物為 <code>chapter1-print-standalone.html</code> 經 <code>_render/shot.mjs</code> 截圖的 20 張圖（A4 列印版）。</p>
+
+<div class="note pass">
+<b>狀態：整章 20 張圖視覺 blocking 已歸零，figure gate 1 通過。</b><br>
+1 條 confirmed blocking（Fig 1.18 <code>floor-function</code> D4）已修並回歸通過；2 條 confirmed advisory（Fig 1.4 D4 ＋ Fig 1.18 D1）已套用並重 render 驗證；6 條經對抗式複核撤回（含 1 條 <b>false-positive blocking</b>）。本稿轉為紀錄。
+</div>
+
+<h2>方法</h2>
+<ul>
+  <li><b>render：</b><code>node _render/shot.mjs</code> 驅動本機 Chrome headless，等 MathJax v4 typeset＋圖 hydrate＋分頁完成後，逐 A4 sheet 以 2× 截圖（共 42 頁）。圖→頁對照用一次性 CDP 腳本產出。</li>
+  <li><b>audit（fan-out）：</b>20 張圖各一個 <code>handout-figure-audit</code> agent，讀該圖的整頁 PNG＋<code>FIGS</code> 繪圖原始碼（座標／tick 核對 D6）＋該節 fragment（figcaption／prose 語境 D5/D7），逐條檢查 D1–D8。</li>
+  <li><b>verify（對抗式）：</b>每一條 finding 各一個獨立複核 agent，預設立場「設法駁回」，比對 rubric 的 Non-findings 清單，把握不足一律降級。此關專抑制圖稽核最常見的失效模式 over-report。</li>
+  <li>共 28 個 agent（20 audit ＋ 8 verify）。auditor／verifier 全程唯讀。</li>
+</ul>
+
+<h2>彙總</h2>
+<table>
+  <tr><th>項目</th><th>數</th><th>說明</th></tr>
+  <tr><td>稽核圖數</td><td>20</td><td>Fig 1.1–1.21（無 1.2）；其中 <span class="tag t-new">NEW</span> 7 張為舊稿（2026-06-12，13 張）之後新增、從未過任何圖閘</td></tr>
+  <tr><td>raw findings</td><td>8</td><td>2 raw blocking ＋ 6 raw advisory</td></tr>
+  <tr><td><span class="tag t-block">confirmed blocking</span></td><td>1</td><td>Fig 1.18 D4（已修＋回歸）</td></tr>
+  <tr><td><span class="tag t-adv">confirmed advisory</span></td><td>2</td><td>Fig 1.4 D4 ＋ Fig 1.18 D1（cosmetic，已套用）</td></tr>
+  <tr><td><span class="tag t-wd">withdrawn</span></td><td>6</td><td>對抗式複核判為 non-finding（含 1 條 false-positive blocking）</td></tr>
+  <tr><td>全乾淨圖</td><td>18 / 20</td><td>含 7 張新圖中的 6 張</td></tr>
+</table>
+
+<h2>逐圖結果</h2>
+<table>
+  <tr><th>Fig</th><th>id</th><th>頁</th><th>新?</th><th>raw</th><th>最終</th></tr>
+  <tr><td>1.1</td><td><code>hlt</code></td><td>3</td><td></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.3</td><td><code>restrict-x2</code></td><td>6</td><td></td><td>0/1</td><td><span class="tag t-clean">clean</span> <span class="small">(advisory 撤回)</span></td></tr>
+  <tr><td>1.4</td><td><code>sine-not-1to1</code></td><td>8</td><td></td><td>0/1</td><td><span class="tag t-adv">1 advisory</span></td></tr>
+  <tr><td>1.5</td><td><code>restricted-sine</code></td><td>9</td><td></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.6</td><td><code>arcsin-triangle</code></td><td>11</td><td></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.7</td><td><code>restricted-cosine</code></td><td>11</td><td></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.8</td><td><code>restricted-tangent</code></td><td>13</td><td></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.9</td><td><code>arctan10-triangle</code></td><td>14</td><td><span class="tag t-new">NEW</span></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.10</td><td><code>arctan-general-triangle</code></td><td>15</td><td><span class="tag t-new">NEW</span></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.11</td><td><code>limit-same-near-a</code></td><td>17</td><td></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.12</td><td><code>read-limit-graph</code></td><td>18</td><td></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.13</td><td><code>one-sided-limits</code></td><td>21</td><td></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.14</td><td><code>piecewise-jump</code></td><td>22</td><td><span class="tag t-new">NEW</span></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.15</td><td><code>one-sided-infinite</code></td><td>24</td><td></td><td>1/0</td><td><span class="tag t-clean">clean</span> <span class="small">(blocking 撤回：false positive)</span></td></tr>
+  <tr><td>1.16</td><td><code>vertical-asymptote</code></td><td>26</td><td></td><td>0/1</td><td><span class="tag t-clean">clean</span> <span class="small">(advisory 撤回)</span></td></tr>
+  <tr><td>1.17</td><td><code>ln-asymptote</code></td><td>27</td><td><span class="tag t-new">NEW</span></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.18</td><td><code>floor-function</code></td><td>32</td><td><span class="tag t-new">NEW</span></td><td>1/0</td><td><span class="tag t-fixed">blocking 已修＋回歸</span></td></tr>
+  <tr><td>1.19</td><td><code>squeeze-theorem</code></td><td>33</td><td><span class="tag t-new">NEW</span></td><td>0/0</td><td><span class="tag t-clean">clean</span></td></tr>
+  <tr><td>1.20</td><td><code>squeeze-x2sin</code></td><td>34</td><td><span class="tag t-new">NEW</span></td><td>0/2</td><td><span class="tag t-clean">clean</span> <span class="small">(2 advisory 撤回)</span></td></tr>
+  <tr><td>1.21</td><td><code>precise-limit</code></td><td>37</td><td></td><td>0/1</td><td><span class="tag t-clean">clean</span> <span class="small">(advisory 撤回)</span></td></tr>
+</table>
+
+<h2>① Confirmed blocking — 已修＋回歸</h2>
+
+<div class="card block">
+<h3>Fig 1.18 <code>floor-function</code> · D4 · <span class="tag t-new">NEW</span></h3>
+<div class="kv"><b>結論：</b>兩軸整數刻度 1,2,3,4 的 tick entry 缺 <code>tex</code>；<code>buildPlot</code> 的 <code>piTex</code> fallback 只認 \(\pi\) 倍數與 0、不認純整數，因此只畫刻度線、不出數字。讀者讀不出階高與跳點所在整數。</div>
+<div class="kv"><b>為何 blocking：</b>Example 1.33 是讀值題（\(x\to3^-\) 為 2、\(x\to3^+\) 為 3）。承載教學值的軸缺刻度文字 → 讀者無法讀值，正是 rubric 明列的 D4 Blocking 案，且與舊稿 B4/B5（restricted-sine／read-limit-graph）同一缺陷類型。</div>
+<div class="kv"><b>證據：</b><code>chapter1-print-standalone.html:2481-2482</code> — <code>xticks/yticks</code> 的 1..4 無 <code>tex</code>；render 後 PNG 僅 \(-1\) 有數字。</div>
+<div class="verdict"><b>對抗式複核：</b><span class="tag t-block">UPHELD — Blocking</span>　code＋pixel 雙重核對：tick 確無 <code>tex</code>、piTex 對純整數回傳 undefined、render 僅 \(-1\) 有字；非 rubric 保護的 non-finding，與逐字命中的 D4 Blocking 案吻合，維持 blocking。</div>
+
+<h3 style="margin-top:1.2rem;">修法（已套用）</h3>
+<div class="kv">於 <code>FIGS</code> 的 <code>floor-function</code> 定義為 1,2,3,4 補 <code>tex</code>（比照既有的 <code>-1</code> entry、亦即舊稿 B4/B5 的同款補法）：</div>
+<pre style="background:#f0f0f0;padding:.7rem;border-radius:6px;overflow:auto;font-size:.82rem;">xticks: [{x:-1,tex:"-1"},{x:1,tex:"1"},{x:2,tex:"2"},{x:3,tex:"3"},{x:4,tex:"4"}]
+yticks: [{y:-1,tex:"-1"},{y:1,tex:"1"},{y:2,tex:"2"},{y:3,tex:"3"},{y:4,tex:"4"}]</pre>
+<div class="kv small"><code>FIGS</code> 位於 standalone 的 script 區、在 <code>build.py</code> 的 BEGIN/END-CONTENT-FRAGMENTS 替換區之外，故此修法不會被重 build 覆蓋。</div>
+<figure>
+  <img src="../_render/out/ch01-fig118-after-fix.png" alt="floor-function after fix">
+  <figcaption>修後 3× 放大：x 軸 \(-1,1,2,3,4\)、y 軸 \(-1,1,2,3,4\) 皆渲染可讀（修前僅 \(-1\)）。標籤文字程式化萃取確認：<code>["x","y","−1","1","2","3","4","−1","1","2","3","4","y=[x]"]</code>。</figcaption>
+</figure>
+<div class="verdict"><b>回歸審核（獨立 agent）：</b><span class="tag t-clean">D4 clean</span>　兩軸整數刻度皆顯示可讀數字、Example 1.33 讀值可從圖直接取得；D2/D3/D5/D6/D7/D8 仍乾淨；<b>本圖視覺 blocking 已歸零</b>。回歸另提一條 D1 <b>advisory</b>（見下），非 blocking。</div>
+</div>
+
+<h2>② Confirmed advisory — 已套用＋重 render 驗證</h2>
+
+<div class="card adv">
+<h3>Fig 1.4 <code>sine-not-1to1</code> · D4</h3>
+<div class="kv"><b>內容：</b>y 軸 \(\pm1\) 的 tick 無 <code>tex</code>（同 piTex 不認整數），故只有刻度線、無 \(1\)/\(-1\) 數字。姊妹圖 <code>restricted-sine</code> 已明標 <code>tex:"-1"/"1"</code>，故屬不一致。</div>
+<div class="kv"><b>為何只是 advisory：</b>本圖教學點是「水平線 \(y=c\) 與 \(\sin x\) 多次相交」，由 \(y=0.5\) 虛線＋5 個交點＋\(x\) 軸 \(\pm\pi,\pm2\pi\) 承載；\(y\) 軸振幅 \(\pm1\) 非承載值。圖讀起來無誤。</div>
+<div class="verdict"><b>對抗式複核：</b><span class="tag t-adv">UPHELD — Advisory</span>　確為真（與姊妹圖不一致屬實），但非承載軸 → 依 rubric 為 advisory，非 blocking、非 non-finding。建議修法（與姊妹圖一致化）：<code>yticks:[{y:-1,tex:"-1"},{y:1,tex:"1"}]</code>。<br><b>已套用：</b>\(y\) 軸 \(\pm1\) 補 <code>tex</code>，重 render 確認 \(-1,1\) 已顯示（label dump 含 <code>"−1","1"</code>）。</div>
+</div>
+
+<div class="card adv">
+<h3>Fig 1.18 <code>floor-function</code> · D1 · <span class="small">（回歸時新提）</span></h3>
+<div class="kv"><b>內容：</b>y 軸的 \(-1\) 刻度標籤與 \(y=-1\) 那段階梯線（\(x\in[-1,0]\)）及其右端空心點視覺相鄰／輕度重疊。</div>
+<div class="kv"><b>定性：</b>此 \(-1\) ytick <b>在本次修法前即已存在</b>（修前 <code>-1</code> 是唯一帶 <code>tex</code> 者；本次只新增正向 1–4），故此 crowding 為<b>既有現象、非本次引入</b>。首輪 audit 判 D1 clean；回歸 agent 判低優先 advisory。數字仍可辨、且 \(-1\) 非 Example 1.33 讀值所需（讀值在第一象限）。</div>
+<div class="verdict"><b>已套用（採 b）：</b>省略 \(y\) 軸 \(-1\) 標籤（保留 \(x\) 軸 \(-1\) 錨定負向尺度，與其他圖只標承載刻度一致）。重 render 確認 crowding 消除、無新碰撞（label dump 顯示 \(y\) 軸僅 \(1,2,3,4\)）。</div>
+</div>
+
+<h2>③ Withdrawn — 對抗式複核判為 non-finding（6 條）</h2>
+
+<div class="card wd">
+<h3>Fig 1.15 <code>one-sided-infinite</code> · D5 · <span class="tag t-block">raw Blocking</span> → <span class="tag t-wd">false positive</span></h3>
+<div class="kv"><b>原指控：</b>右下面板曲線在漸近線右側（\(a^+\)）但 note 標 \(a^-\)，第四案 \(a^+,-\infty\) 被錯標。</div>
+<div class="verdict"><b>對抗式複核：</b><span class="tag t-wd">non-finding</span>　駁回——指控的關鍵證據不實。<code>chapter1-print-standalone.html:2411</code> 實際為 <code>\(\lim_{x\to a^{+}} f(x)=-\infty\)</code>（正確的 \(a^+\)）。四面板與 prose／figcaption 列舉的四案一一對應：TL \(a^-,+\infty\)／TR \(a^+,+\infty\)／BL \(a^-,-\infty\)／BR \(a^+,-\infty\)。auditor 在該 render 縮放下誤讀上標、再杜撰了與檔案矛盾的行號宣稱；其「修法」反而會植入它所指控的缺陷。<span class="small">（已另由人工核對 source 確認一致。）</span></div>
+</div>
+
+<div class="grid2">
+<div class="card wd">
+<h3>Fig 1.3 <code>restrict-x2</code> · D4</h3>
+<div class="kv small"><b>原：</b>兩軸無數字刻度。</div>
+<div class="verdict"><span class="tag t-wd">non-finding</span>　非承載軸 minimalism（純定性反射示意，課文不要求讀座標），rubric 明文「非承載軸缺刻度 → advisory」且原審自標 optional；加刻度純美學，降為 non-finding。</div>
+</div>
+<div class="card wd">
+<h3>Fig 1.16 <code>vertical-asymptote</code> · D3</h3>
+<div class="kv small"><b>原：</b>\(\pm20\) 尺度下 \(y=2\) 水平漸近線刻度貼近 \(x\) 軸。</div>
+<div class="verdict"><span class="tag t-wd">non-finding</span>　本圖承載點是 \(x=3\) 垂直漸近線（清楚可辨）；\(y=2\) 非 figcaption／Example 1.23 教學點。把非承載 HA 的壓縮提為 finding 即 over-report。</div>
+</div>
+<div class="card wd">
+<h3>Fig 1.20 <code>squeeze-x2sin</code> · D3</h3>
+<div class="kv small"><b>原：</b>\(y\)-window 不對稱（\(-0.8..1.2\)），下包絡看似被裁。</div>
+<div class="verdict"><span class="tag t-wd">non-finding</span>　圖未繪 plot-box 邊框，讀者看不出「被裁」，曲線只是自然收尾；對稱性屬美學偏好，未影響可讀性。</div>
+</div>
+<div class="card wd">
+<h3>Fig 1.20 <code>squeeze-x2sin</code> · D1</h3>
+<div class="kv small"><b>原：</b>曲線 label 的 \(\tfrac{1}{x}\) 略擠。</div>
+<div class="verdict"><span class="tag t-wd">non-finding</span>　label 在空白處、不蓋任何元素（原審亦承認），\(1/x\) 仍可讀；字級偏好屬保護 non-finding，且換記號是 copyedit、超出視覺閘範圍。</div>
+</div>
+</div>
+
+<div class="card wd">
+<h3>Fig 1.21 <code>precise-limit</code> · D5</h3>
+<div class="kv small"><b>原：</b>中央兩點（\((a,L)\) 空心、\(f(a)\) 實心）未直接標 <code>f(a)</code>，初看可能不確定。</div>
+<div class="verdict"><span class="tag t-wd">non-finding</span>　標準 \(\varepsilon\)-\(\delta\) 慣例（空心＝極限值、實心＝實際值）＋緊鄰散文「The value \(f(a)\) itself may be different from \(L\)」已消歧義；§10 明文「direct label permitted, not required for every mark」。原審自標 Optional／not blocking — 一條「無需動作」的條目即非缺陷。</div>
+</div>
+
+<h2>結論與後續</h2>
+<div class="note pass">
+<b>Figure gate 1（視覺層）對 Chapter 1 全 20 張圖通過：視覺 blocking 已全數歸零。</b>
+唯一 confirmed blocking（Fig 1.18 D4，新圖）已修＋回歸；對抗式複核成功擋下 1 條 false-positive blocking 與 5 條 over-report advisory，校準與舊稿 B4/B5、math gate-1 一致。
+</div>
+<div class="note pass">
+<b>兩條 advisory 已套用（使用者裁定）並重 render 驗證：</b>
+<ul>
+  <li>Fig 1.4 <code>sine-not-1to1</code> D4：\(y\) 軸 \(\pm1\) 補 <code>tex</code>（與姊妹圖一致）。✓</li>
+  <li>Fig 1.18 <code>floor-function</code> D1：省略 \(y\) 軸 \(-1\) 標籤、消除與階梯段的 crowding。✓</li>
+</ul>
+與 Fig 1.18 的 blocking 修正一併 commit。
+</div>
+<div class="note fixed">
+<b>gate 2（Codex 視覺第二讀者）：</b>依 rubric，圖的 Codex 第二讀者是「定稿前的信心複核（非每輪必跑、<b>計費需同意</b>）」。要不要跑、何時跑，等你決定。
+</div>
+
+<p class="small" style="margin-top:2rem;">本稿為紀錄性質。圖片引用本機 <code>handout/_render/out/</code>（gitignore），換機需重跑 <code>shot.mjs</code> 重生。live 圖請開 <code>chapter1-print-standalone.html</code>。</p>
+
+</div>
+</body>
+</html>
