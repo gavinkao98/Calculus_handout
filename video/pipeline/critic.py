@@ -1,31 +1,39 @@
-"""critic.py -- P1 visual-critique scaffold (Code2Video adoption, advisory only).
+"""critic.py -- external visual-frame critic (VLM gate 2; advisory only).
 
-What this is: the OFFLINE, zero-API half of the VLM critic. It extracts the
-fullest frame of each narration beat from already-rendered scene videos and lays
-out exactly what would be sent to a vision model -- WITHOUT calling one. The
-billed call is a separate, gated step (see `critique_frame`), because every paid
-API call needs explicit per-run approval with a cost estimate (CLAUDE.md).
+The OFFLINE, zero-API half extracts the fullest frame of each content scene from
+already-rendered scene videos and lays out exactly what would be sent to a vision
+model -- WITHOUT calling one. The billed call is a separate, gated step (see
+`critique_frame`), because every paid/external API call needs explicit per-run
+approval with a cost estimate (CLAUDE.md).
+
+Role in the review model: this is GATE 2 of the visual-frame audit -- the
+external-VLM confidence check that mirrors the handout's figure-audit gate 2.
+Gate 1 is a free Claude frame-grab subagent reading the same frames against
+VISUAL-FRAME-RUBRIC.md every render; gate 2 (this, MiMo-V2.5) runs intermittently
+before lock to cover gate 1's model blind spots. Both judge against the SAME SSOT
+rubric, which this script injects VERBATIM into the prompt -- the dimensions live
+only in VISUAL-FRAME-RUBRIC.md, never a second copy here. Convergence = visual
+Blocking (V1-V8) == 0; A1-A7 are 0-100 magnitude that drive re-render priority.
 
 Why frames, not the whole video: a content scene's reveal is additive (scene.py
 _play_content), so the end of each beat is the fullest composition up to that
 point -- the moment most likely to expose overlap / crowding / imbalance. One
-PNG per beat is far cheaper than analysing every frame, and it is the same set a
-VLM would need to judge layout.
+PNG per scene is far cheaper than analysing every frame, and it is the same set
+the gate-1 subagent needs.
 
-Philosophy (unchanged from CODE2VIDEO_STUDY.md P1): the model drafts a *report*
-for a human to act on -- it never edits the storyboard. The human stays the
-layout authority; the VLM only widens what gets noticed. The five scoring
-dimensions are the AES rubric written into DESIGN.md (Visual QA).
+Philosophy: the model drafts a *report* for a human to act on -- it never edits
+the storyboard. The human stays the layout authority; the VLM only widens what
+gets noticed.
 
 Pipeline:
     storyboard.yml + output/audio/<id>/manifest.json + output/_media/.../*.mp4
-        -> extract_frames()   ffmpeg grabs one PNG per beat            (offline)
-        -> build_prompt()     frame + title + beat narration + reveals (offline)
-        -> --dry-run          print the plan + a cost estimate         (offline)
-        -> critique_frame()   the one billed call, gated               (TODO: wire)
+        -> extract_frames()   ffmpeg grabs one fresh PNG per scene      (offline)
+        -> build_prompt()     frame + VISUAL-FRAME rubric + beat context (offline)
+        -> --dry-run          print the plan + a cost estimate          (offline)
+        -> critique_frame()   the one billed call, gated behind --confirm
 
 Run (offline, no key needed):
-    python video/pipeline/critic.py --storyboard video/storyboards/ch01_inverse_functions.yml --dry-run
+    python video/pipeline/critic.py --storyboard video/storyboards/_demo_derivation.yml --dry-run
 """
 from __future__ import annotations
 
@@ -55,13 +63,15 @@ LEAD_SECONDS = SCENE_LEAD_SECONDS
 BEAT_BACKOFF = 0.20     # grab this far before a beat boundary: reveal has settled,
                         # next beat not yet started (fullest frame for THIS beat)
 
-# Placeholder pricing for the cost estimate, clearly labelled -- replace with the
-# confirmed MiMo-V2.5 (omnimodal) vision rates once the provider is fixed. Sources
-# put MiMo-V2.5 inference at ~half MiMo-V2.5-Pro ($0.435/$0.87 per 1M tok).
-PRICE_IN_PER_MTOK = 0.22    # USD per 1M input tokens  (PLACEHOLDER)
-PRICE_OUT_PER_MTOK = 0.44   # USD per 1M output tokens (PLACEHOLDER)
-EST_IMAGE_TOKENS = 1100     # rough input tokens for one 480p frame (PLACEHOLDER)
-EST_PROMPT_TOKENS = 320     # rough input tokens for the text prompt
+# Cost estimate. MiMo-V2.5 (omnimodal) is Xiaomi's FREE public beta as of 2026-06
+# (the same key/endpoint the project already uses for TTS), so the USD figure is
+# $0. The call is still an EXTERNAL API, so --dry-run prints token magnitude and a
+# run stays consent-gated per CLAUDE.md. If MiMo leaves free beta, set real rates
+# here and the estimate updates; the token sizes below are rough, for magnitude.
+PRICE_IN_PER_MTOK = 0.0     # USD per 1M input tokens  (MiMo free public beta, 2026-06)
+PRICE_OUT_PER_MTOK = 0.0    # USD per 1M output tokens (MiMo free public beta, 2026-06)
+EST_IMAGE_TOKENS = 1100     # rough input tokens for one 480p frame (magnitude only)
+EST_PROMPT_TOKENS = 800     # text prompt + verbatim-injected VISUAL-FRAME rubric
 EST_OUTPUT_TOKENS = 1700    # output tokens/frame: ~1300 MiMo reasoning + ~400 JSON
 
 # MiMo platform (Xiaomi): OpenAI-compatible /chat/completions. Auth is the custom
@@ -70,6 +80,21 @@ EST_OUTPUT_TOKENS = 1700    # output tokens/frame: ~1300 MiMo reasoning + ~400 J
 # var MIMO_API_KEY -- never a file, never logged, never committed.
 DEFAULT_BASE_URL = "https://api.xiaomimimo.com/v1"
 DEFAULT_MODEL = "mimo-v2.5"
+
+# The visual-frame audit SSOT. Injected VERBATIM into the prompt so the dimensions
+# live in exactly one place (VISUAL-FRAME-RUBRIC.md) -- the same file gate 1 reads.
+RUBRIC_PATH = (Path(__file__).resolve().parent.parent
+               / "content_scripts" / "_audit" / "VISUAL-FRAME-RUBRIC.md")
+
+
+def load_rubric() -> str:
+    """Read the VISUAL-FRAME rubric body for verbatim injection. Falls back to a
+    one-line pointer if the file is missing, so an offline dry-run never crashes."""
+    try:
+        return RUBRIC_PATH.read_text(encoding="utf-8").strip()
+    except OSError:
+        return ("(VISUAL-FRAME-RUBRIC.md not found; judge V1-V8 visual blocking "
+                "and score A1-A7 magnitude 0-100.)")
 
 
 # ---- inputs -------------------------------------------------------------
@@ -184,6 +209,9 @@ def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
         frame_dir.mkdir(parents=True, exist_ok=True)
         name = "final.png" if item.get("final") else f"beat_{item['beat_index']:02d}.png"
         frame_path = frame_dir / name
+        # freshness: drop any prior PNG first so a failed grab can never leave a
+        # stale frame that the gate-1 subagent would read as current.
+        frame_path.unlink(missing_ok=True)
         res = subprocess.run(
             ["ffmpeg", "-y", "-ss", f"{ts:.3f}", "-i", str(video),
              "-frames:v", "1", "-q:v", "2", str(frame_path)],
@@ -197,21 +225,13 @@ def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
 
 # ---- prompt -------------------------------------------------------------
 
-RUBRIC = (
-    "- Element Layout: overlap, crowding, spilling past the safe margin, balance; "
-    "graph labels must not sit on top of curves, points, hollow points, guide lines, or markers.\n"
-    "- Attractiveness: clear and purposeful, not a flat text slide.\n"
-    "- Logic Flow: does what is shown match this narration beat.\n"
-    "- Visual Consistency: consistent accent colours, font sizes, spacing.\n"
-    "- Accuracy & Depth: does the visual convey the point; any visible labelling problem."
-)
-
-
-def build_prompt(item: dict) -> str:
+def build_prompt(item: dict, rubric: str) -> str:
     """The text half of one critique request (the frame image travels alongside).
-    Mirrors DESIGN.md's Visual QA five dimensions; asks for strict JSON so the
-    report is machine-collatable. Two framings: a final-frame critique (judge the
-    finished composition) vs a mid-beat critique (emptiness is expected)."""
+    Injects VISUAL-FRAME-RUBRIC.md VERBATIM (the single source of the dimensions,
+    the blocking line, and the 'not a finding' list) and asks for strict JSON:
+    V1-V8 blocking findings + A1-A7 magnitude scores, so the report is
+    machine-collatable. Two framings: a final-frame critique (judge the finished
+    composition) vs a mid-beat critique (emptiness is expected)."""
     if item.get("final"):
         ctx = (
             "This is the FINAL, fullest frame of the scene -- every element that "
@@ -231,16 +251,30 @@ def build_prompt(item: dict) -> str:
             f"Elements visible by now: {revealed}\n"
         )
     return (
-        "You are a visual-layout critic for an educational mathematics video "
-        "(3Blue1Brown style, dark theme). NOTE the house style is deliberately flat "
-        "and minimal -- a solid dark background with NO gradients, noise, or grid is "
-        "intentional, not a defect; do not suggest adding them.\n\n"
+        "You are the external visual-frame critic (gate 2) for an educational "
+        "mathematics video. Judge the attached frame STRICTLY against the rubric "
+        "below -- it is the single source of truth for the dimensions, the blocking "
+        "line, and what is NOT a finding.\n\n"
+        "=== VISUAL-FRAME RUBRIC (verbatim) ===\n" + rubric +
+        "\n=== END RUBRIC ===\n\n"
         + ctx +
-        "\nScore each dimension 0-100 and list concrete, specific defects with where "
-        "in the frame they are:\n" + RUBRIC + "\n\n"
+        "\nNow judge THIS frame.\n"
+        "- Layer 1 (V1-V8): for each visual issue cite the V-code and mark "
+        "Blocking vs Advisory per the escalation rule -- loses info / contradicts "
+        "the beat / garbled or missing math -> Blocking; merely cramped or unclear "
+        "-> Advisory (score it in Layer 2 instead). Count the Blocking ones.\n"
+        "- Layer 2 (A1-A7): score each 0-100 and list concrete defects with where "
+        "in the frame they are.\n"
+        "Honour the rubric's 'not a finding' list (dark-flat minimal background, "
+        "progressive reveal, still frame, deliberate schematic scale). A clean "
+        "frame is a valid result -- do not over-report.\n\n"
         "Return STRICT JSON only:\n"
-        '{"scores":{"element_layout":int,"attractiveness":int,"logic_flow":int,'
-        '"visual_consistency":int,"accuracy_depth":int},'
+        '{"visual_blocking_count":int,'
+        '"v_findings":[{"code":"V1..V8","severity":"Blocking|Advisory",'
+        '"where":str,"issue":str,"why":str,"suggestion":str}],'
+        '"scores":{"a1_element_layout":int,"a2_attractiveness":int,'
+        '"a3_logic_flow":int,"a4_visual_consistency":int,"a5_accuracy_depth":int,'
+        '"a6_typography_wrapping":int,"a7_hierarchy_focus":int},'
         '"defects":[{"dimension":str,"severity":"low|med|high","where":str,'
         '"issue":str,"suggestion":str}],"overall":str}'
     )
@@ -275,7 +309,7 @@ def _extract_json(text: str) -> dict:
         return json.loads(re.sub(r'\\(?![\\"/bfnrtu])', r'\\\\', s))
 
 
-def critique_frame(item: dict, *, base_url: str, api_key: str, model: str,
+def critique_frame(item: dict, *, base_url: str, api_key: str, model: str, rubric: str,
                    max_tokens: int = 8000, timeout: int = 180, retries: int = 3) -> dict:
     """One billed vision call: frame image + build_prompt(item) -> parsed JSON
     critique + token usage. OpenAI-compatible /chat/completions on the MiMo
@@ -292,7 +326,7 @@ def critique_frame(item: dict, *, base_url: str, api_key: str, model: str,
         "messages": [{
             "role": "user",
             "content": [
-                {"type": "text", "text": build_prompt(item)},
+                {"type": "text", "text": build_prompt(item, rubric)},
                 {"type": "image_url",
                  "image_url": {"url": _image_data_url(item["frame_path"])}},
             ],
@@ -332,7 +366,9 @@ def critique_frame(item: dict, *, base_url: str, api_key: str, model: str,
 
 
 def _write_md(results: list[dict], path: Path) -> None:
-    out = ["# Visual critique (MiMo-V2.5) -- advisory report\n"]
+    out = ["# Visual-frame critique (MiMo-V2.5, gate 2) -- advisory report\n",
+           "> Convergence = visual Blocking (V1-V8) == 0. A1-A7 are 0-100 "
+           "magnitude (drive re-render priority; advisory, do not gate).\n"]
     for r in results:
         lab = "final frame" if r.get("final") else f"beat {r['beat_index']:02d}"
         out.append(f"## {r['scene_number']:02d} {r['scene_id']} -- {lab}")
@@ -342,13 +378,26 @@ def _write_md(results: list[dict], path: Path) -> None:
             out.append("> could not parse JSON; raw model output:\n")
             out.append("```\n" + (r.get("raw") or "")[:1500] + "\n```\n")
             continue
+        vf = c.get("v_findings", []) or []
+        n_block = c.get("visual_blocking_count")
+        if n_block is None:
+            n_block = sum(1 for f in vf
+                          if str(f.get("severity", "")).lower().startswith("block"))
+        out.append(f"**VERDICT: {n_block} visual blocking**\n")
+        for f in vf:
+            why = f" — {f['why']}" if f.get("why") else ""
+            sug = f" → {f['suggestion']}" if f.get("suggestion") else ""
+            out.append(f"- **[{f.get('severity','?')}] {f.get('code','V?')}** "
+                       f"({f.get('where','?')}): {f.get('issue','?')}{why}{sug}")
         sc = c.get("scores", {})
         if sc:
-            out.append("| Element Layout | Attractiveness | Logic Flow | Visual Consistency | Accuracy & Depth |")
-            out.append("|---|---|---|---|---|")
-            out.append(f"| {sc.get('element_layout','?')} | {sc.get('attractiveness','?')} | "
-                       f"{sc.get('logic_flow','?')} | {sc.get('visual_consistency','?')} | "
-                       f"{sc.get('accuracy_depth','?')} |\n")
+            out.append("\n| A1 Layout | A2 Attract | A3 Flow | A4 Consist | "
+                       "A5 Acc&Depth | A6 Typo/wrap | A7 Hierarchy |")
+            out.append("|---|---|---|---|---|---|---|")
+            out.append(f"| {sc.get('a1_element_layout','?')} | {sc.get('a2_attractiveness','?')} | "
+                       f"{sc.get('a3_logic_flow','?')} | {sc.get('a4_visual_consistency','?')} | "
+                       f"{sc.get('a5_accuracy_depth','?')} | {sc.get('a6_typography_wrapping','?')} | "
+                       f"{sc.get('a7_hierarchy_focus','?')} |\n")
         for d in c.get("defects", []) or []:
             out.append(f"- **[{d.get('severity','?')}] {d.get('dimension','?')}** "
                        f"({d.get('where','?')}): {d.get('issue','?')} "
@@ -360,7 +409,8 @@ def _write_md(results: list[dict], path: Path) -> None:
 
 
 def run_critique(plan: list[dict], *, base_url: str, api_key: str, model: str,
-                 out_dir: Path, smoke: bool = False, delay: float = 0.6) -> "list[dict] | None":
+                 out_dir: Path, rubric: str, smoke: bool = False,
+                 delay: float = 0.6) -> "list[dict] | None":
     have = [p for p in plan if p.get("frame_path")]
     if smoke:
         have = have[:1]
@@ -376,7 +426,8 @@ def run_critique(plan: list[dict], *, base_url: str, api_key: str, model: str,
                   ("scene_id", "scene_number", "beat_index", "title", "frame_path", "final")}
         # one bad frame must not lose the batch: record it and carry on
         try:
-            r = critique_frame(item, base_url=base_url, api_key=api_key, model=model)
+            r = critique_frame(item, base_url=base_url, api_key=api_key,
+                               model=model, rubric=rubric)
         except urllib.error.HTTPError as e:  # noqa: PERF203
             msg = e.read().decode("utf-8", "replace")[:300]
             print(f"           HTTP {e.code}: {msg}  -- skipped", flush=True)
@@ -406,7 +457,8 @@ def run_critique(plan: list[dict], *, base_url: str, api_key: str, model: str,
     ok = len(results) - failures
     print(f"\n[critic] done: {ok}/{len(results)} ok"
           f"{f', {failures} failed' if failures else ''}; tokens {tin:,} in + {tout:,} out "
-          f"-> ~${usd:.4f} (placeholder rates). reports -> {out_dir / 'critique.md'}", flush=True)
+          f"-> ~${usd:.4f} (MiMo free public beta, 2026-06). "
+          f"reports -> {out_dir / 'critique.md'}", flush=True)
     return results
 
 
@@ -419,7 +471,7 @@ def estimate_cost(n_frames: int) -> dict:
     return {"frames": n_frames, "input_tokens": in_tok, "output_tokens": out_tok, "usd": usd}
 
 
-def dry_run(plan: list[dict]) -> None:
+def dry_run(plan: list[dict], rubric: str) -> None:
     have = [p for p in plan if p.get("frame_path")]
     print(f"\n[dry-run] {len(have)}/{len(plan)} frames extracted; "
           f"NO API call. This is what WOULD be sent to MiMo-V2.5:\n", flush=True)
@@ -430,18 +482,26 @@ def dry_run(plan: list[dict]) -> None:
         print(f"  {p['scene_number']:02d} {p['scene_id']} {lab} @ {ts} -> {tag}", flush=True)
     if have:
         print("\n  --- example prompt (first extracted frame) ---", flush=True)
-        for line in build_prompt(have[0]).splitlines():
+        for line in build_prompt(have[0], rubric).splitlines():
             print(f"  | {line}", flush=True)
     est = estimate_cost(len(have))
     print(f"\n[estimate] {est['frames']} frames -> ~{est['input_tokens']:,} in + "
           f"~{est['output_tokens']:,} out tokens -> ~${est['usd']:.3f} "
-          f"(PLACEHOLDER pricing; confirm MiMo-V2.5 vision rates before any run).",
-          flush=True)
+          f"(MiMo-V2.5 free public beta, 2026-06; external API -- consent still "
+          f"required per CLAUDE.md before --confirm).", flush=True)
     print("[note] no key was used and no request was sent.", flush=True)
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="P1 visual-critique scaffold (offline; billed call gated).")
+    # The injected rubric and model output are UTF-8 (Chinese + ✓/✗); a Windows
+    # cp950 console would otherwise crash on the dry-run prompt echo.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+    parser = argparse.ArgumentParser(
+        description="External visual-frame critic / gate 2 (offline plan; billed VLM call gated).")
     parser.add_argument("--storyboard", required=True, type=Path)
     parser.add_argument("--scene", default="all", help="id, 'a,b,c', or 'all'")
     parser.add_argument("--dry-run", action="store_true",
@@ -469,6 +529,7 @@ def main() -> int:
         print("[critic] no content beats selected.", flush=True)
         return 0
     print(f"[critic] {deck_id}: planning {len(plan)} frame(s) across content scenes", flush=True)
+    rubric = load_rubric()
     plan = extract_frames(deck_id, plan, out_dir)
     (out_dir / "frame_plan.json").write_text(
         json.dumps(plan, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -480,10 +541,11 @@ def main() -> int:
                   "(never pass it on the command line as a flag).", flush=True)
             return 2
         res = run_critique(plan, base_url=args.base_url, api_key=api_key,
-                           model=args.model, out_dir=out_dir, smoke=args.smoke)
+                           model=args.model, out_dir=out_dir, rubric=rubric,
+                           smoke=args.smoke)
         return 0 if res else 1
     if args.dry_run:
-        dry_run(plan)
+        dry_run(plan, rubric)
     else:
         print("[critic] frames extracted. Re-run with --dry-run for the send plan + "
               "estimate, or --confirm to run the billed critique (env MIMO_API_KEY).",

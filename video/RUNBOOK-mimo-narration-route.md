@@ -5,9 +5,9 @@
 > `video/DESIGN.md` §「MiMo 口語軌」、`video/REBUILD_STATUS.md` 2026-06-14 節。
 
 **前提（重要）：** 此路線需要該節的**正典 storyboard** `video/storyboards/<deck>.yml`（含 `say` ＋ `{show}`）。
-目前只有 §1.1（`ch01_inverse_functions`）、§1.6（`ch01_precise_limit`）有 storyboard；
-§1.2/1.3/1.4/1.5 仍在「內容稿＋narration HTML、待認可、**尚無 storyboard**」階段——
-那些節**先別跑本路線的影片步驟**，可先用下方「念法慣例」＋ NFA（旁白忠實稽核，原 Mode B）把口語版納入認可包，
+目前 `storyboards/` 僅存 `_demo_*.yml`（模板示範／回歸樣本），**無任何正典章節 storyboard**——
+舊 ch01_* 練習已於 2026-06-16 全數廢棄、將從講義逐節重跑。故任一章節節在**該節 storyboard 落地前
+先別跑本路線的影片步驟**；可先用下方「念法慣例」＋ NFA（旁白忠實稽核，原 Mode B）把口語版納入認可包，
 storyboard 落地後再走完整流程。
 
 ---

@@ -1,16 +1,16 @@
 """make.py -- single-entry orchestrator for the rebuilt video pipeline.
 
-Replaces the gen-2 three-CLI chain (tts.py -> build.py -> mux.py) with ONE
-command: parse -> synth -> render -> compose. The manual hand-off between stages
-(and its no-cache, edit-one-word-rerun-everything debt) is gone; the retained
-lower-layer assets are reused as-is:
+Replaces the gen-2 three-CLI chain with ONE command: parse -> synth -> render ->
+compose. The manual hand-off between stages (and its no-cache,
+edit-one-word-rerun-everything debt) is gone; the retained lower-layer assets are
+reused as-is:
 
   - narration.parse_say        split `say` into reveal-timed beats
   - audio.py                   WAV write / measure / concat
   - scene.LessonScene          audio-driven reveal alignment (the core insight)
   - blocks / templates / brand / theme   Direction B visuals
 
-    python video/make.py --storyboard video/storyboards/ch01_inverse_functions.yml --backend mock
+    python video/make.py --storyboard video/storyboards/_demo_derivation.yml --backend mock
 
 Stages:
   parse    read storyboard -> meta + scene specs + per-scene beats
@@ -18,8 +18,9 @@ Stages:
   render   Manim renders each scene silent; reveal hold = measured beat duration
   compose  ffmpeg lays narration under each scene, concats to output/<id>.mp4
 
-Only `mock` synthesis is wired here. Real Gemini TTS is billed and needs explicit
-per-run approval (CLAUDE.md), so it is intentionally not callable from this path.
+Only `mock` synthesis is wired here. Real audio is the MiMo route: run
+`tts.py --backend mimo` (billed/external -- needs per-run approval, CLAUDE.md),
+then `make.py --reuse-audio` to render against that real manifest.
 """
 from __future__ import annotations
 
@@ -139,9 +140,9 @@ def synth(meta: dict, scenes: list[dict], scene_numbers: dict[str, int],
           audio_dir: Path, backend: str, *, empty_seconds: float) -> dict:
     if backend != "mock":
         raise SystemExit(
-            f"backend '{backend}' is not wired in make.py. Real Gemini TTS is "
-            "billed and needs explicit per-run approval (see CLAUDE.md). Use "
-            "--backend mock (offline, silent) for now."
+            f"backend '{backend}' is not wired in make.py. Real audio is the MiMo "
+            "route: run `tts.py --backend mimo` (billed/external, CLAUDE.md), then "
+            "`make.py --reuse-audio`. make.py itself only does --backend mock."
         )
     audio_dir.mkdir(parents=True, exist_ok=True)
     manifest: dict = {
@@ -434,8 +435,7 @@ def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
     the stream ~lead+tail seconds shorter than the video. The concat demuxer then
     advances audio and video by each stream's own length, so the shortfall makes
     A/V drift apart scene by scene (and the gap grows with lead/tail). A
-    video-length audio stream keeps every segment in sync, like _mux_silent.
-    KEEP IN SYNC with mux.py._mux_content."""
+    video-length audio stream keeps every segment in sync, like _mux_silent."""
     vf = _fade_vf(video, fade)
     vcodec = (["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p"]
               if vf else ["-c:v", "copy"])
@@ -515,7 +515,8 @@ def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None]
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--storyboard", required=True, type=Path)
-    parser.add_argument("--backend", default="mock", choices=("mock", "gemini"))
+    parser.add_argument("--backend", default="mock", choices=("mock",),
+                        help="only mock (silent) is wired here; real audio = tts.py mimo + --reuse-audio")
     parser.add_argument("--scene", default="all", help="id, 'a,b,c', or 'all'")
     parser.add_argument("--quality", default="high", choices=("low", "medium", "high", "4k"),
                         help="low/medium = fast scratch (480p/720p); high = 1080p testing "
@@ -534,9 +535,27 @@ def main() -> int:
                         help="skip the pre-render storyboard garble lint")
     parser.add_argument("--skip-sizecheck", action="store_true",
                         help="skip the pre-render stacked-prose size-consistency guard")
+    parser.add_argument("--skip-schema", action="store_true",
+                        help="skip the pre-render storyboard structure validation")
     args = parser.parse_args()
 
     data = load_storyboard(args.storyboard)
+
+    # validate structure first -- a malformed storyboard (missing meta/scenes, bad
+    # scene kind, duplicate id, unclosed {show}) is caught before lint/render.
+    if not args.skip_schema:
+        from pipeline.schema import schema_storyboard
+        issues = schema_storyboard(data)
+        errors = [m for s, m in issues if s == "error"]
+        warns = [m for s, m in issues if s == "warn"]
+        for msg in warns:
+            print(f"  WARN   {msg}", flush=True)
+        if errors:
+            print(f"[schema] {len(errors)} error(s) -- aborting (use --skip-schema to bypass):", flush=True)
+            for msg in errors:
+                print(f"  SCHEMA {msg}", flush=True)
+            return 2
+        print("[schema] structure OK" + (f" ({len(warns)} warning(s))" if warns else ""), flush=True)
 
     # lint before doing any work -- catches render-garble ($f$ / \\ printed
     # literally, unbalanced $) statically, so it never reaches the video.

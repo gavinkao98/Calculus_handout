@@ -1,9 +1,12 @@
-"""Storyboard beat TTS interface.
+"""Storyboard beat TTS interface (MiMo route).
 
 This command turns content-scene ``say`` fields into one WAV per reveal beat and
-a manifest that later render/mux stages can consume. The backend boundary is
-small on purpose: swap model names or providers without changing storyboard or
-scene-player code.
+a manifest that ``make.py --reuse-audio`` consumes. The real backend is Xiaomi
+MiMo-V2.5-TTS (the project's sole TTS route as of 2026-06-16; the former Gemini
+route was retired). ``mock`` (silence) stays for offline manifest/timing checks.
+
+MiMo does NOT read LaTeX, so callers pass the spoken-form storyboard
+(``storyboards/<deck>_mimo.yml`` from ``derive_spoken.py``), not the canonical one.
 """
 from __future__ import annotations
 
@@ -11,7 +14,6 @@ import argparse
 import base64
 import json
 import os
-import re
 import sys
 import time
 from dataclasses import dataclass
@@ -31,16 +33,10 @@ from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 from pipeline.timing import text_hash  # noqa: E402
 
 
-DEFAULT_MODEL = "gemini-3.1-flash-tts-preview"
-DEFAULT_VOICE = "Charon"
-DEFAULT_STYLE = (
-    "Read in a clear, calm calculus lecture voice. Keep the pacing steady. "
-    "Read inline LaTeX in natural language."
-)
-
 # MiMo platform (Xiaomi): OpenAI-compatible /chat/completions, same as the vision
 # critic (see pipeline/critic.py). MiMo-V2.5-TTS does NOT read LaTeX -- callers
-# must pass spoken-form text (the *_narration_spoken.md versions).
+# must pass spoken-form text (the *_narration_spoken.md / *_mimo.yml versions).
+# This is the project's sole TTS route (Gemini retired 2026-06-16).
 MIMO_BASE_URL = "https://api.xiaomimimo.com/v1"
 MIMO_MODEL = "mimo-v2.5-tts"
 MIMO_VOICE = "Mia"
@@ -99,126 +95,6 @@ class MockTTSBackend:
     def synthesize(self, request: TTSRequest) -> TTSResult:
         seconds = self.empty_seconds if not request.text else estimate_seconds(request.text)
         return TTSResult(silence_pcm(seconds))
-
-
-_RETRY_AFTER = re.compile(r"retry in ([0-9.]+)s", re.IGNORECASE)
-_RETRY_DELAY = re.compile(r"retrydelay['\"]?\s*[:=]\s*['\"]?([0-9.]+)s", re.IGNORECASE)
-
-
-def _retry_delay(exc: Exception) -> float | None:
-    """Seconds to wait before retrying a rate-limited (429) call, else None.
-
-    Free-tier TTS quota is only a few requests per minute; on 429 the server
-    reports how long to wait. Parse that out and honor it (plus headroom).
-    Non-429 errors -- bad key, bad model, malformed request -- return None so
-    they surface immediately instead of being retried.
-    """
-    code = getattr(exc, "code", None) or getattr(exc, "status_code", None)
-    text = str(exc)
-    if code != 429 and "RESOURCE_EXHAUSTED" not in text and "429" not in text:
-        return None
-    # A per-day quota does not reset within any retry window. Retrying it just
-    # burns minutes to fail anyway -- treat it as fatal so the caller stops fast.
-    if "PerDay" in text or "RequestsPerDay" in text:
-        return None
-    for pattern in (_RETRY_AFTER, _RETRY_DELAY):
-        match = pattern.search(text)
-        if match:
-            return float(match.group(1)) + 2.0  # clear the server window
-    return 30.0  # no delay advertised: back off conservatively
-
-
-class GeminiTTSBackend:
-    """Gemini native TTS backend using the google-genai SDK.
-
-    Adds client-side pacing (``min_interval``) and 429-aware retry on top of the
-    raw SDK call, so ``--scene all`` completes unattended even against the free
-    tier's few-requests-per-minute TTS quota.
-    """
-
-    name = "gemini"
-
-    def __init__(self, *, max_retries: int = 6, min_interval: float = 0.0) -> None:
-        try:
-            from google import genai
-            from google.genai import types
-        except ImportError as exc:
-            raise RuntimeError(
-                "Gemini TTS requires google-genai. Install it into the project "
-                "environment, then rerun this command."
-            ) from exc
-        self._genai = genai
-        self._types = types
-        self._client = genai.Client()
-        self._max_retries = max_retries
-        self._min_interval = min_interval
-        self._last_call = 0.0
-
-    def _throttle(self) -> None:
-        """Space consecutive API calls by at least ``min_interval`` seconds."""
-        if self._min_interval > 0:
-            wait = self._min_interval - (time.monotonic() - self._last_call)
-            if wait > 0:
-                time.sleep(wait)
-        self._last_call = time.monotonic()
-
-    def synthesize(self, request: TTSRequest) -> TTSResult:
-        prompt = request.text
-        if request.style:
-            prompt = f"{request.style}\n\n{request.text}"
-
-        config = self._types.GenerateContentConfig(
-            response_modalities=["AUDIO"],
-            speech_config=self._types.SpeechConfig(
-                voice_config=self._types.VoiceConfig(
-                    prebuilt_voice_config=self._types.PrebuiltVoiceConfig(
-                        voice_name=request.voice,
-                    )
-                )
-            ),
-        )
-
-        for attempt in range(self._max_retries + 1):
-            self._throttle()
-            try:
-                response = self._client.models.generate_content(
-                    model=request.model,
-                    contents=prompt,
-                    config=config,
-                )
-                return TTSResult(pcm=self._extract_audio(response))
-            except Exception as exc:  # noqa: BLE001 -- inspect, then retry or reraise
-                delay = _retry_delay(exc)
-                if delay is None or attempt == self._max_retries:
-                    if "RESOURCE_EXHAUSTED" in str(exc) or "429" in str(exc):
-                        print(
-                            "[tts] giving up: free-tier quota exhausted (this TTS model "
-                            "allows ~10 requests/day). Upgrade to a paid tier, or resume "
-                            "later with --reuse-existing to keep finished beats.",
-                            flush=True,
-                        )
-                    raise
-                print(
-                    f"[tts] rate-limited (429); waiting {delay:.0f}s then retrying "
-                    f"(attempt {attempt + 1}/{self._max_retries})",
-                    flush=True,
-                )
-                time.sleep(delay)
-        raise RuntimeError("unreachable: Gemini retry loop exited without a result")
-
-    @staticmethod
-    def _extract_audio(response: Any) -> bytes:
-        candidates = getattr(response, "candidates", None) or []
-        for candidate in candidates:
-            content = getattr(candidate, "content", None)
-            for part in getattr(content, "parts", None) or []:
-                inline_data = getattr(part, "inline_data", None)
-                data = getattr(inline_data, "data", None)
-                if isinstance(data, bytes):
-                    return data
-                if isinstance(data, str):
-                    return base64.b64decode(data)
-        raise RuntimeError("Gemini TTS response did not contain inline audio data.")
 
 
 class MimoTTSBackend:
@@ -346,20 +222,18 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--storyboard", required=True, type=Path)
     parser.add_argument("--scene", default="all", help="id, comma-separated ids, or 'all'")
-    parser.add_argument("--backend", choices=("gemini", "mimo", "mock"), default="gemini")
-    parser.add_argument("--model", default=os.environ.get("GEMINI_TTS_MODEL", DEFAULT_MODEL))
-    parser.add_argument("--voice", default=os.environ.get("GEMINI_TTS_VOICE"))
-    parser.add_argument("--style", default=os.environ.get("GEMINI_TTS_STYLE", DEFAULT_STYLE))
+    parser.add_argument("--backend", choices=("mimo", "mock"), default="mimo")
+    parser.add_argument("--model", default=os.environ.get("MIMO_TTS_MODEL", MIMO_MODEL))
+    parser.add_argument("--voice", default=os.environ.get("MIMO_TTS_VOICE"))
+    parser.add_argument("--style", default=os.environ.get("MIMO_TTS_STYLE", MIMO_STYLE))
     parser.add_argument("--base-url", default=os.environ.get("MIMO_BASE_URL", MIMO_BASE_URL),
                         help="MiMo platform base URL (--backend mimo)")
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--empty-beat-seconds", type=float, default=0.45)
     parser.add_argument("--reuse-existing", action="store_true")
-    parser.add_argument("--max-retries", type=int, default=6,
-                        help="retries per beat on 429 rate-limit (honors server retryDelay)")
-    parser.add_argument("--min-request-interval", type=float, default=0.0,
-                        help="min seconds between API calls; free-tier TTS ~21 avoids most 429s")
+    parser.add_argument("--max-retries", type=int, default=4,
+                        help="retries per beat on 429/5xx (MiMo backend)")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -390,16 +264,11 @@ def safe_stem(value: str) -> str:
 def build_backend(args: argparse.Namespace) -> TTSBackend:
     if args.backend == "mock":
         return MockTTSBackend(args.empty_beat_seconds)
-    if args.backend == "mimo":
-        api_key = os.environ.get("MIMO_API_KEY")
-        if not api_key:
-            raise SystemExit("[tts] --backend mimo needs the API key in env MIMO_API_KEY.")
-        return MimoTTSBackend(
-            base_url=args.base_url, api_key=api_key, max_retries=args.max_retries
-        )
-    return GeminiTTSBackend(
-        max_retries=args.max_retries,
-        min_interval=args.min_request_interval,
+    api_key = os.environ.get("MIMO_API_KEY")
+    if not api_key:
+        raise SystemExit("[tts] --backend mimo needs the API key in env MIMO_API_KEY.")
+    return MimoTTSBackend(
+        base_url=args.base_url, api_key=api_key, max_retries=args.max_retries
     )
 
 
@@ -456,7 +325,7 @@ def synthesize_scene(
     output_dir: Path,
     args: argparse.Namespace,
 ) -> dict[str, Any]:
-    voice = args.voice or meta.get("voice") or DEFAULT_VOICE
+    voice = args.voice or meta.get("voice") or MIMO_VOICE
     scene_id = scene["id"]
     kind = scene.get("kind", "content")
     entry: dict[str, Any] = {
@@ -536,12 +405,6 @@ def write_manifest(path: Path, manifest: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
-    if args.backend == "mimo":
-        # the --model/--style defaults are Gemini's; use MiMo's unless overridden.
-        if args.model == DEFAULT_MODEL:
-            args.model = MIMO_MODEL
-        if args.style == DEFAULT_STYLE:
-            args.style = MIMO_STYLE
     data = load_storyboard(args.storyboard)
     meta = data["meta"]
     scenes = wanted_scenes(data["scenes"], args.scene)
@@ -552,7 +415,7 @@ def main() -> int:
         or (sec_dir / default_audio_subdir)
     ).resolve()
     manifest_path = (args.manifest or (output_dir / "manifest.json")).resolve()
-    voice = args.voice or meta.get("voice") or DEFAULT_VOICE
+    voice = args.voice or meta.get("voice") or MIMO_VOICE
 
     content_count = sum(1 for scene in scenes if scene.get("kind", "content") == "content")
     beat_count = sum(len(scene_beats(scene)) for scene in scenes if scene.get("kind", "content") == "content")

@@ -1,6 +1,6 @@
 """Small WAV helpers for the gen-2 video pipeline.
 
-Gemini TTS returns raw 16-bit PCM in the public API examples. Keeping the audio
+TTS backends return 16-bit PCM (MiMo wraps it in a WAV). Keeping the audio
 helpers here avoids pulling in numpy/soundfile just to wrap, measure, and join
 short narration clips.
 """

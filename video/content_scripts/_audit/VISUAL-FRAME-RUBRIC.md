@@ -61,4 +61,4 @@
   - **A 維：** 每維 0–100 分 ＋ `defects`（`{dimension, severity low|med|high, where, issue, suggestion}`）。
   - 各乾淨維度一行；末行對「本節**視覺 blocking 是否歸零**」給明確結論。
 
-> **wiring 註：** gate 1（Claude subagent）直接讀本檔、即時涵蓋 V1–V8＋A1–A7。外部 gate 2（`critic.py`／MiMo）目前的 prompt/JSON schema 只有舊 5 維（A1–A5）；接上本檔（runtime verbatim-inject 本 rubric body）＋把 A6/A7 與 V 維加進 schema/`_write_md`，歸「code 回報層 normalize」延後項（見 [`../../REVIEW_REDESIGN.md`](../../REVIEW_REDESIGN.md) §七）。
+> **wiring 註（2026-06-16 已接線）：** gate 1（Claude subagent）直接讀本檔、即時涵蓋 V1–V8＋A1–A7。外部 gate 2（[`../../pipeline/critic.py`](../../pipeline/critic.py)／MiMo）**已接上本檔**：runtime verbatim-inject 整份 rubric body（取代原 hardcoded 5 維），JSON schema／`_write_md` 改輸出 `visual_blocking_count`＋`v_findings`（V1–V8、Blocking/Advisory、`VERDICT` 行）＋A1–A7 0–100 scores＋`defects`。§1.1 真 `--dry-run` 驗過。落地紀錄見 [`../../REVIEW_MODEL_DECISIONS.md`](../../REVIEW_MODEL_DECISIONS.md) §八。

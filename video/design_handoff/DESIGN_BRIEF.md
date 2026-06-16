@@ -21,7 +21,7 @@
 - **語言**：旁白英文，數學符號標準 LaTeX。
 - **目前範例章節**：Section 1.1 反函數（Inverse Functions）。
 - **產出**：每節一支 1080p、16:9 的 MP4。
-- **現狀**：§1.1 已端到端打通——storyboard → TTS → 音訊驅動 render → mux，產出一支帶**真旁白**（Gemini TTS）的成片，旁白與揭示動畫對齊。視覺即採用本文件描述的 Direction B。
+- **現狀**：產線已端到端打通——storyboard → TTS（MiMo）→ 音訊驅動 render → compose，旁白與揭示動畫對齊。視覺即採用本文件描述的 Direction B。（舊 §1.1 練習成片已廢棄，正式版從講義重跑。）
 
 ---
 

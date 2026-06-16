@@ -4,7 +4,7 @@
 >
 > 它只管**內容**（教什麼、怎麼教、怎麼說、哪裡要視覺／動畫），**完全不碰工程**（template、`{show}` reveal marker、accent、視覺 payload、render）——工程是**第二階段**把內容稿「模板化」時才處理。
 >
-> **血統與定位：** 萃取自 [`legacy/MANIM_STORYBOARD.md`](../legacy/MANIM_STORYBOARD.md)（gen-1, v1.6）的教學精神，**剝離**其 gen-1 工程約束（spoken-math 改寫大表、reveal 策略、9-template catalog、lint／schema），**適配** gen-2（Gemini TTS 直讀 LaTeX、intro／outro first-class）。它是 gen-1 方法論在 gen-2 的繼任者。
+> **血統與定位：** 萃取自 [`legacy/MANIM_STORYBOARD.md`](../legacy/MANIM_STORYBOARD.md)（gen-1, v1.6）的教學精神，**剝離**其 gen-1 工程約束（spoken-math 改寫大表、reveal 策略、9-template catalog、lint／schema），**適配** gen-2（正典 narration 內嵌 LaTeX 只寫一次；真旁白走 MiMo＝逐節輕量口語派生，非大規則表；intro／outro first-class）。它是 gen-1 方法論在 gen-2 的繼任者。
 >
 > **相關文件：** 視覺系統見 [`design_handoff/`](design_handoff/)（Direction B）；講義（HTML handout kit）的撰寫契約與環境詞彙見 [`../handout/_dev-archive/general/CONTRACT-html-writing.md`](../handout/_dev-archive/general/CONTRACT-html-writing.md)；本產線總覽見 [`README.md`](README.md) 與 [`DESIGN.md`](DESIGN.md)。
 >
@@ -129,11 +129,11 @@
 
 ### 數學口語化（輕量原則，取代 gen-1 的 spoken-math 大表）
 
-gen-2 用 **Gemini TTS 直讀 LaTeX**，所以 narration 裡可以**直接內嵌 LaTeX 數學**讓它讀——**不必**再手動把 `f(x_1)` 改寫成「f of x one」。原則：
+正典 narration **直接內嵌 LaTeX**（`$f(x_1)=f(x_2)$`）——它是內容／閱讀層，寫成「**老師會怎麼把這個式子講出來**」。**真旁白走 MiMo，而 MiMo 不讀 LaTeX**，所以每節由 `<deck>.spoken.yml`（單一源、`derive_spoken.py` 派生、`--check` 守 parity）把數學攤成口語（念法慣例見 [`RUNBOOK-mimo-narration-route.md`](RUNBOOK-mimo-narration-route.md)）。**但這仍是輕量的逐節口語視圖，不是 gen-1 那張大規則表**——正典 narration 只寫一次。原則：
 
-- narration 寫成「**老師會怎麼把這個式子講出來**」。簡單式子直接內嵌（`$f(x_1)=f(x_2)$`）；當念出來會卡或冗長時，改寫成白話敘述。
+- narration 寫成「**老師會怎麼把這個式子講出來**」。簡單式子直接內嵌（`$f(x_1)=f(x_2)$`）；當念出來會卡或冗長時，**在正典**就改寫成白話敘述（這是**教學選擇**——某些式子講白話更好懂）。
 - **對齊推導鏈**（aligned on `=`／`\le`／`<`）：首行念全式（含 LHS），中段只念「連接詞 + RHS」（省掉對齊在維持的 LHS），末行若回到原 LHS（矛盾收尾）則明白點出。不要每行重念 LHS——對齊已經替你做視覺重複了。
-- **直讀已驗證**：Gemini 直讀 LaTeX 已實測沒問題（下標、分數、根號、`\varepsilon`-`\delta`、量詞都可），所以 narration 裡放心直接內嵌數學讓它讀，**無需**任何 spoken-math 改寫層。改寫成白話純粹是**教學選擇**（某些式子講白話更好懂），不是 TTS 的限制。
+- **純符號念法**（`f^{-1}`→「f inverse」、下標→「x sub one」、分數／根號／量詞等的機械攤平）寫在 `.spoken.yml`、由念法慣例表規範，**不污染正典 narration**。
 
 ### repeat-pattern：第二次省掉 setup
 
@@ -224,7 +224,7 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 - **`content_scripts/<deck-id>.md`——source of truth。** 純內容中間產物、可 diff／版控；上表欄位的權威版本。後續維護（§8）一律改這裡。
 - **`content_scripts/<deck-id>_narration.html`——給使用者審核的可讀稿（一律附上）。** standalone HTML（MathJax/KaTeX CDN，雙擊即開、數學即渲染），逐單元列 `narration`，並把 `learning_goal`／`visual_need`／`animation_cue` 收進可展開區。**每次交付內容稿（新撰或修訂）都 MUST 同時編譯出這份 HTML**——生 `.md` 裡的 inline LaTeX 不好讀，渲染後才方便逐段審旁白。
 
-**規則：** 旁白認可在 HTML 上進行，但 `.md` 仍是 source of truth；兩者 narration 內容 MUST 一致（改 `.md` 就重編 HTML，不可只改一邊）。這是根目錄 [`../CLAUDE.md`](../CLAUDE.md)「給使用者審核的交付物要用『打開就能讀』的形式」對內容稿的具體落實。**範本**（head／CSS 可直接沿用）：[`content_scripts/ch01_inverse_trig_narration.html`](content_scripts/ch01_inverse_trig_narration.html)（§1.2）、[`content_scripts/ch01_limit_of_function_narration.html`](content_scripts/ch01_limit_of_function_narration.html)（§1.3）。
+**規則：** 旁白認可在 HTML 上進行，但 `.md` 仍是 source of truth；兩者 narration 內容 MUST 一致（改 `.md` 就重編 HTML，不可只改一邊）。這是根目錄 [`../CLAUDE.md`](../CLAUDE.md)「給使用者審核的交付物要用『打開就能讀』的形式」對內容稿的具體落實。**樣板**：head／CSS 比照 standalone-HTML 交付慣例自製，重跑第一節時即定下可沿用的版型。
 
 ### 範例 A：一個 `definition` 單元（靜態即可）
 

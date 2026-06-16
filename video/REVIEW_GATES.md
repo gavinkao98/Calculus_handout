@@ -9,11 +9,13 @@
 ## 總綱
 
 產線分**七個產物層**，每層各有審核閘。能真正**擋住 render** 的只有 storyboard/timing 與兩軌 parity 的幾個**自動腳本閘**；
-內容／旁白／視覺層全為 **advisory**——模型（Codex / DeepSeek / MiMo / Claude）或人提案，最後由人裁決，**稽核者一律唯讀、不自己改檔**。
+內容／旁白／視覺層全為 **advisory**——模型（Codex / MiMo / Claude）或人提案，最後由人裁決，**稽核者一律唯讀、不自己改檔**。
 
 流向：講義散文 →（Mode A）內容稿 → 旁白稿 → 口語版 → manim hook code → storyboard/timing → render 成品。
 
 圖例：**■ 自動腳本・可擋 render**　**□ LLM 稽核・advisory**　**◆ 人工閘**　**◷ 未建（TODO）**
+
+> **gate 1 具名 subagent（2026-06-17）：** 四道判斷閘的 gate1 已可用 `.claude/agents/` 具名 subagent 跑（唯讀 `Read/Grep/Glob`、薄提示引用各 SSOT rubric，比照講義 `handout-prose-audit`）：[`narration-faithfulness-audit`](../.claude/agents/narration-faithfulness-audit.md)（NFA）、[`narration-copyedit`](../.claude/agents/narration-copyedit.md)、[`visual-frame-audit`](../.claude/agents/visual-frame-audit.md)、[`hook-engineering-audit`](../.claude/agents/hook-engineering-audit.md)。六鏡維持 multi-agent Workflow；gate2（Codex／外部 VLM）是外部模型、**不是** subagent（仍走 `codex exec`／`critic.py --confirm`，thin-prompt 模板 `PROMPT-narration-*.template.md` 留給 Codex gate2）。
 
 ---
 
@@ -44,7 +46,7 @@
 
 | 閘 | 執行者 | 性質 | 把關內容 | 權威文檔 |
 |---|---|---|---|---|
-| `review_pack.py` engineering lens | 腳本組包（免費）→ DeepSeek（計費，`--confirm`） | □（**不接進 make.py**） | 四鏡頭（忠實／語域／拆解／工程）；工程鏡只看生成 code 的數學保真與慣例（theme primitive 不用 hex、實心／空心點語義、SAFE_MARGIN），**不看美學**。⚠️ 工程鏡**至今從未實跑**；`.tex` parser 自 2026-06-10 改 HTML 源後已過時 | [README.md](README.md) §內容 cross-review；source [pipeline/review_pack.py](pipeline/review_pack.py) |
+| 工程鏡（生成 hook code 稽核） | gate1 Claude subagent（免費、讀 `review_pack.py` 組的 engineering packet）→ gate2 Codex（計費、收斂後單次、需同意） | □（收斂＝**engineering blocking==0**） | **單鏡頭**：只看生成 hook code 的數學保真（E1，blocking）與慣例（E2；theme primitive 不用 hex、實心／空心點語義、SAFE_MARGIN），**不看美學**（歸 VISUAL-FRAME）。與 VISUAL-FRAME **V8 邊界**配對：V8 查幀上可見數學、本鏡查生成它的 code。**2026-06-16**：DeepSeek 退場、改兩讀者；忠實／語域／拆解三鏡已歸 CONTENT-SIXLENS；math context 改吃內容稿動畫單元 narration／`source`（脫離已搬 `legacy/` 的 `.tex`） | **SSOT [HOOK-ENGINEERING-RUBRIC.md](content_scripts/_audit/HOOK-ENGINEERING-RUBRIC.md)**；assembler [pipeline/review_pack.py](pipeline/review_pack.py) |
 
 ### 層 6｜storyboard／timing
 
@@ -52,7 +54,7 @@
 |---|---|---|---|---|
 | `lint.py` | 腳本，make.py render 前跑（`--skip-lint` 可繞） | ■ error／warn | error（abort）：純文字欄出現 `$`／反斜線、`$` 不成對；warn：手動 `\\`、空心點用在已達值 | [DESIGN.md](DESIGN.md)、[README.md](README.md) |
 | `sizecheck.py` | 腳本，與 lint 並行（`--skip-sizecheck` 可繞） | ■ error／warn | error（abort）：同層 prose 字級不一、元素出框；warn：教學散文用 muted 色、超安全邊界、內容塊重疊。**盲點**：只查 `brand.prose`，不查直接構造的 `MathTex/Text` | [DESIGN.md](DESIGN.md) |
-| `schema.py` | — | ◷ **TODO，未建** | 規劃：格式驗證 ＋ 列舉 `{show}` reveal 目標。目前不存在 | [DESIGN.md](DESIGN.md)、[README.md](README.md) |
+| `schema.py` | 腳本，make.py render 前跑（`--skip-schema` 可繞） | ■ error／warn | **已建（2026-06-16）**：結構驗證（meta.id／section 必填、scene kind∈intro/content/outro、id 唯一、content 需 template＋say、`{show}` 不閉合→error）＋列舉每場 `{show}` reveal 目標（`--list`）。**不**驗 target 是否存在於模板 payload（需 `reveal_targets()`／manim，屬 task #6） | [DESIGN.md](DESIGN.md)、[README.md](README.md)；source [pipeline/schema.py](pipeline/schema.py) |
 | make.py manifest-freshness（`--reuse-audio`） | 腳本 | ■（fail-fast） | 比對 manifest 與 `<deck>_mimo.yml`（deck id／scene／beat 數／`{show}`／text_hash／WAV 存在與時長），防複用過期音檔；非 reuse 跑時拒絕用 mock 覆蓋真 manifest | [DESIGN.md](DESIGN.md)、[README.md](README.md)；RUNBOOK step 4 |
 | sync guard | 腳本（`pipeline/timing.py` 常數） | ■／□ | render 前 warn 短 beat／純 reveal beat；render 後 ffprobe 比對影音時長，旁白超過影片→compose 前 abort | [DESIGN.md](DESIGN.md)、[README.md](README.md)；RUNBOOK step 4 |
 
@@ -60,8 +62,8 @@
 
 | 閘 | 執行者 | 性質 | 把關內容 | 權威文檔 |
 |---|---|---|---|---|
-| 視覺 gate1 ＝ Claude 抽幀 subagent | Claude 讀 `critic.py --dry-run` 抽出的幀（多模態、免費、每次 render） | □（收斂＝**視覺 blocking==0**） | 逐場：數學渲染完整、圖正確、表不溢出、reveal 同步、端點實心／空心、✓／✗ 正確（蓋資訊的相撞／關鍵元素出框／reveal 不同步＝blocking） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)（已寫；critic.py 接線延後。比照 [`../handout/_audit/FIGURE-AUDIT-RUBRIC.md`](../handout/_audit/FIGURE-AUDIT-RUBRIC.md)）；機制 [pipeline/critic.py](pipeline/critic.py) `--dry-run` |
-| 視覺 gate2 ＝ 外部 VLM 信心複核 | ffmpeg 抽幀（免費）→ MiMo-V2.5（計費、間歇、`--confirm`、需同意） | □（**不接進 make.py**；定稿前非每輪必跑） | 五維 AES rubric，每維 0–100（保留當**驅動重 render／排優先的 magnitude**）＋ 具體缺陷（severity＋位置）；專抓 sizecheck 漏掉的標籤壓線／碰撞。驅動「判→採→重 render→複驗」迴圈（停止條件＝視覺 blocking==0） | [README.md](README.md) §VLM 視覺批改、[DESIGN.md](DESIGN.md)；source [pipeline/critic.py](pipeline/critic.py) |
+| 視覺 gate1 ＝ Claude 抽幀 subagent | Claude 讀 `critic.py --dry-run` 抽出的幀（多模態、免費、每次 render） | □（收斂＝**視覺 blocking==0**） | 逐場 V1–V8 blocking＋A1–A7 magnitude：數學渲染完整、圖正確、表不溢出、reveal 同步、端點實心／空心、✓／✗ 正確（蓋資訊的相撞／關鍵元素出框／reveal 不同步＝blocking） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)（比照 [`../handout/_audit/FIGURE-AUDIT-RUBRIC.md`](../handout/_audit/FIGURE-AUDIT-RUBRIC.md)）；機制 [pipeline/critic.py](pipeline/critic.py) `--dry-run` |
+| 視覺 gate2 ＝ 外部 VLM 信心複核 | ffmpeg 抽幀（免費）→ MiMo-V2.5（外部 API；**公測免費**、間歇、`--confirm`、仍需同意） | □（**不接進 make.py**；定稿前非每輪必跑） | **2026-06-16 已接 VISUAL-FRAME-RUBRIC**：runtime verbatim-inject 整份 rubric body，輸出 V1–V8 blocking findings＋`VERDICT` 行＋A1–A7（每維 0–100，**驅動重 render／排優先的 magnitude**）＋具體缺陷；專抓 sizecheck 漏掉的標籤壓線／碰撞。驅動「判→採→重 render→複驗」迴圈（停止條件＝視覺 blocking==0） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)；[README.md](README.md) §VLM 視覺批改、[DESIGN.md](DESIGN.md)；source [pipeline/critic.py](pipeline/critic.py) |
 | 人工 frame-grab 驗收 | 人工（MiMo route step 4） | ◆ | 在 reveal 時間點抽幀確認 reveal 準時、LaTeX 無亂碼，才 compose／交付 | [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 4 |
 
 外加 **MiMo route step 0**：確認 `storyboards/<deck>.yml` 存在（含 say＋`{show}`），否則整條視覺路徑停住——進視覺步驟的 blocking 前置（[RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 0）。
@@ -75,7 +77,7 @@
 3. **付費 API 先同意**——任何計費呼叫前要使用者明確同意；腳本以 `--dry-run`（估 token／USD、不送請求）＋ `--confirm`（讀 env key）落實。離線路徑（mock TTS、本地 render、ffmpeg）免。[`../CLAUDE.md`](../CLAUDE.md)。
 4. **NFA 裁決寫進 commit message**——subject ≤70、body 逐條「原本／為何不妥／改了什麼／證據」，供 `git log --grep="NFA"` 撈回（講義 Mode B 仍用 `git log --grep="Mode B"`）。[`../CLAUDE.md`](../CLAUDE.md)。
 5. **交付物用 standalone HTML**——等使用者過目的稽核產物一律出可雙擊渲染的 HTML。[`../CLAUDE.md`](../CLAUDE.md)。
-6. **每判斷閘一條收斂線**——所有 LLM 判斷閘（六-lens／copyedit／NFA／視覺）收斂判準＝**blocking findings==0**；advisory 逐筆人裁、不強制歸零。**不** governs Tier 0 確定性腳本（以 exit code 收斂）。散文類兩讀者（gate1 Claude 免費迭代→gate2 Codex 收斂後單次、需同意），**gate2 只套 copyedit／NFA**——six-lens 本身 multi-agent＋對抗複驗，不再疊 Codex。
+6. **每判斷閘一條收斂線**——所有 LLM 判斷閘（六-lens／copyedit／NFA／視覺／工程鏡）收斂判準＝**blocking findings==0**；advisory 逐筆人裁、不強制歸零。**不** governs Tier 0 確定性腳本（以 exit code 收斂）。散文類兩讀者（gate1 Claude 免費迭代→gate2 Codex 收斂後單次、需同意），**gate2 只套 copyedit／NFA**——six-lens 本身 multi-agent＋對抗複驗，不再疊 Codex。
 7. **撰稿兩階段（phase，非 mode）**——**DRAFT**（pre-lock：寫稿→`_narration.html`→copyedit，唯一能改稿窗口）／**LOCKED**（post-lock：derive→NFA→TTS，source 凍結、稽核唯讀）。綁在 `CONTENT_APPROVED` sign-off 這條不可逆邊界；post-lock 改稿須對動到的單元跑一次 scoped NFA 回歸。「Mode」一詞專留給講義 A/B/C。
 
 ---
@@ -106,12 +108,12 @@
 
 ## 五、已知 stale／覆蓋缺口（現狀，非新發現）
 
-- **`review_pack.py` 的 `.tex` parser 已過時**：source 早改 HTML，忠實／工程鏡的 `.tex` 切片 context 失效，未重寫前等於跛腳；且工程鏡從未真正跑過。
-- **`critic.py` 的 header 還寫「P1 scaffold／TODO: wire」，但計費路徑其實已完整可用**（§1.1 實跑過）——註解本身才是 stale。`critic.py` 與 `review_pack.py` 的**定價常數都還是 PLACEHOLDER**，dry-run 的 USD 估值尚不準。
-- **`schema.py` 未建**：storyboard YAML 無結構／格式驗證，也無自動列舉 `{show}` 目標，規劃中的第三道 render 前閘缺席。
-- **hook code 只有那個從未實跑的 advisory 鏡**；直接構造的 `MathTex/Text` 標籤是 sizecheck 盲點（只靠 VLM／人眼）。
+- ✅ **~~`review_pack.py` 的 `.tex` parser 已過時~~（2026-06-16 已解）**：已收斂為 engineering 鏡專用、脫離 `.tex`（math context 改吃內容稿）；忠實／語域／拆解三鏡歸 CONTENT-SIXLENS。工程鏡現可實跑（§1.1 dry-run 驗過 1 packet）。
+- ✅ **~~`critic.py` header stale／PLACEHOLDER 定價~~（2026-06-16 已解）**：header 重寫為「gate 2、已接 VISUAL-FRAME」；critic.py 定價改 MiMo 公測免費＝$0（dated，仍印 token＋受同意閘），review_pack.py 定價改標「unverified estimate」。
+- ✅ **~~`schema.py` 未建~~（2026-06-16 已建）**：結構驗證＋`{show}` 目標列舉，已接進 make.py render 前閘（`--skip-schema` 可繞）。target-vs-payload 交叉驗證仍待 `reveal_targets()`（task #6、需 manim）。
+- **直接構造的 `MathTex/Text` 標籤是 sizecheck 盲點**（只靠 VISUAL-FRAME／人眼）；hook code 的數學保真由 review_pack engineering 鏡（advisory）查。
 - **整節合併影片**（§1.2／§1.4／§1.5）因 Defender Tex-cache race 尚未驗（逐場已驗）。
 - **TTS 發音正確性無自動 listen-back**，只靠 NFA 上游規約＋人工抽驗。
 - **權威來源（NFA 已收回）**：video NFA 的維度／收斂線權威已從「借根 README §Mode B」收回到 [NARRATION-FAITHFULNESS-RUBRIC.md](content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)（SSOT）；commit 慣例權威仍在 `../CLAUDE.md`。講義 Mode B 的權威仍在**根 README**（不同產物，不混用）。
 
-> **重構落地狀態：** [REVIEW_REDESIGN.md](REVIEW_REDESIGN.md) 的 minimal-unify 已**部分採用（2026-06-15）**：NFA 改名＋抽 NFA/copyedit/VISUAL-FRAME/SIXLENS SSOT rubric＋thin prompt＋每閘收斂線＋gate1→gate2＋視覺層改 figure-audit 鏡像＋DRAFT/LOCKED phase 均已落地（**四份判斷閘 rubric 齊**）。**待續**：code 回報層 normalize（`review_pack`/`critic` buckets 與定價、critic.py 接 `VISUAL-FRAME-RUBRIC` 並加 A6/A7、`review_pack` 工程鏡待 `.tex` parser 修）。
+> **重構落地狀態：已採用·收尾（2026-06-16）。** [REVIEW_MODEL_DECISIONS.md](REVIEW_MODEL_DECISIONS.md) 的 minimal-unify **全主體＋code 回報層 normalize 皆已落地**：NFA 改名＋五份判斷閘 SSOT rubric（NFA/copyedit/VISUAL-FRAME/SIXLENS/HOOK-ENGINEERING）＋thin prompt＋每閘收斂線＋gate1→gate2＋視覺層 figure-audit 鏡像＋DRAFT/LOCKED phase；**code 收尾**＝critic.py 接 VISUAL-FRAME（runtime inject＋V1–V8＋A1–A7＋抽幀新鮮度＋MiMo 免費定價），review_pack.py 收斂為 engineering 鏡＋脫離 `.tex`，兩者 §1.1 dry-run 驗過。**本重構無 open item**；schema.py、VISUAL-FRAME detection 面驗證屬產線 backlog（見 [REBUILD_STATUS.md](REBUILD_STATUS.md)）。

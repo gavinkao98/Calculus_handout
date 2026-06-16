@@ -49,4 +49,4 @@
 - 每個乾淨維度一行（如 `C2 wordiness: clean`）。
 - 末行提醒：對**已合成** beat 採用某改寫＝要重 derive ＋ 重 TTS（**計費**）——故由使用者逐筆決定收哪個。
 
-**交付給使用者裁決時**：依 [`../../../CLAUDE.md`](../../../CLAUDE.md) 交付規則產 standalone HTML 審核稿、finding 標穩定編號。格式參照 [`REVIEW-ch01-narration-copyedit.html`](REVIEW-ch01-narration-copyedit.html)。純版控紀錄不在此限。
+**交付給使用者裁決時**：依 [`../../../CLAUDE.md`](../../../CLAUDE.md) 交付規則產 standalone HTML 審核稿（MathJax/KaTeX CDN、雙擊即開）、finding 標穩定編號。純版控紀錄不在此限。

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>video 產線大重設落地報告（2026-06-16）</title>
+<style>
+  :root{
+    --bg:#0f1419; --panel:#171e26; --panel2:#1d2630; --ink:#e6edf3; --muted:#9aa7b4;
+    --line:#2a3742; --ok:#3fb950; --warn:#d29922; --accent:#58a6ff; --bad:#f85149;
+    --code:#0b1118; --codeink:#c9d4df;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.65 -apple-system,"Segoe UI",Roboto,"Noto Sans CJK TC","Microsoft JhengHei",sans-serif;}
+  .wrap{max-width:980px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:26px;margin:0 0 4px;letter-spacing:.2px}
+  h2{font-size:20px;margin:38px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:600;
+    background:rgba(63,185,80,.15);color:var(--ok);border:1px solid rgba(63,185,80,.4)}
+  .tldr{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--ok);
+    border-radius:8px;padding:16px 18px;margin:18px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600}
+  td code,th code,p code,li code{background:var(--code);color:var(--codeink);
+    padding:1px 5px;border-radius:4px;font-size:13px;font-family:"Cascadia Code",Consolas,monospace}
+  pre{background:var(--code);color:var(--codeink);border:1px solid var(--line);border-radius:8px;
+    padding:14px 16px;overflow:auto;font-size:13px;line-height:1.5;font-family:"Cascadia Code",Consolas,monospace}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+  .card h3{margin-top:0}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)} .mut{color:var(--muted)}
+  .tag{font-size:12px;padding:1px 7px;border-radius:5px;border:1px solid var(--line);background:var(--panel2);color:var(--muted)}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:8px 0}
+  .ba>div{padding:10px 12px;font-size:13px}
+  .ba .before{background:rgba(248,81,73,.07);border-right:1px solid var(--line)}
+  .ba .after{background:rgba(63,185,80,.07)}
+  .ba .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+  ul{margin:8px 0;padding-left:22px} li{margin:4px 0}
+  .foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+  a{color:var(--accent)}
+  @media(max-width:720px){.grid,.ba{grid-template-columns:1fr}.ba .before{border-right:none;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>video 產線大重設落地報告</h1>
+  <p class="sub">2026-06-16 · <span class="pill">已完成</span> · <code>video/</code> 產線 · 同日兩輪</p>
+  <p class="sub">①審核重構落地正式流程（code 回報層 normalize）→ ②大重設：廢棄舊練習＋拋棄 Gemini＋退場 DeepSeek＋補 backlog。TTS 主力定 <b>MiMo / Mia</b>。下方先列第二輪大重設，再列第一輪 code 收尾細節（Part B/A）。</p>
+
+  <h2>第二輪 · 大重設（廢棄舊練習 · 拋棄 Gemini · 退場 DeepSeek · 補 backlog）</h2>
+  <p class="sub">使用者拍板：舊影片／旁白全屬累積經驗的練習 → 從講義重跑；TTS 只留 MiMo；engineering 鏡退場 DeepSeek、改 gate1 Claude／gate2 Codex；產線 backlog 做完。刪檔前逐項 asking 確認（①②③ 刪、④ 範本保留）。</p>
+
+  <div class="grid">
+    <div class="card"><h3 class="bad">🗑️ 廢棄舊產物</h3><ul>
+      <li><b>44 檔刪除（git 內可復原）</b>：ch01 全部 per-section（內容稿×6・<code>_narration.html</code>×6・<code>.spoken.yml</code>×4・<code>_narration_spoken.md</code>×4・storyboard×10・hooks×2・per-deck 稽核×10）＋ Gemini 鏈。</li>
+      <li><b><code>output/</code> 630M</b> 清空（gitignored、純本機）。</li>
+      <li>保留：pipeline 引擎、5 rubric＋2 template、<code>_demo_*.yml</code>×7、方法論／產線 <code>.md</code>。</li>
+      <li>正式版從 <code>chapter1-print-standalone.html</code> 逐節重跑。</li>
+    </ul></div>
+    <div class="card"><h3 class="ok">🎙️ Gemini 退場 → MiMo 單一路線</h3><ul>
+      <li>刪 <code>pipeline/build.py</code>＋<code>mux.py</code>（gen-2 Gemini 直鏈、無 importer）。</li>
+      <li><code>tts.py</code> 砍 <code>GeminiTTSBackend</code>＋Gemini 預設＋retry helper；<code>--backend (mimo,mock)</code>、預設 mimo、voice <code>Mia</code>。</li>
+      <li><code>make.py</code> <code>--backend (mock,)</code>；清 build/mux/Gemini 文案。</li>
+      <li>真旁白＝<code>tts.py --backend mimo</code> → <code>make.py --reuse-audio</code>。</li>
+    </ul></div>
+    <div class="card"><h3 class="ok">🔌 退場 DeepSeek（engineering 鏡）</h3><ul>
+      <li>DeepSeek 是單一用途、額外 provider/key/未驗證費率的殘留；gate2 已統一 Codex。</li>
+      <li><code>review_pack.py</code> → <b>離線 packet 組裝器</b>（無 API/key）。</li>
+      <li>新 SSOT <a href="HOOK-ENGINEERING-RUBRIC.md">HOOK-ENGINEERING-RUBRIC.md</a>（E1 數學保真 blocking＋E2 慣例）。</li>
+      <li>gate1 Claude 讀 packet → gate2 Codex 收斂後單次。<b>每道判斷閘形狀一致。</b></li>
+    </ul></div>
+    <div class="card"><h3 class="ok">🧰 backlog · schema.py（render 前第三閘）</h3><ul>
+      <li>新 <a href="../../pipeline/schema.py">schema.py</a>：結構驗證（meta／scene kind／id 唯一／<code>{show}</code> 不閉合）＋<code>--list</code> 列舉 reveal 目標。</li>
+      <li>接進 make.py：<b>schema → lint → sizecheck</b>（<code>--skip-schema</code> 可繞）。</li>
+      <li>對 <code>_demo</code> 實跑＋對抗式 in-memory 測（6 error class＋1 warn 全中、valid deck clean）。</li>
+      <li>target-vs-payload 交叉驗證待 <code>reveal_targets()</code>（task #6、需 manim）；VISUAL-FRAME detection 面驗證併入第一個重跑的節。</li>
+    </ul></div>
+  </div>
+
+  <div class="tldr" style="border-left-color:var(--accent)">
+    <b>驗證（離線、零計費）：</b>5 支 <code>.py</code>（critic／review_pack／schema／tts／make）<code>py_compile</code> 全過；<code>schema.py</code> 對 <code>_demo_*.yml</code> 實跑＋對抗式 in-memory 測全中；<code>review_pack</code> 組裝器 in-memory 驗（rubric 注入＋只留 animated unit＋packet 齊）；<code>make.py</code> 對 demo deck 跑 <code>schema→lint</code> 兩閘通過；grep 確認 <code>.py</code> 無 dangling／無殘留 Gemini-DeepSeek（除刻意「retired」註）。<b>git：44 刪／14 改／3 新；未動任何外部 API。</b>
+  </div>
+
+  <h2 style="border-color:var(--line);color:var(--muted)">第一輪 · 審核重構收尾（code 回報層 normalize）</h2>
+  <div class="tldr">
+    <b>結論：</b>審核重構的 <b>流程／rubric 層</b>先前已實質完成且 dogfood；本輪把當初<b>刻意延後</b>的「code 回報層 normalize」做完，
+    <b>重構自此無 open item</b>，<a href="../../REVIEW_MODEL_DECISIONS.md">REVIEW_MODEL_DECISIONS.md</a> 轉為決策紀錄。
+    兩支稽核工具（<code>critic.py</code>／<code>review_pack.py</code>）皆以當時的 §1.1 真 <code>--dry-run</code> 離線驗過，<b>未動任何外部／計費 API</b>。
+  </div>
+
+  <h2>Part B — code 回報層 normalize</h2>
+
+  <h3>① <code>critic.py</code> — 接 VISUAL-FRAME-RUBRIC（視覺 gate 2 正式接線）</h3>
+  <table>
+    <tr><th>項目</th><th>改動</th></tr>
+    <tr><td>rubric 來源</td><td>新增 <code>load_rubric()</code>，runtime <b>verbatim-inject 整份 <a href="VISUAL-FRAME-RUBRIC.md">VISUAL-FRAME-RUBRIC.md</a></b> body 進 prompt；維度自此<b>只活在 rubric 檔</b>（消 drift）。</td></tr>
+    <tr><td>輸出 schema</td><td>JSON 由舊 5 維（A1–A5）擴成 <b><code>visual_blocking_count</code> + <code>v_findings</code>（V1–V8、Blocking/Advisory）+ A1–A7 0–100 scores + <code>defects</code></b>；<code>_write_md</code> 印 <code>VERDICT: &lt;n&gt; visual blocking</code> 行 + V 清單 + A1–A7 表。</td></tr>
+    <tr><td>抽幀新鮮度</td><td>ffmpeg 前 <code>frame_path.unlink(missing_ok=True)</code> — 失敗的抽幀不再留下舊 PNG 給 gate-1 誤讀。</td></tr>
+    <tr><td>定價</td><td>PLACEHOLDER → <b>MiMo-V2.5 公測免費＝$0</b>（dated；仍印 token 量、仍受同意閘）。</td></tr>
+    <tr><td>robustness</td><td>stdout 改 UTF-8（<code>errors="replace"</code>）— Windows cp950 console 不再因注入的中文 rubric 崩（dry-run 實測抓到並修）。</td></tr>
+    <tr><td>清 stale</td><td>header 去掉「P1 visual-critique scaffold」「TODO: wire」，重寫為「external visual-frame critic / gate 2」。</td></tr>
+  </table>
+
+  <h3>② <code>review_pack.py</code> — 收斂為 engineering 鏡＋脫離 <code>.tex</code></h3>
+  <div class="ba">
+    <div class="before"><div class="lbl">之前</div>四鏡（faithfulness／register／decomposition／engineering）；忠實／工程鏡讀 <code>chapters/*.tex</code> 行號切片。<br><span class="bad">但 <code>chapters/*.tex</code> 已搬 <code>legacy/</code>、<code>source:</code> 欄改 HTML → 忠實鏡<b>實際組 0 packet</b>、工程鏡<b>math context 全空</b>。</span></div>
+    <div class="after"><div class="lbl">之後</div><b>單鏡（engineering）</b>；math context 改吃<b>內容稿動畫單元的 <code>narration</code>／<code>source</code></b>（數學本就 inline LaTeX、source 回溯 HTML）。<br><span class="ok">工程鏡可實跑（§1.1 dry-run 出 1 packet、context 來自內容稿）。</span></div>
+  </div>
+  <p class="mut" style="font-size:14px">移除 <code>tex_slice</code>／<code>source_tex_name</code>／<code>tex_name_label</code>／<code>packets_faithfulness</code>／<code>packets_register</code>／<code>packet_decomposition</code>／<code>--tex</code> 旗標；定價標籤改「unverified estimate」。</p>
+
+  <div class="card" style="border-left:3px solid var(--warn)">
+    <h3 style="color:var(--warn)">⚠️ 一個刻意的工程判斷（可否決）</h3>
+    <p style="margin:0">review_pack 我選擇<b>收斂到 engineering 鏡</b>，而非依原 redesign 設想「重建一個吃 HTML 的 faithfulness parser」。理由：
+    faithfulness／register／decomposition 三鏡已被 <b>CONTENT-SIXLENS（L1–L6 multi-agent）完全取代</b>，保留＝redesign 自己警告的「平行第二套追溯系統」；
+    重建 HTML parser 是純冗餘。收斂後 review_pack 只剩唯一非冗餘的職責，且正好對齊 <b>VISUAL-FRAME V8 邊界</b>（V8 查幀上可見數學、工程鏡查生成它的 code）。
+    它的計費路徑從未實跑過，<b>零回歸風險</b>。若你要的是「保留四鏡、改吃 HTML」，告知即可回退。</p>
+  </div>
+
+  <h2>Part A — 文件正式化</h2>
+  <table>
+    <tr><th>檔</th><th>改動</th></tr>
+    <tr><td><a href="../../REVIEW_MODEL_DECISIONS.md">REVIEW_MODEL_DECISIONS.md</a></td><td>狀態「部分採用」→「<b>已採用·收尾</b>」；§七 待續→收尾紀錄；§八 新增 2026-06-16 code 收尾條目；<b>轉為決策紀錄、無 open item</b>。</td></tr>
+    <tr><td><a href="../../REVIEW_GATES.md">REVIEW_GATES.md</a></td><td>§五 三條 stale 註記標「已解」；層 5（review_pack）列改單鏡＋脫 <code>.tex</code>；層 7（VISUAL-FRAME gate 2）列改「已接線、V1–V8＋A1–A7、MiMo 免費」；落地狀態 note 改「收尾」。</td></tr>
+    <tr><td><a href="VISUAL-FRAME-RUBRIC.md">VISUAL-FRAME-RUBRIC.md</a></td><td>wiring 註「critic.py 接線延後」→「<b>已接線</b>」，附輸出格式。</td></tr>
+    <tr><td><a href="../../README.md">README.md</a></td><td>critic 段「依五維」→ VISUAL-FRAME（V1–V8＋A1–A7）、定價→免費；review_pack 段「四個 lens」→ engineering 單鏡＋為何只剩一鏡＋指令／過濾紀律更新。</td></tr>
+    <tr><td><a href="../../DESIGN.md">DESIGN.md</a></td><td>Visual QA 段加權威指標（SSOT＝VISUAL-FRAME-RUBRIC；五維表保留作 A1–A5 出處）。</td></tr>
+    <tr><td><a href="../../REBUILD_STATUS.md">REBUILD_STATUS.md</a></td><td>頂部新增「審核重構收尾」節（進度錨）；待辦 #4 標 ✅；2026-06-10 banner 加 review_pack 結局指標。</td></tr>
+  </table>
+  <p class="mut" style="font-size:14px"><b>刻意不動：</b><code>CODE2VIDEO_STUDY.md</code>（研究／計畫文件，其「AES 五維」是 redesign 的<b>出處</b>非當前狀態宣稱）、REBUILD_STATUS 既有的<b>歷史 dated 紀錄</b>（描述當時為真）。</p>
+
+  <h2>驗證證據（離線、零計費）</h2>
+  <div class="grid">
+    <div class="card">
+      <h3 class="ok">critic.py — §1.1 dry-run</h3>
+      <pre>=== VISUAL-FRAME RUBRIC (verbatim) ===
+... (整份 rubric 注入) ...
+{"visual_blocking_count":int,
+ "v_findings":[{"code":"V1..V8", ...}],
+ "scores":{"a1_element_layout":int, ...,
+           "a6_typography_wrapping":int,
+           "a7_hierarchy_focus":int}, ...}
+
+[estimate] 1 frames -> ... -> ~$0.000
+ (MiMo-V2.5 free public beta, 2026-06; ...)
+[note] no key was used and no request was sent.</pre>
+    </div>
+    <div class="card">
+      <h3 class="ok">review_pack.py — §1.1 dry-run</h3>
+      <pre>[review] ch01_inverse_functions:
+   1 packet(s) across ['engineering']
+
+  engineering  (section)  ~7944 in-tok
+  by lens: engineering=1
+
+[estimate] 1 calls -> ~7,944 in + ~2,700 out
+ -> ~$0.0052 (unverified DeepSeek rates ...)
+[note] no key was used and no request was sent.</pre>
+    </div>
+  </div>
+  <ul>
+    <li><code>py_compile</code> 兩支皆過；grep 確認<b>無 dangling ref</b>（移除的 symbol 全清）、code 內<b>無殘留</b> <code>TODO: wire</code>／<code>scaffold</code>／<code>PLACEHOLDER</code>。</li>
+    <li>current-state 文件（README／DESIGN／REVIEW_GATES）<b>無殘留</b>「依五維／四個 lens」。</li>
+    <li><span class="mut">環境註：本機 <code>.venv</code> 原缺 <code>yaml</code>（vendored 於 gitignored <code>.deps*</code>，本機無）；為跑 dry-run 補裝 <code>pyyaml</code>（產線本需、無害）。<code>manim</code> 未裝亦可——<code>_bootstrap.bootstrap()</code> 對 manim 缺席 graceful。</span></li>
+  </ul>
+
+  <h2>剩下的（屬產線 backlog，非本重構）</h2>
+  <ul>
+    <li><code>schema.py</code>（render 前第三閘：YAML 結構驗證＋列舉 <code>{show}</code> 目標）未建。</li>
+    <li>VISUAL-FRAME <b>detection 面</b>驗證（拿粗節證明抓得到真 blocking；§1.1 太乾淨未驗）。</li>
+    <li>DeepSeek 實際費率（目前標 unverified estimate；engineering 鏡一節一 call、量小）。</li>
+  </ul>
+
+  <div class="foot">
+    產線進度錨 <a href="../../REBUILD_STATUS.md">REBUILD_STATUS.md</a> · 閘門地圖 <a href="../../REVIEW_GATES.md">REVIEW_GATES.md</a> · 決策紀錄 <a href="../../REVIEW_MODEL_DECISIONS.md">REVIEW_MODEL_DECISIONS.md</a><br>
+    本報告為 2026-06-16「落地成正式流程」一輪的完工記錄（未 commit；依 CLAUDE.md 待使用者過目）。
+  </div>
+
+</div>
+</body>
+</html>
