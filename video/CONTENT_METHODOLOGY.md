@@ -64,7 +64,7 @@
 | `env-remark`（具 `env-name` 的具名規則） | `proposition`／`definition` | 當輕量命題處理。 |
 | `env-remark`（短附註） | —（併入鄰段 narration） | 2 句的提醒不需要自己的單元。 |
 | `env-caution`（1–3 句陷阱警示） | —（併入其警示對象的單元） | 用警示語氣融進該單元 narration；自成教學點（如標準反例）才獨立，多為 `counterexample`。 |
-| `figure`（`data-fig` 註冊於 figures.js，或 inline SVG） | `visual` | **Redraw, don't reproduce**（見 §5）；多半值得做成動畫。 |
+| `figure`（`data-fig` 註冊於 standalone 的 `FIGS`，或 inline SVG） | `visual` | **Redraw, don't reproduce**（見 §5）；多半值得做成動畫。 |
 | 散文裡的幾何主張 | `visual`（補充） | 講義只用散文講鏡射／相交／形狀時，**SHOULD** 加一個視覺單元（symbol-heavy 例外見 §5）。 |
 
 ### 邊角：具名規則 + 其演示圖
