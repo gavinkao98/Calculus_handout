@@ -121,7 +121,7 @@ Categories unchanged: `history`, `application`, `formula`, `summary`, `figure`, 
 
 ## Figures
 
-Placeholder in the fragment, drawing registered in the chapter's `figures.js`:
+Placeholder in the fragment, drawing registered in the standalone HTML's `FIGS` object:
 
 ```html
 <figure class="figure" data-fig="my-plot">
@@ -129,10 +129,10 @@ Placeholder in the fragment, drawing registered in the chapter's `figures.js`:
 </figure>
 ```
 
-`figures.js` entry returns `{ layout, panels:[{ svg: buildPlot(cfg), note }] }`; labels use real
+The `FIGS` entry returns `{ layout, panels:[{ svg: buildPlot(cfg), note }] }`; labels use real
 `\( … \)` TeX so figure symbols match the prose. Inline SVG is also allowed for schematic diagrams
-(see `example-ch01/sec-1-1.html` Figure 1.2). A section with no figures may omit `figures.js`
-(the loader degrades gracefully).
+(see `example-ch01/sec-1-1.html` Figure 1.2). A section with no figures simply registers no `FIGS`
+entry (the loader degrades gracefully).
 
 **Keep figures label-light.** Put only the minimum on the drawing — axis/dimension labels, curve
 labels, and at most one short anchor — and name the regions, areas, formulas, and any extended
