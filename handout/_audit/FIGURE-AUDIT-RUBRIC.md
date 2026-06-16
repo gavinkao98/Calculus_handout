@@ -26,6 +26,16 @@
 - §10 允許的 callout、redundant curve label、宣告過的 palette exception。
 - 純美學偏好（色深、字級），除非已影響可讀性。
 
+## 複核紀律（verifier）
+
+每條 raw finding 交回裁決前 **MUST** 經一輪對抗式複核（預設立場駁回、逐條比對上方 Non-findings）。針對 VLM 視覺誤讀，另有以下硬要求：
+
+- **D5／D6 的「某行／某面板標錯」指控，verifier MUST 回 `FIGS` 原始碼逐字核對被指控的那一行**（座標、上下標、note 字串），不可只憑 render 後 PNG 的觀察就採信。
+- **警覺 VLM 對小字級上標／下標的系統性誤讀**（如把 \(a^{+}\) 看成 \(a^{-}\)）：縮放後的 PNG 在此類細節不可靠，一律以原始碼為準。
+- finding 的「建議修法」若會更動圖上某元素，**先確認該元素原本是否真的有誤**——勿據誤讀的指控把缺陷植入一張本來正確的圖。
+
+Rationale：ch01 gate-1 曾對 Fig 1.15 報出一條假 blocking——auditor 誤讀小字級上標、又杜撰與檔案矛盾的行號，其建議修法反而會把缺陷植入正確的圖；對抗式複核（回原始碼逐字核對）擋下了它，gate-2 獨立盲審亦不復現。把這條紀律寫進契約，使「擋假陽性」不依賴操作者臨場記得。
+
 ## 輸出格式
 1. `VERDICT` 行：視覺 blocking 數。
 2. 逐條 finding：`圖 ID｜Figure #｜維度 D?｜Blocking|Advisory｜證據（座標/檔行/PNG 觀察）｜為何｜建議修法`。

@@ -2026,7 +2026,10 @@ window.MathJax = {
     map[PI.toFixed(4)] = "\\pi";
     map[(2 * PI).toFixed(4)] = "2\\pi";
     map[(0).toFixed(4)] = "0";
-    return map[v.toFixed(4)];
+    var hit = map[v.toFixed(4)];
+    if (hit != null) return hit;
+    if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v)); // plain integers
+    return undefined;
   }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
   function anchorTransform(anchor, vAnchor) {
