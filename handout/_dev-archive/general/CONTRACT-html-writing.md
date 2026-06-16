@@ -131,7 +131,7 @@ Placeholder in the fragment, drawing registered in the standalone HTML's `FIGS` 
 
 The `FIGS` entry returns `{ layout, panels:[{ svg: buildPlot(cfg), note }] }`; labels use real
 `\( … \)` TeX so figure symbols match the prose. Inline SVG is also allowed for schematic diagrams
-(see `example-ch01/sec-1-1.html` Figure 1.2). A section with no figures simply registers no `FIGS`
+(see [../../fragments/ch01/sec-1-1.html](../../fragments/ch01/sec-1-1.html) Figure 1.2). A section with no figures simply registers no `FIGS`
 entry (the loader degrades gracefully).
 
 **Keep figures label-light.** Put only the minimum on the drawing — axis/dimension labels, curve
