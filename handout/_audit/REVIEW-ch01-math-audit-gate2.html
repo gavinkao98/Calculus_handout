@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 數學正確性稽核 — gate 2（Codex 獨立）審核稿</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: {
+        arccsc: ['\\operatorname{arccsc}'],
+        arcsec: ['\\operatorname{arcsec}'],
+        arccot: ['\\operatorname{arccot}']
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .flag{background:var(--warnbg);border-left-color:var(--warn)}
+  .flag b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .one{color:var(--warn);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.adv{background:var(--warnbg);color:var(--warn)}
+  .chip.keep{background:#e6f7ea;color:#1a7f37}
+  .issue{color:var(--muted);font-size:.92rem;margin:2px 0 10px}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:74px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .claim{background:#f4f5f7} .claim .tag{color:#33343a}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  .verdict{background:#eef4ff} .verdict .tag{color:var(--accent)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  .none{color:var(--muted);font-style:italic;padding:8px 2px}
+  code{background:#eef0f4;padding:.5px 5px;border-radius:5px;font-size:.9em}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 1 數學正確性稽核 — gate 2（Codex 獨立）審核稿</h1>
+  <p class="lede">第二道閘：Codex（<code>codex exec -s read-only</code>，獨立、唯讀，<b>盲審——不參照 gate 1 結果</b>）對 ch01 §1.1–§1.6 重跑 M1–M8。契約見 <code>MATH-CORRECTNESS-RUBRIC.md</code>；prompt 見 <code>PROMPT-ch01-math-audit-gate2.md</code>；Codex 原始輸出 <code>REPORT-ch01-math-gate2-raw.md</code>。2026-06-16。</p>
+
+  <div class="note pass"><b>math gate 通過：0 blocking（gate 1 與 gate 2 一致）。</b> Codex 提 1 條 advisory（§1.6 M5），經主審覆核確認為真、應修。<b>已套用，§1.6 回歸審核通過</b>（2026-06-16）——詳下。</div>
+
+  <div class="note flag"><b>跨閘對照（這就是跑 gate 2 的價值）：</b> gate 1（Claude）§1.6 判全乾淨；gate 2（Codex 獨立）抓到一條 gate 1 漏掉的真 advisory——精確定義節裡一句總結式漏了 punctured 條件 <code>0&lt;</code>，而該節的函數恰在該點被重新定義（\(f(3)=6\)），使該句字面為偽。獨立第二雙眼確實補上了單一模型的盲點。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>主題</th><th>gate 2 raw</th><th>主審覆核</th><th>處置</th></tr>
+    <tr><td>§1.1</td><td>Inverse Functions</td><td class="zero">0／0</td><td class="zero">—</td><td>乾淨，M1–M8 全過</td></tr>
+    <tr><td>§1.2</td><td>Inverse Trig Functions</td><td class="zero">0／0</td><td class="zero">—</td><td>乾淨（gate 1 之 1-2-a 此閘亦未提）</td></tr>
+    <tr><td>§1.3</td><td>Limit of a Function</td><td class="zero">0／0</td><td class="zero">—</td><td>乾淨，M1–M8 全過</td></tr>
+    <tr><td>§1.4</td><td>One-Sided &amp; Infinite Limits</td><td class="zero">0／0</td><td class="zero">—</td><td>乾淨（gate 1 之 1-4-a 此閘亦未提）</td></tr>
+    <tr><td>§1.5</td><td>Limit Laws &amp; Techniques</td><td class="zero">0／0</td><td class="zero">—</td><td>乾淨（gate 1 之 1-5-a 此閘亦未提）</td></tr>
+    <tr><td>§1.6</td><td>Precise Definition (ε-δ)</td><td class="one">0／1</td><td class="one">確認 1 advisory</td><td>G2-1 ✓ 已套用＋回歸通過</td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：<b>陳述正確</b> M1 定義 · M2 定理陳述 · M3 量詞／邏輯 ／ <b>推演正確</b> M4 推導／計算 · M5 邊界／定義域／特例 ／ <b>一致與完備</b> M6 記號一致 · M7 跨陳述一致 · M8 隱性假設。</p>
+
+  <h2>§1.1–§1.5</h2>
+  <p class="none">gate 2 全數乾淨（0／0），M1–M8 通過。與 gate 1 一致——gate 1 在 §1.2／§1.4／§1.5 提出的 3 條 advisory 已於 gate 1 對抗式複核撤回，gate 2 獨立重審亦未重提，雙閘交叉確認其為 non-finding。</p>
+
+  <h2>§1.6 The Precise Definition of a Limit</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-1</span><span class="chip unit">sec-1-6.html:46 總結式</span><span class="chip dim">M5 邊界／特例</span><span class="chip adv">Advisory（應修）</span><span class="chip keep">主審確認</span><span class="chip keep">✓ 已套用</span><span class="chip keep">回歸通過</span></div>
+    <div class="issue">精確定義節的引導段：把兩個具體容差推廣為一般式時，漏掉 punctured 條件 <code>0&lt;</code>。此節的引例函數在該點被重新定義 \(f(3)=6\)，故漏掉 <code>0&lt;</code> 使該句字面為偽。</div>
+    <div class="row claim"><span class="tag">引例</span>\( f(x) = \begin{cases} 2x - 1, & x \neq 3,\\ 6, & x = 3. \end{cases}\)　故 \(f(3)=6\)，而 \(\lim_{x\to 3} f(x)=5\)。</div>
+    <div class="row old"><span class="tag">原文 :46</span>…the same manipulation gives \(|f(x) - 5| < \varepsilon\) whenever \(<del>|x - 3| < \tfrac{\varepsilon}{2}</del>\); we may therefore take \(\delta = \tfrac{\varepsilon}{2}\).</div>
+    <div class="row new"><span class="tag">建議改</span>…the same manipulation gives \(|f(x) - 5| < \varepsilon\) whenever \(<ins>0 < |x - 3| < \tfrac{\varepsilon}{2}</ins>\); we may therefore take \(\delta = \tfrac{\varepsilon}{2}\).</div>
+    <div class="row verdict"><span class="tag">主審覆核</span>確認為真、非 non-finding。獨立驗算：在 \(x=3\) 時 \(|x-3|=0<\tfrac{\varepsilon}{2}\) 滿足前件，但 \(|f(3)-5|=|6-5|=1\)，對任何 \(\varepsilon\le 1\) 皆 \(\not<\varepsilon\)——故該總結句字面為偽。緊接其前的兩個具體實例（\(0<|x-3|<0.05\)、\(0<|x-3|<0.005\)）與 Definition 1.13 本身都正確含 <code>0&lt;</code>，故屬孤立的 prose 漏字、非概念錯誤——不升 blocking。但因 (a) 它確實使陳述字面為偽（非「等價表述」、不在 rubric non-findings 之列），且 (b) 出在「精確定義」這個 punctured-neighborhood 正是教學重點的節，<b>建議套用</b>該 3 字補正。</div>
+    <div class="row new"><span class="tag">回歸審核</span>已套用並 <code>python build.py ch01</code> 重組。回歸（§1.6，2026-06-16）：修正後 \(0<|x-3|<\tfrac{\varepsilon}{2}\Rightarrow|f(x)-5|=2|x-3|<\varepsilon\) 正確、與節內兩具體實例及 Definition 1.13 一致、print-standalone 已含修正、全節無殘留 bare 容差——通過，未引入新問題。</div>
+  </div>
+
+  <footer>
+    產線：MATH-CORRECTNESS-RUBRIC.md gate 2（Codex <code>exec -s read-only</code>，獨立盲審）·2026-06-16。<br>
+    雙閘合計：<b>0 blocking</b>（math gate 通過）；<b>1 confirmed advisory</b>（G2-1，§1.6，<b>已套用＋回歸通過</b>）。gate 1 的 3 條 raw advisory 經對抗式複核全撤、gate 2 獨立未重提。本閘所提 G2-1 為跨兩閘第一條 confirmed finding，且來自獨立模型——驗證雙閘設計。G2-1 已落地、§1.6 回歸審核通過、未引入新問題。
+  </footer>
+
+</div>
+</body>
+</html>
