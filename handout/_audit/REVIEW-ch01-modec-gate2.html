@@ -1,0 +1,100 @@
+<!doctype html>
+<!-- Gate 2（獨立第二道閘）：Codex codex-cli 0.130.0（newer build）· model gpt-5.5 / reasoning xhigh · 2026-06-16
+     範圍：ch01 Mode C 的 14 個 [pass: enrichment] 標記（審定稿後＝commit 316d376 的文字）
+     以 read-only sandbox 產生（Codex 不曾、也無法改動 repo 任何檔案）；由 Claude session 原樣落地、僅加此 provenance 註解。
+     契約：handout/_audit/PROSE-AUDIT-RUBRIC.md。對應 gate 1（Claude）報告：REVIEW-ch01-modec-modeb.html。 -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Gate 2 Prose Audit: Chapter 1 Mode C Enrichment</title>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; line-height: 1.5; max-width: 980px; margin: 32px auto; padding: 0 20px; color: #1f2937; background: #ffffff; }
+    .verdict { font-size: 1.1rem; font-weight: 700; margin: 0 0 18px; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0 28px; }
+    th, td { border: 1px solid #d1d5db; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    h1, h2 { margin: 28px 0 10px; }
+    h1 { font-size: 1.35rem; }
+    h2 { font-size: 1.1rem; }
+    .card { border: 1px solid #d1d5db; border-radius: 8px; padding: 16px; margin: 16px 0; background: #fff; }
+    .meta { color: #4b5563; margin: 4px 0 10px; }
+    blockquote { margin: 10px 0; padding: 10px 14px; border-left: 4px solid #d1d5db; background: #f9fafb; }
+    .diff { margin: 10px 0 0; padding: 10px 14px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; }
+    del { background: #fee2e2; color: #991b1b; text-decoration: line-through; }
+    ins { background: #dcfce7; color: #166534; text-decoration: none; }
+    .status li { margin: 4px 0; }
+    .footer { margin-top: 28px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <p class="verdict">VERDICT: 0 blocking, 2 tighten, 0 optional. Gate 2 finds no comprehensibility blockers across the six audited sections.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Section</th>
+        <th># enrichment markers</th>
+        <th>Comprehensibility blocking</th>
+        <th>Tighten</th>
+        <th>Optional</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>§1.1</td><td>2</td><td>0</td><td>1</td><td>0</td></tr>
+      <tr><td>§1.2</td><td>3</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td>§1.3</td><td>2</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td>§1.4</td><td>2</td><td>0</td><td>1</td><td>0</td></tr>
+      <tr><td>§1.5</td><td>2</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td>§1.6</td><td>3</td><td>0</td><td>0</td><td>0</td></tr>
+    </tbody>
+  </table>
+
+  <h1>Findings</h1>
+
+  <section class="card" id="G2-1">
+    <h2>G2-1 <span>[F3]</span></h2>
+    <p class="meta"><strong>Locus:</strong> handout/fragments/ch01/sec-1-1.html:106, intuition paragraph before Definition 1.2</p>
+    <p><strong>Issue:</strong> The final pronoun in “its outputs” has an avoidably loose antecedent. The intended parallel is clear, but the sentence is explaining domain/range reversal, so naming \(f^{-1}\) again prevents a possible misread.</p>
+    <p><strong>Original text:</strong></p>
+    <blockquote>The idea is simply that the inverse trades the roles of input and output. Where \(f\) reads as a question — “given the input \(x\), what is the output?” — the inverse reads the same correspondence in reverse: “given that output, which input produced it?” This is why the domain and range change places: the outputs of \(f\) are exactly the inputs of \(f^{-1}\), and the inputs of \(f\) are its outputs.</blockquote>
+    <p><strong>Suggested fix:</strong></p>
+    <p class="diff">This is why the domain and range change places: the outputs of \(f\) are exactly the inputs of \(f^{-1}\), <del>and the inputs of \(f\) are its outputs.</del><ins>and the inputs of \(f\) are exactly the outputs of \(f^{-1}\).</ins></p>
+  </section>
+
+  <section class="card" id="G2-2">
+    <h2>G2-2 <span>[U4]</span></h2>
+    <p class="meta"><strong>Locus:</strong> handout/fragments/ch01/sec-1-4.html:179, Strategy 1.3 “Locating vertical asymptotes”</p>
+    <p><strong>Issue:</strong> “Discontinuous” appears before continuity is introduced as a formal term, and the phrase also attaches “discontinuous” to the formula rather than the function or graph. Replacing it with ordinary visual language removes the forward-reference seam without changing the strategy.</p>
+    <p><strong>Original text:</strong></p>
+    <blockquote>Find the candidate points: places where the formula is undefined, discontinuous, or otherwise suspect — though still approachable from within the domain. For a rational function, these are usually the zeros of the denominator.</blockquote>
+    <p><strong>Suggested fix:</strong></p>
+    <p class="diff">Find the candidate points: places where the formula is <del>undefined, discontinuous, or otherwise suspect</del><ins>undefined, the graph breaks, or the expression otherwise looks suspect</ins> — though still approachable from within the domain. For a rational function, these are usually the zeros of the denominator.</p>
+  </section>
+
+  <h1>Dimension Status</h1>
+  <ul class="status">
+    <li>U1 motivation: clean</li>
+    <li>U2 gloss: clean</li>
+    <li>U3 logical bridge: clean</li>
+    <li>U4 term/notation order: 1 tighten; no blocking</li>
+    <li>U5 definition unpacking: clean</li>
+    <li>F1 local redundancy: clean</li>
+    <li>F2 filler: clean</li>
+    <li>F3 sentence parse: 1 tighten</li>
+    <li>F4 sentence length/cognitive load: clean</li>
+    <li>F5 register: clean</li>
+  </ul>
+
+  <p class="footer">Comprehensibility blocking = 0 across the six audited sections; the gate-2 convergence criterion is met.</p>
+</body>
+</html>
