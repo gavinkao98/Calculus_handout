@@ -343,27 +343,27 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
     """A display heading that may carry inline ``$math$``.
 
     Plain headings go through ``heading`` (Text, SEMIBOLD). When the title has
-    ``$...$`` (e.g. "Worked Example: $f(x)=x^3+2$"), split on ``$`` and alternate
-    SEMIBOLD Text with MathTex so the math renders instead of printing literally.
+    ``$...$`` it is rendered as a SINGLE Tex (text mode): each prose run is bolded
+    with ``\\textbf{}`` and the ``$...$`` spans stay inline math. LaTeX then sets
+    text and math on one shared baseline and sizes the inline math relative to the
+    text natively -- so a title like "Testing $f(x)=x$ and $g(x)=x^2$" reads as one
+    even line. (Was: split into Pango ``Text`` + ``MathTex`` glued with
+    ``arrange(aligned_edge=DOWN)``, which aligned bounding-box *bottoms*, not
+    baselines -- so a descender-free word like "and" floated up and a tall span
+    like ``\\dfrac{3}{x-5}`` rode high, and the math, bumped by TEX_TEXT_SCALE to
+    undo MathTex's shrink, ran ~5% oversized.) newtxtext bold + newtxmath are both
+    Times, so the mixed line stays a consistent serif at the plain-heading size.
     Callers clamp width themselves (titles vary a lot in length).
     """
     if "$" not in text:
         return heading(text, ground, role=role, size=size)
-    fsz = T.fs(size)
-    col = T.color(ground, role)
-    mobs = []
-    for i, part in enumerate(text.split("$")):
-        if not part:
-            continue
-        if i % 2:  # odd segments are the spans that were between $...$
-            # TEX_TEXT_SCALE: a MathTex at the Text's font_size renders ~25%
-            # smaller (Pango vs LaTeX sizing), which visibly shrank the math in
-            # titles like "Worked Example: $f(x)=x^3+2$".
-            mobs.append(MathTex(part, color=col, font_size=fsz * T.TEX_TEXT_SCALE))
-        else:
-            mobs.append(Text(part, font=T.FONT_DISPLAY, font_size=fsz,
-                             color=col, weight="SEMIBOLD"))
-    return VGroup(*mobs).arrange(RIGHT, buff=0.24, aligned_edge=DOWN)
+    body = "".join(
+        f"${part}$" if i % 2 else (r"\textbf{" + _escape_tex(part) + "}" if part else "")
+        for i, part in enumerate(text.split("$"))
+    )
+    # TEX_TEXT_SCALE matches Tex text-mode to the Pango heading size (same factor
+    # body_text uses); the inline math then follows from LaTeX, not a manual bump.
+    return Tex(body, color=T.color(ground, role), font_size=T.fs(size) * T.TEX_TEXT_SCALE)
 
 
 def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math"):

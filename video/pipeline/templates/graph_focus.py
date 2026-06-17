@@ -36,9 +36,7 @@ from manim import (
     DashedLine,
     Dot,
     Line,
-    MathTex,
     Polygon,
-    Text,
     VGroup,
     VMobject,
 )
@@ -106,22 +104,14 @@ def _axis_ticks(axes: Axes, ac: dict[str, Any], ground: str):
 
 
 def _title(text: str, ground: str):
-    title_fs = T.fs("h1") * 0.88
+    # Rich ($math$) titles go through brand.heading_rich -- one Tex, so text and
+    # math share a baseline and the inline math is sized natively (was a split
+    # Text+MathTex glued by arrange(aligned_edge=DOWN), which aligned bbox bottoms
+    # not baselines, floating descender-free words and oversizing the math). Graph
+    # titles sit at 0.88x h1; fs() takes px, so pass that size back in px units.
     if "$" in text:
-        parts = text.split("$")
-        mobs = []
-        for i, part in enumerate(parts):
-            if not part:
-                continue
-            if i % 2:
-                # TEX_TEXT_SCALE: same Pango-vs-LaTeX size mismatch as
-                # brand.heading_rich -- unscaled, the title's math ran small.
-                mobs.append(MathTex(part, color=T.color(ground, "primary"),
-                                    font_size=title_fs * T.TEX_TEXT_SCALE))
-            else:
-                mobs.append(Text(part, font=T.FONT_DISPLAY, font_size=title_fs,
-                                 color=T.color(ground, "primary"), weight="SEMIBOLD"))
-        mob = VGroup(*mobs).arrange(RIGHT, buff=0.24, aligned_edge=DOWN)
+        mob = brand.heading_rich(text, ground, role="primary",
+                                 size=T.fs("h1") * 0.88 / T.PX_TO_FS)
     else:
         mob = brand.heading(text, ground, role="primary", size="h1")
     max_w = T.FRAME_W - 2 * T.SAFE_MARGIN
