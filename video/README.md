@@ -248,7 +248,9 @@ python video\pipeline\review_pack.py --storyboard video\storyboards\<deck>.yml
 > 換電腦時 `import manim/yaml` 會直接失敗。若它們不在,改建一個本機 venv
 > （與 `.deps*` 互不影響,`_bootstrap` 找不到 `.deps*` 時就用 venv 的套件）。
 
-**換新電腦的一次性設定**（`.deps*` 不存在時）:
+> ✅ **本機現況（2026-06-17 確認，免再逐次查）：** 全域 `python`（Python 3.12，`%LOCALAPPDATA%\Programs\Python\Python312`）已裝 **manim 0.20.1 ＋ PyYAML**；**MiKTeX**（`latex`／`dvisvgm`）與**系統 ffmpeg**（8.x）皆在 PATH。故本機**直接用全域 `python` 跑**即可——`python video\make.py …`、`python video\pipeline\sizecheck.py …`——**不需** `.venv`（其未裝 manim）、**不需** `ffmpeg_shim`。已用 `sizecheck` 對 `_demo_value_table.yml` 實跑驗證（manim 建場景＋LaTeX 編譯＋dvisvgm 全通、exit 0）。下方 `.venv` 設定僅為「無此環境的機器」的後備。
+
+**換新電腦的一次性設定**（`.deps*` 不存在、且全域 python 也沒有 manim 時）:
 
 ```powershell
 # 1) 建 venv 並裝 pinned 依賴

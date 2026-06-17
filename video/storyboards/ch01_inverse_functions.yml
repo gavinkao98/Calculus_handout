@@ -1,0 +1,496 @@
+# §1.1 Inverse Functions — 工程稿（storyboard, Stage 2）
+#
+# 由 LOCKED 內容稿 content_scripts/ch01_inverse_functions.md 模板化而來（2026-06-17）。
+# say = 認可旁白逐字（canonical inline LaTeX）＋ {show} reveal marker。
+# 5 個 `# HOOK(第二輪)` 標客製動畫接入點；本版靜態模板頂著、刪 hook 行即回 stock。
+# 真旁白走 MiMo：另寫 ch01_inverse_functions.spoken.yml → derive_spoken。
+#
+# YAML 引號慣例：say 為 | block scalar（反斜線單寫、字面）；payload 數學字串一律
+# 單引號 '...'（反斜線字面、單寫，唯一特例 '' = 單引號），避免雙引號的 escape 陷阱。
+
+meta:
+  id: ch01_inverse_functions
+  section: "1.1"
+  title: "Inverse Functions"
+  language: en
+  theme: midnight
+  voice: Mia                       # MiMo preset (Gemini retired 2026-06-16)
+  video: { w: 3840, h: 2160, fps: 60 }   # delivery target 4K60; test renders use --quality high (1080p)
+  chapter: "Chapter 1"
+  chapter_title: "Inverse Functions and Limits"
+  sections:
+    - { id: "1.1", title: "Inverse Functions" }
+    - { id: "1.2", title: "Inverse Trigonometric Functions" }
+    - { id: "1.3", title: "The Limit of a Function" }
+    - { id: "1.4", title: "One-Sided and Infinite Limits" }
+    - { id: "1.5", title: "Limit Laws and Computational Techniques" }
+    - { id: "1.6", title: "The Precise Definition of a Limit" }
+
+scenes:
+
+  # 00 ------------------------------------------------------------ intro
+  - id: intro
+    kind: intro
+    tagline: "When can a function be run backwards?"
+    duration: 6.0
+
+  # 01 ----------------------------------------------- motivation (mapping)
+  # HOOK(第二輪): 兩進一出映射 — f(x)=x 乾淨一對一；x^2 把 1/2、-1/2 匯到 1/4（閃紅）。
+  - id: can_we_run_it_backwards
+    kind: content
+    template: definition_math
+    accent: definition
+    kicker: motivation
+    source: "§1.1 開節散文 + warmup + 'difference is central' (content unit can_we_run_it_backwards)"
+    title: "Running a Function Backwards"
+    statement: 'Forwards is easy. Can we recover the input from the output?'
+    math:
+      - '$f(x)=x$ on $[0,1]$: each output comes from one input'
+      - { tex: '$g(x)=x^2$: $\tfrac12$ and $-\tfrac12$ both map to $\tfrac14$', anim: highlight }
+    say: |
+      We know how to run a function forwards — feed it an input, read off the
+      output. The real question of this section is whether we can run it
+      backwards, recovering the input from the output. Sometimes we can,
+      sometimes we can't, and two quick examples show the difference.
+      {show math.0} Take $f(x)=x$ on the interval from $0$ to $1$: zero goes to
+      zero, a half goes to a half, an eighth goes to an eighth — every output
+      traces back to exactly one input, so going backwards is unambiguous.
+      {show math.1} Now take $f(x)=x^2$ on the interval from $-1$ to $1$: a half
+      squares to a quarter, but so does negative a half, so the output a quarter
+      came from two different inputs. That collision is the whole obstacle —
+      when one output can be traced to two inputs, there is no honest way back,
+      and pinning down exactly when that never happens is where we begin.
+
+  # 02 ------------------------------------------------- one-to-one definition
+  - id: one_to_one_definition
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "§1.1 Definition 1.1 + 小節 lead-in"
+    title: "One-to-One"
+    statement: 'A function is one-to-one when different inputs always give different outputs.'
+    math:
+      - '$f(x_1)\ne f(x_2)$ whenever $x_1\ne x_2$'
+      - { tex: '$f(x_1)=f(x_2)\implies x_1=x_2$', anim: highlight }
+    say: |
+      A function can be run backwards only when each output comes from exactly
+      one input, and that property has a name: one-to-one.
+      {show math.0} Formally, that means different inputs always give different
+      outputs — $f(x_1)\ne f(x_2)$ whenever $x_1\ne x_2$.
+      {show math.1} There is an equivalent form that turns out to be the one you
+      actually use in a proof: if $f(x_1)=f(x_2)$, then $x_1=x_2$. The two say
+      the same thing from opposite sides — the first forbids a collision
+      outright, the second says that if a collision did happen, the two inputs
+      must have been equal all along. When you need to prove a function is
+      one-to-one, reach for that second form.
+
+  # 03 --------------------------------------------- example: student IDs (real-world)
+  - id: student_id_is_one_to_one
+    kind: content
+    template: definition_math
+    accent: example
+    source: "§1.1 Example 1.1 (student identification numbers)"
+    title: "A One-to-One Function in Words"
+    statement: 'A class is assigned ID numbers, with no two students sharing one.'
+    math:
+      - '$f:\text{student}\mapsto\text{ID number}$'
+      - { tex: '$\text{distinct students}\Rightarrow\text{distinct IDs}$ — one-to-one', anim: highlight }
+    say: |
+      Let us start with a one-to-one function that needs no algebra at all.
+      Picture a class where every student is assigned an identification number,
+      set up so that no two students ever share a number.
+      {show math.0} Let $f$ send each student to their identification number —
+      is it one-to-one?
+      {show math.1} It is: by construction, two different students always end up
+      with two different numbers, so distinct inputs give distinct outputs. That
+      is the definition in plain words, before a single equation — no two inputs
+      are allowed to collide.
+
+  # 04 --------------------------------- example: testing x and x^2 (algebraic)
+  - id: testing_x_and_x_squared
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "§1.1 Example 1.2 + 'Now we return to the two…' 橋接"
+    title: 'Testing $f(x)=x$ and $g(x)=x^2$'
+    steps:
+      - { text: 'On $[0,1]$, $f(x)=x$ sends each input to itself.', math: 'f \text{ is one-to-one}', mark: ok }
+      - { text: 'On $[-1,1]$, test $g(x)=x^2$ against the definition.', math: 'g(\tfrac12)=\tfrac14=g(-\tfrac12)' }
+      - { text: 'Two inputs, one output — the collision the definition forbids.', math: 'g \text{ is not one-to-one}', mark: bad }
+    takeaway: 'So $g$ is not one-to-one on this interval — exactly why it needs care later.'
+    takeaway_tone: neutral
+    say: |
+      We met these two at the very start; now let us run them through the
+      definition.
+      {show math.0} On $0$ to $1$, $f(x)=x$ sends every input to itself, so
+      different inputs always land on different outputs — $f$ is one-to-one.
+      {show math.1} But $g(x)=x^2$ on $-1$ to $1$ fails, and we can pin it down
+      cleanly: $g$ of a half is a quarter, and $g$ of negative a half is also a
+      quarter.
+      {show math.2} Two different inputs, one shared output — exactly the
+      collision the definition rules out.
+      {show takeaway} So $g$ is not one-to-one on this interval — which is
+      exactly why it needs careful handling later.
+
+  # 05 ------------------------------ example: same shape, opposite verdicts
+  - id: shape_can_mislead
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "§1.1 Example 1.3 (h=x^3-4x vs k=x^3+4)"
+    title: "Same Shape, Opposite Verdicts"
+    steps:
+      - { text: 'Factor $h(x)=x^3-4x$.', math: 'h(x)=x(x-2)(x+2)' }
+      - { text: 'Then $h(0)=h(2)=0$ with $0\ne 2$.', math: 'h \text{ is not one-to-one}', mark: bad }
+      - { text: 'For $k(x)=x^3+4$: $k(x_1)=k(x_2)$ forces $x_1^3=x_2^3$.', math: 'x_1=x_2,\ k \text{ one-to-one}', mark: ok }
+    takeaway: 'When the graph is not in front of you, test the definition directly.'
+    takeaway_tone: neutral
+    say: |
+      Here is a case where the formula can fool you. Compare $h(x)=x^3-4x$ with
+      $k(x)=x^3+4$ on the whole real line — both look like cousins of $x^3$.
+      {show math.0} But factor the first: $h(x)=x(x-2)(x+2)$,
+      {show math.1} so $h$ of $0$ and $h$ of $2$ are both zero even though $0$
+      and $2$ are different inputs; $h$ is not one-to-one.
+      {show math.2} The second behaves oppositely: if $k(x_1)=k(x_2)$, then
+      $x_1^3=x_2^3$, and taking cube roots forces $x_1=x_2$, so $k$ is
+      one-to-one.
+      {show takeaway} Same general shape, opposite verdicts — when the graph is
+      not in front of you, test the definition directly.
+
+  # 06 ---------------------------------- horizontal line test (compare panels)
+  # HOOK(第二輪): 水平線自上而下掃過兩格 — 左 y=x 始終交一次(綠)、右拋物線切兩點(紅)。
+  - id: horizontal_line_test
+    kind: content
+    template: graph_compare
+    accent: example
+    source: "§1.1 Remark 1.1 (Horizontal line test) + Figure 1.1 (hlt)"
+    title: "The Horizontal Line Test"
+    left:
+      axes: { x_range: [-2.3, 2.2, 1], y_range: [-2.1, 2.3, 1] }
+      plots:
+        - { kind: function, expression: 'x', x_range: [-1.7, 1.7], color_role: secondary, label: '$y=x$', label_point: [1.25, 1.7] }
+        - { kind: line, start: [-2.0, 1.0], end: [1.3, 1.0], dashed: true, color_role: warning, reveal: true }
+        - { kind: point, point: [1.0, 1.0], hollow: false, color_role: accent, reveal: true }
+      caption: 'A line: one crossing at every height.'
+      verdict: ok
+    right:
+      axes: { x_range: [-2.3, 2.2, 1], y_range: [-0.5, 2.4, 1] }
+      plots:
+        - { kind: function, expression: '1.15*x**2', x_range: [-1.4, 1.4], color_role: secondary, label: '$y=x^2$', label_point: [1.55, 2.15] }
+        - { kind: line, start: [-1.95, 1.25], end: [1.95, 1.25], dashed: true, color_role: warning, reveal: true }
+        - { kind: point, point: [-1.043, 1.25], hollow: false, color_role: accent, reveal: true }
+        - { kind: point, point: [1.043, 1.25], hollow: false, color_role: accent, reveal: true }
+      caption: 'A parabola: one height, two crossings.'
+      verdict: bad
+    annotations:
+      - 'One-to-one $\iff$ no horizontal line crosses the graph more than once.'
+    say: |
+      When you do have the graph, there is a one-glance test. A horizontal line
+      $y=c$ meets the graph of $f$ wherever $f(x)=c$, so a single output value
+      showing up twice is the same as that line crossing the graph twice. That
+      gives the rule: a function is one-to-one exactly when no horizontal line
+      crosses its graph more than once.
+      {show left.plot.1} A straight line like $y=x$ passes —
+      {show left.plot.2} every horizontal line meets it just once.
+      {show caption.left} {show right.plot.1} A parabola fails — a horizontal
+      line slices clean through both arms,
+      {show right.plot.2} {show right.plot.3} and those two crossings are exactly
+      the pair of inputs sharing an output we found with algebra.
+      {show caption.right} {show annotation.0} One-to-one, in a single glance: no
+      horizontal line gets to cross twice.
+
+  # 07 ------------------------------------------- inverse function definition
+  - id: inverse_function_definition
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "§1.1 Definition 1.2 + role-swap prose + Caution 1.1 (folded N1)"
+    title: "The Inverse Function"
+    statement: 'Read the same correspondence backwards: the inverse sends each output of $f$ back to the input it came from.'
+    math:
+      - { tex: '$f^{-1}(y)=x \iff f(x)=y$', anim: highlight }
+      - '$f^{-1}(x)\ne \dfrac{1}{f(x)}$'
+    say: |
+      Once a function is one-to-one, we can build a second function that undoes
+      it. The idea is simply to read the same correspondence backwards. Where
+      $f$ asks "given the input, what is the output?", the inverse asks "given
+      that output, which input produced it?" So the outputs of $f$ become the
+      inputs of the inverse, and the domain and range trade places.
+      {show math.0} We write the inverse as $f$ inverse, and define it like
+      this: $f^{-1}(y)=x$ exactly when $f(x)=y$.
+      {show math.1} One warning about the notation: that $-1$ means inverse
+      function, not a reciprocal. $f^{-1}(x)$ is the inverse evaluated at $x$,
+      which is a completely different thing from $1$ over $f(x)$ — and the same
+      caution will matter for $\sin^{-1}$ shortly.
+
+  # 08 ---------------------------------------- theorem: inverse iff one-to-one
+  - id: inverse_iff_one_to_one
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    source: "§1.1 Theorem 1.1 + Proof"
+    title: "An Inverse Exists Exactly When One-to-One"
+    statement: 'A function has an inverse if and only if it is one-to-one.'
+    proof:
+      - 'If $f$ has an inverse and $f(x_1)=f(x_2)$, apply $f^{-1}$: $x_1=x_2$. So $f$ is one-to-one.'
+      - 'If $f$ is one-to-one, each output $y$ has exactly one source $x$ — send $y$ back to it and that is $f^{-1}$.'
+    qed: 'So one-to-one and invertible name the same thing.'
+    say: |
+      This ties the two halves of the section into one clean statement: a
+      function has an inverse if and only if it is one-to-one. One direction is
+      quick.
+      {show proof.0} Suppose $f$ already has an inverse and $f(x_1)=f(x_2)$;
+      apply $f$ inverse to both sides — the left collapses to $x_1$, the right
+      to $x_2$, so $x_1=x_2$, and $f$ was one-to-one all along.
+      {show proof.1} The other direction builds the inverse: if $f$ is
+      one-to-one, then every output $y$ in the range comes from exactly one
+      input $x$, and sending each $y$ back to its unique $x$ is precisely the
+      inverse function.
+      {show qed} So "one-to-one" and "invertible" are just two names for the
+      same thing.
+
+  # 09 ------------------------------------- example: first inverses (x, x^3)
+  - id: first_inverses
+    kind: content
+    template: example_walkthrough
+    accent: example
+    source: "§1.1 Example 1.4 (f=x self-inverse; g=x^3 → cbrt x, with check)"
+    title: "Computing a Couple of Inverses"
+    steps:
+      - { text: '$f(x)=x$ leaves every input untouched.', math: 'f^{-1}(x)=x' }
+      - { text: 'For $g(x)=x^3$: set $y=x^3$, solve, then rename.', math: 'g^{-1}(x)=\sqrt[3]{x}' }
+      - { text: 'Check by composing.', math: 'g\bigl(g^{-1}(x)\bigr)=\bigl(\sqrt[3]{x}\bigr)^3=x', mark: ok }
+    takeaway: 'Solve for the input, swap the names — soon to be routine.'
+    takeaway_tone: ok
+    say: |
+      Let us compute a couple of inverses.
+      {show math.0} Start with $f(x)=x$ — it leaves every input untouched, so
+      undoing it does nothing either; $f$ is its own inverse, $f^{-1}(x)=x$.
+      {show math.1} Now $g(x)=x^3$: set $y=x^3$, solve to get $x$ equals the cube
+      root of $y$, then rename the variables to land on $g^{-1}(x)$ equals the
+      cube root of $x$.
+      {show math.2} And we can check it — $g$ of its inverse is the cube root of
+      $x$, all cubed, which is just $x$ again.
+      {show takeaway} Solve for the input, swap the names; that is the move, and
+      we are about to make it routine.
+
+  # 10 ---------------------------------- proposition: composition identities
+  # HOOK(第二輪): A↔B 兩泡泡往返 — x 沿 f 到 f(x)、沿 f^{-1} 回到原 x（閃示同一點）。
+  - id: composition_identities
+    kind: content
+    template: definition_math
+    accent: proposition
+    source: "§1.1 Proposition 1.1 + 'defining relation yields two identities' + Figure 1.2 (fig-map)"
+    title: "Composition Identities"
+    statement: 'Undo, then redo — and you are back where you started.'
+    math:
+      - { tex: '$f^{-1}\bigl(f(x)\bigr)=x \quad\text{for every } x\in A$', anim: highlight }
+      - { tex: '$f\bigl(f^{-1}(y)\bigr)=y \quad\text{for every } y\in B$', anim: highlight }
+    say: |
+      Undoing and then redoing should leave you exactly where you started —
+      worth stating outright.
+      {show math.0} For a one-to-one $f$, applying $f$ and then $f$ inverse
+      returns the original input: $f^{-1}(f(x))=x$ for every $x$ in the domain.
+      {show math.1} Going the other way works too: $f(f^{-1}(y))=y$ for every
+      $y$ in the range. Picture an input $x$ in the set $A$; $f$ carries it
+      across to its output in the set $B$, and $f$ inverse carries that output
+      right back to the same $x$ — a round trip that lands home. Each function
+      is the other's exact undo, in both directions.
+
+  # 11 ------------------------------------- visual: reflection across y=x
+  # HOOK(第二輪): 點 (a,b) 對 y=x 鏡射到 (b,a)；整條 x^3 沿 y=x 翻摺疊到 cbrt x。
+  - id: reflection_across_y_equals_x
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "§1.1 reflection 散文主張升格視覺（以 x^3 / cbrt x 示範, §5）"
+    title: 'Reflection across $y=x$'
+    axes: { x_range: [-2.2, 2.2, 1], y_range: [-2.2, 2.2, 1], x_length: 5.6, y_length: 5.6 }
+    plots:
+      - { kind: line, start: [-2.1, -2.1], end: [2.1, 2.1], dashed: true, color_role: muted, label: '$y=x$', label_point: [1.55, 1.95] }
+      - { kind: function, expression: 'x**3', x_range: [-1.28, 1.28], color_role: secondary, label: '$y=x^3$', label_point: [0.95, 2.0] }
+      - { kind: function, expression: 'cbrt(x)', x_range: [-2.1, 2.1], color_role: accent, label: '$y=\sqrt[3]{x}$', label_point: [1.95, 0.95], reveal: true }
+      - { kind: point, point: [1.1, 1.331], hollow: false, color_role: text, reveal: true }
+      - { kind: point, point: [1.331, 1.1], hollow: false, color_role: text, reveal: true }
+    annotations:
+      - '$(a,b)$ on the graph of $f$ $\iff$ $(b,a)$ on the graph of $f^{-1}$.'
+    say: |
+      There is a clean picture of what taking an inverse does to a graph. If you
+      draw $f$ and its inverse in the same plane, the two graphs are mirror
+      images across the line $y=x$.
+      {show plot.2} The reason is the same swap: a point $(a,b)$ sits on the
+      graph of $f$ exactly when $(b,a)$ sits on the graph of the inverse,
+      {show plot.3} {show plot.4} and reflecting across $y=x$ is precisely what
+      trades a point's two coordinates.
+      {show annotation.0} You can watch it on the cube and the cube root from a
+      moment ago — fold the graph of $x^3$ over the line $y=x$ and it lands right
+      on the graph of the cube root. Inverse, geometrically: reflect across
+      $y=x$.
+
+  # 12 ------------------------------- example: repair by restricting (x^2 → sqrt x)
+  # HOOK(第二輪): 整條拋物線丟棄左臂(x<0)、保留右臂沿 y=x 鏡射生成 sqrt x。
+  - id: repair_by_restricting
+    kind: content
+    template: graph_focus
+    accent: example
+    source: "§1.1 Example 1.5 (restrict x^2 to [0,inf), inverse sqrt x) + Figure 1.3 (restrict-x2)"
+    title: "Restrict, then Invert"
+    axes: { x_range: [-0.4, 2.7, 1], y_range: [-0.4, 2.7, 1], x_length: 5.4, y_length: 5.4 }
+    plots:
+      - { kind: line, start: [0.0, 0.0], end: [2.5, 2.5], dashed: true, color_role: muted, label: '$y=x$', label_point: [2.0, 2.3] }
+      - { kind: function, expression: 'x**2', x_range: [0.0, 1.62], color_role: secondary, label: '$f(x)=x^2$', label_point: [0.55, 2.25] }
+      - { kind: function, expression: 'sqrt(x)', x_range: [0.0, 2.5], color_role: accent, label: '$f^{-1}(x)=\sqrt{x}$', label_point: [2.0, 1.4], reveal: true }
+    annotations:
+      - 'Restricted to $[0,\infty)$, $x^2$ is one-to-one — and $\sqrt{x}$ takes the positive root.'
+    say: |
+      What about a function that fails the one-to-one test — is it hopeless? Not
+      necessarily. Take $f(x)=x^2$, which we already know is not one-to-one on
+      the whole line. But chop its domain down to the nonnegative numbers, from
+      $0$ onwards, and it becomes one-to-one: if two nonnegative inputs square to
+      the same value, they were equal to begin with.
+      {show plot.2} Now we can invert it — solving gives $f^{-1}(x)=\sqrt{x}$,
+      and because the inputs were nonnegative we take the positive root.
+      {show annotation.0} That is why the square root symbol means the positive
+      root: it is the convention that makes square root the genuine inverse of
+      squaring. Restrict first, then invert — and that exact move is the key that
+      unlocks the inverse trigonometric functions coming up.
+
+  # 13 ------------------------------------------- procedure: finding the inverse
+  - id: finding_the_inverse_strategy
+    kind: content
+    template: procedure_steps
+    accent: procedure
+    source: "§1.1 Strategy 1.1 + Remark 1.2 (folded N2) + blind-y=x^2 caution (folded N3)"
+    title: "Finding the Inverse"
+    steps:
+      - { text: 'Write $y=f(x)$.', math: 'y=f(x)' }
+      - { text: 'Solve for $x$ in terms of $y$.', math: 'x=\cdots' }
+      - { text: 'Interchange the names $x$ and $y$.', math: 'y=f^{-1}(x)' }
+    worked:
+      - 'y=x^2'
+      - 'x=\pm\sqrt{y}'
+      - '\text{not a function}'
+    say: |
+      We have inverted a few functions by hand; let us package the moves into a
+      procedure.
+      {show math.0} Step one: write $y=f(x)$.
+      {show math.1} Step two: solve that equation for $x$ in terms of $y$.
+      {show math.2} Step three: interchange the names $x$ and $y$ — the result
+      reads $y=f^{-1}(x)$. That last swap is just the habit of using $x$ for the
+      inverse's own input.
+      {show worked} One guardrail, though: this only works if $f$ is already
+      one-to-one. Apply it blindly to $y=x^2$ and step two hands you
+      $x=\pm\sqrt{y}$ — two values, not a function. So always check one-to-one
+      first, or restrict the domain the way we just did.
+
+  # 14 --------------------------------------- example: inverse of a cubic (derivation)
+  - id: inverse_of_a_cubic
+    kind: content
+    template: derivation
+    accent: example
+    source: "§1.1 Example 1.6 (f=x^3+2 → cbrt(x-2), with check)"
+    title: 'Inverse of $f(x)=x^3+2$'
+    align_on: "="
+    lines:
+      - 'y = x^3 + 2'
+      - 'x^3 = y - 2'
+      - 'x = \sqrt[3]{y-2}'
+      - { tex: 'f^{-1}(x) = \sqrt[3]{x-2}', anim: highlight }
+      - 'f\bigl(f^{-1}(x)\bigr) = \bigl(\sqrt[3]{x-2}\bigr)^3 + 2 = x'
+    say: |
+      Now run the procedure on a fresh function: $f(x)=x^3+2$.
+      {show line.0} Write $y=x^3+2$.
+      {show line.1} Solve for $x$ — subtract to get $x^3=y-2$,
+      {show line.2} then take the cube root, $x=\sqrt[3]{y-2}$.
+      {show line.3} Interchange the names and you have $f^{-1}(x)=\sqrt[3]{x-2}$.
+      {show line.4} Check it by composing: $f$ of the inverse is the cube root
+      of $x-2$, all cubed, plus $2$ — the cube and cube root cancel, leaving
+      $x-2$ plus $2$, which is $x$. Three steps, one check, done.
+
+  # 15 ------------------------------- example: inverse of a rational (derivation)
+  - id: inverse_of_a_rational
+    kind: content
+    template: derivation
+    accent: example
+    source: "§1.1 Example 1.7 (f=3/(x-5) → (5x+3)/x, both-direction check + domain pairing)"
+    title: 'Inverse of $f(x)=\dfrac{3}{x-5}$'
+    align_on: "="
+    lines:
+      - 'y = \dfrac{3}{x-5}'
+      - 'x - 5 = \dfrac{3}{y}'
+      - 'x = 5 + \dfrac{3}{y}'
+      - { tex: 'f^{-1}(x) = 5 + \dfrac{3}{x} = \dfrac{5x+3}{x}', anim: highlight }
+    say: |
+      Same three steps, but now the algebra is a touch more delicate — a
+      rational function, $f(x)=\dfrac{3}{x-5}$.
+      {show line.0} Set $y=\dfrac{3}{x-5}$.
+      {show line.1} Solving, $x-5=\dfrac{3}{y}$,
+      {show line.2} so $x=5+\dfrac{3}{y}$;
+      {show line.3} interchanging gives $f^{-1}(x)=5+\dfrac{3}{x}$, which we can
+      also write as $\dfrac{5x+3}{x}$. This time let us verify both directions:
+      $f$ of the inverse and the inverse of $f$ each come back to $x$, exactly
+      the composition identities at work. And notice the domains pair up: $f$
+      cannot take $x=5$, the inverse cannot take $x=0$, mirroring the fact that
+      $f$ never outputs $0$ and the inverse never outputs $5$.
+
+  # 16 ----------------------------- example: inverse in an application (derivation)
+  - id: inverse_in_an_application
+    kind: content
+    template: derivation
+    accent: example
+    source: "§1.1 Example 1.8 (Celsius↔Fahrenheit)"
+    title: "An Inverse That Answers a Question"
+    align_on: "="
+    lines:
+      - 'f(t) = \tfrac{9}{5}\,t + 32 \quad (\text{C}\to\text{F})'
+      - 't = \tfrac{9}{5}\,f^{-1}(t) + 32'
+      - { tex: 'f^{-1}(t) = \tfrac{5}{9}\,(t - 32) \quad (\text{F}\to\text{C})', anim: highlight }
+      - 'f^{-1}\bigl(f(t)\bigr) = \tfrac{5}{9}\bigl(\tfrac{9}{5}t + 32 - 32\bigr) = t'
+    say: |
+      One more, where the inverse answers a real question. The function
+      $f(t)=\tfrac{9}{5}t+32$ turns a Celsius temperature into Fahrenheit.
+      {show line.0} So what does its inverse do? It runs the conversion in
+      reverse — Fahrenheit back to Celsius.
+      {show line.1} Solving $t=\tfrac{9}{5}f^{-1}(t)+32$ for the inverse
+      {show line.2} gives $f^{-1}(t)=\tfrac{5}{9}(t-32)$.
+      {show line.3} And the check composes back to the start: feed a Celsius
+      reading through $f$ and then through the inverse, the $32$s cancel and the
+      nine-fifths and five-ninths undo each other, returning $t$. An inverse is
+      not just algebra — it is the same relationship read in the direction you
+      happen to need.
+
+  # 17 ------------------------------------------------------------ recap
+  - id: recap
+    kind: content
+    template: recap_cards
+    accent: recap
+    source: "§1.1 全節重點凝煉 (Key Takeaways)"
+    title: "Section 1.1 — Recap"
+    points:
+      - 'One-to-one: different inputs give different outputs (horizontal line test).'
+      - 'A function is invertible exactly when it is one-to-one.'
+      - 'The inverse swaps domain and range; its graph reflects across $y=x$.'
+      - 'Find it: solve $y=f(x)$ for $x$, then swap $x$ and $y$ (check one-to-one first).'
+    formulas:
+      - 'f^{-1}(y)=x \iff f(x)=y'
+      - 'f^{-1}\bigl(f(x)\bigr)=x'
+      - 'f^{-1}\ne 1/f'
+    say: |
+      Let us gather what we have built.
+      {show point.0} A function is one-to-one when distinct inputs give distinct
+      outputs — and you can spot it at a glance with the horizontal line test,
+      where no line is allowed to cross twice.
+      {show point.1} A function is invertible exactly when it is one-to-one,
+      {show point.2} and its inverse swaps inputs with outputs, so its graph is
+      the mirror image across $y=x$.
+      {show point.3} To find an inverse you solve $y=f(x)$ for $x$ and swap the
+      names — after checking one-to-one, or restricting the domain to get there.
+      {show formula.0} {show formula.1} And keep the notation straight: $f$
+      inverse undoes $f$;
+      {show formula.2} it is not $1$ over $f$. One-to-one, invertible, reflected
+      across $y=x$ — that is the whole arc of the section.
+
+  # 18 ------------------------------------------------------------ outro
+  - id: outro
+    kind: outro
+    duration: 8.0
