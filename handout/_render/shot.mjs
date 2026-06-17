@@ -8,9 +8,19 @@
 //     mode = "sheets" (each .sheet -> prefix-pNN.png) | "full" (prefix.png)
 //
 import { spawn } from "node:child_process";
-import { writeFileSync } from "node:fs";
+import { writeFileSync, existsSync } from "node:fs";
 
-const CHROME = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+// Chrome path: honour $CHROME, else probe the usual Windows install locations.
+// (Hardcoding one path silently broke on machines where Chrome lives elsewhere.)
+const CHROME = process.env.CHROME ?? [
+  "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+  (process.env.LOCALAPPDATA ?? "") + "\\Google\\Chrome\\Application\\chrome.exe",
+].find(existsSync);
+if (!CHROME) {
+  console.error("Chrome not found — install it or set the CHROME env var to chrome.exe");
+  process.exit(1);
+}
 const [, , URL_, PREFIX, MODE = "sheets", READY] = process.argv;
 const PORT = 9333;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

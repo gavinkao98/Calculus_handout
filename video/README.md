@@ -281,6 +281,8 @@ python video\pipeline\review_pack.py --storyboard video\storyboards\<deck>.yml
 
 ## 環境
 
+> 📌 **環境統一的權威清單在 repo 根 [`ENVIRONMENT.md`](../ENVIRONMENT.md)；換機後跑 `python tools/doctor.py` 一行看出缺什麼、`tools/setup.ps1` 備妥 Python 端。** 本節僅補 video/ 特有細節。
+
 重量級依賴（`manim` 0.20.1、`PyYAML`）內嵌於儲存庫根目錄的
 `.deps_voiceover` / `.deps`，由 `pipeline/_bootstrap.py` 接上 `sys.path`。
 
@@ -294,31 +296,24 @@ python video\pipeline\review_pack.py --storyboard video\storyboards\<deck>.yml
 > - **用 repo 根的 `.venv`（`.venv\Scripts\python.exe`）跑整條產線**——它有 **manim 0.20.1 ＋ PyYAML 6.0.3**。**全域 `python`（Python 3.12）有 manim 但缺 PyYAML**，故 `python video\make.py …` 會在 `import yaml` 直接掛（本次首跑就是這樣失敗）。MiKTeX（`latex`／`dvisvgm`）在 PATH、可用。
 > - **`ffmpeg`／`ffprobe` 都不在 PATH**（連 PowerShell 也 NOT FOUND）。manim render 靠 `.venv` 內 bundled 的 `imageio_ffmpeg` 自帶 ffmpeg，所以**場景 mp4 照常 render**；但 `make.py` 的 compose／`_audit_render_sync` 與 `critic.py` 是用**裸名** `ffmpeg`／`ffprobe` 呼叫——`.venv\ffmpeg_shim\ffmpeg.exe`（真 ffmpeg 7.1）補得了 `ffmpeg`，**但 `ffprobe` 整台都沒有**。後果：(a) mock render 的 19 個場景 mp4 OK；(b) `make.py` 在 render 後的 ffprobe 時長健檢（`_audit_render_sync`）崩、**compose 沒跑→沒有合併成片**；(c) `critic.py --dry-run`（`per=scene` 靠 ffprobe 取時長算最末幀時刻）抽不到幀。
 > - **抽幀繞法（本次採用，免 ffprobe）：** 直接用 shim ffmpeg 從檔尾回退抓場景 mp4 最末（最滿）幀：`.venv\ffmpeg_shim\ffmpeg.exe -sseof -0.4 -i <scene>.mp4 -frames:v 1 -q:v 2 <out>.png`。輸出落在 `output/ch01/s1.1/critic/frames/NN_<scene_id>/final.png`（與 critic.py 同位）。
-> - **待補（合併成片／真 critic 前的 blocker）：** 要產合併片（含 MiMo 成片）或跑 `critic.py` 都需要 `ffprobe`。imageio_ffmpeg／shim 只給 ffmpeg、**不含 ffprobe**；屆時需在 PATH 放一個真 `ffprobe.exe`（完整 ffmpeg 套件），或把 `make.py`／`critic.py` 的 `_probe_duration`／`_ffprobe_duration` 改用 shim ffmpeg 探時長。
+> - **✅ 2026-06-17 已解（裝 Gyan.FFmpeg 全套，`ffmpeg`＋`ffprobe` 一起進 PATH；見 [`ENVIRONMENT.md`](../ENVIRONMENT.md)、`tools/doctor.py`）。以下為原待補記錄：** 要產合併片（含 MiMo 成片）或跑 `critic.py` 都需要 `ffprobe`。imageio_ffmpeg／shim 只給 ffmpeg、**不含 ffprobe**；屆時需在 PATH 放一個真 `ffprobe.exe`（完整 ffmpeg 套件），或把 `make.py`／`critic.py` 的 `_probe_duration`／`_ffprobe_duration` 改用 shim ffmpeg 探時長。
 
-**換新電腦的一次性設定**（`.deps*` 不存在、且全域 python 也沒有 manim 時）:
+**換新電腦的一次性設定**——完整見 [`ENVIRONMENT.md`](../ENVIRONMENT.md)。摘要：
 
 ```powershell
-# 1) 建 venv 並裝 pinned 依賴
-python -m venv .venv
-.venv\Scripts\python -m pip install -r video\requirements.txt
-
-# 2) make.py 的 compose 階段直接呼叫 `ffmpeg`,需在 PATH 上。若無系統 ffmpeg,
-#    用 imageio-ffmpeg 自帶的二進位做一個 shim（一次即可）:
-$src = .venv\Scripts\python -c "import imageio_ffmpeg as f; print(f.get_ffmpeg_exe())"
-New-Item -ItemType Directory -Force .venv\ffmpeg_shim | Out-Null
-Copy-Item $src .venv\ffmpeg_shim\ffmpeg.exe
+powershell -ExecutionPolicy Bypass -File tools\setup.ps1   # 建 .venv＋裝 requirements.lock＋自動跑 doctor
+winget install --id Gyan.FFmpeg -e                          # 真 ffmpeg＋ffprobe 進 PATH（取代舊 shim）
+python tools\doctor.py                                       # 確認全綠
 ```
 
-**之後每次執行**（把 shim 加進 PATH,用 venv 的 python）:
+**之後每次執行**（用 venv 的 python；系統已有 ffmpeg/ffprobe 後不再需要 shim）:
 
 ```powershell
-$env:PATH=".venv\ffmpeg_shim;$env:PATH"
 .venv\Scripts\python video\make.py --storyboard video\storyboards\<deck>.yml --backend mock --quality low
 ```
 
-（系統若已有 `ffmpeg` 在 PATH,可略過 shim。`.venv` 與 `.venv\ffmpeg_shim`
-本身不進版控。）
+> 註：舊作法是把 `imageio-ffmpeg` 內附 binary 複製成 `.venv\ffmpeg_shim\ffmpeg.exe` 充當 `ffmpeg`，
+> 但它**不含 `ffprobe`**，compose 仍會卡。改裝 Gyan.FFmpeg 全套（含 ffprobe）後 shim 退役。`.venv` 不進版控。
 
 MiMo TTS（唯一旁白路線）透過 `--voice`（預設 `Mia`）使用平台預設語音；key 走
 env `MIMO_API_KEY`（公測免費，仍屬外部 API，依 CLAUDE.md 批次前徵同意）。TTS CLI

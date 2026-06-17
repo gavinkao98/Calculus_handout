@@ -44,6 +44,14 @@ python build.py
 python build.py ch01
 ```
 
+## 環境
+
+- `build.py` 組裝 HTML 是**純 Python stdlib**，任何 python 都能跑、無額外依賴。
+- standalone HTML 雙擊即開，但**檢視時需連網**載 MathJax/KaTeX CDN。
+- `_render/shot.mjs`（把 `.sheet` render 成 PNG 餵 figure 稽核）需要 **Node ≥21** ＋ **Google Chrome**
+  （Chrome 路徑先讀 `CHROME` 環境變數、再退回常見安裝位置）。
+- 整 repo 環境統一見根目錄 [`../ENVIRONMENT.md`](../ENVIRONMENT.md)；換機跑 `python ../tools/doctor.py` 檢查。
+
 ## 新增章節
 
 1. 在 `fragments/ch{NN}/` 放好小節 HTML（照既有格式撰寫）。

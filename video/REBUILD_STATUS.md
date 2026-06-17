@@ -4,6 +4,18 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## 🔧 2026-06-17 全 repo 環境統一——doctor／setup／lock，ffmpeg 策略 A（裝真套、shim 退役）
+
+使用者要求「把整個專案會用到的環境統一起來（含 HTML 講義端），免得 agent 一直在處理環境」。先做一輪完整依賴稽核（Workflow `wf_d6fb3132-a22`：3 路平行掃 video/＋對本機 7 項狀態覆驗全 confirmed），再落地統一。**未動任何計費 API。**
+
+- **完整外部依賴面（四層）：** ① Python 套件（共用 repo 根 `.venv`：manim 0.20.1／PyYAML／ManimPango／Pillow／imageio-ffmpeg／fonttools／pymupdf）；② 系統 binary `ffmpeg`＋`ffprobe`；③ LaTeX（MiKTeX：`latex`／`dvisvgm`＋`newtxtext`/`newtxmath`）；④ Node ≥21＋Google Chrome（`handout/_render/shot.mjs`）。`handout/build.py` 是純 stdlib、無額外需求。祕鑰 `MIMO_/GEMINI_/OPENAI_/DEEPSEEK_API_KEY` per-machine、不進版控。
+- **稽核揪出的隱性洞（都補了）：** `fonttools`（logo 外框工具 `_outline_text.py`）、`pymupdf`/`fitz`（authoring `figure_critic.py`）**過去沒宣告也沒裝**，換機重跑會 ImportError；`pyyaml`/`imageio-ffmpeg` 沒鎖版；`.deps*` vs `.venv` 雙源頭無 lockfile、會悄悄版本漂移；`shot.mjs` 寫死單一 Chrome 路徑。
+- **ffmpeg 策略 A（使用者選定）：** 本機 `winget install --id Gyan.FFmpeg -e` ＝ **ffmpeg＋ffprobe 8.1.1 一起進 PATH**，舊 `.venv\ffmpeg_shim`（只給 ffmpeg、缺 ffprobe）退役。**這解掉下一節記的 ffprobe 硬卡點**——compose／critic 不再因缺 ffprobe 崩。另一台照 [`ENVIRONMENT.md`](../ENVIRONMENT.md) 跑一次同指令即可。
+- **落地產物（全進版控）：** 根 [`ENVIRONMENT.md`](../ENVIRONMENT.md)（環境需求權威清單：四層＋winget 一次性指令）、[`tools/doctor.py`](../tools/doctor.py)（純 stdlib、任何 python 可跑的全 repo 健檢，逐項 PASS/WARN/FAIL＋確切補法＋能力摘要，`--json` 給 agent 解析）、[`tools/setup.ps1`](../tools/setup.ps1)（建 venv＋裝 lock＋自動跑 doctor；**存成 UTF-8 BOM**，否則 Windows PowerShell 5.1 以 ANSI 讀繁中註解會誤判 parse error）、根 `requirements.lock`（`pip freeze` 全圖精確 `==`）。另：`video/requirements.txt` 鎖版＋補 `fonttools`；新增 `authoring/seed_converge/requirements.txt`（`pymupdf`）；`shot.mjs` 改吃 `CHROME` env＋探常見安裝位置。
+- **codex 審核工具一併納入：** Mode B 講義審核／video gate2 常跑的 `codex`，在非互動 shell 易因「裝了但不在持久 PATH」找不到（agent 的 shell 只看 registry PATH、不載互動 profile），且真 binary 在每次更新就變 hash 的 `%LOCALAPPDATA%\OpenAI\Codex\bin\<hash>\`、頂層 launcher 可能 stale（拒 `service_tier=priority`）。把既有解法 shim 版控成 [`tools/codex.cmd`](../tools/codex.cmd)（放 npm 目錄＝已在持久 PATH、動態解析最新 binary，一次解 PATH＋stale-launcher 兩坑）；doctor 加 codex 偵測、setup 在 codex 不在 PATH 時自動部署。**絕不寫死 `<hash>` 路徑**（每機／每版都不同）。
+- **驗證：** 本機 `python tools\doctor.py` → 必要項**全綠**（Python 套件齊、ffmpeg/ffprobe 8.1.1、MiKTeX latex/dvisvgm＋newtx 套件、Node v24、Chrome、codex 0.140.0-alpha.2），退出碼 0，能力摘要（影片成片／handout 圖 render／handout build／codex 審核）全 ✅。
+- **策略 B 決定不做（2026-06-17 拍板）：** 把 `make.py`/`critic.py` 的 `_probe_duration`／`_ffprobe_duration` 改吃 bundled `imageio_ffmpeg` 探時長——**不採**。理由：(1) **無執行速度好處**——`ffprobe` 本就是讀容器時長的最精簡工具，改走 `ffmpeg -i` 解 stderr 只會一樣或更慢；且這些呼叫每節僅數次、各數十 ms，相對 manim 渲染／LaTeX 編譯／mp4 編碼的 wall-clock 量不出差別。(2) 唯一好處「新機零系統安裝」在採策略 A（直接裝真套件）後已無意義。**策略 A 為定案。**
+
 ## 🧹 2026-06-17 video/ 清理＋§1.1 mock 重跑＋稽核報告 self-contained 化＋版控策略落地
 
 使用者要求「清理 video/ 殘存、重跑 §1.1」，並追加：修報告圖換機讀不到、制定子資料夾架構與版控策略。**未動任何計費 API。**

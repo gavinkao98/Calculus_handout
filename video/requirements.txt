@@ -10,7 +10,11 @@
 #
 # See README.md "## 環境" for the ffmpeg shim + run command.
 
-manim==0.20.1        # vendored as .deps_voiceover
-pyyaml               # vendored as .deps
-imageio-ffmpeg       # ships an ffmpeg binary (make.py's compose stage calls ffmpeg)
+# Direct deps of the video/ pipeline (pinned). For an EXACT, reproducible install
+# of the whole repo's Python env (incl. transitive deps) install ../requirements.lock
+# instead — see ../ENVIRONMENT.md / tools/setup.ps1. Versions below match that lock.
+manim==0.20.1         # vendored as .deps_voiceover; render engine
+pyyaml==6.0.3         # vendored as .deps; storyboard/fragment parsing
+imageio-ffmpeg==0.6.0 # bundled ffmpeg binary (only used when no system ffmpeg on PATH)
+fonttools==4.63.0     # one-shot logo-outline SVG generator (pipeline/assets/_outline_text.py)
 # (MiMo TTS uses stdlib urllib -- no extra dep needed; the Gemini route + google-genai were retired 2026-06-16)

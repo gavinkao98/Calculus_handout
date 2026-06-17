@@ -20,6 +20,14 @@
 - 不計費、不連網的離線路徑不在此限，可逕行執行——例如 `tts.py --backend mock`（寫靜音 WAV 驗 manifest／時序）、本地 Manim render、ffmpeg mux/concat。
 - 取得一次同意即代表該次明確說明的工作範圍獲准；範圍變更（換模型、加場景、重跑）需重新徵得同意。
 
+## 安裝環境：缺套件／軟體先問、勿造輪子替代、裝完更新文檔
+
+跨機環境的權威清單在 [`ENVIRONMENT.md`](ENVIRONMENT.md)，可執行版是 [`tools/doctor.py`](tools/doctor.py)（換機先跑它看缺什麼）。在此前提下：
+
+- **缺套件／軟體先問，不要自行安裝。** 偵測到本機缺某個 pip 套件、系統 binary 或工具（如 `ffmpeg`、LaTeX、Node、Chrome、某個 pip 套件）時，**先說明要裝什麼、為什麼、怎麼裝（指令），經使用者同意才裝**，不可自行 `winget`／`pip install`。例外：照既有 [`requirements.lock`](requirements.lock)／`ENVIRONMENT.md` **重現「已議定」的環境**（例如跑 `tools/setup.ps1` 從 lock 裝）是重建、非新增，可逕行。
+- **不要自行造輪子做替代。** 缺東西時**預設把正版裝起來**，不要為了繞過而手刻替代（hack 一條 code path 避開缺的 binary、自寫替代工具）。若你判斷某個替代做法確實更好，**講出來讓使用者定奪**，不要默默做（與下方 Karpathy §1「攤開取捨」、§2「不投機」一致）。前例：`ffmpeg`／`ffprobe` 選「裝真套件」而非「改 code 繞過 `ffprobe`」（策略 A，見 `video/REBUILD_STATUS.md`）。
+- **裝完一定更新相關文檔，確保新電腦對得上。** 任何環境變更後同一輪內補齊：pinned 版本進 [`requirements.lock`](requirements.lock)／對應 `requirements.txt`、新需求寫進 [`ENVIRONMENT.md`](ENVIRONMENT.md)、檢查項加進 [`tools/doctor.py`](tools/doctor.py)（必要時連 `tools/setup.ps1`）。**驗收標準＝在新機 `python tools/doctor.py` 能據此把環境對齊到全綠。**
+
 ## 跨對話記憶寫進版控文檔（不寫本地 memory）
 
 - **做總結、記筆記、留任何跨對話／跨機器的知識時，一律寫進會 git 上去的文檔**，**不要只記在本地的 Claude memory**（`~/.claude/.../memory/`，含 `MEMORY.md`）。

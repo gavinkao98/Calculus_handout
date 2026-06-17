@@ -14,6 +14,7 @@
 - **製作影片**（目前的主要路徑：第二代 Manim 產線）。先看 [`video/README.md`](video/README.md)，再看 [`video/DESIGN.md`](video/DESIGN.md) 了解分鏡契約與目前的模板決策。較舊的 `MANIM_*` 文件已封存於 [`legacy/`](legacy/)，保留作為第一代參考資料。
 - **靜態投影片 MP4**（已凍結的舊路徑）。使用 [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md)。此路徑不再有新開發——新工作請改用 Manim。
 - **為課文補教學範例（從開放題庫選題）。** 見 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md)。講義本體不收習題——習題將以獨立習題本呈現（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14，2026-06-12 定案）。
+- **換電腦／環境出問題。** 見 [`ENVIRONMENT.md`](ENVIRONMENT.md)（每台機器要備什麼的權威清單）；跑 `python tools/doctor.py` 一行看出這台缺什麼、`tools/setup.ps1` 一鍵備妥 Python 端。
 
 ---
 
