@@ -271,7 +271,13 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
             )
             line_group = line
             if plot.get("label"):
-                lab = _label(plot["label"], ground, role=plot.get("label_role", "warning"),
+                # A line label inherits the LINE's colour by default (mirrors the
+                # function-curve label, which defaults to the curve colour). The
+                # old "warning" default painted every unspecified line label coral
+                # red -- so a muted y=x reference line got a jarring red label that
+                # fought the de-emphasis it was drawn with. `label_role` still wins.
+                lab = _label(plot["label"], ground,
+                             role=plot.get("label_role", str(plot.get("color_role", "secondary"))),
                              size=plot.get("label_size", default_label_size))
                 if plot.get("label_point") is not None:
                     # Explicit axes point -- for a sloped/diagonal guide, next_to(line,
