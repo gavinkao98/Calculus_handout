@@ -171,6 +171,14 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 | `sign_chart` | number line + signed interval rows（monotonicity、curve sketching） | `points[]`（`excluded: true` 表示 break）、`rows[{label, marks}]`、`statement` | `mark.R.I`（row R, interval I） |
 | `recap_cards` | key point + remember-formula card | `points[]`、`formulas[]` | `point.N`、`formula.N` |
 
+#### Plot label 顏色慣例（graph_focus／graph_compare，2026-06-17 拍板）
+
+**plot 的標籤預設繼承該 plot 的 `color_role`——標示函數／線的標籤，顏色跟它標示的函數／線一致。** cyan 的 `$y=x^3$` 配 cyan 標籤、orange 的 `$\sqrt[3]{x}$` 配 orange 標籤、`muted` 的 `$y=x$` guide line 配 muted 灰標籤。逐項可用 `label_role` 覆寫。
+
+- **緣由：** 原本 `function` label 預設 `primary`（白）、`line` label 預設 `warning`（紅），標籤與其曲線／線**不同色**——尤其 `muted` 的 `$y=x$` 參考線配到刺眼紅標（VISUAL-FRAME gate1 在 §1.1 scene 11／12 抓到）。改為繼承 `color_role` 後，曲線↔標籤的顏色關聯一眼可辨（使用者 2026-06-17 明確要求「標示函數的標籤顏色跟函數的顏色一致」）。
+- **`point` label** 仍預設 `text`（中性，給座標／標記註解用），可用 `label_role` 覆寫。
+- 實作：[`pipeline/templates/graph_focus.py`](pipeline/templates/graph_focus.py) function／line 分支的 `role=plot.get("label_role", str(plot.get("color_role", "secondary")))`。`graph_compare` 共用 `_plot_blocks` 故一併適用。
+
 ### Template 選擇：離散步驟 vs 推導鏈
 
 計算場景有兩種形狀，選錯 template 就是長公式跑出空間的原因——兩欄 template

@@ -221,7 +221,13 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
             group = VGroup(glow, graph)
 
             if plot.get("label"):
-                lab = _label(plot["label"], ground, role=plot.get("label_role", "primary"),
+                # A function-curve label inherits the CURVE's colour by default,
+                # so the name reads in the same colour as the curve it marks
+                # (e.g. a cyan y=x^3 gets a cyan label, an orange cube root an
+                # orange label). `label_role` still overrides. Mirrors the line
+                # label below; see DESIGN.md "Plot label colour".
+                lab = _label(plot["label"], ground,
+                             role=plot.get("label_role", str(plot.get("color_role", "secondary"))),
                              size=plot.get("label_size", default_label_size))
                 _place_function_label(lab, graph, axes, plot)
                 if static:

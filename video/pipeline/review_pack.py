@@ -68,18 +68,25 @@ def load_rubric() -> str:
                 "[blocking] + E2 convention against the math context below.)")
 
 
-_UNIT_HEADER = re.compile(r"^###\s+\d+\.\s+(\S+)")
-_FIELD = re.compile(r"^-\s+\*\*([A-Za-z_]+):\*\*\s*(.*)$")
+_UNIT_HEADER = re.compile(r"^###\s+unit:\s+(\S+)")
+_SECTION = re.compile(r"^##\s")              # an h2 header ends the unit region
+_FENCE = re.compile(r"^```")
+_FIELD = re.compile(r"^([A-Za-z_]+):\s?(.*)$")
+_FIELD_KEYS = ("id", "source", "learning_goal", "kind", "narration", "visual_need", "animation_cue")
 
 
 def parse_content_script(md_path: Path) -> dict:
     """Parse the §-content-script markdown into units. Each unit is a
-    `### N. <id>` block with `- **field:** value` lines; `narration`/`visual_need`
-    /`animation_cue` may continue on indented (or `>`-quoted) follow lines.
+    `### unit: <id>` header followed by a fenced ``` block of YAML-like fields:
+    `field: value` on one line, or `field: |` for a block scalar whose
+    continuation lines are 2-space indented. The unit region ends at the first
+    `## ` (h2) section header (e.g. the §7 audit notes, which may contain their
+    own fenced blocks -- stopping there keeps them out of the last unit). A
+    line-parser (not a YAML load) is deliberate: `source:` values carry `:`,
+    `·`, em-dashes and quotes that trip a strict YAML scalar.
     Returns {header, units:[{id, source, learning_goal, kind, narration,
     visual_need, animation_cue}]}."""
-    text = md_path.read_text(encoding="utf-8")
-    lines = text.splitlines()
+    lines = md_path.read_text(encoding="utf-8").splitlines()
 
     header_lines: list[str] = []
     for ln in lines:
@@ -90,52 +97,67 @@ def parse_content_script(md_path: Path) -> dict:
 
     units: list[dict] = []
     cur: dict | None = None
-    field: str | None = None
+    in_fence = False
+    scalar: str | None = None        # field currently collecting a `|` block scalar
 
-    def _commit_field() -> None:
-        if cur is not None and field is not None:
-            cur[field] = " ".join(cur[field]).strip() if isinstance(cur[field], list) else cur[field]
+    def _commit() -> None:
+        if cur is not None:
+            for k, v in cur.items():
+                if isinstance(v, list):
+                    cur[k] = " ".join(s.strip() for s in v).strip()
 
     for ln in lines:
         m = _UNIT_HEADER.match(ln)
         if m:
-            _commit_field()
+            _commit()
             if cur is not None:
                 units.append(cur)
-            cur = {"id": m.group(1), "source": "", "learning_goal": "", "kind": "",
-                   "narration": "", "visual_need": "", "animation_cue": ""}
-            field = None
+            cur = {k: "" for k in _FIELD_KEYS}
+            cur["id"] = m.group(1)
+            in_fence = False
+            scalar = None
             continue
         if cur is None:
             continue
+        if _SECTION.match(ln):           # `## ...` -> unit region is over
+            _commit()
+            units.append(cur)
+            cur = None
+            continue
+        if _FENCE.match(ln):
+            in_fence = not in_fence
+            scalar = None
+            continue
+        if not in_fence:
+            continue
+        if scalar is not None:           # collecting a block scalar
+            if not ln.strip() or ln.startswith("  "):
+                cur[scalar].append(ln)
+                continue
+            scalar = None                # a non-indented line ends the scalar
         mf = _FIELD.match(ln)
         if mf:
-            _commit_field()
-            field = mf.group(1).lower()
-            val = mf.group(2).strip().strip("`").strip()
-            cur[field] = [val] if val else []
-            continue
-        # continuation of the current field?
-        if field is not None and ln.strip():
-            piece = ln.strip()
-            if piece.startswith(">"):
-                piece = piece[1:].strip()
-            if not isinstance(cur[field], list):
-                cur[field] = [cur[field]]
-            cur[field].append(piece)
-            continue
-        if not ln.strip():
-            _commit_field()
-            field = None
-    _commit_field()
+            key, val = mf.group(1).lower(), mf.group(2).strip()
+            if key not in cur:
+                continue
+            if val == "|":
+                cur[key] = []
+                scalar = key
+            else:
+                cur[key] = val
+    _commit()
     if cur is not None:
         units.append(cur)
 
-    # normalise the em-dash "not applicable" placeholders to empty
+    # normalise "not applicable" placeholders to empty. A placeholder is a value
+    # that is ENTIRELY one parenthetical note — （無…）, （由…模板處理）, （收尾…） —
+    # so match the whole string, NOT a mere `（`-prefix: a real value like
+    # `（選用）h(x)=x^3-4x …` opens with a paren but carries content after it and
+    # MUST be kept (else it is silently dropped from the packet's math context).
     for u in units:
         for k in ("narration", "visual_need", "animation_cue", "learning_goal"):
-            v = u.get(k, "")
-            if v.lstrip().startswith("—") or v.strip() == "-":
+            vs = u.get(k, "").strip()
+            if not vs or re.fullmatch(r"（[^（）]*）", vs) or vs.startswith("—") or vs == "-":
                 u[k] = ""
     return {"header": header, "units": units}
 

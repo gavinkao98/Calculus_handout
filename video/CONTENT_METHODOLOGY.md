@@ -217,6 +217,8 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 
 > 刻意**不含** `template` / `{show}` marker / `accent` / 視覺 payload——那些是第二階段把內容稿「模板化」時才填。
 
+**檔案級結構（parser 契約）：** 每個單元寫成 `### unit: <id>` 標題 ＋ 緊接一個圍欄 ` ``` ` 區塊，區塊內逐欄 `field: value`（多行散文用 `field: |` block scalar、續行縮 2 空格）；單元間以 `---` 分隔；所有教學單元之後以一個 `## ` 段（如 `## §7 拆解註記…`）收尾。「不適用」欄位寫成單一括號註記 `（無——…）`／`（由…模板處理）`（會被視為空；但 `（選用）…後接內容` 是正常 content，不算空）。[`pipeline/review_pack.py`](pipeline/review_pack.py) 的 `parse_content_script` 以這三個分界（`### unit:` 標題、圍欄、`## ` 段界）切單元並組 engineering packet——**維持此結構**，改動格式時同步該 parser。
+
 ### 交付形式：`.md` 為源、編譯 HTML 為審核稿（2026-06-14 使用者指示）
 
 內容稿以**兩種形式並存**交付，缺一不可：
