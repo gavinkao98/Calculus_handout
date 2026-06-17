@@ -15,7 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from manim import Circumscribe, Create, FadeIn, Flash, GrowFromCenter, Indicate, RIGHT, UP, Write
+from manim import Create, FadeIn, Flash, GrowFromCenter, Indicate, RIGHT, UP, Write
 
 from .visuals import theme as T
 
@@ -82,9 +82,8 @@ def play_block(scene, block: Block, ground: str) -> float:
         scene.play(FadeIn(mob, shift=0.35 * RIGHT), run_time=0.5)
         return 0.5
     elif anim == "highlight":
-        scene.play(Write(mob), run_time=0.6)
-        scene.play(Circumscribe(mob, color=accent), run_time=0.6)
-        return 1.2
+        scene.play(Write(mob), run_time=0.7)
+        return 0.7
     elif anim == "flash_in":
         scene.play(FadeIn(mob, scale=1.05), run_time=0.5)
         scene.play(Flash(mob.get_center(), color=accent, line_length=0.25,

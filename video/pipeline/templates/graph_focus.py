@@ -103,6 +103,18 @@ def _axis_ticks(axes: Axes, ac: dict[str, Any], ground: str):
     return VGroup(*mobs) if mobs else None
 
 
+def _add_axis_labels(axes: Axes, ground: str, ac: dict[str, Any]) -> None:
+    """Add x/y axis labels near the tips — standard math convention.
+    Disable per-scene with ``axis_labels: false`` in the YAML axes block."""
+    if ac.get("axis_labels") is False:
+        return
+    x_lab = brand.math_line("x", ground, role="text", size="math_sm")
+    y_lab = brand.math_line("y", ground, role="text", size="math_sm")
+    x_lab.next_to(axes.x_axis.get_right(), DOWN, buff=0.1)
+    y_lab.next_to(axes.y_axis.get_top(), LEFT, buff=0.1)
+    axes.add(x_lab, y_lab)
+
+
 def _title(text: str, ground: str):
     # Rich ($math$) titles go through brand.heading_rich -- one Tex, so text and
     # math share a baseline and the inline math is sized natively (was a split
@@ -127,7 +139,8 @@ def _label(text: str, ground: str, *, role: str = "text", size: str = "label"):
     return mob
 
 
-def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any]) -> None:
+def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any],
+                          xr: list[float]) -> None:
     if plot.get("label_point") is not None:
         point = plot["label_point"]
         label.move_to(axes.c2p(float(point[0]), float(point[1])), aligned_edge=LEFT)
@@ -136,10 +149,19 @@ def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any]) -> Non
     label_x = plot.get("label_x")
     if label_x is not None:
         try:
-            label.next_to(axes.input_to_graph_point(float(label_x), graph), side, buff=0.13)
+            label.next_to(axes.input_to_graph_point(float(label_x), graph), side, buff=0.18)
             return
         except Exception:
             pass
+    # Default: place near the tail end of the curve
+    x_end = float(xr[1])
+    try:
+        y_end = safe_eval_expression(plot["expression"], x_end)
+        if math.isfinite(y_end):
+            label.next_to(axes.c2p(x_end, y_end), side, buff=0.18)
+            return
+    except Exception:
+        pass
     label.next_to(graph, side, buff=0.13)
 
 
@@ -229,7 +251,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                 lab = _label(plot["label"], ground,
                              role=plot.get("label_role", str(plot.get("color_role", "secondary"))),
                              size=plot.get("label_size", default_label_size))
-                _place_function_label(lab, graph, axes, plot)
+                _place_function_label(lab, graph, axes, plot, xr)
                 if static:
                     labels.append(lab)
                 else:
@@ -369,6 +391,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         axes.x_axis.add_tip(tip_length=0.16, tip_width=0.16)
         axes.y_axis.add_tip(tip_length=0.16, tip_width=0.16)
     axes.move_to([0, -0.2, 0])
+    _add_axis_labels(axes, ground, ac)
     blocks.append(Block("axes", axes, anim="create", static=True, layer="graph"))
 
     plot_blocks, _ = _plot_blocks(spec, axes, ground)

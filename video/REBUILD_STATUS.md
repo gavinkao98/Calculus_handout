@@ -4,6 +4,16 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## 🎬 2026-06-17 §1.1 本機重渲＋5 動畫獨立視覺稽核＋sign-off 報告（動畫待認可）
+
+使用者回報「本機影片檔不是最新的」→ 從現行 code 重渲；並在 sign-off 前對 5 客製動畫補一輪獨立對抗式視覺稽核——**動畫幀是先前唯一未經獨立 gate 的面向**（靜態 VISUAL-FRAME gate 跑的是 hook 前的靜態版、動畫端態幀只經我手動目視）。**未動任何計費 API。**
+
+- **重渲（離線、`--quality high` 1080p、免費）：** `make.py --scene all --backend mock` 三閘全過（schema OK／lint clean／sizecheck consistent）、**19/19 場景一次成功（本輪無 MiKTeX／Defender flake）**、compose 串接 → `output/ch01/s1.1/ch01_inverse_functions.mp4`（~12:53、1080p h264＋aac）。本機產物已對齊現行 code。
+- **5 動畫動態幀獨立稽核（Workflow `wf_d0d69df6-e46`，5 `visual-frame-audit` agent＋blocking refute-by-default 複驗）：** 抽每個 hook 場景的 before→端態關鍵幀＋4s contact sheet（`ffmpeg -ss`／`fps=1/4,tile=4x5` 自 `output/_av/<scene>.mp4`），各 agent 對照動畫 cue＋[`VISUAL-FRAME-RUBRIC`](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md) V1–V8／A1–A7。**confirmed visual blocking==0、choreography 忠實 5/5**（aesthetic 86–91；composition 91 最高）。唯一 raw 標記＝hook5 標籤，agent 自身 issue 文字即寫「Advisory (not Blocking)」、複驗 refute 掉 blocking 等級。數學保真複核全過（映射 ½／−½→¼、HLT 1-vs-2 交點、A↔B 往返弧、x³↔∛x 真鏡射＋對稱點、x²→√x 真鏡射）。
+- **1 個 A1 advisory 已修＋回歸（採「能讓影片更好就改」）：** scene 12 `repair_by_restricting` 橙標籤 `$f^{-1}(x)=\sqrt{x}$` 的 `label_point [2.0,1.4]` 幾乎落在自己曲線上（$\sqrt2\approx1.41$）、橙描邊穿過 `f^{-1}(x)=` 前綴降低可讀。**修：[`storyboards/ch01_inverse_functions.yml`](storyboards/ch01_inverse_functions.yml) `label_point→[2.1,1.78]`**（挪進橙曲線與 $y=x$ 虛線間的乾淨間隙、未碰虛線未出框）。單渲 scene 12 重抽幀目視＝前綴清晰、全標籤可讀。**最終合併片用 make.py 同款 ffmpeg concat 重串 19 段 fade-ready `_av`**（scene 12 修正版＋其餘 18 段不變）＝等價 `--scene all`、省一次全渲；ffprobe 核對 773.1s／1920×1080／h264+aac。⚠️ concat list 路徑須用 `as_posix()`（`C:/…`）格式，MSYS `/c/…` 路徑 Windows ffmpeg 開不了。
+- **sign-off 交付物（standalone HTML，雙擊即開）：** [`content_scripts/_audit/REVIEW-ch01_inverse_functions-animation-signoff.html`](content_scripts/_audit/REVIEW-ch01_inverse_functions-animation-signoff.html)（深色＋MathJax；逐 hook：動畫 cue＋before→端態幀＋認可旁白逐字＋稽核裁決＋可展開 contact sheet）。**圖全 base64 內嵌（self-contained）；瀏覽器實測 15/15 圖載入、0 broken、85 MathJax 渲染、5 卡片。** 產生器 tracked：[`_gen/REVIEW-ch01_inverse_functions-animation-signoff.gen.py`](content_scripts/_audit/_gen/REVIEW-ch01_inverse_functions-animation-signoff.gen.py)（幀讀自 gitignored `output/_signoff_frames/`、重渲＋重抽即可重生；AUDIT 裁決內嵌於產生器）。
+- **下一步不變（MiMo 仍依使用者指示延後）：** 待**動畫 sign-off**（生成 code 視同 narration）→ MiMo 口語軌（spoken.yml→derive→NFA）→ MiMo TTS（計費，徵同意）→ `make.py --reuse-audio` 有聲成片。
+
 ## 🔧 2026-06-17 全 repo 環境統一——doctor／setup／lock，ffmpeg 策略 A（裝真套、shim 退役）
 
 使用者要求「把整個專案會用到的環境統一起來（含 HTML 講義端），免得 agent 一直在處理環境」。先做一輪完整依賴稽核（Workflow `wf_d6fb3132-a22`：3 路平行掃 video/＋對本機 7 項狀態覆驗全 confirmed），再落地統一。**未動任何計費 API。**

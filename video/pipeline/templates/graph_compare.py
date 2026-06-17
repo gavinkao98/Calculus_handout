@@ -78,6 +78,7 @@ def _panel(side_spec: dict[str, Any], ground: str, prefix: str) -> tuple[list[Bl
     if bool(ac.get("tips", True)):
         axes.x_axis.add_tip(tip_length=0.14, tip_width=0.14)
         axes.y_axis.add_tip(tip_length=0.14, tip_width=0.14)
+    gf._add_axis_labels(axes, ground, ac)
 
     panel_blocks: list[Block] = [Block("axes", axes, anim="create", static=True)]
     plot_blocks, _ = gf._plot_blocks(side, axes, ground)

@@ -52,31 +52,17 @@ from ._common import scene_head, motif_corner
 _LINE_BUFF = 0.30
 
 
-def _chain_line(tex: str, ground: str, *, role: str, rel: str) -> MathTex:
-    """One chain line as MathTex with the relation symbol isolated so
-    get_part_by_tex can find it for column alignment. Chain lines are pure
-    math by convention (no '$'), so MathTex is always the right path --
-    brand.math_line is bypassed because it cannot isolate substrings."""
-    return MathTex(tex, substrings_to_isolate=[rel],
-                   color=T.color(ground, role), font_size=T.fs("math"))
-
-
-def _rel_left_offset(mob: MathTex, rel: str) -> float | None:
-    """x-offset of the first `rel` glyph's left edge from the line's left edge,
-    or None when the line does not carry the symbol."""
-    try:
-        part = mob.get_part_by_tex(rel)
-    except Exception:
-        return None
-    if part is None:
-        return None
-    return float(part.get_left()[0]) - float(mob.get_left()[0])
+def _chain_line(tex: str, ground: str, *, role: str) -> MathTex:
+    """One chain line as MathTex. Chain lines are pure math by convention
+    (no '$'), so MathTex is always the right path -- brand.math_line is
+    bypassed because it cannot isolate substrings."""
+    return MathTex(tex, color=T.color(ground, role), font_size=T.fs("math"))
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
-    head = scene_head(spec, ctx, label="[ derivation ]")
+    head = scene_head(spec, ctx, label="[ example ]")
     blocks += head
     title = head[1].mobject
 
@@ -87,7 +73,6 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         statement = brand.prose(spec["statement"], ground, size="body",
                                 max_width=content_w, align="LEFT")
 
-    rel = str(spec.get("align_on", "="))
     line_mobs: list[MathTex] = []
     anims: list[str] = []
     for entry in spec.get("lines", []):
@@ -97,7 +82,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             tex, anim = entry, "write"
         is_key = anim == "highlight"
         line_mobs.append(_chain_line(str(tex).strip(), ground,
-                                     role="accent" if is_key else "math", rel=rel))
+                                     role="accent" if is_key else "math"))
         anims.append(anim)
 
     parts = []
@@ -105,22 +90,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         parts.append(statement)
 
     if line_mobs:
-        # Horizontal: line 0's left edge is the chain origin (x=0 relative).
-        # A continuation line starting at the relation symbol shifts so its
-        # symbol sits exactly under line 0's; a line without the symbol (or a
-        # chain whose first line lacks it) keeps the left edge.
-        anchor = _rel_left_offset(line_mobs[0], rel)
-        lefts = [0.0]
-        for m in line_mobs[1:]:
-            off = _rel_left_offset(m, rel)
-            lefts.append(anchor - off if anchor is not None and off is not None else 0.0)
-
-        # Vertical: top-anchored cursor over REAL line heights -- a fraction
-        # line is ~2x a plain one, so a fixed pitch would collide (same lesson
-        # as the recap_cards fix).
         y = 0.0
-        for m, lx in zip(line_mobs, lefts):
-            m.move_to([lx, y, 0], aligned_edge=UL)
+        for m in line_mobs:
+            m.move_to([0, y, 0], aligned_edge=UL)
             y -= m.height + _LINE_BUFF
         parts.append(VGroup(*line_mobs))
 
