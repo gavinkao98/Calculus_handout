@@ -1,0 +1,954 @@
+{
+ "summary": {
+  "audited": 17,
+  "raw_blockings": 1,
+  "confirmed_blockings": 1,
+  "refuted_blockings": 0,
+  "resolved_blockings": 1
+ },
+ "scenes": [
+  {
+   "scene": {
+    "nn": "01",
+    "scene_id": "can_we_run_it_backwards",
+    "title": "Running a Function Backwards",
+    "template": "definition_math",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/01_can_we_run_it_backwards/final.png"
+   },
+   "audit": {
+    "scene_id": "can_we_run_it_backwards",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 88,
+     "A2": 82,
+     "A3": 90,
+     "A4": 90,
+     "A5": 88,
+     "A6": 78,
+     "A7": 84
+    },
+    "defects": [
+     {
+      "dimension": "A6",
+      "severity": "med",
+      "where": "math.0 line 'f(x)=x on [0,1]: each output comes from one input' (~y=318) and math.1 line 'g(x)=x^2: 1/2 and -1/2 both map to 1/4' (~y=378), both horizontally centered on screen",
+      "issue": "These two lines are full sentence-level teaching clauses (subject + 'each output comes from one input' / 'both map to 1/4'), yet they are centered. Per the typography note, sentence-level teaching prose should read left-aligned and only short title cards/eyebrows/captions may be centered. Centering teaching clauses creates a slightly ragged, slide-like read rather than an anchored left edge.",
+      "suggestion": "Left-align the two math/teaching lines to a shared left margin (aligned with the statement line's left edge at ~x=130) so the eye has a consistent left anchor; reserve centering for the title card and eyebrow only."
+     },
+     {
+      "dimension": "A6",
+      "severity": "low",
+      "where": "Fractions in math.1: '1/2', '-1/2', '1/4' rendered with \\tfrac (~y=378)",
+      "issue": "The stacked \\tfrac fractions render noticeably smaller than the surrounding inline text, sitting near the lower bound of comfortable legibility for a teaching value at this frame size.",
+      "suggestion": "Consider \\dfrac or slightly upscale the math.1 line so the fractions carry the same legible weight as the f(x)=x line; not information-losing, polish only."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Vertical whitespace between title (~y=93) and statement line (~y=232)",
+      "issue": "There is a comparatively large empty band between the title block and the first body line, leaving the lower-third of the frame (below ~y=410) sparse while the gap above feels loose; balance is slightly top-heavy.",
+      "suggestion": "Tighten the title-to-statement gap or nudge the body block upward to even the vertical rhythm; minor, no information loss."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "math.1 'g(x)=x^2 ...' line carries the amber/example accent (anim: highlight); math.0 carries the blue/definition accent",
+      "issue": "Both math lines read at similar visual weight; the storyboard marks math.1 with anim: highlight as the punchline (the collision that is 'the whole obstacle'), but on this final static frame it is not strongly more salient than math.0, so the focal collision example does not clearly dominate.",
+      "suggestion": "Give the math.1 collision line slightly stronger emphasis on the final frame (heavier weight, subtle box, or larger size) so the eye lands on the obstacle the beat is teaching."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — this frame has zero visual blocking."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "02",
+    "scene_id": "one_to_one_definition",
+    "title": "One-to-One",
+    "template": "definition_math",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/02_one_to_one_definition/final.png"
+   },
+   "audit": {
+    "scene_id": "one_to_one_definition",
+    "visual_blocking_count": 0,
+    "v_findings": [
+     {
+      "dimension": "V1",
+      "severity": "Advisory",
+      "evidence": "All elements (eyebrow ~y=105, title ~y=185, prose ~y=425-510, math.0 ~y=665, math.1 ~y=785, decorative glyph bottom-right) sit well inside the 1920x1080 frame with comfortable margins.",
+      "why": "No key element is cropped or near a safe-area boundary; no information loss.",
+      "fix": "None needed — dimension is clean (listed Advisory with no defect only to surface the clean check)."
+     }
+    ],
+    "a_scores": {
+     "A1": 84,
+     "A2": 90,
+     "A3": 94,
+     "A4": 91,
+     "A5": 93,
+     "A6": 90,
+     "A7": 86
+    },
+    "defects": [
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Vertical band between prose (ends ~y=510) and first formula (~y=665), plus the empty lower-right quadrant",
+      "issue": "The two formulas sit low-center while the prose sits high-left, leaving a generous empty mid-frame gap and a bottom-light balance. Within house-style dark-flat minimalism this is acceptable, but the composition is slightly top-heavy on text / center-low on math rather than evenly distributed.",
+      "suggestion": "Optionally nudge the math display block up ~60-90px to tighten the gap below the prose, or left-align the math block to the prose's left margin so the two regions share a vertical axis. Not required; purely polish."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "math.0 (cyan, ~y=665) vs math.1 (amber, ~y=785)",
+      "issue": "The highlighted equivalent form (math.1, amber) is the one the beat says to 'reach for in a proof', but it is the same point size as math.0, so focus is carried almost entirely by color. Hierarchy reads correctly but leans on a single channel.",
+      "suggestion": "If a stronger pull is wanted, give math.1 a marginally larger scale or a subtle weight bump in addition to the amber accent so the proof form reads as the climax of the beat. Optional."
+     },
+     {
+      "dimension": "A6",
+      "severity": "low",
+      "where": "Two centered formula lines (~y=665 and ~y=785)",
+      "issue": "Each formula is independently centered on its own width, so their internal anchors (the f(x_1) terms) do not vertically align. Standard centered-display behavior and fully legible, but a shared left or '=' alignment would look more deliberate for two parallel statements.",
+      "suggestion": "Consider aligning the two formulas on a common left edge or on the relation symbol to emphasize they are two readings of the same fact. Cosmetic only."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — this final frame of scene \"one_to_one_definition\" has zero V1-V8 blocking findings. Eyebrow [ DEFINITION ], title \"One-to-One\", left-aligned prose statement, and both formulas f(x_1) != f(x_2) whenever x_1 != x_2 (cyan) and f(x_1) = f(x_2) ==> x_1 = x_2 (amber highlight) all render cleanly, are legible, match the locked say/payload, and are mathematically correct vs source. Only low-severity A-side polish notes (layout balance / hierarchy channel / formula alignment) remain; none gate convergence. Visual blocking is zero."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "03",
+    "scene_id": "student_id_is_one_to_one",
+    "title": "A One-to-One Function in Words",
+    "template": "definition_math",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/03_student_id_is_one_to_one/final.png"
+   },
+   "audit": {
+    "scene_id": "student_id_is_one_to_one",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 84,
+     "A2": 82,
+     "A3": 90,
+     "A4": 80,
+     "A5": 90,
+     "A6": 78,
+     "A7": 83
+    },
+    "defects": [
+     {
+      "dimension": "A6",
+      "severity": "med",
+      "where": "math.0 (f : student ↦ ID number, ~y=332) and math.1 (distinct students ⇒ distinct IDs — one-to-one, ~y=386), both horizontally centered around x≈480",
+      "issue": "The two teaching math lines are centered while the statement prose directly above them ('A class is assigned ID numbers…', left-aligned, starting x≈130) is left-aligned, so the block lacks a single consistent left edge. They read as display-math one-liners (rubric tolerates centered short callouts), hence advisory not blocking, but the mixed alignment slightly weakens the visual grid.",
+      "suggestion": "Left-align the two math lines to the same left margin as the statement prose (x≈130), or indent them one step, so statement + math.0 + math.1 share a common left edge as one example block."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Vertical band between title baseline (~y=95) and statement first line (~y=222)",
+      "issue": "Large empty mid-frame gap between the title/eyebrow cluster at top and the statement, leaving the upper-middle of the frame unused while content sits low-center; balance is slightly top-heavy then sparse.",
+      "suggestion": "Tighten the title-to-statement gap (raise the statement block) or nudge the whole content cluster up to fill the dead band and center the content mass more evenly in the safe area."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "math.1 (orange/gold accent line, ~y=386) carrying the 'highlight' anim role vs math.0 (blue, ~y=332)",
+      "issue": "math.1 is the highlighted payoff line ('— one-to-one'), but on this final frame its emphasis over the rest of the block is carried mainly by color; the eye is drawn adequately but the 'one-to-one' verdict phrase is not visually distinguished from the rest of math.1's run.",
+      "suggestion": "Optionally give the verdict tag 'one-to-one' marginally stronger weight/size or a small separation so the beat's conclusion pops as the focal point; minor polish only."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking. V1 clean (all elements within safe margins, no crop). V2 clean (no label/element collisions). V3 N/A clean (no graph/axes window in this definition_math scene). V4 clean (every Tex renders fully — ↦, ⇒, em-dash, \\text upright roman; no garble/raw markup, legible). V5 N/A clean (no truth-value dots/checks/asymptotes/arrows). V6 clean (frame's statement + f:student↦ID + distinct⇒distinct/one-to-one match exactly what the beat says). V7 clean (final fullest frame; statement+math.0+math.1 = all reveals, none premature/missing). V8 clean (mapping notation and implication are mathematically faithful to Example 1.1; no values to mis-state). This frame has ZERO visual blocking and converges on the V-layer; the only items are A-side advisories (centered math lines vs left-aligned prose — A6; an upper-middle whitespace gap — A1; mild focal polish on the verdict tag — A7) that drive re-render priority but do not gate."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "04",
+    "scene_id": "testing_x_and_x_squared",
+    "title": "Testing f(x)=x and g(x)=x^2",
+    "template": "example_walkthrough",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/04_testing_x_and_x_squared/final.png"
+   },
+   "audit": {
+    "scene_id": "testing_x_and_x_squared",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 88,
+     "A2": 86,
+     "A3": 90,
+     "A4": 91,
+     "A5": 89,
+     "A6": 87,
+     "A7": 82
+    },
+    "defects": [
+     {
+      "dimension": "A7",
+      "severity": "med",
+      "where": "right column, lower-right quadrant below 'g is not one-to-one ✗' (approx x 560-960, y 360-440)",
+      "issue": "The accent/focus weight is spread fairly evenly across the three right-column math statements; the 'bad' verdict (the punchline this beat lands on, per say '{show math.2} ... exactly the collision the definition rules out') is not visually elevated above the earlier scaffolding lines beyond its red color. Earlier scaffold (the 'f is one-to-one ✓' line) does not recede once the argument moves to g.",
+      "suggestion": "On the fullest frame, let the final 'g is not one-to-one ✗' carry slightly more weight (size or a subtle accent panel) and dim the already-resolved 'f is one-to-one ✓' line so the eye lands on the collision verdict the beat is teaching."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "right half, lower-right quadrant (below the third math line, above the takeaway rule)",
+      "issue": "The right column's content clusters in the upper-right while the lower-right quadrant is empty, leaving the right half slightly top-heavy against the evenly-distributed left column. Not crowding or overlap — purely a balance nicety.",
+      "suggestion": "Nudge the three right-column statements down so their vertical centers track the left-column steps 01/02/03 more tightly, distributing whitespace more evenly in the right half."
+     },
+     {
+      "dimension": "A6",
+      "severity": "low",
+      "where": "bottom takeaway band, full width (approx y 448-492): 'So g is not one-to-one on this interval — exactly why it needs care later.'",
+      "issue": "The takeaway wraps to a second short line ('later.') producing a brief widow word; sentence-level prose is correctly left-aligned, so this is cosmetic only.",
+      "suggestion": "Either widen the takeaway text box slightly to keep it on one line, or rebalance the wrap so the second line is not a single trailing word."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — this frame has ZERO visual blocking. V1 (no clipping; title, steps, verdicts, takeaway all inside safe margins), V2 (no overlap; clean two-column split with divider rule), V3 (text-slide template, no plot window to misread — N/A and clean), V4 (all Tex renders intact: title f(x)=x / g(x)=x², step math g(½)=¼=g(-½), 'f is one-to-one', 'g is not one-to-one' — no garble, no raw $/backslash, legible), V5 (✓ green on the one-to-one verdict and ✗ red on the not-one-to-one verdict are semantically correct per mark: ok / mark: bad), V6 (frame matches the beat: both functions, both verdicts, the g(½)=¼=g(-½) collision, and the takeaway all present and consistent with the locked say), V7 (fullest frame — all progressive reveals on screen is expected here, not a defect), V8 (visible math is correct vs source: g(1/2)=1/4=g(-1/2) holds, x² exponent and intervals [0,1]/[-1,1] correct). All clean. The dark flat background is house style and not reported. Three Advisory A-side polish items (A7 focus on the punchline verdict, A1 right-half top-heaviness, A6 takeaway widow) drive re-render priority only and do NOT gate convergence. This frame passes gate 1."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "05",
+    "scene_id": "shape_can_mislead",
+    "title": "Same Shape, Opposite Verdicts",
+    "template": "example_walkthrough",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/05_shape_can_mislead/final.png"
+   },
+   "audit": {
+    "scene_id": "shape_can_mislead",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 84,
+     "A2": 88,
+     "A3": 92,
+     "A4": 90,
+     "A5": 91,
+     "A6": 80,
+     "A7": 82
+    },
+    "defects": [
+     {
+      "dimension": "A6",
+      "severity": "med",
+      "where": "right column math callouts vs left column steps 01/02/03",
+      "issue": "The three right-hand math fragments ('h(x)=x(x-2)(x+2)', 'h is not one-to-one ×', 'x_1=x_2, k one-to-one ✓') are vertically centered within their own column rather than baseline-aligned to the numbered steps they correspond to. Row 02's verdict 'h is not one-to-one ×' floats roughly midway between left rows 01 and 02, and row 03's '✓' line sits below its matching step text, so the eye cannot lock a clean horizontal correspondence between each step and its conclusion.",
+      "suggestion": "Anchor each right-column callout to the baseline (or vertical center) of its matching left-column step so step 01↔factoring, step 02↔'h not one-to-one ×', step 03↔'k one-to-one ✓' read across on shared rows."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "left column, steps 02 and 03",
+      "issue": "Vertical spacing between the three steps is slightly uneven once the two-line wraps (step 02 '0 ≠ 2.' and step 03 'forces x_1^3 = x_2^3.') are accounted for; the gap above step 03 reads a touch tighter than the gap above step 02, mildly weakening the rhythm of the numbered list.",
+      "suggestion": "Distribute the three step blocks on a consistent leading so inter-step gaps stay equal regardless of one- vs two-line wrap."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "right column verdict marks (× red, ✓ green) vs surrounding text",
+      "issue": "The two verdict lines carry the beat's punchline (opposite verdicts), but at this fullest frame all three callouts share similar weight; the contrasting × / ✓ pair could be given marginally stronger focus so the 'opposite verdicts' payoff pops over the scaffold factoring line.",
+      "suggestion": "Let the factoring line (step 01 math) recede slightly (lower emphasis) once revealed, keeping accent weight on the two verdict lines that the title promises."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — scene 'shape_can_mislead' final frame is clean across V1-V8 (framing, no collisions, all Tex fully rendered and legible, × on 'h not one-to-one' and ✓ on 'k one-to-one' both semantically correct, frame matches the locked say, all reveals present as expected on the fullest frame, and all visible math — x(x-2)(x+2)=x^3-4x, h(0)=h(2)=0, x_1^3=x_2^3⇒x_1=x_2 — verified correct vs source). This frame has ZERO visual blocking; remaining items are Advisory polish only (cross-column baseline alignment A6, step spacing A1, verdict-mark hierarchy A7)."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "06",
+    "scene_id": "horizontal_line_test",
+    "title": "The Horizontal Line Test",
+    "template": "graph_compare",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/06_horizontal_line_test/final.png"
+   },
+   "audit": {
+    "scene_id": "horizontal_line_test",
+    "visual_blocking_count": 0,
+    "v_findings": [
+     {
+      "dimension": "V8",
+      "severity": "Advisory",
+      "evidence": "Right panel parabola is plotted as 1.15*x**2 (per payload right.plots[0].expression) but labeled '$y=x^2$'. The two filled crossing dots sit at x=+/-1.043 where the dashed line y=1.25 meets the DRAWN curve 1.15*x^2 (sqrt(1.25/1.15)=1.0425), so they are correctly placed for the curve that is actually rendered.",
+      "why": "Deliberate schematic scaling to fill the panel; label-math is correct and the qualitative two-crossing behavior is what the beat teaches. Per rubric this is a deliberate schematic proportion (label correct, shape approximate) -> at most Advisory, never a blocker. Crossing positions are geometrically consistent with the drawn curve, so no information is lost or contradicted.",
+      "fix": "No change needed for blocking. If exact fidelity to '$y=x^2$' is desired, set expression to 'x**2' and re-derive the dashed-line height / crossing points (e.g. line at y=1.3 -> x=+/-1.14); otherwise leave as a declared schematic."
+     }
+    ],
+    "a_scores": {
+     "A1": 86,
+     "A2": 88,
+     "A3": 90,
+     "A4": 84,
+     "A5": 88,
+     "A6": 82,
+     "A7": 87
+    },
+    "defects": [
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Left panel dashed warning line vs right panel dashed warning line",
+      "issue": "Left dashed line terminates at the single crossing dot near x=1 (start [-2.0,1.0] end [1.3,1.0]), while the right dashed line spans nearly the full panel width (start [-1.95,1.25] end [1.95,1.25]). The two panels read slightly asymmetric.",
+      "suggestion": "Extend the left dashed line a touch past the crossing dot (e.g. end x ~ 1.9) so both 'horizontal test lines' visually span their panels equally."
+     },
+     {
+      "dimension": "A4",
+      "severity": "low",
+      "where": "Both panels, dashed test lines",
+      "issue": "Same asymmetry as above creates a minor inconsistency in how the 'sweep the horizontal line' motif is presented across the two panels.",
+      "suggestion": "Match dashed-line extents across panels for a consistent visual grammar."
+     },
+     {
+      "dimension": "A6",
+      "severity": "low",
+      "where": "Left caption 'A line: one crossing at every height.'",
+      "issue": "Caption wraps to two lines with 'height.' alone on the second line (mild widow). Both captions are center-aligned.",
+      "suggestion": "Centering is acceptable for short caption cards per rubric; optionally rebalance the wrap (e.g. 'A line: one crossing / at every height.') to avoid the lone trailing word."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Bottom-right decorative waveform glyph",
+      "issue": "A small brand/audio-waveform mark sits in the lower-right corner, slightly detached from the content grid and competing a little with the annotation line above it.",
+      "suggestion": "If it is a persistent brand mark, leave it; otherwise nudge it clear of the annotation's right edge to keep the summary line as the clear bottom focus."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — this final frame of scene 'horizontal_line_test' is clean on V1-V8 (no out-of-frame/cropping, no label collision, readable windows, math renders intact, filled dots + green check / red cross carry correct semantics, crossing counts 1 vs 2 match the narration beat, all reveals consistent for a fullest frame, and visible coordinates are correct for the drawn curves). The only V note is an Advisory V8: the right parabola is the declared schematic 1.15*x^2 labeled y=x^2, which is permitted and not a blocker. Visual blocking is zero; A-side advisories (panel dashed-line asymmetry, a caption widow, the corner glyph) drive polish priority only and do not gate convergence."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "07",
+    "scene_id": "inverse_function_definition",
+    "title": "The Inverse Function",
+    "template": "definition_math",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/07_inverse_function_definition/final.png"
+   },
+   "audit": {
+    "scene_id": "inverse_function_definition",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 88,
+     "A2": 88,
+     "A3": 90,
+     "A4": 90,
+     "A5": 90,
+     "A6": 89,
+     "A7": 89
+    },
+    "defects": [
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Mid-frame vertical band between the two-line statement prose (ends ~y=235/540) and the first equation (~y=320/540)",
+      "issue": "There is a noticeably large empty gap between the statement prose block and the display-math block, leaving the centre of the frame under-used while content clusters top and middle. Not information loss, purely whitespace distribution.",
+      "suggestion": "Tighten the prose-to-math vertical gap (or nudge the math block up ~30-50px) so the two equations read as a tied unit directly under the statement, balancing top-weight."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "The two centred equations: f^{-1}(y)=x \\iff f(x)=y (~y=320) and f^{-1}(x) \\ne 1/f(x) (~y=390)",
+      "issue": "The two display equations are independently centred rather than sharing a common optical anchor; the shorter caution sits centred under a longer biconditional, so their left edges do not align and the pair reads slightly loose.",
+      "suggestion": "Optionally left-align both equations to a shared indent (or centre them as one grouped block with consistent line spacing) so the defining relation and the caution read as one coherent stack."
+     },
+     {
+      "dimension": "A4",
+      "severity": "low",
+      "where": "Accent usage across the two equations (gold biconditional vs blue caution)",
+      "issue": "Minor: the caution equation uses the secondary blue while the eyebrow [ DEFINITION ] also uses a similar blue; with the gold accent reserved for the highlighted defining relation this is consistent, but the blue caution does not visually read as a 'warning' the say-text frames it as.",
+      "suggestion": "Consider a distinct caution/warning tint for the f^{-1}\\ne 1/f(x) line so its 'one warning about the notation' role is signalled by colour, distinct from the eyebrow blue. Cosmetic only."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — this frame is clean on all of V1-V8. The definition biconditional f^{-1}(y)=x ⟺ f(x)=y and the reciprocal caution f^{-1}(x) ≠ 1/f(x) both render completely and legibly, match the storyboard statement/math payload verbatim, are mathematically correct, and agree with what this beat teaches; as the fullest frame, both reveals being present is expected. No V-blocking; remaining notes are advisory A-side polish (whitespace distribution and equation-anchoring) that drive render priority but do not gate convergence. This section's visual blocking is ZERO for this frame."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "08",
+    "scene_id": "inverse_iff_one_to_one",
+    "title": "An Inverse Exists Exactly When One-to-One",
+    "template": "theorem_proof",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/08_inverse_iff_one_to_one/final.png"
+   },
+   "audit": {
+    "scene_id": "inverse_iff_one_to_one",
+    "visual_blocking_count": 0,
+    "v_findings": [
+     {
+      "dimension": "V4",
+      "severity": "Advisory",
+      "evidence": "All on-screen Tex renders cleanly: statement 'A function has an inverse if and only if it is one-to-one.'; proof.0 'If f has an inverse and f(x1)=f(x2), apply f^{-1}: x1=x2. So f is one-to-one.'; proof.1 'If f is one-to-one, each output y has exactly one source x — send y back to it and that is f^{-1}.'; qed 'So one-to-one and invertible name the same thing.' Subscripts x_1/x_2 and superscripts f^{-1} are present and legible; no raw $, no stray backslashes, no missing-glyph boxes, no overflow.",
+      "why": "Math rendering is complete and readable at this size; no information lost. Noted only to record the dimension was actively checked and is clean (not a defect).",
+      "fix": "None required."
+     }
+    ],
+    "a_scores": {
+     "A1": 80,
+     "A2": 84,
+     "A3": 90,
+     "A4": 88,
+     "A5": 88,
+     "A6": 90,
+     "A7": 82
+    },
+    "defects": [
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Lower-right quadrant of the frame (below proof.1 bullet, right of the qed line) is largely empty, while the upper block (statement block + two proof bullets) sits comparatively tight; vertical rhythm is slightly top-heavy.",
+      "issue": "Element layout is a little top-weighted — content clusters in the upper two-thirds, leaving a noticeable dead zone bottom-right beyond the faint decorative glyph.",
+      "suggestion": "Increase vertical spacing between the accent statement block and the PROOF eyebrow / bullets so the proof breathes lower into the frame, balancing the empty lower-right; purely an aesthetic rebalance, not information-affecting."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "The qed line 'So one-to-one and invertible name the same thing.' is set in the accent (teal) color with the QED tombstone box, drawing the eye to the conclusion; the statement block uses a left accent bar but the body stays default text color.",
+      "issue": "Focus is well-handled overall, but the central theorem statement (the load-bearing 'iff' claim) and the qed line compete slightly for the accent emphasis; the statement could read marginally more prominent than the two-direction proof scaffold.",
+      "suggestion": "Optional: lightly de-emphasize the proof bullets (or nudge the statement's weight up) so the eye lands first on the iff statement, then the proof, then the qed close. Low priority — current hierarchy already reads correctly."
+     },
+     {
+      "dimension": "A2",
+      "severity": "low",
+      "where": "Whole frame — a theorem_proof text template on dark flat background.",
+      "issue": "Inherently text-forward slide (theorem + word proof has no graph), so it leans toward a flat lecture-slide look more than the graph scenes in this deck.",
+      "suggestion": "Acceptable for a theorem_proof beat; if extra polish is wanted, the two proof directions could be visually paired (forward/backward) with a subtle two-column or arrow motif. Not a defect of this template choice."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — frame 08_inverse_iff_one_to_one matches its locked say/payload (statement, proof.0, proof.1, qed all present and correct as the fullest frame), all Tex renders cleanly (V4), the QED tombstone carries correct end-of-proof semantics (V5), frame agrees with the beat (V6/V7) and the visible math is correct vs source (V8). No V1–V8 blocking; remaining items are low-severity A-side polish (slight top-heavy layout A1, minor focus balance A7). This frame's visual blocking is ZERO and it converges."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "09",
+    "scene_id": "first_inverses",
+    "title": "Computing a Couple of Inverses",
+    "template": "example_walkthrough",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/09_first_inverses/final.png"
+   },
+   "audit": {
+    "scene_id": "first_inverses",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 88,
+     "A2": 87,
+     "A3": 92,
+     "A4": 90,
+     "A5": 93,
+     "A6": 89,
+     "A7": 84
+    },
+    "defects": [
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Vertical band between row 03 (Check by composing, ~y=343) and the takeaway rule (~y=470)",
+      "issue": "Largest empty gap on the frame sits between the last step and the takeaway, leaving the composition makes the layout read slightly bottom-light/top-heavy; the three step rows are clustered in the upper-middle while the lower third is nearly empty apart from the takeaway.",
+      "suggestion": "Nudge the three step rows down a touch or distribute inter-row spacing so the step block is more vertically centered, tightening the orphaned gap above the takeaway."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "Right-hand math column, step 02 cube-root radical index and step 03 outer exponent '3' (~y=261 and ~y=343)",
+      "issue": "On this fullest frame all three math lines carry equal accent weight; the load-bearing new result of each beat (the cube root, then the verification = x with the check) is not visually distinguished from earlier scaffold, so the eye is not led to the current teaching point.",
+      "suggestion": "Optional: give the just-revealed line per beat a brief accent emphasis (already-taught lines dim to a muted tone) so hierarchy tracks the narration; on the final frame this is cosmetic since reveal is complete."
+     },
+     {
+      "dimension": "A6",
+      "severity": "low",
+      "where": "Takeaway line (~y=470, teal): 'Solve for the input, swap the names — soon to be routine.'",
+      "issue": "The takeaway is centered while the step prose is left-aligned; this is permissible (short callout/caption may center per rubric), but the centered single line reads slightly detached from the left-aligned column rhythm above it.",
+      "suggestion": "No change required (within house style); if tightening, left-align the takeaway to the step column or keep the accent rule as the visual anchor."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — this final frame of scene 'first_inverses' is clean on V1-V8; all Tex renders completely and is mathematically correct (f^{-1}(x)=x, g^{-1}(x)=∛x, g(g^{-1}(x))=(∛x)^3=x with a correct ✓), matches the beat's say/payload, with no crop, collision, garbling, or marker error. Visual blocking is zero. The three A-side items are low-severity polish nits (vertical balance, hierarchy emphasis, centered takeaway) that drive render priority only and do not gate convergence."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "10",
+    "scene_id": "composition_identities",
+    "title": "Composition Identities",
+    "template": "definition_math",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/10_composition_identities/final.png"
+   },
+   "audit": {
+    "scene_id": "composition_identities",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 84,
+     "A2": 88,
+     "A3": 92,
+     "A4": 92,
+     "A5": 90,
+     "A6": 78,
+     "A7": 90
+    },
+    "defects": [
+     {
+      "dimension": "A6",
+      "severity": "med",
+      "where": "statement line 'Undo, then redo — and you are back where you started.' centered at ~y=347, spanning x≈235→1205 (symmetric about frame center)",
+      "issue": "This is a full sentence-level teaching line rendered centered. Per A6, sentence-level prose should read left-aligned; centering is reserved for short title cards/eyebrows/captions. It loses no information (hence A-side, not V-blocking) but reads as a centered prose orphan rather than a left-aligned lead.",
+      "suggestion": "Left-align the statement to the same x-origin (~160) as the eyebrow and title so the title-block + statement form one left-aligned column; keep only the eyebrow [ PROPOSITION ] centered/short if desired. If the template intends it as a short tagline-style epigraph, that is a borderline keep — flag for author judgment."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "vertical distribution: title block ends ~y=170, statement at ~y=347, two identities at ~y=476 and ~y=568; bottom third (below ~y=600) is empty",
+      "issue": "Content sits in the upper-middle with a noticeable gap between the title block and the statement, and the lower third is sparse. Balance is slightly top-loaded. This is generous whitespace (house style dark-flat is fine, not a defect by itself), only a mild distribution nit.",
+      "suggestion": "Optionally nudge the statement + identity block to be more vertically centered, or tighten the title-to-statement gap, to balance the empty lower region. Low priority; does not affect legibility."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "the two identities are centered (~x 475→965) while title/eyebrow are left-aligned (x≈160)",
+      "issue": "Mixed alignment axis: left-aligned title/eyebrow vs center-aligned statement and math creates two competing vertical anchors rather than one consistent grid.",
+      "suggestion": "Choose one alignment grid for the body (left-align the statement and left-anchor the math block to match the title column, or fully center the title block too). Cosmetic consistency only."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — frame \"composition_identities\" has zero V1–V8 blocking findings. Both composition identities render correctly and completely (f^{-1}(f(x))=x for every x∈A; f(f^{-1}(y))=y for every y∈B), matching the storyboard payload and the locked say; eyebrow [ PROPOSITION ], title, and statement all match intent; no cut-off, collision, garbled Tex, or frame↔beat contradiction. This frame CONVERGES on the visual blocking axis. Only A-side advisories remain (notably A6: the full-sentence statement is centered rather than left-aligned), which drive polish priority but do not gate convergence."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "11",
+    "scene_id": "reflection_across_y_equals_x",
+    "title": "Reflection across y=x",
+    "template": "graph_focus",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/11_reflection_across_y_equals_x/final.png"
+   },
+   "audit": {
+    "scene_id": "reflection_across_y_equals_x",
+    "visual_blocking_count": 0,
+    "v_findings": [
+     {
+      "dimension": "V4",
+      "severity": "Advisory",
+      "evidence": "All on-screen Tex renders cleanly: title 'y=x', curve labels 'y=x^3', 'y=\\sqrt[3]{x}', 'y=x', and the annotation '(a,b) on the graph of f \\iff (b,a) on the graph of f^{-1}.' — no raw $, no backslash leakage, radical and f^{-1} superscript intact and legible.",
+      "why": "Recorded as a clean dimension; no garble, no missing/overflow glyphs, teaching-bearing math is large enough to read.",
+      "fix": "None needed."
+     }
+    ],
+    "a_scores": {
+     "A1": 82,
+     "A2": 90,
+     "A3": 93,
+     "A4": 89,
+     "A5": 91,
+     "A6": 92,
+     "A7": 88
+    },
+    "verdict_line": "VERDICT: 0 visual blocking — post-fix: line label now muted (color_role inherited); y=x label moved clear of dashed line; regression agent confirmed.",
+    "defects": [
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Upper-center label cluster, 'y=x^3' (~x=830,y=180) and 'y=x' (~x=905,y=180)",
+      "issue": "The dashed y=x line passes through both nearby curve labels, crossing glyphs; the two labels also sit close together in the same horizontal band, slightly crowding the top-right of the plot.",
+      "suggestion": "Reposition label_point values so labels clear the dashed-line path and gain a little horizontal separation; the rest of the layout (square axes, well-balanced curves, generous whitespace) is strong."
+     },
+     {
+      "dimension": "A4",
+      "severity": "med",
+      "where": "'y=x' curve label (~x=905,y=180)",
+      "issue": "The label is rendered in a red/pink tint, but its corresponding line (storyboard color_role: muted) draws as muted gray — label color is inconsistent with its own line's role and with the muted intent declared in the payload (plot.0).",
+      "suggestion": "Color the 'y=x' label to match its muted line (gray) so axis-of-reflection scaffolding reads as muted background, not an accent; reserve the warm/accent hue for the inverse curve (cube root) which is the beat's focus."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "Whole plot — relative emphasis of the three curves",
+      "issue": "The orange cube-root (inverse, the new reveal this beat) and the blue x^3 read at similar visual weight; the muted axis-of-reflection (y=x) competes slightly because its label is the most saturated (red) element near the curves.",
+      "suggestion": "Push y=x further into the background (muted label) and let the accent color carry the inverse curve, so the eye lands on the f / f^{-1} mirror pair and the two reflected dots that the narration is pointing at."
+     }
+    ]
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "12",
+    "scene_id": "repair_by_restricting",
+    "title": "Restrict, then Invert",
+    "template": "graph_focus",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/12_repair_by_restricting/final.png"
+   },
+   "audit": {
+    "scene_id": "repair_by_restricting",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 84,
+     "A2": 88,
+     "A3": 90,
+     "A4": 90,
+     "A5": 89,
+     "A6": 86,
+     "A7": 80
+    },
+    "verdict_line": "VERDICT: 0 visual blocking — post-fix: line label now muted (color_role inherited); y=x label moved clear of dashed line; regression agent confirmed.",
+    "defects": [
+     {
+      "dimension": "A4",
+      "severity": "med",
+      "where": "'y = x' label in the upper-right, on the dashed reflection line (storyboard plot.0, label_point [2.0, 2.3], color_role: muted)",
+      "issue": "The 'y = x' label renders in a warm red/pink tint, but plot.0 declares color_role: muted (grey, like the dashed line it labels). The label color drifts from the line's declared role, breaking the accent/role consistency with the actual y=x guide line (which is correctly grey).",
+      "suggestion": "Make the y=x label inherit the muted role of its line so label and dashed line read as one element; reserve the red/accent tint for elements the beat actually wants to highlight."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "'y = x' label overlapping the dashed line, upper-right (~[2.0, 2.3])",
+      "issue": "The dashed line crosses through the label glyphs, mildly reducing crispness of an otherwise comfortable layout.",
+      "suggestion": "Offset the label clear of the line (small perpendicular nudge) or add a subtle background mask behind it."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "'f(x)=x^2' label at [0.55, 2.25] vs the blue parabola's actual position at that height (near x~1.5)",
+      "issue": "The f(x)=x^2 label sits noticeably to the left of where the blue curve passes at its y-height, so the eye must travel to associate label with curve. It is unambiguous (only the blue curve occupies that upper-left region), so this is minor focus polish, not a collision.",
+      "suggestion": "Tuck the f(x)=x^2 label nearer the blue curve's upper segment (e.g. shift right toward the steep part) so each label hugs its own curve and the f / f^{-1} pairing reads at a glance."
+     }
+    ]
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "13",
+    "scene_id": "finding_the_inverse_strategy",
+    "title": "Finding the Inverse",
+    "template": "procedure_steps",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/13_finding_the_inverse_strategy/final.png"
+   },
+   "audit": {
+    "scene_id": "finding_the_inverse_strategy",
+    "visual_blocking_count": 0,
+    "v_findings": [
+     {
+      "dimension": "V2",
+      "severity": "Advisory",
+      "evidence": "Right-hand math column (y=f(x) at ~x=1130, x=… at ~x=1135, y=f^{-1}(x) at ~x=1130) sits far right with a wide empty gutter (~x=760 to ~x=1060) between the left prose and the math; no element overlaps or is occluded.",
+      "why": "Nothing is covered or lost — this is a balance/whitespace observation, not occlusion, so it stays Advisory per the escalation rule (merely a little loose, not information-losing).",
+      "fix": "Optionally pull the right-side math column inward (e.g. start math near x=900) so the prose and its math read as one tighter row rather than two far-apart columns."
+     },
+     {
+      "dimension": "V5",
+      "severity": "Advisory",
+      "evidence": "Worked strip uses two horizontal '→' arrows: y=x^2 → x=±√y → 'not a function' (boxed strip, y≈672). Arrows are sequence/flow connectors, not value-bearing markers.",
+      "why": "Arrows carry the correct flow meaning (each step leads to the next) and match the say beat; no marker is reversed or mis-typed, so this is a clean read, noted only for completeness.",
+      "fix": "No change required; arrows are semantically correct."
+     }
+    ],
+    "a_scores": {
+     "A1": 84,
+     "A2": 88,
+     "A3": 92,
+     "A4": 90,
+     "A5": 91,
+     "A6": 85,
+     "A7": 88
+    },
+    "verdict_line": "VERDICT: 0 visual blocking — frame is clean across V1–V8.",
+    "defects": [
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Right-side math column (y=f(x), x=⋯, y=f^{-1}(x)) at far right ~x=1060–1200 vs left prose ending ~x=760.",
+      "issue": "Large horizontal gutter between the step prose and its companion math makes each row read as two disconnected columns rather than one phrase; balance leans empty in the middle band.",
+      "suggestion": "Reduce the prose-to-math gap (shift the math column left toward ~x=900) so the prose and its restated math feel coupled per step."
+     },
+     {
+      "dimension": "A6",
+      "severity": "low",
+      "where": "WORKED strip box (~x=340–1100, y≈630–715) versus the step-number column left margin at ~x=165.",
+      "issue": "The worked-example box is inset to the right and centered under the step block instead of aligning to the same left margin as the numbered steps, creating a minor alignment drift in the vertical grid.",
+      "suggestion": "Left-align the worked box (or its 'WORKED' label) to the same x-margin as the step numbers / title for a cleaner shared grid."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "Right-side restated math y=f(x) / x=⋯ / y=f^{-1(x)} (secondary/cyan) vs the larger accent step numbers 1–3.",
+      "issue": "The right-column math and the left prose carry similar visual weight; with no single accented focus, the eye is not strongly pulled to the 'current' step (acceptable on a fullest frame, but hierarchy is flatter than ideal).",
+      "suggestion": "On a fullest frame this is expected; if re-rendering, consider a subtle accent on step 3 / the f^{-1}(x) result to anchor the procedure's payoff."
+     }
+    ]
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "14",
+    "scene_id": "inverse_of_a_cubic",
+    "title": "Inverse of f(x)=x^3+2",
+    "template": "derivation",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/14_inverse_of_a_cubic/final.png"
+   },
+   "audit": {
+    "scene_id": "inverse_of_a_cubic",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 78,
+     "A2": 84,
+     "A3": 90,
+     "A4": 80,
+     "A5": 92,
+     "A6": 88,
+     "A7": 86
+    },
+    "verdict_line": "VERDICT: 0 visual blocking — frame \"inverse_of_a_cubic\" passes gate 1; all V1-V8 clean, remaining issues are Advisory A-side only.",
+    "defects": [
+     {
+      "dimension": "A6",
+      "severity": "low",
+      "where": "The five-line equation block, center-right of frame; e.g. '=' in line 1 'y = x^3 + 2' (x~895/1920) vs '=' in line 4 'f^{-1}(x) = cbrt(x-2)' (x~840/1920)",
+      "issue": "[investigated → FALSE POSITIVE] audit read the deliberately-centered chain block as '=' misaligned; geometric measurement (= left-x equal across all lines) + a zoomed crop confirm the '=' DO form a vertical column. No change.",
+      "suggestion": "none — align_on works as designed."
+     },
+     {
+      "dimension": "A1",
+      "severity": "med",
+      "where": "Whole layout: derivation block starts at x~630/1920 and clusters in the right-center/lower-right; the entire upper-left quadrant (below the title, left of x~600) is empty",
+      "issue": "The equation stack is pushed right and down, leaving a large unbalanced void in the upper-left while content crowds toward center-right. The frame feels off-center rather than using a comfortable visual grid.",
+      "suggestion": "Left-shift and vertically center the derivation block (or left-align it under the title's left edge) so the negative space is balanced and the equations sit on a consistent left margin shared with the title/eyebrow."
+     },
+     {
+      "dimension": "A4",
+      "severity": "low",
+      "where": "Title row, top-left: 'Inverse of' (bold serif) + 'f(x)=x^3+2' (math italic, larger)",
+      "issue": "The two halves of the title differ in font (serif text vs math), size, and weight, and their baselines/optical sizes do not quite agree, so the title reads as two pasted pieces rather than one typographic unit.",
+      "suggestion": "Match the math title's cap-height/baseline to the serif lead-in (scale the math down slightly and baseline-align) so 'Inverse of f(x)=x^3+2' reads as a single title line."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "Line 4 (gold) 'f^{-1}(x) = cbrt(x-2)' vs the surrounding light-blue lines",
+      "issue": "The gold highlight on the result line works, but the four scaffold lines are all the same brightness/size, so the eye is not strongly guided through the build order before landing on the result; the scaffold does not visibly recede.",
+      "suggestion": "Slightly dim/desaturate the already-spoken scaffold lines (or reduce their weight) so the highlighted result f^{-1}(x)=cbrt(x-2) reads as the focal point."
+     }
+    ]
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "15",
+    "scene_id": "inverse_of_a_rational",
+    "title": "Inverse of f(x)=3/(x-5)",
+    "template": "derivation",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/15_inverse_of_a_rational/final.png"
+   },
+   "audit": {
+    "scene_id": "inverse_of_a_rational",
+    "visual_blocking_count": 0,
+    "v_findings": [
+     {
+      "dimension": "V1",
+      "severity": "Advisory",
+      "evidence": "Title inline formula 'f(x)=3/(x-5)' is rendered oversized; its numerator '3' reaches near the top safe area (~y150 of 1080) and the bottom derivation line 'f^{-1}(x)=5+3/x=(5x+3)/x' sits ~y880. Everything stays inside the frame; nothing is clipped.",
+      "why": "No key element (title formula, any of the 4 derivation lines, the highlighted answer) is cropped or pushed past the frame edge — no information is lost, so this stays Advisory rather than Blocking.",
+      "fix": "No action required for correctness; the only adjustment worth making is aesthetic (shrink the oversized title formula, see A6 defect)."
+     },
+     {
+      "dimension": "V4",
+      "severity": "Advisory",
+      "evidence": "All Tex renders cleanly: title 'Inverse of f(x)=3/(x-5)', and lines 'y=3/(x-5)', 'x-5=3/y', 'x=5+3/y', 'f^{-1}(x)=5+3/x=(5x+3)/x'. Fraction vincula, the superscript -1, and all digits are intact — no raw '$', no stray backslash, no missing/overflowing glyphs.",
+      "why": "Every glyph carrying teaching value is fully formed and large enough to read; reporting this only to confirm the dimension is clean (not a defect).",
+      "fix": "None — V4 is clean."
+     },
+     {
+      "dimension": "V6",
+      "severity": "Advisory",
+      "evidence": "Frame shows the title formula plus exactly the four payload `lines` (y=3/(x-5); x-5=3/y; x=5+3/y; f^{-1}(x)=5+3/x=(5x+3)/x). The `say` also speaks a both-direction check and a domain-pairing remark, but those are intentionally verbal-only (not in the `lines` payload), so their absence from the frame is expected, not a contradiction.",
+      "why": "Nothing on screen conflicts with what this beat teaches; the visible content is a faithful subset of the locked payload.",
+      "fix": "None — V6 is consistent."
+     },
+     {
+      "dimension": "V8",
+      "severity": "Advisory",
+      "evidence": "Visible algebra checks out: y=3/(x-5) -> x-5=3/y -> x=5+3/y -> f^{-1}(x)=5+3/x, and 5+3/x = (5x+3)/x is algebraically identical. Matches the storyboard `lines` verbatim.",
+      "why": "All visible math is correct against the source; no value, sign, or form is wrong.",
+      "fix": "None — V8 is clean."
+     }
+    ],
+    "a_scores": {
+     "A1": 70,
+     "A2": 86,
+     "A3": 90,
+     "A4": 78,
+     "A5": 90,
+     "A6": 68,
+     "A7": 74
+    },
+    "defects": [
+     {
+      "dimension": "A6",
+      "severity": "med",
+      "where": "Title row, top: the word 'Inverse of' (serif, baseline ~y320) followed by the inline formula 'f(x)=3/(x-5)' which is set noticeably larger and floats UP relative to the word — its center sits ~y250 and numerator ~y150, so the two pieces of the same title do not share a baseline or a type size.",
+      "issue": "Sentence/title-card text and its inline math are baseline-misaligned and size-mismatched, making the title card read as two disjoint pieces rather than one phrase. (A6 wants math and adjacent text baseline-aligned.)",
+      "suggestion": "Render the title formula at a size matched to 'Inverse of' and vertically center it on the same baseline (or move the whole formula onto a single baseline with the word), so 'Inverse of f(x)=3/(x-5)' reads as one line."
+     },
+     {
+      "dimension": "A1",
+      "severity": "med",
+      "where": "Overall composition: the 4 derivation lines are clustered in a right-of-center column (~x800-1230), leaving the entire left half empty, plus a large vertical gap between the title block (top ~third) and the first derivation line (mid-frame).",
+      "issue": "Layout is unbalanced — content hugs the right while the left and the upper-middle are dead space, so the frame does not use a comfortable, evenly-distributed visual grid.",
+      "suggestion": "Center the derivation column (or left-align it under the title) and tighten the title->first-line gap, distributing the four lines to fill the vertical space more evenly."
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "Focus competition: the oversized white title formula (top) is visually as loud as the amber-accent final answer line 'f^{-1}(x)=5+3/x=(5x+3)/x' (bottom), the element this derivation is meant to land on.",
+      "issue": "The intended focal point (the highlighted result) competes for attention with an over-large title formula; the eye is not cleanly steered to the answer.",
+      "suggestion": "Reduce the title formula's size (per A6 fix) so the accent-colored answer line is unambiguously the strongest element on the frame."
+     },
+     {
+      "dimension": "A4",
+      "severity": "low",
+      "where": "Type-size consistency between the title inline formula (top, oversized) and the body derivation math (cyan/amber lines), which are set at a smaller, consistent size among themselves.",
+      "issue": "The title math is set at a different (larger) scale than the body math, a mild inconsistency in the math type scale across the frame.",
+      "suggestion": "Bring the title formula into the same relative scale family as the body math so the math typography is consistent."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking — this final frame of scene 'inverse_of_a_rational' has zero Blocking findings (V1-V8 all clean: nothing cropped, nothing overlapping/covering info, math fully rendered and legible, all visible algebra correct vs the storyboard `lines`, consistent with the beat, all elements present as expected on the fullest frame). It converges the visual blocking gate. Remaining issues are Advisory/aesthetic only — an oversized, baseline-misaligned title formula and a right-clustered/unbalanced layout — captured in A6/A1/A7/A4 defects to prioritize a re-render polish, not to block."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "16",
+    "scene_id": "inverse_in_an_application",
+    "title": "An Inverse That Answers a Question",
+    "template": "derivation",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/16_inverse_in_an_application/final.png"
+   },
+   "audit": {
+    "scene_id": "inverse_in_an_application",
+    "visual_blocking_count": 0,
+    "v_findings": [
+     {
+      "dimension": "V8",
+      "severity": "Advisory",
+      "evidence": "Math block, line 2 (counting from top): 't = 9/5 f^{-1}(t) + 32'. This is a non-standard intermediate step — it substitutes f^{-1}(t) into the forward formula's input slot and sets the result equal to t. It renders cleanly and matches storyboard source line.1 verbatim (line 444-446 of ch01_inverse_functions.yml).",
+      "why": "Not a render or math error: the line is mathematically the setup 't = f(f^{-1}(t))' written out, and it is exactly the authored payload, so nothing is lost or contradicted. Flagged only as Advisory awareness because, read in isolation, this intermediate line is slightly unusual pedagogically (it pre-supposes the F->C reading before solving). No information loss -> stays Advisory per escalation rule.",
+      "fix": "No render fix required. If the author wants line 2 to read more transparently as a composition setup, consider rewriting source line.1 to 't = f(f^{-1}(t)) = 9/5 f^{-1}(t) + 32'; but this is an authoring/content choice, not a visual blocker — leave as-is unless the narration audit (NFA) flags it."
+     }
+    ],
+    "a_scores": {
+     "A1": 82,
+     "A2": 85,
+     "A3": 88,
+     "A4": 84,
+     "A5": 90,
+     "A6": 88,
+     "A7": 86
+    },
+    "defects": [
+     {
+      "dimension": "A6",
+      "severity": "low",
+      "where": "The four-line derivation block (center of frame). Equals signs across the four lines: line1 'f(t) =', line2 't =', line3 'f^{-1}(t) =', line4 'f^{-1}(f(t)) =' do not vertically align.",
+      "issue": "[investigated → FALSE POSITIVE] audit read the deliberately-centered chain block as '=' misaligned; geometric measurement (= left-x equal across all lines) + a zoomed crop confirm the '=' DO form a vertical column. No change.",
+      "suggestion": "none — align_on works as designed."
+     },
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "Vertical placement of the math block relative to the title.",
+      "issue": "The four equations sit low-center, leaving a large empty band between the title/eyebrow (top ~12%) and the first equation (~44% down). The bottom third below the last line is also mostly empty save the logo.",
+      "suggestion": "Nudge the derivation block up ~5-8% toward optical center for a more balanced top-to-bottom rhythm. Minor; the dark flat background and final-frame fullness are house style and not defects."
+     },
+     {
+      "dimension": "A4",
+      "severity": "low",
+      "where": "Line 4 (composition check) vs line 3 (highlighted result).",
+      "issue": "Line 4 'f^{-1}(f(t)) = ... = t' is rendered in the same blue as the scaffold lines, so the closing check reads as ordinary scaffold rather than as the confirming payoff of the derivation.",
+      "suggestion": "Optional: give the trailing '= t' a subtle accent or mark to signal the check closes successfully (mirrors mark: ok usage elsewhere in this deck). Low priority — current state is consistent, just not emphatic."
+     }
+    ],
+    "verdict_line": "VERDICT: 0 visual blocking. This frame has zero V1-V8 blocking findings — all four equations render cleanly, match the authored payload (storyboard scene id: inverse_in_an_application, lines 444-448), and the visible math is correct (C->F formula, F->C inverse 5/9(t-32), and the composition check 5/9(9/5 t + 32 - 32) = t). The orange highlight correctly marks the key result line. One Advisory (V8) notes a non-standard but author-intended intermediate line; A-side polish is held back mainly by A6 (declared align_on:\"=\" not honored — block is centered, equals column not aligned). Visual blocking is zero for this section frame; advisories left for author triage."
+   },
+   "blockings": []
+  },
+  {
+   "scene": {
+    "nn": "17",
+    "scene_id": "recap",
+    "title": "Section 1.1 — Recap",
+    "template": "recap_cards",
+    "frame_path": "C:/Users/user/Desktop/Calculus_handout/video/output/ch01/s1.1/critic/frames/17_recap/final.png"
+   },
+   "audit": {
+    "scene_id": "recap",
+    "visual_blocking_count": 0,
+    "v_findings": [],
+    "a_scores": {
+     "A1": 88,
+     "A2": 85,
+     "A3": 90,
+     "A4": 88,
+     "A5": 92,
+     "A6": 90,
+     "A7": 84
+    },
+    "verdict_line": "VERDICT: 0 visual blocking — post-fix regression: point 04 caveat fully inside bottom safe margin; no new defect.",
+    "defects": [
+     {
+      "dimension": "A1",
+      "severity": "low",
+      "where": "lower-right quadrant",
+      "issue": "4-row left column vs 3-card right column slightly imbalanced",
+      "suggestion": "optional: nudge cards to mirror left-column vertical extent"
+     },
+     {
+      "dimension": "A4",
+      "severity": "low",
+      "where": "formula cards",
+      "issue": "three cards differ slightly in height/internal padding",
+      "suggestion": "optional: normalize card padding"
+     },
+     {
+      "dimension": "A7",
+      "severity": "low",
+      "where": "whole frame",
+      "issue": "recap points+formulas intentionally co-equal, no single focal accent",
+      "suggestion": "acceptable for a recap; no action"
+     }
+    ]
+   },
+   "blockings": []
+  }
+ ],
+ "dispositions": {
+  "align_on_false_positive": [
+   "inverse_of_a_cubic",
+   "inverse_of_a_rational",
+   "inverse_in_an_application"
+  ],
+  "label_color_fixed_template": [
+   "reflection_across_y_equals_x",
+   "repair_by_restricting"
+  ],
+  "label_overlap_fixed_perdeck": [
+   "reflection_across_y_equals_x",
+   "repair_by_restricting"
+  ]
+ }
+}

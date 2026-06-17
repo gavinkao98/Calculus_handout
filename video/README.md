@@ -14,8 +14,12 @@
 video/
   README.md            你在這裡
   DESIGN.md            格式 + 資料流契約（先讀這個）
+  CONTENT_METHODOLOGY.md   內容稿撰寫方法論（Mode A／C 散文密度、來源標註）
+  REBUILD_STATUS.md    跨對話進度錨（逐節狀態以此為準）
+  REVIEW_GATES.md / REVIEW_MODEL_DECISIONS.md / RUNBOOK-*.md   審核層／決策／流程
   make.py              單一入口 orchestrator：parse → synth → render → compose（離線、不計費）
-  pipeline/
+  requirements.txt     pinned 依賴
+  pipeline/            產線引擎（全部進版控）
     assets/fonts/      在執行期註冊的內附設計字型
     visuals/           移植並驗證過的素材（colors、graph eval、layout）
     templates/         Direction B 場景模板
@@ -31,13 +35,49 @@ video/
     critic.py          render 後視覺 gate2：抽幀 → MiMo-V2.5 依 VISUAL-FRAME 判定（外部 API、公測免費）
     review_pack.py     工程鏡 packet 組裝（gate1 Claude／gate2 Codex 讀；離線、無 API）
     tts.py             MiMo TTS（唯一真旁白路線；Gemini 已退場 2026-06-16）
-  storyboards/
+  content_scripts/     逐節內容稿（Stage 1 產物，進版控）
+    <deck>.md          內容稿（教學單元拆解、`[source:]` 標註）
+    <deck>_narration.html   旁白 sign-off 稿（淺色、MathJax、雙擊即開）
+    _audit/            稽核資產（進版控）
+      *-RUBRIC.md      五份判斷閘 SSOT（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering）
+      PROMPT-*.md      thin prompt（template + per-deck）
+      REPORT-*.html / REVIEW-*.html   稽核／完工報告（self-contained，圖 base64 內嵌）
+      _gen/            報告產生器 + 資料（進版控；見下節「版控策略」）
+        *.gen.py       產生器：讀 .digest.json + 幀 → 輸出 self-contained HTML
+        *.digest.json  稽核裁決資料（workflow digest；不可廉價重生，故進版控）
+        frames_before/ 修改前 bug-state 幀（不可重生的證據；唯一進版控的 render 幀）
+  animations/          客製動畫 hook code（`# HOOK` 接入點；進版控）
+  storyboards/         Stage 2 工程稿（進版控）
     _demo_*.yml        模板示範／回歸樣本（asymptote／derivation／graph_compare／sign_chart／…）
-                       逐節正式 storyboard 於重跑時依方法論產生（舊 ch01_* 練習已廢棄）
-  output/              render 成品（gitignored），按 ch<NN>/s<X.Y>/ 歸類
-    ch01/s1.1/         一節成品——mp4、audio_mimo/、critic/、review/
-    _media/            manim per-scene render 快取（pipeline 內部用）
+    <deck>.yml         逐節正式 storyboard（依方法論產生）
+  design_handoff/      設計交付參考（進版控；DESIGN_BRIEF、from_designer/、tokens、參考截圖）
+  output/              ★ render 成品（gitignored，可重生），按 ch<NN>/s<X.Y>/ 歸類
+    ch01/s1.1/         一節成品——mp4、audio/、critic/frames/、review/packets/
+    _media/ media/ __pycache__/   manim／python 快取（gitignored）
 ```
+
+### 資料夾架構與版控策略（哪些進 git、哪些不進）
+
+**原則：可重生的成品不進版控；人寫的源、稽核裁決、不可重生的證據進版控。** 因為作者常換電腦，
+凡「換機後還要讀得到」的東西（尤其**含圖的 HTML 報告**）都必須能隨 git 走到每台機器。
+
+| 類別 | 範例 | 進 git？ | 規則 / 位置 |
+|---|---|:---:|---|
+| 文檔・引擎・源 | `*.md`、`make.py`、`pipeline/**`、`storyboards/*.yml`、`content_scripts/*.md`／`*.html`、`animations/**` | ✅ 進 | 預設追蹤 |
+| 稽核資產 | `_audit/*-RUBRIC.md`、`PROMPT-*.md`、`REPORT-*.html`、`REVIEW-*.html`、`*.raw.txt` | ✅ 進 | HTML 報告須 **self-contained**（見下） |
+| 報告產生器＋資料 | `_audit/_gen/*.gen.py`、`*.digest.json`、`frames_before/` | ✅ 進 | 放在 tracked 位置，**不要**留在 `output/` 內 |
+| 設計參考截圖 | `design_handoff/**/*.png`、`tokens.json` | ✅ 進（例外） | 不可重生的設計底稿；非 pipeline 產物 |
+| render 成品 | `output/**`：`*.mp4`、`*.wav`、`critic/frames/*.png`、`manifest.json`、`review/packets/` | ❌ 不進 | `.gitignore`：`/video/output/` |
+| 渲染／快取 | `media/`、`pipeline/**/media/`、`**/__pycache__/`、ad-hoc `*.log` | ❌ 不進 | `.gitignore`：`media/`、`__pycache__/` |
+
+**含圖 HTML 報告的鐵則 —— 一律 self-contained（圖 base64 內嵌）。** render 幀／截圖在 `output/`（gitignored），
+新 clone 的機器上不存在；報告若用相對路徑 `../../output/...` 引用，換機開啟就**整片空白**。因此凡含圖的報告：
+
+1. **產生器把每張幀讀進來、base64 內嵌成 `data:image/png;base64,...`**（用 `.venv` 的 Pillow 縮到約 1100px 寬，兼顧清晰與檔案大小），輸出**零外部圖片引用**的 HTML。驗證：`grep -c 'src="\.\./' report.html` 應為 `0`。
+2. **產生器、digest、不可重生的 `frames_before/` 一律放 `_audit/_gen/`（進版控）**，不要留在會被清掉的 `output/` 內——否則 `output/` 一清，committed HTML 就永久 dangling、且無從重生。
+3. 可重生的 `final.png` 仍由 `output/` 供應（重跑該節即重生）；產生器在 `output/` 被清空時，對缺幀的 `final.png` 退回 SVG placeholder，不會壞掉。
+
+範式：[`content_scripts/_audit/_gen/REVIEW-ch01_inverse_functions-visualframe.gen.py`](content_scripts/_audit/_gen/REVIEW-ch01_inverse_functions-visualframe.gen.py)。
 
 ## 狀態
 
@@ -248,7 +288,13 @@ python video\pipeline\review_pack.py --storyboard video\storyboards\<deck>.yml
 > 換電腦時 `import manim/yaml` 會直接失敗。若它們不在,改建一個本機 venv
 > （與 `.deps*` 互不影響,`_bootstrap` 找不到 `.deps*` 時就用 venv 的套件）。
 
-> ✅ **本機現況（2026-06-17 確認，免再逐次查）：** 全域 `python`（Python 3.12，`%LOCALAPPDATA%\Programs\Python\Python312`）已裝 **manim 0.20.1 ＋ PyYAML**；**MiKTeX**（`latex`／`dvisvgm`）與**系統 ffmpeg**（8.x）皆在 PATH。故本機**直接用全域 `python` 跑**即可——`python video\make.py …`、`python video\pipeline\sizecheck.py …`——**不需** `.venv`（其未裝 manim）、**不需** `ffmpeg_shim`。已用 `sizecheck` 對 `_demo_value_table.yml` 實跑驗證（manim 建場景＋LaTeX 編譯＋dvisvgm 全通、exit 0）。下方 `.venv` 設定僅為「無此環境的機器」的後備。
+> ⚠️ **環境依機器而定——換機後先驗證、別照搬（使用者常換電腦）。** 各機差異大，**跑前先驗一遍**：`.venv\Scripts\python -c "import yaml, manim"` 與（PowerShell）`Get-Command ffmpeg, ffprobe`。
+>
+> **本次這台（2026-06-17 實測）：**
+> - **用 repo 根的 `.venv`（`.venv\Scripts\python.exe`）跑整條產線**——它有 **manim 0.20.1 ＋ PyYAML 6.0.3**。**全域 `python`（Python 3.12）有 manim 但缺 PyYAML**，故 `python video\make.py …` 會在 `import yaml` 直接掛（本次首跑就是這樣失敗）。MiKTeX（`latex`／`dvisvgm`）在 PATH、可用。
+> - **`ffmpeg`／`ffprobe` 都不在 PATH**（連 PowerShell 也 NOT FOUND）。manim render 靠 `.venv` 內 bundled 的 `imageio_ffmpeg` 自帶 ffmpeg，所以**場景 mp4 照常 render**；但 `make.py` 的 compose／`_audit_render_sync` 與 `critic.py` 是用**裸名** `ffmpeg`／`ffprobe` 呼叫——`.venv\ffmpeg_shim\ffmpeg.exe`（真 ffmpeg 7.1）補得了 `ffmpeg`，**但 `ffprobe` 整台都沒有**。後果：(a) mock render 的 19 個場景 mp4 OK；(b) `make.py` 在 render 後的 ffprobe 時長健檢（`_audit_render_sync`）崩、**compose 沒跑→沒有合併成片**；(c) `critic.py --dry-run`（`per=scene` 靠 ffprobe 取時長算最末幀時刻）抽不到幀。
+> - **抽幀繞法（本次採用，免 ffprobe）：** 直接用 shim ffmpeg 從檔尾回退抓場景 mp4 最末（最滿）幀：`.venv\ffmpeg_shim\ffmpeg.exe -sseof -0.4 -i <scene>.mp4 -frames:v 1 -q:v 2 <out>.png`。輸出落在 `output/ch01/s1.1/critic/frames/NN_<scene_id>/final.png`（與 critic.py 同位）。
+> - **待補（合併成片／真 critic 前的 blocker）：** 要產合併片（含 MiMo 成片）或跑 `critic.py` 都需要 `ffprobe`。imageio_ffmpeg／shim 只給 ffmpeg、**不含 ffprobe**；屆時需在 PATH 放一個真 `ffprobe.exe`（完整 ffmpeg 套件），或把 `make.py`／`critic.py` 的 `_probe_duration`／`_ffprobe_duration` 改用 shim ffmpeg 探時長。
 
 **換新電腦的一次性設定**（`.deps*` 不存在、且全域 python 也沒有 manim 時）:
 
