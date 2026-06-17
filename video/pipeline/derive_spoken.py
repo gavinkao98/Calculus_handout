@@ -67,7 +67,7 @@ friend. Pronounce every mathematical expression clearly and correctly.
 
 **Audio tag：** 維持預設**不啟用**（口語稿純文字，節奏靠風格指令＋標點）。
 
-## 二、數學念法慣例（全節通用；Mode B 裁定）
+## 二、數學念法慣例（全節通用；NFA 裁定）
 
 | 數學 | 口語念法 | 備註 |
 |------|---------|------|
@@ -77,7 +77,7 @@ friend. Pronounce every mathematical expression clearly and correctly.
 | $\\sqrt[3]{x}$ / $\\sqrt[3]{y-2}$ | “the cube root of x” / “…of **the quantity** y minus two” | 和/差根號加 “the quantity” 消歧義。 |
 | $(\\sqrt[3]{x-2})^3$ / $(f^{-1}(x))^2$ | “…, **all cubed**” / “…, **all squared**” | 外層次方蓋整體。 |
 | 分數 $\\tfrac{a}{b}$ | “a over b”（簡單分數念 “one half / one quarter / nine-fifths”…） | |
-| 複雜分數（分子或分母含乘積／根號） | “…, all over …” 或 “… divided by the quantity …” | 例：$\\tfrac{1}{2\\sqrt2}$→“one divided by the quantity two times the square root of two”；$-\\tfrac{2\\sqrt5}{5}$→“negative the quantity two times the square root of five, all over five”。防 (1/2)√2 之類誤聽（Mode B §1.2 D5）。 |
+| 複雜分數（分子或分母含乘積／根號） | “…, all over …” 或 “… divided by the quantity …” | 例：$\\tfrac{1}{2\\sqrt2}$→“one over the quantity two root two”（“the quantity” 群組分母、防 (1/2)√2 誤聽）；$-\\tfrac{2\\sqrt5}{5}$→“negative two root five over five”（兩種群組同值、免 quantity）（NFA §1.2 D5）。 |
 | 區間 $[a,b]$ / $(a,b)$ | “the (open) interval from a to b” | |
 | 座標點 $(a,b)$ | **“the point with coordinates a and b”** | 無視覺符號時最清楚。 |
 | $\\pi/2$、$\\arcsin$… | “pi over two”、“arcsine of …” | 反三角直接念 arc-名。 |
@@ -131,7 +131,7 @@ def gen_md(canon: dict, spoken: dict, deck: str) -> str:
         f" 經 `pipeline/derive_spoken.py` 生成。要改旁白請改 `.spoken.yml` 後重生。\n"
         f"> **性質：版本 B（口語 TTS 版）。** 英文散文逐字忠於內容稿 `narration`，**只把數學攤成口語**（無 LaTeX），"
         f"供不能直讀 LaTeX 的 TTS（MiMo）照念。對照閱讀版（版本 A，數學渲染）＝ `{deck}_narration.html`。\n"
-        f"> **Mode B 稽核狀態：** 見 `content_scripts/_audit/`（每節各自記錄）。\n\n---\n\n"
+        f"> **NFA 稽核狀態：** 見 `content_scripts/_audit/`（每節各自記錄）。\n\n---\n\n"
         + MD_CONFIG_AND_CONVENTIONS
         + "\n## 三、逐段口語稿\n\n"
         "> 每段 `uNN · id` 即該單元 `assistant` 訊息內容（`{show}` 已移除）。intro/outro 無旁白，不列。\n\n"

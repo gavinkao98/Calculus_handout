@@ -1,0 +1,242 @@
+# §1.1 Inverse Functions — 口語旁白源（spoken narration source）
+#
+# 這是 derive_spoken.py 的唯一輸入。每個 key = content scene id；
+# value = 英文散文逐字保留、數學攤成口語（無 $）、{show} marker 與正典 say 同位。
+# 改這裡後跑 derive_spoken.py --deck ch01_inverse_functions 重生成。
+#
+# 數學念法依 NARRATION-FAITHFULNESS-RUBRIC.md §2 慣例；
+# 正典來源（LOCKED）: content_scripts/ch01_inverse_functions.md
+
+can_we_run_it_backwards: |
+  We know how to run a function forwards — feed it an input, read off the
+  output. The real question of this section is whether we can run it
+  backwards, recovering the input from the output. Sometimes we can,
+  sometimes we can't, and two quick examples show the difference.
+  {show math.0} Take f of x equals x on the interval from zero to one: zero
+  goes to zero, a half goes to a half, an eighth goes to an eighth — every
+  output traces back to exactly one input, so going backwards is unambiguous.
+  {show math.1} Now take f of x equals x squared on the interval from
+  negative one to one: a half squares to a quarter, but so does negative a
+  half, so the output a quarter came from two different inputs. That
+  collision is the whole obstacle — when one output can be traced to two
+  inputs, there is no honest way back, and pinning down exactly when that
+  never happens is where we begin.
+
+one_to_one_definition: |
+  A function can be run backwards only when each output comes from exactly
+  one input, and that property has a name: one-to-one.
+  {show math.0} Formally, that means different inputs always give different
+  outputs — f of x sub one is not equal to f of x sub two whenever x sub one
+  is not equal to x sub two.
+  {show math.1} There is an equivalent form that turns out to be the one you
+  actually use in a proof: if f of x sub one equals f of x sub two, then
+  x sub one equals x sub two. The two say the same thing from opposite
+  sides — the first forbids a collision outright, the second says that if a
+  collision did happen, the two inputs must have been equal all along. When
+  you need to prove a function is one-to-one, reach for that second form.
+
+student_id_is_one_to_one: |
+  Let us start with a one-to-one function that needs no algebra at all.
+  Picture a class where every student is assigned an identification number,
+  set up so that no two students ever share a number.
+  {show math.0} Let f send each student to their identification number —
+  is it one-to-one?
+  {show math.1} It is: by construction, two different students always end up
+  with two different numbers, so distinct inputs give distinct outputs. That
+  is the definition in plain words, before a single equation — no two inputs
+  are allowed to collide.
+
+testing_x_and_x_squared: |
+  We met these two at the very start; now let us run them through the
+  definition.
+  {show math.0} On zero to one, f of x equals x sends every input to itself,
+  so different inputs always land on different outputs — f is one-to-one.
+  {show math.1} But g of x equals x squared on negative one to one fails,
+  and we can pin it down cleanly: g of a half is a quarter, and g of
+  negative a half is also a quarter.
+  {show math.2} Two different inputs, one shared output — exactly the
+  collision the definition rules out.
+  {show takeaway} So g is not one-to-one on this interval — which is exactly
+  why it needs careful handling later.
+
+shape_can_mislead: |
+  Here is a case where the formula can fool you. Compare h of x equals
+  x cubed minus four x with k of x equals x cubed plus four on the whole
+  real line — both look like cousins of x cubed.
+  {show math.0} But factor the first: h of x equals x times the quantity
+  x minus two, times the quantity x plus two,
+  {show math.1} so h of zero and h of two are both zero even though zero and
+  two are different inputs; h is not one-to-one.
+  {show math.2} The second behaves oppositely: if k of x sub one equals k of
+  x sub two, then x sub one cubed equals x sub two cubed, and taking cube
+  roots forces x sub one equals x sub two, so k is one-to-one.
+  {show takeaway} Same general shape, opposite verdicts — when the graph is
+  not in front of you, test the definition directly.
+
+horizontal_line_test: |
+  When you do have the graph, there is a one-glance test. A horizontal line
+  y equals c meets the graph of f wherever f of x equals c, so a single
+  output value showing up twice is the same as that line crossing the graph
+  twice. That gives the rule: a function is one-to-one exactly when no
+  horizontal line crosses its graph more than once.
+  {show left.plot.1} A straight line like y equals x passes —
+  {show left.plot.2} every horizontal line meets it just once.
+  {show caption.left} {show right.plot.1} A parabola fails — a horizontal
+  line slices clean through both arms,
+  {show right.plot.2} {show right.plot.3} and those two crossings are exactly
+  the pair of inputs sharing an output we found with algebra.
+  {show caption.right} {show annotation.0} One-to-one, in a single glance:
+  no horizontal line gets to cross twice.
+
+inverse_function_definition: |
+  Once a function is one-to-one, we can build a second function that undoes
+  it. The idea is simply to read the same correspondence backwards. Where
+  f asks "given the input, what is the output?", the inverse asks "given
+  that output, which input produced it?" So the outputs of f become the
+  inputs of the inverse, and the domain and range trade places.
+  {show math.0} We write the inverse as f inverse, and define it like this:
+  f inverse of y equals x exactly when f of x equals y.
+  {show math.1} One warning about the notation: that negative one means
+  inverse function, not a reciprocal. f inverse of x is the inverse
+  evaluated at x, which is a completely different thing from one over
+  f of x — and the same caution will matter for sine inverse shortly.
+
+inverse_iff_one_to_one: |
+  This ties the two halves of the section into one clean statement: a
+  function has an inverse if and only if it is one-to-one. One direction is
+  quick.
+  {show proof.0} Suppose f already has an inverse and f of x sub one equals
+  f of x sub two; apply f inverse to both sides — the left collapses to
+  x sub one, the right to x sub two, so x sub one equals x sub two, and f
+  was one-to-one all along.
+  {show proof.1} The other direction builds the inverse: if f is one-to-one,
+  then every output y in the range comes from exactly one input x, and
+  sending each y back to its unique x is precisely the inverse function.
+  {show qed} So "one-to-one" and "invertible" are just two names for the
+  same thing.
+
+first_inverses: |
+  Let us compute a couple of inverses.
+  {show math.0} Start with f of x equals x — it leaves every input
+  untouched, so undoing it does nothing either; f is its own inverse,
+  f inverse of x equals x.
+  {show math.1} Now g of x equals x cubed: set y equals x cubed, solve to
+  get x equals the cube root of y, then rename the variables to land on
+  g inverse of x equals the cube root of x.
+  {show math.2} And we can check it — g of its inverse is the cube root of
+  x, all cubed, which is just x again.
+  {show takeaway} Solve for the input, swap the names; that is the move, and
+  we are about to make it routine.
+
+composition_identities: |
+  Undoing and then redoing should leave you exactly where you started —
+  worth stating outright.
+  {show math.0} For a one-to-one f, applying f and then f inverse returns
+  the original input: f inverse of f of x equals x for every x in the
+  domain.
+  {show math.1} Going the other way works too: f of f inverse of y equals y
+  for every y in the range. Picture an input x in the set A; f carries it
+  across to its output in the set B, and f inverse carries that output right
+  back to the same x — a round trip that lands home. Each function is the
+  other's exact undo, in both directions.
+
+reflection_across_y_equals_x: |
+  There is a clean picture of what taking an inverse does to a graph. If you
+  draw f and its inverse in the same plane, the two graphs are mirror images
+  across the line y equals x.
+  {show plot.2} The reason is the same swap: a point with coordinates a and
+  b sits on the graph of f exactly when the point with coordinates b and a
+  sits on the graph of the inverse,
+  {show plot.3} {show plot.4} and reflecting across y equals x is precisely
+  what trades a point's two coordinates.
+  {show annotation.0} You can watch it on the cube and the cube root from a
+  moment ago — fold the graph of x cubed over the line y equals x and it
+  lands right on the graph of the cube root. Inverse, geometrically: reflect
+  across y equals x.
+
+repair_by_restricting: |
+  What about a function that fails the one-to-one test — is it hopeless? Not
+  necessarily. Take f of x equals x squared, which we already know is not
+  one-to-one on the whole line. But chop its domain down to the nonnegative
+  numbers, from zero onwards, and it becomes one-to-one: if two nonnegative
+  inputs square to the same value, they were equal to begin with.
+  {show plot.2} Now we can invert it — solving gives f inverse of x equals
+  the square root of x, and because the inputs were nonnegative we take the
+  positive root.
+  {show annotation.0} That is why the square root symbol means the positive
+  root: it is the convention that makes square root the genuine inverse of
+  squaring. Restrict first, then invert — and that exact move is the key
+  that unlocks the inverse trigonometric functions coming up.
+
+finding_the_inverse_strategy: |
+  We have inverted a few functions by hand; let us package the moves into a
+  procedure.
+  {show math.0} Step one: write y equals f of x.
+  {show math.1} Step two: solve that equation for x in terms of y.
+  {show math.2} Step three: interchange the names x and y — the result reads
+  y equals f inverse of x. That last swap is just the habit of using x for
+  the inverse's own input.
+  {show worked} One guardrail, though: this only works if f is already
+  one-to-one. Apply it blindly to y equals x squared and step two hands you
+  x equals plus or minus the square root of y — two values, not a function.
+  So always check one-to-one first, or restrict the domain the way we just
+  did.
+
+inverse_of_a_cubic: |
+  Now run the procedure on a fresh function: f of x equals x cubed plus two.
+  {show line.0} Write y equals x cubed plus two.
+  {show line.1} Solve for x — subtract to get x cubed equals y minus two,
+  {show line.2} then take the cube root, x equals the cube root of the
+  quantity y minus two.
+  {show line.3} Interchange the names and you have f inverse of x equals the
+  cube root of the quantity x minus two.
+  {show line.4} Check it by composing: f of the inverse is the cube root of
+  the quantity x minus two, all cubed, plus two — the cube and cube root
+  cancel, leaving x minus two plus two, which is x. Three steps, one check,
+  done.
+
+inverse_of_a_rational: |
+  Same three steps, but now the algebra is a touch more delicate — a
+  rational function, f of x equals three over the quantity x minus five.
+  {show line.0} Set y equals three over the quantity x minus five.
+  {show line.1} Solving, x minus five equals three over y,
+  {show line.2} so x equals five plus three over y;
+  {show line.3} interchanging gives f inverse of x equals five plus three
+  over x, which we can also write as five x plus three, all over x. This
+  time let us verify both directions: f of the inverse and the inverse of f
+  each come back to x, exactly the composition identities at work. And
+  notice the domains pair up: f cannot take x equals five, the inverse
+  cannot take x equals zero, mirroring the fact that f never outputs zero
+  and the inverse never outputs five.
+
+inverse_in_an_application: |
+  One more, where the inverse answers a real question. The function f of t
+  equals nine-fifths t plus thirty-two turns a Celsius temperature into
+  Fahrenheit.
+  {show line.0} So what does its inverse do? It runs the conversion in
+  reverse — Fahrenheit back to Celsius.
+  {show line.1} Solving t equals nine-fifths f inverse of t plus thirty-two
+  for the inverse
+  {show line.2} gives f inverse of t equals five-ninths times the quantity
+  t minus thirty-two.
+  {show line.3} For the check, feed a Celsius reading through f and then
+  through the inverse: the thirty-twos cancel, the nine-fifths and
+  five-ninths undo each other, and you get t back. An inverse is not just
+  algebra — it is the same relationship read in the direction you happen to
+  need.
+
+recap: |
+  Let us gather what we have built.
+  {show point.0} A function is one-to-one when distinct inputs give distinct
+  outputs — and you can spot it at a glance with the horizontal line test,
+  where no line is allowed to cross twice.
+  {show point.1} A function is invertible exactly when it is one-to-one,
+  {show point.2} and its inverse swaps inputs with outputs, so its graph is
+  the mirror image across y equals x.
+  {show point.3} To find an inverse you solve y equals f of x for x and swap
+  the names — after checking one-to-one, or restricting the domain to get
+  there.
+  {show formula.0} {show formula.1} And keep the notation straight: f
+  inverse undoes f;
+  {show formula.2} it is not one over f. One-to-one, invertible, reflected
+  across y equals x — that is the whole arc of the section.

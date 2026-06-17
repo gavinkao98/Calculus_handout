@@ -140,7 +140,7 @@ def _label(text: str, ground: str, *, role: str = "text", size: str = "label"):
 
 
 def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any],
-                          xr: list[float]) -> None:
+                          xr: list[float], yr: list[float]) -> None:
     if plot.get("label_point") is not None:
         point = plot["label_point"]
         label.move_to(axes.c2p(float(point[0]), float(point[1])), aligned_edge=LEFT)
@@ -155,9 +155,10 @@ def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any],
             pass
     # Default: place near the tail end of the curve
     x_end = float(xr[1])
+    y_span = yr[1] - yr[0]
     try:
         y_end = safe_eval_expression(plot["expression"], x_end)
-        if math.isfinite(y_end):
+        if math.isfinite(y_end) and yr[0] - y_span <= y_end <= yr[1] + y_span:
             label.next_to(axes.c2p(x_end, y_end), side, buff=0.18)
             return
     except Exception:
@@ -251,7 +252,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                 lab = _label(plot["label"], ground,
                              role=plot.get("label_role", str(plot.get("color_role", "secondary"))),
                              size=plot.get("label_size", default_label_size))
-                _place_function_label(lab, graph, axes, plot, xr)
+                _place_function_label(lab, graph, axes, plot, xr, y_range)
                 if static:
                     labels.append(lab)
                 else:
@@ -298,14 +299,12 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                              role=plot.get("label_role", str(plot.get("color_role", "secondary"))),
                              size=plot.get("label_size", default_label_size))
                 if plot.get("label_point") is not None:
-                    # Explicit axes point -- for a sloped/diagonal guide, next_to(line,
-                    # side) lands on the bbox edge (a y=x label asking for 'up' ended
-                    # up pinned to the top of the y-axis). Mirrors the function path.
                     p = plot["label_point"]
                     lab.move_to(axes.c2p(float(p[0]), float(p[1])), aligned_edge=LEFT)
                 else:
-                    side = _SIDE.get(str(plot.get("label_side", "right")).lower(), RIGHT)
-                    lab.next_to(line, side, buff=0.13)
+                    side = _SIDE.get(str(plot.get("label_side", "up")).lower(), UP)
+                    end_pt = plot["end"]
+                    lab.next_to(axes.c2p(float(end_pt[0]), float(end_pt[1])), side, buff=0.18)
                 if static:
                     labels.append(lab)
                 else:

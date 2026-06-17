@@ -42,7 +42,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, UL, MathTex, VGroup
+from manim import DOWN, LEFT, UL, MathTex, VGroup
 
 from .. import brand
 from ..blocks import Block
@@ -106,6 +106,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         zone_top = title.get_bottom()[1] - 0.55
         zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.15
         content.move_to([0, (zone_top + zone_bottom) / 2, 0])
+        content.align_to(title, LEFT)
 
     if statement is not None:
         blocks.append(Block("statement", statement, anim="fade", static=True))

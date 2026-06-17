@@ -1,0 +1,284 @@
+# §1.2 Inverse Trigonometric Functions — 口語旁白源（spoken narration source）
+#
+# 這是 derive_spoken.py 的唯一輸入。每個 key = content scene id；
+# value = 英文散文逐字保留、數學攤成口語（無 $）、{show} marker 與正典 say 同位。
+# 改這裡後跑 derive_spoken.py --deck ch01_inverse_trig_functions 重生成。
+#
+# 數學念法依 NARRATION-FAITHFULNESS-RUBRIC.md §2 慣例：
+#   arcsin/arccos/arctan → "arcsine/arccosine/arctangent"；sin^{-1} → "sine inverse"；
+#   arccsc/arcsec/arccot → "inverse cosecant/secant/cotangent"；
+#   π/2 → "pi over two"；-1 → "negative one"；√(a) → "the square root of (the quantity) a"；
+#   2√2 → "two root two"；ℝ → "the real numbers"。
+# 正典來源（六鏡＋潤稿 gate1 收斂、待 sign-off）: content_scripts/ch01_inverse_trig_functions.md
+
+recovering_angles: |
+  We can run the trigonometric functions forwards all day — feed in an angle,
+  read off a ratio.
+  {show math.0} This section runs them the other way: we are handed a ratio,
+  and we want the angle that produced it. The slope of a ramp gives back an
+  angle of inclination; a ratio of two sides of a right triangle gives back
+  one of its angles.
+  {show math.1} But there is an obstacle. The trig functions repeat their
+  values endlessly, so on their full domains they are nowhere near one-to-one
+  — and a function that is not one-to-one has no inverse. The way out is the
+  move we already know: restrict each trig function to an interval where it is
+  one-to-one, and invert that restricted piece. So the real work of this
+  section is choosing the right interval for each one.
+
+sine_is_not_one_to_one: |
+  Start with sine, and watch exactly why it cannot be inverted as it stands.
+  {show plot.1} Slide a horizontal line across the graph of y equals sine x:
+  at almost every height it crosses not once but over and over, marching off
+  in both directions forever.
+  {show plot.2} {show plot.3} {show plot.4} {show plot.5} Each of those
+  crossings is a different angle with the very same sine. So a single value of
+  sine comes from infinitely many angles, and there is no way to choose which
+  one to send back.
+  {show annotation.0} Sine is badly not one-to-one on the whole real line —
+  and that is the problem we have to fix before any inverse can exist.
+
+restrict_sine_branch: |
+  Here is the fix.
+  {show plot.1} Keep only the middle piece of the sine graph, the part between
+  negative pi over two and pi over two.
+  {show plot.2} {show plot.3} On that one interval sine climbs steadily from
+  negative one up to one, never repeating a value along the way — so it is
+  one-to-one there, and it still reaches every output from negative one to
+  one.
+  {show annotation.0} That restricted piece has exactly what we need: it can
+  be reversed, and it gives up nothing in the range. This is the branch we are
+  going to invert.
+
+arcsine_definition: |
+  Now we can name the inverse.
+  {show math.0} The inverse sine of x, written arcsine of x, is the angle in
+  our restricted interval whose sine is x. In symbols, arcsine of x equals y
+  means sine of y equals x, with y between negative pi over two and pi over
+  two.
+  {show math.1} Reading that straight off the branch, its domain is everything
+  from negative one to one — the values sine can produce — and its range is
+  the interval from negative pi over two to pi over two.
+  {show math.2} One warning about notation, the same one as before: arcsine of
+  x is often written sine inverse of x, but that negative one means inverse,
+  not reciprocal — it is not one over sine x. When a source writes sine
+  inverse, check the context to see which is meant.
+
+arcsine_identities: |
+  Sine and arcsine undo each other — but you have to watch the direction.
+  {show math.0} Going out and back, sine of arcsine of x equals x for every x
+  from negative one to one: hand in a legal ratio, take its angle, then take
+  that angle's sine, and you land back on the ratio.
+  {show math.1} The other order, arcsine of sine of x equals x, only returns
+  the original angle when that angle was already inside the restricted
+  interval.
+  {show math.2} Push outside it and arcsine cannot follow you home — take x
+  equals pi: sine of pi is zero, and arcsine of zero is zero, not pi. Arcsine
+  always answers with the angle in its own interval, even when that was not
+  the angle you started from.
+
+reference_triangle_method: |
+  There is a clean recipe for evaluating something like the tangent of an
+  arcsine — a trig function wrapped around an inverse-trig expression.
+  {show math.0} Step one: name the inside. Set theta equal to the inverse-trig
+  expression, which immediately hands you one ratio — if theta equals arcsine
+  of x, then sine of theta equals x.
+  {show math.1} Step two: draw a right triangle whose sides realise that
+  ratio, using positive lengths for its magnitude.
+  {show math.2} Step three: fill in the missing side with the Pythagorean
+  theorem.
+  {show math.3} Step four: read off whatever trig value you were after,
+  straight from the completed triangle — and fix the sign separately, from the
+  principal-value interval, not from the picture. The triangle gives you the
+  size; the interval gives you the sign.
+
+evaluating_arcsin: |
+  Let us evaluate two. First, arcsine of one half: we want the angle in our
+  interval whose sine is a half, and that is pi over six — read straight off a
+  special angle, no triangle needed.
+  {show plot.3} {show plot.0} {show plot.1} The second is the kind the recipe
+  was built for: the tangent of arcsine of one third. Set theta equals arcsine
+  of one third, so sine of theta is a third, an angle in the first quadrant.
+  Draw a right triangle with opposite side one and hypotenuse three;
+  {show plot.2} the adjacent side is the square root of nine minus one, which
+  is two root two.
+  {show annotation.0} Tangent is opposite over adjacent, so tangent of theta
+  is one over the quantity two root two. We never named the angle itself — but
+  the triangle handed us its tangent.
+
+restrict_cosine_branch: |
+  Cosine needs the same treatment, but a different interval — its own middle
+  piece would fail, because cosine is symmetric across zero and would just
+  repeat.
+  {show plot.1} So watch cosine instead on the interval from zero to pi.
+  {show plot.2} {show plot.3} It starts at one, slides down steadily, and ends
+  at negative one, hitting every value in between exactly once.
+  {show annotation.0} On that interval cosine is one-to-one and still sweeps
+  the full range — the natural counterpart of the interval we picked for sine.
+  That is the branch we invert to get the inverse cosine.
+
+arccosine_definition: |
+  The inverse cosine follows the very same script.
+  {show math.0} The inverse cosine of x, written arccosine of x, is the angle
+  between zero and pi whose cosine is x: arccosine of x equals y means cosine
+  of y equals x, with y from zero to pi.
+  {show math.1} Its domain is again everything from negative one to one — the
+  values cosine can take — and this time its range runs from zero to pi. Same
+  idea as arcsine, just anchored on cosine's interval instead of sine's.
+
+arccosine_identities: |
+  The cancellation identities copy straight over.
+  {show math.0} Cosine of arccosine of x equals x for every x from negative
+  one to one — out and back, no fine print.
+  {show math.1} And arccosine of cosine of x equals x as well, but, exactly as
+  with sine, only when the starting angle was already between zero and pi. It
+  is the same one-directional pattern as for sine — and we will pin it down
+  for all three in just a moment.
+
+domain_of_compositions: |
+  Inverse trig functions are fussy about what they will accept, so let us
+  practise finding the domain of a composition.
+  {show math.0} Take f of x equals arcsine of cosine of x. Whatever x is,
+  cosine x already lands between negative one and one — and that is precisely
+  what arcsine accepts —
+  {show math.1} so every real number is allowed; the domain of f is all of the
+  real numbers.
+  {show math.2} Now flip the order: h of x equals sine of arccosine of x. The
+  inner function, arccosine, demands an input from negative one to one; its
+  output is just an angle, and sine will swallow any angle, so the domain of h
+  is negative one to one.
+  {show takeaway} The rule behind both: first make sure the input is legal for
+  the inner function, then make sure the inner function's output is legal for
+  the outer one.
+
+principal_value_trap: |
+  Here is a trap worth springing once, on purpose.
+  {show plot.0} A particle starts moving at time t equals ten and bobs up and
+  down, its height at time t equal to cosine t. True or false: the particle
+  has height one at time t equals arccosine of one? It is false — and the
+  reason is exactly what makes inverse trig subtle.
+  {show plot.1} The equation cosine t equals one holds at infinitely many
+  times,
+  {show plot.3} but arccosine returns only its one principal value, t equals
+  zero. And at t equals zero the particle is not even moving yet; its motion
+  only begins at t equals ten.
+  {show plot.2} The particle really does reach height one, at the times t
+  equals two pi n once n is large enough.
+  {show annotation.0} But arccosine of one is zero, which is not one of them.
+  An inverse trig function gives you a single angle, never the whole family.
+
+restrict_tangent_branch: |
+  Tangent gets the most dramatic interval of the three.
+  {show plot.2} On the open interval from negative pi over two to pi over two,
+  tangent climbs without bound: it plunges toward negative infinity at the
+  left edge, rises through zero in the middle, and races up toward positive
+  infinity at the right edge.
+  {show annotation.0} Along the way it passes through every real number, and
+  through each one exactly once. That is why the inverse tangent is the
+  generous one — where arcsine and arccosine only take inputs between negative
+  one and one, arctangent accepts every real number you can hand it.
+
+arctangent_definition: |
+  So here is the inverse tangent.
+  {show math.0} The inverse tangent of x, written arctangent of x, is the
+  angle strictly between negative pi over two and pi over two whose tangent is
+  x: arctangent of x equals y means tangent of y equals x, with y in that open
+  interval.
+  {show math.1} Because tangent reached every real value, the domain of
+  arctangent is all of the real numbers — no restriction on the input at all —
+  and its range is the open interval from negative pi over two to pi over two,
+  edges never quite reached.
+
+arctangent_identities: |
+  Tangent and arctangent undo each other on the same terms.
+  {show math.0} Tangent of arctangent of x is x for every real x; arctangent
+  of tangent of x is x only when the angle was already in the open interval.
+  {show math.1} And now the pattern across all three inverses is worth stating
+  once and for all. Outer-undoes-inner is always safe on the natural domain —
+  sine of arcsine of x, cosine of arccosine of x, and tangent of arctangent of
+  x each give back x with no conditions. But inner-undoes-outer returns your
+  angle only inside the principal interval.
+  {show math.2} Step outside, and the inverse hands back the equivalent angle
+  that does live there: arctangent of tangent of pi is arctangent of zero,
+  which is zero, not pi.
+
+evaluating_inverse_trig: |
+  Now the triangle method earns its keep on harder values — same recipe,
+  trickier signs.
+  {show math.0} First, the sine of arccosine of negative one half. Arccosine
+  of a negative input always lands in the second quadrant, here at two pi over
+  three, and its sine is root three over two.
+  {show math.1} Second, the secant of arctangent of ten: set the angle with
+  tangent ten, build a triangle with opposite ten and adjacent one, and the
+  hypotenuse is the square root of one hundred and one — so the secant,
+  hypotenuse over adjacent, is the square root of one hundred and one.
+  {show math.2} Third, the tangent of arcsine of negative two root five over
+  five. The sine is negative, so the angle sits in the fourth quadrant, where
+  cosine is positive; the triangle gives cosine one over root five, and the
+  tangent works out to negative two.
+  {show takeaway} Every time, the triangle set the size and the principal
+  interval set the sign.
+
+simplify_cos_arctan: |
+  One more, and this time the answer is a formula, not a number. Simplify the
+  cosine of arctangent of x, for a general x.
+  {show line.0} Let y equals arctangent of x, so tangent of y equals x, with y
+  in the open interval — and what we want is cosine of y.
+  {show line.1} Reach for the identity one plus tangent squared y equals
+  secant squared y: it turns secant squared y into one plus x squared.
+  {show line.2} Since y lives in the open interval, cosine is positive there,
+  so secant is positive too, and secant of y is the square root of the
+  quantity one plus x squared.
+  {show line.3} Cosine is one over secant — so the cosine of arctangent of x
+  is one over the square root of the quantity one plus x squared. A whole
+  family of values, caught in one clean expression.
+
+remaining_inverse_trig: |
+  That completes the three main inverses; three more round out the set, used
+  less often but built the same way.
+  {show math.0} {show math.1} {show math.2} The inverse cosecant, inverse
+  secant, and inverse cotangent each invert their function on a chosen
+  principal range — the interval their output angle is pinned to.
+  {show math.3} Cosecant and secant only take values of size at least one, so
+  inverse cosecant and inverse secant accept inputs from one outward in both
+  directions; cotangent, like tangent, reaches everything, so inverse
+  cotangent has domain all of the real numbers. The principal ranges this time
+  are a little less tidy — built from two pieces apiece — but the principle
+  has not changed at all: pick an interval where the function is one-to-one,
+  and invert there.
+
+conventions_change_answers: |
+  Those principal ranges are choices, not laws — and the choice has visible
+  consequences. Different books pick different intervals for inverse secant
+  and inverse cosecant, and this text deliberately fixes one set, the one that
+  keeps later formulas clean. Here is a function that exposes the stakes: f of
+  x equals arcsine of x plus inverse cosecant of x.
+  {show math.0} Arcsine needs x between negative one and one; inverse cosecant
+  needs x of size at least one — so the only inputs both allow are x equals
+  one and x equals negative one, a domain of just two points.
+  {show math.1} At x equals one, both pieces are pi over two, so f is pi.
+  {show math.2} At x equals negative one, arcsine is negative pi over two, and
+  under this text's convention inverse cosecant is three pi over two — so f is
+  pi again. The function is just the constant pi.
+  {show math.3} But switch to the other common convention, where inverse
+  cosecant of negative one is negative pi over two, and f of negative one
+  would come out negative pi instead — same function, different answer, purely
+  from the branch choice.
+  {show takeaway} That is exactly why we fix a convention up front.
+
+recap: |
+  Let us pull the section together.
+  {show point.0} Every inverse trig function starts the same way: a trig
+  function is not one-to-one, so we restrict it to a branch where it is, and
+  invert that branch.
+  {show point.1} Arcsine lives on negative pi over two to pi over two,
+  arccosine on zero to pi, and arctangent on the open interval between — which
+  is why arctangent alone accepts every real number, while arcsine and
+  arccosine only take inputs from negative one to one.
+  {show point.2} Each inverse returns a single principal value, never the
+  whole family of angles, so the cancellation identities only run cleanly in
+  the outer-undoes-inner direction.
+  {show point.3} And to evaluate a trig function of an inverse-trig
+  expression, draw the reference triangle for the size and read the sign off
+  the principal interval.
+  {show formula.0} {show formula.1} {show formula.2} Restrict, invert, and
+  mind the principal value — that is the whole section.

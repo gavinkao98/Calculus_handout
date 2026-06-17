@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§1.2 Inverse Trigonometric Functions — 內容稿撰寫＋六鏡稽核報告</title>
+<script>
+  window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --bg:#0f1419; --panel:#171e26; --panel2:#1d2630; --ink:#e6edf3; --muted:#9aa7b4;
+    --line:#2a3742; --ok:#3fb950; --warn:#d29922; --accent:#58a6ff; --bad:#f85149;
+    --code:#0b1118; --codeink:#c9d4df;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.65 -apple-system,"Segoe UI",Roboto,"Noto Sans CJK TC","Microsoft JhengHei",sans-serif;}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:26px;margin:0 0 4px;letter-spacing:.2px}
+  h2{font-size:20px;margin:38px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:600;
+    background:rgba(63,185,80,.15);color:var(--ok);border:1px solid rgba(63,185,80,.4)}
+  .pill.warn{background:rgba(210,153,34,.15);color:var(--warn);border-color:rgba(210,153,34,.4)}
+  .tldr{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--ok);
+    border-radius:8px;padding:16px 18px;margin:18px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600}
+  td code,th code,p code,li code{background:var(--code);color:var(--codeink);
+    padding:1px 5px;border-radius:4px;font-size:12.5px;font-family:"Cascadia Code",Consolas,monospace}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)} .mut{color:var(--muted)}
+  .chk{color:var(--ok);font-weight:700}
+  ul{margin:8px 0;padding-left:22px} li{margin:5px 0}
+  .foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+  a{color:var(--accent)}
+  .adv{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 15px;margin:9px 0}
+  .adv .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
+  .adv .verdict{float:right;font-size:12px;font-weight:700}
+  .took{color:var(--ok)} .kept{color:var(--warn)}
+  .diff{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:6px 0;font-size:13px}
+  .diff .old{color:#e0a3a0} .diff .new{color:#9fdfb0}
+  .diff .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>§1.2 Inverse Trigonometric Functions — 內容稿撰寫＋六鏡稽核報告</h1>
+  <p class="sub">2026-06-17 · deck <code>ch01_inverse_trig_functions</code> · Stage 1（內容層）· <span class="pill">六鏡收斂 0 blocking / 6 advisory</span> <span class="pill warn">DRAFT · 待 sign-off</span></p>
+  <p class="sub">產線 2026-06-16 大重設後，§1.2 從 HTML 講義從零重跑（接續 §1.1）。本報告記錄本輪撰寫的內容、稽核裁決與下一步。</p>
+  <p class="sub">source of truth：<code>video/content_scripts/ch01_inverse_trig_functions.md</code> · 審核稿：<a href="../ch01_inverse_trig_functions_narration.html">ch01_inverse_trig_functions_narration.html</a> · 權威來源：<code>handout/chapter1-print-standalone.html</code> §1.2（編輯源 <code>fragments/ch01/sec-1-2.html</code>）</p>
+
+  <div class="tldr">
+    <b>TL;DR.</b> 依 <code>CONTENT_METHODOLOGY.md</code> 從 <code>sec-1-2.html</code> 拆解出 <b>20 個有旁白教學單元 ＋ intro／outro（純動畫）</b>，全收 <b>6 定義（1.3–1.8）／3 命題（1.2–1.4）／1 strategy（參考三角形）／6 例題（1.9–1.14，各帶不同模式、無同型折疊）</b>＋3 Caution／2 Remark 就近折疊＋7 張圖全覆蓋。
+    <b>六鏡對抗式稽核（6 個並行 audit agent → refute-by-default 複驗）＝ 0 blocking、6 advisory（皆非阻斷）</b>；其中 <b>L5 數學隔離盲算</b>把 10 組數值（三角形邊長、象限、主值區間端點、$f\equiv\pi$ vs $-\pi$ 約定後果）獨立重算，全部 match。
+    <b>散文潤稿 gate1</b>＝3 tighten＋6 optional（全 advisory），採納 <b>3 條純 wording 緊縮</b>（語義／數學未動）。<b>未動任何外部／計費 API。</b>
+  </div>
+
+  <h2>一、六鏡稽核結果（收斂線＝blocking==0 ✓）</h2>
+  <p class="sub">性質：對抗式 multi-agent，每鏡 fan out → refute-by-default（預設先試圖駁回，駁不掉才留）；0-hallucination 為目標；六鏡本身已是多代理＋對抗複驗，<b>無付費 gate2</b>。本輪 6 條 advisory 全屬非阻斷的 polish／穩健性提醒，blocking 全歸零。</p>
+  <table>
+    <tr><th style="width:128px">鏡</th><th style="width:96px">裁決</th><th>稽核了什麼（agent summary 摘要）</th></tr>
+    <tr><td><b>L1 忠實</b></td><td class="chk">clean · 0/0</td><td>盤點每個必納環境並確認對應到單元：Def 1.3–1.8、Prop 1.2–1.4、Strategy 1.2、Caution 1.2–1.4、Remark 1.3–1.4、Fig 1.4–1.10、Examples 1.9–1.14。逐字核對數值（$2\sqrt2$、$\tfrac{2\pi}{3}$、$\sqrt{101}$、$f\equiv\pi$）；對抗式駁回 6 個候選 finding（cosine 偶性、象限歸屬、$n\ge2$ 白話化、csc/sec 值域、撤銷方向通則、sign-from-interval）皆判為允許的呈現重排／prerequisite／忠實轉述。無加入講義沒有的數學、無牴觸、每個數學單元可回溯。</td></tr>
+    <tr><td><b>L2 拆解</b></td><td class="warn">0 blk · 3 adv</td><td>環境→kind 對應全符合 §3 表；折疊 N1–N5 逐項站得住（caution 併入警示對象、三定義批次同一單元、remark 併入 example lead-in）；環境之間 6 段散文全數歸類、無 silent drop。3 條 advisory 皆前瞻穩健性／視覺負載提醒（見下節），無拖累教學的 blocking。</td></tr>
+    <tr><td><b>L3 語域</b></td><td class="warn">0 blk · 2 adv</td><td>對齊 §4 口語標準（刻意比講義口語）審：18 個帶 narration 單元無一犯禁則（無念節號／圖號、無 see/as shown、無「In this scene」開場）；無教科書腔、無俚俗、無傷數學的 hedge。2 條 advisory 為長句朗讀 polish。</td></tr>
+    <tr><td><b>L4 不重複</b></td><td class="warn">0 blk · 1 adv</td><td>repeat-pattern 紮實：<code>evaluating_inverse_trig</code>「same recipe, trickier signs」不重走三角形四步；三 restrict 單元（sine 立招／cosine 類比承接／tangent 差異化「most dramatic」）；三 identities 的主值警示分工正確。1 條 advisory 為 arccos 通則句與 arctan 重疊。</td></tr>
+    <tr><td><b>L5 數學<br>（隔離盲算）</b></td><td class="chk">clean · 0/0</td><td><b>先讀源檔題目獨立重算、再比內容稿</b>：(1) $\arcsin\tfrac12=\tfrac\pi6$；(2) $\tan(\arcsin\tfrac13)=\tfrac1{2\sqrt2}$（鄰邊 $\sqrt{9-1}=2\sqrt2$，第一象限）；(3) $\arccos(-\tfrac12)=\tfrac{2\pi}3$、$\sin=\tfrac{\sqrt3}2$（第二象限）；(4) $\sec(\arctan10)=\sqrt{101}$；(5) $\tan(\arcsin(-\tfrac{2\sqrt5}5))=-2$（第四象限、$\cos=\tfrac1{\sqrt5}$）；(6) $\cos(\arctan x)=\tfrac1{\sqrt{1+x^2}}$；(7) $\arcsin(\cos x)$ 域 $\mathbb R$／$\sin(\arccos x)$ 域 $[-1,1]$；(8) $\cos t=1\Rightarrow t=2\pi n$、$\arccos1=0$；(9) $f=\arcsin+\arccsc$ 域 $\{\pm1\}$、$f(1)=f(-1)=\pi$（本書約定 $\arccsc(-1)=\tfrac{3\pi}2$）、另約定 $f(-1)=-\pi$；(10) 六反函數 domain／range。<b>每組與獨立盲算逐項一致，無一算錯。</b></td></tr>
+    <tr><td><b>L6 完整</b></td><td class="chk">clean · 0/0</td><td>每個 def（1.3–1.8）／prop（1.2–1.4）／strategy（1.2）／example 模式（1.9–1.14）有覆蓋單元；6 例六單元一對一、無同型 silent drop；無 exercise 外洩；intro（定位＋tagline）／recap（takeaways）／outro（無 takeaways）齊備；7 張圖（含易吞掉的 Fig 1.10 一般三角形）全覆蓋；§1.2 約 45% 符號／55% 幾何，不套 symbol-heavy 例外。</td></tr>
+  </table>
+
+  <h2>二、六鏡 advisory 逐條裁決（6 條，皆非阻斷）</h2>
+  <p class="sub">依 CLAUDE.md 四級紀律：採納能讓影片更好且零語義／數學風險者；其餘記錄理由。3 條已就地採納（潤稿），3 條維持並說明。</p>
+
+  <div class="adv"><span class="verdict took">採納（已修）</span><span class="lbl">L4 · arccosine_identities — 抽象通則重複</span><br>
+    「outer∘inner 永真／inner∘outer 僅主值」的抽象敘述在 arccos 與 arctan 兩處講；arccos 句既前向承接又預講通則，稀釋 arctan「once for all three」的收束。→ <b>已把 arccos 句瘦身為純前向指標</b>（"It is the same one-directional pattern as for sine — and we will pin it down for all three in just a moment."），通則內容只留在 <code>arctangent_identities</code> 一次講清。</div>
+
+  <div class="adv"><span class="verdict took">採納（已修）</span><span class="lbl">L3 · principal_value_trap — 長句一口氣難念</span><br>
+    雙破折插語夾條件＋尾隨關係子句。→ <b>已拆兩句</b>：「…reach height $1$, at the times $t=2\pi n$ once $n$ is large enough. But $\arccos(1)$ is $0$, which is not one of them.」（純斷句、零語義改動；copyedit 亦標同句）。</div>
+
+  <div class="adv"><span class="verdict took">採納（已修）</span><span class="lbl">L3 · arcsine_identities — 三動作串接黏</span><br>
+    「take its angle, take that angle's sine, and you land back」念到第二個 take 節奏黏。→ <b>已加一拍 "then"</b>：「take its angle, then take that angle's sine…」留氣口。</div>
+
+  <div class="adv"><span class="verdict kept">維持（記錄理由）</span><span class="lbl">L2 · arccosine_identities — 前向承諾鎖順序</span><br>
+    前向承諾把 arccos→arctan 的相對場景順序鎖死，重排會使承諾懸空。→ <b>已就地顯式化</b>：在 §7 拆解註記 N3 補一句「此前向承諾鎖定 arccos→arctan 相對順序，重排需連動」。當前順序下無誤，故不改 narration。</div>
+
+  <div class="adv"><span class="verdict kept">維持（記錄理由）</span><span class="lbl">L2 · remaining_inverse_trig — 三主值區間僅在 visual_need</span><br>
+    三定義合一單元（N4），narration 7 句已達上限，三組兩段式主值區間僅在 <code>visual_need</code> 呈現、口語僅帶過「built from two pieces apiece」。→ 刻意取捨且站得住；N4 已自留「視覺過載則拆三單元」退路，待 Stage 2 視覺稽核判定，當前不動。</div>
+
+  <div class="adv"><span class="verdict kept">維持（記錄理由）</span><span class="lbl">L2 · restrict_cosine_branch — 微型反例 lead-in</span><br>
+    開頭「cosine is symmetric across zero and would just repeat」夾一個「中段為何失敗」的推理（講義只說 cosine 重複、未明指中段）。→ L1 忠實鏡確認未逾「不加新數學」（cosine 偶性屬 prerequisite）；服務「為何選 $[0,\pi]$」單一教學重點的合理 lead-in，非第二個 idea，不到拆單元門檻。維持。</div>
+
+  <h2>三、散文潤稿（copyedit gate1，鎖稿前）</h2>
+  <p class="sub">為何在鎖稿前：忠實性 NFA 在鎖稿後跑且要求口語版逐字照源稿，冗餘／贅字一旦進認可源稿就改不動。gate1 <code>narration-copyedit</code>＝3 tighten＋6 optional，<b>全 advisory（blocking==0）</b>。採納 3 條（與六鏡 advisory 交集、均純 wording、語義不變）：</p>
+  <div class="diff"><span class="lbl">principal_value_trap（L3＋copyedit 雙標 · 拆句）</span><br><span class="old">…reach height $1$ — at the times $t=2\pi n$ once $n$ is large enough — but $\arccos(1)$ is $0$, which is not one of them.</span><br><span class="new">…reach height $1$, at the times $t=2\pi n$ once $n$ is large enough. But $\arccos(1)$ is $0$, which is not one of them.</span></div>
+  <div class="diff"><span class="lbl">arccosine_identities（L4 · 通則句瘦身為前向指標）</span><br><span class="old">Same structure as before: one direction always works, while the other needs the angle to live in the chosen interval. We will state that pattern once for all three in a moment.</span><br><span class="new">It is the same one-directional pattern as for sine — and we will pin it down for all three in just a moment.</span></div>
+  <div class="diff"><span class="lbl">arcsine_identities（L3 · 加一拍）</span><br><span class="old">take its angle, take that angle's sine, and you land back on the ratio.</span><br><span class="new">take its angle, then take that angle's sine, and you land back on the ratio.</span></div>
+  <p class="sub"><b>未採（刻意保留，記錄理由）：</b> <code>arcsine_definition</code>「not reciprocal」保留——與已 LOCKED 的 §1.1 <code>inverse_function_definition</code>「not a reciprocal」平行措辭，命名誤解概念有教學價值；<code>reference_triangle_method</code>「for its magnitude」保留——撐起 step 4「sign 另定」的 magnitude／sign 分離（負比值如 $\sin=-\tfrac2{\sqrt5}$ 仍畫正邊長）；<code>conventions_change_answers</code>「under this text's convention」保留——本單元核心即「約定歸屬」，不可模糊為 "here"；其餘 optional（"forever"／"each one exactly once"／proposition 三胞胎平行開場／"no triangle needed" 對比）皆刻意 cadence。<b>gate2 Codex（計費，徵同意後）可選收尾</b>——比照 §1.1 曾再得 5 條 wording；六鏡已是多代理對抗稽核（無 gate2），僅 copyedit 可選擇性加跑。</p>
+
+  <h2>四、單元清單（20 旁白單元 ＋ intro／outro）</h2>
+  <table>
+    <tr><th style="width:34px">#</th><th>unit id</th><th style="width:130px">kind</th><th>講義來源 / locus</th></tr>
+    <tr><td>00</td><td><code>intro</code></td><td>intro（純動畫）</td><td>Section Gate；tagline “How do we turn a ratio back into an angle?”</td></tr>
+    <tr><td>01</td><td><code>recovering_angles</code></td><td>motivation</td><td>開節散文段 1（recover angle／restrict）</td></tr>
+    <tr><td>02</td><td><code>sine_is_not_one_to_one</code></td><td>counterexample</td><td>開節散文段 2＋Figure 1.4（sine-not-1to1）</td></tr>
+    <tr><td>03</td><td><code>restrict_sine_branch</code></td><td>visual</td><td>"The inverse sine function" 散文＋Figure 1.5</td></tr>
+    <tr><td>04</td><td><code>arcsine_definition</code></td><td>definition</td><td>Definition 1.3＋Caution 1.2（折 N1）</td></tr>
+    <tr><td>05</td><td><code>arcsine_identities</code></td><td>proposition</td><td>Proposition 1.2＋Caution 1.3（折 N2）</td></tr>
+    <tr><td>06</td><td><code>reference_triangle_method</code></td><td>procedure</td><td>Strategy 1.2（reference-triangle）</td></tr>
+    <tr><td>07</td><td><code>evaluating_arcsin</code></td><td>example</td><td>Example 1.9＋Figure 1.6（arcsin-triangle）</td></tr>
+    <tr><td>08</td><td><code>restrict_cosine_branch</code></td><td>visual</td><td>cosine intuition 散文（enrichment）＋Figure 1.7</td></tr>
+    <tr><td>09</td><td><code>arccosine_definition</code></td><td>definition</td><td>Definition 1.4</td></tr>
+    <tr><td>10</td><td><code>arccosine_identities</code></td><td>proposition</td><td>Proposition 1.3</td></tr>
+    <tr><td>11</td><td><code>domain_of_compositions</code></td><td>example</td><td>Example 1.10＋收尾通則散文</td></tr>
+    <tr><td>12</td><td><code>principal_value_trap</code></td><td>counterexample</td><td>Example 1.11（粒子主值陷阱）</td></tr>
+    <tr><td>13</td><td><code>restrict_tangent_branch</code></td><td>visual</td><td>tangent intuition 散文（enrichment）＋Figure 1.8</td></tr>
+    <tr><td>14</td><td><code>arctangent_definition</code></td><td>definition</td><td>Definition 1.5</td></tr>
+    <tr><td>15</td><td><code>arctangent_identities</code></td><td>proposition</td><td>Proposition 1.4＋Caution 1.4（折 N3，三者通則）</td></tr>
+    <tr><td>16</td><td><code>evaluating_inverse_trig</code></td><td>example</td><td>Example 1.12＋Figure 1.9（arctan10-triangle）</td></tr>
+    <tr><td>17</td><td><code>simplify_cos_arctan</code></td><td>example</td><td>Example 1.13＋Figure 1.10（arctan-general-triangle）</td></tr>
+    <tr><td>18</td><td><code>remaining_inverse_trig</code></td><td>definition</td><td>Definition 1.6／1.7／1.8＋domains 散文（合一 N4）</td></tr>
+    <tr><td>19</td><td><code>conventions_change_answers</code></td><td>example</td><td>Remark 1.3／1.4（折 N5）＋Example 1.14</td></tr>
+    <tr><td>20</td><td><code>recap</code></td><td>recap</td><td>§1.2 全節凝煉（Key Takeaways，有旁白）</td></tr>
+    <tr><td>21</td><td><code>outro</code></td><td>outro（純動畫）</td><td>節末品牌字卡（無 takeaways）</td></tr>
+  </table>
+
+  <h2>五、拆解／折疊註記與視覺盤點</h2>
+  <ul>
+    <li><b>N1</b>：Caution 1.2（$\sin^{-1}$ 非倒數）→ 折進 <code>arcsine_definition</code>（警示對象＝剛 introduce 的記號；與 §1.1 N1 一致）。</li>
+    <li><b>N2</b>：Caution 1.3（$\arcsin(\sin x)$ 僅主值，含 $\arcsin(\sin\pi)=0\ne\pi$）→ 折進 <code>arcsine_identities</code> 作 guardrail。</li>
+    <li><b>N3</b>：Caution 1.4（三函數共通＋反向永遠安全）→ 折進 <code>arctangent_identities</code> 收成通則；<code>arccosine_identities</code> 僅純前向指標承接（前向承諾鎖 arccos→arctan 順序，已顯式化）。</li>
+    <li><b>N4</b>：Def 1.6／1.7／1.8（arccsc／arcsec／arccot）→ 合為單一 <code>remaining_inverse_trig</code>（講義明文「used less frequently … same spirit」＋集中處理 domains；三定義式全列於 visual_need、無 silent drop）。</li>
+    <li><b>N5</b>：Remark 1.3＋1.4（arcsec／arccsc 約定）→ 折為 <code>conventions_change_answers</code> 的 lead-in（兩 remark 的「約定是選擇」正是 Example 1.14 要演示者）。</li>
+    <li><b>視覺／動畫盤點（§1.2 約 45% 符號／55% 幾何，medium）：</b> 7 張講義圖全覆蓋；<b>5 個 animation_cue</b>（兩兩不重複）：<code>sine_is_not_one_to_one</code>（水平線掃過 sine 波、多交點失敗）、<code>restrict_sine_branch</code>（隔離中央分支＋點掃過 $[-1,1]$）、<code>evaluating_arcsin</code>（建構參考三角形）、<code>restrict_tangent_branch</code>（沿漸近線爬升、每實數取一次）、<code>principal_value_trap</code>（粒子 bob＋主值單一）。restrict_cosine 刻意類比承接、不重複 branch 隔離動畫。</li>
+  </ul>
+
+  <h2>六、下一步</h2>
+  <ul>
+    <li><b>（人工閘）旁白 sign-off：</b> 讀 <a href="../ch01_inverse_trig_functions_narration.html">ch01_inverse_trig_functions_narration.html</a>，認可後 <code>.md</code> → LOCKED。可選 <b>copyedit gate2 Codex</b>（計費，徵同意）收尾。</li>
+    <li><b>Stage 2 工程稿：</b> <code>storyboards/ch01_inverse_trig_functions.yml</code>（模板化、<code>{show}</code>／accent／payload）→ schema／lint／sizecheck → mock render（1080p、離線）→ 視覺稽核（VISUAL-FRAME）→ <b>5 客製動畫 hook</b> → 工程稽核（HOOK-ENGINEERING）→ 合併 mock 成片。</li>
+    <li><b>（人工閘）動畫 sign-off</b>（生成 code 視同 narration）。</li>
+    <li><b>Stage 3 成片：</b> <code>.spoken.yml</code> → <code>derive_spoken</code> → NFA → <b>MiMo TTS（計費，徵同意）</b> → <code>make.py --reuse-audio</code> 有聲成片。</li>
+  </ul>
+
+  <p class="foot">六鏡稽核：6 個並行 <code>claude</code> audit agent（L1–L6，refute-by-default）＋<code>narration-copyedit</code> gate1，皆唯讀。<b>未動任何外部／計費 API。</b> source of truth：<code>video/content_scripts/ch01_inverse_trig_functions.md</code>。本報告為純文字／數學（無 render 幀），MathJax CDN 渲染、雙擊即開。</p>
+
+</div>
+</body>
+</html>
