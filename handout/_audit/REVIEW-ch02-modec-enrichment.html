@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 2 Mode C — 充實候選裁決稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.6; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .strong { background: #fff7ed; border-left: 3px solid #e0a106; padding: .5rem .8rem; border-radius: 4px;
+            font-size: .9rem; color: #7a5b00; margin: .3rem 0 1rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem;
+          margin: .6rem 0; }
+  .card.hi { border-left: 4px solid var(--blue); }
+  .card.med { border-left: 4px solid var(--gray); }
+  .card.lo { border-left: 4px solid var(--line); opacity: .92; }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+  .b-int { background:#e7f0fb; color:var(--blue); }
+  .b-cau { background:#fdeceb; color:var(--red); }
+  .b-app { background:#e9f7ef; color:#1a7f47; }
+  .b-str { background:#f3e8fd; color:#6c2bd9; }
+  .b-fig { background:#eef1f4; color:var(--gray); }
+  .b-his { background:#fef0e7; color:#9a5b00; }
+  .conf { font-size:.72rem; color:var(--gray); float:right; }
+  .conf.hi { color:var(--blue); font-weight:700; }
+  .loc { font-size:.82rem; color:var(--gray); margin:.25rem 0; }
+  .prop { margin:.35rem 0; }
+  .src { font-size:.78rem; color:var(--gray); margin-top:.3rem; }
+  .src code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .why { font-size:.84rem; color:#475467; margin:.25rem 0 0; }
+  code.kw { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; font-size:.85em; }
+  .legend { font-size:.82rem; color:var(--gray); margin:.5rem 0 0; }
+  .tier { font-weight:700; color:var(--blue); }
+</style>
+</head>
+<body>
+<h1>Chapter 2 — Mode C 充實候選裁決稿</h1>
+<p class="sub">2026-06-18　逐節偵察產出　·　範圍＝軟深度（intuition／application／caution）　·　主軸已凍結，全為「新增」、不動既有內容</p>
+
+<p class="strong"><b>怎麼用：</b>逐條看，告訴我要寫哪些（用左邊的 ID，如「寫 2.1-1、2.3-2...」或「全部 high＋指定的 medium」）。<b>figure-note</b> 這輪不寫（軟深度為主），且多半要靠 figure 閘 render 後才能確認真假——見末段。<b>history</b> 類需先驗證來源才動筆。<br><b>注意：</b>本份為<em>軟深度</em>充實偵察（intuition／application／caution），與已存在的 <code>REVIEW-ch02-modec-candidates.html</code>（worked-example 補充）為互補的兩份，不重複。</p>
+
+<p class="legend">徽章：<span class="badge b-int">intuition</span><span class="badge b-cau">caution</span><span class="badge b-app">application</span><span class="badge b-str">strategy</span><span class="badge b-fig">figure-note</span><span class="badge b-his">history</span>　·　左框色：<span style="color:var(--blue)">藍＝high</span> / 灰＝medium / 淡＝low confidence。</p>
+
+<!-- ====================================================================== -->
+<h2>&sect;2.1 The Tangent Line and the Derivative at a Point</h2>
+<p class="sub">已飽和：section opener（tangent-as-approximation 真實情境 + sqrt(4.01) bookend）、Def 2.1 前動機散文（secant→tangent 極限）、Remark 2.1 local linearity 直覺、h-form 轉換解釋。Examples 2.1--2.5 覆蓋三種代數技巧＋數值＋應用。</p>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">2.1-1</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：after the \(h\)-form paragraph (line 49), before the \(f'(a)\) introduction (line 52)</div>
+<div class="prop">新增一段 Caution：提醒讀者差商的分子是 \(f(a+h) - f(a)\) 而不是 \(f(h)\) — 初學者常把增量 \(h\) 直接代入函數。一句話點出：\(h\) 是<em>距離 \(a\) 的偏移量</em>，不是 \(x\) 本身；代入時要寫 \(f(\text{base point} + h)\)，不是 \(f(h)\)。</div>
+<div class="why">why：差商寫法 \(\bigl(f(a+h)-f(a)\bigr)/h\) 的 \(a+h\) 是初學者最常誤寫成 \(f(h)\) 的地方——後續 §2.2 的三步策略（Strategy 2.1 step 1: "expanding \(f(x+h)\)"）隱含讀者已理解此點，但從未明確警告。§5 checklist 指 <code class="kw">caution</code> 用於「容易忽略的限制條件」。</div>
+<div class="src">source：<code>authored</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">2.1-2</span><span class="badge b-app">application</span>
+<div class="loc">locus：after Remark 2.2 (tangent-line approximation bookend, line 203), before the closing forward-ref paragraph</div>
+<div class="prop">新增一段簡短 Remark：把剛看到的 tangent-line approximation 連結到工程與科學的現實用途——GPS 定位的線性化、物理量測的小擾動近似、經濟學的邊際分析——都是「用切線代替曲線」的應用。一兩句即可，不重述 local linearity 機制（Remark 2.1 已覆蓋）。</div>
+<div class="why">why：§2.1 的 application 層目前集中在純數學（\(\sqrt{4.01}\)、\(1/2.05\)），沒有連結到數學以外的世界。CONTENT_SPEC §15 "每節 1--2 段動機" 包含應用情境的要求。</div>
+<div class="src">source：<code>authored (standard calculus-textbook application note; cf. Stewart 8e &sect;2.1 "applications of tangent lines")</code></div></div>
+
+<div class="card lo"><span class="conf">low</span><span class="id">2.1-3</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：after Def 2.1, before the \(h\)-form subsection heading</div>
+<div class="prop">在 Def 2.1 之後加一句 informal gloss：「Informally, the tangent slope measures how steeply the curve climbs or falls at that single point — one number encoding the curve's direction there.」</div>
+<div class="why">why：Def 2.1 的 formal statement 給出了極限公式但沒有 inline "Informally..." gloss。CONTENT_SPEC §3 規定 formal statement 語法上很重時可加 inline gloss。不過 Def 2.1 的公式算中等重，且 §2.1 的前導散文已相當充分地鋪陳直覺，所以此筆 confidence 較低。</div>
+<div class="src">source：<code>authored</code></div></div>
+
+<!-- ====================================================================== -->
+<h2>&sect;2.2 The Derivative as a Function</h2>
+<p class="sub">已飽和：section opener（velocity-as-function 真實動機）、Def 2.2 有 informal "slope machine" gloss、Remark 2.3 (domain)、Remark 2.4 (rate-of-change bookend)、Leibniz notation 解釋段、sign-correspondence reading principle + Ex 2.10。Strategy 2.1 三步法。Examples 2.6--2.10 覆蓋多項式／根式／有理式＋反向＋圖形。</p>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">2.2-1</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：after the Leibniz notation paragraph (line 162), before the "Reading \(f'\) from the graph" subsection heading (line 164)</div>
+<div class="prop">新增一段 Caution：\(\dfrac{dy}{dx}\) <em>不是</em>一個分數——它是一個完整的符號，表示極限操作的結果。初學者常把它當作 \(dy\) 除以 \(dx\) 兩個獨立量，然後嘗試「交叉相乘」或「約分」。目前 Leibniz notation 的段落正面解釋了它是 operator、echo 差商，但沒有正面警告「別把它當分數拆開來用」。</div>
+<div class="why">why：dy/dx-as-fraction 是微積分初學者最普遍的誤解之一（Stewart 8e &sect;2.8 "What does dy/dx really mean?" 設專段處理；Rogawski 亦然）。目前的散文把 Leibniz notation 介紹為 operator 和 echo，但沒有正面指出「不要把它拆開」。CONTENT_SPEC §5 指 <code class="kw">caution</code> 用於 notation trap。</div>
+<div class="src">source：<code>authored (standard calculus-textbook caution; cf. Stewart 8e &sect;2.8, Rogawski 4e &sect;3.1)</code></div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">2.2-2</span><span class="badge b-app">application</span>
+<div class="loc">locus：after Remark 2.4, before the closing forward-ref paragraph (line 207)</div>
+<div class="prop">新增一段簡短散文：把 "derivative as rate of change" 從速度拓展到其他領域，各一句話——
+(i) 物理：\(s'(t)\) = velocity, \(s''(t)\) = acceleration（提前預告 §2.3 higher derivatives 的物理意義）；
+(ii) 生物：若 \(P(t)\) 是族群數量，\(P'(t)\) 是人口增長率；
+(iii) 經濟：若 \(C(q)\) 是生產 \(q\) 件的總成本，\(C'(q)\) 是邊際成本。
+目的是讓讀者看到 "rate of change" 不僅是速度。</div>
+<div class="why">why：Remark 2.4 只用汽車速度一個場景連結 rate of change。CONTENT_SPEC §15 "每節以 1--2 段動機開頭，或純計算節以一句承接句" + §3 「直覺先於 formal」；講義定位為自足，多領域應用有助讓不同興趣的讀者找到錨點。</div>
+<div class="src">source：<code>[source: CLP-1 &sect;2.4 prob_s2.4.tex line 224--233, population growth rate example] + authored (marginal cost is standard Stewart/Rogawski)</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">2.2-3</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：after Example 2.7 solution (line 99), before Example 2.8</div>
+<div class="prop">新增一段 Caution：強調 \(f'(x) = 1/(2\sqrt{x})\) 的定義域只有 \(x > 0\)，儘管 \(\sqrt{x}\) 本身在 \(x = 0\) 也有定義。原因：\(1/(2\sqrt{0})\) 是除以零。這與 Remark 2.3（domain of \(f'\)）呼應，但 Remark 2.3 只概念性地說「may be smaller」——此處可用具體數字 \(x = 0\) 明確示範失敗。</div>
+<div class="why">why：Remark 2.3 (line 131--135) 提及 domain shrinkage，但該 remark 在 Example 2.8 之後，讀者讀 Example 2.7 solution 時可能未注意到 \(x > 0\) vs \(x \ge 0\) 的差別。在計算結果旁邊即時提醒比事後概論更有效。但因為 Remark 2.3 已經存在，此筆有一定程度的冗餘，故 confidence = medium。</div>
+<div class="src">source：<code>authored</code></div></div>
+
+<!-- ====================================================================== -->
+<h2>&sect;2.3 Differentiability, Continuity, and Higher Derivatives</h2>
+<p class="sub">已飽和：section opener 動機（§2.2 assumed the limit exists; it need not）、Def 2.3 有 informal gloss、Caution（converse is false）、Thm 2.1 proof + inclusion diagram（inline SVG）、Example 2.11 corner + Figure 2.3。</p>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">2.3-1</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：after Theorem 2.1 proof (line 89), before the inclusion diagram</div>
+<div class="prop">新增一段 informal 散文（2--3 句），用白話解釋 Theorem 2.1 的直覺意義：「有切線就必然沒有斷裂」——如果你能在某點畫一條切線（differentiable），那麼曲線在那裡一定沒有跳躍（continuous），因為曲線必須足夠平滑才能讓割線有個穩定的極限方向。反方向不成立，因為連續只保證「沒有跳」，卻不保證「沒有尖角」。</div>
+<div class="why">why：Theorem 2.1 有完整的形式化證明，但證明是代數的（\(f(x)-f(a) = \text{quotient}\times(x-a)\)），缺少一段直覺轉譯讓讀者先抓住 "why should this be true?" 的畫面。CONTENT_SPEC §3 「直覺先於 formal」——此處直覺在 formal proof 之後補充也合理（先看 proof、再用白話回顧「原來如此」）。</div>
+<div class="src">source：<code>authored (standard textbook intuition; cf. Stewart 8e &sect;2.8 "diff implies cont" discussion)</code></div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">2.3-2</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：after the "Higher derivatives" heading (line 112), before the notation paragraph</div>
+<div class="prop">新增一段動機散文：higher derivatives 不只是「再微分一次」的數學操作——它們有具體物理意義。若 \(s(t)\) 是位置，\(s'(t)\) 是速度，\(s''(t)\) 就是<em>加速度</em>——「速度的變化率」。你踩油門時感受到的推背力就是加速度。三階導數 \(s'''(t)\) 叫做 jerk（急挫），是電梯設計中用來控制乘客舒適度的量。</div>
+<div class="why">why：§2.3 的 higher-derivatives 段只有機械化的「differentiate again」和符號表，沒有 application 也沒有 intuition。CONTENT_SPEC §15 "每節 1--2 段動機" — higher derivatives 是這節的第三個主題，完全沒有動機段。</div>
+<div class="src">source：<code>authored (acceleration as s''(t) is universal in Stewart/Rogawski; jerk cf. Stewart 8e &sect;3.7 "Higher Derivatives")</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">2.3-3</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：after Remark 2.5 (higher-derivative notation), before Example 2.12</div>
+<div class="prop">新增一段 Caution：提醒 \(d^2y/dx^2\) 中的 \(dx^2\) 是 \((dx)^2\) 不是 \(d(x^2)\)。類似地，分子的 \(d^2 y\) 表示 "\(d\) 作用兩次"，不是 "\(d\) 乘以 \(2y\)"。Remark 2.5 說了 "the superscript is not an exponent"，但沒有正面指出最常見的誤讀方式。</div>
+<div class="why">why：Remark 2.5 在 line 127 有一句「the superscript in \(d^n y/dx^n\) is not an exponent」，但沒有具體告訴讀者「別怎麼讀」。 \(dx^2\) vs \((dx)^2\) 的混淆是記號陷阱。但因 Remark 2.5 已部分覆蓋此點，confidence = medium。</div>
+<div class="src">source：<code>authored (standard notation trap; cf. Rogawski 4e &sect;3.5 marginal note)</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">2.3-4</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：after Example 2.11 solution (line 53), before Figure 2.3</div>
+<div class="prop">在 Example 2.11 的 solution 之後、Figure 2.3 之前，加一句直覺轉譯：「Geometrically, a corner is a point where the curve abruptly changes direction — coming from the left the tangent would point one way, but from the right it would point another. Since a single tangent line cannot point in two directions at once, the derivative does not exist there.」</div>
+<div class="why">why：Example 2.11 的 solution 是純代數（左右極限不等），直到 Figure 2.3 之後的段落（line 60）才給幾何解釋。但 Figure 2.3 之後的段落已經做了類似的幾何解讀（"two families converge to different directions"），所以此筆有部分冗餘——confidence = medium。可能更好的做法是確認 line 60 的段落是否已足夠，如果是，就跳過。</div>
+<div class="src">source：<code>authored</code></div></div>
+
+<!-- ====================================================================== -->
+<h2>&sect;2.4 Derivatives of Polynomials and the Exponential Function</h2>
+<p class="sub">已飽和：section opener（limit drudgery → rule shortcut 動機）、Thm 2.2 前幾何直覺（horizontal line → slope zero）、power rule 前動機（unifying one-off cases）、兩種 proof（factorization + binomial）、Caution（power rule domain）、Remark 2.6（\(b^x\) preview + why \(e\) is natural）、sum/constant-multiple 前動機段。Examples 2.13--2.14 覆蓋多項式＋指數＋higher derivatives。</p>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">2.4-1</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：after Theorem 2.5 proof (line 196), before the <code>&lt;figure data-fig="exp-self-derivative"&gt;</code></div>
+<div class="prop">新增一段 informal gloss（2--3 句）解釋 \((e^x)' = e^x\) 的直覺意義：「想像一個量，其成長速度永遠等於它的當前大小——越大長越快、越小長越慢。\(e^x\) 正是這樣的函數：它的導數（成長速率）恰好等於它自己。這就是為什麼 \(e^x\) 出現在任何 "成長率正比於大小" 的模型中——人口增長、放射性衰變、連續複利——的根本原因。」</div>
+<div class="why">why：Theorem 2.5 的 proof 是代數的（factor out \(e^x\)、用 series），proof 之後的段落（line 201）只有一句概述「self-replicating property」。但 \((e^x)' = e^x\) 是整章最深刻的結果之一，值得一段將形式結果翻譯成「為什麼 \(e^x\) 無所不在」的白話。CONTENT_SPEC §3 指「繁重形式主義之前的動機段落」——此處是 proof 之後的動機回顧，同樣有教學價值。</div>
+<div class="src">source：<code>authored (exponential growth model as motivation for e^x is standard; cf. Stewart 8e &sect;3.8, Rogawski 4e &sect;3.10)</code></div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">2.4-2</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：after Remark 2.6 (derivative of \(b^x\), line 235), before the closing forward-ref paragraph</div>
+<div class="prop">新增一段 Caution：\(\dfrac{d}{dx}e^x = e^x\) 但 \(\dfrac{d}{dx}x^e \ne x^e\)。前者是指數函數（底數固定、指數是變量），後者是冪函數（指數固定、底數是變量），兩者的微分規則完全不同——指數函數用 \(b^x \ln b\)，冪函數用 \(rx^{r-1}\)。初學者極常混淆。</div>
+<div class="why">why：Remark 2.6 提到了 \(b^x\) 的導數含 \(\ln b\)，但沒有正面警告「\(x^e\) 用 power rule 不是 exponential rule」。這是 CLP-1 &sect;2.6 Conceptual 的經典辨析題 ("True or false: \(d/dx(2^x) = x \cdot 2^{x-1}\)")。缺口分析（已存在的 example-supplement 文件 L2-2）也標記了此辨析但決定留給習題本——但一段 <code class="kw">caution</code>（非 worked example）是本輪軟深度的職責。</div>
+<div class="src">source：<code>[source: CLP-1 &sect;2.6 Conceptual "True or false: d/dx(2^x) = x 2^{x-1}"] + authored</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">2.4-3</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：after Theorem 2.3 (power rule statement, line 55), before the first proof</div>
+<div class="prop">在 power rule 的兩種 proof 之前加一段 informal "pattern-spotting" 直覺：
+「讓我們先看已知的案例——\((x)'=1\), \((x^2)'=2x\), \((x^3)'=3x^2\)（§2.1--2.2 的成果）。每次，指數跑到前面做乘數、指數本身降一。Power rule 說這個模式 \(n x^{n-1}\) 永遠成立——以下兩種 proof 解釋為什麼。」</div>
+<div class="why">why：目前 line 47 的散文只說 "we met a few of their derivatives one exponent at a time" 但沒有把 pattern 明確列出來。CONTENT_SPEC §3 「直覺先於 formal」——在 proof 之前先把 pattern 擺出來，讓讀者帶著「為什麼這個 pattern 一定成立？」的問題去讀 proof。</div>
+<div class="src">source：<code>authored</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">2.4-4</span><span class="badge b-app">application</span>
+<div class="loc">locus：after Corollary 2.1 (polynomial derivative, line 140), before Example 2.13</div>
+<div class="prop">新增一句應用連結：「In kinematics, a polynomial position function \(s(t) = a_n t^n + \cdots + a_1 t + a_0\) yields a polynomial velocity \(s'(t)\) by exactly this corollary — each power of \(t\) drops by one, so we read off the velocity formula in one line.」</div>
+<div class="why">why：Corollary 2.1 是全章最「工具性」的結果——逐項微分多項式。但它目前完全沒有被連結到任何真實用途。一句連結到 kinematics（呼應 §2.2 opener 的汽車場景）既鞏固又不冗長。Confidence = medium 因為 §2.2 Remark 2.4 已經觸及了 rate of change = velocity 的連結。</div>
+<div class="src">source：<code>authored</code></div></div>
+
+<div class="card lo"><span class="conf">low</span><span class="id">2.4-5</span><span class="badge b-his">history</span>
+<div class="loc">locus：after the two proofs of Theorem 2.3, before the inline illustrations (line 89)</div>
+<div class="prop">加一句歷史註腳：兩種 proof 分別對應十七世紀兩個傳統——factorization 技法可追溯至牛頓、費馬對差商的操作，binomial 展開法則與牛頓的二項式定理直接相關。</div>
+<div class="why">why：§2.4 是本書首次出現兩種 proof 並列（line 58 "two proofs, each lighting the result from a different angle"），一句歷史脈絡能讓讀者明白這不是冗餘——它們來自不同的數學傳統。但需驗證具體歸屬。</div>
+<div class="src">source：<code>[source: standard calculus-textbook historical note; needs verification]</code></div></div>
+
+<!-- ====================================================================== -->
+<h2>&sect;2.5 The Product and Quotient Rules</h2>
+<p class="sub">已飽和：section opener（sum was docile, products are not）、Caution \((fg)' \ne f'g'\) 有反例、Figure 2.4 rectangle-area 幾何動機、product-rule proof（add-and-subtract + Thm 2.1）、Caution \(\Delta x \equiv h\)、Caution quotient asymmetry + mnemonic、inline 1/x 一行驗證、Strategy 2.2（rule selection）。Examples 2.15--2.17 覆蓋 product / quotient / rule-selection。</p>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">2.5-1</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：after Theorem 2.7 (quotient rule statement, line 149), before the proof</div>
+<div class="prop">新增一段 informal "why the quotient rule looks like that" 直覺（2--3 句）：product rule 說 \((fg)' = f'g + fg'\) 有兩項（各 "hold one, differentiate the other"）；quotient rule 的分子 \(f'g - fg'\) 結構相同但帶了一個<em>減號</em>（而非加號），且整個除以 \(g^2\)。直覺上，分母變大時商會縮小——\(g'\) 的貢獻要<em>減掉</em>而不是加上，而 \(g^2\) 來自 \(1/g\) 的連鎖效應（就像 \((1/x)' = -1/x^2\) 那個負號和平方）。</div>
+<div class="why">why：Product rule 有完整的矩形面積幾何直覺（Figure 2.4 + 散文），但 quotient rule 只有 proof——沒有對應的直覺段。CONTENT_SPEC §3 "直覺先於 formal"。讀者常覺得 quotient rule 是「從天而降的公式」；一段「它為什麼長這樣」的白話能大幅降低記憶負擔。</div>
+<div class="src">source：<code>authored</code></div></div>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">2.5-2</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：after Strategy 2.2 (line 223), before Example 2.17</div>
+<div class="prop">新增一段 Caution：什麼時候<em>不</em>需要 product/quotient rule——\(\dfrac{d}{dx}(5x^3)\) 不是 product rule（\(5\) 是常數，用 constant-multiple rule）；\(\dfrac{d}{dx}\bigl(\tfrac{x^2}{3}\bigr)\) 不是 quotient rule（分母是常數，只是 \(\tfrac{1}{3} x^2\)）。提醒：只有當分子<em>和</em>分母都依賴 \(x\) 時才需要 quotient rule；同理，只有兩個因子都依賴 \(x\) 時才需要 product rule。</div>
+<div class="why">why：Strategy 2.2 step 2 提到 "algebra simplifies first" 但舉的例子是 \(x^4 - x)/x\)（合併成多項式），沒有正面指出「常數因子／常數分母不算 product/quotient」。初學者常在 \(5x^3\) 上展開 product rule 得到正確但冗餘的結果，浪費時間且容易犯錯。此辨析是 §2.5 的典型教學盲區。</div>
+<div class="src">source：<code>authored (standard pedagogy; cf. Stewart 8e &sect;3.2 "when not to use the product rule")</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">2.5-3</span><span class="badge b-str">strategy</span>
+<div class="loc">locus：after the quotient-rule Caution (asymmetry mnemonic, line 176), before the inline 1/x verification</div>
+<div class="prop">新增一段口訣策略：quotient rule 的分子 \(f'g - fg'\) 可用口訣 "lo d-hi minus hi d-lo, over lo-lo" 記住——\(\text{lo} = g\) (bottom), \(\text{hi} = f\) (top), \(\text{d-hi} = f'\), \(\text{d-lo} = g'\)。放在現有 Caution 的 "derivative of top comes first" mnemonic 旁邊做互補。</div>
+<div class="why">why：現有 Caution 已有 mnemonic（"derivative of top ... all over bottom squared"），但「lo d-hi minus hi d-lo」是一個不同且廣為流傳的輔助記法。兩者功能有重疊，所以 confidence = medium。如果使用者覺得一個 mnemonic 夠了就不加。</div>
+<div class="src">source：<code>authored (widespread classroom mnemonic; attribution difficult)</code></div></div>
+
+<div class="card med"><span class="conf">medium</span><span class="id">2.5-4</span><span class="badge b-app">application</span>
+<div class="loc">locus：after Example 2.15 solution (line 128), before the "Quotient rule" subsection heading</div>
+<div class="prop">新增一句應用連結：product rule 在經濟學中用於收入分析——若 \(R(q) = p(q) \cdot q\)（價格 \(\times\) 數量），則 \(R'(q) = p'(q)\,q + p(q)\)（邊際收入 = 價格效應 + 數量效應）。product rule 把「兩個同時變動的量的總效果」拆成兩項——正是 Figure 2.4 矩形面積分解的經濟學翻版。</div>
+<div class="why">why：product rule 的 Figure 2.4 矩形面積幾何很好，但整節 §2.5 沒有任何 application 連結到數學之外的世界。一句話把 \(f'g + fg'\) 翻譯成經濟學語言可以讓對物理無感的讀者也抓住 "為什麼是兩項" 的直覺。</div>
+<div class="src">source：<code>authored (marginal revenue decomposition is standard economics application of product rule; cf. Stewart 8e &sect;3.7 "Economics" application)</code></div></div>
+
+<div class="card lo"><span class="conf">low</span><span class="id">2.5-5</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：closing paragraph (line 249), extend or add after it</div>
+<div class="prop">在本章的結尾（§2.5 的 closing fence）加一句回顧性直覺：本章的全部規則——constant、power、sum、constant-multiple、product、quotient——加上 \(e^x\)，已經能微分任何由加減乘除和指數組成的表達式。唯一還不會處理的組合方式是<em>複合函數</em> \(f(g(x))\)——例如 \(e^{x^2}\) 或 \(\sqrt{x^2+1}\)——那就是 chain rule 的工作。可以用一個具體的例子 \(e^{x^2}\) 問「你會怎麼微分這個？」來激發好奇心。</div>
+<div class="why">why：現有的 closing paragraph 已經提到了 composition 和 chain rule，但沒有用具體的「你目前還做不到」的例子來激發好奇心。此筆 confidence = low 因為現有的 closing 已經完成了 forward-ref 的職責，加例子是 nice-to-have。</div>
+<div class="src">source：<code>authored</code></div></div>
+
+</body>
+</html>

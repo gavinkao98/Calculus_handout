@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 2 課文範例補充——審核文件（2026-06-18）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.75;
+         max-width: 52rem; margin: 2rem auto 6rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.5rem; }
+  h3 { font-size: 1.02rem; margin: 1.8rem 0 .4rem; }
+  .badge { display: inline-block; font-size: .72rem; padding: .05rem .5rem; border-radius: 999px;
+           vertical-align: middle; margin-left: .45rem; font-weight: 600; }
+  .core { background: #e3efe3; color: #20602a; }
+  .optb { background: #fdf2dd; color: #8a5a00; }
+  .ai   { background: #f3e3f5; color: #7a2585; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .1rem 0 .6rem; }
+  .meta code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  .why  { font-size: .92rem; background: #f2f6fa; border-left: 4px solid #8aa6c0; padding: .5rem .8rem; margin: .6rem 0; }
+  .ex   { border: 1px solid #bcd6bc; border-left: 5px solid #2e7d32; border-radius: 6px;
+          background: #f6faf6; padding: .7rem 1rem; margin: .7rem 0 0; }
+  .sol  { border: 1px solid #d7dde3; border-left: 5px solid #90a0b0; border-radius: 6px;
+          background: #f7f8f9; padding: .7rem 1rem; margin: .35rem 0 .8rem; }
+  .ex::before  { content: "Example"; font-weight: 700; color: #2e7d32; display: block; font-size: .8rem; letter-spacing: .06em; }
+  .sol::before { content: "Solution"; font-weight: 700; color: #5b6b7b; display: block; font-size: .8rem; letter-spacing: .06em; }
+  .note { font-size: .9rem; background: #fff8e8; border-left: 4px solid #d9a514; padding: .5rem .8rem; margin: .5rem 0 1rem; }
+  .gap-l1 { background: #fdf0f0; border-left: 5px solid #c0392b; border-radius: 6px;
+            padding: .7rem 1rem; margin: .7rem 0; }
+  .gap-l2 { background: #fdf8ed; border-left: 5px solid #d9a514; border-radius: 6px;
+            padding: .7rem 1rem; margin: .7rem 0; }
+  .covered { background: #f0f8f0; border-left: 5px solid #27ae60; border-radius: 6px;
+             padding: .5rem 1rem; margin: .4rem 0; font-size: .92rem; }
+  .summary-box { background: #e9eff5; border: 1px solid #a4b8cc; border-radius: 8px;
+                 padding: 1rem 1.2rem; margin: 1.5rem 0; }
+  pre.verdict { background: #102536; color: #e8eef4; padding: 1rem 1.2rem; border-radius: 8px;
+                font-size: .88rem; line-height: 1.7; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: .8rem 0 1.2rem; }
+  th, td { border: 1px solid #c9d3dd; padding: .35rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #e9eff5; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+</style>
+</head>
+<body>
+
+<h1>Ch 2 課文範例補充——審核文件</h1>
+<p class="meta">2026-06-18 ・ 框架：題庫補的是<strong>課文內的 worked examples</strong>（講義不收習題，習題另出獨立習題本）。
+工作流程契約：<code>CONTENT_SOURCING.md</code>。每筆附完整擬改寫的 Example＋Solution——你審的就是會印出來的內容。</p>
+
+<!-- ===================== 裁決表 ===================== -->
+<h2>怎麼回覆（裁決表）</h2>
+<pre class="verdict">核心 4 個（E 編號）：照單 / 去掉 ___ / 重議
+選收 2 個：O2.3-a ___   O2.5-a ___
+          （每個填：收 / 不收）
+build：裁決通過後走 import pass（插入 fragment → 重編號 → build.py 重生 standalone）</pre>
+
+<!-- ===================== 缺口分析摘要 ===================== -->
+<h2>缺口分析摘要</h2>
+
+<div class="summary-box">
+<strong>結論：</strong>Layer 1 正式缺口 <strong>2</strong> 個、Layer 2 soft gap <strong>4</strong> 個。<br>
+本批擬補：核心 <strong>4</strong> 筆＋選收 <strong>2</strong> 筆，共 <strong>6</strong> 筆候選。
+</div>
+
+<table>
+<tr><th>節</th><th>教學點數</th><th>Example 數</th><th>本批擬補</th></tr>
+<tr><td>§2.1 Tangent Line &amp; Derivative at a Point</td><td>1（Def 2.1）</td><td>5（Ex 2.1–2.5）</td><td>+0</td></tr>
+<tr><td>§2.2 The Derivative as a Function</td><td>2（Def 2.2, Strat 2.1）</td><td>5（Ex 2.6–2.10）</td><td>+0</td></tr>
+<tr><td>§2.3 Differentiability, Continuity, Higher Deriv</td><td>2（Def 2.3, Thm 2.1）</td><td>2（Ex 2.11–2.12）</td><td>+2</td></tr>
+<tr><td>§2.4 Polynomials &amp; Exponential</td><td>5（Thm 2.2–2.5, Cor 2.1）</td><td>2（Ex 2.13–2.14）</td><td>+2</td></tr>
+<tr><td>§2.5 Product &amp; Quotient Rules</td><td>3（Thm 2.6–2.7, Strat 2.2）</td><td>3（Ex 2.15–2.17）</td><td>+2</td></tr>
+</table>
+
+<p class="small"><strong>系統性薄點：</strong>§2.1–2.2 範例充足且覆蓋多種代數類型（多項式、有理式、根式、數值、圖形判讀、反向應用），無缺口。§2.3 differentiability 只有 corner 一種失敗模式，缺 cusp/vertical tangent；higher derivatives 只有多項式，缺非多項式。§2.4 的 rules 只有多項式＋指數混合，缺 negative/fractional power。§2.5 的 quotient rule 有 Caution 點名順序錯誤，但無 error-spotting 示範。</p>
+
+<!-- ===================== 缺口清單 ===================== -->
+<h2>缺口清單</h2>
+
+<h3>§2.1 &amp; §2.2——無缺口</h3>
+<div class="covered">
+<strong>§2.1</strong>（5 examples）覆蓋良好：多項式（Ex 2.1）、有理式（Ex 2.2）、根式/conjugate（Ex 2.3）、數值收斂（Ex 2.4）、linear approximation（Ex 2.5），三種代數技巧＋兩種應用類型。<br>
+<strong>§2.2</strong>（5 examples）覆蓋良好：多項式（Ex 2.6）、根式（Ex 2.7）、有理式（Ex 2.8）作為 function 的三連擊，加上反向應用（Ex 2.9）和圖形判讀（Ex 2.10）。Strategy 2.1 有直接示範（Ex 2.6–2.8）。
+</div>
+
+<h3>§2.3——Layer 1 缺口 1 個、Layer 2 soft gap 1 個</h3>
+
+<div class="gap-l1">
+<strong>L1-1：Def 2.3（differentiable）只有 corner 一種失敗模式</strong><br>
+<em>教學點：</em>Definition 2.3 定義了 differentiable；散文描述了三種失敗模式（"no sharp corner, no vertical spike, and no break"），但 Example 2.11 只示範了 corner（\(|x|\)）。<strong>Vertical tangent</strong>（如 \(\sqrt[3]{x}\) at \(x=0\)）是不同類型的 non-differentiability（差商趨向 \(\pm\infty\) 而非左右不等），完全沒有 example 示範。<br>
+<em>優先理由：</em>教新動作——corner 是左右有限極限不等，vertical tangent 是差商無界；兩者的診斷步驟不同。<br>
+<em>建議插入位置：</em>Example 2.11 之後、Figure 2.3 之前。
+</div>
+
+<div class="gap-l2">
+<strong>L2-1：Higher derivatives 只有多項式 example</strong><br>
+<em>教學點：</em>Higher derivatives 定義在 §2.3 散文中，Example 2.12 只對 \(f(x)=x^2+4x-2\) 做了 \(f'', f'''\)。對多項式而言 higher derivatives 最終必然歸零——缺一個涉及<em>非</em>多項式的 higher derivative example。<br>
+<em>優先理由：</em>函數類型單一（medium）。不過 §2.4 的 Example 2.14 已用 \(4e^x - x^3 + 2x\) 做了 higher derivatives（含指數），在一定程度上覆蓋了此缺口——因此降為選收。<br>
+<em>建議插入位置：</em>Example 2.12 之後（§2.3 末尾）或不補。
+</div>
+
+<h3>§2.4——Layer 1 缺口 1 個、Layer 2 soft gap 1 個</h3>
+
+<div class="gap-l1">
+<strong>L1-2：Caution（power rule 域）提到 negative/fractional exponent，但無 example 示範</strong><br>
+<em>教學點：</em>Caution 明確說「\(\frac{d}{dx}x^n = nx^{n-1}\) for negative integer \(n\)... holds wherever \(x \ne 0\)」；Remark 2.6 也提到 \(b^x\) 的一般公式。但 Example 2.13 只有正整數 power 的多項式，Example 2.14 只有 \(e^x\) 加多項式。<strong>整個 §2.4 沒有任何 example 用到 negative 或 fractional exponent 的 power rule</strong>。<br>
+<em>優先理由：</em>教新動作——學生若只看到正整數次方的 power rule，會對 \(x^{-1}\) 或 \(x^{1/2}\) 能否用同一公式感到不確定。且 §2.2 從 definition 得到 \(d/dx(\sqrt{x})=1/(2\sqrt{x})\) 和 \(d/dx(1/x)=-1/x^2\)；此處正好用 power rule 一行重算，驗證一致性。<br>
+<em>建議插入位置：</em>Example 2.13 之後、"The derivative of the exponential function" 小節之前。
+</div>
+
+<div class="gap-l2">
+<strong>L2-2：\(d/dx(e^x)=e^x\) 與 power rule 的混淆未獨立示範</strong><br>
+<em>教學點：</em>CLP1 §2.6 Conceptual 區專門有一題「True or false: \(d/dx(2^x)=x\cdot 2^{x-1}\)」——學生常把 \(b^x\) 誤套 power rule。本書 Remark 2.6 提到了 \(b^x\) 的公式，但沒有 example 讓學生練習「power rule 不適用於指數函數」的辨析。<br>
+<em>優先理由：</em>經典誤解未覆蓋（高）。但 Remark 2.6 已用散文點名，且 §2.4 篇幅已足——適合作為選收。<br>
+<em>建議：</em>不另列候選——此辨析留待題庫階段（習題本）處理更佳；此處不佔 worked example 名額。
+</div>
+
+<h3>§2.5——Layer 2 soft gap 2 個</h3>
+
+<div class="gap-l2">
+<strong>L2-3：Quotient rule 的 Caution（順序錯誤）缺 error-spotting 示範</strong><br>
+<em>教學點：</em>§2.5 第三個 Caution 明確說「Swapping the order to \(fg'-f'g\) flips the sign」，且 Example 2.16 的 solution 也提到「Had we mistakenly written...」——但沒有一個 example 的<em>核心教學任務</em>是找出並糾正 quotient-rule 錯誤。CLP1 §2.6 Conceptual 第一題正是此類 error-spotting exercise。<br>
+<em>優先理由：</em>經典誤解未覆蓋——Caution 點名的錯誤的獨立 example（高）。<br>
+<em>建議插入位置：</em>Example 2.16 之後（quotient rule 第一個 full example 之後）。
+</div>
+
+<div class="gap-l2">
+<strong>L2-4：Product rule 只有 polynomial × \(e^x\) 型，缺函數類型多樣性</strong><br>
+<em>教學點：</em>Example 2.15 是 \(x \cdot e^x\)，inline 示範是 \(x^2 e^x\)，Example 2.17(a) 是 \(x^3 e^x\)——全部是 polynomial × \(e^x\)。本章目前只有多項式、power、和 \(e^x\) 可用（尚無三角函數或對數），所以 product rule 的函數類型天然受限，這<em>不算</em>真正的缺口。<br>
+<em>優先理由：</em>函數類型天然窄，不算 soft gap。不佔名額。
+</div>
+
+<!-- ===================== 候選筆數 ===================== -->
+<h2>候選總覽</h2>
+<table>
+<tr><th>編號</th><th>節</th><th>對應缺口</th><th>分類</th></tr>
+<tr><td>E2.3-a</td><td>§2.3</td><td>L1-1 vertical tangent</td><td>核心</td></tr>
+<tr><td>O2.3-a</td><td>§2.3</td><td>L2-1 piecewise differentiability</td><td>選收</td></tr>
+<tr><td>E2.4-a</td><td>§2.4</td><td>L1-2 negative/fractional power rule</td><td>核心</td></tr>
+<tr><td>E2.4-b</td><td>§2.4</td><td>L1-2 extended power rule + tangent line</td><td>核心</td></tr>
+<tr><td>E2.5-a</td><td>§2.5</td><td>L2-3 quotient rule error-spotting</td><td>核心</td></tr>
+<tr><td>O2.5-a</td><td>§2.5</td><td>L2-3 quotient + exponential</td><td>選收</td></tr>
+</table>
+
+<!-- ===================== §2.3 候選 ===================== -->
+<h2>§2.3 Differentiability, Continuity, and Higher Derivatives（補 2）</h2>
+
+<h3>E2.3-a　Vertical tangent: \(f(x) = \sqrt[3]{x}\) at \(x = 0\)<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §2.2, prob_s2.2 "f(x)=sqrt(1+x)" remark on vertical tangent + standard textbook example]</code>（CC BY-NC-SA 4.0）・解材出處：<code>authored</code>（CLP1 有 \(\sqrt{1+x}\) 的 domain remark 但無 cube-root vertical tangent 的完整 worked example；solution 為本次撰寫）・插入：Example 2.11 之後、Figure 2.3 之前</p>
+<div class="why"><strong>填補 L1-1：</strong>Definition 2.3 的 informal gloss 提到「no vertical spike」，但 Example 2.11 只示範 corner。Vertical tangent 是差商趨向 \(\pm\infty\)（而非左右極限不等的 corner），診斷步驟不同：corner 看兩側有限極限是否相等；vertical tangent 看差商是否無界。這是一個新動作，需要獨立 example。</div>
+<div class="ex">
+<p>Show that \(f(x) = \sqrt[3]{x} = x^{1/3}\) is <em>not</em> differentiable at \(x = 0\), even though its graph has no corner there.</p>
+</div>
+<div class="sol">
+<p>We form the difference quotient at \(a = 0\):</p>
+<p>\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{h^{1/3} - 0}{h} \;=\; \frac{1}{h^{2/3}}. \]</p>
+<p>Since \(h^{2/3} > 0\) for all \(h \ne 0\), the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
+<p>\[ \lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty. \]</p>
+<p>The limit does not exist as a <em>finite</em> number, so by Definition 2.3 the function is not differentiable at \(x = 0\).</p>
+<p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) vs \(-1\)); here both one-sided limits agree — they both tend to \(+\infty\) — so there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative demands a finite limit, so differentiability fails for a different reason than at a corner.</p>
+</div>
+
+<h3>O2.3-a　Piecewise differentiability: matching pieces<span class="badge optb">選收</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §2.2 prob_s2.2 "2006H piecewise x^2 / ax+b"]</code>（CC BY-NC-SA 4.0）・解材出處：<code>official</code>（CLP1 附完整 solution；本書版為其改寫）・插入：Example 2.11 之後或 §2.3 末</p>
+<div class="why"><strong>填補 L2-1（選收）：</strong>把 differentiability 的定義「反過來用」——不是證明某函數不可微，而是找常數使 piecewise function 可微。這是 Theorem 2.1（differentiable \(\Rightarrow\) continuous）的直接應用：先用連續性得到一個方程，再用左右導數相等得到第二個方程。練習了新動作（反向使用定義）和結構對位（Theorem 2.1 的應用）。</div>
+<div class="ex">
+<p>Find the values of the constants \(a\) and \(b\) for which the function
+\[ f(x) = \begin{cases} x^{2} & x \le 2, \\ ax + b & x > 2 \end{cases} \]
+is differentiable everywhere.</p>
+</div>
+<div class="sol">
+<p>When \(x \ne 2\) the function is a polynomial on each piece and therefore differentiable. The only point in question is \(x = 2\).</p>
+<p><em>Step 1 — Continuity.</em> By Theorem 2.1, differentiability at \(x = 2\) requires continuity there. Continuity forces the two pieces to meet:
+\[ \lim_{x \to 2^{-}} f(x) = 2^{2} = 4 \quad\text{and}\quad \lim_{x \to 2^{+}} f(x) = 2a + b, \]
+so we need \(2a + b = 4\).</p>
+<p><em>Step 2 — Matching derivatives.</em> The left-hand derivative at \(x = 2\) uses the \(x^{2}\) branch: its derivative is \(2x\), giving slope \(4\) at \(x = 2\). The right-hand derivative uses the \(ax + b\) branch: its derivative is the constant \(a\). For the two-sided limit to exist we need
+\[ a = 4. \]</p>
+<p>From \(2a + b = 4\) with \(a = 4\) we get \(b = -4\). One can verify that with \(a = 4, b = -4\) the difference quotient at \(x = 2\) has a well-defined limit equal to \(4\).</p>
+</div>
+<div class="note"><strong>改作差異：</strong>CLP1 原題的 solution 直接引用已知的 \(d/dx(x^2)=2x\)；本書在 §2.3 尚未正式介紹 differentiation rules（那是 §2.4），但 §2.2 Example 2.6 已從定義算出 \((x^2+4x-2)'=2x+4\)，故此處引用 §2.2 的結果是合理的。solution 措辭改為引用 Theorem 2.1 和 §2.2 的已知結果，而非 CLP1 的 Lemma 引用。</div>
+
+<!-- ===================== §2.4 候選 ===================== -->
+<h2>§2.4 Derivatives of Polynomials and the Exponential Function（補 2）</h2>
+
+<h3>E2.4-a　Power rule for negative and fractional exponents<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §2.6 prob_s2.6 "s(t)=3t^4+5t^3-1/t"]</code>（CC BY-NC-SA 4.0）・解材出處：<code>official</code>（CLP1 附完整 solution；本書版為其改寫）・插入：Example 2.13 之後、exponential 小節之前</p>
+<div class="why"><strong>填補 L1-2：</strong>Caution 明確說 power rule 對 negative integer exponent 亦成立，但 Example 2.13 只用了正整數次方。此題把 \(1/t\) 改寫為 \(t^{-1}\) 再套 power rule——這正是 Caution 描述的動作，且驗證了 §2.2 Example 2.8 從 definition 得到的 \((1/x)'=-1/x^2\)。</div>
+<div class="ex">
+<p>Differentiate \(s(t) = 3t^{4} + 5t^{3} - \dfrac{1}{t}\).</p>
+</div>
+<div class="sol">
+<p>To use the power rule on every term, we first rewrite \(1/t\) as a power: \(s(t) = 3t^{4} + 5t^{3} - t^{-1}\). Applying the power rule (including the negative-exponent case noted in the Caution above) to each term,</p>
+<p>\[ \begin{aligned}
+  s'(t) &= 3 \cdot 4t^{3} + 5 \cdot 3t^{2} - (-1)\,t^{-2} \\[2pt]
+        &= 12t^{3} + 15t^{2} + \frac{1}{t^{2}}.
+\end{aligned} \]</p>
+<p>The key step was rewriting \(1/t\) as \(t^{-1}\) so the power rule could act on it: the exponent drops by one (\(-1 \to -2\)) and the old exponent \(-1\) comes out front, producing the \(+1/t^{2}\) term — matching what we would obtain from the quotient rule (§2.5) or from the limit definition (§2.2 Example 2.8).</p>
+</div>
+
+<h3>E2.4-b　Power rule with fractional exponent + tangent line<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §2.4 prob_s2.4 "f(x)=3x^2+4x^(1/2)"]</code>（CC BY-NC-SA 4.0）・解材出處：<code>official</code>（CLP1 附完整 solution；本書版為其改寫並加上 tangent-line 部分）・插入：E2.4-a 之後</p>
+<div class="why"><strong>填補 L1-2（延續）：</strong>E2.4-a 示範了 negative exponent；此題補上 fractional exponent \(x^{1/2}\)，並回扣 §2.1 的 tangent-line 計算——用 rule 而非 definition，示範「rules 確實讓生活更輕鬆」。驗證結果一致性：§2.2 Example 2.7 從 definition 得 \((x^{1/2})'=1/(2\sqrt{x})\)，此處 power rule 一行重現。</div>
+<div class="ex">
+<p>Differentiate \(f(x) = 3x^{2} + 4\sqrt{x}\) for \(x > 0\), and find the equation of the tangent line at \(x = 1\).</p>
+</div>
+<div class="sol">
+<p>Writing \(\sqrt{x} = x^{1/2}\), we apply the power rule to each term:</p>
+<p>\[ \begin{aligned}
+  f'(x) &= 3 \cdot 2x + 4 \cdot \tfrac{1}{2}\,x^{-1/2} \\[2pt]
+        &= 6x + \frac{2}{\sqrt{x}}.
+\end{aligned} \]</p>
+<p>The term \(\frac{d}{dx}x^{1/2} = \tfrac{1}{2}x^{-1/2} = \tfrac{1}{2\sqrt{x}}\) is exactly the derivative we computed from the definition in §2.2 Example 2.7 — the power rule reproduces it in one step.</p>
+<p>At \(x = 1\): \(f(1) = 3 + 4 = 7\) and \(f'(1) = 6 + 2 = 8\). The tangent line is
+\[ y - 7 = 8(x - 1), \quad\text{i.e.}\quad y = 8x - 1. \]</p>
+</div>
+<div class="note"><strong>改作差異：</strong>CLP1 原題只要求 differentiate；本書版加上 tangent-line 計算以回扣 §2.1 的核心技能（Definition 2.1），使這道 example 同時服務兩個教學目的。原題的 \(f'(x) = 6x + 2/\sqrt{x}\) 不變。</div>
+
+<!-- ===================== §2.5 候選 ===================== -->
+<h2>§2.5 The Product and Quotient Rules（補 2）</h2>
+
+<h3>E2.5-a　Quotient-rule error spotting<span class="badge core">核心</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §2.6 prob_s2.6 Conceptual Q1 "Spot the error: f(x)=2x/(x+1)"]</code>（CC BY-NC-SA 4.0）・解材出處：<code>official</code>（CLP1 附完整 solution；本書版為其改寫）・插入：Example 2.16 之後（quotient rule 第一個 full example 之後）</p>
+<div class="why"><strong>填補 L2-3：</strong>§2.5 的第三個 Caution 點名「swapping the order flips the sign」是最常見的 quotient-rule 錯誤。Example 2.16 的 solution 附帶一句提醒，但沒有 example <em>以辨錯為核心教學任務</em>。此 CLP1 題正好是 error-spotting：展示一份含有 sign 和 algebra 錯誤的 quotient-rule 計算，要求學生找出並糾正。這是 Caution 的直接 worked example。</div>
+<div class="ex">
+<p>A student differentiates \(f(x) = \dfrac{2x}{x + 1}\) as follows:</p>
+<p>\[ \begin{aligned}
+  f'(x) &= \frac{2(x + 1) + 2x}{(x + 1)^{2}} \\[4pt]
+        &= \frac{2(x + 1)}{(x + 1)^{2}} = \frac{2}{x + 1}.
+\end{aligned} \]</p>
+<p>Spot <em>all</em> errors in this work, and give the correct derivative.</p>
+</div>
+<div class="sol">
+<p>There are two errors.</p>
+<p><em>Error 1 — Wrong sign in the quotient rule.</em> The quotient rule gives
+\[ \left(\frac{f}{g}\right)' = \frac{f'g \;{\color{red}{-}}\; fg'}{g^{2}}. \]
+The student wrote \(+\) instead of \(-\) in the numerator. With top \(= 2x\) and bottom \(= x + 1\), the correct numerator is
+\[ (2)(x + 1) - (2x)(1) = 2x + 2 - 2x = 2, \]
+not \(2(x+1) + 2x = 4x + 2\).</p>
+<p><em>Error 2 — Incorrect simplification.</em> Even within the student's own (wrong) numerator, \(2(x+1) + 2x = 4x + 2\), not \(2(x+1)\). The student dropped the \(2x\) term.</p>
+<p>The correct computation is
+\[ f'(x) = \frac{2(x + 1) - 2x}{(x + 1)^{2}} = \frac{2}{(x + 1)^{2}}. \]
+Notice the denominator is \((x+1)^2\), not \((x+1)\) — a third common slip that the student might have been heading toward.</p>
+</div>
+
+<h3>O2.5-a　Quotient rule with exponential: \(e^x/(2x)\)<span class="badge optb">選收</span></h3>
+<p class="meta">來源 <code>[source: CLP-1 §2.7 prob_s2.7 Procedural "f(x)=e^x/(2x)"]</code>（CC BY-NC-SA 4.0）・解材出處：<code>official</code>（CLP1 附完整 solution；本書版為其改寫）・插入：Example 2.17 之後（§2.5 末）</p>
+<div class="why"><strong>填補 L2-3（延續）：</strong>§2.5 目前的 quotient-rule examples 的分子/分母全是多項式（Ex 2.16: \(x/(x^2+1)\)）或 polynomial/\(e^x\)（Ex 2.17(c)）。此題把 \(e^x\) 放在分子、多項式放在分母——組合方向相反。且 solution 的 factoring out \(e^x\) 和最終化簡 \((x-1)e^x/(2x^2)\) 是一個新的代數動作。低優先，因 Ex 2.17(c) 已部分覆蓋。</div>
+<div class="ex">
+<p>Differentiate \(f(x) = \dfrac{e^{x}}{2x}\).</p>
+</div>
+<div class="sol">
+<p>The quotient rule with top \(e^{x}\) and bottom \(2x\) gives</p>
+<p>\[ \begin{aligned}
+  f'(x) &= \frac{(e^{x})(2x) - (e^{x})(2)}{(2x)^{2}} \\[2pt]
+        &= \frac{2e^{x}(x - 1)}{4x^{2}}
+         = \frac{(x - 1)\,e^{x}}{2x^{2}}.
+\end{aligned} \]</p>
+<p>Notice: the derivative of the top is again \(e^x\) (Theorem 2.5), and the derivative of the bottom is just \(2\). The sign of \(f'(x)\) changes at \(x = 1\) — for \(0 < x < 1\) we have \(f' < 0\) (the function is decreasing), and for \(x > 1\) we have \(f' > 0\) (the function is increasing).</p>
+</div>
+
+<!-- ===================== 結語 ===================== -->
+<h2>附錄：題庫搜索紀錄</h2>
+<table>
+<tr><th>缺口</th><th>搜索範圍</th><th>結果</th></tr>
+<tr><td>L1-1 vertical tangent</td><td>CLP1 §2.2 (prob_s2.2)</td><td>CLP1 有 \(\sqrt{1+x}\) 的 vertical-tangent remark，但無 cube-root 的 full worked example。標準教科書用 \(x^{1/3}\)。Solution authored。</td></tr>
+<tr><td>L2-1 piecewise differentiability</td><td>CLP1 §2.2 (prob_s2.2)</td><td>CLP1 2006H exam problem：piecewise \(x^2 / ax+b\)。Official solution 完整。</td></tr>
+<tr><td>L1-2 negative exponent</td><td>CLP1 §2.6 (prob_s2.6)</td><td>CLP1 Procedural：\(s(t)=3t^4+5t^3-1/t\)。Official solution 完整。</td></tr>
+<tr><td>L1-2 fractional exponent</td><td>CLP1 §2.4 (prob_s2.4)</td><td>CLP1 Procedural：\(f(x)=3x^2+4x^{1/2}\)。Official solution 完整。Tangent-line 部分為本書新增。</td></tr>
+<tr><td>L2-3 quotient error-spotting</td><td>CLP1 §2.6 (prob_s2.6)</td><td>CLP1 Conceptual Q1：spot-the-error on \(2x/(x+1)\)。Official solution 完整。</td></tr>
+<tr><td>L2-3 quotient + exponential</td><td>CLP1 §2.7 (prob_s2.7)</td><td>CLP1 Procedural：\(e^x/(2x)\)。Official solution 完整。</td></tr>
+</table>
+<p class="small">所有候選均來自 CLP-1（首選來源），全部附 official solution。E2.3-a 的 solution 為 authored（CLP1 無 cube-root vertical tangent 的完整 worked example）。E2.4-b 加入了 tangent-line 部分（recomputed/extended）。其餘為 official solution 的改寫。</p>
+
+</body>
+</html>

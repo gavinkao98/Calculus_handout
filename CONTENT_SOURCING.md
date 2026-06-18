@@ -13,14 +13,22 @@ HTML 線為 `env-example`＋`env-solution`，見 [`handout/_dev-archive/general/
 
 1. **手稿範例——必要核心。** 教師手稿中的每個例子都出貨，經 Mode A 擴寫成正式 worked example。
 2. **開放題庫——示範缺口填補。** 該節主要內容寫好之後：
-   1. 盤點該節**既有的 worked examples**；缺口＝「該節教過的 definition／theorem／strategy
-      沒有對應示範」（不是「題目不夠多」——數量克制，每節通常補 1–3 個）。
-   2. 在本地題庫（[`problem_banks/README.md`](problem_banks/README.md)）搜尋候選，
-      產出**可直接閱讀的審核文件**（standalone HTML，數學即渲染）供使用者裁決。
+   1. **缺口分析＋題庫選題**（Claude subagent [`example-supplement`](.claude/agents/example-supplement.md)，
+      比照 Ch 1 實績一氣呵成）：讀整章 fragment，盤點教學點與 worked examples 的對應關係，
+      找出**兩層**缺口：
+      - **Layer 1（正式缺口）**：教學點完全沒有對應 example——優先處理。
+      - **Layer 2（soft gap）**：有示範但多樣性不足（函數類型單一、題型單一、
+        Caution 點名的經典誤解缺獨立 example、Remark 延伸未示範）。
+      數量克制：每節通常補 1–3 個，不是「題目不夠多」。
+      接著在本地題庫（[`problem_banks/README.md`](problem_banks/README.md)）搜尋候選
+      （CLP1 優先、其次 APEX／Mooculus），改寫為本書語域與記號，
+      產出**一份 standalone HTML 審核文件**
+      （路徑 `handout/_dev-archive/chNN/chNN_example-supplement-review.html`，
+      缺口盤點在前、候選全文在後、裁決表在頂，數學即渲染）供使用者裁決。
       題庫的分類法只是搜尋索引——缺口永遠由講義自身內容定義。
-   3. **官方完整 solution 是硬條件**：worked example 必須附解，只收解材完整的源
+   2. **官方完整 solution 是硬條件**：worked example 必須附解，只收解材完整的源
       （只有最終答案的題不合格，除非解由我們撰寫並標記為改作）。
-   4. **裁決前先過一輪選題稽核（2026-06-12 新增）**：以 `codex exec` 唯讀 auditor
+   3. **裁決前先過一輪選題稽核（2026-06-12 新增）**：以 `codex exec` 唯讀 auditor
       （走 ChatGPT 訂閱配額——動用前徵得使用者同意）對照課文片段覆核：缺口判定是否成立、
       候選是否對症且程度合適、自寫／改作之解的數學正確性、來源與授權標示是否屬實。
       契約沿用 [`CONTENT_DIRECTION.md`](CONTENT_DIRECTION.md) ⑤
@@ -31,7 +39,7 @@ HTML 線為 `env-example`＋`env-solution`，見 [`handout/_dev-archive/general/
       下的 `chNN_<artifact>-audit.md`（範例：`handout/_dev-archive/ch01/ch01_example-supplement-audit.md`），不可只留在 commit message 摘要。
 
       **本選題稽核只審例題候選**（數學／來源／圖）；該節**手寫說明散文**的易懂性／流暢性由**獨立的一道散文稽核**負責（gate 1 Claude `handout-prose-audit` subagent ＋ gate 2 Codex，契約見 [`handout/_audit/PROSE-AUDIT-RUBRIC.md`](handout/_audit/PROSE-AUDIT-RUBRIC.md)），與本稽核平行、互不重疊。
-   5. 通過裁決後改寫為本書語域與記號（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §3、§9），
+   4. 通過裁決後改寫為本書語域與記號（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §3、§9），
       插入課文中教學上正確的位置（緊跟相關 definition／theorem／strategy）。
 3. **AI 出題——備援。** 僅用於題庫填不了的缺口（如緊扣手稿 running example 的延伸、
    或為本書特有約定量身打造的示範）。出題後一律經使用者審核。
