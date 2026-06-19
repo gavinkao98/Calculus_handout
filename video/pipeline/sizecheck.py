@@ -32,6 +32,9 @@ from pathlib import Path
 SIBLING_PREFIXES = ("point", "proof", "step", "annotation", "row")
 TOLERANCE = 1.06   # max allowed max/min scale-aware-font_size ratio within a group
 OVERLAP_FRAC = 0.20  # warn when two content blocks intersect over this fraction of the smaller
+LABEL_OVERLAP_FRAC = 0.30  # graph equation labels: advisory-only, higher bar than
+                           # content blocks -- small text near curves is common, so
+                           # only a heavy overlap (two labels truly stacked) warns.
 
 
 def _prose_nodes(mob) -> list:
@@ -180,6 +183,128 @@ def _overlap_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     return out
 
 
+def _graph_labels(mob) -> list:
+    """The graph_focus._label-tagged equation labels under *mob* (curve / line /
+    point names), recursing into groups. Stops at a tagged node."""
+    if getattr(mob, "_graph_label", False):
+        return [mob]
+    out: list = []
+    for sub in getattr(mob, "submobjects", []):
+        out += _graph_labels(sub)
+    return out
+
+
+def _graph_label_overlap_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
+    """Layout guard for the one collision the graph-layer exemption hides.
+
+    _overlap_issues skips the whole "graph" layer because in-axes coincidence is
+    usually intentional (a point on a curve, a guide through an intersection, a
+    label hugging its curve -- see Block.layer docstring). But two EQUATION LABELS
+    landing on top of each other is a genuine defect, and graph labels are placed
+    by a heuristic / hand-tuned ``label_point`` with no collision avoidance. So we
+    carve out just the labels (tagged by graph_focus._label, found wherever they
+    sit -- a static ``label.N`` block or folded inside a revealed ``plot.N`` group)
+    and check them pairwise. Advisory only (``warn``): the fix is a clearer
+    ``label_point``, and a render-blocking error here would be too aggressive for a
+    small-text heuristic. Covers graph_focus and graph_compare (shared _plot_blocks)."""
+    sid = scene.get("id")
+    items: list[tuple[str, tuple]] = []
+    for b in blocks:
+        mob = getattr(b, "mobject", None)
+        if mob is None:
+            continue
+        for lab in _graph_labels(mob):
+            box = _aabb(lab)
+            if box is not None:
+                items.append((str(b.id), box))
+
+    out: list[tuple[str, str]] = []
+    for i in range(len(items)):
+        id_a, a = items[i]
+        for j in range(i + 1, len(items)):
+            id_b, bx = items[j]
+            inter = _box_inter(a, bx)
+            if inter <= 0.0:
+                continue
+            sm = min(_box_area(a), _box_area(bx))
+            if sm <= 1e-9:
+                continue
+            frac = inter / sm
+            if frac > LABEL_OVERLAP_FRAC:
+                out.append(("warn",
+                    f"{sid}: graph labels '{id_a}' and '{id_b}' overlap "
+                    f"({frac * 100:.0f}% of the smaller) -- equation labels collide; "
+                    f"give one an explicit label_point to separate them."))
+    return out
+
+
+def _label_region(nx: float, ny: float) -> str:
+    """Coarse human-readable region for a frame-fraction centre (origin top-left)."""
+    h = "left" if nx < 0.34 else ("right" if nx > 0.66 else "center")
+    v = "upper" if ny < 0.34 else ("lower" if ny > 0.66 else "middle")
+    return f"{v}-{h}"
+
+
+def graph_label_geometry(meta: dict, scene: dict) -> "dict | None":
+    """Deterministic geometry of a graph scene's equation labels, for the critic's
+    VLM context (B.1b). Reuses the SAME _graph_labels machinery as the overlap guard
+    so the critic is grounded on exactly what the guard sees.
+
+    Returns ``{"labels": [{id, text, region, box}], "overlaps": [{a, b, pct}]}`` with
+    boxes in frame-fraction coords (origin TOP-LEFT, x right, y down -- how the VLM
+    reads the rendered image), or ``None`` when the scene is not a graph template, has
+    no labels, or fails to build. Offline: builds blocks, no render, no API."""
+    if scene.get("template") not in ("graph_focus", "graph_compare"):
+        return None
+    from pipeline.templates import build_blocks
+    from pipeline.visuals import theme as T
+
+    try:
+        blocks = build_blocks(scene, {"ground": "dark", "meta": meta})
+    except Exception:  # noqa: BLE001
+        return None
+
+    fw, fh = T.FRAME_W, T.FRAME_H
+    labels: list[dict] = []
+    boxes: list[tuple] = []
+    for b in blocks:
+        mob = getattr(b, "mobject", None)
+        if mob is None:
+            continue
+        for lab in _graph_labels(mob):
+            box = _aabb(lab)
+            if box is None:
+                continue
+            x0, x1, y0, y1 = box
+            # manim (origin centre, y up) -> frame fraction (origin top-left, y down)
+            nx0, nx1 = (x0 + fw / 2) / fw, (x1 + fw / 2) / fw
+            ny0, ny1 = (fh / 2 - y1) / fh, (fh / 2 - y0) / fh
+            cx, cy = (nx0 + nx1) / 2, (ny0 + ny1) / 2
+            text = str(getattr(lab, "_graph_label_text", "") or "")
+            labels.append({"id": str(b.id), "text": text,
+                           "region": _label_region(cx, cy),
+                           "box": [round(nx0, 2), round(nx1, 2), round(ny0, 2), round(ny1, 2)]})
+            boxes.append((str(b.id), text, box))
+    if not labels:
+        return None
+
+    overlaps: list[dict] = []
+    for i in range(len(boxes)):
+        id_a, ta, a = boxes[i]
+        for j in range(i + 1, len(boxes)):
+            id_b, tb, bx = boxes[j]
+            inter = _box_inter(a, bx)
+            if inter <= 0.0:
+                continue
+            sm = min(_box_area(a), _box_area(bx))
+            if sm <= 1e-9:
+                continue
+            frac = inter / sm
+            if frac > LABEL_OVERLAP_FRAC:
+                overlaps.append({"a": ta or id_a, "b": tb or id_b, "pct": round(frac * 100)})
+    return {"labels": labels, "overlaps": overlaps}
+
+
 def check_scenes(meta: dict, scenes: list[dict]) -> list[str]:
     """Return (severity, message) tuples for the given scenes.
     'error' = stacked-prose size mismatch, or an element clipped off-frame (both
@@ -213,6 +338,10 @@ def check_scenes(meta: dict, scenes: list[dict]) -> list[str]:
         # the union of revealed blocks is the fullest frame; screen-space layout
         # layer only (graph/decoration/background exempt by Block.layer). --
         issues += _overlap_issues(scene, blocks)
+
+        # -- warn: two graph equation labels stacked (the one collision the graph
+        # layer exemption above deliberately lets through). --
+        issues += _graph_label_overlap_issues(scene, blocks)
 
         # -- error: stacked siblings at different sizes (shrunk not wrapped) --
         groups: dict[str, list[tuple[str, float]]] = {}

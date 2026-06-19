@@ -6,7 +6,7 @@
 >
 > **日期：** 2026-06-02 ·  **撰寫前讀過的程式碼：** `pipeline/blocks.py`、`pipeline/brand.py`、`pipeline/sizecheck.py`、`pipeline/lint.py`、`make.py`、`pipeline/templates/{__init__,_common,graph_focus}.py`（其餘 5 個 template、`scene.py`、`theme.py` 未逐行讀——見 Part F 動手前要確認的事）。
 >
-> **來源：** [github.com/showlab/Code2Video](https://github.com/showlab/Code2Video) · [arXiv 2510.01174](https://arxiv.org/abs/2510.01174) · [HF paper page](https://huggingface.co/papers/2510.01174)（NeurIPS 2025 DL4C workshop）。
+> **來源：** [github.com/showlab/Code2Video](https://github.com/showlab/Code2Video) · [arXiv 2510.01174](https://arxiv.org/abs/2510.01174) · [HF paper page](https://huggingface.co/papers/2510.01174)（**ICML 2026 main**，README 載 2026-05-01 接收；前身為 NeurIPS 2025 DL4C workshop。venue 更正見文末 2026-06-19 addendum）。
 
 ---
 
@@ -391,3 +391,48 @@ M3（選用，計費）  P4 coverage check（learning_goal 覆蓋回測）
 - [arXiv 2510.01174 — Code2Video: A Code-centric Paradigm for Educational Video Generation](https://arxiv.org/abs/2510.01174)
 - [HF paper page](https://huggingface.co/papers/2510.01174)
 - 機制細節（ScopeRefine 三層、6×6 anchor、TeachQuiz、AES 五維、ablation 數字、r=0.971）取自上述論文之 method 與 experiment 章節。
+
+---
+
+# Addendum — 2026-06-19 再研究
+
+> **觸發：** 使用者要求重新研究 Code2Video「有沒有值得學的地方」。本次以 WebFetch 親驗 live repo＋論文，對照上面 2026-06-02 的結論。**鐵則：只記增量，不重述上文。**
+
+## 淨結論
+**沒有需要急著抄的新機制；主幹上次已抓到，P0–P3 也已落地。** 本次的增值有三：① 一個可更正的事實（venue）；② 把上次寫太粗的 4 個機制讀精確；③ 確認 Code2Video **自己並沒有「標籤自動重新擺位演算法」**——這直接定了我們函數圖標籤缺口的取捨（做 B.1 偵測、不做 B.2 自演算法）。
+
+## repo / paper 變化（WebFetch 親驗）
+- **Repo 實質凍結。** README changelog 最新里程碑為 ICML 接收（2026-05-01）；前一筆是 `requirements.txt` 優化（2025-11-06）。至 2026-06-19 約三週零新模組／release。**baseline 仍 current，我們沒錯過新版本。**
+- **★ venue 更正：** 論文已從「NeurIPS 2025 DL4C **workshop**」升級為 **ICML 2026 main**（README 明列 `[2026.5.1] Accepted to ICML 2026`）。本檔頂部來源行已同步更正。
+
+## 上次寫太粗、這次讀精確（多為「理解更準」，非新採納項）
+1. **Planner 是顯式兩階段**（`P_outline` 產 section metadata → `P_storyboard` 逐節展開）。對我們意義為零——我們的 Planner＝人＋CONTENT_METHODOLOGY，本就分大綱與逐拍稿。（paper §4.1）
+2. **Critic 是單趟 refine，無多輪收斂、無 gate、無錯誤回復**（`c̃_i = P_refine(c_i, V_i)`，跑完就算）。→ **反而背書我們更穩**：`critic.py` 是 advisory＋人裁決＋有收斂線（`V1–V8 blocking==0`），補上了論文沒有的東西。（paper §4.3）
+3. **ScopeRefine 的嘗試上限 K1/K2 與 scope 切換門檻論文未公開**，只給 line→block→global 三層概念。→ P2 維持「文件協定＋人判斷」是對的，本就抄不到具體門檻。（paper §4.2）
+4. **量化佐證可引用**：parallel 5.6× 加速（Table 7）、6×6 grid 在 Element Layout 82.8 vs 4×4 的 71.2（Table 11）。對不跑 batch 的我們意義低，僅作「沿用 6×6 當報告層」的事後背書。
+
+## 採納 scorecard（計畫 vs 現況，已逐項以 file:line 親驗）
+| 項 | 計畫 | 現況 | 佐證 |
+|---|---|---|---|
+| **P0** 重疊偵測 | done | **done** | `sizecheck.py:34`（`OVERLAP_FRAC=0.20`）、`:133`（`_overlap_issues`）；`blocks.py:40`（`layer` 欄＋語義 docstring） |
+| **P1** VLM Critic | done（需同意） | **done，已超出原計畫** | `critic.py`（`--dry-run`/`--confirm` 成本閘＋V1–V8/A1–A7），多了論文沒有的收斂線 |
+| **P2** ScopeRefine 紀律 | done（文件） | **done** | `CONTENT_METHODOLOGY.md` §5 |
+| **P3** AES 五維 | done（文件） | **done，擴成 A1–A7** | `VISUAL-FRAME-RUBRIC.md`（A1–A5 來自 Code2Video＋自加 A6/A7） |
+| **P4** TeachQuiz coverage | 選用／未來 | **pending（刻意延後）** | 內容稿已有 `learning_goal` 欄＝前置備妥 |
+
+**一眼結論：P0–P3 全數兌現，P1/P3 還超出原設計；P4 是唯一 pending，且刻意延後、非缺口。**
+
+## 對「函數圖標籤重疊」缺口的啟示（連到 `_audit/REVIEW-graph-axis-label-convention-proposal.html`）
+- **關鍵發現：** Code2Video 的「重擺位」其實是 **VLM 整段重生**，不是搜尋演算法——occupancy table 只**偵測** overlap/occlusion/imbalance 三類違規，**沒有候選位置集／優先規則／重配迴圈**（paper §4.3、Fig 5，兩次獨立 fetch 一致）。
+- **取捨拍板：**
+  - **B.2 自動擺位 → 不做。** 連 SOTA 論文都選擇不寫這個演算法；硬寫會違反 Karpathy §2「不寫投機性彈性」。
+  - **B.1 偵測器 → 正解。** 缺口本質是「P0 故意豁免 `layer="graph"`、但 P1 rubric 其實已涵蓋（`V2` 蓋字 Blocking、`A1` label 不壓線）」。最小增量＝**確定性偵測 label-vs-label 重疊（advisory），並把 AABB＋鄰近空位餵進 `critic.py` 的 VLM context**，讓 P1 能給「往上移／往尾端移」的 Option A/B 建議——機器偵測＋人選舉，落在 human-in-the-loop 內。
+
+## 本次落地（2026-06-19）
+- **B.1a 已實作（確定性偵測，render 前、免費）：** `sizecheck.py` 新增 `_graph_label_overlap_issues`（advisory warn，門檻 `LABEL_OVERLAP_FRAC=0.30`），對 `graph_focus._label` 標記的曲線／線／點方程式標籤做 label-vs-label 重疊偵測；`graph_focus._label` 單點加 `_graph_label`／`_graph_label_text` 標記，`graph_compare` 因共用 `_plot_blocks` 一併涵蓋。fixture：`storyboards/_demo_label_overlap.yml`。
+- **B.1b 已實作（餵 P1 VLM context）：** `sizecheck.graph_label_geometry(meta, scene)` 算出每個標籤的 frame-fraction box＋region＋重疊（重用 B.1a 機制）；`critic.plan_frames` 對 graph 模板的最終幀掛上 `label_geometry`，`critic.build_prompt` 注入「Deterministic graph-label facts」段落——讓 VLM 對 `V2`（蓋字）/`A1`（壓線）有確定性依據、能指名往哪移，且「未偵測到重疊」時明告「不要幻覺出碰撞」。
+- **校準證據：** §1.1（`ch01_inverse_functions`）`sizecheck` 全乾淨、§1.2（`ch01_inverse_trig_functions`）label-overlap 0 誤報（唯一 warn 是既有 `annotation.0` 超 safe margin，與本次無關）；fixture 蓄意重疊測得 100%（true positive）。B.1b 對 §1.1 deck 端到端 dry-run，3 個 graph 場景（1 graph_compare＋2 graph_focus）皆正確注入幾何、0 誤報。
+- **後續（未做，下一步）：** 把 `critic` 對 V2/A1 的 Option A/B 建議跑一輪真 VLM（計費、需同意）看實際效果；補既有 `OVERLAP_FRAC=0.20`（content-block，非本次新增）的零誤報校準紀錄。
+
+## 不確定性聲明
+repo 凍結／ICML 日期＝高可信（多源 WebFetch，含 raw README 親驗）。論文機制細節＝高可信（兩次獨立 fetch 一致、與 06-02 理解相容）。scorecard P0–P3＝逐項 file:line 親驗。P4 pending／P0 未存證校準＝採信 reader、未獨立複驗。

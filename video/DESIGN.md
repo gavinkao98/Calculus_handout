@@ -179,6 +179,28 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 - **`point` label** 仍預設 `text`（中性，給座標／標記註解用），可用 `label_role` 覆寫。
 - 實作：[`pipeline/templates/graph_focus.py`](pipeline/templates/graph_focus.py) function／line 分支的 `role=plot.get("label_role", str(plot.get("color_role", "secondary")))`。`graph_compare` 共用 `_plot_blocks` 故一併適用。
 
+#### Plot label 重疊偵測（graph_focus／graph_compare，2026-06-19）
+
+**兩個曲線／線／點的方程式標籤互疊由 `sizecheck._graph_label_overlap_issues` 自動抓（advisory warn，門檻 `LABEL_OVERLAP_FRAC=0.30`）。** 這是 graph 層豁免（`Block.layer="graph"`，把「點落在曲線上」「標籤緊貼曲線」等刻意重合放過）唯一刻意開的口——label-vs-label 互疊是 heuristic／手填 `label_point` 無碰撞避讓造成的真缺陷。修法是給標籤一個顯式 `label_point` 分開。
+
+- **不是 error，是 warn：** label 擺位偏 heuristic，render-blocking 太兇；嚴重時印 warn 讓人裁決。曲線／點本身的重合仍豁免（不誤報）。
+- **餵進 critic（B.1b）：** `sizecheck.graph_label_geometry(meta, scene)` 算出每個標籤的 frame-fraction box＋region＋重疊，由 [`pipeline/critic.py`](pipeline/critic.py) `build_prompt` 注入 VLM context，讓視覺幀稽核（gate2）對 `V2`（蓋字）/`A1`（壓線）有確定性依據、能指名往哪移，且未偵測到重疊時明告「勿幻覺出碰撞」。
+- **不做自動擺位：** 連 Code2Video 自己都沒有標籤自動重擺演算法（其「重擺位」是 VLM 整段重生，見 [`CODE2VIDEO_STUDY.md`](CODE2VIDEO_STUDY.md) 2026-06-19 addendum）；故走「偵測＋餵 VLM 建議」，不寫投機性搜尋。
+- 實作：`sizecheck.py` `_graph_label_overlap_issues`／`graph_label_geometry`；標記在 `graph_focus._label`（`_graph_label`／`_graph_label_text`）。fixture：[`storyboards/_demo_label_overlap.yml`](storyboards/_demo_label_overlap.yml)。
+
+#### 座標軸刻度／級距：何時該標（graph_focus／graph_compare，2026-06-19）
+
+**預設無刻度數字是刻意的 house style，不是遺漏。** `Axes` 一律畫軸線＋箭尖＋軸尖的 `x`／`y` 字母，但 `include_ticks`／`include_numbers` 預設 `False`（深藍工程底 + 乾淨軸的 3b1b 風格）。是否補刻度，**依該圖在教什麼分兩類**：
+
+| 圖的類型 | 判準 | 刻度規則 | 例 |
+|---|---|---|---|
+| **qualitative（形狀）** | 旁白只談形狀／趨勢／對稱／單調，不指名具體座標 | 維持無刻度（預設） | 反函數對 `$y=x$` 對稱、漸近線行為 |
+| **quantitative（讀值）** | 旁白指名某座標或要讀值（「在 `$x=a$`」「值為 `$L$`」「`$\arccos 1=0$`」） | **必須**在那些座標放 teaching-tick | `$\sin\theta=\tfrac13$` 求 `$\tan\theta$`、極限讀值 |
+
+- **teaching-tick 機制（已存在、opt-in）：** axes 區塊寫 `x_ticks: [{at, label}]`／`y_ticks: […]`，在指定座標畫**幾個關鍵刻度**（例如在 `$x=a$` 標 `a`、在 `$y$` 軸標 `L`），而非整條數線——保住乾淨軸又給尺度錨點。實作 `graph_focus._axis_ticks`；數字渲成 math，故 `a`／`L` 會是斜體。
+- **軸字母：** `_add_axis_labels` 預設在軸尖標 `x`／`y`；該圖確實不需要時用 `axis_labels: false` 關掉（勿濫用）。
+- **enforcement：** 此為**撰稿慣例**，目前靠人／VISUAL-FRAME gate 判讀，**未加 lint**（曾評估「旁白座標引用 ↔ teaching-tick」的 A-2 lint，因正則偵測旁白偽陽／偽陰風險，暫不採；情境變了再評）。緣由與取捨見 [`content_scripts/_audit/REVIEW-graph-axis-label-convention-proposal.html`](content_scripts/_audit/REVIEW-graph-axis-label-convention-proposal.html)。
+
 ### Template 選擇：離散步驟 vs 推導鏈
 
 計算場景有兩種形狀，選錯 template 就是長公式跑出空間的原因——兩欄 template

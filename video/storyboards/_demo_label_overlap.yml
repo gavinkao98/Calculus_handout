@@ -1,0 +1,46 @@
+# graph_focus 標籤重疊 guard 的驗證稿（非正式節，檔名底線前綴）
+#
+# 目的：驗證 sizecheck._graph_label_overlap_issues——兩個曲線方程式標籤被擺到
+# 同一處時，guard 應印 advisory warn（label-vs-label，門檻 LABEL_OVERLAP_FRAC）。
+# 這是 graph 層豁免（point on curve、label hugging curve 等刻意重合不報）唯一
+# 開的一個口：方程式標籤互疊是真缺陷、heuristic/手填 label_point 無碰撞避讓。
+#
+# 本檔「故意壞」：兩個 function 的 label_point 設在同一座標 → 標籤堆疊。
+# 預期：跑 sizecheck 得到 1 個 warn（兩標籤重疊百分比）。把其中一個 label_point
+# 分開（見註解的 GOOD 值）即回到無 warn——可作為手動回歸對照。
+# demo 專用，不屬任何正式節；只有顯式 render 此檔時才會被 sizecheck 掃到。
+
+meta:
+  id: demo_label_overlap
+  chapter: "Demo"
+  chapter_title: "Guard Validation"
+  section: "0.0"
+  title: "Label Overlap Guard Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Label Overlap Guard Demo" }
+
+scenes:
+
+  - id: two_labels_stacked
+    kind: content
+    template: graph_focus
+    accent: definition
+    source: "合成例（guard 驗證，非教學內容）"
+    title: "Two Labels, One Spot"
+    say: |
+      Both curves carry a name, and both names were placed at the same point --
+      so the labels stack. The overlap guard should flag this.
+    axes:
+      x_range: [-2, 2, 1]
+      y_range: [-2, 2, 1]
+      x_length: 6.2
+      y_length: 4.0
+    plots:
+      # 兩個標籤都擺在 [0.2, 1.4] → 必然重疊（BAD）。
+      # GOOD 對照：把第二個改成 label_point: [1.0, -1.3] 即不重疊、無 warn。
+      - { kind: function, expression: "0.6*x", color_role: secondary, label: "$y=0.6x$", label_point: [0.2, 1.4] }
+      - { kind: function, expression: "-0.6*x", color_role: accent, label: "$y=-0.6x$", label_point: [0.2, 1.4] }

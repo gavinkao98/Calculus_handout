@@ -136,6 +136,16 @@ def _label(text: str, ground: str, *, role: str = "text", size: str = "label"):
     mob = brand.math_line(text, ground, role=role, size=size) if "$" in text else brand.body_text(
         text, ground, role=role, size=size
     )
+    # Tag every curve/line/point equation label so sizecheck can run a
+    # label-vs-label overlap advisory: these live on the exempt "graph" layer
+    # (intentional coincidence -- a label hugging its curve -- is fine), but two
+    # EQUATION LABELS landing on top of each other is a real defect the layer
+    # exemption otherwise hides. graph_compare reuses _label via _plot_blocks, so
+    # both templates are covered by this single tag. The raw text rides along so
+    # the critic's deterministic geometry context (sizecheck.graph_label_geometry)
+    # can name each label without re-deriving it from the rendered Tex.
+    mob._graph_label = True
+    mob._graph_label_text = text
     return mob
 
 

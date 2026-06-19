@@ -58,6 +58,7 @@ _bootstrap.bootstrap()
 import yaml  # noqa: E402
 
 from pipeline.timing import SCENE_LEAD_SECONDS  # noqa: E402
+from pipeline.sizecheck import graph_label_geometry  # noqa: E402
 
 LEAD_SECONDS = SCENE_LEAD_SECONDS
 BEAT_BACKOFF = 0.20     # grab this far before a beat boundary: reveal has settled,
@@ -160,6 +161,8 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
     unbalanced (a real artifact we hit and measured). per="beat": one frame per
     beat (progression view -- catches pacing issues, but ~3x the frames/cost)."""
     titles = {s["id"]: s.get("title", "") for s in storyboard["scenes"]}
+    scenes_by_id = {s["id"]: s for s in storyboard["scenes"]}
+    meta = storyboard.get("meta", {})
     by_id = {s["scene_id"]: s for s in manifest["scenes"]}
     if selector == "all":
         order = [s["scene_id"] for s in manifest["scenes"]]
@@ -177,10 +180,20 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
         common = {"scene_id": sid, "scene_number": entry["scene_number"],
                   "title": titles.get(sid, "")}
         if per == "scene":
-            plan.append({**common, "beat_index": 0, "final": True,
-                         "ts": 1e9,  # extract clamps to (duration - 0.05): the last held frame
-                         "narration": entry.get("script", ""), "reveal": None,
-                         "revealed_so_far": cumulative_reveals(beats, len(beats) - 1)})
+            item = {**common, "beat_index": 0, "final": True,
+                    "ts": 1e9,  # extract clamps to (duration - 0.05): the last held frame
+                    "narration": entry.get("script", ""), "reveal": None,
+                    "revealed_so_far": cumulative_reveals(beats, len(beats) - 1)}
+            # B.1b: attach deterministic graph-label geometry so build_prompt can
+            # ground the VLM's V2/A1 judgment (only the fullest frame is judged, so
+            # the final layout the labels settle into is the right one to describe).
+            try:
+                geom = graph_label_geometry(meta, scenes_by_id.get(sid, {}))
+            except Exception:  # noqa: BLE001
+                geom = None
+            if geom:
+                item["label_geometry"] = geom
+            plan.append(item)
         else:
             for i, beat in enumerate(beats):
                 plan.append({**common, "beat_index": beat["index"], "final": False,
@@ -225,6 +238,31 @@ def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
 
 # ---- prompt -------------------------------------------------------------
 
+def _format_label_geometry(geom: dict) -> str:
+    """Deterministic graph-label facts for the prompt (B.1b). Gives the VLM the
+    exact label positions so it can ground V2 (label occludes) / A1 (label on a
+    mark) instead of guessing, point any fix at real empty space, and -- when no
+    overlap is listed -- NOT invent a collision. Frame-fraction coords, origin
+    top-left. Kept compact: the rubric is already injected verbatim above."""
+    lines = ["\nDeterministic graph-label facts (computed from the storyboard, not "
+             "guessed) -- coordinates are fractions of the frame, origin TOP-LEFT, x "
+             "right, y down. Use these to ground V2/A1 and aim any fix at real empty "
+             "space:"]
+    for lab in geom["labels"]:
+        t = lab["text"] or lab["id"]
+        b = lab["box"]
+        lines.append(f"- label {t} at {lab['region']}, box x[{b[0]},{b[1]}] y[{b[2]},{b[3]}]")
+    if geom["overlaps"]:
+        for ov in geom["overlaps"]:
+            lines.append(f"OVERLAP DETECTED (deterministic): {ov['a']} and {ov['b']} "
+                         f"overlap {ov['pct']}% of the smaller -- a real V2/A1 defect; "
+                         f"name a specific empty direction to move one label.")
+    else:
+        lines.append("No equation-label overlap was detected geometrically -- do not "
+                     "invent a label collision; judge only what the frame shows.")
+    return "\n".join(lines) + "\n"
+
+
 def build_prompt(item: dict, rubric: str) -> str:
     """The text half of one critique request (the frame image travels alongside).
     Injects VISUAL-FRAME-RUBRIC.md VERBATIM (the single source of the dimensions,
@@ -250,6 +288,9 @@ def build_prompt(item: dict, rubric: str) -> str:
             f"Narration spoken as this frame shows: {item['narration']}\n"
             f"Elements visible by now: {revealed}\n"
         )
+    geom = item.get("label_geometry")
+    if geom and geom.get("labels"):
+        ctx += _format_label_geometry(geom)
     return (
         "You are the external visual-frame critic (gate 2) for an educational "
         "mathematics video. Judge the attached frame STRICTLY against the rubric "

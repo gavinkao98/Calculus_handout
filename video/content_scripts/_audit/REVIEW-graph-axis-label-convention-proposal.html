@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>函數圖「軸刻度＋方程式標籤」規範化提案</title>
+<script>
+window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},svg:{fontCache:'global'}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{--bg:#0f1419;--panel:#171e26;--panel2:#1d2630;--ink:#e6edf3;--muted:#9aa7b4;
+    --line:#2a3742;--ok:#3fb950;--warn:#d29922;--accent:#58a6ff;--bad:#f85149;--code:#0b1118;--codeink:#c9d4df;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.65 -apple-system,"Segoe UI",Roboto,"Noto Sans CJK TC","Microsoft JhengHei",sans-serif;}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:25px;margin:0 0 4px} h2{font-size:19px;margin:38px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  h3{font-size:15px;margin:18px 0 6px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:600;
+    background:rgba(88,166,255,.15);color:var(--accent);border:1px solid rgba(88,166,255,.4)}
+  .pill-rec{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:600;
+    background:rgba(63,185,80,.15);color:var(--ok);border:1px solid rgba(63,185,80,.4)}
+  .pill-later{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:600;
+    background:rgba(210,153,34,.15);color:var(--warn);border:1px solid rgba(210,153,34,.4)}
+  .tldr{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:16px 18px;margin:18px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin:16px 0}
+  .card.bad{border-left:3px solid var(--bad)} .card.ok{border-left:3px solid var(--ok)} .card.warn{border-left:3px solid var(--warn)}
+  .lead{font-size:15px;margin:2px 0 10px}
+  .k{display:inline-block;min-width:96px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.4px;margin-right:8px;vertical-align:top}
+  .card p{margin:6px 0;font-size:14px}
+  ul{margin:6px 0 6px 0;padding-left:22px}.card li{font-size:14px;margin:4px 0}
+  code{background:var(--code);color:var(--codeink);padding:1px 5px;border-radius:4px;font-size:13px;font-family:Consolas,monospace}
+  pre{background:var(--code);color:var(--codeink);padding:12px 14px;border-radius:6px;overflow-x:auto;font-size:12.5px;line-height:1.5;border:1px solid var(--line)}
+  pre code{background:none;padding:0}
+  .ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}.mut{color:var(--muted)}.acc{color:var(--accent)}
+  a{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px}
+  .src{color:var(--muted);font-size:12px;font-family:Consolas,monospace}
+  .foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:4px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);margin-left:6px}
+</style></head><body><div class="wrap">
+
+  <h1>函數圖「軸刻度 ＋ 方程式標籤」規範化提案</h1>
+  <p class="sub">2026-06-19 · <span class="pill">提案／待裁決</span> · 只寫提案，<b>不改 code</b>（依你指示）</p>
+  <p class="sub">範圍：<code>video/pipeline/templates/graph_focus.py</code> · <code>graph_compare.py</code>（共用繪圖機制）· <code>sizecheck.py</code> · <code>DESIGN.md</code></p>
+
+  <div class="tldr">
+    <b>結論：</b>你的觀察成立，且有確切技術根因。但要分成<b>兩個獨立缺口</b>看：
+    <ul>
+      <li><b>缺口 A（刻度／級距）</b>：XY 軸線其實<u>一直都有畫</u>，缺的是<b>刻度數字</b>——它被硬編碼關閉，而既有的「teaching ticks」補救機制在 ch01 <u>實測一個都沒用</u>。</li>
+      <li><b>缺口 B（方程式標籤位置）</b>：placement 是啟發式 ＋ 幾乎全靠<b>手填 <code>label_point</code> 硬擺</b>（字面意義的「憑感覺」），而且 <code>sizecheck</code> 的重疊偵測<b>故意豁免</b>整個圖層，所以「標籤撞標籤／撞註解」<u>機器完全不擋</u>，只能等 render 後 VLM 事後抓。</li>
+    </ul>
+    <b>我的建議優先序：</b><span class="pill-rec">先做 B.1 偵測器</span>（高把握、外科、補真洞）→ 再評估 A 的條件式 lint <span class="pill-later">次之</span>；<b>B.2 自動擺位暫不做</b>（投機、複雜）。本文件詳述根因與三種修法，供你裁決。
+  </div>
+
+  <h2>1 · 現況診斷（附依據）</h2>
+
+  <div class="card bad">
+    <h3>1.1　軸線一直畫，但刻度數字被硬編碼關閉</h3>
+    <p><code>build()</code> 永遠建 <code>Axes</code> 並當 block 加入場景，預設還在軸尖標 <span class="acc">x／y</span> 字母。所以「沒有軸」是錯覺——真正缺的是<b>刻度與級距數字</b>：</p>
+    <pre><code>axes = Axes(
+    x_range=[-1.45, 1.45, 0.5],   # 預設；可被 storyboard 覆寫
+    y_range=[-0.28, 1.55, 0.25],
+    axis_config={
+        "include_ticks":   False,   # ← 沒有刻度短線
+        "include_numbers": False,   # ← 沒有級距數字
+    },
+)</code></pre>
+    <p class="src">graph_focus.py:376–391（軸建構）· :393 <code>_add_axis_labels</code>（x／y 字母，<code>axis_labels: false</code> 可關）· :385–386（刻度／數字硬關）</p>
+  </div>
+
+  <div class="card warn">
+    <h3>1.2　補救機制存在，但實測沒在用</h3>
+    <p>已有 opt-in 的「teaching ticks」：在 axes 區塊寫 <code>x_ticks: [{at, label}]</code> 就會在指定座標放<b>幾個關鍵刻度</b>（例如在 $x=a$ 標 $a$、在 $y$ 軸標 $L$）。docstring 明寫用意是「讓一張沒數字的圖仍保有尺度感」。</p>
+    <p><b>但掃過 ch01 全章 storyboard：<code>x_ticks</code>／<code>y_ticks</code> 使用次數＝0。</b>定位幾乎全靠 <code>label_point</code>。所以圖真的是「無刻度、無尺度錨點」的。</p>
+    <p class="src">graph_focus.py:82–103 <code>_axis_ticks</code>（機制本體）· storyboards/ch01_inverse_trig_functions.yml（grep x_ticks/y_ticks → 0 hit）</p>
+  </div>
+
+  <div class="card bad">
+    <h3>1.3　標籤位置：啟發式 ＋ 手填座標（這就是「憑感覺」）</h3>
+    <p><code>_place_function_label</code> 是一條 fallback 鏈，<b>沒有任何碰撞避讓</b>：</p>
+    <pre><code>label_point（顯式座標） → label_x（沿曲線某 x） → 曲線尾端 → next_to(graph, side)</code></pre>
+    <p>實務上幾乎每個標籤都靠手填 <code>label_point: [x, y]</code> 硬擺。真實例子——一張直角三角形圖，三條邊的標籤座標全是肉眼喬出來避開彼此的：</p>
+    <pre><code>- { kind: line, ..., label: '$1$',        label_point: [3.22, 0.90] }
+- { kind: line, ..., label: '$3$',        label_point: [1.35, 1.12] }
+- { kind: line, ..., label: '$2\sqrt{2}$', label_point: [1.45, 0.16] }
+- { kind: point, ..., label: '$\theta$',  label_point: [0.55, 0.62] }</code></pre>
+    <p class="src">graph_focus.py:142–166 <code>_place_function_label</code> · storyboards/ch01_inverse_trig_functions.yml:209–212</p>
+  </div>
+
+  <div class="card bad">
+    <h3>1.4　關鍵根因：<code>sizecheck</code> 的重疊偵測「故意」豁免整個圖層</h3>
+    <p>所有 plot block（含 <code>label.N</code>）在組裝時被改成 <code>layer="graph"</code>；而重疊偵測 <code>_overlap_issues</code> <b>只檢查 <code>content</code> 層</b>。等於把圖內所有東西都排除在碰撞偵測之外。</p>
+    <pre><code># graph_focus.py:404–405 — 把整組 plot 標成 graph 層
+for b in plot_blocks:
+    b.layer = "graph"
+
+# sizecheck.py:149 — 只查 content 層
+if getattr(b, "layer", "content") != "content":
+    continue   # graph 層直接跳過</code></pre>
+    <p><b>本意</b>是放行軸空間裡「合理的重合」（點落在曲線上、虛線導引穿過交點、標籤緊貼曲線）。<b>代價</b>是它順手把「<span class="bad">標籤撞標籤、標籤撞註解</span>」這類<u>真 bug</u> 也一起放行了——這類只能等 render 後 VLM 視覺幀稽核（<code>V1–V8</code>「label 不可壓線／相撞」）事後抓，再回頭手補 <code>label_point</code>。</p>
+    <p class="mut" style="font-size:13px">註：<code>_overflow_issues</code>（出框檢查）對每個 block 都跑，所以標籤<b>掉出畫面</b>仍會被擋；只有「畫面內互相重疊」這一類是盲區。</p>
+    <p class="src">graph_focus.py:404–405 · sizecheck.py:133–180 <code>_overlap_issues</code> · :63–107 <code>_overflow_issues</code> · DESIGN.md:364（VLM gate「graph label 不可壓線」）</p>
+  </div>
+
+  <h2>2 · 缺口 A 提案 — 刻度／級距「條件式規範」</h2>
+
+  <div class="card">
+    <p class="lead"><b>主張：不要一刀切「永遠標數字」。</b>乾淨無數字軸是<u>刻意的 house style</u>（3b1b 風格），對「形狀類」圖是對的；標滿數字反而是雜訊。缺陷只出在「讀值類」圖。</p>
+    <table>
+      <tr><th>圖的類型</th><th>判準</th><th>刻度規則</th><th>例</th></tr>
+      <tr><td><b>qualitative</b>（形狀）</td><td>旁白只談形狀／趨勢／對稱／單調，不指名具體座標</td><td>維持無刻度（現狀）</td><td>反函數對 $y=x$ 對稱、漸近線行為</td></tr>
+      <tr><td><b>quantitative</b>（讀值）</td><td>旁白指名某座標或要讀值（「在 $x=a$」「值為 $L$」「$\arccos 1 = 0$」）</td><td><b>必須</b>在那些座標放 teaching-tick</td><td>$\sin\theta=\tfrac13$ 求 $\tan\theta$、極限讀值</td></tr>
+    </table>
+    <p><b>落地：</b></p>
+    <ul>
+      <li><b>(A-1) 成文：</b>把上表寫進 <code>DESIGN.md</code> §graph（現在只是 docstring，未成文）。</li>
+      <li><b>(A-2) lint：</b>storyboard 旁白若出現座標引用（<code>x=…</code>／<code>值為…</code>／命名點），而對應 plot 的 axes 區塊沒有對應 <code>x_ticks</code>／<code>y_ticks</code> → <span class="warn">warn</span>。把「該標沒標」從靠記性變成機器提醒。</li>
+    </ul>
+    <p class="mut" style="font-size:13px"><b>取捨／風險：</b>A-2 的「旁白指名座標」靠正則偵測，會有偽陽／偽陰；定位成 <span class="warn">warn</span>（不 block render）較安全。判準本身偏內容判斷、非純工程，建議先 A-1 成文、A-2 視情況再上。</p>
+  </div>
+
+  <h2>3 · 缺口 B 提案 — 標籤位置「用偵測器補洞」</h2>
+
+  <div class="card ok">
+    <h3>B.1　收窄 graph 層豁免，補上標籤重疊偵測　<span class="pill-rec">建議優先做</span></h3>
+    <p><span class="k">改什麼</span>放寬 §1.4 那條全域豁免：<b>曲線／點／帶狀仍豁免</b>（合理重合），但 <code>label.N</code> 區塊<b>要</b>互相查重疊、也要對 <code>annotation.N</code> 查重疊。</p>
+    <p><span class="k">怎麼做</span>給標籤 block 一個可辨識的子層（如 <code>layer="graph_label"</code>），<code>_overlap_issues</code> 納入 <code>graph_label</code>＋<code>content</code> 一起兩兩比 AABB，沿用既有的 <code>OVERLAP_FRAC=0.20</code> 門檻與 containment 例外。</p>
+    <p><span class="k">為何best</span>render 前、<b>確定性</b>、<b>免費</b>地擋下整類 bug，正好補掉現在只能靠 VLM 事後抓的洞。改動集中在 <code>sizecheck.py</code> 的層判斷 ＋ <code>graph_focus.py</code> 標籤 block 的 <code>layer</code> 賦值，外科手術級。</p>
+    <p><span class="k">驗收</span>先寫一個能重現「兩標籤重疊」的 storyboard fixture（紅燈），改完讓它亮 warn（綠燈），且既有 ch01 不誤報。</p>
+    <p class="src">動到：sizecheck.py:133–180 · graph_focus.py:256–262 / 308–314 / 331–337（label block 的 layer）</p>
+  </div>
+
+  <div class="card warn">
+    <h3>B.2　標籤自動擺位（occupancy 取重疊最小）　<span class="pill-later">暫不做</span></h3>
+    <p>給每個標籤一組候選位（曲線尾端的上／下／左／右、或沿曲線取樣數個 $x$），選與「已擺元素」重疊最小者，減少手填 <code>label_point</code>。這正是 <code>CODE2VIDEO_STUDY.md</code> 已提到的 occupancy-table 概念。</p>
+    <p class="mut" style="font-size:13px"><b>為何先不做：</b>較複雜、較投機（Karpathy §2「簡單優先」）。B.1 先把「壞了會被抓到」做起來，自動擺位是「讓它更少壞」的加值，等 B.1 上線、看實際還剩多少手調量再決定。</p>
+  </div>
+
+  <div class="card">
+    <h3>B.3　最小版：只成文「多曲線圖建議顯式 <code>label_point</code>」</h3>
+    <p>純文件，不改 code。把現行最佳實務寫進 DESIGN.md。<b>不建議單獨採用</b>——它沒補上 §1.4 的偵測盲區，問題照樣只能事後抓。可作為 B.1 的附帶文件。</p>
+  </div>
+
+  <h2>4 · 建議落地順序 ＋ 待你裁決</h2>
+  <div class="card">
+    <ol style="padding-left:20px;font-size:14px;line-height:1.8">
+      <li><b>B.1 偵測器</b>（外科、高把握）＋ 其驗收 fixture。同一輪把 DESIGN.md §graph 補上「標籤重疊由 sizecheck 把關」一句。</li>
+      <li><b>A-1 成文</b> qualitative／quantitative 判準與刻度規則進 DESIGN.md。</li>
+      <li>視情況：<b>A-2 lint</b>（座標引用 ↔ teaching-tick）。</li>
+      <li>觀察後再評估：<b>B.2 自動擺位</b>。</li>
+    </ol>
+    <p class="mut" style="font-size:13px">三項可逐項採納／否決。任一項一旦你拍板，實作後我會比照規範回歸驗證（重跑 sizecheck／render ch01 不誤報），結果附回本檔。</p>
+  </div>
+
+  <div class="foot">
+    依 CLAUDE.md「待裁決交付物用 standalone HTML（雙擊即開、數學即渲染）」產出 · 本檔不改任何 code，僅供你過目裁決 · 引用之 file:line 均對應現行樹原始碼
+  </div>
+
+</div></body></html>
