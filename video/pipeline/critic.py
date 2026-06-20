@@ -13,7 +13,7 @@ VISUAL-FRAME-RUBRIC.md every render; gate 2 (this, MiMo-V2.5) runs intermittentl
 before lock to cover gate 1's model blind spots. Both judge against the SAME SSOT
 rubric, which this script injects VERBATIM into the prompt -- the dimensions live
 only in VISUAL-FRAME-RUBRIC.md, never a second copy here. Convergence = visual
-Blocking (V1-V8) == 0; A1-A7 are 0-100 magnitude that drive re-render priority.
+Blocking (V1-V9) == 0; A1-A7 are 0-100 magnitude that drive re-render priority.
 
 Why frames, not the whole video: a content scene's reveal is additive (scene.py
 _play_content), so the end of each beat is the fullest composition up to that
@@ -94,7 +94,7 @@ def load_rubric() -> str:
     try:
         return RUBRIC_PATH.read_text(encoding="utf-8").strip()
     except OSError:
-        return ("(VISUAL-FRAME-RUBRIC.md not found; judge V1-V8 visual blocking "
+        return ("(VISUAL-FRAME-RUBRIC.md not found; judge V1-V9 visual blocking "
                 "and score A1-A7 magnitude 0-100.)")
 
 
@@ -267,7 +267,7 @@ def build_prompt(item: dict, rubric: str) -> str:
     """The text half of one critique request (the frame image travels alongside).
     Injects VISUAL-FRAME-RUBRIC.md VERBATIM (the single source of the dimensions,
     the blocking line, and the 'not a finding' list) and asks for strict JSON:
-    V1-V8 blocking findings + A1-A7 magnitude scores, so the report is
+    V1-V9 blocking findings + A1-A7 magnitude scores, so the report is
     machine-collatable. Two framings: a final-frame critique (judge the finished
     composition) vs a mid-beat critique (emptiness is expected)."""
     if item.get("final"):
@@ -300,7 +300,7 @@ def build_prompt(item: dict, rubric: str) -> str:
         "\n=== END RUBRIC ===\n\n"
         + ctx +
         "\nNow judge THIS frame.\n"
-        "- Layer 1 (V1-V8): for each visual issue cite the V-code and mark "
+        "- Layer 1 (V1-V9): for each visual issue cite the V-code and mark "
         "Blocking vs Advisory per the escalation rule -- loses info / contradicts "
         "the beat / garbled or missing math -> Blocking; merely cramped or unclear "
         "-> Advisory (score it in Layer 2 instead). Count the Blocking ones.\n"
@@ -311,7 +311,7 @@ def build_prompt(item: dict, rubric: str) -> str:
         "frame is a valid result -- do not over-report.\n\n"
         "Return STRICT JSON only:\n"
         '{"visual_blocking_count":int,'
-        '"v_findings":[{"code":"V1..V8","severity":"Blocking|Advisory",'
+        '"v_findings":[{"code":"V1..V9","severity":"Blocking|Advisory",'
         '"where":str,"issue":str,"why":str,"suggestion":str}],'
         '"scores":{"a1_element_layout":int,"a2_attractiveness":int,'
         '"a3_logic_flow":int,"a4_visual_consistency":int,"a5_accuracy_depth":int,'
@@ -408,7 +408,7 @@ def critique_frame(item: dict, *, base_url: str, api_key: str, model: str, rubri
 
 def _write_md(results: list[dict], path: Path) -> None:
     out = ["# Visual-frame critique (MiMo-V2.5, gate 2) -- advisory report\n",
-           "> Convergence = visual Blocking (V1-V8) == 0. A1-A7 are 0-100 "
+           "> Convergence = visual Blocking (V1-V9) == 0. A1-A7 are 0-100 "
            "magnitude (drive re-render priority; advisory, do not gate).\n"]
     for r in results:
         lab = "final frame" if r.get("final") else f"beat {r['beat_index']:02d}"

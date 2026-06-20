@@ -154,6 +154,61 @@ def _hollow_on_curve(data: dict) -> "list[tuple[str, str]]":
     return out
 
 
+def _axes_has_ticks(axes: dict) -> bool:
+    return isinstance(axes, dict) and (bool(axes.get("x_ticks")) or bool(axes.get("y_ticks")))
+
+
+def _marks_specific_point(plots) -> bool:
+    """A ``kind: point`` at a non-origin coordinate -- the scene is calling out a
+    specific value, which a number-less axis leaves unanchored."""
+    for p in plots or []:
+        if not isinstance(p, dict) or p.get("kind") != "point":
+            continue
+        try:
+            if any(abs(float(c)) > 1e-9 for c in p.get("point", [])):
+                return True
+        except (TypeError, ValueError):
+            continue
+    return False
+
+
+def _quantitative_without_scale(data: dict) -> "list[tuple[str, str]]":
+    """Warn: a graph scene marks a specific coordinate (a ``kind: point``) but its
+    axes carry no teaching-ticks, so the cited value is not anchored to any readable
+    scale -- the deterministic half of "gap A" (DESIGN.md graph "axis ticks: when to
+    show"). Either add ``x_ticks``/``y_ticks`` for those values, or confirm the plot
+    is purely qualitative (shape only).
+
+    Advisory only: the qualitative/quantitative call is a judgement and the value may
+    be carried by a point label, so this never blocks the render. The narration-
+    semantic half (a value the narration asks you to read off, with no marker) is left
+    to the visual-frame critic's V9 -- a regex over prose is too noisy here. Covers
+    graph_focus (top-level axes/plots) and graph_compare (left/right panels)."""
+    out: list[tuple[str, str]] = []
+    for si, scene in enumerate(data.get("scenes", []) or []):
+        tmpl = scene.get("template")
+        if tmpl == "graph_focus":
+            panels = [("", scene.get("axes", {}) or {}, scene.get("plots", []) or [])]
+        elif tmpl == "graph_compare":
+            panels = [(f"{k} ", (scene.get(k, {}) or {}).get("axes", {}) or {},
+                       (scene.get(k, {}) or {}).get("plots", []) or [])
+                      for k in ("left", "right")]
+        else:
+            continue
+        sid = scene.get("id", f"scenes[{si}]")
+        for prefix, axes, plots in panels:
+            if _axes_has_ticks(axes):
+                continue
+            if _marks_specific_point(plots):
+                out.append(("warn",
+                    f"{sid}: {prefix}graph marks a specific point but its axes have "
+                    f"no x_ticks/y_ticks -- the coordinate is not anchored to a "
+                    f"readable scale. Add teaching-ticks for those values, or confirm "
+                    f"it is a qualitative shape plot (DESIGN.md graph 'axis ticks: "
+                    f"when to show')."))
+    return out
+
+
 def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
     """Return a list of (severity, message); severity is 'error' or 'warn'.
     'error' aborts the render (broken output); 'warn' is advisory (has rare
@@ -190,6 +245,7 @@ def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
                 f"auto-wraps at the column width; remove it unless the break is "
                 f"deliberate. Got: {_snippet(text)!r}"))
     issues += _hollow_on_curve(data)
+    issues += _quantitative_without_scale(data)
     return issues
 
 
