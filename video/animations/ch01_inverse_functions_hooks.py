@@ -140,6 +140,12 @@ def can_we_run_it_backwards(spec, ctx, blocks):
     layout = VGroup(statement, diagrams).arrange(DOWN, buff=0.8)
     _centre_in_zone(title, layout)
 
+    # Name the concept the right diagram (g(x)=x^2) illustrates: two inputs collide
+    # to one output. Revealed at the convergence pause, in warning coral to match the
+    # Indicate flash (addresses the §1.1 visual-frame A5 finding: collision unlabelled).
+    mt_label = brand.math_line(r"\text{many-to-one}", ground, role="warning", size="label")
+    mt_label.next_to(right_outs[0], DOWN, buff=0.4)
+
     def play_left(scene, mob, g):
         scene.play(FadeIn(left_cap, shift=0.1 * UP), *[FadeIn(m) for m in left_ins], run_time=0.5)
         spent = 0.5
@@ -153,8 +159,9 @@ def can_we_run_it_backwards(spec, ctx, blocks):
         scene.play(FadeIn(right_cap, shift=0.1 * UP), *[FadeIn(m) for m in right_ins], run_time=0.5)
         scene.play(GrowArrow(right_arrows[0]), FadeIn(right_outs[0]), run_time=0.45)
         scene.play(GrowArrow(right_arrows[1]), run_time=0.45)
-        # the convergence pause: one output, two claimants
-        scene.play(Indicate(right_outs[0], color=T.color(g, "warning"), scale_factor=1.25), run_time=0.6)
+        # the convergence pause: one output, two claimants -- and name the concept
+        scene.play(Indicate(right_outs[0], color=T.color(g, "warning"), scale_factor=1.25),
+                   FadeIn(mt_label, shift=0.1 * UP), run_time=0.6)
         scene.add(mob)
         return 2.0
 

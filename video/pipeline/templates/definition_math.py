@@ -78,7 +78,15 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     if statement is not None:
         parts.append(statement)
     if math_mobs:
-        parts.append(VGroup(*math_mobs).arrange(DOWN, buff=0.5))
+        stack = VGroup(*math_mobs)
+        # Math lines centre by default; opt-in per scene with `math_align: left`
+        # (left edges flush) -- used where the lines read as statements, not display
+        # equations. Other scenes are untouched (default stays centred).
+        if spec.get("math_align") == "left":
+            stack.arrange(DOWN, buff=0.5, aligned_edge=LEFT)
+        else:
+            stack.arrange(DOWN, buff=0.5)
+        parts.append(stack)
     if parts:
         content = VGroup(*parts).arrange(DOWN, buff=0.9)
         zone_top = title.get_bottom()[1] - 0.55
