@@ -22,24 +22,23 @@ meta:
 
 scenes:
 
-  # 1 ------------- example_walkthrough:換行長文字 + 疊式分數,逼列距撐開
+  # 1 ------------- derivation:疊式分數 math 逼列距撐開（取代退場的 example_walkthrough）
   - id: walkthrough_tall
     kind: content
-    template: example_walkthrough
+    template: derivation
     accent: example
     source: "列高壓測(合成例,非講義內容)"
-    title: "Walkthrough With Tall Rows"
+    title: "Derivation With Tall Rows"
     say: |
       Each step here is deliberately tall, so the rows must expand.
-      {show math.0} A long wrapped reasoning sentence beside a stacked fraction.
-      {show math.1} Another tall pair right below it.
-      {show math.2} And a short closing step.
-      {show takeaway} Rows expanded, nothing collided.
+      {show step.0} A stacked fraction in the first row.
+      {show step.1} Another tall pair right below it.
+      {show step.2} And a short closing step.
+      Rows expanded, nothing collided.
     steps:
-      - { text: "Write the difference quotient for the function and keep every term visible so nothing is lost along the way.", math: "\\dfrac{\\dfrac{1}{2+h} - \\dfrac{1}{2}}{h}" }
-      - { text: "Combine the two fractions in the numerator over a common denominator before any cancellation is attempted.", math: "\\dfrac{\\dfrac{-h}{2(2+h)}}{h}", hot: true }
-      - { text: "Cancel the factor of h.", math: "-\\dfrac{1}{2(2+h)}", mark: ok }
-    takeaway: "Tall rows push the next row down instead of colliding with it."
+      - { math: "\\dfrac{\\dfrac{1}{2+h} - \\dfrac{1}{2}}{h}", reason: "difference quotient" }
+      - { math: "\\dfrac{\\dfrac{-h}{2(2+h)}}{h}", reason: "common denominator" }
+      - { math: "-\\dfrac{1}{2(2+h)}", reason: "cancel $h$", mark: ok }
 
   # 2 --------------------- procedure_steps:超長步驟文字(換行 4-5 行)
   - id: procedure_tall

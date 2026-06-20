@@ -138,9 +138,9 @@ def check_latex() -> None:
         else:
             record(WARN, "LaTeX", f"{name} 不在 PATH（選用）", remedy)
 
-    # video 數學自 Direction D 重設計（2026-06-20）起改 Computer Modern（manim 預設模板內建），
-    # _bootstrap.py 全域 TeX template 不再 \usepackage{newtxtext}/{newtxmath}。CM 不需額外套件，
-    # 故此處不再檢查 newtx（newtx 僅 legacy/tex_handout 需要，已凍結、不在 doctor 範圍）。
+    # video 數學用 newtxtext/newtxmath（Times；2026-06-20 字型自 Direction D 的 CM revert 回 Times
+    # New Roman 後）；_bootstrap.py 全域 TeX template \usepackage 它們。MiKTeX 首次編譯會自動補裝
+    # newtx，故此處不單獨硬檢查（latex/dvisvgm 在即可）；newtx 同時也是 legacy/tex_handout 的需求。
 
 
 # ── ④ handout HTML 圖 render：Node ≥21 + Chrome（shot.mjs）──────────────
@@ -214,20 +214,19 @@ def check_assets() -> None:
         record(WARN, "assets", "內附字型缺", f"預期在 {fonts}（應隨 git 而來；git status 檢查是否誤刪）")
 
 
-# ── ⑥b Direction D 設計字型可見性（manimpango 是否認得，否則 render 靜默 fallback）──
+# ── ⑥b 影片字型可見性（manimpango 是否認得，否則 render 靜默 fallback）──
 
 def check_fonts() -> None:
-    """Direction D 用 Inter Tight（標題/散文）+ JetBrains Mono（eyebrow/標籤），vendored 於
-    video/pipeline/assets/fonts/、由 _bootstrap.register_design_fonts() 進程內註冊。Pango 找不到
-    字型會「靜默」換預設字體（render 不報錯、但畫面字體錯），故這裡主動驗 manimpango 看不看得到。"""
+    """影片用 Times New Roman（標題/散文）+ Courier New（eyebrow/標籤），均為 Windows 系統字型
+    （2026-06-20 字型 revert，自 Direction D 的 Inter Tight/JetBrains Mono 改回）。Pango 找不到
+    字型會「靜默」換預設字體（render 不報錯、但畫面字體錯），故這裡主動驗 manimpango 看不看得到。
+    （Direction D 的 vendored 設計字型已於同日 Times revert 一併移除——影片不再 vendored 任何字型。）"""
     if not VENV_PY.exists():
         return  # check_python_and_venv 已報 .venv 缺
     probe = (
-        "import sys; sys.path.insert(0, r'%s')\n" % (REPO / "video")
-        + "from pipeline import _bootstrap; _bootstrap.register_design_fonts()\n"
         "import manimpango, json\n"
         "fs={f.lower() for f in manimpango.list_fonts()}\n"
-        "print(json.dumps({f: (f.lower() in fs) for f in ['Inter Tight','JetBrains Mono']}))\n"
+        "print(json.dumps({f: (f.lower() in fs) for f in ['Times New Roman','Courier New']}))\n"
     )
     rc, out = _run([str(VENV_PY), "-c", probe])
     seen: dict[str, bool] = {}
@@ -237,16 +236,16 @@ def check_fonts() -> None:
         except Exception:
             pass
     if not seen:
-        record(WARN, "fonts", "無法探測設計字型可見性",
-               "manimpango 探測失敗；確認 .venv 有 ManimPango，且 video/pipeline/assets/fonts/ 有 TTF")
+        record(WARN, "fonts", "無法探測影片字型可見性",
+               "manimpango 探測失敗；確認 .venv 有 ManimPango")
         return
-    for fam in ("Inter Tight", "JetBrains Mono"):
+    for fam in ("Times New Roman", "Courier New"):
         if seen.get(fam):
             record(PASS, "fonts", f"{fam} 可見", "manimpango 認得（render 不會 fallback）")
         else:
             record(FAIL, "fonts", f"{fam} 不可見",
-                   "Direction D render 會靜默換預設字體。確認 vendored TTF 在 "
-                   "video/pipeline/assets/fonts/（隨 git）；必要時系統安裝該字型")
+                   "影片 render 會靜默換預設字體。Times New Roman／Courier New 是 Windows 系統字型，"
+                   "正常 Windows 應內建；非 Windows 機需另行系統安裝該字型")
 
 
 # ── ⑦ API 金鑰（per-machine 祕鑰；未設不算錯，只是提示）────────────────
@@ -306,7 +305,7 @@ def print_report(as_json: bool) -> int:
     video_ok = not any(_missing("Python", x) for x in ("PyYAML", "manim", "ManimPango", "pillow")) \
         and not _missing("LaTeX", "latex") and not _missing("LaTeX", "dvisvgm") \
         and not _missing("ffmpeg", "ffmpeg") and not _missing("ffmpeg", "ffprobe") \
-        and not _missing("fonts", "Inter Tight") and not _missing("fonts", "JetBrains Mono")
+        and not _missing("fonts", "Times New Roman") and not _missing("fonts", "Courier New")
     handout_fig_ok = not _missing("handout", "node") and not _missing("handout", "< 21") \
         and not _missing("handout", "Chrome")
     print("\n能力摘要\n" + "─" * 64)

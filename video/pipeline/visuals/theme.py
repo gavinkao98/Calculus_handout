@@ -1,8 +1,9 @@
-"""Design system: NTU Calculus Video System — Direction D (sans UI + CM math).
+"""Design system: NTU Calculus Video System — Direction D layout, Times serif type.
 
 Port of the redesign (the "Manim Video Design System" handoff): a 3Blue1Brown-style
-dark glowing teaching ground, four semantic accents, Inter-Tight sans headings/prose,
-and Computer Modern math — the modern science-explainer sans/serif contrast.
+dark glowing teaching ground, four semantic accents, and Times New Roman serif type
+throughout (headings/prose + newtx math) — the classic textbook look (the Direction D
+Inter Tight / CM type was reverted to Times on 2026-06-20).
 
 Tokens (colour, type scale, geometry, glow) mirror the redesign's tokens/*.css.
 
@@ -10,10 +11,10 @@ Two grounds:
 - DARK  -> teaching frames (definition/derivation/theorem/procedure/graph/...)
 - PAPER -> brand frames (intro / divider / outro), warm #f4f1e9 with the NTU lockup
 
-Fonts (Direction D): headings + prose use "Inter Tight" (Pango); labels/eyebrows use
-"JetBrains Mono"; math (MathTex/Tex) uses Computer Modern (manim's default template,
-newtx dropped in _bootstrap._set_tex_template). The TTFs are vendored under
-pipeline/assets/fonts and registered process-locally by _bootstrap.register_design_fonts.
+Fonts (Times revert, 2026-06-20): headings + prose use "Times New Roman" (Pango);
+labels/eyebrows use "Courier New"; math (MathTex/Tex) uses newtxtext/newtxmath (set in
+_bootstrap._set_tex_template). All are Windows system fonts / a LaTeX package -- nothing
+is vendored (Direction D's vendored Inter Tight / JetBrains Mono / CM were removed).
 
 Colour contract (reference SEMANTIC roles, not raw hues):
 - blue   -> definitions, default curve, default highlight     (role secondary / blue)
@@ -30,26 +31,25 @@ only blocks.ACCENT_ROLE needed remapping.
 from __future__ import annotations
 
 # -- fonts (Pango family names) -------------------------------------------
-# Direction D: Inter Tight sans for display + prose, JetBrains Mono for labels.
-FONT_DISPLAY = "Inter Tight"
-FONT_BODY = "Inter Tight"
-FONT_MONO = "JetBrains Mono"
+# Times New Roman serif for display + prose, Courier New for labels (font revert
+# from Direction D's Inter Tight / JetBrains Mono, 2026-06-20 per user request).
+FONT_DISPLAY = "Times New Roman"
+FONT_BODY = "Times New Roman"
+FONT_MONO = "Courier New"
 
 # -- type scale -----------------------------------------------------------
 # tokens give px @ 1920x1080. manim font_size is its own unit; PX_TO_FS converts.
-# Re-measured for Inter Tight: a Times "H" was 0.00920 u/fs, Inter Tight is 0.01011
-# (≈10% taller per fs), so the old 0.72 (Times) over-sizes. 0.72*0.920/1.011 = 0.655
-# keeps a given design-px at the same physical size across the font swap; the larger
-# Direction-D px scale (h1 62->82) then gives the intended bigger type. One global knob.
-PX_TO_FS = 0.655
+# Calibrated for Times New Roman (a Times "H" is ~0.00920 u/fs). One global knob —
+# retune if fonts change (Direction D's Inter Tight needed 0.655; Times uses 0.72).
+PX_TO_FS = 0.72
 
 # manim renders Text (Pango) and Tex/MathTex (LaTeX) at *different* visual sizes for
-# the same font_size. Re-measured for Inter Tight vs Computer Modern text-mode: an
-# Inter-Tight "Rg" is 1.42x a CM \text{Rg} at equal font_size. So prose rendered via
-# Tex (the inline-$math$ path) must be scaled up by this to size-match the plain
-# Inter-Tight prose beside it. Pure math (math_line/MathTex) is its own size role,
-# left unscaled. One global knob — retune if fonts change.
-TEX_TEXT_SCALE = 1.42
+# the same font_size. For Times New Roman (Pango) vs newtxtext (LaTeX text-mode), a
+# Times "Rg" is 1.36x a newtx \text{Rg} at equal font_size. So prose rendered via Tex
+# (the inline-$math$ path) must be scaled up by this to size-match the plain Times
+# prose beside it. Pure math (math_line/MathTex) is its own size role, left unscaled.
+# One global knob — retune if fonts change (Direction D's Inter Tight needed 1.42).
+TEX_TEXT_SCALE = 1.36
 
 # Density B px @ 1920x1080. New Direction-D names + back-compat aliases (old callers
 # pass these; most per-frame sizes are raw px overrides via fs(<number>)).

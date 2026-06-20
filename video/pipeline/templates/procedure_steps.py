@@ -48,7 +48,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     y = top
     prev_half = None
     for i, st in enumerate(steps):
-        # zero-padded blue numeral (01/02/03) with a soft blue glow, Inter Tight bold.
+        # zero-padded blue numeral (01/02/03) with a soft blue glow, Times New Roman bold.
         numeral = brand.text_glow(
             Text(f"{i + 1:02d}", font=T.FONT_DISPLAY, weight="BOLD",
                  font_size=T.fs("numeral"), color=T.color(ground, "secondary")),

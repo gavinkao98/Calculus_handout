@@ -24,8 +24,8 @@ python tools\doctor.py
 |---|---|---|
 | **① Python 套件** | 共用 `.venv`（manim 0.20.1、PyYAML、ManimPango、Pillow、imageio-ffmpeg、fonttools、pymupdf…） | `setup.ps1` 從 [`requirements.lock`](requirements.lock) 精確重現 |
 | **② 系統 binary** | `ffmpeg`、`ffprobe` | 每台 `winget install --id Gyan.FFmpeg -e`（**含 ffprobe**） |
-| **③ LaTeX** | MiKTeX：`latex`、`dvisvgm`（video 數學自 2026-06-20 起改 **Computer Modern**，不再需要 `newtx*`） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法） |
-| **①b 設計字型** | Inter Tight（標題/散文）+ JetBrains Mono（eyebrow/標籤）+ Computer Modern（`cmun*.otf`，數學 fallback） | **vendored** 於 [`video/pipeline/assets/fonts/`](video/pipeline/assets/fonts)，由 `_bootstrap.register_design_fonts()` 進程內註冊——隨 git 走、**無需每台安裝** |
+| **③ LaTeX** | MiKTeX：`latex`、`dvisvgm` + `newtxtext`/`newtxmath`（video 數學 Times，2026-06-20 字型 revert 後；MiKTeX 首編自動補裝） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法） |
+| **①b 影片字型** | **Times New Roman**（標題/散文）+ **Courier New**（eyebrow/標籤）= Windows 系統字型；數學走 newtx（LaTeX，見 ③） | Windows 內建、無需安裝。（Direction D 的 Inter Tight/JetBrains Mono 仍 vendored 於 [`video/pipeline/assets/fonts/`](video/pipeline/assets/fonts) 但目前未用——換回時即可用） |
 | **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/_render/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **祕鑰** | `MIMO_API_KEY` / `GEMINI_API_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` | per-machine 設環境變數；**不進版控**（計費 API，依 [`CLAUDE.md`](CLAUDE.md) 徵同意） |
@@ -74,18 +74,17 @@ winget install Google.Chrome
 
 ### ③ LaTeX — MiKTeX，沒有 code 繞法
 - manim 的每個 `Tex`／`MathTex` 都要走真 TeX：`latex → .dvi → dvisvgm → svg`。
-- `pipeline/_bootstrap.py` 設的全域 TeX template 自 2026-06-20（Direction D 重設計）起用 **Computer Modern**
-  （manim 預設模板，amsmath 隨附），只額外 `\DeclareMathOperator` 三個反三角 operator；**不再 `\usepackage{newtxtext}`／`{newtxmath}`**。
-  Direction D 刻意讓「Inter Tight sans 標題 + CM serif 數學」形成對比；newtx 僅 `legacy/tex_handout/` 還需要（已凍結、不在 doctor 範圍）。
+- `pipeline/_bootstrap.py` 設的全域 TeX template 用 **`newtxtext` + `newtxmath`**（Times 風數學，2026-06-20 字型自
+  Direction D 的 CM revert 回 Times New Roman 後），外加 `\DeclareMathOperator` 三個反三角 operator。MiKTeX 首次編譯
+  會自動補裝 newtx；newtx 同時也是 `legacy/tex_handout/` 的需求。
 - handout 的 HTML 講義**不需要** LaTeX（數學走 MathJax/KaTeX CDN）；只有 `video/` render 需要。
 
-### ①b 設計字型 — vendored，隨 git 走、無需每台安裝
-- Direction D 用 **Inter Tight**（標題/散文，weight 400/500/600/700 + italic）、**JetBrains Mono**（eyebrow/標籤，400/500/600）、
-  **Computer Modern Unicode**（`cmun*.otf`，數學 Pango fallback）。三套都 vendored 於 [`video/pipeline/assets/fonts/`](video/pipeline/assets/fonts)。
-- `_bootstrap.register_design_fonts()` 於 import 時用 `manimpango.register_font()` **進程內**註冊該目錄所有 `*.ttf/*.otf`，
-  所以**換機只要 git pull 就有字型、不必系統安裝**；`doctor.py` 會驗 manimpango 是否看得到 `Inter Tight`／`JetBrains Mono`。
-- Inter Tight／JetBrains Mono 由 Google Fonts 可變字型（`google/fonts`）以 `fonttools` instancer 抽成各 weight 靜態 TTF
-  （靜態實例的 weight 命名讓 Pango 選重穩定），再放進 vendored 目錄。要新增 weight 時比照辦理。
+### ①b 影片字型 — Times New Roman / Courier New（Windows 系統字型）
+- 影片目前用 **Times New Roman**（標題/散文）+ **Courier New**（eyebrow/標籤），皆 Windows 內建系統字型、**無需安裝**；
+  數學走 LaTeX newtx（見 ③）。`doctor.py` 驗 manimpango 看不看得到 `Times New Roman`／`Courier New`（Pango 找不到會靜默 fallback）。
+- **影片不再 vendored 任何字型。** Direction D 的 vendored 設計字型（Inter Tight／JetBrains Mono／Computer Modern `cmun*.otf`）
+  與 `_bootstrap.register_design_fonts()` 已於 2026-06-20 Times revert 的「舊設計清理」中**移除**（`video/pipeline/assets/fonts/` 已刪）。
+  `fonttools` 仍是依賴（logo 外框工具 `pipeline/assets/_outline_text.py` 用）。
 
 ### ④ Node + Chrome — 只給 handout 圖 render 用
 - [`handout/build.py`](handout/build.py) 組裝 HTML 是**純 Python stdlib**，任何 python 都能跑、無額外需求。

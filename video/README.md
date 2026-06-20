@@ -50,7 +50,7 @@ video/
   storyboards/         Stage 2 工程稿（進版控）
     _demo_*.yml        模板示範／回歸樣本（asymptote／derivation／graph_compare／sign_chart／…）
     <deck>.yml         逐節正式 storyboard（依方法論產生）
-  design_handoff/      設計交付參考（進版控；DESIGN_BRIEF、from_designer/、tokens、參考截圖）
+  pipeline/assets/brand/  NTU logo 向量源（icon／lockup ×3 色；進版控）
   output/              ★ render 成品（gitignored，可重生），按 ch<NN>/s<X.Y>/ 歸類
     ch01/s1.1/         一節成品——mp4、audio/、critic/frames/、review/packets/
     _media/ media/ __pycache__/   manim／python 快取（gitignored）
@@ -66,7 +66,7 @@ video/
 | 文檔・引擎・源 | `*.md`、`make.py`、`pipeline/**`、`storyboards/*.yml`、`content_scripts/*.md`／`*.html`、`animations/**` | ✅ 進 | 預設追蹤 |
 | 稽核資產 | `_audit/*-RUBRIC.md`、`PROMPT-*.md`、`REPORT-*.html`、`REVIEW-*.html`、`*.raw.txt` | ✅ 進 | HTML 報告須 **self-contained**（見下） |
 | 報告產生器＋資料 | `_audit/_gen/*.gen.py`、`*.digest.json`、`frames_before/` | ✅ 進 | 放在 tracked 位置，**不要**留在 `output/` 內 |
-| 設計參考截圖 | `design_handoff/**/*.png`、`tokens.json` | ✅ 進（例外） | 不可重生的設計底稿；非 pipeline 產物 |
+| 品牌 logo 資產 | `pipeline/assets/brand/*.svg`、`pipeline/assets/lockup-color-outlined.svg` | ✅ 進 | NTU logo 向量源＋`_outline_text.py` 產的 outlined 版（render 用） |
 | render 成品 | `output/**`：`*.mp4`、`*.wav`、`critic/frames/*.png`、`manifest.json`、`review/packets/` | ❌ 不進 | `.gitignore`：`/video/output/` |
 | 渲染／快取 | `media/`、`pipeline/**/media/`、`**/__pycache__/`、ad-hoc `*.log` | ❌ 不進 | `.gitignore`：`media/`、`__pycache__/` |
 
@@ -188,8 +188,8 @@ python video\make.py          --storyboard video\storyboards\<deck>_mimo.yml --r
 
 ## 文字渲染（避免亂碼）
 
-畫面上的字走兩條渲染路徑，**兩者都是 Computer Modern，但 manim 對相同 `font_size`
-的呈現大小不同**（`Text` 約比 `Tex` 大 1.34 倍，已由 `theme.TEX_TEXT_SCALE` 校準對齊）：
+畫面上的字走兩條渲染路徑，**`Text`（Pango）走 Times New Roman、`Tex`（LaTeX）走 newtx，
+manim 對相同 `font_size` 的呈現大小不同**（`Text` 約比 `Tex` 大 1.36 倍，已由 `theme.TEX_TEXT_SCALE` 校準對齊）：
 
 - **`Text`（Pango，OTF 字型）** —— 純文字，**不認得 LaTeX**。`$f$`、`\\` 會被原樣印出（亂碼）。
 - **`Tex` / `MathTex`（LaTeX）** —— 認得 inline `$math$` 與 `\\` 換行。

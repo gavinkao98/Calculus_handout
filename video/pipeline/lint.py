@@ -106,18 +106,13 @@ def _prose_strings(data: dict) -> "list[tuple[str, str]]":
 
 def _graph_kind(scene: dict) -> "str | None":
     """Effective graph type for a scene: 'focus' (single panel: top-level axes/plots)
-    or 'compare' (two panels: left/right), else None. Handles the unified `graph`
-    template (dispatch on `mode`) AND the deprecated graph_focus/graph_compare names,
-    so the missing-tick / label-overlap guards never go dark after the merge."""
-    t = scene.get("template")
-    if t == "graph_focus":
-        return "focus"
-    if t == "graph_compare":
-        return "compare"
-    if t == "graph":
-        return "compare" if str(scene.get("mode", "single")).lower() in (
-            "2up", "two-up", "twoup", "compare", "2-up") else "focus"
-    return None
+    or 'compare' (two panels: left/right) for the `graph` template (dispatch on `mode`),
+    else None. (The old graph_focus/graph_compare template names were retired in the
+    2026-06-20 cleanup; `graph` + mode is the only form now.)"""
+    if scene.get("template") != "graph":
+        return None
+    return "compare" if str(scene.get("mode", "single")).lower() in (
+        "2up", "two-up", "twoup", "compare", "2-up") else "focus"
 
 
 def _hollow_on_curve(data: dict) -> "list[tuple[str, str]]":

@@ -4,6 +4,51 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## 🧹 2026-06-20（續³）舊設計清理：刪死字型資產＋退場舊模板＋掃 stale 字型引用（使用者要求「整個 video 看一下、跟舊設計有關的檔案／文檔刪乾淨」）
+
+承字型 revert，使用者要求把與舊設計有關的檔案／文檔清乾淨。**先完整盤點 video/ 再列確切刪除清單經使用者裁決**（AskUserQuestion：選「A＋舊模板一起退場」；§1.2 旁白「之後重跑、舊的不用了」）。**未動計費 API。** 動手前查清依賴：`design_handoff/` 被 `brand.py` 用（logo SVG `_BRAND`）＋README 標「不可重生設計底稿」故**保留**；舊模板 .py 是 live graph 引擎（非死碼）。
+
+- **Part A — 死字型資產（Times 完全不用）：** 刪 [`pipeline/assets/fonts/`](pipeline/assets/fonts) 全 14 個設計字型（Inter Tight×5／JetBrains×3／CM cmun×6）＋ `_bootstrap.register_design_fonts()`（連 `bootstrap()` 呼叫、doctor probe）＋ DD scratch（`render_still.py`／`_demo_redesign.yml`／`output/_redesign_specs.md`／`_still/`）。`assets/` 保留 live `_outline_text.py`＋`lockup-color-outlined.svg`。doctor 仍綠（Times/Courier 系統字型可見）。
+- **Part B — 退場 3 個舊模板（graph_focus／graph_compare／example_walkthrough）：**
+  - **stale §1.2 mimo 刪除：** [`ch01_inverse_trig_functions_mimo.yml`](storyboards)＋其 narration_spoken.md（references 舊模板、parity 早 broken）——使用者裁決 §1.2 日後整節重跑、舊的不用，故直接刪（重跑時由 canonical〔已用 graph/derivation〕重生）。**§1.2 spoken marker sync 因此跳過**（不碰 NFA 軌）。
+  - **graph 引擎併入 [`graph.py`](pipeline/templates/graph.py)：** 腳本確定性合併 `graph_focus`（單欄引擎→`_build_single`）＋`graph_compare`（2up→`_build_compare`，`gf.`→local）＋dispatcher；**硬刪 graph_focus.py／graph_compare.py／example_walkthrough.py 三檔**；`templates/__init__.py` REGISTRY 移除三名（留 `graph`）。
+  - **5 個 _demo 轉新名：** graph_focus→`graph`(mode 預設 single)／graph_compare→`graph`+`mode:2up`；`_demo_tall_rows` 的 example_walkthrough scene→`derivation`（疊式分數仍逼出 tall rows）。
+  - **lint.py `_graph_kind`／sizecheck.py 模板檢查** 去掉舊名分支（只認 `graph`+mode）。
+  - **驗證：** schema OK ×7（§1.1／§1.2 canonical／5 demos）、sizecheck §1.1 0-error＋demo compare/single/tall_rows 全 consistent、**render §1.1 HLT(2up)＋reflection(single) 經合併 graph.py EXIT 0、抽幀目視與合併前一致**（hooks 照常 wire）。
+- **Part C — stale 字型引用掃除（docstring／comment／doc）：** [`theme.py`](pipeline/visuals/theme.py) 模組 docstring、[`brand.py`](pipeline/brand.py) 12 處 per-function docstring＋模組 note、`sizecheck.py`／`procedure_steps.py` 註解、[`README.md`](README.md) §文字渲染、[`../ENVIRONMENT.md`](../ENVIRONMENT.md)：Inter Tight／CM／JetBrains（當前字型）→ Times／newtx／Courier。**保留歷史性註解**（「Direction D's Inter Tight needed 0.X」retune 註、「former graph_focus」合併註等）。grep 確認 pipeline code 無 current-fact stale 字型引用。
+- **Part D — `design_handoff/` 瘦身（同輪稍後，使用者問「還需要瘦身嗎」→ 查清後裁決執行）：** 追查發現 `brand.py` 的 `logo_svg()`／`_BRAND`（指向 design_handoff 的唯一連結）是**死碼**（無呼叫點），且 logo outlined 版由 [`pipeline/assets/_outline_text.py`](pipeline/assets/_outline_text.py) 從系統字型**自建**（不讀 design_handoff SVG）→ design_handoff 對 render **零依賴**、純 Direction B 參考底稿（已被 D→Times 疊代兩代、含 stale 字型決策）。**① 刪死碼 `logo_svg()`／`_BRAND`；② NTU logo 6 個原始向量 SVG 搬進 [`pipeline/assets/brand/`](pipeline/assets/brand)（留作 logo 源、近 code）；③ `design_handoff/` 整個刪除**（jsx/css/tokens/截圖/兩 brief/html；git 留歷史）；連帶更新 `README.md`（資料夾樹＋版控表）／`CONTENT_METHODOLOGY.md`（視覺系統指標改指 DESIGN.md／theme.py）。logo/intro/outro build 複驗 OK。
+- **保留：** Direction D **版面/配色/模板**（只退字型與舊模板名，layout 仍 DD）、REBUILD_STATUS 的 Direction B/D 歷史記錄。
+
+## 🔤 2026-06-20（續²）字型 revert：Direction D 字型 → Times New Roman（使用者裁決「留 Times」）
+
+使用者看過 Direction D 的 Inter Tight 版後裁決**把字型整套改回 Times New Roman**（版面/配色/模板維持 Direction D 不動，只動字型與其校準度量）。**未動任何計費 API**（mock render）。
+
+- **改什麼（字型＋其校準度量是一對、一起 revert；layout/color/template 不動）：**
+  - [`theme.py`](pipeline/visuals/theme.py)：`FONT_DISPLAY`/`FONT_BODY` `Inter Tight`→**`Times New Roman`**、`FONT_MONO` `JetBrains Mono`→**`Courier New`**；`PX_TO_FS` 0.655→**0.72**、`TEX_TEXT_SCALE` 1.42→**1.36**；[`brand.py`](pipeline/brand.py) `_WIDTH_K` 0.0068→**0.0058**（皆 Direction D 前的 Times 值）。
+  - [`_bootstrap.py`](pipeline/_bootstrap.py) `_set_tex_template`：TeX template 重新 `\usepackage{newtxtext}`+`\usepackage{newtxmath}`（Times 風數學，取代 CM；三反三角 `\DeclareMathOperator` 保留）。
+  - brand.py 所有字型走 `T.FONT_*`、無寫死（grep 確認 code 無 literal font family），故改常數即全套切換。
+- **重渲驗證：** full §1.1 mock（`make.py --scene all --backend mock`）**EXIT 0、sizecheck 0 error**（Times advance 較窄＋既有 QED/recap 瘦身，**無任何溢出**；QED、recap point.4 皆在框內）、5 hooks 全正常、newtx 數學編譯無誤 → mp4 重生（~12:49）。
+- **附帶好處：** ① Inter-Tight 的孤立 `(check` Pango 空-SVG crash 在 Times 下**不存在**（smoke 驗 `Text("(check")` OK）——先前 recap em-dash 改寫不再 load-bearing、但保留（faithful、短）；② derivation reason rail 的「文字↔inline math」邊界 spacing 因現在 serif/serif 一致而**不再刺眼**（先前 advisory 自然緩解）。
+- **環境文檔同步（換機對得上）：** [`tools/doctor.py`](../tools/doctor.py) `check_fonts` 改驗 `Times New Roman`/`Courier New`（Windows 系統字型）＋ newtx 註記（MiKTeX 首編自動補裝）、能力摘要字型名同步；[`ENVIRONMENT.md`](../ENVIRONMENT.md) §③（newtx 回來）＋§①b（影片字型＝Times/Courier 系統字型；Direction D 設計字型仍 vendored 但未用，附換回路徑）。本機 `python tools/doctor.py` 驗過全綠。
+- **brand.py 模組 docstring 已更新為 Times＋注記 per-function docstring 仍用舊名（字型一律走 `theme.FONT_*`）。**（註：Direction D vendored 設計字型原本想留作 switch-back，但**已於同日「舊設計清理」一併刪除**——見下方續³節，switch-back 不再保留。）
+- **註：** 下節 sign-off HTML 報告的內嵌幀是字型 revert 前的 **Inter Tight** 版（那輪 render/overflow 稽核的歷史記錄，base64 凍結）；overflow 修正（QED/recap）已隨字型沿用、Times 版 sizecheck 仍 0 error。
+
+## ✅ 2026-06-20（續）Direction D 收尾：§1.1 端到端 mock 成片＋_mimo 重生＋逐場景溢出微調
+
+承下節 Direction D「🚧 仍待完成」**item 1（_mimo 重生）＋item 3（逐場景溢出）已完成**；過程中**首次對重設計後的 §1.1 跑完整 19 場景 mock 成片**，揪出「代表場景 render」漏掉的 3 個真 regression（全修）。**未動任何計費 API**（全程 mock／離線 render；MiMo TTS 仍延後，本輪只重生 `_mimo` storyboard，非合成）。
+
+- **① §1.1 完整 mock 成片（端到端確認 hooks）：** `make.py --scene all --backend mock --quality high` → schema／lint／sizecheck 三閘全過 → 19 場景全 render → compose → [`output/ch01/s1.1/ch01_inverse_functions.mp4`]（**h264 1920×1080、30fps、769s≈12:49**）。**5 客製動畫 hook 經 `graph_focus/compare`→`graph` 模板收斂後全部正確 wire**（抽幀目視：兩進一出映射、HLT 左1綠/右2紅、A↔B 往返、x³↔∛x 鏡射、x²→√x 反射，端態數學全對、零 runtime 錯）——[`graph.py`](pipeline/templates/graph.py) 是 thin dispatcher，reveal id（`left/right.plot.N`、`axes`、`plot.N`）與舊模板相同故 hook 照常接。
+- **② `_mimo` 重生（綁定延後 MiMo）：** 同步 [`content_scripts/ch01_inverse_functions.spoken.yml`](content_scripts/ch01_inverse_functions.spoken.yml) 三個轉 derivation 場景的 markers（`testing_x_and_x_squared`／`shape_can_mislead`：`math.0/1/2`→`step.0/1/2`；`first_inverses`：`math.0/1/2`→`step.0/1/check`；三場 `takeaway` marker 移除、散文留旁白）→ `derive_spoken --deck` parity OK → 重生 [`storyboards/ch01_inverse_functions_mimo.yml`](storyboards/ch01_inverse_functions_mimo.yml)＋[`content_scripts/ch01_inverse_functions_narration_spoken.md`](content_scripts/ch01_inverse_functions_narration_spoken.md)。**MiMo TTS 合成仍延後**（計費、徵同意；零件已備齊）。
+- **③ 逐場景溢出微調（VLM 複驗 in-frame-and-safe ×17）：** sizecheck（靜態 AABB）＋ VLM gate1（Workflow `wf_b83ff82d-d59`，17 `visual-frame-audit` agent＋refute-by-default）雙軌。**修 2 真溢出：** `inverse_iff_one_to_one` QED（兩 proof step 各瘦成單行，qed bottom −3.92u→−3.08u）、`recap` point.3（去 "then"，bottom −3.81u→−3.27u）。**VLM 終判：0 confirmed blocking、17/17 場景 overflow＝in-frame-and-safe**（含 QED／recap 修後複驗、5 hook 端態）。
+- **🐞 3 個 regression（代表場景 render 漏掉、完整 render 才揪出，全修）：**
+  1. **recap `(check` → manimpango 空 SVG crash（deterministic、本機觸發）：** Inter Tight（Direction D 字型）下 `Text("(check")` 這個**孤立 token** 經 Pango shaping 產出空 SVG→`ParseError: no element found`→recap 整場 build 失敗、**阻斷整個 render**（`"(chec"`／`"(check)"`／`"(check one"`／default 字型皆正常，極窄觸發；非缺字，TTF 有 `(`）。修：recap point.3 payload `(check one-to-one first)`→`— check one-to-one first`（換破折號避開孤立 `(check`）。**⚠️ 潛在地雷：** 任何散文出現孤立 `(某詞` token（Inter Tight）都可能 crash render；robust 修法（`_compose` 防禦性 retry／字型 re-instance）屬 shared infra，**已攤開待使用者定奪、本輪未動**。
+  2. **sizecheck mixed-prose sibling-size 誤報（Direction D `_compose` 引入、被 `(check` crash 遮住）：** inline `$math$` 在 `_compose` 走 **x-height 對齊**（CM font_size≈文字 1.61×），但 [`sizecheck.py`](pipeline/sizecheck.py)`._norm_size` 用 `TEX_TEXT_SCALE`（1.42）正規化→含 inline math 的 prose 行被誤量大→`point`／`step` 兄弟組（text-only vs math-bearing 混排）誤報 size mismatch **error、阻斷 render**。**修 `_block_prose_size`：** 只比較 `_norm_size` 量得準的 carrier（Text run、或獨立 prose_tex Tex），純 inline-math 行（如 reason rail `$h(0)=h(2)=0$`）跳過——真 shrink 仍抓得到（縮排會連 Text 一起縮）。
+  3. **QED／recap 溢出**（見 ③，幾何/字級放大致；屬 item 3 範圍）。
+- **🔎 advisory（已攤開、本輪未修）：** derivation **reason rail 文字↔inline math 邊界空格偏緊**（`testing_x_and_x_squared`／`shape_can_mislead`，如 "factor h(x)"、"+4 one-to-one"；放大後更明顯）——可讀但偏擠，屬 `_compose` text/math 邊界 spacing、**template 級（含 §1.2 等所有 derivation）**，待使用者定奪是否做專門 typography pass。其餘 advisory 多為 A1 上方空白帶／A7 dim 標籤等 cosmetic。
+- **🧹 暫存（本輪我建、待清）：** `video/scratch_diag_recap.py`／`scratch_diag_qed.py`／`scratch_diag_recap2.py`／`scratch_warm_render.sh`（診斷用）。使用者既有 `scratch_isolate/mathtex/split.py` 不動。
+- **⚠️ 並行 render 教訓：** 兩個 manim/LaTeX 進程同跑會在 `media/Tex` 快取 race（`PermissionError`/半寫 SVG `ParseError`）→ 誤判成 build error。**render 與 sizecheck/critic 不可同時跑**；transient flake 用「刪 0-byte 快取＋retry」清。
+- **交付：** sign-off HTML [`content_scripts/_audit/REVIEW-ch01_inverse_functions-s11-render-overflow.html`](content_scripts/_audit/REVIEW-ch01_inverse_functions-s11-render-overflow.html)（base64 內嵌關鍵幀＋VLM 終判＋修正清單，雙擊即開）。
+
 ## 🎨 2026-06-20 Direction D 視覺重設計（「Manim Video Design System」handoff 落地）
 
 使用者重新設計了整套影片視覺（zip handoff：`tokens/*.css`＋`frames/*.html`＋`SKILL.md`／`readme.md`／`CHANGES.md`），要求據此改模板。**兩項裁決（AskUserQuestion）：① 採用 Direction D——標題/散文改 Inter Tight sans、數學維持 serif 但換 Computer Modern；② 完整重建含結構調整。** 未動任何計費 API（全程 mock/離線 render 驗證）。
@@ -29,9 +74,9 @@
   - **derivation 擴充：** step 支援 `mark: ok|bad` → 行末綠 ✓／紅 ✗（落實「ew 的 ✓/✗ 併入 derivation」；conventions_change_answers 的 ✓✓✗ 對比完整保留）。
   - **三閘全過：** schema OK（`--list` 確認 reveal target 全部 resolve、無 stale marker）、lint clean、代表場景 render 視覺驗證（ew→derivation reason rail＋verdict、graph glow 曲線）。
 - **🚧 仍待完成：**
-  1. **`_mimo` 變體重生：** mimo storyboard 由 `derive_spoken.py` 從正典生成。正典 markers 已改（math.N→step.N、去 takeaway），故 `content_scripts/ch01_*.spoken.yml` 的 markers 需同步改、再 `derive_spoken --deck <deck>` 重生 mimo。**綁定延後的 MiMo TTS 步驟**，待使用者重啟有聲版時一併做。
+  1. ✅ **`_mimo` 變體重生（2026-06-20 續完成，見最上方節）：** spoken.yml markers 同步（math.N→step.N/check、去 takeaway）→ `derive_spoken --deck` parity OK → `_mimo.yml`＋`_narration_spoken.md` 重生。**MiMo TTS 合成仍延後**（計費）。
   2. **硬刪 example_walkthrough/graph_focus/graph_compare 三個 .py：** 目前留作 deprecated alias（graph.py 仍 import focus/compare 當實作）。待 mimo 也重生、確認無任何 storyboard 引用舊名後，再決定是否把 focus/compare 改名為 graph.py 內部模組、移除 registry alias。
-  3. **逐場景微調**幾何/字級放大造成的溢出（已知 `inverse_iff_one_to_one` QED 溢出 ~0.47u）——需逐場景 render＋VLM 複驗。
+  3. ✅ **逐場景溢出微調（2026-06-20 續完成，見最上方節）：** QED（−3.92u→−3.08u）＋recap point.3（−3.81u→−3.27u）已修；VLM gate1 複驗 17/17 場景 in-frame-and-safe、0 blocking。
   4. intro 的 paper course-map 完整視覺複驗（目前只調色、結構沿用；dark handoff 階段可考慮改用 divider）。
 - **暫存檔（完成後清）：** `scratch_smoke_fonts.py`／`scratch_measure.py`／`scratch_widthk.py`／`scratch_prose.py`／`render_still.py`／`output/_redesign_specs.md`／`storyboards/_demo_redesign.yml`。使用者既有 `scratch_*.py`（isolate/mathtex/split）不動。
 

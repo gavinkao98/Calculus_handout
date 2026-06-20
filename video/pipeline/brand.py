@@ -1,12 +1,14 @@
-"""Brand visual primitives for Direction D (sans UI + CM math).
+"""Brand visual primitives (Times serif UI + newtx math).
 
 Builds the recurring design elements templates compose. Colours come from the
 active ground's palette (dark/paper) via theme.py -- no hex literals here.
 
-Direction D: headings + prose render in Inter Tight (Pango Text); labels/eyebrows
-in JetBrains Mono; math in Computer Modern (MathTex/Tex). body_text() renders prose
-via Pango Text (Inter Tight); prose_tex()/heading_rich() handle the inline-$math$
-path via Tex (CM), size-matched to the Pango prose by TEX_TEXT_SCALE.
+Fonts (2026-06-20 revert to Times New Roman; was Direction D's Inter Tight + CM):
+headings + prose render in Times New Roman (Pango Text); labels/eyebrows in Courier
+New; math in newtxtext/newtxmath (MathTex/Tex). body_text() renders prose via Pango
+Text (Times); prose_tex()/heading_rich() handle the inline-$math$ path via Tex
+(newtx), size-matched to the Pango prose by TEX_TEXT_SCALE. The font family always
+flows through theme.FONT_* -- this module hardcodes no font name.
 
 Glow recipe ("alive on dark"): glow_curve() = a wide low-alpha halo under a crisp
 stroke (manim has no blur); text_glow() = a static halo behind emphasised glyphs.
@@ -42,10 +44,6 @@ from .visuals import theme as T
 
 FRAME_W = T.FRAME_W
 FRAME_H = T.FRAME_H
-_BRAND = (
-    Path(__file__).resolve().parents[1]
-    / "design_handoff" / "from_designer" / "handoff" / "source" / "assets" / "brand"
-)
 
 
 # -- text wrapping (never breaks a word) ----------------------------------
@@ -56,16 +54,12 @@ _BRAND = (
 # out empty -> "ParseError: no element found". The estimate removes that whole
 # class of failure (and is much faster -- no SVG per trial).
 #
-# Calibration (manim units per char*font_size). Re-measured for Inter Tight (the
-# "tight" is tracking, not glyph width -- its advances run a touch WIDER than Times):
-#   "Distinct outputs always." @ fs42 -> K = 0.00618
-#   "Testing with Algebra here" @ fs42 -> K = 0.00647
-#   "Forwards is easy ..."      @ fs42 -> K = 0.00672  (more spaces -> higher K)
-# CJK glyphs are full-width, so they count as ~2x a latin advance.
-# Upper bound ~0.00672; use 0.0068 as a small safety margin (overflow is worse
-# than a slightly short line).
+# Calibration (manim units per char*font_size), for Times New Roman advances.
+# CJK glyphs are full-width, so they count as ~2x a latin advance. Use 0.0058 as a
+# small safety margin (overflow is worse than a slightly short line). One global knob
+# -- retune if fonts change (Direction D's wider Inter Tight needed 0.0068).
 
-_WIDTH_K = 0.0068
+_WIDTH_K = 0.0058
 
 
 def _char_weight(ch: str) -> float:
@@ -127,14 +121,14 @@ def coordinate_grid(ground: str, *, opacity: float = 1.0) -> VGroup:
 # -- text primitives ------------------------------------------------------
 
 def eyebrow(label: str, ground: str, *, role: str = "secondary") -> Text:
-    """Mono uppercase wide-tracked tag, e.g. '[ DEFINITION ]' (JetBrains Mono)."""
+    """Mono uppercase wide-tracked tag, e.g. '[ DEFINITION ]' (Courier New)."""
     return Text(label.upper(), font=T.FONT_MONO, font_size=T.fs("eyebrow"),
                 color=T.color(ground, role), weight="MEDIUM")
 
 
 def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",
             weight: str = "BOLD", max_width: float | None = None) -> Text:
-    """Display heading -- Inter Tight, 700 (BOLD) by Direction D. If *max_width* is
+    """Display heading -- Times New Roman BOLD. If *max_width* is
     given and the rendered line is wider, scale it down to fit -- the standalone-
     display-line exception to "wrap, don't shrink" (a hero title has no siblings to
     size-match, and manim Text does not centre multi-line cleanly, so clamp beats wrap)."""
@@ -168,10 +162,10 @@ def _escape_tex(text: str) -> str:
 
 def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
               max_width: float | None = None, align: str = "LEFT"):
-    """Body prose rendered via Pango Text (Inter Tight) -- Direction D.
+    """Body prose rendered via Pango Text (Times New Roman).
 
     (Was LaTeX \\text{}/newtx to match the old serif handout; Direction D sets prose
-    in Inter Tight sans, so prose goes through Pango Text again.) If *max_width* is
+    in Times serif, so prose goes through Pango Text again.) If *max_width* is
     given, wraps at word boundaries (never mid-word) using the char-estimate width
     -- no throwaway measurement SVGs, which intermittently came out empty under
     disable_caching. Returns a single Text for one line, a VGroup of Text lines for
@@ -249,10 +243,10 @@ def glyph(name: str, ground: str, *, role: str, size: str = "math"):
     """Render a special symbol via LaTeX, not a font character.
 
     ✓ ✗ ∎ are drawn as MathTex (\\checkmark / \\times / \\blacksquare) so they
-    always render in Computer Modern alongside the math, regardless of the body
-    Text font's glyph coverage. (Originated in the sans body-font era, when Hanken
-    lacked these and they tofu'd; the body font is Computer Modern now, but routing
-    through LaTeX keeps them uniform and font-change-proof.)
+    always render in the newtx math font alongside the math, regardless of the Pango
+    body Text font's glyph coverage. (Originated in an earlier sans body-font era when
+    that font lacked these and they tofu'd; routing through LaTeX keeps them uniform
+    and font-change-proof.)
     """
     return MathTex(_GLYPH_TEX[name], color=T.color(ground, role), font_size=T.fs(size))
 
@@ -284,8 +278,8 @@ _DESC_CHARS = set("gjpqy(),;[]{}/Q")
 
 def _compose(text: str, ground: str, role: str, fsz: float, *, weight: str = "NORMAL",
              max_width: float | None = None, align: str = "LEFT", line_buff: float = 0.26):
-    """Compose a line (or wrapped lines) of Inter-Tight text + CM math (Direction D:
-    sans text, serif math, ON THE SAME LINE). Runs are BASELINE-aligned (text by a
+    """Compose a line (or wrapped lines) of Times text + newtx math (serif text +
+    serif math, ON THE SAME LINE). Runs are BASELINE-aligned (text by a
     descender-aware baseline, math by the optical math-axis); $...$ spans are atomic.
     Wraps at *max_width* if given (prose); otherwise one line (headings, then clamp).
     Shared by prose() and heading_rich() so titles and body match."""
@@ -377,7 +371,7 @@ def _compose(text: str, ground: str, role: str, fsz: float, *, weight: str = "NO
 
 def _prose_mixed(text: str, ground: str, role: str, size: str,
                  max_width: float | None, align: str):
-    """Inline-math prose composite (Direction D sans prose + CM math). See _compose."""
+    """Inline-math prose composite (Times serif prose + newtx math). See _compose."""
     return _compose(text, ground, role, T.fs(size), weight="NORMAL",
                     max_width=max_width, align=align)
 
@@ -386,12 +380,12 @@ def prose(text: str, ground: str, *, role: str = "text", size: str = "body",
           max_width: float | None = None, align: str = "LEFT"):
     """Render an author prose field, routing by content so markup never garbles.
 
-    The ONE place that decides how prose is set. Direction D: prose is Inter Tight
-    sans, math is CM serif -- ON THE SAME LINE.
-    - Markup-free text -> ``body_text`` (plain Inter Tight Text, wraps at *max_width*).
-    - Text with inline ``$math$`` -> ``_prose_mixed`` (Inter Tight text runs + CM
-      MathTex runs composited and word-wrapped) so a math-bearing line stays sans
-      with serif math, matching its pure-prose siblings (no sans/serif mismatch).
+    The ONE place that decides how prose is set. Prose is Times serif, math is
+    newtx serif -- ON THE SAME LINE.
+    - Markup-free text -> ``body_text`` (plain Times Text, wraps at *max_width*).
+    - Text with inline ``$math$`` -> ``_prose_mixed`` (Times text runs + newtx
+      MathTex runs composited and word-wrapped) so a math-bearing line stays serif
+      throughout, matching its pure-prose siblings (no font mismatch).
     - Text with an explicit ``\\\\`` break (no inline $) -> single ``prose_tex`` Tex
       (rare; the author controls the break).
     """
@@ -425,11 +419,11 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
                  max_width: float | None = None):
     """A display heading that may carry inline ``$math$``.
 
-    Plain titles go through ``heading`` (Inter Tight BOLD). A title WITH ``$...$`` is
-    composited the same way as prose (``_compose``): Inter-Tight BOLD text runs +
-    x-height-matched CM MathTex runs, baseline-aligned on one line -- so a mixed
-    title stays sans like its pure-text siblings, with the math in CM (the Direction-D
-    contrast), instead of the whole line going CM serif. *max_width* clamps a long
+    Plain titles go through ``heading`` (Times BOLD). A title WITH ``$...$`` is
+    composited the same way as prose (``_compose``): Times BOLD text runs +
+    x-height-matched newtx MathTex runs, baseline-aligned on one line -- so a mixed
+    title's text stays Pango Times like its pure-text siblings, with the math in newtx,
+    instead of the whole line routing through Tex. *max_width* clamps a long
     title to fit (the standalone-display-line "shrink, don't wrap" exception).
     """
     if "$" not in text:
@@ -441,7 +435,7 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
 
 
 def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math"):
-    """A math (or math+text) line, recoloured. Computer Modern serif.
+    """A math (or math+text) line, recoloured. newtx (Times) serif.
 
     Two forms are accepted, auto-detected:
     - Pure math, no '$' (e.g. r"f(x_1) \\ne f(x_2)") -> MathTex (whole string
@@ -648,20 +642,6 @@ def logo_lockup_outlined(*, height: float = 1.7) -> SVGMobject:
     while rendering at native vector resolution (no bitmap blur).
     """
     path = _ASSETS / "lockup-color-outlined.svg"
-    svg = SVGMobject(str(path))
-    svg.height = height
-    return svg
-
-
-def logo_svg(name: str, *, height: float = 1.4) -> SVGMobject | None:
-    """Load an icon SVG (pure geometry, no <text>) -- e.g. 'icon-color'.
-
-    Safe only for the icon marks, which are all rect/path. Do NOT use for the
-    lockup (its <text> wordmark would be dropped); use logo_lockup_outlined().
-    """
-    path = _BRAND / f"{name}.svg"
-    if not path.exists():
-        return None
     svg = SVGMobject(str(path))
     svg.height = height
     return svg

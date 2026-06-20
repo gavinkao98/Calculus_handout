@@ -56,11 +56,26 @@ def _norm_size(node, tex_text_scale: float) -> float:
 
 
 def _block_prose_size(block_mob, tex_text_scale: float):
+    from manim import MathTex, Tex, Text
+
     nodes = _prose_nodes(block_mob)
     if not nodes:
         return None
+    # The sibling check guards "a prose line was shrunk not wrapped". After Direction
+    # D, inline $math$ in mixed prose (brand._compose) is x-height-matched to the
+    # surrounding Times Text -- its CM font_size (~1.61x the Text size) is NOT
+    # the TEX_TEXT_SCALE relation _norm_size assumes, so an inline-MathTex run would
+    # falsely measure larger than its text siblings. Compare only the carriers
+    # _norm_size CAN normalise: Text runs, or a standalone prose_tex Tex line (a
+    # shrunk line shrinks these too). A pure inline-math prose line (only MathTex,
+    # e.g. a reason rail "$h(0)=h(2)=0$") has no comparable carrier -- skip it rather
+    # than mismeasure it against text siblings.
+    carriers = [n for n in nodes
+                if isinstance(n, Text) or (isinstance(n, Tex) and not isinstance(n, MathTex))]
+    if not carriers:
+        return None
     # all prose lines in a block share a size; max is robust to a stray tag
-    return max(_norm_size(n, tex_text_scale) for n in nodes)
+    return max(_norm_size(n, tex_text_scale) for n in carriers)
 
 
 def _overflow_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
@@ -184,7 +199,7 @@ def _overlap_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
 
 
 def _graph_labels(mob) -> list:
-    """The graph_focus._label-tagged equation labels under *mob* (curve / line /
+    """The graph._label-tagged equation labels under *mob* (curve / line /
     point names), recursing into groups. Stops at a tagged node."""
     if getattr(mob, "_graph_label", False):
         return [mob]
@@ -202,11 +217,11 @@ def _graph_label_overlap_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     label hugging its curve -- see Block.layer docstring). But two EQUATION LABELS
     landing on top of each other is a genuine defect, and graph labels are placed
     by a heuristic / hand-tuned ``label_point`` with no collision avoidance. So we
-    carve out just the labels (tagged by graph_focus._label, found wherever they
+    carve out just the labels (tagged by graph._label, found wherever they
     sit -- a static ``label.N`` block or folded inside a revealed ``plot.N`` group)
     and check them pairwise. Advisory only (``warn``): the fix is a clearer
     ``label_point``, and a render-blocking error here would be too aggressive for a
-    small-text heuristic. Covers graph_focus and graph_compare (shared _plot_blocks)."""
+    small-text heuristic. Covers both graph modes (single / 2up, shared _plot_blocks)."""
     sid = scene.get("id")
     items: list[tuple[str, tuple]] = []
     for b in blocks:
@@ -254,7 +269,7 @@ def graph_label_geometry(meta: dict, scene: dict) -> "dict | None":
     boxes in frame-fraction coords (origin TOP-LEFT, x right, y down -- how the VLM
     reads the rendered image), or ``None`` when the scene is not a graph template, has
     no labels, or fails to build. Offline: builds blocks, no render, no API."""
-    if scene.get("template") not in ("graph_focus", "graph_compare", "graph"):
+    if scene.get("template") != "graph":
         return None
     from pipeline.templates import build_blocks
     from pipeline.visuals import theme as T
