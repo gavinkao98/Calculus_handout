@@ -79,21 +79,43 @@ def _tick_at_label(item: Any) -> "tuple[float, str]":
     return float(item), _fmt_num(item)
 
 
-def _axis_ticks(axes: Axes, ac: dict[str, Any], ground: str):
+def _axis_ticks(axes: Axes, ac: dict[str, Any], ground: str, plots: list[dict] | None = None):
     """Optional teaching ticks: a few key marks (e.g. a on x, L on y) so an
     otherwise number-less plot keeps a sense of scale. Returns a VGroup to fold
     into the graph group (so it scales with the axes), or None when unused."""
     col = T.color(ground, "text")
     tlen = 0.11
     mobs: list[Any] = []
-    for item in ac.get("x_ticks", []) or []:
+
+    # explicit ticks
+    x_ticks = list(ac.get("x_ticks", []) or [])
+    y_ticks = list(ac.get("y_ticks", []) or [])
+
+    # smart auto ticks from points
+    if ac.get("auto_ticks") and plots:
+        explicit_x = {float(_tick_at_label(item)[0]) for item in x_ticks}
+        explicit_y = {float(_tick_at_label(item)[0]) for item in y_ticks}
+        auto_x = set()
+        auto_y = set()
+        for plot in plots:
+            if plot.get("kind") == "point" and "point" in plot:
+                auto_x.add(float(plot["point"][0]))
+                auto_y.add(float(plot["point"][1]))
+        for x in auto_x:
+            if x not in explicit_x:
+                x_ticks.append(x)
+        for y in auto_y:
+            if y not in explicit_y:
+                y_ticks.append(y)
+
+    for item in x_ticks:
         at, lab = _tick_at_label(item)
         base = axes.x_axis.number_to_point(at)
         mark = Line(base + UP * tlen, base + DOWN * tlen, color=col, stroke_width=2.0)
         text = brand.math_line(lab, ground, role="text", size="math_sm")
         text.next_to(base, DOWN, buff=0.14)
         mobs += [mark, text]
-    for item in ac.get("y_ticks", []) or []:
+    for item in y_ticks:
         at, lab = _tick_at_label(item)
         base = axes.y_axis.number_to_point(at)
         mark = Line(base + LEFT * tlen, base + RIGHT * tlen, color=col, stroke_width=2.0)
@@ -233,7 +255,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
 
         if kind == "function":
             xr = _range(plot.get("x_range", x_range[:2]), x_range[2])
-            sw = float(plot.get("stroke_width", 3.5))
+            sw = float(plot.get("stroke_width", 5.0))
             samples = int(plot.get("samples", 900))
             y_clip = plot.get("y_clip")
             if y_clip:
@@ -250,7 +272,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                     color=col,
                     stroke_width=sw,
                 )
-            glow = graph.copy().set_stroke(col, width=12, opacity=0.16)
+            glow = graph.copy().set_stroke(col, width=16, opacity=0.24)
             group = VGroup(glow, graph)
 
             if plot.get("label"):
@@ -390,7 +412,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         y_length=float(ac.get("y_length", 4.15)),
         tips=False,
         axis_config={
-            "color": T.color(ground, "text"),
+            "color": T.color(ground, "muted"),
             "stroke_width": 2.0,
             "include_ticks": False,
             "include_numbers": False,
@@ -404,7 +426,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks.append(Block("axes", axes, anim="create", static=True, layer="graph"))
 
     plot_blocks, _ = _plot_blocks(spec, axes, ground)
-    ticks = _axis_ticks(axes, ac, ground)
+    ticks = _axis_ticks(axes, ac, ground, spec.get("plots", []))
     if ticks is not None:
         plot_blocks.append(Block("ticks", ticks, anim="fade", static=True))
     # Axes-space geometry: coincidence here is intentional (a point sitting on a

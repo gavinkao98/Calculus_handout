@@ -158,18 +158,30 @@ scenes:
 每個 template 一行——教學形狀、payload 和 `{show ...}` 可指向的目標。
 Demo storyboard 在 `storyboards/_demo_*.yml`。
 
+> **Direction D（2026-06-20 視覺重設計）後的目錄。** 標 ★ 者 schema 有變或全新。
+> `definition_math` / `theorem_proof` / `procedure_steps` / `value_table` / `sign_chart`
+> / `recap_cards` 的 payload 欄位**不變**（只是視覺重皮）。standalone 驗證稿見
+> [`storyboards/_demo_redesign.yml`](storyboards/_demo_redesign.yml)。
+
 | template | 教學形狀 | payload 欄位 | reveal target |
 |---|---|---|---|
-| `definition_math` | definition / theorem statement / note / motivation：statement + math lines | `statement`、`math[]`、`kicker` | `math.N` |
-| `theorem_proof` | statement card + dot-led proof steps + QED | `statement`、`proof[]`、`qed` | `proof.N`、`qed` |
-| `example_walkthrough` | 離散的 worked steps，reasoning 在 math 旁邊，✓/✗ mark | `steps[{text,math,mark,hot}]`、`takeaway`、`takeaway_tone` | `math.N`、`takeaway` |
-| `procedure_steps` | 編號步驟 + 底部 worked strip | `steps[{text,math}]`、`worked[]` | `math.N`、`worked` |
-| `derivation` | 全寬連續推導鏈 | `statement`、`lines[]`、`align_on` | `line.N` |
-| `graph_focus` | 一張全幅 plot | `axes`、`plots[]`、`annotations[]` | `annotation.N`；opt-in `plot.N`（`reveal: true`） |
-| `graph_compare` | 兩張並排的圖表——比較本身即是課程（HLT、f vs f′、converges vs diverges） | `left`/`right` `{axes, plots, caption, verdict}`、`annotations[]` | `caption.left/right`、`left.plot.N`/`right.plot.N`（`reveal: true`）、`annotation.N` |
-| `value_table` | 數值 limit 表 / formula grid / property comparison | `header[]`、`rows[][]`、`reveal: rows\|cols`、`accent_col`/`accent_row`、`statement` | `row.N` 或 `col.N` |
-| `sign_chart` | number line + signed interval rows（monotonicity、curve sketching） | `points[]`（`excluded: true` 表示 break）、`rows[{label, marks}]`、`statement` | `mark.R.I`（row R, interval I） |
-| `recap_cards` | key point + remember-formula card | `points[]`、`formulas[]` | `point.N`、`formula.N` |
+| `definition_math` | definition / statement / note / motivation：statement + math lines（key line 用 `anim: highlight` → amber + glow） | `statement`、`math[]`、`kicker`、`math_align: center`(opt) | `math.N` |
+| `theorem_proof` | gold-bar 面板 statement + 藍點 proof steps + 綠 QED | `statement`、`proof[]`、`qed` | `proof.N`、`qed` |
+| `procedure_steps` | 01/02 藍數字步驟 + 底部圓角 worked strip | `steps[{text,math}]`、`worked[]` | `math.N`、`worked` |
+| `derivation` ★ | **統一數學系統**：式子左欄 + reason rail（dotted leader）+ amber ∴ result + 綠 ✓ check | `steps[{math, reason?}]`、`result:{math, reason?}`、`check:{math, reason?}`；**或** back-compat `lines[]`（`anim: highlight` → result）、`statement` | `step.N`/`result`/`check`（或 `line.N`） |
+| `callout` ★（新） | Remark / Caution / Note 具名旁注盒（色隨 type） | `type: remark\|caution\|note`、`number`(opt)、`body` | `body` |
+| `graph` ★ | **統一 graph 引擎**：`mode: single`（一張全幅 plot）或 `mode: 2up`（兩張並排比較） | single：`axes`、`plots[]`、`annotations[]`；2up：`left`/`right` `{axes, plots, caption, verdict}`、`annotations[]` | single：`annotation.N`、`plot.N`(`reveal:true`)；2up：`caption.left/right`、`left.plot.N`/`right.plot.N`、`annotation.N` |
+| `value_table` | 數值 limit 表 / formula grid（punchline 欄藍 tint + blue-ink） | `header[]`、`rows[][]`、`reveal: rows\|cols`、`accent_col`/`accent_row`、`statement` | `row.N` 或 `col.N` |
+| `sign_chart` | number line + signed interval rows（+綠/−紅 glow、↗/↘） | `points[]`（`excluded: true` 表示 break）、`rows[{label, marks}]`、`statement` | `mark.R.I`（row R, interval I） |
+| `recap_cards` | key point（amber idx/dot）+ blue-bar remember-formula cards | `points[]`、`formulas[]` | `point.N`、`formula.N` |
+| ~~`example_walkthrough`~~ | **deprecated → 用 `derivation`**（其 reason rail 取代並列推理欄；舊 scene 仍可渲） | — | — |
+| ~~`graph_focus` / `graph_compare`~~ | **deprecated alias → `graph` + `mode: single`/`2up`**（payload 不變；舊 scene 仍可渲） | — | — |
+
+**Brand frames（`kind` 鍵，非 content template）：** `intro`（paper course-map）、
+`outro`（paper end-slate；opt `next_section`/`next_title` → 「▶ Next §x.x」hint）、
+`divider` ★（新，dark 章節 opener：發光 hero curve + ghost numeral + eyebrow/title/
+subtitle + progress dots；欄位 `eyebrow`/`title`/`subtitle`/`ghost`/`progress:{current,total}`/
+`accent`）。三者皆 silent（不吃 `say`）。
 
 #### Plot label 顏色慣例（graph_focus／graph_compare，2026-06-17 拍板）
 

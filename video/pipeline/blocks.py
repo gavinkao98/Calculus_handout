@@ -15,7 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from manim import Create, FadeIn, Flash, GrowFromCenter, Indicate, RIGHT, UP, Write
+from manim import Create, FadeIn, Flash, RIGHT, UP, Write
 
 from .visuals import theme as T
 
@@ -40,14 +40,20 @@ class Block:
     layer: str = "content"   # content|graph|decoration|background
 
 
+# Direction D: 4 semantic accents. The role names map (via theme aliases) to hues:
+# secondary->blue, accent->amber, warning->red, success->green.
 ACCENT_ROLE = {
-    "definition": "secondary",   # cyan
-    "theorem": "accent",         # gold
-    "proposition": "secondary",
-    "example": "math",           # electric blue
-    "warning": "warning",        # coral
-    "procedure": "primary",
-    "recap": "secondary",
+    "definition": "secondary",   # blue
+    "theorem": "accent",         # amber
+    "proposition": "secondary",  # blue
+    "example": "secondary",      # blue  (was "math"/electric; math is bright ink now)
+    "warning": "warning",        # red
+    "procedure": "secondary",    # blue (frame eyebrow + numeral are var(--accent)=blue)
+    "recap": "secondary",        # blue
+    # callout types (new template)
+    "remark": "secondary",       # blue
+    "caution": "warning",        # red
+    "note": "accent",            # amber
 }
 
 
@@ -76,7 +82,8 @@ def play_block(scene, block: Block, ground: str) -> float:
         scene.play(Create(mob), run_time=0.8)
         return 0.8
     elif anim == "grow":
-        scene.play(GrowFromCenter(mob), run_time=0.45)
+        # Direction D: entrances are fades/writes, never bounces. (Was GrowFromCenter.)
+        scene.play(FadeIn(mob, shift=0.1 * UP), run_time=0.45)
         return 0.45
     elif anim == "slide":
         scene.play(FadeIn(mob, shift=0.35 * RIGHT), run_time=0.5)
@@ -85,7 +92,8 @@ def play_block(scene, block: Block, ground: str) -> float:
         scene.play(Write(mob), run_time=0.7)
         return 0.7
     elif anim == "flash_in":
-        scene.play(FadeIn(mob, scale=1.05), run_time=0.5)
+        # fade in + a glow flash (no scale-pop) -- the "key element reveals with glow"
+        scene.play(FadeIn(mob), run_time=0.5)
         scene.play(Flash(mob.get_center(), color=accent, line_length=0.25,
                          num_lines=14, flash_radius=0.6), run_time=0.6)
         return 1.1
@@ -95,8 +103,11 @@ def play_block(scene, block: Block, ground: str) -> float:
                          flash_radius=max(getattr(mob, "width", 1.0) * 0.55, 0.6)), run_time=0.6)
         return 1.4
     elif anim == "slide_pop":
+        # slide in + a glow flash (no Indicate scale-pop -- "never bounces")
         scene.play(FadeIn(mob, shift=0.4 * RIGHT), run_time=0.45)
-        scene.play(Indicate(mob, color=accent, scale_factor=1.06), run_time=0.4)
+        scene.play(Flash(mob.get_center(), color=accent, line_length=0.25,
+                         num_lines=14, flash_radius=max(getattr(mob, "width", 1.0) * 0.5, 0.6)),
+                   run_time=0.4)
         return 0.85
     else:  # "write"
         if getattr(mob, "width", 0) > 9.0:

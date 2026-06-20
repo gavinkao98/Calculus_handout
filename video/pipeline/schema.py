@@ -26,7 +26,7 @@ import re
 import sys
 from pathlib import Path
 
-SCENE_KINDS = ("intro", "content", "outro")
+SCENE_KINDS = ("intro", "content", "outro", "divider")
 
 # A reveal marker: {show <target>} embedded in a content scene's `say`. The target
 # is dotted (e.g. math.0, step.2, plot.0, takeaway). `_SHOW_OPEN` finds every
@@ -37,7 +37,7 @@ _SHOW_OPEN = re.compile(r"\{show\b")
 
 def reveal_targets(say: str) -> list[str]:
     """Every {show <target>} target in order (stripped); empty string for {show}."""
-    return [m.group(1).strip() for m in _SHOW.finditer(say)]
+    return [m.group(1).strip().replace("[", ".").replace("]", "") for m in _SHOW.finditer(say)]
 
 
 def schema_storyboard(data) -> "list[tuple[str, str]]":

@@ -64,7 +64,8 @@ scenes:
   # HOOK(第二輪)待接: 水平線自上而下滑入、停在 y=1/2，沿 sine 波閃示多個同高交點（往兩側無窮），凸顯一值多角。
   - id: sine_is_not_one_to_one
     kind: content
-    template: graph_focus
+    template: graph
+    mode: single
     hook: "animations.ch01_inverse_trig_functions_hooks:sine_is_not_one_to_one"
     accent: example
     source: "§1.2 開節散文段 2 + Figure 1.4 (sine-not-1to1)"
@@ -95,7 +96,8 @@ scenes:
   # HOOK(第二輪)待接: [-π/2,π/2] 以外淡出、中央分支高亮，一點從 (-π/2,-1) 滑到 (π/2,1)，凸顯單調掃過 [-1,1]。
   - id: restrict_sine_branch
     kind: content
-    template: graph_focus
+    template: graph
+    mode: single
     hook: "animations.ch01_inverse_trig_functions_hooks:restrict_sine_branch"
     accent: example
     source: "§1.2 'The inverse sine function' 散文 + Figure 1.5 (restricted-sine)"
@@ -200,7 +202,8 @@ scenes:
   # HOOK(第二輪)待接: 由 sinθ=1/3 逐步建構直角三角形——畫角 θ、對邊 1、斜邊 3，Pythagoras 浮現鄰邊 2√2，讀出 tanθ。
   - id: evaluating_arcsin
     kind: content
-    template: graph_focus
+    template: graph
+    mode: single
     hook: "animations.ch01_inverse_trig_functions_hooks:evaluating_arcsin"
     accent: example
     source: "§1.2 Example 1.9 + Figure 1.6 (arcsin-triangle)"
@@ -230,7 +233,8 @@ scenes:
   # 08 -------------------------------------- visual: restrict the cosine branch
   - id: restrict_cosine_branch
     kind: content
-    template: graph_focus
+    template: graph
+    mode: single
     accent: example
     source: "§1.2 cosine intuition 散文 (enrichment) + Figure 1.7 (restricted-cosine)"
     title: "Cosine's Branch: $0$ to $\\pi$"
@@ -297,27 +301,25 @@ scenes:
   # 11 ----------------------------- example: domain of a composition
   - id: domain_of_compositions
     kind: content
-    template: example_walkthrough
+    template: derivation
     accent: example
     source: "§1.2 Example 1.10 + 收尾通則散文"
     title: "Domain of a Composition"
     steps:
-      - { text: 'For $f(x)=\arcsin(\cos x)$: $\cos x$ always lies in $[-1,1]$.', math: '[-1,1]=\text{domain of }\arcsin', mark: ok }
-      - { text: 'Every real input is allowed.', math: '\text{dom}(f)=\mathbb{R}', mark: ok }
-      - { text: 'For $h(x)=\sin(\arccos x)$: $\arccos$ needs $x\in[-1,1]$; $\sin$ takes any angle.', math: '\text{dom}(h)=[-1,1]', mark: ok }
-    takeaway: 'Inner input legal first, then the outer accepts the inner output.'
-    takeaway_tone: ok
+      - { math: '[-1,1]=\text{domain of }\arcsin', reason: '$\cos x\in[-1,1]$', mark: ok }
+      - { math: '\text{dom}(f)=\mathbb{R}', reason: 'every real allowed', mark: ok }
+      - { math: '\text{dom}(h)=[-1,1]', reason: '$h(x)=\sin(\arccos x)$', mark: ok }
     say: |
       Inverse trig functions are fussy about what they will accept, so let us
       practise finding the domain of a composition.
-      {show math.0} Take $f(x)=\arcsin(\cos x)$. Whatever $x$ is, $\cos x$ already
+      {show step.0} Take $f(x)=\arcsin(\cos x)$. Whatever $x$ is, $\cos x$ already
       lands between $-1$ and $1$ — and that is precisely what arcsine accepts —
-      {show math.1} so every real number is allowed; the domain of $f$ is all of
+      {show step.1} so every real number is allowed; the domain of $f$ is all of
       $\mathbb{R}$.
-      {show math.2} Now flip the order: $h(x)=\sin(\arccos x)$. The inner function,
+      {show step.2} Now flip the order: $h(x)=\sin(\arccos x)$. The inner function,
       arccosine, demands an input from $-1$ to $1$; its output is just an angle, and
       sine will swallow any angle, so the domain of $h$ is $-1$ to $1$.
-      {show takeaway} The rule behind both: first make sure the input is legal for
+      The rule behind both: first make sure the input is legal for
       the inner function, then make sure the inner function's output is legal for
       the outer one.
 
@@ -325,7 +327,8 @@ scenes:
   # HOOK(第二輪)待接: 小球沿 h=cos t 上下 bob；h=1 在 t=2πn 數處相切閃示；arccos(1)=0 單獨灰標在 t=0（粒子未動）。
   - id: principal_value_trap
     kind: content
-    template: graph_focus
+    template: graph
+    mode: single
     hook: "animations.ch01_inverse_trig_functions_hooks:principal_value_trap"
     accent: example
     source: "§1.2 Example 1.11 (粒子主值陷阱)"
@@ -357,7 +360,8 @@ scenes:
   # HOOK(第二輪)待接: 一點沿 tangent 由左下(趨 -∞)爬到右上(趨 +∞)；水平線可停任意高度顯示恰命中一次。
   - id: restrict_tangent_branch
     kind: content
-    template: graph_focus
+    template: graph
+    mode: single
     hook: "animations.ch01_inverse_trig_functions_hooks:restrict_tangent_branch"
     accent: example
     source: "§1.2 tangent intuition 散文 (enrichment) + Figure 1.8 (restricted-tangent)"
@@ -431,31 +435,29 @@ scenes:
   # 16 ----------------------------- example: harder values (negative inputs)
   - id: evaluating_inverse_trig
     kind: content
-    template: example_walkthrough
+    template: derivation
     accent: example
     source: "§1.2 Example 1.12 + Figure 1.9 (arctan10-triangle)"
     title: "Harder Values, Trickier Signs"
     steps:
-      - { text: '(a) $\sin(\arccos(-\tfrac{1}{2}))$: $\arccos(-\tfrac{1}{2})=\tfrac{2\pi}{3}$ (2nd quadrant).', math: '\sin\tfrac{2\pi}{3}=\tfrac{\sqrt{3}}{2}', mark: ok }
-      - { text: '(b) $\sec(\arctan 10)$: opposite $10$, adjacent $1$, hypotenuse $\sqrt{101}$.', math: '\sec(\arctan 10)=\sqrt{101}', mark: ok }
-      - { text: '(c) $\tan(\arcsin(-\tfrac{2\sqrt{5}}{5}))$: 4th quadrant, $\cos=\tfrac{1}{\sqrt{5}}$.', math: '\tan\theta=-2', mark: ok }
-    takeaway: 'The triangle sets the size; the principal interval sets the sign.'
-    takeaway_tone: ok
+      - { math: '\sin\tfrac{2\pi}{3}=\tfrac{\sqrt{3}}{2}', reason: '(a) $\arccos(-\tfrac12)=\tfrac{2\pi}{3}$, Q2', mark: ok }
+      - { math: '\sec(\arctan 10)=\sqrt{101}', reason: '(b) opp $10$, adj $1$', mark: ok }
+      - { math: '\tan\theta=-2', reason: '(c) Q4, $\cos=\tfrac{1}{\sqrt5}$', mark: ok }
     say: |
       Now the triangle method earns its keep on harder values — same recipe,
       trickier signs.
-      {show math.0} First, the sine of arccosine of $-\tfrac{1}{2}$. Arccosine of a
+      {show step.0} First, the sine of arccosine of $-\tfrac{1}{2}$. Arccosine of a
       negative input always lands in the second quadrant, here at $\tfrac{2\pi}{3}$,
       and its sine is $\tfrac{\sqrt{3}}{2}$.
-      {show math.1} Second, the secant of arctangent of $10$: set the angle with
+      {show step.1} Second, the secant of arctangent of $10$: set the angle with
       tangent $10$, build a triangle with opposite $10$ and adjacent $1$, and the
       hypotenuse is $\sqrt{101}$ — so the secant, hypotenuse over adjacent, is
       $\sqrt{101}$.
-      {show math.2} Third, the tangent of arcsine of $-\tfrac{2\sqrt{5}}{5}$. The
+      {show step.2} Third, the tangent of arcsine of $-\tfrac{2\sqrt{5}}{5}$. The
       sine is negative, so the angle sits in the fourth quadrant, where cosine is
       positive; the triangle gives cosine $\tfrac{1}{\sqrt{5}}$, and the tangent
       works out to $-2$.
-      {show takeaway} Every time, the triangle set the size and the principal
+      Every time, the triangle set the size and the principal
       interval set the sign.
 
   # 17 ---------------------------- example: simplify cos(arctan x) (derivation)
@@ -513,34 +515,32 @@ scenes:
   # 19 --------------------------- example: conventions change answers
   - id: conventions_change_answers
     kind: content
-    template: example_walkthrough
+    template: derivation
     accent: example
     source: "§1.2 Remark 1.3/1.4 (folded N5) + Example 1.14"
     title: "A Convention Changes the Answer"
     steps:
-      - { text: '$\arcsin$: $|x|\le 1$; $\operatorname{arccsc}$: $|x|\ge 1$.', math: '\text{dom}=\{-1,\,1\}' }
-      - { text: 'At $x=1$: $\tfrac{\pi}{2}+\tfrac{\pi}{2}$.', math: 'f(1)=\pi', mark: ok }
-      - { text: 'At $x=-1$ (this text): $-\tfrac{\pi}{2}+\tfrac{3\pi}{2}$.', math: 'f(-1)=\pi', mark: ok }
-      - { text: 'Other: $\operatorname{arccsc}(-1)=-\tfrac{\pi}{2}$.', math: 'f(-1)=-\pi', mark: bad }
-    takeaway: 'A principal range is a convention, not a law.'
-    takeaway_tone: neutral
+      - { math: '\text{dom}=\{-1,\,1\}', reason: 'domains overlap at $\pm 1$' }
+      - { math: 'f(1)=\pi', reason: 'at $x=1$', mark: ok }
+      - { math: 'f(-1)=\pi', reason: "at $x=-1$ (this text)", mark: ok }
+      - { math: 'f(-1)=-\pi', reason: 'other convention', mark: bad }
     say: |
       Those principal ranges are choices, not laws — and the choice has visible
       consequences. Different books pick different intervals for arcsecant and
       arccosecant, and this text deliberately fixes one set, the one that keeps
       later formulas clean. Here is a function that exposes the stakes:
       $f(x)=\arcsin x + \arccsc x$.
-      {show math.0} Arcsine needs $x$ between $-1$ and $1$; arccosecant needs $x$ of
+      {show step.0} Arcsine needs $x$ between $-1$ and $1$; arccosecant needs $x$ of
       size at least $1$ — so the only inputs both allow are $x=1$ and $x=-1$, a
       domain of just two points.
-      {show math.1} At $x=1$, both pieces are $\tfrac{\pi}{2}$, so $f$ is $\pi$.
-      {show math.2} At $x=-1$, arcsine is $-\tfrac{\pi}{2}$, and under this text's
+      {show step.1} At $x=1$, both pieces are $\tfrac{\pi}{2}$, so $f$ is $\pi$.
+      {show step.2} At $x=-1$, arcsine is $-\tfrac{\pi}{2}$, and under this text's
       convention arccosecant is $\tfrac{3\pi}{2}$ — so $f$ is $\pi$ again. The
       function is just the constant $\pi$.
-      {show math.3} But switch to the other common convention, where $\arccsc(-1)$
+      {show step.3} But switch to the other common convention, where $\arccsc(-1)$
       is $-\tfrac{\pi}{2}$, and $f(-1)$ would come out $-\pi$ instead — same
       function, different answer, purely from the branch choice.
-      {show takeaway} That is exactly why we fix a convention up front.
+      That is exactly why we fix a convention up front.
 
   # 20 ------------------------------------------------------------ recap
   - id: recap

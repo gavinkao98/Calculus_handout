@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, VGroup
+from manim import DOWN, LEFT, RIGHT, RoundedRectangle, VGroup
 
 from .. import brand
 from ..blocks import Block
@@ -43,19 +43,23 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     top = 1.5
 
     from manim import Text
+    right_edge = T.FRAME_W / 2 - T.SIDE_GUTTER
     math_rows = []
     y = top
     prev_half = None
     for i, st in enumerate(steps):
-        numeral = Text(str(i + 1), font=T.FONT_DISPLAY, weight="BOLD",
-                       font_size=T.fs(72), color=T.color(ground, "secondary"))
-        rule = brand.vrule(0.9, ground, role="hairline", width=2)
-        txt = brand.prose(st.get("text", ""), ground, size="step",
-                          max_width=4.6, align="LEFT")
+        # zero-padded blue numeral (01/02/03) with a soft blue glow, Inter Tight bold.
+        numeral = brand.text_glow(
+            Text(f"{i + 1:02d}", font=T.FONT_DISPLAY, weight="BOLD",
+                 font_size=T.fs("numeral"), color=T.color(ground, "secondary")),
+            ground, role="secondary", width=3.0, opacity=0.4)
+        rule = brand.vrule(64 / T.PX_PER_UNIT_Y, ground, role="hairline", width=2)
+        txt = brand.prose(st.get("text", ""), ground, role="text", size="prose",
+                          max_width=5.0, align="LEFT")
         # numeral | rule | text as one left-anchored row (move_to+aligned_edge,
-        # the proven pattern); the step's math sits at a fixed right column, same y.
+        # the proven pattern); the step's math sits at the right gutter edge, same y.
         row = VGroup(numeral, rule, txt).arrange(RIGHT, buff=0.5)
-        m = brand.math_line(st.get("math", ""), ground, role="math", size="math")
+        m = brand.math_line(st.get("math", ""), ground, role="blue_ink", size=44)
 
         half = max(row.height, m.height) / 2
         if prev_half is None:
@@ -64,7 +68,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         else:
             y -= max(row_gap, prev_half + min_clear + half)
         row.move_to([left, y, 0], aligned_edge=LEFT)
-        m.move_to([T.FRAME_W / 2 - T.SIDE_GUTTER - 1.4, y, 0])
+        m.move_to([right_edge, y, 0], aligned_edge=RIGHT)
         prev_half = half
 
         blocks.append(Block(f"row.{i}", row, anim="fade", static=True))
@@ -73,21 +77,24 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     for i, m in enumerate(math_rows):
         blocks.append(Block(f"math.{i}", m, anim="write", static=False))
 
-    # bottom worked-example strip
+    # bottom worked-example strip: a rounded outline box (no left bar) with an
+    # amber-ink WORKED tag, then the example chained with CM arrows.
     worked = spec.get("worked", [])
     if worked:
-        from manim import Text
-        tag = brand.eyebrow("worked", ground, role="accent")
+        tag = brand.eyebrow("worked", ground, role="amber_ink")
         chain = []
         for j, piece in enumerate(worked):
-            chain.append(brand.math_line(piece, ground, role="math", size="math_sm"))
+            chain.append(brand.math_line(piece, ground, role="blue_ink", size="math_sm"))
             if j < len(worked) - 1:
-                chain.append(Text("→", font=T.FONT_BODY, font_size=T.fs("math_sm"),
-                                  color=T.color(ground, "muted")))
-        row = VGroup(tag, *chain).arrange(RIGHT, buff=0.35)
-        card = brand.math_card(row, ground, pad=0.4)
-        strip = VGroup(card, row)
-        strip.move_to([0, -T.FRAME_H / 2 + T.SAFE_MARGIN + card.height / 2 + 0.1, 0])
+                chain.append(brand.math_line(r"\to", ground, role="muted", size="math_sm"))
+        row = VGroup(tag, *chain).arrange(RIGHT, buff=0.4)
+        box = RoundedRectangle(
+            corner_radius=T.RADIUS_MD, width=row.width + 0.9, height=row.height + 0.7,
+            stroke_color=T.color(ground, "hairline"), stroke_width=1.5,
+            fill_color=T.color(ground, "bg_soft"), fill_opacity=1.0)
+        box.move_to(row.get_center())
+        strip = VGroup(box, row)
+        strip.move_to([0, -T.FRAME_H / 2 + T.SAFE_MARGIN + box.height / 2 + 0.1, 0])
         blocks.append(Block("worked", strip, anim="fade", static=False))
 
     blocks.append(motif_corner(ground))

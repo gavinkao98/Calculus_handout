@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, UP, Square, VGroup
+from manim import DOWN, LEFT, RIGHT, UP, RoundedRectangle, VGroup
 
 from .. import brand
 from ..blocks import Block
@@ -38,20 +38,18 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     left = -T.FRAME_W / 2 + T.SIDE_GUTTER
     content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
 
-    # -- statement card with gold left bar --
+    # -- statement in a gold-barred panel (the textbook "theorem frame") --
     # prose(): a pure-prose statement (no $) must NOT go to math_line -- that
     # routes to MathTex and renders the whole sentence as run-together math
-    # italic ("Afunction...one-to-one"). prose() sends it to Text instead, and
-    # still handles a statement that does carry inline $math$.
+    # italic. prose() sends it to Text instead, and still handles inline $math$.
     statement = brand.prose(spec.get("statement", ""), ground,
-                            role="primary", size="h2", max_width=content_w - 0.6)
-    bar = brand.vrule(statement.height + 0.3, ground, role="accent", width=6)
-    bar.next_to(statement, LEFT, buff=0.35)
-    card = VGroup(bar, statement)
+                            role="primary", size="h2", max_width=content_w - 1.4)
+    card = brand.accent_panel(statement, ground, bar_role="accent", fill_role="panel",
+                              pad=0.42, pad_x=0.6)
     # The card sits at its designed y; a tall (wrapped) statement grows upward,
     # so cap its top below the title -- the label/steps/qed cascade follows.
-    card_y = min(1.4, title.get_bottom()[1] - 0.2 - card.height / 2)
-    card.move_to([left, card_y, 0], aligned_edge=LEFT)
+    card_y = min(1.55, title.get_bottom()[1] - 0.32 - card.height / 2)
+    card.move_to([left + card.width / 2, card_y, 0])
     blocks.append(Block("statement", card, anim="fade", static=True))
 
     # -- proof label + steps --
@@ -69,7 +67,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     y = label_y - 0.7
     prev_half = None
     for i, p in enumerate(steps):
-        dot = brand.plot_dot(ground, role="secondary", r=0.06)
+        dot = brand.text_glow(brand.plot_dot(ground, role="secondary", r=0.07),
+                              ground, role="secondary", width=5, opacity=0.45)
         # prose() wraps a long step instead of shrinking it, so the steps keep a
         # uniform size -- a scaled-down long step beside a short one is the same
         # mismatch class as the recap points.
@@ -90,11 +89,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     qed_text = spec.get("qed")
     if qed_text:
         line = brand.prose(qed_text, ground, role="success", size="step")
-        box = Square(side_length=0.42, color=T.color(ground, "success"), stroke_width=3)
+        box = RoundedRectangle(width=0.46, height=0.46, corner_radius=T.RADIUS_SM,
+                               color=T.color(ground, "success"), stroke_width=3)
         mark = brand.glyph("qed", ground, role="success", size="math_sm")
-        mark.scale_to_fit_height(box.height * 0.5)
+        mark.scale_to_fit_height(box.height * 0.46)
         mark.move_to(box.get_center())
-        qbox = VGroup(box, mark)
+        qbox = brand.text_glow(VGroup(box, mark), ground, role="success", width=7, opacity=0.4)
         qbox.next_to(line, RIGHT, buff=0.3)
         row = VGroup(line, qbox)
         half = row.height / 2

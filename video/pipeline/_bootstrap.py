@@ -59,7 +59,14 @@ _TEX_TEMPLATE_SET = False
 
 
 def _set_tex_template() -> None:
-    """Set the global manim TeX template to use newtxtext + newtxmath (Times)."""
+    """Set the global manim TeX template — Computer Modern math (Direction D).
+
+    The redesign (Direction D) pairs Inter-Tight sans headings/prose with
+    Computer Modern math (the KaTeX/CM look), for the modern science-explainer
+    sans/serif contrast. So we DROP newtxtext/newtxmath (Times clones the earlier
+    design used to match the LaTeX handout) and let manim's default template
+    render math in CM. Only the inverse-trig operators are kept.
+    """
     global _TEX_TEMPLATE_SET
     if _TEX_TEMPLATE_SET:
         return
@@ -69,8 +76,6 @@ def _set_tex_template() -> None:
         return
     tpl = TexTemplate()
     tpl.add_to_preamble(
-        r"\usepackage{newtxtext}" "\n"
-        r"\usepackage{newtxmath}" "\n"
         # Inverse-trig operators the book preamble defines but manim's default
         # template lacks. \arcsin/\arccos/\arctan are LaTeX-kernel operators;
         # these three are not, so on-screen math using them failed to compile.

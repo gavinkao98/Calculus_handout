@@ -62,7 +62,11 @@ def _mark_mob(entry: Any, ground: str):
         mrole = _SIGN_ROLE.get(tex.strip(), "text")
     # 64px, a step above the "math" role: a sign / arrow glyph is intrinsically
     # small, and the marks ARE this scene's content (first-render finding).
-    return brand.math_line(tex, ground, role=mrole, size=64)
+    m = brand.math_line(tex, ground, role=mrole, size=64)
+    # a + / - sign gets a soft same-colour glow (green/red); arrows stay crisp.
+    if tex.strip() in ("+", "-") and mrole in ("success", "warning"):
+        m = brand.text_glow(m, ground, role=mrole, width=3.5, opacity=0.45)
+    return m
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -72,12 +76,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     title = blocks[1].mobject
 
     content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
-    text_col = T.color(ground, "text")
+    text_col = T.color(ground, "muted")   # number line + ticks read dim (ink-3)
 
     statement = None
     if spec.get("statement"):
-        statement = brand.prose(spec["statement"], ground, size="body",
-                                max_width=content_w, align="LEFT")
+        statement = brand.prose(spec["statement"], ground, role="primary", size=40,
+                                max_width=content_w, align="CENTER")
 
     points = spec.get("points", [])
     rows = spec.get("rows", [])
@@ -116,7 +120,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         else:
             axis_parts.append(Line([x, _TICK, 0], [x, -_TICK, 0],
                                    color=text_col, stroke_width=2.0))
-        lab = brand.math_line(label, ground, role="text", size="math_sm")
+        lab = brand.math_line(label, ground, role="primary", size="math_sm")
         lab.move_to([x, _TICK + 0.30 + lab.height / 2, 0])  # labels above the line,
         axis_parts.append(lab)                              # marks own the space below
 
@@ -142,7 +146,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     if rows and points:
         g_bottom = row_ys[-1] - 0.45
         for x in tick_xs:
-            g = brand.vrule(-g_bottom + 0.2, ground, role="hairline", opacity=0.7)
+            g = brand.vrule(-g_bottom + 0.2, ground, role="hairline", opacity=0.5)
             g.move_to([x, (0.2 + g_bottom) / 2, 0])
             guides.append(g)
 

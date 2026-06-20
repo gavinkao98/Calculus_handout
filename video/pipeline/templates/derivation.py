@@ -1,62 +1,110 @@
-"""derivation template -- Direction B (dark teaching frame).
+"""derivation template -- Direction D UNIFIED math system (the headline redesign).
 
-A FULL-WIDTH multi-line derivation chain: the template for continuous algebraic
-transformation (derivative-from-definition computations, limit-law rewrites,
-identity proofs), where the narration carries the "why" of each step and the
-screen gives the math the whole frame width.
+A step chain where equations share a left edge and an optional reasoning RAIL on
+the right annotates each step (e.g. "subtract 2", "cube root both sides") with a
+faint dotted leader. The result line glows amber with a leading therefore; an
+optional final check line carries a green checkmark verdict. Scales from 2 to ~7
+rows by gap-spacing rows (not glyph size), and carries the reasoning the old
+two-column walkthrough needed a whole column for -- so example_walkthrough folds
+into this one template.
 
-This is the capacity answer to the two-column walkthrough templates: their
-right column tops out around ~5 manim units of math width, while a real chain
-line (e.g. the ch02 slope-from-definition computation) needs 7-9. Here a line
-gets ~11.
+Two authoring shapes (both supported):
 
-Layout:
-  eyebrow + title (scene_head; `kicker` override supported);
-  optional centred prose `statement` (the problem being computed);
-  the chain -- line 0 carries the LHS; every later line written in the
-  "= ..." continuation style has its relation symbol x-aligned under line 0's
-  (one anchor column, like a hand-written derivation); lines without the
-  symbol fall back to the chain's left edge;
-  the statement + chain centre vertically as one group below the title.
-
-Reveal: statement is static; each chain line is dynamic ({show line.N}).
-`anim: highlight` renders that line in the accent colour (use it for the
-result line).
-
-Capacity (sizecheck enforces the frame; the SPLIT decision is the content
-layer's): ~5 fraction-height lines or ~7 single-height lines. Longer chains
-are split into scenes -- see DESIGN.md "Template selection".
-
-YAML shape:
+  # structured (preferred):
   template: derivation
-  accent: example
-  title: "Slope at a Point, from the Definition"
-  statement: "Find the slope of $y=x^2-3x$ at $(2,-2)$."   # optional
-  align_on: "="                                            # optional, default "="
+  title: "Inverting $f(x)=x^3+2$"
+  steps:
+    - { math: "y = x^3 + 2", reason: "write $y=f(x)$" }
+    - { math: "x^3 = y - 2", reason: "subtract 2" }
+    - { math: "x = \\sqrt[3]{y-2}", reason: "cube root both sides" }
+  result: { math: "\\therefore\\; f^{-1}(x) = \\sqrt[3]{x-2}", reason: "swap names" }
+  check:  { math: "f(f^{-1}(x)) = x", reason: "verified" }    # optional, gets a green check
+
+  # back-compat (the old full-width chain; each line -> a reason-less step,
+  # `anim: highlight` -> the amber result):
   lines:
-    - "m = \\lim_{h \\to 0} \\frac{f(2+h)-f(2)}{h}"
-    - "= \\lim_{h \\to 0} \\frac{(4+4h+h^2-6-3h)-(-2)}{h}"
+    - "m = \\lim_{h\\to 0} \\frac{f(2+h)-f(2)}{h}"
     - { tex: "= 1", anim: highlight }
+
+Reveal: each row is dynamic. ids: structured -> step.0..N / result / check;
+back-compat lines -> line.0..N (so existing storyboards keep working).
 """
 from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, UL, MathTex, VGroup
+from manim import DOWN, LEFT, RIGHT, MathTex, Text, VGroup
 
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
 from ._common import scene_head, motif_corner
 
-_LINE_BUFF = 0.30
+_COL_GAP = 0.36       # equation column -> reason rail
+_LEADER_W = 0.67      # dotted leader length (90px)
+_ROW_GAP = 0.40       # between rows (min pitch; expands for tall rows)
 
 
-def _chain_line(tex: str, ground: str, *, role: str) -> MathTex:
-    """One chain line as MathTex. Chain lines are pure math by convention
-    (no '$'), so MathTex is always the right path -- brand.math_line is
-    bypassed because it cannot isolate substrings."""
-    return MathTex(tex, color=T.color(ground, role), font_size=T.fs("math"))
+def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
+    """Normalise either schema into a list of {math, reason, kind, rid, anim}."""
+    rows: list[dict] = []
+    if spec.get("steps") is not None or spec.get("result") is not None:
+        for i, st in enumerate(spec.get("steps", [])):
+            st = st if isinstance(st, dict) else {"math": st}
+            rows.append({"math": str(st.get("math", "")), "reason": st.get("reason"),
+                         "kind": "step", "rid": f"step.{i}", "anim": "write",
+                         "mark": st.get("mark")})
+        if spec.get("result") is not None:
+            r = spec["result"]
+            r = r if isinstance(r, dict) else {"math": r}
+            rows.append({"math": str(r.get("math", "")), "reason": r.get("reason"),
+                         "kind": "result", "rid": "result", "anim": "write_glow"})
+        if spec.get("check") is not None:
+            c = spec["check"]
+            c = c if isinstance(c, dict) else {"math": c}
+            rows.append({"math": str(c.get("math", "")), "reason": c.get("reason"),
+                         "kind": "check", "rid": "check", "anim": "write"})
+    else:  # back-compat `lines`
+        for i, entry in enumerate(spec.get("lines", [])):
+            if isinstance(entry, dict):
+                tex, anim, reason = entry.get("tex", ""), entry.get("anim", "write"), entry.get("reason")
+            else:
+                tex, anim, reason = entry, "write", None
+            kind = "result" if anim == "highlight" else "step"
+            rows.append({"math": str(tex), "reason": reason, "kind": kind,
+                         "rid": f"line.{i}", "anim": "write_glow" if kind == "result" else anim})
+    return rows
+
+
+def _eq_mob(row: dict, ground: str):
+    """The equation mobject for a row, coloured + sized by kind; check rows get a
+    trailing green checkmark."""
+    if row["kind"] == "result":
+        eq = MathTex(row["math"].strip(), color=T.color(ground, "accent"), font_size=T.fs(54))
+        return brand.text_glow(eq, ground, role="accent", width=3.0, opacity=0.45)
+    role = "muted" if row["kind"] == "check" else "primary"
+    eq = MathTex(row["math"].strip(), color=T.color(ground, role), font_size=T.fs("math"))
+    # a trailing verdict glyph: check rows + steps marked ok -> green check; bad -> red cross
+    verdict = "ok" if row["kind"] == "check" else row.get("mark")
+    if verdict in ("ok", "bad"):
+        name, vrole = ("check", "success") if verdict == "ok" else ("cross", "warning")
+        mark = brand.glyph(name, ground, role=vrole, size="math")
+        mark.scale(0.8).next_to(eq, RIGHT, buff=0.28)
+        return VGroup(eq, mark)
+    return eq
+
+
+def _reason_mob(row: dict, ground: str):
+    """The rail reason: result -> mono uppercase amber-ink tag; else faded italic."""
+    reason = row.get("reason")
+    if not reason:
+        return None
+    if row["kind"] == "result":
+        return brand.eyebrow(str(reason), ground, role="amber_ink")
+    if "$" in str(reason):
+        return brand.prose(str(reason), ground, role="muted", size="prose_sm")
+    return Text(str(reason), font=T.FONT_BODY, font_size=T.fs("prose_sm"),
+                color=T.color(ground, "muted"), slant="ITALIC")
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -67,51 +115,61 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     title = head[1].mobject
 
     content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
+    left_x = -T.FRAME_W / 2 + T.SIDE_GUTTER
 
     statement = None
     if spec.get("statement"):
-        statement = brand.prose(spec["statement"], ground, size="body",
+        statement = brand.prose(spec["statement"], ground, role="primary", size="prose",
                                 max_width=content_w, align="LEFT")
 
-    line_mobs: list[MathTex] = []
-    anims: list[str] = []
-    for entry in spec.get("lines", []):
-        if isinstance(entry, dict):
-            tex, anim = entry["tex"], entry.get("anim", "write")
-        else:
-            tex, anim = entry, "write"
-        is_key = anim == "highlight"
-        line_mobs.append(_chain_line(str(tex).strip(), ground,
-                                     role="accent" if is_key else "math"))
-        anims.append(anim)
+    rows = _rows_from_spec(spec)
+    eqs = [_eq_mob(r, ground) for r in rows]
+    reasons = [_reason_mob(r, ground) for r in rows]
 
-    parts = []
-    if statement is not None:
-        parts.append(statement)
+    eq_col_w = max((e.width for e in eqs), default=0.0)
+    rail_x = left_x + eq_col_w + _COL_GAP
+    reason_x = rail_x + _LEADER_W + 0.16
+    reason_max_w = (left_x + content_w) - reason_x
 
-    if line_mobs:
-        y = 0.0
-        for m in line_mobs:
-            m.move_to([0, y, 0], aligned_edge=UL)
-            y -= m.height + _LINE_BUFF
-        parts.append(VGroup(*line_mobs))
+    # vertical layout: gap-spaced rows (fused-rows pitch so tall rows never collide)
+    row_mobs: list[Any] = []
+    y = 0.0
+    prev_half = None
+    for r, eq, reason in zip(rows, eqs, reasons):
+        if reason is not None and reason.width > reason_max_w > 0:
+            reason.scale_to_fit_width(reason_max_w)
+        h = max(eq.height, reason.height if reason is not None else 0.0)
+        half = h / 2
+        if prev_half is not None:
+            extra = _ROW_GAP + (0.12 if r["kind"] == "check" else 0.0)
+            y -= prev_half + extra + half
+        eq.move_to([left_x, y, 0], aligned_edge=LEFT)
+        group = [eq]
+        if reason is not None:
+            reason.move_to([reason_x, y, 0], aligned_edge=LEFT)
+            leader = brand.dotted_leader(
+                _LEADER_W, ground,
+                role="accent" if r["kind"] == "result" else "hairline_strong",
+                opacity=0.5 if r["kind"] == "result" else 0.55)
+            leader.move_to([rail_x + _LEADER_W / 2, y, 0])
+            group += [leader, reason]
+        row_mobs.append((r, VGroup(*group), eq))
+        prev_half = half
 
-    # Statement + chain centre as ONE group in the zone between the title and
-    # the bottom safe margin (same balance rule as definition_math). The zone
-    # reaches deeper than definition_math's (+0.15 vs +0.45): a full 5-line
-    # chain needs the room, and the centred chain never overlaps the corner
-    # motif on the right.
+    # centre statement + chain as one group in the body zone, flush left
+    chain = VGroup(*[g for _, g, _ in row_mobs]) if row_mobs else None
+    parts = ([statement] if statement is not None else []) + ([chain] if chain is not None else [])
     if parts:
-        content = VGroup(*parts).arrange(DOWN, buff=0.55)
-        zone_top = title.get_bottom()[1] - 0.55
-        zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.15
-        content.move_to([0, (zone_top + zone_bottom) / 2, 0])
+        content = VGroup(*parts).arrange(DOWN, buff=0.55, aligned_edge=LEFT)
+        zone_top = title.get_bottom()[1] - T.TITLE_GAP
+        zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
+        content.move_to([left_x + content.width / 2, (zone_top + zone_bottom) / 2, 0])
         content.align_to(title, LEFT)
 
     if statement is not None:
         blocks.append(Block("statement", statement, anim="fade", static=True))
-    for i, (mob, anim) in enumerate(zip(line_mobs, anims)):
-        blocks.append(Block(f"line.{i}", mob, anim=anim, static=False))
+    for r, group, _eq in row_mobs:
+        blocks.append(Block(r["rid"], group, anim=r["anim"], static=False))
 
     blocks.append(motif_corner(ground))
     return blocks

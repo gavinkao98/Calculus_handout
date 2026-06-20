@@ -104,6 +104,22 @@ def _prose_strings(data: dict) -> "list[tuple[str, str]]":
     return out
 
 
+def _graph_kind(scene: dict) -> "str | None":
+    """Effective graph type for a scene: 'focus' (single panel: top-level axes/plots)
+    or 'compare' (two panels: left/right), else None. Handles the unified `graph`
+    template (dispatch on `mode`) AND the deprecated graph_focus/graph_compare names,
+    so the missing-tick / label-overlap guards never go dark after the merge."""
+    t = scene.get("template")
+    if t == "graph_focus":
+        return "focus"
+    if t == "graph_compare":
+        return "compare"
+    if t == "graph":
+        return "compare" if str(scene.get("mode", "single")).lower() in (
+            "2up", "two-up", "twoup", "compare", "2-up") else "focus"
+    return None
+
+
 def _hollow_on_curve(data: dict) -> "list[tuple[str, str]]":
     """Warn for a hollow point that lies (interior) on a plotted curve -- almost
     always an attained value drawn wrong. Endpoints are skipped (a half-open
@@ -114,7 +130,7 @@ def _hollow_on_curve(data: dict) -> "list[tuple[str, str]]":
         return []
     out: list[tuple[str, str]] = []
     for si, scene in enumerate(data.get("scenes", []) or []):
-        if scene.get("template") != "graph_focus":
+        if _graph_kind(scene) != "focus":
             continue
         sid = scene.get("id", f"scenes[{si}]")
         plots = scene.get("plots", []) or []
@@ -186,10 +202,10 @@ def _quantitative_without_scale(data: dict) -> "list[tuple[str, str]]":
     graph_focus (top-level axes/plots) and graph_compare (left/right panels)."""
     out: list[tuple[str, str]] = []
     for si, scene in enumerate(data.get("scenes", []) or []):
-        tmpl = scene.get("template")
-        if tmpl == "graph_focus":
+        gk = _graph_kind(scene)
+        if gk == "focus":
             panels = [("", scene.get("axes", {}) or {}, scene.get("plots", []) or [])]
-        elif tmpl == "graph_compare":
+        elif gk == "compare":
             panels = [(f"{k} ", (scene.get(k, {}) or {}).get("axes", {}) or {},
                        (scene.get(k, {}) or {}).get("plots", []) or [])
                       for k in ("left", "right")]

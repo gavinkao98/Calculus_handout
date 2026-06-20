@@ -86,10 +86,10 @@ def _pulse_timeline(spec: dict[str, Any], meta: dict[str, Any], ground: str) -> 
     # vertical rail line
     rail = Line(
         [rail_x, top_y, 0], [rail_x, bottom_y, 0],
-        stroke_color=T.color(ground, "muted"),
-        stroke_width=2.0,
+        stroke_color=T.color(ground, "ink_faint"),
+        stroke_width=3.0,
     )
-    rail.set_opacity(0.5)
+    rail.set_opacity(0.9)
 
     # all dots (muted) + section numbers only — no titles
     nodes = VGroup()
@@ -102,11 +102,11 @@ def _pulse_timeline(spec: dict[str, Any], meta: dict[str, Any], ground: str) -> 
         y = top_y - i * row_gap
 
         dot = Circle(
-            radius=0.06,
-            stroke_color=T.color(ground, "muted"),
+            radius=0.07,
+            stroke_color=T.color(ground, "ink_faint"),
             stroke_width=1.5,
-            fill_color=T.color(ground, "muted"),
-            fill_opacity=0.3,
+            fill_color=T.color(ground, "ink_faint"),
+            fill_opacity=1.0,
         )
         dot.move_to([rail_x, y, 0])
 

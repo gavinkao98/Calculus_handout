@@ -43,27 +43,25 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, VGroup
+from manim import DOWN, Rectangle, VGroup
 
 from .. import brand
 from ..blocks import Block, accent_role
 from ..visuals import theme as T
 from ._common import scene_head, motif_corner
 
-_COL_GAP = 0.55
-_ROW_GAP = 0.42
-_HEADER_RULE_GAP = 0.24
+_COL_GAP = 0.7
+_ROW_GAP = 0.5
+_HEADER_RULE_GAP = 0.26
 
 
-def _cell(text: str, ground: str, *, role: str):
+def _cell(text: str, ground: str, *, role: str, size):
     """One table cell. Routed on content like every author field: math (or
-    text with inline $math$) -> math_line, plain words -> prose (Text).
-    Full "math" size, not math_sm -- the table IS the scene's content and
-    a small grid read timid at video distance (first-render finding)."""
+    text with inline $math$) -> math_line, plain words -> prose (Text)."""
     s = str(text).strip()
     if "$" in s:
-        return brand.math_line(s, ground, role=role, size="math")
-    return brand.prose(s, ground, role=role, size="step")
+        return brand.math_line(s, ground, role=role, size=size)
+    return brand.prose(s, ground, role=role, size=size)
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -77,8 +75,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     statement = None
     if spec.get("statement"):
-        statement = brand.prose(spec["statement"], ground, size="body",
-                                max_width=content_w, align="LEFT")
+        statement = brand.prose(spec["statement"], ground, role="primary", size=40,
+                                max_width=content_w, align="CENTER")
 
     header = [str(c) for c in spec.get("header", [])]
     rows = [[str(c) for c in r] for r in spec.get("rows", [])]
@@ -87,15 +85,19 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     accent_row = spec.get("accent_row")
 
     def cell_role(r: int | None, c: int) -> str:
-        # r is None for the header row
+        # r is None for the header row. The punchline (accent) column/row is
+        # blue-ink; the row-label column 0 is ink-1; header ink-3; body ink-2.
         if accent_col is not None and c == int(accent_col):
-            return role
+            return "blue_ink"
         if r is not None and accent_row is not None and r == int(accent_row):
-            return role
-        return "primary" if r is None else "text"
+            return "blue_ink"
+        if c == 0:
+            return "primary"
+        return "muted" if r is None else "text"
 
-    header_mobs = [_cell(c, ground, role=cell_role(None, j)) for j, c in enumerate(header)]
-    row_mobs = [[_cell(c, ground, role=cell_role(i, j)) for j, c in enumerate(r)]
+    header_mobs = [_cell(c, ground, role=cell_role(None, j), size=38)
+                   for j, c in enumerate(header)]
+    row_mobs = [[_cell(c, ground, role=cell_role(i, j), size=42) for j, c in enumerate(r)]
                 for i, r in enumerate(rows)]
 
     # -- grid geometry: column width = widest cell in that column ----------
@@ -125,7 +127,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         for j, m in enumerate(header_mobs):
             m.move_to([col_x[j], y - h / 2, 0])
         y -= h + _HEADER_RULE_GAP
-        rule = brand.hrule(table_w, ground, role="hairline", stroke=2.0)
+        rule = brand.hrule(table_w, ground, role="hairline_strong", stroke=2.0)
         rule.move_to([table_w / 2, y, 0])
         y -= _HEADER_RULE_GAP
         table_parts += header_mobs + [rule]
@@ -137,6 +139,17 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             m.move_to([col_x[j], y - h / 2, 0])
         y -= h + _ROW_GAP
         table_parts += r
+
+    # -- faint blue tint behind the punchline (accent) column ---------------
+    tint = None
+    if accent_col is not None and 0 <= int(accent_col) < n_cols:
+        ac = int(accent_col)
+        tint_h = (0.0 - y) + 0.1
+        tint = Rectangle(width=col_w[ac] + 0.6, height=tint_h,
+                         fill_color=T.color(ground, "blue"), fill_opacity=T.ACCENT_DIM,
+                         stroke_width=0)
+        tint.move_to([col_x[ac], (0.0 + y) / 2 + _ROW_GAP / 2, 0])
+        table_parts.insert(0, tint)   # behind the cells
 
     # -- centre statement + table as one group in the zone ------------------
     parts = []
@@ -151,6 +164,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.45
         content.move_to([0, (zone_top + zone_bottom) / 2, 0])
 
+    if tint is not None:
+        blocks.append(Block("col_tint", tint, anim="fade", static=True, layer="background"))
     if statement is not None:
         blocks.append(Block("statement", statement, anim="fade", static=True))
     if rule is not None:

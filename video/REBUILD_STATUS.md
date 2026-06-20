@@ -4,6 +4,37 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## 🎨 2026-06-20 Direction D 視覺重設計（「Manim Video Design System」handoff 落地）
+
+使用者重新設計了整套影片視覺（zip handoff：`tokens/*.css`＋`frames/*.html`＋`SKILL.md`／`readme.md`／`CHANGES.md`），要求據此改模板。**兩項裁決（AskUserQuestion）：① 採用 Direction D——標題/散文改 Inter Tight sans、數學維持 serif 但換 Computer Modern；② 完整重建含結構調整。** 未動任何計費 API（全程 mock/離線 render 驗證）。
+
+- **字型（已徵同意安裝）：** Inter Tight（標題/散文）＋ JetBrains Mono（eyebrow/標籤）由 Google Fonts 可變字型以 `fonttools` instancer 抽成各 weight 靜態 TTF，**vendored 進 [`pipeline/assets/fonts/`](pipeline/assets/fonts)（隨 git、`_bootstrap.register_design_fonts()` 進程內註冊、換機免裝）**。`tools/doctor.py` 加 `check_fonts()`（驗 manimpango 看得到兩家族，否則 render 靜默 fallback）；`ENVIRONMENT.md` 補「①b 設計字型」節。
+- **數學 → Computer Modern：** [`pipeline/_bootstrap.py`](pipeline/_bootstrap.py) `_set_tex_template` **drop `newtxtext`/`newtxmath`**（保留三反三角 `\DeclareMathOperator`）；newtx 自此僅 legacy handout 需要、doctor 移除 newtx 檢查。
+- **Foundation 重寫（tokens 全來自設計檔）：**
+  - [`visuals/theme.py`](pipeline/visuals/theme.py)：4 色彩語意（blue/amber/green/red＋reserved violet）＋4 ink＋5 ground＋paper theme；**舊 role 名（secondary/accent/math/...）保留為 alias 指向新色**（~15 模板免改即解析）。新 type scale（h1 62→82px 等）、幾何（gutter 220→100px、safe 96→74px）、glow/radii/rhythm tokens。**重新量測** `PX_TO_FS` 0.72→**0.655**（Inter Tight cap 比 Times 高 ~10%）、`TEX_TEXT_SCALE` 1.36→**1.42**、`_WIDTH_K` 0.0058→**0.0068**。
+  - [`brand.py`](pipeline/brand.py)：散文/標題改 Inter Tight；新 helper `glow_curve`／`text_glow`（halo-under-stroke，manim 無 blur 故寬低透明 stroke 疊）／`dotted_leader`／`accent_panel`／`hero_curve`／`ghost_numeral`／`progress_dots`。**關鍵 `_compose()` 混排**：Inter Tight 文字 run＋CM MathTex run **同列 baseline 對齊**（文字 descender-aware baseline、數學 math-axis；token 不跨行裂），prose() 與 heading_rich() 共用 → 散文/標題皆「sans 文字＋serif 數學」同列、純散文與含數學散文不再不一致。dash 正規化（Pango「—」／Tex「---」）。
+  - [`blocks.py`](pipeline/blocks.py)：`ACCENT_ROLE` 收斂 4 色＋新增 remark/caution/note；`grow`/`slide_pop` 去彈跳（fade/glow，符合 never-bounce）。
+- **模板（render 逐一視覺驗證，stills 存 `output/_still/`；新增 [`render_still.py`](render_still.py) 終幀 PNG QA 工具）：**
+  - **完成重皮：** definition_math（左齊＋amber key glow）、theorem_proof（gold-bar `accent_panel`＋藍點 glow＋綠 QED 圓角盒）、procedure_steps（01/02 藍數字 glow＋blue-ink RHS＋圓角 WORKED 條）、recap_cards（amber idx/dot＋blue-ink REMEMBER＋藍 bar bg-soft cards）、value_table（藍 tint 欄＋blue-ink＋ink-3 表頭）、sign_chart（暗號線＋綠/紅 sign glow＋ink-1 臨界標）。
+  - **derivation ★ 升級統一數學系統：** 兩欄（式左齊｜reason rail＋dotted leader）＋amber ∴ result glow＋綠 ✓ check；**`steps/result/check` 新 schema＋`lines` 向後相容**。example_walkthrough 內容可併入。
+  - **callout ★（新）：** Remark/Caution/Note 色隨 `type`；已註冊。
+  - **graph 引擎合併（已完成、安全）：** 新增 [`graph.py`](pipeline/templates/graph.py)——單一 `graph` 模板，依 `mode`（single/2up）dispatch 到既有 graph_focus/graph_compare builder（**不重複邏輯**）。曲線套 glow recipe（crisp 3.5→5、halo 12→16 opacity 0.16→0.24）、軸線改 muted（暗）。**critic 已改寫：** `lint.py` 新增 `_graph_kind()`（focus/compare/None，認得 `graph`+mode 與舊名）並接到 missing-tick／label-overlap 兩處；`sizecheck.py:257` 加 `graph`。**graph_focus/graph_compare 保留為 deprecated alias**（未遷移的 storyboard 仍可渲、critic 仍偵測）。
+  - **outro（重設計）：** 單一 paper end-slate（NTU lockup＋紅 rule＋紅 END OF SECTION x.x＋navy 標題＋紅「▶ Next §x.x」hint）；刪掉舊 dark landing stage。
+  - **divider ★（新）：** dark 章節/小節 opener（發光 hero curve＋520px ghost numeral＋eyebrow/title/subtitle＋progress dots）；`kind: divider` 已接 `schema.SCENE_KINDS`／`__init__.build_blocks` dispatch／scene.py（dark ground＋`_play_timed`）。
+  - **intro：** course-map paper tokens 對齊（rail/dot 改 ink_faint 暖淺灰、active 紅）；多階段結構維持（logo→coursemap→dark handoff）。
+  - 驗證稿 [`storyboards/_demo_redesign.yml`](storyboards/_demo_redesign.yml)（definition/theorem/callout/derivation/procedure/recap/outro/divider）。
+- **§1.1／§1.2 已用新模板重做（2026-06-20，使用者裁決「用新模板重做一遍」）：** 兩支**正典 storyboard 就地轉換**（原檔在 git）：
+  - **graph：** `template: graph_focus/compare` → `template: graph` + `mode: single`/`2up`（§1.1 scenes 6/11/12、§1.2 六個 graph_focus；payload／`{show plot.N}`／hook 全不變——hook 接的 reveal id 不動故照常 wire）。
+  - **example_walkthrough → derivation：** §1.1 三場（testing_x_and_x_squared／shape_can_mislead／first_inverses）＋§1.2 三場（domain_of_compositions／evaluating_inverse_trig／conventions_change_answers）。欄位映射 `{text,math,mark}`→`{math, reason, mark}`、`{show math.N}`→`{show step.N}`；驗證步驟（mark:ok 的 check）→ derivation `check` 列；prose `takeaway` 收進旁白（不再上螢幕，結論已在 marked step）。reason 縮成 rail 短標。
+  - **derivation 擴充：** step 支援 `mark: ok|bad` → 行末綠 ✓／紅 ✗（落實「ew 的 ✓/✗ 併入 derivation」；conventions_change_answers 的 ✓✓✗ 對比完整保留）。
+  - **三閘全過：** schema OK（`--list` 確認 reveal target 全部 resolve、無 stale marker）、lint clean、代表場景 render 視覺驗證（ew→derivation reason rail＋verdict、graph glow 曲線）。
+- **🚧 仍待完成：**
+  1. **`_mimo` 變體重生：** mimo storyboard 由 `derive_spoken.py` 從正典生成。正典 markers 已改（math.N→step.N、去 takeaway），故 `content_scripts/ch01_*.spoken.yml` 的 markers 需同步改、再 `derive_spoken --deck <deck>` 重生 mimo。**綁定延後的 MiMo TTS 步驟**，待使用者重啟有聲版時一併做。
+  2. **硬刪 example_walkthrough/graph_focus/graph_compare 三個 .py：** 目前留作 deprecated alias（graph.py 仍 import focus/compare 當實作）。待 mimo 也重生、確認無任何 storyboard 引用舊名後，再決定是否把 focus/compare 改名為 graph.py 內部模組、移除 registry alias。
+  3. **逐場景微調**幾何/字級放大造成的溢出（已知 `inverse_iff_one_to_one` QED 溢出 ~0.47u）——需逐場景 render＋VLM 複驗。
+  4. intro 的 paper course-map 完整視覺複驗（目前只調色、結構沿用；dark handoff 階段可考慮改用 divider）。
+- **暫存檔（完成後清）：** `scratch_smoke_fonts.py`／`scratch_measure.py`／`scratch_widthk.py`／`scratch_prose.py`／`render_still.py`／`output/_redesign_specs.md`／`storyboards/_demo_redesign.yml`。使用者既有 `scratch_*.py`（isolate/mathtex/split）不動。
+
 ## 🎞️ 2026-06-18 §1.2 Inverse Trig 從講義重跑——完成至 mock 里程碑（含動畫＋口語軌＋NFA；MiMo 經使用者裁決延後）
 
 承 §1.1 範本，§1.2「Inverse Trigonometric Functions」從 HTML 講義（[`../handout/fragments/ch01/sec-1-2.html`](../handout/fragments/ch01/sec-1-2.html)）從零重跑。使用者 `/goal 完成1.2的影片`。**未動任何計費 API。**

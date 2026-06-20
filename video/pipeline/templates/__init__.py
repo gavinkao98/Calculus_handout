@@ -15,9 +15,12 @@ from typing import Any, Callable
 
 from ..blocks import Block
 from . import (
+    callout,
     definition_math,
     derivation,
+    divider,
     example_walkthrough,
+    graph,
     graph_compare,
     graph_focus,
     intro,
@@ -32,9 +35,14 @@ from . import (
 Builder = Callable[[dict[str, Any], dict[str, Any]], "list[Block]"]
 
 REGISTRY: dict[str, Builder] = {
+    "callout": callout.build,
     "definition_math": definition_math.build,
     "derivation": derivation.build,
+    "divider": divider.build,
     "example_walkthrough": example_walkthrough.build,
+    "graph": graph.build,
+    # graph_focus / graph_compare: deprecated aliases of `graph` (mode single / 2up),
+    # kept so any un-migrated storyboard still renders.
     "graph_compare": graph_compare.build,
     "graph_focus": graph_focus.build,
     "procedure_steps": procedure_steps.build,
@@ -49,7 +57,7 @@ REGISTRY: dict[str, Builder] = {
 
 def build_blocks(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     kind = spec.get("kind", "content")
-    if kind in ("intro", "outro"):
+    if kind in ("intro", "outro", "divider"):
         return REGISTRY[kind](spec, ctx)
     template = spec.get("template")
     if template not in REGISTRY:

@@ -254,7 +254,7 @@ def graph_label_geometry(meta: dict, scene: dict) -> "dict | None":
     boxes in frame-fraction coords (origin TOP-LEFT, x right, y down -- how the VLM
     reads the rendered image), or ``None`` when the scene is not a graph template, has
     no labels, or fails to build. Offline: builds blocks, no render, no API."""
-    if scene.get("template") not in ("graph_focus", "graph_compare"):
+    if scene.get("template") not in ("graph_focus", "graph_compare", "graph"):
         return None
     from pipeline.templates import build_blocks
     from pipeline.visuals import theme as T

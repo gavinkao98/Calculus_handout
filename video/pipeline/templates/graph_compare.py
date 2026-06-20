@@ -69,7 +69,7 @@ def _panel(side_spec: dict[str, Any], ground: str, prefix: str) -> tuple[list[Bl
         y_length=float(ac.get("y_length", 3.2)),
         tips=False,
         axis_config={
-            "color": T.color(ground, "text"),
+            "color": T.color(ground, "muted"),
             "stroke_width": 2.0,
             "include_ticks": False,
             "include_numbers": False,
@@ -83,7 +83,7 @@ def _panel(side_spec: dict[str, Any], ground: str, prefix: str) -> tuple[list[Bl
     panel_blocks: list[Block] = [Block("axes", axes, anim="create", static=True)]
     plot_blocks, _ = gf._plot_blocks(side, axes, ground)
     panel_blocks += plot_blocks
-    ticks = gf._axis_ticks(axes, ac, ground)
+    ticks = gf._axis_ticks(axes, ac, ground, side_spec.get("plots", []))
     if ticks is not None:
         panel_blocks.append(Block("ticks", ticks, anim="fade", static=True))
     for b in panel_blocks:

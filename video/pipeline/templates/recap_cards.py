@@ -44,12 +44,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # Advance by each row's REAL height (top-anchored), not a fixed row pitch:
     # with pitch 1.2 a point that wrapped to three lines overran the slot and
     # visually fused with the next bullet (v2 frame critique, recap scene).
-    pt_gap = 0.5
-    y_cursor = 1.75
+    pt_gap = 0.42
+    y_cursor = 1.95
     for i, t in enumerate(points):
-        idx = brand.eyebrow(f"0{i+1}", ground, role="accent")
-        dot = brand.plot_dot(ground, role="accent", r=0.06)
-        txt = brand.prose(t, ground, size="step", max_width=5.0, align="LEFT")
+        idx = brand.eyebrow(f"{i+1:02d}", ground, role="accent")
+        dot = brand.plot_dot(ground, role="accent", r=0.07)
+        txt = brand.prose(t, ground, role="text", size="prose", max_width=5.6, align="LEFT")
         dot.next_to(txt, LEFT, buff=0.25, aligned_edge=UP)
         idx.next_to(dot, LEFT, buff=0.25, aligned_edge=UP)
         row = VGroup(idx, dot, txt)
@@ -63,19 +63,17 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # broadcast-safe edge -- at 2.2 it spilled off-frame (caught by the overflow
     # guard); the points column ends near x=0.5, so this still reads as two columns.
     right_x = 1.15
-    rem = brand.eyebrow("remember", ground, role="secondary")
+    rem = brand.eyebrow("remember", ground, role="blue_ink")
     rem.move_to([right_x, 2.0, 0], aligned_edge=LEFT)
     blocks.append(Block("remember", rem, anim="fade", static=True))
 
     card_gap = 1.4
     card_top = 0.9
     for i, f in enumerate(formulas):
-        m = brand.math_line(f, ground, role="math", size="math")
-        card = brand.math_card(m, ground, pad=0.45)
-        # cyan left border accent, flush to the card's left edge
-        accent_bar = brand.vrule(card.height, ground, role="secondary", width=4)
-        accent_bar.move_to([card.get_left()[0], card.get_center()[1], 0])
-        grp = VGroup(card, accent_bar, m)
+        # blue-ink LaTeX on a bg-soft card with a blue 5px left bar (the `.fcard`).
+        m = brand.math_line(f, ground, role="blue_ink", size="math_sm")
+        grp = brand.accent_panel(m, ground, bar_role="secondary", fill_role="bg_soft",
+                                 radius=T.RADIUS_MD, bar_px=5, pad=0.36, pad_x=0.5)
         grp.move_to([right_x, card_top - i * card_gap, 0], aligned_edge=LEFT)
         blocks.append(Block(f"formula.{i}", grp, anim="fade", static=False))
 
