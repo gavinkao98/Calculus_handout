@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "properties": {
+    "converged": { "type": "boolean" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": { "type": "string", "enum": ["math", "faithfulness", "direction-conformance", "house_rule", "register", "other"] },
+          "blocking": { "type": "boolean" },
+          "level": { "type": "integer", "enum": [1, 2, 3, 4] },
+          "severity": { "type": "string", "enum": ["low", "med", "high"] },
+          "where": { "type": "string" },
+          "issue": { "type": "string" },
+          "evidence": { "type": "string" },
+          "suggestion": { "type": "string" }
+        },
+        "required": ["category", "blocking", "level", "severity", "where", "issue", "evidence", "suggestion"],
+        "additionalProperties": false
+      }
+    },
+    "summary": { "type": "string" }
+  },
+  "required": ["converged", "findings", "summary"],
+  "additionalProperties": false
+}

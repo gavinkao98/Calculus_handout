@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§4.1 — gate 2（Codex gpt-5.5 xhigh）審核稿</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f7f5;color:#1d1d1f;font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.6;padding:32px 18px 80px}
+.wrap{max-width:940px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 4px}
+h2{font-size:1.16rem;margin:30px 0 6px;padding-bottom:6px;border-bottom:2px solid #e4e4e0}
+.lede{color:#6b6b70;margin:0 0 16px;font-size:.93rem}
+.note{background:#fff;border:1px solid #e4e4e0;border-left:3px solid #2552b3;border-radius:8px;padding:12px 16px;margin:14px 0;font-size:.93rem}
+.note.pass{background:#eaf6ed;border-left-color:#1a7f37}
+.note.pass b{color:#1a7f37}
+.note.warn{background:#fff6e3;border-left-color:#8a5a00}
+.zero{color:#1a7f37;font-weight:700}.blkw{color:#a11;font-weight:700}
+table.u{width:100%;border-collapse:collapse;margin:10px 0;font-size:.83rem}
+table.u th,table.u td{border:1px solid #e4e4e0;padding:6px 8px;text-align:left;vertical-align:top}
+table.u th{background:#eef0f4}
+table.u td.src{color:#5b3aa8}.table.u td.fx{color:#7a5b00}
+td.fx{color:#7a5b00}
+.card{background:#fff;border:1px solid #e4e4e0;border-radius:10px;padding:12px 15px;margin:11px 0}
+.card.blk{border-left:4px solid #a11}.card.adv{border-left:4px solid #8a5a00}
+.card.applied{border-left:4px solid #1a7f37}.card.kept{border-left:4px solid #9aa}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;align-items:center}
+.chip{font-size:.74rem;padding:2px 9px;border-radius:999px;font-weight:600;letter-spacing:.02em}
+.c-blk{background:#fdeceb;color:#a11}.c-adv{background:#eef0f4;color:#555}.c-cat{background:#e7eefc;color:#1f49a6}
+.c-app{background:#e6f7ea;color:#1a7f37}.c-kept{background:#eef0f4;color:#555}.c-lvl{background:#1d1d1f;color:#fff;font-family:ui-monospace,Menlo,Consolas,monospace}
+.where{color:#6b6b70;font-size:.85rem;margin:2px 0 6px}
+.issue{margin:2px 0 6px}.ev,.sug{font-size:.84rem;color:#555;margin:3px 0}
+.disp{font-weight:700}.disp.applied{color:#1a7f37}.disp.kept{color:#6b6b70}
+footer{margin-top:40px;color:#6b6b70;font-size:.85rem;border-top:1px solid #e4e4e0;padding-top:14px}
+a{color:#2552b3}
+code{background:#f3f4f6;padding:.05rem .3rem;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>§4.1 — gate 2（Codex gpt-5.5 xhigh）審核稿</h1>
+<p class="lede">第二道閘（計費，使用者同意）：Codex CLI 唯讀 reviewer、<code>--output-schema</code> 結構化輸出，停在一次乾淨 audit（run2 converged）。2026-06-21。</p>
+<div class='note warn'><b>run 1 — converged：false</b>（<span class='blkw'>1 blocking</span>＋1 advisory，已全修）。One blocking direction-conformance issue: §4.1 explicitly treats e^0=1 despite the brief forbidding x≤0/e^0 handling in this section.</div><div class='note pass'><b>run 2 — converged：<span class='zero'>true</span></b>（0 blocking＋2 advisory，已全套）。No blocking findings. The draft is mathematically faithful to the seed and conforms to the approved direction brief; only advisory clarity issues remain.</div><p class='lede'>原始裁決檔（計費產物）：<code>result_s41.json</code>（run1）、<code>result_s41_r2.json</code>（run2）；prompt：<code>prompt_s41.txt</code>（<code>build_prompt_s41.py</code> 產）。</p><h2>審核對象</h2><table class='u'><tr><th>已寫入單元</th><th>locus</th><th>source</th><th>gate 修正</th></tr><tr><td><b>Chapter opener</b></td><td>章首 chapter-head＋lead＋六條 learning objectives</td><td class='src'>brief §B.2（章層，涵蓋 §4.1–§4.5）</td><td class='fx'></td></tr><tr><td><b>§4.1 opener (intuition)</b></td><td>§4.1 開頭動機散文</td><td class='src'>expansion:intuition（承重直覺）</td><td class='fx'></td></tr><tr><td><b>Rational exponents → series</b></td><td>子節 From rational exponents…</td><td class='src'>seed（手稿 p.1）</td><td class='fx'></td></tr><tr><td><b>Irrational a^r motivation</b></td><td>同子節</td><td class='src'>expansion:intuition；fence→§4.5（D6）</td><td class='fx'></td></tr><tr><td><b>Definition 4.1 (+gloss)</b></td><td>Definition 4.1</td><td class='src'>seed（手稿 p.2）；gloss=expansion:intuition</td><td class='fx'></td></tr><tr><td><b>Caution（series defines）</b></td><td>Definition 4.1 之後</td><td class='src'>expansion:caution（ROADMAP pitfall）</td><td class='fx'></td></tr><tr><td><b>Theorem 4.1 Completeness</b></td><td>子節 completeness</td><td class='src'>seed（手稿「Property」p.2）；陳述不證</td><td class='fx'></td></tr><tr><td><b>Remark 4.1（ℝ vs ℚ）</b></td><td>Theorem 4.1 之後</td><td class='src'>expansion:intuition</td><td class='fx'>gate-2 run2：根存在加 a>0 條件</td></tr><tr><td><b>Strategy 4.1（geometric tail）</b></td><td>Convergence 子節前</td><td class='src'>expansion:strategy（§4.2 重用）</td><td class='fx'></td></tr><tr><td><b>Theorem 4.2 + Proof</b></td><td>Theorem 4.2＋Proof</td><td class='src'>seed [e1]（手稿 pp.2–3）</td><td class='fx'></td></tr><tr><td><b>P_k 與尾界 (∗)</b></td><td>Proof 之後</td><td class='src'>seed（手稿 p.3）</td><td class='fx'>gate-2 run1：補回中間步 L^k/k!</td></tr><tr><td><b>value of e ＋ Example 4.1 ＋ Figure 4.1</b></td><td>子節 The value of e</td><td class='src'>expansion:formula/history/example/figure（D5）</td><td class='fx'>gate-2 run1 BLOCKING：移除 e^0=1</td></tr><tr><td><b>Summary（→§4.2）</b></td><td>節末</td><td class='src'>expansion:summary</td><td class='fx'>gate-2 run2：§4.2 預告精準化</td></tr></table><h2>run 1 裁決</h2><div class='card blk'><div class='chips'><span class='chip c-blk'>BLOCKING</span><span class='chip c-cat'>direction-conformance</span><span class='chip c-lvl'>L1</span><span class='chip c-adv'>high</span></div><div class='where'>§4.1 body, “The value of e” paragraph and closing paragraph</div><div class='issue'>The draft includes the brief-forbidden §4.1 treatment of x=0 / e^0=1.</div><div class='ev'>證據：Draft says: “At x = 0 the series collapses to its first term, e^0 = ... = 1” and later “direct substitution gives e^0 = 1.” The brief’s 刻意不寫 list explicitly excludes “x&lt;0／x≤0 的收斂、e^0=1 系統處理” from §4.1; the section definition is only for x&gt;0.</div><div class='sug'>建議：Remove the x=0/e^0 discussion from §4.1 body. Keep the sanctioned value anchor at x=1: e=e^1≈2.71828, and leave x≤0 handling to §4.2.</div></div><div class='card adv'><div class='chips'><span class='chip c-adv'>advisory</span><span class='chip c-cat'>faithfulness</span><span class='chip c-lvl'>L2</span><span class='chip c-adv'>low</span></div><div class='where'>Partial-sum tail bound after Theorem 4.2</div><div class='issue'>The final uniform geometric bound is present, but the seed’s intermediate manuscript bound L^k/k! is omitted, reducing traceability to the seed tail estimate.</div><div class='ev'>證據：Seed/brief tail chain is: 0≤e^x−P_k(x)≤L^k/k!≤(L^{n0}/n0!)(1/2)^{k−n0}. Draft gives only: 0≤e^x−P_k(x)≤(L^{n0}/n0!)(1/2)^{k−n0}.</div><div class='sug'>建議：Optionally restore the intermediate inequality in the displayed chain or in the surrounding sentence.</div></div><h2>run 2 裁決</h2><div class='card adv'><div class='chips'><span class='chip c-adv'>advisory</span><span class='chip c-cat'>math</span><span class='chip c-lvl'>L2</span><span class='chip c-adv'>low</span></div><div class='where'>Remark 4.1, final sentence</div><div class='issue'>The root-existence example relies on an implicit domain condition.</div><div class='ev'>證據：The remark lists “that x^n = a has a solution” without restating the needed hypotheses. In context the intended claim is the positive-root case for a &gt; 0, but read literally x^2 = -1 has no real solution.</div><div class='sug'>建議：Qualify it as “for a &gt; 0, the equation x^n = a has a positive solution” or “under the appropriate hypotheses.”</div></div><div class='card adv'><div class='chips'><span class='chip c-adv'>advisory</span><span class='chip c-cat'>math</span><span class='chip c-lvl'>L2</span><span class='chip c-adv'>med</span></div><div class='where'>Closing paragraph after Figure 4.1</div><div class='issue'>The §4.2 preview over-compresses the proof mechanism for continuity and the exponent law.</div><div class='ev'>證據：It says the fact that absolute convergence implies convergence “delivers the continuity of e^x and the exponent law.” The brief emphasizes the partial-sum tail bound as the reusable dependency, and the exponent law also needs additional product/binomial control.</div><div class='sug'>建議：Rephrase to say §4.2 uses absolute convergence together with the uniform tail estimate and product estimates to handle x &lt; 0, continuity, and the exponent law.</div></div>
+<footer>產生器：<code>REVIEW-s41.gen.py</code>　·　成品：<a href="../../../chapter4-print-standalone.html">chapter4-print-standalone.html</a>　·　另一閘：見同目錄 gate1／gate2 檔。</footer>
+</div>
+</body>
+</html>

@@ -77,6 +77,13 @@ CHAPTERS = {
         "target": "chapter3-print-standalone.html",
         # "screen": "chapter3-standalone.html",
     },
+    "ch04": {
+        "fragments": [
+            "sec-4-1",
+        ],
+        "target": "chapter4-print-standalone.html",
+        # "screen": "chapter4-standalone.html",
+    },
 }
 
 # ── Build logic ──────────────────────────────────────────────────
