@@ -206,12 +206,17 @@ def check_codex() -> None:
 # ── ⑥ 內附資產（進版控，理應永遠在）────────────────────────────────────
 
 def check_assets() -> None:
-    fonts = REPO / "video" / "pipeline" / "assets" / "fonts"
-    n = len(list(fonts.glob("*.otf")) + list(fonts.glob("*.ttf"))) if fonts.exists() else 0
-    if n:
-        record(PASS, "assets", f"內附設計字型 ({n})", str(fonts))
+    # The render-critical vendored asset is the outlined NTU lockup SVG -- brand
+    # .logo_lockup_outlined() loads it for every intro/outro. (The Direction-D design fonts
+    # that used to live under assets/fonts/ were intentionally removed with the 2026-06-20
+    # Times revert; video now uses Windows system Times/Courier -- see check_fonts -- so
+    # they are no longer vendored or expected here.)
+    lockup = REPO / "video" / "pipeline" / "assets" / "lockup-color-outlined.svg"
+    if lockup.exists():
+        record(PASS, "assets", "logo lockup SVG", str(lockup))
     else:
-        record(WARN, "assets", "內附字型缺", f"預期在 {fonts}（應隨 git 而來；git status 檢查是否誤刪）")
+        record(WARN, "assets", "logo lockup SVG 缺",
+               f"預期在 {lockup}（intro/outro render 要它；應隨 git 而來，git status 檢查是否誤刪）")
 
 
 # ── ⑥b 影片字型可見性（manimpango 是否認得，否則 render 靜默 fallback）──

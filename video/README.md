@@ -20,7 +20,7 @@ video/
   make.py              單一入口 orchestrator：parse → synth → render → compose（離線、不計費）
   requirements.txt     pinned 依賴
   pipeline/            產線引擎（全部進版控）
-    assets/fonts/      在執行期註冊的內附設計字型
+    assets/            內附 logo 資產（lockup SVG + brand/ 圖示）＋ _outline_text.py（外框工具）
     visuals/           移植並驗證過的素材（colors、graph eval、layout）
     templates/         Direction B 場景模板
     blocks.py          可揭示的 Block 抽象 + 動畫派發

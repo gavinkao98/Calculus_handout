@@ -25,7 +25,7 @@ python tools\doctor.py
 | **① Python 套件** | 共用 `.venv`（manim 0.20.1、PyYAML、ManimPango、Pillow、imageio-ffmpeg、fonttools、pymupdf…） | `setup.ps1` 從 [`requirements.lock`](requirements.lock) 精確重現 |
 | **② 系統 binary** | `ffmpeg`、`ffprobe` | 每台 `winget install --id Gyan.FFmpeg -e`（**含 ffprobe**） |
 | **③ LaTeX** | MiKTeX：`latex`、`dvisvgm` + `newtxtext`/`newtxmath`（video 數學 Times，2026-06-20 字型 revert 後；MiKTeX 首編自動補裝） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法） |
-| **①b 影片字型** | **Times New Roman**（標題/散文）+ **Courier New**（eyebrow/標籤）= Windows 系統字型；數學走 newtx（LaTeX，見 ③） | Windows 內建、無需安裝。（Direction D 的 Inter Tight/JetBrains Mono 仍 vendored 於 [`video/pipeline/assets/fonts/`](video/pipeline/assets/fonts) 但目前未用——換回時即可用） |
+| **①b 影片字型** | **Times New Roman**（標題/散文）+ **Courier New**（eyebrow/標籤）= Windows 系統字型；數學走 newtx（LaTeX，見 ③） | Windows 內建、無需安裝。（Direction D 的 vendored Inter Tight/JetBrains Mono 已於 2026-06-20 Times revert 隨 `assets/fonts/` 一併刪除——見下方 ①b 細節節） |
 | **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/_render/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **祕鑰** | `MIMO_API_KEY` / `GEMINI_API_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` | per-machine 設環境變數；**不進版控**（計費 API，依 [`CLAUDE.md`](CLAUDE.md) 徵同意） |
