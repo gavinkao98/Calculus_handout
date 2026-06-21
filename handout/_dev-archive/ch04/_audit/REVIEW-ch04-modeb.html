@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 4 — Mode B 全章稽核報告（跨節一致性）</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f7f5;color:#1d1d1f;font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.6;padding:32px 18px 80px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 4px}
+h2{font-size:1.16rem;margin:30px 0 6px;padding-bottom:6px;border-bottom:2px solid #e4e4e0}
+.lede{color:#6b6b70;margin:0 0 16px;font-size:.93rem}
+.note{background:#fff;border:1px solid #e4e4e0;border-left:3px solid #2552b3;border-radius:8px;padding:12px 16px;margin:14px 0;font-size:.93rem}
+.note.pass{background:#eaf6ed;border-left-color:#1a7f37}.note.pass b{color:#1a7f37}
+.note.warn{background:#fff6e3;border-left-color:#8a5a00}
+.zero{color:#1a7f37;font-weight:700}.blkw{color:#a11;font-weight:700}
+table.u{width:100%;border-collapse:collapse;margin:10px 0;font-size:.85rem}
+table.u th,table.u td{border:1px solid #e4e4e0;padding:7px 9px;text-align:left;vertical-align:top}
+table.u th{background:#eef0f4}
+.card{background:#fff;border:1px solid #e4e4e0;border-radius:10px;padding:12px 15px;margin:11px 0}
+.card.fix{border-left:4px solid #1a7f37}.card.ref{border-left:4px solid #9aa}.card.adv{border-left:4px solid #8a5a00}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;align-items:center}
+.chip{font-size:.74rem;padding:2px 9px;border-radius:999px;font-weight:600;letter-spacing:.02em}
+.c-cat{background:#e7eefc;color:#1f49a6}.c-fix{background:#e6f7ea;color:#1a7f37}.c-ref{background:#eef0f4;color:#555}
+.c-blk{background:#fdeceb;color:#a11}.c-adv{background:#eef0f4;color:#555}.c-lvl{background:#1d1d1f;color:#fff;font-family:ui-monospace,Menlo,Consolas,monospace}
+.where{color:#6b6b70;font-size:.85rem;margin:2px 0 6px}.ev{font-size:.84rem;color:#555;margin:3px 0}
+.issue{margin:2px 0 6px}.sug{font-size:.84rem;color:#555;margin:3px 0}
+code{background:#f3f4f6;padding:.05rem .3rem;border-radius:3px}
+footer{margin-top:40px;color:#6b6b70;font-size:.85rem;border-top:1px solid #e4e4e0;padding-top:14px}
+a{color:#2552b3}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Chapter 4 — Mode B 全章稽核報告</h1>
+<p class="lede">跨節一致性稽核（whole-chapter Mode B）。逐節撰寫時各節已過自己的雙閘；本輪的新價值＝<b>跨節一致性</b>——逐節閘抓不到的（編號連續、交叉引用解析、記號／術語一致、register、forward-fence／迴路閉合、跨節數學不矛盾、冗餘／缺口）。5 維度並行對抗審（workflow <code>wf_e6a1f641</code>，9 agents）→ dedup level-1 → refute-by-default 對抗複驗 → 四級分流。讀 canonical fragments（非 standalone）。2026-06-21。</p>
+
+<div class="note pass"><b>總裁決：<span class="zero">硬骨頭全 0 level-1</span></b>　·　5 維度中 4 個（numbering-xref／math-consistency／register-flow／redundancy-gaps）<b>零 level-1</b>。唯一真衝突＝notation 維度的 <b>2 件 ① 拼寫不一致</b>（違反 CONTENT_SPEC §拼法美式規則），已修。4 個 level-1 候選經對抗複驗：<b>confirmed 2／refuted 2</b>；另 advisory 1（level-3）、非 finding 6（level-4）。修後 ch04 standalone 重 build、render 同步（純拼寫 diff、零 math/結構變動）。</div>
+
+<h2>五維度裁決</h2>
+<table class="u">
+<tr><th>維度</th><th>level-1</th><th>裁決摘要</th></tr>
+<tr><td><b>numbering-xref</b></td><td><span class="zero">0</span></td><td>9 型 counter 唯一且跨節連續、無 gap/dup/skip，全對 ledger（Def 4.1–4.4／Thm 4.1–4.14／Prop 4.1–4.3／Cor 4.1–4.4／Strat 4.1–4.2／Ex 4.1–4.5／Fig 4.1–4.3／Rem 4.1–4.6／Caution 無號）。key-identity 標號全對（Thm 4.7 指數律／4.8 (e^x)'／4.9 EVT／4.12 MVT…）。<b>全章交叉引用 0 dangling／0 mislabel</b>；跨章引用（Ch3 §3.3 Example 3.6）亦解析。§§ 形式 0 次。</td></tr>
+<tr><td><b>notation-terminology</b></td><td><span class="blkw">2</span></td><td>符號（P_k、e vs e^x、\binom、x_M/x_m、y/y_0）跨節一致；具名結果命名一致（exponent law／EVT／Theorem A／MVT…）；§X–§Y 慣例守。<b>真衝突＝拼寫</b>（見下 ①）。另 1 件 level-3（EVT 散文小寫）。</td></tr>
+<tr><td><b>math-consistency</b></td><td><span class="zero">0</span></td><td>跨節事實一致：<code>|(e^h−1)/h−1|≤|h|</code> 每處精確陳述皆帶 <code>|h|&lt;½</code>（§4.3 Prop 4.2＋章末 Summary）；<code>e^x&gt;0</code>、range <code>(0,∞)</code>、<code>ln</code> 只 x&gt;0 一致；strict vs non-strict 嚴謹分流。<b>依賴鏈無環、無「用在證前」</b>（completeness→…→ln）。</td></tr>
+<tr><td><b>register-flow</b></td><td><span class="zero">0</span></td><td>語氣／密度跨 5 節一致；<b>4 個節間 hand-off 全 reciprocated</b>（§4.1→4.2→4.3→4.4→4.5）；<b>兩 forward-fence 皆閉合且交付屬實</b>（§4.1 a^r→§4.5 Ex 4.5；Ch3 §3.3→§4.5 Rem 4.5）；debt/credit 動機線刻意貫穿。</td></tr>
+<tr><td><b>redundancy-gaps</b></td><td><span class="zero">0</span></td><td>arc 緊湊、tail-bound 機器先建後用、存在定理階梯非循環；「we will show…」承諾皆交付；唯二 taken-for-granted（EVT 不證、range 斷言）皆 settled 決策、非真缺口。（1 件 level-1 候選經複驗駁回——見下。）</td></tr>
+</table>
+
+<h2>① 真衝突（confirmed 2，已修）</h2>
+
+<div class="card fix">
+<div class="chips"><span class="chip c-fix">已修</span><span class="chip c-cat">notation-terminology</span><span class="chip c-lvl">L1</span></div>
+<div class="where">§4.4　sec-4-4.html L175／L213（body prose）</div>
+<div class="issue">同一字 <code>behaviour</code>（英式）在 §4.4 出現，但 §4.2／§4.3 用 <code>behavior</code>（美式）——同詞兩寫，違反美式 house style。</div>
+<div class="ev">證據：sec-4-4 L213「monotonic <b>behaviour</b>」 vs sec-4-3 L129「monotonic <b>behavior</b>」（鄰節近逐字平行句、拼相反）。house rule：CONTENT_SPEC §拼法 line 633「美式 -ize/-ization」＋ spec 自身用 "behavior"。</div>
+<div class="sug">對抗複驗 <b>confirmed real</b>（byte-level 重現＋全 corpus 核對：唯一其他 behaviour 在 ch03 註解、非 reader-facing）。修：<code>behaviour→behavior</code>。</div>
+</div>
+
+<div class="card fix">
+<div class="chips"><span class="chip c-fix">已修</span><span class="chip c-cat">notation-terminology</span><span class="chip c-lvl">L1</span></div>
+<div class="where">§4.5　sec-4-5.html L65（characterised）／L222（normalisation），body prose</div>
+<div class="issue">英式 <code>-ise/-isation</code>（<code>characterised</code>、<code>normalisation</code>）在 §4.5 散文，§4.2 用美式 <code>-ize</code>——同後綴家族跨節分裂，違反 CONTENT_SPEC §拼法明文。</div>
+<div class="ev">證據：sec-4-5 L65「<b>characterised</b> by the two identities」、L222「the <b>normalisation</b> g(1)=e」 vs sec-4-2 L89「<b>recognize</b>」、L196「<b>reorganizes</b>」。CONTENT_SPEC line 633／984 明令 <code>-ize/-ization</code> 非 <code>-ise/-isation</code>。</div>
+<div class="sug">對抗複驗 <b>confirmed real</b>（spec 明文＋逐字重現）。修：<code>characterised→characterized</code>、<code>normalisation→normalization</code>。</div>
+</div>
+
+<div class="note pass"><b>實際修正（6 處，全章正規化美式）：</b>body prose 4 處（§4.4 behaviour×2、§4.5 characterised／normalisation）＋ 開發註解 4 處同詞順手收齊（§4.2 reorganisation／behaviour、§4.4 behaviour、§4.5 characterising）。grep 複驗 ch04 fragments <b>0 英式殘留</b>。</div>
+
+<h2>對抗複驗駁回（refuted 2 — refute-by-default 發揮作用）</h2>
+
+<div class="card ref">
+<div class="chips"><span class="chip c-ref">駁回 → level-3</span><span class="chip c-cat">notation-terminology</span><span class="chip c-lvl">L1?</span></div>
+<div class="where">撇號字形：§4.1–4.2 彎引號 U+2019 vs §4.3–4.5 直引號 ASCII（「Rolle's theorem」兩節不同字形）</div>
+<div class="issue">原報 level-1。<b>複驗駁回為 level-3 排版 drift</b>，且 finding 修法方向相反。</div>
+<div class="ev">複驗（byte-level）：事實重現（§4.1 L39「Rolle<code>’</code>s」=U+2019；§4.4 L116「Rolle<code>'</code>s」=ASCII）。但 <b>(1)</b> §4.1 的彎引號是 gate-1 advisory「套 1：curly」<b>刻意套用</b>（PLAN line 150），非殘留；<b>(2)</b> CONTENT_SPEC §8 引號其實<b>規定用彎引號</b>（禁 ASCII）→ 按 spec 該駁的是 §4.3–4.5；<b>(3)</b> 但 ch01–03 全書 15 檔 de facto 全用 ASCII → <b>spec 與實務矛盾</b>，finding 兩個相反修法都給不出方向。屬全書級 lint 排版 nit（CONTENT_SPEC 自言「靠手動與下游 lint」），非 ch04 Mode B level-1。</div>
+<div class="sug"><b>不修</b>。FYI：撇號／引號的 spec(彎) vs 實務(直) 矛盾橫跨 ch01–04，值得哪天單獨裁一次，不夾本輪。</div>
+</div>
+
+<div class="card ref">
+<div class="chips"><span class="chip c-ref">駁回 → settled</span><span class="chip c-cat">redundancy-gaps</span><span class="chip c-lvl">L1?</span></div>
+<div class="where">§4.4 Example 4.4（L263）以三段論重導 <code>e^x&gt;0</code>，未引 §4.2 Corollary 4.1</div>
+<div class="issue">原報 level-1 unintended duplication。<b>複驗駁回為 settled 決策／style preference</b>。</div>
+<div class="ev">複驗：事實重現（Example 4.4 inline 證 x&gt;0／x=0／x&lt;0 三段，未引 Cor 4.1）。但 <b>(1)</b> §4.4 brief <b>§C-7 明令</b>「Example 4.4 給一行 e^x&gt;0 依據」（fragment L31 註＋PLAN §5 在案）——settled placement；<b>(2)</b> inline 三段論與 Cor 4.1 <b>一致</b>（正確子情形、非矛盾）；<b>(3)</b> finding 自己的建議（改成引 Cor 4.1）只是 how-to-satisfy §C-7 的 style 偏好。cross-ref 紀律只要求「引用要解析」、不禁「就近重述可得事實」。</div>
+<div class="sug"><b>不修</b>（改成引號屬 Mode C polish、且更動 signed-off 內容換一個非衝突，不划算）。</div>
+</div>
+
+<h2>advisory（level-3，不修）</h2>
+<div class="card adv">
+<div class="chips"><span class="chip c-adv">advisory L3</span><span class="chip c-cat">notation-terminology</span></div>
+<div class="where">§4.4 L130/185、§4.5 L237：「the extreme value theorem」散文小寫 vs env-name「Extreme Value Theorem」Title Case</div>
+<div class="issue">EVT 散文小寫、env-name Title Case，與「Mean Value Theorem」散文維持 Title Case 不一致。但<b>與「Rolle's theorem」散文小寫一致、無硬性 house rule 破</b>。</div>
+<div class="sug"><b>不修</b>（低優先 casing drift；若日後要統一，全 named theorem 散文一律 Title 或一律小寫，另議）。</div>
+</div>
+
+<footer>稽核：5 維度 workflow <code>wf_e6a1f641</code>（9 agents、~334s、762.6k tokens）。被審：<code>handout/fragments/ch04/sec-4-1…4-5.html</code>（canonical fragments）。裁決同步寫進修正 commit body（<code>git log --grep="Mode B"</code>）。成品：<a href="../../../chapter4-print-standalone.html">chapter4-print-standalone.html</a>。</footer>
+</div>
+</body>
+</html>
