@@ -65,7 +65,7 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
 **逐階說明：**
 
 - **① intake：** 掃描手稿**先轉錄成文字 seed**〔流程選擇甲〕——這樣「手稿＝數學主軸」就有一份**可 diff 的白紙黑字**，忠實度才查得動。Claude 接著產出盤點與薄度剖析（見 §2 前兩欄）。**產出後先過一道人核對（`①-verify`）：使用者對掃描核對 seed 的數學忠實度，確認才進 ②**——整套「手稿＝數學主軸」的保險，地基就是這份轉錄，轉錯則後面全錯。（校準來源：§4.2 首跑。）
-  - **seed 轉錄語法（輕量可讀，2026-06-07 定）：** seed 是給人讀的轉錄（`①-verify` 拿它逐字對掃描），**純文字好讀為第一優先**。數學一律**反引號行內＋Unicode**（`≤ ≥ ≠ ⟺ ⟹ → ∞ √ ± · π θ ε Σ`、上標 `x² xⁿ x⁻¹`、複合次方用 `x^(n−1)`、分數 `a/b`、`lim_{h→0} (…)`），**不要 `$$…$$`／`\[…\]` 顯示區塊、不要 `\frac`／`\quad`／`\text` 等巨集**；複雜到 Unicode 會歧義時才退回**短**的行內 `\(…\)`（用 kit delimiter，絕不用 `$$`）。seed 為**稀疏骨架**：記手稿有的（含其 worked example）但別展開成多步排版——漂亮 KaTeX 留給 ④ 輸出。可疑／非標準數學標 **[請查核]**。風格範本：[`authoring/direction_layer/ch01/seed_s12.md`](authoring/direction_layer/ch01/seed_s12.md)、[`authoring/direction_layer/test/seed_s42.md`](authoring/direction_layer/test/seed_s42.md)。
+  - **seed 轉錄語法（輕量可讀，2026-06-07 定）：** seed 是給人讀的轉錄（`①-verify` 拿它逐字對掃描），**純文字好讀為第一優先**。數學一律**反引號行內＋Unicode**（`≤ ≥ ≠ ⟺ ⟹ → ∞ √ ± · π θ ε Σ`、上標 `x² xⁿ x⁻¹`、複合次方用 `x^(n−1)`、分數 `a/b`、`lim_{h→0} (…)`），**不要 `$$…$$`／`\[…\]` 顯示區塊、不要 `\frac`／`\quad`／`\text` 等巨集**；複雜到 Unicode 會歧義時才退回**短**的行內 `\(…\)`（用 kit delimiter，絕不用 `$$`）。seed 為**稀疏骨架**：記手稿有的（含其 worked example）但別展開成多步排版——漂亮 KaTeX 留給 ④ 輸出。可疑／非標準數學標 **[請查核]**。風格範本：[`authoring/direction_layer/ch01/seed_s12.md`](authoring/direction_layer/ch01/seed_s12.md)。
 - **② 方向提案：** Claude 把 §2 的 brief 填好，薄的地方提案要補哪些例子／應用。**輸入除了手稿＋薄度，還有該章的 `CONTENT_ROADMAP` 條目**（core skills／key figures／pitfalls／open questions）——讓節層 brief 與章層弧一致，且 brief **引用不複述** ROADMAP（見 §3.5）。
 - **③ 方向閘（新）：** 使用者改或核可。**實驗版沒有這一環**——seed→擴寫→審，中間沒有人定方向的關卡，所以迴圈只能查「對不對」、永遠查不到「是不是你要的」。插入 ③ 即補上此缺口。brief 維持**輕量**〔流程選擇丙〕，讓這道人閘快到你願意每節都過。
 - **④ 擴寫：** Claude 是**唯一寫手**，朝已核可方向擴寫；手稿數學為主軸，每一處非翻譯的增添都加 expansion 標記（沿用 README 的類別與政策）。HTML 講義的標記語法是 HTML 註解 `<!-- expansion:<cat> … -->`（LaTeX 的 `% expansion:` 只存在於 legacy），類別與 `[pass:]`／`[source:]` 規則不變。
@@ -171,7 +171,7 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
 - **核心幻覺假說：樣本仍少（最關鍵 open question）：** 「兩模型會不會一起替同一個幻覺背書」尚未在最硬的具名結果上窮盡。已跑的高風險節（§4.2 eˣ 連續＋指數律、ch02 §2.3 首個定理＋證明）中 auditor 都抓到真問題、**未見幻覺穿過**——正面但**樣本有限**的證據。仍待更多高風險節（如 Ch4 Bolzano–Weierstrass、Cauchy 收斂）持續壓測。見 [`authoring/seed_converge/SYNTHESIS.md`](authoring/seed_converge/SYNTHESIS.md) §4。
 - **丟了「中立第三方評分」那層：** 實驗原讓 Claude 在迴圈外當中立評分；本流程把 Claude 拉進當寫手後，外部裁判只剩「人」。不致命（人本在閘），但可考慮**偶爾請第三模型（如 Gemini）對成稿抽查**，補回外部視角。
 - **配額管理：** 訂閱用量上限（per-5h／每週）是硬牆，且 CLI 撞牆後回退 API key 不可靠。per-section 限次、人在收斂閘是唯一可靠防線。別把架構建立在「撞牆無縫切 API」上。
-- **多節端到端驗證紀錄（詳見 [`authoring/direction_layer/ch01/RESULT_ch01.md`](authoring/direction_layer/ch01/RESULT_ch01.md)、[`authoring/direction_layer/test/RESULT_s42.md`](authoring/direction_layer/test/RESULT_s42.md)、[`handout/_dev-archive/ch02/`](handout/_dev-archive/ch02/)）：** ch01 §1.1（低風險對照節）、§1.2（中風險，direction-conformance 抓到一個真 blocking＝漏畫 brief 指定的圖）、§4.2（高風險，第二模型抓到一處擴寫引入的過度推廣）、ch02 §2.1–§2.5（全數收斂 `blocking=0`）皆跑完六階。
+- **多節端到端驗證紀錄（詳見 [`authoring/direction_layer/ch01/RESULT_ch01.md`](authoring/direction_layer/ch01/RESULT_ch01.md)、[`handout/_dev-archive/ch02/`](handout/_dev-archive/ch02/)）：** ch01 §1.1（低風險對照節）、§1.2（中風險，direction-conformance 抓到一個真 blocking＝漏畫 brief 指定的圖）、§4.2（高風險，第二模型抓到一處擴寫引入的過度推廣）、ch02 §2.1–§2.5（全數收斂 `blocking=0`）皆跑完六階。
 - **工程坑（§4.2 首跑實證）：** 組 ⑤ 的 prompt 時，非 ASCII（中文／Unicode 數學符號）會被 `Get-Content`（ANSI 預設）＋ PowerShell pipe 重編碼成亂碼，auditor 收到糊掉的 seed/brief。修法：`[IO.File]::ReadAllText` 讀 UTF-8 ＋ `cmd /c "codex exec - … < prompt"` 餵原始 bytes ＋ 一道 CJK 護欄。
 
 ---

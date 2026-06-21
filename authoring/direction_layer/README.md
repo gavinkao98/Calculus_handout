@@ -10,7 +10,6 @@
 本資料夾是它的驗證留存：
 
 - [`ch01/`](ch01/) — ch01 §1.1／§1.2 逐節的 seed／brief／draft／audit findings 與 [`RESULT_ch01.md`](ch01/RESULT_ch01.md)（含整章狀態）。
-- [`test/`](test/) — §4.2 高風險節端到端首跑（[`RESULT_s42.md`](test/RESULT_s42.md)）。
 
 > 註：這些早期驗證跑在 LaTeX 格式上（draft 為 `.tex`），是流程**驗證的歷史紀錄**；流程本身後續換源到 HTML（見 [`../../CONTENT_DIRECTION.md`](../../CONTENT_DIRECTION.md) ④）。
 

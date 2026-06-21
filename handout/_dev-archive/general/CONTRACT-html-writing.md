@@ -5,7 +5,7 @@ drafter how to expand a seed into a **LaTeX** `\section` body; this file tells a
 expand the same seed into a **handout-kit** `sec-*.html` fragment. Register and correctness rules
 are identical (they are format-independent); only the surface markup changes.
 
-> **Why this exists:** the experiment in [`RESULT-s42-html-poc.md`](RESULT-s42-html-poc.md) showed
+> **Why this exists:** the §4.2 HTML POC experiment showed
 > that pointing the generation step at this contract (instead of `rules.md`) is the whole change
 > needed to make the pipeline emit HTML that renders directly through the kit — screen + print, no
 > `.tex` and no conversion step. Distilled from
