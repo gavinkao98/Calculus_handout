@@ -277,12 +277,17 @@ _DESC_CHARS = set("gjpqy(),;[]{}/Q")
 
 
 def _compose(text: str, ground: str, role: str, fsz: float, *, weight: str = "NORMAL",
-             max_width: float | None = None, align: str = "LEFT", line_buff: float = 0.26):
+             max_width: float | None = None, align: str = "LEFT", line_buff: float = 0.26,
+             math_scale_mul: float = 1.0):
     """Compose a line (or wrapped lines) of Times text + newtx math (serif text +
     serif math, ON THE SAME LINE). Runs are BASELINE-aligned (text by a
     descender-aware baseline, math by the optical math-axis); $...$ spans are atomic.
     Wraps at *max_width* if given (prose); otherwise one line (headings, then clamp).
-    Shared by prose() and heading_rich() so titles and body match."""
+    Shared by prose() and heading_rich() so titles and body match.
+
+    *math_scale_mul* trims the x-height-matched math size (1.0 = body default);
+    heading_rich passes <1 so a display title's italic math doesn't tower over its
+    bold text (see theme.HEADING_MATH_SCALE)."""
     col = T.color(ground, role)
     xref_h = Text("x", font=T.FONT_BODY, font_size=fsz, weight=weight).height
     descent = max(Text("g", font=T.FONT_BODY, font_size=fsz, weight=weight).height - xref_h, 0.0)
@@ -290,7 +295,7 @@ def _compose(text: str, ground: str, role: str, fsz: float, *, weight: str = "NO
     space = max(Text("a a", font=T.FONT_BODY, font_size=fsz, weight=weight).width
                 - Text("aa", font=T.FONT_BODY, font_size=fsz, weight=weight).width, 0.06)
     ref_mx = MathTex("x", font_size=fsz)
-    math_scale = (xref_h / ref_mx.height) if ref_mx.height > 1e-6 else 1.0
+    math_scale = ((xref_h / ref_mx.height) if ref_mx.height > 1e-6 else 1.0) * math_scale_mul
 
     # tokenize: words, $...$ atomic, trailing punctuation merged onto its token
     tokens: list[str] = []
@@ -428,7 +433,8 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
     """
     if "$" not in text:
         return heading(text, ground, role=role, size=size, max_width=max_width)
-    mob = _compose(text, ground, role, T.fs(size), weight="BOLD")  # one line
+    mob = _compose(text, ground, role, T.fs(size), weight="BOLD",  # one line
+                   math_scale_mul=T.HEADING_MATH_SCALE)
     if max_width is not None and mob.width > max_width:
         mob.scale_to_fit_width(max_width)
     return mob
@@ -492,8 +498,8 @@ def glow_curve(vmob, ground: str, *, role: str = "secondary", width: float = 6.0
     return VGroup(halo, crisp)
 
 
-def text_glow(mob, ground: str, *, role: str = "accent", width: float = 2.6,
-              opacity: float = 0.5) -> VGroup:
+def text_glow(mob, ground: str, *, role: str = "accent", width: float = 2.0,
+              opacity: float = 0.42) -> VGroup:
     """Static persistent halo behind emphasised glyphs (the 'text-shadow' glow).
 
     Returns VGroup(wide-halo, near-halo, mob). The halos are stroke-only copies of

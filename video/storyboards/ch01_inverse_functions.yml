@@ -113,7 +113,10 @@ scenes:
     template: derivation
     accent: example
     source: "§1.1 Example 1.2 + 'Now we return to the two…' 橋接"
-    title: 'Testing $f(x)=x$ and $g(x)=x^2$'
+    # title NAMES the two functions only ($f$, $g$); their full definitions live in
+    # the reason rail ($f(x)=x$ / $g(x)=x^2$). Inlining both definitions made the
+    # heading a text+display-math sentence that towered and broke baseline.
+    title: 'Testing $f$ and $g$'
     steps:
       - { math: 'f \text{ is one-to-one}', reason: '$f(x)=x$ on $[0,1]$', mark: ok }
       - { math: 'g(\tfrac12)=\tfrac14=g(-\tfrac12)', reason: 'test $g(x)=x^2$ on $[-1,1]$' }
@@ -170,7 +173,7 @@ scenes:
         - { kind: function, expression: 'x', x_range: [-1.7, 1.7], color_role: secondary, label: '$y=x$' }
         - { kind: line, start: [-2.0, 1.0], end: [1.3, 1.0], dashed: true, color_role: warning, reveal: true }
         - { kind: point, point: [1.0, 1.0], hollow: false, color_role: accent, reveal: true }
-      caption: 'A line: one crossing at every height.'
+      caption: 'Every height: one crossing.'
       verdict: ok
     right:
       axes: { x_range: [-2.3, 2.2, 1], y_range: [-0.5, 2.4, 1] }
@@ -179,7 +182,7 @@ scenes:
         - { kind: line, start: [-1.95, 1.25], end: [1.95, 1.25], dashed: true, color_role: warning, reveal: true }
         - { kind: point, point: [-1.043, 1.25], hollow: false, color_role: accent, reveal: true }
         - { kind: point, point: [1.043, 1.25], hollow: false, color_role: accent, reveal: true }
-      caption: 'A parabola: one height, two crossings.'
+      caption: 'One height: two crossings.'
       verdict: bad
     annotations:
       - 'One-to-one $\iff$ no horizontal line crosses the graph more than once.'
@@ -307,7 +310,7 @@ scenes:
     title: 'Reflection across $y=x$'
     axes: { x_range: [-2.2, 2.2, 1], y_range: [-2.2, 2.2, 1], x_length: 5.6, y_length: 5.6 }
     plots:
-      - { kind: line, start: [-2.1, -2.1], end: [2.1, 2.1], dashed: true, color_role: muted, label: '$y=x$' }
+      - { kind: line, start: [-2.1, -2.1], end: [2.1, 2.1], dashed: true, color_role: muted, label: '$y=x$', label_role: text }
       - { kind: function, expression: 'x**3', x_range: [-1.28, 1.28], color_role: secondary, label: '$y=x^3$' }
       - { kind: function, expression: 'cbrt(x)', x_range: [-2.1, 2.1], color_role: accent, label: '$y=\sqrt[3]{x}$', reveal: true }
       - { kind: point, point: [1.1, 1.331], hollow: false, color_role: text, reveal: true }
@@ -339,7 +342,7 @@ scenes:
     title: "Restrict, then Invert"
     axes: { x_range: [-0.4, 2.7, 1], y_range: [-0.4, 2.7, 1], x_length: 5.4, y_length: 5.4 }
     plots:
-      - { kind: line, start: [0.0, 0.0], end: [2.5, 2.5], dashed: true, color_role: muted, label: '$y=x$' }
+      - { kind: line, start: [0.0, 0.0], end: [2.5, 2.5], dashed: true, color_role: muted, label: '$y=x$', label_role: text }
       - { kind: function, expression: 'x**2', x_range: [0.0, 1.62], color_role: secondary, label: '$f(x)=x^2$' }
       - { kind: function, expression: 'sqrt(x)', x_range: [0.0, 2.5], color_role: accent, label: '$f^{-1}(x)=\sqrt{x}$', reveal: true }
     annotations:
@@ -367,7 +370,10 @@ scenes:
     steps:
       - { text: 'Write $y=f(x)$.', math: 'y=f(x)' }
       - { text: 'Solve for $x$ in terms of $y$.', math: 'x=\cdots' }
-      - { text: 'Interchange the names $x$ and $y$.', math: 'y=f^{-1}(x)' }
+      # terse on-screen label ('the names' carried by narration) so it sets on ONE
+      # line in the ~5u step column -- 'Interchange the names x and y.' wrapped and
+      # left a lone 'y.' widow (gate-1 A6 finding).
+      - { text: 'Interchange $x$ and $y$.', math: 'y=f^{-1}(x)' }
     worked:
       - 'y=x^2'
       - 'x=\pm\sqrt{y}'
@@ -391,7 +397,10 @@ scenes:
     template: derivation
     accent: example
     source: "§1.1 Example 1.6 (f=x^3+2 → cbrt(x-2), with check)"
-    title: 'Inverse of $f(x)=x^3+2$'
+    # title kept formula-free: the function $f(x)=x^3+2$ is the first body line, so a
+    # formula-bearing title was redundant AND towered over the bold text (heading math
+    # extends past x-height). Descriptive title + formula in the body reads cleaner.
+    title: "Inverting a Cubic"
     align_on: "="
     lines:
       - 'y = x^3 + 2'
@@ -415,7 +424,9 @@ scenes:
     template: derivation
     accent: example
     source: "§1.1 Example 1.7 (f=3/(x-5) → (5x+3)/x, both-direction check + domain pairing)"
-    title: 'Inverse of $f(x)=\dfrac{3}{x-5}$'
+    # title kept formula-free (see inverse_of_a_cubic): the rational $f(x)=3/(x-5)$ is
+    # the first body line; a \dfrac in the heading towered 3x over the text.
+    title: "Inverting a Rational Function"
     align_on: "="
     lines:
       - 'y = \dfrac{3}{x-5}'

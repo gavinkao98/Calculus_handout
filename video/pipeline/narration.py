@@ -22,7 +22,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-_SHOW = re.compile(r"\{\s*show\s+([A-Za-z0-9_.]+)\s*\}")
+_SHOW = re.compile(r"\{\s*show\s+([A-Za-z0-9_.\[\]]+)\s*\}")
 
 
 @dataclass
@@ -46,7 +46,7 @@ def parse_say(say: str) -> list[Beat]:
     prev_reveal: str | None = None
     for match in _SHOW.finditer(say):
         beats.append(Beat(_clean(say[cursor:match.start()]), prev_reveal))
-        prev_reveal = match.group(1)
+        prev_reveal = match.group(1).replace("[", ".").replace("]", "")
         cursor = match.end()
     beats.append(Beat(_clean(say[cursor:]), prev_reveal))
 
@@ -56,7 +56,7 @@ def parse_say(say: str) -> list[Beat]:
 
 def list_reveal_targets(say: str) -> list[str]:
     """All block ids named by ``{show ...}`` in *say* (for validation/lint)."""
-    return [m.group(1) for m in _SHOW.finditer(say or "")]
+    return [m.group(1).replace("[", ".").replace("]", "") for m in _SHOW.finditer(say or "")]
 
 
 def estimate_seconds(text: str, *, wpm: float = 150.0, floor: float = 1.2) -> float:

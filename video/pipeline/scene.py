@@ -111,6 +111,10 @@ class LessonScene(Scene):
 
             play_block(self, by_id["timeline.header"], ground)
             self.wait(0.06)
+            # optional course-map watermark (bottom-right summit bars): reveal it early so
+            # it sits through the timeline animation, then stage 3 fades it out with the rest.
+            if "timeline.motif" in by_id:
+                play_block(self, by_id["timeline.motif"], ground)
             play_block(self, by_id["timeline.rail"], ground)
             self.wait(0.3)
 

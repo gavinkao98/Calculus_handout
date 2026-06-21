@@ -51,11 +51,19 @@ PX_TO_FS = 0.72
 # One global knob — retune if fonts change (Direction D's Inter Tight needed 1.42).
 TEX_TEXT_SCALE = 1.36
 
+# Inline math inside a DISPLAY HEADING (heading_rich). x-height-matched math (the body
+# default) sits at ~1.4-1.7x the bold text's cap height for simple f(x)=x^n, because
+# italic math (f, parens, descenders, superscripts) extends well past the x-height — so
+# a mixed title reads as "tiny words + huge formula". In a heading the visual reference
+# is the CAP height of the bold text, so we rein the math in by this factor (headings
+# only; body prose keeps full x-height match). Tunable; 1.0 = no reduction.
+HEADING_MATH_SCALE = 0.78
+
 # Density B px @ 1920x1080. New Direction-D names + back-compat aliases (old callers
 # pass these; most per-frame sizes are raw px overrides via fs(<number>)).
 _SCALE_PX = {
     # Direction-D scale
-    "hero": 112, "h1": 82, "h2": 58, "h3": 44,
+    "hero": 112, "h1": 78, "h2": 58, "h3": 44,  # h1 82->78: titles read as over-dominant on many scenes (Codex, both rounds)
     "prose": 42, "prose_sm": 35,
     "math": 48, "math_sm": 40,
     "caption": 30, "eyebrow": 26, "numeral": 104, "ghost_numeral": 520,
@@ -170,8 +178,26 @@ HEADING_RULE_W = 3.0
 # vertical rhythm tokens (px -> units) templates consume for consistent spacing
 EYEBROW_GAP = 22 / PX_PER_UNIT_Y      # eyebrow -> title
 TITLE_GAP = 56 / PX_PER_UNIT_Y        # title -> content zone
+# Body placement: short content vertically centred in the title->bottom zone drifts
+# to ~y=-0.6 (below frame centre), reading as disconnected from the title. We instead
+# centre but CLAMP the title->content gap to this max, so short content sits in the
+# upper-middle (anchored to the title like theorem_proof/procedure_steps), while tall
+# content still uses the full zone. Tunable; ~1 prose line of air below TITLE_GAP.
+BODY_TOP_GAP_MAX = 84 / PX_PER_UNIT_Y  # ~0.62 u extra below TITLE_GAP before clamp.
+#   History: 0.71 -> 1.0 (gate-1 audit: at 0.71 short content sat ~y=+0.5, "top-heavy,
+#   empty lower half"). That tune predated row-spreading. Now BODY_FILL_FRAC spreads
+#   short content to fill the LOWER zone, so a tighter top gap no longer strands content
+#   up top -- it just closes the dead band a Codex 2026-06-21 review flagged on ~12
+#   scenes ("title-to-body gap too large"). 0.62 sits content ~one text line below the
+#   title while the spread keeps the lower third occupied.
 LINE_GAP = 28 / PX_PER_UNIT_Y         # between display math lines
 ROW_GAP = 44 / PX_PER_UNIT_Y          # between list rows / steps
+# Short content in a tall body zone leaves BOTH a "dead band under the title" and an
+# empty lower third (a Codex 2026-06-21 review flagged this on ~12 scenes). Rather than
+# yanking the block toward the title (which only trades one empty band for another), the
+# teaching templates SPREAD their inter-row spacing so short content fills ~this fraction
+# of the body zone before placement. Tall content already exceeds it and is untouched.
+BODY_FILL_FRAC = 0.72
 
 # corner radii (px -> units)
 RADIUS_SM = 6 / PX_PER_UNIT_Y

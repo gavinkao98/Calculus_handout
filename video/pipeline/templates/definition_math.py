@@ -19,6 +19,7 @@ from manim import DOWN, LEFT, VGroup
 from .. import brand
 from ..blocks import Block, accent_role
 from ..visuals import theme as T
+from ._common import place_body
 
 LABEL = {
     "definition": "[ definition ]", "theorem": "[ theorem ]",
@@ -94,9 +95,11 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         parts.append(stack)
     if parts:
         content = VGroup(*parts).arrange(DOWN, buff=0.71, aligned_edge=LEFT)
-        zone_top = title.get_bottom()[1] - T.TITLE_GAP
-        zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
-        content.move_to([left + content.width / 2, (zone_top + zone_bottom) / 2, 0])
+        # place_body's tightened BODY_TOP_GAP_MAX (0.62) lifts the block toward the
+        # title -- shrinking the dead band and raising the amber key toward the prose
+        # (both Codex 2026-06-21 asks); the prose statement anchors it from reading
+        # top-heavy.
+        place_body(content, title, left)
     if statement is not None:
         blocks.append(Block("statement", statement, anim="fade", static=True))
     for i, (mob, anim) in enumerate(zip(math_mobs, anims)):

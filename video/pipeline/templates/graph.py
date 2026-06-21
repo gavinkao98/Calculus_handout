@@ -441,7 +441,9 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     if annotations:
         group = VGroup(*annotations).arrange(DOWN, buff=0.25)
-        group.move_to([0, -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.25, 0])
+        # +0.55 (was +0.25): the caption sat ~5px above the safe margin, reading as a
+        # footer parked on the bottom edge (Codex). Lift it for real breathing room.
+        group.move_to([0, -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.55, 0])
     else:
         group = None
 
@@ -541,21 +543,24 @@ def _build_compare(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             continue
         cap = brand.prose(side_spec["caption"], ground, role="text", size="step",
                           max_width=half_w - 0.2, align="CENTER")
-        parts = [cap]
         verdict = str(side_spec.get("verdict", "")).lower()
         if verdict in _VERDICT:
+            # verdict glyph STACKED above the caption, centred under the panel -- it
+            # is this panel's punchline and belongs with the graph above it. (The old
+            # next_to(cap, RIGHT) floated the mark at the vertical middle of a wrapped
+            # 2-line caption, reading as a detached margin glyph.)
             name, vrole = _VERDICT[verdict]
-            gm = brand.glyph(name, ground, role=vrole, size="math_sm")
-            gm.next_to(cap, RIGHT, buff=0.25)
-            parts.append(gm)
-        grp = VGroup(*parts)
+            gm = brand.glyph(name, ground, role=vrole, size="math")
+            grp = VGroup(gm, cap).arrange(DOWN, buff=0.2)
+        else:
+            grp = VGroup(cap)
         captions[key] = grp
         cap_h = max(cap_h, grp.height)
 
     if ann_group is not None:
         cap_y = ann_group.get_top()[1] + _PANEL_CAPTION_GAP + cap_h / 2
     else:
-        cap_y = -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.3 + cap_h / 2
+        cap_y = -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.6 + cap_h / 2  # +0.6 (was +0.3): lift off the bottom edge (Codex)
     for key, grp in captions.items():
         grp.move_to([centers[key], cap_y, 0])
 

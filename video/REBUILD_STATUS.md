@@ -4,6 +4,39 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## 🛰️ 2026-06-21（續）§1.1 Codex 逐場景審核 → 套用 → 回歸（使用者 /goal：每場圖傳 codex 審美學/排版、調到他建議的樣子、再回饋模板）
+
+承同日內部 agent 微調，使用者要求改由**外部 Codex（gpt-5.5, xhigh）就美學/排版逐場審核**、據其建議調整、再把反覆出現的問題回饋進模板。**全程 mock／離線 render；唯一計費＝Codex 審核（使用者明確指定「傳給 codex」即同意）。** 流程：抽全 19 場最滿幀 → `codex exec -i <frame.png> -s read-only`（每場一呼、結構化美學 prompt）→ 套用修正 → 重渲重抽 → **同 prompt 對 14 改動場景跑 Codex 回歸**（分數可比）→ 另跑**獨立 gate-1 `visual-frame-audit` workflow**（17 場、refute-by-default）做雙閘交叉驗證。
+
+- **雙閘結論：0 blocking（兩閘皆是）。** Codex gate-2：19 場兩輪皆 0 blocking、分數 78–88；多數回歸分數上升（rational 78→84、application 78→86、one-to-one 82→86、reflection 84→86、can-we 82→86、first-inverses 78→82）、無真問題退步。Gate-1（[`visual-frame-audit`](#) workflow `wf_676aeafc-872`）：17 場 **0 confirmed blocking、0 raised-then-refuted**、美學 82–87。
+- **六項模板修正（recurring → templates，即「回饋模板」）：**
+  - **① reason-less 推導鏈水平置中**（[`derivation.py`](pipeline/templates/derivation.py)）：純式鏈（無 rail、無 statement）原左齊貼左 1/3、右 ~60% 空；改水平置中（行間仍互相左齊＝置中 display 區塊）。修掉最嚴重的 cubic／rational／application 左偏。
+  - **② 短內容撐滿 body zone**（[`_common.fill_gap`](pipeline/templates/_common.py)＋`theme.BODY_FILL_FRAC=0.72`）：短鏈原同時留「標題下死帶」＋「下緣空帶」；`fill_gap()` 把行距撐到佔 zone ~72%（有上限、長鏈不動）。
+  - **③ 標題→內容間距收緊**（`theme.BODY_TOP_GAP_MAX` 1.0→0.62）：行撐滿下緣後，較緊的頂距可關掉 Codex 在 ~12 場標的死帶而不致頭重（史：0.71→1.0 是撐滿前的 gate-1 調值；0.62 為撐滿後值）。
+  - **④ amber key glow 收斂**（[`brand.text_glow`](pipeline/brand.py) 預設 2.6/0.5→2.0/0.42；derivation result 3.0/0.45→2.2/0.38）：Codex 多場讀到金色光暈糊/浮雕感。
+  - **⑤ ~~角落 motif 調暗~~（已回退）**：原試把右下 summit-bars 由 0.40 調暗到 0.28＋縮小（Codex 在 ~13 場標「與內容競爭」）；**使用者看過後裁決保留原 prominence（opacity 0.40、height 0.45），此項已完整回退**（`MOTIF_OPACITY` 常數移除、兩呼叫點還原字面值）。
+  - **⑥ graph caption 抬離下緣**（[`graph.py`](pipeline/templates/graph.py) single +0.25→+0.55、2up +0.3→+0.6）；derivation rail leader 提亮 0.55→0.7；procedure 數字 glow 3.0/0.4→2.4/0.34＋RHS 結果欄內收 1.3u（Codex 兩輪標 RHS 脫節）。
+  - **⑦ h1 字級 82→78px**（[`theme.py`](pipeline/visuals/theme.py)）：標題在多場兩輪皆被標「過於主導」，~5% 微縮。**⚠️ 影響全 deck、易回退（單一常數）；列為最可議/最需使用者裁決項。**
+- **per-scene（storyboard）：** HLT 兩 caption 改短平行式（'Every height: one crossing.'／'One height: two crossings.'，去除換行孤字）；reflection／repair 的 muted `y=x` 參考標籤提亮（`label_role: text`）。
+- **使用者複審後追加（2026-06-21 續）：** ① motif 調暗回退（見 ⑤）。② **intro 片頭 course-map 加上右下浮水印**（先前只有 dark-handoff 階段有）——[`intro.py`](pipeline/templates/intro.py) `_pulse_timeline` 加 `timeline.motif` block（light ground、summit-bars、opacity 0.40），並在 [`scene.py`](pipeline/scene.py) `_play_intro` stage 2 顯式 `play_block(timeline.motif)`（guarded；原 `_play_intro` 按 hardcoded id 播放，不在序列內的 block 不會顯示——之前唯一「看似有」是 stage 3 FadeOut 把未播放的 mob 閃現一下的假象）。浮水印現整個 course-map 階段持續可見、進 dark 過場時隨其餘 timeline 元素淡出。
+- **刻意非 finding（既定設計，未動）：** outro 淺色 paper end-slate（Codex 以為破風格，實為刻意章末處理）；右下 motif（品牌浮水印，調暗非移除）；can_we 的「many-to-one」紅字（標 collision/失敗、非 amber key）。
+- **殘留 advisory（記錄、未追）：** 定義場景現略頭重（短雙塊內容的本質取捨——round1 要往上、round2 要往下，互斥；現「標題＋lede＋公式＋下留白」為折衷）；testing/shape rail 內 roman 字（"on"/"test"）比相鄰 inline math 略大（`_compose` x-height 對齊老問題，gate-1 A6~72、可讀，待日後 typography pass）；rail text 維持 ink_2（再亮會與式競爭，改提亮 leader）。
+- **驗證＋交付：** schema OK／lint clean（3 timing warn）／sizecheck consistent；全 19 場重渲 → 新 master `output/ch01/s1.1/ch01_inverse_functions.mp4`（mock、1080p）。**HTML 報告**（self-contained、base64 內嵌 19×before/after＋逐場 Codex 前後逐字＋6 模板變更＋雙閘裁決）：[`content_scripts/_audit/REVIEW-ch01_inverse_functions-codex-polish.html`](content_scripts/_audit/REVIEW-ch01_inverse_functions-codex-polish.html)；產生器＋before 幀＋Codex 逐字裁決（不可廉價重生＝計費產物）存 tracked [`_gen/`](content_scripts/_audit/_gen)（`REVIEW-ch01-codex-polish.gen.py`／`frames_before_codex/`／`frames_after_codex/`／`codex_reviews/`）。
+- **待：** 使用者看片／報告認可後，真 TTS（計費，先報價）＋VLM critic gate-2（MiMo，計費）。h1 微縮如不認可可單行回退（`theme.py` `_SCALE_PX["h1"]` 78→82）。
+
+## 🎨 2026-06-21 §1.1 逐場景視覺微調 + 三項模板改進（使用者 /goal：逐場調到視覺最佳並回饋模板）
+
+對 `ch01_inverse_functions` 全 19 場景逐一抽幀（[`critic.py --dry-run`](pipeline/critic.py) 離線抽每場最滿幀、零計費）檢視、逐場微調，並把反覆出現的問題上升為**三項通用模板修正**。**全程 mock／離線 render，未動任何計費 API。** 17 個 content 場景逐一重渲＋抽幀複驗；末了以 **17 個並行 visual-frame-audit agent**（gate 1、每場一個、依 VISUAL-FRAME rubric 判 V1–V9＋A1–A7）獨立複核 → **全 deck 視覺 blocking 歸零**，餘皆 advisory 美學（A 分 78–92）。
+
+- **模板改進 A — 消除「標題↔內容大死帶」、內容置中（影響 ~11 場景）：** `definition_math`／`derivation` 原把內容在「標題→底邊」整個區帶垂直置中，內容少時飄到 ~y=−0.6（低於畫面中心）、與標題脫節。新增共用 helper [`_common.place_body()`](pipeline/templates/_common.py)：仍置中但**把標題→內容間距 clamp 到 `theme.BODY_TOP_GAP_MAX`**——短內容落在接近畫面中央（略偏上以呼應上方標題）、中等內容置中、長內容仍填滿整區帶；底部有防溢出保護。`definition_math`＋`derivation` 皆改用。clamp 值 **0.71→1.0** 是依 gate-1 audit「短場景偏上頭重」回饋微調定案。
+- **模板改進 B — 標題內嵌數學不再壓過文字：** heading inline math 經 x-height 對齊後，簡單 `f(x)=x^n` 達粗體 cap 高 1.4–1.7×、`\dfrac` 達 3.1×，整行讀成「小字＋巨式」。[`brand._compose`](pipeline/brand.py) 加 `math_scale_mul`、`heading_rich` 傳 `theme.HEADING_MATH_SCALE`（0.78）**只縮 heading 數學**（body prose 維持全 x-height 對齊）。另改寫 3 個標題去掉冗餘／過高公式：05 `Testing $f(x)=x$ and $g(x)=x^2$`→`Testing $f$ and $g$`（定義移到 reason rail）、15 `Inverse of $f(x)=x^3+2$`→`Inverting a Cubic`、16 `Inverse of $f(x)=\dfrac{3}{x-5}$`→`Inverting a Rational Function`（後兩者公式本即 body 第一行、重複且過高）。
+- **模板改進 C — verdict 位置＋reason rail 可讀性：** [`graph.py`](pipeline/templates/graph.py) 2-up 的 ✓/✗ 原 `next_to(cap, RIGHT)`、caption 換兩行時飄在右邊欄垂直中央像脫離邊註——改成**置中疊在 caption 上方、在該 panel 正下方**。[`derivation.py`](pipeline/templates/derivation.py) reason rail 由 `muted`（ink_3）改 `text`（ink_2）：rail 承載真正推理、專案 lint 本就標 muted「太淡」，斜體＋虛線導引仍維持次要性。
+- **per-scene 微調：** 14 procedure step 3 標籤 `Interchange the names $x$ and $y$.`→`Interchange $x$ and $y$.`（原 5u 欄寬下換行、留孤字「y.」widow；「the names」由旁白承載）。
+- **逐場狀態：** Fix A 套 02/03/04/08/11(definition_math)＋05/06/10/15/16/17(derivation)；05/15/16 另改標題、降 heading 數學；06/10/15/16 等 rail 提亮；07 verdict 重排；12 標題 `$y=x$` 受 Fix B；09(theorem_proof)／13(graph)／18(recap)／intro／outro 既平衡、未改。**5 hook 動畫經 place_body 後仍正常**（hook 自行定位圖元、不受影響）。
+- **驗證＋交付：** schema／lint／sizecheck 三閘過；全 19 場景重渲 → 新 master `output/ch01/s1.1/ch01_inverse_functions.mp4`（mock 靜音、1080p）。**HTML 報告**（self-contained、base64 內嵌全 17 幀＋2 組 before/after＋3 模板變更＋audit verdict）：[`content_scripts/_audit/REVIEW-ch01_inverse_functions-scene-polish.html`](content_scripts/_audit/REVIEW-ch01_inverse_functions-scene-polish.html)（產生器＋before 幀在 [`_gen/`](content_scripts/_audit/_gen)）。
+- **audit 餘下 advisory（刻意未動、留記錄）：** 09 proof inline-math 標點略擠（A6 70；與多場景同模式，改共用 `_compose` 風險高於收益）；12「$y=x$」/「$y=x^3$」標籤略近（A1 80；移 label 有壓線風險）；13 caption em-dash 間距；18 recap 卡片右緣略擠；06/11 verdict/amber 可再加重（主觀）。皆非 blocking。
+- **待：** 使用者看片／報告認可後，真 TTS（計費，先報價）＋VLM critic gate-2 複核（MiMo，計費）。
+
 ## 🧹 2026-06-20（續³）舊設計清理：刪死字型資產＋退場舊模板＋掃 stale 字型引用（使用者要求「整個 video 看一下、跟舊設計有關的檔案／文檔刪乾淨」）
 
 承字型 revert，使用者要求把與舊設計有關的檔案／文檔清乾淨。**先完整盤點 video/ 再列確切刪除清單經使用者裁決**（AskUserQuestion：選「A＋舊模板一起退場」；§1.2 旁白「之後重跑、舊的不用了」）。**未動計費 API。** 動手前查清依賴：`design_handoff/` 被 `brand.py` 用（logo SVG `_BRAND`）＋README 標「不可重生設計底稿」故**保留**；舊模板 .py 是 live graph 引擎（非死碼）。

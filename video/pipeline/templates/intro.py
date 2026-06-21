@@ -72,6 +72,15 @@ def _pulse_timeline(spec: dict[str, Any], meta: dict[str, Any], ground: str) -> 
                    aligned_edge=LEFT)
     blocks.append(Block("timeline.header", header, anim="fade", static=False))
 
+    # bottom-right summit-bars watermark, matching the dark-handoff + teaching scenes
+    # (the course map was the one stage missing it). Revealed early so it sits as a
+    # persistent mark through the timeline animation; light ground -> muted grey; the
+    # later dark transition rectangle covers it.
+    motif = brand.summit_bars(ground, height=0.45, color_role="muted", opacity=0.4)
+    motif.move_to([T.FRAME_W / 2 - T.SAFE_MARGIN - motif.width / 2,
+                   -T.FRAME_H / 2 + T.SAFE_MARGIN + motif.height / 2, 0])
+    blocks.append(Block("timeline.motif", motif, anim="fade", static=False))
+
     n = len(sections)
     if n == 1:
         center_y = (RAIL_TOP + RAIL_BOTTOM) / 2

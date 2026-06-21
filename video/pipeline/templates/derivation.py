@@ -38,7 +38,7 @@ from manim import DOWN, LEFT, RIGHT, MathTex, Text, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner
+from ._common import scene_head, motif_corner, place_body, body_zone, fill_gap
 
 _COL_GAP = 0.36       # equation column -> reason rail
 _LEADER_W = 0.67      # dotted leader length (90px)
@@ -81,7 +81,8 @@ def _eq_mob(row: dict, ground: str):
     trailing green checkmark."""
     if row["kind"] == "result":
         eq = MathTex(row["math"].strip(), color=T.color(ground, "accent"), font_size=T.fs(54))
-        return brand.text_glow(eq, ground, role="accent", width=3.0, opacity=0.45)
+        # crisper halo (was 3.0/0.45): Codex read the heavy amber glow as fuzzy/embossed.
+        return brand.text_glow(eq, ground, role="accent", width=2.2, opacity=0.38)
     role = "muted" if row["kind"] == "check" else "primary"
     eq = MathTex(row["math"].strip(), color=T.color(ground, role), font_size=T.fs("math"))
     # a trailing verdict glyph: check rows + steps marked ok -> green check; bad -> red cross
@@ -101,10 +102,14 @@ def _reason_mob(row: dict, ground: str):
         return None
     if row["kind"] == "result":
         return brand.eyebrow(str(reason), ground, role="amber_ink")
+    # role="text" (ink_2), not "muted" (ink_3): the rail carries the reasoning the old
+    # two-column walkthrough spent a whole column on -- it is teaching content, so it
+    # must be readable. Italic + the dotted leader keep it subordinate to the bright
+    # equations (ink_1) without dimming it into the "too faint" zone the lint flags.
     if "$" in str(reason):
-        return brand.prose(str(reason), ground, role="muted", size="prose_sm")
+        return brand.prose(str(reason), ground, role="text", size="prose_sm")
     return Text(str(reason), font=T.FONT_BODY, font_size=T.fs("prose_sm"),
-                color=T.color(ground, "muted"), slant="ITALIC")
+                color=T.color(ground, "text"), slant="ITALIC")
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -131,17 +136,29 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     reason_x = rail_x + _LEADER_W + 0.16
     reason_max_w = (left_x + content_w) - reason_x
 
+    # pre-pass: clamp reason widths, collect row heights (needed to size the chain to
+    # the body zone before placing).
+    heights: list[float] = []
+    for r, eq, reason in zip(rows, eqs, reasons):
+        if reason is not None and reason.width > reason_max_w > 0:
+            reason.scale_to_fit_width(reason_max_w)
+        heights.append(max(eq.height, reason.height if reason is not None else 0.0))
+
+    # spread rows so a short chain fills the body zone rather than stranding a dead band
+    # under the title + an empty lower third (Codex 2026-06-21). A statement, if present,
+    # eats one slot of the zone budget. fill_gap caps the spread so tall chains keep pitch.
+    zt, zb = body_zone(title)
+    stmt_h = (statement.height + 0.55) if statement is not None else 0.0
+    row_gap = fill_gap(heights, _ROW_GAP, max(zt - zb - stmt_h, 1.5))
+
     # vertical layout: gap-spaced rows (fused-rows pitch so tall rows never collide)
     row_mobs: list[Any] = []
     y = 0.0
     prev_half = None
-    for r, eq, reason in zip(rows, eqs, reasons):
-        if reason is not None and reason.width > reason_max_w > 0:
-            reason.scale_to_fit_width(reason_max_w)
-        h = max(eq.height, reason.height if reason is not None else 0.0)
+    for r, eq, reason, h in zip(rows, eqs, reasons, heights):
         half = h / 2
         if prev_half is not None:
-            extra = _ROW_GAP + (0.12 if r["kind"] == "check" else 0.0)
+            extra = row_gap + (0.12 if r["kind"] == "check" else 0.0)
             y -= prev_half + extra + half
         eq.move_to([left_x, y, 0], aligned_edge=LEFT)
         group = [eq]
@@ -150,7 +167,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             leader = brand.dotted_leader(
                 _LEADER_W, ground,
                 role="accent" if r["kind"] == "result" else "hairline_strong",
-                opacity=0.5 if r["kind"] == "result" else 0.55)
+                opacity=0.6 if r["kind"] == "result" else 0.7)  # was 0.5/0.55: Codex read the rail as too faint
             leader.move_to([rail_x + _LEADER_W / 2, y, 0])
             group += [leader, reason]
         row_mobs.append((r, VGroup(*group), eq))
@@ -161,10 +178,16 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     parts = ([statement] if statement is not None else []) + ([chain] if chain is not None else [])
     if parts:
         content = VGroup(*parts).arrange(DOWN, buff=0.55, aligned_edge=LEFT)
-        zone_top = title.get_bottom()[1] - T.TITLE_GAP
-        zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
-        content.move_to([left_x + content.width / 2, (zone_top + zone_bottom) / 2, 0])
-        content.align_to(title, LEFT)
+        place_body(content, title, left_x)
+        # A pure equation chain (no reason rail, no statement) left-flush would hug the
+        # left third and strand the right ~60% empty (Codex flagged cubic/rational/app as
+        # "left-heavy, large dead field"). Centre it horizontally; rows stay mutually
+        # left-aligned, so it reads as a centred display-equation block.
+        no_rail = all(not r.get("reason") for r in rows)
+        if no_rail and statement is None:
+            content.move_to([0.0, content.get_center()[1], 0])
+        else:
+            content.align_to(title, LEFT)
 
     if statement is not None:
         blocks.append(Block("statement", statement, anim="fade", static=True))

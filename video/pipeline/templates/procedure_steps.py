@@ -44,6 +44,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     from manim import Text
     right_edge = T.FRAME_W / 2 - T.SIDE_GUTTER
+    # pull the result column in from the far gutter so each instruction sits closer to
+    # its formula (Codex flagged the RHS as detached, "wide dead band", both rounds).
+    rhs_x = right_edge - 1.3
     math_rows = []
     y = top
     prev_half = None
@@ -52,7 +55,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         numeral = brand.text_glow(
             Text(f"{i + 1:02d}", font=T.FONT_DISPLAY, weight="BOLD",
                  font_size=T.fs("numeral"), color=T.color(ground, "secondary")),
-            ground, role="secondary", width=3.0, opacity=0.4)
+            ground, role="secondary", width=2.4, opacity=0.34)  # softer glow: Codex found the numerals over-glowing
         rule = brand.vrule(64 / T.PX_PER_UNIT_Y, ground, role="hairline", width=2)
         txt = brand.prose(st.get("text", ""), ground, role="text", size="prose",
                           max_width=5.0, align="LEFT")
@@ -68,7 +71,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         else:
             y -= max(row_gap, prev_half + min_clear + half)
         row.move_to([left, y, 0], aligned_edge=LEFT)
-        m.move_to([right_edge, y, 0], aligned_edge=RIGHT)
+        m.move_to([rhs_x, y, 0], aligned_edge=RIGHT)
         prev_half = half
 
         blocks.append(Block(f"row.{i}", row, anim="fade", static=True))

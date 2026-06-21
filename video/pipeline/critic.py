@@ -255,11 +255,15 @@ def _format_label_geometry(geom: dict) -> str:
     if geom["overlaps"]:
         for ov in geom["overlaps"]:
             lines.append(f"OVERLAP DETECTED (deterministic): {ov['a']} and {ov['b']} "
-                         f"overlap {ov['pct']}% of the smaller -- a real V2/A1 defect; "
-                         f"name a specific empty direction to move one label.")
+                         f"overlap {ov['pct']}% of the smaller -- a real V2/A1 defect. "
+                         f"CRITICAL: You MUST provide two specific, mutually exclusive placement "
+                         f"options in your suggestion (e.g., 'Option A: move {ov['a']} UP; "
+                         f"Option B: move {ov['b']} to the RIGHT'), aimed at empty space.")
     else:
         lines.append("No equation-label overlap was detected geometrically -- do not "
-                     "invent a label collision; judge only what the frame shows.")
+                     "invent a label collision. However, if any label could be placed "
+                     "in a more aesthetically pleasing, clear, or balanced position, "
+                     "you MUST provide a specific suggestion (e.g., 'move [label] UP').")
     return "\n".join(lines) + "\n"
 
 
