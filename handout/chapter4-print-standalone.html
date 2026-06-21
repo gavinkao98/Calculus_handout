@@ -141,6 +141,8 @@ window.MathJax = {
 .paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
 .paper .secant { stroke: var(--c-aux); stroke-width: 1.6; stroke-dasharray: 5 3.5; fill: none; stroke-linecap: round; }
 .paper .tangent { stroke: var(--c-caution); stroke-width: 2; fill: none; stroke-linecap: round; }
+.paper .curve-log { stroke: var(--c-caution); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .idline { stroke: var(--c-aux); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
 .paper .dot { fill: var(--ink); }
 .paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
 .paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
@@ -1230,6 +1232,252 @@ window.MathJax = {
 
 </article>
 </template>
+
+<template id="frag-sec-4-5">
+<!-- §4.5 Monotonicity and the Logarithmic Function.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from _dev-archive/ch04/seed_ch04_s5.md (manuscript pp. 18–22 + Homework
+     pp. 23–24). Direction brief brief_s45.md approved at ③ (2026-06-21,
+     "全照提案核可" + all three optional add-ons selected). Numbering is MANUAL
+     and CONTINUES from §4.1–§4.4: those used Definition 4.1–4.3, Theorem 4.1–4.12,
+     Proposition 4.1/4.2, Corollary 4.1–4.3, Strategy 4.1/4.2, Example 4.1–4.4,
+     Figure 4.1/4.2, Remark 4.1–4.4 — so §4.5 mints Definition 4.4 (ln x),
+     Theorem 4.13 (continuity) / 4.14 (derivative 1/x), Proposition 4.3 (logarithm
+     product law), Corollary 4.4 (f'=0 ⟹ constant), Example 4.5 (general powers
+     a^x), Figure 4.3 (e^x/ln x reflection), Remark 4.5/4.6, and an unnumbered
+     Caution. No new Strategy is minted. Cross-references are plain prose. Math
+     cross-checked against the signed legacy ground truth
+     legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.5
+     (def:logarithm, thm:ln-continuous, thm:ln-derivative-rigorous,
+     fig:exp-and-log-reflection, remark line 807, application line 834,
+     Summary line 841).
+
+     ③ decisions (brief §C/§D, all approved; all three optional add-ons taken):
+       - §C-1: the range of e^x is (0, ∞); the manuscript asserts this via the
+         limits lim_{x→±∞} e^x without proof. We assert it too, with a one-line
+         note on its dependence (continuity + limits + intermediate values).
+       - §C-2 (ROADMAP pitfall): an unnumbered Caution that ln x is defined only
+         for x > 0 (ln 0, ln(-1) undefined).
+       - §C-3 (ROADMAP key figure): Figure 4.3 — the e^x / ln x reflection across
+         y = x; registered in chapter4 FIGS as "exp-log-reflection".
+       - §C-4 (ROADMAP prerequisite): Remark 4.5 contrasts this rigorous derivation
+         with the informal chain-rule pass of Ch 3 §3.3 (Example 3.6), closing that
+         forward-reference loop.
+       - §C-5: HW1 (f'=0 ⟹ constant) promoted to Corollary 4.4, placed just before
+         the logarithm laws that use it.
+       - §C-6 (add-on taken): HW2 (ln(ab) = ln a + ln b) promoted to a NAMED result,
+         Proposition 4.3 (the logarithm product law), rather than a worked example.
+       - §C-7: HW4 (general powers a^x := e^{x ln a}) promoted to Example 4.5,
+         closing §4.1's deferred question about a^r for irrational r (D6).
+       - §C-8 (add-on taken): HW3 (the Cauchy functional equation characterising e^x)
+         retained as a one-sentence Remark 4.6, proof omitted.
+       - §C-9: a chapter-level 4-strand Summary closes this final section.
+       - §C-10 (add-on taken): a short application capstone (exponential
+         growth/decay, half-life) before the summary.
+       - §C-11: opener closes both forward fences — Ch 3 §3.3 (informal ln) and
+         §4.1 (a^r for irrational r).
+     This is the FINAL section of Chapter 4; the per-type counters reset at
+     Chapter 5. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">4.5</span>Monotonicity and the Logarithmic Function</h2>
+  </header>
+
+  <!-- expansion:intuition — opener: pick up §4.4's closing fact (e^x strictly increasing ⟹ one-to-one); strict monotonicity is the engine that both builds and powers the inverse; lists the section's program and the two fences it closes (§C-11) -->
+  <p>Section 4.4 closed with the fact this section is built on: \(e^{x}\) is strictly increasing on \(\mathbb{R}\), and a strictly increasing function is one-to-one. A one-to-one function can be inverted, and the inverse of the exponential is the function we are after — the <em>natural logarithm</em>. Strict monotonicity is the lever throughout. It does the obvious work of <em>building</em> the inverse, by making each value \(x &gt; 0\) come from exactly one exponent. Less obviously, it also <em>powers</em> everything we then prove about that inverse: the continuity of \(\ln\) and its differentiability are not free gifts that come with the definition. Each needs its own argument, and both arguments reach back to the strict monotonicity of \(e^{x}\). This section defines \(\ln x\), proves it is continuous, and derives \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) rigorously — this time without assuming in advance that \(\ln\) is differentiable, the assumption Chapter 3 made informally. Along the way it settles two debts left earlier: the informal logarithm of §3.3 and the meaning of \(a^{r}\) for irrational \(r\), deferred back in §4.1.</p>
+
+  <h3 class="subsec-head">Defining the natural logarithm</h3>
+
+  <!-- expansion:intuition — §C-1: the range of e^x is (0,∞); assert with a one-line dependency note (manuscript + legacy both assert, do not prove) -->
+  <p>To invert \(e^{x}\) we need to know what values it takes. As \(x\) ranges over \(\mathbb{R}\), \(e^{x}\) is continuous (Theorem 4.6) and runs from \(\lim_{x \to -\infty} e^{x} = 0\) up to \(\lim_{x \to +\infty} e^{x} = +\infty\), passing through every value in between; its range is therefore the open interval \((0, \infty)\). We take this for granted here — the two limits follow from the series and the intermediate values from continuity, but the details would detain us — and read off the consequence we need: for every \(x &gt; 0\) there is exactly one exponent producing it.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.4</span><span class="env-name">Natural logarithm</span></p>
+    <div class="env-body">
+      <p>For \(x \in (0, \infty)\), the <em>natural logarithm</em> of \(x\), written \(\ln x\), is the unique real number \(a\) satisfying</p>
+      <p>\[ e^{a} = x. \]</p>
+      <p>Equivalently, \(\ln x\) is the inverse function of \(e^{x}\) on \((0, \infty)\): it is characterised by the two identities</p>
+      <p>\[ e^{\ln x} = x \quad (x &gt; 0), \qquad \ln(e^{x}) = x \quad (x \in \mathbb{R}). \]</p>
+      <p class="informal">In words, \(\ln x\) is the exponent you must raise \(e\) to in order to land on \(x\). The strict monotonicity of \(e^{x}\) makes that exponent unique; its range being \((0, \infty)\) makes the exponent exist for every positive \(x\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — §C-2 (ROADMAP pitfall): ln defined only for x>0 -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The logarithm is defined only for \(x &gt; 0\). The symbols \(\ln 0\) and \(\ln(-1)\) have no meaning here: \(\ln 0\) would require \(e^{a} = 0\) and \(\ln(-1)\) would require \(e^{a} = -1\), and neither is possible, because \(e^{a} &gt; 0\) for every real \(a\). Every formula in this section that contains \(\ln x\) silently carries the assumption \(x &gt; 0\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:figure — Figure 4.3 (§C-3, ROADMAP key figure): e^x / ln x reflection across y=x; registered in chapter4 FIGS as "exp-log-reflection" -->
+  <figure class="figure" data-fig="exp-log-reflection">
+    <figcaption><span class="fig-no">Figure 4.3</span> The graphs of \(e^{x}\) (blue) and \(\ln x\) (red) are mirror images across the line \(y = x\) (dashed) — the geometric signature of the inverse relation \(\ln(e^{x}) = x\). Reflecting swaps coordinates, sending the point \((0, 1)\) on the exponential to \((1, 0)\) on the logarithm.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">Continuity of the logarithm</h3>
+
+  <!-- expansion:intuition — lead into the continuity proof; the indirect argument leans on strict monotonicity -->
+  <p>That \(\ln\) is continuous is not automatic and takes a short argument. The idea is indirect: if some sequence of inputs approached \(x_{0}\) while their logarithms stayed away from \(\ln x_{0}\), then applying the strictly increasing \(e^{x}\) would re-open a fixed gap on the input side — contradicting the very fact that the inputs converged.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.13</span></p>
+    <div class="env-body">
+      <p>\(\ln x\) is continuous at every \(x_{0} &gt; 0\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x_{0} &gt; 0\) and suppose, for contradiction, that \(\ln\) is <em>not</em> continuous at \(x_{0}\). Then \(\lim_{x \to x_{0}} \ln x\) either fails to exist or exists but differs from \(\ln x_{0}\). In either case the failure is witnessed by a sequence: there is a number \(\delta &gt; 0\) and points \(y_{j} \to x_{0}\) (all in \((0, \infty)\)) with</p>
+      <p>\[ \lvert \ln y_{j} - \ln x_{0} \rvert \ge \delta \qquad \text{for every } j = 1, 2, 3, \dots \]</p>
+      <p>For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.4), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):</p>
+      <ul>
+        <li>if \(\ln y_{j} \le \ln x_{0} - \delta\), then \(x_{0} - y_{j} = e^{\ln x_{0}} - e^{\ln y_{j}} \ge e^{\ln x_{0}} - e^{\ln x_{0} - \delta} &gt; 0\);</li>
+        <li>if \(\ln y_{j} \ge \ln x_{0} + \delta\), then \(y_{j} - x_{0} = e^{\ln y_{j}} - e^{\ln x_{0}} \ge e^{\ln x_{0} + \delta} - e^{\ln x_{0}} &gt; 0\).</li>
+      </ul>
+      <p>Let</p>
+      <p>\[ \varepsilon = \min\!\left\{\, e^{\ln x_{0}} - e^{\ln x_{0} - \delta}, \; e^{\ln x_{0} + \delta} - e^{\ln x_{0}} \,\right\} &gt; 0, \]</p>
+      <p>a single positive number depending only on \(x_{0}\) and \(\delta\). In both cases \(\lvert y_{j} - x_{0} \rvert = \lvert e^{\ln y_{j}} - e^{\ln x_{0}} \rvert \ge \varepsilon\), so</p>
+      <p>\[ \lvert y_{j} - x_{0} \rvert \ge \varepsilon \qquad \text{for every } j. \]</p>
+      <p>But this contradicts \(y_{j} \to x_{0}\), which forces \(\lvert y_{j} - x_{0} \rvert\) below \(\varepsilon\) for large \(j\). The assumption of discontinuity is untenable, so \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) and \(\ln\) is continuous at \(x_{0}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The derivative of the logarithm</h3>
+
+  <!-- expansion:intuition — lead: contrast with Ch3 §3.3's chain-rule pass; the inverse-function technique extracts the derivative without assuming it -->
+  <p>Chapter 3 already wrote down \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), but it did so by differentiating \(e^{\ln x} = x\) with the chain rule — which silently <em>assumes</em> \(\ln\) is differentiable. We can now earn the formula honestly. The inverse-function technique flips the logarithm's difference quotient into a difference quotient for \(e^{x}\), whose derivative we already control, and lets continuity carry the limit across.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.14</span></p>
+    <div class="env-body">
+      <p>For every \(x &gt; 0\),</p>
+      <p>\[ \frac{d}{dx}\ln x = \frac{1}{x}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x &gt; 0\) and take \(h \ne 0\) small enough that \(x + h &gt; 0\). Set</p>
+      <p>\[ y_{0} = \ln x, \qquad y = \ln(x + h), \]</p>
+      <p>so that \(e^{y_{0}} = x\) and \(e^{y} = x + h\); subtracting, \(e^{y} - e^{y_{0}} = (x + h) - x = h\). Substituting this for \(h\) and flipping the quotient,</p>
+      <p>\[ \frac{\ln(x + h) - \ln x}{h} = \frac{y - y_{0}}{e^{y} - e^{y_{0}}} = \frac{1}{\dfrac{e^{y} - e^{y_{0}}}{y - y_{0}}}. \]</p>
+      <p>The division is legitimate because \(y \ne y_{0}\): the logarithm is strictly increasing, being the inverse of the strictly increasing \(e^{x}\), so \(h \ne 0\) forces \(\ln(x + h) \ne \ln x\).</p>
+      <p>Now let \(h \to 0\). By continuity of \(\ln\) (Theorem 4.13), \(y = \ln(x + h) \to \ln x = y_{0}\), and \(y \ne y_{0}\) all the while. The denominator is precisely the difference quotient of \(e^{y}\) at \(y_{0}\), so</p>
+      <p>\[ \lim_{h \to 0} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \lim_{y \to y_{0}} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \left.\frac{d}{dy} e^{y}\right|_{y = y_{0}} = e^{y_{0}} = e^{\ln x} = x, \]</p>
+      <p>using \((e^{y})' = e^{y}\) from Theorem 4.8. Taking the reciprocal,</p>
+      <p>\[ \frac{d}{dx}\ln x = \lim_{h \to 0} \frac{\ln(x + h) - \ln x}{h} = \frac{1}{x}. \tag{$\ast$} \]</p>
+      <p><span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — Remark 4.5 (§C-4, ROADMAP prerequisite): rigorous vs Ch3 chain-rule; closes the §3.3 forward-reference loop -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.5</span></p>
+    <div class="env-body">
+      <p>This closes a loop opened in Chapter 3. There (§3.3) the same formula \((\ln x)' = 1/x\) was obtained quickly by applying the chain rule to \(e^{\ln x} = x\) — a derivation that <em>presupposes</em> \(\ln\) is differentiable. The proof above presupposes no such thing: it extracts differentiability from the difference quotient, using only the continuity of \(\ln\) (Theorem 4.13) and the derivative of \(e^{x}\) (Theorem 4.8). The chain-rule route is faster and perfectly good once differentiability is known; the inverse-function route is the one that establishes differentiability in the first place, and so is the one the foundations rest on.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Logarithm laws and general powers</h3>
+
+  <!-- expansion:intuition — lead: harvest the algebraic properties; first one more MVT consequence (§C-5, HW1 → Corollary 4.4) -->
+  <p>With the derivative in hand we can read off the algebra of the logarithm. The engine is a single extra consequence of the Mean Value Theorem — the companion of the monotonicity corollary, for the borderline case \(f' = 0\).</p>
+
+  <!-- expansion:formula — Corollary 4.4 (§C-5): HW1, f'=0 ⟹ constant -->
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">4.4</span><span class="env-name">Vanishing derivative</span></p>
+    <div class="env-body">
+      <p>Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\). If \(f'(c) = 0\) for every \(c \in (a, b)\), then \(f\) is constant on \([a, b]\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Take any two points \(x_{1} &lt; x_{2}\) in \([a, b]\). The Mean Value Theorem (Theorem 4.12) on \([x_{1}, x_{2}]\) supplies a \(c \in (x_{1}, x_{2})\) with</p>
+      <p>\[ f(x_{2}) - f(x_{1}) = f'(c)\,(x_{2} - x_{1}) = 0 \cdot (x_{2} - x_{1}) = 0, \]</p>
+      <p>so \(f(x_{2}) = f(x_{1})\). As \(x_{1}, x_{2}\) were arbitrary, \(f\) takes a single value throughout \([a, b]\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:formula — Proposition 4.3 (§C-6, add-on taken): HW2 ln(ab)=ln a+ln b promoted to a named result -->
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">4.3</span><span class="env-name">Logarithm product law</span></p>
+    <div class="env-body">
+      <p>For all \(a, b &gt; 0\),</p>
+      <p>\[ \ln(ab) = \ln a + \ln b. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(a &gt; 0\) and define, for \(x &gt; 0\),</p>
+      <p>\[ f(x) = \ln(ax) - \ln x. \]</p>
+      <p>By the chain rule together with Theorem 4.14,</p>
+      <p>\[ f'(x) = a \cdot \frac{1}{ax} - \frac{1}{x} = \frac{1}{x} - \frac{1}{x} = 0 \qquad \text{for every } x &gt; 0. \]</p>
+      <p>So \(f'\) vanishes identically. Applying Corollary 4.4 on the closed interval with endpoints \(1\) and any \(x &gt; 0\) gives \(f(x) = f(1)\). But \(f(1) = \ln a - \ln 1 = \ln a\), since \(\ln 1 = 0\) (because \(e^{0} = 1\)). Hence \(f(x) = \ln a\) for all \(x &gt; 0\); that is, \(\ln(ax) - \ln x = \ln a\). Setting \(x = b\) gives \(\ln(ab) - \ln b = \ln a\), which rearranges to \(\ln(ab) = \ln a + \ln b\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 4.5 (§C-7, HW4): general powers a^x := e^{x ln a}; closes §4.1's deferred a^r question (D6) -->
+  <p>The product law is exactly what is needed to define powers with arbitrary real exponents — the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.5</span><span class="env-name">General powers</span></p>
+      <div class="env-body">
+        <p>For \(a &gt; 0\), <em>define</em> the power \(a^{x}\) for every real \(x\) by</p>
+        <p>\[ a^{x} = e^{x \ln a}. \]</p>
+        <p>This agrees with the usual meaning when \(x\) is rational and extends it to all real \(x\). Verify, for \(a, b &gt; 0\), the two exponent laws</p>
+        <p>\[ \text{(i)}\quad a^{x} b^{x} = (ab)^{x}, \qquad\qquad \text{(ii)}\quad (a^{x})^{y} = a^{xy} = (a^{y})^{x}. \]</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>For <strong>(i)</strong>, multiply and collect exponents with the exponent law for \(e\) (Theorem 4.7), then use the product law just proved:</p>
+        <p>\[ a^{x} b^{x} = e^{x \ln a}\, e^{x \ln b} = e^{x \ln a + x \ln b} = e^{x(\ln a + \ln b)} = e^{x \ln(ab)} = (ab)^{x}. \]</p>
+        <p>For <strong>(ii)</strong>, first note \(\ln(a^{x}) = \ln\!\left(e^{x \ln a}\right) = x \ln a\), using \(\ln(e^{t}) = t\). Therefore</p>
+        <p>\[ (a^{x})^{y} = e^{y \ln(a^{x})} = e^{y \,\cdot\, x \ln a} = e^{xy \ln a} = a^{xy}. \]</p>
+        <p>The middle expression \(e^{xy \ln a}\) is symmetric in \(x\) and \(y\), so running the same computation with the roles swapped gives \((a^{y})^{x} = e^{xy \ln a} = a^{xy}\) as well. Hence \((a^{x})^{y} = a^{xy} = (a^{y})^{x}\). <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — Remark 4.6 (§C-8, add-on taken): HW3 Cauchy functional equation, one sentence, proof omitted -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.6</span></p>
+    <div class="env-body">
+      <p>The exponent law has a converse worth noting: the exponential is the <em>only</em> continuous function \(g \colon \mathbb{R} \to (0, \infty)\) satisfying \(g(x)\,g(y) = g(x + y)\) for all \(x, y\) together with the normalisation \(g(1) = e\); the proof is omitted.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Why these functions are unavoidable</h3>
+
+  <!-- expansion:application [pass: enrichment] — short capstone (§C-10, add-on taken): exponential growth/decay, half-life; ties the chapter's rigour back to why e^x and ln x matter -->
+  <p>The defining feature of the exponential, \((e^{x})' = e^{x}\), is exactly what makes it the right function for any quantity whose rate of change is proportional to its current size. If \(y(t)\) obeys \(y'(t) = k\,y(t)\) for a constant \(k\), then \(y(t) = y(0)\,e^{kt}\) — the model behind population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), and continuously compounded interest. The logarithm enters the moment one inverts: for positive quantities and \(k \ne 0\), solving \(y(t) = y_{\ast}\) for the time gives \(t = (\ln y_{\ast} - \ln y(0))/k\). The radioactive half-life \(t_{1/2} = \ln 2 / \lvert k \rvert\) is just the case \(y_{\ast} = y(0)/2\). Everything this chapter built — the series definition, the exponent law, the rigorous derivatives, the inverse construction — is what makes these formulas genuinely well-defined rather than merely suggestive.</p>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <!-- expansion:summary — §C-9: chapter-level 4-strand summary (this is Chapter 4's final section); distillations matching CONTENT_SPEC §4 -->
+  <p>Chapter 4 set out to put \(e^{x}\) and \(\ln x\) on rigorous foundations, replacing the informal handling of Chapters 2 and 3 with theorems and proofs. Four strands ran through it.</p>
+  <ul>
+    <li><strong>The exponential function.</strong> \(e^{x} := \sum_{n=0}^{\infty} x^{n}/n!\) is defined by a power series (§4.1), shown convergent for every real \(x\) by geometric tail bounds; it is continuous on \(\mathbb{R}\) and obeys the exponent law \(e^{x}e^{y} = e^{x+y}\) (§4.2); and its derivative is itself, \((e^{x})' = e^{x}\), proved with the explicit bound \(\lvert (e^{h}-1)/h - 1 \rvert \le \lvert h \rvert\) for \(\lvert h \rvert &lt; \tfrac{1}{2}\) (§4.3).</li>
+    <li><strong>Real-analysis machinery.</strong> The completeness of \(\mathbb{R}\) — monotone bounded sequences converge — underwrites everything; from it follow the equivalence of convergence and the Cauchy condition (via Bolzano–Weierstrass) used to define \(e^{x}\), and the extreme value theorem used to launch the existence theorems.</li>
+    <li><strong>Existence theorems for differentiation.</strong> Theorem A locates the vanishing of the derivative at interior extrema; Rolle's theorem follows; and the Mean Value Theorem follows from Rolle (§4.4). The MVT converts the sign of \(f'\) into monotonicity, and its borderline case \(f' = 0\) into constancy.</li>
+    <li><strong>The logarithm.</strong> Because \(e^{x}\) is strictly increasing, it has an inverse \(\ln x\) on \((0, \infty)\) (§4.5); \(\ln\) is continuous, its derivative is \(1/x\), it converts products to sums, and through \(a^{x} = e^{x\ln a}\) it finally gives meaning to arbitrary real powers.</li>
+  </ul>
+  <p>Every property of \(e^{x}\) and \(\ln x\) borrowed on faith in earlier chapters has now been turned into a theorem with a proof, and later chapters may use these functions freely.</p>
+
+</article>
+</template>
 <!-- END-CONTENT-FRAGMENTS -->
 <!-- plot.js — inlined -->
 <script>
@@ -1433,6 +1681,37 @@ window.MathJax = {
       return { layout: "single", panels: [{ svg }] };
     },
 
+    /* §4.5 — e^x and ln x as reflections across y = x.
+       The blue exponential (.curve, --c-primary) and the red logarithm
+       (.curve-log, --c-caution) are mirror images across the dashed gray
+       identity line y = x (.idline, --c-aux), as the inverse relation
+       ln(e^x) = x requires. The point (0,1) on e^x reflects to (1,0) on ln x
+       (both dotted). The window is set so the inner box is square and the x
+       and y spans are equal (iw == ih, both span 6.3 units), which keeps the
+       45-degree reflection honest. Labels limited to the three curves; the
+       reflected point pair lives in the caption (CONTENT_SPEC 10). */
+    "exp-log-reflection": () => {
+      const svg = buildPlot({
+        w: 300, h: 296,
+        xmin: -2.3, xmax: 4.0, ymin: -2.3, ymax: 4.0,
+        xlabel: "x", ylabel: "y",
+        xticks: [{ x: 1, tex: "1" }],
+        yticks: [{ y: 1, tex: "1" }],
+        items: [
+          { type: "seg", x1: -2.3, y1: -2.3, x2: 4.0, y2: 4.0, cls: "idline" },
+          { type: "curve", fn: (x) => Math.exp(x), domain: [-2.3, 1.4], samples: 200, cls: "curve" },
+          { type: "curve", fn: (x) => Math.log(x), domain: [0.1, 4.0], samples: 200, cls: "curve-log" },
+          { type: "dot", x: 0, y: 1, r: 2.5 },
+          { type: "dot", x: 1, y: 0, r: 2.5 },
+          { type: "text", x: 1.35, y: 3.95, tex: "e^{x}", cls: "a-curve", anchor: "end", vAnchor: "bottom" },
+          { type: "text", x: 3.95, y: 1.35, tex: "\\ln x", cls: "a-ref", anchor: "start", vAnchor: "top" },
+          { type: "text", x: 3.55, y: 3.4, text: "y = x", cls: "a-ax", anchor: "start", vAnchor: "top" }
+        ],
+        aria: "The blue curve y = e to the x and the red curve y = ln x are reflections of each other across the dashed diagonal line y = x. The point (0, 1) on the exponential curve reflects to the point (1, 0) on the logarithm curve."
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
   };
 
   /* ---- hydrateFigures: fills every <figure data-fig="id"> ---- */
@@ -1465,7 +1744,7 @@ window.MathJax = {
 var CHAPTER = {
   brand: "Chapter 4 — The Exponential and Logarithmic Functions",
   runningHead: "Chapter 4 · The Exponential and Logarithmic Functions",
-  fragments: ["sec-4-1", "sec-4-2", "sec-4-3", "sec-4-4"],
+  fragments: ["sec-4-1", "sec-4-2", "sec-4-3", "sec-4-4", "sec-4-5"],
 };
 var FRAGMENTS = CHAPTER.fragments;
 var RUNNING_HEAD = CHAPTER.runningHead;

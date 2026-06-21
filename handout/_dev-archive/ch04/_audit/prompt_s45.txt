@@ -1,0 +1,656 @@
+You are an ADVISORY adversarial reviewer of a calculus handout section (HTML format) that was expanded from the SEED below, following an approved DIRECTION BRIEF. You do NOT rewrite; you surface findings for a human.
+
+Hunt especially for:
+(a) mathematical errors, fabricated theorems/identities, or over-generalized claims;
+(b) drift from the seed's mathematics (the seed IS the manuscript's mathematical backbone);
+(c) direction-conformance violations: did the draft cover what the brief specifies? did it include anything from the brief's "do-not-write" (kept under the heading 刻意不寫) list?
+
+Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):
+  category: math | faithfulness | direction-conformance | house_rule | register | other
+  blocking: true ONLY for:
+    - a real MATH ERROR or fabricated/over-generalized claim (category=math)
+    - DRIFT from the seed's mathematics (category=faithfulness)
+    - VIOLATION of direction-conformance: missing a brief-mandated item OR including a brief-forbidden item (category=direction-conformance)
+  Everything else MUST be blocking=false.
+
+Formatting / house-rule items (missing expansion comments, register/style nits) are caught by a downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); they MUST NOT block convergence.
+
+Also give each finding a level for human triage:
+  1 = real conflict (must fix)
+  2 = discoverability gap (add doc/comment)
+  3 = editorial drift (low priority)
+  4 = non-finding (mathematically equivalent paraphrase, stylistic preference)
+
+A mathematically equivalent paraphrase is NOT a finding.
+
+This is the FINAL section of the chapter. Its core manuscript content is SHORT (define ln x as the inverse of e^x; prove ln continuous; derive (ln x)'=1/x), but it is EXPANSION-RICH: three Homework items were promoted to lettered results, plus a reflection figure, an application capstone, and a 4-strand chapter summary. So its risk has TWO faces: (1) the two manuscript proofs (continuity, derivative) must be RIGOROUS and unbroken; (2) the expansions must stay within the approved scope and not smuggle in forbidden material (a rigorous proof of the range of e^x; a full table of logarithm laws; the multi-step Cauchy functional-equation proof). Spend your effort on the MATH of the two proofs + the promoted results, and on direction-conformance. Re-derive each step INDEPENDENTLY:
+  - Theorem 4.13 (ln continuous), proof by contradiction: negating continuity at x0>0 yields delta>0 and a sequence y_j -> x0 (all in (0,inf)) with |ln y_j - ln x0| >= delta for all j. Each j gives ln y_j <= ln x0 - delta OR ln y_j >= ln x0 + delta. Apply the strictly increasing e^x: case 1 gives x0 - y_j = e^{ln x0} - e^{ln y_j} >= e^{ln x0} - e^{ln x0 - delta} > 0; case 2 gives y_j - x0 >= e^{ln x0 + delta} - e^{ln x0} > 0. With epsilon = min of the two (strictly positive) gaps, |y_j - x0| = |e^{ln y_j} - e^{ln x0}| >= epsilon for all j, contradicting y_j -> x0. CHECK every inequality direction, that epsilon is genuinely > 0, that the identity y_j = e^{ln y_j} is used correctly, and that the contradiction actually follows.
+  - Theorem 4.14 ((ln x)' = 1/x), inverse-function technique: with y0 = ln x, y = ln(x+h), one has e^{y0}=x, e^y=x+h, so e^y - e^{y0} = h; then (ln(x+h)-ln x)/h = (y-y0)/(e^y-e^{y0}) = 1/[(e^y-e^{y0})/(y-y0)]. The flip requires y != y0, justified because ln is strictly increasing (inverse of strictly increasing e^x), so h != 0 forces y != y0. As h->0, continuity of ln (Thm 4.13) gives y->y0 (and y != y0 throughout), so the denominator -> (d/dy e^y)|_{y0} = e^{y0} = e^{ln x} = x (using Thm 4.8). Hence the derivative is 1/x. CHECK there is no division-by-zero gap, and that taking the reciprocal of the limit is legitimate (the inner limit is x != 0 since x>0).
+  - Corollary 4.4 (f'=0 on (a,b) => f constant): MVT on [x1,x2] gives c with f(x2)-f(x1)=f'(c)(x2-x1)=0, so f(x2)=f(x1); f constant. Check.
+  - Proposition 4.3 (ln(ab)=ln a+ln b): set f(x)=ln(ax)-ln x; f'(x) = a*(1/(ax)) - 1/x = 1/x - 1/x = 0 (chain rule + Thm 4.14); Corollary 4.4 => f constant on the closed interval between 1 and x; f(1) = ln a - ln 1 = ln a (using ln 1 = 0, since e^0 = 1); setting x=b gives ln(ab)-ln b = ln a. CHECK the chain-rule derivative of ln(ax), the ln 1 = 0 step, and that Corollary 4.4 (stated on a closed [a,b]) is legitimately applied to the closed interval with endpoints 1 and x regardless of which is larger.
+  - Example 4.5 (general powers a^x := e^{x ln a}): (i) a^x b^x = e^{x ln a} e^{x ln b} = e^{x ln a + x ln b} = e^{x(ln a + ln b)} = e^{x ln(ab)} = (ab)^x (exponent law Thm 4.7 + product law Prop 4.3); (ii) ln(a^x) = ln(e^{x ln a}) = x ln a, so (a^x)^y = e^{y ln(a^x)} = e^{xy ln a} = a^{xy}, symmetric in x,y so = (a^y)^x. CHECK every exponent manipulation.
+  - Definition 4.4 (ln x): the unique a with e^a = x (x>0); identities e^{ln x}=x (x>0) and ln(e^x)=x (all real x). Quantifiers correct. The range of e^x = (0,inf) is ASSERTED, not proved; the draft must NOT smuggle in a proof of the two limits / surjectivity (it states a one-line dependency note only).
+  - Remark 4.6 (Cauchy functional equation): "the only continuous g: R -> (0,inf) with g(x)g(y)=g(x+y) and g(1)=e is e^x" -- stated as a one-sentence remark with the proof OMITTED. The draft must NOT include the multi-step proof.
+  - Application capstone: y'=ky => y = y(0) e^{kt}; t = (ln y* - ln y(0))/k; half-life t_half = ln 2 / |k| for the case y* = y(0)/2 (k<0). Check these formulas.
+  - Figure 4.3 caption claim: the graphs of e^x and ln x are reflections across y = x, with (0,1) on e^x reflecting to (1,0) on ln x -- verify this is the correct geometric statement of the inverse relation, no false claim. (The figure itself is drawn by JS and renders cleanly; review the caption's mathematical claim, not an image.)
+Cross-check the math against the SIGNED LEGACY GROUND TRUTH legacy/tex_handout/chapters/ch04_exponential_logarithm.tex, section \subsection{Defining $\ln x$} / \subsection{Continuity of $\ln x$} / \subsection{The derivative of $\ln x$} (labels def:logarithm, thm:ln-continuous, thm:ln-derivative-rigorous, fig:exp-and-log-reflection) plus the chapter Summary (\section*{Summary}). NOTE on placement: the legacy puts the monotonicity Corollary and the sin/e^x examples at the START of §4.5; the handout (following the manuscript's page order and the chapter PLAN) already placed those at the END of §4.4. Therefore §4.5 here does NOT restate the monotonicity corollary or those examples -- it opens directly at the logarithm. Do NOT flag the absence of the monotonicity corollary from §4.5 as missing content.
+
+NUMBERING NOTE: §4.5 is the chapter's LAST section. Per-type counters CONTINUE from §4.1-§4.4 (which used Definition 4.1-4.3; Theorem 4.1-4.12; Proposition 4.1/4.2; Corollary 4.1-4.3; Strategy 4.1/4.2; Example 4.1-4.4; Figure 4.1/4.2; Remark 4.1-4.4). Therefore §4.5 correctly uses: Definition 4.4 (natural logarithm); Theorem 4.13 (ln continuous), 4.14 ((ln x)'=1/x); Proposition 4.3 (logarithm product law); Corollary 4.4 (vanishing derivative => constant); Example 4.5 (general powers a^x); Figure 4.3 (e^x/ln x reflection); Remark 4.5 (rigorous vs Ch3 chain-rule), 4.6 (Cauchy functional equation); plus one UNNUMBERED Caution (ln only for x>0). §4.5 mints NO new Strategy and NO new Definition beyond 4.4. Cross-references ("Theorem 4.6" continuity of e^x, "Theorem 4.7" exponent law, "Theorem 4.8" derivative of e^x, "Theorem 4.12" MVT, "Corollary 4.3" monotonicity, "Example 4.4" e^x strictly increasing, "Chapter 3 / §3.3", "§4.1") are correct, not missing content. This continuation is CORRECT -- do NOT flag it as a discontinuity.
+
+SCOPE / EXPANSION NOTE for §4.5: the SEED covers manuscript pp.18-22 (the block the manuscript heads "§ Logarithmic function": define ln's domain via lim e^x -> Definition of ln x -> continuity "Property" + contradiction proof -> differentiability + inverse-function proof -> (ln x)'=1/x) PLUS the chapter Homework pp.23-24 (HW1 f'=0=>const; HW2 ln(ab)=ln a+ln b; HW3 Cauchy functional equation; HW4 a^x:=e^{x ln a} exponent laws). The draft adds, as MARKED expansions sanctioned by the brief (gate 3 approved "全照提案核可" PLUS all THREE optional add-ons) and cross-checked against the signed legacy ground truth:
+  - An OPENER framing strict monotonicity as the engine that both builds and powers the inverse, and closing BOTH forward fences -- Ch3 §3.3's informal ln and §4.1's deferred a^r for irrational r. INTENDED.
+  - The range of e^x = (0,inf) ASSERTED with a one-line dependency note (continuity + the two limits + intermediate values), NOT proved. INTENDED (manuscript + legacy both assert).
+  - An UNNUMBERED Caution that ln x is defined only for x>0 (ln 0, ln(-1) undefined since e^a>0). ROADMAP-mandated pitfall. INTENDED.
+  - Figure 4.3 (the e^x/ln x reflection across y=x, ROADMAP key figure) with caption. INTENDED.
+  - Remark 4.5 contrasting this rigorous derivation with Ch3 §3.3's chain-rule pass (which presupposed differentiability), closing that forward-reference loop. ROADMAP prerequisite. INTENDED.
+  - Corollary 4.4 = HW1 (f'=0 => constant) promoted, placed just before the logarithm laws that use it. INTENDED.
+  - Proposition 4.3 = HW2 (ln(ab)=ln a+ln b) promoted to a NAMED result (optional add-on (c): a named Proposition rather than a worked example). INTENDED.
+  - Example 4.5 = HW4 (general powers a^x := e^{x ln a}, exponent laws (i)(ii)) promoted, closing §4.1's deferred a^r question. INTENDED.
+  - Remark 4.6 = HW3 (Cauchy functional equation) retained as a ONE-SENTENCE remark with the proof OMITTED (optional add-on (b)). INTENDED.
+  - A short application capstone (exponential growth/decay, the y=y0 e^{kt} model, half-life ln2/|k|), optional add-on (a). INTENDED.
+  - A chapter-level 4-strand Summary (exponential / real-analysis machinery / existence theorems / logarithm). INTENDED (this is the chapter's final section).
+These are INTENDED expansions, not drift.
+
+DELIBERATELY OMITTED (brief 刻意不寫) -- these MUST NOT appear in the §4.5 body; flag as blocking direction-conformance ONLY if they actually appear:
+  - the INTEGRAL definition of ln (ln x = integral of dt/t) -- this book builds ln as the inverse of e^x; mixing routes would contradict the manuscript;
+  - the general logarithm log_b x or change-of-base formulas;
+  - a full logarithm-law TABLE beyond the product law (manufactured ln(a/b)=ln a-ln b, ln(a^r)=r ln a) -- only ln(ab) (HW2) is in scope;
+  - a RIGOROUS PROOF of the range of e^x / the two limits / surjectivity (must stay asserted with a one-line note);
+  - the complex logarithm;
+  - the MULTI-STEP proof of HW3's Cauchy functional equation (must stay a one-sentence remark, proof omitted);
+  - Taylor's theorem / L'Hopital for ln, or the integral of ln;
+  - REWRITING Chapter 3 §3.3's informal ln (only a cross-reference is allowed; the chapter does not edit Ch3);
+  - a full monotonicity/concavity curve analysis of ln (the reflection figure suffices);
+  - any self-invented "your turn" / bare exercise (the Homework items are promoted only as worked results, never as bare exercises);
+  - OVER-EXPANSION: padding the final section. NOTE: a definition + two proofs + one promoted corollary + one promoted proposition + one promoted example + one figure + two remarks + one caution + one short application paragraph + a 4-strand chapter summary is the APPROVED scope (gate 3 took all three optional add-ons), NOT over-expansion. Only flag genuinely redundant lemmas/examples/cautions beyond that.
+
+This section HAS one figure (Figure 4.3, the e^x/ln x reflection across y=x; ROADMAP key figure). It is drawn by the chapter's JS figure registry and renders cleanly (verified: 0 MathJax errors, 28 print pages for the chapter, 0 overflow; e^x in blue and ln x in red are mirror images across the dashed y=x line, with the (0,1)<->(1,0) reflected pair marked). Do NOT report "figure missing"; review only the figure CAPTION's mathematical claim.
+
+Set "converged": true when there are ZERO blocking findings (math correct, faithful to seed, conforms to direction brief), even if advisory formatting nits remain.
+
+Return STRICT JSON only, no prose outside the JSON.
+
+=== SEED (manuscript transcription, pp.18-22 + Homework pp.23-24) ===
+
+# Seed — §4.5 Monotonicity and the Logarithmic Function
+
+> stage ① 產物。Transcribed from the handwritten manuscript `2023-11-4-ExponentialFunction`,
+> **pp.18–22** (the section the manuscript heads "§ Logarithmic function", beginning right after
+> the red-boxed "[e^x is strictly increasing for all x ∈ ℝ]" mid-p.18, running through the
+> Def of `ln x`, the continuity "Property", and "§ The differentiability of ln x", ending with
+> `d/dx ln x = 1/x` on p.22) **plus the chapter Homework pp.23–24** (4 items, promotion
+> candidates per D7).
+> Manuscript heads this block "§ Logarithmic function"; handout maps it to §4.5
+> "Monotonicity and the Logarithmic Function" per ROADMAP/PLAN §1. **This is the chapter's
+> final section** (manuscript content ends at p.24).
+> Faithful to the manuscript: structure, order, notation, and deliberate omissions preserved.
+> seed 語法＝輕量可讀（反引號行內＋Unicode；見 CONTENT_DIRECTION ① / `seed_ch04_s4.md`）。漂亮 KaTeX 留給 ④。可疑／非標準處標 **[請查核]**。
+> **數學 cross-check（非手稿）**：legacy `ch04_exponential_logarithm.tex` §4.5 段（`\subsection{Defining $\ln x$}`／`{Continuity of $\ln x$}`／`{The derivative of $\ln x$}`，`def:logarithm` line 738、`thm:ln-continuous` line 758、`thm:ln-derivative-rigorous` line 776、`fig:exp-and-log-reflection` line 812）。**注意 placement**：legacy 把 monotonicity Corollary＋兩 Example 放 §4.5 開頭（`cor:monotonicity` line 705），但手稿頁序＋PLAN §1 已把它們歸 §4.4（`sec-4-4.html` 已含 Corollary 4.3＋Example 4.3/4.4）；故 **§4.5 不重收 Corollary**，自「§ Logarithmic function」（定義 `ln x`）起。D1：僅盲算對賬，不照抄散文／結構。
+
+---
+
+## §4.1–§4.4 依賴（承前；非本節新內容，僅備援引）
+
+§4.5 建構 `ln x` 用到前四節的既成事實：
+
+1. **§4.4 結尾（Example 4.4）**：`e^x` **strictly increasing on ℝ**。這是 §4.5 的起點——嚴格遞增 ⟹ 單射（one-to-one）⟹ `e^x` 在其值域上有反函數。**§4.5 不重證單調性**，直接接手。
+2. **§4.3（Theorem 4.8）**：`d/dx e^x = e^x`。可微性證明的分母極限 `lim_{y→y_0}(e^y−e^{y_0})/(y−y_0) = e^{y_0}` 即套用此導數定義／值。
+3. **§4.2（Theorem 4.7 指數律＋Corollary 4.1 positivity）**：`e^x > 0 ∀x`、`e^{x+y}=e^x e^y`。連續性反證裡「`e^z` strictly increasing」與正性、指數律算式（`e^{ln x_0−δ}` 等）皆依此。
+4. **Ch1（反函數／一對一）**：`ln x` 定義為 `e^x` 反函數——「strictly increasing ⟹ one-to-one ⟹ invertible」用 Ch1 的反函數 setup（ROADMAP key figure 重用 Ch1 reflection；§4.5 圖＝`e^x`/`ln x` 對 `y=x` 反射）。
+5. **Ch3 §3.3（chain-rule applications）**：曾**非正式**用 chain rule 在 `e^{ln x}=x` 上算得 `d/dx ln x = 1/x`（假設 `ln` 可微）。§4.5 是**嚴格重做**：不預設可微，用 inverse-function 技巧從差分商萃取。**forward-loop close**：Ch3 §3.3 forward-ref 到此 → §4.5 關閉迴路。
+
+---
+
+## § Logarithmic function（手稿原文，pp.18–22）
+
+> 手稿標題即 "§ Logarithmic function"；其下依序為 §4.5 opener（由 strict monotonicity 定義 `ln x` 的值域）、Def（`ln x`）、Property（連續性）＋反證、§ The differentiability of ln x（可微＋導數）。handout 標題改為 §4.5「Monotonicity and the Logarithmic Function」。
+
+### §4.5 opener（手稿，承 §4.4 結尾）
+
+`[ e^x is strictly increasing for all x ∈ ℝ ]`   （p.18，手稿紅筆方括，§4.4 收尾句；§4.5 由此接手）
+
+**§ Logarithmic function.**
+Since `e^x` is strictly increasing for all `x ∈ ℝ`, we can define `ln x` to be the inverse function of `e^x` for `x ∈ (a, b)` where
+
+`a = lim_{x→−∞} e^x = 0`   and   `b = lim_{x→∞} e^x = +∞`.
+
+> 手稿筆跡：「the **in** inverse function」有一個贅字 `in`（劃寫殘留），實為「the inverse function」。值域端點 `(a,b)=(0,+∞)` 由兩個極限給出。**[斷言不證]**：手稿直接寫 `lim_{x→−∞}e^x=0`、`lim_{x→∞}e^x=+∞`（即 `e^x` 的值域＝`(0,∞)`），**未證這兩個極限、也未證滿射**。legacy line 736 明言「we will not prove this explicitly; it follows from continuity and the limits …, which can be derived from the series」——同樣斷言不證。屬手稿刻意省略（見下「刻意省略」）。
+
+### Def（`ln x`，手稿方框標 "Def"）
+
+For `x ∈ (0, ∞)`, we define `ln x = a ∈ ℝ` to be the unique value that satisfies
+
+`e^a = x`.
+
+i.e.,   `e^{ln x} = x`.
+
+It is not hard to see that
+
+`ln(e^x) = x`   for all `x ∈ ℝ`.
+
+> 手稿筆跡：「ln x = a ∈ ℝ **be** the unique value」（文法 `be`→`to be`／`is`）、「It is **no** hard to see」（`no`→`not`）——皆筆誤、數學無歧義。兩條反函數恆等式：`e^{ln x}=x`（x>0，`ln` 為右作用的反）與 `ln(e^x)=x`（x∈ℝ，左作用的反）。唯一性來自 `e^x` strict monotonicity；存在性（對每個 x>0 都有 a）來自值域＝`(0,∞)`（上面斷言不證的那條）。legacy `def:logarithm`（line 738）同：「the unique real number `a` satisfying `e^a=x`；equivalently the inverse of `e^x` on `(0,∞)`：`e^{ln x}=x` ∀x>0、`ln(e^x)=x` ∀x∈ℝ」。✓
+
+### Property（`ln x` 連續，手稿方框標 "Property"）
+
+**`ln x` is a continuous function.**
+
+**證（手稿，proof by contradiction）：**
+Suppose `∃ x_0 > 0` s.t. `lim_{x→x_0} ln x ≠ ln x_0`.
+
+Either `lim_{x→x_0} ln x` does not exist, or `lim_{x→x_0} ln x = μ ≠ ln x_0`.
+
+In either case, `∃ δ > 0` and `y_j → x_0` s.t.
+
+`|ln y_j − ln x_0| ≥ δ`   for `j = 1, 2, 3, …`.
+
+**Case 1.** `ln x_0 ≥ ln y_j + δ`
+⟹ `e^{ln x_0} − e^{ln y_j} ≥ e^{ln x_0} − e^{ln x_0 − δ} > 0`
+  (since `e^z` is a strictly increasing function).
+
+**Case 2.** `ln x_0 + δ ≤ ln y_j`
+⟹ `e^{ln y_j} − e^{ln x_0} ≥ e^{ln x_0 + δ} − e^{ln x_0} > 0`.
+
+Let `ε = min{ e^{ln x_0} − e^{ln x_0 − δ},  e^{ln x_0 + δ} − e^{ln x_0} }`.
+
+We see that
+
+`|y_j − x_0| = |e^{ln y_j} − e^{ln x_0}| ≥ ε`   for all `j = 1, 2, …`.
+
+This violates `lim_{j→∞} y_j = x_0`.
+
+Hence, `ln x` is a continuous function.
+
+> 邏輯：否定連續 ⟹ 存在序列 `y_j→x_0` 但 `|ln y_j − ln x_0|≥δ`（sequential continuity 的反面）。每個 `j` 落入 Case 1（`ln y_j ≤ ln x_0−δ`）或 Case 2（`ln y_j ≥ ln x_0+δ`）。對 `e^z`（strict increasing）作用，兩 case 各給一個**嚴格正**的下界；`ε`＝兩者較小。關鍵恆等式 `y_j = e^{ln y_j}`、`x_0 = e^{ln x_0}`（`e^{ln(·)}` 為恆等）⟹ `|y_j−x_0| = |e^{ln y_j}−e^{ln x_0}| ≥ ε > 0`，與 `y_j→x_0` 矛盾。legacy `thm:ln-continuous`（line 758）同骨架，但寫 **WLOG 單邊**（`ln y_j ≥ ln x_0+δ` for infinitely many j），得 `y_j ≥ e^δ·x_0 > x_0`、gap 阻止收斂。手稿顯式雙 case＋`ε=min` 更完整。math 一致。✓ **無 [請查核]。**
+
+### § The differentiability of ln x（手稿小節標題）
+
+For `x > 0` and `x + h > 0` with `h ≠ 0`, we have
+
+`h = (x + h) − x = e^{ln(x+h)} − e^{ln x}`
+` = [ (e^{ln(x+h)} − e^{ln x}) / (ln(x+h) − ln x) ] · (ln(x+h) − ln x)`.
+
+**Note:** Since `h ≠ 0`, `ln(x+h) ≠ ln x`
+
+⟹   `(ln(x+h) − ln x) / h = 1 / [ (e^{ln(x+h)} − e^{ln x}) / (ln(x+h) − ln x) ]`.
+
+Set `y_0 = ln x`,  `y = ln(x+h)`.
+
+Since `ln x` is a continuous and strictly increasing function,
+
+`lim_{h→0} y = y_0`   and   `y ≠ y_0` for `h ≠ 0`.
+
+We then see that
+
+`lim_{h→0, h≠0} (e^{ln(x+h)} − e^{ln x}) / (ln(x+h) − ln x)`
+` = lim_{y→y_0, y≠y_0} (e^y − e^{y_0}) / (y − y_0) = e^{y_0} = e^{ln x} = x`.
+
+**Finally, we conclude**
+
+`lim_{h→0} (ln(x+h) − ln x) / h = lim_{h→0}  1 / [ (e^{ln(x+h)} − e^{ln x}) / (ln(x+h) − ln x) ]`
+` = 1 / [ lim_{h→0} (e^{ln(x+h)} − e^{ln x}) / (ln(x+h) − ln x) ] = 1/x`.
+
+This proves that
+
+`d/dx ln x = 1/x`   for `x > 0`.
+
+> inverse-function 技巧：用 `e^{ln(x+h)}=x+h`、`e^{ln x}=x` 把 `h` 寫成 `e^y−e^{y_0}`（`y=ln(x+h)`, `y_0=ln x`），再把差分商倒置成「`e^y` 在 `y_0` 的差分商」的倒數。`h→0` 時 `y→y_0`（`ln` 連續，剛證），分母 → `lim_{y→y_0}(e^y−e^{y_0})/(y−y_0) = (d/dy e^y)|_{y_0} = e^{y_0} = e^{ln x} = x`（套 §4.3 Theorem 4.8）。`y≠y_0`（`ln` strict ⟹ 單射，`h≠0` ⟹ `y≠y_0`）確保分母差分商分母不為 0。倒數 ⟹ `1/x`。legacy `thm:ln-derivative-rigorous`（line 776）逐步一致（legacy 直接用 `y,y_0` 代換、手稿先寫滿 `ln(x+h)` 再 `Set y=…`，等價）。✓ **無 [請查核]。**
+
+---
+
+## Homework（手稿 pp.23–24，4 題；D7 升格候選）
+
+> 手稿章末附 4 道 homework。**bare your-turn exercise 一律不入 handout body**（root README §防護欄、CONTENT_SPEC §14）；但 **manuscript-faithful 的具名結果可升格 worked example（含解）**（D7，待 ③）。逐題原文＋升格定位：
+
+1. **Show that if `f'(x) = 0` for `x ∈ (a, b)`, then `f(x)` is a constant for `x ∈ (a, b)`.**  `[Hint: mean value theorem]`
+   - → **§4.4 MVT 的直接推論**。但 §4.4 已 ⑥ 簽核完成；此題若升格應在 §4.5 開頭當「MVT 推論的另一面」一句帶過或小 worked example（與 Corollary 4.3「`f'≥0⟹`遞增」對偶：`f'=0⟹`常數）。**待 ③ 定位**：放 §4.5 還是略過。
+2. **Prove that for `a, b > 0`, `ln a + ln b = ln(ab)`.**  `[Hint: Set f(x) = ln(ax) − ln x]`
+   - → **§4.5 核心對數律**，manuscript-faithful。升格 worked example：用 hint 設 `f(x)=ln(ax)−ln x`，`f'(x)= a·(1/(ax)) − 1/x = 1/x − 1/x = 0`（套剛證的 `d/dx ln x=1/x`＋chain rule），故 `f` 常數 ⟹ `f(x)=f(1)=ln a − ln 1 = ln a`（`ln 1=0`，因 `e^0=1`）；代 `x=b`：`ln(ab)−ln b = ln a` ⟹ `ln a + ln b = ln(ab)`。**強升格候選**（D7 點名；既示範 `(ln)'=1/x` 又示範 HW1 的「`f'=0⟹const`」）。
+3. **Suppose `g(x): ℝ → ℝ⁺` is a continuous function s.t. `g(x)g(y) = g(x+y)` `∀ x,y ∈ ℝ` and `g(1) = e`. Show that `g(x) = e^x` for `x ∈ ℝ`.**  `Rmk: ℝ⁺ = {x ∈ ℝ | x > 0}`.
+   - → **Cauchy 函數方程刻畫 `e^x`**。較進階（需從有理數逐步逼近＋連續性延拓），多步。**D7 提案：略過或降為 remark**（低優先；非單一技巧示範，篇幅大）。**待 ③**。
+4. **For `a > 0`, define `a^x = e^{x ln a}` for `x ∈ ℝ`. Show that, for `a, b > 0`:**  **(i)** `a^x · b^x = (ab)^x`,  **(ii)** `(a^x)^y = a^{xy} = (a^y)^x`.
+   - → **一般指數 `a^x` 的定義＋指數律**，manuscript-faithful。升格 worked example：(i) `a^x b^x = e^{x ln a} e^{x ln b} = e^{x(ln a+ln b)} = e^{x ln(ab)} = (ab)^x`（用 HW2 的 `ln a+ln b=ln(ab)` ＋ §4.2 指數律 Theorem 4.7）；(ii) `(a^x)^y = e^{y ln(a^x)} = e^{y·(x ln a)} = e^{xy ln a} = a^{xy}`（用 `ln(a^x)=ln(e^{x ln a})=x ln a`），對稱得 `=(a^y)^x`。**升格候選**（D7 點名；定義一般指數、收束全章「`a^r` for r∉ℚ」的 §4.1 forward-fence）。
+
+> **升格鏈依賴**：HW4 用 HW2（`ln(ab)=ln a+ln b`），HW2 用本節 `(ln)'=1/x`＋HW1（`f'=0⟹const`）。若升格，順序須 HW1/HW2 → HW4。**§4.1 D6 forward-fence**（`a^x:=e^{x ln a}` 留到 §4.5）正落在 HW4——§4.5 是收束點。
+
+---
+
+## §4.5 邊界（章末）
+
+§4.5 是 Chapter 4 **最後一節**。手稿 §4.5 內容止於 p.22 `d/dx ln x = 1/x`；pp.23–24 為 Homework（章末，非新節）。其後無更多手稿內容。handout 的章末 **Summary**（CONTENT_SPEC §4 要求）屬 handout 結構件、非手稿——legacy 有 `\section*{Summary}`（line 841，四段 distillation：exponential／analysis machinery／existence theorems／logarithm）。**章末 Summary 待 ③ 決定是否本節產出**（屬章層收尾，非 §4.5 手稿內容）。
+
+---
+
+## 手稿刻意省略／特徵（忠實記錄）
+
+- **`e^x` 值域＝`(0,∞)`、`lim_{x→±∞}e^x` 斷言不證**：手稿 opener 直接寫 `a=lim_{x→−∞}e^x=0`、`b=lim_{x→∞}e^x=+∞`，未證這兩個極限、未證滿射（存在性所需）。legacy line 736 同樣斷言不證（「follows from continuity and the limits …, which can be derived from the series」）。④ 可選一句 note 指出此處依賴連續＋極限＋（IVT-型）滿射，留作斷言（forward-fence 到更系統的極限處理，或就近 cross-ref §4.2 連續性）。**屬手稿刻意省略，非 [請查核]。**
+- **連續性證走 sequential（序列）層級**：手稿從「`lim ln x ≠ ln x_0`」直接取得「∃ `δ>0` 與 `y_j→x_0` 使 `|ln y_j−ln x_0|≥δ`」（否定 ε-δ 連續 ⟹ 序列見證）。此一步是標準 sequential-continuity 等價，手稿未展開。④ 比照 legacy 維持 sketch/sequence 層級即可（不需補 ε-δ 全套）。
+- **無圖**：手稿 §4.5 全程純文字，無 `e^x`/`ln x` 反射圖。**ROADMAP §4.5 key figure ＝ `e^x`/`ln x` 對 `y=x` 反射**（`e^x` blue、`ln x` red、標 `(0,1)`／`(1,0)`、`y=x` 虛線）——屬 handout 加法（legacy `fig:exp-and-log-reflection` line 812）。② brief 提案 Figure 4.3。
+- **無 strategy box**：手稿不給操作程序。ROADMAP §4.5 未硬性指派 strategy（§4.4 才指派 MVT strategy）；②可選提案「用 inverse-function 技巧求反函數導數」strategy（Strategy 4.3，低優先）或不設。**待 ③。**
+- **無 caution**：手稿不標 (a) `ln x` 只對 x>0（`ln 0`／`ln(−1)` undefined）、(b) range 斷言。legacy 補兩條 caution（domain restriction line 750、range-extension line 730——後者已隨 Corollary 歸 §4.4）。② brief 候選：`ln` domain caution（`x>0`，`ln 0`／負數 undefined）。
+- **`ln 1 = 0`、`ln e = 1` 等具體值未列**：手稿只給定義＋連續＋導數，未列特殊值表。④ 若升格 HW2 worked example 會自然用到 `ln 1=0`（`e^0=1`）；可順帶一句，非獨立 example。
+- **Ch3 重複**：`d/dx ln x=1/x` 在 Ch3 §3.3 已**非正式**算過（假設可微、用 chain rule 於 `e^{ln x}=x`）。§4.5 是嚴格重做（不設可微、inverse-function 技巧）。④ 開頭／Remark cross-ref Ch3、點明「這次不預設 `ln` 可微、改從差分商萃取」（legacy `remark` line 807 即此用法）。重構（Ch3 改 forward-ref）**延後至兩章都簽核後**——本章不動 Ch3。
+- worked example：手稿 §4.5 本體 **0 個 worked example**（純定義＋兩證）；example 全在 Homework（待 D7 升格）。圖：**0**。動機散文：**極少**。named-result 索引：`ln x` Def、連續 Property、可微（`(ln)'=1/x`）。
+- 記號：對數 `ln x`（x>0）；反函數恆等 `e^{ln x}=x`／`ln(e^x)=x`；連續性反證序列 `y_j→x_0`、gap `δ`、`ε=min{…}`；可微代換 `y_0=ln x`、`y=ln(x+h)`。無新巨集。
+
+---
+
+## 對照 ground truth（評分用，非手稿）
+
+已簽核 `legacy/tex_handout/chapters/ch04_exponential_logarithm.tex` §4.5 段是同一手稿的 LaTeX→HTML 前簽核版，**僅作盲算對賬的 ground truth**（D1），不照抄其散文／結構。盲算對賬結果：
+
+- **§4.5 opener / 值域**：legacy line 736 同手稿——`e^x` strict increasing ⟹ one-to-one（`def:one-to-one`）⟹ 有反函數；range `(0,∞)` 斷言不證。✓
+- **Def（`ln x`）**：legacy `def:logarithm`（line 738）逐字同義（unique `a` s.t. `e^a=x`；`e^{ln x}=x` ∀x>0、`ln(e^x)=x` ∀x∈ℝ）。legacy 補 domain caution（`ln` 只 x>0）＋informal gloss。✓
+- **連續性**：legacy `thm:ln-continuous`（line 758，proof sketch）同骨架（反證、`y_j→x_0` 但 `|ln y_j−ln x_0|≥δ`、套 `e^x` strict increasing 得 gap、矛盾）。legacy WLOG 單邊；手稿顯式雙 case＋`ε=min`。math 一致。✓
+- **可微 / 導數**：legacy `thm:ln-derivative-rigorous`（line 776）逐步一致（`y_0=ln x`、`y=ln(x+h)`、`e^y−e^{y_0}=h`、商倒置、`h→0`⟹`y→y_0` by continuity、分母→`e^{y_0}=x`、故 `1/x`；用 `thm:exp-derivative-rigorous`＝§4.3 Theorem 4.8）。✓ legacy 補 remark（與 Ch3 chain-rule 版的異同）。
+- **Figure**：legacy `fig:exp-and-log-reflection`（line 812）＝`e^x`/`ln x` 對 `y=x` 反射、`(0,1)`/`(1,0)` 標點——即 ROADMAP §4.5 key figure。✓（手稿無圖，屬加法）
+- **Homework**：legacy line 874–877 NOTE 完整列 4 題（與手稿一致），註明「講義本體不收習題（CONTENT_SPEC §14）；保留給獨立習題本」。**D7 政策**：manuscript-faithful 的具名結果（HW1 `f'=0⟹const`、HW2 `ln(ab)=ln a+ln b`、HW4 `a^x` 指數律）可升格 **worked example（含解）**；HW3 Cauchy 函數方程較進階、提案略過／降 remark。**待 ③ 裁。**
+- **章末 Summary**：legacy `\section*{Summary}`（line 841）四段。手稿無（屬 handout 結構件）。**待 ③ 決定本節是否產出。**
+
+**編號接續（PLAN §5 ledger）：** §4.1–§4.4 已 mint 到 Definition 4.3、Theorem 4.12、Proposition 4.2、Corollary 4.3、Strategy 4.2、Example 4.4、Figure 4.2、Remark 4.4。**§4.5 因此自 Definition 4.4（`ln x`）、Theorem 4.13、Proposition 4.3、Corollary 4.4、Strategy 4.3、Example 4.5、Figure 4.3、Remark 4.5 起編號**（PLAN §5 已預登）。本 seed 為手稿原貌（pp.18–22＋HW）；具名化與編號落在 ④。
+
+**ROADMAP 已標的 §4.5 方向（待 ③ 方向閘確認）：**
+- **承重直覺 ＝「strict monotonicity 是定義反函數的引擎」**：`e^x` 嚴格遞增（§4.4 收割）⟹ 單射 ⟹ 可逆 ⟹ `ln x` 良定義；continuity／differentiability 兩證又都**回頭依賴** `e^x` 的 strict monotonicity（連續性反證的 gap、可微的 `y≠y_0`）。一個性質撐起整節。
+- **key figure ＝ `e^x`/`ln x` 對 `y=x` 反射**（重用 Ch1 reflection setup；`e^x` blue、`ln x` red）→ Figure 4.3。
+- **forward-loop close**：Ch3 §3.3 非正式用 `ln`／forward-ref 到此 → §4.5 關閉迴路（④ cross-ref，本章不改 Ch3）。
+- **D7 Homework 升格**：HW1/HW2/HW4 → worked example（含解，manuscript-faithful）；HW3 略過／降 remark。**待 ③。**
+- **章末 Summary**：CONTENT_SPEC §4 要求章末 Summary；§4.5 為末節 → 可能由本節產出整章 Summary。**待 ③。**
+- **`a^r`(r∉ℚ) 收束（§4.1 D6 forward-fence）**：若升格 HW4，`a^x:=e^{x ln a}` 正是 §4.1 拋出「how about a^r?」的收束點。
+
+=== END SEED ===
+
+=== DIRECTION BRIEF (approved at gate 3) ===
+
+# Direction Brief — §4.5 Monotonicity and the Logarithmic Function
+
+> ② 方向提案（CONTENT_DIRECTION §2 九欄）。**狀態：待 ③ 方向閘核可**（③ 拍板後本 brief 成 ④/⑤ 契約）。
+> 輸入：[`seed_ch04_s5.md`](seed_ch04_s5.md)（手稿 pp.18–22＋HW pp.23–24）＋ [`PLAN-ch04.md`](PLAN-ch04.md) 章層決策（D7 Homework 升格、編號 ledger 自 Definition 4.4／Theorem 4.13 起）＋ ROADMAP「Chapter 4」條目（core skill「定義 `ln x` 為 `e^x` inverse／證連續／推導 `(ln x)'=1/x`」、key figure＝`e^x`/`ln x` 對 `y=x` 反射、caution＝`ln` 只 x>0、§3.3 forward-loop 在此關閉、**§4.5 無指派 strategy**）。
+> §4.5 **是 Chapter 4 最後一節**。核心手稿內容**短**（opener 定值域 → Def `ln x` → 連續 Property＋證 → 可微＋證），但**加法決策多**：D7 三道 HW 升格（HW1/2/4）、Figure 4.3（反射）、章末 Summary、`ln` domain caution、Ch3 §3.3 迴路關閉、值域斷言處理。**風險側寫與 §4.4 相反**——不是證明階梯紮實度，而是**「升格哪些 HW、加多少、章末怎麼收」的方向取捨**：升太多 → 末節膨脹；升太少 → §4.1 的 `a^r` fence（D6）與 Ch3 迴路懸空。沿用 §4.1–§4.4 已建骨架，續編號（自 Definition 4.4、Theorem 4.13 起）。
+> ①-verify：使用者選「開跑 §4.5」即視為 seed accepted-by-proceeding（§4.5 數學乾淨、無 [請查核] 級疑點）。數學 cross-check：legacy `ch04_exponential_logarithm.tex` §4.5 段（`def:logarithm` line 738、`thm:ln-continuous` line 758、`thm:ln-derivative-rigorous` line 776、`fig:exp-and-log-reflection` line 812、`remark` line 807、application line 834、Summary line 841）。
+
+---
+
+## 手稿盤點（照原順序，pp.18–22＋HW pp.23–24）
+- **§ Logarithmic function**（手稿標題；handout 改 §4.5「Monotonicity and the Logarithmic Function」）。
+- **opener**：`e^x` strictly increasing on ℝ（承 §4.4）⟹ 可定義 `ln x` 為 `e^x` 反函數 on `(a,b)`，`a=lim_{x→−∞}e^x=0`、`b=lim_{x→∞}e^x=+∞`（值域＝`(0,∞)`；**兩極限＋滿射斷言不證**）。
+- **Def（`ln x`）**：x∈(0,∞)，`ln x = a` 為滿足 `e^a=x` 的唯一值，即 `e^{ln x}=x`；且 `ln(e^x)=x ∀x∈ℝ`。
+- **Property（連續）＋證**：`ln x` 連續。反證：否定連續 ⟹ ∃`δ>0`、`y_j→x_0` 使 `|ln y_j−ln x_0|≥δ`；Case 1（`ln x_0≥ln y_j+δ`）／Case 2（`ln x_0+δ≤ln y_j`）對 `e^z`（strict increasing）作用得嚴格正 gap；`ε=min{…}`；`|y_j−x_0|=|e^{ln y_j}−e^{ln x_0}|≥ε`，矛盾於 `y_j→x_0`。
+- **§ The differentiability of ln x＋證**：`h=e^{ln(x+h)}−e^{ln x}`，商倒置成「`e^y` 在 `y_0` 的差分商」倒數；`y_0=ln x`、`y=ln(x+h)`；`ln` 連續＋strict ⟹ `y→y_0`、`y≠y_0`；分母 → `e^{y_0}=x`；故 `d/dx ln x=1/x`（x>0）。
+- **Homework（pp.23–24，4 題；D7 升格候選）**：(1) `f'=0 on (a,b)⟹f` const（hint MVT）；(2) `ln a+ln b=ln(ab)`（hint `f(x)=ln(ax)−ln x`）；(3) 連續 `g:ℝ→ℝ⁺`、`g(x)g(y)=g(x+y)`、`g(1)=e` ⟹ `g=e^x`（Cauchy 函數方程）；(4) `a^x:=e^{x ln a}`，證 (i) `a^x b^x=(ab)^x`、(ii) `(a^x)^y=a^{xy}=(a^y)^x`。
+- 具名人物／史實：**無**。worked example（§4.5 本體）：**0**（example 全在 HW）。圖：**無**。strategy／caution：**無**。
+
+## 薄度剖析
+| 區塊 | 狀態 |
+|---|---|
+| opener／值域斷言 | **夠但須框斷言**：`lim_{x→±∞}e^x`、range`=(0,∞)`、滿射手稿斷言不證；④ 應一句點明此依賴連續＋極限＋（IVT-型）滿射、留作斷言（§C-1） |
+| Def（`ln x`）＋兩恆等式 | **夠**（標準反函數定義；④ 升格 Definition 4.4、補 informal gloss「`ln x`＝把 `e` 升到幾次方得 `x`」） |
+| **`ln` domain caution** | **無**：手稿不標。**ROADMAP pitfall ＝「`ln` 只對 x>0」**（`ln 0`／`ln(−1)` undefined）→ §C-2（roadmap-mandated caution） |
+| 連續性 Property＋證 | **夠**（手稿完整、雙 case＋`ε=min`；④ 具名 Theorem 4.13、維持 sequential sketch 層級） |
+| 可微＋證 | **夠**（inverse-function 技巧完整；④ 具名 Theorem 4.14）。**薄在「為何不直接 chain rule」的動機**：Ch3 §3.3 已用 chain rule（假設可微）算過；④ 須點明「這次不預設 `ln` 可微、從差分商萃取」→ §C-4 Remark 4.5（關 §3.3 迴路） |
+| **`e^x`/`ln x` 反射圖** | **無**：手稿純文字。**ROADMAP key figure ＝ 對 `y=x` 反射**（`e^x` blue、`ln x` red、標 `(0,1)`/`(1,0)`、`y=x` 虛線）→ §C-3（Figure 4.3，ROADMAP mandate） |
+| **HW1 `f'=0⟹const`** | **薄／在 HW**：MVT 直接推論、且升格 HW2 worked example 時需用它。→ §C-5（提案 Corollary 4.4，just-in-time 置於 Example 4.5 前） |
+| **HW2 `ln(ab)=ln a+ln b`** | **薄／在 HW**：§4.5 核心對數律、manuscript-faithful。→ §C-6（升格 Example 4.5；示範 `(ln)'=1/x`＋`f'=0⟹const`） |
+| **HW4 `a^x` 指數律** | **薄／在 HW**：定義一般指數、收束 §4.1 D6 的 `a^r` fence。→ §C-7（升格 Example 4.6；用 HW2） |
+| **HW3 Cauchy 函數方程** | **薄／在 HW、較進階**：多步（有理數逼近＋連續延拓）。→ §C-8（提案略過或降 remark） |
+| **章末 Summary** | **無**：手稿無（屬 handout 章層結構件）。§4.5＝末節 → §C-9（提案產出 4-block 章末 Summary，CONTENT_SPEC §4 要求） |
+| application（為何 `e^x`/`ln x` 重要） | **無**：手稿無。legacy 有（growth/decay/half-life capstone）。→ §C-10（③ 選配；章層 capstone，預設精簡或略） |
+
+## 範圍與深度
+- **吃手稿這一叢**：opener（定值域）→ Def `ln x` → 連續（證）→ 可微（證，`(ln x)'=1/x`）＋ D7 升格的 HW worked example＋ROADMAP 指派的反射圖＋章末 Summary。
+- **末節、加法決策為主軸**：核心三件（Def／連續／可微）手稿全給、紮實、保留全證；**真正的方向工作在「升格哪些 HW、章末怎麼收」**（§C-5～§C-10）。
+- **保留證明**（手稿全給、標準、本節主軸）：連續性反證（雙 case＋`ε`）、可微 inverse-function 技巧。兩證都**回頭依賴 `e^x` strict monotonicity**（承重直覺）。
+- **斷言不證**：`e^x` range`=(0,∞)`、`lim_{x→±∞}e^x`、滿射——手稿＋legacy 皆斷言（§C-1，留作斷言＋一句依賴說明）。
+- **陳述／援引不重證**：`e^x` strictly increasing（§4.4 Example 4.4，opener cross-ref、不重證）；`(e^x)'=e^x`（§4.3 Theorem 4.8，可微證的分母極限援引）；指數律 `e^{x+y}=e^x e^y`（§4.2 Theorem 4.7，HW4 升格用）；MVT（§4.4 Theorem 4.12，HW1 升格 Corollary 4.4 的根據）。
+- **forward-fence（一行帶過）**：一般對數 `log_b x`／換底、`ln` 的積分定義（`∫1/t dt`，與本書「`ln`＝`e^x` 反函數」路線不同，不寫）、複數對數（out of scope）、Taylor/L'Hôpital for `ln` → 後章。
+- **關 Ch3 §3.3 迴路**（ROADMAP prerequisite）：§3.3 非正式用 `ln`（Example 3.6，假設可微、chain rule 於 `e^{ln x}=x`）→ §4.5 嚴格重做（不設可微）；④ cross-ref＋Remark 4.5 點明差異。**本章不改 Ch3**（重構延後至兩章簽核後）。
+- **收束 §4.1 D6**：§4.1 拋出「`a^r` for r∉ℚ?」即跳 series、把 `a^x:=e^{x ln a}` fence 到 §4.5 → HW4 升格（Example 4.6）正是收束點。
+
+## 承重直覺（一節一個，領頭）
+**Strict monotonicity 是同時「建造」與「驅動」反函數的那根槓桿。** 要把 `e^x` 反過來得到 `ln`，天真想法是「反函數自動存在、而且自動跟原函數一樣乖」——兩個都要打臉。**建造**面：反函數要良定義，需 (1) 單射（每個 `x>0` 對到唯一的 `a`，這來自 `e^x` **strict** monotonicity，§4.4 剛收割）＋(2) 滿射到 `(0,∞)`（每個正數都被打到，這來自連續＋極限，斷言）。**驅動**面更關鍵也更反直覺：`ln` 一旦定義，它的**連續性與可微性都不是免費的**——各需一個證明，而**兩個證明都回頭扳同一根槓桿**：`e^x` 的 strict monotonicity。連續性反證裡，若 `ln y_j` 不逼近 `ln x_0`，strict monotonicity 把它放大成 `e^{ln y_j}` 與 `e^{ln x_0}` 之間一道**撐開的 gap**，與 `y_j→x_0` 矛盾。可微性裡，inverse-function 技巧把差分商**倒置**成 `e^y` 的差分商倒數，而「能除」靠的是 `y≠y_0`——又是單射。**最該打臉的天真期待**：Ch3 §3.3 當時「假設 `ln` 可微、用 chain rule 在 `e^{ln x}=x` 上一步得 `1/x`」。§4.5 的整個重點是：**你不必預設可微**——可微性可以從差分商裡**萃取**出來，只用連續（剛證）＋`(e^x)'`（§4.3 證）。這就是本節的可攜技能：**inverse-function 技巧——把反函數的導數從一條代換 + 倒置的差分商裡逼出來，不靠 chain rule、不預設可微。**
+
+## worked example 清單（提案，待 ③）
+| # | 內容 | 取捨 |
+|---|---|---|
+| **Example 4.5** | `ln(ab)=ln a+ln b`（a,b>0）：設 `f(x)=ln(ax)−ln x`，`f'(x)=a/(ax)−1/x=0`（套 Theorem 4.14＋chain rule）⟹ `f` 常數（Corollary 4.4）⟹ `f(x)=f(1)=ln a`（`ln1=0`）⟹ 代 `x=b`：`ln(ab)−ln b=ln a` | **收（HW2 升格）**。manuscript-faithful（hint 即手稿給）；一例同時示範新導數＋`f'=0⟹const`＋對數律。**強升格候選**（D7 點名） |
+| **Example 4.6** | `a^x:=e^{x ln a}`（a>0）指數律：(i) `a^x b^x=e^{x ln a}e^{x ln b}=e^{x(ln a+ln b)}=e^{x ln(ab)}=(ab)^x`（用 Example 4.5＋Theorem 4.7）；(ii) `(a^x)^y=e^{y ln(a^x)}=e^{y·x ln a}=e^{xy ln a}=a^{xy}`，對稱得 `=(a^y)^x` | **收（HW4 升格）**。manuscript-faithful；**收束 §4.1 D6 的 `a^r` fence**（D7 點名） |
+| —（HW1）— | `f'=0 on (a,b)⟹f` const | **不獨立成 Example，升格為 Corollary 4.4**（§C-5）——MVT 推論、被 Example 4.5 使用、是 §4.4 monotonicity corollary 的 `f'=0` 對偶。just-in-time 置於 Example 4.5 前 |
+| —（提案略過）— | HW3 Cauchy 函數方程 `g(x)g(y)=g(x+y),g(1)=e⟹g=e^x` | **提案：略過或降 remark**（§C-8）。多步（有理數逼近＋連續延拓）、非單一技巧示範、篇幅大；末節已有兩升格 example＋章末 Summary，密度足 |
+
+> **自創題政策**：上述 Example 4.5/4.6 皆**手稿 HW 原題升格**、非自創；不產 bare your-turn exercise（root README §防護欄）。**升格鏈依賴**：Example 4.6 用 Example 4.5（`ln(ab)`）；Example 4.5 用 Corollary 4.4（`f'=0⟹const`）＋Theorem 4.14（`(ln)'`）。順序須 Corollary 4.4 → Example 4.5 → Example 4.6。
+
+## history / application
+- **history**：**提案略**（與 §4.4 一致）。對數史（Napier 1614、`e` 的故事）手稿無；末節已收尾繁重，史實在此為裝飾，留白勝 padding。③ 若要，限一句、標 `[source: standard calculus-textbook historical note]`。
+- **application**：**§C-10，③ 選配**。legacy 有一段 capstone（`y'=ky⟹y=y₀e^{kt}`；growth/decay/continuously-compounded interest；half-life `t_{1/2}=ln2/|k|`），把整章機器接回「為何值得建」。**ROADMAP 未指派**（key figure/strategy 表無 application）。**提案：精簡版一段或略**——本節已有 Def＋兩證＋兩 example＋圖＋章末 Summary，full capstone 有膨脹風險；但作為**全章**收尾，一段「為何 `e^x`/`ln x` 在應用中無可迴避」確能升華。③ 取捨（建議：短版一段，或併入章末 Summary 前的一句）。
+
+## 強調 / takeaway
+- **概念樞紐**：**反函數的良好性質不是天上掉下來的——strict monotonicity 一根槓桿同時保證 `ln` 存在（單射＋滿射）、連續、可微**。三件事（定義／連續／可微）都扳同一根槓桿。
+- **可攜技能**：**inverse-function 技巧**——求反函數導數時，把差分商用 `e^{ln(x+h)}=x+h` 代換、倒置成原函數的差分商倒數，取極限（靠反函數連續）得 `1/(原函數導數)`。不預設反函數可微。學生帶得走（求任何可逆函數的反函數導數）。
+- **依賴鏈 takeaway（全章收束）**：`完備性(§4.1)→級數定義 e^x→連續/指數律(§4.2)→(e^x)'=e^x(§4.3)→MVT(§4.4)→e^x 嚴格遞增→ln x 定義/連續/(ln x)'=1/x(§4.5)`。本節是全章終點，把「Ch2/Ch3 非正式用過的 `e^x`/`ln x`」全部補成定理。
+
+## 刻意不寫（餵 auditor 作 direction-conformance 反向檢查）
+| 不寫什麼 | 理由 | 它該去哪 |
+|---|---|---|
+| **`ln` 的積分定義 `∫₁ˣ dt/t`** | 與本書路線（`ln`＝`e^x` 反函數）不同的替代建構；混用兩路線會矛盾 | —（不寫；本書走反函數路線） |
+| **一般對數 `log_b x`／換底公式** | 超出手稿（只 `ln`）；HW4 的 `a^x` 是定義一般指數、非一般對數 | 後章／不寫 |
+| **完整對數律表（`ln(a/b)`、`ln(a^r)=r ln a`）** | 手稿 HW 只給 `ln(ab)=ln a+ln b`；不自造完整律表 | 只升格 HW2（`ln(ab)`）；其餘至多一句「同法可得」 |
+| **`e^x` range`=(0,∞)`／`lim_{x→±∞}e^x` 的嚴格證明** | 手稿＋legacy 皆斷言不證（依連續＋極限＋IVT） | 留作斷言（§C-1 一句依賴說明） |
+| **複數對數 `ln(−1)`** | out of scope（實值設定）；caution 至多一句帶過 undefined | 不寫（複分析） |
+| **HW3 Cauchy 函數方程完整證** | 多步、非單一技巧、末節已密 | 略過或降 remark（§C-8） |
+| **Taylor for `ln`／L'Hôpital／`ln` 的積分** | 超出本節 | 後章 |
+| **改寫 Ch3 §3.3 的 informal `ln`** | 重構延後至兩章簽核後；本章只 cross-ref | 未來（兩章簽核後） |
+| **`ln` 的單調／凹凸／圖形完整分析** | 反射圖示意即可；完整曲線分析超出 | 不寫（圖示足） |
+| 自創 bare your-turn exercise | README §防護欄禁 | —（HW 原題升格為含解 worked example） |
+| **過度堆 caution／重複散文** | 末節易因「收尾」而灌水；caution 取必要者（domain `x>0`） | 保持精煉 |
+
+## 篇幅帶（護欄非預算）
+**4–6 A4 print 頁**（末節：核心短、加法 example/圖/Summary 撐起）。§4.5 ≈ opener（承 §4.4 closer：`e^x` 嚴格遞增⟹單射；strict monotonicity 是建造＋驅動反函數的槓桿）＋ Definition 4.4（`ln x`，含值域斷言§C-1＋informal gloss）＋ `ln` domain Caution（§C-2）＋ Figure 4.3（反射§C-3）＋ Theorem 4.13（連續＋證）＋ Theorem 4.14（`(ln)'=1/x`＋證）＋ Remark 4.5（vs Ch3 chain-rule，關§3.3 迴路§C-4）＋ Corollary 4.4（`f'=0⟹const`§C-5）＋ Example 4.5（`ln(ab)`§C-6）＋ Example 4.6（`a^x` 指數律§C-7）＋ （§C-10 選配 application）＋ 章末 Summary（§C-9）。**明顯超出 6 頁 → 回查是否 HW 升格過度展開／application 灌水**（末節風險＝收尾膨脹，非缺料）。ch04 數學含多行 aligned 差分商、巢狀分式（`1/[(e^y−e^{y_0})/(y−y_0)]`）→ ④ 後查 print overflow（PLAN §6）。
+
+---
+
+## A. 編號 ledger 提案（§4.5；接 §4.4 ledger，自 Definition 4.4／Theorem 4.13 起；④ 落定後回填 PLAN §5）
+
+> §4.1–§4.4 已 mint：Definition 4.1–4.3、Theorem 4.1–4.12、Proposition 4.1–4.2、Corollary 4.1–4.3、Strategy 4.1–4.2、Example 4.1–4.4、Figure 4.1–4.2、Remark 4.1–4.4。各型獨立 counter、跨節連續。Caution 無編號。
+
+| 型別 | §4.5 提案 | 說明 |
+|---|---|---|
+| **Definition** | `4.4`＝natural logarithm `ln x`（`e^a=x` 的唯一 `a`；`e^{ln x}=x`、`ln(e^x)=x`） | 手稿 Def；本節唯一 Definition |
+| **Theorem** | `4.13`＝`ln x` continuous（反證） | 手稿 Property；維持 sequential sketch |
+| | `4.14`＝`d/dx ln x = 1/x`（x>0，inverse-function 技巧） | 手稿可微小節 |
+| **Corollary** | `4.4`＝`f'=0 on (a,b) ⟹ f` constant（HW1 升格） | §C-5；MVT 推論、`f'≥0⟹遞增`的 `=0` 對偶；被 Example 4.5 用 |
+| **Example** | `4.5`＝`ln(ab)=ln a+ln b`（HW2 升格） | §C-6 |
+| | `4.6`＝`a^x:=e^{x ln a}` 指數律 (i)(ii)（HW4 升格） | §C-7；收束 §4.1 D6 |
+| **Figure** | `4.3`＝`e^x`/`ln x` 對 `y=x` 反射（`e^x` blue、`ln x` red、`(0,1)`/`(1,0)`、`y=x` 虛線） | §C-3（ROADMAP key figure；重用 Ch1 reflection setup） |
+| **Remark** | `4.5`＝rigorous（本節）vs Ch3 §3.3 chain-rule 版的異同（關迴路） | §C-4（forward-loop close） |
+| **Caution** | 無編號＝`ln` 只對 x>0（`ln 0`／`ln(−1)` undefined） | §C-2（ROADMAP pitfall mandate） |
+| **Strategy** | **§4.5 不 mint 新 Strategy**（ROADMAP 未指派；inverse-function 技巧由 Theorem 4.14 證本身示範） | Strategy `4.3` 留給後章 |
+| **Proposition** | **§4.5 不 mint 新 Proposition**（`ln(ab)` 走 Example 升格、非 Proposition——D7 default；③ 可改 Proposition 4.3，見 §C-6） | Proposition `4.3` 留給後章（或 §C-6 改判） |
+
+> **編號自查（④）**：寫完逐一確認跨節引用都對得到存在的 `env-num`——opener「`e^x` strictly increasing（§4.4 Example 4.4）」、可微證「`(e^x)'=e^x`（Theorem 4.8）」、Corollary 4.4「MVT（Theorem 4.12）」、Example 4.5「Theorem 4.14＋Corollary 4.4」、Example 4.6「Example 4.5＋指數律 Theorem 4.7」、Remark 4.5「Ch3 §3.3 Example 3.6」。Figure 4.3 為 ch04 第三張圖（接 Figure 4.2）。
+
+## B. 章基礎建設
+**N/A** —— §4.5 非首節。chapter standalone／`fragments/ch04/` 骨架／figures（inline FIGS registry）／`build.py` ch04 entry 皆 §4.1 已建、§4.2–§4.4 沿用。§4.5 落地＝新增 `fragments/ch04/sec-4-5.html`、`build.py` 的 `CHAPTERS["ch04"].fragments` append `"sec-4-5"`、`chapter4-print-standalone.html` 嵌入式 `fragments:[…]` 同步 append（PLAN §6／§4.2–§4.4 整合實證：build.py 與 standalone 內嵌清單**須手動雙同步**）、續用手動編號 ledger。**動手前先讀 `sec-4-4.html` 末尾**確認各型 counter 收在哪（PLAN §5：Theorem 收 4.12、Definition 4.3、Corollary 4.3、Proposition 4.2、Strategy 4.2、Example 4.4、Figure 4.2、Remark 4.4）。**Figure 4.3** 照 ch04 figure 慣例（inline FIGS registry append 不覆蓋、`buildPlot` helper、label economy；反射圖含 `e^x`（blue `.curve`）＋`ln x`（red）＋`y=x`（虛線 `.refline`）＋`(0,1)`/`(1,0)` 標點）——**Figure 4.2（§4.4）已示範新增 FIGS entry＋CSS 的流程，Figure 4.3 比照**（可能需新 `.curve-log` 之類紅色 class，④ 視 CSS 現況定）。**章末 Summary**（§C-9）若收，為章層結構件、放 §4.5 fragment 末（或 standalone 章末），CONTENT_SPEC §4 格式。
+
+## C. 待核對／存疑（③ 一併裁示）
+1. **【建議：斷言＋一句依賴】`e^x` 值域＝`(0,∞)`**（seed「斷言不證」）：手稿 opener 直接寫 `lim_{x→−∞}e^x=0`、`lim_{x→∞}e^x=+∞`、range`=(0,∞)`，未證。**提案：④ 照手稿斷言，但補一句**「值域為 `(0,∞)` 來自 `e^x` 連續（Theorem 4.6）＋兩端極限＋中間值，細節從略」（legacy line 736 即此處理）。③ 確認（建議：斷言＋一句依賴說明，不展開證明）。
+2. **【建議收】`ln` domain Caution（無編號）**：ROADMAP pitfall mandate——`ln x` 只對 `x>0` 定義，`ln 0`／`ln(−1)` undefined（`e^a=0`／`e^a=−1` 對實 `a` 不可能，因 `e^a>0`）；本章每個 `ln` 公式隱含 `x>0`。**提案：收為 caution**（ROADMAP 點名；與 Ch3 §3.3 同慣例）。③ 確認（建議收）。
+3. **【建議收】Figure 4.3（`e^x`/`ln x` 反射）**：ROADMAP §4.5 key figure。`e^x`（blue）、`ln x`（red）對 `y=x`（虛線）反射；標 `(0,1)`（在 `e^x` 上）、`(1,0)`（在 `ln x` 上）。**提案：收**（ROADMAP mandate；視覺化反函數關係 `ln(e^x)=x`），放 Definition 4.4 後。③ 確認（建議收）。
+4. **【建議收】Remark 4.5（vs Ch3 chain-rule；關 §3.3 迴路）**：Ch3 §3.3 Example 3.6 曾**非正式**用 chain rule 於 `e^{ln x}=x` 算得 `(ln x)'=1/x`（**假設** `ln` 可微）。本節嚴格重做**不預設可微**、從差分商萃取。**提案：收 Remark 4.5**，點明兩路線異同（chain-rule 快但假設可微；inverse-function 慢但附帶給出可微存在性），明文「關閉 §3.3 forward-ref 的迴路」（legacy `remark` line 807 即此）。③ 確認（建議收；ROADMAP prerequisite 要求關迴路）。
+5. **【建議升格＋定位】Corollary 4.4（HW1 `f'=0⟹const`）**：HW1 是 MVT 直接推論，且 Example 4.5 升格需用它（`f'=0 ⟹ f` 常數）。**提案：升格為 Corollary 4.4**（`f` 連續 `[a,b]`、可微 `(a,b)`、`f'(c)=0 ∀c∈(a,b)` ⟹ `f` 在 `[a,b]` 常數；證：套 monotonicity Corollary 4.3 兩向，`f'≥0⟹`non-decreasing 且 `f'≤0⟹`non-increasing ⟹ 常數，或直接 MVT）。**定位：just-in-time 置於 Example 4.5 前**（不在 opener，以免延後 `ln` 焦點）。③ 裁（建議升格為 Corollary 4.4、置 Example 4.5 前）。
+6. **【建議升格 Example；③ 可改 Proposition】Example 4.5（HW2 `ln(ab)=ln a+ln b`）**：manuscript-faithful（hint 即手稿給：`f(x)=ln(ax)−ln x`）。**提案：升格 worked Example 4.5**（D7 default「升格 worked example 含解」）。**③ 替代選項**：若偏好「可被後章 cite 的具名律」，改判 **Proposition 4.3「Logarithm product law」**（同一證、改 env 型別）。**建議：Example 4.5**（D7 明示 worked example；單一律未成完整律表、Example 較稱）。③ 裁型別。
+7. **【建議升格】Example 4.6（HW4 `a^x` 指數律）**：manuscript-faithful；`a^x:=e^{x ln a}`，證 (i) `a^x b^x=(ab)^x`、(ii) `(a^x)^y=a^{xy}=(a^y)^x`（用 Example 4.5＋Theorem 4.7）。**收束 §4.1 D6 的 `a^r`(r∉ℚ) fence**。**提案：升格 Example 4.6**。③ 確認（建議收；D7 點名、收束 §4.1）。
+8. **【建議略/降】HW3 Cauchy 函數方程**：`g:ℝ→ℝ⁺` 連續、`g(x)g(y)=g(x+y)`、`g(1)=e` ⟹ `g=e^x`。多步（有理 `g(n)=eⁿ`→`g(p/q)`→連續延拓到 ℝ）、非單一技巧、篇幅大。**提案：略過**（或至多降為一句 remark「函數方程亦可刻畫 `e^x`，從略」）。③ 裁（建議略過；末節已密）。
+9. **【建議產出】章末 Summary（§4.5＝末節）**：CONTENT_SPEC §4 要求章末 Summary。**提案：§4.5 fragment 末產出 4-block 章末 Summary**——(i) exponential（級數定義／連續／指數律／導數）、(ii) real-analysis machinery（完備性／Cauchy⟺收斂／EVT）、(iii) existence theorems（Thm A／Rolle／MVT／monotonicity）、(iv) logarithm（定義／連續／導數）（legacy line 841 即四段 distillation）。③ 確認（建議產出；末節責任）。**注意 placement**：放 §4.5 fragment 末、或 standalone 章層收尾——④ 視 build 慣例定（先讀既有章是否已有 Summary 結構）。
+10. **【選配】application capstone**：legacy 有一段「為何 `e^x`/`ln x` 在應用中無可迴避」（`y'=ky⟹y=y₀e^{kt}`、growth/decay/interest、half-life）。**ROADMAP 未指派**。**提案：③ 選配**——(a) 收精簡一段（章層 capstone，把 rigor 接回 why-we-care）、(b) 略（保持末節精煉）。**建議：短版一段或略**（傾向略，除非要章層升華）。③ 取捨。
+11. **【方向】opener 措辭**：承 §4.4 closer（「`e^x` 嚴格遞增 ⟹ 單射 ⟹ 下節定義 `ln x`」）。**提案：opener 一段**——strict monotonicity 是同時建造（單射＋滿射⟹`ln` 良定義）與驅動（連續/可微兩證都扳此槓桿）反函數的引擎；本節定義 `ln x`、證連續、嚴格推導 `(ln x)'=1/x`，關閉 Ch3 §3.3 與 §4.1 `a^r` 兩條 forward-ref（legacy opener line 701 即此 framing）。③ 確認方向。
+
+## D. 章層決策落地（§4.5 相關；提案＋理由，待 ③ 拍板）
+- **D7 — Homework 升格 worked example。** HW1（`f'=0⟹const`）→ Corollary 4.4（§C-5）；HW2（`ln(ab)`）→ Example 4.5（§C-6）；HW4（`a^x` 指數律）→ Example 4.6（§C-7）；HW3（Cauchy 函數方程）→ 略/降 remark（§C-8）。皆 manuscript-faithful；**bare your-turn exercise 不自創**（root README §防護欄、CONTENT_SPEC §14）。
+- **D6 收束 — `a^x:=e^{x ln a}`（§4.1 fence 的收束點）。** §4.1 拋出「`a^r` for r∉ℚ?」即跳 series、fence 到 §4.5；HW4 升格（Example 4.6）正式定義一般指數、收束此 fence。
+- **D1 — legacy tex 當 signed 數學 cross-check。** §4.5 的 Def／連續／可微一律以 legacy §4.5 段盲算對賬（已對：逐步一致、無筆誤），不照抄散文／結構。
+- **Ch3 §3.3 迴路關閉（ROADMAP prerequisite）— 只 cross-ref、不改 Ch3。** §3.3 informal `ln` forward-ref 到此；§4.5 嚴格重做＋Remark 4.5 點明差異（§C-4）。**本章不動 Ch3**（重構延後至兩章簽核後）。
+- **章末 Summary（CONTENT_SPEC §4）— §4.5 末節責任。** 提案本節產出 4-block 章末 Summary（§C-9）。
+
+---
+
+### 結構草圖（④ 照此寫；待 ③ 定案）
+§4.5 opener（承 §4.4 closer：`e^x` 嚴格遞增⟹單射；strict monotonicity 是建造＋驅動反函數的槓桿；本節定義 `ln x`、證連續、嚴格推 `(ln)'=1/x`、關 Ch3 §3.3＋§4.1 `a^r` 兩 fence〔§C-11〕）→ **Definition 4.4**（`ln x`：`e^a=x` 唯一 `a`；`e^{ln x}=x`、`ln(e^x)=x`；值域`(0,∞)`斷言＋一句依賴〔§C-1〕＋informal gloss）＋ **Caution**（`ln` 只 x>0〔§C-2〕）＋ **Figure 4.3**（`e^x`/`ln x` 反射〔§C-3〕）→ **Theorem 4.13**（`ln x` 連續＋證：反證、雙 case、`ε=min`、靠 `e^x` strict monotonicity）→ **Theorem 4.14**（`(ln x)'=1/x`＋證：inverse-function 技巧，`h=e^y−e^{y_0}`、倒置、`y→y_0` 靠連續、分母→`e^{y_0}=x`〔用 Theorem 4.8〕）＋ **Remark 4.5**（vs Ch3 chain-rule、關 §3.3 迴路〔§C-4〕）→ **Corollary 4.4**（`f'=0⟹const`，HW1〔§C-5〕，置此為 Example 4.5 鋪墊）→ **Example 4.5**（`ln(ab)=ln a+ln b`，HW2〔§C-6〕，用 Corollary 4.4＋Theorem 4.14）→ **Example 4.6**（`a^x` 指數律，HW4〔§C-7〕，用 Example 4.5＋Theorem 4.7；收束 §4.1 D6）→ （〔§C-10 選配 application capstone〕）→ **章末 Summary**（4-block〔§C-9〕；exponential／analysis machinery／existence theorems／logarithm）→ 收尾（全章閉環：Ch2/Ch3 非正式用過的 `e^x`/`ln x` 已全補成定理）。
+
+=== END DIRECTION BRIEF ===
+
+=== DRAFT (HTML fragment to review) ===
+
+<!-- §4.5 Monotonicity and the Logarithmic Function.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from _dev-archive/ch04/seed_ch04_s5.md (manuscript pp. 18–22 + Homework
+     pp. 23–24). Direction brief brief_s45.md approved at ③ (2026-06-21,
+     "全照提案核可" + all three optional add-ons selected). Numbering is MANUAL
+     and CONTINUES from §4.1–§4.4: those used Definition 4.1–4.3, Theorem 4.1–4.12,
+     Proposition 4.1/4.2, Corollary 4.1–4.3, Strategy 4.1/4.2, Example 4.1–4.4,
+     Figure 4.1/4.2, Remark 4.1–4.4 — so §4.5 mints Definition 4.4 (ln x),
+     Theorem 4.13 (continuity) / 4.14 (derivative 1/x), Proposition 4.3 (logarithm
+     product law), Corollary 4.4 (f'=0 ⟹ constant), Example 4.5 (general powers
+     a^x), Figure 4.3 (e^x/ln x reflection), Remark 4.5/4.6, and an unnumbered
+     Caution. No new Strategy is minted. Cross-references are plain prose. Math
+     cross-checked against the signed legacy ground truth
+     legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.5
+     (def:logarithm, thm:ln-continuous, thm:ln-derivative-rigorous,
+     fig:exp-and-log-reflection, remark line 807, application line 834,
+     Summary line 841).
+
+     ③ decisions (brief §C/§D, all approved; all three optional add-ons taken):
+       - §C-1: the range of e^x is (0, ∞); the manuscript asserts this via the
+         limits lim_{x→±∞} e^x without proof. We assert it too, with a one-line
+         note on its dependence (continuity + limits + intermediate values).
+       - §C-2 (ROADMAP pitfall): an unnumbered Caution that ln x is defined only
+         for x > 0 (ln 0, ln(-1) undefined).
+       - §C-3 (ROADMAP key figure): Figure 4.3 — the e^x / ln x reflection across
+         y = x; registered in chapter4 FIGS as "exp-log-reflection".
+       - §C-4 (ROADMAP prerequisite): Remark 4.5 contrasts this rigorous derivation
+         with the informal chain-rule pass of Ch 3 §3.3 (Example 3.6), closing that
+         forward-reference loop.
+       - §C-5: HW1 (f'=0 ⟹ constant) promoted to Corollary 4.4, placed just before
+         the logarithm laws that use it.
+       - §C-6 (add-on taken): HW2 (ln(ab) = ln a + ln b) promoted to a NAMED result,
+         Proposition 4.3 (the logarithm product law), rather than a worked example.
+       - §C-7: HW4 (general powers a^x := e^{x ln a}) promoted to Example 4.5,
+         closing §4.1's deferred question about a^r for irrational r (D6).
+       - §C-8 (add-on taken): HW3 (the Cauchy functional equation characterising e^x)
+         retained as a one-sentence Remark 4.6, proof omitted.
+       - §C-9: a chapter-level 4-strand Summary closes this final section.
+       - §C-10 (add-on taken): a short application capstone (exponential
+         growth/decay, half-life) before the summary.
+       - §C-11: opener closes both forward fences — Ch 3 §3.3 (informal ln) and
+         §4.1 (a^r for irrational r).
+     This is the FINAL section of Chapter 4; the per-type counters reset at
+     Chapter 5. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">4.5</span>Monotonicity and the Logarithmic Function</h2>
+  </header>
+
+  <!-- expansion:intuition — opener: pick up §4.4's closing fact (e^x strictly increasing ⟹ one-to-one); strict monotonicity is the engine that both builds and powers the inverse; lists the section's program and the two fences it closes (§C-11) -->
+  <p>Section 4.4 closed with the fact this section is built on: \(e^{x}\) is strictly increasing on \(\mathbb{R}\), and a strictly increasing function is one-to-one. A one-to-one function can be inverted, and the inverse of the exponential is the function we are after — the <em>natural logarithm</em>. Strict monotonicity is the lever throughout. It does the obvious work of <em>building</em> the inverse, by making each value \(x &gt; 0\) come from exactly one exponent. Less obviously, it also <em>powers</em> everything we then prove about that inverse: the continuity of \(\ln\) and its differentiability are not free gifts that come with the definition. Each needs its own argument, and both arguments reach back to the strict monotonicity of \(e^{x}\). This section defines \(\ln x\), proves it is continuous, and derives \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) rigorously — this time without assuming in advance that \(\ln\) is differentiable, the assumption Chapter 3 made informally. Along the way it settles two debts left earlier: the informal logarithm of §3.3 and the meaning of \(a^{r}\) for irrational \(r\), deferred back in §4.1.</p>
+
+  <h3 class="subsec-head">Defining the natural logarithm</h3>
+
+  <!-- expansion:intuition — §C-1: the range of e^x is (0,∞); assert with a one-line dependency note (manuscript + legacy both assert, do not prove) -->
+  <p>To invert \(e^{x}\) we need to know what values it takes. As \(x\) ranges over \(\mathbb{R}\), \(e^{x}\) is continuous (Theorem 4.6) and runs from \(\lim_{x \to -\infty} e^{x} = 0\) up to \(\lim_{x \to +\infty} e^{x} = +\infty\), passing through every value in between; its range is therefore the open interval \((0, \infty)\). We take this for granted here — the two limits follow from the series and the intermediate values from continuity, but the details would detain us — and read off the consequence we need: for every \(x &gt; 0\) there is exactly one exponent producing it.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.4</span><span class="env-name">Natural logarithm</span></p>
+    <div class="env-body">
+      <p>For \(x \in (0, \infty)\), the <em>natural logarithm</em> of \(x\), written \(\ln x\), is the unique real number \(a\) satisfying</p>
+      <p>\[ e^{a} = x. \]</p>
+      <p>Equivalently, \(\ln x\) is the inverse function of \(e^{x}\) on \((0, \infty)\): it is characterised by the two identities</p>
+      <p>\[ e^{\ln x} = x \quad (x &gt; 0), \qquad \ln(e^{x}) = x \quad (x \in \mathbb{R}). \]</p>
+      <p class="informal">In words, \(\ln x\) is the exponent you must raise \(e\) to in order to land on \(x\). The strict monotonicity of \(e^{x}\) makes that exponent unique; its range being \((0, \infty)\) makes the exponent exist for every positive \(x\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — §C-2 (ROADMAP pitfall): ln defined only for x>0 -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The logarithm is defined only for \(x &gt; 0\). The symbols \(\ln 0\) and \(\ln(-1)\) have no meaning here: \(\ln 0\) would require \(e^{a} = 0\) and \(\ln(-1)\) would require \(e^{a} = -1\), and neither is possible, because \(e^{a} &gt; 0\) for every real \(a\). Every formula in this section that contains \(\ln x\) silently carries the assumption \(x &gt; 0\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:figure — Figure 4.3 (§C-3, ROADMAP key figure): e^x / ln x reflection across y=x; registered in chapter4 FIGS as "exp-log-reflection" -->
+  <figure class="figure" data-fig="exp-log-reflection">
+    <figcaption><span class="fig-no">Figure 4.3</span> The graphs of \(e^{x}\) (blue) and \(\ln x\) (red) are mirror images across the line \(y = x\) (dashed) — the geometric signature of the inverse relation \(\ln(e^{x}) = x\). Reflecting swaps coordinates, sending the point \((0, 1)\) on the exponential to \((1, 0)\) on the logarithm.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">Continuity of the logarithm</h3>
+
+  <!-- expansion:intuition — lead into the continuity proof; the indirect argument leans on strict monotonicity -->
+  <p>That \(\ln\) is continuous is not automatic and takes a short argument. The idea is indirect: if some sequence of inputs approached \(x_{0}\) while their logarithms stayed away from \(\ln x_{0}\), then applying the strictly increasing \(e^{x}\) would re-open a fixed gap on the input side — contradicting the very fact that the inputs converged.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.13</span></p>
+    <div class="env-body">
+      <p>\(\ln x\) is continuous at every \(x_{0} &gt; 0\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x_{0} &gt; 0\) and suppose, for contradiction, that \(\ln\) is <em>not</em> continuous at \(x_{0}\). Then \(\lim_{x \to x_{0}} \ln x\) either fails to exist or exists but differs from \(\ln x_{0}\). In either case the failure is witnessed by a sequence: there is a number \(\delta &gt; 0\) and points \(y_{j} \to x_{0}\) (all in \((0, \infty)\)) with</p>
+      <p>\[ \lvert \ln y_{j} - \ln x_{0} \rvert \ge \delta \qquad \text{for every } j = 1, 2, 3, \dots \]</p>
+      <p>For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.4), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):</p>
+      <ul>
+        <li>if \(\ln y_{j} \le \ln x_{0} - \delta\), then \(x_{0} - y_{j} = e^{\ln x_{0}} - e^{\ln y_{j}} \ge e^{\ln x_{0}} - e^{\ln x_{0} - \delta} &gt; 0\);</li>
+        <li>if \(\ln y_{j} \ge \ln x_{0} + \delta\), then \(y_{j} - x_{0} = e^{\ln y_{j}} - e^{\ln x_{0}} \ge e^{\ln x_{0} + \delta} - e^{\ln x_{0}} &gt; 0\).</li>
+      </ul>
+      <p>Let</p>
+      <p>\[ \varepsilon = \min\!\left\{\, e^{\ln x_{0}} - e^{\ln x_{0} - \delta}, \; e^{\ln x_{0} + \delta} - e^{\ln x_{0}} \,\right\} &gt; 0, \]</p>
+      <p>a single positive number depending only on \(x_{0}\) and \(\delta\). In both cases \(\lvert y_{j} - x_{0} \rvert = \lvert e^{\ln y_{j}} - e^{\ln x_{0}} \rvert \ge \varepsilon\), so</p>
+      <p>\[ \lvert y_{j} - x_{0} \rvert \ge \varepsilon \qquad \text{for every } j. \]</p>
+      <p>But this contradicts \(y_{j} \to x_{0}\), which forces \(\lvert y_{j} - x_{0} \rvert\) below \(\varepsilon\) for large \(j\). The assumption of discontinuity is untenable, so \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) and \(\ln\) is continuous at \(x_{0}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The derivative of the logarithm</h3>
+
+  <!-- expansion:intuition — lead: contrast with Ch3 §3.3's chain-rule pass; the inverse-function technique extracts the derivative without assuming it -->
+  <p>Chapter 3 already wrote down \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), but it did so by differentiating \(e^{\ln x} = x\) with the chain rule — which silently <em>assumes</em> \(\ln\) is differentiable. We can now earn the formula honestly. The inverse-function technique flips the logarithm's difference quotient into a difference quotient for \(e^{x}\), whose derivative we already control, and lets continuity carry the limit across.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.14</span></p>
+    <div class="env-body">
+      <p>For every \(x &gt; 0\),</p>
+      <p>\[ \frac{d}{dx}\ln x = \frac{1}{x}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x &gt; 0\) and take \(h \ne 0\) small enough that \(x + h &gt; 0\). Set</p>
+      <p>\[ y_{0} = \ln x, \qquad y = \ln(x + h), \]</p>
+      <p>so that \(e^{y_{0}} = x\) and \(e^{y} = x + h\); subtracting, \(e^{y} - e^{y_{0}} = (x + h) - x = h\). Substituting this for \(h\) and flipping the quotient,</p>
+      <p>\[ \frac{\ln(x + h) - \ln x}{h} = \frac{y - y_{0}}{e^{y} - e^{y_{0}}} = \frac{1}{\dfrac{e^{y} - e^{y_{0}}}{y - y_{0}}}. \]</p>
+      <p>The division is legitimate because \(y \ne y_{0}\): the logarithm is strictly increasing, being the inverse of the strictly increasing \(e^{x}\), so \(h \ne 0\) forces \(\ln(x + h) \ne \ln x\).</p>
+      <p>Now let \(h \to 0\). By continuity of \(\ln\) (Theorem 4.13), \(y = \ln(x + h) \to \ln x = y_{0}\), and \(y \ne y_{0}\) all the while. The denominator is precisely the difference quotient of \(e^{y}\) at \(y_{0}\), so</p>
+      <p>\[ \lim_{h \to 0} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \lim_{y \to y_{0}} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \left.\frac{d}{dy} e^{y}\right|_{y = y_{0}} = e^{y_{0}} = e^{\ln x} = x, \]</p>
+      <p>using \((e^{y})' = e^{y}\) from Theorem 4.8. Taking the reciprocal,</p>
+      <p>\[ \frac{d}{dx}\ln x = \lim_{h \to 0} \frac{\ln(x + h) - \ln x}{h} = \frac{1}{x}. \tag{$\ast$} \]</p>
+      <p><span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — Remark 4.5 (§C-4, ROADMAP prerequisite): rigorous vs Ch3 chain-rule; closes the §3.3 forward-reference loop -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.5</span></p>
+    <div class="env-body">
+      <p>This closes a loop opened in Chapter 3. There (§3.3) the same formula \((\ln x)' = 1/x\) was obtained quickly by applying the chain rule to \(e^{\ln x} = x\) — a derivation that <em>presupposes</em> \(\ln\) is differentiable. The proof above presupposes no such thing: it extracts differentiability from the difference quotient, using only the continuity of \(\ln\) (Theorem 4.13) and the derivative of \(e^{x}\) (Theorem 4.8). The chain-rule route is faster and perfectly good once differentiability is known; the inverse-function route is the one that establishes differentiability in the first place, and so is the one the foundations rest on.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Logarithm laws and general powers</h3>
+
+  <!-- expansion:intuition — lead: harvest the algebraic properties; first one more MVT consequence (§C-5, HW1 → Corollary 4.4) -->
+  <p>With the derivative in hand we can read off the algebra of the logarithm. The engine is a single extra consequence of the Mean Value Theorem — the companion of the monotonicity corollary, for the borderline case \(f' = 0\).</p>
+
+  <!-- expansion:formula — Corollary 4.4 (§C-5): HW1, f'=0 ⟹ constant -->
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">4.4</span><span class="env-name">Vanishing derivative</span></p>
+    <div class="env-body">
+      <p>Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\). If \(f'(c) = 0\) for every \(c \in (a, b)\), then \(f\) is constant on \([a, b]\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Take any two points \(x_{1} &lt; x_{2}\) in \([a, b]\). The Mean Value Theorem (Theorem 4.12) on \([x_{1}, x_{2}]\) supplies a \(c \in (x_{1}, x_{2})\) with</p>
+      <p>\[ f(x_{2}) - f(x_{1}) = f'(c)\,(x_{2} - x_{1}) = 0 \cdot (x_{2} - x_{1}) = 0, \]</p>
+      <p>so \(f(x_{2}) = f(x_{1})\). As \(x_{1}, x_{2}\) were arbitrary, \(f\) takes a single value throughout \([a, b]\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:formula — Proposition 4.3 (§C-6, add-on taken): HW2 ln(ab)=ln a+ln b promoted to a named result -->
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">4.3</span><span class="env-name">Logarithm product law</span></p>
+    <div class="env-body">
+      <p>For all \(a, b &gt; 0\),</p>
+      <p>\[ \ln(ab) = \ln a + \ln b. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(a &gt; 0\) and define, for \(x &gt; 0\),</p>
+      <p>\[ f(x) = \ln(ax) - \ln x. \]</p>
+      <p>By the chain rule together with Theorem 4.14,</p>
+      <p>\[ f'(x) = a \cdot \frac{1}{ax} - \frac{1}{x} = \frac{1}{x} - \frac{1}{x} = 0 \qquad \text{for every } x &gt; 0. \]</p>
+      <p>So \(f'\) vanishes identically. Applying Corollary 4.4 on the closed interval with endpoints \(1\) and any \(x &gt; 0\) gives \(f(x) = f(1)\). But \(f(1) = \ln a - \ln 1 = \ln a\), since \(\ln 1 = 0\) (because \(e^{0} = 1\)). Hence \(f(x) = \ln a\) for all \(x &gt; 0\); that is, \(\ln(ax) - \ln x = \ln a\). Setting \(x = b\) gives \(\ln(ab) - \ln b = \ln a\), which rearranges to \(\ln(ab) = \ln a + \ln b\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 4.5 (§C-7, HW4): general powers a^x := e^{x ln a}; closes §4.1's deferred a^r question (D6) -->
+  <p>The product law is exactly what is needed to define powers with arbitrary real exponents — the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.5</span><span class="env-name">General powers</span></p>
+      <div class="env-body">
+        <p>For \(a &gt; 0\), <em>define</em> the power \(a^{x}\) for every real \(x\) by</p>
+        <p>\[ a^{x} = e^{x \ln a}. \]</p>
+        <p>This agrees with the usual meaning when \(x\) is rational and extends it to all real \(x\). Verify, for \(a, b &gt; 0\), the two exponent laws</p>
+        <p>\[ \text{(i)}\quad a^{x} b^{x} = (ab)^{x}, \qquad\qquad \text{(ii)}\quad (a^{x})^{y} = a^{xy} = (a^{y})^{x}. \]</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>For <strong>(i)</strong>, multiply and collect exponents with the exponent law for \(e\) (Theorem 4.7), then use the product law just proved:</p>
+        <p>\[ a^{x} b^{x} = e^{x \ln a}\, e^{x \ln b} = e^{x \ln a + x \ln b} = e^{x(\ln a + \ln b)} = e^{x \ln(ab)} = (ab)^{x}. \]</p>
+        <p>For <strong>(ii)</strong>, first note \(\ln(a^{x}) = \ln\!\left(e^{x \ln a}\right) = x \ln a\), using \(\ln(e^{t}) = t\). Therefore</p>
+        <p>\[ (a^{x})^{y} = e^{y \ln(a^{x})} = e^{y \,\cdot\, x \ln a} = e^{xy \ln a} = a^{xy}. \]</p>
+        <p>The middle expression \(e^{xy \ln a}\) is symmetric in \(x\) and \(y\), so running the same computation with the roles swapped gives \((a^{y})^{x} = e^{xy \ln a} = a^{xy}\) as well. Hence \((a^{x})^{y} = a^{xy} = (a^{y})^{x}\). <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — Remark 4.6 (§C-8, add-on taken): HW3 Cauchy functional equation, one sentence, proof omitted -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.6</span></p>
+    <div class="env-body">
+      <p>The exponent law has a converse worth noting: the exponential is the <em>only</em> continuous function \(g \colon \mathbb{R} \to (0, \infty)\) satisfying \(g(x)\,g(y) = g(x + y)\) for all \(x, y\) together with the normalisation \(g(1) = e\); the proof is omitted.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Why these functions are unavoidable</h3>
+
+  <!-- expansion:application [pass: enrichment] — short capstone (§C-10, add-on taken): exponential growth/decay, half-life; ties the chapter's rigour back to why e^x and ln x matter -->
+  <p>The defining feature of the exponential, \((e^{x})' = e^{x}\), is exactly what makes it the right function for any quantity whose rate of change is proportional to its current size. If \(y(t)\) obeys \(y'(t) = k\,y(t)\) for a constant \(k\), then \(y(t) = y(0)\,e^{kt}\) — the model behind population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), and continuously compounded interest. The logarithm enters the moment one inverts: for positive quantities and \(k \ne 0\), solving \(y(t) = y_{\ast}\) for the time gives \(t = (\ln y_{\ast} - \ln y(0))/k\). The radioactive half-life \(t_{1/2} = \ln 2 / \lvert k \rvert\) is just the case \(y_{\ast} = y(0)/2\). Everything this chapter built — the series definition, the exponent law, the rigorous derivatives, the inverse construction — is what makes these formulas genuinely well-defined rather than merely suggestive.</p>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <!-- expansion:summary — §C-9: chapter-level 4-strand summary (this is Chapter 4's final section); distillations matching CONTENT_SPEC §4 -->
+  <p>Chapter 4 set out to put \(e^{x}\) and \(\ln x\) on rigorous foundations, replacing the informal handling of Chapters 2 and 3 with theorems and proofs. Four strands ran through it.</p>
+  <ul>
+    <li><strong>The exponential function.</strong> \(e^{x} := \sum_{n=0}^{\infty} x^{n}/n!\) is defined by a power series (§4.1), shown convergent for every real \(x\) by geometric tail bounds; it is continuous on \(\mathbb{R}\) and obeys the exponent law \(e^{x}e^{y} = e^{x+y}\) (§4.2); and its derivative is itself, \((e^{x})' = e^{x}\), proved with the explicit bound \(\lvert (e^{h}-1)/h - 1 \rvert \le \lvert h \rvert\) for \(\lvert h \rvert &lt; \tfrac{1}{2}\) (§4.3).</li>
+    <li><strong>Real-analysis machinery.</strong> The completeness of \(\mathbb{R}\) — monotone bounded sequences converge — underwrites everything; from it follow the equivalence of convergence and the Cauchy condition (via Bolzano–Weierstrass) used to define \(e^{x}\), and the extreme value theorem used to launch the existence theorems.</li>
+    <li><strong>Existence theorems for differentiation.</strong> Theorem A locates the vanishing of the derivative at interior extrema; Rolle's theorem follows; and the Mean Value Theorem follows from Rolle (§4.4). The MVT converts the sign of \(f'\) into monotonicity, and its borderline case \(f' = 0\) into constancy.</li>
+    <li><strong>The logarithm.</strong> Because \(e^{x}\) is strictly increasing, it has an inverse \(\ln x\) on \((0, \infty)\) (§4.5); \(\ln\) is continuous, its derivative is \(1/x\), it converts products to sums, and through \(a^{x} = e^{x\ln a}\) it finally gives meaning to arbitrary real powers.</li>
+  </ul>
+  <p>Every property of \(e^{x}\) and \(\ln x\) borrowed on faith in earlier chapters has now been turned into a theorem with a proof, and later chapters may use these functions freely.</p>
+
+</article>
+
+=== END DRAFT ===
+
+=== KEY HTML WRITING RULES (advisory -- for house_rule findings) ===
+- Semantic env classes: env-definition, env-theorem, env-proposition, env-corollary, env-example (inside .workedexample with env-solution), env-remark, env-proof, env-caution, env-strategy; NO env-exercise (the handout ships no exercises). §4.5 uses env-definition (Definition 4.4), env-caution (ln-domain, unnumbered), env-theorem (Theorems 4.13/4.14), env-proof, env-remark (Remarks 4.5/4.6), env-corollary (Corollary 4.4), env-proposition (Proposition 4.3), env-example/env-solution (Example 4.5); their bodies auto-italicize where applicable.
+- Qualified proofs keep env-kicker "Proof"; env-name carries any qualifier. House style, not a finding. Caution is UNNUMBERED (matches ch02-ch04 precedent).
+- Math (MathJax 4): inline \(...\), display \[...\], multi-line \begin{aligned}; \lvert..\rvert, \tfrac, \frac, \le/\ge, \mathbb{R}, \ln all render (verified: 0 MathJax errors, 28 print pages total, 0 overflow).
+- Manual numbering: env-num / sec-no; per-type counters CONTINUE Chapter 4 across sections (see NUMBERING NOTE above).
+- Cross-references: plain prose ("by Theorem 4.13", "Theorem 4.8", "the Mean Value Theorem (Theorem 4.12)", "Corollary 4.4", "Chapter 3", "§4.1") -- NO \cref, NO hyperlinks.
+- Expansion markers: <!-- expansion:category --> HTML comment before each non-seed addition; valid categories: history, application, formula, summary, figure, example, intuition, strategy, caution. Seed-derived theorems/proofs correctly carry no expansion marker.
+=== END HTML WRITING RULES ===
+
+Now review the DRAFT against the SEED, DIRECTION BRIEF, and HTML WRITING RULES. Return strict JSON.
