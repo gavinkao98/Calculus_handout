@@ -51,6 +51,12 @@ _TICK = 0.13
 _ROW_GAP = 0.55       # air between mark rows (real-height cursor)
 _FIRST_ROW_DROP = 0.95  # line y -> first mark-row centre
 
+# No capacity_meta: sign_chart stays REACTIVE-only (like graph). Its number line is the
+# chart's top edge but renders on layer="graph" (excluded from the content measurement),
+# so a predictive group-span would read only the mark rows and miss the line + point
+# labels above them -- an under-measure not worth a fragile fixed offset. Mark-row overflow
+# is caught by _overflow_issues; an over-wide chart is an authoring error it also catches.
+
 _SIGN_ROLE = {"+": "success", "-": "warning"}
 
 

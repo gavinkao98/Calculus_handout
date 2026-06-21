@@ -53,3 +53,32 @@ scenes:
       label: "Key idea"
       accent: secondary
       body: "This card should not appear --- the dense primary content collapses it."
+
+  # statement-only theorem (proposition) + aside -> two columns
+  - id: thm_aside
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    title: "Monotonicity Test"
+    say: "A proposition stated without proof, with a supporting note in the rail."
+    statement: "If $f'(x) > 0$ on an interval, then $f$ is strictly increasing there."
+    aside:
+      label: "Why"
+      accent: accent
+      body: "Positive slope everywhere means the graph only ever climbs --- so distinct inputs land on distinct outputs."
+
+  # theorem WITH a proof + aside -> the aside collapses (proof is the content)
+  - id: thm_proof_aside
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    title: "Monotonicity (With Proof)"
+    say: "A theorem with a proof: the aside collapses, the proof fills the zone."
+    statement: "If $f'(x) > 0$ on an interval, then $f$ is strictly increasing there."
+    proof:
+      - "Take $x_1 < x_2$ in the interval and apply the Mean Value Theorem."
+      - "Then $f(x_2)-f(x_1) = f'(c)(x_2-x_1) > 0$, so $f(x_2) > f(x_1)$."
+    qed: "Therefore $f$ is strictly increasing."
+    aside:
+      label: "Note"
+      body: "This card should be ignored --- a theorem with a proof is not sparse."

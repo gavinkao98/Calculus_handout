@@ -48,11 +48,19 @@ from manim import DOWN, Rectangle, VGroup
 from .. import brand
 from ..blocks import Block, accent_role
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner
+from ._common import scene_head, motif_corner, ColumnPlan
 
 _COL_GAP = 0.7
 _ROW_GAP = 0.5
 _HEADER_RULE_GAP = 0.26
+
+
+def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
+    """Capacity contract: a value_table is a centred FIGURE -- statement + header + rows as
+    one unit, not independent columns -- so measure the combined group height (`group`
+    model). extra_bottom=0.45 matches the template's bottom inset. The width side (an
+    over-wide table) stays an authoring error caught reactively by _overflow_issues."""
+    return [ColumnPlan(min_pitch=0.0, model="group", extra_bottom=0.45)]
 
 # accent role (blue/amber/green/red) -> its lifted ink tint for the punchline cells,
 # so the accent column/row echoes the SCENE's accent instead of always blue.

@@ -26,7 +26,8 @@ from manim import DOWN, LEFT, RIGHT, UP, RoundedRectangle, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner, center_in_zone, ColumnPlan, SPINE_X, CONTENT_W
+from ._common import (scene_head, motif_corner, center_in_zone, build_aside, ColumnPlan,
+                      SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
 
 
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
@@ -44,14 +45,35 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     left = SPINE_X
     content_w = CONTENT_W
 
+    steps = spec.get("proof", [])
+    qed_text = spec.get("qed")
+    # An enrichment aside (L3) applies only to a STATEMENT-ONLY proposition (no proof
+    # cascade to fill the zone); with a proof present the proof IS the content and the
+    # aside collapses (ignored). For it the statement narrows to the primary column.
+    use_aside = bool(spec.get("aside")) and not steps and not qed_text
+
     # -- statement in a gold-barred panel (the textbook "theorem frame") --
     # prose(): a pure-prose statement (no $) must NOT go to math_line -- that
     # routes to MathTex and renders the whole sentence as run-together math
     # italic. prose() sends it to Text instead, and still handles inline $math$.
+    stmt_w = (PRIMARY_W - 0.3) if use_aside else (content_w - 1.4)
     statement = brand.prose(spec.get("statement", ""), ground,
-                            role="primary", size="h2", max_width=content_w - 1.4)
+                            role="primary", size="h2", max_width=stmt_w)
     card = brand.accent_panel(statement, ground, bar_role="accent", fill_role="panel",
                               pad=0.42, pad_x=0.6)
+
+    if use_aside:
+        # balanced two-column: card left + enrichment aside in the rail, the pair centred
+        # (Lectern bias), instead of the pinned-high card the proof path uses over empty space.
+        aside = build_aside(spec["aside"], ground, max_width=RAIL_W)
+        card.move_to([left + card.width / 2, 0, 0])
+        aside.move_to([RAIL_X, 0, 0], aligned_edge=LEFT)
+        center_in_zone([card, aside], title)
+        blocks.append(Block("statement", card, anim="fade", static=True))
+        blocks.append(Block("aside", aside, anim="fade", static=True, layer="decoration"))
+        blocks.append(motif_corner(ground))
+        return blocks
+
     # The card sits at its designed y; a tall (wrapped) statement grows upward,
     # so cap its top below the title -- the label/steps/qed cascade follows.
     card_y = min(1.55, title.get_bottom()[1] - 0.32 - card.height / 2)
@@ -67,7 +89,6 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
     proof_content: list = []   # steps + qed, centred below the label (card+label stay put)
 
-    steps = spec.get("proof", [])
     step_gap = 0.95     # designed rhythm = MINIMUM pitch
     min_clear = 0.35    # air kept between tall (wrapped) steps -- pitch expands,
     #                     steps never collide (the recap_cards fused-rows class)
@@ -94,7 +115,6 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         prev_half = half
 
     # -- QED line --
-    qed_text = spec.get("qed")
     if qed_text:
         line = brand.prose(qed_text, ground, role="success", size="step")
         box = RoundedRectangle(width=0.46, height=0.46, corner_radius=T.RADIUS_SM,

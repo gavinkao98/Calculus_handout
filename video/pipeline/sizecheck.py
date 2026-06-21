@@ -400,7 +400,13 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     if not cols:
         return []
 
-    if model == "span":
+    if model == "group":
+        # centred FIGURE (value_table / sign_chart): one unit whose columns are not
+        # independent streams, so the binding height is the COMBINED extent of all content,
+        # not the tallest column. Measured -- conservative vs the figure's slightly inset zone.
+        allrows = [r for rows in cols.values() for r in rows]
+        natural_min = max(t for t, _ in allrows) - min(b for _, b in allrows)
+    elif model == "span":
         # fixed-rhythm template: the built rows already sit at their real centre-to-centre
         # pitch, so a column's natural height is its MEASURED extent (max top - min bottom)
         # -- no tightest-pitch estimate, no row-height prediction.

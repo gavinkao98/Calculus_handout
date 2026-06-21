@@ -42,6 +42,8 @@ EXPECT = {
     "theorem_over": True,
     "recap_fit": False,
     "recap_over": True,
+    "value_table_fit": False,
+    "value_table_over": True,
 }
 
 _FIXTURE = Path(__file__).resolve().parent / "storyboards" / "_demo_capacity.yml"
