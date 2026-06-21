@@ -1,0 +1,711 @@
+You are an ADVISORY adversarial reviewer of a calculus handout section (HTML format) that was expanded from the SEED below, following an approved DIRECTION BRIEF. You do NOT rewrite; you surface findings for a human.
+
+Hunt especially for:
+(a) mathematical errors, fabricated theorems/identities, or over-generalized claims;
+(b) drift from the seed's mathematics (the seed IS the manuscript's mathematical backbone);
+(c) direction-conformance violations: did the draft cover what the brief specifies? did it include anything from the brief's "do-not-write" (kept under the heading 刻意不寫) list?
+
+Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):
+  category: math | faithfulness | direction-conformance | house_rule | register | other
+  blocking: true ONLY for:
+    - a real MATH ERROR or fabricated/over-generalized claim (category=math)
+    - DRIFT from the seed's mathematics (category=faithfulness)
+    - VIOLATION of direction-conformance: missing a brief-mandated item OR including a brief-forbidden item (category=direction-conformance)
+  Everything else MUST be blocking=false.
+
+Formatting / house-rule items (missing expansion comments, register/style nits) are caught by a downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); they MUST NOT block convergence.
+
+Also give each finding a level for human triage:
+  1 = real conflict (must fix)
+  2 = discoverability gap (add doc/comment)
+  3 = editorial drift (low priority)
+  4 = non-finding (mathematically equivalent paraphrase, stylistic preference)
+
+A mathematically equivalent paraphrase is NOT a finding.
+
+This is the HEAVIEST, most proof-dense section of the chapter: four theorems (three with full proofs), a corollary with proof, a key figure, a strategy, and three worked examples. Its risk is the OPPOSITE of a thin section — it is that the proof ladder Theorem A -> Rolle -> MVT -> Corollary be RIGOROUS and unbroken, not that content be missing. Spend your effort on the MATH of each proof and on direction-conformance. Re-derive each step INDEPENDENTLY:
+  - Theorem 4.10 (interior extremum / "Theorem A"): from f(xM) >= f(x) get f(xM+h) - f(xM) <= 0; for h>0 the difference quotient is <= 0 so the right-hand limit f'(xM) <= 0; for h<0 the quotient is >= 0 (nonpositive numerator over negative denominator) so the left-hand limit f'(xM) >= 0; a number both <=0 and >=0 is 0. Check the sign bookkeeping and that interiority (xM in open (a,b)) is what makes both one-sided increments available.
+  - Theorem 4.11 (Rolle): EVT gives max xM and min xm. Case 1: m = M, combined with f(a)=f(b), forces f constant, so f'=0 everywhere. Case 2: m < M; since f(a)=f(b), at least one of f(xM) > f(a) or f(xm) < f(a) holds; the corresponding extremum is then interior, and Theorem 4.10 gives f'=0 there. VERIFY the Case-2 second branch is "f(xm) < f(a)" (the manuscript slip wrote f(xM); the draft is supposed to have CORRECTED it — if the draft still says f(xM) in the second branch, that IS a real error).
+  - Theorem 4.12 (MVT): auxiliary g(x) = f(x) - [f(a) + ((f(b)-f(a))/(b-a))(x-a)]; verify g continuous on [a,b], differentiable on (a,b), g(a)=g(b)=0; Rolle yields c with g'(c)=0; g'(c) = f'(c) - (f(b)-f(a))/(b-a) (the bracket differentiates to the constant secant slope); hence f'(c) = (f(b)-f(a))/(b-a).
+  - Corollary 4.3 (monotonicity, BOTH forms): apply MVT on [x1,x2]; (f(x2)-f(x1))/(x2-x1) = f'(c); denominator positive; f'>=0 gives non-decreasing, f'>0 gives strictly increasing. Check the strict/non-strict split is correct.
+  - Example 4.2 (MVT on x^2 over [0,2]): average slope (4-0)/(2-0) = 2; f'(x)=2x; 2c=2 => c=1 in (0,2). Check.
+  - Example 4.3 (sin on [0, pi/4]): (sin x)' = cos x > 0 there => strictly increasing. Example 4.4 (e^x on R): e^x > 0 everywhere (series for x>=0; exponent law e^x = 1/e^{-x} for x<0) => strictly increasing on every [x1,x2] => on R. Check the "every closed interval => all of R" extension is valid for strict monotonicity.
+  - Theorem 4.9 (Extreme Value Theorem): stated correctly and used WITHOUT proof (as a black box, justified by completeness). The draft must NOT smuggle in a proof.
+  - Figure 4.2 caption claim: the secant through (a,f(a)),(b,f(b)) has slope (f(b)-f(a))/(b-a) and some interior tangent is parallel to it — verify this is exactly the MVT statement, no false claim. (The figure itself is drawn by JS and renders cleanly; you are reviewing the caption's mathematical claim, not an image.)
+Cross-check the math against the SIGNED LEGACY GROUND TRUTH legacy/tex_handout/chapters/ch04_exponential_logarithm.tex, section \section{Rolle's Theorem and the Mean Value Theorem} (label sec:rolle-and-mvt) PLUS the monotonicity corollary at the head of the next section (label cor:monotonicity). NOTE: the legacy places the monotonicity corollary and the sin/e^x examples at the START of §4.5; the handout (following the manuscript's page order and the chapter PLAN) places them at the END of §4.4, closing with "e^x is strictly increasing on R". BOTH orderings are valid; this is the approved placement decision -- do NOT flag the corollary's presence in §4.4 as out-of-scope or as duplicating §4.5.
+
+NUMBERING NOTE: §4.4 is NOT the chapter's first section. Per-type counters CONTINUE from §4.1-§4.3 (which used Definition 4.1/4.2; Theorem 4.1-4.8; Proposition 4.1/4.2; Corollary 4.1/4.2; Strategy 4.1; Example 4.1; Figure 4.1; Remark 4.1-4.3). Therefore §4.4 correctly uses: Definition 4.3 (max/min); Theorem 4.9 (Extreme Value Theorem), 4.10 (interior extremum "Theorem A"), 4.11 (Rolle), 4.12 (MVT); Corollary 4.3 (monotonicity); Strategy 4.2 (applying the MVT); Figure 4.2 (secant-tangent); Example 4.2 (MVT on x^2), 4.3 (sin), 4.4 (e^x); Remark 4.4. §4.4 mints NO new Proposition. Cross-references ("Theorem 4.1" completeness, "Theorem 4.7" exponent law, "Theorem 4.8" derivative of e^x, "Theorem 4.9/4.10/4.11/4.12", "Corollary 4.3", "Chapter 3") are correct, not missing content. This continuation is CORRECT -- do NOT flag it as a discontinuity.
+
+SCOPE / EXPANSION NOTE for §4.4: the SEED covers manuscript pp.11-18 (the block the manuscript heads "§ Rolle's Theorem": max/min definition -> cos x example -> EVT "Fact" (stated unproved) -> Theorem A -> Rolle -> MVT -> monotonicity Corollary -> examples sin and e^x -> "e^x strictly increasing"). The draft adds, as MARKED expansions sanctioned by the brief (gate 3 approved "全照提案核可" PLUS all four optional add-ons) and cross-checked against the signed legacy ground truth:
+  - An OPENER that frames the MVT as the existence bridge from pointwise derivative to interval behaviour, picking up §4.3's closing fence (monotonicity needs an existence theorem). INTENDED.
+  - A ONE-SENTENCE history attribution of Rolle (Michel Rolle, 1691) and the MVT (Cauchy and the 19th-century analysts), marked [source: standard calculus-textbook historical note]. Optional add-on APPROVED. Do not demand a specific citation beyond the standard-note tag.
+  - The Extreme Value Theorem NAMED as Theorem 4.9, stated WITHOUT proof, cross-referencing completeness (Theorem 4.1), with a compact note that both hypotheses (closed interval, continuity) are essential. INTENDED (the manuscript states it as a "Fact" without proof).
+  - Figure 4.2 (MVT secant-tangent, ROADMAP key figure) and Strategy 4.2 (verifying MVT hypotheses, with the |x| on [-1,1] counterexample and the closed/open asymmetry folded in). ROADMAP-mandated. INTENDED.
+  - A caution that Theorem 4.10 needs the extremum INTERIOR (endpoint counterexample f(x)=x on [0,1]). INTENDED.
+  - Remark 4.4 (explicit box): the synthesis that Rolle is the MVT special case, the Theorem A -> Rolle -> MVT ladder, and the MVT as the central existence engine reused for monotonicity and later Taylor. Optional add-on APPROVED.
+  - Corollary 4.3 stated in BOTH forms (non-strict and strict). The manuscript states only the non-strict form but its examples conclude strict; the strict form is REQUIRED downstream (§4.5 needs e^x strictly increasing for injectivity). INTENDED fill.
+  - A one-line justification that e^x > 0 everywhere (Example 4.4) and a one-line note that strict monotonicity passes from every closed interval to all of R. INTENDED fills.
+  - The two corollary examples SPLIT into Example 4.3 (sin) and Example 4.4 (e^x), and an EXTRA MVT numerical worked Example 4.2 (x^2 on [0,2], c=1). Optional add-ons APPROVED.
+These are INTENDED expansions, not drift.
+
+DELIBERATELY OMITTED (brief 刻意不寫) -- these MUST NOT appear in the §4.4 body; flag as blocking direction-conformance ONLY if they actually appear:
+  - constructing, defining, or differentiating ln x (that is §4.5; only the hand-off sentence "e^x is strictly increasing, hence invertible, so the next section builds ln x" is allowed);
+  - a PROOF of the Extreme Value Theorem (it is stated as a black box; the completeness-based proof is deferred);
+  - Taylor's theorem, higher-order or Cauchy's generalized MVT, or L'Hopital's rule (later chapters);
+  - re-proving §4.3's (e^x)'=e^x (it is only CITED as Theorem 4.8);
+  - moving or proposing to move the MVT out of Chapter 4 (decision D4: it stays; only a forward-only fence to §4.5 is allowed);
+  - an integral / antiderivative framing of monotonicity (the corollary goes through the MVT, not integration, which is not yet built);
+  - concavity / the second-derivative test (out of scope);
+  - any self-invented "your turn" / bare exercise;
+  - OVER-EXPANSION: padding beyond the intended ladder. NOTE: this is the chapter's heaviest section by design -- four theorems + one corollary + one figure + one strategy + three worked examples + one remark is the APPROVED scope (gate 3 took all four optional add-ons), NOT over-expansion. Only flag genuinely redundant lemmas/examples/cautions beyond that.
+
+This section HAS one figure (Figure 4.2, the MVT secant-tangent picture; ROADMAP key figure). It is drawn by the chapter's JS figure registry and renders cleanly (verified: 0 MathJax errors, 22 print pages for the chapter, 0 overflow, the tangent is numerically parallel to the secant and touches the curve at the interior c). Do NOT report "figure missing"; review only the figure CAPTION's mathematical claim.
+
+Set "converged": true when there are ZERO blocking findings (math correct, faithful to seed, conforms to direction brief), even if advisory formatting nits remain.
+
+Return STRICT JSON only, no prose outside the JSON.
+
+=== SEED (manuscript transcription, pp.11-18) ===
+
+# Seed — §4.4 Rolle's Theorem and the Mean Value Theorem
+
+> stage ① 產物。Transcribed from the handwritten manuscript `2023-11-4-ExponentialFunction`,
+> **pp.11–18** (the section the manuscript heads "§ Rolle's Theorem", beginning right after
+> `d/dx e^x = e^x` on p.11 and running through the monotonicity Corollary + Examples ending
+> with "[e^x is strictly increasing for all x ∈ ℝ]" on p.18; the next item "§ Logarithmic
+> function" begins §4.5).
+> Manuscript heads this block with its own title "§ Rolle's Theorem" (handout maps it to
+> §4.4 "Rolle's Theorem and the Mean Value Theorem" per ROADMAP/PLAN §1).
+> Faithful to the manuscript: structure, order, notation, and deliberate omissions preserved.
+> seed 語法＝輕量可讀（反引號行內＋Unicode；見 CONTENT_DIRECTION ① / `seed_ch04_s3.md`）。漂亮 KaTeX 留給 ④。可疑／非標準處標 **[請查核]**。
+> **數學 cross-check（非手稿）**：legacy `ch04_exponential_logarithm.tex` §4.4 段（`\section{Rolle's Theorem and the Mean Value Theorem}`，`sec:rolle-and-mvt`，lines 538–696）＋其 §4.5 開頭的 monotonicity corollary（`cor:monotonicity`，lines 705–727；legacy 把推論放 §4.5，手稿＋PLAN 放 §4.4——見下）。D1：僅盲算對賬，不照抄散文／結構。
+
+---
+
+## §4.3 依賴（承前；非本節新內容，僅備援引）
+
+§4.4 用到前一節一件既成事實，及 Ch2 的導數定義：
+
+1. **導數定義（Ch2）**：`f'(x) = lim_{h→0} (f(x+h)−f(x))/h`。Thm A 的證明把這個 difference quotient 拆成單邊極限。
+2. **§4.3（Theorem 4.8）**：`d/dx e^x = e^x`。本節**最後一個 Example** 用它（`(e^x)' = e^x > 0`）推出 `e^x` strictly increasing——這正是 §4.5 建構 `ln x`（`e^x` 反函數）所需的單調性。
+3. **§4.4 → §4.5 交棒**：本節結尾證得「`e^x` strictly increasing on ℝ」。§4.5 從這裡接手定義 `ln x`，**不重證**單調性。
+
+（連續性 Theorem 4.6（`e^x` 在 ℝ 上連續）是 EVT「Fact」可套用到 `e^x`-型函數的背景前提，本節證明本身用的是抽象 `f` 的連續／可微假設，非 `e^x` 專屬。）
+
+---
+
+## § Rolle's Theorem（手稿原文，pp.11–18）
+
+> 手稿標題即 "§ Rolle's Theorem"；其下依序為 max/min 定義、`cos x` 例、EVT「Fact」、Thm A、Rolle、MVT、monotonicity Corollary、兩個 Example。handout 標題改為 §4.4「Rolle's Theorem and the Mean Value Theorem」。
+
+### Def 1（maximum / minimum point）
+
+For `f(x)` defined on a domain `D`, we say that `f(x_0)` is a **maximum** of `f` on `D` if `x_0 ∈ D` and
+
+`f(x_0) ≥ f(x)`   `∀ x ∈ D`.
+
+（手稿以紅筆標出對偶的 **minimum**：把 `maximum` 換成 `minimum`、`≥` 換成 `≤`，即 `f(x_0) ≤ f(x) ∀ x ∈ D`。）
+
+### Ex（`cos x`）
+
+For `f(x) = cos x`, `x ∈ ℝ`, we see that `0 ∈ ℝ` and
+
+`1 = cos 0 ≥ cos x`,   `∀ x ∈ ℝ`.
+
+Hence, `0` is a **maximum point** of `cos x` and the **maximum value** is `1`.
+
+### Fact（Extreme Value Theorem，陳述不證）
+
+If `f` is a continuous function defined on a closed interval `[a, b]`, then `f` has a maximum point `X_M ∈ [a, b]` and a minimum point `X_m ∈ [a, b]`.
+
+> 手稿括註原文：「This fact can be derived from the completeness of real numbers. The whole argument is lengthy. We do not prove it for the moment.」——**明言不證**（依完備性，論證冗長）。
+
+### Thm A（interior extremum ⟹ `f' = 0`）
+
+**Suppose** `X_M ∈ (a, b)` is a maximum point of a continuous function `f(x)` defined on `[a, b]` and `f'(X_M)` exists. **Then** `f'(X_M) = 0`.
+
+（手稿以紅筆標對偶 minimum 版：`X_m ∈ (a, b)`、minimum、`f'(X_m)`、`f'(X_m) = 0`。）
+
+**證（手稿）：**
+Since `f(X_M) ≥ f(x)` for all `x ∈ [a, b]`,
+
+`f(X_M + h) − f(X_M) ≤ 0`.
+
+⟹
+
+`(f(X_M + h) − f(X_M)) / h ≤ 0`   for `h > 0`,
+
+and
+
+`(f(X_M + k) − f(X_M)) / k ≥ 0`   for `k < 0`.
+
+Hence,
+
+`f'(X_M) = lim_{h→0⁺, h>0} (f(X_M + h) − f(X_M)) / h ≤ 0`,
+
+and
+
+`f'(X_M) = lim_{k→0⁻, k<0} (f(X_M + k) − f(X_M)) / k ≥ 0`.
+
+This implies `f'(X_M) = 0`.
+
+> 手稿只顯式做 maximum case；minimum case 由紅筆對偶標注，視為平行（把 `≥`↔`≤`、`h>0`↔`k<0` 對調）。`h>0` 時分子 `≤0`、分母 `>0` ⟹ 商 `≤0`；`k<0` 時分子 `≤0`、分母 `<0` ⟹ 商 `≥0`。兩單邊極限一個 `≤0` 一個 `≥0`，逼出 `=0`。
+
+### Rolle's Thm
+
+**Suppose** `f` is continuous on `[a, b]` and is differentiable on `(a, b)`. **If** `f(a) = f(b)`, **then** there exists a point `c ∈ (a, b)` s.t. `f'(c) = 0`.
+
+**證（手稿）：**
+Suppose `X_m, X_M ∈ [a, b]` s.t.
+
+`m = f(X_m) ≤ f(x) ≤ f(X_M) = M`   `∀ x ∈ [a, b]`.
+
+（`X_m, X_M` 由 Fact〔EVT〕保證存在。）
+
+**Case 1.** If `m = M = f(a) = f(b)`, then `f(x) = f(a)` for all `x ∈ (a, b)` and `f'(c) = 0` `∀ c ∈ (a, b)`.
+
+**Case 2.** If Case 1 does not hold, then either
+
+(i) `f(X_M) > f(a)`   or   (ii) `f(X_m) < f(a)`.
+
+**[請查核]**：手稿 p.14 的 (ii) 寫成「`f(X_M) < f(a)`」——下標應為 `X_m`（手稿筆誤）。p.15 解 (ii) 時用的是 `X_m`（「`X_m ∈ (a,b)`、`c = X_m`」），且 legacy `cor`/Rolle 證（line 612）亦作 `f(x_m) < f(a)`。故此處取 **`f(X_m) < f(a)`**（min 落在端點值之下）。
+
+If (i) holds, `X_M ∈ (a, b)`, and we may choose `c = X_M` so that
+
+`f'(c) = f'(X_M) = 0`.
+
+If (ii) holds, then `X_m ∈ (a, b)` and we may choose `c = X_m`. We then see that
+
+`f'(c) = f'(X_m) = 0`.
+
+This completes the proof.
+
+> 邏輯：Case 2 中 `m < M`（否則退回 Case 1）；又 `f(a)=f(b)`，故 max 與 min 不能都等於端點值——至少一個嚴格在端點值之外，那一個（極值點）必在開區間 `(a,b)` 內部，由 Thm A 得 `f'=0`。
+
+### The mean value theorem（MVT）
+
+**Suppose** `f` is continuous on `[a, b]` and is differentiable on `(a, b)`. **Then** there exists a point `c ∈ (a, b)` s.t.
+
+`f'(c) = (f(b) − f(a)) / (b − a)`.
+
+> 手稿一句：「We shall use the Rolle's theorem to prove the mean value theorem.」
+
+**證（手稿）：**
+Set
+
+`g(x) = f(x) − [ f(a) + ((f(b) − f(a)) / (b − a)) (x − a) ]`.
+
+Observe: Since `f` is differentiable on `(a, b)` and continuous on `[a, b]`, so is `g(x)`.
+
+`g(a) = 0 = g(b)`.
+
+By the Rolle's theorem, `∃ c ∈ (a, b)` s.t.
+
+`0 = g'(c) = f'(c) − (f(b) − f(a)) / (b − a)`,
+
+which implies
+
+`f'(c) = (f(b) − f(a)) / (b − a)`.
+
+This completes the proof of the mean value theorem.
+
+> 中括號 `[ f(a) + ((f(b)−f(a))/(b−a))(x−a) ]` 是過 `(a, f(a))`、`(b, f(b))` 的割線；`g` 是曲線與割線的垂直差。`g(a)=f(a)−f(a)=0`、`g(b)=f(b)−f(b)=0`（手稿直接給 `g(a)=0=g(b)`，未展開兩步）；`g'(x)=f'(x)−(f(b)−f(a))/(b−a)`（中括號對 `x` 微分，常數項 `f(a)` 消失、線性項斜率為割線斜率）。
+
+### Corollary（`f' ≥ 0 ⟹ increasing`）
+
+**Suppose** `f` is continuous on `[a, b]` and is differentiable on `(a, b)`. **If** `f'(c) ≥ 0` for all `c ∈ (a, b)`, **then**
+
+`f(x_2) ≥ f(x_1)`   for all `a ≤ x_1 < x_2 ≤ b`.
+
+**證（手稿）：**
+Applying the mean value theorem on `[x_1, x_2]`, `∃ c ∈ (x_1, x_2)` s.t.
+
+`(f(x_2) − f(x_1)) / (x_2 − x_1) = f'(c) ≥ 0`.
+
+Hence `f(x_2) ≥ f(x_1)`.
+
+### Example
+
+**(i)** `d/dx sin x = cos x > 0` for `x ∈ [0, π/4]`.
+Hence, `sin x_2 > sin x_1` for `0 ≤ x_1 < x_2 ≤ π/4`.
+
+**(2)** `d/dx e^x = e^x > 0` for all `x ∈ ℝ`.
+Hence, `e^{x_2} > e^{x_1}` for all `x_1 < x_2`.
+
+`[ e^x is strictly increasing for all x ∈ ℝ ]`   （手稿以紅筆方括註，標重點）。
+
+> **[請查核]（strict vs non-strict）**：手稿 Corollary 只陳述 `f' ≥ 0 ⟹ f(x_2) ≥ f(x_1)`（**非嚴格**），但兩個 Example 都下 **strict**（`sin x_2 > sin x_1`、`e^{x_2} > e^{x_1}`、"strictly increasing"）。手稿是直接重跑 MVT 商式 `(f(x_2)−f(x_1))/(x_2−x_1)=f'(c)`：當 `f'(c) > 0`（嚴格正）時分子嚴格正，得 strict。即 strict 結論來自「`f' > 0`」而非那條非嚴格 Corollary。**legacy 把 Corollary 寫成雙條（`f'≥0 ⟹` non-decreasing；`f'>0 ⟹` strictly increasing）**（line 705–710）——這是乾淨補法，且 §4.5 需要「`e^x` strictly increasing」（單射）才能定義 `ln x`。屬 ④ 方向（建議 Corollary 補 strict 版；見 ② brief §C）。
+
+---
+
+## §4.4 / §4.5 boundary
+
+手稿在 `[e^x is strictly increasing for all x ∈ ℝ]` 後緊接 **§ Logarithmic function**：「Since `e^x` is strictly increasing for all `x ∈ ℝ`, we can define `ln x` to be the inverse function of `e^x` for `x ∈ (a, b)` where `a = lim_{x→−∞} e^x = 0` and `b = lim_{x→∞} e^x = +∞`」——**這是 §4.5 的開頭**，不屬本 seed。§4.4 收在「`e^x` strictly increasing on ℝ」（交棒給 §4.5）。
+
+---
+
+## 手稿刻意省略／特徵（忠實記錄）
+
+- **無圖**：手稿全程純文字，無 MVT 割線–切線圖。**ROADMAP §4.4 key figure ＝ MVT secant–tangent 圖**（割線 dashed、內部 `c` 處平行 tangent solid）——屬 handout 加法（legacy 有 `fig:mvt`）。② brief 提案 Figure 4.2。
+- **無 strategy box**：手稿不給「套用 MVT 前先驗 hypotheses」程序。**ROADMAP §4.4 指派此 strategy**（[a,b] 連續 vs (a,b) 可微的不對稱）——屬 handout 加法（legacy 有對應 strategy；`|x|` on `[−1,1]` 為 hypothesis-fail 反例）。② brief 提案 Strategy 4.2。
+- **無 caution**：手稿不標 (a) Thm A 的「internal」必要性（端點極值不必 `f'=0`，如 `f(x)=x` on `[0,1]`）、(b) MVT 的 closed/open 不對稱、(c) `|x|` 反例——皆 legacy 加法、② brief 候選。
+- **EVT 不證**：手稿明言「依完備性、論證冗長、暫不證」。handout 具名 Theorem（Extreme Value Theorem）、陳述不證、cross-ref 完備性（Theorem 4.1）。legacy `thm:evt` 同此用法（並補「closed＋continuous 兩條件皆必要」的 remark／反例）。
+- **Corollary 的 strict 缺口**（見上 [請查核]）：陳述非嚴格、Example 用嚴格。④ 建議補 strict 版（§4.5 需 `e^x` 單射）。
+- **`e^x > 0 ∀x` 的依據**：Example (2) 直接寫 `e^x > 0`，未重述理由。依據：`x ≥ 0` 由級數逐項正；`x < 0` 由指數律 `e^x = 1/e^{−x} > 0`（Theorem 4.7）。④ 可補一行（legacy `ex:exp-strictly-increasing` 即如此補）。
+- **Thm A 只顯式做 max case**：min case 由紅筆對偶標注、視為平行。
+- **「Theorem A」命名**：手稿把 interior-extremum 結果命名為「Thm A」（無教科書通名）。handout 編號為 Theorem `4.10`，可在 env-name 保留「Theorem A」或「Interior extremum」為副名（④/② 決定）。legacy 用 `[Theorem A]` 為名、`thm:interior-extrema` 為 label。
+- **「strictly increasing on every [a,b] ⟹ on ℝ」的跳步**：Example (2) 由「任意 `x_1<x_2` 上嚴格增」推「on ℝ 嚴格增」。legacy 加一條 caution（line 730）：此延拓對 strict monotonicity 成立（任取 `[x_1,x_2]` 套 Corollary），但非所有區間性質都可這樣延拓（如 boundedness、attaining max）。④ 可選一句 note。
+- worked example：手稿 **1 個 Example 區塊（含 (i)(ii) 兩小項）**。圖：**0**。動機散文：**極少**（僅 "We shall use the Rolle's theorem to prove the mean value theorem." 一句承轉）。named-result 索引：max/min Def、Fact〔EVT〕、Thm A、Rolle、MVT、Corollary（具名化／編號屬 ④）。
+- 記號：極值點 `X_M`（max）／`X_m`（min）；端點增量 `h>0`／`k<0`；極值 `m=f(X_m)`／`M=f(X_M)`；MVT 輔助函數 `g(x)`；單調性區間端點 `x_1<x_2`、`c`。無新巨集。
+
+---
+
+## 對照 ground truth（評分用，非手稿）
+
+已簽核 `legacy/tex_handout/chapters/ch04_exponential_logarithm.tex` §4.4 段（`\section{Rolle's Theorem and the Mean Value Theorem}`，`sec:rolle-and-mvt`，lines 538–696）是同一手稿的 LaTeX→HTML 前簽核版，**僅作盲算對賬的 ground truth**（D1），不照抄其散文／結構。盲算對賬結果：
+
+- **Def（max/min）**：legacy `def:max-min` 同義（雙列 itemize）。✓
+- **`cos x` example**：legacy 同（並補 `x=π` minimum、週期點）。✓
+- **EVT**：legacy `thm:evt`「continuous on `[a,b]` ⟹ attains max & min」＋ remark「completeness 依賴、closed＋continuous 兩條件皆必要、附 `f(x)=x` on `(0,1)`／rationals-indicator 反例」。手稿只給 Fact＋「暫不證」。✓（math 一致；legacy 反例為加法）
+- **Thm A（interior extremum）**：legacy `thm:interior-extrema` 證法逐字一致（`f(X_M+h)−f(X_M)≤0`；`h>0` 商 `≤0` ⟹ 右極限 `≤0`；`h<0` 商 `≥0` ⟹ 左極限 `≥0`；兩者 ⟹ `=0`）。legacy 補 caution「interior 必要、端點 `f(x)=x` on `[0,1]` 反例」。✓
+- **Rolle**：legacy `thm:rolle` 證法一致（Case 1 `m=M` ⟹ 常數；Case 2 `m<M` ⟹ max 或 min 嚴格在端點值外 ⟹ 該極值點 interior ⟹ Thm A 得 `f'=0`）。legacy Case 2 寫「`f(x_M)>f(a)=f(b)` 或 `f(x_m)<f(a)=f(b)`」——**證實手稿 (ii) 的 `X_M` 為 `X_m` 筆誤**。✓
+- **MVT**：legacy `thm:mvt` 證法逐字一致（輔助 `g(x)=f(x)−[f(a)+((f(b)−f(a))/(b−a))(x−a)]`；`g` 連續可微、`g(a)=g(b)=0`；Rolle ⟹ `g'(c)=0=f'(c)−(f(b)−f(a))/(b−a)`）。legacy 補 `fig:mvt`（割線–切線圖）、MVT hypothesis-asymmetry caution、`Applying the MVT` strategy（`|x|` on `[−1,1]` 反例）。✓
+- **Monotonicity Corollary**：**legacy 把它放 §4.5 開頭（`cor:monotonicity`，line 705），手稿＋PLAN §1 放 §4.4**（手稿頁序：MVT 後緊接 Corollary＋Example，再 § Logarithmic function）。legacy Corollary 寫**雙條**（`f'≥0 ⟹` non-decreasing；`f'>0 ⟹` strictly increasing），證即套 MVT 於 `[x_1,x_2]`（與手稿同）。兩個 Example（sin on `[0,π/4]`、`e^x` on ℝ）legacy 亦在 §4.5 開頭、內容一致。✓
+  - **placement 裁決（PLAN §1/§2 已定）**：§4.4 **含** Corollary＋兩 Example，收在「`e^x` strictly increasing on ℝ」；§4.5 從此接手定義 `ln x`、**不重證**單調性。auditor 勿把 §4.4 收 Corollary 判為「越界／與 §4.5 重複」（手稿頁序如此、PLAN 已裁）。
+
+**編號接續（PLAN §5 ledger）：** §4.1–§4.3 已 mint 到 Definition 4.2、Theorem 4.8、Proposition 4.2、Corollary 4.2、Strategy 4.1、Example 4.1、Figure 4.1、Remark 4.3。**§4.4 因此自 Definition 4.3、Theorem 4.9、Corollary 4.3、Strategy 4.2、Example 4.2、Figure 4.2、Remark 4.4 起編號**（Proposition 本節未必新增）。本 seed 為手稿原貌（pp.11–18）；具名化與編號落在 ④。
+
+**ROADMAP 已標的 §4.4 方向（待 ③ 方向閘確認）：**
+- **key figure ＝ MVT secant–tangent**（割線 dashed、內部 `c` 平行 tangent solid）。
+- **strategy ＝「套用 MVT 前先驗 hypotheses」**（[a,b] 連續 vs (a,b) 可微的不對稱；`|x|` on `[−1,1]` 反例）。
+- **MVT 留在本章**（D4：手稿把 Rolle/MVT 夾在指數章，因 `ln` 建構需單調性 corollary；本章不移走，未來 applications 專章再於 Mode B 僅提議移動）。
+
+=== END SEED ===
+
+=== DIRECTION BRIEF (approved at gate 3) ===
+
+# Direction Brief — §4.4 Rolle's Theorem and the Mean Value Theorem
+
+> ② 方向提案（CONTENT_DIRECTION §2 九欄）。**狀態：待 ③ 方向閘核可**（③ 拍板後本 brief 成 ④/⑤ 契約）。
+> 輸入：[`seed_ch04_s4.md`](seed_ch04_s4.md)（手稿 pp.11–18）＋ [`PLAN-ch04.md`](PLAN-ch04.md) 章層決策（D4 MVT 留本章、編號 ledger）＋ ROADMAP「Chapter 4」條目（core skill「state and prove Rolle/MVT；用 MVT 證 `f'≥0⟹increasing`」、key figure＝MVT secant–tangent、strategy＝套 MVT 前驗 hypotheses）。
+> §4.4 **非首節，且為全章最重、最多證明的節**（4 條 Theorem＋1 Definition＋1 Corollary＋key figure＋strategy＋2 Example）：核心風險與 §4.3 **相反**——不是過度展開，而是**這條 Thm A → Rolle → MVT → Corollary 的證明階梯每一階都要紮實、不可跳步**。沿用 §4.1–§4.3 已建的 chapter standalone／fragments／figures.js，續編號（自 Definition 4.3、Theorem 4.9 起）。
+> ①-verify：使用者選「現在開跑 §4.4」即視為 seed accepted-by-proceeding（pending §C-1／§C-2 兩處 [請查核] 更正）。數學 cross-check：legacy `ch04_exponential_logarithm.tex` §4.4 段（`sec:rolle-and-mvt`，lines 538–696）＋ §4.5 開頭 monotonicity corollary（`cor:monotonicity`，lines 705–727）。
+
+---
+
+## 手稿盤點（照原順序，pp.11–18）
+- **§ Rolle's Theorem**（手稿標題；handout 改 §4.4「Rolle's Theorem and the Mean Value Theorem」）。
+- **Def 1（max/min point）**：`f(x_0)` 為 `f` 在 `D` 上的 maximum 若 `x_0∈D` 且 `f(x_0)≥f(x) ∀x∈D`（紅筆對偶 minimum／`≤`）。
+- **Ex（`cos x`）**：`0` 是 `cos x` 的 maximum point、maximum value `=1`（`1=cos0≥cos x ∀x∈ℝ`）。
+- **Fact（EVT）**：`f` 連續 on `[a,b]` ⟹ 有 max point `X_M∈[a,b]`、min point `X_m∈[a,b]`。手稿明言「依完備性、論證冗長、暫不證」。
+- **Thm A（interior extremum）**：`X_M∈(a,b)` 為 max、`f'(X_M)` 存在 ⟹ `f'(X_M)=0`。證：`f(X_M+h)−f(X_M)≤0` ⟹ `h>0` 商 `≤0`、`k<0` 商 `≥0` ⟹ 兩單邊極限逼出 `f'(X_M)=0`。
+- **Rolle**：`f` 連續 `[a,b]`、可微 `(a,b)`、`f(a)=f(b)` ⟹ `∃c∈(a,b), f'(c)=0`。證：EVT 取 `X_m,X_M`；Case 1（`m=M=f(a)=f(b)` ⟹ 常數）／Case 2（`m<M` ⟹ max 或 min 嚴格在端點值外 ⟹ 該極值點 interior ⟹ Thm A）。
+- **MVT**：`f` 連續 `[a,b]`、可微 `(a,b)` ⟹ `∃c∈(a,b), f'(c)=(f(b)−f(a))/(b−a)`。證：輔助 `g(x)=f(x)−[f(a)+((f(b)−f(a))/(b−a))(x−a)]`（割線差）；`g(a)=g(b)=0` ⟹ Rolle ⟹ `g'(c)=0` ⟹ 結論。
+- **Corollary（monotonicity）**：`f'≥0 on (a,b)` ⟹ `f(x_2)≥f(x_1)` for `a≤x_1<x_2≤b`。證：MVT 於 `[x_1,x_2]`。
+- **Example**：(i) `(sin x)'=cos x>0` on `[0,π/4]` ⟹ `sin x_2>sin x_1`；(2) `(e^x)'=e^x>0 ∀x∈ℝ` ⟹ `e^{x_2}>e^{x_1}` ⟹ **`e^x` strictly increasing on ℝ**（紅筆方括重點；交棒 §4.5）。
+- 具名人物／史實：**無**（Rolle/MVT 皆有可考史，手稿未提）。worked example：**1 個 Example 區塊（i/ii 兩項）**。圖：**無**。strategy／caution：**無**。
+
+## 薄度剖析
+| 區塊 | 狀態 |
+|---|---|
+| Def（max/min）＋`cos x` 例 | **夠**（標準定義＋具體錨；④ 升格 Definition 4.3） |
+| EVT「Fact」 | **夠但須具名＋框邊界**：手稿陳述不證即可，但 ④ 應具名 Theorem 4.9、cross-ref 完備性（Theorem 4.1）、一句點明「closed＋continuous 兩條件皆必要」（legacy remark 有反例）→ §C-3 |
+| Thm A＋證 | **夠**（手稿全給、標準雙單邊極限論證；④ 具名 Theorem 4.10、補一句「interior 必要」caution＝§C-6a） |
+| Rolle＋證 | **夠**（手稿 Case 1/2 完整；④ 修 §C-1 的 (ii) `X_M→X_m` 筆誤、具名 Theorem 4.11） |
+| MVT＋證 | **夠**（輔助 `g` 標準；④ 具名 Theorem 4.12）。**薄在「為何要這個 `g`」的動機**：手稿直接寫出 `g`，未說「`g` 是曲線減割線、把 MVT 化約成 Rolle」→ ④ 補一句幾何動機（§C-4 圖＋一句散文） |
+| **MVT 幾何圖** | **無**：手稿純文字。**ROADMAP key figure ＝ 割線–切線圖**（割線 dashed、內部 `c` 平行 tangent solid）→ §C-4（ROADMAP 指派、Figure 4.2） |
+| **套 MVT 的 hypotheses 驗證程序** | **無**：手稿不給。**ROADMAP strategy ＝「套 MVT 前驗 [a,b] 連續＋(a,b) 可微」**（不對稱）→ §C-5（Strategy 4.2；`|x|` on `[−1,1]` 反例） |
+| Corollary 的 **strict 版** | **薄／有缺口**：手稿陳述非嚴格（`≥`）、Example 卻下嚴格（`>`）。§4.5 需 `e^x` **strictly** increasing（單射）→ §C-2（補 strict 條，legacy 即雙條） |
+| `e^x>0 ∀x` 的依據 | **薄**：Example (2) 直接寫 `e^x>0` 未述理由（`x≥0` 級數正、`x<0` 指數律 `1/e^{−x}`）→ §C-7（補一行） |
+| 「on every `[a,b]` ⟹ on ℝ」的跳步 | **薄**：Example (2) 由任意閉區間嚴格增推 ℝ 上嚴格增 → §C-6c（一句 note，legacy 有對應 caution） |
+
+## 範圍與深度
+- **吃手稿這一叢**：max/min Def → EVT（陳述不證）→ Thm A → Rolle → MVT → monotonicity Corollary → 兩 Example（sin、`e^x`），**收在「`e^x` strictly increasing on ℝ」**（交棒 §4.5）。
+- **全章最重節、證明階梯為主軸**：Thm A → Rolle → MVT 三條環環相扣（每條都化約成前一條），**所有證明都保留、都要紮實**——這正是 ROADMAP core skill「state and prove Rolle/MVT」。不可把任一證明降為「陳述不證」（EVT 例外，手稿本就不證）。
+- **保留證明**（手稿全給、標準、本節主軸）：Thm A 雙單邊極限、Rolle Case 1/2、MVT 輔助 `g`、Corollary 套 MVT。
+- **EVT 唯一陳述不證**：手稿明言、完備性依賴、論證冗長——具名 Theorem 4.9、cross-ref 完備性、當 black box 用。
+- **陳述／援引不重證**：導數定義（Ch2，Thm A 證用之）、§4.3 `(e^x)'=e^x`（Theorem 4.8，`e^x` example 援引）、§4.2 指數律（`e^x>0` for `x<0` 的根據，§C-7 一行）、§4.1 完備性（Theorem 4.1，EVT 的根據，cross-ref）。
+- **forward-fence（一行帶過）**：`ln x` 建構（需 `e^x` 單射）→ §4.5；Taylor／高階 MVT／L'Hôpital → 後章；本節**只交棒「`e^x` strictly increasing」給 §4.5**。
+- **不移走 MVT**（D4）：手稿把 Rolle/MVT 夾在指數章因 `ln` 需單調性；本章保留，未來 applications 專章再於 Mode B 僅提議移動——本節不動此決定。
+
+## 承重直覺（一節一個，領頭）
+**MVT 是「逐點導數資訊」通往「整段函數行為」的橋——而且是一條 existence 定理（只保證有個 `c`、不告訴你 `c` 在哪）。** 你不能光盯著導數值就斷言「`f'≥0 ⟹ f` 遞增」：導數是**一點**的資訊，遞增是**一整段**的性質，中間缺一座橋。MVT 就是那座橋：`(f(b)−f(a))/(b−a)=f'(c)` 把「兩端點的平均變化率」釘在「某內部點的瞬時變化率」上。幾何上——**某條內部切線必與割線平行**（§C-4 圖）。而整個證明是一招漂亮的化約階梯：**MVT「減掉割線」化約成 Rolle（兩端等高）→ Rolle 化約成「內部極值點導數為 0」（Thm A）→ Thm A 是雙單邊極限一逼即得**。三條定理像三節階梯，每節踩在前一節上。**這座橋一旦架好，立刻收割：`f'≥0 ⟹ 遞增`（Corollary），再套到 `e^x`（`(e^x)'=e^x>0`）就得 `e^x` 嚴格遞增——正是 §4.5 定義 `ln x` 所缺的最後一塊。** existence（不指明 `c`）這點要先打臉天真期待：MVT 不是給你 `c` 的公式，是保證 `c` 存在，後續論證**只能用存在性、不能用某個特定 `c`**（§C-5 strategy 第 3 條）。
+
+## worked example 清單（提案，待 ③）
+| # | 內容 | 取捨 |
+|---|---|---|
+| **Example 4.2(i)** | `sin x` on `[0,π/4]`：`(sin x)'=cos x>0` ⟹ `sin x_2>sin x_1`（strictly increasing） | **收**（手稿原有；Corollary 的第一個應用、低風險具體錨） |
+| **Example 4.2(ii)** | `e^x` on ℝ：`(e^x)'=e^x>0` ⟹ `e^{x_2}>e^{x_1}` ⟹ **`e^x` strictly increasing on ℝ** | **收（承重）**（手稿原有；本節**通往 §4.5 的交棒點**，必收。§C-7 補一行 `e^x>0` 依據；§C-6c 一句「every `[a,b]`⟹ℝ」） |
+| —（提案略過）— | 額外的「直接套 MVT」數值 worked example（如某 `f` 在 `[a,b]` 找 `c`） | **提案：不加**。本節已 3 證＋Corollary＋圖＋strategy＋2 例，密度足；strategy 的 `|x|` on `[−1,1]` 反例已示範 hypothesis-checking。加數值例有 over-expansion 風險。③ 若要一個「正面套 MVT」錨，可考慮極小一例（如 `f(x)=x²` on `[0,2]`，`c=1`）——**低優先、預設不收**。 |
+
+> **自創題政策**：上述兩 Example 皆手稿原有、非自創；不產 bare your-turn exercise（root README §防護欄）。
+
+## history / application
+- **history**：**提案一句、可選**。Rolle's theorem 名出 Michel Rolle（1691，原為多項式情形）；MVT 的現代形式由 Cauchy 形式化。**手稿無此**——若收，須標 `[source: standard calculus-textbook historical note]`、限一句、不展開。**預設：略**（本節已密、史實在此為裝飾，留白勝 padding）。③ 取捨。
+- **application**：**本節的 application 就是 Corollary 本身**（`f'≥0⟹遞增`）＋兩 Example——MVT 的「真實用途」是內部的單調性收割，非外部情境。**不另放裝飾性 real-world application**（避免稀釋證明階梯）。
+
+## 強調 / takeaway
+- **概念樞紐**：**existence 定理把逐點導數翻成整段行為**——MVT 是微分學「由量化導數資訊抽取定性函數資訊」的中央引擎（後續 Taylor、L'Hôpital、單調性／凹凸全經它）。Thm A→Rolle→MVT 是「化約到更簡單情形」的範例階梯。
+- **可攜技能**：(1) **套 MVT/Rolle 前先驗 hypotheses**（[a,b] 連續、(a,b) 可微，兩者不對稱；§C-5 strategy）；(2) **「減掉割線」把一般情形化約成對稱情形**（MVT→Rolle 的 `g` 技巧，後續證明常用）；(3) **existence 結論只能用存在性**（MVT 不給特定 `c`）。
+- **依賴鏈 takeaway**：`完備性（§4.1）→ EVT → Thm A → Rolle → MVT → (f'≥0⟹遞增) → (e^x)'=e^x>0（§4.3）⟹ e^x 嚴格遞增 → §4.5 定義 ln x`。本節是這條鏈的中段樞紐。
+
+## 刻意不寫（餵 auditor 作 direction-conformance 反向檢查）
+| 不寫什麼 | 理由 | 它該去哪 |
+|---|---|---|
+| **`ln x` 的建構／定義／導數** | 需 `e^x` 單射（本節交棒「strictly increasing」即止） | §4.5 |
+| **EVT 的證明** | 完備性依賴、論證冗長；手稿＋legacy 皆陳述不證 | 留白（當 black box，cross-ref 完備性） |
+| **Taylor 定理／高階 MVT／Cauchy MVT** | 超出本節；MVT 的推廣 | 後章 |
+| **L'Hôpital 法則** | 用 MVT/Cauchy MVT，屬後章 | 後章 |
+| **§4.3 `(e^x)'=e^x` 的重證** | Theorem 4.8 已證；`e^x` example 只援引 | §4.3（cross-ref） |
+| **把 MVT 移出 Ch4** | D4：本章保留；移動只在未來 applications 專章 Mode B 提議 | 未來 Mode B |
+| **積分／反導數框架的單調性** | 本節單調性走 MVT，非積分（積分未建） | —（不寫） |
+| **凹凸／二階導數判別法** | 超出本節（一階單調性即止） | 後章 |
+| 自創 bare your-turn exercise | README §防護欄禁 | —（自創一律寫成含解 worked example） |
+| **過度堆 caution／重複散文** | 本節已密；caution 取必要者（§C-6），勿每個假設都加框 | 保持精煉 |
+
+## 篇幅帶（護欄非預算）
+**4–6 A4 print 頁**（全章最重節）。§4.4 ≈ opener（承 §4.3 closer 的 forward-fence：單調性需 `(e^x)'>0、下節 Rolle/MVT）＋ Definition 4.3（max/min）＋`cos x` 例 ＋ Theorem 4.9（EVT，陳述不證）＋ Theorem 4.10（Thm A＋證）＋ Theorem 4.11（Rolle＋證）＋ Theorem 4.12（MVT＋證）＋ **Figure 4.2**（割線–切線）＋ Strategy 4.2（套 MVT）＋ Corollary 4.3（monotonicity，雙條）＋ Example 4.2（sin、`e^x`）＋ 收尾（交棒 §4.5）。**明顯超出 6 頁 → 回查是否堆了過多 caution／重複散文**（本節風險＝證明階梯不紮實 vs caution 灌水兩端，非缺料）。ch04 數學含多行 aligned 單邊極限、分式割線 → ④ 後查 print overflow（PLAN §6；多行 `aligned` 易裂頁）。
+
+---
+
+## A. 編號 ledger 提案（§4.4；接 §4.3 ledger，自 Definition 4.3／Theorem 4.9 起；④ 落定後回填 PLAN §5）
+
+> §4.1–§4.3 已 mint：Definition 4.1–4.2、Theorem 4.1–4.8、Proposition 4.1–4.2、Corollary 4.1–4.2、Strategy 4.1、Example 4.1、Figure 4.1、Remark 4.1–4.3。各型獨立 counter、跨節連續。Caution 無編號。
+
+| 型別 | §4.4 提案 | 說明 |
+|---|---|---|
+| **Definition** | `4.3`＝maximum / minimum point（含對偶 min） | 手稿 Def 1；本節第一個具名 Definition |
+| **Theorem** | `4.9`＝Extreme Value Theorem（陳述不證） | 手稿「Fact」具名；cross-ref 完備性（Theorem 4.1） |
+| | `4.10`＝Interior Extremum（手稿「Theorem A」）＋證 | env-name 提案「Interior Extremum (Theorem A)」保留手稿名（§C-8） |
+| | `4.11`＝Rolle's Theorem＋證 | Case 1/2；§C-1 修 (ii) 筆誤 |
+| | `4.12`＝Mean Value Theorem＋證 | 輔助 `g`；§C-4 圖 |
+| **Corollary** | `4.3`＝Monotonicity from `f'`（雙條：`≥0⟹`non-decreasing、`>0⟹`strictly increasing） | §C-2 補 strict 版（legacy 雙條） |
+| **Strategy** | `4.2`＝Applying the MVT（驗 hypotheses；`|x|` on `[−1,1]` 反例） | §C-5（ROADMAP 指派） |
+| **Figure** | `4.2`＝MVT secant–tangent（割線 dashed、`c` 平行 tangent solid） | §C-4（ROADMAP key figure） |
+| **Example** | `4.2`＝(i) `sin` on `[0,π/4]`＋(ii) `e^x` on ℝ（單一 Example 區塊兩項，忠實手稿） | §C-9（可選拆成 4.2/4.3；建議合一） |
+| **Remark** | （選配）`4.4`＝conceptual（Rolle＝MVT 平均斜率為 0 的特例／MVT 是中央 existence 引擎） | §C-10（可選；或併入 opener 散文） |
+| **Caution** | 無編號＝(a) Thm A interior 必要；(b) MVT closed/open 不對稱（與 Strategy 4.2 互補，擇一主述）；(c) 「every `[a,b]`⟹ℝ」延拓 | §C-6（取必要者，勿灌水） |
+| **Proposition** | **§4.4 不 mint 新 Proposition**（EVT/Thm A/Rolle/MVT 皆 Theorem） | Proposition `4.3` 留給 §4.5（如需） |
+
+> **編號自查（④）**：寫完逐一確認每個「by Theorem 4.1（完備性）／Theorem 4.8（`(e^x)'`）／Theorem 4.7（指數律）／Thm A／Rolle／MVT／Corollary 4.3」都對得到一個存在的 `env-num`；跨節引用（EVT→完備性 Theorem 4.1、`e^x` example→Theorem 4.8、`e^x>0`→Theorem 4.7）尤其查。Figure 4.2 為 ch04 第二張圖（接 Figure 4.1）。
+
+## B. 章基礎建設
+**N/A** —— §4.4 非首節。chapter standalone／`fragments/ch04/` 骨架／figures.js／`build.py` ch04 entry 皆 §4.1 已建、§4.2–§4.3 已沿用。§4.4 落地＝新增 `fragments/ch04/sec-4-4.html`、`build.py` 的 `CHAPTERS["ch04"].fragments` append `"sec-4-4"`、`chapter4-print-standalone.html` 嵌入式 `fragments:[…]` 同步 append（PLAN §6／§4.2–§4.3 整合實證：build.py 與 standalone 內嵌清單**須手動雙同步**）、續用手動編號 ledger。**動手前先讀 `sec-4-3.html` 末尾**確認各型 counter 收在哪（接續機制，PLAN §5：Theorem 收 4.8、Definition 4.2、Corollary 4.2、Proposition 4.2、Strategy 4.1、Example 4.1、Figure 4.1、Remark 4.3）。**Figure 4.2** 須照 ch04 figure 慣例（figures.js append 不覆蓋、SVG/inline、label economy；MVT 圖含曲線＋割線 dashed＋內部 `c` 平行 tangent solid＋`a`/`b`/`c` 標記）。
+
+## C. 待核對／存疑（③ 一併裁示）
+1. **【建議修】Rolle Case 2 (ii) 的筆誤**（seed §C-1 [請查核]）：手稿 p.14 (ii) 寫「`f(X_M)<f(a)`」，下標應為 `X_m`（p.15 解 (ii) 用 `X_m`、legacy line 612 亦作 `f(x_m)<f(a)`）。**提案：④ 照正確版寫 `f(X_m)<f(a)`**（min 在端點值之下 ⟹ min 內部）。③ 確認（建議修）。
+2. **【建議補】Corollary 4.3 的 strict 版**（seed §C-2 [請查核]）：手稿 Corollary 只給 `f'≥0⟹f(x_2)≥f(x_1)`（非嚴格），但 Example 下嚴格、且 §4.5 需 `e^x` **strictly** increasing（單射）。**提案：Corollary 4.3 寫雙條**——`f'(c)≥0 ∀c ⟹ f` non-decreasing（`f(x_1)≤f(x_2)`）；`f'(c)>0 ∀c ⟹ f` strictly increasing（`f(x_1)<f(x_2)`）（legacy line 705–710 即雙條，證即同一 MVT 商式分非嚴格/嚴格兩判）。③ 確認（建議補；否則 Example 的 strict 結論懸空）。
+3. **【建議】EVT（Theorem 4.9）的呈現**：具名「Extreme Value Theorem」、**陳述不證**（手稿明言）、cross-ref 完備性（Theorem 4.1）、一句「為何不證（完備性論證冗長、當 black box）」＋**一句「closed 區間＋continuous 兩條件皆必要」**（legacy remark 有 `f(x)=x` on `(0,1)` 無 max、不連續函數可失 max 的反例——提案至多一句帶過，不全展開兩反例以免膨脹）。③ 確認呈現深度（建議：具名＋不證＋cross-ref＋一句必要性）。
+4. **【建議收】Figure 4.2（MVT secant–tangent）**：ROADMAP §4.4 key figure。割線過 `(a,f(a))`、`(b,f(b))`（dashed），內部 `c` 處 tangent（solid）平行割線；標 `a`、`b`、`c`。**提案：收**（ROADMAP 指派、MVT 的承重幾何直覺）＋ MVT 陳述後一句散文點明「圖示：某內部切線平行割線」。③ 確認（建議收，ROADMAP mandate）。
+5. **【建議收】Strategy 4.2（Applying the MVT）**：ROADMAP §4.4 指派。三步——(1) 驗 `[a,b]` 連續（含端點）、(2) 驗 `(a,b)` 可微（端點不算）、(3) 結論只給存在性、不給特定 `c`。**反例**：`|x|` on `[−1,1]` 連續但 `0` 不可微，割線斜率 `0` 卻無 `c` 使 `|x|'(c)=0`（導數恆 `±1`）——示範 hypothesis-fail。③ 確認（建議收，ROADMAP mandate）。
+6. **【建議取必要者】Caution 清單**（無編號）：
+   - **(a) Thm A 的「interior」必要**：端點極值不必 `f'=0`（`f(x)=x` on `[0,1]` 端點取極值、`f'=1≠0`）。**建議收**（Thm A 的關鍵邊界、低成本）。
+   - **(b) MVT 的 closed/open 不對稱**：與 Strategy 4.2 重疊——**建議併入 Strategy 4.2**（不另開 caution，避免重複）。
+   - **(c)「every `[a,b]` ⟹ on ℝ」延拓**：`e^x` 由任意閉區間嚴格增推 ℝ 上嚴格增——**建議一句 note 附在 Example 4.2(ii)**（legacy 有對應 caution；不另開框）。
+   ③ 裁示收哪些（建議：(a) 收為 caution；(b) 併 Strategy；(c) 一句 note）。
+7. **【建議補一行】`e^x>0 ∀x` 的依據**（Example 4.2(ii)）：`x≥0` 級數逐項正、`x<0` 由指數律 `e^x=1/e^{−x}>0`（Theorem 4.7）。**提案：補一行**（否則 `(e^x)'=e^x>0` 的 `>0` 懸空）。③ 確認（建議補）。
+8. **【取捨】「Theorem A」命名**：手稿命名 interior-extremum 結果為「Thm A」（無通名）。**提案：env-name「Interior Extremum (Theorem A)」**（保留手稿名為副、補通用描述名）。③ 取捨（建議保留手稿名為副名）。
+9. **【取捨】Example 結構**：手稿單一「Example」含 (i)(ii)。**提案：合為 Example 4.2（兩項 (i) sin、(ii) `e^x`）**，忠實手稿；`e^x` 項為交棒 §4.5 的承重點。③ 可選拆成 Example 4.2/4.3（建議合一）。
+10. **【選配】Remark 4.4**：一句 conceptual——「Rolle 是 MVT 平均斜率為 0 的特例；MVT 是微分學中央 existence 引擎，後續單調性／Taylor 皆經它」。**提案：可收為 Remark 4.4，或併入 opener／MVT 後散文**（不另立框）。③ 取捨（建議：併入散文、不另開 Remark，除非要顯式索引）。
+11. **【方向】opener 措辭**：承 §4.3 closer 已 forward-fence「單調性需 `(e^x)'=e^x>0`、下節 Rolle/MVT」。**提案：opener 一段承接——本節暫離指數主線、建立 MVT 這座 existence 橋（逐點導數→整段行為），終點是 `f'≥0⟹遞增`、套到 `e^x` 收割嚴格單調、交棒 §4.5 的 `ln`**（legacy opener line 540–541 即此 framing）。③ 確認方向。
+
+## D. 章層決策落地（§4.4 相關；提案＋理由，待 ③ 拍板）
+- **D4 — MVT 留在 §4.4（不移走）。** 手稿把 Rolle/MVT 夾在指數章因 `ln` 建構需單調性 corollary；本章保留。未來 applications-of-differentiation 專章草擬時，再於 Mode B **僅提議**移走——**本節不動此決定、不自行移**。
+- **D1 — legacy tex 當 signed 數學 cross-check。** §4.4 的 Thm A／Rolle／MVT／Corollary 一律以 legacy §4.4＋§4.5-開頭段盲算對賬（已對：證法逐字一致；Case 2 筆誤經 legacy 證實），不照抄散文／結構。
+- **placement（PLAN §1/§2 已定）— Corollary＋兩 Example 收在 §4.4。** legacy 把 monotonicity corollary 放 §4.5 開頭；手稿頁序＋PLAN 放 §4.4（收在「`e^x` strictly increasing」）。§4.5 從此接手、**不重證**單調性。auditor 勿判「§4.4 收 Corollary＝越界／與 §4.5 重複」。
+
+---
+
+### 結構草圖（④ 照此寫；待 ③ 定案）
+§4.4 opener（承 §4.3 closer 的 forward-fence：單調性需 `(e^x)'=e^x>0`；本節暫離指數主線、建 MVT 這座「逐點導數→整段行為」的 existence 橋，終點 `f'≥0⟹遞增`、套 `e^x` 收割嚴格單調、交棒 §4.5。〔§C-11〕）→ **Definition 4.3**（max/min point，含對偶 min）＋`cos x` 例（具體錨）→ **Theorem 4.9**（EVT，陳述不證；cross-ref 完備性 Theorem 4.1；一句必要性〔§C-3〕）→ **Theorem 4.10**（Interior Extremum「Theorem A」〔§C-8〕＋證：`f(X_M+h)−f(X_M)≤0` → `h>0`/`k<0` 雙單邊極限 → `f'=0`；〔§C-6a〕一句 interior-必要 caution）→ **Theorem 4.11**（Rolle＋證：EVT 取 `X_m,X_M`；Case 1 常數／Case 2 內部極值〔§C-1 修筆誤〕）→ **Theorem 4.12**（MVT＋證：輔助 `g`＝曲線減割線、`g(a)=g(b)=0` → Rolle → `f'(c)=`平均斜率）＋ **Figure 4.2**（割線–切線〔§C-4〕＋一句幾何散文）＋ **Strategy 4.2**（套 MVT 驗 hypotheses〔§C-5〕，含 `|x|` 反例＋〔§C-6b〕closed/open 不對稱併此）→ **Corollary 4.3**（monotonicity 雙條〔§C-2〕＋證套 MVT 於 `[x_1,x_2]`）→ **Example 4.2**（(i) sin on `[0,π/4]`；(ii) `e^x` on ℝ〔§C-7 補 `e^x>0`、§C-9 合一、§C-6c 一句 every-`[a,b]`⟹ℝ〕→ **`e^x` strictly increasing on ℝ**）→ 收尾（〔§C-10 選配 Remark 4.4 或散文〕conceptual 一句；交棒 §4.5：`e^x` 嚴格遞增 ⟹ 單射 ⟹ 下節定義 `ln x`）。
+
+=== END DIRECTION BRIEF ===
+
+=== DRAFT (HTML fragment to review) ===
+
+<!-- §4.4 Rolle's Theorem and the Mean Value Theorem.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from _dev-archive/ch04/seed_ch04_s4.md (manuscript pp. 11–18). Direction
+     brief brief_s44.md approved at ③ (2026-06-21, "全照提案核可" + all four
+     optional add-ons selected). Numbering is MANUAL and CONTINUES from §4.1–§4.3:
+     those used Definition 4.1/4.2, Theorem 4.1–4.8, Proposition 4.1/4.2,
+     Corollary 4.1/4.2, Strategy 4.1, Example 4.1, Figure 4.1, Remark 4.1–4.3 —
+     so §4.4 mints Definition 4.3, Theorem 4.9 (EVT) / 4.10 (Theorem A) /
+     4.11 (Rolle) / 4.12 (MVT), Corollary 4.3, Strategy 4.2, Figure 4.2,
+     Example 4.2/4.3/4.4, Remark 4.4. No Proposition is minted here.
+     Cross-references are plain prose. Math cross-checked against the signed
+     legacy ground truth legacy/tex_handout/chapters/ch04_exponential_logarithm.tex
+     §4.4 (sec:rolle-and-mvt) and the monotonicity corollary at the head of §4.5
+     (cor:monotonicity).
+
+     ③ decisions (brief §C/§D, all approved; all four optional add-ons taken):
+       - §C-1 fix: the manuscript's Rolle Case 2 (ii) reads "f(X_M) < f(a)" but
+         resolves with X_m on the next page; this is a slip for "f(X_m) < f(a)"
+         (confirmed by legacy). The corrected form is used.
+       - §C-2 fill: the manuscript's Corollary states only f'≥0 ⟹ non-decreasing,
+         yet its examples conclude strict increase; Corollary 4.3 states BOTH forms
+         (≥0 ⟹ non-decreasing; >0 ⟹ strictly increasing), as §4.5 needs strict
+         monotonicity (injectivity) to define ln x. Legacy states both.
+       - §C-3: the EVT (Theorem 4.9) is stated WITHOUT proof (manuscript defers it
+         to completeness); a compact note records that both hypotheses are essential.
+       - §C-4 (ROADMAP key figure): Figure 4.2 — the MVT secant–tangent picture.
+       - §C-5 (ROADMAP strategy): Strategy 4.2 — verifying the MVT hypotheses,
+         with the |x| on [-1,1] counterexample and the closed/open asymmetry folded in.
+       - §C-6: a Thm-A interior-necessity caution; the every-[a,b]⟹ℝ note folded
+         into Example 4.4.
+       - §C-7: a one-line justification that e^x > 0 everywhere (Example 4.4).
+       - §C-8: Theorem 4.10 keeps the manuscript's name "Theorem A" as a subtitle.
+       - §C-9 (optional taken): the two corollary examples are SPLIT into
+         Example 4.3 (sin) and Example 4.4 (e^x).
+       - §C-10 (optional taken): Remark 4.4 is an explicit box (the existence-engine
+         synthesis), not folded into prose.
+       - history (optional taken): a one-sentence attribution of Rolle and the MVT
+         in the opener [source: standard calculus-textbook historical note].
+       - extra MVT worked example (optional taken): Example 4.2 applies the MVT
+         directly to f(x) = x^2 on [0, 2] (c = 1).
+       - D4: the MVT stays in this chapter (a forward-only fence to §4.5).
+     Counters handed to §4.5: Definition 4.4, Theorem 4.13, Proposition 4.3,
+     Corollary 4.4, Strategy 4.3, Example 4.5, Figure 4.3, Remark 4.5. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">4.4</span>Rolle's Theorem and the Mean Value Theorem</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: pivot from §4.3's closing fence (monotonicity needs an existence theorem). Frame the MVT as the bridge from pointwise derivative to interval behaviour. -->
+  <p>Section 4.3 ended with a promissory note: \(e^{x}\) has positive derivative everywhere, so it <em>ought</em> to be increasing, and once we know that we can invert it to build \(\ln x\). But "positive derivative" is information at a single point, while "increasing" is a statement about the function across a whole interval, and nothing built so far bridges the two. This section constructs that bridge. Its keystone is the <em>Mean Value Theorem</em> (MVT), the central existence theorem of differential calculus: on any interval where a function is continuous and differentiable inside, some interior point carries an instantaneous slope equal to the average slope across the interval. We reach it in two steps — first <em>Rolle's theorem</em>, the special case where the average slope is zero, then the MVT itself — after one preparatory result about where maxima and minima can sit.</p>
+
+  <!-- expansion:history [source: standard calculus-textbook historical note] — one-sentence attribution; not in the manuscript -->
+  <p>The special case is named for Michel Rolle, who stated it for polynomials in 1691; the general theorem and its modern proof belong to the nineteenth-century analysts, Cauchy among them, who made the derivative rigorous.</p>
+
+  <h3 class="subsec-head">Maxima, minima, and the extreme value theorem</h3>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.3</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be defined on a domain \(D \subseteq \mathbb{R}\), and let \(x_{0} \in D\). We call \(x_{0}\) a <em>maximum point</em> of \(f\) on \(D\) (and \(f(x_{0})\) the <em>maximum value</em>) if</p>
+      <p>\[ f(x_{0}) \ge f(x) \qquad \text{for every } x \in D, \]</p>
+      <p>and a <em>minimum point</em> (with <em>minimum value</em> \(f(x_{0})\)) if instead \(f(x_{0}) \le f(x)\) for every \(x \in D\).</p>
+      <p class="informal">A maximum point is where \(f\) attains its largest value on \(D\), a minimum point where it attains its smallest. A function may have several maximum points sharing one maximum value, or none at all when \(D\) is unbounded or open and \(f\) runs off to \(\pm\infty\).</p>
+    </div>
+  </section>
+
+  <p>For instance, \(x_{0} = 0\) is a maximum point of \(\cos x\) on \(\mathbb{R}\), with maximum value \(1\), since \(1 = \cos 0 \ge \cos x\) for every real \(x\).</p>
+
+  <p>Whether a function attains its extremes at all is a delicate matter on a general domain, but on a closed interval the answer is always yes. This is the foundational fact that drives everything below.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.9</span><span class="env-name">Extreme Value Theorem</span></p>
+    <div class="env-body">
+      <p>If \(f\) is continuous on a closed interval \([a, b]\), then \(f\) attains both a maximum and a minimum on \([a, b]\): there exist points \(x_{M}, x_{m} \in [a, b]\) with</p>
+      <p>\[ f(x_{m}) \le f(x) \le f(x_{M}) \qquad \text{for every } x \in [a, b]. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — the manuscript states this Fact without proof (completeness); record why, and that both hypotheses are essential -->
+  <p>We state this without proof. The argument rests on the completeness of \(\mathbb{R}\) (Theorem 4.1) and is the kind of lengthy analytic construction we set aside at this level; the theorem is used here as a black box. Both hypotheses are genuinely needed: on the <em>open</em> interval \((0, 1)\) the function \(f(x) = x\) attains no maximum — its values approach \(1\) without ever reaching it — and a discontinuous function can miss its extremes even on a closed interval. We will only ever apply the theorem to continuous functions on closed intervals, where it always delivers.</p>
+
+  <h3 class="subsec-head">Interior extrema: Theorem A</h3>
+
+  <p>The differential-calculus content is the next theorem: when an extreme value is attained strictly <em>inside</em> the interval — not at an endpoint — the derivative there must vanish.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.10</span><span class="env-name">Interior extremum (Theorem A)</span></p>
+    <div class="env-body">
+      <p>Suppose \(f\) is defined on \([a, b]\), the point \(x_{M} \in (a, b)\) is a maximum (or minimum) point of \(f\) on \([a, b]\), and \(f'(x_{M})\) exists. Then \(f'(x_{M}) = 0\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Take \(x_{M}\) to be a maximum point; the minimum case is identical with the inequalities reversed. Since \(f(x_{M}) \ge f(x)\) for all \(x \in [a, b]\),</p>
+      <p>\[ f(x_{M} + h) - f(x_{M}) \le 0 \]</p>
+      <p>for every increment \(h\) small enough that \(x_{M} + h\) stays in \([a, b]\). Because \(x_{M}\) lies in the open interior \((a, b)\), both small positive and small negative \(h\) are allowed. Dividing by \(h\) and watching the sign of the denominator:</p>
+      <p>\[ \frac{f(x_{M} + h) - f(x_{M})}{h} \le 0 \quad (h > 0), \qquad \frac{f(x_{M} + h) - f(x_{M})}{h} \ge 0 \quad (h < 0). \]</p>
+      <p>The derivative \(f'(x_{M})\) exists, so the one-sided limits both equal it. Letting \(h \to 0^{+}\) through positive values keeps the quotient \(\le 0\), and letting \(h \to 0^{-}\) through negative values keeps it \(\ge 0\):</p>
+      <p>\[ f'(x_{M}) = \lim_{h \to 0^{+}} \frac{f(x_{M} + h) - f(x_{M})}{h} \le 0, \qquad f'(x_{M}) = \lim_{h \to 0^{-}} \frac{f(x_{M} + h) - f(x_{M})}{h} \ge 0. \]</p>
+      <p>A single number that is both \(\le 0\) and \(\ge 0\) is \(0\), so \(f'(x_{M}) = 0\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the "interior" hypothesis is essential; endpoint extrema need not have zero derivative -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Theorem 4.10 needs \(x_{M}\) in the <em>open</em> interior \((a, b)\). At an endpoint the conclusion can fail: \(f(x) = x\) on \([0, 1]\) takes its minimum at \(x = 0\) and its maximum at \(x = 1\), yet \(f'(x) = 1 \ne 0\) everywhere. An endpoint offers only a one-sided increment, so the two-sided squeeze that forced \(f'(x_{M}) = 0\) is unavailable.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Rolle's theorem</h3>
+
+  <p>Rolle's theorem marries the two results above. The picture: if a function leaves and returns to the same height over \([a, b]\), it must turn around somewhere inside, and at that interior turning point — an extremum — the derivative is zero.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.11</span><span class="env-name">Rolle's theorem</span></p>
+    <div class="env-body">
+      <p>Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\), with \(f(a) = f(b)\). Then there exists a point \(c \in (a, b)\) such that \(f'(c) = 0\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By the extreme value theorem (Theorem 4.9), \(f\) attains a maximum at some \(x_{M} \in [a, b]\) and a minimum at some \(x_{m} \in [a, b]\), with \(f(x_{m}) \le f(x) \le f(x_{M})\) for all \(x \in [a, b]\). Write \(m = f(x_{m})\) and \(M = f(x_{M})\).</p>
+      <p><strong>Case 1: \(m = M\).</strong> Together with \(f(a) = f(b)\) this forces \(m = M = f(a) = f(b)\), so the bounds \(m \le f(x) \le M\) collapse and \(f\) is constant on \([a, b]\). Then \(f'(c) = 0\) for every \(c \in (a, b)\); choose any.</p>
+      <p><strong>Case 2: \(m &lt; M\).</strong> Since \(f(a) = f(b)\), the values \(m\) and \(M\) cannot both equal that common endpoint value, so at least one of</p>
+      <p>\[ f(x_{M}) > f(a) \qquad \text{or} \qquad f(x_{m}) < f(a) \]</p>
+      <p>holds. If \(f(x_{M}) > f(a) = f(b)\), then \(x_{M}\) is neither endpoint, so \(x_{M} \in (a, b)\); by Theorem 4.10, \(f'(x_{M}) = 0\), and we set \(c = x_{M}\). Otherwise \(f(x_{m}) < f(a) = f(b)\), the same argument places \(x_{m} \in (a, b)\), and Theorem 4.10 gives \(f'(x_{m}) = 0\) with \(c = x_{m}\). Either way an interior \(c\) with \(f'(c) = 0\) exists. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The Mean Value Theorem</h3>
+
+  <p>The MVT lifts the equal-endpoints restriction. Allow any two endpoint values, and the conclusion becomes that the derivative somewhere equals the <em>average</em> rate of change \((f(b) - f(a))/(b - a)\) — the slope of the secant joining the two endpoints.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.12</span><span class="env-name">Mean Value Theorem</span></p>
+    <div class="env-body">
+      <p>Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\). Then there exists a point \(c \in (a, b)\) such that</p>
+      <p>\[ f'(c) = \frac{f(b) - f(a)}{b - a}. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:figure — the canonical MVT picture (ROADMAP §4.4 key figure); registered in chapter4 FIGS as "mvt-secant-tangent" -->
+  <figure class="figure" data-fig="mvt-secant-tangent">
+    <figcaption><span class="fig-no">Figure 4.2</span> The Mean Value Theorem. The secant through \((a, f(a))\) and \((b, f(b))\) (dashed) has slope \((f(b) - f(a))/(b - a)\); the theorem guarantees an interior point \(c\) where the tangent (solid) is parallel to it. The proof tilts the picture by subtracting the secant, reducing the claim to Rolle's theorem.</figcaption>
+  </figure>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Subtract the secant line from \(f\). Define the auxiliary function</p>
+      <p>\[ g(x) = f(x) - \left[ f(a) + \frac{f(b) - f(a)}{b - a} (x - a) \right]. \]</p>
+      <p>The bracketed term is exactly the secant line through \((a, f(a))\) and \((b, f(b))\), so \(g(x)\) measures the vertical gap between the curve and that secant. It inherits the hypotheses of Rolle's theorem:</p>
+      <ul>
+        <li>\(g\) is continuous on \([a, b]\) and differentiable on \((a, b)\), being \(f\) minus a linear function;</li>
+        <li>\(g(a) = f(a) - f(a) = 0\) and \(g(b) = f(b) - f(b) = 0\), so \(g(a) = g(b)\).</li>
+      </ul>
+      <p>By Rolle's theorem (Theorem 4.11) there is a \(c \in (a, b)\) with \(g'(c) = 0\). Differentiating \(g\), the linear bracket contributes its constant slope, so</p>
+      <p>\[ 0 = g'(c) = f'(c) - \frac{f(b) - f(a)}{b - a}, \]</p>
+      <p>which rearranges to \(f'(c) = (f(b) - f(a))/(b - a)\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — Remark 4.4 (§C-10, optional taken): the existence-engine synthesis tying Theorem A → Rolle → MVT and pointing forward -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.4</span></p>
+    <div class="env-body">
+      <p>Rolle's theorem is precisely the MVT in the case \(f(a) = f(b)\), where the average slope is \(0\) — yet we proved Rolle <em>first</em> and recovered the MVT from it, because subtracting the secant always tilts the general situation back to level endpoints. The three results form a ladder: Theorem A, a statement about the derivative at one point, supports Rolle; Rolle adds the equal-endpoints hypothesis, and Rolle in turn supports the MVT for arbitrary endpoints. The MVT is the load-bearing rung. It is the standard device for turning pointwise information about \(f'\) into behaviour of \(f\) across an interval, and it returns every time we make that move — immediately below to read monotonicity off the sign of \(f'\), and later for Taylor's theorem and the error estimates that lean on it.</p>
+    </div>
+  </section>
+
+  <!-- expansion:strategy — Strategy 4.2 (§C-5, ROADMAP): verifying MVT hypotheses; |x| counterexample + closed/open asymmetry folded in (§C-6b) -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">4.2</span><span class="env-name">Applying the Mean Value Theorem</span></p>
+    <div class="env-body">
+      <p>To extract information about \(f'\) on an interval \([a, b]\) from the MVT:</p>
+      <ol class="steps">
+        <li>Check that \(f\) is continuous on the <em>closed</em> interval \([a, b]\) — endpoints included. Continuity at the endpoints is what lets the proof call on the extreme value theorem, which needs a closed interval.</li>
+        <li>Check that \(f\) is differentiable on the <em>open</em> interval \((a, b)\) — endpoints excluded. The endpoints need no derivative, since Rolle's theorem only ever touched the derivative at an interior point. (So \(f(x) = \sqrt{x}\) on \([0, 1]\), differentiable on \((0, 1)\) despite its vertical tangent at \(0\), is fair game.)</li>
+        <li>Read off the conclusion: there <em>exists</em> a \(c \in (a, b)\) with \(f'(c) = (f(b) - f(a))/(b - a)\). The theorem promises existence only; it does not say which \(c\), so any further argument may rely on the existence of such a \(c\), but not on any specific value.</li>
+      </ol>
+      <p>Skipping the checks is the usual mistake, and the conclusion can then be false. Take \(\lvert x \rvert\) on \([-1, 1]\): it is continuous everywhere but not differentiable at \(0\), so step 2 fails. The secant slope is \((\lvert 1 \rvert - \lvert -1 \rvert)/(1 - (-1)) = 0\), yet \(\lvert x \rvert' = \pm 1\) wherever it is defined and never \(0\) — there is no valid \(c\), exactly because the differentiability hypothesis was missing.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 4.2 (optional taken): a direct MVT application where c can be found explicitly -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.2</span></p>
+      <div class="env-body">
+        <p>Apply the Mean Value Theorem to \(f(x) = x^{2}\) on \([0, 2]\), and locate a point \(c\) it guarantees.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The function \(x^{2}\) is continuous on \([0, 2]\) and differentiable on \((0, 2)\), so both hypotheses hold. The average rate of change is</p>
+        <p>\[ \frac{f(2) - f(0)}{2 - 0} = \frac{4 - 0}{2} = 2. \]</p>
+        <p>The MVT promises a \(c \in (0, 2)\) with \(f'(c) = 2\). Here \(f'(x) = 2x\), so \(2c = 2\) gives \(c = 1\), which indeed lies in \((0, 2)\). For this simple \(f\) we could solve for \(c\) outright; in general the theorem hands us only the existence of such a \(c\), and the arguments below are built to need nothing more. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Monotonicity from the sign of the derivative</h3>
+
+  <p>Now the payoff. The MVT converts the sign of the derivative directly into monotonic behaviour, turning the qualitative slogan "positive derivative means increasing" into a theorem.</p>
+
+  <!-- expansion:formula — Corollary 4.3 (§C-2): both forms stated; the strict form is what §4.5 needs (the manuscript states only the non-strict form, yet its examples conclude strict) -->
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">4.3</span><span class="env-name">Monotonicity from the sign of \(f'\)</span></p>
+    <div class="env-body">
+      <p>Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\).</p>
+      <ul>
+        <li>If \(f'(c) \ge 0\) for every \(c \in (a, b)\), then \(f(x_{1}) \le f(x_{2})\) whenever \(a \le x_{1} < x_{2} \le b\): \(f\) is non-decreasing on \([a, b]\).</li>
+        <li>If \(f'(c) > 0\) for every \(c \in (a, b)\), then \(f(x_{1}) < f(x_{2})\) whenever \(a \le x_{1} < x_{2} \le b\): \(f\) is strictly increasing on \([a, b]\).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x_{1} < x_{2}\) in \([a, b]\). The hypotheses hold on the subinterval \([x_{1}, x_{2}]\) as well, so by the MVT (Theorem 4.12) there is a \(c \in (x_{1}, x_{2})\) with</p>
+      <p>\[ \frac{f(x_{2}) - f(x_{1})}{x_{2} - x_{1}} = f'(c). \]</p>
+      <p>The denominator \(x_{2} - x_{1}\) is positive. If \(f'(c) \ge 0\) the numerator \(f(x_{2}) - f(x_{1})\) is \(\ge 0\), giving \(f(x_{1}) \le f(x_{2})\); if \(f'(c) > 0\) it is strictly positive, giving \(f(x_{1}) < f(x_{2})\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>Two applications close the section — the second is the one we have been working toward.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.3</span></p>
+      <div class="env-body">
+        <p>Show that \(\sin x\) is strictly increasing on \([0, \tfrac{\pi}{4}]\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>On \((0, \tfrac{\pi}{4})\) the derivative \((\sin x)' = \cos x\) is positive, since cosine is positive on \((0, \tfrac{\pi}{2})\). By the strict half of Corollary 4.3, \(\sin x\) is strictly increasing on \([0, \tfrac{\pi}{4}]\): for \(0 \le x_{1} < x_{2} \le \tfrac{\pi}{4}\), \(\sin x_{1} < \sin x_{2}\). <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.4</span></p>
+      <div class="env-body">
+        <p>Show that \(e^{x}\) is strictly increasing on all of \(\mathbb{R}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>By Theorem 4.8, \((e^{x})' = e^{x}\). This derivative is positive everywhere: for \(x > 0\) every term of \(\sum x^{n}/n!\) is positive, at \(x = 0\) the sum is \(e^{0} = 1 > 0\), and for \(x < 0\) the exponent law (Theorem 4.7) gives \(e^{x} = 1/e^{-x} > 0\). So on any closed interval \([x_{1}, x_{2}]\) the strict half of Corollary 4.3 applies and yields \(e^{x_{1}} < e^{x_{2}}\).</p>
+        <!-- expansion:intuition — §C-6c: the every-[a,b] ⟹ all-of-ℝ extension, noted in one line -->
+        <p>Because any two reals \(x_{1} < x_{2}\) lie in some such closed interval, this holds for every pair, and \(e^{x}\) is strictly increasing on \(\mathbb{R}\). (Strict monotonicity passes from every closed interval to the whole line this way. Not every interval property survives such a passage — boundedness, for one, can be lost — but strict monotonicity does.) <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close: e^x strictly increasing ⟹ injective ⟹ §4.5 can define ln x as its inverse (minimal hand-off only; §4.5's continuity/derivative program is NOT previewed — gate-2 §4.5-scope-leak fix) -->
+  <p>That last example is the result the chapter has been driving at. A strictly increasing function is one-to-one, so \(e^{x}\) has a genuine inverse on its range; the next section defines that inverse, the natural logarithm \(\ln x\).</p>
+
+</article>
+
+=== END DRAFT ===
+
+=== KEY HTML WRITING RULES (advisory -- for house_rule findings) ===
+- Semantic env classes: env-definition, env-theorem, env-proposition, env-corollary, env-example (inside .workedexample with env-solution), env-remark, env-proof, env-caution, env-strategy; NO env-exercise (the handout ships no exercises). §4.4 uses env-definition (Definition 4.3), env-theorem (Theorems 4.9-4.12), env-caution (Theorem A interior caution, unnumbered), env-strategy (Strategy 4.2), env-remark (Remark 4.4), env-corollary (Corollary 4.3), env-example/env-solution (Examples 4.2-4.4), env-proof; their bodies auto-italicize where applicable.
+- Qualified proofs keep env-kicker "Proof"; env-name carries any qualifier. House style, not a finding. Caution is UNNUMBERED (matches ch02-ch04 precedent).
+- Math (MathJax 4): inline \(...\), display \[...\], multi-line \begin{aligned}; \lvert..\rvert, \tfrac, \frac, \le/\ge, \mathbb{R} all render (verified: 0 MathJax errors, 22 print pages total, 0 overflow).
+- Manual numbering: env-num / sec-no; per-type counters CONTINUE Chapter 4 across sections (see NUMBERING NOTE above).
+- Cross-references: plain prose ("by the extreme value theorem (Theorem 4.9)", "by Theorem 4.10", "Corollary 4.3", "Theorem 4.8", "Chapter 3") -- NO \cref, NO hyperlinks.
+- Expansion markers: <!-- expansion:category --> HTML comment before each non-seed addition; valid categories: history, application, formula, summary, figure, example, intuition, strategy, caution. Seed-derived theorems/proofs correctly carry no expansion marker.
+=== END HTML WRITING RULES ===
+
+Now review the DRAFT against the SEED, DIRECTION BRIEF, and HTML WRITING RULES. Return strict JSON.

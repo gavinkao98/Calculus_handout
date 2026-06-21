@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§4.4 — gate 2（Codex gpt-5.5 xhigh）審核稿</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f7f5;color:#1d1d1f;font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.6;padding:32px 18px 80px}
+.wrap{max-width:940px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 4px}
+h2{font-size:1.16rem;margin:30px 0 6px;padding-bottom:6px;border-bottom:2px solid #e4e4e0}
+.lede{color:#6b6b70;margin:0 0 16px;font-size:.93rem}
+.note{background:#fff;border:1px solid #e4e4e0;border-left:3px solid #2552b3;border-radius:8px;padding:12px 16px;margin:14px 0;font-size:.93rem}
+.note.pass{background:#eaf6ed;border-left-color:#1a7f37}
+.note.pass b{color:#1a7f37}
+.note.warn{background:#fff6e3;border-left-color:#8a5a00}
+.zero{color:#1a7f37;font-weight:700}.blkw{color:#a11;font-weight:700}
+table.u{width:100%;border-collapse:collapse;margin:10px 0;font-size:.83rem}
+table.u th,table.u td{border:1px solid #e4e4e0;padding:6px 8px;text-align:left;vertical-align:top}
+table.u th{background:#eef0f4}
+table.u td.src{color:#5b3aa8}
+td.fx{color:#7a5b00}
+.card{background:#fff;border:1px solid #e4e4e0;border-radius:10px;padding:12px 15px;margin:11px 0}
+.card.applied{border-left:4px solid #1a7f37}.card.kept{border-left:4px solid #9aa}
+.card.blk{border-left:4px solid #a11}.card.adv{border-left:4px solid #8a5a00}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;align-items:center}
+.chip{font-size:.74rem;padding:2px 9px;border-radius:999px;font-weight:600;letter-spacing:.02em}
+.c-cat{background:#e7eefc;color:#1f49a6}
+.c-app{background:#e6f7ea;color:#1a7f37}.c-kept{background:#eef0f4;color:#555}
+.c-blk{background:#fdeceb;color:#a11}.c-adv{background:#eef0f4;color:#555}.c-lvl{background:#1d1d1f;color:#fff;font-family:ui-monospace,Menlo,Consolas,monospace}
+.where{color:#6b6b70;font-size:.85rem;margin:2px 0 6px}.ev{font-size:.84rem;color:#555;margin:3px 0}
+.issue{margin:2px 0 6px}.sug{font-size:.84rem;color:#555;margin:3px 0}
+.disp{font-weight:700}.disp.applied{color:#1a7f37}.disp.kept{color:#6b6b70}
+footer{margin-top:40px;color:#6b6b70;font-size:.85rem;border-top:1px solid #e4e4e0;padding-top:14px}
+a{color:#2552b3}
+code{background:#f3f4f6;padding:.05rem .3rem;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>§4.4 — gate 2（Codex gpt-5.5 xhigh）審核稿</h1>
+<p class="lede">第二道閘（計費，使用者同意；含 run2）：Codex CLI 唯讀 reviewer、<code>--output-schema</code> 結構化輸出。§4.4 run1 1 blocking（§4.5 scope leak）→ 修 → run2 converged。2026-06-21。</p>
+<div class='note pass'><b>最終：<span class='zero'>run 2 converged（0 blocking）</span></b>　·　run 1 出 <span class='blkw'>1 blocking</span>（direction-conformance：收尾越界預覽 §4.5 的 continuity／derivative 內容）→ 裁去多餘預覽、只留最小交棒 → <b>run 2 converged 0 finding</b>（與 §4.1／§4.2 同型：run1 blocking→run2 clean）。停在一次乾淨 audit。修後回歸 render 0 err／22 頁／0 overflow。</div><div class='note warn'><b>run 1 摘要：</b>The proof ladder Theorem 4.10 → Rolle → MVT → Corollary is mathematically sound, including the Rolle Case 2 correction, MVT auxiliary function, strict/non-strict monotonicity split, and all three examples. The only blocking issue is the §4.5 scope leak in the closing paragraph.</div><p class='lede'>原始裁決檔（計費產物）：<code>result_s44.json</code>（run1）／<code>result_s44_r2.json</code>（run2）；prompt：<code>prompt_s44.txt</code>（<code>build_prompt_s44.py</code> 產，74.7KB）。模型 Codex <code>gpt-5.5</code>／reasoning <code>xhigh</code>、唯讀 sandbox、<code>--output-schema schema.json</code>、prompt 由 Bash <code>&lt; file</code> 餵原始 UTF-8。tokens：run1 ≈ 48.1k＋run2 ≈ 54.5k ≈ 102.6k。</p><h2>審核對象（已寫入單元）</h2><table class='u'><tr><th>已寫入單元</th><th>locus</th><th>source</th><th>gate 修正／備註</th></tr><tr><td><b>§4.4 opener (existence-bridge + history)</b></td><td>節首動機散文</td><td class='src'>expansion:intuition（承 §4.3 closer 的 forward-fence）＋expansion:history（Rolle 1691／Cauchy 一句，[source: standard note]）</td><td class='fx'></td></tr><tr><td><b>Definition 4.3 (max/min) + cos x anchor</b></td><td>子節 Maxima, minima…</td><td class='src'>seed（手稿 p.11 Def 1＋Ex）</td><td class='fx'>對偶 min 折入；cos x 為 inline 具體錨（非編號 Example）</td></tr><tr><td><b>Theorem 4.9 — Extreme Value Theorem</b></td><td>EVT，陳述不證</td><td class='src'>seed「Fact」（手稿 p.12）</td><td class='fx'>§C-3：具名、cross-ref 完備性 Thm 4.1、一句兩條件皆必要</td></tr><tr><td><b>Theorem 4.10 — Interior Extremum (Theorem A) + Proof</b></td><td>interior extremum ⟹ f'=0</td><td class='src'>seed（手稿 pp.12–13）</td><td class='fx'>§C-8 保留手稿名「Theorem A」為副名；§C-6a interior-必要 caution</td></tr><tr><td><b>Theorem 4.11 — Rolle + Proof</b></td><td>Case 1／Case 2</td><td class='src'>seed（手稿 pp.13–15）</td><td class='fx'><b>§C-1 修 Case 2 (ii) 筆誤</b>：f(X_m)&lt;f(a)（手稿誤作 X_M；對賬 legacy line 612）</td></tr><tr><td><b>Theorem 4.12 — Mean Value Theorem + Proof</b></td><td>輔助 g＝曲線減割線</td><td class='src'>seed（手稿 pp.15–17）</td><td class='fx'>g(a)=g(b)=0 → Rolle → f'(c)=平均斜率；gate-1／gate-2 對賬 legacy 全等</td></tr><tr><td><b>Figure 4.2 — MVT secant–tangent</b></td><td>MVT 後</td><td class='src'>expansion:figure（ROADMAP §4.4 key figure）</td><td class='fx'>JS FIGS『mvt-secant-tangent』；render 證 tangent 與 secant 數值平行、於內部 c 觸線</td></tr><tr><td><b>Remark 4.4 — existence-engine synthesis</b></td><td>MVT 後</td><td class='src'>expansion:intuition（§C-10 選配，已取）</td><td class='fx'>gate-1 prose：拆 which→which 鏈</td></tr><tr><td><b>Strategy 4.2 — Applying the MVT</b></td><td>驗 hypotheses</td><td class='src'>expansion:strategy（§C-5，ROADMAP）</td><td class='fx'>|x| on [−1,1] 反例＋closed/open 不對稱折入；gate-1 prose：step3 措辭去壓縮</td></tr><tr><td><b>Corollary 4.3 — Monotonicity (both forms) + Proof</b></td><td>f'≥0⟹non-decr；f'&gt;0⟹strict</td><td class='src'>seed（手稿 p.18）</td><td class='fx'><b>§C-2 補 strict 版</b>（手稿僅非嚴格、Example 卻嚴格；§4.5 需單射）</td></tr><tr><td><b>Example 4.2 — MVT on x² (c=1)</b></td><td>套 MVT 找 c</td><td class='src'>expansion:example（選配 MVT 數值例，已取）</td><td class='fx'>x² on [0,2]：avg slope 2、c=1∈(0,2)</td></tr><tr><td><b>Example 4.3 — sin on [0,π/4]</b></td><td>Corollary 應用 (i)</td><td class='src'>seed（手稿 p.18）</td><td class='fx'>§C-9：拆為獨立 Example（選配，已取）</td></tr><tr><td><b>Example 4.4 — e^x strictly increasing on ℝ</b></td><td>Corollary 應用 (ii)；交棒 §4.5</td><td class='src'>seed（手稿 pp.18–19）</td><td class='fx'>§C-7 補 e^x>0 依據、§C-6c every-[a,b]⟹ℝ；gate-1 math：x>0/x=0 精準化；prose：拆雙層括</td></tr><tr><td><b>Closer — hand-off to §4.5</b></td><td>節末</td><td class='src'>expansion:summary（§C 交棒）</td><td class='fx'><b>gate-2 run1 blocking 修</b>：裁去 §4.5 內容預覽（continuity/derivative），只留最小交棒</td></tr></table><h2>run 1 裁決（1 blocking → 已修）</h2><div class='card blk'><div class='chips'><span class='chip c-blk'>BLOCKING</span><span class='chip c-cat'>direction-conformance</span><span class='chip c-lvl'>L1</span><span class='chip c-adv'>high</span></div><div class='where'>Closing paragraph after Example 4.4</div><div class='issue'>The draft goes beyond the allowed §4.4 hand-off into §4.5 by naming upcoming continuity and derivative work for \(\ln x\). The brief allows only the forward fence that \(e^x\) is strictly increasing/invertible and that the next section builds \(\ln x\).</div><div class='ev'>證據：“The next section names that inverse \(\ln x\), establishes its continuity from the strict monotonicity just proved, and computes \(\frac{d}{dx} \ln x\) rigorously …”</div><div class='sug'>建議：Trim the close to the permitted hand-off: \(e^x\) is strictly increasing, hence one-to-one/invertible on its range, so §4.5 builds \(\ln x\).</div></div><h2>run 2 裁決（converged：true，0 finding）</h2><div class='note pass'>No blocking findings. The Theorem 4.10 -&gt; Rolle -&gt; MVT -&gt; Corollary proof ladder is mathematically sound, the Rolle Case 2 branch correctly uses the minimum point, the strict/non-strict monotonicity split is correct, and the approved expansions stay within the direction brief without smuggling in forbidden material.</div><p class='lede'>（無 findings — 0 blocking／0 advisory）</p>
+<footer>產生器：<code>REVIEW-s44.gen.py</code>　·　成品：<a href="../../../chapter4-print-standalone.html">chapter4-print-standalone.html</a>　·　另一閘：見同目錄 <code>REVIEW-ch04_s44-gate1.html</code>。</footer>
+</div>
+</body>
+</html>
