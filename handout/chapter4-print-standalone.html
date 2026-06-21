@@ -818,6 +818,140 @@ window.MathJax = {
 
 </article>
 </template>
+
+<template id="frag-sec-4-3">
+<!-- §4.3 The Derivative of e^x.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from _dev-archive/ch04/seed_ch04_s3.md (manuscript pp. 10–11). Direction
+     brief brief_s43.md approved at ③ (2026-06-21, "全照提案核可"). Numbering is
+     MANUAL and CONTINUES from §4.1–§4.2: those used Definition 4.1/4.2,
+     Theorem 4.1–4.7, Proposition 4.1, Corollary 4.1, Strategy 4.1, Example 4.1,
+     Figure 4.1, Remark 4.1/4.2 — so §4.3 starts at Theorem 4.8, Proposition 4.2,
+     Corollary 4.2, Remark 4.3. No new Definition is minted here (the derivative
+     was defined in Chapter 2); Definition 4.3 is left for a later section.
+     Cross-references are plain prose. Math cross-checked against the signed
+     legacy ground truth legacy/tex_handout/chapters/ch04_exponential_logarithm.tex
+     §4.3 (sec:rigorous-derivative-of-exp).
+
+     ③ decisions (brief §C/§D, all approved):
+       - D-redundancy: the opener cross-references Chapter 2's informal
+         term-by-term derivation of (e^x)' = e^x and frames this section as the
+         rigorous redo with an explicit bound. Chapter 2 is NOT edited (its
+         restructure into a forward-reference is deferred until both chapters
+         are signed off).
+       - §C-1 fill: the manuscript asserts the bracket "[ 1/2 + |h|/3! + … ] ≤ 1"
+         without proof; the handout supplies the one-line geometric comparison
+         (n! ≥ 2^{n-1}), which also serves as the approved light back-reference
+         to Strategy 4.1 (§C-5).
+       - §C-3 (approved): Corollary 4.2 records the higher derivatives
+         (e^x)^{(n)} = e^x (manuscript stops at the first derivative; legacy adds it).
+       - §C-4 (approved): a single forward-hook sentence notes that slope = value
+         is what makes e^x the modelling function (y' = ky); the full ODE/half-life
+         treatment is deferred to the chapter's end.
+       - No worked examples, no figures (shortest, purely deductive section;
+         no ROADMAP key figure).
+     Counters handed to §4.4: Definition 4.3, Theorem 4.9, Proposition 4.3,
+     Corollary 4.3, Remark 4.4. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">4.3</span>The Derivative of \(e^{x}\)</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: §4.2 gave continuity, positivity, exponent law; now harvest the derivative. Cross-ref Chapter 2's informal version (D-redundancy); Chapter 2 is not edited. -->
+  <p>With Section 4.2 finished, \(e^{x}\) is a fully legitimate function on \(\mathbb{R}\): defined by its power series, continuous, strictly positive, and obeying the exponent law \(e^{x} e^{y} = e^{x + y}\). One classical fact about it is still owed a rigorous proof — its derivative. Chapter 2 already computed \(\frac{d}{dx} e^{x} = e^{x}\), but by a casual term-by-term argument that fed the series into the difference quotient and observed that all but the leading term seemed to drop out as \(h \to 0\). That argument was correct in spirit, yet it leaned on three properties — convergence, continuity, and the exponent law — that had not been established at the time. Now that all three are theorems, we can re-derive the formula honestly. We also gain something the earlier pass skipped: an <em>explicit</em> bound that shows exactly how fast the difference quotient settles to its limit.</p>
+
+  <h3 class="subsec-head">The difference quotient</h3>
+
+  <!-- expansion:formula — the exponent law factors the difference quotient; e^x pulls out, reducing everything to one limit at 0 -->
+  <p>The entire calculation rests on a single algebraic move, and that move is the exponent law. For a fixed \(x\) and a nonzero increment \(h\), Theorem 4.7 gives \(e^{x + h} = e^{x} e^{h}\), so</p>
+
+  <p>\[ \frac{e^{x + h} - e^{x}}{h} = \frac{e^{x} e^{h} - e^{x}}{h} = \left( \frac{e^{h} - 1}{h} \right) e^{x}. \]</p>
+
+  <p>The factor \(e^{x}\) does not depend on \(h\). The whole derivative therefore collapses onto one limit, taken at the single point \(0\):</p>
+
+  <p>\[ \frac{d}{dx} e^{x} = \left( \lim_{h \to 0} \frac{e^{h} - 1}{h} \right) e^{x}, \qquad \text{provided } \lim_{h \to 0} \frac{e^{h} - 1}{h} \text{ exists.} \]</p>
+
+  <p>Everything now hinges on showing that this limit equals \(1\). The series makes it transparent, and — unlike the Chapter 2 pass — it lets us put a number on the rate of approach.</p>
+
+  <!-- expansion:intuition — Proposition 4.2: the explicit bound on (e^h−1)/h − 1. Supplies the manuscript's omitted "bracket ≤ 1" step via a geometric comparison (Strategy 4.1). -->
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>For every nonzero \(h\) with \(\lvert h \rvert < \tfrac{1}{2}\),</p>
+      <p>\[ \left\lvert \frac{e^{h} - 1}{h} - 1 \right\rvert \le \lvert h \rvert. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By the series definition, valid for every real \(h\) since Section 4.2,</p>
+      <p>\[ e^{h} = \sum_{n=0}^{\infty} \frac{h^{n}}{n!} = 1 + h + \frac{h^{2}}{2!} + \frac{h^{3}}{3!} + \cdots. \]</p>
+      <p>Subtracting \(1\) and dividing by \(h \ne 0\) shifts every index down by one, and the constant term \(1\) then cancels the \(-1\):</p>
+      <p>\[ \frac{e^{h} - 1}{h} - 1 = \sum_{n=2}^{\infty} \frac{h^{n - 1}}{n!} = \frac{h}{2!} + \frac{h^{2}}{3!} + \frac{h^{3}}{4!} + \cdots. \]</p>
+      <p>Take absolute values term by term and factor out one power of \(\lvert h \rvert\):</p>
+      <p>\[ \left\lvert \frac{e^{h} - 1}{h} - 1 \right\rvert \le \sum_{n=2}^{\infty} \frac{\lvert h \rvert^{n - 1}}{n!} = \lvert h \rvert \sum_{n=2}^{\infty} \frac{\lvert h \rvert^{n - 2}}{n!}. \]</p>
+      <p>It remains to see that the trailing sum is at most \(1\). Since \(\lvert h \rvert < \tfrac{1}{2} < 1\) and \(n - 2 \ge 0\), every factor \(\lvert h \rvert^{n - 2} \le 1\), so the sum is bounded by \(\sum_{n=2}^{\infty} 1/n!\). The same geometric comparison behind Strategy 4.1 controls that constant: \(n! = 2 \cdot 3 \cdots n \ge 2^{n - 1}\), hence</p>
+      <p>\[ \sum_{n=2}^{\infty} \frac{1}{n!} \le \sum_{n=2}^{\infty} \frac{1}{2^{n - 1}} = \frac{1}{2} + \frac{1}{4} + \frac{1}{8} + \cdots = 1. \]</p>
+      <p>Therefore \(\sum_{n=2}^{\infty} \lvert h \rvert^{n - 2}/n! \le 1\), and the displayed inequality gives \(\left\lvert (e^{h} - 1)/h - 1 \right\rvert \le \lvert h \rvert\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — Remark 4.3: this bound is the rigorous upgrade of Chapter 2's "vanishes as h→0" — an explicit linear rate -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.3</span></p>
+    <div class="env-body">
+      <p>Proposition 4.2 is precisely the quantitative content the Chapter 2 derivation left unstated. There the higher-order terms were said to “vanish as \(h \to 0\),” with no measure of how fast; here the deviation of \(\frac{e^{h} - 1}{h}\) from \(1\) is pinned at no more than \(\lvert h \rvert\) — convergence at a rate at least linear in \(h\). For ordinary differentiation the qualitative statement suffices, but any later argument that must track the size of a derivative error — Taylor remainders, numerical estimates — uses the explicit bound, not the bare limit.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The derivative formula</h3>
+
+  <p>The bound delivers the limit at once, and with it the derivative.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.8</span></p>
+    <div class="env-body">
+      <p>The function \(e^{x}\) is differentiable at every real \(x\), and</p>
+      <p>\[ \frac{d}{dx} e^{x} = e^{x}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By Proposition 4.2, for \(0 < \lvert h \rvert < \tfrac{1}{2}\) we have \(\bigl\lvert \tfrac{e^{h} - 1}{h} - 1 \bigr\rvert \le \lvert h \rvert\), and the right-hand side tends to \(0\) as \(h \to 0\). Hence</p>
+      <p>\[ \lim_{h \to 0} \frac{e^{h} - 1}{h} = 1. \]</p>
+      <p>Returning to the difference quotient and pulling the \(h\)-independent factor \(e^{x}\) out of the limit,</p>
+      <p>\[ \lim_{h \to 0} \frac{e^{x + h} - e^{x}}{h} = \lim_{h \to 0} \left( \frac{e^{h} - 1}{h} \right) e^{x} = 1 \cdot e^{x} = e^{x}. \]</p>
+      <p>The limit exists for every \(x\), so \(e^{x}\) is differentiable on \(\mathbb{R}\) with \(\frac{d}{dx} e^{x} = e^{x}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — Corollary 4.2 (§C-3 approved): higher derivatives all equal e^x, by iteration -->
+  <p>Because differentiating \(e^{x}\) returns \(e^{x}\) unchanged, the process can be repeated without end.</p>
+
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>Every higher derivative of \(e^{x}\) is again \(e^{x}\): for every positive integer \(n\), \(\bigl(e^{x}\bigr)^{(n)} = e^{x}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Induct on \(n\). The case \(n = 1\) is Theorem 4.8. If \(\bigl(e^{x}\bigr)^{(n)} = e^{x}\), then differentiating once more and using Theorem 4.8 again gives \(\bigl(e^{x}\bigr)^{(n + 1)} = \bigl(e^{x}\bigr)' = e^{x}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — §C-4 application hook (one sentence, full treatment deferred) + forward to §4.4 (monotonicity needs the MVT) -->
+  <p>The identity \(\frac{d}{dx} e^{x} = e^{x}\) — slope equal to value at every point — is exactly the property that makes the exponential the natural model for any quantity whose rate of change is proportional to its current size: the relation \(y' = k\,y\), solved by \(y = y(0)\,e^{kt}\). We return to that application once the logarithm is in place. For now the formula hands us one immediate structural fact: since \(e^{x} > 0\) everywhere (Corollary 4.1), its derivative is everywhere positive. Intuitively a function with positive derivative ought to be increasing, which would let us invert \(e^{x}\) and finally build \(\ln x\). Turning that intuition into a theorem requires an existence result that converts the sign of the derivative into monotonic behavior of the function — the Mean Value Theorem. The next section develops it, by way of Rolle's theorem.</p>
+
+</article>
+</template>
 <!-- END-CONTENT-FRAGMENTS -->
 <!-- plot.js — inlined -->
 <script>
@@ -1012,7 +1146,7 @@ window.MathJax = {
 var CHAPTER = {
   brand: "Chapter 4 — The Exponential and Logarithmic Functions",
   runningHead: "Chapter 4 · The Exponential and Logarithmic Functions",
-  fragments: ["sec-4-1", "sec-4-2"],
+  fragments: ["sec-4-1", "sec-4-2", "sec-4-3"],
 };
 var FRAGMENTS = CHAPTER.fragments;
 var RUNNING_HEAD = CHAPTER.runningHead;

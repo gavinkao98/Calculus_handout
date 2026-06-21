@@ -1,0 +1,428 @@
+You are an ADVISORY adversarial reviewer of a calculus handout section (HTML format) that was expanded from the SEED below, following an approved DIRECTION BRIEF. You do NOT rewrite; you surface findings for a human.
+
+Hunt especially for:
+(a) mathematical errors, fabricated theorems/identities, or over-generalized claims;
+(b) drift from the seed's mathematics (the seed IS the manuscript's mathematical backbone);
+(c) direction-conformance violations: did the draft cover what the brief specifies? did it include anything from the brief's "do-not-write" (kept under the heading 刻意不寫) list?
+
+Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):
+  category: math | faithfulness | direction-conformance | house_rule | register | other
+  blocking: true ONLY for:
+    - a real MATH ERROR or fabricated/over-generalized claim (category=math)
+    - DRIFT from the seed's mathematics (category=faithfulness)
+    - VIOLATION of direction-conformance: missing a brief-mandated item OR including a brief-forbidden item (category=direction-conformance)
+  Everything else MUST be blocking=false.
+
+Formatting / house-rule items (missing expansion comments, register/style nits) are caught by a downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); they MUST NOT block convergence.
+
+Also give each finding a level for human triage:
+  1 = real conflict (must fix)
+  2 = discoverability gap (add doc/comment)
+  3 = editorial drift (low priority)
+  4 = non-finding (mathematically equivalent paraphrase, stylistic preference)
+
+A mathematically equivalent paraphrase is NOT a finding.
+
+This is the SHORTEST, purely-deductive section of the chapter; its single risk is OVER-expansion, not missing content. Spend your effort on the MATH and on direction-conformance. Re-derive each step independently:
+  - The difference-quotient factorization (e^{x+h} - e^x)/h = ((e^h - 1)/h) e^x via the exponent law e^{x+h} = e^x e^h (Theorem 4.7); the pull-out of the h-independent factor e^x reducing everything to lim_{h->0} (e^h - 1)/h.
+  - Proposition 4.2: |(e^h - 1)/h - 1| <= |h| for 0 < |h| < 1/2. Check the index shift (e^h - 1)/h - 1 = sum_{n>=2} h^{n-1}/n!; the term-by-term absolute value and the factoring of one |h|; and ESPECIALLY the "trailing sum <= 1" step: |h|^{n-2} <= 1 (since |h| < 1, n >= 2), then sum_{n>=2} 1/n! <= sum_{n>=2} 1/2^{n-1} = 1 via n! >= 2^{n-1}. Verify n! >= 2^{n-1} for n >= 2, verify the geometric sum equals 1, and verify the chain actually yields <= |h|.
+  - Theorem 4.8: bound => lim (e^h - 1)/h = 1 (squeeze, RHS |h| -> 0); pull e^x out of the limit; difference quotient -> 1 * e^x = e^x; differentiability on R.
+  - Corollary 4.2: induction (e^x)^{(n)} = e^x, base = Theorem 4.8, step (e^x)^{(n+1)} = (e^x)' = e^x.
+Cross-check the math against the SIGNED LEGACY GROUND TRUTH legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.3 (label sec:rigorous-derivative-of-exp). NOTE: the legacy proof bounds the bracket via 1/(1-|h|) <= 2 on |h| <= 1/2; the handout instead uses n! >= 2^{n-1} giving sum 1/n! <= 1. BOTH are valid; the handout's self-contained route is the brief's §C-1 decision -- do NOT flag the divergence in proof style as an error.
+
+NUMBERING NOTE: §4.3 is NOT the chapter's first section. Per-type counters CONTINUE from §4.1-§4.2 (which used Definition 4.1/4.2; Theorem 4.1-4.7; Proposition 4.1; Corollary 4.1; Strategy 4.1; Example 4.1; Figure 4.1; Remark 4.1/4.2). Therefore §4.3 correctly uses: Theorem 4.8 (derivative); Proposition 4.2 (the bound); Corollary 4.2 (higher derivatives); Remark 4.3. §4.3 mints NO new Definition (the derivative was defined in Chapter 2). This continuation is CORRECT -- do NOT flag it as a discontinuity. Cross-references ("Theorem 4.7", "Corollary 4.1", "Strategy 4.1", "Section 4.2", "Chapter 2") are correct, not missing content.
+
+SCOPE / EXPANSION NOTE for §4.3: the SEED covers manuscript pp.10-11 (the section "The derivative of the exponential function": difference quotient -> reduce to lim(e^h-1)/h -> series Note bound <= |h| on (-1/2,1/2) -> d/dx e^x = e^x). The draft adds, as MARKED expansions sanctioned by the brief (decisions §C/§D, all approved at gate 3 with "全照提案核可") and cross-checked against the signed legacy ground truth §4.3:
+  - An OPENER that cross-references Chapter 2's informal term-by-term derivation of (e^x)' = e^x and frames this section as the rigorous redo with an explicit bound. Chapter 2 is NOT edited (only referenced in prose). Do NOT demand the Ch2 cross-ref be removed, and do NOT flag it as editing Chapter 2.
+  - The "bracket <= 1" detail (the manuscript only ASSERTS [1/2 + |h|/3! + ...] <= 1; the handout SUPPLIES the one-line geometric comparison). This is the brief's §C-1 fill -- INTENDED, not drift.
+  - Proposition 4.2 NAMING the bound, and Remark 4.3 framing the bound as the rigorous (explicit-rate) upgrade of Chapter 2's "vanishes as h->0".
+  - Corollary 4.2 (higher derivatives (e^x)^{(n)} = e^x) -- the manuscript stops at the first derivative; the handout adds the corollary on user direction (§C-3 approved). Do NOT flag it as out-of-scope.
+  - ONE forward-hook sentence noting that slope = value makes e^x the model for y' = ky (solved by y = y(0) e^{kt}); the full ODE/half-life treatment is DEFERRED to the chapter end (§C-4 approved). This single sentence is sanctioned.
+  - A LIGHT back-reference to Strategy 4.1 at the geometric-tail step (§C-5 approved).
+These are INTENDED expansions, not drift.
+
+DELIBERATELY OMITTED (brief 刻意不寫) -- these MUST NOT appear in the §4.3 body; flag as blocking direction-conformance ONLY if they actually appear:
+  - the chain rule, or derivatives of composites d/dx e^{kx}, d/dx e^{g(x)} (that is Chapter 2/3 material; this section does only the base d/dx e^x). NOTE: writing y = y(0) e^{kt} as the SOLUTION of an ODE in the one sanctioned hook sentence is NOT differentiating a composite -- do not flag it.
+  - constructing or differentiating ln x (that is §4.5);
+  - Rolle's theorem / MVT / a proof that positive derivative implies increasing (that is §4.4; only a one-line forward-fence to it is allowed);
+  - EDITING or restructuring Chapter 2 (only a plain-prose cross-reference is allowed);
+  - a full ODE / half-life / compound-interest treatment (only the single forward-hook sentence is allowed);
+  - re-proving §4.1 series convergence or the §4.2 exponent law (they are only CITED);
+  - any self-invented "your turn" exercise;
+  - OVER-EXPANSION: padding this shortest section beyond its single main line (one Proposition + one Theorem + one Corollary + one Remark + opener + closer). If the draft balloons with extra lemmas/examples/figures, flag as direction-conformance.
+
+This section has NO figure (it is a proof section; no ROADMAP key figure); do NOT report "figure missing".
+
+Set "converged": true when there are ZERO blocking findings (math correct, faithful to seed, conforms to direction brief), even if advisory formatting nits remain.
+
+Return STRICT JSON only, no prose outside the JSON.
+
+=== SEED (manuscript transcription, pp.10-11) ===
+
+# Seed — §4.3 The Derivative of e^x
+
+> stage ① 產物。Transcribed from the handwritten manuscript `2023-11-4-ExponentialFunction`,
+> **pp.10–11** (the section headed "§ The derivative of the exponential function", from the
+> difference quotient `(e^{x+h}−e^x)/h = ((e^h−1)/h)e^x` through `d/dx e^x = e^x`; the next
+> item "§ Rolle's Theorem" begins §4.4).
+> Manuscript heads this with its own title "§ The derivative of the exponential function"
+> (handout maps it to §4.3 per ROADMAP).
+> Faithful to the manuscript: structure, order, notation, and deliberate omissions preserved.
+> seed 語法＝輕量可讀（反引號行內＋Unicode；見 CONTENT_DIRECTION ① / `seed_ch04_s1.md`）。漂亮 KaTeX 留給 ④。可疑／非標準處標 **[請查核]**。
+> **數學 cross-check（非手稿）**：legacy `ch04_exponential_logarithm.tex` 的 §4.3 段（`\section{The Derivative of e^x}`，LaTeX→HTML 轉移前已簽核；D1：僅盲算對賬，不照抄散文／結構）。
+
+---
+
+## §4.1 / §4.2 依賴（承前；非本節新內容，僅備援引）
+
+§4.3 用到前兩節的兩件既成事實：
+
+1. **§4.1 級數定義**：`e^h := Σ_{n=0}^∞ hⁿ/n!`（對全 ℝ；§4.2 Summary 已把定義域延拓到 ℝ）。本節把 `e^h` 的級數代回差分商。
+2. **§4.2 指數律（Theorem 4.7）**：`e^{x+h} = e^x · e^h`（對全 x, h ∈ ℝ）。差分商第一步的因式分解 `(e^{x+h}−e^x)/h = ((e^h−1)/h)e^x` **就靠這條**——把 `e^{x+h}` 拆成 `e^x e^h`、提出與 h 無關的 `e^x`。
+
+（§4.2 還證了 `e^x` 在 ℝ 上連續；本節導數論證主要用指數律＋級數，連續性是背景。）
+
+---
+
+## § The derivative of the exponential function（手稿原文）
+
+Consider the difference quotient
+
+`(e^{x+h} − e^x)/h = ((e^h − 1)/h) · e^x`.
+
+（手稿直接寫出此等式。推導：`e^{x+h} = e^x e^h`（§4.2 指數律）⟹ `e^{x+h} − e^x = e^x(e^h − 1)` ⟹ 除以 h 並提出 `e^x`。手稿未顯式寫這一步，視為由指數律直接得。）
+
+To find `d/dx e^x`, we only need to find the limit
+
+`lim_{h→0} (e^h − 1)/h`.
+
+The factor `e^x` is independent of `h`, so the whole derivative reduces to this one limit.
+
+### Note（手稿的 bound 推導）
+
+`e^h = 1 + h + h²/2! + h³/3! + ⋯`   （§4.1 級數定義，代 x=h）
+
+故
+
+`(e^h − 1)/h − 1 = h/2 + h²/3! + ⋯ + h^{n−1}/n! + ⋯`
+
+（逐項：`e^h − 1 = h + h²/2! + h³/3! + ⋯`；除以 h 得 `(e^h−1)/h = 1 + h/2! + h²/3! + ⋯`；減 1 把常數項 1 消掉，剩 `h/2! + h²/3! + ⋯`，其中 `h/2! = h/2`。）
+
+⟹
+
+`|(e^h − 1)/h − 1| ≤ |h| · [ 1/2 + |h|/3! + ⋯ + |h|^{n−2}/n! + ⋯ ]`
+
+（每項提出一個 `|h|`：`h/2 = |h|·(1/2)`、`h²/3! = |h|·|h|/3!`、…、`h^{n−1}/n! = |h|·|h|^{n−2}/n!`。三角不等式逐項取絕對值。）
+
+`            ≤ |h|`   for `h ∈ (−1/2, 1/2)`.
+
+**[請查核]**：末步「中括號 `[ 1/2 + |h|/3! + ⋯ ] ≤ 1`（當 `|h| < 1/2`）」手稿只給結論、未展開。落地時補一句證明：對 `|h| < 1/2`，括號 `= 1/2 + Σ_{n≥3} |h|^{n−2}/n! ≤ 1/2 + Σ_{n≥3} (1/2)^{n−2}/n! < 1`（首項 1/2，餘項以 `(1/2)^{n−2}/n!` 的幾何/階乘尾界壓住，總和 < 1/2）。屬 ④ 方向（補嚴格化的一句）。cross-check legacy §4.3 的對應 Proposition。
+
+### 結論
+
+Hence,
+
+`lim_{h→0} ( (e^h − 1)/h − 1 ) = 0`,   i.e.   `lim_{h→0} (e^h − 1)/h = 1`.
+
+This implies
+
+**`d/dx e^x = e^x`.**
+
+（因 `(e^{x+h}−e^x)/h = ((e^h−1)/h) e^x → 1 · e^x = e^x`，h→0。手稿在此結束本節，緊接 §4.4「§ Rolle's Theorem」。）
+
+---
+
+## §4.3 / §4.4 boundary
+
+手稿緊接著寫 **§ Rolle's Theorem**：先給 max/min 的 Def 1、`cos x` 在 0 取最大的 ex、EVT「Fact」（[a,b] 連續⟹有最大／最小點，不證）、Thm A（內部極值⟹`f'=0`）…——**這是 §4.4 的開頭**，不屬本 seed。
+
+---
+
+## 手稿刻意省略／特徵（忠實記錄）
+
+- **無 Ch2 cross-ref**：手稿不提「Ch2 曾非正式算過 `(e^x)'=e^x`」。ROADMAP open Q／PLAN §2 指出 Ch2 §2.4 有 informal 版；§4.3 是嚴格重做、差別在 explicit bound。**開頭 cross-ref Ch2「這次補上 bound」屬 handout 加法（legacy §4.3 opener 即如此做）**，非手稿原文——屬 ② brief 方向。
+- **無 higher-derivative corollary**：手稿只得 `d/dx e^x = e^x`，未推「每階導數都是 `e^x`」。legacy §4.3 有 `Corollary`（`(e^x)^{(n)} = e^x`，迭代即得）——**屬 handout 可選加法**，待 ②/③。
+- **差分商第一步**（`e^{x+h}−e^x = e^x(e^h−1)`）手稿未顯式寫中間步，直接給結果（靠 §4.2 指數律）。落地補一句。
+- **中括號 ≤ 1 的細節**手稿從略（見上 [請查核]）。
+- **`(e^h−1)/h` 的下標寫法**：手稿用「`h^{n−1}/n!`」表通項、省略號連接，未寫成 Σ 記號。落地可保留省略號型或改寫 Σ（`(e^h−1)/h − 1 = Σ_{n≥2} h^{n−1}/n!`）——屬 ④ 排版選擇。
+- worked example：**0 個**。圖：**0**。動機散文：**極少**（僅「To find d/dx e^x, we only need to find the limit…」一句承上啟下）。caution／strategy／named-result 索引：**無**（具名化 Theorem/Def 屬 ④ 落地）。
+- 記號：差分商變數 `h`；級數沿用 §4.1 的 `Σ hⁿ/n!`；無新記號。
+
+---
+
+## 對照 ground truth（評分用，非手稿）
+
+已簽核 `legacy/tex_handout/chapters/ch04_exponential_logarithm.tex` 的 §4.3 段（`\section{The Derivative of e^x}`，`sec:rigorous-derivative-of-exp`）是同一手稿的 LaTeX→HTML 前簽核版，**僅作盲算對賬的 ground truth**（D1），不照抄其散文／結構。其結構：
+- **opener**：點明 Ch2 `thm:derivative-of-exp` 曾用 casual term-by-term 論證、假設了收斂／連續／指數律；本節以 explicit bound 重證。
+- **difference-quotient setup**：`(e^{x+h}−e^x)/h = ((e^h−1)/h)e^x`，提出 `e^x`、化約到 `lim(e^h−1)/h`。
+- **Proposition（bound）**：`|(e^h−1)/h − 1| ≤ |h|`（`h ∈ (−1/2, 1/2)`），由級數逐項＋幾何尾界。
+- **Remark**：此 bound 是 Ch2 casual 論證的嚴格版——把「高次項 vanish」量化成 explicit rate `|h|`（至少線性）。
+- **Theorem（derivative formula）**：`d/dx e^x = e^x`。
+- **Corollary（higher derivatives）**：迭代得 `(e^x)^{(n)} = e^x`（手稿無此推論）。
+
+**§4.2 落地後的編號接續（PLAN §5 ledger）：** §4.1–§4.2 已 mint 到 Definition 4.2、Theorem 4.7、Proposition 4.1、Corollary 4.1、Strategy 4.1、Example 4.1、Figure 4.1、Remark 4.2。**§4.3 因此自 Theorem 4.8、Definition 4.3（若需）、Proposition 4.2、Corollary 4.2、Remark 4.3 起編號。** 本 seed 為手稿原貌（pp.10–11）；具名化與編號落在 ④。
+
+**ROADMAP 已標的 §4.3 open question（待 ③ 方向閘確認）：**
+- **與 Ch2 §2.4 的 redundancy**：Ch2 有 informal `(e^x)'=e^x`；§4.3 是嚴格重做、差別在 explicit bound。**§4.3 開頭 cross-ref Ch2、點明「這次補上 bound」**（legacy 做法）。重構（Ch2 改 forward-ref）**延後至兩章都簽核後——本章不動 Ch2**（PLAN §2）。
+
+=== END SEED ===
+
+=== DIRECTION BRIEF (approved at gate 3) ===
+
+# Direction Brief — §4.3 The Derivative of e^x
+
+> ② 方向提案（CONTENT_DIRECTION §2 九欄）。**狀態：待 ③ 方向閘核可**（③ 拍板後本 brief 成 ④/⑤ 契約）。
+> 輸入：[`seed_ch04_s3.md`](seed_ch04_s3.md)（手稿 pp.10–11）＋ [`PLAN-ch04.md`](PLAN-ch04.md) 章層決策（§4.3 redundancy open Q、編號 ledger）＋ ROADMAP「Chapter 4」條目（core skill「rigorous derivative with explicit bound」、§4.3 redundancy open question）。
+> §4.3 **非首節、且為全章最短節**（手稿 ~1 頁純推導）：不建章基礎建設；沿用 §4.1–§4.2 已建的 chapter standalone／fragments／figures.js，續編號（自 Theorem 4.8、Proposition 4.2 起）。
+> ①-verify：使用者選「現在開跑 §4.3」即視為 seed accepted-by-proceeding（pending §C 的 [請查核] 更正）。數學 cross-check：legacy `ch04_exponential_logarithm.tex` 的 §4.3 段（`sec:rigorous-derivative-of-exp`）。
+
+---
+
+## 手稿盤點（照原順序）
+- **§ The derivative of the exponential function**（標題即手稿原文）。
+- **difference quotient**：`(e^{x+h}−e^x)/h = ((e^h−1)/h) e^x`（手稿直接寫出；中間步 `e^{x+h}=e^x e^h`（§4.2 指數律）⟹ `e^{x+h}−e^x=e^x(e^h−1)` 未顯式寫）。
+- **化約**：「To find `d/dx e^x`, we only need to find the limit `lim_{h→0}(e^h−1)/h`」（`e^x` 與 h 無關，提出）。
+- **Note（bound 推導）**：`e^h=1+h+h²/2!+⋯`（§4.1 級數代 x=h）⟹ `(e^h−1)/h−1 = h/2+h²/3!+⋯+h^{n−1}/n!+⋯` ⟹ `|(e^h−1)/h−1| ≤ |h|[1/2+|h|/3!+⋯+|h|^{n−2}/n!+⋯] ≤ |h|` for `h∈(−1/2,1/2)`。
+- **結論**：`lim_{h→0}((e^h−1)/h−1)=0` ⟹ **`d/dx e^x=e^x`**。
+- 具名人物／史實：**無**。worked example：**無**。圖：**無**。caution／strategy：**無**。higher-derivative corollary：**無**（手稿止於 `d/dx e^x=e^x`）。
+
+## 薄度剖析
+| 區塊 | 狀態 |
+|---|---|
+| difference-quotient setup | **夠**（手稿直接給因式分解；補一句中間步 `e^{x+h}=e^x e^h` 即完整） |
+| 化約到 `lim(e^h−1)/h` | **夠**（手稿一句點明 `e^x` 提出） |
+| bound `|(e^h−1)/h−1|≤|h|` | **夠但有一處從略**：手稿給出級數逐項＋提 `|h|`，但**中括號 `[1/2+|h|/3!+⋯]≤1`（當 `|h|<1/2`）手稿只給結論未證**（見 §C-1）→ ④ 補一句尾界 |
+| `lim(e^h−1)/h=1` ⟹ `d/dx e^x=e^x` | **夠**（bound ⟹ squeeze 至 1，直接得） |
+| **Ch2 §2.4 redundancy 的處理** | **薄**：手稿不知 Ch2（手稿是獨立講義）；handout 須開頭 cross-ref Ch2 informal 版、點明「這次補 explicit bound」（legacy opener 即如此）→ §C-2／D1 |
+| bound 的**意義**（為何要 explicit rate） | **薄**：手稿只給 bound、未說「這把 Ch2『高次項 vanish』量化成 explicit linear rate」→ 一句 Remark（legacy 有對應 remark） |
+| higher derivatives | **無**：手稿止於一階；`(e^x)^{(n)}=e^x` 是 legacy 加的 Corollary（低風險、設定後續 Taylor）→ §C-3 |
+| 「slope = height」直覺／application | **無**：手稿純推導；`(e^x)'=e^x` 的建模意義（`y'=ky⟹y=y₀e^{kt}`）legacy 置於章末 → §C-4（提案：本節只一句 forward-hook，全 treatment 留章末/§4.5） |
+
+## 範圍與深度
+- **吃手稿這一叢**：difference quotient → 化約到 `lim(e^h−1)/h` → bound `≤|h|` → `d/dx e^x=e^x`。**全章最短節，核心風險是過度展開**——務必保持精煉、不灌水。
+- **保留證明**（手稿全給、標準、本節主軸）：difference-quotient 因式分解、`(e^h−1)/h−1` 的級數 bound、極限 ⟹ 導數。
+- **小幅 expansion（低風險、提案）**：① 開頭 Ch2 cross-ref 一段（legacy 做法、PLAN §2 指定）；② 把 bound 升格具名 **Proposition 4.2**＋補 §C-1 的「中括號 ≤1」一句；③ **Remark 4.3**（bound＝Ch2 casual 論證的嚴格版、explicit linear rate）；④（選配）**Corollary 4.2**（higher derivatives，迭代一行）。
+- **陳述／援引不重證**：§4.1 級數定義（`e^h=Σhⁿ/n!`，本節代用、不重述）；§4.2 指數律（Theorem 4.7，差分商因式分解的根據，**只援引**）；導數定義（Ch2 已給，本節用 difference-quotient → limit、不重述定義）。
+- **forward-fence（一行帶過）**：monotonicity（`(e^x)'=e^x>0⟹e^x` strictly increasing）→ §4.4 corollary／§4.5；`ln x` 導數 → §4.5；`y'=ky` 建模全 treatment → 章末／§4.5。
+- **不重做 Ch2**：Ch2 §2.4 的 informal 版**不改**（改 forward-ref 延後至兩章簽核後，PLAN §2）；本節只 cross-ref、不動 Ch2 檔。
+
+## 承重直覺（一節一個，領頭）
+**`e^x` 的導數還是 `e^x`，因為差分商一拆就分離成 `((e^h−1)/h)·e^x`——`e^x` 只是「搭便車」被提出去，整節的全部內容濃縮成一個極限 `lim_{h→0}(e^h−1)/h=1`；而級數讓這個極限變透明：`(e^h−1)/h = 1 +（高次項）`，高次項以 explicit 線性速率 `≤|h|` 消失。** §4.1 掙到 `e^x` 存在、§4.2 證它連續＋乘法相加；§4.3 收割：用指數律把 `e^{x+h}` 拆成 `e^x e^h`，導數計算就塌縮成「`(e^h−1)/h` 跑去 1 有多快」這一個問題，級數＋尾界（同 §4.1–§4.2 的 partial-sum/tail 引擎）給出 explicit bound。**這是 Ch2 那個 casual term-by-term 論證的嚴格補完——差別正在這個 explicit bound。**
+
+## worked example 清單（提案，待 ③）
+| # | 內容 | 取捨 |
+|---|---|---|
+| —— | §4.3 為**純推導節**，手稿無例題；推導本身（bound＋導數）即承重 beat。 | **提案：0 個 worked example。** §4.3 已是全章最短節、塞數值例會稀釋單一主線。③ 若要一個「具體感」錨，可考慮極小的「`d/dx e^x` 在 `x=0` 給 slope `=e^0=1`」一句對照——**低優先、預設不收**（且 `e^0=1` 屬 §4.1 刻意不寫範圍，需小心）。 |
+
+## history / application
+- **history**：**留白**（手稿無；導數公式無自然史實錨）。
+- **application**：**提案一句 forward-hook，全 treatment 留章末／§4.5**。`(e^x)'=e^x`（slope=value）是「任何變化率正比於自身的量都由 `e^x` 建模（`y'=ky⟹y(t)=y₀e^{kt}`：人口、放射衰變、連續複利）」的根。legacy 把這段 application 置於**章末**（`ln` 之後）。**提案：§4.3 只在 Remark／收尾一句點到「slope=value 是 `e^x` 成為建模函數的根」並 forward 到章末**，不在本短節展開 ODE/half-life（避免過度膨脹最短節）。③ 確認收一句或全略。
+
+## 強調 / takeaway
+- **概念樞紐**：**導數計算靠指數律塌縮**——`e^{x+h}=e^x e^h` 把「在 x 處的導數」化約成「在 0 處的導數 `lim(e^h−1)/h`」一個普適常數（=1）。指數函數的「自我複製」性質（導數＝自身）正源於此乘法結構。
+- **可攜技能**：(1) 差分商遇指數型，先用指數律分離出與 h 無關的因子；(2) **explicit bound > 定性 vanish**：把「高次項趨於 0」量化成 `≤|h|` 的 explicit rate，是後續誤差分析（Taylor remainder）的基礎。
+- **依賴鏈 takeaway**：`§4.2 指數律 → 差分商分離 → §4.1 級數給 (e^h−1)/h 的 explicit bound → d/dx e^x = e^x`。三節環環相扣，§4.3 是收割。
+
+## 刻意不寫（餵 auditor 作 direction-conformance 反向檢查）
+| 不寫什麼 | 理由 | 它該去哪 |
+|---|---|---|
+| §4.2 指數律的**重證** | Theorem 4.7 已證；本節只援引（差分商因式分解的根據） | §4.2（本節 cross-ref） |
+| §4.1 級數收斂／定義的**重述** | §4.1 已給；本節代 `e^h=Σhⁿ/n!` 直接用 | §4.1 |
+| **chain rule／`d/dx e^{kx}`、`d/dx e^{g(x)}`** | 屬 Ch2/Ch3 chain rule；本節只做 base `d/dx e^x` | Ch2/Ch3（已有） |
+| **`ln x` 的導數** | 需 `e^x` 反函數＋ monotonicity | §4.5 |
+| **Rolle／MVT／monotonicity corollary** | 屬 §4.4 | §4.4 |
+| **改寫 Ch2 §2.4**（informal 版改 forward-ref） | 延後至兩章簽核後；本章不動 Ch2 | 兩章簽核後的 Mode B |
+| **`y'=ky` ODE／half-life 完整 treatment** | 最短節不宜膨脹；建模全 treatment 在章末 | 章末／§4.5（本節至多一句 hook） |
+| 自創 bare your-turn exercise | README §防護欄禁、deferred | —（自創一律寫成含解 worked example） |
+| **過度展開**（把短節灌成長節） | §4.3 是全章最短純推導節；單一主線＋一個 bound＋一個 Theorem 即足 | 保持精煉 |
+
+## 篇幅帶（護欄非預算）
+**2–3 A4 print 頁**（全章最短節）。§4.3 ≈ opener（承 §4.2＋Ch2 cross-ref）＋difference-quotient setup＋**Proposition 4.2**（bound＋證）＋**Remark 4.3**（explicit rate 的意義）＋**Theorem 4.8**（`d/dx e^x=e^x`＋證）＋（選配）**Corollary 4.2**（higher derivatives）＋收尾（forward §4.4 monotonicity）。**明顯超出 3 頁 → 回查是否過度展開**（本節最大風險＝灌水，非缺料）。ch04 數學含級數省略號／絕對值不等式 → ④ 後查 print overflow（PLAN §6）。
+
+---
+
+## A. 編號 ledger 提案（§4.3；接 §4.2 ledger，自 Theorem 4.8／Proposition 4.2 起；④ 落定後回填 PLAN §5）
+
+> §4.1–§4.2 已 mint：Definition 4.1–4.2、Theorem 4.1–4.7、Proposition 4.1、Corollary 4.1、Strategy 4.1、Example 4.1、Figure 4.1、Remark 4.1–4.2。各型獨立 counter、跨節連續。Caution 無編號。
+
+| 型別 | §4.3 提案 | 說明 |
+|---|---|---|
+| **Theorem** | `4.8`＝`d/dx e^x = e^x`（rigorous derivative） | 本節主結果 |
+| **Proposition** | `4.2`＝`|(e^h−1)/h − 1| ≤ |h|` for `h∈(−1/2,1/2)`（bound） | 升格具名（承載 explicit rate；證在其下） |
+| **Corollary** | （選配）`4.2`＝`(e^x)^{(n)} = e^x` ∀n（higher derivatives） | 手稿無；legacy 有；迭代一行。**見 §C-3** |
+| **Remark** | `4.3`＝此 bound＝Ch2 casual 論證的嚴格版（explicit linear rate） | legacy 有對應 remark；承載「為何要 bound」 |
+| **Strategy** | **援引 Strategy 4.1**（series/tail bound）；不新增 | bound 推導同 §4.1–§4.2 的尾界引擎；首次 reuse 處一句回指（選配，見 §C-5） |
+| **Definition** | **§4.3 不 mint 新 Definition**（導數定義 Ch2 已給；本節用 difference-quotient→limit） | Definition `4.3` 留給 §4.4/§4.5（如 `ln x`） |
+| **Example / Figure** | §4.3 **無**（無 ROADMAP key figure；純推導節） | — |
+
+> **編號自查（④）**：寫完逐一確認每個「by Theorem 4.7（指數律）／Proposition 4.2／§4.1 級數／Strategy 4.1」都對得到一個存在的 `env-num`；跨 §4.2↔§4.3 引用（差分商用指數律 Theorem 4.7、bound 用 §4.1 級數）尤其查。
+
+## B. 章基礎建設
+**N/A** —— §4.3 非首節。chapter standalone／`fragments/ch04/` 骨架／figures.js／`build.py` ch04 entry 皆 §4.1 已建、§4.2 已沿用。§4.3 落地＝新增 `fragments/ch04/sec-4-3.html`、`build.py` 的 `CHAPTERS["ch04"].fragments` append `"sec-4-3"`、`chapter4-print-standalone.html` 嵌入式 `fragments:[…]` 同步 append（PLAN §6／§4.2 整合實證：build.py 與 standalone 內嵌清單**須手動雙同步**）、續用手動編號 ledger。**動手前先讀 `sec-4-2.html` 末尾**確認各型 counter 收在哪（接續機制，PLAN §5：Theorem 收在 4.7、Proposition 4.1、Corollary 4.1、Remark 4.2）。
+
+## C. 待核對／存疑（③ 一併裁示）
+1. **中括號 `[1/2+|h|/3!+⋯]≤1`（`|h|<1/2`）的細節**（seed [請查核]）：手稿只給結論。**提案：④ 補一句尾界**——`對 |h|<1/2，括號 = 1/2 + Σ_{n≥3}|h|^{n−2}/n! ≤ 1/2 + Σ_{n≥3}(1/2)^{n−2}/n! < 1`（首項 1/2＋階乘尾界 < 1/2）。cross-check legacy §4.3 對應 Proposition 的證法。③ 確認補（建議補，否則 bound 是斷言）。
+2. **Ch2 cross-ref opener 的措辭**（D1）：手稿不提 Ch2；handout 開頭須 cross-ref Ch2 §2.4 informal `(e^x)'=e^x`、點明「當時 casual term-by-term、假設了收斂/連續/指數律，本節以 explicit bound 補完」。**提案：照 legacy opener 寫一段**（純文字 cross-ref，不動 Ch2 檔）。③ 確認措辭方向。
+3. **higher-derivative Corollary 4.2 收否**：手稿無；legacy 有（`(e^x)^{(n)}=e^x`，迭代一行）。**價值**：設定後續 Taylor／高階導數、近乎零成本。**提案：收**（低風險、一行證）。③ 確認。
+4. **application forward-hook 收否**：`(e^x)'=e^x`（slope=value）⟹ `y'=ky` 建模。**提案：本節只一句 forward-hook（點到「slope=value 是 `e^x` 成為建模函數的根」、forward 章末）**，全 ODE/half-life treatment 留章末／§4.5（避免膨脹最短節）。③ 確認收一句或全略。
+5. **Strategy 4.1 回指收否**：bound 推導同 §4.1–§4.2 尾界引擎。**提案：在 bound 證的尾界步一句回指 Strategy 4.1**（或省略——§4.3 的 bound 是直接級數逐項，與 partial-sum tail 略異）。③ 取捨（建議輕量一句或略）。
+6. **`(e^h−1)/h−1` 記號型態**：手稿用省略號通項 `h/2+⋯+h^{n−1}/n!+⋯`。**提案：④ 以乾淨 Σ 形 `(e^h−1)/h−1 = Σ_{n≥2} h^{n−1}/n!` 為主、省略號為輔 gloss**。③ 排版偏好（建議 Σ 形）。
+
+## D. 章層決策落地（§4.3 相關；提案＋理由，待 ③ 拍板）
+- **D-redundancy（§4.3 open Q）— Ch2 §2.4 cross-ref、不動 Ch2。** §4.3 開頭 cross-ref Ch2 informal `(e^x)'=e^x`、點明本節補 explicit bound（legacy opener 做法）。**重構（Ch2 改 forward-ref）延後至兩章簽核後**——本章**不動 Ch2 檔**（PLAN §2、§C-2）。
+- **D1 — legacy tex 當 signed 數學 cross-check。** §4.3 的 bound、導數、higher-derivative corollary 一律以 legacy §4.3 段盲算對賬，不照抄散文／結構。
+- **D9 — 記號沿用。** `e^h` 級數沿用 §4.1 `Σhⁿ/n!`；差分商變數 `h`；無新記號。
+
+---
+
+### 結構草圖（④ 照此寫；待 ③ 定案）
+§4.3 開場（承 §4.2：`e^x` 在 ℝ 上已定義、連續、滿足指數律；本節收割導數。**Ch2 cross-ref**：Ch2 §2.4 曾 casual 算過 `(e^x)'=e^x`、假設了收斂/連續/指數律，本節以 explicit bound 補完——不動 Ch2）→ **difference-quotient setup**：`(e^{x+h}−e^x)/h = ((e^h−1)/h)e^x`（用 §4.2 指數律 `e^{x+h}=e^x e^h` 因式分解；`e^x` 與 h 無關提出 → 化約到 `lim(e^h−1)/h`）→ **Proposition 4.2**（bound `|(e^h−1)/h−1|≤|h|`，`h∈(−1/2,1/2)`；證：`e^h` 級數逐項 → `(e^h−1)/h−1=Σ_{n≥2}h^{n−1}/n!` → 提 `|h|`＋中括號 ≤1 尾界〔§C-1〕；〔§C-5 選配〕一句回指 Strategy 4.1）→ **Remark 4.3**（此 bound＝Ch2 casual 論證的嚴格版：把「高次項 vanish」量化成 explicit linear rate `≤|h|`）→ **Theorem 4.8**（`d/dx e^x=e^x`；證：bound ⟹ `lim(e^h−1)/h=1` ⟹ 差分商 → `1·e^x`）→〔§C-3 選配〕**Corollary 4.2**（`(e^x)^{(n)}=e^x` ∀n，迭代）→ 收尾（〔§C-4 選配〕slope=value 一句 forward-hook；forward §4.4：monotonicity 需 `(e^x)'=e^x>0`，下節 Rolle/MVT）。
+
+=== END DIRECTION BRIEF ===
+
+=== DRAFT (HTML fragment to review) ===
+
+<!-- §4.3 The Derivative of e^x.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from _dev-archive/ch04/seed_ch04_s3.md (manuscript pp. 10–11). Direction
+     brief brief_s43.md approved at ③ (2026-06-21, "全照提案核可"). Numbering is
+     MANUAL and CONTINUES from §4.1–§4.2: those used Definition 4.1/4.2,
+     Theorem 4.1–4.7, Proposition 4.1, Corollary 4.1, Strategy 4.1, Example 4.1,
+     Figure 4.1, Remark 4.1/4.2 — so §4.3 starts at Theorem 4.8, Proposition 4.2,
+     Corollary 4.2, Remark 4.3. No new Definition is minted here (the derivative
+     was defined in Chapter 2); Definition 4.3 is left for a later section.
+     Cross-references are plain prose. Math cross-checked against the signed
+     legacy ground truth legacy/tex_handout/chapters/ch04_exponential_logarithm.tex
+     §4.3 (sec:rigorous-derivative-of-exp).
+
+     ③ decisions (brief §C/§D, all approved):
+       - D-redundancy: the opener cross-references Chapter 2's informal
+         term-by-term derivation of (e^x)' = e^x and frames this section as the
+         rigorous redo with an explicit bound. Chapter 2 is NOT edited (its
+         restructure into a forward-reference is deferred until both chapters
+         are signed off).
+       - §C-1 fill: the manuscript asserts the bracket "[ 1/2 + |h|/3! + … ] ≤ 1"
+         without proof; the handout supplies the one-line geometric comparison
+         (n! ≥ 2^{n-1}), which also serves as the approved light back-reference
+         to Strategy 4.1 (§C-5).
+       - §C-3 (approved): Corollary 4.2 records the higher derivatives
+         (e^x)^{(n)} = e^x (manuscript stops at the first derivative; legacy adds it).
+       - §C-4 (approved): a single forward-hook sentence notes that slope = value
+         is what makes e^x the modelling function (y' = ky); the full ODE/half-life
+         treatment is deferred to the chapter's end.
+       - No worked examples, no figures (shortest, purely deductive section;
+         no ROADMAP key figure).
+     Counters handed to §4.4: Definition 4.3, Theorem 4.9, Proposition 4.3,
+     Corollary 4.3, Remark 4.4. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">4.3</span>The Derivative of \(e^{x}\)</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: §4.2 gave continuity, positivity, exponent law; now harvest the derivative. Cross-ref Chapter 2's informal version (D-redundancy); Chapter 2 is not edited. -->
+  <p>With Section 4.2 finished, \(e^{x}\) is a fully legitimate function on \(\mathbb{R}\): defined by its power series, continuous, strictly positive, and obeying the exponent law \(e^{x} e^{y} = e^{x + y}\). One classical fact about it is still owed a rigorous proof — its derivative. Chapter 2 already computed \(\frac{d}{dx} e^{x} = e^{x}\), but by a casual term-by-term argument that fed the series into the difference quotient and observed that all but the leading term seemed to drop out as \(h \to 0\). That argument was correct in spirit, yet it leaned on three properties — convergence, continuity, and the exponent law — that had not been established at the time. Now that all three are theorems, we can re-derive the formula honestly. We also gain something the earlier pass skipped: an <em>explicit</em> bound that shows exactly how fast the difference quotient settles to its limit.</p>
+
+  <h3 class="subsec-head">The difference quotient</h3>
+
+  <!-- expansion:formula — the exponent law factors the difference quotient; e^x pulls out, reducing everything to one limit at 0 -->
+  <p>The entire calculation rests on a single algebraic move, and that move is the exponent law. For a fixed \(x\) and a nonzero increment \(h\), Theorem 4.7 gives \(e^{x + h} = e^{x} e^{h}\), so</p>
+
+  <p>\[ \frac{e^{x + h} - e^{x}}{h} = \frac{e^{x} e^{h} - e^{x}}{h} = \left( \frac{e^{h} - 1}{h} \right) e^{x}. \]</p>
+
+  <p>The factor \(e^{x}\) does not depend on \(h\). The whole derivative therefore collapses onto one limit, taken at the single point \(0\):</p>
+
+  <p>\[ \frac{d}{dx} e^{x} = \left( \lim_{h \to 0} \frac{e^{h} - 1}{h} \right) e^{x}, \qquad \text{provided } \lim_{h \to 0} \frac{e^{h} - 1}{h} \text{ exists.} \]</p>
+
+  <p>Everything now hinges on showing that this limit equals \(1\). The series makes it transparent, and — unlike the Chapter 2 pass — it lets us put a number on the rate of approach.</p>
+
+  <!-- expansion:intuition — Proposition 4.2: the explicit bound on (e^h−1)/h − 1. Supplies the manuscript's omitted "bracket ≤ 1" step via a geometric comparison (Strategy 4.1). -->
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>For every nonzero \(h\) with \(\lvert h \rvert < \tfrac{1}{2}\),</p>
+      <p>\[ \left\lvert \frac{e^{h} - 1}{h} - 1 \right\rvert \le \lvert h \rvert. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By the series definition, valid for every real \(h\) since Section 4.2,</p>
+      <p>\[ e^{h} = \sum_{n=0}^{\infty} \frac{h^{n}}{n!} = 1 + h + \frac{h^{2}}{2!} + \frac{h^{3}}{3!} + \cdots. \]</p>
+      <p>Subtracting \(1\) and dividing by \(h \ne 0\) shifts every index down by one, and the constant term \(1\) then cancels the \(-1\):</p>
+      <p>\[ \frac{e^{h} - 1}{h} - 1 = \sum_{n=2}^{\infty} \frac{h^{n - 1}}{n!} = \frac{h}{2!} + \frac{h^{2}}{3!} + \frac{h^{3}}{4!} + \cdots. \]</p>
+      <p>Take absolute values term by term and factor out one power of \(\lvert h \rvert\):</p>
+      <p>\[ \left\lvert \frac{e^{h} - 1}{h} - 1 \right\rvert \le \sum_{n=2}^{\infty} \frac{\lvert h \rvert^{n - 1}}{n!} = \lvert h \rvert \sum_{n=2}^{\infty} \frac{\lvert h \rvert^{n - 2}}{n!}. \]</p>
+      <p>It remains to see that the trailing sum is at most \(1\). Since \(\lvert h \rvert < \tfrac{1}{2} < 1\) and \(n - 2 \ge 0\), every factor \(\lvert h \rvert^{n - 2} \le 1\), so the sum is bounded by \(\sum_{n=2}^{\infty} 1/n!\). The same geometric comparison behind Strategy 4.1 controls that constant: \(n! = 2 \cdot 3 \cdots n \ge 2^{n - 1}\), hence</p>
+      <p>\[ \sum_{n=2}^{\infty} \frac{1}{n!} \le \sum_{n=2}^{\infty} \frac{1}{2^{n - 1}} = \frac{1}{2} + \frac{1}{4} + \frac{1}{8} + \cdots = 1. \]</p>
+      <p>Therefore \(\sum_{n=2}^{\infty} \lvert h \rvert^{n - 2}/n! \le 1\), and the displayed inequality gives \(\left\lvert (e^{h} - 1)/h - 1 \right\rvert \le \lvert h \rvert\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — Remark 4.3: this bound is the rigorous upgrade of Chapter 2's "vanishes as h→0" — an explicit linear rate -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.3</span></p>
+    <div class="env-body">
+      <p>Proposition 4.2 is precisely the quantitative content the Chapter 2 derivation left unstated. There the higher-order terms were said to “vanish as \(h \to 0\),” with no measure of how fast; here the deviation of \(\frac{e^{h} - 1}{h}\) from \(1\) is pinned at no more than \(\lvert h \rvert\) — convergence at a rate at least linear in \(h\). For ordinary differentiation the qualitative statement suffices, but any later argument that must track the size of a derivative error — Taylor remainders, numerical estimates — uses the explicit bound, not the bare limit.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The derivative formula</h3>
+
+  <p>The bound delivers the limit at once, and with it the derivative.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.8</span></p>
+    <div class="env-body">
+      <p>The function \(e^{x}\) is differentiable at every real \(x\), and</p>
+      <p>\[ \frac{d}{dx} e^{x} = e^{x}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By Proposition 4.2, for \(0 < \lvert h \rvert < \tfrac{1}{2}\) we have \(\bigl\lvert \tfrac{e^{h} - 1}{h} - 1 \bigr\rvert \le \lvert h \rvert\), and the right-hand side tends to \(0\) as \(h \to 0\). Hence</p>
+      <p>\[ \lim_{h \to 0} \frac{e^{h} - 1}{h} = 1. \]</p>
+      <p>Returning to the difference quotient and pulling the \(h\)-independent factor \(e^{x}\) out of the limit,</p>
+      <p>\[ \lim_{h \to 0} \frac{e^{x + h} - e^{x}}{h} = \lim_{h \to 0} \left( \frac{e^{h} - 1}{h} \right) e^{x} = 1 \cdot e^{x} = e^{x}. \]</p>
+      <p>The limit exists for every \(x\), so \(e^{x}\) is differentiable on \(\mathbb{R}\) with \(\frac{d}{dx} e^{x} = e^{x}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — Corollary 4.2 (§C-3 approved): higher derivatives all equal e^x, by iteration -->
+  <p>Because differentiating \(e^{x}\) returns \(e^{x}\) unchanged, the process can be repeated without end.</p>
+
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>Every higher derivative of \(e^{x}\) is again \(e^{x}\): for every positive integer \(n\), \(\bigl(e^{x}\bigr)^{(n)} = e^{x}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Induct on \(n\). The case \(n = 1\) is Theorem 4.8. If \(\bigl(e^{x}\bigr)^{(n)} = e^{x}\), then differentiating once more and using Theorem 4.8 again gives \(\bigl(e^{x}\bigr)^{(n + 1)} = \bigl(e^{x}\bigr)' = e^{x}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — §C-4 application hook (one sentence, full treatment deferred) + forward to §4.4 (monotonicity needs the MVT) -->
+  <p>The identity \(\frac{d}{dx} e^{x} = e^{x}\) — slope equal to value at every point — is exactly the property that makes the exponential the natural model for any quantity whose rate of change is proportional to its current size: the relation \(y' = k\,y\), solved by \(y = y(0)\,e^{kt}\). We return to that application once the logarithm is in place. For now the formula hands us one immediate structural fact: since \(e^{x} > 0\) everywhere (Corollary 4.1), its derivative is everywhere positive. Intuitively a function with positive derivative ought to be increasing, which would let us invert \(e^{x}\) and finally build \(\ln x\). Turning that intuition into a theorem requires an existence result that converts the sign of the derivative into monotonic behavior of the function — the Mean Value Theorem. The next section develops it, by way of Rolle's theorem.</p>
+
+</article>
+
+=== END DRAFT ===
+
+=== KEY HTML WRITING RULES (advisory -- for house_rule findings) ===
+- Semantic env classes: env-definition, env-theorem, env-proposition, env-corollary, env-example (inside .workedexample with env-solution), env-remark, env-proof, env-caution, env-strategy; NO env-exercise (the handout ships no exercises). §4.3 uses env-proposition (Proposition 4.2), env-theorem (Theorem 4.8), env-corollary (Corollary 4.2), env-remark (Remark 4.3); their bodies auto-italicize where applicable.
+- Qualified proofs keep env-kicker "Proof" with any qualifier in env-name; this is house style, not a finding.
+- Math (MathJax 4): inline \(...\), display \[...\], multi-line \begin{aligned}...\end{aligned}; \binom, \lvert..\rvert, sums all render (verified: 0 MathJax errors, 15 print pages total for the chapter, 0 overflow).
+- Manual numbering: env-num / sec-no; per-type counters CONTINUE Chapter 4 across sections (see NUMBERING NOTE above).
+- Cross-references: plain prose ("by Theorem 4.7", "Corollary 4.1", "Strategy 4.1", "Section 4.2", "Chapter 2") -- NO \cref, NO hyperlinks.
+- Expansion markers: <!-- expansion:category --> HTML comment before each non-seed addition; valid categories: history, application, formula, summary, figure, example, intuition, strategy, caution. Seed-derived theorems/proofs correctly carry no expansion marker.
+=== END HTML WRITING RULES ===
+
+Now review the DRAFT against the SEED, DIRECTION BRIEF, and HTML WRITING RULES. Return strict JSON.

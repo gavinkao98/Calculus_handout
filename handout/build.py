@@ -79,7 +79,7 @@ CHAPTERS = {
     },
     "ch04": {
         "fragments": [
-            "sec-4-1", "sec-4-2",
+            "sec-4-1", "sec-4-2", "sec-4-3",
         ],
         "target": "chapter4-print-standalone.html",
         # "screen": "chapter4-standalone.html",

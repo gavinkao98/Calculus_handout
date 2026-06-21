@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§4.3 — gate 1（Claude 4-lens 對抗審）審核稿</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f7f5;color:#1d1d1f;font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.6;padding:32px 18px 80px}
+.wrap{max-width:940px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 4px}
+h2{font-size:1.16rem;margin:30px 0 6px;padding-bottom:6px;border-bottom:2px solid #e4e4e0}
+.lede{color:#6b6b70;margin:0 0 16px;font-size:.93rem}
+.note{background:#fff;border:1px solid #e4e4e0;border-left:3px solid #2552b3;border-radius:8px;padding:12px 16px;margin:14px 0;font-size:.93rem}
+.note.pass{background:#eaf6ed;border-left-color:#1a7f37}
+.note.pass b{color:#1a7f37}
+.note.warn{background:#fff6e3;border-left-color:#8a5a00}
+.zero{color:#1a7f37;font-weight:700}.blkw{color:#a11;font-weight:700}
+table.u{width:100%;border-collapse:collapse;margin:10px 0;font-size:.83rem}
+table.u th,table.u td{border:1px solid #e4e4e0;padding:6px 8px;text-align:left;vertical-align:top}
+table.u th{background:#eef0f4}
+table.u td.src{color:#5b3aa8}
+td.fx{color:#7a5b00}
+.card{background:#fff;border:1px solid #e4e4e0;border-radius:10px;padding:12px 15px;margin:11px 0}
+.card.applied{border-left:4px solid #1a7f37}.card.kept{border-left:4px solid #9aa}
+.card.blk{border-left:4px solid #a11}.card.adv{border-left:4px solid #8a5a00}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;align-items:center}
+.chip{font-size:.74rem;padding:2px 9px;border-radius:999px;font-weight:600;letter-spacing:.02em}
+.c-cat{background:#e7eefc;color:#1f49a6}
+.c-app{background:#e6f7ea;color:#1a7f37}.c-kept{background:#eef0f4;color:#555}
+.c-blk{background:#fdeceb;color:#a11}.c-adv{background:#eef0f4;color:#555}.c-lvl{background:#1d1d1f;color:#fff;font-family:ui-monospace,Menlo,Consolas,monospace}
+.where{color:#6b6b70;font-size:.85rem;margin:2px 0 6px}.ev{font-size:.84rem;color:#555;margin:3px 0}
+.issue{margin:2px 0 6px}.sug{font-size:.84rem;color:#555;margin:3px 0}
+.disp{font-weight:700}.disp.applied{color:#1a7f37}.disp.kept{color:#6b6b70}
+footer{margin-top:40px;color:#6b6b70;font-size:.85rem;border-top:1px solid #e4e4e0;padding-top:14px}
+a{color:#2552b3}
+code{background:#f3f4f6;padding:.05rem .3rem;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>§4.3 — gate 1（Claude 4-lens 對抗審）審核稿</h1>
+<p class="lede">第一道閘（免費）：Claude 4-lens 對抗式稽核。blocking = math／faithfulness／direction-conformance；格式 nit = advisory。§4.3（全章最短節，主風險＝過度展開），2026-06-21。</p>
+<div class='note pass'><b>裁決：<span class='zero'>0 blocking → 通過</span></b>　·　math／faithfulness 兩 lens <b>0 finding</b>；direction／prose 兩 lens 共 6 advisory（direction-F2 與 prose-G1-1 同 locus 合併 → 5 張卡：3 已套、2 保留）。4 lens 平行對抗審（math 盲算重算對賬 legacy §4.3／faithfulness 對 seed／direction-conformance 對 brief／prose house rules），每個 blocking 候選 refute-by-default 對抗複驗（本輪 0 candidates）。修完回歸驗證：render 0 MathJax err／15 頁／0 overflow。</div><h2>四 lens 裁決</h2><div class='card kept'><div class='chips'><span class='chip c-cat'>math fidelity</span><span class='chip c-app'>0 blocking</span></div><div class='issue'>盲算重算每一步並對賬 signed legacy §4.3：差分商因式分解（Thm 4.7 指數律）、Prop 4.2 bound（index shift → Σ_{n≥2}h^{n−1}/n!、提 |h|、<b>bracket≤1 用 n!≥2^{n−1} 幾何比較得 Σ1/n!≤Σ1/2^{n−1}=1</b>、鏈確實給 ≤|h|）、Thm 4.8（squeeze→lim=1、提出 h-無關 e^x）、Cor 4.2 induction——<b>全部正確，0 blocking／0 advisory</b>。並指出本稿 bound 論證比 legacy（用 1/(1−|h|)≤2）<b>更自含乾淨</b>。</div></div><div class='card kept'><div class='chips'><span class='chip c-cat'>direction-conformance</span><span class='chip c-app'>0 blocking</span></div><div class='issue'>對 ③-approved brief 全守：編號（Thm 4.8／Prop 4.2／Cor 4.2／Rem 4.3、不 mint 新 Definition）接 §4.1–§4.2 無撞號；「刻意不寫」fence 全守（無 chain rule／e^{kx} 物件、不碰 ln、無 Rolle/MVT 證、不動 Ch2 檔、ODE 僅一句 hook、不重證 §4.1/§4.2、無自創 exercise、不過度展開）；所有 ③-approved item（Ch2 cross-ref／bracket fill／Cor 4.2／hook／Strategy 4.1 nod）皆在且 scope 正確。<b>0 blocking、2 advisory</b>。</div></div><div class='card kept'><div class='chips'><span class='chip c-cat'>seed/manuscript faithfulness</span><span class='chip c-app'>0 blocking</span></div><div class='issue'>對 seed（手稿 pp.10–11）忠實：完整鏈（差分商→化約 lim(e^h−1)/h→級數 Note bound≤|h| on (−½,½)→lim=1→d/dx e^x=e^x）保序、無扭曲、無漏；所有超出 seed 的 addition 皆對映 ③-approved 清單（Ch2 opener／bracket≤1 fill／Prop 4.2 naming／Rem 4.3／Cor 4.2／hook／Strategy 4.1 nod）；記號忠實（h 增量、e^h 級數、無新符號）。<b>0 finding</b>。</div></div><div class='card kept'><div class='chips'><span class='chip c-cat'>prose / readability</span><span class='chip c-app'>0 blocking</span></div><div class='issue'>U1–U5 全達（formal result 前皆有動機、邏輯橋接齊全、無術語先用後定義、無新定義需拆解）；指數律因式分解與 bound 推導學生可循。<b>易懂性 0 blocking、prose gate 通過</b>；findings 全為 advisory polish（2 tighten 已套、2 optional 保留）。</div></div><h2>審核對象（已寫入單元）</h2><table class='u'><tr><th>已寫入單元</th><th>locus</th><th>source</th><th>gate 修正／備註</th></tr><tr><td><b>§4.3 opener (Ch2 cross-ref)</b></td><td>節首動機散文</td><td class='src'>expansion:intuition（D-redundancy；cross-ref Ch2 informal、不動 Ch2）</td><td class='fx'>gate-1 prose G1-2：末句冒號處拆兩句</td></tr><tr><td><b>Difference-quotient setup</b></td><td>子節 The difference quotient</td><td class='src'>seed（手稿 p.10）；expansion:formula</td><td class='fx'>用 Thm 4.7 指數律因式分解、化約到 lim(e^h−1)/h</td></tr><tr><td><b>Proposition 4.2 + Proof（bound）</b></td><td>|（e^h−1)/h − 1| ≤ |h|</td><td class='src'>seed Note（手稿 p.11）</td><td class='fx'>§C-1 fill：bracket≤1 用 n!≥2^{n−1} 幾何比較＋Strategy 4.1 回指（§C-5）</td></tr><tr><td><b>Remark 4.3（explicit rate）</b></td><td>Prop 4.2 之後</td><td class='src'>expansion:intuition（brief §C；legacy 有對應 remark）</td><td class='fx'></td></tr><tr><td><b>Theorem 4.8 + Proof</b></td><td>d/dx e^x = e^x</td><td class='src'>seed（手稿 p.11）</td><td class='fx'>gate-1／gate-2 對賬 legacy §4.3 全等</td></tr><tr><td><b>Corollary 4.2 + Proof（higher derivatives）</b></td><td>(e^x)^{(n)} = e^x</td><td class='src'>expansion:intuition（§C-3；手稿無、legacy 有；迭代）</td><td class='fx'></td></tr><tr><td><b>Closer（application hook → §4.4）</b></td><td>節末</td><td class='src'>expansion:summary；§C-4 一句 hook + forward §4.4 monotonicity</td><td class='fx'>gate-1 direction F1：建模解改 e^{kt}（時間變數）；F2/G1-1：拆 hook 與 fence</td></tr></table><h2>裁決逐條（6 advisory → 5 卡：3 已套、2 保留）</h2><div class='card applied'><div class='chips'><span class='chip c-app'>applied</span><span class='chip c-cat'>direction-conformance</span></div><div class='issue'><b>F1</b>　收尾把建模解寫成 <code>y = y(0)e^{kx}</code>（變數 x）——但 x 正是本節微分變數，瞬間讀起來像本節在處理 <code>e^{kx}</code> 這個函數物件；brief（承重直覺／§C-4）一律用時間變數 <code>t</code>。改 <code>y = y(0)e^{kt}</code>。</div><div class='sug'>裁決：<span class='disp applied'>已套（消除與微分變數撞義、對齊 brief）</span></div></div><div class='card applied'><div class='chips'><span class='chip c-app'>applied</span><span class='chip c-cat'>prose</span></div><div class='issue'><b>G1-1／F2</b>　收尾首句過長：建模式 <code>y'=ky</code>＋解＋遞延＋em-dash 插語擠成一句，且 application hook 與 monotonicity forward-fence 黏連。改：逗號→冒號接 hook、分號→句點，拆成兩句，hook 與 fence 分離。</div><div class='sug'>裁決：<span class='disp applied'>已套（散文 G1-1 與 direction F2 同 locus、合併）</span></div></div><div class='card applied'><div class='chips'><span class='chip c-app'>applied</span><span class='chip c-cat'>prose</span></div><div class='issue'><b>G1-2</b>　opener 末句三子句堆疊（re-derive honestly＋gain something＋冒號定義 bound）。冒號處拆成兩句，降首讀認知負荷。</div><div class='sug'>裁決：<span class='disp applied'>已套（可讀性）</span></div></div><div class='card kept'><div class='chips'><span class='chip c-kept'>kept</span><span class='chip c-cat'>prose</span></div><div class='issue'><b>G1-3</b>　子節首「a single algebraic move, and that move is the exponent law」重複「move」。agent 標 [Optional]／taste：此為刻意修辭強調（先懸念再揭曉指數律），語意無礙。</div><div class='sug'>裁決：<span class='disp kept'>保留（修辭強調、taste）</span></div></div><div class='card kept'><div class='chips'><span class='chip c-kept'>kept</span><span class='chip c-cat'>prose</span></div><div class='issue'><b>G1-4</b>　Remark 4.3 中句 em-dash 插語＋分號密度略高但語意正確、不誤導；屬 [Optional] polish。</div><div class='sug'>裁決：<span class='disp kept'>保留（readable、conf 低）</span></div></div>
+<footer>產生器：<code>REVIEW-s43.gen.py</code>　·　成品：<a href="../../../chapter4-print-standalone.html">chapter4-print-standalone.html</a>　·　另一閘：見同目錄 <code>REVIEW-ch04_s43-gate2.html</code>。</footer>
+</div>
+</body>
+</html>
