@@ -1,0 +1,659 @@
+You are an ADVISORY adversarial reviewer of a calculus handout section (HTML format) that was expanded from the SEED below, following an approved DIRECTION BRIEF. You do NOT rewrite; you surface findings for a human.
+
+Hunt especially for:
+(a) mathematical errors, fabricated theorems/identities, or over-generalized claims;
+(b) drift from the seed's mathematics (the seed IS the manuscript's mathematical backbone);
+(c) direction-conformance violations: did the draft cover what the brief specifies? did it include anything from the brief's "do-not-write" (kept under the heading 刻意不寫) list?
+
+Tag EVERY finding with a CATEGORY and a BLOCKING flag (do not inflate):
+  category: math | faithfulness | direction-conformance | house_rule | register | other
+  blocking: true ONLY for:
+    - a real MATH ERROR or fabricated/over-generalized claim (category=math)
+    - DRIFT from the seed's mathematics (category=faithfulness)
+    - VIOLATION of direction-conformance: missing a brief-mandated item OR including a brief-forbidden item (category=direction-conformance)
+  Everything else MUST be blocking=false.
+
+Formatting / house-rule items (missing expansion comments, register/style nits) are caught by a downstream DETERMINISTIC LINTER, so report them as ADVISORY (blocking=false); they MUST NOT block convergence.
+
+Also give each finding a level for human triage:
+  1 = real conflict (must fix)
+  2 = discoverability gap (add doc/comment)
+  3 = editorial drift (low priority)
+  4 = non-finding (mathematically equivalent paraphrase, stylistic preference)
+
+A mathematically equivalent paraphrase is NOT a finding.
+
+This is a heavy real-analysis section; spend your effort on the MATH. Re-derive each step independently:
+  - Theorem 4.3 continuity for x>0: the three-piece split e^x - e^{x0} = (e^x - P_k(x)) + (P_k(x) - P_k(x0)) + (P_k(x0) - e^{x0}); that both x, x0 lie in (0, x0+1) given delta < min{x0/2, 1/2}; the < 3*epsilon bookkeeping; correct use of the §4.1 tail bound (*).
+  - Theorem 4.4 Bolzano-Weierstrass: the peak-point argument, BOTH cases (infinitely many peaks => non-increasing subsequence bounded below => Theorem 4.1 part (2); finitely many peaks => strictly increasing subsequence bounded above => Theorem 4.1 part (1)).
+  - Theorem 4.5 convergent <=> Cauchy: both directions; "Cauchy => bounded" via epsilon=1; "bounded => convergent subsequence" via BW; "Cauchy + convergent subsequence => convergent".
+  - Proposition 4.1 ((triangle) absolute convergence => convergence): its Cauchy-tail proof.
+  - Theorem 4.7 exponent law (the riskiest): the product split P_k(x)P_k(y) = (I) + (II) grouped by total degree l = i+j; the binomial collapse (I) = P_k(x+y); the (II) tail bound <= (2L)^{n0}/n0! * (1/2)^{k-n0} and whether k > n0 > 8L delivers the geometric ratio; the four-term telescope as an EXACT algebraic identity; the use of (**) at x+y with |x+y| <= 2L; the double limit k -> infinity then L -> infinity.
+  - Corollary 4.1 positivity: e^x = (e^{x/2})^2 and e^x e^{-x} = 1.
+
+NUMBERING NOTE: §4.2 is NOT the chapter's first section. Per-type counters CONTINUE from §4.1 (which used Definition 4.1; Theorem 4.1 Completeness, 4.2 convergence; Strategy 4.1; Example 4.1; Figure 4.1; Remark 4.1). Therefore §4.2 correctly uses: Definition 4.2 (Cauchy); Theorem 4.3 (continuity x>0), 4.4 (Bolzano-Weierstrass), 4.5 (Cauchy criterion), 4.6 (continuity on R), 4.7 (exponent law); Proposition 4.1 (absolute convergence); Corollary 4.1 (positivity); Remark 4.2; Caution unnumbered. This continuation is CORRECT -- do NOT flag it as a discontinuity. Cross-references back to §4.1 ("Theorem 4.1", "Theorem 4.2", "the bound (*)") are correct, not missing content.
+
+SCOPE / EXPANSION NOTE for §4.2: the SEED covers manuscript pp.3-10 ([e2] continuity for x>0 through the exponent law and the closing Summary). The draft adds, as MARKED expansions sanctioned by the brief (decisions D3-1/D3-2/§C) and cross-checked against the SIGNED LEGACY GROUND TRUTH (legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.2):
+  - The FULL Bolzano-Weierstrass theorem + peak-argument proof, and the convergent<=>Cauchy proof. The manuscript explicitly PUNTS here ("we shall not prove this theorem"); the handout SUPPLIES the proof on user direction (D3-1). Do NOT flag the BW/Cauchy proof as out-of-scope, and do NOT demand that it be left unproved.
+  - Theorem 4.6 (continuity on all of R) named explicitly (the manuscript states full-line continuity only in its closing Summary).
+  - Corollary 4.1 (positivity e^x>0), Remark 4.2 (why x<0 is harder), and the Bolzano-Weierstrass-dependency Caution.
+  - The exponent law is written as a FULL multi-step proof (D3-2), not an outline.
+  - Binomial coefficients use \binom with a one-time cross-reference to the manuscript's C^n_k notation (D8).
+These are INTENDED expansions, not drift.
+
+DELIBERATELY OMITTED (brief 刻意不寫) -- these MUST NOT appear in the §4.2 body; flag as blocking direction-conformance ONLY if they actually appear:
+  - re-proving or re-stating the Completeness theorem (it is only cited as Theorem 4.1);
+  - re-proving the §4.1 tail bound (only cited as (*));
+  - the difference quotient (e^{x+h}-e^x)/h, the limit (e^h-1)/h, or (e^x)' beyond a one-line §4.3 forward-fence (that is §4.3);
+  - ln x or irrational powers a^x = e^{x ln a} (that is §4.5);
+  - a PROOF of the binomial theorem (it is a stated tool);
+  - Rolle's theorem / MVT (that is §4.4);
+  - any self-invented "your turn" exercise.
+
+This section has NO figure (it is a proof section); do NOT report "figure missing".
+
+Set "converged": true when there are ZERO blocking findings (math correct, faithful to seed, conforms to direction brief), even if advisory formatting nits remain.
+
+Return STRICT JSON only, no prose outside the JSON.
+
+=== SEED (manuscript transcription, pp.3-10) ===
+
+# Seed — §4.2 Continuity and the Exponent Law for e^x
+
+> stage ① 產物。Transcribed from the handwritten manuscript `2023-11-4-ExponentialFunction`,
+> **pp.3–10** (from `[e2]` "e^x is continuous for x>0", through the boxed exponent law
+> `e^x e^y = e^{x+y}` and the Summary; the next item "§ The derivative of the exponential
+> function" begins §4.3).
+> Manuscript has **no separate section title** here — it is the continuation of the exponential
+> construction (handout splits it into §4.2 per ROADMAP).
+> Faithful to the manuscript: structure, order, notation, and deliberate omissions preserved.
+> seed 語法＝輕量可讀（反引號行內＋Unicode；見 CONTENT_DIRECTION ① / `seed_ch04_s1.md`）。漂亮 KaTeX 留給 ④。可疑／非標準處標 **[請查核]**。
+> **數學 cross-check（非手稿）**：legacy `ch04_exponential_logarithm.tex` 的 §4.2 段（LaTeX→HTML 轉移前已簽核的整章；D1：僅盲算對賬，不照抄散文／結構）。
+> **重跑註記（2026-06-21）**：舊 §4.2 POC `sec-4-2.html` 與舊 seed `seed_s42.md` 已刪除；本 seed 為從手稿重新轉錄、併進正式 ch04 章流程的全新 ① 產物（取代舊 test-pipeline 首跑）。
+
+---
+
+## §4.1 依賴（承前；非本節新內容，僅備援引）
+
+§4.1 在 x>0 收斂結尾建立的**部分和尾界**，§4.2 全程反覆援用：
+記 `P_k(x) := Σ_{n=0}^{k} xⁿ/n!`（手稿自 §4.2 起以 `P_k` 標部分和）。
+對 `0 < x < L` 與 `k > n₀ > 2L`，
+`0 ≤ e^x − P_k(x) ≤ L^k/k! ≤ (L^(n₀)/n₀!)·(1/2)^(k−n₀)`   …(∗)。
+
+(因子比較 `L/j < 1/2`（`j > n₀ > 2L`）給出幾何衰減 `(1/2)^(k−n₀)`。)
+
+---
+
+## [e2] e^x is a continuous function for x > 0
+
+To show `lim_{x→x₀} e^x = e^{x₀}`, `x₀ > 0`:
+
+For given `ε > 0`, choose `k > n₀ > 2(x₀+1)` such that
+`((x₀+1)^(n₀)/n₀!)·(1/2)^(k−n₀) < ε`.
+
+Since `P_k(x) := Σ_{n=0}^{k} xⁿ/n!` is a continuous function
+[any polynomial is a continuous function], `∃ δ > 0` with `δ < min{x₀/2, 1/2}` such that
+`|P_k(x) − P_k(x₀)| < ε`   provided   `|x − x₀| < δ`.
+
+Now:
+`e^x − e^{x₀} = (e^x − P_k(x)) + (P_k(x) − P_k(x₀)) + (P_k(x₀) − e^{x₀})`.
+
+Hence, for `|x − x₀| < δ = min{x₀/2, 1/2}`,
+`|e^x − e^{x₀}|`
+` ≤ |e^x − P_k(x)| + |P_k(x) − P_k(x₀)| + |P_k(x₀) − e^{x₀}|`
+` ≤ ((x₀+1)^(n₀)/n₀!)·(1/2)^(k−n₀)  +  ε  +  ((x₀+1)^(n₀)/n₀!)·(1/2)^(k−n₀)`
+` < 3ε`.
+
+This proves that `lim_{x→x₀} e^x = e^{x₀}`. Hence, `e^x` is a continuous function for `x > 0`.
+
+(兩個端點項用 (∗) 控制：`x`, `x₀` 均落在 `(0, x₀+1)` 內，故 `L = x₀+1`、`n₀ > 2(x₀+1)`，兩處 `|e^· − P_k(·)|` 各 `< ε` 的尾界部分。中間項用 `P_k` 的多項式連續。)
+
+---
+
+## [e3] 0 < e^y < +∞ for y < 0
+
+(手稿以此標明：對 `y < 0`，`e^y` 仍有定義且有限、為正。其有限性／收斂由下方 (△) 絕對收斂性質提供——見後文「We observe that (1)」一步 `|e^y| ≤ e^(|y|) < +∞`。)
+
+**[請查核]**：手稿在此僅陳述 `0 < e^y < +∞`；正性 `e^y > 0`（y<0）手稿未在此處單獨證明（落地時可由指數律 `e^y e^(−y) = e^0` 或級數逐項補述——屬 ④ 方向）。
+
+---
+
+## (△) Property — absolute convergence implies convergence
+
+**(△) Property:** If `Σ_{n=1}^∞ |aₙ| < +∞`, then `Σ_{n=1}^∞ aₙ` converges.
+
+**Note:** when we say `Σ_{n=1}^∞ aₙ` converges, this means `Sₖ = Σ_{n=1}^{k} aₙ` is a convergent
+sequence, i.e. `lim_{k→∞} (Σ_{n=1}^{k} aₙ)` exists.
+
+### Def — Cauchy sequence
+
+A sequence `{aₙ}_{n=1}^∞` is called a **Cauchy sequence** if for any `ε > 0`, `∃ N₀ ∈ ℕ`
+such that `|aₘ − aₙ| < ε` for any `m, n ≥ N₀`.
+
+### Thm — convergent ⟺ Cauchy
+
+A sequence `{aₙ}_{n=1}^∞` is a convergent sequence **if and only if** `{aₙ}_{n=1}^∞` is a
+Cauchy sequence.
+
+> **手稿明寫 punt：** "For the moment, we shall not prove this theorem."
+> （ROADMAP resolved 方向 D3①：handout 版**展開**成完整 Bolzano–Weierstrass ＋ monotone-subsequence
+> 證明——超出手稿、user-directed 2026-04-27。屬 ② brief／④ draft 的擴增，非本 seed 轉錄範圍。）
+
+### Proof of (△) using Cauchy
+
+To show (△) property, set `Sₙ = Σ_{k=1}^{n} aₖ`, where `Σ_{k=1}^∞ |aₖ| < +∞`.
+
+Since `Σ_{k=1}^∞ |aₖ| < +∞`, for any `ε > 0`, `∃ N₀ ∈ ℕ` such that
+`Σ_{k=N₀+1}^∞ |aₖ| < ε`.
+
+Therefore for `m > n > N₀`,
+`|Sₘ − Sₙ| ≤ Σ_{k=n+1}^{m} |aₖ| ≤ Σ_{k=N₀+1}^∞ |aₖ| < ε`.
+
+This proves that `{Sₙ}_{n=1}^∞` is a Cauchy sequence. Hence, `Σ_{k=1}^∞ aₖ` converges. ∎
+
+---
+
+## Exponent law: e^x · e^y = e^{x+y}
+
+> 以下假設 `x, y ∈ [−L, L]`，`k > n₀ > 8L`。
+
+### We observe that
+
+**(1)** `|e^y| ≤ |Σ_{n=0}^∞ yⁿ/n!| ≤ Σ_{n=0}^∞ |y|ⁿ/n! ≤ e^(|y|) < +∞`,   and
+`|e^y − P_k(y)| ≤ Σ_{n=k+1}^∞ |y|ⁿ/n! ≤ |y|^k/k!`   if `k > n₀ > 2|y|`.
+
+(此步同時給出 [e3] 的有限性：`Σ|y|ⁿ/n! = e^(|y|) < ∞` ⟹ 由 (△) 級數絕對收斂 ⟹ `e^y` 對 `y<0` 有定義。)
+
+**(2)** `P_k(x)·P_k(y) = (Σ_{n=0}^{k} xⁿ/n!)(Σ_{n=0}^{k} yⁿ/n!)`
+` = Σ_{ℓ=0}^{k} Σ_{m=0}^{ℓ} [1/(m!(ℓ−m)!)] xᵐ y^(ℓ−m)`   … (I)
+` + Σ_{j=1}^{k} Σ_{m=j}^{k} [1/(m!(k+j−m)!)] xᵐ y^(k+j−m)`   … (II)
+
+### 二項式定理 (Binomial Theorem)
+
+**Notation:** `Cⁿ_k := n!/(k!(n−k)!)`, `k, n ∈ ℕ` and `k ≤ n`.
+（D8：本書全程改用 `\binom{n}{k}`；首見處 cross-ref 手稿記號 `Cⁿ_k`。）
+
+`(x + y)ⁿ = Σ_{k=0}^{n} Cⁿ_k · xᵏ y^(n−k)`.
+
+### (I) = P_k(x+y)
+
+`(I) = Σ_{ℓ=0}^{k} Σ_{m=0}^{ℓ} [1/(m!(ℓ−m)!)] xᵐ y^(ℓ−m)`
+`    = Σ_{ℓ=0}^{k} (1/ℓ!) Σ_{m=0}^{ℓ} [ℓ!/(m!(ℓ−m)!)] xᵐ y^(ℓ−m)`
+`    = Σ_{ℓ=0}^{k} (1/ℓ!) Σ_{m=0}^{ℓ} C^ℓ_m xᵐ y^(ℓ−m)`
+`    = Σ_{ℓ=0}^{k} (1/ℓ!) (x+y)^ℓ  =  P_k(x+y)`.
+
+### (II) tail bound
+
+`|(II)| = |Σ_{j=1}^{k} Σ_{m=j}^{k} [1/(m!(k+j−m)!)] xᵐ y^(k+j−m)|`
+`      ≤ Σ_{ℓ=k+1}^{2k} Σ_{m=0}^{ℓ} [1/(m!(ℓ−m)!)] |x|ᵐ |y|^(ℓ−m)`
+`      ≤ Σ_{ℓ=k+1}^{2k} (1/ℓ!) (|x|+|y|)^ℓ`
+`      ≤ (1/k!) (|x|+|y|)^k`
+`      ≤ (2L)^(n₀)/n₀! · (1/2)^(k−n₀)`.
+
+（末步用 `|x|+|y| ≤ 2L` 與 `k > n₀ > 8L`。**[請查核]** 中間步 `Σ_{ℓ=k+1}^{2k}(1/ℓ!)(|x|+|y|)^ℓ ≤ (1/k!)(|x|+|y|)^k` 的係數收法手稿較簡略。）
+
+Hence,
+`|P_k(x)·P_k(y) − P_k(x+y)| ≤ (2L)^(n₀)/n₀! · (1/2)^(k−n₀)`.
+
+**Note also** (同 (∗)，對 `|x| ≤ L`):
+`|e^x − P_k(x)| ≤ L^k/k! ≤ (L^(n₀)/n₀!) · (1/2)^(k−n₀)`.
+
+### Four-term split → limit
+
+`e^x e^y − e^{x+y}`
+` = (e^x − P_k(x)) e^y  +  P_k(x) (e^y − P_k(y))  +  (P_k(x) P_k(y) − P_k(x+y))  +  (P_k(x+y) − e^{x+y})`
+
+implies
+`|e^x e^y − e^{x+y}|`
+` ≤ (L^(n₀)/n₀!)(1/2)^(k−n₀) · e^L`
+` + e^L · (L^(n₀)/n₀!)(1/2)^(k−n₀)`
+` + (2L)^(n₀)/n₀! · (1/2)^(k−n₀)`
+` + (2L)^(n₀)/n₀! · (1/2)^(k−n₀)`.
+
+By taking the limit `k → ∞`, we see that `e^x · e^y = e^{x+y}` for `x, y ∈ [−L, L]`.
+
+Let `L → ∞`, we see that
+**`e^x · e^y = e^{x+y}` holds for all `x, y ∈ ℝ`.**
+
+---
+
+## Summary (手稿原文)
+
+`e^x := Σ_{n=0}^∞ xⁿ/n!`,  `x ∈ ℝ`  is a continuous function and `e^x · e^y = e^{x+y}`
+for all `x, y ∈ ℝ`.
+
+（注意：Summary 把 `e^x` 的定義域由 §4.1 的 `x>0` **延拓到整個 ℝ**——`x<0` 經 (△) 絕對收斂取得定義，連續性與指數律隨之對全 ℝ 成立。手稿在 §4.2 內只顯式證了 x>0 的連續，全 ℝ 連續性在 Summary 處一併宣告。**[請查核]**：是否要在 handout 補一條全 ℝ 連續的明說 Theorem，屬 ② brief 方向。）
+
+---
+
+## §4.2 / §4.3 boundary
+
+手稿接著寫 **§ The derivative of the exponential function**：差分商
+`(e^{x+h} − e^x)/h = ((e^h − 1)/h) e^x`——**這是 §4.3 的開頭**，不屬本 seed。
+
+---
+
+## 手稿刻意省略／特徵（忠實記錄）
+
+- **收斂⟺Cauchy 定理手稿不證**（"we shall not prove"）。handout 版依 ROADMAP resolved 展開完整 Bolzano–Weierstrass（D3①，屬 ②/④ 擴增）。
+- **指數律手稿走完整推導**（二項式 + 雙和拆 (I)(II) + 四項拆 + 雙重取極限 k→∞、L→∞），非 outline。ROADMAP D3② 亦要求 handout 寫**完整 6 步**，與手稿一致。
+- **x<0 的連續性無獨立證明**：手稿只證 x>0 連續（[e2]），`x<0` 經 (△) 取得 `e^y` 定義與有限性，全 ℝ 連續在 Summary 一併宣告。
+- **`e^y > 0`（y<0）的正性**手稿未在 [e3] 處單獨證（見上 [請查核]）。
+- worked example：**0 個**。圖：**0**。動機散文：**極少**。caution／strategy／named-result 索引：**無**（具名化 Theorem/Def 屬 ④ 落地）。
+- 記號：部分和 `P_k(x)`；二項式手稿記 `Cⁿ_k`（→ 本書 `\binom`，D8）；尾界常數型態 `(C^(n₀)/n₀!)(1/2)^(k−n₀)`，`C ∈ {L, x₀+1, 2L}` 視場景。
+
+---
+
+## 對照 ground truth（評分用，非手稿）
+
+已簽核 `legacy/tex_handout/chapters/ch04_exponential_logarithm.tex` 的 §4.2 段是同一手稿的 LaTeX→HTML 前簽核版，**僅作盲算對賬的 ground truth**（D1），不照抄其散文／結構。落地時新具名結果（Bolzano–Weierstrass、收斂⟺Cauchy 等價）一律人工查核。
+
+**ROADMAP 已 resolved 的 §4.2 方向（待 ③ 方向閘確認沿用，PLAN D3）：**
+- ① 收斂⟺Cauchy **展開**成完整 Bolzano–Weierstrass ＋ monotone-subsequence（超出手稿）。
+- ② 指數律寫**完整 6 步**（與手稿一致，已是完整推導）。
+
+**§4.1 落地後的編號接續（PLAN §5 ledger）：** §4.1 已用到 Definition 4.1、Theorem 4.1（Completeness）／4.2（convergence x>0）、Strategy 4.1、Example 4.1、Figure 4.1、Remark 4.1。**§4.2 因此自 Theorem 4.3、Definition 4.2 起編號。** 本 seed 為手稿原貌（pp.3–10）；具名化與編號落在 ④。
+
+=== END SEED ===
+
+=== DIRECTION BRIEF (approved at gate 3) ===
+
+# Direction Brief — §4.2 Continuity and the Exponent Law for e^x
+
+> ② 方向提案（CONTENT_DIRECTION §2 九欄）。**狀態：待 ③ 方向閘核可**（③ 拍板後本 brief 成 ④/⑤ 契約）。
+> 輸入：[`seed_ch04_s2.md`](seed_ch04_s2.md)（手稿 pp.3–10）＋ [`PLAN-ch04.md`](PLAN-ch04.md) 章層決策 D2/D3/D8/D9 ＋ ROADMAP「Chapter 4」條目（core skill #2、Bolzano–Weierstrass pitfall、兩條 resolved open question）。
+> §4.2 **非首節**：不再建章基礎建設；沿用 §4.1 已建的 chapter standalone／fragments／figures.js，續編號（自 Theorem 4.3、Definition 4.2 起）。
+> ①-verify：使用者選「繼續 §4.2」即視為 seed accepted-by-proceeding（pending §C 的 [請查核] 更正）。數學 cross-check：legacy `ch04_exponential_logarithm.tex` 的 §4.2 段。
+> **重跑脈絡**：舊 POC `sec-4-2.html` 與舊 test-pipeline seed 已刪，本 brief 為從手稿重轉錄、併進正式章流程的全新 ②（取代首跑）。
+
+---
+
+## 手稿盤點（照原順序）
+- **[e2]** `e^x` is continuous for `x>0`：證 `lim_{x→x₀} e^x = e^{x₀}`（x₀>0）。三段拆 `e^x−e^{x₀} = (e^x−P_k(x)) + (P_k(x)−P_k(x₀)) + (P_k(x₀)−e^{x₀})`；兩端用 §4.1 尾界 (∗)（`L=x₀+1`、`n₀>2(x₀+1)`）各 `<ε`，中項用 `P_k` 多項式連續 `<ε` → `<3ε`。
+- **[e3]** `0 < e^y < +∞` for `y<0`（陳述；有限性由 (△)＋後文「observe (1)」`|e^y|≤e^(|y|)<∞` 供給）。
+- **(△) Property**：`Σ|aₙ|<∞ ⟹ Σaₙ converges`。附「converges＝部分和 `Sₖ` 收斂」之定義澄清。
+- **Def** Cauchy sequence：`∀ε>0 ∃N₀ s.t. |aₘ−aₙ|<ε ∀m,n≥N₀`。
+- **Thm** convergent `⟺` Cauchy。**手稿明寫 punt：「we shall not prove this theorem」。**
+- **(△) 的證**：用 Cauchy——`Sₙ=Σ_{1}^{n}aₖ`，`Σ_{N₀+1}^∞|aₖ|<ε ⟹ m>n>N₀ 時 |Sₘ−Sₙ|≤Σ_{n+1}^{m}|aₖ|≤Σ_{N₀+1}^∞|aₖ|<ε ⟹ {Sₙ} Cauchy ⟹ 收斂`。
+- **指數律** `e^x e^y = e^{x+y}`（假設 `x,y∈[−L,L]`、`k>n₀>8L`）：
+  - obs (1)：`|e^y|≤e^(|y|)<∞`、`|e^y−P_k(y)|≤|y|^k/k!`（k>n₀>2|y|）；
+  - obs (2)：`P_k(x)P_k(y) = (I) + (II)`（雙和）；
+  - **二項式定理**（`Cⁿ_k:=n!/(k!(n−k)!)`、`(x+y)ⁿ=Σ Cⁿ_k xᵏ y^{n−k}`）→ `(I) = P_k(x+y)`；
+  - `(II)` 尾界 `≤ (2L)^(n₀)/n₀!·(1/2)^(k−n₀)` → `|P_k(x)P_k(y)−P_k(x+y)| ≤ (2L)^(n₀)/n₀!·(1/2)^(k−n₀)`；
+  - 四項拆 `e^x e^y − e^{x+y} = (e^x−P_k(x))e^y + P_k(x)(e^y−P_k(y)) + (P_k(x)P_k(y)−P_k(x+y)) + (P_k(x+y)−e^{x+y})` → bound → `k→∞` 得 `[−L,L]`、`L→∞` 得全 ℝ。
+- **Summary**：`e^x:=Σxⁿ/n!`（x∈ℝ）continuous 且 exponent law 對全 ℝ 成立（定義域由 §4.1 的 x>0 延拓到 ℝ）。
+- 具名人物／史實：**無**。worked example：**無**。圖：**無**。
+
+## 薄度剖析
+| 區塊 | 狀態 |
+|---|---|
+| [e2] continuity(x>0) 證 | **夠**（手稿全證，三段拆＋(∗)＋多項式連續，標準且本節主軸） |
+| **conv `⟺` Cauchy** | **手稿 punt（不證）** → ROADMAP resolved（D3①）要求 handout **展開**成完整 **Bolzano–Weierstrass ＋ monotone-subsequence** 證明（超出手稿，user-directed 2026-04-27）。**＝本節最大 expansion。** |
+| (△) abs-conv⟹conv 證 | **夠**（手稿用 Cauchy 全證；但依賴鏈「(△)←conv⟺Cauchy←BW←completeness」的**直覺**薄）→ caution |
+| [e3] `0<e^y<∞`（y<0）| **薄**：有限性有（(△)）；**正性 `e^y>0` 手稿未在此證**（見 §C-1） |
+| `x<0`／全 ℝ 連續 | **薄**：手稿只顯證 x>0 連續，全 ℝ 連續在 Summary 一句宣告（見 §C-3：是否補具名 Theorem） |
+| 指數律證 | **夠且完整**（手稿走完整二項式重組＋雙和＋四項拆＋雙重極限；ROADMAP D3② 亦要求完整 6 步——與手稿一致，**不縮成 outline**） |
+| series-multiplication 的**動機**（為何要拆 (I)(II)）| **薄**（手稿直接代數展開，未說「(I) 收成 `P_k(x+y)`、(II) 是可丟的尾」的策略視角）→ 一句 strategy/prose |
+| 具體計算 worked example | **無**（手稿純證明節） |
+
+## 範圍與深度
+- **吃手稿這一叢**：[e2] continuity(x>0) → [e3] → (△)＋Cauchy＋（conv⟺Cauchy）→ x<0 延拓 → 指數律。
+- **保留證明**（手稿全證、標準、本節主軸）：continuity(x>0)、(△) via Cauchy、指數律（完整 6 步，D3②）。
+- **核心 expansion（D3①，user-directed、超出手稿）**：把手稿 punt 的 conv⟺Cauchy **補成完整證**——completeness（§4.1 Thm 4.1）→ **Bolzano–Weierstrass**（monotone-subsequence peak argument）→ Cauchy⟹convergent（用 BW 取收斂子列）＋ convergent⟹Cauchy（易向）。深度＝把「收斂⟺Cauchy」的依賴鏈接回 §4.1 的 completeness，讓學生看到兩者**邏輯等價**（ROADMAP pitfall「Bolzano–Weierstrass dependency」）。
+- **陳述不證**：completeness（§4.1 已陳述為 Theorem 4.1，本節**只援引**、不重述不重證）。二項式定理（Ch2 §2.4 已用；本節陳述記號＋直接用，不另證）。
+- **forward-fence（一行帶過）**：嚴格 `(e^x)'=e^x` → §4.3（本節指數律＋連續是其前置，但**不碰差分商**）；`ln`／無理指數 → §4.5。
+- **不重做 §4.1**：尾界 (∗) 直接以「§4.1 的部分和尾界」援引，**不重證**；`P_k` 記號沿用。
+
+## 承重直覺（一節一個，領頭）
+**用多項式逼近超越級數，再用幾何尾界把誤差一致壓小——多項式會的事（連續、相乘、二項式），就能搬到無窮級數上。** §4.1 掙到了 `e^x` 的存在；§4.2 要證它「行為良好」（連續、乘法相加）。兩證**同一引擎**：把 `e^x` 換成部分和 `P_k(x)`（一個多項式），用 §4.1 尾界 (∗) 讓 `|e^x−P_k(x)|` 一致地小，於是多項式的已知性質（多項式連續、`P_k(x)P_k(y)` 可用二項式重組成 `P_k(x+y)`）逐一過渡到 `e^x`，残差隨 `k→∞` 消失。continuity 的三段拆與指數律的四項拆是**同一招的兩次施展**。（對齊 ROADMAP strategy「tail-bound argument，本章多次重用」。）
+
+## worked example 清單（提案，待 ③）
+| # | 內容 | 取捨 |
+|---|---|---|
+| —— | §4.2 為**純證明節**，手稿無例題；證明本身（continuity、指數律）即承重 beat。 | **提案：0 個 worked example。** 多塞數值例會稀釋三條主證。③ 若要一個「具體感」錨，可考慮極小的 `e^1·e^1 = e^2`（即 `(Σ1/n!)²` 部分和 ≈ `Σ2ⁿ/n!` 部分和）數值對照 remark——**低優先、預設不收**。 |
+
+## history / application
+- **history**：**留白**（手稿無；Cauchy/Bolzano–Weierstrass 的史實註可一句帶過，**低優先、預設不放**，放則標 `[source: standard real-analysis historical note]`）。
+- **application**：**留白**。§4.2 是地基證明節，無自然真實應用錨。
+
+## 強調 / takeaway
+- **概念樞紐**：**絕對收斂 ⟹ 收斂（(△)）是通往 `x<0` 的閘門**——`x<0` 時級數正負交錯、部分和不再單調，§4.1 的單調有界論證失效；(△)（其底層＝completeness 經 BW 給出的 conv⟺Cauchy）把收斂救回來，連續與指數律才能延拓到全 ℝ。
+- **可攜技能**：(1) 對交錯／一般級數，用絕對收斂判收斂；(2) **partial-sum 逼近 + 尾界過渡**：要證超越函數的某性質，先對其多項式部分和證、再用 (∗) 讓誤差消失。
+- **依賴鏈 takeaway**：`completeness → Bolzano–Weierstrass → (convergent ⟺ Cauchy) → (△) → e^x 在 ℝ 上 well-behaved`。
+
+## 刻意不寫（餵 auditor 作 direction-conformance 反向檢查）
+| 不寫什麼 | 理由 | 它該去哪 |
+|---|---|---|
+| completeness 的**重述／重證** | §4.1 Theorem 4.1 已陳述；本節只援引 | §4.1（本節 cross-ref） |
+| §4.1 尾界 (∗) 的**重證** | §4.1 已證；本節一句援引 `P_k`／(∗) | §4.1 |
+| 差分商 `(e^{x+h}−e^x)/h`、`lim(e^h−1)/h`、`(e^x)'=e^x` | 屬導數節 | §4.3（本節 forward-fence 一句） |
+| `ln x`、無理指數 `a^x=e^{x ln a}` | 需 `e^x` 反函數＋ monotonicity | §4.5 |
+| 二項式定理的**證明** | 已知工具（Ch2 §2.4 用過）；本節陳述記號＋直接用 | 陳述即可 |
+| Rolle／MVT／monotonicity corollary | 屬 §4.4 | §4.4 |
+| 自創 bare your-turn exercise | README §防護欄禁、deferred | —（自創一律寫成含解 worked example） |
+| 把 conv⟺Cauchy 留成「不證」 | **反向**：手稿 punt，但 D3① user-directed 要**補全證**——auditor 應確認 BW＋monotone-subsequence 在場、非 outline | 本節（expansion，必寫） |
+
+## 篇幅帶（護欄非預算）
+**6–9 A4 print 頁**（比 §4.1 重：三條主證＋BW expansion；無 figure）。§4.2 ≈ 1 Theorem(continuity x>0＋證)＋1 Proposition((△)＋證)＋1 Definition(Cauchy)＋1–2 Theorem(BW＋conv⟺Cauchy＋證)＋（選配）1 Theorem(全ℝ continuity)＋1 Theorem(exponent law＋完整 6 步證)＋1 Caution(BW dependency)＋1 Strategy(援引 4.1)。**ch04 數學重（多行 aligned 級數、雙和、`\binom`）→ ④ 後特別查 print overflow**（PLAN §6）。明顯超出 9 頁 → 回查 BW 是否過度展開、或四項拆是否可收緊排版。
+
+---
+
+## A. 編號 ledger 提案（§4.2；接 §4.1 ledger，自 Theorem 4.3／Definition 4.2 起；④ 落定後回填 PLAN §5）
+
+> §4.1 已 mint：Definition 4.1、Theorem 4.1（Completeness）／4.2（convergence x>0）、Strategy 4.1、Example 4.1、Figure 4.1、Remark 4.1。各型獨立 counter、跨節連續。Caution 無編號（ch02/ch03 慣例）。
+
+| 型別 | §4.2 提案 | 說明 |
+|---|---|---|
+| **Definition** | `4.2`＝Cauchy sequence | 本節唯一定義 |
+| **Theorem** | `4.3`＝`e^x` continuous for x>0；`4.4`＝Bolzano–Weierstrass（completeness ⟹，monotone-subsequence；**D3① expansion**）；`4.5`＝convergent ⟺ Cauchy；`4.6`＝`e^x` continuous on ℝ（延拓；**見 §C-3 取捨**）；`4.7`＝exponent law `e^x e^y=e^{x+y}` | BW/conv⟺Cauchy 的**切分顆粒度待 ③**（可合可分；提案分立以凸顯依賴鏈） |
+| **Proposition** | `4.1`＝(△) absolute convergence ⟹ convergence | 手稿稱「(△) Property」；升格 Proposition（§4.1 無 Proposition，故起 4.1） |
+| **Corollary** | （選配）`4.1`＝`0<e^y<∞` for y<0（[e3]） | 或降為 Remark；**見 §C-1** |
+| **Strategy** | **援引 Strategy 4.1**（geometric tail）；不新增 | §4.2 兩證皆 reuse；首次 reuse 處一句回指 |
+| **Caution** | 無編號＝**Bolzano–Weierstrass dependency**（conv⟺Cauchy 邏輯上等價於 completeness） | ROADMAP pitfall；高價值依賴鏈警示 |
+| **Remark** | （選配）`4.2`＝為何 `x<0` 需絕對收斂（單調論證失效） | expansion；承載概念樞紐 |
+| **Example / Figure** | §4.2 **無**（無 ROADMAP key figure；純證明節） | — |
+
+> **編號自查（④）**：寫完逐一確認每個「by Theorem 4.x／Proposition 4.1／§4.1 的尾界 (∗)」都對得到一個存在的 `env-num`；跨 §4.1↔§4.2 引用尤其查（continuity 用 §4.1 (∗)、指數律用 (∗)）。**不再有舊 POC 的 renumber 問題**（POC 已刪）。
+
+## B. 章基礎建設
+**N/A** —— §4.2 非首節。chapter standalone／`fragments/ch04/` 骨架／figures.js／`build.py` ch04 entry 皆 §4.1 已建。§4.2 落地＝新增 `fragments/ch04/sec-4-2.html`、`build.py` 的 `CHAPTERS["ch04"].fragments` append `"sec-4-2"`、續用手動編號 ledger。**動手前先讀 `sec-4-1.html` 末尾**確認各型 counter 收在哪（接續機制，PLAN §5）。
+
+## C. 待核對／存疑（③ 一併裁示）
+1. **[e3] 正性 `e^y>0`（y<0）**：手稿在 [e3] 只陳述 `0<e^y<∞`，**正性未在此單獨證**。落地選項：(a) 由指數律 `e^y·e^{−y}=e^0=1>0` 得（須先有指數律與 `e^0=1`——次序上指數律在後，且 `e^0=1` 屬 §4.1 刻意不寫範圍）；(b) 由級數逐項：y<0 時無法逐項判正，故宜走 (a) 或一句「由 `e^y e^{−y}=1` 故 `e^y≠0`，連續＋`e^0=1`⟹恆正」。**提案 (a) 變體，置於指數律之後一句**。③ 確認。
+2. **conv⟺Cauchy 的 BW 展開深度（D3①）**：提案完整寫 Bolzano–Weierstrass（monotone-subsequence peak argument）＋兩向 conv⟺Cauchy。**顆粒度**：分立 Theorem 4.4（BW）／4.5（conv⟺Cauchy），或合成單一帶 lemma 的 Theorem？提案**分立**（凸顯依賴鏈、對齊 ROADMAP caution）。③ 確認深度與切分。
+3. **全 ℝ 連續是否升格具名 Theorem 4.6**：手稿只在 Summary 宣告全 ℝ 連續。提案補一條 **Theorem 4.6（`e^x` continuous on ℝ）**，證法＝x>0 的 [e2] 論證對任意 x₀∈ℝ 同樣成立（用 `|x₀|+1` 當 L、(∗) 對 |x| 版本）。③ 確認收或併入 Summary prose。
+4. **(II) 係數收法**（seed [請查核]）：`Σ_{ℓ=k+1}^{2k}(1/ℓ!)(|x|+|y|)^ℓ ≤ (1/k!)(|x|+|y|)^k` 手稿較簡略；④ 呈現時補一句「首項主導＋幾何尾」或直接走 `≤ (2L)^(n₀)/n₀!(1/2)^{k−n₀}` 的乾淨界。④ 處理、cross-check legacy §4.2。
+
+## D. 章層決策落地（§4.2 相關；提案＋理由，待 ③ 拍板）
+- **D3① — conv⟺Cauchy 展開完整 Bolzano–Weierstrass（必做，user-directed）。** 手稿 punt；handout 補 completeness→BW（monotone-subsequence）→conv⟺Cauchy。**提案：寫**（見 §A、§C-2）。
+- **D3② — 指數律完整 6 步（必做，user-directed）。** 與手稿一致（手稿本就完整）：二項式重組、(I)=`P_k(x+y)`、(II) explicit tail、四項拆、雙重極限。**不縮成 outline。**
+- **D8 — 二項式記號。** 手稿 `Cⁿ_k`；本書 `\binom{n}{k}`（ROADMAP）。**提案：用 `\binom`，首見處一句 cross-ref 手稿 `Cⁿ_k`。**
+- **D9 — `P_k` 部分和記號沿用**（手稿記號，§4.1–§4.2）。
+- **Caution（BW dependency）＋ Remark 4.2（x<0 需絕對收斂）** 為 expansion，承載依賴鏈與概念樞紐。**提案：收**（③ 取捨）。
+
+---
+
+### 結構草圖（④ 照此寫；待 ③ 定案）
+§4.2 開場（承 §4.1：`e^x` 在 x>0 已定義且收斂；本節證「行為良好」＝連續、乘法相加，並延拓到全 ℝ）→ **Thm 4.3** `e^x` continuous(x>0)（證：三段拆＋§4.1 尾界 (∗)＋`P_k` 多項式連續）→ **Remark 4.2** 為何 x<0 較難（交錯、單調失效）→ **Strategy（援引 4.1）** partial-sum＋tail 過渡 → **Prop 4.1** (△) abs-conv⟹conv（陳述）→ **Def 4.2** Cauchy → **Thm 4.4** Bolzano–Weierstrass（completeness⟹，monotone-subsequence）→ **Thm 4.5** convergent⟺Cauchy（用 BW）→ **Caution** BW dependency（邏輯等價 completeness）→ **Prop 4.1 的證**（用 Cauchy）→ `x<0` 延拓（由 (△)：`Σ|y|ⁿ/n!=e^{|y|}<∞`⟹`e^y` 定義）→ **Thm 4.6** `e^x` continuous on ℝ（選配）→ **Thm 4.7** exponent law（完整 6 步：obs(1)(2)、二項式、(I)=`P_k(x+y)`、(II) tail、四項拆、`k→∞`/`L→∞`）→ `e^y>0`(y<0) 一句（§C-1）→ Summary（全 ℝ：continuous＋exponent law）→ forward-ref §4.3（嚴格導數）。
+
+=== END DIRECTION BRIEF ===
+
+=== DRAFT (HTML fragment to review) ===
+
+<!-- §4.2 Continuity and the Exponent Law for e^x.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from _dev-archive/ch04/seed_ch04_s2.md (manuscript pp. 3–10). Direction
+     brief brief_s42.md approved at ③ (2026-06-21). Numbering is MANUAL and
+     CONTINUES from §4.1: §4.1 used Definition 4.1, Theorem 4.1/4.2,
+     Strategy 4.1, Example 4.1, Figure 4.1, Remark 4.1 — so §4.2 starts at
+     Definition 4.2, Theorem 4.3, Proposition 4.1, Remark 4.2, Corollary 4.1.
+     Caution is unnumbered (per ch02/ch03). Cross-references are plain prose.
+     Math cross-checked against the signed legacy ground truth
+     legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.2.
+
+     This is a fresh re-run: the old §4.2 POC (sec-4-2.html) and its
+     test-pipeline seed were deleted 2026-06-21; the section was re-transcribed
+     from the manuscript and merged into the formal chapter flow.
+
+     ③ decisions (brief §C/§D):
+       - D3① (user-directed): the manuscript writes "we shall not prove" for
+         convergent ⟺ Cauchy; the handout SUPPLIES the full proof via
+         Bolzano–Weierstrass (Theorem 4.4) and the monotone-subsequence/peak
+         argument — an expansion beyond the manuscript, required by ROADMAP.
+       - D3② (user-directed): the exponent law is written as a full proof
+         (binomial reorganisation, explicit (II) tail bound, four-term split,
+         double limit k→∞ then L→∞), not a 4-step outline.
+       - Theorem 4.6 (continuity on all of ℝ) is named explicitly (manuscript
+         only states full-line continuity in its closing Summary).
+       - e^y > 0 for y < 0 is obtained after the exponent law as Corollary 4.1
+         (e^x = (e^{x/2})² and e^x e^{-x} = 1); the manuscript states it as the
+         property [e3] without a separate proof.
+       - No worked examples, no figures (proof section; no ROADMAP key figure).
+     Counters handed to §4.3: Definition 4.2, Theorem 4.7, Proposition 4.1,
+     Corollary 4.1, Remark 4.2. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">4.2</span>Continuity and the Exponent Law for \(e^{x}\)</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: §4.1 gave existence for x>0; this section gives good behaviour (continuity, multiplicativity) and extends the definition to all of ℝ -->
+  <p>Section 4.1 gave \(e^{x}\) an honest existence: for \(x > 0\) the defining series converges to a finite number, and the partial sums \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) close in on it at a geometric rate, captured by the tail bound \((*)\). What we have <em>not</em> yet shown is that \(e^{x}\) behaves the way the symbol promises: that it is continuous, that it obeys \(e^{x} e^{y} = e^{x + y}\), and that it even makes sense for \(x \le 0\). This section settles all three. The engine throughout is a single idea: approximate the transcendental function \(e^{x}\) by the polynomial \(P_{k}(x)\), and use \((*)\) to make the error uniformly small. Once the error is controlled, the polynomial carries the argument. The one genuinely new tool we need is a convergence test that survives sign changes, since the partial sums for \(x < 0\) are no longer monotone.</p>
+
+  <h3 class="subsec-head">Continuity for \(x > 0\)</h3>
+
+  <p>Fix a base point \(x_{0} > 0\). We want \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). The difficulty is that \(e^{x}\) is an infinite series, not a polynomial; but its partial sum \(P_{k}\) <em>is</em> a polynomial, hence continuous, and the bound \((*)\) says \(P_{k}\) is uniformly close to \(e^{x}\) for every \(x\) in a fixed interval at once. The proof simply routes the comparison \(e^{x}\) versus \(e^{x_{0}}\) through \(P_{k}\) at both points.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.3</span></p>
+    <div class="env-body">
+      <p>The function \(e^{x}\) is continuous at every \(x_{0} > 0\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Let \(x_{0} > 0\) and let \(\varepsilon > 0\) be given. Work on the interval \(0 < x < x_{0} + 1\), so we may take \(L = x_{0} + 1\) in the tail bound \((*)\). Choose integers \(k > n_{0} > 2(x_{0} + 1)\) large enough that</p>
+      <p>\[ \frac{(x_{0} + 1)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} < \varepsilon. \]</p>
+      <p>This is possible because the left-hand side tends to \(0\) as \(k \to \infty\). With \(k\) now fixed, \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) is a polynomial, and every polynomial is continuous, so there is a \(\delta > 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\), such that</p>
+      <p>\[ \lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon \qquad \text{whenever } \lvert x - x_{0} \rvert < \delta. \]</p>
+      <p>Now split the difference \(e^{x} - e^{x_{0}}\) by inserting and removing the common polynomial:</p>
+      <p>\[ e^{x} - e^{x_{0}} = \bigl(e^{x} - P_{k}(x)\bigr) + \bigl(P_{k}(x) - P_{k}(x_{0})\bigr) + \bigl(P_{k}(x_{0}) - e^{x_{0}}\bigr). \]</p>
+      <p>Suppose \(\lvert x - x_{0} \rvert < \delta\). Then \(x_{0} < x_{0} + 1\) and \(x < x_{0} + \tfrac{1}{2} < x_{0} + 1\), so both \(x\) and \(x_{0}\) lie in \((0,\ x_{0} + 1)\); the bound \((*)\) controls the two outer terms, and the choice of \(\delta\) controls the middle one. By the triangle inequality,</p>
+      <p>\[ \lvert e^{x} - e^{x_{0}} \rvert \le \underbrace{\lvert e^{x} - P_{k}(x) \rvert}_{< \varepsilon} + \underbrace{\lvert P_{k}(x) - P_{k}(x_{0}) \rvert}_{< \varepsilon} + \underbrace{\lvert P_{k}(x_{0}) - e^{x_{0}} \rvert}_{< \varepsilon} < 3\varepsilon. \]</p>
+      <p>Since \(\varepsilon > 0\) was arbitrary, \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). Thus \(e^{x}\) is continuous at every \(x_{0} > 0\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The whole proof turned on one feature of \((*)\): it is <em>uniform</em>. The same fixed polynomial \(P_{k}\) approximates \(e^{x}\) at \(x\) and at \(x_{0}\) simultaneously, so the two outer errors are small together. We will lean on exactly this uniformity again when we multiply two exponentials.</p>
+
+  <h3 class="subsec-head">A convergence test that survives sign changes</h3>
+
+  <!-- expansion:intuition — why x<0 needs a new tool (Remark 4.2): the monotone-bounded argument of §4.1 fails for alternating partial sums -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>For \(x < 0\) the terms \(x^{n}/n!\) alternate in sign, so the partial sums no longer increase steadily, and the monotone-bounded argument behind Theorem 4.2 simply does not apply. We need a convergence criterion that ignores signs. The natural one is: if the series of <em>absolute values</em> converges, the original series should converge too — its terms cannot accumulate any net oscillation that the absolute series has already shown to be summable.</p>
+    </div>
+  </section>
+
+  <p>We record this principle, then build the machinery that proves it. The machinery — Cauchy sequences and the Bolzano–Weierstrass theorem — is of independent importance and will be reused whenever convergence must be established without an explicit limit in hand.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">4.1</span><span class="env-name">Absolute convergence implies convergence</span></p>
+    <div class="env-body">
+      <p>Let \(\{a_{n}\}_{n=1}^{\infty}\) be a sequence of real numbers. If \(\displaystyle\sum_{n=1}^{\infty} \lvert a_{n} \rvert < \infty\), then \(\displaystyle\sum_{n=1}^{\infty} a_{n}\) converges.</p>
+    </div>
+  </section>
+
+  <p>To say that \(\sum_{n=1}^{\infty} a_{n}\) <em>converges</em> means precisely that its sequence of partial sums \(S_{k} = \sum_{n=1}^{k} a_{n}\) has a limit, i.e. \(\lim_{k \to \infty} S_{k}\) exists. The trouble is that for a series with mixed signs we have no candidate value for that limit and no monotonicity to fall back on. The way out is to recognize convergence from the <em>internal</em> behavior of the partial sums alone.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>A sequence \(\{a_{n}\}_{n=1}^{\infty}\) is a <em>Cauchy sequence</em> if for every \(\varepsilon > 0\) there is an \(N_{0} \in \mathbb{N}\) such that</p>
+      <p>\[ \lvert a_{m} - a_{n} \rvert < \varepsilon \qquad \text{for all } m, n \ge N_{0}. \]</p>
+      <p class="informal">Informally, the terms eventually huddle together: past some point, any two of them differ by less than \(\varepsilon\). The definition mentions no limit value — only the terms’ closeness to one another.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — D3① (user-directed): the manuscript writes "we shall not prove this theorem" for convergent⟺Cauchy; the handout supplies the full proof, which rests on Bolzano–Weierstrass, itself proved from completeness via the monotone-subsequence peak argument (ROADMAP resolved 2026-04-27) -->
+  <p>That a sequence converges exactly when it is Cauchy is the bridge we need: it lets us certify the convergence of \(\sum a_{n}\) without naming the sum. The manuscript states this equivalence and uses it directly. We instead prove it, because the proof exposes a dependency worth seeing — the equivalence is, in the end, the completeness of \(\mathbb{R}\) (Theorem 4.1) wearing a different costume. The hinge is a classical existence theorem.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.4</span><span class="env-name">Bolzano–Weierstrass</span></p>
+    <div class="env-body">
+      <p>Every bounded sequence of real numbers has a convergent subsequence.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>We first extract a <em>monotone</em> subsequence, then invoke completeness. Call an index \(p\) a <em>peak</em> of the sequence \(\{a_{n}\}\) if \(a_{p} \ge a_{n}\) for every \(n > p\) — that is, no later term ever exceeds \(a_{p}\). There are two cases.</p>
+      <p class="para-head">Infinitely many peaks.</p>
+      <p>List the peaks in increasing order \(p_{1} < p_{2} < p_{3} < \cdots\). By the defining property of a peak, \(a_{p_{1}} \ge a_{p_{2}} \ge a_{p_{3}} \ge \cdots\), so \(\{a_{p_{j}}\}\) is a non-increasing subsequence. It is bounded below (the whole sequence is bounded), so by part (2) of Theorem 4.1 it converges.</p>
+      <p class="para-head">Only finitely many peaks.</p>
+      <p>Let \(p_{*}\) be larger than every peak, so no index \(\ge p_{*}\) is a peak. Pick any \(n_{1} \ge p_{*}\). Since \(n_{1}\) is not a peak, some \(n_{2} > n_{1}\) has \(a_{n_{2}} > a_{n_{1}}\); since \(n_{2}\) is not a peak, some \(n_{3} > n_{2}\) has \(a_{n_{3}} > a_{n_{2}}\); continuing, we obtain a strictly increasing subsequence \(a_{n_{1}} < a_{n_{2}} < a_{n_{3}} < \cdots\). It is bounded above, so by part (1) of Theorem 4.1 it converges.</p>
+      <p>In either case the bounded sequence has a convergent (indeed monotone) subsequence. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>With Bolzano–Weierstrass in hand, the Cauchy criterion follows.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.5</span><span class="env-name">Cauchy criterion</span></p>
+    <div class="env-body">
+      <p>A sequence \(\{a_{n}\}_{n=1}^{\infty}\) of real numbers converges if and only if it is a Cauchy sequence.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p class="para-head">Convergent \(\Rightarrow\) Cauchy.</p>
+      <p>Suppose \(a_{n} \to A\). Given \(\varepsilon > 0\), choose \(N_{0}\) with \(\lvert a_{n} - A \rvert < \varepsilon/2\) for all \(n \ge N_{0}\). Then for \(m, n \ge N_{0}\),</p>
+      <p>\[ \lvert a_{m} - a_{n} \rvert \le \lvert a_{m} - A \rvert + \lvert A - a_{n} \rvert < \tfrac{\varepsilon}{2} + \tfrac{\varepsilon}{2} = \varepsilon, \]</p>
+      <p>so the sequence is Cauchy.</p>
+      <p class="para-head">Cauchy \(\Rightarrow\) convergent.</p>
+      <p>Suppose \(\{a_{n}\}\) is Cauchy. First it is bounded: taking \(\varepsilon = 1\), there is an \(N\) with \(\lvert a_{n} - a_{N} \rvert < 1\) for \(n \ge N\), hence \(\lvert a_{n} \rvert < \lvert a_{N} \rvert + 1\) for \(n \ge N\), and the finitely many earlier terms are bounded as well. By Bolzano–Weierstrass (Theorem 4.4) some subsequence converges, say \(a_{n_{j}} \to A\). We claim the whole sequence converges to \(A\). Given \(\varepsilon > 0\), choose \(N_{0}\) with \(\lvert a_{m} - a_{n} \rvert < \varepsilon/2\) for \(m, n \ge N_{0}\), and choose an index \(n_{j} \ge N_{0}\) with \(\lvert a_{n_{j}} - A \rvert < \varepsilon/2\). Then for every \(n \ge N_{0}\),</p>
+      <p>\[ \lvert a_{n} - A \rvert \le \lvert a_{n} - a_{n_{j}} \rvert + \lvert a_{n_{j}} - A \rvert < \tfrac{\varepsilon}{2} + \tfrac{\varepsilon}{2} = \varepsilon. \]</p>
+      <p>Hence \(a_{n} \to A\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — ROADMAP pitfall "Bolzano–Weierstrass dependency": make the logical chain back to completeness explicit -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The Cauchy criterion is not an extra axiom; it is completeness in disguise. Trace the chain: Theorem 4.5 rests on Bolzano–Weierstrass (Theorem 4.4), which rests on the monotone-convergence property of \(\mathbb{R}\) (Theorem 4.1). Over the rationals every link breaks — there are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach the irrational \(e\)). So “Cauchy \(\Rightarrow\) convergent” is a statement about \(\mathbb{R}\) specifically, logically equivalent to its completeness.</p>
+    </div>
+  </section>
+
+  <p>We can now discharge the deferred proof.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Proposition 4.1</span></p>
+    <div class="env-body">
+      <p>Set \(S_{n} = \sum_{k=1}^{n} a_{k}\) and assume \(\sum_{k=1}^{\infty} \lvert a_{k} \rvert < \infty\). By Theorem 4.5 it suffices to show \(\{S_{n}\}\) is Cauchy. Given \(\varepsilon > 0\), convergence of the absolute series gives an \(N_{0}\) with \(\sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon\). Then for any \(m > n \ge N_{0}\), the triangle inequality yields</p>
+      <p>\[ \lvert S_{m} - S_{n} \rvert = \Bigl\lvert \sum_{k = n + 1}^{m} a_{k} \Bigr\rvert \le \sum_{k = n + 1}^{m} \lvert a_{k} \rvert \le \sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon. \]</p>
+      <p>So \(\{S_{n}\}\) is Cauchy, hence convergent, which is what it means for \(\sum_{k=1}^{\infty} a_{k}\) to converge. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Extending \(e^{x}\) to all of \(\mathbb{R}\)</h3>
+
+  <!-- expansion:intuition — use Proposition 4.1 to define e^x for x<0; record the absolute-value tail bound (**) that upgrades (*) to all real x -->
+  <p>The convergence test does exactly the job we set it. For any real \(x\), the series of absolute values is \(\sum_{n=0}^{\infty} \lvert x \rvert^{n}/n! = e^{\lvert x \rvert}\), which is finite by Theorem 4.2 (or equals \(1\) when \(x = 0\)). Proposition 4.1 then guarantees that \(\sum_{n=0}^{\infty} x^{n}/n!\) itself converges. This defines</p>
+
+  <!-- expansion:formula — the definition now covers all of ℝ, agreeing with Definition 4.1 for x>0 -->
+  <p>\[ e^{x} = \sum_{n=0}^{\infty} \frac{x^{n}}{n!} \qquad \text{for every } x \in \mathbb{R}, \]</p>
+
+  <p>in agreement with Definition 4.1 when \(x > 0\), and giving \(e^{0} = 1\). Moreover the tail bound upgrades to absolute values with no extra work: for \(\lvert x \rvert \le L\) and any \(k > n_{0} > 2L\), bounding each term of the remainder by its absolute value and reusing the geometric-tail estimate of \((*)\) (Strategy 4.1) gives</p>
+
+  <!-- expansion:formula — absolute-value form of the §4.1 tail bound, valid for all |x| ≤ L -->
+  <p>\[ \lvert e^{x} - P_{k}(x) \rvert \le \sum_{n = k + 1}^{\infty} \frac{\lvert x \rvert^{n}}{n!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$**$} \]</p>
+
+  <p>The bound \((**)\) is the two-sided workhorse for the rest of the section: it is uniform over the whole symmetric interval \(\lvert x \rvert \le L\) and shrinks geometrically in \(k\). With it, the continuity proof for \(x > 0\) extends verbatim to every real base point.</p>
+
+  <!-- expansion:intuition — Theorem 4.6 names full-line continuity (manuscript only states it in the Summary) -->
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.6</span></p>
+    <div class="env-body">
+      <p>The function \(e^{x}\) is continuous on all of \(\mathbb{R}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix any \(x_{0} \in \mathbb{R}\) and set \(L = \lvert x_{0} \rvert + 1\), so that every \(x\) with \(\lvert x - x_{0} \rvert < 1\) satisfies \(\lvert x \rvert \le L\). Repeat the argument of Theorem 4.3 word for word, with the one-sided bound \((*)\) replaced by its two-sided form \((**)\): given \(\varepsilon > 0\), choose \(k > n_{0} > 2L\) so that \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}} < \varepsilon\), then use the continuity of the polynomial \(P_{k}\) to get \(\delta \in (0, 1)\) with \(\lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon\) whenever \(\lvert x - x_{0} \rvert < \delta\). The same three-term split gives \(\lvert e^{x} - e^{x_{0}} \rvert < 3\varepsilon\). Hence \(e^{x}\) is continuous at \(x_{0}\), and \(x_{0}\) was arbitrary. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The exponent law</h3>
+
+  <p>Everything is now in place for the multiplicative identity \(e^{x} e^{y} = e^{x + y}\). The proof is the continuity argument writ large: replace each exponential by its polynomial partial sum, recognize that the <em>product</em> of two partial sums reorganizes — through the binomial theorem — into the partial sum of \(e^{x+y}\) plus a controllable remainder, and let \((**)\) sweep the errors to zero.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.7</span><span class="env-name">Exponent law</span></p>
+    <div class="env-body">
+      <p>For all real numbers \(x\) and \(y\), \(\; e^{x} e^{y} = e^{x + y}\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — D3② (user-directed): full proof, not a 4-step outline. Six steps: two estimates, the product split, the binomial collapse of (I), the (II) tail bound, the four-term telescope, and the double limit. -->
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k > n_{0} > 8L\). Recall \(P_{k}(t) = \sum_{n=0}^{k} t^{n}/n!\).</p>
+
+      <p class="para-head">Step 1: two estimates.</p>
+      <p>From \((**)\), both \(\lvert e^{x} - P_{k}(x) \rvert\) and \(\lvert e^{y} - P_{k}(y) \rvert\) are at most \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\). Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</p>
+
+      <p class="para-head">Step 2: split the product.</p>
+      <p>Multiplying the two finite sums and grouping the terms \(x^{i} y^{j}/(i!\,j!)\) by their total degree \(\ell = i + j\),</p>
+      <p>\[ P_{k}(x)\, P_{k}(y) = \underbrace{\sum_{\ell = 0}^{k} \; \sum_{m = 0}^{\ell} \frac{x^{m} y^{\ell - m}}{m!\,(\ell - m)!}}_{\text{(I)}} \; + \; \underbrace{\sum_{\ell = k + 1}^{2k} \; \sum_{\substack{i + j = \ell \\ 0 \le i, j \le k}} \frac{x^{i} y^{j}}{i!\, j!}}_{\text{(II)}}. \]</p>
+      <p>Group (I) collects every degree \(\ell \le k\), where no term is missing; group (II) collects the leftover high-degree terms \(k < \ell \le 2k\).</p>
+
+      <p class="para-head">Step 3: the binomial theorem collapses (I).</p>
+      <p>Writing \(\dfrac{1}{m!\,(\ell - m)!} = \dfrac{1}{\ell!}\dbinom{\ell}{m}\) and applying the binomial theorem \((x + y)^{\ell} = \sum_{m=0}^{\ell} \binom{\ell}{m} x^{m} y^{\ell - m}\) (with the manuscript’s notation \(\binom{\ell}{m} = C^{\ell}_{m}\)),</p>
+      <p>\[ \text{(I)} = \sum_{\ell = 0}^{k} \frac{1}{\ell!} (x + y)^{\ell} = P_{k}(x + y). \]</p>
+
+      <p class="para-head">Step 4: the leftover (II) is a tail.</p>
+      <p>Enlarging the inner sum in (II) to all \(m\) with \(0 \le m \le \ell\) and passing to absolute values can only increase it, so</p>
+      <p>\[ \lvert \text{(II)} \rvert \le \sum_{\ell = k + 1}^{2k} \frac{1}{\ell!} \sum_{m = 0}^{\ell} \binom{\ell}{m} \lvert x \rvert^{m} \lvert y \rvert^{\ell - m} = \sum_{\ell = k + 1}^{2k} \frac{(\lvert x \rvert + \lvert y \rvert)^{\ell}}{\ell!} \le \sum_{\ell = k + 1}^{\infty} \frac{(2L)^{\ell}}{\ell!}. \]</p>
+      <p>Since \(\ell > n_{0} > 8L\), each ratio \((2L)/\ell < \tfrac{1}{4} < \tfrac{1}{2}\), so the same geometric estimate that produced \((*)\) gives</p>
+      <p>\[ \lvert \text{(II)} \rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}, \qquad \text{hence} \qquad \bigl\lvert P_{k}(x) P_{k}(y) - P_{k}(x + y) \bigr\rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \]</p>
+
+      <p class="para-head">Step 5: telescope the difference.</p>
+      <p>Insert and remove the partial sums to compare \(e^{x} e^{y}\) with \(e^{x + y}\):</p>
+      <p>\[ \begin{aligned} e^{x} e^{y} - e^{x + y} = {}&\bigl(e^{x} - P_{k}(x)\bigr) e^{y} + P_{k}(x)\bigl(e^{y} - P_{k}(y)\bigr) \\ &+ \bigl(P_{k}(x) P_{k}(y) - P_{k}(x + y)\bigr) + \bigl(P_{k}(x + y) - e^{x + y}\bigr). \end{aligned} \]</p>
+      <p>Apply Step 1, Step 4, and the bound \((**)\) at \(x + y\) (valid since \(\lvert x + y \rvert \le 2L\), enlarging \(L\) to \(2L\) there). Each of the four pieces is at most a fixed constant times \(\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\):</p>
+      <p>\[ \lvert e^{x} e^{y} - e^{x + y} \rvert \le 2\, e^{L}\, \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} + 2\, \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \]</p>
+
+      <p class="para-head">Step 6: let \(k \to \infty\), then \(L \to \infty\).</p>
+      <p>The right-hand side is independent of how the left-hand side was formed and tends to \(0\) as \(k \to \infty\), while the left-hand side does not depend on \(k\) at all. Therefore \(\lvert e^{x} e^{y} - e^{x + y} \rvert = 0\), i.e. \(e^{x} e^{y} = e^{x + y}\), for all \(x, y\) with \(\lvert x \rvert, \lvert y \rvert \le L\). Since \(L\) was arbitrary, the identity holds for all \(x, y \in \mathbb{R}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — Corollary 4.1 records positivity (manuscript's [e3] "0 < e^y" for y<0), now a one-line consequence of the exponent law -->
+  <p>One loose end from the extension to negative arguments closes immediately.</p>
+
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">4.1</span></p>
+    <div class="env-body">
+      <p>\(e^{x} > 0\) for every real \(x\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By the exponent law, \(e^{x} = e^{x/2}\, e^{x/2} = \bigl(e^{x/2}\bigr)^{2} \ge 0\). And \(e^{x}\) is never zero, since \(e^{x} e^{-x} = e^{0} = 1\). Hence \(e^{x} > 0\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — collect the section's results and hand off to §4.3 (the derivative) -->
+  <p>Collecting the results of this section: the series</p>
+
+  <p>\[ e^{x} = \sum_{n=0}^{\infty} \frac{x^{n}}{n!}, \qquad x \in \mathbb{R}, \]</p>
+
+  <p>defines a function that is continuous on all of \(\mathbb{R}\) (Theorem 4.6), strictly positive (Corollary 4.1), and satisfies the exponent law \(e^{x} e^{y} = e^{x + y}\) (Theorem 4.7). The convergence that makes the definition legitimate for \(x < 0\) came from absolute convergence (Proposition 4.1), and that in turn from the Cauchy criterion (Theorem 4.5) and Bolzano–Weierstrass (Theorem 4.4) — the completeness of \(\mathbb{R}\) reappearing at every level. With \(e^{x}\) now established as a bona fide continuous, multiplicative, positive function, we are ready to return to the question that Chapter 2 answered only informally: its derivative. That rigorous re-derivation is the subject of §4.3, which leans on the same partial-sum machinery developed here.</p>
+
+</article>
+
+=== END DRAFT ===
+
+=== KEY HTML WRITING RULES (advisory -- for house_rule findings) ===
+- Semantic env classes: env-definition, env-theorem, env-proposition, env-corollary, env-example (inside .workedexample with env-solution), env-remark, env-proof, env-caution, env-strategy; NO env-exercise (the handout ships no exercises). §4.2 uses env-proposition (Proposition 4.1) and env-corollary (Corollary 4.1); their bodies auto-italicize.
+- Qualified proofs keep env-kicker "Proof" with the qualifier in env-name (e.g. "Proof of Proposition 4.1"); this is house style, not a finding.
+- Math (MathJax 4): inline \(...\), display \[...\], multi-line \begin{aligned}...\end{aligned}; \tag{$*$}/\tag{$**$}, \binom, \underbrace, \substack, \lvert..\rvert all render (verified: 0 MathJax errors, 13 print pages, 0 overflow).
+- Manual numbering: env-num / sec-no; per-type counters CONTINUE Chapter 4 across sections (see NUMBERING NOTE above). The tail bound (*) is §4.1's; (**) is §4.2's absolute-value upgrade.
+- Cross-references: plain prose ("by Theorem 4.4", "the bound (*)", "§4.1", "§4.3", "Chapter 2") -- NO \cref, NO hyperlinks
+- Expansion markers: <!-- expansion:category --> HTML comment before each non-seed addition; valid categories: history, application, formula, summary, figure, example, intuition, strategy, caution. Seed-derived theorems/proofs correctly carry no expansion marker.
+=== END HTML WRITING RULES ===
+
+Now review the DRAFT against the SEED, DIRECTION BRIEF, and HTML WRITING RULES. Return strict JSON.

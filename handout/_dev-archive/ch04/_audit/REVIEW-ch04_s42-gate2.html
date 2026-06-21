@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§4.2 — gate 2（Codex gpt-5.5 xhigh）審核稿</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f7f5;color:#1d1d1f;font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.6;padding:32px 18px 80px}
+.wrap{max-width:940px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 4px}
+h2{font-size:1.16rem;margin:30px 0 6px;padding-bottom:6px;border-bottom:2px solid #e4e4e0}
+.lede{color:#6b6b70;margin:0 0 16px;font-size:.93rem}
+.note{background:#fff;border:1px solid #e4e4e0;border-left:3px solid #2552b3;border-radius:8px;padding:12px 16px;margin:14px 0;font-size:.93rem}
+.note.pass{background:#eaf6ed;border-left-color:#1a7f37}
+.note.pass b{color:#1a7f37}
+.note.warn{background:#fff6e3;border-left-color:#8a5a00}
+.zero{color:#1a7f37;font-weight:700}.blkw{color:#a11;font-weight:700}
+table.u{width:100%;border-collapse:collapse;margin:10px 0;font-size:.83rem}
+table.u th,table.u td{border:1px solid #e4e4e0;padding:6px 8px;text-align:left;vertical-align:top}
+table.u th{background:#eef0f4}
+table.u td.src{color:#5b3aa8}
+td.fx{color:#7a5b00}
+.card{background:#fff;border:1px solid #e4e4e0;border-radius:10px;padding:12px 15px;margin:11px 0}
+.card.applied{border-left:4px solid #1a7f37}.card.kept{border-left:4px solid #9aa}
+.card.blk{border-left:4px solid #a11}.card.adv{border-left:4px solid #8a5a00}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;align-items:center}
+.chip{font-size:.74rem;padding:2px 9px;border-radius:999px;font-weight:600;letter-spacing:.02em}
+.c-cat{background:#e7eefc;color:#1f49a6}
+.c-app{background:#e6f7ea;color:#1a7f37}.c-kept{background:#eef0f4;color:#555}
+.c-blk{background:#fdeceb;color:#a11}.c-adv{background:#eef0f4;color:#555}.c-lvl{background:#1d1d1f;color:#fff;font-family:ui-monospace,Menlo,Consolas,monospace}
+.where{color:#6b6b70;font-size:.85rem;margin:2px 0 6px}.ev{font-size:.84rem;color:#555;margin:3px 0}
+.issue{margin:2px 0 6px}.sug{font-size:.84rem;color:#555;margin:3px 0}
+.disp{font-weight:700}.disp.applied{color:#1a7f37}.disp.kept{color:#6b6b70}
+footer{margin-top:40px;color:#6b6b70;font-size:.85rem;border-top:1px solid #e4e4e0;padding-top:14px}
+a{color:#2552b3}
+code{background:#f3f4f6;padding:.05rem .3rem;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>§4.2 — gate 2（Codex gpt-5.5 xhigh）審核稿</h1>
+<p class="lede">第二道閘（計費，使用者同意）：Codex CLI 唯讀 reviewer、<code>--output-schema</code> 結構化輸出，停在一次乾淨 audit（run2 converged）。§4.2 重跑，2026-06-21。</p>
+<div class='note warn'><b>run 1 — converged：false</b>（<span class='blkw'>1 blocking</span>，已修：收尾 forward-fence 移除 \((e^h-1)/h\)、改 generic 一句）。The main §4.2 mathematics checks out: Theorems 4.3–4.7, Proposition 4.1, and Corollary 4.1 follow the seed/brief structure. Convergence is blocked only by the forbidden §4.3 quotient reference in the closing forward fence.</div><div class='note pass'><b>run 2 — converged：<span class='zero'>true</span></b>（0 blocking＋2 advisory，已全套：Thm 4.3 區間下界明寫、Caution e 無理改 cross-ref §4.1）。No blocking findings. The core real-analysis arguments, exponent-law proof, seed faithfulness, and direction-brief requirements all check out.</div><p class='lede'>原始裁決檔（計費產物）：<code>result_s42.json</code>（run1）、<code>result_s42_r2.json</code>（run2）；prompt：<code>prompt_s42.txt</code>（<code>build_prompt_s42.py</code> 產）。模型 Codex <code>gpt-5.5</code>／reasoning <code>xhigh</code>、唯讀 sandbox、<code>--output-schema schema.json</code>、prompt 由 Bash <code>&lt; file</code> 餵原始 UTF-8。</p><h2>審核對象（已寫入單元）</h2><table class='u'><tr><th>已寫入單元</th><th>locus</th><th>source</th><th>gate 修正</th></tr><tr><td><b>§4.2 opener (intuition)</b></td><td>節首動機散文</td><td class='src'>expansion:intuition（承重直覺）</td><td class='fx'></td></tr><tr><td><b>Theorem 4.3 + Proof</b></td><td>continuity for x&gt;0</td><td class='src'>seed [e2]（手稿 pp.3–4）</td><td class='fx'>gate-2 run2：區間 (0,x₀+1) 下界明寫 x>x₀/2>0</td></tr><tr><td><b>Remark 4.2（why x&lt;0 harder）</b></td><td>Thm 4.3 之後</td><td class='src'>expansion:intuition</td><td class='fx'></td></tr><tr><td><b>Proposition 4.1（(△) abs-conv⟹conv）</b></td><td>Remark 4.2 之後（陳述）</td><td class='src'>seed (△)（手稿 p.5）</td><td class='fx'></td></tr><tr><td><b>Definition 4.2（Cauchy）+gloss</b></td><td>Definition 4.2</td><td class='src'>seed（手稿 p.5）；gloss=expansion:intuition</td><td class='fx'></td></tr><tr><td><b>Theorem 4.4 Bolzano–Weierstrass + Proof</b></td><td>peak argument</td><td class='src'>expansion（D3①；手稿 punt，超出手稿）</td><td class='fx'>gate-1 對賬 legacy §4.2</td></tr><tr><td><b>Theorem 4.5 Cauchy criterion + Proof</b></td><td>both directions</td><td class='src'>seed Thm（手稿 p.6「we shall not prove」）→ 補全證（D3①）</td><td class='fx'></td></tr><tr><td><b>Caution（BW dependency）</b></td><td>Thm 4.5 之後</td><td class='src'>expansion:caution（ROADMAP pitfall）</td><td class='fx'>gate-2 run2：e 無理改 cross-ref §4.1</td></tr><tr><td><b>Proof of Proposition 4.1</b></td><td>deferred proof</td><td class='src'>seed（手稿 p.6，用 Cauchy）</td><td class='fx'></td></tr><tr><td><b>Extension to ℝ + (∗∗)</b></td><td>子節 Extending e^x to all of ℝ</td><td class='src'>seed [e3]+(△)；expansion:formula</td><td class='fx'>gate-1：(∗∗) 為 (∗) 的絕對值版</td></tr><tr><td><b>Theorem 4.6（continuity on ℝ）+ Proof</b></td><td>full-line continuity</td><td class='src'>expansion（brief §C-3；手稿僅 Summary 宣告）</td><td class='fx'></td></tr><tr><td><b>Theorem 4.7 Exponent law + Proof（6 步）</b></td><td>binomial／(I)(II)／四項拆／雙重極限</td><td class='src'>seed（手稿 pp.7–10）；D3② 完整 6 步</td><td class='fx'>gate-1 對賬 legacy §4.2 全等</td></tr><tr><td><b>Corollary 4.1（positivity）+ Proof</b></td><td>e^x&gt;0</td><td class='src'>expansion（brief §C-1；手稿 [e3] 陳述）</td><td class='fx'></td></tr><tr><td><b>Summary（→§4.3）</b></td><td>節末</td><td class='src'>seed Summary + expansion:summary</td><td class='fx'>gate-2 run1 BLOCKING：forward-fence 改 generic（移除 (e^h−1)/h）</td></tr></table><h2>run 1 裁決（1 blocking → 已修）</h2><div class='card blk'><div class='chips'><span class='chip c-blk'>BLOCKING</span><span class='chip c-cat'>direction-conformance</span><span class='chip c-lvl'>L1</span><span class='chip c-adv'>high</span></div><div class='where'>final summary paragraph, last sentence</div><div class='issue'>The draft includes a §4.3 derivative-quotient formula that the brief explicitly put on the 刻意不寫 list for §4.2.</div><div class='ev'>證據：The sentence says §4.3 will estimate `\((e^{h} - 1)/h\)`. The direction brief forbids the difference-quotient/`(e^h-1)/h` material in this section except for a generic one-line forward fence to §4.3.</div><div class='sug'>建議：Remove the displayed quotient reference and keep only a generic forward fence such as saying that the derivative is the subject of §4.3.</div></div><h2>run 2 裁決（converged，2 advisory 已套）</h2><div class='card adv'><div class='chips'><span class='chip c-adv'>advisory</span><span class='chip c-cat'>math</span><span class='chip c-lvl'>L2</span><span class='chip c-adv'>low</span></div><div class='where'>Theorem 4.3 proof, interval check after the three-term split</div><div class='issue'>The proof correctly chose delta &lt; x0/2, but the sentence justifying x in (0, x0+1) only spells out the upper bound x &lt; x0 + 1/2.</div><div class='ev'>證據：It says “x0 &lt; x0 + 1 and x &lt; x0 + 1/2 &lt; x0 + 1, so both x and x0 lie in (0, x0 + 1)” without explicitly mentioning x &gt; x0/2 &gt; 0.</div><div class='sug'>建議：Optionally add the lower-bound clause “and x &gt; x0 - delta &gt; x0/2 &gt; 0.” This is advisory only; the argument is already valid.</div></div><div class='card adv'><div class='chips'><span class='chip c-adv'>advisory</span><span class='chip c-cat'>math</span><span class='chip c-lvl'>L2</span><span class='chip c-adv'>low</span></div><div class='where'>Caution after Theorem 4.5</div><div class='issue'>The rational-sequence example uses the unproved fact that e is irrational.</div><div class='ev'>證據：The caution says the rational partial sums of sum 1/n! “approach the irrational e.”</div><div class='sug'>建議：Either cite this as a known later/outside fact, or use a more elementary rational Cauchy sequence converging to sqrt(2) if that has already been established.</div></div>
+<footer>產生器：<code>REVIEW-s42.gen.py</code>　·　成品：<a href="../../../chapter4-print-standalone.html">chapter4-print-standalone.html</a>　·　另一閘：見同目錄 <code>REVIEW-ch04_s42-gate1.html</code>／<code>REVIEW-ch04_s42-gate2.html</code>。</footer>
+</div>
+</body>
+</html>

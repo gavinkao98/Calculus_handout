@@ -1,0 +1,264 @@
+<!-- §4.2 Continuity and the Exponent Law for e^x.
+     Authored into handout-kit semantic markup per CONTRACT-html-writing.md
+     from _dev-archive/ch04/seed_ch04_s2.md (manuscript pp. 3–10). Direction
+     brief brief_s42.md approved at ③ (2026-06-21). Numbering is MANUAL and
+     CONTINUES from §4.1: §4.1 used Definition 4.1, Theorem 4.1/4.2,
+     Strategy 4.1, Example 4.1, Figure 4.1, Remark 4.1 — so §4.2 starts at
+     Definition 4.2, Theorem 4.3, Proposition 4.1, Remark 4.2, Corollary 4.1.
+     Caution is unnumbered (per ch02/ch03). Cross-references are plain prose.
+     Math cross-checked against the signed legacy ground truth
+     legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.2.
+
+     This is a fresh re-run: the old §4.2 POC (sec-4-2.html) and its
+     test-pipeline seed were deleted 2026-06-21; the section was re-transcribed
+     from the manuscript and merged into the formal chapter flow.
+
+     ③ decisions (brief §C/§D):
+       - D3① (user-directed): the manuscript writes "we shall not prove" for
+         convergent ⟺ Cauchy; the handout SUPPLIES the full proof via
+         Bolzano–Weierstrass (Theorem 4.4) and the monotone-subsequence/peak
+         argument — an expansion beyond the manuscript, required by ROADMAP.
+       - D3② (user-directed): the exponent law is written as a full proof
+         (binomial reorganisation, explicit (II) tail bound, four-term split,
+         double limit k→∞ then L→∞), not a 4-step outline.
+       - Theorem 4.6 (continuity on all of ℝ) is named explicitly (manuscript
+         only states full-line continuity in its closing Summary).
+       - e^y > 0 for y < 0 is obtained after the exponent law as Corollary 4.1
+         (e^x = (e^{x/2})² and e^x e^{-x} = 1); the manuscript states it as the
+         property [e3] without a separate proof.
+       - No worked examples, no figures (proof section; no ROADMAP key figure).
+     Counters handed to §4.3: Definition 4.2, Theorem 4.7, Proposition 4.1,
+     Corollary 4.1, Remark 4.2. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">4.2</span>Continuity and the Exponent Law for \(e^{x}\)</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: §4.1 gave existence for x>0; this section gives good behaviour (continuity, multiplicativity) and extends the definition to all of ℝ -->
+  <p>Section 4.1 gave \(e^{x}\) an honest existence: for \(x > 0\) the defining series converges to a finite number, and the partial sums \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) close in on it at a geometric rate, captured by the tail bound \((*)\). What we have <em>not</em> yet shown is that \(e^{x}\) behaves the way the symbol promises: that it is continuous, that it obeys \(e^{x} e^{y} = e^{x + y}\), and that it even makes sense for \(x \le 0\). This section settles all three. The engine throughout is a single idea: approximate the transcendental function \(e^{x}\) by the polynomial \(P_{k}(x)\), and use \((*)\) to make the error uniformly small. Once the error is controlled, the polynomial carries the argument. The one genuinely new tool we need is a convergence test that survives sign changes, since the partial sums for \(x < 0\) are no longer monotone.</p>
+
+  <h3 class="subsec-head">Continuity for \(x > 0\)</h3>
+
+  <p>Fix a base point \(x_{0} > 0\). We want \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). The difficulty is that \(e^{x}\) is an infinite series, not a polynomial; but its partial sum \(P_{k}\) <em>is</em> a polynomial, hence continuous, and the bound \((*)\) says \(P_{k}\) is uniformly close to \(e^{x}\) for every \(x\) in a fixed interval at once. The proof simply routes the comparison \(e^{x}\) versus \(e^{x_{0}}\) through \(P_{k}\) at both points.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.3</span></p>
+    <div class="env-body">
+      <p>The function \(e^{x}\) is continuous at every \(x_{0} > 0\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Let \(x_{0} > 0\) and let \(\varepsilon > 0\) be given. Work on the interval \(0 < x < x_{0} + 1\), so we may take \(L = x_{0} + 1\) in the tail bound \((*)\). Choose integers \(k > n_{0} > 2(x_{0} + 1)\) large enough that</p>
+      <p>\[ \frac{(x_{0} + 1)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} < \varepsilon. \]</p>
+      <p>This is possible because the left-hand side tends to \(0\) as \(k \to \infty\). With \(k\) now fixed, \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) is a polynomial, and every polynomial is continuous, so there is a \(\delta > 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\), such that</p>
+      <p>\[ \lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon \qquad \text{whenever } \lvert x - x_{0} \rvert < \delta. \]</p>
+      <p>Now split the difference \(e^{x} - e^{x_{0}}\) by inserting and removing the common polynomial:</p>
+      <p>\[ e^{x} - e^{x_{0}} = \bigl(e^{x} - P_{k}(x)\bigr) + \bigl(P_{k}(x) - P_{k}(x_{0})\bigr) + \bigl(P_{k}(x_{0}) - e^{x_{0}}\bigr). \]</p>
+      <p>Suppose \(\lvert x - x_{0} \rvert < \delta\). Since \(\delta < x_{0}/2\), we have \(x > x_{0} - \delta > \tfrac{x_{0}}{2} > 0\) and \(x < x_{0} + \tfrac{1}{2} < x_{0} + 1\), so both \(x\) and \(x_{0}\) lie in \((0,\ x_{0} + 1)\); the bound \((*)\) controls the two outer terms, and the choice of \(\delta\) controls the middle one. By the triangle inequality,</p>
+      <p>\[ \lvert e^{x} - e^{x_{0}} \rvert \le \underbrace{\lvert e^{x} - P_{k}(x) \rvert}_{< \varepsilon} + \underbrace{\lvert P_{k}(x) - P_{k}(x_{0}) \rvert}_{< \varepsilon} + \underbrace{\lvert P_{k}(x_{0}) - e^{x_{0}} \rvert}_{< \varepsilon} < 3\varepsilon. \]</p>
+      <p>Since \(\varepsilon > 0\) was arbitrary, \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). Thus \(e^{x}\) is continuous at every \(x_{0} > 0\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The whole proof turned on one feature of \((*)\): it is <em>uniform</em>. The same fixed polynomial \(P_{k}\) approximates \(e^{x}\) at \(x\) and at \(x_{0}\) simultaneously, so the two outer errors are small together. We will lean on exactly this uniformity again when we multiply two exponentials.</p>
+
+  <h3 class="subsec-head">A convergence test that survives sign changes</h3>
+
+  <!-- expansion:intuition — why x<0 needs a new tool (Remark 4.2): the monotone-bounded argument of §4.1 fails for alternating partial sums -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>For \(x < 0\) the terms \(x^{n}/n!\) alternate in sign, so the partial sums no longer increase steadily, and the monotone-bounded argument behind Theorem 4.2 simply does not apply. We need a convergence criterion that ignores signs. The natural one is: if the series of <em>absolute values</em> converges, the original series should converge too — its terms cannot accumulate any net oscillation that the absolute series has already shown to be summable.</p>
+    </div>
+  </section>
+
+  <p>We record this principle, then build the machinery that proves it. The machinery — Cauchy sequences and the Bolzano–Weierstrass theorem — is of independent importance and will be reused whenever convergence must be established without an explicit limit in hand.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">4.1</span><span class="env-name">Absolute convergence implies convergence</span></p>
+    <div class="env-body">
+      <p>Let \(\{a_{n}\}_{n=1}^{\infty}\) be a sequence of real numbers. If \(\displaystyle\sum_{n=1}^{\infty} \lvert a_{n} \rvert < \infty\), then \(\displaystyle\sum_{n=1}^{\infty} a_{n}\) converges.</p>
+    </div>
+  </section>
+
+  <p>To say that \(\sum_{n=1}^{\infty} a_{n}\) <em>converges</em> means precisely that its sequence of partial sums \(S_{k} = \sum_{n=1}^{k} a_{n}\) has a limit, i.e. \(\lim_{k \to \infty} S_{k}\) exists. The trouble is that for a series with mixed signs we have no candidate value for that limit and no monotonicity to fall back on. The way out is to recognize convergence from the <em>internal</em> behavior of the partial sums alone.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>A sequence \(\{a_{n}\}_{n=1}^{\infty}\) is a <em>Cauchy sequence</em> if for every \(\varepsilon > 0\) there is an \(N_{0} \in \mathbb{N}\) such that</p>
+      <p>\[ \lvert a_{m} - a_{n} \rvert < \varepsilon \qquad \text{for all } m, n \ge N_{0}. \]</p>
+      <p class="informal">Informally, the terms eventually huddle together: past some point, any two of them differ by less than \(\varepsilon\). The definition mentions no limit value — only the terms’ closeness to one another.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — D3① (user-directed): the manuscript writes "we shall not prove this theorem" for convergent⟺Cauchy; the handout supplies the full proof, which rests on Bolzano–Weierstrass, itself proved from completeness via the monotone-subsequence peak argument (ROADMAP resolved 2026-04-27) -->
+  <p>That a sequence converges exactly when it is Cauchy is the bridge we need: it lets us certify the convergence of \(\sum a_{n}\) without naming the sum. The manuscript states this equivalence and uses it directly. We instead prove it, because the proof exposes a dependency worth seeing — the equivalence is, in the end, the completeness of \(\mathbb{R}\) (Theorem 4.1) wearing a different costume. The hinge is a classical existence theorem.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.4</span><span class="env-name">Bolzano–Weierstrass</span></p>
+    <div class="env-body">
+      <p>Every bounded sequence of real numbers has a convergent subsequence.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>We first extract a <em>monotone</em> subsequence, then invoke completeness. Call an index \(p\) a <em>peak</em> of the sequence \(\{a_{n}\}\) if \(a_{p} \ge a_{n}\) for every \(n > p\) — that is, no later term ever exceeds \(a_{p}\). There are two cases.</p>
+      <p class="para-head">Infinitely many peaks.</p>
+      <p>List the peaks in increasing order \(p_{1} < p_{2} < p_{3} < \cdots\). By the defining property of a peak, \(a_{p_{1}} \ge a_{p_{2}} \ge a_{p_{3}} \ge \cdots\), so \(\{a_{p_{j}}\}\) is a non-increasing subsequence. It is bounded below (the whole sequence is bounded), so by part (2) of Theorem 4.1 it converges.</p>
+      <p class="para-head">Only finitely many peaks.</p>
+      <p>Let \(p_{*}\) be larger than every peak, so no index \(\ge p_{*}\) is a peak. Pick any \(n_{1} \ge p_{*}\). Since \(n_{1}\) is not a peak, some \(n_{2} > n_{1}\) has \(a_{n_{2}} > a_{n_{1}}\); since \(n_{2}\) is not a peak, some \(n_{3} > n_{2}\) has \(a_{n_{3}} > a_{n_{2}}\); continuing, we obtain a strictly increasing subsequence \(a_{n_{1}} < a_{n_{2}} < a_{n_{3}} < \cdots\). It is bounded above, so by part (1) of Theorem 4.1 it converges.</p>
+      <p>In either case the bounded sequence has a convergent (indeed monotone) subsequence. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>With Bolzano–Weierstrass in hand, the Cauchy criterion follows.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.5</span><span class="env-name">Cauchy criterion</span></p>
+    <div class="env-body">
+      <p>A sequence \(\{a_{n}\}_{n=1}^{\infty}\) of real numbers converges if and only if it is a Cauchy sequence.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p class="para-head">Convergent \(\Rightarrow\) Cauchy.</p>
+      <p>Suppose \(a_{n} \to A\). Given \(\varepsilon > 0\), choose \(N_{0}\) with \(\lvert a_{n} - A \rvert < \varepsilon/2\) for all \(n \ge N_{0}\). Then for \(m, n \ge N_{0}\),</p>
+      <p>\[ \lvert a_{m} - a_{n} \rvert \le \lvert a_{m} - A \rvert + \lvert A - a_{n} \rvert < \tfrac{\varepsilon}{2} + \tfrac{\varepsilon}{2} = \varepsilon, \]</p>
+      <p>so the sequence is Cauchy.</p>
+      <p class="para-head">Cauchy \(\Rightarrow\) convergent.</p>
+      <p>Suppose \(\{a_{n}\}\) is Cauchy. First it is bounded: taking \(\varepsilon = 1\), there is an \(N\) with \(\lvert a_{n} - a_{N} \rvert < 1\) for \(n \ge N\), hence \(\lvert a_{n} \rvert < \lvert a_{N} \rvert + 1\) for \(n \ge N\), and the finitely many earlier terms are bounded as well. By Bolzano–Weierstrass (Theorem 4.4) some subsequence converges, say \(a_{n_{j}} \to A\). We claim the whole sequence converges to \(A\). Given \(\varepsilon > 0\), choose \(N_{0}\) with \(\lvert a_{m} - a_{n} \rvert < \varepsilon/2\) for \(m, n \ge N_{0}\), and choose an index \(n_{j} \ge N_{0}\) with \(\lvert a_{n_{j}} - A \rvert < \varepsilon/2\). Then for every \(n \ge N_{0}\),</p>
+      <p>\[ \lvert a_{n} - A \rvert \le \lvert a_{n} - a_{n_{j}} \rvert + \lvert a_{n_{j}} - A \rvert < \tfrac{\varepsilon}{2} + \tfrac{\varepsilon}{2} = \varepsilon. \]</p>
+      <p>Hence \(a_{n} \to A\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — ROADMAP pitfall "Bolzano–Weierstrass dependency": make the logical chain back to completeness explicit -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The Cauchy criterion is not an extra axiom; it is completeness in disguise. Trace the chain: Theorem 4.5 rests on Bolzano–Weierstrass (Theorem 4.4), which rests on the monotone-convergence property of \(\mathbb{R}\) (Theorem 4.1). Over the rationals every link breaks — there are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach \(e\) — a number noted in §4.1 to be irrational). So “Cauchy \(\Rightarrow\) convergent” is a statement about \(\mathbb{R}\) specifically, logically equivalent to its completeness.</p>
+    </div>
+  </section>
+
+  <p>We can now discharge the deferred proof.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Proposition 4.1</span></p>
+    <div class="env-body">
+      <p>Set \(S_{n} = \sum_{k=1}^{n} a_{k}\) and assume \(\sum_{k=1}^{\infty} \lvert a_{k} \rvert < \infty\). By Theorem 4.5 it suffices to show \(\{S_{n}\}\) is Cauchy. Given \(\varepsilon > 0\), convergence of the absolute series gives an \(N_{0}\) with \(\sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon\). Then for any \(m > n \ge N_{0}\), the triangle inequality yields</p>
+      <p>\[ \lvert S_{m} - S_{n} \rvert = \Bigl\lvert \sum_{k = n + 1}^{m} a_{k} \Bigr\rvert \le \sum_{k = n + 1}^{m} \lvert a_{k} \rvert \le \sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon. \]</p>
+      <p>So \(\{S_{n}\}\) is Cauchy, hence convergent, which is what it means for \(\sum_{k=1}^{\infty} a_{k}\) to converge. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Extending \(e^{x}\) to all of \(\mathbb{R}\)</h3>
+
+  <!-- expansion:intuition — use Proposition 4.1 to define e^x for x<0; record the absolute-value tail bound (**) that upgrades (*) to all real x -->
+  <p>The convergence test does exactly the job we set it. For any real \(x\), the series of absolute values is \(\sum_{n=0}^{\infty} \lvert x \rvert^{n}/n! = e^{\lvert x \rvert}\), which is finite by Theorem 4.2 (or equals \(1\) when \(x = 0\)). Proposition 4.1 then guarantees that \(\sum_{n=0}^{\infty} x^{n}/n!\) itself converges. This defines</p>
+
+  <!-- expansion:formula — the definition now covers all of ℝ, agreeing with Definition 4.1 for x>0 -->
+  <p>\[ e^{x} = \sum_{n=0}^{\infty} \frac{x^{n}}{n!} \qquad \text{for every } x \in \mathbb{R}, \]</p>
+
+  <p>in agreement with Definition 4.1 when \(x > 0\), and giving \(e^{0} = 1\). Moreover the tail bound upgrades to absolute values with no extra work: for \(\lvert x \rvert \le L\) and any \(k > n_{0} > 2L\), bounding each term of the remainder by its absolute value and reusing the geometric-tail estimate of \((*)\) (Strategy 4.1) gives</p>
+
+  <!-- expansion:formula — absolute-value form of the §4.1 tail bound, valid for all |x| ≤ L -->
+  <p>\[ \lvert e^{x} - P_{k}(x) \rvert \le \sum_{n = k + 1}^{\infty} \frac{\lvert x \rvert^{n}}{n!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$**$} \]</p>
+
+  <p>The bound \((**)\) is the two-sided workhorse for the rest of the section: it is uniform over the whole symmetric interval \(\lvert x \rvert \le L\) and shrinks geometrically in \(k\). With it, the continuity proof for \(x > 0\) extends verbatim to every real base point.</p>
+
+  <!-- expansion:intuition — Theorem 4.6 names full-line continuity (manuscript only states it in the Summary) -->
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.6</span></p>
+    <div class="env-body">
+      <p>The function \(e^{x}\) is continuous on all of \(\mathbb{R}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix any \(x_{0} \in \mathbb{R}\) and set \(L = \lvert x_{0} \rvert + 1\), so that every \(x\) with \(\lvert x - x_{0} \rvert < 1\) satisfies \(\lvert x \rvert \le L\). Repeat the argument of Theorem 4.3 word for word, with the one-sided bound \((*)\) replaced by its two-sided form \((**)\): given \(\varepsilon > 0\), choose \(k > n_{0} > 2L\) so that \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}} < \varepsilon\), then use the continuity of the polynomial \(P_{k}\) to get \(\delta \in (0, 1)\) with \(\lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon\) whenever \(\lvert x - x_{0} \rvert < \delta\). The same three-term split gives \(\lvert e^{x} - e^{x_{0}} \rvert < 3\varepsilon\). Hence \(e^{x}\) is continuous at \(x_{0}\), and \(x_{0}\) was arbitrary. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The exponent law</h3>
+
+  <p>Everything is now in place for the multiplicative identity \(e^{x} e^{y} = e^{x + y}\). The proof is the continuity argument writ large: replace each exponential by its polynomial partial sum, recognize that the <em>product</em> of two partial sums reorganizes — through the binomial theorem — into the partial sum of \(e^{x+y}\) plus a controllable remainder, and let \((**)\) sweep the errors to zero.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.7</span><span class="env-name">Exponent law</span></p>
+    <div class="env-body">
+      <p>For all real numbers \(x\) and \(y\), \(\; e^{x} e^{y} = e^{x + y}\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — D3② (user-directed): full proof, not a 4-step outline. Six steps: two estimates, the product split, the binomial collapse of (I), the (II) tail bound, the four-term telescope, and the double limit. -->
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k > n_{0} > 8L\). Recall \(P_{k}(t) = \sum_{n=0}^{k} t^{n}/n!\).</p>
+
+      <p class="para-head">Step 1: two estimates.</p>
+      <p>From \((**)\), both \(\lvert e^{x} - P_{k}(x) \rvert\) and \(\lvert e^{y} - P_{k}(y) \rvert\) are at most \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\). Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</p>
+
+      <p class="para-head">Step 2: split the product.</p>
+      <p>Multiplying the two finite sums and grouping the terms \(x^{i} y^{j}/(i!\,j!)\) by their total degree \(\ell = i + j\),</p>
+      <p>\[ P_{k}(x)\, P_{k}(y) = \underbrace{\sum_{\ell = 0}^{k} \; \sum_{m = 0}^{\ell} \frac{x^{m} y^{\ell - m}}{m!\,(\ell - m)!}}_{\text{(I)}} \; + \; \underbrace{\sum_{\ell = k + 1}^{2k} \; \sum_{\substack{i + j = \ell \\ 0 \le i, j \le k}} \frac{x^{i} y^{j}}{i!\, j!}}_{\text{(II)}}. \]</p>
+      <p>Group (I) collects every degree \(\ell \le k\), where no term is missing; group (II) collects the leftover high-degree terms \(k < \ell \le 2k\).</p>
+
+      <p class="para-head">Step 3: the binomial theorem collapses (I).</p>
+      <p>Writing \(\dfrac{1}{m!\,(\ell - m)!} = \dfrac{1}{\ell!}\dbinom{\ell}{m}\) and applying the binomial theorem \((x + y)^{\ell} = \sum_{m=0}^{\ell} \binom{\ell}{m} x^{m} y^{\ell - m}\) (with the manuscript’s notation \(\binom{\ell}{m} = C^{\ell}_{m}\)),</p>
+      <p>\[ \text{(I)} = \sum_{\ell = 0}^{k} \frac{1}{\ell!} (x + y)^{\ell} = P_{k}(x + y). \]</p>
+
+      <p class="para-head">Step 4: the leftover (II) is a tail.</p>
+      <p>Enlarging the inner sum in (II) to all \(m\) with \(0 \le m \le \ell\) and passing to absolute values can only increase it, so</p>
+      <p>\[ \lvert \text{(II)} \rvert \le \sum_{\ell = k + 1}^{2k} \frac{1}{\ell!} \sum_{m = 0}^{\ell} \binom{\ell}{m} \lvert x \rvert^{m} \lvert y \rvert^{\ell - m} = \sum_{\ell = k + 1}^{2k} \frac{(\lvert x \rvert + \lvert y \rvert)^{\ell}}{\ell!} \le \sum_{\ell = k + 1}^{\infty} \frac{(2L)^{\ell}}{\ell!}. \]</p>
+      <p>Since \(\ell > n_{0} > 8L\), each ratio \((2L)/\ell < \tfrac{1}{4} < \tfrac{1}{2}\), so the same geometric estimate that produced \((*)\) gives</p>
+      <p>\[ \lvert \text{(II)} \rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}, \qquad \text{hence} \qquad \bigl\lvert P_{k}(x) P_{k}(y) - P_{k}(x + y) \bigr\rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \]</p>
+
+      <p class="para-head">Step 5: telescope the difference.</p>
+      <p>Insert and remove the partial sums to compare \(e^{x} e^{y}\) with \(e^{x + y}\):</p>
+      <p>\[ \begin{aligned} e^{x} e^{y} - e^{x + y} = {}&\bigl(e^{x} - P_{k}(x)\bigr) e^{y} + P_{k}(x)\bigl(e^{y} - P_{k}(y)\bigr) \\ &+ \bigl(P_{k}(x) P_{k}(y) - P_{k}(x + y)\bigr) + \bigl(P_{k}(x + y) - e^{x + y}\bigr). \end{aligned} \]</p>
+      <p>Apply Step 1, Step 4, and the bound \((**)\) at \(x + y\) (valid since \(\lvert x + y \rvert \le 2L\), enlarging \(L\) to \(2L\) there). Each of the four pieces is at most a fixed constant times \(\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\):</p>
+      <p>\[ \lvert e^{x} e^{y} - e^{x + y} \rvert \le 2\, e^{L}\, \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} + 2\, \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \]</p>
+
+      <p class="para-head">Step 6: let \(k \to \infty\), then \(L \to \infty\).</p>
+      <p>The right-hand side is independent of how the left-hand side was formed and tends to \(0\) as \(k \to \infty\), while the left-hand side does not depend on \(k\) at all. Therefore \(\lvert e^{x} e^{y} - e^{x + y} \rvert = 0\), i.e. \(e^{x} e^{y} = e^{x + y}\), for all \(x, y\) with \(\lvert x \rvert, \lvert y \rvert \le L\). Since \(L\) was arbitrary, the identity holds for all \(x, y \in \mathbb{R}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — Corollary 4.1 records positivity (manuscript's [e3] "0 < e^y" for y<0), now a one-line consequence of the exponent law -->
+  <p>One loose end from the extension to negative arguments closes immediately.</p>
+
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">4.1</span></p>
+    <div class="env-body">
+      <p>\(e^{x} > 0\) for every real \(x\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By the exponent law, \(e^{x} = e^{x/2}\, e^{x/2} = \bigl(e^{x/2}\bigr)^{2} \ge 0\). And \(e^{x}\) is never zero, since \(e^{x} e^{-x} = e^{0} = 1\). Hence \(e^{x} > 0\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — collect the section's results and hand off to §4.3 (the derivative) -->
+  <p>Collecting the results of this section: the series</p>
+
+  <p>\[ e^{x} = \sum_{n=0}^{\infty} \frac{x^{n}}{n!}, \qquad x \in \mathbb{R}, \]</p>
+
+  <p>defines a function that is continuous on all of \(\mathbb{R}\) (Theorem 4.6), strictly positive (Corollary 4.1), and satisfies the exponent law \(e^{x} e^{y} = e^{x + y}\) (Theorem 4.7). The convergence that makes the definition legitimate for \(x < 0\) came from absolute convergence (Proposition 4.1), and that in turn from the Cauchy criterion (Theorem 4.5) and Bolzano–Weierstrass (Theorem 4.4) — the completeness of \(\mathbb{R}\) reappearing at every level. With \(e^{x}\) now established as a bona fide continuous, multiplicative, positive function, we are ready to return to the question that Chapter 2 answered only informally: its derivative. That rigorous re-derivation is the subject of §4.3, which leans on the same partial-sum machinery developed here.</p>
+
+</article>

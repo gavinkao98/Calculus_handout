@@ -51,8 +51,8 @@
 - **首節責任**：建章 opener（learning objectives ← ROADMAP core skills）、`chapter4` standalone／fragments 骨架、`ch04` figures（見 §4）。
 
 ### §4.2 Continuity and the Exponent Law for `e^x`
-- **狀態：已有 POC 草稿 [`sec-4-2.html`](sec-4-2.html)**（首跑六階收斂、Codex 抓到一處過度推廣已修；見 `RESULT_s42.md`）。seed＝[`seed_s42.md`](../../../authoring/direction_layer/test/seed_s42.md)。
-- **本章決策（D2）**：POC 在 §4.1 落地**之前**寫成，其編號（Thm 4.1…、Def 4.1、Prop 4.1–4.3…）假設自己是章首 → **§4.1 落地後必須 renumber**（見 §5）。是否原樣升格 live、或併進正式章流程重跑一遍，**待使用者裁決**。
+- **狀態：✅ ①→⑥ 完成（2026-06-21 重跑、使用者簽核）。** 舊 POC＋test-pipeline seed 已刪（ab5f330）；從手稿 pp.3–10 重新轉錄、併進正式章流程。seed＝[`seed_ch04_s2.md`](seed_ch04_s2.md)、brief＝[`brief_s42.md`](brief_s42.md)、成品 fragment＝[`../../fragments/ch04/sec-4-2.html`](../../fragments/ch04/sec-4-2.html)（已併入 `build.py` ch04＋`chapter4-print-standalone.html`）。
+- **本章決策（D2）已裁決**：使用者選 (b) 併進正式流程重跑（非 renumber 舊 POC）；編號自 Theorem 4.3／Definition 4.2 起接 §4.1（見 §5）。
 - **忠實主軸＋已 resolved 方向**：continuity(x>0) P_k 三段拆；(△) abs-conv⟹conv；Cauchy；**收斂⟺Cauchy 展開成完整 Bolzano–Weierstrass＋monotone-subsequence**（ROADMAP resolved、超出手稿——手稿 punt）；x<0 延拓；**指數律完整 6 步證**（ROADMAP resolved）。
 
 ### §4.3 The Derivative of `e^x`
@@ -79,14 +79,14 @@
 
 > 依 CONTENT_DIRECTION「模型提案、人定奪」。下列為我依手稿＋ROADMAP 提的章層方向；落地時各節 brief 會再細化、停在 ③ 等核可。
 
-- **D1 — legacy tex 當 signed 數學 cross-check（非手稿、非內容來源）。** 手稿＝數學主軸；`legacy/tex_handout/chapters/ch04_exponential_logarithm.tex` 是 LaTeX→HTML 前已簽核的同章，**只當盲算對賬的 ground truth**（§4.2 POC 即此用法），不照抄其散文／結構。新具名結果（Bolzano–Weierstrass、Cauchy 等價）一律人工查核。
-- **D2 — §4.2 POC 的處置（待使用者裁決）。** `sec-4-2.html` 已收斂但住 `_dev-archive/`、且編號假設自己是章首。選項：(a) §4.1 落地後**renumber 並升格** live（省一次重跑、POC 已過審）；(b) 併進正式章流程**重跑** ⑤（一致性最高、成本一次 Codex）。**預設傾向 (a)**（POC 已端到端收斂、Codex 抓過真問題），但 renumber 後仍須一次 scoped re-audit。
-- **D3 — ROADMAP 已 resolved 的兩個方向叉路照辦（§4.2）。** ① 收斂⟺Cauchy **展開**成完整 Bolzano–Weierstrass＋monotone-subsequence（超出手稿；user-directed 2026-04-27）。② 指數律寫**完整 6 步**（非 4 步 outline；user-directed）。POC 已照此。
+- **D1 — legacy tex 當 signed 數學 cross-check（非手稿、非內容來源）。** 手稿＝數學主軸；`legacy/tex_handout/chapters/ch04_exponential_logarithm.tex` 是 LaTeX→HTML 前已簽核的同章，**只當盲算對賬的 ground truth**（§4.2 即此用法），不照抄其散文／結構。新具名結果（Bolzano–Weierstrass、Cauchy 等價）一律人工查核。
+- **D2 — §4.2 POC 的處置（已裁決，2026-06-21）。** 使用者選 **(b) 併進正式章流程重跑**：舊 POC `sec-4-2.html` 與舊 test-pipeline seed/紀錄已刪（ab5f330），§4.2 從手稿 pp.3–10 重新轉錄（`seed_ch04_s2.md`）走完整六階、編號自 Theorem 4.3／Definition 4.2 起。①→⑥ 已完成、兩閘收斂（gate-1 0 blocking；Codex gate-2 run1 1 blocking→run2 converged）。
+- **D3 — ROADMAP 已 resolved 的兩個方向叉路照辦（§4.2）。** ① 收斂⟺Cauchy **展開**成完整 Bolzano–Weierstrass＋monotone-subsequence（超出手稿；user-directed 2026-04-27）。② 指數律寫**完整 6 步**（非 4 步 outline；user-directed）。§4.2 成品已照此。
 - **D4 — MVT 留在 §4.4（ROADMAP open Q）。** 手稿把 Rolle/MVT 夾在指數章是因 `ln` 建構需要 monotonicity corollary。未來 applications-of-differentiation 專章草擬時，再於 Mode B **僅提議**移走。本章不移。
 - **D5 — §4.1 補 `e` 的值＋部分和（真 expansion，待 ③）。** 手稿**無** `e≈2.718`、無部分和表、無收斂圖。ROADMAP key figure 指定 §4.1 partial-sum 收斂圖。提案：補一個「算 `e` 前幾項部分和」worked example＋收斂圖（低風險 `expansion:example`/`figure`）。
 - **D6 — `a^r`(r∉ℚ) 的處理照手稿＋legacy 框架（待 ③）。** 手稿 p.1 拋出「how about `a^r`?」即跳到 series 定義 `e^x`。提案：照 legacy 的「limit-of-rationals 較笨重 → 改走 series，且 `a^x:=e^{x ln a}` 留到 §4.5」一句帶過，不在 §4.1 真的建構 `a^r`（forward-fence 到 §4.5）。
 - **D7 — Homework 升格 worked example（待 ③）。** 手稿 HW（pp.23–24）：`ln a+ln b=ln(ab)`（→§4.5，重要對數律）、`a^x=e^{x ln a}`＋其指數律（→§4.5，定義一般指數）、`f'=0⟹const`（→§4.4，MVT 直接推論）皆 **manuscript-faithful**、升格 worked example（含解）。函數方程刻畫 `g(x)g(y)=g(x+y),g(1)=e⟹g=e^x`（HW3）較進階、低優先，**提案略過或降為 remark**，待 ③。**bare your-turn exercise 一律不自創**（root README §防護欄、CONTENT_SPEC §14）。
-- **D8 — binomial 記號（§4.2）。** 手稿用 `C^n_k`；本書全程 `\binom{n}{k}`（ROADMAP notation）。POC 已用 `\binom`、首見處 cross-ref 手稿記號。
+- **D8 — binomial 記號（§4.2）。** 手稿用 `C^n_k`；本書全程 `\binom{n}{k}`（ROADMAP notation）。§4.2 成品已用 `\binom`、首見處 cross-ref 手稿記號。
 - **D9 — `P_k` 部分和記號保留（§4.1–§4.2，手稿記號）。** `e`（常數）／`e^x`（函數）在 §4.1 首見加 index；`ln x` 在 §4.5 首見加 index。
 
 > **餵 auditor（direction-conformance 反向檢查）：** 各節 brief 的「刻意不寫」清單須含——§4.1 不在此真的建構 `a^r`（D6 邊界）、不提前做 continuity/exponent law（屬 §4.2）；§4.3 不重證 Ch2 §2.4（cross-ref）；§4.4 不把 MVT 移出本章（D4）；§4.5 不自創 bare exercise（D7）、`ln` 只對 x>0。
@@ -107,7 +107,7 @@
 
 - **規則**：章內**每型獨立 counter、跨節連續**（Theorem 4.1, 4.2, …；Example 4.1, …；Figure 4.1, …）。Caution **無編號**（比照 ch02/ch03）。交叉引用**一律純文字**（"by Theorem 4.x"、"§4.1 的尾界"），無 `\cref`／`\eqref`。
 - **接續機制**：後節 session **先讀前節成品 HTML 末尾**確認各型 counter 用到哪，再續編；寫完**自查每個編號引用都對得到一個存在的 `env-num`**。
-- **⚠️ §4.2 POC 編號待修（D2 連動）**：`sec-4-2.html` 目前用 Thm `4.1`(continuity x>0)、`4.2`(conv⟺Cauchy)、`4.3`(BW)、`4.4`(continuity ℝ)、`4.5`(exponent law)、Def `4.1`(Cauchy)、Prop `4.1–4.3`、Cor `4.1`、Example `4.1`、Caution `4.1–4.2`。**但 §4.1 會先 mint 數個編號** → §4.2 全部須往後移。**§4.1 落地後立即在此回填 §4.1 實際編號，再據以 renumber §4.2 POC。**
+- **✅ §4.2 ④ 落定編號（2026-06-21 重跑，接 §4.1 ledger）**：Definition `4.2`(Cauchy)；Theorem `4.3`(continuity x>0)、`4.4`(Bolzano–Weierstrass)、`4.5`(Cauchy criterion)、`4.6`(continuity ℝ)、`4.7`(exponent law)；Proposition `4.1`((△) abs-conv⟹conv)；Corollary `4.1`(positivity)；Remark `4.2`；Caution 無編號。交叉引用（"Theorem 4.1/4.2"、"bound (∗)"、"(∗∗)"、"Strategy 4.1"、"§4.1"）已自查、render 0 dangling。**→ §4.3 自 Theorem `4.8`、Definition `4.3`、Proposition `4.2`、Corollary `4.2`、Remark `4.3` 起接續。**
 - **§4.1 提案編號（brief ③ 核可後落定、④ 回填）**：
 
   | 型別 | §4.1 提案 |
@@ -138,7 +138,7 @@
 | 節 | ① seed | ①-verify | ② brief | ③ gate | ④ draft | ⑤ audit | ⑥ |
 |---|---|---|---|---|---|---|---|
 | §4.1 Construction | ✅ `seed_ch04_s1.md`（pp.1–3） | 🟢 accepted-by-proceeding（2026-06-21；pending 更正） | ✅ `brief_s41.md` | ✅ 2026-06-21（照提案核可） | ✅ `fragments/ch04/sec-4-1.html`＋章 opener＋`chapter4-print-standalone.html`＋Figure 4.1＋`build.py` ch04（render：0 MathJax err／154 nodes／6 print 頁／0 overflow） | ✅ **converged**。free 4-lens（`wf_b32c202e`）0 blocking／7 advisory（套 1：curly `’`）。Codex gate-2（gpt-5.5 xhigh，使用者同意計費）：**run1** 1 blocking（§4.1 提 `e^0=1` 違 brief 刻意不寫→移除）＋1 advisory（`L^k/k!` 中間步→補回 (∗) 鏈）；**run2 converged 0 blocking**＋2 advisory 皆套（Remark 4.1 根存在補 `a>0`、§4.2 預告措辭精準化＝歸功 (∗)＋product argument）。`result_s41.json`／`result_s41_r2.json`。gate 報告 `_audit/REVIEW-ch04_s41-gate1.html`／`-gate2.html`。render 重驗 0 err／6 頁／0 overflow | ✅ **2026-06-21 使用者簽核** |
-| §4.2 Continuity & Exponent Law | ✅ `seed_s42.md` | ✅（2026-06-03） | ✅（首跑） | ✅（首跑） | 🟡 **POC** `sec-4-2.html`（待 D2：renumber 升格／重跑） | 🟡 首跑收斂 | ⏳ 待併入正式章 |
+| §4.2 Continuity & Exponent Law | ✅ `seed_ch04_s2.md`（pp.3–10，2026-06-21 重轉錄） | 🟢 accepted-by-proceeding（2026-06-21） | ✅ `brief_s42.md` | ✅ 2026-06-21（照提案核可） | ✅ `fragments/ch04/sec-4-2.html`（Thm 4.3–4.7／Def 4.2／Prop 4.1／Cor 4.1／Rem 4.2／Caution 無編號）＋併入 `build.py` ch04＋`chapter4-print-standalone.html`（render：0 MathJax err／13 print 頁／0 overflow） | ✅ **converged**。free 4-lens（`wf_3f10e703`）0 blocking／8 advisory（套 4：M1 (I) 自然形、Strategy 4.1 回指、美式拼寫、開場拆句）。Codex gate-2（gpt-5.5 xhigh，使用者同意計費）：**run1** 1 blocking（收尾 forward-fence 點名 `(e^h−1)/h` 越界→改 generic）；**run2 converged 0 blocking**＋2 advisory 皆套（Thm 4.3 區間下界明寫、Caution `e` 無理 cross-ref §4.1）。`result_s42.json`／`result_s42_r2.json`。gate 報告 `_audit/REVIEW-ch04_s42-gate1.html`／`-gate2.html`。render 重驗 0 err／13 頁／0 overflow | ✅ **2026-06-21 使用者簽核** |
 | §4.3 Derivative of `e^x` | ⏳ pp.10–11 | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ |
 | §4.4 Rolle & MVT | ⏳ pp.11–18 | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ |
 | §4.5 Monotonicity & Logarithm | ⏳ pp.18–22＋HW | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ |
@@ -149,4 +149,4 @@
 >
 > 單一產生器 `_audit/REVIEW-sNM.gen.py` 同時產兩檔（gate-2 讀 JSON、gate-1／單元 map 內嵌）。§4.1 已產：[`_audit/REVIEW-ch04_s41-gate1.html`](_audit/REVIEW-ch04_s41-gate1.html)、[`_audit/REVIEW-ch04_s41-gate2.html`](_audit/REVIEW-ch04_s41-gate2.html)（render 0 MathJax err）。**§4.2 起比照辦理。**
 
-**狀態（2026-06-21）**：§4.1 跑完 ①→⑤——**free 4-lens ＋ Codex gate-2 兩審皆 converged（0 blocking）**，`sec-4-1.html`＋章 opener＋`chapter4-print-standalone.html`＋Figure 4.1 render-clean（0 err／6 頁／0 overflow）。**⑥ 已簽核（2026-06-21 使用者）——§4.1 完成、已 commit。** 下一步：進 §4.2（D2：把既有 POC `sec-4-2.html` renumber 自 Theorem 4.3／Definition 4.2 起、併進正式章流程）。本輪 commit 範圍僅 ch04 §4.1（build.py ch04 entry＋chapter4 standalone＋fragments/ch04＋_dev-archive/ch04）；其餘工作樹既有變更（video/ pipeline、ch03、scratch）不在本輪、未動。**ROADMAP ch04 已填 entry**（含三條 resolved/open question：Cauchy⟺conv、exponent-law detail、MVT placement、§4.3 redundancy）。
+**狀態（2026-06-21）**：§4.1 跑完 ①→⑤——**free 4-lens ＋ Codex gate-2 兩審皆 converged（0 blocking）**，`sec-4-1.html`＋章 opener＋`chapter4-print-standalone.html`＋Figure 4.1 render-clean（0 err／6 頁／0 overflow）。**⑥ 已簽核（2026-06-21 使用者）——§4.1 完成、已 commit。** **§4.2 已於 2026-06-21 重跑完成**（D2 裁定棄舊 POC、從手稿 pp.3–10 重轉錄、併進正式流程；①→⑥ 兩閘收斂、已簽核、已併入 `build.py` ch04＋`chapter4-print-standalone.html`）。**下一步：§4.3**（手稿 pp.10–11；編號自 Theorem 4.8、Definition 4.3 起，見 §5）。各輪 commit 僅含該節 ch04 產物；其餘工作樹既有變更（video/ pipeline、ch03、scratch）不在範圍、未動。**ROADMAP ch04 已填 entry**（含三條 resolved/open question：Cauchy⟺conv、exponent-law detail、MVT placement、§4.3 redundancy）。
