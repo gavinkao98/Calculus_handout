@@ -5,7 +5,9 @@
      Numbering is MANUAL (kit has no auto-counter); cross-references are
      plain prose. Counters continue from §2.2:
        Definition 2.2 → 2.3;  Theorem: first → 2.1;  Figure 2.2 → 2.3;
-       Example 2.10 → 2.11, 2.12;  Remark 2.4 → 2.5.
+       Example 2.10 → 2.11, 2.12, 2.13, 2.14;  Remark 2.4 → 2.5.
+       (2026-06-22 example-supplement import: +E2.3-a vertical tangent = 2.12,
+        +O2.3-a piecewise = 2.13; old higher-deriv example 2.12 → 2.14.)
      No exercises: self-authored problems are written as worked examples
      (see brief_s23.md "題目政策"). -->
 <article class="sec" lang="en">
@@ -59,6 +61,27 @@
 
   <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.3). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line — exactly the geometric meaning of non-differentiability.</p>
 
+  <!-- expansion:example — a second failure mode distinct from the corner: a vertical tangent, where the difference quotient is unbounded [source: CLP-1 §2.2 prob_s2.2 vertical-tangent remark + standard textbook example; solution authored] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.12</span><span class="env-name">A vertical tangent: \(f(x) = \sqrt[3]{x}\) at \(x = 0\)</span></p>
+      <div class="env-body">
+        <p>Show that \(f(x) = \sqrt[3]{x} = x^{1/3}\) is <em>not</em> differentiable at \(x = 0\), even though its graph has no corner there.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We form the difference quotient at \(a = 0\):</p>
+        <p>\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{h^{1/3} - 0}{h} \;=\; \frac{1}{h^{2/3}}. \]</p>
+        <p>Since \(h^{2/3} > 0\) for all \(h \ne 0\), the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
+        <p>\[ \lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty. \]</p>
+        <p>The limit does not exist as a <em>finite</em> number, so by Definition 2.3 the function is not differentiable at \(x = 0\).</p>
+        <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)); here both one-sided limits agree — they both tend to \(+\infty\) — so there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative demands a finite limit, so differentiability fails here for a different reason than at a corner.</p>
+      </div>
+    </section>
+  </div>
+
   <h3 class="subsec-head">Differentiability and continuity</h3>
 
   <!-- expansion:intuition — set up the theorem: differentiable is a stronger condition than continuous -->
@@ -109,6 +132,30 @@
     </div>
   </section>
 
+  <!-- expansion:example — using differentiability in reverse: choose constants so a piecewise function is differentiable, a direct application of Theorem 2.1 [source: CLP-1 §2.2 prob_s2.2 "2006H piecewise x^2 / ax+b"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.13</span></p>
+      <div class="env-body">
+        <p>Find the values of the constants \(a\) and \(b\) for which the function
+        \[ f(x) = \begin{cases} x^{2} & x \le 2, \\ ax + b & x > 2 \end{cases} \]
+        is differentiable everywhere.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Away from \(x = 2\) each piece is a polynomial and therefore differentiable, so the only point in question is \(x = 2\).</p>
+        <p><em>Step 1 — Continuity.</em> By Theorem 2.1, differentiability at \(x = 2\) requires continuity there, which forces the two pieces to meet:</p>
+        <p>\[ \lim_{x \to 2^{-}} f(x) = 2^{2} = 4 \quad\text{and}\quad \lim_{x \to 2^{+}} f(x) = 2a + b, \]</p>
+        <p>so we need \(2a + b = 4\).</p>
+        <p><em>Step 2 — Matching derivatives.</em> The left-hand derivative at \(x = 2\) uses the \(x^{2}\) branch, whose derivative \(2x\) follows in one line from the difference quotient (the same technique used in §2.2 Example 2.6); it gives slope \(4\) at \(x = 2\). The right-hand derivative uses the \(ax + b\) branch, whose derivative is the constant \(a\) (the slope of that line). For the two-sided limit of the difference quotient to exist, these must agree:</p>
+        <p>\[ a = 4. \]</p>
+        <p>Substituting \(a = 4\) into \(2a + b = 4\) gives \(b = -4\). With \(a = 4\) and \(b = -4\) the two pieces meet smoothly, and the difference quotient at \(x = 2\) has a well-defined limit equal to \(4\).</p>
+      </div>
+    </section>
+  </div>
+
   <h3 class="subsec-head">Higher derivatives</h3>
 
   <p>If \(f\) is differentiable, then its derivative \(f'\) is itself a function — and we can ask whether \(f'\) is differentiable. When it is, the derivative of \(f'\) is called the <em>second derivative</em> of \(f\), written \(f''\). Repeating the process gives the third derivative \(f'''\), the fourth derivative \(f^{(4)}\), and in general the \(n\)-th derivative \(f^{(n)}\):</p>
@@ -131,7 +178,7 @@
   <!-- expansion:example — higher-derivative computation using §2.2 result (approved in brief; new type) -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.12</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.14</span></p>
       <div class="env-body">
         <p>Find \(f''(x)\) and \(f'''(x)\) for \(f(x) = x^{2} + 4x - 2\).</p>
       </div>

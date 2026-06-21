@@ -23,6 +23,33 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+<!-- New Computer Modern (prose/text faces) — matches MathJax 4 "mathjax-newcm" math font.
+     Source: npm web-computer-modern@1.1.0-new-cm-7-0-2 via jsDelivr. License: GUST Font License.
+     10pt optical size ("Serif 10"). NOTE: filenames contain %20-encoded spaces — keep them. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+
 <!-- MathJax 4 (CHTML output with inline line-breaking) -->
 <script>
 window.MathJax = {
@@ -69,7 +96,7 @@ window.MathJax = {
   --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
   --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
   /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
-  --serif: "Times New Roman", Times, Georgia, serif;
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
   --ui: "Inter", -apple-system, system-ui, sans-serif;
   --a-concept:  oklch(0.50 0.13 55);
   --a-result:   oklch(0.50 0.13 245);
@@ -135,7 +162,7 @@ window.MathJax = {
 .paper figcaption {
   font-family: var(--ui); font-size: .8em; line-height: 1.5;
   color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
-  max-width: none;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
 }
 .paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
 .paper figcaption mjx-container { font-size: .95em; }
@@ -230,8 +257,8 @@ window.MathJax = {
 .paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
 .paper .figure-art--triple { gap: 18px; }
 .paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
-.paper .figure-art--grid { gap: 20px 16px; }
-.paper .figure-art--grid .fig-panel { flex: 1 1 150px; max-width: 210px; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
 .paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
 .paper .fig-note {
   font-family: var(--ui); font-size: .8em; line-height: 1.45;
@@ -254,7 +281,7 @@ window.MathJax = {
   border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
   border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
 }
-.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl th, .paper table.tbl td { padding: .3em .65em; text-align: center; white-space: nowrap; }
 .paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
 .paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
 .paper table.tbl mjx-container { font-size: .98em; }
@@ -278,11 +305,11 @@ window.MathJax = {
 .sheet {
   position: relative; box-sizing: border-box;
   width: 210mm; height: 297mm;
-  padding: 20mm 18mm 20mm 24mm;
+  padding: 20mm 33mm 20mm 37mm;
   background: #fff; overflow: hidden;
 }
 .sheet-header {
-  position: absolute; top: 11mm; left: 24mm; right: 18mm;
+  position: absolute; top: 11mm; left: 37mm; right: 33mm;
   font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
 }
 .sheet-footer {
@@ -292,7 +319,7 @@ window.MathJax = {
 .sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
 .sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
 .sheet-body .page { padding: 0; max-width: none; margin: 0; }
-.sheet-body.paper { font-size: 11pt; line-height: 1.55; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
 .sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .sheet-body > :first-child { margin-top: 0 !important; }
 .sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
@@ -324,7 +351,7 @@ window.MathJax = {
   box-shadow: 0 2px 10px rgba(0,0,0,.25);
 }
 .print-toolbar button:disabled { opacity: .5; cursor: default; }
-.print-toolbar button:not(:disabled):hover { background: #1a4368; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
 .print-toolbar .status {
   font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
   padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
@@ -333,7 +360,7 @@ window.MathJax = {
   position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
   font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
 }
-#source { position: absolute; left: -10000px; top: 0; width: 635px; }
+#source { position: absolute; left: -10000px; top: 0; width: 645px; }
 </style>
 </head>
 <body>
@@ -418,7 +445,7 @@ window.MathJax = {
   </section>
 
   <!-- expansion:intuition — transition paragraph setting up the computation pattern -->
-  <p>We now practise computing tangent lines from the definition. The routine is the same each time: form the difference quotient, simplify algebraically until the factor that makes the denominator zero cancels, then take the limit.</p>
+  <p>We now practice computing tangent lines from the definition. The routine is the same each time: form the difference quotient, simplify algebraically until the factor that makes the denominator zero cancels, then take the limit.</p>
 
   <!-- expansion:example — polynomial example; simplest type first (brief) -->
   <div class="workedexample">
@@ -609,7 +636,7 @@ window.MathJax = {
     <div class="env-body">
       <ol class="steps">
         <li>Form the difference quotient \(\dfrac{f(x + h) - f(x)}{h}\), expanding \(f(x + h)\).</li>
-        <li>Simplify the quotient algebraically — by expanding, rationalising, or combining fractions — until the \(h\) that makes the denominator vanish cancels.</li>
+        <li>Simplify the quotient algebraically — by expanding, rationalizing, or combining fractions — until the \(h\) that makes the denominator vanish cancels.</li>
         <li>Evaluate the limit as \(h \to 0\) in the simplified expression.</li>
       </ol>
       <p>These are the same three steps we used at a fixed point in §2.1; the only change is that \(x\) now stays symbolic, so the answer emerges as a function rather than a number. The algebra in step 2 takes a different form for each function — expansion, conjugates, common denominators — but its job is always to clear the \(0/0\); for the polynomial, root, and rational functions of this chapter a factor of \(h\) always cancels and leaves a limit we can evaluate.</p>
@@ -782,7 +809,9 @@ window.MathJax = {
      Numbering is MANUAL (kit has no auto-counter); cross-references are
      plain prose. Counters continue from §2.2:
        Definition 2.2 → 2.3;  Theorem: first → 2.1;  Figure 2.2 → 2.3;
-       Example 2.10 → 2.11, 2.12;  Remark 2.4 → 2.5.
+       Example 2.10 → 2.11, 2.12, 2.13, 2.14;  Remark 2.4 → 2.5.
+       (2026-06-22 example-supplement import: +E2.3-a vertical tangent = 2.12,
+        +O2.3-a piecewise = 2.13; old higher-deriv example 2.12 → 2.14.)
      No exercises: self-authored problems are written as worked examples
      (see brief_s23.md "題目政策"). -->
 <article class="sec" lang="en">
@@ -792,7 +821,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — motivation: §2.2 assumed the limit always exists; it need not -->
-  <p>Throughout §2.2 we freely computed \(f'(x)\) by taking the limit of the difference quotient — but we never stopped to ask whether that limit <em>exists</em>. For the polynomial, root, and rational functions we worked with, it always did, and we might be tempted to believe that every function has a derivative at every point of its domain. This section shows that the temptation is wrong: at certain points the limit can fail, and recognising those failures is an essential part of understanding what the derivative means. Along the way we prove the first theorem of the chapter — differentiability guarantees continuity — and extend the derivative idea to second, third, and higher orders.</p>
+  <p>Throughout §2.2 we freely computed \(f'(x)\) by taking the limit of the difference quotient — but we never stopped to ask whether that limit <em>exists</em>. For the polynomial, root, and rational functions we worked with, it always did, and we might be tempted to believe that every function has a derivative at every point of its domain. This section shows that the temptation is wrong: at certain points the limit can fail, and recognizing those failures is an essential part of understanding what the derivative means. Along the way we prove the first theorem of the chapter — differentiability guarantees continuity — and extend the derivative idea to second, third, and higher orders.</p>
 
   <h3 class="subsec-head">When does the derivative exist?</h3>
 
@@ -835,6 +864,27 @@ window.MathJax = {
   </figure>
 
   <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.3). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line — exactly the geometric meaning of non-differentiability.</p>
+
+  <!-- expansion:example — a second failure mode distinct from the corner: a vertical tangent, where the difference quotient is unbounded [source: CLP-1 §2.2 prob_s2.2 vertical-tangent remark + standard textbook example; solution authored] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.12</span><span class="env-name">A vertical tangent: \(f(x) = \sqrt[3]{x}\) at \(x = 0\)</span></p>
+      <div class="env-body">
+        <p>Show that \(f(x) = \sqrt[3]{x} = x^{1/3}\) is <em>not</em> differentiable at \(x = 0\), even though its graph has no corner there.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We form the difference quotient at \(a = 0\):</p>
+        <p>\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{h^{1/3} - 0}{h} \;=\; \frac{1}{h^{2/3}}. \]</p>
+        <p>Since \(h^{2/3} > 0\) for all \(h \ne 0\), the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
+        <p>\[ \lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty. \]</p>
+        <p>The limit does not exist as a <em>finite</em> number, so by Definition 2.3 the function is not differentiable at \(x = 0\).</p>
+        <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)); here both one-sided limits agree — they both tend to \(+\infty\) — so there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative demands a finite limit, so differentiability fails here for a different reason than at a corner.</p>
+      </div>
+    </section>
+  </div>
 
   <h3 class="subsec-head">Differentiability and continuity</h3>
 
@@ -886,6 +936,30 @@ window.MathJax = {
     </div>
   </section>
 
+  <!-- expansion:example — using differentiability in reverse: choose constants so a piecewise function is differentiable, a direct application of Theorem 2.1 [source: CLP-1 §2.2 prob_s2.2 "2006H piecewise x^2 / ax+b"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.13</span></p>
+      <div class="env-body">
+        <p>Find the values of the constants \(a\) and \(b\) for which the function
+        \[ f(x) = \begin{cases} x^{2} & x \le 2, \\ ax + b & x > 2 \end{cases} \]
+        is differentiable everywhere.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Away from \(x = 2\) each piece is a polynomial and therefore differentiable, so the only point in question is \(x = 2\).</p>
+        <p><em>Step 1 — Continuity.</em> By Theorem 2.1, differentiability at \(x = 2\) requires continuity there, which forces the two pieces to meet:</p>
+        <p>\[ \lim_{x \to 2^{-}} f(x) = 2^{2} = 4 \quad\text{and}\quad \lim_{x \to 2^{+}} f(x) = 2a + b, \]</p>
+        <p>so we need \(2a + b = 4\).</p>
+        <p><em>Step 2 — Matching derivatives.</em> The left-hand derivative at \(x = 2\) uses the \(x^{2}\) branch, whose derivative \(2x\) follows in one line from the difference quotient (the same technique used in §2.2 Example 2.6); it gives slope \(4\) at \(x = 2\). The right-hand derivative uses the \(ax + b\) branch, whose derivative is the constant \(a\) (the slope of that line). For the two-sided limit of the difference quotient to exist, these must agree:</p>
+        <p>\[ a = 4. \]</p>
+        <p>Substituting \(a = 4\) into \(2a + b = 4\) gives \(b = -4\). With \(a = 4\) and \(b = -4\) the two pieces meet smoothly, and the difference quotient at \(x = 2\) has a well-defined limit equal to \(4\).</p>
+      </div>
+    </section>
+  </div>
+
   <h3 class="subsec-head">Higher derivatives</h3>
 
   <p>If \(f\) is differentiable, then its derivative \(f'\) is itself a function — and we can ask whether \(f'\) is differentiable. When it is, the derivative of \(f'\) is called the <em>second derivative</em> of \(f\), written \(f''\). Repeating the process gives the third derivative \(f'''\), the fourth derivative \(f^{(4)}\), and in general the \(n\)-th derivative \(f^{(n)}\):</p>
@@ -901,14 +975,14 @@ window.MathJax = {
       <p>\[ f''(x) \;=\; \frac{d^{2}y}{dx^{2}} \;=\; \frac{d^{2}f}{dx^{2}} \;=\; \frac{d^{2}}{dx^{2}}\,f(x), \]</p>
       <p>and in general the \(n\)-th derivative is</p>
       <p>\[ f^{(n)}(x) \;=\; \frac{d^{n}y}{dx^{n}}. \]</p>
-      <p>The superscript in \(d^{n}y/dx^{n}\) is <em>not</em> an exponent — it records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesised form \(f^{(n)}\) avoids a forest of primes.</p>
+      <p>The superscript in \(d^{n}y/dx^{n}\) is <em>not</em> an exponent — it records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesized form \(f^{(n)}\) avoids a forest of primes.</p>
     </div>
   </section>
 
   <!-- expansion:example — higher-derivative computation using §2.2 result (approved in brief; new type) -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.12</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.14</span></p>
       <div class="env-body">
         <p>Find \(f''(x)\) and \(f'''(x)\) for \(f(x) = x^{2} + 4x - 2\).</p>
       </div>
@@ -943,7 +1017,10 @@ window.MathJax = {
      Numbering is MANUAL (kit has no auto-counter); cross-references are
      plain prose. Counters continue from §2.3:
        Theorem 2.1 → 2.2, 2.3, 2.4, 2.5;  Corollary: first → 2.1;
-       Example 2.12 → 2.13, 2.14;  Remark 2.5 → 2.6.
+       Example 2.14 → 2.15, 2.16, 2.17, 2.18;  Remark 2.5 → 2.6.
+       (2026-06-22 example-supplement import: old polynomial example 2.13 → 2.15,
+        +E2.4-a negative exponent = 2.16, +E2.4-b fractional exponent = 2.17;
+        old e^x higher-deriv example 2.14 → 2.18.)
      Power rule proved for positive integer n with TWO proofs (manuscript's
      teaching choice); the negative-integer case is flagged in an unnumbered
      Caution and the full real-exponent version deferred (ROADMAP pitfall).
@@ -958,7 +1035,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — load-bearing intuition: prove each rule once, reuse it as algebra; the limit→shortcut payoff -->
-  <p>In the previous sections every derivative was earned the hard way — by forming the difference quotient and grinding the limit down to a value. That is bearable for one function, but imagine differentiating \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\) straight from the definition: we would expand \((x + h)^{4}\), cancel, and take a limit, only to face the same labour for the next polynomial, and the next. This section ends the drudgery. We prove, once and for all, a short list of differentiation <em>rules</em> — for constants, powers, sums, and constant multiples — each established from the limit definition but thereafter usable as a purely algebraic shortcut. With them, differentiating any polynomial collapses to a one-line, mechanical operation, and we never touch a limit again for these functions. We then turn the same lens on the natural exponential \(e^{x}\) and uncover its remarkable signature: it is its own derivative.</p>
+  <p>In the previous sections every derivative was earned the hard way — by forming the difference quotient and grinding the limit down to a value. That is bearable for one function, but imagine differentiating \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\) straight from the definition: we would expand \((x + h)^{4}\), cancel, and take a limit, only to face the same labor for the next polynomial, and the next. This section ends the drudgery. We prove, once and for all, a short list of differentiation <em>rules</em> — for constants, powers, sums, and constant multiples — each established from the limit definition but thereafter usable as a purely algebraic shortcut. With them, differentiating any polynomial collapses to a one-line, mechanical operation, and we never touch a limit again for these functions. We then turn the same lens on the natural exponential \(e^{x}\) and uncover its remarkable signature: it is its own derivative.</p>
 
   <h3 class="subsec-head">The constant and power rules</h3>
 
@@ -996,9 +1073,9 @@ window.MathJax = {
   <p>The manuscript records two proofs, each lighting the result from a different angle; we give both.</p>
 
   <section class="env env-proof">
-    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">factorisation</span></p>
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">factorization</span></p>
     <div class="env-body">
-      <p>We use the equivalent \(x \to a\) form of the derivative (§2.1) together with the algebraic factorisation</p>
+      <p>We use the equivalent \(x \to a\) form of the derivative (§2.1) together with the algebraic factorization</p>
       <p>\[ x^{n} - a^{n} = (x - a)\bigl(x^{n-1} + a\,x^{n-2} + a^{2}x^{n-3} + \cdots + a^{n-1}\bigr). \]</p>
       <p>Dividing by \(x - a\) cancels the factor that would make the quotient \(0/0\), and letting \(x \to a\),</p>
       <p>\[ \begin{aligned}
@@ -1032,7 +1109,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>So far the power rule is proved only for <em>positive integer</em> exponents. For a <em>negative</em> integer \(n = -1, -2, \ldots\) the identical formula \(\dfrac{d}{dx}x^{n} = n\,x^{n-1}\) still holds wherever \(x \ne 0\) — the manuscript leaves this as an exercise, and it can be checked by applying the same factorisation idea to \(1/x^{m}\). The fully general statement \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for an <em>arbitrary real</em> exponent \(r\) holds as well — for \(x > 0\), where \(x^{r}\) is defined through the logarithm — but its proof needs the chain rule, so we defer it to a later chapter.</p>
+      <p>So far the power rule is proved only for <em>positive integer</em> exponents. For a <em>negative</em> integer \(n = -1, -2, \ldots\) the identical formula \(\dfrac{d}{dx}x^{n} = n\,x^{n-1}\) still holds wherever \(x \ne 0\) — the manuscript leaves this as an exercise, and it can be checked by applying the same factorization idea to \(1/x^{m}\). The fully general statement \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for an <em>arbitrary real</em> exponent \(r\) holds as well — for \(x > 0\), where \(x^{r}\) is defined through the logarithm — but its proof needs the chain rule, so we defer it to a later chapter.</p>
     </div>
   </section>
 
@@ -1083,7 +1160,7 @@ window.MathJax = {
   <!-- expansion:example — apply power + constant-multiple + sum to a polynomial (approved 2026-06-08; new type: rule-application, not first-principles) -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.13</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.15</span></p>
       <div class="env-body">
         <p>Differentiate \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\).</p>
       </div>
@@ -1102,6 +1179,50 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:example — the power rule on a negative exponent: rewrite 1/t as t^{-1}, the case flagged in the Caution above; result matches §2.2 Example 2.8 [source: CLP-1 §2.6 prob_s2.6 "s(t)=3t^4+5t^3-1/t"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.16</span></p>
+      <div class="env-body">
+        <p>Differentiate \(s(t) = 3t^{4} + 5t^{3} - \dfrac{1}{t}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>To use the power rule on every term, we first rewrite \(1/t\) as a power: \(s(t) = 3t^{4} + 5t^{3} - t^{-1}\). Applying the power rule — including the negative-exponent case noted in the Caution above — to each term,</p>
+        <p>\[ \begin{aligned}
+          s'(t) &= 3 \cdot 4t^{3} + 5 \cdot 3t^{2} - (-1)\,t^{-2} \\[2pt]
+                &= 12t^{3} + 15t^{2} + \frac{1}{t^{2}}.
+        \end{aligned} \]</p>
+        <p>The key step was rewriting \(1/t\) as \(t^{-1}\) so the power rule could act on it: the exponent drops by one (\(-1 \to -2\)) and the old exponent \(-1\) comes out front, producing the \(+1/t^{2}\) term — matching what we would obtain from the quotient rule (§2.5) or from the limit definition (§2.2 Example 2.8).</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — the power rule on a fractional exponent, then a tangent line tying back to §2.1; reproduces the §2.2 Example 2.7 limit result in one step [source: CLP-1 §2.4 prob_s2.4 "f(x)=3x^2+4x^(1/2)"; official solution, tangent-line part added] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.17</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = 3x^{2} + 4\sqrt{x}\) for \(x > 0\), and find the equation of the tangent line at \(x = 1\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Writing \(\sqrt{x} = x^{1/2}\), we differentiate term by term. The power rule applies directly to \(3x^{2}\). For \(4\sqrt{x}\) the exponent \(\tfrac{1}{2}\) is not an integer — the very case the Caution above defers for a general proof — but this particular derivative is already secured: §2.2 Example 2.7 found \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\) straight from the definition. Using it,</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= 3 \cdot 2x + 4 \cdot \tfrac{1}{2}\,x^{-1/2} \\[2pt]
+                &= 6x + \frac{2}{\sqrt{x}}.
+        \end{aligned} \]</p>
+        <p>The power rule's bookkeeping — drop the exponent by one (\(\tfrac{1}{2} \to -\tfrac{1}{2}\)) and bring the old exponent out front — reproduces in a single line exactly the value the limit gave in §2.2.</p>
+        <p>At \(x = 1\): \(f(1) = 3 + 4 = 7\) and \(f'(1) = 6 + 2 = 8\). The tangent line through \((1, 7)\) with slope \(8\) is</p>
+        <p>\[ y - 7 = 8(x - 1), \quad\text{i.e.}\quad y = 8x - 1. \]</p>
+      </div>
+    </section>
+  </div>
+
   <h3 class="subsec-head">The derivative of the exponential function</h3>
 
   <!-- expansion:intuition — recall the series definition (seed Note) and fence its rigorous construction to Ch4 -->
@@ -1109,7 +1230,7 @@ window.MathJax = {
 
   <p>\[ e^{x} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots + \frac{x^{n}}{n!} + \cdots, \]</p>
 
-  <p>a definition we take as given here; the convergence of this series and the careful construction of \(e^{x}\) are developed in a later chapter. Granting the series, the derivative falls out beautifully.</p>
+  <p>a definition we take as given here; the convergence of this series and the careful construction of \(e^{x}\) are developed in Chapter 4 (§4.1–§4.2). Granting the series, the derivative falls out beautifully — by an informal term-by-term step that §4.3 there makes rigorous, justifying it with the explicit bound \(\lvert (e^{h} - 1)/h - 1 \rvert \le \lvert h \rvert\).</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.5</span><span class="env-name">Derivative of the natural exponential</span></p>
@@ -1141,7 +1262,7 @@ window.MathJax = {
   <!-- expansion:example — e^x with the linearity rules, plus higher derivatives showing e^x persists while the polynomial dies (approved 2026-06-08; new type) -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.14</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.18</span></p>
       <div class="env-body">
         <p>Let \(g(x) = 4e^{x} - x^{3} + 2x\). Find \(g'(x)\), and then compute \(g''(x)\), \(g'''(x)\), and \(g^{(4)}(x)\).</p>
       </div>
@@ -1195,7 +1316,10 @@ window.MathJax = {
        (G) closing fence to Ch3 chain rule only (no preview).
      Numbering is MANUAL (kit has no auto-counter); cross-references are plain
      prose. Counters continue from §2.4:
-       Theorem 2.5 → 2.6, 2.7;  Example 2.14 → 2.15, 2.16, 2.17;
+       Theorem 2.5 → 2.6, 2.7;  Example 2.18 → 2.19, 2.20, 2.21, 2.22, 2.23;
+       (2026-06-22 example-supplement import: old 2.15 → 2.19, old 2.16 → 2.20,
+        +E2.5-a quotient error-spotting = 2.21, old 2.17 → 2.22,
+        +O2.5-a quotient × exponential = 2.23.)
        Strategy 2.1 → 2.2;  Figure 2.3 → 2.4.  Cautions are unnumbered.
      Both proofs follow the manuscript's add-and-subtract technique; the quotient
      proof keeps the manuscript's Δx notation (a caution notes Δx ≡ h). The product
@@ -1208,7 +1332,7 @@ window.MathJax = {
     <h2 class="sec-title"><span class="sec-no">2.5</span>The Product and Quotient Rules</h2>
   </header>
 
-  <!-- expansion:intuition — open by recalling §2.4's clean sum/difference behaviour, then flag that products and quotients are the unfinished business -->
+  <!-- expansion:intuition — open by recalling §2.4's clean sum/difference behavior, then flag that products and quotients are the unfinished business -->
   <p>In §2.4 we learned that differentiation behaves beautifully with respect to addition: the derivative of a sum is the sum of the derivatives, and the same holds for differences, \((f \pm g)' = f' \pm g'\) (Theorem 2.4). It is tempting to hope that products and quotients are just as docile — that the derivative of a product is the product of the derivatives. This section shows that they are <em>not</em>, finds the correct rules, and so completes the toolkit of basic differentiation rules begun in §2.4. We treat the two cases in turn: first \(\dfrac{d}{dx}(fg)\), then \(\dfrac{d}{dx}\!\left(\dfrac{f}{g}\right)\).</p>
 
   <h3 class="subsec-head">The product rule</h3>
@@ -1293,7 +1417,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.15</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.19</span></p>
       <div class="env-body">
         <p>Differentiate \(h(x) = x\,e^{x}\).</p>
       </div>
@@ -1364,7 +1488,7 @@ window.MathJax = {
   <!-- expansion:example — new worked example (approved 2026-06-08, decision E/F): a genuine rational quotient that exercises the full formula and the numerator order -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.16</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.20</span></p>
       <div class="env-body">
         <p>Differentiate \(f(x) = \dfrac{x}{x^{2} + 1}\).</p>
       </div>
@@ -1385,12 +1509,42 @@ window.MathJax = {
 
   <figure class="figure" data-fig="quotient-example-graph"></figure>
 
+  <!-- expansion:example — error-spotting on the quotient rule, the worked counterpart to the asymmetry Caution above [source: CLP-1 §2.6 prob_s2.6 Conceptual Q1 "spot the error: 2x/(x+1)"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.21</span></p>
+      <div class="env-body">
+        <p>A student differentiates \(f(x) = \dfrac{2x}{x + 1}\) as follows:</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= \frac{2(x + 1) + 2x}{(x + 1)^{2}} \\[4pt]
+                &= \frac{2(x + 1)}{(x + 1)^{2}} = \frac{2}{x + 1}.
+        \end{aligned} \]</p>
+        <p>Spot <em>all</em> the errors in this work, and give the correct derivative.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>There are two errors.</p>
+        <p><em>Error 1 — wrong sign in the quotient rule.</em> The quotient rule carries a <em>minus</em> sign in the numerator,</p>
+        <p>\[ \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \]</p>
+        <p>but the student wrote a plus. With top \(2x\) and bottom \(x + 1\), the correct numerator is</p>
+        <p>\[ (2)(x + 1) - (2x)(1) = 2x + 2 - 2x = 2, \]</p>
+        <p>not \(2(x + 1) + 2x\).</p>
+        <p><em>Error 2 — incorrect simplification.</em> Even within the student's own (wrong) numerator, \(2(x + 1) + 2x = 4x + 2\), not \(2(x + 1)\); the \(2x\) term was simply dropped.</p>
+        <p>Carrying out the rule correctly,</p>
+        <p>\[ f'(x) = \frac{(2)(x + 1) - (2x)(1)}{(x + 1)^{2}} = \frac{2}{(x + 1)^{2}}. \]</p>
+        <p>Note that the denominator is \((x + 1)^{2}\), not \((x + 1)\) — a third common slip the student was heading toward.</p>
+      </div>
+    </section>
+  </div>
+
   <h3 class="subsec-head">Choosing the right rule</h3>
 
   <!-- expansion:intuition — motivate the strategy box: with several rules now available, the first task on any problem is to read its shape and pick the rule -->
-  <p>With the constant, power, sum, constant-multiple, product, and quotient rules all in hand, differentiating a given expression is now less about computing limits and more about <em>recognising</em> which rule its structure calls for. Reading that structure — and simplifying first when possible — is the skill the next box organises.</p>
+  <p>With the constant, power, sum, constant-multiple, product, and quotient rules all in hand, differentiating a given expression is now less about computing limits and more about <em>recognizing</em> which rule its structure calls for. Reading that structure — and simplifying first when possible — is the skill the next box organizes.</p>
 
-  <!-- expansion:strategy — ROADMAP assigns "Selecting among the basic rules" to §2.5; 3 steps incl. the "simplify first" judgement (decision C) -->
+  <!-- expansion:strategy — ROADMAP assigns "Selecting among the basic rules" to §2.5; 3 steps incl. the "simplify first" judgment (decision C) -->
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">2.2</span><span class="env-name">Selecting among the basic rules</span></p>
     <div class="env-body">
@@ -1406,7 +1560,7 @@ window.MathJax = {
   <!-- expansion:example — new worked example (approved 2026-06-08, decision E): rule-selection/diagnosis anchoring Strategy 2.2; (b) is the simplify-first lesson -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.17</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.22</span></p>
       <div class="env-body">
         <p>For each function, first decide which rule applies, then differentiate:
         \[ \text{(a)}\ \ y = x^{3} e^{x}, \qquad \text{(b)}\ \ y = \frac{x^{4} - x}{x}, \qquad \text{(c)}\ \ y = \frac{x^{2}}{e^{x}}. \]</p>
@@ -1421,7 +1575,29 @@ window.MathJax = {
         <p>\[ y' = 3x^{2}. \]</p>
         <p><em>(c)</em> A genuine quotient that does not simplify; use the quotient rule, with top \(x^{2}\) and bottom \(e^{x}\):</p>
         <p>\[ y' = \frac{(2x)\,e^{x} - x^{2}\,e^{x}}{\bigl(e^{x}\bigr)^{2}} = \frac{e^{x}\bigl(2x - x^{2}\bigr)}{e^{2x}} = \frac{2x - x^{2}}{e^{x}}. \]</p>
-        <p>The three parts share no single rule; the work was choosing correctly, and in (b) recognising that the cleanest move was not to use the quotient rule at all.</p>
+        <p>The three parts share no single rule; the work was choosing correctly, and in (b) recognizing that the cleanest move was not to use the quotient rule at all.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — quotient rule with the exponential in the numerator (opposite arrangement to Example 2.22(c)); the sign of f' locates where the function rises and falls [source: CLP-1 §2.7 prob_s2.7 Procedural "f(x)=e^x/(2x)"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.23</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = \dfrac{e^{x}}{2x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The quotient rule with top \(e^{x}\) and bottom \(2x\) gives</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= \frac{(e^{x})(2x) - (e^{x})(2)}{(2x)^{2}} \\[2pt]
+                &= \frac{2e^{x}(x - 1)}{4x^{2}}
+                 = \frac{(x - 1)\,e^{x}}{2x^{2}}.
+        \end{aligned} \]</p>
+        <p>The derivative of the top is again \(e^{x}\) (Theorem 2.5), and the derivative of the bottom is just \(2\). The sign of \(f'(x)\) changes at \(x = 1\): for \(0 < x < 1\) we have \(f'(x) < 0\) (the function is decreasing), while for \(x > 1\) we have \(f'(x) > 0\) (the function is increasing).</p>
       </div>
     </section>
   </div>

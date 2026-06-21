@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 2 課文範例補充——已套用報告（applied，2026-06-22）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.75;
+         max-width: 54rem; margin: 2rem auto 6rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.6rem; }
+  h3 { font-size: 1.03rem; margin: 1.8rem 0 .4rem; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .1rem 0 .6rem; }
+  .meta code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  .badge { display: inline-block; font-size: .72rem; padding: .05rem .5rem; border-radius: 999px;
+           vertical-align: middle; margin-left: .45rem; font-weight: 600; }
+  .core { background: #e3efe3; color: #20602a; }
+  .optb { background: #fdf2dd; color: #8a5a00; }
+  .ok   { background: #e1f0e6; color: #1c6b3f; }
+  .fix  { background: #fdeede; color: #8a4b00; }
+  .why  { font-size: .92rem; background: #f2f6fa; border-left: 4px solid #8aa6c0; padding: .5rem .8rem; margin: .6rem 0; }
+  .ex   { border: 1px solid #bcd6bc; border-left: 5px solid #2e7d32; border-radius: 6px;
+          background: #f6faf6; padding: .7rem 1rem; margin: .7rem 0 0; }
+  .sol  { border: 1px solid #d7dde3; border-left: 5px solid #90a0b0; border-radius: 6px;
+          background: #f7f8f9; padding: .7rem 1rem; margin: .35rem 0 .8rem; }
+  .ex::before  { content: "Example"; font-weight: 700; color: #2e7d32; display: block; font-size: .8rem; letter-spacing: .06em; }
+  .sol::before { content: "Solution"; font-weight: 700; color: #5b6b7b; display: block; font-size: .8rem; letter-spacing: .06em; }
+  .audit { font-size: .9rem; background: #eef6f0; border-left: 4px solid #2e7d32; padding: .5rem .8rem; margin: .5rem 0 1.4rem; }
+  .audit.adv { background: #fff6ea; border-left-color: #d9a514; }
+  .summary-box { background: #e9eff5; border: 1px solid #a4b8cc; border-radius: 8px;
+                 padding: 1rem 1.2rem; margin: 1.5rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: .8rem 0 1.2rem; }
+  th, td { border: 1px solid #c9d3dd; padding: .35rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #e9eff5; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+  .loc { font-family: ui-monospace, monospace; font-size: .8rem; color: #436; }
+</style>
+</head>
+<body>
+
+<h1>Ch 2 課文範例補充——已套用報告（applied）</h1>
+<p class="meta">2026-06-22 ・ 使用者裁決「<strong>六題全部補上</strong>」（核心 4＋選收 2 全收）・
+候選稿：<code>ch02_example-supplement-review.html</code> ・ provenance：<code>ch02_example-imports.md</code> ・
+工作流程契約：<code>CONTENT_SOURCING.md</code> §Import pass。本報告呈現<strong>實際寫進 fragment 的內容</strong>（數學即渲染），逐例附 locus／<code>[source:]</code>／回歸審核結果。</p>
+
+<div class="summary-box">
+<strong>結果：</strong>6 筆 worked examples 已 import 並 build。章內例題由 17（2.1–2.17）增為 <strong>23（2.1–2.23）</strong>。
+<br><strong>渲染：</strong>23 examples 全渲染、6 個 <code>data-fig</code> 圖全 hydrate、<strong>0 MathJax 錯誤</strong>、0 未渲染數學式（Preview MCP）。
+<br><strong>回歸審核：</strong>對抗式唯讀覆核——數學 <strong>6/6 正確</strong>、編號／交叉引用完整性 clean；2 條內部一致性 advisory 已修並重審 <strong>RESOLVED</strong>。
+</div>
+
+<h2>編號 cascade（old → new）</h2>
+<table>
+<tr><th>節</th><th>動作</th><th>結果編號</th></tr>
+<tr><td>§2.1–§2.2</td><td>不動</td><td>2.1 – 2.10</td></tr>
+<tr><td>§2.3</td><td>+E2.3-a vertical tangent、+O2.3-a piecewise；舊 2.12（higher deriv）→ 2.14</td><td>2.11, <strong>2.12</strong>, <strong>2.13</strong>, 2.14</td></tr>
+<tr><td>§2.4</td><td>舊 2.13 → 2.15；+E2.4-a neg exp、+E2.4-b frac exp；舊 2.14 → 2.18</td><td>2.15, <strong>2.16</strong>, <strong>2.17</strong>, 2.18</td></tr>
+<tr><td>§2.5</td><td>舊 2.15→2.19、舊 2.16→2.20；+E2.5-a error-spotting；舊 2.17→2.22；+O2.5-a quot×exp</td><td>2.19, 2.20, <strong>2.21</strong>, 2.22, <strong>2.23</strong></td></tr>
+</table>
+<p class="small">粗體＝新增 6 例。所有既有 prose 交叉引用均指向 2.1–2.11（未位移），故無連帶 prose 改動（grep 確認）。</p>
+
+<!-- ============ §2.3 ============ -->
+<h2>§2.3 — 補 2</h2>
+
+<h3>Example 2.12　A vertical tangent: \(f(x)=\sqrt[3]{x}\) at \(x=0\)<span class="badge core">核心</span></h3>
+<p class="meta"><span class="loc">sec-2-3.html，corner 例＋Figure 2.3 之後</span> ・
+<code>[source: CLP-1 §2.2 prob_s2.2 vertical-tangent remark + standard textbook example]</code>（CC BY-NC-SA 4.0）・解材：<strong>authored</strong></p>
+<div class="why">填 L1-1：Definition 2.3 提「no vertical spike」，但原僅 Example 2.11 示範 corner。本例示範差商 \(1/h^{2/3}\to+\infty\) 的 vertical tangent——左右極限<em>一致</em>但無界，與 corner 的左右<em>不等</em>對比，是不同的失敗模式。</div>
+<div class="ex">
+<p>Show that \(f(x) = \sqrt[3]{x} = x^{1/3}\) is <em>not</em> differentiable at \(x = 0\), even though its graph has no corner there.</p>
+</div>
+<div class="sol">
+<p>We form the difference quotient at \(a = 0\):</p>
+<p>\[ \frac{f(0 + h) - f(0)}{h} = \frac{h^{1/3} - 0}{h} = \frac{1}{h^{2/3}}. \]</p>
+<p>Since \(h^{2/3} > 0\) for all \(h \ne 0\), the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so \(\displaystyle\lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty\). The limit does not exist as a <em>finite</em> number, so by Definition 2.3 the function is not differentiable at \(x = 0\).</p>
+<p>The contrast with Example 2.11: there the one-sided limits existed but <em>disagreed</em> (\(+1\) vs \(-1\)); here both tend to \(+\infty\), so there is no corner — instead the graph has a <em>vertical tangent</em> at the origin.</p>
+</div>
+<div class="audit"><strong>稽核 ✓</strong> final answer 正確、各步有效、交叉引用解析（Example 2.11、Definition 2.3）。<span class="badge ok">RESOLVED none</span></div>
+
+<h3>Example 2.13　Piecewise differentiability<span class="badge optb">選收</span></h3>
+<p class="meta"><span class="loc">sec-2-3.html，Theorem 2.1 的 Caution 之後</span> ・
+<code>[source: CLP-1 §2.2 prob_s2.2 "2006H piecewise x^2 / ax+b"]</code>（CC BY-NC-SA 4.0）・解材：<strong>official</strong>（改寫）</p>
+<div class="why">填 L2-1：把 differentiability 定義反過來用——求 \(a,b\) 使 piecewise 處處可微，是 Theorem 2.1 的直接應用（先用連續、再用左右導數相等）。</div>
+<div class="ex">
+<p>Find the constants \(a\) and \(b\) for which \(f(x) = \begin{cases} x^{2} & x \le 2, \\ ax + b & x > 2 \end{cases}\) is differentiable everywhere.</p>
+</div>
+<div class="sol">
+<p>Away from \(x = 2\) each piece is a polynomial, so the only point in question is \(x = 2\).</p>
+<p><em>Step 1 — Continuity.</em> By Theorem 2.1, differentiability at \(x = 2\) requires continuity, forcing \(\lim_{x\to2^-}f = 4\) and \(\lim_{x\to2^+}f = 2a+b\) to agree: \(2a + b = 4\).</p>
+<p><em>Step 2 — Matching derivatives.</em> The left derivative uses the \(x^2\) branch, whose derivative \(2x\) follows in one line from the difference quotient (the same technique used in §2.2 Example 2.6), giving slope \(4\). The right derivative is the constant \(a\). For the two-sided limit to exist, \(a = 4\).</p>
+<p>Then \(2(4) + b = 4\) gives \(b = -4\). With \(a = 4,\ b = -4\) the pieces meet smoothly and the difference quotient at \(x = 2\) has limit \(4\).</p>
+</div>
+<div class="audit adv"><strong>稽核（advisory 已修）</strong> 初稿「by the limit definition of §2.2 is \(2x\)」overstate §2.2（§2.2 未從定義算過 bare \((x^2)'\)）→ 改 difference-quotient 歸因，重審確認解、未引入新缺陷、math 正確。<span class="badge fix">advisory→RESOLVED</span></div>
+
+<!-- ============ §2.4 ============ -->
+<h2>§2.4 — 補 2</h2>
+
+<h3>Example 2.16　Power rule, negative exponent<span class="badge core">核心</span></h3>
+<p class="meta"><span class="loc">sec-2-4.html，Example 2.15 之後、exponential 小節之前</span> ・
+<code>[source: CLP-1 §2.6 prob_s2.6 "s(t)=3t^4+5t^3-1/t"]</code>（CC BY-NC-SA 4.0）・解材：<strong>official</strong>（改寫）</p>
+<div class="why">填 L1-2：Caution 說 power rule 對負整數指數亦成立，但原例只用正整數次方。本例把 \(1/t\) 改寫 \(t^{-1}\) 再套規則，回扣 §2.2 Example 2.8 的 \((1/x)'=-1/x^2\)。</div>
+<div class="ex">
+<p>Differentiate \(s(t) = 3t^{4} + 5t^{3} - \dfrac{1}{t}\).</p>
+</div>
+<div class="sol">
+<p>Rewrite \(1/t = t^{-1}\): \(s(t) = 3t^{4} + 5t^{3} - t^{-1}\). Applying the power rule (including the negative-exponent case from the Caution above) term by term,</p>
+<p>\[ s'(t) = 3\cdot 4t^{3} + 5\cdot 3t^{2} - (-1)t^{-2} = 12t^{3} + 15t^{2} + \frac{1}{t^{2}}. \]</p>
+<p>The \(+1/t^{2}\) term matches what the quotient rule (§2.5) or the limit definition (§2.2 Example 2.8) would give.</p>
+</div>
+<div class="audit"><strong>稽核 ✓</strong> final answer \(12t^3+15t^2+1/t^2\) 正確、各步有效、交叉引用解析。<span class="badge ok">RESOLVED none</span></div>
+
+<h3>Example 2.17　Power rule, fractional exponent + tangent line<span class="badge core">核心</span></h3>
+<p class="meta"><span class="loc">sec-2-4.html，Example 2.16 之後</span> ・
+<code>[source: CLP-1 §2.4 prob_s2.4 "f(x)=3x^2+4x^(1/2)"]</code>（CC BY-NC-SA 4.0）・解材：<strong>official</strong>，tangent-line 部分本書新增</p>
+<div class="why">填 L1-2（延續）：補分數指數 \(x^{1/2}\)，並回扣 §2.1 切線技能；驗證與 §2.2 Example 2.7 從定義所得一致。</div>
+<div class="ex">
+<p>Differentiate \(f(x) = 3x^{2} + 4\sqrt{x}\) for \(x > 0\), and find the tangent line at \(x = 1\).</p>
+</div>
+<div class="sol">
+<p>Writing \(\sqrt{x} = x^{1/2}\), we differentiate term by term. The power rule applies directly to \(3x^{2}\). For \(4\sqrt{x}\) the exponent \(\tfrac{1}{2}\) is not an integer — the case the Caution above defers for a general proof — but this particular derivative is already secured: §2.2 Example 2.7 found \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\) straight from the definition. Using it,</p>
+<p>\[ f'(x) = 3\cdot 2x + 4\cdot\tfrac{1}{2}x^{-1/2} = 6x + \frac{2}{\sqrt{x}}. \]</p>
+<p>At \(x = 1\): \(f(1) = 7\) and \(f'(1) = 8\), so the tangent line is \(y - 7 = 8(x - 1)\), i.e. \(y = 8x - 1\).</p>
+</div>
+<div class="audit adv"><strong>稽核（advisory 已修）</strong> 初稿對 \(x^{1/2}\) 直接套 power rule，與同節 Caution（一般分數指數延後）內部矛盾→ 加延後保留＋以 §2.2 Example 2.7 立論，重審 RESOLVED、math 正確。<span class="badge fix">advisory→RESOLVED</span></div>
+
+<!-- ============ §2.5 ============ -->
+<h2>§2.5 — 補 2</h2>
+
+<h3>Example 2.21　Quotient-rule error spotting<span class="badge core">核心</span></h3>
+<p class="meta"><span class="loc">sec-2-5.html，Example 2.20（首個 full quotient 例）＋其圖之後</span> ・
+<code>[source: CLP-1 §2.6 prob_s2.6 Conceptual Q1 "spot the error: 2x/(x+1)"]</code>（CC BY-NC-SA 4.0）・解材：<strong>official</strong>（改寫）</p>
+<div class="why">填 L2-3：§2.5 的 Caution 點名「swapping the order flips the sign」是最常見 quotient-rule 錯誤，但無以辨錯為核心的 example。本例給含 sign＋化簡兩錯的學生計算要求糾正。</div>
+<div class="ex">
+<p>A student differentiates \(f(x) = \dfrac{2x}{x+1}\) and gets \(\dfrac{2(x+1)+2x}{(x+1)^2} = \dfrac{2}{x+1}\). Spot <em>all</em> the errors and give the correct derivative.</p>
+</div>
+<div class="sol">
+<p><em>Error 1 — wrong sign.</em> The quotient rule has a <em>minus</em>: \(\left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^2}\); the student wrote a plus. The correct numerator is \((2)(x+1) - (2x)(1) = 2\).</p>
+<p><em>Error 2 — bad simplification.</em> Even the student's own numerator is \(2(x+1)+2x = 4x+2\), not \(2(x+1)\); the \(2x\) term was dropped.</p>
+<p>Correctly, \(f'(x) = \dfrac{(2)(x+1) - (2x)(1)}{(x+1)^2} = \dfrac{2}{(x+1)^2}\) — note the denominator is \((x+1)^2\), not \((x+1)\).</p>
+</div>
+<div class="audit"><strong>稽核 ✓</strong> 兩錯辨識正確、正解 \(2/(x+1)^2\) 正確。改作：以散文陳述減號（避免列印數學內 <code>\color</code>），math 不變。<span class="badge ok">RESOLVED none</span></div>
+
+<h3>Example 2.23　Quotient rule with exponential<span class="badge optb">選收</span></h3>
+<p class="meta"><span class="loc">sec-2-5.html，Example 2.22 之後、§2.5 收尾散文之前</span> ・
+<code>[source: CLP-1 §2.7 prob_s2.7 Procedural "f(x)=e^x/(2x)"]</code>（CC BY-NC-SA 4.0）・解材：<strong>official</strong>（改寫）</p>
+<div class="why">填 L2-3（延續）：\(e^x\) 在分子、多項式在分母（與 Example 2.22(c) 的 \(x^2/e^x\) 反向），並讀 \(f'\) 正負定增減。</div>
+<div class="ex">
+<p>Differentiate \(f(x) = \dfrac{e^{x}}{2x}\).</p>
+</div>
+<div class="sol">
+<p>\[ f'(x) = \frac{(e^{x})(2x) - (e^{x})(2)}{(2x)^{2}} = \frac{2e^{x}(x-1)}{4x^{2}} = \frac{(x-1)e^{x}}{2x^{2}}. \]</p>
+<p>The top's derivative is again \(e^{x}\) (Theorem 2.5); the bottom's is \(2\). The sign of \(f'\) changes at \(x = 1\): \(f' < 0\) on \(0 < x < 1\) (decreasing), \(f' > 0\) for \(x > 1\) (increasing).</p>
+</div>
+<div class="audit"><strong>稽核 ✓</strong> final answer \((x-1)e^x/(2x^2)\) 正確、增減判讀正確、Theorem 2.5 引用解析。<span class="badge ok">RESOLVED none</span></div>
+
+<!-- ============ audit ============ -->
+<h2>回歸審核摘要</h2>
+<table>
+<tr><th>項</th><th>結果</th></tr>
+<tr><td>數學正確性（6 例獨立重推）</td><td>6/6 <code>final_answer_correct</code> ＋ <code>all_steps_valid</code></td></tr>
+<tr><td>編號連續（2.1–2.23）</td><td>連續、無 gap、無重複</td></tr>
+<tr><td>交叉引用解析</td><td>0 dangling；既有 ref 全指向未位移之 2.1–2.11</td></tr>
+<tr><td>被位移 6 例內容一致</td><td>是（僅編號更動）</td></tr>
+<tr><td>advisory（內部一致性）</td><td>2 條（Ex 2.13 歸因、Ex 2.17 Caution 矛盾）→ 已修 ＋ 重審 RESOLVED</td></tr>
+</table>
+<p class="small">稽核為 read-only 對抗式覆核（6 數學 agent ＋ 1 完整性 agent），未動用付費外部 API。修正項已各自重跑一輪確認無新缺陷。</p>
+
+</body>
+</html>

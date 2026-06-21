@@ -5,7 +5,10 @@
      Numbering is MANUAL (kit has no auto-counter); cross-references are
      plain prose. Counters continue from §2.3:
        Theorem 2.1 → 2.2, 2.3, 2.4, 2.5;  Corollary: first → 2.1;
-       Example 2.12 → 2.13, 2.14;  Remark 2.5 → 2.6.
+       Example 2.14 → 2.15, 2.16, 2.17, 2.18;  Remark 2.5 → 2.6.
+       (2026-06-22 example-supplement import: old polynomial example 2.13 → 2.15,
+        +E2.4-a negative exponent = 2.16, +E2.4-b fractional exponent = 2.17;
+        old e^x higher-deriv example 2.14 → 2.18.)
      Power rule proved for positive integer n with TWO proofs (manuscript's
      teaching choice); the negative-integer case is flagged in an unnumbered
      Caution and the full real-exponent version deferred (ROADMAP pitfall).
@@ -145,7 +148,7 @@
   <!-- expansion:example — apply power + constant-multiple + sum to a polynomial (approved 2026-06-08; new type: rule-application, not first-principles) -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.13</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.15</span></p>
       <div class="env-body">
         <p>Differentiate \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\).</p>
       </div>
@@ -160,6 +163,50 @@
                 &= 12x^{3} - 10x + 2.
         \end{aligned} \]</p>
         <p>Not a single limit was computed — the rules did all the work, exactly the shortcut this section was built to deliver.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — the power rule on a negative exponent: rewrite 1/t as t^{-1}, the case flagged in the Caution above; result matches §2.2 Example 2.8 [source: CLP-1 §2.6 prob_s2.6 "s(t)=3t^4+5t^3-1/t"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.16</span></p>
+      <div class="env-body">
+        <p>Differentiate \(s(t) = 3t^{4} + 5t^{3} - \dfrac{1}{t}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>To use the power rule on every term, we first rewrite \(1/t\) as a power: \(s(t) = 3t^{4} + 5t^{3} - t^{-1}\). Applying the power rule — including the negative-exponent case noted in the Caution above — to each term,</p>
+        <p>\[ \begin{aligned}
+          s'(t) &= 3 \cdot 4t^{3} + 5 \cdot 3t^{2} - (-1)\,t^{-2} \\[2pt]
+                &= 12t^{3} + 15t^{2} + \frac{1}{t^{2}}.
+        \end{aligned} \]</p>
+        <p>The key step was rewriting \(1/t\) as \(t^{-1}\) so the power rule could act on it: the exponent drops by one (\(-1 \to -2\)) and the old exponent \(-1\) comes out front, producing the \(+1/t^{2}\) term — matching what we would obtain from the quotient rule (§2.5) or from the limit definition (§2.2 Example 2.8).</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — the power rule on a fractional exponent, then a tangent line tying back to §2.1; reproduces the §2.2 Example 2.7 limit result in one step [source: CLP-1 §2.4 prob_s2.4 "f(x)=3x^2+4x^(1/2)"; official solution, tangent-line part added] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.17</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = 3x^{2} + 4\sqrt{x}\) for \(x > 0\), and find the equation of the tangent line at \(x = 1\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Writing \(\sqrt{x} = x^{1/2}\), we differentiate term by term. The power rule applies directly to \(3x^{2}\). For \(4\sqrt{x}\) the exponent \(\tfrac{1}{2}\) is not an integer — the very case the Caution above defers for a general proof — but this particular derivative is already secured: §2.2 Example 2.7 found \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\) straight from the definition. Using it,</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= 3 \cdot 2x + 4 \cdot \tfrac{1}{2}\,x^{-1/2} \\[2pt]
+                &= 6x + \frac{2}{\sqrt{x}}.
+        \end{aligned} \]</p>
+        <p>The power rule's bookkeeping — drop the exponent by one (\(\tfrac{1}{2} \to -\tfrac{1}{2}\)) and bring the old exponent out front — reproduces in a single line exactly the value the limit gave in §2.2.</p>
+        <p>At \(x = 1\): \(f(1) = 3 + 4 = 7\) and \(f'(1) = 6 + 2 = 8\). The tangent line through \((1, 7)\) with slope \(8\) is</p>
+        <p>\[ y - 7 = 8(x - 1), \quad\text{i.e.}\quad y = 8x - 1. \]</p>
       </div>
     </section>
   </div>
@@ -203,7 +250,7 @@
   <!-- expansion:example — e^x with the linearity rules, plus higher derivatives showing e^x persists while the polynomial dies (approved 2026-06-08; new type) -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.14</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.18</span></p>
       <div class="env-body">
         <p>Let \(g(x) = 4e^{x} - x^{3} + 2x\). Find \(g'(x)\), and then compute \(g''(x)\), \(g'''(x)\), and \(g^{(4)}(x)\).</p>
       </div>
