@@ -24,7 +24,8 @@ from manim import DOWN, LEFT, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner, place_body, SPINE_X, CONTENT_W
+from ._common import (scene_head, motif_corner, place_body, body_zone, build_aside,
+                      ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
 
 LABEL = {
     "definition": "[ definition ]", "theorem": "[ theorem ]",
@@ -33,6 +34,16 @@ LABEL = {
 }
 
 MIN_PITCH = 0.36  # tightest inter-line gap (the math stack arrange buff); sizecheck capacity trigger
+
+
+def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
+    """Capacity contract: definition_math is FIXED-rhythm, not elastic -- it arranges the
+    statement + math stack at fixed buffs (0.71 between them, MIN_PITCH within the math)
+    and place_body only POSITIONS that block (no fill expansion). So measure its actual
+    span (span model), not a uniform-MIN_PITCH estimate, which would under-count the wider
+    statement->math gap. (derivation, by contrast, uses fill_gap to expand, so it stays the
+    stack model -- the tightest-pitch question.) min_pitch is unused by the span model."""
+    return [ColumnPlan(min_pitch=0.0, model="span")]
 
 
 def _math_blocks(spec: dict[str, Any], ground: str):
@@ -69,31 +80,56 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     title = head[1].mobject
 
     math_mobs, anims = _math_blocks(spec, ground)
+    center_math = spec.get("math_align") == "center"
 
-    # single left-flush column: prose statement at full measure, then the math lines,
-    # centred in the body zone (place_body) for balanced breathing room.
-    statement = None
-    if spec.get("statement"):
-        statement = brand.prose(spec["statement"], ground, role="primary", size="prose",
-                                max_width=CONTENT_W, align="LEFT")
-    parts = []
-    if statement is not None:
-        parts.append(statement)
-    if math_mobs:
-        stack = VGroup(*math_mobs)
-        if spec.get("math_align") == "center":
-            stack.arrange(DOWN, buff=MIN_PITCH)
-        else:
-            stack.arrange(DOWN, buff=MIN_PITCH, aligned_edge=LEFT)
-        parts.append(stack)
-    if parts:
-        content = VGroup(*parts).arrange(DOWN, buff=0.71, aligned_edge=LEFT)
+    def assemble(stmt_width: float):
+        """Prose statement (at *stmt_width*) over the math stack, as one left-flush group."""
+        statement = None
+        if spec.get("statement"):
+            statement = brand.prose(spec["statement"], ground, role="primary", size="prose",
+                                    max_width=stmt_width, align="LEFT")
+        parts = []
+        if statement is not None:
+            parts.append(statement)
+        if math_mobs:
+            stack = VGroup(*math_mobs)
+            if center_math:
+                stack.arrange(DOWN, buff=MIN_PITCH)
+            else:
+                stack.arrange(DOWN, buff=MIN_PITCH, aligned_edge=LEFT)
+            parts.append(stack)
+        content = VGroup(*parts).arrange(DOWN, buff=0.71, aligned_edge=LEFT) if parts else None
+        return content, statement
+
+    # Optional right-rail enrichment aside (L3): a sparse definition can opt a supporting
+    # note / key-idea into the rail. When present, narrow the prose to the primary column
+    # and place the aside at RAIL_X; collapse back to a full-width single column (no aside)
+    # if the narrowed primary would overflow the zone or a math line is too wide for it --
+    # the aside never crowds real content (it is enrichment, not a competing stream).
+    aside_spec = spec.get("aside")
+    use_aside = bool(aside_spec)
+    if use_aside:
+        content, statement = assemble(PRIMARY_W)
+        zt, zb = body_zone(title)
+        too_tall = content is not None and content.height > (zt - zb)
+        too_wide = any(m.width > PRIMARY_W + 0.05 for m in math_mobs)
+        if too_tall or too_wide:
+            use_aside = False
+    if not use_aside:
+        content, statement = assemble(CONTENT_W)
+
+    if content is not None:
         place_body(content, title, SPINE_X)
 
     if statement is not None:
         blocks.append(Block("statement", statement, anim="fade", static=True))
     for i, (mob, anim) in enumerate(zip(math_mobs, anims)):
         blocks.append(Block(f"math.{i}", mob, anim=anim, static=False))
+
+    if use_aside and content is not None:
+        aside = build_aside(aside_spec, ground, max_width=RAIL_W)
+        aside.move_to([RAIL_X, content.get_center()[1], 0], aligned_edge=LEFT)
+        blocks.append(Block("aside", aside, anim="fade", static=True, layer="decoration"))
 
     blocks.append(motif_corner(ground))
     return blocks

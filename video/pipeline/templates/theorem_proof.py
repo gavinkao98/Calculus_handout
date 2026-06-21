@@ -26,7 +26,13 @@ from manim import DOWN, LEFT, RIGHT, UP, RoundedRectangle, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner, center_in_zone, SPINE_X, CONTENT_W
+from ._common import scene_head, motif_corner, center_in_zone, ColumnPlan, SPINE_X, CONTENT_W
+
+
+def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
+    """Capacity contract (L2): the statement card + proof steps + QED form one fixed-rhythm
+    cascade in the left column, so measure its actual span (span model). min_pitch unused."""
+    return [ColumnPlan(min_pitch=0.0, model="span")]
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:

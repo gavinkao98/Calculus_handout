@@ -11,9 +11,10 @@ These exist so the six dark templates don't each re-implement the same header.
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
-from manim import DOWN, LEFT
+from manim import DOWN, LEFT, VGroup
 
 from .. import brand
 from ..blocks import Block, accent_role
@@ -93,38 +94,54 @@ def fill_gap(heights: list[float], base_buff: float, zone_h: float, *,
     return base_buff + min(add, base_buff * cap_mult)
 
 
-def place_body(content, title, left_x: float, *, top_gap_max: float | None = None):
-    """Position a left-flush content group CENTRED in the body zone below *title*.
+# Lectern bias: where short content sits between dead-centre (0.0) and top-anchored
+# (1.0) in the body zone. Dead-centre floats content in the void; top-anchor strands the
+# whole lower zone (the two failures the 2026-06-21 survey bounced between). ~0.55 sits
+# short content in the upper-middle -- tied to the title, with the leftover whitespace
+# pooled at the bottom where the corner motif balances it. One knob for every template.
+UPPER_BIAS_FRAC = 0.55
 
-    The body zone is (title bottom - TITLE_GAP) down to the bottom safe margin. Content
-    is CENTRED in it, so short content gets BALANCED top/bottom breathing room (the
-    "對稱留白" the user asked for, 2026-06-21). This replaced an earlier clamp that
-    pulled short content UP toward the title (top_gap_max), which stranded the lower
-    zone empty -- the "light content floats high / wasted space" failure the density
-    survey confirmed. Tall content top-anchors at the zone top and overflows the bottom,
-    where sizecheck's capacity trigger (_capacity_issues) flags it for splitting. The
-    comfortable-band spread (stack_layout / fill_gap) opens light rows first; this then
-    balances the block. *top_gap_max* is accepted for call-site compatibility but no
-    longer pulls content up. Mutates and returns *content*.
+
+def _biased_y(zone_top: float, zone_bottom: float, half: float) -> float:
+    """Centre-y for a block of half-height *half* in (zone_bottom, zone_top), biased to
+    the upper-middle by UPPER_BIAS_FRAC. Tall content (top-anchor already at/below the
+    midpoint) top-anchors unchanged so it overflows the bottom, not the title."""
+    mid_y = (zone_top + zone_bottom) / 2
+    top_y = zone_top - half                       # top-anchored centre
+    if top_y <= mid_y:                            # tall: top-anchor (overflow flagged elsewhere)
+        return top_y
+    return mid_y + UPPER_BIAS_FRAC * (top_y - mid_y)
+
+
+def place_body(content, title, left_x: float, *, top_gap_max: float | None = None):
+    """Position a left-flush content group in the body zone below *title*, biased to the
+    UPPER-middle (the Lectern bias).
+
+    The body zone is (title bottom - TITLE_GAP) down to the bottom safe margin. Dead-
+    centring short content (the previous behaviour) left a large void BOTH under the
+    title and above the bottom, so a 3-line definition read as floating, disconnected
+    from its title (2026-06-21 A1 finding -- worst on single-column definition_math).
+    We instead sit short content in the upper-middle via _biased_y: tied to the title,
+    with the remaining whitespace pooled at the bottom where the corner motif balances
+    it. Tall content still top-anchors and overflows the bottom (sizecheck's capacity
+    trigger flags it for splitting). *top_gap_max* is accepted for call-site
+    compatibility but unused. Mutates and returns *content*.
     """
     zone_top = title.get_bottom()[1] - T.TITLE_GAP
     zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
-    half = content.height / 2
-    center_y = (zone_top + zone_bottom) / 2
-    center_y = min(center_y, zone_top - half)      # tall content: top-anchor (overflow flagged)
+    center_y = _biased_y(zone_top, zone_bottom, content.height / 2)
     content.move_to([left_x + content.width / 2, center_y, 0])
     return content
 
 
 def center_in_zone(mobs, title, *, extra_bottom: float = 0.0) -> None:
-    """Shift *mobs* (as a group) so their combined bounding box is CENTRED in the body
-    zone below *title*. For templates that hand-place content from a fixed HIGH anchor
-    (procedure/theorem/recap) -- which stranded the lower zone when content was light
-    (the "floats high / wasted space" failure) -- call this after placing so the block
-    sits balanced instead. *extra_bottom* reserves room at the bottom (e.g. procedure's
-    worked strip is pinned there). Clamps so a tall group never pokes above the zone top
-    (it then top-anchors and overflows the bottom, which sizecheck's _overflow_issues
-    catches). Mutates the mobs in place."""
+    """Shift *mobs* (as a group) so their combined bounding box sits in the body zone
+    below *title*, biased to the UPPER-middle (the Lectern bias, see _biased_y). For
+    templates that hand-place content from a fixed HIGH anchor (procedure/theorem/recap),
+    call this after placing so a light block is tied to the title instead of floating.
+    *extra_bottom* reserves room at the bottom (e.g. procedure's worked strip is pinned
+    there). A tall group still top-anchors and overflows the bottom (sizecheck catches
+    it). Mutates the mobs in place."""
     from manim import VGroup
 
     mobs = [m for m in mobs if m is not None]
@@ -133,8 +150,7 @@ def center_in_zone(mobs, title, *, extra_bottom: float = 0.0) -> None:
     grp = VGroup(*mobs)
     zt = title.get_bottom()[1] - T.TITLE_GAP
     zb = -T.FRAME_H / 2 + T.SAFE_MARGIN + extra_bottom
-    half = grp.height / 2
-    target = min((zt + zb) / 2, zt - half)        # tall group: top-anchor at zone top
+    target = _biased_y(zt, zb, grp.height / 2)
     grp.shift([0, target - grp.get_center()[1], 0])
 
 
@@ -145,17 +161,73 @@ def center_in_zone(mobs, title, *, extra_bottom: float = 0.0) -> None:
 COMFORT_SPREAD = 0.5
 
 
+# -- capacity contract: one formula drives BOTH placement and audit -----------
+#
+# A stacked column's density falls in one of three regimes, decided by its natural
+# height at the TIGHTEST pitch (natural_min = Σheights + (n-1)*min_pitch) against the
+# body zone. classify_regime is the SINGLE source of that decision, shared by
+# stack_layout (placement) and -- via each template's capacity_meta() -- by
+# sizecheck._capacity_issues (the predictive split audit), so the two never drift apart
+# (the failure the 2026-06-21 design audit flagged: stack_layout and sizecheck each
+# re-deriving the same height formula). See DESIGN.md "內容分量變異：容量契約三層架構".
+SPARSE = "sparse"   # even opened to the comfort max, the column doesn't fill the zone
+FIT = "fit"         # fits between min and comfort-max: open the gap to fill, centred
+DENSE = "dense"     # won't fit even at min pitch -> tightest pitch, top-anchor + split
+
+
+def classify_regime(total_h: float, n: int, zone_h: float, min_pitch: float,
+                    comfort_spread: float = COMFORT_SPREAD) -> tuple[str, float]:
+    """Classify a column of *n* rows (combined height *total_h*) against *zone_h* and
+    return (regime, pitch) -- the inter-row gap to place at. The elastic comfort band is
+    [min_pitch, min_pitch+comfort_spread]. DENSE means natural_min >= zone_h: the column
+    cannot fit one page even at the tightest pitch (sizecheck warns to split). For n<2
+    there is no inter-row gap; the lone row is DENSE iff it alone overflows."""
+    nat_min = total_h + max(n - 1, 0) * min_pitch
+    if n < 2:
+        return (DENSE if nat_min >= zone_h else FIT), min_pitch
+    max_pitch = min_pitch + comfort_spread
+    nat_max = total_h + (n - 1) * max_pitch
+    if nat_max <= zone_h:
+        return SPARSE, max_pitch
+    if nat_min >= zone_h:
+        return DENSE, min_pitch
+    return FIT, min_pitch + (zone_h - nat_min) / (n - 1)
+
+
+@dataclass
+class ColumnPlan:
+    """One stacked column's capacity parameters -- a template's capacity_meta(spec)
+    returns a list of these (one per column). Read by sizecheck._capacity_issues as the
+    per-column source, so the predictive split audit reads the same layout placement does
+    (single source, no drift).
+
+    *model* selects how a column's natural height is read from its built rows:
+    - "stack" (ELASTIC templates -- derivation, definition_math): Σ(row heights) +
+      (n-1)*min_pitch. Their placement EXPANDS to fill the zone, so the built positions
+      don't reveal the tightest packing -- the capacity question is "does it fit even at
+      the tightest pitch?", hence the min-pitch sum.
+    - "span" (FIXED-rhythm templates -- procedure, theorem, recap): the actual rendered
+      extent (max top - min bottom). Their placement is non-elastic, so the built rows
+      already sit at their real centre-to-centre rhythm; a Σh+pitch estimate would
+      mis-model that (and double-count middle row heights). The span is MEASURED, not
+      estimated, so it sidesteps the row-height-prediction problem entirely.
+    *min_pitch* is used only by the "stack" model. *extra_bottom* is room reserved at the
+    bottom of the body zone this content must clear (e.g. procedure's pinned worked strip).
+    *x_bucket* optionally pins a plan to a measured column's round(left) so a multi-column
+    "stack" template can give columns different min_pitch -- None means 'every column'."""
+    min_pitch: float
+    extra_bottom: float = 0.0
+    x_bucket: int | None = None
+    model: str = "stack"
+
+
 def stack_layout(heights: list[float], min_pitch: float, body_ref, *,
                  extra_bottom: float = 0.0) -> tuple[float, float]:
     """Comfortable-band vertical layout for ONE stacked column. Returns (pitch, top_y):
     the inter-row GAP to use and the y of the first row's TOP edge, so the column is
-    CENTRED in the body zone with a capped gap.
-
-    - LIGHT  (even at the comfortable max it doesn't fill): use max pitch, centre ->
-      balanced top/bottom breathing room, NOT anchored high with an empty lower zone.
-    - FIT    (fits between min and max): open the gap to fill the zone, centred.
-    - OVERFLOW (won't fit even at min): min pitch, top-anchored (sizecheck's capacity
-      trigger flags it for splitting).
+    CENTRED in the body zone with a capped gap. The regime decision (SPARSE max-pitch /
+    FIT spread / DENSE min-pitch) is delegated to classify_regime -- the shared source
+    sizecheck mirrors.
 
     The body zone is (body_ref.bottom - TITLE_GAP) down to the bottom safe margin, minus
     *extra_bottom* (room a caller reserves at the bottom, e.g. a pinned worked strip).
@@ -167,19 +239,8 @@ def stack_layout(heights: list[float], min_pitch: float, body_ref, *,
     zone_h = zt - zb
     n = len(heights)
     total = sum(heights)
-    if n < 2:
-        pitch, block_h = min_pitch, total
-    else:
-        nat_min = total + (n - 1) * min_pitch
-        max_pitch = min_pitch + COMFORT_SPREAD
-        nat_max = total + (n - 1) * max_pitch
-        if nat_max <= zone_h:
-            pitch = max_pitch
-        elif nat_min >= zone_h:
-            pitch = min_pitch
-        else:
-            pitch = min_pitch + (zone_h - nat_min) / (n - 1)
-        block_h = total + (n - 1) * pitch
+    _regime, pitch = classify_regime(total, n, zone_h, min_pitch)
+    block_h = total + max(n - 1, 0) * pitch
     top_y = min((zt + zb) / 2 + block_h / 2, zt)
     return pitch, top_y
 
@@ -272,6 +333,41 @@ def example_head(spec: dict[str, Any], ctx: dict[str, Any]) -> tuple[list[Block]
     blocks.append(Block("sollead", sol, anim="fade", static=True))
 
     return blocks, sol
+
+
+# -- L3: optional enrichment aside (turn sparse dead-space into teaching) ------
+#
+# A SPARSE template (a one-line definition) leaves the body's lower band empty even
+# after the Lectern upper-bias -- _biased_y only MOVES the whitespace, it can't fill it.
+# build_aside lets the author opt a supporting note / key-idea / mini-example into the
+# fixed right rail (RAIL_X): a barred panel, sized to RAIL_W, in the section accent. It is
+# AUTHOR-AUTHORED and OPTIONAL -- the framework never generates content to fill space (that
+# would be the auto-fit speculation the design rejects). A template that adopts it (today
+# definition_math) collapses the aside back to a single full-width column when the primary
+# content is dense, so the aside never crowds real content. See DESIGN.md.
+
+_ASIDE_INK = {"secondary": "blue_ink", "accent": "amber_ink", "success": "green_ink",
+              "warning": "red_ink", "blue": "blue_ink", "amber": "amber_ink",
+              "green": "green_ink", "red": "red_ink"}
+
+
+def build_aside(aside, ground: str, *, max_width: float):
+    """An enrichment card for the body's right rail. *aside* is ``{label?, body, accent?}``
+    (or a bare body string); *accent* is a bar colour role (default ``secondary``/blue).
+    Returns an accent_panel VGroup sized to *max_width* -- place its left edge at RAIL_X."""
+    if not isinstance(aside, dict):
+        aside = {"body": str(aside)}
+    accent = str(aside.get("accent", "secondary"))
+    inner_w = max(max_width - 1.1, 1.0)        # room for the 5px bar + horizontal pad
+    body = brand.prose(str(aside.get("body", "")), ground, role="text", size="prose_sm",
+                       max_width=inner_w, align="LEFT")
+    if aside.get("label"):
+        label = brand.eyebrow(str(aside["label"]), ground, role=_ASIDE_INK.get(accent, "blue_ink"))
+        inner = VGroup(label, body).arrange(DOWN, buff=0.22, aligned_edge=LEFT)
+    else:
+        inner = body
+    return brand.accent_panel(inner, ground, bar_role=accent, fill_role="panel",
+                              radius=T.RADIUS_MD, bar_px=5, pad=0.42, pad_x=0.5)
 
 
 def motif_corner(ground: str) -> Block:

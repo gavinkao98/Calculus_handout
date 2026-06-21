@@ -23,12 +23,19 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, UL, UP, VGroup
+from manim import DOWN, LEFT, RIGHT, UL, UP, Text, VGroup
 
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner, center_in_zone, SPINE_X, RAIL_X
+from ._common import scene_head, motif_corner, center_in_zone, ColumnPlan, SPINE_X, RAIL_X
+
+
+def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
+    """Capacity contract (L2): points (left) and formula cards (right) sit at fixed gaps
+    (non-elastic), so measure each column's actual span -- the taller column (usually the
+    wrapped points) binds. min_pitch unused by the span model."""
+    return [ColumnPlan(min_pitch=0.0, model="span")]
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -46,15 +53,21 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # Advance by each row's REAL height (top-anchored), not a fixed row pitch:
     # with pitch 1.2 a point that wrapped to three lines overran the slot and
     # visually fused with the next bullet (v2 frame critique, recap scene).
-    pt_gap = 0.42
+    pt_gap = 0.42  # keep the 4-point column inside the bottom safe margin (sizecheck)
     y_cursor = 1.95
     for i, t in enumerate(points):
-        idx = brand.eyebrow(f"{i+1:02d}", ground, role="accent")
-        dot = brand.plot_dot(ground, role="accent", r=0.07)
+        # numbered-item language shared with procedure_steps: a bold display-serif numeral
+        # in the section accent with a soft glow (was a tiny mono eyebrow + a redundant
+        # accent dot -- a different vocabulary from procedure's glowing numerals, 2026-06-21
+        # A3). Smaller than a procedure step numeral: here the number is a LIST MARKER, not
+        # the structural anchor, and it replaces the dot (one marker, not two).
+        idx = brand.text_glow(
+            Text(f"{i+1:02d}", font=T.FONT_DISPLAY, weight="BOLD", font_size=T.fs("h3"),
+                 color=T.color(ground, "accent")),
+            ground, role="accent", width=1.6, opacity=0.3)
         txt = brand.prose(t, ground, role="text", size="prose", max_width=5.6, align="LEFT")
-        dot.next_to(txt, LEFT, buff=0.25, aligned_edge=UP)
-        idx.next_to(dot, LEFT, buff=0.25, aligned_edge=UP)
-        row = VGroup(idx, dot, txt)
+        idx.next_to(txt, LEFT, buff=0.34, aligned_edge=UP)
+        row = VGroup(idx, txt)
         row.move_to([left, y_cursor, 0], aligned_edge=UL)
         y_cursor -= row.height + pt_gap
         blocks.append(Block(f"point.{i}", row, anim="fade", static=False))
@@ -71,13 +84,15 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks.append(Block("remember", rem, anim="fade", static=True))
     content.append(rem)
 
-    card_gap = 1.4
-    card_top = 0.9
+    card_gap = 1.55
+    card_top = 1.0
     for i, f in enumerate(formulas):
-        # blue-ink LaTeX on a bg-soft card with a blue 5px left bar (the `.fcard`).
+        # blue-ink LaTeX on a raised card with a blue 6px left bar (the `.fcard`). The card
+        # was undersized next to the points column (thin bar, tight pad -- 2026-06-21 B3):
+        # more padding + a 6px bar + the lifted `panel` fill give it equal visual weight.
         m = brand.math_line(f, ground, role="blue_ink", size="math_sm")
-        grp = brand.accent_panel(m, ground, bar_role="secondary", fill_role="bg_soft",
-                                 radius=T.RADIUS_MD, bar_px=5, pad=0.36, pad_x=0.5)
+        grp = brand.accent_panel(m, ground, bar_role="secondary", fill_role="panel",
+                                 radius=T.RADIUS_MD, bar_px=6, pad=0.46, pad_x=0.62)
         grp.move_to([right_x, card_top - i * card_gap, 0], aligned_edge=LEFT)
         blocks.append(Block(f"formula.{i}", grp, anim="fade", static=False))
         content.append(grp)

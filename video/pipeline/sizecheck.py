@@ -327,15 +327,17 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     cards, procedure steps vs results -- is measured per column, not summed). If even
     at min pitch it exceeds the body zone (the band below the masthead), the scene
     cannot fit one page -> advise splitting into pages (warn, with a page estimate)
-    instead of letting it silently spill or squeeze up into the masthead. Only runs for
-    HOMOGENEOUS-chain templates (those whose module declares MIN_PITCH -- derivation,
-    definition_math): their uniform row pitch makes natural_min accurate, AND derivation
-    uses place_body clamping that can HIDE overflow from the reactive off-frame check, so
-    a predictive trigger is genuinely needed there. Heterogeneous templates (theorem /
-    procedure / recap -- card+steps, numerals+strip, points+cards) and figures (graph /
-    value_table / sign_chart) declare no MIN_PITCH; they don't clamp, so their overflow
-    is caught reactively by _overflow_issues (a uniform-pitch estimate would over-count
-    their mixed gaps and false-positive)."""
+    instead of letting it silently spill or squeeze up into the masthead. The per-column
+    min pitch (and any reserved bottom band) comes from the template's capacity_meta()
+    when it declares one, else the legacy scalar MIN_PITCH -- the SAME source placement
+    reads, so audit and layout never drift (capacity contract, DESIGN.md). Runs for any
+    template declaring either; today that is the homogeneous chains (derivation,
+    definition_math), whose uniform pitch makes natural_min accurate AND whose place_body
+    clamp can HIDE overflow from the reactive off-frame check, so a predictive trigger is
+    genuinely needed. Heterogeneous templates (theorem / procedure / recap) gain it once
+    they declare capacity_meta (L2). Figures (graph / value_table / sign_chart) declare
+    neither -- their height is non-linear (a uniform-pitch estimate would over-count their
+    mixed gaps and false-positive), so they stay reactive via _overflow_issues."""
     import math
     import sys as _sys
     from pipeline.visuals import theme as T
@@ -345,9 +347,30 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     if builder is None:
         return []
     mod = _sys.modules.get(builder.__module__)
-    min_pitch = getattr(mod, "MIN_PITCH", None)
-    if min_pitch is None:
-        return []  # figure template -- not a vertical stack
+
+    # Capacity contract: prefer the template's capacity_meta() (per-column min_pitch + a
+    # reserved bottom band) over the legacy scalar MIN_PITCH, so this predictive audit
+    # reads the SAME pitch placement does (single source, no drift). Falls back to
+    # MIN_PITCH when a module declares no capacity_meta; figure templates declare neither
+    # and are skipped (their height is non-linear -- caught reactively by _overflow_issues).
+    plans = None
+    cap = getattr(mod, "capacity_meta", None)
+    if cap is not None:
+        try:
+            plans = [p for p in cap(scene) if p is not None]
+        except Exception:  # noqa: BLE001
+            plans = None
+    if plans:
+        model = plans[0].model
+        extra_bottom = max((p.extra_bottom for p in plans), default=0.0)
+        default_pitch = next((p.min_pitch for p in plans if p.x_bucket is None),
+                             plans[0].min_pitch)
+        bucket_pitch = {p.x_bucket: p.min_pitch for p in plans if p.x_bucket is not None}
+    else:
+        mp = getattr(mod, "MIN_PITCH", None)
+        if mp is None:
+            return []  # figure template -- not a vertical stack
+        model, extra_bottom, default_pitch, bucket_pitch = "stack", 0.0, float(mp), {}
 
     HEADER = {"eyebrow", "title", "prompt", "solrule", "sollead", "part"}
     header_bottoms = [float(b.mobject.get_bottom()[1]) for b in blocks
@@ -355,11 +378,11 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     if not header_bottoms:
         return []
     zone_top = min(header_bottoms)
-    zone_h = zone_top - (-T.FRAME_H / 2 + T.SAFE_MARGIN)
+    zone_h = zone_top - (-T.FRAME_H / 2 + T.SAFE_MARGIN + extra_bottom)
     if zone_h <= 0.5:
         return []
 
-    cols: dict[int, list[float]] = {}
+    cols: dict[int, list[tuple[float, float]]] = {}
     for b in blocks:
         if getattr(b, "layer", "content") != "content" or b.id in HEADER:
             continue
@@ -367,15 +390,29 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
         if mob is None:
             continue
         try:
-            left, h = float(mob.get_left()[0]), float(mob.height)
+            left = float(mob.get_left()[0])
+            top, bottom = float(mob.get_top()[1]), float(mob.get_bottom()[1])
         except Exception:  # noqa: BLE001
             continue
-        if h <= 1e-6:
+        if top - bottom <= 1e-6:
             continue
-        cols.setdefault(round(left), []).append(h)
+        cols.setdefault(round(left), []).append((top, bottom))
     if not cols:
         return []
-    natural_min = max(sum(hs) + (len(hs) - 1) * float(min_pitch) for hs in cols.values())
+
+    if model == "span":
+        # fixed-rhythm template: the built rows already sit at their real centre-to-centre
+        # pitch, so a column's natural height is its MEASURED extent (max top - min bottom)
+        # -- no tightest-pitch estimate, no row-height prediction.
+        natural_min = max(max(t for t, _ in rows) - min(b for _, b in rows)
+                          for rows in cols.values())
+    else:
+        # elastic template: placement would expand to fill, so ask whether it fits at the
+        # TIGHTEST pitch -- Σ(row heights) + (n-1)*min_pitch, per column.
+        natural_min = max(
+            sum(t - b for t, b in rows)
+            + (len(rows) - 1) * float(bucket_pitch.get(bucket, default_pitch))
+            for bucket, rows in cols.items())
 
     if natural_min > zone_h + 0.15:
         pages = max(2, math.ceil(natural_min / zone_h))

@@ -39,10 +39,17 @@ from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
 from ._common import (scene_head, example_head, motif_corner, place_body, body_zone,
-                      fill_gap, SPINE_X, CONTENT_W, RAIL_X)
+                      fill_gap, ColumnPlan, SPINE_X, CONTENT_W, RAIL_X)
 
 _ROW_GAP = 0.40       # between rows (min pitch; expands for tall rows)
 MIN_PITCH = _ROW_GAP  # tightest inter-row gap -- sizecheck's split-capacity trigger reads this
+
+
+def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
+    """Capacity contract (L1): the chain is one column at MIN_PITCH. Equivalent to the
+    scalar MIN_PITCH sizecheck already reads -- declared so the audit reads the same
+    source placement does and so the heterogeneous templates (L2) follow one interface."""
+    return [ColumnPlan(min_pitch=MIN_PITCH)]
 
 
 def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
@@ -83,20 +90,25 @@ def _eq_mob(row: dict, ground: str):
         eq = MathTex(row["math"].strip(), color=T.color(ground, "accent"), font_size=T.fs(54))
         # crisper halo (was 3.0/0.45): Codex read the heavy amber glow as fuzzy/embossed.
         return brand.text_glow(eq, ground, role="accent", width=2.2, opacity=0.38)
-    role = "muted" if row["kind"] == "check" else "primary"
-    eq = MathTex(row["math"].strip(), color=T.color(ground, role), font_size=T.fs("math"))
-    # a trailing verdict glyph: check rows + steps marked ok -> green check; bad -> red cross
+    # a check row is a PASS, not a struck-out aside: render it as bright as the steps
+    # (was role="muted"/ink_3, which read as disabled/greyed-out -- 2026-06-21 A2 finding).
+    eq = MathTex(row["math"].strip(), color=T.color(ground, "primary"), font_size=T.fs("math"))
+    # a trailing verdict glyph: check rows + steps marked ok -> green check; bad -> red cross.
+    # The ok check is the verdict marker, so it reads at full math size with a soft green
+    # glow (was scale 0.8, too small to register as the "it works" payoff).
     verdict = "ok" if row["kind"] == "check" else row.get("mark")
     if verdict in ("ok", "bad"):
         name, vrole = ("check", "success") if verdict == "ok" else ("cross", "warning")
         mark = brand.glyph(name, ground, role=vrole, size="math")
-        mark.scale(0.8).next_to(eq, RIGHT, buff=0.28)
+        mark.next_to(eq, RIGHT, buff=0.3)
+        if verdict == "ok":
+            mark = brand.text_glow(mark, ground, role="success", width=2.0, opacity=0.42)
         return VGroup(eq, mark)
     return eq
 
 
 def _reason_mob(row: dict, ground: str):
-    """The rail reason: result -> mono uppercase amber-ink tag; else faded italic."""
+    """The rail reason: result -> mono uppercase amber-ink tag; else faded upright prose."""
     reason = row.get("reason")
     if not reason:
         return None
@@ -104,12 +116,15 @@ def _reason_mob(row: dict, ground: str):
         return brand.eyebrow(str(reason), ground, role="amber_ink")
     # role="text" (ink_2), not "muted" (ink_3): the rail carries the reasoning the old
     # two-column walkthrough spent a whole column on -- it is teaching content, so it
-    # must be readable. Italic + the dotted leader keep it subordinate to the bright
-    # equations (ink_1) without dimming it into the "too faint" zone the lint flags.
+    # must be readable. The smaller size + the dotted leader keep it subordinate to the
+    # bright equations (ink_1) without dimming it into the "too faint" zone the lint flags.
     if "$" in str(reason):
         return brand.prose(str(reason), ground, role="text", size="prose_sm")
+    # upright (was slant=ITALIC): a math-bearing reason renders upright via prose(), so a
+    # plain-text reason must match -- mixed upright/italic in one rail read as inconsistent
+    # (2026-06-21 A2 finding).
     return Text(str(reason), font=T.FONT_BODY, font_size=T.fs("prose_sm"),
-                color=T.color(ground, "text"), slant="ITALIC")
+                color=T.color(ground, "text"))
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:

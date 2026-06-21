@@ -26,7 +26,16 @@ from manim import DOWN, LEFT, RIGHT, RoundedRectangle, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner, center_in_zone, SPINE_X, RAIL_X
+from ._common import scene_head, motif_corner, center_in_zone, ColumnPlan, SPINE_X, RAIL_X
+
+
+def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
+    """Capacity contract (L2): procedure places rows at a fixed centre-to-centre rhythm
+    (not the elastic fill derivation does), so measure the rows' actual span. A worked
+    strip pinned at the bottom reserves ~1.6u (its height + clearance) that the steps must
+    clear. min_pitch is unused by the span model."""
+    return [ColumnPlan(min_pitch=0.0, model="span",
+                       extra_bottom=1.6 if spec.get("worked") else 0.0)]
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -74,6 +83,20 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         row.move_to([left, y, 0], aligned_edge=LEFT)
         m.move_to([RAIL_X, y, 0], aligned_edge=LEFT)
         prev_half = half
+
+        # a faint dotted leader ties each step to its result math across the gap to the
+        # shared rail (mirrors derivation's reason rail). Without it the RHS read as a
+        # detached column floating off to the right (2026-06-21 B2). Skip when the step
+        # text nearly reaches the rail (no room for a readable leader).
+        lead_start = row.get_right()[0] + 0.28
+        lead_end = m.get_left()[0] - 0.22
+        if lead_end - lead_start > 0.4:
+            leader = brand.dotted_leader(lead_end - lead_start, ground,
+                                         role="hairline_strong", opacity=0.5)
+            leader.move_to([(lead_start + lead_end) / 2, y, 0])
+            blocks.append(Block(f"lead.{i}", leader, anim="fade", static=True,
+                                layer="decoration"))
+            content.append(leader)
 
         blocks.append(Block(f"row.{i}", row, anim="fade", static=True))
         math_rows.append(m)
