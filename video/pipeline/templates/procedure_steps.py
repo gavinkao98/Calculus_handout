@@ -1,4 +1,4 @@
-"""procedure_steps template -- Direction B (dark teaching frame).
+"""procedure_steps template -- Direction D (dark teaching frame).
 
 Matches screenshots/04-procedure_steps.png + B_Procedure:
   eyebrow "[ PROCEDURE ]" + title;
@@ -26,7 +26,7 @@ from manim import DOWN, LEFT, RIGHT, RoundedRectangle, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner
+from ._common import scene_head, motif_corner, center_in_zone, SPINE_X, RAIL_X
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -35,7 +35,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks += scene_head(spec, ctx, label="[ procedure ]")
     title = blocks[1].mobject
 
-    left = -T.FRAME_W / 2 + T.SIDE_GUTTER
+    left = SPINE_X
+    content: list = []   # step rows + result maths, centred in the zone (above the strip)
     steps = spec.get("steps", [])
     row_gap = 1.4        # designed rhythm = MINIMUM pitch
     min_clear = 0.35     # air kept between tall rows (pitch expands, never collides)
@@ -43,10 +44,10 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     top = 1.5
 
     from manim import Text
-    right_edge = T.FRAME_W / 2 - T.SIDE_GUTTER
-    # pull the result column in from the far gutter so each instruction sits closer to
-    # its formula (Codex flagged the RHS as detached, "wide dead band", both rounds).
-    rhs_x = right_edge - 1.3
+    # the result formula snaps to the shared Lectern rail column (was right-aligned at
+    # the far gutter, which Codex flagged both rounds as a detached RHS with a "wide
+    # dead band"). Left-aligned at RAIL_X it sits next to its instruction AND lines up
+    # with the derivation reason rail / recap formula cards -- one right column system.
     math_rows = []
     y = top
     prev_half = None
@@ -71,11 +72,13 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         else:
             y -= max(row_gap, prev_half + min_clear + half)
         row.move_to([left, y, 0], aligned_edge=LEFT)
-        m.move_to([rhs_x, y, 0], aligned_edge=RIGHT)
+        m.move_to([RAIL_X, y, 0], aligned_edge=LEFT)
         prev_half = half
 
         blocks.append(Block(f"row.{i}", row, anim="fade", static=True))
         math_rows.append(m)
+        content.append(row)
+        content.append(m)
 
     for i, m in enumerate(math_rows):
         blocks.append(Block(f"math.{i}", m, anim="write", static=False))
@@ -83,6 +86,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # bottom worked-example strip: a rounded outline box (no left bar) with an
     # amber-ink WORKED tag, then the example chained with CM arrows.
     worked = spec.get("worked", [])
+    strip_h = 0.0
     if worked:
         tag = brand.eyebrow("worked", ground, role="amber_ink")
         chain = []
@@ -99,6 +103,10 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         strip = VGroup(box, row)
         strip.move_to([0, -T.FRAME_H / 2 + T.SAFE_MARGIN + box.height / 2 + 0.1, 0])
         blocks.append(Block("worked", strip, anim="fade", static=False))
+        strip_h = strip.height
 
+    # centre the step rows in the zone above the (bottom-pinned) worked strip, so a
+    # short procedure no longer floats high with an empty band above the strip.
+    center_in_zone(content, title, extra_bottom=(strip_h + 0.35 if strip_h else 0.0))
     blocks.append(motif_corner(ground))
     return blocks

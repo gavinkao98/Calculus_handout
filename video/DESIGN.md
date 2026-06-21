@@ -213,6 +213,83 @@ subtitle + progress dots；欄位 `eyebrow`/`title`/`subtitle`/`ghost`/`progress
 - **軸字母：** `_add_axis_labels` 預設在軸尖標 `x`／`y`；該圖確實不需要時用 `axis_labels: false` 關掉（勿濫用）。
 - **enforcement：** 此為**撰稿慣例**，目前靠人／VISUAL-FRAME gate 判讀，**未加 lint**（曾評估「旁白座標引用 ↔ teaching-tick」的 A-2 lint，因正則偵測旁白偽陽／偽陰風險，暫不採；情境變了再評）。緣由與取捨見 [`content_scripts/_audit/REVIEW-graph-axis-label-convention-proposal.html`](content_scripts/_audit/REVIEW-graph-axis-label-convention-proposal.html)。
 
+## Lectern 版面網格（2026-06-21 版面重設計）
+
+**問題（2026-06-21 設計盤點 #1，最高槓桿）：** 各模板各選左軸（`scene_head` 的
+gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第二內容流」
+（`derivation` 理由、`procedure` 結果、`recap` 公式卡）跟著 primary 欄寬**浮動**，
+導致沒有兩種場景對齊、16:9 右半結構性閒置；`graph` 標題用 `SAFE_MARGIN`、比別人更左，
+切到 graph 場景時標題往左跳（使用者回報的「標題飄來飄去」）。
+
+**解法——一條全模板共用的網格**（`pipeline/templates/_common.py`，全由 `theme` 度量
+推導、無新魔術數字）：
+
+| token | 意義 |
+|---|---|
+| `SPINE_X` | 唯一左對齊軸（masthead ＋ 每個 primary 欄）。 |
+| `RAIL_X` / `col_x(n)` / `RAIL_COL=7` | 固定右 rail 欄；第二內容流一律 snap 到此。`RAIL_COL` 是唯一旋鈕，一改全模板一起平衡。 |
+| `PRIMARY_W` / `RAIL_W` | primary（spine→rail）與 rail（rail→右緣）欄寬。 |
+| `MASTHEAD_TOP` | eyebrow 頂的固定 y；title 釘在其下固定間距，故標題 top 永不飄。修法＝讓 `scene_head` 成為**唯一** masthead（自刻/略過它的模板才會飄）。 |
+
+**各模板採用：**
+
+- `definition_math`：有 `statement`＋符號式且符號 ≤ `RAIL_W` 時 → **兩欄**（文左、
+  符號 snap `RAIL_X`）；否則 graceful 退回單欄（`student_id_is_one_to_one` 即因符號
+  過寬退回，正確）。
+- `derivation`：理由 snap `RAIL_X`；dotted leader 改為**目錄式可變長 connector**
+  （短式配長 leader，連接永遠成立）。無理由的純鏈仍置中（不變）。
+- `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
+- `recap_cards`：公式卡 snap `RAIL_X`（原魔術數字 1.15）。
+- `theorem_proof`：左軸用 `SPINE_X`（proof 仍刻意 `+0.4` 縮排階層）。
+- `graph`：title 左軸 `SAFE_MARGIN`→`SIDE_GUTTER`（=`SPINE_X`），與其他模板水平對齊。
+
+**figure 置中是刻意、非 drift（decline 的 finding）：** `graph`／`value_table`／
+`sign_chart` 是 figure——masthead 左錨、figure 本體置中，是一致的 house rule，**不要**
+硬改成左 flush（盤點的「左 stub」屬 editorial-drift 級）。`sign_chart` 數軸維持 `muted`
+也正確（參考骨架，非內容）。
+
+**四色貫穿內文（增量 6）：** `value_table` punchline 的 tint＋accent cell 改跟
+`accent_role`（原寫死藍，連 theorem-accent 表也藍）；映射 `_ACCENT_INK`。**註：
+`play_block` 的 `Flash` 維持 amber 是對的**——它閃的是依「強調=amber」固定語意本就琥珀的
+result/key 元素，改了反而錯（先前盤點誤列為 bug，已更正）。
+
+**短內容的下半留白**為全模板統一行為（`place_body` 把短內容往標題錨）；是否全域收緊另議。
+
+**驗證：** §1.1 全 19 場景重渲、逐幀檢視無回歸（rail-derivation `first_inverses`／
+`testing_x_and_x_squared`／`shape_can_mislead` 理由欄一致對齊、masthead 跨模板對齊）；
+gate-1 visual-frame 稽核 0 blocking。盤點全文與三方向 mockup 見對話紀錄（2026-06-21）。
+
+## Worked-example 題目結構（2026-06-21）
+
+課堂式 worked example **顯示題目**、不用模糊描述標題。有 `prompt:` 的 content scene 走
+`_common.example_head`：`[ EXAMPLE ]` eyebrow ＋ **題目當 headline**（statement-weight prose，
+不是 towering 的 bold title）＋ 細線 ＋ `SOLUTION` lead，解題本體接在其下。對映 handout 的
+`example`＋`solution`。純 `[ EXAMPLE ]`（不編課本題號）；illustrative 探索型（非單一題目）不放
+`prompt`。`title` 仍保留供 schema，example_head 忽略它。
+
+## 內容分量自適應 ＋ 多頁拆分（2026-06-21）
+
+固定 body zone（≈5u）要容納 1–7 列的內容。原則：**字型保持統一，用「間距帶＋拆分」吸收差異**，
+不靠縮字。
+
+- **`place_body` 置中對稱**（不再 clamp 往標題拉）：短內容上下留白對稱（「對稱留白」），不浮高。
+- **`stack_layout`（舒適間距帶）**：`[min_pitch, min_pitch+COMFORT_SPREAD]`，`COMFORT_SPREAD=0.5`
+  是 stretch 的**絕對上限**。輕→用 max pitch 置中；中→撐到填滿 zone；重→min pitch 頂錨（交給拆分）。
+- **`center_in_zone`**：把 procedure/theorem/recap 那種「固定高錨點擺」的內容群組 shift 到 zone 置中
+  （procedure 用 `extra_bottom` 預留底部 worked strip；theorem 卡片留頂、只置中 proof）。
+- **B 拆分偵測（`sizecheck._capacity_issues`）**：對**同質鏈**模板（derivation/definition，宣告
+  `MIN_PITCH`）算 `Σ列高+(n−1)·MIN_PITCH > zone_h` → warn「拆 N 頁」。predictive（排版前），補上
+  derivation 的 place_body clamp 會藏溢出、反應式 off-frame 抓不到的盲點。異質模板（theorem/
+  procedure/recap，gap 不一）不宣告 `MIN_PITCH`，靠反應式 off-frame。
+- **C 多頁機制**：偵測自動、**切點手動**（作者把長場景拆成數個 scene、每頁重貼 header、設
+  `part: {current, total}`）。`part` 指示（accent 色、右上）通用化到 `scene_head`／`example_head`；
+  續頁 example 標 `SOLUTION (CONT.)`。不全自動切——`{show}` 旁白逐場景手寫，自動切會破壞音畫對齊。
+  fixture：[`storyboards/_demo_multipage.yml`](storyboards/_demo_multipage.yml)。
+
+**definition 單欄（退兩欄，2026-06-21）**：definition 的散文與符號**非逐列配對**，兩欄只會把一行
+寫得下的句子硬拆兩行 → 改回單欄滿寬 prose ＋ 符號式 ＋ place_body 置中。兩欄/rail 保留給有真逐列
+配對的 derivation/procedure/recap（見上節 Lectern「版面 = 內容結構」）。
+
 ### Template 選擇：離散步驟 vs 推導鏈
 
 計算場景有兩種形狀，選錯 template 就是長公式跑出空間的原因——兩欄 template

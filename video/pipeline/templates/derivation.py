@@ -38,11 +38,11 @@ from manim import DOWN, LEFT, RIGHT, MathTex, Text, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner, place_body, body_zone, fill_gap
+from ._common import (scene_head, example_head, motif_corner, place_body, body_zone,
+                      fill_gap, SPINE_X, CONTENT_W, RAIL_X)
 
-_COL_GAP = 0.36       # equation column -> reason rail
-_LEADER_W = 0.67      # dotted leader length (90px)
 _ROW_GAP = 0.40       # between rows (min pitch; expands for tall rows)
+MIN_PITCH = _ROW_GAP  # tightest inter-row gap -- sizecheck's split-capacity trigger reads this
 
 
 def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
@@ -115,12 +115,19 @@ def _reason_mob(row: dict, ground: str):
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
-    head = scene_head(spec, ctx, label="[ example ]")
+    # worked examples (scenes with a `prompt:`) open with example_head -- the problem
+    # as the headline + a SOLUTION lead -- instead of a vague descriptive title; the
+    # solution body sits below that lead. Statement-only / back-compat scenes keep the
+    # plain masthead. body_ref is whatever the body sits under (SOLUTION lead or title).
+    if spec.get("prompt"):
+        head, body_ref = example_head(spec, ctx)
+    else:
+        head = scene_head(spec, ctx, label="[ example ]")
+        body_ref = head[1].mobject
     blocks += head
-    title = head[1].mobject
 
-    content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
-    left_x = -T.FRAME_W / 2 + T.SIDE_GUTTER
+    content_w = CONTENT_W
+    left_x = SPINE_X
 
     statement = None
     if spec.get("statement"):
@@ -131,10 +138,16 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     eqs = [_eq_mob(r, ground) for r in rows]
     reasons = [_reason_mob(r, ground) for r in rows]
 
+    # Reasons snap to the FIXED Lectern rail column (was: floating at
+    # left_x + eq_col_w, so the rail x drifted scene-to-scene and never aligned
+    # with the other templates' right column). The dotted leader becomes a
+    # TOC-style connector spanning each equation's right edge to the reason column
+    # (set per row in the layout loop), so a short equation gets a long leader and
+    # the link always reads. eq_col_w now only guards the rare chain wide enough to
+    # reach the rail -- then that row's leader is skipped.
     eq_col_w = max((e.width for e in eqs), default=0.0)
-    rail_x = left_x + eq_col_w + _COL_GAP
-    reason_x = rail_x + _LEADER_W + 0.16
-    reason_max_w = (left_x + content_w) - reason_x
+    reason_x = RAIL_X
+    reason_max_w = (SPINE_X + CONTENT_W) - reason_x
 
     # pre-pass: clamp reason widths, collect row heights (needed to size the chain to
     # the body zone before placing).
@@ -147,7 +160,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # spread rows so a short chain fills the body zone rather than stranding a dead band
     # under the title + an empty lower third (Codex 2026-06-21). A statement, if present,
     # eats one slot of the zone budget. fill_gap caps the spread so tall chains keep pitch.
-    zt, zb = body_zone(title)
+    zt, zb = body_zone(body_ref)
     stmt_h = (statement.height + 0.55) if statement is not None else 0.0
     row_gap = fill_gap(heights, _ROW_GAP, max(zt - zb - stmt_h, 1.5))
 
@@ -164,12 +177,22 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         group = [eq]
         if reason is not None:
             reason.move_to([reason_x, y, 0], aligned_edge=LEFT)
-            leader = brand.dotted_leader(
-                _LEADER_W, ground,
-                role="accent" if r["kind"] == "result" else "hairline_strong",
-                opacity=0.6 if r["kind"] == "result" else 0.7)  # was 0.5/0.55: Codex read the rail as too faint
-            leader.move_to([rail_x + _LEADER_W / 2, y, 0])
-            group += [leader, reason]
+            # TOC-style leader: spans the gap from this equation's right edge to the
+            # reason column, so the connection holds whatever the equation's width
+            # (was a fixed 0.67u stub anchored to the floating rail). A chain wide
+            # enough to reach the rail leaves no room -> skip the leader, keep the link
+            # implicit by row alignment. opacity 0.6/0.7 (Codex read 0.5/0.55 too faint).
+            lead_start = eq.get_right()[0] + 0.22
+            lead_end = reason_x - 0.18
+            if lead_end - lead_start > 0.12:
+                leader = brand.dotted_leader(
+                    lead_end - lead_start, ground,
+                    role="accent" if r["kind"] == "result" else "hairline_strong",
+                    opacity=0.6 if r["kind"] == "result" else 0.7)
+                leader.move_to([(lead_start + lead_end) / 2, y, 0])
+                group += [leader, reason]
+            else:
+                group += [reason]
         row_mobs.append((r, VGroup(*group), eq))
         prev_half = half
 
@@ -178,16 +201,18 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     parts = ([statement] if statement is not None else []) + ([chain] if chain is not None else [])
     if parts:
         content = VGroup(*parts).arrange(DOWN, buff=0.55, aligned_edge=LEFT)
-        place_body(content, title, left_x)
-        # A pure equation chain (no reason rail, no statement) left-flush would hug the
-        # left third and strand the right ~60% empty (Codex flagged cubic/rational/app as
-        # "left-heavy, large dead field"). Centre it horizontally; rows stay mutually
-        # left-aligned, so it reads as a centred display-equation block.
+        place_body(content, body_ref, left_x)
+        # A pure equation chain (no reason rail, no statement, no prompt header)
+        # left-flush would hug the left third and strand the right ~60% empty (Codex
+        # flagged cubic/rational/app as "left-heavy, large dead field"). Centre it
+        # horizontally; rows stay mutually left-aligned, so it reads as a centred
+        # display-equation block. A worked example with a prompt header instead anchors
+        # the chain left under the SOLUTION lead (the header gives the frame balance).
         no_rail = all(not r.get("reason") for r in rows)
-        if no_rail and statement is None:
+        if no_rail and statement is None and not spec.get("prompt"):
             content.move_to([0.0, content.get_center()[1], 0])
         else:
-            content.align_to(title, LEFT)
+            content.align_to(body_ref, LEFT)
 
     if statement is not None:
         blocks.append(Block("statement", statement, anim="fade", static=True))

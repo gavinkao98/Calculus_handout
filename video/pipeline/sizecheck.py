@@ -320,6 +320,73 @@ def graph_label_geometry(meta: dict, scene: dict) -> "dict | None":
     return {"labels": labels, "overlaps": overlaps}
 
 
+def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
+    """Predictive SPLIT trigger (not reactive like _overflow_issues). Asks: can the
+    body content fit the zone at its TIGHTEST pitch? natural_min = sum(row heights) +
+    (n-1)*MIN_PITCH, computed PER COLUMN (so a 2-column template -- recap points vs
+    cards, procedure steps vs results -- is measured per column, not summed). If even
+    at min pitch it exceeds the body zone (the band below the masthead), the scene
+    cannot fit one page -> advise splitting into pages (warn, with a page estimate)
+    instead of letting it silently spill or squeeze up into the masthead. Only runs for
+    HOMOGENEOUS-chain templates (those whose module declares MIN_PITCH -- derivation,
+    definition_math): their uniform row pitch makes natural_min accurate, AND derivation
+    uses place_body clamping that can HIDE overflow from the reactive off-frame check, so
+    a predictive trigger is genuinely needed there. Heterogeneous templates (theorem /
+    procedure / recap -- card+steps, numerals+strip, points+cards) and figures (graph /
+    value_table / sign_chart) declare no MIN_PITCH; they don't clamp, so their overflow
+    is caught reactively by _overflow_issues (a uniform-pitch estimate would over-count
+    their mixed gaps and false-positive)."""
+    import math
+    import sys as _sys
+    from pipeline.visuals import theme as T
+    from pipeline.templates import REGISTRY
+
+    builder = REGISTRY.get(scene.get("template"))
+    if builder is None:
+        return []
+    mod = _sys.modules.get(builder.__module__)
+    min_pitch = getattr(mod, "MIN_PITCH", None)
+    if min_pitch is None:
+        return []  # figure template -- not a vertical stack
+
+    HEADER = {"eyebrow", "title", "prompt", "solrule", "sollead", "part"}
+    header_bottoms = [float(b.mobject.get_bottom()[1]) for b in blocks
+                      if b.id in HEADER and getattr(b, "mobject", None) is not None]
+    if not header_bottoms:
+        return []
+    zone_top = min(header_bottoms)
+    zone_h = zone_top - (-T.FRAME_H / 2 + T.SAFE_MARGIN)
+    if zone_h <= 0.5:
+        return []
+
+    cols: dict[int, list[float]] = {}
+    for b in blocks:
+        if getattr(b, "layer", "content") != "content" or b.id in HEADER:
+            continue
+        mob = getattr(b, "mobject", None)
+        if mob is None:
+            continue
+        try:
+            left, h = float(mob.get_left()[0]), float(mob.height)
+        except Exception:  # noqa: BLE001
+            continue
+        if h <= 1e-6:
+            continue
+        cols.setdefault(round(left), []).append(h)
+    if not cols:
+        return []
+    natural_min = max(sum(hs) + (len(hs) - 1) * float(min_pitch) for hs in cols.values())
+
+    if natural_min > zone_h + 0.15:
+        pages = max(2, math.ceil(natural_min / zone_h))
+        return [("warn",
+            f"{scene.get('id')}: body content needs ~{natural_min:.1f}u at the tightest "
+            f"pitch but the zone is only ~{zone_h:.1f}u -- it will not fit on one page. "
+            f"Split into ~{pages} pages (each repeating the header + a "
+            f"part: {{current, total}} indicator), or trim.")]
+    return []
+
+
 def check_scenes(meta: dict, scenes: list[dict]) -> list[str]:
     """Return (severity, message) tuples for the given scenes.
     'error' = stacked-prose size mismatch, or an element clipped off-frame (both
@@ -357,6 +424,9 @@ def check_scenes(meta: dict, scenes: list[dict]) -> list[str]:
         # -- warn: two graph equation labels stacked (the one collision the graph
         # layer exemption above deliberately lets through). --
         issues += _graph_label_overlap_issues(scene, blocks)
+
+        # -- warn: content cannot fit one page even at tightest pitch -> split --
+        issues += _capacity_issues(scene, blocks)
 
         # -- error: stacked siblings at different sizes (shrunk not wrapped) --
         groups: dict[str, list[tuple[str, float]]] = {}

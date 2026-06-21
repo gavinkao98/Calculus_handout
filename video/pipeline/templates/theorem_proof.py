@@ -1,4 +1,4 @@
-"""theorem_proof template -- Direction B (dark teaching frame).
+"""theorem_proof template -- Direction D (dark teaching frame).
 
 Matches screenshots/05-theorem_proof.png + B_Theorem:
   eyebrow "[ THEOREM ]" + title;
@@ -26,7 +26,7 @@ from manim import DOWN, LEFT, RIGHT, UP, RoundedRectangle, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner
+from ._common import scene_head, motif_corner, center_in_zone, SPINE_X, CONTENT_W
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -35,8 +35,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks += scene_head(spec, ctx, label="[ theorem ]")
     title = blocks[1].mobject
 
-    left = -T.FRAME_W / 2 + T.SIDE_GUTTER
-    content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
+    left = SPINE_X
+    content_w = CONTENT_W
 
     # -- statement in a gold-barred panel (the textbook "theorem frame") --
     # prose(): a pure-prose statement (no $) must NOT go to math_line -- that
@@ -59,6 +59,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     label_y = min(0.3, card.get_bottom()[1] - 0.35)
     proof_label.move_to([left + 0.4, label_y, 0], aligned_edge=LEFT)
     blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
+    proof_content: list = []   # steps + qed, centred below the label (card+label stay put)
 
     steps = spec.get("proof", [])
     step_gap = 0.95     # designed rhythm = MINIMUM pitch
@@ -83,6 +84,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             y -= max(step_gap, prev_half + min_clear + half)
         row.move_to([left + 0.4, y, 0], aligned_edge=LEFT)
         blocks.append(Block(f"proof.{i}", row, anim="fade", static=False))
+        proof_content.append(row)
         prev_half = half
 
     # -- QED line --
@@ -104,6 +106,10 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             y_qed = y - max(step_gap, prev_half + min_clear + half) - 0.1
         row.move_to([left + 0.4, y_qed, 0], aligned_edge=LEFT)
         blocks.append(Block("qed", row, anim="flash_in", static=False))
+        proof_content.append(row)
 
+    # centre the proof (steps + qed) in the zone below the label, so a short proof
+    # no longer floats high under the statement card with an empty lower zone.
+    center_in_zone(proof_content, proof_label)
     blocks.append(motif_corner(ground))
     return blocks

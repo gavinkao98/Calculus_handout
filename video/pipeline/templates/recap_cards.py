@@ -1,4 +1,4 @@
-"""recap_cards template -- Direction B (dark teaching frame).
+"""recap_cards template -- Direction D (dark teaching frame).
 
 Matches screenshots/06-recap_cards.png + B_Recap. NOTE this is the DARK,
 in-content recap (distinct from the LIGHT brand `outro`): a teaching summary,
@@ -28,15 +28,17 @@ from manim import DOWN, LEFT, RIGHT, UL, UP, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import scene_head, motif_corner
+from ._common import scene_head, motif_corner, center_in_zone, SPINE_X, RAIL_X
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
     blocks += scene_head(spec, ctx, label="[ recap ]")
+    title = blocks[1].mobject
+    content: list = []   # both columns, centred in the zone at the end
 
-    left = -T.FRAME_W / 2 + T.SIDE_GUTTER
+    left = SPINE_X
     points = spec.get("points", [])
     formulas = spec.get("formulas", [])
 
@@ -56,16 +58,18 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         row.move_to([left, y_cursor, 0], aligned_edge=UL)
         y_cursor -= row.height + pt_gap
         blocks.append(Block(f"point.{i}", row, anim="fade", static=False))
+        content.append(row)
 
     # -- right column: "Remember" + formula cards --
-    # right_x sets the cards' left edge. Kept left enough that a full-width
-    # two-term formula card (e.g. "f(x_1)=f(x_2) => x_1=x_2") clears the
-    # broadcast-safe edge -- at 2.2 it spilled off-frame (caught by the overflow
-    # guard); the points column ends near x=0.5, so this still reads as two columns.
-    right_x = 1.15
+    # Cards' left edge snaps to the shared Lectern rail column (was a bare 1.15 magic
+    # number; RAIL_X 1.06 is the same column derivation reasons / procedure results use,
+    # so all three templates' right column aligns). Still clears the points column
+    # (which ends near x=0.5) and keeps full-width two-term cards inside the safe edge.
+    right_x = RAIL_X
     rem = brand.eyebrow("remember", ground, role="blue_ink")
     rem.move_to([right_x, 2.0, 0], aligned_edge=LEFT)
     blocks.append(Block("remember", rem, anim="fade", static=True))
+    content.append(rem)
 
     card_gap = 1.4
     card_top = 0.9
@@ -76,6 +80,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
                                  radius=T.RADIUS_MD, bar_px=5, pad=0.36, pad_x=0.5)
         grp.move_to([right_x, card_top - i * card_gap, 0], aligned_edge=LEFT)
         blocks.append(Block(f"formula.{i}", grp, anim="fade", static=False))
+        content.append(grp)
 
+    center_in_zone(content, title)
     blocks.append(motif_corner(ground))
     return blocks

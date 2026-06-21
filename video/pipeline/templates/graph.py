@@ -385,7 +385,10 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks: list[Block] = []
 
     title = _title(spec.get("title", ""), ground)
-    left = -T.FRAME_W / 2 + T.SAFE_MARGIN
+    # left-anchor the title to the shared spine gutter (was SAFE_MARGIN, ~0.19u
+    # further left than every other template -- the graph title visibly jumped left
+    # when switching to a graph scene). SIDE_GUTTER == _common.SPINE_X.
+    left = -T.FRAME_W / 2 + T.SIDE_GUTTER
     top = T.FRAME_H / 2 - T.SAFE_MARGIN
     title.move_to([left + title.width / 2, top - title.height / 2, 0])
     blocks.append(Block("title", title, anim="fade", static=True))
@@ -513,7 +516,9 @@ def _build_compare(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks: list[Block] = []
 
     title = _title(spec.get("title", ""), ground)
-    left_edge = -T.FRAME_W / 2 + T.SAFE_MARGIN
+    # left-anchor to the shared spine gutter (see _build_single) so the 2-up title
+    # lines up with every other template's title instead of sitting further left.
+    left_edge = -T.FRAME_W / 2 + T.SIDE_GUTTER
     top = T.FRAME_H / 2 - T.SAFE_MARGIN
     title.move_to([left_edge + title.width / 2, top - title.height / 2, 0])
     blocks.append(Block("title", title, anim="fade", static=True))

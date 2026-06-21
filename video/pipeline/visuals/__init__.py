@@ -1,6 +1,6 @@
-"""Visual assets: Direction B theme (palette/type/layout) + graph sampling.
+"""Visual assets: Direction D theme (palette/type/layout) + graph sampling.
 
-theme.py is the design system (NTU Calculus Video System, Direction B). The
+theme.py is the design system (NTU Calculus Video System, Direction D). The
 graph sampling helpers are ported verbatim from the first-generation pipeline.
 """
 

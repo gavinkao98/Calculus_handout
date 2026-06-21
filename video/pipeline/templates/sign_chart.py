@@ -1,4 +1,4 @@
-"""sign_chart template -- Direction B (dark teaching frame).
+"""sign_chart template -- Direction D (dark teaching frame).
 
 The workhorse of the derivative-application sections: a number line with
 critical points, and signed interval rows beneath it -- f' sign ->

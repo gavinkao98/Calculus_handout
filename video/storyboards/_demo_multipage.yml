@@ -1,0 +1,73 @@
+# 多頁 worked-example demo（C：拆分機制驗證）
+#
+# rational_unsplit : 7 行單頁 → sizecheck 的 B 容量觸發應喊「拆 ~2 頁」（不渲染，僅驗 B）。
+# rational_p1/p2   : 拆好的兩頁，各帶 part:{current,total} 與同一 prompt → 渲染看
+#                    part 指示（1/2、2/2）＋每頁重貼題目＋續頁 SOLUTION (CONT.)。
+# 取材：§1.1 Example 1.7（f=3/(x-5) → (5x+3)/x，雙向驗證＋定義域配對）。demo 專用。
+
+meta:
+  id: demo_multipage
+  chapter: "Demo"
+  chapter_title: "Multi-page Split"
+  section: "0.0"
+  title: "Multi-page Worked Example"
+  language: en
+  voice: Mia
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Multi-page Worked Example" }
+
+scenes:
+
+  # ---- 未拆版（7 行）：應觸發 B「拆 ~2 頁」，不渲染 ----
+  - id: rational_unsplit
+    kind: content
+    template: derivation
+    accent: example
+    title: "Inverting a Rational (unsplit, over capacity)"
+    prompt: 'Find the inverse of $f(x)=\dfrac{3}{x-5}$, and verify both directions.'
+    say: |
+      Derive, then verify both directions.
+      {show line.0} {show line.1} {show line.2} {show line.3}
+      {show line.4} {show line.5} {show line.6}
+    lines:
+      - 'y = \dfrac{3}{x-5}'
+      - 'x - 5 = \dfrac{3}{y}'
+      - 'x = 5 + \dfrac{3}{y}'
+      - { tex: 'f^{-1}(x) = \dfrac{5x+3}{x}', anim: highlight }
+      - 'f\bigl(f^{-1}(x)\bigr) = x'
+      - 'f^{-1}\bigl(f(x)\bigr) = x'
+      - 'x \neq 5 \;\leftrightarrow\; x \neq 0'
+
+  # ---- 頁 1/2：求逆 ----
+  - id: rational_p1
+    kind: content
+    template: derivation
+    accent: example
+    part: { current: 1, total: 2 }
+    title: "Inverting a Rational, page 1"
+    prompt: 'Find the inverse of $f(x)=\dfrac{3}{x-5}$, and verify both directions.'
+    say: |
+      First solve for the inverse.
+      {show step.0} {show step.1} {show step.2} {show result}
+    steps:
+      - { math: 'y = \dfrac{3}{x-5}', reason: 'set $y=f(x)$' }
+      - { math: 'x - 5 = \dfrac{3}{y}', reason: 'isolate $x-5$' }
+      - { math: 'x = 5 + \dfrac{3}{y}', reason: 'solve for $x$' }
+    result: { math: 'f^{-1}(x) = \dfrac{5x+3}{x}', reason: 'swap names' }
+
+  # ---- 頁 2/2：雙向驗證 ----
+  - id: rational_p2
+    kind: content
+    template: derivation
+    accent: example
+    part: { current: 2, total: 2 }
+    title: "Inverting a Rational, page 2"
+    prompt: 'Find the inverse of $f(x)=\dfrac{3}{x-5}$, and verify both directions.'
+    say: |
+      Now check both compositions and the domains.
+      {show step.0} {show step.1} {show check}
+    steps:
+      - { math: 'f\bigl(f^{-1}(x)\bigr) = x', reason: 'forward check', mark: ok }
+      - { math: 'f^{-1}\bigl(f(x)\bigr) = x', reason: 'backward check', mark: ok }
+    check: { math: 'x \neq 5 \;\leftrightarrow\; x \neq 0', reason: 'domains pair up' }

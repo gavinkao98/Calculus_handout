@@ -1,14 +1,19 @@
-"""definition_math template -- Direction B (dark teaching frame).
+"""definition_math template -- Lectern dark teaching frame.
 
-Matches screenshots/02-definition_math.png (minus the grid -- grids are
-disabled project-wide, see theme.SHOW_GRID):
-  eyebrow "[ DEFINITION ]" top-left (accent hue) + title beneath it;
-  centred English statement (wrapped, never mid-word);
-  a math card holding the math lines, the key line in gold;
-  faint summit-bars motif bottom-right.
+A definition / statement / note frame: the eyebrow + title masthead (built by the
+shared scene_head, fixed Lectern anchor) over a SINGLE left-flush column -- the prose
+statement at full measure (natural line length, never forced into a narrow column),
+then the symbolic math lines; the key line (`anim: highlight`) is amber + persistent
+glow. The whole block is CENTRED in the body zone (place_body), so a light definition
+gets balanced breathing room instead of floating high.
 
-Static: eyebrow, title, statement, card, motif.
-Dynamic ({show math.N}): each math line.
+(An earlier two-column "words left | symbols right" layout was dropped, 2026-06-21: a
+definition's prose and symbols are NOT paired per row -- unlike derivation's step↔reason
+rail -- so splitting them only forced one-line statements to wrap into two. Two columns
+are reserved for templates with a genuine per-row second stream; place_body centring now
+fixes the vertical waste that the two-column was reaching for.)
+
+Static: eyebrow, title, statement. Dynamic ({show math.N}): each math line.
 """
 from __future__ import annotations
 
@@ -17,9 +22,9 @@ from typing import Any
 from manim import DOWN, LEFT, VGroup
 
 from .. import brand
-from ..blocks import Block, accent_role
+from ..blocks import Block
 from ..visuals import theme as T
-from ._common import place_body
+from ._common import scene_head, motif_corner, place_body, SPINE_X, CONTENT_W
 
 LABEL = {
     "definition": "[ definition ]", "theorem": "[ theorem ]",
@@ -27,49 +32,23 @@ LABEL = {
     "warning": "[ note ]", "procedure": "[ procedure ]", "recap": "[ recap ]",
 }
 
+MIN_PITCH = 0.36  # tightest inter-line gap (the math stack arrange buff); sizecheck capacity trigger
 
-def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
-    ground = ctx["ground"]
-    role = accent_role(spec)
-    left = -T.FRAME_W / 2 + T.SIDE_GUTTER
-    top = T.FRAME_H / 2 - T.SAFE_MARGIN
-    content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
-    blocks: list[Block] = []
 
-    # `kicker` overrides the accent-derived eyebrow word -- e.g. a motivation
-    # scene keeps the definition colour family but reads "[ MOTIVATION ]".
-    kicker = spec.get("kicker")
-    label = f"[ {kicker} ]" if kicker else LABEL.get(spec.get("accent", "definition"),
-                                                     "[ definition ]")
-    eyebrow = brand.eyebrow(label, ground, role=role)
-    eyebrow.move_to([left + eyebrow.width / 2, top - eyebrow.height / 2, 0])
-    blocks.append(Block("eyebrow", eyebrow, anim="fade", static=True))
+def _math_blocks(spec: dict[str, Any], ground: str):
+    """Build the math line mobjects + their reveal anims.
 
-    title = brand.heading_rich(spec.get("title", ""), ground, role="primary", size="h1",
-                               max_width=content_w)
-    title.next_to(eyebrow, DOWN, buff=T.EYEBROW_GAP).align_to(eyebrow, LEFT)
-    blocks.append(Block("title", title, anim="fade", static=True))
-
-    statement = None
-    if spec.get("statement"):
-        # prose() routes on content: inline $math$ / a \\ break -> Tex (so it
-        # never prints "$f$" literally); plain prose -> wrapped, left-aligned Text.
-        # The lead statement is ink-1 (`.f-prose.lead`).
-        statement = brand.prose(spec["statement"], ground, role="primary", size="prose",
-                                max_width=content_w, align="LEFT")
-
+    The key line (`anim: highlight`) is amber + persistent text-shadow glow, revealed
+    with a flash; everything else is bright ink. The raw string goes to math_line
+    unstripped of `$` -- it auto-detects pure-math vs mixed text+inline `$math$` and
+    picks MathTex / Tex (stripping `$` broke "$a$ whenever $b$")."""
     math_mobs, anims = [], []
     for entry in spec.get("math", []):
         if isinstance(entry, dict):
             tex, anim = entry["tex"], entry.get("anim", "write")
         else:
             tex, anim = entry, "write"
-        # Pass the raw string to math_line; it auto-detects pure-math vs mixed
-        # text+inline-$math$ and picks MathTex / Tex. Do NOT strip the $ here --
-        # that turned "$a$ whenever $b$" into broken nested math mode.
-        is_key = anim == "highlight"
-        if is_key:
-            # `.math.key` -- amber + persistent text-shadow glow, revealed with a flash.
+        if anim == "highlight":
             mob = brand.text_glow(brand.math_line(tex.strip(), ground, role="accent"),
                                   ground, role="accent")
             anim = "write_glow"
@@ -77,37 +56,44 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             mob = brand.math_line(tex.strip(), ground, role="primary")
         math_mobs.append(mob)
         anims.append(anim)
+    return math_mobs, anims
 
-    # Statement + math stack centre as ONE LEFT-FLUSH group in the zone between the
-    # title and the bottom safe margin (`.f-body.center`: vertically centred, content
-    # flush to the left gutter). Closes the old dead band above the content.
+
+def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
+    ground = ctx["ground"]
+    blocks: list[Block] = []
+
+    head = scene_head(spec, ctx,
+                      label=LABEL.get(spec.get("accent", "definition"), "[ definition ]"))
+    blocks += head
+    title = head[1].mobject
+
+    math_mobs, anims = _math_blocks(spec, ground)
+
+    # single left-flush column: prose statement at full measure, then the math lines,
+    # centred in the body zone (place_body) for balanced breathing room.
+    statement = None
+    if spec.get("statement"):
+        statement = brand.prose(spec["statement"], ground, role="primary", size="prose",
+                                max_width=CONTENT_W, align="LEFT")
     parts = []
     if statement is not None:
         parts.append(statement)
     if math_mobs:
         stack = VGroup(*math_mobs)
-        # Left-flush by default (Direction D); opt-in `math_align: center` for the
-        # rare scene where the lines read as centred display equations.
         if spec.get("math_align") == "center":
-            stack.arrange(DOWN, buff=0.36)
+            stack.arrange(DOWN, buff=MIN_PITCH)
         else:
-            stack.arrange(DOWN, buff=0.36, aligned_edge=LEFT)
+            stack.arrange(DOWN, buff=MIN_PITCH, aligned_edge=LEFT)
         parts.append(stack)
     if parts:
         content = VGroup(*parts).arrange(DOWN, buff=0.71, aligned_edge=LEFT)
-        # place_body's tightened BODY_TOP_GAP_MAX (0.62) lifts the block toward the
-        # title -- shrinking the dead band and raising the amber key toward the prose
-        # (both Codex 2026-06-21 asks); the prose statement anchors it from reading
-        # top-heavy.
-        place_body(content, title, left)
+        place_body(content, title, SPINE_X)
+
     if statement is not None:
         blocks.append(Block("statement", statement, anim="fade", static=True))
     for i, (mob, anim) in enumerate(zip(math_mobs, anims)):
         blocks.append(Block(f"math.{i}", mob, anim=anim, static=False))
 
-    motif = brand.summit_bars(ground, height=0.45, color_role="muted", opacity=0.4)
-    motif.move_to([T.FRAME_W / 2 - T.SAFE_MARGIN - motif.width / 2,
-                   -T.FRAME_H / 2 + T.SAFE_MARGIN + motif.height / 2, 0])
-    blocks.append(Block("motif", motif, anim="fade", static=True, layer="decoration"))
-
+    blocks.append(motif_corner(ground))
     return blocks
