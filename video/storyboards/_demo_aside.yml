@@ -1,0 +1,55 @@
+# L3 enrichment aside 壓測稿（非正式節,檔名底線前綴）
+#
+# 驗證 definition_math 的可選 `aside`(DESIGN.md「容量契約三層架構」L3):稀疏內容投放
+# 右 rail 的 key-idea 卡(兩欄),內容變密則自動收合回滿寬單欄(aside 不擠真內容)。
+# demo 專用,sizecheck/render 驗證後留作回歸樣本。
+
+meta:
+  id: demo_aside
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Enrichment Aside"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Enrichment Aside" }
+
+scenes:
+
+  # sparse definition + aside -> two columns (primary narrowed, key-idea card in the rail)
+  - id: aside_sparse
+    kind: content
+    template: definition_math
+    accent: definition
+    title: "Inverse Function"
+    say: "A sparse definition with a supporting key idea in the rail."
+    statement: "The inverse sends each output of $f$ back to the input it came from."
+    math:
+      - { tex: "$f^{-1}(y)=x \\iff f(x)=y$", anim: highlight }
+    aside:
+      label: "Key idea"
+      accent: secondary
+      body: "The $-1$ in $f^{-1}$ means the inverse function --- not a reciprocal. So $f^{-1}(x)\\ne 1/f(x)$ in general."
+
+  # dense definition + aside -> the aside collapses; full-width single column
+  - id: aside_collapse
+    kind: content
+    template: definition_math
+    accent: definition
+    title: "Inverse Function (Dense)"
+    say: "A dense definition: the aside collapses so it never crowds the content."
+    statement: "The inverse sends each output of $f$ back to the input it came from, which is well defined precisely when no two inputs of $f$ ever share an output value."
+    math:
+      - "$f^{-1}(y)=x \\iff f(x)=y$"
+      - "$f^{-1}(x)\\ne \\dfrac{1}{f(x)}$"
+      - "$(f^{-1}\\circ f)(x)=x$ on the domain"
+      - "$(f\\circ f^{-1})(y)=y$ on the range"
+      - "domain of $f^{-1}$ = range of $f$"
+      - "graph reflects across $y=x$"
+    aside:
+      label: "Key idea"
+      accent: secondary
+      body: "This card should not appear --- the dense primary content collapses it."

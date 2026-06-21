@@ -1,0 +1,171 @@
+# 容量契約回歸 fixture（非正式節,檔名底線前綴）
+#
+# 目的:鎖住 L1/L2 容量契約（DESIGN.md「內容分量變異:容量契約三層架構」）。每個縱向
+# 模板兩支場景——一支「逼近上限但仍 fit」(sizecheck 應「不」報拆頁)、一支「超量」(應報)。
+# 由 video/capacity_selftest.py 跑 sizecheck 斷言(EXPECT 表),模板放置邏輯一改若破壞容量
+# 預測,自測即紅。span 模型(procedure/theorem/recap)量實際 render 跨度、stack 模型
+# (derivation/definition)用 tightest-pitch 估算——兩者都在這裡受測。
+#
+# 只供 sizecheck 自測;不經 make.py 全渲(say 為佔位、不含 {show})。
+
+meta:
+  id: demo_capacity
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Capacity Contract"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Capacity Contract" }
+
+scenes:
+
+  # -- derivation (stack model) --------------------------------------------
+  - id: derivation_fit
+    kind: content
+    template: derivation
+    accent: example
+    title: "Derivation Within Capacity"
+    say: "Four single-height steps fit one page."
+    steps:
+      - { math: "y = 2x + 3", reason: "write $y=f(x)$" }
+      - { math: "y - 3 = 2x", reason: "subtract 3" }
+      - { math: "x = \\tfrac{y-3}{2}", reason: "divide by 2" }
+    result: { math: "\\therefore\\; f^{-1}(x) = \\tfrac{x-3}{2}", reason: "swap names" }
+
+  - id: derivation_over
+    kind: content
+    template: derivation
+    accent: example
+    title: "Derivation Over Capacity"
+    say: "Seven stacked-fraction steps cannot fit one page."
+    steps:
+      - { math: "\\dfrac{\\dfrac{1}{2+h}-\\dfrac{1}{2}}{h}", reason: "difference quotient" }
+      - { math: "\\dfrac{\\dfrac{2-(2+h)}{2(2+h)}}{h}", reason: "common denominator" }
+      - { math: "\\dfrac{\\dfrac{-h}{2(2+h)}}{h}", reason: "simplify numerator" }
+      - { math: "\\dfrac{-h}{2h(2+h)}", reason: "divide by $h$" }
+      - { math: "\\dfrac{-1}{2(2+h)}", reason: "cancel $h$" }
+      - { math: "\\dfrac{-1}{2(2+0)}", reason: "let $h\\to 0$" }
+    result: { math: "\\therefore\\; f'(2) = -\\tfrac{1}{4}", reason: "evaluate" }
+
+  # -- definition_math (stack model) ---------------------------------------
+  - id: definition_fit
+    kind: content
+    template: definition_math
+    accent: definition
+    title: "Definition Within Capacity"
+    say: "A statement and two formulas fit comfortably."
+    statement: "A function is one-to-one when different inputs always give different outputs."
+    math:
+      - "$f(x_1) \\ne f(x_2)$ whenever $x_1 \\ne x_2$"
+      - { tex: "$f(x_1)=f(x_2) \\implies x_1=x_2$", anim: highlight }
+
+  - id: definition_over
+    kind: content
+    template: definition_math
+    accent: definition
+    title: "Definition Over Capacity"
+    say: "A long statement plus six formula lines overflow."
+    statement: "A function is one-to-one when different inputs always give different outputs, which is exactly the condition under which the correspondence can be read backwards without ambiguity."
+    math:
+      - "$f(x_1) \\ne f(x_2)$ whenever $x_1 \\ne x_2$"
+      - "$f(x_1)=f(x_2) \\implies x_1=x_2$"
+      - "$g(x)=x^2$ on $[-1,1]$ fails this"
+      - "$g(\\tfrac12)=\\tfrac14=g(-\\tfrac12)$"
+      - "$h(x)=x^3$ on $\\mathbb{R}$ passes"
+      - "$h$ is strictly increasing"
+      - "$h^{-1}(x)=\\sqrt[3]{x}$"
+      - "$(h^{-1}\\circ h)(x)=x$"
+
+  # -- procedure_steps (span model) ----------------------------------------
+  - id: procedure_fit
+    kind: content
+    template: procedure_steps
+    accent: procedure
+    title: "Procedure Within Capacity"
+    say: "Three short steps plus a worked strip fit."
+    steps:
+      - { text: "Write $y=f(x)$.", math: "y=f(x)" }
+      - { text: "Solve for $x$ in terms of $y$.", math: "x=\\cdots" }
+      - { text: "Interchange $x$ and $y$.", math: "y=f^{-1}(x)" }
+    worked: ["y=x^2", "x=\\pm\\sqrt{y}", "\\text{not a function}"]
+
+  - id: procedure_over
+    kind: content
+    template: procedure_steps
+    accent: procedure
+    title: "Procedure Over Capacity"
+    say: "Six wrapped steps over a worked strip overflow."
+    steps:
+      - { text: "Replace the function value with the limit definition, keeping the entire difference quotient visible.", math: "\\dfrac{f(a+h)-f(a)}{h}" }
+      - { text: "Expand the numerator fully before cancelling anything.", math: "4ah+2h^2" }
+      - { text: "Factor the common increment out of every term.", math: "h(4a+2h)" }
+      - { text: "Divide through by the increment.", math: "4a+2h" }
+      - { text: "Let the increment go to zero.", math: "4a" }
+      - { text: "Read off the derivative function.", math: "f'(a)=4a" }
+    worked: ["f(x)=2x^2", "f'(x)=4x"]
+
+  # -- theorem_proof (span model) ------------------------------------------
+  - id: theorem_fit
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    title: "Theorem Within Capacity"
+    say: "A short statement, two proof steps and a QED fit."
+    statement: "A function has an inverse if and only if it is one-to-one."
+    proof:
+      - "If $f$ has an inverse and $f(x_1)=f(x_2)$, apply $f^{-1}$: $x_1=x_2$."
+      - "If $f$ is one-to-one, each output $y$ has a unique source $x$; that map is $f^{-1}$."
+    qed: "So one-to-one and invertible name the same thing."
+
+  - id: theorem_over
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    title: "Theorem Over Capacity"
+    say: "A wrapped statement and five long proof steps overflow."
+    statement: "If a function is strictly increasing on an interval then it is one-to-one there, and consequently it admits an inverse on that interval."
+    proof:
+      - "Take any two distinct inputs in the interval, and without loss of generality assume the first is smaller than the second."
+      - "Strict monotonicity sends the smaller input to a strictly smaller output, so the two outputs are themselves distinct."
+      - "Hence distinct inputs always produce distinct outputs, which is exactly the one-to-one condition restated."
+      - "A one-to-one function has a well-defined inverse on its range, sending each output back to its unique source."
+      - "Therefore the inverse exists on the interval, and it is itself strictly increasing by the same argument."
+    qed: "Therefore strict monotonicity implies invertibility."
+
+  # -- recap_cards (span model) --------------------------------------------
+  - id: recap_fit
+    kind: content
+    template: recap_cards
+    accent: recap
+    title: "Recap Within Capacity"
+    say: "Four points and two cards fit two columns."
+    points:
+      - "One-to-one: distinct inputs give distinct outputs."
+      - "A function is invertible exactly when it is one-to-one."
+      - "Inverse swaps domain and range; graph reflects across $y=x$."
+      - "Find it: solve $y=f(x)$ for $x$, swap $x$ and $y$."
+    formulas:
+      - "f^{-1}(y)=x \\iff f(x)=y"
+      - "(f^{-1}\\circ f)(x)=x"
+
+  - id: recap_over
+    kind: content
+    template: recap_cards
+    accent: recap
+    title: "Recap Over Capacity"
+    say: "Seven wrapped points overflow the left column."
+    points:
+      - "One-to-one means distinct inputs always give distinct outputs, with no two inputs sharing an output value."
+      - "A function is invertible exactly when it is one-to-one over the domain in question."
+      - "The inverse swaps domain and range, and its graph is the reflection across the line $y=x$."
+      - "To find the inverse, solve $y=f(x)$ for $x$ and then interchange the names of $x$ and $y$."
+      - "Always confirm the original function is one-to-one before claiming an inverse exists."
+      - "The superscript $-1$ in $f^{-1}$ denotes the inverse function, not a reciprocal power."
+      - "Composition in either order returns the input on the appropriate domain."
+    formulas:
+      - "f^{-1}(y)=x \\iff f(x)=y"
+      - "(f^{-1}\\circ f)(x)=x"
