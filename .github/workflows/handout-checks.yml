@@ -17,6 +17,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      # quote_lint.py is stdlib-only; enforces CONTENT_SPEC §8 (curly quotes /
+      # curly apostrophe) on rendered prose, excluding math primes, attributes,
+      # code and comments. A failure means a fragment has an ASCII " or ' in prose.
+      - name: Lint prose quotes (CONTENT_SPEC §8)
+        run: python handout/quote_lint.py
+
       # build.py is stdlib-only (pathlib/re); no pip install needed.
       - name: Assemble handout (fragments -> print standalone)
         run: python handout/build.py

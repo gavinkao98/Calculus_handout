@@ -60,7 +60,7 @@
 - 駁回項各一行：`[DROP] <title> — <維度 D?>：理由`
 - 末行：本節（或全章）圖機會掃描結論。
 
-**交付給使用者裁決時**：產一份 standalone HTML（MathJax／KaTeX CDN、雙擊即開、數學即渲染、頂部裁決總表、逐條卡片），檔名 `REVIEW-ch{NN}-figure-opportunity.html`；比照 [`REVIEW-ch03-figure-opportunity.html`](REVIEW-ch03-figure-opportunity.html)。核可生成後，另產 `REVIEW-ch{NN}-figure-opportunity-applied.html`（成品報告，內嵌實際 render 截圖），比照 [`REVIEW-ch03-figure-opportunity-applied.html`](REVIEW-ch03-figure-opportunity-applied.html)。
+**分工（唯讀 gate 回文字、orchestrator 落 HTML）：** `handout-figure-opportunity-audit` subagent 唯讀（無 Write），**只回傳上述文字格式的 findings**，不自貼 HTML 原始碼。給使用者裁決的 **standalone HTML 交付稿由父代理／orchestrator** 彙整 findings 後落檔——檔名 `REVIEW-ch{NN}-figure-opportunity.html`（多節彙整一檔、逐節分塊；單節亦可 `…-sec-N-M-…`），MathJax／KaTeX CDN、雙擊即開、數學即渲染、頂部裁決總表、逐條卡片，比照 [`REVIEW-ch01-figure-opportunity.html`](REVIEW-ch01-figure-opportunity.html)／[`REVIEW-ch03-figure-opportunity.html`](REVIEW-ch03-figure-opportunity.html)。核可生成圖後，另產 `REVIEW-ch{NN}-figure-opportunity-applied.html`（成品報告，內嵌實際 render 截圖），比照 [`REVIEW-ch03-figure-opportunity-applied.html`](REVIEW-ch03-figure-opportunity-applied.html)。
 
 ## 規模升級（subagent ↔ workflow）
 

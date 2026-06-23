@@ -21,6 +21,33 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+<!-- New Computer Modern (prose/text faces) — matches MathJax 4 "mathjax-newcm" math font.
+     Source: npm web-computer-modern@1.1.0-new-cm-7-0-2 via jsDelivr. License: GUST Font License.
+     10pt optical size ("Serif 10"). NOTE: filenames contain %20-encoded spaces — keep them. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+
 <!-- MathJax 4 (CHTML output with inline line-breaking) -->
 <script>
 window.MathJax = {
@@ -67,7 +94,7 @@ window.MathJax = {
   --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
   --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
   /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
-  --serif: "Times New Roman", Times, Georgia, serif;
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
   --ui: "Inter", -apple-system, system-ui, sans-serif;
   --a-concept:  oklch(0.50 0.13 55);
   --a-result:   oklch(0.50 0.13 245);
@@ -276,11 +303,11 @@ window.MathJax = {
 .sheet {
   position: relative; box-sizing: border-box;
   width: 210mm; height: 297mm;
-  padding: 20mm 18mm 20mm 24mm;
+  padding: 20mm 28mm 20mm 32mm;
   background: #fff; overflow: hidden;
 }
 .sheet-header {
-  position: absolute; top: 11mm; left: 24mm; right: 18mm;
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
   font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
 }
 .sheet-footer {
@@ -290,7 +317,7 @@ window.MathJax = {
 .sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
 .sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
 .sheet-body .page { padding: 0; max-width: none; margin: 0; }
-.sheet-body.paper { font-size: 11pt; line-height: 1.55; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
 .sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .sheet-body > :first-child { margin-top: 0 !important; }
 .sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
@@ -331,7 +358,7 @@ window.MathJax = {
   position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
   font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
 }
-#source { position: absolute; left: -10000px; top: 0; width: 635px; }
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
 </style>
 </head>
 <body>
@@ -372,9 +399,10 @@ window.MathJax = {
      pulled into §3.1 beside tan' (same quotient-rule technique); the
      companion limit (1−cosθ)/θ → 0 added as a standard limit (D2);
      continuity slimmed (D3) — the cos/sin continuity PROOF is kept (the
-     derivative limits need it), but the definitions of continuity and of
-     even/odd are cross-referenced to Chapter 1 (not restated) and the
-     Dirichlet example is dropped; the squeeze theorem is cross-referenced
+     derivative limits need it), but the definition of continuity is
+     cross-referenced to Chapter 1 (not restated); the even-symmetry of
+     sinθ/θ is justified inline (Chapter 1 does not define even/odd), and
+     the Dirichlet example is dropped; the squeeze theorem is cross-referenced
      to §1.5, not re-stated (D4). Figure 3.1 uses the standard nesting
      △OAB ⊆ sector OAB ⊆ △OAC (½sinθ ≤ ½θ ≤ ½tanθ); the manuscript's
      transcribed middle inequality on p.3 was a slip (①-verify). No
@@ -423,7 +451,7 @@ window.MathJax = {
   <h3 class="subsec-head">A geometric inequality on the unit circle</h3>
 
   <!-- expansion:intuition — motivate the area comparison before carrying it out -->
-  <p>To get a grip on \(\sin\theta/\theta\) for small \(\theta\), we compare three areas on a circle of radius \(1\). Because both \(\theta\) and \(\sin\theta\) reverse sign when \(\theta\) is replaced by \(-\theta\), the ratio \(\sin\theta/\theta\) is unchanged — it is an <em>even</em> function (Chapter 1) — so it is enough to treat \(\theta > 0\), shrinking to \(0\). Take \(0 < \theta < \tfrac{\pi}{2}\) and look at Figure 3.1.</p>
+  <p>To get a grip on \(\sin\theta/\theta\) for small \(\theta\), we compare three areas on a circle of radius \(1\). Because both \(\theta\) and \(\sin\theta\) reverse sign when \(\theta\) is replaced by \(-\theta\), the ratio \(\sin\theta/\theta\) is unchanged — it is an <em>even</em> function — so it is enough to treat \(\theta > 0\), shrinking to \(0\). Take \(0 < \theta < \tfrac{\pi}{2}\) and look at Figure 3.1.</p>
 
   <!-- expansion:figure — sector inequality on the unit circle (ROADMAP key figure; registered in exp-ch03/figures.js as "sector-inequality") -->
   <figure class="figure" data-fig="sector-inequality">
@@ -1108,7 +1136,7 @@ window.MathJax = {
   <p>(The logarithmic and power formulas hold for \(x > 0\), the \(a^{x}\) formula for any base \(a > 0\) and all \(x\), and the \(\arcsin\) and \(\arccos\) formulas only on the open interval \(-1 < y < 1\); \(\arctan\) is differentiable for every \(y\).)</p>
   <p>With these, Chapter 3 is complete. It opened by breaking the one limit algebra could not touch, \(\lim_{\theta \to 0}\dfrac{\sin\theta}{\theta}\), with a piece of unit-circle geometry, and read off \(\sin' = \cos\) and \(\cos' = -\sin\) (§3.1). It then proved the chain rule, the rule for compositions that Chapter 2 had been missing (§3.2). Here that rule was turned loose to reach the derivatives of the logarithmic, exponential, and inverse trigonometric functions (§3.3). Together with the algebraic rules of Chapter 2, we can now differentiate essentially every function built by combining and composing the elementary ones.</p>
 
-  <p>Two debts remain, and both were taken on informally. We have used \(\dfrac{d}{dx}e^{x} = e^{x}\) from the casual series argument of Chapter 2, and we have treated \(\ln x\) as the inverse of \(e^{x}\) without ever constructing it. Chapter 4 settles both: it builds \(e^{x}\) rigorously and re-derives its derivative (§4.3), and it proves the Mean Value Theorem — the result that finally lets us define \(\ln x\) as the inverse of the strictly increasing exponential and recover \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) on solid ground (§4.5).</p>
+  <p>Two debts remain, and both were taken on informally. We have used \(\dfrac{d}{dx}e^{x} = e^{x}\) from the casual series argument of Chapter 2, and we have treated \(\ln x\) as the inverse of \(e^{x}\) without ever constructing it. Chapter 4 settles both: it builds \(e^{x}\) rigorously and re-derives its derivative (§4.3), and it proves the Mean Value Theorem (§4.4) — the result that finally lets us define \(\ln x\) as the inverse of the strictly increasing exponential and recover \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) on solid ground (§4.5).</p>
 
 </article>
 </template>

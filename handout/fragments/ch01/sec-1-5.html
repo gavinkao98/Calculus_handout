@@ -25,13 +25,13 @@
     </div>
   </section>
 
-  <p>In words, the limit of a sum / difference / constant multiple / product / integer power is the corresponding combination of the limits, and the limit of a quotient is the quotient of the limits whenever the denominator's limit is not zero.</p>
+  <p>In words, the limit of a sum / difference / constant multiple / product / integer power is the corresponding combination of the limits, and the limit of a quotient is the quotient of the limits whenever the denominator’s limit is not zero.</p>
 
   <!-- expansion:caution — the quotient law needs a nonzero denominator limit; 0/0 is a signal to simplify, not a verdict [pass: enrichment] [source: CLP-1 §1.4 arithmetic of limits] -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.7</span></p>
     <div class="env-body">
-      <p>The quotient law applies only when the denominator's limit is <em>nonzero</em>. If \(\lim_{x \to a} g(x) = 0\), the law says nothing, and you may not conclude that the quotient's limit fails to exist or that it takes any particular value. A resulting \(\tfrac{0}{0}\) is a signal to do more work — usually algebraic simplification, as in the examples below — not a verdict about the limit.</p>
+      <p>The quotient law applies only when the denominator’s limit is <em>nonzero</em>. If \(\lim_{x \to a} g(x) = 0\), the law says nothing, and you may not conclude that the quotient’s limit fails to exist or that it takes any particular value. A resulting \(\tfrac{0}{0}\) is a signal to do more work — usually algebraic simplification, as in the examples below — not a verdict about the limit.</p>
     </div>
   </section>
 
@@ -49,7 +49,7 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>We never need a formula for \(f\). By the product law, \(\lim_{x \to -1} x f(x) = (-1)(-1) = 1\); by the sum and constant-multiple laws the numerator tends to \(1 + 3 = 4\) and the denominator tends to \(2(-1) + 1 = -1\). The denominator's limit is nonzero, so the quotient law applies:
+        <p>We never need a formula for \(f\). By the product law, \(\lim_{x \to -1} x f(x) = (-1)(-1) = 1\); by the sum and constant-multiple laws the numerator tends to \(1 + 3 = 4\) and the denominator tends to \(2(-1) + 1 = -1\). The denominator’s limit is nonzero, so the quotient law applies:
         \[ \lim_{x \to -1} \frac{x f(x) + 3}{2 f(x) + 1} = \frac{4}{-1} = -4. \]</p>
       </div>
     </section>
@@ -86,7 +86,7 @@
       <div class="env-body">
         <p>The numerator and denominator are polynomials, so their limits at \(x = 1\) are computed by direct substitution:
         \[ \begin{aligned} \lim_{x \to 1}\bigl(x^{3} + 2x^{2} - 1\bigr) &= 1 + 2 - 1 = 2,\\ \lim_{x \to 1}(5 - 3x) &= 5 - 3 = 2. \end{aligned} \]
-        The denominator's limit is nonzero, so the quotient law gives
+        The denominator’s limit is nonzero, so the quotient law gives
         \[ \lim_{x \to 1} \frac{x^{3} + 2x^{2} - 1}{5 - 3x} = \frac{2}{2} = 1. \]</p>
       </div>
     </section>
@@ -111,7 +111,7 @@
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
         <ol class="sol-list">
-          <li>Take \(f(x) = 10(x - 3)\) and \(g(x) = x - 3\). Both tend to \(0\) at \(3\), yet \(\frac{f(x)}{g(x)} = 10\) wherever it is defined, so the quotient's limit is \(10\).</li>
+          <li>Take \(f(x) = 10(x - 3)\) and \(g(x) = x - 3\). Both tend to \(0\) at \(3\), yet \(\frac{f(x)}{g(x)} = 10\) wherever it is defined, so the quotient’s limit is \(10\).</li>
           <li>Replacing \(10\) by any constant \(c\) gives limit \(c\); choices such as \(f(x) = x - 3\), \(g(x) = (x - 3)^{3}\) give \(\infty\); swapping signs gives \(-\infty\); and \(f(x) = x - 3\), \(g(x) = |x - 3|\) makes the limit fail to exist.</li>
         </ol>
         <p>A \(\tfrac{0}{0}\) form can therefore equal <em>anything</em> — which is exactly why it is called indeterminate, and why we must simplify before judging.</p>
@@ -119,7 +119,7 @@
     </section>
   </div>
 
-  <!-- [FIGURE-OPPORTUNITY] removable-hole: y = (x-1)/(x^2-1) = 1/(x+1) with open hole at x = 1, showing that cancelling the common factor removes one missing point without changing the limit. Pairs with Ex 1.29–1.31. -->
+  <!-- figure-opportunity "removable-hole" → FULFILLED as Figure 1.20 below (figure-opportunity audit 2026-06-21). -->
   <div class="workedexample">
     <section class="env env-example">
       <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.29</span></p>
@@ -138,6 +138,11 @@
       </div>
     </section>
   </div>
+
+  <!-- expansion:figure — removable hole: (x-1)/(x²-1)=1/(x+1) with open point at x=1, height ½ (figure-opportunity audit 2026-06-21; fulfils the §1.5 placeholder; registered in chapter1 FIGS as "removable-hole") -->
+  <figure class="figure" data-fig="removable-hole">
+    <figcaption><span class="fig-no">Figure 1.20</span> The graph of \(y = \dfrac{x - 1}{x^{2} - 1}\) coincides with the smooth curve \(y = \dfrac{1}{x + 1}\) everywhere except at \(x = 1\), where the original is undefined — a single missing point (open circle). Cancelling the common factor fills that hole, and the limit as \(x \to 1\) is exactly the hole's height, \(\tfrac{1}{2}\).</figcaption>
+  </figure>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -213,7 +218,7 @@
       <div class="env-body">
         <p>As \(x \to 3^{+}\), the values of \(x\) lie just above \(3\), so \([x] = 3\) and \(\lim_{x \to 3^{+}} [x] = 3\). As \(x \to 3^{-}\), the values of \(x\) lie just below \(3\), so \([x] = 2\) and \(\lim_{x \to 3^{-}} [x] = 2\). The two one-sided limits differ, so \(\lim_{x \to 3} [x]\) does not exist.</p>
         <figure class="figure" data-fig="floor-function">
-          <figcaption><span class="fig-no">Figure 1.18</span> The greatest integer function \([x]\) has a jump at every integer.</figcaption>
+          <figcaption><span class="fig-no">Figure 1.21</span> The greatest integer function \([x]\) has a jump at every integer.</figcaption>
         </figure>
       </div>
     </section>
@@ -235,7 +240,7 @@
   </section>
 
   <figure class="figure" data-fig="squeeze-theorem">
-    <figcaption><span class="fig-no">Figure 1.19</span> The squeeze theorem: \(f\) is trapped between \(g\) and \(h\), which share the same limit \(L\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.22</span> The squeeze theorem: \(f\) is trapped between \(g\) and \(h\), which share the same limit \(L\).</figcaption>
   </figure>
 
   <div class="workedexample">
@@ -256,7 +261,7 @@
         Since \(\lim_{x \to 0}(-x^{2}) = 0 = \lim_{x \to 0} x^{2}\), the squeeze theorem yields
         \[ \lim_{x \to 0} x^{2} \sin\!\left(\frac{1}{x}\right) = 0. \]</p>
         <figure class="figure" data-fig="squeeze-x2sin">
-          <figcaption><span class="fig-no">Figure 1.20</span> The graph of \(y = x^{2}\sin(1/x)\) squeezed between \(y = -x^{2}\) and \(y = x^{2}\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.23</span> The graph of \(y = x^{2}\sin(1/x)\) squeezed between \(y = -x^{2}\) and \(y = x^{2}\).</figcaption>
         </figure>
       </div>
     </section>

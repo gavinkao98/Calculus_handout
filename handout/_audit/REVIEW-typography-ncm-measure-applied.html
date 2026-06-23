@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>排版變更回顧 — New Computer Modern + 12pt + 收窄版心</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<!-- New Computer Modern (prose faces) — same source as the live handout. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<style>
+@font-face { font-family:"New Computer Modern"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2"); }
+@font-face { font-family:"New Computer Modern"; font-style:italic; font-weight:400; font-display:swap;
+  src:url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2"); }
+@font-face { font-family:"New Computer Modern"; font-style:normal; font-weight:700; font-display:swap;
+  src:url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2"); }
+@font-face { font-family:"New Computer Modern"; font-style:italic; font-weight:700; font-display:swap;
+  src:url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2"); }
+</style>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  chtml: { mtextInheritFont: true, matchFontHeight: true },
+  output: { displayOverflow: 'linebreak', linebreaks: { inline: true, width: '100%', lineleading: 0.2 } },
+  startup: { typeset: true }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+
+<style>
+:root{ --ui:"Inter",system-ui,sans-serif; --tc:"Noto Sans TC",system-ui,sans-serif;
+  --c-primary:oklch(0.50 0.13 245); --a-concept:oklch(0.50 0.13 55); --a-practice:oklch(0.50 0.13 152);
+  --ink:#1b1c1f; --ink-soft:#565a63; --ink-faint:#8a8e98; --rule:#e5e7eb; }
+*{ box-sizing:border-box; }
+body{ margin:0; background:#eceef2; color:var(--ink); font-family:var(--tc); }
+header.top{ padding:30px 28px 14px; max-width:1300px; margin:0 auto; }
+header.top h1{ font:700 1.5rem/1.25 var(--tc); margin:0 0 .35em; }
+header.top p{ margin:.2em 0; color:var(--ink-soft); font-size:.95rem; }
+.legend{ display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:.85rem; }
+.legend b{ font-weight:700; }
+.metrics{ max-width:1300px; margin:8px auto 0; padding:0 28px; }
+table.m{ border-collapse:collapse; font-family:var(--ui); font-size:.85rem; background:#fff; border:1px solid var(--rule); border-radius:8px; overflow:hidden; }
+table.m th,table.m td{ padding:7px 14px; border-bottom:1px solid var(--rule); text-align:left; }
+table.m th{ background:#f6f7f9; font-weight:600; }
+table.m tr:last-child td{ border-bottom:0; }
+table.m .good{ color:oklch(0.50 0.13 152); font-weight:600; }
+table.m .bad{ color:oklch(0.52 0.16 25); font-weight:600; }
+
+.cmp{ display:flex; gap:26px; flex-wrap:wrap; align-items:flex-start; justify-content:center;
+  max-width:1320px; margin:18px auto 60px; padding:0 22px; }
+.panel{ background:#fff; box-shadow:0 2px 16px rgba(0,0,0,.12); border-radius:4px; }
+.panel .tag{ font-family:var(--ui); font-size:.72rem; font-weight:700; letter-spacing:.04em; color:#fff;
+  padding:9px 16px; border-radius:4px 4px 0 0; }
+.before .tag{ background:#8a8e98; }
+.after  .tag{ background:var(--c-primary); }
+.before .tag .sub,.after .tag .sub{ font-weight:500; opacity:.92; }
+
+/* the rendered specimen — mimics the live handout skin */
+.paper{ color:var(--ink); -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; padding:26px 30px 32px; }
+/* width = true measure + 2×30px card padding, so the TEXT column equals the real handout measure */
+.before .paper{ width:calc(168mm + 60px); font-family:"Times New Roman",Times,Georgia,serif; font-size:11pt; line-height:1.55; }
+.after  .paper{ width:calc(150mm + 60px); font-family:"New Computer Modern","Latin Modern Roman",Georgia,serif; font-size:12pt; line-height:1.55; }
+.paper p{ margin:0 0 .85em; text-align:justify; hyphens:auto; -webkit-hyphens:auto; }
+.paper em{ font-style:italic; }
+.paper .informal{ font-style:italic; color:var(--ink-soft); }
+.paper mjx-container[display="true"]{ margin:.55em 0 !important; }
+.paper .sec-title{ font-weight:600; font-size:1.7em; letter-spacing:-.012em; margin:0 0 .55em; }
+.paper .sec-no{ color:var(--c-primary); margin-right:.4em; }
+.paper .subsec-head{ font-family:var(--ui); font-weight:600; font-size:1.0rem; margin:1.2em 0 .5em;
+  display:flex; align-items:center; gap:.5em; }
+.paper .subsec-head::before{ content:""; width:18px; height:3px; background:var(--c-primary); border-radius:2px; }
+.paper .env{ margin:1.1em 0; padding-left:16px; border-left:2.5px solid color-mix(in srgb,var(--a-concept) 60%,#fff); }
+.paper .env-head{ font-family:var(--ui); margin:0 0 .5em; display:flex; gap:.5em; align-items:baseline; }
+.paper .env-kicker{ font-size:.62rem; letter-spacing:.07em; text-transform:uppercase; font-weight:700;
+  color:#fff; background:var(--a-concept); padding:3px 10px; border-radius:999px; }
+.paper .env-num{ font-weight:700; color:var(--a-concept); font-size:.94em; }
+.paper .tbl-wrap{ overflow-x:auto; margin:1em 0; }
+.paper table.tbl{ border-collapse:collapse; margin:0 auto; font-family:var(--ui); font-size:.96em;
+  border-top:1.7px solid var(--ink); border-bottom:1.7px solid var(--ink); }
+.paper table.tbl th,.paper table.tbl td{ padding:.3em .8em; text-align:center; white-space:nowrap; }
+.paper table.tbl thead th{ border-bottom:1.1px solid var(--ink-soft); font-weight:500; }
+.paper table.tbl .rowlab{ text-align:right; padding-right:1em; color:var(--ink-soft); }
+@media (max-width:1180px){ .before .paper,.after .paper{ width:92vw; max-width:560px; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>排版變更回顧 — 內文/數學統一為 New Computer Modern、12pt、收窄版心</h1>
+  <p>2026-06-22 · <code>experiment/seed-converge</code> · 四章 print-standalone 已套用。本頁用同一段真實課文（§1.1）並排呈現變更前後，數學在兩側皆即時渲染（數學字體本就是 New Computer Modern，未變）。</p>
+  <div class="legend">
+    <span><b style="color:#8a8e98">■</b> BEFORE：Times New Roman · 11pt · 版心 168mm</span>
+    <span><b style="color:var(--c-primary)">■</b> AFTER：New Computer Modern · 12pt · 版心 150mm</span>
+  </div>
+</header>
+
+<div class="metrics">
+<table class="m">
+  <tr><th>項目</th><th>變更前 (BEFORE)</th><th>變更後 (AFTER)</th><th>說明</th></tr>
+  <tr><td>內文字體</td><td>Times New Roman</td><td class="good">New Computer Modern</td><td>與數學字體（MathJax newcm）同源，字形一致</td></tr>
+  <tr><td>數學字體</td><td>New Computer Modern</td><td>New Computer Modern</td><td>MathJax 4 預設，未變</td></tr>
+  <tr><td>內文字級</td><td>11pt</td><td class="good">12pt</td><td>可讀性提升</td></tr>
+  <tr><td>版心寬</td><td>168mm</td><td class="good">150mm</td><td>邊界 L32/R28mm（講義型取向）</td></tr>
+  <tr><td>每行字數</td><td class="bad">≈ 98 cpc</td><td class="good">≈ 73–77 cpc</td><td>講義密度與可讀的折衷（上限 ~75–80 內）</td></tr>
+  <tr><td>第 1 章頁數</td><td>44</td><td>52</td><td>字大、行短 → 頁數增加（預期）</td></tr>
+  <tr><td>溢出檢查</td><td>—</td><td class="good">行間公式 / 表格 / 圖 0 溢出</td><td>瀏覽器實測通過</td></tr>
+</table>
+</div>
+
+<div class="cmp">
+  <!-- BEFORE -->
+  <section class="panel before">
+    <div class="tag">BEFORE <span class="sub">— Times New Roman · 11pt · 版心 168mm · ~98 字元/行</span></div>
+    <div class="paper" id="specimen-before"></div>
+  </section>
+  <!-- AFTER -->
+  <section class="panel after">
+    <div class="tag">AFTER <span class="sub">— New Computer Modern · 12pt · 版心 150mm · ~74 字元/行</span></div>
+    <div class="paper" id="specimen-after"></div>
+  </section>
+</div>
+
+<template id="specimen">
+  <h2 class="sec-title"><span class="sec-no">1.1</span>Inverse Functions</h2>
+
+  <p>Recall that a function \(f\) assigns a value to every input in its domain. The reverse process — recovering the input from the output — is the subject of this section. We proceed in three stages: identify which functions admit inversion (the one-to-one property), define the inverse function for those that do, and give an explicit procedure for constructing it. Before the formal definitions, two simple examples show when inversion is possible and when it is not.</p>
+
+  <h3 class="subsec-head">One-to-one functions</h3>
+
+  <p>A function can be reversed only when each output comes from exactly one input. This motivates the following definition.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.1</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be a function with domain \(A\). We say that \(f\) is <em>one-to-one</em> if
+      \[ f(x_{1}) \neq f(x_{2}) \qquad \text{whenever } x_{1} \neq x_{2}. \]
+      Equivalently, \(f\) is one-to-one if
+      \[ f(x_{1}) = f(x_{2}) \implies x_{1} = x_{2}. \]</p>
+      <p class="informal">Informally, a function is one-to-one when different inputs always produce different outputs.</p>
+    </div>
+  </section>
+
+  <p>The expression is not defined at \(x = 1\), but we can examine its values for \(x\) near \(1\):</p>
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th>\(x\)</th><th>0.9</th><th>0.99</th><th>0.999</th><th>1.001</th><th>1.01</th><th>1.1</th></tr></thead>
+      <tbody><tr><td class="rowlab">\(\frac{x-1}{x^{2}-1}\)</td><td>0.5263</td><td>0.5025</td><td>0.5003</td><td>0.4998</td><td>0.4975</td><td>0.4762</td></tr></tbody>
+    </table>
+  </div>
+  <p>The values are getting close to \(\tfrac{1}{2}\) as \(x\) approaches \(1\), so we guess
+  \[ \lim_{x \to 1} \frac{x-1}{x^{2}-1} = \tfrac{1}{2}. \]</p>
+</template>
+
+<script>
+(function(){
+  var tpl = document.getElementById('specimen').innerHTML;
+  document.getElementById('specimen-before').innerHTML = tpl;
+  document.getElementById('specimen-after').innerHTML = tpl;
+})();
+</script>
+</body>
+</html>

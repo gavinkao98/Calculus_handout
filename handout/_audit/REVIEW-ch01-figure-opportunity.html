@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 1 圖機會稽核 — 建議插圖清單（待裁決）</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{ --ink:#1a1a1a; --soft:#5c5c5c; --line:#e2e2e2; --bg:#fbfbf9;
+    --hi:#b3261e; --med:#9a6700; --low:#5c5c5c; --keep:#1a7f37; --drop:#8a8a8a; --primary:#1b5fb0; --chip:#f0f0ec; }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Helvetica Neue",system-ui,"Microsoft JhengHei",sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.65; margin:0; padding:0 0 6rem;}
+  .wrap{max-width:1000px; margin:0 auto; padding:0 1.4rem;}
+  header.top{border-bottom:3px solid var(--ink); padding:2.2rem 0 1.4rem; margin-bottom:1.6rem;}
+  h1{font-size:1.6rem; margin:0 0 .3rem;}
+  h2{font-size:1.26rem; margin:2.4rem 0 .8rem; padding-bottom:.3rem; border-bottom:2px solid var(--line);}
+  h3{font-size:1.04rem; margin:0 0 .5rem;}
+  .meta{color:var(--soft); font-size:.9rem;}
+  .lead{background:#fff; border:1px solid var(--line); border-left:4px solid var(--primary); padding:1rem 1.2rem; border-radius:5px; margin:1.2rem 0;}
+  table{border-collapse:collapse; width:100%; font-size:.9rem; margin:1rem 0;}
+  th,td{border:1px solid var(--line); padding:.5rem .6rem; text-align:left; vertical-align:top;}
+  th{background:var(--chip); font-weight:600;}
+  .badge{display:inline-block; font-size:.74rem; font-weight:700; padding:.1rem .5rem; border-radius:999px; color:#fff; white-space:nowrap;}
+  .b-hi{background:var(--hi)} .b-med{background:var(--med)} .b-low{background:var(--low)} .b-keep{background:var(--keep)} .b-drop{background:var(--drop)} .b-sec{background:var(--primary)}
+  .card{background:#fff; border:1px solid var(--line); border-radius:7px; padding:1rem 1.25rem; margin:1.1rem 0; border-left:5px solid var(--keep);}
+  .card.opt{border-left-color:var(--low);}
+  .card h3 .cid{font-family:ui-monospace,Consolas,monospace; background:var(--chip); padding:.05rem .4rem; border-radius:4px; font-size:.85rem; margin-right:.5rem;}
+  .row{margin:.4rem 0;}
+  .row .k{font-weight:600; color:var(--primary); display:inline-block; min-width:6em;}
+  .tags{margin:.3rem 0 .6rem; display:flex; gap:.4rem; flex-wrap:wrap; align-items:center;}
+  .tag{font-size:.78rem; background:var(--chip); color:var(--soft); padding:.1rem .5rem; border-radius:4px;}
+  .quote{font-style:italic; color:var(--soft);}
+  .drops{font-size:.88rem; color:var(--soft); margin:.5rem 0 0;}
+  .drops ul{margin:.3rem 0 .3rem 1.1rem; padding:0;} .drops li{margin:.18rem 0;}
+  .askbox{background:#fff8e6; border:1px solid #e8d9a0; border-radius:7px; padding:1rem 1.2rem; margin:1.2rem 0;}
+  .assess{background:#f3f8f3; border:1px solid #cfe6cf; border-radius:7px; padding:1rem 1.2rem; margin:1.2rem 0;}
+  code{font-family:ui-monospace,Consolas,monospace; background:var(--chip); padding:.05rem .3rem; border-radius:3px; font-size:.88em;}
+  .small{font-size:.85rem; color:var(--soft);}
+  hr{border:none; border-top:1px solid var(--line); margin:1.6rem 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Chapter 1 圖機會稽核 — 建議插圖清單</h1>
+  <div class="meta">
+    對象：Chapter 1 §1.1–§1.6（現況樹，已 21 張圖 Figure 1.1–1.21）· 日期：2026-06-21 ·
+    工具：<code>handout-figure-opportunity-audit</code> subagent（逐節 ×6，每節單次 run）· 性質：<strong>待裁決提案，未動任何檔</strong>
+  </div>
+</header>
+
+<div class="lead">
+  <strong>這份是什麼。</strong> 用新建的 <code>handout-figure-opportunity-audit</code> gate 對已完稿、且圖已豐富的 Chapter 1 跑一輪——目的有二：(1) 煙霧測試這個 gate 是否如預期運作、會不會 over-report；(2) 看它在飽和章還能不能挑出真缺口。逐節各一次 run（雙鏡頭＋對抗式自核），結果如下。<strong>請您裁決後我再生成圖。</strong>
+</div>
+
+<div class="assess">
+  <strong>煙霧測試評估（gate 表現）。</strong>
+  <ul style="margin:.4rem 0 0 1.1rem;padding:0;">
+    <li><strong>沒有 over-report。</strong> 在 21 圖的飽和章，每節大多只挑 1 張（§1.6 兩張、其一還自標與另一重疊），全章共 <strong>7 採納（5 medium／2 low）、約 28 駁回</strong>。多數節判「基本飽和」。</li>
+    <li><strong>駁回理由紮實、有跨章意識。</strong> 正確把 \(\sin x/x\) 扇形圖、\(|\sin x|\le|x|\) 歸還 Chapter 3 §3.1（已有 Figure 3.1），把 unit-circle 求值法判為「不忠於本節 principal-value 方法」，把 sketch 題判為洩答。</li>
+    <li><strong>抓到潛伏 placeholder。</strong> §1.5 找出作者寫稿時標在第 122 行、卻一直沒裁決的 <code>[FIGURE-OPPORTUNITY] removable-hole</code>——證明 gate 接得住 §10 placeholder 機制的產物。</li>
+    <li><strong>浮現一個限制（已知、可接受）。</strong> subagent 唯讀（Read/Grep/Glob），<strong>自己寫不出 HTML 交付物</strong>——只能把內容貼回給父代理落檔（本報告即由父代理彙整六節後寫出）。這符合「唯讀只提議」契約；HTML 落地是父代理的事。</li>
+    <li><strong>成本提醒。</strong> 個別節（如 §1.4）探索較重（百餘次工具呼叫）。日常單節 gate 成本可接受；整章一次跑六節偏重，必要時可分批。</li>
+  </ul>
+</div>
+
+<h2>1. 全章裁決總表</h2>
+<table>
+  <tr><th>節</th><th>採納候選</th><th>型</th><th>優先</th><th>駁回</th></tr>
+  <tr><td>§1.1</td><td>兩個「外形相似」三次的 HLT 對比（\(x^3-4x\) vs \(x^3+4\)）</td><td>multi-panel</td><td><span class="badge b-low">低</span></td><td>4</td></tr>
+  <tr><td>§1.2</td><td><strong>arctan 反函數鏡射</strong>（restricted tan → arctan，漸近線互換）</td><td>graph</td><td><span class="badge b-med">中</span></td><td>6</td></tr>
+  <tr><td>§1.3</td><td><strong>\(\sin(\pi/x)\) 無阻尼振盪</strong>（Caution 1.5，極限 DNE）</td><td>graph</td><td><span class="badge b-med">中</span></td><td>3</td></tr>
+  <tr><td>§1.4</td><td><strong>\(1/x^2\) vs \(1/x\) 對比</strong>（DNE-vs-∞ 觀念樞紐）</td><td>multi-panel</td><td><span class="badge b-med">中</span></td><td>4</td></tr>
+  <tr><td>§1.5</td><td><strong>可去間斷洞</strong>（兌現第 122 行既存 placeholder）</td><td>graph</td><td><span class="badge b-med">中</span></td><td>6</td></tr>
+  <tr><td>§1.6</td><td><strong>ε→δ 動態兩格對照</strong>（＋具體分段函數，低、與前者重疊）</td><td>multi-panel</td><td><span class="badge b-med">中</span> ＋ <span class="badge b-low">低</span></td><td>5</td></tr>
+</table>
+
+<div class="askbox">
+  <strong>我的建議（供裁決）。</strong>
+  <ul style="margin:.4rem 0 0 1.1rem;padding:0;">
+    <li><strong>5 張 medium 都值得一看</strong>，其中我認為最該補的兩張：<strong>§1.4 的 \(1/x^2\) vs \(1/x\) 對比</strong>（整段零圖、是 DNE-vs-∞ 的觀念樞紐）與 <strong>§1.5 的可去間斷洞</strong>（已有 placeholder、補本節唯一零圖的計算技巧區）。</li>
+    <li><strong>§1.2 arctan 鏡射</strong>有個有趣的跨章脈絡：§1.2 有 7 張圖卻沒一張畫反函數本身（鏡射）；而 ch03 §3.3 當初刻意「不在那裡畫 sin↔arcsin 鏡射、留給 Ch1」——這張正是補在 Ch1 該有的位置。值得採。</li>
+    <li><strong>§1.3、§1.6 的 medium</strong> 都補「caption/散文已承諾卻沒視覺化」的缺口（振盪 DNE、δ 隨 ε 動），可採。</li>
+    <li><strong>§1.1 的 low</strong> 採與不採皆可（強化非缺口）；§1.6 的 F2 若採 F1 就撤回。</li>
+    <li><strong>約 28 個駁回</strong>我同意維持——這正是 gate 紀律的體現，不為「飽和章」硬湊。</li>
+  </ul>
+  <div class="small" style="margin-top:.5rem">注意：這只是<strong>測試</strong>。Chapter 1 已簽核完稿；是否真要回頭補這些圖由你定。本輪價值主要在驗證 gate 可用。</div>
+</div>
+
+<h2>2. 採納候選（逐節）</h2>
+
+<div class="card">
+  <h3><span class="cid">§1.2</span>arctan 反函數鏡射：restricted tan 對 \(y=x\) 鏡射成 arctan</h3>
+  <div class="tags"><span class="badge b-med">中</span><span class="tag">graph</span><span class="tag">geometric-intuition</span></div>
+  <div class="row"><span class="k">位置</span> "The inverse tangent function" 小節，Definition 1.5 之後（值域 \((-\tfrac{\pi}{2},\tfrac{\pi}{2})\)、L172「climbs from \(-\infty\) to \(+\infty\)」）。</div>
+  <div class="row"><span class="k">教學功能</span> 同框畫 restricted \(\tan x\)（垂直漸近線 \(x=\pm\tfrac{\pi}{2}\)）、虛線 \(y=x\)、鏡射所得的 \(\arctan x\)（水平漸近線 \(y=\pm\tfrac{\pi}{2}\)、鋪滿整個 \(x\) 軸）。讓「定義域↔值域互換、垂直↔水平漸近線互換」一眼可見——arctan 接受全 \(\mathbb{R}\) 的幾何理由。</div>
+  <div class="row"><span class="k">圖&gt;文字</span> 全節 7 張圖<strong>沒有任何一張畫反三角函數本身</strong>（Fig 1.5/1.6/1.7 只畫 forward 受限分支，三張三角形是求值工具）。「鏡射」是本節核心概念（restrict-then-invert），卻只在散文與符號中。arctan 是三者中最適合示範（漸近線互換戲劇性、圖最乾淨）。</div>
+  <div class="row"><span class="k">定義域事實</span> tan 垂直漸近線 \(x=\pm\tfrac{\pi}{2}\)、arctan 水平漸近線 \(y=\pm\tfrac{\pi}{2}\)（開值域、永不觸及）；兩者端點皆不收邊、不畫端點實心。\(\pm\tfrac{\pi}{2}\) 由 <code>piTex</code> 自動補。</div>
+  <div class="row"><span class="k">與既有</span> 互補 Fig 1.7（只畫 forward 分支）；複製 §1.1 Figure 1.3 的鏡射範式到 §1.2，kit 證明可行。無 §1.2 既往 no-figure 決策。</div>
+</div>
+
+<div class="card">
+  <h3><span class="cid">§1.4</span>\(1/x^2\) vs \(1/x\) 在 \(x\to0\)：兩側同號 ⟹ 寫 \(=\infty\)；異號 ⟹ DNE</h3>
+  <div class="tags"><span class="badge b-med">中</span><span class="tag">multi-panel</span><span class="tag">function-behavior / 密度</span></div>
+  <div class="row"><span class="k">位置</span> "Infinite limits" 小節（Ex 1.21 \(1/x^2\) ＋ Ex 1.22 \(1/x\)）——<strong>整段零圖</strong>。錨句 L126「Since the values do not all grow in the same signed direction, we do not write \(\lim 1/x=\infty\)… Contrast \(1/x^2\)…」。</div>
+  <div class="row"><span class="k">教學功能</span> 並排兩 panel：左 \(1/x^2\)（兩支皆 \(\to+\infty\)）、右 \(1/x\)（左 \(\to-\infty\)、右 \(\to+\infty\)）。把「兩側同號奔 \(+\infty\) ⟹ 寫 \(=\infty\)」vs「兩側異號 ⟹ DNE」做成可一眼對比的形狀差異——整個 §1.4 infinite-limit notation 的觀念樞紐。</div>
+  <div class="row"><span class="k">定義域事實</span> 兩者在 \(x=0\) 未定義 → \(x=0\) <strong>不放任何 dot</strong>、各支到漸近線斷筆不收邊、\(x=0\) 畫紅虛 vline（漸近線）。y-range 須剪裁（同 Fig 1.16 的 B3 教訓，勿用過大 range 壓平曲線）。</div>
+  <div class="row"><span class="k">與既有</span> 不重複 Fig 1.15（一般 \(a\) 的四種單側無窮、不畫 \(1/x\)/\(1/x^2\)）；具名函數 \(1/x^2\)/\(1/x\) 在全章無圖。kit 同 Fig 1.16/1.15。</div>
+</div>
+
+<div class="card">
+  <h3><span class="cid">§1.5</span>可去間斷洞：\(\frac{x-1}{x^2-1}=\frac{1}{x+1}\) 僅在 \(x=1\) 缺一空心點</h3>
+  <div class="tags"><span class="badge b-med">中</span><span class="tag">graph</span><span class="tag">兌現既存 placeholder</span></div>
+  <div class="row"><span class="k">位置</span> Ex 1.29 上方第 122 行<strong>既存 <code>[FIGURE-OPPORTUNITY] removable-hole</code> 佔位符</strong>；錨句 \(\frac{x-1}{x^2-1}=\frac{1}{x+1},x\neq1\)（L135）、\(\lim_{x\to1}=\tfrac12\)（L137）。</div>
+  <div class="row"><span class="k">教學功能</span> 畫 \(y=\frac{x-1}{x^2-1}\)：與平滑 \(y=\frac1{x+1}\) 完全重合、僅在 \(x=1\) 有空心洞 \((1,\tfrac12)\)。讓「\(\tfrac00\) ＝函數少一個點、消因式＝填洞、極限＝洞高 \(\tfrac12\)」成為可見事實。一張圖兌現整個「indeterminate → 簡化 → 取極限」策略（惠及 Ex 1.30/1.31）。</div>
+  <div class="row"><span class="k">定義域事實</span> \(x=1\) 未定義 → \((1,\tfrac12)\) <strong>空心、切勿實心</strong>；兩側分段取樣跳過該點。另一極點 \(x=-1\) 是漸近線、與教學無關 → window 取 \(x\in[-0.2,2.5]\) 避開。\(\tfrac12\) 非整數刻度顯式 <code>tex</code>。</div>
+  <div class="row"><span class="k">與既有</span> 與 Fig 1.18/1.19/1.20（piecewise/squeeze 區）無重疊；補本節唯一零圖的代數簡化區。</div>
+</div>
+
+<div class="card">
+  <h3><span class="cid">§1.3</span>\(\sin(\pi/x)\) 在 \(x\to0\) 的無阻尼振盪：表格會騙人、極限 DNE</h3>
+  <div class="tags"><span class="badge b-med">中</span><span class="tag">graph</span><span class="tag">function-behavior</span></div>
+  <div class="row"><span class="k">位置</span> Caution 1.5（L139–140）：<span class="quote">"near 0 the graph keeps oscillating between −1 and 1 … runs through every value in [−1,1] infinitely often as x→0, so the limit does not exist."</span></div>
+  <div class="row"><span class="k">教學功能</span> 畫 \(y=\sin(\pi/x)\) 隨 \(x\to0\) 週期無限加密、在 \([-1,1]\) 不收斂；可選兩串取樣點 callout 顯示「兩張表各落不同水平線、卻都只是無限振盪的特選樣本」。把散文宣告的「表格只能 suggest、會誤導」翻成可見事件。</div>
+  <div class="row"><span class="k">定義域事實</span> \(x=0\) 未定義 → 不放點、曲線不收邊、左右拆段跳過 0 的 ε 鄰域（比照 Fig 1.20）；值域 \([-1,1]\)，<strong>切勿在 \(x=0\) 畫 dot</strong>。靠近 0 須加 <code>samples</code> 防 aliasing。</div>
+  <div class="row"><span class="k">與既有</span> 與 §1.5 Fig 1.20（<em>阻尼</em> \(x^2\sin\frac1x\)、極限<em>存在</em>=0）教<strong>相反</strong>結論，不重複；與 §1.4 漸近線 DNE（爆向 ∞）機制不同。</div>
+</div>
+
+<div class="card">
+  <h3><span class="cid">§1.6</span>ε 收緊 → δ 跟著收緊：兩格對照（動態依賴 \(\delta(\varepsilon)\)）</h3>
+  <div class="tags"><span class="badge b-med">中</span><span class="tag">multi-panel</span><span class="tag">geometric-intuition</span></div>
+  <div class="row"><span class="k">位置</span> Definition 1.13 後（L46「As the tolerance shrinks, so must the neighborhood」）；錨在 Figure 1.21 figcaption 已寫卻未兌現的「\(\delta\) depends on \(\varepsilon\)」。</div>
+  <div class="row"><span class="k">教學功能</span> 兩格同函數同 \(a\)：左大 \(\varepsilon\)→寬 \(\delta\)、右小 \(\varepsilon\)→窄 \(\delta\)，ε-strip 與 δ-鄰域同步收縮。教「δ 是 ε 的回應、ε 一縮 δ 跟著縮」——definition 的真正動詞。</div>
+  <div class="row"><span class="k">圖&gt;文字</span> 既有 Figure 1.21 是<strong>單一 \((\varepsilon,\delta)\) 靜態快照</strong>，無法呈現「depends on」這個動態（換 ε 會怎樣）。"for every \(\varepsilon>0\)" 的全稱量化＋ε→δ 對應正是本節最難內化處。</div>
+  <div class="row"><span class="k">與既有</span> 互補 Figure 1.21（答「一個 (ε,δ) 長怎樣」vs「換 ε 時 δ 怎麼動」）。<strong>低優先伴侶 F2</strong>（用課文具體分段函數 \(\varepsilon=0.1\Rightarrow\delta=0.05\)）若採 F1 則被吸收、撤回——兩者不同時獨立落地。</div>
+</div>
+
+<div class="card opt">
+  <h3><span class="cid">§1.1</span>兩個「外形相似」三次的 HLT 對比（low，可選）</h3>
+  <div class="tags"><span class="badge b-low">低</span><span class="tag">multi-panel</span><span class="tag">強化非缺口</span></div>
+  <div class="row"><span class="k">位置</span> Example 1.3（L82「looks similar to \(x^3\)」「same general shape can behave differently」）。</div>
+  <div class="row"><span class="k">教學功能</span> 兩格：左 \(x^3-4x\)（\(y=0\) 切 \(x=-2,0,2\) 三點 ⇒ 非 1-to-1）、右 \(x^3+4\)（嚴格遞增、恰交一點）。把 \(h(0)=h(2)\) 兌現成 HLT 具體影像。</div>
+  <div class="row"><span class="k">為何 low</span> 左函數代數反例已一錘定音、圖屬強化；切點 \((-2,0),(0,0),(2,0)\) 為實際取到的值 → 實心點、勿 hollow；\(-2,0,2\) 顯式 <code>tex</code>。§1.1 已有 3 圖、基本飽和，採與不採皆合理。</div>
+</div>
+
+<h2>3. 駁回項（逐節摘要；理由供翻案）</h2>
+<div class="drops">
+  <p><strong>§1.1（4）：</strong></p>
+  <ul>
+    <li>\(x^3/\sqrt[3]{x}\) 鏡射圖 — 重複 Fig 1.3（同角度第二實例）。</li>
+    <li>\(\frac3{x-5}\) 漸近線/定義域圖 — 散文已自足、與輕量代數性質不符（drift）。</li>
+    <li>攝氏↔華氏鏡射 — 純代數應用、鏡射又回 Fig 1.3 同角度、視覺資訊極稀（填頁風險）。</li>
+    <li>\(f^{-1}\) vs \(1/f\) 對比 — Caution 純記號辨析、無幾何；圖示須綁特定 \(f\)＝scope creep。</li>
+  </ul>
+  <p><strong>§1.2（6）：</strong> arcsin 鏡射、arccos 鏡射（與 arctan 同鏡頭、三擇一，採 arctan 即足）；\(\sin^{-1}\neq1/\sin\) caution（純記號）；Example 1.11 cos 多交點圖（重複 Fig 1.4 sine-not-1to1）；arccos 第二象限求值的 unit-circle（不忠於本節 principal-value 法）；arccsc/arcsec/arccot principal-range 區間圖（裝飾、本節刻意輕量）。</p>
+  <p><strong>§1.3（3）：</strong> Example 1.16「畫 lim=10 但 f(3)=0」（題目要學生自己 sketch ＝洩答）；Ex 1.17/1.18 數值表帶洞曲線（散文+表格已自足、重複 Fig 1.11 panel 3）；開場割線→切線（屬 Ch2 導數，散文明確 defer）。</p>
+  <p><strong>§1.4（4）：</strong> Prop 1.5 雙側判準（純邏輯、已由 Fig 1.13 覆蓋）；Def 1.11/Caution 1.6 \(=\infty\) 記號（重複 Fig 1.15、純記號警示）；Ex 1.24 失敗案例（抽象條件論證、可移除洞屬 §1.5）；Def 1.12/Strategy 1.3（其實例正是 Ex 1.23→Fig 1.16、Ex 1.25→Fig 1.17）。</p>
+  <p><strong>§1.5（6）：</strong> \(|x|\) V 形（散文自足、高中已知）；\([x]\) 跳階（重複 Fig 1.18，就在同一 example）；squeeze 示意（重複 Fig 1.19）；\(x^2\sin\frac1x\)（重複 Fig 1.20）；\(x\cos\frac1x\)（與 Fig 1.20 同型冗餘）；\(\sin x/x\) 扇形面積（屬 Chapter 3 §3.1 Figure 3.1、前瞻 teaser、scope creep）。</p>
+  <p><strong>§1.6（5）：</strong> 唯一性證明兩鄰域（純三角不等式、無幾何）；\(\delta=\min\{1,\varepsilon/4\}\) 取小（已是普適規則、洩答風險）；challenge-response「遊戲」mapping（修辭框架、重複 Fig 1.21、擬人敘事 over-label）；Ex 1.43 \(1/x^2=\infty\) 的 M-δ（重複 §1.4 Fig 1.16、與 ε-δ 帶狀圖同型）；Ex 1.42 \(|\sin x|\le|x|\) 夾擠（屬 Ch3 §3.1、刻意當外部事實借用）。</p>
+</div>
+
+<hr>
+<p class="small">產出：<code>handout-figure-opportunity-audit</code> subagent 逐節 ×6（每節單次 run，雙鏡頭＋對抗式自核），依 <code>handout/_audit/FIGURE-OPPORTUNITY-RUBRIC.md</code>＋<code>CONTENT_SPEC §10</code>；六節結果由父代理彙整落檔（subagent 唯讀無寫檔）。本檔為<strong>測試＋待裁決</strong>提案，未修改任何講義內容或圖。Chapter 1 已簽核完稿，是否回補由使用者定；採納者依 <code>handout/CLAUDE.md</code>「圖表系統」落地、render 自驗後跑 correctness 圖稽核（<code>FIGURE-AUDIT-RUBRIC.md</code> D1–D8）。</p>
+
+</div>
+</body>
+</html>

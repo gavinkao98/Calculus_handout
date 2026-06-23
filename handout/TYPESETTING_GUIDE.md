@@ -265,3 +265,52 @@ el.style.setProperty("--fig-w", "var(--fig-1-5)");
 - [ ] **每張圖有 `:root` 寬度變數** — `--fig-{ch}-{n}` 皆已設定
 - [ ] **單圖佈局不使用 100%** — 除非 SVG 寬度 > 650px
 - [ ] **`hydrateFigures()` 映射生效** — figcaption 圖號 → `--fig-w` 自動連結
+
+---
+
+## 9. 全域字體與版心系統（2026-06-22 拍板）
+
+本節記錄整套講義的字體與版心決策，以及一個**容易踩雷的分頁耦合**。
+
+### 9.1 字體
+
+| 角色 | 字體 | 設定處 | 備註 |
+|---|---|---|---|
+| 內文／散文（prose） | **New Computer Modern** | `--serif` | 與數學字體同源，達成 prose／math 字形一致 |
+| 數學（math） | **New Computer Modern** | MathJax 4 預設 `mathjax-newcm` | 不需設定，是 MathJax 4 內建預設；**勿改 MathJax `output.font`** |
+| UI／標籤／表格／圖說 | Inter | `--ui` | kicker、figcaption、`table.tbl`、SVG 標籤 |
+
+- **內文 NCM 來源：** webfont `web-computer-modern@1.1.0-new-cm-7-0-2`（npm，jsDelivr CDN），10pt 視覺尺寸（"Serif 10"），GUST Font License。
+  `@font-face` 寫在各 standalone 的 `<head>`（緊接 Inter 的 `<link>` 之後）。
+- **檔名含空白，URL 必須以 `%20` 編碼**（如 `WebCM%20Serif%2010%20Regular.woff2`）。用生空白或改名會 404，並**靜默退回 Times**——務必保留 `%20`。
+- `--serif` 退路鏈：`"New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif`。
+- 字級：`.sheet-body.paper { font-size: 12pt; line-height: 1.55; }`。改 `line-height` 須同步改 `.qed` 的負 margin（綁定 `1.55em`）。
+
+### 9.2 版心（measure）
+
+- **版心寬 150mm**（講義型取向）：A4 210mm，`.sheet { padding: 20mm 28mm 20mm 32mm; }`（左 32／右 28，留 4mm 裝訂偏移）。
+- 配 12pt NCM 約 **73–77 字元／行**——刻意比書籍最佳值（66）寬一點，換取講義要的密度（每頁多塞、頁數少、長 `aligned` 推導少斷行），仍在可讀上限（~75–80）內。
+- running header 對齊版心：`.sheet-header { left: 32mm; right: 28mm; }`。
+- **沿革：** 168mm／11pt Times（約 98 cpc，過寬）→ 一度收到 140mm（約 68 cpc，偏書籍級寬邊）→ 定案 150mm（講義密度與可讀的折衷，使用者 2026-06-22 拍板）。若改回更窄（如 140mm）追求閱讀舒適或留寬邊供手寫註記，見 §9.3／§9.4 的連動。
+
+### 9.3 ⚠️ 分頁耦合：改版心必同步改 `#source`（踩雷點）
+
+分頁器在離屏的 `#source > .paper > #page` 量測 MathJax 的**行內／行間公式斷行**，再把 block 搬進真正的 `.sheet-body`（垂直 fit 在真 sheet 量測，但**水平斷行沿用 staging 的結果**）。因此：
+
+> **staging 的文字寬必須等於 sheet 版心寬，否則行間公式可能溢出較窄的頁面。**
+
+staging 文字寬 = `#source` 寬 − `.paper .page` 左右 padding（2×58px = 116px）。所以：
+
+```
+#source width = 版心寬(px) + 116
+```
+
+目前 150mm = 567px → `#source { width: 683px; }`（換算：567 + 116）。**任何時候改了 `.sheet` 的左右 padding（版心寬），就要照上式重算並改 `#source` 寬**，否則含長公式的頁面會在列印時被裁切。改完務必瀏覽器實測：`mjx-container[display="true"]` 無 `scrollWidth > clientWidth`。
+
+### 9.4 表格在窄版心的配合
+
+`table.tbl` 儲存格水平 padding 維持原設計 `.8em`（`padding: .3em .8em`）；在 150mm 版心下，多欄數值表（如 7 欄極限值表，約 521px）仍能容納於縮排環境內，無需收窄。**但若版心再收窄（如曾測試的 140mm），這類表會溢出**——當時的解法是把儲存格水平 padding 收為 `.65em`。所以：**收窄版心時務必重測表格** `.tbl-wrap` 是否 `scrollWidth > clientWidth`；若溢出，先收 `.8em → .65em`，仍不夠再考慮縮表格字級。新增寬表時一律目視確認。
+
+### 9.5 四章 standalone 各自帶一份相同 CSS
+
+四個 `chapter{N}-print-standalone.html` 的 `<head>` CSS 是**各自獨立的副本**（無共用樣式表）。上述任一全域樣式（字體、版心、`#source`、表格 padding）變更時，**四個檔都要一起改**，否則章節間排版不一致。`build.py` 只替換內容區、不動 CSS shell。

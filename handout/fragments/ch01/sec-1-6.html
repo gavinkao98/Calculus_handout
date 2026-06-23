@@ -1,6 +1,8 @@
 <!-- §1.6 The Precise Definition of a Limit. Content verbatim from ch01_foundations.tex;
      worked examples E1.6-a/b + O1.6-c/d supplemented from open banks + one AI-authored
-     (O1.6-d), 2026-06-12, audit-approved. Figure 1.11 -> 1.13. -->
+     (O1.6-d), 2026-06-12, audit-approved. 2026-06-21 chapter-wide figure renumber:
+     this section now Fig 1.24 (ε-δ geometric interpretation) + 1.25 (ε→δ dynamic, new).
+     Authoritative record: handout/_audit/REVIEW-ch01-figure-opportunity-applied.html. -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -56,13 +58,18 @@
     </div>
   </section>
 
-  <p>Figure 1.21 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
+  <p>Figure 1.24 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
 
   <figure class="figure" data-fig="precise-limit">
-    <figcaption><span class="fig-no">Figure 1.21</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.24</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
   </figure>
 
-  <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\).</p>
+  <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\) (Figure 1.25).</p>
+
+  <!-- expansion:figure — ε→δ dynamic: shrink the ε-strip and the responding δ-band shrinks too (here δ=ε/2 for f=2x−1) (figure-opportunity audit 2026-06-21; registered in chapter1 FIGS as "epsilon-delta-dynamic") -->
+  <figure class="figure" data-fig="epsilon-delta-dynamic">
+    <figcaption><span class="fig-no">Figure 1.25</span> Why \(\delta\) depends on \(\varepsilon\). For \(f(x) = 2x - 1\) at \(a = 3\) (where \(L = 5\)), a generous tolerance (left, \(\varepsilon = 1\)) is met by a wide neighborhood (\(\delta = \tfrac{1}{2}\)); tightening the tolerance (right, \(\varepsilon = 0.4\)) forces a narrower one (\(\delta = 0.2\)). Each time the horizontal \(\varepsilon\)-strip narrows, the responding vertical \(\delta\)-band must narrow too — here \(\delta = \varepsilon/2\). Figure 1.24 shows a single such \((\varepsilon, \delta)\) pair; this one shows how the pair responds.</figcaption>
+  </figure>
 
   <!-- expansion:intuition — the ε-δ definition read as a challenge-and-response game [pass: enrichment] [source: CLP-1 clp_limits_notes §1.7] -->
   <p>It is useful to picture the definition as a challenge-and-response game. A skeptic names a tolerance \(\varepsilon > 0\) — how close to \(L\) they insist \(f(x)\) must be — and our job is to respond with a \(\delta > 0\) that meets the demand: every \(x\) within \(\delta\) of \(a\) (but not equal to \(a\)) is sent to within \(\varepsilon\) of \(L\). The limit equals \(L\) precisely when we can answer <em>every</em> challenge, no matter how small the \(\varepsilon\). This is why \(\varepsilon\) comes first and \(\delta\) second: \(\delta\) is chosen in reply to \(\varepsilon\).</p>

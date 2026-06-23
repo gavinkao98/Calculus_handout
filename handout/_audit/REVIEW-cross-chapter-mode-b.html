@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>跨章 Mode B 稽核 — Ch1–4 一致性（引用 + 矛盾）</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2e2; --bg:#fafafa; --card:#fff;
+    --blue:#1f5fab; --blue-bg:#eef4fb; --red:#b4232a; --red-bg:#fbeded;
+    --amber:#9a6a00; --amber-bg:#fdf6e6; --green:#236b3a; --green-bg:#edf6ef;
+    --gray-bg:#f2f2f2;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.65; margin:0; padding:0 18px 80px;}
+  .wrap{max-width:960px; margin:0 auto;}
+  header.top{padding:34px 0 12px; border-bottom:2px solid var(--ink); margin-bottom:24px;}
+  h1{font-size:1.6rem; margin:0 0 6px;}
+  .sub{color:var(--muted); font-size:.95rem;}
+  h2{font-size:1.18rem; margin:34px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--line);}
+  h3{font-size:1.02rem; margin:0 0 4px;}
+  table{border-collapse:collapse; width:100%; font-size:.92rem; margin:10px 0 6px;}
+  th,td{border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top;}
+  th{background:var(--gray-bg); font-weight:600;}
+  .num{text-align:center; font-variant-numeric:tabular-nums;}
+  .pill{display:inline-block; font-size:.74rem; font-weight:700; letter-spacing:.02em; padding:2px 8px; border-radius:999px; white-space:nowrap;}
+  .pill.block{color:var(--red); background:var(--red-bg);}
+  .pill.adv{color:var(--amber); background:var(--amber-bg);}
+  .pill.ref{color:var(--blue); background:var(--blue-bg);}
+  .pill.contra{color:#6a3aa0; background:#f1ecfa;}
+  .pill.ok{color:var(--green); background:var(--green-bg);}
+  .card{background:var(--card); border:1px solid var(--line); border-left-width:5px; border-radius:6px; padding:16px 18px; margin:16px 0;}
+  .card.block{border-left-color:var(--red);}
+  .card.adv{border-left-color:var(--amber);}
+  .card.refuted{border-left-color:#b9b9b9; background:#fbfbfb;}
+  .card .hd{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px;}
+  .card .id{font-weight:700; font-size:1.0rem;}
+  .meta{font-size:.86rem; color:var(--muted); margin:2px 0 10px;}
+  .locus{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; font-size:.82rem; background:var(--gray-bg); padding:1px 5px; border-radius:4px;}
+  .label{font-weight:600; font-size:.84rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-top:12px; margin-bottom:2px;}
+  blockquote{margin:4px 0; padding:8px 12px; background:var(--blue-bg); border-left:3px solid var(--blue); border-radius:0 4px 4px 0; font-size:.93rem;}
+  blockquote.tgt{background:#f5f0ea; border-left-color:#9a6a00;}
+  .fix{background:var(--green-bg); border:1px solid #cfe6d6; border-radius:4px; padding:8px 12px; margin-top:6px; font-size:.93rem;}
+  del{background:#fbe3e3; text-decoration:line-through; padding:0 2px;}
+  ins{background:#e1f3e6; text-decoration:none; padding:0 2px;}
+  .note{font-size:.88rem; color:var(--muted);}
+  code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; font-size:.85em; background:var(--gray-bg); padding:1px 4px; border-radius:3px;}
+  .verdict{font-size:.88rem; border-top:1px dashed var(--line); margin-top:12px; padding-top:8px; color:#333;}
+  footer{margin-top:48px; padding-top:14px; border-top:1px solid var(--line); font-size:.82rem; color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>跨章 Mode B 稽核 — Chapter 1–4 一致性</h1>
+  <div class="sub">範圍：跨章「引用正確性」與「矛盾偵測」（非單節 Keep/Rewrite/Move/Cut）。全程唯讀，所有修法皆為<strong>提議</strong>，交使用者裁決。日期 2026-06-22。</div>
+</header>
+
+<section>
+  <h2>一、方法與範圍</h2>
+  <p>對 <code>handout/fragments/ch01–ch04/sec-*.html</code> 全 20 節做跨章一致性走查，鎖定使用者指定的兩類發現：</p>
+  <ul>
+    <li><strong>引用錯誤</strong>——每個「Theorem N.M / §X.Y / Example X.Y / Figure X.Y / Chapter N」式引用是否對應到存在且型別正確的物件（<code>CONTENT_SPEC §6/§15</code> 手動編號一致性）：dangling、wrong-type、wrong-number（改版漂移）、content-mismatch、未兌現的 forward-ref。</li>
+    <li><strong>矛盾</strong>——跨章記號衝突、核心定義（函數／一對一／反函數／極限／連續／可微／指對數／級數收斂）不一致、術語漂移、跨章主張或承諾互相牴觸。</li>
+  </ul>
+  <p class="note">流程：每節抽取「編號物件＋跨章引用＋定義/記號慣例」→ 合併成全域索引 → 逐章引用解析器＋4 個主題式矛盾獵手產候選 → <strong>每個候選由敵對驗證者重讀原檔複核</strong>（預設 refute，避免 over-report）→ 完整性批判補漏再驗證。共 37 個 subagent。</p>
+</section>
+
+<section>
+  <h2>二、總覽</h2>
+  <table>
+    <tr><th class="num">抽取節數</th><th class="num">編號物件</th><th class="num">跨章引用</th><th class="num">慣例</th><th class="num">候選</th><th class="num">確認</th><th class="num">駁回</th></tr>
+    <tr><td class="num">20</td><td class="num">246</td><td class="num">414</td><td class="num">224</td><td class="num">8</td><td class="num"><strong>4</strong></td><td class="num">4</td></tr>
+  </table>
+  <p class="note">確認 4 筆中：<strong>1 筆 reader-facing 引用斷裂</strong>（F3，最該優先）、2 筆引用指向漂移（HTML 註解 / 章末 §-tag）、1 筆跨章定義域條件不一致。無一為「會誤算」的 blocking 數學錯誤。</p>
+
+  <table>
+    <tr><th>#</th><th>類別</th><th>嚴重度</th><th>位置</th><th>一句話</th></tr>
+    <tr><td>F1</td><td><span class="pill ref">reference</span></td><td><span class="pill adv">advisory</span></td><td class="locus">§1.3 header</td><td>§1.3 provenance 註解的圖號是改版前舊號（1.7→1.8、Fig 1.9），實際圖為 1.12/1.13。</td></tr>
+    <tr><td>F2</td><td><span class="pill ref">reference</span></td><td><span class="pill adv">advisory</span></td><td class="locus">§3.3 → §4.4/§4.5</td><td>章末總結把 MVT 的「證明」指到 §4.5，但 MVT（Theorem 4.12）是在 §4.4 證的。</td></tr>
+    <tr><td>F3</td><td><span class="pill ref">reference</span></td><td><span class="pill adv">advisory*</span></td><td class="locus">§3.1 → Ch1</td><td>「even function (Chapter 1)」——但第 1 章從未定義奇/偶函數，回指落空。</td></tr>
+    <tr><td>F4</td><td><span class="pill contra">contradiction</span></td><td><span class="pill adv">advisory</span></td><td class="locus">§2.4 vs §3.3/§4.5</td><td>同一事實的底數條件不一致：§2.4 寫 \(b&gt;1\)，§3.3/§4.5 兌現為 \(a&gt;0\)。</td></tr>
+  </table>
+  <p class="note">*F3 候選原標 blocking，敵對驗證者下修為 advisory（散文已就地自證、數學正確；僅 provenance pointer 斷裂）。它仍是四筆中唯一 <em>reader-facing</em> 的引用斷裂，建議列第一優先。</p>
+</section>
+
+<section>
+  <h2>三、確認的 findings（皆為提議）</h2>
+
+  <!-- F3 first: most reader-facing -->
+  <div class="card adv">
+    <div class="hd"><span class="id">F3</span><span class="pill ref">reference · dangling</span><span class="pill adv">advisory（原標 blocking）</span></div>
+    <div class="meta">citing <span class="locus">handout/fragments/ch03/sec-3-1.html:74</span> → target <span class="locus">handout/fragments/ch01/*</span>（不存在）</div>
+    <h3>§3.1 把「even function」回指到第 1 章，但第 1 章從未定義奇／偶函數</h3>
+    <p>§3.1 兩處用到「even function」並明確掛上「(Chapter 1)」歸屬；但對 <code>ch01/*.html</code> 全文做不分大小寫搜尋，找不到 even/odd function 的定義或 \(f(-x)=f(x)\) 的關係（「even」只出現在副詞用法，如 “even though”）。Chapter 1 的物件索引與慣例索引也都無此概念。回指目標不存在——讀者被送回第 1 章查定義會撲空。</p>
+    <div class="label">citing 原文</div>
+    <blockquote>Because both \(\theta\) and \(\sin\theta\) reverse sign when \(\theta\) is replaced by \(-\theta\), the ratio \(\sin\theta/\theta\) is unchanged — it is an <em>even</em> function <strong>(Chapter 1)</strong>.</blockquote>
+    <div class="label">target（缺）</div>
+    <blockquote class="tgt">Chapter 1 全章無 “even function” / “odd function” / \(f(-x)=f(x)\) / parity / symmetry 的任何定義；§1.1 是 one-to-one、inverse，§1.2 反三角，§1.3–1.6 極限與連續。</blockquote>
+    <div class="label">提議修法（擇一，使用者裁決）</div>
+    <div class="fix">
+      (a) 拿掉誤導的回指，讓就地論證自足（該句已給一行理由：\(\theta\) 與 \(\sin\theta\) 同時變號）：<br>
+      …the ratio \(\sin\theta/\theta\) is unchanged — it is an <em>even</em> function<del> (Chapter 1)</del>.<br>
+      或 (b) 在第 1 章補一條 even/odd function 的定義，讓回指成立。<br>
+      <span class="note">另：§3.1 開頭 line 23–25 的 authoring 註解寫「even/odd 交叉引用到 Chapter 1（不重述）」——其前提（Ch1 有定義）為假，採 (a) 時請一併修正該註解。</span>
+    </div>
+    <div class="verdict"><strong>裁決</strong>：isReal=true，confidence=high。Figure 3.2 caption（line 144）也說「The ratio is even」但<strong>無</strong>「(Chapter 1)」掛勾，不算斷裂；僅 line 74 一處。</div>
+  </div>
+
+  <!-- F2 -->
+  <div class="card adv">
+    <div class="hd"><span class="id">F2</span><span class="pill ref">reference · wrong-number</span><span class="pill adv">advisory</span></div>
+    <div class="meta">citing <span class="locus">handout/fragments/ch03/sec-3-3.html:247</span> → target <span class="locus">§4.4（Theorem 4.12）</span></div>
+    <h3>§3.3 章末總結把 Mean Value Theorem 的「證明」指到 §4.5，實際在 §4.4</h3>
+    <p>MVT（Theorem 4.12）在 §4.4 陳述並完整證明；§4.5 只是<strong>引用／應用</strong>它。§3.3 總結句中整段 MVT 子句唯一的 §-tag 是「(§4.5)」，§4.4 完全沒出現，讀者循指標找 MVT 證明會落到只有應用的 §4.5。「(§4.5)」對子句後半（定義 \(\ln x\)、回收 \(\frac{d}{dx}\ln x=\frac1x\)）是對的——所以這是「位置指標漂移」，非 dangling。佐證：§4.5 自己（line 239）就把 MVT 正確歸給 §4.4。</p>
+    <div class="label">citing 原文</div>
+    <blockquote>Chapter 4 settles both: it builds \(e^{x}\) rigorously and re-derives its derivative (§4.3), and it proves the Mean Value Theorem — the result that finally lets us define \(\ln x\) … and recover \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) on solid ground <strong>(§4.5)</strong>.</blockquote>
+    <div class="label">target</div>
+    <blockquote class="tgt">sec-4-4.html：<code>Theorem 4.12 — Mean Value Theorem</code>（含完整 env-proof）。sec-4-5.html:167 僅「The Mean Value Theorem (Theorem 4.12) … supplies a \(c\)…」（應用）。</blockquote>
+    <div class="label">提議修法</div>
+    <div class="fix">把 MVT 歸 §4.4、ln 構造留 §4.5：<br>
+      …and it proves the Mean Value Theorem<ins> (§4.4)</ins> — the result that finally lets us define \(\ln x\) … on solid ground (§4.5).
+    </div>
+    <div class="verdict"><strong>裁決</strong>：isReal=true，confidence=medium（寬容讀者可能不被誤導，但「proves the MVT」的字面指標確實指錯節）。</div>
+  </div>
+
+  <!-- F4 -->
+  <div class="card adv">
+    <div class="hd"><span class="id">F4</span><span class="pill contra">contradiction · domain-condition</span><span class="pill adv">advisory</span></div>
+    <div class="meta">citing <span class="locus">handout/fragments/ch02/sec-2-4.html:278（Remark 2.6）</span> ↔ <span class="locus">§3.3 Ex 3.8 / §4.5 Ex 4.5</span></div>
+    <h3>一般底數指數導數：承諾處寫 \(b&gt;1\)，兌現處寫 \(a&gt;0\)</h3>
+    <p>同一事實 \(\frac{d}{dx}b^{x}=b^{x}\ln b\)，在 §2.4 Remark 2.6 forward-promise 時限定「a general base \(b&gt;1\)」；它前指的 chain-rule 推導（§3.3 Example 3.8）與嚴格冪定義（§4.5 Example 4.5）都寫「any base \(a&gt;0\)」。\(b&gt;1\) 的限制其實多餘（對每個 \(b&gt;0\) 都成立，\(0&lt;b&lt;1\) 只是 \(\ln b&lt;0\)），讀者讀完 §3.3 回頭看 §2.4 會疑惑 \((0,1)\) 是否被刻意排除。公式內容一致，僅承諾／兌現對的底數條件不一致。</p>
+    <div class="label">citing（§2.4 Remark 2.6）</div>
+    <blockquote>For a general base \(b &gt; 1\), the exponential \(b^{x}\) is differentiable too, with \(\frac{d}{dx}\,b^{x} = b^{x}\,\ln b\) … We will be able to derive this cleanly once the chain rule is available (Chapter 3).</blockquote>
+    <div class="label">target（§3.3 / §4.5）</div>
+    <blockquote class="tgt">§3.3 Ex 3.8：「The same rewrite gives \(\frac{d}{dx}a^{x}=a^{x}\ln a\) for any base \(a&gt;0\).」　§4.5 Ex 4.5：「For \(a&gt;0\), define the power \(a^{x}=e^{x\ln a}\)…」</blockquote>
+    <div class="label">提議修法</div>
+    <div class="fix">放寬 §2.4 Remark 2.6 的條件對齊兌現處：<br>
+      For a general base \(b &gt; <del>1</del><ins>0</ins>\)…（若要排除常數底，寫 \(b&gt;0,\ b\neq 1\)）；除非 \(b&gt;1\) 是刻意的，則補一行理由。
+    </div>
+    <div class="verdict"><strong>裁決</strong>：isReal=true，confidence=medium（無錯誤結果，實務影響有限，故 advisory）。</div>
+  </div>
+
+  <!-- F1 -->
+  <div class="card adv">
+    <div class="hd"><span class="id">F1</span><span class="pill ref">reference · renumbering drift</span><span class="pill adv">advisory（非 reader-facing）</span></div>
+    <div class="meta">citing <span class="locus">handout/fragments/ch01/sec-1-3.html:3（header comment）</span></div>
+    <h3>§1.3 provenance 註解的圖號停在改版前的中間號</h3>
+    <p>§1.3 頂部註解寫「Figure 1.7 → 1.8; new Fig 1.9 (read-from-graph)」，是 2026-06-21 全章圖號重編<strong>前</strong>的舊號。重編後 §1.3 實際圖為 1.12（three functions with the same limit）與 1.13（read-from-graph）；本節無 Fig 1.8，read-from-graph 圖現為 1.13 不是 1.9（1.9 現屬 §1.2 的 arctan 反射圖）。<strong>正文與 figcaption 都已用最終號（1.12/1.13），無 reader-facing 引用斷裂</strong>——漂移僅限這條 bookkeeping 註解。對照 §1.4 的 header 已更新到最終號，§1.3 成了唯一漏網。</p>
+    <div class="label">citing 原文</div>
+    <blockquote>&lt;!-- §1.3 … audit-approved. Figure 1.7 -&gt; 1.8; new Fig 1.9 (read-from-graph). --&gt;</blockquote>
+    <div class="label">提議修法</div>
+    <div class="fix">把 §1.3 header 註解更新到最終號，比照 §1.4 風格：<br>
+      Figures now <ins>1.12 (three-functions) and 1.13 (read-from-graph) after the 2026-06-21 chapter-wide renumber; authoritative record: handout/_audit/REVIEW-ch01-figure-opportunity-applied.html</ins>。<span class="note">非 blocking，不影響任何讀者可見引用。</span>
+    </div>
+    <div class="verdict"><strong>裁決</strong>：isReal=true，confidence=high。權威紀錄 REVIEW-ch01-figure-opportunity-applied.html 確認 1.11→1.12、1.12→1.13 的重編。</div>
+  </div>
+</section>
+
+<section>
+  <h2>四、駁回的候選（敵對驗證後判定非 finding，列出以示無漏報）</h2>
+  <p class="note">完整性批判另提了 6 個深掘候選，其中 4 個經重讀原檔後判為非 finding（多屬「discoverability gap / editorial drift」第②③級，依專案規則不報為 finding）。列此供查核，避免 silent screening。</p>
+
+  <div class="card refuted">
+    <div class="hd"><span class="id">R1</span><span class="pill ok">非 finding</span></div>
+    <h3>§1.6「systematic study of continuity … a later chapter」是否落空？</h3>
+    <p class="note">否。<code>CONTENT_ROADMAP.md</code> 顯示整書約 14 章、Ch5–14 為 planned（TBD）。這是指向<strong>四章範圍之外</strong>的 intended forward reference，非斷裂承諾。</p>
+  </div>
+
+  <div class="card refuted">
+    <div class="hd"><span class="id">R2</span><span class="pill ok">非 finding</span></div>
+    <h3>§4.5 用 ln 為 \(e^x\) 反函數，卻未回鏈 §1.1 Theorem 1.1（one-to-one ⟺ invertible）／y=x 反射慣例</h3>
+    <p class="note">否。§4.4/§4.5 與 §1.1 完全一致、無錯；只是「可加一條 cross-ref」的增益建議。§4.5 header 記錄交叉引用是 decision ③ 核可範圍（已指 §3.3、§4.1，未含回指 §1.1）。屬第②③級，不報。</p>
+  </div>
+
+  <div class="card refuted">
+    <div class="hd"><span class="id">R3</span><span class="pill ok">非 finding</span></div>
+    <h3>§2.1 Remark 2.1 用「differentiable」早於 Definition 2.3（§2.3）？</h3>
+    <p class="note">否。用在非正式 intuition Remark，且就地以「tangent line / local linearity」自證；§2.2 結尾（line 207）明確 forward-point 到 §2.3 的 differentiability——標準「先非正式、後正式」教學鋪陳，無誤導。</p>
+  </div>
+
+  <div class="card refuted">
+    <div class="hd"><span class="id">R4</span><span class="pill ok">非 finding</span></div>
+    <h3>連續性定義只在 §1.6，§2.3 用 \(\lim f=f(a)\) 卻未回引 §1.6？</h3>
+    <p class="note">否。§1.6 自陳是「informal 順帶提及，系統研究留待後章」，非須被引用的正式 single-source 定義框；§2.3 就地用該判準是標準做法；§3.1 的回引是該節 dev-comment 的刻意選擇，非全 repo 強制慣例。兩式數學等價，屬編輯細節。</p>
+  </div>
+</section>
+
+<section>
+  <h2>五、修正落地 + Gate-2 回歸審核（Codex 獨立複核）</h2>
+  <p>使用者裁決後落實全部四筆（F1–F4），重建 <code>chapter{1,2,3}-print-standalone.html</code>（KaTeX 無 render 錯誤），再送 Codex（codex-cli 0.136.0 · gpt-5.5 · read-only · reasoning xhigh）獨立回歸審核。</p>
+  <table>
+    <tr><th>#</th><th>修正</th><th>Codex 判定</th></tr>
+    <tr><td>F3</td><td>§3.1 移除「(Chapter 1)」+ 修正 D3 authoring 註解</td><td><span class="pill ok">PASS</span>（ch01 搜尋 even/odd 無命中；句內自證 even-symmetry；§1.6 確有連續性定義）</td></tr>
+    <tr><td>F2</td><td>§3.3 總結 MVT 標 (§4.4)、ln 構造留 (§4.5)</td><td><span class="pill ok">PASS</span>（MVT = Theorem 4.12 確在 §4.4:143 並由 Rolle 證出；§4.5 負責 Definition 4.4 + d/dx ln x = 1/x）</td></tr>
+    <tr><td>F4</td><td>§2.4 Remark 2.6 條件 \(b&gt;1\) → \(b&gt;0\)</td><td><span class="pill ok">PASS</span>（與 §3.3:129 / §4.5:200 的 \(a&gt;0\) 一致；後文「\(\ln b=1\) when \(b=e\)」對 \(b&gt;0\) 仍正確，無對 \(b&gt;1\) 的隱性依賴）</td></tr>
+    <tr><td>F1</td><td>§1.3 header 註解更新到最終圖號</td><td><span class="pill ok">PASS</span>（註解、正文、figcaption 一致為 1.12 / 1.13）</td></tr>
+  </table>
+  <p class="note"><strong>四筆指定修正全部 PASS，未引入新問題。</strong></p>
+
+  <p>Codex 另查出 <strong>2 個既有（非本次引入）、非 reader-facing 的同類 authoring-note 漂移</strong>——與 F1 同屬「provenance/handoff 註解落後於正文」，本輪跨章 workflow 漏覆蓋（只抓到 §1.3 一處 header）：</p>
+  <div class="card adv">
+    <div class="hd"><span class="id">C1</span><span class="pill ref">reference · renumbering drift</span><span class="pill adv">advisory（非 reader-facing，既有）</span><span class="pill ok">已修正 · PASS</span></div>
+    <div class="meta"><span class="locus">handout/fragments/ch01/sec-1-6.html:3</span></div>
+    <h3>§1.6 header 註解圖號陳腐</h3>
+    <p>header 寫「<code>Figure 1.12 -&gt; 1.13.</code>」,但 §1.6 正文實際圖號為 <strong>Figure 1.24</strong>（line 59/62,ε-δ 幾何）與 <strong>Figure 1.25</strong>（line 65）。同 F1 機械修正:更新註解到最終號（並可比照 §1.4 指向 authoritative record）。</p>
+  </div>
+  <div class="card refuted">
+    <div class="hd"><span class="id">C2</span><span class="pill ref">reference · handoff-note</span><span class="pill ok">已撤回 · 誤報</span></div>
+    <div class="meta"><span class="locus">handout/fragments/ch04/sec-4-4.html:42–43</span></div>
+    <h3>§4.4「Counters handed to §4.5」——<del>判為 drift（曾修）</del> → 經第六節 header 全掃後<strong>撤回為誤報，原修改已還原</strong></h3>
+    <p><strong>更正：</strong>本筆當初（連同 Codex gate-2）把「Counters handed to §4.5」誤讀為「下一節會 mint 什麼」,因而認為「Strategy 4.3」是 phantom、「Theorem 4.13」漏了 4.14。第六節的 header 全掃證明:本 repo 的「handed to」記的是**交棒當下各 per-type counter 的「下一個可用值」（next-available）**,不是下一節的 mint 清單。決定性證據是未經改動的 §4.3→§4.4 交棒同樣列了「Proposition 4.3」,而 §4.4 不 mint proposition——該值原封傳到 §4.5 才被 mint。據此,**原本的** §4.4 交棒「… Theorem 4.13, Proposition 4.3, Corollary 4.4, Strategy 4.3, …, Remark 4.5」全是正確的 next-available 值。<strong>原修改已還原</strong>（sec-4-4.html 回到動手前的工作樹原文）;C2 重新歸類為非 finding。教訓:改 header bookkeeping 前須先確認該欄位的語義慣例。</p>
+  </div>
+  <p class="note"><strong>Gate-2 verdict（Codex，兩輪）：</strong>第一輪——四筆指定修正 F1–F4 全部 PASS、未引入新問題；另查出 C1/C2 兩條同類既有陳腐註解，總判 ISSUE。經使用者裁決「兩個都修」後，C1/C2 已落地、重建、由 Codex 接續同一 session 複核：C1 PASS、C2 PASS，F1–F4 仍維持 PASS。<strong>但隨後的 header 全掃（第六節）推翻了 C2：</strong>「handed to」語義被誤讀，C2 實為誤報、原修改已還原；<strong>有效結論為 F1–F4 + C1 PASS。</strong></p>
+</section>
+
+<section>
+  <h2>六、Header 註解全掃（fragment 頂部 provenance/handoff vs 正文）</h2>
+  <p>應使用者要求，對全 20 節做一輪 header/inline 註解 vs 正文編號的徹底掃描（workflow，42 subagents，read-only）。抽出 <strong>252</strong> 條 numbering 宣稱、對照 <strong>245</strong> 個正文編號物件，敵對驗證後候選 3 筆 → <strong>確認 2、駁回 1，0 reader-facing</strong>。兩筆確認皆與 F1/C1 同類（comment-only 陳腐號）；駁回的那筆反而揭露了 C2 的語義誤讀（見第五節 C2 撤回）。</p>
+  <table>
+    <tr><th>#</th><th>類別</th><th>位置</th><th>結果</th><th>一句話</th></tr>
+    <tr><td>H1</td><td><span class="pill ref">figure-renumber</span></td><td class="locus">§1.4 header line 3</td><td><span class="pill ok">已修正</span></td><td>誤植的舊圖號 changelog「1.8-1.10 → 1.10-1.12」（屬 §1.2/§1.3，§1.4 從未有此號）。</td></tr>
+    <tr><td>H2</td><td><span class="pill ref">cross-ref</span></td><td class="locus">§2.5 header line 13</td><td><span class="pill ok">已修正</span></td><td>凍結 ③-decision label「(F) Ex 2.16」未隨改版更新（現為 2.20）。</td></tr>
+    <tr><td>H3</td><td><span class="pill contra">handed-to</span></td><td class="locus">§4.3 → §4.4</td><td><span class="pill ok">駁回（正確）</span></td><td>「Proposition 4.3」非 phantom——是 next-available 值，§4.4 不消耗、傳至 §4.5。此筆揭露交棒語義 → 連帶撤回 C2。</td></tr>
+  </table>
+
+  <div class="card adv">
+    <div class="hd"><span class="id">H1</span><span class="pill ref">reference · renumbering drift</span><span class="pill adv">advisory（非 reader-facing）</span><span class="pill ok">已修正</span></div>
+    <div class="meta"><span class="locus">handout/fragments/ch01/sec-1-4.html:3</span></div>
+    <h3>§1.4 header line 3 誤植舊圖號 changelog</h3>
+    <p>line 3「Figures 1.8-1.10 -&gt; 1.10-1.12 (two new figures added upstream in §1.1, §1.3)」是誤植——§1.4 正文圖號為 1.14–1.19（同 header line 5 已正確記載），且 <code>git log -S "Figure 1.10"</code> 在 §1.4 正文史上<strong>毫無命中</strong>（§1.4 從未有 body 圖號 1.10；該 1.10-1.12 範圍屬 §1.2/§1.3）。<strong>修法</strong>：刪除誤植的 line 3，保留 line 4–5 的正確 dated record。已落地。</p>
+  </div>
+
+  <div class="card adv">
+    <div class="hd"><span class="id">H2</span><span class="pill ref">reference · stale label</span><span class="pill adv">advisory（非 reader-facing）</span><span class="pill ok">已修正</span></div>
+    <div class="meta"><span class="locus">handout/fragments/ch02/sec-2-5.html:13</span></div>
+    <h3>§2.5 凍結 ③-decision label 的 example 號未更新</h3>
+    <p>2026-06-08 的凍結決策標籤「(F) Ex 2.16 uses x/(x^2+1)」名為 2.16,但該 worked example 經 2026-06-22 改版後正文為 <strong>Example 2.20</strong>（同 header lines 18-20 自己記了「old 2.16 → 2.20」）。<strong>修法</strong>：標註為「(F) Ex 2.16 → 2.20 uses x/(x^2+1)」（沿用同 header 既有的「old X → Y」記法，保留原決策 id）。已落地。</p>
+  </div>
+
+  <div class="card refuted">
+    <div class="hd"><span class="id">H3</span><span class="pill contra">handed-to</span><span class="pill ok">駁回（正確判斷）</span></div>
+    <div class="meta"><span class="locus">handout/fragments/ch04/sec-4-3.html header</span> → <span class="locus">§4.4</span></div>
+    <h3>§4.3「Counters handed to §4.4: … Proposition 4.3 …」非 phantom</h3>
+    <p>初判疑「Proposition 4.3」是 phantom（§4.4 不 mint proposition）。敵對驗證者正確駁回:此 repo 的「handed to」＝交棒當下各 per-type counter 的 <strong>next-available 值</strong>。§4.3 末個 proposition 是 4.2 → 下一個 4.3;§4.4 不消耗它,原封傳到 §4.5 才 mint（§4.5 確 mint Proposition 4.3「logarithm product law」）。<strong>此筆同時推翻了第五節的 C2</strong>——同一語義下,原 §4.4→§4.5 交棒的「Strategy 4.3 / Theorem 4.13 / Remark 4.5」皆為正確 next-available 值,C2 的「修正」其實改錯、已還原。</p>
+  </div>
+  <p class="note"><strong>本輪淨結果：</strong>修正 2 筆真陳腐註解（H1、H2，皆 comment-only）、還原 1 筆誤報（C2）。連同前幾輪,目前樹中所有經查的 header bookkeeping 與正文一致。</p>
+  <p class="note"><strong>Gate-2 第三輪（Codex，接續同一 session）：</strong>R3-1（C2 還原）、R3-2（H1）、R3-3（H2）<strong>全數 PASS</strong>；Codex 自行用 <code>git log -G</code> 核對 §1.4 無誤刪，並<strong>正式撤回上一輪對 C2 的判定</strong>（確認「handed to」為 next-available 語義、原 C2「修正」係誤報）。先前 F1–F4、C1 仍有效 PASS。<strong>最終 gate-2 總判定：PASS，可放行。</strong></p>
+</section>
+
+<footer>
+  <p>Mode B 護欄：本稽核唯讀；逐標記與新發現一律<strong>提議</strong>、交使用者裁決。F1–F4、C1、H1、H2 經使用者核可後落實；C2 經 header 全掃判為誤報並還原。每一輪修正後均重建並回歸審核。「Move/重編號」類一律僅提議。</p>
+  <p>產生：cross-chapter-mode-b workflow（37 subagents，每候選經敵對驗證）。原始輸出見 task <code>woyio4hf5</code>。本檔為待裁決審核稿，依 CLAUDE.md「待裁決交付物用打開即讀的 standalone HTML」規範。</p>
+</footer>
+
+</div>
+</body>
+</html>

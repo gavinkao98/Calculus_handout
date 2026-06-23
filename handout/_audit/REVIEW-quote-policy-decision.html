@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>引號政策裁決簡報 — CONTENT_SPEC §8 vs ch01–04 實務</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #6b6b6b; --line: #e0e0e0;
+    --bg: #fbfbf9; --card: #ffffff;
+    --good: #1f7a44; --good-bg: #eaf6ee;
+    --warn: #9a5b00; --warn-bg: #fdf3e3;
+    --bad: #a3232a;  --bad-bg: #fbecec;
+    --code-bg: #f4f4f2; --accent: #2d5a8a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Inter", "Noto Sans TC", system-ui, -apple-system, sans-serif;
+    color: var(--ink); background: var(--bg); line-height: 1.65;
+    max-width: 920px; margin: 0 auto; padding: 2.4rem 1.6rem 5rem;
+  }
+  h1 { font-size: 1.55rem; line-height: 1.3; margin: 0 0 .3rem; }
+  .sub { color: var(--muted); font-size: .95rem; margin: 0 0 2rem; }
+  h2 { font-size: 1.2rem; margin: 2.4rem 0 .6rem; padding-bottom: .3rem;
+       border-bottom: 2px solid var(--line); }
+  h3 { font-size: 1.02rem; margin: 1.4rem 0 .4rem; }
+  code, .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+                font-size: .9em; background: var(--code-bg); padding: .08em .35em;
+                border-radius: 3px; }
+  table { border-collapse: collapse; width: 100%; margin: .8rem 0 1rem; font-size: .92rem; }
+  th, td { border: 1px solid var(--line); padding: .42rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #f0f0ee; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+          padding: 1rem 1.2rem; margin: 1rem 0; }
+  .tag { display: inline-block; font-size: .78rem; font-weight: 600; padding: .1rem .5rem;
+         border-radius: 999px; vertical-align: middle; }
+  .tag.good { color: var(--good); background: var(--good-bg); }
+  .tag.warn { color: var(--warn); background: var(--warn-bg); }
+  .tag.bad  { color: var(--bad);  background: var(--bad-bg); }
+  .pill { font-weight: 700; }
+  blockquote { margin: .6rem 0; padding: .5rem 1rem; border-left: 3px solid var(--accent);
+               background: #f3f6fa; color: #2a2a2a; }
+  .opt { border-radius: 10px; padding: 1.1rem 1.3rem; margin: 1rem 0; border: 1px solid var(--line); }
+  .opt.rec { border: 2px solid var(--good); background: var(--good-bg); }
+  .opt h3 { margin-top: 0; }
+  .opt .verdict { font-weight: 700; }
+  .kv { color: var(--muted); font-size: .9rem; }
+  .small { font-size: .86rem; color: var(--muted); }
+  ul.tight { margin: .3rem 0 .6rem; padding-left: 1.3rem; }
+  ul.tight li { margin: .15rem 0; }
+  .ch { color: var(--bad); font-weight: 700; }
+  .chg { color: var(--good); font-weight: 700; }
+  .hl { background: #fff3b0; padding: 0 .15em; border-radius: 2px; }
+  .foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line);
+          font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>引號政策裁決簡報</h1>
+<p class="sub">CONTENT_SPEC §8（彎引號規定）vs handout/fragments ch01–04 實務 · 全書範圍 · 2026-06-21</p>
+
+<div class="card">
+  <strong>一句話結論：</strong>原本的二分（「改 spec 對齊實務」vs「全書 lint 成彎引號」）其實不成立——
+  <em>雙引號</em>實務已大致遵守 §8（19 對彎 vs 6 對直），那 6 對直引號是 drift，<span class="chg">哪個方向都該修</span>；
+  真正要裁的只剩一件窄事：<span class="hl">possessive 撇號（<code>Rolle's</code> 等）要轉成彎撇號 <code>&rsquo;</code>（U+2019），還是放寬 §8 容許 ASCII 直撇號 <code>'</code></span>。
+  全書共 <span class="pill">26 個直撇號 + 6 對直雙引號 ≈ 32 處</span>，修改機械且安全。
+</div>
+
+<div class="opt rec" style="margin:1.4rem 0 .4rem;">
+  <h3 style="margin-top:0;">✓ 已裁決並執行：方案 A（全轉彎引號）　<span class="tag good">2026-06-21 done</span></h3>
+  <p class="verdict">使用者裁定方案 A。以下已套用並通過回歸驗證：</p>
+  <ul class="tight">
+    <li><strong>26 個 prose 撇號 → <code>&rsquo;</code>（U+2019）</strong>：sec-1-1/1-2/1-4/1-5、sec-2-2、sec-3-2、sec-4-3/4-4/4-5。全 possessive，方向唯一。</li>
+    <li><strong>6 對 prose 直雙引號 → <code>&ldquo;&hellip;&rdquo;</code></strong>：sec-2-1（3 對）、sec-4-4（3 對）。逐一驗 codepoint：開引號全 U+201C 在詞前、關引號全 U+201D 在詞後。</li>
+    <li><strong>§8 文字補強</strong>：明文「possessive 撇號用 U+2019」，並列出例外（數學 prime <code>f'</code>、HTML 屬性 <code>"..."</code> MUST 保持 ASCII）。</li>
+    <li><strong>新增 lint</strong> <code>handout/quote_lint.py</code>（結構分類器，stdlib-only），<strong>掛進 CI</strong> <code>handout-checks.yml</code>（build 前先 lint）。填補執法缺口。</li>
+    <li><strong>重建 standalone</strong> <code>python handout/build.py</code>（idempotent）。</li>
+  </ul>
+  <p class="kv"><strong>回歸驗證：</strong>全書 prose ASCII 引號 <code>'</code>／<code>"</code> = <strong>0</strong>；數學 prime 仍 <strong>311</strong> 個未被觸碰；HTML 屬性 <code>"</code> 仍 <strong>4286</strong> 個未被觸碰；<code>quote_lint.py</code> clean（20 檔）。</p>
+  <p class="small">註：執行時 working tree 已有另一項未提交工作（圖機會稽核 gate／ch03 Figure 3.6），與本次引號改動在 <code>CONTENT_SPEC.md</code>、<code>sec-3-2.html</code> 兩檔夾雜——commit 時需分流。</p>
+</div>
+
+<h2>1 · CONTENT_SPEC §8 怎麼規定</h2>
+<blockquote>
+  <strong>引號</strong><br>
+  · 散文中的雙引號：直接用 Unicode curly quotes <code>&ldquo;&hellip;&rdquo;</code>（檔案為 UTF-8）。<br>
+  · 單引號：<code>&lsquo;&hellip;&rsquo;</code>。<br>
+  · <strong>MUST NOT</strong> 在 fragment 中使用 straight ASCII <code>"..."</code>。
+  （&hellip;引號／省略號的一致性靠手動與下游 lint 檢查。）
+</blockquote>
+<p class="small">同章 §8 已強制 Unicode em dash <code>&mdash;</code>、en dash <code>&ndash;</code>、省略號 <code>&hellip;</code>、
+彎雙引號——「用正統 Unicode 排版、不用 ASCII」是 §8 一以貫之的精神。</p>
+<p><strong>注意兩個語意縫隙：</strong></p>
+<ul class="tight">
+  <li>§8 的「單引號 <code>&lsquo;&hellip;&rsquo;</code>」字面只規範<em>成對的單引號引用</em>（quote-within-quote），
+      <span class="ch">並未明文規範 possessive／contraction 的撇號</span>。</li>
+  <li>「MUST NOT 用 ASCII <code>"..."</code>」字面只點名<em>雙引號</em>；撇號 <code>'</code> 不在字面之內，但在精神之內。</li>
+</ul>
+
+<h2>2 · 全書實際盤點（程式精確分類，非抽樣）</h2>
+<p class="small">以結構分類器逐字判定每個 ASCII <code>'</code>／<code>"</code> 落在哪個 context；
+優先序 comment &gt; math &gt; code &gt; tag(屬性) &gt; <strong>prose</strong>。只有 prose 的才算 §8 違規。</p>
+
+<table>
+  <thead><tr><th>Context</th><th class="num">ASCII <code>'</code></th><th class="num">ASCII <code>"</code></th><th>判讀</th></tr></thead>
+  <tbody>
+    <tr><td>tag（HTML 屬性 <code>class="..."</code>）</td><td class="num">—</td><td class="num">4286</td><td><span class="tag good">合法</span> 必須保持 ASCII</td></tr>
+    <tr><td>math（<code>\(f'\)</code>、<code>f''</code> prime 記號）</td><td class="num">311</td><td class="num">—</td><td><span class="tag bad">禁止觸碰</span> MathJax prime，轉了會壞數學</td></tr>
+    <tr><td>comment（authoring note）</td><td class="num">122</td><td class="num">86</td><td><span class="tag warn">不渲染</span> 嚴格說違字面，但非 rendered prose</td></tr>
+    <tr><td><strong>prose（rendered 散文）</strong></td><td class="num"><strong>26</strong></td><td class="num"><strong>12</strong> (=6 對)</td><td><span class="tag bad">§8 違規</span> 要處理的對象</td></tr>
+  </tbody>
+</table>
+
+<h3>已經合規 / 已轉彎的部分（證明實務並非「全用直引號」）</h3>
+<table>
+  <thead><tr><th>Unicode 彎引號（prose）</th><th class="num">數量</th><th>含意</th></tr></thead>
+  <tbody>
+    <tr><td><code>&ldquo;</code> / <code>&rdquo;</code> 成對雙引號</td><td class="num">19 / 19</td><td>雙引號實務 <span class="chg">76% 已合規</span>（19 對彎 vs 6 對直）</td></tr>
+    <tr><td><code>&rsquo;</code> 彎撇號</td><td class="num">4</td><td>§4.1/§4.2 已把 <code>Rolle&rsquo;s</code>／<code>manuscript&rsquo;s</code> 轉彎——<span class="ch">但 §4.3/§4.4/§4.5 的 <code>Rolle's</code> 還是直的</span></td></tr>
+  </tbody>
+</table>
+<p>真正的<strong>單引號成對引用 <code>&lsquo;&hellip;&rsquo;</code>：全書 0 個</strong>。
+→ §8 的單引號規則沒有任何實際用例；26 個撇號<strong>全部是 possessive</strong>。</p>
+
+<h2>3 · 兩類問題，分開看</h2>
+
+<div class="card">
+  <h3>3a · 散文雙引號 <span class="tag good">非矛盾，只是 6 處 drift</span></h3>
+  <p>spec 要彎、實務也大致彎（19:6）。這 6 對直引號純屬漏網，<strong>無論最後怎麼裁都應修成彎引號</strong>：</p>
+  <table>
+    <thead><tr><th>檔案</th><th>locus（行）</th><th>內容</th></tr></thead>
+    <tbody>
+      <tr><td>ch02/sec-2-1.html</td><td>L19 / L49 / L52</td><td><code>"slope&hellip;"</code> · <code>"\(h\)-form"</code> · <code>"\(f\) prime of \(a\)"</code></td></tr>
+      <tr><td>ch04/sec-4-4.html</td><td>L52 / L52 / L213</td><td><code>"positive derivative"</code> · <code>"increasing"</code> · <code>"positive derivative means increasing"</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>3b · possessive 撇號 <span class="tag bad">這才是真正要裁的</span></h3>
+  <p>26 個 ASCII <code>'</code>，全是 possessive（<code>student's</code>、<code>denominator's</code>、<code>quotient's</code>、<code>car's</code>、
+     <code>composite's</code>、<code>functions'</code>、<code>Rolle's</code>、<code>Taylor's</code>、<code>logarithm's</code>、<code>text's</code>、<code>function's</code>）。
+     分布：§1.1×1 · §1.2×1 · §1.4×1 · §1.5×6 · §2.2×1 · §3.2×2 · §4.3×1 · §4.4×11 · §4.5×2。</p>
+  <p>因為全是 possessive（無成對引用），轉成 <code>&rsquo;</code>(U+2019) 是<strong>機械且 100% 安全</strong>的（possessive 撇號 = U+2019 是排版通則）。</p>
+</div>
+
+<h2>4 · 執法缺口（drift 為何長存）</h2>
+<p>handout HTML 產線<strong>沒有任何引號 linter</strong>。<code>book_style_lint.py</code> 只跑在 <code>legacy/tex_handout/</code>。
+CI <code>handout-checks.yml</code> 只做 build + standalone 同步檢查，不查引號。§8 結尾自己也寫「靠手動與下游 lint 檢查」——但下游 lint 從未在 HTML 產線建立。
+<strong>無論哪個方向，都應補一支 lint 掛進 CI</strong>，否則修完還會再漂。</p>
+
+<h2>5 · 兩個裁決方案</h2>
+
+<div class="opt rec">
+  <h3>方案 A — 全書彎引號（補齊 §8）　<span class="tag good">建議</span></h3>
+  <p class="verdict">把 26 撇號 → <code>&rsquo;</code>、6 對雙引號 → <code>&ldquo;&hellip;&rdquo;</code>；§8 明文補上「possessive 撇號用 U+2019」；補 lint 進 CI。</p>
+  <p><strong>為何建議：</strong></p>
+  <ul class="tight">
+    <li>本講義自我定位是「排版聖經」，§8 已強制 em/en dash、省略號、彎雙引號全走 Unicode。
+        possessive 撇號是<strong>唯一剩下的 ASCII 落單者</strong>——轉彎才是與既定標準一致的唯一選擇。</li>
+    <li>成本極低且零風險：32 處全機械（撇號全 possessive、雙引號全簡單 inline），math prime 由分類器嚴格排除、不會被碰。</li>
+    <li>順手消滅「同章 <code>Rolle's</code> 一下直一下彎」的尷尬不一致。</li>
+  </ul>
+  <p class="kv"><strong>代價：</strong>source 裡多了 U+2019——grep <code>Rolle's</code> 不會命中 <code>Rolle&rsquo;s</code>。
+     以 normalizer + lint 緩解（搜尋前先 normalize，或記得用彎撇號搜）。對 rendered HTML 講義而言此代價甚小。</p>
+</div>
+
+<div class="opt">
+  <h3>方案 B — 放寬 §8 容許 ASCII 撇號（雙引號仍彎）</h3>
+  <p class="verdict">§8 改為：possessive／contraction 撇號 MAY 用 ASCII <code>'</code>；雙引號 MUST 彎；成對單引號（若有）MUST 彎。仍修那 6 對直雙引號；補 lint 強制「撇號正規化為 ASCII、雙引號彎」。</p>
+  <ul class="tight">
+    <li><strong>優點：</strong>source 少 Unicode、好 grep／好編輯；貼近撇號的多數實務（26:4）；「彎雙引號 + 直撇號」是不少網頁 style guide 的正當 house style。</li>
+    <li><strong>缺點：</strong>在唯一的地方對排版標準讓步、形成「雙彎單直」不對稱；且要真正消除不一致，仍須把 §4.1/§4.2 已轉彎的 4 個撇號<strong>倒轉回 ASCII</strong>，並補 lint 正規化。</li>
+  </ul>
+</div>
+
+<p class="small">兩案<strong>共通</strong>：①修 6 對直雙引號 ②補一支引號 lint 進 CI（填執法缺口） ③ §8 文字補明確 ④ <code>python handout/build.py</code> 重建 standalone ⑤ 改完跑回歸稽核。唯一差別＝撇號方向。</p>
+
+<div class="foot">
+  本簡報為「待裁決」交付物（CLAUDE.md：審核交付物用 standalone HTML）。數據由 <code>quote_audit_scratch.py</code> 結構分類器產出，全書 20 個 fragment 逐字掃描，非抽樣。
+</div>
+
+</body>
+</html>

@@ -40,6 +40,33 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+<!-- New Computer Modern (prose/text faces) — matches MathJax 4 "mathjax-newcm" math font.
+     Source: npm web-computer-modern@1.1.0-new-cm-7-0-2 via jsDelivr. License: GUST Font License.
+     10pt optical size ("Serif 10"). NOTE: filenames contain %20-encoded spaces — keep them. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+
 <!-- MathJax 4 (CHTML output with inline line-breaking) -->
 <script>
 window.MathJax = {
@@ -86,7 +113,7 @@ window.MathJax = {
   --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
   --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
   /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
-  --serif: "Times New Roman", Times, Georgia, serif;
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
   --ui: "Inter", -apple-system, system-ui, sans-serif;
   --a-concept:  oklch(0.50 0.13 55);
   --a-result:   oklch(0.50 0.13 245);
@@ -296,11 +323,11 @@ window.MathJax = {
 .sheet {
   position: relative; box-sizing: border-box;
   width: 210mm; height: 297mm;
-  padding: 20mm 18mm 20mm 24mm;
+  padding: 20mm 28mm 20mm 32mm;
   background: #fff; overflow: hidden;
 }
 .sheet-header {
-  position: absolute; top: 11mm; left: 24mm; right: 18mm;
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
   font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
 }
 .sheet-footer {
@@ -310,7 +337,7 @@ window.MathJax = {
 .sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
 .sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
 .sheet-body .page { padding: 0; max-width: none; margin: 0; }
-.sheet-body.paper { font-size: 11pt; line-height: 1.55; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
 .sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .sheet-body > :first-child { margin-top: 0 !important; }
 .sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
@@ -351,7 +378,7 @@ window.MathJax = {
   position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
   font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
 }
-#source { position: absolute; left: -10000px; top: 0; width: 635px; }
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
 </style>
 </head>
 <body>
@@ -384,7 +411,7 @@ window.MathJax = {
     <li>decide when a function is one-to-one and find its inverse when it exists;</li>
     <li>work with the inverse trigonometric functions \(\arcsin\), \(\arccos\), \(\arctan\), and their companions, together with their principal intervals;</li>
     <li>estimate the value of a limit from tables, graphs, and algebraic simplification, and handle one-sided and infinite limits;</li>
-    <li>compute limits using the limit laws, factoring and rationalisation, and the squeeze theorem;</li>
+    <li>compute limits using the limit laws, factoring and rationalization, and the squeeze theorem;</li>
     <li>state and apply the precise \(\varepsilon\)-\(\delta\) definition of a limit to verify a given limit rigorously.</li>
   </ul>
 </article>
@@ -428,7 +455,7 @@ window.MathJax = {
     <section class="env env-example">
       <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.1</span></p>
       <div class="env-body">
-        <p>A class of students is assigned identification numbers, arranged so that no two students share a number. Define \(f(\mathrm{student})\) to be that student's identification number. Is \(f\) one-to-one?</p>
+        <p>A class of students is assigned identification numbers, arranged so that no two students share a number. Define \(f(\mathrm{student})\) to be that student’s identification number. Is \(f\) one-to-one?</p>
       </div>
     </section>
     <section class="env env-solution">
@@ -700,7 +727,10 @@ window.MathJax = {
 <template id="frag-sec-1-2">
 <!-- §1.2 Inverse Trigonometric Functions. Content verbatim from ch01_foundations.tex;
      worked examples E1.2-a/b/c + O1.2-d supplemented from open banks (2026-06-12),
-     audit-approved. Figures renumbered 1.3-1.6 -> 1.4-1.7 (new Fig 1.3 added in §1.1). -->
+     audit-approved. Figures renumbered 1.3-1.6 -> 1.4-1.7 (new Fig 1.3 added in §1.1).
+     2026-06-21 figure-opportunity audit added Fig 1.9 (arctan reflection, after Def 1.5);
+     chapter-wide renumber followed (old 1.9/1.10 -> 1.10/1.11; full chapter now 1.1-1.25).
+     Authoritative record: handout/_audit/REVIEW-ch01-figure-opportunity-applied.html. -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -779,7 +809,7 @@ window.MathJax = {
         <p>Evaluate the following expressions.</p>
         <ol class="prompt-list">
           <li>\(\arcsin\!\left(\tfrac{1}{2}\right)\).</li>
-          <li>\(\tan\!\bigl(\arcsin\!\left(\tfrac{1}{3}\right)\bigr)\).</li>
+          <li>\(\tan\bigl(\arcsin\!\left(\tfrac{1}{3}\right)\bigr)\).</li>
         </ol>
       </div>
     </section>
@@ -793,7 +823,7 @@ window.MathJax = {
           <figure class="figure" data-fig="arcsin-triangle">
             <figcaption><span class="fig-no">Figure 1.6</span> Right triangle with \(\sin\theta = \tfrac{1}{3}\).</figcaption>
           </figure>
-          Therefore \(\tan\!\bigl(\arcsin\!\left(\tfrac{1}{3}\right)\bigr) = \tan\theta = \tfrac{1}{2\sqrt{2}}\).</li>
+          Therefore \(\tan\bigl(\arcsin\!\left(\tfrac{1}{3}\right)\bigr) = \tan\theta = \tfrac{1}{2\sqrt{2}}\).</li>
         </ol>
       </div>
     </section>
@@ -869,7 +899,7 @@ window.MathJax = {
   <h3 class="subsec-head">The inverse tangent function</h3>
 
   <!-- expansion:intuition — why arctan accepts all of R, tying the open interval to the unbounded domain [pass: enrichment] -->
-  <p>On the open interval \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\), the tangent function climbs continuously from \(-\infty\) to \(+\infty\), taking each real number as a value exactly once. This is why the inverse tangent, unlike \(\arcsin\) and \(\arccos\), accepts <em>every</em> real number as input: its domain is all of \(\mathbb{R}\).</p>
+  <p>On the open interval \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\), the tangent function climbs continuously from \(-\infty\) to \(+\infty\), taking each real number as a value exactly once. This is why the inverse tangent, unlike \(\arcsin\) and \(\arccos\), accepts <em>every</em> real number as input: its domain is all of \(\mathbb{R}\) (Figure 1.9).</p>
 
   <p>The tangent function is one-to-one on the interval \(-\tfrac{\pi}{2} < x < \tfrac{\pi}{2}\), shown in Figure 1.8.</p>
 
@@ -885,6 +915,11 @@ window.MathJax = {
       Its domain is \(\mathbb{R}\) and its range is \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\).</p>
     </div>
   </section>
+
+  <!-- expansion:figure — restricted tan reflects across y=x to arctan; domain↔range and vertical↔horizontal asymptotes swap (figure-opportunity audit 2026-06-21; registered in chapter1 FIGS as "arctan-reflection") -->
+  <figure class="figure" data-fig="arctan-reflection">
+    <figcaption><span class="fig-no">Figure 1.9</span> The graph of \(\arctan x\) is the reflection of the restricted tangent branch across the line \(y = x\) (dashed). Reflection swaps domain and range: the vertical asymptotes of \(\tan\) at \(x = \pm\tfrac{\pi}{2}\) become the horizontal asymptotes of \(\arctan\) at \(y = \pm\tfrac{\pi}{2}\) — which is why \(\arctan\) accepts every real input yet keeps its outputs inside \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\).</figcaption>
+  </figure>
 
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.4</span><span class="env-name">Inverse tangent identities</span></p>
@@ -910,9 +945,9 @@ window.MathJax = {
       <div class="env-body">
         <p>Find the exact value of each expression.</p>
         <ol class="prompt-list">
-          <li>\(\sin\!\bigl(\arccos(-\tfrac{1}{2})\bigr)\).</li>
+          <li>\(\sin\bigl(\arccos(-\tfrac{1}{2})\bigr)\).</li>
           <li>\(\sec(\arctan 10)\).</li>
-          <li>\(\tan\!\bigl(\arcsin(-\tfrac{2\sqrt{5}}{5})\bigr)\).</li>
+          <li>\(\tan\bigl(\arcsin(-\tfrac{2\sqrt{5}}{5})\bigr)\).</li>
         </ol>
       </div>
     </section>
@@ -923,10 +958,10 @@ window.MathJax = {
           <li>\(\arccos(-\tfrac{1}{2})\) is the angle in \([0, \pi]\) whose cosine is \(-\tfrac{1}{2}\): that is \(\tfrac{2\pi}{3}\), and \(\sin\tfrac{2\pi}{3} = \tfrac{\sqrt{3}}{2}\). Note the principal value lands in the <em>second</em> quadrant — negative inputs to \(\arccos\) always do.</li>
           <li>Let \(\theta = \arctan 10\), so \(\tan\theta = 10\) with \(\theta \in \left(0, \tfrac{\pi}{2}\right)\). In a right triangle with opposite side \(10\) and adjacent side \(1\), the hypotenuse is \(\sqrt{101}\), so \(\sec(\arctan 10) = \sqrt{101}\).
           <figure class="figure" data-fig="arctan10-triangle">
-            <figcaption><span class="fig-no">Figure 1.9</span> Right triangle with \(\tan\theta = 10\).</figcaption>
+            <figcaption><span class="fig-no">Figure 1.10</span> Right triangle with \(\tan\theta = 10\).</figcaption>
           </figure>
           </li>
-          <li>Let \(\theta = \arcsin\!\bigl(-\tfrac{2\sqrt{5}}{5}\bigr)\), so \(\sin\theta = -\tfrac{2}{\sqrt{5}}\) with \(\theta \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\). Because \(\sin\theta < 0\), the angle lies in the fourth quadrant, where cosine is positive: \(\cos\theta = \sqrt{1 - \tfrac{4}{5}} = \tfrac{1}{\sqrt{5}}\). Therefore \(\tan\theta = \frac{-2/\sqrt{5}}{1/\sqrt{5}} = -2\). The sign came from the <em>range</em> of \(\arcsin\), not from guessing.</li>
+          <li>Let \(\theta = \arcsin\bigl(-\tfrac{2\sqrt{5}}{5}\bigr)\), so \(\sin\theta = -\tfrac{2}{\sqrt{5}}\) with \(\theta \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\). Because \(\sin\theta < 0\), the angle lies in the fourth quadrant, where cosine is positive: \(\cos\theta = \sqrt{1 - \tfrac{4}{5}} = \tfrac{1}{\sqrt{5}}\). Therefore \(\tan\theta = \frac{-2/\sqrt{5}}{1/\sqrt{5}} = -2\). The sign came from the <em>range</em> of \(\arcsin\), not from guessing.</li>
         </ol>
       </div>
     </section>
@@ -947,7 +982,7 @@ window.MathJax = {
         Since \(y \in \left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\) we have \(\cos y > 0\) and hence \(\sec y > 0\), so \(\sec y = \sqrt{1 + x^{2}}\). Therefore
         \[ \cos(\arctan x) = \cos y = \frac{1}{\sec y} = \frac{1}{\sqrt{1 + x^{2}}}. \]</p>
         <figure class="figure" data-fig="arctan-general-triangle">
-          <figcaption><span class="fig-no">Figure 1.10</span> Right triangle with \(\tan y = x\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.11</span> Right triangle with \(\tan y = x\).</figcaption>
         </figure>
       </div>
     </section>
@@ -1008,7 +1043,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>\(\arcsin\) requires \(|x| \le 1\) while \(\arccsc\) requires \(|x| \ge 1\), so the domain is just the two points \(x = \pm 1\). At \(x = 1\): \(\arcsin 1 = \tfrac{\pi}{2}\) and \(\arccsc 1 = \tfrac{\pi}{2}\) (the angle in \(\left(0, \tfrac{\pi}{2}\right]\) with cosecant \(1\)), so \(f(1) = \pi\). At \(x = -1\): \(\arcsin(-1) = -\tfrac{\pi}{2}\), and under this text's principal range for \(\arccsc\) the angle with cosecant \(-1\) is \(\arccsc(-1) = \tfrac{3\pi}{2}\), so \(f(-1) = -\tfrac{\pi}{2} + \tfrac{3\pi}{2} = \pi\). So \(f\) is the constant \(\pi\) on its two-point domain.</p>
+        <p>\(\arcsin\) requires \(|x| \le 1\) while \(\arccsc\) requires \(|x| \ge 1\), so the domain is just the two points \(x = \pm 1\). At \(x = 1\): \(\arcsin 1 = \tfrac{\pi}{2}\) and \(\arccsc 1 = \tfrac{\pi}{2}\) (the angle in \(\left(0, \tfrac{\pi}{2}\right]\) with cosecant \(1\)), so \(f(1) = \pi\). At \(x = -1\): \(\arcsin(-1) = -\tfrac{\pi}{2}\), and under this text’s principal range for \(\arccsc\) the angle with cosecant \(-1\) is \(\arccsc(-1) = \tfrac{3\pi}{2}\), so \(f(-1) = -\tfrac{\pi}{2} + \tfrac{3\pi}{2} = \pi\). So \(f\) is the constant \(\pi\) on its two-point domain.</p>
         <p>Under the alternative convention of Remark 1.4 (\(\arccsc(-1) = -\tfrac{\pi}{2}\)) one gets \(f(-1) = -\pi\) instead — a concrete instance of branch conventions changing answers, which is why this text fixes its conventions explicitly.</p>
       </div>
     </section>
@@ -1020,7 +1055,9 @@ window.MathJax = {
 <template id="frag-sec-1-3">
 <!-- §1.3 The Limit of a Function. Content verbatim from ch01_foundations.tex;
      worked examples E1.3-a + O1.3-b supplemented from open banks (2026-06-12),
-     audit-approved. Figure 1.7 -> 1.8; new Fig 1.9 (read-from-graph). -->
+     audit-approved. 2026-06-21 chapter-wide figure renumber: this section now
+     Fig 1.12 (three functions, same limit) + 1.13 (read-from-graph).
+     Authoritative record: handout/_audit/REVIEW-ch01-figure-opportunity-applied.html. -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -1046,10 +1083,10 @@ window.MathJax = {
   \[ f(x) \to L \qquad \text{as } x \to a, \]
   read “\(f(x)\) tends to \(L\) as \(x\) tends to \(a\).”</p>
 
-  <p>When we consider \(\lim_{x \to a} f(x)\), we are concerned with the values of \(f(x)\) for \(x\) near \(a\), not with the value of \(f(a)\). In particular, \(f(a)\) need not be defined at all. Figure 1.11 shows three functions whose values at \(a\) are different (and one is undefined), yet which all share the same limit as \(x \to a\).</p>
+  <p>When we consider \(\lim_{x \to a} f(x)\), we are concerned with the values of \(f(x)\) for \(x\) near \(a\), not with the value of \(f(a)\). In particular, \(f(a)\) need not be defined at all. Figure 1.12 shows three functions whose values at \(a\) are different (and one is undefined), yet which all share the same limit as \(x \to a\).</p>
 
   <figure class="figure" data-fig="limit-same-near-a">
-    <figcaption><span class="fig-no">Figure 1.11</span> Three functions with the same limit as \(x \to a\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.12</span> Three functions with the same limit as \(x \to a\).</figcaption>
   </figure>
 
   <!-- expansion:example — read limits off a graph, including a point where the limit differs from f(a) [source: CLP-1 §1.3 #1] -->
@@ -1057,14 +1094,14 @@ window.MathJax = {
     <section class="env env-example">
       <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.15</span></p>
       <div class="env-body">
-        <p>The graph of a function \(f\) is shown in Figure 1.12. Evaluate the following, or state that the limit does not exist:</p>
+        <p>The graph of a function \(f\) is shown in Figure 1.13. Evaluate the following, or state that the limit does not exist:</p>
         <ol class="prompt-list">
           <li>\(\lim_{x \to -2} f(x)\).</li>
           <li>\(\lim_{x \to 0} f(x)\).</li>
           <li>\(\lim_{x \to 2} f(x)\).</li>
         </ol>
         <figure class="figure" data-fig="read-limit-graph">
-          <figcaption><span class="fig-no">Figure 1.12</span> A function whose limit at \(x = 2\) differs from its value there.</figcaption>
+          <figcaption><span class="fig-no">Figure 1.13</span> A function whose limit at \(x = 2\) differs from its value there.</figcaption>
         </figure>
       </div>
     </section>
@@ -1176,7 +1213,9 @@ window.MathJax = {
 <template id="frag-sec-1-4">
 <!-- §1.4 One-Sided and Infinite Limits. Content verbatim from ch01_foundations.tex;
      worked examples E1.4-a/b/c supplemented from open banks (2026-06-12), audit-approved.
-     Figures 1.8-1.10 -> 1.10-1.12 (two new figures added upstream in §1.1, §1.3). -->
+     2026-06-21 figure-opportunity audit added Fig 1.16 (1/x² vs 1/x, after Ex 1.22) + figures
+     in §1.2/§1.5/§1.6; chapter-wide renumber (this section now 1.14,1.15,1.16,1.17,1.18,1.19).
+     Authoritative record: handout/_audit/REVIEW-ch01-figure-opportunity-applied.html. -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -1201,7 +1240,7 @@ window.MathJax = {
   </section>
 
   <figure class="figure" data-fig="one-sided-limits">
-    <figcaption><span class="fig-no">Figure 1.13</span> A function whose left-hand and right-hand limits at \(a\) are different.</figcaption>
+    <figcaption><span class="fig-no">Figure 1.14</span> A function whose left-hand and right-hand limits at \(a\) are different.</figcaption>
   </figure>
 
   <p>The two one-sided limits together determine the two-sided limit.</p>
@@ -1255,7 +1294,7 @@ window.MathJax = {
         <p>From the right we use the branch \(f(x) = 4 - x\), so \(\lim_{x \to 2^{+}} f(x) = 2\).</p>
         <p>Since the left-hand and right-hand limits differ, \(\lim_{x \to 2} f(x)\) does not exist.</p>
         <figure class="figure" data-fig="piecewise-jump">
-          <figcaption><span class="fig-no">Figure 1.14</span> Graph of the piecewise function of Example 1.20, showing a jump at \(x = 2\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.15</span> Graph of the piecewise function of Example 1.20, showing a jump at \(x = 2\).</figcaption>
         </figure>
       </div>
     </section>
@@ -1299,14 +1338,19 @@ window.MathJax = {
         \[ \lim_{x \to 0^{-}} \frac{1}{x} = -\infty. \]
         From the right, \(1/x\) is positive and grows without bound, so
         \[ \lim_{x \to 0^{+}} \frac{1}{x} = \infty. \]
-        Because the two one-sided behaviors disagree, the two-sided limit does not exist. Since the values do not all grow in the <em>same</em> signed direction, we do <strong>not</strong> write \(\lim_{x \to 0} \frac{1}{x} = \infty\). Contrast \(1/x^{2}\): both sides grow positively, so there we do write \(\lim_{x \to 0} \frac{1}{x^{2}} = \infty\).</p>
+        Because the two one-sided behaviors disagree, the two-sided limit does not exist. Since the values do not all grow in the <em>same</em> signed direction, we do <strong>not</strong> write \(\lim_{x \to 0} \frac{1}{x} = \infty\). Contrast \(1/x^{2}\): both sides grow positively, so there we do write \(\lim_{x \to 0} \frac{1}{x^{2}} = \infty\) (Figure 1.16).</p>
       </div>
     </section>
   </div>
 
+  <!-- expansion:figure — 1/x² (both sides → +∞, write =∞) vs 1/x (sides disagree, DNE) (figure-opportunity audit 2026-06-21; registered in chapter1 FIGS as "recip-x-vs-x2") -->
+  <figure class="figure" data-fig="recip-x-vs-x2">
+    <figcaption><span class="fig-no">Figure 1.16</span> Why \(1/x^{2}\) and \(1/x\) are treated differently at \(0\). For \(1/x^{2}\) (left) both branches climb toward \(+\infty\) — the same signed direction — so we write \(\lim_{x \to 0} 1/x^{2} = \infty\). For \(1/x\) (right) the left branch falls to \(-\infty\) while the right rises to \(+\infty\); the two disagree, so the two-sided limit does not exist and we do <em>not</em> write \(=\infty\).</figcaption>
+  </figure>
+
   <p>To capture this behavior, we introduce the notation
   \[ \lim_{x \to 0} \frac{1}{x^{2}} = \infty. \]
-  The symbol \(\infty\) does not represent a real number; it records that the function's values grow without bound.</p>
+  The symbol \(\infty\) does not represent a real number; it records that the function’s values grow without bound.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.11</span></p>
@@ -1329,10 +1373,10 @@ window.MathJax = {
 
   <p>One-sided versions,
   \[ \begin{aligned} \lim_{x \to a^{-}} f(x) &= \infty, &\qquad \lim_{x \to a^{+}} f(x) &= \infty, \\ \lim_{x \to a^{-}} f(x) &= -\infty, &\qquad \lim_{x \to a^{+}} f(x) &= -\infty, \end{aligned} \]
-  are defined analogously. The four cases are illustrated in Figure 1.15.</p>
+  are defined analogously. The four cases are illustrated in Figure 1.17.</p>
 
   <figure class="figure" data-fig="one-sided-infinite">
-    <figcaption><span class="fig-no">Figure 1.15</span> The four typical one-sided infinite limits.</figcaption>
+    <figcaption><span class="fig-no">Figure 1.17</span> The four typical one-sided infinite limits.</figcaption>
   </figure>
 
   <h3 class="subsec-head">Vertical asymptotes</h3>
@@ -1373,9 +1417,9 @@ window.MathJax = {
         \[ \lim_{x \to 3^{+}} \frac{2x}{x - 3} = \infty. \]
         As \(x \to 3^{-}\), the denominator is a small negative number while the numerator is still close to \(6\), so
         \[ \lim_{x \to 3^{-}} \frac{2x}{x - 3} = -\infty. \]
-        At least one one-sided limit is infinite, so the line \(x = 3\) is a vertical asymptote, as shown in Figure 1.16.</p>
+        At least one one-sided limit is infinite, so the line \(x = 3\) is a vertical asymptote, as shown in Figure 1.18.</p>
         <figure class="figure" data-fig="vertical-asymptote">
-          <figcaption><span class="fig-no">Figure 1.16</span> The graph of \(y = \frac{2x}{x - 3}\) has a vertical asymptote at \(x = 3\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.18</span> The graph of \(y = \frac{2x}{x - 3}\) has a vertical asymptote at \(x = 3\).</figcaption>
         </figure>
       </div>
     </section>
@@ -1411,7 +1455,7 @@ window.MathJax = {
         \[ \lim_{x \to 0^{+}} \ln x = -\infty. \]
         Therefore \(x = 0\) is a vertical asymptote of the graph of \(y = \ln x\).</p>
         <figure class="figure" data-fig="ln-asymptote">
-          <figcaption><span class="fig-no">Figure 1.17</span> The graph of \(y = \ln x\) has a vertical asymptote at \(x = 0\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.19</span> The graph of \(y = \ln x\) has a vertical asymptote at \(x = 0\).</figcaption>
         </figure>
       </div>
     </section>
@@ -1448,13 +1492,13 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>In words, the limit of a sum / difference / constant multiple / product / integer power is the corresponding combination of the limits, and the limit of a quotient is the quotient of the limits whenever the denominator's limit is not zero.</p>
+  <p>In words, the limit of a sum / difference / constant multiple / product / integer power is the corresponding combination of the limits, and the limit of a quotient is the quotient of the limits whenever the denominator’s limit is not zero.</p>
 
   <!-- expansion:caution — the quotient law needs a nonzero denominator limit; 0/0 is a signal to simplify, not a verdict [pass: enrichment] [source: CLP-1 §1.4 arithmetic of limits] -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.7</span></p>
     <div class="env-body">
-      <p>The quotient law applies only when the denominator's limit is <em>nonzero</em>. If \(\lim_{x \to a} g(x) = 0\), the law says nothing, and you may not conclude that the quotient's limit fails to exist or that it takes any particular value. A resulting \(\tfrac{0}{0}\) is a signal to do more work — usually algebraic simplification, as in the examples below — not a verdict about the limit.</p>
+      <p>The quotient law applies only when the denominator’s limit is <em>nonzero</em>. If \(\lim_{x \to a} g(x) = 0\), the law says nothing, and you may not conclude that the quotient’s limit fails to exist or that it takes any particular value. A resulting \(\tfrac{0}{0}\) is a signal to do more work — usually algebraic simplification, as in the examples below — not a verdict about the limit.</p>
     </div>
   </section>
 
@@ -1472,7 +1516,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>We never need a formula for \(f\). By the product law, \(\lim_{x \to -1} x f(x) = (-1)(-1) = 1\); by the sum and constant-multiple laws the numerator tends to \(1 + 3 = 4\) and the denominator tends to \(2(-1) + 1 = -1\). The denominator's limit is nonzero, so the quotient law applies:
+        <p>We never need a formula for \(f\). By the product law, \(\lim_{x \to -1} x f(x) = (-1)(-1) = 1\); by the sum and constant-multiple laws the numerator tends to \(1 + 3 = 4\) and the denominator tends to \(2(-1) + 1 = -1\). The denominator’s limit is nonzero, so the quotient law applies:
         \[ \lim_{x \to -1} \frac{x f(x) + 3}{2 f(x) + 1} = \frac{4}{-1} = -4. \]</p>
       </div>
     </section>
@@ -1509,7 +1553,7 @@ window.MathJax = {
       <div class="env-body">
         <p>The numerator and denominator are polynomials, so their limits at \(x = 1\) are computed by direct substitution:
         \[ \begin{aligned} \lim_{x \to 1}\bigl(x^{3} + 2x^{2} - 1\bigr) &= 1 + 2 - 1 = 2,\\ \lim_{x \to 1}(5 - 3x) &= 5 - 3 = 2. \end{aligned} \]
-        The denominator's limit is nonzero, so the quotient law gives
+        The denominator’s limit is nonzero, so the quotient law gives
         \[ \lim_{x \to 1} \frac{x^{3} + 2x^{2} - 1}{5 - 3x} = \frac{2}{2} = 1. \]</p>
       </div>
     </section>
@@ -1534,7 +1578,7 @@ window.MathJax = {
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
         <ol class="sol-list">
-          <li>Take \(f(x) = 10(x - 3)\) and \(g(x) = x - 3\). Both tend to \(0\) at \(3\), yet \(\frac{f(x)}{g(x)} = 10\) wherever it is defined, so the quotient's limit is \(10\).</li>
+          <li>Take \(f(x) = 10(x - 3)\) and \(g(x) = x - 3\). Both tend to \(0\) at \(3\), yet \(\frac{f(x)}{g(x)} = 10\) wherever it is defined, so the quotient’s limit is \(10\).</li>
           <li>Replacing \(10\) by any constant \(c\) gives limit \(c\); choices such as \(f(x) = x - 3\), \(g(x) = (x - 3)^{3}\) give \(\infty\); swapping signs gives \(-\infty\); and \(f(x) = x - 3\), \(g(x) = |x - 3|\) makes the limit fail to exist.</li>
         </ol>
         <p>A \(\tfrac{0}{0}\) form can therefore equal <em>anything</em> — which is exactly why it is called indeterminate, and why we must simplify before judging.</p>
@@ -1542,7 +1586,7 @@ window.MathJax = {
     </section>
   </div>
 
-  <!-- [FIGURE-OPPORTUNITY] removable-hole: y = (x-1)/(x^2-1) = 1/(x+1) with open hole at x = 1, showing that cancelling the common factor removes one missing point without changing the limit. Pairs with Ex 1.29–1.31. -->
+  <!-- figure-opportunity "removable-hole" → FULFILLED as Figure 1.20 below (figure-opportunity audit 2026-06-21). -->
   <div class="workedexample">
     <section class="env env-example">
       <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.29</span></p>
@@ -1562,6 +1606,11 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:figure — removable hole: (x-1)/(x²-1)=1/(x+1) with open point at x=1, height ½ (figure-opportunity audit 2026-06-21; fulfils the §1.5 placeholder; registered in chapter1 FIGS as "removable-hole") -->
+  <figure class="figure" data-fig="removable-hole">
+    <figcaption><span class="fig-no">Figure 1.20</span> The graph of \(y = \dfrac{x - 1}{x^{2} - 1}\) coincides with the smooth curve \(y = \dfrac{1}{x + 1}\) everywhere except at \(x = 1\), where the original is undefined — a single missing point (open circle). Cancelling the common factor fills that hole, and the limit as \(x \to 1\) is exactly the hole's height, \(\tfrac{1}{2}\).</figcaption>
+  </figure>
+
   <div class="workedexample">
     <section class="env env-example">
       <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.30</span></p>
@@ -1573,7 +1622,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Direct substitution gives \(\tfrac{0}{0}\), so we rationalise the numerator:
+        <p>Direct substitution gives \(\tfrac{0}{0}\), so we rationalize the numerator:
         \[ \begin{aligned} \frac{\sqrt{t^{2} + 9} - 3}{t^{2}} \cdot \frac{\sqrt{t^{2} + 9} + 3}{\sqrt{t^{2} + 9} + 3} &= \frac{t^{2} + 9 - 9}{t^{2}\bigl(\sqrt{t^{2} + 9} + 3\bigr)}\\ &= \frac{1}{\sqrt{t^{2} + 9} + 3}, \qquad t \neq 0. \end{aligned} \]
         Therefore
         \[ \lim_{t \to 0} \frac{\sqrt{t^{2} + 9} - 3}{t^{2}} = \lim_{t \to 0} \frac{1}{\sqrt{t^{2} + 9} + 3} = \tfrac{1}{6}. \]</p>
@@ -1636,7 +1685,7 @@ window.MathJax = {
       <div class="env-body">
         <p>As \(x \to 3^{+}\), the values of \(x\) lie just above \(3\), so \([x] = 3\) and \(\lim_{x \to 3^{+}} [x] = 3\). As \(x \to 3^{-}\), the values of \(x\) lie just below \(3\), so \([x] = 2\) and \(\lim_{x \to 3^{-}} [x] = 2\). The two one-sided limits differ, so \(\lim_{x \to 3} [x]\) does not exist.</p>
         <figure class="figure" data-fig="floor-function">
-          <figcaption><span class="fig-no">Figure 1.18</span> The greatest integer function \([x]\) has a jump at every integer.</figcaption>
+          <figcaption><span class="fig-no">Figure 1.21</span> The greatest integer function \([x]\) has a jump at every integer.</figcaption>
         </figure>
       </div>
     </section>
@@ -1658,7 +1707,7 @@ window.MathJax = {
   </section>
 
   <figure class="figure" data-fig="squeeze-theorem">
-    <figcaption><span class="fig-no">Figure 1.19</span> The squeeze theorem: \(f\) is trapped between \(g\) and \(h\), which share the same limit \(L\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.22</span> The squeeze theorem: \(f\) is trapped between \(g\) and \(h\), which share the same limit \(L\).</figcaption>
   </figure>
 
   <div class="workedexample">
@@ -1679,7 +1728,7 @@ window.MathJax = {
         Since \(\lim_{x \to 0}(-x^{2}) = 0 = \lim_{x \to 0} x^{2}\), the squeeze theorem yields
         \[ \lim_{x \to 0} x^{2} \sin\!\left(\frac{1}{x}\right) = 0. \]</p>
         <figure class="figure" data-fig="squeeze-x2sin">
-          <figcaption><span class="fig-no">Figure 1.20</span> The graph of \(y = x^{2}\sin(1/x)\) squeezed between \(y = -x^{2}\) and \(y = x^{2}\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.23</span> The graph of \(y = x^{2}\sin(1/x)\) squeezed between \(y = -x^{2}\) and \(y = x^{2}\).</figcaption>
         </figure>
       </div>
     </section>
@@ -1719,7 +1768,7 @@ window.MathJax = {
     <div class="env-body">
       <ol class="steps">
         <li><em>Try direct substitution first.</em> If \(f(a)\) is defined and the expression is a polynomial or rational function with a nonzero denominator at \(a\), then the limit equals \(f(a)\).</li>
-        <li><em>If substitution gives an indeterminate form</em> such as \(\tfrac{0}{0}\), simplify algebraically: factor and cancel, rationalise a numerator or denominator, or combine fractions.</li>
+        <li><em>If substitution gives an indeterminate form</em> such as \(\tfrac{0}{0}\), simplify algebraically: factor and cancel, rationalize a numerator or denominator, or combine fractions.</li>
         <li><em>For a piecewise function</em>, evaluate the two one-sided limits on the appropriate branches and check whether they agree.</li>
         <li><em>If the expression is trapped between two simpler ones</em> whose limits at \(a\) are known and equal, apply the squeeze theorem.</li>
         <li><em>If the values grow without bound</em>, the limit is \(\pm\infty\) and the line \(x = a\) is a vertical asymptote.</li>
@@ -1753,7 +1802,9 @@ window.MathJax = {
 <template id="frag-sec-1-6">
 <!-- §1.6 The Precise Definition of a Limit. Content verbatim from ch01_foundations.tex;
      worked examples E1.6-a/b + O1.6-c/d supplemented from open banks + one AI-authored
-     (O1.6-d), 2026-06-12, audit-approved. Figure 1.11 -> 1.13. -->
+     (O1.6-d), 2026-06-12, audit-approved. 2026-06-21 chapter-wide figure renumber:
+     this section now Fig 1.24 (ε-δ geometric interpretation) + 1.25 (ε→δ dynamic, new).
+     Authoritative record: handout/_audit/REVIEW-ch01-figure-opportunity-applied.html. -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -1762,11 +1813,11 @@ window.MathJax = {
 
   <p>From the time of Newton and Leibniz, calculus was remarkably successful at solving problems in geometry, mechanics, and astronomy. For a long time, however, there was also controversy about its logical foundations. Early arguments often relied on infinitesimals — quantities thought of as being extremely small but not described in a fully precise way — and mathematicians continued to ask what it really means to say that \(x\) approaches \(a\) or that \(f(x)\) approaches \(L\). The modern resolution, developed in the nineteenth century, is the \(\varepsilon\)-\(\delta\) definition of a limit, which gave calculus the level of rigor used in modern mathematics.</p>
 
-  <!-- expansion:history — the arithmetisation of analysis: Bolzano, Cauchy, Weierstrass [source: Boyer, A History of the Calculus; Kline, Mathematical Thought from Ancient to Modern Times] -->
+  <!-- expansion:history — the arithmetization of analysis: Bolzano, Cauchy, Weierstrass [source: Boyer, A History of the Calculus; Kline, Mathematical Thought from Ancient to Modern Times] -->
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.6</span><span class="env-name">Historical note</span></p>
     <div class="env-body">
-      <p>The drive to replace intuitive arguments with arithmetic precision is known as the <em>arithmetisation of analysis</em>. Bolzano anticipated a more rigorous, inequality-based treatment of continuity and convergence, while Cauchy gave limits and continuity a more systematic analytic form. Weierstrass, lecturing at Berlin from the 1860s onward, refined these ideas into the \(\varepsilon\text{-}\delta\) formulation that is essentially the one presented here.</p>
+      <p>The drive to replace intuitive arguments with arithmetic precision is known as the <em>arithmetization of analysis</em>. Bolzano anticipated a more rigorous, inequality-based treatment of continuity and convergence, while Cauchy gave limits and continuity a more systematic analytic form. Weierstrass, lecturing at Berlin from the 1860s onward, refined these ideas into the \(\varepsilon\text{-}\delta\) formulation that is essentially the one presented here.</p>
     </div>
   </section>
 
@@ -1809,13 +1860,18 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>Figure 1.21 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
+  <p>Figure 1.24 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
 
   <figure class="figure" data-fig="precise-limit">
-    <figcaption><span class="fig-no">Figure 1.21</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.24</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
   </figure>
 
-  <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\).</p>
+  <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\) (Figure 1.25).</p>
+
+  <!-- expansion:figure — ε→δ dynamic: shrink the ε-strip and the responding δ-band shrinks too (here δ=ε/2 for f=2x−1) (figure-opportunity audit 2026-06-21; registered in chapter1 FIGS as "epsilon-delta-dynamic") -->
+  <figure class="figure" data-fig="epsilon-delta-dynamic">
+    <figcaption><span class="fig-no">Figure 1.25</span> Why \(\delta\) depends on \(\varepsilon\). For \(f(x) = 2x - 1\) at \(a = 3\) (where \(L = 5\)), a generous tolerance (left, \(\varepsilon = 1\)) is met by a wide neighborhood (\(\delta = \tfrac{1}{2}\)); tightening the tolerance (right, \(\varepsilon = 0.4\)) forces a narrower one (\(\delta = 0.2\)). Each time the horizontal \(\varepsilon\)-strip narrows, the responding vertical \(\delta\)-band must narrow too — here \(\delta = \varepsilon/2\). Figure 1.24 shows a single such \((\varepsilon, \delta)\) pair; this one shows how the pair responds.</figcaption>
+  </figure>
 
   <!-- expansion:intuition — the ε-δ definition read as a challenge-and-response game [pass: enrichment] [source: CLP-1 clp_limits_notes §1.7] -->
   <p>It is useful to picture the definition as a challenge-and-response game. A skeptic names a tolerance \(\varepsilon > 0\) — how close to \(L\) they insist \(f(x)\) must be — and our job is to respond with a \(\delta > 0\) that meets the demand: every \(x\) within \(\delta\) of \(a\) (but not equal to \(a\)) is sent to within \(\varepsilon\) of \(L\). The limit equals \(L\) precisely when we can answer <em>every</em> challenge, no matter how small the \(\varepsilon\). This is why \(\varepsilon\) comes first and \(\delta\) second: \(\delta\) is chosen in reply to \(\varepsilon\).</p>
@@ -2563,6 +2619,120 @@ window.MathJax = {
         }],
       };
     },
+
+    /* §1.2 — arctan as the reflection of restricted tan across y=x (Figure 1.9).
+       Equal-aspect square window so the reflection reads true. Both curves
+       solid; y=x dashed (ch01 restrict-x2 convention). Vertical asymptotes of
+       tan at ±π/2 mirror to horizontal asymptotes of arctan at ±π/2 — shown by
+       the curve shapes + the ±π/2 ticks on both axes; the swap lives in the
+       caption (figure-opportunity audit 2026-06-21). */
+    "arctan-reflection": () => {
+      const h = Math.PI / 2;
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 300, h: 300, xmin: -3.3, xmax: 3.3, ymin: -3.3, ymax: 3.3,
+            pad: { t: 14, r: 14, b: 20, l: 22 },
+            aria: "The graph of arctan x is the reflection of the restricted tangent branch across the line y equals x; tangent's vertical asymptotes at x = plus or minus pi over 2 become arctan's horizontal asymptotes at y = plus or minus pi over 2.",
+            xticks: [{ x: -h }, { x: h }],
+            yticks: [{ y: -h }, { y: h }],
+            items: [
+              { type: "curve", fn: (x) => x, domain: [-3.3, 3.3], cls: "refline" },
+              { type: "curve", fn: (x) => Math.tan(x), domain: [-1.3, 1.3], samples: 260, cls: "curve" },
+              { type: "curve", fn: (x) => Math.atan(x), domain: [-3.3, 3.3], samples: 220, cls: "curve" },
+              { type: "text", x: 1.18, y: 2.95, tex: "\\tan x", cls: "a-curve", anchor: "start" },
+              { type: "text", x: 3.05, y: 1.3, tex: "\\arctan x", cls: "a-curve", anchor: "end", dy: 13 },
+              { type: "text", x: 2.45, y: 2.85, tex: "y=x", cls: "a-ref", anchor: "start" },
+            ],
+          }),
+        }],
+      };
+    },
+
+    /* §1.4 — 1/x² (=∞) vs 1/x (DNE) at 0, same window (Figure 1.16).
+       Left: both branches → +∞ (same signed direction, write =∞). Right:
+       left → −∞, right → +∞ (disagree, DNE). x=0 undefined → no dot, curves
+       split at ±0.001 and break at the y-axis (figure-opportunity audit 2026-06-21). */
+    "recip-x-vs-x2": () => {
+      const win = { w: 244, h: 196, xmin: -2.2, xmax: 2.2, ymin: -7, ymax: 7, pad: { t: 12, r: 12, b: 22, l: 22 } };
+      const panel = (fn, note, aria) => ({
+        svg: buildPlot(Object.assign({}, win, {
+          aria: aria,
+          xticks: [{ x: 0 }],
+          items: [
+            { type: "curve", fn: fn, domain: [-2.2, -0.001], samples: 200, cls: "curve" },
+            { type: "curve", fn: fn, domain: [0.001, 2.2], samples: 200, cls: "curve" },
+          ],
+        })),
+        note: note,
+      });
+      return {
+        layout: "pair",
+        panels: [
+          panel((x) => 1 / (x * x), "y = 1/x²", "Graph of one over x squared: both branches rise toward plus infinity near zero."),
+          panel((x) => 1 / x, "y = 1/x", "Graph of one over x: the left branch falls to minus infinity, the right branch rises to plus infinity."),
+        ],
+      };
+    },
+
+    /* §1.5 — removable hole: (x-1)/(x²-1)=1/(x+1) with an open point at x=1,
+       height ½ (Figure 1.20). Crosshair reflines guide the eye to the hole;
+       limit = hole height. Fulfils the §1.5 placeholder (figure-opportunity
+       audit 2026-06-21). */
+    "removable-hole": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 320, h: 208, xmin: -0.4, xmax: 2.7, ymin: 0, ymax: 1.7,
+          pad: { t: 14, r: 14, b: 24, l: 26 },
+          aria: "Graph of (x minus 1) over (x squared minus 1), which equals 1 over (x plus 1) except at x = 1, where there is an open hole at height one half.",
+          xticks: [{ x: 1, tex: "1" }],
+          yticks: [{ y: 0.5, tex: "\\tfrac{1}{2}" }],
+          items: [
+            { type: "hline", y: 0.5, from: -0.4, to: 1, cls: "refline" },
+            { type: "vline", x: 1, cls: "refline" },
+            { type: "curve", fn: (x) => 1 / (x + 1), domain: [-0.35, 0.97], samples: 120, cls: "curve" },
+            { type: "curve", fn: (x) => 1 / (x + 1), domain: [1.03, 2.7], samples: 120, cls: "curve" },
+            { type: "dot", x: 1, y: 0.5, hollow: true },
+            { type: "text", x: 2.6, y: 0.62, tex: "y=\\tfrac{x-1}{x^{2}-1}", cls: "a-curve", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* §1.6 — ε→δ dynamic: shrink the ε-strip, the responding δ-band shrinks too
+       (Figure 1.25). f(x)=2x-1 at a=3, L=5, δ=ε/2 (the §1.6 worked example).
+       Two panels at the same window; companion to the static Figure 1.24
+       (figure-opportunity audit 2026-06-21). */
+    "epsilon-delta-dynamic": () => {
+      const f = (x) => 2 * x - 1, a = 3, L = 5;
+      const win = { w: 240, h: 220, xmin: 2.3, xmax: 3.7, ymin: 3.6, ymax: 6.4, pad: { t: 12, r: 12, b: 22, l: 26 } };
+      const panel = (eps, note) => {
+        const d = eps / 2;
+        return {
+          svg: buildPlot(Object.assign({}, win, {
+            aria: "Epsilon-delta box for f of x equals 2x minus 1 at a equals 3: a horizontal strip of half-height epsilon and a vertical band of half-width delta equal to epsilon over 2.",
+            xticks: [{ x: a, tex: "a" }],
+            yticks: [{ y: L, tex: "L" }],
+            items: [
+              { type: "hline", y: L + eps, cls: "refline" },
+              { type: "hline", y: L - eps, cls: "refline" },
+              { type: "vline", x: a - d, cls: "refline" },
+              { type: "vline", x: a + d, cls: "refline" },
+              { type: "curve", fn: f, domain: [2.3, 3.7], cls: "curve" },
+              { type: "dot", x: a, y: L },
+            ],
+          })),
+          note: note,
+        };
+      };
+      return {
+        layout: "pair",
+        panels: [panel(1, "ε = 1,  δ = ½"), panel(0.4, "ε = 0.4,  δ = 0.2")],
+      };
+    },
+
   };
 
   function hydrateFigures(root) {

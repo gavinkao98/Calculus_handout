@@ -45,11 +45,11 @@
 <article class="sec" lang="en">
 
   <header class="sec-head">
-    <h2 class="sec-title"><span class="sec-no">4.4</span>Rolle's Theorem and the Mean Value Theorem</h2>
+    <h2 class="sec-title"><span class="sec-no">4.4</span>Rolle’s Theorem and the Mean Value Theorem</h2>
   </header>
 
   <!-- expansion:intuition — section opener: pivot from §4.3's closing fence (monotonicity needs an existence theorem). Frame the MVT as the bridge from pointwise derivative to interval behavior. -->
-  <p>Section 4.3 ended with a promissory note: \(e^{x}\) has positive derivative everywhere, so it <em>ought</em> to be increasing, and once we know that we can invert it to build \(\ln x\). But "positive derivative" is information at a single point, while "increasing" is a statement about the function across a whole interval, and nothing built so far bridges the two. This section constructs that bridge. Its keystone is the <em>Mean Value Theorem</em> (MVT), the central existence theorem of differential calculus: on any interval where a function is continuous and differentiable inside, some interior point carries an instantaneous slope equal to the average slope across the interval. We reach it in two steps — first <em>Rolle's theorem</em>, the special case where the average slope is zero, then the MVT itself — after one preparatory result about where maxima and minima can sit.</p>
+  <p>Section 4.3 ended with a promissory note: \(e^{x}\) has positive derivative everywhere, so it <em>ought</em> to be increasing, and once we know that we can invert it to build \(\ln x\). But “positive derivative” is information at a single point, while “increasing” is a statement about the function across a whole interval, and nothing built so far bridges the two. This section constructs that bridge. Its keystone is the <em>Mean Value Theorem</em> (MVT), the central existence theorem of differential calculus: on any interval where a function is continuous and differentiable inside, some interior point carries an instantaneous slope equal to the average slope across the interval. We reach it in two steps — first <em>Rolle’s theorem</em>, the special case where the average slope is zero, then the MVT itself — after one preparatory result about where maxima and minima can sit.</p>
 
   <!-- expansion:history [source: standard calculus-textbook historical note] — one-sentence attribution; not in the manuscript -->
   <p>The special case is named for Michel Rolle, who stated it for polynomials in 1691; the general theorem and its modern proof belong to the nineteenth-century analysts, Cauchy among them, who made the derivative rigorous.</p>
@@ -113,12 +113,12 @@
     </div>
   </section>
 
-  <h3 class="subsec-head">Rolle's theorem</h3>
+  <h3 class="subsec-head">Rolle’s theorem</h3>
 
-  <p>Rolle's theorem marries the two results above. The picture: if a function leaves and returns to the same height over \([a, b]\), it must turn around somewhere inside, and at that interior turning point — an extremum — the derivative is zero.</p>
+  <p>Rolle’s theorem marries the two results above. The picture: if a function leaves and returns to the same height over \([a, b]\), it must turn around somewhere inside, and at that interior turning point — an extremum — the derivative is zero.</p>
 
   <section class="env env-theorem">
-    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.11</span><span class="env-name">Rolle's theorem</span></p>
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.11</span><span class="env-name">Rolle’s theorem</span></p>
     <div class="env-body">
       <p>Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\), with \(f(a) = f(b)\). Then there exists a point \(c \in (a, b)\) such that \(f'(c) = 0\).</p>
     </div>
@@ -149,7 +149,7 @@
 
   <!-- expansion:figure — the canonical MVT picture (ROADMAP §4.4 key figure); registered in chapter4 FIGS as "mvt-secant-tangent" -->
   <figure class="figure" data-fig="mvt-secant-tangent">
-    <figcaption><span class="fig-no">Figure 4.2</span> The Mean Value Theorem. The secant through \((a, f(a))\) and \((b, f(b))\) (dashed) has slope \((f(b) - f(a))/(b - a)\); the theorem guarantees an interior point \(c\) where the tangent (solid) is parallel to it. The proof tilts the picture by subtracting the secant, reducing the claim to Rolle's theorem.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.2</span> The Mean Value Theorem. The secant through \((a, f(a))\) and \((b, f(b))\) (dashed) has slope \((f(b) - f(a))/(b - a)\); the theorem guarantees an interior point \(c\) where the tangent (solid) is parallel to it. The proof tilts the picture by subtracting the secant, reducing the claim to Rolle’s theorem.</figcaption>
   </figure>
 
   <section class="env env-proof">
@@ -157,12 +157,12 @@
     <div class="env-body">
       <p>Subtract the secant line from \(f\). Define the auxiliary function</p>
       <p>\[ g(x) = f(x) - \left[ f(a) + \frac{f(b) - f(a)}{b - a} (x - a) \right]. \]</p>
-      <p>The bracketed term is exactly the secant line through \((a, f(a))\) and \((b, f(b))\), so \(g(x)\) measures the vertical gap between the curve and that secant. It inherits the hypotheses of Rolle's theorem:</p>
+      <p>The bracketed term is exactly the secant line through \((a, f(a))\) and \((b, f(b))\), so \(g(x)\) measures the vertical gap between the curve and that secant. It inherits the hypotheses of Rolle’s theorem:</p>
       <ul>
         <li>\(g\) is continuous on \([a, b]\) and differentiable on \((a, b)\), being \(f\) minus a linear function;</li>
         <li>\(g(a) = f(a) - f(a) = 0\) and \(g(b) = f(b) - f(b) = 0\), so \(g(a) = g(b)\).</li>
       </ul>
-      <p>By Rolle's theorem (Theorem 4.11) there is a \(c \in (a, b)\) with \(g'(c) = 0\). Differentiating \(g\), the linear bracket contributes its constant slope, so</p>
+      <p>By Rolle’s theorem (Theorem 4.11) there is a \(c \in (a, b)\) with \(g'(c) = 0\). Differentiating \(g\), the linear bracket contributes its constant slope, so</p>
       <p>\[ 0 = g'(c) = f'(c) - \frac{f(b) - f(a)}{b - a}, \]</p>
       <p>which rearranges to \(f'(c) = (f(b) - f(a))/(b - a)\). <span class="qed qed-proof"></span></p>
     </div>
@@ -172,7 +172,7 @@
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.4</span></p>
     <div class="env-body">
-      <p>Rolle's theorem is precisely the MVT in the case \(f(a) = f(b)\), where the average slope is \(0\) — yet we proved Rolle <em>first</em> and recovered the MVT from it, because subtracting the secant always tilts the general situation back to level endpoints. The three results form a ladder: Theorem A, a statement about the derivative at one point, supports Rolle; Rolle adds the equal-endpoints hypothesis, and Rolle in turn supports the MVT for arbitrary endpoints. The MVT is the load-bearing rung. It is the standard device for turning pointwise information about \(f'\) into behavior of \(f\) across an interval, and it returns every time we make that move — immediately below to read monotonicity off the sign of \(f'\), and later for Taylor's theorem and the error estimates that lean on it.</p>
+      <p>Rolle’s theorem is precisely the MVT in the case \(f(a) = f(b)\), where the average slope is \(0\) — yet we proved Rolle <em>first</em> and recovered the MVT from it, because subtracting the secant always tilts the general situation back to level endpoints. The three results form a ladder: Theorem A, a statement about the derivative at one point, supports Rolle; Rolle adds the equal-endpoints hypothesis, and Rolle in turn supports the MVT for arbitrary endpoints. The MVT is the load-bearing rung. It is the standard device for turning pointwise information about \(f'\) into behavior of \(f\) across an interval, and it returns every time we make that move — immediately below to read monotonicity off the sign of \(f'\), and later for Taylor’s theorem and the error estimates that lean on it.</p>
     </div>
   </section>
 
@@ -183,7 +183,7 @@
       <p>To extract information about \(f'\) on an interval \([a, b]\) from the MVT:</p>
       <ol class="steps">
         <li>Check that \(f\) is continuous on the <em>closed</em> interval \([a, b]\) — endpoints included. Continuity at the endpoints is what lets the proof call on the extreme value theorem, which needs a closed interval.</li>
-        <li>Check that \(f\) is differentiable on the <em>open</em> interval \((a, b)\) — endpoints excluded. The endpoints need no derivative, since Rolle's theorem only ever touched the derivative at an interior point. (So \(f(x) = \sqrt{x}\) on \([0, 1]\), differentiable on \((0, 1)\) despite its vertical tangent at \(0\), is fair game.)</li>
+        <li>Check that \(f\) is differentiable on the <em>open</em> interval \((a, b)\) — endpoints excluded. The endpoints need no derivative, since Rolle’s theorem only ever touched the derivative at an interior point. (So \(f(x) = \sqrt{x}\) on \([0, 1]\), differentiable on \((0, 1)\) despite its vertical tangent at \(0\), is fair game.)</li>
         <li>Read off the conclusion: there <em>exists</em> a \(c \in (a, b)\) with \(f'(c) = (f(b) - f(a))/(b - a)\). The theorem promises existence only; it does not say which \(c\), so any further argument may rely on the existence of such a \(c\), but not on any specific value.</li>
       </ol>
       <p>Skipping the checks is the usual mistake, and the conclusion can then be false. Take \(\lvert x \rvert\) on \([-1, 1]\): it is continuous everywhere but not differentiable at \(0\), so step 2 fails. The secant slope is \((\lvert 1 \rvert - \lvert -1 \rvert)/(1 - (-1)) = 0\), yet \(\lvert x \rvert' = \pm 1\) wherever it is defined and never \(0\) — there is no valid \(c\), exactly because the differentiability hypothesis was missing.</p>
@@ -210,7 +210,7 @@
 
   <h3 class="subsec-head">Monotonicity from the sign of the derivative</h3>
 
-  <p>Now the payoff. The MVT converts the sign of the derivative directly into monotonic behavior, turning the qualitative slogan "positive derivative means increasing" into a theorem.</p>
+  <p>Now the payoff. The MVT converts the sign of the derivative directly into monotonic behavior, turning the qualitative slogan “positive derivative means increasing” into a theorem.</p>
 
   <!-- expansion:formula — Corollary 4.3 (§C-2): both forms stated; the strict form is what §4.5 needs (the manuscript states only the non-strict form, yet its examples conclude strict) -->
   <section class="env env-corollary">

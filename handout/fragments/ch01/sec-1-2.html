@@ -1,6 +1,9 @@
 <!-- §1.2 Inverse Trigonometric Functions. Content verbatim from ch01_foundations.tex;
      worked examples E1.2-a/b/c + O1.2-d supplemented from open banks (2026-06-12),
-     audit-approved. Figures renumbered 1.3-1.6 -> 1.4-1.7 (new Fig 1.3 added in §1.1). -->
+     audit-approved. Figures renumbered 1.3-1.6 -> 1.4-1.7 (new Fig 1.3 added in §1.1).
+     2026-06-21 figure-opportunity audit added Fig 1.9 (arctan reflection, after Def 1.5);
+     chapter-wide renumber followed (old 1.9/1.10 -> 1.10/1.11; full chapter now 1.1-1.25).
+     Authoritative record: handout/_audit/REVIEW-ch01-figure-opportunity-applied.html. -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -169,7 +172,7 @@
   <h3 class="subsec-head">The inverse tangent function</h3>
 
   <!-- expansion:intuition — why arctan accepts all of R, tying the open interval to the unbounded domain [pass: enrichment] -->
-  <p>On the open interval \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\), the tangent function climbs continuously from \(-\infty\) to \(+\infty\), taking each real number as a value exactly once. This is why the inverse tangent, unlike \(\arcsin\) and \(\arccos\), accepts <em>every</em> real number as input: its domain is all of \(\mathbb{R}\).</p>
+  <p>On the open interval \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\), the tangent function climbs continuously from \(-\infty\) to \(+\infty\), taking each real number as a value exactly once. This is why the inverse tangent, unlike \(\arcsin\) and \(\arccos\), accepts <em>every</em> real number as input: its domain is all of \(\mathbb{R}\) (Figure 1.9).</p>
 
   <p>The tangent function is one-to-one on the interval \(-\tfrac{\pi}{2} < x < \tfrac{\pi}{2}\), shown in Figure 1.8.</p>
 
@@ -185,6 +188,11 @@
       Its domain is \(\mathbb{R}\) and its range is \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\).</p>
     </div>
   </section>
+
+  <!-- expansion:figure — restricted tan reflects across y=x to arctan; domain↔range and vertical↔horizontal asymptotes swap (figure-opportunity audit 2026-06-21; registered in chapter1 FIGS as "arctan-reflection") -->
+  <figure class="figure" data-fig="arctan-reflection">
+    <figcaption><span class="fig-no">Figure 1.9</span> The graph of \(\arctan x\) is the reflection of the restricted tangent branch across the line \(y = x\) (dashed). Reflection swaps domain and range: the vertical asymptotes of \(\tan\) at \(x = \pm\tfrac{\pi}{2}\) become the horizontal asymptotes of \(\arctan\) at \(y = \pm\tfrac{\pi}{2}\) — which is why \(\arctan\) accepts every real input yet keeps its outputs inside \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\).</figcaption>
+  </figure>
 
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">1.4</span><span class="env-name">Inverse tangent identities</span></p>
@@ -223,7 +231,7 @@
           <li>\(\arccos(-\tfrac{1}{2})\) is the angle in \([0, \pi]\) whose cosine is \(-\tfrac{1}{2}\): that is \(\tfrac{2\pi}{3}\), and \(\sin\tfrac{2\pi}{3} = \tfrac{\sqrt{3}}{2}\). Note the principal value lands in the <em>second</em> quadrant — negative inputs to \(\arccos\) always do.</li>
           <li>Let \(\theta = \arctan 10\), so \(\tan\theta = 10\) with \(\theta \in \left(0, \tfrac{\pi}{2}\right)\). In a right triangle with opposite side \(10\) and adjacent side \(1\), the hypotenuse is \(\sqrt{101}\), so \(\sec(\arctan 10) = \sqrt{101}\).
           <figure class="figure" data-fig="arctan10-triangle">
-            <figcaption><span class="fig-no">Figure 1.9</span> Right triangle with \(\tan\theta = 10\).</figcaption>
+            <figcaption><span class="fig-no">Figure 1.10</span> Right triangle with \(\tan\theta = 10\).</figcaption>
           </figure>
           </li>
           <li>Let \(\theta = \arcsin\bigl(-\tfrac{2\sqrt{5}}{5}\bigr)\), so \(\sin\theta = -\tfrac{2}{\sqrt{5}}\) with \(\theta \in \left[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right]\). Because \(\sin\theta < 0\), the angle lies in the fourth quadrant, where cosine is positive: \(\cos\theta = \sqrt{1 - \tfrac{4}{5}} = \tfrac{1}{\sqrt{5}}\). Therefore \(\tan\theta = \frac{-2/\sqrt{5}}{1/\sqrt{5}} = -2\). The sign came from the <em>range</em> of \(\arcsin\), not from guessing.</li>
@@ -247,7 +255,7 @@
         Since \(y \in \left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\) we have \(\cos y > 0\) and hence \(\sec y > 0\), so \(\sec y = \sqrt{1 + x^{2}}\). Therefore
         \[ \cos(\arctan x) = \cos y = \frac{1}{\sec y} = \frac{1}{\sqrt{1 + x^{2}}}. \]</p>
         <figure class="figure" data-fig="arctan-general-triangle">
-          <figcaption><span class="fig-no">Figure 1.10</span> Right triangle with \(\tan y = x\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.11</span> Right triangle with \(\tan y = x\).</figcaption>
         </figure>
       </div>
     </section>
@@ -308,7 +316,7 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>\(\arcsin\) requires \(|x| \le 1\) while \(\arccsc\) requires \(|x| \ge 1\), so the domain is just the two points \(x = \pm 1\). At \(x = 1\): \(\arcsin 1 = \tfrac{\pi}{2}\) and \(\arccsc 1 = \tfrac{\pi}{2}\) (the angle in \(\left(0, \tfrac{\pi}{2}\right]\) with cosecant \(1\)), so \(f(1) = \pi\). At \(x = -1\): \(\arcsin(-1) = -\tfrac{\pi}{2}\), and under this text's principal range for \(\arccsc\) the angle with cosecant \(-1\) is \(\arccsc(-1) = \tfrac{3\pi}{2}\), so \(f(-1) = -\tfrac{\pi}{2} + \tfrac{3\pi}{2} = \pi\). So \(f\) is the constant \(\pi\) on its two-point domain.</p>
+        <p>\(\arcsin\) requires \(|x| \le 1\) while \(\arccsc\) requires \(|x| \ge 1\), so the domain is just the two points \(x = \pm 1\). At \(x = 1\): \(\arcsin 1 = \tfrac{\pi}{2}\) and \(\arccsc 1 = \tfrac{\pi}{2}\) (the angle in \(\left(0, \tfrac{\pi}{2}\right]\) with cosecant \(1\)), so \(f(1) = \pi\). At \(x = -1\): \(\arcsin(-1) = -\tfrac{\pi}{2}\), and under this text’s principal range for \(\arccsc\) the angle with cosecant \(-1\) is \(\arccsc(-1) = \tfrac{3\pi}{2}\), so \(f(-1) = -\tfrac{\pi}{2} + \tfrac{3\pi}{2} = \pi\). So \(f\) is the constant \(\pi\) on its two-point domain.</p>
         <p>Under the alternative convention of Remark 1.4 (\(\arccsc(-1) = -\tfrac{\pi}{2}\)) one gets \(f(-1) = -\pi\) instead — a concrete instance of branch conventions changing answers, which is why this text fixes its conventions explicitly.</p>
       </div>
     </section>
