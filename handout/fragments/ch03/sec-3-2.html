@@ -7,10 +7,11 @@
        Theorem 3.3 (chain rule); Proposition 3.3 (Def1⇔Def2 equivalence);
        Definition 3.1 (remainder form — the chapter's first Definition);
        Example 3.4 (single composition), 3.5 (nested composition);
-       Figure 3.2 (composed mapping); Remark 3.2 (Leibniz form);
+       Figure 3.5 (composed mapping), 3.6 (tangent / remainder-form linear
+         approximation); Remark 3.2 (Leibniz form);
        Strategy 3.1 (chain-rule decomposition — the chapter's first Strategy);
        Caution is unnumbered (per ch02). §3.3 continues from Theorem 3.4,
-       Proposition 3.4, Definition 3.2, Example 3.6, Figure 3.3, Remark 3.3,
+       Proposition 3.4, Definition 3.2, Example 3.6, Figure 3.7, Remark 3.3,
        Strategy 3.2.
 
      ③ decisions: Definition treatment = Option B (the §2.2 limit definition
@@ -18,7 +19,7 @@
      minted, as Definition 3.1, with equivalence as Proposition 3.3) — D5.
      Narrative order = intuition-first (statement + figure + remark + strategy
      make the rule usable, then definition + equivalence + the ε-δ proof, then
-     worked examples). Figure 3.2 (composed mapping) included as inline SVG in
+     worked examples). Figure 3.5 (composed mapping) included as inline SVG in
      figures.js. Examples 3.4 + 3.5 approved (self-authored, in §3.2's
      derivative inventory: sin/cos from §3.1, power from Ch2 — no ln/arcsin/x^x,
      which are §3.3 per D7). Product rule and differentiable⇒continuous are
@@ -51,7 +52,7 @@
 
   <!-- expansion:figure — chain rule as composed mapping (ROADMAP key figure; registered in exp-ch03/figures.js as "composed-mapping") -->
   <figure class="figure" data-fig="composed-mapping">
-    <figcaption><span class="fig-no">Figure 3.2</span> The chain rule as a composed mapping. A small input increment \(h\) at \(x_{0}\) is carried by \(g\) to an increment of about \(g'(x_{0})\,h\) at \(u_{0} = g(x_{0})\), and then by \(f\) to about \(f'(g(x_{0}))\,g'(x_{0})\,h\) at \(y_{0} = f(g(x_{0}))\). The two local slopes multiply — which is why the composite's derivative is their product.</figcaption>
+    <figcaption><span class="fig-no">Figure 3.5</span> The chain rule as a composed mapping. A small input increment \(h\) at \(x_{0}\) is carried by \(g\) to an increment of about \(g'(x_{0})\,h\) at \(u_{0} = g(x_{0})\), and then by \(f\) to about \(f'(g(x_{0}))\,g'(x_{0})\,h\) at \(y_{0} = f(g(x_{0}))\). The two local slopes multiply — which is why the composite’s derivative is their product.</figcaption>
   </figure>
 
   <!-- expansion:intuition — the Leibniz form (the working notation), with the mnemonic-not-proof caveat folded in (ROADMAP pitfall) -->
@@ -83,7 +84,7 @@
   <h3 class="subsec-head">Why the rule is true</h3>
 
   <!-- expansion:intuition — bridge: the rule is usable; to prove it we need the remainder form, which packages differentiability as a linear approximation that composes -->
-  <p>The rule is already usable — the rest of this section earns it. To prove that the two slopes really do multiply, we need to handle both functions' linear approximations at once, and for that it helps to repackage what “differentiable” means. Chapter 2 defined \(f\) to be differentiable at \(x_{0}\) when the difference quotient \(\dfrac{f(x_{0}+h) - f(x_{0})}{h}\) has a limit as \(h \to 0\) (§2.2); that limit is \(f'(x_{0})\). The following form says the same thing, but as a statement about approximation by a straight line.</p>
+  <p>The rule is already usable — the rest of this section earns it. To prove that the two slopes really do multiply, we need to handle both functions’ linear approximations at once, and for that it helps to repackage what “differentiable” means. Chapter 2 defined \(f\) to be differentiable at \(x_{0}\) when the difference quotient \(\dfrac{f(x_{0}+h) - f(x_{0})}{h}\) has a limit as \(h \to 0\) (§2.2); that limit is \(f'(x_{0})\). The following form says the same thing, but as a statement about approximation by a straight line.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">3.1</span><span class="env-name">Differentiability, remainder form</span></p>
@@ -92,9 +93,14 @@
       <p>\[ f(x_{0} + h) = f(x_{0}) + m h + R(h), \qquad \lim_{h \to 0}\frac{R(h)}{h} = 0. \]</p>
       <p>The number \(m\) is the derivative \(f'(x_{0})\).</p>
       <!-- expansion:intuition — informal gloss on the remainder form; the seed's bare Def 2 carries no such gloss -->
-      <p class="informal">Informally, \(f(x_{0}+h)\) equals its tangent-line value \(f(x_{0}) + m h\) plus an error \(R(h)\) that dies away faster than \(h\) does — the tangent line is a good fit to first order.</p>
+      <p class="informal">Informally, \(f(x_{0}+h)\) equals its tangent-line value \(f(x_{0}) + m h\) plus an error \(R(h)\) that dies away faster than \(h\) does — the tangent line is a good fit to first order (Figure 3.6).</p>
     </div>
   </section>
+
+  <!-- expansion:figure — remainder form geometry: curve vs tangent, gap R(h) shrinking faster than h (registered in figures.js as "remainder-tangent") -->
+  <figure class="figure" data-fig="remainder-tangent">
+    <figcaption><span class="fig-no">Figure 3.6</span> Differentiability as a first-order fit. Near \(x_{0}\) the graph of \(f\) (solid) hugs its tangent line (dashed); at \(x_{0}+h\) the vertical gap between them is the remainder \(R(h)\). Halving \(h\) (right panel) shrinks that gap far faster than \(h\) itself — the geometric content of \(R(h)/h \to 0\). This single-function picture is the local fact behind Figure 3.5: each function in a composition is, up close, almost its own tangent line, and it is those linear parts whose slopes multiply.</figcaption>
+  </figure>
 
   <!-- expansion:intuition — frame the equivalence: the remainder form is not a new notion of derivative, just a repackaging of §2.2 -->
   <p>This is not a new notion of derivative, only a new way of writing the old one.</p>
@@ -199,7 +205,7 @@
             &= \frac{1}{2\sqrt{1 + \sin^{2} x}}\cdot 2\sin x\cdot \cos x \\[2pt]
             &= \frac{\sin x \cos x}{\sqrt{1 + \sin^{2} x}}.
         \end{aligned} \]</p>
-        <p>Each layer contributes exactly one factor: \(\tfrac12 u^{-1/2}\) from the square root, \(2\sin x\) from squaring, and \(\cos x\) from the sine. Their product is the derivative — the slopes multiply down the chain, just as Figure 3.2 pictures.</p>
+        <p>Each layer contributes exactly one factor: \(\tfrac12 u^{-1/2}\) from the square root, \(2\sin x\) from squaring, and \(\cos x\) from the sine. Their product is the derivative — the slopes multiply down the chain, just as Figure 3.5 pictures.</p>
       </div>
     </section>
   </div>

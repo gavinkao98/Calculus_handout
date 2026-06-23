@@ -104,7 +104,7 @@
   | Proposition | `3.1`= sin & cos 連續、`3.2`= `lim sinθ/θ=1` | `3.3`= Def1⇔Def2 等價 | —（§3.3 無；`3.4` 未用） |
   | Definition | （§3.1 無；連續/odd-even cross-ref Ch1） | **`3.1`= remainder form（只此一個；Option B：limit form 的 Def 1 cross-ref §2.2、不另編號）** | —（§3.3 無；arcsin/arccos/arctan 定義 cross-ref Ch1；`3.2` 未用） |
   | Example | `3.1`= companion limit、`3.2`= tan′ & sec′（兩 part）、`3.3`= SHM | `3.4`= √(1+x²)&sin(x²)、`3.5`= √(1+sin²x) 巢狀 | `3.6`= ln′、`3.7`= xˣ、`3.8`= 2ˣ、`3.9`= (x ln x−x)′、`3.10`= arcsin′、`3.11`= arccos′、`3.12`= arctan′ |
-  | Figure | `3.1`= 扇形不等式 | `3.2`= composed-mapping（inline SVG） | —（§3.3 無圖；`3.3` 未用） |
+  | Figure | `3.1`= 扇形不等式、`3.2`= squeeze graph、`3.3`= sin/cos slope=height、`3.4`= SHM 三聯 | `3.5`= composed-mapping（inline SVG；2026-06-21 由 `3.2` 改號）、`3.6`= remainder-form 切線逼近 | `3.7`= arcsin 端點垂直切線 |
   | Remark | `3.1`= 導數四循環 | `3.2`= Leibniz form | `3.3`= one lever for many derivatives |
   | Caution | 無編號（radian 慣例） | 無編號（忘內層導數） | 無編號（arcsin/arccos 域 `(−1,1)`） |
   | Strategy | （§3.1 無） | `3.1`= chain-rule decomposition | `3.2`= logarithmic differentiation |
@@ -114,6 +114,8 @@
   > **§3.3 落定（④/⑥ 回填，2026-06-08）**：applications 全寫 **worked example**（手稿/ledger framing）→ §3.3 **不 mint** 新 Theorem/Proposition/Definition/Figure（`3.4`/`3.4`/`3.2`/`3.3` 留給後續）。Example **3.6–3.12**（ln′/xˣ/2ˣ/(x ln x−x)′/arcsin′/arccos′/arctan′）；Strategy **3.2**（log diff）；Remark **3.3**；Caution 無編號（arcsin/arccos 域）。**arctan′（3.12）為 ③ 核可的自創**，補齊 §3.1 opener＋§3.2 收尾已 shipped 的 arctan 承諾（同 composition-identity 技巧、只用 §3.1 tan′=sec²）。**arccos 用正確 identity `arccos(cos x)=x`**（非手稿 loose 形，①-verify 經使用者授權更正）。⑤ 兩模型（Claude 5-lens＋Codex gpt-5.5 ×4 runs，xhigh，`result_s33{,_r2,_r3,_r4}.json`）：run1 1 blocking（`arcsin(sin x)=x` 未標分支，係我 ⑤ 編輯引入→**獨立 Codex 擋下**）＋advisory 皆修，run2/3/4 連三次 `converged` 0 blocking；幻覺未穿過任一模型。render screen 545 KaTeX/0 err、print 18 頁/0 overflow（§3.3 ≈5 頁）；交叉引用 0 dangling（Ch1/Ch2/Ch4 跨章 ref 為 generic prose、非 defect）。**本機無 node/codex 於 PATH**：render 走 Claude_Preview MCP；Codex 由 `%LOCALAPPDATA%\OpenAI\Codex\bin\codex.exe` 絕對路徑叫（MSIX WindowsApps 版受 ACL 鎖、不可直叫）。
 
 ---
+
+  > **圖機會稽核（figure-opportunity audit，2026-06-21）**：多代理稽核（雙鏡頭提案→合併→對抗式複核→完整性批判，產 [`../../_audit/REVIEW-ch03-figure-opportunity.html`](../../_audit/REVIEW-ch03-figure-opportunity.html)）後，使用者核可新增 **5 張圖**：§3.1 `3.2` squeeze graph（C2）／`3.3` sin/cos slope=height（C1）／`3.4` SHM 三聯（C3）；§3.2 `3.6` remainder-form 切線逼近（C4）；§3.3 `3.7` arcsin 端點垂直切線（C5，窄義推翻 §3.3 原「no figure」③ 決定——只畫 arcsin 自身端點導數行為、非 Ch1 鏡射）。連帶 **composed-mapping 由 `3.2` 改號為 `3.5`**、全章圖重編 `3.1`–`3.7`，散文引用同步更新。圖碼進 `chapter3-print-standalone.html` 的 `FIGS`（4 個 buildPlot graph＋1 個 raw-SVG 三聯），fragment 加 `<figure data-fig>`＋caption。render 自驗 MathJax 0 err／21 頁／0 overflow／7 圖 hydrate；視覺 gate-1（D1–D8，5 個獨立 auditor）：Fig 3.7 一條 D6 blocking（非等比座標使 slope-1 切線不呈 45°）已修為等比座標並回歸複驗，餘皆 0 blocking。**駁回**：C6（參考三角形）／M1（巢狀分解樹）／M2（e^x↔ln x 鏡射，不忠於本節 composition-identity 法）／M3（反導數圖，概念越界 Ch 積分）／M4（a^x 自然底），理由見 REVIEW HTML §4。
 
 ## 6. 工程坑（承 ch01/ch02，後續節沿用）
 

@@ -10,9 +10,11 @@
        Proposition 3.1 (sin, cos continuous), 3.2 (lim sinθ/θ = 1);
        Theorem 3.1 (sin' = cos), 3.2 (cos' = −sin);
        Example 3.1 (companion limit), 3.2 (tan' & sec'), 3.3 (SHM);
-       Figure 3.1 (sector inequality); Remark 3.1 (derivative cycle).
+       Figure 3.1 (sector inequality), 3.2 (graphical squeeze of sinθ/θ),
+         3.3 (sin'=cos as slope=height), 3.4 (SHM s/s'/s'' stacked);
+       Remark 3.1 (derivative cycle).
        Caution is unnumbered (per ch02). §3.2 continues from Theorem 3.3,
-       Proposition 3.3, Example 3.4, Figure 3.2, Remark 3.2.
+       Proposition 3.3, Example 3.4, Figure 3.5, Remark 3.2.
 
      ③ decisions D1–D4: tan' as a worked example, not a theorem (D1); sec'
      pulled into §3.1 beside tan' (same quotient-rule technique); the
@@ -121,7 +123,7 @@
   <h3 class="subsec-head">The fundamental limit</h3>
 
   <!-- expansion:intuition — frame the squeeze payoff -->
-  <p>We can finally squeeze \(\sin\theta/\theta\) to its limit: inequality (1) traps it between \(\cos\theta\) and \(1\), and both ends head for the same place.</p>
+  <p>We can finally squeeze \(\sin\theta/\theta\) to its limit: inequality (1) traps it between \(\cos\theta\) and \(1\), and both ends head for the same place (Figure 3.2).</p>
 
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.2</span><span class="env-name">The fundamental trigonometric limit</span></p>
@@ -136,6 +138,11 @@
       <p>For \(0 < \theta < \tfrac{\pi}{2}\), inequality (1) reads \(\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1\). As \(\theta \to 0^{+}\) the upper bound is the constant \(1\), while the lower bound satisfies \(\cos\theta \to \cos 0 = 1\) by the continuity of cosine (Proposition 3.1). The squeeze theorem (§1.5) pins the quantity between them: \(\lim_{\theta \to 0^{+}} \sin\theta/\theta = 1\). Finally \(\sin\theta/\theta\) is even, so its left-hand limit at \(0\) equals its right-hand limit, and the two-sided limit is \(1\) as well.</p>
     </div>
   </section>
+
+  <!-- expansion:figure — the same bound read as a function graph: (sinθ)/θ squeezed between cosθ and 1 (registered in figures.js as "squeeze-limit") -->
+  <figure class="figure" data-fig="squeeze-limit">
+    <figcaption><span class="fig-no">Figure 3.2</span> The same inequality, read as a graph. Near \(\theta = 0\) the quantity \(\dfrac{\sin\theta}{\theta}\) (solid) is trapped between \(\cos\theta\) (dashed, below) and the constant \(1\) (above). As \(\theta \to 0\) both bounds tend to \(1\), so the quantity between them is squeezed to \(1\). The ratio is even and is undefined at \(\theta = 0\) (open circle), where the limit — not a value — equals \(1\).</figcaption>
+  </figure>
 
   <!-- expansion:caution — the radian convention is essential: sinθ/θ→1, and hence sin'=cos, fails in degrees -->
   <section class="env env-caution">
@@ -188,6 +195,11 @@
       <p>\[ \frac{d}{dx}\cos x = -\sin x \cdot 1 = -\sin x. \]</p>
     </div>
   </section>
+
+  <!-- expansion:figure — sin'=cos as slope=height: tangents of sin x vs heights of cos x (registered in figures.js as "sin-cos-slope") -->
+  <figure class="figure" data-fig="sin-cos-slope">
+    <figcaption><span class="fig-no">Figure 3.3</span> Why \(\sin' = \cos\), seen on the graph. The tangents to \(y = \sin x\) (solid) at \(x = 0, \tfrac{\pi}{2}, \pi\) have slopes \(1, 0, -1\) — exactly the heights of \(y = \cos x\) (dashed) at those points (dots). The slope of sine at each \(x\) is the height of cosine there; one more derivative drops cosine to \(-\sin x\), giving the four-step cycle of Remark 3.1.</figcaption>
+  </figure>
 
   <!-- expansion:example — companion fundamental limit (1−cosθ)/θ → 0 (D2; standard companion to Proposition 3.2) -->
   <div class="workedexample">
@@ -252,16 +264,21 @@
       <div class="env-body">
         <p>Velocity is the derivative of height, and acceleration the derivative of velocity. Differentiating with Theorems 3.1 and 3.2,</p>
         <p>\[ s'(t) = \cos t, \qquad s''(t) = \frac{d}{dt}\cos t = -\sin t. \]</p>
-        <p>Thus \(s''(t) = -\sin t = -s(t)\): at every instant the weight accelerates back toward its rest level, by an amount proportional to how far it has strayed. This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em>, and it is no accident that sine and cosine — the functions whose second derivative is their own negative — are precisely the ones that describe oscillation.</p>
+        <p>Thus \(s''(t) = -\sin t = -s(t)\): at every instant the weight accelerates back toward its rest level, by an amount proportional to how far it has strayed. This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em> (Figure 3.4), and it is no accident that sine and cosine — the functions whose second derivative is their own negative — are precisely the ones that describe oscillation.</p>
       </div>
     </section>
   </div>
+
+  <!-- expansion:figure — SHM: s=sin t, s'=cos t, s''=−sin t stacked; s''=−s mirror (registered in figures.js as "shm-triple") -->
+  <figure class="figure" data-fig="shm-triple">
+    <figcaption><span class="fig-no">Figure 3.4</span> Simple harmonic motion, read off three stacked graphs over one time axis: height \(s = \sin t\) (top), velocity \(s' = \cos t\) (middle), acceleration \(s'' = -\sin t\) (bottom). Where the height reaches a peak or trough (dashed lines at \(t = \tfrac{\pi}{2}, \tfrac{3\pi}{2}\)) the velocity passes through zero; and the bottom graph is the top one flipped upside down — the picture of \(s'' = -s\).</figcaption>
+  </figure>
 
   <!-- expansion:intuition — the four-fold derivative cycle, a bookend echoing the e^x self-replication remark of §2.4 -->
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.1</span><span class="env-name">The derivative cycle of sine and cosine</span></p>
     <div class="env-body">
-      <p>Differentiation sends sine and cosine into each other, with a sign that turns over every second step. Writing \(\to\) for one application of \(\dfrac{d}{dx}\),</p>
+      <p>Differentiation sends sine and cosine into each other, with a sign that turns over every second step (Figure 3.3). Writing \(\to\) for one application of \(\dfrac{d}{dx}\),</p>
       <p>\[ \sin x \;\to\; \cos x \;\to\; -\sin x \;\to\; -\cos x \;\to\; \sin x. \]</p>
       <p>After four derivatives we are back where we started, so \(\dfrac{d^{4}}{dx^{4}}\sin x = \sin x\), and likewise for cosine. Where \(e^{x}\) reproduces itself in a single step (§2.4), sine and cosine reproduce themselves in a cycle of four — the same self-renewal that lets \(s'' = -s\) describe an oscillation that never winds down.</p>
     </div>

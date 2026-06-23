@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 3 圖機會稽核 — 建議插圖清單（待裁決）</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --ink:#1a1a1a; --soft:#5c5c5c; --line:#e2e2e2; --bg:#fbfbf9;
+    --hi:#b3261e; --med:#9a6700; --low:#5c5c5c; --keep:#1a7f37; --drop:#8a8a8a;
+    --primary:#1b5fb0; --chip:#f0f0ec;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Helvetica Neue",system-ui,"Microsoft JhengHei",sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.65; margin:0; padding:0 0 6rem;}
+  .wrap{max-width:1000px; margin:0 auto; padding:0 1.4rem;}
+  header.top{border-bottom:3px solid var(--ink); padding:2.2rem 0 1.4rem; margin-bottom:1.6rem;}
+  h1{font-size:1.7rem; margin:0 0 .3rem;}
+  h2{font-size:1.28rem; margin:2.4rem 0 .8rem; padding-bottom:.3rem; border-bottom:2px solid var(--line);}
+  h3{font-size:1.06rem; margin:0 0 .5rem;}
+  .meta{color:var(--soft); font-size:.9rem;}
+  .lead{background:#fff; border:1px solid var(--line); border-left:4px solid var(--primary);
+    padding:1rem 1.2rem; border-radius:5px; margin:1.2rem 0;}
+  table{border-collapse:collapse; width:100%; font-size:.9rem; margin:1rem 0;}
+  th,td{border:1px solid var(--line); padding:.5rem .6rem; text-align:left; vertical-align:top;}
+  th{background:var(--chip); font-weight:600;}
+  .badge{display:inline-block; font-size:.74rem; font-weight:700; padding:.1rem .5rem;
+    border-radius:999px; color:#fff; white-space:nowrap;}
+  .b-hi{background:var(--hi)} .b-med{background:var(--med)} .b-low{background:var(--low)}
+  .b-keep{background:var(--keep)} .b-drop{background:var(--drop)}
+  .b-sec{background:var(--primary)}
+  .card{background:#fff; border:1px solid var(--line); border-radius:7px; padding:1.1rem 1.3rem; margin:1.1rem 0;}
+  .card.keep{border-left:5px solid var(--keep)}
+  .card.drop{border-left:5px solid var(--drop); background:#fafafa;}
+  .card h3 .cid{font-family:ui-monospace,Consolas,monospace; background:var(--chip);
+    padding:.05rem .4rem; border-radius:4px; font-size:.85rem; margin-right:.5rem;}
+  .row{margin:.5rem 0;}
+  .row .k{font-weight:600; color:var(--primary); display:inline-block; min-width:6.5em;}
+  .drop .row .k{color:var(--soft);}
+  .tags{margin:.4rem 0 .7rem; display:flex; gap:.4rem; flex-wrap:wrap; align-items:center;}
+  .tag{font-size:.78rem; background:var(--chip); color:var(--soft); padding:.1rem .5rem; border-radius:4px;}
+  .quote{font-style:italic; color:var(--soft); border-left:2px solid var(--line); padding-left:.7rem;}
+  .note{font-size:.92rem;}
+  ul.compact{margin:.3rem 0 .3rem 1.1rem; padding:0;}
+  ul.compact li{margin:.25rem 0;}
+  .askbox{background:#fff8e6; border:1px solid #e8d9a0; border-radius:7px; padding:1rem 1.2rem; margin:1.2rem 0;}
+  code{font-family:ui-monospace,Consolas,monospace; background:var(--chip); padding:.05rem .3rem; border-radius:3px; font-size:.88em;}
+  .small{font-size:.85rem; color:var(--soft);}
+  hr{border:none; border-top:1px solid var(--line); margin:2rem 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Chapter 3 圖機會稽核 — 建議插圖清單</h1>
+  <div class="meta">
+    對象：Chapter 3 <em>Chain Rule and Trigonometric Derivatives</em>（§3.1–§3.3，現況樹）·
+    日期：2026-06-21 · 性質：<strong>待裁決提案，未動任何檔</strong>
+  </div>
+</header>
+
+<div class="lead">
+  <strong>這份是什麼。</strong> 對 Chapter 3 三節跑一輪「圖機會稽核」（figure-opportunity audit）——找出「目前用純文字、但用圖會更直覺」的位置，逐條附 <strong>位置（locus）＋圖的教學功能＋為何圖優於純文字＋落地可行性</strong>，對齊 <code>CONTENT_SPEC §10</code> 的 <code>[FIGURE-OPPORTUNITY]</code> 佔位符 schema。<strong>請您裁決後我再生成圖。</strong>
+</div>
+
+<p class="note"><strong>方法（多代理對抗式稽核）。</strong> 逐節 × 雙鏡頭（幾何/證明直覺、函數行為/密度）共 6 個提案 agent 平行掃描 → 跨鏡頭合併去重成 7 個唯一候選 → 每個候選一個「預設駁回」的對抗式複核 agent（查：散文是否已自足、是否重複既有圖、是否違背既往 ③ 決策、是否忠於講義、kit 可行性、洩答風險）→ 完整性批判補 4 個漏網候選並各自複核。原始 12 提案 → 11 候選經裁決。</p>
+
+<h2>0. 既有基準（不重複提案）</h2>
+<table>
+  <tr><th>既有圖</th><th>節</th><th>內容</th></tr>
+  <tr><td><strong>Figure 3.1</strong> sector-inequality</td><td>§3.1</td><td>單位圓第一象限，\(\triangle OAB \subseteq\) 扇形 \(OAB \subseteq \triangle OAC\)，三面積給出 \(\tfrac12\sin\theta \le \tfrac12\theta \le \tfrac12\tan\theta\)（建立基本極限的不等式）。</td></tr>
+  <tr><td><strong>Figure 3.2</strong> composed-mapping</td><td>§3.2</td><td>三條水平軸 \(x\,/\,u{=}g(x)\,/\,y{=}f(u)\)；小增量 \(h\) 經 \(g\)、\(f\) 兩段放大，兩段局部斜率相乘（chain rule 的抽象 mapping 直覺）。</td></tr>
+  <tr><td><strong>（§3.3 目前零圖）</strong></td><td>§3.3</td><td>七個 worked example、無任何圖。③（2026-06-08）曾刻意決定「不放圖」——理由：sin↔arcsin 鏡射屬 Chapter 1 §1.2 定義素材，於散文中以文字 recall。</td></tr>
+</table>
+
+<h2>1. 裁決總表</h2>
+<table>
+  <tr><th>ID</th><th>節</th><th>型</th><th>建議插圖</th><th>裁決</th><th>優先</th></tr>
+  <tr><td><code>C4</code></td><td>§3.2</td><td>graph</td><td>切線一階逼近：曲線、切線與餘項 \(R(h)\)（remainder form 幾何）</td><td><span class="badge b-keep">採納</span></td><td><span class="badge b-hi">高</span></td></tr>
+  <tr><td><code>C2</code></td><td>§3.1</td><td>graph</td><td>函數圖版 squeeze：\(\cos\theta \le \tfrac{\sin\theta}{\theta} \le 1\) 被夾到 1</td><td><span class="badge b-keep">採納</span></td><td><span class="badge b-hi">高</span></td></tr>
+  <tr><td><code>C5</code></td><td>§3.3</td><td>graph</td><td>arcsin 在 \(y=\pm1\) 的垂直切線：導數在端點不存在</td><td><span class="badge b-keep">採納</span></td><td><span class="badge b-hi">高 *</span></td></tr>
+  <tr><td><code>C1</code></td><td>§3.1</td><td>graph</td><td>sin/cos 疊圖：sine 的切線斜率＝cosine 的當下高度</td><td><span class="badge b-keep">採納</span></td><td><span class="badge b-med">中</span></td></tr>
+  <tr><td><code>C3</code></td><td>§3.1</td><td>multi-panel</td><td>簡諧運動三聯圖：\(s,\,s',\,s''\) 與 \(s''=-s\)</td><td><span class="badge b-keep">採納</span></td><td><span class="badge b-med">中</span></td></tr>
+  <tr><td><code>C7</code></td><td>§3.3</td><td>multi-panel</td><td>三反三角對照全景：arctan 處處可微 vs arcsin/arccos 端點垂直切線</td><td><span class="badge b-keep">可選</span></td><td><span class="badge b-low">低 *</span></td></tr>
+  <tr><td><code>C6</code></td><td>§3.3</td><td>diagram</td><td>參考直角三角形：\(\cos x=\sqrt{1-y^2}\) 為何取正根</td><td><span class="badge b-drop">駁回</span></td><td>—</td></tr>
+  <tr><td><code>M1</code></td><td>§3.2</td><td>diagram</td><td>三層巢狀合成「剝洋蔥」分解樹</td><td><span class="badge b-drop">駁回</span></td><td>—</td></tr>
+  <tr><td><code>M2</code></td><td>§3.3</td><td>graph</td><td>\(e^x\)↔\(\ln x\) 鏡射、斜率互為倒數</td><td><span class="badge b-drop">駁回</span></td><td>—</td></tr>
+  <tr><td><code>M3</code></td><td>§3.3</td><td>graph</td><td>\(x\ln x - x\) 是 \(\ln x\) 的反導數（斜率＝高度）</td><td><span class="badge b-drop">駁回</span></td><td>—</td></tr>
+  <tr><td><code>M4</code></td><td>§3.3</td><td>graph</td><td>\(a^x\) 各底數：唯獨 \(e^x\) 斜率＝自身高度</td><td><span class="badge b-drop">駁回</span></td><td>—</td></tr>
+</table>
+<p class="small">* <code>C5</code> 與 <code>C7</code> 皆會<strong>窄義推翻 §3.3 ③「不放圖」決定</strong>，且兩者內容重疊（見下）——需您先裁決是否重啟 §3.3 的 no-figure 立場。</p>
+
+<div class="askbox">
+  <strong>我的建議（供裁決）。</strong>
+  <ul class="compact">
+    <li><strong>無條件採納 <code>C4</code>（§3.2）、<code>C2</code>（§3.1）</strong>：兩者「圖&gt;文字」最清楚、忠實、低風險，分別補上 §3.2 唯一缺的「函數為何局部像切線」與 §3.1 基本極限的收束直覺。</li>
+    <li><strong>§3.3 是否開圖＝關鍵裁決</strong>：若願窄義重啟 ③，採 <strong><code>C5</code></strong>（單張、就地釐清 Caution 陷阱、成本低）；<code>C7</code>（章末三聯全景）較重、與 <code>C5</code> 重疊，建議「先 <code>C5</code>，日後再評估是否併成對照組」，不與 <code>C5</code> 同時獨立落地。</li>
+    <li><strong>§3.1 別一次塞滿</strong>：§3.1 已有 Figure 3.1，再加 <code>C2</code>＋<code>C1</code>＋<code>C3</code> 共 4 圖偏密。建議 <code>C2</code> 必收，<code>C1</code> 與 <code>C3</code> 二擇一（同為「函數行為」鏡頭，<code>C1</code> 教局部斜率對應、<code>C3</code> 教 SHM 整體相位）。</li>
+    <li><strong>五個駁回項</strong>我同意維持駁回；理由逐條列於 §4，若您對其中某項有不同看法可逐案翻案。</li>
+  </ul>
+</div>
+
+<h2>2. 採納候選（詳細卡）</h2>
+
+<div class="card keep">
+  <h3><span class="cid">C4</span>切線一階逼近：曲線、切線與餘項 \(R(h)\)（remainder form 的局部線性化圖）</h3>
+  <div class="tags"><span class="badge b-keep">採納</span><span class="badge b-hi">高</span><span class="tag">§3.2</span><span class="tag">graph（建議 multi-panel）</span><span class="tag">geometric-intuition</span></div>
+  <div class="row"><span class="k">位置</span> Definition 3.1（remainder form）正下方的 informal 旁白：<span class="quote">"the tangent line is a good fit to first order"</span>（sec-3-2.html L95；同直覺亦見開場 L40）。圖錨在 Definition 3.1 env-body 內。</div>
+  <div class="row"><span class="k">教學功能</span> 用單一光滑曲線 \(y=f(x)\) 及其在 \(x_0\) 的切線，把 \(f(x_0+h)=f(x_0)+mh+R(h)\) 兌現成可量的幾何量：\(x_0+h\) 處曲線值與切線值的鉛直差即 \(R(h)\)。建議畫大、小兩個 \(h\) 對照（multi-panel 兩格），讓讀者看見 \(h\) 減半時鉛直缺口相對於 \(h\) 的比例肉眼塌陷——這正是 \(\lim_{h\to0}R(h)/h=0\) 的幾何意義（切線在 \(x_0\) 附近相切而非僅相交）。</div>
+  <div class="row"><span class="k">圖&gt;文字</span> remainder form 是整節證明的引擎（Theorem 3.3 的證明＝把兩個線性近似疊起來、再驗餘項可忽略），但目前只以符號＋一句散文呈現，<strong>§3.2 無任何「函數圖」</strong>。「\(R(h)\) 比 \(h\) 更快趨零」是純文字最難內化的一點，圖能直接呈現速率對照。屬 §10「重要 definition（尤其 geometric）SHOULD 加圖」，且為本章首個 Definition。</div>
+  <div class="row"><span class="k">定義域事實</span> 無。只需一條一般光滑可微曲線；無定義域限制/間斷/未定義點。承載軸非整數刻度 \(x_0,\;x_0+h\) 以顯式 <code>tex</code> 給出；曲線取一般凸/凹小段、不綁特定函數（避免觸 D6 的 Ch2 重證）。</div>
+  <div class="row"><span class="k">可行性</span> <code>buildPlot</code>：<code>curve</code> ＋ 兩條 <code>seg</code>（沿切線、鉛直 \(R(h)\)）＋ <code>dot</code> ＋ 少量 <code>text</code> ＋ 顯式 tex 刻度。複雜度同 ch01 Fig 1.16/1.17。</div>
+  <div class="row"><span class="k">與既有/③</span> 與 Figure 3.2 互補分工：3.2 是抽象三軸 mapping（刻意不畫曲線）回答「兩段斜率為何相乘」；本圖是具體單函數，回答更上游的「每個函數為何局部像切線」——正是 3.2 magnification 能相乘的底層理由。與 ③ D5（intuition-first）一致，不涉 D6/D10。</div>
+</div>
+
+<div class="card keep">
+  <h3><span class="cid">C2</span>函數圖版 squeeze：\(\cos\theta \le \tfrac{\sin\theta}{\theta} \le 1\) 在 \(\theta\to0\) 被夾到 1</h3>
+  <div class="tags"><span class="badge b-keep">採納</span><span class="badge b-hi">高</span><span class="tag">§3.1</span><span class="tag">graph</span><span class="tag">function-behavior / proof-visualization</span></div>
+  <div class="row"><span class="k">位置</span>「The fundamental limit」小節，Proposition 3.2 證明處：<span class="quote">"inequality (1) traps it between \(\cos\theta\) and 1, and both ends head for the same place"</span>（sec-3-1.html L124）。</div>
+  <div class="row"><span class="k">教學功能</span> 在 \(\theta\approx[-1.2,1.2]\)（\(\theta\to0\) 放大）同框畫三條：上界 \(y=1\)、下界 \(y=\cos\theta\)、被夾的 \(y=\tfrac{\sin\theta}{\theta}\)，呈現三者在 \(\theta\to0\) 同奔向 \((0,1)\) 的漏斗收束。教「為何 squeeze 必然逼出 1」——把證明中以符號宣告的夾擠變成可見的幾何擠壓。</div>
+  <div class="row"><span class="k">圖&gt;文字</span> 散文只能逐句宣告「上界是常數 1、下界 \(\cos\theta\to1\)、故被夾者→1」，讀者須在腦中疊三條曲線並想像夾擠。座標圖讓「兩條夾界在 0 會合、中間別無去處」一目了然，是 Stewart/Rogawski 處理此極限的標準視覺。</div>
+  <div class="row"><span class="k">定義域事實</span> \(\tfrac{\sin\theta}{\theta}\) 在 \(\theta=0\) 未定義（\(0/0\)）→ 該曲線在 \((0,1)\) 須畫<strong>空心點</strong>（kit <code>it.hollow</code> 已支援），標「此處無定義、極限為 1」；下界 \(\cos\theta\) 與上界 1 在 0 皆取值 1，三線於 \((0,1)\) 對齊收束；取樣須在 0 處跳過 \(\varepsilon\) 鄰域以免除以零。承載軸顯式 tex（\(\theta=0,\;y=1\)）。</div>
+  <div class="row"><span class="k">可行性</span> <code>buildPlot</code> 三 <code>curve</code>/<code>hline</code> ＋ hollow <code>dot</code>，已逐一對照 standalone 原語（curve/domain、hline、hollow dot、tex ticks）確認存在。</div>
+  <div class="row"><span class="k">與既有/③</span> 與 Figure 3.1 <strong>互補分管 Proposition 3.2 兩端</strong>：3.1 用面積「證出」不等式（界的來源），本圖把不等式「畫成函數圖」展示收束（界的結果）。不違 D4（D4 禁的是「重述 §1.5 squeeze 定理」，本圖是把該定理於此具體情形的作用視覺化）。<span class="small">提醒：與 Figure 3.1 同處基本極限近一頁，落地時請以 caption 明示兩圖分工，避免讀者誤為重複。</span></div>
+</div>
+
+<div class="card keep">
+  <h3><span class="cid">C5</span>arcsin 在 \(y=\pm1\) 的垂直切線：導數在端點不存在的圖形後果</h3>
+  <div class="tags"><span class="badge b-keep">採納</span><span class="badge b-hi">高</span><span class="badge b-sec">窄義推翻 ③</span><span class="tag">§3.3</span><span class="tag">graph</span><span class="tag">function-behavior</span></div>
+  <div class="row"><span class="k">位置</span> Example 3.10 之後的 Caution（sec-3-3.html L171–177）：<span class="quote">"the graph of arcsin … has a vertical tangent there, so the derivative does not exist. Report these derivatives on the open interval, never the closed one."</span></div>
+  <div class="row"><span class="k">教學功能</span> 在開區間 \((-1,1)\) 畫 \(y=\arcsin y\)：內部平緩、越近 \(y=\pm1\) 越陡、到端點切線轉垂直（斜率\(\to+\infty\)），對應 \(\tfrac{1}{\sqrt{1-y^2}}\) 在端點發散；中段 \(x=0\) 疊一段斜率 1 的切線作對照。把「分母為零」這個代數事實翻成讀者可直接看見的幾何事件，鎖住開區間限制與端點不可微。</div>
+  <div class="row"><span class="k">圖&gt;文字</span> Caution 用的是純圖形語彙（"graph"、"vertical tangent"）斷言一個可視化結論，但<strong>全節零圖</strong>，讀者得自行心算「分母趨零→切線變垂直→導數 DNE」三段翻譯。屬 §10「有可視化後果的 domain-limitation 斷言 SHOULD 加圖」＋§3.3 零圖密度缺口的典型。</div>
+  <div class="row"><span class="k">定義域事實</span> 公式 \(\tfrac{1}{\sqrt{1-y^2}}\) 僅在開區間 \((-1,1)\) 有效；端點 \(y=\pm1\) 分母為 0、導數不存在 → 端點 \((\pm1,\pm\tfrac{\pi}{2})\) 切線垂直，畫<strong>空心點或不畫該點</strong>、曲線端點不收邊，<strong>切勿在端點畫實心點或有定義斜率</strong>。承載軸 \(y=\pm1\) 與 \(\pm\tfrac{\pi}{2}\) 顯式 tex。</div>
+  <div class="row"><span class="k">可行性</span> <code>buildPlot</code>：<code>curve</code> 於 \([-0.999,0.999]\)（超出範圍自動斷筆、端點自然變陡）＋ <code>seg</code> 切線段 ＋ hollow <code>dot</code> ＋ 顯式 tex。原語皆現成。</div>
+  <div class="row"><span class="k">與既有/③</span> <strong>窄義推翻 §3.3 ③ no-figure</strong>，但有理：③ 的理由僅針對「重畫 sin↔arcsin 鏡射＝重述 Ch1 §1.2 定義」，本圖<strong>刻意不畫鏡射、不重述 Ch1</strong>，改畫 arcsin 自身曲線在端點的切線行為——這是 §3.3 此 Caution 才首次成立的導數結論，Ch1（尚無微分）沒有也不可能有。請您裁決此窄義推翻。</div>
+</div>
+
+<div class="card keep">
+  <h3><span class="cid">C1</span>sin/cos 疊圖：sine 的切線斜率處處等於 cosine 的當下高度</h3>
+  <div class="tags"><span class="badge b-keep">採納</span><span class="badge b-med">中</span><span class="tag">§3.1</span><span class="tag">graph</span><span class="tag">function-behavior</span></div>
+  <div class="row"><span class="k">位置</span> Theorem 3.1/3.2 成立之後、Example 3.1 之前：<span class="quote">"the difference quotient for \(\sin\) all but evaluates itself"</span>（sec-3-1.html L151）；亦為 Remark 3.1 導數循環的視覺錨。</div>
+  <div class="row"><span class="k">教學功能</span> 同框疊畫 \(y=\sin x\) 與 \(y=\cos x\)（\(x\in[-\tfrac{\pi}{2},2\pi]\)），在 \(x=0\)（斜率 \(1=\cos0\)）、\(x=\tfrac{\pi}{2}\)（切線水平 \(=\cos\tfrac{\pi}{2}\)）、\(x=\pi\)（斜率 \(-1=\cos\pi\)）標切線小段並對應到 cosine 高度。把恆等式 \(\sin'=\cos\) 轉成「一條曲線的瞬時斜率＝另一條曲線的當下高度」的視覺事實。</div>
+  <div class="row"><span class="k">圖&gt;文字</span> 整節以 difference quotient「算」出公式，但全節無一處給結果的形狀詮釋；Remark 3.1 只給符號四循環 \(\sin\to\cos\to-\sin\to-\cos\to\sin\)、無幾何錨。建立「導數即斜率函數」的直覺。</div>
+  <div class="row"><span class="k">定義域事實</span> 無（\(\sin,\cos\) 處處連續可微）。x 軸刻度為 \(\pi\) 倍數，須顯式 tex（\(\tfrac{\pi}{2},\pi,\tfrac{3\pi}{2}\)）。</div>
+  <div class="row"><span class="k">可行性</span> <code>buildPlot</code> 多 <code>curve</code>（Math.sin/Math.cos）＋ <code>seg</code> 切線 ＋ <code>dot</code> ＋ pi-ticks。保持 label economy：對應關係寫進 caption。</div>
+  <div class="row"><span class="k">與既有/③</span> 與 Figure 3.1（面積證明）互補，補 §3.1 唯一缺的「結果形狀」鏡頭。下修為中：§3.1 非零圖缺口，屬 §10 補強而非密度急缺。<span class="small">與 C3 同為函數行為鏡頭，建議二擇一。</span></div>
+</div>
+
+<div class="card keep">
+  <h3><span class="cid">C3</span>簡諧運動三聯圖：\(s=\sin t,\; s'=\cos t,\; s''=-\sin t\) 與 \(s''=-s\)</h3>
+  <div class="tags"><span class="badge b-keep">採納</span><span class="badge b-med">中</span><span class="tag">§3.1</span><span class="tag">multi-panel</span><span class="tag">function-behavior</span></div>
+  <div class="row"><span class="k">位置</span> Example 3.3（彈簧重物 \(s(t)=\sin t\)）Solution（sec-3-1.html L255）：<span class="quote">"\(s''(t)=-\sin t=-s(t)\) … the signature of simple harmonic motion"</span>。</div>
+  <div class="row"><span class="k">教學功能</span> 三層共 \(t\) 軸堆疊（上位置、中速度、下加速度）：(1) 位置取極值時速度過零（\(s\) 極值對齊 \(s'\) 零交越）；(2) 加速度是位置的上下鏡射 \(s''=-s\)。把「永遠被拉回平衡位置、與位移成正比」落到可見的相位關係。</div>
+  <div class="row"><span class="k">圖&gt;文字</span> 「位置峰值⇄速度為零」「加速度＝位置鏡射」這種跨三函數的相位對齊，純文字無法讓讀者在腦中同時對齊三條曲線；三聯共軸圖是物理/微積分教材呈現 SHM 的標準手法。</div>
+  <div class="row"><span class="k">定義域事實</span> 無；須相位對齊正確（極值 \(t=\tfrac{\pi}{2},\tfrac{3\pi}{2}\) 對齊 \(s'\) 零交越；\(s\) 與 \(s''\) 嚴格上下鏡射），三 panel 共用同一 \(t\) 比例尺。畫一週期 \([0,2\pi]\)、pi-ticks。</div>
+  <div class="row"><span class="k">可行性</span> FIGS <code>triple</code> layout（已支援）堆三個 <code>buildPlot</code> panel ＋ <code>vline</code> 對齊線 ＋ pi-ticks。</div>
+  <div class="row"><span class="k">與既有/③</span> 與 Fig 3.1/3.2 無重疊；§3.1 只裁定過 Figure 3.1，SHM 圖屬全新機會（③ no-figure 屬 §3.3）。<span class="small">與 C1 鏡頭不同可並存，但若控密度建議與 C1 二擇一。</span></div>
+</div>
+
+<div class="card keep">
+  <h3><span class="cid">C7</span>三反三角導數對照全景：arctan 處處可微 vs arcsin/arccos 端點垂直切線</h3>
+  <div class="tags"><span class="badge b-keep">可選</span><span class="badge b-low">低</span><span class="badge b-sec">窄義推翻 ③</span><span class="tag">§3.3</span><span class="tag">multi-panel</span><span class="tag">function-behavior</span></div>
+  <div class="row"><span class="k">位置</span> Example 3.12 收尾（L214「Unlike arcsin and arccos, the arctangent is differentiable everywhere.」）與 Chapter summary 之間。</div>
+  <div class="row"><span class="k">教學功能</span> 三聯並排 \(y=\arcsin x,\;\arccos x,\;\arctan x\)：左中兩格定義域受限於 \([-1,1]\)、端點豎起（垂直切線、空心端點）；右格 arctan 鋪滿 \(\mathbb{R}\)、兩端僅貼近水平漸近線 \(\pm\tfrac{\pi}{2}\)（永不垂直）。把章末斷言「arctan 處處可微 vs arcsin/arccos 只在開區間」轉成同一視野的可比形狀。</div>
+  <div class="row"><span class="k">圖&gt;文字</span> 「三函數形狀差異同框可比」是散文結構上無法達成的；但邏輯結論散文已清楚陳述，故增量價值僅在章末整合。</div>
+  <div class="row"><span class="k">定義域事實</span> arcsin/arccos 僅開區間 \((-1,1)\) 可微、端點垂直切線（空心、不收邊）；arctan 全 \(\mathbb{R}\) 可微、加 \(y=\pm\tfrac{\pi}{2}\) 兩條水平虛線漸近線。\(\pm\tfrac{\pi}{2}\) 顯式 tex。<span class="small">（複核已建議刪去原提案附加的「鐘形導數面板」以收斂 scope。）</span></div>
+  <div class="row"><span class="k">可行性</span> 三格 <code>buildPlot</code> graph，形制同 ch01 Fig 1.16/1.17 漸近線圖。</div>
+  <div class="row"><span class="k">與既有/③</span> <strong>與 C5 高度重疊、請擇一</strong>：C5 在 Caution 當下、成本低、即時釐清陷阱，承擔了 C7 中唯一「純視覺才有」的內容；C7 較重、增量僅在章末整合。建議「先採 C5，再評估是否把 arctan 格併入成同一對照組」——<strong>C5 與 C7 不應同時獨立落地</strong>。同屬窄義推翻 ③。</div>
+</div>
+
+<h2>3. 採納後的圖配置（若全收 C1–C5＋擇一 C7）</h2>
+<table>
+  <tr><th>節</th><th>既有</th><th>建議新增</th><th>合計</th><th>密度註</th></tr>
+  <tr><td>§3.1（~7 頁）</td><td>Fig 3.1</td><td>C2（必）＋ C1/C3（擇一）</td><td>3</td><td>近 Stewart 密度，OK；若三張全收（4 張）偏密。</td></tr>
+  <tr><td>§3.2（~6 頁）</td><td>Fig 3.2</td><td>C4</td><td>2</td><td>補上唯一缺的函數圖，合理。</td></tr>
+  <tr><td>§3.3（~5 頁）</td><td>—（零）</td><td>C5（或 C5+C7 合併）</td><td>1–2</td><td>從零圖補到 1–2 張，仍偏少但已填關鍵 Caution 缺口。</td></tr>
+</table>
+
+<h2>4. 駁回候選（已考慮、不建議；附理由供翻案）</h2>
+
+<div class="card drop">
+  <h3><span class="cid">C6</span>參考直角三角形：\(\cos x=\sqrt{1-y^2}\) 為何取正根 — <span class="badge b-drop">駁回</span></h3>
+  <div class="row"><span class="k">位置</span> Example 3.10 取根步 L165。</div>
+  <div class="row"><span class="k">駁回理由</span>
+    <ul class="compact">
+      <li><strong>散文已自足</strong>：L165 已用 \(\cos x=\sqrt{1-\sin^2x}=\sqrt{1-y^2}\) 給大小、並以「開區間 \(x\in(-\tfrac{\pi}{2},\tfrac{\pi}{2})\Rightarrow\cos x>0\)」給正負，兩個判斷都已乾淨陳述。</li>
+      <li><strong>不忠於講義方法</strong>：講義全程用 Pythagorean 恆等式、非 SOH-CAH-TOA；畫成三角形等於引入講義沒有的推導裝置（與 ③/D10 純代數取向相左）。</li>
+      <li><strong>定義域致命傷</strong>：標準銳角參考三角形只能畫 \(x\in[0,\tfrac{\pi}{2})\)（\(y\ge0\)），無法呈現散文嚴謹處理的負 \(y\)——圖反而比散文涵蓋更少。</li>
+    </ul>
+  </div>
+  <div class="small">翻案空間：若您偏好多數教科書的「參考三角形」慣例、且願在此引入該方法，可重評；但需處理負 \(y\) 的呈現。</div>
+</div>
+
+<div class="card drop">
+  <h3><span class="cid">M1</span>三層巢狀合成「剝洋蔥」分解樹 — <span class="badge b-drop">駁回</span></h3>
+  <div class="row"><span class="k">位置</span> Example 3.5（\(\sqrt{1+\sin^2x}\)）L202。</div>
+  <div class="row"><span class="k">駁回理由</span> 散文已充分：L202 已逐字寫出「層→因子」一對一對應（\(\tfrac12u^{-1/2}\) from √、\(2\sin x\) from squaring、\(\cos x\) from sine），L196–201 的 aligned 展開式本身就是分解樹的線性化呈現；Strategy 3.1 L77 已把同一遞迴結構說成普適規則。對 3 層特例另畫一張「同一句話的圖」屬教學冗餘，非密度缺口。</div>
+</div>
+
+<div class="card drop">
+  <h3><span class="cid">M2</span>\(e^x\)↔\(\ln x\) 鏡射、斜率互為倒數 — <span class="badge b-drop">駁回（完整性批判自稱「最高價值漏網」，但忠實度檢查擋下）</span></h3>
+  <div class="row"><span class="k">位置</span> Example 3.6 之後、L72 bridge 段之前。</div>
+  <div class="row"><span class="k">駁回理由</span>
+    <ul class="compact">
+      <li><strong>不忠於本節方法（致命）</strong>：§3.3 的槓桿是 <em>composition-identity ＋ chain rule</em>（對 \(e^{\ln x}=x\) 取導再解），<strong>不是</strong> reciprocal-slope / 反函數導數定理 \((f^{-1})'=1/f'(f^{-1})\)；PLAN D10 明示不引入該框架。此圖會把本節刻意迴避的機制呈現為「為何斜率取倒數」的解釋，誤導讀者。</li>
+      <li><strong>重複 Ch1</strong>：\(e^x\)↔\(\ln x\) 對 \(y=x\) 鏡射＝Ch1 §1.1 概念再實例（Ch1 已有 Figure 1.2/1.3 圖示 \(f^{-1}(f(x))=x\) 與 mirror line）——正是 ③ 判 no-figure 的原始理由。</li>
+      <li>散文零次提及 reflection/mirror/reciprocal slope。</li>
+    </ul>
+  </div>
+  <div class="small">這條值得一提：完整性批判把它列為最高價值漏網，但對抗式複核回原文 grep 後判定它教的是本節拒用的方法——稽核的「擋假陽性」機制在此生效。</div>
+</div>
+
+<div class="card drop">
+  <h3><span class="cid">M3</span>\(x\ln x-x\) 是 \(\ln x\) 的反導數（斜率＝高度）— <span class="badge b-drop">駁回</span></h3>
+  <div class="row"><span class="k">位置</span> Example 3.9 結尾 L141。</div>
+  <div class="row"><span class="k">駁回理由</span> <strong>概念越界＋洩答</strong>：L141「a fact worth filing away for when we turn to integration」是刻意前瞻 teaser，antiderivative 被明確 fence 到積分章；在其定義前畫反導數可視化＝用圖教尚未引入的概念。又 Example 3.9 是 D9「Short」促升、刻意輕量，掛雙聯主圖屬 editorial drift（喧賓奪主）。其 Solution 為純代數操作，正中 §10「無幾何直覺者不必硬標」。</div>
+</div>
+
+<div class="card drop">
+  <h3><span class="cid">M4</span>\(a^x\) 各底數：唯獨 \(e^x\) 斜率＝自身高度 — <span class="badge b-drop">駁回</span></h3>
+  <div class="row"><span class="k">位置</span> Example 3.8 結尾 L123。</div>
+  <div class="row"><span class="k">駁回理由</span> 散文把「natural base」定性為<strong>純代數結果</strong>（\(\ln e=1\) 消掉因子），候選圖卻把它重述為幾何敘事（\((0,1)\) 處斜率＝高度）——雖為真但不在 manuscript，屬引入散文未發展的新素材（§10 警示的 scope creep）。被圖解的只是 worked example 收尾的一句旁註、非本節核心命題。提案者自評 priority low 且自承依賴他案、屬邊際密度填充。</div>
+</div>
+
+<hr>
+<p class="small">產出工具：多代理 figure-opportunity 稽核 workflow（19 agents：6 提案 + 1 合併 + 11 對抗式複核 + 1 完整性批判）。本檔為待裁決提案，未修改任何講義內容或圖。裁決後依 <code>handout/CLAUDE.md</code>「圖表系統」於 fragment 加 <code>&lt;figure data-fig&gt;</code>＋standalone 加 <code>FIGS</code> 兩處落地，並跑 render 自驗（0 KaTeX 錯誤）後回歸圖稽核（<code>FIGURE-AUDIT-RUBRIC.md</code> D1–D8）。</p>
+
+</div>
+</body>
+</html>

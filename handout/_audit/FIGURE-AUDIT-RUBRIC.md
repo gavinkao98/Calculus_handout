@@ -5,6 +5,7 @@
 > **枚舉（母體）：** 稽核母體 = 該章 fragment 內**全部 `<figure>` 元素**，含 inline-SVG（有 `id=` 無 `data-fig`、甚至無 figcaption 編號者）；**不可只取 `FIGS`／`data-fig` 定義的圖**。每章開審前以 `Grep '<figure'` 掃 fragment 對齊圖清單，漏的補進去並指派審查者。（shot.mjs 截整頁，inline-SVG 本就入鏡——漏的是「沒人被指派去看」，故枚舉須以 `<figure>` 為準。）
 > **依據：** [`../../CONTENT_SPEC.md`](../../CONTENT_SPEC.md) §10（圖規則）＋本檔維度（從 ch01 圖稽核實證蒸餾，見 `../_dev-archive/ch01/ch01_figure-audit.md`）。
 > **性質：** 唯讀、advisory＋blocking 分流、不改檔。審「**畫出來**對不對、讀不讀得懂」，不是 copyedit。
+> **別跟「圖機會稽核」混為一談：** 本檔審「**已畫的圖對不對**」（correctness，render 後）；上游「**該不該加圖**」（opportunity，出圖前、Mode A／C）是另一道閘——`handout-figure-opportunity-audit` subagent ＋ [`FIGURE-OPPORTUNITY-RUBRIC.md`](FIGURE-OPPORTUNITY-RUBRIC.md)。兩者是同一張圖生命週期的兩端。
 
 ## 維度（D1–D8；每條標 Blocking / Advisory）
 

@@ -133,7 +133,7 @@ window.MathJax = {
 .paper figcaption {
   font-family: var(--ui); font-size: .8em; line-height: 1.5;
   color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
-  max-width: none;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
 }
 .paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
 .paper figcaption mjx-container { font-size: .95em; }
@@ -228,8 +228,8 @@ window.MathJax = {
 .paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
 .paper .figure-art--triple { gap: 18px; }
 .paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
-.paper .figure-art--grid { gap: 20px 16px; }
-.paper .figure-art--grid .fig-panel { flex: 1 1 150px; max-width: 210px; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
 .paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
 .paper .fig-note {
   font-family: var(--ui); font-size: .8em; line-height: 1.45;
@@ -322,7 +322,7 @@ window.MathJax = {
   box-shadow: 0 2px 10px rgba(0,0,0,.25);
 }
 .print-toolbar button:disabled { opacity: .5; cursor: default; }
-.print-toolbar button:not(:disabled):hover { background: #1a4368; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
 .print-toolbar .status {
   font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
   padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
@@ -362,9 +362,11 @@ window.MathJax = {
        Proposition 3.1 (sin, cos continuous), 3.2 (lim sinθ/θ = 1);
        Theorem 3.1 (sin' = cos), 3.2 (cos' = −sin);
        Example 3.1 (companion limit), 3.2 (tan' & sec'), 3.3 (SHM);
-       Figure 3.1 (sector inequality); Remark 3.1 (derivative cycle).
+       Figure 3.1 (sector inequality), 3.2 (graphical squeeze of sinθ/θ),
+         3.3 (sin'=cos as slope=height), 3.4 (SHM s/s'/s'' stacked);
+       Remark 3.1 (derivative cycle).
        Caution is unnumbered (per ch02). §3.2 continues from Theorem 3.3,
-       Proposition 3.3, Example 3.4, Figure 3.2, Remark 3.2.
+       Proposition 3.3, Example 3.4, Figure 3.5, Remark 3.2.
 
      ③ decisions D1–D4: tan' as a worked example, not a theorem (D1); sec'
      pulled into §3.1 beside tan' (same quotient-rule technique); the
@@ -402,7 +404,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — load-bearing intuition: the trig difference quotient collapses to lim sinθ/θ, a 0/0 algebra cannot touch; geometry breaks it -->
-  <p>So far every derivative has yielded to algebra. For a polynomial we expanded \((x + h)^{n}\) and cancelled the factor of \(h\); for \(e^{x}\) the power series did the same job. The trigonometric functions are different in kind. Consider the difference quotient for \(\sin x\),
+  <p>So far every derivative has yielded to algebra. For a polynomial we expanded \((x + h)^{n}\) and canceled the factor of \(h\); for \(e^{x}\) the power series did the same job. The trigonometric functions are different in kind. Consider the difference quotient for \(\sin x\),
   \[ \frac{\sin(x + h) - \sin x}{h}. \]
   No algebraic identity cancels the \(h\) in the denominator against the numerator — \(\sin(x + h)\) does not break into pieces that conveniently subtract. As we are about to see, the entire computation funnels down to a single limit,
   \[ \lim_{\theta \to 0} \frac{\sin \theta}{\theta}, \]
@@ -473,7 +475,7 @@ window.MathJax = {
   <h3 class="subsec-head">The fundamental limit</h3>
 
   <!-- expansion:intuition — frame the squeeze payoff -->
-  <p>We can finally squeeze \(\sin\theta/\theta\) to its limit: inequality (1) traps it between \(\cos\theta\) and \(1\), and both ends head for the same place.</p>
+  <p>We can finally squeeze \(\sin\theta/\theta\) to its limit: inequality (1) traps it between \(\cos\theta\) and \(1\), and both ends head for the same place (Figure 3.2).</p>
 
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.2</span><span class="env-name">The fundamental trigonometric limit</span></p>
@@ -488,6 +490,11 @@ window.MathJax = {
       <p>For \(0 < \theta < \tfrac{\pi}{2}\), inequality (1) reads \(\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1\). As \(\theta \to 0^{+}\) the upper bound is the constant \(1\), while the lower bound satisfies \(\cos\theta \to \cos 0 = 1\) by the continuity of cosine (Proposition 3.1). The squeeze theorem (§1.5) pins the quantity between them: \(\lim_{\theta \to 0^{+}} \sin\theta/\theta = 1\). Finally \(\sin\theta/\theta\) is even, so its left-hand limit at \(0\) equals its right-hand limit, and the two-sided limit is \(1\) as well.</p>
     </div>
   </section>
+
+  <!-- expansion:figure — the same bound read as a function graph: (sinθ)/θ squeezed between cosθ and 1 (registered in figures.js as "squeeze-limit") -->
+  <figure class="figure" data-fig="squeeze-limit">
+    <figcaption><span class="fig-no">Figure 3.2</span> The same inequality, read as a graph. Near \(\theta = 0\) the quantity \(\dfrac{\sin\theta}{\theta}\) (solid) is trapped between \(\cos\theta\) (dashed, below) and the constant \(1\) (above). As \(\theta \to 0\) both bounds tend to \(1\), so the quantity between them is squeezed to \(1\). The ratio is even and is undefined at \(\theta = 0\) (open circle), where the limit — not a value — equals \(1\).</figcaption>
+  </figure>
 
   <!-- expansion:caution — the radian convention is essential: sinθ/θ→1, and hence sin'=cos, fails in degrees -->
   <section class="env env-caution">
@@ -540,6 +547,11 @@ window.MathJax = {
       <p>\[ \frac{d}{dx}\cos x = -\sin x \cdot 1 = -\sin x. \]</p>
     </div>
   </section>
+
+  <!-- expansion:figure — sin'=cos as slope=height: tangents of sin x vs heights of cos x (registered in figures.js as "sin-cos-slope") -->
+  <figure class="figure" data-fig="sin-cos-slope">
+    <figcaption><span class="fig-no">Figure 3.3</span> Why \(\sin' = \cos\), seen on the graph. The tangents to \(y = \sin x\) (solid) at \(x = 0, \tfrac{\pi}{2}, \pi\) have slopes \(1, 0, -1\) — exactly the heights of \(y = \cos x\) (dashed) at those points (dots). The slope of sine at each \(x\) is the height of cosine there; one more derivative drops cosine to \(-\sin x\), giving the four-step cycle of Remark 3.1.</figcaption>
+  </figure>
 
   <!-- expansion:example — companion fundamental limit (1−cosθ)/θ → 0 (D2; standard companion to Proposition 3.2) -->
   <div class="workedexample">
@@ -604,16 +616,21 @@ window.MathJax = {
       <div class="env-body">
         <p>Velocity is the derivative of height, and acceleration the derivative of velocity. Differentiating with Theorems 3.1 and 3.2,</p>
         <p>\[ s'(t) = \cos t, \qquad s''(t) = \frac{d}{dt}\cos t = -\sin t. \]</p>
-        <p>Thus \(s''(t) = -\sin t = -s(t)\): at every instant the weight accelerates back toward its rest level, by an amount proportional to how far it has strayed. This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em>, and it is no accident that sine and cosine — the functions whose second derivative is their own negative — are precisely the ones that describe oscillation.</p>
+        <p>Thus \(s''(t) = -\sin t = -s(t)\): at every instant the weight accelerates back toward its rest level, by an amount proportional to how far it has strayed. This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em> (Figure 3.4), and it is no accident that sine and cosine — the functions whose second derivative is their own negative — are precisely the ones that describe oscillation.</p>
       </div>
     </section>
   </div>
+
+  <!-- expansion:figure — SHM: s=sin t, s'=cos t, s''=−sin t stacked; s''=−s mirror (registered in figures.js as "shm-triple") -->
+  <figure class="figure" data-fig="shm-triple">
+    <figcaption><span class="fig-no">Figure 3.4</span> Simple harmonic motion, read off three stacked graphs over one time axis: height \(s = \sin t\) (top), velocity \(s' = \cos t\) (middle), acceleration \(s'' = -\sin t\) (bottom). Where the height reaches a peak or trough (dashed lines at \(t = \tfrac{\pi}{2}, \tfrac{3\pi}{2}\)) the velocity passes through zero; and the bottom graph is the top one flipped upside down — the picture of \(s'' = -s\).</figcaption>
+  </figure>
 
   <!-- expansion:intuition — the four-fold derivative cycle, a bookend echoing the e^x self-replication remark of §2.4 -->
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.1</span><span class="env-name">The derivative cycle of sine and cosine</span></p>
     <div class="env-body">
-      <p>Differentiation sends sine and cosine into each other, with a sign that turns over every second step. Writing \(\to\) for one application of \(\dfrac{d}{dx}\),</p>
+      <p>Differentiation sends sine and cosine into each other, with a sign that turns over every second step (Figure 3.3). Writing \(\to\) for one application of \(\dfrac{d}{dx}\),</p>
       <p>\[ \sin x \;\to\; \cos x \;\to\; -\sin x \;\to\; -\cos x \;\to\; \sin x. \]</p>
       <p>After four derivatives we are back where we started, so \(\dfrac{d^{4}}{dx^{4}}\sin x = \sin x\), and likewise for cosine. Where \(e^{x}\) reproduces itself in a single step (§2.4), sine and cosine reproduce themselves in a cycle of four — the same self-renewal that lets \(s'' = -s\) describe an oscillation that never winds down.</p>
     </div>
@@ -635,10 +652,11 @@ window.MathJax = {
        Theorem 3.3 (chain rule); Proposition 3.3 (Def1⇔Def2 equivalence);
        Definition 3.1 (remainder form — the chapter's first Definition);
        Example 3.4 (single composition), 3.5 (nested composition);
-       Figure 3.2 (composed mapping); Remark 3.2 (Leibniz form);
+       Figure 3.5 (composed mapping), 3.6 (tangent / remainder-form linear
+         approximation); Remark 3.2 (Leibniz form);
        Strategy 3.1 (chain-rule decomposition — the chapter's first Strategy);
        Caution is unnumbered (per ch02). §3.3 continues from Theorem 3.4,
-       Proposition 3.4, Definition 3.2, Example 3.6, Figure 3.3, Remark 3.3,
+       Proposition 3.4, Definition 3.2, Example 3.6, Figure 3.7, Remark 3.3,
        Strategy 3.2.
 
      ③ decisions: Definition treatment = Option B (the §2.2 limit definition
@@ -646,7 +664,7 @@ window.MathJax = {
      minted, as Definition 3.1, with equivalence as Proposition 3.3) — D5.
      Narrative order = intuition-first (statement + figure + remark + strategy
      make the rule usable, then definition + equivalence + the ε-δ proof, then
-     worked examples). Figure 3.2 (composed mapping) included as inline SVG in
+     worked examples). Figure 3.5 (composed mapping) included as inline SVG in
      figures.js. Examples 3.4 + 3.5 approved (self-authored, in §3.2's
      derivative inventory: sin/cos from §3.1, power from Ch2 — no ln/arcsin/x^x,
      which are §3.3 per D7). Product rule and differentiable⇒continuous are
@@ -679,7 +697,7 @@ window.MathJax = {
 
   <!-- expansion:figure — chain rule as composed mapping (ROADMAP key figure; registered in exp-ch03/figures.js as "composed-mapping") -->
   <figure class="figure" data-fig="composed-mapping">
-    <figcaption><span class="fig-no">Figure 3.2</span> The chain rule as a composed mapping. A small input increment \(h\) at \(x_{0}\) is carried by \(g\) to an increment of about \(g'(x_{0})\,h\) at \(u_{0} = g(x_{0})\), and then by \(f\) to about \(f'(g(x_{0}))\,g'(x_{0})\,h\) at \(y_{0} = f(g(x_{0}))\). The two local slopes multiply — which is why the composite's derivative is their product.</figcaption>
+    <figcaption><span class="fig-no">Figure 3.5</span> The chain rule as a composed mapping. A small input increment \(h\) at \(x_{0}\) is carried by \(g\) to an increment of about \(g'(x_{0})\,h\) at \(u_{0} = g(x_{0})\), and then by \(f\) to about \(f'(g(x_{0}))\,g'(x_{0})\,h\) at \(y_{0} = f(g(x_{0}))\). The two local slopes multiply — which is why the composite’s derivative is their product.</figcaption>
   </figure>
 
   <!-- expansion:intuition — the Leibniz form (the working notation), with the mnemonic-not-proof caveat folded in (ROADMAP pitfall) -->
@@ -711,7 +729,7 @@ window.MathJax = {
   <h3 class="subsec-head">Why the rule is true</h3>
 
   <!-- expansion:intuition — bridge: the rule is usable; to prove it we need the remainder form, which packages differentiability as a linear approximation that composes -->
-  <p>The rule is already usable — the rest of this section earns it. To prove that the two slopes really do multiply, we need to handle both functions' linear approximations at once, and for that it helps to repackage what “differentiable” means. Chapter 2 defined \(f\) to be differentiable at \(x_{0}\) when the difference quotient \(\dfrac{f(x_{0}+h) - f(x_{0})}{h}\) has a limit as \(h \to 0\) (§2.2); that limit is \(f'(x_{0})\). The following form says the same thing, but as a statement about approximation by a straight line.</p>
+  <p>The rule is already usable — the rest of this section earns it. To prove that the two slopes really do multiply, we need to handle both functions’ linear approximations at once, and for that it helps to repackage what “differentiable” means. Chapter 2 defined \(f\) to be differentiable at \(x_{0}\) when the difference quotient \(\dfrac{f(x_{0}+h) - f(x_{0})}{h}\) has a limit as \(h \to 0\) (§2.2); that limit is \(f'(x_{0})\). The following form says the same thing, but as a statement about approximation by a straight line.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">3.1</span><span class="env-name">Differentiability, remainder form</span></p>
@@ -720,9 +738,14 @@ window.MathJax = {
       <p>\[ f(x_{0} + h) = f(x_{0}) + m h + R(h), \qquad \lim_{h \to 0}\frac{R(h)}{h} = 0. \]</p>
       <p>The number \(m\) is the derivative \(f'(x_{0})\).</p>
       <!-- expansion:intuition — informal gloss on the remainder form; the seed's bare Def 2 carries no such gloss -->
-      <p class="informal">Informally, \(f(x_{0}+h)\) equals its tangent-line value \(f(x_{0}) + m h\) plus an error \(R(h)\) that dies away faster than \(h\) does — the tangent line is a good fit to first order.</p>
+      <p class="informal">Informally, \(f(x_{0}+h)\) equals its tangent-line value \(f(x_{0}) + m h\) plus an error \(R(h)\) that dies away faster than \(h\) does — the tangent line is a good fit to first order (Figure 3.6).</p>
     </div>
   </section>
+
+  <!-- expansion:figure — remainder form geometry: curve vs tangent, gap R(h) shrinking faster than h (registered in figures.js as "remainder-tangent") -->
+  <figure class="figure" data-fig="remainder-tangent">
+    <figcaption><span class="fig-no">Figure 3.6</span> Differentiability as a first-order fit. Near \(x_{0}\) the graph of \(f\) (solid) hugs its tangent line (dashed); at \(x_{0}+h\) the vertical gap between them is the remainder \(R(h)\). Halving \(h\) (right panel) shrinks that gap far faster than \(h\) itself — the geometric content of \(R(h)/h \to 0\). This single-function picture is the local fact behind Figure 3.5: each function in a composition is, up close, almost its own tangent line, and it is those linear parts whose slopes multiply.</figcaption>
+  </figure>
 
   <!-- expansion:intuition — frame the equivalence: the remainder form is not a new notion of derivative, just a repackaging of §2.2 -->
   <p>This is not a new notion of derivative, only a new way of writing the old one.</p>
@@ -827,7 +850,7 @@ window.MathJax = {
             &= \frac{1}{2\sqrt{1 + \sin^{2} x}}\cdot 2\sin x\cdot \cos x \\[2pt]
             &= \frac{\sin x \cos x}{\sqrt{1 + \sin^{2} x}}.
         \end{aligned} \]</p>
-        <p>Each layer contributes exactly one factor: \(\tfrac12 u^{-1/2}\) from the square root, \(2\sin x\) from squaring, and \(\cos x\) from the sine. Their product is the derivative — the slopes multiply down the chain, just as Figure 3.2 pictures.</p>
+        <p>Each layer contributes exactly one factor: \(\tfrac12 u^{-1/2}\) from the square root, \(2\sin x\) from squaring, and \(\cos x\) from the sine. Their product is the derivative — the slopes multiply down the chain, just as Figure 3.5 pictures.</p>
       </div>
     </section>
   </div>
@@ -852,8 +875,11 @@ window.MathJax = {
          3.10 (arcsin'), 3.11 (arccos'), 3.12 (arctan');
        Strategy 3.2 (logarithmic differentiation);
        Remark 3.3 (one lever, six derivatives);
+       Figure 3.7 (arcsin vertical tangents — §3.3's first figure, added by the
+         2026-06-21 figure-opportunity audit; chapter figures renumbered, so the
+         §3.2 composed-mapping figure is now 3.5);
        Caution is unnumbered (arcsin/arccos domain).
-     Theorem 3.4, Proposition 3.4, Definition 3.2, Figure 3.3 are NOT minted
+     Theorem 3.4, Proposition 3.4, Definition 3.2 are NOT minted
      (left for later): §3.3's results are framed as worked examples, per the
      manuscript and the PLAN ledger.
 
@@ -861,8 +887,11 @@ window.MathJax = {
      approved to honor the Ch3 opener (sec-3-1) + §3.2 closing forward-ref +
      ROADMAP core skill; same composition-identity method as arcsin/arccos.
      (2) Results framed as worked examples, not Propositions (citability via
-     the chapter-summary recap). (3) No figure — the sin↔arcsin reflection is
-     Chapter 1 §1.2 definition material, recalled in prose. (4) All three
+     the chapter-summary recap). (3) Originally no figure (the sin↔arcsin
+     reflection is Chapter 1 §1.2 material, recalled in prose); SUPERSEDED by the
+     2026-06-21 figure-opportunity audit, which added Figure 3.7 — a narrow
+     override drawing arcsin's OWN endpoint vertical tangents (a §3.3 derivative
+     result, not the Ch1 reflection). (4) All three
      Homework promotions approved (arccos' 3.11, 2^x 3.8, (x ln x − x)' 3.9).
      D8: ln is informal here (inverse of e^x via e^{ln x}=x); the rigorous
      construction is deferred to Ch4 §4.5 — flagged once, in Example 3.6.
@@ -1013,9 +1042,14 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>The formula \(\dfrac{1}{\sqrt{1 - y^{2}}}\) is valid only on the <em>open</em> interval \((-1, 1)\). At the endpoints \(y = \pm 1\) the denominator vanishes: the graph of \(\arcsin\) (and of \(\arccos\) below) has a vertical tangent there, so the derivative does not exist. Report these derivatives on the open interval, never the closed one.</p>
+      <p>The formula \(\dfrac{1}{\sqrt{1 - y^{2}}}\) is valid only on the <em>open</em> interval \((-1, 1)\). At the endpoints \(y = \pm 1\) the denominator vanishes: the graph of \(\arcsin\) (and of \(\arccos\) below) has a vertical tangent there (Figure 3.7), so the derivative does not exist. Report these derivatives on the open interval, never the closed one.</p>
     </div>
   </section>
+
+  <!-- expansion:figure — arcsin's vertical tangents at y=±1: derivative blows up, endpoints excluded (registered in figures.js as "arcsin-vertical-tangent"). Figure-opportunity audit (2026-06-21) narrow override of ③'s "no figure": this draws arcsin's own endpoint behaviour — a §3.3 derivative result, NOT the Ch1 reflection ③ excluded. -->
+  <figure class="figure" data-fig="arcsin-vertical-tangent">
+    <figcaption><span class="fig-no">Figure 3.7</span> Why the derivative dies at the endpoints. On the open interval \((-1, 1)\) the graph of \(\arcsin y\) climbs ever more steeply toward \(y = \pm 1\); at the endpoints its tangent is vertical (dashed) and \(\dfrac{1}{\sqrt{1 - y^{2}}}\) blows up, so the derivative does not exist there (open circles). At the centre the tangent has slope \(1 = \tfrac{1}{\sqrt{1 - 0}}\). The graph of \(\arccos\) behaves the same way.</figcaption>
+  </figure>
 
   <!-- expansion:example — D9 promotion of manuscript Homework 1: d/dy arccos y, by the same method as Example 3.10. Approved at ③ (2026-06-08). Short, skip-setup; uses the correct identity arccos(cos x)=x (not the manuscript's loose cos⁻¹(cos y)=y). -->
   <div class="workedexample">
@@ -1338,6 +1372,166 @@ window.MathJax = {
         `</svg>`;
 
       return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §3.1 — Function-graph squeeze for the fundamental limit (Figure 3.2).
+       Three curves near θ = 0: the constant upper bound y = 1, the lower
+       bound y = cos θ (dashed), and the trapped quantity y = (sin θ)/θ
+       (solid; undefined at 0 → hollow dot, but → 1). The funnel collapses to
+       (0, 1): the squeeze forces (sin θ)/θ → 1. The inequality
+       cos θ ≤ (sin θ)/θ ≤ 1 lives in the caption (CONTENT_SPEC §10 economy). */
+    "squeeze-limit": () => {
+      const D = 1.05;
+      const cfg = {
+        w: 300, h: 196, xmin: -1.18, xmax: 1.18, ymin: 0.45, ymax: 1.07,
+        pad: { t: 20, r: 16, b: 22, l: 24 },
+        aria: "Near theta equals zero, the constant one on top and cosine theta below both converge to one, squeezing the middle curve sine theta over theta to the value one.",
+        xlabel: "\\theta",
+        xticks: [{ x: 0 }],
+        yticks: [{ y: 1, tex: "1" }],
+        items: [
+          { type: "hline", y: 1, cls: "refline" },
+          { type: "curve", fn: (t) => Math.cos(t), domain: [-D, D], cls: "refline" },
+          { type: "curve", fn: (t) => (Math.abs(t) < 1e-6 ? 1 : Math.sin(t) / t), domain: [-D, D], samples: 220, cls: "curve" },
+          { type: "dot", x: 0, y: 1, hollow: true },
+          { type: "text", x: D, y: Math.sin(D) / D, tex: "\\dfrac{\\sin\\theta}{\\theta}", cls: "a-curve", anchor: "start", dx: 3 },
+          { type: "text", x: D, y: Math.cos(D), tex: "\\cos\\theta", cls: "a-ref", anchor: "start", dx: 3, dy: 2 },
+        ],
+      };
+      return { layout: "single", panels: [{ svg: buildPlot(cfg) }] };
+    },
+
+    /* §3.1 — The slope of sin x is the height of cos x (Figure 3.3).
+       sin x (solid) with short grey tangent segments at x = 0, π/2, π whose
+       slopes +1, 0, −1 equal the heights of cos x (dashed) marked by dots at
+       the same x. Makes sin' = cos a visible "slope = height" fact and
+       anchors the four-step derivative cycle (Remark 3.1). The slope values
+       and the correspondence live in the caption. */
+    "sin-cos-slope": () => {
+      const sin = Math.sin, cos = Math.cos, P = Math.PI;
+      const tanSeg = (x0) => { const m = cos(x0), w = 0.6; return { type: "seg", x1: x0 - w, y1: sin(x0) - m * w, x2: x0 + w, y2: sin(x0) + m * w, cls: "axis" }; };
+      const cfg = {
+        w: 336, h: 198, xmin: -0.5, xmax: 6.75, ymin: -1.4, ymax: 1.45,
+        pad: { t: 14, r: 12, b: 22, l: 22 },
+        aria: "Graphs of sine x (solid) and cosine x (dashed). Where sine is steepest its tangent slope equals the height of cosine; where sine is flat cosine is zero; where sine falls steepest cosine is minus one.",
+        xlabel: "x",
+        xticks: [{ x: P / 2 }, { x: P }, { x: 3 * P / 2 }, { x: 2 * P }],
+        yticks: [{ y: 1, tex: "1" }, { y: -1, tex: "-1" }],
+        items: [
+          { type: "curve", fn: (x) => cos(x), domain: [-0.5, 2 * P + 0.25], samples: 300, cls: "refline" },
+          { type: "curve", fn: (x) => sin(x), domain: [-0.5, 2 * P + 0.25], samples: 300, cls: "curve" },
+          tanSeg(0), tanSeg(P / 2), tanSeg(P),
+          { type: "dot", x: 0, y: 1 }, { type: "dot", x: P / 2, y: 0 }, { type: "dot", x: P, y: -1 },
+          { type: "text", x: 2.3, y: sin(2.3), tex: "\\sin x", cls: "a-curve", anchor: "middle", dy: -9 },
+          { type: "text", x: 4.55, y: cos(4.55), tex: "\\cos x", cls: "a-ref", anchor: "start", dy: 11 },
+        ],
+      };
+      return { layout: "single", panels: [{ svg: buildPlot(cfg) }] };
+    },
+
+    /* §3.1 — Simple harmonic motion: s, s', s'' stacked (Figure 3.4).
+       Three vertically-stacked panels sharing one t-axis: position s = sin t,
+       velocity s' = cos t, acceleration s'' = −sin t. Dashed verticals at
+       t = π/2, 3π/2 show position extrema aligning with velocity zeros; the
+       bottom panel is the vertical mirror of the top (s'' = −s). Raw SVG —
+       buildPlot has no stacked-panel / cross-panel-alignment primitive.
+       Single-symbol labels s, s', s''; the relations live in the caption. */
+    "shm-triple": () => {
+      const L = 50, R = 286, TT = 2 * Math.PI, n = 128, A = 30;
+      const TX = (t) => L + (t / TT) * (R - L);
+      const f1 = (v) => v.toFixed(1);
+      const bands = [
+        { yc: 54, fn: (t) => Math.sin(t), lab: "s" },
+        { yc: 150, fn: (t) => Math.cos(t), lab: "s′" },
+        { yc: 246, fn: (t) => -Math.sin(t), lab: "s″" },
+      ];
+      let svg =
+        '<svg viewBox="0 0 300 300" style="width:300px" class="fig-svg" role="img"' +
+        ' aria-label="Three vertically stacked graphs over a common time axis: position s equals sine t on top, velocity s-prime equals cosine t in the middle, and acceleration s-double-prime equals minus sine t at the bottom. Dashed vertical lines mark where the position reaches its extrema and the velocity is zero; the bottom graph is the upside-down mirror of the top.">';
+      // alignment verticals at t = π/2 and 3π/2 (position extrema ↔ velocity zeros)
+      [Math.PI / 2, 3 * Math.PI / 2].forEach((t) => {
+        const x = TX(t);
+        svg += '<line x1="' + f1(x) + '" y1="30" x2="' + f1(x) + '" y2="282" class="refline"/>';
+      });
+      bands.forEach((b) => {
+        svg += '<line x1="' + L + '" y1="' + b.yc + '" x2="' + R + '" y2="' + b.yc + '" class="axis"/>';
+        let d = "";
+        for (let i = 0; i <= n; i++) { const t = TT * (i / n); d += (i ? "L" : "M") + f1(TX(t)) + "," + f1(b.yc - A * b.fn(t)) + " "; }
+        svg += '<path d="' + d.trim() + '" class="curve"/>';
+        svg += '<text x="14" y="' + (b.yc + 4) + '" text-anchor="middle" class="ptlab" font-style="italic">' + b.lab + '</text>';
+      });
+      // t-axis tick labels under the bottom band
+      [[0, "0"], [Math.PI / 2, "π/2"], [Math.PI, "π"], [3 * Math.PI / 2, "3π/2"], [2 * Math.PI, "2π"]].forEach((p) => {
+        svg += '<text x="' + f1(TX(p[0])) + '" y="294" text-anchor="middle" class="ptlab">' + p[1] + '</text>';
+      });
+      svg += '<text x="' + (R + 6) + '" y="' + (246 + 4) + '" text-anchor="start" class="ptlab" font-style="italic">t</text>';
+      svg += '</svg>';
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §3.2 — Differentiability as tangent-line approximation (Figure 3.6).
+       For a smooth f and its tangent at x₀, the vertical gap at x₀+h is the
+       remainder R(h) of Definition 3.1. Two panels at the SAME scale show
+       that halving h shrinks the gap far faster than h itself — the visual
+       meaning of R(h)/h → 0. A generic convex arc (not a named function, so
+       no Chapter 2 result is re-proven). */
+    "remainder-tangent": () => {
+      const f = (x) => 0.34 * x * x + 0.25;
+      const x0 = 1.0, m = 0.68;            // f'(x) = 0.68x → 0.68 at x0 = 1
+      const f0 = f(x0), tan = (x) => f0 + m * (x - x0);
+      const panel = (h, note) => {
+        const xe = x0 + h, fe = f(xe), te = tan(xe);
+        const cfg = {
+          w: 246, h: 186, xmin: 0, xmax: 2.85, ymin: 0, ymax: 2.65,
+          pad: { t: 12, r: 12, b: 24, l: 16 },
+          aria: "A smooth curve and its tangent line at x-zero; at x-zero plus h the vertical gap between the curve and the tangent is the remainder R of h, which shrinks faster than h.",
+          xticks: [{ x: x0, tex: "x_0" }, { x: xe, tex: "x_0\\!+\\!h" }],
+          yticks: [],
+          items: [
+            { type: "seg", x1: 0.18, y1: tan(0.18), x2: 2.8, y2: tan(2.8), cls: "refline" },
+            { type: "curve", fn: f, domain: [0.05, 2.82], cls: "curve" },
+            { type: "seg", x1: xe, y1: te, x2: xe, y2: fe, cls: "axis" },
+            { type: "dot", x: x0, y: f0 },
+            { type: "dot", x: xe, y: te, hollow: true },
+            { type: "dot", x: xe, y: fe },
+            { type: "text", x: 0.62, y: f(0.62), tex: "f", cls: "a-curve", anchor: "end", dy: -6 },
+            { type: "text", x: xe, y: (te + fe) / 2, tex: "R(h)", cls: "a-pt", anchor: "start", dx: 4 },
+          ],
+        };
+        return { svg: buildPlot(cfg), note: note };
+      };
+      return { layout: "pair", panels: [panel(1.35, "larger h"), panel(0.5, "smaller h")] };
+    },
+
+    /* §3.3 — arcsin has vertical tangents at y = ±1 (Figure 3.7).
+       The curve y = arcsin y on (−1, 1) steepens toward the endpoints; at
+       y = ±1 the tangent is vertical (dashed indicators) and the derivative
+       1/√(1−y²) blows up, so the endpoints are hollow (derivative does not
+       exist there). A short tangent of slope 1 at the centre (= 1/√(1−0))
+       gives contrast. Visualizes the Caution; the open-interval restriction
+       is in the caption. NOTE: open interval — endpoints hollow, curve does
+       not close on y = ±1. */
+    "arcsin-vertical-tangent": () => {
+      const P = Math.PI, clamp = (y) => Math.max(-0.99999, Math.min(0.99999, y));
+      const cfg = {
+        w: 240, h: 336, xmin: -1.25, xmax: 1.25, ymin: -1.8, ymax: 1.8,  // equal aspect (≈82 px/unit both axes) so slope-1 reads as 45° and endpoints look vertical
+        pad: { t: 16, r: 14, b: 24, l: 20 },
+        aria: "Graph of arcsin y on the open interval from minus one to one. The curve grows steeper toward the endpoints; at y equals plus or minus one its tangent is vertical and the derivative does not exist, so the endpoints are drawn as open circles.",
+        xlabel: "y",
+        xticks: [{ x: -1, tex: "-1" }, { x: 1, tex: "1" }],
+        yticks: [{ y: P / 2 }, { y: -P / 2 }],
+        items: [
+          { type: "seg", x1: -1, y1: -1.74, x2: -1, y2: -1.08, cls: "refline" },
+          { type: "seg", x1: 1, y1: 1.08, x2: 1, y2: 1.74, cls: "refline" },
+          { type: "curve", fn: (y) => Math.asin(clamp(y)), domain: [-0.9997, 0.9997], samples: 320, cls: "curve" },
+          { type: "seg", x1: -0.62, y1: -0.62, x2: 0.62, y2: 0.62, cls: "axis" },
+          { type: "dot", x: 1, y: P / 2, hollow: true },
+          { type: "dot", x: -1, y: -P / 2, hollow: true },
+          { type: "text", x: -0.6, y: 1.2, tex: "\\arcsin y", cls: "a-curve", anchor: "middle" },
+          { type: "text", x: 0.52, y: 1.52, text: "vertical tangent", cls: "a-pt", anchor: "middle", size: 10 },
+        ],
+      };
+      return { layout: "single", panels: [{ svg: buildPlot(cfg) }] };
     },
 
   };
