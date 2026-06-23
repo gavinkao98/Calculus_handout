@@ -96,6 +96,13 @@ def _overflow_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
         mob = getattr(b, "mobject", None)
         if mob is None:
             continue
+        # Decoration / background bleed off-frame by design (the divider's hero curve
+        # runs off the right edge; full-frame grounds, ghost numerals, corner motifs),
+        # so they are not "content clipped off-frame". Mirrors the layer exemption in
+        # _overlap_issues -- but keep "graph" checked: graph / sign_chart rely on this
+        # guard for their reactive overflow (DESIGN.md, capacity contract).
+        if getattr(b, "layer", "content") in ("decoration", "background"):
+            continue
         try:
             w, h = float(mob.width), float(mob.height)
         except Exception:  # noqa: BLE001
