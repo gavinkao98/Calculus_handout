@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, RIGHT, Polygon, Rectangle, Text, VGroup
+from manim import DOWN, RIGHT, Polygon, Rectangle, VGroup
 
 from .. import brand
 from ..blocks import Block
@@ -72,10 +72,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     hint = None
     if next_section:
         caret = _caret(ground)
-        nxt = Text("Next", font=T.FONT_BODY, font_size=T.fs("caption"), color=T.color(ground, "muted"))
+        nxt = brand.body_text("Next", ground, role="muted", size="caption")
         sec = brand.eyebrow(f"§{next_section}", ground, role="accent")
-        ntitle = Text(str(next_title or ""), font=T.FONT_BODY, weight="SEMIBOLD",
-                      font_size=T.fs("caption"), color=T.color(ground, "text"))
+        ntitle = brand.heading_rich(str(next_title or ""), ground, role="text", size="caption")
         hint = VGroup(caret, nxt, sec, ntitle).arrange(RIGHT, buff=0.22)
         parts.append(hint)
 

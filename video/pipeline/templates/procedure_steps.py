@@ -52,7 +52,6 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     title_clear = 0.2    # air a tall FIRST row keeps below the title
     top = 1.5
 
-    from manim import Text
     # the result formula snaps to the shared Lectern rail column (was right-aligned at
     # the far gutter, which Codex flagged both rounds as a detached RHS with a "wide
     # dead band"). Left-aligned at RAIL_X it sits next to its instruction AND lines up
@@ -63,8 +62,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     for i, st in enumerate(steps):
         # zero-padded blue numeral (01/02/03) with a soft blue glow, Times New Roman bold.
         numeral = brand.text_glow(
-            Text(f"{i + 1:02d}", font=T.FONT_DISPLAY, weight="BOLD",
-                 font_size=T.fs("numeral"), color=T.color(ground, "secondary")),
+            brand.heading(f"{i + 1:02d}", ground, role="secondary", size="numeral"),
             ground, role="secondary", width=2.4, opacity=0.34)  # softer glow: Codex found the numerals over-glowing
         rule = brand.vrule(64 / T.PX_PER_UNIT_Y, ground, role="hairline", width=2)
         txt = brand.prose(st.get("text", ""), ground, role="text", size="prose",

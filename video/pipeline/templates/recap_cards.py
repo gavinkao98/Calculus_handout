@@ -23,7 +23,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, UL, UP, Text, VGroup
+from manim import DOWN, LEFT, RIGHT, UL, UP, VGroup
 
 from .. import brand
 from ..blocks import Block
@@ -62,8 +62,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         # A3). Smaller than a procedure step numeral: here the number is a LIST MARKER, not
         # the structural anchor, and it replaces the dot (one marker, not two).
         idx = brand.text_glow(
-            Text(f"{i+1:02d}", font=T.FONT_DISPLAY, weight="BOLD", font_size=T.fs("h3"),
-                 color=T.color(ground, "accent")),
+            brand.heading(f"{i+1:02d}", ground, role="accent", size="h3"),
             ground, role="accent", width=1.6, opacity=0.3)
         txt = brand.prose(t, ground, role="text", size="prose", max_width=5.6, align="LEFT")
         idx.next_to(txt, LEFT, buff=0.34, aligned_edge=UP)

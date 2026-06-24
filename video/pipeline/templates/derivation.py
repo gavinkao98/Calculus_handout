@@ -33,7 +33,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, MathTex, Text, VGroup
+from manim import DOWN, LEFT, RIGHT, MathTex, VGroup
 
 from .. import brand
 from ..blocks import Block
@@ -118,13 +118,10 @@ def _reason_mob(row: dict, ground: str):
     # two-column walkthrough spent a whole column on -- it is teaching content, so it
     # must be readable. The smaller size + the dotted leader keep it subordinate to the
     # bright equations (ink_1) without dimming it into the "too faint" zone the lint flags.
-    if "$" in str(reason):
-        return brand.prose(str(reason), ground, role="text", size="prose_sm")
-    # upright (was slant=ITALIC): a math-bearing reason renders upright via prose(), so a
-    # plain-text reason must match -- mixed upright/italic in one rail read as inconsistent
-    # (2026-06-21 A2 finding).
-    return Text(str(reason), font=T.FONT_BODY, font_size=T.fs("prose_sm"),
-                color=T.color(ground, "text"))
+    # Plain text and $math$-bearing reasons both render upright via prose() (Plex text +
+    # Latin Modern math), so a math-bearing reason never looks different from a plain one
+    # in the same rail (2026-06-21 A2 finding).
+    return brand.prose(str(reason), ground, role="text", size="prose_sm")
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:

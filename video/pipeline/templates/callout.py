@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, UP, MathTex, RoundedRectangle, Text, VGroup
+from manim import DOWN, LEFT, RIGHT, UP, MathTex, RoundedRectangle, VGroup
 
 from .. import brand
 from ..blocks import Block
@@ -41,8 +41,7 @@ def _mark(ctype: str, ground: str, role: str) -> VGroup:
         glyph = brand._four_point_star(side * 0.26, T.color(ground, role), 1.0)
     else:
         ch = "!" if ctype == "caution" else "i"
-        glyph = Text(ch, font=T.FONT_DISPLAY, weight="BOLD",
-                     color=T.color(ground, role), font_size=T.fs(46))
+        glyph = brand.heading(ch, ground, role=role, size=46)
     glyph.move_to(box.get_center())
     return brand.text_glow(VGroup(box, glyph), ground, role=role, width=4.0, opacity=0.4)
 
