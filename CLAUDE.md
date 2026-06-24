@@ -2,6 +2,23 @@
 
 本檔案為本儲存庫提供給 AI 代理（Claude Code、Codex 等）的專案層級指引，是這份指引的**權威版本**；[`AGENTS.md`](AGENTS.md) 僅為指向本檔的指標,內容不重複。儲存庫的完整結構與建置規則以權威性文件 [`README.md`](README.md) 為準；內容撰寫規則以 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) 為準。
 
+## 產線一覽
+
+| 產線 | 路徑 | 說明 |
+|------|------|------|
+| HTML 講義 | `handout/` | MathJax/KaTeX＋JS paginator；fragment → print-standalone 組裝 |
+| Manim 影片 | `video/` | 旁白＋動畫＋TTS；`make.py` 建置（詳見 [`video/README.md`](video/README.md)） |
+| 舊 LaTeX 講義 | `legacy/tex_handout/` | 已凍結，僅供參照 |
+
+## 常用指令速查
+
+```bash
+python handout/build.py           # 建置全部講義章節（可接 ch01 只建一章）
+python video/make.py --quality high  # 1080p 渲染影片（預設品質）
+python tools/doctor.py            # 環境健康檢查
+tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
+```
+
 ## 文件撰寫語言
 
 - **README 一律以繁體中文書寫。** 這包含根目錄的 [`README.md`](README.md) 以及子資料夾中屬於本專案的 README（例如 [`video/README.md`](video/README.md)）。新增或修改 README 時都比照辦理。
@@ -11,8 +28,7 @@
 
 ## 影片渲染解析度
 
-- **除非使用者特別要求，否則一律以 1080p 渲染**（`make.py --quality high`）。不要自行使用 `--quality low`（480p）或 `--quality 4k`。
-- 4K 渲染（`--quality 4k`）僅在使用者明確指定「4K」或「正式交付」時使用。
+- **除非使用者特別要求，否則一律以 1080p 渲染**（`make.py --quality high`）。
 
 ## 付費 API 調用須先經同意
 
@@ -40,7 +56,6 @@
 - **做 doc／code review 時分清四級，不要混為一談：** ① 真衝突／違反既定規則（要修）② discoverability gap（補文件即可，非矛盾）③ editorial drift 風險（低優先，不是 finding）④ 非 finding（如示例覆蓋面差異）。**Framing：** 從「目前被 review 的樹的現況」出發，不要把 session 內未 commit／未 merge 的變更當既成事實；語義等價的用詞差異不算 inconsistency。Over-reporting 會稀釋真正高優先項。
 - **三-mode 撰寫流程（root [`README.md`](README.md) §Mode B）下，Mode B 的稽核裁決與發現寫進該次修正 commit 的 message body**（subject ≤70 字、body 逐條：原本是什麼、為何不妥、改了什麼、引用證據），好讓未來對話用 `git log --grep="Mode B"` 撈回。參考 commit：`112aa5c`、`0ef06ee`。純 Mode A 或例行 bugfix 不適用。
   - **commit-grep 分流（2026-06-15）：** 上述 `Mode B` 是**講義**線。**video 旁白的忠實稽核已改名 NFA**（旁白忠實稽核，原 video「Mode B」；契約 [`video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)），其裁決同樣寫進修正 commit body，但用 `git log --grep="NFA"` 撈回（與講義 `Mode B` 分流，免兩條線混在同一 grep）。
-- **以下四項 preamble／style 現狀是使用者 2026-04-21 審查後刻意保留的，勿再當遺漏重提：** 不開 `showonlyrefs`、維持 `\raggedbottom`+`[H]`、題組用 `exercise` 環境（不另立 `problems` newlist）、不加 `csquotes autostyle`（引號靠 `style_lint.py`）。情境真變了再重評，並明講「原本你選擇保留，但現在 X」。（註：2026-06-12 起講義本體不收習題、`exercise` 環境退場——見 `CONTENT_SPEC.md` §14；第三項僅餘歷史意義。註：2026-06-13 起 LaTeX 講義整套搬進 `legacy/tex_handout/`、live 講義改為 `handout/` 的 HTML 版（MathJax/KaTeX＋JS paginator），故第 1／2／4 項的 LaTeX preamble 機制亦不再適用於 live 講義、與第 3 項同屬歷史性質；引號 linter 即 `legacy/tex_handout/tools/book_style_lint.py`，不在 HTML 產線上跑。）
 - **給使用者審核的交付物要用「打開就能讀」的形式（2026-06-12 使用者要求）：** 含數學式的審核文件**不要**交塞滿生 LaTeX 的 `.md`，改產出 standalone HTML（MathJax/KaTeX CDN，雙擊即開、數學即渲染）或其他可直接閱讀的形式。版控紀錄性質的文檔不在此限；凡「等使用者過目裁決」的東西一律照此辦理。
 - **每完成一輪撰寫後也要產 HTML 報告（2026-06-15 使用者要求）：** 不只「待裁決」的候選／findings 要 HTML——**凡完成一輪內容撰寫（Mode A／C 等），都要對實際寫入的內容另產一份 standalone HTML 報告**（MathJax/KaTeX CDN、雙擊即開、數學即渲染），逐條呈現所寫段落＋locus＋`[source:]`＋該輪 Mode B 結果，供使用者過目，不要只在對話裡給文字摘要。比照 [`handout/_audit/REVIEW-ch01-modec-candidates.html`](handout/_audit/REVIEW-ch01-modec-candidates.html) 的形式，檔名用 `REVIEW-…-applied.html` 之類，與「候選／裁決稿」分開。
 - **審核 finding 修完後必須回歸審核（2026-06-12 使用者要求）：** 修完 blocking／advisory finding 後，不可直接宣告完成——必須對修改過的項目重新跑一輪審核（Codex 或手動比對均可），確認修改本身沒有引入新問題。回歸審核的結果附在原稽核文檔中記錄。

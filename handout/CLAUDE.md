@@ -2,6 +2,8 @@
 
 本檔案補充根目錄 [`../CLAUDE.md`](../CLAUDE.md) 的專案層級指引，僅涵蓋 `handout/` 特有的架構約束。
 
+內容撰寫規則（用語、密度、數學排版、圖表規範等）以 [`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) 為準。
+
 ## Fragment 架構：改課文一律改 fragment
 
 課文內容存放在 `fragments/ch{NN}/sec-*.html`，由 `build.py` 組裝成 `chapter{N}-print-standalone.html`（列印版）。
@@ -23,3 +25,5 @@
 python build.py              # 全部章節
 python build.py ch01          # 只重建第一章
 ```
+
+建好的 `chapter{N}-print-standalone.html` 直接用瀏覽器開啟即可預覽（純靜態 HTML，不需 dev server）。
