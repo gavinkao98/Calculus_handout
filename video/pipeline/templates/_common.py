@@ -54,6 +54,12 @@ RAIL_X = col_x(RAIL_COL)
 RAIL_W = CONTENT_W - RAIL_COL * _COL_W         # rail width (RAIL_X -> right gutter edge)
 PRIMARY_W = RAIL_COL * _COL_W                  # primary width (SPINE_X -> RAIL_X)
 
+# Decorative spine axis (2026-06-24 Step 2-B2 prototype): the x of a VISIBLE vertical
+# line that makes the Lectern's left axis show. It sits in the LEFT GUTTER, just left of
+# SPINE_X (the content edge), so content reads as flush to it and the line never overlaps
+# glyphs. Deliberately NOT SPINE_X -- drawing the spine AT SPINE_X would collide with text.
+DECOR_SPINE_X = SPINE_X - 0.22
+
 # Masthead vertical anchor: the eyebrow's TOP edge sits here in EVERY title-bearing
 # template (via scene_head), and the title is pinned a fixed gap below it. Because the
 # eyebrow font size is constant, the title's top lands at a fixed y too -- so the
@@ -277,6 +283,38 @@ def scene_head(spec: dict[str, Any], ctx: dict[str, Any], *, label: str) -> list
     blocks.append(Block("title", title, anim="fade", static=True))
 
     return blocks
+
+
+def scene_spine(spec: dict[str, Any], ctx: dict[str, Any],
+                blocks: "list[Block] | None" = None) -> Block:
+    """The Lectern's left axis, made visible -- a restrained vertical spine in the left
+    gutter (2026-06-24 Step 2-B2 prototype). A quiet full-height hairline carries the
+    structure; an accent 'cap' lit at the masthead carries the scene accent (the
+    signature) so content reads as flush to a structural axis. Flat solid only -- NO
+    gradient (VISUAL-FRAME-RUBRIC house style); the masthead 'lit' look is a text_glow
+    halo on the cap, not a fade. Static, on the decoration layer (drawn under content).
+
+    The cap runs from the masthead top down to the TITLE's actual bottom edge (read from
+    *blocks*), so the lit length tracks the real title height on every template -- graph's
+    Pango title renders ~1.36x taller than the Tex titles, so a fixed fraction under-lit
+    it (2026-06-24 fix). Falls back to a fixed band when no title block is present."""
+    ground = ctx["ground"]
+    role = accent_role(spec)
+    top = MASTHEAD_TOP
+    bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
+    span = top - bottom
+    axis = brand.vrule(span, ground, role="hairline_strong", width=2.0, opacity=0.9)
+    axis.move_to([DECOR_SPINE_X, (top + bottom) / 2, 0])
+    cap_bottom = top - span * 0.17
+    if blocks:
+        title_mob = next((b.mobject for b in blocks if b.id in ("title", "prompt")), None)
+        if title_mob is not None:
+            cap_bottom = title_mob.get_bottom()[1]
+    cap_h = max(top - cap_bottom, 0.2)
+    cap = brand.vrule(cap_h, ground, role=role, width=2.4)
+    cap.move_to([DECOR_SPINE_X, top - cap_h / 2, 0])
+    cap_glow = brand.text_glow(cap, ground, role=role, width=2.4, opacity=0.5)
+    return Block("spine", VGroup(axis, cap_glow), anim="fade", static=True, layer="decoration")
 
 
 def _part_text(part) -> str:

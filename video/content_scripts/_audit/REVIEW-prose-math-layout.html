@@ -53,7 +53,7 @@
 
   /* ---- video frame ---- */
   .frame{position:relative; width:100%; aspect-ratio:16/9; border-radius:12px; overflow:hidden; container-type:inline-size;
-    background:radial-gradient(120% 90% at 18% 0%, var(--ink-2) 0%, var(--ink-1) 62%); color:var(--t1); font-family:var(--f-body);
+    background:var(--ink-1); color:var(--t1); font-family:var(--f-body);
     box-shadow:0 16px 40px -22px rgba(12,20,40,.55), 0 1px 0 rgba(255,255,255,.4)}
   .frame.bad{outline:2px solid #d98a8a55} .frame.good{outline:2px solid #7fc79a55}
   .stage{position:absolute; left:7%; right:6%; top:8%; bottom:9%; display:flex; flex-direction:column}
@@ -61,7 +61,7 @@
   .title{font-family:var(--f-display); font-weight:600; font-size:5.4cqw; line-height:1.03; margin:.6cqw 0 0}
   .title .katex{font-size:.85em}
   .spine{position:absolute; left:4.4%; top:7%; bottom:7%; width:2px; border-radius:2px;
-    background:linear-gradient(var(--blue) 0%, var(--blue) 15%, #5cc8ec44 32%, var(--hairline) 58%, var(--hairline) 100%)}
+    background:var(--blue)}
 
   /* procedure rows */
   .prows{display:flex; flex-direction:column; gap:2.2cqw; margin-top:3cqw}
@@ -88,7 +88,7 @@
   .fillframe .stage{align-items:center; text-align:center}
   .fillframe .statement{max-width:42ch; margin:0 auto}
   .cardrow{display:flex; gap:2cqw; justify-content:center; margin-top:auto; padding-top:3cqw}
-  .fcard{position:relative; background:linear-gradient(180deg,var(--panel),var(--panel-2)); border-radius:9px; padding:1.6cqw 2cqw 1.6cqw 2.2cqw; overflow:hidden}
+  .fcard{position:relative; background:var(--panel); border-radius:9px; padding:1.6cqw 2cqw 1.6cqw 2.2cqw; overflow:hidden}
   .fcard::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--blue)}
   .fcard .katex{font-size:2.0cqw; color:var(--blue-ink)}
 
@@ -283,7 +283,7 @@
     <li><b>spine ≠ 兩欄。</b>v1 的左 spine 只是「左邊界的結構件」，它<b>不要求</b>內容左右切——spine 底下的內容可以完全上下堆疊。簽名與「上下優先」不衝突。</li>
     <li><b>rail 收斂為 atom-only。</b>右 rail 只放容得下寬度／天生就短的東西：公式卡（recap）、1–3 字理由 tag（derivation）、短結果式（procedure）、短 key-idea aside（definition 稀疏時）。<b>絕不</b>把整句 statement／point 放進 rail。</li>
     <li><b>definition 維持單欄。</b>v1 的 definition AFTER 本來就是「statement 上、math 下」的單欄堆疊，rail 只掛一張短 aside 卡——符合規則。可選的強化：statement 給更滿的 measure，aside 在內容稀疏時才出現（沿用既有 L3 collapse）。</li>
-    <li><b>新增一條撰稿護欄（建議）。</b>把「步驟／點若 > ~45 字就不該進 rail，改上下」寫進 <code>DESIGN.md</code> 的 authoring checklist；可選地讓 <code>sizecheck</code> 對 procedure step text 過長時 warn（沿用既有 <code>estimate_text_width</code>）。</li>
+    <li><b>撰稿護欄（更正 2026-06-24）。</b><b>撤回</b>原「步驟／點 > ~45 字改上下」的固定字數 lint——真實 recap points 已 50–60 字會<b>誤報</b>。改為：<b>長 procedure prose 拆 scene／改寫</b>，不卡固定字數；rail 只放 atom（短句↔短式）。</li>
   </ul>
   <p class="note" style="margin-top:18px">一句話：<b>你說得對，但你已經做對了。</b>規則確立、缺陷沒有；要動的是把「上下優先 / rail 限 atom」寫成明文，並讓 v1 的 spine 跟它相容。要我把這條規則補進 <code>DESIGN.md</code> 並據此微調 v1 的 definition 嗎？</p>
 

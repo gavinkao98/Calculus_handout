@@ -233,9 +233,9 @@ gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第
 
 **各模板採用：**
 
-- `definition_math`：有 `statement`＋符號式且符號 ≤ `RAIL_W` 時 → **兩欄**（文左、
-  符號 snap `RAIL_X`）；否則 graceful 退回單欄（`student_id_is_one_to_one` 即因符號
-  過寬退回，正確）。
+- `definition_math`：**單欄**（退兩欄，2026-06-21；見下「definition 單欄」節）——散文
+  `statement` 滿寬 ＋ 符號式堆其下 ＋ `place_body` 上偏置中。內容稀疏時可選 L3 `aside`
+  卡 snap `RAIL_X`（會 graceful 收合，不與內容競爭）。
 - `derivation`：理由 snap `RAIL_X`；dotted leader 改為**目錄式可變長 connector**
   （短式配長 leader，連接永遠成立）。無理由的純鏈仍置中（不變）。
 - `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
@@ -481,23 +481,16 @@ style）在此。乾淨分離。
 
 ### Text rendering：prose vs math（no garble）
 
-螢幕文字走兩條 render path 之一。兩者都是 Times（匹配 HTML handout 的 Times
-serif——`"Times New Roman", Times, Georgia, serif` + MathJax），但 manim 在相同
-`font_size` 下 size 不同，且只有一條理解 LaTeX：
+> **⚠️ 2026-06-24 改 Route A（已決議、待實作）：** 文字將**全改走 LaTeX/pdflatex**——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**——以拿到正確 kerning。**根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning**（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。落地時本節重寫，並移除 Pango 路徑專屬機制：`theme.TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊）、`brand._pango_dashes`（Pango 不認 LaTeX dash ligature）、`brand._compose`／`_prose_mixed` 的 Pango＋Tex baseline 拼接（LaTeX 原生排文字＋內聯數學同行）。`_WIDTH_K`／`estimate_text_width` 是換行寬度估計（非 kerning），**保留並重校**。硬約束：只能 pdflatex（lualatex 會破壞 manim 數學子部件定址）。計畫 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)、決策見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「2026-06-24」節。**以下為 Route A 落地前的現況。**
+
+螢幕文字走兩條 render path 之一（manim 對相同 `font_size` 的 Pango 與 LaTeX 呈現大小不同、且只有一條理解 LaTeX）：
 
 | Path | Engine | 理解 `$math$` / `\\`？ | 使用者 |
 |---|---|---|---|
-| `Text` | Pango（Times New Roman） | **否**——markup 會 literally 印出（garble） | `brand.heading`、`brand.eyebrow` |
-| `Tex` / `MathTex` | LaTeX（newtxtext + newtxmath） | 是 | `brand.body_text`、`brand.prose`、`brand.heading_rich`、`brand.math_line` |
+| `Text` | Pango | **否**——markup 會 literally 印出（garble） | `brand.heading`、`brand.eyebrow`、`brand.body_text` |
+| `Tex` / `MathTex` | LaTeX | 是 | `brand.prose`、`brand.heading_rich`、`brand.math_line` |
 
-`brand.body_text` 透過 `Tex(r'\text{...}')` render（不是 Pango `Text`），讓
-body prose 取得 LaTeX-quality kerning——匹配 handout。Heading 仍使用 Pango
-`Text`（SEMIBOLD weight，Tex 無法表達）；在 display size 和 bold weight 下
-Pango kerning 差異不可感知。
-
-`Text` 在相同 `font_size` 下比 `Tex` 高 ~1.36×，因此透過 Tex render 的 prose
-以 `theme.TEX_TEXT_SCALE` 放大，使其與旁邊的 heading 相同大小。Math
-（`math_line`）保持其自身的 size role，不放大。
+`Text` 在相同 `font_size` 下比 `Tex` 高約 `theme.TEX_TEXT_SCALE` 倍，故經 Tex render 的 prose 以此放大、與旁邊的 heading 對齊；`math_line` 保持其自身 size role 不放大。（Route A 後全文字皆 Tex，此係數作廢。）
 
 **規則（template 必須遵循）：** 作者可能放入 `$` 或 `\` 的任何欄位——`title`、
 `statement`、step `text`、`takeaway`、recap `points`——透過 **`brand.prose`**

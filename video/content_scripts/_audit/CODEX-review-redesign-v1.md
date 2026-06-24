@@ -5,7 +5,7 @@
 > （%TEMP% 不隨 repo 走，故落版控）。被審物：
 > [`REVIEW-template-redesign-v1.html`](REVIEW-template-redesign-v1.html)、
 > [`REVIEW-prose-math-layout.html`](REVIEW-prose-math-layout.html)。
-> 彙整與裁決見 [`TODO-template-redesign.md`](TODO-template-redesign.md)。
+> 彙整與裁決原在 `TODO-template-redesign.md`（已退場，內容搬進 [`REBUILD_STATUS.md`](../../REBUILD_STATUS.md)「2026-06-24」節）；字體 Route A 實作計畫見 [`PLAN-routeA-plex-latex.md`](PLAN-routeA-plex-latex.md)。
 
 ---
 

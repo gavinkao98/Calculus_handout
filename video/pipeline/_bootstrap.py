@@ -3,12 +3,18 @@
 manim/yaml are not in .venv; they live under .deps_voiceover (manim 0.20.1) and
 .deps (PyYAML). Call bootstrap() before importing manim or yaml.
 
-Fonts: the video uses Times New Roman / Courier New (Windows system fonts) + newtx
-math (LaTeX) -- no fonts are vendored or registered. (The Direction D vendored design
-fonts + register_design_fonts() were removed with the 2026-06-20 Times revert.)
+Fonts (NCM, 2026-06-24): prose/headings use New Computer Modern (Pango family
+"NewComputerModern10") to match the handout's 2026-06-22 NCM switch; math uses
+Latin Modern (LaTeX `lmodern`), the pdflatex-compatible CM-family closest to NCM
+(exact `newcomputermodern` needs lualatex/xelatex, which breaks manim's dvisvgm
+sub-part addressing). The NCM10 OTFs are LOCATED via kpsewhich from the MiKTeX
+`newcomputermodern` package (already required for math) and registered with Pango --
+not vendored. Eyebrows/labels stay Courier New. (Was Times New Roman + newtx, the
+2026-06-20 Times revert.)
 """
 from __future__ import annotations
 
+import subprocess
 import sys
 from pathlib import Path
 
@@ -21,7 +27,43 @@ def bootstrap() -> None:
         dep = REPO_ROOT / name
         if dep.exists() and str(dep) not in sys.path:
             sys.path.insert(0, str(dep))
+    _register_ncm_fonts()
     _set_tex_template()
+
+
+_NCM_STYLES = ("Regular", "Bold", "Italic", "BoldItalic")
+
+
+def _register_ncm_fonts() -> None:
+    """Register the New Computer Modern text OTFs (family "NewComputerModern10") with
+    Pango so manim Text (prose/headings) can use them.
+
+    The OTFs ship with the `newcomputermodern` TeX package (which the math template now
+    also needs), so we LOCATE them via kpsewhich rather than vendor a copy -- one
+    dependency serves both the Pango text font and the LaTeX math font, and it stays
+    machine-independent. No-op (text falls back) if kpsewhich / the package is absent;
+    tools/doctor.py checks the family is visible to Pango."""
+    try:
+        import manimpango
+    except Exception:
+        return
+    if "NewComputerModern10" in manimpango.list_fonts():
+        return
+    try:
+        anchor = subprocess.run(["kpsewhich", "NewCM10-Regular.otf"],
+                                capture_output=True, text=True, timeout=20).stdout.strip()
+    except Exception:
+        anchor = ""
+    if not anchor:
+        return
+    base = Path(anchor).parent
+    for style in _NCM_STYLES:
+        fp = base / f"NewCM10-{style}.otf"
+        if fp.exists():
+            try:
+                manimpango.register_font(str(fp))
+            except Exception:
+                pass
 
 
 def section_output_dir(meta: dict) -> Path:
@@ -40,12 +82,15 @@ _TEX_TEMPLATE_SET = False
 
 
 def _set_tex_template() -> None:
-    """Set the global manim TeX template — newtxtext + newtxmath (Times).
+    """Set the global manim TeX template — Latin Modern (`lmodern`), CM-family math.
 
-    Times-style math to match the Times New Roman Pango prose/headings (font revert
-    from Direction D's Inter Tight + Computer Modern, 2026-06-20 per user request).
-    newtxmath is the Times-compatible math font; the three inverse-trig operators the
-    book preamble defines but manim's default template lacks are also declared.
+    NCM switch (2026-06-24): the on-screen math moves off Times (newtx) to the Computer-
+    Modern family to match the handout's New Computer Modern. Exact `newcomputermodern`
+    needs lualatex/xelatex (fontspec), which breaks manim's `\\special{dvisvgm:raw}`
+    sub-part addressing, so we use `lmodern` (Latin Modern) -- pdflatex-compatible and
+    visually the closest CM-family to NCM (CM -> Latin Modern -> NCM lineage). The three
+    inverse-trig operators the book preamble defines but manim's default template lacks
+    are also declared.
     """
     global _TEX_TEMPLATE_SET
     if _TEX_TEMPLATE_SET:
@@ -56,8 +101,7 @@ def _set_tex_template() -> None:
         return
     tpl = TexTemplate()
     tpl.add_to_preamble(
-        r"\usepackage{newtxtext}" "\n"
-        r"\usepackage{newtxmath}" "\n"
+        r"\usepackage{lmodern}" "\n"
         # Inverse-trig operators the book preamble defines but manim's default
         # template lacks. \arcsin/\arccos/\arctan are LaTeX-kernel operators;
         # these three are not, so on-screen math using them failed to compile.

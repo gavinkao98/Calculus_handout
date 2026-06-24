@@ -4,13 +4,27 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
-## 🎨 2026-06-24 模板重設計提案「The Lectern」→ Codex review → 待辦彙總（進行中、未動程式碼）
+## 🎨 2026-06-24 模板重設計「The Lectern」：navy＋spine 已落地、字體定 Plex＋LaTeX（Route A 待實作）
 
-使用者 /goal：研究現有模板、把它們設計得更好。已產兩份 standalone HTML 提案稿並送 Codex（`codex exec -s read-only`）做 review，**尚未動任何 Manim 程式碼、尚未 commit 視覺改動**。完整待辦與裁決在 **[`content_scripts/_audit/TODO-template-redesign.md`](content_scripts/_audit/TODO-template-redesign.md)**（換機接續看這份）。
+使用者 /goal：研究現有模板、設計得更好。起於兩份 standalone HTML 提案稿＋Codex review；經多輪 render 驗證與決策後收斂如下。**所有程式改動目前皆未 commit**（待開對題分支）。原逐步待辦 `TODO-template-redesign.md` 內容已全數搬進本節，該檔已退場。
 
-- **提案：** [`REVIEW-template-redesign-v1.html`](content_scripts/_audit/REVIEW-template-redesign-v1.html)（The Lectern：左 spine＋底部 footer＋深藍墨 navy＋Fraunces＋左 flush＋rail aside＋標題數學修正）；[`REVIEW-prose-math-layout.html`](content_scripts/_audit/REVIEW-prose-math-layout.html)（左右 vs 上下規則＋A/B＋逐模板裁決）。
-- **Codex 總評（原稿 [`CODEX-review-redesign-v1.md`](content_scripts/_audit/CODEX-review-redesign-v1.md)）：** 不建議整包核准；navy/spine/footer/Fraunces 拆獨立決策逐一驗證。已核實 4 個真衝突：① gradient 違反 flat house style（`VISUAL-FRAME-RUBRIC.md:45`）② 字體論證過期（handout 已 NCM、Fraunces 會分裂 heading 數學）③ spine/footer 非單純共用件（`SPINE_X` 即內容左緣、footer 動 capacity/data flow）④ BEFORE 非 current tree。另挖出 `DESIGN.md` 兩個 doc bug（definition 兩欄/已退兩欄自相矛盾、body_text Tex/Pango 敘述錯）。
-- **下一步（回來時）：** Step 0 修兩份 html＋`DESIGN.md` stale 敘述 → 使用者先拍板字體（NCM／Times／Fraunces）→ Step 1–2 做 flat-navy＋克制 spine 的 3 張 1080p Manim A/B（definition／procedure＋worked／graph，離線抽幀、零計費）。footer／Fraunces 延後單測。
+**起點與 Codex 核實（原稿 [`CODEX-review-redesign-v1.md`](content_scripts/_audit/CODEX-review-redesign-v1.md)）：** 4 個真衝突——① gradient 違反 flat house style ② 字體論證過期 ③ spine/footer 非單純共用件 ④ BEFORE 非 current tree；另 2 個 `DESIGN.md` doc bug。**Step 0 已修**：兩份 REVIEW html 去 9 處 gradient＋更正 current-tree/字體敘述；`DESIGN.md:236`（definition 改單欄）＋ body_text Tex→Pango 表格/散文更正；撤回「>45 字」固定字數 lint。
+
+**已拍板＋已落地（未 commit）：**
+- **navy 底（採、已實作）：** [`theme.py`](pipeline/visuals/theme.py) DARK ground 改純色 navy（`bg #0c0f17→#0a1322`、`panel→#13233f`、`hairline→#22324f`＋同步重調 bg_black/bg_soft/panel_2/hairline_strong/hairline_faint/card_fill）。flat 純色、無 gradient（守 house style）。使用者確認色值 OK。
+- **克制 spine（採、已實作）：** [`_common.py`](pipeline/templates/_common.py) 加 `DECOR_SPINE_X = SPINE_X − 0.22`（左 gutter、不壓字）＋ `scene_spine()`（安靜 hairline ＋ masthead accent cap，cap 高度**追實際 `title.get_bottom()`**——因 graph 標題走 Pango heading 比 Tex heading_rich 高 ~1.36×，固定比例會對不齊；用 `text_glow` 做「點亮」、無 gradient），由 [`__init__.py`](pipeline/templates/__init__.py) `build_blocks` 注入所有 dark content 模板。
+- **footer：暫緩**（要動 capacity／data flow，本輪不做）。
+
+**字體定案＝IBM Plex Sans（內文/標題）＋ IBM Plex Mono（eyebrow）＋ Latin Modern（數學），全走「路線 A：文字 render 由 Pango 換成 LaTeX/pdflatex」。** 決策歷程與理念：
+- 先試「跟 handout 一致改 NCM」並**已實作**（`_bootstrap._register_ncm_fonts` kpsewhich 註冊 `NewComputerModern10`＋math 改 `lmodern`＋theme 字體＋校準）→ 使用者發現**字距不均**。
+- **根因實測：manim `Text`/`MarkupText`（Pango）完全不套 kerning**（`W("AVAVAV")`≈各字寬相加）——所有字體都偏鬆、sans 最明顯、數學(LaTeX)反而整齊（LaTeX 會 kerning）。**這是 Pango 文字渲染的限制，非字體問題；過去專案一直「用 serif 容忍、就這樣用」，並無專為 kerning 寫的修正。**
+- **修法＝文字改走 LaTeX（路線 A）**，順帶可**移除過時的 Pango 專屬機制**：`_compose` 的 Pango＋Tex baseline 拼接 hack（LaTeX 原生排「文字＋內聯數學同行」）、`TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊）、`_pango_dashes`（Pango 不認 LaTeX dash ligature）。（`_WIDTH_K` 寬度估計是換行用、非 kerning，保留並重校。）**硬約束：只能 pdflatex**——lualatex/xelatex 會破壞 manim `\special{dvisvgm:raw}` 數學子部件定址（故 `newcomputermodern` 排除、數學用 `lmodern`）。
+- 路線 A 解鎖字體自由（pdflatex 下任何字體都正確 kerning）→ render 對比後使用者**選 Plex Sans ＋ Latin Modern**（cmbright 全 sans render 壞；serif 文字配 LM 數學會兩 serif 互打）。
+- **實作計畫（自足、可在新對話 inline 執行）：** [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)（8 task、含現況/起點說明＋render/lint/sizecheck 驗證點；preamble 已 spike 驗證）。**尚未開始實作。**
+
+**驗證資產（`output/` gitignore、皆可重生）：** `output/_qa/REVIEW-navy-spine-render-AB.html`（navy/spine A/B/C）、`REVIEW-font-routeA.html`／`REVIEW-font-design.html`（字體決選）、`route_a/B_plex_lmodern.png`（Plex+LM 目標樣式 mock）。navy/spine 階段回歸：全 §1.1 lint 0、sizecheck 0 error（NCM 階段 1 warn＝recap 變寬溢出，Route A 重校後 Task 7 複驗）。
+
+**回來時的下一步：** 開對題分支 → 照 `PLAN-routeA-plex-latex.md` inline 執行 Route A（Plex+LaTeX）→ 全 §1.1 回歸 → commit。footer 日後單測。
 
 ## 🛰️ 2026-06-21（續）§1.1 Codex 逐場景審核 → 套用 → 回歸（使用者 /goal：每場圖傳 codex 審美學/排版、調到他建議的樣子、再回饋模板）
 

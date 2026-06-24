@@ -188,6 +188,8 @@ python video\make.py          --storyboard video\storyboards\<deck>_mimo.yml --r
 
 ## 文字渲染（避免亂碼）
 
+> **⚠️ 2026-06-24 改 Route A（已決議、待實作）：** 文字將**全改走 LaTeX/pdflatex**（內文/標題 IBM Plex Sans、eyebrow IBM Plex Mono、數學 Latin Modern），因實測 manim `Text`（Pango）不套 kerning。落地後本節重寫、Pango 路徑與 `TEX_TEXT_SCALE` 等機制移除。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「2026-06-24」節與 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。**以下為落地前現況。**
+
 畫面上的字走兩條渲染路徑，**`Text`（Pango）走 Times New Roman、`Tex`（LaTeX）走 newtx，
 manim 對相同 `font_size` 的呈現大小不同**（`Text` 約比 `Tex` 大 1.36 倍，已由 `theme.TEX_TEXT_SCALE` 校準對齊）：
 

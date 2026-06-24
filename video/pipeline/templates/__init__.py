@@ -58,6 +58,12 @@ def build_blocks(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             f"Known: {sorted(REGISTRY)}"
         )
     blocks = REGISTRY[template](spec, ctx)
+    # Step 2-B2 prototype: prepend the made-visible Lectern spine on dark teaching scenes
+    # (drawn UNDER content -- decoration layer). One shared component for every content
+    # template; isolate-one-variable A/B. Remove this block to revert to no spine.
+    if ctx.get("ground") != "light":
+        from ._common import scene_spine
+        blocks = [scene_spine(spec, ctx, blocks)] + blocks
     return _apply_hook(spec, ctx, blocks)
 
 

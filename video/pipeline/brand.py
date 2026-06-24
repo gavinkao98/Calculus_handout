@@ -54,12 +54,13 @@ FRAME_H = T.FRAME_H
 # out empty -> "ParseError: no element found". The estimate removes that whole
 # class of failure (and is much faster -- no SVG per trial).
 #
-# Calibration (manim units per char*font_size), for Times New Roman advances.
-# CJK glyphs are full-width, so they count as ~2x a latin advance. Use 0.0058 as a
-# small safety margin (overflow is worse than a slightly short line). One global knob
-# -- retune if fonts change (Direction D's wider Inter Tight needed 0.0068).
+# Calibration (manim units per char*font_size). CJK glyphs are full-width, so they count
+# as ~2x a latin advance. One global knob -- retune if fonts change (Times advance ~0.0060,
+# used 0.0058; Inter Tight needed 0.0068). NCM is ~11% wider than Times: measured ~0.00643
+# per char*fs (2026-06-24), so 0.0065 estimates just above the real advance (overflow is
+# worse than a slightly short line).
 
-_WIDTH_K = 0.0058
+_WIDTH_K = 0.0065
 
 
 def _char_weight(ch: str) -> float:

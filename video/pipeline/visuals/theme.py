@@ -31,25 +31,30 @@ only blocks.ACCENT_ROLE needed remapping.
 from __future__ import annotations
 
 # -- fonts (Pango family names) -------------------------------------------
-# Times New Roman serif for display + prose, Courier New for labels (font revert
-# from Direction D's Inter Tight / JetBrains Mono, 2026-06-20 per user request).
-FONT_DISPLAY = "Times New Roman"
-FONT_BODY = "Times New Roman"
+# New Computer Modern serif for display + prose (NCM switch 2026-06-24, to match the
+# handout's 2026-06-22 NCM move); Courier New for labels/eyebrows. The NCM text family
+# "NewComputerModern10" is registered with Pango in _bootstrap._register_ncm_fonts()
+# (located via kpsewhich from the MiKTeX newcomputermodern package, not vendored).
+# (Was Times New Roman, the 2026-06-20 revert.)
+FONT_DISPLAY = "NewComputerModern10"
+FONT_BODY = "NewComputerModern10"
 FONT_MONO = "Courier New"
 
 # -- type scale -----------------------------------------------------------
 # tokens give px @ 1920x1080. manim font_size is its own unit; PX_TO_FS converts.
-# Calibrated for Times New Roman (a Times "H" is ~0.00920 u/fs). One global knob —
-# retune if fonts change (Direction D's Inter Tight needed 0.655; Times uses 0.72).
-PX_TO_FS = 0.72
+# One global knob — retune if fonts change (Inter Tight needed 0.655; Times used 0.72,
+# H ~0.00920 u/fs). NCM "H" measures ~0.00949 u/fs (~3% taller), so 0.698 = 0.72 *
+# 0.00920/0.00949 keeps cap heights identical to the Times calibration (layout unchanged).
+PX_TO_FS = 0.698
 
 # manim renders Text (Pango) and Tex/MathTex (LaTeX) at *different* visual sizes for
 # the same font_size. For Times New Roman (Pango) vs newtxtext (LaTeX text-mode), a
 # Times "Rg" is 1.36x a newtx \text{Rg} at equal font_size. So prose rendered via Tex
 # (the inline-$math$ path) must be scaled up by this to size-match the plain Times
 # prose beside it. Pure math (math_line/MathTex) is its own size role, left unscaled.
-# One global knob — retune if fonts change (Direction D's Inter Tight needed 1.42).
-TEX_TEXT_SCALE = 1.36
+# One global knob — retune if fonts change (Inter Tight needed 1.42; Times/newtx 1.36;
+# NCM-Pango / lmodern-Tex measured 1.34, 2026-06-24).
+TEX_TEXT_SCALE = 1.34
 
 # Inline math inside a DISPLAY HEADING (heading_rich). x-height-matched math (the body
 # default) sits at ~1.4-1.7x the bold text's cap height for simple f(x)=x^n, because
@@ -89,9 +94,11 @@ def fs(role) -> float:
 # Canonical Direction-D keys + back-compat aliases (old name -> new hue). color()
 # falls back to 'primary' for any unknown role, so a stray name degrades to ink_1.
 DARK: dict[str, str] = {
-    # grounds
-    "bg_black": "#07090f", "bg": "#0c0f17", "bg_soft": "#10131d",
-    "panel": "#141927", "panel_2": "#1a2031",
+    # grounds (flat NTU-navy ink, 2026-06-24 Step 2-B1 A/B: was neutral near-black
+    # #0c0f17; navy #0a1322 echoes brand_navy #16294e, drops the "near-black + neon"
+    # default. Flat solid only -- no gradient, per VISUAL-FRAME-RUBRIC house style.)
+    "bg_black": "#070e1a", "bg": "#0a1322", "bg_soft": "#0e1a2e",
+    "panel": "#13233f", "panel_2": "#172a49",
     # ink (text on dark)
     "ink_1": "#eef2fb", "ink_2": "#aab3c6", "ink_3": "#6b748a", "ink_faint": "#444c5e",
     # accents (4 working + 1 reserved)
@@ -99,8 +106,8 @@ DARK: dict[str, str] = {
     "violet": "#9d8cf2",
     # accent ink-tints (text on dark, slightly lifted)
     "blue_ink": "#8fdcf6", "amber_ink": "#f7c469", "green_ink": "#79e0b4", "red_ink": "#ff8f86",
-    # hairlines (low-alpha ink flattened over bg #0c0f17)
-    "hairline": "#20232b", "hairline_strong": "#2f333b", "hairline_faint": "#171a22",
+    # hairlines (low-alpha ink flattened over navy bg #0a1322; retuned with the navy ground)
+    "hairline": "#22324f", "hairline_strong": "#33456a", "hairline_faint": "#1a2840",
     # brand (theme-independent constants; used on paper frames + carried for continuity)
     "brand_red": "#ba0c2f", "brand_red_bright": "#e23a57",
     "brand_navy": "#16294e", "brand_gold": "#b6892b",
@@ -116,7 +123,7 @@ DARK: dict[str, str] = {
     "muted": "#6b748a",       # -> ink_3  (captions / faded)
     "heading": "#eef2fb",     # -> ink_1
     "subtitle": "#6b748a",    # -> ink_3
-    "card_fill": "#141927",   # -> panel
+    "card_fill": "#13233f",   # -> panel
 }
 
 LIGHT: dict[str, str] = {

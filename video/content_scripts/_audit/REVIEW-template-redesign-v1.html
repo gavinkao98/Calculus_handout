@@ -82,8 +82,7 @@
   .frame{
     --accent:var(--blue); --accent-ink:var(--blue-ink);
     position:relative; width:100%; aspect-ratio:16/9; border-radius:14px; overflow:hidden;
-    background:
-      radial-gradient(120% 90% at 18% 0%, var(--ink-ground-2) 0%, var(--ink-ground-1) 62%);
+    background:var(--ink-ground-1);
     color:var(--ink-1); box-shadow:0 24px 60px -28px rgba(12,20,40,.6), 0 2px 0 rgba(255,255,255,.4);
     font-family:var(--f-body);
   }
@@ -93,7 +92,7 @@
 
   /* the signature: a left spine, lit at the masthead, capped by summit-bars at its foot */
   .spine{position:absolute; left:5.0%; top:6.4%; bottom:6.4%; width:2px; border-radius:2px;
-    background:linear-gradient(var(--accent) 0%, var(--accent) 16%, color-mix(in srgb,var(--accent) 30%, transparent) 34%, var(--hairline) 60%, var(--hairline) 100%);
+    background:var(--accent);
   }
   .spine::before{content:""; position:absolute; left:-3px; top:0; width:8px; height:15%;
     border-radius:8px; background:var(--accent); filter:blur(7px); opacity:.55}
@@ -133,7 +132,7 @@
   .mline.is-blue{color:var(--blue-ink)}
 
   /* rail aside card (the L3 enrichment slot, made visible) */
-  .aside{position:relative; background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%);
+  .aside{position:relative; background:var(--panel);
     border-radius:10px; padding:1.7cqw 1.9cqw 1.7cqw 2.2cqw; overflow:hidden}
   .aside::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent)}
   .aside .lab{font-family:var(--f-mono); font-weight:700; font-size:1.2cqw; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-ink); margin:0 0 .7cqw}
@@ -166,7 +165,7 @@
   .worked .wm{font-size:2.0cqw; color:var(--blue-ink)} .worked .ar{color:var(--ink-3); font-size:1.8cqw}
 
   /* ---- theorem ---- */
-  .thmcard{position:relative; flex:none; background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%); border-radius:12px;
+  .thmcard{position:relative; flex:none; background:var(--panel); border-radius:12px;
     padding:2.2cqw 2.6cqw 2.2cqw 3cqw; overflow:hidden; max-width:42ch}
   .thmcard::before{content:""; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--ntu-gold)}
   .thmcard p{margin:0; font-size:2.7cqw; line-height:1.34; color:var(--ink-1)}
@@ -184,7 +183,7 @@
   .pt .idx{font-family:var(--f-display); font-weight:700; font-size:2.2cqw; color:var(--amber); text-shadow:0 0 12px color-mix(in srgb,var(--amber) 40%,transparent)}
   .pt .ptx{font-size:2.0cqw; color:var(--ink-2); line-height:1.34}
   .remember{font-family:var(--f-mono); font-weight:700; font-size:1.25cqw; letter-spacing:.18em; text-transform:uppercase; color:var(--blue-ink); margin:0 0 1.6cqw}
-  .fcard{position:relative; background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%); border-radius:9px; padding:1.5cqw 1.8cqw 1.5cqw 2cqw; margin-bottom:1.4cqw; overflow:hidden}
+  .fcard{position:relative; background:var(--panel); border-radius:9px; padding:1.5cqw 1.8cqw 1.5cqw 2cqw; margin-bottom:1.4cqw; overflow:hidden}
   .fcard::before{content:""; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--blue)}
   .fcard .katex{font-size:2.05cqw; color:var(--blue-ink)}
 
@@ -204,7 +203,7 @@
   .gcaption{font-size:2.0cqw; color:var(--ink-2); text-align:center}
 
   /* BEFORE frame (faithful recreation of current look, no spine) */
-  .frame.before{background:radial-gradient(120% 90% at 50% 30%, #0e121c 0%, #0a0d15 70%)}
+  .frame.before{background:#0a0d15}
   .frame.before .stage{align-items:flex-start}
   .frame.before .b-state{font-size:2.55cqw; color:var(--ink-2); max-width:36ch; margin:7cqw 0 0 2cqw; line-height:1.45}
   .frame.before .b-math{align-self:center; text-align:center; margin-top:5cqw; display:flex; flex-direction:column; gap:2.2cqw}
@@ -223,7 +222,7 @@
   <h1 class="report">把版面變成建築：<br>“The Lectern” 模板重設計</h1>
   <p class="lede">現有 12 個模板已經是一套成熟、經多輪稽核的系統——這份提案<b>不重來</b>，而是把已經藏在程式碼裡的 Lectern 網格<b>顯化成一個看得見的結構</b>，順手解決浮空死區、讓 masthead 帶上識別、並修掉幾個具體缺陷。</p>
   <p class="lede" style="font-size:16px">下面每一格都是真實 16:9 影片幀的比例，數學由 KaTeX 即時渲染。這是<b>方向定調稿</b>：認可後才移植進 Manim 模板並本地 render 驗收。</p>
-  <p class="meta-line">提案範圍：版面張力 · masthead 簽名化 · 針對性 polish · 大膽美學翻新（你全選）　|　承載四色語意系統、Times↔handout 連結、Lectern 對齊網格不動</p>
+  <p class="meta-line">提案範圍：版面張力 · masthead 簽名化 · 針對性 polish · 大膽美學翻新（你全選）　|　承載四色語意系統、Lectern 對齊網格不動（字體方向 2026-06-22 後待重新拍板——見 §04／決策）</p>
 
   <!-- ================= 1. 設計核心 ================= -->
   <h2 class="report"><span class="n">01</span>一句話的設計論點</h2>
@@ -242,7 +241,7 @@
       <h4>型 · Type</h4>
       <div class="spec">Fraunces</div>
       <div class="spec mono" style="font-size:15px">Space Mono · eyebrow</div>
-      <p><b>顯示字</b>用 Fraunces（高對比 old-style serif，更有編輯個性）；<b>內文／數學</b>維持 Times 系（<code>Tinos</code> 與 Times metric 相容，零風險移植，守住 handout 連結）。eyebrow 用 Space Mono。<span class="tag bold">需決策</span> 只有 Fraunces 要 Manim 端定字。</p>
+      <p><b>顯示字</b>用 Fraunces（高對比 old-style serif，更有編輯個性）；<b>內文／數學</b>原提案寫「維持 Times 系（<code>Tinos</code>）守 handout 連結」。<span class="tag bold">更正 2026-06-24</span>：handout 已於 <b>2026-06-22 改 New Computer Modern</b>，「維持 Times 守 handout 連結」的理由<b>作廢</b>——video 字體方向（NCM／Times／Fraunces）改列待拍板。另注：Fraunces 含數學標題走 <code>brand._compose</code> 仍以 <code>FONT_BODY</code> render，會成「標題 Fraunces／數學 Times」分裂；<code>Space Mono</code> 與 Fraunces <b>都非系統字體、都需 vendoring</b>。</p>
     </div>
   </div>
 
@@ -259,7 +258,7 @@
 
   <!-- ================= 2. 旗艦 before / after ================= -->
   <h2 class="report"><span class="n">02</span>旗艦對照 · <code>definition_math</code></h2>
-  <p class="sub">最常用、也最浮空的模板。左：忠實重建現況（內容偏左上、右側＋下方一片空、角落 tiny motif）。右：spine 架構 ＋ 左 flush ＋ 右 rail 的 key-idea 卡（這正是程式碼已有的 L3 <code>aside</code> 槽，只是現在<b>看得見地</b>用上）＋ footer。</p>
+  <p class="sub"><b>更正現況描述 2026-06-24：</b>此模板現行<b>已是</b>單欄、<b>已左 flush</b> 對齊 <code>SPINE_X</code>、由 <code>place_body</code> 在 body zone 上偏置中（<b>非「浮空」</b>），且<b>已有</b>可選的 L3 <code>aside</code> 槽（內容稀疏才出現、會 graceful 收合）。所以本提案對 <code>definition_math</code> 的<b>真正 delta 只有</b>：深藍墨底、可見 spine、底部 footer、把 aside 改成常駐。左：現況示意。右：加上述四項後的樣子。</p>
 
   <h3 class="report">BEFORE — 現況</h3>
   <div class="frame before">
@@ -274,7 +273,7 @@
     </div>
     <div class="motif"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
-  <p class="frame-cap"><b>讀法：</b>乾淨，但右 40%＋下 25% 死區，內容與標題脫節地浮在中段。</p>
+  <p class="frame-cap"><b>讀法（更正）：</b>此「BEFORE」幀為<b>示意</b>，誇大了死區——現行 <code>place_body</code>（2026-06-21 上偏置中）其實已把短內容貼住標題、底部留白由 motif 平衡，<b>並無「浮在中段、與標題脫節」</b>。現況真正缺的是 navy／spine／footer 這層識別，不是版面置放。實際對照以 Step 1 的真 render 為準。</p>
 
   <h3 class="report">AFTER — The Lectern</h3>
   <div class="frame">
@@ -301,11 +300,11 @@
     </div>
     <div class="footer"><span>§1.1 · Inverse Functions</span><span><span class="accentdot">●</span>&nbsp; Definition · 02</span></div>
   </div>
-  <p class="frame-cap"><b>變了什麼：</b>spine 給左緣骨架 · 內容左 flush 貼標題 · key 式用 amber tick 標記 · 右 rail 的 <b>aside</b> 填右側並多教一句 · footer 鎖底。<b>沒變：</b>字級、四色語意、glow。</p>
+  <p class="frame-cap"><b>真正變了（更正）：</b>navy 底 · 可見 spine 給左緣骨架 · 常駐的右 rail <b>aside</b>（現行為稀疏才出現）· footer 鎖底。<b>本來就有、沒變：</b>單欄、左 flush 對齊 <code>SPINE_X</code>、<code>place_body</code> 置中、key 式 amber＋glow、字級、四色語意。（amber tick 標記為可選新增。）</p>
 
   <!-- ================= 3. 套用到其他模板 ================= -->
   <h2 class="report"><span class="n">03</span>同一套語言，套到其他模板</h2>
-  <p class="sub">spine／footer／rail 是共用件，每個模板只填中欄。下面六張示範 accent 隨場景型別切換（definition 藍 · derivation 藍→amber · theorem 金 · recap amber · divider 藍），以及兩個 polish 修正。</p>
+  <p class="sub">rail（<code>RAIL_X</code>）已是共用件；<b>spine／footer 則非</b>——<span class="tag fix">注意</span>spine 需新增 <code>DECOR_SPINE_X</code>（現行 <code>SPINE_X</code> 就是內容左緣，直接畫會壓字），footer 需把 scene ordinal 傳入 template context（現行 <code>scene.py</code> 未傳），兩者都要動 layout／data flow，<b>不是只填中欄</b>。下面六張示範 accent 隨場景型別切換（definition 藍 · derivation 藍→amber · theorem 金 · recap amber · divider 藍），以及 polish 修正。</p>
 
   <h3 class="report"><code>derivation</code> — 含 polish：標題內聯數學不再壓過粗體字 <span class="tag fix">fix</span></h3>
   <div class="frame">
@@ -326,7 +325,7 @@
     </div>
     <div class="footer"><span>§1.1 · Inverse Functions</span><span><span class="accentdot">●</span>&nbsp; Derivation · 14</span></div>
   </div>
-  <p class="frame-cap"><b>polish：</b>標題裡的 <code>$f(x)=x^3+2$</code> 收到約 cap height（現況 <code>HEADING_MATH_SCALE=0.78</code> 視覺上仍偏大）· reason rail 改右對齊掛在固定 rail 欄 · ∴ result amber、✓ check 全尺寸綠。</p>
+  <p class="frame-cap"><b>polish：</b>標題內聯數學的大小<b>待 Manim 內實測</b>（<code>HEADING_MATH_SCALE=0.78</code> 已是 Manim 校準值，<b>勿</b>照本網頁 KaTeX <code>.84em</code> 改——KaTeX≠newtx 指標）· reason rail 改右對齊掛在固定 rail 欄 · ∴ result amber、✓ check 全尺寸綠。</p>
 
   <h3 class="report"><code>procedure_steps</code> — 發光序號掛上 spine</h3>
   <div class="frame">
@@ -449,17 +448,17 @@
     <span><span class="tag bold">需決策</span> 你拍板</span>
   </div>
   <ul class="tight">
-    <li><b>左 spine ＋ summit 腳</b> <span class="tag bold">需決策</span>：新增 <code>_common.scene_spine()</code>，所有 <code>scene_head</code> 模板共用；accent 隨場景。最大的觀感改變來源。</li>
-    <li><b>底部 meta footer</b> <span class="tag bold">需決策</span>：<code>§x.y · TYPE · NN</code>，鎖下緣死區、加紀錄片式結構。</li>
-    <li><b>內容左 flush（取代置中浮空）</b> <span class="tag bold">需決策</span>：definition／derivation 純鏈不再水平置中，改貼 spine；填右靠 rail aside。</li>
+    <li><b>左 spine ＋ summit 腳</b> <span class="tag bold">需決策</span>：新增 <code>_common.scene_spine()</code>，所有 <code>scene_head</code> 模板共用；accent 隨場景。<b>注意</b>：須另立 <code>DECOR_SPINE_X</code>（不可挪用 <code>SPINE_X</code>＝內容左緣，否則壓字）。最大的觀感改變來源。</li>
+    <li><b>底部 meta footer</b> <span class="tag bold">需決策</span>：<code>§x.y · TYPE · NN</code>，鎖下緣死區、加紀錄片式結構。<b>注意</b>：<code>NN</code>（scene ordinal）目前未傳入 template context（<code>scene.py</code>），且 footer 會吃 body zone／worked strip／motif 空間——要動 capacity／data flow，故<b>暫緩、單獨單測</b>。</li>
+    <li><b>內容左 flush</b> <span class="tag fix">更正</span>：<code>definition_math</code> 現行<b>已</b>左 flush 對齊 <code>SPINE_X</code>（非新改）；<b>純 <code>derivation</code> 鏈刻意置中是 house 設計、非缺陷</b>（左 flush 會 strand 右 ~60% 空白，Codex 已 flag）——<b>不要</b>改純鏈為左 flush。此項實為「已完成」，非待辦。</li>
     <li><b>深藍墨底</b> #0c0f17 → #0a1322 <span class="tag bold">需決策</span>：脫離「近黑＋霓虹」AI 預設臉、呼應 NTU navy。</li>
-    <li><b>Fraunces 顯示字</b> <span class="tag bold">需決策</span>：唯一需要 Manim 端定字／vendoring 的項目；內文／數學仍 Times（守 handout 連結）。</li>
-    <li><b>標題內聯數學 scale</b> <span class="tag fix">fix</span>：<code>HEADING_MATH_SCALE</code> 0.78 → 約 cap height，治 derivation 標題「字小式大」。</li>
+    <li><b>Fraunces 顯示字</b> <span class="tag bold">需決策</span>：<b>更正</b>——Fraunces <b>與 Space Mono 都需 vendoring</b>（皆非系統字體）；且 Fraunces 含數學標題經 <code>_compose</code>／<code>FONT_BODY</code> 會分裂成「標題 Fraunces／數學 Times」，須先改 <code>_compose</code> 才不分裂。「內文／數學維持 Times 守 handout 連結」的理由已<b>作廢</b>（handout 2026-06-22 改 NCM）——字體方向（NCM／Times／Fraunces）併入決策一併拍板。</li>
+    <li><b>標題內聯數學 scale</b> <span class="tag bold">待實測</span>：本 HTML 的 KaTeX <code>.84em</code> 只是<b>網頁示意</b>，<b>不可</b>直接拿來改 Manim 的 <code>HEADING_MATH_SCALE</code>（KaTeX≠newtx 指標）——現行 <code>0.78</code> 已是 Manim 校準值；要動須在 Manim 內實測校。</li>
     <li><b>rail aside 顯性使用</b> <span class="tag fix">fix</span>：L3 <code>aside</code> 槽已存在，用它把 sparse definition 的右側死區變成多教一句。</li>
     <li><b>四色語意系統</b> <span class="tag keep">keep</span> · <b>glow 配方</b> <span class="tag keep">keep</span> · <b>Lectern 對齊網格</b> <span class="tag keep">keep</span>（只是顯化）· <b>figure 置中 house rule</b> <span class="tag keep">keep</span> · <b>數學保真 / sizecheck / lint guard</b> <span class="tag keep">keep</span>。</li>
   </ul>
 
-  <p class="note" style="margin-top:30px"><b>下一步（認可後）：</b>① 在 <code>_common.py</code> 加 spine／footer 共用件、調 ground 與 <code>HEADING_MATH_SCALE</code>；② 一個模板一個模板移植、每步離線 <code>save_last_frame</code> 抽幀逐幀比對（不計費）；③ 跑 sizecheck／lint／capacity selftest 確認零回歸；④ 把本輪決策寫進 <code>DESIGN.md</code>（依 CLAUDE.md：設計拍板進版控文檔）。Fraunces 若你要，再單獨議字體 vendoring。</p>
+  <p class="note" style="margin-top:30px"><b>下一步（採 Codex「一次只動一個變因」）：</b>① 先做 3 張 1080p 真 render A/B（<code>definition</code>、<code>procedure</code>＋worked、<code>graph</code>），不再用本 HTML 猜；② 第一輪只測 <b>flat navy ＋ 克制 spine</b>（新增 <code>DECOR_SPINE_X</code>、保持現行字體、無 footer、無 gradient，隔離變因）；③ footer（要動 capacity／data flow）與 Fraunces（要先定字體方向、改 <code>_compose</code> 才不分裂）各自<b>延後單測</b>；<code>HEADING_MATH_SCALE</code> 不照 CSS 改、要動就在 Manim 內實測校；④ 拍板後把決策寫進 <code>DESIGN.md</code>（CLAUDE.md：設計拍板進版控）。離線 <code>save_last_frame</code>／<code>critic.py --dry-run</code> 抽幀逐幀比對，不計費。</p>
 
 </div>
 
