@@ -165,27 +165,27 @@ def _escape_tex(text: str) -> str:
 
 def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
               max_width: float | None = None, align: str = "LEFT"):
-    """Body prose rendered via Pango Text (Times New Roman).
+    """Body prose rendered via LaTeX (Tex) in IBM Plex Sans (the \\sfdefault family).
 
-    (Was LaTeX \\text{}/newtx to match the old serif handout; Direction D sets prose
-    in Times serif, so prose goes through Pango Text again.) If *max_width* is
-    given, wraps at word boundaries (never mid-word) using the char-estimate width
-    -- no throwaway measurement SVGs, which intermittently came out empty under
-    disable_caching. Returns a single Text for one line, a VGroup of Text lines for
-    multi-line.
+    (Route A, 2026-06-24: was Pango Text -- manim Text does not kern, LaTeX does.)
+    Handles pure text only; the prose() router sends any inline-$math$ line through the
+    mixed path instead. If *max_width* is given, wraps at word boundaries (never
+    mid-word) using the char-estimate width -- no throwaway measurement SVGs, which
+    intermittently came out empty under disable_caching. Returns a single Tex for one
+    line, a VGroup of LEFT-arranged Tex lines for multi-line.
     """
     col = T.color(ground, role)
     fsz = T.fs(size)
 
-    def mk(s: str) -> Text:
-        return Text(_pango_dashes(s), font=T.FONT_BODY, font_size=fsz, color=col)
+    def mk(s: str) -> Tex:
+        return Tex(_tex_dashes(_escape_tex(s)), color=col, font_size=fsz)
 
     if max_width is None:
         return mk(text)
 
     words = text.split()
     if not words:
-        return mk("")
+        return VGroup()
 
     lines: list[str] = []
     cur: list[str] = []
