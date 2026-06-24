@@ -24,8 +24,8 @@ python tools\doctor.py
 |---|---|---|
 | **① Python 套件** | 共用 `.venv`（manim 0.20.1、PyYAML、ManimPango、Pillow、imageio-ffmpeg、fonttools、pymupdf…） | `setup.ps1` 從 [`requirements.lock`](requirements.lock) 精確重現 |
 | **② 系統 binary** | `ffmpeg`、`ffprobe` | 每台 `winget install --id Gyan.FFmpeg -e`（**含 ffprobe**） |
-| **③ LaTeX** | MiKTeX：`latex`、`dvisvgm` + `newtxtext`/`newtxmath`（video 數學 Times，2026-06-20 字型 revert 後；MiKTeX 首編自動補裝） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法） |
-| **①b 影片字型** | **Times New Roman**（標題/散文）+ **Courier New**（eyebrow/標籤）= Windows 系統字型；數學走 newtx（LaTeX，見 ③） | Windows 內建、無需安裝。（Direction D 的 vendored Inter Tight/JetBrains Mono 已於 2026-06-20 Times revert 隨 `assets/fonts/` 一併刪除——見下方 ①b 細節節） |
+| **③ LaTeX** | MiKTeX：`latex`、`dvisvgm` + `plex-sans`/`plex-mono`/`lmodern`/`microtype`（Route A：video 文字＋數學皆走 LaTeX；MiKTeX 首編自動補裝） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法） |
+| **①b 影片字型** | **全走 LaTeX**：文字 IBM Plex Sans/Mono、數學 Latin Modern（套件見 ③）。**不再用 Pango 系統字型**（Times/Courier 已棄） | 無需安裝系統字型；只要 ③ 的 MiKTeX 套件在即可（`doctor.py` 以 kpsewhich 驗）。video 不 vendored 任何字型 |
 | **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/_render/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **祕鑰** | `MIMO_API_KEY` / `GEMINI_API_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` | per-machine 設環境變數；**不進版控**（計費 API，依 [`CLAUDE.md`](CLAUDE.md) 徵同意） |
@@ -48,7 +48,8 @@ winget install OpenJS.NodeJS.LTS
 winget install Google.Chrome
 
 # LaTeX：裝 MiKTeX（https://miktex.org）。latex/dvisvgm 會進 PATH；
-# video 數學用 Computer Modern（LaTeX base 內建，無需額外套件）。
+# video 文字＋數學皆走 LaTeX，需 plex(plex-sans/plex-mono)/lmodern/microtype 套件
+# （MiKTeX 首次編譯自動補裝；只能 pdflatex）。
 ```
 
 裝完跑 `tools\setup.ps1` 補 Python 端，再 `python tools\doctor.py` 應全綠。
@@ -74,17 +75,21 @@ winget install Google.Chrome
 
 ### ③ LaTeX — MiKTeX，沒有 code 繞法
 - manim 的每個 `Tex`／`MathTex` 都要走真 TeX：`latex → .dvi → dvisvgm → svg`。
-- `pipeline/_bootstrap.py` 設的全域 TeX template 用 **`newtxtext` + `newtxmath`**（Times 風數學，2026-06-20 字型自
-  Direction D 的 CM revert 回 Times New Roman 後），外加 `\DeclareMathOperator` 三個反三角 operator。MiKTeX 首次編譯
-  會自動補裝 newtx；newtx 同時也是 `legacy/tex_handout/` 的需求。
+- `pipeline/_bootstrap.apply_tex_template()` 設的全域 TeX template 用 **`plex-sans` + `plex-mono`**（文字，`familydefault=\sfdefault`）
+  **+ `lmodern`**（數學）**+ `microtype`**（kerning），外加 `\DeclareMathOperator` 三個反三角 operator（Route A，2026-06-24：
+  所有螢幕文字＋數學都走 LaTeX 以拿到 kerning）。MiKTeX 首次編譯會自動補裝這些套件。**硬約束：只能 pdflatex**——
+  lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址，故排除需 fontspec 的 `newcomputermodern`。
+  （`newtx` 已不再是 video 需求，但仍是 `legacy/tex_handout/` 的需求。）
 - handout 的 HTML 講義**不需要** LaTeX（數學走 MathJax/KaTeX CDN）；只有 `video/` render 需要。
 
-### ①b 影片字型 — Times New Roman / Courier New（Windows 系統字型）
-- 影片目前用 **Times New Roman**（標題/散文）+ **Courier New**（eyebrow/標籤），皆 Windows 內建系統字型、**無需安裝**；
-  數學走 LaTeX newtx（見 ③）。`doctor.py` 驗 manimpango 看不看得到 `Times New Roman`／`Courier New`（Pango 找不到會靜默 fallback）。
-- **影片不再 vendored 任何字型。** Direction D 的 vendored 設計字型（Inter Tight／JetBrains Mono／Computer Modern `cmun*.otf`）
-  與 `_bootstrap.register_design_fonts()` 已於 2026-06-20 Times revert 的「舊設計清理」中**移除**（`video/pipeline/assets/fonts/` 已刪）。
-  `fonttools` 仍是依賴（logo 外框工具 `pipeline/assets/_outline_text.py` 用）。
+### ①b 影片字型 — 全走 LaTeX（Plex Sans/Mono 文字 + Latin Modern 數學）
+- Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**：文字 **IBM Plex Sans**（標題/內文）+ **IBM Plex Mono**
+  （eyebrow/標籤），數學 **Latin Modern**。字體在 ③ 的 preamble 設定，**不再經 Pango、不用任何系統字型**（舊的 Times New Roman／
+  Courier New 已棄）。根因：manim `Text`（Pango）不套 kerning，LaTeX 會。
+- `doctor.py` 的 `check_fonts` 改以 **kpsewhich 驗 `plex-sans.sty`／`plex-mono.sty`／`lmodern.sty`／`microtype.sty`** 存在（缺了含
+  文字／數學的場景會編譯失敗或 fallback）。
+- **影片不 vendored 任何字型。** Direction D 的 vendored 設計字型早於 2026-06-20 清理移除；`fonttools` 仍是依賴（logo 外框工具
+  `pipeline/assets/_outline_text.py` 用）。
 
 ### ④ Node + Chrome — 只給 handout 圖 render 用
 - [`handout/build.py`](handout/build.py) 組裝 HTML 是**純 Python stdlib**，任何 python 都能跑、無額外需求。

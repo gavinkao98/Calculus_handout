@@ -4,7 +4,21 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
-## 🎨 2026-06-24 模板重設計「The Lectern」：navy＋spine 已落地、字體定 Plex＋LaTeX（Route A 待實作）
+## ✅ 2026-06-25 Route A 落地：全螢幕文字改走 LaTeX（IBM Plex Sans/Mono ＋ Latin Modern 數學）
+
+照 [`PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md) 8 task 逐步執行完成（分支 `video/template-redesign-navy-spine` 續做；navy/spine 已是對題分支，未另開）。**所有螢幕文字現在都走 LaTeX/pdflatex** 以拿到 kerning——文字 IBM Plex Sans（內文/標題）＋ IBM Plex Mono（eyebrow），數學 Latin Modern。
+
+**做了什麼（逐 task commit）：** T1 preamble 換 `plex-sans`/`plex-mono`/`lmodern`/`microtype`、移除 NCM Pango 註冊（`_register_ncm_fonts`／`_NCM_STYLES`／`import subprocess` 一併刪）；T2 型階校準；T3 `body_text`→Tex；T4 `prose`/`heading_rich` 純 LaTeX、**移除 `_compose`/`_prose_mixed`/`_DESC_CHARS`/`prose_tex`**（LaTeX 原生排文字＋內聯數學同行）；T5 `heading`=Plex Bold、`eyebrow`=Plex Mono（**不用 `\textls`**，會觸發 Plex Mono 的 makemf 缺字錯）；T5b 6 處 template Pango Text（derivation 理由／outro Next+title／recap+procedure 序號／callout glyph）＋ ghost_numeral 一併改走 LaTeX；T6 `theme.py` 移除 `FONT_*`/`FONTS`、`DESIGN.md` 改寫；T8 `doctor.py` `check_fonts` 改 kpsewhich 驗 `.sty`、`ENVIRONMENT.md` 更新。
+
+**兩個過程中發現並修掉的坑（durable）：**
+1. **`tempconfig` 每景丟失 `config.tex_template`（production bug，非 QA-only）。** manim 的 `tempconfig` 退出時把 `config.tex_template` 重設回預設（serif CM、缺 `\sfdefault` 與 `\arccsc` 等）。`make.py`／`scratch_frames` 都是每景 `with tempconfig(cfg): LessonScene().render()`，所以**只有 batch 第一景拿到 Plex，第 2 景起全 serif**。Route A 前 latent（文字走 Pango 不受影響、CM≈lmodern 看不出）。修法：`_set_tex_template`→`apply_tex_template`（去掉 run-once guard），`LessonScene.construct()` build 前每景重套。
+2. **PX_TO_FS 同時縮放文字與數學 → 為 Plex 文字校準把數學放大 31%。** Plex caps 比 lmodern 短 ~24%/fs，校到 0.9145 讓 `invert_a_rational` 數學鏈溢出被裁。修法（使用者裁決「解耦」）：`PX_TO_FS=0.698` 當**數學錨點**（維持既定尺寸），文字另乘 `theme.TEXT_SCALE=1.3102`（brand 文字函式用 `_text_fs(size)=fs(size)*TEXT_SCALE`；math_line/glyph 不乘）。文字視覺尺寸不變、數學縮回原尺寸。`TEX_TEXT_SCALE` 更名 `TEXT_SCALE`（sizecheck `_norm_size` 跟著改）。
+
+**回歸（全 21 景，`output/_qa/REVIEW-routeA-applied.html`）：** lint 0 error/0 warn；sizecheck **0 error**/2 within-frame advisory warn（`invertible_iff_one_to_one` qed 近底邊、`recap` point.3 近底邊＝NCM baseline 既有）。`python tools/doctor.py` fonts 段全綠（kpsewhich 驗 plex/lmodern/microtype）。**未動：** navy 底、克制 spine、四色語意、容量契約、math 唸法。
+
+**未決：** footer（暫緩，同舊節）；§1.2 以後章節尚未跑 Route A 回歸（同管線、`make.py` render 時會自動套，但未逐景目視）。
+
+## 🎨 2026-06-24 模板重設計「The Lectern」：navy＋spine 已落地、字體定 Plex＋LaTeX（Route A 待實作 → ✅ 已於 2026-06-25 落地，見上方節）
 
 使用者 /goal：研究現有模板、設計得更好。起於兩份 standalone HTML 提案稿＋Codex review；經多輪 render 驗證與決策後收斂如下。**所有程式改動目前皆未 commit**（待開對題分支）。原逐步待辦 `TODO-template-redesign.md` 內容已全數搬進本節，該檔已退場。
 

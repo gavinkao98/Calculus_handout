@@ -138,9 +138,9 @@ def check_latex() -> None:
         else:
             record(WARN, "LaTeX", f"{name} 不在 PATH（選用）", remedy)
 
-    # video 數學用 newtxtext/newtxmath（Times；2026-06-20 字型自 Direction D 的 CM revert 回 Times
-    # New Roman 後）；_bootstrap.py 全域 TeX template \usepackage 它們。MiKTeX 首次編譯會自動補裝
-    # newtx，故此處不單獨硬檢查（latex/dvisvgm 在即可）；newtx 同時也是 legacy/tex_handout 的需求。
+    # Route A：video 文字＋數學皆走 LaTeX——_bootstrap.apply_tex_template 的 preamble \usepackage
+    # plex-sans／plex-mono／lmodern／microtype。這些套件的存在由 check_fonts 以 kpsewhich 驗
+    # （latex/dvisvgm 在 PATH 是先決條件）。newtx 已不再是 video 需求，但仍是 legacy/tex_handout 的需求。
 
 
 # ── ④ handout HTML 圖 render：Node ≥21 + Chrome（shot.mjs）──────────────
@@ -207,10 +207,9 @@ def check_codex() -> None:
 
 def check_assets() -> None:
     # The render-critical vendored asset is the outlined NTU lockup SVG -- brand
-    # .logo_lockup_outlined() loads it for every intro/outro. (The Direction-D design fonts
-    # that used to live under assets/fonts/ were intentionally removed with the 2026-06-20
-    # Times revert; video now uses Windows system Times/Courier -- see check_fonts -- so
-    # they are no longer vendored or expected here.)
+    # .logo_lockup_outlined() loads it for every intro/outro. (No design fonts are vendored:
+    # Route A renders all text + math through LaTeX packages -- see check_fonts -- so there
+    # is nothing under assets/fonts/ to expect.)
     lockup = REPO / "video" / "pipeline" / "assets" / "lockup-color-outlined.svg"
     if lockup.exists():
         record(PASS, "assets", "logo lockup SVG", str(lockup))
@@ -219,38 +218,31 @@ def check_assets() -> None:
                f"預期在 {lockup}（intro/outro render 要它；應隨 git 而來，git status 檢查是否誤刪）")
 
 
-# ── ⑥b 影片字型可見性（manimpango 是否認得，否則 render 靜默 fallback）──
+# ── ⑥b 影片字型：LaTeX 套件（Route A 後文字＋數學皆走 LaTeX，不再用 Pango 系統字型）──
 
 def check_fonts() -> None:
-    """影片用 Times New Roman（標題/散文）+ Courier New（eyebrow/標籤），均為 Windows 系統字型
-    （2026-06-20 字型 revert，自 Direction D 的 Inter Tight/JetBrains Mono 改回）。Pango 找不到
-    字型會「靜默」換預設字體（render 不報錯、但畫面字體錯），故這裡主動驗 manimpango 看不看得到。
-    （Direction D 的 vendored 設計字型已於同日 Times revert 一併移除——影片不再 vendored 任何字型。）"""
-    if not VENV_PY.exists():
-        return  # check_python_and_venv 已報 .venv 缺
-    probe = (
-        "import manimpango, json\n"
-        "fs={f.lower() for f in manimpango.list_fonts()}\n"
-        "print(json.dumps({f: (f.lower() in fs) for f in ['Times New Roman','Courier New']}))\n"
-    )
-    rc, out = _run([str(VENV_PY), "-c", probe])
-    seen: dict[str, bool] = {}
-    if rc == 0 and out:
-        try:
-            seen = json.loads(out.splitlines()[-1])
-        except Exception:
-            pass
-    if not seen:
-        record(WARN, "fonts", "無法探測影片字型可見性",
-               "manimpango 探測失敗；確認 .venv 有 ManimPango")
+    """Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**——文字 IBM Plex
+    Sans／Mono、數學 Latin Modern，字體在 _bootstrap.apply_tex_template 的 preamble 設定，不再經
+    Pango（舊的 Times New Roman／Courier New 系統字型已棄）。所以這裡驗的是這些 MiKTeX 套件存在
+    （kpsewhich），缺了含文字／數學的場景會編譯失敗或 fallback。"""
+    if not shutil.which("kpsewhich"):
+        record(WARN, "fonts", "kpsewhich 不在 PATH，略過 LaTeX 字型套件檢查",
+               "裝 MiKTeX 後 kpsewhich 會進 PATH（見 LaTeX 區）")
         return
-    for fam in ("Times New Roman", "Courier New"):
-        if seen.get(fam):
-            record(PASS, "fonts", f"{fam} 可見", "manimpango 認得（render 不會 fallback）")
+    styles = (
+        ("plex-sans.sty", FAIL, "影片文字（IBM Plex Sans，內文/標題）"),
+        ("plex-mono.sty", FAIL, "eyebrow/label（IBM Plex Mono）"),
+        ("lmodern.sty", FAIL, "影片數學（Latin Modern）"),
+        ("microtype.sty", WARN, "kerning/protrusion（preamble 也載它）"),
+    )
+    for sty, sev, why in styles:
+        rc, out = _run(["kpsewhich", sty])
+        if rc == 0 and out.strip():
+            record(PASS, "fonts", f"{sty} 可見", f"{why}")
         else:
-            record(FAIL, "fonts", f"{fam} 不可見",
-                   "影片 render 會靜默換預設字體。Times New Roman／Courier New 是 Windows 系統字型，"
-                   "正常 Windows 應內建；非 Windows 機需另行系統安裝該字型")
+            record(sev, "fonts", f"{sty} 找不到",
+                   f"{why}。MiKTeX 首次編譯通常自動補裝；或手動 `mpm --install` 對應 bundle"
+                   "（plex / lm / microtype）")
 
 
 # ── ⑦ API 金鑰（per-machine 祕鑰；未設不算錯，只是提示）────────────────
@@ -310,7 +302,8 @@ def print_report(as_json: bool) -> int:
     video_ok = not any(_missing("Python", x) for x in ("PyYAML", "manim", "ManimPango", "pillow")) \
         and not _missing("LaTeX", "latex") and not _missing("LaTeX", "dvisvgm") \
         and not _missing("ffmpeg", "ffmpeg") and not _missing("ffmpeg", "ffprobe") \
-        and not _missing("fonts", "Times New Roman") and not _missing("fonts", "Courier New")
+        and not _missing("fonts", "plex-sans.sty") and not _missing("fonts", "plex-mono.sty") \
+        and not _missing("fonts", "lmodern.sty")
     handout_fig_ok = not _missing("handout", "node") and not _missing("handout", "< 21") \
         and not _missing("handout", "Chrome")
     print("\n能力摘要\n" + "─" * 64)
