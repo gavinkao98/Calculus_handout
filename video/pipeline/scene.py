@@ -15,6 +15,7 @@ from typing import Any
 
 from manim import DOWN, UP, FadeIn, FadeOut, Rectangle, Scene
 
+from . import _bootstrap
 from .blocks import play_block
 from .narration import estimate_seconds, parse_say
 from .templates import build_blocks
@@ -33,6 +34,12 @@ class LessonScene(Scene):
     def construct(self) -> None:
         if self.spec is None:
             raise RuntimeError("LessonScene was not configured (spec missing).")
+
+        # Re-apply the Plex/lmodern TeX template every scene: manim's tempconfig (this
+        # scene runs inside `with tempconfig(cfg):`) drops config.tex_template back to
+        # the default on each block's exit, so without this only the batch's first scene
+        # would build its Tex in Plex (see _bootstrap.apply_tex_template).
+        _bootstrap.apply_tex_template()
 
         kind = self.spec.get("kind", "content")
         ground = "light" if kind in LIGHT_KINDS else "dark"

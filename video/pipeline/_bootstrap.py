@@ -27,7 +27,7 @@ def bootstrap() -> None:
         dep = REPO_ROOT / name
         if dep.exists() and str(dep) not in sys.path:
             sys.path.insert(0, str(dep))
-    _set_tex_template()
+    apply_tex_template()
 
 
 def section_output_dir(meta: dict) -> Path:
@@ -42,11 +42,8 @@ def section_output_dir(meta: dict) -> Path:
     )
 
 
-_TEX_TEMPLATE_SET = False
-
-
-def _set_tex_template() -> None:
-    """Set the global manim TeX template — Plex Sans/Mono text + Latin Modern math.
+def apply_tex_template() -> None:
+    """(Re)assign the global manim TeX template — Plex Sans/Mono text + Latin Modern math.
 
     Route A (2026-06-24): on-screen TEXT moves off Pango onto LaTeX so it gets real
     kerning (manim Text/Pango does not kern -- "AVAVAV" rendered as the sum of the
@@ -56,10 +53,18 @@ def _set_tex_template() -> None:
     lualatex/xelatex, which breaks manim's `\\special{dvisvgm:raw}` math sub-part
     addressing). microtype adds kerning/protrusion. The three inverse-trig operators
     the book preamble defines but manim's default template lacks are also declared.
+
+    Must be (re)applied PER SCENE, not once: manim's ``tempconfig`` (make.py and
+    scratch_frames both render as ``with tempconfig(cfg): LessonScene().render()`` in a
+    per-scene loop) does NOT preserve ``config.tex_template`` across its save/restore --
+    exiting ANY tempconfig block drops it back to manim's default (serif Computer Modern,
+    no \\sfdefault, missing \\arccsc/\\arcsec/\\arccot). So without re-applying, only the
+    FIRST scene of a batch would get this template and every later scene would build its
+    Tex in the default serif. LessonScene.construct() calls this before building blocks,
+    so each scene re-applies it. (Latent pre-Route-A: text was Pango and CM ~ Latin Modern,
+    so the drop was invisible for text and harmless for §1.1 math; Route A made on-screen
+    text depend on this template and exposed it.)
     """
-    global _TEX_TEMPLATE_SET
-    if _TEX_TEMPLATE_SET:
-        return
     try:
         from manim import config, TexTemplate
     except Exception:
@@ -79,4 +84,3 @@ def _set_tex_template() -> None:
         r"\DeclareMathOperator{\arccot}{arccot}"
     )
     config.tex_template = tpl
-    _TEX_TEMPLATE_SET = True
