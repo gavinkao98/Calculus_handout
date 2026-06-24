@@ -1,14 +1,14 @@
-"""Brand visual primitives (Times serif UI + newtx math).
+"""Brand visual primitives (all-LaTeX type: Plex Sans/Mono text + Latin Modern math).
 
 Builds the recurring design elements templates compose. Colours come from the
 active ground's palette (dark/paper) via theme.py -- no hex literals here.
 
-Fonts (2026-06-20 revert to Times New Roman; was Direction D's Inter Tight + CM):
-headings + prose render in Times New Roman (Pango Text); labels/eyebrows in Courier
-New; math in newtxtext/newtxmath (MathTex/Tex). body_text() renders prose via Pango
-Text (Times); prose_tex()/heading_rich() handle the inline-$math$ path via Tex
-(newtx), size-matched to the Pango prose by TEX_TEXT_SCALE. The font family always
-flows through theme.FONT_* -- this module hardcodes no font name.
+Fonts (Route A, 2026-06-24): ALL on-screen text renders through LaTeX (Tex) so it is
+kerned -- manim Text (Pango) does not kern. heading()/heading_rich() set IBM Plex Sans
+Bold, body_text()/prose() set IBM Plex Sans, eyebrow() sets IBM Plex Mono; math
+(MathTex/Tex) is Latin Modern. The fonts live in the TeX preamble
+(_bootstrap._set_tex_template), so this module hardcodes no font name and no longer
+touches Pango for text. ghost_numeral() is the one remaining decorative Pango Text.
 
 Glow recipe ("alive on dark"): glow_curve() = a wide low-alpha halo under a crisp
 stroke (manim has no blur); text_glow() = a static halo behind emphasised glyphs.
@@ -123,29 +123,26 @@ def coordinate_grid(ground: str, *, opacity: float = 1.0) -> VGroup:
 
 # -- text primitives ------------------------------------------------------
 
-def eyebrow(label: str, ground: str, *, role: str = "secondary") -> Text:
-    """Mono uppercase wide-tracked tag, e.g. '[ DEFINITION ]' (Courier New)."""
-    return Text(label.upper(), font=T.FONT_MONO, font_size=T.fs("eyebrow"),
-                color=T.color(ground, role), weight="MEDIUM")
+def eyebrow(label: str, ground: str, *, role: str = "secondary") -> Tex:
+    """Mono uppercase tag, e.g. '[ DEFINITION ]' -- IBM Plex Mono via Tex ``\\texttt{}``.
+    (Route A: was Pango Courier New.) No microtype ``\\textls`` tracking: it triggers a
+    missing-Metafont makemf error on Plex Mono, and the mono advance already reads as a
+    tracked tag."""
+    return Tex(r"\texttt{" + _tex_text(label.upper()) + "}",
+               font_size=T.fs("eyebrow"), color=T.color(ground, role))
 
 
 def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",
-            weight: str = "BOLD", max_width: float | None = None) -> Text:
-    """Display heading -- Times New Roman BOLD. If *max_width* is
-    given and the rendered line is wider, scale it down to fit -- the standalone-
-    display-line exception to "wrap, don't shrink" (a hero title has no siblings to
-    size-match, and manim Text does not centre multi-line cleanly, so clamp beats wrap)."""
-    mob = Text(_pango_dashes(text), font=T.FONT_DISPLAY, font_size=T.fs(size),
-               color=T.color(ground, role), weight=weight)
+            max_width: float | None = None) -> Tex:
+    """Display heading -- IBM Plex Sans Bold (Tex ``\\textbf{}``). (Route A: was Pango
+    Times/NCM bold.) If *max_width* is given and the rendered line is wider, scale it
+    down to fit -- the standalone-display-line exception to "wrap, don't shrink" (a hero
+    title has no siblings to size-match)."""
+    mob = Tex(r"\textbf{" + _tex_text(text) + "}", font_size=T.fs(size),
+              color=T.color(ground, role))
     if max_width is not None and mob.width > max_width:
         mob.scale_to_fit_width(max_width)
     return mob
-
-
-def _pango_dashes(s: str) -> str:
-    """LaTeX dash ligatures don't exist in Pango Text, so render the glyphs:
-    ``---`` -> em dash, ``--`` -> en dash. (The Tex paths take the reverse.)"""
-    return s.replace("---", "—").replace("--", "–")
 
 
 def _tex_dashes(s: str) -> str:
