@@ -56,11 +56,13 @@ FRAME_H = T.FRAME_H
 #
 # Calibration (manim units per char*font_size). CJK glyphs are full-width, so they count
 # as ~2x a latin advance. One global knob -- retune if fonts change (Times advance ~0.0060,
-# used 0.0058; Inter Tight needed 0.0068). NCM is ~11% wider than Times: measured ~0.00643
-# per char*fs (2026-06-24), so 0.0065 estimates just above the real advance (overflow is
-# worse than a slightly short line).
+# used 0.0058; Inter Tight 0.0068; NCM-Pango 0.0065). Plex Sans via LaTeX measures
+# ~0.004973 per char*fs (Route A, 2026-06-24); 0.00507 = that + 2% so the estimate sits
+# just above the real advance (overflow is worse than a slightly short line). Note the
+# per-fs advance dropped vs NCM because PX_TO_FS rose to 0.9145, so net width per *px*
+# (PX_TO_FS * _WIDTH_K) is ~unchanged.
 
-_WIDTH_K = 0.0065
+_WIDTH_K = 0.00507
 
 
 def _char_weight(ch: str) -> float:

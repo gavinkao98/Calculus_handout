@@ -42,27 +42,27 @@ FONT_MONO = "Courier New"
 
 # -- type scale -----------------------------------------------------------
 # tokens give px @ 1920x1080. manim font_size is its own unit; PX_TO_FS converts.
-# One global knob — retune if fonts change (Inter Tight needed 0.655; Times used 0.72,
-# H ~0.00920 u/fs). NCM "H" measures ~0.00949 u/fs (~3% taller), so 0.698 = 0.72 *
-# 0.00920/0.00949 keeps cap heights identical to the Times calibration (layout unchanged).
-PX_TO_FS = 0.698
+# One global knob — retune if fonts change. Calibrated to keep cap heights CONSTANT
+# across font swaps: cap_height(px) = px * PX_TO_FS * (H/fs). The Times anchor was
+# PX_TO_FS 0.72 at H/fs 0.00920 (= 0.006624 u/px). Plex Sans via LaTeX measures
+# H/fs 0.007244 (shorter caps per fs), so 0.9145 = 0.72*0.00920/0.007244 preserves that
+# cap height, layout unchanged (Route A, 2026-06-24; was 0.698 NCM-Pango, 0.72 Times,
+# 0.655 Inter Tight).
+PX_TO_FS = 0.9145
 
-# manim renders Text (Pango) and Tex/MathTex (LaTeX) at *different* visual sizes for
-# the same font_size. For Times New Roman (Pango) vs newtxtext (LaTeX text-mode), a
-# Times "Rg" is 1.36x a newtx \text{Rg} at equal font_size. So prose rendered via Tex
-# (the inline-$math$ path) must be scaled up by this to size-match the plain Times
-# prose beside it. Pure math (math_line/MathTex) is its own size role, left unscaled.
-# One global knob — retune if fonts change (Inter Tight needed 1.42; Times/newtx 1.36;
-# NCM-Pango / lmodern-Tex measured 1.34, 2026-06-24).
-TEX_TEXT_SCALE = 1.34
+# Route A: ALL text now renders via LaTeX (Tex), so there is no Pango↔Tex size gap to
+# correct — prose and inline-$math$ Tex share one code path at one font_size. Held at
+# 1.0 (no-op multiplier) so prose_tex and any other call site that still reads it stays
+# correct. (Historical: Pango-Text-vs-Tex needed 1.36 for Times/newtx, 1.34 for
+# NCM-Pango/lmodern, 1.42 for Inter Tight — all obsolete now that no text is Pango.)
+TEX_TEXT_SCALE = 1.0
 
-# Inline math inside a DISPLAY HEADING (heading_rich). x-height-matched math (the body
-# default) sits at ~1.4-1.7x the bold text's cap height for simple f(x)=x^n, because
-# italic math (f, parens, descenders, superscripts) extends well past the x-height — so
-# a mixed title reads as "tiny words + huge formula". In a heading the visual reference
-# is the CAP height of the bold text, so we rein the math in by this factor (headings
-# only; body prose keeps full x-height match). Tunable; 1.0 = no reduction.
-HEADING_MATH_SCALE = 0.78
+# Inline math inside a DISPLAY HEADING (heading_rich). Provisional 1.0 for Route A:
+# LaTeX sets text + inline math on one line with native baseline/sizing, so a heading's
+# $f(x)=x^n$ no longer towers over the bold words the way the old composited
+# (x-height-matched MathTex) path did — which needed 0.78 to rein it in. Finalised in
+# Task 5 after rendering headings that carry math; 1.0 = no reduction.
+HEADING_MATH_SCALE = 1.0
 
 # Density B px @ 1920x1080. New Direction-D names + back-compat aliases (old callers
 # pass these; most per-frame sizes are raw px overrides via fs(<number>)).
