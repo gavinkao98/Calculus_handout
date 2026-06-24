@@ -47,15 +47,16 @@ def _prose_nodes(mob) -> list:
     return out
 
 
-def _norm_size(node, tex_text_scale: float) -> float:
-    """font_size normalised so Text and prose Tex are comparable (Tex renders
-    smaller per font_size, so prose_tex multiplies by TEX_TEXT_SCALE; undo it)."""
+def _norm_size(node, text_scale: float) -> float:
+    """font_size normalised to the canonical (math-anchored) scale so prose lines are
+    comparable. brand renders text at fs(size) * theme.TEXT_SCALE, so divide a prose Tex's
+    font_size back out by TEXT_SCALE to recover the canonical size before comparing."""
     from manim import MathTex, Tex
     fs = float(node.font_size)
-    return fs / tex_text_scale if isinstance(node, (Tex, MathTex)) else fs
+    return fs / text_scale if isinstance(node, (Tex, MathTex)) else fs
 
 
-def _block_prose_size(block_mob, tex_text_scale: float):
+def _block_prose_size(block_mob, text_scale: float):
     from manim import MathTex, Tex, Text
 
     nodes = _prose_nodes(block_mob)
@@ -75,7 +76,7 @@ def _block_prose_size(block_mob, tex_text_scale: float):
     if not carriers:
         return None
     # all prose lines in a block share a size; max is robust to a stray tag
-    return max(_norm_size(n, tex_text_scale) for n in carriers)
+    return max(_norm_size(n, text_scale) for n in carriers)
 
 
 def _overflow_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
@@ -484,7 +485,7 @@ def check_scenes(meta: dict, scenes: list[dict]) -> list[str]:
             prefix = str(b.id).split(".")[0]
             if prefix not in SIBLING_PREFIXES:
                 continue
-            size = _block_prose_size(b.mobject, T.TEX_TEXT_SCALE)
+            size = _block_prose_size(b.mobject, T.TEXT_SCALE)
             if size is not None:
                 groups.setdefault(prefix, []).append((b.id, size))
         for prefix, members in groups.items():

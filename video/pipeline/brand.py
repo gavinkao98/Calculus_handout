@@ -58,9 +58,9 @@ FRAME_H = T.FRAME_H
 # as ~2x a latin advance. One global knob -- retune if fonts change (Times advance ~0.0060,
 # used 0.0058; Inter Tight 0.0068; NCM-Pango 0.0065). Plex Sans via LaTeX measures
 # ~0.004973 per char*fs (Route A, 2026-06-24); 0.00507 = that + 2% so the estimate sits
-# just above the real advance (overflow is worse than a slightly short line). Note the
-# per-fs advance dropped vs NCM because PX_TO_FS rose to 0.9145, so net width per *px*
-# (PX_TO_FS * _WIDTH_K) is ~unchanged.
+# just above the real advance (overflow is worse than a slightly short line). The font_size
+# fed to estimate_text_width is the TEXT size (_text_fs = fs(size)*TEXT_SCALE), so this is
+# keyed to the rendered Plex text size and is unaffected by the math-anchored PX_TO_FS.
 
 _WIDTH_K = 0.00507
 
@@ -129,7 +129,7 @@ def eyebrow(label: str, ground: str, *, role: str = "secondary") -> Tex:
     missing-Metafont makemf error on Plex Mono, and the mono advance already reads as a
     tracked tag."""
     return Tex(r"\texttt{" + _tex_text(label.upper()) + "}",
-               font_size=T.fs("eyebrow"), color=T.color(ground, role))
+               font_size=_text_fs("eyebrow"), color=T.color(ground, role))
 
 
 def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",
@@ -138,7 +138,7 @@ def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",
     Times/NCM bold.) If *max_width* is given and the rendered line is wider, scale it
     down to fit -- the standalone-display-line exception to "wrap, don't shrink" (a hero
     title has no siblings to size-match)."""
-    mob = Tex(r"\textbf{" + _tex_text(text) + "}", font_size=T.fs(size),
+    mob = Tex(r"\textbf{" + _tex_text(text) + "}", font_size=_text_fs(size),
               color=T.color(ground, role))
     if max_width is not None and mob.width > max_width:
         mob.scale_to_fit_width(max_width)
@@ -165,6 +165,14 @@ def _tex_text(s: str) -> str:
     return _tex_dashes(_escape_tex(s))
 
 
+def _text_fs(size) -> float:
+    """Font size for TEXT (Plex Sans/Mono), in manim units. theme.PX_TO_FS is the MATH
+    (Latin Modern) anchor, so TEXT is scaled up by theme.TEXT_SCALE to its calibrated cap
+    height -- this keeps math at its established size while text matches the prior visual
+    size (Plex caps are smaller per font_size, so the single PX_TO_FS knob can't size both)."""
+    return T.fs(size) * T.TEXT_SCALE
+
+
 def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
               max_width: float | None = None, align: str = "LEFT"):
     """Body prose rendered via LaTeX (Tex) in IBM Plex Sans (the \\sfdefault family).
@@ -177,7 +185,7 @@ def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
     line, a VGroup of LEFT-arranged Tex lines for multi-line.
     """
     col = T.color(ground, role)
-    fsz = T.fs(size)
+    fsz = _text_fs(size)
 
     def mk(s: str) -> Tex:
         return Tex(_tex_text(s), color=col, font_size=fsz)
@@ -317,7 +325,7 @@ def _prose_lines(text: str, ground: str, role: str, size: str,
     split first, then each segment word-wraps to *max_width*; lines are LEFT-stacked.
     """
     col = T.color(ground, role)
-    fsz = T.fs(size)
+    fsz = _text_fs(size)
     line_strs: list[str] = []
     for seg in re.split(r"\\\\", text):
         seg = seg.strip()
@@ -384,7 +392,7 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
             pieces.append(p)
         else:
             pieces.append(r"\textbf{" + _tex_text(p) + "}")
-    mob = Tex("".join(pieces), color=T.color(ground, role), font_size=T.fs(size))
+    mob = Tex("".join(pieces), color=T.color(ground, role), font_size=_text_fs(size))
     if max_width is not None and mob.width > max_width:
         mob.scale_to_fit_width(max_width)
     return mob
@@ -531,7 +539,7 @@ def hero_curve(ground: str, *, role: str = "secondary", width: float = 6.0) -> V
 
 def ghost_numeral(text: str, ground: str, *, opacity: float = 0.05) -> Tex:
     """A huge faint numeral behind divider content (5% opacity ink-1), Plex Bold via Tex."""
-    mob = Tex(r"\textbf{" + _tex_text(str(text)) + "}", font_size=T.fs("ghost_numeral"),
+    mob = Tex(r"\textbf{" + _tex_text(str(text)) + "}", font_size=_text_fs("ghost_numeral"),
               color=T.color(ground, "ink_1"))
     mob.set_opacity(opacity)
     return mob

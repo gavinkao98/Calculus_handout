@@ -37,20 +37,21 @@ from __future__ import annotations
 
 # -- type scale -----------------------------------------------------------
 # tokens give px @ 1920x1080. manim font_size is its own unit; PX_TO_FS converts.
-# One global knob — retune if fonts change. Calibrated to keep cap heights CONSTANT
-# across font swaps: cap_height(px) = px * PX_TO_FS * (H/fs). The Times anchor was
-# PX_TO_FS 0.72 at H/fs 0.00920 (= 0.006624 u/px). Plex Sans via LaTeX measures
-# H/fs 0.007244 (shorter caps per fs), so 0.9145 = 0.72*0.00920/0.007244 preserves that
-# cap height, layout unchanged (Route A, 2026-06-24; was 0.698 NCM-Pango, 0.72 Times,
-# 0.655 Inter Tight).
-PX_TO_FS = 0.9145
+# PX_TO_FS is the MATH (Latin Modern) anchor: math is unchanged across the Route A font
+# swap, so this stays at the established 0.698 (the NCM-era value the layout/zones were
+# tuned for) and on-screen math keeps its size. TEXT (Plex) is then scaled up by
+# TEXT_SCALE to reach its calibrated cap height -- one knob cannot size both, because
+# Plex caps are ~24% shorter per font_size than the math font, so calibrating PX_TO_FS to
+# Plex's caps (0.9145) would have inflated all math ~31% and overflowed dense scenes
+# (Route A decouple, 2026-06-24; was 0.72 Times, 0.655 Inter Tight).
+PX_TO_FS = 0.698
 
-# Route A: ALL text now renders via LaTeX (Tex), so there is no Pango↔Tex size gap to
-# correct — prose and inline-$math$ Tex share one code path at one font_size. Held at
-# 1.0 (no-op multiplier) so prose_tex and any other call site that still reads it stays
-# correct. (Historical: Pango-Text-vs-Tex needed 1.36 for Times/newtx, 1.34 for
-# NCM-Pango/lmodern, 1.42 for Inter Tight — all obsolete now that no text is Pango.)
-TEX_TEXT_SCALE = 1.0
+# TEXT-only scale on top of the MATH-anchored PX_TO_FS. brand's text builders use
+# _text_fs(size) = fs(size) * TEXT_SCALE; math (math_line/glyph/MathTex) uses fs(size)
+# directly. 1.3102 = 0.9145/0.698 keeps Plex text at the cap height the Times anchor
+# defined (0.006624 u/px) while leaving math at its established size. (Was TEX_TEXT_SCALE,
+# the obsolete Pango↔Tex size-match factor, before the all-LaTeX Route A.)
+TEXT_SCALE = 1.3102
 
 # Inline math inside a DISPLAY HEADING (heading_rich). Provisional 1.0 for Route A:
 # LaTeX sets text + inline math on one line with native baseline/sizing, so a heading's
