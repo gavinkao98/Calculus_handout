@@ -4,6 +4,14 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## 🎨 2026-06-24 模板重設計提案「The Lectern」→ Codex review → 待辦彙總（進行中、未動程式碼）
+
+使用者 /goal：研究現有模板、把它們設計得更好。已產兩份 standalone HTML 提案稿並送 Codex（`codex exec -s read-only`）做 review，**尚未動任何 Manim 程式碼、尚未 commit 視覺改動**。完整待辦與裁決在 **[`content_scripts/_audit/TODO-template-redesign.md`](content_scripts/_audit/TODO-template-redesign.md)**（換機接續看這份）。
+
+- **提案：** [`REVIEW-template-redesign-v1.html`](content_scripts/_audit/REVIEW-template-redesign-v1.html)（The Lectern：左 spine＋底部 footer＋深藍墨 navy＋Fraunces＋左 flush＋rail aside＋標題數學修正）；[`REVIEW-prose-math-layout.html`](content_scripts/_audit/REVIEW-prose-math-layout.html)（左右 vs 上下規則＋A/B＋逐模板裁決）。
+- **Codex 總評（原稿 [`CODEX-review-redesign-v1.md`](content_scripts/_audit/CODEX-review-redesign-v1.md)）：** 不建議整包核准；navy/spine/footer/Fraunces 拆獨立決策逐一驗證。已核實 4 個真衝突：① gradient 違反 flat house style（`VISUAL-FRAME-RUBRIC.md:45`）② 字體論證過期（handout 已 NCM、Fraunces 會分裂 heading 數學）③ spine/footer 非單純共用件（`SPINE_X` 即內容左緣、footer 動 capacity/data flow）④ BEFORE 非 current tree。另挖出 `DESIGN.md` 兩個 doc bug（definition 兩欄/已退兩欄自相矛盾、body_text Tex/Pango 敘述錯）。
+- **下一步（回來時）：** Step 0 修兩份 html＋`DESIGN.md` stale 敘述 → 使用者先拍板字體（NCM／Times／Fraunces）→ Step 1–2 做 flat-navy＋克制 spine 的 3 張 1080p Manim A/B（definition／procedure＋worked／graph，離線抽幀、零計費）。footer／Fraunces 延後單測。
+
 ## 🛰️ 2026-06-21（續）§1.1 Codex 逐場景審核 → 套用 → 回歸（使用者 /goal：每場圖傳 codex 審美學/排版、調到他建議的樣子、再回饋模板）
 
 承同日內部 agent 微調，使用者要求改由**外部 Codex（gpt-5.5, xhigh）就美學/排版逐場審核**、據其建議調整、再把反覆出現的問題回饋進模板。**全程 mock／離線 render；唯一計費＝Codex 審核（使用者明確指定「傳給 codex」即同意）。** 流程：抽全 19 場最滿幀 → `codex exec -i <frame.png> -s read-only`（每場一呼、結構化美學 prompt）→ 套用修正 → 重渲重抽 → **同 prompt 對 14 改動場景跑 Codex 回歸**（分數可比）→ 另跑**獨立 gate-1 `visual-frame-audit` workflow**（17 場、refute-by-default）做雙閘交叉驗證。
