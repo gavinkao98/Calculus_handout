@@ -6,7 +6,7 @@ manim/yaml are not in .venv; they live under .deps_voiceover (manim 0.20.1) and
 Type (Route A, 2026-06-24): all on-screen text AND math render through LaTeX
 (pdflatex). Text = IBM Plex Sans (body/headings) + IBM Plex Mono (eyebrows/labels);
 math = Latin Modern (`lmodern`). The fonts are set in the TeX preamble
-(_set_tex_template); nothing is registered with Pango, because manim Text (Pango)
+(apply_tex_template); nothing is registered with Pango, because manim Text (Pango)
 no longer carries the type -- Pango does not apply kerning ("AVAVAV" came out as the
 sum of the glyph advances), LaTeX does. Exact `newcomputermodern` needs lualatex/
 xelatex (fontspec), which breaks manim's `\\special{dvisvgm:raw}` math sub-part

@@ -7,8 +7,9 @@ Fonts (Route A, 2026-06-24): ALL on-screen text renders through LaTeX (Tex) so i
 kerned -- manim Text (Pango) does not kern. heading()/heading_rich() set IBM Plex Sans
 Bold, body_text()/prose() set IBM Plex Sans, eyebrow() sets IBM Plex Mono; math
 (MathTex/Tex) is Latin Modern. The fonts live in the TeX preamble
-(_bootstrap._set_tex_template), so this module hardcodes no font name and no longer
-touches Pango for text. ghost_numeral() is the one remaining decorative Pango Text.
+(_bootstrap.apply_tex_template), so this module hardcodes no font name and no longer
+touches Pango at all -- every text mobject it builds (heading, body, eyebrow, glyph,
+ghost_numeral) is a Tex/MathTex.
 
 Glow recipe ("alive on dark"): glow_curve() = a wide low-alpha halo under a crisp
 stroke (manim has no blur); text_glow() = a static halo behind emphasised glyphs.
@@ -36,7 +37,6 @@ from manim import (
     RoundedRectangle,
     SVGMobject,
     Tex,
-    Text,
     VGroup,
 )
 
@@ -356,7 +356,7 @@ def _mark_prose(mob):
     """Tag the Text/Tex nodes a prose() call produced, so sizecheck.py can find
     the prose lines in a built scene and compare their (scale-aware) font_size
     across stacked siblings. The tag rides through any later .scale()."""
-    if isinstance(mob, (Text, Tex, MathTex)):
+    if isinstance(mob, (Tex, MathTex)):
         mob._brand_prose = True
     else:
         for sub in mob.submobjects:
@@ -529,10 +529,10 @@ def hero_curve(ground: str, *, role: str = "secondary", width: float = 6.0) -> V
     return glow_curve(curve, ground, role=role, width=width, halo_opacity=0.22)
 
 
-def ghost_numeral(text: str, ground: str, *, opacity: float = 0.05) -> Text:
-    """A huge faint numeral behind divider content (5% opacity ink-1)."""
-    mob = Text(str(text), font=T.FONT_DISPLAY, font_size=T.fs("ghost_numeral"),
-               color=T.color(ground, "ink_1"), weight="BOLD")
+def ghost_numeral(text: str, ground: str, *, opacity: float = 0.05) -> Tex:
+    """A huge faint numeral behind divider content (5% opacity ink-1), Plex Bold via Tex."""
+    mob = Tex(r"\textbf{" + _tex_text(str(text)) + "}", font_size=T.fs("ghost_numeral"),
+              color=T.color(ground, "ink_1"))
     mob.set_opacity(opacity)
     return mob
 

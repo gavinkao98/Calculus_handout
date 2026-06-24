@@ -43,7 +43,7 @@ scene `kind` 是 first-class 的，且支援 silent（no-narration）scene。
 
 | 原封沿用（已驗證，重寫無收益） | 從零重寫 |
 |---|---|
-| `visuals/theme.py`（Midnight Canvas palette + Times typography + layout metrics） | storyboard schema + format |
+| `visuals/theme.py`（Midnight Canvas palette + Plex/LaTeX type scale + layout metrics） | storyboard schema + format |
 | `visuals/graph_utils.py`（safe expr eval + sampling） | narration → beats compiler |
 | `visuals/layout.py`（16:9 zone layout） | scene templates |
 | ffmpeg mux/concat logic *（現於 `make.py` compose；gen-2 的 `mux.py` 已刪）* | TTS backend（MiMo；Gemini 已退場） |
@@ -481,16 +481,20 @@ style）在此。乾淨分離。
 
 ### Text rendering：prose vs math（no garble）
 
-> **⚠️ 2026-06-24 改 Route A（已決議、待實作）：** 文字將**全改走 LaTeX/pdflatex**——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**——以拿到正確 kerning。**根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning**（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。落地時本節重寫，並移除 Pango 路徑專屬機制：`theme.TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊）、`brand._pango_dashes`（Pango 不認 LaTeX dash ligature）、`brand._compose`／`_prose_mixed` 的 Pango＋Tex baseline 拼接（LaTeX 原生排文字＋內聯數學同行）。`_WIDTH_K`／`estimate_text_width` 是換行寬度估計（非 kerning），**保留並重校**。硬約束：只能 pdflatex（lualatex 會破壞 manim 數學子部件定址）。計畫 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)、決策見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「2026-06-24」節。**以下為 Route A 落地前的現況。**
+**Route A（2026-06-24 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以拿到正確 kerning——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**。根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。字體在 TeX preamble 設定（`_bootstrap.apply_tex_template`：`plex-sans`＋`plex-mono`＋`lmodern`＋`microtype`，`familydefault=\sfdefault`），所以本模組不再出現任何 Pango family 名。硬約束：只能 pdflatex（lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址）。計畫見 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
 
-螢幕文字走兩條 render path 之一（manim 對相同 `font_size` 的 Pango 與 LaTeX 呈現大小不同、且只有一條理解 LaTeX）：
+> **每景重套 template（坑）：** manim 的 `tempconfig`（`make.py`／`scratch_frames` 每景 `with tempconfig(cfg): LessonScene().render()`）退出時會把 `config.tex_template` 重設回預設（serif CM、缺 `\sfdefault` 與 `\arccsc` 等），所以 `LessonScene.construct()` 在 build 前都呼叫 `_bootstrap.apply_tex_template()` 重套，否則一個 batch 只有第一景拿到 Plex。
 
-| Path | Engine | 理解 `$math$` / `\\`？ | 使用者 |
+螢幕文字現在全走 LaTeX（`Tex`／`MathTex`），按角色分：
+
+| 角色 | 函式 | 字體 | LaTeX |
 |---|---|---|---|
-| `Text` | Pango | **否**——markup 會 literally 印出（garble） | `brand.heading`、`brand.eyebrow`、`brand.body_text` |
-| `Tex` / `MathTex` | LaTeX | 是 | `brand.prose`、`brand.heading_rich`、`brand.math_line` |
+| 標題 | `brand.heading` / `brand.heading_rich` | Plex Sans Bold | `\textbf{…}` |
+| 內文 prose | `brand.body_text` / `brand.prose` | Plex Sans | text-mode（含 `$math$`） |
+| eyebrow / label | `brand.eyebrow` | Plex Mono | `\texttt{…}` |
+| 數學 | `brand.math_line` / `MathTex` | Latin Modern | math-mode |
 
-`Text` 在相同 `font_size` 下比 `Tex` 高約 `theme.TEX_TEXT_SCALE` 倍，故經 Tex render 的 prose 以此放大、與旁邊的 heading 對齊；`math_line` 保持其自身 size role 不放大。（Route A 後全文字皆 Tex，此係數作廢。）
+`Tex` 在 text mode 原生排「文字＋內聯 `$math$` 同行」、baseline 正確、kerned，所以**舊的 Pango↔Tex 拼接機制已全部移除**：`theme.TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊，今 = 1.0 no-op）、`brand._pango_dashes`、`brand._compose`／`_prose_mixed`（手動 baseline 拼接）。換行寬度估計 `_WIDTH_K`／`estimate_text_width` 與 kerning 無關，保留並已重校為 Plex-LaTeX。
 
 **規則（template 必須遵循）：** 作者可能放入 `$` 或 `\` 的任何欄位——`title`、
 `statement`、step `text`、`takeaway`、recap `points`——透過 **`brand.prose`**

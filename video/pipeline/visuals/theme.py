@@ -1,9 +1,8 @@
-"""Design system: NTU Calculus Video System — Direction D layout, Times serif type.
+"""Design system: NTU Calculus Video System — Direction D layout, all-LaTeX Plex type.
 
 Port of the redesign (the "Manim Video Design System" handoff): a 3Blue1Brown-style
-dark glowing teaching ground, four semantic accents, and Times New Roman serif type
-throughout (headings/prose + newtx math) — the classic textbook look (the Direction D
-Inter Tight / CM type was reverted to Times on 2026-06-20).
+dark glowing teaching ground, four semantic accents, and IBM Plex Sans for all text with
+Latin Modern math — set through LaTeX so it is kerned (Route A, 2026-06-24).
 
 Tokens (colour, type scale, geometry, glow) mirror the redesign's tokens/*.css.
 
@@ -11,10 +10,11 @@ Two grounds:
 - DARK  -> teaching frames (definition/derivation/theorem/procedure/graph/...)
 - PAPER -> brand frames (intro / divider / outro), warm #f4f1e9 with the NTU lockup
 
-Fonts (Times revert, 2026-06-20): headings + prose use "Times New Roman" (Pango);
-labels/eyebrows use "Courier New"; math (MathTex/Tex) uses newtxtext/newtxmath (set in
-_bootstrap._set_tex_template). All are Windows system fonts / a LaTeX package -- nothing
-is vendored (Direction D's vendored Inter Tight / JetBrains Mono / CM were removed).
+Fonts (Route A, 2026-06-24): ALL on-screen text renders through LaTeX (Tex) -- IBM Plex
+Sans for headings/prose, IBM Plex Mono for eyebrows/labels, Latin Modern for math. The
+families live in the TeX preamble (_bootstrap.apply_tex_template); nothing goes through
+Pango, so this module no longer carries Pango family names. (Was Pango Times/NCM text +
+newtx/lmodern math.)
 
 Colour contract (reference SEMANTIC roles, not raw hues):
 - blue   -> definitions, default curve, default highlight     (role secondary / blue)
@@ -30,15 +30,10 @@ only blocks.ACCENT_ROLE needed remapping.
 """
 from __future__ import annotations
 
-# -- fonts (Pango family names) -------------------------------------------
-# New Computer Modern serif for display + prose (NCM switch 2026-06-24, to match the
-# handout's 2026-06-22 NCM move); Courier New for labels/eyebrows. The NCM text family
-# "NewComputerModern10" is registered with Pango in _bootstrap._register_ncm_fonts()
-# (located via kpsewhich from the MiKTeX newcomputermodern package, not vendored).
-# (Was Times New Roman, the 2026-06-20 revert.)
-FONT_DISPLAY = "NewComputerModern10"
-FONT_BODY = "NewComputerModern10"
-FONT_MONO = "Courier New"
+# Fonts are no longer named here: all text renders through LaTeX (Tex) and the families
+# (Plex Sans / Plex Mono / Latin Modern) are set in _bootstrap.apply_tex_template. (Route
+# A removed the FONT_DISPLAY/FONT_BODY/FONT_MONO Pango family names this module used to
+# expose; nothing reads them now.)
 
 # -- type scale -----------------------------------------------------------
 # tokens give px @ 1920x1080. manim font_size is its own unit; PX_TO_FS converts.
@@ -211,8 +206,6 @@ RADIUS_SM = 6 / PX_PER_UNIT_Y
 RADIUS_MD = 12 / PX_PER_UNIT_Y
 RADIUS_LG = 18 / PX_PER_UNIT_Y
 BAR_W = 5 / PX_PER_UNIT_X             # accent-bar left-edge width
-
-FONTS = {"display": FONT_DISPLAY, "body": FONT_BODY, "mono": FONT_MONO}
 
 # Settled: no coordinate grid is rendered on any template — the deep-ink ground
 # carries the aesthetic. grid_line colours stay as a latent motif.
