@@ -163,6 +163,11 @@ def _escape_tex(text: str) -> str:
     return text
 
 
+def _tex_text(s: str) -> str:
+    """A plain-text segment -> LaTeX text-mode source: escape specials, set dashes."""
+    return _tex_dashes(_escape_tex(s))
+
+
 def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
               max_width: float | None = None, align: str = "LEFT"):
     """Body prose rendered via LaTeX (Tex) in IBM Plex Sans (the \\sfdefault family).
@@ -178,7 +183,7 @@ def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
     fsz = T.fs(size)
 
     def mk(s: str) -> Tex:
-        return Tex(_tex_dashes(_escape_tex(s)), color=col, font_size=fsz)
+        return Tex(_tex_text(s), color=col, font_size=fsz)
 
     if max_width is None:
         return mk(text)
@@ -254,53 +259,27 @@ def glyph(name: str, ground: str, *, role: str, size: str = "math"):
     return MathTex(_GLYPH_TEX[name], color=T.color(ground, role), font_size=T.fs(size))
 
 
-def prose_tex(text: str, ground: str, *, role: str = "text", size: str = "body"):
-    """Prose that may carry LaTeX markup -- inline ``$math$`` and/or a ``\\\\``
-    line break -- rendered in Tex *text mode*.
+def _escape_prose(text: str) -> str:
+    """Escape the plain-text segments of a prose string for LaTeX text mode, leaving
+    any ``$...$`` math spans untouched (they are already math-mode source)."""
+    out: list[str] = []
+    for part in re.split(r"(\$[^$]*\$)", text):
+        if part.startswith("$") and part.endswith("$") and len(part) >= 2:
+            out.append(part)
+        elif part:
+            out.append(_tex_text(part))
+    return "".join(out)
 
-    Use this (not ``body_text``) whenever a prose field can contain ``$...$`` or
-    ``\\\\``: plain ``Text`` shows that markup literally (the ``$f$`` / ``\\\\``
-    garble). Unlike ``math_line``, this never routes to MathTex, so a markup-free
-    word like "Identity" stays upright text, not math italics.
 
-    font_size is scaled by ``TEX_TEXT_SCALE`` so this sits at the same visual size
-    as ``body_text`` (Text and Tex render the same font_size differently). Prefer
-    the ``prose()`` router below over calling this directly.
+def _wrap_mixed(text: str, fsz: float, max_width: float | None) -> list[str]:
+    """Word-wrap prose that may carry inline ``$math$`` into line strings.
 
-    Wrapped in ``\\mbox{}`` so LaTeX never line-breaks it into a centred paragraph:
-    a long sentence stays ONE (wide) line, so prose()'s width check is a true
-    single-line width and prose() can word-wrap it into LEFT-aligned lines itself
-    (Direction D is left-flush, not the old centred LaTeX paragraph).
+    A ``$...$`` span is one atomic token (never broken, even across its inner spaces);
+    trailing punctuation is glued onto its token so a period never wraps off alone.
+    Width is the char estimate (estimate_text_width) -- a math span is counted by its
+    source length, an over-estimate that wraps a touch early (overflow-safe). Each
+    returned line still carries its ``$...$`` spans for prose() to render as one Tex.
     """
-    return Tex(r"\mbox{" + text + "}", color=T.color(ground, role),
-               font_size=T.fs(size) * T.TEX_TEXT_SCALE)
-
-
-_DESC_CHARS = set("gjpqy(),;[]{}/Q")
-
-
-def _compose(text: str, ground: str, role: str, fsz: float, *, weight: str = "NORMAL",
-             max_width: float | None = None, align: str = "LEFT", line_buff: float = 0.26,
-             math_scale_mul: float = 1.0):
-    """Compose a line (or wrapped lines) of Times text + newtx math (serif text +
-    serif math, ON THE SAME LINE). Runs are BASELINE-aligned (text by a
-    descender-aware baseline, math by the optical math-axis); $...$ spans are atomic.
-    Wraps at *max_width* if given (prose); otherwise one line (headings, then clamp).
-    Shared by prose() and heading_rich() so titles and body match.
-
-    *math_scale_mul* trims the x-height-matched math size (1.0 = body default);
-    heading_rich passes <1 so a display title's italic math doesn't tower over its
-    bold text (see theme.HEADING_MATH_SCALE)."""
-    col = T.color(ground, role)
-    xref_h = Text("x", font=T.FONT_BODY, font_size=fsz, weight=weight).height
-    descent = max(Text("g", font=T.FONT_BODY, font_size=fsz, weight=weight).height - xref_h, 0.0)
-    axis = 0.30 * xref_h
-    space = max(Text("a a", font=T.FONT_BODY, font_size=fsz, weight=weight).width
-                - Text("aa", font=T.FONT_BODY, font_size=fsz, weight=weight).width, 0.06)
-    ref_mx = MathTex("x", font_size=fsz)
-    math_scale = ((xref_h / ref_mx.height) if ref_mx.height > 1e-6 else 1.0) * math_scale_mul
-
-    # tokenize: words, $...$ atomic, trailing punctuation merged onto its token
     tokens: list[str] = []
     for part in re.split(r"(\$[^$]*\$)", text):
         if part.startswith("$") and part.endswith("$") and len(part) >= 2:
@@ -315,100 +294,65 @@ def _compose(text: str, ground: str, role: str, fsz: float, *, weight: str = "NO
             merged.append(tok)
     tokens = merged
     if not tokens:
-        return Text("", font=T.FONT_BODY, font_size=fsz, weight=weight, color=col)
-
-    # runs grouped by token: (mob, is_math, gap_before[, text]); intra-token runs
-    # (e.g. "$y$.") are tight and stay together so a period never wraps off alone.
-    token_groups: list[list] = []
-    for ti, tok in enumerate(tokens):
-        parts = [p for p in re.split(r"(\$[^$]*\$)", tok) if p]
-        grp = []
-        for pi, p in enumerate(parts):
-            gap = space if (ti > 0 and pi == 0) else 0.0
-            if p.startswith("$") and p.endswith("$") and len(p) >= 2:
-                m = MathTex(p[1:-1], color=col, font_size=fsz).scale(math_scale)
-                grp.append((m, True, gap))
-            else:
-                t = Text(_pango_dashes(p), font=T.FONT_BODY, font_size=fsz,
-                         weight=weight, color=col)
-                grp.append((t, False, gap, p))
-        token_groups.append(grp)
-
-    budget = max_width if max_width is not None else 1e9
-    lines: list[list] = []
-    cur: list = []
-    cur_w = 0.0
-    for grp in token_groups:
-        gw = sum(r[0].width for r in grp)
-        lead = space if cur else 0.0
-        if cur and cur_w + lead + gw > budget:
-            lines.append(cur)
-            cur, cur_w = list(grp), gw
+        return []
+    if max_width is None:
+        return [" ".join(tokens)]
+    lines: list[str] = []
+    cur: list[str] = []
+    for tok in tokens:
+        if cur and estimate_text_width(" ".join(cur + [tok]), fsz) > max_width:
+            lines.append(" ".join(cur))
+            cur = [tok]
         else:
-            cur.extend(grp)
-            cur_w += lead + gw
+            cur.append(tok)
     if cur:
-        lines.append(cur)
-
-    def place(line_runs) -> VGroup:
-        x = 0.0
-        for i, run in enumerate(line_runs):
-            mob, is_math = run[0], run[1]
-            if i > 0:
-                x += run[2]
-            if is_math or (run[3].strip() and all(c in "—–-·•*" for c in run[3].strip())):
-                mob.move_to([0, axis, 0])              # math / mid-height glyph -> axis
-            else:
-                has_desc = any(c in _DESC_CHARS for c in run[3])
-                base = mob.get_bottom()[1] + (descent if has_desc else 0.0)
-                mob.shift([0, -base, 0])               # baseline -> 0
-            mob.shift([x - mob.get_left()[0], 0, 0])   # left edge -> x
-            x = mob.get_right()[0]
-        return VGroup(*[r[0] for r in line_runs])
-
-    line_grps = [place(ln) for ln in lines]
-    if len(line_grps) == 1:
-        return line_grps[0]
-    grp = VGroup(*line_grps)
-    if align == "LEFT":
-        grp.arrange(DOWN, buff=line_buff, aligned_edge=LEFT)
-    else:
-        grp.arrange(DOWN, buff=line_buff)
-    return grp
+        lines.append(" ".join(cur))
+    return lines
 
 
-def _prose_mixed(text: str, ground: str, role: str, size: str,
+def _prose_lines(text: str, ground: str, role: str, size: str,
                  max_width: float | None, align: str):
-    """Inline-math prose composite (Times serif prose + newtx math). See _compose."""
-    return _compose(text, ground, role, T.fs(size), weight="NORMAL",
-                    max_width=max_width, align=align)
+    """Prose with inline ``$math$`` and/or explicit ``\\\\`` breaks, set as LaTeX.
+
+    Each output line is ONE ``Tex`` in text mode: LaTeX lays text + inline math on the
+    same line with native baselines and kerning (Plex Sans text, Latin Modern math), so
+    the old Pango/Tex baseline compositing (_compose) is gone. Author ``\\\\`` breaks
+    split first, then each segment word-wraps to *max_width*; lines are LEFT-stacked.
+    """
+    col = T.color(ground, role)
+    fsz = T.fs(size)
+    line_strs: list[str] = []
+    for seg in re.split(r"\\\\", text):
+        seg = seg.strip()
+        if seg:
+            line_strs.extend(_wrap_mixed(seg, fsz, max_width))
+    if not line_strs:
+        return VGroup()
+    mobs = [Tex(_escape_prose(ls), color=col, font_size=fsz) for ls in line_strs]
+    if len(mobs) == 1:
+        return mobs[0]
+    grp = VGroup(*mobs)
+    if align == "LEFT":
+        grp.arrange(DOWN, buff=0.22, aligned_edge=LEFT)
+    else:
+        grp.arrange(DOWN, buff=0.22)
+    return grp
 
 
 def prose(text: str, ground: str, *, role: str = "text", size: str = "body",
           max_width: float | None = None, align: str = "LEFT"):
     """Render an author prose field, routing by content so markup never garbles.
 
-    The ONE place that decides how prose is set. Prose is Times serif, math is
-    newtx serif -- ON THE SAME LINE.
-    - Markup-free text -> ``body_text`` (plain Times Text, wraps at *max_width*).
-    - Text with inline ``$math$`` -> ``_prose_mixed`` (Times text runs + newtx
-      MathTex runs composited and word-wrapped) so a math-bearing line stays serif
-      throughout, matching its pure-prose siblings (no font mismatch).
-    - Text with an explicit ``\\\\`` break (no inline $) -> single ``prose_tex`` Tex
-      (rare; the author controls the break).
+    The ONE place that decides how prose is set. Route A: all text is LaTeX (Plex Sans),
+    math is Latin Modern -- on the same line.
+    - Markup-free text -> ``body_text`` (Plex Sans Tex, wraps at *max_width*).
+    - Text with inline ``$math$`` and/or an explicit ``\\\\`` break -> ``_prose_lines``
+      (one Tex per wrapped line; text + inline math sit native on each line).
     """
     if "$" not in text and "\\" not in text:
         return _mark_prose(body_text(text, ground, role=role, size=size,
                                      max_width=max_width, align=align))
-
-    # explicit \\ break, no inline math: keep the author's break as one Tex line
-    if "$" not in text and "\\\\" in text:
-        mob = prose_tex(text, ground, role=role, size=size)
-        if max_width is not None and mob.width > max_width:
-            mob.scale_to_fit_width(max_width)
-        return _mark_prose(mob)
-
-    return _mark_prose(_prose_mixed(text, ground, role, size, max_width, align))
+    return _mark_prose(_prose_lines(text, ground, role, size, max_width, align))
 
 
 def _mark_prose(mob):
@@ -427,17 +371,23 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
                  max_width: float | None = None):
     """A display heading that may carry inline ``$math$``.
 
-    Plain titles go through ``heading`` (Times BOLD). A title WITH ``$...$`` is
-    composited the same way as prose (``_compose``): Times BOLD text runs +
-    x-height-matched newtx MathTex runs, baseline-aligned on one line -- so a mixed
-    title's text stays Pango Times like its pure-text siblings, with the math in newtx,
-    instead of the whole line routing through Tex. *max_width* clamps a long
-    title to fit (the standalone-display-line "shrink, don't wrap" exception).
+    Plain titles go through ``heading`` (Plex Sans Bold). A title WITH ``$...$`` is set
+    as ONE ``Tex``: the words become ``\\textbf{}`` (Plex Bold), the ``$...$`` spans stay
+    math (Latin Modern). LaTeX lays text + math on one line with native baselines, so the
+    old Pango/Tex compositing (_compose) is gone. *max_width* clamps a long title to fit
+    (the standalone-display-line "shrink, don't wrap" exception).
     """
     if "$" not in text:
         return heading(text, ground, role=role, size=size, max_width=max_width)
-    mob = _compose(text, ground, role, T.fs(size), weight="BOLD",  # one line
-                   math_scale_mul=T.HEADING_MATH_SCALE)
+    pieces: list[str] = []
+    for p in re.split(r"(\$[^$]*\$)", text):
+        if not p:
+            continue
+        if p.startswith("$") and p.endswith("$") and len(p) >= 2:
+            pieces.append(p)
+        else:
+            pieces.append(r"\textbf{" + _tex_text(p) + "}")
+    mob = Tex("".join(pieces), color=T.color(ground, role), font_size=T.fs(size))
     if max_width is not None and mob.width > max_width:
         mob.scale_to_fit_width(max_width)
     return mob
