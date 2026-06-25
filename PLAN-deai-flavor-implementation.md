@@ -6,6 +6,39 @@
 
 **Goal:** 在 handout（HTML 講義）與 video（旁白）兩條產線建立一套「flag-only 決定性 lint ＋ 人審語聲維度 ＋ 撰寫時預防」的防禦，系統性降低成稿散文的「AI 味」，且不誤砍合法數學散文。
 
+---
+
+## 執行進度（Handoff — 跨機器接手看這裡）
+
+> **最後更新：2026-06-25（下班交接）。** 跨對話／跨機器進度錨（依 CLAUDE.md：進度寫進版控文檔，不只記本地 memory）。回家換電腦接手時先讀這節。步驟級 `- [ ]` checkbox 維持原樣，**task 級狀態以本節為準**。
+
+### 環境（換機先做）
+- 本案新依賴 **Vale 3.15.1** 已登記進 [`tools/doctor.py`](tools/doctor.py)／[`ENVIRONMENT.md`](ENVIRONMENT.md)（⑤b 段）。**新機器先跑：** `winget install errata-ai.Vale`（裝完開新 shell 讓 PATH 生效），再 `python tools/doctor.py` 確認 `vale` 行轉綠。
+- 跑本案測試（需 vale 在 PATH）：`python tools/deai/check_seed.py`、`python tools/deai/test_vale_fixture.py`、`python tools/deai/build_seed.py --check`。
+
+### 完成度
+- **Phase 0（0.1–0.3）✅**：Vale 裝好＋進 doctor/ENVIRONMENT；種子 `reject`(14)/`accept`(9) + curation 守門；`.vale.ini` markup-aware + AItexture rule-pack（Phrases/Copula/Negative）+ fixture 測試（抓 tell、不誤砍數學、對照組乾淨）。
+- **Phase 1（1.1–1.2）✅**：Dimension C 進 `PROSE-AUDIT-RUBRIC.md`；Ch1 校準（Vale **0 誤砍/9324 字**、人審真 tell≈0、唯一訊號 em-dash 峰值 ~4.0/500）→ [`handout/_audit/REPORT-deai-ch1-calibration.md`](handout/_audit/REPORT-deai-ch1-calibration.md) ＋ HTML。
+- **Phase 2**：2.1 ✅（Dimension C 升 blocking、N=3 + 兩 refinement、§3 保護清單加密度天花板；fixture 現觸 Blocking、對照組仍 0）｜ 2.2 ✅（README Mode A/C 第 9 項 AI-texture sweep）｜ 2.3 ✅（Output Style `.claude/output-styles/deai-house-voice.md`）｜ **2.4 ⏳ 待你裁決（⛳#3，見下）**｜ 2.5 ⬜ 未開始（接 Vale 進 CONTENT_DIRECTION ⑤，doc-only 無 ⛳）。
+- **Phase 3 / 4 ⬜**：未開始。
+
+### 已拍板（locked，勿 re-litigate）
+- **⛳#1**：blocking 門檻 **N=3** + (a) 只數真 tell（content-bearing 邊緣不計）(b) 短節絕對下限（≥3 absolute 且 ≥3/500）；**C6 em-dash** advisory ≥4/500、單句≥3 為熱點；C1–C6 措辭維持；**Ch1 不動**。
+- **⛳#2**：Output Style 內容、§3 密度天花板（連接詞 distinct >3/500、em-dash ≥4/500、其餘四類僅進叢集才轉 finding）、Mode A 第 9 項措辭——三項照現狀採納。
+
+### ⬇ 回家第一件事：⛳#3 voice corpus 入選
+打開 [`handout/_audit/REVIEW-deai-voicecorpus-candidates.html`](handout/_audit/REVIEW-deai-voicecorpus-candidates.html) 勾選，或直接回覆要哪幾個 ID：
+- **②a** §1.1 Example 1.7（worked solution 主錨，**最高優先缺口**，建議必加）
+- **③a** §1.6 開場歷史段 ｜ **④a** §1.6 challenge-and-response（延伸 gloss）｜ **①a** §1.3 極限動機段（concrete-first，選擇性）
+- 次選：②b 短解法、③b/④b tolerances（同段、擇一）、①b §1.2
+- **我的建議組合：②a + ③a + ④a（＋可選 ①a）湊滿四型。**
+- 選定後：2.4 Step 3-4（逐字插入 §3、標特徵、核對 verbatim 不動數學）→ commit → 2.5 → Phase 3（Ch2–4 定稿 Mode B，逐章 ⛳）→ Phase 4（video gate，⛳）。
+
+### Commit / 分支
+本案 Phase 0–2 已完成部分本次已 commit（撈：`git log --grep=deai`）。落在 `video/template-redesign-navy-spine`（使用者選定留此分支）。video WIP（`video/DESIGN.md`／`graph.py`／storyboard）非本案、未碰、未 commit。
+
+---
+
 **Architecture:** 三層——(1) 預防（Mode A 自查、Output Style、voice corpus）；(2) 決定性 lint（Vale，markup-aware，接進 `CONTENT_DIRECTION ⑤` 既有 linter lane，永遠 advisory）；(3) 人審 gate（`PROSE-AUDIT-RUBRIC.md` 新增 Dimension C，由既有 `handout-prose-audit` subagent ＋ Codex gate-2 繼承；video 平行 C6）。不做成 Skill。Workflow 只用於一次性唯讀掃描。
 
 **Tech Stack:** Vale（Go binary，prose linter）；既有 Python 工具鏈（`tools/doctor.py`、`build.py`）；Markdown rubric 契約；Claude subagent（gate 1）＋ Codex（gate 2）；Claude Code Output Styles。平台 win32（PowerShell 主、Bash 可用）。
