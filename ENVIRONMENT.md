@@ -28,11 +28,12 @@ python tools\doctor.py
 | **①b 影片字型** | **全走 LaTeX**：文字 IBM Plex Sans/Mono、數學 Latin Modern（套件見 ③）。**不再用 Pango 系統字型**（Times/Courier 已棄） | 無需安裝系統字型；只要 ③ 的 MiKTeX 套件在即可（`doctor.py` 以 kpsewhich 驗）。video 不 vendored 任何字型 |
 | **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/_render/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
+| **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
 | **祕鑰** | `MIMO_API_KEY` / `GEMINI_API_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` | per-machine 設環境變數；**不進版控**（計費 API，依 [`CLAUDE.md`](CLAUDE.md) 徵同意） |
 
 ## 一次性安裝（每台機器各做一次）
 
-本機驗證過的版本：Python 3.12.10、Node v24、MiKTeX、ffmpeg 8.1.1。
+本機驗證過的版本：Python 3.12.10、Node v24、MiKTeX、ffmpeg 8.1.1、Vale 3.15.1（選用）。
 
 ```powershell
 # Python（lock 以 3.12 凍結，請用 3.12 以免 wheel 不相容）
@@ -46,6 +47,9 @@ winget install OpenJS.NodeJS.LTS
 
 # Google Chrome（shot.mjs 用 CDP 截圖）
 winget install Google.Chrome
+
+# Vale（去 AI 味散文 lint；選用，跑 PLAN-deai-flavor 的 prose lint 才需要）— 裝完開新 shell 讓 PATH 生效
+winget install --id errata-ai.Vale -e
 
 # LaTeX：裝 MiKTeX（https://miktex.org）。latex/dvisvgm 會進 PATH；
 # video 文字＋數學皆走 LaTeX，需 plex(plex-sans/plex-mono)/lmodern/microtype 套件
@@ -130,6 +134,15 @@ copy tools\codex.cmd "%APPDATA%\npm\codex.cmd"
 - 兩台機器這條指令**一模一樣**（`%APPDATA%`／`%LOCALAPPDATA%` 都按使用者展開），所以**不必管實際路徑差異**。
 - codex 本體走它自己的安裝／自更新管道（自更新到 `%LOCALAPPDATA%\OpenAI\Codex\bin`）；shim 只負責「找得到 ＋ 找最新」。
 - 換機後 `python tools\doctor.py` 會判定 codex 是「在 PATH／裝了但沒部署 shim／沒裝」哪一種，並給對應補法。
+
+### ⑤b Vale — 去 AI 味散文 lint（選用、flag-only）
+
+去 AI 味方案（[`PLAN-deai-flavor.md`](PLAN-deai-flavor.md)）的決定性 lint 引擎。選 Vale 的理由：**markup-aware**（自動排除 `$...$`／`\(...\)`／LaTeX 命令／`<code>`，數學符號不會淹沒訊號）、單一 Go binary、跨平台、零 AI-detector 風險。
+
+- **裝法（每台機器一次）：** `winget install --id errata-ai.Vale -e`（備援 `scoop install vale`，或自 <https://github.com/errata-ai/vale/releases> 下載 binary 放 PATH）。裝完開新 shell 讓 PATH 生效。**pinned 版本：3.15.1。**
+- **定位：永遠 flag-only／advisory。** 嚴重度設 `warning`/`suggestion`、**不設 `error`**；決定性「擋不擋」交給 Mode B 人審維度 C，不在此。所以缺它不擋核心產線——`doctor.py` 判 **WARN 不 FAIL**（同 codex）。
+- 設定檔（`.vale.ini` + `styles/AItexture/` + `reject.txt`/`accept.txt`）隨 repo 進版控；裝好 binary 即可對 fragment 跑 `vale <file>`。
+- 換機後 `python tools\doctor.py` 的 `vale` 區會判「在 PATH／未安裝」並給補法。
 
 ### 祕鑰
 - 全部走環境變數，**永不進版控、不寫檔、不記 log**。`.env` 已 gitignored。

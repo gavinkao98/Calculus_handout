@@ -203,6 +203,25 @@ def check_codex() -> None:
                r"把 tools\codex.cmd 複製進任一已在持久 PATH 的目錄（如 %APPDATA%\npm）")
 
 
+# ── ⑤b Vale prose linter（去 AI 味 lint 引擎；PLAN-deai-flavor；選用、flag-only）──
+
+def check_vale() -> None:
+    """Vale = 去 AI 味散文 lint 引擎（markup-aware，自動排除 $...$／LaTeX／code）。
+    flag-only／advisory，決定性「擋不擋」交給 Mode B 人審維度 C，不在此——故缺它不擋
+    核心產線，WARN 不 FAIL（同 codex）。裝法見 ENVIRONMENT.md「Vale」段。"""
+    exe = shutil.which("vale")
+    if not exe:
+        record(WARN, "vale", "Vale 未安裝（選用，跑去 AI 味 lint 才需要）",
+               "winget install errata-ai.Vale（備援 scoop install vale）；見 ENVIRONMENT.md「Vale」段")
+        return
+    rc, out = _run([exe, "--version"])
+    ver = out.splitlines()[0].strip() if (rc == 0 and out) else ""
+    if ver:
+        record(PASS, "vale", f"Vale 在 PATH（{ver}）", exe)
+    else:
+        record(WARN, "vale", "Vale 在 PATH 但無法取得版本", f"執行回報：{out or '?'}（{exe}）")
+
+
 # ── ⑥ 內附資產（進版控，理應永遠在）────────────────────────────────────
 
 def check_assets() -> None:
@@ -375,6 +394,7 @@ def main() -> int:
     check_latex()
     check_node_and_chrome()
     check_codex()
+    check_vale()
     check_assets()
     check_fonts()
     check_tex_compiles()
