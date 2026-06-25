@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>寫作流程「AI 味」診斷 — 跨產線稽核報告</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.55rem;margin:0 0 4px}
+  h2{font-size:1.2rem;margin:38px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.02rem;margin:22px 0 4px;color:#33343a}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .warnbox{background:var(--warnbg);border-left-color:var(--warn)}
+  .warnbox b{color:var(--warn)}
+  p{margin:8px 0}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .card.diag{border-left:3px solid var(--block)}
+  .card.rec{border-left:3px solid var(--new)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.block{background:#fdeceb;color:#a11}
+  .chip.high{background:#fde8d6;color:#8a4b00}
+  .chip.med{background:#fff6e3;color:#8a5a00}
+  .chip.low{background:#eef0f4;color:#555}
+  .chip.eff{background:#e6f7ea;color:#1a7f37;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.line{background:#e7eefc;color:#1f49a6}
+  .chip.both{background:#efe7fb;color:#5b3aa8}
+  .lab{font-weight:700;font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:8px 0 2px}
+  .why{margin:2px 0 6px}
+  .ev{color:var(--muted);font-size:.9rem;margin:2px 0 0;border-left:2px solid var(--line);padding-left:10px}
+  code{background:#f0f0ee;padding:1px 5px;border-radius:4px;font-size:.88em;font-family:ui-monospace,Menlo,Consolas,monospace}
+  ul{margin:6px 0 6px 0;padding-left:22px}
+  li{margin:3px 0}
+  .tellgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+  @media(max-width:640px){.tellgrid{grid-template-columns:1fr}}
+  .tellbox{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 13px}
+  .tellbox h4{margin:0 0 4px;font-size:.92rem;color:#5b3aa8}
+  .tellbox p{margin:0;font-size:.88rem;color:#444}
+  .rubric{background:#1d1f24;color:#e6e6e6;border-radius:10px;padding:16px 18px;margin:12px 0;
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.7;white-space:pre-wrap;overflow-x:auto}
+  .rubric .h{color:#9ecbff;font-weight:700}
+  .rubric .b{color:#ff9e9e}
+  .banned{columns:2;column-gap:24px;font-size:.9rem}
+  @media(max-width:640px){.banned{columns:1}}
+  .banned li{break-inside:avoid;margin:4px 0}
+  .refs li{margin:6px 0;font-size:.9rem}
+  .refs a{color:var(--accent);text-decoration:none}
+  .refs a:hover{text-decoration:underline}
+  footer{margin-top:44px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>寫作流程「AI 味」診斷 — 跨產線稽核報告</h1>
+  <p class="lede">盤點 handout（三模式狀態機）＋ video（鎖稿模型）兩條撰寫產線的 AI 紋理來源，對照外部研究，給出貼著現有 Mode A/B/C 與稽核 gate 的對策。涵蓋 <code>README.md</code>、<code>CONTENT_SPEC §3</code>、<code>CONTENT_DIRECTION</code>、<code>CONTENT_SOURCING</code>、<code>PROSE-AUDIT-RUBRIC.md</code>、<code>video/CONTENT_METHODOLOGY.md</code>、<code>NARRATION-COPYEDIT-RUBRIC.md</code>、<code>NARRATION-FAITHFULNESS-RUBRIC.md</code>。2026-06-25。</p>
+
+  <div class="note warnbox"><b>一句話結論：</b>問題不是「沒有寫作標準」——你們的語聲規範比多數 AI 產線嚴謹。問題是 <b>沒有任何一道 gate 的維度在抓「AI 味」本身</b>；而 Mode A 的「傾向更多擴充」密度哲學、§3 鼓勵的連接詞、rubric 的「不算 finding」保護清單，三者疊起來反而在<b>結構性地製造並保護</b> AI 紋理。</div>
+
+  <h2>摘要表 — 六個入口</h2>
+  <table class="sum">
+    <tr><th>#</th><th>入口</th><th>嚴重度</th><th>產線</th></tr>
+    <tr><td><b>E1</b></td><td>Mode A 擴充 + 8 項放大稽核（開場/收尾/直覺變必填槽位）</td><td>最大入口</td><td>handout</td></tr>
+    <tr><td><b>E2</b></td><td>prose gate 兩維度都不抓 AI 紋理；唯一語域維 F5 是 advisory + 字表封閉</td><td>結構性</td><td>handout</td></tr>
+    <tr><td><b>E3</b></td><td>copyedit C1–C5 只抓局部毛病；瀰漫式 cadence 歸 tier-3「至多一行」</td><td>結構性</td><td>video</td></tr>
+    <tr><td><b>E4</b></td><td><b>鎖稿後凍結</b>：去味窗口只有一次，鎖稿後 NFA D2 把去味當違規</td><td>最致命</td><td>兩條線</td></tr>
+    <tr><td><b>E5</b></td><td>具名歷史 +「不要自我審查」+ AI 備援例題：marker 只稽核 source 不稽核 tone</td><td>高</td><td>兩條線</td></tr>
+    <tr><td><b>E6</b></td><td>語聲錨點只有一段 130 字範文；worked solution 完全沒有語聲目標</td><td>中</td><td>handout</td></tr>
+  </table>
+
+  <h2>1 · 重新框定問題</h2>
+  <p>你們其實<b>有</b>語聲錨點：<code>CONTENT_SPEC §3</code> 不只定了 Stewart/Rogawski 語域，還附了校準階梯（太 formal＝Spivak/Apostol/Rudin、太 informal＝課堂筆記 PDF、目標＝Stewart）和一段附五點註解的「語聲參考範文」。這比絕大多數 AI 產線都嚴謹。AI 味的根因不在缺標準，而在三件事疊加：</p>
+  <ul>
+    <li><b>沒有一道 gate 抓 AI 紋理。</b>它們抓「讀者懂不懂」(U1–U5) 和「冗不冗贅」(F1–F5 / C1–C5)。文法通順、看得懂、不囉嗦的 AI 散文乾淨穿過每一道閘。</li>
+    <li><b>密度哲學結構性地生產連接散文。</b>Mode A 明令「拿不準時傾向更多擴充而非更少」，8 項放大稽核把開場句、收尾總結、每個定義前的直覺鋪陳變成必填槽位——「按需生成開場與收尾」正是製造 AI 鷹架最典型的工作。</li>
+    <li><b>保護清單替 tell 辯護。</b>rubric 把 <code>Notice that</code>／<code>Let us now</code>／「刻意教學重述」列為絕不可砍的特性、<b>且無密度上限</b>——而這批正好是 AI 文最濃的 tell。</li>
+  </ul>
+
+  <h2>2 · 你們現在的流程（盤點）</h2>
+  <h3>handout（HTML 講義）— 手稿為主軸的三模式狀態機</h3>
+  <ul>
+    <li><b>Mode A</b> 草擬：圍繞手稿擴充到 Stewart 密度，每處擴充打 <code>&lt;!-- expansion:&lt;category&gt; [source:…] --&gt;</code> marker，收尾跑 8 項放大稽核 → <b>gate 1 Claude <code>handout-prose-audit</code> + gate 2 Codex</b>（共用 <code>PROSE-AUDIT-RUBRIC.md</code>）。</li>
+    <li><b>Mode B</b> 稽核：逐 marker 判 Keep/Rewrite/Move/Cut，只提議不行動。「已提交＝已授權」。</li>
+    <li><b>Mode C</b> 充實：只加不重構，加 <code>[pass: enrichment]</code> marker，收尾再跑 scoped Mode B。</li>
+  </ul>
+  <h3>video（旁白）— 鎖稿模型</h3>
+  <ul>
+    <li>草稿 → 六鏡 L1–L6 → <b>copyedit C1–C5（鎖稿前唯一能改字的窗口）</b> → 鎖稿 → derive 口語/HTML → <b>NFA D1–D7 忠實稽核</b>。</li>
+    <li>旁白刻意比講義口語；register 底線禁 <code>super easy</code>/<code>you guys</code>，但允許 <code>Here's the idea</code>/<code>Notice that</code> 等引導語（軟註「別變口頭禪」）。</li>
+  </ul>
+  <div class="note pass"><b>既有護欄不少</b>，但全是 lexical 黑名單 + 主觀通讀（「任何一段聽起來像教科書就重寫」）——沒有一條針對 AI 紋理的<b>結構性、可量測</b>的 tell。</div>
+
+  <h2>3 · 診斷：AI 味從哪幾個環節滲進來</h2>
+
+  <div class="card diag">
+    <div class="chips"><span class="chip num">E1</span><span class="chip line">handout</span><span class="chip block">最大入口</span><span class="chip dim">Mode A 擴充</span></div>
+    <p class="why"><b>密度政策結構性地推向「生成更多連接散文」。</b>「傾向更多擴充」把 under-expansion 列為唯一被點名的失敗模式，volume 檢查明文「軟性不強制」。8 項稽核把「承接上節的開場」「收尾總結段」「每個定義前的直覺」變成 Claude 必須補的槽位。</p>
+    <p class="ev"><b>證據：</b>README「拿不準時 Claude 應傾向更多擴充（帶標記）而非更少。擴充不足比擴充過度更難事後補救。」對應外部 tell：section-narration signposts、<code>In summary, we have seen</code> 總結重述、copula-avoidance。Mode A 的 no-repetition 自檢只防「同一論點」重複，不防句長均勻 / 過度 hedge 的紋理。</p>
+  </div>
+
+  <div class="card diag">
+    <div class="chips"><span class="chip num">E2</span><span class="chip line">handout</span><span class="chip block">結構性</span><span class="chip dim">prose gate</span></div>
+    <p class="why"><b>AI 紋理根本不是 gate 的維度。</b>gate 只有兩維度（U1–U5、F1–F5），通過判準是「易懂 blocking = 0」。沒有任何 U#/F# 在抓 tricolon、negative parallelism、copula-avoidance、signposting 密度、em-dash 密度、<code>It's worth noting</code> 框架。唯一沾語域的 F5 字表封閉且全 advisory——就算抓到也不擋稿。</p>
+    <p class="ev"><b>證據：</b>RUBRIC 行 26（B 流暢性全 ADVISORY）、行 38–40（blocking 只含 U1–U4 + 歧義 F3；收斂＝blocking=0）。更糟：行 44–51「不算 finding」<b>主動保護</b>「§3 鼓勵連接詞」「刻意教學重複」「章末回查重述」<b>且無密度天花板</b>——而這些正是外部研究列的 tell-markers。驗證報告只種了「易懂性」缺陷，從未測過 AI-voice 樣本。</p>
+  </div>
+
+  <div class="card diag">
+    <div class="chips"><span class="chip num">E3</span><span class="chip line">video</span><span class="chip block">結構性</span><span class="chip dim">copyedit gate</span></div>
+    <p class="why"><b>C1–C5 只抓局部機械毛病。</b>鄰句冗餘、封閉 filler 字表、句長、近逐字跨單元 echo——抓不到瀰漫式 register：20+ 單元間句長一致、單元間重複的公式化引導語、triadic/em-dash cadence、被磨平的同質聲音。而「voice drift」被歸 tier-3「至多一行」最低優先。</p>
+    <p class="ev"><b>證據：</b>NARRATION-COPYEDIT-RUBRIC 行 19–29（C1–C5 全 advisory、全局部）、行 43（tier 3 voice drift 至多一行）。§4 正面鼓勵的引導語在 LLM 密度下正是 tell；唯一煞車是軟註「別變口頭禪」，沒有任何維度在執法。</p>
+  </div>
+
+  <div class="card diag">
+    <div class="chips"><span class="chip num">E4</span><span class="chip both">兩條線</span><span class="chip block">⚠ 最致命</span><span class="chip dim">鎖稿凍結</span></div>
+    <p class="why"><b>去味窗口只有鎖稿前那一次。</b>video 鎖稿後 NFA D2 要求口語版逐字照 source、明令不 re-litigate 已認可內容——去味反而被當 D2 違規；handout「已提交＝已授權」使落地的擴充被推定正確、不再為 tone 重審。AI cadence 一旦在唯一窗口漏掉，永久凍結、正常 gate 改不動。</p>
+    <p class="ev"><b>證據：</b>NARRATION-COPYEDIT-RUBRIC 行 12–13「去重會被當成 D2 違規……冗餘只能在這個鎖稿前的 pass 攔下」；NFA D4 範圍限「念出來造成的」彆扭、明文不回頭改 source 散文品質。低 burstiness / 同質聲音正是單一局部 pass 最會漏的瀰漫性質。</p>
+  </div>
+
+  <div class="card diag">
+    <div class="chips"><span class="chip num">E5</span><span class="chip both">兩條線</span><span class="chip high">高</span><span class="chip dim">具名內容 / AI 備援</span></div>
+    <p class="why"><b>marker 只稽核 source/math，不稽核 tone。</b>Claude 被鼓勵納入帶 <code>[source: standard calculus-textbook historical note]</code> 的歷史內容而非自我審查；AI 備援例題只有人工抽查把關。兩者都邀請 puffery（"a revolutionary advance"）直接出貨——只要審稿者查事實、不查語氣就活下來。</p>
+    <p class="ev"><b>證據：</b>README「具名內容……傾向納入……而非為求保險而自我審查」；CONTENT_SOURCING「AI 出題……一律經使用者審核」但無語聲 rubric。外部研究：regression-to-the-mean 把具體事實換成通用讚美（「第一個火車連結器的發明者」→「一位革命性的工業巨人」）。worked-solution 散文（全書大宗）<b>沒有任何語聲範本</b>。</p>
+  </div>
+
+  <div class="card diag">
+    <div class="chips"><span class="chip num">E6</span><span class="chip line">handout</span><span class="chip med">中</span><span class="chip dim">語聲錨點</span></div>
+    <p class="why"><b>整個 house voice 釘在一段 130 字範文上。</b>那段是「定義/動機」型；不像那段的散文就退回模型的「通用教科書」預設——滿足每條 §3 規則、卻聽起來完全不像 Stewart。多作者「抹平 Ch3→Ch7 語聲差異」的目標是<b>減法</b>（消除個人特色），本身就拉向同質、無個性的 AI 散文。</p>
+    <p class="ev"><b>證據：</b>外部研究：few-shot 真範本（STYLL / register-analysis style transfer）遠勝裸標籤「write like Stewart」。去 AI 味與去個人特色兩個目標方向相反，而目前只執行後者。</p>
+  </div>
+
+  <h2>4 · 外部研究（關鍵且可引用）</h2>
+  <p>AI 味是<b>可偵測、但無法靠單一分數</b>的。它分四層 tell，根因是 LLM 退回統計平均、缺乏「節制使用修辭」的 taste：</p>
+  <div class="tellgrid">
+    <div class="tellbox"><h4>lexical 詞彙層</h4><p>delve · crucial · pivotal · underscore · tapestry · realm · landscape · testament · multifaceted · foster · leverage</p></div>
+    <div class="tellbox"><h4>syntactic 句法層</h4><p>tricolon 三段排比 · <code>not just X, it's Y</code> 反襯 · copula avoidance（<code>serves as</code> 取代 <code>is</code>）· negative parallelism</p></div>
+    <div class="tellbox"><h4>structural 結構層</h4><p>signposting 開場 · <code>In summary</code> 總結重述 · listicle 鷹架 · 現在分詞「意義尾巴」(…highlighting its importance)</p></div>
+    <div class="tellbox"><h4>statistical 統計層</h4><p>low burstiness（句長均勻 15–25 字）· low perplexity（用詞可預測）· 高重複、低詞彙多樣性</p></div>
+  </div>
+  <p><b>數學寫作的好聲音</b>（Halmos、Tao、Spivak、Strang、3B1B、Paul's Notes）恰好是 AI 文的反面：動機先於形式、<b>具體數值錨點先於一般式</b>、直覺<b>不 hedge 地說出再收緊</b>、不旁白每個邏輯步、作者在場（<code>we / you / I claim / notice</code>）。AI 數學文則均勻謹慎、過度 signpost、定義冷丟、停在抽象。Tao：「rigour 是用來摧毀壞直覺、同時釐清並提升好直覺，不是消滅所有直覺」——AI 把直覺 hedge 成糊。</p>
+
+  <div class="note warnbox"><b>偵測鐵律：絕對不要用 AI detector 分數當 gate。</b> OpenAI 自家 classifier 26% 真陽 / 9% 偽陽，已下架；對非母語寫作 <b>61% 偽陽性</b>（你們是中文母語團隊寫英文，正中高風險區）；paraphrase 一下 DetectGPT 準確率 70.3%→4.6%。唯一可靠的是「<b>詞彙/結構 checklist + 人審</b>」；自動 lint 只能當 flag-only 路由器，永遠不當判官。</div>
+
+  <h2>5 · 對策（貼著你們現有結構，按 effort 分級）</h2>
+  <p>三個最高槓桿的改動<b>全是 low effort，而且都複用既有機制</b>——建議先做這三個。</p>
+
+  <h3>🟢 三個最便宜的勝利</h3>
+
+  <div class="card rec">
+    <div class="chips"><span class="chip num">R1</span><span class="chip eff">effort: low</span><span class="chip high">priority: high</span><span class="chip unit">PROSE-AUDIT-RUBRIC.md 行 44–51</span></div>
+    <p class="why"><b>替「不算 finding」保護清單加密度天花板。</b>把「§3 鼓勵連接詞、教學重述<b>絕不可當 finding</b>」改成「<b>密度 N 以內是特性、超過就是 finding</b>」。一行改動，把 gate 從<b>保護 tell</b> 翻成<b>抓 tell</b>，補掉最大的漏洞。</p>
+  </div>
+
+  <div class="card rec">
+    <div class="chips"><span class="chip num">R2</span><span class="chip eff">effort: low</span><span class="chip high">priority: high</span><span class="chip unit">NARRATION-COPYEDIT-RUBRIC.md 行 29 / 43</span></div>
+    <p class="why"><b>把 video copyedit 的 voice 檢查從 tier-3「至多一行」解放，加 C6 AI-cadence 維度。</b>因為這是鎖稿前<b>唯一</b>能去味的窗口（見 E4），解放它等於決定「video 線到底有沒有機會去味」。同時把 §4 軟註「別變口頭禪」改成具體頻率預算（某引導語至多每 N 個單元出現一次）。</p>
+  </div>
+
+  <div class="card rec">
+    <div class="chips"><span class="chip num">R3</span><span class="chip eff">effort: low</span><span class="chip high">priority: high</span><span class="chip unit">CONTENT_DIRECTION ⑤ linter lane</span></div>
+    <p class="why"><b>一個 deterministic flag-only 的 AI-tell lint。</b>塞進<b>已存在</b>的 linter lane（那條 lane 本來就 advisory、不擋收斂 → 零誤砍風險）。種子用下方 banned-starter 清單 + Kobak et al. 實證 excess-vocabulary。輸出 highlight 候選餵給 prose gate 當人審預標。上線前先用 §3 範文＋已簽核 ch01 散文校準，確保不誤觸自家數學散文。</p>
+  </div>
+
+  <h3>🟡 中等</h3>
+
+  <div class="card rec">
+    <div class="chips"><span class="chip num">R4</span><span class="chip eff">effort: medium</span><span class="chip med">priority: medium</span><span class="chip unit">PROSE-AUDIT-RUBRIC.md 第三維度</span></div>
+    <p class="why"><b>給 prose rubric 加第三維度 C「語聲 / AI-texture」</b>，密度觸發 blocking（≥3 個 distinct tell / ~500 字才擋，單次合法使用不算）。gate 1 + gate 2 共用（單一真相來源）。可直接貼的草稿見下節。</p>
+  </div>
+
+  <div class="card rec">
+    <div class="chips"><span class="chip num">R5</span><span class="chip eff">effort: medium</span><span class="chip med">priority: medium</span><span class="chip unit">CONTENT_SPEC §3 語聲參考範文</span></div>
+    <p class="why"><b>把單一範文擴成 3–4 段 corpus</b>，特別補上目前完全缺席的 <b>worked-solution 語聲範本</b>，並從<b>已簽核的人寫 ch01 散文</b>取材（範本本身帶真人 burstiness）。涵蓋全書四種散文型：(1) 動機鋪陳 (2) 完整解題 (3) 歷史/應用旁註 (4) 直覺 gloss。同時當 R4 維度 C 的比對目標、CONTENT_SOURCING 改寫例題的語聲目標。</p>
+  </div>
+
+  <h3>🔵 低優先</h3>
+
+  <div class="card rec">
+    <div class="chips"><span class="chip num">R6</span><span class="chip eff">effort: low</span><span class="chip low">priority: low</span><span class="chip unit">Mode A/C 8 項稽核 · source 稽核</span></div>
+    <p class="why"><b>把主觀通讀硬化成清單。</b>Mode A/C 8 項稽核加第 9 項「AI-texture sweep」（複用「補上或記錄」機制）；source-grounding 稽核加一行 tone 檢查「具體可查事實，非通用讚美」——針對歷史/AI 備援例題的 puffery（E5）。</p>
+  </div>
+
+  <h2>6 · 可直接貼進 PROSE-AUDIT-RUBRIC 的第三維度 C 草稿</h2>
+  <div class="rubric"><span class="h">### C. 語聲 AI-texture（新增第三維度；密度觸發 BLOCKING）</span>
+
+讀者「會不會覺得這是機器寫的」。§3 語域權威不變，本維度只審 AI-tell 的密度，不審個別合法用法。
+<span class="b">單一合法用法不算 finding；觸發擋稿的是密度。</span>
+
+- C1 空心 signposting / 連接詞超量 — signpost 開頭（It is worth/important to note、
+  Recall that[無可回查]、In this section we will、Now let us turn our attention to）與
+  「敘述顯而易見步驟」的連接詞（This means that、From this we can see、It follows naturally
+  that）。§3 鼓勵的連接詞仍是特性，但帶密度天花板：同一節超過約每 500 字 3 個 distinct → C1。
+- C2 copula-avoidance — 以 serves as / represents / marks / stands as 取代可用的 is/are。
+- C3 裝飾性 negative parallelism — 'not X but Y' / 'not only…but also'，純為節奏、對比可隱含時。
+- C4 強迫性 rule-of-three — 三形容詞／三子句堆疊為 cadence 而非真有三項。
+- C5 puffery / 借來的宏大 — powerful tool、elegant、profound、fundamental building block、
+  rich tapestry，斷言而非由內容掙得；及無新意的 'In summary, we have seen…' 重述。
+- C6 em-dash 密度 — 散文中 em-dash 作插入語的頻率（§8 已要求謹慎；此處給密度線）。
+
+<span class="b">擋稿線：</span> BLOCKING = 任一節 C1–C6 合計 ≥3 個 distinct AI-tell 落在約 500 字內。
+單一 tell = ADVISORY。收斂判準補一條：該節 AI-texture 通過 = 高密度叢集 = 0。
+
+<span class="b">不算 finding（§3-protected，但加密度天花板）：</span> §3 鼓勵連接詞、刻意教學重複、
+章末回查重述、Informally gloss、topic-term recurrence —— 仍是特性，但任一者在單節內超過
+上述密度即轉 C# finding；舊版「絕不可當 finding」的無上限保護到此為止（這正是 AI scaffolding
+過去被積極辯護而存活的漏洞）。
+
+唯讀、提議不行動，與 A/B 維度同護欄。gate 1（Claude）與 gate 2（Codex）共用本維度。</div>
+
+  <h2>7 · banned-starter 清單（lint 與 C 維度共用種子）</h2>
+  <ul class="banned">
+    <li><code>It is worth / important to note that</code></li>
+    <li><code>It is important to remember</code></li>
+    <li><code>Recall that</code>（無可回查時）</li>
+    <li><code>In this section, we will explore / examine</code></li>
+    <li><code>Now, let us turn our attention to</code></li>
+    <li><code>Let's dive into / Let's explore</code></li>
+    <li><code>This means that</code>（敘述顯而易見步驟）</li>
+    <li><code>From this, we can see that</code></li>
+    <li><code>It follows naturally that</code> / <code>As we can clearly see</code></li>
+    <li><code>In summary / In conclusion / Ultimately / At its core</code>（無新意重述）</li>
+    <li><code>not just X, it's Y</code> / <code>not X, but Y</code></li>
+    <li><code>not only X but also Y</code></li>
+    <li><code>serves as a / stands as a / represents / marks / acts as</code>（copula 迴避）</li>
+    <li><code>plays a crucial / pivotal / vital role in</code></li>
+    <li><code>stands as a testament to</code></li>
+    <li><code>a powerful (and elegant) tool</code></li>
+    <li><code>the fundamental building block of</code></li>
+    <li><code>rich tapestry / ever-evolving landscape / in the realm of</code></li>
+    <li><code>delve into</code></li>
+    <li><code>underscore / underscoring the importance of</code></li>
+    <li><code>highlighting / emphasizing / further enhancing</code>（-ing 意義尾巴）</li>
+    <li><code>Moreover / Furthermore / Additionally</code>（超人類頻率的連接膠）</li>
+    <li><code>powerful, elegant, and profound</code>（裝飾性三段形容詞）</li>
+    <li><code>Here's the idea / Notice that / Watch what happens</code>（video：僅當作為每單元口頭禪重複時，非首次使用）</li>
+  </ul>
+  <p class="ev">詞彙種子另可併入 Kobak et al. 對 1500 萬篇 PubMed 摘要測得的 excess-vocabulary（delve、showcasing、pivotal、crucial、intricate、garner、underscore…），是「實測頻率躍升」而非憑感覺的清單。密度啟發式：同一段 ≥3 個 distinct trigger / ~500 字才 flag，單次合法使用不觸發。</p>
+
+  <h2>8 · 來源</h2>
+  <ul class="refs">
+    <li><a href="https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing">Wikipedia: Signs of AI writing</a> — 目前最完整、可操作的人工 checklist（lexical / syntactic / structural / tonal tells）。</li>
+    <li><a href="https://www.deadlanguagesociety.com/p/rhetorical-analysis-ai">Colin Gorrie, “Why ChatGPT writes like that”</a> — AI 聲音＝三個古典修辭（parallelism / antithesis / tricolon）被無節制濫用。</li>
+    <li><a href="https://terrytao.wordpress.com/career-advice/theres-more-to-mathematics-than-rigour-and-proofs/">Terence Tao, “There's more to mathematics than rigour and proofs”</a> — 直覺與嚴謹應交織，不應 hedge 成糊。</li>
+    <li><a href="https://mathcomm.org/paul-halmos-on-writing-mathematics/">Paul Halmos, “How to Write Mathematics”</a> — 「有話要說」是好說明文最重要的成分；最佳風格是最不礙事的風格。</li>
+    <li><a href="https://news.mit.edu/2023/gilbert-strang-made-linear-algebra-fun-0531">MIT News — Gilbert Strang</a> · <a href="https://mathpop.com/blogs/news/the-spivak-difference-why-his-texts-endure">The Spivak Moment</a> — 動機先於形式、作者在場的數學聲音。</li>
+    <li><a href="https://arxiv.org/pdf/2304.02819">Liang et al., “GPT detectors are biased against non-native English writers”</a> — 非母語偽陽性 61.3%。</li>
+    <li><a href="https://openai.com/index/new-ai-classifier-for-indicating-ai-written-text/">OpenAI AI-text classifier（已下架公告）</a> — 26% 真陽 / 9% 偽陽。</li>
+    <li><a href="https://arxiv.org/pdf/2303.13408">Krishna et al., “Paraphrasing evades detectors”</a> — DetectGPT 70.3%→4.6%。</li>
+    <li><a href="https://arxiv.org/pdf/2406.07016">Kobak et al., “Delving into LLM-assisted writing… excess vocabulary”</a> — 實證詞頻躍升，可作 lint 種子。</li>
+    <li><a href="https://arxiv.org/pdf/2505.00679">“Steering LLMs with Register Analysis”</a> — few-shot 真範本 style transfer 勝裸標籤。</li>
+  </ul>
+
+  <footer>
+    跨產線寫作流程「AI 味」診斷。方法：9-agent workflow（4 平行精讀 pipeline 文檔 + 4 平行外部研究 + 1 合成），佐以人工核對 <code>PROSE-AUDIT-RUBRIC.md</code>／<code>NARRATION-COPYEDIT-RUBRIC.md</code>／<code>CONTENT_SPEC §3</code>。本報告為待裁決交付物——對策 R1–R6 皆「提議、不行動」，等使用者逐條裁決後才落地。檔案位置 <code>REVIEW-ai-flavor-authoring-audit.html</code>（cross-pipeline，置於 repo 根；如要可移入 <code>handout/_audit/</code> 或 <code>video/content_scripts/_audit/</code>）。2026-06-25。
+  </footer>
+</div>
+</body>
+</html>
