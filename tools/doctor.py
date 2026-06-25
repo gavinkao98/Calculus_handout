@@ -43,9 +43,9 @@ def record(status: str, area: str, label: str, detail: str = "") -> None:
     _results.append((status, area, label, detail))
 
 
-def _run(cmd: list[str]) -> tuple[int, str]:
+def _run(cmd: list[str], timeout: int = 30) -> tuple[int, str]:
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
         return r.returncode, ((r.stdout or "") + (r.stderr or "")).strip()
     except FileNotFoundError:
         return 127, "not found"
@@ -245,6 +245,54 @@ def check_fonts() -> None:
                    "（plex / lm / microtype）")
 
 
+# ── ⑥d Plex 文字真的編得出來：實 build 一個 Tex、確認非空（補 kpsewhich 盲點）──
+
+def check_tex_compiles() -> None:
+    """kpsewhich 只證 `.sty` 檔在；**不證** latex→dvisvgm 真能把 Plex 字編成 glyph。
+    踩坑（2026-06-25）：MiKTeX 字型檔名庫（FNDB）stale → latex 找不到 Plex .tfm、fallback 去壞掉的
+    `makemf` → 文字 render 成空白 → 場景一開頭 `IndexError` 崩，但 doctor 全綠（只查 .sty）。
+    這裡實 build 一個 Plex Sans Bold＋Plex Mono 的 Tex（每次用全新 media_dir，壞掉時期的空白快取
+    才不會遮住真壞），斷言 family 有 glyph 點。修法見 ENVIRONMENT.md「Plex 文字 render 成空白」。"""
+    if not VENV_PY.exists() or not shutil.which("latex") or not shutil.which("kpsewhich"):
+        record(INFO, "fonts", "Plex Tex 實編檢查略過", "缺 .venv／latex／kpsewhich（見上方對應區）")
+        return
+    probe = (
+        "import sys, os, json, tempfile\n"
+        "sys.path.insert(0, %r)\n"
+        "os.chdir(%r)\n"
+        "from pipeline import _bootstrap\n"
+        "_bootstrap.bootstrap()\n"
+        "import manim\n"
+        "manim.config.media_dir = tempfile.mkdtemp(prefix='doctor_tex_')\n"  # fresh -> 不吃舊空白快取
+        "_bootstrap.apply_tex_template()\n"
+        "from manim import Tex\n"
+        "import numpy as np\n"
+        "try:\n"
+        "    t = Tex(r'\\textbf{Hg} \\texttt{Hg}')\n"            # Plex Sans Bold + Plex Mono
+        "    n = sum(int(np.asarray(m.points).shape[0]) for m in t.family_members_with_points())\n"
+        "    print('DOCTOR_TEX ' + json.dumps({'ok': n > 0, 'points': n}))\n"
+        "except Exception as e:\n"
+        "    print('DOCTOR_TEX ' + json.dumps({'ok': False, 'error': type(e).__name__ + ': ' + str(e)[:200]}))\n"
+    ) % (str(REPO / "video"), str(REPO))
+    _rc, out = _run([str(VENV_PY), "-c", probe], timeout=120)  # 一次 live latex 編譯，給足時間
+    data: dict = {}
+    for line in (out or "").splitlines():
+        if line.startswith("DOCTOR_TEX "):
+            try:
+                data = json.loads(line[len("DOCTOR_TEX "):])
+            except Exception:
+                data = {}
+    fix = ("字型查找壞（latex fallback 去 makemf）。修：`initexmf --update-fndb` ＋ `initexmf --mkmaps`，"
+           "再刪 `media/Tex` 快取（manim 會沿用舊空白）。詳見 ENVIRONMENT.md「Plex 文字 render 成空白」。")
+    if data.get("ok"):
+        record(PASS, "fonts", "Plex Tex 實編非空",
+               f"latex→dvisvgm 出 {data.get('points')} 個 glyph 點（文字真的 render 得出來）")
+    elif data.get("error"):
+        record(FAIL, "fonts", "Plex Tex 編譯失敗（render 會崩）", f"{data['error']}。{fix}")
+    else:
+        record(FAIL, "fonts", "Plex Tex 實編出空白（render 會崩）", fix)
+
+
 # ── ⑦ API 金鑰（per-machine 祕鑰；未設不算錯，只是提示）────────────────
 
 _KEYS = [
@@ -303,7 +351,7 @@ def print_report(as_json: bool) -> int:
         and not _missing("LaTeX", "latex") and not _missing("LaTeX", "dvisvgm") \
         and not _missing("ffmpeg", "ffmpeg") and not _missing("ffmpeg", "ffprobe") \
         and not _missing("fonts", "plex-sans.sty") and not _missing("fonts", "plex-mono.sty") \
-        and not _missing("fonts", "lmodern.sty")
+        and not _missing("fonts", "lmodern.sty") and not _missing("fonts", "Plex Tex")
     handout_fig_ok = not _missing("handout", "node") and not _missing("handout", "< 21") \
         and not _missing("handout", "Chrome")
     print("\n能力摘要\n" + "─" * 64)
@@ -329,6 +377,7 @@ def main() -> int:
     check_codex()
     check_assets()
     check_fonts()
+    check_tex_compiles()
     check_keys()
     return print_report(as_json)
 

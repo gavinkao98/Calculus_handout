@@ -81,6 +81,18 @@ winget install Google.Chrome
   lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址，故排除需 fontspec 的 `newcomputermodern`。
   （`newtx` 已不再是 video 需求，但仍是 `legacy/tex_handout/` 的需求。）
 - handout 的 HTML 講義**不需要** LaTeX（數學走 MathJax/KaTeX CDN）；只有 `video/` render 需要。
+- **踩坑（2026-06-25）：Plex 文字 render 成空白／場景一開頭 `IndexError` 崩。** 症狀：含文字的場景 render 崩在
+  `IndexError: too many indices for array`（標題 Tex 沒有任何點），或 latex 印 `'miktex-makemf.exe…plxSans-…mf'
+  is not recognized`。**不是缺套件**——`kpsewhich plex-sans.sty` 找得到——而是這台 MiKTeX 的**字型檔名庫（FNDB）
+  stale**：latex 找不到已裝的 Plex `.tfm`，就 fallback 去壞掉的 `makemf`，glyph 描成空白。修法：
+  ```powershell
+  initexmf --update-fndb     # 刷新檔名資料庫，latex 才找得到已裝的 Plex .tfm
+  initexmf --mkmaps          # 重建字型 map（dvisvgm 描 Type1 外框要它）
+  ```
+  修完**還要刪 manim 的 Tex 快取** `media/Tex/`——壞掉時期那批空白 svg 會被 manim 依 hash 沿用，不清就還是空。
+  `doctor.py` 的「Plex Tex 實編非空」檢查（`check_tex_compiles`）會實 build 一個 Plex Tex 抓這個坑（kpsewhich 查
+  `.sty` 在 ≠ 編得出字）。另：MiKTeX 一直印「you have not checked for updates as a MiKTeX user」是同源警告，
+  開一次 MiKTeX Console → Check for updates 可消。
 
 ### ①b 影片字型 — 全走 LaTeX（Plex Sans/Mono 文字 + Latin Modern 數學）
 - Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**：文字 **IBM Plex Sans**（標題/內文）+ **IBM Plex Mono**
