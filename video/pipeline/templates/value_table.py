@@ -164,7 +164,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     tint = None
     if accent_col is not None and 0 <= int(accent_col) < n_cols:
         ac = int(accent_col)
-        tint_h = (0.0 - y) + 0.1
+        tint_h = (0.0 - y) - 0.2   # was +0.1: clamp the panel to ~0.15u padding around the
+        #                            header-top..last-row span (was overhanging both ends)
         tint = Rectangle(width=col_w[ac] + 0.6, height=tint_h,
                          fill_color=T.color(ground, role), fill_opacity=T.ACCENT_DIM,
                          stroke_width=0)

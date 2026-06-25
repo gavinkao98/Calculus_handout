@@ -262,7 +262,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                     color=col,
                     stroke_width=sw,
                 )
-            glow = graph.copy().set_stroke(col, width=16, opacity=0.24)
+            glow = graph.copy().set_stroke(col, width=12, opacity=0.24)
             group = VGroup(glow, graph)
 
             if plot.get("label"):

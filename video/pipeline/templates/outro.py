@@ -88,7 +88,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     if hint is not None:
         blocks.append(Block("end.next", hint, anim="fade", static=False))
 
-    motif = brand.summit_bars(ground, height=0.45, color_role="muted", opacity=0.5)
+    motif = brand.summit_bars(ground, height=0.45, color_role="brand_navy", opacity=0.6)
     motif.move_to([T.FRAME_W / 2 - T.SAFE_MARGIN - motif.width / 2,
                    -T.FRAME_H / 2 + T.SAFE_MARGIN + motif.height / 2, 0])
     blocks.append(Block("motif", motif, anim="fade", static=True, layer="decoration"))
