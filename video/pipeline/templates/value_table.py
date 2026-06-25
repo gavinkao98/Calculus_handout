@@ -102,14 +102,18 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     def cell_role(r: int | None, c: int) -> str:
         # r is None for the header row. The punchline (accent) column/row is the
         # SCENE's accent ink (was hardcoded blue_ink -- so a theorem/amber table still
-        # tinted blue); the row-label column 0 is ink-1; header ink-3; body ink-2.
+        # tinted blue); the row-label column 0 is ink-1; header + body both ink-2 (text).
+        # (Header cells were ink-3/muted -- too dim to read as a column label on the navy
+        # ground + Plex Sans, 2026-06-25; lifted to text so the column labels stay legible.
+        # The hairline rule under the header + the primary col-0 still separate header from
+        # body without dimming it.)
         if accent_col is not None and c == int(accent_col):
             return accent_ink
         if r is not None and accent_row is not None and r == int(accent_row):
             return accent_ink
         if c == 0:
             return "primary"
-        return "muted" if r is None else "text"
+        return "text"
 
     header_mobs = [_cell(c, ground, role=cell_role(None, j), size=38)
                    for j, c in enumerate(header)]

@@ -95,8 +95,12 @@ DARK: dict[str, str] = {
     # default. Flat solid only -- no gradient, per VISUAL-FRAME-RUBRIC house style.)
     "bg_black": "#070e1a", "bg": "#0a1322", "bg_soft": "#0e1a2e",
     "panel": "#13233f", "panel_2": "#172a49",
-    # ink (text on dark)
-    "ink_1": "#eef2fb", "ink_2": "#aab3c6", "ink_3": "#6b748a", "ink_faint": "#444c5e",
+    # ink (text on dark). ink_2 lifted #aab3c6 -> #c6cedd (2026-06-25): the navy ground +
+    # lighter-weight Plex Sans made the old (near-black/Times-tuned) ink_2 read too dim for
+    # teaching annotations/captions/aside bodies (the role="text" tier) at video distance --
+    # the recurring "muted teaching text" finding. Still clearly below ink_1 (lum .62 vs .89)
+    # so the primary↔secondary hierarchy holds; ink_3 (muted=decoration only) is unchanged.
+    "ink_1": "#eef2fb", "ink_2": "#c6cedd", "ink_3": "#6b748a", "ink_faint": "#444c5e",
     # accents (4 working + 1 reserved)
     "blue": "#5cc8ec", "amber": "#f2b13c", "green": "#54d199", "red": "#fb6a5d",
     "violet": "#9d8cf2",
@@ -115,7 +119,7 @@ DARK: dict[str, str] = {
     "math": "#eef2fb",        # -> ink_1  (was electric cyan; math is bright ink now)
     "warning": "#fb6a5d",     # -> red
     "success": "#54d199",     # -> green
-    "text": "#aab3c6",        # -> ink_2  (body prose)
+    "text": "#c6cedd",        # -> ink_2  (body prose; lifted for navy+Plex, see ink_2 note)
     "muted": "#6b748a",       # -> ink_3  (captions / faded)
     "heading": "#eef2fb",     # -> ink_1
     "subtitle": "#6b748a",    # -> ink_3
