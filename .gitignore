@@ -105,8 +105,17 @@ tmp_*.pdf
 .idea/
 *.code-workspace
 
-# Claude Code session state (scheduled tasks, internal bookkeeping)
-.claude/
+# Claude Code: ignore personal/volatile state, but track shared project assets
+# (agents, commands, skills, output styles, shared settings). New shared assets
+# under a whitelisted dir are tracked automatically — no `git add -f` needed.
+# Ignored: settings.local.json (personal), worktrees/ (git work-trees), launch.json
+# (ad-hoc local QA), scheduled_tasks.lock, and anything else under .claude/.
+.claude/*
+!.claude/agents/
+!.claude/commands/
+!.claude/skills/
+!.claude/output-styles/
+!.claude/settings.json
 
 # OS metadata
 Thumbs.db
