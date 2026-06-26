@@ -1,5 +1,7 @@
 # 去「AI 味」方案 Implementation Plan
 
+> ⚠️ **偵測層已 SUPERSEDED（2026-06-26）。** 本檔 Phase 0–2 的「Vale 清單＋Dimension C 數 tell／密度」偵測實作，已由 [`PLAN-deai-semantic-critic.md`](PLAN-deai-semantic-critic.md)（語意/聲音 S/A/V critic）取代；緣由見該檔 §0。下方 Phase 0–4 步驟保留作**已完成工作的紀錄**，但 Dimension C（數 tell/密度）、Ch1 校準門檻、§3 的 Ch1 voice corpus 等均退役或替換——新的逐 task 展開以 semantic-critic 的 implementation plan 為準。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 > **本檔是什麼：** [`PLAN-deai-flavor.md`](PLAN-deai-flavor.md)（設計/決策）的細顆粒度實作展開。設計層的「為什麼、決策、規格」看 `PLAN-deai-flavor.md`；本檔是「逐 task 怎麼做、怎麼驗」。執行者可零背景上手。完整診斷另見 [`REVIEW-ai-flavor-authoring-audit.html`](REVIEW-ai-flavor-authoring-audit.html)。
