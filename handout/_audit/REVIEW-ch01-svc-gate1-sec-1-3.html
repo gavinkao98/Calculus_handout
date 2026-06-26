@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§1.3 The Limit of a Function — 語意/聲音 critic gate 1（待 ⛳，Task 8）</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{--ink:#1a1a1a;--mut:#5b5b5b;--line:#e2e2e2;--accent:#2a4d8f;--pass:#1b7f4b;--pass-bg:#e7f6ee;--warn:#9a6700;--warn-bg:#fff8e1;}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif;color:var(--ink);max-width:880px;margin:0 auto;padding:32px 24px 80px;line-height:1.65;background:#fff}
+  h1{font-size:1.42rem;margin:0 0 4px}
+  h2{font-size:1.12rem;margin:26px 0 8px;padding-top:8px;border-top:2px solid var(--line)}
+  .sub{color:var(--mut);font-size:.92rem;margin:0 0 14px}
+  .verdict{background:var(--pass-bg);border:1px solid #9ed7b6;border-left:5px solid var(--pass);border-radius:10px;padding:13px 17px;margin:14px 0}
+  .verdict b{color:var(--pass)}
+  .pill{display:inline-block;font-weight:700;font-size:.78rem;padding:2px 9px;border-radius:20px;margin:2px 4px 2px 0}
+  .pill.zero{background:var(--pass);color:#fff}
+  .pill.adv{background:var(--warn-bg);color:var(--warn);border:1px solid #f0d680}
+  .card{border:1px solid var(--line);border-radius:10px;margin:13px 0;overflow:hidden;border-left:5px solid var(--warn)}
+  .card.pick{border-left-color:var(--accent)}
+  .card .h{padding:9px 15px;background:var(--warn-bg);font-weight:700;font-size:.93rem;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+  .card.pick .h{background:#eef3fb}
+  .card .bd{padding:11px 15px}
+  .chip{display:inline-block;font-weight:800;font-size:.7rem;padding:1px 6px;border-radius:5px;color:#fff;background:var(--warn)}
+  .id{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.74rem;background:#1d1d1f;color:#fff;padding:1px 7px;border-radius:5px;font-weight:700}
+  .loc{font-size:.79rem;color:var(--mut)}
+  blockquote{margin:7px 0;padding:9px 13px;background:#fafafa;border-left:3px solid #cfcfcf;border-radius:0 8px 8px 0;font-size:.94rem}
+  .lab{font-weight:700;color:var(--accent);font-size:.83rem;margin:7px 0 1px}
+  ins{background:#e7f6ee;text-decoration:none;padding:0 2px} del{background:#fdeceb;padding:0 2px}
+  .rec{background:#eef3fb;border:1px solid #cdddf5;border-radius:7px;padding:7px 12px;font-size:.86rem;margin-top:7px}
+  .rec b{color:var(--accent)}
+  .clean{background:#f6faf7;border:1px solid #cce7d6;border-radius:10px;padding:11px 15px;font-size:.87rem;margin:12px 0}
+  .clean b{color:var(--pass)}
+  code{background:#f0f0f2;padding:1px 5px;border-radius:4px;font-size:.85em}
+  .foot{font-size:.82rem;color:var(--mut);margin-top:24px;border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+
+<h1>§1.3 The Limit of a Function — critic gate 1 <span style="font-weight:400;color:var(--mut)">— 待 ⛳</span></h1>
+<p class="sub">Task 8（Ch1 §1.3）｜gate 1 <code>handout-prose-audit</code>（A/B/C＋錨）｜<code>handout/fragments/ch01/sec-1-3.html</code>｜唯讀</p>
+
+<div class="verdict" style="background:#eef3fb;border-color:#cdddf5;border-left-color:var(--accent)">
+<b style="color:var(--accent)">✓ 已套用 G3-2（2026-06-26）＋回歸通過。</b> <code>sec-1-3.html</code> line 31 加暖化 signpost：<ins>Notice that the definition deliberately sidesteps \(f(a)\):</ins> when we consider…。<code>build.py ch01</code> 綠。回歸：語意保留（核心陳述未變）、signpost→clause 流暢、math 未動 → 無新問題。G3-1（lean keep, clarity）／G3-3 依裁決維持原狀。
+</div>
+
+<div class="verdict">
+<span class="pill zero">0 blocking</span><span class="pill adv">1 tighten (F1)</span><span class="pill adv">2 voice (V1)</span><br>
+<b>§1.3 乾淨。</b>易懂性、S/A 全 clean（Caution 1.5 的 \(\sin(\pi/x)\) 雙表診斷、收尾 \(0/0\)「was what made the limit accessible」都掙得其位）。<b>0 blocking、0 誤傷。</b>3 條 advisory：我建議 <b>G3-2 值得套用</b>（暖化關鍵概念點），G3-1 borderline lean keep、G3-3 keep。
+</div>
+
+<h2>建議套用 — G3-2 暖化「極限忽略 f(a)」這個關鍵點</h2>
+<div class="card pick">
+  <div class="h"><span class="id">G3-2</span><span class="chip" style="background:var(--accent)">V1</span>Voice｜<span class="loc">Definition 1.9 後解拆段（line 31）</span></div>
+  <div class="bd">
+    <blockquote>When we consider \(\lim_{x \to a} f(x)\), we are concerned with the values of \(f(x)\) for \(x\) near \(a\), not with the value of \(f(a)\).</blockquote>
+    <div class="lab">為什麼值得套用</div>
+    <p style="margin:1px 0">本身合格（言之有物，不踩 S/A），但起句偏機械。這是極限定義<b>最易被誤讀之處</b>——「limit 不看 \(f(a)\)」——§3 該暖。加一個輕 signpost 點名「定義刻意繞開 \(f(a)\)」，呼應後文 Figure 1.12 的三函數同極限對照。</p>
+    <div class="rec"><b>建議：套用。</b><ins>Notice that the definition deliberately sidesteps \(f(a)\):</ins> When we consider \(\lim_{x \to a} f(x)\), we are concerned with the values of \(f(x)\) for \(x\) near \(a\), not with the value of \(f(a)\).</div>
+  </div>
+</div>
+
+<h2>Borderline — G3-1（lean keep，clarity 價值）</h2>
+<div class="card">
+  <div class="h"><span class="id">G3-1</span><span class="chip">F1</span>Tighten｜<span class="loc">開節 instantaneous-velocity 引入（line 14）</span></div>
+  <div class="bd">
+    <blockquote>Very often we want the <em>instantaneous velocity</em> — how fast the object is moving at a single moment — <b>rather than the average</b>. To describe this, we let \(h\) shrink toward zero…</blockquote>
+    <div class="lab">踩哪測試＋我的看法</div>
+    <p style="margin:1px 0">F1：agent 判 "rather than the average" 與 em-dash gloss 輕度重述，建議刪。<b>但我評估 borderline：</b>"rather than the average" 是對<b>剛定義的 average velocity</b> 的明確對比，有 clarity 價值（§3 保護「服務清晰度的囉嗦」）。刪了對比變隱含。</p>
+    <div class="rec"><b>建議：lean keep。</b>若你偏好更緊：<del>— rather than the average. To describe this,</del> → <ins>. To describe it,</ins>（agent 版，對比轉隱含）。你定。</div>
+  </div>
+</div>
+
+<h2>Keep — G3-3</h2>
+<div class="card">
+  <div class="h"><span class="id">G3-3</span><span class="chip">V1</span>Voice｜<span class="loc">Example 1.17 表格引入句（line 92）</span></div>
+  <div class="bd">
+    <blockquote>The expression is not defined at \(x = 1\), but we can examine its values for \(x\) near \(1\):</blockquote>
+    <p style="margin:1px 0;font-size:.9rem">言之有物且簡潔得當（"not defined at \(x=1\)" 正是看表的理由）。V1 寬報下列出，但此句的簡潔正是其功能。</p>
+    <div class="rec"><b>建議：維持原狀。</b></div>
+  </div>
+</div>
+
+<h2>乾淨維度（節選證據）</h2>
+<div class="clean">
+<b>全 clean：</b> <b>U1</b> Def 1.9 前有完整動機（average→instantaneous→一般差商→"This is the motivation for the concept of a limit"）；<b>U5</b> 定義後專段解拆「只看 a 附近、不看 f(a)」＋Fig 1.12 三函數同極限；<b>S</b> Caution 1.5（\(\sin(\pi/x)\) 兩張表給矛盾值，診斷「表格只能 suggest、會誤導」）、收尾 \(0/0\) indeterminate 都 object-specific；<b>A</b> 真正非顯然處（表格為何不可靠、\(0/0\) 為何 indeterminate）誠實交代，不犯 A2。
+</div>
+
+<h2>判定與建議</h2>
+<div class="verdict">
+<b>§1.3 通過 gate 1。</b>建議：<b>套用 G3-2</b>（暖化關鍵概念點）；G3-1 lean keep（clarity）、G3-3 keep。你定。
+</div>
+
+<p class="foot">
+<b>下一步（待你 ⛳）：</b>① 套用 G3-2（＋你要的）→ build ch01＋回歸→ 進 §1.4。② 全不動 → 進 §1.4。<br>
+<b>§1.4</b> 已 pilot 過（0 blocking、2 advisory：S3 承接句＋V1 notation 引入），輪到時直接用 pilot findings 裁決、不重審。<br>
+<b>commit：</b>依你政策攢著。
+</p>
+
+</body>
+</html>
