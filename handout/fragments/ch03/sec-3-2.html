@@ -6,12 +6,14 @@
 
        Theorem 3.3 (chain rule); Proposition 3.3 (Def1⇔Def2 equivalence);
        Definition 3.1 (remainder form — the chapter's first Definition);
-       Example 3.4 (single composition), 3.5 (nested composition);
+       Example 3.4 (single composition), 3.5 (nested composition),
+         3.6 (chain×quotient), 3.7 (chain×product), 3.8 (Leibniz rates);
+         [3.6–3.8 added by Mode C wave-① example supplement, 2026-06-26, CLP-1 §2.9]
        Figure 3.5 (composed mapping), 3.6 (tangent / remainder-form linear
          approximation); Remark 3.2 (Leibniz form);
        Strategy 3.1 (chain-rule decomposition — the chapter's first Strategy);
        Caution is unnumbered (per ch02). §3.3 continues from Theorem 3.4,
-       Proposition 3.4, Definition 3.2, Example 3.6, Figure 3.7, Remark 3.3,
+       Proposition 3.4, Definition 3.2, Example 3.9, Figure 3.7, Remark 3.3,
        Strategy 3.2.
 
      ③ decisions: Definition treatment = Option B (the §2.2 limit definition
@@ -206,6 +208,68 @@
             &= \frac{\sin x \cos x}{\sqrt{1 + \sin^{2} x}}.
         \end{aligned} \]</p>
         <p>Each layer contributes exactly one factor: \(\tfrac12 u^{-1/2}\) from the square root, \(2\sin x\) from squaring, and \(\cos x\) from the sine. Their product is the derivative — the slopes multiply down the chain, just as Figure 3.5 pictures.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — chain rule × quotient rule: the inner derivative is itself a §2.5 quotient-rule computation (Mode C example supplement) [pass: enrichment] [source: CLP-1 §2.9 Procedural, 2009H variant; stated for x>1, the branch where √((x-1)/(x+2))=√(x-1)/√(x+2) — the function is also differentiable on x<-2] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.6</span></p>
+      <div class="env-body">
+        <p>Differentiate \(\sqrt{\dfrac{x - 1}{x + 2}}\) for \(x > 1\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The outermost operation is the square root, so by Strategy 3.1 take \(f(u) = \sqrt{u} = u^{1/2}\) with inner function \(u = \dfrac{x - 1}{x + 2}\). The chain rule gives</p>
+        <p>\[ \frac{d}{dx}\sqrt{\frac{x - 1}{x + 2}} = \frac{1}{2\sqrt{(x - 1)/(x + 2)}}\cdot\frac{d}{dx}\!\left(\frac{x - 1}{x + 2}\right). \]</p>
+        <p>The inner derivative is now a quotient-rule computation (§2.5):</p>
+        <p>\[ \frac{d}{dx}\!\left(\frac{x - 1}{x + 2}\right) = \frac{(x + 2)\cdot 1 - (x - 1)\cdot 1}{(x + 2)^{2}} = \frac{3}{(x + 2)^{2}}. \]</p>
+        <p>Substituting, and writing \(\dfrac{1}{2\sqrt{(x - 1)/(x + 2)}} = \dfrac{\sqrt{x + 2}}{2\sqrt{x - 1}}\),</p>
+        <p>\[ \frac{d}{dx}\sqrt{\frac{x - 1}{x + 2}} = \frac{\sqrt{x + 2}}{2\sqrt{x - 1}}\cdot\frac{3}{(x + 2)^{2}} = \frac{3}{2\sqrt{x - 1}\,(x + 2)^{3/2}} \qquad (x > 1). \]</p>
+        <p>The chain rule does not finish the job by itself: the factor it asks for — the derivative of the inside — is a small problem of its own, here a quotient rule.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — chain rule × product rule, with the chain applied to the trigonometric power cos²x = [cos x]² (Mode C example supplement) [pass: enrichment] [source: CLP-1 §2.9 Procedural, 1996D] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.7</span></p>
+      <div class="env-body">
+        <p>Differentiate \(y = (1 + x^{2})\cos^{2} x\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The outermost operation is a product, so begin with the product rule (§2.5):</p>
+        <p>\[ y' = (2x)\cos^{2} x + (1 + x^{2})\,\frac{d}{dx}\bigl(\cos^{2} x\bigr). \]</p>
+        <p>The remaining derivative needs the chain rule, since \(\cos^{2} x = [\cos x]^{2}\) is a composition — outer function \((\,\cdot\,)^{2}\), inner function \(\cos x\):</p>
+        <p>\[ \frac{d}{dx}\bigl(\cos^{2} x\bigr) = 2\cos x\cdot(-\sin x) = -2\sin x\cos x. \]</p>
+        <p>Therefore</p>
+        <p>\[ y' = 2x\cos^{2} x - 2(1 + x^{2})\sin x\cos x. \]</p>
+        <p>The two rules cooperate: the product rule splits the work into two terms, and the chain rule supplies the slope factor inside the second. Neither alone differentiates this function.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — the Leibniz form as composed rates: signs multiply along a dependency chain (Mode C example supplement; demonstrates Remark 3.2) [pass: enrichment] [source: CLP-1 §2.9 Conceptual] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.8</span></p>
+      <div class="env-body">
+        <p>In a harbour, the amount of kelp \(K\) depends on the urchin population \(U\) — urchins eat kelp — and \(U\) in turn depends on the otter population \(O\), since otters eat urchins. Use the chain rule to decide whether \(\dfrac{dK}{dO}\) is positive or negative.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Read off the sign of each link first. More urchins means less kelp, so \(K\) decreases as \(U\) increases: \(\dfrac{dK}{dU} < 0\). More otters means fewer urchins, so \(\dfrac{dU}{dO} < 0\). The chain rule in Leibniz form (Remark 3.2) chains the two rates:</p>
+        <p>\[ \frac{dK}{dO} = \frac{dK}{dU}\cdot\frac{dU}{dO}. \]</p>
+        <p>A product of two negative numbers is positive, so \(\dfrac{dK}{dO} > 0\): more otters ultimately means more kelp. This is the formal version of the two-step argument — otters thin out the urchins, and fewer urchins let the kelp recover — with each \(dy/du\) factor carrying the sign of one link and the signs multiplying along the chain.</p>
       </div>
     </section>
   </div>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 3 課文範例補充——套用報告（2026-06-26）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.7;
+         max-width: 52rem; margin: 2rem auto 5rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.45rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.15rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.2rem; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .2rem 0 1rem; }
+  .meta code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; margin: .8rem 0 1.2rem; }
+  th, td { border: 1px solid #c9d3dd; padding: .4rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #e9eff5; }
+  .pass { background: #e3efe3; color: #20602a; font-weight: 600; padding: .05rem .5rem; border-radius: 999px; font-size: .8rem; }
+  .adv  { background: #fdf2dd; color: #8a5a00; font-weight: 600; padding: .05rem .5rem; border-radius: 999px; font-size: .8rem; }
+  .ok { color: #20602a; font-weight: 700; }
+  .summary-box { background: #e9eff5; border: 1px solid #a4b8cc; border-radius: 8px; padding: .9rem 1.1rem; margin: 1.2rem 0; }
+  .adv-card { background: #fdf8ed; border-left: 5px solid #d9a514; border-radius: 6px; padding: .6rem .9rem; margin: .6rem 0; font-size: .92rem; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+  code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .85em; }
+</style>
+</head>
+<body>
+
+<h1>Ch 3 課文範例補充——套用報告（Mode C 第①波）</h1>
+<p class="meta">2026-06-26 ・ 工作流程 <code>CONTENT_SOURCING.md</code> ・ 選題 subagent <code>.claude/agents/example-supplement.md</code>（本輪新建）・
+裁決稿 <code>handout/_dev-archive/ch03/ch03_example-supplement-review.html</code>（含每例完整 Example＋Solution 全文）。
+本檔記錄<strong>實際落地的內容＋範圍限定 Mode B gate-1 稽核結果</strong>。</p>
+
+<div class="summary-box">
+<strong>結果：</strong>使用者裁決「全收 4 條」→ import pass 落地 4 個 worked example（全部 CLP-1 對症真題、CC BY-NC-SA 4.0）。
+全章 Example 手動重編號 <strong>3.1 → 3.16</strong>。<strong>雙閘跨模型複核：</strong>gate-1（Claude 三路）<strong class="ok">0 blocking</strong>＋3 advisory；gate-2（Codex gpt-5.5 xhigh，121k tokens）<strong>2 blocking → 已修 → 回歸 PASS</strong>。
+build + render 自驗全綠。<strong>幻覺未穿過任一模型。</strong>
+</div>
+
+<h2>落地的 4 個 worked example</h2>
+<table>
+<tr><th>新編號</th><th>節</th><th>內容</th><th>缺口</th><th>來源（CC BY-NC-SA 4.0）</th></tr>
+<tr><td><strong>Example 3.6</strong></td><td>§3.2</td><td>\(\dfrac{d}{dx}\sqrt{\dfrac{x-1}{x+2}}\)（chain × quotient；內層導數需 §2.5 商規則）</td><td>L2</td><td><code>CLP-1 §2.9 [2009H]</code>，輕改</td></tr>
+<tr><td><strong>Example 3.7</strong></td><td>§3.2</td><td>\(\dfrac{d}{dx}(1+x^2)\cos^2 x\)（chain × product；\(\cos^2x=[\cos x]^2\)）</td><td>L2</td><td><code>CLP-1 §2.9 [1996D]</code>，照搬</td></tr>
+<tr><td><strong>Example 3.8</strong></td><td>§3.2</td><td>otter→urchin→kelp 的 \(\dfrac{dK}{dO}\) 符號（Leibniz 形 rate×rate，示範 Remark 3.2）</td><td>L1</td><td><code>CLP-1 §2.9 Conceptual</code>，輕改</td></tr>
+<tr><td><strong>Example 3.13</strong></td><td>§3.3</td><td>\(\dfrac{d}{dx}(x+1)(x^2+1)^2(x^3+1)^3\)（log-diff 乘積式；兌現 Strategy 3.2 未示範用途）</td><td>L2</td><td><code>CLP-1 §2.10 5-factor 截 3</code>，輕改</td></tr>
+</table>
+
+<p class="small"><strong>重編號 cascade：</strong>§3.2 在 Ex 3.5 後 +3（3.6/3.7/3.8）→ §3.3 既有 7 例 cascade +3（舊 3.6–3.12 → 3.9/3.10/3.11/3.12 與 3.14/3.15/3.16），中間插入 3.13。3 處渲染 cross-ref 同步更新（x^x 解內 ln′ ref → Example 3.9、(x ln x−x) 解內 x^x ref → 3.10、arccos′ 解內 arcsin′ ref → 3.14）。Theorem/Proposition/Definition/Figure/Remark/Strategy 編號不受影響（只插 example）。</p>
+
+<h2>範圍限定 Mode B 稽核（gate-1，只審 4 個新 [pass: enrichment] 標記）</h2>
+<p class="meta">Claude 三路平行（① math：sympy 1.14 逐例重算　② faithfulness：對 <code>prob_s2.9/2.10.tex</code> 逐字核源＋license＋語域去 AI 味　③ D-邊界＋編號整合）＋ 對抗式綜合裁決。</p>
+<table>
+<tr><th>鏡頭</th><th>結果</th><th>重點</th></tr>
+<tr><td>數學正確性</td><td><span class="pass">0 blocking</span></td><td>4 例導數經 sympy 獨立重算，與講義式差 = 0（3.6/3.7/3.13）；3.8 Leibniz 符號推理具體模型複現。</td></tr>
+<tr><td>來源忠實＋語域</td><td><span class="pass">0 blocking</span></td><td>4 例題幹/解/官方答逐一對 .tex 吻合；license 檔頭屬實；改作揭露誠實；語域清楚、無 AI-tell；marker 格式（<code>[pass:]</code> 在 <code>[source:]</code> 前）正確。</td></tr>
+<tr><td>D-邊界＋編號整合</td><td><span class="pass">0 blocking · 0 advisory</span></td><td>§3.2 例僅用 power/sin-cos/§2.5（無 e^x/ln/arcsin，不踩 D6/D7/D10）；§3.13 ln 當工具（不踩 D8）；皆完整解非 bare exercise（§14）；Example 連續 3.1–3.16、0 dangling。</td></tr>
+</table>
+
+<h3>3 條 advisory 與處置（全 propose-only）</h3>
+<div class="adv-card"><span class="adv">A2 已套</span> <strong>Ex 3.13 來源序號 <code>#34</code> 不可核實。</strong>CLP-1 §2.10 該題為無編號 <code>\begin{Mquestion}</code>，<code>#34</code> 無法從 .tex 推得（題目與方法已正確指認）。→ marker 改為 <code>[source: CLP-1 §2.10 Procedural, 5-factor log-diff product (truncated 5→3 factors, log→ln)]</code>，不再依賴外發行序號。</div>
+<div class="adv-card"><span class="adv">A1 維持現狀</span> <strong>Ex 3.6 定義域標 \((x>1)\) 未提 \(x<-2\) 支。</strong>真實可微域是 \(x<-2 \cup x>1\)，但末式經由「只在 \(x>1\) 成立的 \(\sqrt{}\) 拆解」取得，故 \((x>1)\) 標註<strong>自洽無誤</strong>，且與 CLP 官方答案形式一致。本例重點是 chain×quotient 機制 → 維持現狀（不為完整性犧牲教學焦點）。</div>
+<div class="adv-card"><span class="adv">A3 維持現狀</span> <strong>Ex 3.13 \((x>0)\) 比方法所需 \((x>-1)\) 保守。</strong>\(x>0\) 是乾淨安全的選擇、教學上無誤；改 \(x>-1\) 屬 editorial drift、非必要 → 維持現狀。</div>
+
+<h2>選題稽核（gate-2，Codex gpt-5.5 xhigh 跨模型獨立複核）</h2>
+<p class="meta">`codex exec -s read-only`、ChatGPT 訂閱配額（事前經同意）、121,425 tokens、`--output-schema` 結構化。Codex 自讀 fragments＋PLAN＋CLP `.tex` 為 ground truth。findings 留版控於 <code>handout/_dev-archive/ch03/ch03_example-supplement-audit.md</code>。</p>
+<p><strong>結果：2 blocking → 已修 → 回歸 PASS。</strong>（其餘：3.7/3.8 重算正確、來源逐字吻合；license CC BY-NC-SA 4.0 屬實；aptness／D-邊界皆過。）gate-1（Claude）把這兩點判 advisory、gate-2（Codex）判 blocking——採從嚴修正，零教學代價；幻覺未穿過任一模型。</p>
+<div class="adv-card" style="border-left-color:#c0392b;background:#fdf0f0"><span class="adv" style="background:#fde2e0;color:#9a2820">B1 已修</span> <strong>Ex 3.6（math）：</strong>原題未限定 \(x\)，但解的 \(\sqrt{(x-1)/(x+2)}=\sqrt{x-1}/\sqrt{x+2}\) 拆解只在 \(x>1\) 為實，silently 丟了 \(x<-2\) 支。→ 題目改「Differentiate \(\sqrt{(x-1)/(x+2)}\) <strong>for \(x>1\)</strong>」，marker 補揭露 \(x<-2\) 支亦可微。採 Codex option A（限定域、保教學焦點），與 CLP 官方答案隱含域一致。</div>
+<div class="adv-card" style="border-left-color:#c0392b;background:#fdf0f0"><span class="adv" style="background:#fde2e0;color:#9a2820">B2 已修</span> <strong>Ex 3.13（faithfulness）：</strong>marker 揭露了 5→3 截斷與 log→ln，但漏揭露「本書自加 \(x>0\)」這個改動（CONTENT_SOURCING 要求逐筆揭露）。→ marker 補「domain restricted to x>0 so all three log factors stay positive」。</div>
+
+<h2>build + render 自驗</h2>
+<table>
+<tr><th>檢查</th><th>結果</th></tr>
+<tr><td>Example 編號連續性（DOM 實測）</td><td class="ok">3.1 → 3.16 連續，無跳號無重複</td></tr>
+<tr><td>交叉引用 resolve</td><td class="ok">全部對到既有 env-num，0 dangling</td></tr>
+<tr><td>KaTeX/MathJax 錯誤</td><td class="ok">0</td></tr>
+<tr><td>未渲染數學式（殘留 \( / \[）</td><td class="ok">0</td></tr>
+<tr><td>圖 hydrate</td><td class="ok">7 / 7</td></tr>
+<tr><td>build.py ch03</td><td class="ok">成功重生 chapter3-print-standalone.html</td></tr>
+</table>
+
+<p class="small" style="margin-top:1.8rem">— Mode C 第①波收斂（gate-1 0 blocking）。<strong>待辦</strong>：① Codex 選題稽核 gate-2（跨模型獨立複核，計費——動用前徵同意）；② commit（需授權）；③ Mode C 第②波軟深度（ch03 剩 1 條 caution 候選，<code>REVIEW-ch03-modec-enrichment.html</code>）；④ 後續四閘——圖正確性 gate-2／數學 M1–M8／S·A·V 散文／prose A·B。</p>
+
+</body>
+</html>

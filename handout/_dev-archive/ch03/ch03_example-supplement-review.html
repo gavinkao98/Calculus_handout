@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 3 課文範例補充——審核文件（2026-06-26）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.75;
+         max-width: 52rem; margin: 2rem auto 6rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.5rem; }
+  h3 { font-size: 1.02rem; margin: 1.8rem 0 .4rem; }
+  .badge { display: inline-block; font-size: .72rem; padding: .05rem .5rem; border-radius: 999px;
+           vertical-align: middle; margin-left: .45rem; font-weight: 600; }
+  .hi   { background: #dbe9fb; color: #1f4e79; }
+  .med  { background: #fdf2dd; color: #8a5a00; }
+  .l1   { background: #fde2e0; color: #9a2820; }
+  .l2   { background: #fdf2dd; color: #8a5a00; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .1rem 0 .6rem; }
+  .meta code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  .why  { font-size: .92rem; background: #f2f6fa; border-left: 4px solid #8aa6c0; padding: .5rem .8rem; margin: .6rem 0; }
+  .ex   { border: 1px solid #bcd6bc; border-left: 5px solid #2e7d32; border-radius: 6px;
+          background: #f6faf6; padding: .7rem 1rem; margin: .7rem 0 0; }
+  .sol  { border: 1px solid #d7dde3; border-left: 5px solid #90a0b0; border-radius: 6px;
+          background: #f7f8f9; padding: .7rem 1rem; margin: .35rem 0 .8rem; }
+  .ex::before  { content: "Example（擬補）"; font-weight: 700; color: #2e7d32; display: block; font-size: .8rem; letter-spacing: .04em; }
+  .sol::before { content: "Solution"; font-weight: 700; color: #5b6b7b; display: block; font-size: .8rem; letter-spacing: .06em; }
+  .prov { font-size: .82rem; color: #5b6b7b; margin: .2rem 0 0; }
+  .prov code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; }
+  .note { font-size: .9rem; background: #fff8e8; border-left: 4px solid #d9a514; padding: .5rem .8rem; margin: .5rem 0 1rem; }
+  .gap-l1 { background: #fdf0f0; border-left: 5px solid #c0392b; border-radius: 6px; padding: .7rem 1rem; margin: .7rem 0; }
+  .gap-l2 { background: #fdf8ed; border-left: 5px solid #d9a514; border-radius: 6px; padding: .7rem 1rem; margin: .7rem 0; }
+  .covered { background: #f0f8f0; border-left: 5px solid #27ae60; border-radius: 6px; padding: .5rem 1rem; margin: .4rem 0; font-size: .92rem; }
+  .summary-box { background: #e9eff5; border: 1px solid #a4b8cc; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; }
+  pre.verdict { background: #102536; color: #e8eef4; padding: 1rem 1.2rem; border-radius: 8px; font-size: .9rem; line-height: 1.9; overflow-x: auto; white-space: pre-wrap; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: .8rem 0 1.2rem; }
+  th, td { border: 1px solid #c9d3dd; padding: .35rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #e9eff5; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+  details { margin: .6rem 0; font-size: .88rem; color: #475467; }
+  details summary { cursor: pointer; font-weight: 600; color: #5b6b7b; }
+  details ul { margin: .4rem 0; padding-left: 1.2rem; }
+  details li { margin: .25rem 0; }
+</style>
+</head>
+<body>
+
+<h1>Ch 3 課文範例補充——審核文件（Mode C 第①波）</h1>
+<p class="meta">2026-06-26 ・ 框架：題庫補的是<strong>課文內的 worked examples</strong>（講義不收習題，習題另出獨立習題本）。
+工作流程契約：<code>CONTENT_SOURCING.md</code>；選題 subagent：<code>.claude/agents/example-supplement.md</code>。
+每筆附完整擬改寫的 Example＋Solution——你審的就是會印出來的內容。來源優先序：手稿（已出貨）→ <strong>CLP-1 對症真題</strong>（本批全部）→ authored（本批 0）。</p>
+
+<!-- ===================== 裁決表 ===================== -->
+<h2>怎麼回覆（裁決表）</h2>
+<pre class="verdict">§3.1：0 候選（已飽和；唯一對症題違 D-邊界——詳見下）　→ 同意 / 有異議 ___
+
+§3.2（CLP-1 §2.9）：
+  3.2-E1  chain × quotient   √((x-1)/(x+2))      [high]   收 / 不收 ___
+  3.2-E2  chain × product    (1+x²)cos²x         [med]    收 / 不收 ___
+  3.2-E3  Leibniz 形 rate×rate  otter/urchin/kelp [med]   收 / 不收 ___
+
+§3.3（CLP-1 §2.10）：
+  3.3-E1  log-diff 乘積式    (x+1)(x²+1)²(x³+1)³  [high]   收 / 不收 ___
+
+回覆範例：「3.2-E1、3.2-E3、3.3-E1 收；E2 不收」或「全收」或「只收 high 兩條」。
+裁決通過後 →（可選）Codex 選題稽核 gate-2（計費、另徵同意）→ import pass（插入 fragment → 手動重編號 → build.py 重生）。</pre>
+
+<!-- ===================== 缺口分析摘要 ===================== -->
+<h2>缺口分析摘要</h2>
+<div class="summary-box">
+<strong>結論：</strong>Layer 1 正式缺口 <strong>1</strong> 個（§3.2 Remark 3.2 Leibniz 形零示範）、Layer 2 soft gap <strong>3</strong> 個（§3.2 chain×quotient、chain×product；§3.3 log-diff 乘積式）。<br>
+本批擬補 <strong>4</strong> 筆，全部 CLP-1 對症真題（附官方完整解）、CC BY-NC-SA 4.0、數學已核（§3.3 經 CAS 驗算）。§3.1 乾淨無缺口。
+</div>
+
+<table>
+<tr><th>節</th><th>既有 Example</th><th>本批擬補</th><th>缺口型</th></tr>
+<tr><td>§3.1 Sine &amp; Cosine</td><td>3（Ex 3.1–3.3）</td><td><strong>+0</strong></td><td>—（飽和）</td></tr>
+<tr><td>§3.2 The Chain Rule</td><td>2（Ex 3.4–3.5）</td><td><strong>+1～3</strong></td><td>L1×1 + L2×2</td></tr>
+<tr><td>§3.3 Applications</td><td>7（Ex 3.6–3.12）</td><td><strong>+0～1</strong></td><td>L2×1</td></tr>
+</table>
+
+<p class="small"><strong>系統性薄點：</strong>§3.1／§3.3 在 Mode A 已寫得很滿（§3.3 達 7 例），補題空間小。<strong>真正的薄點集中在 §3.2</strong>：現有 Ex 3.4／3.5 都是「純 composition」（內層導數一步可得），從未示範「chain rule 與 Ch2 product/quotient 規則接合」（內層導數自身是一道題），也從未用 worked example 走 Remark 3.2 的 Leibniz「rate × rate」表徵。§3.3 則缺 Strategy 3.2 明列卻沒示範的「乘積式 log diff」。</p>
+
+<!-- ===================== §3.1 ===================== -->
+<h2>§3.1 Derivatives of the Sine and Cosine Functions —— 無缺口</h2>
+<div class="covered">
+3 個 worked example（Ex 3.1 companion limit、Ex 3.2 tan′/sec′、Ex 3.3 SHM）＋2 Prop＋2 Thm＋Caution＋Remark＋4 圖，覆蓋飽和。
+</div>
+<div class="note"><strong>唯一被評估但駁回的缺口：</strong>Proposition 3.2（\(\lim_{\theta\to0}\sin\theta/\theta=1\)）證後，確實沒有 example 示範「把外觀不同的 \(0/0\) 極限代換回 \(\sin\theta/\theta\)」（如 \(\sin5x/x\to5\)）。但 CLP-1 §2.8 的對症題（及其簡化版）都需要「把複合內層 \(5x\to0\) 送進極限」——這在本書是 <strong>chain-rule 式的代換動作，而 §3.1 尚未引入 chain rule（§3.2 才引入）</strong>，違 PLAN-ch03 §3 的 D-邊界。故此處 0 候選；若日後要補，宜放在 §3.2 chain rule <em>之後</em>。<br><span class="small">（這也修正了我先前 <code>REVIEW-ch03-modec-enrichment.html</code> 把 sinθ/θ 代換例放 §3.1 的提案。）</span></div>
+
+<!-- ===================== §3.2 ===================== -->
+<h2>§3.2 The Chain Rule —— L1×1 + L2×2</h2>
+
+<div class="gap-l2"><strong>L2：chain rule × quotient rule 從未示範。</strong>現有 Ex 3.4／3.5 內層導數都一步可得（\(2x\) 或 \(\cos x\)）；沒有任何例子的「內層導數本身是一道 Ch2 規則的計算」。</div>
+
+<h3>3.2-E1 <span class="badge hi">high</span><span class="badge l2">L2</span>　chain × quotient</h3>
+<div class="ex">
+<p>Differentiate \( \sqrt{\dfrac{x-1}{x+2}} \).</p>
+</div>
+<div class="sol">
+<p>The outermost operation is the square root, so by Strategy 3.1 take \(f(u)=\sqrt{u}=u^{1/2}\) with inner \(u=\dfrac{x-1}{x+2}\). The chain rule gives</p>
+<p>\[ \frac{d}{dx}\sqrt{\frac{x-1}{x+2}}=\frac{1}{2\sqrt{(x-1)/(x+2)}}\cdot\frac{d}{dx}\!\left(\frac{x-1}{x+2}\right). \]</p>
+<p>The inner derivative is now a quotient-rule computation (§2.5):</p>
+<p>\[ \frac{d}{dx}\!\left(\frac{x-1}{x+2}\right)=\frac{(x+2)\cdot 1-(x-1)\cdot 1}{(x+2)^2}=\frac{3}{(x+2)^2}. \]</p>
+<p>Substituting, and writing \(\dfrac{1}{2\sqrt{(x-1)/(x+2)}}=\dfrac{\sqrt{x+2}}{2\sqrt{x-1}}\),</p>
+<p>\[ \frac{d}{dx}\sqrt{\frac{x-1}{x+2}}=\frac{\sqrt{x+2}}{2\sqrt{x-1}}\cdot\frac{3}{(x+2)^2}=\frac{3}{2\sqrt{x-1}\,(x+2)^{3/2}}\qquad(x>1). \]</p>
+<p>The point is that the chain rule does not finish the job by itself: the factor it asks for — the derivative of the inside — is a small problem of its own, here a quotient rule.</p>
+</div>
+<p class="prov"><strong>source:</strong> <code>[source: CLP-1 §2.9 Procedural (2009H 變式)]</code>　·　<strong>license:</strong> CC BY-NC-SA 4.0　·　<strong>rewrite:</strong> 輕改（照搬計算骨架；補 domain \(x>1\)；明引 Strategy 3.1／§2.5）。答案與官方一致。</p>
+<div class="why"><strong>why（teaching function）：</strong>首次示範「內層導數自身需要一條 Ch2 規則」——把 Strategy 3.1 第 4 步「multiply by the derivative of the inside」落實到 inside 非平凡的情形。導數庫全在 §3.2 範圍（power＋§2.5 quotient），不踩 D7。</div>
+
+<div class="gap-l2"><strong>L2：chain rule × product rule 從未示範</strong>，且 \(\cos^2x=[\cos x]^2\)「三角冪是 composition」的辨識沒被單獨擺到 product 結構裡。</div>
+
+<h3>3.2-E2 <span class="badge med">medium</span><span class="badge l2">L2</span>　chain × product</h3>
+<div class="ex">
+<p>Differentiate \( y=(1+x^{2})\cos^{2}x \).</p>
+</div>
+<div class="sol">
+<p>The outermost operation is a product, so start with the product rule (§2.5):</p>
+<p>\[ y'=(2x)\cos^{2}x+(1+x^{2})\,\frac{d}{dx}\bigl(\cos^{2}x\bigr). \]</p>
+<p>The second factor's derivative needs the chain rule, since \(\cos^{2}x=[\cos x]^{2}\) is a composition (outer \((\cdot)^{2}\), inner \(\cos x\)):</p>
+<p>\[ \frac{d}{dx}\bigl(\cos^{2}x\bigr)=2\cos x\cdot(-\sin x)=-2\sin x\cos x. \]</p>
+<p>Therefore</p>
+<p>\[ y'=2x\cos^{2}x-2(1+x^{2})\sin x\cos x. \]</p>
+<p>Reading the structure: the product rule splits the work into two terms, and the chain rule supplies the slope factor inside the second term. The two rules cooperate — neither alone differentiates this function.</p>
+</div>
+<p class="prov"><strong>source:</strong> <code>[source: CLP-1 §2.9 Procedural (1996D)]</code>　·　<strong>license:</strong> CC BY-NC-SA 4.0　·　<strong>rewrite:</strong> 照搬／輕改（步驟原樣；加一句結構解讀）。答案與官方逐字一致。</p>
+<div class="why"><strong>why：</strong>補「product 切兩項、chain 供其一項內層斜率」的接合，與 E1 的 chain×quotient 成對。標 medium：與 E1 同屬「chain＋Ch2 規則」家族，若只收一個，E1（內層更不平凡）優先。</div>
+
+<div class="gap-l1"><strong>L1（正式缺口）：Remark 3.2 的 Leibniz 形 \(\frac{dy}{dx}=\frac{dy}{du}\cdot\frac{du}{dx}\) 全節零示範。</strong>現有例都走函數記號 \(f'(g(x))\,g'(x)\) 的機械代入，從未走「rate × rate」推理。</div>
+
+<h3>3.2-E3 <span class="badge med">medium</span><span class="badge l1">L1</span>　Leibniz 形（rate × rate）</h3>
+<div class="ex">
+<p>In a harbour, the amount of kelp \(K\) depends on the urchin population \(U\) (urchins eat kelp), and \(U\) in turn depends on the otter population \(O\) (otters eat urchins). Using the chain rule, decide whether \(\dfrac{dK}{dO}\) is positive or negative.</p>
+</div>
+<div class="sol">
+<p>First read off the sign of each link. More urchins means less kelp, so \(K\) decreases as \(U\) increases: \(\dfrac{dK}{dU}<0\). More otters means fewer urchins, so \(\dfrac{dU}{dO}<0\). The chain rule in Leibniz form (Remark 3.2) chains the two rates:</p>
+<p>\[ \frac{dK}{dO}=\frac{dK}{dU}\cdot\frac{dU}{dO}. \]</p>
+<p>A product of two negative numbers is positive, so \(\dfrac{dK}{dO}>0\): more otters ultimately means more kelp. This matches the plain-language reasoning — otters cut the urchins, and fewer urchins lets the kelp recover — and the chain rule is exactly the formal version of that two-step argument: each \(dy/du\) factor carries the sign of one link, and the signs multiply along the chain.</p>
+</div>
+<p class="prov"><strong>source:</strong> <code>[source: CLP-1 §2.9 Conceptual (otters/urchins/kelp)]</code>　·　<strong>license:</strong> CC BY-NC-SA 4.0　·　<strong>rewrite:</strong> 輕改（縮短官方逐一以差分商論證各 link 的長段；明引 Remark 3.2）。三個符號判定與官方一致。</p>
+<div class="why"><strong>why：</strong>補 Remark 3.2 的 Leibniz「rate 複合」示範——chain rule 的 meaning（非 mechanics）那一面。標 medium：屬<em>概念型</em>，與 §3.2 偏計算的既有例風格略異；若你偏好全計算型，可只收 E1／E2。我個人覺得這條值得收——Leibniz 形目前真的零示範，而這題優雅。</div>
+
+<!-- ===================== §3.3 ===================== -->
+<h2>§3.3 Applications of the Chain Rule —— L2×1</h2>
+
+<div class="gap-l2"><strong>L2：Strategy 3.2 明列 log diff 適用於「a sprawling product and quotient of many factors」，但 3 個 log-diff 例（3.7 \(x^x\)、3.8 \(2^x\)）全是「變數指數」型——「乘積化成對數和」的那半從未被任一例示範。</strong></div>
+
+<h3>3.3-E1 <span class="badge hi">high</span><span class="badge l2">L2</span>　log-diff 乘積式</h3>
+<div class="ex">
+<p>Differentiate \( y=(x+1)(x^{2}+1)^{2}(x^{3}+1)^{3} \) for \(x>0\), using logarithmic differentiation.</p>
+</div>
+<div class="sol">
+<p>The product rule would demand three (then more) nested applications; instead take logs. Since \(y>0\),</p>
+<p>\[ \ln y=\ln\!\bigl[(x+1)(x^{2}+1)^{2}(x^{3}+1)^{3}\bigr]. \]</p>
+<p>The laws of logarithms (Strategy 3.2, step 2) turn the product into a sum and pull each exponent out front:</p>
+<p>\[ \ln y=\ln(x+1)+2\ln(x^{2}+1)+3\ln(x^{3}+1). \]</p>
+<p>Differentiate both sides with respect to \(x\). On the left, \(\dfrac{d}{dx}\ln y=\dfrac{y'}{y}\) by the chain rule. On the right, each term is a logarithm of a simple expression, so \(\dfrac{d}{dx}\ln u=\dfrac{u'}{u}\) gives one fraction per factor:</p>
+<p>\[ \frac{y'}{y}=\frac{1}{x+1}+\frac{2(2x)}{x^{2}+1}+\frac{3(3x^{2})}{x^{3}+1}=\frac{1}{x+1}+\frac{4x}{x^{2}+1}+\frac{9x^{2}}{x^{3}+1}. \]</p>
+<p>Solve for \(y'\) and substitute \(y\) back:</p>
+<p>\[ y'=(x+1)(x^{2}+1)^{2}(x^{3}+1)^{3}\left[\frac{1}{x+1}+\frac{4x}{x^{2}+1}+\frac{9x^{2}}{x^{3}+1}\right]. \]</p>
+<p>Notice that each factor of the original product contributed exactly one term to the bracket — log-diff trades one hard product-rule computation for several easy logarithmic derivatives added together.</p>
+</div>
+<p class="prov"><strong>source:</strong> <code>[source: CLP-1 §2.10 #34]</code>　·　<strong>license:</strong> CC BY-NC-SA 4.0　·　<strong>rewrite:</strong> 輕改＋已揭露：(a) 記號 \(\log\to\ln\)（CLP 用 \(\log\) 表自然對數）；(b) 把官方 5 因子截成 3 因子控制篇幅（方法不變，每因子仍貢獻一項）；補 \(x>0\)。已 CAS 驗算，\(y'\) 與直接 product-rule 導數逐字相符。</p>
+<div class="why"><strong>why：</strong>唯一真缺口——Strategy 3.2 與其前導散文都點名「乘積式」用途卻零示範。教的新動作「product → 對數和 → 逐項微分」與 3.7／3.8 的「變數指數」型機制不同。結構上正好收束對數小節、接到反三角小節之前。</div>
+
+<details>
+<summary>§3.2 / §3.3 考慮過但駁回（節錄）</summary>
+<ul>
+<li><strong>§3.2 generalized power rule</strong>（如 \((x^2+2)^5\)）：與 Ex 3.4(a) 的 \(\sqrt{1+x^2}=(1+x^2)^{1/2}\) 同型動作（只差冪次），不教新動作，drop。</li>
+<li><strong>§3.2 含 \(e^x\)/\(\ln\) 的雙重 chain 題</strong>（CLP §2.9 大宗）：導數庫越界（\(e^x\) 屬 §3.3，D7）；§3.2 多層 chain 缺口已由 Ex 3.5 三層 \(\sqrt{1+\sin^2x}\) 覆蓋，drop。</li>
+<li><strong>§3.2 參數曲線切線斜率 \(dy/dx=(dy/dt)/(dx/dt)\)</strong>：貼近 implicit/parametric 框架，逾 §3.2 範圍＋D10，drop。</li>
+<li><strong>§3.3 第二個 log-diff（商/根式變體 CLP §2.10 #31）</strong>：與 3.3-E1 教學動作重複（一個示範足矣）；若你偏好「同時涵蓋乘積＋商＋根」的單一較重例，#31 是對症替代（rewrite 升為「重算」）。</li>
+<li><strong>§3.3 反三角 composition drill</strong>（如 \(d/dx\,\arcsin(x/3)\)）、<strong>一般反函數導數定理</strong>、<strong>所有 implicit-diff 題</strong>：§3.3 刻意不 mint 新定理、不引入 implicit-diff（D10）；且屬 bare drill（§14 禁），drop。</li>
+<li><strong>§3.3 \(\ln(a+b)\neq\ln a+\ln b\) 誤解 Caution</strong>：屬對數代數（Ch1 風味），非 chain-rule 應用；§3.3 已有開區間域的 Caution，drop。</li>
+</ul>
+</details>
+
+<p class="small" style="margin-top:2rem">— 下一步：你勾完 → 我（可選）跑 Codex 選題稽核 gate-2（計費前另徵你同意）→ import pass（插入 fragment、手動重編號、<code>build.py ch03</code> 重生、render 自驗）→ 產 <code>REVIEW-ch03-example-supplement-applied.html</code>。<br>
+另：Mode C 第②波「軟深度」對 ch03 幾乎只剩一條 caution（\(\sin\theta/\theta\) 是極限非恆等式），我會把先前的 <code>REVIEW-ch03-modec-enrichment.html</code> 瘦身成只留它，與本①波分清楚。</p>
+
+</body>
+</html>

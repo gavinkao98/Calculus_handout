@@ -679,12 +679,14 @@ window.MathJax = {
 
        Theorem 3.3 (chain rule); Proposition 3.3 (Def1⇔Def2 equivalence);
        Definition 3.1 (remainder form — the chapter's first Definition);
-       Example 3.4 (single composition), 3.5 (nested composition);
+       Example 3.4 (single composition), 3.5 (nested composition),
+         3.6 (chain×quotient), 3.7 (chain×product), 3.8 (Leibniz rates);
+         [3.6–3.8 added by Mode C wave-① example supplement, 2026-06-26, CLP-1 §2.9]
        Figure 3.5 (composed mapping), 3.6 (tangent / remainder-form linear
          approximation); Remark 3.2 (Leibniz form);
        Strategy 3.1 (chain-rule decomposition — the chapter's first Strategy);
        Caution is unnumbered (per ch02). §3.3 continues from Theorem 3.4,
-       Proposition 3.4, Definition 3.2, Example 3.6, Figure 3.7, Remark 3.3,
+       Proposition 3.4, Definition 3.2, Example 3.9, Figure 3.7, Remark 3.3,
        Strategy 3.2.
 
      ③ decisions: Definition treatment = Option B (the §2.2 limit definition
@@ -883,6 +885,68 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:example — chain rule × quotient rule: the inner derivative is itself a §2.5 quotient-rule computation (Mode C example supplement) [pass: enrichment] [source: CLP-1 §2.9 Procedural, 2009H variant; stated for x>1, the branch where √((x-1)/(x+2))=√(x-1)/√(x+2) — the function is also differentiable on x<-2] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.6</span></p>
+      <div class="env-body">
+        <p>Differentiate \(\sqrt{\dfrac{x - 1}{x + 2}}\) for \(x > 1\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The outermost operation is the square root, so by Strategy 3.1 take \(f(u) = \sqrt{u} = u^{1/2}\) with inner function \(u = \dfrac{x - 1}{x + 2}\). The chain rule gives</p>
+        <p>\[ \frac{d}{dx}\sqrt{\frac{x - 1}{x + 2}} = \frac{1}{2\sqrt{(x - 1)/(x + 2)}}\cdot\frac{d}{dx}\!\left(\frac{x - 1}{x + 2}\right). \]</p>
+        <p>The inner derivative is now a quotient-rule computation (§2.5):</p>
+        <p>\[ \frac{d}{dx}\!\left(\frac{x - 1}{x + 2}\right) = \frac{(x + 2)\cdot 1 - (x - 1)\cdot 1}{(x + 2)^{2}} = \frac{3}{(x + 2)^{2}}. \]</p>
+        <p>Substituting, and writing \(\dfrac{1}{2\sqrt{(x - 1)/(x + 2)}} = \dfrac{\sqrt{x + 2}}{2\sqrt{x - 1}}\),</p>
+        <p>\[ \frac{d}{dx}\sqrt{\frac{x - 1}{x + 2}} = \frac{\sqrt{x + 2}}{2\sqrt{x - 1}}\cdot\frac{3}{(x + 2)^{2}} = \frac{3}{2\sqrt{x - 1}\,(x + 2)^{3/2}} \qquad (x > 1). \]</p>
+        <p>The chain rule does not finish the job by itself: the factor it asks for — the derivative of the inside — is a small problem of its own, here a quotient rule.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — chain rule × product rule, with the chain applied to the trigonometric power cos²x = [cos x]² (Mode C example supplement) [pass: enrichment] [source: CLP-1 §2.9 Procedural, 1996D] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.7</span></p>
+      <div class="env-body">
+        <p>Differentiate \(y = (1 + x^{2})\cos^{2} x\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The outermost operation is a product, so begin with the product rule (§2.5):</p>
+        <p>\[ y' = (2x)\cos^{2} x + (1 + x^{2})\,\frac{d}{dx}\bigl(\cos^{2} x\bigr). \]</p>
+        <p>The remaining derivative needs the chain rule, since \(\cos^{2} x = [\cos x]^{2}\) is a composition — outer function \((\,\cdot\,)^{2}\), inner function \(\cos x\):</p>
+        <p>\[ \frac{d}{dx}\bigl(\cos^{2} x\bigr) = 2\cos x\cdot(-\sin x) = -2\sin x\cos x. \]</p>
+        <p>Therefore</p>
+        <p>\[ y' = 2x\cos^{2} x - 2(1 + x^{2})\sin x\cos x. \]</p>
+        <p>The two rules cooperate: the product rule splits the work into two terms, and the chain rule supplies the slope factor inside the second. Neither alone differentiates this function.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — the Leibniz form as composed rates: signs multiply along a dependency chain (Mode C example supplement; demonstrates Remark 3.2) [pass: enrichment] [source: CLP-1 §2.9 Conceptual] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.8</span></p>
+      <div class="env-body">
+        <p>In a harbour, the amount of kelp \(K\) depends on the urchin population \(U\) — urchins eat kelp — and \(U\) in turn depends on the otter population \(O\), since otters eat urchins. Use the chain rule to decide whether \(\dfrac{dK}{dO}\) is positive or negative.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Read off the sign of each link first. More urchins means less kelp, so \(K\) decreases as \(U\) increases: \(\dfrac{dK}{dU} < 0\). More otters means fewer urchins, so \(\dfrac{dU}{dO} < 0\). The chain rule in Leibniz form (Remark 3.2) chains the two rates:</p>
+        <p>\[ \frac{dK}{dO} = \frac{dK}{dU}\cdot\frac{dU}{dO}. \]</p>
+        <p>A product of two negative numbers is positive, so \(\dfrac{dK}{dO} > 0\): more otters ultimately means more kelp. This is the formal version of the two-step argument — otters thin out the urchins, and fewer urchins let the kelp recover — with each \(dy/du\) factor carrying the sign of one link and the signs multiplying along the chain.</p>
+      </div>
+    </section>
+  </div>
+
   <!-- expansion:summary — forward-ref to §3.3: the chain rule unlocks inverse-function and logarithmic derivatives (D7: named, none worked here) -->
   <p>With the chain rule in hand the differentiation toolkit is essentially complete: any function assembled by composing the elementary functions of Chapters 2 and 3 can now be differentiated mechanically. In the next section the rule does something new — it becomes the key that unlocks derivatives we could not otherwise reach, those of the inverse functions \(\ln x\), \(\arcsin x\), and \(\arctan x\), and, through logarithmic differentiation, of expressions such as \(x^{x}\).</p>
 
@@ -899,8 +963,9 @@ window.MathJax = {
      carries the chapter summary. It continues Chapter 3's per-type counters
      from §3.2:
 
-       Example 3.6 (ln'), 3.7 (x^x), 3.8 (2^x), 3.9 ((x ln x − x)'),
-         3.10 (arcsin'), 3.11 (arccos'), 3.12 (arctan');
+       Example 3.9 (ln'), 3.10 (x^x), 3.11 (2^x), 3.12 ((x ln x − x)'),
+         3.13 (log-diff on a product — Mode C ①波 supplement, CLP-1 §2.10),
+         3.14 (arcsin'), 3.15 (arccos'), 3.16 (arctan');
        Strategy 3.2 (logarithmic differentiation);
        Remark 3.3 (one lever, six derivatives);
        Figure 3.7 (arcsin vertical tangents — §3.3's first figure, added by the
@@ -911,7 +976,7 @@ window.MathJax = {
      (left for later): §3.3's results are framed as worked examples, per the
      manuscript and the PLAN ledger.
 
-     ③ decisions (2026-06-08): (1) arctan' Example 3.12 is self-authored,
+     ③ decisions (2026-06-08): (1) arctan' Example 3.16 is self-authored,
      approved to honor the Ch3 opener (sec-3-1) + §3.2 closing forward-ref +
      ROADMAP core skill; same composition-identity method as arcsin/arccos.
      (2) Results framed as worked examples, not Propositions (citability via
@@ -922,7 +987,7 @@ window.MathJax = {
      result, not the Ch1 reflection). (4) All three
      Homework promotions approved (arccos' 3.11, 2^x 3.8, (x ln x − x)' 3.9).
      D8: ln is informal here (inverse of e^x via e^{ln x}=x); the rigorous
-     construction is deferred to Ch4 §4.5 — flagged once, in Example 3.6.
+     construction is deferred to Ch4 §4.5 — flagged once, in Example 3.9.
      D10: no implicit-differentiation framework/vocabulary; the manuscript's
      composition-identity route is used throughout. tan'/sec' are NOT redone
      (done in §3.1 Example 3.2); arctan' only USES tan'=sec^2. The cross-ref
@@ -946,10 +1011,10 @@ window.MathJax = {
   <!-- expansion:intuition — D8 forward fence: ln used informally as the inverse of e^x; rigorous construction deferred to Ch4 §4.5 -->
   <p>We begin with the natural logarithm. Throughout this section we use \(\ln x\) informally, as the inverse of the exponential function — the number whose exponential is \(x\), so that \(e^{\ln x} = x\) for every \(x > 0\). This relation is all we need to find its derivative. The rigorous construction of \(\ln x\) as the inverse of \(e^{x}\), together with a proof that it is differentiable, is deferred to Chapter 4 (§4.5), which re-derives the formula below from the ground up.</p>
 
-  <!-- Example 3.6 — manuscript application ① (seed): d/dx ln x = 1/x via the identity e^{ln x}=x -->
+  <!-- Example 3.9 — manuscript application ① (seed): d/dx ln x = 1/x via the identity e^{ln x}=x -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.6</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.9</span></p>
       <div class="env-body">
         <p>Show that \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) for \(x > 0\).</p>
       </div>
@@ -984,10 +1049,10 @@ window.MathJax = {
     </div>
   </section>
 
-  <!-- Example 3.7 — manuscript application ② (seed): d/dx x^x by logarithmic differentiation -->
+  <!-- Example 3.10 — manuscript application ② (seed): d/dx x^x by logarithmic differentiation -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.7</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.10</span></p>
       <div class="env-body">
         <p>Differentiate \(W(x) = x^{x}\) for \(x > 0\).</p>
       </div>
@@ -997,7 +1062,7 @@ window.MathJax = {
       <div class="env-body">
         <p>There is no rule for a variable raised to a variable power, so we take logarithms. With \(W = x^{x} > 0\),</p>
         <p>\[ \ln W = \ln\bigl(x^{x}\bigr) = x\ln x. \]</p>
-        <p>Differentiate both sides with respect to \(x\). On the left, the chain rule gives \(\dfrac{d}{dx}\ln W = \dfrac{W'}{W}\). On the right, the product rule (Chapter 2, §2.5, Theorem 2.6) together with \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) (Example 3.6) gives</p>
+        <p>Differentiate both sides with respect to \(x\). On the left, the chain rule gives \(\dfrac{d}{dx}\ln W = \dfrac{W'}{W}\). On the right, the product rule (Chapter 2, §2.5, Theorem 2.6) together with \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) (Example 3.9) gives</p>
         <p>\[ \frac{d}{dx}\bigl(x\ln x\bigr) = 1\cdot\ln x + x\cdot\frac{1}{x} = \ln x + 1. \]</p>
         <p>Therefore \(\dfrac{W'}{W} = \ln x + 1\), and solving for \(W'\),</p>
         <p>\[ \frac{d}{dx}x^{x} = W'(x) = W\,(\ln x + 1) = (1 + \ln x)\,x^{x} \quad (x > 0). \]</p>
@@ -1008,7 +1073,7 @@ window.MathJax = {
   <!-- expansion:example — D9 promotion of manuscript Homework 2(iv): d/dx 2^x. Approved at ③ (2026-06-08). Short: reuses the rewrite-via-e idea. -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.8</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.11</span></p>
       <div class="env-body">
         <p>Differentiate \(2^{x}\) for \(x \in \mathbb{R}\).</p>
       </div>
@@ -1023,10 +1088,10 @@ window.MathJax = {
     </section>
   </div>
 
-  <!-- expansion:example — D9 promotion of manuscript Homework 2(iii): d/dx (x ln x − x). Approved at ③ (2026-06-08). Short: reuses Example 3.7's (x ln x)' computation. -->
+  <!-- expansion:example — D9 promotion of manuscript Homework 2(iii): d/dx (x ln x − x). Approved at ③ (2026-06-08). Short: reuses Example 3.10's (x ln x)' computation. -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.9</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.12</span></p>
       <div class="env-body">
         <p>Differentiate \(x\ln x - x\) for \(x > 0\).</p>
       </div>
@@ -1034,9 +1099,33 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>We met the first term inside Example 3.7: by the product rule and \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), we have \(\dfrac{d}{dx}(x\ln x) = \ln x + 1\). The second term has derivative \(1\). Hence</p>
+        <p>We met the first term inside Example 3.10: by the product rule and \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), we have \(\dfrac{d}{dx}(x\ln x) = \ln x + 1\). The second term has derivative \(1\). Hence</p>
         <p>\[ \frac{d}{dx}\bigl(x\ln x - x\bigr) = (\ln x + 1) - 1 = \ln x \quad (x > 0). \]</p>
         <p>The derivative is exactly \(\ln x\) — so \(x\ln x - x\) is an <em>antiderivative</em> of \(\ln x\), a fact worth filing away for when we turn to integration.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — logarithmic differentiation on a product (Strategy 3.2's second advertised use): take log, products become sums, differentiate term by term (Mode C example supplement) [pass: enrichment] [source: CLP-1 §2.10 Procedural, 5-factor log-diff product (truncated 5→3 factors, log→ln, domain restricted to x>0 so all three log factors stay positive)] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.13</span></p>
+      <div class="env-body">
+        <p>Differentiate \(y = (x + 1)(x^{2} + 1)^{2}(x^{3} + 1)^{3}\) for \(x > 0\) by logarithmic differentiation.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Differentiating this product directly would mean nesting the product rule again and again. Instead take logarithms. Since \(y > 0\),</p>
+        <p>\[ \ln y = \ln\!\bigl[(x + 1)(x^{2} + 1)^{2}(x^{3} + 1)^{3}\bigr]. \]</p>
+        <p>The laws of logarithms (Strategy 3.2, step 2) turn the product into a sum and bring each exponent out in front:</p>
+        <p>\[ \ln y = \ln(x + 1) + 2\ln(x^{2} + 1) + 3\ln(x^{3} + 1). \]</p>
+        <p>Differentiate both sides with respect to \(x\). On the left, \(\dfrac{d}{dx}\ln y = \dfrac{y'}{y}\) by the chain rule; on the right, \(\dfrac{d}{dx}\ln u = \dfrac{u'}{u}\) gives one fraction per factor:</p>
+        <p>\[ \frac{y'}{y} = \frac{1}{x + 1} + \frac{2(2x)}{x^{2} + 1} + \frac{3(3x^{2})}{x^{3} + 1} = \frac{1}{x + 1} + \frac{4x}{x^{2} + 1} + \frac{9x^{2}}{x^{3} + 1}. \]</p>
+        <p>Solving for \(y'\) and substituting \(y\) back,</p>
+        <p>\[ y' = (x + 1)(x^{2} + 1)^{2}(x^{3} + 1)^{3}\left(\frac{1}{x + 1} + \frac{4x}{x^{2} + 1} + \frac{9x^{2}}{x^{3} + 1}\right). \]</p>
+        <p>Each factor of the original product contributes exactly one term to the bracket: logarithmic differentiation trades one hard product-rule computation for several easy logarithmic derivatives added together.</p>
       </div>
     </section>
   </div>
@@ -1046,10 +1135,10 @@ window.MathJax = {
   <!-- expansion:intuition — bridge: the same lever, now the identity comes from trigonometry -->
   <p>The logarithm gave way because it is the inverse of \(e^{x}\): we differentiated the relation \(e^{\ln x} = x\). The inverse trigonometric functions yield to exactly the same lever — only now the identity comes from trigonometry. Each inverse function composes with its parent to give an identity, and differentiating that identity by the chain rule isolates the derivative we are after.</p>
 
-  <!-- Example 3.10 — manuscript application ③ (seed): d/dy arcsin y via the composition identity arcsin(sin x)=x; cos x ≥ 0 on the branch fixes the sign of the root -->
+  <!-- Example 3.14 — manuscript application ③ (seed): d/dy arcsin y via the composition identity arcsin(sin x)=x; cos x ≥ 0 on the branch fixes the sign of the root -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.10</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.14</span></p>
       <div class="env-body">
         <p>Show that \(\dfrac{d}{dy}\arcsin y = \dfrac{1}{\sqrt{1 - y^{2}}}\) for \(y \in (-1, 1)\).</p>
       </div>
@@ -1079,10 +1168,10 @@ window.MathJax = {
     <figcaption><span class="fig-no">Figure 3.7</span> Why the derivative dies at the endpoints. On the open interval \((-1, 1)\) the graph of \(\arcsin y\) climbs ever more steeply toward \(y = \pm 1\); at the endpoints its tangent is vertical (dashed) and \(\dfrac{1}{\sqrt{1 - y^{2}}}\) blows up, so the derivative does not exist there (open circles). At the centre the tangent has slope \(1 = \tfrac{1}{\sqrt{1 - 0}}\). The graph of \(\arccos\) behaves the same way.</figcaption>
   </figure>
 
-  <!-- expansion:example — D9 promotion of manuscript Homework 1: d/dy arccos y, by the same method as Example 3.10. Approved at ③ (2026-06-08). Short, skip-setup; uses the correct identity arccos(cos x)=x (not the manuscript's loose cos⁻¹(cos y)=y). -->
+  <!-- expansion:example — D9 promotion of manuscript Homework 1: d/dy arccos y, by the same method as Example 3.14. Approved at ③ (2026-06-08). Short, skip-setup; uses the correct identity arccos(cos x)=x (not the manuscript's loose cos⁻¹(cos y)=y). -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.11</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.15</span></p>
       <div class="env-body">
         <p>Show that \(\dfrac{d}{dy}\arccos y = \dfrac{-1}{\sqrt{1 - y^{2}}}\) for \(y \in (-1, 1)\).</p>
       </div>
@@ -1090,7 +1179,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>The method is exactly that of Example 3.10, now applied to cosine. Recall that \(\arccos\) is the inverse of cosine on the branch \([0, \pi]\), so \(\arccos(\cos x) = x\) there. Differentiating with respect to \(x\), with \(\dfrac{d}{dx}\cos x = -\sin x\) (Theorem 3.2),</p>
+        <p>The method is exactly that of Example 3.14, now applied to cosine. Recall that \(\arccos\) is the inverse of cosine on the branch \([0, \pi]\), so \(\arccos(\cos x) = x\) there. Differentiating with respect to \(x\), with \(\dfrac{d}{dx}\cos x = -\sin x\) (Theorem 3.2),</p>
         <p>\[ 1 = (\arccos)'(\cos x)\cdot(-\sin x). \]</p>
         <p>Writing \(y = \cos x\): on the <em>open</em> interior \(x \in (0, \pi)\) we have \(\sin x > 0\), so the division by \(-\sin x\) is legitimate and \(\sin x = \sqrt{1 - \cos^{2} x} = \sqrt{1 - y^{2}}\); this interior corresponds to \(y \in (-1, 1)\). Hence</p>
         <p>\[ \frac{d}{dy}\arccos y = \frac{1}{-\sin x} = \frac{-1}{\sqrt{1 - y^{2}}} \quad (y \in (-1, 1)). \]</p>
@@ -1102,7 +1191,7 @@ window.MathJax = {
   <!-- expansion:example — self-authored (③ 2026-06-08): d/dy arctan y, honoring the Ch3 opener + §3.2 forward-ref + ROADMAP core skill; same composition-identity method, using tan'=sec^2 from §3.1 Example 3.2 and the Pythagorean identity -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.12</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.16</span></p>
       <div class="env-body">
         <p>Show that \(\dfrac{d}{dy}\arctan y = \dfrac{1}{1 + y^{2}}\) for all \(y \in \mathbb{R}\).</p>
       </div>
