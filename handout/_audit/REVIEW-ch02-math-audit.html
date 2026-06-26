@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 2 數學正確性閘 — gate-1＋gate-2 審核稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:980px; margin:0 auto;
+         padding:2rem 1.5rem 4rem; background:var(--bg); color:#1a1a1a; line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.13rem; margin:2rem 0 .5rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .pass { background:#eaf6ed; border-left:3px solid var(--green); padding:.6rem .9rem; border-radius:5px; font-size:.93rem; color:#13502c; margin:.4rem 0 1.2rem; }
+  .pass b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.88rem; }
+  th, td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#eef2f7; }
+  .zero { color:var(--green); font-weight:700; }
+  .card { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--amber); border-radius:8px; padding:.75rem 1rem; margin:.7rem 0; }
+  .row1 { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin-bottom:.3rem; }
+  .id { font-family:ui-monospace,monospace; font-weight:700; font-size:.82rem; background:#fef0e7; color:var(--amber); padding:.1rem .45rem; border-radius:4px; }
+  .badge { font-size:.7rem; font-weight:700; padding:.1rem .5rem; border-radius:999px; background:#fef0e7; color:var(--amber); }
+  .k { font-weight:700; color:var(--gray); font-size:.8rem; }
+  .f { margin:.3rem 0; font-size:.92rem; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+</style>
+</head>
+<body>
+<h1>Chapter 2 — 數學正確性閘（math-correctness M1–M8）審核稿</h1>
+<p class="sub">2026-06-26　·　契約 <code>MATH-CORRECTNESS-RUBRIC.md</code>（M1–M8，「請查核 X」propose-only，手稿勝出，不確定降級）　·　雙閘：gate-1 Claude ×5（逐節，對抗式自審）＋ gate-2 Codex gpt-5.5（read-only，獨立複核）</p>
+
+<div class="pass"><b>結論：math gate 通過 —— 雙閘 blocking 全 0。</b> gate-1（Claude）：5 節 0 blocking、1 advisory（§2.4 Ex 2.16 定義域 polish，borderline）。gate-2（Codex，121.6k tokens）：<b>0 blocking、0 advisory</b>，未復現該 advisory。每個 worked-example 最終答案經獨立重算（多處 sympy）核對正確；手稿刻意設計（eˣ 級數論證、power rule 僅正整數 n、省略證明）皆判 non-finding。收斂判準（blocking = 0）達成。</div>
+
+<table>
+  <tr><th>節</th><th>gate-1（Claude）</th><th>gate-2（Codex）</th><th>重點</th></tr>
+  <tr><td>§2.1 Tangent Line &amp; Derivative</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Ex 2.1–2.5＋Remark 2.2 答案全重算正確；Def 2.1 完整；小數精度宣稱成立</td></tr>
+  <tr><td>§2.2 Derivative as a Function</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Ex 2.6–2.10 重算；Def 2.2 域完整；Remark 2.3 域處理（\(x\ge0\) vs \(x&gt;0\)）正確；dy/dx Caution 健全</td></tr>
+  <tr><td>§2.3 Differentiability…</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Thm 2.1 證明、\(|x|\) 角、\(\sqrt[3]{x}\) 垂直切線、Ex 2.13 \(a{=}4,b{=}{-}4\)、Ex 2.14 \(f''{=}2,f'''{=}0\) 全驗；M8 前提（§1.5/§1.6）齊備</td></tr>
+  <tr><td>§2.4 Polynomials &amp; Exp.</td><td>0 blocking · <b>1 advisory</b></td><td class="zero">clean</td><td>兩 power-rule proof、Cor 2.1、eˣ 級數 proof、Ex 2.15–2.18 全驗（sympy）；eˣ／正整數 power rule 為刻意設計；唯一 advisory 見下</td></tr>
+  <tr><td>§2.5 Product &amp; Quotient</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Thm 2.6/2.7 假設充分（含 \(g\neq0\)、引 Thm 2.1）；Ex 2.19–2.23 全驗（sympy）；2.21 改錯、2.23 號分析正確</td></tr>
+  <tr><td><b>合計</b></td><td><b class="zero">0 blocking</b> · 1 advisory</td><td><b class="zero">0 blocking · 0 advisory</b></td><td>雙閘收斂</td></tr>
+</table>
+
+<h2>唯一 advisory（gate-1，borderline、propose-only）</h2>
+<div class="card">
+  <div class="row1"><span class="id">M-2.4-1</span><span class="badge">advisory · M5</span></div>
+  <div class="f"><span class="k">locus</span>　§2.4 Example 2.16：\(s(t)=3t^{4}+5t^{3}-\dfrac{1}{t}\)，結果 \(s'(t)=12t^{3}+15t^{2}+\dfrac{1}{t^{2}}\)。</div>
+  <div class="f"><span class="k">為何提</span>　\(1/t\)（即 \(t^{-1}\)）在 \(t=0\) 未定義，本節 Caution 也把負指數 power rule 限在 \(x\neq0\)；故結果僅對 \(t\neq0\) 成立，此處未明說，與 Example 2.17 明寫「for \(x&gt;0\)」略不對稱。</div>
+  <div class="f"><span class="k">把握度</span>　低（borderline）：\(1/t\) 與 \(1/t^{2}\) 本身已自帶 \(t\neq0\)，屬 polish 非 correctness defect。gate-2 Codex 未提此條。</div>
+  <div class="f"><span class="k">請查核 / 建議</span>　是否在 Example 2.16 補一句 \(t\neq0\)（與 Example 2.17 對齊），或刻意省略？<b>propose-only，待你裁決，不自行改。</b></div>
+</div>
+
+<p class="sub" style="margin-top:1.6rem">方法：gate-1＝5 個並行 <code>general-purpose</code> agent 逐節走 M1–M8、每筆候選對抗式自審（比對 math-content-protected non-findings＋自行重算）後才報，數學內容對照手稿 seed（<code>_dev-archive/ch02/seed_ch02_s*.md</code>）。gate-2＝<code>codex exec --sandbox read-only --output-schema</code>（gpt-5.5），獨立讀 rubric＋5 fragment＋5 seed 複審。兩閘皆「不確定降級、寧缺勿濫」。</p>
+
+</body>
+</html>
