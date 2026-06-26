@@ -1,7 +1,7 @@
 # 講義圖稽核 — RUBRIC（figure audit）
 
 > **本審契約（單一真相來源）。** gate 1 = Claude `handout-figure-audit` subagent；視覺層的 Codex 第二讀者退為**定稿前的信心複核**（非每輪必跑，計費需同意）。
-> **被審物：** 一張 **render 後的 PNG**（由 [`../_render/shot.mjs`](../_render/shot.mjs) 截**整張 A4 頁**產出，圖隨頁入鏡），對照語境讀該圖的繪圖原始碼：FIGS 圖讀 standalone 的 `const FIGS`、inline-SVG 圖讀 fragment 內 `<svg>`，並參照該節 `figcaption`。
+> **被審物：** 一張 **render 後的 PNG**（由 [`../_render/shot.mjs`](../_render/shot.mjs) 的 **`figures` 模式**逐 `<figure>` 截 2× PNG：`node shot.mjs <file-url> <out/prefix> figures` → `prefix-<data-fig>.png`；print-standalone 以 CSS @page 分頁、**無 `.sheet` div**，readiness 預設等 `#boot`「Preparing …」遮罩移除＝build 完成才截），對照語境讀該圖的繪圖原始碼：FIGS 圖讀 standalone 的 `const FIGS`、inline-SVG 圖讀 fragment 內 `<svg>`，並參照該節 `figcaption`。
 > **枚舉（母體）：** 稽核母體 = 該章 fragment 內**全部 `<figure>` 元素**，含 inline-SVG（有 `id=` 無 `data-fig`、甚至無 figcaption 編號者）；**不可只取 `FIGS`／`data-fig` 定義的圖**。每章開審前以 `Grep '<figure'` 掃 fragment 對齊圖清單，漏的補進去並指派審查者。（shot.mjs 截整頁，inline-SVG 本就入鏡——漏的是「沒人被指派去看」，故枚舉須以 `<figure>` 為準。）
 > **依據：** [`../../CONTENT_SPEC.md`](../../CONTENT_SPEC.md) §10（圖規則）＋本檔維度（從 ch01 圖稽核實證蒸餾，見 `../_dev-archive/ch01/ch01_figure-audit.md`）。
 > **性質：** 唯讀、advisory＋blocking 分流、不改檔。審「**畫出來**對不對、讀不讀得懂」，不是 copyedit。
