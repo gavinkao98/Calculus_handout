@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 3 Mode C 第②波（軟深度）——候選裁決稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; --green:#1a7f47; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.6; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .strong { background: #fff7ed; border-left: 3px solid #e0a106; padding: .6rem .9rem; border-radius: 4px;
+            font-size: .9rem; color: #7a5b00; margin: .3rem 0 1rem; }
+  pre.verdict { background: #102536; color: #e8eef4; padding: 1rem 1.2rem; border-radius: 8px;
+                font-size: .9rem; line-height: 1.9; overflow-x: auto; white-space: pre-wrap; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem; margin: .6rem 0; }
+  .card.hi { border-left: 4px solid var(--blue); }
+  .id { font-family: ui-monospace, monospace; font-weight: 700; font-size: .82rem; background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem; text-transform: uppercase; }
+  .b-cau { background:#fdeceb; color:var(--red); }
+  .conf { font-size:.72rem; color:var(--gray); float:right; }
+  .loc { font-size:.82rem; color:var(--gray); margin:.25rem 0; }
+  .prop { margin:.45rem 0; background:#f7f9fc; border-left:3px solid #8aa6c0; padding:.5rem .8rem; border-radius:4px; }
+  .why { font-size:.84rem; color:#475467; margin:.35rem 0 0; }
+  .variant { font-size:.86rem; background:#f3f6fb; border:1px dashed #aac; border-radius:6px; padding:.5rem .8rem; margin:.5rem 0; }
+  .done { background:#f0f8f0; border-left:5px solid var(--green); border-radius:6px; padding:.5rem 1rem; margin:.5rem 0; font-size:.9rem; }
+  details { margin:.6rem 0; font-size:.84rem; color:#475467; }
+  details summary { cursor:pointer; font-weight:600; color:var(--gray); }
+  details ul { margin:.4rem 0; padding-left:1.2rem; } details li { margin:.25rem 0; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; font-size:.85em; }
+</style>
+</head>
+<body>
+<h1>Chapter 3 — Mode C 第②波（軟深度）候選裁決稿</h1>
+<p class="sub">2026-06-26　範圍＝軟深度（intuition／caution／application／strategy／summary／history，<strong>不含 worked example</strong>）　·　主軸已凍結，全為「新增」</p>
+
+<p class="strong"><b>兩波分流：</b>本章 Mode C 分兩波。<b>第①波（補題目／worked example）已完成並 commit</b>（<code>b80dd42</code>）——4 例、雙閘收斂，見 <code>REVIEW-ch03-example-supplement-applied.html</code>。<b>本檔是第②波（軟深度）</b>。<br>
+<b>結論先講：</b>ch03 三節在 Mode A 已寫得極滿（§3.1 6–7 處 intuition＋radian caution＋summary＋Remark；§3.2 三段 intuition-first＋Leibniz＋Strategy＋Caution；§3.3 7 例＋Strategy＋Remark＋章末 summary）。軟深度偵察（9 鏡頭、三節對抗式過濾）後<b>只剩 1 條真候選</b>，其餘飽和或越 D-邊界（見末段 cut log）。</p>
+
+<pre class="verdict">【裁決：2026-06-26　使用者選「收（乾淨固定角版）」→ 已套用】
+§3.1  C-1  caution「sinθ/θ 是極限非恆等式」   ✅ 收（乾淨固定角版）已套用
+§3.2  —   無軟深度缺口（飽和＋D-邊界，cut log）
+§3.3  —   無軟深度缺口（極飽和，cut log）
+
+落地：sec-3-1.html 接 Figure 3.2 後、radian Caution 前新增 1 個 unnumbered Caution
+（[pass: enrichment]）。Caution 無編號→不影響任何 renumber。
+Mode B gate-1（inline）：math ✓（2/π≈0.637、0/π=0）／register 具體無 AI-tell ✓／
+D-邊界 固定角不用 chain rule、自足 ✓。build+render：0 err、example 仍 3.1–3.16、7/7 圖。
+本章 Mode C（①波 worked example ＋ ②波軟深度）至此收尾。</pre>
+
+<h2>§3.1 Derivatives of the Sine and Cosine Functions</h2>
+
+<div class="card hi"><span class="conf">medium</span><span class="id">C-1</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：接 Proposition 3.2（\(\lim_{\theta\to0}\sin\theta/\theta=1\)）的 payoff 處，與既有 radian Caution 並列（其前或其後）。</div>
+<div class="prop"><b>擬補（乾淨版，推薦）：</b><br>
+Proposition 3.2 is a statement about the limit as \(\theta\to0\), <em>not</em> an identity. At a fixed angle the ratio \(\sin\theta/\theta\) is generally not \(1\): at \(\theta=\tfrac{\pi}{2}\) it equals \(\dfrac{\sin(\pi/2)}{\pi/2}=\dfrac{1}{\pi/2}=\dfrac{2}{\pi}\approx0.64\), and at \(\theta=\pi\) it equals \(\dfrac{0}{\pi}=0\). The value \(1\) is reached only in the limit, as \(\theta\) shrinks to \(0\).</div>
+<div class="variant"><b>變體（加 forward-ref，覆蓋更常見的學生錯）：</b>末尾再加一句——“More subtly, the argument of the sine must be exactly what divides it: a ratio like \(\sin(5x)/x\) does <em>not</em> tend to \(1\) either (it tends to \(5\), as the chain rule of §3.2 will explain).” <span style="color:var(--gray)">略長；\(\sin(5x)/x\) 的「為何是 5」需 §3.2 代換，故只點到、不在此推。</span></div>
+<div class="why"><b>why：</b>守「把 \(\sin\theta/\theta=1\) 誤當恆等式」這個真實常見誤解（檢查表第 4/5 項）。與既有 radian caution 正交（那管度量單位、這管極限 vs 恆等式）。乾淨版用固定角反例、<b>自足不越 D-邊界</b>（不需 chain rule）。數學已核：\(\sin(\pi/2)/(\pi/2)=2/\pi\approx0.637\)、\(\sin\pi/\pi=0\)。</div>
+<div class="why" style="color:#8a5b00"><b>誠實揭露：</b>medium 信心。§3.1 已有一個 caution（radian）；要不要第二個 caution 屬「補上或記錄」的邊際裁決，由你定。</div>
+</div>
+
+<h2>§3.2 The Chain Rule　·　§3.3 Applications</h2>
+<div class="done"><b>§3.2 / §3.3 軟深度＝0 候選。</b>兩節的 intuition／caution／strategy／summary 在 Mode A 已飽和；真缺口都是 worked example（已進①波：§3.2 chain×quotient/product/Leibniz、§3.3 log-diff 乘積式）。其餘軟深度候選經對抗式過濾全數刷掉——見下。</div>
+
+<details>
+<summary>軟深度 cut log（為何其餘都不補）</summary>
+<ul>
+<li><b>§3.1</b>：opener／定義 gloss／strategy／summary 皆飽和（line 56–60 漏斗 intuition＋章 lead＋Remark 3.1＋forward-ref 段）；history（\(\sin\theta/\theta\) 幾何源流）缺可靠獨特鉤、易 AI 味補白 → 刪。</li>
+<li><b>§3.2</b>：三段 intuition-first 開場、Definition 3.1 informal gloss、Remark 3.2（Leibniz「\(du\) 約分非證明」陷阱）、Strategy 3.1、Caution（忘內層導數）皆已在；第二個同主題 caution／越級的「鏈式假設失效非例」（屬 Ch2 §2.3）、implicit-diff 預告（違 D10）、product-rule 重述（違 D6）→ 全刪。</li>
+<li><b>§3.3</b>（極飽和，7 例＋Strategy＋Remark＋章末 summary）：composition-identity 升第二 strategy box（D10 風險、brief 刻意不寫）、log-diff 正性 caution（Strategy 3.2 已明示 \(f(x)>0\)）、ln 嚴謹建構（違 D8）、implicit-diff（違 D10）、章末再加情境 application（§3.1 已有 SHM、屬 padding）→ 全刪。</li>
+</ul>
+</details>
+
+<p class="sub" style="margin-top:1.5rem">你裁決後：若收 → 套用為 <code>&lt;!-- expansion:caution [pass: enrichment] --&gt;</code>（不動既有內容）→ 範圍限定 Mode B gate-1 → <code>build.py ch03</code> → commit。若不收 → 記進 ROADMAP ch03 Open questions「②波軟深度：sections saturated，無高價值缺口」。<br>
+無論哪個，本章 Mode C（①波 worked example ＋ ②波軟深度）即收尾，接著進圖正確性 gate-2／數學 M1–M8／S·A·V 三閘。</p>
+
+</body>
+</html>
