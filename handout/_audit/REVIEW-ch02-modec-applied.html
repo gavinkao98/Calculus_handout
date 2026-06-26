@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 2 Mode C soft-depth — 已套用報告</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085;
+          --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; --ink:#1a1a1a; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:1000px;
+         margin:0 auto; padding:2rem 1.5rem 5rem; background:var(--bg); color:var(--ink); line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.16rem; margin:2.3rem 0 .5rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .pass { background:#eaf6ed; border-left:3px solid var(--green); padding:.6rem .9rem; border-radius:5px;
+          font-size:.92rem; color:#13502c; margin:.4rem 0 1.2rem; }
+  .pass b { color:var(--green); }
+  table.sum { width:100%; border-collapse:collapse; margin:1rem 0 .4rem; font-size:.88rem; }
+  table.sum th, table.sum td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; }
+  table.sum th { background:#eef2f7; }
+  .zero { color:var(--green); font-weight:700; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.7rem .95rem .85rem;
+          margin:.6rem 0; border-left:4px solid var(--green); }
+  .row1 { display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; margin-bottom:.2rem; }
+  .id { font-family:ui-monospace,"Cascadia Code",monospace; font-weight:700; font-size:.82rem;
+        background:#eef2f7; padding:.1rem .45rem; border-radius:4px; }
+  .badge { font-size:.7rem; font-weight:700; padding:.1rem .5rem; border-radius:999px;
+           text-transform:uppercase; letter-spacing:.02em; }
+  .b-int { background:#e7f0fb; color:var(--blue); }
+  .b-cau { background:#fdeceb; color:var(--red); }
+  .b-app { background:#e9f7ef; color:var(--green); }
+  .b-his { background:#fef0e7; color:var(--amber); }
+  .gate { font-size:.72rem; font-weight:700; color:var(--green); margin-left:auto; }
+  .loc { font-size:.8rem; color:var(--gray); margin:.25rem 0 .4rem; }
+  .prose { background:#fff; border:1px dashed var(--line); border-radius:6px; padding:.55rem .8rem;
+           margin:.2rem 0 .35rem; font-size:.95rem; }
+  .src { font-size:.77rem; color:var(--gray); }
+  .src code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .skip { background:#fafafa; border:1px solid var(--line); border-left:4px solid var(--line);
+          border-radius:8px; padding:.5rem .9rem; margin:.4rem 0; font-size:.9rem; }
+  .skip .id { background:#f1f1f1; }
+  .ev code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+</style>
+</head>
+<body>
+<h1>Chapter 2 — Mode C soft-depth 擴充：已套用報告</h1>
+<p class="sub">2026-06-26　·　主軸凍結、全為「新增」　·　15 條寫入 / 5 條跳過 / 1 條（history）查證後寫入　·　每塊標 <code>[pass: enrichment]</code>，逐塊範圍限定 Mode B / S·A·V gate-1</p>
+
+<div class="pass"><b>雙閘皆過。gate-1（Claude handout-prose-audit ×5，唯讀，範圍限定新塊）：5 節全 0 blocking、0 advisory。</b> gate-2（Codex gpt-5.5, read-only）：14 塊 clean、1 blocking on 2.3-3（記號把 \(dx\) reify 成可平方因子，與 §2.2 caution「\(dy/dx\) 非分數」衝突）→ 改寫為 operator 讀法 → re-audit <b>pass</b>。各塊數學／論斷逐句核對皆正確。<code>python handout/build.py ch02</code> EXIT 0、新散文已併入 standalone。詳見 <code>REVIEW-ch02-modec-gate2.html</code>。</div>
+
+<table class="sum">
+  <tr><th>節</th><th>寫入塊</th><th>Blocking</th><th>Advisory</th></tr>
+  <tr><td>§2.1 Tangent Line &amp; Derivative at a Point</td><td>2.1-1, 2.1-2</td><td class="zero">0</td><td class="zero">0</td></tr>
+  <tr><td>§2.2 The Derivative as a Function</td><td>2.2-1, 2.2-2</td><td class="zero">0</td><td class="zero">0</td></tr>
+  <tr><td>§2.3 Differentiability, Continuity, Higher Deriv.</td><td>2.3-1, 2.3-2, 2.3-3</td><td class="zero">0</td><td class="zero">0</td></tr>
+  <tr><td>§2.4 Derivatives of Polynomials &amp; Exp.</td><td>2.4-1, 2.4-2, 2.4-3, 2.4-4, 2.4-5</td><td class="zero">0</td><td class="zero">0</td></tr>
+  <tr><td>§2.5 The Product and Quotient Rules</td><td>2.5-1, 2.5-2, 2.5-4</td><td class="zero">0</td><td class="zero">0</td></tr>
+</table>
+
+<!-- ===================== §2.1 ===================== -->
+<h2>§2.1 The Tangent Line and the Derivative at a Point</h2>
+
+<div class="card">
+  <div class="row1"><span class="id">2.1-1</span><span class="badge b-cau">caution</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：在 \(h\)-form 段之後、\(f'(a)\) 引入之前（unnumbered Caution）</div>
+  <div class="prose">A common slip is to read the numerator \(f(a + h) - f(a)\) as \(f(h)\). The symbol \(h\) is an <em>increment</em> — a small step away from the base point \(a\) — not an input in its own right. When you expand the difference quotient, substitute \(a + h\) into the function, writing \(f(a + h)\); never replace it with \(f(h)\) alone.</div>
+  <div class="src">source：<code>authored</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.1-2</span><span class="badge b-app">application</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Remark 2.2（tangent-line approximation bookend）之後、§2.2 forward-ref 之前（plain paragraph，不新增編號 Remark）</div>
+  <div class="prose">The move we just made — replacing a curve by its tangent line over a small range — is used throughout applied science and engineering, where it is called <em>linearization</em>. A navigation system linearizes the equations relating its position to satellite distances; a physicist replaces \(\sin\theta\) by \(\theta\) for the small swings of a pendulum; an economist treats a marginal cost as the slope of a cost curve. Each time, a hard curved problem is traded, near a point of interest, for an easy straight-line one — the practical payoff of local linearity.</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §2.1）</code></div>
+</div>
+
+<!-- ===================== §2.2 ===================== -->
+<h2>§2.2 The Derivative as a Function</h2>
+
+<div class="card">
+  <div class="row1"><span class="id">2.2-1</span><span class="badge b-cau">caution</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Leibniz notation 段之後、"Reading \(f'\) from the graph" 子標題之前</div>
+  <div class="prose">The symbol \(\dfrac{dy}{dx}\) names the derivative as a single object; it is <em>not</em> a fraction with numerator \(dy\) and denominator \(dx\). On its own, neither \(dy\) nor \(dx\) has been given a separate meaning here, so the pieces cannot be cancelled or cross-multiplied the way the parts of an ordinary fraction can. The notation is deliberately suggestive — it remembers that the derivative grew out of the quotient \(\Delta y / \Delta x\) — but until those parts are defined on their own (which we do not do in this book), read \(dy/dx\) as one indivisible name for \(f'(x)\).</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §2.8, Rogawski 4e §3.1）</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.2-2</span><span class="badge b-app">application</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Remark 2.4 之後、§2.3 forward-ref 之前（plain paragraph）</div>
+  <div class="prose">Velocity is only the most familiar of these rates. Whenever one quantity depends on another, the derivative measures a rate of change with its own meaning. If \(s(t)\) is position, the derivative of the velocity \(s'(t)\) is the <em>acceleration</em> \(s''(t)\), the rate at which velocity itself changes — a second derivative we take up in §2.3. If \(P(t)\) is the size of a population, then \(P'(t)\) is its growth rate, in individuals per unit time. If \(C(q)\) is the cost of producing \(q\) units of a good, then \(C'(q)\) is the <em>marginal cost</em>, the added cost of producing one more unit. One limit, read in different settings, becomes a velocity, an acceleration, a growth rate, or a marginal cost.</div>
+  <div class="src">source：<code>[source: CLP-1 §2.4 population-growth example; marginal cost standard]</code></div>
+</div>
+
+<!-- ===================== §2.3 ===================== -->
+<h2>§2.3 Differentiability, Continuity, and Higher Derivatives</h2>
+
+<div class="card">
+  <div class="row1"><span class="id">2.3-1</span><span class="badge b-int">intuition</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Theorem 2.1 proof 之後、inclusion diagram 之前</div>
+  <div class="prose">The proof is short, but the picture behind it is worth keeping. To be differentiable at \(a\) is to have one definite tangent direction there, and a curve smooth enough to settle on a single tangent has no room to jump — so differentiability forces continuity. The converse fails because continuity asks far less: it only forbids breaks, and an unbroken curve is still free to have a sharp corner, where no single tangent direction exists.</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §2.8）</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.3-2</span><span class="badge b-int">intuition</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：higher-derivatives 概念引入段之後、Remark 2.5 之前</div>
+  <div class="prose">Higher derivatives are more than a formal exercise in differentiating again; the low-order ones carry concrete meaning. If \(s(t)\) is the position of a moving object, the first derivative \(s'(t)\) is its velocity and the second derivative \(s''(t)\) is its <em>acceleration</em> — the rate at which the velocity changes, felt as the push that presses you back when a car speeds up. The third derivative \(s'''(t)\), the rate of change of acceleration, is called the <em>jerk</em>; engineers keep it small when designing elevators and trains so that changes in acceleration come on smoothly rather than as an abrupt lurch.</div>
+  <div class="src">source：<code>authored（accel 普遍；jerk cf. Stewart 8e §3.7）</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.3-3</span><span class="badge b-cau">caution</span><span class="gate">gate-1 ✓ · gate-2 修正後 ✓</span></div>
+  <div class="loc">locus：Remark 2.5（higher-derivative notation）之後、Example 2.14 之前</div>
+  <div class="prose">Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\), and — as Remark 2.5 noted — the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\); and the \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\) — not \(d(x^{2})\), where the \(x\) itself would be squared, and not an algebraic denominator to cancel or split.</div>
+  <div class="src">source：<code>authored（cf. Rogawski 4e §3.5）</code>　·　<b>gate-2 修正：</b>初稿寫「\(dx^{2}\) means \((dx)^{2}\)」reify 了 \(dx\)，與 §2.2 caution「\(dy/dx\) 非分數」衝突；改為 operator 讀法（不 reify、保留「非 \(d(x^2)\)、非 \(d\cdot2y\)、不可約分」三戒），re-audit pass。</div>
+</div>
+
+<!-- ===================== §2.4 ===================== -->
+<h2>§2.4 Derivatives of Polynomials and the Exponential Function</h2>
+
+<div class="card">
+  <div class="row1"><span class="id">2.4-3</span><span class="badge b-int">intuition</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Theorem 2.3（power rule statement）之後、兩 proof 之前</div>
+  <div class="prose">Before proving it, notice the pattern the rule records. List the first few cases: \(x\) has derivative \(1\), the function \(x^{2}\) has derivative \(2x\) (computed in §2.2), and \(x^{3}\) has derivative \(3x^{2}\). In each one the exponent drops to the front as a multiplier and the power itself decreases by one — exactly \(n\,x^{n-1}\). The power rule claims that this pattern never breaks, for every positive integer \(n\). Showing that it <em>must</em> continue, rather than merely holding for the small cases we can check by hand, is the work of the proofs.</div>
+  <div class="src">source：<code>authored</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.4-4</span><span class="badge b-app">application</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Corollary 2.1（polynomial derivative）的論證段之後、Example 2.15 之前</div>
+  <div class="prose">This corollary is the workhorse of kinematics. If a moving object has a polynomial position \(s(t) = a_{n}t^{n} + \cdots + a_{1}t + a_{0}\), its velocity \(s'(t)\) follows in a single line by the same term-by-term rule, each power of \(t\) dropping by one. The car of §2.2, whose velocity we could there describe only in principle, is now a function we can differentiate at sight.</div>
+  <div class="src">source：<code>authored</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.4-1</span><span class="badge b-int">intuition</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：既有 self-replication takeaway 之後、Example 2.18 之前（置於 takeaway 後以免與其重複）</div>
+  <div class="prose">That one property — rate of change equal to current size — is why \(e^{x}\) governs so much of the world. Any quantity whose growth rate is proportional to how much is already present obeys a relation of the form \(y' = ky\), and its solution is built from \(e^{x}\). Money under continuous compounding grows in proportion to the balance; a radioactive sample decays in proportion to the amount remaining; an unchecked population grows in proportion to its current size. In every case the rate is tied to the level, and \(e^{x}\) is the function that ties them.</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §3.8）</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.4-2</span><span class="badge b-cau">caution</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Remark 2.6（\(b^x\) 導數）之後、§2.5 forward-ref 之前</div>
+  <div class="prose">Keep the exponential and power functions apart. In \(e^{x}\) the base is the fixed number \(e\) and the exponent varies, so it is an <em>exponential</em> function with \(\dfrac{d}{dx}e^{x} = e^{x}\). In \(x^{e}\) the exponent is the fixed number \(e \approx 2.718\) and the base varies, so it is a <em>power</em> function, differentiated by the power rule: \(\dfrac{d}{dx}x^{e} = e\,x^{e-1}\). The two obey different rules, and in particular \(\dfrac{d}{dx}x^{e} \ne x^{e}\). The general split is \(\dfrac{d}{dx}b^{x} = b^{x}\ln b\) for an exponential against \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for a power — decide which form you are looking at before you differentiate.</div>
+  <div class="src">source：<code>[source: CLP-1 §2.6 Conceptual "is d/dx(2^x)=x·2^(x-1)?"]</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.4-5</span><span class="badge b-his">history</span><span class="gate">gate-1 ✓ · 來源已查證</span></div>
+  <div class="loc">locus：兩 proof 之後、inline illustrations 之前</div>
+  <div class="prose">The two proofs trace two strands in the early history of the derivative. The binomial-expansion argument rests on Newton's generalized binomial theorem, which he developed around 1665 as part of the calculus he was then inventing; expanding \((x + h)^{n}\) and letting \(h \to 0\) is descended from the increment-and-discard method Fermat had used in the 1630s to find tangents and extrema. The factorization argument, by contrast, leans on no infinitesimal at all — it is ordinary algebra turned to the same purpose.</div>
+  <div class="src">source：<code>standard history of calculus — Newton's generalized binomial theorem c.1665; Fermat's adequality/tangents, 1636</code>　·　<b>查證調整：</b>候選原把 factorization 也歸於 Newton/Fermat；查證後改寫——Fermat 的「增量後丟棄」實對應 binomial/h-form proof，factorization 是純代數、不涉無窮小（更正確且更切教學）</div>
+</div>
+
+<!-- ===================== §2.5 ===================== -->
+<h2>§2.5 The Product and Quotient Rules</h2>
+
+<div class="card">
+  <div class="row1"><span class="id">2.5-1</span><span class="badge b-int">intuition</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Theorem 2.7（quotient rule statement）之後、proof 之前</div>
+  <div class="prose">Before the proof, it helps to see why the rule has this shape. Like the product rule, its numerator pairs each function with the derivative of the other — but joined by a <em>minus</em> sign instead of a plus, and the whole expression is divided by \(g^{2}\). The minus sign reflects that \(g\) sits in the denominator: making \(g\) larger makes the quotient \(f/g\) smaller, so the effect of \(g'\) is subtracted rather than added. The \(g^{2}\) is the footprint of differentiating \(1/g\): already in the simplest case \(f = 1\), the derivative of \(1/x\) was \(-1/x^{2}\) in §2.2 — the same minus sign and the same square that the quotient rule carries in general.</div>
+  <div class="src">source：<code>authored</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.5-2</span><span class="badge b-cau">caution</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Strategy 2.2 之後、Example 2.22 之前</div>
+  <div class="prose">Not every product or quotient on the page calls for the product or quotient rule. A constant factor is handled by the constant-multiple rule: \(\dfrac{d}{dx}(5x^{3}) = 5 \cdot 3x^{2} = 15x^{2}\), with no need to "differentiate" the \(5\). A constant denominator is likewise just a constant multiple, since \(\dfrac{x^{2}}{3} = \tfrac{1}{3}x^{2}\) gives \(\dfrac{d}{dx}\dfrac{x^{2}}{3} = \tfrac{2}{3}x\). The product and quotient rules are needed only when <em>both</em> parts genuinely depend on \(x\); using them when one part is constant still reaches the answer, but by a longer route with more chances to slip.</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §3.2）</code></div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">2.5-4</span><span class="badge b-app">application</span><span class="gate">gate-1 ✓</span></div>
+  <div class="loc">locus：Example 2.19 之後、"The quotient rule" 子標題之前</div>
+  <div class="prose">The product rule has a clean reading in economics. Suppose a firm sells \(q\) units at a price \(p(q)\) that depends on how many are sold; its revenue is the product \(R(q) = p(q)\,q\). The product rule gives the <em>marginal revenue</em> \(R'(q) = p'(q)\,q + p(q)\): selling one more unit changes revenue in two ways at once — through the price change \(p'(q)\) spread over all \(q\) units, and through the price \(p(q)\) fetched by the extra unit itself. The two strips of Figure 2.4 return here as two competing economic effects.</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §3.7 Economics）</code></div>
+</div>
+
+<!-- ===================== 跳過 ===================== -->
+<h2>裁決跳過（5 條）</h2>
+<div class="skip"><span class="id">2.2-3</span> caution（\(f'=1/(2\sqrt{x})\) 定義域）— <b>冗餘</b>：Remark 2.3 已用相同 \(x>0\) 具體案例（<code>sec-2-2.html:133</code>）。</div>
+<div class="skip"><span class="id">2.3-4</span> intuition（corner 幾何）— <b>冗餘</b>：既有 V-shape 段已給「two families converge to different directions」幾何解讀（<code>sec-2-3.html:62</code>）。</div>
+<div class="skip"><span class="id">2.5-3</span> strategy（"lo d-hi" 口訣）— <b>冗餘</b>：既有 Caution 已有同功能口訣（<code>sec-2-5.html:177</code>）。</div>
+<div class="skip"><span class="id">2.1-3</span> intuition（Def 2.1 後 gloss）— <b>低收益</b>：前導散文已充分鋪陳直覺。</div>
+<div class="skip"><span class="id">2.5-5</span> intuition（章末好奇鉤）— <b>低收益</b>：既有 closing 段已完成 chain-rule forward-ref。</div>
+
+<p class="sub" style="margin-top:2rem">候選來源：<code>REVIEW-ch02-modec-enrichment.html</code>（2026-06-18 偵察）　·　裁決稿：<code>REVIEW-ch02-modec-adjudication.html</code>（2026-06-26）　·　gate-1：<code>handout-prose-audit</code> ×5（範圍限定新 <code>[pass: enrichment]</code> 塊）　·　gate-2：<code>codex exec</code>（gpt-5.5, read-only）＋ 2.3-3 修正 re-audit，紀錄見 <code>REVIEW-ch02-modec-gate2.html</code>。</p>
+
+</body>
+</html>

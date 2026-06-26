@@ -429,6 +429,14 @@ window.MathJax = {
 
   <p>This “\(h\)-form” is often more convenient for computation: expand \(f(a + h)\), subtract \(f(a)\), cancel the factor of \(h\) from the denominator, then let \(h \to 0\).</p>
 
+  <!-- expansion:caution — the difference-quotient numerator is f(a+h)−f(a), not f(h); h is an increment from the base point a [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>A common slip is to read the numerator \(f(a + h) - f(a)\) as \(f(h)\). The symbol \(h\) is an <em>increment</em> — a small step away from the base point \(a\) — not an input in its own right. When you expand the difference quotient, substitute \(a + h\) into the function, writing \(f(a + h)\); never replace it with \(f(h)\) alone.</p>
+    </div>
+  </section>
+
   <!-- expansion:formula — name the limit as "derivative at a point"; brief: introduce f'(a) as slope alias -->
   <p>When this limit exists, the slope of the tangent line at \((a, f(a))\) is called the <em>derivative of \(f\) at \(a\)</em> and is written \(f'(a)\) (read “\(f\) prime of \(a\)”). Thus</p>
 
@@ -582,6 +590,9 @@ window.MathJax = {
       A calculator confirms \(\sqrt{4.01} = 2.00249844\ldots\), so the tangent-line estimate is accurate to four decimal places. This is the tangent-line approximation of Example 2.5 — the principle of local linearity (Remark 2.1) — applied to the question we opened the section with.</p>
     </div>
   </section>
+
+  <!-- expansion:application — the tangent line as linearization, used throughout applied mathematics [pass: enrichment] -->
+  <p>The move we just made — replacing a curve by its tangent line over a small range — is used throughout applied science and engineering, where it is called <em>linearization</em>. A navigation system linearizes the equations relating its position to satellite distances; a physicist replaces \(\sin\theta\) by \(\theta\) for the small swings of a pendulum; an economist treats a marginal cost as the slope of a cost curve. Each time, a hard curved problem is traded, near a point of interest, for an easy straight-line one — the practical payoff of local linearity.</p>
 
   <!-- expansion:summary — forward-ref to §2.2 -->
   <p>In the next section we turn the slope formula into a <em>function</em>: instead of computing the tangent slope at one fixed point \(a\), we let \(a\) vary and obtain a new function \(f'(x)\) that records the slope at every point where the limit exists.</p>
@@ -753,6 +764,14 @@ window.MathJax = {
 
   <p>the last three being <em>Leibniz notation</em>. Here \(\dfrac{d}{dx}\) is an <em>operator</em> — it acts on a function and returns its derivative — and the symbol deliberately echoes the difference quotient \(\Delta y / \Delta x\), which becomes \(dy/dx\) as the increment \(\Delta x\) (our \(h\)) shrinks to zero. Leibniz notation has the merit of displaying the variable we differentiate with respect to, which becomes valuable once a problem involves more than one variable; prime notation is lighter when the variable is understood. We will use whichever is clearer, and we state the rules of the coming sections most often with \(\dfrac{d}{dx}\). Thus the two results above may equally be written \(\dfrac{d}{dx}(x^{2} + 4x - 2) = 2x + 4\) and \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\).</p>
 
+  <!-- expansion:caution — dy/dx is one symbol for the derivative, not a fraction to split or cancel [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The symbol \(\dfrac{dy}{dx}\) names the derivative as a single object; it is <em>not</em> a fraction with numerator \(dy\) and denominator \(dx\). On its own, neither \(dy\) nor \(dx\) has been given a separate meaning here, so the pieces cannot be cancelled or cross-multiplied the way the parts of an ordinary fraction can. The notation is deliberately suggestive — it remembers that the derivative grew out of the quotient \(\Delta y / \Delta x\) — but until those parts are defined on their own (which we do not do in this book), read \(dy/dx\) as one indivisible name for \(f'(x)\).</p>
+    </div>
+  </section>
+
   <h3 class="subsec-head">Reading \(f'\) from the graph of \(f\)</h3>
 
   <!-- expansion:figure — derivative-as-a-function: f above, f' below on a common x-axis (ROADMAP key figure) -->
@@ -794,6 +813,9 @@ window.MathJax = {
       <p>Return to the moving car of the opening. If \(s(t)\) is its position, the derivative function \(s'(t)\) is its <em>velocity</em> \(v(t)\) at every time \(t\). The slope reading and the rate-of-change reading are two faces of the same limit: \(f'(x)\) measures how fast the output of \(f\) changes per unit change in the input — whether that output is read as a height (slope) or a position (velocity). This is why the derivative function is one of the central objects of calculus: it turns any varying quantity into a record of how fast it varies.</p>
     </div>
   </section>
+
+  <!-- expansion:application — rate of change beyond velocity: acceleration, population growth, marginal cost [pass: enrichment] [source: CLP-1 §2.4 population-growth example; marginal cost standard] -->
+  <p>Velocity is only the most familiar of these rates. Whenever one quantity depends on another, the derivative measures a rate of change with its own meaning. If \(s(t)\) is position, the derivative of the velocity \(s'(t)\) is the <em>acceleration</em> \(s''(t)\), the rate at which velocity itself changes — a second derivative we take up in §2.3. If \(P(t)\) is the size of a population, then \(P'(t)\) is its growth rate, in individuals per unit time. If \(C(q)\) is the cost of producing \(q\) units of a good, then \(C'(q)\) is the <em>marginal cost</em>, the added cost of producing one more unit. One limit, read in different settings, becomes a velocity, an acceleration, a growth rate, or a marginal cost.</p>
 
   <!-- expansion:summary — forward-ref to §2.3 -->
   <p>Throughout this section we assumed the defining limit exists. It need not: at some points a function may have no well-defined slope at all. In the next section we ask precisely when \(f'\) exists — the question of <em>differentiability</em> — uncover its close tie to continuity, and form the derivative of a derivative.</p>
@@ -915,6 +937,9 @@ window.MathJax = {
     </div>
   </section>
 
+  <!-- expansion:intuition — the picture behind Theorem 2.1: a single tangent direction leaves no room to jump [pass: enrichment] -->
+  <p>The proof is short, but the picture behind it is worth keeping. To be differentiable at \(a\) is to have one definite tangent direction there, and a curve smooth enough to settle on a single tangent has no room to jump — so differentiability forces continuity. The converse fails because continuity asks far less: it only forbids breaks, and an unbroken curve is still free to have a sharp corner, where no single tangent direction exists.</p>
+
   <figure class="figure" id="fig-diff-cont">
     <div class="figure-art">
       <svg viewBox="0 0 380 200" style="width:380px" class="fig-svg" role="img"
@@ -968,6 +993,9 @@ window.MathJax = {
 
   <p>Each is obtained by differentiating the previous one. By convention, \(f^{(0)} = f\) and \(f^{(1)} = f'\).</p>
 
+  <!-- expansion:intuition — physical meaning of higher derivatives: acceleration and jerk [pass: enrichment] -->
+  <p>Higher derivatives are more than a formal exercise in differentiating again; the low-order ones carry concrete meaning. If \(s(t)\) is the position of a moving object, the first derivative \(s'(t)\) is its velocity and the second derivative \(s''(t)\) is its <em>acceleration</em> — the rate at which the velocity changes, felt as the push that presses you back when a car speeds up. The third derivative \(s'''(t)\), the rate of change of acceleration, is called the <em>jerk</em>; engineers keep it small when designing elevators and trains so that changes in acceleration come on smoothly rather than as an abrupt lurch.</p>
+
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.5</span><span class="env-name">Higher-derivative notation</span></p>
     <div class="env-body">
@@ -976,6 +1004,14 @@ window.MathJax = {
       <p>and in general the \(n\)-th derivative is</p>
       <p>\[ f^{(n)}(x) \;=\; \frac{d^{n}y}{dx^{n}}. \]</p>
       <p>The superscript in \(d^{n}y/dx^{n}\) is <em>not</em> an exponent — it records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesized form \(f^{(n)}\) avoids a forest of primes.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — reading d²y/dx² as one operator symbol: not d(x²), not d·2y, not a fraction to cancel; the 2's only count differentiations [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\), and — as Remark 2.5 noted — the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\); and the \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\) — not \(d(x^{2})\), where the \(x\) itself would be squared, and not an algebraic denominator to cancel or split.</p>
     </div>
   </section>
 
@@ -1069,6 +1105,9 @@ window.MathJax = {
     </div>
   </section>
 
+  <!-- expansion:intuition — spot the pattern n·x^(n-1) in the known cases before proving it [pass: enrichment] -->
+  <p>Before proving it, notice the pattern the rule records. List the first few cases: \(x\) has derivative \(1\), the function \(x^{2}\) has derivative \(2x\) (computed in §2.2), and \(x^{3}\) has derivative \(3x^{2}\). In each one the exponent drops to the front as a multiplier and the power itself decreases by one — exactly \(n\,x^{n-1}\). The power rule claims that this pattern never breaks, for every positive integer \(n\). Showing that it <em>must</em> continue, rather than merely holding for the small cases we can check by hand, is the work of the proofs.</p>
+
   <!-- expansion:intuition — frame the manuscript's deliberate two-proof choice for the power rule -->
   <p>The manuscript records two proofs, each lighting the result from a different angle; we give both.</p>
 
@@ -1099,6 +1138,9 @@ window.MathJax = {
       <p>since \(\binom{n}{1} = n\).</p>
     </div>
   </section>
+
+  <!-- expansion:history — two proofs, two 17th-century strands: Newton's binomial theorem (c.1665) and Fermat's increment method (1630s) [pass: enrichment] [source: standard history of calculus — Newton's generalized binomial theorem, c.1665; Fermat's method of adequality for tangents and extrema, 1636] -->
+  <p>The two proofs trace two strands in the early history of the derivative. The binomial-expansion argument rests on Newton's generalized binomial theorem, which he developed around 1665 as part of the calculus he was then inventing; expanding \((x + h)^{n}\) and letting \(h \to 0\) is descended from the increment-and-discard method Fermat had used in the 1630s to find tangents and extrema. The factorization argument, by contrast, leans on no infinitesimal at all — it is ordinary algebra turned to the same purpose.</p>
 
   <!-- expansion:example — quick inline illustrations of the power rule -->
   <p>The rule is now a reflex. For instance,</p>
@@ -1156,6 +1198,9 @@ window.MathJax = {
 
   <!-- expansion:formula — justify the corollary by naming which rule does what -->
   <p>The reasoning is exactly the three rules acting in concert: the sum rule lets the derivative act term by term; the constant-multiple rule carries each coefficient \(a_{k}\) along untouched; and the power rule turns each \(x^{k}\) into \(k\,x^{k-1}\). The constant term \(a_{0}\) contributes \(0\), and the linear term \(a_{1}x\) contributes \(a_{1}\). Assembling the pieces gives the stated formula.</p>
+
+  <!-- expansion:application — the polynomial rule as the workhorse of kinematics: position → velocity in one line [pass: enrichment] -->
+  <p>This corollary is the workhorse of kinematics. If a moving object has a polynomial position \(s(t) = a_{n}t^{n} + \cdots + a_{1}t + a_{0}\), its velocity \(s'(t)\) follows in a single line by the same term-by-term rule, each power of \(t\) dropping by one. The car of §2.2, whose velocity we could there describe only in principle, is now a function we can differentiate at sight.</p>
 
   <!-- expansion:example — apply power + constant-multiple + sum to a polynomial (approved 2026-06-08; new type: rule-application, not first-principles) -->
   <div class="workedexample">
@@ -1259,6 +1304,9 @@ window.MathJax = {
   <!-- expansion:intuition — the takeaway: self-replication is what makes e^x "natural" -->
   <p>This self-replicating property is exactly what singles \(e^{x}\) out among all exponential functions and earns it the name <em>natural</em> exponential: at every point its rate of change equals its current value.</p>
 
+  <!-- expansion:intuition — why e^x is everywhere: any quantity whose growth rate is proportional to its size (y'=ky) [pass: enrichment] -->
+  <p>That one property — rate of change equal to current size — is why \(e^{x}\) governs so much of the world. Any quantity whose growth rate is proportional to how much is already present obeys a relation of the form \(y' = ky\), and its solution is built from \(e^{x}\). Money under continuous compounding grows in proportion to the balance; a radioactive sample decays in proportion to the amount remaining; an unchecked population grows in proportion to its current size. In every case the rate is tied to the level, and \(e^{x}\) is the function that ties them.</p>
+
   <!-- expansion:example — e^x with the linearity rules, plus higher derivatives showing e^x persists while the polynomial dies (approved 2026-06-08; new type) -->
   <div class="workedexample">
     <section class="env env-example">
@@ -1290,6 +1338,14 @@ window.MathJax = {
       <p>For a general base \(b > 0\), the exponential \(b^{x}\) is differentiable too, with</p>
       <p>\[ \frac{d}{dx}\,b^{x} = b^{x}\,\ln b, \]</p>
       <p>where \(\ln b = \log_{e} b\). We will be able to derive this cleanly once the chain rule is available (Chapter 3). Notice that the extra factor \(\ln b\) equals \(1\) precisely when \(b = e\) — yet another way of seeing why base \(e\) is the natural choice: only for it does the derivative arrive with no stray constant attached.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — e^x (exponential) vs x^e (power): different rules; d/dx x^e ≠ x^e [pass: enrichment] [source: CLP-1 §2.6 Conceptual "is d/dx(2^x)=x·2^(x-1)?"] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Keep the exponential and power functions apart. In \(e^{x}\) the base is the fixed number \(e\) and the exponent varies, so it is an <em>exponential</em> function with \(\dfrac{d}{dx}e^{x} = e^{x}\). In \(x^{e}\) the exponent is the fixed number \(e \approx 2.718\) and the base varies, so it is a <em>power</em> function, differentiated by the power rule: \(\dfrac{d}{dx}x^{e} = e\,x^{e-1}\). The two obey different rules, and in particular \(\dfrac{d}{dx}x^{e} \ne x^{e}\). The general split is \(\dfrac{d}{dx}b^{x} = b^{x}\ln b\) for an exponential against \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for a power — decide which form you are looking at before you differentiate.</p>
     </div>
   </section>
 
@@ -1432,6 +1488,9 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:application — product rule in economics: marginal revenue R'(q)=p'(q)q+p(q) [pass: enrichment] -->
+  <p>The product rule has a clean reading in economics. Suppose a firm sells \(q\) units at a price \(p(q)\) that depends on how many are sold; its revenue is the product \(R(q) = p(q)\,q\). The product rule gives the <em>marginal revenue</em> \(R'(q) = p'(q)\,q + p(q)\): selling one more unit changes revenue in two ways at once — through the price change \(p'(q)\) spread over all \(q\) units, and through the price \(p(q)\) fetched by the extra unit itself. The two strips of Figure 2.4 return here as two competing economic effects.</p>
+
   <h3 class="subsec-head">The quotient rule</h3>
 
   <!-- expansion:intuition — bridge to the quotient, reusing the same add-and-subtract idea; introduce the manuscript's Δx notation -->
@@ -1452,6 +1511,9 @@ window.MathJax = {
       <p>\[ \left(\frac{f}{g}\right)'(x) = \frac{f'(x)\,g(x) - f(x)\,g'(x)}{\bigl[g(x)\bigr]^{2}}. \]</p>
     </div>
   </section>
+
+  <!-- expansion:intuition — why the quotient rule carries a minus sign and a g²: g sits in the denominator [pass: enrichment] -->
+  <p>Before the proof, it helps to see why the rule has this shape. Like the product rule, its numerator pairs each function with the derivative of the other — but joined by a <em>minus</em> sign instead of a plus, and the whole expression is divided by \(g^{2}\). The minus sign reflects that \(g\) sits in the denominator: making \(g\) larger makes the quotient \(f/g\) smaller, so the effect of \(g'\) is subtracted rather than added. The \(g^{2}\) is the footprint of differentiating \(1/g\): already in the simplest case \(f = 1\), the derivative of \(1/x\) was \(-1/x^{2}\) in §2.2 — the same minus sign and the same square that the quotient rule carries in general.</p>
 
   <!-- proof follows the manuscript: combine over a common denominator, add and subtract f(x)g(x) on the numerator, keep Δx notation; needs g continuous (so g(x+Δx)→g(x)) and g(x)≠0 (so the denominator tends to g(x)^2 ≠ 0) -->
   <section class="env env-proof">
@@ -1554,6 +1616,14 @@ window.MathJax = {
         <li>Apply the matching rule: the power, sum, and constant-multiple rules for polynomials and powers; the product rule (Theorem 2.6) for a genuine product; the quotient rule (Theorem 2.7) for a genuine quotient. For compound expressions, the rules combine — a sum of products, a product with a polynomial factor, and so on.</li>
       </ol>
       <p>The point is to spend a moment on the shape of the problem before computing: the same expression can be far easier under one rule than another, and some apparent quotients are not quotients at all once simplified.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — a constant factor or constant denominator needs the constant-multiple rule, not the product/quotient rule [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Not every product or quotient on the page calls for the product or quotient rule. A constant factor is handled by the constant-multiple rule: \(\dfrac{d}{dx}(5x^{3}) = 5 \cdot 3x^{2} = 15x^{2}\), with no need to "differentiate" the \(5\). A constant denominator is likewise just a constant multiple, since \(\dfrac{x^{2}}{3} = \tfrac{1}{3}x^{2}\) gives \(\dfrac{d}{dx}\dfrac{x^{2}}{3} = \tfrac{2}{3}x\). The product and quotient rules are needed only when <em>both</em> parts genuinely depend on \(x\); using them when one part is constant still reaches the answer, but by a longer route with more chances to slip.</p>
     </div>
   </section>
 

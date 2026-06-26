@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 2 Mode C soft-depth — 裁決稿（含核冗餘＋建議）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085;
+          --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; --ink:#1a1a1a; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:1040px;
+         margin:0 auto; padding:2rem 1.5rem 7rem; background:var(--bg); color:var(--ink); line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.15rem; margin:2.4rem 0 .5rem; padding-top:.7rem; border-top:2px solid var(--line); }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .how { background:#fff7ed; border-left:3px solid #e0a106; padding:.6rem .9rem; border-radius:5px;
+         font-size:.9rem; color:#7a5b00; margin:.4rem 0 1.2rem; }
+  .legend { font-size:.82rem; color:var(--gray); margin:.3rem 0 0; }
+  table.sum { width:100%; border-collapse:collapse; margin:1rem 0 .4rem; font-size:.88rem; }
+  table.sum th, table.sum td { border:1px solid var(--line); padding:.4rem .6rem; text-align:left; }
+  table.sum th { background:#eef2f7; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.7rem .9rem .8rem;
+          margin:.6rem 0; position:relative; }
+  .card.write { border-left:4px solid var(--green); }
+  .card.skip  { border-left:4px solid var(--line); background:#fafafa; }
+  .card.defer { border-left:4px solid var(--amber); }
+  .row1 { display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; }
+  .pick { width:1.05rem; height:1.05rem; accent-color:var(--green); cursor:pointer; margin-right:.2rem; }
+  .id { font-family:ui-monospace,"Cascadia Code",monospace; font-weight:700; font-size:.82rem;
+        background:#eef2f7; padding:.1rem .45rem; border-radius:4px; }
+  .badge { font-size:.7rem; font-weight:700; padding:.1rem .5rem; border-radius:999px;
+           text-transform:uppercase; letter-spacing:.02em; }
+  .b-int { background:#e7f0fb; color:var(--blue); }
+  .b-cau { background:#fdeceb; color:var(--red); }
+  .b-app { background:#e9f7ef; color:var(--green); }
+  .b-str { background:#f3e8fd; color:#6c2bd9; }
+  .b-his { background:#fef0e7; color:var(--amber); }
+  .conf { font-size:.7rem; color:var(--gray); }
+  .conf.hi { color:var(--blue); font-weight:700; }
+  .v { font-size:.72rem; font-weight:700; padding:.12rem .55rem; border-radius:4px; margin-left:auto; }
+  .v-write { background:#e9f7ef; color:var(--green); }
+  .v-skip  { background:#f1f1f1; color:var(--gray); }
+  .v-defer { background:#fef0e7; color:var(--amber); }
+  .loc { font-size:.8rem; color:var(--gray); margin:.4rem 0 .2rem; }
+  .prop { margin:.3rem 0; font-size:.95rem; }
+  .why { font-size:.83rem; color:#475467; margin:.3rem 0 0; }
+  .ev { font-size:.82rem; color:#5a3000; background:#fff7ed; border:1px solid #f3e3c8;
+        border-radius:5px; padding:.4rem .6rem; margin:.4rem 0 0; }
+  .ev code { background:#fbe7cf; padding:.05rem .3rem; border-radius:3px; }
+  .src { font-size:.76rem; color:var(--gray); margin-top:.35rem; }
+  .src code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .footer { position:fixed; left:0; right:0; bottom:0; background:#1a1a1a; color:#fff;
+            padding:.6rem 1.2rem; font-size:.86rem; display:flex; align-items:center; gap:.8rem;
+            box-shadow:0 -2px 8px rgba(0,0,0,.18); }
+  .footer .count { color:#8fd3a8; font-weight:700; white-space:nowrap; }
+  .footer .cmd { font-family:ui-monospace,monospace; background:#2b2b2b; padding:.3rem .6rem;
+                 border-radius:5px; flex:1; overflow-x:auto; white-space:nowrap; }
+  .footer button { background:var(--green); color:#fff; border:0; border-radius:5px; padding:.4rem .8rem;
+                   font-weight:700; cursor:pointer; white-space:nowrap; }
+  .footer button.ghost { background:#3a3a3a; }
+  .secnote { font-size:.84rem; color:var(--gray); margin:.2rem 0 .6rem; }
+</style>
+</head>
+<body>
+<h1>Chapter 2 — Mode C soft-depth 裁決稿</h1>
+<p class="sub">2026-06-26　·　20 條軟深度候選（intuition／caution／application／strategy／history）　·　主軸已凍結，全為「新增」、不動既有內容　·　已對<b>現行</b> fragment 核過冗餘（原 2026-06-18 候選稿的行號／例題號已過時）</p>
+
+<div class="how"><b>怎麼用：</b>每張卡左上的勾選框＝是否要寫，<b>預設已照我的建議勾好</b>（綠＝建議寫、灰＝建議跳過、琥珀＝待驗證）。你可任意改勾，底部會即時生成「<code>寫 …</code>」指令——按「複製清單」貼回給我，我就開寫。</div>
+
+<p class="legend">型別：<span class="badge b-int">intuition</span> <span class="badge b-cau">caution</span> <span class="badge b-app">application</span> <span class="badge b-str">strategy</span> <span class="badge b-his">history</span></p>
+
+<table class="sum">
+  <tr><th>建議</th><th>數量</th><th>條目</th></tr>
+  <tr><td><b style="color:var(--green)">寫</b></td><td>14</td><td>9 high 全寫＋5 條 non-redundant medium（2.1-2, 2.3-3, 2.4-3, 2.4-4, 2.5-4）</td></tr>
+  <tr><td><b style="color:var(--gray)">跳過</b></td><td>5</td><td>與現有散文重複：2.2-3, 2.3-4, 2.5-3；低收益：2.1-3, 2.5-5</td></tr>
+  <tr><td><b style="color:var(--amber)">待驗證</b></td><td>1</td><td>2.4-5 history（Newton/Fermat 歸屬未證）</td></tr>
+</table>
+
+<!-- ===================== §2.1 ===================== -->
+<h2>§2.1 The Tangent Line and the Derivative at a Point</h2>
+<p class="secnote">已飽和：tangent-as-approximation opener＋\(\sqrt{4.01}\) bookend、Def 2.1 動機散文、Remark 2.1 local linearity、h-form 解釋；Examples 2.1–2.5。</p>
+
+<div class="card write" data-id="2.1-1">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.1-1</span><span class="badge b-cau">caution</span><span class="conf hi">high</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：h-form 段之後、\(f'(a)\) 引入之前</div>
+  <div class="prop">新增 Caution：差商分子是 \(f(a+h)-f(a)\)，<b>不是</b> \(f(h)\)。\(h\) 是「距 \(a\) 的偏移量」，代入要寫 \(f(\text{base}+h)\)。</div>
+  <div class="why">why：\(f(a+h)\) 是初學者最常誤寫成 \(f(h)\) 之處；§2.2 三步策略隱含已懂此點卻從未明講。</div>
+  <div class="src">source：<code>authored</code></div>
+</div>
+
+<div class="card write" data-id="2.1-2">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.1-2</span><span class="badge b-app">application</span><span class="conf">medium</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Remark 2.2（tangent-line approximation bookend）之後</div>
+  <div class="prop">新增一句 Remark：把切線近似連到現實——GPS 定位線性化、物理小擾動近似、經濟邊際分析，皆「以切線代曲線」。不重述 local linearity 機制。</div>
+  <div class="why">why：§2.1 的應用層全是純數學（\(\sqrt{4.01}\)、\(1/2.05\)），無數學外世界的錨。</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §2.1）</code></div>
+</div>
+
+<div class="card skip" data-id="2.1-3">
+  <div class="row1"><input type="checkbox" class="pick"><span class="id">2.1-3</span><span class="badge b-int">intuition</span><span class="conf">low</span><span class="v v-skip">建議跳過</span></div>
+  <div class="loc">locus：Def 2.1 之後</div>
+  <div class="prop">在 Def 2.1 後加一句 informal gloss（切線斜率＝該點曲線陡峭程度的單一數字）。</div>
+  <div class="ev"><b>跳過理由：</b>§2.1 前導散文（secant→tangent 極限動機）已相當充分地鋪陳此直覺；Def 2.1 公式重度只算中等，再加 gloss 邊際收益低。原報告自評 confidence=low。</div>
+</div>
+
+<!-- ===================== §2.2 ===================== -->
+<h2>§2.2 The Derivative as a Function</h2>
+<p class="secnote">已飽和：velocity opener、Def 2.2「slope machine」gloss、Remark 2.3 (domain)、Remark 2.4 (rate-of-change bookend)、Leibniz 段、sign-correspondence＋Ex 2.10；Strategy 2.1；Examples 2.6–2.10。</p>
+
+<div class="card write" data-id="2.2-1">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.2-1</span><span class="badge b-cau">caution</span><span class="conf hi">high</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Leibniz notation 段之後、"Reading \(f'\) from the graph" 子標題之前</div>
+  <div class="prop">新增 Caution：\(\dfrac{dy}{dx}\) <b>不是</b>分數，是表示極限操作結果的完整符號；別把它當 \(dy\div dx\) 拆開「交叉相乘／約分」。</div>
+  <div class="why">why：dy/dx-as-fraction 是最普遍誤解；現有 Leibniz 段正面介紹 operator，但沒正面警告「別拆開」。</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §2.8, Rogawski 4e §3.1）</code></div>
+</div>
+
+<div class="card write" data-id="2.2-2">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.2-2</span><span class="badge b-app">application</span><span class="conf hi">high</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Remark 2.4 之後、收束 forward-ref 段之前</div>
+  <div class="prop">把 "derivative as rate of change" 從速度拓展（各一句）：物理 \(s'(t)\)=速度、\(s''(t)\)=加速度；生物 \(P'(t)\)=族群增長率；經濟 \(C'(q)\)=邊際成本。</div>
+  <div class="why">why：Remark 2.4 只用汽車速度一個場景；多領域錨點助不同讀者。</div>
+  <div class="src">source：<code>[source: CLP-1 §2.4 population growth] + authored（marginal cost 標準）</code></div>
+</div>
+
+<div class="card skip" data-id="2.2-3">
+  <div class="row1"><input type="checkbox" class="pick"><span class="id">2.2-3</span><span class="badge b-cau">caution</span><span class="conf">medium</span><span class="v v-skip">建議跳過（冗餘）</span></div>
+  <div class="loc">locus：Example 2.7 solution 之後</div>
+  <div class="prop">提醒 \(f'(x)=1/(2\sqrt{x})\) 定義域只 \(x>0\)（\(1/(2\sqrt0)\) 除以零），即使 \(\sqrt{x}\) 在 \(x=0\) 有定義。</div>
+  <div class="ev"><b>核過＝已覆蓋：</b>Remark 2.3 已用<b>完全相同</b>的具體案例：<code>sec-2-2.html:133</code>「the square-root function is defined for all \(x\ge0\), whereas its derivative \(f'(x)=1/(2\sqrt{x})\) is defined only for \(x>0\)」。再加一條 Caution 屬重複。</div>
+</div>
+
+<!-- ===================== §2.3 ===================== -->
+<h2>§2.3 Differentiability, Continuity, and Higher Derivatives</h2>
+<p class="secnote">已飽和：opener 動機、Def 2.3 gloss、Caution (converse false)、Thm 2.1 proof＋inclusion diagram、Example 2.11 corner＋Figure 2.3、vertical-tangent 例、higher-derivatives 子節。</p>
+
+<div class="card write" data-id="2.3-1">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.3-1</span><span class="badge b-int">intuition</span><span class="conf hi">high</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Theorem 2.1 proof 之後、inclusion diagram 之前</div>
+  <div class="prop">2–3 句白話：「有切線就必然沒斷裂」——可畫切線（differentiable）⇒ 曲線夠平滑、割線有穩定極限方向 ⇒ continuous；反向不成立（連續不保證無尖角）。</div>
+  <div class="why">why：Thm 2.1 證明是代數的，缺一段「為什麼該成立」的直覺轉譯（proof 後回顧亦有教學價值）。</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §2.8）</code></div>
+</div>
+
+<div class="card write" data-id="2.3-2">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.3-2</span><span class="badge b-int">intuition</span><span class="conf hi">high</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus："Higher derivatives" 子標題之後、notation 段之前</div>
+  <div class="prop">動機散文：higher derivatives 有物理意義——\(s'\)=速度、\(s''\)=加速度（踩油門的推背力）、\(s'''\)=jerk（電梯舒適度設計用）。</div>
+  <div class="why">why：higher-derivatives 段目前只有機械化「differentiate again」＋符號表，零動機零直覺。</div>
+  <div class="src">source：<code>authored（accel 普遍；jerk cf. Stewart 8e §3.7）</code></div>
+</div>
+
+<div class="card write" data-id="2.3-3">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.3-3</span><span class="badge b-cau">caution</span><span class="conf">medium</span><span class="v v-write">建議寫（報告低估）</span></div>
+  <div class="loc">locus：higher-derivative notation 段之後、Example 2.12 之前</div>
+  <div class="prop">提醒 \(d^2y/dx^2\) 的 \(dx^2\) 是 \((dx)^2\) 不是 \(d(x^2)\)；分子 \(d^2y\)＝「\(d\) 作用兩次」不是「\(d\) 乘 \(2y\)」。</div>
+  <div class="ev"><b>核過＝非冗餘：</b>現有 notation 段（<code>sec-2-3.html:174</code>）只說「the superscript … is <em>not</em> an exponent」，<b>沒</b>觸及 \(dx^2=(dx)^2\) vs \(d(x^2)\) 這個具體誤讀。此條補的是不同盲點 → 值得寫（原報告 confidence=medium 偏保守）。</div>
+  <div class="src">source：<code>authored（cf. Rogawski 4e §3.5）</code></div>
+</div>
+
+<div class="card skip" data-id="2.3-4">
+  <div class="row1"><input type="checkbox" class="pick"><span class="id">2.3-4</span><span class="badge b-int">intuition</span><span class="conf">medium</span><span class="v v-skip">建議跳過（冗餘）</span></div>
+  <div class="loc">locus：Example 2.11 solution 之後、Figure 2.3 之前</div>
+  <div class="prop">corner 幾何 gloss：左右切線指不同方向、單一切線無法同時指兩方向 ⇒ 導數不存在。</div>
+  <div class="ev"><b>核過＝已覆蓋：</b><code>sec-2-3.html:62</code> 已有完整幾何解讀「the two families converge to different directions, so there is no single tangent line — exactly the geometric meaning of non-differentiability」；Def 2.3 gloss（line 30）也已說「no sharp corner」。再加屬重複。</div>
+</div>
+
+<!-- ===================== §2.4 ===================== -->
+<h2>§2.4 Derivatives of Polynomials and the Exponential Function</h2>
+<p class="secnote">已飽和：opener、Thm 2.2 幾何直覺、power-rule 動機、兩種 proof、Caution (power-rule domain)、Remark 2.6（\(b^x\)＋why \(e\)）、sum/const-mult 動機；Examples 覆蓋多項式＋指數＋higher deriv。</p>
+
+<div class="card write" data-id="2.4-1">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.4-1</span><span class="badge b-int">intuition</span><span class="conf hi">high</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Theorem 2.5 proof 之後、\(\texttt{exp-self-derivative}\) figure 之前</div>
+  <div class="prop">2–3 句解釋 \((e^x)'=e^x\) 直覺：一個量其成長速度永遠等於當前大小——這就是為何 \(e^x\) 出現在所有「成長率正比於大小」的模型（人口、衰變、連續複利）。</div>
+  <div class="why">why：\((e^x)'=e^x\) 是全章最深結果之一；proof 後只一句帶過 self-replicating，值得一段白話翻譯。</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §3.8）</code></div>
+</div>
+
+<div class="card write" data-id="2.4-2">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.4-2</span><span class="badge b-cau">caution</span><span class="conf hi">high</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Remark 2.6（\(b^x\) 導數）之後、收束 forward-ref 之前</div>
+  <div class="prop">Caution：\(\dfrac{d}{dx}e^x=e^x\) 但 \(\dfrac{d}{dx}x^e\ne x^e\)。前者指數函數（用 \(b^x\ln b\)）、後者冪函數（用 \(rx^{r-1}\)），規則完全不同。</div>
+  <div class="why">why：Remark 2.6 提了 \(b^x\) 含 \(\ln b\)，但沒警告「\(x^e\) 用 power rule 不是 exponential rule」；CLP-1 經典辨析題。</div>
+  <div class="src">source：<code>[source: CLP-1 §2.6 Conceptual] + authored</code></div>
+</div>
+
+<div class="card write" data-id="2.4-3">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.4-3</span><span class="badge b-int">intuition</span><span class="conf">medium</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Theorem 2.3（power rule statement）之後、第一個 proof 之前</div>
+  <div class="prop">pattern-spotting 直覺：已知 \((x)'=1,(x^2)'=2x,(x^3)'=3x^2\)——每次指數跑前面做乘數、本身降一。Power rule 說 \(nx^{n-1}\) 永遠成立，以下兩 proof 解釋為何。</div>
+  <div class="why">why：現有散文只說「met a few one at a time」沒把 pattern 攤出來；proof 前先擺 pattern 讓讀者帶問題讀。</div>
+  <div class="src">source：<code>authored</code></div>
+</div>
+
+<div class="card write" data-id="2.4-4">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.4-4</span><span class="badge b-app">application</span><span class="conf">medium</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Corollary 2.1（polynomial derivative）之後</div>
+  <div class="prop">一句應用：kinematics 中多項式位置 \(s(t)\) 由此 corollary 一行得多項式速度 \(s'(t)\)（每個 \(t\) 次方降一）。</div>
+  <div class="why">why：Corollary 2.1 最工具性卻無任何用途連結；一句呼應 §2.2 汽車場景。<b>（與 2.2-2 微弱主題重疊，但 locus／教學拍不同，僅一句。）</b></div>
+  <div class="src">source：<code>authored</code></div>
+</div>
+
+<div class="card defer" data-id="2.4-5">
+  <div class="row1"><input type="checkbox" class="pick"><span class="id">2.4-5</span><span class="badge b-his">history</span><span class="conf">low</span><span class="v v-defer">待驗證</span></div>
+  <div class="loc">locus：Theorem 2.3 兩 proof 之後</div>
+  <div class="prop">歷史註腳：factorization 技法溯及 Newton/Fermat 的差商操作；binomial 展開法則連 Newton 二項式定理。</div>
+  <div class="ev"><b>待驗證：</b>具體歸屬需查證才能下筆（教科書若寫錯歷史風險高）。原報告 source 標 <code>needs verification</code>。若你選「建議集＋history」，我會先把歸屬查實，查不實則降級為泛論或不寫。</div>
+</div>
+
+<!-- ===================== §2.5 ===================== -->
+<h2>§2.5 The Product and Quotient Rules</h2>
+<p class="secnote">已飽和：opener、Caution \((fg)'\ne f'g'\)＋反例、Figure 2.4 rectangle-area、product proof、Caution \(\Delta x\equiv h\)、Caution quotient asymmetry＋mnemonic、Strategy 2.2；Examples 覆蓋 product/quotient/rule-selection。</p>
+
+<div class="card write" data-id="2.5-1">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.5-1</span><span class="badge b-int">intuition</span><span class="conf hi">high</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Theorem 2.7（quotient rule statement）之後、proof 之前</div>
+  <div class="prop">2–3 句：為何 quotient rule 長這樣——分子 \(f'g-fg'\) 結構同 product rule 但帶<b>減號</b>（分母變大商縮小、\(g'\) 貢獻要減），\(g^2\) 來自 \(1/g\) 的連鎖（呼應 \((1/x)'=-1/x^2\) 的負號與平方）。</div>
+  <div class="why">why：product rule 有 Figure 2.4 幾何直覺，quotient rule 只有 proof、無直覺段，讀者常覺「天降公式」。</div>
+  <div class="src">source：<code>authored</code></div>
+</div>
+
+<div class="card write" data-id="2.5-2">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.5-2</span><span class="badge b-cau">caution</span><span class="conf hi">high</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Strategy 2.2 之後</div>
+  <div class="prop">Caution：何時<b>不</b>需 product/quotient rule——\(\frac{d}{dx}(5x^3)\) 用 constant-multiple（5 是常數）；\(\frac{d}{dx}(x^2/3)\) 只是 \(\frac13x^2\)。只有分子<b>和</b>分母都依賴 \(x\) 才用 quotient rule。</div>
+  <div class="why">why：Strategy 2.2 提「simplify first」但例子是 \((x^4-x)/x\)，沒正面點「常數因子/分母不算」；初學者常在 \(5x^3\) 上展 product rule。</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §3.2）</code></div>
+</div>
+
+<div class="card skip" data-id="2.5-3">
+  <div class="row1"><input type="checkbox" class="pick"><span class="id">2.5-3</span><span class="badge b-str">strategy</span><span class="conf">medium</span><span class="v v-skip">建議跳過（冗餘）</span></div>
+  <div class="loc">locus：quotient-rule asymmetry Caution 之後</div>
+  <div class="prop">加口訣 "lo d-hi minus hi d-lo, over lo-lo"。</div>
+  <div class="ev"><b>核過＝已有口訣：</b><code>sec-2-5.html:177</code> 已有 mnemonic「(derivative of top)(bottom) minus (top)(derivative of bottom), all over bottom squared」。同一規則第二個口訣屬功能重疊的雜訊，建議只留一個。</div>
+</div>
+
+<div class="card write" data-id="2.5-4">
+  <div class="row1"><input type="checkbox" class="pick" checked><span class="id">2.5-4</span><span class="badge b-app">application</span><span class="conf">medium</span><span class="v v-write">建議寫</span></div>
+  <div class="loc">locus：Example 2.15 solution 之後、"Quotient rule" 子標題之前</div>
+  <div class="prop">一句應用：經濟學收入 \(R(q)=p(q)\cdot q\) ⇒ \(R'(q)=p'(q)\,q+p(q)\)（邊際收入＝價格效應＋數量效應）——product rule 把「兩量同變的總效果」拆兩項，是 Figure 2.4 矩形分解的經濟學翻版。</div>
+  <div class="why">why：§2.5 無任何數學外應用；把 \(f'g+fg'\) 翻成經濟語言讓對物理無感的讀者也抓住「為何兩項」。</div>
+  <div class="src">source：<code>authored（cf. Stewart 8e §3.7 Economics）</code></div>
+</div>
+
+<div class="card skip" data-id="2.5-5">
+  <div class="row1"><input type="checkbox" class="pick"><span class="id">2.5-5</span><span class="badge b-int">intuition</span><span class="conf">low</span><span class="v v-skip">建議跳過</span></div>
+  <div class="loc">locus：本章 closing 段</div>
+  <div class="prop">結尾回顧：現有規則已能微分任何加減乘除＋指數組合，唯缺複合 \(f(g(x))\)（如 \(e^{x^2}\)）⇒ chain rule 的工作；以 \(e^{x^2}\) 激好奇。</div>
+  <div class="ev"><b>跳過理由：</b>現有 closing 段已提 composition 與 chain rule、已完成 forward-ref 職責；加例子屬 nice-to-have，原報告自評 low。</div>
+</div>
+
+<div class="footer">
+  <span class="count" id="count">14 條</span>
+  <span class="cmd" id="cmd">寫 …</span>
+  <button onclick="copyCmd()">複製清單</button>
+  <button class="ghost" onclick="setAll(true)">全勾</button>
+  <button class="ghost" onclick="resetRec()">回建議</button>
+</div>
+
+<script>
+  var REC = ['2.1-1','2.1-2','2.2-1','2.2-2','2.3-1','2.3-2','2.3-3','2.4-1','2.4-2','2.4-3','2.4-4','2.5-1','2.5-2','2.5-4'];
+  function update() {
+    var ids = [];
+    document.querySelectorAll('.card').forEach(function(c){
+      if (c.querySelector('.pick').checked) ids.push(c.getAttribute('data-id'));
+    });
+    document.getElementById('count').textContent = ids.length + ' 條';
+    document.getElementById('cmd').textContent = ids.length ? ('寫 ' + ids.join(', ')) : '（未選任何條目）';
+  }
+  function copyCmd() {
+    var t = document.getElementById('cmd').textContent;
+    navigator.clipboard.writeText(t).then(function(){
+      var b = event.target; var o = b.textContent; b.textContent = '已複製 ✓';
+      setTimeout(function(){ b.textContent = o; }, 1200);
+    });
+  }
+  function setAll(v){ document.querySelectorAll('.pick').forEach(function(p){ p.checked = v; }); update(); }
+  function resetRec(){
+    document.querySelectorAll('.card').forEach(function(c){
+      c.querySelector('.pick').checked = REC.indexOf(c.getAttribute('data-id')) >= 0;
+    });
+    update();
+  }
+  document.querySelectorAll('.pick').forEach(function(p){ p.addEventListener('change', update); });
+  update();
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 2 Mode C soft-depth — gate-2（Codex）複審紀錄</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:960px;
+         margin:0 auto; padding:2rem 1.5rem 4rem; background:var(--bg); color:#1a1a1a; line-height:1.62; }
+  h1 { font-size:1.45rem; margin:0 0 .3rem; }
+  h2 { font-size:1.12rem; margin:2rem 0 .4rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .pass { background:#eaf6ed; border-left:3px solid var(--green); padding:.6rem .9rem; border-radius:5px; margin:.4rem 0 1rem; font-size:.93rem; color:#13502c; }
+  .pass b { color:var(--green); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.8rem 1rem; margin:.7rem 0; border-left:4px solid var(--red); }
+  .lab { font-weight:700; font-size:.82rem; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; margin:.6rem 0 .15rem; }
+  .old { background:#fcecea; border-radius:6px; padding:.5rem .75rem; font-size:.93rem; }
+  .new { background:#eaf6ed; border-radius:6px; padding:.5rem .75rem; font-size:.93rem; }
+  .why { font-size:.9rem; color:#475467; margin:.4rem 0; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  table { width:100%; border-collapse:collapse; margin:.6rem 0; font-size:.88rem; }
+  th, td { border:1px solid var(--line); padding:.4rem .6rem; text-align:left; }
+  th { background:#eef2f7; }
+  .zero { color:var(--green); font-weight:700; }
+</style>
+</head>
+<body>
+<h1>Chapter 2 — Mode C soft-depth：gate-2（Codex）複審紀錄</h1>
+<p class="sub">2026-06-26　·　gate-2 = 跨模型複審　·　<code>codex exec --sandbox read-only --output-schema …</code>（Codex gpt-5.5，ChatGPT 訂閱、唯讀，非 API 計費）　·　範圍＝gate-1 已過的 15 塊 <code>[pass: enrichment]</code></p>
+
+<div class="pass"><b>結論：1 blocking（2.3-3）→ 修正 → re-audit pass。其餘 14 塊兩閘皆 clean。</b> 跨模型雙閘與 Ch1 modec 一致（Ch1 = <code>REVIEW-ch01-modec-gate2.html</code>）。</div>
+
+<table>
+  <tr><th>輪次</th><th>模型</th><th>blocking</th><th>advisory</th><th>備註</th></tr>
+  <tr><td>gate-1（×5 節）</td><td>Claude handout-prose-audit</td><td class="zero">0</td><td class="zero">0</td><td>範圍限定新塊；數學逐句核對</td></tr>
+  <tr><td>gate-2（initial）</td><td>Codex gpt-5.5 (xhigh)</td><td>1</td><td class="zero">0</td><td>2.3-3 記號 reify dx（見下）；~131k tokens</td></tr>
+  <tr><td>gate-2（re-audit 2.3-3）</td><td>Codex gpt-5.5 (xhigh)</td><td class="zero">0</td><td class="zero">0</td><td>verdict: pass；~13k tokens</td></tr>
+</table>
+
+<h2>唯一 finding：2.3-3（second-derivative 記號 caution）— blocking, math/consistency</h2>
+
+<div class="card">
+  <div class="why"><b>Codex issue：</b>初稿把 \(dx^{2}\) 解釋為 \((dx)^{2}\)，等於把 \(dx\) reify 成一個可平方的因子——但本書在 §2.2 的 caption（2.2-1，本輪同批寫入）才剛告訴學生「\(dy/dx\) 不是分數、\(dx\) 沒有獨立意義」。兩塊自相矛盾；且與既有 Remark 2.5 的 operator 讀法不一致。屬內部一致性／數學讀法的 blocking。</div>
+
+  <div class="lab">原文（gate-2 前）</div>
+  <div class="old">Read the Leibniz symbol for the second derivative with care. In \(\dfrac{d^{2}y}{dx^{2}}\), the bottom \(dx^{2}\) means \((dx)^{2}\) — the operator \(\dfrac{d}{dx}\) applied twice — not \(d(x^{2})\); and the top \(d^{2}y\) means \(d\) applied twice to \(y\), not \(d\) times \(2y\). …</div>
+
+  <div class="lab">改寫（gate-2 後，採 operator 讀法、不 reify \(dx\)）</div>
+  <div class="new">Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\), and — as Remark 2.5 noted — the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\); and the \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\) — not \(d(x^{2})\), where the \(x\) itself would be squared, and not an algebraic denominator to cancel or split.</div>
+
+  <div class="why"><b>為何此改正確：</b>保留原塊的兩個防誤讀目標（非 \(d(x^{2})\)、非 \(d\cdot2y\），再加「不可約分」呼應 2.2-1），但不再宣稱 \(dx^{2}=(dx)^{2}\)；改採「整個符號＝operator 套兩次」的讀法，與 §2.2 caution、Remark 2.5 一致。Codex re-audit（餵入原 issue＋改寫）回 <code>{"findings":[],"blockingCount":0,"verdict":"pass"}</code>。</div>
+</div>
+
+<h2>14 塊 clean</h2>
+<p class="sub">2.1-1, 2.1-2, 2.2-1, 2.2-2, 2.3-1, 2.3-2, 2.4-1, 2.4-2, 2.4-3, 2.4-4, 2.4-5, 2.5-1, 2.5-2, 2.5-4 — gate-2 皆無 finding，數學／史實（含 2.4-5 Newton/Fermat）核對通過。內容見 <code>REVIEW-ch02-modec-applied.html</code>。</p>
+
+<p class="sub" style="margin-top:1.6rem"><b>Codex 呼叫法（紀錄）：</b><code>Get-Content prompt.txt -Raw | codex exec --sandbox read-only --output-schema schema.json -o out.json -</code>（stdin 收 EOF、唯讀沙箱、結構化輸出；schema 全欄 required、無 min/max——依 <code>authoring/seed_converge/PLAN_codex_subscription_loop.md</code> §8/§9）。</p>
+
+</body>
+</html>
