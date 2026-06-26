@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 2 圖機會稽核 — 裁決稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:1000px; margin:0 auto;
+         padding:2rem 1.5rem 5rem; background:var(--bg); color:#1a1a1a; line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.14rem; margin:2.2rem 0 .5rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .how { background:#fff7ed; border-left:3px solid #e0a106; padding:.6rem .9rem; border-radius:5px; font-size:.9rem; color:#7a5b00; margin:.4rem 0 1.1rem; }
+  table.sum { width:100%; border-collapse:collapse; margin:1rem 0 .4rem; font-size:.88rem; }
+  table.sum th, table.sum td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; }
+  table.sum th { background:#eef2f7; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.75rem 1rem; margin:.6rem 0; }
+  .card.high { border-left:4px solid var(--blue); }
+  .card.medium { border-left:4px solid var(--gray); }
+  .card.low { border-left:4px solid var(--line); opacity:.95; }
+  .row1 { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin-bottom:.25rem; }
+  .pri { font-size:.7rem; font-weight:700; padding:.1rem .55rem; border-radius:999px; text-transform:uppercase; letter-spacing:.02em; }
+  .pri.high { background:#e7f0fb; color:var(--blue); }
+  .pri.medium { background:#eef0f4; color:#33343a; }
+  .pri.low { background:#f1f1f1; color:var(--gray); }
+  .type { font-size:.72rem; font-family:ui-monospace,monospace; background:#f0ecf9; color:#6c2bd9; padding:.1rem .45rem; border-radius:4px; }
+  .ttl { font-weight:700; }
+  .k { font-weight:700; color:var(--gray); font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
+  .field { margin:.32rem 0; font-size:.93rem; }
+  .dom { background:#fff7ed; border:1px solid #f3e3c8; border-radius:5px; padding:.4rem .6rem; font-size:.88rem; color:#5a3000; margin:.32rem 0; }
+  .drops { font-size:.86rem; color:#475467; }
+  .drops li { margin:.25rem 0; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .verdict { font-size:.86rem; color:var(--gray); font-style:italic; margin:.4rem 0 0; }
+</style>
+</head>
+<body>
+<h1>Chapter 2 — 圖機會稽核（figure-opportunity）裁決稿</h1>
+<p class="sub">2026-06-26　·　唯讀 gate（<code>handout-figure-opportunity-audit</code> ×5，雙鏡頭 L1 幾何＋L2 函數行為）　·　提議清單，<b>不畫圖</b>，由你逐條裁決</p>
+
+<div style="background:#eaf6ed;border-left:3px solid #1a7f47;padding:.6rem .9rem;border-radius:5px;font-size:.9rem;color:#13502c;margin:.4rem 0 1rem;"><b>裁決結果（2026-06-26）：</b>已畫 <b>F-2.3-A</b>（∛x 垂直切線，Example 2.12）＋ <b>F-2.1-A</b>（差商解剖）；兩新圖 figure-correctness D1–D8 複審皆 0 blocking／0 advisory，render 成品見 <code>REVIEW-ch02-figure-audit.html</code>。F-2.2-A／F-2.4-A／F-2.5-A 不畫（與既有圖近重複）。</div>
+
+<div class="how"><b>怎麼用：</b>逐條看，告訴我要畫哪些（用 ID）。<b>本節已對現有 8 張圖去重</b>，只提缺口。圖機會閘<em>無</em>「blocking 歸零」概念——乾淨（少候選）就是有效結果。核可後才落地（fragment <code>&lt;figure data-fig&gt;</code> ＋ standalone <code>FIGS</code>），落地後 render 自驗、再跑圖正確性閘。</div>
+
+<table class="sum">
+  <tr><th>節</th><th>候選</th><th>優先</th><th>駁回</th></tr>
+  <tr><td>§2.1 Tangent Line &amp; Derivative</td><td>F-2.1-A 差商解剖</td><td>medium</td><td>3</td></tr>
+  <tr><td>§2.2 Derivative as a Function</td><td>F-2.2-A √x 垂直切線/定義域</td><td>medium（可能改置 §2.3）</td><td>5</td></tr>
+  <tr><td>§2.3 Differentiability…</td><td><b>F-2.3-A ∛x 垂直切線（Ex 2.12）</b></td><td><b>high</b></td><td>5</td></tr>
+  <tr><td>§2.4 Polynomials &amp; Exp.</td><td>F-2.4-A 3x²+4√x 切線</td><td>low</td><td>6</td></tr>
+  <tr><td>§2.5 Product &amp; Quotient</td><td>F-2.5-A eˣ/(2x) 單調性（Ex 2.23）</td><td>low</td><td>7</td></tr>
+  <tr><td colspan="4"><b>合計：5 候選（high 1 / medium 2 / low 2）；駁回 26。</b></td></tr>
+</table>
+
+<p class="sub" style="margin-top:.8rem"><b>我的建議：</b>只有 <b>F-2.3-A（high）</b>是清楚的缺口（Example 2.12 ∛x 垂直切線目前無圖，與既有 abs-corner 形成「有限不一致斜率 vs 無限同向斜率」的對照對）。F-2.1-A、F-2.2-A（medium）視你要不要加深；兩個 low 接近冗餘，建議不畫。<b>F-2.2-A 與 F-2.3-A 都在講「垂直切線/導數定義域」——若要畫，建議二擇一或合併到 §2.3。</b></p>
+
+<!-- ===== §2.1 ===== -->
+<h2>§2.1 The Tangent Line and the Derivative at a Point</h2>
+<div class="card medium">
+  <div class="row1"><span class="pri medium">medium</span><span class="type">diagram</span><span class="ttl">F-2.1-A　差商解剖：單一割線上的增量 \(h\) 與 rise \(f(a+h)-f(a)\)</span></div>
+  <div class="field"><span class="k">locus</span>　「The \(h\)-form of the slope」子節 ＋ 相鄰 Caution。錨：\(x=a+h\)、Caution「\(h\) 是距 base point \(a\) 的偏移，不是 \(f(h)\)」。</div>
+  <div class="field"><span class="k">教什麼</span>　把差商畫成可讀的直角三角形：割線 \(P=(a,f(a))\to(a+h,f(a+h))\)，水平 leg 標 \(h\)、垂直 leg 標 \(f(a+h)-f(a)\)，使 \(m=\text{rise}/\text{run}\) 可見；坐實 Caution「分子是 \(f(a+h)-f(a)\) 不是 \(f(h)\)」。</div>
+  <div class="field"><span class="k">why</span>　\(h\)-form 與 Caution 目前純符號，散文說得出「\(h\) 是步長」卻畫不出兩條垂直 leg 的比＝斜率。Stewart 經典的差商解剖圖。</div>
+  <div class="dom"><span class="k">domain</span>　\(h\ne0\)（須畫真正的第二點 \(a+h\ne a\)，不可塌成一點）。</div>
+  <div class="field"><span class="k">relation</span>　與 Figure 2.1 互補不重複：2.1 畫「割線族收斂」（極限過程），本圖畫「單一差商的解剖」（標 \(h\) 與 rise）。</div>
+  <div class="drops"><span class="k">駁回 3</span><ul>
+    <li>「一點無斜率」0/0 障礙圖 — D1 散文已自足＋D4 Figure 2.1 已畫解法。</li>
+    <li>Examples 2.1–2.3 各自的坐標圖 — D1 純代數、密度已達標。</li>
+    <li>Example 2.5 / Remark 2.2 估值圖 — D2 已被 tangent-approx 圖覆蓋。</li>
+  </ul></div>
+</div>
+
+<!-- ===== §2.2 ===== -->
+<h2>§2.2 The Derivative as a Function</h2>
+<div class="card medium">
+  <div class="row1"><span class="pri medium">medium</span><span class="type">graph</span><span class="ttl">F-2.2-A　\(\sqrt{x}\) 在 \(x=0\) 的垂直切線：\(\operatorname{dom}(f')\subsetneq\operatorname{dom}(f)\)</span></div>
+  <div class="field"><span class="k">locus</span>　Remark 2.3「The domain of \(f'\)」：\(\sqrt{x}\) 定義於 \(x\ge0\)，但 \(f'(x)=1/(2\sqrt{x})\) 只在 \(x>0\)。</div>
+  <div class="field"><span class="k">教什麼</span>　為何導數定義域縮小：\(\sqrt{x}\) 在 \(x\to0^+\) 切線變垂直、\(1/(2\sqrt{x})\to+\infty\)，故 \(f'(0)\) 不存在。把抽象集合包含變成看得見的幾何。</div>
+  <div class="dom"><span class="k">domain（§10 硬觸發）</span>　\(\sqrt{x}\)：\(x\ge0\)（\(x=0\) 實心端點）；切線在 \(x=0\) 垂直（無有限斜率，標註勿畫有限斜率切線）。\(f'(x)=1/(2\sqrt{x})\)：\(x>0\)（\(x=0\) 空心、\(\to+\infty\)、不畫點）。</div>
+  <div class="field"><span class="k">relation</span>　與 Figure 2.2（多項式 sign-reading）無重疊。<b>但與 §2.3 的 F-2.3-A 同屬「垂直切線/可微失敗」主題，且本節已 forward-ref「§2.3 細談」——故 medium，建議考慮改置/合併到 §2.3。</b></div>
+  <div class="drops"><span class="k">駁回 5</span><ul>
+    <li>「slope machine」point→function mapping 圖 — D1 概念是運算性非幾何，Figure 2.2 已給幾何 payoff。</li>
+    <li>Example 2.9（slope=2 的點）圖 — D1/D2 純代數＋同一拋物線（Figure 2.2）。</li>
+    <li>Example 2.7 \(f'(4)=1/4\) 圖 — D4/D2 §2.1 已覆蓋或與本節 √x 候選重皮。</li>
+    <li>Leibniz / 「dy/dx 非分數」Caution 圖 — D1 純符號文法、§10 不必硬加。</li>
+    <li>Examples 2.6、2.8 圖 — D1/D2 已被 Figure 2.2 覆蓋或純代數。</li>
+  </ul></div>
+</div>
+
+<!-- ===== §2.3 ===== -->
+<h2>§2.3 Differentiability, Continuity, and Higher Derivatives</h2>
+<div class="card high">
+  <div class="row1"><span class="pri high">high</span><span class="type">graph</span><span class="ttl">F-2.3-A　\(f(x)=\sqrt[3]{x}\) 在原點的垂直切線（Example 2.12）</span></div>
+  <div class="field"><span class="k">locus</span>　Example 2.12「A vertical tangent: \(f(x)=\sqrt[3]{x}\) at \(x=0\)」solution：「割線隨 \(h\to0\) 無界變陡…垂直線無有限斜率」。</div>
+  <div class="field"><span class="k">教什麼</span>　可微失敗的<b>第二種</b>幾何模式：平滑（無角）曲線的割線 \(h\to0\) 時轉向垂直、斜率爆到 \(+\infty\)。讓「無角卻不可微」看得見（代數 \(1/h^{2/3}\to\infty\) 看不見）。</div>
+  <div class="field"><span class="k">why</span>　兩種具名失敗模式中唯一無圖、且最難從散文想像者；散文明白對抗「不可微＝有角」的誤解。與 Figure 2.3（角：兩個不同有限斜率）構成對照對（垂直：同一個無限斜率）。</div>
+  <div class="dom"><span class="k">domain</span>　\(\sqrt[3]{x}\) 在 \(x=0\) 有定義且連續（過原點，<b>實心點</b>）；\(f'(0)\) 不存在（\(\to+\infty\)）；極限切線＝鉛直線 \(x=0\)（虛線標註，<b>勿</b>畫有限斜率）。</div>
+  <div class="field"><span class="k">relation</span>　新增、與 Figure 2.3 互補不重複；散文本身把兩例並列為對照，圖配對是自然的視覺補完。無 no-figure 決策反對。</div>
+  <div class="drops"><span class="k">駁回 5</span><ul>
+    <li>Example 2.13 分段平滑接合圖 — D1 散文已用兩個代數條件說清，且有 D6 spoiler 風險。</li>
+    <li>位置/速度/加速度（jerk）多面板 — D4 加速度/jerk 段是無具體函數的 enrichment 類比，畫圖＝引入講義沒有的新數學。</li>
+    <li>Example 2.14（f, f', f''）圖 — D1 純極限計算得常數，一行散文已承載。</li>
+    <li>Theorem 2.1「無處可跳」示意 — D2 已被 fig-diff-cont 包含圖＋Figure 2.3 覆蓋。</li>
+    <li>\(d^2y/dx^2\) 記號註解圖 — D1 純記號/代數、§10 排除。</li>
+  </ul></div>
+</div>
+
+<!-- ===== §2.4 ===== -->
+<h2>§2.4 Derivatives of Polynomials and the Exponential Function</h2>
+<div class="card low">
+  <div class="row1"><span class="pri low">low</span><span class="type">graph</span><span class="ttl">F-2.4-A　\(f(x)=3x^2+4\sqrt{x}\) 在 \((1,7)\) 的切線（Example 2.17）</span></div>
+  <div class="field"><span class="k">locus</span>　Example 2.17 末：\(f(1)=7,\ f'(1)=8\)，切線 \(y=8x-1\)（限 \(x>0\)）。</div>
+  <div class="field"><span class="k">教什麼</span>　把 power-rule 算出的 \(f'(1)=8\) 顯示為「切線斜率」，使「導數＝切線斜率」對 power-rule 例也具體（不只 eˣ）。</div>
+  <div class="dom"><span class="k">domain</span>　\(x>0\)（√x 未定義於 \(x<0\)；\(x=0\) 附近 \(f'\to+\infty\)，視窗從小 \(x>0\) 起，勿含原點）。</div>
+  <div class="field"><span class="k">relation</span>　與既有 exp-self-derivative 圖共用「曲線＋標記點切線＝斜率」模板（D2 部分重疊）；本節手稿原意 figure-light（「No figure this section」已被 exp 圖 override 一次）。<b>建議不畫，除非要對 power-rule 也強調「斜率＝切線」。</b></div>
+  <div class="drops"><span class="k">駁回 6</span>　常數規則水平線、power-rule pattern、兩 proof、線性規則/多項式 corollary、Examples 2.15/2.16/2.18、Remark 2.6＋eˣ-vs-xᵉ Caution — 全 D1（純代數/符號）或 D4（畫圖＝引入手稿沒有的數學）。</div>
+</div>
+
+<!-- ===== §2.5 ===== -->
+<h2>§2.5 The Product and Quotient Rules</h2>
+<div class="card low">
+  <div class="row1"><span class="pri low">low</span><span class="type">graph</span><span class="ttl">F-2.5-A　\(f(x)=e^x/(2x)\) 的 \(f'\) 號決定升降（Example 2.23）</span></div>
+  <div class="field"><span class="k">locus</span>　Example 2.23 末：\(f'\) 在 \(x=1\) 變號，\(0<x<1\) 遞減、\(x>1\) 遞增。</div>
+  <div class="field"><span class="k">教什麼</span>　把代數號分析變成可見：\(x=1\) 的低谷、\(x>0\) 的升降，並標 \(x=0\) 鉛直漸近線（商未定義）。</div>
+  <div class="dom"><span class="k">domain</span>　\(x=0\) 未定義（分母 \(2x\to\) 鉛直漸近線）；域分 \((-\infty,0)\cup(0,\infty)\)；散文只談 \(x>0\)。畫時 \(x=0\) 斷開、不連線。</div>
+  <div class="field"><span class="k">relation</span>　與已建的 quotient-example-graph（Ex 2.20）<b>教學角色幾乎重複</b>（同節、同「\(f'\) 號定極值/單調」功能）→ low。建議不畫，避免裝飾性密度。</div>
+  <div class="drops"><span class="k">駁回 7</span>　quotient 幾何 proof 圖（D4 無 manuscript-faithful 幾何）、marginal-revenue 重畫 Figure 2.4（D2/D3，散文已明說「重用 Figure 2.4」）、\((fg)'\ne f'g'\) 反例圖、Example 2.20 圖（D2 已存在）、Strategy 2.2 流程圖、常數因子 Caution 圖、\((1/x)'\) 圖 — 全 D1/D2/D4。</div>
+</div>
+
+<p class="sub" style="margin-top:2rem">契約：<code>FIGURE-OPPORTUNITY-RUBRIC.md</code>（雙鏡頭 L1/L2、預設駁回 D1–D6）。核可的候選落地後，render（<code>_render/shot.mjs</code> 類）自驗，再跑 <code>FIGURE-AUDIT-RUBRIC.md</code> 的 D1–D8 圖正確性閘。</p>
+
+</body>
+</html>

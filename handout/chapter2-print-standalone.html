@@ -437,6 +437,9 @@ window.MathJax = {
     </div>
   </section>
 
+  <!-- expansion:figure — anatomy of the difference quotient: increment h and rise f(a+h)−f(a) on one secant (figure-opportunity F-2.1-A) [pass: enrichment] -->
+  <figure class="figure" data-fig="difference-quotient-anatomy"></figure>
+
   <!-- expansion:formula — name the limit as "derivative at a point"; brief: introduce f'(a) as slope alias -->
   <p>When this limit exists, the slope of the tangent line at \((a, f(a))\) is called the <em>derivative of \(f\) at \(a\)</em> and is written \(f'(a)\) (read “\(f\) prime of \(a\)”). Thus</p>
 
@@ -907,6 +910,9 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
+  <!-- expansion:figure — ∛x vertical tangent: the non-corner differentiability failure of Example 2.12 (figure-opportunity F-2.3-A) [pass: enrichment] -->
+  <figure class="figure" data-fig="cbrt-vertical-tangent"></figure>
 
   <h3 class="subsec-head">Differentiability and continuity</h3>
 
@@ -2035,7 +2041,7 @@ window.MathJax = {
           { type: "dot", x: -1, y: -0.5 },
           { type: "hline", y: 0.5, from: 0.5, to: 1.5, cls: "refline" },
           { type: "hline", y: -0.5, from: -1.5, to: -0.5, cls: "refline" },
-          { type: "text", x: 4.2, y: 0.35, tex: "f(x)=\\tfrac{x}{x^{2}+1}", cls: "a-curve", anchor: "end" },
+          { type: "text", x: 4.2, y: -0.3, tex: "f(x)=\\tfrac{x}{x^{2}+1}", cls: "a-curve", anchor: "end" },
         ],
       }));
 
@@ -2053,6 +2059,66 @@ window.MathJax = {
       }));
 
       return { layout: "stack", panels: [{ svg: top + bot }] };
+    },
+
+    /* §2.3 (enrichment) — f(x)=∛x: vertical tangent at the origin (Example 2.12).
+       S-shaped curve through the origin (solid dot — f(0) exists); secant lines
+       from the origin steepen toward vertical as Q→0 (slope→∞), so f'(0) does not
+       exist — a non-corner failure of differentiability (contrast Figure 2.3). */
+    "cbrt-vertical-tangent": () => {
+      var f = function (x) { return Math.cbrt(x); };
+      var sec = function (qx) {
+        var m = f(qx) / qx;
+        return { type: "curve", fn: function (x) { return m * x; }, domain: [-4.5, 4.5], samples: 6, cls: "refline" };
+      };
+      var items = [
+        sec(2.6), sec(1.0), sec(0.35),
+        { type: "curve", fn: f, domain: [-4.5, 4.5], samples: 260, cls: "curve" },
+        { type: "dot", x: 0, y: 0, r: 3.5 },
+        { type: "dot", x: 2.6, y: f(2.6), r: 2.2 },
+        { type: "dot", x: 1.0, y: f(1.0), r: 2.2 },
+        { type: "dot", x: 0.35, y: f(0.35), r: 2.2 },
+        { type: "text", x: 3.4, y: f(3.4) + 0.2, tex: "y=\\sqrt[3]{x}", cls: "a-curve", anchor: "start" },
+        { type: "text", x: -0.25, y: 1.62, tex: "\\text{vertical tangent}", cls: "a-ref", anchor: "end", size: 12 },
+        { type: "text", x: -0.25, y: 1.18, tex: "(\\text{slope} \\to \\infty)", cls: "a-ref", anchor: "end", size: 12 },
+      ];
+      return { layout: "single", panels: [{ svg: buildPlot({
+        w: 420, h: 290, xmin: -4.5, xmax: 4.5, ymin: -1.9, ymax: 1.9,
+        xlabel: "x", ylabel: "y",
+        aria: "Graph of y equals cube root of x, an S-shaped curve through the origin with a vertical tangent there; secant lines from the origin steepen toward vertical as the second point approaches the origin, so the derivative at zero does not exist.",
+        items: items,
+      }) }] };
+    },
+
+    /* §2.1 (enrichment) — anatomy of the difference quotient (h-form + Caution).
+       One secant from P=(a,f(a)) to Q=(a+h,f(a+h)); the run leg h and the rise
+       leg f(a+h)-f(a) make slope = rise/run visible and cement that the
+       numerator is f(a+h)-f(a), not f(h). */
+    "difference-quotient-anatomy": () => {
+      var f = function (x) { return 0.2 * x * x + 0.5; };
+      var a = 1.5, h = 2.5, b = a + h;
+      var fa = f(a), fb = f(b);
+      var m = (fb - fa) / h;
+      var items = [
+        { type: "curve", fn: f, domain: [0.1, 5.05], samples: 200, cls: "curve" },
+        { type: "curve", fn: function (x) { return fa + m * (x - a); }, domain: [0.85, 4.7], samples: 6, cls: "arrow-bwd" },
+        { type: "seg", x1: a, y1: fa, x2: b, y2: fa, cls: "refline" },
+        { type: "seg", x1: b, y1: fa, x2: b, y2: fb, cls: "refline" },
+        { type: "dot", x: a, y: fa, r: 3.2 },
+        { type: "dot", x: b, y: fb, r: 3.2 },
+        { type: "text", x: a - 0.12, y: fa - 0.34, tex: "P", cls: "a-pt", anchor: "end" },
+        { type: "text", x: b + 0.15, y: fb + 0.08, tex: "Q", cls: "a-pt", anchor: "start" },
+        { type: "text", x: (a + b) / 2, y: fa - 0.36, tex: "h", cls: "a-ref", anchor: "middle" },
+        { type: "text", x: b + 0.18, y: (fa + fb) / 2, tex: "f(a+h)-f(a)", cls: "a-ref", anchor: "start", size: 12 },
+        { type: "text", x: 1.05, y: 4.15, tex: "y=f(x)", cls: "a-curve", anchor: "start" },
+      ];
+      return { layout: "single", panels: [{ svg: buildPlot({
+        w: 440, h: 300, xmin: -0.3, xmax: 6, ymin: -0.3, ymax: 5,
+        xlabel: "x", ylabel: "y",
+        xticks: [{ x: a, tex: "a" }, { x: b, tex: "a+h" }],
+        aria: "A curve y equals f of x with a secant line from P at (a, f of a) to Q at (a plus h, f of a plus h); a horizontal leg labeled h and a vertical leg labeled f of a plus h minus f of a form the run and rise whose ratio is the slope of the secant.",
+        items: items,
+      }) }] };
     },
 
   };
