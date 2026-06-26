@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>語意/聲音 critic 錨組候選 — 待 ⛳ bless（Task 1）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] } };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --pos:#1b7f4b; --pos-bg:#e7f6ee; --neg:#b3261e; --neg-bg:#fdeceb;
+    --ink:#1a1a1a; --mut:#5b5b5b; --line:#e2e2e2; --accent:#2a4d8f; --warn:#9a6700; --warn-bg:#fff8e1;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif;color:var(--ink);
+       max-width:880px;margin:0 auto;padding:32px 24px 80px;line-height:1.65;background:#fff}
+  h1{font-size:1.55rem;margin:0 0 4px;line-height:1.3}
+  h2{font-size:1.18rem;margin:34px 0 10px;padding-top:8px;border-top:2px solid var(--line)}
+  .sub{color:var(--mut);font-size:.92rem;margin:0 0 18px}
+  .legend{background:#f6f8fc;border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-size:.9rem;margin:14px 0 8px}
+  .legend b{color:var(--accent)}
+  .card{border:1px solid var(--line);border-radius:12px;padding:0;margin:16px 0;overflow:hidden}
+  .card.pos{border-left:5px solid var(--pos)}
+  .card.neg{border-left:5px solid var(--neg)}
+  .card .head{padding:12px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .card.pos .head{background:var(--pos-bg)}
+  .card.neg .head{background:var(--neg-bg)}
+  .card .head .t{font-weight:700;font-size:1.02rem}
+  .tag{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.02em}
+  .tag.pos{background:var(--pos);color:#fff}
+  .tag.neg{background:var(--neg);color:#fff}
+  .tag.src{background:#eef1f6;color:var(--accent);font-weight:600}
+  .body{padding:14px 18px}
+  blockquote{margin:0 0 12px;padding:12px 16px;background:#fafafa;border-left:3px solid #cfcfcf;
+             border-radius:0 8px 8px 0;font-size:1.02rem;line-height:1.7}
+  .neg blockquote{background:#fbf3f3;border-left-color:#e3b6b3}
+  .why{margin:8px 0 0;padding:0;list-style:none}
+  .why li{margin:7px 0;padding-left:0}
+  .chip{display:inline-block;min-width:1.7em;text-align:center;font-weight:800;font-size:.78rem;
+        padding:1px 7px;border-radius:6px;margin-right:8px;color:#fff}
+  .chip.S{background:#2a6f97}.chip.A{background:#7b4ea0}.chip.V{background:#b5651d}
+  .chip.bad{background:var(--neg)}
+  .meta{font-size:.85rem;color:var(--mut);margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+  .decision{background:var(--warn-bg);border:1px solid #f0d680;border-left:5px solid var(--warn);
+            border-radius:10px;padding:14px 18px;margin:26px 0 10px}
+  .decision h3{margin:0 0 8px;color:var(--warn);font-size:1.05rem}
+  .opt{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:10px 0;background:#fff}
+  .opt .lab{font-weight:700;margin-bottom:4px}
+  .rec{display:inline-block;background:var(--pos);color:#fff;font-size:.7rem;font-weight:700;
+       padding:1px 7px;border-radius:5px;margin-left:6px}
+  code{background:#f0f0f2;padding:1px 5px;border-radius:4px;font-size:.86em}
+  .foot{font-size:.82rem;color:var(--mut);margin-top:30px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+
+<h1>語意/聲音 critic 錨組候選 <span style="font-weight:400;color:var(--mut)">— 待 ⛳ bless</span></h1>
+<p class="sub">Task 1（PLAN-deai-semantic-critic-implementation）｜固定 <b>2 正 ＋ 1 負</b>｜選法：3 個獨立 lens（substance/altitude/voice）panel ＋ 1 個綜合驗證 agent 合議｜本檔對應 <code>handout/_audit/anchors/svc-exemplars.md</code></p>
+
+<div class="legend">
+<b>判準（spec §2）：</b>
+<b>S</b> Substance（S1 加新洞見／S2 針對這個物件／S3 刪了會損失）｜
+<b>A</b> Altitude（A1 不嘮叨顯而易見／A2 不揮手帶過真正難的一步，self-relative）｜
+<b>V</b> Voice（V1 §3 那點暖在不在，不灌人格）。
+<br><b>信念：</b>中性 ≠ AI；<b>中性＋空</b>才是 AI。正例＝中性但言之有物；負例＝中性但空。
+</div>
+
+<h2>正例 1 ／ limit — 三維 S/A/V 皆高</h2>
+<div class="card pos">
+  <div class="head">
+    <span class="tag pos">正例</span>
+    <span class="t">三維皆高的「言之有物」標靶</span>
+    <span class="tag src">OpenStax Calculus Vol.1 · §2.2 · CC BY-NC-SA 4.0 · 84 字</span>
+  </div>
+  <div class="body">
+    <blockquote>Looking at a table of functional values or looking at the graph of a function provides us with useful insight into the value of the limit of a function at a given point. However, these techniques rely too much on guesswork. We eventually need to develop alternative methods of evaluating limits. These new methods are more algebraic in nature and we explore them in the next section; however, at this point we introduce two special limits that are foundational to the techniques to come.</blockquote>
+    <ul class="why">
+      <li><span class="chip S">S</span>不是把表格/圖翻成英文，而是<b>診斷其具體缺陷</b>（“rely too much on guesswork”）再用此 gap 推出代數方法——payload＝「被命名的局限＋向前動機」，刪了讀者真的少一塊。</li>
+      <li><span class="chip A">A</span>高度剛好：不重講怎麼讀表（不犯 A1），也不揮手帶過為何需要更難的代數路徑（不犯 A2）。</li>
+      <li><span class="chip V">V</span>§3 暖度到位但不話嘮：motivation-before-formalism、主代名詞 “we”、真連接詞 “However”，對讀者誠實而非乾巴巴斷言。</li>
+    </ul>
+    <p class="meta">自足：無 figure/example/table 跨指涉、零 inline math；“the next section” 為前指性動機手勢，非 load-bearing。<b>無 caveat。</b></p>
+  </div>
+</div>
+
+<h2>正例 2 ／ derivative — concrete-to-abstract 標靶（含一個 figure 依賴 caveat）</h2>
+<div class="card pos">
+  <div class="head">
+    <span class="tag pos">正例（推薦 A）</span>
+    <span class="t">§3 招牌「具體→抽象、最後才命名」：local linearity</span>
+    <span class="tag src">OpenStax Calculus Vol.1 · §3.1 · CC BY-NC-SA 4.0 · 81 字</span>
+  </div>
+  <div class="body">
+    <blockquote>In Figure 3.5 we show the graph of \(f(x)=\sqrt{x}\) and its tangent line at \((1,1)\) in a series of tighter intervals about \(x=1\). As the intervals become narrower, the graph of the function and its tangent line appear to coincide, making the values on the tangent line a good approximation to the values of the function for choices of \(x\) close to \(1\). In fact, the graph of \(f(x)\) itself appears to be locally linear in the immediate vicinity of \(x=1\).</blockquote>
+    <ul class="why">
+      <li><span class="chip S">S</span>object-specific 且層層推進：從 \(\sqrt{x}\)、點 \((1,1)\)、收緊區間建起 local-linearity，每句推進 zoom 論證（重合 → 切線值近似函數值 → 局部線性），非重述。</li>
+      <li><span class="chip V">V</span>不機械陳述局部線性，而讓讀者先「看見」再命名；“In fact, … locally linear” 把直覺當小揭示——§3 motivation-before-formalism 的暖。</li>
+      <li><span class="chip A">A</span>停在真正非顯然的一步（為何放大讓曲線看起來直），不糾纏瑣碎。</li>
+    </ul>
+    <p class="meta"><b>⚠ caveat：</b>以 “In Figure 3.5 we show” 開頭、依賴該圖；但散文本身（收緊區間使 \(\sqrt{x}\) 與其 \((1,1)\) 切線視覺重合＝局部線性）<b>完整承載核心意思，斷圖仍可讀懂</b>。display 數學為閱讀正規化，canonical verbatim 在 <code>svc-exemplars.md</code>。</p>
+  </div>
+</div>
+
+<div class="decision">
+  <h3>⛳ 這輪唯一的真決策點：derivative 正例要不要保留那個 figure 依賴？</h3>
+  <p style="margin:0 0 6px;font-size:.93rem">錨是「那把尺」、會被原樣貼進 critic prompt（脫離原書上下文）。正例 2 開頭 “In Figure 3.5 we show…” 指向讀者看不到的圖。兩個選項：</p>
+  <div class="opt">
+    <div class="lab">A · 保留 local-linearity 段（panel 三 lens 一致收斂）<span class="rec">我的推薦</span></div>
+    <span style="font-size:.9rem">Substance 最厚、最能示範 §3「具體→抽象」；figure 依賴只在開頭 4 字，散文自帶完整意思。錨的正面任務正是「示範厚實」，這段做得最好。caveat 已在檔中誠實標註。</span>
+  </div>
+  <div class="opt">
+    <div class="lab">B · 換成 figure-free 的「命名 derivative」段（§3.1，~69 字）</div>
+    <blockquote style="font-size:.95rem;margin:8px 0">The type of limit we compute in order to find the slope of the line tangent to a function at a point occurs in many applications across many disciplines. These applications include velocity and acceleration in physics, marginal profit functions in business, and growth rates in biology. This limit occurs so frequently that we give this value a special name: the derivative. The process of finding a derivative is called differentiation.</blockquote>
+    <span style="font-size:.9rem"><b>優：</b>零 figure 依賴、零 mangled math，同樣示範「具體（應用）→最後才命名」。<b>缺：</b>~69 字略低於 80–150 區間下緣；altitude 較輕（是命名/動機段，非推導），Substance 厚度不及 A。</span>
+  </div>
+  <p style="margin:8px 0 0;font-size:.9rem"><b>推薦：A。</b>錨要示範「厚」，figure 依賴是可控的小瑕（已標註）；B 更乾淨但偏薄、且字數偏短。你也可要求兩段都收（變 3 正）或要更暖/topic-matched。</p>
+</div>
+
+<h2>負例 ／ AI-default 空泛 — 「該被 flag 長這樣」</h2>
+<div class="card neg">
+  <div class="head">
+    <span class="tag neg">負例</span>
+    <span class="t">中性＋空＝AI 的反面教材</span>
+    <span class="tag src">本案自撰示範段（非引用）· 83 字</span>
+  </div>
+  <div class="body">
+    <blockquote>The derivative is a fundamental and powerful concept that plays a crucial role in calculus. It is important to note that the derivative measures the rate of change of a function. In this section, we will explore how the derivative works and why it is so essential. By understanding the derivative, we unlock a deeper appreciation of how functions behave. Let us now delve into the details — at its core, the derivative captures the essence of change itself.</blockquote>
+    <ul class="why">
+      <li><span class="chip bad">S1</span>無新洞見：每句相對前句只堆形容詞（fundamental/powerful/crucial/essential）。</li>
+      <li><span class="chip bad">S2</span>通用填充：整段貼到積分、極限、向量都成立，毫無對「導數這個物件」的針對性。</li>
+      <li><span class="chip bad">A2</span>揮手帶過真正難的一步：承諾講 “how it works and why” 卻從不碰差商、極限過程，全是 promise、無 delivery。</li>
+      <li><span class="chip bad">V1</span>假暖：“unlock a deeper appreciation”、“captures the essence of change itself” 是灌人格／空泛抒情，不是 §3 那點暖。</li>
+    </ul>
+    <p class="meta"><b>校正：</b>plan 草稿原註 A1（嘮叨顯而易見），panel 改判為 <b>A2</b>——此段不是過度解釋已知步驟，而是揮手帶過難步、從不交付。A2 較精準，已採用。</p>
+  </div>
+</div>
+
+<p class="foot">
+<b>錨總量</b> ~250 字（偏精簡側，故意從嚴）。
+<b>盲測防洩漏（Task 4）：</b>本兩段正例不得進盲測真人負例池；benchmark 另取 OpenStax 其他節＋CLP-1。
+<b>§3 共用（Task 6）：</b>2 段正例為 <code>CONTENT_SPEC.md</code> §3 真人 voice corpus 的指定替換素材。
+<br><b>下一步：</b>等你 bless（① 三段是否入選 ② derivative 取 A 或 B ③ 要不要更暖/topic-matched）。獲准後才 commit <code>svc-exemplars.md</code>，再進 Task 2（改鑄 rubric Dimension C 為 S/A/V）。
+</p>
+
+</body>
+</html>
