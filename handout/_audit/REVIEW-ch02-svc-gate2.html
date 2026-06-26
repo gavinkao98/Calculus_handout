@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch2 語意/聲音 critic — gate 2（Codex 獨立審）</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{--ink:#1a1a1a;--mut:#5b5b5b;--line:#e2e2e2;--accent:#2a4d8f;--pass:#1b7f4b;--pass-bg:#e7f6ee;--warn:#9a6700;--warn-bg:#fff8e1;--apply:#1c5fb4;--apply-bg:#e7f0fb;}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif;color:var(--ink);max-width:920px;margin:0 auto;padding:32px 24px 80px;line-height:1.65;background:#fff}
+  h1{font-size:1.4rem;margin:0 0 4px}
+  h2{font-size:1.13rem;margin:28px 0 8px;padding-top:8px;border-top:2px solid var(--line)}
+  .sub{color:var(--mut);font-size:.92rem;margin:0 0 14px}
+  .verdict{background:var(--pass-bg);border:1px solid #9ed7b6;border-left:5px solid var(--pass);border-radius:10px;padding:14px 18px;margin:14px 0}
+  .verdict b{color:var(--pass)}
+  .big{font-size:1.4rem;font-weight:800;color:var(--pass)}
+  table{border-collapse:collapse;width:100%;font-size:.88rem;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:center}
+  th{background:#f3f6fb;color:var(--accent)}
+  td.l{text-align:left}
+  .zero{color:var(--pass);font-weight:700}
+  .card{border:1px solid var(--line);border-radius:10px;margin:13px 0;overflow:hidden;border-left:5px solid var(--warn)}
+  .card.alt{border-left-color:var(--apply)}
+  .card .h{padding:9px 15px;background:var(--warn-bg);font-weight:700;font-size:.93rem;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+  .card.alt .h{background:var(--apply-bg)}
+  .card .bd{padding:11px 15px}
+  .chip{display:inline-block;font-weight:800;font-size:.7rem;padding:1px 6px;border-radius:5px;color:#fff;background:var(--warn)}
+  .chip.alt{background:var(--apply)}
+  .loc{font-size:.79rem;color:var(--mut)}
+  blockquote{margin:7px 0;padding:9px 13px;background:#fafafa;border-left:3px solid #cfcfcf;border-radius:0 8px 8px 0;font-size:.92rem}
+  .lab{font-weight:700;color:var(--accent);font-size:.83rem;margin:7px 0 1px}
+  ins{background:#e7f6ee;text-decoration:none;padding:0 2px} del{background:#fdeceb;padding:0 2px}
+  .rec{background:#eef3fb;border:1px solid #cdddf5;border-radius:7px;padding:7px 12px;font-size:.86rem;margin-top:7px}
+  .rec b{color:var(--accent)}
+  code{background:#f0f0f2;padding:1px 5px;border-radius:4px;font-size:.85em}
+  .foot{font-size:.82rem;color:var(--mut);margin-top:26px;border-top:1px solid var(--line);padding-top:13px}
+</style>
+</head>
+<body>
+
+<h1>Ch2 語意/聲音 critic — gate 2（Codex 獨立審）</h1>
+<p class="sub">2026-06-26｜gate 2 = Codex CLI（<code>codex exec --sandbox read-only</code>，ChatGPT 訂閱、唯讀 reviewer）依同一 <code>PROSE-AUDIT-RUBRIC.md</code>（S/A/V 單一真相來源）＋錨組 <code>svc-exemplars.md</code> 獨立審 Ch2 五節｜審的是 gate-1 改後的現況（已套 2 條 F4 拆句）｜prompt：<code>PROMPT-ch02-svc-gate2.md</code>、raw：<code>REPORT-ch02-prose-gate2-raw.md</code></p>
+
+<div class="verdict">
+<b>兩個獨立審查者一致：Ch2 五節全 <span class="big">0 blocking</span>。</b><br>
+gate-1（Claude ×5）與 gate-2（Codex）<b>都</b>判 Ch2 prose gate 通過、無任何 blocking、無 AI-default 空泛 pattern。這再次佐證 critic 不幻覺 blocking（中性≠AI）。gate-2 在乾淨化後的稿上<b>獨立</b>再掃，新撈到 <b>4 條 advisory</b>（gate-1 未提）：2 條 F4 句長／段落密度（§2.2、§2.3，我 lean keep）＋ <b>2 條 A高度（§2.4、§2.5）</b>——student-facing 散文出現「the manuscript」字樣，把讀者拉到來源／編輯層。<b>後者我建議採納</b>（見下）。
+</div>
+
+<div class="verdict" style="background:var(--apply-bg);border-color:#cdddf5;border-left-color:var(--apply)">
+<b style="color:var(--apply)">裁決＋套用（2026-06-26）：</b>採納 <b>C2-3＋C2-4</b>——改掉 §2.4（line 64、106）＋§2.5（line 114、139、145）共 5 處「the manuscript」露出為內容層語氣（HTML 註解的 provenance 保留、數學與 cross-ref 全不動）。<b>逐節回歸 re-audit 皆 PASS</b>：§2.4／§2.5 各 0 blocking、語意保留、無新 A/B/S/V 問題（§2.5 另確認 line 114 新句與緊接的 Example 2.19 同屬「polynomial × eˣ」product-rule pattern、無誤導），各餘 1 條 V1「可更暖」optional（不擋稿、保留）。<b>C2-1／C2-2（F4 密度）依建議保留。</b>
+</div>
+
+<h2>gate-2 逐節 verdict</h2>
+<table>
+<tr><th>節</th><th>blocking</th><th>gate-2 advisory</th></tr>
+<tr><td class="l">§2.1 Tangent Line &amp; Derivative</td><td class="zero">0</td><td>clean（全維度）</td></tr>
+<tr><td class="l">§2.2 Derivative as a Function</td><td class="zero">0</td><td>1（F4 段落密度，C2-1）</td></tr>
+<tr><td class="l">§2.3 Differentiability…</td><td class="zero">0</td><td>1（F4 caution 密度，C2-2）</td></tr>
+<tr><td class="l">§2.4 Polynomials &amp; Exp.</td><td class="zero">0</td><td>1（A高度「manuscript」×2，C2-3）</td></tr>
+<tr><td class="l">§2.5 Product &amp; Quotient</td><td class="zero">0</td><td>1（A高度「manuscript」×3，C2-4）</td></tr>
+</table>
+<p class="sub">Chapter rollup（Codex 原話）：總 blocking = 0、總 advisory = 4；prose gate（gate 2）通過，因為 blocking = 0。</p>
+
+<h2>建議採納 — C2-3／C2-4（A高度「the manuscript」露出，§2.4＋§2.5）</h2>
+<div class="verdict" style="background:var(--apply-bg);border-color:#cdddf5;border-left-color:var(--apply)">
+<b style="color:var(--apply)">為何這次我建議採納（與 §2.3 那條不同）：</b>這 5 處是<b>真實的 A高度小漏</b>——可驗證的字面 quote，散文向學生說「the manuscript records…／leaves this as an exercise／writes…／only to match the manuscript」。對讀者而言，這份講義<b>就是</b>正文；提到「手稿」是把讀者拉到他既不知情也不在意的編輯層。faithfulness provenance 本就活在 HTML 註解（<code>&lt;!-- … manuscript … --&gt;</code>）裡，那些保留即可；<b>只需把溢出到可見 <code>&lt;p&gt;</code> 的 5 處改成內容層語氣</b>，數學與 cross-ref 全不動。gate-1（Claude）漏了這個 pattern——正是 gate-2 跨模型獨立審的價值。
+</div>
+
+<div class="card alt">
+  <div class="h"><span class="chip alt">A高度</span>C2-3｜<span class="loc">§2.4 sec-2-4.html line 64、line 106</span></div>
+  <div class="bd">
+    <blockquote>(line 64) <b>The manuscript records two proofs</b>, each lighting the result from a different angle; we give both.<br>(line 106, Caution) …the identical formula still holds wherever \(x\ne0\) — <b>the manuscript leaves this as an exercise</b>, and it can be checked by applying the same factorization idea to \(1/x^{m}\).</blockquote>
+    <div class="lab">建議改法（內容層語氣、保留後半已有的內容）</div>
+    <div class="rec" style="background:#fff;border-color:var(--line)">
+      line 64：<del>The manuscript records two proofs</del> <ins>There are two proofs</ins>, each lighting the result from a different angle; we give both.<br>
+      line 106：<del>— the manuscript leaves this as an exercise, and it can be checked</del> <ins>— this can be checked</ins> by applying the same factorization idea to \(1/x^{m}\).（line 106 後半本就接「it can be checked…」，刪去前綴即可、零語意損失）
+    </div>
+  </div>
+</div>
+
+<div class="card alt">
+  <div class="h"><span class="chip alt">A高度</span>C2-4｜<span class="loc">§2.5 sec-2-5.html line 114、line 139、line 145</span></div>
+  <div class="bd">
+    <blockquote>(line 114) …for the exponential factor. <b>The manuscript records the following companion example.</b><br>(line 139) The same add-and-subtract idea handles a quotient \(f/g\). <b>Here the manuscript writes</b> the increment as \(\Delta x\) rather than \(h\); the two symbols mean the same thing…<br>(line 145, Caution) …We switch to \(\Delta x\) below <b>only to match the manuscript</b>.</blockquote>
+    <div class="lab">建議改法（把「下一例題做什麼」「Δx≡h」這兩個真內容講清楚即可）</div>
+    <div class="rec" style="background:#fff;border-color:var(--line)">
+      line 114：<del>The manuscript records the following companion example.</del> <ins>The next example isolates the same product-rule pattern.</ins><br>
+      line 139：<del>Here the manuscript writes</del> <ins>From here we write</ins> the increment as \(\Delta x\) rather than \(h\)；…（其餘不動）<br>
+      line 145：<del>We switch to \(\Delta x\) below only to match the manuscript.</del> <ins>We use \(\Delta x\) below; it is the same increment, just a different letter.</ins>
+    </div>
+  </div>
+</div>
+
+<h2>建議保留 — C2-1（§2.2 F4，lean keep）</h2>
+<div class="card">
+  <div class="h"><span class="chip">F4</span>段落密度｜<span class="loc">§2.2 sec-2-2.html line 162</span></div>
+  <div class="bd">
+    <blockquote>Here \(\dfrac{d}{dx}\) is an operator … the symbol deliberately echoes the difference quotient … Leibniz notation has the merit …</blockquote>
+    <p style="margin:1px 0;font-size:.9rem">Codex：同段同時介紹 operator、差商來源、多變數用途、prime notation 取捨與例子，負荷偏高；建議切兩段。</p>
+    <div class="lab">我的評估</div>
+    <p style="margin:1px 0;font-size:.9rem"><b>lean keep。</b>這是 Leibniz notation 的單一連貫主題段，資訊都 load-bearing 且彼此相扣；gate-1 五審皆未 flag。可選切段但非必要——不切不損易懂性。</p>
+    <div class="rec"><b>建議：維持原狀。</b>若偏好可在「with respect to / prime notation」處另起一段，純排版、不動字。</div>
+  </div>
+</div>
+
+<h2>建議保留 — C2-2（§2.3 F4，lean keep）</h2>
+<div class="card">
+  <div class="h"><span class="chip">F4</span>caution 密度｜<span class="loc">§2.3 sec-2-3.html line 191</span></div>
+  <div class="bd">
+    <blockquote>So \(d^{2}y\) means … not \(d\) times \(2y\); and the \(dx^{2}\) is part of the symbol … not \(d(x^{2})\) … and not an algebraic denominator …</blockquote>
+    <p style="margin:1px 0;font-size:.9rem">Codex：最後一句連續排除三種誤讀，否定結構偏密；建議拆兩句。</p>
+    <div class="lab">我的評估</div>
+    <p style="margin:1px 0;font-size:.9rem"><b>lean keep。</b>這句正是本 session Mode C gate-2 為避免 reify \(dx\) 而<b>刻意重寫</b>的 caution——三段排除是精準需求（逐一擋掉 \(d\cdot2y\)、\(d(x^2)\)、分母三種誤讀），密度服務正確性。拆句可讀性增益有限、且有重新引入歧義的風險。</p>
+    <div class="rec"><b>建議：維持原狀（密度服務精準）。</b></div>
+  </div>
+</div>
+
+<h2>gate-1 ↔ gate-2 關係</h2>
+<div class="verdict" style="background:#f6f8fc;border-color:#cdddf5;border-left-color:var(--accent)">
+<b style="color:var(--accent)">為何兩審 findings 不同：</b>gate-2 審的是 gate-1 改後的現況，gate-1 已套用的 2 條 F4 拆句（§2.4 eˣ setup、§2.5 rectangle-area）不會被重提。gate-2 獨立再掃，<b>最關鍵的 blocking 維度兩審完全一致（皆 0）</b>，並額外撈到一個 gate-1 漏掉的真 pattern（「the manuscript」露出 A高度）——跨模型第二讀者的典型增益。
+</div>
+
+<p class="foot">
+<b>裁決事項（待你 ⛳）：</b>① <b>C2-3／C2-4</b>（§2.4＋§2.5 共 5 處「the manuscript」露出）——我<b>建議採納</b>，純語氣、零數學變動。② C2-1／C2-2（F4 密度）我 lean keep。<br>
+<b>raw：</b><code>handout/_audit/REPORT-ch02-prose-gate2-raw.md</code>（Codex 原始輸出）、<code>handout/_audit/PROMPT-ch02-svc-gate2.md</code>（送審 prompt）。
+</p>
+
+</body>
+</html>

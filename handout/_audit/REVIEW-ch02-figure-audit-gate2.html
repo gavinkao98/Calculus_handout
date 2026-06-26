@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch2 圖正確性閘 — gate 2（Codex 視覺獨立審）</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{--ink:#1a1a1a;--mut:#5b5b5b;--line:#e2e2e2;--accent:#2a4d8f;--pass:#1b7f4b;--pass-bg:#e7f6ee;}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif;color:var(--ink);max-width:980px;margin:0 auto;padding:32px 24px 80px;line-height:1.62;background:#fff}
+  h1{font-size:1.4rem;margin:0 0 4px}
+  h2{font-size:1.13rem;margin:28px 0 8px;padding-top:8px;border-top:2px solid var(--line)}
+  .sub{color:var(--mut);font-size:.9rem;margin:0 0 14px}
+  .verdict{background:var(--pass-bg);border:1px solid #9ed7b6;border-left:5px solid var(--pass);border-radius:10px;padding:14px 18px;margin:14px 0}
+  .verdict b{color:var(--pass)}
+  .big{font-size:1.4rem;font-weight:800;color:var(--pass)}
+  table{border-collapse:collapse;width:100%;font-size:.85rem;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+  th{background:#f3f6fb;color:var(--accent);text-align:center}
+  td.c{text-align:center}
+  .zero{color:var(--pass);font-weight:700}
+  .new{display:inline-block;font-size:.66rem;font-weight:800;color:#fff;background:#1c5fb4;border-radius:4px;padding:0 5px;margin-left:4px;vertical-align:middle}
+  code{background:#f0f0f2;padding:1px 5px;border-radius:4px;font-size:.85em}
+  .foot{font-size:.82rem;color:var(--mut);margin-top:26px;border-top:1px solid var(--line);padding-top:13px}
+</style>
+</head>
+<body>
+
+<h1>Ch2 圖正確性閘 — gate 2（Codex 視覺獨立審）</h1>
+<p class="sub">2026-06-26｜gate 2 = Codex CLI（<code>codex exec --sandbox read-only</code>，ChatGPT 訂閱、唯讀 reviewer），依 <code>FIGURE-AUDIT-RUBRIC.md</code> D1–D8 獨立複核｜被審物：10 張 render 後 2× PNG（<code>shot.mjs figures</code> 模式逐 <code>&lt;figure&gt;</code> 截）經 <code>-i</code> 附上，對照 <code>const FIGS</code>／inline-SVG 原始碼算數值核對｜prompt：<code>PROMPT-ch02-figure-audit-gate2.md</code>、raw：<code>REPORT-ch02-figure-gate2-raw.md</code></p>
+
+<div class="verdict">
+<b>兩個獨立視覺審查者一致：Ch2 全 10 圖 <span class="big">0 blocking</span>。</b><br>
+gate-2（Codex）對 8 張 FIGS ＋ 2 張 inline-SVG <b>逐圖回繪圖原始碼算數值核對</b>（割線斜率、極值座標、tick、slope→∞ 行為等），結論 <b>0 blocking、0 advisory，全 10 圖 D1–D8 乾淨</b>。母體核對亦一致（10 = 8 FIGS + 2 inline-SVG）。這獨立確認了 gate-1 修掉的那條（<code>quotient-example-graph</code> 上面板 f(x) 標籤糊字、已移右下）在重渲後乾淨，兩枚新圖也站得住。
+</div>
+
+<h2>gate-2 逐圖 verdict（含 Codex 的數值核對證據）</h2>
+<table>
+<tr><th style="width:22%">圖 ID</th><th style="width:8%">節</th><th style="width:10%">blocking</th><th>Codex 回原始碼核對的數值（D6 / D1–D8）</th></tr>
+<tr><td><code>secant-to-tangent</code></td><td class="c">§2.1</td><td class="c zero">0</td><td>\(f=0.1x^2+0.5,\ c=1,\ f'(c)=0.2\)；\(Q_{1,2,3}=(7,5,3)\) 割線斜率 \(0.8,0.6,0.4\) 收斂到切線，caption 一致</td></tr>
+<tr><td><code>difference-quotient-anatomy</code><span class="new">新</span></td><td class="c">§2.1</td><td class="c zero">0</td><td>\(a=1.5,h=2.5,b=4\)；水平腿標 \(h\)、垂直腿標 \(f(a+h)-f(a)\)，與 h-form prose 一致</td></tr>
+<tr><td><code>tangent-approx</code></td><td class="c">§2.1</td><td class="c zero">0</td><td>\(y=1/x\) 在 \((2,\tfrac12)\) 切線 \(y=-0.25x+1\)，tick 與 Example 2.5 相符；無遮擋/裁切</td></tr>
+<tr><td><code>f-and-fprime</code></td><td class="c">§2.2</td><td class="c zero">0</td><td>上 \(f=x^2+4x-2\) 最小點 \((-2,-6)\)，下 \(f'=2x+4\) 於 \(x=-2\) 為 0；共同垂直線＋正負號標示一致</td></tr>
+<tr><td><code>fig-diff-cont</code>（inline）</td><td class="c">§2.3</td><td class="c zero">0</td><td>外 dashed ellipse=Continuous、內 ellipse=Differentiable，「\(|x|\) at \(x=0\)」置於內外之間，符合 Theorem 2.1</td></tr>
+<tr><td><code>abs-corner</code></td><td class="c">§2.3</td><td class="c zero">0</td><td>\(y=|x|\) 右側 secant 斜率 \(+1\)、左側 \(-1\)，與 Example 2.11 一致；線型+標籤可灰階辨識（D8）</td></tr>
+<tr><td><code>cbrt-vertical-tangent</code><span class="new">新</span></td><td class="c">§2.3</td><td class="c zero">0</td><td>\(y=\sqrt[3]{x}\)，割線點 \(x=2.6,1.0,0.35\) 斜率依 \(x^{-2/3}\) 增大，正確表達 slope\(\to\infty\)</td></tr>
+<tr><td><code>exp-self-derivative</code></td><td class="c">§2.4</td><td class="c zero">0</td><td>\(y=e^x\)，切線 \(x=0\!: y=x+1\)、\(x=1\!: y=ex\)，標 slope\(=1=e^0\)、\(=e=e^1\) 正確</td></tr>
+<tr><td><code>fig-product-area</code>（inline）</td><td class="c">§2.5</td><td class="c zero">0</td><td>base \(fg\)＋右 strip＋上 strip＋corner，邊長標 \(f,\Delta f,g,\Delta g\)，與 Figure 2.4 caption 一致</td></tr>
+<tr><td><code>quotient-example-graph</code></td><td class="c">§2.5</td><td class="c zero">0</td><td>\(f=x/(x^2+1)\)、\(f'=(1-x^2)/(x^2+1)^2\)；頂/谷 \((\pm1,\pm\tfrac12)\)、\(f'(\pm1)=0\)、\(f'(0)=1\) 與 Example 2.20 一致（gate-1 糊字已修，gate-2 確認）</td></tr>
+<tr><td><b>合計</b></td><td class="c">—</td><td class="c zero"><b>0</b></td><td><b>0 advisory；全 10 圖 D1–D8 乾淨</b></td></tr>
+</table>
+
+<h2>gate-1 ↔ gate-2 關係</h2>
+<div class="verdict" style="background:#f6f8fc;border-color:#cdddf5;border-left-color:var(--accent)">
+<b style="color:var(--accent)">兩審收斂：</b>gate-1（Claude <code>handout-figure-audit</code>）曾報 1 blocking（<code>quotient-example-graph</code> 標籤與藍曲線同色糊字）→ 已修（標籤移右下空白區）＋重渲確認。gate-2（Codex）審的是<b>修後的重渲 PNG</b>，獨立逐圖回原始碼算數值，<b>0 blocking、0 advisory</b>——含兩枚新圖（<code>difference-quotient-anatomy</code>、<code>cbrt-vertical-tangent</code>）與全部 inline-SVG。圖正確性閘雙審皆過。
+</div>
+
+<p class="foot">
+<b>方法：</b>10 張 PNG 由 <code>handout/_render/shot.mjs &lt;url&gt; &lt;prefix&gt; figures</code> 逐 <code>&lt;figure class="figure"&gt;</code> 截 2×（readiness 等 <code>#boot</code> 遮罩移除＝build 完成）；render 健康 <code>math=851, katex-errors=0</code>，byte 大小與既驗渲染一致。Codex 經 <code>-i</code> 收 10 圖、read-only 讀 <code>const FIGS</code>／fragment <code>&lt;svg&gt;</code> 逐字核對。<br>
+<b>raw：</b><code>handout/_audit/REPORT-ch02-figure-gate2-raw.md</code>、<b>prompt：</b><code>handout/_audit/PROMPT-ch02-figure-audit-gate2.md</code>。
+</p>
+
+</body>
+</html>
