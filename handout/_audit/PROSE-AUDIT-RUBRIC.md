@@ -33,28 +33,37 @@
 - **F4 句長／認知負荷** — 一句塞太多概念，超出自學讀者一次能扛的量；給切點。
 - **F5 語域** — hedge、過度口語（*super easy*、*you guys*）、黑板縮寫（*iff*、*w.r.t.*、*s.t.*）、代名詞策略（*we* 預設；*you* 僅用於溫和提醒或 forward reference）。
 
-### C. 語聲 AI-texture（密度觸發；分兩階段上線）
+### C. 語意／聲音 Substance／Altitude／Voice（S/A/V 語意層 critic；部分 BLOCKING）
 
-讀者「會不會覺得這是機器寫的」。§3 語域權威不變，本維度只審 AI-tell 的**密度**，不審個別合法用法。**單一合法用法不算 finding；觸發擋稿的是密度。**
+讀者「會不會覺得這是機器寫的」——但**不是數 tell／密度，是讀意思**。**中性 ≠ AI；中性＋空才是 AI**（[`PLAN-deai-semantic-critic.md`](../../PLAN-deai-semantic-critic.md) §0）。對每個候選句/段跑下面三組診斷，**每條 finding 強制附證據**。
 
-- **C1 空心 signposting / 連接詞超量** — signpost 開頭（It is worth/important to note、Recall that[無可回查]、In this section we will、Now let us turn our attention to）與「敘述顯而易見步驟」的連接詞（This means that、From this we can see、It follows naturally that）。§3 鼓勵的連接詞仍是特性，**但帶密度天花板**：同一節超過約每 500 字 3 個 distinct → C1。
-- **C2 copula-avoidance** — 以 serves as / represents / marks / stands as 取代可用的 is/are。
-- **C3 裝飾性 negative parallelism** — `not X but Y` / `not only…but also`，純為節奏、對比可隱含時。
-- **C4 強迫性 rule-of-three** — 三形容詞／三子句堆疊為 cadence 而非真有三項。
-- **C5 puffery / 借來的宏大** — powerful tool、elegant、profound、fundamental building block、rich tapestry，斷言而非由內容掙得；及無新意的 `In summary, we have seen…` 重述。
-- **C6 em-dash 密度** — 散文中 em-dash 作插入語的頻率（§8 已要求謹慎）。**密度線（Ch1 校準）：advisory ≥4 個/~500 字**（在已簽核 Ch1 上界 ~4.0 之上，故基準不誤判）；**單句內 ≥3 個 em-dash 作插入語＝ advisory 局部熱點**（即使全節未超線）。em-dash 僅在與其他 C-tell 合計達高密度叢集時才貢獻 blocking。
+**S — Substance（這句掙得它的位置嗎？）**
+- **S1 資訊** — 相對前句、相對數學式本身，有沒有加**新洞見**？（只把算式翻成英文卻沒加東西＝空）
+- **S2 具體性** — 斷言針對**這個**物件/問題，還是「貼到任何節都成立」的通用填充？
+- **S3 刪除測試** — 刪掉讀者有損失嗎？**沒有→建議刪，不是改寫。**
 
-**擋稿線（Ch1 校準定案，N=3）：** BLOCKING = 任一節 C1–C6 **高密度叢集**＝合計 **≥3 個 distinct 真 tell**（genuine；content-bearing／§3-protected 邊緣**不計入**密度）落在約 500 字內，**且**該節 distinct 真 tell 絕對數 **≥3**（短節絕對下限：免 <~400 字節以 1–2 項外插假觸發，例 sec-intro）。單一 tell＝ADVISORY。
-**收斂判準補一條：** 該節 AI-texture 通過 = 高密度叢集（依上式）= 0。advisory（單一 tell）不強制歸零。
+**A — Altitude（對自學者高度對嗎？）**
+- **A1 嘮叨** — 顯而易見的步驟被長篇解釋？（過高）
+- **A2 跳步** — 真正難的一步被略過/揮手帶過？（過低）
+- **高度 self-relative：** A1/A2 對著「**這節在教什麼、這一步本身多難**」判，**不**對著範本判（避免引進別人的教法）。範本只示範「好高度的形狀」。
 
-**不算 finding（§3-protected，但加密度天花板）：** §3 鼓勵連接詞、刻意教學重複、章末回查重述、Informally gloss、topic-term recurrence —— 仍是特性，**但任一者在單節內超過密度門檻即轉 C# finding**；舊版「絕不可當 finding」的無上限保護到此為止（這正是 AI scaffolding 過去被積極辯護而存活的漏洞）。密度門檻：signposting／連接詞比照 C1（distinct >3/~500 字），em-dash 比照 C6（≥4/~500 字）；其餘受保護特性（刻意教學重複／章末回查重述／Informally gloss／topic-term recurrence）僅在**貢獻高密度叢集**（上述擋稿線）時才轉 finding，無獨立 per-item 數（Ch1 校準：此四類在已簽核章節從未逼近任何門檻）。
+**V — Voice（§3 那點暖到位嗎？）**
+- **V1 平** — 某處只機械陳述、缺了 §3 要的動機/直覺鋪陳？（**不是**叫它灌人格/加笑話——只問「§3 本來就要的那點暖在不在」）
+  - **V1 寬報校準（2026-06-26 使用者拍板）：** V1 **永遠 advisory、never blocking**，且採**寬報**——不只「該暖全無」要報，連「**中性但可更暖**」（某句本身偏平、§3 可更暖，即便鄰句已補上直覺）也列為 advisory，交使用者逐條裁。下方防呆 2「中性不扣分」只約束 S/A 的 blocking 判定，**不豁免** V1 的「可更暖」提示。
 
-唯讀、提議不行動，與 A/B 維度同護欄。Vale lint 的 flag 當預標餵入。
+**兩個防呆（避免重蹈 metric/tell 覆轍）：**
+1. **真人範本當錨 ＋ 強制附證據** — gate 跑 S/A/V 時，**prompt 末尾掛 [`anchors/svc-exemplars.md`](anchors/svc-exemplars.md)（固定 2 正 1 負真人範本）**，標為「言之有物的真人數學散文」，**對著正面 bar 判、把負面當「該 flag 長這樣」**。每條 finding **必附**：問題句＋踩哪個測試（S1/S2/S3/A1/A2/V1）＋一行為什麼＋改寫（或「刪」）。→ 可稽核，不是憑感覺。
+2. **中性不扣分** — 純粹平實、中性但言之有物的句子**不准 flag**（指 S/A：不因「中性」就判它空／錯高度——那正是目標）。只抓空（S）/錯高度（A）/該暖沒暖或可更暖（V1 寬報 advisory，見上）。
+
+**擋稿線（從嚴、寧少報）：** BLOCKING = ① **空句佔位**——某句踩 S1（無新洞見）／S3（刪無損失）且**佔著承載教學功能的位置（動機／直覺／解拆）卻無實質**；或 ② **高度錯**——A2（真正難的一步被揮手帶過，讀者會卡）。其餘 S/A/V（單純 S2、A1 嘮叨、V1 平、非承載位的可刪 filler）一律 **ADVISORY**。
+**收斂判準：** 該節 C 通過 = **S/A 的 blocking findings = 0**；advisory（含 V）不強制歸零。
+
+唯讀、propose-only、**保語意、不動數學、不碰教學順序與選題**（copyedit 級硬護欄，同 A/B 維度）。Vale lint 的 flag 仍當零成本預標餵入（**降級護欄、預期 ~0**，非 gate）。
 
 ## 擋稿線（blocking vs advisory）
 
-- **BLOCKING（讀者會卡住或被誤導）**：`U1` 嚴重（全無動機就丟形式）、`U2`、`U3`、`U4`；`F3` 中**會導致誤解、進而誤算**的真歧義句；以及 **C 維度的高密度叢集**（≥3 個 distinct 真 tell / ~500 字，含短節絕對下限）。
-- **ADVISORY（polish；讀者仍懂）**：`F1`、`F2`、`F4`、`F5`、`U5`、輕微 `U1`（動機偏薄但有）、`F3` 一般彆扭。
+- **BLOCKING（讀者會卡住或被誤導）**：`U1` 嚴重（全無動機就丟形式）、`U2`、`U3`、`U4`；`F3` 中**會導致誤解、進而誤算**的真歧義句；以及 **C 維度的 S/A blocking**（空句佔承載位＝S1/S3＋無實質，或 `A2` 揮手帶過真難步）。
+- **ADVISORY（polish；讀者仍懂）**：`F1`、`F2`、`F4`、`F5`、`U5`、輕微 `U1`（動機偏薄但有）、`F3` 一般彆扭；以及 C 維度的 `S2`／`A1`／`V1`／非承載位的可刪 filler。
 - **收斂判準**：該節 prose gate 通過 = **blocking findings = 0**。advisory 由使用者逐條裁決，**不強制歸零**。
 
 ## 不算 finding（§3-protected；別誤砍）
@@ -85,10 +94,11 @@
 
 **輸出格式：**
 
-- 首行：`VERDICT: <B> blocking, <T> tighten, <O> optional, <X> AI-texture`
+- 首行：`VERDICT: <B> blocking, <T> tighten, <O> optional, <V> voice`
 - 逐條（一行一筆）：
-  `- [Blocking|Tighten|Optional] [U#|F#|C#] <sec>:<locus> — <issue>（原文：「…」）→ 建議：「…」`
-- 每個**乾淨**的維度各一行（如 `F2 贅字: clean`）。
-- 末行：對「**易懂性 blocking 是否歸零**」給一句明確結論（prose gate 收斂判準）。
+  `- [Blocking|Tighten|Optional] [U#|F#|S#|A#|V#] <sec>:<locus> — <issue>（原文：「…」）→ 建議：「…」或【刪】`
+  - **S/A/V 條必附**：踩哪個測試（S1/S2/S3/A1/A2/V1）＋一行為什麼；S3 成立時建議用【刪】而非改寫。
+- 每個**乾淨**的維度各一行（如 `F2 贅字: clean`、`S/A/V: clean`）。
+- 末行：對「**易懂性＋S/A 的 blocking 是否歸零**」給一句明確結論（prose gate 收斂判準）。
 
 **交付給使用者裁決時**：**每道閘各產一份** standalone HTML 審核稿（MathJax CDN、雙擊即開、數學即渲染、頂部摘要表、逐條卡片含 `<del>`／`<ins>` diff）。正常流程：gate 1（Claude）審完交 `REVIEW-ch{NN}-prose-audit-gate1.html`，再換 gate 2（Codex）審完交 `REVIEW-ch{NN}-prose-audit-gate2.html`——**兩份各自獨立、不合併**（對應 Claude 先審、Codex 再審的兩步）。格式參照 [`REVIEW-ch01-prose-audit-gate1.html`](REVIEW-ch01-prose-audit-gate1.html)／[`REVIEW-ch01-prose-audit-gate2.html`](REVIEW-ch01-prose-audit-gate2.html)（源自 [`../../video/content_scripts/_audit/REVIEW-ch01-narration-copyedit.html`](../../video/content_scripts/_audit/REVIEW-ch01-narration-copyedit.html)）。**不要**交塞滿生 LaTeX 的 `.md`（CLAUDE.md 規則）。純版控紀錄（如本 rubric、驗證報告）不在此限。每條 finding 標**穩定編號**（gate 1 用 `G1-1…`、gate 2 用 `G2-1…`），方便使用者逐條報編號討論與回覆裁決。
