@@ -12,6 +12,30 @@
 
 ---
 
+## 實作進度與結果（2026-06-26，跨對話狀態錨）
+
+> **本輪落地範圍：偵測機制（Tasks 1–7）＋ Task 8 的 Ch1，全部完成並經雙審驗證；Ch2–Ch4 待續。** 下一輪從 Task 8 的 Ch2 接手即可（critic 已凍結、穩定）。
+
+| Task | 狀態 | 重點 |
+|---|---|---|
+| 1 錨組 | ✅ 完成 | 2 正（OpenStax §2.2 limit、§3.1 derivative）1 負（自撰 AI-default）；⛳ 使用者 bless（derivative 取 A，local-linearity）。檔：`handout/_audit/anchors/svc-exemplars.md` |
+| 2 rubric C→S/A/V | ✅ 完成 | `PROSE-AUDIT-RUBRIC.md` Dimension C 改鑄；blocking 線＝空句佔承載位（S1/S3）或 A2。**＋V1 寬報校準（⛳ 拍板：中性但可更暖也報 advisory、never blocking）** |
+| 3 agent 收編 | ✅ 完成 | `handout-prose-audit.md` 三維化、載入錨組 |
+| 4 盲測分離 ⛳ | ✅ 通過 | 見下「驗證結果」。`tools/deai/separation_tally.py`＋`REVIEW-svc-separation-test.html` |
+| 5 pilot ⛳ | ✅ 通過 | §1.4，0 blocking、克制過關 |
+| 6 §3 voice corpus 換真人 | ✅ 完成 | ⛳ 採 **option (c)**：四型全換真人（OpenStax/CLP，CC BY-NC-SA），破 Ch1 循環。`CONTENT_SPEC.md` §3＋`REVIEW-svc-voicecorpus-applied.html` |
+| 7 退役舊機制 | ✅ 完成 | Vale 降級護欄（`CONTENT_DIRECTION.md` ⑤）、刪 2 過時 voicecorpus html、`REVIEW-ch02-deai-gate1.html` 加退役註 |
+| 8 逐章鋪 | 🔶 **Ch1 完成、Ch2–4 待續** | **Ch1：gate-1（Claude）＋gate-2（Codex）雙審皆 0 blocking**；套用 6 條 advisory 改進（§1.2/§1.3/§1.4/§1.5×2/§1.6×2，§1.1 全 keep），逐節回歸通過、build 全綠。per-節 `REVIEW-ch01-svc-gate1-sec-*.html`＋`REVIEW-ch01-svc-gate2.html` |
+
+**驗證結果（核心信任檢查）：**
+- **盲測分離 PASS：** empty（刻意空泛 AI-default）vs substantive（真人＋好 AI＋bare vanilla）**29.7× 分離**、blocking-only **完美分離**（11 段實質散文零 blocking、3 段空泛全被 blocking 重咬，踩對 S1/S3/A2/V1）。
+- **重要 reframe（修正 spec §5.1 框架）：** vanilla LLM 在「limit/derivative」這類好走主題上**本身就言之有物**，與真人**不可分**（實證 spec §0「中性≠AI」）——所以可驗證、critic 真能分的軸是 **「空 vs 實」**，不是「AI vs 人」。本 critic 驗的是**空泛偵測＋過度-flag 防護**，這正是 Task 8 的職責。
+- **Ch1 雙審 0 blocking 的意義：** 推翻舊 metric「Ch1 是 AI 灌水」（em-dash 密度高只是 OpenStax 不愛 em-dash 的假象）；Ch1 一直是好的人類編修內容，新語意 critic 只找到少量暖度/實質 polish。
+
+**下一輪接手：** Task 8 的 Ch2（§2.1–§2.5）→ Ch3 → Ch4，一次一節，同 gate-1（±gate-2）→ ⛳ 逐條裁決 → 回歸 流程。rubric/錨/agent 已凍結，不需再動。
+
+---
+
 ## Global Constraints（每個 task 隱含包含）
 
 - **目標＝積極（難以分辨人類），但路徑是語意層編輯、瞄 §3 既定調**；中性≠AI，中性+空才是 AI（spec §0）。

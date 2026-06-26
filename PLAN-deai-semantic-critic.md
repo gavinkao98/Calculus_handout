@@ -87,6 +87,11 @@
 3. **使用者抽查：** 挑 1–2 節真實講義，比對 critic findings 與使用者讀感；常不同步就重調。
 4. **pilot 再鋪：** 驗證過的 critic 先跑**一節**，看順了再鋪 Ch1–4。
 
+**驗證結果（2026-06-26，已執行）：**
+- **盲測分離 PASS：** empty vs substantive **29.7× 分離**、blocking-only **完美分離**（11 段實質散文——真人＋好 AI＋bare vanilla——零 blocking；3 段刻意空泛全被 blocking 重咬、踩對 S1/S3/A2/V1）。過度-flag 防護成立。
+- **軸的修正：** §5.1 原框「正例＝AI 段、負例＝真人段」假設「AI＝該 flag」。實測推翻：vanilla LLM 在 limit/derivative 這類好走主題上**本身言之有物、與真人不可分**（實證 §0「中性≠AI」）。故可驗證、critic 真能分的軸是 **「空 vs 實」**，不是「AI vs 人」——本 critic 驗的是**空泛偵測＋過度-flag 防護**（正是 §6 Task 8 的職責），不是「AI 偵測」。
+- **pilot＋Ch1：** §1.4 pilot 通過；Ch1 六節經 **gate-1（Claude）＋gate-2（Codex）雙審皆 0 blocking**，推翻舊 metric「Ch1 是 AI 灌水」。實作細節與逐節結果見 [`PLAN-deai-semantic-critic-implementation.md`](PLAN-deai-semantic-critic-implementation.md)「實作進度與結果」。
+
 ---
 
 ## 6. Scope／退役／連帶
