@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch2 散文稽核 — 去 AI 味 gate 1（Claude）審核稿</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}
+  .warnnote b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.pend{background:var(--warnbg);color:var(--warn)}
+  .chip.sev{background:#fdeceb;color:var(--old)}
+  .chip.kept{background:#eef0f4;color:#33343a}
+  .issue{color:var(--muted);font-size:.92rem;margin:2px 0 10px}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:54px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  .none{color:var(--muted);font-style:italic;padding:8px 2px}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 2 散文稽核 — 去 AI 味 gate 1（Claude）審核稿</h1>
+
+  <div class="note warnnote" style="border-left-width:5px;border-left-color:var(--old);background:#fdeceb">
+    <b style="color:var(--old)">⚠ 退役註記（2026-06-26，「去 AI 味」方案 pivot）。</b>
+    本審核稿用的是<b>舊版 metric Dimension C（C1–C6／em-dash 密度／高密度叢集／章級 em-dash 減量提案）</b>。真人語料校準（OpenStax／CLP-1）證明這類結構指標<b>分不出人/AI</b>——Ch1 4.12、Ch2 8.22 的 em-dash 密度都落在真人區間內（OpenStax 0.63、CLP-1 7.32）——故該偵測法<b>已整套退役</b>（見 <code>PLAN-deai-semantic-critic.md</code> §0／§6）。
+    <br><b>本稿處置：</b>① <b>保留 A（易懂 U1–U5）／B（流暢 F1–F5）的 advisory findings——仍有效、仍可逐條裁決</b>；② 下方所有 <b>C 維度（C1–C6、尤其 C6 em-dash 密度與「章級 em-dash 減量」<code>G1-C6</code>）一律作廢</b>，<b>不再依其裁決</b>。新的「去 AI 味」偵測改為 prose gate 的 Dimension C＝語意/聲音 <b>S/A/V</b> 人審 critic（中性≠AI，中性+空才是 AI；空句/錯高度才 blocking），驗證見 <code>REVIEW-svc-separation-test.html</code>。本稿不刪，留作 A/B 紀錄與 pivot 證據。
+  </div>
+  <p class="lede">Phase 3 / Task 3.1（PLAN-deai-flavor）。Claude <code>handout-prose-audit</code> subagent（唯讀）對 ch02 全 5 節散文跑<b>三維度</b>：易懂性 U1–U5＋流暢性 F1–F5＋<b>語聲 AI-texture C1–C6</b>（C 已升 blocking，N=3）。契約見 <code>PROSE-AUDIT-RUBRIC.md</code>。Vale AItexture 預標：全 5 節 <b>0 hit</b>。2026-06-25。</p>
+
+  <div class="note pass"><b>狀態：整章 0 blocking——ch02 prose gate（收斂判準＝blocking findings = 0）通過。</b> 易懂性五項全節 clean；C 高密度叢集（≥3 distinct 真 tell／~500 字）每節皆 = 0。以下全為 <b>advisory</b>（tighten／optional／AI-texture），<b>propose-only、尚未套用，待你逐條裁決</b>（advisory 不強制歸零）。</div>
+
+  <div class="note warnnote"><b>唯一系統性訊號：C6 em-dash 密度（章級）。</b> 5 節中 <b>4 節</b>（§2.2／§2.3／§2.4／§2.5）的散文 em-dash 作插入語密度約 <b>6–8 個/500 字</b>，高於 Ch1 校準的 advisory 線（~4/500）。皆為 advisory（無單句 ≥3 個插入語的局部熱點、未與其他 C-tell 形成高密度叢集，故不貢獻 blocking）。這是 Ch2 相對 Ch1 唯一明顯的 AI-texture 漂移；是否做<b>章級 em-dash 減量</b>請見下方合併卡 <code>G1-C6</code> 一次裁決。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>Blocking</th><th>Advisory（待裁決）</th></tr>
+    <tr><td>§2.1 Tangent Line &amp; Derivative at a Point</td><td class="zero">0</td><td>2 tighten · 2 optional</td></tr>
+    <tr><td>§2.2 The Derivative as a Function</td><td class="zero">0</td><td>2 optional · C6 密度</td></tr>
+    <tr><td>§2.3 Differentiability, Continuity, Higher Deriv.</td><td class="zero">0</td><td>1 tighten · C6 密度</td></tr>
+    <tr><td>§2.4 Derivatives of Polynomials &amp; Exp.</td><td class="zero">0</td><td>2 tighten · 2 optional · C6 密度</td></tr>
+    <tr><td>§2.5 The Product and Quotient Rules</td><td class="zero">0</td><td>1 tighten · 1 optional(C5) · C6 密度</td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：<b>易懂性</b> U1 動機缺位 · U2 重型形式無 gloss · U3 未解釋的跳躍 · U4 術語先用後定義 · U5 定義後未拆解 ／ <b>流暢性</b> F1 局部冗餘 · F2 贅字 · F3 句構可解析 · F4 句長／負荷 · F5 語域 ／ <b>語聲</b> C1 空心 signposting · C2 copula-avoidance · C3 negative parallelism · C4 rule-of-three · C5 puffery · C6 em-dash 密度。</p>
+
+  <!-- ===================== §2.1 ===================== -->
+  <h2>§2.1 The Tangent Line and the Derivative at a Point</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.1-1</span><span class="chip unit">開場段 (line 14)</span><span class="chip dim">F4 句長</span><span class="chip pend">待裁決</span></div>
+    <div class="issue">末句一句內接連「定義問題（找斜率）＋宏大收束（central idea）」，認知負荷略高，且 "that quest" 稍文藝。拆成兩個小節拍。</div>
+    <div class="row old"><span class="tag">原文</span>To pin down this line we need to determine its slope, <del>and that quest leads directly to the central idea of differential calculus.</del></div>
+    <div class="row new"><span class="tag">建議</span>To pin down this line we need <ins>its slope — and finding that slope is the central idea of differential calculus.</ins></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.1-2</span><span class="chip unit">Remark 2.2 末句 (line 201)</span><span class="chip dim">F3 句構</span><span class="chip pend">待裁決</span></div>
+    <div class="issue">三重後置修飾（兩段 em-dash 插入＋"applied to…"）疊在句尾，解析負荷偏高；併為單一插入語。</div>
+    <div class="row old"><span class="tag">原文</span>This is the tangent-line approximation of Example 2.5 — the principle of local linearity (Remark 2.1) — <del>applied to the question we opened the section with.</del></div>
+    <div class="row new"><span class="tag">建議</span>This is <ins>exactly the</ins> tangent-line approximation of Example 2.5 — <ins>local linearity (Remark 2.1) put to work on the question we opened with.</ins></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.1-3</span><span class="chip unit">h-form 段 (line 49)</span><span class="chip dim">F2 贅字</span><span class="chip pend">待裁決（optional）</span></div>
+    <div class="issue">"often" 與 "for computation" 輕微鬆，可收緊但語意不損。低優先。</div>
+    <div class="row old"><span class="tag">原文</span>This "\(h\)-form" is <del>often</del> more convenient <del>for</del> computation</div>
+    <div class="row new"><span class="tag">建議</span>This "\(h\)-form" is <ins>usually</ins> more convenient <ins>in</ins> computation</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.1-4</span><span class="chip unit">Remark 2.2 (line 201)</span><span class="chip dim">F1 局部冗餘</span><span class="chip kept">建議保留</span></div>
+    <div class="issue">與 Example 2.5、Remark 2.1 在「local linearity／tangent-line approximation」上有可感重述，但屬 §3-protected 的章末回查／bookend 重述（呼應開場 \(\sqrt{4.01}\)），密度未逼近門檻——<b>備記、不擋稿，建議保留</b>。</div>
+    <div class="row new"><span class="tag">處置</span><ins>保留。</ins>兩段各帶不同回指，刪任一會損 lookup 價值。</div>
+  </div>
+
+  <!-- ===================== §2.2 ===================== -->
+  <h2>§2.2 The Derivative as a Function</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.2-1</span><span class="chip unit">Strategy 2.1 收束段 (line 50)</span><span class="chip dim">F4 句長</span><span class="chip pend">待裁決（optional）</span></div>
+    <div class="issue">末句一句內塞四概念＋一組成對 em-dash 插入語＋一個分號，認知負荷偏高；在分號處斷句。</div>
+    <div class="row old"><span class="tag">原文</span>…but its job is always to clear the \(0/0\)<del>;</del> <del>f</del>or the polynomial, root, and rational functions of this chapter a factor of \(h\) always cancels and leaves a limit we can evaluate.</div>
+    <div class="row new"><span class="tag">建議</span>…but its job is always to clear the \(0/0\)<ins>.</ins> <ins>F</ins>or the polynomial, root, and rational functions of this chapter<ins>,</ins> a factor of \(h\) always cancels and leaves a limit we can evaluate.</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.2-2</span><span class="chip unit">開場段 (line 18)</span><span class="chip dim">F1 局部冗餘</span><span class="chip pend">待裁決（optional）</span></div>
+    <div class="issue">"velocity as a function of time" 與緊接末句的同一概念近距複述；惟屬 §3 鼓勵的 concrete→abstract 交棒收束句（topic-term recurrence 邊緣），可保留，若要更緊可省 in-clause 重述。</div>
+    <div class="row old"><span class="tag">原文</span>Making this shift<del>, from the derivative at one point to the derivative as a function,</del> is the work of this section.</div>
+    <div class="row new"><span class="tag">建議</span>Making this shift is the work of this section. <ins>（或保留原句——擇一）</ins></div>
+  </div>
+
+  <!-- ===================== §2.3 ===================== -->
+  <h2>§2.3 Differentiability, Continuity, and Higher Derivatives</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.3-1</span><span class="chip unit">vertical-tangent 對比段 (line 80)</span><span class="chip dim">F4 句長</span><span class="chip pend">待裁決</span></div>
+    <div class="issue">一句串四子句（no finite slope／derivative demands finite limit／fails here／不同於 corner），認知負荷偏高；給切點。</div>
+    <div class="row old"><span class="tag">原文</span>A vertical line has no finite slope<del>, and</del> the derivative demands a finite limit, so differentiability fails here <del>for</del> a different reason than at a corner.</div>
+    <div class="row new"><span class="tag">建議</span>A vertical line has no finite slope<ins>. Since</ins> the derivative demands a finite limit, differentiability fails here <ins>— but for</ins> a different reason than at a corner.</div>
+  </div>
+
+  <!-- ===================== §2.4 ===================== -->
+  <h2>§2.4 Derivatives of Polynomials and the Exponential Function</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.4-1</span><span class="chip unit">intro 第二句 (line 26)</span><span class="chip dim">F4 句長</span><span class="chip pend">待裁決（optional）</span></div>
+    <div class="issue">一句串「expand／cancel／take a limit／同樣勞動重複」多子句，自學讀者一次認知負荷略高；在 "take a limit." 斷句。</div>
+    <div class="row old"><span class="tag">原文</span>…we would expand \((x + h)^{4}\), cancel, and take a limit<del>, only to face the same labor for the next polynomial, and the next.</del></div>
+    <div class="row new"><span class="tag">建議</span>…we would expand \((x + h)^{4}\), cancel, and take a limit<ins>. And then the same labor awaits the next polynomial, and the next.</ins></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.4-2</span><span class="chip unit">power-rule 鋪陳 (line 50)</span><span class="chip dim">F2 贅字</span><span class="chip pend">待裁決</span></div>
+    <div class="issue">"the caution that follows" 與下文 Caution 直接相鄰，"that follows" 屬可省的指路贅字。</div>
+    <div class="row old"><span class="tag">原文</span>the <del>case of other exponents is discussed in the caution that follows.</del></div>
+    <div class="row new"><span class="tag">建議</span>the <ins>other exponents are discussed in the Caution below.</ins></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.4-3</span><span class="chip unit">Example（§2.2 回指）(line 207)</span><span class="chip dim">F1 局部冗餘</span><span class="chip pend">待裁決</span></div>
+    <div class="issue">同段相鄰兩句內重提「§2.2 給的值」（前句已點名 §2.2 Example 2.7），屬局部冗餘（非章末回查）。</div>
+    <div class="row old"><span class="tag">原文</span>reproduces in a single line <del>exactly the value the limit gave in §2.2.</del></div>
+    <div class="row new"><span class="tag">建議</span>reproduces <ins>that value</ins> in a single line<ins>.</ins></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.4-4</span><span class="chip unit">intro (line 26)</span><span class="chip dim">F5 語域</span><span class="chip kept">建議保留</span></div>
+    <div class="issue">"This section ends the drudgery." 語氣偏戲劇化，屬服務動機的口吻、§3 容許範圍。<b>保留</b>；若要中性化可選改。</div>
+    <div class="row old"><span class="tag">原文</span>This section ends the drudgery.</div>
+    <div class="row new"><span class="tag">可選</span><ins>This section removes that repetition.</ins>（中性化，非必要）</div>
+  </div>
+
+  <!-- ===================== §2.5 ===================== -->
+  <h2>§2.5 The Product and Quotient Rules</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.5-1</span><span class="chip unit">product-rule 幾何證明 (line 84)</span><span class="chip dim">F4 句長</span><span class="chip pend">待裁決</span></div>
+    <div class="issue">單句塞「兩 strip 收斂＋corner 收斂＋為何 corner 消失」三件事並夾多個顯示分數，認知負荷偏高；在 corner 結果後斷句。</div>
+    <div class="row old"><span class="tag">原文</span>…while the corner contributes \(\to f' \cdot 0 = 0\)<del>, since \(\Delta f/h\) stays finite (tending to \(f'\)) while \(\Delta g \to 0\).</del></div>
+    <div class="row new"><span class="tag">建議</span>…while the corner contributes \(\to f' \cdot 0 = 0\)<ins>. This last term vanishes: \(\Delta f/h\) stays finite (tending to \(f'\)) while \(\Delta g \to 0\).</ins></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2.5-2</span><span class="chip unit">開場 (line 34)</span><span class="chip dim">C5 puffery（單點）</span><span class="chip kept">建議保留</span></div>
+    <div class="issue">"behaves beautifully"／"just as docile" 屬輕度擬人化修飾，單一出現、§3 Stewart 語域容許溫度，<b>不擋稿、單一 tell 不計入叢集</b>。保留；若要更中性可選改 "behaves simply"。</div>
+    <div class="row old"><span class="tag">原文</span>differentiation <del>behaves beautifully</del> with respect to addition … products and quotients are <del>just as docile</del></div>
+    <div class="row new"><span class="tag">可選</span>differentiation <ins>behaves simply</ins> with respect to addition …（非必要；保留亦可）</div>
+  </div>
+
+  <!-- ===================== 章級 C6 ===================== -->
+  <h2>章級 AI-texture：C6 em-dash 密度（一次裁決）</h2>
+
+  <div class="card" style="border-style:solid;border-left:4px solid var(--warn)">
+    <div class="chips"><span class="chip num">G1-C6</span><span class="chip unit">§2.2 / §2.3 / §2.4 / §2.5</span><span class="chip dim">C6 em-dash 密度</span><span class="chip pend">待裁決（章級 advisory）</span></div>
+    <div class="issue">合併四節的 C6 訊號（原子編號 G1-2.2-3／G1-2.3-2／G1-2.4-5／G1-2.5-3）。散文中 em-dash 作插入語的密度高於 Ch1 校準上界（~4/500 字）：</div>
+    <table class="sum" style="margin:4px 0 10px">
+      <tr><th>節</th><th>估計密度</th><th>備註</th></tr>
+      <tr><td>§2.2</td><td>~5–6 / 500 字</td><td>無單句 ≥3 熱點（最密成對 2 個）</td></tr>
+      <tr><td>§2.3</td><td>~8 / 500 字</td><td>L34、L80 各單句成對</td></tr>
+      <tr><td>§2.4</td><td>~8.3 / 500 字</td><td>分散多段，無單句熱點</td></tr>
+      <tr><td>§2.5</td><td>~6–7 / 500 字</td><td>分散多段 example/caution</td></tr>
+    </table>
+    <div class="issue">全為 <b>advisory</b>（無單句 ≥3 插入語熱點、不與其他 C-tell 形成 ≥3 distinct 真 tell 的高密度叢集，故不貢獻 blocking）。代表性 loci：§2.2 L25/L47/L124/L187、§2.3 L80、§2.4 L100、§2.5 L197/L243/L272。</div>
+    <div class="row new"><span class="tag">建議</span><ins>章級輕度減量：</ins>各節挑 2–3 處最可省的 em-dash 插入語改逗號／括號／獨立句，把每節降到 ~5/500 字以下即可，語意不變。例：§2.3 L80「…limits agree — they both tend to \(+\infty\) — so…」→「…limits agree (they both tend to \(+\infty\)), so…」。<b>是否執行請一次裁決（全章做／不做／指定節做）。</b></div>
+  </div>
+
+  <footer>
+    gate 1（Claude）審核稿，propose-only。整章 0 blocking，prose gate 通過；以上 advisory 待使用者逐條（或章級 C6 一次）裁決後，獲准項才套用。<br>
+    回歸審核（CLAUDE.md 2026-06-12）：套用獲准修改後，對改過的節重跑一次審核確認未引入新問題，結果附此稿。<br>
+    對應 commit（<code>fix(deai): ch02 定稿語聲收斂…</code>）待使用者授權。下一步：gate 2（Codex）可另出 <code>REVIEW-ch02-deai-gate2.html</code>（兩份各自獨立、不合併）。
+  </footer>
+
+</div>
+</body>
+</html>

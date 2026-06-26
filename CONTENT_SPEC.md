@@ -119,23 +119,66 @@ Rationale：Stewart 語域加上自足的 handout 意味著讀者無法依賴老
 
 ### 語聲參考範文
 
-以下段落示範目標語聲。對語域有疑問時，將你的草稿與此範文對照。
+以下範文示範目標語聲，涵蓋講義四種主要散文型別：① 動機鋪陳、② worked solution（全書大宗）、③ 歷史／應用旁註、④ 直覺 gloss。對語域有疑問時，把草稿與**對應型別**的範文對照。**所有範文逐字取自開放授權的真人微積分教材**（OpenStax Calculus Volume 1、CLP-1 Calculus，皆 **CC BY-NC-SA**，各標出處）——刻意用真人範本、不取本書 Chapter 1，以免「拿 Ch1 對 Ch1」的循環標靶（見 [`PLAN-deai-semantic-critic.md`](PLAN-deai-semantic-critic.md) §0／§3）。數學內容未改，僅把來源的純文字行內數學依本節 Markdown 慣例正規化為 `$...$`／`$$...$$`／`*…*`。型① 的兩段同時是語意/聲音 critic 的正面錨（[`handout/_audit/anchors/svc-exemplars.md`](handout/_audit/anchors/svc-exemplars.md)）。
 
-> Not every function can be reversed. If two different inputs produce the same output, we cannot recover the input from the output uniquely. To build a rigorous version of this idea, we first need a name for the functions that avoid this problem.
->
-> **Definition.** A function $f$ with domain $A$ is *one-to-one* if $f(x_1) \ne f(x_2)$ whenever $x_1 \ne x_2$. *Informally, a function is one-to-one when different inputs always give different outputs.*
->
-> Notice how this condition rules out exactly the problem described above. If two different inputs $x_1$ and $x_2$ gave the same output, there would be no way to decide which one was "the" input corresponding to that output, and the reverse direction would be ambiguous.
->
-> To check whether a specific function is one-to-one, we can use a graphical test that you have likely seen before in precalculus...
+#### 型① 動機鋪陳
 
-此語聲的關鍵特徵：
+**範文 1（diagnose-then-motivate，OpenStax §2.2）——** 不把表格／圖翻成英文，而是診斷其具體缺陷，再用這個 gap 推出下一步：
 
-- 動機段落先於 definition（"Not every function can be reversed..."）。
-- 直覺出現在 definition body 內（斜體 *"Informally, ..."* 句子）。
-- Definition 之後的散文解拆該條件（*"Notice how this condition rules out..."*）。
-- 明確的 bridge（*Notice how*、*To check...*）引導讀者經過每個轉折。
-- "We" 是預設；"you" 出現為溫和的 forward-reference（"you have likely seen..."）。
+> Looking at a table of functional values or looking at the graph of a function provides us with useful insight into the value of the limit of a function at a given point. However, these techniques rely too much on guesswork. We eventually need to develop alternative methods of evaluating limits. These new methods are more algebraic in nature and we explore them in the next section; however, at this point we introduce two special limits that are foundational to the techniques to come.
+
+〔source: OpenStax Calculus Vol.1, §2.2, CC BY-NC-SA〕此語聲的關鍵特徵：
+
+- **substance**：每句掙得位置——診斷「rely too much on guesswork」這個具體局限，再用它 motivate 代數方法；非貼到任何節都成立的通用填充。
+- **altitude**：對自學者剛好——不重講怎麼讀表，也不揮手帶過為何需要更難的方法。
+- **voice**：§3 那點暖到位但不話嘮——motivation-before-formalism、主代名詞 "we"、真連接詞 "However"，對讀者誠實而非乾巴巴斷言。
+
+**範文 2（concrete-to-abstract，OpenStax §3.1）——** 與範文 1 互補：從可觸摸的物件（$\sqrt{x}$、收緊的區間）建起 local-linearity，最後才命名概念，示範 Stewart 招牌的 concrete-to-abstract：
+
+> In Figure 3.5 we show the graph of $f(x)=\sqrt{x}$ and its tangent line at $(1,1)$ in a series of tighter intervals about $x=1$. As the intervals become narrower, the graph of the function and its tangent line appear to coincide, making the values on the tangent line a good approximation to the values of the function for choices of $x$ close to $1$. In fact, the graph of $f(x)$ itself appears to be locally linear in the immediate vicinity of $x=1$.
+
+〔source: OpenStax Calculus Vol.1, §3.1, CC BY-NC-SA〕關鍵特徵：
+
+- **substance**：object-specific 且層層推進（圖與切線重合 → 切線值近似函數值 → 局部線性），每句推進論證、非重述。
+- **voice**："In fact, … locally linear" 把直覺當小小揭示而非平板定義——concrete-to-abstract 的那點暖。
+- **altitude**：停在真正非顯然的一步（為何放大會讓曲線看起來直），不糾纏瑣碎步驟。
+
+#### 型② Worked solution（解法散文標靶——全書大宗）
+
+**CLP-1**：用「越收越緊」逼近切線斜率，把計算推到第一個 limit：
+
+> So as we make $h$ smaller and smaller, we bring $Q$ closer and closer to $P$, and make our secant line a better and better approximation of the tangent line. We can observe what happens to the slope of the line as we make $h$ smaller by plugging some numbers into our formula. So again we see that as this difference in $x$ becomes smaller and smaller, the slope appears to be getting closer and closer to $2$. This is our first limit!
+
+〔source: CLP-1 Calculus（§1.1, drawing tangent lines）, CC BY-NC-SA〕關鍵特徵：
+
+- 動作—觀察式 connective（*make $h$ smaller*、*observe what happens*、*plugging some numbers*）——逐步逼近、每步可追，不偷步。
+- 把數值計算收束回概念（"the slope appears to be getting closer and closer to $2$"），並當場命名（"This is our first limit!"）——讓計算帶上意義，而非只是符號。
+- burstiness：長鋪陳句 → 中段觀察句 → 短促命名收束，模擬「動手算、回望命名」的節奏。
+- （此為 discovery／computation 型 worked solution——逐步逼近、每步可追；演算式 solve-and-verify 解法同樣比照「動作標籤式 connective、每個等號可追、結尾把限制條件翻成意義」的標準。）
+
+#### 型③ 歷史／應用旁註
+
+**OpenStax §3.1**（微積分歸屬於 Newton／Leibniz）：
+
+> When we credit Newton and Leibniz with developing calculus, we are really referring to the fact that Newton and Leibniz were the first to understand the relationship between the derivative and the integral. Both mathematicians benefited from the work of predecessors, such as Barrow, Fermat, and Cavalieri. The initial relationship between the two mathematicians appears to have been amicable; however, in later years a bitter controversy erupted over whose work took precedence. Although it seems likely that Newton did, indeed, arrive at the ideas behind calculus first, we are indebted to Leibniz for the notation that we commonly use today.
+
+〔source: OpenStax Calculus Vol.1, §3.1, CC BY-NC-SA〕關鍵特徵：
+
+- 把歷史當「概念如何成形」的脈絡，而非名人軼事；無「偉大天才／劃時代突破」之類空泛宏大語。
+- 誠實點出爭議（precedence controversy）與前人貢獻（Barrow／Fermat／Cavalieri），不神化。
+- 具體 payoff 收束（"indebted to Leibniz for the notation that we commonly use today"）——把歷史掛回讀者每天在用的記號。
+
+#### 型④ 直覺 gloss（把概念講成白話）
+
+**OpenStax §2.2**（極限的非正式直覺，formal definition 之前）：
+
+> We can think of the limit of a function at a number $a$ as being the one real number $L$ that the functional values approach as the $x$-values approach $a$, provided such a real number $L$ exists.
+
+〔source: OpenStax Calculus Vol.1, §2.2, CC BY-NC-SA〕關鍵特徵：
+
+- 把概念整句翻成白話（"the one real number $L$ that the functional values approach"），果斷說出直覺、不 hedge（無 *basically*／*sort of*）。
+- 末尾的 "provided such a real number $L$ exists" 把直覺釘回嚴謹前提，收緊不放任。
+- 中性但言之有物——正是「中性≠AI」的正面樣貌：平實、無灌人格，卻精準傳達概念。
 
 ---
 
