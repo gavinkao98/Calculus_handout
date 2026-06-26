@@ -10,6 +10,8 @@
 | Manim 影片 | `video/` | 旁白＋動畫＋TTS；`make.py` 建置（詳見 [`video/README.md`](video/README.md)） |
 | 舊 LaTeX 講義 | `legacy/tex_handout/` | 已凍結，僅供參照 |
 
+> **講義「完成一章的完整閘序」**（Mode A 六階 → Mode B → Mode C ①補題目＋②軟深度 → 圖機會/正確性 → 數學 M1–M8 → S·A·V，含各閘 subagent／rubric／雙閘／Codex 調用紀律／「做完＝與 Ch1/Ch2 同級」定義）見權威總覽 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
+
 ## 常用指令速查
 
 ```bash

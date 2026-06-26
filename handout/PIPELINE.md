@@ -1,0 +1,56 @@
+# 完成一章的閘序（HTML 講義 chapter lifecycle）
+
+> **本檔是什麼：** 把一章講義從「手稿」推到「定稿」要經過的**完整閘序**之**權威總覽**。
+> 各閘的細節規格不在此重複——本檔給「順序、各閘用什麼、哪裡停下、產出什麼」，細節指向既有 sub-doc。
+> 內容撰寫規則以 [`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) 為準；改課文只改 `fragments/`、再 `python build.py ch{NN}`（見 [`README.md`](README.md)）。
+
+## 「做完一章」的定義
+
+= **與 Ch1／Ch2 完全同級全跑**。權威敘述見 [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) 的 Ch2 status 行末句：
+**手稿六階 ＋ Mode C（①例題＋②軟深度）＋ 去 AI 味 S·A·V（gate-1+2）＋ 圖機會/正確性兩閘（圖正確性 gate-1+2）＋ 數學正確性雙閘。**
+
+## 閘序總表
+
+| # | 階段 | 做什麼 | gate-1（Claude，免費） | gate-2（Codex，計費） | ⛳ | 產物 | 權威 sub-doc |
+|---|---|---|---|---|---|---|---|
+| 0 | **Mode A 六階定稿** | 手稿→教科書草稿，章內六階方向層收斂、雙模型對抗審至 blocking=0、使用者簽核 | 各節 ④/⑤ | Codex ⑤ | 多處 | `sec-{N}.html`＋章 opener | [`../CONTENT_DIRECTION.md`](../CONTENT_DIRECTION.md)（六階）、[`README.md`](README.md)（Mode A 擴增稽核 9 項） |
+| 1 | **Mode B** | 審訂稽核（簽核前 或 Mode C 後**範圍限定**新 `[pass: enrichment]` 標記） | 主審/各 audit subagent | 可選 | 逐條 | commit body 裁決 | [`README.md`](README.md) §Mode B |
+| 2a | **Mode C ①波 補題目** | 從題庫補 worked example（缺口分析→CLP-1 對症選題→改寫） | `example-supplement` subagent | Codex 選題稽核 | 裁決選哪些 | `ch{NN}_example-supplement-review.html`＋`-applied`＋`-audit.md` | [`../CONTENT_SOURCING.md`](../CONTENT_SOURCING.md) |
+| 2b | **Mode C ②波 軟深度** | 補 intuition/caution/application/strategy/summary/history（**非** example） | `handout-prose-audit` 等 + 9 鏡頭檢查表 | 可選 | 裁決選哪些 | `REVIEW-ch{NN}-modec-enrichment.html`（+applied） | [`README.md`](README.md) §Mode C |
+| 3 | **圖機會閘** | 該不該加圖（出圖前） | `handout-figure-opportunity-audit` subagent | — | 裁決畫哪些 | `REVIEW-ch{NN}-figure-opportunity.html` | [`_audit/FIGURE-OPPORTUNITY-RUBRIC.md`](_audit/FIGURE-OPPORTUNITY-RUBRIC.md) |
+| 4 | **圖正確性閘 D1–D8** | 畫出來對不對（render 後） | `handout-figure-audit` subagent（吃 `shot.mjs` 圖 PNG） | Codex 視覺第二讀者（`-i` 餵 PNG） | 修法裁決 | `REVIEW-ch{NN}-figure-audit{,-gate2}.html` | [`_audit/FIGURE-AUDIT-RUBRIC.md`](_audit/FIGURE-AUDIT-RUBRIC.md) |
+| 5 | **數學正確性閘 M1–M8** | 教什麼、對不對 | Claude/Mode B 走查（sympy 重算 worked example） | Codex 獨立複核 | 逐條裁決 | `REVIEW-ch{NN}-math-audit.html`＋`-gate2.md` | [`_audit/MATH-CORRECTNESS-RUBRIC.md`](_audit/MATH-CORRECTNESS-RUBRIC.md) |
+| 6 | **S·A·V 散文閘**（含易懂性 A／流暢性 B） | 去 AI 味語意收斂 | `handout-prose-audit` subagent（三維＋錨組） | Codex 同 rubric 複核 | 逐條裁決改寫/刪 | `REVIEW-ch{NN}-svc-gate{1,2}.html` | [`_audit/PROSE-AUDIT-RUBRIC.md`](_audit/PROSE-AUDIT-RUBRIC.md)、[`../PLAN-deai-semantic-critic-implementation.md`](../PLAN-deai-semantic-critic-implementation.md)（Task 8 逐章鋪） |
+| 7 | **收尾** | ROADMAP status 標「與 Ch1/Ch2 同級全跑」 | — | — | 確認 | ROADMAP 更新 | [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) |
+
+> **順序不是死管線**：0→1 是 Mode A 內建；簽核後 2–6 是可獨立補跑的閘（互相大致獨立，建議「數學→圖→散文」或「圖→數學→散文」皆可；②軟深度宜在數學/散文閘之前，使新增內容一併被後閘審到）。每個 ⛳ 停下等使用者裁決。
+
+## Mode C 兩波（最易混淆，釘死）
+
+「Mode C 充實」**分兩波、各有獨立 spec／subagent／產物**，不要混為一談（ROADMAP Ch2 status：「Mode C 充實分兩波 ①課文範例補充 ②軟深度充實」）：
+- **①波 補題目＝worked example**：服務對象是 `example`＋`solution`；流程 [`../CONTENT_SOURCING.md`](../CONTENT_SOURCING.md)（手稿→題庫 CLP-1/APEX/Mooculus 對症選題→AI 備援）；subagent [`../.claude/agents/example-supplement.md`](../.claude/agents/example-supplement.md)；產 `ch{NN}_example-supplement-review.html`。
+- **②波 軟深度**＝intuition/caution/application/strategy/summary/history（**不含 example**）；依 [`README.md`](README.md) §Mode C 的 9 鏡頭擴增檢查表；產 `REVIEW-ch{NN}-modec-enrichment.html`。
+- 兩波都標 `<!-- expansion:<cat> [pass: enrichment] [source: …] -->`（`[pass:]` 在 `[source:]` 前），且**都必接範圍限定的 Mode B**（README 硬規則）。
+
+## 通用紀律
+
+- **雙閘**：gate-1 Claude（免費）→ ⛳ 裁決 → 回歸審核 → （計費徵同意後）gate-2 Codex 跨模型獨立複核。幻覺要穿過兩個獨立模型才會漏——這是雙閘的價值。
+- **Codex 調用（實證，照這個）**：用 **PATH 上的 `codex`**（npm `codex-cli 0.136.0`，已登入 ChatGPT、走訂閱配額；**勿**用絕對路徑 `%LOCALAPPDATA%\OpenAI\Codex\bin\codex.exe` 的 alpha 版——其與 `~/.codex/config.toml` 的 `service_tier="default"` 不相容會啟動失敗）。指令：`codex exec -s read-only -C <repo> --output-schema <s.json> -o <out.json> - < <prompt.txt>`（Bash 工具、prompt 經 stdin 餵 raw UTF-8 避 PowerShell CJK 重編碼；prompt/schema 用 Write 寫檔不用 heredoc）。schema 全欄 required、`additionalProperties:false`、enum、無 min/max。每輪 ~120k tokens。**付費調用前一律先說明模型/用量/成本徵同意**（[`../CLAUDE.md`](../CLAUDE.md)）。
+- **findings 留版控**：Codex 原始輸出落 gitignored scratchpad、換機即失 → 轉錄進 `handout/_dev-archive/ch{NN}/ch{NN}_<gate>-audit.md`（範本 `_dev-archive/ch03/ch03_example-supplement-audit.md`）。
+- **render 自驗**：node v22＋Chrome。`handout/_render/shot.mjs <url> <out/prefix> {full|figures}`（`figures` 逐圖截 2× PNG 餵圖閘）。驗收：0 KaTeX/MathJax err、0 未渲染 `\(`、env-num 連續無斷號、cross-ref 0 dangling、圖全 hydrate。
+- **編號 ledger 手動**（kit 無 auto-counter，**最大錯誤來源**）：每型獨立 counter、跨節連續；插 example/figure 會 cascade 其後全部編號＋散文 cross-ref。**先建完整編號地圖再動手**，改完 grep 核對連續性與引用解析。ledger 權威表在各章 `_dev-archive/ch{NN}/PLAN-ch{NN}.md` §5。
+- **交付物「打開就能讀」**：含數學的待裁決/已套用報告產 standalone HTML（MathJax/KaTeX CDN、雙擊即開）。每完成一輪撰寫都產 `REVIEW-…-applied.html`。
+- **commit**：經授權才 commit；繁中、body 逐條記裁決（供 `git log --grep` 撈回）、結尾 `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`。
+
+## 工程注意：subagent 持久化
+
+`.claude/` 被根 `.gitignore`（第 109 行）整個擋掉。要讓 gate subagent 進版控（換機/未來重用），須 **`git add -f .claude/agents/<name>.md`**（既有 5 個已追蹤 agent 即如此 force-add 進去）。**已知未版控**：`handout-figure-opportunity-audit.md`（圖機會閘 subagent，工作樹有、未版控）——要持久化請 force-add。
+
+## 各章現況（2026-06-27）
+
+| 章 | 狀態 |
+|---|---|
+| Ch1 | 全閘跑完（六閘齊） |
+| Ch2 | 全閘跑完（與 Ch1 同級） |
+| Ch3 | Mode A＋圖機會/正確性 gate-1＋Mode C ①②波 ✅；**剩 數學 M1–M8／圖正確性 gate-2／S·A·V 三閘**——執行 prompt 見 [`_dev-archive/ch03/PROMPT-ch03-remaining-gates.md`](_dev-archive/ch03/PROMPT-ch03-remaining-gates.md) |
+| Ch4 | Mode A 六階＋章層 Mode B 完成；2026-06 後的獨立閘（圖機會/正確性/數學/S·A·V/Mode C）尚未跑 |
