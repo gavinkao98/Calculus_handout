@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>語意/聲音 critic pilot — §1.4（待 ⛳ 看順，Task 5）</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{--ink:#1a1a1a;--mut:#5b5b5b;--line:#e2e2e2;--accent:#2a4d8f;
+    --pass:#1b7f4b;--pass-bg:#e7f6ee;--warn:#9a6700;--warn-bg:#fff8e1;--flag:#b3261e;}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif;color:var(--ink);
+    max-width:880px;margin:0 auto;padding:32px 24px 80px;line-height:1.65;background:#fff}
+  h1{font-size:1.5rem;margin:0 0 4px;line-height:1.3}
+  h2{font-size:1.16rem;margin:30px 0 10px;padding-top:8px;border-top:2px solid var(--line)}
+  .sub{color:var(--mut);font-size:.92rem;margin:0 0 14px}
+  .verdict{background:var(--pass-bg);border:1px solid #9ed7b6;border-left:5px solid var(--pass);
+    border-radius:10px;padding:14px 18px;margin:16px 0}
+  .verdict b{color:var(--pass)}
+  .pill{display:inline-block;font-weight:700;font-size:.8rem;padding:2px 10px;border-radius:20px;margin:2px 4px 2px 0}
+  .pill.zero{background:var(--pass);color:#fff}
+  .pill.adv{background:var(--warn-bg);color:var(--warn);border:1px solid #f0d680}
+  .card{border:1px solid var(--line);border-radius:10px;margin:14px 0;overflow:hidden}
+  .card.adv{border-left:5px solid var(--warn)}
+  .card .h{padding:10px 16px;background:var(--warn-bg);font-weight:700;font-size:.97rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .card .bd{padding:12px 16px}
+  .chip{display:inline-block;font-weight:800;font-size:.72rem;padding:1px 7px;border-radius:5px;color:#fff;background:var(--warn)}
+  .loc{font-size:.8rem;color:var(--mut)}
+  blockquote{margin:8px 0;padding:10px 14px;background:#fafafa;border-left:3px solid #cfcfcf;border-radius:0 8px 8px 0;font-size:.97rem}
+  .lab{font-weight:700;color:var(--accent);font-size:.86rem;margin:8px 0 2px}
+  ins{background:#e7f6ee;text-decoration:none;padding:0 2px}
+  del{background:#fdeceb;padding:0 2px}
+  .mynote{background:#eef3fb;border:1px solid #cdddf5;border-radius:8px;padding:9px 13px;font-size:.88rem;margin-top:8px}
+  .clean{background:#f6faf7;border:1px solid #cce7d6;border-radius:10px;padding:12px 16px;font-size:.88rem;margin:12px 0}
+  .clean b{color:var(--pass)}
+  .clean ul{margin:6px 0 0;padding-left:18px} .clean li{margin:3px 0}
+  code{background:#f0f0f2;padding:1px 5px;border-radius:4px;font-size:.85em}
+  .foot{font-size:.82rem;color:var(--mut);margin-top:26px;border-top:1px solid var(--line);padding-top:13px}
+</style>
+</head>
+<body>
+
+<h1>語意/聲音 critic pilot — §1.4 One-Sided and Infinite Limits <span style="font-weight:400;color:var(--mut)">— 待 ⛳ 看順</span></h1>
+<p class="sub">Task 5（PLAN-deai-semantic-critic-implementation）｜gate 1（<code>handout-prose-audit</code>，全三維 A/B/C＋錨）｜對象 <code>handout/fragments/ch01/sec-1-4.html</code>（已簽核節）｜唯讀、propose-only</p>
+
+<div class="verdict">
+<span class="pill zero">0 blocking</span><span class="pill zero">0 tighten</span><span class="pill adv">1 optional (S3)</span><span class="pill adv">1 voice (V1)</span><br>
+<b>已簽核節如預期大致乾淨。</b>critic 對 13 個維度（U1–U5、F1–F5、S、A）逐一判 <b>clean</b> 並附具體證據——<b>零 blocking、零誤傷中性好句</b>，只挑出 2 條有理有據的 advisory。這正是「中性不扣分」護欄該有的克制。
+</div>
+
+<h2>Advisory 1 — S3 承接句（VA 子節開頭）</h2>
+<div class="card adv">
+  <div class="h"><span class="chip">S3</span>Optional｜<span class="loc">§1.4 «Vertical asymptotes» 子節首句（fragment line 171）</span></div>
+  <div class="bd">
+    <blockquote>Infinite limits are closely related to vertical asymptotes.</blockquote>
+    <div class="lab">踩哪測試＋為什麼</div>
+    <p style="margin:2px 0">S3（刪除測試）：此句相對緊接其後的 Definition 1.12（用 \(\lim_{x\to a^{\pm}} f(x)=\pm\infty\) 正式定義 VA）幾無新增 payload——Definition 自身已建立兩者關係，此句僅前指預告。</p>
+    <div class="lab">為何只 optional、非 blocking</div>
+    <p style="margin:2px 0">它佔的是「formal 前的承接句」位（§3 明許純結構性子節用一句承接句啟動），屬合法 lookup-friendly 開場，<b>非「承載教學功能卻無實質」的承載位空句</b>，故不踩 blocking 線。可保留。</p>
+    <div class="lab">若要收緊（二選一）</div>
+    <p style="margin:2px 0">① 升級為帶 payload 的承接句：<br>
+    <del>Infinite limits are closely related to vertical asymptotes.</del><br>
+    <ins>Infinite limits give a precise way to describe vertical asymptotes — the lines a graph shoots up or down along.</ins><br>
+    ② 或【刪】（直接讓 Definition 1.12 啟動子節）。</p>
+    <div class="mynote"><b>我的看法：</b>fair 的 mild advisory。傾向①（升級），把純預告變成帶直覺的承接，比刪更貼 §3「formal 前該有動機」。但兩者都可接受，非必改。</div>
+  </div>
+</div>
+
+<h2>Advisory 2 — V1 notation 引入（偏平）</h2>
+<div class="card adv">
+  <div class="h"><span class="chip">V1</span>Voice / Optional｜<span class="loc">§1.4 «Infinite limits» notation 引入段（fragment line 138–140）</span></div>
+  <div class="bd">
+    <blockquote>To capture this behavior, we introduce the notation \[ \lim_{x \to 0} \frac{1}{x^{2}} = \infty. \] The symbol \(\infty\) does not represent a real number; it records that the function's values grow without bound.</blockquote>
+    <div class="lab">踩哪測試＋為什麼</div>
+    <p style="margin:2px 0">V1（§3 那點暖）：首句「we introduce the notation …」僅機械宣告「引入記號」，未說「為何值得為這現象造一個記號」。</p>
+    <div class="lab">為何只 advisory（甚至可不改）</div>
+    <p style="margin:2px 0">緊接的後半句即時補上 §3 要的那點暖（記號是在「<em>記錄</em> growth」，而非斷言一個數），且這層直覺在隨後的 Caution 1.6 又被完整展開——<b>暖度在相鄰散文已到位</b>，不構成 V1 blocking。agent 結論：可不改。</p>
+    <div class="mynote"><b>我的看法（要你裁的重點）：</b>這條 <b>borderline</b>，接近「中性不扣分」的邊界——「we introduce the notation」是乾淨中性的記號引入，下一句也已補直覺。我傾向它<b>更像透明標示而非真 finding</b>。請你判：這種「中性但可更暖」的 V1 要不要列入？你的取態會校準 critic 的 V 維鬆緊（往後逐節照辦）。</p>
+  </div>
+</div>
+
+<h2>乾淨維度（critic 的克制證據）</h2>
+<div class="clean">
+<b>全數判 clean，各附具體證據（節選）：</b>
+<ul>
+  <li><b>U1 動機</b>：節首段以兩個觀察動機帶出 one-sided／infinite 兩線；各子節 formal 前有動機或具體例鋪墊。</li>
+  <li><b>U3 邏輯跳躍</b>：關鍵推論皆有橋接（Ex 1.20「Since … differ, … does not exist」；Ex 1.22「Because … disagree」）。</li>
+  <li><b>S（S1/S2）</b>：解說句多 object-specific 且加洞見——Ex 1.19 收束句精準命名 criterion 的非對稱性；Ex 1.24「A zero denominator marks a place to investigate …, not a guaranteed asymptote」掙得其位。</li>
+  <li><b>A（A1/A2）</b>：高度恰當——\(1/x\) vs \(1/x^2\) 的「同號才寫 \(=\infty\)」這個真正易錯點，Ex 1.22＋Fig 1.16 誠實展開，不犯 A2；也不嘮叨顯而易見步驟。</li>
+  <li><b>F1 冗餘</b>：反覆出現的 "one-sided limit"／"vertical asymptote" 屬 topic-term recurrence（§3-protected），<b>未誤判</b>為冗餘。</li>
+</ul>
+（完整逐維 clean 證據見 gate-1 raw 輸出。）
+</div>
+
+<h2>判定與建議</h2>
+<div class="verdict">
+<b>pilot 順。</b>findings 中肯、零誤傷中性好句、改寫品質有據；critic 在已簽核節展現正確的克制（0 blocking）。唯一要你校準的是 <b>Advisory 2 的 V1 鬆緊</b>（中性但可更暖，算不算 finding）。
+</div>
+
+<p class="foot">
+<b>下一步（待你 ⛳）：</b>① 認可 pilot 順 → 進收尾 Task 6/7（§3 voice corpus 換真人、退役舊機制）再正式逐節鋪 Task 8（Ch1–4，含本節）。② 順帶請你裁 Advisory 2 的 V1 取態（列入／不列入），我據此定 V 維鬆緊。③ 若覺不順 → 回 Task 2 微調 rubric/錨。<br>
+<b>commit：</b>Tasks 1–5 檔案均未 commit（依你政策攢著），待你示意一次處理。
+</p>
+
+</body>
+</html>

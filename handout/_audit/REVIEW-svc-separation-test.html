@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>語意/聲音 critic 盲測分離驗證 — 待 ⛳（Task 4）</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{--ink:#1a1a1a;--mut:#5b5b5b;--line:#e2e2e2;--accent:#2a4d8f;
+    --pass:#1b7f4b;--pass-bg:#e7f6ee;--flag:#b3261e;--flag-bg:#fdeceb;--warn:#9a6700;--warn-bg:#fff8e1;}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif;color:var(--ink);
+    max-width:900px;margin:0 auto;padding:32px 24px 80px;line-height:1.65;background:#fff}
+  h1{font-size:1.5rem;margin:0 0 4px;line-height:1.3}
+  h2{font-size:1.16rem;margin:32px 0 10px;padding-top:8px;border-top:2px solid var(--line)}
+  .sub{color:var(--mut);font-size:.92rem;margin:0 0 14px}
+  .verdict{background:var(--pass-bg);border:1px solid #9ed7b6;border-left:5px solid var(--pass);
+    border-radius:10px;padding:14px 18px;margin:16px 0}
+  .verdict b{color:var(--pass)}
+  .big{font-size:1.5rem;font-weight:800;color:var(--pass)}
+  table{border-collapse:collapse;width:100%;font-size:.86rem;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:5px 8px;text-align:center}
+  th{background:#f3f6fb;color:var(--accent)}
+  td.l{text-align:left}
+  tr.empty td{background:var(--flag-bg)}
+  tr.empty td:first-child{font-weight:700}
+  .b{font-weight:800;color:var(--flag)}
+  .z{color:var(--pass);font-weight:700}
+  .legend{background:#f6f8fc;border:1px solid var(--line);border-radius:10px;padding:11px 15px;font-size:.88rem;margin:12px 0}
+  .card{border:1px solid var(--line);border-radius:10px;margin:14px 0;overflow:hidden}
+  .card.flag{border-left:5px solid var(--flag)} .card.clean{border-left:5px solid var(--pass)}
+  .card .h{padding:9px 15px;font-weight:700;font-size:.96rem}
+  .card.flag .h{background:var(--flag-bg)} .card.clean .h{background:var(--pass-bg)}
+  .card .bd{padding:11px 15px}
+  blockquote{margin:0 0 10px;padding:10px 14px;background:#fafafa;border-left:3px solid #cfcfcf;
+    border-radius:0 8px 8px 0;font-size:.95rem;font-style:italic}
+  ul.f{margin:6px 0 0;padding-left:0;list-style:none}
+  ul.f li{margin:6px 0;font-size:.88rem;padding-left:0}
+  .chip{display:inline-block;font-weight:800;font-size:.72rem;padding:1px 6px;border-radius:5px;color:#fff;margin-right:6px}
+  .chip.bk{background:var(--flag)} .chip.adv{background:var(--warn)}
+  .reframe{background:var(--warn-bg);border:1px solid #f0d680;border-left:5px solid var(--warn);
+    border-radius:10px;padding:13px 17px;margin:18px 0}
+  .reframe h3{margin:0 0 6px;color:var(--warn);font-size:1.04rem}
+  code{background:#f0f0f2;padding:1px 5px;border-radius:4px;font-size:.85em}
+  .foot{font-size:.82rem;color:var(--mut);margin-top:26px;border-top:1px solid var(--line);padding-top:13px}
+</style>
+</head>
+<body>
+
+<h1>語意/聲音 critic 盲測分離驗證 <span style="font-weight:400;color:var(--mut)">— 待 ⛳ 認可可信</span></h1>
+<p class="sub">Task 4（PLAN-deai-semantic-critic-implementation）｜方法：遮標籤對 14 段各派 <code>handout-prose-audit</code>（讀 rubric S/A/V＋掛 <code>svc-exemplars.md</code> 錨，只跑 Dimension C）｜tally：<code>tools/deai/separation_tally.py</code></p>
+
+<div class="verdict">
+<b>VERDICT：PASS</b>（門檻 2×）。分離倍數 <span class="big">29.7×</span>——空泛段 mean 26.5 vs 實質段 mean 0.89（S/A findings per 500 字）。<br>
+<b>blocking-only 為完美分離</b>：3 段空泛全被 blocking 重咬；<b>11 段實質散文零 blocking</b>（真人＋好 AI＋bare 一律乾淨）。
+</div>
+
+<div class="legend">
+<b>核心信念（spec §0）：</b>中性 ≠ AI；中性＋空才是 AI。本測即驗 critic 能否抓「空」、又不誤咬「中性但實質」。<br>
+<b>類別：</b><span class="b">空泛正控（empty）</span>＝同失敗模式、新措辭的刻意 AI-default（該被 flag）；<b>實質（substantive）</b>＝真人段＋好 AI＋bare vanilla（該乾淨）。
+</div>
+
+<h2>1. 結果總表（14 段，遮標籤）</h2>
+<table>
+<tr><th>id</th><th class="l">類別 / 來源</th><th>words</th><th>S</th><th>A</th><th>V</th><th>blocking</th><th>S/A per500</th></tr>
+<tr class="empty"><td>e1</td><td class="l">空泛正控 · derivative</td><td>62</td><td>4</td><td>1</td><td>1</td><td class="b">5</td><td>40.3</td></tr>
+<tr class="empty"><td>e2</td><td class="l">空泛正控 · limit</td><td>66</td><td>2</td><td>1</td><td>1</td><td class="b">2</td><td>22.7</td></tr>
+<tr class="empty"><td>e3</td><td class="l">空泛正控 · chain rule</td><td>91</td><td>2</td><td>1</td><td>1</td><td class="b">2</td><td>16.5</td></tr>
+<tr><td>h1</td><td class="l">真人 · OpenStax §2.2</td><td>99</td><td>0</td><td>0</td><td>0</td><td class="z">0</td><td>0</td></tr>
+<tr><td>h2</td><td class="l">真人 · OpenStax §3.1</td><td>66</td><td>0</td><td>0</td><td>0</td><td class="z">0</td><td>0</td></tr>
+<tr><td>h3</td><td class="l">真人 · CLP-1</td><td>99</td><td>0</td><td>0</td><td>0</td><td class="z">0</td><td>0</td></tr>
+<tr><td>h4</td><td class="l">真人 · CLP-1</td><td>88</td><td>1</td><td>0</td><td>0</td><td class="z">0</td><td>5.7<sup>adv</sup></td></tr>
+<tr><td>a1</td><td class="l">好 AI（vanilla）· limit</td><td>123</td><td>0</td><td>0</td><td>0</td><td class="z">0</td><td>0</td></tr>
+<tr><td>a2</td><td class="l">好 AI · derivative</td><td>110</td><td>0</td><td>0</td><td>0</td><td class="z">0</td><td>0</td></tr>
+<tr><td>a3</td><td class="l">好 AI · chain rule</td><td>123</td><td>0</td><td>0</td><td>0</td><td class="z">0</td><td>0</td></tr>
+<tr><td>a4</td><td class="l">好 AI · one-sided</td><td>113</td><td>0</td><td>0</td><td>0</td><td class="z">0</td><td>0</td></tr>
+<tr><td>b1</td><td class="l">bare vanilla · continuity</td><td>560</td><td>1</td><td>0</td><td>0</td><td class="z">0</td><td>0.9<sup>adv</sup></td></tr>
+<tr><td>b2</td><td class="l">bare vanilla · definite integral</td><td>240</td><td>1</td><td>0</td><td>0</td><td class="z">0</td><td>2.1<sup>adv</sup></td></tr>
+<tr><td>b3</td><td class="l">bare vanilla · product rule</td><td>430</td><td>1</td><td>0</td><td>0</td><td class="z">0</td><td>1.2<sup>adv</sup></td></tr>
+</table>
+<p class="sub"><sup>adv</sup> = advisory（tightening，非 blocking）。實質段的全部 4 條 finding 都是 advisory，無一 blocking。</p>
+
+<div class="reframe">
+<h3>關鍵 reframe：真正分得開的軸是「空 vs 實」，不是「AI vs 人」</h3>
+<p style="margin:0 0 6px;font-size:.92rem">spec §5 原把測試框成「AI 段 vs 真人段」，假設「AI = 該被 flag」。但實測顯示：<b>vanilla AI 在這些好走的主題上本身言之有物</b>（a1–a4、b1–b3 近乎全乾淨），與真人段<b>不可分</b>。</p>
+<p style="margin:0 0 6px;font-size:.92rem">用 spec 的原軸量：mean(真人)=1.42、mean(好 AI＋bare)=0.59 per 500——AI 甚至略低於真人，<b>literal「AI vs 人」分不開</b>。這不是 critic 失靈，而是<b>「難以分辨」目標已達成</b>（spec §0：中性≠AI）。</p>
+<p style="margin:0;font-size:.92rem">把軸換成 critic 真正在判的「<b>空 vs 實</b>」：空泛段全被重咬、實質段零 blocking → <b>29.7× 分離、blocking 完美分離</b>。這正是 critic 在 Task 8 要做的事（在講義裡找空句/錯高度），驗證它<b>抓得到空、又不誤咬中性實質</b>。</p>
+</div>
+
+<h2>2. Sensitivity 樣本：critic 對空泛段的 blocking findings（e1, derivative）</h2>
+<div class="card flag">
+  <div class="h">e1 · 刻意 AI-default 空泛（新措辭，非負例錨本身）→ 5 blocking</div>
+  <div class="bd">
+    <blockquote>The derivative of a function is one of the most fundamental and powerful concepts in all of mathematics, playing a crucial role across countless fields and applications. It is important to note that mastering this idea is essential… Let us now delve into this remarkable topic… By carefully understanding this concept, we gain a deeper appreciation… and unlock truly invaluable insights.</blockquote>
+    <ul class="f">
+      <li><span class="chip bk">S1/S3</span>形容詞堆疊無洞見、貼到任何主題都成立、佔動機承載位卻刪了無損 →【刪】（4 句皆中）</li>
+      <li><span class="chip bk">A2</span>承諾 explore/unlock 卻從不碰真正難的一步（差商／極限過程），全 promise、無 delivery——與負例錨同 A2</li>
+      <li><span class="chip adv">V1</span>'deeper appreciation / elegant structures / invaluable insights' 假暖空泛抒情，非 §3 那點暖（advisory）</li>
+    </ul>
+    <p class="sub" style="margin:6px 0 0">e2/e3 同模式（各 2 blocking）。三段正控全踩 S1/S3＋A2＋V1，與負例錨失敗模式一致 → <b>敏感度確認</b>。</p>
+  </div>
+</div>
+
+<h2>3. 過度-flag 防護樣本：critic 對實質段的克制</h2>
+<div class="card clean">
+  <div class="h">b3 · bare vanilla「product rule」（430 字真內容）→ 0 blocking，1 advisory</div>
+  <div class="bd">
+    <blockquote>…It is natural to hope that products behave the same way — that the derivative of a product is the product of the derivatives. This section shows that the naive guess is wrong… Take \(f(x)=x\) and \(g(x)=x^2\)… \((fg)'=3x^2\), whereas \(f'g'=2x\). Since \(3x^2\neq 2x\), differentiating a product is <em>not</em> a term-by-term operation.…</blockquote>
+    <ul class="f">
+      <li><span class="chip adv">S3</span>唯一 finding：段末「The text above follows the house conventions…」是 agent→user 的 meta 自述，非教學位 → advisory【刪】，不 blocking。</li>
+      <li><span class="z">S/A/V 本體全 clean</span>：critic 明判「中性但實質＝目標，中性不扣分」——動機段點名具體 false hope、反例真做（\(3x^2\neq2x\)）、最難一步（角落項消失）有交代。</li>
+    </ul>
+    <p class="sub" style="margin:6px 0 0">h4（真人）唯一的 S3 也是 advisory（邊緣轉接句，明判不建議刪）。11 段實質散文 <b>零 false-positive blocking</b>。</p>
+  </div>
+</div>
+
+<h2>4. 判定與建議</h2>
+<div class="verdict">
+<b>critic 可信（在驗證過的軸上）。</b>它<b>抓得到</b>真空泛（空泛段 100% blocking、踩對 S1/S3/A2/V1），又<b>不誤咬</b>中性實質（11 段實質零 blocking、僅 3 條合理 advisory）。「中性不扣分」護欄成立。
+</div>
+<p style="font-size:.92rem"><b>一個誠實的範圍註記：</b>本測驗證的是 <b>空泛偵測 ＋ 過度-flag 防護</b>，<b>不是</b>「AI 偵測」——因為好 AI 在易主題上與真人不可分（那是目標，非缺陷）。Task 8 critic 的職責正是前者（在講義裡找空句/錯高度），故此驗證對得上用途。</p>
+
+<p class="foot">
+<b>防洩漏：</b>真人負例非錨組那 2 段；空泛正控用新措辭、不用負例錨本身（免考古題）。<br>
+<b>raw 資料：</b><code>.tmp/svc-benchmark/</code>（gitignored）：<code>tally-input.json</code>＋<code>provenance.md</code>（含 run id、完整 findings）。<br>
+<b>下一步（待你 ⛳）：</b>認可 critic 可信 → 進 Task 5（pilot 單節，建議 Ch2 某節或你指定）。若覺得門檻/措辭要調 → 回 Task 2 微調 rubric/錨後重測。
+</p>
+
+</body>
+</html>
