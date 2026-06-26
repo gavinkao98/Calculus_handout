@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 3 S·A·V 散文閘 — gate-1（Claude）審核稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:1000px; margin:0 auto;
+         padding:2rem 1.5rem 4rem; background:var(--bg); color:#1a1a1a; line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.13rem; margin:2rem 0 .5rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .pass { background:#eaf6ed; border-left:3px solid var(--green); padding:.6rem .9rem; border-radius:5px; font-size:.93rem; color:#13502c; margin:.4rem 0 1.2rem; }
+  .pass b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.88rem; }
+  th, td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#eef2f7; }
+  .zero { color:var(--green); font-weight:700; }
+  .card { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--amber); border-radius:8px; padding:.75rem 1rem; margin:.7rem 0; }
+  .card.keep { border-left-color:var(--gray); }
+  .card.apply { border-left-color:var(--blue); }
+  .row1 { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin-bottom:.3rem; }
+  .id { font-family:ui-monospace,monospace; font-weight:700; font-size:.8rem; background:#fef0e7; color:var(--amber); padding:.1rem .45rem; border-radius:4px; }
+  .badge { font-size:.7rem; font-weight:700; padding:.1rem .5rem; border-radius:999px; background:#fef0e7; color:var(--amber); }
+  .badge.rec { background:#e9f0fb; color:var(--blue); }
+  .badge.keep { background:#eef1f4; color:var(--gray); }
+  .k { font-weight:700; color:var(--gray); font-size:.78rem; }
+  .f { margin:.3rem 0; font-size:.92rem; }
+  del { background:#fde8e7; color:#7a271a; text-decoration:line-through; padding:.02rem .15rem; }
+  ins { background:#e7f6ec; color:#0f5132; text-decoration:none; padding:.02rem .15rem; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+</style>
+</head>
+<body>
+<h1>Chapter 3 — S·A·V 去 AI 味散文閘 gate-1（Claude）審核稿</h1>
+<p class="sub">2026-06-27　·　契約 <code>PROSE-AUDIT-RUBRIC.md</code>（A 易懂性 U1–U5／B 流暢性 F1–F5／C 語意·高度·聲音 S·A·V）＋錨組 <code>anchors/svc-exemplars.md</code>　·　gate-1 ＝ <code>handout-prose-audit</code> subagent ×3（逐節）　·　Vale pre-flag：<b>0 errors / 0 warnings / 0 suggestions</b>　·　propose-only、保語意、不動數學、不碰教學順序</p>
+
+<div class="pass"><b>結論：prose gate-1 通過 —— 三節 blocking 全 0（易懂性 U＋S/A 皆 0）。</b> 全部 findings 為 advisory（polish），符合本章已過 Mode A 六階＋Mode C 後的「largely clean」預期。收斂判準（blocking = 0）達成；advisory 不強制歸零，交使用者逐條裁決。下方 5 條為可實作的 tighten、其餘為 V1 voice／refrain（建議維持現狀）。</p></div>
+
+<table>
+  <tr><th>節</th><th>VERDICT</th><th>blocking</th><th>可實作 tighten</th><th>V1/optional（建議留）</th></tr>
+  <tr><td>§3.1 Sine &amp; Cosine</td><td>0 blk · 2 tighten · 1 opt · 4 voice</td><td class="zero">0</td><td>G1-3.1-1（F4）、G1-3.1-2（F1）</td><td>G1-3.1-3（S2）＋4×V1</td></tr>
+  <tr><td>§3.2 Chain Rule</td><td>0 blk · 2 tighten · 2 voice</td><td class="zero">0</td><td>G1-3.2-1（F4）、<b>G1-3.2-2（F4，建議採）</b></td><td>2×V1</td></tr>
+  <tr><td>§3.3 Applications</td><td>0 blk · 1 tighten · 1 opt · 2 voice</td><td class="zero">0</td><td>G1-3.3-1（F2）</td><td>G1-3.3-2（refrain）＋2×V1</td></tr>
+  <tr><td><b>合計</b></td><td></td><td><b class="zero">0 blocking</b></td><td><b>5 條可實作</b></td><td>~8 條建議留</td></tr>
+</table>
+
+<h2>可實作的 tighten（advisory；⛳ 逐條裁決）</h2>
+
+<div class="card apply">
+  <div class="row1"><span class="id">G1-3.2-2</span><span class="badge">advisory · F4 句長</span><span class="badge rec">建議採</span></div>
+  <div class="f"><span class="k">locus</span>　§3.2 chain-rule 主證明的樞紐句（<code>sec-3-2.html</code> 行 142）：結論＋「provided」＋待證條件擠在一個長單位、正落在證明轉折處。</div>
+  <div class="f"><span class="k">diff</span>　By the remainder form, this says precisely that \(P\) is differentiable at \(x_{0}\) with \(P'(x_{0}) = f'(g(x_{0}))g'(x_{0})\)<del> — <em>provided</em> we show</del><ins>. It remains only to show that</ins> \[\lim_{h \to 0}\frac{R_{3}(h)}{h} = 0.\]</div>
+  <div class="f"><span class="k">為何</span>　純切句、零語意改動；讓讀者先 register 結論、再接「只剩這一步」的待證義務。承載位（proof pivot）的真實可讀性收益——本輪唯一明確值得採的一條。</div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">G1-3.1-1</span><span class="badge">advisory · F4 句長</span></div>
+  <div class="f"><span class="k">locus</span>　§3.1 開節 funnel 段（行 60）末，radian 句疊在已 8 子句的長段上：「…Throughout this section angles are measured in radians; this assumption turns out to be essential, as we note below.」</div>
+  <div class="f"><span class="k">建議</span>　把 radian 句獨立成短句／短段，減輕單段認知負荷。<span class="k" style="color:var(--blue)">取捨</span>：它本是刻意的「as we note below」前置 flag，分段屬 cosmetic——可採可留。</div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">G1-3.1-2</span><span class="badge">advisory · F1 局部冗餘</span></div>
+  <div class="f"><span class="k">locus</span>　§3.1 fundamental-limit 引導句（行 127）與其下 Proof 開頭內容近重：framing「traps it between \(\cos\theta\) and \(1\)」↔ proof「inequality (1) reads \(\cos\theta \le \sin\theta/\theta \le 1\)」。</div>
+  <div class="f"><span class="k">diff</span>　<del>We can finally squeeze \(\sin\theta/\theta\) to its limit: inequality (1) traps it between \(\cos\theta\) and \(1\), and both ends head for the same place (Figure 3.2).</del><ins>With continuity secured, we can finally squeeze \(\sin\theta/\theta\) to its limit (Figure 3.2).</ins></div>
+  <div class="f"><span class="k">取捨</span>　屬 §3 鼓勵的 motivation-before-formalism，echo 輕、不致卡讀者；auditor 自評「非缺陷、僅收緊機會」。可採可留。</div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">G1-3.2-1</span><span class="badge">advisory · F4 句長</span></div>
+  <div class="f"><span class="k">locus</span>　§3.2 intuition 第 2 段（行 43）一句疊四概念（切線行為／輸入縮放／斜率／更快消失的誤差）。</div>
+  <div class="f"><span class="k">diff</span>　…and scales it by its slope<del>, up to an error that shrinks faster than the change itself.</del><ins>. The catch is only that this is approximate: there is an error, and it shrinks faster than the change itself.</ins></div>
+  <div class="f"><span class="k">取捨</span>　原句清楚、讀得通；切句為輕度收緊。可採可留。</div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">G1-3.3-1</span><span class="badge">advisory · F2 贅字</span></div>
+  <div class="f"><span class="k">locus</span>　§3.3 開節第 1 段（行 49）：「Each of these functions is<del>, in a sense,</del> defined only indirectly.」</div>
+  <div class="f"><span class="k">為何</span>　「in a sense」為輕度 hedge，刪後語意零損失（後續 Example 已具體兌現 indirectly 之意）。<span class="k">取捨</span>：亦可視為對「only indirectly」強斷言的軟化而保留。可採可留。</div>
+</div>
+
+<h2>V1 voice／refrain（寬報登記；建議維持現狀）</h2>
+<div class="card keep">
+  <div class="row1"><span class="badge keep">V1 · 寬報 · 建議留</span></div>
+  <div class="f">§3.1：G1-3.1-3（.lead「complete the differentiation toolkit」略通用但緊接具體兩點救回，S2 advisory）＋ difference-quotient 句／assemble-pieces 句／tan-sec 解／companion-limit 解 共 4 條 V1（多為「已達暖度 bar 或目標 worked-solution 語域，建議不動」）。</div>
+  <div class="f">§3.2：line 108「This is not a new notion…」、line 278 收尾句——皆 neutral-but-substantive 或目標 voice，V1 寬報登記、建議留。</div>
+  <div class="f">§3.3：G1-3.3-2「one lever」refrain（§3-protected，不算 F1，建議留）＋「Two debts remain」／Example 3.11「natural base」兩句皆「已達暖度 bar」。</div>
+  <div class="f"><span class="k">說明</span>　依 rubric「中性不扣分」「V1 永遠 advisory 且寬報」，上列登記供裁決，預設建議維持現狀（皆非空句、非錯高度）。</div>
+</div>
+
+<h2>方法</h2>
+<p class="sub">gate-1 ＝ 3 個 <code>handout-prose-audit</code> subagent（逐節 §3.1/§3.2/§3.3），各讀 <code>PROSE-AUDIT-RUBRIC.md</code>＋<code>anchors/svc-exemplars.md</code>（2 正 1 負真人錨）對 A/B/C 三維走查、對著正面 bar 判、中性不扣分、不確定降級、不 over-report。Vale 3.15.1 為零成本預標護欄：3 檔 0/0/0。收斂判準（易懂性＋S/A blocking = 0）達成。gate-2 ＝ Codex 同 rubric＋錨組獨立複核（計費、待授權），另出 <code>REVIEW-ch03-svc-gate2.html</code>。</p>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 3 圖正確性閘 — gate-2（Codex 視覺第二讀者 D1–D8）審核稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:980px; margin:0 auto;
+         padding:2rem 1.5rem 4rem; background:var(--bg); color:#1a1a1a; line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.13rem; margin:2rem 0 .5rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .pass { background:#eaf6ed; border-left:3px solid var(--green); padding:.6rem .9rem; border-radius:5px; font-size:.93rem; color:#13502c; margin:.4rem 0 1.2rem; }
+  .pass b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.88rem; }
+  th, td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#eef2f7; }
+  .zero { color:var(--green); font-weight:700; }
+  .fix { color:var(--blue); font-weight:700; }
+  .card { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:8px; padding:.75rem 1rem; margin:.7rem 0; }
+  .row1 { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin-bottom:.3rem; }
+  .id { font-family:ui-monospace,monospace; font-weight:700; font-size:.82rem; background:#e9f0fb; color:var(--blue); padding:.1rem .45rem; border-radius:4px; }
+  .badge { font-size:.7rem; font-weight:700; padding:.1rem .5rem; border-radius:999px; background:#e9f0fb; color:var(--blue); }
+  .badge.done { background:#eaf6ed; color:var(--green); }
+  .k { font-weight:700; color:var(--gray); font-size:.8rem; }
+  .f { margin:.3rem 0; font-size:.92rem; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+</style>
+</head>
+<body>
+<h1>Chapter 3 — 圖正確性閘 gate-2（Codex 視覺第二讀者，D1–D8）審核稿</h1>
+<p class="sub">2026-06-27　·　契約 <code>FIGURE-AUDIT-RUBRIC.md</code>（D1–D8、blocking/advisory、Non-findings、D5/D6 指控必回繪圖原始碼逐字核對）　·　gate-1（圖機會＋視覺 D1–D8）已於 2026-06-21 過（Claude 多 auditor、Fig 3.7 等比座標修正後回歸）　·　本閘＝gate-2 Codex gpt-5.5（read-only，<code>-i</code> 餵 7 張 2× PNG，120,683 tokens、ChatGPT 訂閱配額，經使用者授權）</p>
+
+<div class="pass"><b>結論：figure gate-2 通過 —— 7 圖視覺 blocking 全 0。</b> Codex 獨立複核 7 圖 D1–D8，提 <b>1 blocking</b>（Fig 3.6 D5 caption↔source 不一致）＋0 advisory；經使用者裁決 <b>Option A 修圖</b>（FIGS <code>panel(0.5)→panel(0.675)</code>，令「Halving \(h\)」屬實）→ <b>手動回歸 PASS</b>（源碼算術＋重 render 目視）。其餘 6 圖兩閘皆 clean。雙閘收斂（blocking = 0）。</div>
+
+<table>
+  <tr><th>Figure</th><th>圖 ID</th><th>gate-2 結果</th><th>重點</th></tr>
+  <tr><td>3.1</td><td>sector-inequality</td><td class="zero">0 / 0</td><td>三嵌套區域 \(A=(1,0),B=(\cos\theta,\sin\theta),C=(1,\tan\theta)\)、直角 tick、\(\theta\) 弧、labels 不撞</td></tr>
+  <tr><td>3.2</td><td>squeeze-limit</td><td class="zero">0 / 0</td><td>\(\frac{\sin\theta}{\theta}\)（實）困於 \(\cos\theta\)（虛）與 \(1\) 之間、\(\theta=0\) 空心、虛實線灰階可辨</td></tr>
+  <tr><td>3.3</td><td>sin-cos-slope</td><td class="zero">0 / 0</td><td>切線斜率 \(1,0,-1\) ＝ \(\cos\) 在 \(0,\tfrac\pi2,\pi\) 的高度（dots）、caption↔source 一致</td></tr>
+  <tr><td>3.4</td><td>shm-triple</td><td class="zero">0 / 0</td><td>三聯 \(s,s',s''\)、虛線標 extrema↔velocity zero、底＝頂上下鏡射（\(s''=-s\)）</td></tr>
+  <tr><td>3.5</td><td>composed-mapping</td><td class="zero">0 / 0</td><td>三軸 \(x,u,y\)、增量 \(h\) 經 \(g',f'\) 放大；<b>示意比例為刻意</b>（D6 advisory-protected、非 finding）</td></tr>
+  <tr><td><b>3.6</b></td><td><b>remainder-tangent</b></td><td class="fix">1 blk → 修 → 0</td><td><b>D5 blocking</b>：caption「Halving \(h\)」vs source \(0.5/1.35\approx0.37\)；<b>修為 \(0.675\)（真減半）</b>、回歸 PASS</td></tr>
+  <tr><td>3.7</td><td>arcsin-vertical-tangent</td><td class="zero">0 / 0</td><td>開區間 \((-1,1)\)、端點垂直切線（空心）、中心 slope-1（等比座標呈 45°，gate-1 已修）</td></tr>
+  <tr><td><b>合計</b></td><td></td><td><b class="zero">0 blocking</b>（1 已修）· 0 advisory</td><td>雙閘收斂</td></tr>
+</table>
+
+<h2>唯一 blocking（gate-2，已修＋回歸）</h2>
+<div class="card">
+  <div class="row1"><span class="id">F-3.6-1</span><span class="badge">blocking · D5</span><span class="badge done">已修・回歸 PASS</span></div>
+  <div class="f"><span class="k">locus</span>　Figure 3.6 <code>remainder-tangent</code>（§3.2，FIGS pair）。caption：<code>fragments/ch03/sec-3-2.html:104</code>；繪圖源碼：<code>chapter3-print-standalone.html:1628</code>。</div>
+  <div class="f"><span class="k">Codex 證據</span>　caption 寫「Halving \(h\) (right panel)」，但 source 畫 <code>panel(1.35,"larger h")</code> 與 <code>panel(0.5,"smaller h")</code>、同尺度 → 右區間為左之 \(0.5/1.35\approx0.37\)、非半。同尺度而宣稱「halving」者，右 \(x_0\!\to\!x_0\!+\!h\) 應為左之半，座標與 caption 矛盾（D5 blocking）。</div>
+  <div class="f"><span class="k">驗證</span>　回繪圖源碼逐字核對（rubric verifier 紀律）：\(0.5/1.35=0.370\neq0.5\)，由源碼數值即可判定、非 PNG 像素誤讀 → confirmed real。gate-1（2026-06-21）漏掉、gate-2 跨模型補上。</div>
+  <div class="f"><span class="k">裁決（⛳ 使用者）</span>　Option A 修圖：<code>panel(0.5)→panel(0.675)</code>（\(=1.35/2\)）。本例 remainder 恰純二次 \(R(h)=0.34\,h^2\)，故 \(h\) 減半 → gap 成 <b>四分之一</b>（\(R\colon 0.620\to0.155\)），正是「shrinks that gap far faster than \(h\) itself — \(R(h)/h\to0\)」最漂亮的視覺；修圖最忠於 caption 以「Halving」承載的量化直覺。</div>
+  <div class="f"><span class="k">回歸（手動）</span>　源碼算術：\(0.675=1.35/2\)、\(x_e=1.675<x_{\max}=2.85\)（在框內）、右 \(R=0.155\)、左 \(R=0.620\)。重 render 目視：兩 panel 同尺度、右增量為左之半、\(R(h)\) gap 明顯縮小、labels 無碰撞無裁切、0 KaTeX err、7/7 圖 hydrate。D5 現與 caption 一致、D1–D8 全 clean。<b>PASS。</b></div>
+</div>
+
+<h2>方法</h2>
+<p class="sub">gate-2 ＝ <code>codex exec -s read-only -C &lt;repo&gt; --output-schema -i &lt;7 png&gt;</code>（gpt-5.5 xhigh，120,683 tokens、ChatGPT 訂閱配額，經使用者授權 2026-06-27）。Codex 獨立讀 <code>FIGURE-AUDIT-RUBRIC.md</code>＋standalone 的 <code>const FIGS</code>（7 圖繪圖源碼）＋3 fragment 的 figcaption／散文，逐圖判 D1–D8、D5/D6 指控回源碼逐字核對、不確定降級、不 over-report。原始 JSON 轉錄於版控 <code>_dev-archive/ch03/ch03_figure-audit-gate2.md</code>。1 blocking 經 ⛳ 裁決修圖＋手動回歸後收斂（blocking = 0）。</p>
+
+</body>
+</html>

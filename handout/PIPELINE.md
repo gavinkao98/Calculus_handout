@@ -52,5 +52,5 @@
 |---|---|
 | Ch1 | 全閘跑完（六閘齊） |
 | Ch2 | 全閘跑完（與 Ch1 同級） |
-| Ch3 | Mode A＋圖機會/正確性 gate-1＋Mode C ①②波 ✅；**剩 數學 M1–M8／圖正確性 gate-2／S·A·V 三閘**——執行 prompt 見 [`_dev-archive/ch03/PROMPT-ch03-remaining-gates.md`](_dev-archive/ch03/PROMPT-ch03-remaining-gates.md) |
+| Ch3 | 全閘跑完（與 Ch1/Ch2 同級）——數學 M1–M8 雙閘／圖正確性 gate-2／S·A·V gate-1+2 於 2026-06-27 補齊收斂（執行紀錄 [`_dev-archive/ch03/PROMPT-ch03-remaining-gates.md`](_dev-archive/ch03/PROMPT-ch03-remaining-gates.md)） |
 | Ch4 | Mode A 六階＋章層 Mode B 完成；2026-06 後的獨立閘（圖機會/正確性/數學/S·A·V/Mode C）尚未跑 |

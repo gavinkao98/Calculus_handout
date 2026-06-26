@@ -436,7 +436,9 @@ window.MathJax = {
   \[ \frac{\sin(x + h) - \sin x}{h}. \]
   No algebraic identity cancels the \(h\) in the denominator against the numerator — \(\sin(x + h)\) does not break into pieces that conveniently subtract. As we are about to see, the entire computation funnels down to a single limit,
   \[ \lim_{\theta \to 0} \frac{\sin \theta}{\theta}, \]
-  which has the indeterminate form \(0/0\) and which no amount of algebra will resolve. To evaluate it we need a genuinely new tool: a geometric comparison of areas on the unit circle, squeezed to a limit. That one limit, once secured, unlocks the derivatives of <em>both</em> \(\sin\) and \(\cos\) — and through them the rest of the trigonometric functions. Throughout this section angles are measured in radians; this assumption turns out to be essential, as we note below.</p>
+  which has the indeterminate form \(0/0\) and which no amount of algebra will resolve. To evaluate it we need a genuinely new tool: a geometric comparison of areas on the unit circle, squeezed to a limit. That one limit, once secured, unlocks the derivatives of <em>both</em> \(\sin\) and \(\cos\) — and through them the rest of the trigonometric functions.</p>
+
+  <p>Throughout this section angles are measured in radians; this assumption turns out to be essential, as we note below.</p>
 
   <h3 class="subsec-head">The difference quotient for sine</h3>
 
@@ -468,7 +470,7 @@ window.MathJax = {
 
   <p>The triangle \(OAB\) lies inside the sector, which lies inside the triangle \(OAC\), so their areas increase in that order:
   \[ \tfrac12 \sin\theta \;\le\; \tfrac12 \theta \;\le\; \tfrac12 \tan\theta. \]
-  (The manuscript reads the same picture by splitting the outer triangle as \(OAC = OAB \cup ABC\); the corner piece \(ABC\) is what \(OAC\) adds to the inscribed triangle \(OAB\), and it contains the circular segment between the chord \(AB\) and the arc.) Multiplying through by \(2\) gives \(\sin\theta \le \theta \le \tan\theta\). Dividing by \(\sin\theta > 0\) and using \(\tan\theta = \sin\theta/\cos\theta\) turns this into \(1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}\), and taking reciprocals of these positive quantities reverses the inequalities:
+  Equivalently, split the outer triangle as \(OAC = OAB \cup ABC\): the corner piece \(ABC\) is what \(OAC\) adds to the inscribed triangle \(OAB\), and it contains the circular segment between the chord \(AB\) and the arc. Multiplying through by \(2\) gives \(\sin\theta \le \theta \le \tan\theta\). Dividing by \(\sin\theta > 0\) and using \(\tan\theta = \sin\theta/\cos\theta\) turns this into \(1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}\), and taking reciprocals of these positive quantities reverses the inequalities:
   \[ \cos\theta \;\le\; \frac{\sin\theta}{\theta} \;\le\; 1, \qquad 0 < \theta < \tfrac{\pi}{2}. \tag{1} \]
   In particular \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) for \(\lvert \theta \rvert < \tfrac{\pi}{2}\) — a bound we lean on repeatedly below.</p>
 
@@ -503,7 +505,7 @@ window.MathJax = {
   <h3 class="subsec-head">The fundamental limit</h3>
 
   <!-- expansion:intuition — frame the squeeze payoff -->
-  <p>We can finally squeeze \(\sin\theta/\theta\) to its limit: inequality (1) traps it between \(\cos\theta\) and \(1\), and both ends head for the same place (Figure 3.2).</p>
+  <p>With continuity secured, we can finally squeeze \(\sin\theta/\theta\) to its limit (Figure 3.2).</p>
 
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.2</span><span class="env-name">The fundamental trigonometric limit</span></p>
@@ -721,9 +723,9 @@ window.MathJax = {
   <!-- expansion:intuition — load-bearing intuition: rates multiply because local linear approximations compose; this carries the statement, the Leibniz mnemonic, and the proof strategy at once -->
   <p>Section 3.1 gave us the derivatives of the trigonometric functions, but only in their bare form. We can differentiate \(\sin x\), yet nothing so far reaches \(\sin(x^{2})\) or \(\sqrt{1 + x^{2}}\), where one function is fed <em>into</em> another. Chapter 2 supplied rules for sums, products, and quotients — but not for <em>composition</em>, the operation of applying one function to the output of another. The chain rule fills exactly this gap, and it is the rule that finally completes the differentiation toolkit.</p>
 
-  <p>The idea behind it fits in a single image. Near a point, a differentiable function behaves like its tangent line: it takes a small change in its input and scales it by its slope, up to an error that shrinks faster than the change itself. Now chain two such functions together. If \(g\) scales a small increment \(h\) by \(g'(x)\), and \(f\) then scales <em>that</em> by \(f'(g(x))\), the two magnifications stack — the composite scales \(h\) by the product \(f'(g(x))\,g'(x)\). That product is the chain rule, and the proof at the end of this section is nothing more than the careful check that the two error terms, once chained, are still negligible.</p>
+  <p>The idea behind it fits in a single image. Near a point, a differentiable function behaves like its tangent line: it takes a small change in its input and scales it by its slope. The catch is only that this is approximate: there is an error, and it shrinks faster than the change itself. Now chain two such functions together. If \(g\) scales a small increment \(h\) by \(g'(x)\), and \(f\) then scales <em>that</em> by \(f'(g(x))\), the two magnifications stack — the composite scales \(h\) by the product \(f'(g(x))\,g'(x)\). That product is the chain rule, and the proof at the end of this section is nothing more than the careful check that the two error terms, once chained, are still negligible.</p>
 
-  <p>The manuscript this chapter follows develops the chain rule alongside two results that already belong to Chapter 2 — the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1). We take both as established and use them freely, without re-proving them here.</p>
+  <p>Alongside the chain rule, this section draws on two results that already belong to Chapter 2 — the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1). We take both as established and use them freely, without re-proving them here.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.3</span><span class="env-name">The chain rule</span></p>
@@ -820,7 +822,7 @@ window.MathJax = {
       <p>\[ P(x_{0}+h) = f\bigl(g(x_{0}+h)\bigr) = f(g(x_{0})) + m_{2}\bigl[m_{1} h + R_{1}(h)\bigr] + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr), \]</p>
       <p>where \(m_{2} = f'(g(x_{0}))\) and \(\lim_{y \to 0} R_{2}(y)/y = 0\). Collecting the term linear in \(h\) and bundling the rest into a single remainder \(R_{3}\),</p>
       <p>\[ P(x_{0}+h) = P(x_{0}) + \bigl(g'(x_{0})\,f'(g(x_{0}))\bigr) h + R_{3}(h), \qquad R_{3}(h) = m_{2} R_{1}(h) + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr), \]</p>
-      <p>using \(f(g(x_{0})) = P(x_{0})\) and \(m_{1} m_{2} = g'(x_{0})f'(g(x_{0})) = f'(g(x_{0}))g'(x_{0})\), the same product in either order. By the remainder form, this says precisely that \(P\) is differentiable at \(x_{0}\) with \(P'(x_{0}) = f'(g(x_{0}))g'(x_{0})\) — <em>provided</em> we show</p>
+      <p>using \(f(g(x_{0})) = P(x_{0})\) and \(m_{1} m_{2} = g'(x_{0})f'(g(x_{0})) = f'(g(x_{0}))g'(x_{0})\), the same product in either order. By the remainder form, this says precisely that \(P\) is differentiable at \(x_{0}\) with \(P'(x_{0}) = f'(g(x_{0}))g'(x_{0})\). It remains only to show that</p>
       <p>\[ \lim_{h \to 0}\frac{R_{3}(h)}{h} = 0. \]</p>
       <!-- expansion:formula — the manuscript leaves the splitting and the easy term m₂R₁(h)/h → 0 implicit; we make it explicit -->
       <p>Split the quotient into its two pieces, \(\dfrac{R_{3}(h)}{h} = m_{2}\dfrac{R_{1}(h)}{h} + \dfrac{R_{2}(m_{1} h + R_{1}(h))}{h}\). The first piece is easy: \(m_{2}\) is a constant and \(R_{1}(h)/h \to 0\), so \(m_{2} R_{1}(h)/h \to 0\). We also note for later that \(m_{1} h + R_{1}(h) \to 0\) as \(h \to 0\), since \(m_{1} h \to 0\) and \(R_{1}(h) \to 0\) (the latter because \(R_{1}(h)/h \to 0\)).</p>
@@ -1010,7 +1012,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — load-bearing intuition: the chain rule run BACKWARD on a known identity extracts a derivative no direct rule reaches; concrete hook = ln, x^x, arcsin have nothing to attack head-on -->
-  <p>Sections 3.1 and 3.2 built the machinery; this section spends it. The chain rule (Theorem 3.3) was advertised as the tool that completes the differentiation toolkit, and here we see why: it reaches a whole family of derivatives that no rule of Chapter 2 can touch directly. We have no formula for \(\ln x\) to differentiate — it is known only as the function that undoes \(e^{x}\). The expression \(x^{x}\) carries its variable in <em>both</em> the base and the exponent, so neither the power rule nor the rule for \(e^{x}\) applies to it. And \(\arcsin\) has no elementary formula at all. Each of these functions is, in a sense, defined only indirectly.</p>
+  <p>Sections 3.1 and 3.2 built the machinery; this section spends it. The chain rule (Theorem 3.3) was advertised as the tool that completes the differentiation toolkit, and here we see why: it reaches a whole family of derivatives that no rule of Chapter 2 can touch directly. We have no formula for \(\ln x\) to differentiate — it is known only as the function that undoes \(e^{x}\). The expression \(x^{x}\) carries its variable in <em>both</em> the base and the exponent, so neither the power rule nor the rule for \(e^{x}\) applies to it. And \(\arcsin\) has no elementary formula at all. Each of these functions is defined only indirectly.</p>
 
   <p>Yet each one satisfies an <em>identity</em> assembled from functions we already know how to differentiate: \(e^{\ln x} = x\), or \(\ln(x^{x}) = x\ln x\), or \(\arcsin(\sin x) = x\) for \(x \in \bigl[-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr]\). That is the whole idea of this section, used over and over: <em>to differentiate a function you cannot attack head-on, differentiate an identity it satisfies, then solve for the derivative you want.</em> It is the chain rule run backward — instead of pushing a known derivative forward through a composition (Strategy 3.1), we apply the chain rule to a known relation and read off the one derivative we do not yet have. The same move handles the inverse functions \(\ln\), \(\arcsin\), \(\arccos\), and \(\arctan\), and, through the closely related trick of <em>logarithmic differentiation</em>, awkward powers like \(x^{x}\).</p>
 
@@ -1625,7 +1627,7 @@ window.MathJax = {
         };
         return { svg: buildPlot(cfg), note: note };
       };
-      return { layout: "pair", panels: [panel(1.35, "larger h"), panel(0.5, "smaller h")] };
+      return { layout: "pair", panels: [panel(1.35, "larger h"), panel(0.675, "smaller h")] };
     },
 
     /* §3.3 — arcsin has vertical tangents at y = ±1 (Figure 3.7).

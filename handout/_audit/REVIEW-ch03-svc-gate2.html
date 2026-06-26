@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 3 S·A·V 散文閘 — gate-2（Codex）審核稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:1000px; margin:0 auto;
+         padding:2rem 1.5rem 4rem; background:var(--bg); color:#1a1a1a; line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.13rem; margin:2rem 0 .5rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .pass { background:#eaf6ed; border-left:3px solid var(--green); padding:.6rem .9rem; border-radius:5px; font-size:.93rem; color:#13502c; margin:.4rem 0 1.2rem; }
+  .pass b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.88rem; }
+  th, td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#eef2f7; }
+  .zero { color:var(--green); font-weight:700; }
+  .card { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:8px; padding:.75rem 1rem; margin:.7rem 0; }
+  .row1 { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin-bottom:.3rem; }
+  .id { font-family:ui-monospace,monospace; font-weight:700; font-size:.8rem; background:#e9f0fb; color:var(--blue); padding:.1rem .45rem; border-radius:4px; }
+  .badge { font-size:.7rem; font-weight:700; padding:.1rem .5rem; border-radius:999px; background:#e9f0fb; color:var(--blue); }
+  .badge.done { background:#eaf6ed; color:var(--green); }
+  .k { font-weight:700; color:var(--gray); font-size:.78rem; }
+  .f { margin:.3rem 0; font-size:.92rem; }
+  del { background:#fde8e7; color:#7a271a; text-decoration:line-through; padding:.02rem .15rem; }
+  ins { background:#e7f6ec; color:#0f5132; text-decoration:none; padding:.02rem .15rem; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+</style>
+</head>
+<body>
+<h1>Chapter 3 — S·A·V 去 AI 味散文閘 gate-2（Codex）審核稿</h1>
+<p class="sub">2026-06-27　·　契約 <code>PROSE-AUDIT-RUBRIC.md</code>＋錨組 <code>anchors/svc-exemplars.md</code>　·　gate-2 ＝ <code>codex exec -s read-only --output-schema</code>（gpt-5.5 xhigh，81,096 tokens、ChatGPT 訂閱配額，經使用者授權）獨立讀 rubric＋錨組＋3 fragment（gate-1 已套 5 tightening 後版本）複審　·　propose-only、保語意、不動數學</p>
+
+<div class="pass"><b>結論：prose gate-2 通過 —— 0 blocking、2 advisory（皆採納）。</b> Codex 獨立複核三節散文：無讀者卡關的 U 問題、無承載位空句 S/A 缺陷；僅 <b>2 條 F5 register slip</b>——student-facing 散文露出「the manuscript」內容層語氣。經使用者裁決 <b>採兩條改寫</b>（去 manuscript meta、保語意數學、provenance 註解保留）→ <b>手動回歸 PASS</b>。<b>S·A·V 雙閘收斂（blocking = 0）。</b></div>
+
+<table>
+  <tr><th>節</th><th>gate-1（Claude ×3）</th><th>gate-2（Codex）</th><th>gate-2 重點</th></tr>
+  <tr><td>§3.1</td><td class="zero">0 blk（2 tighten 已採）</td><td class="zero">0 blk · 1 adv 已採</td><td>F5：扇形不等式證明中「The manuscript reads the same picture…」露出 → 改 Equivalently</td></tr>
+  <tr><td>§3.2</td><td class="zero">0 blk（2 tighten 已採）</td><td class="zero">0 blk · 1 adv 已採</td><td>F5：Thm 前 setup「The manuscript this chapter follows develops…」露出 → 改 Alongside the chain rule…</td></tr>
+  <tr><td>§3.3</td><td class="zero">0 blk（1 tighten 已採）</td><td class="zero">0 blk · 0 adv</td><td>clean</td></tr>
+  <tr><td><b>合計</b></td><td><b class="zero">0 blocking</b></td><td><b class="zero">0 blocking · 2 advisory（採）</b></td><td>雙閘收斂</td></tr>
+</table>
+
+<h2>兩條 advisory（gate-2，F5「the manuscript」露出；已採＋回歸）</h2>
+
+<div class="card">
+  <div class="row1"><span class="id">C2-1</span><span class="badge">advisory · F5 語域</span><span class="badge done">已採・回歸 PASS</span></div>
+  <div class="f"><span class="k">locus</span>　§3.1 扇形面積不等式推導中的括號 aside（<code>sec-3-1.html</code>）。</div>
+  <div class="f"><span class="k">diff</span>　<del>(The manuscript reads the same picture by splitting</del><ins>Equivalently, split</ins> the outer triangle as \(OAC = OAB \cup ABC\)<del>;</del><ins>:</ins> the corner piece \(ABC\) is what \(OAC\) adds to the inscribed triangle \(OAB\), and it contains the circular segment between the chord \(AB\) and the arc.<del>)</del></div>
+  <div class="f"><span class="k">為何</span>　student-facing 散文不應提及「the manuscript」（內容層語氣）；改 Equivalently 框架後 register 回到 handout 直接教學聲音，數學內容（角片 \(ABC = OAC - OAB\) 的幾何解讀）完整保留。HTML 註解的 provenance「manuscript pp.1–9」等保留不動。</div>
+</div>
+
+<div class="card">
+  <div class="row1"><span class="id">C2-2</span><span class="badge">advisory · F5 語域</span><span class="badge done">已採・回歸 PASS</span></div>
+  <div class="f"><span class="k">locus</span>　§3.2 Theorem 3.3 前的 setup 段（<code>sec-3-2.html</code>）。</div>
+  <div class="f"><span class="k">diff</span>　<del>The manuscript this chapter follows develops the chain rule alongside</del><ins>Alongside the chain rule, this section draws on</ins> two results that already belong to Chapter 2 — the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1). We take both as established and use them freely, without re-proving them here.</div>
+  <div class="f"><span class="k">為何</span>　同上：去掉「The manuscript this chapter follows」meta-reference、改主詞為本節自身框架。保留第二句不變（避免 Codex 原議「will be used freely here」與第二句「use them freely」重複——選更外科手術的主詞替換）。</div>
+</div>
+
+<h2>完整性掃描（Claude）</h2>
+<p class="sub"><code>grep "manuscript"</code> 三 fragment 共 19 處：除上述 2 處 student-facing `&lt;p&gt;` 外，其餘 17 處全在 `&lt;!-- --&gt;` provenance 註解內（規則明文保留）。Codex 抓到的 2 處即全部 student-facing 露出，無遺漏。回歸後 rendered content region 的「manuscript」全數落在註解、0 student-facing 露出。</p>
+
+<h2>方法</h2>
+<p class="sub">gate-2 ＝ <code>codex exec -s read-only -C &lt;repo&gt; --output-schema</code>（gpt-5.5 xhigh，81,096 tokens、ChatGPT 訂閱配額，經使用者授權 2026-06-27），獨立讀 <code>PROSE-AUDIT-RUBRIC.md</code>＋<code>anchors/svc-exemplars.md</code>（2 正 1 負真人錨）＋3 fragment（gate-1 已套 5 tightening 後版本）複審三維 A/B/C，中性不扣分、V1 永遠 advisory、不確定降級、不 over-report。原始 JSON 轉錄於版控 <code>_dev-archive/ch03/ch03_svc-gate2.md</code>。2 條 advisory 經 ⛳ 裁決採納＋手動回歸後，S·A·V 雙閘收斂（blocking = 0）。</p>
+
+</body>
+</html>

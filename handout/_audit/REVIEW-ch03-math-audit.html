@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 3 數學正確性閘 — gate-1＋gate-2 審核稿（雙閘收斂）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:980px; margin:0 auto;
+         padding:2rem 1.5rem 4rem; background:var(--bg); color:#1a1a1a; line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.13rem; margin:2rem 0 .5rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  h3 { font-size:1rem; margin:1.3rem 0 .3rem; color:#272a33; }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .pass { background:#eaf6ed; border-left:3px solid var(--green); padding:.6rem .9rem; border-radius:5px; font-size:.93rem; color:#13502c; margin:.4rem 0 1.2rem; }
+  .pass b { color:var(--green); }
+  .pend { background:#fff7e6; border-left:3px solid var(--amber); padding:.6rem .9rem; border-radius:5px; font-size:.9rem; color:#6b3f00; margin:.4rem 0 1.2rem; }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.88rem; }
+  th, td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#eef2f7; }
+  .zero { color:var(--green); font-weight:700; }
+  .wait { color:var(--amber); font-weight:700; }
+  .card { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--green); border-radius:8px; padding:.75rem 1rem; margin:.7rem 0; }
+  .k { font-weight:700; color:var(--gray); font-size:.8rem; }
+  .f { margin:.3rem 0; font-size:.92rem; }
+  ul.checks { margin:.3rem 0 .3rem 0; padding-left:1.1rem; }
+  ul.checks li { margin:.22rem 0; font-size:.9rem; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .tag { font-family:ui-monospace,monospace; font-weight:700; font-size:.74rem; background:#eef5ff; color:var(--blue); padding:.06rem .4rem; border-radius:4px; }
+</style>
+</head>
+<body>
+<h1>Chapter 3 — 數學正確性閘（math-correctness M1–M8）審核稿</h1>
+<p class="sub">2026-06-27　·　契約 <code>MATH-CORRECTNESS-RUBRIC.md</code>（M1–M8，「請查核 X」propose-only、手稿勝出、不確定降級）　·　被審物 <code>fragments/ch03/sec-3-{1,2,3}.html</code>　·　雙閘：gate-1 Claude ×5（per-section ×3＋cross-ref＋proof-rigor，每候選對抗式 verify）＋ gate-2 Codex gpt-5.5（跨模型獨立複核，read-only，100,807 tokens）</p>
+
+<div class="pass"><b>結論：math gate-1 通過 —— 0 blocking、0 advisory、0 候選。</b> 5 個獨立 auditor（3 個 per-section 全 M1–M8、1 個跨節 M6/M7 一致性、1 個 proof-rigor 第二讀者）一致判 clean；adversarial verify 階段 <b>0 候選需複核</b>（無 over-report）。另以 <b>sympy 獨立重算 31 項全 PASS</b>（全部 worked-example 最終答案＋關鍵極限／恆等式）。收斂判準（blocking = 0）達成。</div>
+
+<div class="pass"><b>gate-2（Codex gpt-5.5）通過 —— 0 blocking、0 advisory。</b> 經使用者授權後調用（100,807 tokens、ChatGPT 訂閱配額）；Codex 獨立讀 rubric＋CLAUDE.md＋PLAN-ch03＋3 fragment＋Ch2 引用，重算 squeeze／連續性／Prop 3.2／Thm 3.1–3.3（含 remainder-form 證明與退化 \(R_2(0)\) 情形）／Ex 3.1–3.16／反三角分支域／章末 recap，結論全數健全、無 finding。<b>雙閘收斂（blocking = 0）。</b></div>
+
+<table>
+  <tr><th>節</th><th>gate-1（Claude）</th><th>gate-2（Codex）</th><th>重點（已獨立核對）</th></tr>
+  <tr><td>§3.1 Sine &amp; Cosine</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>差分商 sum-to-product 化簡、扇形面積不等式 (1)、Prop 3.1 連續性、Prop 3.2 \(\lim\sin\theta/\theta=1\)（含 evenness 收兩側）、Ex 3.2 tan′/sec′/cot′/csc′、Ex 3.3 SHM、radian/degree caution \(\pi/180\)</td></tr>
+  <tr><td>§3.2 Chain Rule</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Thm 3.3 假設充分、Def 3.1 remainder form 完整、Prop 3.3 等價雙向、\(\varepsilon\)–\(\delta\) 證明逐步（\(R_2(0)=0\) 退化情形＋\((|m_1|+1)\varepsilon\) bound）、Ex 3.4–3.8</td></tr>
+  <tr><td>§3.3 Applications</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Ex 3.9 \(\ln'\)（\(e^{\ln x}=x\)）、Strategy 3.2 log-diff、Ex 3.10–3.13、Ex 3.14–3.16 反三角（分支恆等式、開區間、根號正負由 \(\cos x>0/\sin x>0\) 選定、arctan Pythagorean）、章末 recap 表</td></tr>
+  <tr><td>跨節 M6/M7</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>編號無重無漏、章末 recap 與各例逐式相符、Ch2 引用 grep 核對（Thm 2.1/2.5/2.6、quotient rule 2.7）皆落在被引結果假設內</td></tr>
+  <tr><td><b>合計</b></td><td><b class="zero">0 blocking · 0 advisory</b></td><td><b class="zero">0 blocking · 0 advisory</b></td><td>雙閘收斂；sympy 31/31 PASS</td></tr>
+</table>
+
+<h2>sympy 獨立重算（deterministic ground truth，31 項全 PASS）</h2>
+<div class="card">
+  <div class="f"><span class="k">worked-example 最終答案</span>　\(\tan'=\sec^2\)、\(\sec'=\sec\tan\)、\(\cot'=-\csc^2\)、\(\csc'=-\csc\cot\)；SHM \(s'=\cos,\ s''=-\sin=-s\)；\(\frac{d}{dx}\sqrt{1+x^2}=\frac{x}{\sqrt{1+x^2}}\)、\(\frac{d}{dx}\sin(x^2)=2x\cos(x^2)\)；\(\frac{d}{dx}\sqrt{1+\sin^2 x}=\frac{\sin x\cos x}{\sqrt{1+\sin^2 x}}\)；Ex 3.6（\(x>1\)）；Ex 3.7 \(y'\)；\(\ln'=\frac1x\)、\((x^x)'=(1+\ln x)x^x\)、\((2^x)'=2^x\ln2\)、\((a^x)'=a^x\ln a\)、\((x\ln x-x)'=\ln x\)；Ex 3.13 \(\frac{y'}{y}=\frac{1}{x+1}+\frac{4x}{x^2+1}+\frac{9x^2}{x^3+1}\)；\(\arcsin'=\frac{1}{\sqrt{1-y^2}}\)、\(\arccos'=\frac{-1}{\sqrt{1-y^2}}\)、\(\arctan'=\frac{1}{1+y^2}\)。</div>
+  <div class="f"><span class="k">關鍵極限／恆等式</span>　\(\lim_{\theta\to0}\frac{\sin\theta}{\theta}=1\)、\(\lim_{\theta\to0}\frac{1-\cos\theta}{\theta}=0\)；caution 值 \(\frac{\sin(\pi/2)}{\pi/2}=\frac{2}{\pi}\approx0.6366\)、\(\frac{\sin\pi}{\pi}=0\)；degree-limit \(\lim_{x\to0}\frac{\sin(\pi x/180)}{x}=\frac{\pi}{180}\)；\(\sec^2 x=1+\tan^2 x\)；§3.1 用到的四條 sum-to-product 恆等式。</div>
+</div>
+
+<h2>逐節已核對項（gate-1，每條皆獨立走查）</h2>
+
+<h3>§3.1 Derivatives of Sine &amp; Cosine　<span class="tag">0/0</span></h3>
+<ul class="checks">
+  <li><b>M2/M3</b> Prop 3.1（\(\sin,\cos\) 在 \(\mathbb{R}\) 連續）、Prop 3.2（\(\lim\sin\theta/\theta=1\)）、Thm 3.1/3.2（\(\sin'=\cos,\ \cos'=-\sin\) 全 \(x\)）陳述正確；Prop 3.2 由單側＋ evenness 正確收到兩側極限。</li>
+  <li><b>M4</b> sum-to-product 把差分商化為 \(\cos(x+\tfrac h2)\cdot\frac{\sin(h/2)}{h/2}\)（分母 \(h=2\cdot\tfrac h2\) 對齊）；面積鏈 \(\tfrac12\sin\theta\le\tfrac12\theta\le\tfrac12\tan\theta\Rightarrow\cos\theta\le\frac{\sin\theta}{\theta}\le1\)（除以 \(\sin\theta>0\)、正量取倒數反向，無除零）。Ex 3.1 共軛化 \((1-\cos\theta)/\theta\to0\)。</li>
+  <li><b>M5</b> 不等式 (1) 正確限定 \(0<\theta<\tfrac\pi2\)；\(|\sin\theta|\le|\theta|\) 由 evenness 延到 \(|\theta|<\tfrac\pi2\)；Ex 3.2 正確限定 \(\cos x\neq0\)（tan/sec）與 \(\sin x\neq0\)（cot/csc）；Fig 3.2 caption 正確標 \(\theta=0\) 處為「極限非值」。</li>
+  <li><b>M8</b> radian 依賴明標（第二 Caution），非隱藏；degree \(\frac{d}{dx}\sin(x^\circ)=\frac{\pi}{180}\cos(x^\circ)\) 經 sympy 核。</li>
+</ul>
+
+<h3>§3.2 The Chain Rule　<span class="tag">0/0</span></h3>
+<ul class="checks">
+  <li><b>M1/M2</b> Thm 3.3 假設（\(g\) 在 \(x_0\) 可微、\(f\) 在 \(g(x_0)\) 可微）充分如實，結論 \(P'(x_0)=f'(g(x_0))g'(x_0)\) 正確；Def 3.1 remainder form 完整（\(m=f'(x_0)\)）。</li>
+  <li><b>M3</b> Prop 3.3 雙向等價、同一 \(m\)，兩方向證明皆乾淨。</li>
+  <li><b>M4（最吃重）</b> \(\varepsilon\)–\(\delta\) 證明逐步成立：\(R_3=m_2R_1+R_2(m_1h+R_1)\) 為恆等分解；易項 \(m_2R_1/h\to0\)；難項正確分 \(m_1h+R_1=0\)（用 \(R_2(0)=0\)，由 remainder 關係於 \(y=0\) 導出）與 \(\neq0\) 兩情形，三角不等式 \(\frac{|m_1h+R_1|}{|h|}\le|m_1|+\frac{|R_1|}{|h|}\)、末 \((|m_1|+1)\varepsilon\) bound 皆對；量詞順序（先固定 \(\varepsilon\)→\(\delta\)→\(\alpha\)→\(\alpha_1\)）正確。</li>
+  <li><b>M7</b> product rule（§2.5 Thm 2.6）、diff⇒continuous（§2.3 Thm 2.1）只引用不重證（D6）；Ex 3.4(b) 引 Thm 3.1 正確。</li>
+</ul>
+
+<h3>§3.3 Applications of the Chain Rule　<span class="tag">0/0</span></h3>
+<ul class="checks">
+  <li><b>M4</b> Ex 3.9 由 \(e^{\ln x}=x\) 取導得 \((\ln x)'=1/x\)；Ex 3.10–3.13 全式正確（含 3.13 逐因子 \(\frac{2(2x)}{x^2+1}=\frac{4x}{x^2+1}\) 等中間步）。</li>
+  <li><b>M5（反三角，最易錯）</b> Ex 3.14 arcsin：開區間 \((-\tfrac\pi2,\tfrac\pi2)\) 上 \(\cos x>0\) 選正根 \(+\sqrt{1-y^2}\)、域 \((-1,1)\)；Ex 3.15 arccos：用正確恆等式 \(\arccos(\cos x)=x\)、開區間 \((0,\pi)\) 上 \(\sin x>0\) 合法除 \(-\sin x\)、負號繼承自 \(\cos'=-\sin\)；Ex 3.16 arctan：\(\sec^2x=1+y^2\) 不為零、全 \(\mathbb{R}\) 可微、無假性限制。</li>
+  <li><b>M7</b> Caution＋Fig 3.7＋章末 recap 表（含域註）與各例逐一相符；Ch2 §2.4 Thm 2.5（\(e^x\) 導數）引用 grep 核對落在被引結果內。</li>
+  <li><b>M8</b> \(\ln\) 以「\(e^x\) 反函數」非正式用、嚴謹建構延 Ch4 §4.5（D8，一次性 fence，rubric-protected）。</li>
+</ul>
+
+<h2>方法</h2>
+<p class="sub">gate-1 ＝ 5 個並行 auditor（workflow <code>ch03-math-gate1</code>，opus-4-8、high effort）：3 個 per-section 走全 M1–M8、1 個跨節走 M6/M7、1 個 proof-rigor 第二讀者鎖三處最密推理（§3.1 squeeze 鏈／§3.2 \(\varepsilon\)–\(\delta\) 證明／§3.3 開閉區間與根號正負）。每個候選 finding 進對抗式 verify（獨立 skeptic 嘗試 refute、不確定即降級為 non-finding）——本輪 <b>0 候選</b>，故 verify 空跑。數學內容對照 rubric 的 deliberate-editorial-choices／already-handled 護欄（手稿刻意的 composition-identity 法、D8 ln-fence、Ex 3.6 \(x>1\)、Ex 3.13 \(x>0\) 等不當 finding）。computational 項另以 sympy 1.14 獨立重算交叉核對。兩閘皆「不確定降級、寧缺勿濫」。gate-2 ＝ <code>codex exec -s read-only --output-schema</code>（gpt-5.5 xhigh，100,807 tokens、ChatGPT 訂閱配額，經使用者授權 2026-06-27）獨立讀 rubric＋CLAUDE.md＋PLAN-ch03＋3 fragment＋Ch2 引用複審，verdict clean、0 finding；原始 JSON 轉錄於版控 <code>_dev-archive/ch03/ch03_math-audit-gate2.md</code>。<b>雙閘收斂（blocking = 0）。</b></p>
+
+</body>
+</html>
