@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 4 課文範例補充——已套用報告（Mode C 第①波，2026-06-27）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.75;
+         max-width: 52rem; margin: 2rem auto 6rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.5rem; }
+  h3 { font-size: 1.02rem; margin: 1.8rem 0 .4rem; }
+  .badge { display: inline-block; font-size: .72rem; padding: .05rem .5rem; border-radius: 999px; vertical-align: middle; margin-left: .45rem; font-weight: 600; }
+  .new  { background: #d8f0db; color: #1d6b29; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .1rem 0 .6rem; }
+  .meta code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  .why  { font-size: .92rem; background: #f2f6fa; border-left: 4px solid #8aa6c0; padding: .5rem .8rem; margin: .6rem 0; }
+  .ex   { border: 1px solid #bcd6bc; border-left: 5px solid #2e7d32; border-radius: 6px; background: #f6faf6; padding: .7rem 1rem; margin: .7rem 0 0; }
+  .sol  { border: 1px solid #d7dde3; border-left: 5px solid #90a0b0; border-radius: 6px; background: #f7f8f9; padding: .7rem 1rem; margin: .35rem 0 .8rem; }
+  .ex::before  { content: "Example（已套用）"; font-weight: 700; color: #2e7d32; display: block; font-size: .8rem; letter-spacing: .04em; }
+  .sol::before { content: "Solution"; font-weight: 700; color: #5b6b7b; display: block; font-size: .8rem; letter-spacing: .06em; }
+  .prov { font-size: .82rem; color: #5b6b7b; margin: .2rem 0 0; }
+  .prov code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; }
+  .ok { background: #eef6ee; border: 1px solid #a4ccb0; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: .92rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: .8rem 0 1.2rem; }
+  th, td { border: 1px solid #c9d3dd; padding: .35rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #e9eff5; }
+  .chg { background: #fffaf0; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+  code.k { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<h1>Ch 4 課文範例補充——已套用報告（Mode C 第①波）</h1>
+<p class="meta">2026-06-27 ・ 對「實際寫入 <code>handout/fragments/ch04/</code> 的內容」逐條呈現（CLAUDE.md 2026-06-15：每完成一輪撰寫都產 standalone HTML 報告）。
+候選/裁決稿見 <code>_dev-archive/ch04/ch04_example-supplement-review.html</code>；gate-2 findings 轉錄見 <code>_dev-archive/ch04/ch04_example-supplement-audit.md</code>。
+<strong>本輪結果：</strong>§4.1/§4.2/§4.3/§4.5 四節 clean、§4.4 補 <strong>2</strong> 個 worked example（皆 CLP-1 §2.13、CC BY-NC-SA 4.0）。</p>
+
+<div class="ok">
+<strong>雙閘皆 0 blocking。</strong>
+gate-1＝五節 <code>example-supplement</code> 並行＋章層 completeness critic（<code>wf_a9a30cfa-c0e</code>，Claude、免費）：4 節 clean、§4.4 浮 2 候選、critic 跨節無重複/無漏缺、建議全留。
+gate-2＝Codex <code>gpt-5.5</code> @ <code>xhigh</code>（使用者同意計費，74,207 tokens）：<strong>run1 收斂</strong>，E1 本次撰寫解＋E2 補算行皆獨立查核正確、provenance 誠實、與 §4.5 Cor 4.4 不衝突。
+</div>
+
+<h2>編號 cascade（手動重編號）</h2>
+<p class="small">兩例插在 §4.4 的 Example 4.2（MVT 找 c）之後、Corollary 4.3（單調性）之前——「MVT/Rolle 作為證明工具」的群組，進入單調性應用之前。</p>
+<table>
+<tr><th>Example</th><th>內容</th><th>位置</th><th>變動</th></tr>
+<tr><td>4.1</td><td>partial sums of \(e\)</td><td>§4.1</td><td>不變</td></tr>
+<tr><td>4.2</td><td>MVT on \(x^2\)（找 \(c=1\)）</td><td>§4.4</td><td>不變</td></tr>
+<tr class="chg"><td><strong>4.3</strong> <span class="badge new">新</span></td><td>\(\lvert\sin a-\sin b\rvert\le\lvert a-b\rvert\)（MVT Lipschitz 估計）</td><td>§4.4</td><td><strong>新增（E1）</strong></td></tr>
+<tr class="chg"><td><strong>4.4</strong> <span class="badge new">新</span></td><td>\(3x-\sin x\) 恰一根（Rolle 反用）</td><td>§4.4</td><td><strong>新增（E2）</strong></td></tr>
+<tr class="chg"><td>4.5</td><td>\(\sin x\) strictly increasing</td><td>§4.4</td><td>← 原 4.3</td></tr>
+<tr class="chg"><td>4.6</td><td>\(e^x\) strictly increasing</td><td>§4.4</td><td>← 原 4.4</td></tr>
+<tr class="chg"><td>4.7</td><td>general powers \(a^x:=e^{x\ln a}\)</td><td>§4.5</td><td>← 原 4.5</td></tr>
+</table>
+<p class="small">唯一 student-facing prose cross-ref 更新：§4.5 Theorem 4.13（ln 連續）證明處「strictly increasing (Example 4.4)」→「(Example 4.6)」。dev header ledger（兩節 fragment 註解）＋ <code>PLAN-ch04.md</code> §5/§8 一併更新。</p>
+
+<h2>實際寫入的兩個 worked example</h2>
+
+<h3>Example 4.3 <span class="badge new">新</span>　MVT → Lipschitz 估計（只用存在性、不解 c）</h3>
+<div class="ex">
+<p>Use the Mean Value Theorem to show that \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\) for all real numbers \(a\) and \(b\).</p>
+</div>
+<div class="sol">
+<p>If \(a = b\) both sides are \(0\) and there is nothing to prove, so assume \(a \ne b\); relabel if necessary so that \(b < a\). The function \(f(x) = \sin x\) is continuous on \([b, a]\) and differentiable on \((b, a)\) — it is differentiable on all of \(\mathbb{R}\) — so by the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with
+\[ \frac{\sin a - \sin b}{a - b} = f'(c) = \cos c. \]
+We do not need to know which \(c\) — only that one exists. Multiplying across and taking absolute values,
+\[ \lvert \sin a - \sin b \rvert = \lvert \cos c \rvert \,\lvert a - b \rvert. \]
+Since \(\lvert \cos c \rvert \le 1\) for every real \(c\), this gives \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\), as claimed. The same argument bounds the change of any function by a bound on its derivative: if \(\lvert f' \rvert \le K\) throughout an interval, then \(\lvert f(a) - f(b) \rvert \le K \lvert a - b \rvert\) for any two points in it.</p>
+</div>
+<p class="prov"><strong>locus:</strong> 緊跟 Strategy 4.2 / Example 4.2，Corollary 4.3 之前　·　<strong>source:</strong> <code>[source: CLP-1 §2.13 (MVT) — bounded-derivative application variant]</code>　·　<strong>license:</strong> CC BY-NC-SA 4.0　·　<strong>rewrite:</strong> 解為本次撰寫（CLP 原 \(f(100)<100\) 自參照 ODE 超綱，改用 \(\sin\)）。</p>
+<div class="why"><strong>teaching function：</strong>MVT 的全新動作——把「導數有界」翻成「函數變化有界」。Strategy 4.2 step 3「只用存在性、不靠特定 \(c\)」的第一個正面落地（既有三例都解出特定 \(c\) 或讀單調）。<strong>gate-2：</strong>數學正確、只用 Theorem 4.12＋\(|\cos|\le1\)、provenance 誠實。</div>
+
+<h3>Example 4.4 <span class="badge new">新</span>　Rolle 反用 → 精確根計數</h3>
+<div class="ex">
+<p>How many real roots does \(f(x) = 3x - \sin x\) have? Show that your count is exact.</p>
+</div>
+<div class="sol">
+<p>By inspection \(f(0) = 3 \cdot 0 - \sin 0 = 0\), so \(x = 0\) is a root; \(f\) has at least one. The question is whether there could be a second. Suppose, for contradiction, that \(f\) had a second root \(a \ne 0\). Then \(f(0) = f(a) = 0\), and \(f\) is continuous and differentiable on all of \(\mathbb{R}\), so Rolle's theorem (Theorem 4.11) applied to the interval between \(0\) and \(a\) would supply a point \(c\) strictly between them with \(f'(c) = 0\). But
+\[ f'(x) = 3 - \cos x, \]
+and since \(\cos x \le 1 < 3\) for every real \(x\), we have \(f'(x) \ge 3 - 1 = 2 > 0\) everywhere — \(f'\) is never zero. No such \(c\) can exist, so the assumed second root is impossible.</p>
+<p>Therefore \(f(x) = 3x - \sin x\) has exactly one real root, namely \(x = 0\). The pattern is general: a function whose derivative never vanishes has at most one root, since two roots would force a zero of \(f'\) between them.</p>
+</div>
+<p class="prov"><strong>locus:</strong> 緊跟 Example 4.3，Corollary 4.3 之前　·　<strong>source:</strong> <code>[source: CLP-1 §2.13 (MVT) Procedural — “How many roots does 3x − sin x have?”]</code>（<code>prob_s2.13.tex:348</code>）　·　<strong>license:</strong> CC BY-NC-SA 4.0　·　<strong>rewrite:</strong> 輕改照搬論證骨架＋補一行 \(f'(x)\ge2>0\) 明算。</p>
+<div class="why"><strong>teaching function：</strong>Rolle 的反向（contrapositive）動作——用「\(f'\) 永不為零」排除第二根、精確計數方程根數。本節無任何根計數/Rolle 反用示範。<strong>gate-2：</strong>論證對得上 CLP 源（<code>:348-357</code>）、補算正確、與 §4.5 Cor 4.4（\(f'\equiv0\Rightarrow\)const）邏輯相異不衝突。</div>
+
+<h2>render 自驗（重建後）</h2>
+<div class="ok">
+<code class="k">python build.py ch04</code> 重生 <code>chapter4-print-standalone.html</code> → CDP 渲染驗證：
+<ul style="margin:.4rem 0">
+<li><strong>Example 編號連續 4.1–4.7</strong>（DOM 順序核對：4.1 partial sums／4.2 MVT x²／<strong>4.3 \(|\sin a-\sin b|\)</strong>／<strong>4.4 \(3x-\sin x\) roots</strong>／4.5 sin↑／4.6 \(e^x\)↑／4.7 general powers）。</li>
+<li><strong>0 dangling cross-ref</strong>（所有 prose「Example 4.x」∈ {4.1–4.7}）。</li>
+<li><strong>0 mjx-merror</strong>（MathJax 全渲染）、<strong>0 未渲染 \(\backslash(\) / \(\backslash[\)</strong>、全頁無水平溢出。</li>
+</ul>
+</div>
+
+<p class="small" style="margin-top:2rem">— 狀態：Mode C ①波**內容已落地、build＋render-clean**，<strong>尚未 commit（待使用者授權）</strong>。下一棒（建議序）：Mode C ②波 軟深度 → 圖機會 → 數學 M1–M8 → 圖正確性 → S·A·V → 收尾 ROADMAP status。進度錨見 <code>_dev-archive/ch04/PLAN-ch04.md</code> §8。</p>
+
+</body>
+</html>

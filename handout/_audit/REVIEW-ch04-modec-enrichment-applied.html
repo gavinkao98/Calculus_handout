@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 4 軟深度充實——已套用報告（Mode C 第②波，2026-06-27）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.75;
+         max-width: 52rem; margin: 2rem auto 6rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.5rem; }
+  h3 { font-size: 1.02rem; margin: 1.8rem 0 .4rem; }
+  .badge { display: inline-block; font-size: .72rem; padding: .05rem .5rem; border-radius: 999px; vertical-align: middle; margin-left: .45rem; font-weight: 600; }
+  .new { background: #d8f0db; color: #1d6b29; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .1rem 0 .6rem; }
+  .meta code, .prov code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  .why  { font-size: .92rem; background: #f2f6fa; border-left: 4px solid #8aa6c0; padding: .5rem .8rem; margin: .6rem 0; }
+  .caution { border: 1px solid #e0c89a; border-left: 5px solid #d9a514; border-radius: 6px; background: #fffaf0; padding: .7rem 1rem; margin: .7rem 0 0; }
+  .caution::before { content: "Caution（已套用，無編號）"; font-weight: 700; color: #8a5a00; display: block; font-size: .8rem; letter-spacing: .04em; }
+  .prov { font-size: .82rem; color: #5b6b7b; margin: .3rem 0 0; }
+  .ok { background: #eef6ee; border: 1px solid #a4ccb0; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: .92rem; }
+  .covered { background: #f0f8f0; border-left: 5px solid #27ae60; border-radius: 6px; padding: .5rem 1rem; margin: .4rem 0; font-size: .92rem; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+</style>
+</head>
+<body>
+
+<h1>Ch 4 軟深度充實——已套用報告（Mode C 第②波）</h1>
+<p class="meta">2026-06-27 ・ 對「實際寫入 <code>handout/fragments/ch04/</code> 的軟深度內容」逐條呈現（CLAUDE.md 2026-06-15）。
+候選/裁決稿見 <code>_dev-archive/ch04/REVIEW-ch04-modec-enrichment.html</code>。
+②波＝補 intuition/caution/strategy/application/summary（非 example、非 figure）。<strong>本波實際寫入：2 條 caution</strong>（皆無編號＝零 cascade）。</p>
+
+<div class="ok">
+<strong>gate-1（9 鏡頭 ×5＋anti-padding critic，<code>wf_e4cbacd9-00d</code>，Claude、免費）：</strong>§4.1/§4.2/§4.3 clean、§4.4 +1 caution、§4.5 +1 caution；critic 0 重構/越界、0 漏缺、建議兩條都留。<br>
+<strong>範圍限定 Mode B（<code>handout-prose-audit</code>，README 硬規則「②波必接」，只審新 <code>[pass: enrichment]</code> caution）：兩條皆 Keep、0 blocking</strong>——math／faithfulness（不過度宣稱）／Mode C 合規（純增添、無重構、無編號）／A 易懂性／B 流暢性／C 去 AI 味 全 clean。
+</div>
+
+<h2>§4.1 / §4.2 / §4.3 —— clean（未動一行）</h2>
+<div class="covered">三節 6 軟深度鏡頭（1,2,4,5,6,8）逐項由既有 marker 承擔或刻意精簡（記錄省略）。Mode A 飽和章，clean 是有效結果。</div>
+
+<h2>實際寫入的兩條 Caution</h2>
+
+<h3>§4.4 <span class="badge new">新</span>　Corollary 4.3 的假逆命題（精簡版）</h3>
+<div class="caution">
+<p>Corollary 4.3 runs in one direction only: a positive derivative forces strict increase, not the reverse. A strictly increasing function need <em>not</em> have a strictly positive derivative everywhere. The function \(f(x) = x^{3}\) is strictly increasing on all of \(\mathbb{R}\), yet \(f'(0) = 0\); the derivative is allowed to touch zero at isolated points without spoiling strict monotonicity. The corollary is a sufficient test, not a characterisation.</p>
+</div>
+<p class="prov"><strong>locus:</strong> 緊接 Corollary 4.3 證明、「Two applications close the section…」之前　·　<strong>marker:</strong> <code>expansion:caution [pass: enrichment]</code>　·　<strong>採精簡版</strong>（依 critic 砍除原結尾自指句）。</p>
+<div class="why"><strong>why（鏡頭5）：</strong>守住本章驅動推論免於標準假逆命題誤讀（嚴格遞增 ⇏ f′>0 everywhere，\(x^3\) 在 0 處反證）。現有三條 caution 全談 hypotheses 失效，無一捕捉此「方向誤讀」。<strong>Mode B：</strong>Keep，0 blocking（x³ 嚴格遞增、f′(0)=0、isolated-zeros 機制皆正確；與 Corollary 4.3 雙條形式不矛盾；純增添無編號）。</div>
+
+<h3>§4.5 <span class="badge new">新</span>　對數積律的過度推廣陷阱</h3>
+<div class="caution">
+<p>The product law converts a product <em>inside</em> the logarithm into a sum <em>outside</em> it: \(\ln(ab) = \ln a + \ln b\). It says nothing about a sum inside. In general \(\ln(a + b) \ne \ln a + \ln b\) — take \(a = b = 1\), where the left side is \(\ln 2\) and the right side is \(0\). Likewise \(\ln(a/b)\) is \(\ln a - \ln b\), not \(\ln a / \ln b\). The proof above earns the one identity that holds; it grants no licence to the look-alikes.</p>
+</div>
+<p class="prov"><strong>locus:</strong> 緊接 Proposition 4.3（積律）證明、引出 Example 4.7 的橋接句之前　·　<strong>marker:</strong> <code>expansion:caution [pass: enrichment]</code></p>
+<div class="why"><strong>why（鏡頭5）：</strong>本節既有 caution 只管「ln 定義域(x>0)」，未管「ln 運算陷阱」。剛證完積律後補堵最高頻 log 錯誤，附一行可驗反例（a=b=1 → ln2 vs 0）。<strong>Mode B：</strong>Keep，0 blocking（ln2≠0 反例正確；ln(a/b)=ln a−ln b≠ln a/ln b 正確；忠實回指剛證的 Prop 4.3、不過度推廣；純增添無編號）。</div>
+
+<h2>render 自驗（重建後）</h2>
+<div class="ok">
+<code>python build.py ch04</code> 重生 → CDP 渲染驗證：<strong>0 mjx-merror</strong>、<strong>0 未渲染 \(\backslash(\)/\(\backslash[\)</strong>、Example 編號仍連續 <strong>4.1–4.7</strong>（caution 無編號、不影響任何編號）、兩條 caution 文字確認在 build 中。
+</div>
+
+<p class="small" style="margin-top:2rem">— 狀態：Mode C ②波**已落地、Mode B 通過、render-clean**，<strong>尚未 commit（與 ①波一起，待授權）</strong>。下一棒（建議序）：圖機會閘 → 數學 M1–M8 → 圖正確性 → S·A·V → 收尾 ROADMAP status。進度錨見 <code>PLAN-ch04.md</code> §8。</p>
+
+</body>
+</html>

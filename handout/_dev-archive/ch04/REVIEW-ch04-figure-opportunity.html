@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 4 圖機會稽核——審核文件（gate-1，2026-06-27）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.75;
+         max-width: 52rem; margin: 2rem auto 6rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.5rem; }
+  h3 { font-size: 1.02rem; margin: 1.8rem 0 .4rem; }
+  .badge { display: inline-block; font-size: .72rem; padding: .05rem .5rem; border-radius: 999px; vertical-align: middle; margin-left: .45rem; font-weight: 600; }
+  .med { background: #fdf2dd; color: #8a5a00; } .strong { background: #dbe9fb; color: #1f4e79; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .1rem 0 .6rem; }
+  .meta code, .prov code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  .fig { border: 1px solid #b9c6d4; border-left: 5px solid #1f4e79; border-radius: 6px; background: #f5f8fb; padding: .7rem 1rem; margin: .7rem 0; }
+  .row { font-size: .92rem; margin: .35rem 0; }
+  .row b { color: #1f4e79; }
+  .critic { font-size: .9rem; background: #eef4ee; border-left: 4px solid #6fae7e; padding: .45rem .8rem; margin: .5rem 0; }
+  .covered { background: #f0f8f0; border-left: 5px solid #27ae60; border-radius: 6px; padding: .5rem 1rem; margin: .4rem 0; font-size: .92rem; }
+  .summary-box { background: #e9eff5; border: 1px solid #a4b8cc; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; }
+  pre.verdict { background: #102536; color: #e8eef4; padding: 1rem 1.2rem; border-radius: 8px; font-size: .9rem; line-height: 1.9; overflow-x: auto; white-space: pre-wrap; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+</style>
+</head>
+<body>
+
+<h1>Ch 4 圖機會稽核——審核文件（gate-1）</h1>
+<p class="meta">2026-06-27 ・ 操作化 README 擴增檢查表第 7 項「視覺推理」。這是「<strong>該不該加圖</strong>」（opportunity）的閘——非「畫出來對不對」（那是 render 後的 D1–D8 圖正確性閘）。
+gate-1＝五節 <code>handout-figure-opportunity-audit</code> 並行＋章層 critic（<code>wf_a514bfba-3d6</code>，Claude、免費、唯讀）。
+<strong>唯讀：只提議、絕不畫圖。</strong></p>
+
+<h2>怎麼回覆（裁決表）</h2>
+<pre class="verdict">既有 3 圖：Figure 4.1（部分和收斂）/ 4.2（MVT）/ 4.3（exp-log 反射）——皆 ROADMAP key figure、已落地。
+
+§4.2 / §4.3：clean（純證明/演繹節，0 圖機會）　→ 同意 / 有異議 ___
+
+本批 3 個 net-new 機會（皆 medium）：
+  fig-op-s44-01  §4.4  Theorem A 兩側夾擠 ⟹ f′=0   [critic：最強]   畫 / 延後 / 不要 ___
+  FO-4.5-1       §4.5  Theorem 4.14 倒數斜率(1/x 幾何)  [medium]       畫 / 延後 / 不要 ___
+  F4.1-OPP-1     §4.1  完備性階梯(ℝ-vs-ℚ 洞)           [最弱但合法]    畫 / 延後 / 不要 ___
+
+「畫」＝實作 FIGS+fragment&lt;figure&gt;、再過 D1–D8 圖正確性雙閘；「延後」＝記入 ROADMAP Open questions（README 容許的有效收尾）；「不要」＝判為低值省略。
+回覆範例：「三個都畫」或「只畫 s44-01」或「全部延後（記 Open questions）」。</pre>
+
+<div class="summary-box">
+<strong>結論：</strong>本章是嚴格實分析章，§4.2/§4.3 為證明/純演繹節（0 圖機會＝預期有效結果），既有 3 張 ROADMAP key figure 已覆蓋主視覺。掃出 <strong>3 個 net-new 機會</strong>（§4.1/§4.4/§4.5 各 1，皆 medium），critic 獨立複核：與既有圖角度互補不重複、domain_facts 正確、不違 D-邊界、<strong>全建議保留</strong>，17 項其他想法駁回（純代數/裝飾/重複），0 漏缺。
+</div>
+
+<h2>§4.2 / §4.3 —— clean</h2>
+<div class="covered">純證明（§4.2：continuity 三段拆／Bolzano–Weierstrass／Cauchy／指數律雙和）與純演繹（§4.3：差分商 bound）皆為 ε–N 估計/代數重組，無可視覺化的幾何/函數行為。共 7 項想法駁回。</div>
+
+<h2>fig-op-s44-01 <span class="badge strong">§4.4 · critic 最強</span></h2>
+<div class="fig">
+<div class="row"><b>圖：</b>Theorem A（內部極值，Theorem 4.10）證明的「兩側夾擠」機制——在內部最大點 \(x_M\) 達峰的曲線，配左右兩條反向傾斜的割線（端點都落在峰下方）：右側 \(h>0\) 差分商 \(\le 0\)、左側 \(h<0\) 差分商 \(\ge 0\)，兩個單側極限把 \(f'(x_M)\) 從上下夾成 \(0\)，峰頂水平切線 solid。</div>
+<div class="row"><b>locus：</b>Theorem 4.10 證明之後、Rolle subsection 之前。</div>
+<div class="row"><b>why 圖優於文字：</b>證明是純符號雙不等式，讀者要把「商的正負」翻回「割線往哪斜/峰頂左升右降」才懂——這正是二維斜率對應，散文承載不了。同時解釋 Caution 的端點失效（端點只有單側增量、夾不住）。</div>
+<div class="row"><b>domain_facts：</b>\(x_M\) 嚴格在 open interior、峰頂水平切線、左割線正斜率右割線負斜率；可用局部凹函數示意、不必標 y 刻度（比照 Fig 4.2）。</div>
+<div class="critic"><b>critic：</b>三候選最強。與 Figure 4.2（整體 MVT secant–tangent）角度不同、不重複（4.2 不含單點極值的兩側夾擠）。落地原語（curve/seg/dot/text）Fig 4.2 已具。強烈保留。</div>
+</div>
+
+<h2>FO-4.5-1 <span class="badge med">§4.5 · medium</span></h2>
+<div class="fig">
+<div class="row"><b>圖：</b>Theorem 4.14（\(d/dx\ln x=1/x\)）的「倒數斜率」幾何——同框 \(e^x\)/\(\ln x\)，在一對鏡射對應點 \((a,e^a)\leftrightarrow(e^a,a)\) 各畫切線並標斜率三角形：\(e^x\) 在 \((a,e^a)\) 斜率 \(e^a\)，鏡射把 rise/run 對調 ⟹ \(\ln\) 在 \((e^a,a)\) 斜率 \(1/e^a=1/x\)。</div>
+<div class="row"><b>locus：</b>Theorem 4.14 證明之後或 Remark 4.5 之前。</div>
+<div class="row"><b>why 圖優於文字：</b>證明走純代數的 difference-quotient flip（取倒數），散文未給「為何倒數」的幾何根據。鏡射 ⟹ rise/run 對調 ⟹ 斜率互倒，是二維對應，散文承載不了。Figure 4.3 沒教這個角度。</div>
+<div class="row"><b>domain_facts：</b>ln 只 x&gt;0（x→0⁺ 垂直漸近線）；對應點須真為鏡射對、斜率 \(e^a\) 與 \(1/e^a\)；x/y 等比例尺使 45° 鏡射成立（同 Fig 4.3 硬要求）。</div>
+<div class="critic"><b>critic：</b>補 Theorem 4.14「取倒數」那一步的幾何，角度 net-new。保留意見：重用 Figure 4.3 同兩條曲線，有「Fig 4.3 加切線三角形」之嫌、與 4.3 鄰近度高；但教學角度確新、locus 不同，可保留。</div>
+</div>
+
+<h2>F4.1-OPP-1 <span class="badge med">§4.1 · 最弱但合法</span></h2>
+<div class="fig">
+<div class="row"><b>圖：</b>完備性「單調有界 ⟹ 收斂」階梯（Theorem 4.1＋Remark 4.1）——離散爬升點列 \(a_n\)（stems/dots，不連線）被水平天花板 \(M\) 擋住、逼近極限虛線 \(L\)；以 \(3,3.1,3.14,\dots\to\pi\) 為實例，ℝ-vs-ℚ 對比凸顯「極限恰落在數線的洞」。</div>
+<div class="row"><b>locus：</b>Remark 4.1 之後。</div>
+<div class="row"><b>why 圖優於文字：</b>把離散爬升點列、上界 M、被夾出的極限 L 三者放進同一畫面，一眼看見「被天花板壓住的單調點列無處可去、只能收斂」；ℝ-vs-ℚ 對比尤難用純文字傳達。</div>
+<div class="row"><b>domain_facts：</b>序列項離散（畫 stems/dots 不連線）；M 水平上界、L 虛線（從下逼近不達到、用空心點）；M=4、L=π≈3.14159；完備性本章「陳述不證」→ caption 勿暗示「圖證明了它」。</div>
+<div class="critic"><b>critic：</b>與 Figure 4.1（級數曲線收斂）對象不同（序列 vs 級數）、不重複。三 keep 中最弱：「被天花板壓住」一句散文亦可達意，真正圖優於文字處是 ℝ-vs-ℚ 對比。medium 合理。</div>
+</div>
+
+<p class="small" style="margin-top:2rem">— 下一步：你勾完 →「畫」者 import（FIGS+&lt;figure&gt;）→ build → render 圖 PNG → <strong>圖正確性 D1–D8 雙閘</strong>（gate-1 Claude 吃 PNG＋gate-2 Codex 視覺第二讀者）；「延後」者記入 ROADMAP Chapter 4 Open questions。圖正確性閘是「同級全跑」的必要一道——若全延後，該閘對 Ch4 即無新圖待審（既有 3 圖的正確性可一併在該閘補審）。</p>
+
+</body>
+</html>

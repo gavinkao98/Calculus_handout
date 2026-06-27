@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 4 課文範例補充——審核文件（2026-06-27）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.75;
+         max-width: 52rem; margin: 2rem auto 6rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.5rem; }
+  h3 { font-size: 1.02rem; margin: 1.8rem 0 .4rem; }
+  .badge { display: inline-block; font-size: .72rem; padding: .05rem .5rem; border-radius: 999px;
+           vertical-align: middle; margin-left: .45rem; font-weight: 600; }
+  .hi   { background: #dbe9fb; color: #1f4e79; }
+  .med  { background: #fdf2dd; color: #8a5a00; }
+  .l1   { background: #fde2e0; color: #9a2820; }
+  .l2   { background: #fdf2dd; color: #8a5a00; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .1rem 0 .6rem; }
+  .meta code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  .why  { font-size: .92rem; background: #f2f6fa; border-left: 4px solid #8aa6c0; padding: .5rem .8rem; margin: .6rem 0; }
+  .ex   { border: 1px solid #bcd6bc; border-left: 5px solid #2e7d32; border-radius: 6px;
+          background: #f6faf6; padding: .7rem 1rem; margin: .7rem 0 0; }
+  .sol  { border: 1px solid #d7dde3; border-left: 5px solid #90a0b0; border-radius: 6px;
+          background: #f7f8f9; padding: .7rem 1rem; margin: .35rem 0 .8rem; }
+  .ex::before  { content: "Example（擬補）"; font-weight: 700; color: #2e7d32; display: block; font-size: .8rem; letter-spacing: .04em; }
+  .sol::before { content: "Solution"; font-weight: 700; color: #5b6b7b; display: block; font-size: .8rem; letter-spacing: .06em; }
+  .prov { font-size: .82rem; color: #5b6b7b; margin: .2rem 0 0; }
+  .prov code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; }
+  .note { font-size: .9rem; background: #fff8e8; border-left: 4px solid #d9a514; padding: .5rem .8rem; margin: .5rem 0 1rem; }
+  .gap-l1 { background: #fdf0f0; border-left: 5px solid #c0392b; border-radius: 6px; padding: .7rem 1rem; margin: .7rem 0; }
+  .gap-l2 { background: #fdf8ed; border-left: 5px solid #d9a514; border-radius: 6px; padding: .7rem 1rem; margin: .7rem 0; }
+  .covered { background: #f0f8f0; border-left: 5px solid #27ae60; border-radius: 6px; padding: .5rem 1rem; margin: .4rem 0; font-size: .92rem; }
+  .summary-box { background: #e9eff5; border: 1px solid #a4b8cc; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; }
+  .critic-box { background: #eef4ee; border: 1px solid #a4ccb0; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: .92rem; }
+  pre.verdict { background: #102536; color: #e8eef4; padding: 1rem 1.2rem; border-radius: 8px; font-size: .9rem; line-height: 1.9; overflow-x: auto; white-space: pre-wrap; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: .8rem 0 1.2rem; }
+  th, td { border: 1px solid #c9d3dd; padding: .35rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #e9eff5; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+  details { margin: .6rem 0; font-size: .88rem; color: #475467; }
+  details summary { cursor: pointer; font-weight: 600; color: #5b6b7b; }
+  details ul { margin: .4rem 0; padding-left: 1.2rem; }
+  details li { margin: .35rem 0; }
+</style>
+</head>
+<body>
+
+<h1>Ch 4 課文範例補充——審核文件（Mode C 第①波）</h1>
+<p class="meta">2026-06-27 ・ 框架：題庫補的是<strong>課文內的 worked examples</strong>（講義不收習題，習題另出獨立習題本）。
+工作流程契約：<code>CONTENT_SOURCING.md</code>；選題 subagent：<code>.claude/agents/example-supplement.md</code>。
+gate-1＝五節並行 <code>example-supplement</code> 缺口分析 ＋ 章層 completeness critic（皆 Claude，免費、唯讀）。
+每筆附完整擬改寫的 Example＋Solution——你審的就是會印出來的內容。來源優先序：手稿（已出貨）→ <strong>CLP-1 §2.13 對症真題</strong>（本批全部）→ authored（本批 0；E1 解為本次撰寫）。</p>
+
+<!-- ===================== 裁決表 ===================== -->
+<h2>怎麼回覆（裁決表）</h2>
+<pre class="verdict">§4.1 Construction：0 候選（theory-heavy；幾何尾界技巧已在 Thm 4.2 證明內示範）　→ 同意 clean / 有異議 ___
+§4.2 Continuity & Exponent Law：0 候選（proof section；③ 已裁定 no worked example）　→ 同意 clean / 有異議 ___
+§4.3 Derivative of eˣ：0 候選（③ 已核可 no worked example；計算動作 Ch2/Ch3 已示範）　→ 同意 clean / 有異議 ___
+
+§4.4 Rolle & MVT（CLP-1 §2.13）：
+  4.4-E1  MVT → Lipschitz 估計   |sin a − sin b| ≤ |a − b|   [high]   收 / 不收 ___
+  4.4-E2  Rolle 反用 → 根計數     3x − sin x 恰一根            [high]   收 / 不收 ___
+
+§4.5 Monotonicity & Logarithm：0 候選（ln 計算動作 Ch3 §3.3 已示範；Example 4.5 充分）　→ 同意 clean / 有異議 ___
+
+回覆範例：「4.4-E1、4.4-E2 全收」或「只收 E1」或「兩條都不收（維持現狀）」。
+裁決通過後 →（可選）Codex 選題稽核 gate-2（計費、另徵同意）→ import pass（插入 fragment → 手動重編號 → build.py ch04 重生 → render 自驗）。</pre>
+
+<!-- ===================== 缺口分析摘要 ===================== -->
+<h2>缺口分析摘要</h2>
+<div class="summary-box">
+<strong>結論：</strong>Layer 1 正式缺口 <strong>0</strong> 個、Layer 2 soft gap <strong>2</strong> 個（皆 §4.4：MVT 的 Lipschitz 估計用法、Rolle 的根計數反用）。<br>
+本批擬補 <strong>2</strong> 筆，皆 CLP-1 §2.13 對症真題、CC BY-NC-SA 4.0、數學已雙重自核（出題 subagent ＋ 章層 critic 各獨立查核、皆正確）。<strong>§4.1／§4.2／§4.3／§4.5 四節判定 clean</strong>——本章是嚴格的實分析建構章，多數教學點為帶完整證明的具名定理，定理證明本身即 worked-style 示範，補題空間極小。
+</div>
+
+<table>
+<tr><th>節</th><th>既有 Example</th><th>本批擬補</th><th>缺口型</th></tr>
+<tr><td>§4.1 Construction of eˣ</td><td>1（Ex 4.1 部分和）</td><td><strong>+0</strong></td><td>—（theory-heavy）</td></tr>
+<tr><td>§4.2 Continuity &amp; Exponent Law</td><td>0</td><td><strong>+0</strong></td><td>—（proof section）</td></tr>
+<tr><td>§4.3 Derivative of eˣ</td><td>0</td><td><strong>+0</strong></td><td>—（純演繹，③ 核可無例）</td></tr>
+<tr><td>§4.4 Rolle &amp; MVT</td><td>3（Ex 4.2–4.4）</td><td><strong>+2</strong></td><td>L2×2</td></tr>
+<tr><td>§4.5 Monotonicity &amp; Logarithm</td><td>1（Ex 4.5 general powers）</td><td><strong>+0</strong></td><td>—（Ch3 已示範 ln 計算）</td></tr>
+</table>
+
+<p class="small"><strong>系統性薄點：</strong>真正的缺口只集中在 <strong>§4.4</strong>。現有三例（Ex 4.2 數值找 \(c\)、Ex 4.3 sin 單調、Ex 4.4 \(e^x\) 單調）全屬同一條動作軸——「正面套 MVT/Cor 4.3 找 \(c\) 或讀單調」；MVT／Rolle 作為<strong>證明工具</strong>的兩個經典動作完全沒有 worked example：(E1) 把導數的界翻成函數變化的界（Lipschitz 估計），(E2) 用 Rolle 反向排除第二根、精確計數方程根數。其餘四節為「建構／證明／純演繹」節，定理證明本身即示範，CLP1 power-series／Cauchy 收斂屬 CLP2 範圍無對症題源——乾淨是有效結果，非漏報。</p>
+
+<!-- ===================== §4.1 ===================== -->
+<h2>§4.1 Construction of the Exponential Function —— clean（無缺口）</h2>
+<div class="covered">
+1 個 worked example（Ex 4.1 partial sums of \(e\)）＋Def 4.1＋Thm 4.1/4.2＋Strategy 4.1＋Figure 4.1＋Remark 4.1＋Caution，覆蓋到位。唯一具程序性的「新動作」（幾何尾界 bounding）已在 <strong>Theorem 4.2 的證明內</strong>完整逐步示範（選 \(n_0>2x\)、ratio \(=x/(n+1)<\tfrac12\)、尾界 \(\le x^{n_0}/n_0!\)）。
+</div>
+<div class="note"><strong>考慮過但駁回（4 個）：</strong>Strategy 4.1 獨立演示（同技巧換級數＝drill，且收斂判定屬 CLP2／超綱）、用尾界 \((\ast)\) 做「精度認證」（Ex 4.1 已示範、且誤導本節重點＝理論機器而非數值 drill）、Def 4.1 數值代入（Ex 4.1 已涵蓋「代入級數累加」唯一動作）、完備性示範（純存在定理，Remark 4.1 的 \(\pi\) 序列已是恰當示範形式）。本地 CLP1 無對症 power-series 收斂題源。</div>
+
+<!-- ===================== §4.2 ===================== -->
+<h2>§4.2 Continuity and the Exponent Law —— clean（無缺口）</h2>
+<div class="covered">
+fragment header 已記載 ③ 方向閘裁定「<strong>No worked examples, no figures（proof section）</strong>」。教學點（Def 4.2 Cauchy、Thm 4.3–4.7、Prop 4.1、Cor 4.1）皆存在性定理與 ε-δ／級數證明；每個定理證明本身即逐步 worked-style 演示，無「可計算而證明未涵蓋」的學生動作。
+</div>
+<div class="note"><strong>考慮過但駁回（4 個）：</strong>數值 Cauchy 驗證（Prop 4.1 證明本身即用 Cauchy criterion 判斂的示範）、ℚ-反例 \(\sum 1/n!\to e\) 重算（Caution 已散文點名）、指數律恆等式（Cor 4.1 證明已示範 \(e^x e^{-x}=1\)）、ε-δ 連續性例（Thm 4.3/4.6 證明本身即 ε-δ 演示）。CLP1 此節無對症題源（sequence-Cauchy 屬 CLP2／實分析）。</div>
+
+<!-- ===================== §4.3 ===================== -->
+<h2>§4.3 The Derivative of eˣ —— clean（無缺口）</h2>
+<div class="covered">
+brief ③ 已核可「<strong>No worked examples（本書最短、純演繹節）</strong>」。教學點（Prop 4.2 bound、Thm 4.8 嚴格證明、Cor 4.2 高階導數）皆帶完整證明。
+</div>
+<div class="note"><strong>考慮過但駁回（5 個）：</strong>CLP1 §2.7/§2.14 的所有對症計算題（\(e^{2x}\)、\(e^{-x}\)、\(xe^x\)、180th derivative、\(P(t)=100e^{0.2t}\)）教的動作——把 chain/product/quotient rule 套到 \(e^u\)、用導數符號判單調、指數建模——本書已由 <strong>Ch2 §2.4–§2.5 與 Ch3 §3.3</strong>（尤其 Ex 3.11 的 \(e^{x\ln 2}\) 複合微分）示範完畢；其餘屬 §4.4/§4.5 才建立工具的後續節（單調性 Cor 4.3、growth/decay capstone）。在 §4.3 補任何計算例都會重複 Ch3 已示範的動作、或違反本節已簽核的純演繹定位。</div>
+
+<!-- ===================== §4.4 ===================== -->
+<h2>§4.4 Rolle’s Theorem and the Mean Value Theorem —— L2×2</h2>
+
+<div class="gap-l2"><strong>L2：MVT／Rolle 作為「證明工具」從未示範。</strong>現有三例（Ex 4.2 解出 \(c=1\)、Ex 4.3/4.4 讀單調性）全部解出特定 \(c\) 或正面讀單調；沒有一例用 \(|f'|\) 的上界去 bound 函數值的差，也沒有一例把 Rolle 反過來用以排除第二根。</div>
+
+<h3>4.4-E1 <span class="badge hi">high</span><span class="badge l2">L2</span>　MVT → Lipschitz 估計（只用存在性、不解 c）</h3>
+<div class="ex">
+<p>Use the Mean Value Theorem to show that \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\) for all real numbers \(a\) and \(b\).</p>
+</div>
+<div class="sol">
+<p>If \(a=b\) both sides are \(0\) and there is nothing to prove, so assume \(a \ne b\); relabel if necessary so that \(b < a\). The function \(f(x)=\sin x\) is continuous on \([b,a]\) and differentiable on \((b,a)\) (it is differentiable on all of \(\mathbb{R}\)), so by the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b,a)\) with
+\[ \frac{\sin a - \sin b}{a - b} = f'(c) = \cos c. \]
+We do not need to know which \(c\) — only that one exists. Multiplying across and taking absolute values,
+\[ \lvert \sin a - \sin b \rvert = \lvert \cos c \rvert \,\lvert a - b \rvert. \]
+Since \(\lvert \cos c \rvert \le 1\) for every real \(c\), this gives \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\), as claimed.</p>
+<p>(The same argument bounds the change of any function by a bound on its derivative: if \(\lvert f' \rvert \le K\) throughout an interval, then \(\lvert f(a)-f(b) \rvert \le K\lvert a-b \rvert\) for any two points in it.)</p>
+</div>
+<p class="prov"><strong>source:</strong> <code>[source: CLP-1 §2.13 (MVT) — bounded-derivative application 變式]</code>　·　<strong>license:</strong> CC BY-NC-SA 4.0　·　<strong>rewrite:</strong> 重寫（<strong>解為本次撰寫</strong>）。CLP-1 原題 \(f(0)=0,\ f'(x)=1/(1+e^{-f(x)})<1\Rightarrow f(100)<100\) 用同一招「\(|f'|\) 有界 ⟹ \(|\Delta f|\) 有界」，但函數隱式、自參照微分方程、超綱；本候選改用 \(\sin\)（顯式、自足、只需 \(|\cos|\le1\)），是本書語域裡這招最乾淨的入門版。通用化尾註亦為本次撰寫。<strong>須 gate-2 數學覆核。</strong></p>
+<div class="why"><strong>why（teaching function）：</strong>教 MVT 的一個全新動作——把「導數有界」翻成「函數變化有界」（Lipschitz 估計）。緊接 <strong>Strategy 4.2 step 3</strong>「the theorem promises existence only … may rely on the existence of such a \(c\), but not on any specific value」的<em>第一個正面落地</em>：既有例都解出 \(c\)，本例刻意不解 \(c\)、只用 \(|\cos c|\le1\)。只用 Theorem 4.12 與 \(|\cos|\le1\)，高中自學可讀、無需新圖。</div>
+
+<h3>4.4-E2 <span class="badge hi">high</span><span class="badge l2">L2</span>　Rolle 反用 → 精確根計數</h3>
+<div class="ex">
+<p>How many real roots does \(f(x)=3x-\sin x\) have? Show that your count is exact.</p>
+</div>
+<div class="sol">
+<p>By inspection \(f(0)=3\cdot 0-\sin 0 = 0\), so \(x=0\) is a root; \(f\) has at least one. The question is whether there could be a second. Suppose, for contradiction, that \(f\) had a second root \(a \ne 0\). Then \(f(0)=f(a)=0\), and \(f\) is continuous and differentiable on all of \(\mathbb{R}\), so Rolle's theorem (Theorem 4.11) applied to the interval between \(0\) and \(a\) would supply a point \(c\) strictly between them with \(f'(c)=0\). But
+\[ f'(x) = 3 - \cos x, \]
+and since \(\cos x \le 1 < 3\) for every real \(x\), we have \(f'(x) \ge 3-1 = 2 > 0\) everywhere — \(f'\) is never zero. No such \(c\) can exist, so the assumed second root is impossible.</p>
+<p>Therefore \(f(x)=3x-\sin x\) has exactly one real root, namely \(x=0\). (The pattern is general: a function whose derivative never vanishes can have at most one root, because two roots would force a zero of \(f'\) between them.)</p>
+</div>
+<p class="prov"><strong>source:</strong> <code>[source: CLP-1 §2.13 (MVT) Procedural — “How many roots does 3x−sin x have?”]</code>　·　<strong>license:</strong> CC BY-NC-SA 4.0　·　<strong>rewrite:</strong> 輕改（官方 solution 全文可得、照搬論證骨架）。僅補一行 \(f'(x)\ge2>0\) 的明算（原解只說「never zero」）與一句通用化尾註（為本次撰寫）。</p>
+<div class="why"><strong>why：</strong>教 Rolle 的反向（contrapositive）動作——用「\(f'\) 永不為零」排除第二根、精確計數方程根數（先 by inspection 找一根，再 by Rolle 排除其餘）。本節無任何「根計數／Rolle 反用」示範。與 E1 不同動作（E1 做大小估計、E2 做根計數）。<strong>關鍵邊界：</strong>與 §4.5 Corollary 4.4（\(f'\equiv0\Rightarrow\) constant）不衝突——Cor 4.4 是 \(f'\) 恆零得常數，本例是 \(f'\) 恆非零排第二根，方向相反（critic 已逐字核對 sec-4-5 確認）。只用 \(\cos\le1\)，高中自學可讀、無需新圖。</div>
+
+<details>
+<summary>§4.4 考慮過但駁回（6 個）</summary>
+<ul>
+<li><strong>再補一個「正面套 MVT 數值找 c」</strong>（\(e^x\) on \([0,T]\)、多項式找 \(c\)）：Ex 4.2 已示範此動作，同型換數字＝drill，drop。</li>
+<li><strong>用 Rolle/MVT 證「f 在某區間 one-to-one／可逆」</strong>：與 E2 本質同源（皆「\(f'\) 非零 ⟹ 不重複取值」），且 injectivity 收尾正是本節已寫的「\(e^x\) strictly increasing ⟹ one-to-one ⟹ §4.5 定義 \(\ln\)」交棒散文，重疊，drop。</li>
+<li><strong>MVT 的物理／情境應用</strong>（caribou 70kph、sandhill crane 平均速率題）：brief §application 已定向本節 application＝Corollary 本身＋兩單調性例，不另放裝飾性 real-world，避免稀釋證明階梯，drop。</li>
+<li><strong>用 MVT/Cor 證「f′=0 ⟹ const」或「兩函數導數相等 ⟹ 差為常數」</strong>（arcsec=C−arccsc 題）：\(f'=0\Rightarrow\)const 已在 §4.5 升格具名 Corollary 4.4；且 arcsec/arccsc 涉反三角導數（本章未建、超綱），drop。</li>
+<li><strong>Layer 1：Def 4.3 max/min、Thm 4.9 EVT、Thm 4.10 Thm A 各自無獨立 example</strong>：非真缺口。Def 4.3 已有 \(\cos x\) 散文錨例；EVT/Thm A 是黑箱定理／證明中介，其「動作」即定理證明本身（內文已給）。Layer 1 乾淨。</li>
+<li><strong>MVT 進階 bounded-derivative 估計</strong>（CLP \(f(100)<100\) 自參照 ODE 題）：函數隱式、依賴自我參照微分方程、超綱；其教學動作已由 E1 的 sin 版以更乾淨自足的形式覆蓋，drop。</li>
+</ul>
+</details>
+
+<!-- ===================== §4.5 ===================== -->
+<h2>§4.5 Monotonicity and the Logarithmic Function —— clean（無缺口）</h2>
+<div class="covered">
+既有 Example 4.5（general powers \(a^x:=e^{x\ln a}\)，封住 §4.1 的 \(a^r\) forward-fence）為唯一且充分的計算型示範。Prop 4.3 與 Cor 4.4 的「落地用途」已在本節內互相串接示範（Cor 4.4 用於 Prop 4.3 證明；Prop 4.3 用於 Example 4.5）；ln 應用由本節末 application capstone 覆蓋。
+</div>
+<div class="note"><strong>考慮過但駁回（6 個）：</strong>direct ln(內層) 計算（\(d/dx\ln(10x)\)、\(\ln(x^2)\)）——本節 Thm 4.14 教的新動作是「不預設可微、用 inverse-function 技巧嚴格導出 \(1/x\)」，而「把 \((\ln u)'=u'/u\) 套到具體內層」<strong>Ch3 §3.3 已大量示範</strong>（Ex 3.9 chain-rule informal 路徑、Ex 3.10–3.13 logarithmic differentiation），指派 D-邊界明文要求對此類去重；base-change／\(d/dx\log_{10}x\)（超出本節 scope，未 mint 換底）；ln 應用題（複利、dB——同型換場景，capstone 已覆蓋）；\(\ln(\cos^2x)\) 誤解題（涉本節未建的 power law）；\(x^x\) log-diff（Ch3 已示範，明文去重命中）。</div>
+
+<!-- ===================== 章層 critic 複核 ===================== -->
+<h2>章層 completeness critic 複核（gate-1 對抗式第二讀者）</h2>
+<div class="critic-box">
+<strong>cross_section_duplicates：</strong>無——四節 clean 各自無候選，§4.4 兩例互為不同動作（E1 Lipschitz 估計／E2 Rolle 反向根計數），且不與其他節或 Ch3 §3.3 log-diff 重疊；grep 獨立確認 ch04 全章無既有 Lipschitz 或根計數例。<br>
+<strong>missed_gaps：</strong>無——四 clean 節判定複核成立、乃寧缺勿濫的有效結果，非漏報（§4.1/§4.2 建構節定理證明即示範、CLP1 收斂題屬 CLP2；§4.3 純演繹、計算動作 Ch2/Ch3 已示範；§4.5 ln 計算 Ch3 已履行）。<br>
+<strong>challenged_candidates：</strong>4.4-E1、4.4-E2 皆 <strong>recommend_drop = false</strong>。兩例數學獨立自核皆正確（E1：\(|\sin a-\sin b|=|\cos c||a-b|\le|a-b|\)；E2：\(f(0)=0\)、\(f'=3-\cos x\ge2>0\) 故恰一根），皆只用本章內可用工具、不踩 D4/D6/D7/§4.5 任何邊界，程度貼齊、無需新圖。<br>
+<strong>overall：</strong>總候選 2（皆 §4.4、Layer-2、high），建議全留、駁回 0。本章 example-supplement gate-1 結論穩健——四 theory-heavy 節 clean、§4.4 補兩例。唯一 advisory：E1 解為本次撰寫，gate-2 須對重寫解與通用化尾註做數學覆核（兩例 JSON 自身與 critic 均如此建議）。
+</div>
+
+<p class="small" style="margin-top:2rem">— 下一步：你勾完裁決表 →（可選）跑 <strong>Codex 選題稽核 gate-2</strong>（計費前另徵你同意；重點覆核 E1 重寫解＋E2 補算行的數學正確性、來源授權標示）→ import pass（緊跟 Strategy 4.2／Example 4.2 帶區插入 \(env\)-example、<strong>手動重編號</strong>——插 2 例會把現有 Example 4.5 cascade 成 4.7、其後散文 cross-ref 一併更新；\(env\)-example 計數器章內連續 → \(build.py\ ch04\) 重生 → render 自驗）→ 產 <code>REVIEW-ch04-example-supplement-applied.html</code>。<br>
+若你裁定「兩條都不收」，§4.4 維持 3 例，本章 Mode C ①波即收斂（全章 clean），可直接進 ②波軟深度。</p>
+
+</body>
+</html>

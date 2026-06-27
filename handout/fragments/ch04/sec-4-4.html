@@ -4,10 +4,11 @@
      brief brief_s44.md approved at ③ (2026-06-21, "全照提案核可" + all four
      optional add-ons selected). Numbering is MANUAL and CONTINUES from §4.1–§4.3:
      those used Definition 4.1/4.2, Theorem 4.1–4.8, Proposition 4.1/4.2,
-     Corollary 4.1/4.2, Strategy 4.1, Example 4.1, Figure 4.1, Remark 4.1–4.3 —
+     Corollary 4.1/4.2, Strategy 4.1, Example 4.1, Figure 4.1/4.2, Remark 4.1–4.3 —
      so §4.4 mints Definition 4.3, Theorem 4.9 (EVT) / 4.10 (Theorem A) /
-     4.11 (Rolle) / 4.12 (MVT), Corollary 4.3, Strategy 4.2, Figure 4.2,
-     Example 4.2/4.3/4.4, Remark 4.4. No Proposition is minted here.
+     4.11 (Rolle) / 4.12 (MVT), Corollary 4.3, Strategy 4.2, Figure 4.3/4.4,
+     Example 4.2–4.6, Remark 4.4. No Proposition is minted here. (Mode A minted
+     Example 4.2/4.3/4.4; Mode C ① inserted 4.3/4.4 — see the Mode C ① note below.)
      Cross-references are plain prose. Math cross-checked against the signed
      legacy ground truth legacy/tex_handout/chapters/ch04_exponential_logarithm.tex
      §4.4 (sec:rolle-and-mvt) and the monotonicity corollary at the head of §4.5
@@ -23,15 +24,16 @@
          monotonicity (injectivity) to define ln x. Legacy states both.
        - §C-3: the EVT (Theorem 4.9) is stated WITHOUT proof (manuscript defers it
          to completeness); a compact note records that both hypotheses are essential.
-       - §C-4 (ROADMAP key figure): Figure 4.2 — the MVT secant–tangent picture.
+       - §C-4 (ROADMAP key figure): Figure 4.4 — the MVT secant–tangent picture
+         (was 4.2 before the figure-opportunity gate inserted Figure 4.3).
        - §C-5 (ROADMAP strategy): Strategy 4.2 — verifying the MVT hypotheses,
          with the |x| on [-1,1] counterexample and the closed/open asymmetry folded in.
        - §C-6: a Thm-A interior-necessity caution; the every-[a,b]⟹ℝ note folded
-         into Example 4.4.
-       - §C-7: a one-line justification that e^x > 0 everywhere (Example 4.4).
+         into Example 4.6 (the e^x monotonicity example; was 4.4 before Mode C ①).
+       - §C-7: a one-line justification that e^x > 0 everywhere (Example 4.6).
        - §C-8: Theorem 4.10 keeps the manuscript's name "Theorem A" as a subtitle.
        - §C-9 (optional taken): the two corollary examples are SPLIT into
-         Example 4.3 (sin) and Example 4.4 (e^x).
+         Example 4.5 (sin) and Example 4.6 (e^x) [renumbered +2 by Mode C ①].
        - §C-10 (optional taken): Remark 4.4 is an explicit box (the existence-engine
          synthesis), not folded into prose.
        - history (optional taken): a one-sentence attribution of Rolle and the MVT
@@ -39,8 +41,17 @@
        - extra MVT worked example (optional taken): Example 4.2 applies the MVT
          directly to f(x) = x^2 on [0, 2] (c = 1).
        - D4: the MVT stays in this chapter (a forward-only fence to §4.5).
+     Mode C ① (2026-06-27): two worked examples inserted after Example 4.2, before
+     the monotonicity subsection — Example 4.3 (|sin a − sin b| ≤ |a − b| via the
+     MVT, a Lipschitz estimate) and Example 4.4 (root count of 3x − sin x via Rolle's
+     contrapositive). Both [source: CLP-1 §2.13], CC BY-NC-SA 4.0; E1's solution
+     authored, E2 a light rewrite. gate-1 (example-supplement ×5 + chapter critic)
+     0 blocking; gate-2 (Codex gpt-5.5 xhigh) run1 converged 0 blocking. This
+     renumbered the former Example 4.3 (sin)→4.5 and 4.4 (e^x)→4.6 here, and §4.5's
+     general-powers Example 4.5→4.7. See _dev-archive/ch04/ch04_example-supplement-
+     {review.html, audit.md}.
      Counters handed to §4.5: Definition 4.4, Theorem 4.13, Proposition 4.3,
-     Corollary 4.4, Strategy 4.3, Example 4.5, Figure 4.3, Remark 4.5. -->
+     Corollary 4.4, Strategy 4.3, Example 4.7, Figure 4.5, Remark 4.5. -->
 
 <article class="sec" lang="en">
 
@@ -105,6 +116,11 @@
     </div>
   </section>
 
+  <!-- expansion:figure [pass: enrichment] [source: pedagogical synthesis — Theorem A two-sided squeeze; registered in chapter4 FIGS as "interior-extremum-squeeze"] -->
+  <figure class="figure" data-fig="interior-extremum-squeeze">
+    <figcaption><span class="fig-no">Figure 4.3</span> At an interior maximum \(x_{M}\) the difference quotient is \(\le 0\) on the right (a secant sloping down) and \(\ge 0\) on the left (a secant sloping up). The one value \(f'(x_{M})\) is caught between, so it must be \(0\): the tangent there is horizontal. The squeeze needs both sides — which is exactly why the conclusion can fail at an endpoint.</figcaption>
+  </figure>
+
   <!-- expansion:caution — the "interior" hypothesis is essential; endpoint extrema need not have zero derivative -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
@@ -149,7 +165,7 @@
 
   <!-- expansion:figure — the canonical MVT picture (ROADMAP §4.4 key figure); registered in chapter4 FIGS as "mvt-secant-tangent" -->
   <figure class="figure" data-fig="mvt-secant-tangent">
-    <figcaption><span class="fig-no">Figure 4.2</span> The Mean Value Theorem. The secant through \((a, f(a))\) and \((b, f(b))\) (dashed) has slope \((f(b) - f(a))/(b - a)\); the theorem guarantees an interior point \(c\) where the tangent (solid) is parallel to it. The proof tilts the picture by subtracting the secant, reducing the claim to Rolle’s theorem.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.4</span> The Mean Value Theorem. The secant through \((a, f(a))\) and \((b, f(b))\) (dashed) has slope \((f(b) - f(a))/(b - a)\); the theorem guarantees an interior point \(c\) where the tangent (solid) is parallel to it. The proof tilts the picture by subtracting the secant, reducing the claim to Rolle’s theorem.</figcaption>
   </figure>
 
   <section class="env env-proof">
@@ -208,6 +224,45 @@
     </section>
   </div>
 
+  <!-- expansion:example — Example 4.3 (Mode C ①, 2026-06-27): the MVT as a bound — turning a bound on \(f'\) into a Lipschitz estimate on \(f\); the first positive use of Strategy 4.2 step 3's "existence only, no specific c" clause [pass: enrichment] [source: CLP-1 §2.13 (MVT), bounded-derivative application variant; solution authored] [license: CC BY-NC-SA 4.0] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.3</span></p>
+      <div class="env-body">
+        <p>Use the Mean Value Theorem to show that \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\) for all real numbers \(a\) and \(b\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>If \(a = b\) both sides are \(0\) and there is nothing to prove, so assume \(a \ne b\); relabel if necessary so that \(b &lt; a\). The function \(f(x) = \sin x\) is continuous on \([b, a]\) and differentiable on \((b, a)\) — it is differentiable on all of \(\mathbb{R}\) — so by the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with</p>
+        <p>\[ \frac{\sin a - \sin b}{a - b} = f'(c) = \cos c. \]</p>
+        <p>We do not need to know which \(c\) — only that one exists. Multiplying across and taking absolute values,</p>
+        <p>\[ \lvert \sin a - \sin b \rvert = \lvert \cos c \rvert \,\lvert a - b \rvert. \]</p>
+        <p>Since \(\lvert \cos c \rvert \le 1\) for every real \(c\), this gives \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\), as claimed. The same argument bounds the change of any function by a bound on its derivative: if \(\lvert f' \rvert \le K\) throughout an interval, then \(\lvert f(a) - f(b) \rvert \le K \lvert a - b \rvert\) for any two points in it. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 4.4 (Mode C ①, 2026-06-27): Rolle's contrapositive — a derivative that never vanishes forces at most one root, giving an exact root count [pass: enrichment] [source: CLP-1 §2.13 (MVT) Procedural, "How many roots does 3x − sin x have?"; light rewrite] [license: CC BY-NC-SA 4.0] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.4</span></p>
+      <div class="env-body">
+        <p>How many real roots does \(f(x) = 3x - \sin x\) have? Show that your count is exact.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>By inspection \(f(0) = 3 \cdot 0 - \sin 0 = 0\), so \(x = 0\) is a root; \(f\) has at least one. The question is whether there could be a second. Suppose, for contradiction, that \(f\) had a second root \(a \ne 0\). Then \(f(0) = f(a) = 0\), and \(f\) is continuous and differentiable on all of \(\mathbb{R}\), so Rolle's theorem (Theorem 4.11) applied to the interval between \(0\) and \(a\) would supply a point \(c\) strictly between them with \(f'(c) = 0\). But</p>
+        <p>\[ f'(x) = 3 - \cos x, \]</p>
+        <p>and since \(\cos x \le 1 &lt; 3\) for every real \(x\), we have \(f'(x) \ge 3 - 1 = 2 &gt; 0\) everywhere — \(f'\) is never zero. No such \(c\) can exist, so the assumed second root is impossible.</p>
+        <p>Therefore \(f(x) = 3x - \sin x\) has exactly one real root, namely \(x = 0\). The pattern is general: a function whose derivative never vanishes has at most one root, since two roots would force a zero of \(f'\) between them. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <h3 class="subsec-head">Monotonicity from the sign of the derivative</h3>
 
   <p>Now the payoff. The MVT converts the sign of the derivative directly into monotonic behavior, turning the qualitative slogan “positive derivative means increasing” into a theorem.</p>
@@ -233,11 +288,19 @@
     </div>
   </section>
 
+  <!-- expansion:caution [pass: enrichment] [source: pedagogical synthesis — false-converse pitfall for the monotonicity corollary; x^3 counterexample] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Corollary 4.3 runs in one direction only: a positive derivative forces strict increase, not the reverse. A strictly increasing function need <em>not</em> have a strictly positive derivative everywhere. The function \(f(x) = x^{3}\) is strictly increasing on all of \(\mathbb{R}\), yet \(f'(0) = 0\); the derivative is allowed to touch zero at isolated points without spoiling strict monotonicity. The corollary is a sufficient test, not a characterisation.</p>
+    </div>
+  </section>
+
   <p>Two applications close the section — the second is the one we have been working toward.</p>
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.3</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.5</span></p>
       <div class="env-body">
         <p>Show that \(\sin x\) is strictly increasing on \([0, \tfrac{\pi}{4}]\).</p>
       </div>
@@ -252,7 +315,7 @@
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.4</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.6</span></p>
       <div class="env-body">
         <p>Show that \(e^{x}\) is strictly increasing on all of \(\mathbb{R}\).</p>
       </div>

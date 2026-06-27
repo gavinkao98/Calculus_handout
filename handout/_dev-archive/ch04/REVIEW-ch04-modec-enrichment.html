@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 4 軟深度充實——審核文件（Mode C 第②波，2026-06-27）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.75;
+         max-width: 52rem; margin: 2rem auto 6rem; padding: 0 1.2rem; color: #1c2733; background: #fcfcfa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; border-bottom: 1px solid #c8d4e0; padding-bottom: .25rem; margin-top: 2.5rem; }
+  h3 { font-size: 1.02rem; margin: 1.8rem 0 .4rem; }
+  .badge { display: inline-block; font-size: .72rem; padding: .05rem .5rem; border-radius: 999px; vertical-align: middle; margin-left: .45rem; font-weight: 600; }
+  .hi { background: #dbe9fb; color: #1f4e79; } .med { background: #fdf2dd; color: #8a5a00; } .low { background: #eceff2; color: #5b6b7b; }
+  .meta { font-size: .85rem; color: #5b6b7b; margin: .1rem 0 .6rem; }
+  .meta code, .prov code { background: #eef1f4; padding: .05rem .3rem; border-radius: 4px; font-size: .8rem; }
+  .why  { font-size: .92rem; background: #f2f6fa; border-left: 4px solid #8aa6c0; padding: .5rem .8rem; margin: .6rem 0; }
+  .caution { border: 1px solid #e0c89a; border-left: 5px solid #d9a514; border-radius: 6px; background: #fffaf0; padding: .7rem 1rem; margin: .7rem 0 0; }
+  .caution::before { content: "Caution（擬補，無編號）"; font-weight: 700; color: #8a5a00; display: block; font-size: .8rem; letter-spacing: .04em; }
+  .prov { font-size: .82rem; color: #5b6b7b; margin: .3rem 0 0; }
+  .covered { background: #f0f8f0; border-left: 5px solid #27ae60; border-radius: 6px; padding: .5rem 1rem; margin: .4rem 0; font-size: .92rem; }
+  .summary-box { background: #e9eff5; border: 1px solid #a4b8cc; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; }
+  .critic-box { background: #eef4ee; border: 1px solid #a4ccb0; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: .92rem; }
+  pre.verdict { background: #102536; color: #e8eef4; padding: 1rem 1.2rem; border-radius: 8px; font-size: .9rem; line-height: 1.9; overflow-x: auto; white-space: pre-wrap; }
+  .small { font-size: .85rem; color: #5b6b7b; }
+  del { color: #b04a3a; }
+</style>
+</head>
+<body>
+
+<h1>Ch 4 軟深度充實——審核文件（Mode C 第②波）</h1>
+<p class="meta">2026-06-27 ・ ②波＝補 intuition／caution／strategy／application／summary（<strong>非</strong> worked example，那是①波；<strong>非</strong> figure，那是圖機會閘）。
+原則：<strong>只增添、絕不重構</strong>。gate-1＝五節 9 鏡頭(1,2,4,5,6,8)分析＋章層 anti-padding critic（<code>wf_e4cbacd9-00d</code>，Claude、免費、唯讀）。
+每筆附完整擬寫散文——你審的就是會印出來的內容。</p>
+
+<h2>怎麼回覆（裁決表）</h2>
+<pre class="verdict">§4.1 / §4.2 / §4.3：clean（6 鏡頭全已滿足或刻意記錄省略）　→ 同意 clean / 有異議 ___
+
+§4.4-D1  caution  「strictly increasing ⇏ f′>0 everywhere」(x³ 反例)   [low,borderline]   收 / 不收 ___
+         （critic 建議採精簡版：砍結尾自指句；下方已標）
+
+§4.5-D1  caution  「ln(ab)=ln a+ln b 不等於 ln(a+b)」(a=b=1→ln2 vs 0)   [medium,強留]    收 / 不收 ___
+
+回覆範例：「兩條都收（4.4-D1 用精簡版）」或「只收 4.5-D1」或「都不收」。
+裁決通過後 → import（插入 caution，Caution 無編號＝零 cascade）→ build.py ch04 → 範圍限定 Mode B（README 硬規則：②波必接）→ render 自驗。</pre>
+
+<div class="summary-box">
+<strong>結論：</strong>本章 Mode A 已寫得非常滿（每節 opener＋多段 intuition＋summary，多數有 caution）。②波 6 鏡頭逐節走查 → <strong>§4.1/§4.2/§4.3 clean</strong>、<strong>§4.4/§4.5 各浮 1 條 caution</strong>。共 <strong>2</strong> 條 net-new（皆 caution、皆無編號＝插入不影響任何編號）。critic：0 重構/越界、0 漏缺、建議兩條都留。Caution 是「補上或記錄」鏡頭裡風險最低的增添——純加一個讀者易自誤推的警示，不碰任何既有語義。
+</div>
+
+<h2>§4.1 / §4.2 / §4.3 —— clean</h2>
+<div class="covered">
+三節 6 鏡頭逐項由既有 marker 承擔或刻意精簡（記錄省略）。代表性判定：§4.1 鏡頭4 邊界情況已由 Remark 4.1（ℚ-反例＝完備性失效）＋summary（x&lt;0 Theorem 4.1 不適用）兩處承擔；§4.2 鏡頭6 strategy 為 §4.1 Strategy 4.1 的重用點（已顯式回指），非鑄造點；§4.3 是最短純演繹節，③ 已核可無 caution/strategy/example。考慮過但駁回的 net-new（§4.1 ratio-bound caution、§4.2 Step-6 order-of-limits、§4.3 e^x-collapse caution）皆會重述已自明的散文＝padding，刻意不補。
+</div>
+
+<h2>§4.4 Rolle &amp; MVT —— +1 caution</h2>
+<h3>4.4-D1 <span class="badge low">low · borderline</span>　Corollary 4.3 的假逆命題（單向性）</h3>
+<div class="caution">
+<p>Corollary 4.3 runs in one direction only: a positive derivative forces strict increase, not the reverse. A strictly increasing function need <em>not</em> have a strictly positive derivative everywhere. The function \(f(x) = x^{3}\) is strictly increasing on all of \(\mathbb{R}\), yet \(f'(0) = 0\); the derivative is allowed to touch zero at isolated points without spoiling strict monotonicity. The corollary is a sufficient test, not a characterisation.<span class="small"> <del>〔critic 建議砍除的原結尾自指句：— when we read strict increase off \(f'>0\) below, we are using the safe direction, and the examples are chosen so that direction applies.〕</del></span></p>
+</div>
+<p class="prov"><strong>locus:</strong> 緊接 Corollary 4.3 證明 <code>&lt;/section&gt;</code> 之後、「Two applications close the section…」之前　·　<strong>lens:</strong> 5-caution　·　<strong>source:</strong> <code>[source: pedagogical synthesis — false-converse pitfall; x³ counterexample]</code>　·　<strong>編號:</strong> Caution 無編號（零 cascade）</p>
+<div class="why"><strong>why：</strong>Corollary 4.3 是本章驅動目標（散文明寫「the one we have been working toward」），其假逆命題（嚴格遞增 ⟹ f′&gt;0 everywhere）是教科書級最常見邏輯陷阱，x³ 在 0 處即反證。現有三條 caution/反例全談 hypotheses 失效，無一捕捉此「方向誤讀」。<strong>borderline：</strong>本書只單向用此推論、從不主張逆命題，故無「矛盾」需修——僅補一個讀者易自誤推的方向。<strong>critic：</strong>留（建議砍結尾自指句＝padding-risk）；判為 padding 而 omit 亦完全成立。數學自核：x³ 嚴格遞增、f′(0)=0 ✓。</div>
+
+<h2>§4.5 Monotonicity &amp; Logarithm —— +1 caution</h2>
+<h3>4.5-D1 <span class="badge med">medium · 強留</span>　對數積律的過度推廣陷阱</h3>
+<div class="caution">
+<p>The product law converts a product <em>inside</em> the logarithm into a sum <em>outside</em> it: \(\ln(ab) = \ln a + \ln b\). It says nothing about a sum inside. In general \(\ln(a + b) \ne \ln a + \ln b\) — take \(a = b = 1\), where the left side is \(\ln 2\) and the right side is \(0\). Likewise \(\ln(a/b)\) is \(\ln a - \ln b\), not \(\ln a / \ln b\). The proof above earns the one identity that holds; it grants no licence to the look-alikes.</p>
+</div>
+<p class="prov"><strong>locus:</strong> 緊接 Proposition 4.3（積律）證明方塊之後、引出 Example 4.7 的橋接句之前　·　<strong>lens:</strong> 5-caution　·　<strong>source:</strong> <code>[source: pedagogical synthesis; high-frequency logarithm misgeneralisation, guards Proposition 4.3]</code>　·　<strong>編號:</strong> Caution 無編號（零 cascade）</p>
+<div class="why"><strong>why：</strong>本節既有 caution 只管「ln 的定義域(x&gt;0)」，未管「ln 的運算陷阱」。剛證完的 Prop 4.3 積律正是學生最易過度推廣處——把積律誤搬到 \(\ln(a+b)\) 或誤寫成 \(\ln a/\ln b\) 是公認對數第一錯誤。含一行可驗反例（a=b=1 → ln2 vs 0），非空泛告誡。未被任何既有 marker 或 ROADMAP pitfall 涵蓋、locus 唯一自然。<strong>critic：</strong>兩提案中最強、非 padding，留。數學自核：ln2≈0.693≠0 ✓；ln(a/b)=ln a−ln b（≠ ln a/ln b）✓。</div>
+
+<h2>章層 anti-padding critic 複核</h2>
+<div class="critic-box">
+<strong>padding_flags：</strong>4.4-D1、4.5-D1 皆 <strong>recommend_drop = false</strong>。4.5-D1＝兩者最強、非 padding（最高頻 log 錯誤、具體反例、locus 緊貼定理、補定義域-only caution 留下的縫）。4.4-D1＝真但低值缺口（守住本章驅動推論免於標準假逆命題誤讀）；建議砍結尾自指句後保留，或 omit 亦可。<br>
+<strong>restructure_or_scope_violations：</strong>無——兩條皆純增添、不 mint 編號、不越 D-邊界（D6/D4/§4.3 不重證 Ch2/§4.5 ln 只 x&gt;0）、不踏入①波 example 或圖閘領域。<br>
+<strong>missed_gaps：</strong>無（真搜過、未硬找）。§4.1/§4.2/§4.3 的 clean 判定成立——Mode A 飽和章，clean 是有效結果。<br>
+<strong>verdict：</strong>Ch4 ②波 near-clean、2 條外科手術級 caution，皆 legitimate addition 而非稀釋密度的 padding。
+</div>
+
+<p class="small" style="margin-top:2rem">— 下一步：你勾完 → import（插 caution，無編號＝零 cascade）→ <code>build.py ch04</code> → <strong>範圍限定 Mode B</strong>（README 硬規則：②波必接，只審新 <code>[pass: enrichment]</code> caution）→ render 自驗 → 產 <code>REVIEW-ch04-modec-enrichment-applied.html</code>。本波 2 條 caution 數學單純（x³／ln2 反例），Mode B 走 Claude 即可；如你要加 Codex 跨模型再徵同意。</p>
+
+</body>
+</html>

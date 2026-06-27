@@ -4,11 +4,16 @@
      pp. 23–24). Direction brief brief_s45.md approved at ③ (2026-06-21,
      "全照提案核可" + all three optional add-ons selected). Numbering is MANUAL
      and CONTINUES from §4.1–§4.4: those used Definition 4.1–4.3, Theorem 4.1–4.12,
-     Proposition 4.1/4.2, Corollary 4.1–4.3, Strategy 4.1/4.2, Example 4.1–4.4,
-     Figure 4.1/4.2, Remark 4.1–4.4 — so §4.5 mints Definition 4.4 (ln x),
-     Theorem 4.13 (continuity) / 4.14 (derivative 1/x), Proposition 4.3 (logarithm
-     product law), Corollary 4.4 (f'=0 ⟹ constant), Example 4.5 (general powers
-     a^x), Figure 4.3 (e^x/ln x reflection), Remark 4.5/4.6, and an unnumbered
+     Proposition 4.1/4.2, Corollary 4.1–4.3, Strategy 4.1/4.2, Example 4.1–4.6
+     (§4.4's Example 4.3/4.4 were added by Mode C ① on 2026-06-27, shifting the
+     monotonicity examples to 4.5/4.6), Figure 4.1–4.4 (§4.1 gained Figure 4.1
+     and §4.4 gained Figure 4.3 from the figure-opportunity gate, 2026-06-27),
+     Remark 4.1–4.4 — so §4.5
+     mints Definition 4.4 (ln x), Theorem 4.13 (continuity) / 4.14 (derivative 1/x),
+     Proposition 4.3 (logarithm product law), Corollary 4.4 (f'=0 ⟹ constant),
+     Example 4.7 (general powers a^x; was 4.5 before the Mode C ① insertion in §4.4),
+     Figure 4.5 (e^x/ln x reflection) and Figure 4.6 (reciprocal-slope geometry
+     of (ln x)'=1/x, added by the figure-opportunity gate), Remark 4.5/4.6, and an unnumbered
      Caution. No new Strategy is minted. Cross-references are plain prose. Math
      cross-checked against the signed legacy ground truth
      legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.5
@@ -22,7 +27,7 @@
          note on its dependence (continuity + limits + intermediate values).
        - §C-2 (ROADMAP pitfall): an unnumbered Caution that ln x is defined only
          for x > 0 (ln 0, ln(-1) undefined).
-       - §C-3 (ROADMAP key figure): Figure 4.3 — the e^x / ln x reflection across
+       - §C-3 (ROADMAP key figure): Figure 4.5 — the e^x / ln x reflection across
          y = x; registered in chapter4 FIGS as "exp-log-reflection".
        - §C-4 (ROADMAP prerequisite): Remark 4.5 contrasts this rigorous derivation
          with the informal chain-rule pass of Ch 3 §3.3 (Example 3.6), closing that
@@ -31,7 +36,8 @@
          the logarithm laws that use it.
        - §C-6 (add-on taken): HW2 (ln(ab) = ln a + ln b) promoted to a NAMED result,
          Proposition 4.3 (the logarithm product law), rather than a worked example.
-       - §C-7: HW4 (general powers a^x := e^{x ln a}) promoted to Example 4.5,
+       - §C-7: HW4 (general powers a^x := e^{x ln a}) promoted to Example 4.7
+         (was 4.5 before §4.4's Mode C ① insertion renumbered it),
          closing §4.1's deferred question about a^r for irrational r (D6).
        - §C-8 (add-on taken): HW3 (the Cauchy functional equation characterizing e^x)
          retained as a one-sentence Remark 4.6, proof omitted.
@@ -76,9 +82,9 @@
     </div>
   </section>
 
-  <!-- expansion:figure — Figure 4.3 (§C-3, ROADMAP key figure): e^x / ln x reflection across y=x; registered in chapter4 FIGS as "exp-log-reflection" -->
+  <!-- expansion:figure — Figure 4.5 (§C-3, ROADMAP key figure): e^x / ln x reflection across y=x; registered in chapter4 FIGS as "exp-log-reflection" -->
   <figure class="figure" data-fig="exp-log-reflection">
-    <figcaption><span class="fig-no">Figure 4.3</span> The graphs of \(e^{x}\) (blue) and \(\ln x\) (red) are mirror images across the line \(y = x\) (dashed) — the geometric signature of the inverse relation \(\ln(e^{x}) = x\). Reflecting swaps coordinates, sending the point \((0, 1)\) on the exponential to \((1, 0)\) on the logarithm.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.5</span> The graphs of \(e^{x}\) (blue) and \(\ln x\) (red) are mirror images across the line \(y = x\) (dashed) — the geometric signature of the inverse relation \(\ln(e^{x}) = x\). Reflecting swaps coordinates, sending the point \((0, 1)\) on the exponential to \((1, 0)\) on the logarithm.</figcaption>
   </figure>
 
   <h3 class="subsec-head">Continuity of the logarithm</h3>
@@ -98,7 +104,7 @@
     <div class="env-body">
       <p>Fix \(x_{0} &gt; 0\) and suppose, for contradiction, that \(\ln\) is <em>not</em> continuous at \(x_{0}\). Then \(\lim_{x \to x_{0}} \ln x\) either fails to exist or exists but differs from \(\ln x_{0}\). In either case the failure is witnessed by a sequence: there is a number \(\delta &gt; 0\) and points \(y_{j} \to x_{0}\) (all in \((0, \infty)\)) with</p>
       <p>\[ \lvert \ln y_{j} - \ln x_{0} \rvert \ge \delta \qquad \text{for every } j = 1, 2, 3, \dots \]</p>
-      <p>For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.4), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):</p>
+      <p>For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.6), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):</p>
       <ul>
         <li>if \(\ln y_{j} \le \ln x_{0} - \delta\), then \(x_{0} - y_{j} = e^{\ln x_{0}} - e^{\ln y_{j}} \ge e^{\ln x_{0}} - e^{\ln x_{0} - \delta} &gt; 0\);</li>
         <li>if \(\ln y_{j} \ge \ln x_{0} + \delta\), then \(y_{j} - x_{0} = e^{\ln y_{j}} - e^{\ln x_{0}} \ge e^{\ln x_{0} + \delta} - e^{\ln x_{0}} &gt; 0\).</li>
@@ -139,6 +145,11 @@
       <p><span class="qed qed-proof"></span></p>
     </div>
   </section>
+
+  <!-- expansion:figure [pass: enrichment] [source: pedagogical synthesis — reciprocal-slope geometry of the inverse-function derivative; registered in chapter4 FIGS as "reciprocal-slope-log"] -->
+  <figure class="figure" data-fig="reciprocal-slope-log">
+    <figcaption><span class="fig-no">Figure 4.6</span> Why the slope inverts. Reflecting \(e^{x}\) across \(y = x\) turns its tangent at \((\ln 2,\ 2)\), of slope \(e^{\ln 2} = 2\), into the tangent to \(\ln x\) at \((2,\ \ln 2)\) — the mirror image, of reciprocal slope \(\tfrac{1}{2}\). Reflection swaps rise and run, which is exactly \((\ln x)' = 1/e^{\ln x} = 1/x\).</figcaption>
+  </figure>
 
   <!-- expansion:intuition — Remark 4.5 (§C-4, ROADMAP prerequisite): rigorous vs Ch3 chain-rule; closes the §3.3 forward-reference loop -->
   <section class="env env-remark">
@@ -190,12 +201,20 @@
     </div>
   </section>
 
+  <!-- expansion:caution [pass: enrichment] [source: pedagogical synthesis — high-frequency logarithm misgeneralisation, guards Proposition 4.3] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The product law converts a product <em>inside</em> the logarithm into a sum <em>outside</em> it: \(\ln(ab) = \ln a + \ln b\). It says nothing about a sum inside. In general \(\ln(a + b) \ne \ln a + \ln b\) — take \(a = b = 1\), where the left side is \(\ln 2\) and the right side is \(0\). Likewise \(\ln(a/b)\) is \(\ln a - \ln b\), not \(\ln a / \ln b\). The proof above earns the one identity that holds; it grants no licence to the look-alikes.</p>
+    </div>
+  </section>
+
   <!-- expansion:example — Example 4.5 (§C-7, HW4): general powers a^x := e^{x ln a}; closes §4.1's deferred a^r question (D6) -->
   <p>The product law is exactly what is needed to define powers with arbitrary real exponents — the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</p>
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.5</span><span class="env-name">General powers</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.7</span><span class="env-name">General powers</span></p>
       <div class="env-body">
         <p>For \(a &gt; 0\), <em>define</em> the power \(a^{x}\) for every real \(x\) by</p>
         <p>\[ a^{x} = e^{x \ln a}. \]</p>

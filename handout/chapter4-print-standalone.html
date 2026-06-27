@@ -386,7 +386,7 @@ window.MathJax = {
      brief brief_s41.md approved at ③ (2026-06-21). Numbering is MANUAL (the
      kit has no auto-counter); cross-references are plain prose. §4.1 is the
      chapter's first section, so it carries the chapter opener (a second
-     <article>) and starts the Chapter 4 figure registry (Figure 4.1).
+     <article>) and starts the Chapter 4 figure registry (Figures 4.1, 4.2).
      Math cross-checked against the signed legacy ground truth
      legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.1.
 
@@ -394,7 +394,8 @@ window.MathJax = {
        Definition 4.1 (the exponential series);
        Theorem 4.1 (Completeness, stated not proved), 4.2 (series converges, x>0);
        Strategy 4.1 (geometric-tail bound); Example 4.1 (partial sums of e);
-       Figure 4.1 (partial-sum convergence); Remark 4.1 (ℝ vs ℚ).
+       Figure 4.2 (partial-sum convergence) and Figure 4.1 (completeness,
+       ℝ vs ℚ — added by the figure-opportunity gate, 2026-06-27); Remark 4.1 (ℝ vs ℚ).
        Caution is unnumbered (per ch02/ch03). §4.2 continues from Theorem 4.3,
        Definition 4.2, etc. (the existing §4.2 POC must be renumbered to follow).
 
@@ -489,6 +490,11 @@ window.MathJax = {
     </div>
   </section>
 
+  <!-- expansion:figure [pass: enrichment] [source: pedagogical synthesis — monotone-bounded/completeness illustration; registered in chapter4 FIGS as "completeness-bound"] -->
+  <figure class="figure" data-fig="completeness-bound">
+    <figcaption><span class="fig-no">Figure 4.1</span> A non-decreasing sequence trapped below an upper bound \(M\) has nowhere to go but toward a limit \(L\); the completeness of \(\mathbb{R}\) guarantees that limit exists. The terms are isolated dots, not a curve. The same trapping fails in \(\mathbb{Q}\): the sequence \(3,\ 3.1,\ 3.14,\ \dots\), bounded above by \(4\), converges to \(\pi\) — a limit absent from \(\mathbb{Q}\).</figcaption>
+  </figure>
+
   <h3 class="subsec-head">Convergence of the series for \(x > 0\)</h3>
 
   <p>The plan is to trap the tail of the series \(\sum x^{n}/n!\) inside a geometric series. Once the tail is controlled, the partial sums form a non-decreasing sequence that is bounded above, and Theorem 4.1 hands us the limit. The technique is worth isolating, because it returns several times in this section and the next.</p>
@@ -574,7 +580,7 @@ window.MathJax = {
 
   <!-- expansion:figure — the partial-sum convergence picture (ROADMAP §4.1 key figure); registered in chapter4 FIGS as "partial-sums-exp" -->
   <figure class="figure" data-fig="partial-sums-exp">
-    <figcaption><span class="fig-no">Figure 4.1</span> The polynomial partial sums \(P_{k}(x)\) for \(k = 1, 2, 3, 4\) (gray) rise to meet the smooth exponential curve \(e^{x}\) (blue). All pass through \((0, 1)\); near \(x = 0\) even low-order sums hug the curve, and higher-order sums stay close over a wider range, just as the tail bound \((*)\) requires.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.2</span> The polynomial partial sums \(P_{k}(x)\) for \(k = 1, 2, 3, 4\) (gray) rise to meet the smooth exponential curve \(e^{x}\) (blue). All pass through \((0, 1)\); near \(x = 0\) even low-order sums hug the curve, and higher-order sums stay close over a wider range, just as the tail bound \((*)\) requires.</figcaption>
   </figure>
 
   <!-- expansion:summary — close the section and set up §4.2 (x<0, continuity, exponent law) -->
@@ -991,10 +997,11 @@ window.MathJax = {
      brief brief_s44.md approved at ③ (2026-06-21, "全照提案核可" + all four
      optional add-ons selected). Numbering is MANUAL and CONTINUES from §4.1–§4.3:
      those used Definition 4.1/4.2, Theorem 4.1–4.8, Proposition 4.1/4.2,
-     Corollary 4.1/4.2, Strategy 4.1, Example 4.1, Figure 4.1, Remark 4.1–4.3 —
+     Corollary 4.1/4.2, Strategy 4.1, Example 4.1, Figure 4.1/4.2, Remark 4.1–4.3 —
      so §4.4 mints Definition 4.3, Theorem 4.9 (EVT) / 4.10 (Theorem A) /
-     4.11 (Rolle) / 4.12 (MVT), Corollary 4.3, Strategy 4.2, Figure 4.2,
-     Example 4.2/4.3/4.4, Remark 4.4. No Proposition is minted here.
+     4.11 (Rolle) / 4.12 (MVT), Corollary 4.3, Strategy 4.2, Figure 4.3/4.4,
+     Example 4.2–4.6, Remark 4.4. No Proposition is minted here. (Mode A minted
+     Example 4.2/4.3/4.4; Mode C ① inserted 4.3/4.4 — see the Mode C ① note below.)
      Cross-references are plain prose. Math cross-checked against the signed
      legacy ground truth legacy/tex_handout/chapters/ch04_exponential_logarithm.tex
      §4.4 (sec:rolle-and-mvt) and the monotonicity corollary at the head of §4.5
@@ -1010,15 +1017,16 @@ window.MathJax = {
          monotonicity (injectivity) to define ln x. Legacy states both.
        - §C-3: the EVT (Theorem 4.9) is stated WITHOUT proof (manuscript defers it
          to completeness); a compact note records that both hypotheses are essential.
-       - §C-4 (ROADMAP key figure): Figure 4.2 — the MVT secant–tangent picture.
+       - §C-4 (ROADMAP key figure): Figure 4.4 — the MVT secant–tangent picture
+         (was 4.2 before the figure-opportunity gate inserted Figure 4.3).
        - §C-5 (ROADMAP strategy): Strategy 4.2 — verifying the MVT hypotheses,
          with the |x| on [-1,1] counterexample and the closed/open asymmetry folded in.
        - §C-6: a Thm-A interior-necessity caution; the every-[a,b]⟹ℝ note folded
-         into Example 4.4.
-       - §C-7: a one-line justification that e^x > 0 everywhere (Example 4.4).
+         into Example 4.6 (the e^x monotonicity example; was 4.4 before Mode C ①).
+       - §C-7: a one-line justification that e^x > 0 everywhere (Example 4.6).
        - §C-8: Theorem 4.10 keeps the manuscript's name "Theorem A" as a subtitle.
        - §C-9 (optional taken): the two corollary examples are SPLIT into
-         Example 4.3 (sin) and Example 4.4 (e^x).
+         Example 4.5 (sin) and Example 4.6 (e^x) [renumbered +2 by Mode C ①].
        - §C-10 (optional taken): Remark 4.4 is an explicit box (the existence-engine
          synthesis), not folded into prose.
        - history (optional taken): a one-sentence attribution of Rolle and the MVT
@@ -1026,8 +1034,17 @@ window.MathJax = {
        - extra MVT worked example (optional taken): Example 4.2 applies the MVT
          directly to f(x) = x^2 on [0, 2] (c = 1).
        - D4: the MVT stays in this chapter (a forward-only fence to §4.5).
+     Mode C ① (2026-06-27): two worked examples inserted after Example 4.2, before
+     the monotonicity subsection — Example 4.3 (|sin a − sin b| ≤ |a − b| via the
+     MVT, a Lipschitz estimate) and Example 4.4 (root count of 3x − sin x via Rolle's
+     contrapositive). Both [source: CLP-1 §2.13], CC BY-NC-SA 4.0; E1's solution
+     authored, E2 a light rewrite. gate-1 (example-supplement ×5 + chapter critic)
+     0 blocking; gate-2 (Codex gpt-5.5 xhigh) run1 converged 0 blocking. This
+     renumbered the former Example 4.3 (sin)→4.5 and 4.4 (e^x)→4.6 here, and §4.5's
+     general-powers Example 4.5→4.7. See _dev-archive/ch04/ch04_example-supplement-
+     {review.html, audit.md}.
      Counters handed to §4.5: Definition 4.4, Theorem 4.13, Proposition 4.3,
-     Corollary 4.4, Strategy 4.3, Example 4.5, Figure 4.3, Remark 4.5. -->
+     Corollary 4.4, Strategy 4.3, Example 4.7, Figure 4.5, Remark 4.5. -->
 
 <article class="sec" lang="en">
 
@@ -1092,6 +1109,11 @@ window.MathJax = {
     </div>
   </section>
 
+  <!-- expansion:figure [pass: enrichment] [source: pedagogical synthesis — Theorem A two-sided squeeze; registered in chapter4 FIGS as "interior-extremum-squeeze"] -->
+  <figure class="figure" data-fig="interior-extremum-squeeze">
+    <figcaption><span class="fig-no">Figure 4.3</span> At an interior maximum \(x_{M}\) the difference quotient is \(\le 0\) on the right (a secant sloping down) and \(\ge 0\) on the left (a secant sloping up). The one value \(f'(x_{M})\) is caught between, so it must be \(0\): the tangent there is horizontal. The squeeze needs both sides — which is exactly why the conclusion can fail at an endpoint.</figcaption>
+  </figure>
+
   <!-- expansion:caution — the "interior" hypothesis is essential; endpoint extrema need not have zero derivative -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
@@ -1136,7 +1158,7 @@ window.MathJax = {
 
   <!-- expansion:figure — the canonical MVT picture (ROADMAP §4.4 key figure); registered in chapter4 FIGS as "mvt-secant-tangent" -->
   <figure class="figure" data-fig="mvt-secant-tangent">
-    <figcaption><span class="fig-no">Figure 4.2</span> The Mean Value Theorem. The secant through \((a, f(a))\) and \((b, f(b))\) (dashed) has slope \((f(b) - f(a))/(b - a)\); the theorem guarantees an interior point \(c\) where the tangent (solid) is parallel to it. The proof tilts the picture by subtracting the secant, reducing the claim to Rolle’s theorem.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.4</span> The Mean Value Theorem. The secant through \((a, f(a))\) and \((b, f(b))\) (dashed) has slope \((f(b) - f(a))/(b - a)\); the theorem guarantees an interior point \(c\) where the tangent (solid) is parallel to it. The proof tilts the picture by subtracting the secant, reducing the claim to Rolle’s theorem.</figcaption>
   </figure>
 
   <section class="env env-proof">
@@ -1195,6 +1217,45 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:example — Example 4.3 (Mode C ①, 2026-06-27): the MVT as a bound — turning a bound on \(f'\) into a Lipschitz estimate on \(f\); the first positive use of Strategy 4.2 step 3's "existence only, no specific c" clause [pass: enrichment] [source: CLP-1 §2.13 (MVT), bounded-derivative application variant; solution authored] [license: CC BY-NC-SA 4.0] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.3</span></p>
+      <div class="env-body">
+        <p>Use the Mean Value Theorem to show that \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\) for all real numbers \(a\) and \(b\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>If \(a = b\) both sides are \(0\) and there is nothing to prove, so assume \(a \ne b\); relabel if necessary so that \(b &lt; a\). The function \(f(x) = \sin x\) is continuous on \([b, a]\) and differentiable on \((b, a)\) — it is differentiable on all of \(\mathbb{R}\) — so by the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with</p>
+        <p>\[ \frac{\sin a - \sin b}{a - b} = f'(c) = \cos c. \]</p>
+        <p>We do not need to know which \(c\) — only that one exists. Multiplying across and taking absolute values,</p>
+        <p>\[ \lvert \sin a - \sin b \rvert = \lvert \cos c \rvert \,\lvert a - b \rvert. \]</p>
+        <p>Since \(\lvert \cos c \rvert \le 1\) for every real \(c\), this gives \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\), as claimed. The same argument bounds the change of any function by a bound on its derivative: if \(\lvert f' \rvert \le K\) throughout an interval, then \(\lvert f(a) - f(b) \rvert \le K \lvert a - b \rvert\) for any two points in it. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 4.4 (Mode C ①, 2026-06-27): Rolle's contrapositive — a derivative that never vanishes forces at most one root, giving an exact root count [pass: enrichment] [source: CLP-1 §2.13 (MVT) Procedural, "How many roots does 3x − sin x have?"; light rewrite] [license: CC BY-NC-SA 4.0] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.4</span></p>
+      <div class="env-body">
+        <p>How many real roots does \(f(x) = 3x - \sin x\) have? Show that your count is exact.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>By inspection \(f(0) = 3 \cdot 0 - \sin 0 = 0\), so \(x = 0\) is a root; \(f\) has at least one. The question is whether there could be a second. Suppose, for contradiction, that \(f\) had a second root \(a \ne 0\). Then \(f(0) = f(a) = 0\), and \(f\) is continuous and differentiable on all of \(\mathbb{R}\), so Rolle's theorem (Theorem 4.11) applied to the interval between \(0\) and \(a\) would supply a point \(c\) strictly between them with \(f'(c) = 0\). But</p>
+        <p>\[ f'(x) = 3 - \cos x, \]</p>
+        <p>and since \(\cos x \le 1 &lt; 3\) for every real \(x\), we have \(f'(x) \ge 3 - 1 = 2 &gt; 0\) everywhere — \(f'\) is never zero. No such \(c\) can exist, so the assumed second root is impossible.</p>
+        <p>Therefore \(f(x) = 3x - \sin x\) has exactly one real root, namely \(x = 0\). The pattern is general: a function whose derivative never vanishes has at most one root, since two roots would force a zero of \(f'\) between them. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <h3 class="subsec-head">Monotonicity from the sign of the derivative</h3>
 
   <p>Now the payoff. The MVT converts the sign of the derivative directly into monotonic behavior, turning the qualitative slogan “positive derivative means increasing” into a theorem.</p>
@@ -1220,11 +1281,19 @@ window.MathJax = {
     </div>
   </section>
 
+  <!-- expansion:caution [pass: enrichment] [source: pedagogical synthesis — false-converse pitfall for the monotonicity corollary; x^3 counterexample] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Corollary 4.3 runs in one direction only: a positive derivative forces strict increase, not the reverse. A strictly increasing function need <em>not</em> have a strictly positive derivative everywhere. The function \(f(x) = x^{3}\) is strictly increasing on all of \(\mathbb{R}\), yet \(f'(0) = 0\); the derivative is allowed to touch zero at isolated points without spoiling strict monotonicity. The corollary is a sufficient test, not a characterisation.</p>
+    </div>
+  </section>
+
   <p>Two applications close the section — the second is the one we have been working toward.</p>
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.3</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.5</span></p>
       <div class="env-body">
         <p>Show that \(\sin x\) is strictly increasing on \([0, \tfrac{\pi}{4}]\).</p>
       </div>
@@ -1239,7 +1308,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.4</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.6</span></p>
       <div class="env-body">
         <p>Show that \(e^{x}\) is strictly increasing on all of \(\mathbb{R}\).</p>
       </div>
@@ -1267,11 +1336,16 @@ window.MathJax = {
      pp. 23–24). Direction brief brief_s45.md approved at ③ (2026-06-21,
      "全照提案核可" + all three optional add-ons selected). Numbering is MANUAL
      and CONTINUES from §4.1–§4.4: those used Definition 4.1–4.3, Theorem 4.1–4.12,
-     Proposition 4.1/4.2, Corollary 4.1–4.3, Strategy 4.1/4.2, Example 4.1–4.4,
-     Figure 4.1/4.2, Remark 4.1–4.4 — so §4.5 mints Definition 4.4 (ln x),
-     Theorem 4.13 (continuity) / 4.14 (derivative 1/x), Proposition 4.3 (logarithm
-     product law), Corollary 4.4 (f'=0 ⟹ constant), Example 4.5 (general powers
-     a^x), Figure 4.3 (e^x/ln x reflection), Remark 4.5/4.6, and an unnumbered
+     Proposition 4.1/4.2, Corollary 4.1–4.3, Strategy 4.1/4.2, Example 4.1–4.6
+     (§4.4's Example 4.3/4.4 were added by Mode C ① on 2026-06-27, shifting the
+     monotonicity examples to 4.5/4.6), Figure 4.1–4.4 (§4.1 gained Figure 4.1
+     and §4.4 gained Figure 4.3 from the figure-opportunity gate, 2026-06-27),
+     Remark 4.1–4.4 — so §4.5
+     mints Definition 4.4 (ln x), Theorem 4.13 (continuity) / 4.14 (derivative 1/x),
+     Proposition 4.3 (logarithm product law), Corollary 4.4 (f'=0 ⟹ constant),
+     Example 4.7 (general powers a^x; was 4.5 before the Mode C ① insertion in §4.4),
+     Figure 4.5 (e^x/ln x reflection) and Figure 4.6 (reciprocal-slope geometry
+     of (ln x)'=1/x, added by the figure-opportunity gate), Remark 4.5/4.6, and an unnumbered
      Caution. No new Strategy is minted. Cross-references are plain prose. Math
      cross-checked against the signed legacy ground truth
      legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.5
@@ -1285,7 +1359,7 @@ window.MathJax = {
          note on its dependence (continuity + limits + intermediate values).
        - §C-2 (ROADMAP pitfall): an unnumbered Caution that ln x is defined only
          for x > 0 (ln 0, ln(-1) undefined).
-       - §C-3 (ROADMAP key figure): Figure 4.3 — the e^x / ln x reflection across
+       - §C-3 (ROADMAP key figure): Figure 4.5 — the e^x / ln x reflection across
          y = x; registered in chapter4 FIGS as "exp-log-reflection".
        - §C-4 (ROADMAP prerequisite): Remark 4.5 contrasts this rigorous derivation
          with the informal chain-rule pass of Ch 3 §3.3 (Example 3.6), closing that
@@ -1294,7 +1368,8 @@ window.MathJax = {
          the logarithm laws that use it.
        - §C-6 (add-on taken): HW2 (ln(ab) = ln a + ln b) promoted to a NAMED result,
          Proposition 4.3 (the logarithm product law), rather than a worked example.
-       - §C-7: HW4 (general powers a^x := e^{x ln a}) promoted to Example 4.5,
+       - §C-7: HW4 (general powers a^x := e^{x ln a}) promoted to Example 4.7
+         (was 4.5 before §4.4's Mode C ① insertion renumbered it),
          closing §4.1's deferred question about a^r for irrational r (D6).
        - §C-8 (add-on taken): HW3 (the Cauchy functional equation characterizing e^x)
          retained as a one-sentence Remark 4.6, proof omitted.
@@ -1339,9 +1414,9 @@ window.MathJax = {
     </div>
   </section>
 
-  <!-- expansion:figure — Figure 4.3 (§C-3, ROADMAP key figure): e^x / ln x reflection across y=x; registered in chapter4 FIGS as "exp-log-reflection" -->
+  <!-- expansion:figure — Figure 4.5 (§C-3, ROADMAP key figure): e^x / ln x reflection across y=x; registered in chapter4 FIGS as "exp-log-reflection" -->
   <figure class="figure" data-fig="exp-log-reflection">
-    <figcaption><span class="fig-no">Figure 4.3</span> The graphs of \(e^{x}\) (blue) and \(\ln x\) (red) are mirror images across the line \(y = x\) (dashed) — the geometric signature of the inverse relation \(\ln(e^{x}) = x\). Reflecting swaps coordinates, sending the point \((0, 1)\) on the exponential to \((1, 0)\) on the logarithm.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.5</span> The graphs of \(e^{x}\) (blue) and \(\ln x\) (red) are mirror images across the line \(y = x\) (dashed) — the geometric signature of the inverse relation \(\ln(e^{x}) = x\). Reflecting swaps coordinates, sending the point \((0, 1)\) on the exponential to \((1, 0)\) on the logarithm.</figcaption>
   </figure>
 
   <h3 class="subsec-head">Continuity of the logarithm</h3>
@@ -1361,7 +1436,7 @@ window.MathJax = {
     <div class="env-body">
       <p>Fix \(x_{0} &gt; 0\) and suppose, for contradiction, that \(\ln\) is <em>not</em> continuous at \(x_{0}\). Then \(\lim_{x \to x_{0}} \ln x\) either fails to exist or exists but differs from \(\ln x_{0}\). In either case the failure is witnessed by a sequence: there is a number \(\delta &gt; 0\) and points \(y_{j} \to x_{0}\) (all in \((0, \infty)\)) with</p>
       <p>\[ \lvert \ln y_{j} - \ln x_{0} \rvert \ge \delta \qquad \text{for every } j = 1, 2, 3, \dots \]</p>
-      <p>For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.4), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):</p>
+      <p>For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.6), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):</p>
       <ul>
         <li>if \(\ln y_{j} \le \ln x_{0} - \delta\), then \(x_{0} - y_{j} = e^{\ln x_{0}} - e^{\ln y_{j}} \ge e^{\ln x_{0}} - e^{\ln x_{0} - \delta} &gt; 0\);</li>
         <li>if \(\ln y_{j} \ge \ln x_{0} + \delta\), then \(y_{j} - x_{0} = e^{\ln y_{j}} - e^{\ln x_{0}} \ge e^{\ln x_{0} + \delta} - e^{\ln x_{0}} &gt; 0\).</li>
@@ -1402,6 +1477,11 @@ window.MathJax = {
       <p><span class="qed qed-proof"></span></p>
     </div>
   </section>
+
+  <!-- expansion:figure [pass: enrichment] [source: pedagogical synthesis — reciprocal-slope geometry of the inverse-function derivative; registered in chapter4 FIGS as "reciprocal-slope-log"] -->
+  <figure class="figure" data-fig="reciprocal-slope-log">
+    <figcaption><span class="fig-no">Figure 4.6</span> Why the slope inverts. Reflecting \(e^{x}\) across \(y = x\) turns its tangent at \((\ln 2,\ 2)\), of slope \(e^{\ln 2} = 2\), into the tangent to \(\ln x\) at \((2,\ \ln 2)\) — the mirror image, of reciprocal slope \(\tfrac{1}{2}\). Reflection swaps rise and run, which is exactly \((\ln x)' = 1/e^{\ln x} = 1/x\).</figcaption>
+  </figure>
 
   <!-- expansion:intuition — Remark 4.5 (§C-4, ROADMAP prerequisite): rigorous vs Ch3 chain-rule; closes the §3.3 forward-reference loop -->
   <section class="env env-remark">
@@ -1453,12 +1533,20 @@ window.MathJax = {
     </div>
   </section>
 
+  <!-- expansion:caution [pass: enrichment] [source: pedagogical synthesis — high-frequency logarithm misgeneralisation, guards Proposition 4.3] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The product law converts a product <em>inside</em> the logarithm into a sum <em>outside</em> it: \(\ln(ab) = \ln a + \ln b\). It says nothing about a sum inside. In general \(\ln(a + b) \ne \ln a + \ln b\) — take \(a = b = 1\), where the left side is \(\ln 2\) and the right side is \(0\). Likewise \(\ln(a/b)\) is \(\ln a - \ln b\), not \(\ln a / \ln b\). The proof above earns the one identity that holds; it grants no licence to the look-alikes.</p>
+    </div>
+  </section>
+
   <!-- expansion:example — Example 4.5 (§C-7, HW4): general powers a^x := e^{x ln a}; closes §4.1's deferred a^r question (D6) -->
   <p>The product law is exactly what is needed to define powers with arbitrary real exponents — the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</p>
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.5</span><span class="env-name">General powers</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">4.7</span><span class="env-name">General powers</span></p>
       <div class="env-body">
         <p>For \(a &gt; 0\), <em>define</em> the power \(a^{x}\) for every real \(x\) by</p>
         <p>\[ a^{x} = e^{x \ln a}. \]</p>
@@ -1735,6 +1823,99 @@ window.MathJax = {
           { type: "text", x: 3.55, y: 3.4, text: "y = x", cls: "a-ax", anchor: "start", vAnchor: "top" }
         ],
         aria: "The blue curve y = e to the x and the red curve y = ln x are reflections of each other across the dashed diagonal line y = x. The point (0, 1) on the exponential curve reflects to the point (1, 0) on the logarithm curve."
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §4.1 — Completeness: a monotone, bounded sequence is forced to converge.
+       Discrete terms a_n (dots, not joined — a sequence, not a curve) rise while
+       staying under the upper bound M (gray dashed); pinned below M they have
+       nowhere to go but toward a limit L (red dashed), which exists because R is
+       complete. Illustration of the stated-not-proved Property (Theorem 4.1); the
+       concrete instance 3, 3.1, 3.14, … -> pi under M = 4 lives in the caption.
+       Labels limited to M and L. */
+    "completeness-bound": () => {
+      const L = 3, M = 3.5;
+      const a = (n) => L - 1.5 * Math.pow(0.62, n);
+      const items = [
+        { type: "hline", y: M, cls: "idline" },
+        { type: "hline", y: L, cls: "refline" },
+        { type: "text", x: 7.7, y: M, tex: "M", cls: "a-pt", anchor: "start", vAnchor: "middle" },
+        { type: "text", x: 7.7, y: L, tex: "L", cls: "a-ref", anchor: "start", vAnchor: "middle" }
+      ];
+      for (let n = 1; n <= 7; n++) items.push({ type: "dot", x: n, y: a(n), r: 2.6 });
+      const svg = buildPlot({
+        w: 322, h: 244,
+        xmin: 0, xmax: 8.5, ymin: 1.7, ymax: 3.8,
+        xlabel: "n", ylabel: "",
+        xticks: [{ x: 1, tex: "1" }, { x: 2, tex: "2" }, { x: 3, tex: "3" }],
+        yticks: [],
+        items: items,
+        aria: "Dots representing the terms of an increasing sequence rise from left to right while staying below a gray dashed horizontal upper bound M. Pinned beneath M, the terms crowd toward a red dashed limit line L just below M, which the completeness of the real numbers guarantees exists."
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §4.4 — Interior extremum (Theorem A): the two-sided squeeze forcing f'(x_M)=0.
+       A curve peaking at an interior maximum x_M. From the peak the right secant
+       (h>0) slopes down and the left secant (h<0) slopes up (both dashed, gray):
+       the right difference quotient stays <=0, the left stays >=0, so the single
+       value f'(x_M) is caught between and must be 0 — the horizontal tangent
+       (solid). Only works in the open interior, where both one-sided increments
+       exist (the endpoint caution). Labels limited to x_M and f'(x_M)=0. */
+    "interior-extremum-squeeze": () => {
+      const f = (x) => 1 - 0.5 * (x - 1.5) * (x - 1.5);
+      const xM = 1.5, hh = 0.8;
+      const xr = xM + hh, xl = xM - hh;
+      const svg = buildPlot({
+        w: 322, h: 244,
+        xmin: -0.1, xmax: 3.1, ymin: -0.05, ymax: 1.3,
+        xlabel: "x", ylabel: "",
+        xticks: [{ x: xM, tex: "x_{M}" }],
+        yticks: [],
+        items: [
+          { type: "curve", fn: f, domain: [0.2, 2.8], samples: 200, cls: "curve" },
+          { type: "seg", x1: xM, y1: f(xM), x2: xr, y2: f(xr), cls: "secant" },
+          { type: "seg", x1: xl, y1: f(xl), x2: xM, y2: f(xM), cls: "secant" },
+          { type: "seg", x1: xM - 0.62, y1: f(xM), x2: xM + 0.62, y2: f(xM), cls: "tangent" },
+          { type: "dot", x: xM, y: f(xM), r: 2.6 },
+          { type: "dot", x: xr, y: f(xr), r: 2.4 },
+          { type: "dot", x: xl, y: f(xl), r: 2.4 },
+          { type: "text", x: xM, y: f(xM) + 0.13, tex: "f'(x_{M})=0", cls: "a-pt", anchor: "middle", vAnchor: "bottom" }
+        ],
+        aria: "A smooth curve rising to an interior maximum at x sub M and falling again. From the peak a dashed secant goes down to the right and another dashed secant comes up from the left; the right difference quotient is at most zero and the left at least zero, trapping the derivative at the peak between them. The solid horizontal tangent at the peak shows that this trapped value is zero."
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §4.5 — Why (ln x)' = 1/x: reflection makes the tangent slopes reciprocal.
+       e^x (blue) and ln x (red) mirror across y = x (gray dashed). At the mirror
+       pair P = (ln 2, 2) on e^x and Q = (2, ln 2) on ln x, the tangents (solid)
+       are themselves mirror images: e^x has slope e^{ln 2} = 2 there, so its
+       reflection — the tangent to ln at Q — has the reciprocal slope 1/2.
+       Reflection swaps rise and run, which is exactly (ln x)' = 1/e^{ln x} = 1/x.
+       Equal axis scales keep the 45-degree reflection honest. Labels: three curves. */
+    "reciprocal-slope-log": () => {
+      const a = Math.log(2);          // P=(a, 2) on e^x, slope e^a = 2; Q=(2, a) on ln x, slope 1/2
+      const svg = buildPlot({
+        w: 300, h: 296,
+        xmin: -0.4, xmax: 3.2, ymin: -0.4, ymax: 3.2,
+        xlabel: "x", ylabel: "y",
+        xticks: [{ x: 1, tex: "1" }],
+        yticks: [{ y: 1, tex: "1" }],
+        items: [
+          { type: "seg", x1: -0.4, y1: -0.4, x2: 3.2, y2: 3.2, cls: "idline" },
+          { type: "curve", fn: (x) => Math.exp(x), domain: [-0.4, 1.18], samples: 200, cls: "curve" },
+          { type: "curve", fn: (x) => Math.log(x), domain: [0.08, 3.2], samples: 200, cls: "curve-log" },
+          { type: "seg", x1: a - 0.4, y1: 2 - 0.8, x2: a + 0.4, y2: 2 + 0.8, cls: "tangent" },
+          { type: "seg", x1: 2 - 0.8, y1: a - 0.4, x2: 2 + 0.8, y2: a + 0.4, cls: "tangent" },
+          { type: "dot", x: a, y: 2, r: 2.5 },
+          { type: "dot", x: 2, y: a, r: 2.5 },
+          { type: "text", x: 1.12, y: 3.05, tex: "e^{x}", cls: "a-curve", anchor: "end", vAnchor: "bottom" },
+          { type: "text", x: 3.15, y: 1.18, tex: "\\ln x", cls: "a-ref", anchor: "start", vAnchor: "top" },
+          { type: "text", x: 2.46, y: 3.08, text: "y = x", cls: "a-ax", anchor: "start", vAnchor: "bottom" }
+        ],
+        aria: "The blue curve e to the x and the red curve ln x are mirror images across the dashed line y = x. At the matching pair of points ln 2 comma 2 on the exponential and 2 comma ln 2 on the logarithm, the two solid tangent lines are also mirror images: the steep one on the exponential has slope 2, and its reflection on the logarithm has the reciprocal slope one half. Reflection swaps rise and run, which is why the derivative of ln x is one over x."
       });
       return { layout: "single", panels: [{ svg }] };
     },
