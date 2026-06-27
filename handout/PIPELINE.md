@@ -53,4 +53,4 @@
 | Ch1 | 全閘跑完（六閘齊） |
 | Ch2 | 全閘跑完（與 Ch1 同級） |
 | Ch3 | 全閘跑完（與 Ch1/Ch2 同級）——數學 M1–M8 雙閘／圖正確性 gate-2／S·A·V gate-1+2 於 2026-06-27 補齊收斂（執行紀錄 [`_dev-archive/ch03/PROMPT-ch03-remaining-gates.md`](_dev-archive/ch03/PROMPT-ch03-remaining-gates.md)） |
-| Ch4 | Mode A 六階＋章層 Mode B 完成；2026-06 後的獨立閘（圖機會/正確性/數學/S·A·V/Mode C）尚未跑 |
+| Ch4 | 全閘跑完（與 Ch1/Ch2/Ch3 同級）——Mode C ①②波＋圖機會/正確性雙閘＋數學 M1–M8 雙閘（gate-2 Codex 173,720 tok）＋S·A·V gate-1+2（gate-2 Codex 154,714 tok，含完整性掃描 3 處 manuscript 去露出）於 2026-06-27 補齊收斂（執行紀錄 [`_dev-archive/ch04/PLAN-ch04.md`](_dev-archive/ch04/PLAN-ch04.md) §8） |

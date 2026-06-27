@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 4 數學正確性閘 — gate-1 審核稿（gate-2 待計費徵同意）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:980px; margin:0 auto;
+         padding:2rem 1.5rem 4rem; background:var(--bg); color:#1a1a1a; line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.13rem; margin:2rem 0 .5rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  h3 { font-size:1rem; margin:1.3rem 0 .3rem; color:#272a33; }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .pass { background:#eaf6ed; border-left:3px solid var(--green); padding:.6rem .9rem; border-radius:5px; font-size:.93rem; color:#13502c; margin:.4rem 0 1.2rem; }
+  .pass b { color:var(--green); }
+  .pend { background:#fff7e6; border-left:3px solid var(--amber); padding:.6rem .9rem; border-radius:5px; font-size:.9rem; color:#6b3f00; margin:.4rem 0 1.2rem; }
+  .pend b { color:var(--amber); }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.88rem; }
+  th, td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#eef2f7; }
+  .zero { color:var(--green); font-weight:700; }
+  .wait { color:var(--amber); font-weight:700; }
+  .card { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--green); border-radius:8px; padding:.75rem 1rem; margin:.7rem 0; }
+  .k { font-weight:700; color:var(--gray); font-size:.8rem; }
+  .f { margin:.3rem 0; font-size:.92rem; }
+  ul.checks { margin:.3rem 0 .3rem 0; padding-left:1.1rem; }
+  ul.checks li { margin:.22rem 0; font-size:.9rem; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .tag { font-family:ui-monospace,monospace; font-weight:700; font-size:.74rem; background:#eef5ff; color:var(--blue); padding:.06rem .4rem; border-radius:4px; }
+</style>
+</head>
+<body>
+<h1>Chapter 4 — 數學正確性閘（math-correctness M1–M8）審核稿</h1>
+<p class="sub">2026-06-27　·　契約 <code>MATH-CORRECTNESS-RUBRIC.md</code>（M1–M8，「請查核 X」propose-only、手稿勝出、不確定降級）　·　被審物 <code>fragments/ch04/sec-4-{1,2,3,4,5}.html</code>（The Exponential and Logarithmic Functions）　·　雙閘：gate-1 Claude ×7（per-section ×5 全 M1–M8＋worked-example 重算專員＋跨章 M6/M7/M8 一致性，每候選對抗式雙鏡頭 verify）＋ 主流程 sympy 獨立重算 ＋ gate-2 Codex gpt-5.5 xhigh（173,720 tokens 跨模型獨立複核，read-only）</p>
+
+<div class="pass"><b>結論：math gate-1 通過 —— 0 blocking、0 advisory、0 候選。</b> 7 個獨立 auditor（5 個 per-section 全 M1–M8、1 個 Ex 4.1–4.7 重算專員、1 個跨章 M6/M7/M8 一致性）一致判 clean；對抗式 verify 階段 <b>0 候選需複核</b>（無 over-report，符 Ch1 校準的 non-findings 護欄）。另以主流程 <b>sympy／python 獨立重算</b>交叉核對全部 worked-example 數值與關鍵尾界，全 PASS。收斂判準（blocking = 0）達成。</div>
+
+<div class="pass"><b>gate-2（Codex gpt-5.5）通過 —— 0 blocking、0 advisory。</b> 經使用者授權後調用（<b>173,720 tokens</b>、單輪收斂、ChatGPT 訂閱配額，2026-06-27）；Codex 獨立讀 rubric＋CLAUDE.md＋PLAN-ch04（§3 D1–D9／§5 ledger）＋5 fragment＋手稿 seed＋signed legacy，自行重算 Example 4.1–4.7（七題 <code>agrees=true</code>）、尾界 (∗)、指數律 6 步、(e^h−1)/h index-shift、積律與反函數導數證明，並查依賴鏈無循環，結論全數健全、0 finding。findings 轉錄於版控 <code>_dev-archive/ch04/ch04_math-audit-gate2.md</code>。<b>雙閘收斂（blocking = 0）。</b></div>
+
+<table>
+  <tr><th>節</th><th>gate-1（Claude）</th><th>gate-2（Codex）</th><th>重點（已獨立核對）</th></tr>
+  <tr><td>§4.1 Construction of \(e^{x}\)</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Def 4.1 級數定義（\(x>0\)、\(0!=1\)）；Thm 4.1 完備性兩式、Thm 4.2 \(\sum x^n/n!\) 收斂；Strategy 4.1 幾何尾界；Ex 4.1 部分和表；尾界 \((*)\ 0\le e^x-P_k\le L^k/k!\)（\(0<x<L,\ k>n_0>2L\)）</td></tr>
+  <tr><td>§4.2 Continuity &amp; Exponent Law</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Def 4.2 Cauchy；Thm 4.3–4.7（連續 \(x>0\)／B–W／Cauchy 準則／連續 \(\mathbb R\)／指數律）、Prop 4.1 \((\triangle)\)、Cor 4.1 正性；指數律 6 步（二項式塌縮 (I)=\(P_k(x{+}y)\)、Step 5 telescope 係數對賬 legacy）</td></tr>
+  <tr><td>§4.3 Derivative of \(e^{x}\)</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Prop 4.2 \(\bigl|\tfrac{e^h-1}{h}-1\bigr|\le|h|\)（\(0<|h|<\tfrac12\)）、Thm 4.8 \((e^x)'=e^x\)、Cor 4.2 高階導；index-shift 比較 \(\sum_{n\ge2}1/n!=e-2\le\sum 1/2^{\,n-1}=1\)（\(n!\ge2^{\,n-1}\)）</td></tr>
+  <tr><td>§4.4 Rolle &amp; MVT</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Def 4.3；Thm 4.9 EVT／4.10 Thm A／4.11 Rolle／4.12 MVT；Cor 4.3 雙條（\(\ge0\) 非減／\(>0\) 嚴增）；Ex 4.2 \(c=1\)、Ex 4.3 Lipschitz、Ex 4.4 \(3x-\sin x\) 恰一根、Ex 4.5/4.6；輔助函數 \(g\) 代數；\(x^3\) 假逆命題 caution</td></tr>
+  <tr><td>§4.5 Monotonicity &amp; Logarithm</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>Def 4.4 \(\ln x\)（反函數雙域）；Thm 4.13 連續／4.14 \((\ln x)'=1/x\)；Cor 4.4 \(f'=0\Rightarrow\) const、Prop 4.3 積律；Ex 4.7 一般冪兩律；range \((0,\infty)\) 明標 intentional omission（§C-1）</td></tr>
+  <tr><td>跨章 M6/M7/M8</td><td class="zero">0 / 0</td><td class="zero">clean</td><td>env-num 普查連續無漏無重；依賴鏈 完備性→B–W→Cauchy→\((\triangle)\)→\(e^x\)（§4.2）／EVT→Thm A→Rolle→MVT→Cor 4.3→Ex 4.6→\(\ln\)，無前向／循環依賴</td></tr>
+  <tr><td><b>合計</b></td><td><b class="zero">0 blocking · 0 advisory</b></td><td><b class="zero">0 blocking · 0 advisory</b></td><td>雙閘收斂；sympy 全 PASS</td></tr>
+</table>
+
+<h2>sympy／python 獨立重算（deterministic ground truth，全 PASS）</h2>
+<div class="card">
+  <div class="f"><span class="k">worked-example 數值</span>　Ex 4.1 部分和 \(P_0{\dots}P_5=1.0000,2.0000,2.5000,2.6667,2.7083,2.7167\)、\(P_{10}(1)\approx2.7182818\)、\(e\approx2.7183\)（表中六項＋\(P_{10}\) 全對）；「每多一項把殘差砍過半」逐步 ratio \(0.42\to0.30\to0.24\to0.19\to0.16\)（皆 \(<\tfrac12\)）。Ex 4.2 \(\dfrac{f(2)-f(0)}{2}=2,\ 2c=2\Rightarrow c=1\in(0,2)\)。Ex 4.4 \(\min_x(3-\cos x)=2>0\)、\(f(0)=0\Rightarrow\) 恰一根。</div>
+  <div class="f"><span class="k">關鍵恆等式／尾界</span>　§4.5 半衰期 \(t_{1/2}=\ln 2/|k|\Rightarrow y(t_{1/2})/y_0=0.5\)；Ex 4.7 \(a^xb^x=(ab)^x\)、\((a^x)^y=a^{xy}\) 符號化皆歸 0；§4.1 尾界 \((*)\) 三組參數 \((x,L,k)=(1.5,2,7),(0.5,1,5),(3,4,12)\) 皆滿足 \(0\le e^x-P_k\le L^k/k!\)。</div>
+  <div class="f"><span class="k">auditor 端 sympy</span>　Ex 4.3 \(|\cos c|\le1\) Lipschitz、Ex 4.5 \(\cos>0\) on \((0,\tfrac\pi4)\)、Ex 4.6 三段 \(e^x>0\)、Prop 4.2 不等式於 \(h=\pm0.49,\pm0.4,\pm0.1,\pm0.01\)、§4.2 \((I)=P_k(x{+}y)\) 二項式塌縮（\(k=1{\dots}5\)）、尾界 \((*)\) 鏈 3000 組隨機合法參數（mpmath）皆 True。</div>
+</div>
+
+<h2>逐節已核對項（gate-1，每條皆獨立走查）</h2>
+
+<h3>§4.1 Construction of the Exponential Function　<span class="tag">0/0</span></h3>
+<ul class="checks">
+  <li><b>M1/M2</b> Def 4.1 級數定義正確完整（\(x>0\) fencing 為 brief-D 刻意範圍、符手稿，非遺漏）；Thm 4.1 完備性兩式、Thm 4.2 收斂陳述假設充分如實，對賬手稿與 signed legacy 相符。</li>
+  <li><b>M4</b> Ex 4.1 部分和、\(P_{10}\)、\(e\) 全經重算；比值界 \(x/(n+1)\)、幾何衰減、piece (II) \(\le x^{n_0}/n_0!\)、尾界 \((*)\) 鏈經 sympy＋mpmath（3000 組）驗證。</li>
+  <li><b>M5/M7</b> \(x>0\) 限定貫穿；\((*)\) 明帶 \(0<x<L,\ k>n_0>2L\)，無過度推廣到全 \(x\)；Strategy 4.1（\(r=\tfrac12\Rightarrow r/(1-r)=1\)）與 (II) 界一致。</li>
+  <li><b>M8</b> 完備性以 Thm 4.1 先陳述後使用；Remark 4.1「\(x^n=a\) 有正解」正確帶 \(a>0\)。</li>
+</ul>
+
+<h3>§4.2 Continuity &amp; the Exponent Law for \(e^{x}\)　<span class="tag">0/0</span></h3>
+<ul class="checks">
+  <li><b>M1/M2</b> Def 4.2（Cauchy）量詞齊備、與 legacy 逐字一致；Thm 4.3–4.7＋Prop 4.1＋Cor 4.1 全對賬 ground truth。</li>
+  <li><b>M3</b> Thm 4.5 iff 雙向皆證（\(\Rightarrow\) 三角不等式；\(\Leftarrow\) 經 B–W 取收斂子列）；B–W peak 兩 case 互斥窮盡。</li>
+  <li><b>M4（最吃重）</b> sympy 驗 \((I)=P_k(x{+}y)\) 二項式塌縮、\(P_k(x)P_k(y)=(I)+(II)\) 乘積拆解、Step 4 inner-sum 放大；Step 5 telescope 係數 \(2e^L L^{n_0}/n_0!+2(2L)^{n_0}/n_0!\) 與 legacy 完全一致；Cor 4.1 \(e^x e^{-x}=1\)。</li>
+  <li><b>M5/M8</b> Thm 4.3 取 \(\delta<\min\{x_0/2,\tfrac12\}\)；\(n_0\) 門檻一致（binding \(n_0>8L\)）；收斂\(\Leftrightarrow\)Cauchy 經 B–W 回溯完備性（Caution 明寫依賴鏈）；手稿 punt 的證明在 handout 展開係 PLAN D3① 授權擴增，非隱性假設。</li>
+</ul>
+
+<h3>§4.3 The Derivative of \(e^{x}\)　<span class="tag">0/0</span></h3>
+<ul class="checks">
+  <li><b>M2/M3</b> Prop 4.2、Thm 4.8、Cor 4.2 對賬 legacy §4.3；Cor 4.2 歸納結構有效（base＝Thm 4.8、step 再微一次）。</li>
+  <li><b>M4</b> sympy 驗 index-shift \(\tfrac{e^h-1}{h}-1=\sum_{n\ge2}h^{\,n-1}/n!\)；比較 \(\sum_{n\ge2}1/n!=e-2\approx0.718\le\sum 1/2^{\,n-1}=1\)（由 \(n!\ge2^{\,n-1}\)）；squeeze 到 \(\lim=1\)、常數 \(e^x\) 外提得 \((e^x)'=e^x\)。</li>
+  <li><b>M5/M6</b> 差分商正確限非零 \(h\)、\(0<|h|<\tfrac12\) 排除 \(h=0\)；Prop 4.2 取開區間 \(|h|<\tfrac12\) 對齊手稿（legacy 為 \(|h|\le\tfrac12\)，HTML 從手稿——手稿勝出，非 drift）。</li>
+  <li><b>M8</b> 級數收斂／指數律／連續性皆明引 §4.1/§4.2 已證結果；刻意 cross-ref Ch2 §2.4「這次補上 bound」為 direction-approved 特性。</li>
+</ul>
+
+<h3>§4.4 Rolle's Theorem and the Mean Value Theorem　<span class="tag">0/0</span></h3>
+<ul class="checks">
+  <li><b>M1/M2</b> Def 4.3 max/min 量詞齊備；EVT 4.9（連續＋閉區間）／Thm A 4.10（內部＋\(f'\) 存在）／Rolle 4.11／MVT 4.12／Cor 4.3（非嚴＋嚴格兩式）假設充分如實、與手稿及 legacy 等價。</li>
+  <li><b>M3</b> Thm A 單側極限正確夾擠；Rolle Case 1/Case 2 互斥窮盡；Ex 4.4 用 Rolle 反證健全；Caution 正確指 Cor 4.3 為充分非必要（\(x^3\) 反例）。</li>
+  <li><b>M4</b> Ex 4.2 \(c=1\)、Ex 4.3 Lipschitz、Ex 4.4 \(f'=3-\cos x\ge2>0\)、Ex 4.5/4.6 皆 sympy 驗；MVT 輔助函數 \(g'(c)=f'(c)-\tfrac{f(b)-f(a)}{b-a}\) 代數正確；Strategy 4.2 \(|x|\) 割線斜率 \(=0\)。</li>
+  <li><b>M5/M7/M8</b> 內部 vs 端點以 \(f(x)=x\) on \([0,1]\) 點明、閉/開假設不對稱以 \(\sqrt x\) on \([0,1]\) 處理；Cor 4.3 引 MVT 落在假設內；Mode C ① 重編號 Ex 4.3/4.4→4.5/4.6 與 ledger 一致；\(e^x>0\) 三段論證非默設。</li>
+</ul>
+
+<h3>§4.5 Monotonicity and the Logarithmic Function　<span class="tag">0/0</span></h3>
+<ul class="checks">
+  <li><b>M1/M2</b> Def 4.4 反函數雙域正確（\(e^{\ln x}=x,\ x>0\)；\(\ln(e^x)=x,\ x\in\mathbb R\)），存在唯一性歸於 range \((0,\infty)\)＋嚴格單調；Thm 4.13/4.14、Cor 4.4、Prop 4.3 假設完整、對賬 legacy。</li>
+  <li><b>M3/M4</b> Thm 4.13 反證的 \(\exists\delta\exists\) 序列見證結構正確、\(\varepsilon=\min\{\dots\}\) 兩 case；sympy 驗 Ex 4.7 兩律歸 0、Prop 4.3 \(f'(x)=a\cdot\tfrac{1}{ax}-\tfrac1x=0\)、\(f(1)=\ln a\)、半衰期 \(t=\ln2/|k|\)、caution \(\ln(1{+}1)=\ln2\ne0\)。</li>
+  <li><b>M5/M7</b> \(x>0\) 域貫穿、Caution 明標 \(\ln 0,\ \ln(-1)\) 無定義（\(e^a>0\)）；Thm 4.14 取 \(h\) 小使 \(x+h>0\)；引 Thm 4.6/4.7/4.8/4.12、Cor 4.4、Ex 4.6（重編號後）皆落假設內；Summary 的 \(|h|<\tfrac12\) 界對齊 §4.3。</li>
+  <li><b>M8</b> range \((0,\infty)\)「斷言不證」為明標 intentional omission（§C-1，手稿＋legacy 皆斷言）；序列連續性刻畫為手稿用的標準等價，無取用未及前提。</li>
+</ul>
+
+<h3>跨章 M6/M7/M8 一致性　<span class="tag">0/0</span></h3>
+<ul class="checks">
+  <li><b>M6</b> \(P_k\) 部分和記號 §4.1 定義、§4.2–§4.5 沿用一致；\(\binom{\ell}{m}\) 全程用、首見處 cross-ref 手稿 \(C^\ell_m\) 一次（D8、符 §9＋ledger）；\(e\)（常數）vs \(e^x\)（函數）vs \(\ln x\) 區分一致；界名 \((*)\)（§4.1）／\((**)\)（§4.2）各引入一次後一致沿用。</li>
+  <li><b>M7</b> env-num 普查：Definition 4.1–4.4、Theorem 4.1–4.14、Proposition 4.1–4.3、Corollary 4.1–4.4、Strategy 4.1–4.2、Example 4.1–4.7、Figure 4.1–4.6、Remark 4.1–4.6 —— 全連續、無漏號、無重 mint、無 dangling reference。每個 student-facing 引用皆解析到存在的 env-num 且落在被引結果假設內（含 §4.5 Thm 4.13 證明引 Ex 4.6——已由 Mode C ① 重編號正確更新自舊 4.4）。</li>
+  <li><b>M8</b> 依賴鏈無前向／循環：完備性(4.1)→B–W(4.4)→Cauchy 準則(4.5)→絕對收斂(Prop 4.1)→\(e^x\) 定義於 \(\mathbb R\)（§4.2）；§4.1 尾界 \((*)\) 於 §4.2/§4.3 重用；EVT(4.9)→Thm A(4.10)→Rolle(4.11)→MVT(4.12)→單調 Cor(4.3)→\(e^x\) 嚴增(Ex 4.6)→\(\ln\) 定義(4.4)；MVT 前提（\([a,b]\) 連續、\((a,b)\) 可微）於每次引用前皆已供給。</li>
+</ul>
+
+<h2>方法</h2>
+<p class="sub">gate-1 ＝ 7 個並行 auditor（workflow <code>ch04-math-audit-gate1</code>，<code>wf_ea8a0ceb-39a</code>，opus-4-8、high effort，總計 713k tokens）：5 個 per-section 走全 M1–M8、1 個 Ex 4.1–4.7 重算專員（M4/M5）、1 個跨章 M6/M7/M8 一致性。各 auditor 讀 fragment＋手稿轉錄 <code>seed_ch04_s{1..5}.md</code>＋ signed legacy <code>legacy/tex_handout/chapters/ch04_exponential_logarithm.tex</code>，computational 項以 sympy／mpmath 獨立重算。每個候選 finding 進<b>對抗式雙鏡頭 verify</b>（recompute lens 從零重導＋rubric-protection lens 對照「不算 finding」清單與 PLAN §3 D1–D9 邊界，預設 refute／降級）——本輪 <b>raw 候選 = 0</b>，故 verify 空跑、synthesize 出空表。數學內容對照 rubric 的 deliberate-editorial-choices／already-handled 護欄（手稿刻意證法、省略證明、記號升級、明標 informal、節層範圍假設、刻意近似、語意等價）。主流程另以 python／sympy 獨立重算全部 worked-example 數值＋尾界 \((*)\) 交叉核對。全程「不確定降級、寧缺勿濫」。<b>gate-1 收斂（blocking = 0）。</b> gate-2 ＝ <code>codex exec -s read-only --output-schema</code>（gpt-5.5 xhigh，<b>173,720 tokens</b>、單輪收斂、ChatGPT 訂閱配額，經使用者授權 2026-06-27）獨立讀 rubric＋CLAUDE.md＋PLAN-ch04＋5 fragment＋手稿 seed＋signed legacy 複審，自行重算 Ex 4.1–4.7（七題 agrees=true）＋尾界 (∗)＋指數律 6 步＋積律／反函數導數，verdict converged、0 finding；原始 JSON 轉錄於版控 <code>_dev-archive/ch04/ch04_math-audit-gate2.md</code>。<b>雙閘收斂（blocking = 0）。</b></p>
+
+</body>
+</html>

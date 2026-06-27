@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 4 S·A·V 散文閘 — gate-1（Claude）審核稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --amber:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,"Noto Sans TC",sans-serif; max-width:1000px; margin:0 auto;
+         padding:2rem 1.5rem 4rem; background:var(--bg); color:#1a1a1a; line-height:1.62; }
+  h1 { font-size:1.5rem; margin:0 0 .3rem; }
+  h2 { font-size:1.13rem; margin:2rem 0 .5rem; padding-top:.6rem; border-top:2px solid var(--line); }
+  .sub { color:var(--gray); font-size:.9rem; margin:0 0 1rem; }
+  .pass { background:#eaf6ed; border-left:3px solid var(--green); padding:.6rem .9rem; border-radius:5px; font-size:.93rem; color:#13502c; margin:.4rem 0 1.2rem; }
+  .pass b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.88rem; }
+  th, td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#eef2f7; }
+  .zero { color:var(--green); font-weight:700; }
+  .card { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--amber); border-radius:8px; padding:.75rem 1rem; margin:.7rem 0; }
+  .card.keep { border-left-color:var(--gray); }
+  .card.apply { border-left-color:var(--blue); }
+  .row1 { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin-bottom:.3rem; }
+  .id { font-family:ui-monospace,monospace; font-weight:700; font-size:.8rem; background:#fef0e7; color:var(--amber); padding:.1rem .45rem; border-radius:4px; }
+  .badge { font-size:.7rem; font-weight:700; padding:.1rem .5rem; border-radius:999px; background:#fef0e7; color:var(--amber); }
+  .badge.rec { background:#e9f0fb; color:var(--blue); }
+  .badge.keep { background:#eef1f4; color:var(--gray); }
+  .k { font-weight:700; color:var(--gray); font-size:.78rem; }
+  .f { margin:.3rem 0; font-size:.92rem; }
+  del { background:#fde8e7; color:#7a271a; text-decoration:line-through; padding:.02rem .15rem; }
+  ins { background:#e7f6ec; color:#0f5132; text-decoration:none; padding:.02rem .15rem; }
+  code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+</style>
+</head>
+<body>
+<h1>Chapter 4 — S·A·V 去 AI 味散文閘 gate-1（Claude）審核稿</h1>
+<p class="sub">2026-06-27　·　契約 <code>PROSE-AUDIT-RUBRIC.md</code>（A 易懂性 U1–U5／B 流暢性 F1–F5／C 語意·高度·聲音 S·A·V）＋錨組 <code>anchors/svc-exemplars.md</code>　·　gate-1 ＝ <code>handout-prose-audit</code> subagent ×5（逐節 §4.1–§4.5），每 blocking 候選對抗式降級複核　·　Vale 3.15.1 pre-flag：<b>0 errors / 0 warnings / 0 suggestions（5 檔）</b>　·　propose-only、保語意、不動數學、不碰教學順序</p>
+
+<div class="pass"><b>結論：prose gate-1 通過 —— 五節 blocking 全 0（易懂性 U＋S/A 皆 0）。</b> 17 條 findings 全為 advisory；blocking 候選佇列為空（無 auditor 升 blocking，降級複核空跑）。符合本章已過 Mode A 六階＋Mode C 後的「largely clean」預期。收斂判準（blocking = 0）達成；advisory 不強制歸零，交使用者逐條裁決。下方 <b>4 條建議採</b>（純切句／去重的 copyedit，零語意改動），1 條 F2 可選，其餘 12 條為 Optional／V1 voice（建議維持現狀）。</p></div>
+
+<table>
+  <tr><th>節</th><th>VERDICT</th><th>blocking</th><th>建議採（copyedit）</th><th>Optional／V1（建議留）</th></tr>
+  <tr><td>§4.1 Construction</td><td>0 blk · 1 opt · 1 voice</td><td class="zero">0</td><td>—</td><td>G1-4.1-1（U4→opt）＋G1-4.1-2（V1）</td></tr>
+  <tr><td>§4.2 Continuity &amp; Exponent Law</td><td>0 blk · 1 tighten · 1 voice</td><td class="zero">0</td><td><b>G1-4.2-1（F4 切句）</b></td><td>G1-4.2-2（V1）</td></tr>
+  <tr><td>§4.3 Derivative of \(e^x\)</td><td>0 blk · 1 tighten · 1 opt · 2 voice</td><td class="zero">0</td><td><b>G1-4.3-1（F1 去重）</b></td><td>G1-4.3-2（F2 taste）＋2×V1</td></tr>
+  <tr><td>§4.4 Rolle &amp; MVT</td><td>0 blk · 2 opt · 2 voice</td><td class="zero">0</td><td>—</td><td>G1-4.4-1（S2/S3 lean 刪）＋G1-4.4-2（S2）＋2×V1</td></tr>
+  <tr><td>§4.5 Monotonicity &amp; Logarithm</td><td>0 blk · 3 tighten · 2 voice</td><td class="zero">0</td><td><b>G1-4.5-1、G1-4.5-2（F4 切句）</b></td><td>G1-4.5-3（F2 可選）＋2×V1</td></tr>
+  <tr><td><b>合計</b></td><td></td><td><b class="zero">0 blocking</b></td><td><b>4 條建議採</b></td><td>~13 條建議留</td></tr>
+</table>
+
+<h2>建議採的 copyedit（advisory；⛳ 逐條裁決，全為純切句／去重、零語意改動）</h2>
+
+<div class="card apply">
+  <div class="row1"><span class="id">G1-4.2-1</span><span class="badge">advisory · F4 句長</span><span class="badge rec">建議採</span></div>
+  <div class="f"><span class="k">locus</span>　§4.2 開節（<code>sec-4-2.html</code> 行 40）：一句以巢狀「that…that…and that…」並列三項待證命題，自學讀者一次須扛三 clause＋一層「the way the symbol promises」鋪陳。</div>
+  <div class="f"><span class="k">diff</span>　What we have <em>not</em> yet shown is that \(e^{x}\) behaves the way the symbol promises<del>: that it is continuous, that it obeys</del><ins>. Three things remain: that it is continuous; that it obeys</ins> \(e^{x} e^{y} = e^{x + y}\)<del>, and that</del><ins>; and that</ins> it even makes sense for \(x \le 0\).</div>
+  <div class="f"><span class="k">為何</span>　純切句＋分號化三項；先讓讀者 register「行為待證」，再分項列出。承載位（節開場 roadmap 句）的真實可讀性收益。</div>
+</div>
+
+<div class="card apply">
+  <div class="row1"><span class="id">G1-4.3-1</span><span class="badge">advisory · F1 局部冗餘</span><span class="badge rec">建議採</span></div>
+  <div class="f"><span class="k">locus</span>　§4.3 difference quotient 小節開頭（<code>sec-4-3.html</code> 行 46）：「a single algebraic move, and that move is」在同句內把「move」重述一次。</div>
+  <div class="f"><span class="k">diff</span>　The entire calculation rests on a single algebraic move<del>, and that move is the exponent law.</del><ins> — the exponent law.</ins></div>
+  <div class="f"><span class="k">為何</span>　破折號直接揭示，去掉同句重述、零語意損失，且強調手勢更俐落。</div>
+</div>
+
+<div class="card apply">
+  <div class="row1"><span class="id">G1-4.5-1</span><span class="badge">advisory · F4 句長</span><span class="badge rec">建議採</span></div>
+  <div class="f"><span class="k">locus</span>　§4.5 開節（<code>sec-4-5.html</code> 行 59）：「Less obviously…」一句串 role-claim＋冒號解拆＋「not free gifts」隱喻共四 clause，讀者尚無形式錨點。</div>
+  <div class="f"><span class="k">diff</span>　Less obviously, it also <em>powers</em> everything we then prove about that inverse<del>:</del><ins>.</ins> <del>the</del><ins>The</ins> continuity of \(\ln\) and its differentiability are not free gifts that come with the definition<del>. Each</del><ins>; each</ins> needs its own argument, and both <del>arguments </del>reach back to the strict monotonicity of \(e^{x}\).</div>
+  <div class="f"><span class="k">為何</span>　冒號改句點分段、第二句改分號接續、刪重複「arguments」；building/powering 對比與語意全保留。</div>
+</div>
+
+<div class="card apply">
+  <div class="row1"><span class="id">G1-4.5-2</span><span class="badge">advisory · F4 句長</span><span class="badge rec">建議採</span></div>
+  <div class="f"><span class="k">locus</span>　§4.5「Defining the natural logarithm」導句（<code>sec-4-5.html</code> 行 64）：一句夾長破折號插入語＋第二 clause，讀者解析三層巢狀才到承載 payoff（每個 \(x>0\) 恰一指數）。</div>
+  <div class="f"><span class="k">diff</span>　We take this for granted here<del> —</del><ins>:</ins> the two limits follow from the series and the intermediate values from continuity, but the details would detain us<del> — and read off the consequence we need:</del><ins>. The consequence we need is what matters —</ins> for every \(x &gt; 0\) there is exactly one exponent producing it.</div>
+  <div class="f"><span class="k">為何</span>　把長插入語斷成獨立句，payoff 另起；「we don't prove this」的誠實訊號保留。</div>
+</div>
+
+<h2>其餘 advisory（Optional／V1 voice；寬報登記、建議維持現狀）</h2>
+<div class="card keep">
+  <div class="row1"><span class="badge keep">可選 · 建議留</span></div>
+  <div class="f"><span class="k">§4.1</span>　G1-4.1-1（U4→Optional）：(∗) 重用 \(n_0\) 但綁 \(n_0>2L\)（原為 \(n_0>2x\)）；使用處散文＋不等式可當場重建，<b>非 blocking</b>，可選加半句點明重選。G1-4.1-2（V1）：「The definition becomes concrete at \(x=1\)…」中性可更暖。</div>
+  <div class="f"><span class="k">§4.2</span>　G1-4.2-2（V1）：「With Bolzano–Weierstrass in hand, the Cauchy criterion follows.」轉場句中性可更暖。</div>
+  <div class="f"><span class="k">§4.3</span>　G1-4.3-2（F2 taste）：「makes it transparent」略抽象、可不改；G1-4.3-3／G1-4.3-4（V1）：payoff／iteration 過場句中性可更暖。</div>
+  <div class="f"><span class="k">§4.4</span>　<b>G1-4.4-1（S2/S3，lean 刪）</b>：「This is the foundational fact that drives everything below.」（行 82）為 orienting filler，與行 93 已賺得的 black-box framing 重複，刪無損——但非承載位空句，故 advisory 非 blocking，交裁。G1-4.4-2（S2）：「Two applications close the section…」signposting，建議留。G1-4.4-3／G1-4.4-4（V1）：皆已達暖度 bar，建議留。</div>
+  <div class="f"><span class="k">§4.5</span>　G1-4.5-3（F2 可選）：「silently carries the assumption」→「tacitly assumes」輕修，可不改；G1-4.5-4／G1-4.5-5（V1）：導句中性、鄰句已補直覺，建議留。</div>
+  <div class="f"><span class="k">說明</span>　依 rubric「中性不扣分」「V1 永遠 advisory 且寬報」，上列登記供裁決，預設建議維持現狀（皆非空句、非錯高度）。</div>
+</div>
+
+<h2>方法</h2>
+<p class="sub">gate-1 ＝ 5 個 <code>handout-prose-audit</code> subagent（逐節 §4.1–§4.5，opus-4-8、high effort，workflow <code>wf_18dcf9d6-64b</code>），各讀 <code>PROSE-AUDIT-RUBRIC.md</code>＋<code>anchors/svc-exemplars.md</code>（2 正 1 負真人錨）對 A/B/C 三維走查、對著正面 bar 判、中性不扣分、不確定降級、不 over-report。每個被標 blocking 的候選再進對抗式降級複核（refute-biased、預設降級）——本輪 <b>0 blocking 候選</b>，複核空跑。Vale 3.15.1 為零成本預標護欄：5 檔 0/0/0。收斂判準（易懂性＋S/A blocking = 0）達成。gate-2 ＝ Codex 同 rubric＋錨組獨立複核（計費、待授權），另出 <code>REVIEW-ch04-svc-gate2.html</code>。</p>
+
+</body>
+</html>
