@@ -4,6 +4,24 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## ✅ 2026-06-29 ch03 §3.1 detail-redo：內容稿從「壓縮骨架」重做成「最大詳細」（mock 里程碑達成）
+
+**緣起：** §3.1 第一版（commit `520a625` LOCKED）在 Stage-2 把證明壓成單頁 2–3 行骨架；密度稽核（[`content_scripts/_audit/REVIEW-ch03-s31-density-audit.html`](content_scripts/_audit/REVIEW-ch03-s31-density-audit.html)，19 場三方對照＋對抗複驗）證實**無承載缺口但場景稀、填充僅 ~30–35%、continuity 的界憑空出現**。使用者裁決「影片講解要最大詳細、少省略；選材可少但講解要清楚；必要時重頭來過」。**定性：不是改規則，是回去遵守 `CONTENT_METHODOLOGY §1`「detail over compression」**（第一版違背了自己的方法論）。規格/計畫見 [`SPEC-ch03-s31-detail-redo.md`](content_scripts/_audit/SPEC-ch03-s31-detail-redo.md)／[`PLAN-ch03-s31-detail-redo.md`](content_scripts/_audit/PLAN-ch03-s31-detail-redo.md)（取代前版 `PLAN-ch03-s31-video.md` 的密度假設）。
+
+**決策 D1–D4（使用者逐項裁）：** 全 §3.1 從頭重拆／第1檔忠實全展開為基準＋4 樞紐加第2檔直覺鷹架（difference_quotient、sector、continuity、fundamental_limit）／選材全保留（companion／all-six／SHM）／加防漂移護欄。
+
+**做了什麼：**
+- **Stage 1 內容稿重拆＋re-LOCK：** continuity 拆 `continuity_statement_sin_limit`＋`continuity_argument` 兩單元（後者**畫面顯示和差化積兩條恆等式**→界→squeeze，修掉「界憑空出現」唯一真缺口）；每個 proof/derivation 的 `visual_need` 改為逐行列出畫面承載步驟（derivative_of_sine 補 `lim_{h→0}` setup、derivative_of_cosine 顯示伴隨恆等式、all_six 顯示 sec′ 商法則步驟）。**六鏡 blocking==0**（6 鏡 clean、L5 隔離盲算 11 組關鍵數全 match、Workflow `wf_2a33636d-17d`）＋ copyedit 7 tighten 全採納 ＋ 使用者 2026-06-29 sign-off → LOCKED（取代 06-28 壓縮版 LOCK）。
+- **Stage 2 工程：** storyboard 重模板化（continuity 拆場走 `part: 1/2,2/2`、proof payload 每步上畫面、`say`/`{show}` 對齊）；3 hook reveal id 不變、無需改；chord≤arc 以 continuity_statement 的 proof 行承載、不另立 hook。schema/lint 0、sizecheck **0 error**（2 within-frame advisory：continuity_argument qed／recap point.3）。全片 mock render 1080p 成片。**視覺幀稽核**（Workflow `wf_579f76f9-b5c`，20 場並行 refute-by-default）：**19 場 clean、1 blocking** → all_six V4 garble → **已修＋回歸通過**。
+- **報告：** [`REVIEW-ch03-s31-detail-redo-applied.html`](content_scripts/_audit/REVIEW-ch03-s31-detail-redo-applied.html)（逐場最終幀＋narration＋change tag＋閘結果）。
+
+**durable 教訓（已 codify 進 `DESIGN.md` authoring checklist）：**
+1. **`derivation` 的 `result`/`check` 的 `reason` 不可放 `$math$`** —— 走 `texttt`（大寫 mono、不處理 `$…$`）→ 印 raw LaTeX garble（本輪 all_six 的 V4）；只有 step 的 `reason` 吃 math。要顯示的 math 放進 `result.math`／`check.math` 本體。
+2. **proof >4 步必拆 statement＋proof 場、超頁走 `part:`、一步一 beat；不得在低填充幀只放骨架**（detail over compression 防漂移）。
+3. **result 等式過寬會與 rail 的 reason 重疊** —— 縮短等式或拿掉該行 reason（本輪 all_six sec′）。
+
+**里程碑＝mock 成片＋視覺 blocking==0。** TTS（MiMo）／NFA／Codex gate-2／VLM critic gate-2 等計費步驟**延後**，各自徵同意才跑。分支續用 `video/template-redesign-navy-spine`。
+
 ## ✅ 2026-06-25 Route A 落地：全螢幕文字改走 LaTeX（IBM Plex Sans/Mono ＋ Latin Modern 數學）
 
 照 [`PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md) 8 task 逐步執行完成（分支 `video/template-redesign-navy-spine` 續做；navy/spine 已是對題分支，未另開）。**所有螢幕文字現在都走 LaTeX/pdflatex** 以拿到 kerning——文字 IBM Plex Sans（內文/標題）＋ IBM Plex Mono（eyebrow），數學 Latin Modern。

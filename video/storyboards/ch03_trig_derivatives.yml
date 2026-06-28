@@ -1,0 +1,616 @@
+# §3.1 Derivatives of Sine and Cosine -- canonical storyboard.
+#
+# Stage-2 engineering storyboard, DETAIL-REDO (2026-06-29) authored from the
+# re-LOCKED content script (video/content_scripts/ch03_trig_derivatives.md,
+# detail-redo) and the HTML handout (handout/fragments/ch03/sec-3-1.html;
+# authoritative build handout/chapter3-print-standalone.html). Follows
+# CONTENT_METHODOLOGY.md (one teaching idea per scene, detail over compression,
+# faithful to the handout) and DESIGN.md (template catalog, say/{show} reveal,
+# capacity contract + multipage `part:`).
+#
+# DETAIL-REDO changes vs the prior compressed storyboard:
+#   * continuity SPLIT into two scenes (statement+sinθ→0 / the sum-to-product
+#     argument), part 1/2 + 2/2; the argument now SHOWS both sum-to-product
+#     identities on screen (the bound no longer appears from nowhere).
+#   * every proof/derivation payload enumerates the load-bearing steps on
+#     screen: derivative_of_sine gains the lim_{h→0} definition line;
+#     derivative_of_cosine shows the companion identity; all_six shows the
+#     sec' quotient-rule step.
+#   * 4 pivots carry L2 intuition in `say` (difference_quotient, sector,
+#     continuity, fundamental_limit). No new mathematics added.
+#
+# Three custom animation hooks (animations/ch03_trig_derivatives_hooks.py):
+#   * sector_inequality  (Figure 3.1) -- nested unit-circle areas
+#   * slope_equals_height(Figure 3.3) -- sin tangents vs cos heights
+#   * shm_stacked_graphs (Figure 3.4) -- s/s'/s'' over one time axis, s''=-s
+# Figure 3.2 (squeeze_graph) is a stock single-panel graph (no hook).
+
+meta:
+  id: ch03_trig_derivatives
+  chapter: "Chapter 3"
+  chapter_title: "Chain Rule and Trigonometric Derivatives"
+  section: "3.1"
+  title: "Derivatives of Sine and Cosine"
+  language: en
+  theme: midnight
+  voice: Mia
+  video: { w: 3840, h: 2160, fps: 60 }   # 4K60 delivery; --quality high renders 1080p for QA
+  sections:
+    - { id: "3.1", title: "Derivatives of the Sine and Cosine Functions" }
+    - { id: "3.2", title: "The Chain Rule" }
+    - { id: "3.3", title: "Applications of the Chain Rule" }
+
+scenes:
+
+  # 0 ---------------------------------------------------------------- intro
+  - id: intro
+    kind: intro
+    tagline: "How fast does sine change?"
+    duration: 6.0
+
+  # 1 ------------------------------------------- divider: Stage 1 opener
+  - id: divider_limit
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 1"
+    title: "The Limit Behind the Slope"
+    subtitle: "Why a trig derivative needs a new idea."
+    ghost: "1"
+    progress: { current: 1, total: 4 }
+    duration: 4.0
+
+  # 2 --------------------------------------- motivation: the trig difference quotient
+  - id: why_trig_is_different
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "chapter3-print-standalone.html SS3.1 . opening prose (funnels to sin/theta over theta)"
+    title: "A Limit No Algebra Can Crack"
+    say: |
+      Every derivative so far has yielded to algebra. For a polynomial we
+      expanded $(x+h)^n$ and the binomial theorem handed us a factor of $h$ to
+      cancel; for $e^x$ the power series did the same job. The trigonometric
+      functions refuse to play along.
+      {show math.0} Write down the difference quotient for $\sin x$ and try the
+      usual move. You cannot simply set $h=0$: that gives $\tfrac00$, which
+      tells you nothing. And no identity cancels the $h$ in the denominator --
+      $\sin(x+h)$ simply does not break into pieces that conveniently subtract.
+      {show math.1} As we are about to see, the whole computation funnels down
+      to a single limit, the limit of $\sin\theta$ over $\theta$ -- again the
+      indeterminate form zero over zero, and one that no algebra will crack.
+      {show statement} Prying it open takes a genuinely new tool: a geometric
+      comparison of areas on the unit circle. And once we secure that one
+      limit, it unlocks the derivatives of both sine and cosine at once. One
+      ground rule, though: throughout, angles are measured in radians -- an
+      assumption that turns out to be essential.
+    statement: "Every trigonometric derivative funnels down to a single limit."
+    math:
+      - "$\\dfrac{\\sin(x+h)-\\sin x}{h}\\ \\xrightarrow{\\ h=0\\ }\\ \\dfrac{0}{0}\\quad(\\text{no information})$"
+      - { tex: "$\\displaystyle\\lim_{\\theta\\to 0}\\dfrac{\\sin\\theta}{\\theta}\\quad\\left(\\tfrac{0}{0},\\ \\text{no algebra}\\right)$", anim: highlight }
+
+  # 3 ------------------------------------ derivation: reduce the difference quotient (L2)
+  - id: difference_quotient_for_sine
+    kind: content
+    template: derivation
+    accent: definition
+    kicker: derivation
+    source: "chapter3-print-standalone.html SS3.1 . The difference quotient for sine (sum-to-product)"
+    title: "The Difference Quotient for Sine"
+    say: |
+      So let us transform that difference quotient instead of fighting it
+      head-on. The decisive step is one trigonometric identity -- sum-to-product
+      -- which turns a difference of sines into a product.
+      {show step.0} Here it is; and a product is exactly what we want, because
+      we can pull it apart and take limits one factor at a time.
+      {show step.1} Put $A=x+h$ and $B=x$, and the numerator becomes
+      $2\cos(x+\tfrac h2)\sin\tfrac h2$.
+      {show step.2} Now divide by $h$ -- and here is the small trick that makes
+      everything line up: write $h$ as $2$ times $\tfrac h2$, so the denominator
+      carries the very $\tfrac h2$ inside the sine. The quotient cleans up to
+      $\cos(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
+      {show result} Look at what we have: a product of two factors. The first
+      slides to $\cos x$, provided cosine is continuous; the second is exactly
+      $\sin\theta$ over $\theta$ with $\theta=\tfrac h2$. So the whole derivative
+      hangs on just two facts -- continuity, and that fundamental limit. We
+      secure both now.
+    steps:
+      - { math: "\\sin A-\\sin B = 2\\cos\\tfrac{A+B}{2}\\,\\sin\\tfrac{A-B}{2}", reason: "sum-to-product" }
+      - { math: "\\sin(x+h)-\\sin x = 2\\cos\\!\\left(x+\\tfrac h2\\right)\\sin\\tfrac h2", reason: "$A=x+h,\\ B=x$" }
+      - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\tfrac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot\\tfrac h2$" }
+    result: { math: "\\cos\\!\\left(x+\\tfrac h2\\right)\\to\\cos x\\quad\\text{and}\\quad \\frac{\\sin(h/2)}{h/2}\\to 1", reason: "continuity + the limit" }
+
+  # 4 ------------------------------------------- divider: Stage 2 opener
+  - id: divider_squeeze
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 2"
+    title: "A Geometric Squeeze"
+    subtitle: "Trapping a ratio between two areas."
+    ghost: "2"
+    progress: { current: 2, total: 4 }
+    duration: 4.0
+
+  # 5 ----------------------------- Figure 3.1: nested areas on the unit circle (HOOK, L2)
+  - id: sector_inequality
+    kind: content
+    template: graph
+    mode: single
+    accent: definition
+    hook: "animations.ch03_trig_derivatives_hooks:sector_inequality"
+    source: "chapter3-print-standalone.html SS3.1 . Figure 3.1 (sector-inequality) + area prose"
+    title: "A Squeeze on the Unit Circle"
+    say: |
+      Here is that new tool. We compare three areas on a circle of radius one.
+      But first, one convenience that saves us half the work. Replacing $\theta$
+      by $-\theta$ flips the sign of both $\theta$ and $\sin\theta$, so the
+      ratio $\sin\theta/\theta$ is even -- whatever we learn for positive angles
+      holds for negative ones, so it is enough to chase $\theta$ down to zero
+      from the positive side. Now the geometry. On the unit circle, $A$ is at
+      $(1,0)$, $B$ is the point at angle $\theta$, and extending the radius to
+      the tangent at $A$ gives $C=(1,\tan\theta)$.
+      {show tri_inner} The inner triangle $OAB$ has base one and height
+      $\sin\theta$, so its area is one half $\sin\theta$.
+      {show sector} The sector $OAB$ is the fraction $\theta$ over $2\pi$ of the
+      disc -- area one half $\theta$.
+      {show tri_outer} And the outer triangle $OAC$ has height $\tan\theta$, so
+      its area is one half $\tan\theta$.
+      {show ineq} Each region sits inside the next, so the areas line up in
+      order: one half $\sin\theta$, then one half $\theta$, then one half
+      $\tan\theta$. The whole argument hangs on that one picture.
+    axes:
+      x_range: [-0.45, 1.4, 1]
+      y_range: [-0.35, 1.65, 1]
+      x_length: 5.4
+      y_length: 5.4
+    plots: []
+
+  # 6 --------------------------------- derivation: areas -> cos t <= sin t/t <= 1 (L2)
+  - id: squeeze_to_the_bound
+    kind: content
+    template: derivation
+    accent: definition
+    kicker: derivation
+    source: "chapter3-print-standalone.html SS3.1 . algebra after Figure 3.1 (inequality 1)"
+    title: "Trapping the Ratio"
+    say: |
+      Now turn that chain of areas into a statement about $\sin\theta/\theta$,
+      one careful step at a time.
+      {show step.0} Multiply through by $2$ to clear the halves:
+      $\sin\theta\le\theta\le\tan\theta$.
+      {show step.1} Divide every part by $\sin\theta$, positive here, and
+      rewrite $\tan\theta$ as $\sin\theta$ over $\cos\theta$ -- giving $1$ at
+      most $\theta$ over $\sin\theta$ at most $1$ over $\cos\theta$.
+      {show result} The middle is upside down, so take reciprocals of all three.
+      They are positive, and flipping positives reverses the inequalities, so
+      the chain turns around: $\cos\theta\le\sin\theta/\theta\le 1$, for $\theta$
+      between zero and $\tfrac\pi2$.
+      {show check} And pocket one more consequence: from $\sin\theta\le\theta$ we
+      also get zero at most $|\sin\theta|$ at most $|\theta|$ near zero -- a
+      bound we lean on twice in a moment.
+    steps:
+      - { math: "\\sin\\theta \\;\\le\\; \\theta \\;\\le\\; \\tan\\theta", reason: "multiply areas by $2$" }
+      - { math: "1 \\;\\le\\; \\frac{\\theta}{\\sin\\theta} \\;\\le\\; \\frac{1}{\\cos\\theta}", reason: "$\\div\\sin\\theta$, $\\tan=\\tfrac{\\sin}{\\cos}$" }
+    result: { math: "\\cos\\theta \\;\\le\\; \\frac{\\sin\\theta}{\\theta} \\;\\le\\; 1 \\qquad (0<\\theta<\\tfrac{\\pi}{2})", reason: "reciprocate -- reverses" }
+    check:  { math: "0 \\;\\le\\; \\lvert\\sin\\theta\\rvert \\;\\le\\; \\lvert\\theta\\rvert", reason: "kept for later" }
+
+  # 7 ------------------- Proposition 3.1 (part 1/2): statement + lim sin theta = 0
+  - id: continuity_statement_sin_limit
+    kind: content
+    template: theorem_proof
+    accent: proposition
+    label: "[ proposition ]"
+    part: { current: 1, total: 2 }
+    source: "chapter3-print-standalone.html SS3.1 . Proposition 3.1 (statement) + Proof (sin theta -> 0)"
+    title: "Sine and Cosine Are Continuous"
+    say: |
+      That little bound does more than help with the limit -- it is the key to
+      continuity. And continuity here means something concrete: nudge the angle
+      a little, and sine and cosine move only a little; they never jump. We even
+      have the tool that says so -- on the unit circle the half-chord
+      $\sin\theta$ is always shorter than the arc $\theta$ above it, which is
+      just $|\sin\theta|\le|\theta|$ read geometrically.
+      {show statement} So here is the claim, made precise: $\sin x$ and $\cos x$
+      are continuous at every real $x_0$.
+      {show proof.0} Build it from the ground up. Since zero at most
+      $|\sin\theta|$ at most $|\theta|$, and $|\theta|$ itself goes to zero,
+      {show proof.1} the squeeze theorem forces $\sin\theta\to 0$.
+      {show qed} That single limit is the seed; the full continuity grows
+      straight out of it, which is what we do next.
+    statement: "$\\sin x,\\ \\cos x$ are continuous at every $x_0$."
+    proof:
+      - "$0\\le|\\sin\\theta|\\le|\\theta|$ (chord $\\le$ arc)"
+      - "$|\\theta|\\to 0$, squeeze $\\Rightarrow\\ \\sin\\theta\\to 0$"
+    qed: "$\\lim_{\\theta\\to 0}\\sin\\theta = 0$"
+
+  # 8 ------------------- Proposition 3.1 (part 2/2): sum-to-product argument -> continuity
+  - id: continuity_argument
+    kind: content
+    template: theorem_proof
+    accent: proposition
+    label: "[ proof, cont. ]"
+    part: { current: 2, total: 2 }
+    source: "chapter3-print-standalone.html SS3.1 . Proposition 3.1 . Proof (sum-to-product bound + squeeze)"
+    title: "Sine and Cosine Are Continuous"
+    say: |
+      {show statement} Now turn that seed into full continuity. Fix a point
+      $x_0$, and ask how much $\cos x$ and $\sin x$ can change as $x$ moves
+      toward it.
+      {show proof.0} Sum-to-product answers both at once. For cosine,
+      $\cos x-\cos x_0$ is $-2\sin\tfrac{x-x_0}{2}\sin\tfrac{x+x_0}{2}$;
+      {show proof.1} and for sine, $\sin x-\sin x_0$ is
+      $2\cos\tfrac{x+x_0}{2}\sin\tfrac{x-x_0}{2}$. In each, the half-sum factor
+      never exceeds one in size.
+      {show proof.2} Drop it to its largest size, one, and both differences are
+      bounded by the same thing -- twice $|\sin\tfrac{x-x_0}{2}|$.
+      {show qed} Now let $x\to x_0$: the half-angle goes to zero, so that bound
+      collapses to zero. Squeeze one last time, and $\cos x\to\cos x_0$,
+      $\sin x\to\sin x_0$ -- both continuous everywhere.
+    statement: "Fix $x_0$: how far can $\\cos x,\\ \\sin x$ move?"
+    proof:
+      - "$\\cos x-\\cos x_0=-2\\sin\\tfrac{x-x_0}{2}\\,\\sin\\tfrac{x+x_0}{2}$"
+      - "$\\sin x-\\sin x_0=\\phantom{-}2\\cos\\tfrac{x+x_0}{2}\\,\\sin\\tfrac{x-x_0}{2}$"
+      - "$|\\cos x-\\cos x_0|,\\ |\\sin x-\\sin x_0|\\le 2|\\sin\\tfrac{x-x_0}{2}|$"
+    qed: "$x\\to x_0\\ \\Rightarrow\\ \\cos x\\to\\cos x_0,\\ \\sin x\\to\\sin x_0$"
+
+  # 9 --------------------------- Proposition 3.2 + Proof: the fundamental limit = 1 (L2)
+  - id: fundamental_limit
+    kind: content
+    template: theorem_proof
+    accent: proposition
+    label: "[ proposition ]"
+    source: "chapter3-print-standalone.html SS3.1 . Proposition 3.2 + Proof"
+    title: "The Fundamental Limit"
+    say: |
+      Now we can finally close the limit that started all of this.
+      {show statement} The claim is as clean as it gets: $\sin\theta$ over
+      $\theta$ tends to one as $\theta\to 0$.
+      {show proof.0} And we already built the trap. For $\theta$ between zero and
+      $\tfrac\pi2$, the ratio is pinned between a floor and a ceiling:
+      $\cos\theta\le\sin\theta/\theta\le 1$.
+      {show proof.1} The ceiling is the constant one. The floor is $\cos\theta$,
+      which tends to one now that we know cosine is continuous -- so the squeeze
+      pins the ratio to one from the right.
+      {show qed} And because the ratio is even, its left limit matches its right,
+      so the two-sided limit is one as well. That is the keystone.
+    statement: "$\\lim_{\\theta\\to 0}\\tfrac{\\sin\\theta}{\\theta}=1$"
+    proof:
+      - "$\\cos\\theta\\le\\tfrac{\\sin\\theta}{\\theta}\\le 1\\quad(0<\\theta<\\tfrac{\\pi}{2})$"
+      - "$\\cos\\theta\\to 1\\ \\Rightarrow\\ \\tfrac{\\sin\\theta}{\\theta}\\to 1^{+}$"
+    qed: "even $\\Rightarrow$ two-sided limit $=1$"
+
+  # 10 ------------------------------------- Figure 3.2: the squeeze as a graph (stock)
+  - id: squeeze_graph
+    kind: content
+    template: graph
+    mode: single
+    accent: definition
+    source: "chapter3-print-standalone.html SS3.1 . Figure 3.2 (squeeze-limit)"
+    title: "The Squeeze, Drawn"
+    say: |
+      It helps to picture that squeeze.
+      {show plot.0} Here runs $\cos\theta$, the dashed floor.
+      {show plot.1} And the ceiling -- the constant line at height one.
+      {show plot.2} Between them, the ratio $\sin\theta$ over $\theta$, caught in
+      the narrowing gap. As $\theta$ slides toward zero the floor rises to one
+      and the ceiling already is one, so the curve is squeezed right to one.
+      {show plot.3} Notice the open circle at $\theta=0$: the ratio is undefined
+      there, zero over zero.
+      {show annotation.0} So what equals one is the limit -- the height the curve
+      is forced toward, not a value it ever takes.
+    axes:
+      x_range: [-1.5, 1.5, 0.5]
+      y_range: [0, 1.18, 0.5]
+      y_ticks: [{ at: 1, label: "$1$" }]
+      x_length: 6.4
+      y_length: 3.6
+    plots:
+      - { kind: function, expression: "cos(x)", x_range: [-1.5, 1.5], color_role: muted, dashed: true, label: "$\\cos\\theta$", reveal: true }
+      - { kind: line, start: [-1.5, 1], end: [1.5, 1], color_role: secondary, label: "$1$", label_point: [1.25, 1.08], reveal: true }
+      - { kind: function, expression: "sin(x)/x", x_range: [-1.5, 1.5], color_role: accent, label: "$\\dfrac{\\sin\\theta}{\\theta}$", label_point: [0.95, 0.86], reveal: true }
+      - { kind: point, point: [0, 1], hollow: true, hollow_reason: "ratio undefined at theta=0 (0/0)", color_role: accent, reveal: true }
+    annotations:
+      - "Trapped between $\\cos\\theta$ and $1$, the ratio is forced to $1$ -- undefined at $\\theta=0$."
+
+  # 11 --------------------------------------- Caution: a limit, not an identity
+  - id: limit_not_identity
+    kind: content
+    template: callout
+    type: caution
+    source: "chapter3-print-standalone.html SS3.1 . Caution (limit not identity)"
+    title: "A Limit, Not an Identity"
+    say: |
+      One caution, because this result is easy to over-read.
+      {show body} The statement is about the limit as $\theta\to 0$ -- not an
+      identity. At a fixed angle the ratio is generally not one: at
+      $\theta=\tfrac\pi2$ it is two over $\pi$, about $0.64$, and at $\theta=\pi$
+      it is zero. The value one is reached only in the limit.
+    body: "The limit as $\\theta\\to 0$ is not an identity. At a fixed angle, $\\dfrac{\\sin\\theta}{\\theta}$ is generally not $1$: at $\\theta=\\tfrac{\\pi}{2}$ it is $\\dfrac{2}{\\pi}\\approx 0.64$, and at $\\theta=\\pi$ it is $0$."
+
+  # 12 -------------------------------------------- Caution: radians are essential
+  - id: radians_essential
+    kind: content
+    template: callout
+    type: caution
+    source: "chapter3-print-standalone.html SS3.1 . Caution (radian convention)"
+    title: "Why Radians"
+    say: |
+      A second caution, and this one is structural.
+      {show body} Everything here depends on radians. The sector area one half
+      $\theta$ -- and with it the limit -- uses radian measure. Switch to degrees
+      and the limit is $\pi$ over $180$, not one, so the derivative drags that
+      factor along. The clean formulas $\sin'=\cos$ and $\cos'=-\sin$ hold only
+      in radians.
+    body: "Everything here needs radians. In degrees, $\\displaystyle\\lim_{x\\to 0}\\frac{\\sin(x^{\\circ})}{x}=\\frac{\\pi}{180}$, so $\\dfrac{d}{dx}\\sin(x^{\\circ})=\\dfrac{\\pi}{180}\\cos(x^{\\circ})$ --- the clean $\\sin'=\\cos$ holds only in radians."
+
+  # 13 ----------------------------------------- divider: Stage 3 opener
+  - id: divider_derivatives
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 3"
+    title: "The Two Derivatives"
+    subtitle: "Assembling the pieces."
+    ghost: "3"
+    progress: { current: 3, total: 4 }
+    duration: 4.0
+
+  # 14 ----------------------------------- Theorem 3.1 + Proof: d/dx sin x = cos x (L1)
+  - id: derivative_of_sine
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    source: "chapter3-print-standalone.html SS3.1 . Theorem 3.1 + Proof"
+    title: "The Derivative of Sine"
+    say: |
+      Now the payoff, and it falls into our hands.
+      {show statement} The claim: the derivative of $\sin x$ is $\cos x$, for
+      every real $x$.
+      {show proof.0} Start from the definition, and use the form we already
+      found -- the derivative is the limit of $\cos(x+\tfrac h2)$ times
+      $\sin(h/2)$ over $h/2$.
+      {show proof.1} Let $h\to 0$: the first factor tends to $\cos x$ by
+      continuity, the second to one by the fundamental limit.
+      {show qed} A continuous thing times a limit -- the product is $\cos x$
+      times one, just $\cos x$.
+    statement: "$\\tfrac{d}{dx}\\sin x = \\cos x$"
+    proof:
+      - "$\\tfrac{d}{dx}\\sin x=\\lim_{h\\to 0}\\cos\\!\\left(x+\\tfrac h2\\right)\\tfrac{\\sin(h/2)}{h/2}$"
+      - "$\\cos\\!\\left(x+\\tfrac h2\\right)\\to\\cos x,\\quad \\tfrac{\\sin(h/2)}{h/2}\\to 1$"
+    qed: "$\\Rightarrow\\ \\cos x\\cdot 1=\\cos x$"
+
+  # 15 --------------------------- Theorem 3.2 + Proof: d/dx cos x = -sin x (L1, repeat-pattern)
+  - id: derivative_of_cosine
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    source: "chapter3-print-standalone.html SS3.1 . Theorem 3.2 + Proof"
+    title: "The Derivative of Cosine"
+    say: |
+      Cosine falls to the very same machinery -- only the identity changes, so
+      we go quickly.
+      {show statement} The claim: the derivative of $\cos x$ is $-\sin x$.
+      {show proof.0} This time use the companion sum-to-product formula.
+      {show proof.1} The same division by $h$ turns the difference quotient into
+      $-\sin(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
+      {show qed} Send $h$ to zero: the sine factor goes to $\sin x$, the other
+      to one, and the minus sign comes along -- leaving $-\sin x$. Same two
+      tools, one extra minus sign.
+    statement: "$\\tfrac{d}{dx}\\cos x = -\\sin x$"
+    proof:
+      - "$\\cos A-\\cos B=-2\\sin\\tfrac{A+B}{2}\\,\\sin\\tfrac{A-B}{2}$"
+      - "$\\tfrac{\\cos(x+h)-\\cos x}{h}=-\\sin\\!\\left(x+\\tfrac h2\\right)\\tfrac{\\sin(h/2)}{h/2}$"
+    qed: "$\\to\\ -\\sin x\\cdot 1=-\\sin x$"
+
+  # 16 ----------------------------- Figure 3.3: slope of sine = height of cosine (HOOK)
+  - id: slope_equals_height
+    kind: content
+    template: graph
+    mode: single
+    accent: definition
+    hook: "animations.ch03_trig_derivatives_hooks:slope_equals_height"
+    source: "chapter3-print-standalone.html SS3.1 . Figure 3.3 (sin-cos-slope)"
+    title: "Slope Equals Height"
+    say: |
+      Here is what that theorem looks like on the graph.
+      {show plot.0} Draw $y=\sin x$, and check the slope of its tangent at a few
+      points.
+      {show tan_0} At $x=0$ it is climbing at slope one.
+      {show tan_halfpi} At $x=\tfrac\pi2$, the top of the hump, the tangent is
+      flat -- slope zero.
+      {show tan_pi} At $x=\pi$ it is falling at slope minus one.
+      {show plot.1} Now lay $y=\cos x$ on top,
+      {show cos_dots} and read its heights at those same points: one, zero,
+      minus one. They match exactly -- the slope of sine is the height of
+      cosine, the theorem drawn.
+    axes:
+      x_range: [-0.25, 3.45, 1]
+      y_range: [-1.35, 1.35, 1]
+      x_length: 7.2
+      y_length: 4.0
+    plots:
+      - { kind: function, expression: "sin(x)", x_range: [0, 3.3], color_role: accent, label: "$y=\\sin x$", label_point: [1.4, 1.12], reveal: true }
+      - { kind: function, expression: "cos(x)", x_range: [0, 3.3], color_role: muted, dashed: true, label: "$y=\\cos x$", label_point: [2.95, 1.05], reveal: true }
+
+  # 17 -------------------------------------- Remark 3.1: the four-step derivative cycle
+  - id: derivative_cycle
+    kind: content
+    template: definition_math
+    accent: proposition
+    source: "chapter3-print-standalone.html SS3.1 . Remark 3.1 (derivative cycle)"
+    title: "The Derivative Cycle"
+    say: |
+      Step back and watch the pattern these two derivatives make.
+      {show statement} Differentiation sends sine and cosine into each other,
+      with a minus sign that turns over every second step.
+      {show math.0} Writing an arrow for one derivative: $\sin x$ to $\cos x$ to
+      $-\sin x$ to $-\cos x$, and back to $\sin x$.
+      {show math.1} Four derivatives and you are home -- the fourth derivative of
+      sine is sine again. Where $e^x$ reproduces itself in a single step, these
+      do it in a cycle of four: the self-renewal that lets them oscillate forever
+      without winding down.
+    statement: "Differentiation cycles sine and cosine, with a sign flip every second step."
+    math:
+      - { tex: "$\\sin x \\;\\to\\; \\cos x \\;\\to\\; -\\sin x \\;\\to\\; -\\cos x \\;\\to\\; \\sin x$", anim: highlight }
+      - "$\\dfrac{d^{4}}{dx^{4}}\\sin x = \\sin x \\qquad\\text{vs.}\\qquad \\dfrac{d}{dx}e^{x}=e^{x}$"
+
+  # 18 ----------------------------------------- divider: Stage 4 opener
+  - id: divider_apply
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 4"
+    title: "Consequences and Applications"
+    subtitle: "From the cycle to oscillation."
+    ghost: "4"
+    progress: { current: 4, total: 4 }
+    duration: 4.0
+
+  # 19 -------------------------------- Example 3.1: the companion limit (1-cos t)/t -> 0
+  - id: companion_limit
+    kind: content
+    template: derivation
+    accent: example
+    source: "chapter3-print-standalone.html SS3.1 . Example 3.1 (companion limit)"
+    title: "A Companion Limit"
+    prompt: "Establish the companion limit $\\lim_{\\theta\\to 0}\\dfrac{1-\\cos\\theta}{\\theta}=0$."
+    say: |
+      The fundamental limit has a companion worth knowing: $(1-\cos\theta)$ over
+      $\theta$ tends to zero. It is again zero over zero, so we need a way in.
+      {show step.0} Multiply top and bottom by the conjugate $1+\cos\theta$; the
+      numerator becomes a difference of squares, $1-\cos^2\theta$.
+      {show step.1} And $1-\cos^2\theta$ is just $\sin^2\theta$, so the whole
+      thing splits into $\sin\theta$ over $\theta$ times $\sin\theta$ over
+      $1+\cos\theta$.
+      {show result} Let $\theta\to 0$: the first factor goes to one, the second
+      to zero over two. One times zero is zero.
+    steps:
+      - { math: "\\frac{1-\\cos\\theta}{\\theta} = \\frac{(1-\\cos\\theta)(1+\\cos\\theta)}{\\theta\\,(1+\\cos\\theta)} = \\frac{1-\\cos^{2}\\theta}{\\theta\\,(1+\\cos\\theta)}", reason: "multiply by $1+\\cos\\theta$" }
+      - { math: "= \\frac{\\sin^{2}\\theta}{\\theta\\,(1+\\cos\\theta)} = \\frac{\\sin\\theta}{\\theta}\\cdot\\frac{\\sin\\theta}{1+\\cos\\theta}", reason: "$1-\\cos^{2}\\theta=\\sin^{2}\\theta$" }
+    result: { math: "\\longrightarrow\\ 1\\cdot\\frac{0}{1+1} = 0", reason: "the limit, then continuity" }
+
+  # 20 ----------------------------- Example 3.2: all six trig derivatives (quotient rule, L1)
+  - id: all_six_trig_derivatives
+    kind: content
+    template: derivation
+    accent: example
+    source: "chapter3-print-standalone.html SS3.1 . Example 3.2 (tan', sec', cot', csc')"
+    title: "All Six Derivatives"
+    prompt: "Differentiate $\\tan x$, $\\sec x$, $\\cot x$, and $\\csc x$."
+    say: |
+      With sine and cosine in hand, the other four cost almost nothing -- just
+      the quotient rule.
+      {show step.0} Take $\tan x=\sin x$ over $\cos x$. The quotient rule gives
+      this.
+      {show step.1} The numerator is $\cos^2 x+\sin^2 x$, which is one -- so the
+      derivative of $\tan x$ is $\sec^2 x$.
+      {show result} Secant is the same idea on $1$ over $\cos x$: the quotient
+      rule lands $\sin x$ over $\cos^2 x$, which is $\sec x\tan x$.
+      {show check} And the same move on $\cot x$ and $\csc x$ finishes all six --
+      every one built on $\sin'=\cos$ and $\cos'=-\sin$.
+    steps:
+      - { math: "\\frac{d}{dx}\\tan x = \\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{\\sin x}{\\cos x}$" }
+      - { math: "= \\frac{\\cos^{2} x+\\sin^{2} x}{\\cos^{2} x} = \\frac{1}{\\cos^{2} x} = \\sec^{2} x", reason: "Pythagorean identity" }
+    result: { math: "\\frac{d}{dx}\\sec x = \\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x} = \\sec x\\tan x" }
+    check:  { math: "\\frac{d}{dx}\\cot x = -\\csc^{2} x,\\quad \\frac{d}{dx}\\csc x = -\\csc x\\cot x", reason: "the other two, same move" }
+
+  # 21 ------------------------------- Example 3.3: simple harmonic motion (s'' = -s)
+  - id: shm_compute
+    kind: content
+    template: derivation
+    accent: example
+    source: "chapter3-print-standalone.html SS3.1 . Example 3.3 (simple harmonic motion)"
+    title: "A Weight on a Spring"
+    prompt: "A weight on a spring has height $s(t)=\\sin t$. Find the velocity $s'(t)$ and acceleration $s''(t)$, and relate the acceleration to the height."
+    say: |
+      Let us put the new derivatives to work on something moving.
+      {show step.0} A weight on a spring has height $s(t)=\sin t$.
+      {show step.1} Velocity is its derivative, $s'(t)=\cos t$.
+      {show step.2} Acceleration is the next derivative, $s''(t)=-\sin t$.
+      {show result} But $-\sin t$ is just $-s(t)$ -- at every instant the weight
+      is pushed back toward rest. That relation, $s''=-s$, is the signature of
+      simple harmonic motion; sine and cosine are exactly the functions that
+      describe it.
+    steps:
+      - { math: "s(t) = \\sin t", reason: "height" }
+      - { math: "s'(t) = \\cos t", reason: "velocity" }
+      - { math: "s''(t) = -\\sin t", reason: "acceleration" }
+    result: { math: "s''(t) = -\\sin t = -\\,s(t)", reason: "simple harmonic motion" }
+
+  # 22 ------------------------- Figure 3.4: s/s'/s'' stacked over one time axis (HOOK)
+  - id: shm_stacked_graphs
+    kind: content
+    template: graph
+    mode: single
+    accent: example
+    hook: "animations.ch03_trig_derivatives_hooks:shm_stacked_graphs"
+    source: "chapter3-print-standalone.html SS3.1 . Figure 3.4 (shm-triple)"
+    title: "Height, Velocity, Acceleration"
+    say: |
+      Stack the three graphs over one time axis and the relationship jumps out.
+      {show g_s} On top, the height $s=\sin t$.
+      {show g_v} In the middle, the velocity $s'=\cos t$.
+      {show g_a} On the bottom, the acceleration $s''=-\sin t$. Watch where the
+      height hits a peak or a trough -- there the velocity passes through zero,
+      because at the extremes the weight momentarily stops.
+      {show mirror} And hold the bottom graph against the top: it is the top one
+      flipped upside down. That is $s''=-s$, drawn -- the very picture of an
+      oscillation.
+    axes:
+      x_range: [0, 6.4, 1.5708]
+      y_range: [-1.2, 1.2, 1]
+      x_length: 7.0
+      y_length: 4.2
+    plots: []
+
+  # 23 -------------------------------- forward-ref: toward the chain rule (no section no.)
+  - id: toward_the_chain_rule
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "chapter3-print-standalone.html SS3.1 . closing prose (forward-ref to the chain rule)"
+    title: "Toward the Chain Rule"
+    say: |
+      We can now differentiate every trigonometric function -- but only in its
+      bare form.
+      {show statement} We can handle $\sin x$, yet not $\sin(x^2)$ or
+      $\sin(3x+1)$, where the angle is itself a function tucked inside.
+      {show math.0} To reach a function buried inside another, we need one more
+      rule -- a way to differentiate a composition. That is the chain rule, and
+      it is what comes next; with it, every derivative we found today becomes the
+      seed of a whole family more.
+    statement: "We can differentiate $\\sin x$ --- but not yet $\\sin(x^{2})$ or $\\sin(3x+1)$."
+    math:
+      - { tex: "$\\sin x\\ \\checkmark \\qquad \\sin(x^{2})\\ ? \\qquad \\sin(3x+1)\\ ?$", anim: highlight }
+
+  # 24 ------------------------------------------------------------- recap (Key Takeaways)
+  - id: recap
+    kind: content
+    template: recap_cards
+    accent: recap
+    source: "chapter3-print-standalone.html SS3.1 . whole-section synthesis"
+    title: "Key Takeaways"
+    say: |
+      Pull the section together.
+      {show point.0} Everything grew from one limit: $\sin\theta$ over $\theta$
+      tends to one, cracked by squeezing on the unit circle.
+      {show point.1} That limit, with continuity, gave the two derivatives at the
+      heart of the section -- $\sin'=\cos$ and $\cos'=-\sin$.
+      {show point.2} From those two, the quotient rule delivered all the other
+      trig derivatives.
+      {show point.3} And keep the cycle in mind -- four derivatives bring you home
+      -- with the fine print that it all depends on radians.
+      {show formula.0} Hold the keystone close.
+      {show formula.1} And the two derivatives that follow from it.
+    points:
+      - "Fundamental limit: $\\sin\\theta/\\theta\\to 1$, squeezed on the unit circle."
+      - "$\\sin'=\\cos$ and $\\cos'=-\\sin$."
+      - "The quotient rule then gives all six trig derivatives."
+      - "Derivatives cycle every four; all in radians."
+    formulas:
+      - "\\lim_{\\theta\\to 0}\\tfrac{\\sin\\theta}{\\theta}=1"
+      - "\\sin'=\\cos,\\quad \\cos'=-\\sin"
+
+  # 25 ------------------------------------------------------------------------- outro
+  - id: outro
+    kind: outro
+    duration: 8.0
+    next_section: "3.2"
+    next_title: "The Chain Rule"
