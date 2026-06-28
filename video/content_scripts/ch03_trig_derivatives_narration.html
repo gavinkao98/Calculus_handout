@@ -60,62 +60,81 @@ math 由 MathJax 即時渲染。intro／outro 為純動畫無 narration。</div>
   <div class="u-head"><span class="u-num">01</span>
     <span class="u-id">why_trig_is_different</span><span class="u-kind">motivation</span></div>
   <div class="u-narr"><p>Every derivative so far has yielded to algebra. For a polynomial we
-expanded $(x+h)^n$ and canceled the factor of $h$; for $e^x$ the power
-series did the same job. The trigonometric functions are different in
-kind. Write down the difference quotient for $\sin x$ —
-$\dfrac{\sin(x+h)-\sin x}{h}$ — and the usual move stalls: no identity
-cancels that $h$ in the denominator, because $\sin(x+h)$ does not split
-into pieces that conveniently subtract. As we are about to see, the whole
-computation funnels down to a single limit, $\lim_{\theta\to 0}
-\dfrac{\sin\theta}{\theta}$, which has the indeterminate form zero over
-zero and which no algebra will crack. Breaking it open takes a
-genuinely new tool — a geometric comparison of areas on the unit circle.
-And once we secure that one limit, it unlocks the derivatives of both
-sine and cosine at once. One ground rule before we start: throughout,
-angles are measured in radians, and that assumption turns out to be
-essential.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · 開節散文（expansion:intuition，"So far every derivative has yielded to algebra … funnels down to a single limit"）+ "angles are measured in radians" 預告句</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看出三角函數的導數卡在一個代數攻不下的極限 sinθ/θ，需要全新的幾何工具。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">差分商 $\dfrac{\sin(x+h)-\sin x}{h}$；指向目標極限 $\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}$（標 0/0）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態即可；funnel 的視覺收斂交給後續單元）</span></div></details>
+expanded $(x+h)^n$ and the binomial theorem handed us a factor of $h$ to
+cancel; for $e^x$ the power series did the same job. The trigonometric
+functions refuse to play along. Write down the difference quotient for
+$\sin x$ — $\dfrac{\sin(x+h)-\sin x}{h}$ — and try the usual move. You
+cannot simply set $h=0$: that gives $\dfrac{0}{0}$, which tells you
+nothing. And no identity cancels the $h$ in the denominator —
+$\sin(x+h)$ simply does not break into pieces that conveniently subtract.
+As we
+are about to see, the whole computation funnels down to a single limit,
+$\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}$ — again the indeterminate
+form zero over zero, and one that no algebra will crack. Prying it open
+takes a genuinely new tool: a geometric comparison of areas on the unit
+circle. And once we secure that one limit, it unlocks the derivatives of
+both sine and cosine at once. One ground rule, though: throughout, angles
+are measured in radians — an assumption that turns out to be essential.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · 開節散文（expansion:intuition，"So far every derivative has yielded to algebra … funnels down to a single limit"）+ "angles are measured in radians" 預告句</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看出三角函數的導數卡在一個代數攻不下的 0/0 極限 sinθ/θ，需要全新的幾何工具。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">逐步顯示（每步一個 reveal）：
+ 1. 差分商 $\dfrac{\sin(x+h)-\sin x}{h}$。
+ 2. 天真代入 $h=0$ → $\dfrac{0}{0}$（標「indeterminate — 無資訊」）。
+ 3. funnel 指向目標極限 $\displaystyle\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}$（標 0/0、no algebra）。
+收尾標籤：tool = 單位圓面積比較；ground rule = radians。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態即可；funnel 的視覺收斂交給後續單元）</span></div></details>
 </section>
 <section class="unit">
   <div class="u-head"><span class="u-num">02</span>
     <span class="u-id">difference_quotient_for_sine</span><span class="u-kind">derivation</span></div>
-  <div class="u-narr"><p>So let us transform that difference quotient. The decisive step is a
-sum-to-product identity: $\sin A - \sin B = 2\cos\frac{A+B}{2}
-\sin\frac{A-B}{2}$. Take $A=x+h$ and $B=x$, and the numerator becomes
-$2\cos\!\left(x+\frac h2\right)\sin\frac h2$. Now divide by $h$, but write
-$h$ as $2$ times $\frac h2$ so it matches the $\frac h2$ tucked inside the
-sine. The quotient cleans up to $\cos\!\left(x+\frac h2\right)\cdot
-\dfrac{\sin(h/2)}{h/2}$. Look at what we have: two factors, and as
-$h\to 0$ each one moves. The cosine factor should slide to
-$\cos x$ — provided cosine is continuous — and the second factor is exactly
-$\dfrac{\sin\theta}{\theta}$ with $\theta=\frac h2$. So the whole derivative
-rests on just two facts: that sine and cosine are continuous, and the value
-of that fundamental limit. We secure both now.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · "The difference quotient for sine" 子節（sum-to-product 化簡 → cos(x+h/2)·sin(h/2)/(h/2)）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把 sine 的差分商化成「一個會趨近 cos x 的因子 × 一個基本極限因子」，看出整個導數靠哪兩件事。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導鏈：$\sin(x+h)-\sin x = 2\cos(x+\tfrac h2)\sin\tfrac h2$ →
-$\dfrac{\sin(x+h)-\sin x}{h}=\cos(x+\tfrac h2)\cdot\dfrac{\sin(h/2)}{h/2}$；
-標出兩個因子各自的去向（→cos x；→基本極限）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導鏈即可）</span></div></details>
+  <div class="u-narr"><p>So let us transform that difference quotient instead of fighting it
+head-on. The decisive step is one trigonometric identity — sum-to-product —
+which turns a difference of sines into a product:
+$\sin A-\sin B=2\cos\frac{A+B}{2}\sin\frac{A-B}{2}$. A product is exactly
+what we want, because we can pull it apart and take limits one factor at
+a time. Put $A=x+h$ and $B=x$. The numerator becomes
+$2\cos\!\left(x+\frac h2\right)\sin\frac h2$. Now divide by $h$ — and here
+is the small trick that makes everything line up: write $h$ as
+$2\cdot\frac h2$, so the denominator carries the very $\frac h2$ that sits
+inside the sine. The quotient cleans up to
+$\cos\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. Look at what we
+have now: a product of two factors, and as $h\to 0$ each one moves on its
+own. The first factor, $\cos\!\left(x+\frac h2\right)$, should slide to
+$\cos x$ — provided cosine is continuous. The second factor is exactly
+$\dfrac{\sin\theta}{\theta}$ in disguise, with $\theta=\frac h2$ shrinking
+to zero. So the entire derivative now hangs on just two facts: that sine
+and cosine are continuous, and the value of that one fundamental limit. We
+secure both, in that order, and then come straight back to finish.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · "The difference quotient for sine" 子節（sum-to-product 化簡 → cos(x+h/2)·sin(h/2)/(h/2)）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把 sine 的差分商化成「一個會趨近 cos x 的因子 × 一個基本極限因子」，看出整個導數靠哪兩件事。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導鏈，逐行 reveal（每行一個 step）：
+ 1. 恆等式 $\sin A-\sin B=2\cos\tfrac{A+B}{2}\sin\tfrac{A-B}{2}$（理由：sum-to-product）。
+ 2. 代入 $A=x+h,\ B=x$：$\sin(x+h)-\sin x=2\cos(x+\tfrac h2)\sin\tfrac h2$。
+ 3. 除以 $h=2\cdot\tfrac h2$：$\dfrac{\sin(x+h)-\sin x}{h}=\cos(x+\tfrac h2)\cdot\dfrac{\sin(h/2)}{h/2}$。
+ 4. 兩因子標去向：$\cos(x+\tfrac h2)\xrightarrow{\,h\to0\,}\cos x$（需「連續」）；$\dfrac{\sin(h/2)}{h/2}\xrightarrow{\,h\to0\,}?$（即 $\dfrac{\sin\theta}{\theta}$，需「基本極限」）。
+收尾標籤：整個導數 = 兩因子的乘積 → 靠「連續」＋「基本極限」兩件事。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導鏈即可；兩因子去向用引線/同色標記）</span></div></details>
 </section>
 <section class="unit">
   <div class="u-head"><span class="u-num">03</span>
     <span class="u-id">sector_inequality</span><span class="u-kind">visual</span></div>
-  <div class="u-narr"><p>First, one convenience. Replacing $\theta$ by $-\theta$ flips
-the sign of both $\theta$ and $\sin\theta$, so their ratio
-$\sin\theta/\theta$ is left unchanged — it is an even function, and that
-means it is enough to chase $\theta$ down to zero from the positive side.
-Now the geometry. On the unit circle, put $A$ at $(1,0)$ and let $B$ be the
-point at angle $\theta$, so $B=(\cos\theta,\sin\theta)$. Extend the radius
-until it meets the vertical tangent line at $A$, and call that point
-$C=(1,\tan\theta)$. Three regions now nest one inside the next. The inner
-triangle $OAB$ has base one and height $\sin\theta$, so its area is
-$\frac12\sin\theta$. The circular sector $OAB$ is the fraction $\theta$ over
-$2\pi$ of the whole disc, which comes out to $\frac12\theta$. And the outer
-triangle $OAC$ has base one and height $\tan\theta$, so its area is
-$\frac12\tan\theta$. Because each region sits inside the next, their areas
-line up in that same order: $\frac12\sin\theta \le \frac12\theta \le
-\frac12\tan\theta$.</p></div>
+  <div class="u-narr"><p>Here is that new tool. We compare three areas on a circle of radius one.
+But first, one convenience that saves us half the work. Replacing $\theta$
+by $-\theta$ flips the sign of both $\theta$ and $\sin\theta$, so their
+ratio $\sin\theta/\theta$ is left unchanged — it is an even function. That
+means whatever we learn for positive angles holds for negative ones, so it
+is enough to chase $\theta$ down to zero from the positive side. Now the
+geometry. On the unit circle, put $A$ at $(1,0)$ and let $B$ be the point at
+angle $\theta$, so $B=(\cos\theta,\sin\theta)$. Extend the radius until it
+meets the vertical tangent line at $A$, and call that meeting point
+$C=(1,\tan\theta)$. Three regions now nest one inside the next, and each
+area is easy to read off. The inner triangle $OAB$ has base one and height
+$\sin\theta$, so its area is $\frac12\sin\theta$. The circular sector $OAB$
+is the fraction $\theta$ over $2\pi$ of the whole disc, which comes out to
+$\frac12\theta$. And the outer triangle $OAC$ has base one and height
+$\tan\theta$, so its area is $\frac12\tan\theta$. Because each region sits
+strictly inside the next, their areas must line up in the same order:
+$\frac12\sin\theta \le \frac12\theta \le \frac12\tan\theta$. The whole
+argument hangs on that one picture — a triangle inside a sector inside a
+triangle.</p></div>
   <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · "A geometric inequality on the unit circle" 散文（含偶函數論證）+ Figure 3.1（data-fig: sector-inequality）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">在單位圓上用三塊嵌套面積，幾何地夾出 sinθ ≤ θ ≤ tanθ。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">單位圓（半徑 1），A=(1,0)、B=(cosθ,sinθ)、C=(1,tanθ)、射線 OB 延伸交切線於 C；
 三塊嵌套區域：內接 △OAB、扇形 OAB、外切 △OAC，各標面積 ½sinθ／½θ／½tanθ；
-浮出 $\tfrac12\sin\theta \le \tfrac12\theta \le \tfrac12\tan\theta$。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">建議動畫：先畫單位圓與 A。掃出角 θ 標出 B，延伸 OB 交切線得 C。依序高亮
+逐塊高亮（內→中→外）以「一個包一個」成立；浮出 $\tfrac12\sin\theta \le \tfrac12\theta \le \tfrac12\tan\theta$；
+旁標偶函數一句記號 $\sin(-\theta)/(-\theta)=\sin\theta/\theta$（只看 θ&gt;0）。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">建議動畫：先畫單位圓與 A。掃出角 θ 標出 B，延伸 OB 交切線得 C。依序高亮
 並標面積——內接三角形（½sinθ）→ 扇形（½θ）→ 外切三角形（½tanθ），讓「一個包
 一個」在視覺上逐層成立，最後浮出三者面積的不等式。θ 可從中等角緩緩縮小，
 預告後續要把它推向 0。</span></div></details>
@@ -123,60 +142,102 @@ line up in that same order: $\frac12\sin\theta \le \frac12\theta \le
 <section class="unit">
   <div class="u-head"><span class="u-num">04</span>
     <span class="u-id">squeeze_to_the_bound</span><span class="u-kind">derivation</span></div>
-  <div class="u-narr"><p>Now turn that chain of areas into a statement about $\sin\theta/\theta$.
-Multiply through by $2$: $\sin\theta \le \theta \le \tan\theta$. Divide by
-$\sin\theta$, which is positive here, and rewrite $\tan\theta$ as
-$\sin\theta/\cos\theta$ — that gives $1 \le \dfrac{\theta}{\sin\theta} \le
-\dfrac{1}{\cos\theta}$. Every term is positive, so taking reciprocals
-reverses the inequalities, and we land on the bound we were after:
+  <div class="u-narr"><p>Now turn that chain of areas into a statement about $\sin\theta/\theta$,
+one careful step at a time. Start by multiplying through by $2$ to clear the
+halves: $\sin\theta \le \theta \le \tan\theta$. Next, divide every part by
+$\sin\theta$, which is positive for these angles, and rewrite $\tan\theta$
+as $\sin\theta/\cos\theta$; that gives
+$1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}$. We are close,
+but the middle is upside down — it has $\theta$ over $\sin\theta$, and we
+want $\sin\theta$ over $\theta$. So take reciprocals of all three parts. They
+are all positive, and flipping positive quantities reverses the inequalities,
+so the chain turns around and we land exactly on the bound we were after:
 $\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$, for $\theta$ between zero
-and $\frac\pi2$. Tuck one more consequence in your pocket while we are here:
-from $\sin\theta \le \theta$ we also get $0 \le |\sin\theta| \le |\theta|$
-near zero — a small bound we will lean on twice in just a moment.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Fig 3.1 後代數（×2、÷sinθ、取倒數翻向 → 式(1)）+ "0 ≤ |sinθ| ≤ |θ|" 附帶界</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把三塊面積的不等式代數地整理成 cosθ ≤ sinθ/θ ≤ 1，並收下 |sinθ|≤|θ| 這個附帶界。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導鏈：$\sin\theta\le\theta\le\tan\theta$ → $1\le\tfrac{\theta}{\sin\theta}\le\tfrac{1}{\cos\theta}$
-→ （取倒數翻向）$\cos\theta \le \tfrac{\sin\theta}{\theta} \le 1$（標式 1，限 0&lt;θ&lt;π/2）；
-附帶界 $0\le|\sin\theta|\le|\theta|$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導鏈即可）</span></div></details>
+and $\frac\pi2$. One more thing worth pocketing before we move on: the very
+first inequality, $\sin\theta \le \theta$, also gives
+$0 \le |\sin\theta| \le |\theta|$ near zero — a small bound we will lean on
+twice in just a moment.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Fig 3.1 後代數（×2、÷sinθ、取倒數翻向 → 式(1)）+ "0 ≤ |sinθ| ≤ |θ|" 附帶界</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把三塊面積的不等式代數地整理成 cosθ ≤ sinθ/θ ≤ 1，並收下 |sinθ|≤|θ| 這個附帶界。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導鏈，逐行 reveal（每行附理由）：
+ 1. $\sin\theta\le\theta\le\tan\theta$（理由：面積 ×2）。
+ 2. $1\le\dfrac{\theta}{\sin\theta}\le\dfrac{1}{\cos\theta}$（理由：÷sinθ&gt;0、$\tan=\tfrac{\sin}{\cos}$）。
+ 3. $\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$（理由：取倒數→翻向；限 $0&lt;\theta&lt;\tfrac\pi2$）—— 標為「式 (1)」。
+附帶界（另起一行、標「keep for later」）：$0\le|\sin\theta|\le|\theta|$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導鏈即可；翻向那步可短暫強調不等號方向反轉）</span></div></details>
 </section>
 <section class="unit">
   <div class="u-head"><span class="u-num">05</span>
-    <span class="u-id">continuity_of_sin_cos</span><span class="u-kind">theorem</span></div>
-  <div class="u-narr"><p>That little bound does more than help with the limit — it is also what
-makes sine and cosine continuous, which is exactly what those two factors
-of the difference quotient needed in order to settle down. Here is the
-claim: $\sin x$ and $\cos x$ are continuous at every real $x_0$. Start
-small. Since $0 \le |\sin\theta| \le |\theta|$ and $|\theta|$ goes to zero,
-the squeeze theorem forces $\sin\theta \to 0$ as $\theta\to 0$. Now fix a
-point $x_0$. The sum-to-product identities let us bound the change in each
-function by the same quantity: both $|\cos x-\cos x_0|$ and
-$|\sin x-\sin x_0|$ are at most $2\,|\sin\frac{x-x_0}{2}|$, since the other
-factor never exceeds one in size. As $x$ approaches $x_0$ that half-angle
-goes to zero, so by what we just showed both bounds collapse to zero.
-Squeeze once more, and $\cos x\to\cos x_0$ and $\sin x\to\sin x_0$ — both
-functions are continuous.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Proposition 3.1（sin、cos 連續）+ Proof</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用 |sinθ|≤|θ| 與夾擠定理證明 sine、cosine 處處連續——這正是差分商兩因子收斂所需。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Proposition 陳述卡（sin、cos 在每個 x₀ 連續）＋證明邏輯鏈：
-$0\le|\sin\theta|\le|\theta|$ + squeeze ⇒ $\lim_{\theta\to0}\sin\theta=0$；
-$|\cos x-\cos x_0|,\,|\sin x-\sin x_0|\le 2|\sin\tfrac{x-x_0}{2}|\to0$ ⇒ 連續。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可）</span></div></details>
+    <span class="u-id">continuity_statement_sin_limit</span><span class="u-kind">proposition</span></div>
+  <div class="u-narr"><p>That little bound does more than help with the limit — it is also the key
+to continuity. And continuity here means something very concrete: nudge the
+angle by a little, and sine and cosine move only a little; they never jump.
+We even have the tool that says so. On the unit circle the half-chord
+$\sin\theta$ is always shorter than the arc $\theta$ above it, which is just
+$|\sin\theta| \le |\theta|$ read geometrically — close up the angle and you
+close up the sine. So here is the claim, made precise: $\sin x$ and $\cos x$
+are continuous at every real $x_0$. Build it from the ground up. Since
+$0 \le |\sin\theta| \le |\theta|$, and $|\theta|$ itself goes to zero as
+$\theta\to 0$, the squeeze theorem pins $|\sin\theta|$ between zero and
+something vanishing, and forces $\sin\theta \to 0$. That single limit,
+$\lim_{\theta\to 0}\sin\theta = 0$, is the seed; the full continuity grows
+straight out of it, which is what we do next.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Proposition 3.1（陳述）+ Proof 第一段（|sinθ|≤|θ| + squeeze ⇒ limθ→0 sinθ = 0）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">先抓住「連續＝角度動一點、值只動一點」的直覺，並用 |sinθ|≤|θ| 與夾擠證出 limθ→0 sinθ = 0。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Proposition 陳述卡：$\sin x,\ \cos x$ 在每個 $x_0$ 連續。
+直覺小圖（mini，弦≤弧）：單位圓上半弦 $\sin\theta$ 短於弧 $\theta$ → $|\sin\theta|\le|\theta|$。
+推導（逐行）：
+ 1. $0\le|\sin\theta|\le|\theta|$，且 $|\theta|\to 0$。
+ 2. squeeze ⇒ $\displaystyle\lim_{\theta\to 0}\sin\theta = 0$（標為下一場的「seed」）。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">（選用）建議動畫：單位圓上同時畫出半弦 $\sin\theta$ 與其上方的弧 $\theta$，讓
+角 θ 收小，弦與弧一起縮向 0，直觀呈現「弦 ≤ 弧、且一起趨 0」＝ $|\sin\theta|\le|\theta|\to0$。</span></div></details>
 </section>
 <section class="unit">
   <div class="u-head"><span class="u-num">06</span>
-    <span class="u-id">fundamental_limit</span><span class="u-kind">proposition</span></div>
-  <div class="u-narr"><p>Now we can finish the limit that started all this. The claim is clean:
-$\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}=1$. We already have the trap.
-For $\theta$ between zero and $\frac\pi2$, $\cos\theta \le
-\dfrac{\sin\theta}{\theta} \le 1$. The ceiling is the constant one. The
-floor is $\cos\theta$, which tends to $\cos 0 = 1$ now that we know cosine
-is continuous. So the ratio is pinned between two quantities both heading to
-one — the squeeze theorem says it must head to one as well, at least from
-the right. And because $\sin\theta/\theta$ is even, its left-hand limit
-matches its right, so the full two-sided limit is one too. That is the
-keystone; the rest of the section rests on it.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Proposition 3.2（lim sinθ/θ = 1）+ Proof</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用 cosθ ≤ sinθ/θ ≤ 1、cosθ→1 與偶函數，夾擠出基本極限等於 1。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Proposition 陳述卡（$\lim_{\theta\to0}\tfrac{\sin\theta}{\theta}=1$）＋證明鏈：
-式(1) squeeze、$\cos\theta\to1$（連續）、偶 ⇒ 兩側極限相等。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可）</span></div></details>
+    <span class="u-id">continuity_argument</span><span class="u-kind">proof</span></div>
+  <div class="u-narr"><p>Now turn that seed into full continuity. Fix a point $x_0$, and ask how much
+$\cos x$ and $\sin x$ can change as $x$ moves toward it. Sum-to-product
+answers both at once. For cosine,
+$\cos x-\cos x_0=-2\sin\frac{x-x_0}{2}\sin\frac{x+x_0}{2}$; and for sine,
+$\sin x-\sin x_0=2\cos\frac{x+x_0}{2}\sin\frac{x-x_0}{2}$. In each line one
+factor carries the half-difference $\frac{x-x_0}{2}$, and the other carries
+the half-sum $\frac{x+x_0}{2}$ — and that second factor, a sine or a cosine,
+never exceeds one in size. Drop it to its largest size, one, and both
+differences are bounded by the same thing:
+$|\cos x-\cos x_0|$ and $|\sin x-\sin x_0|$ are each at most
+$2\,|\sin\frac{x-x_0}{2}|$. Now let $x\to x_0$. The half-angle
+$\frac{x-x_0}{2}$ goes to zero, so by the limit we just established that
+bound, $2\,|\sin\frac{x-x_0}{2}|$, collapses to zero. Squeeze one last time,
+and the differences are crushed to nothing: $\cos x\to\cos x_0$ and
+$\sin x\to\sin x_0$. Both functions are continuous everywhere.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Proposition 3.1 · Proof 第二段（sum-to-product 界住 |Δcos|、|Δsin| ≤ 2|sin((x−x₀)/2)| → squeeze ⇒ 連續）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看見連續性如何從「sum-to-product 把函數的變化界住、再夾擠」完整推出——畫面上顯示恆等式來源，界不再憑空出現。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">證明鏈，逐行 reveal——關鍵：和差化積兩條恆等式**顯示在畫面上**（界的來源不再憑空）：
+ 1. $\cos x-\cos x_0=-2\sin\tfrac{x-x_0}{2}\sin\tfrac{x+x_0}{2}$（理由：sum-to-product）。
+ 2. $\sin x-\sin x_0=\phantom{-}2\cos\tfrac{x+x_0}{2}\sin\tfrac{x-x_0}{2}$（理由：sum-to-product，伴隨式）。
+ 3. 半和因子 $\bigl|\sin\tfrac{x+x_0}{2}\bigr|\le1$、$\bigl|\cos\tfrac{x+x_0}{2}\bigr|\le1$ ⇒ $|\cos x-\cos x_0|,\ |\sin x-\sin x_0|\le 2\bigl|\sin\tfrac{x-x_0}{2}\bigr|$。
+ 4. $x\to x_0 \Rightarrow \tfrac{x-x_0}{2}\to0 \Rightarrow 2\bigl|\sin\tfrac{x-x_0}{2}\bigr|\to0$（用上場 $\sin\theta\to0$）。
+ 5. squeeze ⇒ $\cos x\to\cos x_0,\ \sin x\to\sin x_0$（QED：兩者連續）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態證明鏈即可；步驟 3 可短暫強調「半和因子被丟成 1」這個放大動作）</span></div></details>
 </section>
 <section class="unit">
   <div class="u-head"><span class="u-num">07</span>
+    <span class="u-id">fundamental_limit</span><span class="u-kind">proposition</span></div>
+  <div class="u-narr"><p>Now we can finally close the limit that started all of this. The claim is
+as clean as it gets: $\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}=1$. And we
+already built the trap for it. For $\theta$ between zero and $\frac\pi2$, our
+bound reads $\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$ — the ratio is
+pinned between a floor and a ceiling. The ceiling is the constant one, going
+nowhere. The floor is $\cos\theta$, and now that we know cosine is
+continuous, $\cos\theta \to \cos 0 = 1$ as $\theta\to 0$. So the ratio is
+squeezed between two quantities both heading to one, and has nowhere to go
+but there — at least as $\theta$ approaches from the right. And here the
+even symmetry pays off: because $\sin\theta/\theta$ is unchanged when
+$\theta$ flips sign, its left-hand limit must equal its right-hand limit, so
+the full two-sided limit is one as well. That is the keystone — every result
+in the rest of the section rests on this single value.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Proposition 3.2（lim sinθ/θ = 1）+ Proof</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用 cosθ ≤ sinθ/θ ≤ 1、cosθ→1 與偶函數，夾擠出基本極限等於 1。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Proposition 陳述卡：$\displaystyle\lim_{\theta\to0}\dfrac{\sin\theta}{\theta}=1$。
+證明鏈，逐行 reveal：
+ 1. 式(1)：$\cos\theta\le\dfrac{\sin\theta}{\theta}\le1$（$0&lt;\theta&lt;\tfrac\pi2$）——標「floor / ceiling」。
+ 2. ceiling $=1$；floor $\cos\theta\to\cos0=1$（理由：cos 連續，上場結果）。
+ 3. squeeze ⇒ $\dfrac{\sin\theta}{\theta}\to1$（右極限）。
+ 4. 偶函數 ⇒ 左 = 右 ⇒ 兩側極限 $=1$（標「keystone」）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可；可把 floor/ceiling 兩界向 1 收攏短暫示意）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">08</span>
     <span class="u-id">squeeze_graph</span><span class="u-kind">visual</span></div>
-  <div class="u-narr"><p>It helps to see that squeeze as a picture. Plot the ratio
+  <div class="u-narr"><p>It helps to picture that squeeze. Plot the ratio
 $\dfrac{\sin\theta}{\theta}$ near zero — the solid curve. Below it runs
 $\cos\theta$, dashed, and above it sits the constant line at height one. The
 ratio is trapped in the narrowing gap between them. As $\theta$ slides
@@ -191,19 +252,19 @@ toward, not a value it ever actually takes.</p></div>
 凸顯「是極限、不是值」。</span></div></details>
 </section>
 <section class="unit">
-  <div class="u-head"><span class="u-num">08</span>
+  <div class="u-head"><span class="u-num">09</span>
     <span class="u-id">limit_not_identity</span><span class="u-kind">counterexample</span></div>
-  <div class="u-narr"><p>One caution, because this is easy to over-read. The statement is about the
-limit as $\theta\to 0$ — it is not an identity. At a fixed angle the ratio
-is generally not one. At $\theta=\frac\pi2$ it is
-$\dfrac{\sin(\pi/2)}{\pi/2}=\dfrac{1}{\pi/2}=\dfrac{2}{\pi}$, about
-$0.64$; and at $\theta=\pi$ it is $\dfrac{0}{\pi}$, which is just zero. The
-value one is reached only in the limit, as $\theta$ shrinks to nothing.</p></div>
+  <div class="u-narr"><p>One caution, because this result is easy to over-read. The statement is
+about the limit as $\theta\to 0$ — it is not an identity. At a fixed angle
+the ratio is generally not one. At $\theta=\frac\pi2$ it is
+$\dfrac{\sin(\pi/2)}{\pi/2}=\dfrac{1}{\pi/2}=\dfrac{2}{\pi}$, about $0.64$;
+and at $\theta=\pi$ it is $\dfrac{0}{\pi}$, which is just zero. The value one
+is reached only in the limit, as $\theta$ shrinks to nothing.</p></div>
   <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Caution（Proposition 3.2 是極限敘述、非恆等式；θ=π/2、θ=π 的值）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">別把基本極限誤讀成恆等式——固定角下 sinθ/θ 一般不等於 1。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">警示卡：$\lim_{\theta\to0}\tfrac{\sin\theta}{\theta}=1$ 但固定角 ≠ 1——
 $\tfrac{\sin(\pi/2)}{\pi/2}=\tfrac{2}{\pi}\approx0.64$、$\tfrac{\sin\pi}{\pi}=0$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態警示即可）</span></div></details>
 </section>
 <section class="unit">
-  <div class="u-head"><span class="u-num">09</span>
+  <div class="u-head"><span class="u-num">10</span>
     <span class="u-id">radians_essential</span><span class="u-kind">counterexample</span></div>
   <div class="u-narr"><p>A second caution, and this one is structural: everything here depends on
 measuring angles in radians. The sector area $\frac12\theta$ — and through
@@ -213,48 +274,62 @@ degrees and the limit is no longer one. Since $x$ degrees is
 $\frac{\pi}{180}x$ radians, you get $\lim_{x\to 0}\dfrac{\sin(x^\circ)}{x}=
 \dfrac{\pi}{180}$, and the derivative drags that factor along:
 $\dfrac{d}{dx}\sin(x^\circ)=\dfrac{\pi}{180}\cos(x^\circ)$. The clean
-formulas we are about to prove, $\sin'=\cos$ and $\cos'=-\sin$, hold only
-in radians. So radians are not a stylistic choice here — they are what
-keeps the calculus tidy.</p></div>
+formulas we are about to prove, $\sin'=\cos$ and $\cos'=-\sin$, hold only in
+radians. So radians are not a stylistic choice here — they are what keeps
+the calculus tidy.</p></div>
   <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Caution（弧度制必要；度數下極限為 π/180、sin' 帶 π/180 因子）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">懂得弧度制不是慣例而是 sin'=cos、cos'=−sin 成立的前提——度數下公式會帶醜因子。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">警示卡：弧度 → $\sin\theta/\theta\to1$、$\sin'=\cos$；度數 →
 $\lim_{x\to0}\tfrac{\sin(x^\circ)}{x}=\tfrac{\pi}{180}$、
 $\tfrac{d}{dx}\sin(x^\circ)=\tfrac{\pi}{180}\cos(x^\circ)$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態警示即可）</span></div></details>
 </section>
 <section class="unit">
-  <div class="u-head"><span class="u-num">10</span>
-    <span class="u-id">derivative_of_sine</span><span class="u-kind">theorem</span></div>
-  <div class="u-narr"><p>Now the payoff. With continuity and the fundamental limit in hand, the
-difference quotient for sine all but evaluates itself. The claim:
-$\dfrac{d}{dx}\sin x=\cos x$, for every real $x$. We already rewrote the
-quotient as $\cos\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. Let
-$h\to 0$. The first factor tends to $\cos x$, because cosine is continuous;
-the second tends to one, by the fundamental limit, with $\theta=\frac h2$.
-Their product tends to $\cos x$ times one — which is just $\cos x$. The
-derivative of sine is cosine.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Theorem 3.1（d/dx sin x = cos x）+ Proof</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把連續與基本極限組裝起來，證出 sin 的導數是 cos。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Theorem 陳述卡（$\tfrac{d}{dx}\sin x=\cos x$）＋證明鏈：
-$\lim_{h\to0}\cos(x+\tfrac h2)\cdot\tfrac{\sin(h/2)}{h/2}=\cos x\cdot1=\cos x$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可）</span></div></details>
-</section>
-<section class="unit">
   <div class="u-head"><span class="u-num">11</span>
-    <span class="u-id">derivative_of_cosine</span><span class="u-kind">theorem</span></div>
-  <div class="u-narr"><p>Cosine falls to the very same machinery — only the identity changes. This
-time use $\cos A-\cos B=-2\sin\frac{A+B}{2}\sin\frac{A-B}{2}$. With $A=x+h$
-and $B=x$, the difference quotient becomes
-$-\sin\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. Send $h$ to
-zero: the sine factor goes to $\sin x$ by continuity, the other to one by
-the fundamental limit, and we are left with
-$\dfrac{d}{dx}\cos x=-\sin x$. Same two tools, one extra minus sign — that
-is the derivative of cosine.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Theorem 3.2（d/dx cos x = −sin x）+ Proof（伴隨恆等式）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看出 cosine 走完全相同的機制（只換一條恆等式），導數是 −sin。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Theorem 陳述卡（$\tfrac{d}{dx}\cos x=-\sin x$）＋證明鏈：
-$\tfrac{\cos(x+h)-\cos x}{h}=-\sin(x+\tfrac h2)\cdot\tfrac{\sin(h/2)}{h/2}\to-\sin x$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可；setup 走 repeat-pattern，不重述）</span></div></details>
+    <span class="u-id">derivative_of_sine</span><span class="u-kind">theorem</span></div>
+  <div class="u-narr"><p>Now the payoff, and it falls into our hands. The claim:
+$\dfrac{d}{dx}\sin x=\cos x$, for every real $x$. Start from the definition —
+the derivative is the limit of the difference quotient,
+$\dfrac{d}{dx}\sin x=\lim_{h\to 0}\dfrac{\sin(x+h)-\sin x}{h}$. But we
+already did the hard algebra: that quotient is
+$\cos\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. So the whole job
+is to take the limit of this product as $h\to 0$. The first factor,
+$\cos\!\left(x+\frac h2\right)$, tends to $\cos x$, because cosine is
+continuous — that is exactly what we proved continuity for. The second
+factor is $\dfrac{\sin(h/2)}{h/2}$, which is our fundamental limit with
+$\theta=\frac h2$, so it tends to one. A continuous thing times a limit:
+the product tends to $\cos x$ times one, which is simply $\cos x$. The
+derivative of sine is cosine.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Theorem 3.1（d/dx sin x = cos x）+ Proof</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把連續與基本極限組裝起來，從差分商一路寫到 sin 的導數是 cos。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Theorem 陳述卡：$\dfrac{d}{dx}\sin x=\cos x$（for all real $x$）。
+證明鏈，逐行 reveal（補回 setup 行）：
+ 1. $\dfrac{d}{dx}\sin x=\displaystyle\lim_{h\to0}\dfrac{\sin(x+h)-\sin x}{h}$（理由：定義）。
+ 2. $=\displaystyle\lim_{h\to0}\cos\!\left(x+\tfrac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$（理由：前面化簡）。
+ 3. $\cos(x+\tfrac h2)\to\cos x$（連續）；$\dfrac{\sin(h/2)}{h/2}\to1$（基本極限，$\theta=\tfrac h2$）。
+ 4. $=\cos x\cdot1=\cos x$（QED）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可）</span></div></details>
 </section>
 <section class="unit">
   <div class="u-head"><span class="u-num">12</span>
+    <span class="u-id">derivative_of_cosine</span><span class="u-kind">theorem</span></div>
+  <div class="u-narr"><p>Cosine falls to the very same machinery — only the identity changes, so we
+go quickly. This time use the companion sum-to-product formula,
+$\cos A-\cos B=-2\sin\frac{A+B}{2}\sin\frac{A-B}{2}$. With $A=x+h$ and
+$B=x$, the same division by $h=2\cdot\frac h2$ turns the difference quotient
+into $-\sin\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. Send $h$ to
+zero. The sine factor goes to $\sin x$ by continuity, the second factor goes
+to one by the fundamental limit, and the leading minus sign comes along for
+the ride — leaving $\dfrac{d}{dx}\cos x=-\sin x$. Same two tools, one extra
+minus sign. That is the derivative of cosine.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Theorem 3.2（d/dx cos x = −sin x）+ Proof（伴隨恆等式）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看出 cosine 走完全相同的機制（只換一條伴隨恆等式），導數是 −sin。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Theorem 陳述卡：$\dfrac{d}{dx}\cos x=-\sin x$（for all real $x$）。
+證明鏈，逐行 reveal——關鍵：**顯示伴隨恆等式**（唯一的新東西）：
+ 1. $\cos A-\cos B=-2\sin\tfrac{A+B}{2}\sin\tfrac{A-B}{2}$（理由：companion 恆等式）。
+ 2. $\dfrac{\cos(x+h)-\cos x}{h}=-\sin\!\left(x+\tfrac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$（理由：除以 $h=2\cdot\tfrac h2$）。
+ 3. $-\sin(x+\tfrac h2)\to-\sin x$（連續）；$\dfrac{\sin(h/2)}{h/2}\to1$（基本極限）。
+ 4. $=-\sin x$（QED）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可；differece-quotient setup 走 repeat-pattern、不重述，只顯示新恆等式那行）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">13</span>
     <span class="u-id">slope_equals_height</span><span class="u-kind">visual</span></div>
   <div class="u-narr"><p>Here is what $\sin'=\cos$ looks like on the graph. Draw $y=\sin x$, and
 check the slope of its tangent at a few points. At $x=0$ the sine curve is
-climbing at slope one. At $x=\frac\pi2$, the top of the hump, the tangent
-is flat — slope zero. At $x=\pi$ it is falling at slope minus one. Now lay
+climbing at slope one. At $x=\frac\pi2$, the top of the hump, the tangent is
+flat — slope zero. At $x=\pi$ it is falling at slope minus one. Now lay
 $y=\cos x$ on top and read its heights at those same points: one, zero,
 minus one. They match exactly. The slope of sine at each $x$ is the height
 of cosine right there — that is the theorem, drawn. And one more derivative
@@ -265,70 +340,86 @@ tips cosine down to $-\sin x$, which is where the next idea comes from.</p></div
 1／0／−1，用同色/引線把「sin 的斜率」對到「cos 的高度」上，凸顯兩者相等。</span></div></details>
 </section>
 <section class="unit">
-  <div class="u-head"><span class="u-num">13</span>
-    <span class="u-id">derivative_cycle</span><span class="u-kind">proposition</span></div>
-  <div class="u-narr"><p>Step back and watch the pattern. Differentiation sends sine and cosine into
-each other, with a minus sign that turns over on every second step. Writing
-an arrow for one derivative: $\sin x \to \cos x \to -\sin x \to -\cos x \to
-\sin x$. Four derivatives, and you are back where you started — so the
-fourth derivative of sine is sine again, and the same holds for cosine.
-Where $e^x$ reproduces itself in a single step, sine and cosine reproduce
-themselves in a cycle of four. It is a kind of self-renewal — and it is
-exactly what lets these functions describe motion that oscillates forever
-without ever winding down.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Remark 3.1（sin/cos 的四步導數循環；呼應 §2.4 e^x 自我複製）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看出微分把 sin、cos 循環送進彼此，四步回到原點（d⁴/dx⁴ sin = sin）。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">四步循環圖：$\sin x \to \cos x \to -\sin x \to -\cos x \to \sin x$（一個 d/dx 一個箭頭）；
-標 $\tfrac{d^4}{dx^4}\sin x=\sin x$。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">（選用）建議動畫：四個節點 sin x、cos x、−sin x、−cos x 排成環，箭頭依序
-點亮（每箭頭＝一次 d/dx），走完四步回到 sin x，凸顯「循環」與「四步歸位」。</span></div></details>
-</section>
-<section class="unit">
   <div class="u-head"><span class="u-num">14</span>
-    <span class="u-id">companion_limit</span><span class="u-kind">example</span></div>
-  <div class="u-narr"><p>The fundamental limit has a companion worth knowing:
-$\lim_{\theta\to 0}\dfrac{1-\cos\theta}{\theta}=0$. It is again of the form
-zero over zero, and the trick is to multiply top and bottom by
-$1+\cos\theta$. The numerator turns into $1-\cos^2\theta$, which is
-$\sin^2\theta$, so the whole expression rearranges into
-$\dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$. Now let
-$\theta\to 0$. The first factor goes to one, by the limit we just proved;
-the second goes to $\dfrac{0}{1+1}$, which is zero. One times zero is zero —
-and there is the companion limit.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Example 3.1（伴隨極限 (1−cosθ)/θ → 0）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用「乘 1+cosθ」把另一個 0/0 極限化成基本極限的形式，得 0。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導鏈：$\tfrac{1-\cos\theta}{\theta}=\tfrac{1-\cos^2\theta}{\theta(1+\cos\theta)}
-=\tfrac{\sin^2\theta}{\theta(1+\cos\theta)}=\tfrac{\sin\theta}{\theta}\cdot
-\tfrac{\sin\theta}{1+\cos\theta}\to1\cdot0=0$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導鏈即可）</span></div></details>
+    <span class="u-id">derivative_cycle</span><span class="u-kind">proposition</span></div>
+  <div class="u-narr"><p>Step back and watch the pattern these two derivatives make. Differentiation
+sends sine and cosine into each other, with a minus sign that turns over on
+every second step. Writing an arrow for one derivative:
+$\sin x \to \cos x \to -\sin x \to -\cos x \to \sin x$. Four derivatives,
+and you are back exactly where you started — so the fourth derivative of
+sine is sine again, and likewise for cosine. Compare that with $e^x$, which
+reproduces itself in a single step; sine and cosine reproduce themselves in
+a cycle of four. That is a kind of self-renewal, and it is exactly what lets
+these functions describe motion that oscillates forever without ever winding
+down — which is the application we turn to next.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Remark 3.1（sin/cos 的四步導數循環；呼應 §2.4 e^x 自我複製）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看出微分把 sin、cos 循環送進彼此，四步回到原點（d⁴/dx⁴ sin = sin），並對照 e^x 的一步自我複製。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">四步循環圖：$\sin x \to \cos x \to -\sin x \to -\cos x \to \sin x$（一個 d/dx 一個箭頭）；
+標 $\tfrac{d^4}{dx^4}\sin x=\sin x$；旁標對照 $e^x$ 一步自我複製（$\tfrac{d}{dx}e^x=e^x$）。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">（選用）建議動畫：四個節點 sin x、cos x、−sin x、−cos x 排成環，箭頭依序
+點亮（每箭頭＝一次 d/dx），走完四步回到 sin x，凸顯「循環」與「四步歸位」；
+可在一旁放 e^x 的自我箭頭（一步即回）作對照。</span></div></details>
 </section>
 <section class="unit">
   <div class="u-head"><span class="u-num">15</span>
-    <span class="u-id">all_six_trig_derivatives</span><span class="u-kind">example</span></div>
-  <div class="u-narr"><p>With sine and cosine handled, the other four trig functions cost almost
-nothing — just the quotient rule. Take $\tan x=\dfrac{\sin x}{\cos x}$. The
-quotient rule gives $\dfrac{\cos x\cos x-\sin x(-\sin x)}{\cos^2 x}$, and
-the numerator is $\cos^2 x+\sin^2 x$, which is one. So
-$\dfrac{d}{dx}\tan x=\dfrac{1}{\cos^2 x}=\sec^2 x$. Secant is the same idea
-on $\dfrac{1}{\cos x}$: the quotient rule lands
-$\dfrac{d}{dx}\sec x=\sec x\tan x$. And the very same move on $\cot x$ and
-$\csc x$ gives $-\csc^2 x$ and $-\csc x\cot x$. That completes the
-derivatives of all six trigonometric functions — every one of them riding
-on $\sin'=\cos$ and $\cos'=-\sin$.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Example 3.2（tan'、sec' 用商法則；cot'、csc' 同法帶過）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用商法則把 sin'/cos' 推到其餘四個三角函數，補齊全部六個導數。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導：$\tfrac{d}{dx}\tan x=\tfrac{\cos^2x+\sin^2x}{\cos^2x}=\sec^2x$；
-$\tfrac{d}{dx}\sec x=\sec x\tan x$；帶過 $\cot'=-\csc^2x$、$\csc'=-\csc x\cot x$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導即可；cot/csc 走 repeat-pattern 帶過）</span></div></details>
+    <span class="u-id">companion_limit</span><span class="u-kind">example</span></div>
+  <div class="u-narr"><p>The fundamental limit has a companion worth knowing:
+$\lim_{\theta\to 0}\dfrac{1-\cos\theta}{\theta}=0$. It is again of the form
+zero over zero, so we need a way in. The trick is to multiply top and bottom
+by $1+\cos\theta$ — the conjugate — which turns the numerator into a
+difference of squares: $(1-\cos\theta)(1+\cos\theta)=1-\cos^2\theta$. And
+$1-\cos^2\theta$ is just $\sin^2\theta$. So the expression becomes
+$\dfrac{\sin^2\theta}{\theta(1+\cos\theta)}$, which we split deliberately
+into two familiar pieces:
+$\dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$. Now let
+$\theta\to 0$. The first factor goes to one, by the fundamental limit we
+just proved. The second goes to $\dfrac{0}{1+1}$, which is zero. One times
+zero is zero — and there is the companion limit.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Example 3.1（伴隨極限 (1−cosθ)/θ → 0）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用「乘 1+cosθ」把另一個 0/0 極限化成基本極限的形式，得 0。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導鏈，逐行 reveal（每步附理由）：
+ 1. $\dfrac{1-\cos\theta}{\theta}=\dfrac{(1-\cos\theta)(1+\cos\theta)}{\theta(1+\cos\theta)}=\dfrac{1-\cos^2\theta}{\theta(1+\cos\theta)}$（理由：乘共軛 1+cosθ）。
+ 2. $=\dfrac{\sin^2\theta}{\theta(1+\cos\theta)}=\dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$（理由：$1-\cos^2\theta=\sin^2\theta$、拆兩因子）。
+ 3. $\to 1\cdot\dfrac{0}{1+1}=0$（理由：基本極限 + 連續）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導鏈即可）</span></div></details>
 </section>
 <section class="unit">
   <div class="u-head"><span class="u-num">16</span>
-    <span class="u-id">shm_compute</span><span class="u-kind">example</span></div>
-  <div class="u-narr"><p>Let us put the new derivatives to work on something moving. A weight
-bobbing on a spring sits at height $s(t)=\sin t$ above its rest level.
-Velocity is the derivative of height, so $s'(t)=\cos t$; acceleration is
-the derivative of velocity, so $s''(t)=-\sin t$. But $-\sin t$ is just
-$-s(t)$ — the acceleration is the negative of the height. So at every
-instant the weight is pushed back toward rest, and harder the farther it
-has strayed. That relation, $s''=-s$, is the signature of simple harmonic
-motion. And it is no accident that sine and cosine — the functions whose
-second derivative is their own negative — are exactly the ones that
-describe oscillation.</p></div>
-  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Example 3.3（彈簧 s(t)=sin t，求 s'、s''，得 s''=−s）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">只用 sin'/cos' 算出速度與加速度，發現加速度等於負的高度——簡諧運動的簽名。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">$s(t)=\sin t$ → $s'(t)=\cos t$ → $s''(t)=-\sin t=-s(t)$；標出簽名 $s''=-s$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導即可；幾何面交給 shm_stacked_graphs）</span></div></details>
+    <span class="u-id">all_six_trig_derivatives</span><span class="u-kind">example</span></div>
+  <div class="u-narr"><p>With sine and cosine in hand, the other four trig functions cost almost
+nothing — they are all just the quotient rule. Take $\tan x$, which is
+$\dfrac{\sin x}{\cos x}$. The quotient rule gives
+$\dfrac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^2 x}$, and the numerator is
+$\cos^2 x+\sin^2 x$, which the Pythagorean identity collapses to one. So
+$\dfrac{d}{dx}\tan x=\dfrac{1}{\cos^2 x}=\sec^2 x$. Secant is the same idea
+on $\dfrac{1}{\cos x}$: the quotient rule, with a constant on top, gives
+$\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}=\dfrac{\sin x}{\cos^2 x}$,
+which we read as $\dfrac{1}{\cos x}\cdot\dfrac{\sin x}{\cos x}=\sec x\tan x$.
+And the very same move on $\cot x=\dfrac{\cos x}{\sin x}$ and
+$\csc x=\dfrac{1}{\sin x}$ gives $-\csc^2 x$ and $-\csc x\cot x$. That
+completes the derivatives of all six trigonometric functions — every one
+built on $\sin'=\cos$ and $\cos'=-\sin$.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Example 3.2（tan'、sec' 用商法則；cot'、csc' 同法帶過）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用商法則把 sin'/cos' 推到其餘四個三角函數，補齊全部六個導數。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導，逐行 reveal（tan、sec 完整顯示步驟；cot、csc repeat-pattern 帶過）：
+ 1. $\dfrac{d}{dx}\tan x=\dfrac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^2 x}$（理由：商法則於 $\tfrac{\sin}{\cos}$）。
+ 2. $=\dfrac{\cos^2 x+\sin^2 x}{\cos^2 x}=\dfrac{1}{\cos^2 x}=\sec^2 x$（理由：Pythagorean）。
+ 3. $\dfrac{d}{dx}\sec x=\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}=\dfrac{\sin x}{\cos^2 x}=\sec x\tan x$（理由：商法則於 $\tfrac1{\cos}$）。
+ 4. （帶過）$\dfrac{d}{dx}\cot x=-\csc^2 x,\quad \dfrac{d}{dx}\csc x=-\csc x\cot x$（理由：同手法）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導即可；cot/csc 走 repeat-pattern 帶過。若容量溢出，Stage 2 可拆 tan/sec 與 cot/csc 兩場、設 part:）</span></div></details>
 </section>
 <section class="unit">
   <div class="u-head"><span class="u-num">17</span>
+    <span class="u-id">shm_compute</span><span class="u-kind">example</span></div>
+  <div class="u-narr"><p>Let us put the new derivatives to work on something that moves. A weight
+bobbing on a spring sits at height $s(t)=\sin t$ above its rest level.
+Velocity is the derivative of height, so $s'(t)=\cos t$. Acceleration is the
+derivative of velocity, so $s''(t)=-\sin t$. But look at that last line:
+$-\sin t$ is just $-s(t)$. The acceleration is the negative of the height.
+So at every instant the weight is pushed back toward rest, and harder the
+farther it has strayed. That relation, $s''=-s$, is the signature of simple
+harmonic motion. And it is no accident that sine and cosine — the functions
+whose second derivative is their own negative — are exactly the ones that
+describe oscillation.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Example 3.3（彈簧 s(t)=sin t，求 s'、s''，得 s''=−s）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">只用 sin'/cos' 算出速度與加速度，發現加速度等於負的高度——簡諧運動的簽名。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導，逐行 reveal：
+ 1. $s(t)=\sin t$（height）。
+ 2. $s'(t)=\cos t$（velocity）。
+ 3. $s''(t)=-\sin t$（acceleration）。
+ 4. $-\sin t=-s(t)$ ⇒ $s''=-s$（標「signature of SHM」）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導即可；幾何面交給 shm_stacked_graphs）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">18</span>
     <span class="u-id">shm_stacked_graphs</span><span class="u-kind">visual</span></div>
   <div class="u-narr"><p>Stack the three graphs over one time axis and the relationship jumps out.
 On top, the height $s=\sin t$. In the middle, the velocity $s'=\cos t$. On
@@ -344,31 +435,30 @@ s''（底）。在 t=π/2、3π/2 落下垂直虛線，凸顯頂圖峰/谷處中
 最後把底圖與頂圖並比（或底圖由頂圖翻摺生成），點出 s''=−s 的上下鏡射。</span></div></details>
 </section>
 <section class="unit">
-  <div class="u-head"><span class="u-num">18</span>
+  <div class="u-head"><span class="u-num">19</span>
     <span class="u-id">toward_the_chain_rule</span><span class="u-kind">forward_ref</span></div>
-  <div class="u-narr"><p>We can now differentiate every trigonometric function — but only in its
-bare form. We can handle $\sin x$, yet not $\sin(x^2)$ or $\sin(3x+1)$,
-where the angle is itself a function tucked inside. To reach a function
-buried inside another, we need one more rule: a way to differentiate a
-composition. That rule is the chain rule, and it is what comes next — and
-with it, every derivative we found today becomes the seed of a whole family
-more.</p></div>
+  <div class="u-narr"><p>We can now differentiate every trigonometric function — but only in its bare
+form. We can handle $\sin x$, yet not $\sin(x^2)$ or $\sin(3x+1)$, where the
+angle is itself a function tucked inside. To reach a function buried inside
+another, we need one more rule: a way to differentiate a composition. That
+rule is the chain rule, and it is what comes next — and with it, every
+derivative we found today becomes the seed of a whole family more.</p></div>
   <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · 收尾散文（forward-ref：只能微分裸三角函數，sin(x²) 等需連鎖律）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">認清目前只能微分「裸」三角函數，要處理 sin(x²) 之類的合成需要下一個工具。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">對比：能做 $\sin x$；不能直接做 $\sin(x^2)$、$\sin(3x+1)$（角度是內層函數）→
 指向「下一個工具：連鎖律」。MUST NOT 報節號。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態即可）</span></div></details>
 </section>
 <section class="unit">
-  <div class="u-head"><span class="u-num">19</span>
+  <div class="u-head"><span class="u-num">20</span>
     <span class="u-id">recap</span><span class="u-kind">recap</span></div>
   <div class="u-narr"><p>Pull the section together. Everything grew from one limit:
-$\dfrac{\sin\theta}{\theta}\to 1$ as $\theta\to 0$, which we cracked not
-with algebra but by squeezing it between $\cos\theta$ and one on the unit
-circle. That limit, together with the continuity of sine and cosine, gave
-the two derivatives at the heart of the section: $\sin'=\cos$ and
-$\cos'=-\sin$. From those two, the quotient rule delivered all the other
-trig derivatives. Keep the cycle in mind — differentiating runs
+$\dfrac{\sin\theta}{\theta}\to 1$ as $\theta\to 0$, which we cracked not with
+algebra but by squeezing it between $\cos\theta$ and one on the unit circle.
+That limit, together with the continuity of sine and cosine, gave the two
+derivatives at the heart of the section: $\sin'=\cos$ and $\cos'=-\sin$.
+From those two, the quotient rule delivered all the other trig derivatives.
+Keep the cycle in mind — differentiating runs
 $\sin\to\cos\to-\sin\to-\cos$ and back around, so the fourth derivative
-brings you home. And remember the fine print: all of it depends on
-measuring angles in radians.</p></div>
+brings you home. And remember the fine print: all of it depends on measuring
+angles in radians.</p></div>
   <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1（全節重點凝煉；Key Takeaways 單元，有旁白）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把本節串成一條線——一個極限 → 兩個導數 → 其餘四個 → 四步循環 → 全靠弧度。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Key Takeaways 卡片（5 點）＋ remember-formula 卡：
 points：
   • 基本極限：$\sin\theta/\theta \to 1$（θ→0），靠單位圓上的夾擠證得。
@@ -381,7 +471,7 @@ formulas（保持短，避免出框）：
   • $\dfrac{d}{dx}\sin x=\cos x,\quad \dfrac{d}{dx}\cos x=-\sin x$</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態卡片即可）</span></div></details>
 </section>
 <section class="unit">
-  <div class="u-head"><span class="u-num">20</span>
+  <div class="u-head"><span class="u-num">21</span>
     <span class="u-id">outro</span><span class="u-kind">recap</span></div>
   <div class="u-narr"><p class="narr-none">（無——outro 為純動畫，無 takeaways）</p></div>
   <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1（節末品牌字卡）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">（收尾；無教學內容）</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">兩段式 outro——暗轉亮橋接 → 最終 logo／節號／標題字卡（Next 3.2 The Chain Rule）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（由 outro 模板處理）</span></div></details>
