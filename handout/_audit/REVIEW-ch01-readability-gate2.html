@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 可讀性回填 — gate 2（Codex）跨模型複核稿</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: { arccsc:['\\operatorname{arccsc}'], arcsec:['\\operatorname{arcsec}'], arccot:['\\operatorname{arccot}'] }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{--bg:#f7f7f5;--card:#ffffff;--ink:#1d1d1f;--muted:#6b6b70;--line:#e4e4e0;--old:#b3261e;--new:#1a7f37;--accent:#2552b3;--chip:#eef0f4;--warn:#8a5a00;--warnbg:#fff6e3;--block:#a11;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.0rem;margin:22px 0 4px;color:var(--accent)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}.pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}.warnnote b{color:var(--warn)}
+  .fixnote{background:#eef3ff;border-left-color:var(--accent)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .card.solid{border-style:solid}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.c2{background:#fdeede;color:#9a5a12}
+  .chip.fixed{background:#d8f0e0;color:#15692f}
+  .chip.inter{background:#1d1d1f;color:#fff}
+  .chip.rec{background:#fff0d6;color:#8a5a00}
+  .chip.low{background:#eef0f4;color:#666}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .meta{color:var(--muted);font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .meta b{color:#444}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.95rem}
+  .row .tag{display:inline-block;min-width:64px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea}.old .tag{color:var(--old)}
+  .new{background:#eaf6ed}.new .tag{color:var(--new)}
+  .ctx{background:#f5f6f8}.ctx .tag{color:var(--muted)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  ul.adv,ul.cut{list-style:none;padding:0;margin:8px 0}
+  ul.adv li,ul.cut li{border:1px solid var(--line);border-radius:7px;padding:8px 12px;margin:6px 0;font-size:.9rem}
+  ul.adv li{background:#fffdf6}
+  ul.cut li{background:#fafafa;color:#555}
+  .cid{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:#666;margin-right:8px}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 1 可讀性回填 — gate 2（Codex）跨模型複核稿</h1>
+  <p class="lede">第二道閘：<code>codex-cli 0.136.0</code>（PATH，ChatGPT 訂閱）對<b>現行（已套用 gate-1 7 條後）</b>的 Ch1 六節，獨立跨模型複核同樣兩條檢查（① reader-persona、② introduce-before-use）。乾淨 inline UTF-8 餵入（非 <code>-C</code> 自讀）、schema-constrained。raw 一律過四級＋no-dumbing triage。原始轉錄存 <code>handout/_dev-archive/ch01/ch01_readability-gate2-audit.md</code>。2026-06-28。用量 ≈ <b>172,715 token</b>（訂閱配額，遠低於估上限）。</p>
+
+  <div class="note fixnote"><b>本輪雙閘最大價值：gate-2 抓到 gate-1＋Mode B 都漏的迴歸。</b> 我們套用 G1-5 時不慎刪掉 <code>integers</code>（原文「for integers \(n\ge2\)」），使 \(n\) 不再限整數＝數學上不成立。<b>已修復</b>（改回 <code>for integer \(n\)</code>）並重建。Codex 獨立讀到後點出——正是跨模型第二讀者的意義。</div>
+
+  <div class="note pass"><b>0 新 blocking。</b> 25 raw findings → triage：<b>1 已修</b>（迴歸 G2-9）、<b>1 真交集</b>（§1.4 <code>=∞</code> G2-19 ↔ gate-1 G1-7，已套用）、<b>9 低／中度 advisory</b> 交你裁決、<b>14 砍除</b>（過度回報，透明列出）。gate-2 系統性比 gate-1 嚴，集中在 U4「每個記號都要 gloss」（邏輯箭號 \(\implies\,\Longleftrightarrow\)、映射 \(\mapsto\)、非正式動詞 vanish／blows up）——典型 reasoning 模型 over-report，多數 side with gate-1。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>raw</th><th>處置</th></tr>
+    <tr><td>§1.1 Inverse Functions</td><td>5</td><td>G2-5 advisory（Ex 1.8 \(t\) 重用）；G2-1·2·3·4 砍</td></tr>
+    <tr><td>§1.2 Inverse Trig</td><td>5</td><td><b>G2-9 已修（迴歸）</b>；G2-8 advisory（拆長句·refine G1-4）；G2-10 low；G2-6·7 砍</td></tr>
+    <tr><td>§1.3 Limit of a Function</td><td>5</td><td>G2-12·13·14·15 low advisory；G2-11 砍</td></tr>
+    <tr><td>§1.4 One-Sided &amp; Infinite</td><td>5</td><td><b>G2-19 真交集 ↔ G1-7（已套用）</b>；G2-16·17·18·20 砍</td></tr>
+    <tr><td>§1.5 Limit Laws</td><td>3</td><td>G2-21·22·23 砍</td></tr>
+    <tr><td>§1.6 Precise Definition</td><td>2</td><td>G2-24·25 low advisory</td></tr>
+  </table>
+
+  <!-- ============ 已處理 ============ -->
+  <h2>① 已處理 —— 迴歸修復（correctness）</h2>
+  <div class="card solid">
+    <div class="chips"><span class="chip num">G2-9</span><span class="chip c2">② introduce-before-use → 迴歸</span><span class="chip unit">§1.2 Example 1.11</span><span class="chip dim">U4</span><span class="chip fixed">✓ 已修復＋重建</span></div>
+    <div class="issue">我們套用 G1-5（補 \(n\ge2\) 的推導）時，把原句的 <code>integers</code> 連同改寫一起弄丟了，導致 \(n\) 不再限為整數——\(\cos t = 1\) 僅在 \(t=2\pi n,\ n\in\mathbb{Z}\) 成立，少了整數限制即不成立。Codex 獨立讀到並點出。</div>
+    <div class="row old"><span class="tag">套用後(誤)</span>…at the times \(t = 2\pi n\)<del>;</del> because the motion exists only for \(t \ge 10\), …</div>
+    <div class="row new"><span class="tag">已修復</span>…at the times \(t = 2\pi n\) <ins>for integer \(n\)</ins>; because the motion exists only for \(t \ge 10\), …</div>
+    <div class="meta"><b>意義：</b> gate-1 reader＋verifier＋範圍限定 Mode B（共 3 次 Claude 檢視）皆未抓到；獨立模型一次抓到——雙閘對「同源盲點」的價值就在此。已改 <code>fragments/ch01/sec-1-2.html</code> 並 <code>build.py ch01</code> 重建。</div>
+  </div>
+
+  <!-- ============ 真交集 ============ -->
+  <h2>② 真交集（最高信心）—— §1.4 <code>=∞</code></h2>
+  <div class="card solid">
+    <div class="chips"><span class="chip num">G2-19</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">§1.4 Example 1.22</span><span class="chip dim">U3</span><span class="chip inter">↔ gate-1 G1-7</span><span class="chip rec">已套用·可選 refine</span></div>
+    <div class="issue">兩個獨立模型各自抓到同一處：極限值記法 <code>=∞</code> 在 Example 1.22 用於 \(1/x^2\) 的對比句，早於 Definition 1.11。這把 §1.4 <code>=∞</code> 確立為**真雙閘交集＝最低後悔**。我們已在前一個 \(=-\infty\) display 後加輕量 forward-ref（G1-7）。</div>
+    <div class="row ctx"><span class="tag">已套用</span>(G1-7) …\(\lim_{x\to0^-}\frac1x=-\infty.\) <ins>(The limit-value notation \(=-\infty\) is made precise in Definition 1.11 below.)</ins> From the right…</div>
+    <div class="row new"><span class="tag">可選 refine</span>Codex 另建議在末句 1/x² 對比處也加路標：「…both sides grow positively, so, <ins>in the infinite-limit notation defined below,</ins> we write \(\lim_{x\to0}1/x^2=\infty\)」。<b>可選</b>——既有 forward-ref 已概括該記法，是否再加一處交你定。</div>
+    <div class="meta"><b>意義：</b> gate-1（Claude）與 gate-2（Codex）對此處獨立同判，是本章信心最高的 ②。</div>
+  </div>
+
+  <!-- ============ advisory ============ -->
+  <h2>③ gate-2 advisory 候選（交你裁決，唯讀未改）</h2>
+
+  <h3>建議採納（refine 既有 edit／真實新摩擦）</h3>
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-8</span><span class="chip c1">① reader-persona</span><span class="chip unit">§1.2 Strategy 1.2 step 2</span><span class="chip dim">F4</span><span class="chip rec">建議·refine G1-4</span></div>
+    <div class="issue">我們的 G1-4 gloss（補 principal-value interval 定義）讓 step 2 變成一句塞「正側長＋符號＋principal-value interval」的長指令，gate-2 評 F4（首讀負荷）。建議拆兩句，保 gloss 又降負荷。</div>
+    <div class="row old"><span class="tag">現行</span>Draw a right triangle using positive side lengths for the magnitude of the known ratio; keep track of the sign separately, using the principal-value interval (the range of the inverse function, fixed in its definition) to settle it.</div>
+    <div class="row new"><span class="tag">建議</span>Draw a right triangle whose side lengths are the <em>magnitudes</em> (absolute values) of the known ratio. Keep the sign separate, and use the principal-value interval — the range fixed in the inverse function's definition — to settle it.</div>
+    <div class="meta"><b>雙閘：</b> 同一 locus gate-1 修了 U4（先用後定義），gate-2 指出修法附帶的 F4；兩者疊加 → 拆句兼顧。建議採。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-5</span><span class="chip c1">① reader-persona</span><span class="chip unit">§1.1 Example 1.8 solution</span><span class="chip dim">U3</span><span class="chip rec">建議（gate-1 漏）</span></div>
+    <div class="issue">Example 1.8 的 \(t\) 先是 \(f(t)\) 的攝氏輸入，下一句「Writing \(t=\tfrac95 f^{-1}(t)+32\)」又把 \(t\) 當華氏輸入——同符號兩角色，L2 首讀易混。gate-1 漏、gate-2 抓到。修法引入不同名（如 \(T\) 華氏、\(C=f^{-1}(T)\) 攝氏）。注意：屬較大改寫，交你定要不要動定稿例題。</div>
+    <div class="row old"><span class="tag">原文</span>Since \(f\) converts Celsius to Fahrenheit, its inverse \(f^{-1}\) converts a Fahrenheit reading back into Celsius. <del>Writing \(t = \tfrac{9}{5} f^{-1}(t) + 32\) and solving,</del></div>
+    <div class="row new"><span class="tag">建議</span><ins>Let \(T\) be a Fahrenheit reading and \(C=f^{-1}(T)\) the Celsius value that produced it. Then \(T=f(C)=\tfrac95 C+32\); solving for \(C\),</ins></div>
+    <div class="meta"><b>雙閘：</b> gate-2-only（gate-1 未抓）。真實 role-confusion，但 fix 動到例題符號體系——偏結構，建議但請你定奪。</div>
+  </div>
+
+  <h3>低優先（可改可不改；多為單句小 gloss）</h3>
+  <ul class="adv">
+    <li><span class="cid">G2-15</span><b>§1.3 indeterminate form</b>（U4）— gate-2 重新點到 gate-1 已砍的 G1-6（reader 提、verifier 砍）。兩模型部分相合給它一點分量。§1.3 已說「both tend to 0」；可加極輕 forward-ref「(a form examined in §1.5)」。<b>建議：低優先，可留。</b></li>
+    <li><span class="cid">G2-12</span><b>§1.3 Caution 1.5 振盪</b>（U3）— 「runs through every value infinitely often」前可補一句「\(\pi/x\to\infty\) 故正弦週期不斷重複」。兩張矛盾抽樣表其實已暗示；輕度 enrichment。</li>
+    <li><span class="cid">G2-13</span><b>§1.3 瞬時速度代數</b>（U3）— 化簡 \(5(t-2)(t-4)/(4-t)=-5(t-2)\) 跳了 \(4-t=-(t-4)\)；可顯示該負號步。屬數學 display 內，邊界。</li>
+    <li><span class="cid">G2-14</span><b>§1.3 \(v(4)\) 記號</b>（U4）— display 前可加「Writing \(v(4)\) for the instantaneous velocity at \(t=4\),」。極小。</li>
+    <li><span class="cid">G2-24</span><b>§1.6 \(\varepsilon\)-\(\delta\) 開場</b>（U4）— 歷史開場先講「the \(\varepsilon\)-\(\delta\) definition」才在 line 25 把 \(\varepsilon,\delta\) gloss 成 tolerances；可加「(two positive tolerances \(\varepsilon,\delta\))」。該處近似專名，極小。</li>
+    <li><span class="cid">G2-25</span><b>§1.6 Example 1.41 預設限制</b>（U3）— 「first assume \(|x-1|<1\)」之動機（之後取 \(\delta\le1\)）較晚才現；可加「because we will later take \(\delta\le1\)」。gate-1 判非 stall、gate-2 判 tier-1；輕量一句即足。</li>
+    <li><span class="cid">G2-10</span><b>§1.2 Remark 1.3</b>（U4）— 「differentiation formulas」前向引用 Ch3；可改「later derivative formula」。最小。</li>
+  </ul>
+
+  <!-- ============ 砍除 ============ -->
+  <h2>④ 經 triage 砍除（過度回報；透明列出，預設不採）</h2>
+  <p class="lede">14 條 gate-2 raw 判為過度回報或與 gate-1 已決相左而砍。如你不同意某條可指名 G2-編號要求復活。</p>
+  <ul class="cut">
+    <li><span class="cid">G2-1·G2-7·G2-16</span><b>邏輯箭號 \(\implies\,\Longleftrightarrow\) 未 gloss</b>（§1.1 Def 1.1/1.2、§1.2 Def 1.3、§1.4 Prop 1.5）— 標準邏輯記號，且多被「Equivalently」/「defined by」就地語境化。gate-1 未獨立提。<b>砍</b>（一致出現三次但同一過嚴標準）。</li>
+    <li><span class="cid">G2-3</span><b>§1.1 \(\mapsto\) / \(:B\to A\)</b> — gate-1 明確考慮過並砍（「The correspondence … defines an inverse function」就地以文字復述）。<b>砍。</b></li>
+    <li><span class="cid">G2-2</span><b>§1.1 \(x_1,x_2\) 未明寫 \(\in A\)</b> — 「whenever \(x_1\ne x_2\)」已使量化清楚；吹毛求疵。<b>砍。</b></li>
+    <li><span class="cid">G2-6</span><b>§1.2 開場 arcsin/arccos/arctan 先用</b> — 開場是刻意的非正式動機預告，§1.1 目標清單已點名；gate-1 判 clean。<b>砍。</b></li>
+    <li><span class="cid">G2-4</span><b>§1.1「restrict its domain」</b> — 正是本節教學點，解答當場示範；自明。<b>砍。</b></li>
+    <li><span class="cid">G2-17·G2-18·G2-20</span><b>§1.4 branch / signed direction / blows up</b> — 皆就地語境化（branch=piecewise 分式；「signed direction」緊接「Contrast 1/x²: both sides grow positively」；blows up 透明）。<b>砍。</b></li>
+    <li><span class="cid">G2-21</span><b>§1.5「vanish」→「is zero」</b> — 標準數學英語；屬 rubric 點名的「吹毛求疵詞彙替換」，非真 stall。<b>砍。</b></li>
+    <li><span class="cid">G2-22</span><b>§1.5 Example 1.28 要求展開每個商</b> — 已套用 G1-11 拆句解決 F3；再加全部代數會稀釋「can equal anything」的重點。<b>砍。</b></li>
+    <li><span class="cid">G2-23</span><b>§1.5 squeeze \(\sin(1/x)\) 不存在之由</b> — gate-2 跨節盲點：§1.3 Caution 1.5 已立振盪/DNE，線性讀者拿得到理由。<b>砍。</b></li>
+    <li><span class="cid">G2-11</span><b>§1.3「arbitrarily/sufficiently close」</b> — 標準非正式極限措辭，Definition 1.9 本身即 gloss；且改寫定義風險較高。<b>砍。</b></li>
+  </ul>
+
+  <footer>
+    gate 2：Codex <code>codex-cli 0.136.0</code>（訂閱），6 節 × ①② 獨立跨模型複核，172,715 token。唯讀、propose-only。<b>0 新 blocking</b>；25 raw → 1 已修迴歸（G2-9）＋1 真交集已套用（G2-19）＋9 advisory（2 建議·7 低優先）＋14 砍。原始轉錄：<code>handout/_dev-archive/ch01/ch01_readability-gate2-audit.md</code>。<br>
+    ⛳ <b>停。</b> advisory（③）一律唯讀，等你逐條裁決後才改。已套用 7 條＋本輪迴歸修復見 <code>REVIEW-ch01-readability-applied.html</code>；gate-1 候選見 <code>REVIEW-ch01-readability-gate1.html</code>。<br>
+    後續：① 裁決 ③ 的 advisory（我建議至少採 G2-8 拆句、G2-19 refine 可選）；② 之後推 <b>Ch2–4</b>（pilot 基準已立，含「gate-1 套用後務必 gate-2 抓迴歸」這條教訓）；③ commit（需授權）。
+  </footer>
+</div>
+</body>
+</html>

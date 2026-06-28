@@ -396,8 +396,14 @@ window.MathJax = {
 <!-- Section fragments (inlined) -->
 
 <!-- BEGIN-CONTENT-FRAGMENTS -->
-<template id="frag-sec-intro">
-<!-- Chapter 1 opener — overview + learning outcomes. Content verbatim from ch01_foundations.tex. -->
+<template id="frag-sec-1-1">
+<!-- §1.1 Inverse Functions. Content verbatim from ch01_foundations.tex;
+     worked examples E1.1-a/b/c + O1.1-d supplemented from open banks (2026-06-12),
+     audit-approved (ch01_example-supplement-audit.md). §1.1 is the chapter's
+     first section, so it carries the chapter opener (a second <article>), per
+     Ch2/Ch3/Ch4 convention. Opener content verbatim from ch01_foundations.tex
+     chapter overview (formerly the standalone sec-intro fragment). -->
+
 <article class="sec" lang="en">
   <header class="chapter-head">
     <div class="ch-kicker">Chapter 1</div>
@@ -415,12 +421,7 @@ window.MathJax = {
     <li>state and apply the precise \(\varepsilon\)-\(\delta\) definition of a limit to verify a given limit rigorously.</li>
   </ul>
 </article>
-</template>
 
-<template id="frag-sec-1-1">
-<!-- §1.1 Inverse Functions. Content verbatim from ch01_foundations.tex;
-     worked examples E1.1-a/b/c + O1.1-d supplemented from open banks (2026-06-12),
-     audit-approved (ch01_example-supplement-audit.md). -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -635,7 +636,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>This example illustrates why not every function can be reversed — and how restricting the domain repairs it. On the interval \([0, \infty)\) the function \(f(x) = x^{2}\) is one-to-one: if \(x_{1}^{2} = x_{2}^{2}\) with \(x_{1}, x_{2} \ge 0\), then \(x_{1} = x_{2}\). To find the inverse, write \(x = \bigl(f^{-1}(x)\bigr)^{2}\); since \(f^{-1}(x) \ge 0\), taking the positive square root gives
+        <p>This example illustrates why not every function can be reversed — and how restricting the domain repairs it. On the interval \([0, \infty)\) the function \(f(x) = x^{2}\) is one-to-one: if \(x_{1}^{2} = x_{2}^{2}\) with \(x_{1}, x_{2} \ge 0\), then \(x_{1} = x_{2}\). To find the inverse, apply the same procedure: from \(y = x^{2}\) with \(x \ge 0\), solving for \(x\) gives \(x = \sqrt{y}\) — the positive root, because \(x \ge 0\). Interchanging the names of the variables gives
         \[ f^{-1}(x) = \sqrt{x}, \qquad x \ge 0. \]
         This is exactly why \(\sqrt{x}\) means the <em>positive</em> square root: the convention makes the square root the inverse of the restricted squaring function. Figure 1.3 shows the restricted parabola, its inverse, and the mirror line \(y = x\). The same idea — restrict first, then invert — is the key to the inverse trigonometric functions of the next section.</p>
         <figure class="figure" data-fig="restrict-x2">
@@ -713,7 +714,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Since \(f\) converts Celsius to Fahrenheit, its inverse \(f^{-1}\) converts a Fahrenheit reading back into Celsius. Writing \(t = \tfrac{9}{5} f^{-1}(t) + 32\) and solving,
+        <p>Since \(f\) converts Celsius to Fahrenheit, its inverse \(f^{-1}\) converts a Fahrenheit reading back into Celsius. So \(f^{-1}(t)\) is the Celsius value whose Fahrenheit reading is \(t\); applying \(f\) to it returns \(t\), giving \(t = \tfrac{9}{5} f^{-1}(t) + 32\). Solving,
         \[ f^{-1}(t) = \tfrac{5}{9}\,(t - 32). \]
         As a check,
         \[ f^{-1}\!\bigl(f(t)\bigr) = \tfrac{5}{9}\!\left(\tfrac{9}{5} t + 32 - 32\right) = \tfrac{5}{9}\cdot\tfrac{9}{5}\,t = t. \]</p>
@@ -795,7 +796,7 @@ window.MathJax = {
       <p>To evaluate a trigonometric function of an inverse trigonometric expression — such as \(\tan(\arcsin x)\) or \(\cos(\arctan x)\):</p>
       <ol class="steps">
         <li>Set \(\theta\) equal to the inverse trigonometric expression, so that the known ratio is read directly from the definition (e.g. \(\theta = \arcsin x\) gives \(\sin\theta = x\)).</li>
-        <li>Draw a right triangle using positive side lengths for the magnitude of the known ratio; keep track of the sign separately from the principal-value interval.</li>
+        <li>Draw a right triangle whose side lengths are the magnitudes (absolute values) of the known ratio. Keep the sign separate, and use the principal-value interval — the range fixed in the inverse function's definition — to settle it.</li>
         <li>Find the missing side by the Pythagorean theorem.</li>
         <li>Read the desired value from the completed triangle. Determine the sign from the principal-value interval, not from the triangle alone.</li>
       </ol>
@@ -891,7 +892,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>False. The equation \(\cos t = 1\) holds for infinitely many \(t\), but \(\arccos\) returns only the principal value \(t = 0\) — and the particle is not even moving at \(t = 0\), since its motion starts at \(t = 10\). The particle does reach height \(1\) at the times \(t = 2\pi n\) for integers \(n \ge 2\), but \(\arccos(1) = 0\) is not one of them.</p>
+        <p>False. The equation \(\cos t = 1\) holds for infinitely many \(t\), but \(\arccos\) returns only the principal value \(t = 0\) — and the particle is not even moving at \(t = 0\), since its motion starts at \(t = 10\). The particle does reach height \(1\) at the times \(t = 2\pi n\) for integer \(n\); because the motion exists only for \(t \ge 10\), this requires \(2\pi n \ge 10\), i.e. \(n \ge 2\), but \(\arccos(1) = 0\) is not one of them.</p>
       </div>
     </section>
   </div>
@@ -1021,7 +1022,7 @@ window.MathJax = {
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.3</span></p>
     <div class="env-body">
-      <p>For \(\arcsec x\), another common choice of principal range is \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left(\tfrac{\pi}{2}, \pi\right]\). In this text we use \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right)\) because it makes the differentiation formulas for the inverse secant simpler. When consulting other sources or software, always check which convention is in use, since different branch choices can lead to different values.</p>
+      <p>For \(\arcsec x\), another common choice of principal range is \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left(\tfrac{\pi}{2}, \pi\right]\). In this text we use \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right)\) because it makes the later derivative formula for the inverse secant simpler. When consulting other sources or software, always check which convention is in use, since different branch choices can lead to different values.</p>
     </div>
   </section>
 
@@ -1194,16 +1195,16 @@ window.MathJax = {
     <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.5</span></p>
     <div class="env-body">
       <p class="ragged">A table of values can only ever <em>suggest</em> a limit; it can never confirm one, and it can mislead. Consider \(f(x) = \sin(\pi / x)\) as \(x \to 0\). Sampling \(x = 0.1, 0.01, 0.001, \dots\) gives \(\sin(10\pi), \sin(100\pi), \dots = 0\) every time, suggesting the limit is \(0\). But sampling \(x = 0.3, 0.03, 0.003, \dots\) gives \(\sin\!\left(\tfrac{10\pi}{3}\right), \sin\!\left(\tfrac{100\pi}{3}\right), \dots = -\tfrac{\sqrt{3}}{2}\) every time, suggesting \(-\tfrac{\sqrt{3}}{2}\).</p>
-      <p class="ragged">In truth, near \(0\) the graph keeps oscillating between \(-1\) and \(1\), no matter how closely we zoom in — \(f\) runs through every value in \([-1, 1]\) infinitely often as \(x \to 0\), so the limit does not exist. The definition requires \(f(x)\) to be close to a single \(L\) for <em>all</em> \(x\) sufficiently near \(0\) — not merely for a convenient list of samples.</p>
+      <p class="ragged">Because \(\pi / x\) grows without bound as \(x \to 0\), the sine runs through more and more complete cycles. In truth, near \(0\) the graph keeps oscillating between \(-1\) and \(1\), no matter how closely we zoom in — \(f\) runs through every value in \([-1, 1]\) infinitely often as \(x \to 0\), so the limit does not exist. The definition requires \(f(x)\) to be close to a single \(L\) for <em>all</em> \(x\) sufficiently near \(0\) — not merely for a convenient list of samples.</p>
     </div>
   </section>
 
   <!-- expansion:application — close the instantaneous-velocity thread opened at the start of the section [pass: enrichment] [source: Mooculus digInInstantaneousVelocity, ball example; units converted to SI] -->
   <p>We can now close the loop opened at the start of the section. Suppose a ball thrown upward has height \(s(t) = 30t - 5t^{2}\) metres at time \(t\) seconds. Its average velocity over the interval from \(t\) to \(4\) is
-  \[ \frac{s(4) - s(t)}{4 - t} = \frac{40 - (30t - 5t^{2})}{4 - t} = \frac{5(t - 2)(t - 4)}{4 - t} = -5(t - 2), \qquad t \neq 4. \]
-  The <em>instantaneous</em> velocity at \(t = 4\) is the value this average approaches as the interval shrinks to nothing:
+  \[ \frac{s(4) - s(t)}{4 - t} = \frac{40 - (30t - 5t^{2})}{4 - t} = \frac{5(t - 2)(t - 4)}{4 - t} = \frac{5(t - 2)(t - 4)}{-(t - 4)} = -5(t - 2), \qquad t \neq 4. \]
+  The <em>instantaneous</em> velocity at \(t = 4\), written \(v(4)\), is the value this average approaches as the interval shrinks to nothing:
   \[ v(4) = \lim_{t \to 4} \frac{s(4) - s(t)}{4 - t} = \lim_{t \to 4} \bigl[-5(t - 2)\bigr] = -10 \text{ m/s}. \]
-  Notice that the original ratio has the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) — both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\) — so the cancellation that produced \(-5(t - 2)\) was what made the limit accessible.</p>
+  Notice that the original ratio has the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) (a form taken up systematically in §1.5) — both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\) — so the cancellation that produced \(-5(t - 2)\) was what made the limit accessible.</p>
 
   <p>The limits above were guessed by looking at function values near the point of interest. In the following sections, we will develop systematic methods for evaluating limits and study more subtle behavior such as one-sided limits and infinite limits.</p>
 
@@ -1336,7 +1337,7 @@ window.MathJax = {
       <div class="env-body">
         <p>As \(x\) approaches \(0\) from the left, \(1/x\) is negative with larger and larger magnitude, so
         \[ \lim_{x \to 0^{-}} \frac{1}{x} = -\infty. \]
-        From the right, \(1/x\) is positive and grows without bound, so
+        (The limit-value notation \(= -\infty\) is made precise in Definition 1.11 below.) From the right, \(1/x\) is positive and grows without bound, so
         \[ \lim_{x \to 0^{+}} \frac{1}{x} = \infty. \]
         Because the two one-sided behaviors disagree, the two-sided limit does not exist. Since the values do not all grow in the <em>same</em> signed direction, we do <strong>not</strong> write \(\lim_{x \to 0} \frac{1}{x} = \infty\). Contrast \(1/x^{2}\): both sides grow positively, so there we do write \(\lim_{x \to 0} \frac{1}{x^{2}} = \infty\) (Figure 1.16).</p>
       </div>
@@ -1579,7 +1580,7 @@ window.MathJax = {
       <div class="env-body">
         <ol class="sol-list">
           <li>Take \(f(x) = 10(x - 3)\) and \(g(x) = x - 3\). Both tend to \(0\) at \(3\), yet \(\frac{f(x)}{g(x)} = 10\) wherever it is defined, so the quotient’s limit is \(10\).</li>
-          <li>Replacing \(10\) by any constant \(c\) gives limit \(c\); choices such as \(f(x) = x - 3\), \(g(x) = (x - 3)^{3}\) give \(\infty\); swapping signs gives \(-\infty\); and \(f(x) = x - 3\), \(g(x) = |x - 3|\) makes the limit fail to exist.</li>
+          <li>Replacing \(10\) by any constant \(c\) gives limit \(c\). The choice \(f(x) = x - 3\), \(g(x) = (x - 3)^{3}\) gives \(\infty\), and reversing the sign of \(g\) gives \(-\infty\). Finally, \(f(x) = x - 3\), \(g(x) = |x - 3|\) makes the limit fail to exist.</li>
         </ol>
         <p>A \(\tfrac{0}{0}\) form can therefore equal <em>anything</em> — which is exactly why it is called indeterminate, and why we must simplify before judging.</p>
       </div>
@@ -1811,7 +1812,7 @@ window.MathJax = {
     <h2 class="sec-title"><span class="sec-no">1.6</span>The Precise Definition of a Limit</h2>
   </header>
 
-  <p>From the time of Newton and Leibniz, calculus was remarkably successful at solving problems in geometry, mechanics, and astronomy. For a long time, however, there was also controversy about its logical foundations. Early arguments often relied on infinitesimals — quantities thought of as being extremely small but not described in a fully precise way — and mathematicians continued to ask what it really means to say that \(x\) approaches \(a\) or that \(f(x)\) approaches \(L\). The modern resolution, developed in the nineteenth century, is the \(\varepsilon\)-\(\delta\) definition of a limit, which gave calculus the level of rigor used in modern mathematics.</p>
+  <p>From the time of Newton and Leibniz, calculus was remarkably successful at solving problems in geometry, mechanics, and astronomy. For a long time, however, there was also controversy about its logical foundations. Early arguments often relied on infinitesimals — quantities thought of as being extremely small but not described in a fully precise way — and mathematicians continued to ask what it really means to say that \(x\) approaches \(a\) or that \(f(x)\) approaches \(L\). The modern resolution, developed in the nineteenth century, is the \(\varepsilon\)-\(\delta\) definition of a limit (stated below in terms of two positive tolerances, \(\varepsilon\) and \(\delta\)), which gave calculus the level of rigor used in modern mathematics.</p>
 
   <!-- expansion:history — the arithmetization of analysis: Bolzano, Cauchy, Weierstrass [source: Boyer, A History of the Calculus; Kline, Mathematical Thought from Ancient to Modern Times] -->
   <section class="env env-remark">
@@ -1907,11 +1908,11 @@ window.MathJax = {
     <div class="env-body">
       <p>Suppose that
       \[ \begin{aligned} \lim_{x \to a} f(x) &= L,\\ \lim_{x \to a} f(x) &= M, \end{aligned} \]
-      and that \(L \neq M\). Let \(\varepsilon = \tfrac{|L - M|}{2}\). By the definition of the limit, there exist \(\delta_{1}, \delta_{2} > 0\) such that
+      and that \(L \neq M\). Let \(\varepsilon = \tfrac{|L - M|}{2}\) (half the gap between the two supposed limits — the choice that will make the contradiction appear at the end). By the definition of the limit, there exist \(\delta_{1}, \delta_{2} > 0\) such that
       \[ |f(x) - L| < \varepsilon \quad \text{whenever} \quad 0 < |x - a| < \delta_{1}, \]
       and
       \[ |f(x) - M| < \varepsilon \quad \text{whenever} \quad 0 < |x - a| < \delta_{2}. \]
-      If \(0 < |x - a| < \min\{\delta_{1}, \delta_{2}\}\), both inequalities hold. By the triangle inequality,
+      If \(0 < |x - a| < \min\{\delta_{1}, \delta_{2}\}\), both inequalities hold. By the triangle inequality \(|p + q| \le |p| + |q|\) (applied with \(p = L - f(x)\) and \(q = f(x) - M\)),
       \[ \begin{aligned} |L - M| &= |L - f(x) + f(x) - M|\\ &\le |L - f(x)| + |f(x) - M|\\ &< 2\varepsilon\\ &= |L - M|, \end{aligned} \]
       which is impossible. Therefore \(L = M\).</p>
     </div>
@@ -1970,7 +1971,7 @@ window.MathJax = {
         \[ |(x^{2} - 5x + 6) - 2| < \varepsilon \quad \text{whenever} \quad 0 < |x - 1| < \delta. \]
         We first simplify:
         \[ \begin{aligned} |(x^{2} - 5x + 6) - 2| &= |x^{2} - 5x + 4|\\ &= |(x - 1)(x - 4)|. \end{aligned} \]
-        The factor \(|x - 4|\) depends on \(x\). To control it, first assume \(|x - 1| < 1\). Then
+        The factor \(|x - 4|\) depends on \(x\). To control it, first assume \(|x - 1| < 1\) (legitimate because we will in the end choose \(\delta \le 1\)). Then
         \[ \begin{aligned} |x - 1| < 1 &\implies -1 < x - 1 < 1\\ &\implies 0 < x < 2\\ &\implies -4 < x - 4 < -2\\ &\implies |x - 4| < 4. \end{aligned} \]
         So whenever \(|x - 1| < 1\), we have \(|(x - 1)(x - 4)| < 4 |x - 1|\). To force this below \(\varepsilon\), we also require \(4 |x - 1| < \varepsilon\), i.e. \(|x - 1| < \tfrac{\varepsilon}{4}\). Choosing
         \[ \delta = \min\!\left\{1, \tfrac{\varepsilon}{4}\right\}, \]
@@ -2064,6 +2065,15 @@ window.MathJax = {
   <p>Finally, the \(\varepsilon\)-\(\delta\) definition gives a precise meaning to a property of functions that recurs throughout later chapters. If \(f\) is defined at every point near \(a\), including at \(a\), and if
   \[ \lim_{x \to a} f(x) = f(a), \]
   then \(f\) is said to be <em>continuous at \(a\)</em>. A systematic study of continuity belongs to a later chapter; we mention the term here because it is expressed directly in terms of limits.</p>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <!-- expansion:summary — chapter-level summary (ch01's final section): two threads (inverses §1.1–§1.2, limits §1.3–§1.6) + informal→rigorous arc + forward fence to Ch2 (derivative as a limit) -->
+  <p>Chapter 1 laid down two foundations, and they could hardly look less alike. The first was the inverse of a function (§1.1–§1.2). A function can be run backwards exactly when it is <em>one-to-one</em> — distinct inputs give distinct outputs — a condition the horizontal line test reads straight off a graph. For such a function the inverse \(f^{-1}\) exists (Theorem 1.1), pinned down by the identities \(f^{-1}(f(x)) = x\) and \(f(f^{-1}(y)) = y\) (Proposition 1.1). Restricting each trigonometric function to a principal interval on which it is one-to-one produced the inverse trigonometric functions \(\arcsin\), \(\arccos\), \(\arctan\) and their three companions, with fixed principal ranges and the reference-triangle method (Strategy 1.2) turning expressions such as \(\cos(\arcsin x)\) into algebra.</p>
+
+  <p>The second, and longer, thread was the <em>limit</em> (§1.3–§1.6). We began informally — \(\lim_{x \to a} f(x) = L\) means \(f(x)\) is as close to \(L\) as we please once \(x\) is close enough to, but not equal to, \(a\) — and estimated limits from tables and graphs (§1.3). One-sided limits refined the picture, with a two-sided limit existing exactly when the two one-sided limits agree (Proposition 1.5); allowing the values to grow without bound gave infinite limits and the vertical asymptotes that mark them (§1.4). The limit laws (Theorem 1.2) then made limits computable: for functions built from polynomials and rational functions, direct substitution works wherever the function is defined (Proposition 1.6), and the gaps left by the indeterminate form \(0/0\) yield to factoring, rationalization, or the squeeze theorem (Theorem 1.3) (§1.5).</p>
+
+  <p>The precise \(\varepsilon\)-\(\delta\) definition (Definition 1.13) finally placed every preceding limit argument on a rigorous footing (§1.6): \(\lim_{x \to a} f(x) = L\) means that for every \(\varepsilon > 0\) there is a \(\delta > 0\) with \(\lvert f(x) - L \rvert < \varepsilon\) whenever \(0 < \lvert x - a \rvert < \delta\), and from it we proved that a limit, when it exists, is unique (Proposition 1.7). The chapter closed by naming the property that limits make precise — \(f\) is continuous at \(a\) when \(\lim_{x \to a} f(x) = f(a)\) — and it is on this machinery that Chapter 2 is built: the derivative is itself a limit, the limit of secant slopes.</p>
 
 </article>
 </template>
@@ -2773,7 +2783,7 @@ window.MathJax = {
 var CHAPTER = {
   brand: "Chapter 1",
   runningHead: "Chapter 1 · Inverse Functions and Limits",
-  fragments: ["sec-intro", "sec-1-1", "sec-1-2", "sec-1-3", "sec-1-4", "sec-1-5", "sec-1-6"],
+  fragments: ["sec-1-1", "sec-1-2", "sec-1-3", "sec-1-4", "sec-1-5", "sec-1-6"],
 };
 var FRAGMENTS = CHAPTER.fragments;
 var RUNNING_HEAD = CHAPTER.runningHead;

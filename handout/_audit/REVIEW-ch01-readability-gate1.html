@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 可讀性回填 — gate 1（Claude）審核稿｜① reader-persona ＋ ② introduce-before-use</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: {
+        arccsc: ['\\operatorname{arccsc}'],
+        arcsec: ['\\operatorname{arcsec}'],
+        arccot: ['\\operatorname{arccot}']
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.0rem;margin:24px 0 4px;color:var(--accent)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}
+  .warnnote b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.c2{background:#fdeede;color:#9a5a12}
+  .chip.sev-sl{background:#fff0d6;color:#8a5a00}
+  .chip.sev-mi{background:#eef0f4;color:#555}
+  .chip.t2{background:#fde7e7;color:#a11}
+  .chip.t3{background:#eef0f4;color:#555}
+  .chip.surv{background:#e6f7ea;color:#1a7f37}
+  .chip.cut{background:#f0eded;color:#8a8a8a;text-decoration:line-through}
+  .chip.struct{background:#efe7fb;color:#5b3aa8}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .gate2{color:var(--muted);font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .gate2 b{color:#444}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:64px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  .ctx{background:#f5f6f8} .ctx .tag{color:var(--muted)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  .none{color:var(--muted);font-style:italic;padding:8px 2px}
+  ul.cut{list-style:none;padding:0;margin:8px 0}
+  ul.cut li{background:#fafafa;border:1px solid var(--line);border-radius:7px;padding:8px 12px;margin:6px 0;font-size:.9rem}
+  ul.cut .cid{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:#888;margin-right:8px}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 1 可讀性回填 — gate 1（Claude）審核稿</h1>
+  <p class="lede">把 2026-06-28 新增的兩條規則回填 Ch1（pilot 校準）。本關只跑兩條<b>平起平坐</b>的具名檢查，不重跑任何既有閘（數學 M1–M8／S·A·V／圖 D1–D8 已過）：<br>
+  <b>①&nbsp;reader-persona first-read</b>——以「讀完高中先修、用英文（非母語）自學、第一次線性讀」的視角找首讀摩擦。<br>
+  <b>②&nbsp;introduce-before-use</b>——記號／術語／非正式記法是否先用後定義（U4 排序面，獨立掃一遍）。<br>
+  契約見 <code>handout/_audit/PROSE-AUDIT-RUBRIC.md</code>。唯讀、propose-only：裁決前不改任何課文。2026-06-28。</p>
+
+  <div class="note pass"><b>整章 0 blocking。</b> 13 raw findings（6 節各跑 ①＋②）→ 經對抗式複核（adversarial verify）留下 <b>7 條</b>、砍除 6 條（46% 為過度回報）。留下者：4 條 tier-2 advisory（無 dumbing 風險）＋1 條 canonical 結構型 ②（§1.4 <code>=∞</code>）＋2 條 tier-3 選配。<b>無一條達 blocking（Lost）。</b></div>
+
+  <div class="note"><b>方法（雙 agent 對抗）：</b> 每節先由 reader-persona agent 跑 ①＋②，再對<b>每一條 finding</b> 派一個對抗 verifier（預設懷疑、誠實重評嚴重度、查 no-dumbing、確認真的「先用後定義」而非當場 gloss／更早已介紹）。本表的 severity／tier 採 <b>verifier 修正後</b>值；reader agent 原判與修正寫在每張卡的「雙閘」列。<b>校準訊號：</b> 方法獨立重現了 rubric 自己點名的兩個 canonical 案例（§1.4 <code>=∞</code>、§1.6 <code>ε=|L−M|/2</code>），且 verifier 砍掉近半過度回報，與 rubric「reasoning 模型偏 over-report、須過 triage」的實證一致。</div>
+
+  <div class="note warnnote"><b>這是 gate-1（Claude，免費）。</b> gate-2（Codex，訂閱計費，跨模型獨立複核同樣兩條檢查）<b>尚未跑</b>——需先就模型／用量／成本向你徵得同意（一輪約 5–6 萬 token／節級別）。最終以<b>兩閘交集</b>為最高信心候選交裁決。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>留存 / raw</th><th>處置摘要</th></tr>
+    <tr><td>§1.1 Inverse Functions（含章開場）</td><td>1 / 3</td><td>G1-3 留（tier-3 選配）；G1-1·G1-2 砍</td></tr>
+    <tr><td>§1.2 Inverse Trigonometric Functions</td><td>2 / 2</td><td><b>G1-4·G1-5 留（tier-2）</b></td></tr>
+    <tr><td>§1.3 The Limit of a Function</td><td>0 / 1</td><td>乾淨；G1-6 砍（就地已 gloss）</td></tr>
+    <tr><td>§1.4 One-Sided and Infinite Limits</td><td>1 / 3</td><td><b>G1-7 留（canonical 結構型 ②）</b>；G1-8·G1-9 砍</td></tr>
+    <tr><td>§1.5 Limit Laws and Computational Techniques</td><td>1 / 2</td><td>G1-11 留（tier-3 選配）；G1-10 砍</td></tr>
+    <tr><td>§1.6 The Precise Definition of a Limit</td><td>2 / 2</td><td><b>G1-12·G1-13 留（tier-2）</b></td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：<b>易懂性</b> U1 動機缺位 · U2 重型形式無 gloss · U3 未解釋的跳躍 · U4 先用後定義 · U5 定義後未拆解 ／ <b>流暢性</b> F3 句構可解析 · F4 句長／負荷。 嚴重度：<b>Lost</b>（讀不下去／放棄）· <b>Slowed</b>（須重讀但能回神）· <b>Minor</b>（小顛簸）。 修法型：<b>(a) 局部</b> gloss／forward-ref（低風險，可改）· <b>(b) 結構 reorder</b>（搬定義／介紹段，定稿章 cascade 編號＝只報不搬）。</p>
+
+  <!-- ===================== 主要候選 tier-2 ===================== -->
+  <h2>主要候選（tier-2 advisory，雙閘存活、無 dumbing 風險）</h2>
+
+  <h3>§1.2 Inverse Trigonometric Functions</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-4</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">Strategy 1.2 step 2／4</span><span class="chip dim">U4</span><span class="chip sev-sl">Slowed</span><span class="chip t2">tier 2</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">術語 <em>principal-value interval</em> 在 Strategy 1.2 首次當作已知使用，但「principal range／principal value」要到 <code>The remaining inverse trigonometric functions</code> 開頭（「a principal range — the interval its output angle is restricted to」）才正式 gloss。L2 首讀者撞到承重術語、無就地定義，得自行猜它＝Def 1.3–1.5 的 range。修法 <b>(a) 局部</b>：在首次出現處一句 gloss 綁回已給的 range，免 reorder。</div>
+    <div class="row old"><span class="tag">原文</span>Draw a right triangle using positive side lengths for the magnitude of the known ratio; keep track of the sign separately from the <del>principal-value interval</del>.</div>
+    <div class="row new"><span class="tag">建議</span>…keep track of the sign separately, <ins>using the principal-value interval (the range of the inverse function, fixed in its definition)</ins> to settle it.</div>
+    <div class="gate2"><b>雙閘：</b> reader agent 判 tier-1 Slowed → verifier 確認真為先用後定義（line 71 首用、line 266 才 gloss），但因概念剛在 Def 1.3／Caution 1.3 建立、可推回，修正為 <b>tier-2 Slowed</b>。dumbing 風險：無。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-5</span><span class="chip c1">① reader-persona</span><span class="chip unit">Example 1.11 solution</span><span class="chip dim">U3</span><span class="chip sev-sl">Slowed</span><span class="chip t2">tier 2</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">約束 <code>n ≥ 2</code> 憑空出現、無計算。讀者得自行回推：運動只在 \(t \ge 10\) 存在，故 \(2\pi n \ge 10\Rightarrow n \ge 10/(2\pi)\approx1.59\Rightarrow n\ge2\)。這正是審稿視角會略過、首讀者卻會卡的「跳一行代數」。修法補那一行（不降難度）。</div>
+    <div class="row old"><span class="tag">原文</span>The particle does reach height \(1\) at the times \(t = 2\pi n\) for integers <del>\(n \ge 2\)</del>, but \(\arccos(1) = 0\) is not one of them.</div>
+    <div class="row new"><span class="tag">建議</span>The particle does reach height \(1\) at the times \(t = 2\pi n\); <ins>since the motion only exists for \(t \ge 10\), this requires \(2\pi n \ge 10\), i.e. \(n \ge 2\)</ins>, but \(\arccos(1) = 0\) is not one of them.</div>
+    <div class="gate2"><b>雙閘：</b> reader agent tier-2 Slowed → verifier 確認須回推 \(2\pi n\ge10\)，維持 <b>tier-2 Slowed</b>。dumbing 風險：無（補的是真實一行代數）。</div>
+  </div>
+
+  <h3>§1.6 The Precise Definition of a Limit</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-12</span><span class="chip c1">① reader-persona</span><span class="chip unit">Prop 1.7 證明（唯一性）</span><span class="chip dim">U3</span><span class="chip sev-sl">Slowed</span><span class="chip t2">tier 2</span><span class="chip surv">✓ 存活</span><span class="chip" style="background:#1d1d1f;color:#fff">canonical ①</span></div>
+    <div class="issue">rubric 自己點名的 canonical trap（「憑空挑 \(\varepsilon=|L-M|/2\)」）。線性首讀時這個值毫無理由；其用意要到顯示鏈最後一行 \(2\varepsilon\) 塌回 \(|L-M|\) 產生矛盾才浮現，讀者得讀到底再跳回。修法 <b>(a) 局部</b>：一句動機 gloss 點出「半個間距＝讓矛盾在結尾出現」，不刪任何代數。</div>
+    <div class="row old"><span class="tag">原文</span>Let \(\varepsilon = \tfrac{|L - M|}{2}\).</div>
+    <div class="row new"><span class="tag">建議</span>Let \(\varepsilon = \tfrac{|L - M|}{2}\) <ins>(half the gap between the two supposed limits — the choice that will make the contradiction appear at the end)</ins>.</div>
+    <div class="gate2"><b>雙閘：</b> reader agent tier-2 Slowed → verifier 確認 line 108 就地無動機、payoff 在 line 113 才現，維持 <b>tier-2 Slowed</b>。dumbing 風險：無（只加動機、不動算式）。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-13</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">Prop 1.7 證明（line 112）</span><span class="chip dim">U4</span><span class="chip sev-sl">Slowed</span><span class="chip t2">tier 2</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue"><em>triangle inequality</em> 全章首次出現（§1.2 的 triangle 指幾何參考三角形，無關），且絕對值形 \(|p+q|\le|p|+|q|\) 從未陳述。對 L2 讀者，這名稱聽起來像幾何、對絕對值無把手，配上同句 add-and-subtract 技巧 \(|L-M|=|L-f(x)+f(x)-M|\) 易卡。顯示行雖立即示範該步、可逆推，但術語確是先用後定義。修法 <b>(a) 局部</b>：就地補規則＋代入。</div>
+    <div class="row old"><span class="tag">原文</span><del>By the triangle inequality,</del></div>
+    <div class="row new"><span class="tag">建議</span>By the triangle inequality <ins>\(|p + q| \le |p| + |q|\) (applied with \(p = L - f(x)\) and \(q = f(x) - M\))</ins>,</div>
+    <div class="gate2"><b>雙閘：</b> reader agent tier-2 Slowed → verifier 確認全章唯一出現、絕對值形未陳述，維持 <b>tier-2 Slowed</b>。dumbing 風險：無（陳述標準規則＋代入，不軟化證明難度）。</div>
+  </div>
+
+  <!-- ===================== canonical 結構型 ② ===================== -->
+  <h2>canonical 結構型 ②（§1.4 <code>=∞</code>）—— 需你定奪修法</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-7</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">Example 1.22 solution（line 125/127）</span><span class="chip dim">U4</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3*</span><span class="chip surv">✓ 存活</span><span class="chip struct">建議當 (b) 結構處理</span></div>
+    <div class="issue">這是 rubric／<code>CONTENT_DIRECTION §2</code> 點名的 canonical 先用後定義案例。極限值記法 <code>=∞</code>／<code>=−∞</code> 首次出現是在 Example 1.22 的解裡（甚至要讀者套用「何時可寫 <code>=∞</code>」的<em>約定</em>），但這記法要到其後 line 138「To capture this behavior, we introduce the notation…」＋ Def 1.11／Caution 1.6 才正式引入。<br>
+    <b>誠實評估（verifier）：</b> 已被就地緩解——每個 display 前一句都寫了「negative with larger and larger magnitude／positive and grows without bound」，故嚴重度只 Minor、非 Lost。<b>但</b>最乾淨的根治是<b>結構 reorder</b>（把「introduce the notation ∞」介紹段＋ Def 1.11 搬到 Example 1.21–1.22 之前）；定稿章搬動會 cascade 編號與 cross-ref，依紀律<b>只報不搬、宜上游（Mode A 方向層）處理</b>。</div>
+    <div class="row ctx"><span class="tag">現況序</span>Example 1.21（DNE）→ Example 1.22 解用 <code>=−∞/=∞</code> 並講「we do <strong>not</strong> write <code>=∞</code>」→ <em>line 138「we introduce the notation \(\infty\)」</em>→ Def 1.11 → Caution 1.6</div>
+    <div class="row new"><span class="tag">選項 (b)</span><ins>結構 reorder（建議、但定稿章只報不搬）：</ins>把 line 138 介紹段＋ Def 1.11 移到 Example 1.21–1.22 之前，讓記法先定義後使用。</div>
+    <div class="row new"><span class="tag">選項 (a)</span><ins>輕量 forward-ref（若不 reorder）：</ins>在 Example 1.22 首次寫 <code>=−∞</code> 處加一句「the notation \(=-\infty\) records that the values fall without bound; it is made precise in Definition 1.11 below」。⚠ verifier 警示：<b>重的</b> local gloss 會與既有「grows without bound」重複、過度解釋（dumbing 風險），故只宜極輕一句或乾脆走 (b)。</div>
+    <div class="gate2"><b>雙閘：</b> reader agent 判 tier-1（連同已砍的 G1-8「約定先講」）→ verifier 因就地已 gloss 而降為 <b>tier-3 Minor</b>、並對<b>重的</b> local gloss 標 dumbing_risk。<b>*</b> 我仍提到主表，因它是 rubric 的 canonical 標的、值得你親裁修法（reorder vs. 輕 gloss vs. 不動）。</div>
+  </div>
+
+  <!-- ===================== tier-3 選配 ===================== -->
+  <h2>tier-3 選配 polish（存活但 Minor；可裁可不裁）</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-3</span><span class="chip c1">① reader-persona</span><span class="chip unit">Example 1.5 solution（line 240）</span><span class="chip dim">U3</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">兩個小跳一起落在首讀者：(1)「write \(x=(f^{-1}(x))^2\)」沒推導，而前面 Example 1.4 已把讀者訓練成期待「let \(y=f(x)\)、解 \(x\)、換名」的 recipe（Strategy 1.1 命名該 recipe 還在 Example 1.5 <em>之後</em>）；(2)「since \(f^{-1}(x)\ge0\)」當已知，讀者得自行從 restricted domain \([0,\infty)\) 推出 range 也 \(\ge0\)。下一句「this is exactly why \(\sqrt{x}\) means the positive root」會補上，故 Minor、可回神。修法：改用既有 recipe 敘述。</div>
+    <div class="row old"><span class="tag">原文</span>To find the inverse, <del>write \(x = \bigl(f^{-1}(x)\bigr)^{2}\); since \(f^{-1}(x) \ge 0\), taking the positive square root gives</del> …</div>
+    <div class="row new"><span class="tag">建議</span>To find the inverse, <ins>apply the same procedure: from \(y = x^{2}\) with \(x \ge 0\), solving for \(x\) gives \(x = \sqrt{y}\) (the positive root, because \(x \ge 0\)); interchanging the names, \(f^{-1}(x) = \sqrt{x}\).</ins></div>
+    <div class="gate2"><b>雙閘：</b> reader agent tier-2 Slowed → verifier 降為 <b>tier-3 Minor</b>（結果 \(\sqrt{x}\) 是精算畢業生已知、下一句即補理由）。dumbing 風險：無。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-11</span><span class="chip c1">① reader-persona</span><span class="chip unit">Example 1.28 solution part 2</span><span class="chip dim">F3</span><span class="chip sev-sl">Slowed</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">四個結果（finite \(c\)／\(+\infty\)／\(-\infty\)／DNE）擠進一句分號鏈，每個各帶函數對；「swapping signs gives \(-\infty\)」特別省略，讀者得回指前一對、自行推哪個號變。L2 線性讀負荷高、會重讀一次。修法：拆成短的平行句（不動數學）。</div>
+    <div class="row old"><span class="tag">原文</span><del>Replacing \(10\) by any constant \(c\) gives limit \(c\); choices such as \(f(x) = x - 3\), \(g(x) = (x - 3)^{3}\) give \(\infty\); swapping signs gives \(-\infty\); and \(f(x) = x - 3\), \(g(x) = |x - 3|\) makes the limit fail to exist.</del></div>
+    <div class="row new"><span class="tag">建議</span><ins>Replacing \(10\) by any constant \(c\) gives limit \(c\). The choice \(f(x) = x - 3\), \(g(x) = (x - 3)^{3}\) gives \(\infty\), and reversing the sign of \(g\) gives \(-\infty\). Finally, \(f(x) = x - 3\), \(g(x) = |x - 3|\) makes the limit fail to exist.</ins></div>
+    <div class="gate2"><b>雙閘：</b> reader agent tier-2 Slowed → verifier 維持 Slowed 但因是自足清單、緊接 punchline「can equal anything」而降 <b>tier-3</b>。dumbing 風險：無（只拆句＋補「reversing the sign of \(g\)」）。</div>
+  </div>
+
+  <!-- ===================== 砍除 ===================== -->
+  <h2>經對抗複核砍除（透明列出，預設不採納）</h2>
+  <p class="lede">下列 6 條由 reader agent 提出、但 verifier 判為非 finding 或過度回報而砍除。列出以示雙閘運作、供你覆核；如你不同意某條砍除可指名 G1-編號要求復活。</p>
+  <ul class="cut">
+    <li><span class="cid">G1-1</span><b>§1.1</b> ② \(\mathbb{R}\) 在 Example 1.3 首次無 gloss。<b>砍：</b> \(\mathbb{R}\) 近乎通用標準符號，且落在前例用區間填過的「domain」位、套在明顯定義域為全實數的 cubic 上，lead 也已鋪「real-number line」——首讀即時從脈絡回神（tier-3 taste）。</li>
+    <li><span class="cid">G1-2</span><b>§1.1</b> ②／① 「range \(B\)」在 Def 1.2 無就地 gloss。<b>砍：</b> 前提事實有誤——line 128 role-swap 段「the outputs of \(f\) are exactly the inputs of \(f^{-1}\)」已把 range↔outputs 綁在同句；range 是與 domain 並教的標準精算詞。提議的括號＝過度 gloss（dumbing）。</li>
+    <li><span class="cid">G1-6</span><b>§1.3</b> ② 「indeterminate form」用於 §1.3、§1.5 才正式引入。<b>砍：</b> 就地已 gloss——同句 em-dash「both \(s(4)-s(t)\) and \(4-t\) tend to \(0\)」即解釋 \(0/0\)，承重結論（cancellation 使極限可得）當句說出，首讀同句回神（tier-3）。</li>
+    <li><span class="cid">G1-8</span><b>§1.4</b> ①② 「we do not write \(=\infty\)」約定先講後定。<b>砍：</b> 就地自足——下一句「Contrast \(1/x^2\): both sides grow positively, so there we do write \(=\infty\)」已給 disagree 與 both-positive 兩例；併入 G1-7 處理。提議重述＝過度 gloss。</li>
+    <li><span class="cid">G1-9</span><b>§1.4</b> ① Strategy 1.3 step 1「approachable from within the domain」抽象（F3）。<b>砍：</b> 此為三個具體線索後可略讀的修飾子句，下一句「for a rational function, these are usually the zeros of the denominator」即給把手；提議把 \(\ln x\) 端點案例前置＝過度 gloss。</li>
+    <li><span class="cid">G1-10</span><b>§1.5</b> ① Example 1.36 默默代 \(x=-2\) 得 \(4-2a+3=0\)（U3）。<b>砍：</b> 分子 \(x^2+ax+3\) 兩行前已給、極限 \(x\to-2\)，此即最基本精算代入，緊接「must tend to 0」條件，同句回神（tier-3，非真 stall）。</li>
+  </ul>
+
+  <footer>
+    gate 1：Claude workflow（6 節 reader-persona agent ＋ 逐條對抗 verifier，共 19 agents）。唯讀、propose-only。<b>整章 0 blocking</b>；13 raw → 7 存活（4×tier-2 ＋ 1×canonical 結構型 ② ＋ 2×tier-3），6 砍。<br>
+    ⛳ <b>停。</b> 等你過目此稿並逐條裁決（採／不採／改修法）。裁決前不改任何 <code>fragments/</code>。<br>
+    下一步（待你授權）：① 對你選採的條目改 fragment → <code>python build.py ch01</code> → 範圍限定 Mode B → 產 <code>REVIEW-ch01-readability-applied.html</code> 回歸；或 ② 先跑 <b>gate-2（Codex 訂閱，需先徵成本同意）</b>取兩閘交集再裁。Ch1 跑完當基準後再推 Ch2–4。
+  </footer>
+</div>
+</body>
+</html>

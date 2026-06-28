@@ -9,7 +9,7 @@
     <h2 class="sec-title"><span class="sec-no">1.6</span>The Precise Definition of a Limit</h2>
   </header>
 
-  <p>From the time of Newton and Leibniz, calculus was remarkably successful at solving problems in geometry, mechanics, and astronomy. For a long time, however, there was also controversy about its logical foundations. Early arguments often relied on infinitesimals — quantities thought of as being extremely small but not described in a fully precise way — and mathematicians continued to ask what it really means to say that \(x\) approaches \(a\) or that \(f(x)\) approaches \(L\). The modern resolution, developed in the nineteenth century, is the \(\varepsilon\)-\(\delta\) definition of a limit, which gave calculus the level of rigor used in modern mathematics.</p>
+  <p>From the time of Newton and Leibniz, calculus was remarkably successful at solving problems in geometry, mechanics, and astronomy. For a long time, however, there was also controversy about its logical foundations. Early arguments often relied on infinitesimals — quantities thought of as being extremely small but not described in a fully precise way — and mathematicians continued to ask what it really means to say that \(x\) approaches \(a\) or that \(f(x)\) approaches \(L\). The modern resolution, developed in the nineteenth century, is the \(\varepsilon\)-\(\delta\) definition of a limit (stated below in terms of two positive tolerances, \(\varepsilon\) and \(\delta\)), which gave calculus the level of rigor used in modern mathematics.</p>
 
   <!-- expansion:history — the arithmetization of analysis: Bolzano, Cauchy, Weierstrass [source: Boyer, A History of the Calculus; Kline, Mathematical Thought from Ancient to Modern Times] -->
   <section class="env env-remark">
@@ -105,11 +105,11 @@
     <div class="env-body">
       <p>Suppose that
       \[ \begin{aligned} \lim_{x \to a} f(x) &= L,\\ \lim_{x \to a} f(x) &= M, \end{aligned} \]
-      and that \(L \neq M\). Let \(\varepsilon = \tfrac{|L - M|}{2}\). By the definition of the limit, there exist \(\delta_{1}, \delta_{2} > 0\) such that
+      and that \(L \neq M\). Let \(\varepsilon = \tfrac{|L - M|}{2}\) (half the gap between the two supposed limits — the choice that will make the contradiction appear at the end). By the definition of the limit, there exist \(\delta_{1}, \delta_{2} > 0\) such that
       \[ |f(x) - L| < \varepsilon \quad \text{whenever} \quad 0 < |x - a| < \delta_{1}, \]
       and
       \[ |f(x) - M| < \varepsilon \quad \text{whenever} \quad 0 < |x - a| < \delta_{2}. \]
-      If \(0 < |x - a| < \min\{\delta_{1}, \delta_{2}\}\), both inequalities hold. By the triangle inequality,
+      If \(0 < |x - a| < \min\{\delta_{1}, \delta_{2}\}\), both inequalities hold. By the triangle inequality \(|p + q| \le |p| + |q|\) (applied with \(p = L - f(x)\) and \(q = f(x) - M\)),
       \[ \begin{aligned} |L - M| &= |L - f(x) + f(x) - M|\\ &\le |L - f(x)| + |f(x) - M|\\ &< 2\varepsilon\\ &= |L - M|, \end{aligned} \]
       which is impossible. Therefore \(L = M\).</p>
     </div>
@@ -168,7 +168,7 @@
         \[ |(x^{2} - 5x + 6) - 2| < \varepsilon \quad \text{whenever} \quad 0 < |x - 1| < \delta. \]
         We first simplify:
         \[ \begin{aligned} |(x^{2} - 5x + 6) - 2| &= |x^{2} - 5x + 4|\\ &= |(x - 1)(x - 4)|. \end{aligned} \]
-        The factor \(|x - 4|\) depends on \(x\). To control it, first assume \(|x - 1| < 1\). Then
+        The factor \(|x - 4|\) depends on \(x\). To control it, first assume \(|x - 1| < 1\) (legitimate because we will in the end choose \(\delta \le 1\)). Then
         \[ \begin{aligned} |x - 1| < 1 &\implies -1 < x - 1 < 1\\ &\implies 0 < x < 2\\ &\implies -4 < x - 4 < -2\\ &\implies |x - 4| < 4. \end{aligned} \]
         So whenever \(|x - 1| < 1\), we have \(|(x - 1)(x - 4)| < 4 |x - 1|\). To force this below \(\varepsilon\), we also require \(4 |x - 1| < \varepsilon\), i.e. \(|x - 1| < \tfrac{\varepsilon}{4}\). Choosing
         \[ \delta = \min\!\left\{1, \tfrac{\varepsilon}{4}\right\}, \]
@@ -262,5 +262,14 @@
   <p>Finally, the \(\varepsilon\)-\(\delta\) definition gives a precise meaning to a property of functions that recurs throughout later chapters. If \(f\) is defined at every point near \(a\), including at \(a\), and if
   \[ \lim_{x \to a} f(x) = f(a), \]
   then \(f\) is said to be <em>continuous at \(a\)</em>. A systematic study of continuity belongs to a later chapter; we mention the term here because it is expressed directly in terms of limits.</p>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <!-- expansion:summary — chapter-level summary (ch01's final section): two threads (inverses §1.1–§1.2, limits §1.3–§1.6) + informal→rigorous arc + forward fence to Ch2 (derivative as a limit) -->
+  <p>Chapter 1 laid down two foundations, and they could hardly look less alike. The first was the inverse of a function (§1.1–§1.2). A function can be run backwards exactly when it is <em>one-to-one</em> — distinct inputs give distinct outputs — a condition the horizontal line test reads straight off a graph. For such a function the inverse \(f^{-1}\) exists (Theorem 1.1), pinned down by the identities \(f^{-1}(f(x)) = x\) and \(f(f^{-1}(y)) = y\) (Proposition 1.1). Restricting each trigonometric function to a principal interval on which it is one-to-one produced the inverse trigonometric functions \(\arcsin\), \(\arccos\), \(\arctan\) and their three companions, with fixed principal ranges and the reference-triangle method (Strategy 1.2) turning expressions such as \(\cos(\arcsin x)\) into algebra.</p>
+
+  <p>The second, and longer, thread was the <em>limit</em> (§1.3–§1.6). We began informally — \(\lim_{x \to a} f(x) = L\) means \(f(x)\) is as close to \(L\) as we please once \(x\) is close enough to, but not equal to, \(a\) — and estimated limits from tables and graphs (§1.3). One-sided limits refined the picture, with a two-sided limit existing exactly when the two one-sided limits agree (Proposition 1.5); allowing the values to grow without bound gave infinite limits and the vertical asymptotes that mark them (§1.4). The limit laws (Theorem 1.2) then made limits computable: for functions built from polynomials and rational functions, direct substitution works wherever the function is defined (Proposition 1.6), and the gaps left by the indeterminate form \(0/0\) yield to factoring, rationalization, or the squeeze theorem (Theorem 1.3) (§1.5).</p>
+
+  <p>The precise \(\varepsilon\)-\(\delta\) definition (Definition 1.13) finally placed every preceding limit argument on a rigorous footing (§1.6): \(\lim_{x \to a} f(x) = L\) means that for every \(\varepsilon > 0\) there is a \(\delta > 0\) with \(\lvert f(x) - L \rvert < \varepsilon\) whenever \(0 < \lvert x - a \rvert < \delta\), and from it we proved that a limit, when it exists, is unique (Proposition 1.7). The chapter closed by naming the property that limits make precise — \(f\) is continuous at \(a\) when \(\lim_{x \to a} f(x) = f(a)\) — and it is on this machinery that Chapter 2 is built: the derivative is itself a limit, the limit of secant slopes.</p>
 
 </article>

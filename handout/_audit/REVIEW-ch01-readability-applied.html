@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1 可讀性回填 — applied 回歸稿（7 條已套用＋範圍限定 Mode B）</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: {
+        arccsc: ['\\operatorname{arccsc}'],
+        arcsec: ['\\operatorname{arcsec}'],
+        arccot: ['\\operatorname{arccot}']
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}
+  .warnnote b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.c2{background:#fdeede;color:#9a5a12}
+  .chip.done{background:#e6f7ea;color:#1a7f37}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .mb{color:#1a7f37;font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .mb b{color:#176a2e}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:54px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 1 可讀性回填 — applied 回歸稿</h1>
+  <p class="lede">承 <code>REVIEW-ch01-readability-gate1.html</code>：使用者裁決「7 條都按建議處理」→ 已套用到 <code>fragments/ch01/</code> → <code>python build.py ch01</code> 重組 → 對<b>每條新句</b>跑範圍限定 Mode B 回歸。唯讀紀錄稿（old→new）。2026-06-28。</p>
+
+  <div class="note pass"><b>兩輪全數套用、回歸全綠（Ch1 fragment 累計 17 處變更）。</b> ① <b>gate-1 7 條</b>（下方 §1.1–§1.6 卡）→ Mode B <b>7/7 pass</b>。② <b>gate-2 抓到的迴歸 1 條</b>（G1-5 掉了 <code>integers</code>，已補）。③ <b>gate-2 advisory 9 條</b>（文末「第二輪」段）→ Mode B <b>9/9 pass</b>。三輪皆「修好摩擦 ✓、守語域不灌水不過度 gloss ✓、未引入新問題 ✓」；standalone 新句到位、舊句全清、0 數學錯誤標記。<b>無新增 blocking。</b></div>
+
+  <div class="note warnnote"><b>未 commit</b>（待你授權）。<b>gate-2（Codex）已跑完</b>，原始轉錄存 <code>handout/_dev-archive/ch01/ch01_readability-gate2-audit.md</code>，跨模型複核稿見 <code>REVIEW-ch01-readability-gate2.html</code>。編號無 cascade：所有變更皆純散文／inline-math，未增刪任何 numbered environment（definition／example／figure），cross-ref 不受影響。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>套用</th><th>Mode B 回歸</th></tr>
+    <tr><td>§1.1 Inverse Functions</td><td>G1-3</td><td class="zero">pass</td></tr>
+    <tr><td>§1.2 Inverse Trigonometric Functions</td><td>G1-4 · G1-5</td><td class="zero">pass · pass</td></tr>
+    <tr><td>§1.4 One-Sided and Infinite Limits</td><td>G1-7</td><td class="zero">pass</td></tr>
+    <tr><td>§1.5 Limit Laws and Computational Techniques</td><td>G1-11</td><td class="zero">pass</td></tr>
+    <tr><td>§1.6 The Precise Definition of a Limit</td><td>G1-12 · G1-13</td><td class="zero">pass · pass</td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：U3 未解釋的跳躍 · U4 先用後定義 · F3 句構可解析。 ①＝reader-persona first-read ／ ②＝introduce-before-use。 Mode B 三查：修好摩擦／守語域不灌水不過度 gloss／未引入新問題。</p>
+
+  <h2>§1.1 Inverse Functions</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-3</span><span class="chip c1">① reader-persona</span><span class="chip unit">Example 1.5 solution</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">回到既有「let \(y=f(x)\)、解 \(x\)、換名」recipe（與 Example 1.4／Strategy 1.1 一致），並把「正根因 \(x\ge0\)」這步講出來。</div>
+    <div class="row old"><span class="tag">原文</span>To find the inverse, <del>write \(x = \bigl(f^{-1}(x)\bigr)^{2}\); since \(f^{-1}(x) \ge 0\), taking the positive square root gives</del></div>
+    <div class="row new"><span class="tag">已改</span>To find the inverse, <ins>apply the same procedure: from \(y = x^{2}\) with \(x \ge 0\), solving for \(x\) gives \(x = \sqrt{y}\) — the positive root, because \(x \ge 0\). Interchanging the names of the variables gives</ins></div>
+    <div class="mb"><b>Mode B 回歸 pass：</b> 還原典型三步 recipe、與 Example 1.4 同語、sign 理由就地點明且綁回定義域限制；語域守住，「because \(x\ge0\)」是承重子句非過度 gloss；脈絡中數學正確（restricted \([0,\infty)\) 迫正根）。無新問題。</div>
+  </div>
+
+  <h2>§1.2 Inverse Trigonometric Functions</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-4</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">Strategy 1.2 step 2</span><span class="chip dim">U4</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">在首次出現處就地 gloss <em>principal-value interval</em>，綁回 Def 1.3–1.5 已給的 range；step 4 的同詞由此一併解套，無需 reorder。</div>
+    <div class="row old"><span class="tag">原文</span>…keep track of the sign separately <del>from the principal-value interval.</del></div>
+    <div class="row new"><span class="tag">已改</span>…keep track of the sign separately<ins>, using the principal-value interval (the range of the inverse function, fixed in its definition) to settle it.</ins></div>
+    <div class="mb"><b>Mode B 回歸 pass。</b> 首用處精準 inline gloss 解除先用後定義。<b>後續經 gate-2（G2-8）再 refine：</b>此 gloss 使該步偏長（F4），已拆成兩句（見文末「第二輪」），現行 live 文字為拆句版。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-5</span><span class="chip c1">① reader-persona</span><span class="chip unit">Example 1.11 solution</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">補上原本要讀者自行回推的那行：\(t\ge10\Rightarrow 2\pi n\ge10\Rightarrow n\ge2\)。</div>
+    <div class="row old"><span class="tag">原文</span>…at the times \(t = 2\pi n\) <del>for integers \(n \ge 2\)</del>, but \(\arccos(1) = 0\)…</div>
+    <div class="row new"><span class="tag">已改</span>…at the times \(t = 2\pi n\) <ins>for integer \(n\)</ins><ins>; because the motion exists only for \(t \ge 10\), this requires \(2\pi n \ge 10\), i.e. \(n \ge 2\)</ins>, but \(\arccos(1) = 0\)…</div>
+    <div class="mb"><b>Mode B 回歸 pass；但 gate-2 抓到迴歸（已修）：</b> 初次套用時改寫不慎刪掉原句的 <code>integers</code>，使 \(n\) 不再限整數。範圍限定 Mode B 漏掉，<b>gate-2（Codex）獨立抓到</b>，已補回 <code>for integer \(n\)</code> 並重建（見 <code>REVIEW-ch01-readability-gate2.html</code> G2-9）。補的推導本身正確（\(2\pi\cdot2\approx12.57\ge10\)）。</div>
+  </div>
+
+  <h2>§1.4 One-Sided and Infinite Limits</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-7</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">Example 1.22 solution</span><span class="chip dim">U4</span><span class="chip done">✓ 已套用（極輕 forward-ref）</span></div>
+    <div class="issue">canonical 結構案：在定稿章不做 reorder，改加<b>極輕一句 forward-ref</b>指向 Definition 1.11，<b>刻意不</b>重述「grows without bound」（避免 verifier 警示的過度解釋）。</div>
+    <div class="row old"><span class="tag">原文</span>\[ \lim_{x \to 0^{-}} \frac{1}{x} = -\infty. \] <del>From the right,</del> \(1/x\) is positive and grows without bound, so…</div>
+    <div class="row new"><span class="tag">已改</span>\[ \lim_{x \to 0^{-}} \frac{1}{x} = -\infty. \] <ins>(The limit-value notation \(= -\infty\) is made precise in Definition 1.11 below.)</ins> From the right, \(1/x\) is positive and grows without bound, so…</div>
+    <div class="mb"><b>Mode B 回歸 pass：</b> 補上原缺的前向路標、錨在前一個 \(=-\infty\) display；「is made precise in Definition 1.11 below」是標準 Stewart cross-ref 句，<b>未</b>重述 \(-\infty\) 義（鄰句已講），故非過度 gloss、未降難度；forward-ref 明寫「below」非 U4 缺失。無新問題。</div>
+  </div>
+
+  <h2>§1.5 Limit Laws and Computational Techniques</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-11</span><span class="chip c1">① reader-persona</span><span class="chip unit">Example 1.28 solution part 2</span><span class="chip dim">F3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">四結果分號鏈拆成三句並把「swapping signs」明確化為「reversing the sign of \(g\)」。</div>
+    <div class="row old"><span class="tag">原文</span><del>…gives limit \(c\); choices such as \(f(x)=x-3\), \(g(x)=(x-3)^{3}\) give \(\infty\); swapping signs gives \(-\infty\); and \(f(x)=x-3\), \(g(x)=|x-3|\) makes the limit fail to exist.</del></div>
+    <div class="row new"><span class="tag">已改</span><ins>…gives limit \(c\). The choice \(f(x)=x-3\), \(g(x)=(x-3)^{3}\) gives \(\infty\), and reversing the sign of \(g\) gives \(-\infty\). Finally, \(f(x)=x-3\), \(g(x)=|x-3|\) makes the limit fail to exist.</ins></div>
+    <div class="mb"><b>Mode B 回歸 pass：</b> 分組合理（finite \(c\)／成對 \(\pm\infty\)／DNE）、「reversing the sign of \(g\)」點名變號對象；脈絡數學正確；句短、連接詞 Stewart-warm，與後段不重複。無新問題。</div>
+  </div>
+
+  <h2>§1.6 The Precise Definition of a Limit</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-12</span><span class="chip c1">① reader-persona</span><span class="chip unit">Prop 1.7 證明（唯一性）</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">在挑 \(\varepsilon\) 處就地補動機（是什麼＋為什麼），原本要讀到鏈尾才浮現的設計意圖前置。</div>
+    <div class="row old"><span class="tag">原文</span>Let \(\varepsilon = \tfrac{|L - M|}{2}\)<del>.</del> By the definition of the limit,…</div>
+    <div class="row new"><span class="tag">已改</span>Let \(\varepsilon = \tfrac{|L - M|}{2}\) <ins>(half the gap between the two supposed limits — the choice that will make the contradiction appear at the end).</ins> By the definition of the limit,…</div>
+    <div class="mb"><b>Mode B 回歸 pass：</b> gloss 出 WHAT＋WHY；動機是新資訊非鄰句重述，故非過度 gloss；「supposed」精準標 \(L\ne M\) 為反證前提（非降難度）；括號為自足旁白、非超長承載句。無新問題。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-13</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">Prop 1.7 證明（bound 步）</span><span class="chip dim">U4</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">首次用 <em>triangle inequality</em> 時就地附絕對值形 \(|p+q|\le|p|+|q|\) 並標出代入。</div>
+    <div class="row old"><span class="tag">原文</span>…both inequalities hold. By the triangle inequality<del>,</del></div>
+    <div class="row new"><span class="tag">已改</span>…both inequalities hold. By the triangle inequality <ins>\(|p + q| \le |p| + |q|\) (applied with \(p = L - f(x)\) and \(q = f(x) - M\)),</ins></div>
+    <div class="mb"><b>Mode B 回歸 pass：</b> 名稱與形式同時現身、解除先用後定義；脈絡驗算 \(p+q=L-M\) 與顯示鏈逐行吻合；\(p,q\) 此處引入此處用畢，無新 U3/U4；語域提升而非降低。無新問題。</div>
+  </div>
+
+  <h2>第二輪 · gate-2 advisory（9 條已套用，Mode B 9/9 pass）</h2>
+  <p class="lede">承 <code>REVIEW-ch01-readability-gate2.html</code>：使用者裁決「9 條 advisory 全採」。皆唯讀 propose、經裁決後才改入 fragment → build ch01 → 範圍限定 Mode B 回歸 <b>9/9 pass</b>（含獨立驗算改動過的 §1.3 速度 display）。</p>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-5</span><span class="chip c1">① reader-persona</span><span class="chip unit">§1.1 Example 1.8</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">\(t\) 同符號兩角色（\(f(t)\) 攝氏輸入／\(f^{-1}(t)\) 華氏輸入）→ 就地點明角色（不引入 \(T/C\) 以免與例題 prompt 衝突）。</div>
+    <div class="row old"><span class="tag">原文</span>…back into Celsius. <del>Writing \(t = \tfrac{9}{5} f^{-1}(t) + 32\) and solving,</del></div>
+    <div class="row new"><span class="tag">已改</span>…back into Celsius. <ins>So \(f^{-1}(t)\) is the Celsius value whose Fahrenheit reading is \(t\); applying \(f\) to it returns \(t\), giving \(t = \tfrac{9}{5} f^{-1}(t) + 32\). Solving,</ins></div>
+    <div class="mb"><b>Mode B pass：</b> 點名 \(t\)＝華氏、\(f^{-1}(t)\)＝攝氏，並以 \(f\circ f^{-1}=\)id 證該式；脈絡數學經驗算正確；無新問題。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-8</span><span class="chip c1">① reader-persona</span><span class="chip unit">§1.2 Strategy 1.2 step 2</span><span class="chip dim">F4</span><span class="chip done">✓ 已套用·refine G1-4</span></div>
+    <div class="issue">G1-4 的 gloss 使該步偏長；拆兩句各司一職（建三角形／定符號），保 gloss、降負荷。<b>取代上方 G1-4 卡的措辭。</b></div>
+    <div class="row old"><span class="tag">原(G1-4)</span><del>Draw a right triangle using positive side lengths for the magnitude of the known ratio; keep track of the sign separately, using the principal-value interval (the range …, fixed in its definition) to settle it.</del></div>
+    <div class="row new"><span class="tag">已改</span><ins>Draw a right triangle whose side lengths are the magnitudes (absolute values) of the known ratio. Keep the sign separate, and use the principal-value interval (the range fixed in the definition of the inverse function) to settle it.</ins></div>
+    <div class="mb"><b>Mode B pass：</b> 兩句各一職、解 F4 packing；gloss 保留、無新問題。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-10</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">§1.2 Remark 1.3</span><span class="chip dim">U4</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">「differentiation formulas」前向引用 Ch3 → 標明 forward 並具體化。</div>
+    <div class="row old"><span class="tag">原文</span>…because it makes the <del>differentiation formulas</del> for the inverse secant simpler.</div>
+    <div class="row new"><span class="tag">已改</span>…because it makes the <ins>later derivative formula</ins> for the inverse secant simpler.</div>
+    <div class="mb"><b>Mode B pass：</b>「later」明示前向、具體單數更精準；分支範圍未動。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-12</span><span class="chip c1">① reader-persona</span><span class="chip unit">§1.3 Caution 1.5</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">「runs through every value … infinitely often」前補週期機制（\(\pi/x\to\infty\) 故正弦不斷掃過完整週期）。</div>
+    <div class="row new"><span class="tag">新增</span><ins>Because \(\pi / x\) grows without bound as \(x \to 0\), the sine runs through more and more complete cycles.</ins> In truth, near \(0\) the graph keeps oscillating…</div>
+    <div class="mb"><b>Mode B pass：</b> 補上缺的因果機制、Stewart 語域單句；無新歧義。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-13</span><span class="chip c1">① reader-persona</span><span class="chip unit">§1.3 速度化簡 display</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">化簡跳了符號步 \(4-t=-(t-4)\) → 顯示該中間等式。</div>
+    <div class="row old"><span class="tag">原文</span>… = \frac{5(t-2)(t-4)}{4-t} <del>= -5(t-2),</del> \quad t\neq4.</div>
+    <div class="row new"><span class="tag">已改</span>… = \frac{5(t-2)(t-4)}{4-t} <ins>= \frac{5(t-2)(t-4)}{-(t-4)}</ins> = -5(t-2), \quad t\neq4.</div>
+    <div class="mb"><b>Mode B pass：</b> 新增等式經驗算正確（\(4-t=-(t-4)\)，\(t\neq4\) 可消）；下游 \(v(4)=-10\) m/s 不受影響。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-14</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">§1.3 \(v(4)\) display 引句</span><span class="chip dim">U4</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">符號 \(v(4)\) 在 display 出現前先綁回「instantaneous velocity」。</div>
+    <div class="row old"><span class="tag">原文</span>The <em>instantaneous</em> velocity at \(t = 4\) <del>is the value</del> this average approaches…</div>
+    <div class="row new"><span class="tag">已改</span>The <em>instantaneous</em> velocity at \(t = 4\)<ins>, written \(v(4)\),</ins> is the value this average approaches…</div>
+    <div class="mb"><b>Mode B pass：</b> 標準符號引入 idiom；display 未動、數學正確。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-15</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">§1.3 末句</span><span class="chip dim">U4</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">新詞「indeterminate form」補極輕 forward-ref（系統處理在 §1.5）。</div>
+    <div class="row old"><span class="tag">原文</span>…has the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\)<del> —</del> both…</div>
+    <div class="row new"><span class="tag">已改</span>…has the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) <ins>(a form taken up systematically in §1.5)</ins> — both…</div>
+    <div class="mb"><b>Mode B pass：</b> cross-ref 目標已核（§1.5「why 0/0 is indeterminate」）；純路標、未重述、無 dumbing。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-24</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">§1.6 開場</span><span class="chip dim">U4</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">歷史開場先講「\(\varepsilon\)-\(\delta\) definition」→ 首次提及即點明 \(\varepsilon,\delta\) 為兩個正容差。</div>
+    <div class="row old"><span class="tag">原文</span>…is the \(\varepsilon\)-\(\delta\) definition of a limit<del>,</del> which gave calculus…</div>
+    <div class="row new"><span class="tag">已改</span>…is the \(\varepsilon\)-\(\delta\) definition of a limit <ins>(stated below in terms of two positive tolerances, \(\varepsilon\) and \(\delta\))</ins>, which gave calculus…</div>
+    <div class="mb"><b>Mode B pass：</b>「stated below」正確延後完整定義（Def 1.13）；line 25 tolerance 段不冗。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-25</span><span class="chip c1">① reader-persona</span><span class="chip unit">§1.6 Example 1.41</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">「first assume \(|x-1|<1\)」的正當性（之後取 \(\delta\le1\)）就地點出，免讀者以為憑空設限。</div>
+    <div class="row old"><span class="tag">原文</span>To control it, first assume \(|x - 1| < 1\)<del>.</del> Then…</div>
+    <div class="row new"><span class="tag">已改</span>To control it, first assume \(|x - 1| < 1\) <ins>(legitimate because we will in the end choose \(\delta \le 1\))</ins>. Then…</div>
+    <div class="mb"><b>Mode B pass：</b> 一句點出設限正當性、不軟化 ε-δ 難度；與後文 \(\delta=\min\{1,\varepsilon/4\}\) 一致。</div>
+  </div>
+
+  <footer>
+    applied 回歸（兩輪）：<b>gate-1 7 條</b> ＋ <b>gate-2 迴歸修復 1 條</b> ＋ <b>gate-2 advisory 9 條</b> = Ch1 fragment 累計 17 處變更 → <code>python build.py ch01</code> ✓ → 範圍限定 Mode B <b>7/7 ＋ 9/9 pass</b>（獨立 reviewer 逐條）。<b>0 新 blocking、0 新散文問題、0 編號 cascade。</b><br>
+    未 commit（待授權）。相關稿：gate-1 候選 <code>REVIEW-ch01-readability-gate1.html</code>｜gate-2 複核 <code>REVIEW-ch01-readability-gate2.html</code>｜gate-2 原始轉錄 <code>handout/_dev-archive/ch01/ch01_readability-gate2-audit.md</code>。後續：commit（需授權）或推 <b>Ch2–4</b>（pilot 基準已立，含「gate-1 套用後必跑 gate-2 抓迴歸」這條教訓）。
+  </footer>
+</div>
+</body>
+</html>
