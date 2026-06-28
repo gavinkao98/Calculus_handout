@@ -28,6 +28,7 @@ Run standalone:
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -220,6 +221,37 @@ def _quantitative_without_scale(data: dict) -> "list[tuple[str, str]]":
     return out
 
 
+def _example_missing_prompt(data: dict) -> "list[tuple[str, str]]":
+    """Warn: a ``derivation`` scene that DEPICTS a handout worked Example (its
+    ``source`` descriptor begins with 'Example N.N') but carries no ``prompt:``.
+
+    Such a scene renders with a plain title and NO problem statement on screen, so the
+    viewer must infer the task from narration alone -- the exact gap the 2026-06-29
+    example-prompt fix closed (ch03 §3.1). A worked example must state its problem; add
+    a ``prompt:`` (a short / simplified statement is fine for a long problem), which
+    routes the scene through ``_common.example_head`` (``[ EXAMPLE ]`` + problem +
+    ``SOLUTION``). Non-example derivations are exempt -- their source does not name an
+    Example, and they correctly default to the ``[ derivation ]`` eyebrow. Advisory,
+    not an error: it must not abort building a chapter that has not yet been
+    backfilled. See DESIGN.md 'Worked-example 題目結構'."""
+    out: list[tuple[str, str]] = []
+    for si, scene in enumerate(data.get("scenes", []) or []):
+        if scene.get("template") != "derivation" or scene.get("prompt"):
+            continue
+        src = scene.get("source")
+        if not isinstance(src, str):
+            continue
+        desc = src.rsplit(" . ", 1)[-1].strip()   # the content descriptor after the locus
+        if re.match(r"Example\s+\d", desc):
+            sid = scene.get("id", f"scenes[{si}]")
+            out.append(("warn",
+                f"{sid}: derivation depicts a handout Example ({_snippet(desc)!r}) but "
+                f"has no `prompt:` -- the problem will not appear on screen, only in "
+                f"narration. Add a `prompt:` with the problem statement (a simplified "
+                f"version is fine for a long problem). See DESIGN.md 'Worked-example 題目結構'."))
+    return out
+
+
 def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
     """Return a list of (severity, message); severity is 'error' or 'warn'.
     'error' aborts the render (broken output); 'warn' is advisory (has rare
@@ -257,6 +289,7 @@ def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
                 f"deliberate. Got: {_snippet(text)!r}"))
     issues += _hollow_on_curve(data)
     issues += _quantitative_without_scale(data)
+    issues += _example_missing_prompt(data)
     return issues
 
 

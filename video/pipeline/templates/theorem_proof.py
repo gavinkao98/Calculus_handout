@@ -12,6 +12,8 @@ dynamic (proof.0/1/2, qed) so narration walks the argument via {show ...}.
 YAML shape:
   template: theorem_proof
   accent: theorem
+  label: "[ proposition ]"               # optional masthead eyebrow (default "[ theorem ]");
+  #                                        use for propositions/lemmas/corollaries that carry a proof
   title: "..."
   statement: "If $f$ is strictly increasing ... then $f$ is one-to-one ..."
   proof: ["Take any $x_1 < x_2$ ...", "...", "..."]
@@ -39,7 +41,7 @@ def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
-    blocks += scene_head(spec, ctx, label="[ theorem ]")
+    blocks += scene_head(spec, ctx, label=spec.get("label", "[ theorem ]"))
     title = blocks[1].mobject
 
     left = SPINE_X

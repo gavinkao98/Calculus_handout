@@ -3,7 +3,28 @@
      authored directly into the handout-kit semantic markup per
      CONTRACT-html-writing.md. Direction brief approved at ③.
      Numbering is MANUAL (kit has no auto-counter); cross-references
-     are plain prose. -->
+     are plain prose. §2.1 is the chapter's first section, so it carries
+     the chapter opener (a second <article>), per Ch3/Ch4 convention.
+     Opener content adapted from legacy ch02_derivatives.tex chapter overview. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Chapter 2</div>
+    <h1 class="ch-title">Derivatives</h1>
+  </header>
+
+  <p class="lead">The limit machinery of Chapter 1 was developed in part to make precise the idea of a function approaching a value as its input approaches some target. The principal payoff of that machinery, and the subject of this chapter, is the <em>derivative</em>: an operator that takes a function and returns another function describing how fast it is changing. Geometrically the derivative gives the slope of the tangent line at each point of a curve; physically it gives the instantaneous rate of change of a quantity that varies in time; algebraically it satisfies a small set of arithmetic rules that turn differentiation into a procedure rather than a per-problem invention. We meet the derivative first at a single point, as a limit of secant slopes, then as a function in its own right. A subtler point comes next: its existence at a point implies continuity, but continuity does not imply it. Finally we treat it as an operator we can compute on polynomials, on the natural exponential, and on products and quotients of differentiable functions.</p>
+
+  <p class="para-head">By the end of this chapter, you will be able to:</p>
+  <ul>
+    <li>state the limit definition of the derivative, move fluently between the equivalent forms \(\lim_{x \to a} \tfrac{f(x) - f(a)}{x - a}\) and \(\lim_{h \to 0} \tfrac{f(a + h) - f(a)}{h}\), and apply it to compute derivatives from first principles for polynomial, root, and exponential functions;</li>
+    <li>read the derivative as the slope of the tangent line, and pass from the derivative at a point to the derivative as a function;</li>
+    <li>recognize where a function fails to be differentiable, and explain why differentiability implies continuity but not the reverse;</li>
+    <li>differentiate any polynomial and the exponential function \(e^{x}\) using the power rule, the constant-multiple rule, the sum rule, and the series-based derivation of \((e^{x})' = e^{x}\), and compute higher-order derivatives \(f''\), \(f'''\), \(f^{(n)}\);</li>
+    <li>differentiate products and quotients of differentiable functions using the product and quotient rules.</li>
+  </ul>
+</article>
+
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -57,7 +78,9 @@
   </section>
 
   <!-- expansion:figure — anatomy of the difference quotient: increment h and rise f(a+h)−f(a) on one secant (figure-opportunity F-2.1-A) [pass: enrichment] -->
-  <figure class="figure" data-fig="difference-quotient-anatomy"></figure>
+  <figure class="figure" data-fig="difference-quotient-anatomy">
+    <figcaption><span class="fig-no">Figure 2.2</span> The difference quotient as the slope of the secant through \(P=(a,f(a))\) and \(Q=(a+h,f(a+h))\): the run \(h\) and the rise \(f(a+h)-f(a)\) form a right triangle whose ratio gives the slope.</figcaption>
+  </figure>
 
   <!-- expansion:formula — name the limit as "derivative at a point"; brief: introduce f'(a) as slope alias -->
   <p>When this limit exists, the slope of the tangent line at \((a, f(a))\) is called the <em>derivative of \(f\) at \(a\)</em> and is written \(f'(a)\) (read “\(f\) prime of \(a\)”). Thus</p>
@@ -116,8 +139,9 @@
         <p>\[ \begin{aligned}
           m &= \lim_{h \to 0} \frac{f(3 + h) - f(3)}{h}
              = \lim_{h \to 0} \frac{\dfrac{3}{3 + h} - 1}{h} \\[6pt]
-            &= \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h}
-             = \lim_{h \to 0} \frac{-1}{3 + h} = -\frac{1}{3}.
+            &= \lim_{h \to 0} \frac{\dfrac{3 - (3 + h)}{3 + h}}{h}
+             = \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h} \\[6pt]
+            &= \lim_{h \to 0} \frac{-1}{3 + h} = -\frac{1}{3}.
         \end{aligned} \]</p>
         <p>The tangent line through \((3, 1)\) with slope \(-\tfrac{1}{3}\) is
         \[ y - 1 = -\tfrac{1}{3}(x - 3), \quad \text{i.e.} \quad x + 3y - 6 = 0. \]</p>
@@ -199,7 +223,9 @@
     </section>
   </div>
 
-  <figure class="figure" data-fig="tangent-approx"></figure>
+  <figure class="figure" data-fig="tangent-approx">
+    <figcaption><span class="fig-no">Figure 2.3</span> The curve \(y = \tfrac{1}{x}\) and its tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\): near the point of tangency the curve hugs the line, the local linearity that licenses the tangent-line approximation.</figcaption>
+  </figure>
 
   <!-- expansion:application — return to the opening approximation question (bookend) -->
   <section class="env env-remark">

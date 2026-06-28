@@ -15,7 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from manim import Create, FadeIn, Flash, RIGHT, UP, Write
+from manim import Create, FadeIn, RIGHT, UP, Write
 
 from .visuals import theme as T
 
@@ -92,23 +92,22 @@ def play_block(scene, block: Block, ground: str) -> float:
         scene.play(Write(mob), run_time=0.7)
         return 0.7
     elif anim == "flash_in":
-        # fade in + a glow flash (no scale-pop) -- the "key element reveals with glow"
+        # was FadeIn + a glow Flash burst; the burst removed project-wide per user
+        # request (2026-06-29 -- "no explosion effect"). Kept as a distinct name so
+        # callers (theorem_proof qed) need not change; now a plain fade reveal.
         scene.play(FadeIn(mob), run_time=0.5)
-        scene.play(Flash(mob.get_center(), color=accent, line_length=0.25,
-                         num_lines=14, flash_radius=0.6), run_time=0.6)
-        return 1.1
+        return 0.5
     elif anim == "write_glow":
+        # was Write + a glow Flash burst; the burst removed project-wide per user
+        # request (2026-06-29). The key/result line keeps its colour + persistent
+        # text_glow halo (set in the templates); only the reveal burst is gone.
         scene.play(Write(mob), run_time=0.8)
-        scene.play(Flash(mob.get_center(), color=accent, line_length=0.3, num_lines=16,
-                         flash_radius=max(getattr(mob, "width", 1.0) * 0.55, 0.6)), run_time=0.6)
-        return 1.4
+        return 0.8
     elif anim == "slide_pop":
-        # slide in + a glow flash (no Indicate scale-pop -- "never bounces")
+        # was slide in + a glow Flash burst; the burst removed project-wide per user
+        # request (2026-06-29). Now a plain slide-in (no bounce, no flash).
         scene.play(FadeIn(mob, shift=0.4 * RIGHT), run_time=0.45)
-        scene.play(Flash(mob.get_center(), color=accent, line_length=0.25,
-                         num_lines=14, flash_radius=max(getattr(mob, "width", 1.0) * 0.5, 0.6)),
-                   run_time=0.4)
-        return 0.85
+        return 0.45
     else:  # "write"
         if getattr(mob, "width", 0) > 9.0:
             scene.play(FadeIn(mob, shift=0.1 * UP), run_time=0.6)

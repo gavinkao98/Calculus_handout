@@ -1,0 +1,40 @@
+{
+  "gate": "visual-frame-audit (gate-1, Workflow wf_91940030-4e1, 19 content scenes, refute-by-default)",
+  "blocking_initial": 1,
+  "blocking_after_fix": 0,
+  "advisory": 3,
+  "blocking_fixed": [
+    {
+      "scene": "all_six_trig_derivatives",
+      "dim": "V4",
+      "issue": "result.reason 內聯數學 $\\tfrac{1}{\\cos x}$ 渲成亂碼（derivation 的 result.reason 是大寫 mono 標籤欄、不渲染數學）",
+      "fix": "改成純文字標籤「secant, same rule」→ 重渲複核：亂碼消失、六導數數學全正確"
+    }
+  ],
+  "advisories": [
+    {"scene": "squeeze_graph", "dim": "V2", "issue": "cosθ 曲線標籤對比偏低（疊在灰 cosθ 線上、可讀不蓋資訊）", "disposition": "保留——cosmetic、無教學影響"},
+    {"scene": "squeeze_graph", "dim": "V5", "issue": "cosθ 指定 dashed:true 但渲成實線", "disposition": "保留——graph 模板對 function plot 的 dashed 行為；色彩可辨、無教學影響"},
+    {"scene": "slope_equals_height", "dim": "V4", "issue": "y=cos x 指定 dashed 但渲成實線", "disposition": "保留——同上；sin/cos 以顏色與標籤可辨、無教學影響"}
+  ],
+  "notes": {
+    "why_trig_is_different": "Clean definition slide: cyan kicker, bold white title with navy spine, prose statement, clear vertical flow from the sin difference quotient to the amber sinθ/θ limit with its (0/0) tag — strong hierarchy, generous margins.",
+    "difference_quotient_for_sine": "Clean three-row derivation: [EXAMPLE] eyebrow, two equations with dashed leaders to reason labels, amber-highlighted result row. Strong logic-flow top-to-bottom; all Tex legible.",
+    "sector_inequality": "Clean, well-balanced unit-circle squeeze figure: nested inner triangle (teal), sector wedge (orange), outer-triangle height AC (green) color-coded to the ½sinθ ≤ ½θ ≤ ½tanθ chain; geometry faithful (B on circle and radius OC, A=(1,0), C above A).",
+    "squeeze_to_the_bound": "Clean derivation: four left-aligned inequality rows with dashed leaders to reasons, orange highlight on the key result line; Tex legible.",
+    "continuity_of_sin_cos": "Clean theorem_proof: [PROPOSITION] eyebrow, accent-bordered statement box, two proof lines, green QED marker. Tex matches storyboard verbatim; good vertical rhythm.",
+    "fundamental_limit": "Clean theorem-proof: boxed statement, two-step proof with cyan bullets, green QED with tombstone glyph; navy-spine left margin, no crowding.",
+    "squeeze_graph": "Clean squeeze diagram: orange ratio trapped between cyan y=1 ceiling and muted cosθ floor, converging on the hollow open circle at (0,1).",
+    "limit_not_identity": "Clean CAUTION callout: navy card with orange spine + warning icon; body and all math (θ→0, sinθ/θ, π/2, 2/π≈0.64, θ=π) render crisply.",
+    "radians_essential": "Clean CAUTION callout: red accent bar + icon; three teaching equations (degree limit = π/180, dragged derivative, clean radian sin'=cos) in clear top-to-bottom flow.",
+    "derivative_of_sine": "Clean theorem-proof card: boxed statement, two bulleted proof steps, green QED line; left-aligned, strong hierarchy and Tex legibility.",
+    "derivative_of_cosine": "Clean theorem-proof: accent-bar title with THEOREM badge, boxed statement, spaced PROOF list ending in green QED; Tex legible, comfortable margin.",
+    "slope_equals_height": "Clean layout: orange sin vs gray cos read clearly, three green tangents (m=1,0,-1) align with the orange cos-height dots (1,0,-1); labels well-separated, no collisions. (Nit: cos dashing spec-vs-render mismatch, non-blocking.)",
+    "derivative_cycle": "Clean definition_math: clear hierarchy (eyebrow / title / statement / two amber equations); cycle chain and d⁴/dx⁴ identity render crisply, match storyboard.",
+    "companion_limit": "Clean three-row derivation: left-aligned equations with dashed leaders to reasons, amber accent on the final limit result; strong hierarchy, uncrowded.",
+    "all_six_trig_derivatives": "Clean derivation: consistent left-aligned math rows with dashed leaders to reasons; highlighted gold sec-result row. (Garbled reason fixed → now reads SECANT, SAME RULE.)",
+    "shm_compute": "Clean derivation: four equation rows with dashed leaders, SHM result row highlighted amber to mark the punchline; strong hierarchy, ample whitespace.",
+    "shm_stacked_graphs": "Clean three-row stack with color coding (orange sin / blue cos / green −sin), aligned baselines, shared dashed guides at t=π/2, 3π/2 tying peaks-to-zeros. (Mild left-band whitespace, within house style.)",
+    "toward_the_chain_rule": "Clean definition slide: [DEFINITION] eyebrow + title, two-line statement, one highlighted math row (sin x ✓, sin(x²)?, sin(3x+1)?). Forward-reference closing slide.",
+    "recap": "Clean recap card: navy spine + header, four numbered takeaways left, two boxed REMEMBER formulas right; all Tex crisp, good hierarchy."
+  }
+}

@@ -127,14 +127,19 @@ def _reason_mob(row: dict, ground: str):
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
-    # worked examples (scenes with a `prompt:`) open with example_head -- the problem
+    # A worked example (scene with a `prompt:`) opens with example_head -- the problem
     # as the headline + a SOLUTION lead -- instead of a vague descriptive title; the
-    # solution body sits below that lead. Statement-only / back-compat scenes keep the
-    # plain masthead. body_ref is whatever the body sits under (SOLUTION lead or title).
+    # solution body sits below that lead. A scene WITHOUT a prompt is a plain derivation
+    # (the template's namesake), so its eyebrow defaults to `[ derivation ]` -- NOT
+    # `[ example ]`: the old default silently mislabelled every proof-step chain as an
+    # example (the 2026-06-29 fix; `kicker:` still overrides the word). A scene that
+    # DEPICTS a handout Example must therefore carry a `prompt:` -- lint's
+    # _example_missing_prompt warns when one forgets. body_ref is whatever the body
+    # sits under (SOLUTION lead or title).
     if spec.get("prompt"):
         head, body_ref = example_head(spec, ctx)
     else:
-        head = scene_head(spec, ctx, label="[ example ]")
+        head = scene_head(spec, ctx, label="[ derivation ]")
         body_ref = head[1].mobject
     blocks += head
 

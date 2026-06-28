@@ -1,84 +1,95 @@
-"""callout template -- Direction D (NEW). Remark / Caution / Note.
+"""callout template -- Lectern dark teaching frame. Remark / Caution / Note.
 
-The recurring named boxed aside the handouts use constantly ((fg)'!=f'g',
-f^{-1}!=1/f, power-rule domain, ...). One template, colour-swapped by `type`:
+The recurring named aside the handouts use constantly ((fg)'!=f'g', f^{-1}!=1/f,
+power-rule domain, ...). One template, colour-swapped by `type`:
   remark -> blue, caution -> red, note -> amber.
 
-A single raised panel (surface + a 6px coloured left bar) centred vertically; a
-glyph box on the left (! caution / star remark / i note), then a mono kicker in
-the type colour (+ optional number) and a large prose body with inline math.
+REDESIGN (2026-06-29): dropped the centred card panel + glyph box. A callout now
+reads like every other teaching frame -- the shared `scene_head` masthead (eyebrow
+`[ CAUTION 1.1 ]` in the type colour + the scene title), the centrally-added navy
+spine with a TYPE-COLOURED cap (see templates.build_blocks), and the body flowing
+LEFT-FLUSH BELOW the title (place_body, upper-bias), exactly as definition_math does.
+The type is signalled by colour (eyebrow + spine cap + bullet markers) and the eyebrow
+word -- no box. (The accent colour is wired by setting spec["accent"]=type up front so
+BOTH this template's scene_head AND the central scene_spine read the right role.)
 
 YAML shape:
   template: callout
   type: caution            # remark | caution | note   (default caution)
-  number: "1.1"            # optional
-  body: "The superscript $-1$ in $f^{-1}$ means the inverse function --- not a reciprocal."
+  number: "1.1"            # optional -> folded into the eyebrow label
+  title: "A Notation Trap" # rendered as the masthead title
+  body: "..."              # a string -> prose;  a LIST -> bullet rows (type-colour dot)
 """
 from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, UP, MathTex, RoundedRectangle, VGroup
+from manim import DOWN, LEFT, Dot, VGroup
 
 from .. import brand
-from ..blocks import Block
+from ..blocks import Block, accent_role
 from ..visuals import theme as T
-from ._common import motif_corner
+from ._common import (scene_head, motif_corner, place_body, ColumnPlan,
+                      SPINE_X, CONTENT_W)
 
-_TYPE_ROLE = {"remark": "secondary", "caution": "warning", "note": "accent"}
-_TYPE_INK = {"remark": "blue_ink", "caution": "red_ink", "note": "amber_ink"}
-_TYPE_LABEL = {"remark": "Remark", "caution": "Caution", "note": "Note"}
+_TYPES = ("remark", "caution", "note")
+_TYPE_LABEL = {"remark": "remark", "caution": "caution", "note": "note"}
 
 
-def _mark(ctype: str, ground: str, role: str) -> VGroup:
-    """The 74px glyph box: a rounded square outlined in the type colour, with the
-    type's glyph centred, and a soft same-colour glow."""
-    side = 74 / T.PX_PER_UNIT_X
-    box = RoundedRectangle(width=side, height=side, corner_radius=16 / T.PX_PER_UNIT_X,
-                           stroke_color=T.color(ground, role), stroke_width=3,
-                           fill_opacity=0)
-    if ctype == "remark":
-        glyph = brand._four_point_star(side * 0.26, T.color(ground, role), 1.0)
-    else:
-        ch = "!" if ctype == "caution" else "i"
-        glyph = brand.heading(ch, ground, role=role, size=46)
-    glyph.move_to(box.get_center())
-    return brand.text_glow(VGroup(box, glyph), ground, role=role, width=4.0, opacity=0.4)
+def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
+    """Capacity contract (L2): like definition_math, the callout places a single
+    left-flush block (prose or bullet rows) at a fixed rhythm and place_body only
+    POSITIONS it (no fill expansion). Measure its actual span, not a min-pitch estimate,
+    so the predictive split audit covers callouts too (was excluded as a card scene)."""
+    return [ColumnPlan(min_pitch=0.0, model="span")]
+
+
+def _bullets(items: list, ground: str, role: str) -> VGroup:
+    """A stacked bullet list: each row is a small type-colour dot aligned to the first
+    text line + the item prose (left-flush). Returns the rows as one left-aligned group."""
+    ref = brand.prose("X", ground, role="primary", size="prose")
+    radius = ref.height * 0.13
+    measure = CONTENT_W - 0.5                      # leave room for the dot + its gap
+    rows = []
+    for item in items:
+        text = brand.prose(str(item), ground, role="primary", size="prose",
+                           max_width=measure, align="LEFT")
+        dot = Dot(radius=radius, color=T.color(ground, role))
+        dot.next_to(text, LEFT, buff=0.3)
+        # drop the dot from the block's vertical centre to the FIRST line's centre
+        dot.move_to([dot.get_x(), text.get_top()[1] - ref.height / 2, 0])
+        rows.append(VGroup(dot, text))
+    return VGroup(*rows).arrange(DOWN, buff=T.ROW_GAP, aligned_edge=LEFT)
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     ctype = str(spec.get("type", "caution")).lower()
-    if ctype not in _TYPE_ROLE:
+    if ctype not in _TYPES:
         ctype = "caution"
-    role = _TYPE_ROLE[ctype]
-    ink = _TYPE_INK[ctype]
-    blocks: list[Block] = []
 
-    mark = _mark(ctype, ground, role)
+    # Wire the accent family from `type` so BOTH scene_head (below) and the centrally
+    # added scene_spine (templates.build_blocks, after this returns) colour to the type.
+    # ACCENT_ROLE already maps caution->warning / remark->secondary / note->accent.
+    spec["accent"] = ctype
+    role = accent_role(spec)
 
-    # kicker: mono uppercase label in the type ink, + optional number in ink-3
-    label = brand.eyebrow(_TYPE_LABEL[ctype], ground, role=ink)
-    kicker_parts = [label]
+    label = _TYPE_LABEL[ctype]
     if spec.get("number"):
-        num = brand.eyebrow(str(spec["number"]), ground, role="muted")
-        kicker_parts.append(num)
-    kicker = VGroup(*kicker_parts).arrange(RIGHT, buff=0.3, aligned_edge=DOWN)
+        label = f"{label} {spec['number']}"
+    blocks: list[Block] = scene_head(spec, ctx, label=f"[ {label} ]")
+    title = next(b.mobject for b in blocks if b.id == "title")
 
-    body = brand.prose(str(spec.get("body", "")), ground, role="primary", size="prose",
-                       max_width=8.4, align="LEFT")
+    body_spec = spec.get("body", "")
+    if isinstance(body_spec, (list, tuple)):
+        content = _bullets(list(body_spec), ground, role)
+        anim = "fade"
+    else:
+        content = brand.prose(str(body_spec), ground, role="primary", size="prose",
+                              max_width=CONTENT_W, align="LEFT")
+        anim = "write"
 
-    content = VGroup(kicker, body).arrange(DOWN, buff=0.3, aligned_edge=LEFT)
-    row = VGroup(mark, content).arrange(RIGHT, buff=0.55, aligned_edge=UP)
-
-    panel = brand.accent_panel(row, ground, bar_role=role, fill_role="panel",
-                               radius=T.RADIUS_LG, bar_px=6, pad=0.6, pad_x=0.75)
-    panel.move_to([0, 0, 0])
-
-    blocks.append(Block("panel", VGroup(panel[0], panel[1]), anim="fade",
-                        static=True, layer="background"))
-    blocks.append(Block("mark", mark, anim="fade", static=True))
-    blocks.append(Block("kicker", kicker, anim="fade", static=True))
-    blocks.append(Block("body", body, anim="write_glow", static=False))
+    place_body(content, title, SPINE_X)
+    blocks.append(Block("body", content, anim=anim, static=False))
     blocks.append(motif_corner(ground))
     return blocks

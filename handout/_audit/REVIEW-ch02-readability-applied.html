@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch2 可讀性回填 — applied 回歸稿（兩輪：gate-1 3＋圖號 3＋gate-2 4，範圍限定 Mode B）</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}
+  .warnnote b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.c2{background:#fdeede;color:#9a5a12}
+  .chip.fig{background:#e9f3ec;color:#1a7f37}
+  .chip.done{background:#e6f7ea;color:#1a7f37}
+  .chip.r2{background:#ede7fb;color:#5b3aa8}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .mb{color:#1a7f37;font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .mb b{color:#176a2e}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:64px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 2 可讀性回填 — applied 回歸稿（兩輪）</h1>
+  <p class="lede">兩輪雙閘的已套用紀錄（old→new）。<b>第一輪 gate-1</b>：裁決採 G1-1·G1-2·G1-8（跳過 G1-6）＋隨輪修 3 處過時圖號。<b>第二輪 gate-2</b>（Codex 跨模型）：裁決採 G2-8（refine G1-8）·G2-6·G2-9·G2-5（跳過 G2-3·G2-4·G2-7，砍 G2-1·G2-2）。每條套用後 → <code>python build.py ch02</code> → render 自驗 → 對<b>每條新句</b>跑範圍限定 Mode B。唯讀紀錄稿。2026-06-28。</p>
+
+  <div class="note pass"><b>兩輪全數套用、回歸全綠（Ch2 fragment 共 10 處變更）。</b> ① <b>gate-1 可讀性 3 條</b>（G1-1·G1-2·G1-8）→ Mode B 3/3 pass。② <b>圖號 cross-ref 3 處</b>（範圍外、隨輪修）→ 圖號複核 all-correct。③ <b>gate-2 4 條</b>（G2-8 refine·G2-6·G2-9·G2-5）→ Mode B <b>4/4 pass</b>。各輪 Mode B 皆「修好摩擦 ✓、守語域不灌水不過度 gloss ✓、未引入新 U/F ✓、<b>逐字無掉字 ✓</b>、數學綁定/驗算正確」。render 自驗 <code>ready=true math=915 katex-errors=0</code>。<b>0 新增 blocking、0 編號 cascade</b>（皆純散文／inline-math／cross-ref 號，未增刪任何 numbered environment）。</div>
+
+  <div class="note warnnote"><b>未 commit</b>（待你授權）。<b>gate-2（Codex）已跑完</b>，原始轉錄存 <code>handout/_dev-archive/ch02/ch02_readability-gate2-audit.md</code>，跨模型複核稿見 <code>REVIEW-ch02-readability-gate2.html</code>。<b>未採納：</b>gate-1 G1-6（§2.4 factorization 命名）；gate-2 G2-3（§2.2 x 雙角色）、G2-4（§2.3 therefore differentiable）、G2-7（§2.4 Theorem 2.5 f 綁定）依裁決<b>跳過</b>，未動。<b>已知保留（低優先）：</b>§2.2 line 190 一處<b>非 reader-facing 的 HTML 註解</b>仍寫「Figure 2.2's f-graph」——比照圖編號閘「不改寫 authoring/history 註解」，刻意未動；visible 正文已全部更正。</div>
+
+  <h2>第一輪 · gate-1（可讀性 3 條）</h2>
+  <table class="sum">
+    <tr><th>節</th><th>套用</th><th>Mode B 回歸</th></tr>
+    <tr><td>§2.1 The Tangent Line and the Derivative at a Point</td><td>G1-1 · G1-2</td><td class="zero">pass · pass</td></tr>
+    <tr><td>§2.5 The Product and Quotient Rules</td><td>G1-8（後經 G2-8 refine）</td><td class="zero">pass</td></tr>
+  </table>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-1</span><span class="chip c1">① reader-persona</span><span class="chip unit">§2.1 Example 2.2 solution</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">本章第一個倒數例題：補上通分中間步，讓承載後續消去的 \(-h\) 的來源在 display 中可見。純加一行，不改任何既有等式。</div>
+    <div class="row old"><span class="tag">原文（跳步）</span>\(\displaystyle \lim_{h \to 0} \frac{\dfrac{3}{3 + h} - 1}{h} = \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h} = \lim_{h \to 0} \frac{-1}{3 + h} = -\frac{1}{3}\)</div>
+    <div class="row new"><span class="tag">已改</span>\(\displaystyle \lim_{h \to 0} \frac{\dfrac{3}{3 + h} - 1}{h} =\) <ins>\(\displaystyle \lim_{h \to 0} \frac{\dfrac{3 - (3 + h)}{3 + h}}{h} =\)</ins> \(\displaystyle \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h} = \lim_{h \to 0} \frac{-1}{3 + h} = -\frac{1}{3}\)</div>
+    <div class="mb"><b>Mode B 回歸 pass（含驗算）：</b> \(\dfrac{3}{3+h}-1 = \dfrac{3-(3+h)}{3+h} = \dfrac{-h}{3+h}\)，\(\div h = \dfrac{-1}{3+h}\to -\tfrac13\)——與切線 \(x+3y-6=0\) 一致；結果同原版。守語域、無掉字、無新 U/F。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2</span><span class="chip c1">① reader-persona</span><span class="chip unit">§2.1 章開場 lead</span><span class="chip dim">F3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">破折號夾注的被動倒裝拆成兩個主動短句；單向蘊涵內容不變。</div>
+    <div class="row old"><span class="tag">原文</span>…its existence at a point <del>implies — but is not implied by —</del> continuity.</div>
+    <div class="row new"><span class="tag">已改</span>…its existence at a point <ins>implies continuity, but continuity does not imply it.</ins></div>
+    <div class="mb"><b>Mode B 回歸 pass：</b> 單向蘊涵原樣保留、「at a point」保留、代名詞回指同構；與 objectives 清單同調；無掉字。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-8</span><span class="chip c1">① reader-persona</span><span class="chip unit">§2.5 Quotient rule 動機段</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">把原本隱含的「取最簡分母 \(g(x)=x\)」點明，再特化到 \(1/x\)。</div>
+    <div class="row old"><span class="tag">原文</span>… <del>already in the simplest case \(f = 1\), the derivative of \(1/x\) was \(-1/x^{2}\)</del> in §2.2 …</div>
+    <div class="row new"><span class="tag">已改</span>… <ins>take the simplest denominator, \(g(x) = x\), so that \(f/g = 1/x\), whose derivative was \(-1/x^{2}\)</ins> in §2.2 …</div>
+    <div class="mb"><b>Mode B 回歸 pass。</b> 首版套用解除「\(g=x\) 隱含」。<b>後續經 gate-2（G2-8）再 refine：</b>此版把原本顯式的 \(f=1\) 變成隱含，gate-2 跨模型抓到，已補回 \(f(x)=1\) 顯式（見文末「第二輪」），現行 live 文字為 refine 版。</div>
+  </div>
+
+  <h2>第一輪 · 圖號 cross-ref 修正（範圍外、隨輪一併修；非可讀性 finding）</h2>
+  <p class="lede">3 處屬「圖編號／cross-ref」閘領域，於 gate-1 讀稿時順手發現、依裁決「這輪一併修掉」。皆純圖號數字更正，不動散文／數學。圖號複核 reviewer 判 <b>all-correct</b>。</p>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">FIG-1</span><span class="chip fig">圖號 cross-ref</span><span class="chip unit">sec-2-2 · Example 2.10 題幹</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">Example 2.10「lower panel / graph of \(f\) on top」需指<b>雙面板</b> \(f\)／\(f'\) 圖（Figure 2.4）；原誤指單面板 Figure 2.2。</div>
+    <div class="row old"><span class="tag">原文</span>Cover the lower panel of <del>Figure 2.2</del> and look only at the graph of \(f\) on top.</div>
+    <div class="row new"><span class="tag">已改</span>Cover the lower panel of <ins>Figure 2.4</ins> and look only at the graph of \(f\) on top.</div>
+    <div class="mb"><b>圖號複核 correct：</b> Figure 2.4 caption 即雙面板 \(f\)（top）／\(f'\)（bottom）。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">FIG-2 · FIG-3</span><span class="chip fig">圖號 cross-ref</span><span class="chip unit">sec-2-5 · line 52 ＋ line 134</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">矩形面積圖實為 Figure 2.9；兩處 in-text 原誤指 Figure 2.4（同節 line 128 已正確用 2.9）。</div>
+    <div class="row old"><span class="tag">原文</span>… made of three pieces (<del>Figure 2.4</del>) …　／　The two strips of <del>Figure 2.4</del> return here …</div>
+    <div class="row new"><span class="tag">已改</span>… made of three pieces (<ins>Figure 2.9</ins>) …　／　The two strips of <ins>Figure 2.9</ins> return here …</div>
+    <div class="mb"><b>圖號複核 correct：</b> Figure 2.9 caption 即「rectangle … two strips and a small corner」，與「three pieces」「two strips」吻合。</div>
+  </div>
+
+  <h2>第二輪 · gate-2（Codex 跨模型，4 條已套用，Mode B 4/4 pass）</h2>
+  <p class="lede">承 <code>REVIEW-ch02-readability-gate2.html</code>：裁決採 G2-8·G2-6·G2-9·G2-5。皆唯讀 propose、經裁決後才改入 fragment → build ch02 → render 自驗 → 範圍限定 Mode B 回歸 <b>4/4 pass</b>（含 G2-8/G2-6/G2-9 的數學綁定驗算）。</p>
+  <table class="sum">
+    <tr><th>節</th><th>套用</th><th>Mode B 回歸</th></tr>
+    <tr><td>§2.3 Differentiability, Continuity, and Higher Derivatives</td><td>G2-5</td><td class="zero">pass</td></tr>
+    <tr><td>§2.4 Derivatives of Polynomials and the Exponential Function</td><td>G2-6</td><td class="zero">pass</td></tr>
+    <tr><td>§2.5 The Product and Quotient Rules</td><td>G2-8（refine G1-8）· G2-9</td><td class="zero">pass · pass</td></tr>
+  </table>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-8</span><span class="chip r2">迴歸/交集 ↔ G1-8</span><span class="chip c1">① reader-persona</span><span class="chip unit">§2.5 Quotient 動機段</span><span class="chip dim">U3</span><span class="chip done">✓ 已套用·refine G1-8</span></div>
+    <div class="issue">gate-2 命中 G1-8 套用後 \(f=1\) 由顯式變隱含；補回 \(f(x)=1\) 使 \(g=x\) 與 \(f=1\) <b>皆顯式</b>。<b>取代上方 G1-8 卡的 live 措辭。</b></div>
+    <div class="row old"><span class="tag">原(G1-8)</span>take the simplest denominator, \(g(x) = x\), <del>so that</del> \(f/g = 1/x\), whose derivative was \(-1/x^{2}\) in §2.2 …</div>
+    <div class="row new"><span class="tag">已改</span>take the simplest denominator \(g(x) = x\) <ins>with numerator \(f(x) = 1\)</ins>, so that \(f/g = 1/x\), whose derivative was \(-1/x^{2}\) in §2.2 …</div>
+    <div class="mb"><b>Mode B 回歸 pass（含驗算）：</b> \(f=1,\,g=x\Rightarrow f/g=1/x\)，導數 \(-1/x^{2}\)；純插入、無掉字（尾句 byte-identical）、與 line 188「numerator the constant 1 and the denominator \(x\)」同調。<b>此即本輪雙閘最大價值：跨模型抓到 gate-1 套用後的迴歸。</b></div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-6</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">§2.4 negative-exponent Caution</span><span class="chip dim">U4</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">綁定先前未定義的 \(m\)：負整數 \(n\) 之下 \(1/x^{m}\) 的 \(m\) 憑空出現，補 \((m=-n>0)\)。</div>
+    <div class="row old"><span class="tag">原文</span>… applying the same factorization idea to \(1/x^{m}\)<del>.</del></div>
+    <div class="row new"><span class="tag">已改</span>… applying the same factorization idea to \(1/x^{m}\) <ins>(where \(m = -n > 0\))</ins>.</div>
+    <div class="mb"><b>Mode B 回歸 pass（含驗算）：</b> \(n=-1,-2,\ldots\Rightarrow m=-n>0\)，\(x^{n}=x^{-m}=1/x^{m}\)；\(m\) 原確未在本節定義；純附加、無掉字、不軟化。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-9</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">§2.5 Chapter summary</span><span class="chip dim">U4</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">把章末才首見的標籤「linearity」就地 gloss 回 Theorem 2.4 的 sum＋constant-multiple rules。</div>
+    <div class="row old"><span class="tag">原文</span>… and <del>linearity (Theorem 2.4)</del> together differentiate every polynomial term by term …</div>
+    <div class="row new"><span class="tag">已改</span>… and <ins>linearity — the sum and constant-multiple rules (Theorem 2.4)</ins> — together differentiate every polynomial term by term …</div>
+    <div class="mb"><b>Mode B 回歸 pass：</b> 核對 §2.4 Theorem 2.4 即「The sum and constant-multiple rules」，gloss 綁定正確；同位語插入、所有 token 保留、(Corollary 2.1) 下游不受影響。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-5</span><span class="chip c1">① reader-persona</span><span class="chip unit">§2.3 Caution after Remark 2.5</span><span class="chip dim">F4</span><span class="chip done">✓ 已套用</span></div>
+    <div class="issue">把一句連串三個「not X」否定（\(d^{2}y/dx^{2}\) 的誤讀）拆成三短句；純拆句、零內容改動。</div>
+    <div class="row old"><span class="tag">原文</span>… not \(d\) times \(2y\)<del>; and the</del> \(dx^{2}\) is part of the symbol … <del>— not</del> \(d(x^{2})\), where the \(x\) itself would be squared, <del>and not</del> an algebraic denominator to cancel or split.</div>
+    <div class="row new"><span class="tag">已改</span>… not \(d\) times \(2y\)<ins>. The</ins> \(dx^{2}\) is part of the symbol … <ins>; it does not mean</ins> \(d(x^{2})\), where the \(x\) itself would be squared<ins>. And it is not</ins> an algebraic denominator to cancel or split.</div>
+    <div class="mb"><b>Mode B 回歸 pass：</b> 三個 not-X 警告全保留（not \(d\!\cdot\!2y\)／not \(d(x^{2})\)／not a denominator）；純句界拆分，補「it does not mean」「it is not」給否定明確主詞（L2 淨助益、非過度 gloss）；無掉字。</div>
+  </div>
+
+  <footer>
+    applied 回歸（兩輪）：<b>gate-1 3 條</b>（G1-1·G1-2·G1-8）＋ <b>圖號 cross-ref 3 處</b> ＋ <b>gate-2 4 條</b>（G2-8 refine·G2-6·G2-9·G2-5）= Ch2 fragment 共 10 處變更 → <code>python build.py ch02</code> ✓ → render 自驗 <code>ready=true math=915 katex-errors=0</code> → 範圍限定 Mode B <b>3/3 ＋ 4/4 pass</b>（逐字無掉字、數學綁定驗算）＋圖號複核 <b>all-correct</b>。<b>0 新 blocking、0 新散文問題、0 編號 cascade。</b>未採 G1-6／G2-3／G2-4／G2-7。<br>
+    相關稿：gate-1 候選 <code>REVIEW-ch02-readability-gate1.html</code>｜gate-2 複核 <code>REVIEW-ch02-readability-gate2.html</code>｜gate-2 原始轉錄 <code>handout/_dev-archive/ch02/ch02_readability-gate2-audit.md</code>。<b>下一步：commit（需你授權）。</b>
+  </footer>
+</div>
+</body>
+</html>

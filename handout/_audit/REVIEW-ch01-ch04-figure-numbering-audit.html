@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>圖片編號全面檢核 — Ch1–Ch4</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --ink:#1d2330; --muted:#5b6677; --line:#e2e6ec; --bg:#f7f8fa;
+    --ok:#1a7f4b; --okbg:#e7f6ee; --bad:#b4232a; --badbg:#fdecec;
+    --warn:#9a5b00; --warnbg:#fbf1e0; --add:#0b6bcb; --addbg:#e8f1fc;
+    --code:#f0f2f5; --chip:#eef1f6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",system-ui,"PingFang TC","Microsoft JhengHei",sans-serif;
+    line-height:1.62;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:40px 26px 96px}
+  header.top{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:8px}
+  h1{font-size:25px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14.5px}
+  h2{font-size:19px;margin:38px 0 12px;padding-top:14px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:24px 0 8px}
+  p{margin:9px 0}
+  code,kbd{background:var(--code);border-radius:4px;padding:1px 5px;font-size:13px;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Consolas,monospace}
+  .lede{background:#fff;border:1px solid var(--line);border-left:4px solid var(--ink);
+    border-radius:8px;padding:14px 18px;margin:16px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px;background:#fff;
+    border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th,td{padding:8px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{background:#eef1f6;font-weight:600;font-size:12.5px;letter-spacing:.02em;text-transform:uppercase;color:#43505f}
+  tr:last-child td{border-bottom:none}
+  td.center,th.center{text-align:center;white-space:nowrap}
+  .pill{display:inline-block;border-radius:999px;padding:1px 10px;font-size:12px;font-weight:600;white-space:nowrap}
+  .pill.ok{background:var(--okbg);color:var(--ok)}
+  .pill.bad{background:var(--badbg);color:var(--bad)}
+  .pill.add{background:var(--addbg);color:var(--add)}
+  .pill.keep{background:var(--chip);color:var(--muted)}
+  .pill.renum{background:var(--warnbg);color:var(--warn)}
+  .from{color:var(--muted);text-decoration:line-through}
+  .to{color:var(--bad);font-weight:700}
+  .arrow{color:var(--muted);padding:0 4px}
+  .figcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:0;margin:16px 0;overflow:hidden}
+  .figcard .head{display:flex;align-items:center;gap:10px;background:#fafbfd;border-bottom:1px solid var(--line);padding:10px 16px}
+  .figcard .num{font-weight:700;font-size:15px}
+  .figcard .id{color:var(--muted);font-size:12.5px;font-family:ui-monospace,monospace}
+  .figcard .body{padding:14px 16px}
+  .figcard .caplabel{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  .cap{background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:11px 14px;margin:4px 0 12px}
+  .cap .fig-no{font-weight:700;margin-right:.4em}
+  .draws{font-size:13.5px;color:var(--muted);margin-top:6px}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:7px;padding:11px 13px;overflow-x:auto;
+    font-size:12.5px;line-height:1.5;margin:6px 0}
+  .loc{font-family:ui-monospace,monospace;font-size:12.5px;color:var(--add)}
+  .note{background:var(--warnbg);border:1px solid #f0dcb8;border-radius:8px;padding:12px 16px;margin:14px 0;font-size:14px}
+  .meta{font-size:13px;color:var(--muted);margin-top:4px}
+  ul.tight{margin:6px 0;padding-left:22px}
+  ul.tight li{margin:3px 0}
+  details{margin:10px 0}
+  summary{cursor:pointer;font-weight:600;font-size:14.5px;padding:6px 0}
+  .small{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>HTML 講義 圖片編號 — 全面檢核報告（Ch 1–4）</h1>
+  <div class="sub">2026-06-28 · 範圍 <code>handout/fragments/ch01–ch04</code> · 方法：確定性程式解析 ＋ 四章各一個對抗式 subagent 獨立重核（兩者結論 100% 一致）</div>
+</header>
+
+<div class="lede">
+  <strong>結論：問題完全集中在第 2 章。</strong>
+  第 1、3、4 章的圖片編號都是乾淨的連續序列（1.1–1.25、3.1–3.7、4.1–4.6，依正文順序遞增、無缺號／重號／亂序，每張圖都畫得出來）。
+  第 2 章共 10 張圖，<strong>只有 4 張有編號（2.1–2.4），其餘 6 張完全沒有編號</strong>。這 6 張的共同特徵：都是後來各輪「補圖」時插入的、<em>自閉合且沒有 <code>&lt;figcaption&gt;</code></em> 的 figure——你的猜測正確：補圖時只加了能渲染的 <code>data-fig</code> 標記，<strong>caption 與編號從未回填</strong>。
+</div>
+
+<h2>0 · 編號是怎麼運作的（為什麼會「漏號」）</h2>
+<p>本講義的圖號是<strong>純手寫文字</strong>，寫在每張圖的 caption 裡：</p>
+<pre>&lt;figure class="figure" data-fig="…"&gt;
+  &lt;figcaption&gt;&lt;span class="fig-no"&gt;Figure 2.1&lt;/span&gt; 說明文字…&lt;/figcaption&gt;
+&lt;/figure&gt;</pre>
+<p>沒有任何 CSS counter 或 JS 自動編號（只有 <code>warmup</code> 清單用 <code>counter-increment</code>）。因此一張<strong>沒有 <code>&lt;figcaption&gt;</code>（或 caption 裡沒有 <code>fig-no</code> span）的 figure，就完全沒有號碼</strong>，渲染時只畫出 SVG、底下空白。第 2 章那 6 張正是如此。</p>
+
+<h2>1 · 四章總覽</h2>
+<table>
+  <thead><tr><th>章</th><th class="center">圖數</th><th class="center">編號範圍</th><th class="center">缺號 / 重號 / 亂序</th><th class="center">裁決</th></tr></thead>
+  <tbody>
+    <tr><td>Ch 1</td><td class="center">25</td><td class="center">1.1 – 1.25</td><td class="center">無</td><td class="center"><span class="pill ok">CLEAN</span></td></tr>
+    <tr><td><strong>Ch 2</strong></td><td class="center"><strong>10</strong></td><td class="center">2.1 – 2.4 ＋ <strong>6 張無號</strong></td><td class="center"><strong>6 張無編號</strong></td><td class="center"><span class="pill bad">DEFECTIVE</span></td></tr>
+    <tr><td>Ch 3</td><td class="center">7</td><td class="center">3.1 – 3.7</td><td class="center">無</td><td class="center"><span class="pill ok">CLEAN</span></td></tr>
+    <tr><td>Ch 4</td><td class="center">6</td><td class="center">4.1 – 4.6</td><td class="center">無</td><td class="center"><span class="pill ok">CLEAN</span></td></tr>
+  </tbody>
+</table>
+<p class="small">兩道獨立驗證皆得相同結果：(a) 確定性 Python 解析器逐章按 registry＋文件順序列舉每個 <code>&lt;figure&gt;</code>；(b) 四個對抗式 subagent 各自從原始檔重新推導、互不參照。兩者對「哪些圖、第幾號、是否渲染」逐項吻合。</p>
+
+<h2>2 · 第 2 章圖片清單（依正文順序）＋ 建議編號</h2>
+<p>把 6 張無號圖依其<strong>正文出現位置</strong>納入序列後，全章應為 2.1–2.10。這會連帶把現有的 2.2 / 2.3 / 2.4 往後推（它們的正文交叉引用也要一起改，見 §4）。</p>
+<table>
+  <thead><tr>
+    <th class="center">正文序</th><th>圖 ident</th><th class="loc">位置</th>
+    <th class="center">現在</th><th class="center">建議</th><th class="center">動作</th>
+  </tr></thead>
+  <tbody>
+    <tr><td class="center">1</td><td><code>secant-to-tangent</code></td><td class="loc">sec-2-1:51</td><td class="center">2.1</td><td class="center">2.1</td><td class="center"><span class="pill keep">不變</span></td></tr>
+    <tr><td class="center">2</td><td><code>difference-quotient-anatomy</code></td><td class="loc">sec-2-1:81</td><td class="center">—</td><td class="center">2.2</td><td class="center"><span class="pill add">補 caption</span></td></tr>
+    <tr><td class="center">3</td><td><code>tangent-approx</code></td><td class="loc">sec-2-1:223</td><td class="center">—</td><td class="center">2.3</td><td class="center"><span class="pill add">補 caption</span></td></tr>
+    <tr><td class="center">4</td><td><code>f-and-fprime</code></td><td class="loc">sec-2-2:175</td><td class="center">2.2</td><td class="center">2.4</td><td class="center"><span class="pill renum">改號 +引用</span></td></tr>
+    <tr><td class="center">5</td><td><code>abs-corner</code></td><td class="loc">sec-2-3:58</td><td class="center">2.3</td><td class="center">2.5</td><td class="center"><span class="pill renum">改號 +引用</span></td></tr>
+    <tr><td class="center">6</td><td><code>cbrt-vertical-tangent</code></td><td class="loc">sec-2-3:86</td><td class="center">—</td><td class="center">2.6</td><td class="center"><span class="pill add">補 caption</span></td></tr>
+    <tr><td class="center">7</td><td><code>#fig-diff-cont</code></td><td class="loc">sec-2-3:120</td><td class="center">—</td><td class="center">2.7</td><td class="center"><span class="pill add">補 caption</span></td></tr>
+    <tr><td class="center">8</td><td><code>exp-self-derivative</code></td><td class="loc">sec-2-4:254</td><td class="center">—</td><td class="center">2.8</td><td class="center"><span class="pill add">補 caption</span></td></tr>
+    <tr><td class="center">9</td><td><code>#fig-product-area</code></td><td class="loc">sec-2-5:55</td><td class="center">2.4</td><td class="center">2.9</td><td class="center"><span class="pill renum">改號 +引用</span></td></tr>
+    <tr><td class="center">10</td><td><code>quotient-example-graph</code></td><td class="loc">sec-2-5:214</td><td class="center">—</td><td class="center">2.10</td><td class="center"><span class="pill add">補 caption</span></td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <strong>為什麼一定要重排、不能只「往後接號」？</strong> 這 6 張無號圖<em>夾在</em>有號圖之間（位置 2、3 在 2.1 與舊 2.2 之間…）。若維持舊號、把新圖編成 2.5–2.10，正文順序會變成 2.1 → 2.5 → 2.6 → 2.2 → 2.3 …，號碼完全亂跳——比現狀更糟。本書（Ch1/3/4 與 Ch2 現有 4 張）一致採「依正文順序遞增」，所以正解就是整章重排為 2.1–2.10。
+</div>
+
+<h2>3 · 6 張無號圖的建議 caption（草稿，待你裁決）</h2>
+<p class="small">每段 caption 都依該圖<strong>實際的繪圖程式碼</strong>（<code>FIGS</code> 函數或 inline SVG）撰寫，語域比照本章既有 caption。以下為建議草稿，<strong>可逐字採用或修改</strong>。</p>
+
+<div class="figcard">
+  <div class="head"><span class="num">Figure 2.2</span><span class="id">difference-quotient-anatomy · sec-2-1:81</span></div>
+  <div class="body">
+    <div class="caplabel">渲染後</div>
+    <div class="cap"><span class="fig-no">Figure 2.2</span> The difference quotient as the slope of the secant through \(P=(a,f(a))\) and \(Q=(a+h,f(a+h))\): the run \(h\) and the rise \(f(a+h)-f(a)\) form a right triangle whose ratio gives the slope.</div>
+    <div class="draws"><strong>圖內容：</strong>單一曲線 \(y=f(x)\) 上一條過 \(P=(a,f(a))\)、\(Q=(a+h,f(a+h))\) 的割線，底下以 run \(h\) 與 rise \(f(a+h)-f(a)\) 構成直角三角形（靜態，無極限收斂動畫）。</div>
+    <details><summary>原始 HTML（可直接貼入 fragment）</summary>
+<pre>&lt;figcaption&gt;&lt;span class="fig-no"&gt;Figure 2.2&lt;/span&gt; The difference quotient as the slope of the secant through \(P=(a,f(a))\) and \(Q=(a+h,f(a+h))\): the run \(h\) and the rise \(f(a+h)-f(a)\) form a right triangle whose ratio gives the slope.&lt;/figcaption&gt;</pre>
+    </details>
+  </div>
+</div>
+
+<div class="figcard">
+  <div class="head"><span class="num">Figure 2.3</span><span class="id">tangent-approx · sec-2-1:223</span></div>
+  <div class="body">
+    <div class="caplabel">渲染後</div>
+    <div class="cap"><span class="fig-no">Figure 2.3</span> The curve \(y = \tfrac{1}{x}\) and its tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\): near the point of tangency the curve hugs the line, the local linearity that licenses the tangent-line approximation.</div>
+    <div class="draws"><strong>圖內容：</strong>曲線 \(y=1/x\) 與其在 \((2,\tfrac12)\) 的切線 \(y=-\tfrac14 x+1\)（虛線），切點標記；對應 §2.1 Example 2.5 的局部線性估計。</div>
+    <details><summary>原始 HTML</summary>
+<pre>&lt;figcaption&gt;&lt;span class="fig-no"&gt;Figure 2.3&lt;/span&gt; The curve \(y = \tfrac{1}{x}\) and its tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\): near the point of tangency the curve hugs the line, the local linearity that licenses the tangent-line approximation.&lt;/figcaption&gt;</pre>
+    </details>
+  </div>
+</div>
+
+<div class="figcard">
+  <div class="head"><span class="num">Figure 2.6</span><span class="id">cbrt-vertical-tangent · sec-2-3:86</span></div>
+  <div class="body">
+    <div class="caplabel">渲染後</div>
+    <div class="cap"><span class="fig-no">Figure 2.6</span> The graph of \(f(x) = \sqrt[3]{x}\) near the origin, with secant lines from the origin that steepen toward the vertical as the second point approaches \(0\). Both sides agree, so there is no corner — instead a vertical tangent, where the slope tends to \(+\infty\) and the derivative fails to exist.</div>
+    <div class="draws"><strong>圖內容：</strong>立方根曲線過原點，三條由原點出發的割線隨第二點趨近原點而趨於鉛直；標註「vertical tangent (slope → ∞)」。對應 Example 2.12（與 |x| 角點對照的另一種不可導）。</div>
+    <details><summary>原始 HTML</summary>
+<pre>&lt;figcaption&gt;&lt;span class="fig-no"&gt;Figure 2.6&lt;/span&gt; The graph of \(f(x) = \sqrt[3]{x}\) near the origin, with secant lines from the origin that steepen toward the vertical as the second point approaches \(0\). Both sides agree, so there is no corner — instead a vertical tangent, where the slope tends to \(+\infty\) and the derivative fails to exist.&lt;/figcaption&gt;</pre>
+    </details>
+  </div>
+</div>
+
+<div class="figcard">
+  <div class="head"><span class="num">Figure 2.7</span><span class="id">#fig-diff-cont（inline SVG）· sec-2-3:120</span></div>
+  <div class="body">
+    <div class="caplabel">渲染後</div>
+    <div class="cap"><span class="fig-no">Figure 2.7</span> The differentiable functions form a proper subset of the continuous ones: examples such as \(x^{2}\), \(\sqrt{x}\), and \(e^{x}\) lie inside both regions, while \(\lvert x \rvert\) at \(x = 0\) is continuous but not differentiable.</div>
+    <div class="draws"><strong>圖內容：</strong>內含包含關係圖——外層虛線橢圓「Continuous」，內層實線橢圓「Differentiable」（含 \(x^2,\sqrt{x},e^x\)），夾層處標 \(\lvert x\rvert\) at \(x=0\)，示真子集。對應 Theorem 2.1。</div>
+    <details><summary>原始 HTML</summary>
+<pre>&lt;figcaption&gt;&lt;span class="fig-no"&gt;Figure 2.7&lt;/span&gt; The differentiable functions form a proper subset of the continuous ones: examples such as \(x^{2}\), \(\sqrt{x}\), and \(e^{x}\) lie inside both regions, while \(\lvert x \rvert\) at \(x = 0\) is continuous but not differentiable.&lt;/figcaption&gt;</pre>
+    </details>
+  </div>
+</div>
+
+<div class="figcard">
+  <div class="head"><span class="num">Figure 2.8</span><span class="id">exp-self-derivative · sec-2-4:254</span></div>
+  <div class="body">
+    <div class="caplabel">渲染後</div>
+    <div class="cap"><span class="fig-no">Figure 2.8</span> The graph of \(y = e^{x}\) with its tangent lines at \(x = 0\) and \(x = 1\): at \((0, 1)\) the slope is \(1 = e^{0}\) and at \((1, e)\) the slope is \(e = e^{1}\), so at each point the tangent's slope equals the height of the curve — \(e^{x}\) is its own derivative.</div>
+    <div class="draws"><strong>圖內容：</strong>\(y=e^x\) 配兩條切線：在 \((0,1)\) 斜率 \(1=e^0\)、在 \((1,e)\) 斜率 \(e=e^1\)，示「切線斜率＝曲線高度」。</div>
+    <details><summary>原始 HTML</summary>
+<pre>&lt;figcaption&gt;&lt;span class="fig-no"&gt;Figure 2.8&lt;/span&gt; The graph of \(y = e^{x}\) with its tangent lines at \(x = 0\) and \(x = 1\): at \((0, 1)\) the slope is \(1 = e^{0}\) and at \((1, e)\) the slope is \(e = e^{1}\), so at each point the tangent's slope equals the height of the curve — \(e^{x}\) is its own derivative.&lt;/figcaption&gt;</pre>
+    </details>
+  </div>
+</div>
+
+<div class="figcard">
+  <div class="head"><span class="num">Figure 2.10</span><span class="id">quotient-example-graph · sec-2-5:214</span></div>
+  <div class="body">
+    <div class="caplabel">渲染後</div>
+    <div class="cap"><span class="fig-no">Figure 2.10</span> The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom) from Example 2.20, aligned along the common axis \(x\). At \(x = \pm 1\), where \(f\) reaches its maximum and minimum and its tangents run horizontal, \(f'\) crosses zero; at the origin the curve rises with slope \(f'(0) = 1\).</div>
+    <div class="draws"><strong>圖內容：</strong>上下雙面板——上 \(f(x)=x/(x^2+1)\)（標極大 \((1,\tfrac12)\)、極小 \((-1,-\tfrac12)\) 與水平切線）；下 \(f'(x)=(1-x^2)/(x^2+1)^2\)（標 \(x=\pm1\) 為零點、\(f'(0)=1\)），兩面板對齊。對應 Example 2.20。</div>
+    <details><summary>原始 HTML</summary>
+<pre>&lt;figcaption&gt;&lt;span class="fig-no"&gt;Figure 2.10&lt;/span&gt; The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom) from Example 2.20, aligned along the common axis \(x\). At \(x = \pm 1\), where \(f\) reaches its maximum and minimum and its tangents run horizontal, \(f'\) crosses zero; at the origin the curve rises with slope \(f'(0) = 1\).&lt;/figcaption&gt;</pre>
+    </details>
+    <div class="meta">註：caption 寫「Example 2.20」沿用該圖所示之 worked example 編號，套用前請順手確認該例號未在近期改動。</div>
+  </div>
+</div>
+
+<h2>4 · 連帶要改的「改號 + 正文交叉引用」清單</h2>
+<p>3 張既有圖往後移號，其 caption 標籤與正文中的 <code>Figure 2.x</code> 文字引用都要同步改：</p>
+<table>
+  <thead><tr><th>圖</th><th class="center">改號</th><th>要改的位置（caption 標籤 ＋ 正文引用）</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>f-and-fprime</code></td>
+      <td class="center"><span class="from">2.2</span><span class="arrow">→</span><span class="to">2.4</span></td>
+      <td>
+        <span class="loc">sec-2-2:176</span>（caption 標籤）<br>
+        <span class="loc">sec-2-2:180</span>「Figure 2.2 places the parabola…」<br>
+        <span class="loc">sec-2-2:195</span>「Cover the lower panel of Figure 2.2…」（Example 2.10 題幹）
+      </td>
+    </tr>
+    <tr>
+      <td><code>abs-corner</code></td>
+      <td class="center"><span class="from">2.3</span><span class="arrow">→</span><span class="to">2.5</span></td>
+      <td>
+        <span class="loc">sec-2-3:59</span>（caption 標籤）<br>
+        <span class="loc">sec-2-3:62</span>「forms a V-shape at the origin (Figure 2.3)」
+      </td>
+    </tr>
+    <tr>
+      <td><code>#fig-product-area</code></td>
+      <td class="center"><span class="from">2.4</span><span class="arrow">→</span><span class="to">2.9</span></td>
+      <td>
+        <span class="loc">sec-2-5:80</span>（caption 標籤）<br>
+        <span class="loc">sec-2-5:128</span>「the two strips of Figure 2.4 in algebraic form」
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p class="small">這 6 張<strong>新</strong>圖目前正文都<em>沒有</em>「Figure 2.x」文字引用（補圖時也沒寫交叉引用），所以補 caption 不會牽動其他正文。是否要順便在相關段落補上「(Figure 2.x)」交叉引用，由你決定（非必要）。</p>
+
+<h3>附帶：會變過時的註解（選擇性整理）</h3>
+<ul class="tight">
+  <li><span class="loc">sec-2-4:17</span> 檔頭註解寫「<code>No figure this section.</code>」——已過時（本節現有 <code>exp-self-derivative</code>＝建議 Figure 2.8）。補 caption 時順手更正。</li>
+  <li><span class="loc">sec-2-2:7、sec-2-3:7,21、sec-2-5:10,21</span> 等改號歷史註解、以及 <span class="loc">sec-2-2:190</span> 註解內的「Figure 2.2」，重排後會與新號不一致。屬 HTML 註解（不影響讀者），可一併更新或保留。</li>
+</ul>
+
+<h2>5 · 建議施作方式（若你決定修）</h2>
+<ul class="tight">
+  <li>一律改 <code>handout/fragments/ch02/sec-*.html</code> 原始片段，<strong>不要直接改</strong> <code>chapter2-print-standalone.html</code> 內容區（下次 build 會覆蓋）。</li>
+  <li>6 張補 <code>&lt;figcaption&gt;</code>（§3）＋ 3 張改號與正文引用（§4），共動 <strong>5 個 fragment 檔</strong>（sec-2-1 / 2-2 / 2-3 / 2-4 / 2-5）。</li>
+  <li>改完跑 <kbd>python handout/build.py ch02</kbd> 重組，瀏覽器開 <code>chapter2-print-standalone.html</code> 複驗 2.1–2.10 連號、圖都有號。</li>
+  <li>可重跑本檢核腳本回歸驗證（Ch2 應由 DEFECTIVE 轉 CLEAN）。</li>
+</ul>
+
+<h2>6 · 乾淨章節的完整清單（備查）</h2>
+<details>
+  <summary>Ch 1 — 25 張，1.1–1.25（CLEAN）</summary>
+  <p class="small">hlt(1.1)·#fig-map(1.2)·restrict-x2(1.3)·sine-not-1to1(1.4)·restricted-sine(1.5)·arcsin-triangle(1.6)·restricted-cosine(1.7)·restricted-tangent(1.8)·arctan-reflection(1.9)·arctan10-triangle(1.10)·arctan-general-triangle(1.11)·limit-same-near-a(1.12)·read-limit-graph(1.13)·one-sided-limits(1.14)·piecewise-jump(1.15)·recip-x-vs-x2(1.16)·one-sided-infinite(1.17)·vertical-asymptote(1.18)·ln-asymptote(1.19)·removable-hole(1.20)·floor-function(1.21)·squeeze-theorem(1.22)·squeeze-x2sin(1.23)·precise-limit(1.24)·epsilon-delta-dynamic(1.25)</p>
+</details>
+<details>
+  <summary>Ch 3 — 7 張，3.1–3.7（CLEAN）</summary>
+  <p class="small">sector-inequality(3.1)·squeeze-limit(3.2)·sin-cos-slope(3.3)·shm-triple(3.4)·composed-mapping(3.5)·remainder-tangent(3.6)·arcsin-vertical-tangent(3.7)</p>
+</details>
+<details>
+  <summary>Ch 4 — 6 張，4.1–4.6（CLEAN）</summary>
+  <p class="small">completeness-bound(4.1)·partial-sums-exp(4.2)·interior-extremum-squeeze(4.3)·mvt-secant-tangent(4.4)·exp-log-reflection(4.5)·reciprocal-slope-log(4.6)</p>
+</details>
+
+<p class="small" style="margin-top:40px;border-top:1px solid var(--line);padding-top:14px">
+  本報告為「待裁決」稽核稿，未改動任何課文檔。建議 caption 與改號方案需經你核可後才施作。
+</p>
+
+</div>
+</body>
+</html>

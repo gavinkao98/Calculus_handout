@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch2 可讀性回填 — gate 1（Claude）審核稿｜① reader-persona ＋ ② introduce-before-use</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.0rem;margin:24px 0 4px;color:var(--accent)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}
+  .warnnote b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.c2{background:#fdeede;color:#9a5a12}
+  .chip.sev-sl{background:#fff0d6;color:#8a5a00}
+  .chip.sev-mi{background:#eef0f4;color:#555}
+  .chip.t2{background:#fde7e7;color:#a11}
+  .chip.t3{background:#eef0f4;color:#555}
+  .chip.surv{background:#e6f7ea;color:#1a7f37}
+  .chip.cut{background:#f0eded;color:#8a8a8a;text-decoration:line-through}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .gate2{color:var(--muted);font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .gate2 b{color:#444}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:64px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  .ctx{background:#f5f6f8} .ctx .tag{color:var(--muted)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  .none{color:var(--muted);font-style:italic;padding:8px 2px}
+  ul.cut{list-style:none;padding:0;margin:8px 0}
+  ul.cut li{background:#fafafa;border:1px solid var(--line);border-radius:7px;padding:8px 12px;margin:6px 0;font-size:.9rem}
+  ul.cut .cid{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:#888;margin-right:8px}
+  .oos{background:#fbf6ff;border:1px solid #e7d9fb;border-left:3px solid #7a52c3;border-radius:8px;padding:12px 16px;margin:14px 0;font-size:.92rem}
+  .oos b{color:#5b3aa8}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 2 可讀性回填 — gate 1（Claude）審核稿</h1>
+  <p class="lede">把 2026-06-28 兩條具名檢查回填 Ch2（pilot 基準＝Ch1，見 <code>REVIEW-ch01-readability-*.html</code>）。本關只跑兩條<b>平起平坐</b>的具名檢查，不重跑任何既有閘（數學 M1–M8／S·A·V／圖 D1–D8 已過）：<br>
+  <b>①&nbsp;reader-persona first-read</b>——以「讀完高中先修、用英文（非母語）自學、第一次線性讀」的視角找首讀摩擦。<br>
+  <b>②&nbsp;introduce-before-use</b>——記號／術語／非正式記法是否先用後定義（U4 排序面，獨立掃一遍）。<br>
+  契約見 <code>handout/_audit/PROSE-AUDIT-RUBRIC.md</code>。唯讀、propose-only：裁決前不改任何課文。2026-06-28。</p>
+
+  <div class="note pass"><b>整章 0 blocking、0 tier-1、0 tier-2。</b> 8 raw findings（5 節各跑 ①＋②）→ 經對抗式複核（adversarial verify）留下 <b>4 條</b>、砍除 4 條（50% 為過度回報）。留下者<b>全為 tier-3 選配 polish</b>（Minor／Slowed），無一達 blocking。<b>② introduce-before-use 0 條存活</b>——本章記號出場序（h-form、導數記法、Leibniz <code>dy/dx</code>、<code>Δx</code>）乾淨；唯一被提的 ②（<code>Δy/Δx</code>）經複核判為就地自解的動機旁白而砍。<br>這份乾淨度高於 Ch1（彼 7 留含 4×tier-2），合理：Ch2 已跑完全閘（與 Ch1 同級），可讀性回填只撿到細修。</div>
+
+  <div class="note"><b>方法（雙 agent 對抗）：</b> 每節先由 reader-persona agent 跑 ①＋②，再對<b>每一條 finding</b> 派一個對抗 verifier（預設懷疑、誠實重評嚴重度 Lost／Slowed／Minor、查 no-dumbing、確認真的「先用後定義」而非當場 gloss／更早已介紹／標準 precalc）。本表的 severity／tier 採 <b>verifier 修正後</b>值；reader agent 原判與修正寫在每張卡的「雙閘」列。對抗 verifier 砍掉 50% 過度回報（4/8），與 rubric「reasoning 模型偏 over-report、須過 triage」的實證一致。</div>
+
+  <div class="note warnnote"><b>這是 gate-1（Claude，免費）。</b> gate-2（Codex，訂閱計費，跨模型獨立複核同樣兩條檢查）<b>尚未跑</b>——需先就模型／用量／成本向你徵得同意（Ch1 實測每節 ~2.5–3.3 萬 token、全章 ~17 萬）。最終以<b>兩閘交集</b>為最高信心候選交裁決。<b>即使 gate-1 已偏乾淨，gate-2 仍值得跑</b>——其不可取代價值＝抓 gate-1 套用後的迴歸＋跨模型獨立交集（Ch1 教訓：gate-1 套用時掉了 <code>integers</code>，三次 Claude 檢視全沒抓到、靠 gate-2 才抓到）。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>留存 / raw</th><th>處置摘要</th></tr>
+    <tr><td>§2.1 The Tangent Line and the Derivative at a Point（含章開場）</td><td>2 / 2</td><td><b>G1-1·G1-2 留（tier-3 選配）</b></td></tr>
+    <tr><td>§2.2 The Derivative as a Function</td><td>0 / 1</td><td>乾淨；G1-3 砍（就地自解的動機旁白）</td></tr>
+    <tr><td>§2.3 Differentiability, Continuity, and Higher Derivatives</td><td>0 / 2</td><td>乾淨；G1-4·G1-5 砍（就地已解／over-gloss）</td></tr>
+    <tr><td>§2.4 Derivatives of Polynomials and the Exponential Function</td><td>1 / 1</td><td><b>G1-6 留（tier-3 選配）</b></td></tr>
+    <tr><td>§2.5 The Product and Quotient Rules</td><td>1 / 2</td><td><b>G1-8 留（tier-3 選配）</b>；G1-7 砍</td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：<b>易懂性</b> U1 動機缺位 · U3 未解釋的跳躍 · U4 先用後定義 ／ <b>流暢性</b> F3 句構可解析。 嚴重度：<b>Lost</b>（讀不下去／放棄）· <b>Slowed</b>（須重讀但能回神）· <b>Minor</b>（小顛簸）。 修法型：<b>(a) 局部</b> gloss／forward-ref／補一行（低風險，可改）· <b>(b) 結構 reorder</b>（搬定義／介紹段，定稿章 cascade 編號＝只報不搬）。 本輪 4 條留存皆 ① reader-persona、皆 (a) 局部、皆 tier-3。</p>
+
+  <!-- ===================== tier-3 選配（4 條存活） ===================== -->
+  <h2>tier-3 選配 polish（雙閘存活、無 dumbing 風險；可裁可不裁）</h2>
+
+  <h3>§2.1 The Tangent Line and the Derivative at a Point</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-1</span><span class="chip c1">① reader-persona</span><span class="chip unit">Example 2.2 solution（line 141–142）</span><span class="chip dim">U3</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">本章<b>第一個倒數（reciprocal）例題</b>。化簡跳一步：分子 \(\dfrac{3}{3+h}-1\) 直接變成 \(\dfrac{-h}{3+h}\)，省略了通分這一行——而承載後續消去的 \(-h\) 正是在此誕生。§2.1 自己的 h-form recipe（「expand、subtract、cancel the factor of \(h\)」）就讓讀者期待看到這步。L2 首讀者會停下補算 \(\dfrac{3}{3+h}-\dfrac{3+h}{3+h}=\dfrac{3-(3+h)}{3+h}=\dfrac{-h}{3+h}\)。下一個等號隨即消去得 \(-\dfrac{1}{3+h}\)，故只 Minor、可回神。修法 <b>(a) 局部</b>：補一行中間等式（屬 display，套用時 Mode B 要驗算）。</div>
+    <div class="row old"><span class="tag">原文（跳步）</span>\(\displaystyle \lim_{h \to 0} \frac{\dfrac{3}{3 + h} - 1}{h} \;=\; \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h}\)</div>
+    <div class="row new"><span class="tag">建議</span>\(\displaystyle \lim_{h \to 0} \frac{\dfrac{3}{3 + h} - 1}{h} \;=\;\) <ins>\(\displaystyle \lim_{h \to 0} \frac{\dfrac{3 - (3 + h)}{3 + h}}{h} \;=\;\)</ins> \(\displaystyle \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h}\)　<span style="color:var(--new)">（插入通分中間步）</span></div>
+    <div class="gate2"><b>雙閘：</b> reader agent 判 Slowed／tier-2 → verifier 確認跳步屬實（line 141→142 一個等號、省通分），但因 \(-h\) 隨即在下一等號消去、且通分屬 assume-known 的有理式代數，降為 <b>Minor／tier-3</b>。dumbing 風險：無（只補一行標準代數，不軟化）。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2</span><span class="chip c1">① reader-persona</span><span class="chip unit">章開場 lead（line 16）</span><span class="chip dim">F3</span><span class="chip sev-sl">Slowed</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">破折號夾注的被動倒裝「implies — but is not implied by —」把同一關係的「正向」與「被動否定的反向」塞進一個子句，還把受詞 <em>continuity</em> 拖到句尾。L2 線性讀者得先掛著「existence implies ???」、跨過插入、解析被動否定、再把兩個動詞綁回句尾的名詞——一遍解析不出。摩擦純屬句構（數學的單向蘊涵本身不難）；章末 objectives 清單已用白話重述（「differentiability implies continuity but not the reverse」），故 Slowed、可回神。修法 <b>(a) 局部</b>：拆成兩個主動短句。</div>
+    <div class="row old"><span class="tag">原文</span>A subtler point comes next: its existence at a point <del>implies — but is not implied by —</del> continuity.</div>
+    <div class="row new"><span class="tag">建議</span>A subtler point comes next: its existence at a point <ins>implies continuity, but continuity does not imply it.</ins></div>
+    <div class="gate2"><b>雙閘：</b> reader agent Slowed／tier-3 → verifier 確認為真正的 center-embedding／受詞延後，非固有難度（數學不變、只拆句），維持 <b>Slowed／tier-3</b>；抗拒灌成 Lost（objectives 已重述）。dumbing 風險：無（單向蘊涵原樣保留）。</div>
+  </div>
+
+  <h3>§2.4 Derivatives of Polynomials and the Exponential Function</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-6</span><span class="chip c1">① reader-persona</span><span class="chip unit">Power rule 證明一（factorization，line 70–71）</span><span class="chip dim">U1</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">證明開頭用定冠詞「<em>the</em> algebraic factorization」把 \(x^{n}-a^{n}\) 的<b>一般 \(n\) 項分解</b>當已知端出，無推導也無指引。剛畢業的 precalc 讀者穩知 \(x^{2}-a^{2}=(x-a)(x+a)\)、或許 \(x^{3}-a^{3}\)，但 \(n\) 項（升降冪交錯）通式<b>不在標準高中教材</b>；定冠詞還暗示一種假性熟悉感，讀者會停在證明第一行想確認它從哪來。降 Minor 的兩個理由：下一行只需此式為真即可前進；且緊接的<b>第二個證明（binomial，line 82–93）完全自足</b>，卡在分解的讀者在同一定理區塊內就被救回。修法 <b>(a) 局部</b>：把它命名為 \(x^{2}-a^{2}\) 的一般式並給一個自驗法。</div>
+    <div class="row old"><span class="tag">原文</span>…together with the algebraic factorization \[ x^{n} - a^{n} = (x - a)\bigl(x^{n-1} + a\,x^{n-2} + \cdots + a^{n-1}\bigr). \] <del>Dividing by \(x - a\) cancels the factor…</del></div>
+    <div class="row new"><span class="tag">建議</span>…together with the algebraic factorization \[ x^{n} - a^{n} = (x - a)\bigl(x^{n-1} + a\,x^{n-2} + \cdots + a^{n-1}\bigr). \] <ins>This is the general-\(n\) form of the familiar \(x^{2} - a^{2} = (x - a)(x + a)\), which you can confirm by multiplying the right-hand side out and watching the interior terms cancel in pairs.</ins> Dividing by \(x - a\) cancels the factor…</div>
+    <div class="gate2"><b>雙閘：</b> reader agent Slowed／tier-3 → verifier 確認通式確非 assume-known（清單只含 binomial／factoring／\(x^2-a^2\)）、定冠詞造成假性熟悉，但因下行只需其為真＋第二證明自足救回，維持 <b>Minor／tier-3</b>；final_fix 刻意避用「telescope」生詞、改說「cancel in pairs」。dumbing 風險：無（命名＋自驗，不刪式不降難度）。</div>
+  </div>
+
+  <h3>§2.5 The Product and Quotient Rules</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-8</span><span class="chip c1">① reader-persona</span><span class="chip unit">Quotient rule 動機段（line 158）</span><span class="chip dim">U3</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">句子先設 \(f=1\)（得商 \(1/g\)），接著「悄悄」從 \(1/g\) 滑到「\(1/x\) 的導數是 \(-1/x^{2}\)」——中間「取最簡分母 \(g(x)=x\)」這步沒講出。L2 首讀者把抽象的 \(1/g\) 接到具體的 \(1/x\) 時，得自行補上 \(g=x\) 的代換，是個小卡頓。降 Minor 的理由：段落要點（負號留下、平方留下）不靠形式化 \(g=x\) 也成立；完整證明緊接其後（line 161–177），且 line 187–189 又用商法則明確重算 \((1/x)'\)（「numerator the constant \(1\), denominator \(x\)」）回頭印證。「footprint」雖是比喻，但同句冒號後的例子即是其 gloss，自解、不另計。修法 <b>(a) 局部</b>：把 \(g(x)=x\) 點出。</div>
+    <div class="row old"><span class="tag">原文</span>The \(g^{2}\) is the footprint of differentiating \(1/g\): <del>already in the simplest case \(f = 1\), the derivative of \(1/x\) was \(-1/x^{2}\)</del> in §2.2 — the same minus sign and the same square that the quotient rule carries in general.</div>
+    <div class="row new"><span class="tag">建議</span>The \(g^{2}\) is the footprint of differentiating \(1/g\): <ins>take the simplest denominator, \(g(x) = x\), so that \(f/g = 1/x\), whose derivative was \(-1/x^{2}\)</ins> in §2.2 — the same minus sign and the same square that the quotient rule carries in general.</div>
+    <div class="gate2"><b>雙閘：</b> reader agent Minor／tier-3 → verifier 核對 §2.2 line 123 確有 \((1/x)'=-1/x^2\)、引用正確；確認 \(g=x\) 代換確被省略但屬小卡頓（payload 與後續證明不受影響），維持 <b>Minor／tier-3</b>；建議保留「footprint」（例子已 gloss）。dumbing 風險：無（只點明已隱含的代換）。</div>
+  </div>
+
+  <!-- ===================== 砍除 ===================== -->
+  <h2>經對抗複核砍除（透明列出，預設不採納）</h2>
+  <p class="lede">下列 4 條由 reader agent 提出、但 verifier 判為過度回報或就地自解而砍除。列出以示雙閘運作、供你覆核；如你不同意某條砍除可指名 G1-編號要求復活。</p>
+  <ul class="cut">
+    <li><span class="cid">G1-3</span><b>§2.2</b> ①（U4）Notation 段 \(\Delta y/\Delta x\) 為全章首次 delta 記法，\(\Delta x\) 有「(our \(h\))」gloss、\(\Delta y\) 無。<b>砍（tier-4）：</b> 純動機旁白，正上方剛列出 \(f'(x)=y'=dy/dx=\cdots\)（且 \(y=f(x)\) 已立），位置對位使 \(\Delta y\) 在使用處即讀為「對應的 \(y\) 變化（rise）」；讀者不需用 \(\Delta y\) 算任何東西，單一推論就地自解。</li>
+    <li><span class="cid">G1-4</span><b>§2.3</b> ①（U1）Theorem 2.1 證明「\(f(x)-f(a)=\dfrac{f(x)-f(a)}{x-a}\cdot(x-a)\)」乘除技巧無動機。<b>砍（tier-4）：</b> 目標就在 display 前一行（line 105「show \(\lim[f(x)-f(a)]=0\)」），payoff 是 display 後緊接的下一句＋兩個 bullet；而差商正是本章最被反覆操練的物件（§2.2 剛教完），非「憑空」。屬編輯後見之明。</li>
+    <li><span class="cid">G1-5</span><b>§2.3</b> ①（U3）Example 2.13 Step 2「derivative \(2x\)…gives slope \(4\) at \(x=2\)」省略代入 \(2(2)=4\)。<b>砍（tier-4，dumbing_risk）：</b> \(2(2)=4\) 是 assume-known 的函數求值；同段 Step 1（line 159）剛示範同型 \(2^2=4\)。補「\(2(2)=4\)」＝把鄰句已示範的瑣碎算術過度 gloss。</li>
+    <li><span class="cid">G1-7</span><b>§2.5</b> ①（U3）line 84「Dividing the added area by \(h\)…\(g\cdot(\Delta f/h)\to g f'\)」未點明 \(\Delta f/h\) 即差商。<b>砍（tier-4，dumbing_risk）：</b> \(\Delta f\) 已於 line 52 定義為 \(f(x+h)-f(x)\)，故 \(\Delta f/h\to f'\) 就是 Definition 2.2（最被操練的事實）；且正下方嚴格證明（line 99–107）對同一步明寫「The two difference quotients tend to \(f'(x)\) and \(g'(x)\)」。此處 comment 標明是 informal「intuition」preview，設計如此。</li>
+  </ul>
+
+  <!-- ===================== 範圍外旁註（非本閘 finding） ===================== -->
+  <h2>範圍外旁註（<b>非</b>本閘 finding，給你定奪是否另行處理）</h2>
+  <div class="oos">
+    <b>圖編號交叉引用 staleness（屬「圖編號／cross-ref」閘，非可讀性兩條）。</b> 讀稿時順手發現<b>目前工作樹</b>（即本閘所審的現況）仍有 3 處 reader-facing 的過時圖號，會讓首讀者翻到錯的圖。<b>這不是 ① 散文摩擦也不是 ② 先用後定義</b>，而是圖號正確性，有自己的閘（工作樹已存在未追蹤的 <code>REVIEW-ch02-figure-numbering-applied.html</code>）。依紀律「不重跑既有閘／不擅動他閘領域」，<b>我只報不改</b>，交你定奪是否回去把那個閘補完：
+    <ul style="margin:8px 0 4px">
+      <li><code>sec-2-2:195</code> Example 2.10 題幹「Cover the lower panel of <b>Figure 2.2</b>」——應為 <b>Figure 2.4</b>（雙面板 \(f\)／\(f'\) 圖；Figure 2.2 是 §2.1 單面板差商圖，無 lower panel）。同節 line 180 已正確用 2.4。<b>該圖編號 applied 報告把此列為已改（2.2→2.4），但工作樹仍是 2.2</b>——可能沒落地。</li>
+      <li><code>sec-2-5:52</code>「three pieces (<b>Figure 2.4</b>)」——矩形面積圖實為 <b>Figure 2.9</b>。該圖編號報告<b>未列此處</b>（漏掉）。</li>
+      <li><code>sec-2-5:134</code>「The two strips of <b>Figure 2.4</b> return here」——應為 <b>Figure 2.9</b>。該圖編號報告<b>未列此處</b>（漏掉）。同節 line 128 已正確用 2.9。</li>
+    </ul>
+    （另 <code>sec-2-2:190</code> 有一處非 reader-facing 的 HTML 註解仍寫「Figure 2.2's f-graph」，低優先。）建議：把這幾處交回圖編號閘一併修，<b>不</b>併入本可讀性輪（避免混閘、避免 commit 範圍夾帶）。
+  </div>
+
+  <footer>
+    gate 1：Claude workflow（5 節 reader-persona agent ＋ 逐條對抗 verifier，共 13 agents、~62 萬 token、78 秒）。唯讀、propose-only。<b>整章 0 blocking、0 tier-1、0 tier-2</b>；8 raw → 4 存活（皆 tier-3 選配 ①）、4 砍（50%）。<b>② introduce-before-use 0 存活</b>。<br>
+    ⛳ <b>停。</b> 等你過目此稿並逐條裁決（採／不採／改修法；4 條皆選配，可全採、部分採、或全不採直接走 gate-2）。裁決前不改任何 <code>fragments/</code>。<br>
+    下一步（待你授權）：① 對你選採的條目改 fragment → <code>python build.py ch02</code> → 範圍限定 Mode B → render 自驗 → 產 <code>REVIEW-ch02-readability-applied.html</code> 回歸；或 ② 先跑 <b>gate-2（Codex 訂閱，需先徵成本同意）</b>取兩閘交集再裁。
+  </footer>
+</div>
+</body>
+</html>

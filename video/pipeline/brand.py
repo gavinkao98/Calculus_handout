@@ -463,8 +463,9 @@ def text_glow(mob, ground: str, *, role: str = "accent", width: float = 2.0,
     Returns VGroup(wide-halo, near-halo, mob). The halos are stroke-only copies of
     *mob* (no fill -- the original carries the fill on top), in the glow hue, at two
     widths for a soft falloff that reads as a glow rather than a thick outline. (manim
-    has no blur.) Distinct from blocks.write_glow (a reveal Flash); use when the glow
-    must persist on the final frame.
+    has no blur.) Distinct from blocks.write_glow (a reveal animation -- its Flash burst
+    was removed project-wide 2026-06-29); use this when the glow must persist on the
+    final frame.
     """
     glow_hex, _a = T.glow_for(_glow_name(role))
     wide = mob.copy().set_stroke(color=glow_hex, width=width * 2.2, opacity=opacity * 0.38)

@@ -35,6 +35,7 @@
 ## 通用紀律
 
 - **雙閘**：gate-1 Claude（免費）→ ⛳ 裁決 → 回歸審核 → （計費徵同意後）gate-2 Codex 跨模型獨立複核。幻覺要穿過兩個獨立模型才會漏——這是雙閘的價值。
+- **易懂性 reader-persona（Gate 6，不新開關）：** 易懂性 A 以「**高中生／英文 L2／第一次線性讀**」為錨判（見 [`_audit/PROSE-AUDIT-RUBRIC.md`](_audit/PROSE-AUDIT-RUBRIC.md) 維度 A）。可選**每章定稿前**用一個外部模型跑一輪 first-read 補強（gate-2 flavor），但**餵乾淨 inline 文字**（Codex 自讀檔在本機會把 UTF-8 解成亂碼＝假陽性）、raw 輸出過四級 triage 再裁決。其中「先用後定義」的**結構性排序**宜更早在 Mode A 方向層攔（[`../CONTENT_DIRECTION.md`](../CONTENT_DIRECTION.md) §2），別留到散文閘才搬而 cascade 編號。
 - **Codex 調用（實證，照這個）**：用 **PATH 上的 `codex`**（npm `codex-cli 0.136.0`，已登入 ChatGPT、走訂閱配額；**勿**用絕對路徑 `%LOCALAPPDATA%\OpenAI\Codex\bin\codex.exe` 的 alpha 版——其與 `~/.codex/config.toml` 的 `service_tier="default"` 不相容會啟動失敗）。指令：`codex exec -s read-only -C <repo> --output-schema <s.json> -o <out.json> - < <prompt.txt>`（Bash 工具、prompt 經 stdin 餵 raw UTF-8 避 PowerShell CJK 重編碼；prompt/schema 用 Write 寫檔不用 heredoc）。schema 全欄 required、`additionalProperties:false`、enum、無 min/max。每輪 ~120k tokens。**付費調用前一律先說明模型/用量/成本徵同意**（[`../CLAUDE.md`](../CLAUDE.md)）。
 - **findings 留版控**：Codex 原始輸出落 gitignored scratchpad、換機即失 → 轉錄進 `handout/_dev-archive/ch{NN}/ch{NN}_<gate>-audit.md`（範本 `_dev-archive/ch03/ch03_example-supplement-audit.md`）。
 - **render 自驗**：node v22＋Chrome。`handout/_render/shot.mjs <url> <out/prefix> {full|figures}`（`figures` 逐圖截 2× PNG 餵圖閘）。驗收：0 KaTeX/MathJax err、0 未渲染 `\(`、env-num 連續無斷號、cross-ref 0 dangling、圖全 hydrate。

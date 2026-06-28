@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch2 可讀性回填 — gate 2（Codex）跨模型複核稿</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{--bg:#f7f7f5;--card:#ffffff;--ink:#1d1d1f;--muted:#6b6b70;--line:#e4e4e0;--old:#b3261e;--new:#1a7f37;--accent:#2552b3;--chip:#eef0f4;--warn:#8a5a00;--warnbg:#fff6e3;--block:#a11;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.0rem;margin:22px 0 4px;color:var(--accent)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}.pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}.warnnote b{color:var(--warn)}
+  .fixnote{background:#eef3ff;border-left-color:var(--accent)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .card.solid{border-style:solid}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.c2{background:#fdeede;color:#9a5a12}
+  .chip.fixed{background:#d8f0e0;color:#15692f}
+  .chip.inter{background:#1d1d1f;color:#fff}
+  .chip.rec{background:#fff0d6;color:#8a5a00}
+  .chip.low{background:#eef0f4;color:#666}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .meta{color:var(--muted);font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .meta b{color:#444}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.95rem}
+  .row .tag{display:inline-block;min-width:64px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea}.old .tag{color:var(--old)}
+  .new{background:#eaf6ed}.new .tag{color:var(--new)}
+  .ctx{background:#f5f6f8}.ctx .tag{color:var(--muted)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  ul.adv,ul.cut{list-style:none;padding:0;margin:8px 0}
+  ul.adv li,ul.cut li{border:1px solid var(--line);border-radius:7px;padding:8px 12px;margin:6px 0;font-size:.9rem}
+  ul.adv li{background:#fffdf6}
+  ul.cut li{background:#fafafa;color:#555}
+  .cid{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:#666;margin-right:8px}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 2 可讀性回填 — gate 2（Codex）跨模型複核稿</h1>
+  <p class="lede">第二道閘：<code>codex-cli 0.136.0</code>（PATH，ChatGPT 訂閱）對<b>現行（已套用 gate-1 G1-1·G1-2·G1-8 ＋ 3 處圖號 cross-ref 後）</b>的 Ch2 五節，獨立跨模型複核同樣兩條檢查（① reader-persona、② introduce-before-use）。乾淨 inline UTF-8 餵入（非 <code>-C</code> 自讀）、schema-constrained、輸出 <b>0 個 U+FFFD</b>（編碼乾淨）。raw 一律過四級＋no-dumbing triage。原始轉錄存 <code>handout/_dev-archive/ch02/ch02_readability-gate2-audit.md</code>。2026-06-28。用量 ≈ <b>115,156 token</b>（訂閱配額，低於 ~13–17 萬估值）。</p>
+
+  <div class="note fixnote"><b>本輪雙閘最大價值：gate-2 命中 gate-1 套用後的迴歸。</b> 我套用 G1-8 時把「<code>g(x)=x, so that f/g=1/x</code>」中的 <code>f=1</code> 由<b>顯式</b>（原文「in the simplest case \(f=1\)」）變成<b>隱含</b>。Codex 獨立讀到並點出「\(g(x)=x\) 單獨只給 \(f/g=f(x)/x\)、未必 \(1/x\)」（G2-8）——正是跨模型第二讀者抓「同源盲點」的意義（對照 Ch1 掉 <code>integers</code>）。<b>建議 refine</b>（補回 <code>f(x)=1</code> 顯式），唯讀未改、待你裁。</div>
+
+  <div class="note pass"><b>0 新 blocking。</b> 9 raw findings → triage：<b>1 迴歸/交集 refine</b>（G2-8 ↔ gate-1 G1-8）、<b>2 建議採納</b>（G2-6 <code>m</code> 綁定、G2-9 <code>linearity</code> gloss）、<b>4 低優先 advisory</b> 交你裁決（G2-3/4/5/7）、<b>2 砍除</b>（過度回報，透明列出）。gate-2 仍系統性比 gate-1 嚴（opener 主題預告、<code>operator</code> 自解被 over-report），多數 side with gate-1／就地語境。② introduce-before-use 本章除上述就地綁定外無結構性先用後定義。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>raw</th><th>處置</th></tr>
+    <tr><td>§2.1 Tangent Line &amp; Derivative at a Point</td><td>2</td><td>G2-1·G2-2 砍（opener 預告／operator 自解）</td></tr>
+    <tr><td>§2.2 Derivative as a Function</td><td>1</td><td>G2-3 低優先 advisory（\(x\) 雙角色）</td></tr>
+    <tr><td>§2.3 Differentiability &amp; Higher Derivatives</td><td>2</td><td>G2-4·G2-5 低優先 advisory</td></tr>
+    <tr><td>§2.4 Polynomials &amp; Exponential</td><td>2</td><td><b>G2-6 建議</b>（\(m\) 綁定）；G2-7 低優先（\(f\) 綁定）</td></tr>
+    <tr><td>§2.5 Product &amp; Quotient Rules</td><td>2</td><td><b>G2-8 迴歸 refine ↔ G1-8</b>；<b>G2-9 建議</b>（linearity gloss）</td></tr>
+  </table>
+
+  <!-- ============ 迴歸/交集 ============ -->
+  <h2>① 迴歸／交集（最高信心）—— §2.5 命中 gate-1 套用</h2>
+  <div class="card solid">
+    <div class="chips"><span class="chip num">G2-8</span><span class="chip c1">① reader-persona</span><span class="chip unit">§2.5 quotient 動機段</span><span class="chip dim">U3</span><span class="chip inter">↔ gate-1 G1-8（已套用）</span><span class="chip rec">建議 refine·唯讀未改</span></div>
+    <div class="issue">Codex 讀的是<b>我已套用 G1-8 後</b>的句子。G1-8 把 \(g(x)=x\) 點明、卻把原本顯式的 numerator \(f=1\) 變成隱含——「take the simplest denominator, \(g(x)=x\), so that \(f/g=1/x\)」。Codex：「numerator 悄悄變成 1；\(g(x)=x\) 單獨只會給 \(f/g=f(x)/x\)、未必 \(1/x\)」，首讀者會停。<b>修法：補回 \(f(x)=1\) 顯式</b>，使 \(g=x\) 與 \(f=1\) <b>兩者皆顯式</b>（兼顧 gate-1 的 g=x 與原文的 f=1）。</div>
+    <div class="row old"><span class="tag">現行(G1-8)</span>The \(g^{2}\) is the footprint of differentiating \(1/g\): take the simplest denominator, \(g(x) = x\), <del>so that</del> \(f/g = 1/x\), whose derivative was \(-1/x^{2}\) in §2.2 …</div>
+    <div class="row new"><span class="tag">建議 refine</span>…take the simplest denominator \(g(x) = x\) <ins>with numerator \(f(x)=1\)</ins>, so that \(f/g = 1/x\), whose derivative was \(-1/x^{2}\) in §2.2 …</div>
+    <div class="meta"><b>意義：</b> gate-1 reader＋verifier＋範圍限定 Mode B（我方 3 次 Claude 檢視）皆判 G1-8 套用 OK；跨模型 gate-2 一次點出「換了一個隱含」。這是雙閘對「同源盲點」的價值落地。非數學錯誤（\(f=1\) 由 \(f/g=1/x\) 隱含），故列<b>建議 refine</b>、未自行套用、待你裁。</div>
+  </div>
+
+  <!-- ============ 建議採納 ============ -->
+  <h2>② 建議採納（真實、低風險、無 dumbing）</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-6</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">§2.4 negative-exponent Caution</span><span class="chip dim">U4</span><span class="chip rec">建議</span></div>
+    <div class="issue">負整數冪 caution 用 \(n\) 為負整數，卻接著寫「\(1/x^{m}\)」——\(m\) 憑空出現、未綁定。首讀者要自行推 \(m=-n>0\)。補一句綁定即解。</div>
+    <div class="row old"><span class="tag">原文</span>… still holds wherever \(x \ne 0\) — this can be checked by applying the same factorization idea to \(1/x^{m}\)<del>.</del></div>
+    <div class="row new"><span class="tag">建議</span>… this can be checked by applying the same factorization idea to \(1/x^{m}\) <ins>(where \(m = -n > 0\))</ins>.</div>
+    <div class="meta"><b>雙閘：</b> gate-2-only（gate-1 未提）。真實未綁定符號；補 \(m=-n>0\) 純綁定、不軟化、不過度 gloss。建議採。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G2-9</span><span class="chip c2">② introduce-before-use</span><span class="chip unit">§2.5 Chapter summary</span><span class="chip dim">U4</span><span class="chip rec">建議</span></div>
+    <div class="issue">章末摘要用「linearity」當技術標籤指 Theorem 2.4，但 §2.4 從未以「linearity」命名該定理（只叫 sum rule＋constant-multiple rule）。\((Theorem 2.4)\) 可回查，但名稱本身是章末才首見。補一句就地 gloss 接回。</div>
+    <div class="row old"><span class="tag">原文</span>… the power rule \((x^{n})' = n x^{n-1}\) for positive integers \(n\) (Theorem 2.3), and <del>linearity (Theorem 2.4)</del> together differentiate every polynomial term by term …</div>
+    <div class="row new"><span class="tag">建議</span>… and <ins>linearity — the sum and constant-multiple rules (Theorem 2.4)</ins> together differentiate every polynomial term by term …</div>
+    <div class="meta"><b>雙閘：</b> gate-2-only。標準術語但本書未命名；一句 gloss 把「linearity」綁回已教的兩條規則，clarity &gt; compactness。建議採。</div>
+  </div>
+
+  <!-- ============ 低優先 ============ -->
+  <h2>③ 低優先 advisory（交你裁決；唯讀未改）</h2>
+  <ul class="adv">
+    <li><span class="cid">G2-3</span><b>§2.2 Def 2.2 後段 · U3 · Slowed</b>（\(x\) 雙角色）— 回憶句「the substitution \(x=a+h\) turns it into \(\lim_{x\to a}(f(x)-f(a))/(x-a)\) with the fixed point renamed」：§2.2 的 h-form 以 \(x\) 為符號基點，這裡 \(x=a+h\) 又把 \(x\) 當移動點，同字兩角色。<b>「with the fixed point renamed」已示警、可回神</b>，故只 Slowed。Codex 建議引入 spare letter \(u=a+h\)。<b>邊界：</b>修法易過度複雜（多一個符號），是否動交你定。</li>
+    <li><span class="cid">G2-4</span><b>§2.3 Example 2.13 · U3 · Slowed</b>（therefore differentiable）— 「Away from \(x=2\) each piece is a polynomial and therefore differentiable」在 §2.4 通則前用了「多項式皆可微」。<b>邊界 hard-but-fair：</b>§2.1–§2.2 已多次由定義算出多項式導數，這是合理歸納；honestly Minor。可補一句「(difference quotient has a finite limit, as in §2.2)」橋接，或留白。交你定。</li>
+    <li><span class="cid">G2-5</span><b>§2.3 Remark 2.5 後 Caution · F4 · Minor</b>（句長）— \(d^{2}y/dx^{2}\) caution 一句連串多個「not X」否定誤讀（not \(d\) times \(2y\)；not \(d(x^{2})\)；not a denominator），首讀負荷高。建議<b>拆成三短句</b>（純拆句、零內容/數學改動）。低風險 copyedit，可採。</li>
+    <li><span class="cid">G2-7</span><b>§2.4 Theorem 2.5 敘述 · U4 · Minor</b>（\(f\) 未綁定）— 「Consequently every higher derivative is \(e^{x}\) as well: \(f^{(n)}(x)=e^{x}\)」中 \(f\) 未就地綁為 \(e^{x}\)，\(f^{(n)}\) 暫時無依。<b>惟定理通篇即講 \(e^{x}\)、語境清楚，且動到定理敘述需謹慎。</b>若採，可改「…as well: with \(f(x)=e^{x}\), \(f^{(n)}(x)=e^{x}\) for all \(n\)」。交你定。</li>
+  </ul>
+
+  <!-- ============ 砍除 ============ -->
+  <h2>④ 經 triage 砍除（過度回報；透明列出，預設不採）</h2>
+  <p class="lede">2 條 gate-2 raw 判為過度回報而砍。如你不同意某條砍除可指名 G2-編號要求復活。</p>
+  <ul class="cut">
+    <li><span class="cid">G2-1</span><b>§2.1 章開場 lead（U4，both）</b> — 開場以「tangent line／instantaneous rate of change／differentiation」預告全章主題。<b>砍：</b> 章開場本就<b>預告</b>後續主題（CONTENT_SPEC §4 opener 的功能、Stewart idiom），非有害的先用後定義；Codex 建議的「The meanings … will be developed in this chapter」會加 §3「避免」清單點名的 meta-commentary。gate-1 未提。</li>
+    <li><span class="cid">G2-2</span><b>§2.1 章開場 lead（U2，①）</b> — 「an operator that takes a function and returns another function」中「operator」偏形式。<b>砍：</b> <b>就地自解</b>——「that takes a function and returns another function」本身即「operator」的 gloss；Codex 建議的括號「(a rule acting on functions)」與既有 gloss 重複。tier-3→非 finding。</li>
+  </ul>
+
+  <footer>
+    gate 2：Codex <code>codex-cli 0.136.0</code>（訂閱），5 節 × ①② 獨立跨模型複核，<b>115,156 token</b>，輸出 0 個 U+FFFD。唯讀、propose-only。<b>0 新 blocking</b>；9 raw → 1 迴歸/交集 refine（G2-8 ↔ G1-8）＋2 建議（G2-6·G2-9）＋4 低優先（G2-3/4/5/7）＋2 砍（G2-1·G2-2）。原始轉錄：<code>handout/_dev-archive/ch02/ch02_readability-gate2-audit.md</code>。<br>
+    ⛳ <b>停。</b> ②③（含 G2-8 refine）一律唯讀，等你逐條裁決後才改。gate-1 已套用 3 條＋圖號 3 處見 <code>REVIEW-ch02-readability-applied.html</code>；gate-1 候選見 <code>REVIEW-ch02-readability-gate1.html</code>。<br>
+    後續：① 裁決本稿（我建議至少採 G2-8 refine、G2-6、G2-9）；② 採納者套用 → <code>build ch02</code> → 範圍限定 Mode B → render 自驗 → 更新 <code>applied</code> 報告；③ commit（需授權）。
+  </footer>
+</div>
+</body>
+</html>

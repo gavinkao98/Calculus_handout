@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1/Ch2 開場＋章末 summary — 已寫入內容報告</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --purple:#6c2bd9; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.65; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  h3 { font-size: 1rem; margin: 1.3rem 0 .3rem; color:#333; }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .summary { background:#f0f6ff; border:1px solid #cfe0fb; border-radius:8px; padding:.8rem 1rem; font-size:.92rem; margin:0 0 1.4rem; }
+  .summary b { color: var(--blue); }
+  .pass { color: var(--green); font-weight: 700; }
+  .warn { color: var(--red); font-weight: 700; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem 1rem; margin: .7rem 0; }
+  .card.int { border-left: 4px solid var(--blue); }
+  .card.app { border-left: 4px solid var(--green); }
+  .card.str { border-left: 4px solid var(--purple); }
+  .card.dec { border-left: 4px solid #9a5b00; }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+  .b-int { background:#e7f0fb; color:var(--blue); } .b-app { background:#e9f7ef; color:var(--green); }
+  .b-str { background:#f3e8fd; color:var(--purple); } .b-dec { background:#fef0e7; color:#9a5b00; }
+  .loc { font-size:.82rem; color:var(--gray); margin:.3rem 0 .6rem; }
+  .loc code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .content { background:#fcfcfd; border:1px dashed var(--line); border-radius:6px; padding:.6rem .9rem; }
+  .content .envlabel { font-weight:700; font-size:.85rem; color:#333; display:block; margin-bottom:.25rem; }
+  .content ul { margin:.3rem 0 .3rem 1.1rem; padding:0; }
+  .content li { margin:.25rem 0; }
+  .src { font-size:.78rem; color:var(--gray); margin-top:.55rem; }
+  .src code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .audit { background:#f6fef9; border-left:3px solid var(--green); padding:.3rem .7rem; border-radius:4px; font-size:.82rem; color:#155e38; margin-top:.5rem; }
+  .applied { background:#fff7ed; border-left:3px solid #e0a106; padding:.2rem .6rem; border-radius:4px; font-size:.8rem; color:#7a5b00; margin-top:.4rem; }
+  table { border-collapse: collapse; width:100%; font-size:.86rem; margin:.5rem 0; }
+  th, td { border:1px solid var(--line); padding:.35rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f3f6fb; }
+  a { color: var(--blue); }
+  code.path { font-family: ui-monospace, monospace; font-size:.8rem; }
+</style>
+</head>
+<body>
+<h1>Ch1／Ch2：章節開場 ＋ 章末 Chapter summary（已寫入）</h1>
+<p class="sub">2026-06-27　·　補齊 Ch1 缺的章末 summary、Ch2 缺的開場＋章末 summary；形態經使用者裁決＝<b>重寫成敘事體、對齊 Ch3/Ch4</b>　·　全為新增，無既有內容改寫（除採納散文閘的零語意切句）</p>
+
+<div class="summary">
+<b>本輪做了什麼：</b><br>
+① Ch1 與 Ch2 的開場（概述 lead ＋「By the end of this chapter」learning objectives）<b>併入各自第一節</b>（<code>sec-1-1.html</code> / <code>sec-2-1.html</code>），與 Ch3/Ch4 一致——四章皆無獨立 intro fragment；
+② Ch1 章末新增敘事體 <em>Chapter summary</em>；
+③ Ch2 章末新增敘事體 <em>Chapter summary</em>；
+④ 同步更新 <code>CONTENT_SPEC.md §4</code> 章節結尾規範，使其與 Ch1–Ch4 的敘事體實作相符。<br><br>
+<b>S·A·V 散文閘 — 雙閘收斂：<span class="pass">gate-1（Claude ×3）＋ gate-2（Codex gpt-5.5 xhigh）皆 0 blocking</span>。</b>
+gate-1 findings 已採納 3 條零語意切句＋1 條 Ch1 開場聲音對齊。<b>數學保真稽核</b>另抓到並修一處 Ch1 blocking（<code>roots</code>→<code>rational functions</code>＋補引 Proposition 1.1）。<b>gate-2（Codex，2026-06-28，訂閱配額）</b>：0 blocking／2 advisory（Ch2 opener objectives 可收緊、Ch2 summary 末段輕微重疊）——兩者經裁決<b>保留</b>（前者守「移植 legacy」決定、後者為 §1/§3 lookup-protected 查閱頁）。<b>gate-2 後完整性掃描</b>：student-facing meta 露出 0 處（乾淨）。findings 轉錄存版控 <a href="../_dev-archive/general/svc-gate2_ch01-ch02-opener-summary.md">svc-gate2_ch01-ch02-opener-summary.md</a>。<br>
+<b>渲染驗證：</b> <span class="pass">兩章 standalone 開場＋summary 皆正確渲染，MathJax 0 錯誤，console 0 error</span>（localhost 靜態伺服器實測 DOM）。
+</div>
+
+<h2>0 · 決策紀錄：為什麼「重寫」而非「移植」</h2>
+<div class="card dec"><span class="badge b-dec">decision</span>
+<p style="margin:.2rem 0 .5rem"><b>背景矛盾：</b> <code>CONTENT_SPEC §4</code>（原文）硬性規定章末 Summary 為三桶條列（Key definitions／theorems／formulas），legacy <code>.tex</code> 四章都照此寫；但你最近定稿的 <b>Ch3／Ch4 HTML 已偏離規範</b>，改成連續散文重述論證弧線（recap＋跨章 fence）。四章無法同時「彼此一致」又「全符合 §4 原文」。</p>
+<p style="margin:.2rem 0 .5rem"><b>裁決（你選）：</b> 以成書一致為重 → Ch1/Ch2 的 summary <b>重寫成敘事體、對齊 Ch3/Ch4</b>；legacy 三桶清單僅當「不漏定義/定理/公式」的對照表；同一輪把 <code>§4</code> 文字更新成與實作相符（敘事體合法化）。</p>
+<p style="margin:.2rem 0 0"><b>例外：</b> Ch2 開場的 learning objectives 無此矛盾（spec 與 Ch1/3/4 都用 verb-first bullet）→ 直接<b>移植 legacy ch02 並核實＋美式拼寫</b>。</p>
+</div>
+
+<h2>1 · 章開場：Ch1／Ch2 併入各自第一節（<code class="path">sec-1-1.html</code> / <code class="path">sec-2-1.html</code>），四章一致</h2>
+<p class="sub" style="margin:.2rem 0 .8rem">下方卡片以 Ch2 開場為例呈現內容；Ch1 開場（章標題 <code>Inverse Functions and Limits</code> ＋ lead ＋ 5 條 objectives）同樣置於 <code>fragments/ch01/sec-1-1.html</code> 檔內第一個 &lt;article&gt;，內容逐字取自 legacy <code>ch01_foundations.tex</code> 章首概述。</p>
+
+<div class="card int"><span class="id">opener · lead</span><span class="badge b-int">overview</span>
+<div class="loc">locus：<code>fragments/ch02/sec-2-1.html</code>（檔內第一個 &lt;article&gt;，§2.1 section 之前）· 章標題 <code>Derivatives</code></div>
+<div class="content">
+<span class="envlabel">概述（lead）</span>
+<p>The limit machinery of Chapter 1 was developed in part to make precise the idea of a function approaching a value as its input approaches some target. The principal payoff of that machinery, and the subject of this chapter, is the <em>derivative</em>: an operator that takes a function and returns another function describing how fast it is changing. Geometrically the derivative gives the slope of the tangent line at each point of a curve; physically it gives the instantaneous rate of change of a quantity that varies in time; algebraically it satisfies a small set of arithmetic rules that turn differentiation into a procedure rather than a per-problem invention. We meet the derivative first at a single point, as a limit of secant slopes, then as a function in its own right. A subtler point comes next: its existence at a point implies — but is not implied by — continuity. Finally we treat it as an operator we can compute on polynomials, on the natural exponential, and on products and quotients of differentiable functions.</p>
+</div>
+<div class="src">[source:] 概述移植自 legacy <code>ch02_derivatives.tex</code> 章首 overview（<code>\chapter{Derivatives}</code> 後一段），對齊現有 §2.1–§2.5 結構。</div>
+<div class="applied">採納散文閘 [F4]：原 lead 末句「first…then…then…and finally…」五面向＋三例同句，已切為三句（零語意改動）。</div>
+</div>
+
+<div class="card app"><span class="id">opener · objectives</span><span class="badge b-app">learning outcomes</span>
+<div class="content">
+<span class="envlabel">By the end of this chapter, you will be able to:</span>
+<ul>
+<li>state the limit definition of the derivative, move fluently between the equivalent forms \(\lim_{x \to a} \tfrac{f(x) - f(a)}{x - a}\) and \(\lim_{h \to 0} \tfrac{f(a + h) - f(a)}{h}\), and apply it to compute derivatives from first principles for polynomial, root, and exponential functions;</li>
+<li>read the derivative as the slope of the tangent line, and pass from the derivative at a point to the derivative as a function;</li>
+<li>recognize where a function fails to be differentiable, and explain why differentiability implies continuity but not the reverse;</li>
+<li>differentiate any polynomial and the exponential function \(e^{x}\) using the power rule, the constant-multiple rule, the sum rule, and the series-based derivation of \((e^{x})' = e^{x}\), and compute higher-order derivatives \(f''\), \(f'''\), \(f^{(n)}\);</li>
+<li>differentiate products and quotients of differentiable functions using the product and quotient rules.</li>
+</ul>
+</div>
+<div class="src">[source:] 移植自 legacy <code>ch02_derivatives.tex:7</code> 的 6 條成果，consolidate 為 5 條（§2.1→§2.5 逐節對齊）；英式 <code>recognise</code> → 美式 <code>recognize</code>（依 commit <code>101e6f7</code> 拼寫政策）。</div>
+<div class="audit">散文閘：0 blocking。voice 評為「中性且言之有物，與 ch01/ch03/ch04 開場同級」。optional 未採納：「machinery」承接性重複（§3 lookup 鼓勵，保留）、「per-problem invention」略生造（語意清楚，保留）。</div>
+</div>
+
+<h2>2 · Ch1 章末 Chapter summary（接 <code class="path">fragments/ch01/sec-1-6.html</code>）</h2>
+<div class="card str"><span class="id">ch01 · summary</span><span class="badge b-str">narrative recap</span>
+<div class="loc">locus：<code>fragments/ch01/sec-1-6.html</code> 末（<code>&lt;h3 class="subsec-head"&gt;Chapter summary&lt;/h3&gt;</code> 後三段）</div>
+<div class="content">
+<p>Chapter 1 laid down two foundations, and they could hardly look less alike. The first was the inverse of a function (§1.1–§1.2). A function can be run backwards exactly when it is <em>one-to-one</em> — distinct inputs give distinct outputs — a condition the horizontal line test reads straight off a graph. For such a function the inverse \(f^{-1}\) exists (Theorem 1.1), pinned down by \(f^{-1}(f(x)) = x\) and \(f(f^{-1}(y)) = y\). Restricting each trigonometric function to a principal interval on which it is one-to-one produced the inverse trigonometric functions \(\arcsin\), \(\arccos\), \(\arctan\) and their three companions, with fixed principal ranges and the reference-triangle method (Strategy 1.2) turning expressions such as \(\cos(\arcsin x)\) into algebra.</p>
+<p>The second, and longer, thread was the <em>limit</em> (§1.3–§1.6). We began informally — \(\lim_{x \to a} f(x) = L\) means \(f(x)\) is as close to \(L\) as we please once \(x\) is close enough to, but not equal to, \(a\) — and estimated limits from tables and graphs (§1.3). One-sided limits refined the picture, with a two-sided limit existing exactly when the two one-sided limits agree (Proposition 1.5); allowing the values to grow without bound gave infinite limits and the vertical asymptotes that mark them (§1.4). The limit laws (Theorem 1.2) then made limits computable: for functions built from polynomials and roots, direct substitution works wherever the function is defined (Proposition 1.6), and the gaps left by the indeterminate form \(0/0\) yield to factoring, rationalization, or the squeeze theorem (Theorem 1.3) (§1.5).</p>
+<p>The precise \(\varepsilon\)-\(\delta\) definition (Definition 1.13) finally placed every preceding limit argument on a rigorous footing (§1.6): \(\lim_{x \to a} f(x) = L\) means that for every \(\varepsilon > 0\) there is a \(\delta > 0\) with \(\lvert f(x) - L \rvert < \varepsilon\) whenever \(0 < \lvert x - a \rvert < \delta\), and from it we proved that a limit, when it exists, is unique (Proposition 1.7). The chapter closed by naming the property that limits make precise — \(f\) is continuous at \(a\) when \(\lim_{x \to a} f(x) = f(a)\) — and it is on this machinery that Chapter 2 is built: the derivative is itself a limit, the limit of secant slopes.</p>
+</div>
+<div class="src">[source:] 弧線與結果取自現有 §1.1–§1.6 HTML（Thm 1.1／Prop 1.5／Thm 1.2／Prop 1.6／Thm 1.3／Def 1.13／Prop 1.7 編號已逐一核對 fragment）；內容覆蓋面對照 legacy <code>ch01_foundations.tex:1585</code> 的三桶清單，確認無遺漏。</div>
+<div class="applied">採納 [F4] ¶1 過長句於分號處切兩句；採納 voice ¶1 開場「…and they could hardly look less alike」對齊 Ch3/Ch4 聲音。</div>
+<div class="audit">散文閘：0 blocking（易懂性＋S/A 全 clean）。「聲音已成功對齊 ch03 的連續散文 summary 形狀」。未採納 voice ¶2「ran longer and cut deeper」（可選 polish，保留中性陳述）。</div>
+</div>
+
+<h2>3 · Ch2 章末 Chapter summary（接 <code class="path">fragments/ch02/sec-2-5.html</code>）</h2>
+<div class="card str"><span class="id">ch02 · summary</span><span class="badge b-str">narrative recap</span>
+<div class="loc">locus：<code>fragments/ch02/sec-2-5.html</code> 末（<code>&lt;h3 class="subsec-head"&gt;Chapter summary&lt;/h3&gt;</code> 後四段）</div>
+<div class="content">
+<p>Chapter 2 built the derivative in stages. At a single point it is a limit of secant slopes,
+\[ f'(a) = \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} = \lim_{x \to a} \frac{f(x) - f(a)}{x - a}, \]
+the slope of the tangent line \(y - f(a) = f'(a)(x - a)\) and, read locally, the best linear approximation to \(f\) near \(a\) (§2.1). Letting the basepoint vary turns this number into a function \(f'\) — the derivative — recoverable from the graph of \(f\) and written interchangeably as \(f'\), \(\tfrac{df}{dx}\), or \(\tfrac{d}{dx}[f]\) (§2.2).</p>
+<p>Not every function has a derivative everywhere. The limit can fail at a corner (\(\lvert x \rvert\) at \(0\)), at a vertical tangent (\(\sqrt[3]{x}\) at \(0\)), or at any discontinuity, so differentiability is a genuinely stronger condition than continuity: differentiable \(\Rightarrow\) continuous (Theorem 2.1), but the converse is false. Iterating the operation gives the higher derivatives \(f''\), \(f'''\), \(\dots\), \(f^{(n)}\) (§2.3).</p>
+<p>The rest of the chapter replaced the limit, case by case, with arithmetic. The constant rule \((c)' = 0\) (Theorem 2.2), the power rule \((x^{n})' = n x^{n - 1}\) for positive integers \(n\) (Theorem 2.3), and linearity (Theorem 2.4) together differentiate every polynomial term by term (Corollary 2.1). The natural exponential earned its defining property \((e^{x})' = e^{x}\) (Theorem 2.5), proved here from the series for \(e^{x}\) (§2.4); Chapter 4 will make that step fully rigorous. Products and quotients then closed the toolkit:
+\[ (fg)' = f'g + fg', \qquad \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \]
+the first emphatically <em>not</em> \(f'g'\), the second sensitive to the order of its numerator (§2.5).</p>
+<p>With these rules we can differentiate any function assembled from powers and the exponential by adding, scaling, multiplying, and dividing. Two things still lie outside their reach: <em>composition</em>, \(f\bigl(g(x)\bigr)\), which no rule here touches, and the power rule itself, so far secured only for integer exponents. Both are the business of Chapter 3, which opens with the rule for compositions — the chain rule — and uses it to extend the power rule and to differentiate the trigonometric, logarithmic, and inverse functions.</p>
+</div>
+<div class="src">[source:] 弧線與結果取自現有 §2.1–§2.5 HTML（Def 2.1／Thm 2.1–2.7／Cor 2.1 編號已核對）；forward fence（整數冪／e^x 嚴格化）與 Ch3/Ch4 既有 summary 的「debt」框架一致；覆蓋面對照 legacy <code>ch02_derivatives.tex:922</code>。</div>
+<div class="applied">採納 [F4]：\((e^{x})' = e^{x}\) 一句（命名定理＋證明來源＋Ch4 前指）切為兩分句。</div>
+<div class="audit">散文閘：0 blocking。使用者特別關心的「與緊鄰既有 closing 段（line 318）重複」→ 判定為<b>功能不同的合法 lookup 重述（§1）</b>，非缺陷；本 summary 第四段已加入 line 318 未提的新債（整數冪限制），手勢不撞臉。未採納 optional：刪「case by case」、voice 對齊「Two debts remain」措辭（保留）。</div>
+</div>
+
+<h2>4 · 規範同步：<code class="path">CONTENT_SPEC.md §4</code> 章節結尾</h2>
+<div class="card dec"><span class="badge b-dec">spec update</span>
+<p style="margin:.2rem 0 .5rem">原文要求章末 Summary = 三桶條列（Key definitions／theorems／formulas）。已改為描述<b>連續散文重述論證弧線</b>的章末總結（heading <em>Chapter summary</em>、<code>subsec-head</code> 風格），SHOULD 做到：①點名核心結果＋§號回指 ②串起主線 ③收 forward/backward fence；3–8 個關鍵公式 SHOULD 內嵌敘事。保留原 rationale（永久參考頁／五分鐘重吸收骨架），並列 Ch1–Ch4 為參考實作。</p>
+<p style="margin:0"><b>效果：</b> 四章 summary 形態自此一致且皆合規（先前 Ch3/Ch4 其實已偏離原文 §4）。</p>
+</div>
+
+<h2>5 · build 與分頁器 fragment 清單：兩份來源需手動同步（latent，交你裁決）</h2>
+<div class="card"><span class="badge" style="background:#fdeceb;color:var(--red)">discoverability</span>
+<p style="margin:.2rem 0 .5rem">每章的 fragment 順序存在<b>兩個各自獨立</b>的來源：<br>
+① <code>build.py</code> 的 <code>CHAPTERS[ch]["fragments"]</code>（決定哪些 template 被注入 standalone）；<br>
+② 各 <code>chapter{N}-print-standalone.html</code> 裡的 <code>CHAPTER.fragments</code> JS 陣列（分頁器實際渲染哪些 template）。</p>
+<p style="margin:.2rem 0 .5rem"><code>build.py</code> 只重寫 content-fragments 標記區，<b>不會同步 ② 的 JS 陣列</b>。本輪最初以「獨立 <code>sec-intro</code>」實作 Ch2 開場時，曾因只改 ① 漏改 ② 而「開場在檔案裡卻不渲染」。<b>改採 Ch3/Ch4 的「併入第一節」後此問題不再適用</b>（第一節片段本就在兩份清單中），相關暫時性改動已還原。Ch1 開場亦同樣併入 <code>sec-1-1.html</code>；<b>現在四章開場全部併入第一節，無任何獨立 <code>sec-intro</code></b>。</p>
+<p style="margin:0"><b>仍是 latent footgun：</b> 只要日後有章節新增/刪減節，兩份清單仍須人工同步。<b>建議：</b> 讓 <code>build.py</code> 組裝時用 registry 一併改寫 standalone 的 <code>CHAPTER.fragments</code>，或在 <code>doctor.py</code> 加一致性檢查。屬程式工作、需你同意才動 <code>build.py</code>——是否要我做？</p>
+</div>
+
+<p class="sub" style="margin-top:2rem">驗證：localhost:8761 靜態伺服器實測——Ch1（opener＋summary）、Ch2（opener＋summary）皆於 <code>.paper</code> 渲染，<code>mjx-merror</code> = 0，console error = 0。本報告唯讀，數學以 MathJax CDN 即時渲染。</p>
+</body>
+</html>

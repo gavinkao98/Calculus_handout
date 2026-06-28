@@ -5,6 +5,11 @@ Content lives in fragments/ch{N}/ (one file per section, canonical = print versi
 Each standalone HTML has <!-- BEGIN-CONTENT-FRAGMENTS --> / <!-- END-CONTENT-FRAGMENTS -->
 markers; this script replaces that region with assembled <template> blocks.
 
+The CHAPTERS registry below is the single source of truth for fragment order:
+build_chapter() also rewrites each standalone's paginator `CHAPTER.fragments`
+JS array from it, so the two lists can never drift out of sync (add/remove a
+section or chapter by editing the registry alone, then rebuild).
+
 Usage:
     python build.py              # rebuild all chapters
     python build.py ch01         # rebuild chapter 1 only
@@ -21,6 +26,10 @@ MARKER_RE = re.compile(
     r"<!-- BEGIN-CONTENT-FRAGMENTS -->.*?<!-- END-CONTENT-FRAGMENTS -->",
     re.DOTALL,
 )
+
+# The paginator's `CHAPTER.fragments: [...]` array (lives in the trailing
+# <script>, after the content region). Rewritten from the registry on build.
+FRAGMENTS_JS_RE = re.compile(r"(fragments:\s*)\[[^\]]*\]")
 
 # ── Screen transforms (disabled — screen variants removed) ───────
 #
@@ -57,7 +66,7 @@ MARKER_RE = re.compile(
 CHAPTERS = {
     "ch01": {
         "fragments": [
-            "sec-intro", "sec-1-1", "sec-1-2", "sec-1-3",
+            "sec-1-1", "sec-1-2", "sec-1-3",
             "sec-1-4", "sec-1-5", "sec-1-6",
         ],
         "target": "chapter1-print-standalone.html",
@@ -110,20 +119,35 @@ def assemble_templates(fragment_ids, fragments, transform=None):
         parts.append(f'<template id="frag-{fid}">\n{content.rstrip()}\n</template>')
     return "\n\n".join(parts)
 
-def patch_standalone(html_path, templates_block):
-    """Replace the CONTENT-FRAGMENTS region in a standalone file."""
-    html = html_path.read_text(encoding="utf-8")
+def patch_standalone(html, templates_block):
+    """Return `html` with the CONTENT-FRAGMENTS region replaced (pure transform)."""
     m = MARKER_RE.search(html)
     if not m:
-        raise ValueError(f"No CONTENT-FRAGMENTS markers found in {html_path.name}")
+        raise ValueError("No CONTENT-FRAGMENTS markers found")
     replacement = (
         "<!-- BEGIN-CONTENT-FRAGMENTS -->\n"
         + templates_block
         + "\n<!-- END-CONTENT-FRAGMENTS -->"
     )
-    new_html = html[:m.start()] + replacement + html[m.end():]
-    html_path.write_text(new_html, encoding="utf-8")
-    return 1
+    return html[:m.start()] + replacement + html[m.end():]
+
+def sync_fragments_js(html, frag_ids):
+    """Return `html` with the paginator `CHAPTER.fragments` array rebuilt from the
+    registry, so it can never drift from build.py's fragment list (pure transform).
+
+    Only the tail after END-CONTENT-FRAGMENTS is searched, so fragment prose can
+    never be matched by accident; `count=1` relies on CHAPTER.fragments being the
+    first (and only) `fragments:` token in that tail. The output format matches the
+    existing one, so re-running on an already-synced file is a no-op.
+    """
+    m = MARKER_RE.search(html)
+    split = m.end() if m else 0
+    head, tail = html[:split], html[split:]
+    arr = "[" + ", ".join(f'"{fid}"' for fid in frag_ids) + "]"
+    new_tail, n = FRAGMENTS_JS_RE.subn(lambda mm: mm.group(1) + arr, tail, count=1)
+    if n == 0:
+        raise ValueError("No `CHAPTER.fragments` array found")
+    return head + new_tail
 
 def build_chapter(ch_id):
     """Build the print-standalone for a chapter."""
@@ -133,7 +157,12 @@ def build_chapter(ch_id):
 
     html_path = HERE / cfg["target"]
     templates = assemble_templates(frag_ids, fragments)
-    patch_standalone(html_path, templates)
+    # Apply both edits in memory, then write once: if either step raises, the
+    # existing standalone is left untouched (atomic with respect to this build).
+    html = html_path.read_text(encoding="utf-8")
+    html = patch_standalone(html, templates)
+    html = sync_fragments_js(html, frag_ids)
+    html_path.write_text(html, encoding="utf-8")
     print(f"  -> {html_path.name}")
 
     # Screen variant (disabled — standalone files removed)

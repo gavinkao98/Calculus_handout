@@ -15,12 +15,15 @@
 
 讀者「跟不跟得上」。據 CONTENT_SPEC §3。
 
+- **判讀視角 reader persona（2026-06-28 定）：** 易懂性以「**讀完高中先修、用英文（非母語）自學、第一次線性讀**」的讀者為錨判，不用審稿者的後見之明。實證（外部模型 first-read 校準，見下「可選：跨模型 first-read」節）顯示：同一節改用此 persona 讀，才抓得到審稿視角會略過的首讀摩擦——首次未定義詞、跳一行代數、沒鋪動機的戰術選擇（如憑空挑 ε = |L−M|/2）、L2 讀不動的長句。這些摩擦多半早已落在下列 U／F 維度（U3 跳步、U4 先用後定義、F3／F4 句構句長）——persona 只是把判讀對準真讀者，**不新增維度、不放寬下方 no-dumbing 護欄**。
+
 - **U1 動機缺位** — formal statement（definition／theorem／…）前面沒有動機散文說明「為何引入、直覺上是什麼」（§3：formal 前該有 1–2 段；純計算短節可只用一句承接句，為合法例外）。
 - **U2 重型形式無 gloss** — 語法重的定義（巢狀量詞、ε-δ、符號密）沒有「*Informally, …*」白話重述（§3 規則）。形式已近英語、僅一兩個符號者**不需要** gloss，別反向挑剔。
   - **白話重述可在 inline gloss、或定義前後相鄰散文任一處。只有當附近完全找不到任何白話重述、讀者被卡在純符號上，才算 blocking。** inline 缺、但相鄰散文已充分解拆 → 至多 advisory（可建議補 inline gloss，但不擋稿）。
 - **U3 未解釋的邏輯跳躍** — 自學讀者無法自行重建的一步，缺 *because*／*therefore*／*since* 等橋接（§3 明文禁止「未解釋的邏輯跳躍」）。
 - **U4 術語／記號先用後定義** — 術語或 notation 在被引入前就使用，把讀者晾住（forward dependency）。
   - **blocking 限於「讀者被晾住、無法從使用處的散文重建其義」。** 若記號在使用處當場以散文 gloss、讀者可重建其義 → 降為 advisory（建議調整順序，但不擋稿）。
+  - **結構性排序（需 reorder）優先往上游：** 若修法是「**把一個定義／介紹段搬到它首次被用之前**」（非在使用處補一句 gloss）——例如新記號在 example 用掉後才正式定義（ch01 §1.4 `=∞` 即此型）——這是**結構**問題，最便宜的修點在 Mode A 方向層（[`CONTENT_DIRECTION.md`](../../CONTENT_DIRECTION.md) §2「範圍與深度」之 introduce-before-use），**編號鎖定後才搬會 cascade 編號與 cross-ref**。散文閘照報此 U4，但**標明「需 reorder＝結構，宜上游處理」**，別在定稿期硬搬。
 - **U5 定義後未拆解** — 重定義之後沒有散文解拆「這條件排除了什麼／該怎麼讀」（§3：definition 後的散文解拆）。
 
 ### B. 流暢性 Fluency（copyedit；全 ADVISORY）
@@ -82,6 +85,15 @@
 - **流暢性 findings**：必須**保留語意**，只能收緊措辭（copyedit 護欄，同 video 潤稿模板）。
 - **易懂性 findings**：**可以**提議「加」一句動機／一個 gloss／一條橋接（踩進 Mode B 的 Rewrite／擴充地帶），但一律是**提議，不是行動**——交回使用者裁決。
 - 稽核員**唯讀**：只回報，不改任何檔案。
+
+## 可選：跨模型 first-read 第二讀者（每章定稿前一次）
+
+易懂性 A 的 reader-persona 校準，可由**一個外部模型**（DeepSeek／Codex／Gemini 等，不同訓練分布＝fresh eyes）跑一輪 first-read 補強——這是 [`CONTENT_DIRECTION.md`](../../CONTENT_DIRECTION.md) §5 floated 的「偶爾請第三模型抽查」的具體落地。定位：**選用、每章定稿前一次**（非每次編輯都跑），且**外部 raw 輸出一律過本檔 U／F 維度＋四級 triage 後才交裁決**——不直接吃。
+
+兩條硬紀律（2026-06-28 實證，ch01 校準）：
+
+1. **餵乾淨 inline 文字，別讓模型自己讀檔。** Codex 在本機用 `-C <repo>` 自讀 fragment 會把 UTF-8 解成亂碼（`—`→`??`、`§`→`禮`、彎引號→`?`），整批「編碼 bug」全是假陽性、甚至誤判 worst stall。把 fragment 預先以 UTF-8 解好、**inline 進 prompt**（DeepSeek 路線）即免疫。（與 [`CONTENT_DIRECTION.md`](../../CONTENT_DIRECTION.md) §5 工程坑「prompt 餵入 CJK 重編碼」是**兩個相關但不同**的坑：一個在輸入端、一個在模型自讀端。）
+2. **reasoning 模型 run-to-run 會飄、且偏 over-report**（實測 severity 灌水成 Lost、夾帶吹毛求疵的詞彙替換）→ raw 不可直接吃，必接四級 triage（核 no-dumbing、重評嚴重度、砍 non-finding）。**多跑取聯集、優先採兩模型交集**（交集＝最低後悔）。
 
 ## 回報規格
 

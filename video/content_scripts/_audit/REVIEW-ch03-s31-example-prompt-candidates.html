@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch03 §3.1 — Example 模板：原題上畫面（候選稿）</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --page:#0a0f17; --card:#0e1622; --card2:#111a28;
+    --ink1:#e9eef6; --ink2:#aab4c4; --ink3:#6b748a;
+    --accent:#f2b13c; --accent-soft:#f3cd8a;
+    --blue:#5cc8ec; --blue-soft:#a9def5;
+    --rule:#2a3446; --spine:#5cc8ec;
+    --good:#5fb98f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--ink1);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;
+    line-height:1.6;padding:32px 20px 80px}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-size:26px;font-weight:650;margin:0 0 4px}
+  .sub{color:var(--ink3);font-size:14px;margin:0 0 28px}
+  .note{background:var(--card);border:1px solid var(--rule);border-radius:12px;
+    padding:18px 22px;margin:0 0 36px;color:var(--ink2);font-size:14.5px}
+  .note b{color:var(--ink1)}
+  .note code{color:var(--accent-soft);
+    background:#16202f;padding:1px 6px;border-radius:5px;font-size:13px}
+  .ex{margin:0 0 54px}
+  .ex-h{display:flex;align-items:baseline;gap:12px;margin:0 0 14px}
+  .ex-h .tag{font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink3);font-weight:700}
+  .ex-h .name{color:var(--ink2);font-size:14px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:880px){.cols{grid-template-columns:1fr}}
+  .label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    font-weight:700;margin:0 0 8px}
+  .label.before{color:#c0708a}
+  .label.after{color:var(--good)}
+  /* the dark teaching frame mock */
+  .frame{background:var(--card);border:1px solid var(--rule);border-radius:14px;
+    padding:26px 28px 30px;position:relative;overflow:hidden;min-height:280px}
+  .frame::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:var(--spine);opacity:.85}
+  .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--blue);font-weight:800;margin:0 0 14px}
+  .headline{font-size:19px;font-weight:480;color:var(--ink1);margin:0 0 6px;
+    line-height:1.45}
+  .titlebig{font-size:25px;font-weight:680;color:var(--ink1);margin:0 0 22px}
+  .hr{height:1px;background:var(--rule);margin:16px 0 12px}
+  .sollead{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--ink3);font-weight:700;margin:0 0 14px}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:18px;
+    margin:0 0 13px}
+  .row .math{color:var(--ink1);font-size:15px;overflow-x:auto}
+  .row.result .math{color:var(--accent-soft)}
+  .row.check .math{color:var(--ink1)}
+  .row .reason{color:var(--ink3);font-size:11px;letter-spacing:.04em;
+    text-transform:uppercase;white-space:nowrap;flex:none}
+  .miss{color:#c0708a;font-style:italic;font-size:13.5px;margin:18px 0 0}
+  .yaml{background:#0b1320;border:1px solid var(--rule);border-radius:10px;
+    padding:14px 16px;margin:14px 0 0;font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:12.5px;color:var(--ink2);white-space:pre-wrap;overflow-x:auto}
+  .yaml .k{color:#7fa8d8}
+  .yaml .add{color:var(--good)}
+  .legend{display:flex;gap:22px;margin:6px 0 30px;font-size:12.5px;color:var(--ink3)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ch03 §3.1 — Example 模板：原題上畫面（候選稿）</h1>
+  <p class="sub">三個 worked example 的標頭比較：現況（只有描述性標題、原題僅在旁白）→ 提案（原題直接當 headline）。數學即時渲染，雙擊即讀。</p>
+
+  <div class="note">
+    <b>這次要改什麼：</b>不動 template code。只在 storyboard
+    <code>ch03_trig_derivatives.yml</code> 的三個 example scene 各加一行
+    <code>prompt:</code>（原題；太長寫簡略版）。<br>
+    <b>機制：</b><code>derivation</code> 模板看到 <code>prompt:</code> 就改走
+    <code>example_head</code>——<code>[ EXAMPLE ]</code> eyebrow ＋ <b>原題當 headline</b>
+    ＋ 細線 ＋ <code>SOLUTION</code> lead ＋ 解題鏈。<br>
+    <b>描述性 <code>title:</code> 保留</b>（<code>critic.py</code> 視覺稽核的場景標籤仍會用到），但有了
+    <code>prompt:</code> 後就不再上畫面——正好是你要的「直接上重點、小標題拿掉」。<br>
+    <b>容量：</b><code>sizecheck</code> 已把 <code>prompt/solrule/sollead</code> 算進標頭；若某題加了標頭後解題鏈塞不下，會被自動標記，屆時用
+    <code>part:</code> 分頁（<code>example_head</code> 內建「SOLUTION (CONT.)」）。
+  </div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:#c0708a"></span>現況（BEFORE）：原題沒出現</span>
+    <span><span class="dot" style="background:var(--good)"></span>提案（AFTER）：原題上 headline</span>
+  </div>
+
+  <!-- ============ Example 3.1 ============ -->
+  <section class="ex">
+    <div class="ex-h"><span class="tag">Example 3.1</span><span class="name">scene 18 · companion_limit · 原題夠短 → 用完整版</span></div>
+    <div class="cols">
+      <div>
+        <div class="label before">現況 BEFORE</div>
+        <div class="frame">
+          <div class="eyebrow">[ example ]</div>
+          <div class="titlebig">A Companion Limit</div>
+          <div class="row"><span class="math">$\dfrac{1-\cos\theta}{\theta} = \dfrac{(1-\cos\theta)(1+\cos\theta)}{\theta\,(1+\cos\theta)} = \dfrac{1-\cos^{2}\theta}{\theta\,(1+\cos\theta)}$</span><span class="reason">multiply by $1{+}\cos\theta$</span></div>
+          <div class="row"><span class="math">$= \dfrac{\sin^{2}\theta}{\theta\,(1+\cos\theta)} = \dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$</span><span class="reason">$1{-}\cos^{2}\theta=\sin^{2}\theta$</span></div>
+          <div class="row result"><span class="math">$\longrightarrow\ 1\cdot\dfrac{0}{1+1} = 0$</span><span class="reason">the limit, then continuity</span></div>
+          <p class="miss">⚠ 讀者不知道在解什麼：「$(1-\cos\theta)/\theta$ 趨近 0」只在旁白講過。</p>
+        </div>
+      </div>
+      <div>
+        <div class="label after">提案 AFTER</div>
+        <div class="frame">
+          <div class="eyebrow">[ example ]</div>
+          <div class="headline">Establish the companion limit $\lim_{\theta\to 0}\dfrac{1-\cos\theta}{\theta}=0$.</div>
+          <div class="hr"></div>
+          <div class="sollead">solution</div>
+          <div class="row"><span class="math">$\dfrac{1-\cos\theta}{\theta} = \dfrac{(1-\cos\theta)(1+\cos\theta)}{\theta\,(1+\cos\theta)} = \dfrac{1-\cos^{2}\theta}{\theta\,(1+\cos\theta)}$</span><span class="reason">multiply by $1{+}\cos\theta$</span></div>
+          <div class="row"><span class="math">$= \dfrac{\sin^{2}\theta}{\theta\,(1+\cos\theta)} = \dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$</span><span class="reason">$1{-}\cos^{2}\theta=\sin^{2}\theta$</span></div>
+          <div class="row result"><span class="math">$\longrightarrow\ 1\cdot\dfrac{0}{1+1} = 0$</span><span class="reason">the limit, then continuity</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="yaml"><span class="k">title:</span> "A Companion Limit"        <span style="color:#5a6477"># 保留，僅作場景標籤（不上畫面）</span>
+<span class="add">prompt: "Establish the companion limit $\lim_{\theta\to 0}\dfrac{1-\cos\theta}{\theta}=0$."</span></div>
+    <p class="sub" style="margin-top:8px">handout 原文：<i>“Establish the companion limit $\lim_{\theta \to 0} \frac{1 - \cos\theta}{\theta} = 0$.”</i> — 完整保留。</p>
+  </section>
+
+  <!-- ============ Example 3.2 ============ -->
+  <section class="ex">
+    <div class="ex-h"><span class="tag">Example 3.2</span><span class="name">scene 19 · all_six_trig_derivatives · 簡化（去掉 §2.5 與定義域附註）</span></div>
+    <div class="cols">
+      <div>
+        <div class="label before">現況 BEFORE</div>
+        <div class="frame">
+          <div class="eyebrow">[ example ]</div>
+          <div class="titlebig">All Six Derivatives</div>
+          <div class="row"><span class="math">$\dfrac{d}{dx}\tan x = \dfrac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^{2} x}$</span><span class="reason">quotient rule</span></div>
+          <div class="row"><span class="math">$= \dfrac{\cos^{2} x+\sin^{2} x}{\cos^{2} x} = \dfrac{1}{\cos^{2} x} = \sec^{2} x$</span><span class="reason">Pythagorean identity</span></div>
+          <div class="row result"><span class="math">$\dfrac{d}{dx}\sec x = \sec x\tan x$</span><span class="reason">secant, same rule</span></div>
+          <div class="row check"><span class="math">$\dfrac{d}{dx}\cot x = -\csc^{2} x,\quad \dfrac{d}{dx}\csc x = -\csc x\cot x$</span><span class="reason">the other two</span></div>
+          <p class="miss">⚠ 沒寫出「要用商法則微分 tan / sec…」這個任務。</p>
+        </div>
+      </div>
+      <div>
+        <div class="label after">提案 AFTER</div>
+        <div class="frame">
+          <div class="eyebrow">[ example ]</div>
+          <div class="headline">With $\sin'=\cos$, $\cos'=-\sin$ and the quotient rule, differentiate $\tan x$ and $\sec x$ — then likewise $\cot x$ and $\csc x$.</div>
+          <div class="hr"></div>
+          <div class="sollead">solution</div>
+          <div class="row"><span class="math">$\dfrac{d}{dx}\tan x = \dfrac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^{2} x}$</span><span class="reason">quotient rule</span></div>
+          <div class="row"><span class="math">$= \dfrac{\cos^{2} x+\sin^{2} x}{\cos^{2} x} = \dfrac{1}{\cos^{2} x} = \sec^{2} x$</span><span class="reason">Pythagorean identity</span></div>
+          <div class="row result"><span class="math">$\dfrac{d}{dx}\sec x = \sec x\tan x$</span><span class="reason">secant, same rule</span></div>
+          <div class="row check"><span class="math">$\dfrac{d}{dx}\cot x = -\csc^{2} x,\quad \dfrac{d}{dx}\csc x = -\csc x\cot x$</span><span class="reason">the other two</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="yaml"><span class="k">title:</span> "All Six Derivatives"
+<span class="add">prompt: "With $\sin'=\cos$, $\cos'=-\sin$ and the quotient rule, differentiate $\tan x$ and $\sec x$ --- then likewise $\cot x$ and $\csc x$."</span></div>
+    <p class="sub" style="margin-top:8px">handout 原文：<i>“Using $\sin' = \cos$ and $\cos' = -\sin$ together with the quotient rule (§2.5), differentiate (a) $\tan x$ and (b) $\sec x$, wherever $\cos x \ne 0$.”</i> — 去掉節號 §2.5 與定義域附註（cos x≠0），並把 handout 收尾才提的 cot/csc 提前進題敘，對齊本場「All Six」與 check 列。</p>
+  </section>
+
+  <!-- ============ Example 3.3 ============ -->
+  <section class="ex">
+    <div class="ex-h"><span class="tag">Example 3.3</span><span class="name">scene 20 · shm_compute · 較長 → 簡化版</span></div>
+    <div class="cols">
+      <div>
+        <div class="label before">現況 BEFORE</div>
+        <div class="frame">
+          <div class="eyebrow">[ example ]</div>
+          <div class="titlebig">A Weight on a Spring</div>
+          <div class="row"><span class="math">$s(t) = \sin t$</span><span class="reason">height</span></div>
+          <div class="row"><span class="math">$s'(t) = \cos t$</span><span class="reason">velocity</span></div>
+          <div class="row"><span class="math">$s''(t) = -\sin t$</span><span class="reason">acceleration</span></div>
+          <div class="row result"><span class="math">$s''(t) = -\sin t = -\,s(t)$</span><span class="reason">simple harmonic motion</span></div>
+          <p class="miss">⚠ 「彈簧高度 $s(t)=\sin t$，求速度／加速度並說明關係」整個任務只在旁白。</p>
+        </div>
+      </div>
+      <div>
+        <div class="label after">提案 AFTER</div>
+        <div class="frame">
+          <div class="eyebrow">[ example ]</div>
+          <div class="headline">A weight on a spring has height $s(t)=\sin t$. Find the velocity $s'(t)$ and acceleration $s''(t)$, and relate the acceleration to the height.</div>
+          <div class="hr"></div>
+          <div class="sollead">solution</div>
+          <div class="row"><span class="math">$s(t) = \sin t$</span><span class="reason">height</span></div>
+          <div class="row"><span class="math">$s'(t) = \cos t$</span><span class="reason">velocity</span></div>
+          <div class="row"><span class="math">$s''(t) = -\sin t$</span><span class="reason">acceleration</span></div>
+          <div class="row result"><span class="math">$s''(t) = -\sin t = -\,s(t)$</span><span class="reason">simple harmonic motion</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="yaml"><span class="k">title:</span> "A Weight on a Spring"
+<span class="add">prompt: "A weight on a spring has height $s(t)=\sin t$. Find the velocity $s'(t)$ and acceleration $s''(t)$, and relate the acceleration to the height."</span></div>
+    <p class="sub" style="margin-top:8px">handout 原文：<i>“A weight bobbing on a spring has height $s(t) = \sin t$ above its rest level at time $t$. Find its velocity $s'(t)$ and acceleration $s''(t)$, and describe how the acceleration is related to the height.”</i> — 簡化：去掉「bobbing」「above its rest level at time $t$」，「describe how…related」→「relate…to」。</p>
+  </section>
+
+</div>
+</body>
+</html>

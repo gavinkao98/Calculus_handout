@@ -12,6 +12,11 @@
 
 直接改 standalone 的內容區塊（`<!-- BEGIN-CONTENT-FRAGMENTS -->` 至 `<!-- END-CONTENT-FRAGMENTS -->`）會在下次 build 時被覆蓋。目前只維護 print 版（`chapter{N}-print-standalone.html`），螢幕版已移除。
 
+## 章節與小節結構：registry 為單一真實來源
+
+- **fragment 順序只在 `build.py` 的 `CHAPTERS` registry 維護。** 新增/刪除一個小節、或新增一整章，只改 registry 一處；`build.py` 組裝時會自動把每個 standalone 裡分頁器用的 `CHAPTER.fragments` JS 陣列改寫成與 registry 一致（單一真實來源，兩份清單不會再各自漂移）。**不要手改 standalone 的 `CHAPTER.fragments`**——下次 build 會覆蓋。
+- **章開場併入該章第一節的 fragment**（`sec-N-1.html`）：檔內第一個 `<article>` 為開場（`chapter-head` ＋ lead ＋「By the end of this chapter」清單），第二個 `<article>` 才是該節本身。**不設獨立的 `sec-intro` fragment**（四章一致；範例見 [`fragments/ch04/sec-4-1.html`](fragments/ch04/sec-4-1.html)）。開場/結尾的撰寫規範見 [`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) §4 與 [`../CONTENT_QUICKSTART.md`](../CONTENT_QUICKSTART.md)。
+
 ## 圖表系統
 
 - Fragment 放 `<figure class="figure" data-fig="id">` 標記。
