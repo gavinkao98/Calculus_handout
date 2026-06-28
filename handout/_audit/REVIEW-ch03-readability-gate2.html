@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch3 可讀性回填 — gate 2（Codex）審核稿｜① reader-persona ＋ ② introduce-before-use</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: { arccsc: ['\\operatorname{arccsc}'], arcsec: ['\\operatorname{arcsec}'], arccot: ['\\operatorname{arccot}'] }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.0rem;margin:24px 0 4px;color:var(--accent)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}
+  .warnnote b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .ledger{background:#fafafa;border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.9rem}
+  .ledger .sec{font-weight:700;color:var(--accent);font-family:ui-monospace,Menlo,Consolas,monospace}
+  .ledger .tok{font-family:ui-monospace,Menlo,Consolas,monospace;color:#888;font-size:.82rem}
+  .ledger .q{color:#333;display:block;margin-top:5px;padding-left:10px;border-left:2px solid var(--line)}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 3 可讀性回填 — gate 2（Codex）審核稿</h1>
+  <p class="lede">跨模型獨立複核同兩條檢查（與 gate-1 平起平坐），由 <b>Codex <code>codex-cli 0.136.0</code></b>（PATH／ChatGPT 訂閱；model <code>gpt-5.5</code>、reasoning effort <code>xhigh</code>、sandbox <code>read-only</code>）執行：<br>
+  <b>①&nbsp;reader-persona first-read</b>（高中先修／英文 L2／第一次線性讀、已讀完 Ch1+Ch2）＋ <b>②&nbsp;introduce-before-use</b>（U4 排序面，獨立掃一遍）。<br>
+  契約見 <code>handout/_audit/PROSE-AUDIT-RUBRIC.md</code>；原始輸出轉錄存版控 <code>handout/_dev-archive/ch03/ch03_readability-gate2-audit.md</code>。唯讀、propose-only。2026-06-28。</p>
+
+  <div class="note pass"><b>gate-2 全章 0 findings —— 跨模型獨立確認 ch03 乾淨。</b><br>
+  三節 Codex 皆回空 findings 陣列、U1–U5／F1–F5 十維度全 clean。<b>兩閘交集為空集</b>：gate-1（Claude Opus）2 raw → 0 survivors、completeness 0 new；gate-2（Codex gpt-5.5）0 findings。兩個獨立模型各自判定 ch03 在兩條檢查上乾淨——交集＝最低後悔＝最高信心 clean。</div>
+
+  <div class="note"><b>方法／編碼紀律（依 rubric 硬規則）：</b> Python（UTF-8 read+write）剝除 HTML 註解後把每節全文 <b>clean inline</b> 餵入，<b>絕不讓 Codex 用 -C 自讀 fragment</b>（本機會把 UTF-8 解成亂碼＝假陽性）。每節 prompt 另附 <b>③ 本章先前已介紹之記號/術語 ledger</b>（Ch1/Ch2/§3 前節＋standard precalc），使 Codex 不把合法 cross-ref 誤報為先用後定義。先跑 sec-3-1 smoke test（schema 解析 OK、輸出 0 個 U+FFFD、編碼正常）再循序跑其餘兩節。schema 全欄 required／<code>additionalProperties:false</code>／enum／無 min/max。</div>
+
+  <div class="note"><b>校準對照 Ch1：</b> Ch1 gate-2 曾出 25 raw（多為「每個記號都要 gloss」的 ⟹／⟺／↦／vanish／blows up over-report），並抓到 1 個套用迴歸（掉 <code>integers</code>）＋1 真交集（§1.4 <code>=∞</code>）。ch03 gate-2 出 <b>0 raw</b>——因 ch03 在 introduce-before-use 寫入方向層（§2）之後撰寫、且已過完整 S·A·V 散文閘；且本章 gate-1 0 survivors＝<b>無套用、無迴歸可抓</b>，gate-2 在此純為跨模型 clean 確認。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>gate-2 findings</th><th>token</th><th>U+FFFD</th><th>判定</th></tr>
+    <tr><td>§3.1 Derivatives of Sine and Cosine（含章開場）</td><td class="zero">0</td><td>20,422</td><td class="zero">0</td><td>U1–U5／F1–F5 全 clean</td></tr>
+    <tr><td>§3.2 The Chain Rule</td><td class="zero">0</td><td>20,977</td><td class="zero">0</td><td>U1–U5／F1–F5 全 clean</td></tr>
+    <tr><td>§3.3 Applications of the Chain Rule（含 summary）</td><td class="zero">0</td><td>19,544</td><td class="zero">0</td><td>U1–U5／F1–F5 全 clean</td></tr>
+    <tr><td><b>合計</b></td><td class="zero"><b>0</b></td><td><b>60,943</b></td><td class="zero"><b>0</b></td><td><b>跨模型獨立 clean</b></td></tr>
+  </table>
+
+  <h2>Codex 獨立檢查紀錄（每節 notes 原文轉錄）</h2>
+  <p class="lede">下列為各節 Codex 自陳「② introduce-before-use 掃了哪些記號/術語、判為何乾淨」的逐字轉錄——可稽核其確實逐符號走查、非空轉。穩定編號預留 <code>G2-</code>，本輪 0 findings 故無逐條卡。</p>
+
+  <div class="ledger"><span class="sec">§3.1</span> <span class="tok">20,422 tok · 0 findings</span>
+    <span class="q">“No tier 1-3 findings. For introduce-before-use, I checked symbols/terms including composition, chain rule, logarithmic differentiation, inverse/implicitly defined functions, radians, theta/h substitution, even function, unit circle/tangent/sector/chord/arc, inequality (1), continuity, squeeze theorem, proposition/theorem references, quotient rule, sec/csc/cot, simple harmonic motion, and derivative-cycle notation. Items were either already in the ledger, standard precalculus notation, glossed in place, or clearly previewed as later chapter business. Clean dimensions: U1, U2, U3, U4, U5, F1, F2, F3, F4, F5.”</span>
+  </div>
+
+  <div class="ledger"><span class="sec">§3.2</span> <span class="tok">20,977 tok · 0 findings</span>
+    <span class="q">“Ran exactly the two requested independent sweeps: reader-persona first-read friction and introduce-before-use. For introduce-before-use, I checked symbols/terms/notations including composition/composite, \(P=f\circ g\), \(h\) increments, \(u_0/y_0\), Leibniz \(dy/dx\) form, inner/outer function language, differentiability/remainder form, \(R\), \(R_1/R_2/R_3\), \(m_1/m_2\), epsilon-delta symbols, \(\alpha/\alpha_1\), quotient/product/power-rule references, \(\sin^2 x/\cos^2 x\) notation, and inverse-function names in the closing paragraph against the ledger and local glosses. No tier 1-3 findings. Clean dimensions: U1, U2, U3, U4, U5, F1, F2, F3, F4, F5.”</span>
+  </div>
+
+  <div class="ledger"><span class="sec">§3.3</span> <span class="tok">19,544 tok · 0 findings</span>
+    <span class="q">“Clean: no tier 1-3 findings. introduce-before-use checked symbols/terms including \(\ln\), logarithmic differentiation, \(W\), \(y\) as a function of \(x\), \(\frac{d}{dx}\ln y = y'/y\), \(\frac{d}{dx}\ln u = u'/u\), antiderivative, inverse-trig branch/interior language, vertical tangent, open interval restrictions, and summary domain conditions; all are either ledger-known, standard notation, introduced/glossed in place, or immediately recoverable from adjacent prose. Clean dimensions: U1, U2, U3, U4, U5, F1, F2, F3, F4, F5.”</span>
+  </div>
+
+  <footer>
+    gate 2：Codex <code>codex-cli 0.136.0</code>（model <code>gpt-5.5</code>、xhigh、read-only、ChatGPT 訂閱）逐節 schema-constrained 複核；clean inline UTF-8、③ ledger 餵入、smoke test 先行。<b>全章 0 findings</b>，60,943 token，0 個 U+FFFD。<br>
+    <b>雙閘收斂：</b> gate-1（0 survivors）∩ gate-2（0 findings）＝<b>整章乾淨、0 課文改動</b>。無套用 → 無 build、無範圍限定 Mode B、無 render 自驗需求（未碰任何 <code>fragments/</code>）。<br>
+    ⛳ <b>停。</b> 待你裁決最終收尾（如授權 commit：僅納本輪 readability 3 份 HTML ＋ gate-2 audit md，不夾帶 session 既有未提交改動）。
+  </footer>
+</div>
+</body>
+</html>

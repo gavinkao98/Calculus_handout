@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch3 可讀性回填 — applied（套用紀錄）｜① reader-persona ＋ ② introduce-before-use</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{ --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --new:#1a7f37; --accent:#2552b3; --chip:#eef0f4; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 3 可讀性回填 — applied（套用紀錄）</h1>
+  <p class="lede">記錄本輪兩條檢查（① reader-persona、② introduce-before-use）雙閘收斂後實際套用到 <code>fragments/ch03/</code> 的改動。唯讀流程、採納須使用者逐條點頭。2026-06-28。</p>
+
+  <div class="note pass"><b>0 課文改動 —— ch03 雙閘全乾淨，無任何採納項待套用。</b><br>
+  <b>gate-1（Claude Opus）：</b> reader pass 2 raw findings → 對抗 verifier <b>全砍（2/2，皆 high dumbing-risk、且回原文核對成立）</b>；completeness pass（②記號-ledger＋L2長句＋跳步代數三鏡頭）<b>0 new</b>。0 survivors。<br>
+  <b>gate-2（Codex gpt-5.5, xhigh）：</b> 三節各 <b>0 findings</b>、U1–U5／F1–F5 全 clean，跨模型獨立確認。<br>
+  <b>兩閘交集為空集。</b> 因 0 survivors／0 findings，無採納項 → 未編輯任何 <code>fragments/ch03/*</code>、未動 <code>chapter3-print-standalone.html</code>。</p></div>
+
+  <table class="sum">
+    <tr><th>節</th><th>gate-1 採納</th><th>gate-2 採納</th><th>套用改動</th><th>Mode B 回歸</th></tr>
+    <tr><td>§3.1 Derivatives of Sine and Cosine（含章開場）</td><td class="zero">0</td><td class="zero">0</td><td>—（無）</td><td>N/A</td></tr>
+    <tr><td>§3.2 The Chain Rule</td><td class="zero">0</td><td class="zero">0</td><td>—（無）</td><td>N/A</td></tr>
+    <tr><td>§3.3 Applications of the Chain Rule（含 summary）</td><td class="zero">0</td><td class="zero">0</td><td>—（無）</td><td>N/A</td></tr>
+    <tr><td><b>合計</b></td><td class="zero"><b>0</b></td><td class="zero"><b>0</b></td><td><b>0 改動</b></td><td><b>N/A</b></td></tr>
+  </table>
+
+  <h2>後續步驟狀態</h2>
+  <div class="note"><b>build：</b> N/A——未編輯任何 fragment，<code>chapter3-print-standalone.html</code> 內容區塊與現行版本一致，無需 <code>python build.py ch03</code> 重組。<br>
+  <b>範圍限定 Mode B：</b> N/A——無新句／改寫，無待回歸對象。<br>
+  <b>render 自驗：</b> N/A——未碰任何課文或公式 display，render 狀態與「ch03 已過全閘」時相同（該狀態 <code>ready=true</code>、<code>katex-errors=0</code>）；本輪無新增可能引入 KaTeX 錯誤的編輯。<br>
+  <b>砍除條復活通道：</b> 若你覆核 gate-1 報告後認為 <code>G1-1</code>（§3.1 even-ness 延拓）或 <code>G1-2</code>（§3.3 bijection 對應）不該砍，指名即可重啟「採納 → build → Mode B → 更新本報告」。</div>
+
+  <footer>
+    本輪產物：<code>REVIEW-ch03-readability-gate1.html</code>（Claude 雙 agent ＋ completeness）／<code>REVIEW-ch03-readability-gate2.html</code>（Codex 跨模型）／本檔 ＋ <code>_dev-archive/ch03/ch03_readability-gate2-audit.md</code>（gate-2 原始輸出轉錄）。<br>
+    <b>結論：</b> ch03 在 ① reader-persona ＋ ② introduce-before-use 兩條 2026-06-28 檢查上，經 Claude＋Codex 雙閘獨立複核<b>整章乾淨、0 課文改動</b>。
+  </footer>
+</div>
+</body>
+</html>

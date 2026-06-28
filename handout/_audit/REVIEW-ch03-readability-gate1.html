@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch3 可讀性回填 — gate 1（Claude）審核稿｜① reader-persona ＋ ② introduce-before-use</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: {
+        arccsc: ['\\operatorname{arccsc}'],
+        arcsec: ['\\operatorname{arcsec}'],
+        arccot: ['\\operatorname{arccot}']
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.0rem;margin:24px 0 4px;color:var(--accent)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}
+  .warnnote b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.c2{background:#fdeede;color:#9a5a12}
+  .chip.sev-sl{background:#fff0d6;color:#8a5a00}
+  .chip.sev-mi{background:#eef0f4;color:#555}
+  .chip.t2{background:#fde7e7;color:#a11}
+  .chip.t3{background:#eef0f4;color:#555}
+  .chip.t4{background:#eef0f4;color:#888}
+  .chip.surv{background:#e6f7ea;color:#1a7f37}
+  .chip.cutv{background:#fbeaea;color:#a11;font-weight:700}
+  .chip.dr{background:#fff0d6;color:#8a5a00}
+  .chip.struct{background:#efe7fb;color:#5b3aa8}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .gate2{color:var(--muted);font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .gate2 b{color:#444}
+  .conf{color:#1a7f37;font-size:.85rem;margin:6px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .conf b{color:#1a7f37}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:64px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  .ctx{background:#f5f6f8} .ctx .tag{color:var(--muted)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  .none{color:var(--muted);font-style:italic;padding:8px 2px}
+  .ledger{background:#fafafa;border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.88rem}
+  .ledger .sec{font-weight:700;color:var(--accent);font-family:ui-monospace,Menlo,Consolas,monospace}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 3 可讀性回填 — gate 1（Claude）審核稿</h1>
+  <p class="lede">把 2026-06-28 新增的兩條規則回填 Ch3。本關只跑兩條<b>平起平坐</b>的具名檢查，不重跑任何既有閘（Ch3 的數學 M1–M8／S·A·V／圖 D1–D8 已於 2026-06-27 收斂）：<br>
+  <b>①&nbsp;reader-persona first-read</b>——以「讀完高中先修、用英文（非母語）自學、第一次線性讀（且已讀完 Ch1+Ch2）」的視角找首讀摩擦。<br>
+  <b>②&nbsp;introduce-before-use</b>——記號／術語／非正式記法是否先用後定義（U4 排序面，獨立掃一遍）。<br>
+  契約見 <code>handout/_audit/PROSE-AUDIT-RUBRIC.md</code>；格式比照 Ch1 pilot（<code>REVIEW-ch01-readability-gate1.html</code>）。唯讀、propose-only：裁決前不改任何課文。2026-06-28。</p>
+
+  <div class="note pass"><b>整章 0 blocking、0 advisory 存活 —— ch03 為乾淨章。</b><br>
+  • <b>reader-persona pass：</b> 2 raw findings（3 節各跑 ①＋②）→ 經對抗式複核（adversarial verify）<b>全數砍除（2/2）</b>，二者皆 high dumbing-risk（補述會 restate adjacent prose／over-gloss 一個 Stewart 語域刻意略去的瑣節）。<br>
+  • <b>完整性複核 pass（false-negative 保險）：</b> 再對每節跑一個 diverse-lens completeness critic（三鏡頭獨立第二讀：②記號-ledger ＋ L2 長句 parse ＋ 跳步代數）→ <b>0 new findings</b>。<br>
+  • <b>② introduce-before-use：三節全清。</b> 每個非-precalc 記號/術語都解析到 prior（Ch1/Ch2/§3 前節）、standard precalc、或就地 gloss。<br>
+  此結果與「Ch3 已過完整 S·A·V 散文閘（含 U／F 維度）」一致；可讀性回填的兩條檢查多被該閘涵蓋，乾淨是預期且有效的結果。</div>
+
+  <div class="note"><b>方法（雙 agent 對抗 ＋ 完整性複核）：</b> ① 每節先由 reader-persona agent 跑 ①＋② 兩條獨立掃描；② 對<b>每一條 raw finding</b> 派一個對抗 verifier（預設懷疑、誠實重評嚴重度、查 no-dumbing 護欄、確認 ② 真為先用後定義而非當場 gloss／更早已介紹）；③ 再加一輪每節 diverse-lens completeness critic 抓單一 reader 可能漏的 false negative，新 finding 再對抗 verify。本表 severity／tier 採 <b>verifier 修正後</b>值。<b>校準訊號：</b> verifier 砍除率 100%（與 rubric「reasoning 模型偏 over-report、須過 triage」實證一致）；完整性複核獨立建 ② 記號 ledger 並實際 Grep/Read 核對 Ch1/Ch2 cross-ref（squeeze theorem <code>§1.5</code>、quotient rule <code>§2.5</code>、二階導記號、<code>e^x §2.4</code> 皆 confirmed 存在），非空轉。</div>
+
+  <div class="note warnnote"><b>這是 gate-1（Claude，免費）。</b> gate-2（Codex，訂閱計費，跨模型獨立複核同樣兩條檢查）<b>尚未跑</b>——需先就模型／用量／成本向你徵得同意。<b>Ch1 教訓提醒：</b> 即使 gate-1 乾淨，gate-2 的不可取代價值＝跨模型獨立交集＋抓 gate-1 套用後可能的迴歸；Ch1 正是靠 gate-2 才抓到套用時掉了限定詞 <code>integers</code>。本章 gate-1 0 survivors＝無套用、無迴歸風險，但跨模型交集仍建議跑。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>raw / 存活</th><th>完整性複核 new</th><th>處置摘要</th></tr>
+    <tr><td>§3.1 Derivatives of Sine and Cosine（含章開場）</td><td>1 / <span class="zero">0</span></td><td><span class="zero">0</span></td><td>G1-1 砍（① U3；even-ness 上一段已給）</td></tr>
+    <tr><td>§3.2 The Chain Rule</td><td>0 / <span class="zero">0</span></td><td><span class="zero">0</span></td><td>乾淨（①② 皆無 raw）</td></tr>
+    <tr><td>§3.3 Applications of the Chain Rule（含 Chapter summary）</td><td>1 / <span class="zero">0</span></td><td><span class="zero">0</span></td><td>G1-2 砍（① U3；bijection 前三句已述）</td></tr>
+    <tr><td><b>合計</b></td><td><b>2 / <span class="zero">0</span></b></td><td><b><span class="zero">0</span></b></td><td><b>整章 0 blocking、0 存活</b></td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：<b>易懂性</b> U1 動機缺位 · U2 重型形式無 gloss · U3 未解釋的跳躍 · U4 先用後定義 · U5 定義後未拆解 ／ <b>流暢性</b> F3 句構可解析 · F4 句長／負荷。 嚴重度：<b>Lost</b>（讀不下去）· <b>Slowed</b>（須重讀但能回神）· <b>Minor</b>（小顛簸）。 兩條 raw findings 皆 ①（reader-persona）／U3，無一條 ②。</p>
+
+  <!-- ===================== 兩條候選（皆經雙閘砍除） ===================== -->
+  <h2>兩條候選（皆經雙閘砍除——透明列出供你覆核／可指名復活）</h2>
+  <p class="lede">本章只生出這兩條 raw findings，且皆被對抗 verifier 砍除。我已逐條回 fragment 原文核對 verifier 的砍除理由（見每卡「源碼核對」列），確認砍除成立。仍全卡列出，供你親裁；如你不同意某條砍除，可指名 <code>G1-編號</code> 要求復活。</p>
+
+  <h3>§3.1 Derivatives of the Sine and Cosine Functions</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-1</span><span class="chip c1">① reader-persona</span><span class="chip unit">「A geometric inequality」段，display (1) 後末句</span><span class="chip dim">U3</span><span class="chip sev-mi">Minor</span><span class="chip t4">tier 4</span><span class="chip cutv">✗ 砍除</span><span class="chip dr">dumbing-risk: high</span></div>
+    <div class="issue"><b>reader agent 主張（原判 Slowed／tier-2）：</b> 正文剛只對 \(0 < \theta < \tfrac{\pi}{2}\)（嚴格正）證得 \(\sin\theta \le \theta \le \tan\theta\)；「In particular」卻把界推到<em>所有</em> \(\lvert\theta\rvert < \tfrac{\pi}{2}\)（含負角與 \(\theta=0\)）。首讀 L2 讀者回看正角推導，未必立刻看出負角靠的是 \(\lvert\sin\theta\rvert\)、\(\lvert\theta\rvert\) 的偶性，會停下重建；而此界緊接著被 Proposition 3.1 證明直接引用，故 gap 有感。</div>
+    <div class="row old"><span class="tag">原文</span>In particular \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) for \(\lvert \theta \rvert < \tfrac{\pi}{2}\) — a bound we lean on repeatedly below.</div>
+    <div class="row new"><span class="tag">原提議</span>補一句偶性延拓，如「…since both \(\lvert\sin\theta\rvert\) and \(\lvert\theta\rvert\) are even in \(\theta\), the bound holds for \(\lvert\theta\rvert<\tfrac{\pi}{2}\)…」。</div>
+    <div class="gate2"><b>對抗 verifier（砍除 → Minor／tier-4／dumbing-risk high）：</b> 延拓所需的偶性事實<b>剛在同小節上一段（line 77）給過</b>——「Because both \(\theta\) and \(\sin\theta\) reverse sign when \(\theta\) is replaced by \(-\theta\)… it is enough to treat \(\theta > 0\)」。故從正角結果到 \(\lvert\sin\theta\rvert\le\lvert\theta\rvert\) 是「由剛給事實一步推得」＝<b>就地相鄰回神</b>（rubric 明令降評）。「In particular」誠實（\(\lvert\sin\theta\rvert\le\lvert\theta\rvert\) 確由 \(\sin\theta\le\theta\) 得），\(0\le\) 與 \(\theta=0\) 也已寫明。<b>原提議重述 line 77 的偶性論證＝textbook「restates adjacent prose」、且 over-gloss 一個 Stewart 語域刻意略去的瑣節 → high dumbing risk。</b></div>
+    <div class="conf"><b>源碼核對（我）：</b> 確認 <code>sec-3-1.html:77</code> 偶性事實在前、<code>:96</code> 為該界；砍除成立。</div>
+  </div>
+
+  <h3>§3.3 Applications of the Chain Rule</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2</span><span class="chip c1">① reader-persona</span><span class="chip unit">Example 3.14 solution（line 196）</span><span class="chip dim">U3</span><span class="chip sev-mi">Minor</span><span class="chip t4">tier 4</span><span class="chip cutv">✗ 砍除</span><span class="chip dr">dumbing-risk: high</span></div>
+    <div class="issue"><b>reader agent 主張（原判 Minor／tier-3）：</b> 文中說開區間 \(x\in(-\tfrac{\pi}{2},\tfrac{\pi}{2})\) 在 \(y=\sin x\) 下「corresponds exactly to」開區間 \(y\in(-1,1)\)，但未給「為何恰好對應」的理由（須自行補：sine 在此 branch 連續且嚴格遞增、把端點 \(\pm\tfrac{\pi}{2}\) 帶到 \(\pm 1\)）。雖可由 precalc 回神，但無 since，讀者會停一下再信任後續代入。</div>
+    <div class="row old"><span class="tag">原文</span>Writing \(y = \sin x\), this interior corresponds exactly to \(y \in (-1, 1)\)</div>
+    <div class="row new"><span class="tag">原提議</span>補一短句，如「since sine increases continuously from \(-1\) to \(1\) across this branch, the open interior … corresponds exactly to \(y\in(-1,1)\)」。</div>
+    <div class="gate2"><b>對抗 verifier（砍除 → Minor／tier-4／dumbing-risk high）：</b> 「恰好對應」是<b>同一解答前三句（line 193）剛述的雙射</b>之即時推論——「for \(-1\le y\le 1\), \(\arcsin y\) is the unique angle \(x\) in that interval with \(\sin x = y\)」，並由 Ch1 §1.2 加強。端點 \(\pm\tfrac{\pi}{2}\leftrightarrow\pm1\) 的對應顯然；finding 自己也承認此事實「recoverable from precalc knowledge」＝就地相鄰回神，<b>連 Minor 都不到</b>。原提議重述 line 193 已給的雙射、再 gloss 一個自明的內點對內點映射＝water，Stewart 語域略去。</div>
+    <div class="conf"><b>源碼核對（我）：</b> 確認 <code>sec-3-3.html:193</code> 雙射在前、<code>:196</code> 為該句；砍除成立。</div>
+  </div>
+
+  <!-- ===================== 完整性複核 ledger ===================== -->
+  <h2>完整性複核：② 記號 ledger ＋ L2 句構 ＋ 跳步代數（0 new findings）</h2>
+  <p class="lede">每節獨立跑一個 completeness critic，專抓單一 reader 可能漏的 false negative。三鏡頭：<b>A</b> 逐符號建 ② ledger（每筆標 introduced-where）、<b>B</b> L2 長句 parse、<b>C</b> 每個 so/therefore＋display 的跳步代數。三節皆回 0 new。下列為各節 ledger 摘要（節錄）。</p>
+
+  <div class="ledger"><span class="sec">§3.1</span> — <b>A ledger：</b> difference quotient／\(\sin(x+h)\)〔Ch2 §2.2〕、indeterminate form \(0/0\)〔Ch1〕、sum-to-product／Pythagorean／\(\tan=\sin/\cos\)〔precalc〕、unit circle／inscribed triangle／sector／chord／arc／segment／disc area \(\pi r^2\)／tangent line〔precalc 幾何〕、even function〔Ch1 無，但 line 77 就地 gloss〕、squeeze theorem §1.5〔Ch1，已核 <code>ch01/sec-1-5.html:227</code> 存在〕、continuity〔Ch1，D3 cross-ref〕、quotient rule §2.5〔Ch2，已核〕、\(\sec/\csc/\cot\)〔precalc〕、\(s''\)／\(d^4/dx^4\)〔Ch2 §2.3，已核〕、SHM〔line 278 就地 gloss〕、tag (1) 回引〔標準〕。<b>每筆皆解析到 prior/precalc/in-place。</b> <b>B：</b> 長句（lines 38, 60, 68, 94, 278, 294）皆 clause-stacked 但 L2 單次可 parse。 <b>C：</b> 每步帶 because/since；硬步（sector squeeze、radian）為 inherent-but-fair。</div>
+
+  <div class="ledger"><span class="sec">§3.2</span> — <b>A ledger：</b> composition／\(f\circ g\)／\(P=f(g(x))\)〔line 50 就地〕、product rule §2.5 ＋ differentiable⇒continuous §2.3 Thm 2.1〔Ch2〕、\(u=g(x),y=f(u),\frac{dy}{dx}=\frac{dy}{du}\frac{du}{dx}\)〔Remark 3.2 就地〕、remainder form／\(R(h)\)／\(R(h)/h\to0\)〔Def 3.1 ＋ line 98 informal gloss〕、\(m_1,R_1,m_2,R_2,R_3,\varepsilon,\delta,\alpha,\alpha_1\)〔proof 就地，ε-δ 源 Ch1〕、\(\cos u\) via Theorem 3.1〔§3.1，已核〕、power rule／\(e^x\)〔Ch2〕、\(\ln x/\arcsin x/\arctan x/x^x\)〔僅 forward-named，未用〕。<b>無先用後定義且不可重建者。</b> <b>B：</b> lines 43, 104, 131 ＋ Fig 3.6 caption 皆 clause-segmented、標點正確、無 garden-path。 <b>C：</b> 每步 because/since 或 expansion:formula 補齊（Prop 3.3 proof、\(R_3\) split line 145、ε-δ bullets、triangle ineq line 154）。</div>
+
+  <div class="ledger"><span class="sec">§3.3</span> — <b>A ledger：</b> \(\ln x\)〔L56 就地 \(e^{\ln x}=x\)〕、\(x^x\)〔L49/L101 就地〕、arcsin/arccos/arctan〔Ch1 §1.2 ＋ L193/L226/L246 recall〕、\(e^u,\frac{d}{du}e^u=e^u\)〔Ch2 §2.4 Thm 2.5，L69 cite〕、chain rule Thm 3.3／Strategy 3.1〔§3.2，cite〕、product rule Thm 2.6〔Ch2，L109 cite〕、logarithmic differentiation〔L79 gloss〕、\(a^x=a^x\ln a\)〔L130 derived〕、\(\sin'=\cos\)／\(\cos'=-\sin\)／\(\tan'=\sec^2\)〔§3.1，cite〕、Pythagorean \(\sec^2=1+\tan^2\)〔precalc〕、MVT〔僅 forward fence 到 §4.4，未用〕、antiderivative〔L148 同句 gloss、未下游用——連 Minor 不到〕。<b>全解析到 prior/precalc/glossed-in-place。</b> <b>B：</b> 最長句 L51/L92/L196 L2 單次可 parse。 <b>C：</b> Example 3.13 的 \(u'/u\) 與係數顯式寫出；\(\sqrt{1-y^2}\) 取號（L196/L228）為 signposted inherent difficulty。</div>
+
+  <footer>
+    gate 1：Claude workflow 兩輪（① reader-persona pass：3 節 reader agent ＋ 逐條對抗 verifier；② completeness pass：3 節 diverse-lens critic）。唯讀、propose-only。<b>整章 0 blocking、0 advisory 存活</b>；2 raw → 0 存活（皆 high dumbing-risk 砍除）＋ 完整性複核 0 new。<br>
+    ⛳ <b>停。</b> 等你過目此稿。本章 gate-1 <b>0 survivors → 無課文改動待套用、無迴歸風險</b>。<br>
+    下一步（待你授權）：① <b>確認此 clean 結果並授權跑 gate-2（Codex 訂閱，需先徵模型／用量／成本同意）</b>取跨模型獨立交集；或 ② 指名復活任一 <code>G1-</code> 砍除條再裁。裁決前不改任何 <code>fragments/</code>。
+  </footer>
+</div>
+</body>
+</html>
