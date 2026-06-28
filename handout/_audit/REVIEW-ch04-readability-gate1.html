@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch4 可讀性回填 — gate 1（Claude）審核稿｜① reader-persona ＋ ② introduce-before-use</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: {
+        arccsc: ['\\operatorname{arccsc}'],
+        arcsec: ['\\operatorname{arcsec}'],
+        arccot: ['\\operatorname{arccot}']
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70;
+    --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3;
+    --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; --block:#a11;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+    line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.0rem;margin:24px 0 4px;color:var(--accent)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)}
+  .pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)}
+  .warnnote b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.92rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);border-style:dashed}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);
+    color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.c2{background:#fdeede;color:#9a5a12}
+  .chip.sev-sl{background:#fff0d6;color:#8a5a00}
+  .chip.sev-mi{background:#eef0f4;color:#555}
+  .chip.t2{background:#fde7e7;color:#a11}
+  .chip.t3{background:#eef0f4;color:#555}
+  .chip.surv{background:#e6f7ea;color:#1a7f37}
+  .chip.cut{background:#f0eded;color:#8a8a8a;text-decoration:line-through}
+  .chip.struct{background:#efe7fb;color:#5b3aa8}
+  .chip.rec{background:#1a7f37;color:#fff;font-weight:700}
+  .chip.leave{background:#8a5a00;color:#fff;font-weight:700}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .gate2{color:var(--muted);font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .gate2 b{color:#444}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:64px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  .ctx{background:#f5f6f8} .ctx .tag{color:var(--muted)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  .none{color:var(--muted);font-style:italic;padding:8px 2px}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 4 可讀性回填 — gate 1（Claude）審核稿</h1>
+  <p class="lede">把 2026-06-28 新增的兩條規則回填 Ch4（指數與對數函數；本章把 \(e^{x}\) 從冪級數重建：完備性、ε-δ、Bolzano–Weierstrass、Cauchy 數列、Rolle/MVT）。本關只跑兩條<b>平起平坐</b>的具名檢查，不重跑任何既有閘（數學 M1–M8／S·A·V／圖 D1–D8 已於 2026-06-27 過）：<br>
+  <b>①&nbsp;reader-persona first-read</b>——以「讀完高中先修、用英文（非母語）自學、第一次線性讀」的視角找首讀摩擦。<br>
+  <b>②&nbsp;introduce-before-use</b>——記號／術語／非正式記法是否先用後定義（U4 排序面，獨立掃一遍）。<br>
+  契約見 <code>handout/_audit/PROSE-AUDIT-RUBRIC.md</code>。唯讀、propose-only：裁決前不改任何課文。2026-06-28。</p>
+
+  <div class="note pass"><b>整章 0 blocking（0 Lost）。</b> 9 raw findings（5 節各跑 ①＋②）→ 經對抗式複核（adversarial verify）<b>全數存活、0 條砍除</b>，但 verifier 把其中 6 條由 Slowed 誠實降為 Minor／tier-3。留下處置：<b>3 條 tier-2 advisory</b>（無 dumbing 風險，建議採）＋<b>6 條 tier-3 選配</b>（其一帶 dumbing 警示、建議維持原樣；其一為跨節 ε/δ 命名一致性）。<b>無一條達 blocking。</b></div>
+
+  <div class="note pass" style="border-left-color:#1a7f37"><b>② introduce-before-use：全章 5 節 0 finding。</b> 每個記號／術語／非正式記法（\(P_{k}\)、尾界 \((*)\)／\((**)\)、\(n_{0}\)、\(L\)、Cauchy、peak、\(x_{M}/x_{m}\)、輔助函數 \(g\)、\(\ln x\)、\(a^{x}\)…）皆在首用處或更早（本節／前節／標準 precalc）已介紹。<b>本章無 Ch1 §1.4 <code>=∞</code> 那類結構型先用後定義案例</b>——所有 9 條 finding 都落在 ① reader-persona（U1 動機就地缺位／U3 跳一步代數），無一條 ②。</div>
+
+  <div class="note"><b>方法（雙 agent 對抗）：</b> 每節先由 reader-persona agent 跑 ①＋②，再對<b>每一條 finding</b> 派一個對抗 verifier（預設懷疑、誠實重評嚴重度、查 no-dumbing、確認真的「先用後定義」而非當場 gloss／更早已介紹）。本表 severity／tier 採 <b>verifier 修正後</b>值；reader 原判與修正寫在每張卡的「雙閘」列。<b>校準訊號：</b> verifier 把 6/9 過度回報的 Slowed 降為 Minor（與 rubric「reasoning 模型偏 over-report、須過 triage」一致），並對 §4.3 一條提議標 dumbing_risk（reader 想把證明內容前置到 Proposition 陳述）。</div>
+
+  <div class="note warnnote"><b>這是 gate-1（Claude，免費）。</b> gate-2（Codex，訂閱計費，跨模型獨立複核同樣兩條檢查）<b>尚未跑</b>——需先就模型／用量／成本向你徵得同意（參考 Ch1：每節 ~2.5–3.3 萬 token、全章 ~17 萬）。最終以<b>兩閘交集</b>為最高信心候選交裁決；gate-2 的不可取代價值＝抓 gate-1 套用後的迴歸（Ch1 教訓：套用時掉 <code>integers</code> 限定詞，靠跨模型才抓到）＋跨模型獨立交集。</div>
+
+  <table class="sum">
+    <tr><th>節</th><th>候選（tier-2 / tier-3）</th><th>處置摘要</th></tr>
+    <tr><td>§4.1 Construction of the Exponential Function（含章開場）</td><td>1（1 / 0）</td><td><b>G1-1 留（tier-2）</b></td></tr>
+    <tr><td>§4.2 Continuity and the Exponent Law for \(e^{x}\)</td><td>4（2 / 2）</td><td><b>G1-2·G1-4 留（tier-2）</b>；G1-3·G1-5 降 tier-3</td></tr>
+    <tr><td>§4.3 The Derivative of \(e^{x}\)</td><td>1（0 / 1）</td><td>G1-6 降 tier-3（<b>dumbing 警示→建議維持原樣</b>）</td></tr>
+    <tr><td>§4.4 Rolle’s Theorem and the Mean Value Theorem</td><td>1（0 / 1）</td><td>G1-7 降 tier-3</td></tr>
+    <tr><td>§4.5 Monotonicity and the Logarithmic Function</td><td>2（0 / 2）</td><td>G1-8 降 tier-3；G1-9 降 tier-3（<b>跨節 ε/δ 一致性</b>）</td></tr>
+    <tr><td colspan="3" style="background:#eaf6ed"><b>② introduce-before-use：全章 0 finding（5 節皆 clean）。</b></td></tr>
+  </table>
+  <p class="lede" style="margin-top:6px">維度：<b>易懂性</b> U1 動機就地缺位（戰術選擇／常數無就地理由）· U3 未解釋的跳躍（跳一步代數／reparametrization）。 嚴重度：<b>Lost</b>（讀不下去／放棄）· <b>Slowed</b>（須重讀但能回神）· <b>Minor</b>（小顛簸）。 修法型：本章全為 <b>(a) 局部</b>就地 gloss／because-bridge／forward-ref／補一行代數（皆低風險、無 reorder）；無 ②結構型。</p>
+
+  <!-- ===================== 主要候選 tier-2 ===================== -->
+  <h2>主要候選（tier-2 advisory，雙閘存活、無 dumbing 風險，建議採）</h2>
+
+  <h3>§4.1 Construction of the Exponential Function</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-1</span><span class="chip c1">① reader-persona</span><span class="chip unit">收尾段，display \((*)\) 前一句</span><span class="chip dim">U3</span><span class="chip sev-sl">Slowed</span><span class="chip t2">tier 2</span><span class="chip surv">✓ 存活</span><span class="chip rec">建議採</span></div>
+    <div class="issue">Theorem 4.2 的證明固定<b>單一</b> \(x\)、取 \(n_{0} &gt; 2x\)。收尾段悄悄切到 <b>uniform</b> 設定：\(x\) 改成在 \(0 &lt; x &lt; L\) 區間遊走、門檻變 \(n_{0} &gt; 2L\)，但沒講「重點是挑<b>一個</b>對整段區間都成立的 \(n_{0}\)」。且 \((*)\) 顯示鏈的中段 \(e^{x} - P_{k}(x) \le L^{k}/k!\) 從未推導（證明裡是對單一 \(x\) 的幾何收攏，這裡換了參數 \(L\) 又要讀者自行重建）。首讀者撞到無橋接的 reparametrization＋未推導的中段。「one \(n_{0}\) for all \(x\)」這層意圖要到 \((*)\) <em>之後</em>那句才講。</div>
+    <div class="row old"><span class="tag">原文</span>The estimate inside the proof does more than establish convergence: it measures how fast the partial sums close in on \(e^{x}\). <del>Repeating the tail bound for the terms beyond index \(k\) shows that, for \(0 &lt; x &lt; L\) and any \(k &gt; n_{0} &gt; 2L\),</del>　[接 display \((*)\)]</div>
+    <div class="row new"><span class="tag">建議</span>…it measures how fast the partial sums close in on \(e^{x}\). <ins>Now fix an interval \(0 &lt; x &lt; L\) and pick \(n_{0} &gt; 2L\) once, so the same threshold serves every such \(x\); bounding each term by \(x^{n}/n! \le L^{n}/n!\) and repeating the geometric collapse from the proof gives, for \(k &gt; n_{0}\),</ins>　[接 display \((*)\)]</div>
+    <div class="gate2"><b>雙閘：</b> reader 判 Slowed/tier-2 → verifier 核引文逐字（fragment line 162/165）、確認中段 \(L^{k}/k!\) 未推導、「one \(n_{0}\) for all \(x\)」只在 line 167（display 後）才講，<b>維持 Slowed/tier-2、upheld</b>。dumbing：無（補的是 \(x \le L\) 項界＋既有 uniform 意圖，不加數學、不降嚴謹）。</div>
+  </div>
+
+  <h3>§4.2 Continuity and the Exponent Law for \(e^{x}\)</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2</span><span class="chip c1">① reader-persona</span><span class="chip unit">Theorem 4.3 證明，取 \(\delta\) 那句</span><span class="chip dim">U1</span><span class="chip sev-sl">Slowed</span><span class="chip t2">tier 2</span><span class="chip surv">✓ 存活</span><span class="chip rec">建議採</span></div>
+    <div class="issue">\(\delta\) 被限制 \(&lt; \min\{x_{0}/2,\ 1/2\}\) 時，當下對兩個界都無理由。\(x_{0}/2\) 是為了保 \(x &gt; x_{0}/2 &gt; 0\)、\(1/2\) 是為了保 \(x &lt; x_{0}+1\) 落在 \((*)\) 成立的區間——但這理由要到<b>下一個 display</b>（「Since \(\delta &lt; x_{0}/2\) …」）才出現。首讀者看到兩段式 \(\min\) 像憑空常數。修法 <b>(a) 局部</b>：在約束處就地 forward-gloss 其用途。</div>
+    <div class="row old"><span class="tag">原文</span>…every polynomial is continuous, so there is a \(\delta &gt; 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\), such that</div>
+    <div class="row new"><span class="tag">建議</span>…there is a \(\delta &gt; 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\) <ins>(the first bound keeps \(x &gt; 0\), the second keeps \(x &lt; x_{0}+1\))</ins>, such that</div>
+    <div class="gate2"><b>雙閘：</b> reader 判 Slowed/tier-2 → verifier 核引文逐字（line 58）、確認理由在兩個 display 後（line 62）才現，<b>維持 Slowed/tier-2、upheld</b>。dumbing：無（約束處 forward-gloss 用途，不軟化、不刪界、不重述）。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-4</span><span class="chip c1">① reader-persona</span><span class="chip unit">Theorem 4.7 證明開頭，取 \(n_{0} &gt; 8L\)</span><span class="chip dim">U1</span><span class="chip sev-mi">Minor</span><span class="chip t2">tier 2</span><span class="chip surv">✓ 存活</span><span class="chip rec">建議採</span></div>
+    <div class="issue">\(n_{0} &gt; 8L\) 出現時無動機。因子 \(8\) 既非 \((*)\) 的 \(2L\)、也非區間的 \(2L\)，它是為了 <b>Step 4</b> 讓 \((2L)/\ell &lt; \tfrac14 &lt; \tfrac12\)（\(\ell &gt; n_{0} &gt; 8L\)）。但這 payoff 在三步後（~17 行 downstream），所以取值當下 \(8L\) 像魔術常數。（對照 §4.1 的 \(n_{0} &gt; 2x\)，其 \(r &lt; \tfrac12\) 用意在下一行就看得到。）修法 <b>(a) 局部</b>：純 forward-ref 半句，不洩 Step 4。</div>
+    <div class="row old"><span class="tag">原文</span>Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k &gt; n_{0} &gt; 8L\).</div>
+    <div class="row new"><span class="tag">建議</span>…throughout, take \(k &gt; n_{0} &gt; 8L\) <ins>(the factor \(8\) is calibrated in Step 4, where it forces the tail ratio below \(\tfrac12\))</ins>.</div>
+    <div class="gate2"><b>雙閘：</b> reader 判 Minor/tier-2 → verifier 核引文逐字（line 209）、確認因子 \(8\) 的理由在 Step 4（line 226）才現、~17 行 downstream＝真 forward-ref 非重述鄰句，<b>維持 Minor/tier-2、upheld</b>。dumbing：無（純 forward-ref，比照 §4.1 慣例）。</div>
+  </div>
+
+  <!-- ===================== tier-3 選配 ===================== -->
+  <h2>tier-3 選配 polish（存活但 Minor；可裁可不裁）</h2>
+
+  <h3>§4.2 Continuity and the Exponent Law for \(e^{x}\)</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-3</span><span class="chip c1">① reader-persona</span><span class="chip unit">Theorem 4.7 證明 Step 5 末括號</span><span class="chip dim">U3</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">\((**)\) 原陳述於 \(\lvert x \rvert \le L\)。這裡套在 \(x+y\)（模 \(\le 2L\)），讀者須默默把 \((**)\) 的 \(L\) 換成 \(2L\)。「enlarging \(L\) to \(2L\) there」三字壓縮了這個代入；L2 首讀者看到固定符號 \(L\) 突然變 \(2L\)，會疑惑全域 \(L\) 是否改了（其實沒）。verifier 降 Minor：同括號已自 gloss「valid since \(\lvert x+y \rvert \le 2L\)」、且 \(2L\) 作為合成引數半徑在 Step 4 已出現。</div>
+    <div class="row old"><span class="tag">原文</span>…and the bound \((**)\) at \(x + y\) (valid since \(\lvert x + y \rvert \le 2L\), <del>enlarging \(L\) to \(2L\) there</del>)</div>
+    <div class="row new"><span class="tag">建議</span>…and the bound \((**)\) at \(x + y\) (valid since \(\lvert x + y \rvert \le 2L\), <ins>applying \((**)\) at radius \(2L\) — it holds for any radius</ins>)</div>
+    <div class="gate2"><b>雙閘：</b> reader 判 Slowed/tier-2 → verifier <b>降 Minor/tier-3、downgraded</b>：括號內即回神＝短暫停頓非 stall。dumbing：無，但 reader 原提議冗長、部分重述，改一句即可。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-5</span><span class="chip c1">① reader-persona</span><span class="chip unit">Theorem 4.7 證明 Step 4 幾何尾那行</span><span class="chip dim">U3</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span><span class="chip leave">近冗餘，可不採</span></div>
+    <div class="issue">從「ratio \((2L)/\ell &lt; \tfrac12\)」跳到封閉界 \((2L)^{n_{0}}/n_{0}! \cdot (\tfrac12)^{k-n_{0}}\)，重用 Strategy 4.1 機制但 summation 改成 \(\ell = k+1..\infty\) 在項 \((2L)^{\ell}/\ell!\) 上。讀者要把 Strategy 4.1 重新映到這個新級數，可重建但要刻意回讀。<b>verifier 評近乎冗餘</b>：被代入的項 \((2L)^{\ell}/\ell!\) 正是上一行的 summand、結果在下一行。</div>
+    <div class="row old"><span class="tag">原文</span>Since \(\ell &gt; n_{0} &gt; 8L\), each ratio \((2L)/\ell &lt; \tfrac{1}{4} &lt; \tfrac{1}{2}\), so the same geometric estimate that produced \((*)\) gives</div>
+    <div class="row new"><span class="tag">建議（如保留）</span>…so the same geometric estimate that produced \((*)\) <ins>(with \(L\) replaced by \(2L\))</ins> gives</div>
+    <div class="gate2"><b>雙閘：</b> reader 判 Minor/tier-3 → verifier <b>維持 Minor/tier-3、downgraded</b>，建議近乎不採；如保留只補「\(L \to 2L\)」一語（reader 原提議的「applied to the term \((2L)^{\ell}/\ell!\)」只是輕述鄰接 display）。dumbing：無但近冗餘。</div>
+  </div>
+
+  <h3>§4.3 The Derivative of \(e^{x}\)</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-6</span><span class="chip c1">① reader-persona</span><span class="chip unit">Proposition 4.2 陳述，\(\lvert h \rvert &lt; \tfrac12\) 假設</span><span class="chip dim">U1</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span><span class="chip leave">dumbing 警示→建議維持原樣</span></div>
+    <div class="issue">Proposition 陳述當下，門檻 \(\tfrac12\) 無理由、像天上掉的常數。其動機（保 \(\lvert h \rvert^{n-2} \le 1\) 使尾和 \(\le 1\)）在數行後的證明裡才現。首讀者會頓一下問「為何 \(\tfrac12\)？」再讀下去找答案。<b>但</b> reader 原提議把 \(\lvert h \rvert^{n-2} \le 1\) 尾界寫進<em>陳述</em>＝把證明內容前置、與緊接的證明重複——<b>verifier 標 dumbing_risk</b>。</div>
+    <div class="row ctx"><span class="tag">原文</span>For every nonzero \(h\) with \(\lvert h \rvert &lt; \tfrac{1}{2}\),</div>
+    <div class="row new"><span class="tag">建議</span><ins>維持原樣</ins>（「why \(\tfrac12\)」在自然閱讀序的下一個 environment（緊接的證明）即解、幾乎不卡）。<b>勿</b>把證明內容寫進陳述；最多在陳述後加 3 字 forward-pointer「(threshold justified in the proof)」。</div>
+    <div class="gate2"><b>雙閘：</b> reader 判 Minor/tier-2 → verifier <b>降 Minor/tier-3、downgraded、dumbing_risk=true</b>：reader 主提議把尾界搬進 Proposition 會 pre-empt 緊接證明＝冗餘；只接受最輕 forward-pointer 或維持原樣。</div>
+  </div>
+
+  <h3>§4.4 Rolle’s Theorem and the Mean Value Theorem</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-7</span><span class="chip c1">① reader-persona</span><span class="chip unit">Rolle 證明 Case 2，disjunction 那句</span><span class="chip dim">U3</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">要接受「\(m\)、\(M\) 不能同時等於共同端點值 \(\Rightarrow f(x_{M}) &gt; f(a)\) 或 \(f(x_{m}) &lt; f(a)\)」，首讀者得自補兩事：(i) \(f(a)\) 本身是 \(f\) 的值，故 EVT 界給 \(m \le f(a) \le M\)；(ii) Case 2 設 \(m &lt; M\)，故 \(f(a)\) 不能同時等於 \(m\) 與 \(M\)。鏈 \(m \le f(a) \le M\) 從未寫出，L2 讀者要停下重建。verifier 降 Minor：句子已自 gloss、Case 2 標籤已說 \(m &lt; M\)，同句內回神。</div>
+    <div class="row old"><span class="tag">原文</span>Since \(f(a) = f(b)\), the values \(m\) and \(M\) cannot both equal that common endpoint value, so at least one of \(f(x_{M}) &gt; f(a)\) or \(f(x_{m}) &lt; f(a)\) holds.</div>
+    <div class="row new"><span class="tag">建議</span><ins>Since \(f(a)\) is a value of \(f\), the bounds give \(m \le f(a) \le M\); with \(m &lt; M\) (Case 2), \(f(a)\) cannot equal both, so</ins> \(f(x_{M}) &gt; f(a)\) or \(f(x_{m}) &lt; f(a)\).</div>
+    <div class="gate2"><b>雙閘：</b> reader 判 Slowed/tier-2 → verifier <b>降 Minor/tier-3、downgraded</b>（polish 級）。dumbing：無（只揭示 \(m \le f(a) \le M\)，本可由原證明 line 146 不等式代 \(x=a\) 得）。</div>
+  </div>
+
+  <h3>§4.5 Monotonicity and the Logarithmic Function</h3>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-8</span><span class="chip c1">① reader-persona</span><span class="chip unit">Theorem 4.13 證明，\(\varepsilon = \min\{\dots\}\) 後接 “In both cases”</span><span class="chip dim">U3</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span></div>
+    <div class="issue">首讀者剛在 bullet list 看到兩個分別下界（case 1：\(x_{0} - y_{j} \ge \dots\)；case 2：\(y_{j} - x_{0} \ge \dots\)）。下一句直接斷言「In both cases \(\lvert y_{j} - x_{0} \rvert \ge \varepsilon\)」，但沒一句把「取 \(\min\) 後每個 case 的下界都 \(\ge\) 這共同 \(\min\)」連起來——讀者要自己把第一個 \(\min\) 引數配 case 1、第二個配 case 2。verifier 降 Minor：\(\varepsilon\) 的兩個 \(\min\) 引數正是 bullet list 兩下界的<b>逐字複本</b>、對應可直接視覺追溯。</div>
+    <div class="row old"><span class="tag">原文</span>\[ \varepsilon = \min\{\, e^{\ln x_{0}} - e^{\ln x_{0} - \delta},\ e^{\ln x_{0} + \delta} - e^{\ln x_{0}} \,\} &gt; 0, \]　In both cases \(\lvert y_{j} - x_{0} \rvert \ge \varepsilon\), so…</div>
+    <div class="row new"><span class="tag">建議</span>\[ \varepsilon = \min\{\,\dots\,\} &gt; 0, \]　<ins>—so each of the two case bounds is at least \(\varepsilon\).</ins>　In both cases \(\lvert y_{j} - x_{0} \rvert \ge \varepsilon\), so…</div>
+    <div class="gate2"><b>雙閘：</b> reader 判 Slowed/tier-2 → verifier <b>降 Minor/tier-3、downgraded</b>：「each \(\ge \min\{A,B\}\)」對目標讀者近反射＝瞥一眼回神。dumbing：無（只點明 \(\min\) 與兩 case 的對應，不重述不等式鏈）。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-9</span><span class="chip c1">① reader-persona</span><span class="chip unit">Theorem 4.13 證明，命名為 \(\varepsilon\) 的常數</span><span class="chip dim">U1</span><span class="chip sev-mi">Minor</span><span class="chip t3">tier 3</span><span class="chip surv">✓ 存活</span><span class="chip struct">跨節 ε/δ 一致性</span></div>
+    <div class="issue">標準 ε-δ 直覺裡 \(\varepsilon\)＝輸出側容差、\(\delta\)＝輸入側半徑。此反證證明把 \(\delta\) 取成 \(\ln\)（log 側）的固定間隙、把 \(\varepsilon\) 取成 \(e^{x}\) 後（輸入側）的間隙，角色與<b>本章 §4.2 自訂慣例相反</b>。首讀者可能短暫困惑「為何這裡 \(\varepsilon\) 是輸入側」。屬可避免的命名摩擦，但僅 Minor——符號就地以等式定義、意義不致誤解。<b>最便宜修法不是加 gloss</b>（會與 line 93 lead-in「a fixed gap on the input side」及就地定義式重複）。</div>
+    <div class="row ctx"><span class="tag">脈絡</span>lead-in（line 93）已說 “re-open a fixed gap on the input side”；證明取 \(\delta &gt; 0\)（log 側固定間隙）、\(\varepsilon = \min\{\dots\}\)（\(e^{x}\) 後輸入側間隙）。</div>
+    <div class="row new"><span class="tag">建議</span><ins>換名以服膺 §4.2 慣例</ins>：把證明裡 \(\delta \leftrightarrow \varepsilon\) 對調命名（log 側固定間隙叫 \(\varepsilon\)、\(e^{x}\) 後輸入側間隙叫 \(\delta\)），消除與 §4.2 的方向衝突且<b>不動任何數學</b>；若不願改名則<ins>維持原樣、勿加 gloss</ins>。</div>
+    <div class="gate2"><b>雙閘：</b> reader 判 Minor/tier-3 → verifier <b>維持 Minor/tier-3、downgraded</b>：\(\varepsilon/\delta\) 角色確與 §4.2 慣例相反，但符號就地定義、lead-in 已說輸入側，故僅命名摩擦非理解卡點。dumbing：無（換名不軟化數學）。<b>※</b> 此條為跨節一致性，gate-2 跨模型也常抓此類——先記下，與 gate-2 取交集時優先確認。</div>
+  </div>
+
+  <!-- ===================== 砍除 ===================== -->
+  <h2>經對抗複核砍除</h2>
+  <p class="lede"><b>本輪 0 條砍除（rejected）</b>——9 條 raw 全部存活。但 verifier 把 6 條由 Slowed 誠實<b>降為 Minor／tier-3</b>（G1-3·G1-5·G1-6·G1-7·G1-8·G1-9，列於上節），其中 G1-5 評「近冗餘、可不採」、G1-6 標 dumbing_risk「建議維持原樣」。相較 Ch1（13 raw → 砍 6），本章 raw 數本就少（9）、且因 2026-06-27 已過完整 Mode A/B/C＋S·A·V＋圖／數學閘而高度打磨，over-report 少、改以降級表達。</p>
+
+  <footer>
+    gate 1：Claude workflow（5 節 reader-persona agent ＋ 逐條對抗 verifier，共 14 agents、~591k token）。唯讀、propose-only。<b>整章 0 blocking</b>；9 raw → 9 存活（3×tier-2 advisory ＋ 6×tier-3 選配），0 砍除；<b>② introduce-before-use 全章 0 finding</b>。<br>
+    ⛳ <b>停。</b> 等你過目此稿並逐條裁決（採／不採／改修法）。裁決前不改任何 <code>fragments/</code>。<br>
+    我的建議：採 3 條 tier-2（G1-1·G1-2·G1-4，皆低風險就地 gloss/forward-ref）；tier-3 中 G1-7·G1-8 為乾淨輕橋接可順手採、G1-3 改一句即可、G1-5·G1-6 建議不採（近冗餘／dumbing 警示）、G1-9 為跨節 ε/δ 命名決策（換名 vs 維持，宜留待與 gate-2 交集後定）。<br>
+    下一步（待你授權）：① 對你選採的條目改 fragment → <code>python build.py ch04</code> → 範圍限定 Mode B → 產 <code>REVIEW-ch04-readability-applied.html</code> 回歸；或 ② 先跑 <b>gate-2（Codex 訂閱，需先徵成本同意）</b>取兩閘交集再裁。
+  </footer>
+</div>
+</body>
+</html>

@@ -55,7 +55,7 @@
     <div class="env-body">
       <p>Let \(x_{0} > 0\) and let \(\varepsilon > 0\) be given. Work on the interval \(0 < x < x_{0} + 1\), so we may take \(L = x_{0} + 1\) in the tail bound \((*)\). Choose integers \(k > n_{0} > 2(x_{0} + 1)\) large enough that</p>
       <p>\[ \frac{(x_{0} + 1)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} < \varepsilon. \]</p>
-      <p>This is possible because the left-hand side tends to \(0\) as \(k \to \infty\). With \(k\) now fixed, \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) is a polynomial, and every polynomial is continuous, so there is a \(\delta > 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\), such that</p>
+      <p>This is possible because the left-hand side tends to \(0\) as \(k \to \infty\). With \(k\) now fixed, \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) is a polynomial, and every polynomial is continuous, so there is a \(\delta > 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\) (the first bound keeps \(x > 0\), the second keeps \(x < x_{0} + 1\)), such that</p>
       <p>\[ \lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon \qquad \text{whenever } \lvert x - x_{0} \rvert < \delta. \]</p>
       <p>Now split the difference \(e^{x} - e^{x_{0}}\) by inserting and removing the common polynomial:</p>
       <p>\[ e^{x} - e^{x_{0}} = \bigl(e^{x} - P_{k}(x)\bigr) + \bigl(P_{k}(x) - P_{k}(x_{0})\bigr) + \bigl(P_{k}(x_{0}) - e^{x_{0}}\bigr). \]</p>
@@ -206,10 +206,10 @@
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
-      <p>Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k > n_{0} > 8L\). Recall \(P_{k}(t) = \sum_{n=0}^{k} t^{n}/n!\).</p>
+      <p>Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k > n_{0} > 8L\) (the factor \(8\) is calibrated in Step 4, where it forces the tail ratio below \(\tfrac{1}{2}\)). Recall \(P_{k}(t) = \sum_{n=0}^{k} t^{n}/n!\).</p>
 
       <p class="para-head">Step 1: two estimates.</p>
-      <p>From \((**)\), both \(\lvert e^{x} - P_{k}(x) \rvert\) and \(\lvert e^{y} - P_{k}(y) \rvert\) are at most \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\). Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</p>
+      <p>From \((**)\), both \(\lvert e^{x} - P_{k}(x) \rvert\) and \(\lvert e^{y} - P_{k}(y) \rvert\) are at most \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\). Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\) (term by term, since \(\lvert y \rvert \le L\) gives \(\lvert y \rvert^{n} \le L^{n}\); monotonicity of \(e^{t}\) is not yet available), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</p>
 
       <p class="para-head">Step 2: split the product.</p>
       <p>Multiplying the two finite sums and grouping the terms \(x^{i} y^{j}/(i!\,j!)\) by their total degree \(\ell = i + j\),</p>

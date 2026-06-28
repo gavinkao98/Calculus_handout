@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch4 可讀性回填 — gate 2（Codex 跨模型）審核稿｜① reader-persona ＋ ② introduce-before-use</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: { arccsc: ['\\operatorname{arccsc}'], arcsec: ['\\operatorname{arcsec}'], arccot: ['\\operatorname{arccot}'] }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{ --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3; --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.0rem;margin:24px 0 4px;color:var(--accent)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)} .pass b{color:var(--new)}
+  .warnnote{background:var(--warnbg);border-left-color:var(--warn)} .warnnote b{color:var(--warn)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.9rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .card.adopt{border-left:4px solid var(--new)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.c2{background:#fdeede;color:#9a5a12}
+  .chip.rec{background:#1a7f37;color:#fff;font-weight:700}
+  .chip.opt{background:#fff0d6;color:#8a5a00;font-weight:700}
+  .chip.rej{background:#f0eded;color:#8a8a8a;font-weight:700}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .gate2{color:var(--muted);font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .gate2 b{color:#444}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:64px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  ul.cut{list-style:none;padding:0;margin:8px 0}
+  ul.cut li{background:#fafafa;border:1px solid var(--line);border-radius:7px;padding:8px 12px;margin:6px 0;font-size:.9rem}
+  ul.cut .cid{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:#888;margin-right:8px}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 4 可讀性回填 — gate 2（Codex 跨模型）審核稿</h1>
+  <p class="lede">gate-2＝<b>Codex（<code>codex-cli 0.136.0</code>、<code>gpt-5.5</code> xhigh、訂閱配額）跨模型獨立複核</b>同兩條檢查（① reader-persona ＋ ② introduce-before-use）。逐節 clean-inline 餵入<b>套用 gate-1 5 條後</b>的定稿 fragment（絕不讓 Codex 自讀檔，避 UTF-8 假陽性），故 gate-2 同時擔任「抓 gate-1 套用迴歸」之用。共 <b>~120,172 token</b>、5 節輸出皆 U+FFFD=0。Codex raw 一律過<b>四級 triage</b>（Claude 對抗 verifier 逐條複核）。2026-06-28。</p>
+
+  <div class="note pass"><b>0 blocking、0 迴歸。</b> 11 raw findings → 對抗 triage：<b>2 adopt</b>（G2-5 §4.2 潛在循環論證、G2-11 §4.5 capstone 嚴謹化）＋<b>5 optional</b>＋<b>4 reject</b>。<b>gate-2 讀套用後文字，未在 gate-1 5 條任一處發現迴歸</b>——且把 G1-1 位置的殘餘細節（G2-1）判為 over-gloss reject，等於<b>確認 G1-1 已完整</b>。兩條 adopt 皆為跨模型新發現（gate-1 未及），經 Claude 對抗 verifier 確認 genuine、非 dumbing。</div>
+
+  <div class="note"><b>兩閘收斂：</b> gate-1（Claude）抓 9、套 5；gate-2（Codex）獨立抓 11、triage 後 2 adopt。<b>無直接 intersection</b>（兩閘命中不同 loci），但 gate-2 的不可取代價值在此具現：① 確認 gate-1 5 條套用無迴歸；② 抓到 gate-1 漏的<b>潛在循環論證</b>（G2-5：\(e^{\lvert y\rvert}\le e^{L}\) 若讀成 \(e^t\) 單調＝引用尚未證的 §4.4 結果）與<b>capstone 未自證</b>（G2-11）；③ <b>未</b>佐證 gate-1 G1-9（\(\varepsilon/\delta\) 命名）——支持 G1-9 維持原樣。</div>
+
+  <table class="sum">
+    <tr><th>G2</th><th>節 / locus</th><th>check / 維度</th><th>Codex 判</th><th>triage 裁決</th></tr>
+    <tr><td><b>G2-5</b></td><td>§4.2 Thm 4.7 Step 1</td><td>① U3</td><td>Slowed/2</td><td><span class="zero">adopt</span>（Minor/2）</td></tr>
+    <tr><td><b>G2-11</b></td><td>§4.5 capstone y'=ky</td><td>① U1/U3</td><td>Slowed/2</td><td><span class="zero">adopt</span>（Slowed/2）</td></tr>
+    <tr><td>G2-2</td><td>§4.1 “transcendental”</td><td>② U4</td><td>Minor/2</td><td>optional（Minor/3）</td></tr>
+    <tr><td>G2-3</td><td>§4.2 Thm 4.4 “subsequence”</td><td>② U4</td><td>Slowed/1</td><td>optional（Minor/3）</td></tr>
+    <tr><td>G2-4</td><td>§4.2 Thm 4.5 選 \(n_j\)</td><td>① U3</td><td>Slowed/2</td><td>optional（Minor/4）</td></tr>
+    <tr><td>G2-6</td><td>§4.2 Step 6 標題 “L→∞”</td><td>① U3</td><td>Slowed/2</td><td>optional（Minor/3）</td></tr>
+    <tr><td>G2-10</td><td>§4.5 Example 4.7 開頭</td><td>① U3</td><td>Slowed/2</td><td>optional（Minor/3）</td></tr>
+    <tr><td>G2-1</td><td>§4.1 \((*)\)（G1-1 位置）</td><td>① U3</td><td>Slowed/2</td><td><span style="color:#999">reject</span>（over-gloss）</td></tr>
+    <tr><td>G2-7</td><td>§4.3 forward-hook y'=ky</td><td>② U4</td><td>Slowed/2</td><td><span style="color:#999">reject</span>（locally-glossed）</td></tr>
+    <tr><td>G2-8</td><td>§4.4 “characterisation”</td><td>② U4</td><td>Minor/2</td><td><span style="color:#999">reject</span>（locally-glossed）</td></tr>
+    <tr><td>G2-9</td><td>§4.5 Thm 4.13 sequential negation</td><td>① U3</td><td>Slowed/2</td><td><span style="color:#999">reject</span>（over-gloss）</td></tr>
+  </table>
+
+  <!-- ===================== adopt ===================== -->
+  <h2>主要候選（triage adopt，建議採）</h2>
+
+  <div class="card adopt">
+    <div class="chips"><span class="chip num">G2-5</span><span class="chip c1">① reader-persona</span><span class="chip unit">§4.2 Thm 4.7（指數律）證明 Step 1</span><span class="chip dim">U3</span><span class="chip rec">建議採</span></div>
+    <div class="issue"><b>潛在循環論證。</b> 此處 \(e^{t}\) 只被定義為級數 \(\sum t^{n}/n!\)，其<b>嚴格單調性要到 §4.4（Rolle/MVT）才證</b>。若把 \(e^{\lvert y\rvert} \le e^{L}\) 讀成「\(e^t\) 遞增且 \(\lvert y\rvert\le L\)」，等於在 §4.2 證明裡引用 §4.5 才有的結果＝循環。正確（且當下唯一可用）的理由是<b>兩個非負級數的逐項比較</b>：\(\lvert y\rvert\le L \Rightarrow \lvert y\rvert^{n}\le L^{n} \Rightarrow \sum\lvert y\rvert^{n}/n! \le \sum L^{n}/n! = e^{L}\)。verifier：左式 \(\sum\lvert y\rvert^{n}/n!\) 就寫在同句，讀者一拍可重建＝Minor/tier-2，但循環風險真實、值得就地點明（非 dumbing，反而<b>加固嚴謹、防誤讀</b>）。</div>
+    <div class="row old"><span class="tag">原文</span>Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</div>
+    <div class="row new"><span class="tag">建議</span>Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\) <ins>(term by term, since \(\lvert y \rvert \le L\) gives \(\lvert y \rvert^{n} \le L^{n}\); monotonicity of \(e^{t}\) is not yet available)</ins>, and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</div>
+    <div class="gate2"><b>triage：</b> quote 逐字（line 212）；check2 n/a；genuine、Minor/tier-2；dumbing_risk=false（指名正確依據、防循環誤讀）；gate1_overlap=none（5 條 G1 edit 皆不在 Step 1）。<b>adopt。</b></div>
+  </div>
+
+  <div class="card adopt">
+    <div class="chips"><span class="chip num">G2-11</span><span class="chip c1">① reader-persona</span><span class="chip unit">§4.5 “Why these functions are unavoidable” capstone</span><span class="chip dim">U1/U3</span><span class="chip rec">建議採</span></div>
+    <div class="issue"><b>capstone 未實踐它所宣稱的嚴謹。</b> 該段主旨是「本章的嚴謹讓這些公式 genuinely well-defined 而非 merely suggestive」，但它唯一給出的具體推論 \(y'=ky \Rightarrow y=y(0)e^{kt}\) 卻當成「trust me」一步丟出——正是這 closer 自稱要消滅的 gap。依據完全在<b>本章本節</b>：Corollary 4.4（\(f'=0 \Rightarrow\) constant）就在 §4.5 前面，且 §4.5 證 log product law（Proposition 4.3）時已用過同一招 \((g\cdot e^{-\cdots})'=0\)。fix 不引新機器、不擴 scope，還<b>補上 §4.3 §C-4 forward-hook 承諾的「deferred to chapter's end」</b>。verifier：嚴謹讀者可自重建 \((ye^{-kt})'=0\)＝Slowed/tier-2，但 fix 高價值（讓 capstone 言行一致），代價一句。</div>
+    <div class="row old"><span class="tag">原文</span>If \(y(t)\) obeys \(y'(t) = k\,y(t)\) for a constant \(k\), then \(y(t) = y(0)\,e^{kt}\) — the model behind population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), …</div>
+    <div class="row new"><span class="tag">建議</span>…then \(y(t) = y(0)\,e^{kt}\) <ins>— because \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 forces \(y(t)e^{-kt}\) to be the constant \(y(0)\)</ins> — the model behind population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), …</div>
+    <div class="gate2"><b>triage：</b> quote 逐字（line 248）；check2 n/a；genuine、Slowed/tier-2；dumbing_risk=false（加引理引用＝加嚴謹，非軟化）；gate1_overlap=none；複用 line 200 已現的 \((\cdot)e^{-kt}\) 手法。<b>adopt。</b></div>
+  </div>
+
+  <!-- ===================== optional ===================== -->
+  <h2>tier-3 選配（triage optional，可裁可不裁）</h2>
+  <ul class="cut">
+    <li><span class="cid">G2-2</span><b>§4.1 ②</b> “transcendental” 未 gloss（irrational 是 precalc，transcendental 不是）。<b>optional：</b> genuine ② 但落在 terminal history aside（「we prove neither fact here」）、無下游承載＝Minor/tier-3。如採：appositive「transcendental (not a root of any nonzero polynomial with integer coefficients)」。</li>
+    <li><span class="cid">G2-3</span><b>§4.2 ②</b> Theorem 4.4 “subsequence” 首用未定義。<b>optional：</b> genuine ② 但緊接的 peak 證明即以遞增指標 \(p_1&lt;p_2&lt;\cdots\) 自我構造＝就地自 gloss、Minor/tier-3。如採：Thm 4.4 加 appositive「a convergent subsequence (a sequence formed by selecting terms in order of increasing index)」。</li>
+    <li><span class="cid">G2-4</span><b>§4.2 ①</b> Theorem 4.5 選 \(n_j\) 同時要 \(n_j\ge N_0\) 且近 \(A\)。<b>optional（近非 finding）：</b> 兩事實同段前句皆已給、為 Cauchy 證明的標準 subsequence-extraction＝inherent、tier-4。建議 leave。</li>
+    <li><span class="cid">G2-6</span><b>§4.2 ①</b> Step 6 標題「let \(k\to\infty\), then \(L\to\infty\)」——\(L\) 其實是 arbitrary（量詞）非取極限。<b>optional：</b> body（「Since \(L\) was arbitrary」）已正確、Minor/tier-3。如採：僅把標題 \(L\to\infty\) 換成 \(L\) arbitrary（拒 Codex 較長改寫＝近 over-gloss）。</li>
+    <li><span class="cid">G2-10</span><b>§4.5 ①</b> Example 4.7「agrees with the usual meaning when \(x\) is rational」未當場驗。<b>optional：</b> 該句為脈絡陳述、Example 任務是驗 (i)(ii) 兩律＝補驗屬 scope 擴張、Minor/tier-3。建議 leave 或至多括號一句。</li>
+  </ul>
+
+  <!-- ===================== reject ===================== -->
+  <h2>經對抗 triage 砍除（reject）</h2>
+  <ul class="cut">
+    <li><span class="cid">G2-1</span><b>§4.1 ①</b>（G1-1 位置）\((*)\) 中段 \(L^k/k!\) 仍可再點明。<b>reject：</b> dumbing_risk=true——「repeating the geometric collapse from the proof」＋display 全鏈已是該 gloss，再加＝over-gloss。<b>等於確認 G1-1 已完整、無迴歸。</b> leave as-is。</li>
+    <li><span class="cid">G2-7</span><b>§4.3 ②</b> forward-hook \(y'=ky\) 的 \(k,t,y(0)\) 未逐一 gloss。<b>reject：</b> 該句已白話 gloss（「rate of change proportional to current size」）、符號皆 intro-calc 標準；此為 §C-4 刻意輕量 forward-hook，full treatment 由 §4.5 capstone（G2-11 已採）承接。加 gloss＝dumbing＋越界。leave。</li>
+    <li><span class="cid">G2-8</span><b>§4.4 ②</b> Caution 末「not a characterisation」未 gloss。<b>reject：</b> 同段前文已用 \(x^3\) 反例完整解釋 one-way（false converse）、與「sufficient test」對舉即點出 iff 義＝locally-glossed、tier-4。提議「(not an if-and-only-if test)」＝重述前文。leave。</li>
+    <li><span class="cid">G2-9</span><b>§4.5 ①</b> Theorem 4.13 反證的 sequential-negation setup 未橋接。<b>reject：</b> dumbing_risk=true——lead-in（line 93「a fixed gap on the input side」）＋「the failure is witnessed by a sequence」＋就地不等式已三重 scaffolding；Codex 提議近乎重述鄰句。leave。</li>
+  </ul>
+
+  <div class="note warnnote"><b>gate-1 G1-9（\(\varepsilon/\delta\) 命名）之決議：</b> gate-2 讀同一 Theorem 4.13 證明，<b>未</b>獨立提出 \(\varepsilon/\delta\) 角色與 §4.2 慣例相反一事（它在此證明只提了已 reject 的 G2-9）。依「兩閘交集＝最高信心」反面：<b>無跨模型佐證＋ gate-1 verifier 已評 Minor/rename-or-leave</b> → <b>建議 G1-9 維持原樣（不改名）</b>。如你仍想統一命名，那是純改名（不動數學）的編輯偏好決策，可另行指示。</div>
+
+  <footer>
+    gate 2：Codex（<code>gpt-5.5</code> xhigh、訂閱）逐節 clean-inline、~120,172 token、5 節 U+FFFD=0；raw 11 → Claude 對抗 verifier 四級 triage（11 agents＋1 重跑、~440k token）→ <b>2 adopt／5 optional／4 reject</b>。原始輸出轉錄於版控 <code>handout/_dev-archive/ch04/ch04_readability-gate2-audit.md</code>。<br>
+    ⛳ <b>停。</b> 我的建議：<b>採 G2-5（防循環論證）＋ G2-11（capstone 引 Cor 4.4 自證）</b>——皆 genuine、非 dumbing、跨模型新發現；其餘 optional 多為 leave、reject 4 條為 over-gloss/locally-glossed；G1-9 建議維持原樣。<br>
+    下一步（待你裁決）：① 你選採的 gate-2 條目 → 改 fragment → <code>build.py ch04</code> → 範圍限定 Mode B → 更新 <code>REVIEW-ch04-readability-applied.html</code>；② 之後 commit（繁中、body 逐條記裁決、結尾 Co-Authored-By；範圍只納本輪 readability 檔）。<b>套用與 commit 皆等你點頭。</b>
+  </footer>
+</div>
+</body>
+</html>

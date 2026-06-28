@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch4 可讀性回填 — 套用（applied）回歸稿｜雙閘採納 7 條 ＋ 範圍限定 Mode B</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      macros: { arccsc: ['\\operatorname{arccsc}'], arcsec: ['\\operatorname{arcsec}'], arccot: ['\\operatorname{arccot}'] } },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{ --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#e4e4e0; --old:#b3261e; --new:#1a7f37; --accent:#2552b3; --chip:#eef0f4; --warn:#8a5a00; --warnbg:#fff6e3; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.6;padding:32px 18px 80px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  h2{font-size:1.18rem;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h3{font-size:1.0rem;margin:24px 0 4px;color:var(--accent)}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:.94rem}
+  .note b{color:var(--accent)}
+  .pass{background:#eaf6ed;border-left-color:var(--new)} .pass b{color:var(--new)}
+  table.sum{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:.9rem}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+  table.sum th{background:var(--chip)}
+  .zero{color:var(--new);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .chip{font-size:.76rem;padding:2px 9px;border-radius:999px;background:var(--chip);color:#33343a;font-weight:600;letter-spacing:.02em}
+  .chip.num{background:#1d1d1f;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.g2{background:#2552b3;color:#fff;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.unit{background:#e7eefc;color:#1f49a6;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip.dim{background:#efe7fb;color:#5b3aa8}
+  .chip.c1{background:#e7f0ff;color:#1a4fa0}
+  .chip.applied{background:#1a7f37;color:#fff;font-weight:700}
+  .chip.mb{background:#e6f7ea;color:#1a7f37;font-weight:700}
+  .issue{color:#333;font-size:.92rem;margin:2px 0 10px}
+  .gate2{color:var(--muted);font-size:.85rem;margin:8px 0 2px;border-top:1px dotted var(--line);padding-top:7px}
+  .gate2 b{color:#1a7f37}
+  .row{margin:6px 0;padding:9px 12px;border-radius:7px;font-size:.97rem}
+  .row .tag{display:inline-block;min-width:64px;font-weight:700;font-size:.78rem;vertical-align:top;margin-right:8px}
+  .old{background:#fcecea} .old .tag{color:var(--old)}
+  .new{background:#eaf6ed} .new .tag{color:var(--new)}
+  del{color:var(--old);text-decoration:line-through;text-decoration-thickness:1px}
+  ins{color:var(--new);text-decoration:none;font-weight:600}
+  ul.defer{list-style:none;padding:0;margin:8px 0}
+  ul.defer li{background:#fafafa;border:1px solid var(--line);border-radius:7px;padding:8px 12px;margin:6px 0;font-size:.9rem}
+  ul.defer .cid{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:#888;margin-right:8px}
+  footer{margin-top:40px;color:var(--muted);font-size:.86rem;border-top:1px solid var(--line);padding-top:14px}
+  code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:.86em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chapter 4 可讀性回填 — 套用（applied）回歸稿</h1>
+  <p class="lede"><b>雙閘收斂、共採 7 條：</b> gate-1（Claude）採 5（tier-2 三條 G1-1·G1-2·G1-4 ＋ tier-3 兩條乾淨橋接 G1-7·G1-8）＋ gate-2（Codex 跨模型）triage adopt 2（G2-5·G2-11）。全部套用到 <code>fragments/ch04/</code> → <code>python build.py ch04</code>。每條新句跑<b>範圍限定 Mode B</b>（對抗 reviewer：修好摩擦？守語域不灌水不過度 gloss？無新 U/F？數學忠實＋逐字查無掉限定詞）。2026-06-28。</p>
+
+  <div class="note pass"><b>Mode B 回歸：7/7 pass。</b> 每條皆 fixes_friction＋register_ok（無 dumbing）＋no_over_gloss＋no_new_issue＋math_faithful＋<b>no_dropped_qualifier（dropped_detail 全為 “none”）</b>。gate-2 兩條經數學雙驗：G2-5 確認 \(\lvert y\rvert\le L \Rightarrow \lvert y\rvert^{n}\le L^{n}\) 且就地擋掉「\(e^t\) 單調」循環；G2-11 確認 product rule \((ye^{-kt})'=(y'-ky)e^{-kt}=0\)、Corollary 4.4 可引、\(t=0\Rightarrow\) const \(=y(0)\)。無一條動到任何數學 display。</div>
+
+  <div class="note pass"><b>render 自驗：<code>ready=true&nbsp;&nbsp;math=1028&nbsp;&nbsp;katex-errors=0</code>。</b> 7 條皆插入 inline math，全章 0 KaTeX 錯誤、無未渲染 <code>\(</code>。</div>
+
+  <div class="note"><b>gate-2 收斂：</b> Codex 跨模型讀<b>套用後</b>文字，<b>未在 gate-1 5 條任一處發現迴歸</b>（G2-1 在 G1-1 位置被判 over-gloss reject ＝確認 G1-1 已完整）。11 raw → triage 2 adopt（已套，下方）＋5 optional＋4 reject（多為 over-gloss/locally-glossed，未採）。<b>G1-9（§4.5 \(\varepsilon/\delta\) 命名）gate-2 未佐證 → 維持原樣（不改名）。</b> 詳見 <code>REVIEW-ch04-readability-gate2.html</code>。</div>
+
+  <table class="sum">
+    <tr><th>編號</th><th>節 / 位置</th><th>閘 / 維度</th><th>Mode B</th></tr>
+    <tr><td><b>G1-1</b></td><td>§4.1 tail-bound \((*)\) 前一句</td><td>gate-1 ① U3</td><td><span class="zero">pass</span></td></tr>
+    <tr><td><b>G1-2</b></td><td>§4.2 Thm 4.3 取 \(\delta\)</td><td>gate-1 ① U1</td><td><span class="zero">pass</span></td></tr>
+    <tr><td><b>G1-4</b></td><td>§4.2 Thm 4.7 取 \(n_{0} &gt; 8L\)</td><td>gate-1 ① U1</td><td><span class="zero">pass</span></td></tr>
+    <tr><td><b>G1-7</b></td><td>§4.4 Rolle 證明 Case 2</td><td>gate-1 ① U3</td><td><span class="zero">pass</span></td></tr>
+    <tr><td><b>G1-8</b></td><td>§4.5 Thm 4.13 \(\varepsilon = \min\) 後</td><td>gate-1 ① U3</td><td><span class="zero">pass</span></td></tr>
+    <tr><td><b>G2-5</b></td><td>§4.2 Thm 4.7 Step 1（防循環論證）</td><td>gate-2 ① U3</td><td><span class="zero">pass</span></td></tr>
+    <tr><td><b>G2-11</b></td><td>§4.5 capstone（引 Cor 4.4 自證）</td><td>gate-2 ① U1/U3</td><td><span class="zero">pass</span></td></tr>
+  </table>
+
+  <!-- ===================== gate-2 採納 ===================== -->
+  <h2>gate-2 採納（adopt 2，跨模型新發現）</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip g2">G2-5</span><span class="chip c1">① reader-persona</span><span class="chip unit">§4.2 sec-4-2，Thm 4.7 證明 Step 1</span><span class="chip dim">U3</span><span class="chip applied">✓ 套用</span><span class="chip mb">Mode B pass</span></div>
+    <div class="issue"><b>防潛在循環論證。</b> 此處 \(e^{t}\) 嚴格單調性要到 §4.4 才證；\(e^{\lvert y\rvert}\le e^{L}\) 若讀成「\(e^t\) 遞增」＝引用未證結果。就地標明正確依據：非負級數逐項比較。</div>
+    <div class="row old"><span class="tag">原文</span>Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</div>
+    <div class="row new"><span class="tag">現文</span>Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\) <ins>(term by term, since \(\lvert y \rvert \le L\) gives \(\lvert y \rvert^{n} \le L^{n}\); monotonicity of \(e^{t}\) is not yet available)</ins>, and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</div>
+    <div class="gate2"><b>Mode B：</b> pass — \(\lvert y\rvert\le L\Rightarrow\lvert y\rvert^{n}\le L^{n}\)（\(L\ge0\)、\(n\ge0\)）正確、防真循環非灌水；主句與界逐字保留、未動 display、無掉詞。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip g2">G2-11</span><span class="chip c1">① reader-persona</span><span class="chip unit">§4.5 sec-4-5，capstone “Why these functions are unavoidable”</span><span class="chip dim">U1/U3</span><span class="chip applied">✓ 套用</span><span class="chip mb">Mode B pass</span></div>
+    <div class="issue"><b>capstone 自證。</b> \(y'=ky \Rightarrow y=y(0)e^{kt}\) 原被當「trust me」丟出——正是此段自稱要消滅的 gap。補一句引<b>本章 Corollary 4.4</b> 自證（複用 §4.5 log product law 已現的 \((\cdot)e^{-\cdots}\) 手法），並補上 §4.3 承諾的 deferred treatment。</div>
+    <div class="row old"><span class="tag">原文</span>…then \(y(t) = y(0)\,e^{kt}\) — the model behind population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), …</div>
+    <div class="row new"><span class="tag">現文</span>…then \(y(t) = y(0)\,e^{kt}\) <ins>— because \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 forces \(y(t)e^{-kt}\) to be the constant \(y(0)\)</ins> — the model behind population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), …</div>
+    <div class="gate2"><b>Mode B：</b> pass — product rule \((ye^{-kt})'=(y'-ky)e^{-kt}=0\) 正確、Corollary 4.4 在 §4.5 已證可引、\(t=0\Rightarrow\) const \(=y(0)\)；非新機器、非 scope 擴張；\(k&gt;0/k&lt;0/k\ne0/\lvert k\rvert\) 等限定詞全保留、未動 display。</div>
+  </div>
+
+  <!-- ===================== gate-1 採納 ===================== -->
+  <h2>gate-1 採納（5 條，前一輪已套用）</h2>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-1</span><span class="chip c1">① reader-persona</span><span class="chip unit">§4.1 sec-4-1，display \((*)\) 前一句</span><span class="chip dim">U3</span><span class="chip applied">✓ 套用</span><span class="chip mb">Mode B pass</span></div>
+    <div class="issue">點明單一 \(x\)（\(n_{0} &gt; 2x\)）切到 uniform \(0 &lt; x &lt; L\)、\(n_{0} &gt; 2L\)，並補 term bound \(x^{n}/n! \le L^{n}/n!\)＋幾何收攏，再導入 \((*)\)。</div>
+    <div class="row old"><span class="tag">原文</span>…close in on \(e^{x}\). <del>Repeating the tail bound for the terms beyond index \(k\) shows that, for \(0 &lt; x &lt; L\) and any \(k &gt; n_{0} &gt; 2L\),</del></div>
+    <div class="row new"><span class="tag">現文</span>…close in on \(e^{x}\). <ins>Now fix an interval \(0 &lt; x &lt; L\) and pick \(n_{0} &gt; 2L\) once, so the same threshold serves every such \(x\); bounding each term by \(x^{n}/n! \le L^{n}/n!\) and repeating the geometric collapse from the proof gives, for \(k &gt; n_{0}\),</ins></div>
+    <div class="gate2"><b>Mode B：</b> pass — \((*)\) 全鏈數值＋解析雙驗；\(0 &lt; x &lt; L\)、\(n_{0} &gt; 2L\)、\(k &gt; n_{0}\) 全保留；display 未動。gate-2 複核（G2-1）確認此處已完整、reject 進一步 gloss。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-2</span><span class="chip c1">① reader-persona</span><span class="chip unit">§4.2 Thm 4.3 取 \(\delta\)</span><span class="chip dim">U1</span><span class="chip applied">✓ 套用</span><span class="chip mb">Mode B pass</span></div>
+    <div class="row old"><span class="tag">原文</span>…there is a \(\delta &gt; 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\)<del>,</del> such that</div>
+    <div class="row new"><span class="tag">現文</span>…smaller than \(\min\{x_{0}/2,\ 1/2\}\) <ins>(the first bound keeps \(x &gt; 0\), the second keeps \(x &lt; x_{0} + 1\))</ins>, such that</div>
+    <div class="gate2"><b>Mode B：</b> pass — forward-gloss 與下一 display（\(x &gt; x_{0}/2 &gt; 0\)、\(x &lt; x_{0}+1/2 &lt; x_{0}+1\)）一致；無掉詞、未動 display。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-4</span><span class="chip c1">① reader-persona</span><span class="chip unit">§4.2 Thm 4.7 取 \(n_{0} &gt; 8L\)</span><span class="chip dim">U1</span><span class="chip applied">✓ 套用</span><span class="chip mb">Mode B pass</span></div>
+    <div class="row old"><span class="tag">原文</span>…throughout, take \(k &gt; n_{0} &gt; 8L\)<del>.</del> Recall …</div>
+    <div class="row new"><span class="tag">現文</span>…take \(k &gt; n_{0} &gt; 8L\) <ins>(the factor \(8\) is calibrated in Step 4, where it forces the tail ratio below \(\tfrac{1}{2}\))</ins>. Recall …</div>
+    <div class="gate2"><b>Mode B：</b> pass — 與 Step 4（\(\ell &gt; n_{0} &gt; 8L \Rightarrow (2L)/\ell &lt; \tfrac14 &lt; \tfrac12\)）一致；純插入、無掉詞、未動 display。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-7</span><span class="chip c1">① reader-persona</span><span class="chip unit">§4.4 Rolle 證明 Case 2</span><span class="chip dim">U3</span><span class="chip applied">✓ 套用</span><span class="chip mb">Mode B pass</span></div>
+    <div class="row old"><span class="tag">原文</span><del>Since \(f(a) = f(b)\), the values \(m\) and \(M\) cannot both equal that common endpoint value,</del> so at least one of</div>
+    <div class="row new"><span class="tag">現文</span><ins>Since \(f(a)\) is a value of \(f\), the bounds give \(m \le f(a) \le M\). As \(f(a) = f(b)\) and \(m &lt; M\), the values \(m\) and \(M\) cannot both equal that common endpoint value,</ins> so at least one of</div>
+    <div class="gate2"><b>Mode B：</b> pass — bracket \(m \le f(a) \le M\) 正確；原 \(f(a)=f(b)\) 與 “common endpoint value” 保留；display 未動。</div>
+  </div>
+
+  <div class="card">
+    <div class="chips"><span class="chip num">G1-8</span><span class="chip c1">① reader-persona</span><span class="chip unit">§4.5 Thm 4.13 \(\varepsilon = \min\) 後</span><span class="chip dim">U3</span><span class="chip applied">✓ 套用</span><span class="chip mb">Mode B pass</span></div>
+    <div class="row old"><span class="tag">原文</span>…depending only on \(x_{0}\) and \(\delta\)<del>.</del> In both cases \(\lvert y_{j} - x_{0} \rvert \ge \varepsilon\), so…</div>
+    <div class="row new"><span class="tag">現文</span>…depending only on \(x_{0}\) and \(\delta\) <ins>— so each of the two case bounds above is at least \(\varepsilon\)</ins>. In both cases \(\lvert y_{j} - x_{0} \rvert \ge \varepsilon\), so…</div>
+    <div class="gate2"><b>Mode B：</b> pass — 橋接正確（\(\varepsilon = \min\{A,B\} \Rightarrow A,B \ge \varepsilon\)）；未動 display、未掉詞、未過度重述。</div>
+  </div>
+
+  <!-- ===================== 未採 ===================== -->
+  <h2>本輪未採（保留）</h2>
+  <ul class="defer">
+    <li><span class="cid">gate-1</span><b>G1-3·G1-5·G1-6·G1-9</b>（tier-3）— G1-3/5 近冗餘、G1-6 dumbing 警示維持原樣、<b>G1-9 \(\varepsilon/\delta\) 命名 gate-2 未佐證 → 維持原樣</b>。</li>
+    <li><span class="cid">gate-2</span><b>5 optional</b>（G2-2 transcendental／G2-3 subsequence／G2-4 \(n_j\)／G2-6 Step 6 標題／G2-10 Example 4.7）— 多為就地自 gloss、無下游承載或低值，建議 leave。</li>
+    <li><span class="cid">gate-2</span><b>4 reject</b>（G2-1 over-gloss／G2-7 locally-glossed＋越界／G2-8 locally-glossed／G2-9 over-gloss）。</li>
+  </ul>
+
+  <footer>
+    套用：7 條（gate-1 G1-1·G1-2·G1-4·G1-7·G1-8 ＋ gate-2 G2-5·G2-11）→ <code>build.py ch04</code> → 範圍限定 Mode B <b>全 7/7 pass</b> → render <code>ready=true math=1028 katex-errors=0</code>。唯讀紀律下僅改 <code>fragments/ch04/{sec-4-1,sec-4-2,sec-4-4,sec-4-5}.html</code> 與重建之 <code>chapter4-print-standalone.html</code>（<code>sec-4-3</code> 無改動）。<br>
+    <b>雙閘完成。</b> 三份審核稿（gate1／gate2／applied）＋ gate-2 原始輸出轉錄（<code>_dev-archive/ch04/ch04_readability-gate2-audit.md</code>）齊備，整輪 ready to commit。
+  </footer>
+</div>
+</body>
+</html>

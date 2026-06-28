@@ -541,7 +541,7 @@ window.MathJax = {
 
   <p>\[ P_{k}(x) = \sum_{n = 0}^{k} \frac{x^{n}}{n!} \]</p>
 
-  <p>for the \(k\)-th partial sum. The estimate inside the proof does more than establish convergence: it measures how fast the partial sums close in on \(e^{x}\). Repeating the tail bound for the terms beyond index \(k\) shows that, for \(0 < x < L\) and any \(k > n_{0} > 2L\),</p>
+  <p>for the \(k\)-th partial sum. The estimate inside the proof does more than establish convergence: it measures how fast the partial sums close in on \(e^{x}\). Now fix an interval \(0 < x < L\) and pick \(n_{0} > 2L\) once, so the same threshold serves every such \(x\); bounding each term by \(x^{n}/n! \le L^{n}/n!\) and repeating the geometric collapse from the proof gives, for \(k > n_{0}\),</p>
 
   <!-- expansion:formula — the explicit partial-sum tail bound, isolated for reuse; §4.2's continuity and exponent-law proofs invoke it repeatedly -->
   <p>\[ 0 \le e^{x} - P_{k}(x) \le \frac{L^{k}}{k!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$*$} \]</p>
@@ -647,7 +647,7 @@ window.MathJax = {
     <div class="env-body">
       <p>Let \(x_{0} > 0\) and let \(\varepsilon > 0\) be given. Work on the interval \(0 < x < x_{0} + 1\), so we may take \(L = x_{0} + 1\) in the tail bound \((*)\). Choose integers \(k > n_{0} > 2(x_{0} + 1)\) large enough that</p>
       <p>\[ \frac{(x_{0} + 1)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} < \varepsilon. \]</p>
-      <p>This is possible because the left-hand side tends to \(0\) as \(k \to \infty\). With \(k\) now fixed, \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) is a polynomial, and every polynomial is continuous, so there is a \(\delta > 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\), such that</p>
+      <p>This is possible because the left-hand side tends to \(0\) as \(k \to \infty\). With \(k\) now fixed, \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) is a polynomial, and every polynomial is continuous, so there is a \(\delta > 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\) (the first bound keeps \(x > 0\), the second keeps \(x < x_{0} + 1\)), such that</p>
       <p>\[ \lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon \qquad \text{whenever } \lvert x - x_{0} \rvert < \delta. \]</p>
       <p>Now split the difference \(e^{x} - e^{x_{0}}\) by inserting and removing the common polynomial:</p>
       <p>\[ e^{x} - e^{x_{0}} = \bigl(e^{x} - P_{k}(x)\bigr) + \bigl(P_{k}(x) - P_{k}(x_{0})\bigr) + \bigl(P_{k}(x_{0}) - e^{x_{0}}\bigr). \]</p>
@@ -798,10 +798,10 @@ window.MathJax = {
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
-      <p>Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k > n_{0} > 8L\). Recall \(P_{k}(t) = \sum_{n=0}^{k} t^{n}/n!\).</p>
+      <p>Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k > n_{0} > 8L\) (the factor \(8\) is calibrated in Step 4, where it forces the tail ratio below \(\tfrac{1}{2}\)). Recall \(P_{k}(t) = \sum_{n=0}^{k} t^{n}/n!\).</p>
 
       <p class="para-head">Step 1: two estimates.</p>
-      <p>From \((**)\), both \(\lvert e^{x} - P_{k}(x) \rvert\) and \(\lvert e^{y} - P_{k}(y) \rvert\) are at most \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\). Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</p>
+      <p>From \((**)\), both \(\lvert e^{x} - P_{k}(x) \rvert\) and \(\lvert e^{y} - P_{k}(y) \rvert\) are at most \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\). Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\) (term by term, since \(\lvert y \rvert \le L\) gives \(\lvert y \rvert^{n} \le L^{n}\); monotonicity of \(e^{t}\) is not yet available), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</p>
 
       <p class="para-head">Step 2: split the product.</p>
       <p>Multiplying the two finite sums and grouping the terms \(x^{i} y^{j}/(i!\,j!)\) by their total degree \(\ell = i + j\),</p>
@@ -1138,7 +1138,7 @@ window.MathJax = {
     <div class="env-body">
       <p>By the extreme value theorem (Theorem 4.9), \(f\) attains a maximum at some \(x_{M} \in [a, b]\) and a minimum at some \(x_{m} \in [a, b]\), with \(f(x_{m}) \le f(x) \le f(x_{M})\) for all \(x \in [a, b]\). Write \(m = f(x_{m})\) and \(M = f(x_{M})\).</p>
       <p><strong>Case 1: \(m = M\).</strong> Together with \(f(a) = f(b)\) this forces \(m = M = f(a) = f(b)\), so the bounds \(m \le f(x) \le M\) collapse and \(f\) is constant on \([a, b]\). Then \(f'(c) = 0\) for every \(c \in (a, b)\); choose any.</p>
-      <p><strong>Case 2: \(m &lt; M\).</strong> Since \(f(a) = f(b)\), the values \(m\) and \(M\) cannot both equal that common endpoint value, so at least one of</p>
+      <p><strong>Case 2: \(m &lt; M\).</strong> Since \(f(a)\) is a value of \(f\), the bounds give \(m \le f(a) \le M\). As \(f(a) = f(b)\) and \(m &lt; M\), the values \(m\) and \(M\) cannot both equal that common endpoint value, so at least one of</p>
       <p>\[ f(x_{M}) > f(a) \qquad \text{or} \qquad f(x_{m}) < f(a) \]</p>
       <p>holds. If \(f(x_{M}) > f(a) = f(b)\), then \(x_{M}\) is neither endpoint, so \(x_{M} \in (a, b)\); by Theorem 4.10, \(f'(x_{M}) = 0\), and we set \(c = x_{M}\). Otherwise \(f(x_{m}) < f(a) = f(b)\), the same argument places \(x_{m} \in (a, b)\), and Theorem 4.10 gives \(f'(x_{m}) = 0\) with \(c = x_{m}\). Either way an interior \(c\) with \(f'(c) = 0\) exists. <span class="qed qed-proof"></span></p>
     </div>
@@ -1443,7 +1443,7 @@ window.MathJax = {
       </ul>
       <p>Let</p>
       <p>\[ \varepsilon = \min\!\left\{\, e^{\ln x_{0}} - e^{\ln x_{0} - \delta}, \; e^{\ln x_{0} + \delta} - e^{\ln x_{0}} \,\right\} &gt; 0, \]</p>
-      <p>a single positive number depending only on \(x_{0}\) and \(\delta\). In both cases \(\lvert y_{j} - x_{0} \rvert = \lvert e^{\ln y_{j}} - e^{\ln x_{0}} \rvert \ge \varepsilon\), so</p>
+      <p>a single positive number depending only on \(x_{0}\) and \(\delta\) — so each of the two case bounds above is at least \(\varepsilon\). In both cases \(\lvert y_{j} - x_{0} \rvert = \lvert e^{\ln y_{j}} - e^{\ln x_{0}} \rvert \ge \varepsilon\), so</p>
       <p>\[ \lvert y_{j} - x_{0} \rvert \ge \varepsilon \qquad \text{for every } j. \]</p>
       <p>But this contradicts \(y_{j} \to x_{0}\), which forces \(\lvert y_{j} - x_{0} \rvert\) below \(\varepsilon\) for large \(j\). The assumption of discontinuity is untenable, so \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) and \(\ln\) is continuous at \(x_{0}\). <span class="qed qed-proof"></span></p>
     </div>
@@ -1577,7 +1577,7 @@ window.MathJax = {
   <h3 class="subsec-head">Why these functions are unavoidable</h3>
 
   <!-- expansion:application [pass: enrichment] — short capstone (§C-10, add-on taken): exponential growth/decay, half-life; ties the chapter's rigour back to why e^x and ln x matter -->
-  <p>The defining feature of the exponential, \((e^{x})' = e^{x}\), is exactly what makes it the right function for any quantity whose rate of change is proportional to its current size. If \(y(t)\) obeys \(y'(t) = k\,y(t)\) for a constant \(k\), then \(y(t) = y(0)\,e^{kt}\) — the model behind population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), and continuously compounded interest. The logarithm enters the moment one inverts: for positive quantities and \(k \ne 0\), solving \(y(t) = y_{\ast}\) for the time gives \(t = (\ln y_{\ast} - \ln y(0))/k\). The radioactive half-life \(t_{1/2} = \ln 2 / \lvert k \rvert\) is just the case \(y_{\ast} = y(0)/2\). Everything this chapter built — the series definition, the exponent law, the rigorous derivatives, the inverse construction — is what makes these formulas genuinely well-defined rather than merely suggestive.</p>
+  <p>The defining feature of the exponential, \((e^{x})' = e^{x}\), is exactly what makes it the right function for any quantity whose rate of change is proportional to its current size. If \(y(t)\) obeys \(y'(t) = k\,y(t)\) for a constant \(k\), then \(y(t) = y(0)\,e^{kt}\) — because \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 forces \(y(t)e^{-kt}\) to be the constant \(y(0)\) — the model behind population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), and continuously compounded interest. The logarithm enters the moment one inverts: for positive quantities and \(k \ne 0\), solving \(y(t) = y_{\ast}\) for the time gives \(t = (\ln y_{\ast} - \ln y(0))/k\). The radioactive half-life \(t_{1/2} = \ln 2 / \lvert k \rvert\) is just the case \(y_{\ast} = y(0)/2\). Everything this chapter built — the series definition, the exponent law, the rigorous derivatives, the inverse construction — is what makes these formulas genuinely well-defined rather than merely suggestive.</p>
 
   <h3 class="subsec-head">Chapter summary</h3>
 
