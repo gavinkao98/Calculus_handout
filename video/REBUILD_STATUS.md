@@ -4,6 +4,18 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## ✅ 2026-06-29 ch03 §3.2 The Chain Rule — Stage 1（內容稿＋六鏡＋copyedit）完成、旁白 sign-off 通過 → 內容稿 LOCKED
+
+第二個正式從 HTML 講義重跑的 ch03 節（接 §3.1）。**本輪只做 Stage 1**（使用者裁決：先做內容稿到 sign-off 暫停，Stage 2 storyboard/render 另徵範圍）；**未動任何計費 API**。deck id＝`ch03_chain_rule`，分支續用 `video/template-redesign-navy-spine`。計畫見 [`PLAN-ch03-s32-video.md`](content_scripts/_audit/PLAN-ch03-s32-video.md)。
+
+- **裁決：** 證明走 **full ε-δ 全展開**（使用者裁決；Thm 3.3 證明切 4 個 proof 單元 11–14 讓畫面可讀，忠實搬講義不壓縮）。3 幕結構：The Rule You Can Use → Why the Rule Is True → Using the Rule。
+- **內容稿：** [`ch03_chain_rule.md`](content_scripts/ch03_chain_rule.md)（24 單元＝intro＋22 教學＋outro）。Def 3.1（餘項形式）＋Prop 3.3（等價，雙向證）＋Remark 3.2 升格 Leibniz proposition＋Strategy 3.1 procedure＋Ex 3.4–3.8 全收（3.6/3.7 同型 chain×{quotient,product}、3.7 套 repeat-pattern）＋頭號 caution。Fig 3.5（composed mapping）／3.6（remainder-tangent）寫 animation_cue，hook code 留 Stage 2。Definition 走 ③ D5 Option B（§2.2 極限定義 prose 交叉引用、只鑄餘項形式）。
+- **閘：六鏡 blocking==0**（Workflow `wf_d53afe59-4f2`，6 鏡 refute-by-default 全 clean、0 tier-1/2；**L5 隔離盲算** Ex 3.4–3.8＋Prop 3.3 雙向＋Thm 3.3 full ε-δ 全 match）；**copyedit** `narration-copyedit` 6 tighten＋9 optional **全採納**（register relax 對齊 §4 口語預設與 §3.1 peer、保留 deliberate-formal proof 開場；rates_multiply 去重、proof_delicate_choices 斷句、toward_section_3_3 去開節 toolkit 回音）。3 條 tier-3 advisory 逐筆裁決、未強制歸零。
+- **工具：** 新增 [`pipeline/narration_review.py`](pipeline/narration_review.py)——`.md → _narration.html` 生成器（reuse parser 契約、純 stdlib、不觸 manim bootstrap），§3.1 未 committed、本輪定版供 §3.2/3.3 沿用。
+- **交付物：** [`ch03_chain_rule_narration.html`](content_scripts/ch03_chain_rule_narration.html)（逐單元旁白審核稿）＋ [`REVIEW-ch03_chain_rule-applied.html`](content_scripts/_audit/REVIEW-ch03_chain_rule-applied.html)（本輪 round 報告＋閘結果）。
+- **sign-off：2026-06-29 使用者通過 → `.md` LOCKED、`CONTENT_APPROVED=yes`。** 之後忠實性由 NFA 把關；post-lock 改任何單元措辭須對動到單元跑 scoped NFA 回歸（CONTENT_METHODOLOGY §8）。
+- **下一步（Stage 2，達範圍同意後續做）：** storyboard `ch03_chain_rule.yml`（模板化、`{show}`/accent/payload、proof 拆場）＋2 客製 hook `composed_mapping`（Fig 3.5）/`remainder_tangent`（Fig 3.6）＋schema/lint/sizecheck＋mock render 1080p＋visual-frame-audit → 之後 MiMo 口語軌＋TTS（計費，屆時徵同意）。
+
 ## ✅ 2026-06-29 ch03 §3.1 detail-redo：內容稿從「壓縮骨架」重做成「最大詳細」（mock 里程碑達成）
 
 **緣起：** §3.1 第一版（commit `520a625` LOCKED）在 Stage-2 把證明壓成單頁 2–3 行骨架；密度稽核（[`content_scripts/_audit/REVIEW-ch03-s31-density-audit.html`](content_scripts/_audit/REVIEW-ch03-s31-density-audit.html)，19 場三方對照＋對抗複驗）證實**無承載缺口但場景稀、填充僅 ~30–35%、continuity 的界憑空出現**。使用者裁決「影片講解要最大詳細、少省略；選材可少但講解要清楚；必要時重頭來過」。**定性：不是改規則，是回去遵守 `CONTENT_METHODOLOGY §1`「detail over compression」**（第一版違背了自己的方法論）。規格/計畫見 [`SPEC-ch03-s31-detail-redo.md`](content_scripts/_audit/SPEC-ch03-s31-detail-redo.md)／[`PLAN-ch03-s31-detail-redo.md`](content_scripts/_audit/PLAN-ch03-s31-detail-redo.md)（取代前版 `PLAN-ch03-s31-video.md` 的密度假設）。
