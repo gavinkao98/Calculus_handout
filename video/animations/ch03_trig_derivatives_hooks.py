@@ -26,6 +26,7 @@ from manim import (
     AnnularSector,
     Arc,
     Axes,
+    Circle,
     Create,
     DashedLine,
     Dot,
@@ -33,7 +34,9 @@ from manim import (
     Line,
     MathTex,
     Polygon,
+    ReplacementTransform,
     VGroup,
+    smooth,
 )
 
 from pipeline import brand
@@ -75,9 +78,14 @@ def _draw(scene, mob, g):
 
 
 # ================================================================ hook 1
-# sector_inequality (Figure 3.1) -- on the unit circle, the inscribed triangle
-# OAB sits inside the sector OAB, which sits inside the outer triangle OAC;
-# revealing the three regions builds 1/2 sin t <= 1/2 t <= 1/2 tan t.
+# sector_inequality (Figure 3.1) -- on the unit circle the inscribed triangle
+# OAB sits inside the sector OAB, which sits inside the outer triangle OAC. The
+# source figure (left) builds that nested picture as narration names each region;
+# a congruent copy of each region then peels off and slides onto a shared
+# baseline on the right at true relative size, turning 1/2 sin t <= 1/2 t <=
+# 1/2 tan t into a visible ordering of three SEPARATED shapes (not three
+# overlapping fills). Reveal ids are unchanged (tri_inner, sector, tri_outer,
+# ineq), so the LOCKED narration + {show ...} cues need no edit.
 
 
 def sector_inequality(spec, ctx, blocks):
@@ -86,12 +94,10 @@ def sector_inequality(spec, ctx, blocks):
     title = ids["title"].mobject
     out = [b for b in blocks if b.id != "axes"]   # we draw the circle ourselves
 
-    R = 2.3
+    R = 1.45
     th = 0.72                                       # representative angle (~41 deg)
-    O = np.array([0.0, 0.0, 0.0])
-    A = np.array([R, 0.0, 0.0])
-    B = np.array([R * np.cos(th), R * np.sin(th), 0.0])
-    C = np.array([R, R * np.tan(th), 0.0])
+    B_off = R * np.array([np.cos(th), np.sin(th), 0.0])   # apex of triangle OAB
+    C_off = np.array([R, R * np.tan(th), 0.0])            # apex of triangle OAC
 
     text = T.color(ground, "text")
     mut = T.color(ground, "muted")
@@ -99,56 +105,100 @@ def sector_inequality(spec, ctx, blocks):
     amber = T.color(ground, "accent")
     green = T.color(ground, "success")
 
+    def _tri(o, apex_off, col, fop, z):
+        return Polygon(o, o + np.array([R, 0.0, 0.0]), o + apex_off,
+                       color=col, fill_opacity=fop, stroke_width=2.5).set_z_index(z)
+
+    def _sec(o, fop, z):
+        return AnnularSector(inner_radius=0.0, outer_radius=R, angle=th,
+                             start_angle=0.0, arc_center=o, color=amber,
+                             fill_opacity=fop, stroke_width=2.5).set_z_index(z)
+
+    # -- left: source figure (scaffold static; regions revealed in place) --------
+    O = np.array([-4.55, -0.40, 0.0])
+    A = O + np.array([R, 0.0, 0.0])
+    B = O + B_off
+    C = O + C_off
+
     quarter = Arc(radius=R, start_angle=0.0, angle=PI / 2, arc_center=O,
                   color=mut, stroke_width=2.0)
-    xaxis = Line(O + 0.25 * LEFT, A + 0.6 * RIGHT, color=mut, stroke_width=1.5)
-    yaxis = Line(O + 0.25 * DOWN, np.array([0.0, R + 0.6, 0.0]), color=mut, stroke_width=1.5)
-    tangent = DashedLine(A, C, color=mut, stroke_width=2.0, dash_length=0.1)
+    xaxis = Line(O + 0.25 * LEFT, A + 0.5 * RIGHT, color=mut, stroke_width=1.5)
+    yaxis = Line(O + 0.25 * DOWN, O + np.array([0.0, R + 0.5, 0.0]),
+                 color=mut, stroke_width=1.5)
+    tangent = DashedLine(A, C, color=mut, stroke_width=2.0, dash_length=0.08)
     radius_OC = Line(O, C, color=text, stroke_width=2.0)
     chord_OA = Line(O, A, color=text, stroke_width=2.0)
 
-    dots = VGroup(*[Dot(p, radius=0.05, color=text) for p in (O, A, B, C)])
-    lO = MathTex("O", color=text, font_size=T.fs("label")).next_to(O, DL, buff=0.12)
-    lA = MathTex("A", color=text, font_size=T.fs("label")).next_to(A, DR, buff=0.10)
-    lB = MathTex("B", color=text, font_size=T.fs("label")).next_to(B, UL, buff=0.08)
-    lC = MathTex("C", color=text, font_size=T.fs("label")).next_to(C, RIGHT, buff=0.12)
-    arc_th = Arc(radius=0.48, start_angle=0.0, angle=th, arc_center=O, color=text, stroke_width=2.0)
+    dots = VGroup(*[Dot(p, radius=0.045, color=text) for p in (O, A, B, C)])
+    lO = MathTex("O", color=text, font_size=T.fs("label")).next_to(O, DL, buff=0.10)
+    lA = MathTex("A", color=text, font_size=T.fs("label")).next_to(A, DR, buff=0.08)
+    lB = MathTex("B", color=text, font_size=T.fs("label")).next_to(B, UL, buff=0.06)
+    lC = MathTex("C", color=text, font_size=T.fs("label")).next_to(C, RIGHT, buff=0.10)
+    arc_th = Arc(radius=0.34, start_angle=0.0, angle=th, arc_center=O,
+                 color=text, stroke_width=2.0)
     lth = MathTex(r"\theta", color=text, font_size=T.fs("label")).move_to(
-        O + 0.72 * np.array([np.cos(th / 2), np.sin(th / 2), 0.0]))
+        O + 0.55 * np.array([np.cos(th / 2), np.sin(th / 2), 0.0]))
 
     for m in (radius_OC, chord_OA, dots, lO, lA, lB, lC, arc_th, lth):
         m.set_z_index(5)
     scaffold = VGroup(quarter, xaxis, yaxis, tangent, radius_OC, chord_OA,
                       dots, lO, lA, lB, lC, arc_th, lth)
 
-    tri_inner = Polygon(O, A, B, color=blue, fill_opacity=0.40, stroke_width=2.5).set_z_index(2)
-    lab_inner = brand.math_line(r"\tfrac12\sin\theta", ground, role="secondary", size="label")
-    lab_inner.move_to(0.46 * A + 0.16 * B)          # interior, clear of the theta vertex label
-    g_inner = VGroup(tri_inner, lab_inner)
+    src_inner = _tri(O, B_off, blue, 0.45, 2)
+    src_sector = _sec(O, 0.30, 1)
+    src_outer = _tri(O, C_off, green, 0.10, 3)
 
-    sector = AnnularSector(inner_radius=0.0, outer_radius=R, angle=th, start_angle=0.0,
-                           arc_center=O, color=amber, fill_opacity=0.30,
-                           stroke_width=2.0).set_z_index(1)
-    lab_sector = brand.math_line(r"\tfrac12\theta", ground, role="accent", size="label")
-    lab_sector.move_to(O + (R + 0.5) * np.array([np.cos(th / 2), np.sin(th / 2), 0.0]))
-    g_sector = VGroup(sector, lab_sector)
+    # -- right: three peeled shapes on one baseline (true relative size) ---------
+    yb = O[1]                                        # share the source baseline
+    O1 = np.array([-1.30, yb, 0.0])
+    O2 = np.array([1.20, yb, 0.0])
+    O3 = np.array([3.70, yb, 0.0])
+    badge_y = yb + R * np.tan(th) + 0.34             # one row, above the tallest apex
 
-    tri_outer = Polygon(O, A, C, color=green, fill_opacity=0.0, stroke_width=3.0).set_z_index(3)
-    lab_outer = brand.math_line(r"\tfrac12\tan\theta", ground, role="success", size="label")
-    lab_outer.next_to(C, RIGHT, buff=0.55).shift(0.25 * DOWN)
-    g_outer = VGroup(tri_outer, lab_outer)
+    def _badge(n, x, col):
+        ring = Circle(radius=0.16, color=col, stroke_width=2.0)
+        num = MathTex(str(n), color=text, font_size=T.fs("label") * 0.75)
+        return VGroup(ring, num).move_to(np.array([x, badge_y, 0.0])).set_z_index(6)
 
-    ineq = brand.math_line(r"\tfrac12\sin\theta \;\le\; \tfrac12\theta \;\le\; \tfrac12\tan\theta",
-                           ground, role="text", size="math_sm")
+    def _slot(o, shape, lab_tex, role, n, badge_col):
+        lab = brand.math_line(lab_tex, ground, role=role, size="label")
+        lab.next_to(shape, DOWN, buff=0.28)
+        badge = _badge(n, o[0] + R / 2, badge_col)   # centred over the slot, equal height
+        return VGroup(shape, lab, badge)
 
-    figure = VGroup(scaffold, g_inner, g_sector, g_outer)
-    ineq.next_to(figure, DOWN, buff=0.55)
-    _centre_in_zone(title, VGroup(figure, ineq))
+    dst1 = _slot(O1, _tri(O1, B_off, blue, 0.50, 2),
+                 r"\tfrac12\sin\theta", "secondary", 1, blue)
+    dst2 = _slot(O2, _sec(O2, 0.42, 2),
+                 r"\tfrac12\theta", "accent", 2, amber)
+    dst3 = _slot(O3, _tri(O3, C_off, green, 0.40, 2),
+                 r"\tfrac12\tan\theta", "success", 3, green)
+
+    ineq = brand.math_line(
+        r"\tfrac12\sin\theta \;\le\; \tfrac12\theta \;\le\; \tfrac12\tan\theta",
+        ground, role="text", size="math_sm")
+    row = VGroup(dst1, dst2, dst3)
+    ineq.next_to(row, DOWN, buff=0.55)
+
+    full = VGroup(scaffold, src_inner, src_sector, src_outer, dst1, dst2, dst3, ineq)
+    _centre_in_zone(title, full)
+
+    def _peel(src):
+        def anim(scene, mob, ground):
+            shape, label, badge = mob[0], mob[1], mob[2]
+            scene.play(FadeIn(src), run_time=0.4)            # region appears on the left
+            scene.add(src)
+            flyer = src.copy()
+            scene.add(flyer)
+            # congruent copy slides out to its slot on the right (rigid motion)
+            scene.play(ReplacementTransform(flyer, shape), run_time=0.8, rate_func=smooth)
+            scene.play(FadeIn(label, shift=0.08 * UP), FadeIn(badge), run_time=0.32)
+            return 1.52
+        return anim
 
     out.append(Block("scaffold", scaffold, static=True, layer="graph"))
-    out.append(Block("tri_inner", g_inner, anim=_fade, static=False, layer="graph"))
-    out.append(Block("sector", g_sector, anim=_fade, static=False, layer="graph"))
-    out.append(Block("tri_outer", g_outer, anim=_fade, static=False, layer="graph"))
+    out.append(Block("tri_inner", dst1, anim=_peel(src_inner), static=False, layer="graph"))
+    out.append(Block("sector", dst2, anim=_peel(src_sector), static=False, layer="graph"))
+    out.append(Block("tri_outer", dst3, anim=_peel(src_outer), static=False, layer="graph"))
     out.append(Block("ineq", ineq, anim=_fade, static=False, layer="graph"))
     return out
 

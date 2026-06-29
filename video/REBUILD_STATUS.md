@@ -4,6 +4,19 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## ✅ 2026-06-29 ch03 §3.1 Fig 3.1「A Squeeze on the Unit Circle」場景動畫重設計（剝離飛出＋等高徽章）
+
+承 §3.1 detail-redo mock 成片後使用者目視回饋：`sector_inequality`（Fig 3.1）原本把三塊面積（½sinθ／½θ／½tanθ）疊在同一張單位圓圖上、互相覆蓋且標籤擠在縫隙，「標示不清」。使用者要求改成動畫——三塊分別飛到右邊、看清各自形狀。經 brainstorm＋mockup 裁決：**一排・共用底邊・真實相對大小**＋原圖縮小留左當來源。
+
+**做了什麼（只動 [`animations/ch03_trig_derivatives_hooks.py`](animations/ch03_trig_derivatives_hooks.py) 的 `sector_inequality` 一個 hook，外科手術式）：**
+- **左 ⅓ 來源圖：** 縮小（`R 2.3→1.45`）留原位，scaffold（quarter arc／軸／O·A·B·C／θ／切線）static；三塊區域改成「揭示時才原位畫出」，逐步長成「內三角 ⊂ 扇形 ⊂ 外三角」的嵌套實況。
+- **右 ⅔ 剝離排：** 每塊揭示時複製一份**剛性平移**（`ReplacementTransform`，全等＝乾淨滑出）飛到共用底邊的槽位，成獨立填色形狀＋面積標籤＋①②③徽章。三塊**真實相對大小** → ½sinθ ≤ ½θ ≤ ½tanθ 變成看得見的遞增；底部仍掛不等式鏈。
+- **第二輪微調（使用者要求）：** ①②③ 徽章改**等高**——單一 `badge_y = yb + R·tanθ + 0.34`（最高 apex 上緣之上）、x 置中於各槽（`o[0]+R/2`）；順手移除 `_slot` 已不需要的 `apex_off` 參數。
+
+**旁白：未動。** `say`／`{show tri_inner|sector|tri_outer|ineq}` 標記逐字不變（reveal id 不變），§3.1 LOCKED 旁白／sign-off／NFA 全維持有效。narration↔visual 比對結論：**不需改**，且「the areas line up in order」一句反而被右排具象化（原疊圖撐不太起這句）；唯一可斟酌的修辭「that one picture」維持原文。
+
+**驗證：** schema OK／lint clean／**sizecheck consistent（0 error）**／`[sync] clean`；§3.1 mock render 1080p 成片。分支 `video/template-redesign-navy-spine` 續用。**未動任何計費 API**（mock TTS＋本地 manim render＋ffmpeg，皆離線）。
+
 ## ✅ 2026-06-29 ch03 §3.2 The Chain Rule — Stage 1（內容稿＋六鏡＋copyedit）完成、旁白 sign-off 通過 → 內容稿 LOCKED
 
 第二個正式從 HTML 講義重跑的 ch03 節（接 §3.1）。**本輪只做 Stage 1**（使用者裁決：先做內容稿到 sign-off 暫停，Stage 2 storyboard/render 另徵範圍）；**未動任何計費 API**。deck id＝`ch03_chain_rule`，分支續用 `video/template-redesign-navy-spine`。計畫見 [`PLAN-ch03-s32-video.md`](content_scripts/_audit/PLAN-ch03-s32-video.md)。
