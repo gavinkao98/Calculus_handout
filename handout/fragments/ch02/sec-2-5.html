@@ -77,7 +77,7 @@
         <text x="38" y="74" text-anchor="end" class="ptlab">Δ<tspan font-style="italic">g</tspan></text>
       </svg>
     </div>
-    <figcaption><span class="fig-no">Figure 2.9</span> Reading the product \(fg\) as the area of a rectangle: enlarging the sides by \(\Delta f\) and \(\Delta g\) adds two strips and a small corner.</figcaption>
+    <figcaption><span class="fig-no">Figure 2.9</span> Area model for the product rule: base \(fg\), two strips, and the corner \(\Delta f\,\Delta g\).</figcaption>
   </figure>
 
   <!-- expansion:intuition — convert the picture into the formula: the two strips give f'g and fg'; the corner is second-order and vanishes -->
@@ -87,7 +87,10 @@
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.6</span><span class="env-name">The product rule</span></p>
     <div class="env-body">
       <p>If \(f\) and \(g\) are differentiable at \(x\), then their product \(fg\) is differentiable at \(x\), and</p>
-      <p>\[ (fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x), \qquad\text{i.e.}\qquad \frac{d}{dx}(fg) = \left(\frac{d}{dx}f\right)g + f\left(\frac{d}{dx}g\right). \]</p>
+      <p>\[ \begin{aligned}
+        &(fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x), \\[2pt]
+        &\text{i.e.}\quad \frac{d}{dx}(fg) = \left(\frac{d}{dx}f\right)g + f\left(\frac{d}{dx}g\right).
+      \end{aligned} \]</p>
     </div>
   </section>
 
@@ -97,12 +100,15 @@
     <div class="env-body">
       <p>We start from the definition and apply a useful trick: add and subtract \(f(x)\,g(x+h)\) in the numerator, which lets us isolate the change in \(f\) from the change in \(g\):</p>
       <p>\[ \begin{aligned}
-        f(x+h)g(x+h) - f(x)g(x)
-          &= \bigl[f(x+h)g(x+h) - f(x)g(x+h)\bigr] + \bigl[f(x)g(x+h) - f(x)g(x)\bigr] \\[2pt]
-          &= \bigl[f(x+h) - f(x)\bigr]\,g(x+h) + f(x)\,\bigl[g(x+h) - g(x)\bigr].
+        &f(x+h)g(x+h) - f(x)g(x) \\
+        &= \bigl[f(x+h)g(x+h) - f(x)g(x+h)\bigr] + \bigl[f(x)g(x+h) - f(x)g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+h) - f(x)\bigr]\,g(x+h) + f(x)\,\bigl[g(x+h) - g(x)\bigr].
       \end{aligned} \]</p>
       <p>Dividing by \(h\),</p>
-      <p>\[ \frac{f(x+h)g(x+h) - f(x)g(x)}{h} = \frac{f(x+h) - f(x)}{h}\,g(x+h) \;+\; f(x)\,\frac{g(x+h) - g(x)}{h}. \]</p>
+      <p>\[ \begin{aligned}
+        &\frac{f(x+h)g(x+h) - f(x)g(x)}{h} \\[2pt]
+        &= \frac{f(x+h) - f(x)}{h}\,g(x+h) \;+\; f(x)\,\frac{g(x+h) - g(x)}{h}.
+      \end{aligned} \]</p>
       <p>Now let \(h \to 0\) and evaluate each piece with the limit laws of §1.5. The two difference quotients tend to \(f'(x)\) and \(g'(x)\). For the remaining factor, \(g(x+h) \to g(x)\): this is exactly the statement that \(g\) is continuous at \(x\), which holds because \(g\), being differentiable at \(x\), is continuous there (Theorem 2.1, §2.3). Therefore</p>
       <p>\[ (fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x). \]</p>
     </div>
@@ -165,9 +171,9 @@
       <p>\[ \frac{f(x+\Delta x)}{g(x+\Delta x)} - \frac{f(x)}{g(x)} = \frac{f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x)}{g(x+\Delta x)\,g(x)}. \]</p>
       <p>On the numerator we play the same trick as before, now adding and subtracting \(f(x)\,g(x)\):</p>
       <p>\[ \begin{aligned}
-        f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x)
-          &= \bigl[f(x+\Delta x)\,g(x) - f(x)\,g(x)\bigr] - \bigl[f(x)\,g(x+\Delta x) - f(x)\,g(x)\bigr] \\[2pt]
-          &= \bigl[f(x+\Delta x) - f(x)\bigr]\,g(x) - f(x)\,\bigl[g(x+\Delta x) - g(x)\bigr].
+        &f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x) \\[2pt]
+        &= \bigl[f(x+\Delta x)\,g(x) - f(x)\,g(x)\bigr] - \bigl[f(x)\,g(x+\Delta x) - f(x)\,g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+\Delta x) - f(x)\bigr]\,g(x) - f(x)\,\bigl[g(x+\Delta x) - g(x)\bigr].
       \end{aligned} \]</p>
       <p>Dividing the whole difference by \(\Delta x\), the difference quotient becomes</p>
       <p>\[ \frac{1}{g(x+\Delta x)\,g(x)}\left( \frac{f(x+\Delta x) - f(x)}{\Delta x}\,g(x) - f(x)\,\frac{g(x+\Delta x) - g(x)}{\Delta x} \right). \]</p>
@@ -207,13 +213,13 @@
                  = \frac{1 - x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}.
         \end{aligned} \]</p>
         <p>Had we mistakenly written the numerator as \((x)(2x) - (1)(x^{2}+1)\), every sign would be wrong. As a sanity check on the result, \(f'(0) = 1 > 0\) (the curve rises through the origin) and \(f'(\pm 1) = 0\), the two points where \(x/(x^{2}+1)\) reaches its largest and smallest values.</p>
+
+        <figure class="figure" data-fig="quotient-example-graph">
+          <figcaption><span class="fig-no">Figure 2.10</span> The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom), from Example 2.20.</figcaption>
+        </figure>
       </div>
     </section>
   </div>
-
-  <figure class="figure" data-fig="quotient-example-graph">
-    <figcaption><span class="fig-no">Figure 2.10</span> The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom) from Example 2.20, aligned along the common axis \(x\). At \(x = \pm 1\), where \(f\) reaches its maximum and minimum and its tangents run horizontal, \(f'\) crosses zero; at the origin the curve rises with slope \(f'(0) = 1\).</figcaption>
-  </figure>
 
   <!-- expansion:example — error-spotting on the quotient rule, the worked counterpart to the asymmetry Caution above [source: CLP-1 §2.6 prob_s2.6 Conceptual Q1 "spot the error: 2x/(x+1)"; official solution, rewritten] -->
   <div class="workedexample">

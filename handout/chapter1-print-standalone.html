@@ -14,24 +14,28 @@
   --fig-1-1:  250px;   /* Figure 1.1  horizontal line test (pair) */
   --fig-1-2:  340px;   /* Figure 1.2  inverse mapping diagram */
   --fig-1-3:  280px;   /* Figure 1.3  restricted x^2, sqrt x, y=x */
-  --fig-1-4:  480px;   /* Figure 1.4  sine not one-to-one (SVG 620×220, wide) */
+  --fig-1-4:  500px;   /* Figure 1.4  sine not one-to-one (SVG 620×220, wide) */
   --fig-1-5:  340px;   /* Figure 1.5  restricted sine (SVG 380×260) */
   --fig-1-6:  200px;   /* Figure 1.6  arcsin right triangle (SVG 300×130) */
   --fig-1-7:  340px;   /* Figure 1.7  restricted cosine (SVG 380×200) */
   --fig-1-8:  300px;   /* Figure 1.8  restricted tangent (SVG 320×320) */
-  --fig-1-9:  200px;   /* Figure 1.9  arctan 10 right triangle (SVG 240×180) */
-  --fig-1-10: 200px;   /* Figure 1.10 arctan x right triangle (SVG 240×180) */
-  --fig-1-11: 100%;    /* Figure 1.11 three functions, same limit (triple layout) */
-  --fig-1-12: 380px;   /* Figure 1.12 read-off-the-graph example */
-  --fig-1-13: 380px;   /* Figure 1.13 left/right limits differ */
-  --fig-1-14: 340px;   /* Figure 1.14 piecewise jump (SVG 360×240) */
-  --fig-1-15: 100%;    /* Figure 1.15 four one-sided infinite limits (grid layout) */
-  --fig-1-16: 360px;   /* Figure 1.16 vertical asymptote */
-  --fig-1-17: 340px;   /* Figure 1.17 ln asymptote (SVG 340×260) */
-  --fig-1-18: 360px;   /* Figure 1.18 floor function (SVG 380×320) */
-  --fig-1-19: 400px;   /* Figure 1.19 squeeze theorem (SVG 420×280) */
-  --fig-1-20: 380px;   /* Figure 1.20 x^2 sin(1/x) squeeze (SVG 400×280) */
-  --fig-1-21: 420px;   /* Figure 1.21 epsilon-delta geometry */
+  --fig-1-9:  500px;   /* Figure 1.9  arctan reflection */
+  --fig-1-10: 200px;   /* Figure 1.10 arctan 10 right triangle (SVG 240×180) */
+  --fig-1-11: 100%;    /* Figure 1.11 arctan x right triangle (SVG 240×180) */
+  --fig-1-12: 380px;   /* Figure 1.12 three functions, same limit (triple layout) */
+  --fig-1-13: 380px;   /* Figure 1.13 read-off-the-graph example */
+  --fig-1-14: 340px;   /* Figure 1.14 left/right limits differ */
+  --fig-1-15: 100%;    /* Figure 1.15 piecewise jump */
+  --fig-1-16: 200px;   /* Figure 1.16 1/x^2 vs 1/x */
+  --fig-1-17: 340px;   /* Figure 1.17 four one-sided infinite limits (grid layout) */
+  --fig-1-18: 360px;   /* Figure 1.18 vertical asymptote */
+  --fig-1-19: 400px;   /* Figure 1.19 ln asymptote */
+  --fig-1-20: 380px;   /* Figure 1.20 removable hole */
+  --fig-1-21: 350px;   /* Figure 1.21 floor function */
+  --fig-1-22: 420px;   /* Figure 1.22 squeeze theorem */
+  --fig-1-23: 400px;   /* Figure 1.23 x^2 sin(1/x) squeeze */
+  --fig-1-24: 360px;   /* Figure 1.24 epsilon-delta geometry */
+  --fig-1-25: 100%;    /* Figure 1.25 epsilon-delta dynamic pair */
 }
 </style>
 
@@ -171,6 +175,7 @@ window.MathJax = {
   font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
   display: flex; align-items: center; gap: .55em; color: var(--ink);
 }
+.paper .page-break-before { break-before: page; page-break-before: always; }
 .paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
 .paper .figure { margin: 1.7em 0; text-align: center; }
 .paper .figure-art { display: flex; justify-content: center; }
@@ -239,7 +244,7 @@ window.MathJax = {
 .skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
 .skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
 .skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
-.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
 .skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
 .skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
 .skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
@@ -269,12 +274,15 @@ window.MathJax = {
 /* ============================================================
    figs.css — inlined + modified for MathJax
    ============================================================ */
-.paper .fig-svg { height: auto; max-width: 100%; overflow: visible; }
+.paper .fig-svg { height: auto; overflow: visible; }
 .paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
 .paper .figure-art--pair { gap: 24px; }
 .paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
 .paper .figure-art--triple { gap: 18px; }
 .paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple { gap: 28px; flex-wrap: nowrap; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-panel { flex: 0 1 160px; max-width: 160px; min-width: 0; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-svg { width: 100% !important; max-width: 100%; }
 .paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
 .paper .figure-art--grid .fig-panel { max-width: 240px; }
 .paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
@@ -519,7 +527,7 @@ window.MathJax = {
     <figcaption><span class="fig-no">Figure 1.1</span> Geometric interpretation of the horizontal line test.</figcaption>
   </figure>
 
-  <h3 class="subsec-head">Inverse functions</h3>
+  <h3 class="subsec-head page-break-before">Inverse functions</h3>
 
   <p>If \(f\) is one-to-one, then we can define a second function that undoes \(f\): given an output of \(f\), it returns the unique input that produced it.</p>
 
@@ -550,7 +558,7 @@ window.MathJax = {
     </div>
   </section>
 
-  <section class="env env-theorem">
+  <section class="env env-theorem page-break-before">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">1.1</span></p>
     <div class="env-body">
       <p>A function has an inverse if and only if it is one-to-one.</p>
@@ -620,7 +628,7 @@ window.MathJax = {
         <text x="180" y="150" class="lab-ref-b">f⁻¹</text>
       </svg>
     </div>
-    <figcaption><span class="fig-no">Figure 1.2</span> A one-to-one function and its inverse. Going forward by \(f\) and back by \(f^{-1}\) recovers the input: \(f^{-1}\!\bigl(f(x)\bigr) = x\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.2</span> A one-to-one function and its inverse map between \(A\) and \(B\).</figcaption>
   </figure>
 
   <p>Graphically, if the graph of \(f^{-1}\) is drawn in the same coordinate plane as the graph of \(f\), the two graphs are reflections of one another across the line \(y = x\). The point \((a, b)\) lies on the graph of \(f\) exactly when \((b, a)\) lies on the graph of \(f^{-1}\).</p>
@@ -640,7 +648,7 @@ window.MathJax = {
         \[ f^{-1}(x) = \sqrt{x}, \qquad x \ge 0. \]
         This is exactly why \(\sqrt{x}\) means the <em>positive</em> square root: the convention makes the square root the inverse of the restricted squaring function. Figure 1.3 shows the restricted parabola, its inverse, and the mirror line \(y = x\). The same idea — restrict first, then invert — is the key to the inverse trigonometric functions of the next section.</p>
         <figure class="figure" data-fig="restrict-x2">
-          <figcaption><span class="fig-no">Figure 1.3</span> The squaring function restricted to \([0, \infty)\), its inverse \(\sqrt{x}\), and the mirror line \(y = x\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.3</span> Restricted squaring, its inverse \(\sqrt{x}\), and the mirror line \(y = x\).</figcaption>
         </figure>
       </div>
     </section>
@@ -917,9 +925,11 @@ window.MathJax = {
     </div>
   </section>
 
+  <p>Figure 1.9 shows this reflection. In the reflected graph, the vertical asymptotes of the restricted tangent branch become horizontal asymptotes of the inverse tangent graph.</p>
+
   <!-- expansion:figure — restricted tan reflects across y=x to arctan; domain↔range and vertical↔horizontal asymptotes swap (figure-opportunity audit 2026-06-21; registered in chapter1 FIGS as "arctan-reflection") -->
   <figure class="figure" data-fig="arctan-reflection">
-    <figcaption><span class="fig-no">Figure 1.9</span> The graph of \(\arctan x\) is the reflection of the restricted tangent branch across the line \(y = x\) (dashed). Reflection swaps domain and range: the vertical asymptotes of \(\tan\) at \(x = \pm\tfrac{\pi}{2}\) become the horizontal asymptotes of \(\arctan\) at \(y = \pm\tfrac{\pi}{2}\) — which is why \(\arctan\) accepts every real input yet keeps its outputs inside \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.9</span> The restricted tangent branch and its inverse, reflected across \(y = x\).</figcaption>
   </figure>
 
   <section class="env env-proposition">
@@ -1200,11 +1210,17 @@ window.MathJax = {
   </section>
 
   <!-- expansion:application — close the instantaneous-velocity thread opened at the start of the section [pass: enrichment] [source: Mooculus digInInstantaneousVelocity, ball example; units converted to SI] -->
-  <p>We can now close the loop opened at the start of the section. Suppose a ball thrown upward has height \(s(t) = 30t - 5t^{2}\) metres at time \(t\) seconds. Its average velocity over the interval from \(t\) to \(4\) is
-  \[ \frac{s(4) - s(t)}{4 - t} = \frac{40 - (30t - 5t^{2})}{4 - t} = \frac{5(t - 2)(t - 4)}{4 - t} = \frac{5(t - 2)(t - 4)}{-(t - 4)} = -5(t - 2), \qquad t \neq 4. \]
-  The <em>instantaneous</em> velocity at \(t = 4\), written \(v(4)\), is the value this average approaches as the interval shrinks to nothing:
-  \[ v(4) = \lim_{t \to 4} \frac{s(4) - s(t)}{4 - t} = \lim_{t \to 4} \bigl[-5(t - 2)\bigr] = -10 \text{ m/s}. \]
-  Notice that the original ratio has the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) (a form taken up systematically in §1.5) — both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\) — so the cancellation that produced \(-5(t - 2)\) was what made the limit accessible.</p>
+  <p>We can now close the loop opened at the start of the section. Suppose a ball thrown upward has height \(s(t) = 30t - 5t^{2}\) metres at time \(t\) seconds. Its average velocity over the interval from \(t\) to \(4\) is</p>
+  <p>\[ \begin{aligned}
+    \frac{s(4) - s(t)}{4 - t}
+      &= \frac{40 - (30t - 5t^{2})}{4 - t} \\[2pt]
+      &= \frac{5(t - 2)(t - 4)}{4 - t} \\[2pt]
+      &= \frac{5(t - 2)(t - 4)}{-(t - 4)} \\[2pt]
+      &= -5(t - 2), \qquad t \neq 4.
+  \end{aligned} \]</p>
+  <p>The <em>instantaneous</em> velocity at \(t = 4\), written \(v(4)\), is the value this average approaches as the interval shrinks to nothing:</p>
+  <p>\[ v(4) = \lim_{t \to 4} \frac{s(4) - s(t)}{4 - t} = \lim_{t \to 4} \bigl[-5(t - 2)\bigr] = -10 \text{ m/s}. \]</p>
+  <p>Notice that the original ratio has the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) (a form taken up systematically in §1.5) — both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\) — so the cancellation that produced \(-5(t - 2)\) was what made the limit accessible.</p>
 
   <p>The limits above were guessed by looking at function values near the point of interest. In the following sections, we will develop systematic methods for evaluating limits and study more subtle behavior such as one-sided limits and infinite limits.</p>
 
@@ -1295,7 +1311,7 @@ window.MathJax = {
         <p>From the right we use the branch \(f(x) = 4 - x\), so \(\lim_{x \to 2^{+}} f(x) = 2\).</p>
         <p>Since the left-hand and right-hand limits differ, \(\lim_{x \to 2} f(x)\) does not exist.</p>
         <figure class="figure" data-fig="piecewise-jump">
-          <figcaption><span class="fig-no">Figure 1.15</span> Graph of the piecewise function of Example 1.20, showing a jump at \(x = 2\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.15</span> The jump at \(x = 2\) in Example 1.20.</figcaption>
         </figure>
       </div>
     </section>
@@ -1340,14 +1356,13 @@ window.MathJax = {
         (The limit-value notation \(= -\infty\) is made precise in Definition 1.11 below.) From the right, \(1/x\) is positive and grows without bound, so
         \[ \lim_{x \to 0^{+}} \frac{1}{x} = \infty. \]
         Because the two one-sided behaviors disagree, the two-sided limit does not exist. Since the values do not all grow in the <em>same</em> signed direction, we do <strong>not</strong> write \(\lim_{x \to 0} \frac{1}{x} = \infty\). Contrast \(1/x^{2}\): both sides grow positively, so there we do write \(\lim_{x \to 0} \frac{1}{x^{2}} = \infty\) (Figure 1.16).</p>
+        <!-- expansion:figure — 1/x² (both sides → +∞, write =∞) vs 1/x (sides disagree, DNE) (figure-opportunity audit 2026-06-21; registered in chapter1 FIGS as "recip-x-vs-x2") -->
+        <figure class="figure" data-fig="recip-x-vs-x2">
+          <figcaption><span class="fig-no">Figure 1.16</span> Comparing \(1/x^{2}\) and \(1/x\) near \(0\).</figcaption>
+        </figure>
       </div>
     </section>
   </div>
-
-  <!-- expansion:figure — 1/x² (both sides → +∞, write =∞) vs 1/x (sides disagree, DNE) (figure-opportunity audit 2026-06-21; registered in chapter1 FIGS as "recip-x-vs-x2") -->
-  <figure class="figure" data-fig="recip-x-vs-x2">
-    <figcaption><span class="fig-no">Figure 1.16</span> Why \(1/x^{2}\) and \(1/x\) are treated differently at \(0\). For \(1/x^{2}\) (left) both branches climb toward \(+\infty\) — the same signed direction — so we write \(\lim_{x \to 0} 1/x^{2} = \infty\). For \(1/x\) (right) the left branch falls to \(-\infty\) while the right rises to \(+\infty\); the two disagree, so the two-sided limit does not exist and we do <em>not</em> write \(=\infty\).</figcaption>
-  </figure>
 
   <p>To capture this behavior, we introduce the notation
   \[ \lim_{x \to 0} \frac{1}{x^{2}} = \infty. \]
@@ -1420,7 +1435,7 @@ window.MathJax = {
         \[ \lim_{x \to 3^{-}} \frac{2x}{x - 3} = -\infty. \]
         At least one one-sided limit is infinite, so the line \(x = 3\) is a vertical asymptote, as shown in Figure 1.18.</p>
         <figure class="figure" data-fig="vertical-asymptote">
-          <figcaption><span class="fig-no">Figure 1.18</span> The graph of \(y = \frac{2x}{x - 3}\) has a vertical asymptote at \(x = 3\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.18</span> The vertical asymptote at \(x = 3\).</figcaption>
         </figure>
       </div>
     </section>
@@ -1456,7 +1471,7 @@ window.MathJax = {
         \[ \lim_{x \to 0^{+}} \ln x = -\infty. \]
         Therefore \(x = 0\) is a vertical asymptote of the graph of \(y = \ln x\).</p>
         <figure class="figure" data-fig="ln-asymptote">
-          <figcaption><span class="fig-no">Figure 1.19</span> The graph of \(y = \ln x\) has a vertical asymptote at \(x = 0\).</figcaption>
+          <figcaption><span class="fig-no">Figure 1.19</span> The vertical asymptote of \(y = \ln x\).</figcaption>
         </figure>
       </div>
     </section>
@@ -1603,14 +1618,13 @@ window.MathJax = {
         \[ \begin{aligned} \frac{x - 1}{x^{2} - 1} &= \frac{x - 1}{(x - 1)(x + 1)}\\ &= \frac{1}{x + 1}, \qquad x \neq 1. \end{aligned} \]
         Therefore
         \[ \lim_{x \to 1} \frac{x - 1}{x^{2} - 1} = \lim_{x \to 1} \frac{1}{x + 1} = \tfrac{1}{2}. \]</p>
+        <!-- expansion:figure — removable hole: (x-1)/(x²-1)=1/(x+1) with open point at x=1, height ½ (figure-opportunity audit 2026-06-21; fulfils the §1.5 placeholder; registered in chapter1 FIGS as "removable-hole") -->
+        <figure class="figure" data-fig="removable-hole">
+          <figcaption><span class="fig-no">Figure 1.20</span> The removable hole at \(x = 1\); its height is \(\tfrac{1}{2}\).</figcaption>
+        </figure>
       </div>
     </section>
   </div>
-
-  <!-- expansion:figure — removable hole: (x-1)/(x²-1)=1/(x+1) with open point at x=1, height ½ (figure-opportunity audit 2026-06-21; fulfils the §1.5 placeholder; registered in chapter1 FIGS as "removable-hole") -->
-  <figure class="figure" data-fig="removable-hole">
-    <figcaption><span class="fig-no">Figure 1.20</span> The graph of \(y = \dfrac{x - 1}{x^{2} - 1}\) coincides with the smooth curve \(y = \dfrac{1}{x + 1}\) everywhere except at \(x = 1\), where the original is undefined — a single missing point (open circle). Cancelling the common factor fills that hole, and the limit as \(x \to 1\) is exactly the hole's height, \(\tfrac{1}{2}\).</figcaption>
-  </figure>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -1864,14 +1878,14 @@ window.MathJax = {
   <p>Figure 1.24 gives a geometric reading of the definition. If \(x\) is restricted to the punctured interval \((a - \delta, a + \delta)\) with \(x \neq a\), then the corresponding values of \(f(x)\) lie in the target strip \((L - \varepsilon, L + \varepsilon)\). The value \(f(a)\) itself may be different from \(L\): the limit depends only on the behavior of \(f(x)\) when \(x\) is close to \(a\), not on what happens at \(x = a\).</p>
 
   <figure class="figure" data-fig="precise-limit">
-    <figcaption><span class="fig-no">Figure 1.24</span> Geometric interpretation of the \(\varepsilon\)-\(\delta\) definition; \(\delta\) depends on \(\varepsilon\).</figcaption>
+    <figcaption><span class="fig-no">Figure 1.24</span> A punctured \(\delta\)-neighborhood maps into an \(\varepsilon\)-strip around \(L\).</figcaption>
   </figure>
 
   <p>The condition \(0 < |x - a| < \delta\) says that \(x\) lies within distance \(\delta\) of \(a\), but \(x \neq a\). The inequality \(|f(x) - L| < \varepsilon\) says that \(f(x)\) lies within distance \(\varepsilon\) of \(L\). The key phrase is “for every \(\varepsilon > 0\)”: no matter how small a tolerance \(\varepsilon\) we demand, we must be able to find a corresponding \(\delta\) (Figure 1.25).</p>
 
   <!-- expansion:figure — ε→δ dynamic: shrink the ε-strip and the responding δ-band shrinks too (here δ=ε/2 for f=2x−1) (figure-opportunity audit 2026-06-21; registered in chapter1 FIGS as "epsilon-delta-dynamic") -->
   <figure class="figure" data-fig="epsilon-delta-dynamic">
-    <figcaption><span class="fig-no">Figure 1.25</span> Why \(\delta\) depends on \(\varepsilon\). For \(f(x) = 2x - 1\) at \(a = 3\) (where \(L = 5\)), a generous tolerance (left, \(\varepsilon = 1\)) is met by a wide neighborhood (\(\delta = \tfrac{1}{2}\)); tightening the tolerance (right, \(\varepsilon = 0.4\)) forces a narrower one (\(\delta = 0.2\)). Each time the horizontal \(\varepsilon\)-strip narrows, the responding vertical \(\delta\)-band must narrow too — here \(\delta = \varepsilon/2\). Figure 1.24 shows a single such \((\varepsilon, \delta)\) pair; this one shows how the pair responds.</figcaption>
+    <figcaption><span class="fig-no">Figure 1.25</span> For \(f(x) = 2x - 1\) at \(a = 3\), tightening \(\varepsilon\) forces a narrower \(\delta\)-band.</figcaption>
   </figure>
 
   <!-- expansion:intuition — the ε-δ definition read as a challenge-and-response game [pass: enrichment] [source: CLP-1 clp_limits_notes §1.7] -->
@@ -2633,9 +2647,8 @@ window.MathJax = {
     /* §1.2 — arctan as the reflection of restricted tan across y=x (Figure 1.9).
        Equal-aspect square window so the reflection reads true. Both curves
        solid; y=x dashed (ch01 restrict-x2 convention). Vertical asymptotes of
-       tan at ±π/2 mirror to horizontal asymptotes of arctan at ±π/2 — shown by
-       the curve shapes + the ±π/2 ticks on both axes; the swap lives in the
-       caption (figure-opportunity audit 2026-06-21). */
+       tan at ±π/2 are drawn explicitly; the reflected arctan curve approaches
+       the corresponding horizontal levels (figure-opportunity audit 2026-06-21). */
     "arctan-reflection": () => {
       const h = Math.PI / 2;
       return {
@@ -2649,9 +2662,11 @@ window.MathJax = {
             yticks: [{ y: -h }, { y: h }],
             items: [
               { type: "curve", fn: (x) => x, domain: [-3.3, 3.3], cls: "refline" },
+              { type: "vline", x: -h, cls: "refline" },
+              { type: "vline", x: h, cls: "refline" },
               { type: "curve", fn: (x) => Math.tan(x), domain: [-1.3, 1.3], samples: 260, cls: "curve" },
               { type: "curve", fn: (x) => Math.atan(x), domain: [-3.3, 3.3], samples: 220, cls: "curve" },
-              { type: "text", x: 1.18, y: 2.95, tex: "\\tan x", cls: "a-curve", anchor: "start" },
+              { type: "text", x: 1.42, y: 2.95, tex: "\\tan x", cls: "a-curve", anchor: "start" },
               { type: "text", x: 3.05, y: 1.3, tex: "\\arctan x", cls: "a-curve", anchor: "end", dy: 13 },
               { type: "text", x: 2.45, y: 2.85, tex: "y=x", cls: "a-ref", anchor: "start" },
             ],
@@ -2761,7 +2776,7 @@ window.MathJax = {
       }
       el.insertAdjacentHTML("afterbegin", html);
 
-      /* Connect per-figure CSS width variables (--fig-1-1 … --fig-1-13)
+      /* Connect per-figure CSS width variables (--fig-1-1 … --fig-1-25)
          defined in :root to this figure's --fig-w so the control panel
          actually takes effect. */
       const figNo = el.querySelector(".fig-no");
@@ -2991,6 +3006,9 @@ function paginate(blocks) {
   newSheet();
   var fits = function() { return body.scrollHeight <= body.clientHeight + 1; };
   var FREE_THRESHOLD = 130;
+  var shouldBreakBefore = function(block) {
+    return block.classList && block.classList.contains("page-break-before") && body.childElementCount > 0;
+  };
   var moveToFreshPage = function(block) {
     var carry = null;
     if (body.childElementCount > 0) {
@@ -3002,6 +3020,7 @@ function paginate(blocks) {
     body.appendChild(block);
   };
   var place = function(block) {
+    if (shouldBreakBefore(block)) newSheet();
     body.appendChild(block);
     if (fits()) {
       /* ── Orphan heading prevention ──────────────────────────

@@ -11,8 +11,20 @@
      ════════════════════════════════════════════════════════════════ -->
 <style>
 :root {
-  --fig-4-1:  100%;    /* Figure 4.1  Partial sums converging to e^x */
+  --fig-4-1:  100%;    /* Figure 4.1  Completeness bound */
+  --fig-4-2:  100%;    /* Figure 4.2  Partial sums converging to e^x */
+  --fig-4-3:  100%;    /* Figure 4.3  Interior extremum squeeze */
+  --fig-4-4:  100%;    /* Figure 4.4  MVT secant-tangent */
+  --fig-4-5:  100%;    /* Figure 4.5  e^x / ln x reflection */
+  --fig-4-6:  100%;    /* Figure 4.6  Reciprocal-slope geometry */
 }
+
+.paper figure[data-fig="completeness-bound"] { --fig-w: var(--fig-4-1); }
+.paper figure[data-fig="partial-sums-exp"] { --fig-w: var(--fig-4-2); }
+.paper figure[data-fig="interior-extremum-squeeze"] { --fig-w: var(--fig-4-3); }
+.paper figure[data-fig="mvt-secant-tangent"] { --fig-w: var(--fig-4-4); }
+.paper figure[data-fig="exp-log-reflection"] { --fig-w: var(--fig-4-5); }
+.paper figure[data-fig="reciprocal-slope-log"] { --fig-w: var(--fig-4-6); }
 </style>
 
 <!-- Google Fonts: Inter for UI -->
@@ -222,7 +234,7 @@ window.MathJax = {
 .skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
 .skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
 .skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
-.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
 .skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
 .skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
 .skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
@@ -490,9 +502,11 @@ window.MathJax = {
     </div>
   </section>
 
+  <p>Figure 4.1 pictures the real-number side of this principle: the sequence terms are isolated dots approaching a limiting level, not points on a continuous curve.</p>
+
   <!-- expansion:figure [pass: enrichment] [source: pedagogical synthesis — monotone-bounded/completeness illustration; registered in chapter4 FIGS as "completeness-bound"] -->
   <figure class="figure" data-fig="completeness-bound">
-    <figcaption><span class="fig-no">Figure 4.1</span> A non-decreasing sequence trapped below an upper bound \(M\) has nowhere to go but toward a limit \(L\); the completeness of \(\mathbb{R}\) guarantees that limit exists. The terms are isolated dots, not a curve. The same trapping fails in \(\mathbb{Q}\): the sequence \(3,\ 3.1,\ 3.14,\ \dots\), bounded above by \(4\), converges to \(\pi\) — a limit absent from \(\mathbb{Q}\).</figcaption>
+    <figcaption><span class="fig-no">Figure 4.1</span> A monotone bounded sequence in \(\mathbb{R}\): the terms climb toward a limiting level \(L\) while staying below \(M\).</figcaption>
   </figure>
 
   <h3 class="subsec-head">Convergence of the series for \(x > 0\)</h3>
@@ -578,9 +592,11 @@ window.MathJax = {
     </section>
   </div>
 
+  <p>Figure 4.2 shows the same closing-in as functions of \(x\): \(P_{1}, \dots, P_{4}\) are polynomial approximations to \(e^{x}\), with higher-degree sums staying close over a wider range.</p>
+
   <!-- expansion:figure — the partial-sum convergence picture (ROADMAP §4.1 key figure); registered in chapter4 FIGS as "partial-sums-exp" -->
   <figure class="figure" data-fig="partial-sums-exp">
-    <figcaption><span class="fig-no">Figure 4.2</span> The polynomial partial sums \(P_{k}(x)\) for \(k = 1, 2, 3, 4\) (gray) rise to meet the smooth exponential curve \(e^{x}\) (blue). All pass through \((0, 1)\); near \(x = 0\) even low-order sums hug the curve, and higher-order sums stay close over a wider range, just as the tail bound \((*)\) requires.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.2</span> Polynomial partial sums \(P_{1}, \dots, P_{4}\) compared with the exponential curve \(e^{x}\).</figcaption>
   </figure>
 
   <!-- expansion:summary — close the section and set up §4.2 (x<0, continuity, exponent law) -->
@@ -816,7 +832,10 @@ window.MathJax = {
       <p>Enlarging the inner sum in (II) to all \(m\) with \(0 \le m \le \ell\) and passing to absolute values can only increase it, so</p>
       <p>\[ \lvert \text{(II)} \rvert \le \sum_{\ell = k + 1}^{2k} \frac{1}{\ell!} \sum_{m = 0}^{\ell} \binom{\ell}{m} \lvert x \rvert^{m} \lvert y \rvert^{\ell - m} = \sum_{\ell = k + 1}^{2k} \frac{(\lvert x \rvert + \lvert y \rvert)^{\ell}}{\ell!} \le \sum_{\ell = k + 1}^{\infty} \frac{(2L)^{\ell}}{\ell!}. \]</p>
       <p>Since \(\ell > n_{0} > 8L\), each ratio \((2L)/\ell < \tfrac{1}{4} < \tfrac{1}{2}\), so the same geometric estimate that produced \((*)\) gives</p>
-      <p>\[ \lvert \text{(II)} \rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}, \qquad \text{hence} \qquad \bigl\lvert P_{k}(x) P_{k}(y) - P_{k}(x + y) \bigr\rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \]</p>
+      <p>\[ \begin{aligned}
+        &\lvert \text{(II)} \rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}, \\[2pt]
+        &\text{hence}\quad \bigl\lvert P_{k}(x) P_{k}(y) - P_{k}(x + y) \bigr\rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}.
+      \end{aligned} \]</p>
 
       <p class="para-head">Step 5: telescope the difference.</p>
       <p>Insert and remove the partial sums to compare \(e^{x} e^{y}\) with \(e^{x + y}\):</p>
@@ -1102,16 +1121,24 @@ window.MathJax = {
       <p>Take \(x_{M}\) to be a maximum point; the minimum case is identical with the inequalities reversed. Since \(f(x_{M}) \ge f(x)\) for all \(x \in [a, b]\),</p>
       <p>\[ f(x_{M} + h) - f(x_{M}) \le 0 \]</p>
       <p>for every increment \(h\) small enough that \(x_{M} + h\) stays in \([a, b]\). Because \(x_{M}\) lies in the open interior \((a, b)\), both small positive and small negative \(h\) are allowed. Dividing by \(h\) and watching the sign of the denominator:</p>
-      <p>\[ \frac{f(x_{M} + h) - f(x_{M})}{h} \le 0 \quad (h > 0), \qquad \frac{f(x_{M} + h) - f(x_{M})}{h} \ge 0 \quad (h < 0). \]</p>
+      <p>\[ \begin{aligned}
+        &\frac{f(x_{M} + h) - f(x_{M})}{h} \le 0 \quad (h > 0), \\[2pt]
+        &\frac{f(x_{M} + h) - f(x_{M})}{h} \ge 0 \quad (h < 0).
+      \end{aligned} \]</p>
       <p>The derivative \(f'(x_{M})\) exists, so the one-sided limits both equal it. Letting \(h \to 0^{+}\) through positive values keeps the quotient \(\le 0\), and letting \(h \to 0^{-}\) through negative values keeps it \(\ge 0\):</p>
-      <p>\[ f'(x_{M}) = \lim_{h \to 0^{+}} \frac{f(x_{M} + h) - f(x_{M})}{h} \le 0, \qquad f'(x_{M}) = \lim_{h \to 0^{-}} \frac{f(x_{M} + h) - f(x_{M})}{h} \ge 0. \]</p>
+      <p>\[ \begin{aligned}
+        &f'(x_{M}) = \lim_{h \to 0^{+}} \frac{f(x_{M} + h) - f(x_{M})}{h} \le 0, \\[2pt]
+        &f'(x_{M}) = \lim_{h \to 0^{-}} \frac{f(x_{M} + h) - f(x_{M})}{h} \ge 0.
+      \end{aligned} \]</p>
       <p>A single number that is both \(\le 0\) and \(\ge 0\) is \(0\), so \(f'(x_{M}) = 0\). <span class="qed qed-proof"></span></p>
     </div>
   </section>
 
+  <p>Figure 4.3 packages the maximum case of the proof: the left and right secants approach the same derivative from opposite sides.</p>
+
   <!-- expansion:figure [pass: enrichment] [source: pedagogical synthesis — Theorem A two-sided squeeze; registered in chapter4 FIGS as "interior-extremum-squeeze"] -->
   <figure class="figure" data-fig="interior-extremum-squeeze">
-    <figcaption><span class="fig-no">Figure 4.3</span> At an interior maximum \(x_{M}\) the difference quotient is \(\le 0\) on the right (a secant sloping down) and \(\ge 0\) on the left (a secant sloping up). The one value \(f'(x_{M})\) is caught between, so it must be \(0\): the tangent there is horizontal. The squeeze needs both sides — which is exactly why the conclusion can fail at an endpoint.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.3</span> Two-sided secants at an interior maximum, forcing the tangent slope to be \(0\).</figcaption>
   </figure>
 
   <!-- expansion:caution — the "interior" hypothesis is essential; endpoint extrema need not have zero derivative -->
@@ -1156,9 +1183,11 @@ window.MathJax = {
     </div>
   </section>
 
+  <p>Figure 4.4 is the picture to keep in mind: one average slope across \([a,b]\), matched by one tangent slope inside.</p>
+
   <!-- expansion:figure — the canonical MVT picture (ROADMAP §4.4 key figure); registered in chapter4 FIGS as "mvt-secant-tangent" -->
   <figure class="figure" data-fig="mvt-secant-tangent">
-    <figcaption><span class="fig-no">Figure 4.4</span> The Mean Value Theorem. The secant through \((a, f(a))\) and \((b, f(b))\) (dashed) has slope \((f(b) - f(a))/(b - a)\); the theorem guarantees an interior point \(c\) where the tangent (solid) is parallel to it. The proof tilts the picture by subtracting the secant, reducing the claim to Rolle’s theorem.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.4</span> The MVT secant–tangent picture: an interior tangent parallel to the secant through the endpoints.</figcaption>
   </figure>
 
   <section class="env env-proof">
@@ -1416,7 +1445,7 @@ window.MathJax = {
 
   <!-- expansion:figure — Figure 4.5 (§C-3, ROADMAP key figure): e^x / ln x reflection across y=x; registered in chapter4 FIGS as "exp-log-reflection" -->
   <figure class="figure" data-fig="exp-log-reflection">
-    <figcaption><span class="fig-no">Figure 4.5</span> The graphs of \(e^{x}\) (blue) and \(\ln x\) (red) are mirror images across the line \(y = x\) (dashed) — the geometric signature of the inverse relation \(\ln(e^{x}) = x\). Reflecting swaps coordinates, sending the point \((0, 1)\) on the exponential to \((1, 0)\) on the logarithm.</figcaption>
+    <figcaption><span class="fig-no">Figure 4.5</span> The inverse relationship between \(e^{x}\) and \(\ln x\) appears as reflection across \(y = x\); \((0,1)\) reflects to \((1,0)\).</figcaption>
   </figure>
 
   <h3 class="subsec-head">Continuity of the logarithm</h3>
@@ -1478,9 +1507,11 @@ window.MathJax = {
     </div>
   </section>
 
+  <p>Figure 4.6 turns that reciprocal into geometry: reflecting an inverse function swaps rise and run for corresponding tangents.</p>
+
   <!-- expansion:figure [pass: enrichment] [source: pedagogical synthesis — reciprocal-slope geometry of the inverse-function derivative; registered in chapter4 FIGS as "reciprocal-slope-log"] -->
   <figure class="figure" data-fig="reciprocal-slope-log">
-    <figcaption><span class="fig-no">Figure 4.6</span> Why the slope inverts. Reflecting \(e^{x}\) across \(y = x\) turns its tangent at \((\ln 2,\ 2)\), of slope \(e^{\ln 2} = 2\), into the tangent to \(\ln x\) at \((2,\ \ln 2)\) — the mirror image, of reciprocal slope \(\tfrac{1}{2}\). Reflection swaps rise and run, which is exactly \((\ln x)' = 1/e^{\ln x} = 1/x\).</figcaption>
+    <figcaption><span class="fig-no">Figure 4.6</span> Corresponding tangent slopes under reflection: slope \(2\) on \(e^{x}\) becomes slope \(\tfrac12\) on \(\ln x\).</figcaption>
   </figure>
 
   <!-- expansion:intuition — Remark 4.5 (§C-4, ROADMAP prerequisite): rigorous vs Ch3 chain-rule; closes the §3.3 forward-reference loop -->
@@ -2251,7 +2282,15 @@ function paginate(blocks) {
       return;
     }
     var mode = splitMode(block);
-    var want = (mode !== "none" && blockH > body.clientHeight);
+    var remainingAtInsert = 0;
+    if (mode !== "none") {
+      var splitProbe = document.createElement("div");
+      splitProbe.style.height = "0"; splitProbe.style.margin = "0"; splitProbe.style.padding = "0";
+      body.appendChild(splitProbe);
+      remainingAtInsert = body.clientHeight - (splitProbe.getBoundingClientRect().top - body.getBoundingClientRect().top);
+      body.removeChild(splitProbe);
+    }
+    var want = (mode !== "none" && (blockH > body.clientHeight || remainingAtInsert >= FREE_THRESHOLD));
     if (want) { var parts = splitParts(block); if (parts.length > 1) { parts.forEach(place); return; } }
     moveToFreshPage(block);
     if (!fits() && mode !== "none") {

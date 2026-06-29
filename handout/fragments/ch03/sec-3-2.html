@@ -40,7 +40,7 @@
   <!-- expansion:intuition — load-bearing intuition: rates multiply because local linear approximations compose; this carries the statement, the Leibniz mnemonic, and the proof strategy at once -->
   <p>Section 3.1 gave us the derivatives of the trigonometric functions, but only in their bare form. We can differentiate \(\sin x\), yet nothing so far reaches \(\sin(x^{2})\) or \(\sqrt{1 + x^{2}}\), where one function is fed <em>into</em> another. Chapter 2 supplied rules for sums, products, and quotients — but not for <em>composition</em>, the operation of applying one function to the output of another. The chain rule fills exactly this gap, and it is the rule that finally completes the differentiation toolkit.</p>
 
-  <p>The idea behind it fits in a single image. Near a point, a differentiable function behaves like its tangent line: it takes a small change in its input and scales it by its slope. The catch is only that this is approximate: there is an error, and it shrinks faster than the change itself. Now chain two such functions together. If \(g\) scales a small increment \(h\) by \(g'(x)\), and \(f\) then scales <em>that</em> by \(f'(g(x))\), the two magnifications stack — the composite scales \(h\) by the product \(f'(g(x))\,g'(x)\). That product is the chain rule, and the proof at the end of this section is nothing more than the careful check that the two error terms, once chained, are still negligible.</p>
+  <p>The idea behind it, pictured in Figure 3.5, fits in a single image. Near a point, a differentiable function behaves like its tangent line: it takes a small change in its input and scales it by its slope. The catch is only that this is approximate: there is an error, and it shrinks faster than the change itself. Now chain two such functions together. If \(g\) scales a small increment \(h\) by \(g'(x)\), and \(f\) then scales <em>that</em> by \(f'(g(x))\), the two magnifications stack — the composite scales \(h\) by the product \(f'(g(x))\,g'(x)\). That product is the chain rule, and the proof at the end of this section is nothing more than the careful check that the two error terms, once chained, are still negligible.</p>
 
   <p>Alongside the chain rule, this section draws on two results that already belong to Chapter 2 — the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1). We take both as established and use them freely, without re-proving them here.</p>
 
@@ -54,7 +54,7 @@
 
   <!-- expansion:figure — chain rule as composed mapping (ROADMAP key figure; registered in exp-ch03/figures.js as "composed-mapping") -->
   <figure class="figure" data-fig="composed-mapping">
-    <figcaption><span class="fig-no">Figure 3.5</span> The chain rule as a composed mapping. A small input increment \(h\) at \(x_{0}\) is carried by \(g\) to an increment of about \(g'(x_{0})\,h\) at \(u_{0} = g(x_{0})\), and then by \(f\) to about \(f'(g(x_{0}))\,g'(x_{0})\,h\) at \(y_{0} = f(g(x_{0}))\). The two local slopes multiply — which is why the composite’s derivative is their product.</figcaption>
+    <figcaption><span class="fig-no">Figure 3.5</span> The chain rule as a composed mapping: local slope factors accumulate along \(x \mapsto u \mapsto y\).</figcaption>
   </figure>
 
   <!-- expansion:intuition — the Leibniz form (the working notation), with the mnemonic-not-proof caveat folded in (ROADMAP pitfall) -->
@@ -101,7 +101,7 @@
 
   <!-- expansion:figure — remainder form geometry: curve vs tangent, gap R(h) shrinking faster than h (registered in figures.js as "remainder-tangent") -->
   <figure class="figure" data-fig="remainder-tangent">
-    <figcaption><span class="fig-no">Figure 3.6</span> Differentiability as a first-order fit. Near \(x_{0}\) the graph of \(f\) (solid) hugs its tangent line (dashed); at \(x_{0}+h\) the vertical gap between them is the remainder \(R(h)\). Halving \(h\) (right panel) shrinks that gap far faster than \(h\) itself — the geometric content of \(R(h)/h \to 0\). This single-function picture is the local fact behind Figure 3.5: each function in a composition is, up close, almost its own tangent line, and it is those linear parts whose slopes multiply.</figcaption>
+    <figcaption><span class="fig-no">Figure 3.6</span> Remainder-form geometry: halving \(h\) makes the vertical error \(R(h)\) much smaller, illustrating \(R(h)/h \to 0\).</figcaption>
   </figure>
 
   <!-- expansion:intuition — frame the equivalence: the remainder form is not a new notion of derivative, just a repackaging of §2.2 -->
@@ -136,9 +136,16 @@
       <p>We use the remainder form of differentiability (Definition 3.1), which by Proposition 3.3 is available for any differentiable function. Because \(g\) is differentiable at \(x_{0}\),</p>
       <p>\[ g(x_{0} + h) = g(x_{0}) + m_{1} h + R_{1}(h), \qquad m_{1} = g'(x_{0}), \quad \lim_{h \to 0}\frac{R_{1}(h)}{h} = 0. \]</p>
       <p>Because \(f\) is differentiable at \(g(x_{0})\), we may apply the remainder form to \(f\) with the increment \(m_{1} h + R_{1}(h)\) playing the role of \(h\):</p>
-      <p>\[ P(x_{0}+h) = f\bigl(g(x_{0}+h)\bigr) = f(g(x_{0})) + m_{2}\bigl[m_{1} h + R_{1}(h)\bigr] + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr), \]</p>
+      <p>\[ \begin{aligned}
+        P(x_{0}+h)
+          &= f\bigl(g(x_{0}+h)\bigr) \\[2pt]
+          &= f(g(x_{0})) + m_{2}\bigl[m_{1} h + R_{1}(h)\bigr] + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr),
+      \end{aligned} \]</p>
       <p>where \(m_{2} = f'(g(x_{0}))\) and \(\lim_{y \to 0} R_{2}(y)/y = 0\). Collecting the term linear in \(h\) and bundling the rest into a single remainder \(R_{3}\),</p>
-      <p>\[ P(x_{0}+h) = P(x_{0}) + \bigl(g'(x_{0})\,f'(g(x_{0}))\bigr) h + R_{3}(h), \qquad R_{3}(h) = m_{2} R_{1}(h) + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr), \]</p>
+      <p>\[ \begin{aligned}
+        &P(x_{0}+h) = P(x_{0}) + \bigl(g'(x_{0})\,f'(g(x_{0}))\bigr) h + R_{3}(h), \\[2pt]
+        &\qquad R_{3}(h) = m_{2} R_{1}(h) + R_{2}\bigl(m_{1} h + R_{1}(h)\bigr),
+      \end{aligned} \]</p>
       <p>using \(f(g(x_{0})) = P(x_{0})\) and \(m_{1} m_{2} = g'(x_{0})f'(g(x_{0})) = f'(g(x_{0}))g'(x_{0})\), the same product in either order. By the remainder form, this says precisely that \(P\) is differentiable at \(x_{0}\) with \(P'(x_{0}) = f'(g(x_{0}))g'(x_{0})\). It remains only to show that</p>
       <p>\[ \lim_{h \to 0}\frac{R_{3}(h)}{h} = 0. \]</p>
       <!-- expansion:formula — the manuscript leaves the splitting and the easy term m₂R₁(h)/h → 0 implicit; we make it explicit -->

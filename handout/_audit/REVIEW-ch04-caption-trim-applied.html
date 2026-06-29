@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 4 圖說精簡 — applied report</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --ink:#1f2933; --muted:#667085; --line:#d9dee7; --blue:#1f5fbf; --green:#1a7f45; --amber:#9a5b00; --bg:#fbfbfa; --card:#fff; }
+  body { margin:0 auto; max-width:1080px; padding:2rem 1.4rem 4rem; background:var(--bg); color:var(--ink);
+         font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif; line-height:1.65; }
+  h1 { font-size:1.55rem; margin:.2rem 0 .3rem; }
+  h2 { font-size:1.12rem; margin:1.8rem 0 .6rem; padding-top:.8rem; border-top:2px solid var(--line); }
+  p { margin:.55rem 0; }
+  .sub { color:var(--muted); font-size:.92rem; }
+  .ok { border-left:4px solid var(--green); background:#edf8f1; padding:.7rem .9rem; border-radius:6px; }
+  .warn { border-left:4px solid var(--amber); background:#fff8e6; padding:.7rem .9rem; border-radius:6px; }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; background:var(--card); font-size:.9rem; }
+  th, td { border:1px solid var(--line); padding:.55rem .65rem; vertical-align:top; text-align:left; }
+  th { background:#eef2f7; }
+  .fig { white-space:nowrap; font-weight:700; color:var(--blue); }
+  code { background:#eef2f7; border-radius:4px; padding:.08rem .3rem; }
+  .caption { font-style:italic; }
+</style>
+</head>
+<body>
+<h1>Chapter 4 — 圖說精簡 applied report</h1>
+<p class="sub">2026-06-29 · 範圍：<code>handout/fragments/ch04/sec-4-1.html</code>、<code>sec-4-4.html</code>、<code>sec-4-5.html</code>。本輪只做 caption / adjacent prose copyedit：不改 FIGS 繪圖、不新增數學結果、不重新編號。</p>
+
+<div class="ok">
+  <p><b>結論：</b>第四章 6 張圖的 figcaption 全部檢查並精簡。原本在 caption 中重講 theorem proof、remark 或 example 的內容，已改由相鄰正文承擔；凡有拆到正文者，都在正文保留明確 Figure 引用。</p>
+</div>
+
+<h2>逐圖裁決</h2>
+<table>
+  <tr>
+    <th>Figure</th>
+    <th>裁決</th>
+    <th>精簡理由</th>
+    <th>新版 caption</th>
+  </tr>
+  <tr>
+    <td class="fig">4.1</td>
+    <td>拆到正文＋縮短</td>
+    <td>Remark 4.1 已說明 \(\mathbb{R}\) vs \(\mathbb{Q}\)、\(3,3.1,3.14,\dots\to\pi\) 的反例；caption 不再重講完整對比。正文補入 Figure 4.1，提醒讀者這是 sequence dots 而非 curve。</td>
+    <td class="caption">A monotone bounded sequence in \(\mathbb{R}\): the terms climb toward a limiting level \(L\) while staying below \(M\).</td>
+  </tr>
+  <tr>
+    <td class="fig">4.2</td>
+    <td>拆到正文＋縮短</td>
+    <td>Example 4.1 和 tail bound \((*)\) 已說明 partial sums closing in；正文補 Figure 4.2 說明「higher-degree sums stay close over a wider range」，caption 只留圖的比較對象。</td>
+    <td class="caption">Polynomial partial sums \(P_{1}, \dots, P_{4}\) compared with the exponential curve \(e^{x}\).</td>
+  </tr>
+  <tr>
+    <td class="fig">4.3</td>
+    <td>拆到正文＋縮短</td>
+    <td>Theorem 4.10 proof 已完整推導左右 difference quotient 的符號；endpoint 例外也由後方 caution 承擔。正文補 Figure 4.3 作為 proof 的圖像摘要。</td>
+    <td class="caption">Two-sided secants at an interior maximum, forcing the tangent slope to be \(0\).</td>
+  </tr>
+  <tr>
+    <td class="fig">4.4</td>
+    <td>拆到正文＋縮短</td>
+    <td>Theorem 4.12 陳述已給 secant slope；proof 已說明 subtracting the secant 如何回到 Rolle。正文補 Figure 4.4 的讀圖句，caption 不再重講 proof。</td>
+    <td class="caption">The MVT secant–tangent picture: an interior tangent parallel to the secant through the endpoints.</td>
+  </tr>
+  <tr>
+    <td class="fig">4.5</td>
+    <td>縮短</td>
+    <td>Definition 4.4 已給 inverse identities；caption 保留反射與代表點，刪去較長的 explanatory apposition。</td>
+    <td class="caption">The inverse relationship between \(e^{x}\) and \(\ln x\) appears as reflection across \(y = x\); \((0,1)\) reflects to \((1,0)\).</td>
+  </tr>
+  <tr>
+    <td class="fig">4.6</td>
+    <td>拆到正文＋縮短</td>
+    <td>Theorem 4.14 proof 已推到 reciprocal quotient；正文補 Figure 4.6 說明 reflection swaps rise and run。caption 只保留圖上 slope \(2\leftrightarrow\tfrac12\) 的對應。</td>
+    <td class="caption">Corresponding tangent slopes under reflection: slope \(2\) on \(e^{x}\) becomes slope \(\tfrac12\) on \(\ln x\).</td>
+  </tr>
+</table>
+
+<h2>驗證</h2>
+<ul>
+  <li><code>python build.py ch04</code>：通過，已重建 <code>handout/chapter4-print-standalone.html</code>。</li>
+  <li>standalone caption grep：6/6 張圖皆為新版 caption；舊長句關鍵片語（例如 “A non-decreasing sequence trapped”、 “Why the slope inverts”）未再出現。</li>
+  <li>相鄰正文檢查：Figure 4.1、4.2、4.3、4.4、4.6 的拆分句都保留明確 Figure 編號。</li>
+</ul>
+
+<div class="warn">
+  <p><b>未完成的視覺 gate：</b><code>node handout/_render/linebreak-gate.mjs handout/chapter4-print-standalone.html</code> 本輪未能作為驗收通過；頁面等待期間 <code>#boot</code> 未移除。用 <code>shot.mjs</code> 以 DOM-loaded readiness 診斷時回報 <code>math=0</code> 且 6 figure 仍為 source-template/off-screen，指向 MathJax 載入或 boot 前置流程未完成，而不是 caption 文字本身的語法錯誤。已清除該診斷留下的 headless Chrome/Node helper。</p>
+</div>
+
+<p class="sub">Mode B / source note：本輪沒有新增外部題源或數學內容，屬於既有正文與圖說的局部 copyedit；因此不新增 provenance。人工回歸重點為「caption 不再重複正文，但仍能讀懂圖的數學目的」。</p>
+</body>
+</html>

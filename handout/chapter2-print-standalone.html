@@ -11,11 +11,28 @@
      ════════════════════════════════════════════════════════════════ -->
 <style>
 :root {
-  --fig-2-1:  100%;    /* Figure 2.1  Secant-to-tangent */
-  --fig-2-2:  100%;    /* Figure 2.2  f and f-prime */
-  --fig-2-3:  100%;    /* Figure 2.3  |x| corner */
-  --fig-2-4:  100%;    /* Figure 2.4  Product-rule rectangle (inline SVG) */
+  --fig-2-1:  100%;    /* Figure 2.1   Secant-to-tangent */
+  --fig-2-2:  80%;    /* Figure 2.2   Difference quotient anatomy */
+  --fig-2-3:  100%;    /* Figure 2.3   Tangent approximation */
+  --fig-2-4:  80%;    /* Figure 2.4   f and f-prime */
+  --fig-2-5:  100%;    /* Figure 2.5   |x| corner */
+  --fig-2-6:  80%;    /* Figure 2.6   Cube-root vertical tangent */
+  --fig-2-7:  100%;    /* Figure 2.7   Differentiable vs. continuous */
+  --fig-2-8:  100%;    /* Figure 2.8   e^x self-derivative */
+  --fig-2-9:  100%;    /* Figure 2.9   Product-rule rectangle (inline SVG) */
+  --fig-2-10: 100%;    /* Figure 2.10  Quotient-rule graph */
 }
+
+.paper figure[data-fig="secant-to-tangent"] { --fig-w: var(--fig-2-1); }
+.paper figure[data-fig="difference-quotient-anatomy"] { --fig-w: var(--fig-2-2); }
+.paper figure[data-fig="tangent-approx"] { --fig-w: var(--fig-2-3); }
+.paper figure[data-fig="f-and-fprime"] { --fig-w: var(--fig-2-4); }
+.paper figure[data-fig="abs-corner"] { --fig-w: var(--fig-2-5); }
+.paper figure[data-fig="cbrt-vertical-tangent"] { --fig-w: var(--fig-2-6); }
+.paper figure#fig-diff-cont { --fig-w: var(--fig-2-7); }
+.paper figure[data-fig="exp-self-derivative"] { --fig-w: var(--fig-2-8); }
+.paper figure#fig-product-area { --fig-w: var(--fig-2-9); }
+.paper figure[data-fig="quotient-example-graph"] { --fig-w: var(--fig-2-10); }
 </style>
 
 <!-- Google Fonts: Inter for UI -->
@@ -221,7 +238,7 @@ window.MathJax = {
 .skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
 .skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
 .skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
-.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
 .skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
 .skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
 .skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
@@ -251,7 +268,7 @@ window.MathJax = {
 /* ============================================================
    figs.css — inlined + modified for MathJax
    ============================================================ */
-.paper .fig-svg { height: auto; max-width: 100%; overflow: visible; }
+.paper .fig-svg { height: auto; overflow: visible; }
 .paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
 .paper .figure-art--pair { gap: 24px; }
 .paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
@@ -327,6 +344,8 @@ window.MathJax = {
 .sheet-body .env-body::after { display: none; content: none; }
 .sheet-body .env-cont { margin-top: 0; }
 .sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+.sheet-body .split-unit > :first-child { margin-top: 0; }
+.sheet-body .split-unit > :last-child { margin-bottom: 0; }
 @media screen {
   body { background: #6f727b; margin: 0; }
   .sheet { box-shadow: 0 3px 18px rgba(0,0,0,.3); margin: 9mm auto; }
@@ -430,7 +449,7 @@ window.MathJax = {
 
   <!-- expansion:figure — secant-to-tangent convergence diagram (seed had placeholder, no art) -->
   <figure class="figure" data-fig="secant-to-tangent">
-    <figcaption><span class="fig-no">Figure 2.1</span> Secant lines \(PQ\) converging to the tangent line at \(P\) as the second point \(Q\) approaches \(P\) along the curve.</figcaption>
+    <figcaption><span class="fig-no">Figure 2.1</span> Secant lines \(PQ\) approaching the tangent line at \(P\).</figcaption>
   </figure>
 
   <section class="env env-definition">
@@ -460,7 +479,7 @@ window.MathJax = {
 
   <!-- expansion:figure — anatomy of the difference quotient: increment h and rise f(a+h)−f(a) on one secant (figure-opportunity F-2.1-A) [pass: enrichment] -->
   <figure class="figure" data-fig="difference-quotient-anatomy">
-    <figcaption><span class="fig-no">Figure 2.2</span> The difference quotient as the slope of the secant through \(P=(a,f(a))\) and \(Q=(a+h,f(a+h))\): the run \(h\) and the rise \(f(a+h)-f(a)\) form a right triangle whose ratio gives the slope.</figcaption>
+    <figcaption><span class="fig-no">Figure 2.2</span> The \(h\)-form difference quotient on one secant: run \(h\), rise \(f(a+h)-f(a)\).</figcaption>
   </figure>
 
   <!-- expansion:formula — name the limit as "derivative at a point"; brief: introduce f'(a) as slope alias -->
@@ -600,13 +619,13 @@ window.MathJax = {
         so the tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\) is \(y = \tfrac{1}{2} - \tfrac{1}{4}(x - 2)\). Near \(x = 2\) the curve hugs this line (local linearity, Remark 2.1), so substituting \(x = 2.05\) gives</p>
         <p>\[ \frac{1}{2.05} \;\approx\; \tfrac{1}{2} - \tfrac{1}{4}(0.05) = 0.5 - 0.0125 = 0.4875. \]</p>
         <p>A calculator gives \(1/2.05 = 0.48780\ldots\), so the estimate is accurate to three decimal places.</p>
+
+        <figure class="figure" data-fig="tangent-approx">
+          <figcaption><span class="fig-no">Figure 2.3</span> The curve \(y = \tfrac{1}{x}\) and its tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\), used for the approximation in Example 2.5.</figcaption>
+        </figure>
       </div>
     </section>
   </div>
-
-  <figure class="figure" data-fig="tangent-approx">
-    <figcaption><span class="fig-no">Figure 2.3</span> The curve \(y = \tfrac{1}{x}\) and its tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\): near the point of tangency the curve hugs the line, the local linearity that licenses the tangent-line approximation.</figcaption>
-  </figure>
 
   <!-- expansion:application — return to the opening approximation question (bookend) -->
   <section class="env env-remark">
@@ -720,10 +739,10 @@ window.MathJax = {
         <p>The difference quotient contains a difference of square roots, which we clear by multiplying by the conjugate \(\sqrt{x + h} + \sqrt{x}\):</p>
         <p>\[ \begin{aligned}
           \frac{f(x + h) - f(x)}{h}
-            &= \frac{\sqrt{x + h} - \sqrt{x}}{h}
-             = \frac{\bigl(\sqrt{x + h} - \sqrt{x}\bigr)\bigl(\sqrt{x + h} + \sqrt{x}\bigr)}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)} \\[4pt]
-            &= \frac{(x + h) - x}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)}
-             = \frac{1}{\sqrt{x + h} + \sqrt{x}}.
+            &= \frac{\sqrt{x + h} - \sqrt{x}}{h} \\[4pt]
+            &= \frac{\bigl(\sqrt{x + h} - \sqrt{x}\bigr)\bigl(\sqrt{x + h} + \sqrt{x}\bigr)}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)} \\[4pt]
+            &= \frac{(x + h) - x}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)} \\[4pt]
+            &= \frac{1}{\sqrt{x + h} + \sqrt{x}}.
         \end{aligned} \]</p>
         <p>The denominator no longer vanishes as \(h \to 0\), so
         \[ f'(x) = \lim_{h \to 0} \frac{1}{\sqrt{x + h} + \sqrt{x}} = \frac{1}{2\sqrt{x}}. \]
@@ -805,7 +824,7 @@ window.MathJax = {
 
   <!-- expansion:figure — derivative-as-a-function: f above, f' below on a common x-axis (ROADMAP key figure) -->
   <figure class="figure" data-fig="f-and-fprime">
-    <figcaption><span class="fig-no">Figure 2.4</span> The function \(f(x) = x^{2} + 4x - 2\) (top) and its derivative \(f'(x) = 2x + 4\) (bottom), aligned along the common vertical line \(x = -2\). To the left of \(x = -2\) the tangent lines of \(f\) slope downward and \(f' < 0\); to the right they slope upward and \(f' > 0\); at the lowest point, where the tangent is horizontal, \(f' = 0\).</figcaption>
+    <figcaption><span class="fig-no">Figure 2.4</span> The graph of \(f(x) = x^{2} + 4x - 2\) above its derivative \(f'(x) = 2x + 4\), aligned at \(x = -2\).</figcaption>
   </figure>
 
   <!-- expansion:intuition — the sign-correspondence reading principle -->
@@ -905,14 +924,14 @@ window.MathJax = {
         <p>For \(h < 0\) we have \(\lvert h \rvert = -h\), so</p>
         <p>\[ \lim_{h \to 0^{-}} \frac{\lvert h \rvert}{h} = \lim_{h \to 0^{-}} \frac{-h}{h} = -1. \]</p>
         <p>Since the right-hand limit (\(1\)) and the left-hand limit (\(-1\)) are not equal, the two-sided limit \(\lim_{h \to 0} \lvert h \rvert / h\) does not exist. By Definition 2.3, \(f(x) = \lvert x \rvert\) is <em>not</em> differentiable at \(x = 0\).</p>
+
+        <!-- expansion:figure — |x| corner with left/right secant slopes (ROADMAP key figure) -->
+        <figure class="figure" data-fig="abs-corner">
+          <figcaption><span class="fig-no">Figure 2.5</span> The graph of \(f(x) = \lvert x \rvert\) near the origin, with secant lines from each side.</figcaption>
+        </figure>
       </div>
     </section>
   </div>
-
-  <!-- expansion:figure — |x| corner with left/right secant slopes (ROADMAP key figure) -->
-  <figure class="figure" data-fig="abs-corner">
-    <figcaption><span class="fig-no">Figure 2.5</span> The graph of \(f(x) = \lvert x \rvert\) near the origin, with secant lines from each side.</figcaption>
-  </figure>
 
   <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.5). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line — exactly the geometric meaning of non-differentiability.</p>
 
@@ -933,14 +952,14 @@ window.MathJax = {
         <p>\[ \lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty. \]</p>
         <p>The limit does not exist as a <em>finite</em> number, so by Definition 2.3 the function is not differentiable at \(x = 0\).</p>
         <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)); here both one-sided limits agree — they both tend to \(+\infty\) — so there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative demands a finite limit, so differentiability fails here for a different reason than at a corner.</p>
+
+        <!-- expansion:figure — ∛x vertical tangent: the non-corner differentiability failure of Example 2.12 (figure-opportunity F-2.3-A) [pass: enrichment] -->
+        <figure class="figure" data-fig="cbrt-vertical-tangent">
+          <figcaption><span class="fig-no">Figure 2.6</span> The graph of \(f(x) = \sqrt[3]{x}\) near the origin, with secants steepening toward a vertical tangent.</figcaption>
+        </figure>
       </div>
     </section>
   </div>
-
-  <!-- expansion:figure — ∛x vertical tangent: the non-corner differentiability failure of Example 2.12 (figure-opportunity F-2.3-A) [pass: enrichment] -->
-  <figure class="figure" data-fig="cbrt-vertical-tangent">
-    <figcaption><span class="fig-no">Figure 2.6</span> The graph of \(f(x) = \sqrt[3]{x}\) near the origin, with secant lines from the origin that steepen toward the vertical as the second point approaches \(0\). Both sides agree, so there is no corner — instead a vertical tangent, where the slope tends to \(+\infty\) and the derivative fails to exist.</figcaption>
-  </figure>
 
   <h3 class="subsec-head">Differentiability and continuity</h3>
 
@@ -976,17 +995,17 @@ window.MathJax = {
 
   <figure class="figure" id="fig-diff-cont">
     <div class="figure-art">
-      <svg viewBox="0 0 380 200" style="width:380px" class="fig-svg" role="img"
+      <svg viewBox="0 -20 380 220" style="width:380px" class="fig-svg" role="img"
            aria-label="Inclusion diagram: differentiable functions form a proper subset of continuous functions. |x| at x=0 is continuous but not differentiable.">
         <ellipse cx="175" cy="105" rx="170" ry="88" fill="none" stroke="var(--c-primary)" stroke-width="1.5" stroke-dasharray="6 3"/>
         <ellipse cx="150" cy="108" rx="110" ry="62" fill="var(--c-primary)" fill-opacity="0.08" stroke="var(--c-primary)" stroke-width="1.5"/>
         <text x="150" y="104" text-anchor="middle" fill="var(--ink)" font-size="14" font-weight="500">Differentiable</text>
         <text x="150" y="124" text-anchor="middle" fill="var(--ink-soft)" font-size="12" font-style="italic">x&#xB2;, &#x221A;x, e&#x02E3;</text>
-        <text x="325" y="42" text-anchor="middle" fill="var(--ink)" font-size="14" font-weight="500">Continuous</text>
-        <text x="320" y="148" text-anchor="middle" fill="var(--c-caution)" font-size="12">|x| at x = 0</text>
+        <text x="175" y="4" text-anchor="middle" fill="var(--ink)" font-size="14" font-weight="500">Continuous</text>
+        <text x="300" y="122" text-anchor="middle" fill="var(--c-caution)" font-size="12">|x| at x = 0</text>
       </svg>
     </div>
-    <figcaption><span class="fig-no">Figure 2.7</span> The differentiable functions form a proper subset of the continuous ones: examples such as \(x^{2}\), \(\sqrt{x}\), and \(e^{x}\) lie inside both regions, while \(\lvert x \rvert\) at \(x = 0\) is continuous but not differentiable.</figcaption>
+    <figcaption><span class="fig-no">Figure 2.7</span> Differentiable functions sit inside the continuous functions; \(\lvert x \rvert\) at \(x = 0\) marks the continuous-but-not-differentiable case.</figcaption>
   </figure>
 
   <section class="env env-caution">
@@ -1336,11 +1355,11 @@ window.MathJax = {
   </section>
 
   <figure class="figure" data-fig="exp-self-derivative">
-    <figcaption><span class="fig-no">Figure 2.8</span> The graph of \(y = e^{x}\) with its tangent lines at \(x = 0\) and \(x = 1\): at \((0, 1)\) the slope is \(1 = e^{0}\) and at \((1, e)\) the slope is \(e = e^{1}\), so at each point the tangent's slope equals the height of the curve — \(e^{x}\) is its own derivative.</figcaption>
+    <figcaption><span class="fig-no">Figure 2.8</span> The graph of \(y = e^{x}\) with tangent lines at \(x = 0\) and \(x = 1\).</figcaption>
   </figure>
 
   <!-- expansion:intuition — the takeaway: self-replication is what makes e^x "natural" -->
-  <p>This self-replicating property is exactly what singles \(e^{x}\) out among all exponential functions and earns it the name <em>natural</em> exponential: at every point its rate of change equals its current value.</p>
+  <p>Figure 2.8 shows this self-replicating property at two points: the tangent slope is \(1=e^{0}\) at \((0,1)\) and \(e=e^{1}\) at \((1,e)\). That same slope-equals-height rule is exactly what singles \(e^{x}\) out among all exponential functions and earns it the name <em>natural</em> exponential: at every point its rate of change equals its current value.</p>
 
   <!-- expansion:intuition — why e^x is everywhere: any quantity whose growth rate is proportional to its size (y'=ky) [pass: enrichment] -->
   <p>That one property — rate of change equal to current size — is why \(e^{x}\) governs so much of the world. Any quantity whose growth rate is proportional to how much is already present obeys a relation of the form \(y' = ky\), and its solution is built from \(e^{x}\). Money under continuous compounding grows in proportion to the balance; a radioactive sample decays in proportion to the amount remaining; an unchecked population grows in proportion to its current size. In every case the rate is tied to the level, and \(e^{x}\) is the function that ties them.</p>
@@ -1473,7 +1492,7 @@ window.MathJax = {
         <text x="38" y="74" text-anchor="end" class="ptlab">Δ<tspan font-style="italic">g</tspan></text>
       </svg>
     </div>
-    <figcaption><span class="fig-no">Figure 2.9</span> Reading the product \(fg\) as the area of a rectangle: enlarging the sides by \(\Delta f\) and \(\Delta g\) adds two strips and a small corner.</figcaption>
+    <figcaption><span class="fig-no">Figure 2.9</span> Area model for the product rule: base \(fg\), two strips, and the corner \(\Delta f\,\Delta g\).</figcaption>
   </figure>
 
   <!-- expansion:intuition — convert the picture into the formula: the two strips give f'g and fg'; the corner is second-order and vanishes -->
@@ -1483,7 +1502,10 @@ window.MathJax = {
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.6</span><span class="env-name">The product rule</span></p>
     <div class="env-body">
       <p>If \(f\) and \(g\) are differentiable at \(x\), then their product \(fg\) is differentiable at \(x\), and</p>
-      <p>\[ (fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x), \qquad\text{i.e.}\qquad \frac{d}{dx}(fg) = \left(\frac{d}{dx}f\right)g + f\left(\frac{d}{dx}g\right). \]</p>
+      <p>\[ \begin{aligned}
+        &(fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x), \\[2pt]
+        &\text{i.e.}\quad \frac{d}{dx}(fg) = \left(\frac{d}{dx}f\right)g + f\left(\frac{d}{dx}g\right).
+      \end{aligned} \]</p>
     </div>
   </section>
 
@@ -1493,12 +1515,15 @@ window.MathJax = {
     <div class="env-body">
       <p>We start from the definition and apply a useful trick: add and subtract \(f(x)\,g(x+h)\) in the numerator, which lets us isolate the change in \(f\) from the change in \(g\):</p>
       <p>\[ \begin{aligned}
-        f(x+h)g(x+h) - f(x)g(x)
-          &= \bigl[f(x+h)g(x+h) - f(x)g(x+h)\bigr] + \bigl[f(x)g(x+h) - f(x)g(x)\bigr] \\[2pt]
-          &= \bigl[f(x+h) - f(x)\bigr]\,g(x+h) + f(x)\,\bigl[g(x+h) - g(x)\bigr].
+        &f(x+h)g(x+h) - f(x)g(x) \\
+        &= \bigl[f(x+h)g(x+h) - f(x)g(x+h)\bigr] + \bigl[f(x)g(x+h) - f(x)g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+h) - f(x)\bigr]\,g(x+h) + f(x)\,\bigl[g(x+h) - g(x)\bigr].
       \end{aligned} \]</p>
       <p>Dividing by \(h\),</p>
-      <p>\[ \frac{f(x+h)g(x+h) - f(x)g(x)}{h} = \frac{f(x+h) - f(x)}{h}\,g(x+h) \;+\; f(x)\,\frac{g(x+h) - g(x)}{h}. \]</p>
+      <p>\[ \begin{aligned}
+        &\frac{f(x+h)g(x+h) - f(x)g(x)}{h} \\[2pt]
+        &= \frac{f(x+h) - f(x)}{h}\,g(x+h) \;+\; f(x)\,\frac{g(x+h) - g(x)}{h}.
+      \end{aligned} \]</p>
       <p>Now let \(h \to 0\) and evaluate each piece with the limit laws of §1.5. The two difference quotients tend to \(f'(x)\) and \(g'(x)\). For the remaining factor, \(g(x+h) \to g(x)\): this is exactly the statement that \(g\) is continuous at \(x\), which holds because \(g\), being differentiable at \(x\), is continuous there (Theorem 2.1, §2.3). Therefore</p>
       <p>\[ (fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x). \]</p>
     </div>
@@ -1561,9 +1586,9 @@ window.MathJax = {
       <p>\[ \frac{f(x+\Delta x)}{g(x+\Delta x)} - \frac{f(x)}{g(x)} = \frac{f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x)}{g(x+\Delta x)\,g(x)}. \]</p>
       <p>On the numerator we play the same trick as before, now adding and subtracting \(f(x)\,g(x)\):</p>
       <p>\[ \begin{aligned}
-        f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x)
-          &= \bigl[f(x+\Delta x)\,g(x) - f(x)\,g(x)\bigr] - \bigl[f(x)\,g(x+\Delta x) - f(x)\,g(x)\bigr] \\[2pt]
-          &= \bigl[f(x+\Delta x) - f(x)\bigr]\,g(x) - f(x)\,\bigl[g(x+\Delta x) - g(x)\bigr].
+        &f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x) \\[2pt]
+        &= \bigl[f(x+\Delta x)\,g(x) - f(x)\,g(x)\bigr] - \bigl[f(x)\,g(x+\Delta x) - f(x)\,g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+\Delta x) - f(x)\bigr]\,g(x) - f(x)\,\bigl[g(x+\Delta x) - g(x)\bigr].
       \end{aligned} \]</p>
       <p>Dividing the whole difference by \(\Delta x\), the difference quotient becomes</p>
       <p>\[ \frac{1}{g(x+\Delta x)\,g(x)}\left( \frac{f(x+\Delta x) - f(x)}{\Delta x}\,g(x) - f(x)\,\frac{g(x+\Delta x) - g(x)}{\Delta x} \right). \]</p>
@@ -1603,13 +1628,13 @@ window.MathJax = {
                  = \frac{1 - x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}.
         \end{aligned} \]</p>
         <p>Had we mistakenly written the numerator as \((x)(2x) - (1)(x^{2}+1)\), every sign would be wrong. As a sanity check on the result, \(f'(0) = 1 > 0\) (the curve rises through the origin) and \(f'(\pm 1) = 0\), the two points where \(x/(x^{2}+1)\) reaches its largest and smallest values.</p>
+
+        <figure class="figure" data-fig="quotient-example-graph">
+          <figcaption><span class="fig-no">Figure 2.10</span> The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom), from Example 2.20.</figcaption>
+        </figure>
       </div>
     </section>
   </div>
-
-  <figure class="figure" data-fig="quotient-example-graph">
-    <figcaption><span class="fig-no">Figure 2.10</span> The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom) from Example 2.20, aligned along the common axis \(x\). At \(x = \pm 1\), where \(f\) reaches its maximum and minimum and its tangents run horizontal, \(f'\) crosses zero; at the origin the curve rises with slope \(f'(0) = 1\).</figcaption>
-  </figure>
 
   <!-- expansion:example — error-spotting on the quotient rule, the worked counterpart to the asymmetry Caution above [source: CLP-1 §2.6 prob_s2.6 Conceptual Q1 "spot the error: 2x/(x+1)"; official solution, rewritten] -->
   <div class="workedexample">
@@ -1902,7 +1927,7 @@ window.MathJax = {
         { type: "text", x: xR + 0.2, y: fc + fprime * (xR - c),
           tex: "\\text{Tangent line}", cls: "a-ref", anchor: "start", size: 12 },
         // --- curve label ---
-        { type: "text", x: 8, y: f(8) + 0.45,
+        { type: "text", x: 8, y: f(8) + 0.8,
           tex: "y\\!=\\!f(x)", cls: "a-curve", anchor: "start" },
       ];
       return {
@@ -1941,7 +1966,7 @@ window.MathJax = {
             { type: "curve", fn: (x) => -0.25 * x + 1, domain: [0.5, 3.8], cls: "refline" },
             { type: "dot", x: 2, y: 0.5 },
             { type: "text", x: 3.8, y: 0.55, tex: "y=\\tfrac{1}{x}", cls: "a-curve", anchor: "start" },
-            { type: "text", x: 0.8, y: 0.9, tex: "\\text{tangent}", cls: "a-ref", anchor: "start" },
+            { type: "text", x: 0.8, y: 0.42, tex: "\\text{tangent}", cls: "a-ref", anchor: "start" },
           ],
         }),
       }],
@@ -2344,22 +2369,45 @@ function listToUnits(listEl) {
   });
 }
 
-function bodyToUnits(bodyEl) {
+function isDisplayOnlyParagraph(p) {
+  if (!p || p.tagName !== "P") return false;
+  var content = [].filter.call(p.childNodes, function(node) {
+    return (node.textContent && node.textContent.trim()) || node.nodeType === 1;
+  });
+  return content.length === 1 && isDisplayChild(content[0]);
+}
+
+function mathLeadUnit(lead, display) {
+  var unit = document.createElement("div");
+  unit.className = "split-unit";
+  unit.appendChild(lead);
+  unit.appendChild(display);
+  return unit;
+}
+
+function bodyToUnits(bodyEl, keepMathPairs) {
   var units = [];
-  [].forEach.call(bodyEl.children, function(ch) {
+  var children = [].slice.call(bodyEl.children);
+  for (var i = 0; i < children.length; i++) {
+    var ch = children[i];
+    if (keepMathPairs && ch.tagName === "P" && !ch.querySelector(DISP_SEL) && isDisplayOnlyParagraph(children[i + 1])) {
+      units.push(mathLeadUnit(ch, children[i + 1]));
+      i++;
+      continue;
+    }
     if (ch.tagName === "P" && ch.querySelector(DISP_SEL) && explodeParagraph2(ch) > 1) {
       explodeParagraph(ch).forEach(function(u) { units.push(u); });
     } else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) {
       listToUnits(ch).forEach(function(u) { units.push(u); });
     } else { units.push(ch); }
-  });
+  }
   return units;
 }
 
 function splitEnvOverflow(env) {
   var bodyEl = env.querySelector(":scope > .env-body");
   if (!bodyEl) return null;
-  var kids = bodyToUnits(bodyEl);
+  var kids = bodyToUnits(bodyEl, env.classList && env.classList.contains("env-proof"));
   if (kids.length < 2) return null;
   bodyEl.innerHTML = "";
   bodyEl.appendChild(kids.shift());
@@ -2501,7 +2549,8 @@ function paginate(blocks) {
       return;
     }
     var mode = splitMode(block);
-    var want = (mode !== "none" && blockH > body.clientHeight);
+    var splitProofOnOverflow = block.classList && block.classList.contains("env-proof");
+    var want = (mode !== "none" && (blockH > body.clientHeight || splitProofOnOverflow));
     if (want) { var parts = splitParts(block); if (parts.length > 1) { parts.forEach(place); return; } }
     moveToFreshPage(block);
     if (!fits() && mode !== "none") {

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 3 圖說精簡 — applied report</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --ink:#1f2933; --muted:#667085; --line:#d9dee7; --blue:#1f5fbf; --green:#1a7f45; --bg:#fbfbfa; --card:#fff; }
+  body { margin:0 auto; max-width:1080px; padding:2rem 1.4rem 4rem; background:var(--bg); color:var(--ink);
+         font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif; line-height:1.65; }
+  h1 { font-size:1.55rem; margin:.2rem 0 .3rem; }
+  h2 { font-size:1.12rem; margin:1.8rem 0 .6rem; padding-top:.8rem; border-top:2px solid var(--line); }
+  p { margin:.55rem 0; }
+  .sub { color:var(--muted); font-size:.92rem; }
+  .ok { border-left:4px solid var(--green); background:#edf8f1; padding:.7rem .9rem; border-radius:6px; }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; background:var(--card); font-size:.9rem; }
+  th, td { border:1px solid var(--line); padding:.55rem .65rem; vertical-align:top; text-align:left; }
+  th { background:#eef2f7; }
+  .fig { white-space:nowrap; font-weight:700; color:var(--blue); }
+  code { background:#eef2f7; border-radius:4px; padding:.08rem .3rem; }
+  .caption { font-style:italic; }
+</style>
+</head>
+<body>
+<h1>Chapter 3 — 圖說精簡 applied report</h1>
+<p class="sub">2026-06-29 · 範圍：<code>handout/fragments/ch03/sec-3-1.html</code>、<code>sec-3-2.html</code>、<code>sec-3-3.html</code>。本輪只做 editorial trim：不新增數學結果、不改圖形繪製、不重新編號。</p>
+
+<div class="ok">
+  <p><b>結論：</b>第三章 7 張圖的 figcaption 全部檢查並精簡。重複 proof、example 或 caution 已經承擔的推論時，caption 改為只保留讀圖 anchor；唯一需要拆回正文的是 Figure 3.5，已在 §3.2 開頭段補成 “pictured in Figure 3.5”。</p>
+</div>
+
+<h2>逐圖裁決</h2>
+<table>
+  <tr>
+    <th>Figure</th>
+    <th>裁決</th>
+    <th>精簡理由</th>
+    <th>新版 caption</th>
+  </tr>
+  <tr>
+    <td class="fig">3.1</td>
+    <td>縮短</td>
+    <td>圖後正文已逐一介紹 \(A,B,C\)、三個區域、三個面積與不等式推導；caption 不必先把整段推導重講一次。</td>
+    <td class="caption">The unit-circle area comparison behind \(\sin\theta \le \theta \le \tan\theta\).</td>
+  </tr>
+  <tr>
+    <td class="fig">3.2</td>
+    <td>縮短</td>
+    <td>Proposition 3.2 的 proof 已說明 squeeze theorem；後方 caution 已說明 limit 不是函數值。caption 只需標出三條曲線與 open circle。</td>
+    <td class="caption">A graphical reading of the squeeze in Proposition 3.2: \(\dfrac{\sin\theta}{\theta}\) sits between \(\cos\theta\) and \(1\), with an open circle at \(\theta = 0\).</td>
+  </tr>
+  <tr>
+    <td class="fig">3.3</td>
+    <td>縮短</td>
+    <td>Theorem 3.1、Theorem 3.2 和 Remark 3.1 已承擔 \(\sin'=\cos\) 與四步循環；caption 留下 slope-height 的讀圖目的即可。</td>
+    <td class="caption">Tangent slopes on \(y = \sin x\) matching the heights of \(y = \cos x\) at the same \(x\)-values.</td>
+  </tr>
+  <tr>
+    <td class="fig">3.4</td>
+    <td>縮短</td>
+    <td>Example 3.3 的 solution 已解釋 \(s''=-s\) 與 simple harmonic motion；caption 保留三層圖的對應關係。</td>
+    <td class="caption">Simple harmonic motion over one time axis: \(s = \sin t\), \(s' = \cos t\), and \(s'' = -\sin t\).</td>
+  </tr>
+  <tr>
+    <td class="fig">3.5</td>
+    <td>拆回正文＋縮短</td>
+    <td>§3.2 開頭段已完整說明小增量經 \(g'\) 與 \(f'\) 連續放大；該段補上 Figure 3.5 引用後，caption 可退回成圖的 mapping label。</td>
+    <td class="caption">The chain rule as a composed mapping: local slope factors accumulate along \(x \mapsto u \mapsto y\).</td>
+  </tr>
+  <tr>
+    <td class="fig">3.6</td>
+    <td>縮短</td>
+    <td>Definition 3.1 的 informal gloss 已說明 tangent-line value、\(R(h)\) 與 first-order fit；caption 保留「右圖把 \(h\) 減半」這個圖上最需要讀者看的量化提示。</td>
+    <td class="caption">Remainder-form geometry: halving \(h\) makes the vertical error \(R(h)\) much smaller, illustrating \(R(h)/h \to 0\).</td>
+  </tr>
+  <tr>
+    <td class="fig">3.7</td>
+    <td>縮短</td>
+    <td>前方 caution 已說明 \(\arcsin\)、\(\arccos\) 的 open-interval 限制與端點不可微；caption 只需服務這張 \(\arcsin\) 圖本身。</td>
+    <td class="caption">Endpoint behavior of \(\arcsin y\): the tangent becomes vertical at \(y = \pm 1\), so the derivative formula applies only on \((-1, 1)\).</td>
+  </tr>
+</table>
+
+<h2>驗證</h2>
+<ul>
+  <li><code>python build.py ch03</code>：通過，已重建 <code>handout/chapter3-print-standalone.html</code>。</li>
+  <li>standalone caption grep：7/7 張圖皆為新版 caption；舊長句關鍵片語未再出現。</li>
+  <li><code>node handout/_render/linebreak-gate.mjs handout/chapter3-print-standalone.html</code>：升權重跑通過，退出碼 0。第一次 sandbox 內嘗試因本機 Chrome/CDP 目標不可用而失敗，非內容錯誤。</li>
+</ul>
+
+<p class="sub">Mode B / source note：本輪沒有新增外部題源或數學內容，屬於既有正文與圖說的局部 copyedit；因此不新增 provenance。人工回歸重點為「caption 不再重複正文，但仍能讀懂圖的數學目的」。</p>
+</body>
+</html>
