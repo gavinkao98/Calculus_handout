@@ -152,8 +152,8 @@ def _label(text: str, ground: str, *, role: str = "text", size: str = "label"):
     # label-vs-label overlap advisory: these live on the exempt "graph" layer
     # (intentional coincidence -- a label hugging its curve -- is fine), but two
     # EQUATION LABELS landing on top of each other is a real defect the layer
-    # exemption otherwise hides. graph_compare reuses _label via _plot_blocks, so
-    # both templates are covered by this single tag. The raw text rides along so
+    # exemption otherwise hides. The 2up (compare) mode reuses _label via _plot_blocks,
+    # so both modes are covered by this single tag. The raw text rides along so
     # the critic's deterministic geometry context (sizecheck.graph_label_geometry)
     # can name each label without re-deriving it from the rendered Tex.
     mob._graph_label = True

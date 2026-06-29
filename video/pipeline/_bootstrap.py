@@ -76,6 +76,8 @@ def apply_tex_template() -> None:
         r"\usepackage{plex-mono}" "\n"        # mono (eyebrow) = IBM Plex Mono
         r"\renewcommand{\familydefault}{\sfdefault}" "\n"   # body default -> Plex Sans
         r"\usepackage{microtype}" "\n"        # kerning / protrusion
+        r"\everymath{\displaystyle}" "\n"     # all inline $..$ render display-style;
+        #                                       \tfrac still overrides to text-style
         # Inverse-trig operators the book preamble defines but manim's default
         # template lacks. \arcsin/\arccos/\arctan are LaTeX-kernel operators;
         # these three are not, so on-screen math using them failed to compile.

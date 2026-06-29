@@ -276,14 +276,44 @@ def _escape_prose(text: str) -> str:
     return "".join(out)
 
 
+def _math_render_width(span: str, fsz: float) -> float:
+    """Actual rendered width of a ``$...$`` math span (manim units)."""
+    inner = span.strip("$")
+    return MathTex(inner, font_size=fsz).width
+
+
+_math_width_cache: dict[tuple[str, float], float] = {}
+
+
+def _token_width(tok: str, fsz: float) -> float:
+    """Width of one token: rendered width for math spans, char estimate for text.
+
+    Handles math spans with trailing punctuation glued on (e.g. ``$...$,``)
+    by splitting into math width + punctuation width.
+    """
+    if tok.startswith("$"):
+        dollar_end = tok.rfind("$", 1)
+        if dollar_end > 0:
+            math_part = tok[:dollar_end + 1]
+            tail = tok[dollar_end + 1:]
+            key = (math_part, fsz)
+            if key not in _math_width_cache:
+                _math_width_cache[key] = _math_render_width(math_part, fsz)
+            w = _math_width_cache[key]
+            if tail:
+                w += estimate_text_width(tail, fsz)
+            return w
+    return estimate_text_width(tok, fsz)
+
+
 def _wrap_mixed(text: str, fsz: float, max_width: float | None) -> list[str]:
     """Word-wrap prose that may carry inline ``$math$`` into line strings.
 
     A ``$...$`` span is one atomic token (never broken, even across its inner spaces);
     trailing punctuation is glued onto its token so a period never wraps off alone.
-    Width is the char estimate (estimate_text_width) -- a math span is counted by its
-    source length, an over-estimate that wraps a touch early (overflow-safe). Each
-    returned line still carries its ``$...$`` spans for prose() to render as one Tex.
+    Text tokens use the char estimate; math spans use their actual rendered width
+    so display-style formulas don't get over-estimated and pushed to a new line.
+    Each returned line still carries its ``$...$`` spans for prose() to render as one Tex.
     """
     tokens: list[str] = []
     for part in re.split(r"(\$[^$]*\$)", text):
@@ -302,14 +332,20 @@ def _wrap_mixed(text: str, fsz: float, max_width: float | None) -> list[str]:
         return []
     if max_width is None:
         return [" ".join(tokens)]
+    space_w = estimate_text_width(" ", fsz)
     lines: list[str] = []
     cur: list[str] = []
+    cur_w: float = 0.0
     for tok in tokens:
-        if cur and estimate_text_width(" ".join(cur + [tok]), fsz) > max_width:
+        tw = _token_width(tok, fsz)
+        trial_w = cur_w + (space_w if cur else 0) + tw
+        if cur and trial_w > max_width:
             lines.append(" ".join(cur))
             cur = [tok]
+            cur_w = tw
         else:
             cur.append(tok)
+            cur_w = trial_w
     if cur:
         lines.append(" ".join(cur))
     return lines
@@ -350,10 +386,17 @@ def prose(text: str, ground: str, *, role: str = "text", size: str = "body",
 
     The ONE place that decides how prose is set. Route A: all text is LaTeX (Plex Sans),
     math is Latin Modern -- on the same line.
+    - Single ``$...$`` wrapping pure math -> ``math_line`` (display mode, Latin Modern).
     - Markup-free text -> ``body_text`` (Plex Sans Tex, wraps at *max_width*).
     - Text with inline ``$math$`` and/or an explicit ``\\\\`` break -> ``_prose_lines``
       (one Tex per wrapped line; text + inline math sit native on each line).
     """
+    stripped = text.strip()
+    if stripped.startswith("$") and stripped.endswith("$") and stripped.count("$") == 2:
+        mob = math_line(stripped, ground, role=role, size=size)
+        if max_width is not None and mob.width > max_width:
+            mob.scale_to_fit_width(max_width)
+        return _mark_prose(mob)
     if "$" not in text and "\\" not in text:
         return _mark_prose(body_text(text, ground, role=role, size=size,
                                      max_width=max_width, align=align))
@@ -401,16 +444,20 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
 def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math"):
     """A math (or math+text) line, recoloured. newtx (Times) serif.
 
-    Two forms are accepted, auto-detected:
-    - Pure math, no '$' (e.g. r"f(x_1) \\ne f(x_2)") -> MathTex (whole string
-      is math mode).
-    - Mixed text + inline math with '$...$' (e.g. "$f(x_1)$ whenever $x_1$")
-      -> Tex (text mode; the $...$ spans are the math). Passing this to MathTex
-      would nest math mode inside align* and crash ("Missing }"), which is the
-      bug this guards against.
+    Three forms are accepted, auto-detected:
+    - Pure math, no '$' (e.g. r"f(x_1) \\ne f(x_2)") -> MathTex (display).
+    - Single '$...$' wrapping pure math (e.g. "$\\frac{a}{b}$") -> strip the
+      delimiters and use MathTex (display).  This is the common storyboard
+      convention; without stripping, Tex would render in text mode (inline).
+    - Multiple '$...$' spans mixed with text (e.g. "if $f(x)=0$ then $x=a$")
+      -> Tex (text mode).  Passing this to MathTex would nest math mode inside
+      align* and crash ("Missing }"), which is the bug this guards against.
     """
     col = T.color(ground, role)
     fsz = T.fs(size)
+    stripped = tex.strip()
+    if stripped.startswith("$") and stripped.endswith("$") and stripped.count("$") == 2:
+        return MathTex(stripped[1:-1], color=col, font_size=fsz)
     if "$" in tex:
         return Tex(tex, color=col, font_size=fsz)
     return MathTex(tex, color=col, font_size=fsz)
@@ -458,21 +505,8 @@ def glow_curve(vmob, ground: str, *, role: str = "secondary", width: float = 6.0
 
 def text_glow(mob, ground: str, *, role: str = "accent", width: float = 2.0,
               opacity: float = 0.42) -> VGroup:
-    """Static persistent halo behind emphasised glyphs (the 'text-shadow' glow).
-
-    Returns VGroup(wide-halo, near-halo, mob). The halos are stroke-only copies of
-    *mob* (no fill -- the original carries the fill on top), in the glow hue, at two
-    widths for a soft falloff that reads as a glow rather than a thick outline. (manim
-    has no blur.) Distinct from blocks.write_glow (a reveal animation -- its Flash burst
-    was removed project-wide 2026-06-29); use this when the glow must persist on the
-    final frame.
-    """
-    glow_hex, _a = T.glow_for(_glow_name(role))
-    wide = mob.copy().set_stroke(color=glow_hex, width=width * 2.2, opacity=opacity * 0.38)
-    wide.set_fill(opacity=0)
-    near = mob.copy().set_stroke(color=glow_hex, width=width, opacity=opacity * 0.85)
-    near.set_fill(opacity=0)
-    return VGroup(wide, near, mob)
+    """Wrap *mob* in a VGroup (no-op pass-through; glow disabled 2026-06-29)."""
+    return VGroup(mob)
 
 
 def _glow_name(role: str) -> str:

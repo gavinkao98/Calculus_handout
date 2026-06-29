@@ -103,7 +103,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         # uniform size -- a scaled-down long step beside a short one is the same
         # mismatch class as the recap points.
         txt = brand.prose(p, ground, role="text", size="step", max_width=content_w - 1.0)
-        dot.next_to(txt, LEFT, buff=0.3, aligned_edge=UP)
+        first_line = txt.submobjects[0] if isinstance(txt, VGroup) and txt.submobjects else txt
+        dot.next_to(first_line, LEFT, buff=0.3)
         row = VGroup(dot, txt)
         half = row.height / 2
         if prev_half is None:

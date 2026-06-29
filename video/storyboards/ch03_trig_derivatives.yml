@@ -86,7 +86,7 @@ scenes:
     statement: "Every trigonometric derivative funnels down to a single limit."
     math:
       - "$\\dfrac{\\sin(x+h)-\\sin x}{h}\\ \\xrightarrow{\\ h=0\\ }\\ \\dfrac{0}{0}\\quad(\\text{no information})$"
-      - { tex: "$\\displaystyle\\lim_{\\theta\\to 0}\\dfrac{\\sin\\theta}{\\theta}\\quad\\left(\\tfrac{0}{0},\\ \\text{no algebra}\\right)$", anim: highlight }
+      - { tex: "$\\lim_{\\theta\\to 0}\\dfrac{\\sin\\theta}{\\theta}\\quad\\left(\\tfrac{0}{0},\\ \\text{no algebra}\\right)$", anim: highlight }
 
   # 3 ------------------------------------ derivation: reduce the difference quotient (L2)
   - id: difference_quotient_for_sine
@@ -114,10 +114,10 @@ scenes:
       hangs on just two facts -- continuity, and that fundamental limit. We
       secure both now.
     steps:
-      - { math: "\\sin A-\\sin B = 2\\cos\\tfrac{A+B}{2}\\,\\sin\\tfrac{A-B}{2}", reason: "sum-to-product" }
-      - { math: "\\sin(x+h)-\\sin x = 2\\cos\\!\\left(x+\\tfrac h2\\right)\\sin\\tfrac h2", reason: "$A=x+h,\\ B=x$" }
-      - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\tfrac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot\\tfrac h2$" }
-    result: { math: "\\cos\\!\\left(x+\\tfrac h2\\right)\\to\\cos x\\quad\\text{and}\\quad \\frac{\\sin(h/2)}{h/2}\\to 1", reason: "continuity + the limit" }
+      - { math: "\\sin A-\\sin B = 2\\cos\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}", reason: "sum-to-product" }
+      - { math: "\\sin(x+h)-\\sin x = 2\\cos\\!\\left(x+\\frac h2\\right)\\sin\\frac h2", reason: "$A=x+h,\\ B=x$" }
+      - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\frac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot\\tfrac h2$" }
+    result: { math: "\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x\\quad\\text{and}\\quad \\frac{\\sin(h/2)}{h/2}\\to 1", reason: "continuity + the limit" }
 
   # 4 ------------------------------------------- divider: Stage 2 opener
   - id: divider_squeeze
@@ -190,7 +190,7 @@ scenes:
     steps:
       - { math: "\\sin\\theta \\;\\le\\; \\theta \\;\\le\\; \\tan\\theta", reason: "multiply areas by $2$" }
       - { math: "1 \\;\\le\\; \\frac{\\theta}{\\sin\\theta} \\;\\le\\; \\frac{1}{\\cos\\theta}", reason: "$\\div\\sin\\theta$, $\\tan=\\tfrac{\\sin}{\\cos}$" }
-    result: { math: "\\cos\\theta \\;\\le\\; \\frac{\\sin\\theta}{\\theta} \\;\\le\\; 1 \\qquad (0<\\theta<\\tfrac{\\pi}{2})", reason: "reciprocate -- reverses" }
+    result: { math: "\\cos\\theta \\;\\le\\; \\frac{\\sin\\theta}{\\theta} \\;\\le\\; 1 \\qquad (0<\\theta<\\frac{\\pi}{2})", reason: "reciprocate -- reverses" }
     check:  { math: "0 \\;\\le\\; \\lvert\\sin\\theta\\rvert \\;\\le\\; \\lvert\\theta\\rvert", reason: "kept for later" }
 
   # 7 ------------------- Proposition 3.1 (part 1/2): statement + lim sin theta = 0
@@ -247,9 +247,9 @@ scenes:
       $\sin x\to\sin x_0$ -- both continuous everywhere.
     statement: "Fix $x_0$: how far can $\\cos x,\\ \\sin x$ move?"
     proof:
-      - "$\\cos x-\\cos x_0=-2\\sin\\tfrac{x-x_0}{2}\\,\\sin\\tfrac{x+x_0}{2}$"
-      - "$\\sin x-\\sin x_0=\\phantom{-}2\\cos\\tfrac{x+x_0}{2}\\,\\sin\\tfrac{x-x_0}{2}$"
-      - "$|\\cos x-\\cos x_0|,\\ |\\sin x-\\sin x_0|\\le 2|\\sin\\tfrac{x-x_0}{2}|$"
+      - "$\\cos x-\\cos x_0=-2\\sin\\frac{x-x_0}{2}\\,\\sin\\frac{x+x_0}{2}$"
+      - "$\\sin x-\\sin x_0=\\phantom{-}2\\cos\\frac{x+x_0}{2}\\,\\sin\\frac{x-x_0}{2}$"
+      - "$|\\cos x-\\cos x_0|,\\ |\\sin x-\\sin x_0|\\le 2|\\sin\\frac{x-x_0}{2}|$"
     qed: "$x\\to x_0\\ \\Rightarrow\\ \\cos x\\to\\cos x_0,\\ \\sin x\\to\\sin x_0$"
 
   # 9 --------------------------- Proposition 3.2 + Proof: the fundamental limit = 1 (L2)
@@ -272,10 +272,10 @@ scenes:
       pins the ratio to one from the right.
       {show qed} And because the ratio is even, its left limit matches its right,
       so the two-sided limit is one as well. That is the keystone.
-    statement: "$\\lim_{\\theta\\to 0}\\tfrac{\\sin\\theta}{\\theta}=1$"
+    statement: "$\\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1$"
     proof:
-      - "$\\cos\\theta\\le\\tfrac{\\sin\\theta}{\\theta}\\le 1\\quad(0<\\theta<\\tfrac{\\pi}{2})$"
-      - "$\\cos\\theta\\to 1\\ \\Rightarrow\\ \\tfrac{\\sin\\theta}{\\theta}\\to 1^{+}$"
+      - "$\\cos\\theta\\le\\frac{\\sin\\theta}{\\theta}\\le 1\\quad(0<\\theta<\\frac{\\pi}{2})$"
+      - "$\\cos\\theta\\to 1\\ \\Rightarrow\\ \\frac{\\sin\\theta}{\\theta}\\to 1^{+}$"
     qed: "even $\\Rightarrow$ two-sided limit $=1$"
 
   # 10 ------------------------------------- Figure 3.2: the squeeze as a graph (stock)
@@ -371,10 +371,10 @@ scenes:
       continuity, the second to one by the fundamental limit.
       {show qed} A continuous thing times a limit -- the product is $\cos x$
       times one, just $\cos x$.
-    statement: "$\\tfrac{d}{dx}\\sin x = \\cos x$"
+    statement: "$\\frac{d}{dx}\\sin x = \\cos x$"
     proof:
-      - "$\\tfrac{d}{dx}\\sin x=\\lim_{h\\to 0}\\cos\\!\\left(x+\\tfrac h2\\right)\\tfrac{\\sin(h/2)}{h/2}$"
-      - "$\\cos\\!\\left(x+\\tfrac h2\\right)\\to\\cos x,\\quad \\tfrac{\\sin(h/2)}{h/2}\\to 1$"
+      - "$\\frac{d}{dx}\\sin x=\\lim_{h\\to 0}\\cos\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
+      - "$\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
     qed: "$\\Rightarrow\\ \\cos x\\cdot 1=\\cos x$"
 
   # 15 --------------------------- Theorem 3.2 + Proof: d/dx cos x = -sin x (L1, repeat-pattern)
@@ -394,10 +394,10 @@ scenes:
       {show qed} Send $h$ to zero: the sine factor goes to $\sin x$, the other
       to one, and the minus sign comes along -- leaving $-\sin x$. Same two
       tools, one extra minus sign.
-    statement: "$\\tfrac{d}{dx}\\cos x = -\\sin x$"
+    statement: "$\\frac{d}{dx}\\cos x = -\\sin x$"
     proof:
-      - "$\\cos A-\\cos B=-2\\sin\\tfrac{A+B}{2}\\,\\sin\\tfrac{A-B}{2}$"
-      - "$\\tfrac{\\cos(x+h)-\\cos x}{h}=-\\sin\\!\\left(x+\\tfrac h2\\right)\\tfrac{\\sin(h/2)}{h/2}$"
+      - "$\\cos A-\\cos B=-2\\sin\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}$"
+      - "$\\frac{\\cos(x+h)-\\cos x}{h}=-\\sin\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
     qed: "$\\to\\ -\\sin x\\cdot 1=-\\sin x$"
 
   # 16 ----------------------------- Figure 3.3: slope of sine = height of cosine (HOOK)
@@ -590,23 +590,20 @@ scenes:
     say: |
       Pull the section together.
       {show point.0} Everything grew from one limit: $\sin\theta$ over $\theta$
-      tends to one, cracked by squeezing on the unit circle.
+      tends to one, cracked by squeezing areas on the unit circle.
       {show point.1} That limit, with continuity, gave the two derivatives at the
-      heart of the section -- $\sin'=\cos$ and $\cos'=-\sin$.
+      heart of the section -- sine differentiates to cosine, cosine to negative
+      sine.
       {show point.2} From those two, the quotient rule delivered all the other
-      trig derivatives.
-      {show point.3} And keep the cycle in mind -- four derivatives bring you home
-      -- with the fine print that it all depends on radians.
-      {show formula.0} Hold the keystone close.
-      {show formula.1} And the two derivatives that follow from it.
+      trig derivatives -- tangent, cotangent, secant, cosecant.
+      {show point.3} And keep the cycle in mind -- four derivatives of sine or
+      cosine bring you home -- with the fine print that it all depends on
+      radians.
     points:
-      - "Fundamental limit: $\\sin\\theta/\\theta\\to 1$, squeezed on the unit circle."
-      - "$\\sin'=\\cos$ and $\\cos'=-\\sin$."
-      - "The quotient rule then gives all six trig derivatives."
-      - "Derivatives cycle every four; all in radians."
-    formulas:
-      - "\\lim_{\\theta\\to 0}\\tfrac{\\sin\\theta}{\\theta}=1"
-      - "\\sin'=\\cos,\\quad \\cos'=-\\sin"
+      - "Fundamental limit: $\\displaystyle\\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1$, proved by squeezing areas on the unit circle."
+      - "Two core derivatives: $\\sin'=\\cos$ and $\\cos'=-\\sin$."
+      - "The quotient rule delivers all six trig derivatives: $\\tan,\\cot,\\sec,\\csc$."
+      - "Derivatives of $\\sin$ and $\\cos$ cycle with period four; the entire framework requires radians."
 
   # 25 ------------------------------------------------------------------------- outro
   - id: outro
