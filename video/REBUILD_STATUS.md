@@ -27,7 +27,27 @@
 - **工具：** 新增 [`pipeline/narration_review.py`](pipeline/narration_review.py)——`.md → _narration.html` 生成器（reuse parser 契約、純 stdlib、不觸 manim bootstrap），§3.1 未 committed、本輪定版供 §3.2/3.3 沿用。
 - **交付物：** [`ch03_chain_rule_narration.html`](content_scripts/ch03_chain_rule_narration.html)（逐單元旁白審核稿）＋ [`REVIEW-ch03_chain_rule-applied.html`](content_scripts/_audit/REVIEW-ch03_chain_rule-applied.html)（本輪 round 報告＋閘結果）。
 - **sign-off：2026-06-29 使用者通過 → `.md` LOCKED、`CONTENT_APPROVED=yes`。** 之後忠實性由 NFA 把關；post-lock 改任何單元措辭須對動到單元跑 scoped NFA 回歸（CONTENT_METHODOLOGY §8）。
-- **下一步（Stage 2，達範圍同意後續做）：** storyboard `ch03_chain_rule.yml`（模板化、`{show}`/accent/payload、proof 拆場）＋2 客製 hook `composed_mapping`（Fig 3.5）/`remainder_tangent`（Fig 3.6）＋schema/lint/sizecheck＋mock render 1080p＋visual-frame-audit → 之後 MiMo 口語軌＋TTS（計費，屆時徵同意）。
+### Stage 2 工程進度（2026-06-29，**WIP — 待換機收尾**；使用者同意進 Stage 2 後續做）
+
+> 本機已把 Stage 2 做到「mock 成片＋視覺稽核 blocking 已修」，但**乾淨重渲未完成就換機**；source（storyboard＋hooks，含修正）已 commit、git 帶得走，render 產物（mp4/frames）gitignore、新機重生。**新機從下方「待新機收尾」逐步跑。**
+
+- **storyboard：** [`storyboards/ch03_chain_rule.yml`](storyboards/ch03_chain_rule.yml)（27 場＝intro＋3 stage divider＋22 content＋outro；3 幕 Rule/Why/Use）。Thm 3.3 證明 **full ε-δ** 切 4 場 `part: n/4`；模板對應：definition_math（motivation/statement/Leibniz/forward）、procedure_steps（Strategy 3.1）、graph+hook（Fig 3.5/3.6）、theorem_proof（Prop 3.3＋4 proof 場）、derivation（5 例）、callout（caution）、recap_cards。
+- **2 客製 hook：** [`animations/ch03_chain_rule_hooks.py`](animations/ch03_chain_rule_hooks.py)——`composed_mapping`（Fig 3.5：三軸 x/u/y，增量 h 經 g'(x₀)、f'(g(x₀)) 兩段伸縮、真實相對寬度可見相乘；reveal inc_h/stretch_g/stretch_f/product）＋`remainder_tangent`（Fig 3.6：曲線貼切線，R(h) vs R(h/2)≈¼，foot 虛線；reveal gap_Rh/gap_halved/local_fact）。**兩 hook 已 render、目視正確**（本機 scratch_frames 驗過）。
+- **三閘：** schema OK／lint clean／sizecheck **0 error**＋3 advisory（proof_setup/easy/delicate_choices 的 `qed` 越安全邊界 ~0.15u、**仍在框內、完整可見** → 比照 §3.1 within-frame advisory 接受、記錄）。
+- **全片 mock render 1080p：** 27 場 → `output/ch03/s3.2/ch03_chain_rule.mp4`（gitignore）。修正 3 場後**本機乾淨重渲再次 exit 0、27 場 compose 成片、gates 0-error** → 證實修正後的 source 端到端可渲；新機只需重抽幀＋回歸再審＋出報告（見下步驟）。
+- **視覺幀稽核（Workflow `wf_a5f8fe0d-039`，22 幀並行 refute-by-default，V1–V9＋A1–A7）：21/22 clean、1 Blocking → 已修＋驗證：**
+  - **[V4] `example_chain_times_quotient`：** `result.reason: "for $x>1$"` 走 derivation 的 texttt（不處理 `$…$`）→ 渲成亂碼 `FOR $X¿1$`、丟失承載性定義域 x>1。**＝ DESIGN.md §610 「result/check reason 不可放 $math$」那條學費**。修法：把 `(x>1)` 移進 `result.math` 本體、移除 reason（§3.1 有 reason-less result 先例）→ fresh render 確認 (x>1) 正常渲染、無相撞。
+  - **10 advisory：** 多為 progressive-reveal 滿幀的下半空白（top-heavy）、A7 焦點、密 proof 行寬自動縮小（可讀）。**採納 2 個便宜的清晰度修正**：`example_nested_three_layers` step reason 由小字數學改純文字「chain rule again」；`remainder_tangent` 的 `R(h/2)` 標籤改 `lab_dir=UP` 移離虛線切線（V2）——皆 fresh render 驗過。其餘 advisory 屬 house-style、記錄不追。
+- **durable 教訓（render 工具，記這裡免重蹈）：** 改 storyboard 後 **`critic.py --dry-run` 重抽幀可能給「舊快取幀」**（PNG mtime 更新但內容是舊的）；**驗證單場改動要用 `scratch_frames.py --scene <id> --out <dir>`（每次 fresh render，是 ground truth）**；要讓 critic 重抽乾淨，先 `rm -rf output/<ch>/<sec>/critic/frames/` 再 `--dry-run`。（與既有「render 與 sizecheck/critic 不可同時跑」「0-byte 快取 retry」並列。）
+
+**待新機收尾（逐步；全離線免費，到 TTS 才計費）：**
+1. `python tools/doctor.py` 確認環境全綠（缺 venv 照 [`README.md`](README.md) §環境重建）；**所有 pipeline 指令用該 venv 的 python**（本機是 `.venv/Scripts/python.exe`；vendored `.deps*` 在 fresh clone 不存在，靠 venv）。
+2. 乾淨重渲：`<py> video/make.py --storyboard video/storyboards/ch03_chain_rule.yml --scene all --backend mock --quality high`（內部跑三閘，確認 0 error）。
+3. `rm -rf video/output/ch03/s3.2/critic/frames` → `<py> video/pipeline/critic.py --storyboard video/storyboards/ch03_chain_rule.yml --dry-run`（fresh 抽幀）。
+4. 對 3 個修正場景（example_chain_times_quotient／example_nested_three_layers／remainder_tangent_figure）跑回歸 visual-frame-audit，確認 **visual blocking==0**（其餘 19 場本機已 clean，全量再審可選）。
+5. **使用者 sign-off 2 個 hook 動畫（CONTENT_METHODOLOGY §5）**——composed_mapping／remainder_tangent，本機已驗渲染正確、**待你正式認可**。
+6. 產 Stage 2 HTML 報告（`REVIEW-ch03_chain_rule-stage2-applied.html`，base64 嵌關鍵幀＋V/A 裁決＋change tag）→ 本節改 ✅ → commit Stage 2 收尾。
+7. 之後（計費、單獨報價徵同意）：MiMo 口語軌（`derive_spoken --check`→NFA）→ MiMo TTS → 最終 1080p/4K。
 
 ## ✅ 2026-06-29 ch03 §3.1 detail-redo：內容稿從「壓縮骨架」重做成「最大詳細」（mock 里程碑達成）
 

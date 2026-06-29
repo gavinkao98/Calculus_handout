@@ -1,0 +1,594 @@
+# §3.2 The Chain Rule -- canonical storyboard.
+#
+# Stage-2 engineering storyboard, authored from the LOCKED content script
+# (video/content_scripts/ch03_chain_rule.md; CONTENT_APPROVED=yes, 2026-06-29
+# user sign-off) and the HTML handout (handout/fragments/ch03/sec-3-2.html;
+# authoritative build handout/chapter3-print-standalone.html SS3.2). Follows
+# CONTENT_METHODOLOGY.md (one teaching idea per scene, detail over compression,
+# faithful to the handout) and DESIGN.md (template catalog, say/{show} reveal,
+# display vs inline frac, capacity contract + multipage `part:`).
+#
+# Three-act structure (dividers, progress n/3):
+#   Act 1  The Rule You Can Use   -- statement, figure, Leibniz, strategy
+#   Act 2  Why the Rule Is True   -- remainder form, equivalence, full e-d proof
+#   Act 3  Using the Rule         -- five worked examples + the inner-derivative caution
+#
+# Theorem 3.3's proof is presented in FULL epsilon-delta detail (user decision);
+# split across four `part: n/4` proof scenes so each logical block fits and the
+# student can pause between them.
+#
+# Two custom animation hooks (animations/ch03_chain_rule_hooks.py):
+#   * composed_mapping   (Figure 3.5) -- h stretched by g'(x0) then f'(g(x0))
+#   * remainder_tangent  (Figure 3.6) -- gap R(h) shrinks faster than h
+
+meta:
+  id: ch03_chain_rule
+  chapter: "Chapter 3"
+  chapter_title: "Chain Rule and Trigonometric Derivatives"
+  section: "3.2"
+  title: "The Chain Rule"
+  language: en
+  theme: midnight
+  voice: Mia
+  video: { w: 3840, h: 2160, fps: 60 }   # 4K60 delivery; --quality high renders 1080p for QA
+  sections:
+    - { id: "3.1", title: "Derivatives of the Sine and Cosine Functions" }
+    - { id: "3.2", title: "The Chain Rule" }
+    - { id: "3.3", title: "Applications of the Chain Rule" }
+
+scenes:
+
+  # 0 ---------------------------------------------------------------- intro
+  - id: intro
+    kind: intro
+    tagline: "Why do the slopes multiply?"
+    duration: 6.0
+
+  # 1 --------------------------------------------- divider: Act 1 opener
+  - id: divider_rule
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 1"
+    title: "The Rule You Can Use"
+    subtitle: "State it first, then put it to work."
+    ghost: "1"
+    progress: { current: 1, total: 3 }
+    duration: 4.0
+
+  # 2 ------------------------------------------ motivation: composition is missing
+  - id: why_composition_is_missing
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "chapter3-print-standalone.html SS3.2 . opening prose (the missing rule)"
+    title: "The Missing Rule"
+    say: |
+      We can differentiate sine and cosine now -- but only in their bare form.
+      {show math.0} We can handle $\sin x$, yet nothing so far reaches
+      $\sin(x^2)$ or $\sqrt{1+x^2}$, where one function is fed into another.
+      {show math.1} We built rules for sums, products, and quotients -- but
+      never for composition, the operation of dropping one function inside
+      another.
+      {show statement} That is the one gap left, and the chain rule fills it
+      exactly -- and with it, the toolkit for differentiation is finally
+      complete.
+    statement: "Composition is the missing rule --- the chain rule completes the toolkit."
+    math:
+      - "$\\sin x\\ \\checkmark \\qquad \\sin(x^{2})\\,?\\qquad \\sqrt{1+x^{2}}\\,?$"
+      - { tex: "$\\text{sums},\\ \\text{products},\\ \\text{quotients}\\ \\checkmark \\qquad \\text{composition}\\,?$", anim: highlight }
+
+  # 3 ----------------------------------------- intuition: rates multiply
+  - id: rates_multiply_intuition
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "chapter3-print-standalone.html SS3.2 . opening prose (rates multiply, tangent-line idea)"
+    title: "The Whole Idea, in One Picture"
+    say: |
+      Here's the whole idea in one picture. Near a point, a differentiable
+      function behaves like its tangent line -- it scales a small change in its
+      input by its slope, with an error that shrinks faster than the change
+      does.
+      {show math.0} Now chain two together: $g$ scales a small increment $h$ by
+      $g'(x)$, and then $f$ scales that by $f'(g(x))$.
+      {show statement} The two magnifications stack -- so the composite scales
+      $h$ by the product $f'(g(x))\,g'(x)$.
+      {show math.1} That's the chain rule; the proof, later, is just checking
+      the two small errors stay negligible once chained.
+    statement: "Stack two local stretches and the slopes multiply."
+    math:
+      - "$h \\;\\xrightarrow{\\ g\\ }\\; g'(x)\\,h \\;\\xrightarrow{\\ f\\ }\\; f'(g(x))\\,g'(x)\\,h$"
+      - { tex: "$\\text{composite scales }h\\text{ by } f'(g(x))\\,g'(x)$", anim: highlight }
+
+  # 4 ----------------------------------------- Theorem 3.3: the statement
+  - id: chain_rule_statement
+    kind: content
+    template: definition_math
+    accent: theorem
+    kicker: theorem
+    source: "chapter3-print-standalone.html SS3.2 . Theorem 3.3 (the chain rule)"
+    title: "The Chain Rule"
+    say: |
+      Let's state it precisely.
+      {show statement} If $g$ is differentiable at $x_0$, and $f$ is
+      differentiable at $g(x_0)$, then the composition $P(x)=f(g(x))$ is
+      differentiable at $x_0$ too.
+      {show math.0} And its derivative is the outer derivative at the inner
+      function, times the inner derivative.
+      {show math.1} Read it from the inside out. We'll earn this with a proof a
+      little later -- for now, let's learn to use it.
+    statement: "$g$ differentiable at $x_0$, $f$ at $g(x_0)\\ \\Rightarrow\\ P=f\\circ g$ differentiable at $x_0$."
+    math:
+      - { tex: "$P'(x_0)=f'(g(x_0))\\,g'(x_0)$", anim: highlight }
+      - "$\\underbrace{f'(g(x_0))}_{\\text{outer at inner}}\\;\\cdot\\;\\underbrace{g'(x_0)}_{\\text{inner derivative}}$"
+
+  # 5 ---------------------------- Figure 3.5: the composed mapping (HOOK)
+  - id: composed_mapping_figure
+    kind: content
+    template: graph
+    mode: single
+    accent: definition
+    hook: "animations.ch03_chain_rule_hooks:composed_mapping"
+    source: "chapter3-print-standalone.html SS3.2 . Figure 3.5 (composed-mapping)"
+    title: "Two Stretches in a Row"
+    say: |
+      Picture the rule as a relay of two stretches.
+      {show inc_h} Start with a small increment $h$ sitting at $x_0$.
+      {show stretch_g} The first function $g$ carries it forward and stretches
+      it to about $g'(x_0)\,h$, now sitting at $u_0=g(x_0)$.
+      {show stretch_f} The second function $f$ stretches that again by its own
+      slope there, landing at about $f'(g(x_0))\,g'(x_0)\,h$.
+      {show product} Two stretches one after the other -- and stretching by one
+      factor then another just multiplies the factors. That's why the
+      composite's slope is the product of the two local slopes.
+    axes:
+      x_range: [-1, 1, 1]
+      y_range: [-1, 1, 1]
+      x_length: 6.0
+      y_length: 3.0
+    plots: []
+
+  # 6 ----------------------------------------- Remark 3.2: the Leibniz form
+  - id: leibniz_form
+    kind: content
+    template: definition_math
+    accent: proposition
+    source: "chapter3-print-standalone.html SS3.2 . Remark 3.2 (the Leibniz form)"
+    title: "The Leibniz Form"
+    say: |
+      There's a second way to write the rule, and it's the one you'll actually
+      compute with.
+      {show math.0} Name the inner variable $u=g(x)$ and the output $y=f(u)$.
+      Then the chain rule takes its memorable shape: the rate of $y$ per $x$
+      equals the rate of $y$ per $u$ times the rate of $u$ per $x$.
+      {show statement} It looks as though the $du$'s simply cancel -- a handy way
+      to remember it, but not a proof.
+      {show math.1} These aren't fractions with a common factor to strike out;
+      each is a limit. What truly makes the rule work is the error argument
+      we're about to give.
+    statement: "The cancelling $du$ is a mnemonic, not a proof --- both pieces are limits."
+    math:
+      - { tex: "$\\dfrac{dy}{dx}=\\dfrac{dy}{du}\\cdot\\dfrac{du}{dx}\\qquad(u=g(x),\\ y=f(u))$", anim: highlight }
+      - "$\\dfrac{dy}{du},\\ \\dfrac{du}{dx}\\ \\text{are limits, not fractions}$"
+
+  # 7 --------------------------------------- Strategy 3.1: decompose outside-in
+  - id: decomposition_strategy
+    kind: content
+    template: procedure_steps
+    accent: procedure
+    source: "chapter3-print-standalone.html SS3.2 . Strategy 3.1 (differentiating a composition)"
+    title: "Differentiating a Composition"
+    say: |
+      Here's a reliable way to take any composition apart -- work from the
+      outside in.
+      {show math.0} First, spot the outermost operation -- the last thing you'd
+      do if you plugged in a number. That's the outer function $f$.
+      {show math.1} Whatever it's applied to is the inner function $u=g(x)$.
+      {show math.2} Differentiate the outside at the inside, keeping the inside
+      whole.
+      {show math.3} Then multiply by the inner derivative -- and if the inside is
+      itself a composition, just run the steps again. So $\sqrt{1+x^2}$ has outer
+      root and inner $1+x^2$; $\sin(x^2)$ has outer sine and inner $x^2$.
+    steps:
+      - { text: "Find the outermost operation.", math: "f(\\,\\cdot\\,)" }
+      - { text: "Name the inside.", math: "u=g(x)" }
+      - { text: "Differentiate the outside at the inside.", math: "f'(g(x))" }
+      - { text: "Multiply by the inner derivative.", math: "f'(g(x))\\cdot g'(x)" }
+
+  # 8 --------------------------------------------- divider: Act 2 opener
+  - id: divider_why
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 2"
+    title: "Why the Rule Is True"
+    subtitle: "Local linear approximations, and how they compose."
+    ghost: "2"
+    progress: { current: 2, total: 3 }
+    duration: 4.0
+
+  # 9 ----------------------------------- bridge: repackage "differentiable"
+  - id: proof_strategy_bridge
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "chapter3-print-standalone.html SS3.2 . Why the rule is true (bridge) + borrowed tools"
+    title: "Repackaging the Derivative"
+    say: |
+      The rule is already usable -- now let's earn it.
+      {show statement} To prove the two slopes really multiply, we handle both
+      functions' tangent-line approximations at once -- and for that we repackage
+      what differentiable means. Two facts we'll lean on without re-proving: the
+      product rule, and that a differentiable function is continuous.
+      {show math.0} We earlier called $f$ differentiable at $x_0$ when its
+      difference quotient has a limit -- and that limit is $f'(x_0)$.
+      {show math.1} We're about to say exactly the same thing, only phrased as
+      approximation by a straight line.
+    statement: "Same derivative, restated as approximation by a line."
+    math:
+      - "$\\dfrac{f(x_0+h)-f(x_0)}{h}\\ \\longrightarrow\\ f'(x_0)$"
+      - { tex: "$\\text{limit form}\\ \\Longleftrightarrow\\ \\text{remainder (line) form}$", anim: highlight }
+
+  # 10 ------------------------------- Definition 3.1: the remainder form
+  - id: remainder_form_definition
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "chapter3-print-standalone.html SS3.2 . Definition 3.1 (remainder form) + informal gloss"
+    title: "Differentiability, Remainder Form"
+    say: |
+      Here's the form.
+      {show statement} We say $f$ is differentiable at $x_0$ if there's a number
+      $m$ and a function $R$ with this equation, where the remainder over $h$
+      goes to zero.
+      {show math.0} The number $m$ is just the derivative, $f'(x_0)$.
+      {show math.1} Informally: $f(x_0+h)$ equals its tangent-line value plus an
+      error that dies faster than $h$ itself. That "faster than $h$" is the whole
+      point -- it's what lets these pieces compose.
+    statement: "$f(x_0+h)=f(x_0)+m\\,h+R(h),\\qquad \\displaystyle\\lim_{h\\to 0}\\frac{R(h)}{h}=0.$"
+    math:
+      - "$m=f'(x_0)$"
+      - { tex: "$f(x_0+h)\\approx \\underbrace{f(x_0)+m\\,h}_{\\text{tangent line}}\\ +\\ \\underbrace{R(h)}_{\\text{error}\\,\\ll\\, h}$", anim: highlight }
+
+  # 11 ----------------------------- Figure 3.6: remainder as a first-order fit (HOOK)
+  - id: remainder_tangent_figure
+    kind: content
+    template: graph
+    mode: single
+    accent: definition
+    hook: "animations.ch03_chain_rule_hooks:remainder_tangent"
+    source: "chapter3-print-standalone.html SS3.2 . Figure 3.6 (remainder-tangent)"
+    title: "The Error Shrinks Faster"
+    say: |
+      Let's watch that error shrink. Here's the graph of $f$ near $x_0$, hugging
+      its tangent line.
+      {show gap_Rh} At a nearby point $x_0+h$ the two don't quite agree, and the
+      little vertical gap between them is exactly the remainder $R(h)$.
+      {show gap_halved} Now halve $h$. The gap doesn't merely halve -- it
+      collapses far faster, shrinking to nothing next to $h$. That's the picture
+      of the remainder over $h$ going to zero.
+      {show local_fact} And this single-curve fact is what's underneath the
+      composition: up close, each function is almost its own tangent line, and
+      it's those straight-line parts whose slopes multiply.
+    axes:
+      x_range: [-1, 1, 1]
+      y_range: [-1, 1, 1]
+      x_length: 6.0
+      y_length: 3.2
+    plots: []
+
+  # 12 ------------------------- Proposition 3.3 + Proof: the two forms agree
+  - id: two_forms_equivalent
+    kind: content
+    template: theorem_proof
+    accent: proposition
+    label: "[ proposition ]"
+    source: "chapter3-print-standalone.html SS3.2 . Proposition 3.3 + Proof (both directions)"
+    title: "The Two Forms Agree"
+    say: |
+      Before we use this, let's check it's not a new idea -- just the old one
+      rewritten.
+      {show statement} The claim: the limit form and the remainder form are
+      equivalent, with the same $m$.
+      {show proof.0} One direction -- if the difference quotient tends to $m$,
+      set $R(h)=f(x_0+h)-f(x_0)-mh$; then $R(h)/h$ is that quotient minus $m$,
+      which goes to zero.
+      {show proof.1} The other way runs backward: divide the remainder equation
+      by $h$ and the quotient becomes $m+R(h)/h$, which goes to $m$.
+      {show qed} Same property, same derivative -- two ways of saying one thing.
+    statement: "Limit form $\\Longleftrightarrow$ remainder form, same $m=f'(x_0)$."
+    proof:
+      - "$\\tfrac{R(h)}{h}=\\tfrac{f(x_0+h)-f(x_0)}{h}-m\\ \\longrightarrow\\ 0$"
+      - "$\\tfrac{f(x_0+h)-f(x_0)}{h}=m+\\tfrac{R(h)}{h}\\ \\longrightarrow\\ m$"
+    qed: "same property, same derivative"
+
+  # 13 --------------------- Proof of Theorem 3.3 (1/4): substitute the remainder forms
+  - id: proof_setup_substitution
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    label: "[ proof of the chain rule ]"
+    part: { current: 1, total: 4 }
+    source: "chapter3-print-standalone.html SS3.2 . Proof of Theorem 3.3 (substitution, collect, R_3)"
+    title: "Why the Slopes Multiply"
+    say: |
+      Now the proof, and the remainder form does the heavy lifting.
+      {show proof.0} Because $g$ is differentiable at $x_0$, write it in
+      remainder form, with $m_1=g'(x_0)$.
+      {show proof.1} Because $f$ is differentiable at $g(x_0)$, apply its
+      remainder form too -- with $m_1 h+R_1(h)$ playing the role of $h$.
+      {show proof.2} Collect the part linear in $h$, and sweep everything else
+      into a single remainder $R_3$.
+      {show qed} Matched against the remainder form, that already gives the
+      derivative we want -- provided $R_3(h)/h$ goes to zero. That one limit is
+      all that's left.
+    statement: "Substitute the remainder forms."
+    proof:
+      - "$g(x_0+h)=g(x_0)+m_1 h+R_1(h),\\quad m_1=g'(x_0)$"
+      - "$P(x_0+h)=f(g(x_0))+m_2\\!\\left[m_1 h+R_1(h)\\right]+R_2\\!\\left(m_1 h+R_1(h)\\right)$"
+      - "$=P(x_0)+\\bigl(g'(x_0)f'(g(x_0))\\bigr)h+R_3(h)$"
+    qed: "remains: $\\tfrac{R_3(h)}{h}\\to 0$"
+
+  # 14 --------------------- Proof of Theorem 3.3 (2/4): split off the easy piece
+  - id: proof_easy_piece
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    label: "[ proof of the chain rule ]"
+    part: { current: 2, total: 4 }
+    source: "chapter3-print-standalone.html SS3.2 . Proof of Theorem 3.3 (split R_3/h; easy piece; inner -> 0)"
+    title: "Why the Slopes Multiply"
+    say: |
+      {show proof.0} Split that quotient into two pieces.
+      {show proof.1} The first is easy: $m_2$ is a constant and $R_1(h)/h$ goes
+      to zero, so the whole first piece goes to zero.
+      {show proof.2} And note for later -- the inner increment $m_1 h+R_1(h)$
+      itself goes to zero, since both $m_1 h$ and $R_1(h)$ do.
+      {show qed} So the easy piece is settled; everything delicate now lives in
+      the second piece.
+    statement: "Split the quotient; the first piece is easy."
+    proof:
+      - "$\\tfrac{R_3(h)}{h}=m_2\\,\\tfrac{R_1(h)}{h}+\\tfrac{R_2(m_1 h+R_1(h))}{h}$"
+      - "$m_2\\,\\tfrac{R_1(h)}{h}\\to 0\\quad(m_2\\text{ const},\\ \\tfrac{R_1(h)}{h}\\to 0)$"
+      - "$m_1 h+R_1(h)\\to 0\\quad(\\text{noted for later})$"
+    qed: "the delicate piece remains"
+
+  # 15 --------------------- Proof of Theorem 3.3 (3/4): the epsilon-delta choices
+  - id: proof_delicate_choices
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    label: "[ proof of the chain rule ]"
+    part: { current: 3, total: 4 }
+    source: "chapter3-print-standalone.html SS3.2 . Proof of Theorem 3.3 (choose delta, alpha; zero case)"
+    title: "Why the Slopes Multiply"
+    say: |
+      The second piece is the careful one -- a remainder of $f$ at that wobbling
+      inner increment, over $h$. Run an epsilon-delta argument; fix any
+      $\varepsilon>0$.
+      {show proof.0} Since $R_2(y)/y\to 0$, there's a $\delta$ so the relative
+      remainder of $f$ is below $\varepsilon$ for $0<|y|<\delta$.
+      {show proof.1} Since the inner increment goes to zero, there's an $\alpha$
+      keeping it below $\delta$ for $0<|h|<\alpha$.
+      {show proof.2} Take such an $h$. If the inner increment is exactly zero,
+      then $R_2(0)=0$ and the piece is just zero.
+      {show qed} So only the nonzero case is left.
+    statement: "Fix $\\varepsilon>0$ and choose the windows."
+    proof:
+      - "$\\tfrac{R_2(y)}{y}\\to 0\\ \\Rightarrow\\ \\exists\\,\\delta:\\ \\bigl|\\tfrac{R_2(y)}{y}\\bigr|<\\varepsilon\\ \\ (0<|y|<\\delta)$"
+      - "$m_1 h+R_1(h)\\to 0\\ \\Rightarrow\\ \\exists\\,\\alpha:\\ |m_1 h+R_1(h)|<\\delta\\ \\ (0<|h|<\\alpha)$"
+      - "$m_1 h+R_1(h)=0\\ \\Rightarrow\\ R_2(0)=0\\ \\Rightarrow\\ \\text{piece}=0$"
+    qed: "only the nonzero case remains"
+
+  # 16 --------------------- Proof of Theorem 3.3 (4/4): bound it, and conclude
+  - id: proof_delicate_bound
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    label: "[ proof of the chain rule ]"
+    part: { current: 4, total: 4 }
+    source: "chapter3-print-standalone.html SS3.2 . Proof of Theorem 3.3 (factor, triangle bound, alpha_1; QED)"
+    title: "Why the Slopes Multiply"
+    say: |
+      Take the nonzero case.
+      {show proof.0} Multiply and divide by the inner increment, splitting the
+      piece into two factors.
+      {show proof.1} The second factor is below $\varepsilon$ by our choice of
+      $\delta$, the first is bounded by the triangle inequality, and shrinking
+      the window once more so $|R_1(h)|/|h|<1$ puts the whole piece below
+      $(|m_1|+1)\,\varepsilon$.
+      {show qed} A fixed constant times $\varepsilon$, and $\varepsilon$ was
+      arbitrary -- so this piece vanishes too. Both pieces vanish, $R_3(h)/h$
+      goes to zero, and the chain rule is proved.
+    statement: "Bound the nonzero case, then let $\\varepsilon\\to 0$."
+    proof:
+      - "$\\tfrac{|R_2(m_1 h+R_1(h))|}{|h|}=\\tfrac{|m_1 h+R_1(h)|}{|h|}\\cdot\\tfrac{|R_2(m_1 h+R_1(h))|}{|m_1 h+R_1(h)|}$"
+      - "$\\le\\left(|m_1|+\\tfrac{|R_1(h)|}{|h|}\\right)\\varepsilon\\ <\\ (|m_1|+1)\\,\\varepsilon$"
+    qed: "so $\\tfrac{R_3(h)}{h}\\to 0$ --- proved"
+
+  # 17 --------------------------------------------- divider: Act 3 opener
+  - id: divider_use
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 3"
+    title: "Using the Rule"
+    subtitle: "Compositions, layer by layer."
+    ghost: "3"
+    progress: { current: 3, total: 3 }
+    duration: 4.0
+
+  # 18 ----------------------------------- Example 3.4: a single composition (a)(b)
+  - id: example_single_composition
+    kind: content
+    template: derivation
+    accent: example
+    source: "chapter3-print-standalone.html SS3.2 . Example 3.4 (sqrt(1+x^2), sin(x^2))"
+    title: "A Single Composition"
+    prompt: "Differentiate $\\sqrt{1+x^{2}}$ and $\\sin(x^{2})$."
+    say: |
+      Time to use it -- two quick ones.
+      {show step.0} For $\sqrt{1+x^2}$, the outer is the square root and the
+      inner is $1+x^2$: the outer derivative times $2x$ tidies to $x$ over
+      $\sqrt{1+x^2}$.
+      {show step.1} For $\sin(x^2)$, the outer is sine and the inner is $x^2$:
+      cosine of the inside times $2x$.
+      {show result} Notice that $2x$ in each -- it's the inner derivative, and
+      forgetting it is the single most common slip.
+    steps:
+      - { math: "\\frac{d}{dx}\\sqrt{1+x^{2}} = \\frac{1}{2\\sqrt{1+x^{2}}}\\cdot 2x = \\frac{x}{\\sqrt{1+x^{2}}}", reason: "outer $u^{1/2}$, inner $1+x^{2}$" }
+      - { math: "\\frac{d}{dx}\\sin(x^{2}) = \\cos(x^{2})\\cdot 2x = 2x\\cos(x^{2})", reason: "outer $\\sin$, inner $x^{2}$" }
+    result: { math: "\\text{the inner derivative } 2x \\text{ is never optional}", reason: "the common slip" }
+
+  # 19 ----------------------------------------- Caution: the inner derivative
+  - id: caution_inner_derivative
+    kind: content
+    template: callout
+    type: caution
+    source: "chapter3-print-standalone.html SS3.2 . Caution (forgetting the inner derivative)"
+    title: "Never Drop the Inner Derivative"
+    say: |
+      Let's make that mistake explicit, so you never make it.
+      {show body} The most common chain-rule error is to differentiate the outer
+      function and then stop -- to write the derivative of $\sin(g(x))$ as just
+      $\cos(g(x))$. That's wrong; the right answer carries the inner factor
+      $g'(x)$. The $2x$ back in $\sin(x^2)$ is never optional.
+    body: "Wrong: $\\dfrac{d}{dx}\\sin(g(x))=\\cos(g(x))$. Right: $\\dfrac{d}{dx}\\sin(g(x))=\\cos(g(x))\\cdot g'(x)$. The inner factor $g'(x)$ --- the $2x$ in $\\sin(x^{2})$ --- is never optional."
+
+  # 20 ----------------------------- Example 3.5: a three-layer nested composition
+  - id: example_nested_three_layers
+    kind: content
+    template: derivation
+    accent: example
+    source: "chapter3-print-standalone.html SS3.2 . Example 3.5 (sqrt(1+sin^2 x))"
+    title: "Three Layers Deep"
+    prompt: "Differentiate $\\sqrt{1+\\sin^{2} x}$."
+    say: |
+      Now let the inside be a composition too -- $\sqrt{1+\sin^2 x}$ is three
+      layers deep, since $\sin^2 x$ is itself $(\sin x)^2$.
+      {show step.0} The square root gives one over twice itself, times the
+      derivative of the inside.
+      {show step.1} That inside derivative is the square of $\sin x$, which by the
+      chain rule again is $2\sin x\cos x$.
+      {show result} Three layers, three factors -- and they simply multiply down
+      the chain.
+    steps:
+      - { math: "\\frac{d}{dx}\\sqrt{1+\\sin^{2}x} = \\frac{1}{2\\sqrt{1+\\sin^{2}x}}\\cdot\\frac{d}{dx}\\!\\left(1+\\sin^{2}x\\right)", reason: "outer: square root" }
+      - { math: "= \\frac{1}{2\\sqrt{1+\\sin^{2}x}}\\cdot 2\\sin x\\cos x", reason: "chain rule again" }
+    result: { math: "\\frac{d}{dx}\\sqrt{1+\\sin^{2}x} = \\frac{\\sin x\\cos x}{\\sqrt{1+\\sin^{2}x}}", reason: "the factors multiply" }
+
+  # 21 ----------------------- Example 3.6: chain rule times the quotient rule
+  - id: example_chain_times_quotient
+    kind: content
+    template: derivation
+    accent: example
+    source: "chapter3-print-standalone.html SS3.2 . Example 3.6 (sqrt((x-1)/(x+2)), x>1)"
+    title: "When the Inside Is Its Own Problem"
+    prompt: "Differentiate $\\sqrt{\\dfrac{x-1}{x+2}}$ for $x>1$."
+    say: |
+      Sometimes the inner derivative is a small problem of its own.
+      {show step.0} The outer is the square root, the inner is the fraction -- so
+      the chain rule gives one over twice the root, times the derivative of the
+      fraction.
+      {show step.1} And that derivative is a quotient rule: it comes out to three
+      over $(x+2)$ squared.
+      {show result} Tidy the front factor and multiply -- the answer is three
+      over twice the product. The chain rule started the job; the quotient rule
+      finished the inside.
+    steps:
+      - { math: "\\frac{d}{dx}\\sqrt{\\frac{x-1}{x+2}} = \\frac{1}{2\\sqrt{(x-1)/(x+2)}}\\cdot\\frac{d}{dx}\\!\\left(\\frac{x-1}{x+2}\\right)", reason: "outer: square root" }
+      - { math: "\\frac{d}{dx}\\!\\left(\\frac{x-1}{x+2}\\right) = \\frac{(x+2)-(x-1)}{(x+2)^{2}} = \\frac{3}{(x+2)^{2}}", reason: "quotient rule" }
+    result: { math: "= \\frac{\\sqrt{x+2}}{2\\sqrt{x-1}}\\cdot\\frac{3}{(x+2)^{2}} = \\frac{3}{2\\sqrt{x-1}\\,(x+2)^{3/2}}\\quad(x>1)" }
+
+  # 22 ------------------------ Example 3.7: chain rule times the product rule
+  - id: example_chain_times_product
+    kind: content
+    template: derivation
+    accent: example
+    source: "chapter3-print-standalone.html SS3.2 . Example 3.7 ((1+x^2) cos^2 x)"
+    title: "Two Rules Cooperate"
+    prompt: "Differentiate $y=(1+x^{2})\\cos^{2}x$."
+    say: |
+      Same story, a different partner rule.
+      {show step.0} The outermost operation is a product, so start with the
+      product rule.
+      {show step.1} The leftover derivative needs the chain rule, since
+      $\cos^2 x$ is $(\cos x)^2$ -- giving minus $2\sin x\cos x$.
+      {show result} Put it together. The product rule split the work; the chain
+      rule supplied the slope inside the second piece.
+    steps:
+      - { math: "y' = (2x)\\cos^{2}x + (1+x^{2})\\,\\frac{d}{dx}\\!\\left(\\cos^{2}x\\right)", reason: "product rule" }
+      - { math: "\\frac{d}{dx}\\!\\left(\\cos^{2}x\\right) = 2\\cos x\\,(-\\sin x) = -2\\sin x\\cos x", reason: "chain rule on $(\\cos x)^{2}$" }
+    result: { math: "y' = 2x\\cos^{2}x - 2(1+x^{2})\\sin x\\cos x", reason: "both rules together" }
+
+  # 23 ------------------------ Example 3.8: Leibniz rates -- signs along a chain
+  - id: example_leibniz_rates
+    kind: content
+    template: derivation
+    accent: example
+    source: "chapter3-print-standalone.html SS3.2 . Example 3.8 (kelp/urchin/otter, Leibniz)"
+    title: "Signs Along a Chain"
+    prompt: "Kelp $K$ depends on urchins $U$, and $U$ on otters $O$. Is $\\dfrac{dK}{dO}$ positive or negative?"
+    say: |
+      Here's the Leibniz form earning its keep. Kelp $K$ depends on the urchins
+      $U$ that eat it, and $U$ on the otters $O$ that eat them.
+      {show step.0} Read each link: more urchins, less kelp, so $dK/dU$ is
+      negative; more otters, fewer urchins, so $dU/dO$ is negative.
+      {show step.1} The chain rule chains the two rates.
+      {show result} A product of two negatives is positive -- so $dK/dO$ is
+      positive: more otters ultimately means more kelp. The signs multiply along
+      the chain.
+    steps:
+      - { math: "\\frac{dK}{dU} < 0, \\qquad \\frac{dU}{dO} < 0", reason: "read each link" }
+      - { math: "\\frac{dK}{dO} = \\frac{dK}{dU}\\cdot\\frac{dU}{dO}", reason: "Leibniz form" }
+    result: { math: "\\frac{dK}{dO} = (-)\\cdot(-) > 0", reason: "more otters, more kelp" }
+
+  # 24 --------------------------- forward-ref: toward inverse derivatives (no section no.)
+  - id: toward_section_3_3
+    kind: content
+    template: definition_math
+    accent: definition
+    source: "chapter3-print-standalone.html SS3.2 . closing prose (forward-ref: ln, arcsin, arctan, x^x)"
+    title: "A Key, Not Just a Rule"
+    say: |
+      {show statement} With the chain rule in hand, any function you build by
+      composing the elementary ones can now be differentiated, almost
+      mechanically.
+      {show math.0} But the rule does something more interesting next -- it
+      becomes a key, unlocking derivatives we couldn't otherwise reach: the
+      inverse functions, and even something like $x^x$ through a clever trick.
+      That's where we head next.
+    statement: "The chain rule isn't just another rule --- it's a key to new derivatives."
+    math:
+      - { tex: "$\\ln x \\qquad \\arcsin x \\qquad \\arctan x \\qquad x^{x}$", anim: highlight }
+
+  # 25 ------------------------------------------------------- recap (Key Takeaways)
+  - id: recap
+    kind: content
+    template: recap_cards
+    accent: recap
+    source: "chapter3-print-standalone.html SS3.2 . whole-section synthesis"
+    title: "Key Takeaways"
+    say: |
+      Pull the section together.
+      {show point.0} The chain rule differentiates a composition: the outer
+      derivative at the inner function, times the inner derivative.
+      {show point.1} In Leibniz form, the rates multiply.
+      {show point.2} To use it, decompose from the outside in -- every layer
+      contributes one slope factor.
+      {show point.3} The number-one pitfall is dropping the inner derivative; and
+      underneath it all, each function is locally its tangent line, so the local
+      slopes multiply.
+    points:
+      - "Chain rule: $P'(x_0)=f'(g(x_0))\\,g'(x_0)$ --- outer derivative at the inner function, times the inner derivative."
+      - "Leibniz form: $\\dfrac{dy}{dx}=\\dfrac{dy}{du}\\cdot\\dfrac{du}{dx}$ --- the rates multiply."
+      - "Decompose from the outside in; every layer contributes one slope factor."
+      - "Pitfall: never drop the inner derivative $g'(x)$. Why it works: locally each function is its tangent line."
+    formulas:
+      - "$P'(x_0)=f'(g(x_0))\\,g'(x_0)$"
+      - "$\\dfrac{dy}{dx}=\\dfrac{dy}{du}\\cdot\\dfrac{du}{dx}$"
+
+  # 26 ------------------------------------------------------------------ outro
+  - id: outro
+    kind: outro
+    duration: 8.0
+    next_section: "3.3"
+    next_title: "Applications of the Chain Rule"
