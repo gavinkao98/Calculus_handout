@@ -28,8 +28,8 @@ from manim import DOWN, LEFT, RIGHT, UP, RoundedRectangle, VGroup
 from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
-from ._common import (scene_head, motif_corner, center_in_zone, build_aside, ColumnPlan,
-                      SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
+from ._common import (scene_head, motif_corner, center_in_zone, build_aside, render_scaffold,
+                      ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
 
 
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
@@ -41,8 +41,15 @@ def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
-    blocks += scene_head(spec, ctx, label=spec.get("label", "[ theorem ]"))
-    title = blocks[1].mobject
+    head = scene_head(spec, ctx, label=spec.get("label", "[ theorem ]"))
+    blocks += head
+    title = head[1].mobject
+
+    scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"))
+    for sb in scaffold_blocks:
+        sb.mobject.next_to(title, DOWN, buff=T.TITLE_GAP).align_to(title, LEFT)
+        title = sb.mobject
+    blocks += scaffold_blocks
 
     left = SPINE_X
     content_w = CONTENT_W

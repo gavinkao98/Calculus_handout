@@ -24,6 +24,7 @@ from manim import DOWN, LEFT, UP, VGroup
 from .. import brand
 from ..blocks import Block, accent_role
 from ..visuals import theme as T
+from ._common import render_scaffold
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -71,16 +72,22 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # left-flush vstack, anchored to the title then vertically centred in the frame
     eyebrow.next_to(title, UP, buff=0.34).align_to(title, LEFT)
     below = title
+    scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"))
+    for sb in scaffold_blocks:
+        sb.mobject.next_to(below, DOWN, buff=T.TITLE_GAP).align_to(title, LEFT)
+        below = sb.mobject
     if subtitle is not None:
-        subtitle.next_to(title, DOWN, buff=0.42).align_to(title, LEFT)
+        subtitle.next_to(below, DOWN, buff=0.42).align_to(title, LEFT)
         below = subtitle
     dots.next_to(below, DOWN, buff=0.6).align_to(title, LEFT)
-    members = [eyebrow, title] + ([subtitle] if subtitle is not None else []) + [dots]
+    members = ([eyebrow, title] + [sb.mobject for sb in scaffold_blocks]
+               + ([subtitle] if subtitle is not None else []) + [dots])
     stack = VGroup(*members)
     stack.move_to([left_x + stack.width / 2, 0, 0])
 
     blocks.append(Block("eyebrow", eyebrow, anim="fade", static=True))
     blocks.append(Block("title", title, anim="fade", static=True))
+    blocks += scaffold_blocks
     if subtitle is not None:
         blocks.append(Block("subtitle", subtitle, anim="fade", static=True))
     blocks.append(Block("dots", dots, anim="fade", static=True))

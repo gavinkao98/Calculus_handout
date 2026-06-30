@@ -39,7 +39,7 @@ from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
 from ._common import (scene_head, example_head, motif_corner, place_body, body_zone,
-                      fill_gap, ColumnPlan, SPINE_X, CONTENT_W, RAIL_X)
+                      fill_gap, render_scaffold, ColumnPlan, SPINE_X, CONTENT_W, RAIL_X)
 
 _ROW_GAP = 0.40       # between rows (min pitch; expands for tall rows)
 MIN_PITCH = _ROW_GAP  # tightest inter-row gap -- sizecheck's split-capacity trigger reads this
@@ -142,6 +142,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         head = scene_head(spec, ctx, label="[ derivation ]")
         body_ref = head[1].mobject
     blocks += head
+
+    scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"))
+    for sb in scaffold_blocks:
+        sb.mobject.next_to(body_ref, DOWN, buff=T.TITLE_GAP).align_to(body_ref, LEFT)
+        body_ref = sb.mobject
+    blocks += scaffold_blocks
 
     content_w = CONTENT_W
     left_x = SPINE_X

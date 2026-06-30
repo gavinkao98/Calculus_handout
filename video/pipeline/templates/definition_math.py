@@ -25,7 +25,7 @@ from .. import brand
 from ..blocks import Block
 from ..visuals import theme as T
 from ._common import (scene_head, motif_corner, place_body, body_zone, build_aside,
-                      ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
+                      render_scaffold, ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
 
 LABEL = {
     "definition": "[ definition ]", "theorem": "[ theorem ]",
@@ -78,6 +78,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
                       label=LABEL.get(spec.get("accent", "definition"), "[ definition ]"))
     blocks += head
     title = head[1].mobject
+
+    scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"))
+    for sb in scaffold_blocks:
+        sb.mobject.next_to(title, DOWN, buff=T.TITLE_GAP).align_to(title, LEFT)
+        title = sb.mobject
+    blocks += scaffold_blocks
 
     math_mobs, anims = _math_blocks(spec, ground)
     center_math = spec.get("math_align") == "center"
