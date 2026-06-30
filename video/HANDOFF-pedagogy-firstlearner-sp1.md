@@ -91,3 +91,29 @@ git 只帶走**已 commit**的東西。以下目前**未 commit**，換到家裡
 1. 要讓家裡機器拿到：**`git push`** 分支 `video/template-redesign-navy-spine`（committed 的 Plan 1/2 ＋ 本交接文件才會過去）。
 2. 未 commit 的（音檔 WIP ＋ REBUILD_STATUS 編輯）**先 commit 才會跟著走**，否則留在這台。
 3. 回家後：`git pull` → 讀本檔「四、怎麼接手」→ 從 Plan 2 Task 4 續做。
+
+---
+
+## 附錄 — Minor findings 全集（cosmetic／低優先，給 Plan 2 final whole-branch review 參考）
+
+> 這些原本只記在本機 gitignored ledger（`.superpowers/sdd/progress.md`）；為免換機遺失，搬進此版控文檔。**多數 won't-fix**（比照既有風格／harmless）；final whole-branch review 也會自行 re-derive。**真正 actionable 的兩項在「六」**（非此附錄）。
+
+**Plan 1（provenance）：**
+- `provenance.py` `parse_ref` 正則 `(\S.*)`＋`.strip()` 接受 token 內空白（plan 規定；harmless，這種 ref 永不 resolve）；要收緊改 `(\S+)`。
+- `provenance.py` `parse_ref` 回傳註解加引號 `"tuple[str,str]|None"`，在 `from __future__ import annotations` 下冗餘。
+- `_selftest_provenance.py` `test_loci(tmp_md,tmp_handout)` 參數未用（vestigial）；`from_deck` 無常駐 unit test（smoke 涵蓋，設計如此）。
+- `provenance.py` `from_deck` 中段 import（brief 規定；PEP8 會提到頂）。
+- `provenance.py` `from_deck` 的 `except Exception: pass` 靜默——壞 `.md` → 空 md units 無 stderr 提示（spec-correct warn-only；加一行 stderr warn 利除錯）。
+- `_selftest_provenance.py` `scene_text_refs` 的 `points` 欄＋list-path ref 值未斷言（只測 `annotations`）。
+- `provenance.py` `scene_text_refs` 的 `isinstance(ref,str)` belt-and-suspenders（harmless）。
+- `_selftest_provenance.py` `assert "ok" not in msgs` 鬆散 substring（`"ok."` 較穩）。
+- `otf_provenance.yml` fixture 無 `divider` 場（membership 由 `test_constants` 護；與 content 同分支）。
+- `schema.py` `main()` 內 local import＋`_Path` alias（合既有 deferred-import 風格；alias 或冗餘）。
+- `_selftest_provenance.py` 複合否定斷言（`ok_inherited`＋`intro` 同一 assert）。
+
+**Plan 2（pedagogy）：**
+- `pedagogy.py` 結尾換行；空-id 場排除（defensible）；docstring 提 PD2/PD3 為 forward-decl。
+- `_selftest_pedagogy.py` PEP8 空行。
+- `make.py` `[pedagogy]` 的 `if _ped_err and _ped_enforce:` 冗餘（vs `[provenance]` 的 `if _p_err:`）→ 已列「六」的 actionable 對齊項。
+
+> 此附錄落地後，**所有跨機該留的紀錄都在版控文檔內**；`.superpowers/sdd/progress.md` 維持本機 gitignored scratch（不需移出），其逐步 log 僅供同機／同 session 回復用。
