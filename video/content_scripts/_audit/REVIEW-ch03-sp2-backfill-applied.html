@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SP2 回填 applied 報告 — ch03 §3.1 + §3.2</title>
+<script>
+MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root { --ink:#1a2332; --muted:#5b6677; --accent:#0169cc; --ok:#0a7d33; --warn:#b06a00; --line:#dde3ec; --card:#f7f9fc; }
+  body { font-family: -apple-system, "Segoe UI", "Noto Sans TC", system-ui, sans-serif; color: var(--ink);
+         max-width: 1080px; margin: 0 auto; padding: 28px 22px 80px; line-height: 1.6; }
+  h1 { font-size: 1.7rem; border-bottom: 3px solid var(--accent); padding-bottom: 8px; }
+  h2 { font-size: 1.3rem; margin-top: 2.2em; border-left: 5px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 1.08rem; margin-top: 1.6em; color: #243; }
+  .lede { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.92rem; }
+  th, td { border: 1px solid var(--line); padding: 7px 9px; text-align: left; vertical-align: top; }
+  th { background: var(--card); }
+  code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; font-size: 0.86em; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .warn { color: var(--warn); }
+  .muted { color: var(--muted); font-size: 0.9em; }
+  .pill { display:inline-block; background: var(--ok); color:#fff; border-radius: 999px; padding: 1px 10px; font-size:0.8rem; font-weight:600;}
+  .scene { font-family: ui-monospace, monospace; font-size: 0.82em; color:#334; }
+  ul { margin: 6px 0; }
+</style>
+</head>
+<body>
+<h1>SP2 回填 — applied 報告（ch03 §3.1 + §3.2）</h1>
+<p class="lede">
+<b>日期：</b>2026-07-01　<b>分支：</b><code>video/template-redesign-navy-spine</code>　<b>commits：</b><code>d7b4131..f3a3f4c</code><br>
+<b>範圍：</b>把 SP1 框架（OTF provenance <code>ref:</code>/<code>refs:</code>、PD <code>scaffold.motive</code>/<code>problem</code>、視覺 font-floor）回填進兩個既有 ch03 deck，並把三個 per-deck opt-in flag（<code>otf_enforce</code>／<code>pedagogy_enforce</code>／<code>fontfloor_enforce</code>）翻成 <b>gating</b>。<b>ch01 §1.1 範圍外、未動。</b><br>
+<b>結果：</b><span class="pill">兩 deck first-learner GATED</span>　確定性閘 0 error、gate-1 <b>0 PD / 0 OF blocking</b>（baseline 與 backfill 後各一輪 ×2 deck）、<code>visual-frame-audit</code> <b>0 visual blocking</b>（13 代表幀）、Codex 計畫 3 輪覆核 READY-TO-EXECUTE＋migration list 覆核＋template-fix 覆核。全程離線；Codex read-only 覆核經使用者 standing-consent。
+</p>
+
+<h2>一、回填量總表（只動 2 個 <code>.yml</code>）</h2>
+<table>
+<tr><th>deck</th><th>場級 <code>ref:</code></th><th><code>scaffold.motive</code></th><th><code>scaffold.problem</code></th><th>欄級 <code>refs:</code></th><th>OF1 reword</th><th>provenance</th><th>pedagogy</th></tr>
+<tr><td>§3.1 <span class="scene">ch03_trig_derivatives</span></td><td>17 content + 4 divider</td><td>10</td><td>4</td><td>recap points.0–3 → md:recap</td><td>0</td><td class="ok">36 → 0</td><td class="ok">14 → 0</td></tr>
+<tr><td>§3.2 <span class="scene">ch03_chain_rule</span></td><td>19 content + 3 divider</td><td>10</td><td>3</td><td>recap points.0–3 → md:recap</td><td>1（statement 精確化）</td><td class="ok">36 → 0</td><td class="ok">13 → 0</td></tr>
+</table>
+<p class="muted">機械化規則：content 場 <code>ref: md:&lt;scene_id&gt;</code>（每場都有同名 .md unit）；divider <code>ref: doc:frag-sec-3-1/3-2</code>。6 個無 present OTF 欄的 graph/procedure 場（sector_inequality／slope_equals_height／shm_stacked_graphs／composed_mapping_figure／remainder_tangent_figure／decomposition_strategy）不加 ref（無可追溯上畫面文字）。font-floor 兩 deck 0 surface（no-op flip）。</p>
+
+<h2>二、§3.1 新增 scaffold 內容（lift 自已核可 <code>say</code>；OF1 逐條忠實）</h2>
+<h3>scaffold.motive（10；theorem_proof×5 + derivation×5）</h3>
+<table>
+<tr><th>場</th><th>motive（上畫面「為什麼做這個」）</th><th>ref（繼承）</th></tr>
+<tr><td class="scene">difference_quotient_for_sine</td><td>Sum-to-product turns the difference of sines into a product.</td><td>md:difference_quotient_for_sine</td></tr>
+<tr><td class="scene">squeeze_to_the_bound</td><td>Turn the chain of areas into bounds on $\sin\theta/\theta$.</td><td>md:squeeze_to_the_bound</td></tr>
+<tr><td class="scene">continuity_statement_sin_limit</td><td>The bound is the key to continuity — first prove $\sin\theta\to 0$.</td><td>md:continuity_statement_sin_limit</td></tr>
+<tr><td class="scene">continuity_argument</td><td>Turn $\sin\theta\to 0$ into full continuity, everywhere.</td><td>md:continuity_argument</td></tr>
+<tr><td class="scene">fundamental_limit</td><td>Close the limit $\sin\theta/\theta\to 1$ the whole section is built on.</td><td>md:fundamental_limit</td></tr>
+<tr><td class="scene">derivative_of_sine</td><td>Cash in continuity and the limit — sine's derivative falls out.</td><td>md:derivative_of_sine</td></tr>
+<tr><td class="scene">derivative_of_cosine</td><td>Same machinery, companion identity — now cosine.</td><td>md:derivative_of_cosine</td></tr>
+<tr><td class="scene">companion_limit</td><td>Bank a companion limit: $(1-\cos\theta)/\theta\to 0$.</td><td>md:companion_limit</td></tr>
+<tr><td class="scene">all_six_trig_derivatives</td><td>From $\sin,\cos$, the quotient rule gives the other four.</td><td>md:all_six_trig_derivatives</td></tr>
+<tr><td class="scene">shm_compute</td><td>Put the new derivatives to work: a weight on a spring.</td><td>md:shm_compute</td></tr>
+</table>
+<h3>scaffold.problem（4 divider；具體 $math$ 顯示公式行；cite doc:frag-sec-3-1）</h3>
+<table>
+<tr><th>divider（title）</th><th>problem</th></tr>
+<tr><td class="scene">divider_limit（The Limit Behind the Slope）</td><td>$\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}=\;?$</td></tr>
+<tr><td class="scene">divider_squeeze（A Geometric Squeeze）</td><td>$\tfrac12\sin\theta\;\le\;\tfrac12\theta\;\le\;\tfrac12\tan\theta$</td></tr>
+<tr><td class="scene">divider_derivatives（The Two Derivatives）</td><td>$\dfrac{d}{dx}\sin x=\;?\qquad\dfrac{d}{dx}\cos x=\;?$</td></tr>
+<tr><td class="scene">divider_apply（Consequences and Applications）</td><td>$\dfrac{d}{dx}\tan x,\ \sec x,\ \cot x,\ \csc x=\;?$</td></tr>
+</table>
+
+<h2>三、§3.2 新增 scaffold 內容</h2>
+<h3>scaffold.motive（10；theorem_proof×5 含 4 ε-δ proof part + derivation×5）</h3>
+<table>
+<tr><th>場</th><th>motive</th><th>ref（繼承）</th></tr>
+<tr><td class="scene">two_forms_equivalent</td><td>Check the remainder form is the old derivative, just rewritten.</td><td>md:two_forms_equivalent</td></tr>
+<tr><td class="scene">proof_setup_substitution</td><td>Let the remainder form do the lifting — substitute both, collect.</td><td>md:proof_setup_substitution</td></tr>
+<tr><td class="scene">proof_easy_piece</td><td>Split $R_3/h$ in two — dispatch the easy piece first.</td><td>md:proof_easy_piece</td></tr>
+<tr><td class="scene">proof_delicate_choices</td><td>The delicate piece: an $\varepsilon$–$\delta$ argument, choose the windows.</td><td>md:proof_delicate_choices</td></tr>
+<tr><td class="scene">proof_delicate_bound</td><td>Bound the delicate piece; $\varepsilon$ is arbitrary, so it vanishes.</td><td>md:proof_delicate_bound</td></tr>
+<tr><td class="scene">example_single_composition</td><td>Use the rule on two quick composites: $\sqrt{1+x^2}$, $\sin(x^2)$.</td><td>md:example_single_composition</td></tr>
+<tr><td class="scene">example_nested_three_layers</td><td>Let the inside be a composition too — three layers.</td><td>md:example_nested_three_layers</td></tr>
+<tr><td class="scene">example_chain_times_quotient</td><td>When the inner derivative is its own problem — chain meets quotient.</td><td>md:example_chain_times_quotient</td></tr>
+<tr><td class="scene">example_chain_times_product</td><td>The chain rule teams up with the product rule.</td><td>md:example_chain_times_product</td></tr>
+<tr><td class="scene">example_leibniz_rates</td><td>Leibniz form earning its keep — signs along a chain.</td><td>md:example_leibniz_rates</td></tr>
+</table>
+<h3>scaffold.problem（3 divider；cite doc:frag-sec-3-2）</h3>
+<table>
+<tr><th>divider（title）</th><th>problem</th></tr>
+<tr><td class="scene">divider_rule（The Rule You Can Use）</td><td>$\dfrac{d}{dx}\,f\!\big(g(x)\big)=\;?$</td></tr>
+<tr><td class="scene">divider_why（Why the Rule Is True）</td><td>$P'(x_0)=f'(g(x_0))\,g'(x_0)\;?$</td></tr>
+<tr><td class="scene">divider_use（Using the Rule）</td><td>$\dfrac{d}{dx}\sqrt{1+x^{2}},\ \sin(x^{2}),\ \sqrt{1+\sin^{2}x}=\;?$</td></tr>
+</table>
+<h3>OF1 statement 精確化（§3.2，唯一改動既有上畫面文字）</h3>
+<p><span class="scene">proof_delicate_bound.statement</span>：
+原「Bound the nonzero case, then let $\varepsilon\to 0$.」→ 新「Bound the nonzero case; $\varepsilon$ was arbitrary, so it vanishes.」<br>
+<span class="muted">理由：該證明用「$\varepsilon$ 任意 ⇒ 量 = 0」的論證，非對 $\varepsilon$ 取極限；原 statement 的「let $\varepsilon\to0$」是不精確 gloss。Codex（migration review）＋gate-1 OF1 owner 皆判此為 <b>advisory</b>（源支持結論、非硬矛盾）。改寫對齊【同場 say 本就精確的「$\varepsilon$ was arbitrary — so this piece vanishes」】＋ cited 源；<b>不動 .md／narration</b>（NFA 護欄）。<code>visual-frame-audit</code> 對改寫後 2 行 statement 判 <b>KEEP</b>（不 cramped、qed 框內）。</span></p>
+
+<h2>四、閘裁決</h2>
+<ul>
+<li><b>確定性層：</b>翻 flag 後 <code>schema.py</code> 兩 deck exit 0（無 <code>[provenance]</code>/<code>[pedagogy]</code> 區塊＝ENFORCE 下 0 surface）；<code>sizecheck.py</code> 0 error；<code>make.py</code> render-gate exit 0。</li>
+<li><b>gate-1 <code>pedagogy-firstlearner-audit</code>（×2 deck × baseline＋backfill 後）：</b>全部 <b class="ok">VERDICT 0 PD blocking, 0 OF blocking</b>。baseline 即 0/0 → 證 SP2 是補確定性結構、非修教學/忠實失敗（PD1 beat 粒度＋OF1 上畫面忠實本就乾淨）；backfill 後複驗 23 段新 scaffold 文字逐條忠實 cited 源。</li>
+<li><b><code>visual-frame-audit</code>（×2 deck，13 代表幀）：</b><b class="ok">0 visual blocking</b>。scaffold.motive 可讀（≥26px floor）、非 muted、不裁切、不擠 statement；divider problem 公式正確；稠密 ε-δ proof 的 qed 框內（<span class="scene">proof_easy_piece</span> 距框底 1.35px，三來源對抗式複驗未截字）。A 分 80–92（最低為稠密 proof 底部呼吸空間／手機尺標，皆 advisory）。</li>
+<li><b>Codex（gpt-5.5/xhigh, read-only）：</b>計畫 3 輪（R1 8 findings→修、R2 §3.2 計數→修、R3 READY-TO-EXECUTE）；migration list 覆核（APPROVE-WITH-FIXES：2 motive 改寫＋recap §53b refs＋proof_delicate_bound statement→全 folded-in）；template-fix 覆核（head[1] 修正確、contained）。</li>
+</ul>
+
+<h2>五、決策（D-A ~ D-E）</h2>
+<ul>
+<li><b>D-A〔§3.1 radians registry〕defer：</b>不加 <code>meta.assumptions:[radians]</code>（P4 follow-up）。不加不擋 flip（PD4 無 registry 即零發現）；加會改 render（新 ASSUMES badge）＋需視覺 sign-off；<span class="scene">radians_essential</span> caution 場已顯式講前提。日後若要 P4 first-use flag：first_use_unit 候選 <span class="scene">sector_inequality</span>。</li>
+<li><b>D-B〔recap source-adequacy〕</b>兩 deck recap 加顯式 <code>refs: {points.0–3: md:recap}</code>。recap.points 為跨單元綜合（rubric §53b 要求欄級覆寫）；target 用 whole-section synthesis unit <code>md:recap</code>＝同 altitude 源、OF1 最 adequate（單值覆寫指向單一 constituent unit 反而 under-cover 多單元 point）。gate-1 OF1 確認 source-adequate。</li>
+<li><b>D-C〔OF1〕</b>兩 deck baseline OF1 clean（0 blocking）；唯 §3.2 <span class="scene">proof_delicate_bound.statement</span> 的 advisory 已精確化（見三）。無其他 reword；不動 .md。</li>
+<li><b>D-D〔PD1〕</b>0 blocking。1 條 advisory（<span class="scene">proof_delicate_bound</span> 的 <code>proof.1</code> 可拆 2 reveal）<b>surface 不動</b>——拆會 re-litigate 已核可的 reveal 結構＋narration 對齊，gate-1 明示 reveal 與源一致、非 blocking。</li>
+<li><b>D-E〔motive 文字〕</b>全部 lift 自各場已核可 <code>say</code> 開場句（保 OF1 忠實、不另造新措辭）；problem 為具體 $math$ 式。</li>
+</ul>
+
+<h2>六、框架修正（shared template，有據偏離 plan「不動共用模板」）</h2>
+<p><code>video/pipeline/templates/theorem_proof.py</code>（commit <code>6851d0a</code>，Codex 覆核 contained）：</p>
+<ul>
+<li><b>latent bug：</b>原 <code>title = head[1].mobject</code> 假設 head[1] 是 title，但 <code>scene_head</code> 對 <b>part: 場</b>在 title 前插 part 指示器（top-right）→ <code>scaffold.motive</code> <code>align_to</code> 到它、衝出右界。<b>修＝以 id 取 title</b>（<code>next(b.mobject for b in head if b.id=="title")</code>；非-part 場 byte-identical）。SP1 Plan 2 把 render_scaffold 接進 theorem_proof 但從未測 part: 場 motive，故此 bug 潛伏至今。</li>
+<li><b>motive-gap 收緊：</b>motive 吃垂直空間使稠密 part: proof 的 qed 出框 → 加 <code>has_motive</code> gated 的間距收緊（title→motive 0.22／motive→card 0.20），reclaim ~0.3u；<b>no-motive 場不變</b>（ch01 零影響）。</li>
+<li><b>follow-up：</b><code>derivation.py:143</code>／<code>definition_math.py:80</code> 有同款 <code>head[1]</code> latent bug，但 ch03 無 part: 的這兩類場故<b>未觸發、未改</b>（外科手術）；日後若有 part: derivation/definition_math 場需比照修。</li>
+</ul>
+
+<h2>七、代表幀（gitignored；本機可開）</h2>
+<p class="muted">
+§3.1：<code>video/output/_qa/sp2-s31-scaffold/</code>（continuity_argument／continuity_statement_sin_limit／difference_quotient_for_sine／fundamental_limit／divider_squeeze／divider_apply）<br>
+§3.2：<code>video/output/_qa/sp2-s32-scaffold/</code>（proof_setup_substitution／proof_easy_piece／proof_delicate_bound／two_forms_equivalent／example_single_composition／divider_rule／divider_use）<br>
+全片 mock 成片：<code>video/output/ch03/s3.1/ch03_trig_derivatives.mp4</code>、<code>video/output/ch03/s3.2/ch03_chain_rule.mp4</code>（1080p mock；未動計費 API）。
+</p>
+
+<h2>八、接續</h2>
+<ul>
+<li>SP2 ch03 完成。<b>ch01 §1.1（<code>ch01_inverse_functions.yml</code>）未回填</b>（本輪範圍外）。</li>
+<li>計費步驟（真 TTS、高解析渲染、gate-2 VLM critic）仍 consent-gated，未動。</li>
+<li>新 ch03 deck 撰寫時，<code>make.py</code> render-gate 會自動以 OTF/PD/font-floor 把關（兩 deck 已 gating）。</li>
+</ul>
+<p class="muted">唯讀稽核＋確定性閘＋離線 render 產出；本報告 standalone（MathJax CDN，雙擊即開）。施工計畫見 <code>video/PLAN-pedagogy-firstlearner-sp2-backfill.md</code>；跨機進度錨見 <code>video/REBUILD_STATUS.md</code>「✅ 2026-07-01 SP2 回填」段。</p>
+</body>
+</html>

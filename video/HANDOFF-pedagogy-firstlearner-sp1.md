@@ -6,7 +6,7 @@
 > 跨對話進度錨仍是 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)；本檔是「回家接手」用的單張 resume 卡。
 > **全程離線、未動任何計費 API。** 流程：`superpowers:subagent-driven-development`，task-by-task，每 task 過 spec＋品質雙閘 review。
 
-SP1 共 5 個 Plan。目前 **Plan 1 ✅、Plan 2 ✅、Plan 3 ✅、Plan 4 ✅、Plan 5 ✅ 全數完成 → SP1（Plans 1–5）完成**；只剩 **SP2 回填**未開始（spec §11）。
+SP1 共 5 個 Plan。目前 **Plan 1 ✅、Plan 2 ✅、Plan 3 ✅、Plan 4 ✅、Plan 5 ✅ 全數完成 → SP1（Plans 1–5）完成**。**SP2 回填亦於 2026-07-01 完成（ch03 §3.1＋§3.2 兩 deck first-learner gated；見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「✅ 2026-07-01 SP2 回填」段＋施工計畫 [`PLAN-pedagogy-firstlearner-sp2-backfill.md`](PLAN-pedagogy-firstlearner-sp2-backfill.md)）。** 僅 **ch01 §1.1（`ch01_inverse_functions.yml`）未回填**（使用者裁決本輪範圍外）。下方原為 SP2 未開始時的接手指南，保留作歷史參照。
 
 > **2026-07-01 完成 Plan 5（methodology／文件接線）全 5 task → SP1（Plans 1–5）全完成。** 把 as-built Plans 1–4 寫進 4 份權威文件（`CONTENT_METHODOLOGY` P1–P4＋OTF／`DESIGN` scaffold 承載＋P5/P6／`CONTENT-SIXLENS` L1 §5.5 例外／`REVIEW_GATES` 閘序）＋ V1–V8→V1–V9 清理；commits `78e7b0f..9b145ee`，純文件、零行為改變。每 task spec＋品質雙閘、opus 跨檔一致性 review、**Codex(gpt-5.5/xhigh) 2 輪**（R1 揭 1 blocking＝`REVIEW_GATES` schema kind set 漏 `divider`＋3 deferrable→全修；R2 = **READY TO FINALIZE SP1**）。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「methodology／文件接線（SP1 Plan 5）完成」段。**下一步＝SP2 回填。**
 >
