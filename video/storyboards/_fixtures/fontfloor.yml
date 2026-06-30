@@ -1,0 +1,57 @@
+# FONT-FLOOR fixture (Plan 4 Task 5) -- NOT a real section; underscore-prefixed,
+# lives under _fixtures/ so it never enters a chapter build.
+#
+# Purpose: a schema-valid single-`derivation` deck whose ONE step carries a long,
+# plain-text, single-line `reason`. At the layout rail width (reason_max_w ~ 5.31u),
+# fitting that reason WOULD shrink it to ~16.9px -- below MIN_FONT_FLOOR (26px) --
+# WITHOUT the render-time clamp. With brand._clamp_shrink (derivation.py ~180) the
+# reason instead HOLDS at the 26px floor; refusing to shrink, it then overflows PAST
+# THE FRAME EDGE (held right edge ~9.24u vs frame half 7.11u) -- the correct consequence
+# of "wrap/overflow, don't shrink below floor". (So this fixture, run through
+# check_scenes/make.py, trips the off-frame clip guard -- expected; the fixture pins the
+# CLAMP via the self-test's build_blocks/_effective_font_px path, not via check_scenes.)
+# The fixture is the regression that pins that clamp.
+#
+#   reason natural width 11.01u  ->  fit 5.31/11.01 = 0.482  ->  35px x 0.482 = 16.9px
+#   without clamp: 16.9px  (sub-floor -> sizecheck floor-WARNs)
+#   with    clamp: held at 26.0px (recovers to 26 - ~1e-14; passes via _FLOOR_EPS=1e-6 tolerance, not strict `<`)
+#
+# A `step`-kind reason renders via brand.prose(size="prose_sm") = 35px upright text
+# (the clamp target). A `result`-kind reason renders as a 26px mono eyebrow and is
+# NOT the clamp target (derivation.py:180 note), so the long reason sits on a STEP.
+
+meta:
+  id: fontfloor
+  chapter: "Fixture"
+  chapter_title: "Font-Floor Regression"
+  section: "0.0"
+  title: "Font-Floor Clamp Fixture"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Font-Floor Clamp Fixture" }
+
+scenes:
+
+  # ONE derivation scene. step.0 carries the would-shrink-below-floor reason; the
+  # other rows are minimal and valid. Math payloads are short so only the reason
+  # rail is under width pressure.
+  - id: floor_clamp_reason
+    kind: content
+    template: derivation
+    accent: example
+    source: "synthetic fixture (Plan 4 Task 5) -- not handout content"
+    title: "A Reason Wide Enough to Floor"
+    say: |
+      This fixture pins the reason-rail font-floor clamp.
+      {show step.0} Its single step carries a long plain-text reason that, fit to
+      the rail width, would shrink below the legibility floor -- the clamp holds it
+      at the floor instead.
+      {show step.1} A second, short step keeps the chain valid.
+      {show result} And a result line closes it.
+    steps:
+      - { math: "\\sin(x+h) - \\sin x", reason: "apply the sum-to-product identity to turn the difference of two sines into a single product we can then factor" }
+      - { math: "= 2\\cos\\!\\left(x+\\tfrac h2\\right)\\sin\\tfrac h2", reason: "sum-to-product" }
+    result: { math: "= \\cos x \\cdot 1 = \\cos x", reason: "the limit" }
