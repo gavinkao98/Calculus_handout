@@ -177,7 +177,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     heights: list[float] = []
     for r, eq, reason in zip(rows, eqs, reasons):
         if reason is not None and reason.width > reason_max_w > 0:
-            reason.scale_to_fit_width(reason_max_w)
+            brand._clamp_shrink(reason, reason_max_w, T._SCALE_PX['prose_sm'])
         heights.append(max(eq.height, reason.height if reason is not None else 0.0))
 
     # spread rows so a short chain fills the body zone rather than stranding a dead band

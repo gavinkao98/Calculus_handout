@@ -139,8 +139,9 @@ def _title(text: str, ground: str):
     else:
         mob = brand.heading(text, ground, role="primary", size="h1")
     max_w = T.FRAME_W - 2 * T.SAFE_MARGIN
+    size_px = T._SCALE_PX['h1'] * 0.88 if '$' in text else T._SCALE_PX['h1']
     if mob.width > max_w:
-        mob.scale_to_fit_width(max_w)
+        brand._clamp_shrink(mob, max_w, size_px)
     return mob
 
 

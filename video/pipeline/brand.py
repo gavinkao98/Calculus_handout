@@ -123,6 +123,25 @@ def coordinate_grid(ground: str, *, opacity: float = 1.0) -> VGroup:
 
 # -- text primitives ------------------------------------------------------
 
+def _clamp_scale(cur_w, max_w, cur_size, floor):
+    """Scale factor to fit max_w without shrinking effective size below `floor`. Never enlarges."""
+    if max_w is None or max_w <= 0 or cur_w <= max_w or cur_w <= 0:
+        return 1.0
+    fit = max_w / cur_w
+    floor_scale = floor / cur_size if cur_size > 0 else fit
+    return min(1.0, max(fit, floor_scale))
+
+
+def _clamp_shrink(mob, max_w, cur_size_px):
+    """In-place: shrink mob to fit max_w but not below theme.MIN_FONT_FLOOR. The caller passes
+    cur_size_px (the role's authored px) -- required for VGroup reasons with no single font_size.
+    Drop-in for mob.scale_to_fit_width(max_w) at the single-line sites (SPEC §8)."""
+    factor = _clamp_scale(mob.width, max_w, float(cur_size_px), T.MIN_FONT_FLOOR)
+    if factor < 1.0:
+        mob.scale(factor)
+    return mob
+
+
 def eyebrow(label: str, ground: str, *, role: str = "secondary") -> Tex:
     """Mono uppercase tag, e.g. '[ DEFINITION ]' -- IBM Plex Mono via Tex ``\\texttt{}``.
     (Route A: was Pango Courier New.) No microtype ``\\textls`` tracking: it triggers a
@@ -141,7 +160,7 @@ def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",
     mob = Tex(r"\textbf{" + _tex_text(text) + "}", font_size=_text_fs(size),
               color=T.color(ground, role))
     if max_width is not None and mob.width > max_width:
-        mob.scale_to_fit_width(max_width)
+        _clamp_shrink(mob, max_width, T.fs(size) / T.PX_TO_FS)
     return mob
 
 
@@ -395,7 +414,7 @@ def prose(text: str, ground: str, *, role: str = "text", size: str = "body",
     if stripped.startswith("$") and stripped.endswith("$") and stripped.count("$") == 2:
         mob = math_line(stripped, ground, role=role, size=size)
         if max_width is not None and mob.width > max_width:
-            mob.scale_to_fit_width(max_width)
+            _clamp_shrink(mob, max_width, T.fs(size) / T.PX_TO_FS)
         return _mark_prose(mob)
     if "$" not in text and "\\" not in text:
         return _mark_prose(body_text(text, ground, role=role, size=size,
@@ -437,7 +456,7 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
             pieces.append(r"\textbf{" + _tex_text(p) + "}")
     mob = Tex("".join(pieces), color=T.color(ground, role), font_size=_text_fs(size))
     if max_width is not None and mob.width > max_width:
-        mob.scale_to_fit_width(max_width)
+        _clamp_shrink(mob, max_width, T.fs(size) / T.PX_TO_FS)
     return mob
 
 
