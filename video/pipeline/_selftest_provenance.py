@@ -34,8 +34,29 @@ def test_loci(tmp_md, tmp_handout):
     assert empty.resolves("md:anything") is False   # fail closed
 
 
+def test_scene_text_refs():
+    scene = {"kind": "content", "template": "theorem_proof",
+             "ref": "md:scene_src",
+             "statement": "$\\sin x$ continuous",
+             "scaffold": {"motive": "why we need continuity"},
+             "refs": {"scaffold.motive": "doc:frag-sec-3-1"}}
+    got = dict(P.scene_text_refs(scene))
+    assert got["statement"] == "md:scene_src"            # inherited scene ref
+    assert got["scaffold.motive"] == "doc:frag-sec-3-1"  # field override
+    # absent fields not reported; non-teaching 'title' never reported
+    scene2 = {"kind": "content", "title": "X", "statement": "y"}
+    got2 = dict(P.scene_text_refs(scene2))
+    assert got2 == {"statement": ""}                      # missing ref -> ""
+    assert "title" not in got2
+    # list field expands per index
+    scene3 = {"kind": "content", "ref": "md:s", "annotations": ["a", "b"]}
+    paths = {p for p, _ in P.scene_text_refs(scene3)}
+    assert paths == {"annotations.0", "annotations.1"}
+
+
 if __name__ == "__main__":
     test_parse_ref()
     test_constants()
     test_loci(None, None)
+    test_scene_text_refs()
     print("OK provenance self-test")

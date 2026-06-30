@@ -81,3 +81,36 @@ class Loci:
             return set()
         text = html.read_text(encoding="utf-8", errors="replace")
         return set(_FRAG.findall(text)) | set(_DFIG.findall(text))
+
+
+def _present_text_fields(scene: dict) -> "list[str]":
+    """Field paths of present teaching-text fields. Scalars -> the name; lists ->
+    name.i per index; scaffold.* -> dotted. Order: stable for readable findings."""
+    paths: list[str] = []
+    for name in ("statement", "problem", "body", "reason", "prompt"):
+        if isinstance(scene.get(name), str) and scene[name].strip():
+            paths.append(name)
+    scaffold = scene.get("scaffold")
+    if isinstance(scaffold, dict):
+        for key in ("motive", "problem"):
+            if isinstance(scaffold.get(key), str) and scaffold[key].strip():
+                paths.append(f"scaffold.{key}")
+    for name in ("annotations", "points"):
+        seq = scene.get(name)
+        if isinstance(seq, list):
+            for i, v in enumerate(seq):
+                if isinstance(v, str) and v.strip():
+                    paths.append(f"{name}.{i}")
+    return paths
+
+
+def scene_text_refs(scene: dict) -> "list[tuple[str, str]]":
+    """(field_path, effective_ref) for each present teaching-text field. Effective
+    ref = per-field override (refs map) else scene-level ref else '' (missing)."""
+    scene_ref = scene.get("ref") if isinstance(scene.get("ref"), str) else ""
+    overrides = scene.get("refs") if isinstance(scene.get("refs"), dict) else {}
+    out: list[tuple[str, str]] = []
+    for path in _present_text_fields(scene):
+        ref = overrides.get(path, scene_ref)
+        out.append((path, ref if isinstance(ref, str) else ""))
+    return out
