@@ -71,13 +71,13 @@ model: inherit
 
 把所有節的候選彙整成一份 standalone HTML 裁決稿。
 
-路徑：`handout/_audit/REVIEW-chNN-modec-candidates.html`（NN 為章號，如 `ch02`）。
+路徑：`handout/_audit/REVIEW-chNN-modec-enrichment.html`（NN 為章號，如 `ch03`；此為 `handout/PIPELINE.md` row 2b 釘死的②波候選稿命名）。
 
 ---
 
 # HTML 輸出格式
 
-比照 Ch 1 的實際產出（`handout/_audit/REVIEW-ch01-modec-candidates.html`），結構如下：
+比照 Ch 3 的實際產出（`handout/_audit/REVIEW-ch03-modec-enrichment.html`），結構如下：
 
 1. **標題**：`Chapter N — Mode C 充實候選裁決稿`
 2. **副標**（`.sub`）：日期、方法（逐節偵察）、範圍（軟深度：intuition／application／caution）

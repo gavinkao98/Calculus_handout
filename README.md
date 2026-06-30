@@ -224,7 +224,7 @@ Mode B 中的關鍵問題是*「這段內容是否正確、合規、位置適當
 #### Mode C 可以做的事
 
 - 加入 `intuition`、`example`、`figure`、`caution`、`strategy`、`application`、`formula`、`history` 或 `summary` 擴充，每一處的標記方式與 Mode A 完全相同（`<!-- expansion:<category> … -->`），**但帶有必要的 `[pass: enrichment]` 提示**，使事後審查能區分原始草擬與充實；
-- 以 Mode A 所用的同一份逐節擴增稽核作結——依檢查表逐節走查，補上現在可見的任何缺口，或在 roadmap 的 *Open questions* 中記錄缺口。這次稽核正是使 Mode C 成為一次充實回合、而非零散補強的關鍵。
+- 以 Mode A 所用的同一份逐節擴增稽核作結——依檢查表逐節走查，補上現在可見的任何缺口，或在 roadmap 的 *Open questions* 中記錄缺口。這次稽核正是使 Mode C 成為一次充實回合、而非零散補強的關鍵。在操作上，②波軟深度的逐節缺口偵察由 `mode-c-gapwalk` subagent 執行（對應①波 worked example 的 `example-supplement`），產出 `REVIEW-ch{NN}-modec-enrichment.html` 候選裁決稿供裁決；各閘逐步對應見 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
 
 #### Mode C 不得做的事
 

@@ -16,7 +16,7 @@
 | 0 | **Mode A 六階定稿** | 手稿→教科書草稿，章內六階方向層收斂、雙模型對抗審至 blocking=0、使用者簽核 | 各節 ④/⑤ | Codex ⑤ | 多處 | `sec-{N}.html`＋章 opener | [`../CONTENT_DIRECTION.md`](../CONTENT_DIRECTION.md)（六階）、[`README.md`](README.md)（Mode A 擴增稽核 9 項） |
 | 1 | **Mode B** | 審訂稽核（簽核前 或 Mode C 後**範圍限定**新 `[pass: enrichment]` 標記） | 主審/各 audit subagent | 可選 | 逐條 | commit body 裁決 | [`README.md`](README.md) §Mode B |
 | 2a | **Mode C ①波 補題目** | 從題庫補 worked example（缺口分析→CLP-1 對症選題→改寫） | `example-supplement` subagent | Codex 選題稽核 | 裁決選哪些 | `ch{NN}_example-supplement-review.html`＋`-applied`＋`-audit.md` | [`../CONTENT_SOURCING.md`](../CONTENT_SOURCING.md) |
-| 2b | **Mode C ②波 軟深度** | 補 intuition/caution/application/strategy/summary/history（**非** example） | `handout-prose-audit` 等 + 9 鏡頭檢查表 | 可選 | 裁決選哪些 | `REVIEW-ch{NN}-modec-enrichment.html`（+applied） | [`README.md`](README.md) §Mode C |
+| 2b | **Mode C ②波 軟深度** | 補 intuition/caution/application/strategy/summary/history（**非** example） | `mode-c-gapwalk` subagent（9 鏡頭逐節偵察） | 可選 | 裁決選哪些 | `REVIEW-ch{NN}-modec-enrichment.html`（+applied） | [`README.md`](README.md) §Mode C |
 | 3 | **圖機會閘** | 該不該加圖（出圖前） | `handout-figure-opportunity-audit` subagent | — | 裁決畫哪些 | `REVIEW-ch{NN}-figure-opportunity.html` | [`_audit/FIGURE-OPPORTUNITY-RUBRIC.md`](_audit/FIGURE-OPPORTUNITY-RUBRIC.md) |
 | 4 | **圖正確性閘 D1–D8** | 畫出來對不對（render 後） | `handout-figure-audit` subagent（吃 `shot.mjs` 圖 PNG） | Codex 視覺第二讀者（`-i` 餵 PNG） | 修法裁決 | `REVIEW-ch{NN}-figure-audit{,-gate2}.html` | [`_audit/FIGURE-AUDIT-RUBRIC.md`](_audit/FIGURE-AUDIT-RUBRIC.md) |
 | 5 | **數學正確性閘 M1–M8** | 教什麼、對不對 | Claude/Mode B 走查（sympy 重算 worked example） | Codex 獨立複核 | 逐條裁決 | `REVIEW-ch{NN}-math-audit.html`＋`-gate2.md` | [`_audit/MATH-CORRECTNESS-RUBRIC.md`](_audit/MATH-CORRECTNESS-RUBRIC.md) |
@@ -29,7 +29,7 @@
 
 「Mode C 充實」**分兩波、各有獨立 spec／subagent／產物**，不要混為一談（ROADMAP Ch2 status：「Mode C 充實分兩波 ①課文範例補充 ②軟深度充實」）：
 - **①波 補題目＝worked example**：服務對象是 `example`＋`solution`；流程 [`../CONTENT_SOURCING.md`](../CONTENT_SOURCING.md)（手稿→題庫 CLP-1/APEX/Mooculus 對症選題→AI 備援）；subagent [`../.claude/agents/example-supplement.md`](../.claude/agents/example-supplement.md)；產 `ch{NN}_example-supplement-review.html`。
-- **②波 軟深度**＝intuition/caution/application/strategy/summary/history（**不含 example**）；依 [`README.md`](README.md) §Mode C 的 9 鏡頭擴增檢查表；產 `REVIEW-ch{NN}-modec-enrichment.html`。
+- **②波 軟深度**＝intuition/caution/application/strategy/summary/history（**不含 example**）；依 [`README.md`](README.md) §Mode C 的 9 鏡頭擴增檢查表；subagent [`../.claude/agents/mode-c-gapwalk.md`](../.claude/agents/mode-c-gapwalk.md)；產 `REVIEW-ch{NN}-modec-enrichment.html`。
 - 兩波都標 `<!-- expansion:<cat> [pass: enrichment] [source: …] -->`（`[pass:]` 在 `[source:]` 前），且**都必接範圍限定的 Mode B**（README 硬規則）。
 
 ## 通用紀律
@@ -46,7 +46,7 @@
 
 ## 工程注意：subagent 持久化
 
-`.claude/` 被根 `.gitignore`（第 109 行）整個擋掉。要讓 gate subagent 進版控（換機/未來重用），須 **`git add -f .claude/agents/<name>.md`**（既有 5 個已追蹤 agent 即如此 force-add 進去）。**已知未版控**：`handout-figure-opportunity-audit.md`（圖機會閘 subagent，工作樹有、未版控）——要持久化請 force-add。
+`.claude/` 被根 `.gitignore`（第 109 行）整個擋掉。要讓 gate subagent 進版控（換機/未來重用），須 **`git add -f .claude/agents/<name>.md`**。目前 `.claude/agents/` 下 **9 個 subagent 皆已 force-add 追蹤**：handout 線 5 個（`example-supplement`、`handout-prose-audit`、`handout-figure-opportunity-audit`、`handout-figure-audit`、`mode-c-gapwalk`）＋ video 線 4 個（`hook-engineering-audit`、`narration-copyedit`、`narration-faithfulness-audit`、`visual-frame-audit`）。**新增 subagent 後務必 force-add**，否則換機即失。
 
 ## 各章現況（2026-06-27）
 
