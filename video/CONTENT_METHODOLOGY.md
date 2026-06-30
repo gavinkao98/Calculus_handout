@@ -205,7 +205,7 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 
 - **P1 證明／推導粒度（一 beat 一承重動作）。** 對初學者，**一個 beat／reveal 只扛一個承重的代數／邏輯動作**，不過度壓縮——寧可多分一段，也不要把兩個推導步驟塞進同一次揭示。拆步粒度讀 `meta.pedagogy_profile`（預設 `first_time` 的慢節奏）。這是 audience-sensitive 的語意判斷，無確定性必填欄位；判斷層 = `PD1`（與 `L2`「一單元兩**概念**」分工：`PD1` 管單一概念單元**內部**一個 beat 多**動作**的過度壓縮）。
 - **P2 動機上畫面（`scaffold.motive`）。** 每個 proof／子結論場景在**畫面上**有一句「為什麼做這個」，寫進 `scaffold.motive`，**不只藏在旁白**。`theorem_proof`／`derivation` 場缺 `scaffold.motive` → 確定性層 `schema.py` warn（`PD2`；唯有 opt-in `meta.pedagogy_enforce` 才升 gating）；`definition_math` 的 motive 屬語意、**非確定性必填**，由 gate-1 以 advisory 浮現。motive 渲為標題下一行**較小的 `text` role**（不可 `muted`——見 [`DESIGN.md`](DESIGN.md)；de-emphasis 靠字級／位置，非調暗）。
-- **P3 divider 講具體問題（`scaffold.problem`）。** section divider 講出正在解的**問題／式子**（`scaffold.problem`），不只給概念標題。承載與渲染契約（divider 的 `problem` 走 formula-block）見 [`DESIGN.md`](DESIGN.md)，**本檔不重述渲染細節**；確定性必填（`kind: divider` 場缺 `scaffold.problem` → warn）與判斷見 `PD3`。
+- **P3 divider 講具體問題（`scaffold.problem`）。** section divider 講出正在解的**問題／式子**（`scaffold.problem`），不只給概念標題。承載與渲染契約（divider 的 `problem` 渲為顯示公式行）見 [`DESIGN.md`](DESIGN.md)，**本檔不重述渲染細節**；確定性必填（`kind: divider` 場缺 `scaffold.problem` → warn）與判斷見 `PD3`。
 - **P4 前提首用即標（`scaffold.flag` + `meta.assumptions`）。** 默默用到的慣例／假設（radians、定義域限制）在**第一次用到**的場景標 `scaffold.flag: <assumption_id>`。每筆假設在 deck 的 **`meta.assumptions[]`** registry 顯式宣告 `id`／`text`／`first_use_unit`／`source`（此 `source` 是該假設的人讀引用，與下節 OTF provenance 的 `ref:`／`refs:` 是兩回事）；**閘不推斷**「是否用到／何處首用」，一律以作者宣告為準。registry 一致性（每筆 assumption 在其 `first_use_unit` 渲出對應 flag、無孤兒 flag）由確定性層檢查（`PD4`）。
 
 ### OTF：上畫面教學文字可回溯核准源
