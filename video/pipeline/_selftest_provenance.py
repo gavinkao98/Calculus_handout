@@ -73,10 +73,24 @@ def test_provenance_issues():
     assert len(errs) == len(warns) == 2
 
 
+def test_schema_integration():
+    import subprocess
+    py = sys.executable
+    out = subprocess.run(
+        [py, "video/pipeline/schema.py", "video/storyboards/_fixtures/otf_provenance.yml"],
+        capture_output=True, text=True)
+    assert out.returncode == 0                      # warn-default never aborts
+    assert "[provenance]" in out.stdout
+    assert "bad_missing.statement" in out.stdout
+    assert "bad_unresolvable.statement" in out.stdout
+    assert "ok_inherited" not in out.stdout and "intro" not in out.stdout
+
+
 if __name__ == "__main__":
     test_parse_ref()
     test_constants()
     test_loci(None, None)
     test_scene_text_refs()
     test_provenance_issues()
+    test_schema_integration()
     print("OK provenance self-test")

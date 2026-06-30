@@ -165,6 +165,23 @@ def main(argv: "list[str] | None" = None) -> int:
     else:
         print(f"[schema] {args.storyboard.name}: structure OK")
 
+    # OTF provenance (warn-default; gates only when meta.otf_enforce is True)
+    from pathlib import Path as _Path
+    from pipeline import provenance as _prov
+    repo_root = _Path(__file__).resolve().parent.parent.parent
+    meta = data.get("meta", {}) if isinstance(data, dict) else {}
+    enforce = bool(meta.get("otf_enforce"))
+    loci = _prov.Loci.from_deck(meta, repo_root)
+    prov = _prov.provenance_issues(data, loci, enforce=enforce)
+    if prov:
+        p_err = sum(1 for s, _ in prov if s == "error")
+        print(f"[provenance] {args.storyboard.name}: {len(prov)} finding(s)"
+              f"{' (ENFORCED)' if enforce else ' (warn-only; set meta.otf_enforce to gate)'}")
+        for sev, msg in prov:
+            print(f"  {'ERROR' if sev == 'error' else 'WARN '}  {msg}")
+        if p_err:
+            errors = errors + [m for s, m in prov if s == "error"]
+
     if args.list and not errors:
         print(f"[schema] {args.storyboard.name}: reveal targets per content scene")
         for sid, targets in enumerate_reveals(data):
