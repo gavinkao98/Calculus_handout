@@ -99,7 +99,11 @@ def test_schema_integration():
     assert "bad_missing.statement" in out.stdout
     assert "bad_unresolvable.statement" in out.stdout
     assert "bad_divider.problem" in out.stdout         # Fix 2: divider kind produces finding
-    assert "ok_inherited" not in out.stdout and "intro" not in out.stdout
+    # Scope the negatives to the provenance-finding form `<id>.<field>` (matches the
+    # positives above): bare `ok_inherited`/`intro` also surface in the [pedagogy] block,
+    # which shares stdout since Task 3 wired it in -- the provenance form stays absent
+    # (ok_inherited resolves via md:unit_a; intro is exempt).
+    assert "ok_inherited.statement" not in out.stdout and "intro.statement" not in out.stdout
 
 
 # NOTE: make.py provenance wiring is verified manually (see verification step 2/3 in
