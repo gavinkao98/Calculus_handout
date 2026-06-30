@@ -454,12 +454,18 @@ def _effective_font_px(node) -> float:
     return fs / T.PX_TO_FS  # plain Text (no TEXT_SCALE); confirm against brand if such nodes occur
 
 
+_FLOOR_EPS = 1e-6  # tolerance for float-boundary false-positives: the clamp lands a held node at
+                   # floor ± ~1e-14 (sub-ULP drift from build transforms); 1e-6 absorbs that while
+                   # staying far below any real sub-floor gap (genuinely too-small text is ≥ ~1px
+                   # below floor, e.g. the 16.9px counterfactual or the 35px-vs-36 probe).
+
+
 def _floor_findings(scene_id: str, sizes: list, floor: float, enforce: bool) -> "list[tuple[str, str]]":
     """(severity, message) for each (block_id, px) below `floor`. Pure: no manim."""
     sev = "error" if enforce else "warn"
     return [(sev, f"{scene_id}: '{bid}' renders at {px:.1f}px < MIN_FONT_FLOOR {floor:.0f}px "
                   f"-- too small to read (a line shrank below the floor, or an explicit tiny size)")
-            for bid, px in sizes if px < floor]
+            for bid, px in sizes if px < floor - _FLOOR_EPS]
 
 
 def _floor_issues(scene: dict, blocks, enforce: bool) -> "list[tuple[str, str]]":

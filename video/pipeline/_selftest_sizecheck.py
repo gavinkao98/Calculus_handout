@@ -105,6 +105,14 @@ def test_clamp_none_max_w_safe():
     assert B._clamp_scale(5.0, None, 40.0, 26.0) == 1.0
 
 
+def test_floor_findings_tolerates_clamp_boundary():
+    # a node the clamp held AT the floor recovers to 26 - ~1e-14 (build drift); must NOT warn
+    assert S._floor_findings("sc", [("held", 26.0 - 1e-14)], 26.0, enforce=False) == []
+    # genuinely-too-small text still fires (1px below floor is far past the tolerance)
+    flagged = S._floor_findings("sc", [("tiny", 25.0)], 26.0, enforce=False)
+    assert len(flagged) == 1 and "tiny" in flagged[0][1]
+
+
 if __name__ == "__main__":
     test_effective_px_recovers_authored_size()
     test_floor_findings_flags_below()
@@ -119,4 +127,5 @@ if __name__ == "__main__":
     test_clamp_zero_width_safe()
     test_clamp_cur_size_nonpositive_uses_fit()
     test_clamp_none_max_w_safe()
+    test_floor_findings_tolerates_clamp_boundary()
     print("OK sizecheck self-test")
