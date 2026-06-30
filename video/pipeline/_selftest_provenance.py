@@ -76,9 +76,10 @@ def test_provenance_issues():
 def test_schema_integration():
     import subprocess
     py = sys.executable
+    repo_root = Path(__file__).resolve().parent.parent.parent   # video/pipeline/_selftest_provenance.py -> repo root
     out = subprocess.run(
         [py, "video/pipeline/schema.py", "video/storyboards/_fixtures/otf_provenance.yml"],
-        capture_output=True, text=True)
+        capture_output=True, text=True, cwd=repo_root)
     assert out.returncode == 0                      # warn-default never aborts
     assert "[provenance]" in out.stdout
     assert "bad_missing.statement" in out.stdout
