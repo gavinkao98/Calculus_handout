@@ -62,7 +62,7 @@ EXIT=0
 |---|---|---|---|
 | **Blocking** | **PD1** | `pd1_compressed` · `{show statement}` | 單一 reveal 把「同除 $\sin\theta$」與「取倒數翻向」**≥2 個承重代數動作**塞進一拍；對 `first_time` 過度壓縮（unit_squeeze 支持內容但要求分步）→ 拆成多個 `{show}` beat（比照 `clean_segmented`）。 |
 | **Blocking** | **OF1**（exceeds source） | `of1_exceeds` · `statement` | `statement` 斷言 $(\sin\theta)/\theta$ 在 $(0,\pi/2)$ **單調遞減且以 1 為上界**，但 `md:unit_narrow` 只陳述 $\theta\to0$ 單點極限、明言不對任何 $\theta\neq0$ 下結論 → 刪去超出源的單調／有界斷言，或改 cite 真正支持它的源。 |
-| **Blocking** | **OF1**（source adequacy） | `of1_adequacy` · `statement` | scene-level `ref: md:unit_broad` 過寬：unit_broad 是主題層綜述、明言**不寫任何具體子斷言**（含不給 $(1-\cos\theta)/\theta\to0$），卻被用來 cite 這條具體極限；且無欄級 `refs:` 覆寫 → 補一個 `refs.statement` 指向真正陳述該斷言的更 specific locus（如 `md:unit_two`）。 |
+| **Blocking** | **OF1**（source adequacy） | `of1_adequacy` · `statement` | scene-level `ref: md:unit_broad` 過寬：unit_broad 是主題層綜述、明言**不寫任何具體子斷言**（含不給 $(1-\cos\theta)/\theta\to0$），卻被用來 cite 這條具體極限；且無欄級 `refs:` 覆寫 → 補欄級 `refs:` 覆寫指向真正陳述該斷言的更 specific locus；`refs:` 是以欄位路徑為 key 的 **map**（非 dotted scalar），正確寫法 `refs: { statement: "md:unit_two" }`。 |
 
 ### deck A — agent advisory（motive／problem 在，故無對應確定性 blocking）
 
@@ -90,7 +90,7 @@ agent **不重算**確定性層，但會把上節①的 4 條（PD2 `pd2_det_no_
 | 期望 | code | scene · 欄位 | 判斷依據 → 處置 |
 |---|---|---|---|
 | **Advisory／dry-run（NOT blocking）** | **OF1** | `draft_exceeds` · `statement` | `statement` 超出 `md:unit_draft`（draft 只給單點極限，未核准導數結論），**但** deck 級 `CONTENT_APPROVED=no` → 依 rubric §生命週期，OF 一律 dry-run／advisory、**永不 blocking**（否則是拿未核准源當忠實基準）。確定性層此 deck 乾淨。 |
-| **Advisory（incidental）** | **PD1** | `draft_exceeds` · `say:{show statement}` | 同一單拍 `{show statement}` 同時揭極限值與導數結論（兩承重動作），對 `first_time` 可更分段 → PD1 advisory。**非 deck B 主測項**（主測為上方 OF1 lifecycle），但屬合理 agent 判斷、列此以求 expected 表完整；advisory 不強制歸零。故 deck B 期望 `VERDICT: 0 PD blocking, 0 OF blocking, 2 advisory`（OF1-dry-run + PD1）。 |
+| **Advisory（incidental）** | **PD1** | `draft_exceeds` · `say:{show statement}` | 同一單拍 `{show statement}` 同時陳述**兩個 claim**（極限值＋導數結論）——這是「可為清楚再拆」的 clarity-split advisory，**不是**壓掉一個承重推導步驟（後者才達 PD1 blocking 線「>1 承重代數／邏輯動作」）；此處非多步推導被壓成一拍，而是兩條 claim 同框。**非 deck B 主測項**（主測為上方 OF1 lifecycle），屬合理 agent advisory、列此以求 expected 表完整；advisory 不強制歸零。故 deck B 期望 `VERDICT: 0 PD blocking, 0 OF blocking, 2 advisory`（OF1-dry-run + PD1）。 |
 
 ### 期望 VERDICT 形狀與「計數約定」（Task 4 需確認鎖定）
 
@@ -126,7 +126,9 @@ deck A 恰 4 條（OF2 `of2_det_no_ref.statement` + PD2 `pd2_det_no_motive` + PD
   - MUST-NOT-RAISE 全靜默：`clean_segmented`、`clean_of1`、`boundary_two_concepts`（正確判為 `L2` 非 PD1）、`boundary_intro`（`L6`／OF2-exempt）、`boundary_recap`（`L6`）。
 
 ### deck B（draft，`CONTENT_APPROVED=no`）agent 軌 — ✅ 命中（生命週期）
-- **VERDICT：`0 PD blocking, 0 OF blocking, 2 advisory`**（此 deck 無 surfaced 確定性，計數約定不影響、約定無關）。`draft_exceeds` 的 statement 確實超出 `unit_draft`（加了未核准的導數結論 $\frac{d}{d\theta}\sin\theta=\cos\theta$），agent 正確判為 **OF1 但因 deck `CONTENT_APPROVED=no` → dry-run／advisory、非 blocking**（並註明「若 approved 則 OF blocking 會是 1」）。另含一條 PD1 advisory（同場單拍壓兩動作；在 advisory 帶、不影響收斂）。確定性層乾淨。
+- **VERDICT：`0 PD blocking, 0 OF blocking, 2 advisory`**（此 deck 無 surfaced 確定性，計數約定不影響、約定無關）。`draft_exceeds` 的 statement 確實超出 `unit_draft`（加了未核准的導數結論 $\frac{d}{d\theta}\sin\theta=\cos\theta$），agent 正確判為 **OF1 但因 deck `CONTENT_APPROVED=no` → dry-run／advisory、非 blocking**（並註明「若 approved 則 OF blocking 會是 1」）。另含一條 PD1 advisory（同場單拍同框兩 claim＝clarity-split、非壓掉承重推導步驟；在 advisory 帶、不影響收斂）。確定性層乾淨。
 
 ### 結論
 gate **calibrated**：確定性軌逐字命中、agent 判斷軌兩 deck 全中（自有 blocking、surfaced 確定性、advisory、MUST-NOT-RAISE、lifecycle 皆正確），VERDICT 計數約定鎖為 **B** 並寫進 rubric。Plan 3 判斷層成立，落地 non-gating（warn/dry-run）待 SP2 per-deck opt-in。
+
+**Codex（gpt-5.5/xhigh）獨立覆核（2026-06-30）：** §10 邊界 airtight、約定 B 三段一致皆確認；揭露一條 Claude review 漏掉的 **Plan-1 gap**——OF2 確定性層 `_present_text_fields()` 只掃頂層 `reason`，**未掃 derivation 模板的巢狀 `reason`**（`steps[].reason`／`result.reason`／`check.reason`／`lines[].reason`，真實 deck 大量使用），故巢狀 reason 缺 ref 時 OF2 不觸發。已在 rubric §OF2 記為 **scoped `provenance.py` Plan-1 follow-up**（SP2 回填真實 deck 前須補：擴 `_present_text_fields`／`scene_text_refs` 發巢狀路徑＋self-test＋一條巢狀-reason 缺 ref 的 fixture）；Plan 3 依「不改 Python」約定不在此修。兩條 Minor（deck B PD1 advisory 措辭、`refs:` map 寫法）已修。

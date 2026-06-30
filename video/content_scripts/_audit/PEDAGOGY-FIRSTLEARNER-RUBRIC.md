@@ -48,6 +48,7 @@
   - **source 充分性（D-P3-4）：** 也要 flag 當解析到的源**過寬、無法 specifically 支持該斷言**——例：用整節／recap 綜合單元當源，去 cite 一條它根本沒講的具體子斷言。此時**必須補一個欄級 `refs:` 覆寫**指向更 specific 的 locus。
   - **OF1 不重算數學正確性**（那是 `L5`）；只查「是否被 cited 源支持」。
 - **OF2 可回溯（blocking，結構／確定性）。** 某上畫面教學文字欄位的**有效 `ref`** 缺失或無法解析 → [`../../pipeline/provenance.py`](../../pipeline/provenance.py) `provenance_issues`（Plan 1）確定性產出。agent **只浮現、不重新實作**。
+  - **OF2 確定性覆蓋現況（calibration 揭露的 Plan-1 gap，2026-06-30）：** `_present_text_fields()` 目前只掃**頂層**教學文字欄位（`statement`／`problem`／`body`／`reason`／`prompt`／`scaffold.motive`·`problem`／`annotations[]`／`points[]`），**尚未掃 derivation 模板的巢狀 `reason`**（`steps[].reason`／`result.reason`／`check.reason`／`lines[].reason`，見 [`../../pipeline/templates/derivation.py`](../../pipeline/templates/derivation.py)，**真實 deck 大量使用**）。故巢狀 `reason` 缺 ref 時 OF2 目前**不會**觸發——這是 **`provenance.py` 的 scoped Plan-1 follow-up**（須在 SP2 回填真實 deck 前補上：擴 `_present_text_fields`／`scene_text_refs` 發 `steps.i.reason`／`result.reason`／`check.reason`／`lines.i.reason` 路徑＋self-test＋一條巢狀-reason 缺 ref 的 fixture）。Plan 3 依「不改 Python」約定**不**在此修；OF1（agent 讀 YAML）仍看得到巢狀 `reason`、但無 ref 可比時無法判忠實。
 
 **欄級覆寫規則（§5.1，已落地文法）：** 所有上畫面教學文字欄位**預設繼承 scene 級 `ref:`**；**只有當該欄位 (a) cite 一個與 scene 級不同的 locus、(b) 跨單元綜合、或 (c) 提出高風險數學斷言時，才必須帶欄級 `refs.<field_path>` 覆寫**。OF1 的 source 充分性就是在強制這條：**何時必須欄級覆寫 ＝ 上述 (a)(b)(c) 任一；OF1 如何判 specific ＝ 看解析到的源有沒有直接陳述該欄位的斷言**——支持得了就 clean，源太寬（只「沾得上邊」卻沒陳述該斷言）就 flag 並要求更緊的 `refs:` 覆寫。（`source:` 是 freeform 人讀標籤，**不是**機器 ref，OF1 不據它判斷。）
 
