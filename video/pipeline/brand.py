@@ -323,7 +323,7 @@ def _wrap_mixed(text: str, fsz: float, max_width: float | None) -> list[str]:
             tokens.extend(part.split())
     merged: list[str] = []
     for tok in tokens:
-        if merged and re.fullmatch(r"[,.;:!?]+", tok):
+        if merged and re.fullmatch(r"[,.;:!?)\]}]+", tok):
             merged[-1] += tok
         else:
             merged.append(tok)
