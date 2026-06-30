@@ -6,8 +6,10 @@
 > 跨對話進度錨仍是 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)；本檔是「回家接手」用的單張 resume 卡。
 > **全程離線、未動任何計費 API。** 流程：`superpowers:subagent-driven-development`，task-by-task，每 task 過 spec＋品質雙閘 review。
 
-SP1 共 5 個 Plan。目前 **Plan 1 ✅、Plan 2 ✅ 完整完成（邏輯＋渲染＋polish，全分支 opus review = merge-ready）、Plan 3 為下一步、Plans 4–5＋SP2 未開始**。
+SP1 共 5 個 Plan。目前 **Plan 1 ✅、Plan 2 ✅、Plan 3 ✅ 完整完成（rubric＋gate-1 agent＋兩副校準 fixture＋約定 B 鎖定＋opus 全分支＋Codex 覆核 = merge-ready）、Plan 4 為下一步、Plan 5＋SP2 未開始**。
 
+> **2026-06-30 續做完成 Plan 3（pedagogy 判斷閘）全 5 task。** commits `4c7aaaa`(rubric)→`665844f`(agent)→`6e1ab93`(fixtures)→`049a71e`(校準＋鎖約定 B)→`9552c78`(opus review 2 minor)→`ac16d5d`(Codex review 回應)→`c0b254d`(Codex follow-up：OF2 巢狀 reason 覆蓋)。校準：deck A `1 PD/2 OF/2 adv`、deck B `0/0/2`（lifecycle）；opus 全分支＝merge-ready；Codex（gpt-5.5/xhigh）獨立覆核揭 OF2 巢狀-reason gap、已 TDD 修畢。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「pedagogy 判斷閘（SP1 Plan 3）完成」段。
+>
 > **2026-06-30 續做完成 Plan 2 渲染階段＋全分支 review＋使用者視覺 sign-off。** 新增 commits（接在 `253fe64` 後）：`c3e0d33`（baseline 修）→ `7e18e09`（T4 helper）→ `a0a29bc`（T5 接線）→ `194a8eb`（polish：孤行 `)`＋divider）→ `a9e5203`（§6 對齊）→ `d05f240`（null-meta fail-closed）→ `d88f137`（進度錨）→ `c879d7e`（sign-off：ASSUMES badge `RAIL_W`→`PRIMARY_W`）→ `58722e1`（sign-off：motive `PRIMARY_W`→`CONTENT_W`，皆解「太早換行、右邊空間沒用上」）。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「scaffold 模型＋模板渲染（SP1 Plan 2）完成」段。
 
 ---
@@ -53,7 +55,7 @@ PD 確定性層（教學結構檢查），全部 warn-default。
 
 依 spec §12 ＋ 兩份 plan 文件末尾清單。Plans 3–5 與 Plan 2 一樣，**待前一 Plan 落地後才細化成 task-by-task 施工計畫**（沿用 writing-plans → subagent-driven-development）。
 
-- **Plan 3 — pedagogy gate（判斷層）**：`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`（PD1–PD4 ＋ OF1–OF2）＋ `pedagogy-firstlearner-audit` gate-1 subagent（讀 storyboard＋.md＋handout）；OF1 source-adequacy 判斷；`CONTENT_APPROVED` 生命週期 gating；PD/OF 分開計數。（gate-1 agent 直接讀 `meta.pedagogy_profile`。）**→ 施工計畫已出（2026-06-30）：[`PLAN-pedagogy-firstlearner-sp1-plan3-gate.md`](PLAN-pedagogy-firstlearner-sp1-plan3-gate.md)（5 task：rubric→agent→fixture→校準→sign-off；純 markdown＋校準、無新 Python，gate-1 blocking＝PD1＋OF1，PD2/3/4＋OF2 為已落地確定性層）。下一步直接跑 Task 1。**
+- **Plan 3 — pedagogy gate（判斷層）**：`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`（PD1–PD4 ＋ OF1–OF2）＋ `pedagogy-firstlearner-audit` gate-1 subagent（讀 storyboard＋.md＋handout）；OF1 source-adequacy 判斷；`CONTENT_APPROVED` 生命週期 gating；PD/OF 分開計數。（gate-1 agent 直接讀 `meta.pedagogy_profile`。）**→ ✅ 完成（2026-06-30，commits `4c7aaaa..c0b254d`）：5 task（rubric→agent→fixture→校準→sign-off）全做完；VERDICT 約定 B 鎖定；opus 全分支＋Codex（gpt-5.5/xhigh）覆核 = merge-ready；Codex 揭的 OF2 巢狀-reason gap 已 TDD 修畢。計畫文件 [`PLAN-pedagogy-firstlearner-sp1-plan3-gate.md`](PLAN-pedagogy-firstlearner-sp1-plan3-gate.md)（歷史參照）；詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「pedagogy 判斷閘（SP1 Plan 3）完成」段。**
 - **Plan 4 — 視覺擴充**：A7 figure-prominence 子準則（量測）、V4/A6 最小字級 floor 常數（`theme.py`/`sizecheck.py`）、手機標尺（`VISUAL-FRAME-RUBRIC.md`）。
 - **Plan 5 — methodology／文件接線**：`CONTENT_METHODOLOGY.md`（P1/P2/P4 ＋ scaffold authoring）、`DESIGN.md`（scaffold 承載＋authoring checklist）、`CONTENT-SIXLENS-RUBRIC.md`（L1 scaffold 例外措辭）、`REVIEW_GATES.md`（新閘入序）、V1–V8→V1–V9 doc-drift。
 - **SP2 — 回填**：把 SP1（Plans 1–4）套到 3 個既有 deck（ch01 §1.1、ch03 §3.1/§3.2），走 spec §11「乾跑 → 分類 → 你核可遷移清單 → scoped 修」。**注意**：場級繼承讓回填收斂，但 Plan 1 文法決定 `ref:`/`refs:` 是**新欄位**（不沿用 freeform `source:`），故每個 OTF-subject 場仍需新增 `ref:` ＋ 寫 freeform→`md:`/`doc:` 對映。
@@ -62,7 +64,7 @@ PD 確定性層（教學結構檢查），全部 warn-default。
 
 ## 四、怎麼接手（resume 指南）
 
-- **流程**：`superpowers:subagent-driven-development`，task-by-task。**下一步＝執行 Plan 3 計畫** [`PLAN-pedagogy-firstlearner-sp1-plan3-gate.md`](PLAN-pedagogy-firstlearner-sp1-plan3-gate.md)（pedagogy 判斷閘；已過 Codex gate-2 審核＋回歸、findings 全處理；BASE＝當前 HEAD；從 Task 1 起跑）。
+- **流程**：`superpowers:subagent-driven-development`，task-by-task。**Plan 3 ✅ 完成**（pedagogy 判斷閘，commits `4c7aaaa..c0b254d`，calibrated＋opus 全分支＋Codex 覆核 = merge-ready）。**下一步＝Plan 4（視覺擴充：A7 figure-prominence／V4·A6 min-size floor 常數／手機標尺）**，依 spec §8／§12，待用 writing-plans 細化成 task-by-task 施工計畫後再跑。
 - **測試 venv（換機注意）**：一律用 **repo 內**的 `.venv/Scripts/python.exe`（相對 repo root → 換機自動對；**勿沿用其他機器的絕對路徑**。bare python 缺 vendored PyYAML 會誤判 `test_schema_integration`）。本機絕對路徑＝`C:/Users/Kao/Downloads/Calculus_handout/.venv/Scripts/python.exe`；換機請改用該機 repo 下的 `.venv/Scripts/python.exe`（找不到先跑 `python tools/doctor.py`）。
 - **快速健檢**：
   - `…/.venv/…/python.exe video/pipeline/_selftest_provenance.py` → `OK provenance self-test`
@@ -92,7 +94,7 @@ git 只帶走**已 commit**的東西。以下目前**未 commit**，換到家裡
 
 1. 要讓家裡機器拿到：**`git push`** 分支 `video/template-redesign-navy-spine`（committed 的 Plan 1/2 ＋ 本交接文件才會過去）。
 2. 未 commit 的（音檔 WIP ＋ REBUILD_STATUS 編輯）**先 commit 才會跟著走**，否則留在這台。
-3. 回家後：`git pull` → 讀本檔「四、怎麼接手」→ **執行 Plan 3 計畫 [`PLAN-pedagogy-firstlearner-sp1-plan3-gate.md`](PLAN-pedagogy-firstlearner-sp1-plan3-gate.md) 從 Task 1 起**（Plan 1/2 已完成、merge-ready）。
+3. 回家後：`git pull` → 讀本檔「四、怎麼接手」→ **下一步＝Plan 4（視覺擴充），待用 writing-plans 細化施工計畫**（Plan 1/2/3 已完成、merge-ready）。
 
 ---
 

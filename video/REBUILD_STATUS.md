@@ -14,6 +14,17 @@
 - **第三方素材閘（若未來替換）：** 優先 YouTube Audio Library「不需署名」素材；可用 Pixabay Content License／CC0，但必須保存來源、授權、作者、下載日期。拒用 CC BY-NC／ND、來路不明的 "no copyright" 轉載音樂、無授權證據素材。
 - **仍待：** 使用者試聽後裁決 A/B/C、是否用 caution ping、是否用 divider stinger；之後把勝出 cue 接上 ducking/mux。目前 render 仍未混入這些 cues。
 
+## ✅ 2026-06-30 pedagogy 判斷閘（SP1 Plan 3）完成・calibrated・opus 全分支＋Codex 雙覆核 = merge-ready
+
+承下方 spec：**SP1 Plan 3（pedagogy 判斷閘＝判斷層）全 5 task 完成，通過 opus 全分支 review ＝ merge-ready，並經 Codex（gpt-5.5/xhigh）獨立覆核＋回歸全 clean**。同 `subagent-driven-development`（每 task spec＋品質雙閘；判斷閘走 dispatch gate-1 agent→diff 期望表→鎖約定；末了 opus 全分支＋Codex 覆核）。分支 `video/template-redesign-navy-spine`，commits `4c7aaaa..c0b254d`。**全程離線、未動計費 API（Codex 覆核經使用者同意）。** 落地 **non-gating**（warn/dry-run），per-deck opt-in 待 SP2。
+
+- **判斷層三件（純 markdown＋校準，無新 Python）：** ① rubric SSOT [`content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md)（PD1–PD4 教學品質＋OF1–OF2 上畫面文字忠實、§10 不重疊邊界、硬紀律、OF 生命週期＋source-adequacy、回報格式）；② gate-1 agent [`../.claude/agents/pedagogy-firstlearner-audit.md`](../.claude/agents/pedagogy-firstlearner-audit.md)（唯讀，指向 rubric 不複述）；③ 兩副校準 fixture（approved＋draft deck，各一 backing `.md`，＋ [`CALIBRATION-pedagogy-firstlearner.md`](content_scripts/_audit/CALIBRATION-pedagogy-firstlearner.md) 兩軌期望表）。承載層（PD2/3/4 結構＋OF2）為 Plan 1–2 既有。
+- **校準（dispatch gate-1 → diff → 鎖約定）：** deck A（approved）`VERDICT: 1 PD blocking, 2 OF blocking, 2 advisory`——PD1＋OF1×2 自有 blocking 全中、4 條確定性 surface（`[Surface ...]` 標、不進整數）、5 條 MUST-NOT-RAISE 邊界全靜默；deck B（draft）`0/0/2`——OF1 超出源因 `CONTENT_APPROVED=no` 正確降 dry-run（lifecycle）。
+- **VERDICT 計數約定鎖 B（calibration 裁決，`049a71e`）：** VERDICT 整數只計 gate-1 自有 PD1＋OF1；surfaced 確定性（PD2/3/4＋OF2）`[Surface ...]` 列出、不進整數（`schema.py` 已以 `pedagogy_enforce`/`otf_enforce` 各自 gating，免重複計數）。寫進 rubric §回報規格＋§收斂線。
+- **Codex（gpt-5.5/xhigh）獨立覆核：** §10 邊界 airtight、約定 B 三段一致皆確認；揭露一條 Claude review 漏掉的 **Plan-1 substrate gap**——OF2 確定性層 `_present_text_fields()` 只掃頂層 `reason`，**未掃 derivation 模板巢狀 `reason`**（`steps[].reason`/`result.reason`/`check.reason`/`lines[].reason`，真實 deck 大量用）。**已修（TDD，`c0b254d`）：** [`pipeline/provenance.py`](pipeline/provenance.py) 擴掃巢狀 reason 路徑＋self-test＋fixture `bad_nested_reason`，gap closed；`steps[].math` 等等式內容 by-design 仍在 OF2 外。另 2 條 minor doc（deck B PD1 advisory 措辭、`refs:` map 寫法）已修。
+- **durable 教訓：** ① **計數約定（gate-1 自有 vs surfaced 確定性）** 是這類「判斷層＋確定性層並存」閘的必鎖項——校準時若 agent 給混合計數即鎖一致約定（採 B＝自有層，確定性歸 `schema.py`）。② **OF2 巢狀 reason 已補後，真實 deck（ch03）`schema.py` 會多印 `[provenance]` warn**（那些 nested reason 尚無 ref）——這是 **SP2 回填的 surface、預期非 regression**（warn-only、exit 0 不變）。
+- **接續：** **Plan 4（視覺擴充：A7 figure-prominence 子準則、V4/A6 min-size floor 常數、手機標尺）為下一步**，依 spec §8／§12。Plan 5（methodology/文件接線）＋ SP2 回填（3 deck，spec §11）續後。
+
 ## ✅ 2026-06-30 scaffold 模型＋模板渲染（SP1 Plan 2）完成・全分支 review = merge-ready
 
 承下方 spec：**SP1 Plan 2（scaffold 模型＋模板）全 5 task ＋ 渲染 ＋ polish 完成，通過全分支 opus review = merge-ready**。同 `subagent-driven-development`（每 task spec＋品質雙閘；渲染走 mock render→`visual-frame-audit` gate→使用者 sign-off；末了 opus 全分支 review）。分支 `video/template-redesign-navy-spine`。**全程離線、未動計費 API。**
@@ -22,7 +33,7 @@
 - **渲染層：** `render_scaffold()`（[`templates/_common.py`](pipeline/templates/_common.py)）把 `scaffold.motive`（標題下小 `role="text"` 行，**不可 muted**）／`problem`（divider 公式塊）／`flag`（從 `meta.assumptions` 查文字的 ASSUMES badge）渲成 static Block；接進 4 模板（`definition_math`/`theorem_proof`/`derivation`/`divider`）標題下，**缺 scaffold → no-op**（commits `7e18e09` helper、`a0a29bc` 接線）。**no-op 不變式經全分支 review base-vs-HEAD 全幾何 diff 證實 byte-identical。**
 - **視覺 sign-off（使用者核可、逐輪迭代）：** mock render 4 模板 1080p 幀（`scratch_frames.py`）→ `visual-frame-audit` gate V1–V9＝0 blocking；polish：① `brand._wrap_mixed` 把尾標點黏合集推廣含閉括號 `)]}`（解 ASSUMES badge 孤行 `)`，blast-radius 回歸 clean）＋ divider buff/style（`194a8eb`，回歸 audit 0 blocking、A1 兩幀升）；② 使用者回饋「太早換行、右邊空間沒用上」→ scaffold 文字改用滿可用寬：ASSUMES badge `RAIL_W`→`PRIMARY_W`（`c879d7e`）、motive `PRIMARY_W`→`CONTENT_W`（`58722e1`），皆 scaffold-only 守 no-op、lint/sizecheck clean。**statement 字卡的字級/寬度＝`theorem_proof` 共用既有設計，刻意不動**（真實 ch03 theorem 場 h2 字卡平衡；動了破壞既有 deck 零行為改變）。
 - **全分支 review findings 全處理：** §6 兩個對齊項（provenance 非 dict guard／make.py abort idiom，`a9e5203`）＋ review 抓到的 null／非 dict `meta` fail-closed bug（4 處 meta 抽取點對齊＋self-test，`d05f240`，順帶關 `schema.py` 同根 Plan-1 gap）。
-- **接續：** **Plan 3（pedagogy 判斷閘：`PEDAGOGY-FIRSTLEARNER-RUBRIC.md` ＋ `pedagogy-firstlearner-audit` gate-1 agent ＋ OF1 source-adequacy ＋ `CONTENT_APPROVED` 生命週期）為下一步**，待細化成 task-by-task 施工計畫。Plans 4–5＋SP2 回填依 spec §12／plan 末清單。接手卡 [`HANDOFF-pedagogy-firstlearner-sp1.md`](HANDOFF-pedagogy-firstlearner-sp1.md) 已同步更新。
+- **接續：** **Plan 3 ✅ 完成見上節**（pedagogy 判斷閘）。其後 Plan 4（視覺擴充）→ Plan 5（methodology 文件）→ SP2 回填，依 spec §12／plan 末清單。接手卡 [`HANDOFF-pedagogy-firstlearner-sp1.md`](HANDOFF-pedagogy-firstlearner-sp1.md) 已同步更新。
 
 ## ✅ 2026-06-30 OTF provenance 基礎（SP1 Plan 1）實作完成
 
