@@ -213,14 +213,14 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 所有**上畫面教學文字**（`statement`／`scaffold`／`annotations`／`reason`／`problem`／…）應可回溯到核准源。provenance 用**新欄位** `ref:`（單一）／`refs:`（多筆、欄級覆寫），**與 freeform `source:` 分離**——`source:` 是給人讀的標籤、provenance 不解析它，**不要寫成「`scaffold`／文字以 `source:`／`from:` 帶 provenance」**。
 
 - **文法（[`pipeline/provenance.py`](pipeline/provenance.py)）：** ref 為 `md:<unit_id>`（指 `.md` 的某個 narration 單元 id）或 `doc:<frag-sec-*|data-fig>`（指 handout 的 section／figure anchor）。確定性層只查 ref **解析得到**（指到存在的 `.md` 單元或 handout anchor），**不做文字語意比對**。
-- **場級繼承 + 欄級覆寫：** 場景設一個 `ref:`，所有上畫面文字欄位**預設繼承**；某欄要引不同源／跨單元綜合／提高風險斷言時，才用 `refs.<欄位路徑>` 覆寫（如 `refs.scaffold.motive`）。缺欄級 ref 的欄位繼承場級。
+- **場級繼承 + 欄級覆寫：** 場景設一個 `ref:`，所有上畫面文字欄位**預設繼承**；某欄要引不同源／跨單元綜合／提高風險斷言時，才用 `refs:` 覆寫。`refs:` 是一個 **flat map**，key 是欄位路徑**字串**（**非巢狀物件**），如 `refs: { scaffold.motive: 'md:<unit_id>', statement: 'doc:<anchor>' }`——不可寫成巢狀 `refs: { scaffold: { motive: … } }`（會 silently 漏掉）。缺欄級 ref 的欄位繼承場級。（權威範例見 [`CALIBRATION-pedagogy-firstlearner.md`](content_scripts/_audit/CALIBRATION-pedagogy-firstlearner.md)：`refs:` 以欄位路徑為 key、非 dotted scalar。）
 - **落地行為（零行為改變）：** provenance 檢查 **warn-only**，唯有 `meta.otf_enforce: true` 才 gating；`intro`／`outro` 場**豁免**（只在 `content`／`divider` 場觸發）。忠實的**語意**比對歸判斷層 `OF1`（gate-1 讀真正解析到的源、判是否被支持），確定性層只查 ref 可解析。
 - **source-adequacy + 生命週期：** 當場景 `ref:` 過寬、藏住某欄該有的覆寫時，`OF1` 要求補一個**更 specific 的 `refs:` 欄級覆寫**。OF 忠實 finding **僅當所引源 `CONTENT_APPROVED=yes` 時才 blocking**（源還是 `DRAFT` → dry-run／advisory）；`md:<unit>` ref 繼承該 deck 的核准狀態，`doc:<anchor>` ref 一旦解析即可 gate。
 - **強制層：** OTF 規則同時落在本檔與 [`REVIEW_GATES.md`](REVIEW_GATES.md)（SPEC §4 規則層分工：OTF → 本檔 + `REVIEW_GATES.md`）。
 
 ### 邊界：pedagogy／OTF 閘與 six-lens 不重疊
 
-pedagogy／OTF 閘與 six-lens **界定不重疊的切片**：`.md` 內容是否忠實講義歸 six-lens `L1`（含 scaffold 例外，見 `CONTENT-SIXLENS-RUBRIC.md` §5.5）；**上畫面文字 vs 核准源**歸 `OF1`（既有未守的軌，`OF1` 只查「是否被 cited 源支持」、**不重算**數學正確性）；`scaffold`／`statement` 的數學**正確性**仍歸 `L5`。完整邊界表見 [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md) §10，本檔不複製整表。
+pedagogy／OTF 閘與 six-lens **界定不重疊的切片**：`.md` 內容是否忠實講義歸 six-lens `L1`（含 scaffold 例外，見 [`CONTENT-SIXLENS-RUBRIC.md`](content_scripts/_audit/CONTENT-SIXLENS-RUBRIC.md) §5.5）；**上畫面文字 vs 核准源**歸 `OF1`（既有未守的軌，`OF1` 只查「是否被 cited 源支持」、**不重算**數學正確性）；`scaffold`／`statement` 的數學**正確性**仍歸 `L5`。完整邊界表見 [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md) §10，本檔不複製整表。
 
 ---
 
