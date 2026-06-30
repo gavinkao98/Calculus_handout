@@ -4,6 +4,16 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## 🧱 2026-06-30 初學者教學＋上畫面文字忠實（OTF）框架：spec SHIP＋SP1 Plan 1 已出，**待實作**
+
+緣起：使用者對 §3.1 成片回饋（針對「第一次學的人」）→ 升級為**可複用框架/流程/模板/規則**，非單節修補。**設計與計畫已定稿並 commit；實作未開始**（換新對話接手）。
+
+- **權威 spec：** [`SPEC-pedagogy-firstlearner-framework.md`](SPEC-pedagogy-firstlearner-framework.md)（v3, SHIP）。6 教學原則 P1–P6 ＋ OTF 上畫面文字忠實機制；新獨立 pedagogy 閘（PD1–PD4 教學品質＋OF1–OF2 文字忠實）、視覺閘擴充（A7 prominence／V4·A6 min-size）、確定性 provenance 層。關鍵決策：預設初學者（`meta.pedagogy_profile`）、場級 `source` 繼承、warn-default＋per-deck opt-in（落地零行為改變）。**核心教訓：** v1 曾假設「scaffold 搬進 .md → NFA 自動覆蓋」，自審證偽（NFA 只審 `.md narration:` 欄）→ 重設計為 OTF（provenance ref＋新閘自查）。審查履歷見 spec §13（Codex×3＋4-agent 對抗式自審＋回歸）。
+- **分兩子專案：** SP1＝框架（先做）；SP2＝回填 3 個既有 deck（ch01 §1.1、ch03 §3.1/§3.2）另計（spec §11，走乾跑→人核可→scoped 修）。
+- **SP1 拆 5 個計畫，Plan 1 已出：** [`PLAN-pedagogy-firstlearner-sp1-foundation.md`](PLAN-pedagogy-firstlearner-sp1-foundation.md)（OTF provenance 基礎：ref 文法 `md:<unit>`／`doc:<frag-sec-*|data-fig>`、locus 載入、resolver、warn-only schema 檢查；25 個 TDD step；新模組 `pipeline/provenance.py`）。Plans 2–5（scaffold＋模板／pedagogy 閘／視覺擴充／methodology 文件）待 Plan 1 落地、文法實測後細化（清單在 Plan 1 末）。
+- **實作 idiom：** 專案無 pytest → stdlib `assert` self-test ＋ fixture storyboard ＋ `schema.py` 接線；**不加新依賴**；warn-default 故既有 deck 維持 green。
+- **下一步（新對話）：** 用 `superpowers:subagent-driven-development`（或 `executing-plans`）跑 Plan 1，task-by-task。Commit：`ecf0bcc`（spec）、`27a19f6`（Plan 1）；分支 `video/template-redesign-navy-spine`。
+
 ## ✅ 2026-06-29 ch03 §3.1 Fig 3.1「A Squeeze on the Unit Circle」場景動畫重設計（剝離飛出＋等高徽章）
 
 承 §3.1 detail-redo mock 成片後使用者目視回饋：`sector_inequality`（Fig 3.1）原本把三塊面積（½sinθ／½θ／½tanθ）疊在同一張單位圓圖上、互相覆蓋且標籤擠在縫隙，「標示不清」。使用者要求改成動畫——三塊分別飛到右邊、看清各自形狀。經 brainstorm＋mockup 裁決：**一排・共用底邊・真實相對大小**＋原圖縮小留左當來源。
