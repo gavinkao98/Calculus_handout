@@ -64,7 +64,7 @@ PD 確定性層（教學結構檢查），全部 warn-default。
 
 ## 四、怎麼接手（resume 指南）
 
-- **流程**：`superpowers:subagent-driven-development`，task-by-task。**Plan 3 ✅ 完成**（pedagogy 判斷閘，commits `4c7aaaa..c0b254d`，calibrated＋opus 全分支＋Codex 覆核 = merge-ready）。**下一步＝執行 Plan 4 施工計畫** [`PLAN-pedagogy-firstlearner-sp1-plan4-visual.md`](PLAN-pedagogy-firstlearner-sp1-plan4-visual.md)（視覺擴充：`MIN_FONT_FLOOR` 常數＋warn-default sizecheck 檢查＋clamp single-line shrink，V4/A6 floor＋手機標尺，A7 figure-prominence；5 task；已出 2026-06-30；BASE＝當前 HEAD；從 Task 1 起跑）。
+- **流程**：`superpowers:subagent-driven-development`，task-by-task。**Plan 3 ✅ 完成**（pedagogy 判斷閘，commits `4c7aaaa..c0b254d`，calibrated＋opus 全分支＋Codex 覆核 = merge-ready）。**下一步＝執行 Plan 4 施工計畫** [`PLAN-pedagogy-firstlearner-sp1-plan4-visual.md`](PLAN-pedagogy-firstlearner-sp1-plan4-visual.md)（視覺擴充：`MIN_FONT_FLOOR` 常數＋warn-default sizecheck 檢查＋clamp single-line shrink，V4/A6 floor＋手機標尺，A7 figure-prominence；5 task；已出 2026-06-30、**已過 3 輪 Codex（gpt-5.5/xhigh）覆核＝ready-to-execute**（grounding／floor px normalization／clamp 算術／commit 順序皆驗過，無殘留）；BASE＝當前 HEAD；從 Task 1 起跑）。
 - **測試 venv（換機注意）**：一律用 **repo 內**的 `.venv/Scripts/python.exe`（相對 repo root → 換機自動對；**勿沿用其他機器的絕對路徑**。bare python 缺 vendored PyYAML 會誤判 `test_schema_integration`）。本機絕對路徑＝`C:/Users/Kao/Downloads/Calculus_handout/.venv/Scripts/python.exe`；換機請改用該機 repo 下的 `.venv/Scripts/python.exe`（找不到先跑 `python tools/doctor.py`）。
 - **快速健檢**：
   - `…/.venv/…/python.exe video/pipeline/_selftest_provenance.py` → `OK provenance self-test`

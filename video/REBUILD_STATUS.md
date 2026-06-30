@@ -23,7 +23,7 @@
 - **VERDICT 計數約定鎖 B（calibration 裁決，`049a71e`）：** VERDICT 整數只計 gate-1 自有 PD1＋OF1；surfaced 確定性（PD2/3/4＋OF2）`[Surface ...]` 列出、不進整數（`schema.py` 已以 `pedagogy_enforce`/`otf_enforce` 各自 gating，免重複計數）。寫進 rubric §回報規格＋§收斂線。
 - **Codex（gpt-5.5/xhigh）獨立覆核：** §10 邊界 airtight、約定 B 三段一致皆確認；揭露一條 Claude review 漏掉的 **Plan-1 substrate gap**——OF2 確定性層 `_present_text_fields()` 只掃頂層 `reason`，**未掃 derivation 模板巢狀 `reason`**（`steps[].reason`/`result.reason`/`check.reason`/`lines[].reason`，真實 deck 大量用）。**已修（TDD，`c0b254d`）：** [`pipeline/provenance.py`](pipeline/provenance.py) 擴掃巢狀 reason 路徑＋self-test＋fixture `bad_nested_reason`，gap closed；`steps[].math` 等等式內容 by-design 仍在 OF2 外。另 2 條 minor doc（deck B PD1 advisory 措辭、`refs:` map 寫法）已修。
 - **durable 教訓：** ① **計數約定（gate-1 自有 vs surfaced 確定性）** 是這類「判斷層＋確定性層並存」閘的必鎖項——校準時若 agent 給混合計數即鎖一致約定（採 B＝自有層，確定性歸 `schema.py`）。② **OF2 巢狀 reason 已補後，真實 deck（ch03）`schema.py` 會多印 `[provenance]` warn**（那些 nested reason 尚無 ref）——這是 **SP2 回填的 surface、預期非 regression**（warn-only、exit 0 不變）。
-- **接續：** **Plan 4（視覺擴充）為下一步——施工計畫已出**：[`PLAN-pedagogy-firstlearner-sp1-plan4-visual.md`](PLAN-pedagogy-firstlearner-sp1-plan4-visual.md)（`MIN_FONT_FLOOR` 常數＋warn-default sizecheck 檢查＋clamp single-line shrink，V4/A6 floor＋手機標尺，A7 figure-prominence；5 task，依 spec §8／§12）。Plan 5（methodology/文件接線）＋ SP2 回填（3 deck，spec §11）續後。
+- **接續：** **Plan 4（視覺擴充）為下一步——施工計畫已出**：[`PLAN-pedagogy-firstlearner-sp1-plan4-visual.md`](PLAN-pedagogy-firstlearner-sp1-plan4-visual.md)（`MIN_FONT_FLOOR` 常數＋warn-default sizecheck 檢查＋clamp single-line shrink，V4/A6 floor＋手機標尺，A7 figure-prominence；5 task，依 spec §8／§12；**已過 3 輪 Codex 覆核＝ready-to-execute**）。Plan 5（methodology/文件接線）＋ SP2 回填（3 deck，spec §11）續後。
 
 ## ✅ 2026-06-30 scaffold 模型＋模板渲染（SP1 Plan 2）完成・全分支 review = merge-ready
 
