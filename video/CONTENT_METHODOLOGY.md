@@ -199,6 +199,29 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 
 操作判準：下筆前估這一節的教學重量裡，符號／邏輯佔多少 vs 幾何佔多少。≥70% 符號 → 套條件化規則。（gen-1 校準：§1.1 約 40% 符號，七個視覺單元各司其職；§1.6 約 90% 符號，只有 anchor + 一個動機圖。）
 
+### 初學者教學原則（P1–P4）
+
+預設觀眾是**第一次學這段微積分的同學**（storyboard `meta.pedagogy_profile`，預設 `first_time`、可覆寫）。下面四條把「為初學者教」落成可承載、可稽核的畫面決策，對應教學閘 `PEDAGOGY-FIRSTLEARNER-RUBRIC.md` 的 `PD1`–`PD4`。（其強制層見 [`REVIEW_GATES.md`](REVIEW_GATES.md)；結構必填由確定性層 [`pipeline/pedagogy.py`](pipeline/pedagogy.py) 計算，落地當下 warn-only，詳見下節「落地行為」。）
+
+- **P1 證明／推導粒度（一 beat 一承重動作）。** 對初學者，**一個 beat／reveal 只扛一個承重的代數／邏輯動作**，不過度壓縮——寧可多分一段，也不要把兩個推導步驟塞進同一次揭示。拆步粒度讀 `meta.pedagogy_profile`（預設 `first_time` 的慢節奏）。這是 audience-sensitive 的語意判斷，無確定性必填欄位；判斷層 = `PD1`（與 `L2`「一單元兩**概念**」分工：`PD1` 管單一概念單元**內部**一個 beat 多**動作**的過度壓縮）。
+- **P2 動機上畫面（`scaffold.motive`）。** 每個 proof／子結論場景在**畫面上**有一句「為什麼做這個」，寫進 `scaffold.motive`，**不只藏在旁白**。`theorem_proof`／`derivation` 場缺 `scaffold.motive` → 確定性層 `schema.py` warn（`PD2`；唯有 opt-in `meta.pedagogy_enforce` 才升 gating）；`definition_math` 的 motive 屬語意、**非確定性必填**，由 gate-1 以 advisory 浮現。motive 渲為標題下一行**較小的 `text` role**（不可 `muted`——見 [`DESIGN.md`](DESIGN.md)；de-emphasis 靠字級／位置，非調暗）。
+- **P3 divider 講具體問題（`scaffold.problem`）。** section divider 講出正在解的**問題／式子**（`scaffold.problem`），不只給概念標題。承載與渲染契約（divider 的 `problem` 走 formula-block）見 [`DESIGN.md`](DESIGN.md)，**本檔不重述渲染細節**；確定性必填（`kind: divider` 場缺 `scaffold.problem` → warn）與判斷見 `PD3`。
+- **P4 前提首用即標（`scaffold.flag` + `meta.assumptions`）。** 默默用到的慣例／假設（radians、定義域限制）在**第一次用到**的場景標 `scaffold.flag: <assumption_id>`。每筆假設在 deck 的 **`meta.assumptions[]`** registry 顯式宣告 `id`／`text`／`first_use_unit`／`source`（此 `source` 是該假設的人讀引用，與下節 OTF provenance 的 `ref:`／`refs:` 是兩回事）；**閘不推斷**「是否用到／何處首用」，一律以作者宣告為準。registry 一致性（每筆 assumption 在其 `first_use_unit` 渲出對應 flag、無孤兒 flag）由確定性層檢查（`PD4`）。
+
+### OTF：上畫面教學文字可回溯核准源
+
+所有**上畫面教學文字**（`statement`／`scaffold`／`annotations`／`reason`／`problem`／…）應可回溯到核准源。provenance 用**新欄位** `ref:`（單一）／`refs:`（多筆、欄級覆寫），**與 freeform `source:` 分離**——`source:` 是給人讀的標籤、provenance 不解析它，**不要寫成「`scaffold`／文字以 `source:`／`from:` 帶 provenance」**。
+
+- **文法（[`pipeline/provenance.py`](pipeline/provenance.py)）：** ref 為 `md:<unit_id>`（指 `.md` 的某個 narration 單元 id）或 `doc:<frag-sec-*|data-fig>`（指 handout 的 section／figure anchor）。確定性層只查 ref **解析得到**（指到存在的 `.md` 單元或 handout anchor），**不做文字語意比對**。
+- **場級繼承 + 欄級覆寫：** 場景設一個 `ref:`，所有上畫面文字欄位**預設繼承**；某欄要引不同源／跨單元綜合／提高風險斷言時，才用 `refs.<欄位路徑>` 覆寫（如 `refs.scaffold.motive`）。缺欄級 ref 的欄位繼承場級。
+- **落地行為（零行為改變）：** provenance 檢查 **warn-only**，唯有 `meta.otf_enforce: true` 才 gating；`intro`／`outro` 場**豁免**（只在 `content`／`divider` 場觸發）。忠實的**語意**比對歸判斷層 `OF1`（gate-1 讀真正解析到的源、判是否被支持），確定性層只查 ref 可解析。
+- **source-adequacy + 生命週期：** 當場景 `ref:` 過寬、藏住某欄該有的覆寫時，`OF1` 要求補一個**更 specific 的 `refs:` 欄級覆寫**。OF 忠實 finding **僅當所引源 `CONTENT_APPROVED=yes` 時才 blocking**（源還是 `DRAFT` → dry-run／advisory）；`md:<unit>` ref 繼承該 deck 的核准狀態，`doc:<anchor>` ref 一旦解析即可 gate。
+- **強制層：** OTF 規則同時落在本檔與 [`REVIEW_GATES.md`](REVIEW_GATES.md)（SPEC §4 規則層分工：OTF → 本檔 + `REVIEW_GATES.md`）。
+
+### 邊界：pedagogy／OTF 閘與 six-lens 不重疊
+
+pedagogy／OTF 閘與 six-lens **界定不重疊的切片**：`.md` 內容是否忠實講義歸 six-lens `L1`（含 scaffold 例外，見 `CONTENT-SIXLENS-RUBRIC.md` §5.5）；**上畫面文字 vs 核准源**歸 `OF1`（既有未守的軌，`OF1` 只查「是否被 cited 源支持」、**不重算**數學正確性）；`scaffold`／`statement` 的數學**正確性**仍歸 `L5`。完整邊界表見 [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md) §10，本檔不複製整表。
+
 ---
 
 ## 6. 內容稿格式（純內容中間產物）
