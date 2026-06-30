@@ -133,7 +133,9 @@ git commit -m "docs(design): scaffold 承載 contract + enforced P5/P6 visual ru
 - [ ] **Step 1: Read the locus.** Read the L1 definition + its existing「**呈現**的重排與增補（…）**不算** finding」carve-out (in the L1 paragraph), and the dedicated「不算 finding（別誤報）」section. Decide the single best placement (D-P5-2): beside the L1 carve-out, mirrored in「不算 finding」only if the doc's structure clearly invites it (do not double-state in a drifting way).
 
 - [ ] **Step 2: Add the L1 scaffold 例外 — SPEC §5.5 verbatim** (adapt punctuation to the doc's voice but preserve every constraint):
-  > **L1 scaffold 例外：** 標記為 `scaffold` 的短文字若只把「已用到的目的／記號／慣例／定義域／前提」講白，**不算** L1「加入講義沒有的數學」；但須 cite locus（`source`/`ref`）、**不得**引入新定理／例題／結果、**不得**改條件。
+  > **L1 scaffold 例外：** 標記為 `scaffold` 的短文字若只把「已用到的目的／記號／慣例／定義域／前提」講白，**不算** L1「加入講義沒有的數學」；但須 cite locus、**不得**引入新定理／例題／結果、**不得**改條件。
+
+  (SPEC §5.5 verbatim — `須 cite locus` 不加 `source`/`ref` 限定詞，避免 OTF source-vs-ref 歧義。L1 is the six-lens content-faithfulness lens; 「locus」泛指所本的講義/核准源處。)
   Place it immediately beside the existing「呈現的重排與增補不算 finding」carve-out so the two parallel carve-outs read together.
 
 - [ ] **Step 3: Self-consistency check (no run).** (a) the four hard limits are all present — cite locus, no new 定理/例題/結果, no condition change, scope = 已用到的目的/記號/慣例/定義域/前提; (b) it sits beside the existing L1 carve-out, parallel grammar; (c) not double-stated; (d) 繁中 voice + 全形; (e) no other L-code或 carve-out reworded.
