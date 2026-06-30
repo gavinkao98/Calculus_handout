@@ -4,7 +4,28 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
-## 🧱 2026-06-30 初學者教學＋上畫面文字忠實（OTF）框架：spec SHIP＋SP1 Plan 1 已出，**待實作**
+## 🧪 2026-06-30 影片音樂／音效候選包：repo 自有 house cues，待使用者試聽裁決
+
+使用者詢問數學教學影片是否需要音效／背景音，以及如何依現有模板統一規則；後續要求「寫成一份文檔，回家後試聽裁決，並多放幾個候選」。候選裁決包已寫入 [`pipeline/assets/audio/house/REVIEW-house-audio-candidates.html`](pipeline/assets/audio/house/REVIEW-house-audio-candidates.html)，規則同步到 [`DESIGN.md`](DESIGN.md) 的 **Audio policy（全章節統一）** 與 [`README.md`](README.md)。
+
+- **核心規則：** 所有章節、所有 section 依 template 決定音樂／音效；內容教學模板預設不放 BGM，維持乾淨旁白。`intro`／`outro` 使用裁決出的 repo 自有 bed；`divider` 使用裁決出的 stinger。
+- **候選音檔：** [`pipeline/assets/audio/house/`](pipeline/assets/audio/house/) 內 A=`calculus_*`（清亮品牌感）、B=`candidate_b_*`（溫暖低調，Codex 初選建議）、C=`candidate_c_*`（極簡自然）。來源為 `generate_house_cues.py` 程序合成，無第三方 sample／素材庫／外部 API。
+- **內容模板：** `definition_math`、`theorem_proof`、`procedure_steps`、`derivation`、`value_table`、`sign_chart` 一律乾聲；`graph` 只在大型視覺轉換可用極淡 whoosh；`callout type: caution` 可用短提示；`recap_cards` 不放 BGM，音樂留給 `outro`。
+- **第三方素材閘（若未來替換）：** 優先 YouTube Audio Library「不需署名」素材；可用 Pixabay Content License／CC0，但必須保存來源、授權、作者、下載日期。拒用 CC BY-NC／ND、來路不明的 "no copyright" 轉載音樂、無授權證據素材。
+- **仍待：** 使用者試聽後裁決 A/B/C、是否用 caution ping、是否用 divider stinger；之後把勝出 cue 接上 ducking/mux。目前 render 仍未混入這些 cues。
+
+## ✅ 2026-06-30 OTF provenance 基礎（SP1 Plan 1）實作完成
+
+承下方「初學者教學＋OTF 框架」spec：**SP1 Plan 1（OTF provenance 基礎）已實作完成並通過全分支 review**。用 `subagent-driven-development` task-by-task（每 task spec＋品質雙閘 review，末了 opus 全分支 review = merge: yes）。分支 `video/template-redesign-navy-spine`，9 個 commit `cd7a01b..b3bf68c`。**全程離線、未動計費 API。**
+
+- **新模組 [`pipeline/provenance.py`](pipeline/provenance.py)（純 stdlib）：** ref 文法 `md:<unit_id>`／`doc:<frag-sec-*|data-fig>`、locus 載入 `Loci.from_deck`（讀 deck `.md` 單元 id ＋ handout anchor，fail-closed 不 crash）、resolver `Loci.resolves`、場級繼承＋欄級覆寫的 `scene_text_refs`、warn/error 檢查 `provenance_issues`（intro/outro 豁免）。
+- **接線（warn-default，僅 `meta.otf_enforce: true` 才 gating）：** 同時接進 [`pipeline/schema.py`](pipeline/schema.py) `main()` 與 **[`make.py`](make.py) render gate**（schema gate 後、lint 前）。**落地零行為改變**——無 deck 設 `otf_enforce`，ch03 render 仍 exit 0、只多印 warn-only `[provenance]` 區塊（實測 18 條）。
+- **測試：** stdlib `assert` self-test [`pipeline/_selftest_provenance.py`](pipeline/_selftest_provenance.py)（專案首個測試檔，**須用 venv python 跑**；bare python 缺 vendored PyYAML 會誤判）＋ fixture [`storyboards/_fixtures/otf_provenance.yml`](storyboards/_fixtures/otf_provenance.yml) ＋ 最小 backing [`content_scripts/_fixture_otf.md`](content_scripts/_fixture_otf.md)（讓 fixture `md:` ref 可解析；無工具會 glob content_scripts，安全）。
+- **文法定案（使用者過目裁決）：** `ref:`/`refs:` 為**新欄位**、與既有 freeform `source:` 分離（`source:` 維持人話、永不 parse）；`subtitle` 豁免（brand），divider 教學文字走 `problem`/`scaffold.problem`。
+- **durable 教訓（記這免重蹈）：** ① 確定性 provenance 檢查**必須接進 `make.py` render gate**，不能只放 `schema.py main()`——`make.py` 呼叫純函式 `schema_storyboard()`、不呼叫 `schema.main()`（全分支 review 抓到的 Critical）。② `repo_root` 深度：`schema.py` 在 `video/pipeline/` 用 `.parent.parent.parent`；`make.py` 在 `video/` 用 `.parent.parent`。③ self-test 須用 venv python（vendored PyYAML）。
+- **接續：** Plan 2（scaffold model＋模板）**邏輯階段 ✅ 完成**（`pipeline/pedagogy.py` PD2/PD3/PD4＋`pedagogy_profile`，warn-only 接進 `schema.py`/`make.py`，僅 `meta.pedagogy_enforce` gating，零行為改變；commits `b3bf68c..101fd80`，計畫 [`PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md`](PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md)）；**渲染階段（`render_scaffold`＋模板接線）GATED 待做**。**完整回家接手卡見 [`HANDOFF-pedagogy-firstlearner-sp1.md`](HANDOFF-pedagogy-firstlearner-sp1.md)。** Plans 3–5 與 SP2 回填依 spec §11／plan 文件末清單續推。
+
+## 🧱 2026-06-30 初學者教學＋上畫面文字忠實（OTF）框架：spec SHIP＋SP1 5-plan 拆解（**Plan 1 ✅ 完成見上節；Plans 2–5 待續**）
 
 緣起：使用者對 §3.1 成片回饋（針對「第一次學的人」）→ 升級為**可複用框架/流程/模板/規則**，非單節修補。**設計與計畫已定稿並 commit；實作未開始**（換新對話接手）。
 

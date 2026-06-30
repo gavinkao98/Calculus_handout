@@ -184,6 +184,54 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 `divider` ★（新，dark 章節 opener：發光 hero curve + ghost numeral + eyebrow/title/
 subtitle + progress dots；欄位 `eyebrow`（別名 `kicker`；省略→`Section {section}`）/`title`（省略→`meta.title`）/`subtitle`（別名 `sub`/`tagline`）/`ghost`（省略→`meta.section` 章號）/`progress:{current,total}`（省略→由 `meta.sections` 推導）/`accent`）。三者皆 silent（不吃 `say`），文案多讀自 `meta`（`chapter`/`chapter_title`/`section`/`title`/`sections[]`）；intro 另吃 scene 層 `tagline` 與 `duration`，詳見上 §Scene kind 與下方最小範例。
 
+### Audio policy（全章節統一）
+
+本產線的預設聲音設計是 **narration-first**：數學教學內容已同時承載旁白、公式、
+圖形與 reveal timing，連續背景音容易和工作記憶競爭。所有章節、所有 section
+統一依 template 決定音樂／音效，不依單節喜好臨場加配樂。
+
+**House cue candidates（待使用者裁決）。** 預設不用外部素材庫音樂，改用 repo 內自有 cues：
+[`pipeline/assets/audio/house/`](pipeline/assets/audio/house/)。這些 WAV 由
+`generate_house_cues.py` 程序合成，無第三方 sample、無素材庫來源、無外部 API。
+音樂底色固定為無人聲、無鼓點、無明顯旋律 hook 的 soft pad / bell texture。
+剪輯音量以旁白為中心：BGM 約比旁白低 20-30 dB，所有 stinger / whoosh 都短、淡、
+一次性。候選試聽裁決稿為
+[`pipeline/assets/audio/house/REVIEW-house-audio-candidates.html`](pipeline/assets/audio/house/REVIEW-house-audio-candidates.html)。
+
+| candidate | 風格 | cue set |
+|---|---|---|
+| A | 清亮品牌感 | `calculus_*` |
+| B | 溫暖低調（目前建議） | `candidate_b_*` |
+| C | 極簡自然 | `candidate_c_*` |
+
+**Template-level 規則。**
+
+| kind / template | 音樂規則 | 音效規則 |
+|---|---|---|
+| `intro` | **使用裁決出的 intro bed**。6-8 秒淡入淡出；不接到第一個教學場景。 | 不需要額外音效。 |
+| `divider` | **使用裁決出的 divider stinger**。只標示 act/stage 切換，不鋪滿前後內容。 | 不另加音效。 |
+| `outro` | **使用裁決出的 outro bed**。用於結尾呼吸與品牌收束。 | 不需要額外音效。 |
+| `definition_math` | **不放 BGM**。定義與符號需要乾淨旁白。 | 通常不放；key line 的 visual highlight 已足夠。 |
+| `theorem_proof` | **不放 BGM**。證明步驟不可被音樂稀釋。 | 不放逐步音效；`qed` 也不加 ding。 |
+| `procedure_steps` | **不放 BGM**。程序要靠旁白節奏和畫面步驟讀清楚。 | 不放每步提示音。 |
+| `derivation` | **不放 BGM**。任何代數、極限、導數連續推導一律乾聲。 | 不放每行 reveal 音效。 |
+| `value_table` | **不放 BGM**。表格讀值時保持安靜。 | 不放每列／每欄音效。 |
+| `sign_chart` | **不放 BGM**。符號區間判讀需要低干擾。 | 不放每個 mark 音效。 |
+| `graph` | **不放 BGM**。圖形講解以旁白和動畫承擔節奏。 | 只有大型視覺轉換（例如整張圖切入、反射、domain restriction）可用極淡 whoosh；單一曲線、點、標籤 reveal 不加。 |
+| `callout` | **不放 BGM**。Remark/Caution/Note 是教學語氣的轉折，不是音樂段落。 | `type: caution` 可用裁決出的 caution ping；`remark` 預設不加。 |
+| `recap_cards` | **不放 BGM**。Key Takeaways 仍是 narrated content；音樂留給後面的 `outro`。 | 可在第一張 recap 卡出現時用一次短 chime；不要每點都加。 |
+
+**授權與來源規則。**
+
+- 優先使用 YouTube Audio Library 中「不需署名」的 music/SFX，尤其是 `intro`、`divider`、
+  `outro` 這種品牌場景。
+- 可接受 Pixabay Content License 的 music/SFX，但下載當日必須保存來源 URL、授權頁、
+  作者、下載日期；若素材頁標示 Content ID registered，除非沒有等價替代，否則避開。
+- 可接受 CC0 SFX。CC BY 只在確定會於影片描述署名時使用。**不用** CC BY-NC、CC BY-ND、
+  來路不明的 "no copyright" YouTube 轉載音樂或無法保留授權證據的素材。
+- 真正加入音檔時，第三方素材清單必須進版控，記錄檔名、用途、來源、license、是否需署名；
+  沒有這份清單，不進最終 mux。
+
 #### Plot label 顏色慣例（graph，2026-06-17 拍板）
 
 **plot 的標籤預設繼承該 plot 的 `color_role`——標示函數／線的標籤，顏色跟它標示的函數／線一致。** cyan 的 `$y=x^3$` 配 cyan 標籤、orange 的 `$\sqrt[3]{x}$` 配 orange 標籤、`muted` 的 `$y=x$` guide line 配 muted 灰標籤。逐項可用 `label_role` 覆寫。

@@ -20,7 +20,7 @@ video/
   make.py              單一入口 orchestrator：parse → synth → render → compose（離線、不計費）
   requirements.txt     pinned 依賴
   pipeline/            產線引擎（全部進版控）
-    assets/            內附 logo 資產（lockup SVG + brand/ 圖示）＋ _outline_text.py（外框工具）
+    assets/            內附 logo 資產（lockup SVG + brand/ 圖示）＋ house audio cue candidates
     visuals/           移植並驗證過的素材（colors、graph eval、layout）
     templates/         Direction B 場景模板
     blocks.py          可揭示的 Block 抽象 + 動畫派發
@@ -146,7 +146,7 @@ python video\pipeline\tts.py --storyboard video\storyboards\<deck>_mimo.yml --ba
 
 產生的音訊／manifest 存於 `video/output/ch<NN>/s<X.Y>/audio_mimo/`。
 
-manifest 為每 reveal beat 記一個 WAV、每內容場景記一個串接旁白 WAV；intro/outro 為無聲條目（`bgm` 占位、待 BGM 回合）。`video/output/` 為 gitignored。內容場景長度由旁白音訊驅動（每 beat 影片長度＝該 beat 音檔長度）；intro/outro 由 `duration` 加動畫時間決定。**完整有聲成片走下方「MiMo 旁白／影片路線」**（`tts.py --backend mimo` → `make.py --reuse-audio`）。
+manifest 為每 reveal beat 記一個 WAV、每內容場景記一個串接旁白 WAV；intro/outro 為無聲條目（`bgm` 占位，音樂規則見 [DESIGN.md](DESIGN.md) 的 Audio policy）。`video/output/` 為 gitignored。內容場景長度由旁白音訊驅動（每 beat 影片長度＝該 beat 音檔長度）；intro/outro 由 `duration` 加動畫時間決定。**完整有聲成片走下方「MiMo 旁白／影片路線」**（`tts.py --backend mimo` → `make.py --reuse-audio`）。
 
 **自動守門員**（`make.py` render 前依序執行；兩級 **error 擋下 / warn 提示**）：
 
@@ -156,7 +156,7 @@ manifest 為每 reveal beat 記一個 WAV、每內容場景記一個串接旁白
 
 **解析度慣例**：測試／預覽用 1080p（`make.py --quality high`，預設），正式交付才 4K（`--quality 4k`，依 `meta.video`，未設預設 4K60）。版面與解析度無關，1080p 測試與 4K master 構圖逐像素相同。
 
-**仍待**：intro/outro 的 BGM 來源／授權／ducking；視覺方向定後為 intro/outro 做最終節奏調整；`{show}` target-vs-payload 交叉驗證（task #6，需 manim）。
+**仍待**：使用者試聽 [`pipeline/assets/audio/house/REVIEW-house-audio-candidates.html`](pipeline/assets/audio/house/REVIEW-house-audio-candidates.html) 後裁決 A/B/C，再將勝出的 house audio cues 接上 ducking/mux；視覺方向定後為 intro/outro 做最終節奏調整；`{show}` target-vs-payload 交叉驗證（task #6，需 manim）。
 
 ## MiMo 旁白／影片路線（口語雙版 · single-source · 2026-06-14）
 
@@ -326,7 +326,7 @@ Render 註記：
 
 - `make.py` 的 render 階段算出的每場景 MP4（在 `output/_media/`）為無聲；compose
   階段才把對應小節旁白混進去、concat 成有聲成片 `output/ch<NN>/s<X.Y>/<id>.mp4`（真旁白走 MiMo route）。
-- intro/outro 仍為無聲；分鏡中的 `bgm` 欄位是占位符，待 BGM 回合。
+- intro/outro 目前 render 仍為無聲；house audio cue candidates 已在 `pipeline/assets/audio/house/`，後續依使用者裁決接入 ducking/mux。
 - 無聲預覽 render 期間可能出現 `SoX could not be found` 警告；對目前的
   檢查點而言它是無害的。
 - 若 sandbox 阻擋了對內嵌依賴的存取，請以正常的專案權限重新執行 Manim
