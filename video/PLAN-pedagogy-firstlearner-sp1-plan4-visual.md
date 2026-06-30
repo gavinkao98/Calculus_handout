@@ -1,87 +1,98 @@
 # Visual Extension (min-size floor + A7 figure-prominence + mobile yardstick) — Implementation Plan (SP1, Plan 4 of 5)
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. All self-tests run with the **repo venv python** `.venv/Scripts/python.exe` (bare `python` lacks vendored PyYAML and misjudges).
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. All self-tests run with the **repo venv python** `.venv/Scripts/python.exe` (it has `manim-0.20.1` + vendored PyYAML; bare `python` misjudges).
+>
+> **This plan was independently reviewed by Codex (gpt-5.5/xhigh) against the real code before finalizing; its findings are folded in (esp. the font-unit normalization, the clamp/fixture interaction, coverage scope, and commit ordering).**
 
-**Goal:** Sharpen the **existing** visual-frame gate per spec §8 (P5/P6, Codex C — "sharpen 既有、不立新 code"): add a deterministic **minimum on-screen font-size floor** (a `theme.py` constant + a warn-default `sizecheck.py` check + an unconditional render-time clamp so a single line can't `scale_to_fit_width` below the floor), and extend the `VISUAL-FRAME-RUBRIC.md` **judgment layer** (V4/A6 numeric floor + a phone-width "mobile yardstick", A7 **figure-prominence** sub-criterion). Lands **non-gating** (check is warn-default + opt-in `meta.fontfloor_enforce`; the clamp is an always-correct engineering fix verified to be a **no-op on existing decks**).
+**Goal:** Sharpen the **existing** visual-frame gate per spec §8 (P5/P6, Codex C — "sharpen 既有、不立新 code"): add a deterministic **minimum on-screen font-size floor** (a `theme.py` constant + a warn-default `sizecheck.py` check + an unconditional render-time clamp so a single line can't `scale_to_fit_width` below the floor), and extend the `VISUAL-FRAME-RUBRIC.md` **judgment layer** (V4/A6 numeric floor + a phone-width "mobile yardstick", A7 **figure-prominence** sub-criterion). Lands **non-gating** (check is warn-default + opt-in `meta.fontfloor_enforce`; the clamp is an always-correct engineering fix verified to be a **no-op on existing decks before it is committed**).
 
-**Architecture:** Two layers, mirroring Plans 1–3. **(1) Deterministic** — `theme.MIN_FONT_FLOOR` (px, compared in the canonical scale the existing `sizecheck._norm_size` already produces); a `sizecheck.py` floor check that flags any prose/label node whose effective size falls below the floor (incl. the pure-inline-math reason rails the existing `TOLERANCE` consistency check deliberately skips), warn-by-default and flipped to `error` only under `meta.fontfloor_enforce`; and a shared `brand._clamp_shrink` helper that prevents the single-line `scale_to_fit_width` sites from shrinking past the floor (wrap/overflow instead, consistent with DESIGN.md "wrap, don't shrink"). **(2) Judgment** — rubric edits the read-only `visual-frame-audit` gate-1 agent applies on rendered-frame PNGs. TDD for the deterministic core (a manim-free pure function + stdlib-assert self-test); offline mock-render + gate-1 audit for visual verification.
+**Architecture:** Two layers, mirroring Plans 1–3. **(1) Deterministic** — `theme.MIN_FONT_FLOOR` (in **px**); a dedicated `sizecheck._effective_font_px(node)` that recovers a node's true on-screen px from its manim `font_size` (text Tex carries `PX_TO_FS×TEXT_SCALE`; MathTex carries only `PX_TO_FS`); a `sizecheck.py` floor check that flags any **`_brand_prose`** node (reason-rail / annotation / step prose — `_prose_nodes`) whose recovered px is `< MIN_FONT_FLOOR`, warn-by-default and flipped to `error` only under `meta.fontfloor_enforce`; and a shared `brand._clamp_shrink` helper that prevents the single-line `scale_to_fit_width` sites from shrinking past the floor (wrap/overflow instead). **(2) Judgment** — rubric edits the read-only `visual-frame-audit` gate-1 agent applies on rendered-frame PNGs. TDD for the deterministic core (manim-free pure functions + stdlib-assert self-test); offline mock-render for clamp verification + gate-1 audit for visual verification.
 
-**Tech Stack:** Python (stdlib + manim) for `theme.py`/`sizecheck.py`/`brand.py`/templates; markdown for `VISUAL-FRAME-RUBRIC.md`; stdlib-`assert` self-test (new `_selftest_sizecheck.py`, pattern-identical to `_selftest_provenance.py`); offline `make.py --backend mock` / `scratch_frames.py` / `critic.py --dry-run` for visual verification (all $0, offline).
+**Tech Stack:** Python (stdlib + manim 0.20.1) for `theme.py`/`sizecheck.py`/`brand.py`/templates; markdown for `VISUAL-FRAME-RUBRIC.md`; stdlib-`assert` self-test (new `_selftest_sizecheck.py`, pattern-identical to `_selftest_provenance.py`); offline `make.py --backend mock` / `scratch_frames.py` / `critic.py --dry-run` for verification (all $0).
 
 ---
 
 ## Global Constraints
 
-- **Spec authority:** `SPEC-pedagogy-firstlearner-framework.md` — **§8** (the visual extension: P5→A7 figure-prominence; P6→V4/A6 min-size floor + mobile; engineering = floor constant + clamp single-line shrink), **§9** (deterministic layer is warn-default + per-deck opt-in enforce — "所有新檢查預設 warn-only"), **§12** (change-landing: `VISUAL-FRAME-RUBRIC.md` A7/V4/A6; `theme.py`/`sizecheck.py` floor constant + clamp), **§14** (success: "新檢查（warn 模式）綠/紅正確"; convergence "A7/V4 視覺 blocking == 0"; "全程離線可驗"). This plan implements **only §8**. The methodology/doc wiring (`CONTENT_METHODOLOGY.md`, `DESIGN.md`, `REVIEW_GATES.md` gate-sequence, the broader V1–V8→V1–V9 doc-drift) is **Plan 5**.
-- **Sharpen, don't add new codes (§8, Codex C).** No new V-code or A-code. The floor extends V4/A6; figure-prominence extends A7. All three already exist in `VISUAL-FRAME-RUBRIC.md` (V4 line 23, A6 line 40, A7 line 41).
-- **Deterministic floor lands non-gating (§9 / §14).** The `sizecheck.py` floor check is **warn-default**; it flips to `error` (gating) only when the deck sets `meta.fontfloor_enforce: true` (a NEW key, **independent of** `otf_enforce`/`pedagogy_enforce` — each gate owns its key, per Plan-2 precedent). **Zero behavior change on landing** — no existing deck sets the flag, so render output and exit codes are unchanged.
-- **The clamp is unconditional but must be a no-op on existing decks.** Unlike the check, the `_clamp_shrink` render-time fix has no opt-in (it is always-correct "wrap, don't shrink"). But it must not silently change existing renders: Task 5 verifies, by mock-rendering the 3 locked decks (ch01 §1.1, ch03 §3.1, §3.2) base-vs-HEAD, that **no current line shrinks below the floor** → frames byte-identical. If calibration finds a deck that DOES shrink below floor, that is a pre-existing too-small-text case → surface it (the floor warn names it) and raise it with the user (fix now vs SP2), do NOT silently change the render.
-- **Floor reasons in effective on-screen size, not raw `font_size` (grounding correction).** `theme.fs(size)` returns manim units `= px * PX_TO_FS` (PX_TO_FS≈0.698); **text** additionally renders at `fs(size) * TEXT_SCALE` (TEXT_SCALE≈1.3102, `brand._text_fs`). The existing `sizecheck._norm_size(node, text_scale)` already recovers the canonical math-anchored size (divides a Tex/MathTex `font_size` by `TEXT_SCALE`). **The floor check MUST compare against `_norm_size(...)`, reusing that helper — do not invent new normalization.** `MIN_FONT_FLOOR` is therefore expressed in the same canonical px units `_norm_size` yields.
-- **TDD for code.** Each code task: write the failing stdlib-`assert` self-test first, run it to see it fail, implement the minimal change, run it to see it pass, commit. Keep the unit-tested core **manim-free** (a pure function over `(block_id, size)` pairs), matching how `_selftest_provenance.py` / `_selftest_pedagogy.py` keep logic manim-free and push manim/end-to-end to a subprocess or to manual calibration (see `provenance.py:153–159` note).
-- **Surgical (Karpathy, CLAUDE.md).** Touch only the files named per task. Match each file's existing style. Do not "improve" adjacent code. The agent V1–V8→V1–V9 staleness fix is scoped explicitly in D-P4-5 (do not broaden it).
-- **Offline only.** Mock render (`--backend mock`), `scratch_frames.py`, `critic.py --dry-run` are $0. The gate-1 `visual-frame-audit` subagent is a free Claude agent. Any billed step (external VLM `critic.py --confirm`, high-res real render, Codex review) is **consent-gated** (CLAUDE.md) — propose + price first.
+- **Spec authority:** `SPEC-pedagogy-firstlearner-framework.md` — **§8** (P5→A7 figure-prominence by **量測**圖佔幀比例; P6→V4/A6 min-size floor + mobile; engineering = floor constant + clamp single-line shrink), **§9** (new checks warn-default + per-deck opt-in enforce), **§12** (`VISUAL-FRAME-RUBRIC.md` A7/V4/A6; `theme.py`/`sizecheck.py` floor constant + clamp), **§14** ("新檢查（warn 模式）綠/紅正確"; "A7/V4 視覺 blocking == 0"; "全程離線可驗"). This plan implements **only §8**. Methodology/doc wiring is **Plan 5**.
+- **Sharpen, don't add new codes (§8, Codex C).** No new V/A code. The floor extends V4/A6; figure-prominence extends A7. All three already exist in `VISUAL-FRAME-RUBRIC.md` (V4 line ~23, A6 ~40, A7 ~41).
+- **CRITICAL — the floor reasons in true px, recovered per node type (Codex C1).** `theme.fs(size)` returns **manim font units** `= px * PX_TO_FS` (PX_TO_FS≈0.698, `theme.py:47`), NOT px. **Text** Tex renders at `fs(size) * TEXT_SCALE` (TEXT_SCALE≈1.3102, `brand._text_fs`, `brand.py:168`); **MathTex** renders at `fs(size)` with **no** TEXT_SCALE (`brand.math_line`, `brand.py:456`). The existing `sizecheck._norm_size(node, text_scale)` (`sizecheck.py:50`) divides **both** Tex and MathTex by TEXT_SCALE — correct for the *sibling-ratio* TOLERANCE check, but **WRONG as an absolute px floor** (it returns manim units, and over-divides MathTex). **Therefore Plan 4 adds a NEW `_effective_font_px(node)` helper** that recovers the true authored px: a text Tex → `font_size / (TEXT_SCALE * PX_TO_FS)`; a MathTex → `font_size / PX_TO_FS`. `MIN_FONT_FLOOR` is a px constant compared against `_effective_font_px`. **Do NOT feed the px floor to `_norm_size`; leave `_norm_size` untouched for TOLERANCE.**
+- **Coverage scope is `_brand_prose` (reason-rail / annotation / step prose), NOT graph/axis labels (Codex I2).** `_prose_nodes()` (`sizecheck.py:40`) finds only `_brand_prose`-tagged nodes; graph equation labels + axis ticks are a separate `_graph_labels()` path (`sizecheck.py:209`, `graph.py:147`) with their own size metadata. §8 P6 is explicitly about **reason-rail / 註解** secondary text, so the deterministic floor scopes to `_brand_prose` nodes. Graph-label/axis-tick floor coverage is **out of scope** (a possible Plan-5 / SP2 follow-up — note it, don't build it).
+- **Deterministic floor lands non-gating (§9 / §14).** The `sizecheck.py` floor check is **warn-default**; it flips to `error` (gating) only when the deck sets `meta.fontfloor_enforce: true` (a NEW key, **independent of** `otf_enforce`/`pedagogy_enforce`). Zero behavior change on landing.
+- **The clamp is unconditional but its no-op is verified BEFORE it is committed (Codex I3 + D-P4-3).** The `_clamp_shrink` render-time fix has no opt-in (always-correct "wrap, don't shrink", DESIGN.md §599–609). It must not silently change existing renders: Task 3 mock-renders the 3 locked decks (ch01 §1.1, ch03 §3.1, §3.2) base-vs-HEAD and confirms **byte-identical** frames **before** the clamp commit lands. If a deck differs, a current line shrinks below the floor (a pre-existing too-small-text case) → do NOT commit silently; surface it to the user (fix now vs SP2).
+- **TDD for code.** Each code task: write the failing stdlib-`assert` self-test first, run it to fail, implement minimally, run to pass, commit. The unit-tested cores (`_effective_font_px`, `_floor_findings`, `_clamp_scale`) are **pure / render-free**. Note: importing `pipeline.brand` / `pipeline.sizecheck` pulls in manim (top-level imports, e.g. `brand.py:31`) — the `.venv` has `manim-0.20.1`, so the self-test imports fine; the cores themselves do no rendering. "render-free", not "manim-free".
+- **Surgical (Karpathy, CLAUDE.md).** Touch only the files named per task; match each file's style; don't "improve" adjacent code. The agent V1–V8→V1–V9 fix is scoped in D-P4-5.
+- **Offline only.** Mock render, `scratch_frames.py`, `critic.py --dry-run`, and the gate-1 `visual-frame-audit` subagent are $0. Any billed step (external VLM `critic.py --confirm`, real render, Codex) is consent-gated (CLAUDE.md).
 
 ## Decisions (LOCKED by this plan — review here first)
 
-- **D-P4-1 — floor value + units.** `theme.MIN_FONT_FLOOR` is a **px** constant in the canonical scale `_norm_size` yields. **Initial value = `26.0`** — the smallest *intentional* named size (`eyebrow`=26 in `theme._SCALE_PX`), so every deliberate size (`eyebrow`/`caption`/`prose_sm`/`math_sm`/… ≥26) passes and only sub-floor **shrink** (or an explicit too-small size) is caught. The check fires on `effective_size < MIN_FONT_FLOOR` (strict `<`, so a node exactly at the floor passes). **Calibrated in Task 5**: confirm no false positive on the 3 real decks; if a legit node trips it, lower the floor by the smallest amount that clears it (and record why). The value is one constant — trivially tunable.
-- **D-P4-2 — floor CHECK is warn-default + opt-in.** New key `meta.fontfloor_enforce` (bool). `sizecheck.check_scenes` reads it and emits floor findings as `warn` (default) or `error` (when set). Wired into the existing `make.py` sizecheck block (which already prints warns and aborts on errors) and surfaced by `sizecheck.py main()`. **Not** wired into `schema.py` (sizecheck is a separate make.py-only gate; `sizecheck.py` has its own CLI/`main()` for standalone runs). Zero behavior change on landing.
-- **D-P4-3 — CLAMP is unconditional + no-op-verified.** A shared `brand._clamp_shrink(mob, max_width)` (uses `theme.MIN_FONT_FLOOR`) replaces the raw `mob.scale_to_fit_width(max_width)` at the **two primary sites** — `brand.py:398` (pure-`$math$` single-line `prose()` branch) and `templates/derivation.py:180` (reason-rail). It also replaces the raw calls at the **three standalone-title sites** for consistency — `brand.py:144` (`heading`), `brand.py:440` (`heading_rich`), `templates/graph.py:143` (`_title`). Behavior: shrink to fit width **only down to the floor**; if fitting would require going below the floor, stop at the floor and let it overflow/wrap (DESIGN.md §599–609 "wrap, don't shrink"; titles already prefer wrapping). The clamp's *arithmetic* is a pure manim-free helper `_clamp_scale(cur_w, max_w, cur_size, floor) -> float` (unit-tested); the mobject application wraps it.
-- **D-P4-4 — A7 prominence + V4/A6 floor + mobile are JUDGMENT (rubric), no new code (§8).** The `visual-frame-audit` agent reads `VISUAL-FRAME-RUBRIC.md` as SSOT and applies them on rendered frames. **A7 figure-prominence**: for scenes whose core IS geometric intuition (hook / graph-centric content), the figure should visually dominate; if text/whitespace crowds it so it is **not** the focus (rough guide: figure occupies less than ~half the content area when the beat is "look at this shape/graph"), deduct A7 (advisory magnitude — never a V-blocking). **V4/A6 floor**: name `MIN_FONT_FLOOR` (26px) as the numeric reference — text rendered below it is "too small to read" → V4 blocking if it makes a load-bearing value unreadable, else A6 deduction. **Mobile yardstick**: a one-line rule to sanity-check secondary text (reason-rail / annotations) at phone width (~the frame downscaled to a 360–414px-wide viewport) — if it would be unreadable there, A6 deduction. These are agent judgments, not measured by code.
-- **D-P4-5 — agent V1–V8→V1–V9 staleness fix (scoped-in here).** `.claude/agents/visual-frame-audit.md` still says "V1–V8" (lines 5/15/25/27–28/32) while `VISUAL-FRAME-RUBRIC.md` is already V1–V9. Since Plan 4 edits the rubric the agent applies, fix the agent's stale `V1–V8`→`V1–V9` references **in Task 4** (one-locus, surgical). The OTHER two stale loci the spec §12 names (`REVIEW_GATES.md` line 65/66, `DESIGN.md` ~621/636) stay **Plan 5** — do not touch them here.
+- **D-P4-1 — floor value + units.** `theme.MIN_FONT_FLOOR = 26.0` (**px**), compared against the true authored px recovered by `sizecheck._effective_font_px(node)` (Global Constraints / Codex C1). 26 = the smallest *intentional* named size (`eyebrow`=26 in `theme._SCALE_PX`), so every deliberate size passes (`eyebrow` recovers to exactly 26, and the check is strict `<`) and only genuinely-too-small text is caught. **Calibrated in Task 5** against the 3 real decks (no false positive). One constant — trivially tunable.
+- **D-P4-2 — floor CHECK is warn-default + opt-in.** New key `meta.fontfloor_enforce` (bool). `sizecheck.check_scenes` reads it; floor findings are `warn` (default) or `error` (when set). Wired into the existing `make.py` sizecheck block (already prints warns / aborts on errors) and surfaced by `sizecheck.py main()`. **Not** wired into `schema.py` (sizecheck is a make.py-only gate with its own CLI). Zero behavior change on landing.
+- **D-P4-3 — CLAMP is unconditional + no-op-verified-before-commit.** A shared `brand._clamp_shrink(mob, max_w, cur_size_px)` (uses `theme.MIN_FONT_FLOOR`) replaces the raw `mob.scale_to_fit_width(max_w)` at the **two primary sites** (`brand.py:398` pure-`$math$` `prose()`; `templates/derivation.py:180` reason-rail) and, for consistency, the **three standalone-title sites** (`brand.py:144` `heading`; `brand.py:440` `heading_rich`; `templates/graph.py:143` `_title`). **The call site passes `cur_size_px`** (the role's authored px, e.g. `26.0` for an `eyebrow` reason) so the helper never has to guess units; for a `VGroup`/no-`font_size` mob (the derivation reason can be a group, `derivation.py:179`) the call site MUST pass the size (the helper does not read `font_size` off a group). Behavior: shrink to fit width **only down to the floor**; below that, stop at the floor and overflow/wrap. The arithmetic is a pure `_clamp_scale(cur_w, max_w, cur_size, floor)` (unit-tested); `_clamp_shrink` applies it.
+- **D-P4-4 — A7 prominence + V4/A6 floor + mobile are JUDGMENT (rubric), no new code (§8).** The `visual-frame-audit` agent applies them on rendered frames. **A7 figure-prominence**: for scenes whose core IS geometric intuition (hook / graph-centric), the figure should dominate; the agent makes an **approximate visual measurement of the figure's share of the content area** (honoring §8's "由量測圖佔幀比例判定") — if it is well below ~half when the beat is fundamentally about the figure, deduct A7 (advisory magnitude, **never** a V-blocking). **V4/A6 floor**: name `MIN_FONT_FLOOR` (26px) as the numeric reference — text below it is "too small to read" → V4 blocking if it makes a load-bearing value unreadable, else A6 deduction. **Mobile yardstick**: sanity-check secondary text at phone width (the frame downscaled to ~360–414px wide) — unreadable there → A6 deduction.
+- **D-P4-5 — agent V1–V8→V1–V9 staleness fix (scoped-in here).** `.claude/agents/visual-frame-audit.md` says "V1–V8" at **lines 4 / 15 / 25 / 27** while `VISUAL-FRAME-RUBRIC.md` is already V1–V9. Fix those four `V1–V8`→`V1–V9` in **Task 4** (surgical). The other two stale loci the spec §12 names (`REVIEW_GATES.md`, `DESIGN.md`) stay **Plan 5**.
 
 ## File Structure
 
-- **Modify** `video/pipeline/visuals/theme.py` — add `MIN_FONT_FLOOR` constant in the type-scale block (after `_SCALE_PX`/`PX_TO_FS`/`TEXT_SCALE`). One responsibility: own the type-system constant.
-- **Modify** `video/pipeline/sizecheck.py` — add a manim-free pure core `_floor_findings(scene_id, sizes, floor, enforce)` + a `_floor_issues(scene, blocks, enforce)` extractor that reuses `_prose_nodes`/`_norm_size` and ALSO checks the pure-inline-math carriers the TOLERANCE filter skips; call it from `check_scenes` with `enforce = bool(meta.get("fontfloor_enforce"))`.
-- **Create** `video/pipeline/_selftest_sizecheck.py` — stdlib-assert self-test for the floor pure-core + the clamp pure-core (manim-free), following `_selftest_provenance.py` shape.
-- **Modify** `video/pipeline/brand.py` — add `_clamp_scale` (pure) + `_clamp_shrink` (mobject) helpers; replace raw `scale_to_fit_width` at `:144`, `:398`, `:440`.
-- **Modify** `video/pipeline/templates/derivation.py` — use `_clamp_shrink` at `:180` (reason-rail).
-- **Modify** `video/pipeline/templates/graph.py` — use `_clamp_shrink` at `:143` (graph title).
-- **Modify** `video/make.py` — the sizecheck block (~`:617`) prints a `[fontfloor]`-tagged note line; gating already handled by the existing error/warn split (no structural change — confirm the floor findings flow through).
-- **Modify** `video/content_scripts/_audit/VISUAL-FRAME-RUBRIC.md` — V4/A6 numeric floor + mobile yardstick; A7 figure-prominence sub-criterion.
-- **Modify** `.claude/agents/visual-frame-audit.md` — V1–V8→V1–V9 staleness fix (D-P4-5).
-- **Create** `video/storyboards/_fixtures/fontfloor.yml` (+ backing `content_scripts/_fixture_fontfloor.md` if a `md:` ref is needed) — a deck with a deliberately-below-floor scaled line, for Task 5 calibration of the end-to-end floor warn.
+- **Modify** `video/pipeline/visuals/theme.py` — add `MIN_FONT_FLOOR` in the type-scale block (after `_SCALE_PX`/`PX_TO_FS`/`TEXT_SCALE`).
+- **Modify** `video/pipeline/sizecheck.py` — add `_effective_font_px(node)` (px recovery); a pure `_floor_findings(scene_id, sizes, floor, enforce)`; a `_floor_issues(scene, blocks, enforce)` that walks `_prose_nodes(...)` and ALSO the pure-inline-math single-line carriers the `_block_prose_size` filter (`sizecheck.py:74–77`) skips (an absolute floor needs no sibling group); call it from `check_scenes` with `enforce = bool(meta.get("fontfloor_enforce"))`. Also fix the stale `check_scenes`/`check_file` return annotation (`list[str]` → `list[tuple[str, str]]`, `sizecheck.py:441,520`).
+- **Create** `video/pipeline/_selftest_sizecheck.py` — stdlib-assert self-test for `_effective_font_px` + `_floor_findings` + `_clamp_scale` (render-free), following `_selftest_provenance.py` shape.
+- **Modify** `video/pipeline/brand.py` — add `_clamp_scale` (pure) + `_clamp_shrink(mob, max_w, cur_size_px)`; replace raw `scale_to_fit_width` at `:144`, `:398`, `:440` (each call site passes its role px).
+- **Modify** `video/pipeline/templates/derivation.py` — use `_clamp_shrink` at `:180` (reason-rail; pass the reason's role px, handle the group case).
+- **Modify** `video/pipeline/templates/graph.py` — use `_clamp_shrink` at `:143` (graph title; pass its role px).
+- **Modify** `video/make.py` — confirm floor findings flow through the existing sizecheck error/warn split; adjust the printed line wording if it hides them.
+- **Modify** `video/content_scripts/_audit/VISUAL-FRAME-RUBRIC.md` — V4/A6 floor + mobile yardstick; A7 figure-prominence (approximate measurement).
+- **Modify** `.claude/agents/visual-frame-audit.md` — V1–V8→V1–V9 at lines 4/15/25/27 (D-P4-5).
+- **Create** `video/storyboards/_fixtures/fontfloor.yml` — a deck for Task 5 that (a) WOULD shrink a reason below floor (to prove the **clamp** keeps it ≥ floor) and (b) declares an explicit sub-floor px size (to prove the **check** fires) if the schema exposes a per-field px size; else the check's positive case is the unit test + a temporary-raised-floor calibration (Task 5 Step 3).
 
 ---
 
-### Task 1: `MIN_FONT_FLOOR` constant + the deterministic floor check (sizecheck.py) — TDD
+### Task 1: `MIN_FONT_FLOOR` + `_effective_font_px` + the floor check (sizecheck.py) — TDD
 
 **Files:**
-- Modify: `video/pipeline/visuals/theme.py` (type-scale block, after `_SCALE_PX`)
-- Modify: `video/pipeline/sizecheck.py` (add `_floor_findings` pure core + `_floor_issues` extractor; call from `check_scenes`)
+- Modify: `video/pipeline/visuals/theme.py`
+- Modify: `video/pipeline/sizecheck.py`
 - Create: `video/pipeline/_selftest_sizecheck.py`
 
-**Interface:** `_floor_findings(scene_id: str, sizes: list[tuple[str, float]], floor: float, enforce: bool) -> list[tuple[str, str]]` — pure, manim-free: for each `(block_id, effective_size)` with `effective_size < floor`, append `(sev, msg)` where `sev = "error" if enforce else "warn"`; message names the scene, the block, the size, and the floor. `_floor_issues(scene, blocks, enforce)` walks the scene's prose/label nodes (reuse `_prose_nodes`, `_norm_size`), builds the `sizes` list **including the pure-inline-math reason rails that `_block_prose_size`'s carriers filter (sizecheck.py:74–77) skips** (an absolute floor needs no sibling, so these CAN and SHOULD be checked), and delegates to `_floor_findings`.
+**Interface:** `_effective_font_px(node) -> float` recovers a node's authored px (MathTex: `font_size/PX_TO_FS`; text Tex: `font_size/(TEXT_SCALE*PX_TO_FS)`). `_floor_findings(scene_id, sizes, floor, enforce)` is pure: for each `(block_id, px)` with `px < floor`, append `(sev, msg)` (`sev = "error" if enforce else "warn"`). `_floor_issues(scene, blocks, enforce)` builds `sizes = [(bid, _effective_font_px(node)) ...]` over the scene's `_brand_prose` nodes (reuse `_prose_nodes`), **including** the pure-inline-math single-line carriers the `_block_prose_size` filter skips, and delegates to `_floor_findings`.
 
-- [ ] **Step 1: Add the constant.** In `video/pipeline/visuals/theme.py`, in the type-scale block right after the `_SCALE_PX` dict / `PX_TO_FS` / `TEXT_SCALE`:
+- [ ] **Step 1: Add the constant.** In `video/pipeline/visuals/theme.py`, in the type-scale block after `_SCALE_PX`/`PX_TO_FS`/`TEXT_SCALE`:
 
 ```python
-# Minimum readable on-screen font size, in the canonical math-anchored px scale that
-# sizecheck._norm_size yields (a Tex/MathTex font_size divided back out by TEXT_SCALE).
-# Set at the smallest INTENTIONAL named size (`eyebrow`=26) so every deliberate size passes
-# and only sub-floor shrink (or an explicit too-small size) is caught. Plan 4 / SPEC §8.
-MIN_FONT_FLOOR = 26.0  # px (canonical scale); calibrated in PLAN-…-plan4 Task 5
+# Minimum readable on-screen font size in PX (1920x1080). Compared against the TRUE authored
+# px recovered by sizecheck._effective_font_px (NOT _norm_size, which yields manim units and
+# over-divides MathTex). Set at the smallest INTENTIONAL named size (eyebrow=26). Plan 4 / SPEC §8.
+MIN_FONT_FLOOR = 26.0  # px; calibrated in PLAN-…-plan4 Task 5
 ```
 
 - [ ] **Step 2: Write the failing self-test.** Create `video/pipeline/_selftest_sizecheck.py`:
 
 ```python
-"""Stdlib assert self-test for sizecheck.py floor logic. Run: .venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py"""
+"""Stdlib assert self-test for sizecheck.py floor logic. Run: .venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py
+Render-free (imports manim via sizecheck/brand, but renders nothing)."""
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from pipeline import sizecheck as S  # noqa: E402
-from pipeline.visuals import theme as T  # noqa: E402
+from pipeline import sizecheck as S          # noqa: E402
+from pipeline.visuals import theme as T      # noqa: E402
+from manim import MathTex, Tex               # noqa: E402
+
+
+def test_effective_px_recovers_authored_size():
+    # a text Tex authored at 26px renders at fs(26)*TEXT_SCALE; recover -> ~26
+    text = Tex("x"); text.font_size = 26 * T.PX_TO_FS * T.TEXT_SCALE
+    assert abs(S._effective_font_px(text) - 26.0) < 0.5
+    # a MathTex authored at 40px renders at fs(40) (no TEXT_SCALE); recover -> ~40
+    math = MathTex("x"); math.font_size = 40 * T.PX_TO_FS
+    assert abs(S._effective_font_px(math) - 40.0) < 0.5
 
 
 def test_floor_findings_flags_below():
-    floor = 26.0
-    sizes = [("reason.0", 24.0), ("reason.1", 26.0), ("statement", 40.0)]  # only reason.0 < floor
-    warns = S._floor_findings("sc", sizes, floor, enforce=False)
+    sizes = [("reason.0", 22.0), ("reason.1", 26.0), ("statement", 40.0)]  # only reason.0 < 26
+    warns = S._floor_findings("sc", sizes, 26.0, enforce=False)
     msgs = " | ".join(m for _, m in warns)
-    assert all(s == "warn" for s, _ in warns)
-    assert len(warns) == 1
-    assert "reason.0" in msgs and "sc" in msgs        # names scene + block
+    assert all(s == "warn" for s, _ in warns) and len(warns) == 1
+    assert "reason.0" in msgs and "sc" in msgs
     assert "reason.1" not in msgs and "statement" not in msgs   # at/above floor pass
 
 
@@ -99,6 +110,7 @@ def test_floor_uses_theme_constant():
 
 
 if __name__ == "__main__":
+    test_effective_px_recovers_authored_size()
     test_floor_findings_flags_below()
     test_floor_findings_enforce_is_error()
     test_floor_findings_empty_when_all_pass()
@@ -106,85 +118,93 @@ if __name__ == "__main__":
     print("OK sizecheck self-test")
 ```
 
-- [ ] **Step 3: Run it to confirm it FAILS.** Run: `.venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py`
-Expected: `AttributeError: module 'pipeline.sizecheck' has no attribute '_floor_findings'`.
+- [ ] **Step 3: Run it to confirm it FAILS.** `.venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py`
+Expected: `AttributeError: module 'pipeline.sizecheck' has no attribute '_effective_font_px'`.
 
-- [ ] **Step 4: Implement the pure core + the extractor.** In `video/pipeline/sizecheck.py`, add the manim-free `_floor_findings`:
+- [ ] **Step 4: Implement.** In `video/pipeline/sizecheck.py`:
 
 ```python
+def _effective_font_px(node):
+    """The node's TRUE authored on-screen px, recovered from its manim font_size.
+    MathTex renders at fs(px)=px*PX_TO_FS (no TEXT_SCALE); text Tex renders at
+    fs(px)*TEXT_SCALE. (Check MathTex first: MathTex subclasses Tex.)"""
+    from manim import MathTex, Tex
+    from pipeline.visuals import theme as T
+    fs = float(node.font_size)
+    if isinstance(node, MathTex):
+        return fs / T.PX_TO_FS
+    if isinstance(node, Tex):
+        return fs / (T.TEXT_SCALE * T.PX_TO_FS)
+    return fs / T.PX_TO_FS  # plain Text (no TEXT_SCALE); confirm against brand if such nodes occur
+
+
 def _floor_findings(scene_id, sizes, floor, enforce):
-    """(severity, message) for each (block_id, effective_size) below `floor`. Pure: no manim.
-    severity = 'error' if enforce else 'warn' (the warn-default/opt-in gating axis)."""
+    """(severity, message) for each (block_id, px) below `floor`. Pure: no manim."""
     sev = "error" if enforce else "warn"
-    out = []
-    for bid, size in sizes:
-        if size < floor:
-            out.append((sev, f"{scene_id}: '{bid}' renders at {size:.1f} < MIN_FONT_FLOOR "
-                             f"{floor:.0f} -- too small to read (a line was shrunk below the floor)"))
-    return out
+    return [(sev, f"{scene_id}: '{bid}' renders at {px:.1f}px < MIN_FONT_FLOOR {floor:.0f}px "
+                  f"-- too small to read (a line shrank below the floor, or an explicit tiny size)")
+            for bid, px in sizes if px < floor]
 ```
 
-Then add `_floor_issues(scene, blocks, enforce)` that builds the `sizes` list from the scene's prose/label nodes **using the existing `_prose_nodes(...)` + `_norm_size(node, T.TEXT_SCALE)` helpers** (read sizecheck.py:40–77 to match exact node-walking; reuse them, do NOT re-implement normalization), and — unlike the TOLERANCE path — **include the pure-inline-math single-line carriers** that `_block_prose_size` skips (lines 74–77), since an absolute floor needs no sibling group. Call `_floor_findings(scene.get("id"), sizes, T.MIN_FONT_FLOOR, enforce)`. Finally, in `check_scenes(meta, scenes)`, after the existing checks, add:
+Then add `_floor_issues(scene, blocks, enforce)` that collects `(block_id, _effective_font_px(node))` over the scene's `_brand_prose` nodes — **reuse `_prose_nodes(...)`** (read `sizecheck.py:40` for how it walks; do NOT re-implement) and additionally include the pure-inline-math single-line carriers that `_block_prose_size` filters out (`sizecheck.py:74–77`) — then `return _floor_findings(scene.get("id"), sizes, T.MIN_FONT_FLOOR, enforce)`. Call it from `check_scenes(meta, scenes)` after the existing checks:
 
 ```python
     enforce = bool(meta.get("fontfloor_enforce"))
-    for scene in scenes:
-        issues += _floor_issues(scene, <the scene's built blocks>, enforce)
+    for scene, blocks in <the same (scene, built-blocks) pairs the TOLERANCE walk uses>:
+        issues += _floor_issues(scene, blocks, enforce)
 ```
 
-(Match how `check_scenes` already iterates scenes and obtains each scene's blocks for the TOLERANCE walk — reuse that same block source so the floor check sees the same nodes.)
+(Reuse the exact block source `check_scenes` already builds for TOLERANCE — read the function to find it; do not rebuild blocks.) While here, fix the stale return annotation on `check_scenes` and `check_file` (`list[str]` → `list[tuple[str, str]]`).
 
-- [ ] **Step 5: Run the self-test to confirm it PASSES.** Run: `.venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py`
-Expected: `OK sizecheck self-test`.
+- [ ] **Step 5: Run to confirm PASS.** `.venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py` → `OK sizecheck self-test`.
 
 - [ ] **Step 6: Commit.**
 
 ```bash
 git add video/pipeline/visuals/theme.py video/pipeline/sizecheck.py video/pipeline/_selftest_sizecheck.py
-git commit -m "feat(sizecheck): MIN_FONT_FLOOR + warn-default floor check (SPEC §8)"
+git commit -m "feat(sizecheck): MIN_FONT_FLOOR + _effective_font_px + warn-default floor check (SPEC §8)"
 ```
 
 ---
 
-### Task 2: Opt-in enforce wiring + zero-behavior-change confirmation
+### Task 2: Opt-in enforce wiring + run the floor check on real decks (pre-clamp surface)
 
 **Files:**
-- Modify: `video/make.py` (sizecheck block ~`:617` — confirm floor findings print under the gate; add a `[fontfloor]` note only if the existing block does not already surface them clearly)
-- Modify: `video/pipeline/sizecheck.py` (`main()` standalone CLI — confirm it prints the floor findings + that `meta.fontfloor_enforce` flips severity)
-- Modify: `video/pipeline/_selftest_sizecheck.py` (add an enforce-key integration assertion)
+- Modify: `video/make.py` (sizecheck block ~`:617`); `video/pipeline/sizecheck.py` (`main()` if it filters messages); `video/pipeline/_selftest_sizecheck.py` (enforce assertion)
 
-**Interface:** with no `meta.fontfloor_enforce`, floor findings are `warn` → printed but **never gate** (make.py does not abort; `sizecheck.py main()` returns 0). With `meta.fontfloor_enforce: true`, they are `error` → make.py aborts (`return 2`) and `sizecheck.py main()` returns 1. The enforce key is **independent of** `otf_enforce`/`pedagogy_enforce`.
+**Interface:** no `meta.fontfloor_enforce` → floor findings are `warn` (printed, never gate). With it → `error` (make.py aborts `return 2`; `sizecheck.py main()` returns 1). Independent of `otf_enforce`/`pedagogy_enforce`.
 
-- [ ] **Step 1: Confirm the standalone CLI surfaces the floor.** Read `sizecheck.py main()` (line ~531) and `check_file` (line ~520). The floor findings are already in the `check_scenes` return list, so `main()`'s existing error/warn split prints them. Verify the WARN lines read sensibly (they carry "MIN_FONT_FLOOR"). No code change expected here unless `main()` filters messages — if so, ensure floor warns pass through.
+- [ ] **Step 1: Confirm the standalone CLI + make.py surface the floor.** Read `sizecheck.py main()` (~`:531`) and the `make.py` sizecheck block (~`:617–629`). The floor findings are already in the `check_scenes` return list, so the existing error/warn split prints/gates them. Only change wording if a hard `[sizecheck] consistent` line hides the floor warns — if so, list them (match the `[provenance]`/`[pedagogy]` warn-block idiom, `schema.py:179–197`).
 
-- [ ] **Step 2: Confirm the make.py gate handles it.** Read `make.py` sizecheck block (lines ~617–629). Floor findings flow through the existing `errors`/`warns` partition: warns print as `WARN`, errors abort with `return 2`. Confirm no change needed; if the block hard-prints "[sizecheck] consistent" in a way that hides floor warns, adjust the wording to a `[sizecheck]`/`[fontfloor]` line that lists them (match the `[provenance]`/`[pedagogy]` warn-block idiom in `schema.py:179–197`).
+- [ ] **Step 2: Add an enforce assertion** to `_selftest_sizecheck.py` (render-free): assert `_floor_findings(..., enforce=True)` yields `error` (already covered) and that the `meta.fontfloor_enforce` flag is read where `check_scenes` builds `enforce` (a focused assert; keep it render-free — the full render path is exercised in Task 5).
 
-- [ ] **Step 3: Add an enforce integration assertion** to `_selftest_sizecheck.py` (still manim-free — test the enforce **plumbing** at the `check_scenes` meta-reading level using a stub, OR assert the documented behavior via `_floor_findings` enforce param already covered in Task 1; if `check_scenes` can be exercised without manim for a scene with no blocks, assert `bool(meta.get("fontfloor_enforce"))` is read). Keep it manim-free; the end-to-end render-fires-the-warn path is verified in Task 5 (manual mock-render), mirroring the `provenance.py:153–159` rationale for not auto-testing the manim-dependent path.
+- [ ] **Step 3: Run the floor check on the 3 real decks BEFORE any clamp lands (the pre-clamp surface).** Run, with NO enforce key:
+```
+.venv/Scripts/python.exe video/pipeline/sizecheck.py video/storyboards/ch01_inverse_functions.yml
+.venv/Scripts/python.exe video/pipeline/sizecheck.py video/storyboards/ch03_trig_derivatives.yml
+.venv/Scripts/python.exe video/pipeline/sizecheck.py video/storyboards/ch03_chain_rule.yml
+```
+Expected exit 0 (warn-default). **Record every floor WARN** (scene · block · px). These are the decks' current sub-floor cases — the surface the clamp will fix (and the SP2 backfill surface). If a WARN names a legit `eyebrow`/`caption` node, the unit recovery is off → re-check `_effective_font_px` against `brand`'s actual node type before proceeding (D-P4-1 calibration).
 
-- [ ] **Step 4: Confirm zero behavior change.** Run `sizecheck.py` on a real deck (no enforce key):
-`.venv/Scripts/python.exe video/pipeline/sizecheck.py video/storyboards/ch03_trig_derivatives.yml`
-Expected: exit 0 (warns may appear for any genuinely-small text — that is the new visibility, warn-only, non-gating). Note in the commit body whether any real-deck warn appeared (those are the SP2 surface, not regressions).
+- [ ] **Step 4: Run the self-test.** `.venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py` → `OK sizecheck self-test`.
 
-- [ ] **Step 5: Run the self-test.** `.venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py` → `OK sizecheck self-test`.
-
-- [ ] **Step 6: Commit.**
+- [ ] **Step 5: Commit.**
 
 ```bash
 git add video/make.py video/pipeline/sizecheck.py video/pipeline/_selftest_sizecheck.py
-git commit -m "feat(sizecheck): floor check opt-in via meta.fontfloor_enforce (warn-default, zero behavior change)"
+git commit -m "feat(sizecheck): floor check opt-in via meta.fontfloor_enforce (warn-default, real-deck surface recorded)"
 ```
+
+(Record the Step-3 per-deck floor surface in the commit body — it is the pre-clamp baseline the next task's no-op check is measured against.)
 
 ---
 
-### Task 3: Unconditional clamp helper (`_clamp_shrink`) — TDD core + render no-op
+### Task 3: Unconditional clamp (`_clamp_shrink`) — TDD core + no-op verified BEFORE commit
 
 **Files:**
-- Modify: `video/pipeline/brand.py` (add `_clamp_scale` pure + `_clamp_shrink` mobject helper; replace raw `scale_to_fit_width` at `:144`, `:398`, `:440`)
-- Modify: `video/pipeline/templates/derivation.py` (`:180`)
-- Modify: `video/pipeline/templates/graph.py` (`:143`)
-- Modify: `video/pipeline/_selftest_sizecheck.py` (add `_clamp_scale` unit tests)
+- Modify: `video/pipeline/brand.py`, `video/pipeline/templates/derivation.py`, `video/pipeline/templates/graph.py`, `video/pipeline/_selftest_sizecheck.py`
 
-**Interface:** `_clamp_scale(cur_w: float, max_w: float, cur_size: float, floor: float) -> float` — pure: the scale factor to apply so the mob fits `max_w` **but its resulting effective size stays ≥ floor**. If `cur_w <= max_w`: return `1.0` (no shrink). Else the fit-scale is `max_w / cur_w`; the floor-scale is `floor / cur_size`; return `max(fit_scale, floor_scale)` capped at `1.0` (never enlarge). `_clamp_shrink(mob, max_w)` reads the mob's current width + effective size, computes `_clamp_scale(..., theme.MIN_FONT_FLOOR)`, and applies `mob.scale(factor)` (replacing the raw `mob.scale_to_fit_width(max_w)`).
+**Interface:** `_clamp_scale(cur_w, max_w, cur_size, floor) -> float` — pure: `1.0` if `cur_w <= max_w` or `cur_w <= 0`; else `min(1.0, max(max_w/cur_w, floor/cur_size))` (fit, but never below the floor-scale; never enlarge). `_clamp_shrink(mob, max_w, cur_size_px)` — the **call site passes `cur_size_px`** (the role's authored px; required because a `VGroup` reason has no single `font_size`); applies `mob.scale(_clamp_scale(mob.width, max_w, cur_size_px, theme.MIN_FONT_FLOOR))`.
 
 - [ ] **Step 1: Write the failing `_clamp_scale` tests** in `_selftest_sizecheck.py`:
 
@@ -192,81 +212,86 @@ git commit -m "feat(sizecheck): floor check opt-in via meta.fontfloor_enforce (w
 from pipeline import brand as B  # noqa: E402
 
 def test_clamp_no_shrink_when_fits():
-    assert B._clamp_scale(cur_w=3.0, max_w=5.0, cur_size=40.0, floor=26.0) == 1.0
+    assert B._clamp_scale(3.0, 5.0, 40.0, 26.0) == 1.0
 
-def test_clamp_fits_when_above_floor():
-    # need to shrink 5->4 (0.8x); resulting size 40*0.8=32 >= 26 -> use the fit scale
-    assert abs(B._clamp_scale(cur_w=5.0, max_w=4.0, cur_size=40.0, floor=26.0) - 0.8) < 1e-9
+def test_clamp_fits_when_result_above_floor():
+    # shrink 5->4 (0.8x); 40*0.8=32 >= 26 -> use fit
+    assert abs(B._clamp_scale(5.0, 4.0, 40.0, 26.0) - 0.8) < 1e-9
 
 def test_clamp_stops_at_floor():
-    # fitting would need 0.5x -> size 40*0.5=20 < 26; clamp to floor scale 26/40=0.65
-    assert abs(B._clamp_scale(cur_w=10.0, max_w=5.0, cur_size=40.0, floor=26.0) - 0.65) < 1e-9
+    # fit would be 0.5x -> 40*0.5=20 < 26; clamp to floor scale 26/40=0.65
+    assert abs(B._clamp_scale(10.0, 5.0, 40.0, 26.0) - 0.65) < 1e-9
 
 def test_clamp_never_enlarges():
-    assert B._clamp_scale(cur_w=2.0, max_w=9.0, cur_size=20.0, floor=26.0) == 1.0
+    assert B._clamp_scale(2.0, 9.0, 20.0, 26.0) == 1.0
+
+def test_clamp_zero_width_safe():
+    assert B._clamp_scale(0.0, 5.0, 40.0, 26.0) == 1.0
 ```
 
-Add these four calls to the `__main__` block.
+Add the five calls to `__main__`.
 
-- [ ] **Step 2: Run to confirm FAIL.** `.venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py` → `AttributeError: … '_clamp_scale'`.
+- [ ] **Step 2: Run to confirm FAIL.** → `AttributeError: … '_clamp_scale'`.
 
 - [ ] **Step 3: Implement the helpers** in `video/pipeline/brand.py`:
 
 ```python
 def _clamp_scale(cur_w, max_w, cur_size, floor):
-    """Scale factor to fit max_w without shrinking effective size below `floor`.
-    Never enlarges (cap at 1.0). Wrap/overflow is preferred over sub-floor shrink."""
-    if cur_w <= max_w or cur_w <= 0:
+    """Scale factor to fit max_w without shrinking effective size below `floor`. Never enlarges."""
+    if max_w is None or max_w <= 0 or cur_w <= max_w or cur_w <= 0:
         return 1.0
     fit = max_w / cur_w
     floor_scale = floor / cur_size if cur_size > 0 else fit
     return min(1.0, max(fit, floor_scale))
 
 
-def _clamp_shrink(mob, max_w):
-    """In-place: shrink mob to fit max_w but not below theme.MIN_FONT_FLOOR. Drop-in
-    replacement for mob.scale_to_fit_width(max_w) at single-line sites (SPEC §8)."""
-    if max_w is None or max_w <= 0:
-        return mob
-    size = float(getattr(mob, "font_size", T.MIN_FONT_FLOOR))
-    factor = _clamp_scale(mob.width, max_w, size, T.MIN_FONT_FLOOR)
+def _clamp_shrink(mob, max_w, cur_size_px):
+    """In-place: shrink mob to fit max_w but not below theme.MIN_FONT_FLOOR. The caller passes
+    cur_size_px (the role's authored px) -- required for VGroup reasons with no single font_size.
+    Drop-in for mob.scale_to_fit_width(max_w) at the single-line sites (SPEC §8)."""
+    factor = _clamp_scale(mob.width, max_w, float(cur_size_px), T.MIN_FONT_FLOOR)
     if factor < 1.0:
         mob.scale(factor)
     return mob
 ```
 
-(Confirm `T` is the theme import alias already used in `brand.py`; if `font_size` is not directly on the mob at a given site, pass the known size in — read each call site. For Tex carrying TEXT_SCALE, `font_size` is already the rendered size, so comparing to a px-canonical floor needs the same `_norm_size` logic — if the site renders text, divide the mob's `font_size` by `T.TEXT_SCALE` before comparing, mirroring `sizecheck._norm_size`. Match each site's actual node type.)
+(Confirm `T` is brand.py's theme alias.)
 
-- [ ] **Step 4: Replace the raw calls.** At `brand.py:398` (`prose()` pure-`$math$` branch), `brand.py:144` (`heading`), `brand.py:440` (`heading_rich`), `templates/derivation.py:180` (reason-rail), `templates/graph.py:143` (`_title`): replace `mob.scale_to_fit_width(max_w)` (or the local equivalent) with `brand._clamp_shrink(mob, max_w)` (templates import `brand`). Keep each site's surrounding logic intact.
+- [ ] **Step 4: Replace the raw calls, each passing its role px.** At `brand.py:398` (`prose()` pure-`$math$`), `brand.py:144` (`heading`), `brand.py:440` (`heading_rich`), `derivation.py:180` (reason-rail), `graph.py:143` (`_title`): replace `mob.scale_to_fit_width(max_w)` with `brand._clamp_shrink(mob, max_w, <role px>)`, where `<role px>` is the px the site already knows from its `size`/role (e.g. the reason rail's `prose_sm` → `theme._SCALE_PX['prose_sm']`; a title's size role → its `_SCALE_PX` value). Read each site to pass the correct px; do not read `font_size` off a possibly-grouped mob.
 
-- [ ] **Step 5: Run the self-test to confirm PASS.** `.venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py` → `OK sizecheck self-test`.
+- [ ] **Step 5: Run the self-test → PASS.** `.venv/Scripts/python.exe video/pipeline/_selftest_sizecheck.py` → `OK sizecheck self-test`.
 
-- [ ] **Step 6: Commit.**
+- [ ] **Step 6: Verify the clamp is a no-op on existing decks — BEFORE committing (Codex I3).** For each locked deck: render base (pre-Step-3 working tree — `git stash` the brand/template edits) vs HEAD (edits applied) and diff final frames:
+```
+python video/scratch_frames.py --storyboard video/storyboards/ch03_trig_derivatives.yml --scene all --out video/output/_qa/clamp_base   # with edits stashed
+git stash pop                                                                                                                          # re-apply edits
+python video/scratch_frames.py --storyboard video/storyboards/ch03_trig_derivatives.yml --scene all --out video/output/_qa/clamp_head
+```
+Compare the PNGs (byte/pixel diff) for all 3 decks. **Expected: byte-identical** (no current line needed sub-floor shrink → clamp inert; cross-check against Task 2 Step 3 — the decks whose floor surface was empty MUST be byte-identical). If a deck DIFFERS: a scene was shrinking below the floor; capture the scene id, **do NOT commit** — surface to the user (fix now vs SP2). Only commit once no-op is confirmed (or the user accepts the specific render change).
+
+- [ ] **Step 7: Commit** (only after Step 6 passes).
 
 ```bash
 git add video/pipeline/brand.py video/pipeline/templates/derivation.py video/pipeline/templates/graph.py video/pipeline/_selftest_sizecheck.py
-git commit -m "feat(brand): clamp single-line scale_to_fit_width to MIN_FONT_FLOOR (SPEC §8 wrap-don't-shrink)"
+git commit -m "feat(brand): clamp single-line scale_to_fit_width to MIN_FONT_FLOOR (no-op on existing decks; SPEC §8)"
 ```
-
-(Render no-op verification on real decks is Task 5 Step 2 — do NOT claim no-op until that mock-render diff runs.)
 
 ---
 
 ### Task 4: Rubric extension (V4/A6 floor + mobile yardstick, A7 figure-prominence) + agent V-code refresh
 
 **Files:**
-- Modify: `video/content_scripts/_audit/VISUAL-FRAME-RUBRIC.md`
-- Modify: `.claude/agents/visual-frame-audit.md` (D-P4-5 staleness fix only)
+- Modify: `video/content_scripts/_audit/VISUAL-FRAME-RUBRIC.md`; `.claude/agents/visual-frame-audit.md`
 
-- [ ] **Step 1: Extend V4 (Layer 1, rubric line ~23).** Append the numeric floor as the concrete reference for "small to read": add that a Tex/text node whose **effective size falls below `MIN_FONT_FLOOR` (26px, the deterministic floor in `theme.py` / `sizecheck.py`)** is "too small to read"; if that makes a **load-bearing value** unreadable → **Blocking** (consistent with V4's existing "小到讀不到值 → Blocking"); if merely small-but-legible → defer to A6. Reference the deterministic check (`sizecheck.py` floor, warn-default) as the engineering counterpart that surfaces it pre-render.
+- [ ] **Step 1: Extend V4 (Layer 1, rubric line ~23).** Add: a `_brand_prose` text node whose **true on-screen size falls below `MIN_FONT_FLOOR` (26px, the deterministic floor in `theme.py`/`sizecheck.py`)** is "too small to read"; if that makes a **load-bearing value** unreadable → **Blocking** (consistent with V4's existing "小到讀不到值 → Blocking"); merely small-but-legible → defer to A6. Reference the `sizecheck.py` floor (warn-default) as the engineering counterpart that surfaces it pre-render.
 
-- [ ] **Step 2: Extend A6 (Layer 2, rubric line ~40) with the mobile yardstick.** Add: secondary/subordinate text (reason-rail, annotations, captions) should stay readable when the frame is **downscaled to phone width** (sanity-check at ~360–414px-wide viewport — i.e. the 1920px frame at ~0.2× ); if a reason/annotation would be unreadable there, deduct A6 (severity by how far below). State this is a **judgment** yardstick the gate-1 agent applies by eye on the rendered frame, complementing the deterministic desktop floor.
+- [ ] **Step 2: Extend A6 (Layer 2, rubric line ~40) — mobile yardstick.** Add: secondary text (reason-rail, annotations, captions) should stay readable when the frame is **downscaled to phone width** (~360–414px-wide viewport, i.e. the 1920px frame at ~0.2×); if a reason/annotation would be unreadable there → A6 deduction (severity by how far). State this is a **judgment** yardstick the agent applies by eye on the rendered frame, complementing the deterministic desktop floor.
 
-- [ ] **Step 3: Add the A7 figure-prominence sub-criterion (Layer 2, rubric line ~41).** Append to A7: for scenes whose **core is geometric intuition** (hook / graph-centric content where "look at this shape/graph" IS the beat), the **figure should visually dominate** the content area; if text/whitespace crowds it so the figure is not the focus — rough guide: it occupies **less than ~half** the content area when the beat is fundamentally about the figure — deduct A7 (advisory magnitude, severity by how crowded). State explicitly: this is **measured by the agent's eye on the frame**, never a V-blocking, and never fires on text-centric scenes (definitions/derivations where the figure is a supporting aside).
+- [ ] **Step 3: Add the A7 figure-prominence sub-criterion (Layer 2, rubric line ~41).** Append to A7: for scenes whose **core is geometric intuition** (hook / graph-centric, where "look at this shape/graph" IS the beat), the **figure should visually dominate** — the agent makes an **approximate measurement of the figure's share of the content area** (honoring §8's "由量測圖佔幀比例判定"); if it is well below ~half when the beat is fundamentally about the figure → deduct A7 (advisory magnitude, severity by how crowded). State: this is **agent-estimated on the frame** (no new code), **never** a V-blocking, and **never** fires on text-centric scenes (definitions/derivations where the figure is a supporting aside).
 
-- [ ] **Step 4: Self-consistency check (no run).** Re-read the three edits: (a) V4 keeps blocking only when a load-bearing value is unreadable (else A6); (b) A6 mobile yardstick is advisory; (c) A7 prominence is advisory and scoped to geometric-core scenes; (d) all three name the deterministic floor / "by eye" boundary correctly; (e) no new V/A code introduced (§8).
+- [ ] **Step 4: Self-consistency check (no run).** (a) V4 blocking only when a load-bearing value is unreadable (else A6); (b) A6 mobile yardstick advisory; (c) A7 prominence advisory + approximate-measurement wording + scoped to geometric-core scenes; (d) all name the floor / measurement boundary correctly; (e) no new V/A code (§8).
 
-- [ ] **Step 5: Refresh the agent's stale V-code count (D-P4-5).** In `.claude/agents/visual-frame-audit.md`, change every `V1–V8` to `V1–V9` (lines ~5/15/25/27–28/32 per grounding). Do NOT otherwise edit the agent (it points to the rubric, doesn't restate it). Confirm the agent still reads `VISUAL-FRAME-RUBRIC.md` as authority.
+- [ ] **Step 5: Refresh the agent's stale V-code count (D-P4-5).** In `.claude/agents/visual-frame-audit.md`, change `V1–V8`→`V1–V9` at **lines 4, 15, 25, 27**. Do NOT otherwise edit the agent (it points to the rubric, doesn't restate it).
 
 - [ ] **Step 6: Commit.**
 
@@ -280,28 +305,34 @@ git commit -m "docs(visual): V4/A6 min-size floor + mobile yardstick, A7 figure-
 ### Task 5: Calibration + visual verification + sign-off + whole-branch review
 
 **Files:**
-- Create (scratchpad, not committed): a deliberately-below-floor fixture run + an "open and read" HTML sign-off report.
-- Possibly modify: `theme.MIN_FONT_FLOOR` (calibrated value) / the rubric thresholds (if calibration shows a false positive).
+- Create (committed): `video/storyboards/_fixtures/fontfloor.yml`. Create (scratchpad, not committed): an "open and read" HTML sign-off report.
+- Possibly modify: `theme.MIN_FONT_FLOOR` / rubric thresholds (if calibration shows a false positive).
 
-- [ ] **Step 1: Calibrate the floor CHECK (deterministic).** Create `video/storyboards/_fixtures/fontfloor.yml`: a minimal schema-valid deck with one content scene carrying a reason-rail / single-line that, at its declared width, is forced to shrink below 26px (e.g. a long `$…$` reason in a narrow `reason_max_w`). Run `.venv/Scripts/python.exe video/pipeline/sizecheck.py video/storyboards/_fixtures/fontfloor.yml` → confirm a `WARN` floor finding names that block, exit 0 (warn-default). Add `fontfloor_enforce: true` to its `meta` → confirm it becomes an `error`, exit 1. Record both runs.
+- [ ] **Step 1: Verify the CLAMP works (would-shrink fixture).** Create `video/storyboards/_fixtures/fontfloor.yml`: a schema-valid deck with one `derivation` scene whose reason, at its declared `reason_max_w`, WOULD shrink below 26px. Mock-render its final frame (`python video/scratch_frames.py --storyboard video/storyboards/_fixtures/fontfloor.yml --scene all --out video/output/_qa/floor`). Confirm the reason renders at the **floor** (legible, overflowing/wrapping) — NOT tiny. (This proves the clamp; the reason will NOT trip the floor CHECK precisely because the clamp held it at ≥ floor — that is correct, not a failure.)
 
-- [ ] **Step 2: Verify the CLAMP is a no-op on existing decks (render invariance).** For each locked deck (ch01 §1.1 `ch01_inverse_functions.yml`, ch03 §3.1 `ch03_trig_derivatives.yml`, ch03 §3.2 `ch03_chain_rule.yml`): mock-render base-vs-HEAD final frames and diff. Recipe: `git stash` (or check out base), `python video/scratch_frames.py --storyboard <deck> --scene all --out video/output/_qa/floor_base`, then HEAD, render to `…/floor_head`, and compare PNGs (byte / pixel diff). **Expected: byte-identical** (no current line shrinks below the floor → clamp inert). If a deck DIFFERS: that scene was shrinking below the floor (a pre-existing too-small-text case) — capture the scene id, do NOT silently accept the changed render; surface it to the user (Step 4) as "fix now vs SP2". (Use `--backend mock`/`scratch_frames.py`; all offline. `--quality high` for 1080p per CLAUDE.md.)
+- [ ] **Step 2: Verify the CHECK fires (clamp-independent).** The floor check's positive case is the **unit test** (Task 1, `_floor_findings` on a synthetic `<floor` size) — that is the authoritative proof. For an end-to-end confirmation of the wiring + message, temporarily set `theme.MIN_FONT_FLOOR` high enough that a normal `eyebrow` (26) trips it (e.g. `30.0`), run `sizecheck.py` on `fontfloor.yml` (or any real deck), confirm a `[fontfloor]`/WARN line naming the block appears at exit 0, then **restore `MIN_FONT_FLOOR = 26.0`**. Record both. (Do not leave the floor raised.)
 
-- [ ] **Step 3: Run the deterministic floor + real decks; confirm no false positives.** Run `sizecheck.py` (no enforce) on the 3 real decks; confirm any floor warns are genuine too-small text (not legit `eyebrow`/`caption`). If a legit node trips it, lower `MIN_FONT_FLOOR` by the minimum needed and re-run (D-P4-1); record the calibrated value + reason.
+- [ ] **Step 3: Calibrate the floor value + confirm no false positives on real decks.** With `MIN_FONT_FLOOR = 26.0`, the Task-2 Step-3 real-deck run should have shown either no floor WARN or only genuinely-too-small text. If a legit node tripped it, the `_effective_font_px` recovery is wrong for that node type — fix the helper (not the floor) and re-run; only lower the floor if a real intentional size legitimately sits below 26 (record why).
 
-- [ ] **Step 4: Visual gate-1 audit (judgment layer).** Mock-render a geometric-core deck (e.g. ch03 §3.1's squeeze/graph scenes) → `python video/pipeline/critic.py --storyboard <deck> --dry-run` to extract frames → dispatch the `visual-frame-audit` gate-1 agent on the frames. Confirm it now applies the new V4/A6 floor + mobile yardstick + A7 figure-prominence per the rubric, and that **A7/V4 visual blocking == 0** on the (good) real decks (§14 convergence). Capture its VERDICT.
+- [ ] **Step 4: Visual gate-1 audit (judgment layer).** Mock-render a geometric-core deck (ch03 §3.1 squeeze/graph scenes) → `python video/pipeline/critic.py --storyboard video/storyboards/ch03_trig_derivatives.yml --dry-run` → dispatch the `visual-frame-audit` gate-1 agent on the extracted frames. Confirm it now applies the V4/A6 floor + mobile yardstick + A7 figure-prominence per the rubric, and that **A7/V4 visual blocking == 0** on the (good) real decks (§14). Capture its VERDICT.
 
-- [ ] **Step 5: Produce the sign-off report.** A standalone HTML (CDN MathJax/KaTeX, double-click to open) summarizing: the `MIN_FONT_FLOOR` value + the warn-default/opt-in model + the clamp; the rubric's V4/A6 floor + mobile yardstick + A7 prominence; and the calibration result (floor warn fires on the fixture; clamp is byte-identical no-op on the 3 decks — or the surfaced exceptions; gate-1 A7/V4 blocking == 0). Per CLAUDE.md sign-off culture.
+- [ ] **Step 5: Produce the sign-off report.** Standalone HTML (CDN MathJax/KaTeX, double-click) summarizing: `MIN_FONT_FLOOR` + the `_effective_font_px` recovery + the warn-default/opt-in model + the clamp; the rubric V4/A6 floor + mobile yardstick + A7 prominence; and the calibration result (clamp holds the would-shrink reason at floor; check fires under the temporary-raised-floor probe; real decks clean / the recorded sub-floor surface; clamp byte-identical no-op on the 3 decks; gate-1 A7/V4 blocking == 0). Per CLAUDE.md sign-off culture.
 
-- [ ] **Step 6: User sign-off.** Present the report; get sign-off on the floor value + the rubric judgments + the no-op verification before considering Plan 4 done.
+- [ ] **Step 6: Commit the fixture + user sign-off.**
+```bash
+git add video/storyboards/_fixtures/fontfloor.yml
+git commit -m "test(sizecheck): fontfloor fixture (clamp-holds-at-floor) + Plan 4 calibration record"
+```
+Present the report; get sign-off on the floor value + the rubric judgments + the no-op verification before considering Plan 4 done.
 
-- [ ] **Step 7: Plan 4 whole-branch review.** Opus whole-branch review of the Plan 4 changeset (theme/sizecheck/brand/templates/rubric/agent + tests): is the floor check warn-default + correctly opt-in? Is the clamp arithmetic correct + the render no-op verified? Does the floor check correctly catch the inline-math carriers TOLERANCE skips, without false-positiving legit sizes? Are the rubric edits §8-faithful (no new V/A code; A7 advisory-only)? Address findings, re-audit. (Optionally, per the Plan-3 precedent and CLAUDE.md consent rule, offer the user a billed Codex independent pass.)
+- [ ] **Step 7: Plan 4 whole-branch review.** Opus whole-branch review of the changeset (theme/sizecheck/brand/templates/rubric/agent + tests + fixture): is `_effective_font_px` correct per node type? Is the floor check warn-default + correctly opt-in + scoped to `_brand_prose`? Is the clamp arithmetic correct, size-from-call-site, VGroup-safe, and the render no-op verified? Are the rubric edits §8-faithful (no new V/A code; A7 advisory + approximate-measurement)? Address findings, re-audit. (Optionally offer the user a billed Codex independent pass, per the Plan-3 precedent + CLAUDE.md consent.)
 
-- [ ] **Step 8: Update progress anchors + finish.** Update `REBUILD_STATUS.md` + `HANDOFF-pedagogy-firstlearner-sp1.md`: Plan 4 ✅ (visual extension landed — floor constant + warn-default check + clamp + rubric V4/A6/A7; non-gating; no-op verified; calibrated, signed off); next = Plan 5. Then `superpowers:finishing-a-development-branch`.
+- [ ] **Step 8: Update progress anchors + finish.** Update `REBUILD_STATUS.md` + `HANDOFF-pedagogy-firstlearner-sp1.md`: Plan 4 ✅ (visual extension landed — floor constant + `_effective_font_px` + warn-default check + clamp + rubric V4/A6/A7; non-gating; no-op verified; calibrated, signed off); next = Plan 5. Then `superpowers:finishing-a-development-branch`.
 
 ---
 
 ## After Plan 4 lands
 
-- **Plan 5 — Methodology/doc wiring (§12):** `CONTENT_METHODOLOGY.md` (P1/P2/P4 + scaffold authoring), `DESIGN.md` (scaffold 承載 + authoring checklist + the P5/P6 visual rules now enforced), `CONTENT-SIXLENS-RUBRIC.md` L1 scaffold exception (§5.5 exact wording), `REVIEW_GATES.md` (the pedagogy + fontfloor gates in sequence) + the remaining **V1–V8→V1–V9 doc-drift** cleanup (`REVIEW_GATES.md` line 65/66, `DESIGN.md` ~621/636 — the agent locus was already fixed in Plan 4 Task 4 / D-P4-5).
-- **SP2 backfill** then applies Plans 1–4 to the 3 locked decks per spec §11 (dry-run → classify → user-approved migration list → scoped fix → re-gate/re-render/re-sign-off), flipping per-deck opt-in (`otf_enforce` / `pedagogy_enforce` / `fontfloor_enforce`) to gating. The fontfloor warns surfaced in Task 2/Task 5 on real decks are part of that SP2 surface.
+- **Plan 5 — Methodology/doc wiring (§12):** `CONTENT_METHODOLOGY.md` (P1/P2/P4 + scaffold authoring), `DESIGN.md` (scaffold 承載 + authoring checklist + the now-enforced P5/P6 visual rules), `CONTENT-SIXLENS-RUBRIC.md` L1 scaffold exception (§5.5 exact wording), `REVIEW_GATES.md` (pedagogy + fontfloor gates in sequence) + the remaining **V1–V8→V1–V9 doc-drift** (`REVIEW_GATES.md` line 65/66, `DESIGN.md` ~621/636 — the agent locus was fixed in Plan 4 Task 4 / D-P4-5).
+- **Graph-label / axis-tick floor coverage** (deliberately out of Plan 4 scope, Codex I2): if wanted, extend the floor check to `_graph_labels()` after resolving label Tex/MathTex size metadata — a scoped Plan-5 / SP2 follow-up.
+- **SP2 backfill** applies Plans 1–4 to the 3 locked decks per spec §11 (dry-run → classify → user-approved migration list → scoped fix → re-gate/re-render/re-sign-off), flipping per-deck opt-in (`otf_enforce` / `pedagogy_enforce` / `fontfloor_enforce`) to gating. The fontfloor surface recorded in Task 2 Step 3 is part of that SP2 surface.
