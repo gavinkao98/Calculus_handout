@@ -327,8 +327,9 @@ helper ＋ deck-level registry ＋ 既有 provenance 慣例承載。落地當下
 **共用渲染（[`_common.render_scaffold`](pipeline/templates/_common.py)，掛 Lectern）：** content 場
 （`definition_math`／`theorem_proof`／`derivation`）的 `scaffold.motive` → 標題下一行**較小的 `text` role**「為什麼」
 （`prose_sm`、滿 `CONTENT_W` 不早 wrap）；**不可 `muted`**——違反上「教學內容用 `text`/`primary` 非 `muted`」並觸發
-`sizecheck` muted-prose 警告，de-emphasis 靠字級／位置、非調暗。`divider` 的 `scaffold.problem` → 標題下一個公式塊
-（`text` role、`prose` size 的 formula-block，比會 wrap 的 `subtitle` 更強）。首用場的 `scaffold.flag: <assumption_id>`
+`sizecheck` muted-prose 警告，de-emphasis 靠字級／位置、非調暗。`divider` 的 `scaffold.problem` → 標題下用
+**`brand.prose`（`prose` 字級、`text` role）**；純 `$…$` 問題式由 `brand.prose` 自動走 `math_line` 渲為**顯示
+公式行**、純文字則 wrap（無專用 formula-block compositor），字級比會 wrap 成小字的 `subtitle` 大。首用場的 `scaffold.flag: <assumption_id>`
 → 小 badge／aside（`assumes` 標籤＋該 assumption 文字，走 `build_aside` snap primary 欄）。**缺 `scaffold` 一律
 no-op**（`render_scaffold` 回傳 `[]`，render 不變、零行為改變）。
 
