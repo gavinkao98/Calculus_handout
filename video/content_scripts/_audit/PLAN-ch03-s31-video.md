@@ -198,7 +198,7 @@
 ### Task 15 — 視覺幀稽核（gate-1 visual-frame-audit，免費）→ 修到 blocking==0
 **Files:** Modify storyboard/hooks（依裁決）。
 - [ ] 抽幀：`python video/pipeline/critic.py --storyboard <yml> --dry-run`（零計費，抽每場最滿幀）。
-- [ ] 對每場跑 `visual-frame-audit` subagent（SSOT `VISUAL-FRAME-RUBRIC.md`）：V1–V8 blocking（數學渲染完整、圖正確、reveal 同步、端點實心/空心、✓/✗ 正確、不出框/不相撞）＋A1–A7 magnitude。可用 Workflow 並行（每場一 agent，refute-by-default）。
+- [ ] 對每場跑 `visual-frame-audit` subagent（SSOT `VISUAL-FRAME-RUBRIC.md`）：V1–V9 blocking（數學渲染完整、圖正確、reveal 同步、端點實心/空心、✓/✗ 正確、不出框/不相撞）＋A1–A7 magnitude。可用 Workflow 並行（每場一 agent，refute-by-default）。
 - [ ] 修 blocking → 重渲改動場 → 複驗（回歸再審）。
 - **驗證點：** 視覺 **blocking==0**；advisory 逐筆記錄。
 - **收斂線：** 視覺 blocking findings == 0。

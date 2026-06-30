@@ -407,7 +407,7 @@ M3（選用，計費）  P4 coverage check（learning_goal 覆蓋回測）
 
 ## 上次寫太粗、這次讀精確（多為「理解更準」，非新採納項）
 1. **Planner 是顯式兩階段**（`P_outline` 產 section metadata → `P_storyboard` 逐節展開）。對我們意義為零——我們的 Planner＝人＋CONTENT_METHODOLOGY，本就分大綱與逐拍稿。（paper §4.1）
-2. **Critic 是單趟 refine，無多輪收斂、無 gate、無錯誤回復**（`c̃_i = P_refine(c_i, V_i)`，跑完就算）。→ **反而背書我們更穩**：`critic.py` 是 advisory＋人裁決＋有收斂線（`V1–V8 blocking==0`），補上了論文沒有的東西。（paper §4.3）
+2. **Critic 是單趟 refine，無多輪收斂、無 gate、無錯誤回復**（`c̃_i = P_refine(c_i, V_i)`，跑完就算）。→ **反而背書我們更穩**：`critic.py` 是 advisory＋人裁決＋有收斂線（`V1–V9 blocking==0`），補上了論文沒有的東西。（paper §4.3）
 3. **ScopeRefine 的嘗試上限 K1/K2 與 scope 切換門檻論文未公開**，只給 line→block→global 三層概念。→ P2 維持「文件協定＋人判斷」是對的，本就抄不到具體門檻。（paper §4.2）
 4. **量化佐證可引用**：parallel 5.6× 加速（Table 7）、6×6 grid 在 Element Layout 82.8 vs 4×4 的 71.2（Table 11）。對不跑 batch 的我們意義低，僅作「沿用 6×6 當報告層」的事後背書。
 
@@ -415,7 +415,7 @@ M3（選用，計費）  P4 coverage check（learning_goal 覆蓋回測）
 | 項 | 計畫 | 現況 | 佐證 |
 |---|---|---|---|
 | **P0** 重疊偵測 | done | **done** | `sizecheck.py:34`（`OVERLAP_FRAC=0.20`）、`:133`（`_overlap_issues`）；`blocks.py:40`（`layer` 欄＋語義 docstring） |
-| **P1** VLM Critic | done（需同意） | **done，已超出原計畫** | `critic.py`（`--dry-run`/`--confirm` 成本閘＋V1–V8/A1–A7），多了論文沒有的收斂線 |
+| **P1** VLM Critic | done（需同意） | **done，已超出原計畫** | `critic.py`（`--dry-run`/`--confirm` 成本閘＋V1–V9/A1–A7），多了論文沒有的收斂線 |
 | **P2** ScopeRefine 紀律 | done（文件） | **done** | `CONTENT_METHODOLOGY.md` §5 |
 | **P3** AES 五維 | done（文件） | **done，擴成 A1–A7** | `VISUAL-FRAME-RUBRIC.md`（A1–A5 來自 Code2Video＋自加 A6/A7） |
 | **P4** TeachQuiz coverage | 選用／未來 | **pending（刻意延後）** | 內容稿已有 `learning_goal` 欄＝前置備妥 |

@@ -213,7 +213,7 @@ python video\pipeline\lint.py video\storyboards\<deck>.yml
 
 render 後的視覺 QA（視覺 **gate 2**）：抽每場景最滿的一幀，送 vision 模型（MiMo-V2.5）依
 **[VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)** 判定——runtime
-**verbatim-inject 整份 rubric body**，輸出 **V1–V8 blocking findings＋`VERDICT` 行＋A1–A7 0–100
+**verbatim-inject 整份 rubric body**，輸出 **V1–V9 blocking findings＋`VERDICT` 行＋A1–A7 0–100
 magnitude** 與具體缺陷。**純建議**——只寫報告
 `output/ch<NN>/s<X.Y>/critic/critique.{json,md}`，不改 storyboard；採納與否由人判斷。
 

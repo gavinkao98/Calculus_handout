@@ -102,7 +102,7 @@
 2. 調整 3 個 hook（`sector_inequality`／`slope_equals_height`／`shm_stacked_graphs`）；若新增 `chord_le_arc` 則加第 4 個 hook 或併入 sector。
 3. 三閘：`schema.py`／`lint.py`／`sizecheck.py` **0 error**（sizecheck 的「拆 ~N 頁」warn 逐筆判，作為拆場依據）。
 4. 全片 mock render 1080p（`make.py --backend mock --quality high`）。
-5. **視覺幀稽核**（`visual-frame-audit`，SSOT `VISUAL-FRAME-RUBRIC.md`）V1–V8 blocking → 修到 **blocking==0**。
+5. **視覺幀稽核**（`visual-frame-audit`，SSOT `VISUAL-FRAME-RUBRIC.md`）V1–V9 blocking → 修到 **blocking==0**。
 6. HTML 報告（`REVIEW-ch03-s31-detail-redo-applied.html`）＋更新 `REBUILD_STATUS.md`。
 
 ## 6. 護欄（D4，順手加）
