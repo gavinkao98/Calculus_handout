@@ -443,6 +443,9 @@ def render_scaffold(scaffold, ground, meta=None) -> list[Block]:
     flag = scaffold.get("flag")
     if isinstance(flag, str) and flag.strip():
         body = _assumption_text(meta, flag) or flag
-        mob = build_aside({"label": "assumes", "body": body}, ground, max_width=RAIL_W)
+        # PRIMARY_W (not the narrow RAIL_W): the flag sits under the title on the spine,
+        # so the full primary column is free -- a short assumption shouldn't wrap when
+        # there is ample room to its right. accent_panel still shrink-wraps to content.
+        mob = build_aside({"label": "assumes", "body": body}, ground, max_width=PRIMARY_W)
         out.append(Block(f"scaffold.flag.{flag}", mob, anim="fade", static=True, layer="content"))
     return out
