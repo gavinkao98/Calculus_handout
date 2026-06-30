@@ -6,7 +6,9 @@
 > 跨對話進度錨仍是 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)；本檔是「回家接手」用的單張 resume 卡。
 > **全程離線、未動任何計費 API。** 流程：`superpowers:subagent-driven-development`，task-by-task，每 task 過 spec＋品質雙閘 review。
 
-SP1 共 5 個 Plan。目前 **Plan 1 ✅ 完成、Plan 2 邏輯階段 ✅ 完成、Plan 2 渲染階段待做、Plans 3–5＋SP2 未開始**。
+SP1 共 5 個 Plan。目前 **Plan 1 ✅、Plan 2 ✅ 完整完成（邏輯＋渲染＋polish，全分支 opus review = merge-ready）、Plan 3 為下一步、Plans 4–5＋SP2 未開始**。
+
+> **2026-06-30 續做完成 Plan 2 渲染階段＋全分支 review。** 新增 commits（接在 `253fe64` 後）：`c3e0d33`（baseline 修）→ `7e18e09`（T4 helper）→ `a0a29bc`（T5 接線）→ `194a8eb`（polish）→ `a9e5203`（§6 對齊）→ `d05f240`（null-meta fail-closed）。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「scaffold 模型＋模板渲染（SP1 Plan 2）完成」段。
 
 ---
 
@@ -36,15 +38,14 @@ PD 確定性層（教學結構檢查），全部 warn-default。
 
 ---
 
-## 二、還沒做（Plan 2 渲染階段 — 下一步，已 GATED 等你）
+## 二、Plan 2 渲染階段 ✅ 完成（Tasks 4–5＋polish＋全分支 review = merge-ready）
 
-細節在 [`PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md`](PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md) 的 Task 4、Task 5（含 exact code／hook 行號／驗證協定）。
+> 2026-06-30 續做完成。Task 4/5 的 exact code／pattern 仍在 [`PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md`](PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md)（歷史參照）。
 
-- **Task 4 — `render_scaffold()` helper**（改 `pipeline/templates/_common.py`）：把 `scaffold.motive`／`problem`／`flag` 渲成 static Block（motive＝標題下 `role="text" size="prose_sm"` 小行，**不可 muted**；problem＝divider 標題下公式塊；flag＝從 `meta.assumptions` 查 text 的小 badge）。缺 scaffold 一律回 `[]`（no-op）。
-- **Task 5 — 模板接線**（改 `definition_math.py`／`theorem_proof.py`／`derivation.py`／`divider.py`）：各模板在 `scene_head()` 後呼 `render_scaffold`、定位於標題下、append Block。**缺 scaffold → no-op → 既有 deck 渲染不變。**
-- **驗證（為何 GATED）**：渲染無法純 assert 測 → 走 **mock render（離線免費）→ critic.py 抽幀 → visual-frame-audit gate（V1–V9/A1–A7）→ 你 sign-off**（比照 hook 動畫 sign-off 文化）。這是版面微調的活，計畫裡的 per-template code 是 hook 行號＋pattern，實作時要對著 render 調 buff。
-
-- **Plan 2 final whole-branch review**：Tasks 4–5 落地後，跑一次 Plan 2 全分支 opus review（比照 Plan 1）；屆時一併裁決下方「待 final review 的小項」。
+- **Task 4 `render_scaffold()` helper**（commit `7e18e09`，`pipeline/templates/_common.py`）＋ **Task 5 模板接線**（`a0a29bc`，4 模板）：`scaffold.motive`（標題下 `role="text"` 小行，不 muted）／`problem`（divider 公式塊）／`flag`（ASSUMES badge）渲成 static Block，缺 scaffold → `[]` → no-op。spec＋品質雙閘 review 皆過；**no-op 不變式經全分支 review base-vs-HEAD 全幾何 diff 證實 byte-identical**。
+- **視覺 sign-off（比照 hook 動畫文化）：** `scratch_frames.py` mock render 4 模板 1080p 幀 → `visual-frame-audit` gate V1–V9＝0 blocking → 使用者核可「全 polish」→ polish（`brand._wrap_mixed` 推廣尾標點黏合含閉括號 `)]}`，解 ASSUMES badge 孤行 `)`＋divider buff/style，`194a8eb`）→ 回歸 audit 0 blocking、A1 兩幀升。
+- **全分支 opus review = merge-ready**；findings 全處理：§6 兩對齊項（`a9e5203`）＋ review 抓到的 null／非 dict `meta` fail-closed bug（4 處 meta 抽取點對齊＋self-test，`d05f240`）。
+- **下一步＝Plan 3**（見下節三）。
 
 ---
 
@@ -80,11 +81,12 @@ git 只帶走**已 commit**的東西。以下目前**未 commit**，換到家裡
 2. **我幫你貼進 `REBUILD_STATUS.md` 的 Plan 1 ✅ 段（＋下方新增的 Plan 2 段）**：也未 commit——因為同一檔含上述音檔 WIP，**commit 邊界留你**（你決定要不要跟音檔一起提交，或先 stash 音檔讓那段單獨提交）。
 3. **本交接文件**（`video/HANDOFF-pedagogy-firstlearner-sp1.md`）＋ **Plan 2 計畫文件**：**已 commit**（乾淨、獨立），會隨 push 到家。
 
-## 六、待 Plan 2 final review 的小項（已記，非 blocking）
+## 六、Plan 2 final review 小項 — ✅ 全數處理（2026-06-30）
 
-- `provenance_issues`（Plan 1）的 `data.get("scenes")` 對非 dict 輸入未 guard（`pedagogy_issues` 已修）→ final review 時兩個 warn-only 檢查的非 dict guard 一起對齊。
-- `make.py` 的 `[pedagogy]` abort idiom（`if _ped_err and _ped_enforce:`）與 `[provenance]`（`if _p_err:`）對齊（去掉冗餘 `and _ped_enforce`）。
-- 其餘 Plan 1／Plan 2 各 task 的 cosmetic Minor 已逐條記在 `.superpowers/sdd/progress.md`（本機）。
+- ✅ `provenance_issues` 非 dict guard：已對齊 `pedagogy_issues`（commit `a9e5203`，並加 self-test 斷言）。
+- ✅ `make.py` `[pedagogy]` abort idiom：去冗餘 `and _ped_enforce`、對齊 `[provenance]` 的 `if _p_err:`（`a9e5203`）。
+- ✅ 全分支 review 另抓到 **null／非 dict `meta` 會 crash**（違反模組 fail-closed docstring，不變式 4 部分破口）：4 處 meta 抽取點（`pedagogy.py`×2／`schema.py`／`make.py`）統一 null-safe＋self-test（`d05f240`，順帶關 `schema.py` 同根 Plan-1 gap）。
+- 維持 won't-fix（reviewer 判定非 blocking）：PD4 重複 assumption id 靜默接受（opt-in advisory 層、低衝擊）；content 模板「置中 hero」留白（共用 body 擺放＋scratch 內容極簡，硬改破 no-op）。其餘 cosmetic Minor 全集附錄見下方。
 
 ## 七、跨機帶走清單（TL;DR）
 

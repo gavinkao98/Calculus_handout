@@ -14,6 +14,16 @@
 - **第三方素材閘（若未來替換）：** 優先 YouTube Audio Library「不需署名」素材；可用 Pixabay Content License／CC0，但必須保存來源、授權、作者、下載日期。拒用 CC BY-NC／ND、來路不明的 "no copyright" 轉載音樂、無授權證據素材。
 - **仍待：** 使用者試聽後裁決 A/B/C、是否用 caution ping、是否用 divider stinger；之後把勝出 cue 接上 ducking/mux。目前 render 仍未混入這些 cues。
 
+## ✅ 2026-06-30 scaffold 模型＋模板渲染（SP1 Plan 2）完成・全分支 review = merge-ready
+
+承下方 spec：**SP1 Plan 2（scaffold 模型＋模板）全 5 task ＋ 渲染 ＋ polish 完成，通過全分支 opus review = merge-ready**。同 `subagent-driven-development`（每 task spec＋品質雙閘；渲染走 mock render→`visual-frame-audit` gate→使用者 sign-off；末了 opus 全分支 review）。分支 `video/template-redesign-navy-spine`。**全程離線、未動計費 API。**
+
+- **PD 確定性層 [`pipeline/pedagogy.py`](pipeline/pedagogy.py)（純 stdlib）：** `pedagogy_issues`（PD2 theorem_proof/derivation 缺 `scaffold.motive`；PD3 divider 缺 `scaffold.problem`；`pedagogy_profile` 驗證）＋ `assumptions_registry_issues`（PD4 registry 一致性）。warn-default，僅 `meta.pedagogy_enforce` 才 gating（**獨立於** `otf_enforce`）。接進 `schema.py main()` ＋ `make.py` render gate（commits `6d7defa`/`9c755fc`/`e295a58`/`101fd80`）。
+- **渲染層：** `render_scaffold()`（[`templates/_common.py`](pipeline/templates/_common.py)）把 `scaffold.motive`（標題下小 `role="text"` 行，**不可 muted**）／`problem`（divider 公式塊）／`flag`（從 `meta.assumptions` 查文字的 ASSUMES badge）渲成 static Block；接進 4 模板（`definition_math`/`theorem_proof`/`derivation`/`divider`）標題下，**缺 scaffold → no-op**（commits `7e18e09` helper、`a0a29bc` 接線）。**no-op 不變式經全分支 review base-vs-HEAD 全幾何 diff 證實 byte-identical。**
+- **視覺 sign-off（使用者核可「全 polish」）：** mock render 4 模板 1080p 幀（`scratch_frames.py`）→ `visual-frame-audit` gate V1–V9＝0 blocking；polish：`brand._wrap_mixed` 把尾標點黏合集推廣含閉括號 `)]}`（解 ASSUMES badge 孤行 `)`，blast-radius 回歸 lint/sizecheck clean）＋ divider buff/style（commit `194a8eb`，回歸 audit 0 blocking、A1 兩幀皆升）。content 模板「置中 hero」留白＝共用 body 擺放＋scratch 內容極簡，守 no-op 刻意不動。
+- **全分支 review findings 全處理：** §6 兩個對齊項（provenance 非 dict guard／make.py abort idiom，`a9e5203`）＋ review 抓到的 null／非 dict `meta` fail-closed bug（4 處 meta 抽取點對齊＋self-test，`d05f240`，順帶關 `schema.py` 同根 Plan-1 gap）。
+- **接續：** **Plan 3（pedagogy 判斷閘：`PEDAGOGY-FIRSTLEARNER-RUBRIC.md` ＋ `pedagogy-firstlearner-audit` gate-1 agent ＋ OF1 source-adequacy ＋ `CONTENT_APPROVED` 生命週期）為下一步**，待細化成 task-by-task 施工計畫。Plans 4–5＋SP2 回填依 spec §12／plan 末清單。接手卡 [`HANDOFF-pedagogy-firstlearner-sp1.md`](HANDOFF-pedagogy-firstlearner-sp1.md) 已同步更新。
+
 ## ✅ 2026-06-30 OTF provenance 基礎（SP1 Plan 1）實作完成
 
 承下方「初學者教學＋OTF 框架」spec：**SP1 Plan 1（OTF provenance 基礎）已實作完成並通過全分支 review**。用 `subagent-driven-development` task-by-task（每 task spec＋品質雙閘 review，末了 opus 全分支 review = merge: yes）。分支 `video/template-redesign-navy-spine`，9 個 commit `cd7a01b..b3bf68c`。**全程離線、未動計費 API。**
@@ -23,7 +33,7 @@
 - **測試：** stdlib `assert` self-test [`pipeline/_selftest_provenance.py`](pipeline/_selftest_provenance.py)（專案首個測試檔，**須用 venv python 跑**；bare python 缺 vendored PyYAML 會誤判）＋ fixture [`storyboards/_fixtures/otf_provenance.yml`](storyboards/_fixtures/otf_provenance.yml) ＋ 最小 backing [`content_scripts/_fixture_otf.md`](content_scripts/_fixture_otf.md)（讓 fixture `md:` ref 可解析；無工具會 glob content_scripts，安全）。
 - **文法定案（使用者過目裁決）：** `ref:`/`refs:` 為**新欄位**、與既有 freeform `source:` 分離（`source:` 維持人話、永不 parse）；`subtitle` 豁免（brand），divider 教學文字走 `problem`/`scaffold.problem`。
 - **durable 教訓（記這免重蹈）：** ① 確定性 provenance 檢查**必須接進 `make.py` render gate**，不能只放 `schema.py main()`——`make.py` 呼叫純函式 `schema_storyboard()`、不呼叫 `schema.main()`（全分支 review 抓到的 Critical）。② `repo_root` 深度：`schema.py` 在 `video/pipeline/` 用 `.parent.parent.parent`；`make.py` 在 `video/` 用 `.parent.parent`。③ self-test 須用 venv python（vendored PyYAML）。
-- **接續：** Plan 2（scaffold model＋模板）**邏輯階段 ✅ 完成**（`pipeline/pedagogy.py` PD2/PD3/PD4＋`pedagogy_profile`，warn-only 接進 `schema.py`/`make.py`，僅 `meta.pedagogy_enforce` gating，零行為改變；commits `b3bf68c..101fd80`，計畫 [`PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md`](PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md)）；**渲染階段（`render_scaffold`＋模板接線）GATED 待做**。**完整回家接手卡見 [`HANDOFF-pedagogy-firstlearner-sp1.md`](HANDOFF-pedagogy-firstlearner-sp1.md)。** Plans 3–5 與 SP2 回填依 spec §11／plan 文件末清單續推。
+- **接續：** Plan 2（scaffold model＋模板）**邏輯階段 ✅ 完成**（`pipeline/pedagogy.py` PD2/PD3/PD4＋`pedagogy_profile`，warn-only 接進 `schema.py`/`make.py`，僅 `meta.pedagogy_enforce` gating，零行為改變；commits `b3bf68c..101fd80`，計畫 [`PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md`](PLAN-pedagogy-firstlearner-sp1-plan2-scaffold.md)）；**渲染階段 ✅ 完成、全分支 review = merge-ready 見上節**。**完整回家接手卡見 [`HANDOFF-pedagogy-firstlearner-sp1.md`](HANDOFF-pedagogy-firstlearner-sp1.md)。** Plans 3–5 與 SP2 回填依 spec §11／plan 文件末清單續推。
 
 ## 🧱 2026-06-30 初學者教學＋上畫面文字忠實（OTF）框架：spec SHIP＋SP1 5-plan 拆解（**Plan 1 ✅ 完成見上節；Plans 2–5 待續**）
 
