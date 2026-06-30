@@ -96,6 +96,15 @@ def test_clamp_zero_width_safe():
     assert B._clamp_scale(0.0, 5.0, 40.0, 26.0) == 1.0
 
 
+def test_clamp_cur_size_nonpositive_uses_fit():
+    # cur_size<=0 -> floor_scale falls back to fit -> just the fit factor
+    assert abs(B._clamp_scale(10.0, 5.0, 0.0, 26.0) - 0.5) < 1e-9
+
+
+def test_clamp_none_max_w_safe():
+    assert B._clamp_scale(5.0, None, 40.0, 26.0) == 1.0
+
+
 if __name__ == "__main__":
     test_effective_px_recovers_authored_size()
     test_floor_findings_flags_below()
@@ -108,4 +117,6 @@ if __name__ == "__main__":
     test_clamp_stops_at_floor()
     test_clamp_never_enlarges()
     test_clamp_zero_width_safe()
+    test_clamp_cur_size_nonpositive_uses_fit()
+    test_clamp_none_max_w_safe()
     print("OK sizecheck self-test")

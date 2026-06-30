@@ -177,6 +177,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     heights: list[float] = []
     for r, eq, reason in zip(rows, eqs, reasons):
         if reason is not None and reason.width > reason_max_w > 0:
+            # NOTE (SP2): a `result`-kind reason renders as an eyebrow (26px == MIN_FONT_FLOOR), but
+            # we pass prose_sm (35) here for all reasons. Inert today (reason_max_w is too wide for a
+            # 26px mono eyebrow to overflow); if a long result reason ever clamps, dispatch px by kind.
             brand._clamp_shrink(reason, reason_max_w, T._SCALE_PX['prose_sm'])
         heights.append(max(eq.height, reason.height if reason is not None else 0.0))
 

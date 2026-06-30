@@ -160,6 +160,7 @@ def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",
     mob = Tex(r"\textbf{" + _tex_text(text) + "}", font_size=_text_fs(size),
               color=T.color(ground, role))
     if max_width is not None and mob.width > max_width:
+        # T.fs(size)/T.PX_TO_FS recovers the authored px (handles named OR numeric size).
         _clamp_shrink(mob, max_width, T.fs(size) / T.PX_TO_FS)
     return mob
 
