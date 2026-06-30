@@ -21,6 +21,7 @@
 - **V2 標籤／元素相撞蓋字。** label 壓在曲線／點／空心點／導引線／marker／另一 label 上而**蓋住資訊**。蓋住 → **Blocking**；不蓋字的輕微偏移 → advisory。
 - **V3 視窗可讀性。** x/y range 過大或過小，使定性行為（漸近線、截距、彎曲、方向、交點）不可辨、曲線貼框／爆框。→ **Blocking**（等同畫錯）。
 - **V4 數學渲染完整／可讀。** 螢幕上每個 Tex 完整渲染——**無亂碼、無生 `$`／反斜線漏出、無缺字／溢字**（manim Tex 特有失效）；承載教學值的字大到讀得到。亂碼／缺字／小到讀不到值 → **Blocking**。
+  - **最小字級 floor（`MIN_FONT_FLOOR` = 26px）：** 某個 `_brand_prose` 文字節點的**真實上螢幕尺寸低於 `MIN_FONT_FLOOR`**（26px，即 `theme.py`／`sizecheck.py` 裡的確定性 floor）即「小到讀不到」；若因此使一個**承載值**不可讀 → **Blocking**（與本條既有「小到讀不到值 → Blocking」一致）；僅小但仍可辨 → 不升 Blocking、改扣 **A6**。`sizecheck.py` 的 floor check（warn-default）是 render 前就把此問題浮現的工程對應物。
 - **V5 端點／記號語義。** 實心／空心端點對該值正確（閉/開）、✓／✗ 正確、箭頭／漸近線虛線正確。畫反 → **Blocking**（教錯）。
 - **V6 幀 ↔ 旁白 beat 一致。** 螢幕所示與**這個 beat 正在講的**相符（交點數、哪個函數、宣稱的特徵、象限）。矛盾 → **Blocking**。
 - **V7 reveal 同步（影片特有）。** 每個元素**跟著它的 narration beat 出現**——不早（劇透學生要算的答案）、不晚（旁白提到還沒出現的東西）。破壞教學 → **Blocking**；輕微時序 → advisory。
@@ -37,8 +38,8 @@
 - **A3 Logic Flow。** 螢幕所示是否服務這個 narration beat 的重點。
 - **A4 Visual Consistency。** accent 色、字級、間距一致。
 - **A5 Accuracy & Depth。** 視覺是否傳達到該點；任何可見的標註品質問題。
-- **A6 Typography & wrapping（新）。** wrap 斷在合理處；**多行對齊一致——句子級教學散文左對齊、不要置中孤行**（短 callout／title card 才置中）；無 orphan／widow；math 與相鄰文字 baseline 對齊；行距舒服。
-- **A7 Visual hierarchy／focus（新）。** 眼睛被帶到**這個 beat 正在講的東西**（用 accent／大小／位置凸顯）；已講完的 scaffold 退到背景；不是所有元素一樣搶眼。
+- **A6 Typography & wrapping（新）。** wrap 斷在合理處；**多行對齊一致——句子級教學散文左對齊、不要置中孤行**（短 callout／title card 才置中）；無 orphan／widow；math 與相鄰文字 baseline 對齊；行距舒服。**手機寬尺標：** 次級文字（理由欄／註解／caption）在幀**縮到手機寬**（~360–414px 視窗，即 1920px 幀 ~0.2×）仍要讀得到；在該尺度讀不到 → 扣 A6（依程度）。此為 agent 在 render 幀上**以肉眼施作的判斷**標尺，補足確定性的桌面 floor。
+- **A7 Visual hierarchy／focus（新）。** 眼睛被帶到**這個 beat 正在講的東西**（用 accent／大小／位置凸顯）；已講完的 scaffold 退到背景；不是所有元素一樣搶眼。**圖佔幀比例（figure-prominence）：** 對**核心是幾何直覺**的場（hook／graph-centric，「看這個形狀／圖」就是該 beat 本身），**圖應視覺主導**；agent 對**圖佔內容區比例做近似量測**（落實 §8「由量測圖佔幀比例判定」），當 beat 根本在講那張圖、圖卻**明顯不到約一半** → 扣 A7（advisory magnitude，依擠迫程度）。此為 agent 在幀上**目測估計**（無新 code）、**永不**升 V-blocking、且**永不**在 text-centric 場（定義／推導，圖僅輔助）觸發。
 
 ## 不算 finding（house style／影片特性；別誤報）
 

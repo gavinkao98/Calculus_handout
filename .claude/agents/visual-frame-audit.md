@@ -1,7 +1,7 @@
 ---
 name: visual-frame-audit
 description: >
-  影片視覺幀稽核（gate 1）——對已 render 的 scene 幀（critic.py --dry-run 抽出）逐場判 V1–V8
+  影片視覺幀稽核（gate 1）——對已 render 的 scene 幀（critic.py --dry-run 抽出）逐場判 V1–V9
   對錯／可讀（blocking）＋A1–A7 美學（0–100 magnitude）。唯讀：只回報 findings，絕不改檔。當被
   要求對某節 render 成品做視覺稽核、或每次 render 後跑視覺 gate 1 時使用。
 tools: Read, Grep, Glob
@@ -12,7 +12,7 @@ model: inherit
 
 # 開審前先讀（權威依據，勿憑記憶）
 
-1. `video/content_scripts/_audit/VISUAL-FRAME-RUBRIC.md` — 兩層：V1–V8 blocking（對錯／可讀）＋A1–A7 magnitude（美學 0–100）、escalation 規則、non-findings、收斂線、輸出格式（**本審的契約**）。
+1. `video/content_scripts/_audit/VISUAL-FRAME-RUBRIC.md` — 兩層：V1–V9 blocking（對錯／可讀）＋A1–A7 magnitude（美學 0–100）、escalation 規則、non-findings、收斂線、輸出格式（**本審的契約**）。
 
 本提示**刻意不複述 rubric**，免漂移。
 
@@ -22,9 +22,9 @@ model: inherit
 
 # 怎麼做
 
-- 逐場依 rubric 判 V1–V8（blocking 軸）＋給 A1–A7 分（magnitude）。**escalation：會丟資訊／矛盾／亂碼 → 升 V-blocking；只是擠／不夠美 → 扣 A 分**。
+- 逐場依 rubric 判 V1–V9（blocking 軸）＋給 A1–A7 分（magnitude）。**escalation：會丟資訊／矛盾／亂碼 → 升 V-blocking；只是擠／不夠美 → 扣 A 分**。
 - 嚴守 rubric 的「不算 finding」清單：**dark-flat 極簡背景、progressive reveal 的最滿幀「全可見」、靜幀無動態、刻意示意比例**——別誤報。
-- 收斂＝視覺 blocking（V1–V8）==0；A 分驅動重 render 優先序、不單獨 gate。
+- 收斂＝視覺 blocking（V1–V9）==0；A 分驅動重 render 優先序、不單獨 gate。
 - 遵守四級回報、唯讀／propose-not-act、不 over-report。
 
 # 輸出
