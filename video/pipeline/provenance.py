@@ -62,8 +62,11 @@ class Loci:
         md = repo_root / "video" / "content_scripts" / f"{deck_id}.md"
         unit_ids: set[str] = set()
         if md.exists():
-            parsed = review_pack.parse_content_script(md)
-            unit_ids = {u["id"] for u in parsed.get("units", []) if u.get("id")}
+            try:
+                parsed = review_pack.parse_content_script(md)
+                unit_ids = {u["id"] for u in parsed.get("units", []) if u.get("id")}
+            except Exception:
+                pass  # present-but-unreadable/malformed .md -> empty set -> fail-closed (never crash)
         anchors = cls._handout_anchors(meta, repo_root)
         return cls(md_unit_ids=unit_ids, handout_anchors=anchors)
 
