@@ -79,7 +79,7 @@ OF findings **只有當 cited content-script 的 deck 級 `CONTENT_APPROVED=yes`
 
 ## 收斂線（§9.3）
 
-- **收斂判準**：本閘收斂 ＝ **PD blocking == 0 AND OF blocking == 0**，是 **per-deck opt-in 後**的收斂目標，**NOT 落地門檻**（落地當下一切 warn/dry-run，見上「兩軸澄清」）。
+- **收斂判準**：本閘收斂 ＝ **PD blocking == 0 AND OF blocking == 0**（此處 PD/OF blocking 指 **gate-1 自有層**＝PD1＋OF1，計數約定見 §回報規格；確定性層 PD2/3/4＋OF2 另由 `schema.py` 以 `pedagogy_enforce`／`otf_enforce` 收斂），是 **per-deck opt-in 後**的收斂目標，**NOT 落地門檻**（落地當下一切 warn/dry-run，見上「兩軸澄清」）。
 - advisory 由使用者**逐條裁決**，**不強制歸零**（同 [`NARRATION-FAITHFULNESS-RUBRIC.md`](NARRATION-FAITHFULNESS-RUBRIC.md):40、[`../../../handout/_audit/PROSE-AUDIT-RUBRIC.md`](../../../handout/_audit/PROSE-AUDIT-RUBRIC.md):40）。
 
 ## 不算 finding（別誤報）
@@ -93,8 +93,10 @@ OF findings **只有當 cited content-script 的 deck 級 `CONTENT_APPROVED=yes`
 ## 回報規格（最終訊息；不寫任何檔案）
 
 - 首行：`VERDICT: <P> PD blocking, <O> OF blocking, <A> advisory`（PD 與 OF **分開計**）。
+- **VERDICT 整數的計數約定（calibration 已鎖，2026-06-30）：** `PD blocking`／`OF blocking` 整數**只計 gate-1 自有 blocking——PD1 與 OF1**。surfaced 的確定性結構 blocking（PD2/PD3/PD4 結構存在性＋OF2）由確定性層（`schema.py` → `../../pipeline/pedagogy.py`／`../../pipeline/provenance.py`）擁有並各自 gating（`pedagogy_enforce`／`otf_enforce`），**不計入本 VERDICT 整數**——免與確定性閘重複計數；它們仍逐條列出（見下）但不進首行整數。`advisory` 整數只計 gate-1 自身的 advisory（如 PD2／PD3 advisory）。
 - 逐條（一行一筆）：
   `- [Blocking|Advisory] [PD#|OF#] <unit-id> · <beat/field> — issue（cite 源／文字）→ minimal fix`
+  surfaced 的確定性 finding 改用 **`[Surface PD#-det|OF2-det]`** 前綴、帶教學脈絡列出（**不**進 VERDICT 整數）。
 - 每個**乾淨**維度各一行（如 `PD3 clean`）。
 - 末行：對「**PD blocking 與 OF blocking 是否各自歸零**」給明確結論（post-opt-in framing）。
 - 護欄重申：稽核員**唯讀**，propose-not-act，只回報、不改任何檔，findings 交回使用者裁決。
