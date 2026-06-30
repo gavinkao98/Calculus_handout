@@ -66,7 +66,8 @@ def pedagogy_issues(data: dict, enforce: bool) -> "list[tuple[str, str]]":
     if prof not in _PROFILES:
         issues.append(("warn", f"meta.pedagogy_profile {prof!r} unknown "
                                f"(known: {sorted(_PROFILES)}); treated as first_time"))
-    for scene in (data.get("scenes") or []):
+    scenes = data.get("scenes") if isinstance(data, dict) else []
+    for scene in (scenes or []):
         if not isinstance(scene, dict):
             continue
         sid = scene.get("id", "?")

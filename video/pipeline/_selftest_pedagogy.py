@@ -60,10 +60,16 @@ def test_pedagogy_profile_unknown_is_warn():
     assert any(s == "warn" and "pedagogy_profile" in m for s, m in out)
 
 
+def test_pedagogy_issues_non_dict_data():
+    assert P.pedagogy_issues(None, enforce=False) == []
+    assert P.pedagogy_issues([], enforce=False) == []
+
+
 if __name__ == "__main__":
     test_registry_ok()
     test_registry_absent_is_noop()
     test_registry_findings()
     test_pedagogy_issues()
     test_pedagogy_profile_unknown_is_warn()
+    test_pedagogy_issues_non_dict_data()
     print("OK pedagogy self-test")
