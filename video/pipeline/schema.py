@@ -169,7 +169,8 @@ def main(argv: "list[str] | None" = None) -> int:
     from pathlib import Path as _Path
     from pipeline import provenance as _prov
     repo_root = _Path(__file__).resolve().parent.parent.parent
-    meta = data.get("meta", {}) if isinstance(data, dict) else {}
+    meta = data.get("meta") if isinstance(data, dict) else None
+    meta = meta if isinstance(meta, dict) else {}
     enforce = bool(meta.get("otf_enforce"))
     loci = _prov.Loci.from_deck(meta, repo_root)
     prov = _prov.provenance_issues(data, loci, enforce=enforce)

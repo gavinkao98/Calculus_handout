@@ -561,7 +561,8 @@ def main() -> int:
     # deterministic provenance check runs at the schema/lint stage that gates render.
     from pipeline import provenance as _prov
     _repo_root = Path(__file__).resolve().parent.parent   # video/make.py -> repo root
-    _meta = data.get("meta", {}) if isinstance(data, dict) else {}
+    _meta = data.get("meta") if isinstance(data, dict) else None
+    _meta = _meta if isinstance(_meta, dict) else {}
     _enforce = bool(_meta.get("otf_enforce"))
     _loci = _prov.Loci.from_deck(_meta, _repo_root)
     _prov_issues = _prov.provenance_issues(data, _loci, enforce=_enforce)

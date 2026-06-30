@@ -63,6 +63,12 @@ def test_pedagogy_profile_unknown_is_warn():
 def test_pedagogy_issues_non_dict_data():
     assert P.pedagogy_issues(None, enforce=False) == []
     assert P.pedagogy_issues([], enforce=False) == []
+    # fail-closed on a present-but-null / non-dict `meta` (Plan 2 final-review finding):
+    # data.get("meta", {}) returns None when the key exists with a null value.
+    assert P.pedagogy_issues({"meta": None}, enforce=True) == []
+    assert P.pedagogy_issues({"meta": "x", "scenes": []}, enforce=False) == []
+    assert P.assumptions_registry_issues({"meta": None}, enforce=False) == []
+    assert P.assumptions_registry_issues({"meta": "x"}, enforce=True) == []
 
 
 def test_schema_integration():

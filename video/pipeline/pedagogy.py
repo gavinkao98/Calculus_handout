@@ -12,7 +12,8 @@ def assumptions_registry_issues(data: dict, enforce: bool) -> "list[tuple[str, s
     Each assumption needs id/text/first_use_unit/source; first_use_unit must be a real
     scene id; that scene must carry scaffold.flag == id; no orphan flags."""
     sev = "error" if enforce else "warn"
-    meta = data.get("meta", {}) if isinstance(data, dict) else {}
+    meta = data.get("meta") if isinstance(data, dict) else None
+    meta = meta if isinstance(meta, dict) else {}
     assumptions = meta.get("assumptions")
     if not isinstance(assumptions, list):
         return []
@@ -61,7 +62,8 @@ def pedagogy_issues(data: dict, enforce: bool) -> "list[tuple[str, str]]":
     severity = 'error' if enforce else 'warn' (profile note is always 'warn')."""
     sev = "error" if enforce else "warn"
     issues: list[tuple[str, str]] = []
-    meta = data.get("meta", {}) if isinstance(data, dict) else {}
+    meta = data.get("meta") if isinstance(data, dict) else None
+    meta = meta if isinstance(meta, dict) else {}
     prof = meta.get("pedagogy_profile", "first_time")
     if prof not in _PROFILES:
         issues.append(("warn", f"meta.pedagogy_profile {prof!r} unknown "
