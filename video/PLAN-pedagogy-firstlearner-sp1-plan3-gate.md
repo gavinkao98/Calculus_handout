@@ -35,7 +35,7 @@
 
 - **Create** `content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md` — the SSOT: scope/boundaries, PD1–PD4 + OF1–OF2 dimensions (blocking/advisory), §10 boundary table, hard discipline (cite-or-advisory, no rewrite loop, separate PD/OF counts), OF lifecycle + source-adequacy, convergence line, output format. One responsibility: the pedagogy/OTF audit contract.
 - **Create** `.claude/agents/pedagogy-firstlearner-audit.md` — the gate-1 agent (frontmatter `name`/`description`/`tools: Read, Grep, Glob`/`model: inherit`; body points to the rubric, lists inputs, defers the output format to the rubric — does NOT duplicate the rubric).
-- **Create** `storyboards/_fixtures/pedagogy_audit.yml` + `content_scripts/_fixture_pedagogy.md` — the calibration fixture: a storyboard with planted PD/OF + clean + boundary scenes, and backing `.md` units (cited sources) with `CONTENT_APPROVED` set (some approved → OF gating, some DRAFT → OF dry-run).
+- **Create** the calibration fixtures — **two decks, one `.md` per deck via `meta.id`** (D-P3-6): `storyboards/_fixtures/pedagogy_audit.yml` (+ backing `content_scripts/_fixture_pedagogy.md`, `CONTENT_APPROVED: yes`) carrying the deterministic + agent-judgment + clean + boundary cases; and `storyboards/_fixtures/pedagogy_audit_draft.yml` (+ backing `content_scripts/_fixture_pedagogy_draft.md`, `CONTENT_APPROVED: no`) for the OF dry-run lifecycle case.
 - **Create** `content_scripts/_audit/CALIBRATION-pedagogy-firstlearner.md` — the expected-findings table (what the gate MUST catch / MUST NOT raise / lifecycle expectation) + the recorded calibration result.
 
 ---
@@ -160,7 +160,7 @@ git commit -m "feat(pedagogy): pedagogy-firstlearner-audit gate-1 subagent defin
 - [ ] **Step 1: Create the two backing `.md` cited sources (deck-level `CONTENT_APPROVED`)**
 
 `Loci.from_deck` resolves a deck's refs only against `content_scripts/<meta.id>.md`, so the lifecycle needs two decks (D-P3-6). Create, with real prose so OF1 has actual source text:
-- `video/content_scripts/_fixture_pedagogy.md` — `meta.id: _fixture_pedagogy`, `CONTENT_APPROVED: yes`. Units e.g. `unit_squeeze` (states `cos θ ≤ sinθ/θ ≤ 1`, the faithful OF1 source) and `unit_narrow` (a *narrow* source that does NOT state a broader claim — for the OF1 exceeds-source / source-adequacy plants).
+- `video/content_scripts/_fixture_pedagogy.md` — `meta.id: _fixture_pedagogy`, `CONTENT_APPROVED: yes`. Units e.g. `unit_squeeze` (states `cos θ ≤ sinθ/θ ≤ 1`, the faithful OF1 source); `unit_narrow` (a *narrow* source that does NOT state a broader claim — for the OF1 **exceeds-source** plant: the on-screen text asserts more than this source); and `unit_broad` (a *broad / cross-unit synthesis* source — for the OF1 **source-adequacy** plant: it loosely "covers" a specific sub-claim it never specifically states, so a field-level `refs:` override to a tighter locus is required — D-P3-4 / §12b).
 - `video/content_scripts/_fixture_pedagogy_draft.md` — `meta.id: _fixture_pedagogy_draft`, `CONTENT_APPROVED: no`. One unit cited by the draft storyboard (OF dry-run).
 
 - [ ] **Step 2: Create the main fixture storyboard `pedagogy_audit.yml` (approved)**
