@@ -52,6 +52,16 @@ def test_scene_text_refs():
     scene3 = {"kind": "content", "ref": "md:s", "annotations": ["a", "b"]}
     paths = {p for p, _ in P.scene_text_refs(scene3)}
     assert paths == {"annotations.0", "annotations.1"}
+    # points[] expands per index (Fix 3: cover points[] path coverage)
+    scene4 = {"kind": "content", "ref": "md:s", "points": ["p0", "p1"]}
+    got4 = dict(P.scene_text_refs(scene4))
+    assert "points.0" in got4 and "points.1" in got4
+    # list-index ref VALUE is inherited scene ref (not empty)
+    assert got4["points.0"] == "md:s"
+    assert got4["points.1"] == "md:s"
+    # inherited ref value also correct for annotations.0
+    got3 = dict(P.scene_text_refs(scene3))
+    assert got3["annotations.0"] == "md:s"
 
 
 def test_provenance_issues():
@@ -62,15 +72,19 @@ def test_provenance_issues():
         {"id": "bad", "kind": "content", "statement": "x",
          "refs": {"statement": "md:nope"}},
         {"id": "intro", "kind": "intro", "statement": "x"},
+        # Fix 2: divider kind must NOT be exempt -- teaching text must have provenance
+        {"id": "bad_div", "kind": "divider", "problem": "x",
+         "refs": {"problem": "md:not_exist"}},
     ]}
     warns = P.provenance_issues(data, loci, enforce=False)
     msgs = " | ".join(m for _, m in warns)
     assert all(s == "warn" for s, _ in warns)
     assert "miss" in msgs and "bad" in msgs
+    assert "bad_div" in msgs                           # divider is NOT exempt
     assert "ok" not in msgs and "intro" not in msgs    # resolvable + exempt skipped
     errs = P.provenance_issues(data, loci, enforce=True)
     assert all(s == "error" for s, _ in errs)
-    assert len(errs) == len(warns) == 2
+    assert len(errs) == len(warns) == 3
 
 
 def test_schema_integration():
@@ -84,7 +98,17 @@ def test_schema_integration():
     assert "[provenance]" in out.stdout
     assert "bad_missing.statement" in out.stdout
     assert "bad_unresolvable.statement" in out.stdout
+    assert "bad_divider.problem" in out.stdout         # Fix 2: divider kind produces finding
     assert "ok_inherited" not in out.stdout and "intro" not in out.stdout
+
+
+# NOTE: make.py provenance wiring is verified manually (see verification step 2/3 in
+# SP1 Plan 1 task-6-fixes-report.md). A permanent automated test is omitted because
+# running the fixture through make.py exits at the sizecheck gate (the minimal fixture
+# lacks complete scene templates), making the subprocess nondeterministic. The logic
+# guard is test_schema_integration (schema.py standalone), which mirrors the proven
+# make.py block verbatim. The make.py block is a direct copy -- if one regresses the
+# other will catch it.
 
 
 if __name__ == "__main__":
