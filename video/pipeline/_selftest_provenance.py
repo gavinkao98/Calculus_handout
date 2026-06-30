@@ -22,7 +22,20 @@ def test_constants():
     assert P.OTF_KINDS == frozenset({"content", "divider"})
 
 
+def test_loci(tmp_md, tmp_handout):
+    loci = P.Loci(md_unit_ids={"why_trig", "sector"},
+                  handout_anchors={"frag-sec-3-1", "sector-inequality"})
+    assert loci.resolves("md:why_trig") is True
+    assert loci.resolves("md:absent") is False
+    assert loci.resolves("doc:frag-sec-3-1") is True
+    assert loci.resolves("doc:data-fig-absent") is False
+    assert loci.resolves("garbage") is False
+    empty = P.Loci(md_unit_ids=set(), handout_anchors=set())
+    assert empty.resolves("md:anything") is False   # fail closed
+
+
 if __name__ == "__main__":
     test_parse_ref()
     test_constants()
+    test_loci(None, None)
     print("OK provenance self-test")
