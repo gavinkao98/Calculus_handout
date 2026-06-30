@@ -65,6 +65,20 @@ def test_pedagogy_issues_non_dict_data():
     assert P.pedagogy_issues([], enforce=False) == []
 
 
+def test_schema_integration():
+    import subprocess
+    py = sys.executable
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    out = subprocess.run(
+        [py, "video/pipeline/schema.py", "video/storyboards/_fixtures/scaffold.yml"],
+        capture_output=True, text=True, cwd=repo_root)
+    assert out.returncode == 0                       # warn-default never aborts
+    assert "[pedagogy]" in out.stdout
+    assert "thm_no_motive" in out.stdout             # PD2
+    assert "div_no_problem" in out.stdout            # PD3
+    assert "uses_radians" not in out.stdout          # satisfied -> no finding
+
+
 if __name__ == "__main__":
     test_registry_ok()
     test_registry_absent_is_noop()
@@ -72,4 +86,5 @@ if __name__ == "__main__":
     test_pedagogy_issues()
     test_pedagogy_profile_unknown_is_warn()
     test_pedagogy_issues_non_dict_data()
+    test_schema_integration()
     print("OK pedagogy self-test")

@@ -575,6 +575,20 @@ def main() -> int:
             print(f"[provenance] {_p_err} error(s) -- aborting (fix refs or unset meta.otf_enforce):", flush=True)
             return 2
 
+    # Pedagogy structural checks (warn-default; gates only when meta.pedagogy_enforce is True)
+    from pipeline import pedagogy as _ped
+    _ped_enforce = bool(_meta.get("pedagogy_enforce"))
+    _ped_issues = _ped.pedagogy_issues(data, enforce=_ped_enforce)
+    if _ped_issues:
+        _ped_err = sum(1 for s, _ in _ped_issues if s == "error")
+        print(f"[pedagogy] {len(_ped_issues)} finding(s)"
+              f"{' (ENFORCED)' if _ped_enforce else ' (warn-only; set meta.pedagogy_enforce to gate)'}", flush=True)
+        for _sev, _msg in _ped_issues:
+            print(f"  {'ERROR' if _sev == 'error' else 'WARN '}  {_msg}", flush=True)
+        if _ped_err and _ped_enforce:
+            print(f"[pedagogy] {_ped_err} error(s) -- aborting (fix scaffold/registry or unset meta.pedagogy_enforce):", flush=True)
+            return 2
+
     # lint before doing any work -- catches render-garble ($f$ / \\ printed
     # literally, unbalanced $) statically, so it never reaches the video.
     if not args.skip_lint:

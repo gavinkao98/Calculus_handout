@@ -182,6 +182,19 @@ def main(argv: "list[str] | None" = None) -> int:
         if p_err:
             errors = errors + [m for s, m in prov if s == "error"]
 
+    # Pedagogy structural checks (warn-default; gates only when meta.pedagogy_enforce is True)
+    from pipeline import pedagogy as _ped
+    ped_enforce = bool(meta.get("pedagogy_enforce"))
+    ped = _ped.pedagogy_issues(data, enforce=ped_enforce)
+    if ped:
+        ped_err = sum(1 for s, _ in ped if s == "error")
+        print(f"[pedagogy] {args.storyboard.name}: {len(ped)} finding(s)"
+              f"{' (ENFORCED)' if ped_enforce else ' (warn-only; set meta.pedagogy_enforce to gate)'}")
+        for sev, msg in ped:
+            print(f"  {'ERROR' if sev == 'error' else 'WARN '}  {msg}")
+        if ped_err:
+            errors = errors + [m for s, m in ped if s == "error"]
+
     if args.list and not errors:
         print(f"[schema] {args.storyboard.name}: reveal targets per content scene")
         for sid, targets in enumerate_reveals(data):
