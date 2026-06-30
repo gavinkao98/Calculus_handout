@@ -6,8 +6,10 @@
 > 跨對話進度錨仍是 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)；本檔是「回家接手」用的單張 resume 卡。
 > **全程離線、未動任何計費 API。** 流程：`superpowers:subagent-driven-development`，task-by-task，每 task 過 spec＋品質雙閘 review。
 
-SP1 共 5 個 Plan。目前 **Plan 1 ✅、Plan 2 ✅、Plan 3 ✅、Plan 4 ✅ 完整完成（floor 常數＋px 還原＋warn-default check＋clamp＋rubric V4/A6/A7＋邊界校準＋opus 全分支＋Codex 覆核 = merge-ready）、Plan 5＋SP2 未開始**。
+SP1 共 5 個 Plan。目前 **Plan 1 ✅、Plan 2 ✅、Plan 3 ✅、Plan 4 ✅、Plan 5 ✅ 全數完成 → SP1（Plans 1–5）完成**；只剩 **SP2 回填**未開始（spec §11）。
 
+> **2026-07-01 完成 Plan 5（methodology／文件接線）全 5 task → SP1（Plans 1–5）全完成。** 把 as-built Plans 1–4 寫進 4 份權威文件（`CONTENT_METHODOLOGY` P1–P4＋OTF／`DESIGN` scaffold 承載＋P5/P6／`CONTENT-SIXLENS` L1 §5.5 例外／`REVIEW_GATES` 閘序）＋ V1–V8→V1–V9 清理；commits `78e7b0f..9b145ee`，純文件、零行為改變。每 task spec＋品質雙閘、opus 跨檔一致性 review、**Codex(gpt-5.5/xhigh) 2 輪**（R1 揭 1 blocking＝`REVIEW_GATES` schema kind set 漏 `divider`＋3 deferrable→全修；R2 = **READY TO FINALIZE SP1**）。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「methodology／文件接線（SP1 Plan 5）完成」段。**下一步＝SP2 回填。**
+>
 > **2026-07-01 完成 Plan 4（視覺擴充）全 5 task。** min-size floor（`MIN_FONT_FLOOR=26px`）＋`_effective_font_px` 逐 node-type 還原＋warn-default sizecheck check＋5 site render-time clamp（commit 前驗 **74/74 幀 byte-identical no-op**）＋rubric V4/A6/A7＋`_FLOOR_EPS` 邊界校準；commits `dcdc74a..4a66b6d`（9 個，BASE `53803b0`）。opus 全分支 review = Ready for sign-off、Codex（gpt-5.5/xhigh）獨立覆核 = **no blocking**（2 條 deferrable comment-accuracy 已修 `4a66b6d`）、使用者 sign-off 通過。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「視覺擴充（SP1 Plan 4）完成」段。**下一步＝Plan 5（methodology/文件接線）。**
 >
 > **2026-06-30 續做完成 Plan 3（pedagogy 判斷閘）全 5 task。** commits `4c7aaaa`(rubric)→`665844f`(agent)→`6e1ab93`(fixtures)→`049a71e`(校準＋鎖約定 B)→`9552c78`(opus review 2 minor)→`ac16d5d`(Codex review 回應)→`c0b254d`(Codex follow-up：OF2 巢狀 reason 覆蓋)。校準：deck A `1 PD/2 OF/2 adv`、deck B `0/0/2`（lifecycle）；opus 全分支＝merge-ready；Codex（gpt-5.5/xhigh）獨立覆核揭 OF2 巢狀-reason gap、已 TDD 修畢。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「pedagogy 判斷閘（SP1 Plan 3）完成」段。
@@ -59,14 +61,14 @@ PD 確定性層（教學結構檢查），全部 warn-default。
 
 - **Plan 3 — pedagogy gate（判斷層）**：`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`（PD1–PD4 ＋ OF1–OF2）＋ `pedagogy-firstlearner-audit` gate-1 subagent（讀 storyboard＋.md＋handout）；OF1 source-adequacy 判斷；`CONTENT_APPROVED` 生命週期 gating；PD/OF 分開計數。（gate-1 agent 直接讀 `meta.pedagogy_profile`。）**→ ✅ 完成（2026-06-30，commits `4c7aaaa..c0b254d`）：5 task（rubric→agent→fixture→校準→sign-off）全做完；VERDICT 約定 B 鎖定；opus 全分支＋Codex（gpt-5.5/xhigh）覆核 = merge-ready；Codex 揭的 OF2 巢狀-reason gap 已 TDD 修畢。計畫文件 [`PLAN-pedagogy-firstlearner-sp1-plan3-gate.md`](PLAN-pedagogy-firstlearner-sp1-plan3-gate.md)（歷史參照）；詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「pedagogy 判斷閘（SP1 Plan 3）完成」段。**
 - **Plan 4 — 視覺擴充**：A7 figure-prominence 子準則（量測）、V4/A6 最小字級 floor 常數（`theme.py`/`sizecheck.py`）、手機標尺（`VISUAL-FRAME-RUBRIC.md`）。**→ ✅ 完成（2026-07-01，commits `dcdc74a..4a66b6d`）：5 task（floor 常數＋check→opt-in/surface→clamp→rubric→校準/sign-off）全做完；clamp byte-identical no-op 74/74 幀；gate-1 `visual-frame-audit` VERDICT 0 visual blocking；opus 全分支＋Codex(gpt-5.5/xhigh) 覆核 = merge-ready（2 條 deferrable 已修）。計畫文件 [`PLAN-pedagogy-firstlearner-sp1-plan4-visual.md`](PLAN-pedagogy-firstlearner-sp1-plan4-visual.md)（歷史參照）；詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「視覺擴充（SP1 Plan 4）完成」段。**
-- **Plan 5 — methodology／文件接線**：`CONTENT_METHODOLOGY.md`（P1/P2/P4 ＋ scaffold authoring）、`DESIGN.md`（scaffold 承載＋authoring checklist）、`CONTENT-SIXLENS-RUBRIC.md`（L1 scaffold 例外措辭）、`REVIEW_GATES.md`（新閘入序）、V1–V8→V1–V9 doc-drift。
+- **Plan 5 — methodology／文件接線**：`CONTENT_METHODOLOGY.md`（P1/P2/P4 ＋ scaffold authoring）、`DESIGN.md`（scaffold 承載＋authoring checklist）、`CONTENT-SIXLENS-RUBRIC.md`（L1 scaffold 例外措辭）、`REVIEW_GATES.md`（新閘入序）、V1–V8→V1–V9 doc-drift。**→ ✅ 完成（2026-07-01，commits `78e7b0f..9b145ee`）：5 task 全做完、4 份權威文件忠實 as-built；opus 跨檔一致性＋Codex 2 輪覆核 = READY TO FINALIZE SP1。計畫文件 [`PLAN-pedagogy-firstlearner-sp1-plan5-docs.md`](PLAN-pedagogy-firstlearner-sp1-plan5-docs.md)（歷史參照）；詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「methodology／文件接線（SP1 Plan 5）完成」段。**
 - **SP2 — 回填**：把 SP1（Plans 1–4）套到 3 個既有 deck（ch01 §1.1、ch03 §3.1/§3.2），走 spec §11「乾跑 → 分類 → 你核可遷移清單 → scoped 修」。**注意**：場級繼承讓回填收斂，但 Plan 1 文法決定 `ref:`/`refs:` 是**新欄位**（不沿用 freeform `source:`），故每個 OTF-subject 場仍需新增 `ref:` ＋ 寫 freeform→`md:`/`doc:` 對映。
 
 ---
 
 ## 四、怎麼接手（resume 指南）
 
-- **流程**：`superpowers:subagent-driven-development`，task-by-task。**Plan 4 ✅ 完成**（視覺擴充：min-size floor＋clamp＋rubric V4/A6/A7，commits `dcdc74a..4a66b6d`，clamp no-op 74/74 幀＋gate-1 0 visual blocking＋opus 全分支＋Codex 覆核 = merge-ready）。**下一步＝Plan 5（methodology／文件接線）**——尚未細化成 task 計畫，比照 Plan 2/3/4，先用 `superpowers:writing-plans` 把 spec §12 清單（`CONTENT_METHODOLOGY.md`／`DESIGN.md`／`CONTENT-SIXLENS-RUBRIC.md` L1 scaffold 例外／`REVIEW_GATES.md` 新閘入序＋剩餘 `V1–V8→V1–V9` doc-drift `REVIEW_GATES.md`／`DESIGN.md`）拆成 task-by-task 施工計畫，再執行。
+- **流程**：`superpowers:subagent-driven-development`，task-by-task。**Plan 5 ✅ 完成 → SP1（Plans 1–5）全完成**（文件接線，commits `78e7b0f..9b145ee`，opus 跨檔一致性＋Codex 2 輪覆核 = READY TO FINALIZE）。**下一步＝SP2 回填**（spec §11）——把 SP1 套到 3 個 locked deck（ch01 §1.1、ch03 §3.1/§3.2）：乾跑→分類→使用者核可遷移清單→scoped 補 `ref:`/`scaffold`＋OF1 忠實修→重跑 PD/OF＋L1/L5＋NFA 回歸→重渲→重 sign-off→翻 per-deck opt-in（`otf_enforce`/`pedagogy_enforce`/`fontfloor_enforce`）為 gating。比照前例先用 `superpowers:writing-plans` 把 §11 拆成 task-by-task 施工計畫，再執行。**注意**：場級繼承讓回填收斂，但 `ref:`/`refs:` 是新欄位（非沿用 freeform `source:`）、`refs:` 為 flat dotted-key map，故每個 OTF-subject 場仍需新增 `ref:` ＋寫 freeform→`md:`/`doc:` 對映。
 - **測試 venv（換機注意）**：一律用 **repo 內**的 `.venv/Scripts/python.exe`（相對 repo root → 換機自動對；**勿沿用其他機器的絕對路徑**。bare python 缺 vendored PyYAML 會誤判 `test_schema_integration`）。本機絕對路徑＝`C:/Users/Kao/Downloads/Calculus_handout/.venv/Scripts/python.exe`；換機請改用該機 repo 下的 `.venv/Scripts/python.exe`（找不到先跑 `python tools/doctor.py`）。
 - **快速健檢**：
   - `…/.venv/…/python.exe video/pipeline/_selftest_provenance.py` → `OK provenance self-test`
@@ -96,7 +98,7 @@ git 只帶走**已 commit**的東西。以下目前**未 commit**，換到家裡
 
 1. 要讓家裡機器拿到：**`git push`** 分支 `video/template-redesign-navy-spine`（committed 的 Plan 1/2 ＋ 本交接文件才會過去）。
 2. 未 commit 的（音檔 WIP ＋ REBUILD_STATUS 編輯）**先 commit 才會跟著走**，否則留在這台。
-3. 回家後：`git pull` → 讀本檔「四、怎麼接手」→ **細化並執行 Plan 5（methodology／文件接線）**（Plan 1/2/3/4 已完成、merge-ready；Plan 5 先用 `superpowers:writing-plans` 拆 task，再 subagent-driven 執行）。
+3. 回家後：`git pull` → 讀本檔「四、怎麼接手」→ **細化並執行 SP2 回填**（spec §11；Plans 1–5 已完成、**SP1 全完成**；SP2 先用 `superpowers:writing-plans` 把 §11 拆 task，再 subagent-driven 執行）。
 
 ---
 
