@@ -49,3 +49,36 @@ def assumptions_registry_issues(data: dict, enforce: bool) -> "list[tuple[str, s
         if isinstance(flag, str) and flag and flag not in seen_ids:
             issues.append((sev, f"{sid}: scaffold.flag {flag!r} has no meta.assumptions entry"))
     return issues
+
+
+_PROFILES = frozenset({"first_time", "review", "expert"})
+_MOTIVE_TEMPLATES = frozenset({"theorem_proof", "derivation"})  # definition_math NOT deterministic (§9.2)
+
+
+def pedagogy_issues(data: dict, enforce: bool) -> "list[tuple[str, str]]":
+    """All PD deterministic findings: PD2 (motive on theorem_proof/derivation),
+    PD3 (problem on divider), PD4 (registry), + a pedagogy_profile sanity note.
+    severity = 'error' if enforce else 'warn' (profile note is always 'warn')."""
+    sev = "error" if enforce else "warn"
+    issues: list[tuple[str, str]] = []
+    meta = data.get("meta", {}) if isinstance(data, dict) else {}
+    prof = meta.get("pedagogy_profile", "first_time")
+    if prof not in _PROFILES:
+        issues.append(("warn", f"meta.pedagogy_profile {prof!r} unknown "
+                               f"(known: {sorted(_PROFILES)}); treated as first_time"))
+    for scene in (data.get("scenes") or []):
+        if not isinstance(scene, dict):
+            continue
+        sid = scene.get("id", "?")
+        kind = scene.get("kind", "content")
+        scaf = scene.get("scaffold") if isinstance(scene.get("scaffold"), dict) else {}
+        if kind == "content" and scene.get("template") in _MOTIVE_TEMPLATES:
+            if not (isinstance(scaf.get("motive"), str) and scaf["motive"].strip()):
+                issues.append((sev, f"{sid}: {scene.get('template')} should carry "
+                                    f"scaffold.motive (on-screen 'why we're doing this')"))
+        elif kind == "divider":
+            if not (isinstance(scaf.get("problem"), str) and scaf["problem"].strip()):
+                issues.append((sev, f"{sid}: divider should carry scaffold.problem "
+                                    f"(the concrete problem/expression being solved)"))
+    issues += assumptions_registry_issues(data, enforce)
+    return issues

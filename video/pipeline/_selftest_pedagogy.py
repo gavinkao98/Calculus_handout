@@ -37,8 +37,33 @@ def test_registry_findings():
     assert len(errs) == len(warns)
 
 
+def test_pedagogy_issues():
+    data = {"meta": {"pedagogy_profile": "first_time"}, "scenes": [
+        {"id": "thm", "kind": "content", "template": "theorem_proof"},          # missing motive
+        {"id": "der", "kind": "content", "template": "derivation",
+         "scaffold": {"motive": "why"}},                                         # ok
+        {"id": "def", "kind": "content", "template": "definition_math"},         # exempt (not deterministic)
+        {"id": "div", "kind": "divider"},                                        # missing problem
+    ]}
+    warns = P.pedagogy_issues(data, enforce=False)
+    msgs = " | ".join(m for _, m in warns)
+    assert "thm" in msgs and "scaffold.motive" in msgs    # PD2 fires
+    assert "div" in msgs and "scaffold.problem" in msgs   # PD3 fires
+    assert "der:" not in msgs and "def:" not in msgs       # has motive / exempt (colon-suffix avoids substring hit on "divider")
+    assert all(s == "warn" for s, _ in warns)
+    errs = P.pedagogy_issues(data, enforce=True)
+    assert all(s == "error" for s, _ in errs)
+
+def test_pedagogy_profile_unknown_is_warn():
+    data = {"meta": {"pedagogy_profile": "nonsense"}, "scenes": []}
+    out = P.pedagogy_issues(data, enforce=True)   # even enforced, profile note stays warn
+    assert any(s == "warn" and "pedagogy_profile" in m for s, m in out)
+
+
 if __name__ == "__main__":
     test_registry_ok()
     test_registry_absent_is_noop()
     test_registry_findings()
+    test_pedagogy_issues()
+    test_pedagogy_profile_unknown_is_warn()
     print("OK pedagogy self-test")
