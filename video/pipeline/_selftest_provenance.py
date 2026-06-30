@@ -62,6 +62,31 @@ def test_scene_text_refs():
     # inherited ref value also correct for annotations.0
     got3 = dict(P.scene_text_refs(scene3))
     assert got3["annotations.0"] == "md:s"
+    # derivation nested reasons (steps[]/result/check) expand per path, inherit scene ref
+    scene5 = {"kind": "content", "template": "derivation", "ref": "md:deriv",
+              "steps": [{"math": "a = b", "reason": "first"},
+                        {"math": "b = c"},                       # no reason -> skipped
+                        "scalar entry"],                          # scalar -> skipped
+              "result": {"math": "\\therefore a = c", "reason": "transitivity"},
+              "check": {"math": "ok", "reason": "verified"}}
+    got5 = dict(P.scene_text_refs(scene5))
+    assert got5["steps.0.reason"] == "md:deriv"     # inherited scene ref
+    assert "steps.1.reason" not in got5             # dict step without reason -> absent
+    assert "steps.2.reason" not in got5             # scalar step -> absent
+    assert got5["result.reason"] == "md:deriv"
+    assert got5["check.reason"] == "md:deriv"
+    # back-compat lines[] nested reasons expand per path
+    scene6 = {"kind": "content", "ref": "md:bc",
+              "lines": [{"tex": "= 1", "reason": "why"}, "= 2"]}
+    got6 = dict(P.scene_text_refs(scene6))
+    assert got6["lines.0.reason"] == "md:bc"
+    assert "lines.1.reason" not in got6             # scalar line -> no reason
+    # field-level refs override wins for a nested-reason path
+    scene7 = {"kind": "content", "template": "derivation", "ref": "md:scene",
+              "steps": [{"math": "a = b", "reason": "first"}],
+              "refs": {"steps.0.reason": "md:x"}}
+    got7 = dict(P.scene_text_refs(scene7))
+    assert got7["steps.0.reason"] == "md:x"         # override beats inherited scene ref
 
 
 def test_provenance_issues():
@@ -88,6 +113,21 @@ def test_provenance_issues():
     # fail-closed on non-dict data (aligned with pedagogy_issues; handoff Plan 2 final-review item)
     assert P.provenance_issues("not a dict", loci, enforce=False) == []
     assert P.provenance_issues(None, loci, enforce=True) == []
+    # nested reason (derivation steps[].reason) with no ref -> OF2 finding on that path;
+    # a field-override-reffed nested reason resolves -> no finding (Codex follow-up)
+    nested = {"scenes": [
+        {"id": "miss_step", "kind": "content", "template": "derivation",
+         "steps": [{"math": "a = b", "reason": "why"}]},          # no ref -> finding
+        {"id": "ok_step", "kind": "content", "template": "derivation",
+         "steps": [{"math": "a = b", "reason": "why"}],
+         "refs": {"steps.0.reason": "md:unit_a"}},                # override resolves -> none
+    ]}
+    nwarns = P.provenance_issues(nested, loci, enforce=False)
+    nmsgs = " | ".join(m for _, m in nwarns)
+    assert all(s == "warn" for s, _ in nwarns)
+    assert "miss_step.steps.0.reason" in nmsgs
+    assert "ok_step" not in nmsgs
+    assert len(nwarns) == 1
 
 
 def test_schema_integration():
@@ -102,6 +142,7 @@ def test_schema_integration():
     assert "bad_missing.statement" in out.stdout
     assert "bad_unresolvable.statement" in out.stdout
     assert "bad_divider.problem" in out.stdout         # Fix 2: divider kind produces finding
+    assert "bad_nested_reason.steps.0.reason" in out.stdout   # Codex follow-up: nested reason scanned
     # Scope the negatives to the provenance-finding form `<id>.<field>` (matches the
     # positives above): bare `ok_inherited`/`intro` also surface in the [pedagogy] block,
     # which shares stdout since Task 3 wired it in -- the provenance form stays absent

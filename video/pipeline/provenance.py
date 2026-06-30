@@ -101,6 +101,20 @@ def _present_text_fields(scene: dict) -> "list[str]":
             for i, v in enumerate(seq):
                 if isinstance(v, str) and v.strip():
                     paths.append(f"{name}.{i}")
+    # derivation template renders nested `reason` as on-screen rail teaching text
+    # (templates/derivation.py _rows_from_spec): steps[].reason / result.reason /
+    # check.reason, plus back-compat lines[].reason. A list entry may be a scalar
+    # (no reason); only dict entries with a non-empty str reason are on-screen text.
+    for name in ("steps", "lines"):
+        seq = scene.get(name)
+        if isinstance(seq, list):
+            for i, v in enumerate(seq):
+                if isinstance(v, dict) and isinstance(v.get("reason"), str) and v["reason"].strip():
+                    paths.append(f"{name}.{i}.reason")
+    for name in ("result", "check"):
+        v = scene.get(name)
+        if isinstance(v, dict) and isinstance(v.get("reason"), str) and v["reason"].strip():
+            paths.append(f"{name}.reason")
     return paths
 
 
