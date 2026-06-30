@@ -8,7 +8,7 @@
 
 SP1 共 5 個 Plan。目前 **Plan 1 ✅、Plan 2 ✅ 完整完成（邏輯＋渲染＋polish，全分支 opus review = merge-ready）、Plan 3 為下一步、Plans 4–5＋SP2 未開始**。
 
-> **2026-06-30 續做完成 Plan 2 渲染階段＋全分支 review。** 新增 commits（接在 `253fe64` 後）：`c3e0d33`（baseline 修）→ `7e18e09`（T4 helper）→ `a0a29bc`（T5 接線）→ `194a8eb`（polish）→ `a9e5203`（§6 對齊）→ `d05f240`（null-meta fail-closed）。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「scaffold 模型＋模板渲染（SP1 Plan 2）完成」段。
+> **2026-06-30 續做完成 Plan 2 渲染階段＋全分支 review＋使用者視覺 sign-off。** 新增 commits（接在 `253fe64` 後）：`c3e0d33`（baseline 修）→ `7e18e09`（T4 helper）→ `a0a29bc`（T5 接線）→ `194a8eb`（polish：孤行 `)`＋divider）→ `a9e5203`（§6 對齊）→ `d05f240`（null-meta fail-closed）→ `d88f137`（進度錨）→ `c879d7e`（sign-off：ASSUMES badge `RAIL_W`→`PRIMARY_W`）→ `58722e1`（sign-off：motive `PRIMARY_W`→`CONTENT_W`，皆解「太早換行、右邊空間沒用上」）。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「scaffold 模型＋模板渲染（SP1 Plan 2）完成」段。
 
 ---
 
