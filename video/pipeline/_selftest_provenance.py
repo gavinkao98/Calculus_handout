@@ -54,9 +54,29 @@ def test_scene_text_refs():
     assert paths == {"annotations.0", "annotations.1"}
 
 
+def test_provenance_issues():
+    loci = P.Loci(md_unit_ids={"unit_a"}, handout_anchors=set())
+    data = {"scenes": [
+        {"id": "ok", "kind": "content", "ref": "md:unit_a", "statement": "x"},
+        {"id": "miss", "kind": "content", "statement": "x"},
+        {"id": "bad", "kind": "content", "statement": "x",
+         "refs": {"statement": "md:nope"}},
+        {"id": "intro", "kind": "intro", "statement": "x"},
+    ]}
+    warns = P.provenance_issues(data, loci, enforce=False)
+    msgs = " | ".join(m for _, m in warns)
+    assert all(s == "warn" for s, _ in warns)
+    assert "miss" in msgs and "bad" in msgs
+    assert "ok" not in msgs and "intro" not in msgs    # resolvable + exempt skipped
+    errs = P.provenance_issues(data, loci, enforce=True)
+    assert all(s == "error" for s, _ in errs)
+    assert len(errs) == len(warns) == 2
+
+
 if __name__ == "__main__":
     test_parse_ref()
     test_constants()
     test_loci(None, None)
     test_scene_text_refs()
+    test_provenance_issues()
     print("OK provenance self-test")

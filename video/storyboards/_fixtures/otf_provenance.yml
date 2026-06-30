@@ -1,0 +1,22 @@
+meta: { id: _fixture_otf, section: "0.0", chapter: "Chapter 3" }
+scenes:
+  - id: ok_inherited
+    kind: content
+    template: theorem_proof
+    ref: md:unit_a
+    say: "{show statement}"
+    statement: "resolvable via inherited scene ref"
+  - id: bad_missing
+    kind: content
+    template: theorem_proof
+    say: "{show statement}"
+    statement: "no ref anywhere -> finding"
+  - id: bad_unresolvable
+    kind: content
+    template: derivation
+    say: "{show statement}"
+    statement: "ref points nowhere"
+    refs: { statement: "md:does_not_exist" }
+  - id: intro
+    kind: intro
+    statement: "exempt brand text -> no finding"

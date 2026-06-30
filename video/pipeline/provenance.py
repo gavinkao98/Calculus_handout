@@ -114,3 +114,23 @@ def scene_text_refs(scene: dict) -> "list[tuple[str, str]]":
         ref = overrides.get(path, scene_ref)
         out.append((path, ref if isinstance(ref, str) else ""))
     return out
+
+
+def provenance_issues(data: dict, loci: "Loci", enforce: bool) -> "list[tuple[str, str]]":
+    """(severity, message) per teaching-text field whose ref is missing/unresolvable.
+    severity = 'error' if enforce else 'warn' (the warn-default/opt-in gating axis).
+    intro/outro exempt; resolvable fields produce nothing."""
+    sev = "error" if enforce else "warn"
+    issues: list[tuple[str, str]] = []
+    for scene in data.get("scenes", []) or []:
+        if not isinstance(scene, dict) or scene.get("kind") not in OTF_KINDS:
+            continue
+        sid = scene.get("id", "?")
+        for path, ref in scene_text_refs(scene):
+            if not ref:
+                issues.append((sev, f"{sid}.{path}: on-screen teaching text has no "
+                                    f"provenance ref (scene `ref:` or `refs.{path}`)"))
+            elif not loci.resolves(ref):
+                issues.append((sev, f"{sid}.{path}: provenance ref {ref!r} does not "
+                                    f"resolve (no such .md unit / handout anchor)"))
+    return issues
