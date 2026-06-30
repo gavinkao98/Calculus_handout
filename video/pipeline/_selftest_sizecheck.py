@@ -42,7 +42,6 @@ def test_floor_uses_theme_constant():
 def test_floor_issues_enforce_propagation():
     """Enforce flag propagates through _floor_issues (the path check_scenes uses).
     Uses a hand-built Block with a sub-floor _brand_prose Tex node -- render-free."""
-    import types
     from pipeline.blocks import Block
 
     # Build a sub-floor prose Tex: authored at 20px < MIN_FONT_FLOOR (26px).
