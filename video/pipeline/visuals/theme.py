@@ -86,6 +86,12 @@ def fs(role) -> float:
     return _SCALE_PX[role] * PX_TO_FS
 
 
+# Minimum readable on-screen font size in PX (1920x1080). Compared against the TRUE authored
+# px recovered by sizecheck._effective_font_px (NOT _norm_size, which yields manim units and
+# over-divides MathTex). Set at the smallest INTENTIONAL named size (eyebrow=26). Plan 4 / SPEC §8.
+MIN_FONT_FLOOR = 26.0  # px; calibrated in PLAN-…-plan4 Task 5
+
+
 # -- palettes (hex from the redesign tokens) ------------------------------
 # Canonical Direction-D keys + back-compat aliases (old name -> new hue). color()
 # falls back to 'primary' for any unknown role, so a stray name degrades to ink_1.

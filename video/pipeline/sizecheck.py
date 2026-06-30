@@ -438,7 +438,48 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     return []
 
 
-def check_scenes(meta: dict, scenes: list[dict]) -> list[str]:
+def _effective_font_px(node) -> float:
+    """The node's TRUE authored on-screen px, recovered from its manim font_size.
+    text Tex renders at fs(px)*TEXT_SCALE; pure-math MathTex renders at fs(px)=px*PX_TO_FS.
+    CRITICAL: in this manim `Tex` SUBCLASSES `MathTex` (.venv .../tex_mobject.py:227,607), so a
+    text Tex IS-A MathTex -- you MUST test `Tex` FIRST, else every text node is mis-typed as
+    math (and Step-2's `Tex("x")` assert fails on first run)."""
+    from manim import MathTex, Tex
+    from pipeline.visuals import theme as T
+    fs = float(node.font_size)
+    if isinstance(node, Tex):                       # text prose (carries TEXT_SCALE) -- Tex FIRST!
+        return fs / (T.TEXT_SCALE * T.PX_TO_FS)
+    if isinstance(node, MathTex):                   # pure-math carrier (no TEXT_SCALE)
+        return fs / T.PX_TO_FS
+    return fs / T.PX_TO_FS  # plain Text (no TEXT_SCALE); confirm against brand if such nodes occur
+
+
+def _floor_findings(scene_id: str, sizes: list, floor: float, enforce: bool) -> "list[tuple[str, str]]":
+    """(severity, message) for each (block_id, px) below `floor`. Pure: no manim."""
+    sev = "error" if enforce else "warn"
+    return [(sev, f"{scene_id}: '{bid}' renders at {px:.1f}px < MIN_FONT_FLOOR {floor:.0f}px "
+                  f"-- too small to read (a line shrank below the floor, or an explicit tiny size)")
+            for bid, px in sizes if px < floor]
+
+
+def _floor_issues(scene: dict, blocks, enforce: bool) -> "list[tuple[str, str]]":
+    """Font-floor check for all _brand_prose nodes in a scene's blocks.
+
+    Unlike _block_prose_size (which skips pure-inline-math single-line carriers for the
+    SIBLING ratio check), an absolute floor needs no sibling group -- it includes ALL
+    _prose_nodes, the inline-math-only carriers too. Delegates to _floor_findings."""
+    from pipeline.visuals import theme as T
+    sizes: list[tuple[str, float]] = []
+    for b in blocks:
+        mob = getattr(b, "mobject", None)
+        if mob is None:
+            continue
+        for node in _prose_nodes(mob):
+            sizes.append((str(b.id), _effective_font_px(node)))
+    return _floor_findings(scene.get("id"), sizes, T.MIN_FONT_FLOOR, enforce)
+
+
+def check_scenes(meta: dict, scenes: list[dict]) -> "list[tuple[str, str]]":
     """Return (severity, message) tuples for the given scenes.
     'error' = stacked-prose size mismatch, or an element clipped off-frame (both
     abort the render); 'warn' = teaching prose in muted, an element spilling past
@@ -514,10 +555,14 @@ def check_scenes(meta: dict, scenes: list[dict]) -> list[str]:
                     f"{scene.get('id')}: prose '{b.id}' is rendered in muted "
                     f"({muted_hex}) -- teaching content is too faint in muted; "
                     f"use role 'text'/'primary'."))
+
+        # -- font floor: warn (or error when fontfloor_enforce) for prose below MIN_FONT_FLOOR --
+        enforce = bool(meta.get("fontfloor_enforce"))
+        issues += _floor_issues(scene, blocks, enforce)
     return issues
 
 
-def check_file(path: Path) -> list[str]:
+def check_file(path: Path) -> "list[tuple[str, str]]":
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from pipeline import _bootstrap
 
