@@ -64,7 +64,7 @@ PD 確定性層（教學結構檢查），全部 warn-default。
 
 ## 四、怎麼接手（resume 指南）
 
-- **流程**：`superpowers:subagent-driven-development`，task-by-task。**Plan 3 ✅ 完成**（pedagogy 判斷閘，commits `4c7aaaa..c0b254d`，calibrated＋opus 全分支＋Codex 覆核 = merge-ready）。**下一步＝Plan 4（視覺擴充：A7 figure-prominence／V4·A6 min-size floor 常數／手機標尺）**，依 spec §8／§12，待用 writing-plans 細化成 task-by-task 施工計畫後再跑。
+- **流程**：`superpowers:subagent-driven-development`，task-by-task。**Plan 3 ✅ 完成**（pedagogy 判斷閘，commits `4c7aaaa..c0b254d`，calibrated＋opus 全分支＋Codex 覆核 = merge-ready）。**下一步＝執行 Plan 4 施工計畫** [`PLAN-pedagogy-firstlearner-sp1-plan4-visual.md`](PLAN-pedagogy-firstlearner-sp1-plan4-visual.md)（視覺擴充：`MIN_FONT_FLOOR` 常數＋warn-default sizecheck 檢查＋clamp single-line shrink，V4/A6 floor＋手機標尺，A7 figure-prominence；5 task；已出 2026-06-30；BASE＝當前 HEAD；從 Task 1 起跑）。
 - **測試 venv（換機注意）**：一律用 **repo 內**的 `.venv/Scripts/python.exe`（相對 repo root → 換機自動對；**勿沿用其他機器的絕對路徑**。bare python 缺 vendored PyYAML 會誤判 `test_schema_integration`）。本機絕對路徑＝`C:/Users/Kao/Downloads/Calculus_handout/.venv/Scripts/python.exe`；換機請改用該機 repo 下的 `.venv/Scripts/python.exe`（找不到先跑 `python tools/doctor.py`）。
 - **快速健檢**：
   - `…/.venv/…/python.exe video/pipeline/_selftest_provenance.py` → `OK provenance self-test`
@@ -94,7 +94,7 @@ git 只帶走**已 commit**的東西。以下目前**未 commit**，換到家裡
 
 1. 要讓家裡機器拿到：**`git push`** 分支 `video/template-redesign-navy-spine`（committed 的 Plan 1/2 ＋ 本交接文件才會過去）。
 2. 未 commit 的（音檔 WIP ＋ REBUILD_STATUS 編輯）**先 commit 才會跟著走**，否則留在這台。
-3. 回家後：`git pull` → 讀本檔「四、怎麼接手」→ **下一步＝Plan 4（視覺擴充），待用 writing-plans 細化施工計畫**（Plan 1/2/3 已完成、merge-ready）。
+3. 回家後：`git pull` → 讀本檔「四、怎麼接手」→ **執行 Plan 4 計畫 [`PLAN-pedagogy-firstlearner-sp1-plan4-visual.md`](PLAN-pedagogy-firstlearner-sp1-plan4-visual.md) 從 Task 1 起**（Plan 1/2/3 已完成、merge-ready）。
 
 ---
 
