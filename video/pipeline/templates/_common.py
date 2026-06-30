@@ -432,8 +432,11 @@ def render_scaffold(scaffold, ground, meta=None) -> list[Block]:
     out = []
     motive = scaffold.get("motive")
     if isinstance(motive, str) and motive.strip():
+        # CONTENT_W (not the primary-column PRIMARY_W): the motive line sits on the spine
+        # with the full width free, so it shouldn't wrap early and leave the right half
+        # empty (it read as a too-short right margin next to the wider statement below).
         mob = brand.prose(motive, ground, role="text", size="prose_sm",
-                          max_width=PRIMARY_W, align="LEFT")
+                          max_width=CONTENT_W, align="LEFT")
         out.append(Block("scaffold.motive", mob, anim="fade", static=True, layer="content"))
     problem = scaffold.get("problem")
     if isinstance(problem, str) and problem.strip():
