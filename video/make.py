@@ -557,6 +557,24 @@ def main() -> int:
             return 2
         print("[schema] structure OK" + (f" ({len(warns)} warning(s))" if warns else ""), flush=True)
 
+    # OTF provenance (warn-default; gates only when meta.otf_enforce is True) -- spec §4:
+    # deterministic provenance check runs at the schema/lint stage that gates render.
+    from pipeline import provenance as _prov
+    _repo_root = Path(__file__).resolve().parent.parent   # video/make.py -> repo root
+    _meta = data.get("meta", {}) if isinstance(data, dict) else {}
+    _enforce = bool(_meta.get("otf_enforce"))
+    _loci = _prov.Loci.from_deck(_meta, _repo_root)
+    _prov_issues = _prov.provenance_issues(data, _loci, enforce=_enforce)
+    if _prov_issues:
+        _p_err = sum(1 for s, _ in _prov_issues if s == "error")
+        print(f"[provenance] {len(_prov_issues)} finding(s)"
+              f"{' (ENFORCED)' if _enforce else ' (warn-only; set meta.otf_enforce to gate)'}", flush=True)
+        for _sev, _msg in _prov_issues:
+            print(f"  {'ERROR' if _sev == 'error' else 'WARN '}  {_msg}", flush=True)
+        if _p_err:
+            print(f"[provenance] {_p_err} error(s) -- aborting (fix refs or unset meta.otf_enforce):", flush=True)
+            return 2
+
     # lint before doing any work -- catches render-garble ($f$ / \\ printed
     # literally, unbalanced $) statically, so it never reaches the video.
     if not args.skip_lint:
