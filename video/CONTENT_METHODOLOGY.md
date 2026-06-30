@@ -220,7 +220,7 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 
 ### 邊界：pedagogy／OTF 閘與 six-lens 不重疊
 
-pedagogy／OTF 閘與 six-lens **界定不重疊的切片**：`.md` 內容是否忠實講義歸 six-lens `L1`（含 scaffold 例外，見 [`CONTENT-SIXLENS-RUBRIC.md`](content_scripts/_audit/CONTENT-SIXLENS-RUBRIC.md) §5.5）；**上畫面文字 vs 核准源**歸 `OF1`（既有未守的軌，`OF1` 只查「是否被 cited 源支持」、**不重算**數學正確性）；`scaffold`／`statement` 的數學**正確性**仍歸 `L5`。完整邊界表見 [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md) §10，本檔不複製整表。
+pedagogy／OTF 閘與 six-lens **界定不重疊的切片**：`.md` 內容是否忠實講義歸 six-lens `L1`（含 scaffold 例外，見 [`CONTENT-SIXLENS-RUBRIC.md`](content_scripts/_audit/CONTENT-SIXLENS-RUBRIC.md) 的 L1 scaffold 例外；該例外逐字本於 SPEC §5.5）；**上畫面文字 vs 核准源**歸 `OF1`（既有未守的軌，`OF1` 只查「是否被 cited 源支持」、**不重算**數學正確性）；`scaffold`／`statement` 的數學**正確性**仍歸 `L5`。完整邊界表見 [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md) §10，本檔不複製整表。
 
 ---
 

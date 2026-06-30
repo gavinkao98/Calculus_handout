@@ -717,7 +717,7 @@ template 時請遵守。嚴重度：**error** 中止 render（確定壞了）；
 | `theorem_proof`／`derivation` 場缺 `scaffold.motive`（PD2「為什麼做這個」上畫面） | 加一句 `scaffold.motive` | **pedagogy warn**（opt-in `meta.pedagogy_enforce` 才升 error）；definition_math 必填與否＝gate-1 advisory |
 | `kind: divider` 場缺 `scaffold.problem`（PD3 講具體式、非概念標題） | 加 `scaffold.problem` 公式塊 | **pedagogy warn**（opt-in 才 error）；intro／recap 依 kind／template 本就排除 |
 | `meta.assumptions[]` 有 entry 卻在 `first_use_unit` 沒對應 `scaffold.flag`，或有孤兒 `scaffold.flag`（PD4 前提首用即標） | 每筆 assumption ⇄ 其 `first_use_unit` 的 `flag` 一一對應，無孤兒 | **pedagogy warn**（registry 一致性，opt-in 才 error） |
-| 上畫面教學文字（含 scaffold）無 provenance ref（OTF 可回溯） | 帶場級 `ref:`，例外欄位用 `refs:` flat-map 覆寫（key＝欄位路徑字串） | **provenance warn**（opt-in `meta.otf_enforce` 才 error）；規則見 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) |
+| 上畫面教學文字（含 scaffold）無 provenance ref（OTF 可回溯） | 帶場級 `ref:`，例外欄位用 `refs:` flat-map 覆寫（key＝欄位路徑字串） | **provenance warn**（opt-in `meta.otf_enforce` 才 error）；規則見 [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md) |
 
 ---
 
