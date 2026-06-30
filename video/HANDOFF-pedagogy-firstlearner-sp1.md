@@ -53,7 +53,7 @@ PD 確定性層（教學結構檢查），全部 warn-default。
 
 依 spec §12 ＋ 兩份 plan 文件末尾清單。Plans 3–5 與 Plan 2 一樣，**待前一 Plan 落地後才細化成 task-by-task 施工計畫**（沿用 writing-plans → subagent-driven-development）。
 
-- **Plan 3 — pedagogy gate（判斷層）**：`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`（PD1–PD4 ＋ OF1–OF2）＋ `pedagogy-firstlearner-audit` gate-1 subagent（讀 storyboard＋.md＋handout）；OF1 source-adequacy 判斷；`CONTENT_APPROVED` 生命週期 gating；PD/OF 分開計數。（gate-1 agent 直接讀 `meta.pedagogy_profile`。）
+- **Plan 3 — pedagogy gate（判斷層）**：`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`（PD1–PD4 ＋ OF1–OF2）＋ `pedagogy-firstlearner-audit` gate-1 subagent（讀 storyboard＋.md＋handout）；OF1 source-adequacy 判斷；`CONTENT_APPROVED` 生命週期 gating；PD/OF 分開計數。（gate-1 agent 直接讀 `meta.pedagogy_profile`。）**→ 施工計畫已出（2026-06-30）：[`PLAN-pedagogy-firstlearner-sp1-plan3-gate.md`](PLAN-pedagogy-firstlearner-sp1-plan3-gate.md)（5 task：rubric→agent→fixture→校準→sign-off；純 markdown＋校準、無新 Python，gate-1 blocking＝PD1＋OF1，PD2/3/4＋OF2 為已落地確定性層）。下一步直接跑 Task 1。**
 - **Plan 4 — 視覺擴充**：A7 figure-prominence 子準則（量測）、V4/A6 最小字級 floor 常數（`theme.py`/`sizecheck.py`）、手機標尺（`VISUAL-FRAME-RUBRIC.md`）。
 - **Plan 5 — methodology／文件接線**：`CONTENT_METHODOLOGY.md`（P1/P2/P4 ＋ scaffold authoring）、`DESIGN.md`（scaffold 承載＋authoring checklist）、`CONTENT-SIXLENS-RUBRIC.md`（L1 scaffold 例外措辭）、`REVIEW_GATES.md`（新閘入序）、V1–V8→V1–V9 doc-drift。
 - **SP2 — 回填**：把 SP1（Plans 1–4）套到 3 個既有 deck（ch01 §1.1、ch03 §3.1/§3.2），走 spec §11「乾跑 → 分類 → 你核可遷移清單 → scoped 修」。**注意**：場級繼承讓回填收斂，但 Plan 1 文法決定 `ref:`/`refs:` 是**新欄位**（不沿用 freeform `source:`），故每個 OTF-subject 場仍需新增 `ref:` ＋ 寫 freeform→`md:`/`doc:` 對映。
