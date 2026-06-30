@@ -1,0 +1,25 @@
+# pedagogy_audit_draft.yml -- calibration fixture (DRAFT deck) for the pedagogy-firstlearner gate.
+#
+# Lifecycle plant: the backing source _fixture_pedagogy_draft.md is CONTENT_APPROVED=no, so any OF
+# finding the gate-1 agent (Task 4) raises here MUST be dry-run/advisory, NEVER blocking (rubric
+# §lifecycle). Deterministically this deck is CLEAN: the single scene has a resolvable ref + a
+# present scaffold.motive, so schema.py emits no [pedagogy]/[provenance] findings.
+# meta.id binds content_scripts/_fixture_pedagogy_draft.md. No chapter -> md-only, hermetic.
+meta:
+  id: _fixture_pedagogy_draft
+  section: "0.0"
+  pedagogy_profile: first_time
+scenes:
+
+  # draft_exceeds: statement asserts MORE than unit_draft states (unit_draft gives only the single
+  #   (sin θ)/θ -> 1 limit; this adds the derivative conclusion the draft source has not approved).
+  #   theorem_proof + motive present -> no PD2-det; resolvable ref -> no OF2 -> deterministically clean.
+  #   Because the deck is CONTENT_APPROVED=no, the agent reports this OF as dry-run/advisory, NOT blocking.
+  - id: draft_exceeds
+    kind: content
+    template: theorem_proof
+    ref: "md:unit_draft"
+    scaffold:
+      motive: "先把極限值定下來，之後再推導數"
+    say: "{show statement}"
+    statement: "$\\dfrac{\\sin\\theta}{\\theta}\\to 1$，因此 $\\dfrac{d}{d\\theta}\\sin\\theta=\\cos\\theta$"

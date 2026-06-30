@@ -1,0 +1,169 @@
+# pedagogy_audit.yml -- calibration fixture (APPROVED deck) for the pedagogy-firstlearner gate.
+#
+# Two tracks are planted:
+#   * DETERMINISTIC (verified by schema.py -> pedagogy.py / provenance.py): PD2, PD3, PD4, OF2.
+#       Each is ISOLATED to exactly one finding on the named scene; every OTHER scene is
+#       deterministically clean (resolvable ref + motive where the template demands one).
+#   * AGENT-JUDGMENT (raised by the gate-1 agent in Task 4): PD1, OF1x2, PD2-advisory, PD3-advisory,
+#       plus CLEAN scenes and BOUNDARY (MUST-NOT-RAISE) scenes.
+# Expected findings are pinned in content_scripts/_audit/CALIBRATION-pedagogy-firstlearner.md.
+# meta.id binds content_scripts/_fixture_pedagogy.md for md:<unit> resolution. No chapter -> md-only, hermetic.
+meta:
+  id: _fixture_pedagogy
+  section: "0.0"
+  pedagogy_profile: first_time
+  assumptions:
+    - id: radians
+      text: "$\\theta$ in radians (arc length $=\\theta$)"
+      first_use_unit: pd4_det_first_use
+      source: "md:unit_squeeze"
+scenes:
+
+  # ============================ DETERMINISTIC TRACK (4) ============================
+
+  # (1) PD2-det: theorem_proof with NO scaffold.motive -> PD2 fires. Resolvable ref so OF2-clean.
+  - id: pd2_det_no_motive
+    kind: content
+    template: theorem_proof
+    ref: "md:unit_squeeze"
+    say: "{show statement}"
+    statement: "$\\cos\\theta \\le \\dfrac{\\sin\\theta}{\\theta} \\le 1$"
+
+  # (2) PD3-det: divider with NO scaffold.problem and no other teaching-text field -> PD3 fires.
+  #     say:"" is fine for a divider; nothing here needs a ref, so OF2 stays silent on this scene.
+  - id: pd3_det_no_problem
+    kind: divider
+    say: ""
+
+  # (3) PD4-det: registry assumption 'radians' first-uses here, but this scene carries NO
+  #     scaffold.flag -> PD4 fires (found None). definition_math (not theorem_proof/derivation)
+  #     so NO PD2-det. Resolvable ref -> OF2-clean.
+  - id: pd4_det_first_use
+    kind: content
+    template: definition_math
+    ref: "md:unit_squeeze"
+    say: "{show statement}"
+    statement: "弧度制：弧長 $=\\theta$，故 $\\sin\\theta < \\theta < \\tan\\theta$ 對 $0<\\theta<\\pi/2$ 成立"
+
+  # (4) OF2-det: the ONLY scene with no ref/refs anywhere. statement is present teaching text
+  #     -> OF2 fires on of2_det_no_ref.statement. definition_math -> no PD2-det.
+  - id: of2_det_no_ref
+    kind: content
+    template: definition_math
+    say: "{show statement}"
+    statement: "$\\displaystyle\\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1$"
+
+  # ============================ AGENT-JUDGMENT TRACK (5) ============================
+
+  # (5) PD1 blocking (agent): one {show} reveal jams >=2 load-bearing algebra steps into a
+  #     single beat. Supported by unit_squeeze, but over-compressed for first_time.
+  #     derivation + motive present -> no PD2-det; resolvable ref -> no OF2.
+  - id: pd1_compressed
+    kind: content
+    template: derivation
+    ref: "md:unit_squeeze"
+    scaffold:
+      motive: "把幾何不等式一路代數化到夾擠定理可用的形式"
+    say: "{show statement}"
+    statement: "由 $\\sin\\theta<\\theta<\\tan\\theta$，同除 $\\sin\\theta$ 再取倒數翻向，一步得到 $\\cos\\theta\\le\\dfrac{\\sin\\theta}{\\theta}\\le 1$"
+
+  # (6) OF1 blocking -- exceeds source (agent): statement asserts MORE than unit_narrow states.
+  #     unit_narrow gives only the single-point limit; this scene adds a monotonic/bounded claim
+  #     the source never makes. theorem_proof + motive -> no PD2-det; resolvable ref -> no OF2.
+  - id: of1_exceeds
+    kind: content
+    template: theorem_proof
+    ref: "md:unit_narrow"
+    scaffold:
+      motive: "確立極限值，作為後續導數推導的起點"
+    say: "{show statement}"
+    statement: "$\\dfrac{\\sin\\theta}{\\theta}\\to 1$ 且 $\\dfrac{\\sin\\theta}{\\theta}$ 在 $(0,\\pi/2)$ 上單調遞減並以 $1$ 為上界"
+
+  # (7) OF1 blocking -- source adequacy (agent): scene-level ref is the over-broad unit_broad,
+  #     but the statement makes a SPECIFIC sub-claim unit_broad never specifically states, with
+  #     NO field-level refs override -> agent flags + demands a tighter refs:. theorem_proof +
+  #     motive -> no PD2-det; ref resolves (unit_broad exists) -> no OF2.
+  - id: of1_adequacy
+    kind: content
+    template: theorem_proof
+    ref: "md:unit_broad"
+    scaffold:
+      motive: "補上餘弦那一側的小角極限"
+    say: "{show statement}"
+    statement: "$\\displaystyle\\lim_{\\theta\\to 0}\\frac{1-\\cos\\theta}{\\theta}=0$"
+
+  # (8) PD2 advisory (agent): motive PRESENT but weak/vacuous -> no PD2-det (det only fires on
+  #     ABSENT motive); agent raises advisory. Resolvable ref + faithful statement -> no OF.
+  - id: pd2_adv_weak_motive
+    kind: content
+    template: theorem_proof
+    ref: "md:unit_squeeze"
+    scaffold:
+      motive: "做這個證明"
+    say: "{show statement}"
+    statement: "$\\cos\\theta \\le \\dfrac{\\sin\\theta}{\\theta} \\le 1$"
+
+  # (9) PD3 advisory (agent): scaffold.problem PRESENT but vague/non-concrete -> no PD3-det
+  #     (det only fires on ABSENT problem); agent raises advisory. Resolvable ref makes the
+  #     scaffold.problem field OF2-clean.
+  - id: pd3_adv_vague_problem
+    kind: divider
+    ref: "md:unit_squeeze"
+    scaffold:
+      problem: "再來看更多三角的東西"
+    say: ""
+
+  # ============================ CLEAN (no finding; agent silent) ============================
+
+  # (10) PD1 clean: derivation segmented into MULTIPLE {show} beats, one action each. Faithful
+  #      to unit_squeeze. motive present -> no PD2-det; resolvable ref -> no OF2.
+  - id: clean_segmented
+    kind: content
+    template: derivation
+    ref: "md:unit_squeeze"
+    scaffold:
+      motive: "把每個代數動作分一拍，給初學者跟得上的節奏"
+    say: "{show ineq} {show divide} {show reciprocal} {show limit}"
+    statement: "從 $\\sin\\theta<\\theta<\\tan\\theta$ 逐步推到 $\\cos\\theta\\le\\dfrac{\\sin\\theta}{\\theta}\\le 1$"
+
+  # (11) OF clean: statement states EXACTLY what unit_squeeze states (fully supported).
+  #      theorem_proof + motive -> no PD2-det; resolvable ref -> no OF2.
+  - id: clean_of1
+    kind: content
+    template: theorem_proof
+    ref: "md:unit_squeeze"
+    scaffold:
+      motive: "用夾擠定理收掉這個極限"
+    say: "{show statement}"
+    statement: "因 $\\cos\\theta\\le\\dfrac{\\sin\\theta}{\\theta}\\le 1$ 且 $\\cos\\theta\\to 1$，由夾擠定理 $\\dfrac{\\sin\\theta}{\\theta}\\to 1$"
+
+  # ============================ BOUNDARY -- MUST NOT RAISE (§10) ============================
+
+  # (12) boundary_two_concepts: statement carries TWO distinct teaching CONCEPTS -> this is L2
+  #      territory (owned elsewhere), NOT PD1 (per-beat action count). Faithful to unit_two
+  #      (which states both) -> no OF. theorem_proof + motive -> no PD2-det; resolvable ref -> no OF2.
+  - id: boundary_two_concepts
+    kind: content
+    template: theorem_proof
+    ref: "md:unit_two"
+    scaffold:
+      motive: "把正弦、餘弦兩側的小角極限一次擺在一起對照"
+    say: "{show statement}"
+    statement: "$\\displaystyle\\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1$ 且 $\\displaystyle\\lim_{\\theta\\to 0}\\frac{1-\\cos\\theta}{\\theta}=0$"
+
+  # (13) boundary_intro: intro tagline. OMIT say (intro/outro silent -> omitting avoids the
+  #      'silent' warn). intro kind is OF2-exempt. Agent must NOT raise (L6 brand text).
+  - id: boundary_intro
+    kind: intro
+    statement: "三角函數的小角行為：從一個極限開始"
+
+  # (14) boundary_recap: recap takeaways are L6 (owned elsewhere) -> agent must NOT raise.
+  #      recap_cards + resolvable ref makes the points OF2-clean; points are faithful/innocuous.
+  - id: boundary_recap
+    kind: content
+    template: recap_cards
+    ref: "md:unit_recap"
+    say: "{show points}"
+    points:
+      - "用面積比較夾出 $(\\sin\\theta)/\\theta \\to 1$"
+      - "$\\theta$ 要用弧度量，弧長 $=\\theta$ 才成立"
