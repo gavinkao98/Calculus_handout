@@ -85,6 +85,9 @@ def test_provenance_issues():
     errs = P.provenance_issues(data, loci, enforce=True)
     assert all(s == "error" for s, _ in errs)
     assert len(errs) == len(warns) == 3
+    # fail-closed on non-dict data (aligned with pedagogy_issues; handoff Plan 2 final-review item)
+    assert P.provenance_issues("not a dict", loci, enforce=False) == []
+    assert P.provenance_issues(None, loci, enforce=True) == []
 
 
 def test_schema_integration():

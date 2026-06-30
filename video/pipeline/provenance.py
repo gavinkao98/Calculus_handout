@@ -122,7 +122,8 @@ def provenance_issues(data: dict, loci: "Loci", enforce: bool) -> "list[tuple[st
     intro/outro exempt; resolvable fields produce nothing."""
     sev = "error" if enforce else "warn"
     issues: list[tuple[str, str]] = []
-    for scene in data.get("scenes", []) or []:
+    scenes = data.get("scenes", []) if isinstance(data, dict) else []
+    for scene in scenes or []:
         if not isinstance(scene, dict) or scene.get("kind") not in OTF_KINDS:
             continue
         sid = scene.get("id", "?")

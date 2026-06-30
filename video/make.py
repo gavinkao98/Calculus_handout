@@ -585,7 +585,7 @@ def main() -> int:
               f"{' (ENFORCED)' if _ped_enforce else ' (warn-only; set meta.pedagogy_enforce to gate)'}", flush=True)
         for _sev, _msg in _ped_issues:
             print(f"  {'ERROR' if _sev == 'error' else 'WARN '}  {_msg}", flush=True)
-        if _ped_err and _ped_enforce:
+        if _ped_err:
             print(f"[pedagogy] {_ped_err} error(s) -- aborting (fix scaffold/registry or unset meta.pedagogy_enforce):", flush=True)
             return 2
 
