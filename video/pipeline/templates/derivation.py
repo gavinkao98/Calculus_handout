@@ -179,7 +179,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         if reason is not None and reason.width > reason_max_w > 0:
             # NOTE (SP2): a `result`-kind reason renders as an eyebrow (26px == MIN_FONT_FLOOR), but
             # we pass prose_sm (35) here for all reasons. Inert today (reason_max_w is too wide for a
-            # 26px mono eyebrow to overflow); if a long result reason ever clamps, dispatch px by kind.
+            # 26px mono eyebrow to overflow). The eyebrow is NOT _brand_prose, so the sizecheck floor
+            # check would not catch a sub-floor result reason either -- the clamp is the sole floor
+            # guard there. If a long result reason ever clamps, dispatch px by row kind.
             brand._clamp_shrink(reason, reason_max_w, T._SCALE_PX['prose_sm'])
         heights.append(max(eq.height, reason.height if reason is not None else 0.0))
 

@@ -8,9 +8,13 @@
 # reason instead HOLDS at the 26px floor; refusing to shrink, it then overflows PAST
 # THE FRAME EDGE (held right edge ~9.24u vs frame half 7.11u) -- the correct consequence
 # of "wrap/overflow, don't shrink below floor". (So this fixture, run through
-# check_scenes/make.py, trips the off-frame clip guard -- expected; the fixture pins the
-# CLAMP via the self-test's build_blocks/_effective_font_px path, not via check_scenes.)
-# The fixture is the regression that pins that clamp.
+# check_scenes/make.py, trips the off-frame clip guard -- expected.)
+#
+# This fixture is a MANUAL end-to-end demonstration of the clamp (Plan 4 Task 5
+# mock-render + the calibration record in this commit's message body); it is NOT
+# loaded by any automated test. The clamp's automated regression lives in
+# _selftest_sizecheck.py (_clamp_scale / _floor_findings / _effective_font_px on
+# synthetic values), independent of this deck.
 #
 #   reason natural width 11.01u  ->  fit 5.31/11.01 = 0.482  ->  35px x 0.482 = 16.9px
 #   without clamp: 16.9px  (sub-floor -> sizecheck floor-WARNs)
