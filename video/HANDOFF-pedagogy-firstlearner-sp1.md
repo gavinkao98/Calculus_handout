@@ -62,8 +62,8 @@ PD 確定性層（教學結構檢查），全部 warn-default。
 
 ## 四、怎麼接手（resume 指南）
 
-- **流程**：`superpowers:subagent-driven-development`，task-by-task。下一步直接做 Plan 2 Task 4（計畫文件已 ready，BASE = 當前 HEAD）。
-- **測試**：一律用 `C:/Users/user/Desktop/Calculus_handout/.venv/Scripts/python.exe`（bare python 缺 vendored PyYAML 會誤判 `test_schema_integration`）。
+- **流程**：`superpowers:subagent-driven-development`，task-by-task。**下一步＝執行 Plan 3 計畫** [`PLAN-pedagogy-firstlearner-sp1-plan3-gate.md`](PLAN-pedagogy-firstlearner-sp1-plan3-gate.md)（pedagogy 判斷閘；已過 Codex gate-2 審核＋回歸、findings 全處理；BASE＝當前 HEAD；從 Task 1 起跑）。
+- **測試 venv（換機注意）**：一律用 **repo 內**的 `.venv/Scripts/python.exe`（相對 repo root → 換機自動對；**勿沿用其他機器的絕對路徑**。bare python 缺 vendored PyYAML 會誤判 `test_schema_integration`）。本機絕對路徑＝`C:/Users/Kao/Downloads/Calculus_handout/.venv/Scripts/python.exe`；換機請改用該機 repo 下的 `.venv/Scripts/python.exe`（找不到先跑 `python tools/doctor.py`）。
 - **快速健檢**：
   - `…/.venv/…/python.exe video/pipeline/_selftest_provenance.py` → `OK provenance self-test`
   - `…/.venv/…/python.exe video/pipeline/_selftest_pedagogy.py` → `OK pedagogy self-test`
@@ -92,7 +92,7 @@ git 只帶走**已 commit**的東西。以下目前**未 commit**，換到家裡
 
 1. 要讓家裡機器拿到：**`git push`** 分支 `video/template-redesign-navy-spine`（committed 的 Plan 1/2 ＋ 本交接文件才會過去）。
 2. 未 commit 的（音檔 WIP ＋ REBUILD_STATUS 編輯）**先 commit 才會跟著走**，否則留在這台。
-3. 回家後：`git pull` → 讀本檔「四、怎麼接手」→ 從 Plan 2 Task 4 續做。
+3. 回家後：`git pull` → 讀本檔「四、怎麼接手」→ **執行 Plan 3 計畫 [`PLAN-pedagogy-firstlearner-sp1-plan3-gate.md`](PLAN-pedagogy-firstlearner-sp1-plan3-gate.md) 從 Task 1 起**（Plan 1/2 已完成、merge-ready）。
 
 ---
 
