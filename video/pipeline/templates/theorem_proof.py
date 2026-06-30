@@ -43,11 +43,22 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks: list[Block] = []
     head = scene_head(spec, ctx, label=spec.get("label", "[ theorem ]"))
     blocks += head
-    title = head[1].mobject
+    # The title block by id -- NOT head[1]: scene_head inserts a `part` indicator before
+    # the title for multipage (`part:`) scenes, so head[1] is the part indicator there.
+    # scaffold placement + card_y must anchor on the real title (else a part-scene motive
+    # aligns to the top-right part indicator and runs off-frame).
+    title = next(b.mobject for b in head if b.id == "title")
 
     scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"))
+    # A motive line eats header air the dense proof cascade needs (qed can clip off-frame
+    # on a full part: proof). Tighten the title->motive and motive->card gaps ONLY when a
+    # motive is present, reclaiming ~0.3u; no-motive scenes keep T.TITLE_GAP/0.32 unchanged
+    # (byte-identical). The motive is a small de-emphasised line, so a tighter coupling to
+    # the title reads fine (visual gate confirms).
+    has_motive = any(sb.id == "scaffold.motive" for sb in scaffold_blocks)
     for sb in scaffold_blocks:
-        sb.mobject.next_to(title, DOWN, buff=T.TITLE_GAP).align_to(title, LEFT)
+        gap = 0.22 if sb.id == "scaffold.motive" else T.TITLE_GAP
+        sb.mobject.next_to(title, DOWN, buff=gap).align_to(title, LEFT)
         title = sb.mobject
     blocks += scaffold_blocks
 
@@ -85,7 +96,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     # The card sits at its designed y; a tall (wrapped) statement grows upward,
     # so cap its top below the title -- the label/steps/qed cascade follows.
-    card_y = min(1.55, title.get_bottom()[1] - 0.32 - card.height / 2)
+    card_gap = 0.20 if has_motive else 0.32
+    card_y = min(1.55, title.get_bottom()[1] - card_gap - card.height / 2)
     card.move_to([left + card.width / 2, card_y, 0])
     blocks.append(Block("statement", card, anim="fade", static=True))
 
