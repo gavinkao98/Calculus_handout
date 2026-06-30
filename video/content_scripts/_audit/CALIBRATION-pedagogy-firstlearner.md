@@ -90,6 +90,7 @@ agent **不重算**確定性層，但會把上節①的 4 條（PD2 `pd2_det_no_
 | 期望 | code | scene · 欄位 | 判斷依據 → 處置 |
 |---|---|---|---|
 | **Advisory／dry-run（NOT blocking）** | **OF1** | `draft_exceeds` · `statement` | `statement` 超出 `md:unit_draft`（draft 只給單點極限，未核准導數結論），**但** deck 級 `CONTENT_APPROVED=no` → 依 rubric §生命週期，OF 一律 dry-run／advisory、**永不 blocking**（否則是拿未核准源當忠實基準）。確定性層此 deck 乾淨。 |
+| **Advisory（incidental）** | **PD1** | `draft_exceeds` · `say:{show statement}` | 同一單拍 `{show statement}` 同時揭極限值與導數結論（兩承重動作），對 `first_time` 可更分段 → PD1 advisory。**非 deck B 主測項**（主測為上方 OF1 lifecycle），但屬合理 agent 判斷、列此以求 expected 表完整；advisory 不強制歸零。故 deck B 期望 `VERDICT: 0 PD blocking, 0 OF blocking, 2 advisory`（OF1-dry-run + PD1）。 |
 
 ### 期望 VERDICT 形狀與「計數約定」（Task 4 需確認鎖定）
 

@@ -93,7 +93,7 @@ OF findings **只有當 cited content-script 的 deck 級 `CONTENT_APPROVED=yes`
 ## 回報規格（最終訊息；不寫任何檔案）
 
 - 首行：`VERDICT: <P> PD blocking, <O> OF blocking, <A> advisory`（PD 與 OF **分開計**）。
-- **VERDICT 整數的計數約定（calibration 已鎖，2026-06-30）：** `PD blocking`／`OF blocking` 整數**只計 gate-1 自有 blocking——PD1 與 OF1**。surfaced 的確定性結構 blocking（PD2/PD3/PD4 結構存在性＋OF2）由確定性層（`schema.py` → `../../pipeline/pedagogy.py`／`../../pipeline/provenance.py`）擁有並各自 gating（`pedagogy_enforce`／`otf_enforce`），**不計入本 VERDICT 整數**——免與確定性閘重複計數；它們仍逐條列出（見下）但不進首行整數。`advisory` 整數只計 gate-1 自身的 advisory（如 PD2／PD3 advisory）。
+- **VERDICT 整數的計數約定（calibration 已鎖，2026-06-30）：** `PD blocking`／`OF blocking` 整數**只計 gate-1 自有 blocking——PD1 與 OF1**。surfaced 的確定性結構 blocking（PD2/PD3/PD4 結構存在性＋OF2）由確定性層（`schema.py` → `../../pipeline/pedagogy.py`／`../../pipeline/provenance.py`）擁有並各自 gating（`pedagogy_enforce`／`otf_enforce`），**不計入本 VERDICT 整數**——免與確定性閘重複計數；它們仍逐條列出（見下）但不進首行整數。`advisory` 整數只計 gate-1 自身的 advisory（如 PD2／PD3 advisory，**含 OF1 因 §生命週期 降為 dry-run 者**）。
 - 逐條（一行一筆）：
   `- [Blocking|Advisory] [PD#|OF#] <unit-id> · <beat/field> — issue（cite 源／文字）→ minimal fix`
   surfaced 的確定性 finding 改用 **`[Surface PD#-det|OF2-det]`** 前綴、帶教學脈絡列出（**不**進 VERDICT 整數）。
