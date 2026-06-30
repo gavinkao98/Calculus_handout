@@ -37,6 +37,7 @@ tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
 - **每次調用任何計費的外部 API（如 Gemini TTS、Gemini 文字／影像生成等）之前，都必須先取得使用者明確同意，不可自行調用。** 批次合成（例如整節旁白 TTS、整章重跑）一律先說明：這次要調用什麼模型、預估用量（beat 數／音訊秒數）與成本，經同意後才執行。
 - 不計費、不連網的離線路徑不在此限，可逕行執行——例如 `tts.py --backend mock`（寫靜音 WAV 驗 manifest／時序）、本地 Manim render、ffmpeg mux/concat。
 - 取得一次同意即代表該次明確說明的工作範圍獲准；範圍變更（換模型、加場景、重跑）需重新徵得同意。
+- **〔2026-07-01 使用者授權〕Codex 唯讀調用（review／覆核／詢問意見／second-opinion）有 standing consent，直接逕行、不逐次徵詢；並盡量用 Codex 取代「停下來問使用者意見」、減少打擾。** 範圍＝**`codex exec -s read-only`**（計畫／code／doc 對抗式 review、徵第二意見，唯讀不改檔；模型走 `~/.codex/config.toml` 預設 gpt-5.5／xhigh）。**工作風格（使用者要求「盡量不要一直打擾我」）：** 自主推進、需要審核或第二意見時調 Codex 而非 ping 使用者；僅在 (i) 真正不可逆／對外動作、(ii) 計費生成（見下）、(iii) Codex＋自身判斷仍無法解的真兩難、(iv) 流程明定須使用者裁決的 deliverable（如交付物 sign-off）時才停下。**此授權僅及 Codex read-only 與「以 Codex 代替詢問」**；真 TTS、高解析渲染、Gemini 文字／影像生成等計費 API **仍須**先報價徵同意（不在此授權內）。
 
 ## 安裝環境：缺套件／軟體先問、勿造輪子替代、裝完更新文檔
 
