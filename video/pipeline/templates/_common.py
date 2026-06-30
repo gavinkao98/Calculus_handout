@@ -413,3 +413,36 @@ def motif_corner(ground: str) -> Block:
     motif.move_to([T.FRAME_W / 2 - T.SAFE_MARGIN - motif.width / 2,
                    -T.FRAME_H / 2 + T.SAFE_MARGIN + motif.height / 2, 0])
     return Block("motif", motif, anim="fade", static=True, layer="decoration")
+
+
+def _assumption_text(meta, flag_id) -> str | None:
+    """The human text for an assumption id, from meta.assumptions; None if absent."""
+    for a in (meta or {}).get("assumptions", []) or []:
+        if isinstance(a, dict) and a.get("id") == flag_id:
+            return a.get("text")
+    return None
+
+
+def render_scaffold(scaffold, ground, meta=None) -> list[Block]:
+    """Render optional scaffold (motive / divider-problem / first-use flag) as static
+    Block(s). Returns [] when scaffold is absent/empty (no-op -> render unchanged).
+    motive/problem use role='text' (NEVER 'muted'); flag shows the assumption text."""
+    if not isinstance(scaffold, dict):
+        return []
+    out = []
+    motive = scaffold.get("motive")
+    if isinstance(motive, str) and motive.strip():
+        mob = brand.prose(motive, ground, role="text", size="prose_sm",
+                          max_width=PRIMARY_W, align="LEFT")
+        out.append(Block("scaffold.motive", mob, anim="fade", static=True, layer="content"))
+    problem = scaffold.get("problem")
+    if isinstance(problem, str) and problem.strip():
+        mob = brand.prose(problem, ground, role="text", size="prose",
+                          max_width=CONTENT_W, align="LEFT")
+        out.append(Block("scaffold.problem", mob, anim="fade", static=True, layer="content"))
+    flag = scaffold.get("flag")
+    if isinstance(flag, str) and flag.strip():
+        body = _assumption_text(meta, flag) or flag
+        mob = build_aside({"label": "assumes", "body": body}, ground, max_width=RAIL_W)
+        out.append(Block(f"scaffold.flag.{flag}", mob, anim="fade", static=True, layer="content"))
+    return out
