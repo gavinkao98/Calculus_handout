@@ -10,8 +10,8 @@
 
 本閘在 render 相位跑（隨閘跑、含後鎖），一次讀齊三件：
 
-1. **本節的 `storyboards/<deck>.yml`** — 畫面文字 SSOT：`statement` / `scaffold(motive·problem·flag)` / `annotations` / divider 文字 / callout `body` / step·result `reason` 等全部上畫面教學文字，以及 `meta.pedagogy_profile`、`assumptions` registry、各欄的 `ref:` / `refs:`。
-2. **`content_scripts/<deck>.md`** 裡被 cite 的 `.md` 單元 — 上畫面文字的核准源（`md:<unit_id>` 解析到此）。
+1. **本節的 `storyboards/<deck>.yml`** — 畫面文字 SSOT：`statement` / `scaffold(motive·problem·flag)` / `annotations` / divider 文字 / callout `body` / step·result `reason` 等全部上畫面教學文字，以及 `meta.pedagogy_profile`、`assumptions` registry、各欄的 `ref:` / `refs:`，以及場級 `covers:`（SC 覆蓋宣告）。
+2. **`content_scripts/<deck>.md`** 裡被 cite 的 `.md` 單元 — 上畫面文字的核准源（`md:<unit_id>` 解析到此），**含該單元的 `screen_contract.required_steps`（SC 的承重步驟契約）**。
 3. **handout `chapter<N>-print-standalone.html`** 的 anchor — `doc:<handout-anchor>` 解析到此（`id="frag-sec-*"`／`data-fig="*"`）。
 
 讀 `meta.pedagogy_profile`（預設 `first_time`）與 deck 級 `CONTENT_APPROVED`（yes/no）。
@@ -27,7 +27,7 @@
 - **每條 blocking 必須 cite**：unit id ＋ 確切的 beat／欄位 ＋ 缺的步驟或矛盾點 ＋ 一個最小修法。
 - **禁止**自動改寫迴圈；**禁止** re-litigate 已認可的教學法。
 - **分開計數（Codex D）：** 輸出**分別**回報 `PD blocking` 與 `OF blocking` 摘要，**不混在一起**——免得主觀教學 finding 蓋掉硬忠實失敗。
-- **確定性／判斷分工（D-P3-1）：** PD2/PD3/PD4 的**結構** blocking 與 OF2 由 [`../../pipeline/pedagogy.py`](../../pipeline/pedagogy.py)／[`../../pipeline/provenance.py`](../../pipeline/provenance.py) **確定性計算**（Plan 1–2）；gate-1 agent **不重新實作**它們，只把它們帶教學脈絡**浮現出來（surface）**並擁有 advisory 層。**gate-1 agent 自己的 blocking ＝ PD1（判斷）＋ OF1（讀真正解析到的源）。**
+- **確定性／判斷分工（D-P3-1）：** PD2/PD3/PD4 的**結構** blocking、OF2、**SC1/SC2** 由 [`../../pipeline/pedagogy.py`](../../pipeline/pedagogy.py)／[`../../pipeline/provenance.py`](../../pipeline/provenance.py)／[`../../pipeline/coverage.py`](../../pipeline/coverage.py) **確定性計算**；gate-1 agent **不重新實作**它們，只把它們帶教學脈絡**浮現出來（surface）**並擁有 advisory 層。**gate-1 agent 自己的 blocking ＝ PD1＋OF1＋SC-honesty（讀真正解析到的源／payload）。**
 
 ## PD1–PD4 — 教學品質（§7 i）
 
@@ -52,6 +52,15 @@
 
 **欄級覆寫規則（§5.1，已落地文法）：** 所有上畫面教學文字欄位**預設繼承 scene 級 `ref:`**；**只有當該欄位 (a) cite 一個與 scene 級不同的 locus、(b) 跨單元綜合、或 (c) 提出高風險數學斷言時，才必須帶欄級 `refs.<field_path>` 覆寫**。OF1 的 source 充分性就是在強制這條：**何時必須欄級覆寫 ＝ 上述 (a)(b)(c) 任一；OF1 如何判 specific ＝ 看解析到的源有沒有直接陳述該欄位的斷言**——支持得了就 clean，源太寬（只「沾得上邊」卻沒陳述該斷言）就 flag 並要求更緊的 `refs:` 覆寫。（`source:` 是 freeform 人讀標籤，**不是**機器 ref，OF1 不據它判斷。）
 
+## SC1–SC2 ＋ SC-adv／SC-honesty — 推導步驟覆蓋（expansion 層，spec §4）
+
+審 storyboard 的 proof/derivation 有沒有**覆蓋** cited 源宣告的承重步驟——**與 OF 反方向**：OF 抓「上畫面文字**超出**源」，SC 抓「畫面**漏掉**源列的承重步驟」。錨＝`.md` 單元的 `screen_contract.required_steps`（作者宣告的承重步驟清單，帶 `id`／`tex`／`depends_on?`／`recap_required?`）＋ storyboard 場級 `covers:`。核心校準：**可合併／重排、不可掉**（一個 reveal 可 `covers` 多個 id；只有掉某承重步驟才是 finding）。
+
+- **SC1／SC2（確定性，surface 不重算）。** 由 [`../../pipeline/coverage.py`](../../pipeline/coverage.py) `coverage_issues` 確定性計算：**SC1**＝某「須顯示」步驟（`required_steps` 除「有 `depends_on` 且無 `recap_required`」的純回指外）未被該單元所有 `ref:` 場景之 `covers:` 聯集蓋到；**SC2**＝帶 `recap_required` 的 cash-in 步驟未被在地覆蓋（SC1 的回指子集，另標訊息）。agent **只帶教學脈絡 surface**（前綴 `[Surface SC1-det|SC2-det]`），不重算、**不計入 VERDICT 整數**（同 OF2／PD2-4 待遇）；gating 由 `schema.py` 的 `coverage_enforce` 管。
+- **SC-honesty（blocking，agent 判斷，evidence-based）。** 某場 `covers:` 宣告某 id、但其上畫面 payload（`statement`／`proof.N`／`qed`／`steps[].math`…）語義上**沒有**該步驟 → blocking。**每條 finding 必 cite 確切可見欄位／reveal target（如 `proof.0`），非泛稱。** 這是把「`covers:` 當橡皮圖章」補實的守門——**`coverage_enforce` sign-off 前不可略過**。這是 **gate-1 自有 SC blocking**。
+- **SC-adv（advisory，agent 判斷）。** 拿 `required_steps`／`covers` 對 **handout** 承重步驟比，疑似「併過頭、少了承重動作、初學者恐失脈絡」→ 建議加 `required_step`。**最終校準是作者的**（不 blocking）。與 `L1` 不同切片：SC-adv 問「screen contract 對初學者夠不夠」，非「`.md` 忠不忠於講義」。
+- **生命週期／收斂：** 同 OF——`md:` 契約在 deck `CONTENT_APPROVED=yes` 才 gating；DRAFT 期 dry-run。收斂＝**SC blocking（＝SC-honesty）== 0**（opt-in 後）。
+
 ## 邊界與不重疊（§10）
 
 本閘**獨立但從屬於既有 owner**；永不 raise 下表既有擁有者已擁有的 finding：
@@ -65,6 +74,9 @@
 | `.md` 內容忠實講義 | `L1`（含 scaffold 例外 §5.5） | — |
 | narration → HTML/spoken 衍生忠實 | `NFA` | — |
 | **storyboard 上畫面文字 vs 核准源** | —（既有未守） | **OF1/OF2** |
+| **storyboard 漏掉源列的承重步驟**（子集／掉步驟） | —（既有未守） | **SC1**（確定性）＋**SC-honesty**（覆蓋誠實） |
+| **cash-in 缺在地 recap**（標註依賴） | —（既有未守） | **SC2**（確定性） |
+| screen contract 對初學者夠不夠（vs handout） | `L1` 管 `.md` vs 講義 | **SC-adv**（不同切片：問 contract 夠不夠，非 `.md` 忠實） |
 | scaffold／statement 數學**正確** | `L5`（`.md` 內） | OF1 只查「是否被源支持」，**不重算**正確性 |
 | 圖可讀（窗格／爆框） | `V3` | — |
 | 圖**凸顯**夠不夠 | — | `A7` 子準則 |
@@ -80,7 +92,7 @@ OF findings **只有當 cited content-script 的 deck 級 `CONTENT_APPROVED=yes`
 
 ## 收斂線（§9.3）
 
-- **收斂判準**：本閘收斂 ＝ **PD blocking == 0 AND OF blocking == 0**（此處 PD/OF blocking 指 **gate-1 自有層**＝PD1＋OF1，計數約定見 §回報規格；確定性層 PD2/3/4＋OF2 另由 `schema.py` 以 `pedagogy_enforce`／`otf_enforce` 收斂），是 **per-deck opt-in 後**的收斂目標，**NOT 落地門檻**（落地當下一切 warn/dry-run，見上「兩軸澄清」）。
+- **收斂判準**：本閘收斂 ＝ **PD blocking == 0 AND OF blocking == 0 AND SC blocking == 0**（此處 PD/OF/SC blocking 指 **gate-1 自有層**＝PD1＋OF1＋SC-honesty，計數約定見 §回報規格；確定性層 PD2/3/4＋OF2＋SC1/SC2 另由 `schema.py` 以 `pedagogy_enforce`／`otf_enforce`／`coverage_enforce` 收斂），是 **per-deck opt-in 後**的收斂目標，**NOT 落地門檻**（落地當下一切 warn/dry-run，見上「兩軸澄清」）。
 - advisory 由使用者**逐條裁決**，**不強制歸零**（同 [`NARRATION-FAITHFULNESS-RUBRIC.md`](NARRATION-FAITHFULNESS-RUBRIC.md):40、[`../../../handout/_audit/PROSE-AUDIT-RUBRIC.md`](../../../handout/_audit/PROSE-AUDIT-RUBRIC.md):40）。
 
 ## 不算 finding（別誤報）
@@ -93,8 +105,8 @@ OF findings **只有當 cited content-script 的 deck 級 `CONTENT_APPROVED=yes`
 
 ## 回報規格（最終訊息；不寫任何檔案）
 
-- 首行：`VERDICT: <P> PD blocking, <O> OF blocking, <A> advisory`（PD 與 OF **分開計**）。
-- **VERDICT 整數的計數約定（calibration 已鎖，2026-06-30）：** `PD blocking`／`OF blocking` 整數**只計 gate-1 自有 blocking——PD1 與 OF1**。surfaced 的確定性結構 blocking（PD2/PD3/PD4 結構存在性＋OF2）由確定性層（`schema.py` → `../../pipeline/pedagogy.py`／`../../pipeline/provenance.py`）擁有並各自 gating（`pedagogy_enforce`／`otf_enforce`），**不計入本 VERDICT 整數**——免與確定性閘重複計數；它們仍逐條列出（見下）但不進首行整數。`advisory` 整數只計 gate-1 自身的 advisory（如 PD2／PD3 advisory，**含 OF1 因 §生命週期 降為 dry-run 者**）。
+- 首行：`VERDICT: <P> PD blocking, <O> OF blocking, <S> SC blocking, <A> advisory`（PD／OF／SC **分開計**）。
+- **VERDICT 整數的計數約定（calibration 已鎖，2026-06-30）：** `PD blocking`／`OF blocking` 整數**只計 gate-1 自有 blocking——PD1 與 OF1**。surfaced 的確定性結構 blocking（PD2/PD3/PD4 結構存在性＋OF2）由確定性層（`schema.py` → `../../pipeline/pedagogy.py`／`../../pipeline/provenance.py`）擁有並各自 gating（`pedagogy_enforce`／`otf_enforce`），**不計入本 VERDICT 整數**——免與確定性閘重複計數；它們仍逐條列出（見下）但不進首行整數。**`SC blocking` 同理只計 gate-1 自有的 SC-honesty；SC1／SC2 確定性（`../../pipeline/coverage.py`，`coverage_enforce` gating）以 `[Surface SC1-det|SC2-det]` 列出、不計入整數；SC-adv 計入 advisory。** `advisory` 整數只計 gate-1 自身的 advisory（如 PD2／PD3 advisory，**含 OF1 因 §生命週期 降為 dry-run 者**）。
 - 逐條（一行一筆）：
   `- [Blocking|Advisory] [PD#|OF#] <unit-id> · <beat/field> — issue（cite 源／文字）→ minimal fix`
   surfaced 的確定性 finding 改用 **`[Surface PD#-det|OF2-det]`** 前綴、帶教學脈絡列出（**不**進 VERDICT 整數）。
