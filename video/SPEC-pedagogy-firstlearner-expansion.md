@@ -109,7 +109,7 @@ screen_contract:
 **流程：**
 1. 列出該節 handout 的 `expansion:intuition` / `expansion:application`（**correctness-critical `expansion:caution` 不在此——升級假設，§7/§8**）標記及其承載的直覺。
 2. 對每個標記判 surfaced 四態（Codex D6）：`screened`（上畫面文字承載）／`narration-only`（旁白承載）／`visual-only`（圖/動畫承載）／`missing`（全都沒有）。
-3. **只有 `missing` 的承重直覺**成為**提議**：補一句敘述/一個 beat，綁 `doc:frag-sec-*` provenance，供使用者裁決。`narration-only`/`visual-only` 僅資訊性列出、預設不提議（除非該直覺對初學者顯然需要落到畫面）。
+3. **只有 `missing` 的承重直覺**成為**提議**：補一句敘述/一個 beat，綁 `doc:frag-sec-*` provenance（＋標記短引文，因 anchor 是節級非標記級），供使用者裁決。`narration-only`/`visual-only` 僅資訊性列出、**不計入 AMP1 提議**（若判斷顯然該落畫面，可另附非提議的 `[consider-screen]` 註記，不算候選、不計數——Codex R6 去矛盾）。
 4. 產 standalone HTML 裁決稿（比照 CLAUDE.md 交付規則、`mode-c-gapwalk`）。
 
 **AMP1（唯一 code，advisory）：** 該節某承重 `expansion:intuition`/`application` 判為 `missing` → 提議候選。永不 blocking。

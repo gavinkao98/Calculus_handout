@@ -20,14 +20,14 @@ model: inherit
 2. handout `expansion:*` 標記的權威定義：`README.md` §撰稿工作流程。
 
 # 你要審什麼（一次讀齊）
-1. **handout fragment**：`handout/fragments/chNN/sec-*.html`——盤點該節所有 `<!-- expansion:intuition|application … -->` 標記所承載的直覺（＝候選的來源池）。
+1. **handout fragment**：`handout/fragments/chNN/sec-*.html`——盤點該節所有 `<!-- expansion:intuition|application … -->` 標記所承載的直覺（＝候選來源池），**並另掃 `expansion:caution`**（僅為把 correctness-critical 者路由到末段假設清單，**不當 intuition 候選**）。
 2. **影片 storyboard**：`video/storyboards/<deck>.yml`——各場**上畫面文字**（`statement`／`annotations`／`scaffold`／divider 文字／callout `body`…）＋ **`say`（旁白）** ＋ **`# HOOK`／animation（視覺）**。
 3. **cited `.md`**：`video/content_scripts/<deck>.md`——單元 `narration`／`visual_need`，佐證某直覺是否已在旁白／視覺承載。
 
 # 怎麼做（完全依 rubric）
-- 對每個 handout `expansion:intuition`／`application` 標記，判影片四態（`screened`／`narration-only`／`visual-only`／`missing`）——**criteria 一律以 rubric 為準，本提示不複述**（rubric 是 SSOT）。放寬定義：**任一模態承載都算 surfaced**（防過度觸發）。
-- **只有 `missing`（三模態都沒有）的承重直覺**成為提議，記：`category`（intuition／application）、`locus`（影片哪個 beat／場之前後）、`proposal`（補什麼，1–3 句）、`why`（填補什麼初學者缺口）、`source`（綁該標記的 `doc:frag-sec-*`）、`confidence`（high／medium／low）。
-- **correctness caution** → 另記一筆「建議進 `meta.assumptions`／PD4」，**不當 intuition 提**；**example** → 不提（歸 `example-supplement`）。
+- 對每個 handout `expansion:intuition`／`application` 標記，判影片四態（`screened`／`narration-only`／`visual-only`／`missing`）——**criteria 一律以 rubric 為準**。**判 surfaced 的權威＝ storyboard**（上畫面文字／`say`／`# HOOK`·animation）；`.md` 的 `narration`／`visual_need` 只作**交叉佐證**（`visual_need` 是意圖、**非** storyboard 已實作的證明）。任一模態承載都算 surfaced（防過度觸發）。
+- **只有 `missing`（三模態都沒有）**成為 AMP1 提議，記：`category`、`locus`（影片哪個 beat／場之前後）、`proposal`（1–3 句）、`why`、`source`（`doc:frag-sec-*` ＋**該標記短引文**，因 anchor 是節級、非標記級）、`confidence`（high／medium／low）。`narration-only`／`visual-only` 僅資訊性列出、**不計入提議**；若顯然該落畫面，另記非提議的 `[consider-screen]` 註記。
+- **另掃 `expansion:caution`**：correctness-critical 者 → 末段「建議進 `meta.assumptions`／PD4」清單，**不當 intuition 提**；`example` → 不提（歸 `example-supplement`）。
 - 唯讀、propose-not-act、**advisory-only、永不 blocking**；傾向多提（使用者可刪）、**under-propose 才是要避免的失敗**；同一直覺不重複灌水；**不 re-litigate 已認可旁白**；乾淨節候選可為零、不硬湊。
 
 # 輸出

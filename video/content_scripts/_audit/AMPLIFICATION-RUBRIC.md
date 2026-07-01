@@ -22,12 +22,13 @@
 | 態 | 判準 | 動作 |
 |---|---|---|
 | `screened` | 上畫面文字（`statement`／`annotations`／`scaffold`／…）承載該直覺 | 資訊性列出、**不提議** |
-| `narration-only` | `say`／narration 承載、但畫面沒有 | 列出；**僅當**該直覺對初學者顯然該落到畫面才提議 |
+| `narration-only` | `say`／narration 承載、但畫面沒有 | 資訊性列出、**不計入 AMP1 提議**；若判斷顯然該落畫面，另記非提議的 `[consider-screen]` 註記供參考（不算候選、不計數） |
 | `visual-only` | 圖／動畫承載 | 列出、預設不提議 |
 | `missing` | 影片三模態（畫面／旁白／視覺）**都沒有** | **→ AMP1 提議**：補一句敘述／一個 beat |
 
-- **只有 `missing` 的承重直覺成為提議。** 這是防過度觸發的核心——大量 handout 直覺本就該在旁白、不必上畫面。
-- 每筆提議帶 **provenance `doc:frag-sec-*`**（該 handout 標記的 anchor），讓補進來的敘述可過 OTF、**不違反忠實層**。
+- **只有 `missing`（三模態都沒有）的承重直覺成為 AMP1 提議。** 這是防過度觸發的核心——大量 handout 直覺本就該在旁白、不必上畫面；`narration-only`／`visual-only` 一律**不計入提議**（見上表）。
+- **判 surfaced 的權威＝ storyboard**（上畫面文字／`say`／`# HOOK`·animation）。`.md` 的 `narration`／`visual_need` 只作**交叉佐證／詮釋**，**不單獨當「已 surface」的證據**——`visual_need` 是意圖、非 storyboard 已實作的證明（Codex R6）。
+- 每筆提議帶 **provenance `doc:frag-sec-*`**，但 **anchor 是節級、非標記級**（同節多個 `expansion:` 共用同一 `frag-sec`）→ 故**必附該標記的短引文／行**以定位是哪一筆（Codex R6）。這讓補進來的敘述可過 OTF、**不違反忠實層**。
 
 ## 硬紀律
 
