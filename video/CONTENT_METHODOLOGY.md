@@ -162,6 +162,8 @@
 - **`visual_need`** — 靜態視覺需求：要畫什麼圖、標什麼點、放哪句數學。
 - **`animation_cue`** — 當概念適合**動態演示**時，用**自然語言**描述建議動畫：**演什麼、怎麼動、強調哪個教學點**。
 
+> **另有選用欄位 `screen_contract`（expansion 層 M1）：** proof／derivation 單元可宣告畫面必須顯示的**承重步驟清單**（`required_steps: [{id, tex, depends_on?, recap_required?}]`，或 `coverage_exempt: true` 顯式豁免）；storyboard 以場級 `covers:` 對應，**可合併／重排、不可掉**——漏掉承重步驟由 [`pipeline/coverage.py`](pipeline/coverage.py) 的 SC1／SC2 擋（warn-default，`meta.coverage_enforce` 才 gating；零 opt-in 時 no-op）。correctness caution（radians 等影響公式真假者）走 `meta.assumptions`／PD4、**不進此**。細節見 [`SPEC-pedagogy-firstlearner-expansion.md`](SPEC-pedagogy-firstlearner-expansion.md) §4 與 [`content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md) SC 節。敘述（非推導）「太簡略」由唯讀 [`content_scripts/_audit/AMPLIFICATION-RUBRIC.md`](content_scripts/_audit/AMPLIFICATION-RUBRIC.md)（M2，propose-not-act）提案，不在此欄。
+
 ### 動畫的分工（重要）
 
 內容稿**只提動畫建議（自然語言）**，**MUST NOT 寫 manim code**——內容層與工程層的分離不變。但**客製動畫的 manim code 由 Claude 依 `animation_cue` 的自然語言生成**（不再由使用者手畫），生成後接入工程層的 hook 接入點（工程稿的 `# HOOK` 處）。這對應 gen-1 的 `hook`（客製動畫 escape hatch）——模板畫不出來的、需要手控時序的動畫，現由 Claude 從自然語言規格生成。生成的動畫 code 視同 narration：**SHOULD 經使用者過目認可**再定版。
