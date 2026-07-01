@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§3.1 First-Learner Sweep — ch03_trig_derivatives</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['\\(','\\)'], ['$','$']], displayMath: [['\\[','\\]'], ['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --ink:#1a1f2b; --muted:#5c6675; --line:#e2e6ee; --bg:#f6f8fc; --card:#fff;
+    --green:#1a7f52; --green-bg:#e7f6ee; --amber:#a8710a; --amber-bg:#fdf4e0;
+    --red:#b3261e; --red-bg:#fbe9e7; --blue:#1d5fb3; --blue-bg:#e8f0fb;
+    --orange:#b5560a; --orange-bg:#fceee0; --grey:#8a94a4; --navy:#22304d;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+       color:var(--ink); background:var(--bg); margin:0; line-height:1.6; font-size:15.5px}
+  .wrap{max-width:1180px; margin:0 auto; padding:34px 26px 90px}
+  h1{font-size:25px; margin:0 0 4px; letter-spacing:-.01em}
+  h2{font-size:20px; margin:44px 0 12px; padding-bottom:6px; border-bottom:2px solid var(--navy); color:var(--navy)}
+  h3{font-size:16.5px; margin:26px 0 8px; color:var(--navy)}
+  .sub{color:var(--muted); font-size:13.5px; margin:0 0 18px}
+  .sub code{background:#eef1f7; padding:1px 5px; border-radius:4px; font-size:12.5px}
+  code{font-family:"SF Mono",Consolas,"Liberation Mono",monospace}
+  .box{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin:14px 0}
+  .disclaimer{background:#fffbe9; border:1px solid #f0e2ad; border-radius:10px; padding:13px 17px; margin:16px 0; font-size:13.8px}
+  .disclaimer b{color:var(--amber)}
+  .lens{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0}
+  .lens .l{background:var(--card); border:1px solid var(--line); border-left:4px solid var(--navy); border-radius:8px; padding:12px 14px; font-size:13.6px}
+  .lens .l b{display:block; margin-bottom:3px; color:var(--navy)}
+  /* badges */
+  .bdg{display:inline-block; padding:1px 8px; border-radius:20px; font-size:11.5px; font-weight:600; white-space:nowrap; vertical-align:baseline}
+  .clean{background:var(--green-bg); color:var(--green)}
+  .adv{background:var(--amber-bg); color:var(--amber)}
+  .block{background:var(--red-bg); color:var(--red)}
+  .sc1{background:var(--orange-bg); color:var(--orange)}
+  .na{background:#eef0f4; color:var(--grey)}
+  .surf{background:var(--blue-bg); color:var(--blue)}
+  .kind{background:#eceff5; color:#54607a; font-weight:600; font-size:11px; padding:1px 7px; border-radius:5px}
+  /* matrix */
+  .mtx-scroll{overflow-x:auto; border:1px solid var(--line); border-radius:10px; margin:14px 0}
+  table.mtx{border-collapse:collapse; width:100%; font-size:12.5px; background:var(--card)}
+  table.mtx th,table.mtx td{border:1px solid var(--line); padding:6px 7px; text-align:center; white-space:nowrap}
+  table.mtx th{background:var(--navy); color:#fff; font-weight:600; position:sticky; top:0; font-size:11.5px}
+  table.mtx td.scene{text-align:left; font-weight:600; font-size:12px}
+  table.mtx td.k{text-align:left; color:#54607a; font-size:10.8px}
+  table.mtx tr:nth-child(even) td{background:#fafbfd}
+  table.mtx tr:nth-child(even) td.hl{background:#fef6ec}
+  td.hl{background:#fef6ec}
+  .c-ok{color:var(--green); font-weight:700}
+  .c-na{color:#c2c9d4}
+  .c-adv{color:var(--amber); font-weight:700}
+  .c-sc1{color:var(--orange); font-weight:800}
+  .c-route{color:var(--blue); font-weight:700}
+  /* cards */
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:12px 0; border-left:5px solid var(--green)}
+  .card.has-adv{border-left-color:var(--amber)}
+  .card.has-sc1{border-left-color:var(--orange)}
+  .card.na{border-left-color:#cfd6e2}
+  .card h4{margin:0 0 3px; font-size:15.5px; display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+  .card .vd{font-size:12px; color:var(--muted); margin:0 0 9px; font-family:"SF Mono",Consolas,monospace}
+  .card ul{margin:7px 0 3px; padding-left:19px}
+  .card li{margin:4px 0; font-size:13.8px}
+  .card li.f-adv{list-style:none; margin-left:-19px; padding:6px 10px; background:var(--amber-bg); border-radius:6px}
+  .card li.f-sc1{list-style:none; margin-left:-19px; padding:6px 10px; background:var(--orange-bg); border-radius:6px}
+  .card li.f-clean{color:#3a4658}
+  .tag{font-weight:700; font-size:11.5px; padding:0 5px; border-radius:4px; margin-right:4px}
+  .tag.a{background:#f4dfab; color:#7a5300}
+  .tag.s{background:#f3ccae; color:#7c3a06}
+  .tag.d{background:#cfe0f7; color:#124a91}
+  .fix{color:var(--navy)}
+  .cite{color:var(--muted); font-size:12.5px}
+  .stage{margin:30px 0 4px; font-size:13px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.06em}
+  .contract{background:#fbfcfe; border:1px solid var(--line); border-radius:9px; padding:12px 15px; margin:11px 0; font-size:13.5px}
+  .contract .cid{font-weight:700; color:var(--navy); font-size:14.5px}
+  .contract table{border-collapse:collapse; width:100%; margin-top:7px; font-size:13px}
+  .contract td{border-bottom:1px solid var(--line); padding:5px 8px; vertical-align:top}
+  .contract td.step{font-family:"SF Mono",Consolas,monospace; color:#7c3a06; font-weight:600; white-space:nowrap; width:120px}
+  .contract .cov{margin-top:8px; font-size:12.8px; color:var(--muted)}
+  .contract .cov code{background:#eef1f7; padding:1px 5px; border-radius:4px}
+  .amp td{border-bottom:1px solid var(--line); padding:7px 9px; vertical-align:top; font-size:13.3px}
+  .amp table{border-collapse:collapse; width:100%}
+  .amp .st{font-weight:700}
+  footer{margin-top:60px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:12.5px}
+  .legend{font-size:12.3px; color:var(--muted); margin:8px 0 0}
+  .legend span{margin-right:14px; white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>§3.1「初學者可懂性」最完整掃描 — <code>ch03_trig_derivatives</code></h1>
+<p class="sub">
+deck <code>ch03_trig_derivatives</code>（Derivatives of Sine and Cosine）· 分支 <code>video/template-redesign-navy-spine</code> · 2026-07-01<br>
+三管 lens：<b>SC</b>（推導掉步驟）· <b>AMP</b>（缺直覺）· <b>PD/OF</b>（beat 過壓／前提／上畫面文字忠實）· 全 26 場覆蓋 ·
+權威源：<code>SPEC-pedagogy-firstlearner-expansion.md</code>、<code>PEDAGOGY-FIRSTLEARNER-RUBRIC.md</code>、<code>AMPLIFICATION-RUBRIC.md</code>
+</p>
+
+<div class="disclaimer">
+<b>範圍與安全性。</b> 本輪只做「掃描 ＋ 授 <code>screen_contract</code>/<code>covers</code> 稽核 metadata ＋ 出報告」。
+<code>screen_contract</code> 與場級 <code>covers:</code> 皆為 <b>warn-default</b>（未開 <code>coverage_enforce</code>）→ <code>schema.py</code> exit 0、零 render 影響、不觸發 re-derive／TTS。
+所有 PD／SC-adv／AMP 提議一律 <b>propose-not-act</b>：<b>未</b>修改任何 proof／散文／narration／<code>{show}</code>；ch03 為 <code>CONTENT_APPROVED=yes</code> 的已鎖內容，任何內容修法都需先經使用者裁決。
+</div>
+
+<div class="box">
+<b>總結論（一句話）。</b> §3.1 影片對初學者的可懂性<b>整體良好</b>：三管掃全 26 場，<b>gate-1 blocking（PD1／OF1／SC-honesty）＝0</b>、
+<b>AMP missing 直覺＝0</b>（7 個承重 <code>expansion:intuition</code> 全部已 surface）。唯一的<b>確定性 SC1</b> 是刻意保留的 flagship
+—— <code>derivative_of_sine</code> 的<b>導數定義行被丟</b>（warn，不擋稿）—— 加上 <b>6 條 advisory</b> 校準建議（多集中在「第二／更省的證明」場）與 <b>1 筆</b> radians 假設登錄建議。全部交使用者裁決。
+</div>
+
+<h2>1 · 首頁總表（每場 × 各 lens）</h2>
+<p class="legend">
+<span><span class="c-ok">✓</span> clean</span>
+<span><span class="c-na">—</span> 不適用（該場 kind 無此維度）</span>
+<span><span class="c-adv">● adv</span> advisory（作者裁決）</span>
+<span><span class="c-sc1">▲ SC1</span> 確定性掉步驟（warn）</span>
+<span><span class="c-route">⤴ reg</span> 建議登錄假設</span>
+</p>
+<div class="mtx-scroll">
+<table class="mtx">
+<thead>
+<tr>
+  <th>#</th><th>場景</th><th>kind/template</th>
+  <th>PD1</th><th>PD2–4</th><th>OF1</th><th>OF2</th>
+  <th>SC1/2<br>(det)</th><th>SC-adv</th><th>SC-hon</th><th>AMP</th><th>本場</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>0</td><td class="scene">intro</td><td class="k">intro</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg na">n/a</span></td></tr>
+<tr><td>1</td><td class="scene">divider_limit</td><td class="k">divider</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>2</td><td class="scene">why_trig_is_different</td><td class="k">definition_math</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-ok">✓</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>3</td><td class="scene">difference_quotient_for_sine</td><td class="k">derivation</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>4</td><td class="scene">divider_squeeze</td><td class="k">divider</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>5</td><td class="scene">sector_inequality</td><td class="k">graph·hook</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-ok">✓</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>6</td><td class="scene">squeeze_to_the_bound</td><td class="k">derivation</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>7</td><td class="scene">continuity_statement_sin_limit</td><td class="k">theorem_proof</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>8</td><td class="scene">continuity_argument</td><td class="k">theorem_proof</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>9</td><td class="scene">fundamental_limit</td><td class="k">theorem_proof</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>10</td><td class="scene">squeeze_graph</td><td class="k">graph</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>11</td><td class="scene">limit_not_identity</td><td class="k">callout·caution</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>12</td><td class="scene">radians_essential</td><td class="k">callout·caution</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-route">⤴ reg</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>13</td><td class="scene">divider_derivatives</td><td class="k">divider</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td class="hl">14</td><td class="scene hl">derivative_of_sine</td><td class="k hl">theorem_proof</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-sc1 hl">▲ SC1</td><td class="c-adv hl">●</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="hl"><span class="bdg sc1">SC1</span> <span class="bdg adv">1 adv</span></td></tr>
+<tr><td class="hl">15</td><td class="scene hl">derivative_of_cosine</td><td class="k hl">theorem_proof</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-adv hl">●</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="hl"><span class="bdg adv">1 adv</span></td></tr>
+<tr><td>16</td><td class="scene">slope_equals_height</td><td class="k">graph·hook</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td class="hl">17</td><td class="scene hl">derivative_cycle</td><td class="k hl">definition_math</td><td class="c-ok hl">✓</td><td class="c-adv hl">● PD2</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-na hl">—</td><td class="c-na hl">—</td><td class="c-na hl">—</td><td class="c-ok hl">✓</td><td class="hl"><span class="bdg adv">1 adv</span></td></tr>
+<tr><td>18</td><td class="scene">divider_apply</td><td class="k">divider</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>19</td><td class="scene">companion_limit</td><td class="k">derivation</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td class="hl">20</td><td class="scene hl">all_six_trig_derivatives</td><td class="k hl">derivation</td><td class="c-adv hl">● PD1</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-adv hl">●</td><td class="c-ok hl">✓</td><td class="c-na hl">—</td><td class="hl"><span class="bdg adv">2 adv</span></td></tr>
+<tr><td>21</td><td class="scene">shm_compute</td><td class="k">derivation</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>22</td><td class="scene">shm_stacked_graphs</td><td class="k">graph·hook</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td class="hl">23</td><td class="scene hl">toward_the_chain_rule</td><td class="k hl">definition_math</td><td class="c-ok hl">✓</td><td class="c-adv hl">● PD2</td><td class="c-ok hl">✓</td><td class="c-ok hl">✓</td><td class="c-na hl">—</td><td class="c-na hl">—</td><td class="c-na hl">—</td><td class="c-na hl">—</td><td class="hl"><span class="bdg adv">1 adv</span></td></tr>
+<tr><td>24</td><td class="scene">recap</td><td class="k">recap_cards</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-ok">✓</td><td class="c-ok">✓</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg clean">clean</span></td></tr>
+<tr><td>25</td><td class="scene">outro</td><td class="k">outro</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td class="c-na">—</td><td><span class="bdg na">n/a</span></td></tr>
+</tbody>
+</table>
+</div>
+<p class="sub" style="margin-top:8px">
+各 lens 計數：<b>SC 確定性</b> 1 筆（<code>derivative_of_sine.def</code>，warn）· <b>PD1 blocking</b> 0 · <b>OF1 blocking</b> 0 · <b>SC-honesty blocking</b> 0 ·
+<b>advisory</b> 6（SC-adv 3、PD1 1、PD2 2）· <b>AMP missing</b> 0（7/7 screened）· <b>假設登錄建議</b> 1（radians）。
+</p>
+
+<h2>2 · 各 lens 計數與「哪幾場最需要修」</h2>
+<div class="lens">
+  <div class="l"><b>SC — 推導掉步驟</b>
+    確定性 <b>1</b>（<code>derivative_of_sine.def</code>，warn）＋ SC-adv <b>3</b>（sine 掉定義、cosine 併 limits、all_six 的 cot/csc）。
+    SC-honesty 全 <b>0</b>：10 個 proof 場的 <code>covers:</code> 逐一經 evidence 核對皆誠實（含兩個 recap cash-in 的界確有在地重畫）。</div>
+  <div class="l"><b>AMP — 缺直覺</b>
+    handout 7 個承重 <code>expansion:intuition</code> <b>全 screened</b>（畫面／旁白／視覺至少一模態承載），<b>missing = 0</b>。
+    無獨立 <code>expansion:application</code>。→ 0 條補敘述提議（乾淨、不硬湊）。</div>
+  <div class="l"><b>PD/OF — 過壓／忠實</b>
+    PD1／OF1／OF2／PD3 <b>blocking = 0</b>。advisory <b>3</b>：<code>all_six</code> 的 sec′ reveal 壓縮（PD1）、
+    <code>derivative_cycle</code> 與 <code>toward_the_chain_rule</code> 的 <code>definition_math</code> 缺 motive（PD2，§9.2）。</div>
+</div>
+
+<div class="box">
+<b>最需要看的場（依優先序）。</b>
+<ol style="margin:8px 0 0; padding-left:20px">
+<li><b><code>derivative_of_sine</code>（#14）</b> — 唯一確定性 SC1 ＋ SC-adv 共同指向同一處：<b>導數定義行被丟</b>。整個 SC 層就是為抓這種「初學者看不懂 reduced form 從哪來」而建。</li>
+<li><b><code>all_six_trig_derivatives</code>（#20）</b> — 2 條 advisory：sec′ 一個 reveal 併兩動作（PD1）＋ prompt 承諾四導數但 cot/csc 只給結果（SC-adv）。全節最壓縮的例題場。</li>
+<li><b><code>derivative_of_cosine</code>（#15）</b> — SC-adv：limits 折進 qed，比 sine 省一條顯式行（但兩極限值可見 → 合併非掉步驟，SC-honesty 過關）。</li>
+<li><b><code>derivative_cycle</code>（#17）、<code>toward_the_chain_rule</code>（#23）</b> — PD2 advisory：<code>definition_math</code> 缺 <code>scaffold.motive</code>（語意層、輕微）。</li>
+<li><b>radians（跨場）</b> — AMP 建議把 correctness-critical 的弧度前提登錄進 <code>meta.assumptions</code>／PD4（內容已 surface，僅缺 registry 條目）。</li>
+</ol>
+</div>
+
+<h2>3 · Findings 明細（每筆 cite 源 ＋ 建議修法）</h2>
+
+<div class="card has-sc1">
+<h4><span class="bdg sc1">SC1 · det (warn)</span> <span class="bdg adv">SC-adv</span> derivative_of_sine — 導數定義行被丟 <span class="kind">theorem_proof · #14</span></h4>
+<p class="vd">coverage.py：<code>[SC1] derivative_of_sine.def</code>（warn-only，exit 0）</p>
+<ul>
+<li><span class="tag d">SC1</span><b>掉的步驟：</b>定義行 \(\dfrac{d}{dx}\sin x=\lim_{h\to0}\dfrac{\sin(x+h)-\sin x}{h}\)。storyboard <code>covers: [reduced, limits, qed]</code> 刻意不含 <code>def</code>；<code>proof.0</code> 直接是 reduced form \(\dfrac{d}{dx}\sin x=\lim_{h\to0}\cos(x+\tfrac h2)\dfrac{\sin(h/2)}{h/2}\)。<span class="cite">cite：storyboard <code>derivative_of_sine.proof.0</code>（yml:402）／contract <code>required_steps.def</code>（md）。</span></li>
+<li><span class="tag s">SC-adv</span><b>初學者代價：</b>LHS 一步從 \(\frac{d}{dx}\sin x\) 跳到 reduced 右式，未先立「導數＝差分商極限」這座橋；而該化簡在 <code>difference_quotient_for_sine</code>（#3）完成、距此約 <b>11 場</b>、中間<b>無畫面 recap</b>。旁白雖說「Start from the definition, and use the form we already found」，但畫面上 \(\cos(x+\tfrac h2)\dfrac{\sin(h/2)}{h/2}\) 對初學者像憑空冒出。<span class="cite">對照 handout Theorem 3.1 Proof（sec-3-1.html:182–185）<b>保留兩行對齊</b>：先定義行、再 reduced。</span></li>
+<li class="fix"><b>建議修法（propose，未施作）：</b>把 <code>def</code> 納入 <code>covers:</code> 並讓 <code>proof.0</code> 顯示定義行、reduced 順延為 <code>proof.1</code>（limits→proof.2、qed 不變），與 handout 兩行對齊一致；或在 proof.0 前補一格「回顧：這條 reduced form 來自 §差分商」的畫面 recap。屬已鎖內容變更，需使用者裁決。</li>
+<li class="f-clean"><b>SC-honesty clean：</b><code>reduced</code>（標 <code>recap_required</code>）在 <code>proof.0</code> <b>確有在地重畫</b>整條 \(\cos(x+\tfrac h2)\frac{\sin(h/2)}{h/2}\)（非只口頭指涉）→ SC2 在地覆蓋誠實。</li>
+</ul>
+</div>
+
+<div class="card has-adv">
+<h4><span class="bdg adv">PD1 · adv</span> <span class="bdg adv">SC-adv</span> all_six_trig_derivatives — sec′ 壓縮 ＋ cot/csc prompt 落差 <span class="kind">derivation · #20</span></h4>
+<p class="vd">VERDICT：0 PD blocking, 0 OF, 0 SC blocking, 2 advisory</p>
+<ul>
+<li><span class="tag a">PD1</span><b>sec′ reveal 過壓：</b><code>result</code> 一個 reveal \(\dfrac{d}{dx}\sec x=\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^{2}x}=\sec x\tan x\) 併了兩個承重動作（商法則套用＋化簡）；而 tan′ 把<b>同樣兩動作分成兩 reveal</b>（<code>step.0</code> 商法則式、<code>step.1</code> 化簡到 \(\sec^2 x\)）。對預設 <code>first_time</code> profile 屬輕度內部壓縮。<b>非 blocking</b>：畫面每個等號都在、且 handout 亦以單一對齊式呈現 sec′（sec-3-1.html:259–265）、又是 tan′ 剛示範過的重複手法。<span class="cite">cite：storyboard <code>all_six_trig_derivatives.result</code>。</span></li>
+<li><span class="tag s">SC-adv</span><b>prompt vs payload 落差：</b><code>prompt</code> 允諾「Differentiate \(\tan x,\ \sec x,\ \cot x,\ \csc x\)」四個，但 cot′/csc′ 只在 <code>check</code> 以裸結果 \(-\csc^2 x,\ -\csc x\cot x\) 出現、無推導。對初學者，prompt 起了但 cot/csc 未在畫面得到對應演算。<span class="cite">cite：storyboard <code>prompt</code> vs <code>check</code>；handout Example 3.2 亦把 cot/csc 放在 solution 收尾「the same technique … gives」（sec-3-1.html:266）。</span></li>
+<li class="fix"><b>建議修法（propose）：</b>(a) 把 sec′ 拆成 setup ＋ result 兩格、比照 tan′ 節奏；(b) prompt 改以 tan/sec 為主體（cot/csc 用「and, by the same rule, …」帶出），或補一格 cot′ 的商法則 setup。最終校準歸作者。</li>
+<li class="f-clean"><b>SC-honesty clean：</b><code>covers: [tan_quotient, tan_result, sec, cot_csc]</code> 對 <code>required_steps</code> 1:1；<code>cot_csc</code> contract 自身即宣告為 result-only（<code>reason: same move (repeat-pattern)</code>），<code>check</code> 正好顯示那兩個結果 → 非橡皮圖章。</li>
+</ul>
+</div>
+
+<div class="card has-adv">
+<h4><span class="bdg adv">SC-adv · adv</span> derivative_of_cosine — limits 折進 qed <span class="kind">theorem_proof · #15</span></h4>
+<p class="vd">VERDICT：0 PD, 0 OF, 0 SC blocking, 1 advisory</p>
+<ul>
+<li><span class="tag s">SC-adv</span><b>比 sine 更省的可見度落差：</b>cosine 無獨立的 <code>limits</code> reveal，把「兩因子各自趨向」折進 <code>qed</code> 的 \(\to -\sin x\cdot 1=-\sin x\)；而 <code>derivative_of_sine</code> 有<b>獨立 <code>proof.1</code></b> 專門顯示 \(\cos(x+\tfrac h2)\to\cos x,\ \tfrac{\sin(h/2)}{h/2}\to1\)。故 cosine 的 <code>qed</code> 一行同時吃「兩因子取極限＋乘積＋負號」，密度偏高。<span class="cite">cite：storyboard <code>derivative_of_cosine.qed</code> vs <code>derivative_of_sine.proof.1</code>。註：handout 兩個 Proof 其實<b>對稱</b>（都用一句散文帶兩因子極限），此落差是 storyboard 讓 sine 多出一行、非對 handout 不忠。</span></li>
+<li class="fix"><b>建議修法（propose，可選）：</b>若求兩場對稱，為 cosine 補一條與 sine <code>proof.1</code> 對應的獨立 limits reveal；否則維持 repeat-pattern（「so we go quickly」）亦可接受。</li>
+<li class="f-clean"><b>SC-honesty clean（合併非掉步驟）：</b><code>qed</code> payload \(-\sin x\cdot 1\) <b>同時呈現兩因子的極限目標值</b>——\(-\sin x\)（第一因子）與 \(1\)（第二因子）皆可見，僅省去「箭頭那一行」的獨立呈現。依 SC 校準「合併可、掉不可」，判為合併、covers 宣告 <code>limits</code> 誠實。</li>
+</ul>
+</div>
+
+<div class="card has-adv">
+<h4><span class="bdg adv">PD2 · adv ×2</span> derivative_cycle ＋ toward_the_chain_rule — definition_math 缺 motive <span class="kind">definition_math · #17, #23</span></h4>
+<ul>
+<li><span class="tag a">PD2</span><b>語意層（§9.2），非確定性 blocking</b>（PD2 確定性只限 <code>theorem_proof</code>／<code>derivation</code>）。兩場皆 <code>definition_math</code>、無 <code>scaffold.motive</code>；但 framing 已由 <code>say</code>＋<code>statement</code> 承載（<code>derivative_cycle</code>：「Differentiation cycles sine and cosine…」；<code>toward_the_chain_rule</code>：「We can differentiate \(\sin x\) — but not yet \(\sin(x^2)\)…」）。<span class="cite">cite：storyboard 兩場無 scaffold 區塊。</span></li>
+<li class="fix"><b>建議修法（可選）：</b>各補一句 <code>scaffold.motive</code>（如 cycle 場「看這兩個導數合起來組成什麼模式」）以求全 deck 一致；缺席可接受。</li>
+<li class="f-clean"><b>OF1 clean（<code>toward_the_chain_rule</code> 重點核對）：</b>上畫面 <code>statement</code>／<code>math.0</code> <b>未洩節號</b>（只有 \(\sin(x^2),\sin(3x+1)\)），忠於 handout「the business of the next section」（sec-3-1.html:305）與 <code>.md</code>「MUST NOT 報節號」。</li>
+</ul>
+</div>
+
+<div class="card has-adv">
+<h4><span class="bdg adv">AMP → 假設</span> radians convention — 建議登錄 meta.assumptions／PD4 <span class="kind">跨場 · caution</span></h4>
+<ul>
+<li><span class="tag d">route</span><b>correctness-critical：</b>弧度前提決定 \(\sin\theta/\theta\to1\)、\(\sin'=\cos\) 是否成立（度數下極限為 \(\pi/180\)）。依 AMP rubric 邊界，correctness caution <b>不當 intuition 提</b>，改<b>路由到假設機制</b>。<span class="cite">cite：handout <code>expansion:caution</code>（sec-3-1.html:158）。</span></li>
+<li class="fix"><b>建議（propose）：</b>在 storyboard <code>meta.assumptions</code> registry 顯式登錄 radians 條目（供 PD4 前提 flag）。<b>現況：</b>影片內容已充分 surface（<code>why_trig_is_different</code> 收尾＋<code>radians_essential</code> 獨立 callout），僅 registry 未見顯式條目——「登錄」與「surface」是兩件事。</li>
+<li class="f-clean"><b>另一 caution（limit-not-identity）</b>為 <code>[pass: enrichment]</code>、非 correctness-critical → 不進假設清單；已由 <code>limit_not_identity</code>（#11）充分承載。</li>
+</ul>
+</div>
+
+<h2>4 · 逐場結論（全 26 場；乾淨場一行）</h2>
+
+<div class="stage">Stage 1 — 極限的動機與差分商化簡</div>
+<div class="card na"><h4>intro <span class="kind">intro</span> <span class="bdg na">n/a</span></h4><ul><li class="f-clean">純定位卡（tagline「How fast does sine change?」）；無 <code>{show}</code>／教學文字 → PD/OF/SC 各維度不適用。</li></ul></div>
+<div class="card"><h4>divider_limit <span class="kind">divider</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD3 <code>scaffold.problem</code> \(\lim_{\theta\to0}\frac{\sin\theta}{\theta}=?\) 為具體式（present）；OF1/OF2 clean（<code>ref: doc:frag-sec-3-1</code>，problem 逐字取自節內中心極限 sec-3-1.html:59）。PD1 不適用（單卡）。</li></ul></div>
+<div class="card"><h4>why_trig_is_different <span class="kind">definition_math</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（3 reveal 各一物件：差分商→0/0、funnel 到 \(\lim\sin\theta/\theta\)、claim）；PD2 不強制（此場本身即動機、say＋title 已飽和）；OF1 clean（忠於 <code>md</code>／handout:58–60）；AMP：intuition①「trig 差分商塌成 \(\sin\theta/\theta\)」<b>screened</b>（畫面 math.0/1＋旁白＋funnel anim）。</li></ul></div>
+<div class="card"><h4>difference_quotient_for_sine <span class="kind">derivation</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（4 reveal ↔ 4 required_steps 各一動作）；OF1 clean（steps/result 逐式對 handout:66–72）；SC-honesty clean（<code>covers:[identity,substitute,divide,factors]</code> 各對 payload）；SC-adv clean（比 handote 更逐行、無合併掉步驟）；AMP：intuition②動機在此鏈上 surfaced。根 derivation，其 result 供 <code>derivative_of_sine</code> cash-in。</li></ul></div>
+
+<div class="stage">Stage 2 — 幾何夾擠 · 連續性 · 基本極限</div>
+<div class="card"><h4>divider_squeeze <span class="kind">divider</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD3 <code>scaffold.problem</code> \(\tfrac12\sin\theta\le\tfrac12\theta\le\tfrac12\tan\theta\) 具體、逐字對 handout:93；OF clean。</li></ul></div>
+<div class="card"><h4>sector_inequality <span class="kind">graph·hook</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（<code>{show tri_inner／sector／tri_outer／ineq}</code> 各承一塊面積／排序，偶函數便利在 say 前置、未擠進 reveal）；OF1 clean（點 A/B/C、三面積 \(\tfrac12\sin\theta/\tfrac12\theta/\tfrac12\tan\theta\) 忠於 handout:84–93）；AMP：intuition②「面積比較動機＋偶函數」screened（say＋divider scaffold＋hook）。圖可讀性歸 V*。</li></ul></div>
+<div class="card"><h4>squeeze_to_the_bound <span class="kind">derivation</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（4 reveal 各一代數動作，取倒數翻向為單一動作）；OF1 clean（對 handout:94–96 式(1)＋附帶界）；SC-honesty clean（<code>covers:[clear_halves,divide_sin,bound,abs_bound]</code>→step.0/step.1/result/check）；<b>SC-adv clean 且優</b>：contract 比 handout 連寫段落<b>更細</b>、另把 <code>abs_bound</code> 自成一步，無承重動作被併掉。</li></ul></div>
+<div class="card"><h4>continuity_statement_sin_limit <span class="kind">theorem_proof · part 1/2</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（statement／proof.0／proof.1／qed 各一動作，part 拆場再降密度）；OF1 clean（Prop 3.1＋Proof 段一，handout:106/113–114）；<b>SC2/SC-honesty clean（重點）</b>：<code>bound</code> 標 <code>recap_required</code>（cash-in <code>squeeze_to_the_bound.abs_bound</code>），<code>proof.0</code> \(0\le|\sin\theta|\le|\theta|\) <b>在地重畫</b>、界非憑空；AMP：intuition③「為何需要連續」screened（say）。</li></ul></div>
+<div class="card"><h4>continuity_argument <span class="kind">theorem_proof · part 2/2</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（proof.0 cos 恆等式／proof.1 sin 恆等式／proof.2 界／qed 各一）——正是 detail-redo 的修正：<b>兩條和差化積顯示在畫面</b>，界有可見來源；OF1 clean（handout:116–122）；SC-honesty clean（4 covers ↔ payload，<code>bound</code> 為在地新導、非 recap）。</li></ul></div>
+<div class="card"><h4>fundamental_limit <span class="kind">theorem_proof</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（bound／squeeze／qed 各一）；OF1 clean（Prop 3.2＋Proof，handout:134/141）；<b>SC2/SC-honesty clean</b>：<code>bound</code>（recap，cash-in 式(1)）在 <code>proof.0</code> \(\cos\theta\le\frac{\sin\theta}{\theta}\le1\) 在地重畫；AMP：intuition④「squeeze payoff」screened（say＋statement）。</li></ul></div>
+<div class="card"><h4>squeeze_graph <span class="kind">graph</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（plot.0–3＋annotation 各一視覺元素）；OF1 clean（annotation「Trapped between \(\cos\theta\) and \(1\)…undefined at \(\theta=0\)」＋空心點忠於 Figure 3.2，handout:147）；SC 不適用（stock 圖、無 contract）。</li></ul></div>
+<div class="card"><h4>limit_not_identity <span class="kind">callout·caution</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（單 <code>{show body}</code> 一教學點）；OF1 clean（\(\theta=\tfrac\pi2\)→\(2/\pi\approx0.64\)、\(\theta=\pi\)→0 逐字對 handout:154）；AMP：此 caution 為 enrichment、不進提議（已充分承載）。</li></ul></div>
+<div class="card"><h4>radians_essential <span class="kind">callout·caution</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">OF1 clean（度數下 \(\pi/180\) 因子、\(\sin'=\cos\) 僅弧度成立，逐字對 handout:162）。<b>惟</b>：此為 correctness-critical caution → 見 §3「radians 建議登錄 <code>meta.assumptions</code>」（AMP 路由，非本場 blocking）。</li></ul></div>
+
+<div class="stage">Stage 3 — 兩個導數</div>
+<div class="card"><h4>divider_derivatives <span class="kind">divider</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD3 <code>scaffold.problem</code> \(\frac{d}{dx}\sin x=?\ \frac{d}{dx}\cos x=?\) 具體；OF clean（<code>ref: doc:frag-sec-3-1</code>）。</li></ul></div>
+<div class="card has-sc1"><h4>derivative_of_sine <span class="kind">theorem_proof</span> <span class="bdg sc1">SC1</span> <span class="bdg adv">1 adv</span></h4><ul><li>詳見 §3 第一張卡：<b>SC1</b>（def 掉，warn）＋ <b>SC-adv</b>（reduced form 無橋、~11 場無 recap）。<b>SC-honesty clean</b>（reduced 在地重畫）、PD1/OF1/PD2 clean。</li></ul></div>
+<div class="card has-adv"><h4>derivative_of_cosine <span class="kind">theorem_proof</span> <span class="bdg adv">1 adv</span></h4><ul><li>詳見 §3 第三張卡：<b>SC-adv</b>（limits 折進 qed、比 sine 省一行）。<b>SC-honesty clean</b>（\(-\sin x\cdot1\) 兩極限值可見＝合併非掉步驟）、PD1/OF1 clean。</li></ul></div>
+<div class="card"><h4>slope_equals_height <span class="kind">graph·hook</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（切線／高度逐點 reveal）；OF1 clean（斜率 1/0/−1 ＝ cos 高度，忠於 Figure 3.3，handout:210–213）；SC 不適用（圖）；hook 幾何文字歸 E1／V*。</li></ul></div>
+<div class="card has-adv"><h4>derivative_cycle <span class="kind">definition_math</span> <span class="bdg adv">1 adv</span></h4><ul><li>見 §3 第四張卡：<b>PD2 advisory</b>（缺 <code>scaffold.motive</code>，§9.2）。PD1/OF1 clean（四步環＋\(d^4/dx^4\sin x=\sin x\) vs \(e^x\) 對照，忠於 Remark 3.1 handout:298–300）；AMP：intuition⑦「四步循環＋\(e^x\) 對照 bookend」screened（畫面 math.0/1＋say）。</li></ul></div>
+
+<div class="stage">Stage 4 — 例題與收尾</div>
+<div class="card"><h4>divider_apply <span class="kind">divider</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD3 <code>scaffold.problem</code> \(\frac{d}{dx}\tan x,\sec x,\cot x,\csc x=?\) 具體（§3.1 Example 3.2 確實交付四者）；OF clean。</li></ul></div>
+<div class="card"><h4>companion_limit <span class="kind">derivation</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（乘共軛→平方差／\(1-\cos^2=\sin^2\)＋拆因子／取極限，各一 reveal）；OF1 clean（Example 3.1，handout:227–234）；SC-honesty clean（<code>covers:[conjugate,split,evaluate]</code>→step.0/step.1/result）；SC-adv clean（乘共軛動機在 scaffold.motive＋say）。</li></ul></div>
+<div class="card has-adv"><h4>all_six_trig_derivatives <span class="kind">derivation</span> <span class="bdg adv">2 adv</span></h4><ul><li>見 §3 第二張卡：<b>PD1</b>（sec′ 一 reveal 併兩動作）＋ <b>SC-adv</b>（prompt 四導數、cot/csc 只給結果）。OF1/SC-honesty clean。</li></ul></div>
+<div class="card"><h4>shm_compute <span class="kind">derivation</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（height→velocity→acceleration→\(s''=-s\)，一行一動作）；OF1 clean（Example 3.3，handout:283–284）；SC-honesty clean（<code>covers:[height,velocity,acceleration,shm]</code> 全對）；SC-adv clean（無過度合併）；application 直覺「\(s''=-s\)＝SHM 簽名」screened（result＋say＋Figure 3.4）。</li></ul></div>
+<div class="card"><h4>shm_stacked_graphs <span class="kind">graph·hook</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（<code>{show g_s／g_v／g_a／mirror}</code> 各一層／鏡像一觀念）；OF1 clean（三層 s/s′/s″、\(s''=-s\) 鏡像，忠於 Figure 3.4，handout:290–292）；SC 不適用（圖）。</li></ul></div>
+<div class="card has-adv"><h4>toward_the_chain_rule <span class="kind">definition_math</span> <span class="bdg adv">1 adv</span></h4><ul><li>見 §3 第四張卡：<b>PD2 advisory</b>（缺 motive）。<b>OF1 clean 重點</b>：未洩節號（只 \(\sin(x^2),\sin(3x+1)\)），忠於 handout:305＋<code>.md</code>「MUST NOT 報節號」。</li></ul></div>
+<div class="card"><h4>recap <span class="kind">recap_cards</span> <span class="bdg clean">clean</span></h4><ul><li class="f-clean">PD1 clean（4 point 各一 takeaway）；OF1 clean（4 點各對全節綜合 <code>md:recap</code>＋handout：基本極限／兩導數／商法則六個／四步循環＋弧度）；<code>refs:</code> 明確映射 points.0–3→<code>md:recap</code>。takeaway 存在性歸 L6。<span class="cite">註：<code>.md</code> visual_need 列 5 點、storyboard 折為 4（cycle＋radians 併一點），內容無不忠、屬 L6 non-finding。</span></li></ul></div>
+<div class="card na"><h4>outro <span class="kind">outro</span> <span class="bdg na">n/a</span></h4><ul><li class="f-clean">品牌／Next 卡（<code>next_section: 3.2</code>）；無教學文字 → 各維度不適用（§10 non-finding）。</li></ul></div>
+
+<h2>5 · 附錄 A：本輪所授 <code>screen_contract</code> ＋ <code>covers</code>（10 個 proof/derivation 場）</h2>
+<p class="sub">warn-default metadata（<code>.md</code> 側 <code>screen_contract.required_steps</code> ＋ storyboard 場級 <code>covers:</code>）。<code>derivative_of_sine</code> 為既有範本；其餘 9 個本輪新授。<code>coverage.py</code> 唯一 finding = <code>derivative_of_sine.def</code>（warn）。</p>
+
+<div class="contract"><span class="cid">difference_quotient_for_sine</span> <span class="kind">derivation · #3</span>
+<table>
+<tr><td class="step">identity</td><td>\(\sin A-\sin B=2\cos\frac{A+B}{2}\sin\frac{A-B}{2}\)</td></tr>
+<tr><td class="step">substitute</td><td>\(\sin(x+h)-\sin x=2\cos(x+\tfrac h2)\sin\tfrac h2\)</td></tr>
+<tr><td class="step">divide</td><td>\(\frac{\sin(x+h)-\sin x}{h}=\cos(x+\tfrac h2)\frac{\sin(h/2)}{h/2}\)</td></tr>
+<tr><td class="step">factors</td><td>\(\cos(x+\tfrac h2)\to\cos x;\ \frac{\sin(h/2)}{h/2}\to1\)</td></tr>
+</table>
+<div class="cov"><code>covers: [identity, substitute, divide, factors]</code> — step.0/1/2 ＋ result（全演；根化簡）</div></div>
+
+<div class="contract"><span class="cid">squeeze_to_the_bound</span> <span class="kind">derivation · #6</span>
+<table>
+<tr><td class="step">clear_halves</td><td>\(\sin\theta\le\theta\le\tan\theta\)</td></tr>
+<tr><td class="step">divide_sin</td><td>\(1\le\frac{\theta}{\sin\theta}\le\frac{1}{\cos\theta}\)</td></tr>
+<tr><td class="step">bound</td><td>\(\cos\theta\le\frac{\sin\theta}{\theta}\le1\quad(0\lt\theta\lt\tfrac\pi2)\)</td></tr>
+<tr><td class="step">abs_bound</td><td>\(0\le|\sin\theta|\le|\theta|\)</td></tr>
+</table>
+<div class="cov"><code>covers: [clear_halves, divide_sin, bound, abs_bound]</code> — step.0/1 ＋ result ＋ check（全演）</div></div>
+
+<div class="contract"><span class="cid">continuity_statement_sin_limit</span> <span class="kind">theorem_proof · #7</span>
+<table>
+<tr><td class="step">bound <span class="bdg surf">recap</span></td><td>\(0\le|\sin\theta|\le|\theta|\ (\text{chord}\le\text{arc})\) &nbsp;·&nbsp; <code>depends_on: squeeze_to_the_bound.abs_bound</code></td></tr>
+<tr><td class="step">squeeze</td><td>\(|\theta|\to0,\ \text{squeeze}\Rightarrow\sin\theta\to0\)</td></tr>
+<tr><td class="step">qed</td><td>\(\lim_{\theta\to0}\sin\theta=0\)</td></tr>
+</table>
+<div class="cov"><code>covers: [bound, squeeze, qed]</code> — proof.0/1 ＋ qed；<code>bound</code> 為 recap（在地重畫）</div></div>
+
+<div class="contract"><span class="cid">continuity_argument</span> <span class="kind">theorem_proof · #8</span>
+<table>
+<tr><td class="step">cos_identity</td><td>\(\cos x-\cos x_0=-2\sin\frac{x-x_0}{2}\sin\frac{x+x_0}{2}\)</td></tr>
+<tr><td class="step">sin_identity</td><td>\(\sin x-\sin x_0=2\cos\frac{x+x_0}{2}\sin\frac{x-x_0}{2}\)</td></tr>
+<tr><td class="step">bound</td><td>\(|\cos x-\cos x_0|,\ |\sin x-\sin x_0|\le2|\sin\tfrac{x-x_0}{2}|\)</td></tr>
+<tr><td class="step">qed</td><td>\(x\to x_0\Rightarrow\cos x\to\cos x_0,\ \sin x\to\sin x_0\)</td></tr>
+</table>
+<div class="cov"><code>covers: [cos_identity, sin_identity, bound, qed]</code> — proof.0/1/2 ＋ qed（全演）</div></div>
+
+<div class="contract"><span class="cid">fundamental_limit</span> <span class="kind">theorem_proof · #9</span>
+<table>
+<tr><td class="step">bound <span class="bdg surf">recap</span></td><td>\(\cos\theta\le\frac{\sin\theta}{\theta}\le1\quad(0\lt\theta\lt\tfrac\pi2)\) &nbsp;·&nbsp; <code>depends_on: squeeze_to_the_bound.bound</code></td></tr>
+<tr><td class="step">squeeze</td><td>\(\cos\theta\to1\Rightarrow\frac{\sin\theta}{\theta}\to1^{+}\)</td></tr>
+<tr><td class="step">qed</td><td>\(\text{even}\Rightarrow\text{two-sided limit}=1\)</td></tr>
+</table>
+<div class="cov"><code>covers: [bound, squeeze, qed]</code> — proof.0/1 ＋ qed；<code>bound</code> 為 recap（在地重畫式(1)）</div></div>
+
+<div class="contract" style="border-left:4px solid var(--orange)"><span class="cid">derivative_of_sine</span> <span class="kind">theorem_proof · #14</span> <span class="bdg sc1">SC1: def 未覆蓋</span>
+<table>
+<tr><td class="step">def <span class="bdg block">dropped</span></td><td>\(\frac{d}{dx}\sin x=\lim_{h\to0}\frac{\sin(x+h)-\sin x}{h}\) &nbsp;— <b>不在 covers</b>（proof.0 直跳 reduced）</td></tr>
+<tr><td class="step">reduced <span class="bdg surf">recap</span></td><td>\(=\lim_{h\to0}\cos(x+\tfrac h2)\frac{\sin(h/2)}{h/2}\) &nbsp;·&nbsp; <code>depends_on: difference_quotient_for_sine.result</code></td></tr>
+<tr><td class="step">limits</td><td>\(\cos(x+\tfrac h2)\to\cos x;\ \tfrac{\sin(h/2)}{h/2}\to1\)</td></tr>
+<tr><td class="step">qed</td><td>\(=\cos x\cdot1=\cos x\)</td></tr>
+</table>
+<div class="cov"><code>covers: [reduced, limits, qed]</code> — <b>def 刻意丟</b> → 唯一確定性 SC1（warn）。既有範本。</div></div>
+
+<div class="contract"><span class="cid">derivative_of_cosine</span> <span class="kind">theorem_proof · #15</span>
+<table>
+<tr><td class="step">companion_identity</td><td>\(\cos A-\cos B=-2\sin\frac{A+B}{2}\sin\frac{A-B}{2}\)</td></tr>
+<tr><td class="step">divide</td><td>\(\frac{\cos(x+h)-\cos x}{h}=-\sin(x+\tfrac h2)\frac{\sin(h/2)}{h/2}\)</td></tr>
+<tr><td class="step">limits</td><td>\(-\sin(x+\tfrac h2)\to-\sin x;\ \frac{\sin(h/2)}{h/2}\to1\) &nbsp;<span class="cite">（畫面上併入 qed）</span></td></tr>
+<tr><td class="step">qed</td><td>\(=-\sin x\cdot1=-\sin x\)</td></tr>
+</table>
+<div class="cov"><code>covers: [companion_identity, divide, limits, qed]</code> — proof.0/1 ＋ qed；<code>limits</code> 併入 qed 的 \(-\sin x\cdot1\)（SC-honesty 判為合併）</div></div>
+
+<div class="contract"><span class="cid">companion_limit</span> <span class="kind">derivation · #19</span>
+<table>
+<tr><td class="step">conjugate</td><td>\(\frac{1-\cos\theta}{\theta}=\frac{(1-\cos\theta)(1+\cos\theta)}{\theta(1+\cos\theta)}=\frac{1-\cos^{2}\theta}{\theta(1+\cos\theta)}\)</td></tr>
+<tr><td class="step">split</td><td>\(=\frac{\sin^{2}\theta}{\theta(1+\cos\theta)}=\frac{\sin\theta}{\theta}\cdot\frac{\sin\theta}{1+\cos\theta}\)</td></tr>
+<tr><td class="step">evaluate</td><td>\(\to1\cdot\frac{0}{1+1}=0\)</td></tr>
+</table>
+<div class="cov"><code>covers: [conjugate, split, evaluate]</code> — step.0/1 ＋ result（全演）</div></div>
+
+<div class="contract"><span class="cid">all_six_trig_derivatives</span> <span class="kind">derivation · #20</span>
+<table>
+<tr><td class="step">tan_quotient</td><td>\(\frac{d}{dx}\tan x=\frac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^{2}x}\)</td></tr>
+<tr><td class="step">tan_result</td><td>\(=\frac{\cos^{2}x+\sin^{2}x}{\cos^{2}x}=\frac{1}{\cos^{2}x}=\sec^{2}x\)</td></tr>
+<tr><td class="step">sec</td><td>\(\frac{d}{dx}\sec x=\frac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^{2}x}=\sec x\tan x\) &nbsp;<span class="cite">（PD1 adv：一 reveal 併兩動作）</span></td></tr>
+<tr><td class="step">cot_csc</td><td>\(\frac{d}{dx}\cot x=-\csc^{2}x,\ \frac{d}{dx}\csc x=-\csc x\cot x\) &nbsp;<span class="cite">（result-only；SC-adv）</span></td></tr>
+</table>
+<div class="cov"><code>covers: [tan_quotient, tan_result, sec, cot_csc]</code> — step.0/1 ＋ result ＋ check</div></div>
+
+<div class="contract"><span class="cid">shm_compute</span> <span class="kind">derivation · #21</span>
+<table>
+<tr><td class="step">height</td><td>\(s(t)=\sin t\)</td></tr>
+<tr><td class="step">velocity</td><td>\(s'(t)=\cos t\)</td></tr>
+<tr><td class="step">acceleration</td><td>\(s''(t)=-\sin t\)</td></tr>
+<tr><td class="step">shm</td><td>\(s''(t)=-\sin t=-s(t)\)</td></tr>
+</table>
+<div class="cov"><code>covers: [height, velocity, acceleration, shm]</code> — step.0/1/2 ＋ result（全演）</div></div>
+
+<h2>6 · 附錄 B：AMP 四態總表（handout <code>expansion:intuition</code>／<code>application</code>）</h2>
+<p class="sub">判 surfaced 權威＝storyboard（任一模態承載即 surfaced）。<b>7/7 screened、0 missing</b> → 0 條 AMP1 提議（乾淨、不硬湊；與 detail-redo 刻意把 4 樞紐直覺加進 <code>say</code> 的設計一致）。</p>
+<div class="box amp">
+<table>
+<tr><th style="text-align:left; padding:6px 9px; border-bottom:2px solid var(--navy)">handout 標記（短引文）</th><th style="border-bottom:2px solid var(--navy)">態</th><th style="text-align:left; border-bottom:2px solid var(--navy)">承載處</th></tr>
+<tr><td>① (sec-3-1:55) trig 差分商塌成 \(\lim\sin\theta/\theta\)，代數攻不下、幾何破</td><td class="st c-ok">screened</td><td>#2 why_trig_is_different：畫面 math.0/1 ＋ 旁白 ＋ funnel anim</td></tr>
+<tr><td>② (sec-3-1:76) 先給面積比較的動機（偶函數省一半）</td><td class="st c-ok">screened</td><td>#5 sector_inequality say ＋ #4 divider scaffold ＋ hook</td></tr>
+<tr><td>③ (sec-3-1:100) 為何此處需要連續性</td><td class="st c-ok">screened</td><td>#7 continuity_statement say「the key to continuity…never jump」</td></tr>
+<tr><td>④ (sec-3-1:128) squeeze payoff 框架</td><td class="st c-ok">screened</td><td>#9 fundamental_limit say ＋ 畫面 statement</td></tr>
+<tr><td>⑤ (sec-3-1:168) 組裝各片（連續＋基本極限）</td><td class="st c-ok">screened</td><td>#14 derivative_of_sine say ＋ scaffold.motive「Cash in continuity and the limit」</td></tr>
+<tr><td>⑥ (sec-3-1:190) 同機制、第二函數（cosine）</td><td class="st c-ok">screened</td><td>#15 derivative_of_cosine say ＋ scaffold.motive「Same machinery…」</td></tr>
+<tr><td>⑦ (sec-3-1:294) 四步導數循環，呼應 \(e^x\) 自我複製</td><td class="st c-ok">screened</td><td>#17 derivative_cycle 畫面 math.0/1（含 \(e^x\) 對照）＋ 旁白</td></tr>
+<tr><td colspan="3" style="padding-top:10px; color:var(--muted)"><b>application：</b>§3.1 無獨立 <code>expansion:application</code>；SHM（Example 3.3）標 <code>expansion:example</code>（歸 example-supplement，本審不提）。交叉檢視其 application 直覺「\(s''=-s\)＝SHM 簽名」＝ screened（#21 result ＋ #22 hook）。</td></tr>
+<tr><td colspan="3" style="color:var(--muted)"><b>caution 路由：</b>radians（sec-3-1:158，correctness-critical）→ 建議進 <code>meta.assumptions</code>／PD4（見 §3）；limit-not-identity（sec-3-1:150，enrichment）→ 不路由。</td></tr>
+</table>
+</div>
+
+<footer>
+稽核方法：6 組 <code>pedagogy-firstlearner-audit</code>（PD1–4／OF1–2／SC-adv／SC-honesty，覆蓋全 26 場）＋ 1 組 <code>video-amplification-audit</code>（整節 AMP），皆 gate-1 唯讀、propose-not-act；SC1/SC2 由 <code>video/pipeline/coverage.py</code> 確定性計算（warn-default）。
+本報告不含任何內容修改；所有提議交使用者裁決。deck <code>CONTENT_APPROVED=yes</code>（LOCKED，detail-redo 2026-06-29）；<code>meta.otf_enforce</code>／<code>pedagogy_enforce</code> = true 且 0-surface（backfill 後）。
+</footer>
+
+</div>
+</body>
+</html>

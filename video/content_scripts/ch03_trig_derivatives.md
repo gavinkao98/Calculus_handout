@@ -111,6 +111,20 @@ visual_need: |
    4. 兩因子標去向：$\cos(x+\tfrac h2)\xrightarrow{\,h\to0\,}\cos x$（需「連續」）；$\dfrac{\sin(h/2)}{h/2}\xrightarrow{\,h\to0\,}?$（即 $\dfrac{\sin\theta}{\theta}$，需「基本極限」）。
   收尾標籤：整個導數 = 兩因子的乘積 → 靠「連續」＋「基本極限」兩件事。
 animation_cue: （無——靜態推導鏈即可；兩因子去向用引線/同色標記）
+screen_contract: |
+  required_steps:
+    - id: identity
+      tex: '\sin A-\sin B=2\cos\frac{A+B}{2}\sin\frac{A-B}{2}'
+      reason: 'sum-to-product'
+    - id: substitute
+      tex: '\sin(x+h)-\sin x=2\cos(x+\tfrac h2)\sin\tfrac h2'
+      reason: 'A=x+h, B=x'
+    - id: divide
+      tex: '\frac{\sin(x+h)-\sin x}{h}=\cos(x+\tfrac h2)\frac{\sin(h/2)}{h/2}'
+      reason: 'write h=2*(h/2)'
+    - id: factors
+      tex: '\cos(x+\tfrac h2)\to\cos x;\ \frac{\sin(h/2)}{h/2}\to1'
+      reason: 'continuity + fundamental limit'
 ```
 
 ---
@@ -186,6 +200,20 @@ visual_need: |
    3. $\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$（理由：取倒數→翻向；限 $0<\theta<\tfrac\pi2$）—— 標為「式 (1)」。
   附帶界（另起一行、標「keep for later」）：$0\le|\sin\theta|\le|\theta|$。
 animation_cue: （無——靜態推導鏈即可；翻向那步可短暫強調不等號方向反轉）
+screen_contract: |
+  required_steps:
+    - id: clear_halves
+      tex: '\sin\theta\le\theta\le\tan\theta'
+      reason: 'multiply areas by 2'
+    - id: divide_sin
+      tex: '1\le\frac{\theta}{\sin\theta}\le\frac{1}{\cos\theta}'
+      reason: 'divide by sin>0, tan=sin/cos'
+    - id: bound
+      tex: '\cos\theta\le\frac{\sin\theta}{\theta}\le1\quad(0<\theta<\tfrac\pi2)'
+      reason: 'reciprocate reverses; inequality (1)'
+    - id: abs_bound
+      tex: '0\le|\sin\theta|\le|\theta|'
+      reason: 'kept for later'
 ```
 
 ---
@@ -220,6 +248,18 @@ visual_need: |
 animation_cue: |
   （選用）建議動畫：單位圓上同時畫出半弦 $\sin\theta$ 與其上方的弧 $\theta$，讓
   角 θ 收小，弦與弧一起縮向 0，直觀呈現「弦 ≤ 弧、且一起趨 0」＝ $|\sin\theta|\le|\theta|\to0$。
+screen_contract: |
+  required_steps:
+    - id: bound
+      tex: '0\le|\sin\theta|\le|\theta|\ (\text{chord}\le\text{arc})'
+      depends_on: squeeze_to_the_bound.abs_bound
+      recap_required: true
+    - id: squeeze
+      tex: '|\theta|\to0,\ \text{squeeze}\Rightarrow\sin\theta\to0'
+      reason: 'squeeze theorem'
+    - id: qed
+      tex: '\lim_{\theta\to0}\sin\theta=0'
+      reason: 'the seed'
 ```
 
 ---
@@ -255,6 +295,20 @@ visual_need: |
    4. $x\to x_0 \Rightarrow \tfrac{x-x_0}{2}\to0 \Rightarrow 2\bigl|\sin\tfrac{x-x_0}{2}\bigr|\to0$（用上場 $\sin\theta\to0$）。
    5. squeeze ⇒ $\cos x\to\cos x_0,\ \sin x\to\sin x_0$（QED：兩者連續）。
 animation_cue: （無——靜態證明鏈即可；步驟 3 可短暫強調「半和因子被丟成 1」這個放大動作）
+screen_contract: |
+  required_steps:
+    - id: cos_identity
+      tex: '\cos x-\cos x_0=-2\sin\frac{x-x_0}{2}\sin\frac{x+x_0}{2}'
+      reason: 'sum-to-product'
+    - id: sin_identity
+      tex: '\sin x-\sin x_0=2\cos\frac{x+x_0}{2}\sin\frac{x-x_0}{2}'
+      reason: 'sum-to-product companion'
+    - id: bound
+      tex: '|\cos x-\cos x_0|,\ |\sin x-\sin x_0|\le2|\sin\tfrac{x-x_0}{2}|'
+      reason: 'half-sum factor <= 1'
+    - id: qed
+      tex: 'x\to x_0\Rightarrow\cos x\to\cos x_0,\ \sin x\to\sin x_0'
+      reason: 'squeeze (uses sin theta -> 0)'
 ```
 
 ---
@@ -288,6 +342,18 @@ visual_need: |
    3. squeeze ⇒ $\dfrac{\sin\theta}{\theta}\to1$（右極限）。
    4. 偶函數 ⇒ 左 = 右 ⇒ 兩側極限 $=1$（標「keystone」）。
 animation_cue: （無——靜態陳述＋證明鏈即可；可把 floor/ceiling 兩界向 1 收攏短暫示意）
+screen_contract: |
+  required_steps:
+    - id: bound
+      tex: '\cos\theta\le\frac{\sin\theta}{\theta}\le1\quad(0<\theta<\tfrac\pi2)'
+      depends_on: squeeze_to_the_bound.bound
+      recap_required: true
+    - id: squeeze
+      tex: '\cos\theta\to1\Rightarrow\frac{\sin\theta}{\theta}\to1^{+}'
+      reason: 'cos continuous + squeeze'
+    - id: qed
+      tex: '\text{even}\Rightarrow\text{two-sided limit}=1'
+      reason: 'even symmetry'
 ```
 
 ---
@@ -443,6 +509,20 @@ visual_need: |
    3. $-\sin(x+\tfrac h2)\to-\sin x$（連續）；$\dfrac{\sin(h/2)}{h/2}\to1$（基本極限）。
    4. $=-\sin x$（QED）。
 animation_cue: （無——靜態陳述＋證明鏈即可；differece-quotient setup 走 repeat-pattern、不重述，只顯示新恆等式那行）
+screen_contract: |
+  required_steps:
+    - id: companion_identity
+      tex: '\cos A-\cos B=-2\sin\frac{A+B}{2}\sin\frac{A-B}{2}'
+      reason: 'companion sum-to-product'
+    - id: divide
+      tex: '\frac{\cos(x+h)-\cos x}{h}=-\sin(x+\tfrac h2)\frac{\sin(h/2)}{h/2}'
+      reason: 'divide by h=2*(h/2)'
+    - id: limits
+      tex: '-\sin(x+\tfrac h2)\to-\sin x;\ \frac{\sin(h/2)}{h/2}\to1'
+      reason: 'continuity + fundamental limit (merged into qed on screen)'
+    - id: qed
+      tex: '=-\sin x\cdot1=-\sin x'
+      reason: 'QED'
 ```
 
 ---
@@ -529,6 +609,17 @@ visual_need: |
    2. $=\dfrac{\sin^2\theta}{\theta(1+\cos\theta)}=\dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$（理由：$1-\cos^2\theta=\sin^2\theta$、拆兩因子）。
    3. $\to 1\cdot\dfrac{0}{1+1}=0$（理由：基本極限 + 連續）。
 animation_cue: （無——靜態推導鏈即可）
+screen_contract: |
+  required_steps:
+    - id: conjugate
+      tex: '\frac{1-\cos\theta}{\theta}=\frac{(1-\cos\theta)(1+\cos\theta)}{\theta(1+\cos\theta)}=\frac{1-\cos^{2}\theta}{\theta(1+\cos\theta)}'
+      reason: 'multiply by 1+cos'
+    - id: split
+      tex: '=\frac{\sin^{2}\theta}{\theta(1+\cos\theta)}=\frac{\sin\theta}{\theta}\cdot\frac{\sin\theta}{1+\cos\theta}'
+      reason: '1-cos^2=sin^2, split'
+    - id: evaluate
+      tex: '\to1\cdot\frac{0}{1+1}=0'
+      reason: 'fundamental limit + continuity'
 ```
 
 ---
@@ -561,6 +652,20 @@ visual_need: |
    3. $\dfrac{d}{dx}\sec x=\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}=\dfrac{\sin x}{\cos^2 x}=\sec x\tan x$（理由：商法則於 $\tfrac1{\cos}$）。
    4. （帶過）$\dfrac{d}{dx}\cot x=-\csc^2 x,\quad \dfrac{d}{dx}\csc x=-\csc x\cot x$（理由：同手法）。
 animation_cue: （無——靜態推導即可；cot/csc 走 repeat-pattern 帶過。若容量溢出，Stage 2 可拆 tan/sec 與 cot/csc 兩場、設 part:）
+screen_contract: |
+  required_steps:
+    - id: tan_quotient
+      tex: '\frac{d}{dx}\tan x=\frac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^{2}x}'
+      reason: 'quotient rule on sin/cos'
+    - id: tan_result
+      tex: '=\frac{\cos^{2}x+\sin^{2}x}{\cos^{2}x}=\frac{1}{\cos^{2}x}=\sec^{2}x'
+      reason: 'Pythagorean identity'
+    - id: sec
+      tex: '\frac{d}{dx}\sec x=\frac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^{2}x}=\sec x\tan x'
+      reason: 'quotient rule on 1/cos'
+    - id: cot_csc
+      tex: '\frac{d}{dx}\cot x=-\csc^{2}x,\ \frac{d}{dx}\csc x=-\csc x\cot x'
+      reason: 'same move (repeat-pattern)'
 ```
 
 ---
@@ -590,6 +695,20 @@ visual_need: |
    3. $s''(t)=-\sin t$（acceleration）。
    4. $-\sin t=-s(t)$ ⇒ $s''=-s$（標「signature of SHM」）。
 animation_cue: （無——靜態推導即可；幾何面交給 shm_stacked_graphs）
+screen_contract: |
+  required_steps:
+    - id: height
+      tex: 's(t)=\sin t'
+      reason: 'height'
+    - id: velocity
+      tex: "s'(t)=\\cos t"
+      reason: 'velocity'
+    - id: acceleration
+      tex: "s''(t)=-\\sin t"
+      reason: 'acceleration'
+    - id: shm
+      tex: "s''(t)=-\\sin t=-s(t)"
+      reason: 'simple harmonic motion'
 ```
 
 ---
