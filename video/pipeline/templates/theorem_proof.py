@@ -1,10 +1,17 @@
 """theorem_proof template -- Direction D (dark teaching frame).
 
-Matches screenshots/05-theorem_proof.png + B_Theorem:
-  eyebrow "[ THEOREM ]" + title;
-  a statement card with a thick gold left bar (theorem accent);
-  a "Proof" eyebrow, then dot-led proof steps;
+Layout (2026-07-01 redesign): the statement sits in a rail card at the TOP-RIGHT
+(freeing the wide band under the title), and the proof reads as a left-spine
+equation chain (was a dot-led bullet list) closing on a green boxed QED:
+  eyebrow "[ THEOREM ]" + title + optional motive;
+  a statement card with a thick accent left bar, in the RIGHT rail;
+  a "Proof" eyebrow, then the proof steps as a chain on the Lectern spine;
   a closing "Therefore ..." line in success-green with a boxed QED mark.
+
+A proof row wide enough to reach the rail card's column drops the whole chain
+BELOW the card (full width); a narrow proof sits to the LEFT of the card (two
+columns). The statement-only proposition path (no proof) keeps the balanced
+card+aside two-column layout unchanged.
 
 Reveal: statement is static (the frame); each proof step and the QED line are
 dynamic (proof.0/1/2, qed) so narration walks the argument via {show ...}.
@@ -23,7 +30,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, UP, RoundedRectangle, VGroup
+from manim import DOWN, LEFT, RIGHT, UP, Rectangle, RoundedRectangle, VGroup
 
 from .. import brand
 from ..blocks import Block
@@ -32,10 +39,15 @@ from ._common import (scene_head, motif_corner, center_in_zone, build_aside, ren
                       ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
 
 
+_ROW_GAP = 0.5   # proof-chain min inter-row pitch (edge-to-edge); tall rows keep it
+
+
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
-    """Capacity contract (L2): the statement card + proof steps + QED form one fixed-rhythm
-    cascade in the left column, so measure its actual span (span model). min_pitch unused."""
-    return [ColumnPlan(min_pitch=0.0, model="span")]
+    """Capacity contract: the proof is now an ELASTIC equation chain on one column
+    (like derivation), so it is a "stack" model at the chain's min pitch -- the audit
+    reads the same tightest-packing question placement does. (Was "span": that measured
+    the expanded rendered gaps and would over-warn once the chain spreads.)"""
+    return [ColumnPlan(min_pitch=_ROW_GAP, model="stack")]
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -45,98 +57,99 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks += head
     # The title block by id -- NOT head[1]: scene_head inserts a `part` indicator before
     # the title for multipage (`part:`) scenes, so head[1] is the part indicator there.
-    # scaffold placement + card_y must anchor on the real title (else a part-scene motive
-    # aligns to the top-right part indicator and runs off-frame).
     title = next(b.mobject for b in head if b.id == "title")
 
+    # scaffold (motive) sits under the title at full width; body content flows below it.
+    # body_ref tracks the lowest header element (title, or the motive if present) so the
+    # card + proof anchor below the REAL header, never colliding with a wrapped title/motive.
     scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"))
-    # A motive line eats header air the dense proof cascade needs (qed can clip off-frame
-    # on a full part: proof). Tighten the title->motive and motive->card gaps ONLY when a
-    # motive is present, reclaiming ~0.3u; no-motive scenes keep T.TITLE_GAP/0.32 unchanged
-    # (byte-identical). The motive is a small de-emphasised line, so a tighter coupling to
-    # the title reads fine (visual gate confirms).
-    has_motive = any(sb.id == "scaffold.motive" for sb in scaffold_blocks)
+    body_ref = title
     for sb in scaffold_blocks:
         gap = 0.22 if sb.id == "scaffold.motive" else T.TITLE_GAP
-        sb.mobject.next_to(title, DOWN, buff=gap).align_to(title, LEFT)
-        title = sb.mobject
+        sb.mobject.next_to(body_ref, DOWN, buff=gap).align_to(body_ref, LEFT)
+        body_ref = sb.mobject
     blocks += scaffold_blocks
 
     left = SPINE_X
     content_w = CONTENT_W
-
     steps = spec.get("proof", [])
     qed_text = spec.get("qed")
-    # An enrichment aside (L3) applies only to a STATEMENT-ONLY proposition (no proof
-    # cascade to fill the zone); with a proof present the proof IS the content and the
-    # aside collapses (ignored). For it the statement narrows to the primary column.
+
+    # -- statement-only proposition (no proof) + enrichment aside: balanced two-column,
+    #    UNCHANGED. The aside path keeps the card in the PRIMARY column with the note in
+    #    the rail, the pair centred (Lectern bias). --
     use_aside = bool(spec.get("aside")) and not steps and not qed_text
-
-    # -- statement in a gold-barred panel (the textbook "theorem frame") --
-    # prose(): a pure-prose statement (no $) must NOT go to math_line -- that
-    # routes to MathTex and renders the whole sentence as run-together math
-    # italic. prose() sends it to Text instead, and still handles inline $math$.
-    stmt_w = (PRIMARY_W - 0.3) if use_aside else (content_w - 1.4)
-    statement = brand.prose(spec.get("statement", ""), ground,
-                            role="primary", size="h2", max_width=stmt_w)
-    card = brand.accent_panel(statement, ground, bar_role="accent", fill_role="panel",
-                              pad=0.42, pad_x=0.6)
-
     if use_aside:
-        # balanced two-column: card left + enrichment aside in the rail, the pair centred
-        # (Lectern bias), instead of the pinned-high card the proof path uses over empty space.
+        statement = brand.prose(spec.get("statement", ""), ground, role="primary",
+                                size="h2", max_width=PRIMARY_W - 0.3)
+        card = brand.accent_panel(statement, ground, bar_role="accent", fill_role="panel",
+                                  pad=0.42, pad_x=0.6)
         aside = build_aside(spec["aside"], ground, max_width=RAIL_W)
         card.move_to([left + card.width / 2, 0, 0])
         aside.move_to([RAIL_X, 0, 0], aligned_edge=LEFT)
-        center_in_zone([card, aside], title)
+        center_in_zone([card, aside], body_ref)
         blocks.append(Block("statement", card, anim="fade", static=True))
         blocks.append(Block("aside", aside, anim="fade", static=True, layer="decoration"))
         blocks.append(motif_corner(ground))
         return blocks
 
-    # The card sits at its designed y; a tall (wrapped) statement grows upward,
-    # so cap its top below the title -- the label/steps/qed cascade follows.
-    card_gap = 0.20 if has_motive else 0.32
-    card_y = min(1.55, title.get_bottom()[1] - card_gap - card.height / 2)
-    card.move_to([left + card.width / 2, card_y, 0])
+    # -- statement card -> TOP-RIGHT rail (the redesign). The old card sat full-width
+    #    directly under the title and ate the band the proof needed, leaving the right
+    #    half empty; moving it into the rail frees the wide band for the proof chain.
+    #    Sized to the rail interior (RAIL_W minus the panel's own horizontal pad) so it
+    #    never spills past the right gutter. Kept static -- reveal timing is unchanged. --
+    zone_top = body_ref.get_bottom()[1] - T.TITLE_GAP
+    card_pad_x = 0.5
+    inner_w = RAIL_W - 2 * card_pad_x
+    stmt_text = spec.get("statement", "")
+    is_formula = (stmt_text.strip().startswith("$") and stmt_text.strip().endswith("$")
+                  and stmt_text.count("$") == 2)
+    statement = brand.prose(stmt_text, ground, role="primary", size="h3",
+                            max_width=inner_w, align="LEFT")
+    # Consistent rail-width card: pad a narrow (short-formula) statement out to the rail
+    # interior via a transparent spacer, so EVERY card spans the full rail (right edge on
+    # the gutter) instead of a small card drifting at RAIL_X. A display formula centres in
+    # the card; wrapped prose left-aligns (2026-07-01 visual polish, Codex-confirmed).
+    spacer = Rectangle(width=inner_w, height=statement.height, stroke_width=0, fill_opacity=0)
+    if is_formula:
+        statement.move_to(spacer)
+    else:
+        statement.move_to(spacer.get_left(), aligned_edge=LEFT)
+    card = brand.accent_panel(VGroup(spacer, statement), ground, bar_role="accent",
+                              fill_role="panel", pad=0.34, pad_x=card_pad_x)
+    card.move_to([RAIL_X + card.width / 2, zone_top - card.height / 2, 0])
     blocks.append(Block("statement", card, anim="fade", static=True))
 
-    # -- proof label + steps --
-    # The label sits at its designed y unless a tall (wrapped) statement card
-    # reaches down into it -- then label and steps shift down together.
+    # -- proof: an equation chain on the Lectern spine (was a dot-led bullet list). Rows
+    #    share the spine's left edge and flow like a derivation, closing on the green QED.
+    #    A row wide enough to reach the rail card's column drops the whole chain BELOW the
+    #    card (full width); otherwise the chain sits to the LEFT of the card (two columns).
+    #    The chain stays flush-left on the spine -- it is NOT centred horizontally (that
+    #    would fight the top-right card and break the theorem/proof grammar). --
+    proof_left = left + 0.4
     proof_label = brand.eyebrow("proof", ground, role="muted")
-    label_y = min(0.3, card.get_bottom()[1] - 0.35)
-    proof_label.move_to([left + 0.4, label_y, 0], aligned_edge=LEFT)
-    blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
-    proof_content: list = []   # steps + qed, centred below the label (card+label stay put)
+    step_mobs = [brand.prose(p, ground, role="text", size="step",
+                             max_width=content_w - 1.0) for p in steps]
+    reaches_rail = any(proof_left + m.width > RAIL_X - 0.25 for m in step_mobs)
 
-    step_gap = 0.95     # designed rhythm = MINIMUM pitch
-    min_clear = 0.35    # air kept between tall (wrapped) steps -- pitch expands,
-    #                     steps never collide (the recap_cards fused-rows class)
-    y = label_y - 0.7
+    proof_label.move_to([proof_left, zone_top - proof_label.height / 2, 0], aligned_edge=LEFT)
+    blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
+
+    chain: list = []
+    y = 0.0
     prev_half = None
-    for i, p in enumerate(steps):
-        dot = brand.text_glow(brand.plot_dot(ground, role="secondary", r=0.07),
-                              ground, role="secondary", width=5, opacity=0.45)
-        # prose() wraps a long step instead of shrinking it, so the steps keep a
-        # uniform size -- a scaled-down long step beside a short one is the same
-        # mismatch class as the recap points.
-        txt = brand.prose(p, ground, role="text", size="step", max_width=content_w - 1.0)
-        first_line = txt.submobjects[0] if isinstance(txt, VGroup) and txt.submobjects else txt
-        dot.next_to(first_line, LEFT, buff=0.3)
-        row = VGroup(dot, txt)
-        half = row.height / 2
-        if prev_half is None:
-            # first step: clear the label too, if the step wraps tall
-            y = min(y, label_y - (0.2 + proof_label.height / 2 + half))
-        else:
-            y -= max(step_gap, prev_half + min_clear + half)
-        row.move_to([left + 0.4, y, 0], aligned_edge=LEFT)
-        blocks.append(Block(f"proof.{i}", row, anim="fade", static=False))
-        proof_content.append(row)
+    for i, m in enumerate(step_mobs):
+        half = m.height / 2
+        if prev_half is not None:
+            y -= prev_half + _ROW_GAP + half
+        m.move_to([proof_left, y, 0], aligned_edge=LEFT)
+        blocks.append(Block(f"proof.{i}", m, anim="fade", static=False))
+        chain.append(m)
         prev_half = half
 
-    # -- QED line --
+    # -- QED line: a green closing line + boxed QED mark, folded into the chain rhythm
+    #    (was floating low). A theorem/proposition proof CLOSES -- the green boxed QED is
+    #    the right idiom, NOT derivation's amber "result". --
     if qed_text:
         line = brand.prose(qed_text, ground, role="success", size="step")
         box = RoundedRectangle(width=0.46, height=0.46, corner_radius=T.RADIUS_SM,
@@ -144,20 +157,26 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         mark = brand.glyph("qed", ground, role="success", size="math_sm")
         mark.scale_to_fit_height(box.height * 0.46)
         mark.move_to(box.get_center())
-        qbox = brand.text_glow(VGroup(box, mark), ground, role="success", width=7, opacity=0.4)
+        qbox = VGroup(box, mark)
         qbox.next_to(line, RIGHT, buff=0.3)
         row = VGroup(line, qbox)
         half = row.height / 2
-        if prev_half is None:
-            y_qed = y - 0.1  # no steps: legacy position below the label zone
-        else:
-            y_qed = y - max(step_gap, prev_half + min_clear + half) - 0.1
-        row.move_to([left + 0.4, y_qed, 0], aligned_edge=LEFT)
+        if prev_half is not None:
+            y -= prev_half + _ROW_GAP + half
+        row.move_to([proof_left, y, 0], aligned_edge=LEFT)
         blocks.append(Block("qed", row, anim="flash_in", static=False))
-        proof_content.append(row)
+        chain.append(row)
 
-    # centre the proof (steps + qed) in the zone below the label, so a short proof
-    # no longer floats high under the statement card with an empty lower zone.
-    center_in_zone(proof_content, proof_label)
+    # anchor the chain just below the PROOF label instead of centring it in the whole band
+    # (a short 2-step proof otherwise floats mid-frame, detached from its label -- the
+    # 2026-07-01 visual polish). A wide proof that reaches the rail drops below the card so
+    # it still clears it. The calm lower whitespace is intentional (Lectern bias).
+    if chain:
+        anchor_top = proof_label.get_bottom()[1] - 0.5
+        if reaches_rail:
+            anchor_top = min(anchor_top, card.get_bottom()[1] - 0.4)
+        dy = anchor_top - chain[0].get_top()[1]
+        for m in chain:
+            m.shift([0, dy, 0])
     blocks.append(motif_corner(ground))
     return blocks
