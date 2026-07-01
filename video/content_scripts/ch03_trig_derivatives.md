@@ -349,7 +349,7 @@ screen_contract: |
       depends_on: squeeze_to_the_bound.bound
       recap_required: true
     - id: squeeze
-      tex: '\cos\theta\to1\Rightarrow\frac{\sin\theta}{\theta}\to1^{+}'
+      tex: '\cos\theta\to1\Rightarrow\frac{\sin\theta}{\theta}\to1'
       reason: 'cos continuous + squeeze'
     - id: qed
       tex: '\text{even}\Rightarrow\text{two-sided limit}=1'
