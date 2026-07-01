@@ -745,6 +745,7 @@ template 時請遵守。嚴重度：**error** 中止 render（確定壞了）；
 | `meta.assumptions[]` 有 entry 卻在 `first_use_unit` 沒對應 `scaffold.flag`，或有孤兒 `scaffold.flag`（PD4 前提首用即標） | 每筆 assumption ⇄ 其 `first_use_unit` 的 `flag` 一一對應，無孤兒 | **pedagogy warn**（registry 一致性，opt-in 才 error） |
 | 上畫面教學文字（含 scaffold）無 provenance ref（OTF 可回溯） | 帶場級 `ref:`，例外欄位用 `refs:` flat-map 覆寫（key＝欄位路徑字串） | **provenance warn**（opt-in `meta.otf_enforce` 才 error）；規則見 [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md) |
 | proof／derivation 場的 storyboard 漏掉 `.md screen_contract.required_steps` 宣告的承重步驟（SC1，**可合併不可掉**）；或場級 `covers:` 宣告了畫面 payload 沒有的步驟（SC-honesty） | 場級 `covers: [id…]` 聯集蓋滿該單元承重步驟（一 reveal 可蓋多 id＝合併／重排）；掉步驟就補上畫面，`recap_required` 的 cash-in 步驟要在地重述（SC2） | **coverage warn**（opt-in `meta.coverage_enforce` 才 error）；把上方「>4 步壓成 2–3 行」從人工 checklist 升級為確定性閘；細節 [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md) `screen_contract` 節 |
+| exposition beat（`motivation`／`intuition`／`bridge`／`forward-ref`）用 `definition_math`／`value_table` 卻不設 `scene_role` | 設 `scene_role: <beat>`（→ 無字卡）；只有真形式物件（definition/theorem/…）才戴字卡 | 否則靜默沿用 `accent` 的預設字卡（如 `[ DEFINITION ]`）＝把形式標籤套在講解 beat（2026-07-01 字卡 resolver 學費，見 §Eyebrow 字卡 resolver）。**注意：lint 抓不到「漏設」**（無法偵測 beat role）→ 純靠此 checklist；完全強制須待 L3 把 `scene_role` 設必填 |
 
 ---
 

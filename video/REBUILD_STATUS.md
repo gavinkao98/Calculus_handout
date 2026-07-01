@@ -4,6 +4,23 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## ✅ 2026-07-01 字卡（eyebrow chip）resolver＋`scene_role`：exposition beat 去字卡・14 格 mislabel 清零・TDD・Codex 2 輪
+
+使用者從 §3.1 場景「A Limit No Algebra Can Crack」被歸類 `[ DEFINITION ]` 追起：字卡由 `accent` 的預設 label 推導，故**修辭／教學 beat**（motivation／intuition／bridge／forward-ref，寫在 `definition_math` 上）靜默戴 `[ DEFINITION ]`；Remark 戴 `[ PROPOSITION ]`；例題（`derivation` 無 `prompt:`／`value_table`）戴 `[ DERIVATION ]`／`[ TABLE ]`。根因＝**字卡標的是「形式／accent」、缺「教學 beat」這條軸**。全程 TDD＋Codex standing-consent 2 輪覆核。分支 `video/template-redesign-navy-spine`，離線零計費。
+
+- **清點：** 全 3 個現存 storyboard（§1.1 `ch01_inverse_functions`／§3.1 `ch03_trig_derivatives`／§3.2 `ch03_chain_rule`，共 77 場）→ [`content_scripts/_audit/REVIEW-storyboard-eyebrow-chip-inventory.html`](content_scripts/_audit/REVIEW-storyboard-eyebrow-chip-inventory.html)。**video 只有這 3 個 section storyboard**（無 ch02/ch04、ch01/ch03 其餘節未寫）。6 MIGRATE＋8 DECIDE＝14 格 mislabel。
+- **機制（新，contract 在 [`DESIGN.md`](DESIGN.md) §Eyebrow 字卡 resolver）：** [`pipeline/scene_roles.py`](pipeline/scene_roles.py)（純 stdlib：`SCENE_ROLE_CHIP` 字彙＋`resolve_chip`；優先序 **kicker > label > scene_role > 模板預設**；exposition role → `None`＝無字卡）；`templates/_common.py:scene_head` 接 `resolve_chip`，無字卡＝**隱形 placeholder eyebrow**（照樣建＋定位＋放 index-0，再 `set_opacity(0)`）→ title 錨點與有字卡場景完全相同（零飄移，`body_zone`/`place_body` 不動）、保 `head[1]`/`blocks[1]` title 契約；`lint._scene_role_issues`（未知值→error／與 label|kicker 併存→warn，**不做** accent 全域 lint）。
+- **遷移 14 格（3 commits）：** §1.1（ch01，**本輪首次被動到**）＝4 例題補 `prompt:`→`[EXAMPLE]`（shape_can_mislead／first_inverses／invert_a_cubic／invert_a_rational）＋`when_inversion_fails` motivation→無字卡＋`temperature_inverse` Example 1.8→`[EXAMPLE]`；§3.1＝`why_trig_is_different`／`toward_the_chain_rule`→無字卡、`derivative_cycle`（Remark 3.1）→`[REMARK]`；§3.2＝`why_composition_is_missing`／`rates_multiply_intuition`／`proof_strategy_bridge`／`toward_section_3_3`→無字卡、`leibniz_form`（Remark 3.2）→`[REMARK]`。兩 Remark 連 `accent: proposition→remark`（同為 `secondary` 藍、零視覺變化、消語義錯位）。commits `f6a183a`（resolver＋§3.x 8 格＋DESIGN＋測試＋inventory）、`e928a4b`（ch01 4 例題 prompt）、`8462a11`（ch01 2 table）。
+- **驗證：** TDD（resolver／lint／scene_head 各 RED→GREEN）；[`pipeline/_selftest_scene_roles.py`](pipeline/_selftest_scene_roles.py)（resolver 6＋lint 4＋scene_head chipless build 1）；5 個 selftest 全綠；3 deck lint clean（ch01 原 4 個 `_example_missing_prompt` warn 也清掉）；mock render 過 schema/lint/**sizecheck**（隱形 eyebrow 未卡 sizecheck）；抽幀眼驗（無字卡／`[REMARK]`／`[EXAMPLE]`、title 基線零飄移）。Codex gpt-5.5/xhigh 2 輪（設計＋實作計畫）抓到：ch01 `[table]≠[example]` 事實錯、3 個 `kicker` 皆多餘、漏了 `label:` 機制、precedence 應 label>scene_role、常數放輕量模組、單向規則。
+- **durable 教訓／給後續章節（重要）：**
+  1. **新章節寫 exposition beat（motivation／intuition／bridge／forward-ref）務必設 `scene_role`**，否則會**回退成戴 `accent` 的預設字卡**（即原 bug）。**lint 抓不到「漏設」**（無法偵測 beat role，全域 accent lint 會誤傷真定義）→ 靠 [`DESIGN.md`](DESIGN.md) 的 Authoring checklist＋§Eyebrow 字卡 resolver。
+  2. `scene_role` 目前是**選填、非強制**；完全強制＝**L3（設必填、去 fallback）＝延後**。
+  3. resolver **只在 `scene_head`**；`graph`（不經 scene_head）／`example_head` 的 `[ example ]`／各模板固定 `default_label` 仍散著＝**第二次遷移邊界**（未來若要 `scene_role` 控 graph 字卡需 header 重構）。
+  4. `value_table`／`definition_math` 都走 `scene_head` → resolver 對兩者皆生效；chipless 隱形 placeholder 保 `blocks[1]` title 契約（與既有 `head[1]` latent-bug 追蹤相容，本輪 8 格皆非 `part:` 故未觸發）。
+  5. 視覺規則**單向**：exposition ⟹ 無字卡；**無字卡 ⇏ exposition**（graph/figure 本就無字卡，別反推）。
+- **延後（未做）：** L3（`scene_role` 必填＋去 fallback）；`graph`／`example_face` 上 resolver。inventory 的 14 格已全解，無其他 mislabel。
+- **成品：** inventory HTML（上）＋ [`DESIGN.md`](DESIGN.md) §Eyebrow 字卡 resolver＋Authoring checklist；交付 mock 片沿用 §3.1／§3.2 既有 mp4（真 TTS／最終 render 另議報價）。**本地未 push。**
+
 ## ✅ 2026-07-01 §3.1 thm/prop 場景視覺重構（字卡右上＋proof 等式鏈）・sizecheck 全綠・Codex 兩輪
 
 使用者要求優化 thm/prop 場景：**字卡移到標題右方空曠處（適當縮小）、下方 proof 改成像 derivation／example 的推導流程**。使用者授權自主推進＋standing-consent 跑 Codex 拍板，只交付成果。**只改 [`pipeline/templates/theorem_proof.py`](pipeline/templates/theorem_proof.py) 一個檔**（authoring schema、旁白 source、block id `statement`/`proof.0..N`/`qed` 全不動），§3.1 共 **7 個 theorem_proof 場景**一次全套（continuity_statement_sin_limit／continuity_argument／fundamental_limit／derivative_of_sine(_finish)／derivative_of_cosine(_finish)）。分支 `video/template-redesign-navy-spine`。**全程離線零計費**（Codex read-only＋mock render＋scratch_frames）。
