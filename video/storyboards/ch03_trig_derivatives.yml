@@ -37,6 +37,12 @@ meta:
   otf_enforce: true        # SP2: provenance gating (0 surface after backfill)
   pedagogy_enforce: true   # SP2: PD2/3/4 gating (0 surface after backfill)
   fontfloor_enforce: true  # SP2: font-floor gating (0 surface)
+  coverage_enforce: true   # SC step-coverage gating (0 SC1 after first-learner fixes)
+  assumptions:
+    - id: radians
+      text: "angles in radians (arc $=\\theta$)"
+      first_use_unit: why_trig_is_different
+      source: "chapter3-print-standalone.html SS3.1 . radian convention (Caution)"
   video: { w: 3840, h: 2160, fps: 60 }   # 4K60 delivery; --quality high renders 1080p for QA
   sections:
     - { id: "3.1", title: "Derivatives of the Sine and Cosine Functions" }
@@ -70,6 +76,7 @@ scenes:
     template: definition_math
     accent: definition
     ref: md:why_trig_is_different
+    scaffold: { flag: radians }     # PD4: first use of the radian assumption
     source: "chapter3-print-standalone.html SS3.1 . opening prose (funnels to sin/theta over theta)"
     title: "A Limit No Algebra Can Crack"
     say: |
@@ -381,13 +388,14 @@ scenes:
     progress: { current: 3, total: 4 }
     duration: 4.0
 
-  # 14 ----------------------------------- Theorem 3.1 + Proof: d/dx sin x = cos x (L1)
+  # 14 ------------------ Theorem 3.1 + Proof (part 1/2): definition -> reduced form
   - id: derivative_of_sine
     kind: content
     template: theorem_proof
     accent: theorem
+    part: { current: 1, total: 2 }
     ref: md:derivative_of_sine
-    covers: [reduced, limits, qed]     # storyboard shows proof.0=reduced, proof.1=limits, qed -- def line dropped
+    covers: [def, reduced]     # def restored (sweep fix -- SC1 def cleared); split for capacity
     scaffold: { motive: "Cash in continuity and the limit — sine's derivative falls out." }
     source: "chapter3-print-standalone.html SS3.1 . Theorem 3.1 + Proof"
     title: "The Derivative of Sine"
@@ -395,26 +403,44 @@ scenes:
       Now the payoff, and it falls into our hands.
       {show statement} The claim: the derivative of $\sin x$ is $\cos x$, for
       every real $x$.
-      {show proof.0} Start from the definition, and use the form we already
-      found -- the derivative is the limit of $\cos(x+\tfrac h2)$ times
-      $\sin(h/2)$ over $h/2$.
-      {show proof.1} Let $h\to 0$: the first factor tends to $\cos x$ by
+      {show proof.0} Start from the definition -- the derivative is the limit
+      of the difference quotient.
+      {show proof.1} But we already did the hard algebra: that quotient is
+      $\cos(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
+    statement: "$\\frac{d}{dx}\\sin x = \\cos x$"
+    proof:
+      - "$\\frac{d}{dx}\\sin x=\\lim_{h\\to 0}\\frac{\\sin(x+h)-\\sin x}{h}$"
+      - "$=\\lim_{h\\to 0}\\cos\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
+
+  # 14b ----------------- Theorem 3.1 + Proof (part 2/2): take the limit -> cos x
+  - id: derivative_of_sine_finish
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    part: { current: 2, total: 2 }
+    ref: md:derivative_of_sine
+    covers: [limits, qed]
+    scaffold: { motive: "Send $h\\to 0$: continuity and the fundamental limit finish it." }
+    source: "chapter3-print-standalone.html SS3.1 . Theorem 3.1 + Proof"
+    title: "The Derivative of Sine"
+    say: |
+      {show proof.0} Let $h\to 0$: the first factor tends to $\cos x$ by
       continuity, the second to one by the fundamental limit.
       {show qed} A continuous thing times a limit -- the product is $\cos x$
       times one, just $\cos x$.
     statement: "$\\frac{d}{dx}\\sin x = \\cos x$"
     proof:
-      - "$\\frac{d}{dx}\\sin x=\\lim_{h\\to 0}\\cos\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
       - "$\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
     qed: "$\\Rightarrow\\ \\cos x\\cdot 1=\\cos x$"
 
-  # 15 --------------------------- Theorem 3.2 + Proof: d/dx cos x = -sin x (L1, repeat-pattern)
+  # 15 ------------------ Theorem 3.2 + Proof (part 1/2): companion identity -> divided form
   - id: derivative_of_cosine
     kind: content
     template: theorem_proof
     accent: theorem
+    part: { current: 1, total: 2 }
     ref: md:derivative_of_cosine
-    covers: [companion_identity, divide, limits, qed]     # proof.0/1 + qed; limits merged into qed "-sin x*1" (repeat-pattern)
+    covers: [companion_identity, divide]     # split for capacity
     scaffold: { motive: "Same machinery, companion identity — now cosine." }
     source: "chapter3-print-standalone.html SS3.1 . Theorem 3.2 + Proof"
     title: "The Derivative of Cosine"
@@ -425,14 +451,31 @@ scenes:
       {show proof.0} This time use the companion sum-to-product formula.
       {show proof.1} The same division by $h$ turns the difference quotient into
       $-\sin(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
-      {show qed} Send $h$ to zero: the sine factor goes to $\sin x$, the other
-      to one, and the minus sign comes along -- leaving $-\sin x$. Same two
-      tools, one extra minus sign.
     statement: "$\\frac{d}{dx}\\cos x = -\\sin x$"
     proof:
       - "$\\cos A-\\cos B=-2\\sin\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}$"
       - "$\\frac{\\cos(x+h)-\\cos x}{h}=-\\sin\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
-    qed: "$\\to\\ -\\sin x\\cdot 1=-\\sin x$"
+
+  # 15b ----------------- Theorem 3.2 + Proof (part 2/2): take the limit -> -sin x
+  - id: derivative_of_cosine_finish
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    part: { current: 2, total: 2 }
+    ref: md:derivative_of_cosine
+    covers: [limits, qed]     # explicit limits reveal (sweep fix -- symmetry with sine)
+    scaffold: { motive: "Send $h\\to 0$: the same two tools, one extra minus sign." }
+    source: "chapter3-print-standalone.html SS3.1 . Theorem 3.2 + Proof"
+    title: "The Derivative of Cosine"
+    say: |
+      {show proof.0} Send $h$ to zero: the sine factor tends to $\sin x$ by
+      continuity, the second to one by the fundamental limit.
+      {show qed} The leading minus sign comes along -- leaving $-\sin x$. Same
+      two tools, one extra minus sign.
+    statement: "$\\frac{d}{dx}\\cos x = -\\sin x$"
+    proof:
+      - "$-\\sin\\!\\left(x+\\frac h2\\right)\\to-\\sin x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
+    qed: "$\\Rightarrow\\ -\\sin x\\cdot 1=-\\sin x$"
 
   # 16 ----------------------------- Figure 3.3: slope of sine = height of cosine (HOOK)
   - id: slope_equals_height
@@ -470,6 +513,7 @@ scenes:
     template: definition_math
     accent: proposition
     ref: md:derivative_cycle
+    scaffold: { motive: "Step back: what pattern do these two derivatives make together?" }
     source: "chapter3-print-standalone.html SS3.1 . Remark 3.1 (derivative cycle)"
     title: "The Derivative Cycle"
     say: |
@@ -526,17 +570,18 @@ scenes:
       - { math: "= \\frac{\\sin^{2}\\theta}{\\theta\\,(1+\\cos\\theta)} = \\frac{\\sin\\theta}{\\theta}\\cdot\\frac{\\sin\\theta}{1+\\cos\\theta}", reason: "$1-\\cos^{2}\\theta=\\sin^{2}\\theta$" }
     result: { math: "\\longrightarrow\\ 1\\cdot\\frac{0}{1+1} = 0", reason: "the limit, then continuity" }
 
-  # 20 ----------------------------- Example 3.2: all six trig derivatives (quotient rule, L1)
-  - id: all_six_trig_derivatives
+  # 20a ------------------- Example 3.2 (part 1/2): tan' and sec' via the quotient rule
+  - id: all_six_tan_sec
     kind: content
     template: derivation
     accent: example
+    part: { current: 1, total: 2 }
     ref: md:all_six_trig_derivatives
-    covers: [tan_quotient, tan_result, sec, cot_csc]     # step.0/1 + result + check (all shown)
+    covers: [tan_quotient, tan_result, sec_setup, sec_result]     # step.0/1/2 + result
     scaffold: { motive: "From $\\sin,\\cos$, the quotient rule gives the other four." }
-    source: "chapter3-print-standalone.html SS3.1 . Example 3.2 (tan', sec', cot', csc')"
+    source: "chapter3-print-standalone.html SS3.1 . Example 3.2 (tan', sec')"
     title: "All Six Derivatives"
-    prompt: "Differentiate $\\tan x$, $\\sec x$, $\\cot x$, and $\\csc x$."
+    prompt: "Differentiate $\\tan x$ and $\\sec x$."
     say: |
       With sine and cosine in hand, the other four cost almost nothing -- just
       the quotient rule.
@@ -544,15 +589,41 @@ scenes:
       this.
       {show step.1} The numerator is $\cos^2 x+\sin^2 x$, which is one -- so the
       derivative of $\tan x$ is $\sec^2 x$.
-      {show result} Secant is the same idea on $1$ over $\cos x$: the quotient
-      rule lands $\sin x$ over $\cos^2 x$, which is $\sec x\tan x$.
-      {show check} And the same move on $\cot x$ and $\csc x$ finishes all six --
-      every one built on $\sin'=\cos$ and $\cos'=-\sin$.
+      {show step.2} Secant is the same idea on $1$ over $\cos x$: the quotient
+      rule, with a constant on top, gives this.
+      {show result} Clean it up, and secant's derivative is $\sec x\tan x$.
     steps:
       - { math: "\\frac{d}{dx}\\tan x = \\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{\\sin x}{\\cos x}$" }
       - { math: "= \\frac{\\cos^{2} x+\\sin^{2} x}{\\cos^{2} x} = \\frac{1}{\\cos^{2} x} = \\sec^{2} x", reason: "Pythagorean identity" }
-    result: { math: "\\frac{d}{dx}\\sec x = \\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x} = \\sec x\\tan x" }
-    check:  { math: "\\frac{d}{dx}\\cot x = -\\csc^{2} x,\\quad \\frac{d}{dx}\\csc x = -\\csc x\\cot x", reason: "the other two, same move" }
+      - { math: "\\frac{d}{dx}\\sec x = \\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{1}{\\cos x}$" }
+    result: { math: "= \\frac{\\sin x}{\\cos^{2} x} = \\sec x\\tan x" }
+
+  # 20b ------------------- Example 3.2 (part 2/2): cot' and csc' -- the same move
+  - id: all_six_cot_csc
+    kind: content
+    template: derivation
+    accent: example
+    part: { current: 2, total: 2 }
+    ref: md:all_six_trig_derivatives
+    covers: [cot_setup, cot_result, csc_setup, csc_result]     # step.0/1/2 + result
+    scaffold: { motive: "The same quotient rule finishes $\\cot x$ and $\\csc x$." }
+    source: "chapter3-print-standalone.html SS3.1 . Example 3.2 (cot', csc')"
+    title: "All Six Derivatives"
+    prompt: "And the same rule on $\\cot x$ and $\\csc x$."
+    say: |
+      The last two run exactly the same way.
+      {show step.0} Take $\cot x=\cos x$ over $\sin x$. The quotient rule gives
+      this.
+      {show step.1} The numerator is minus the quantity $\sin^2 x+\cos^2 x$,
+      again one -- so $\cot x$ differentiates to $-\csc^2 x$.
+      {show step.2} And $\csc x$ is $1$ over $\sin x$: the same rule lands this.
+      {show result} Cleaned up, that is $-\csc x\cot x$ -- and all six are done,
+      every one built on $\sin'=\cos$ and $\cos'=-\sin$.
+    steps:
+      - { math: "\\frac{d}{dx}\\cot x = \\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}", reason: "quotient rule on $\\tfrac{\\cos x}{\\sin x}$" }
+      - { math: "= \\frac{-(\\sin^{2} x+\\cos^{2} x)}{\\sin^{2} x} = -\\frac{1}{\\sin^{2} x} = -\\csc^{2} x", reason: "Pythagorean identity" }
+      - { math: "\\frac{d}{dx}\\csc x = \\frac{0\\cdot\\sin x-1\\cdot\\cos x}{\\sin^{2} x}", reason: "quotient rule on $\\tfrac{1}{\\sin x}$" }
+    result: { math: "= -\\frac{\\cos x}{\\sin^{2} x} = -\\csc x\\cot x" }
 
   # 21 ------------------------------- Example 3.3: simple harmonic motion (s'' = -s)
   - id: shm_compute
@@ -612,6 +683,7 @@ scenes:
     template: definition_math
     accent: definition
     ref: md:toward_the_chain_rule
+    scaffold: { motive: "We can do bare trig functions -- but not yet composed ones." }
     source: "chapter3-print-standalone.html SS3.1 . closing prose (forward-ref to the chain rule)"
     title: "Toward the Chain Rule"
     say: |

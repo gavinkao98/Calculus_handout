@@ -628,7 +628,7 @@ screen_contract: |
 
 ```
 id: all_six_trig_derivatives
-source: chapter3-print-standalone.html §3.1 · Example 3.2（tan'、sec' 用商法則；cot'、csc' 同法帶過）
+source: chapter3-print-standalone.html §3.1 · Example 3.2（tan'、sec'、cot'、csc' 全用商法則逐步）
 learning_goal: 用商法則把 sin'/cos' 推到其餘四個三角函數，補齊全部六個導數。
 kind: example
 narration: |
@@ -641,17 +641,28 @@ narration: |
   on $\dfrac{1}{\cos x}$: the quotient rule, with a constant on top, gives
   $\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}=\dfrac{\sin x}{\cos^2 x}$,
   which we read as $\dfrac{1}{\cos x}\cdot\dfrac{\sin x}{\cos x}=\sec x\tan x$.
-  And the very same move on $\cot x=\dfrac{\cos x}{\sin x}$ and
-  $\csc x=\dfrac{1}{\sin x}$ gives $-\csc^2 x$ and $-\csc x\cot x$. That
-  completes the derivatives of all six trigonometric functions — every one
-  built on $\sin'=\cos$ and $\cos'=-\sin$.
+  The last two run exactly the same way. Take $\cot x=\dfrac{\cos x}{\sin x}$;
+  the quotient rule gives
+  $\dfrac{(-\sin x)(\sin x)-(\cos x)(\cos x)}{\sin^2 x}$, whose numerator is
+  $-(\sin^2 x+\cos^2 x)=-1$, so
+  $\dfrac{d}{dx}\cot x=-\dfrac{1}{\sin^2 x}=-\csc^2 x$. And
+  $\csc x=\dfrac{1}{\sin x}$ gives
+  $\dfrac{0\cdot\sin x-1\cdot\cos x}{\sin^2 x}=-\dfrac{\cos x}{\sin^2 x}=
+  -\csc x\cot x$. That completes the derivatives of all six trigonometric
+  functions — every one built on $\sin'=\cos$ and $\cos'=-\sin$.
 visual_need: |
-  推導，逐行 reveal（tan、sec 完整顯示步驟；cot、csc repeat-pattern 帶過）：
+  推導，逐行 reveal（拆兩場 part:；四個導數各顯示商法則步驟）：
+  Part 1（tan、sec）：
    1. $\dfrac{d}{dx}\tan x=\dfrac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^2 x}$（理由：商法則於 $\tfrac{\sin}{\cos}$）。
    2. $=\dfrac{\cos^2 x+\sin^2 x}{\cos^2 x}=\dfrac{1}{\cos^2 x}=\sec^2 x$（理由：Pythagorean）。
-   3. $\dfrac{d}{dx}\sec x=\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}=\dfrac{\sin x}{\cos^2 x}=\sec x\tan x$（理由：商法則於 $\tfrac1{\cos}$）。
-   4. （帶過）$\dfrac{d}{dx}\cot x=-\csc^2 x,\quad \dfrac{d}{dx}\csc x=-\csc x\cot x$（理由：同手法）。
-animation_cue: （無——靜態推導即可；cot/csc 走 repeat-pattern 帶過。若容量溢出，Stage 2 可拆 tan/sec 與 cot/csc 兩場、設 part:）
+   3. $\dfrac{d}{dx}\sec x=\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}$（理由：商法則於 $\tfrac1{\cos}$）。
+   4. $=\dfrac{\sin x}{\cos^2 x}=\sec x\tan x$。
+  Part 2（cot、csc）：
+   5. $\dfrac{d}{dx}\cot x=\dfrac{(-\sin x)(\sin x)-(\cos x)(\cos x)}{\sin^2 x}$（理由：商法則於 $\tfrac{\cos}{\sin}$）。
+   6. $=\dfrac{-(\sin^2 x+\cos^2 x)}{\sin^2 x}=-\dfrac{1}{\sin^2 x}=-\csc^2 x$（理由：Pythagorean）。
+   7. $\dfrac{d}{dx}\csc x=\dfrac{0\cdot\sin x-1\cdot\cos x}{\sin^2 x}$（理由：商法則於 $\tfrac1{\sin}$）。
+   8. $=-\dfrac{\cos x}{\sin^2 x}=-\csc x\cot x$。
+animation_cue: （無——靜態推導即可；已拆 tan/sec 與 cot/csc 兩場 part:，四個導數各展步驟）
 screen_contract: |
   required_steps:
     - id: tan_quotient
@@ -660,12 +671,24 @@ screen_contract: |
     - id: tan_result
       tex: '=\frac{\cos^{2}x+\sin^{2}x}{\cos^{2}x}=\frac{1}{\cos^{2}x}=\sec^{2}x'
       reason: 'Pythagorean identity'
-    - id: sec
-      tex: '\frac{d}{dx}\sec x=\frac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^{2}x}=\sec x\tan x'
+    - id: sec_setup
+      tex: '\frac{d}{dx}\sec x=\frac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^{2}x}'
       reason: 'quotient rule on 1/cos'
-    - id: cot_csc
-      tex: '\frac{d}{dx}\cot x=-\csc^{2}x,\ \frac{d}{dx}\csc x=-\csc x\cot x'
-      reason: 'same move (repeat-pattern)'
+    - id: sec_result
+      tex: '=\frac{\sin x}{\cos^{2}x}=\sec x\tan x'
+      reason: 'simplify'
+    - id: cot_setup
+      tex: '\frac{d}{dx}\cot x=\frac{(-\sin x)(\sin x)-(\cos x)(\cos x)}{\sin^{2}x}'
+      reason: 'quotient rule on cos/sin'
+    - id: cot_result
+      tex: '=\frac{-(\sin^{2}x+\cos^{2}x)}{\sin^{2}x}=-\frac{1}{\sin^{2}x}=-\csc^{2}x'
+      reason: 'Pythagorean identity'
+    - id: csc_setup
+      tex: '\frac{d}{dx}\csc x=\frac{0\cdot\sin x-1\cdot\cos x}{\sin^{2}x}'
+      reason: 'quotient rule on 1/sin'
+    - id: csc_result
+      tex: '=-\frac{\cos x}{\sin^{2}x}=-\csc x\cot x'
+      reason: 'simplify'
 ```
 
 ---
