@@ -110,10 +110,23 @@ def test_schema_integration():
     assert "reduced" in out.stdout                          # SC2 surfaced as warn
 
 
+def test_non_dict_storyboard():
+    from pipeline import coverage
+    # A malformed deck (yaml top-level null / scalar / list) must NOT crash the
+    # coverage block -- schema_storyboard already reports the schema error; coverage
+    # stays quiet (returns []/{}) rather than AttributeError or SC-spam. (Codex R4.)
+    c = {"u": {"required_steps": [{"id": "x", "tex": "a"}]}}
+    assert coverage.coverage_issues(None, c, enforce=True) == []
+    assert coverage.coverage_issues([1, 2], c, enforce=True) == []
+    assert coverage.coverage_issues("scalar", c, enforce=False) == []
+    assert coverage.covers_by_unit(None) == {}
+
+
 if __name__ == "__main__":
     test_parse_block()
     test_parser_wiring()
     test_sc1_and_orphan()
     test_sc2_and_missing_contract()
     test_schema_integration()
+    test_non_dict_storyboard()
     print("OK coverage self-test")

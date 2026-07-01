@@ -19,6 +19,8 @@ _SCOPED_TEMPLATES = frozenset({"theorem_proof", "derivation"})
 
 def covers_by_unit(storyboard: dict) -> "dict[str, set[str]]":
     """Union of scene-level `covers:` grouped by the `md:` unit the scene ref-s."""
+    if not isinstance(storyboard, dict):
+        return {}
     out: dict[str, set[str]] = {}
     for scene in (storyboard.get("scenes") or []):
         if not isinstance(scene, dict):
@@ -38,6 +40,8 @@ def coverage_issues(storyboard: dict, contracts: "dict[str, dict]", enforce: boo
     recap_required back-ref not re-shown locally), orphan covers ids, and --
     under enforce -- a scoped proof/derivation scene whose unit has no contract.
     severity = 'error' if enforce else 'warn' (orphan is always 'warn')."""
+    if not isinstance(storyboard, dict):
+        return []          # malformed deck: schema_storyboard reports it; coverage stays quiet (Codex R4)
     sev = "error" if enforce else "warn"
     cov = covers_by_unit(storyboard)
     issues: list[tuple[str, str]] = []
