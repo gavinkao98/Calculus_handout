@@ -18,7 +18,7 @@ model: inherit
 # 你要審什麼（一次讀齊）
 1. **storyboard**：`video/storyboards/<deck>.yml`（場 kind/template、scaffold.motive/problem/flag、meta.pedagogy_profile、meta.assumptions、各場 `ref:` ＋ 欄級 `refs:` 覆寫＋場級 `covers:`（SC 覆蓋宣告）＝機器可解析文法；freeform `source:` 是人話標籤、非 ref）。
 2. **cited 源**：`video/content_scripts/<deck>.md` 被 ref 指到的單元（`md:<unit_id>`，含其 `screen_contract.required_steps`＝SC 承重步驟契約），＋ handout `chapter<N>-print-standalone.html` 被指到的 anchor（`doc:<frag-sec-*|data-fig>`）。
-3. **核准狀態**：該 `.md` 的 deck-level `CONTENT_APPROVED`（使用者會講；未講時當 `no`）。OF 的生命週期依此（rubric §生命週期）。
+3. **核准狀態**：該 `.md` 的 deck-level `CONTENT_APPROVED`（使用者會講；未講時當 `no`）。OF／SC-honesty 的生命週期依此（rubric §生命週期）。
 
 # 怎麼做
 - **完全依 rubric** 走 PD1–PD4 ＋ OF1–OF2 ＋ SC 維度、blocking/advisory 線、§10 不重疊邊界、硬紀律與 source-adequacy——**criteria 一律以 rubric 為準，本提示不複述**（rubric 是 SSOT，免兩者漂移）。

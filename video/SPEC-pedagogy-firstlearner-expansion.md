@@ -93,7 +93,7 @@ screen_contract:
 
 ### 4.3 確定性演算法（`coverage.py`，unit 級）
 對每個帶 `screen_contract` 的 `.md` 單元 `U`：
-1. 收集所有 `ref: md:U`（或某欄 `refs` 指向 `U`）的 storyboard 場景，取其 `covers:` 聯集 `C`。
+1. 收集所有 `ref: md:U` 的 storyboard 場景（`covers:` 只列本場 `ref` 單元的 id，故按**場級 `ref`** 分組即可；跨單元依賴走 `depends_on`、不進 `covers`），取其 `covers:` 聯集 `C`。
 2. **判「須顯示」集：** `required_steps` 中，除「有 `depends_on` 且無 `recap_required`」的純回指步驟（指向別場的引用、不強制在地重畫）外，其餘皆須在地顯示。
 3. **SC1：** 「須顯示」集每個 `id` ∈ `C`？缺者逐一 `error/warn`，訊息帶該 step 的 `tex`（修法＝把這步放上某場畫面並加進 `covers:`）。
 4. **SC2：** 「須顯示」集中帶 `recap_required` 者（＝被要求在地重述的 cash-in 結果）若未 ∈ `C`，另以「cash-in 缺在地 recap」訊息報（實作上是 SC1 的子情形，分訊息以利作者辨識）。

@@ -19,14 +19,14 @@
 - **審**：教學粒度／動機／divider／前提（PD1–PD4）＋上畫面文字對 cited 源的忠實與 source 充分性（OF1–OF2）。
 - **不審**：`.md` 內容 vs 講義（歸 `L1`）、narration 衍生（歸 `NFA`）、render 後像素／hook 輸出／timing（歸 `V*`/`A*`），以及 §10 既有 owner 已擁有的任何 finding。
 
-**兩軸澄清（§9.3，severity class vs gating）：** 「blocking」是 finding 的**嚴重度類別**，**不等於「會擋稿（blocks the deck）」**。落地當下，未回填 deck 上的**所有**新發現——確定性層**與** gate-1 的 PD/OF blocking——一律以 **warn/dry-run** 呈現、不 gating；per-deck 經 SP2 opt-in 後才翻 gating。下文「收斂＝PD/OF blocking == 0」是 **opt-in 後**的收斂目標，非落地門檻。
+**兩軸澄清（§9.3，severity class vs gating）：** 「blocking」是 finding 的**嚴重度類別**，**不等於「會擋稿（blocks the deck）」**。落地當下，未回填 deck 上的**所有**新發現——確定性層**與** gate-1 的 PD/OF/SC blocking——一律以 **warn/dry-run** 呈現、不 gating；per-deck 經 opt-in 後才翻 gating。下文「收斂＝PD/OF/SC blocking == 0」是 **opt-in 後**的收斂目標，非落地門檻。
 
 ## 硬紀律（置於維度之前，防 seed_converge 的「主觀不收斂＋drift」）
 
 - **blocking 只給**：可觀察的遺漏 / 一個具體被跳過的步驟 / 缺必填欄位 / 與 cited 源矛盾。「可以更有動機／更慢／更清楚」**一律 advisory**。
 - **每條 blocking 必須 cite**：unit id ＋ 確切的 beat／欄位 ＋ 缺的步驟或矛盾點 ＋ 一個最小修法。
 - **禁止**自動改寫迴圈；**禁止** re-litigate 已認可的教學法。
-- **分開計數（Codex D）：** 輸出**分別**回報 `PD blocking` 與 `OF blocking` 摘要，**不混在一起**——免得主觀教學 finding 蓋掉硬忠實失敗。
+- **分開計數（Codex D）：** 輸出**分別**回報 `PD blocking`／`OF blocking`／`SC blocking` 摘要，**不混在一起**——免得主觀教學 finding 蓋掉硬忠實／覆蓋失敗。
 - **確定性／判斷分工（D-P3-1）：** PD2/PD3/PD4 的**結構** blocking、OF2、**SC1/SC2** 由 [`../../pipeline/pedagogy.py`](../../pipeline/pedagogy.py)／[`../../pipeline/provenance.py`](../../pipeline/provenance.py)／[`../../pipeline/coverage.py`](../../pipeline/coverage.py) **確定性計算**；gate-1 agent **不重新實作**它們，只把它們帶教學脈絡**浮現出來（surface）**並擁有 advisory 層。**gate-1 agent 自己的 blocking ＝ PD1＋OF1＋SC-honesty（讀真正解析到的源／payload）。**
 
 ## PD1–PD4 — 教學品質（§7 i）
