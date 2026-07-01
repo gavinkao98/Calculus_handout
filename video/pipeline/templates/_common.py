@@ -292,6 +292,23 @@ def scene_head(spec: dict[str, Any], ctx: dict[str, Any], *, label: str) -> list
     return blocks
 
 
+# sentinel default so resolve_chip returns None ONLY for a chipless (exposition)
+# scene_role -- lets spine geometry ask "is this scene chipless?" via the one resolver.
+_CHIP_SENTINEL = "\x00"
+
+
+def _spine_cap_top(spec: dict[str, Any], title_mob) -> float:
+    """y of the accent cap's TOP edge.
+
+    Normally the masthead top, so the lit cap spans chip + title. But a chipless scene
+    (exposition scene_role -> an invisible placeholder eyebrow) has no chip to light --
+    the cap would otherwise dangle over the empty masthead band above the title. Start it
+    at the title's top instead, so the cap hugs the title it belongs to."""
+    if title_mob is not None and resolve_chip(spec, _CHIP_SENTINEL) is None:
+        return title_mob.get_top()[1]
+    return MASTHEAD_TOP
+
+
 def scene_spine(spec: dict[str, Any], ctx: dict[str, Any],
                 blocks: "list[Block] | None" = None) -> Block:
     """The Lectern's left axis, made visible -- a restrained vertical spine in the left
@@ -313,13 +330,15 @@ def scene_spine(spec: dict[str, Any], ctx: dict[str, Any],
     axis = brand.vrule(span, ground, role="hairline_strong", width=2.0, opacity=0.9)
     axis.move_to([DECOR_SPINE_X, (top + bottom) / 2, 0])
     cap_bottom = top - span * 0.17
+    title_mob = None
     if blocks:
         title_mob = next((b.mobject for b in blocks if b.id in ("title", "prompt")), None)
         if title_mob is not None:
             cap_bottom = title_mob.get_bottom()[1]
-    cap_h = max(top - cap_bottom, 0.2)
+    cap_top = _spine_cap_top(spec, title_mob)   # title-top for a chipless scene, else masthead
+    cap_h = max(cap_top - cap_bottom, 0.2)
     cap = brand.vrule(cap_h, ground, role=role, width=2.4)
-    cap.move_to([DECOR_SPINE_X, top - cap_h / 2, 0])
+    cap.move_to([DECOR_SPINE_X, cap_top - cap_h / 2, 0])
     cap_glow = brand.text_glow(cap, ground, role=role, width=2.4, opacity=0.5)
     return Block("spine", VGroup(axis, cap_glow), anim="fade", static=True, layer="decoration")
 

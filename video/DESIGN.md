@@ -197,7 +197,7 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 
 **視覺規則是單向的。** exposition ⟹ 無字卡；但**無字卡 ⇏ exposition**——`graph`／figure 場景本來就無字卡（走 `_build_single`，不經 `scene_head`），是另一條路徑。所以不要反推。
 
-**無字卡的機制＝隱形 placeholder。** `scene_head` 仍以預設字建出 eyebrow mobject 並定位（量測其高度），再 `set_opacity(0)` 隱形、且**照樣放進 index-0 的 block**。如此：(i) title 錨在與有字卡場景**完全相同**的 y（`title.next_to(eyebrow, DOWN)`）→ 無跨場飄移（`MASTHEAD_TOP` 不變式，下游 `body_zone`/`place_body` 也不動）；(ii) 保住 `head[1]`/`blocks[1]` 取 title 的既有契約，六個 index-based 模板零改動。static block 走 `scene.py` 的 `self.add()`（不 FadeIn、不強設 opacity），隱形得以保持。
+**無字卡的機制＝隱形 placeholder。** `scene_head` 仍以預設字建出 eyebrow mobject 並定位（量測其高度），再 `set_opacity(0)` 隱形、且**照樣放進 index-0 的 block**。如此：(i) title 錨在與有字卡場景**完全相同**的 y（`title.next_to(eyebrow, DOWN)`）→ 無跨場飄移（`MASTHEAD_TOP` 不變式，下游 `body_zone`/`place_body` 也不動）；(ii) 保住 `head[1]`/`blocks[1]` 取 title 的既有契約，六個 index-based 模板零改動。static block 走 `scene.py` 的 `self.add()`（不 FadeIn、不強設 opacity），隱形得以保持。**Lectern spine 的 accent cap** 對 chipless 場景改從 **title 頂端**起算（`_spine_cap_top`），不照亮字卡列的空白帶——否則藍 cap 會懸在標題上方的空白處（2026-07-01 修）。
 
 **lint（`lint.py:_scene_role_issues`）。** 未知 `scene_role` → error；`scene_role` 與 `label`/`kicker` 併存 → warn（`scene_role` 被 outrank、形同失效）。**刻意不做**「`accent: definition` 無 `scene_role` 就報」的全域 lint（會誤傷真定義）。
 

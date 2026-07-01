@@ -103,6 +103,26 @@ def test_scene_head_chipless_hides_eyebrow_but_keeps_title_y():
     assert abs(y_chipped - y_chipless) < 1e-6, (y_chipped, y_chipless)
 
 
+# -- scene_spine: accent cap must not light the empty masthead of a chipless scene --
+
+def test_spine_cap_top_is_masthead_when_chipped():
+    from pipeline.templates._common import _spine_cap_top, MASTHEAD_TOP
+    from manim import Rectangle
+    title = Rectangle(width=2, height=0.6).move_to([0, 2.0, 0])
+    # no scene_role -> chipped -> cap tops out at the masthead (spans chip + title)
+    assert _spine_cap_top({"id": "a"}, title) == MASTHEAD_TOP
+
+
+def test_spine_cap_top_hugs_title_when_chipless():
+    from pipeline.templates._common import _spine_cap_top
+    from manim import Rectangle
+    title = Rectangle(width=2, height=0.6).move_to([0, 2.0, 0])
+    # exposition scene_role -> chipless -> cap starts at the title top (no dangling
+    # segment over the empty placeholder-eyebrow space)
+    got = _spine_cap_top({"id": "b", "scene_role": "motivation"}, title)
+    assert abs(got - title.get_top()[1]) < 1e-9, got
+
+
 if __name__ == "__main__":
     test_exposition_roles_are_chipless()
     test_formal_role_maps_to_its_chip()
@@ -115,4 +135,6 @@ if __name__ == "__main__":
     test_lint_clean_on_valid_scene_role()
     test_lint_ignores_scenes_without_scene_role()
     test_scene_head_chipless_hides_eyebrow_but_keeps_title_y()
+    test_spine_cap_top_is_masthead_when_chipped()
+    test_spine_cap_top_hugs_title_when_chipless()
     print("OK scene_roles self-test")
