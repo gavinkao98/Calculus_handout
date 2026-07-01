@@ -49,7 +49,34 @@ def test_parser_wiring():
     assert nu["narration"].strip() == "A one line narration." and "screen_contract" not in nu
 
 
+def test_sc1_and_orphan():
+    from pipeline import coverage
+    contract = SC.parse_block([
+        "  required_steps:",
+        "    - id: def",
+        "      tex: \"a=b\"",
+        "    - id: reduced",
+        "      depends_on: e.result",
+        "      recap_required: true",
+    ])
+    contracts = {"u": contract}
+    sb_missing = {"scenes": [{"id": "s1", "kind": "content", "ref": "md:u", "covers": ["def"]}]}
+    warns = coverage.coverage_issues(sb_missing, contracts, enforce=False)
+    msgs = " | ".join(m for _, m in warns)
+    assert all(sev == "warn" for sev, _ in warns)
+    assert "[SC1]" in msgs and "reduced" in msgs and "u." in msgs  # reduced (recap) uncovered
+    assert not any("[SC1]" in m and ".def" in m for _, m in warns)  # def IS covered -> not flagged
+    sb_ok = {"scenes": [{"id": "s1", "kind": "content", "ref": "md:u", "covers": ["def", "reduced"]}]}
+    assert coverage.coverage_issues(sb_ok, contracts, enforce=False) == []
+    sb_orphan = {"scenes": [{"id": "s1", "kind": "content", "ref": "md:u",
+                             "covers": ["def", "reduced", "typo"]}]}
+    assert any("typo" in m for _, m in coverage.coverage_issues(sb_orphan, contracts, enforce=False))
+    errs = coverage.coverage_issues(sb_missing, contracts, enforce=True)
+    assert errs and all(sev == "error" for sev, _ in errs)
+
+
 if __name__ == "__main__":
     test_parse_block()
     test_parser_wiring()
+    test_sc1_and_orphan()
     print("OK coverage self-test")
