@@ -74,6 +74,8 @@ _FENCE = re.compile(r"^```")
 _FIELD = re.compile(r"^([A-Za-z_]+):\s?(.*)$")
 _FIELD_KEYS = ("id", "source", "learning_goal", "kind", "narration", "visual_need", "animation_cue")
 
+from pipeline import _screen_contract
+
 
 def parse_content_script(md_path: Path) -> dict:
     """Parse the §-content-script markdown into units. Each unit is a
@@ -104,7 +106,10 @@ def parse_content_script(md_path: Path) -> dict:
         if cur is not None:
             for k, v in cur.items():
                 if isinstance(v, list):
-                    cur[k] = " ".join(s.strip() for s in v).strip()
+                    if k == "screen_contract":
+                        cur[k] = _screen_contract.parse_block(v)
+                    else:
+                        cur[k] = " ".join(s.strip() for s in v).strip()
 
     for ln in lines:
         m = _UNIT_HEADER.match(ln)
@@ -113,6 +118,7 @@ def parse_content_script(md_path: Path) -> dict:
             if cur is not None:
                 units.append(cur)
             cur = {k: "" for k in _FIELD_KEYS}
+            cur["screen_contract"] = None
             cur["id"] = m.group(1)
             in_fence = False
             scalar = None

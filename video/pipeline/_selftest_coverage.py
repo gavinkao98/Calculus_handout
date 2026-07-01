@@ -35,6 +35,21 @@ def test_parse_block():
     assert SC.is_exempt(None) is False
 
 
+def test_parser_wiring():
+    from pipeline import review_pack, narration_review
+    md = Path(__file__).resolve().parent.parent / "content_scripts" / "_fixtures" / "sc_coverage.md"
+    units = review_pack.parse_content_script(md)["units"]
+    u = next(x for x in units if x["id"] == "proved_here")
+    assert isinstance(u["screen_contract"], dict)
+    assert [s["id"] for s in u["screen_contract"]["required_steps"]] == ["def", "reduced"]
+    # freeform source: with :, ·, em-dash, quotes survives (NOT yaml-parsed)
+    assert "em—dash" in u["source"] and u["source"].startswith("chapter3")
+    # narration_review mirror ignores the block and still returns the narration
+    nu = next(x for x in narration_review.parse_content_script(md)["units"] if x["id"] == "proved_here")
+    assert nu["narration"].strip() == "A one line narration." and "screen_contract" not in nu
+
+
 if __name__ == "__main__":
     test_parse_block()
+    test_parser_wiring()
     print("OK coverage self-test")
