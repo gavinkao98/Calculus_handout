@@ -55,28 +55,53 @@ def test_sc1_and_orphan():
         "  required_steps:",
         "    - id: def",
         "      tex: \"a=b\"",
-        "    - id: reduced",
-        "      depends_on: e.result",
-        "      recap_required: true",
+        "    - id: mid",
+        "      tex: \"b=c\"",
     ])
     contracts = {"u": contract}
     sb_missing = {"scenes": [{"id": "s1", "kind": "content", "ref": "md:u", "covers": ["def"]}]}
     warns = coverage.coverage_issues(sb_missing, contracts, enforce=False)
     msgs = " | ".join(m for _, m in warns)
     assert all(sev == "warn" for sev, _ in warns)
-    assert "[SC1]" in msgs and "reduced" in msgs and "u." in msgs  # reduced (recap) uncovered
+    assert "[SC1]" in msgs and ".mid" in msgs and "u." in msgs   # mid (plain must-show) uncovered
     assert not any("[SC1]" in m and ".def" in m for _, m in warns)  # def IS covered -> not flagged
-    sb_ok = {"scenes": [{"id": "s1", "kind": "content", "ref": "md:u", "covers": ["def", "reduced"]}]}
+    sb_ok = {"scenes": [{"id": "s1", "kind": "content", "ref": "md:u", "covers": ["def", "mid"]}]}
     assert coverage.coverage_issues(sb_ok, contracts, enforce=False) == []
     sb_orphan = {"scenes": [{"id": "s1", "kind": "content", "ref": "md:u",
-                             "covers": ["def", "reduced", "typo"]}]}
+                             "covers": ["def", "mid", "typo"]}]}
     assert any("typo" in m for _, m in coverage.coverage_issues(sb_orphan, contracts, enforce=False))
     errs = coverage.coverage_issues(sb_missing, contracts, enforce=True)
     assert errs and all(sev == "error" for sev, _ in errs)
+
+
+def test_sc2_and_missing_contract():
+    from pipeline import coverage
+    # a recap_required back-ref, uncovered -> SC2 ONLY (not double-reported as SC1)
+    contract = SC.parse_block([
+        "  required_steps:",
+        "    - id: reduced",
+        "      depends_on: e.result",
+        "      recap_required: true",
+    ])
+    sb = {"scenes": [{"id": "s1", "kind": "content", "ref": "md:u", "covers": []}]}
+    msgs = " | ".join(m for _, m in coverage.coverage_issues(sb, {"u": contract}, enforce=False))
+    assert "[SC2]" in msgs and "reduced" in msgs
+    assert "[SC1]" not in msgs                       # partition: recap step is SC2's job only
+    # missing contract on a proof/derivation scene, enforce=True -> error
+    sb2 = {"scenes": [{"id": "p", "kind": "content", "template": "theorem_proof",
+                       "ref": "md:nocontract", "covers": []}]}
+    errs = coverage.coverage_issues(sb2, {}, enforce=True)
+    assert any(sev == "error" and "nocontract" in m and "screen_contract" in m for sev, m in errs)
+    # same, enforce=False -> no missing-contract noise (warn-default zero-behavior-change)
+    assert not any("screen_contract" in m for _, m in coverage.coverage_issues(sb2, {}, enforce=False))
+    # exempt unit -> no missing-contract error even under enforce
+    exempt = {"nocontract": SC.parse_block(["  coverage_exempt: true"])}
+    assert not any("nocontract" in m for _, m in coverage.coverage_issues(sb2, exempt, enforce=True))
 
 
 if __name__ == "__main__":
     test_parse_block()
     test_parser_wiring()
     test_sc1_and_orphan()
+    test_sc2_and_missing_contract()
     print("OK coverage self-test")
