@@ -54,11 +54,11 @@ def coverage_issues(storyboard: dict, contracts: "dict[str, dict]", enforce: boo
                 continue          # recap steps report as SC2 below (avoid double-report)
             if s["id"] not in C:
                 issues.append((sev, f"[SC1] {unit_id}.{s['id']}: required on-screen step "
-                                    f"not covered by any scene's covers: — {s.get('tex', '')!r}"))
+                                    f"not covered by any scene's covers: -- {s.get('tex', '')!r}"))
         for s in _sc.required_steps(contract):
             if s.get("recap_required") and s["id"] not in C:
                 issues.append((sev, f"[SC2] {unit_id}.{s['id']}: cash-in result (recap_required) "
-                                    f"not re-shown locally — {s.get('tex', '')!r}"))
+                                    f"not re-shown locally -- {s.get('tex', '')!r}"))
     if enforce:
         flagged: set[str] = set()
         for scene in (storyboard.get("scenes") or []):

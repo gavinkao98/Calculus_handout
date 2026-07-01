@@ -196,6 +196,29 @@ def main(argv: "list[str] | None" = None) -> int:
         if ped_err:
             errors = errors + [m for s, m in ped if s == "error"]
 
+    # SC step-coverage (warn-default; gates only when meta.coverage_enforce is True)
+    from pipeline import coverage as _cov
+    from pipeline import review_pack as _rp
+    cov_enforce = bool(meta.get("coverage_enforce"))
+    deck_md = repo_root / "video" / "content_scripts" / f"{meta.get('id', '')}.md"
+    contracts = {}
+    if deck_md.exists():
+        try:
+            for u in _rp.parse_content_script(deck_md).get("units", []):
+                if u.get("id") and u.get("screen_contract"):
+                    contracts[u["id"]] = u["screen_contract"]
+        except Exception:
+            contracts = {}     # fail-closed: unreadable .md -> no contracts -> no SC noise
+    cov_issues = _cov.coverage_issues(data, contracts, enforce=cov_enforce)
+    if cov_issues:
+        cov_err = sum(1 for s, _ in cov_issues if s == "error")
+        print(f"[coverage] {args.storyboard.name}: {len(cov_issues)} finding(s)"
+              f"{' (ENFORCED)' if cov_enforce else ' (warn-only; set meta.coverage_enforce to gate)'}")
+        for sev, msg in cov_issues:
+            print(f"  {'ERROR' if sev == 'error' else 'WARN '}  {msg}")
+        if cov_err:
+            errors = errors + [m for s, m in cov_issues if s == "error"]
+
     if args.list and not errors:
         print(f"[schema] {args.storyboard.name}: reveal targets per content scene")
         for sid, targets in enumerate_reveals(data):

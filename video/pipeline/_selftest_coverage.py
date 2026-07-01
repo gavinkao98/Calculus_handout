@@ -99,9 +99,21 @@ def test_sc2_and_missing_contract():
     assert not any("nocontract" in m for _, m in coverage.coverage_issues(sb2, exempt, enforce=True))
 
 
+def test_schema_integration():
+    import subprocess
+    py = sys.executable
+    out = subprocess.run(
+        [py, "video/pipeline/schema.py", "video/storyboards/_fixtures/sc_coverage.yml"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    assert out.returncode == 0, out.stdout + out.stderr   # warn-default never aborts
+    assert "[coverage]" in out.stdout
+    assert "reduced" in out.stdout                          # SC2 surfaced as warn
+
+
 if __name__ == "__main__":
     test_parse_block()
     test_parser_wiring()
     test_sc1_and_orphan()
     test_sc2_and_missing_contract()
+    test_schema_integration()
     print("OK coverage self-test")
