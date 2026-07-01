@@ -18,6 +18,7 @@ from manim import DOWN, LEFT, VGroup
 
 from .. import brand
 from ..blocks import Block, accent_role
+from ..scene_roles import resolve_chip
 from ..visuals import theme as T
 
 
@@ -259,11 +260,17 @@ def scene_head(spec: dict[str, Any], ctx: dict[str, Any], *, label: str) -> list
 
     blocks = []
 
-    # `kicker` overrides the template's default eyebrow word (e.g. a motivation
-    # scene reading "[ MOTIVATION ]" while keeping its accent colour family).
-    if spec.get("kicker"):
-        label = f"[ {spec['kicker']} ]"
-    eyebrow = brand.eyebrow(label, ground, role=role)
+    # The eyebrow chip is resolved centrally (scene_roles.resolve_chip):
+    # kicker > explicit `label` > `scene_role` > the template's default `label`.
+    # A chipless scene_role (motivation / intuition / bridge / forward-ref / ...) resolves
+    # to None: we still build + position the eyebrow at its default text -- so the title
+    # anchor, and thus every downstream body zone, is IDENTICAL to a chipped scene (no
+    # drift) -- but render it invisible. Keeping the block at index 0 preserves the
+    # head[1] / blocks[1] title contract the other templates rely on.
+    chip = resolve_chip(spec, label)
+    eyebrow = brand.eyebrow(label if chip is None else chip, ground, role=role)
+    if chip is None:
+        eyebrow.set_opacity(0)
     eyebrow.move_to([left + eyebrow.width / 2, top - eyebrow.height / 2, 0])
     blocks.append(Block("eyebrow", eyebrow, anim="fade", static=True))
 

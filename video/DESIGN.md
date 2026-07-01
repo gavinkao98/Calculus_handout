@@ -147,7 +147,8 @@ scenes:
 | 欄位 | 必填 | 意義 |
 |---|---|---|
 | `template` | yes | 使用哪個 scene template（見下方 "Template catalog"） |
-| `accent` | definition-family 必填 | 色彩角色：`definition` / `theorem` / `proposition` / `example` / `warning` / `procedure` / `recap`。取代舊的 `content_type`。 |
+| `accent` | definition-family 必填 | 色彩角色：`definition` / `theorem` / `proposition` / `example` / `warning` / `procedure` / `recap`。取代舊的 `content_type`。**只管顏色**，不管 eyebrow 字卡（見下 §Eyebrow 字卡 resolver）。 |
+| `scene_role` | no | eyebrow 字卡的**教學 beat 軸**（與 `accent` 顏色軸正交）。exposition beat（`motivation`/`intuition`/`bridge`/`forward-ref`/`setup`/`roadmap`）→ **無字卡**；形式物件（`definition`/`theorem`/`remark`/…）→ 對應字卡。省略＝沿用模板/`accent` 預設字卡（見下 §Eyebrow 字卡 resolver）。 |
 | `title` | yes | 螢幕上的 scene title；可使用 `$...$` 表示數學 |
 | `say` | yes | 單一 narration 欄位（見下方） |
 | `statement`、`math`、`steps`、`plots`、… | per template | 螢幕上的 visual payload |
@@ -177,7 +178,32 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 | ~~`example_walkthrough`~~ | **deprecated → 用 `derivation`**（其 reason rail 取代並列推理欄；舊 scene 仍可渲） | — | — |
 | ~~`graph_focus` / `graph_compare`~~ | **deprecated alias → `graph` + `mode: single`/`2up`**（payload 不變；舊 scene 仍可渲） | — | — |
 
-**全 content 模板共用的選用欄位（上表各列不再重複）：** `kicker`（覆寫 eyebrow 標籤字、保留 accent 配色）、`part: {current, total}`（多頁分頁指示器，右上角）、`hook`（custom-animation factory，見上 §`content` scene 欄位）。`definition_math`／`theorem_proof` 另支援 `aside`（L3 右 rail enrichment 卡：主內容夠稀疏才展開成雙欄、過密自動收掉）。
+**全 content 模板共用的選用欄位（上表各列不再重複）：** `scene_role`（eyebrow 字卡的 beat 軸，含「無字卡」；見下 §Eyebrow 字卡 resolver）、`kicker`（覆寫 eyebrow 標籤字、保留 accent 配色）、`part: {current, total}`（多頁分頁指示器，右上角）、`hook`（custom-animation factory，見上 §`content` scene 欄位）。`definition_math`／`theorem_proof` 另支援 `aside`（L3 右 rail enrichment 卡：主內容夠稀疏才展開成雙欄、過密自動收掉）。
+
+### Eyebrow 字卡 resolver（`scene_role`；2026-07-01）
+
+**兩條正交的軸。** eyebrow 字卡（`[ DEFINITION ]` 等）與顏色是**兩件事**：`accent` 決定**顏色**（`blocks.ACCENT_ROLE`），`scene_role` 決定**字卡**。字卡標的是「這格是什麼**教學 beat**」，不是「什麼數學物件」——對定理格兩者重合，但對開場／動機／直覺這類 exposition beat 兩者分岔，字卡不該硬套形式標籤。
+
+**單一 resolver。** 字卡在**一處**決定——`pipeline/scene_roles.py:resolve_chip(spec, default_label)`，由 `templates/_common.py:scene_head` 呼叫。優先序（高→低）：
+
+1. `kicker` — 顯式覆寫字（既有行為）
+2. `label` — 顯式字卡字（如 `theorem_proof` 的 `[ proof of the chain rule ]`）；**贏過 `scene_role`**，使後加的 `scene_role` 絕不會抹掉作者寫死的 label
+3. `scene_role` — beat → 對應字卡（`SCENE_ROLE_CHIP`；可為 `None` = 無字卡）
+4. `default_label` — 模板預設（`definition_math` 的 `LABEL[accent]` / 各模板固定字串）
+
+未知 `scene_role` → `raise`（typo guard；lint 亦攔）。
+
+**字彙（`SCENE_ROLE_CHIP`）。** exposition／修辭 beat → **`None`（無字卡）**：`motivation`、`intuition`、`bridge`、`forward-ref`、`setup`、`roadmap`。形式／半形式物件 → 對應字卡：`definition`/`theorem`/`proposition`/`example`/`remark`/`caution`/`note`/`procedure`/`recap`/`derivation`（形式值先備齊，使 `scene_role` 可逐步成為完整字卡軸；本波只實際用到 exposition + `remark`）。
+
+**視覺規則是單向的。** exposition ⟹ 無字卡；但**無字卡 ⇏ exposition**——`graph`／figure 場景本來就無字卡（走 `_build_single`，不經 `scene_head`），是另一條路徑。所以不要反推。
+
+**無字卡的機制＝隱形 placeholder。** `scene_head` 仍以預設字建出 eyebrow mobject 並定位（量測其高度），再 `set_opacity(0)` 隱形、且**照樣放進 index-0 的 block**。如此：(i) title 錨在與有字卡場景**完全相同**的 y（`title.next_to(eyebrow, DOWN)`）→ 無跨場飄移（`MASTHEAD_TOP` 不變式，下游 `body_zone`/`place_body` 也不動）；(ii) 保住 `head[1]`/`blocks[1]` 取 title 的既有契約，六個 index-based 模板零改動。static block 走 `scene.py` 的 `self.add()`（不 FadeIn、不強設 opacity），隱形得以保持。
+
+**lint（`lint.py:_scene_role_issues`）。** 未知 `scene_role` → error；`scene_role` 與 `label`/`kicker` 併存 → warn（`scene_role` 被 outrank、形同失效）。**刻意不做**「`accent: definition` 無 `scene_role` 就報」的全域 lint（會誤傷真定義）。
+
+**本波邊界（Codex 標的「第二次遷移」）。** resolver 這次**只接 `scene_head`**。仍散在外面、未上 resolver 的：`graph`（不經 `scene_head`）、`example_head` 自建的 `[ example ]`、各模板傳給 `scene_head` 的固定 `default_label`。若未來要讓 `scene_role` 全面控管字卡（含 graph 加/去字卡），需再一次 header 重構。**待清理（本波刻意延後）：** ch01 四格用 `derivation` 描述 handout Example 但缺 `prompt:` → 現渲 `[ derivation ]`（`_example_missing_prompt` 已 warn，補 `prompt:` 即成 `[ example ]`）；ch01 兩格 motivation/Example 走 `value_table` → `[ table ]`（低風險）。
+
+測試：`_selftest_scene_roles.py`（resolver 6 例 + lint 4 例 + scene_head chipless build 1 例）。
 
 **Brand frames（`kind` 鍵，非 content template）：** `intro`（paper course-map）、
 `outro`（paper end-slate；opt `next_section`/`next_title` → 自畫品牌紅三角 caret＋「Next §x.x」hint）、

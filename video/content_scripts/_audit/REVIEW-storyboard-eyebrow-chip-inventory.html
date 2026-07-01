@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>字卡（eyebrow chip）清點 — video storyboards 全掃</title>
+<style>
+  :root{
+    --bg:#0b1220; --panel:#111a2e; --ink:#e7edf7; --dim:#9fb0c9; --line:#22304d;
+    --migrate:#ff8a5c; --decide:#f2c14e; --keep:#5fd39a; --chipless:#5cc8ec; --struct:#7c89a3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.6 -apple-system,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;padding:32px}
+  h1{font-size:24px;margin:0 0 4px} h2{font-size:19px;margin:34px 0 10px;border-left:4px solid #4a7bd6;padding-left:10px}
+  h3{font-size:16px;margin:22px 0 6px;color:#cdd9ee}
+  .sub{color:var(--dim);margin:0 0 6px} code{background:#0d1526;padding:1px 5px;border-radius:4px;color:#cfe1ff;font-size:13px}
+  .note{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+  .cards{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;min-width:130px}
+  .card .n{font-size:30px;font-weight:700;line-height:1} .card .l{color:var(--dim);font-size:13px;margin-top:4px}
+  table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+  th{background:#0d1526;color:#cdd9ee;position:sticky;top:0}
+  tr:nth-child(even) td{background:#0e1728}
+  .tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap}
+  .t-migrate{background:rgba(255,138,92,.16);color:var(--migrate);border:1px solid var(--migrate)}
+  .t-decide{background:rgba(242,193,78,.14);color:var(--decide);border:1px solid var(--decide)}
+  .t-keep{background:rgba(95,211,154,.13);color:var(--keep);border:1px solid var(--keep)}
+  .t-chipless{background:rgba(92,200,236,.13);color:var(--chipless);border:1px solid var(--chipless)}
+  .t-struct{background:rgba(124,137,163,.13);color:var(--struct);border:1px solid var(--struct)}
+  .chip{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:#ffd9a8}
+  .none{color:var(--struct);font-style:italic}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+  .q{color:var(--decide)}
+  footer{margin-top:40px;color:var(--dim);font-size:12.5px;border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+
+<h1>字卡（eyebrow chip）清點 — video storyboards 全掃</h1>
+<p class="sub">步驟 (a) 唯讀清點 · 為「chip resolver ＋ <code>scene_role</code> ＋ 單向視覺規則」的設計範圍定調 · 產出日 2026-07-01</p>
+
+<div class="note">
+<b>掃描範圍（重要）：</b>video 產線實際存在的章節 storyboard <b>只有 3 個</b>：
+<code>ch01_inverse_functions</code>（§1.1）、<code>ch03_trig_derivatives</code>（§3.1）、<code>ch03_chain_rule</code>（§3.2）。
+<b>沒有 ch02、ch04，ch01/ch03 其餘節也還沒 storyboard。</b>
+講義定案 ≠ 影片 storyboard 存在——字卡問題只在 storyboard 裡發生，所以此清點已覆蓋 <b>100% 現存 video storyboard（77 個場景）</b>；其餘章節等於零存量，未來新寫時直接照新標準走。
+</div>
+
+<h2>1 · 總覽（＝遷移規模）</h2>
+<div class="cards">
+  <div class="card"><div class="n">77</div><div class="l">總場景（3 storyboards）</div></div>
+  <div class="card"><div class="n" style="color:var(--migrate)">6</div><div class="l">MIGRATE：講解 beat → 應無字卡</div></div>
+  <div class="card"><div class="n" style="color:var(--decide)">8</div><div class="l">DECIDE：其他 mislabel（待裁決）</div></div>
+  <div class="card"><div class="n" style="color:var(--keep)">38</div><div class="l">KEEP：形式物件、字卡正確</div></div>
+  <div class="card"><div class="n" style="color:var(--chipless)">9</div><div class="l">已無字卡（graph／figure）</div></div>
+  <div class="card"><div class="n" style="color:var(--struct)">16</div><div class="l">結構（intro/outro/divider）</div></div>
+</div>
+<p class="sub">核心工作面很小：<b>真正的「講解 beat 掛了形式字卡」只有 6 格，全在 ch03</b>；ch01 一格都沒有（它的 motivation 用的是 value_table，落在 DECIDE）。另有 8 格是掃出來的鄰近 mislabel，同一個「字卡標的是_形式／accent_、不是_角色_」的根因，是否納入由你決定。</p>
+
+<h2>2 · 字卡來源地圖（＝resolver 要收斂的東西）</h2>
+<p class="sub">字卡目前由這些各自為政的來源決定；<code>kicker</code> 在 <code>scene_head</code> 內覆寫一切。這就是 Codex 指出的「先做中央 resolver，否則 L3 要遷兩次」的具體清單。</p>
+<table>
+<tr><th>來源</th><th>機制／位置</th><th>產出字卡</th><th>本次用量</th><th>備註</th></tr>
+<tr><td class="mono">kicker</td><td><code>_common.py:264</code>（scene_head，通用覆寫）</td><td class="chip">[ {kicker} ]</td><td>3</td><td>3 處<b>全部多餘</b>（值與模板／accent 預設相同）</td></tr>
+<tr><td class="mono">accent → LABEL</td><td><code>definition_math.py:78</code></td><td class="chip">[ definition ] 等</td><td>definition_math 全部</td><td>唯一「accent 驅動字卡」的模板；問題溫床</td></tr>
+<tr><td class="mono">label:</td><td><code>theorem_proof.py:56</code>（自由字串）</td><td class="chip">[ proposition ] / [ proof … ]</td><td>7</td><td>我上一輪漏掉的機制（Codex 指出）</td></tr>
+<tr><td class="mono">type:</td><td><code>callout.py:80</code></td><td class="chip">[ caution ] 等</td><td>4</td><td>remark/caution/note，可 +number</td></tr>
+<tr><td class="mono">模板固定字串</td><td>value_table / procedure_steps / recap_cards / sign_chart</td><td class="chip">[ table ] / [ procedure ] / [ recap ] / [ sign chart ]</td><td>2 / 2 / 3 / 0</td><td>寫死、不看 accent</td></tr>
+<tr><td class="mono">derivation 分歧</td><td><code>derivation.py:139</code></td><td class="chip">[ example ]（有 prompt）／ [ derivation ]（無）</td><td>7 / 6</td><td>有 <code>prompt:</code> → example_head；無 → [derivation]</td></tr>
+<tr><td class="mono">graph（無）</td><td>不呼叫 scene_head</td><td class="none">（無字卡）</td><td>9</td><td>已天生無字卡 → 印證規則須<b>單向</b></td></tr>
+</table>
+
+<h2>3 · MIGRATE — 講解 beat 掛了形式字卡（核心 6 格）</h2>
+<p class="sub">全部是 <code>definition_math</code> + <code>accent:definition</code> + 無覆寫 → 靜默 fallback 成 <span class="chip">[ DEFINITION ]</span>。這 6 格就是 <code>scene_role: &lt;exposition&gt;</code>（chipless）的乾淨目標。</p>
+<table>
+<tr><th>storyboard</th><th>#</th><th>id</th><th>角色（註解）</th><th>現字卡</th></tr>
+<tr><td>§3.1 trig</td><td>2</td><td class="mono">why_trig_is_different</td><td>motivation</td><td class="chip">[ DEFINITION ]</td></tr>
+<tr><td>§3.1 trig</td><td>23</td><td class="mono">toward_the_chain_rule</td><td>forward-ref</td><td class="chip">[ DEFINITION ]</td></tr>
+<tr><td>§3.2 chain</td><td>2</td><td class="mono">why_composition_is_missing</td><td>motivation</td><td class="chip">[ DEFINITION ]</td></tr>
+<tr><td>§3.2 chain</td><td>3</td><td class="mono">rates_multiply_intuition</td><td>intuition</td><td class="chip">[ DEFINITION ]</td></tr>
+<tr><td>§3.2 chain</td><td>9</td><td class="mono">proof_strategy_bridge</td><td>bridge</td><td class="chip">[ DEFINITION ]</td></tr>
+<tr><td>§3.2 chain</td><td>24</td><td class="mono">toward_section_3_3</td><td>forward-ref</td><td class="chip">[ DEFINITION ]</td></tr>
+</table>
+
+<h2>4 · DECIDE — 掃出的鄰近 mislabel（8 格，待你裁決是否納入）</h2>
+
+<h3>4a · Remark 被標成 [ PROPOSITION ]（2 格）</h3>
+<p class="sub">用 <code>definition_math</code> + <code>accent:proposition</code>。Remark 不是 Proposition。<span class="q">修法與 MIGRATE 不同：不是拿掉字卡，是改對成 <span class="chip">[ remark ]</span>（新增 role／或改 callout <code>type:remark</code>）。</span></p>
+<table>
+<tr><th>storyboard</th><th>#</th><th>id</th><th>角色</th><th>現字卡</th></tr>
+<tr><td>§3.1 trig</td><td>17</td><td class="mono">derivative_cycle</td><td>Remark 3.1</td><td class="chip">[ PROPOSITION ]</td></tr>
+<tr><td>§3.2 chain</td><td>6</td><td class="mono">leibniz_form</td><td>Remark 3.2</td><td class="chip">[ PROPOSITION ]</td></tr>
+</table>
+
+<h3>4b · Example 被標成 [ DERIVATION ]（4 格，皆 ch01，缺 prompt）</h3>
+<p class="sub">ch01 的 worked example 用 <code>derivation</code> 但<b>沒帶 <code>prompt:</code></b> → 字卡 <span class="chip">[ DERIVATION ]</span>（ch03 的 example 都有 prompt → <span class="chip">[ EXAMPLE ]</span>）。<span class="q">lint <code>_example_missing_prompt</code> 已會 warn；修法＝補 <code>prompt:</code> 使其成 [ EXAMPLE ]，或確認就是要當 derivation。</span></p>
+<table>
+<tr><th>storyboard</th><th>#</th><th>id</th><th>角色</th><th>現字卡</th></tr>
+<tr><td>§1.1 inv</td><td>4</td><td class="mono">shape_can_mislead</td><td>Example 1.3</td><td class="chip">[ DERIVATION ]</td></tr>
+<tr><td>§1.1 inv</td><td>10</td><td class="mono">first_inverses</td><td>Example 1.4</td><td class="chip">[ DERIVATION ]</td></tr>
+<tr><td>§1.1 inv</td><td>16</td><td class="mono">invert_a_cubic</td><td>Example 1.6</td><td class="chip">[ DERIVATION ]</td></tr>
+<tr><td>§1.1 inv</td><td>17</td><td class="mono">invert_a_rational</td><td>Example 1.7</td><td class="chip">[ DERIVATION ]</td></tr>
+</table>
+
+<h3>4c · motivation／Example 走 value_table → [ TABLE ]（2 格，皆 ch01）</h3>
+<p class="sub"><span class="chip">[ TABLE ]</span> 形式正確、角色盲。<span class="q">低風險；問題是「motivation-用表格」要不要也 chipless（單向規則下 motivation ⟹ 無字卡）。#18 是 Example 1.8，更接近可保留。</span></p>
+<table>
+<tr><th>storyboard</th><th>#</th><th>id</th><th>角色</th><th>現字卡</th></tr>
+<tr><td>§1.1 inv</td><td>1</td><td class="mono">when_inversion_fails</td><td>motivation</td><td class="chip">[ TABLE ]</td></tr>
+<tr><td>§1.1 inv</td><td>18</td><td class="mono">temperature_inverse</td><td>Example 1.8</td><td class="chip">[ TABLE ]</td></tr>
+</table>
+
+<h2>5 · 完整逐格清單（77）</h2>
+<p class="sub">verdict：
+<span class="tag t-migrate">MIGRATE</span>
+<span class="tag t-decide">DECIDE</span>
+<span class="tag t-keep">KEEP</span>
+<span class="tag t-chipless">CHIPLESS-OK</span>
+<span class="tag t-struct">STRUCT</span></p>
+
+<h3>§1.1 — ch01_inverse_functions（21）</h3>
+<table>
+<tr><th>#</th><th>id</th><th>角色</th><th>template</th><th>accent</th><th>覆寫</th><th>字卡</th><th>verdict</th></tr>
+<tr><td>0</td><td class="mono">intro</td><td>intro</td><td>intro</td><td>—</td><td>—</td><td class="none">intro head</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>1</td><td class="mono">when_inversion_fails</td><td>motivation</td><td>value_table</td><td>example</td><td>—</td><td class="chip">[ TABLE ]</td><td><span class="tag t-decide">DECIDE</span></td></tr>
+<tr><td>2</td><td class="mono">divider_one_to_one</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>3</td><td class="mono">one_to_one_definition</td><td>Definition 1.1</td><td>definition_math</td><td>definition</td><td>—</td><td class="chip">[ DEFINITION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>4</td><td class="mono">shape_can_mislead</td><td>Example 1.3</td><td>derivation</td><td>example</td><td>no prompt</td><td class="chip">[ DERIVATION ]</td><td><span class="tag t-decide">DECIDE</span></td></tr>
+<tr><td>5</td><td class="mono">horizontal_line_test</td><td>Remark 1.1 + Fig</td><td>graph</td><td>definition</td><td>—</td><td class="none">（無）</td><td><span class="tag t-chipless">CHIPLESS-OK</span></td></tr>
+<tr><td>6</td><td class="mono">divider_inverse</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>7</td><td class="mono">inverse_definition</td><td>Definition 1.2</td><td>definition_math</td><td>definition</td><td>—</td><td class="chip">[ DEFINITION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>8</td><td class="mono">not_a_reciprocal</td><td>Caution 1.1</td><td>callout</td><td>—</td><td>type+number</td><td class="chip">[ CAUTION 1.1 ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>9</td><td class="mono">invertible_iff_one_to_one</td><td>Theorem 1.1</td><td>theorem_proof</td><td>theorem</td><td>—</td><td class="chip">[ THEOREM ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>10</td><td class="mono">first_inverses</td><td>Example 1.4</td><td>derivation</td><td>example</td><td>no prompt</td><td class="chip">[ DERIVATION ]</td><td><span class="tag t-decide">DECIDE</span></td></tr>
+<tr><td>11</td><td class="mono">composition_identities</td><td>Proposition 1.1</td><td>definition_math</td><td>proposition</td><td>—</td><td class="chip">[ PROPOSITION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>12</td><td class="mono">reflection_across_y_eq_x</td><td>reflection prose</td><td>graph</td><td>example</td><td>—</td><td class="none">（無）</td><td><span class="tag t-chipless">CHIPLESS-OK</span></td></tr>
+<tr><td>13</td><td class="mono">restrict_to_invert</td><td>Example 1.5 + Fig</td><td>graph</td><td>example</td><td>—</td><td class="none">（無）</td><td><span class="tag t-chipless">CHIPLESS-OK</span></td></tr>
+<tr><td>14</td><td class="mono">divider_finding</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>15</td><td class="mono">inverse_procedure</td><td>Strategy 1.1</td><td>procedure_steps</td><td>procedure</td><td>—</td><td class="chip">[ PROCEDURE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>16</td><td class="mono">invert_a_cubic</td><td>Example 1.6</td><td>derivation</td><td>example</td><td>no prompt</td><td class="chip">[ DERIVATION ]</td><td><span class="tag t-decide">DECIDE</span></td></tr>
+<tr><td>17</td><td class="mono">invert_a_rational</td><td>Example 1.7</td><td>derivation</td><td>example</td><td>no prompt</td><td class="chip">[ DERIVATION ]</td><td><span class="tag t-decide">DECIDE</span></td></tr>
+<tr><td>18</td><td class="mono">temperature_inverse</td><td>Example 1.8</td><td>value_table</td><td>example</td><td>—</td><td class="chip">[ TABLE ]</td><td><span class="tag t-decide">DECIDE</span></td></tr>
+<tr><td>19</td><td class="mono">recap</td><td>recap</td><td>recap_cards</td><td>recap</td><td>—</td><td class="chip">[ RECAP ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>20</td><td class="mono">outro</td><td>outro</td><td>outro</td><td>—</td><td>—</td><td class="none">outro</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+</table>
+
+<h3>§3.1 — ch03_trig_derivatives（29）</h3>
+<table>
+<tr><th>#</th><th>id</th><th>角色</th><th>template</th><th>accent</th><th>覆寫</th><th>字卡</th><th>verdict</th></tr>
+<tr><td>0</td><td class="mono">intro</td><td>intro</td><td>intro</td><td>—</td><td>—</td><td class="none">intro</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>1</td><td class="mono">divider_limit</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>2</td><td class="mono">why_trig_is_different</td><td>motivation</td><td>definition_math</td><td>definition</td><td>—</td><td class="chip">[ DEFINITION ]</td><td><span class="tag t-migrate">MIGRATE</span></td></tr>
+<tr><td>3</td><td class="mono">difference_quotient_for_sine</td><td>derivation</td><td>derivation</td><td>definition</td><td>kicker(redun.)</td><td class="chip">[ DERIVATION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>4</td><td class="mono">divider_squeeze</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>5</td><td class="mono">sector_inequality</td><td>Figure 3.1</td><td>graph</td><td>definition</td><td>hook</td><td class="none">（無）</td><td><span class="tag t-chipless">CHIPLESS-OK</span></td></tr>
+<tr><td>6</td><td class="mono">squeeze_to_the_bound</td><td>derivation</td><td>derivation</td><td>definition</td><td>kicker(redun.)</td><td class="chip">[ DERIVATION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>7</td><td class="mono">continuity_statement_sin_limit</td><td>Proposition 3.1 (1/2)</td><td>theorem_proof</td><td>proposition</td><td>label</td><td class="chip">[ PROPOSITION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>8</td><td class="mono">continuity_argument</td><td>Prop 3.1 (2/2)</td><td>theorem_proof</td><td>proposition</td><td>label</td><td class="chip">[ PROOF, CONT. ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>9</td><td class="mono">fundamental_limit</td><td>Proposition 3.2</td><td>theorem_proof</td><td>proposition</td><td>label</td><td class="chip">[ PROPOSITION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>10</td><td class="mono">squeeze_graph</td><td>Figure 3.2</td><td>graph</td><td>definition</td><td>—</td><td class="none">（無）</td><td><span class="tag t-chipless">CHIPLESS-OK</span></td></tr>
+<tr><td>11</td><td class="mono">limit_not_identity</td><td>Caution</td><td>callout</td><td>—</td><td>type</td><td class="chip">[ CAUTION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>12</td><td class="mono">radians_essential</td><td>Caution</td><td>callout</td><td>—</td><td>type</td><td class="chip">[ CAUTION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>13</td><td class="mono">divider_derivatives</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>14</td><td class="mono">derivative_of_sine</td><td>Theorem 3.1 (1/2)</td><td>theorem_proof</td><td>theorem</td><td>—</td><td class="chip">[ THEOREM ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>14b</td><td class="mono">derivative_of_sine_finish</td><td>Theorem 3.1 (2/2)</td><td>theorem_proof</td><td>theorem</td><td>—</td><td class="chip">[ THEOREM ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>15</td><td class="mono">derivative_of_cosine</td><td>Theorem 3.2 (1/2)</td><td>theorem_proof</td><td>theorem</td><td>—</td><td class="chip">[ THEOREM ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>15b</td><td class="mono">derivative_of_cosine_finish</td><td>Theorem 3.2 (2/2)</td><td>theorem_proof</td><td>theorem</td><td>—</td><td class="chip">[ THEOREM ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>16</td><td class="mono">slope_equals_height</td><td>Figure 3.3</td><td>graph</td><td>definition</td><td>hook</td><td class="none">（無）</td><td><span class="tag t-chipless">CHIPLESS-OK</span></td></tr>
+<tr><td>17</td><td class="mono">derivative_cycle</td><td>Remark 3.1</td><td>definition_math</td><td>proposition</td><td>—</td><td class="chip">[ PROPOSITION ]</td><td><span class="tag t-decide">DECIDE</span></td></tr>
+<tr><td>18</td><td class="mono">divider_apply</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>19</td><td class="mono">companion_limit</td><td>Example 3.1</td><td>derivation</td><td>example</td><td>prompt</td><td class="chip">[ EXAMPLE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>20a</td><td class="mono">all_six_tan_sec</td><td>Example 3.2 (1/2)</td><td>derivation</td><td>example</td><td>prompt</td><td class="chip">[ EXAMPLE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>20b</td><td class="mono">all_six_cot_csc</td><td>Example 3.2 (2/2)</td><td>derivation</td><td>example</td><td>prompt</td><td class="chip">[ EXAMPLE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>21</td><td class="mono">shm_compute</td><td>Example 3.3</td><td>derivation</td><td>example</td><td>prompt</td><td class="chip">[ EXAMPLE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>22</td><td class="mono">shm_stacked_graphs</td><td>Figure 3.4</td><td>graph</td><td>example</td><td>hook</td><td class="none">（無）</td><td><span class="tag t-chipless">CHIPLESS-OK</span></td></tr>
+<tr><td>23</td><td class="mono">toward_the_chain_rule</td><td>forward-ref</td><td>definition_math</td><td>definition</td><td>—</td><td class="chip">[ DEFINITION ]</td><td><span class="tag t-migrate">MIGRATE</span></td></tr>
+<tr><td>24</td><td class="mono">recap</td><td>recap</td><td>recap_cards</td><td>recap</td><td>—</td><td class="chip">[ RECAP ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>25</td><td class="mono">outro</td><td>outro</td><td>outro</td><td>—</td><td>—</td><td class="none">outro</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+</table>
+
+<h3>§3.2 — ch03_chain_rule（27）</h3>
+<table>
+<tr><th>#</th><th>id</th><th>角色</th><th>template</th><th>accent</th><th>覆寫</th><th>字卡</th><th>verdict</th></tr>
+<tr><td>0</td><td class="mono">intro</td><td>intro</td><td>intro</td><td>—</td><td>—</td><td class="none">intro</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>1</td><td class="mono">divider_rule</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>2</td><td class="mono">why_composition_is_missing</td><td>motivation</td><td>definition_math</td><td>definition</td><td>—</td><td class="chip">[ DEFINITION ]</td><td><span class="tag t-migrate">MIGRATE</span></td></tr>
+<tr><td>3</td><td class="mono">rates_multiply_intuition</td><td>intuition</td><td>definition_math</td><td>definition</td><td>—</td><td class="chip">[ DEFINITION ]</td><td><span class="tag t-migrate">MIGRATE</span></td></tr>
+<tr><td>4</td><td class="mono">chain_rule_statement</td><td>Theorem 3.3（陳述）</td><td>definition_math</td><td>theorem</td><td>kicker(redun.)</td><td class="chip">[ THEOREM ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>5</td><td class="mono">composed_mapping_figure</td><td>Figure 3.5</td><td>graph</td><td>definition</td><td>hook</td><td class="none">（無）</td><td><span class="tag t-chipless">CHIPLESS-OK</span></td></tr>
+<tr><td>6</td><td class="mono">leibniz_form</td><td>Remark 3.2</td><td>definition_math</td><td>proposition</td><td>—</td><td class="chip">[ PROPOSITION ]</td><td><span class="tag t-decide">DECIDE</span></td></tr>
+<tr><td>7</td><td class="mono">decomposition_strategy</td><td>Strategy 3.1</td><td>procedure_steps</td><td>procedure</td><td>—</td><td class="chip">[ PROCEDURE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>8</td><td class="mono">divider_why</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>9</td><td class="mono">proof_strategy_bridge</td><td>bridge</td><td>definition_math</td><td>definition</td><td>—</td><td class="chip">[ DEFINITION ]</td><td><span class="tag t-migrate">MIGRATE</span></td></tr>
+<tr><td>10</td><td class="mono">remainder_form_definition</td><td>Definition 3.1</td><td>definition_math</td><td>definition</td><td>—</td><td class="chip">[ DEFINITION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>11</td><td class="mono">remainder_tangent_figure</td><td>Figure 3.6</td><td>graph</td><td>definition</td><td>hook</td><td class="none">（無）</td><td><span class="tag t-chipless">CHIPLESS-OK</span></td></tr>
+<tr><td>12</td><td class="mono">two_forms_equivalent</td><td>Proposition 3.3</td><td>theorem_proof</td><td>proposition</td><td>label</td><td class="chip">[ PROPOSITION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>13</td><td class="mono">proof_setup_substitution</td><td>Proof 3.3 (1/4)</td><td>theorem_proof</td><td>theorem</td><td>label</td><td class="chip">[ PROOF OF … ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>14</td><td class="mono">proof_easy_piece</td><td>Proof 3.3 (2/4)</td><td>theorem_proof</td><td>theorem</td><td>label</td><td class="chip">[ PROOF OF … ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>15</td><td class="mono">proof_delicate_choices</td><td>Proof 3.3 (3/4)</td><td>theorem_proof</td><td>theorem</td><td>label</td><td class="chip">[ PROOF OF … ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>16</td><td class="mono">proof_delicate_bound</td><td>Proof 3.3 (4/4)</td><td>theorem_proof</td><td>theorem</td><td>label</td><td class="chip">[ PROOF OF … ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>17</td><td class="mono">divider_use</td><td>divider</td><td>divider</td><td>definition</td><td>eyebrow</td><td class="none">divider</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+<tr><td>18</td><td class="mono">example_single_composition</td><td>Example 3.4</td><td>derivation</td><td>example</td><td>prompt</td><td class="chip">[ EXAMPLE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>19</td><td class="mono">caution_inner_derivative</td><td>Caution</td><td>callout</td><td>—</td><td>type</td><td class="chip">[ CAUTION ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>20</td><td class="mono">example_nested_three_layers</td><td>Example 3.5</td><td>derivation</td><td>example</td><td>prompt</td><td class="chip">[ EXAMPLE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>21</td><td class="mono">example_chain_times_quotient</td><td>Example 3.6</td><td>derivation</td><td>example</td><td>prompt</td><td class="chip">[ EXAMPLE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>22</td><td class="mono">example_chain_times_product</td><td>Example 3.7</td><td>derivation</td><td>example</td><td>prompt</td><td class="chip">[ EXAMPLE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>23</td><td class="mono">example_leibniz_rates</td><td>Example 3.8</td><td>derivation</td><td>example</td><td>prompt</td><td class="chip">[ EXAMPLE ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>24</td><td class="mono">toward_section_3_3</td><td>forward-ref</td><td>definition_math</td><td>definition</td><td>—</td><td class="chip">[ DEFINITION ]</td><td><span class="tag t-migrate">MIGRATE</span></td></tr>
+<tr><td>25</td><td class="mono">recap</td><td>recap</td><td>recap_cards</td><td>recap</td><td>—</td><td class="chip">[ RECAP ]</td><td><span class="tag t-keep">KEEP</span></td></tr>
+<tr><td>26</td><td class="mono">outro</td><td>outro</td><td>outro</td><td>—</td><td>—</td><td class="none">outro</td><td><span class="tag t-struct">STRUCT</span></td></tr>
+</table>
+
+<h2>6 · 給設計草案的三個裁決點</h2>
+<div class="note">
+<b>① 核心遷移範圍</b>：確定就是那 <b>6 格 MIGRATE</b>（exposition → <code>scene_role</code> chipless）嗎？<br>
+<b>② DECIDE 是否納入</b>：Remark→PROPOSITION（2，修法＝改標 <span class="chip">[ remark ]</span>）／Example→DERIVATION（4，補 <code>prompt:</code>，lint 已 warn）／→TABLE（2，低風險）——這 8 格哪些納入本次？<br>
+<b>③ 單向規則確認</b>：9 個 graph/figure <b>本來就無字卡</b>，所以規則必須是「講解 ⟹ 無字卡」（單向），不能反推「無字卡 ⟹ 講解」。確認採單向。
+</div>
+
+<footer>
+唯讀清點，未改任何檔。來源：<code>video/storyboards/{ch01_inverse_functions,ch03_trig_derivatives,ch03_chain_rule}.yml</code>；
+字卡邏輯：<code>video/pipeline/templates/*.py</code>（scene_head / example_head / 各 build）。
+下一步：待裁決後把「chip resolver ＋ <code>scene_role</code> ＋ lint ＋ 單向規則」寫成設計草案進 <code>video/DESIGN</code>。
+</footer>
+
+</body>
+</html>

@@ -252,6 +252,40 @@ def _example_missing_prompt(data: dict) -> "list[tuple[str, str]]":
     return out
 
 
+def _scene_role_issues(data: dict) -> "list[tuple[str, str]]":
+    """Validate the `scene_role` field (the eyebrow-chip beat axis).
+
+      * unknown value           -> error (typo guard; would raise at render)
+      * scene_role + label/kicker -> warn (scene_role is silently ignored:
+        label/kicker outrank it in scene_roles.resolve_chip; drop one)
+    """
+    # deferred absolute import (lint.py runs both as a script and as a module; a
+    # top-level relative import breaks `python video/pipeline/lint.py`). scene_roles
+    # is pure stdlib, so this is cheap.
+    from pipeline.scene_roles import SCENE_ROLE_CHIP
+
+    issues: list[tuple[str, str]] = []
+    scenes = data.get("scenes", []) if isinstance(data, dict) else []
+    for sc in scenes:
+        if not isinstance(sc, dict):
+            continue
+        role = sc.get("scene_role")
+        if not role:
+            continue
+        sid = sc.get("id", "?")
+        if role not in SCENE_ROLE_CHIP:
+            issues.append(("error",
+                f"{sid}.scene_role: unknown value {role!r} -- known: "
+                f"{sorted(SCENE_ROLE_CHIP)}"))
+            continue
+        if sc.get("label") or sc.get("kicker"):
+            other = "label" if sc.get("label") else "kicker"
+            issues.append(("warn",
+                f"{sid}.scene_role: {role!r} is ignored -- {other} outranks "
+                f"scene_role in resolve_chip. Drop one."))
+    return issues
+
+
 def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
     """Return a list of (severity, message); severity is 'error' or 'warn'.
     'error' aborts the render (broken output); 'warn' is advisory (has rare
@@ -290,6 +324,7 @@ def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
     issues += _hollow_on_curve(data)
     issues += _quantitative_without_scale(data)
     issues += _example_missing_prompt(data)
+    issues += _scene_role_issues(data)
     return issues
 
 
