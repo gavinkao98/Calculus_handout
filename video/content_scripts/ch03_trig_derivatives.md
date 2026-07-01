@@ -399,6 +399,21 @@ visual_need: |
    3. $\cos(x+\tfrac h2)\to\cos x$（連續）；$\dfrac{\sin(h/2)}{h/2}\to1$（基本極限，$\theta=\tfrac h2$）。
    4. $=\cos x\cdot1=\cos x$（QED）。
 animation_cue: （無——靜態陳述＋證明鏈即可）
+screen_contract: |
+  required_steps:
+    - id: def
+      tex: '\frac{d}{dx}\sin x=\lim_{h\to0}\frac{\sin(x+h)-\sin x}{h}'
+      reason: '定義'
+    - id: reduced
+      tex: '=\lim_{h\to0}\cos(x+\tfrac h2)\frac{\sin(h/2)}{h/2}'
+      depends_on: difference_quotient_for_sine.result
+      recap_required: true
+    - id: limits
+      tex: '\cos(x+\tfrac h2)\to\cos x;\ \tfrac{\sin(h/2)}{h/2}\to1'
+      reason: '連續＋基本極限'
+    - id: qed
+      tex: '=\cos x\cdot1=\cos x'
+      reason: 'QED'
 ```
 
 ---
