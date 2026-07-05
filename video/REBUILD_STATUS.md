@@ -4,6 +4,16 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## ✅ 2026-07-05 Step 0（Layout & Type Pass）落地＋A/B sign-off「提案通過」＋Step 0-b 全回歸綠
+
+承下「計畫已出」節，[`PLAN-step0-typepass-capacity-v2.md`](PLAN-step0-typepass-capacity-v2.md) 的 **Phase 0-a（Tasks 1–8）已執行完畢**（subagent-driven，逐 task「failing 自測→實作→實作者外 reviewer 雙閘」；全程離線零計費）。分支 `video/template-redesign-navy-spine`，本地未 push。
+
+- **五項型階修正 commits：** `7cba3e2` graph carrier 標籤 default→math_sm(40)＋亮度地板（G2，新 helper `_carrier_label_role`；point 讀數標籤刻意不套、維持 ink_2 地板不倒退）｜`67f4428` `"tag"` scale token（result reason＋part 頁碼 26→30；clamp px 按 row kind 分派、authored size＝clamp floor 同源＝`_REASON_PX` 單一常數，關掉舊 SP2 note）｜`dc9f115` divider hook 式 56px（`render_scaffold(*, problem_size=)`，其餘三 caller 預設 `prose` 不變）｜`e961e24` 進度點 14→19px（pill 幾何全繫於 r，自動同比）｜`2f331e1` graph 預設繪圖區 6.35×4.15→8.0×4.6（compare 5.2×3.6；`_fit_graph_to_safe_zone` 仍封頂）。
+- **A/B sign-off 硬閘（Task 7）：** base＋typepass＋5 開放值變體渲 14 幀、產對照頁 `output/_qa/step0_ab/REVIEW-step0-typepass-AB.html`（gitignored、圖已 base64 內嵌以利預覽）→ 使用者裁決 **「提案通過」＝全採提案預設**（tag 30／刻度 math_sm=40／reason 35／h1 78／authored 現狀），皆＝Tasks 2–6 落地現狀，故**無額外 code diff**；sign-off 由空 commit `330ec4a` 錨定（`git log --grep="A/B verdicts"`）。
+- **Step 0-b 全回歸（Task 8，結論頁 `output/_qa/REVIEW-step0-applied.html`）：** ① 三 deck schema/lint/sizecheck 全 **0 error**（ch03_trig consistent；ch01／ch03_chain 各 2 條 within-frame advisory＝近邊界但完整可讀、eyeball 無截斷、recap_cards/qed 非本次觸及＝既有，符合「warn 不 error」）② `capacity_selftest` **12/12 match**、容量邊界未位移、無需 re-baseline EXPECT ③ 全景重渲 ch01 21＋ch03_trig 27＝**48 場 0 render error** ④ `visual-frame-audit` gate-1 掃 7 graph 景 **V blocking = 0**；G2 亮度地板在 `slope_equals_height`(y=cos x)／`squeeze_graph`(cos θ) 確認生效且無過度校正、無 label-vs-label/curve 壓線/截斷；僅 4 條低嚴重度 A-level 美學註記（非 blocking，歸 §3.1 backlog）。
+- **並行協調（durable）：** 本輪與 scene-TTS/「Dean」線在同分支同工作樹交錯 commit，但**檔案不相交**（本線只動 `pipeline/templates/*`＋`visuals/theme.py`＋`brand.py`；唯一共用檔＝本 REBUILD_STATUS.md，逐次 fresh-read＋只 stage 自己 hunk、never `-A`）。前幾輪 storyboard theorem-merge／MiMo spoken 等未 commit 變更全程**原封保留**（V-authored 臨時改 storyboard 後用 file-copy 還原、核對 foreign 63 行 diff 逐字無損）。
+- **接續（PLAN 續辦，另可獨立排程）：** Phase 1 DESIGN.md Playbook＋型階/語域/量測表＋rubric carrier-label（Task 9，純文檔可與 0-b 並行）→ Phase 2 lint G1/G4（Task 10/11）→ Phase 3 sizecheck G3 稀疏出口（Task 12）→ Phase 4 回歸網＋canary（Task 13）→ Phase 5 §3.1 單景 VLM backlog（Task 14）。
+
 ## 🎯 2026-07-05 版面/字級 pass＋容量契約 v2——設計全數核可、實作計畫已出（**新對話由 PLAN 接手實作**）
 
 同日三輪裁決（場景效果分析 → 通用密度策略 → layout/type 體檢），兩份提案各過一輪 Codex read-only 對抗式 review（8＋8 findings 全數處置）後**使用者全數核可**。**實作入口（權威、自足，不需回讀 gitignored 提案稿）＝ [`PLAN-step0-typepass-capacity-v2.md`](PLAN-step0-typepass-capacity-v2.md)**。分支續用 `video/template-redesign-navy-spine`；全程離線零計費（Codex standing consent）。
