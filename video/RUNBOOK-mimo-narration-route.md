@@ -52,13 +52,22 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   寫乾淨的 REPORT-<deck>-narration-faithfulness.md。NFA 裁決寫進該次修正 commit 的 message body（CLAUDE.md，`git log --grep="NFA"`）。
 
 步驟 4 —（須先徵得使用者同意：MiMo 雖免費仍屬外部 API）合成＋render：
-- 確認 .env 有 MIMO_API_KEY。先 smoke（mimo_preview.py --smoke）確認回應形狀，報用量、徵同意後：
-  python video/pipeline/tts.py  --storyboard video/storyboards/<deck>_mimo.yml --backend mimo --voice Mia
+- 確認 .env 有 MIMO_API_KEY。預設走 `mimo-v2.5-tts-voicedesign` 的 `Calm Professor`
+  prompt（中速、穩重美式教授聲線，`optimize_text_preview=false`，不讓平台改稿）。先 smoke
+  （mimo_preview.py --smoke）確認回應形狀，報用量、徵同意後：
+  python video/pipeline/tts.py  --storyboard video/storyboards/<deck>_mimo.yml --backend mimo
   python video/make.py          --storyboard video/storyboards/<deck>_mimo.yml --reuse-audio --quality high
   → output/chNN/sX.Y/<deck>_mimo.mp4（1080p 預覽；正式交付才 --quality 4k）
+- **合成單位 `--unit`（scene-level TTS＋forced alignment，2026-07-05；設計見 DESIGN.md「Manifest schema 2」）：**
+  `tts.py` 預設 `--unit auto`——batch-1 template（`definition_math`／`graph`／`callout`／`recap_cards`）走
+  scene-level（一場一次合成、`stable-ts` 回推 beat 時序、per-scene validation，過不了自動回退 beat），
+  其餘（含 `derivation`／`theorem_proof`）暫走 beat。要全走舊路用 `--unit beat`；單一場強制 scene 用 `--unit scene`。
+  **紀律：scene-level 真合成只在 narration lock＋NFA 之後**（「改一個字→整場重合成」的 blast radius 由 lock 吃掉）；
+  lock 前一律 `make.py --backend mock`（beats、零計費、離線）迭代。scene-level 合成報價時**要把 §7 fallback retry 預算
+  一併列入**（每場至多 2 次額外 call：resynth／chunk），核准即涵蓋、超出即停。
 - `make.py --reuse-audio` 會先驗 manifest freshness（deck id、scene、beat count、`{show}`、
-  `text_hash`、WAV 存在/時長），再 render；若報 stale/incomplete，不要硬跳過，先重跑該 storyboard
-  的 `tts.py` 或確認是不是選錯 `<deck>_mimo.yml`。
+  `text_hash`、WAV 存在/時長；`scene_aligned` 另驗 scene WAV＋words/aligned 檔＋`validation.status`），再 render；
+  若報 stale/incomplete，不要硬跳過，先重跑該 storyboard 的 `tts.py` 或確認是不是選錯 `<deck>_mimo.yml`。
 - 若出現 `[sync] short/reveal-only beat warning`，通常是連續 `{show a} {show b}` 或短空 beat；
   優先把其中一個 reveal 合併到有旁白的 beat，或接受它作為 deliberate visual pause。
 - render 後 `[sync] render/audio lengths clean` 最好要出現；fatal mismatch 代表 narration 可能超過
@@ -74,4 +83,5 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
 ---
 
 **只想聽聲音（不出影片）：** `python video/pipeline/mimo_preview.py --spoken content_scripts/<deck>_narration_spoken.md`
-（`--dry-run` 不呼叫 API；`--smoke` 只合首段）。
+（`--dry-run` 不呼叫 API；`--smoke` 只合首段）。要臨時回到內建音色試聽時，加
+`--model mimo-v2.5-tts --voice Dean`（或 `Mia` / `Chloe` / `Milo`）。
