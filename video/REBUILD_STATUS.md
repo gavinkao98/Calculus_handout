@@ -4,6 +4,16 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## ✅ 2026-07-05 §3.1 單景 backlog（PLAN Phase 5 / Task 14）落地——8 項場景視覺打磨全數完成
+
+承下 v2 節，[`PLAN-step0-typepass-capacity-v2.md`](PLAN-step0-typepass-capacity-v2.md) 的 **Phase 5（Task 14）8 項 §3.1 單景 backlog 全數完成**（使用者「續做整個 Task 14」、接受成本）。創意 hook 逐項派 fresh subagent（VLM render→自檢→迭代），coordinator 逐項 VLM 複驗（**V blocking=0**）＋commit；離線零計費。
+
+- **8 項 commits：** #5 squeeze_graph ±π/2 刻度＋tfrac label（`9fe7dd9`）｜#1 slope_equals_height connectors＋等長切線＋全稱 cos 標籤（`4c7191b`，**folds in 前輪未 commit 的 §3.1 hooks 工作**：slope ticks／sector dim-labels／shm words，per 使用者「納進一起 commit」裁決）｜#2 sector_inequality 放大＋三色區域填色＋①②③ chip＋tanθ 移位（`500447b`）｜#7 limit_not_identity／radians_essential 加 `sparse_ok`（`354d21c`，G3 出口＝pull-quote 留白刻意）｜#4 shm_stacked_graphs guide 標籤＋交點 dots＋s''=-s 錨定（`04a705d`）｜#6 toward_the_chain_rule 收尾三 chip 卡 ✓/?（`e15ecc1`，新 hook）｜#3 derivative_cycle 線性鏈→四節點環圖（`90e6001`，新 hook）。#8 divider hook/spine 無互撞＝眼檢通過（無改）。
+- **foreign 全程保留：** §3.1 hooks 前輪未 commit 工作依裁決 folds-in（committed within Task 14）；storyboard theorem-merge／MiMo 等其餘 foreign 全程未動——每個 storyboard 改動用 `git stash push -- <storyboard>` 隔離、pop 後 63 行 foreign diff 逐字無損（多次 stash cycle 全乾淨）。新 hook 用「先 wire `hook:` 行（stash-isolated）→ subagent 寫 function（build on working tree）→ 合併 commit → pop」。
+- **驗收：** 逐景 render＋VLM 複驗 V blocking=0；ch03 deck schema OK／lint **0 error**（G1/G4 advisory 命中他景不擋）／sizecheck consistent。旁白時序未動（視覺加料全綁進既有 `{show}` beat、beat↔audio 不變），故 `make.py --reuse-audio` sync 檢正當跳過、NFA 不重開。
+- **plan drift（非 bug，記錄）：** #7 plan 原列 toward_the_chain_rule 為 G3 命中，實際非 G3-可掃模板（真 §3.1 G3＝limit_not_identity/radians_essential）；#6「sparse_ok 接受現狀」moot（非 G3 命中），改實作 chip 卡。
+- **A-level 遞留（非 blocking，未來 polish 可收）：** #1 slope 圖偏 busy（皆 1080p 可讀）；#3 ring 偏小（受限於不動 statement/math.1 的夾縫、下方留白）。成本：6 項創意 hook subagent 各 ~80k–216k tokens。
+
 ## ✅ 2026-07-05 容量契約 v2（G1–G6）落地＋回歸網收口（PLAN Phases 1–4 完成）
 
 承下「Step 0 落地」節，[`PLAN-step0-typepass-capacity-v2.md`](PLAN-step0-typepass-capacity-v2.md) 的 **Phases 1–4（Tasks 9–13）已執行完畢**（subagent-driven，逐 task failing 自測→實作→實作者外 reviewer 雙閘 全 APPROVED；phase 收尾 Codex read-only 覆核）。全為 **advisory（warn 不 error）**，離線零計費。結論頁 `output/_qa/REVIEW-capacityv2-applied.html`（gitignored）。
