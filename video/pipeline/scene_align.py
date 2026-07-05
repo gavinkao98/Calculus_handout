@@ -65,3 +65,60 @@ def build_scene_plan(scene: dict[str, Any]) -> dict[str, Any]:
         "word_count": len(tokenize(transcript)),
         "beats": plan_beats,
     }
+
+
+def explode_to_plan_tokens(
+    aligned_words: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[int, dict[str, Any]]]:
+    """Split aligner words into plan WORD_RE tokens, interpolating timestamps by
+    character share. Both aligner and plan read the same transcript text, so
+    exploding each aligner word with WORD_RE reproduces the plan token sequence.
+
+    Punctuation-only aligner words (e.g. a standalone "--") yield no token; their
+    span survives as an inter-word gap, and beat starts always sit on the next real
+    word's onset, so no reveal timing is lost by dropping them.
+
+    Returns (tokens, multi) where multi maps token index -> parent info for tokens
+    from a multi-token parent word (their timestamps are interpolated, not measured).
+    """
+    out: list[dict[str, Any]] = []
+    multi: dict[int, dict[str, Any]] = {}
+    for word in aligned_words:
+        tokens = WORD_RE.findall(word["text"])
+        if not tokens:
+            continue  # punctuation-only word
+        for ordinal in range(len(tokens)) if len(tokens) > 1 else ():
+            multi[len(out) + ordinal] = {
+                "parent": word["text"].strip(), "ordinal": ordinal, "tokens": len(tokens),
+            }
+        start, end = float(word["start"]), float(word["end"])
+        span = max(end - start, 0.0)
+        total_chars = sum(len(t) for t in tokens)
+        cursor = start
+        for token in tokens:
+            share = (len(token) / total_chars) if total_chars else 1.0 / len(tokens)
+            token_end = min(cursor + span * share, end)
+            out.append({
+                "word": token, "start": round(cursor, 3), "end": round(token_end, 3),
+                "probability": word.get("probability"),
+            })
+            cursor = token_end
+        out[-1]["end"] = end  # avoid rounding drift on the last token
+    return out, multi
+
+
+def verify_plan_index(words: list[dict[str, Any]], plan: dict[str, Any]) -> None:
+    """Raise AlignmentError unless exploded aligner tokens == plan tokens, position
+    by position. This is the contract that makes index-based beat mapping sound;
+    by construction it should always hold, so a break means a real defect."""
+    plan_tokens = tokenize(plan["transcript"])
+    got = [w["word"] for w in words]
+    if got == plan_tokens:
+        return
+    for i, (g, want) in enumerate(zip(got, plan_tokens)):
+        if g != want:
+            raise AlignmentError(
+                f"token mismatch at index {i}: aligned={g!r} plan={want!r}; "
+                "index-based beat mapping would be unsound"
+            )
+    raise AlignmentError(f"token count mismatch: aligned={len(got)} plan={len(plan_tokens)}")
