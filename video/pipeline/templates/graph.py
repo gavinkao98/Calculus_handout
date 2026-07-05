@@ -145,6 +145,23 @@ def _title(text: str, ground: str):
     return mob
 
 
+# Carrier-label luminance floor (G2, 2026-07-05): a curve label INHERITS its curve's
+# colour by default -- correct for bright accents, but a de-emphasised curve (muted /
+# hairline grey) dragged its identity label below legibility (s3.1 frame 10 "cos t"
+# nearly invisible). The curve may stay dim; its LABEL floors to ink_2 ("text").
+# An explicit label_role is the author's override and is respected untouched.
+_DIM_LABEL_ROLES = {"muted", "subtitle", "ink_3", "ink_faint",
+                    "hairline", "hairline_strong", "hairline_faint", "grid_line"}
+
+
+def _carrier_label_role(plot: dict) -> str:
+    explicit = plot.get("label_role")
+    if explicit is not None:
+        return str(explicit)
+    role = str(plot.get("color_role", "secondary"))
+    return "text" if role in _DIM_LABEL_ROLES else role
+
+
 def _label(text: str, ground: str, *, role: str = "text", size: str = "label"):
     mob = brand.math_line(text, ground, role=role, size=size) if "$" in text else brand.body_text(
         text, ground, role=role, size=size
@@ -235,7 +252,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
     ac = spec["axes"]
     x_range = _range(ac["x_range"], 0.5)
     y_range = _range(ac["y_range"], 0.25)
-    default_label_size = str(ac.get("label_size", "label"))
+    default_label_size = str(ac.get("label_size", "math_sm"))   # was "label" (30px) -- carrier >= ticks (P-A1)
 
     for i, plot in enumerate(spec.get("plots", [])):
         kind = plot.get("kind")
@@ -273,7 +290,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                 # orange label). `label_role` still overrides. Mirrors the line
                 # label below; see DESIGN.md "Plot label colour".
                 lab = _label(plot["label"], ground,
-                             role=plot.get("label_role", str(plot.get("color_role", "secondary"))),
+                             role=_carrier_label_role(plot),
                              size=plot.get("label_size", default_label_size))
                 _place_function_label(lab, graph, axes, plot, xr, y_range)
                 if static:
@@ -319,7 +336,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                 # red -- so a muted y=x reference line got a jarring red label that
                 # fought the de-emphasis it was drawn with. `label_role` still wins.
                 lab = _label(plot["label"], ground,
-                             role=plot.get("label_role", str(plot.get("color_role", "secondary"))),
+                             role=_carrier_label_role(plot),
                              size=plot.get("label_size", default_label_size))
                 if plot.get("label_point") is not None:
                     p = plot["label_point"]
