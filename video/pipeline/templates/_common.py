@@ -449,10 +449,14 @@ def _assumption_text(meta, flag_id) -> str | None:
     return None
 
 
-def render_scaffold(scaffold, ground, meta=None) -> list[Block]:
+def render_scaffold(scaffold, ground, meta=None, *, problem_size="prose") -> list[Block]:
     """Render optional scaffold (motive / divider-problem / first-use flag) as static
     Block(s). Returns [] when scaffold is absent/empty (no-op -> render unchanged).
-    motive/problem use role='text' (NEVER 'muted'); flag shows the assumption text."""
+    motive/problem use role='text' (NEVER 'muted'); flag shows the assumption text.
+
+    *problem_size*: divider passes 56 so a pure-$math$ hook (-> MathTex path, no TEXT_SCALE)
+    reads ABOVE the subtitle instead of ~80% of it; every other template keeps "prose".
+    """
     if not isinstance(scaffold, dict):
         return []
     out = []
@@ -466,7 +470,7 @@ def render_scaffold(scaffold, ground, meta=None) -> list[Block]:
         out.append(Block("scaffold.motive", mob, anim="fade", static=True, layer="content"))
     problem = scaffold.get("problem")
     if isinstance(problem, str) and problem.strip():
-        mob = brand.prose(problem, ground, role="text", size="prose",
+        mob = brand.prose(problem, ground, role="text", size=problem_size,
                           max_width=CONTENT_W, align="LEFT")
         out.append(Block("scaffold.problem", mob, anim="fade", static=True, layer="content"))
     flag = scaffold.get("flag")

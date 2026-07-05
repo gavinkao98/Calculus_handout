@@ -73,7 +73,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     eyebrow.next_to(title, UP, buff=0.34).align_to(title, LEFT)
     below = title
 
-    scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"))
+    scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"), problem_size=56)
     for sb in scaffold_blocks:
         sb.mobject.next_to(below, DOWN, buff=0.42).align_to(title, LEFT)
         below = sb.mobject
