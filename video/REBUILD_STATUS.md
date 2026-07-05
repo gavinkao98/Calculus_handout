@@ -55,6 +55,7 @@
 - **成片：** `make.py --reuse-audio --quality high` 全 27 場 render/compose 綠（`[sync] beat timing clean`）→ **`output/ch03/s3.1/ch03_trig_derivatives_mimo.mp4`（clean Dean、31.9MB、~16.2 分、1080p）**。真 4K final 另議。
 - **成本記帳：** 本輪真 MiMo billed ≈ 21 primary＋3 resynth＋3 降級場的 beats（~12）≈ 36 call（在報價信封 21＋每場 ≤2 fallback 內）。
 - **durable 教訓：** ① builtin voice 路線經 `audio.voice` 選定、**不送 style/persona prompt**（送了會被當 delivery 提示、污染「純 builtin」）。② 退某條 config 路線時分清「活躍 config（改）」vs「歷史稽核記錄（不竄改）」。③ CP→Dean 換 canonical 用「合成到新目錄→驗證→改路徑→刪舊→rename」的非破壞序，舊 CP 在新 deck 驗證前不動。
+- **路線定位（回答「正式 or 實驗」）＋3 場降級裁決（2026-07-05 使用者問答）：** 此 scene-level TTS＋forced alignment 已是**正式旁白路線**——code 在正式產線 `video/pipeline/`（`scene_align`／`scene_fallback`／`atomicio`），走 `tts.py --unit`→schema-2 manifest→`make.py --reuse-audio` 正式流程，§3.1 clean Dean deck 即由它產；`experiments/forced_alignment_dean/` **保留當 lab bench、非產出來源**。目前為 **batch-1 rollout 姿態**：`--unit auto` 只自動送 `definition_math`／`graph`／`callout`／`recap_cards` 走 scene、其餘（含 `derivation`／`theorem_proof`）走 beat；全 scene 要手動 `--unit scene`（本輪 21 場即此）。「預設全開」＝batch-2 三件（見下節接續：allowlist 擴充＋rung 3 chunk＋`coverage.py` 重命名）。**3 場降級（`continuity_argument`／`derivative_of_cosine`／`shm_stacked_graphs`）使用者裁決「先不用」修**——以 beat-level Dean 出貨，未來勿自行重試 scene-level（會燒 billed API）。
 
 ## ✅ 2026-07-05 scene-level TTS＋forced alignment **production 化 Phase A 落地**（scene_align 核心・消費端遷移・selftest／整合／真資料回歸全綠・全 deck mock 驗收）
 
