@@ -51,12 +51,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     eyebrow_text = spec.get("kicker") or spec.get("eyebrow") or (f"Section {section}" if section else "")
     eyebrow = brand.eyebrow(eyebrow_text, ground, role=role)
     title = brand.heading_rich(str(spec.get("title", meta.get("title", ""))), ground,
-                               role="primary", size=92, max_width=content_w * 0.72)
+                               role="primary", size="intro_headline", max_width=content_w * 0.72)
 
     sub = spec.get("subtitle") or spec.get("sub") or spec.get("tagline")
     subtitle = None
     if sub:
-        subtitle = brand.prose(str(sub), ground, role="text", size=40,
+        subtitle = brand.prose(str(sub), ground, role="text", size="intro_subtitle",
                                max_width=content_w * 0.62, align="LEFT")
 
     prog = spec.get("progress") or {}

@@ -78,9 +78,9 @@ def statement_regime(spec: dict[str, Any], ground: str) -> tuple[bool, int, bool
                   and stmt_text.count("$") == 2)
     inner_w = RAIL_W - 2 * _CARD_PAD_X
     if is_formula:
-        glyph = brand.math_line(stmt_text, ground, role="primary", size="h3")
+        glyph = brand.math_line(stmt_text, ground, role="primary", size="statement")
         return (bool(glyph.width > inner_w), 1, True)   # bool(): glyph.width is a numpy float
-    stmt = brand.prose(stmt_text, ground, role="primary", size="h3",
+    stmt = brand.prose(stmt_text, ground, role="primary", size="statement",
                        max_width=inner_w, align="LEFT")
     multiline = isinstance(stmt, VGroup) and not isinstance(stmt, (Tex, MathTex))
     n_lines = len(stmt.submobjects) if multiline else 1
@@ -92,8 +92,8 @@ def _statement_content(stmt_text: str, is_formula: bool, ground: str, max_width:
     never clamps it -- a too-wide one overflows and _overflow_issues catches it, no silent shrink),
     wrapped prose left-flush otherwise."""
     if is_formula:
-        return brand.prose(stmt_text, ground, role="primary", size="h3")
-    return brand.prose(stmt_text, ground, role="primary", size="h3", max_width=max_width, align="LEFT")
+        return brand.prose(stmt_text, ground, role="primary", size="statement")
+    return brand.prose(stmt_text, ground, role="primary", size="statement", max_width=max_width, align="LEFT")
 
 
 def _band_card(stmt_text: str, is_formula: bool, ground: str):

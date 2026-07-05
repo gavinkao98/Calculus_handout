@@ -88,7 +88,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     statement = None
     if spec.get("statement"):
-        statement = brand.prose(spec["statement"], ground, role="primary", size=40,
+        statement = brand.prose(spec["statement"], ground, role="primary", size="statement",
                                 max_width=content_w, align="CENTER")
 
     header = [str(c) for c in spec.get("header", [])]
@@ -115,9 +115,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             return "primary"
         return "text"
 
-    header_mobs = [_cell(c, ground, role=cell_role(None, j), size=38)
+    header_mobs = [_cell(c, ground, role=cell_role(None, j), size="prose_sm")
                    for j, c in enumerate(header)]
-    row_mobs = [[_cell(c, ground, role=cell_role(i, j), size=42) for j, c in enumerate(r)]
+    row_mobs = [[_cell(c, ground, role=cell_role(i, j), size="prose") for j, c in enumerate(r)]
                 for i, r in enumerate(rows)]
 
     # -- grid geometry: column width = widest cell in that column ----------

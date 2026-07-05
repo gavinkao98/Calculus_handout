@@ -155,7 +155,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     statement = None
     if spec.get("statement"):
-        statement = brand.prose(spec["statement"], ground, role="primary", size="prose",
+        statement = brand.prose(spec["statement"], ground, role="primary", size="statement",
                                 max_width=content_w, align="LEFT")
 
     rows = _rows_from_spec(spec)

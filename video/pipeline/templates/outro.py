@@ -56,7 +56,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     label = brand.eyebrow(_format_meta(str(end.get("label", "end of section {section}")), meta),
                           ground, role="accent")
     title = brand.heading(_format_meta(str(end.get("title", "{title}")), meta), ground,
-                          role="heading", size=72, max_width=T.FRAME_W - 2 * T.SIDE_GUTTER)
+                          role="heading", size="outro_headline", max_width=T.FRAME_W - 2 * T.SIDE_GUTTER)
 
     slate = VGroup(logo, rule, label, title)
     slate.arrange(DOWN, buff=0.0)

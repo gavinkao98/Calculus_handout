@@ -66,6 +66,7 @@ _SCALE_PX = {
     # Direction-D scale
     "hero": 112, "h1": 78, "h2": 58, "h3": 44,  # h1 82->78: titles read as over-dominant on many scenes (Codex, both rounds)
     "prose": 42, "prose_sm": 35,
+    "statement": 44,  # canonical declarative statement line (theorem/definition/value_table/sign_chart) -- unify 2026-07-05; was scattered h3=44 / prose=42 / raw 40
     "math": 48, "math_sm": 40,
     "caption": 30, "eyebrow": 26, "numeral": 104, "ghost_numeral": 520,
     "tag": 30,   # mono nav/emphasis tag: derivation result-reason + part pager (was eyebrow=26 == floor; A/B may settle 32)

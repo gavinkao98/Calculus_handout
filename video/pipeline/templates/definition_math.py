@@ -92,7 +92,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         """Prose statement (at *stmt_width*) over the math stack, as one left-flush group."""
         statement = None
         if spec.get("statement"):
-            statement = brand.prose(spec["statement"], ground, role="primary", size="prose",
+            statement = brand.prose(spec["statement"], ground, role="primary", size="statement",
                                     max_width=stmt_width, align="LEFT")
         parts = []
         if statement is not None:

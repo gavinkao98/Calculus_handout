@@ -86,7 +86,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     statement = None
     if spec.get("statement"):
-        statement = brand.prose(spec["statement"], ground, role="primary", size=40,
+        statement = brand.prose(spec["statement"], ground, role="primary", size="statement",
                                 max_width=content_w, align="CENTER")
 
     points = spec.get("points", [])
