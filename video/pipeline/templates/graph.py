@@ -419,8 +419,9 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     axes = Axes(
         x_range=_range(ac.get("x_range", [-1.45, 1.45, 0.5]), 0.5),
         y_range=_range(ac.get("y_range", [-0.28, 1.55, 0.25]), 0.25),
-        x_length=float(ac.get("x_length", 6.35)),
-        y_length=float(ac.get("y_length", 4.15)),
+        # default raised toward the P5 zone ceiling (2026-07-05); _fit_graph_to_safe_zone still caps to the zone
+        x_length=float(ac.get("x_length", 8.0)),
+        y_length=float(ac.get("y_length", 4.6)),
         tips=False,
         axis_config={
             "color": T.color(ground, "muted"),
@@ -501,8 +502,9 @@ def _panel(side_spec: dict[str, Any], ground: str, prefix: str) -> tuple[list[Bl
     axes = Axes(
         x_range=_range(ac["x_range"], 0.5),
         y_range=_range(ac["y_range"], 0.25),
-        x_length=float(ac.get("x_length", 4.6)),
-        y_length=float(ac.get("y_length", 3.2)),
+        # default raised toward the P5 zone ceiling (2026-07-05); _fit_graph_to_safe_zone still caps to the zone
+        x_length=float(ac.get("x_length", 5.2)),
+        y_length=float(ac.get("y_length", 3.6)),
         tips=False,
         axis_config={
             "color": T.color(ground, "muted"),
