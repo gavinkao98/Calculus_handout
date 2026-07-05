@@ -338,6 +338,43 @@ def _display_math_in_inline(data) -> "list[tuple[str, str]]":
     return issues
 
 
+# G4 (2026-07-05): a card's prose that ENDS on a lone short/math token tends to wrap the
+# token onto its own last line (s3.1 frame 07's lone $x_0$). Advisory: reword the tail
+# (e.g. "at every point $x_0$."). Card registers = aside bodies + theorem's rail statement
+# (prose form only -- a pure-$formula$ statement centres in the card and never wraps).
+def _widow_tail(text: str) -> "str | None":
+    """The lone trailing short/math token if *text* risks a widow line, else None."""
+    words = text.strip().rstrip(".,;:!?").split()
+    if len(words) < 7:
+        return None
+    last = words[-1]
+    if re.fullmatch(r"\$[^$]+\$", last) or len(last) <= 4:
+        return last
+    return None
+
+
+def _card_widow_issues(data) -> "list[tuple[str, str]]":
+    issues = []
+    for i, sc in enumerate(data.get("scenes", []) or []):
+        sid = sc.get("id", f"scene{i}")
+        cards = []
+        aside = sc.get("aside")
+        body = aside.get("body") if isinstance(aside, dict) else aside
+        if isinstance(body, str):
+            cards.append(("aside", body))
+        stmt = sc.get("statement")
+        if (sc.get("template") == "theorem_proof" and isinstance(stmt, str)
+                and not re.fullmatch(r"\s*\$[^$]+\$\s*", stmt)):   # prose statement only
+            cards.append(("statement", stmt))
+        for field, text in cards:
+            last = _widow_tail(text)
+            if last is not None:
+                issues.append(("warn",
+                    f"{sid}.{field}: ends on a lone short/math token ('{last}') -- likely "
+                    f"widow line in the card; reword the tail (e.g. 'at every point {last}.')"))
+    return issues
+
+
 def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
     """Return a list of (severity, message); severity is 'error' or 'warn'.
     'error' aborts the render (broken output); 'warn' is advisory (has rare
@@ -378,6 +415,7 @@ def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
     issues += _example_missing_prompt(data)
     issues += _scene_role_issues(data)
     issues += _display_math_in_inline(data)
+    issues += _card_widow_issues(data)
     return issues
 
 

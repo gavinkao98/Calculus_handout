@@ -23,6 +23,14 @@ def test_negative_control_derivation_lines():
     assert msgs == [], msgs
 
 
+def test_widow_flags_lone_trailing_math_token():
+    msgs = [m for sev, m in lint_file(FIX / "_demo_registers.yml") if "widow" in m.lower()]
+    assert any("widow_aside.aside" in m for m in msgs), msgs
+    assert any("widow_statement.statement" in m for m in msgs), msgs       # rail statement 卡（prose 形）
+    assert not any("widow_ok" in m for m in msgs), msgs
+    assert not any("widow_statement_ok" in m for m in msgs), msgs          # 純 $formula$ 卡不掃
+
+
 if __name__ == "__main__":
     import sys, traceback
     fails = 0
