@@ -94,7 +94,12 @@ def sector_inequality(spec, ctx, blocks):
     title = ids["title"].mobject
     out = [b for b in blocks if b.id != "axes"]   # we draw the circle ourselves
 
-    R = 1.45
+    R = 2.4                                          # was 1.45 -- enlarged to fill the empty
+                                                      # band under the old (smallish) figure;
+                                                      # the right-side glyphs are CONGRUENT
+                                                      # copies of the same R (see docstring),
+                                                      # so their baseline spacing below widens
+                                                      # to match instead of letting them touch
     th = 0.72                                       # representative angle (~41 deg)
     B_off = R * np.array([np.cos(th), np.sin(th), 0.0])   # apex of triangle OAB
     C_off = np.array([R, R * np.tan(th), 0.0])            # apex of triangle OAC
@@ -113,6 +118,14 @@ def sector_inequality(spec, ctx, blocks):
         return AnnularSector(inner_radius=0.0, outer_radius=R, angle=th,
                              start_angle=0.0, arc_center=o, color=amber,
                              fill_opacity=fop, stroke_width=2.5).set_z_index(z)
+
+    # Main-figure fills stack OPAQUE (not translucent): OAB (blue) sits inside
+    # the sector (amber), which sits inside OAC (green), so painting largest-
+    # first at increasing z-index (outer=1 -> sector=2 -> inner=3) lets each
+    # later fill fully mask the part of the one below it -- three clean colour
+    # bands (the ring between sector/outer edges) instead of the old low-alpha
+    # stack (0.10/0.30/0.45) whose overlaps blended into a muddy teal.
+    MAIN_FOP = 0.88
 
     # -- left: source figure (scaffold static; regions revealed in place) --------
     O = np.array([-4.55, -0.40, 0.0])
@@ -147,7 +160,11 @@ def sector_inequality(spec, ctx, blocks):
     footB = np.array([B[0], O[1], 0.0])
     drop_sin = DashedLine(B, footB, color=mut, stroke_width=1.6, dash_length=0.06)
     l_sin = MathTex(r"\sin\theta", color=text, font_size=T.fs("label")).next_to(drop_sin, LEFT, buff=0.05)
-    l_tan = MathTex(r"\tan\theta", color=text, font_size=T.fs("label")).next_to((A + C) / 2.0, RIGHT, buff=0.10)
+    # sits on AC's outer (right) edge, below C's own label so the two never
+    # crowd each other -- 0.62*(A->C) instead of the true midpoint leaves lC
+    # (near the top, at C) and l_tan clearly separated.
+    tan_anchor = A + 0.62 * (C - A)
+    l_tan = MathTex(r"\tan\theta", color=text, font_size=T.fs("label")).next_to(tan_anchor, RIGHT, buff=0.12)
     dim = (l_base, drop_sin, l_sin, l_tan)
 
     for m in (radius_OC, chord_OA, dots, lO, lA, lB, lC, arc_th, lth, *dim):
@@ -155,15 +172,45 @@ def sector_inequality(spec, ctx, blocks):
     scaffold = VGroup(quarter, xaxis, yaxis, tangent, radius_OC, chord_OA,
                       dots, lO, lA, lB, lC, arc_th, lth, *dim)
 
-    src_inner = _tri(O, B_off, blue, 0.45, 2)
-    src_sector = _sec(O, 0.30, 1)
-    src_outer = _tri(O, C_off, green, 0.10, 3)
+    # z-order LARGEST region first (bottom) so each later, smaller, opaque fill
+    # fully covers the part of the bigger one it sits inside -- outer (z=1)
+    # under sector (z=2) under inner (z=3) leaves three distinct colour rings:
+    # green (OAC-only) / amber (sector-only) / blue (OAB), not a translucent blend.
+    src_outer = _tri(O, C_off, green, MAIN_FOP, 1)
+    src_sector = _sec(O, MAIN_FOP, 2)
+    src_inner = _tri(O, B_off, blue, MAIN_FOP, 3)
+
+    # ①②③ chips anchored IN the main figure's three regions (not just the right
+    # glyphs), so a paused viewer can map region -> formula directly on the
+    # source construction. Anchors are fractions of R (hand-tuned by numeric
+    # point-in-region search, then expressed R-relative so they track a resize):
+    # the sector-only sliver between chord AB and the arc is genuinely thin
+    # (~0.15u regardless of R), so its chip sits astride the arc itself rather
+    # than buried in a sliver too narrow to hold a legible ring; the other two
+    # sit well inside their own region, clear of the scaffold's O/A/B/C/
+    # dimension labels.
+    def _chip(anchor_off, col, n, radius=0.14):
+        ring = Circle(radius=radius, color=col, stroke_width=2.0,
+                      fill_color=T.color(ground, "bg"), fill_opacity=0.9).set_z_index(7)
+        ring.move_to(O + anchor_off)
+        num = MathTex(str(n), color=text, font_size=T.fs("label") * 0.68 * (radius / 0.14))
+        num.move_to(ring.get_center()).set_z_index(8)
+        return VGroup(ring, num)
+
+    chip_inner = _chip(R * np.array([0.605, 0.158, 0.0]), blue, 1)
+    # smaller radius: the sector-only sliver between chord AB and the arc is only
+    # ~0.12u deep regardless of R, so a full-size chip would bleed equally into
+    # both neighbours; a tighter ring keeps it legibly "on the amber band."
+    chip_sector = _chip(R * np.array([np.cos(0.52 * th), np.sin(0.52 * th), 0.0]),
+                        amber, 2, radius=0.10)
+    chip_outer = _chip(R * np.array([0.947, 0.716, 0.0]), green, 3)
 
     # -- right: three peeled shapes on one baseline (true relative size) ---------
     yb = O[1]                                        # share the source baseline
+    GLYPH_GAP = 0.45                                 # air between adjacent congruent shapes
     O1 = np.array([-1.30, yb, 0.0])
-    O2 = np.array([1.20, yb, 0.0])
-    O3 = np.array([3.70, yb, 0.0])
+    O2 = O1 + np.array([R + GLYPH_GAP, 0.0, 0.0])
+    O3 = O2 + np.array([R + GLYPH_GAP, 0.0, 0.0])
     badge_y = yb + R * np.tan(th) + 0.34             # one row, above the tallest apex
 
     def _badge(n, x, col):
@@ -190,10 +237,11 @@ def sector_inequality(spec, ctx, blocks):
     row = VGroup(dst1, dst2, dst3)
     ineq.next_to(row, DOWN, buff=0.55)
 
-    full = VGroup(scaffold, src_inner, src_sector, src_outer, dst1, dst2, dst3, ineq)
+    full = VGroup(scaffold, src_inner, src_sector, src_outer,
+                  chip_inner, chip_sector, chip_outer, dst1, dst2, dst3, ineq)
     _centre_in_zone(title, full)
 
-    def _peel(src):
+    def _peel(src, chip):
         def anim(scene, mob, ground):
             shape, label, badge = mob[0], mob[1], mob[2]
             scene.play(FadeIn(src), run_time=0.4)            # region appears on the left
@@ -202,14 +250,16 @@ def sector_inequality(spec, ctx, blocks):
             scene.add(flyer)
             # congruent copy slides out to its slot on the right (rigid motion)
             scene.play(ReplacementTransform(flyer, shape), run_time=0.8, rate_func=smooth)
-            scene.play(FadeIn(label, shift=0.08 * UP), FadeIn(badge), run_time=0.32)
+            # right-side glyph brightens (label + badge) the SAME beat the main
+            # figure's own ①②③ chip appears, tying the two halves together.
+            scene.play(FadeIn(label, shift=0.08 * UP), FadeIn(badge), FadeIn(chip), run_time=0.32)
             return 1.52
         return anim
 
     out.append(Block("scaffold", scaffold, static=True, layer="graph"))
-    out.append(Block("tri_inner", dst1, anim=_peel(src_inner), static=False, layer="graph"))
-    out.append(Block("sector", dst2, anim=_peel(src_sector), static=False, layer="graph"))
-    out.append(Block("tri_outer", dst3, anim=_peel(src_outer), static=False, layer="graph"))
+    out.append(Block("tri_inner", dst1, anim=_peel(src_inner, chip_inner), static=False, layer="graph"))
+    out.append(Block("sector", dst2, anim=_peel(src_sector, chip_sector), static=False, layer="graph"))
+    out.append(Block("tri_outer", dst3, anim=_peel(src_outer, chip_outer), static=False, layer="graph"))
     out.append(Block("ineq", ineq, anim=_fade, static=False, layer="graph"))
     return out
 
