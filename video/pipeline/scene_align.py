@@ -346,3 +346,106 @@ def boundary_weak_spans(beats, *, warn=0.35):
         if p is not None and p < warn:
             spans.append((int(b["word_start"]), int(b["word_start"]) + 1))
     return spans
+
+
+def low_prob_runs(words, threshold, min_run):
+    """Runs of >= min_run consecutive words below `threshold` (ported verbatim from
+    run_stable_ts_align.py so the persisted summary matches the experiment)."""
+    runs, cur = [], []
+    for i, w in enumerate(words):
+        p = w.get("probability")
+        if p is not None and p < threshold:
+            cur.append(i)
+        else:
+            if len(cur) >= min_run:
+                runs.append(cur)
+            cur = []
+    if len(cur) >= min_run:
+        runs.append(cur)
+    return runs
+
+
+def align_scene(wav_path, plan, *, model="base.en", device="cpu", language="en",
+                nonspeech_skip=5.0, failure_threshold=0.2, prob_threshold=0.5, min_run=2):
+    """THE aligner seam -- the only stable-ts caller. Constrained to plan["transcript"],
+    explodes to plan tokens, verifies the plan-token index. Returns a dict
+    {"words", "summary", "segments", "multi"}:
+      - words:   plan-token list [{word,start,end,probability}], the beat-mapping input
+      - summary: SAME shape the experiment (run_stable_ts_align.py) persists -- aligner,
+                 word_count, beat_boundary_in_multi_token_word, prob_min, prob_mean,
+                 low_prob_words, low_prob_runs (so Task 12 regression is meaningful)
+      - segments: raw stable-ts segments (persisted for QA/debug parity)
+      - multi:   token-index -> multi-token-parent map, for map_to_beats boundary flags
+                 (NOT persisted; the experiment stores its beat-keyed projection in
+                 summary.beat_boundary_in_multi_token_word instead)
+    Raises AlignmentError on aligner abort or token-index break. Swapping to torchaudio
+    CTC means reimplementing only this function.
+
+    remove_instant_words stays False: dropping zero-duration words would break the 1:1
+    plan-token indexing that beat mapping depends on."""
+    try:
+        import stable_whisper
+    except ImportError as exc:  # pragma: no cover - env guard
+        raise AlignmentError("stable-ts not installed; see ENVIRONMENT.md 5c") from exc
+    model_obj = stable_whisper.load_model(model, device=device)
+    result = model_obj.align(str(wav_path), plan["transcript"], language=language,
+                             nonspeech_skip=nonspeech_skip, failure_threshold=failure_threshold,
+                             remove_instant_words=False)
+    if result is None:
+        raise AlignmentError(f"stable-ts aborted: > {failure_threshold:.0%} of words failed to align")
+    raw = result.to_dict()
+    segments = raw.get("segments", [])
+    aligned_words = [{"text": w.get("word", ""), "start": w.get("start"),
+                      "end": w.get("end"), "probability": w.get("probability")}
+                     for seg in segments for w in seg.get("words", [])]
+    words, multi = explode_to_plan_tokens(aligned_words)
+    verify_plan_index(words, plan)
+    boundary_in_multi = [{"beat": b["id"], **multi[int(b["word_start"])]}
+                         for b in plan["beats"]
+                         if int(b["word_start"]) in multi and multi[int(b["word_start"])]["ordinal"] > 0]
+    probs = [w["probability"] for w in words if w.get("probability") is not None]
+    runs = low_prob_runs(words, prob_threshold, min_run)
+    summary = {
+        "aligner": {"tool": "stable-ts", "version": stable_whisper.__version__, "model": model,
+                    "nonspeech_skip": nonspeech_skip, "failure_threshold": failure_threshold},
+        "word_count": len(words),
+        "beat_boundary_in_multi_token_word": boundary_in_multi,
+        "prob_min": round(min(probs), 3) if probs else None,
+        "prob_mean": round(sum(probs) / len(probs), 3) if probs else None,
+        "low_prob_words": sum(1 for p in probs if p < prob_threshold),
+        "low_prob_runs": [
+            {"indices": [r[0], r[-1]], "start": words[r[0]]["start"], "end": words[r[-1]]["end"],
+             "text": " ".join(words[i]["word"] for i in r),
+             "probs": [round(words[i]["probability"], 3) for i in r]}
+            for r in runs
+        ],
+    }
+    return {"words": words, "summary": summary, "segments": segments, "multi": multi}
+
+
+def build_scene_aligned_entry(*, scene_number, plan, beats, audio_seconds, audio_file,
+                              summary, gates, words_file, aligned_file, chunks=None,
+                              fallback_history=None):
+    """Assemble a schema-2 scene_aligned manifest entry (design §3). Same beats[]
+    shape as beats mode + scene-level audio_file + alignment/validation blocks."""
+    return {
+        "scene_number": scene_number,
+        "scene_id": plan["scene_id"],
+        "kind": "content",
+        "narration_mode": "scene_aligned",
+        "audio_file": str(audio_file),
+        "audio_seconds": round(float(audio_seconds), 3),
+        "scene_text_hash": plan["scene_text_hash"],
+        "script": " ".join(b["text"] for b in beats if b["text"]).strip(),
+        "beat_count": len(beats),
+        "beats": beats,
+        "alignment": {
+            "words_file": str(words_file),
+            "aligned_file": str(aligned_file),
+            "aligner": summary["aligner"],
+            "chunks": chunks,
+        },
+        "validation": {"status": gates["status"], "warnings": gates["warnings"],
+                       "metrics": gates["metrics"]},
+        "fallback_history": fallback_history or [],
+    }

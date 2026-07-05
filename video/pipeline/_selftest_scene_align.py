@@ -250,6 +250,36 @@ def test_qa_diff_ignores_small_clusters():
     assert res["verdict"] == "clean"
 
 
+def test_build_scene_aligned_entry_shape():
+    plan = SA.build_scene_plan({"id": "difference_quotient_for_sine",
+                                "say": "a b {show m.0} c d {show m.1} e f"})
+    words = _linear_words(SA.tokenize(plan["transcript"]))
+    beats = SA.map_to_beats(plan, words, audio_seconds=6.0)
+    gates = SA.run_gates(plan, words, beats, audio_seconds=6.0)
+    entry = SA.build_scene_aligned_entry(
+        scene_number=7, plan=plan, beats=beats, audio_seconds=6.0,
+        audio_file="/x/scenes/07_difference_quotient_for_sine.wav",
+        summary={"aligner": {"tool": "stable-ts", "version": "2.19.1", "model": "base.en",
+                             "nonspeech_skip": 5.0, "failure_threshold": 0.2}},
+        gates=gates,
+        words_file="/x/align/07.words.json", aligned_file="/x/align/07.aligned.json")
+    assert entry["narration_mode"] == "scene_aligned"
+    assert entry["kind"] == "content"
+    assert entry["scene_text_hash"] == plan["scene_text_hash"]
+    assert entry["beat_count"] == len(beats) == len(entry["beats"])
+    assert entry["audio_seconds"] == 6.0
+    assert entry["alignment"]["aligner"]["tool"] == "stable-ts"
+    assert entry["alignment"]["chunks"] is None
+    assert entry["validation"]["status"] in ("pass", "pass_with_warnings")
+    assert entry["fallback_history"] == []
+    # script == space-join of beat texts (same field beats mode exposes to critic)
+    assert entry["script"] == "a b c d e f"
+    # no per-beat audio_file (beat WAVs do not exist in scene_aligned)
+    assert all("audio_file" not in b for b in entry["beats"])
+    # sum(beat durations) ~= audio_seconds (make.py asserts this)
+    assert abs(sum(b["audio_seconds"] for b in entry["beats"]) - entry["audio_seconds"]) < 0.01
+
+
 if __name__ == "__main__":
     test_tokenize_matches_word_re()
     test_build_scene_plan_token_ranges_and_transcript()
@@ -272,4 +302,5 @@ if __name__ == "__main__":
     test_qa_diff_insertion_uses_neighborhood_window()
     test_qa_diff_gate_weakness_must_be_colocated_not_global()
     test_qa_diff_ignores_small_clusters()
-    print("OK scene_align self-test (Tasks 1-5)")
+    test_build_scene_aligned_entry_shape()
+    print("OK scene_align self-test (Tasks 1-6)")
