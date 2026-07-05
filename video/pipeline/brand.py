@@ -602,7 +602,7 @@ def ghost_numeral(text: str, ground: str, *, opacity: float = 0.05) -> Tex:
 
 
 def progress_dots(current: int, total: int, ground: str, *, role: str = "accent",
-                  gap: float = 0.34, r: float = 0.052) -> VGroup:
+                  gap: float = 0.44, r: float = 0.07) -> VGroup:
     """A row of progress dots; the *current* one is elongated into a pill + accent.
     current is 1-based."""
     items = []
