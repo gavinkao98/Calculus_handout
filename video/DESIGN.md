@@ -593,6 +593,32 @@ slope-from-definition computation）需要 7–9：
   預期 ~3 行。Overflow 現在從底部溢出（sizecheck 會抓）；修復仍是 split。
   Stress demo：`storyboards/_demo_tall_rows.yml`。
 
+### Authoring Playbook：內容形狀 → 模板 → 單頁容量預算 → 超量／稀疏動作（2026-07-05 拍板）
+
+寫 storyboard 時對照選模板、預估分頁；寫完跑 schema→lint→sizecheck→mock render→visual gate 即收斂。
+預算與 `_demo_capacity.yml`／`capacity_selftest.py` 的 fit/over EXPECT 對齊，fixture 調整需同步本表。
+
+| 內容形狀 | 模板 | 單頁容量預算 | 超量動作（DENSE） | 稀疏動作（SPARSE） |
+|---|---|---|---|---|
+| 連續推導鏈 | `derivation` | fraction 列：無 statement ~5、有 statement ~4；single 列 ~7 | 按邏輯階段切 `part:`，不硬切等號 | fill_gap 自動；勿加廢列 |
+| 陳述＋符號式 | `definition_math` | statement ≤3 行＋math ≤4 列 | 拆 part 或把長鏈改 derivation 景 | 掛 `aside` 卡（L3） |
+| 命題＋證明 | `theorem_proof` | proof ≤4 步＋qed（一般步 2–3；fraction 步更保守） | >4 步拆 statement＋proof 兩場、超頁 `part:` | statement-only 走 card＋aside 兩欄 |
+| 離散步驟 | `procedure_steps` | 3–4 步、math ≤5u 寬 | 拆 part；長式改 derivation | ——（步驟自然 ≥3） |
+| 單句警示／評註 | `callout` | 條列 2–4 點或段落 ≥3 行 | 條列砍到 ≤4 點 | G3 三出口：條列化／併景／`sparse_ok` |
+| 函數圖／幾何圖 | `graph` | 圖主導：x 以 8.0u 起手、y 交 `_fit_graph_to_safe_zone` 封頂；有 caption band 時被自動縮回是預期行為；A7 量測為最終裁判；標籤走 carrier≥刻度＋亮度地板 | 拆 reveal beats（`{show plot.N}`） | 放大圖填版（P5 正向） |
+| 數值對照 | `value_table` | ~5×3 格 | 砍列（教學點優先） | —— |
+| 正負號分析 | `sign_chart` | 1 軸＋≤4 區 | —— | —— |
+| 總結要點 | `recap_cards` | 4–5 點 | 砍點（recap 不拆頁） | —— |
+| 章節轉場 | `divider` | title＋hook 式（56px）＋一句 subtitle | —— | —— |
+
+**G3 稀疏出口（單塊 prose 場景）：** callout（字串 body）／definition_math（statement-only）實測佔 body zone
+<35% 時 sizecheck advisory 提示三出口——① 條列化（callout body 用 list 形式）；② 併景（掛相鄰場景
+`scaffold.flag`／`aside`）；③ `sparse_ok: true` 接受留白（pull-quote 式刻意孤句合法；render 不讀此欄位，
+僅 sizecheck 讀＝advisory ack，非 magic boolean）。
+
+**G4 卡片孤字：** aside／rail statement 的 prose 尾端孤 math token（frame 07 的孤 `$x_0$`）由 lint advisory
+提示，修法＝改寫文案（如 `at every point $x_0$.`）。**不用 `~`**——`brand._escape_tex` 會把它印成可見波浪號。
+
 ### `say`：narration + inline reveal（核心變更）
 
 `say` 是**被朗讀的內容**，**LaTeX inline 書寫**（`$f(x_1)$`），以及**reveal
@@ -669,10 +695,14 @@ kerning）。永遠不要在 author prose 欄位上直接呼叫 `heading`。純 
 | 位置 | 用 | 效果 |
 |---|---|---|
 | display 欄位（`statement` / `math` / `proof` / `formulas`） | `\frac` | display-size 大分數 |
-| inline 位置（`reason` / `say` / `body` / table cell / axis label） | `\tfrac` | 顯式覆蓋回 text-size 小分數 |
+| inline 位置（`title`・`prompt`・`body`（callout）・`points[]`（recap）・`scaffold.motive`・`reason`（含 `steps[].reason`）・`say`・table cell・axis label） | `\tfrac`／slash form／inline `\lim` | 顯式覆蓋回 text-size；display 級分數與堆疊上下標只進 display 欄位 |
 
 `\tfrac` 不受 `\everymath{\displaystyle}` 影響（它顯式指定 text style），所以
 兩者能共存：display 位置自動大，inline 位置顯式小。
+
+**G1 執法（2026-07-05）：** 上表由 `pipeline/lint.py` 的 `_display_math_in_inline` advisory 靜態執法
+（掃 inline 欄位 `$...$` 內的 `\frac`/`\dfrac`/`\lim_`/`\sum_`/`\int_`）。display 欄位
+（`statement`/`math`/`proof`/`formulas`/`scaffold.problem`）**不掃**。罕例真要 display 可無視 warn。
 
 Plain-Text-only 欄位是 intro/outro brand label（`meta.chapter`、
 `meta.chapter_title`、`meta.section`、`meta.title`、`meta.tagline`、
@@ -690,6 +720,53 @@ prose line 必須走 `brand.prose` 帶 `max_width`——不是 `math_line` +
 standalone display line**——`heading`/`heading_rich` title——即使在那裡，換行
 讀起來好時也優先。Math grid（`math`、`formulas`、`worked`）是自己的 size role，
 免除此規則。
+
+### 型階與量測表（2026-07-05 體檢存檔）
+
+**型階承載表**（`theme._SCALE_PX`，px＠1920×1080；由大到小）：
+
+| 型階 | px | 用途 |
+|---|---|---|
+| hero | 112 | 無 call site 保留 |
+| h1 | 78 | 一級標題 |
+| h2 | 58 | 二級標題 |
+| result | 54 | derivation result line |
+| math | 48 | display 數學 |
+| h3 | 44 | 三級標題 |
+| prose / step | 42 | 內文、離散步驟文字 |
+| math_sm | 40 | 刻度／軸名（graph carrier label 現已升為 math_sm） |
+| prose_sm | 35 | reason rail／aside |
+| tag | 30 | derivation result-reason、part pager |
+| eyebrow | 26 | floor（`MIN_FONT_FLOOR`） |
+
+**數學三路徑表**：
+
+| 路徑 | 公式 | 說明 |
+|---|---|---|
+| `MathTex`（display） | `px × PX_TO_FS(0.698)` | 基準：math-anchored 換算 |
+| inline-in-prose | 同基準 `× TEXT_SCALE(1.3102)` ＝ **+31%** | `brand.prose` 中的 inline `$...$` |
+| inline-in-heading | 同基準 `× HEADING_MATH_SCALE(1.0)` | 標題中的 inline `$...$`，無額外放大 |
+
+Divider hook 案例：`divider` 的 title 走 hook 式 56px（見上方 Authoring Playbook「章節轉場」列），不套用上述 prose/heading 兩路徑換算。
+
+**縱向節奏 token 表**（有壓測紀錄、不重構）：
+
+| Token | 值 | 用途 |
+|---|---|---|
+| `EYEBROW_GAP` | 22 | eyebrow → title 間距 |
+| `TITLE_GAP` | 56 | title → body 間距 |
+| `LINE_GAP` | 28 | 同段內行距 |
+| `ROW_GAP` | 44 | 跨列間距 |
+| derivation pitch | 54 | chain line 節奏 |
+| definition pitch | 48.6 ／ 95.9 | statement／math 節奏 |
+| theorem pitch | 67.5 | proof step 節奏 |
+| procedure pitch | 1.25 / 0.95 / 1.4u | 依 template 設計 rhythm |
+| recap pitch | 47 | recap card 節奏 |
+
+**行長量測法：** 權威＝`brand._WIDTH_K = 0.00507`（＋CJK 字元 ×2 加權）；
+`CONTENT_W ≈ 65` 加權字元＝可讀上緣。**勿再用 0.5em 粗估**——`_WIDTH_K` 已為
+Plex-LaTeX kerning 重新校正，粗估法未計入 kerning 與 CJK 加權，會系統性低估
+真實跨度。
 
 自動強制：`pipeline/sizecheck.py` build 每個 scene（不 render），在每個
 stacked-sibling group（`point`、`proof`、`step`、`annotation`、`row`）中找到
