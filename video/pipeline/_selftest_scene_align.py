@@ -125,6 +125,84 @@ def test_map_to_beats_interpolated_boundary_flagged():
     assert beats[1]["boundary"]["interpolated"] is True
 
 
+def _linear_words(tokens, per=1.0, prob=0.9):
+    return [{"word": t, "start": i * per, "end": i * per + per * 0.9, "probability": prob}
+            for i, t in enumerate(tokens)]
+
+
+def test_run_gates_pass_clean_scene():
+    plan = SA.build_scene_plan({"id": "s", "say": "a b {show m.0} c d {show m.1} e f"})
+    words = _linear_words(SA.tokenize(plan["transcript"]))
+    beats = SA.map_to_beats(plan, words, audio_seconds=6.0)
+    v = SA.run_gates(plan, words, beats, audio_seconds=6.0)
+    assert v["status"] == "pass"
+
+
+def test_run_gates_fail_nonmonotonic_timestamps():
+    plan = SA.build_scene_plan({"id": "s", "say": "a b {show m.0} c d"})
+    words = _linear_words(SA.tokenize(plan["transcript"]))
+    words[2]["start"] = 0.1  # token 2 (beat 2 boundary) jumps back before token 1
+    beats = SA.map_to_beats(plan, words, audio_seconds=4.0)
+    v = SA.run_gates(plan, words, beats, audio_seconds=4.0)
+    assert v["status"] == "fail"
+    assert any("monotonic" in w.lower() for w in v["failures"])
+
+
+def test_run_gates_fail_overlapping_word_timestamps():
+    # design §5 row 3 is "non-monotonic OR overlapping". Starts stay ordered but a word
+    # ends AFTER the next word starts -> overlap -> FAIL (aligner anomaly).
+    plan = SA.build_scene_plan({"id": "s", "say": "a b {show m.0} c d"})
+    words = _linear_words(SA.tokenize(plan["transcript"]))
+    words[1]["end"] = words[2]["start"] + 0.5   # token 1 overruns token 2's onset
+    beats = SA.map_to_beats(plan, words, audio_seconds=4.0)
+    v = SA.run_gates(plan, words, beats, audio_seconds=4.0)
+    assert v["status"] == "fail"
+    assert any("overlap" in w.lower() for w in v["failures"])
+
+
+def test_run_gates_tolerates_trailing_silence():
+    # design §5: the char-share gate computes the LAST beat from "last word end,
+    # excluding tail silence" -- trailing silence is deliberately NOT a fail gate.
+    plan = SA.build_scene_plan({"id": "s", "say": "a b {show m.0} c d"})
+    words = _linear_words(SA.tokenize(plan["transcript"]))   # speech ends ~3.6s
+    beats = SA.map_to_beats(plan, words, audio_seconds=12.0)  # 8s+ of trailing silence
+    v = SA.run_gates(plan, words, beats, audio_seconds=12.0)
+    assert v["status"] in ("pass", "pass_with_warnings")     # not failed by tail silence
+
+
+def test_run_gates_fail_low_boundary_probability():
+    plan = SA.build_scene_plan({"id": "s", "say": "a b {show m.0} c d"})
+    words = _linear_words(SA.tokenize(plan["transcript"]))
+    words[2]["probability"] = 0.05  # beat-2 boundary word far below 0.15
+    beats = SA.map_to_beats(plan, words, audio_seconds=4.0)
+    v = SA.run_gates(plan, words, beats, audio_seconds=4.0)
+    assert v["status"] == "fail"
+    assert any("boundary" in w.lower() for w in v["failures"])
+
+
+def test_run_gates_fail_large_interior_gap():
+    plan = SA.build_scene_plan({"id": "s", "say": "a b {show m.0} c d"})
+    words = _linear_words(SA.tokenize(plan["transcript"]))
+    words[3]["start"] = words[2]["end"] + 3.0  # 3s hole not at a beat boundary
+    words[3]["end"] = words[3]["start"] + 0.5
+    beats = SA.map_to_beats(plan, words, audio_seconds=8.0)
+    v = SA.run_gates(plan, words, beats, audio_seconds=8.0)
+    assert v["status"] == "fail"
+    assert any("gap" in w.lower() for w in v["failures"])
+
+
+def test_run_gates_warn_only_interior_low_prob_run():
+    plan = SA.build_scene_plan({"id": "s", "say": "a b c {show m.0} d e f"})
+    words = _linear_words(SA.tokenize(plan["transcript"]))
+    words[1]["probability"] = 0.2  # interior (not a boundary) low-prob run
+    words[2]["probability"] = 0.2
+    beats = SA.map_to_beats(plan, words, audio_seconds=6.0)
+    v = SA.run_gates(plan, words, beats, audio_seconds=6.0)
+    assert v["status"] == "pass_with_warnings"
+    assert v["failures"] == []
+    assert any("low-prob" in w.lower() for w in v["warnings"])
+
+
 if __name__ == "__main__":
     test_tokenize_matches_word_re()
     test_build_scene_plan_token_ranges_and_transcript()
@@ -135,4 +213,11 @@ if __name__ == "__main__":
     test_map_to_beats_boundaries_and_shape()
     test_map_to_beats_leading_reveal_only_then_spoken_boundary_has_prob()
     test_map_to_beats_interpolated_boundary_flagged()
-    print("OK scene_align self-test (Tasks 1-3)")
+    test_run_gates_pass_clean_scene()
+    test_run_gates_fail_nonmonotonic_timestamps()
+    test_run_gates_fail_overlapping_word_timestamps()
+    test_run_gates_tolerates_trailing_silence()
+    test_run_gates_fail_low_boundary_probability()
+    test_run_gates_fail_large_interior_gap()
+    test_run_gates_warn_only_interior_low_prob_run()
+    print("OK scene_align self-test (Tasks 1-4)")

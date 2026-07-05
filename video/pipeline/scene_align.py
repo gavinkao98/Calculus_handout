@@ -168,3 +168,121 @@ def map_to_beats(
             "boundary": {"prob": prob, "interpolated": wi in multi and multi[wi]["ordinal"] > 0},
         })
     return out
+
+
+# 3-scene pilot (2026-07-05) initial thresholds -- RECALIBRATE after the first real
+# deck rollout (design §5, acceptance clause §10). Every gate value + its rationale
+# lives here so tuning is one edit.
+GATES = {
+    "boundary_prob_fail": 0.15,   # observed normal boundary min 0.53 ("Look"); << this = untrustworthy
+    "boundary_prob_warn": 0.35,   # 0.15-0.35 -> WARN
+    "interior_low_prob": 0.5,     # run threshold for interior words
+    "interior_low_prob_min_run": 2,
+    "prob_mean_warn": 0.7,        # informational only (never fails: no discriminative power)
+    "interior_gap_fail": 2.0,     # legal inter-sentence pause maxed at 0.89s in pilot
+    "zero_dur_ratio_fail": 0.05,  # or >=2 consecutive zero-duration tokens
+    "char_share_warn": (0.6, 1.6),  # beat duration vs char-share ratio band
+    "char_share_fail": (0.4, 2.2),
+    "short_beat_warn": 0.05,      # existing mapper convention
+}
+
+
+def _zero_runs(words):
+    runs, cur = [], []
+    for i, w in enumerate(words):
+        if float(w["end"]) - float(w["start"]) <= 0.0:
+            cur.append(i)
+        else:
+            if cur:
+                runs.append(cur)
+            cur = []
+    if cur:
+        runs.append(cur)
+    return runs
+
+
+def run_gates(plan, words, beats, audio_seconds):
+    """Return {"status": pass|pass_with_warnings|fail, "failures": [...],
+    "warnings": [...], "metrics": {...}}. FAIL -> scene goes to the fallback ladder;
+    status is never written to a manifest as "fail" (a failed scene is retried or
+    demoted to beats), so consumers only ever see pass / pass_with_warnings."""
+    failures: list[str] = []
+    warnings: list[str] = []
+    probs = [w["probability"] for w in words if w.get("probability") is not None]
+
+    # 1. monotonic AND non-overlapping word timestamps (design §5 row 3: either fails).
+    #    Trailing silence (last word end -> audio end) is intentionally NOT gated here:
+    #    §5's char-share gate excludes tail silence, so the design tolerates it.
+    for i in range(1, len(words)):
+        if float(words[i]["start"]) + 1e-6 < float(words[i - 1]["start"]):
+            failures.append(f"non-monotonic word timestamps at index {i}")
+            break
+    for i in range(1, len(words)):
+        if float(words[i]["start"]) + 1e-6 < float(words[i - 1]["end"]):
+            failures.append(f"overlapping word timestamps at index {i} "
+                            f"(token {i-1} ends {words[i-1]['end']:.3f} > token {i} starts {words[i]['start']:.3f})")
+            break
+
+    # 2. zero-duration tokens: >=2 consecutive, or >5% total -> FAIL (isolated -> ignore)
+    zruns = _zero_runs(words)
+    total_zero = sum(len(r) for r in zruns)
+    if any(len(r) >= 2 for r in zruns) or (words and total_zero / len(words) > GATES["zero_dur_ratio_fail"]):
+        failures.append(f"zero-duration tokens: {total_zero} in {len(zruns)} run(s)")
+
+    # 3. boundary-word probability (beats 2..N first word)
+    for b in beats[1:]:
+        p = (b.get("boundary") or {}).get("prob")
+        if p is None:
+            continue
+        if p < GATES["boundary_prob_fail"]:
+            failures.append(f"{b['id']} boundary word probability {p:.2f} < {GATES['boundary_prob_fail']}")
+        elif p < GATES["boundary_prob_warn"]:
+            warnings.append(f"{b['id']} boundary word probability {p:.2f} (soft)")
+
+    # 4. unexplained interior gap (between consecutive words, not a beat boundary)
+    boundary_word_idx = {int(b["word_start"]) for b in beats}
+    for i in range(1, len(words)):
+        gap = float(words[i]["start"]) - float(words[i - 1]["end"])
+        if gap > GATES["interior_gap_fail"] and i not in boundary_word_idx:
+            failures.append(f"unexplained {gap:.2f}s gap before token {i} (not a beat boundary)")
+
+    # 5. beat duration vs character-share sanity (last beat uses last-word end, not tail silence)
+    total_chars = sum(len(b["text"]) for b in beats) or 1
+    speech_end = float(words[-1]["end"]) if words else audio_seconds
+    for i, b in enumerate(beats):
+        share = len(b["text"]) / total_chars
+        dur = b["audio_seconds"] if i + 1 < len(beats) else max(speech_end - b["start_seconds"], 0.0)
+        span = speech_end or 1.0
+        ratio = (dur / (share * span)) if share else 1.0
+        lo_f, hi_f = GATES["char_share_fail"]
+        lo_w, hi_w = GATES["char_share_warn"]
+        if ratio < lo_f or ratio > hi_f:
+            failures.append(f"{b['id']} duration/char-share ratio {ratio:.2f} out of {GATES['char_share_fail']}")
+        elif ratio < lo_w or ratio > hi_w:
+            warnings.append(f"{b['id']} duration/char-share ratio {ratio:.2f} (soft)")
+        if b["audio_seconds"] < GATES["short_beat_warn"]:
+            warnings.append(f"{b['id']} very short duration {b['audio_seconds']:.3f}s")
+
+    # 6. interior low-prob runs + prob_mean -> informational WARN only (never fail)
+    runs, cur = [], []
+    for i, w in enumerate(words):
+        p = w.get("probability")
+        if p is not None and p < GATES["interior_low_prob"] and i not in boundary_word_idx:
+            cur.append(i)
+        else:
+            if len(cur) >= GATES["interior_low_prob_min_run"]:
+                runs.append(cur)
+            cur = []
+    if len(cur) >= GATES["interior_low_prob_min_run"]:
+        runs.append(cur)
+    for r in runs:
+        warnings.append(f"interior low-prob run tokens {r[0]}-{r[-1]}: "
+                        + " ".join(words[i]["word"] for i in r))
+    prob_mean = round(sum(probs) / len(probs), 3) if probs else None
+    if prob_mean is not None and prob_mean < GATES["prob_mean_warn"]:
+        warnings.append(f"prob_mean {prob_mean} < {GATES['prob_mean_warn']} (informational)")
+
+    status = "fail" if failures else ("pass_with_warnings" if warnings else "pass")
+    return {"status": status, "failures": failures, "warnings": warnings,
+            "metrics": {"prob_mean": prob_mean,
+                        "low_prob_words": sum(1 for p in probs if p < GATES["interior_low_prob"])}}
