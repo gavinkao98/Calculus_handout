@@ -86,7 +86,25 @@ def test_gate_fail_demotes_to_beats():
         SA.align_scene, tts._synth_scene_wav, SA.run_gates = saved
 
 
+def test_alignment_error_demotes_to_beats_not_crash():
+    # a raising aligner (stable-ts abort / token break) must NOT crash the deck: the
+    # scene routes through the ladder to the beats terminal (design: always shippable).
+    def _raises(wav_path, plan, **kw):
+        raise SA.AlignmentError("simulated stable-ts abort")
+    saved = (SA.align_scene, tts._synth_scene_wav)
+    SA.align_scene, tts._synth_scene_wav = _raises, _fake_synth(12.0)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "audio_mimo"
+            entry = tts.synthesize_scene(backend=tts.MockTTSBackend(0.45), meta=META, scene=SCENE,
+                scene_number=7, output_dir=out, args=_args(), reuse_index={}, scene_reuse_index={})
+            assert entry["narration_mode"] == "beats"   # demoted, not crashed
+    finally:
+        SA.align_scene, tts._synth_scene_wav = saved
+
+
 if __name__ == "__main__":
     test_tts_scene_path_and_make_consumers()
     test_gate_fail_demotes_to_beats()
+    test_alignment_error_demotes_to_beats_not_crash()
     print("OK scene_align integration self-test (Task 11)")

@@ -632,7 +632,17 @@ def _align_and_gate(plan: dict[str, Any], wav: Path, scene_number: int,
     from pipeline import scene_align as SA
     from pipeline import atomicio
     model = aligner_model or args.aligner_model
-    res = SA.align_scene(wav, plan, model=model, device=args.aligner_device)
+    try:
+        res = SA.align_scene(wav, plan, model=model, device=args.aligner_device)
+    except SA.AlignmentError as exc:
+        # aligner aborted (>failure_threshold words unaligned) or token-index broke.
+        # Do NOT crash the deck: return a fail-status entry so the caller routes to the
+        # fallback ladder -> beats terminal (design "always a shippable path"). Never
+        # becomes the final entry, since the beats rung always passes.
+        return {"scene_id": plan["scene_id"], "narration_mode": "scene_aligned",
+                "validation": {"status": "fail", "warnings": [], "metrics": {},
+                               "error": f"alignment aborted: {exc}"},
+                "fallback_history": []}
     words = res["words"]
     audio_seconds = wav_duration(wav)
     beats = SA.map_to_beats(plan, words, audio_seconds, multi=res["multi"])
