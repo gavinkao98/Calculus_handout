@@ -11,13 +11,15 @@ Per CONTENT_METHODOLOGY §5, this generated code is treated like narration: the
 user reviews the rendered result before it is final; render failures are
 patched smallest-first.
 
-The three hooks (scene id -> Figure -> cue):
-  sector_inequality   Figure 3.1  nested unit-circle areas  (tri_inner, sector,
-                                  tri_outer, ineq)
-  slope_equals_height Figure 3.3  sin tangents vs cos heights (tan_0,
-                                  tan_halfpi, tan_pi, cos_dots)
-  shm_stacked_graphs  Figure 3.4  s/s'/s'' over one time axis, s''=-s
-                                  (g_s, g_v, g_a, mirror)
+The four hooks (scene id -> Figure -> cue):
+  sector_inequality    Figure 3.1  nested unit-circle areas  (tri_inner, sector,
+                                   tri_outer, ineq)
+  slope_equals_height  Figure 3.3  sin tangents vs cos heights (tan_0,
+                                   tan_halfpi, tan_pi, cos_dots)
+  shm_stacked_graphs   Figure 3.4  s/s'/s'' over one time axis, s''=-s
+                                   (g_s, g_v, g_a, mirror)
+  toward_the_chain_rule  end-of-section trio -> three chip cards, solved vs
+                                   not-yet (math.0; Task 14 #6)
 """
 from __future__ import annotations
 
@@ -438,3 +440,46 @@ def shm_stacked_graphs(spec, ctx, blocks):
     out.append(Block("g_a", groups[2], anim=_draw, static=False, layer="graph"))
     out.append(Block("mirror", g_mirror, anim=_fade, static=False, layer="graph"))
     return out
+
+
+# ================================================================ hook 4
+# toward_the_chain_rule -- the section closer's trio ($\sin x$ vs $\sin(x^2)$
+# vs $\sin(3x+1)$) was one flat math line ("checkmark ... ? ... ?"), which
+# buries the point the narration is making: one of the three is already solved,
+# the other two are not (yet). Three chip cards say that at a glance -- a
+# green-accent-bar card for the solved bare form, two amber-accent-bar cards
+# (matching the "?" ink) for the composed ones still waiting on the chain rule.
+# Single reveal id `math.0` is kept (the storyboard's {show math.0} cue and
+# narration are untouched); only the block's mobject is swapped.
+
+
+def toward_the_chain_rule(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    old_math = ids["math.0"].mobject   # old line's LEFT edge == SPINE_X (statement's own left-flush axis)
+
+    chips_spec = [
+        (r"\sin x", "check", "success"),
+        (r"\sin(x^{2})", "query", "accent"),
+        (r"\sin(3x+1)", "query", "accent"),
+    ]
+
+    def _chip(tex, glyph_name, role):
+        formula = brand.math_line(tex, ground, role="primary", size="math_sm")
+        # glyph() has no ready-made "?"; a direct MathTex keeps the actual question
+        # mark the storyboard math reads, styled the same accent colour glyph() uses.
+        mark = (brand.glyph("check", ground, role=role, size="math_sm") if glyph_name == "check"
+               else MathTex("?", color=T.color(ground, role), font_size=T.fs("math_sm")))
+        row = VGroup(formula, mark).arrange(RIGHT, buff=0.30)
+        return brand.accent_panel(row, ground, bar_role=role, pad=0.32, pad_x=0.42)
+
+    chips = [_chip(tex, gname, role) for tex, gname, role in chips_spec]
+    trio = VGroup(*chips).arrange(RIGHT, buff=0.55)
+    # Left-flush to the old line's left edge (== SPINE_X), matching the statement
+    # above it -- old_math.get_center() would be wrong here: it is the centre of a
+    # short single line, not of this much wider row, and would push the row's left
+    # edge off-frame.
+    trio.move_to(old_math.get_left(), aligned_edge=LEFT)
+
+    ids["math.0"].mobject = trio
+    return blocks
