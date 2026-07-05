@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import scene_align as SA  # noqa: E402
+from pipeline import scene_fallback as FB  # noqa: E402
 
 
 def test_tokenize_matches_word_re():
@@ -280,6 +281,43 @@ def test_build_scene_aligned_entry_shape():
     assert abs(sum(b["audio_seconds"] for b in entry["beats"]) - entry["audio_seconds"]) < 0.01
 
 
+def test_fallback_ladder_stops_at_first_pass():
+    calls = []
+    def rung(name, status):
+        def _f(ctx):
+            calls.append(name)
+            return {"status": status, "entry": {"narration_mode": "scene_aligned", "rung": name}}
+        return _f
+    # rung spec is (name, billed, callable): billedness is explicit up front (no name
+    # convention, no self-report). arbiter is free; resynth/chunk billed; beats exempt.
+    result = FB.run_ladder(
+        scene_id="s",
+        rungs=[("arbiter", False, rung("arbiter", "fail")),
+               ("resynth", True, rung("resynth", "pass")),
+               ("chunk", True, rung("chunk", "pass")),
+               ("beats", False, rung("beats", "pass"))],
+        budget=FB.RetryBudget(max_billed=2))
+    assert calls == ["arbiter", "resynth"]           # stopped at first pass
+    assert result["entry"]["rung"] == "resynth"
+    assert [h["rung"] for h in result["history"]] == ["arbiter", "resynth"]
+
+
+def test_fallback_ladder_budget_stops_before_overrun():
+    def billed_fail(ctx):
+        return {"status": "fail", "entry": None}
+    def beats_ok(ctx):
+        return {"status": "pass", "entry": {"narration_mode": "beats"}}
+    result = FB.run_ladder(
+        scene_id="s",
+        rungs=[("resynth", True, billed_fail), ("chunk", True, billed_fail),
+               ("beats", False, beats_ok)],      # beats is the always-allowed terminal
+        budget=FB.RetryBudget(max_billed=1))     # only 1 billed retry allowed
+    # resynth consumes the 1 billed retry and fails; chunk is billed but over budget -> skipped;
+    # ladder falls straight to the beats terminal (free, always runs).
+    assert result["entry"]["narration_mode"] == "beats"
+    assert any(h.get("skipped_over_budget") for h in result["history"])
+
+
 if __name__ == "__main__":
     test_tokenize_matches_word_re()
     test_build_scene_plan_token_ranges_and_transcript()
@@ -303,4 +341,6 @@ if __name__ == "__main__":
     test_qa_diff_gate_weakness_must_be_colocated_not_global()
     test_qa_diff_ignores_small_clusters()
     test_build_scene_aligned_entry_shape()
-    print("OK scene_align self-test (Tasks 1-6)")
+    test_fallback_ladder_stops_at_first_pass()
+    test_fallback_ladder_budget_stops_before_overrun()
+    print("OK scene_align self-test (Tasks 1-7)")
