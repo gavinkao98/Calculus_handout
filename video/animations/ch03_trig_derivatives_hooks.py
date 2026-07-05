@@ -409,10 +409,29 @@ def shm_stacked_graphs(spec, ctx, blocks):
         return DashedLine(np.array([top[0], top[1], 0.0]), np.array([bot[0], bot[1], 0.0]),
                           color=mut, stroke_width=1.8, dash_length=0.09)
 
-    mirror = VGroup(vline(PI / 2), vline(3 * PI / 2))
+    guide_ts = [PI / 2, 3 * PI / 2]
+    mirror = VGroup(*(vline(t) for t in guide_ts))
+
+    # guide labels, once each, tucked under the bottom axis where they sit clear
+    # of all three curves (no per-panel repetition needed -- one shared time axis).
+    guide_labels = VGroup()
+    for t, tex in zip(guide_ts, [r"t=\tfrac{\pi}{2}", r"t=\tfrac{3\pi}{2}"]):
+        glab = brand.math_line(tex, ground, role="text", size="label")
+        glab.next_to(ax_bot.c2p(t, -1.2), DOWN, buff=0.22)
+        guide_labels.add(glab)
+
+    # dots where each curve crosses a guide -- the read-off the narration asks for
+    # (height peaks/troughs <-> velocity crosses zero <-> acceleration mirrors height).
+    # These can only sit on a guide that already spans all three panels, so, like the
+    # guide lines themselves, they ride the `mirror` beat rather than their own panel.
+    guide_dots = VGroup()
+    for (func, color, _, _), ax in zip(rows, axes_list):
+        for t in guide_ts:
+            guide_dots.add(Dot(ax.c2p(t, func(t)), radius=0.07, color=color))
+
     mlab = brand.math_line(r"s''=-s", ground, role="success", size="label")
-    mlab.next_to(groups[2], DOWN, buff=0.22)
-    g_mirror = VGroup(mirror, mlab)
+    mlab.next_to(groups[2][1], RIGHT, buff=0.35)  # anchored to the accel panel's right side
+    g_mirror = VGroup(mirror, guide_labels, guide_dots, mlab)
 
     out.append(Block("g_s", groups[0], anim=_draw, static=False, layer="graph"))
     out.append(Block("g_v", groups[1], anim=_draw, static=False, layer="graph"))
