@@ -330,15 +330,16 @@ scenes:
       {show annotation.0} So what equals one is the limit -- the height the curve
       is forced toward, not a value it ever takes.
     axes:
-      x_range: [-1.5, 1.5, 0.5]
+      x_range: [-1.85, 1.85, 0.5]
       y_range: [0, 1.18, 0.5]
       y_ticks: [{ at: 1, label: "$1$" }]
+      x_ticks: [{ at: 1.5708, label: "$\\tfrac{\\pi}{2}$" }, { at: -1.5708, label: "$-\\tfrac{\\pi}{2}$" }]
       x_length: 6.4
       y_length: 3.6
     plots:
-      - { kind: function, expression: "cos(x)", x_range: [-1.5, 1.5], color_role: muted, dashed: true, label: "$\\cos\\theta$", reveal: true }
-      - { kind: line, start: [-1.5, 1], end: [1.5, 1], color_role: secondary, label: "$1$", label_point: [1.25, 1.08], reveal: true }
-      - { kind: function, expression: "sin(x)/x", x_range: [-1.5, 1.5], color_role: accent, label: "$\\dfrac{\\sin\\theta}{\\theta}$", label_point: [0.95, 0.86], reveal: true }
+      - { kind: function, expression: "cos(x)", x_range: [-1.5708, 1.5708], color_role: muted, dashed: true, label: "$\\cos\\theta$", reveal: true }
+      - { kind: line, start: [-1.72, 1], end: [1.72, 1], color_role: secondary, label: "$1$", label_point: [1.15, 1.08], reveal: true }
+      - { kind: function, expression: "sin(x)/x", x_range: [-1.72, 1.72], color_role: accent, label: "$\\tfrac{\\sin\\theta}{\\theta}$", label_point: [-0.72, 1.06], reveal: true }
       - { kind: point, point: [0, 1], hollow: true, hollow_reason: "ratio undefined at theta=0 (0/0)", color_role: accent, reveal: true }
     annotations:
       - "Trapped between $\\cos\\theta$ and $1$, the ratio is forced to $1$ -- undefined at $\\theta=0$."
