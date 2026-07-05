@@ -1,0 +1,29 @@
+# G2 carrier-label luminance-floor probe (demo fixture)
+meta:
+  id: demo_graph_muted
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Muted Label Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Muted Label Demo" }
+
+scenes:
+  - id: muted_curve_label
+    kind: content
+    template: graph
+    accent: definition
+    title: "Floor Probe"
+    say: "probe."
+    axes:
+      x_range: [-3, 3, 1]
+      y_range: [-2, 2, 1]
+    plots:
+      # 繼承路徑：暗曲線 -> 標籤應升 ink_2（G2 clamp 生效）
+      - { kind: function, expression: "0.2*x*x - 1.5", color_role: muted, label: "$g(x)$" }
+      # 顯式 label_role: muted -> 尊重不動（作者覆蓋權）
+      - { kind: function, expression: "0.5*x", color_role: secondary, label: "$f(x)$", label_role: muted, label_side: down }
