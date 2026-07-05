@@ -315,7 +315,15 @@ gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第
   （短式配長 leader，連接永遠成立）。無理由的純鏈仍置中（不變）。
 - `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
 - `recap_cards`：公式卡 snap `RAIL_X`（原魔術數字 1.15）。
-- `theorem_proof`：左軸用 `SPINE_X`（proof 仍刻意 `+0.4` 縮排階層）。
+- `theorem_proof`：左軸用 `SPINE_X`（proof 仍刻意 `+0.4` 縮排階層）。**statement 字卡採
+  measure-driven regime（2026-07-05）**：塞得進 rail 舒適 measure（散文 ≤`RAIL_MAX_LINES`=3 行、
+  或公式不寬於 rail 內寬）→ 右上 rail、**shrink-wrap、右緣貼 gutter**（短句更緊湊、退掉舊的滿-rail
+  spacer）；否則升成 title 下**全寬 band**（左緣 `SPINE_X`、與 proof 同 `round(left)` 欄 stack，故
+  `_capacity_issues` 量得到二者疊高），proof 改置 band 下方。判定在 `theorem_proof.statement_regime()`
+  ——讀**真實 `brand.prose` 行數**（多行為每行一 Tex 的 VGroup，`len(submobjects)` 對 `body_text`／
+  `_prose_lines` 兩路徑皆精準，不另估換行），sizecheck 的升-band advisory 同源呼叫、零 drift。過寬公式
+  **不縮小**（band 走 `prose(max_width=None)` 自然尺寸），逾 band 寬者交 `_overflow_issues` 攔（作者分頁）。
+  `RAIL_COL` 固定不動——rail 仍留給次要短卡（`build_aside`），只有主角 statement 依量體改欄。
 - `graph`：title 左軸 `SAFE_MARGIN`→`SIDE_GUTTER`（=`SPINE_X`），與其他模板水平對齊。
 
 **figure 置中是刻意、非 drift（decline 的 finding）：** `graph`／`value_table`／

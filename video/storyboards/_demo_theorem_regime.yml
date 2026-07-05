@@ -1,0 +1,64 @@
+# theorem_proof statement-card regime fixture（非正式節,檔名底線前綴）
+#
+# 目的:鎖住 measure-driven regime（DESIGN「字卡定位」）。main path（有 proof）的 statement:
+#   * 短（rail 寬下 <=3 行 / 公式塞得下）→ 右上 rail，卡片 shrink-wrap（右緣貼 gutter）
+#   * 長（rail 寬下 >3 行）→ 升 title 下的全寬 band，proof 往下 stack
+#   * 寬公式（自然寬 > rail 內寬）→ 全寬 band，公式「不縮」（維持 h3 字級）
+# 由 video/pipeline/_selftest_theorem_regime.py 斷言幾何;模板 regime 邏輯一改若破壞,自測即紅。
+#
+# 只供 selftest;不經 make.py 全渲（say 為佔位、不含 {show}）。
+
+meta:
+  id: demo_theorem_regime
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Statement Card Regime"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Statement Card Regime" }
+
+scenes:
+
+  # -- SHORT prose: stays in the right rail, card shrink-wraps (< full rail width) --
+  - id: theorem_regime_short
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    label: "[ proposition ]"
+    title: "Cosine Is Continuous"
+    say: "A one-line statement keeps the compact right rail."
+    statement: "Cosine is continuous."
+    proof:
+      - "The bound $0 \\le |\\cos\\theta - 1| \\le \\tfrac{\\theta^2}{2}$ forces the gap to zero."
+      - "So $\\cos\\theta \\to \\cos a$ at every $a$."
+    qed: "Hence cosine is continuous everywhere."
+
+  # -- LONG prose (>3 lines at rail width): promotes to a full-width band, proof stacks below --
+  - id: theorem_regime_long
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    label: "[ proposition ]"
+    title: "Sine and Cosine Are Continuous"
+    say: "A long statement promotes to a full-width band."
+    statement: "At every point $x_0$ in its domain, both $\\sin x$ and $\\cos x$ are continuous functions of the angle."
+    proof:
+      - "$0 \\le |\\sin\\theta| \\le |\\theta|$ forces $\\sin\\theta \\to 0$, and the angle-sum identities extend it to every point."
+    qed: "So both are continuous."
+
+  # -- WIDE formula (natural width > rail interior): band, and the formula is NOT shrunk --
+  - id: theorem_regime_wide_formula
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    label: "[ proposition ]"
+    title: "The Product Rule for Sine and Cosine"
+    say: "A wide display formula promotes to a band rather than shrinking in the rail."
+    statement: "$\\dfrac{d}{dx}\\bigl[\\sin x\\,\\cos x\\bigr] = \\cos^2 x - \\sin^2 x$"
+    proof:
+      - "Differentiate the product: $\\cos x\\cos x + \\sin x(-\\sin x)$."
+    qed: "Which is $\\cos 2x$."

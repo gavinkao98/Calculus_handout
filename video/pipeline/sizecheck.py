@@ -472,6 +472,34 @@ def _sparse_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
         f"(c) `sparse_ok: true` to accept the calm whitespace")]
 
 
+def _statement_regime_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
+    """G-advisory: a theorem_proof statement long enough to leave the compact rail renders as a
+    full-width band instead (measure-driven regime, DESIGN "字卡定位"). Reuses
+    theorem_proof.statement_regime -- the SAME source build() branches on -- so the advisory never
+    drifts from the actual layout (capacity-contract discipline). Advisory only: the band is a valid
+    outcome; this just tells the author their statement changed regime, so a wanted-compact-rail
+    scene can be trimmed. (*blocks* unused -- the regime is recomputed from spec, kept in the
+    signature to mount uniformly with the other single-scene checks.)"""
+    if scene.get("template") != "theorem_proof":
+        return []
+    from pipeline.templates import theorem_proof as TP
+    kind = scene.get("kind", "content")
+    ground = "light" if kind in ("intro", "outro") else "dark"
+    try:
+        promote, n_lines, is_formula = TP.statement_regime(scene, ground)
+    except Exception:  # noqa: BLE001
+        return []
+    if not promote:
+        return []
+    sid = scene.get("id", "?")
+    why = ("the display formula is wider than the rail" if is_formula
+           else f"the statement wraps to {n_lines} lines at rail width")
+    return [("warn",
+        f"{sid}: {why} -- the statement renders as a full-width band (not the compact right "
+        f"rail); trim to <= {TP.RAIL_MAX_LINES} rail lines / a rail-width formula to keep the "
+        f"rail, or accept the band.")]
+
+
 def _effective_font_px(node) -> float:
     """The node's TRUE authored on-screen px, recovered from its manim font_size.
     text Tex renders at fs(px)*TEXT_SCALE; pure-math MathTex renders at fs(px)=px*PX_TO_FS.
@@ -562,6 +590,9 @@ def check_scenes(meta: dict, scenes: list[dict]) -> "list[tuple[str, str]]":
 
         # -- warn: single content block strands most of the body zone -> sparse --
         issues += _sparse_issues(scene, blocks)
+
+        # -- warn: a theorem statement long enough to render as a band, not the compact rail --
+        issues += _statement_regime_issues(scene, blocks)
 
         # -- error: stacked siblings at different sizes (shrunk not wrapped) --
         groups: dict[str, list[tuple[str, float]]] = {}
