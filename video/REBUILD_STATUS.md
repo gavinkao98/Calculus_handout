@@ -45,6 +45,15 @@
 - **執行順序（PLAN 內建）：** Step 0-a A/B 定字級（**使用者 sign-off 硬閘**：tag 30/32、刻度 40/35、reason 35/38、h1 78/68、authored graph 尺寸）→ Step 0-b 落地全回歸 → v2 文檔/lint/sizecheck/fixtures → §3.1 單景 backlog（VLM 迴圈）。容量預算只在定案尺寸上校一次。
 - **裁決稿（gitignored `output/_qa/`、可重生）：** `REVIEW-s31-scene-effect-analysis.html`／`PROPOSAL-universal-density-strategy.html`／`PROPOSAL-layout-type-pass.html`（各含 Codex findings 逐條 disposition 附錄）。
 
+## ✅ 2026-07-06 scene-level TTS **batch-2 落地**（rung 3 chunk＋allowlist 全開＋coverage.py 根治）
+
+承 Phase A 節「接續（batch-2）」三件，使用者「這三件事情都做」→ 全部離線落地、零計費（Codex read-only standing consent；tts.py 兩處變更避開混提交＝按 ③→②→① 順序 surgical commit）。**定位：** 完成後 scene-level TTS＋FA 達設計稿「終態」姿態——`--unit auto` 涵蓋全 content template、fallback rung 3 到位、`-P` 拐杖除。
+
+- **① allowlist 全開（`ed5132c`）：** `SCENE_UNIT_TEMPLATES` 加 `derivation`／`theorem_proof`，`--unit auto` 現涵蓋全部 content template。驗收證據＝clean-Dean 21 場全開實測（讀 manifest×storyboard 交叉統計）：**derivation 6/6 scene-aligned、theorem_proof 3/5**（另 2 場 `continuity_argument`／`derivative_of_cosine` 自動降級 beats、正是使用者「先不用」的兩場）。安全性：FA 失敗仍回退 beats，最多一次 billed attempt、不會壞 deck。theorem_proof 3/5 誠實記進 code 註解，一行 frozenset 可回退。
+- **② rung 3 sentence-chunk（`2e11850`）：** ladder＝arbiter→resynth→**chunk**→beats。`scene_align.split_sentence_chunks`（只切句末標點後 whitespace→token tiling 精確）＋`merge_chunk_alignments`（逐 chunk 時間軸 offset＋multi 索引 offset，`verify_plan_index` 對全 plan 自檢）；`tts._finalize_aligned` 抽成主／chunk 共用（同規則 gating、不 drift）。**計費紀律：chunk fan-out＝N 個 sub-synth，故對 `run_ladder` 宣告 `billed=False`、自檢 `RetryBudget`——reserve N、`need > 剩餘 budget` 即 decline 退 beats**；預設 `--fallback-budget 2` 下 chunk 幾乎不觸發，要啟用得把 budget 依 fan-out 調高（句數＝billed sub-synth 數）＋報價。robustness：chunk 廣義 except→退 beats（永不崩）＋`finally` 清 temp（三路徑：pass promoted／fail gated／exception mid-chunk）。**Codex 兩輪 read-only：R1 抓 2 blocking（budget bypass／窄 except crash）＋1 advisory（temp 清理非例外安全）全修＋各補回歸測試（rescue@budget=4／over-budget decline／generic-error demotion）；R2 回歸無 finding。** 7 個 scene_align selftest＋tts_unit／make／critic 全綠。
+- **③ `pipeline/coverage.py`→`step_coverage.py`（`5fb898d`；根治既有 bug `task_eeee4b9a`）：** 裸名與 numba `import coverage` 撞名（腳本從 pipeline/ 直跑時 `sys.path[0]=pipeline/`→numba 命中我們的 SC 模組、缺 `.types` 崩 aligner）根除。`git mv`＋2 個真 importer（`schema.py`／`_selftest_coverage.py`）＋移除 `_regression_scene_align.py` 的 sys.path workaround＋修 `SPEC-pedagogy-firstlearner-expansion.md` 死連結。**`python -P` 拐杖不再需要**（本機無 stable-ts，用結構性探針證明裸 `import coverage` 從 pipeline/ 不再命中我們的模組；`_selftest_coverage.py` 綠證 schema 路徑完好）。
+- **未動（非本輪範圍，維持使用者「先不用」）：** 3 場降級（`continuity_argument`／`derivative_of_cosine`／`shm_stacked_graphs`＝後者為 graph）維持 beat-level Dean、不重試 scene-level（會燒 billed API）；真 4K final render 另議。
+
 ## ✅ 2026-07-05 Calm Professor／voice-design 退役，旁白路線拍板 **builtin voice Dean**（全 §3.1 重合成 clean Dean）
 
 使用者裁決（2026-07-05）：**Calm Professor 路線確定退掉、以後走 Dean、把相關的都刪乾淨**，且**全 21 場重合成 clean Dean**（AskUserQuestion 定案：整條 voice-design code path 移除＋全 deck 重合成而非只補 11 場）。計費部分先報價徵同意（全 21 場 2504 字 ~16.7 分）。

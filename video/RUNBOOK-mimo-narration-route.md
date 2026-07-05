@@ -58,13 +58,15 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   python video/pipeline/tts.py  --storyboard video/storyboards/<deck>_mimo.yml --backend mimo
   python video/make.py          --storyboard video/storyboards/<deck>_mimo.yml --reuse-audio --quality high
   → output/chNN/sX.Y/<deck>_mimo.mp4（1080p 預覽；正式交付才 --quality 4k）
-- **合成單位 `--unit`（scene-level TTS＋forced alignment，2026-07-05；設計見 DESIGN.md「Manifest schema 2」）：**
-  `tts.py` 預設 `--unit auto`——batch-1 template（`definition_math`／`graph`／`callout`／`recap_cards`）走
-  scene-level（一場一次合成、`stable-ts` 回推 beat 時序、per-scene validation，過不了自動回退 beat），
-  其餘（含 `derivation`／`theorem_proof`）暫走 beat。要全走舊路用 `--unit beat`；單一場強制 scene 用 `--unit scene`。
+- **合成單位 `--unit`（scene-level TTS＋forced alignment，2026-07-05；batch-2 全 template＋rung 3 於 2026-07-06；設計見 DESIGN.md「Manifest schema 2」）：**
+  `tts.py` 預設 `--unit auto`——**全部 content template**（`definition_math`／`graph`／`callout`／`recap_cards`／
+  `derivation`／`theorem_proof`，batch-2 全開）走 scene-level（一場一次合成、`stable-ts` 回推 beat 時序、
+  per-scene validation，過不了自動回退 beat）。要全走舊路用 `--unit beat`；單一場強制 scene 用 `--unit scene`。
   **紀律：scene-level 真合成只在 narration lock＋NFA 之後**（「改一個字→整場重合成」的 blast radius 由 lock 吃掉）；
-  lock 前一律 `make.py --backend mock`（beats、零計費、離線）迭代。scene-level 合成報價時**要把 §7 fallback retry 預算
-  一併列入**（每場至多 2 次額外 call：resynth／chunk），核准即涵蓋、超出即停。
+  lock 前一律 `make.py --backend mock`（beats、零計費、離線）迭代。**§7 fallback ladder＝arbiter(免費)→resynth(1 call)
+  →chunk(sentence-chunk，N 個 billed sub-synth)→beats(免費終點)**；scene-level 合成報價時要把 fallback 預算一併列入：
+  預設 `--fallback-budget 2` 只夠 resynth，**要啟用 chunk 救援得把 budget 調到覆蓋 fan-out（1＋該場句數），句數即 billed
+  sub-synth 數、須併入報價**——chunk 會自檢 budget、不足即 decline 退 beats（不偷跑爆預算）。
 - `make.py --reuse-audio` 會先驗 manifest freshness（deck id、scene、beat count、`{show}`、
   `text_hash`、WAV 存在/時長；`scene_aligned` 另驗 scene WAV＋words/aligned 檔＋`validation.status`），再 render；
   若報 stale/incomplete，不要硬跳過，先重跑該 storyboard 的 `tts.py` 或確認是不是選錯 `<deck>_mimo.yml`。
