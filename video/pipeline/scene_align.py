@@ -454,3 +454,85 @@ def build_scene_aligned_entry(*, scene_number, plan, beats, audio_seconds, audio
                        "metrics": gates["metrics"]},
         "fallback_history": fallback_history or [],
     }
+
+
+# --- sentence-chunk fallback (design §7 rung 3) --------------------------------
+# Split only on whitespace that FOLLOWS sentence-ending punctuation, so no WORD_RE
+# token is ever cut: flatten(tokenize(c) for c in chunks) == tokenize(transcript).
+# That tiling identity is what keeps the merged, re-indexed word list sound.
+_SENT_BOUNDARY = re.compile(r"(?<=[.!?])\s+")
+
+
+def split_sentence_chunks(transcript: str) -> list[str]:
+    """Partition `transcript` into sentence substrings that tile its WORD_RE tokens
+    exactly (see note above). Over-splitting (e.g. an "e.g. " abbreviation) is
+    harmless -- it only shortens a chunk; the tiling invariant holds because every
+    split point sits on whitespace. Returns a single-element list when there is no
+    interior sentence break (the caller then declines to chunk)."""
+    parts = [p.strip() for p in _SENT_BOUNDARY.split(transcript.strip()) if p.strip()]
+    return parts or ([transcript.strip()] if transcript.strip() else [])
+
+
+def merge_chunk_alignments(
+    chunk_results: list[dict[str, Any]],
+    chunk_durations: list[float],
+    chunk_texts: list[str],
+    plan: dict[str, Any],
+) -> dict[str, Any]:
+    """Merge per-sentence-chunk align_scene outputs into ONE align_scene-shaped result
+    over the whole scene (design §7 rung 3). Each chunk was aligned against its own WAV
+    with local timestamps; here every chunk's word times are offset by the cumulative
+    chunk-WAV duration and its multi-token indices by the cumulative token count, so the
+    concatenated WAV and the merged word list share one clock. verify_plan_index against
+    the FULL plan is the soundness gate -- a tiling/count break raises AlignmentError and
+    the caller routes to the beats terminal. Returns the align_scene shape
+    {"words","summary","segments","multi"} plus per-chunk `chunks` metadata."""
+    merged_words: list[dict[str, Any]] = []
+    merged_multi: dict[int, dict[str, Any]] = {}
+    merged_segments: list[dict[str, Any]] = []
+    chunks_meta: list[dict[str, Any]] = []
+    time_offset = 0.0
+    token_offset = 0
+    for i, (res, dur, text) in enumerate(zip(chunk_results, chunk_durations, chunk_texts)):
+        words = res["words"]
+        for w in words:
+            merged_words.append({**w, "start": round(float(w["start"]) + time_offset, 3),
+                                 "end": round(float(w["end"]) + time_offset, 3)})
+        for k, v in (res.get("multi") or {}).items():
+            merged_multi[int(k) + token_offset] = v
+        for seg in (res.get("segments") or []):
+            merged_segments.append({**seg, "chunk": i, "time_offset": round(time_offset, 3)})
+        probs = [w["probability"] for w in words if w.get("probability") is not None]
+        chunks_meta.append({
+            "index": i, "text": text,
+            "word_start": token_offset, "word_end": token_offset + len(words),
+            "audio_seconds": round(float(dur), 3),
+            "prob_min": round(min(probs), 3) if probs else None,
+        })
+        time_offset += float(dur)
+        token_offset += len(words)
+    verify_plan_index(merged_words, plan)   # soundness: merged tokens must equal plan tokens
+    boundary_in_multi = [{"beat": b["id"], **merged_multi[int(b["word_start"])]}
+                         for b in plan["beats"]
+                         if int(b["word_start"]) in merged_multi
+                         and merged_multi[int(b["word_start"])]["ordinal"] > 0]
+    all_probs = [w["probability"] for w in merged_words if w.get("probability") is not None]
+    runs = low_prob_runs(merged_words, 0.5, 2)
+    base_aligner = chunk_results[0]["summary"]["aligner"] if chunk_results else {}
+    summary = {
+        "aligner": {**base_aligner, "mode": "sentence_chunk", "chunks": len(chunk_results)},
+        "word_count": len(merged_words),
+        "beat_boundary_in_multi_token_word": boundary_in_multi,
+        "prob_min": round(min(all_probs), 3) if all_probs else None,
+        "prob_mean": round(sum(all_probs) / len(all_probs), 3) if all_probs else None,
+        "low_prob_words": sum(1 for p in all_probs if p < 0.5),
+        "low_prob_runs": [
+            {"indices": [r[0], r[-1]], "start": merged_words[r[0]]["start"],
+             "end": merged_words[r[-1]]["end"],
+             "text": " ".join(merged_words[i]["word"] for i in r),
+             "probs": [round(merged_words[i]["probability"], 3) for i in r]}
+            for r in runs
+        ],
+    }
+    return {"words": merged_words, "summary": summary, "segments": merged_segments,
+            "multi": merged_multi, "chunks": chunks_meta}

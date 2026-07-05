@@ -318,6 +318,75 @@ def test_fallback_ladder_budget_stops_before_overrun():
     assert any(h.get("skipped_over_budget") for h in result["history"])
 
 
+def test_split_sentence_chunks():
+    # multi-sentence -> one chunk per sentence, TILING the transcript's WORD_RE tokens
+    t = "First point here. Second point now! Third and final?"
+    chunks = SA.split_sentence_chunks(t)
+    assert chunks == ["First point here.", "Second point now!", "Third and final?"]
+    assert [tok for c in chunks for tok in SA.tokenize(c)] == SA.tokenize(t)   # tiling invariant
+    # no interior break -> single chunk (rung then declines: nothing to gain over resynth)
+    assert SA.split_sentence_chunks("just some words") == ["just some words"]
+    assert SA.split_sentence_chunks("   ") == []
+    # split points sit on whitespace, so an abbreviation over-splits but never cuts a token
+    over = "Use e.g. this rule. Done."
+    assert [tok for c in SA.split_sentence_chunks(over) for tok in SA.tokenize(c)] == SA.tokenize(over)
+
+
+def _chunk_res(text, dur, prob):
+    toks = SA.tokenize(text)
+    step = dur / len(toks)
+    words = [{"word": t, "start": round(i * step, 3), "end": round((i + 1) * step, 3),
+              "probability": prob} for i, t in enumerate(toks)]
+    return {"words": words, "multi": {}, "segments": [{"id": 0}],
+            "summary": {"aligner": {"tool": "stable-ts", "version": "x", "model": "base.en"}}}
+
+
+def test_merge_chunk_alignments():
+    plan = SA.build_scene_plan({"id": "s", "say": "Look here now. {show g.0} Then we go."})
+    chunk_texts = SA.split_sentence_chunks(plan["transcript"])
+    assert chunk_texts == ["Look here now.", "Then we go."]
+    merged = SA.merge_chunk_alignments(
+        [_chunk_res("Look here now.", 1.5, 0.9), _chunk_res("Then we go.", 1.2, 0.8)],
+        [1.5, 1.2], chunk_texts, plan)
+    # merged word list reproduces the plan token order (merge asserts this internally too)
+    assert [w["word"] for w in merged["words"]] == SA.tokenize(plan["transcript"])
+    # chunk 1's words are offset by chunk 0's WAV duration (1.5s)
+    tail = merged["words"][len(SA.tokenize("Look here now.")):]
+    assert tail[0]["word"] == "Then" and abs(tail[0]["start"] - 1.5) < 1e-6
+    # per-chunk metadata: contiguous token ranges tiling the transcript + durations + prob_min
+    chunks = merged["chunks"]
+    assert [c["word_start"] for c in chunks] == [0, 3]
+    assert chunks[0]["word_end"] == chunks[1]["word_start"] == 3
+    assert chunks[-1]["word_end"] == plan["word_count"]
+    assert (chunks[0]["audio_seconds"], chunks[1]["audio_seconds"]) == (1.5, 1.2)
+    assert chunks[0]["prob_min"] == 0.9
+    # summary carries the sentence_chunk marker + aggregate stats (feeds entry assembly)
+    assert merged["summary"]["aligner"]["mode"] == "sentence_chunk"
+    assert merged["summary"]["word_count"] == plan["word_count"]
+    # threads through map_to_beats + entry assembly with chunks populated
+    beats = SA.map_to_beats(plan, merged["words"], 2.7, multi=merged["multi"])
+    entry = SA.build_scene_aligned_entry(
+        scene_number=1, plan=plan, beats=beats, audio_seconds=2.7, audio_file="/x.wav",
+        summary=merged["summary"], gates={"status": "pass", "warnings": [], "metrics": {}},
+        words_file="/w.json", aligned_file="/a.json", chunks=merged["chunks"])
+    assert entry["alignment"]["chunks"] == merged["chunks"]
+
+
+def test_merge_chunk_alignments_raises_on_token_break():
+    # soundness gate: a chunk whose tokens don't reproduce the plan slice must raise, so a
+    # broken chunk alignment can never be promoted as if it mapped cleanly.
+    plan = SA.build_scene_plan({"id": "s", "say": "Look here. {show g.0} Then go."})
+    chunk_texts = SA.split_sentence_chunks(plan["transcript"])
+    bad = {"words": [{"word": "WRONG", "start": 0.0, "end": 0.5, "probability": 0.9}],
+           "multi": {}, "segments": [], "summary": {"aligner": {}}}
+    good = _chunk_res("Then go.", 0.6, 0.9)
+    try:
+        SA.merge_chunk_alignments([bad, good], [0.5, 0.6], chunk_texts, plan)
+        assert False, "expected AlignmentError on token mismatch"
+    except SA.AlignmentError:
+        pass
+
+
 if __name__ == "__main__":
     test_tokenize_matches_word_re()
     test_build_scene_plan_token_ranges_and_transcript()
@@ -343,4 +412,7 @@ if __name__ == "__main__":
     test_build_scene_aligned_entry_shape()
     test_fallback_ladder_stops_at_first_pass()
     test_fallback_ladder_budget_stops_before_overrun()
-    print("OK scene_align self-test (Tasks 1-7)")
+    test_split_sentence_chunks()
+    test_merge_chunk_alignments()
+    test_merge_chunk_alignments_raises_on_token_break()
+    print("OK scene_align self-test (Tasks 1-7 + batch-2 chunk rung)")

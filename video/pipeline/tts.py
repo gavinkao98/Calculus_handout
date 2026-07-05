@@ -603,33 +603,22 @@ def _asr_probe_tokens(wav: Path, args: argparse.Namespace) -> list[str] | None:
     return SA.tokenize(text)
 
 
-def _align_and_gate(plan: dict[str, Any], wav: Path, scene_number: int,
-                    words_file: Path, aligned_file: Path, args: argparse.Namespace, *,
-                    audio_file: Path, promote_from: Path | None,
-                    aligner_model: str | None = None) -> dict[str, Any]:
-    """Align `wav` to the plan, map to beats, run gates (+ optional ASR QA probe),
-    and assemble the scene_aligned entry. Verify-before-overwrite: only on PASS does
-    it promote the WAV and atomically write the canonical words/aligned artifacts."""
+def _finalize_aligned(*, plan: dict[str, Any], words: list[dict[str, Any]],
+                      multi: dict[int, dict[str, Any]], segments: list[dict[str, Any]],
+                      summary: dict[str, Any], audio_seconds: float, scene_number: int,
+                      words_file: Path, aligned_file: Path, audio_file: Path,
+                      args: argparse.Namespace, qa_wav: Path | None, promote_from: Path | None,
+                      chunks: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Shared tail for both scene paths (single-shot + sentence-chunk): map to beats,
+    run gates (+ optional ASR QA probe over `qa_wav`), assemble the entry, and -- only on
+    PASS -- promote the WAV and atomically write the words/aligned artifacts. Both paths
+    gate by the SAME rules, so chunk output can never ship under a looser bar."""
     from pipeline import scene_align as SA
     from pipeline import atomicio
-    model = aligner_model or args.aligner_model
-    try:
-        res = SA.align_scene(wav, plan, model=model, device=args.aligner_device)
-    except SA.AlignmentError as exc:
-        # aligner aborted (>failure_threshold words unaligned) or token-index broke.
-        # Do NOT crash the deck: return a fail-status entry so the caller routes to the
-        # fallback ladder -> beats terminal (design "always a shippable path"). Never
-        # becomes the final entry, since the beats rung always passes.
-        return {"scene_id": plan["scene_id"], "narration_mode": "scene_aligned",
-                "validation": {"status": "fail", "warnings": [], "metrics": {},
-                               "error": f"alignment aborted: {exc}"},
-                "fallback_history": []}
-    words = res["words"]
-    audio_seconds = wav_duration(wav)
-    beats = SA.map_to_beats(plan, words, audio_seconds, multi=res["multi"])
+    beats = SA.map_to_beats(plan, words, audio_seconds, multi=multi)
     gates = SA.run_gates(plan, words, beats, audio_seconds)
-    if not getattr(args, "skip_qa", False):
-        asr = _asr_probe_tokens(wav, args)
+    if not getattr(args, "skip_qa", False) and qa_wav is not None:
+        asr = _asr_probe_tokens(qa_wav, args)
         if asr is not None:
             fa_probs = [w.get("probability") for w in words]
             qa = SA.qa_diff(SA.tokenize(plan["transcript"]), asr, fa_probs,
@@ -640,24 +629,92 @@ def _align_and_gate(plan: dict[str, Any], wav: Path, scene_number: int,
                 gates["failures"] = gates["failures"] + ["QA probe: suspect TTS misspeak"]
     entry = SA.build_scene_aligned_entry(
         scene_number=scene_number, plan=plan, beats=beats, audio_seconds=audio_seconds,
-        audio_file=audio_file, summary=res["summary"], gates=gates,
-        words_file=words_file, aligned_file=aligned_file)
+        audio_file=audio_file, summary=summary, gates=gates,
+        words_file=words_file, aligned_file=aligned_file, chunks=chunks)
     if gates["status"] in ("pass", "pass_with_warnings"):
         if promote_from is not None:
             atomicio.promote(promote_from, Path(audio_file))
         atomicio.atomic_write_json(words_file, {
-            "summary": res["summary"], "words": words, "segments": res["segments"]})
+            "summary": summary, "words": words, "segments": segments})
         atomicio.atomic_write_json(aligned_file, {
             "scene_id": plan["scene_id"], "audio_seconds": round(audio_seconds, 3), "beats": beats})
     return entry
 
 
+def _align_and_gate(plan: dict[str, Any], wav: Path, scene_number: int,
+                    words_file: Path, aligned_file: Path, args: argparse.Namespace, *,
+                    audio_file: Path, promote_from: Path | None,
+                    aligner_model: str | None = None) -> dict[str, Any]:
+    """Single-shot path: align the whole-scene `wav` to the plan, then finalize
+    (map/gate/build/verify-before-overwrite). On aligner abort, return a fail-status
+    entry so the caller routes to the fallback ladder -> beats terminal (design "always
+    a shippable path") instead of crashing the deck."""
+    from pipeline import scene_align as SA
+    model = aligner_model or args.aligner_model
+    try:
+        res = SA.align_scene(wav, plan, model=model, device=args.aligner_device)
+    except SA.AlignmentError as exc:
+        return {"scene_id": plan["scene_id"], "narration_mode": "scene_aligned",
+                "validation": {"status": "fail", "warnings": [], "metrics": {},
+                               "error": f"alignment aborted: {exc}"},
+                "fallback_history": []}
+    return _finalize_aligned(
+        plan=plan, words=res["words"], multi=res["multi"], segments=res["segments"],
+        summary=res["summary"], audio_seconds=wav_duration(wav), scene_number=scene_number,
+        words_file=words_file, aligned_file=aligned_file, audio_file=audio_file,
+        args=args, qa_wav=wav, promote_from=promote_from)
+
+
+def _synth_align_chunks(backend, plan, chunk_texts, voice, args, chunk_dir, concat_tmp):
+    """Rung 3 core: synth each sentence chunk to its OWN WAV (one TTS call each -- billed for
+    mimo), align each independently (short spans align more reliably than the full scene),
+    concat the WAVs into concat_tmp, and merge the alignments onto one clock. chunk_dir and
+    concat_tmp are supplied by the caller so it can clean them in a finally on ANY failure.
+    Returns (merged, total_seconds). May raise AlignmentError (chunk abort / merged-token
+    break) or a synth/IO error -- the caller catches broadly and demotes to the beats terminal."""
+    from pipeline import scene_align as SA
+    chunk_dir.mkdir(parents=True, exist_ok=True)
+    chunk_wavs: list[Path] = []
+    chunk_results: list[dict[str, Any]] = []
+    chunk_durations: list[float] = []
+    for i, text in enumerate(chunk_texts):
+        cwav = chunk_dir / f"chunk_{i:02d}.wav"
+        _synth_scene_wav(backend, {"transcript": text}, cwav, voice, args)       # 1 TTS call
+        res = SA.align_scene(cwav, {"transcript": text, "beats": []},
+                             model=args.aligner_model, device=args.aligner_device)
+        chunk_wavs.append(cwav)
+        chunk_results.append(res)
+        chunk_durations.append(wav_duration(cwav))
+    total = concat_wavs(chunk_wavs, concat_tmp)
+    merged = SA.merge_chunk_alignments(chunk_results, chunk_durations, chunk_texts, plan)
+    return merged, total
+
+
+def _cleanup_chunk_temps(chunk_dir: Path, concat_tmp: Path) -> None:
+    """Remove every chunk temp on ANY exit path (design §3 verify-before-overwrite). concat_tmp
+    is already gone when it was promoted onto the canonical WAV, so the unlink is a no-op there;
+    it never touches the canonical scene WAV (a different path)."""
+    concat_tmp.unlink(missing_ok=True)
+    if chunk_dir.exists():
+        for f in chunk_dir.iterdir():
+            f.unlink(missing_ok=True)
+        try:
+            chunk_dir.rmdir()
+        except OSError:
+            pass
+
+
 def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, plan, reuse_index):
-    """Design §7 ladder rungs for one failed scene. Batch-1 ladder is
-    arbiter (free) -> resynth (billed) -> beats (free terminal). Rung 3 (sentence
-    chunk) is deferred to batch-2 -- the pilot showed all scene types pass FA, so it
-    is rarely reached; when a real deck needs it, add a ("chunk", True, ...) rung
-    here. Each rung callable takes the ctx dict from _synthesize_scene_aligned."""
+    """Design §7 ladder rungs for one failed scene: arbiter (free small.en re-align) ->
+    resynth (1 billed call) -> chunk (sentence-chunk resynth+merge) -> beats (free terminal).
+    Each rung callable takes the ctx dict from _synthesize_scene_aligned, which carries the
+    RetryBudget. The chunk rung is declared NOT billed to run_ladder because it fans out to ONE
+    TTS call per sentence and must account for that itself: it RESERVES N units of the budget up
+    front and DECLINES (routing to beats) when N would exceed the quote, so the budget still
+    bounds real billed calls (Codex R-item2). Consequence: under the default budget of 2 a
+    multi-sentence scene declines chunk and demotes to beats; chunk engages only when the operator
+    raises --fallback-budget to cover the fan-out (quoted per CLAUDE.md)."""
+    from pipeline import scene_align as SA
     scene_id = scene["id"]
     scenes_dir, align_dir = output_dir / "scenes", output_dir / "align"
     scene_wav = scenes_dir / f"{scene_number:02d}_{scene_id}.wav"
@@ -667,6 +724,11 @@ def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, 
 
     def _ok(entry):
         return entry["validation"]["status"] in ("pass", "pass_with_warnings")
+
+    def _fail(error):
+        return {"scene_id": scene_id, "narration_mode": "scene_aligned",
+                "validation": {"status": "fail", "warnings": [], "metrics": {}, "error": error},
+                "fallback_history": []}
 
     def arbiter(ctx):
         # re-align the SAME primary WAV with small.en (no re-synthesis, no billing)
@@ -686,12 +748,50 @@ def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, 
         return {"status": "pass" if _ok(entry) else "fail", "entry": entry,
                 "reason": "resynthesize scene once"}
 
+    def chunk(ctx):
+        # split the scene into sentences; a scene with no interior break has nothing to gain
+        # over the resynth already tried, so decline and let the beats terminal run.
+        chunk_texts = SA.split_sentence_chunks(plan["transcript"])
+        if len(chunk_texts) < 2:
+            return {"status": "fail", "entry": _fail("single sentence -- no chunk benefit"),
+                    "reason": "chunk declined: one sentence"}
+        # each chunk is a billed sub-synth: RESERVE N budget units up front and decline (->
+        # beats) rather than overrun the consent quote (Codex R-item2 blocking 1).
+        budget = ctx["budget"]
+        need = len(chunk_texts)
+        left = budget.max_billed - budget.spent
+        if need > left:
+            return {"status": "fail",
+                    "entry": _fail(f"chunk needs {need} sub-synths, only {left} of billed budget left"),
+                    "reason": f"chunk declined: {need} sub-synths > {left} budget "
+                              f"(raise --fallback-budget with a quote to enable)"}
+        budget.spent += need
+        chunk_dir = scene_wav.with_name(scene_wav.stem + ".chunks")
+        concat_tmp = scene_wav.with_name(scene_wav.name + ".chunk.tmp")
+        try:
+            merged, total = _synth_align_chunks(backend, plan, chunk_texts, voice, args,
+                                                chunk_dir, concat_tmp)
+            entry = _finalize_aligned(
+                plan=plan, words=merged["words"], multi=merged["multi"], segments=merged["segments"],
+                summary=merged["summary"], audio_seconds=total, scene_number=scene_number,
+                words_file=words_file, aligned_file=aligned_file, audio_file=scene_wav,
+                args=args, qa_wav=concat_tmp, promote_from=concat_tmp, chunks=merged["chunks"])
+            ok = _ok(entry)
+            reason = f"sentence-chunk resynth+merge: {need} chunks ({need} billed sub-synths)"
+        except Exception as exc:   # noqa: BLE001 -- a fallback rescue must NEVER crash the deck:
+            entry, ok = _fail(f"chunk failed: {exc}"), False   # any synth/align/concat error -> beats
+            reason = f"chunk failed: {exc}"
+        finally:
+            _cleanup_chunk_temps(chunk_dir, concat_tmp)
+        return {"status": "pass" if ok else "fail", "entry": entry, "reason": reason}
+
     def beats(ctx):
         entry = _synthesize_scene_beats(backend=backend, meta=meta, scene=scene,
             scene_number=scene_number, output_dir=output_dir, args=args, reuse_index=reuse_index)
         return {"status": "pass", "entry": entry, "reason": "beat-level fallback (terminal)"}
 
-    return [("arbiter", False, arbiter), ("resynth", True, resynth), ("beats", False, beats)]
+    return [("arbiter", False, arbiter), ("resynth", True, resynth),
+            ("chunk", False, chunk), ("beats", False, beats)]
 
 
 def _synthesize_scene_aligned(*, backend, meta, scene, scene_number, output_dir, args,
@@ -728,7 +828,7 @@ def _synthesize_scene_aligned(*, backend, meta, scene, scene_number, output_dir,
     # gates FAILED -> fallback ladder (§7). Keep tmp_wav: the arbiter rung re-aligns
     # THIS audio with small.en (rung 1 does not re-synthesize). scene_wav stays untouched.
     budget = FB.RetryBudget(max_billed=getattr(args, "fallback_budget", 2))
-    ctx = {"plan": plan, "primary_wav": tmp_wav, "scene_wav": scene_wav}
+    ctx = {"plan": plan, "primary_wav": tmp_wav, "scene_wav": scene_wav, "budget": budget}
     rungs = _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, plan, reuse_index)
     result = FB.run_ladder(scene_id=scene_id, rungs=rungs, budget=budget, ctx=ctx)
     tmp_wav.unlink(missing_ok=True)   # clean the primary temp after the ladder settles
