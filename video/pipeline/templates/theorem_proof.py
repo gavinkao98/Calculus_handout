@@ -41,7 +41,9 @@ from ._common import (scene_head, motif_corner, center_in_zone, build_aside, ren
 
 _ROW_GAP = 0.5   # proof-chain min inter-row pitch (edge-to-edge); tall rows keep it
 _CARD_PAD_X = 0.5     # statement-card horizontal pad; rail interior == RAIL_W - 2*_CARD_PAD_X
-RAIL_MAX_LINES = 3    # a statement wrapping to more than this at rail width promotes to a band
+RAIL_MAX_LINES = 1    # rail is single-line only (a formula / one-liner); any wrap -> full-width band
+                      # (a wrapped card in the ~4-word rail is inherently ragged; the band wraps far
+                      #  less at ~3x the measure, so "wrap -> band" reads cleaner -- 2026-07-05 user call)
 
 
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
@@ -83,6 +85,53 @@ def statement_regime(spec: dict[str, Any], ground: str) -> tuple[bool, int, bool
     multiline = isinstance(stmt, VGroup) and not isinstance(stmt, (Tex, MathTex))
     n_lines = len(stmt.submobjects) if multiline else 1
     return (bool(n_lines > RAIL_MAX_LINES), n_lines, False)
+
+
+def _statement_content(stmt_text: str, is_formula: bool, ground: str, max_width: float):
+    """The statement mob at *max_width*: a display formula at NATURAL size (prose(max_width=None)
+    never clamps it -- a too-wide one overflows and _overflow_issues catches it, no silent shrink),
+    wrapped prose left-flush otherwise."""
+    if is_formula:
+        return brand.prose(stmt_text, ground, role="primary", size="h3")
+    return brand.prose(stmt_text, ground, role="primary", size="h3", max_width=max_width, align="LEFT")
+
+
+def _band_card(stmt_text: str, is_formula: bool, ground: str):
+    """A FULL-WIDTH statement band: a transparent full-width spacer forces the card to span
+    CONTENT_W (accent_panel would otherwise shrink-wrap to the text) with its LEFT edge on the spine,
+    so it shares the proof's round(left) column and _capacity_issues measures the two STACKED (Codex
+    review B2). Prose left-aligns on the spine; a display formula centres in the band."""
+    band_pad_x = 0.6
+    band_inner = CONTENT_W - 2 * band_pad_x
+    content = _statement_content(stmt_text, is_formula, ground, band_inner)
+    spacer = Rectangle(width=band_inner, height=content.height, stroke_width=0, fill_opacity=0)
+    if is_formula:
+        content.move_to(spacer)
+    else:
+        content.move_to(spacer.get_left(), aligned_edge=LEFT)
+    return brand.accent_panel(VGroup(spacer, content), ground, bar_role="accent",
+                              fill_role="panel", pad=0.34, pad_x=band_pad_x)
+
+
+def _rail_card(stmt_text: str, is_formula: bool, ground: str):
+    """A compact TOP-RIGHT rail card, shrink-wrapped to its content (no full-rail spacer) so a short
+    statement reads tight; the caller hangs its right edge on the gutter."""
+    content = _statement_content(stmt_text, is_formula, ground, RAIL_W - 2 * _CARD_PAD_X)
+    return brand.accent_panel(content, ground, bar_role="accent", fill_role="panel",
+                              pad=0.34, pad_x=_CARD_PAD_X)
+
+
+def _qed_row(qed_text: str, ground: str):
+    """The green closing line + boxed QED mark, folded into the proof chain rhythm."""
+    line = brand.prose(qed_text, ground, role="success", size="step")
+    box = RoundedRectangle(width=0.46, height=0.46, corner_radius=T.RADIUS_SM,
+                           color=T.color(ground, "success"), stroke_width=3)
+    mark = brand.glyph("qed", ground, role="success", size="math_sm")
+    mark.scale_to_fit_height(box.height * 0.46)
+    mark.move_to(box.get_center())
+    qbox = VGroup(box, mark)
+    qbox.next_to(line, RIGHT, buff=0.3)
+    return VGroup(line, qbox)
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -128,67 +177,47 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         blocks.append(motif_corner(ground))
         return blocks
 
-    # -- statement card: measure-driven regime (rail vs band, DESIGN "字卡定位"). A statement that
-    #    FITS the rail measure stays in the compact TOP-RIGHT rail, shrink-wrapped with its right
-    #    edge on the gutter; a longer statement (or a formula wider than the rail) is promoted to a
-    #    FULL-WIDTH band under the title, with the proof stacked below it. The rail was built for a
-    #    short SECONDARY note -- exiling a long PRIMARY statement into its ~4-word measure wrapped it
-    #    into a tall ragged column (the reported defect). Kept static -- reveal timing is unchanged. --
+    # -- statement card: capacity-aware measure-driven regime (rail vs band, DESIGN "字卡定位").
+    #    A statement that wraps PREFERS a full-width band (cleaner than the ragged ~4-word rail),
+    #    but a band stacks it ABOVE the proof and costs vertical room; if that would push the proof
+    #    off the body zone, fall back to the space-saving two-column RAIL (statement BESIDE the
+    #    proof) so a long proof still fits one page. A single-line statement / a rail-fit formula
+    #    stays in the compact rail either way. The proof mobs are built FIRST so their height drives
+    #    the fit test. Statement stays static -- reveal timing is unchanged. --
     zone_top = body_ref.get_bottom()[1] - T.TITLE_GAP
+    zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
+    zone_h = zone_top - zone_bottom
     stmt_text = spec.get("statement", "")
-    promote, _n_lines, is_formula = statement_regime(spec, ground)
-    if promote:
-        # FULL-WIDTH band. A transparent full-width spacer forces the card to span CONTENT_W
-        # (accent_panel would otherwise shrink-wrap to the text) with its LEFT edge on the spine, so
-        # it shares the proof's round(left) column and _capacity_issues measures the two STACKED
-        # (Codex review B2). Prose left-aligns on the spine; a display formula centres in the band at
-        # NATURAL size -- prose(max_width=None) never clamps it, and one wider than the band overflows
-        # so _overflow_issues catches it rather than a silent shrink (Codex review B3).
-        band_pad_x = 0.6
-        band_inner = CONTENT_W - 2 * band_pad_x
-        if is_formula:
-            content = brand.prose(stmt_text, ground, role="primary", size="h3")
-            spacer = Rectangle(width=band_inner, height=content.height, stroke_width=0, fill_opacity=0)
-            content.move_to(spacer)
-        else:
-            content = brand.prose(stmt_text, ground, role="primary", size="h3",
-                                  max_width=band_inner, align="LEFT")
-            spacer = Rectangle(width=band_inner, height=content.height, stroke_width=0, fill_opacity=0)
-            content.move_to(spacer.get_left(), aligned_edge=LEFT)
-        card = brand.accent_panel(VGroup(spacer, content), ground, bar_role="accent",
-                                  fill_role="panel", pad=0.34, pad_x=band_pad_x)
-        card.move_to([SPINE_X + card.width / 2, zone_top - card.height / 2, 0])
-        blocks.append(Block("statement", card, anim="fade", static=True))
-        proof_top = card.get_bottom()[1] - 0.4         # proof stacks BELOW the band
-    else:
-        # Compact rail: shrink-wrap the card to its content (no full-rail spacer) and hang its RIGHT
-        # edge on the gutter, so a short statement reads tight instead of a wide half-empty box. A
-        # formula here already fits the rail interior (the regime said so), so it is never clamped.
-        if is_formula:
-            content = brand.prose(stmt_text, ground, role="primary", size="h3")
-        else:
-            content = brand.prose(stmt_text, ground, role="primary", size="h3",
-                                  max_width=RAIL_W - 2 * _CARD_PAD_X, align="LEFT")
-        card = brand.accent_panel(content, ground, bar_role="accent",
-                                  fill_role="panel", pad=0.34, pad_x=_CARD_PAD_X)
-        card.move_to([SPINE_X + CONTENT_W - card.width / 2, zone_top - card.height / 2, 0])
-        blocks.append(Block("statement", card, anim="fade", static=True))
-        proof_top = zone_top                            # proof sits BESIDE the card
 
-    # -- proof: an equation chain on the Lectern spine (was a dot-led bullet list). Rows
-    #    share the spine's left edge and flow like a derivation, closing on the green QED.
-    #    A row wide enough to reach the rail card's column drops the whole chain BELOW the
-    #    card (full width); otherwise the chain sits to the LEFT of the card (two columns).
-    #    The chain stays flush-left on the spine -- it is NOT centred horizontally (that
-    #    would fight the top-right card and break the theorem/proof grammar). --
     proof_left = left + 0.4
     proof_label = brand.eyebrow("proof", ground, role="muted")
     step_mobs = [brand.prose(p, ground, role="text", size="step",
                              max_width=content_w - 1.0) for p in steps]
-    # A wide proof only "reaches the rail" in RAIL mode; in BAND mode the statement is already a
-    # full-width band above proof_top, so the chain just stacks below it (no rail column to clear).
-    reaches_rail = (not promote) and any(proof_left + m.width > RAIL_X - 0.25 for m in step_mobs)
+    qrow = _qed_row(qed_text, ground) if qed_text else None
+    # the proof stack's vertical extent at the chain's min pitch: label + (label->chain gap) + rows
+    row_hs = [m.height for m in step_mobs] + ([qrow.height] if qrow is not None else [])
+    proof_stack_h = proof_label.height + (0.5 + sum(row_hs) + max(len(row_hs) - 1, 0) * _ROW_GAP
+                                          if row_hs else 0.0)
 
+    promote_pref, _n_lines, is_formula = statement_regime(spec, ground)
+    promote = promote_pref
+    card = _band_card(stmt_text, is_formula, ground) if promote_pref else None
+    if promote and card.height + 0.4 + proof_stack_h > zone_h:
+        promote = False                                 # band would overflow -> keep the two columns
+
+    if promote:
+        card.move_to([SPINE_X + card.width / 2, zone_top - card.height / 2, 0])
+        proof_top = card.get_bottom()[1] - 0.4          # proof stacks BELOW the full-width band
+    else:
+        card = _rail_card(stmt_text, is_formula, ground)
+        card.move_to([SPINE_X + CONTENT_W - card.width / 2, zone_top - card.height / 2, 0])
+        proof_top = zone_top                            # proof sits BESIDE the card
+    blocks.append(Block("statement", card, anim="fade", static=True))
+
+    # -- proof: an equation chain on the Lectern spine, flush-left, closing on the green QED. In
+    #    RAIL mode a row wide enough to reach the card's column drops the whole chain BELOW the card;
+    #    in BAND mode the chain already sits below the full-width band. --
+    reaches_rail = (not promote) and any(proof_left + m.width > RAIL_X - 0.25 for m in step_mobs)
     proof_label.move_to([proof_left, proof_top - proof_label.height / 2, 0], aligned_edge=LEFT)
     blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
 
@@ -204,25 +233,13 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         chain.append(m)
         prev_half = half
 
-    # -- QED line: a green closing line + boxed QED mark, folded into the chain rhythm
-    #    (was floating low). A theorem/proposition proof CLOSES -- the green boxed QED is
-    #    the right idiom, NOT derivation's amber "result". --
-    if qed_text:
-        line = brand.prose(qed_text, ground, role="success", size="step")
-        box = RoundedRectangle(width=0.46, height=0.46, corner_radius=T.RADIUS_SM,
-                               color=T.color(ground, "success"), stroke_width=3)
-        mark = brand.glyph("qed", ground, role="success", size="math_sm")
-        mark.scale_to_fit_height(box.height * 0.46)
-        mark.move_to(box.get_center())
-        qbox = VGroup(box, mark)
-        qbox.next_to(line, RIGHT, buff=0.3)
-        row = VGroup(line, qbox)
-        half = row.height / 2
+    if qrow is not None:
+        half = qrow.height / 2
         if prev_half is not None:
             y -= prev_half + _ROW_GAP + half
-        row.move_to([proof_left, y, 0], aligned_edge=LEFT)
-        blocks.append(Block("qed", row, anim="flash_in", static=False))
-        chain.append(row)
+        qrow.move_to([proof_left, y, 0], aligned_edge=LEFT)
+        blocks.append(Block("qed", qrow, anim="flash_in", static=False))
+        chain.append(qrow)
 
     # anchor the chain just below the PROOF label instead of centring it in the whole band
     # (a short 2-step proof otherwise floats mid-frame, detached from its label -- the

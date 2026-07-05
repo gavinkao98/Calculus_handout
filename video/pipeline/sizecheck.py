@@ -473,31 +473,31 @@ def _sparse_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
 
 
 def _statement_regime_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
-    """G-advisory: a theorem_proof statement long enough to leave the compact rail renders as a
-    full-width band instead (measure-driven regime, DESIGN "字卡定位"). Reuses
-    theorem_proof.statement_regime -- the SAME source build() branches on -- so the advisory never
-    drifts from the actual layout (capacity-contract discipline). Advisory only: the band is a valid
-    outcome; this just tells the author their statement changed regime, so a wanted-compact-rail
-    scene can be trimmed. (*blocks* unused -- the regime is recomputed from spec, kept in the
-    signature to mount uniformly with the other single-scene checks.)"""
+    """G-advisory: a theorem_proof statement that wrapped renders as a full-width BAND instead of the
+    compact rail (measure-driven regime, DESIGN "字卡定位"). Reads the BUILT statement block's
+    geometry -- a band spans ~CONTENT_W with its left edge on the spine; the rail card hangs narrow on
+    the right gutter -- so the advisory reflects the ACTUAL capacity-aware outcome: a scene whose band
+    would overflow falls back to rail in build() and correctly gets NO band advisory here, never
+    drifting from the layout. Advisory only: the band is a valid outcome; this just flags that a
+    wanted-compact-rail statement changed regime, so it can be trimmed to a single line."""
     if scene.get("template") != "theorem_proof":
         return []
-    from pipeline.templates import theorem_proof as TP
-    kind = scene.get("kind", "content")
-    ground = "light" if kind in ("intro", "outro") else "dark"
+    from pipeline.templates._common import SPINE_X, CONTENT_W
+    card = next((getattr(b, "mobject", None) for b in blocks
+                 if getattr(b, "id", "") == "statement"), None)
+    if card is None:
+        return []
     try:
-        promote, n_lines, is_formula = TP.statement_regime(scene, ground)
+        left, w = float(card.get_left()[0]), float(card.width)
     except Exception:  # noqa: BLE001
         return []
-    if not promote:
+    if not (abs(left - SPINE_X) < 0.3 and w > 0.6 * CONTENT_W):   # band: spine-flush + ~full width
         return []
     sid = scene.get("id", "?")
-    why = ("the display formula is wider than the rail" if is_formula
-           else f"the statement wraps to {n_lines} lines at rail width")
     return [("warn",
-        f"{sid}: {why} -- the statement renders as a full-width band (not the compact right "
-        f"rail); trim to <= {TP.RAIL_MAX_LINES} rail lines / a rail-width formula to keep the "
-        f"rail, or accept the band.")]
+        f"{sid}: the statement wrapped, so it renders as a full-width band (not the compact right "
+        f"rail); trim it to a single rail line / a rail-width formula to keep the rail, or accept "
+        f"the band.")]
 
 
 def _effective_font_px(node) -> float:

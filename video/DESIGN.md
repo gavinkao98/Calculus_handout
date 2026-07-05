@@ -316,15 +316,17 @@ gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第
 - `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
 - `recap_cards`：**不用 rail**——改為單一全幅編號點欄（`points[]` 以 `01/02/03` ＋ 全寬 prose
   左堆疊、`center_in_zone` 上偏置中）；舊「公式卡 snap `RAIL_X`」雙欄版已退場。
-- `theorem_proof`：左軸用 `SPINE_X`（proof 仍刻意 `+0.4` 縮排階層）。**statement 字卡採
-  measure-driven regime（2026-07-05）**：塞得進 rail 舒適 measure（散文 ≤`RAIL_MAX_LINES`=3 行、
-  或公式不寬於 rail 內寬）→ 右上 rail、**shrink-wrap、右緣貼 gutter**（短句更緊湊、退掉舊的滿-rail
-  spacer）；否則升成 title 下**全寬 band**（左緣 `SPINE_X`、與 proof 同 `round(left)` 欄 stack，故
-  `_capacity_issues` 量得到二者疊高），proof 改置 band 下方。判定在 `theorem_proof.statement_regime()`
-  ——讀**真實 `brand.prose` 行數**（多行為每行一 Tex 的 VGroup，`len(submobjects)` 對 `body_text`／
-  `_prose_lines` 兩路徑皆精準，不另估換行），sizecheck 的升-band advisory 同源呼叫、零 drift。過寬公式
-  **不縮小**（band 走 `prose(max_width=None)` 自然尺寸），逾 band 寬者交 `_overflow_issues` 攔（作者分頁）。
-  `RAIL_COL` 固定不動——rail 仍留給次要短卡（`build_aside`），只有主角 statement 依量體改欄。
+- `theorem_proof`：左軸用 `SPINE_X`（proof 仍刻意 `+0.4` 縮排階層）。**statement 字卡採容量感知的
+  measure-driven regime（2026-07-05）**：**只有「不換行」才留 rail**（`RAIL_MAX_LINES=1`：單行散文 /
+  rail-fit 公式）→ 右上 rail、**shrink-wrap、右緣貼 gutter**；**一換行就想升 title 下全寬 band**（左緣
+  `SPINE_X`、與 proof 同 `round(left)` 欄 stack）——**但 band 把 statement 疊到 proof 上方、較耗縱向；若
+  band＋proof 超出 body zone，自動退回兩欄 rail**（statement 右欄、proof 左欄用滿縱向），讓長證明仍單頁
+  塞得下（§3.1 實例：`continuity_statement`→band、`continuity_argument`→rail fallback）。判定：
+  `statement_regime()` 給「換行→想 band」的**美學偏好**（讀**真實 `brand.prose` 行數** `len(submobjects)`，
+  對 `body_text`／`_prose_lines` 皆精準）；`build()` **先建 proof 量高度**、加**容量 fallback** 定案；
+  sizecheck 的升-band advisory **改讀實際 build 出的卡片幾何**（band＝貼脊全寬、rail＝貼右緣窄卡）→ 反映
+  真實結果、零 drift。過寬公式**不縮小**（band 走 `prose(max_width=None)`），逾 band 寬交 `_overflow_issues`。
+  `RAIL_COL` 不動——rail 仍留給次要短卡（`build_aside`），只有主角 statement 依量體＋容量改欄。
 - `graph`：title 左軸 `SAFE_MARGIN`→`SIDE_GUTTER`（=`SPINE_X`），與其他模板水平對齊。
 
 **figure 置中是刻意、非 drift（decline 的 finding）：** `graph`／`value_table`／

@@ -94,7 +94,21 @@ def test_wide_formula_band_not_shrunk():
     assert glyph is not None and abs(glyph.width - ref.width) < 0.05   # not scaled down
 
 
-# -- sizecheck promotion advisory (reuses TP.statement_regime, no drift) ------
+# -- WRAPS but proof too long: aesthetic prefers band, capacity forces a rail fallback ------
+
+def test_tall_proof_prefers_band_but_falls_back_to_rail():
+    scene = _SCENES["theorem_regime_tall_proof"]
+    promote_pref, n_lines, is_formula = TP.statement_regime(scene, "dark")
+    assert promote_pref is True and is_formula is False and n_lines > TP.RAIL_MAX_LINES
+    card = _block(_build("theorem_regime_tall_proof"), "statement")
+    # capacity fallback: a band would overflow, so the built card is the RAIL, not a full-width band.
+    # (a wrapping statement fills the rail measure, so its card ~= RAIL_W -- test "not a band", i.e.
+    # clearly narrower than CONTENT_W and hung on the right gutter, NOT "< RAIL_W".)
+    assert card.width < 0.6 * CONTENT_W
+    assert abs(card.get_right()[0] - (SPINE_X + CONTENT_W)) < 0.12
+
+
+# -- sizecheck promotion advisory (reads the built band geometry, no drift) ------
 
 def _band_warns():
     issues = sizecheck.check_scenes(_META, list(_DATA["scenes"]))
@@ -107,6 +121,8 @@ def test_sizecheck_advises_on_promotion_only():
     warns = _band_warns()
     assert warns["theorem_regime_long"] and warns["theorem_regime_wide_formula"]
     assert not warns["theorem_regime_short"]
+    # a scene that fell back to rail (band would overflow) is NOT a band -> no band advisory
+    assert not warns["theorem_regime_tall_proof"]
 
 
 def test_regime_demos_have_no_overflow_error():

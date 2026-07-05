@@ -50,6 +50,24 @@ scenes:
       - "$0 \\le |\\sin\\theta| \\le |\\theta|$ forces $\\sin\\theta \\to 0$, and the angle-sum identities extend it to every point."
     qed: "So both are continuous."
 
+  # -- WRAPS but the proof is LONG: a band would stack the statement above a tall proof and
+  #    overflow, so the regime falls back to the space-saving two-column rail (statement beside
+  #    the proof). Aesthetic pref = band; capacity forces rail. --
+  - id: theorem_regime_tall_proof
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    label: "[ proposition ]"
+    title: "A Wrapping Statement With a Tall Proof"
+    say: "A wrapping statement whose narrow proof needs the full column stays in the two-column rail."
+    statement: "Sine and cosine are continuous at every point of the entire real line."
+    proof:
+      - "$0 \\le |\\sin\\theta| \\le |\\theta|$."
+      - "Hence $\\sin\\theta \\to 0$."
+      - "Also $\\cos\\theta \\to 1$."
+      - "Angle-sum carries both."
+    qed: "Continuous everywhere."
+
   # -- WIDE formula (natural width > rail interior): band, and the formula is NOT shrunk --
   - id: theorem_regime_wide_formula
     kind: content
