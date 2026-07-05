@@ -13,6 +13,7 @@ _selftest_scene_align.py needs no whisper model.
 from __future__ import annotations
 
 import re
+from difflib import SequenceMatcher
 from typing import Any
 
 from pipeline.narration import parse_say
@@ -286,3 +287,62 @@ def run_gates(plan, words, beats, audio_seconds):
     return {"status": status, "failures": failures, "warnings": warnings,
             "metrics": {"prob_mean": prob_mean,
                         "low_prob_words": sum(1 for p in probs if p < GATES["interior_low_prob"])}}
+
+
+def qa_diff(plan_tokens, asr_tokens, fa_probs, *, weak_spans=(), min_cluster=3,
+            weak_prob=0.5, window=2):
+    """Grade the free-ASR-vs-transcript diff (design §6). transcript-constrained FA
+    cannot see words the TTS dropped/repeated -- the ASR probe can. A dropped/inserted/
+    replaced cluster of >= min_cluster tokens is:
+      - FAIL (suspect TTS misspeak) if it CO-LOCATES with weakness -- either low FA
+        probability inside the cluster's plan-token WINDOW, or overlap with a gate
+        weak_span (plan-token ranges the gates flagged). Co-location is LOCAL, not
+        global: an unrelated weak span elsewhere does not condemn the cluster.
+      - INFO (ASR artifact) otherwise -- the derivation pilot was exactly this: ASR
+        skipped a repeated formula, the audio was innocent.
+
+    Deletions/replacements span [i1,i2) on the plan side; an INSERTION has i1==i2, so
+    its co-location window is [i1-window, i1+window) (fa_probs[i1:i2] would be empty).
+    weak_spans: iterable of (start, end) plan-token index ranges from the gate pass
+    (e.g. a soft/failed boundary word's index, an interior-gap location).
+    Returns {"verdict": clean|info|fail, "clusters": [...]}."""
+    spans = list(weak_spans)
+    n = len(plan_tokens)
+
+    def _overlaps_weak_span(lo, hi):
+        return any(not (hi <= s or lo >= e) for s, e in spans)
+
+    sm = SequenceMatcher(a=plan_tokens, b=asr_tokens, autojunk=False)
+    clusters = []
+    verdict = "clean"
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal":
+            continue
+        size = max(i2 - i1, j2 - j1)
+        if size < min_cluster:
+            continue
+        lo, hi = (i1, i2) if i2 > i1 else (max(0, i1 - window), min(n, i1 + window))
+        local_weak = any(p is not None and p < weak_prob for p in fa_probs[lo:hi])
+        gate_weak = _overlaps_weak_span(lo, hi)
+        is_fail = local_weak or gate_weak
+        clusters.append({"tag": tag, "plan_span": [i1, i2], "asr_span": [j1, j2],
+                         "window": [lo, hi], "size": size,
+                         "fa_weak": local_weak, "gate_weak": gate_weak,
+                         "verdict": "fail" if is_fail else "info"})
+        if is_fail:
+            verdict = "fail"
+        elif verdict != "fail":
+            verdict = "info"
+    return {"verdict": verdict, "clusters": clusters}
+
+
+def boundary_weak_spans(beats, *, warn=0.35):
+    """Plan-token weak spans for qa_diff co-location: each boundary beat (beats[1:])
+    whose boundary prob is below `warn` contributes a 1-wide span at its word_start.
+    Kept separate so the tts caller can also add interior-gap spans if needed."""
+    spans = []
+    for b in beats[1:]:
+        p = (b.get("boundary") or {}).get("prob")
+        if p is not None and p < warn:
+            spans.append((int(b["word_start"]), int(b["word_start"]) + 1))
+    return spans

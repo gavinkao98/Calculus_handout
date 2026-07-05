@@ -203,6 +203,53 @@ def test_run_gates_warn_only_interior_low_prob_run():
     assert any("low-prob" in w.lower() for w in v["warnings"])
 
 
+def test_qa_diff_info_when_fa_region_healthy():
+    plan_tokens = "the quantity x plus one half h times sine".split()
+    asr_tokens = "the quantity x plus sine".split()   # ASR dropped a cluster (>=3)
+    # FA says that region is high-probability and no gate flagged it -> ASR artifact, INFO
+    fa_probs = [0.9] * len(plan_tokens)
+    res = SA.qa_diff(plan_tokens, asr_tokens, fa_probs, weak_spans=[])
+    assert res["verdict"] == "info"
+    assert res["clusters"]
+
+
+def test_qa_diff_fail_on_deletion_over_fa_weakness():
+    plan_tokens = "alpha beta gamma delta epsilon zeta".split()
+    asr_tokens = "alpha zeta".split()                  # dropped 4-token cluster [1,5)
+    fa_probs = [0.9, 0.1, 0.1, 0.1, 0.1, 0.9]          # FA weak exactly there
+    res = SA.qa_diff(plan_tokens, asr_tokens, fa_probs, weak_spans=[])
+    assert res["verdict"] == "fail"                    # local FA weakness inside the cluster
+
+
+def test_qa_diff_insertion_uses_neighborhood_window():
+    # ASR INSERTED tokens -> opcode span is empty on the plan side (i1==i2). Co-location
+    # must look at a WINDOW around the insertion point, not the empty slice fa_probs[i1:i2].
+    plan_tokens = "alpha beta gamma delta".split()
+    asr_tokens = "alpha beta XXX YYY ZZZ gamma delta".split()   # 3-token insertion after "beta"
+    fa_probs = [0.9, 0.1, 0.1, 0.9]                    # FA weak around the insertion point (idx ~2)
+    res = SA.qa_diff(plan_tokens, asr_tokens, fa_probs, weak_spans=[], window=2)
+    assert res["verdict"] == "fail"
+
+
+def test_qa_diff_gate_weakness_must_be_colocated_not_global():
+    # A weak span FAR from the diff cluster must NOT make the cluster fail (design §6:
+    # "同區" = same region, local; the earlier draft's bool(gate_failures) was global).
+    plan_tokens = "alpha beta gamma delta epsilon zeta eta theta".split()
+    asr_tokens = "alpha beta gamma eta theta".split()            # drop 3-token cluster [3,6)
+    fa_probs = [0.9] * len(plan_tokens)                          # FA healthy everywhere
+    far = SA.qa_diff(plan_tokens, asr_tokens, fa_probs, weak_spans=[(0, 1)])   # weak span at token 0
+    assert far["verdict"] == "info"                             # not co-located -> not fail
+    near = SA.qa_diff(plan_tokens, asr_tokens, fa_probs, weak_spans=[(4, 5)])  # weak span in cluster
+    assert near["verdict"] == "fail"
+
+
+def test_qa_diff_ignores_small_clusters():
+    plan_tokens = "alpha beta gamma".split()
+    asr_tokens = "alpha gamma".split()                 # single-token drop (<3)
+    res = SA.qa_diff(plan_tokens, asr_tokens, [0.9, 0.9, 0.9], weak_spans=[])
+    assert res["verdict"] == "clean"
+
+
 if __name__ == "__main__":
     test_tokenize_matches_word_re()
     test_build_scene_plan_token_ranges_and_transcript()
@@ -220,4 +267,9 @@ if __name__ == "__main__":
     test_run_gates_fail_low_boundary_probability()
     test_run_gates_fail_large_interior_gap()
     test_run_gates_warn_only_interior_low_prob_run()
-    print("OK scene_align self-test (Tasks 1-4)")
+    test_qa_diff_info_when_fa_region_healthy()
+    test_qa_diff_fail_on_deletion_over_fa_weakness()
+    test_qa_diff_insertion_uses_neighborhood_window()
+    test_qa_diff_gate_weakness_must_be_colocated_not_global()
+    test_qa_diff_ignores_small_clusters()
+    print("OK scene_align self-test (Tasks 1-5)")
