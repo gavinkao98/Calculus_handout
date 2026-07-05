@@ -13,8 +13,10 @@ voice, not to drive a timed render.
     python video/pipeline/mimo_preview.py --spoken video/content_scripts/ch01_inverse_functions_narration_spoken.md --dry-run
     # one billed/real call (first unit) to confirm the API shape:
     python video/pipeline/mimo_preview.py --spoken ...spoken.md --smoke
-    # full preview (needs env MIMO_API_KEY):
-    python video/pipeline/mimo_preview.py --spoken ...spoken.md --voice Dean
+    # full preview (needs env MIMO_API_KEY; defaults to built-in voice Dean):
+    python video/pipeline/mimo_preview.py --spoken ...spoken.md
+    # audition a different built-in voice:
+    python video/pipeline/mimo_preview.py --spoken ...spoken.md --voice Mia
 """
 from __future__ import annotations
 
@@ -34,9 +36,10 @@ from pipeline.audio import concat_wavs, silence_pcm, wav_duration, write_pcm_wav
 from pipeline.tts import (  # noqa: E402
     MIMO_MODEL,
     MIMO_STYLE,
-    MIMO_VOICE,
     MimoTTSBackend,
     TTSRequest,
+    default_voice_for_model,
+    load_dotenv,
     safe_stem,
 )
 
@@ -83,10 +86,12 @@ def parse_spoken(path: Path) -> list[dict[str, str]]:
 
 
 def parse_args() -> argparse.Namespace:
+    load_dotenv()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--spoken", required=True, type=Path,
                         help="path to a *_narration_spoken.md (Version B)")
-    parser.add_argument("--voice", default=MIMO_VOICE, help="MiMo preset voice")
+    parser.add_argument("--voice", default=os.environ.get("MIMO_TTS_VOICE"),
+                        help="MiMo preset voice, or logical label for voice design")
     parser.add_argument("--model", default=MIMO_MODEL)
     parser.add_argument("--style", default=MIMO_STYLE)
     parser.add_argument("--base-url", default=os.environ.get("MIMO_BASE_URL", "https://api.xiaomimimo.com/v1"))
@@ -116,9 +121,10 @@ def main() -> int:
                or (_bootstrap.REPO_ROOT / "video" / "output" / "audio" / f"{deck}_mimo_preview")).resolve()
     unit_dir = out_dir / "units"
 
+    voice = args.voice or default_voice_for_model()
     total_words = sum(len(u["text"].split()) for u in units)
     print(f"[mimo] {deck}: {len(units)} unit(s), ~{total_words} words, "
-          f"voice={args.voice}, model={args.model}", flush=True)
+          f"voice={voice}, model={args.model}", flush=True)
 
     if args.dry_run:
         for u in units:
@@ -149,7 +155,7 @@ def main() -> int:
         else:
             print(f"[mimo] {unit['id']} ({unit['label']}) ...", flush=True)
             result = backend.synthesize(
-                TTSRequest(text=unit["text"], model=args.model, voice=args.voice, style=args.style)
+                TTSRequest(text=unit["text"], model=args.model, voice=voice, style=args.style)
             )
             write_pcm_wav(wav_path, result.pcm, sample_rate=result.sample_rate,
                           channels=result.channels, sample_width=result.sample_width)

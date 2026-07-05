@@ -36,19 +36,13 @@ from pipeline.timing import text_hash  # noqa: E402
 # MiMo platform (Xiaomi): OpenAI-compatible /chat/completions, same as the vision
 # critic (see pipeline/critic.py). MiMo-V2.5-TTS does NOT read LaTeX -- callers
 # must pass spoken-form text (the *_narration_spoken.md / *_mimo.yml versions).
-# This is the project's sole TTS route (Gemini retired 2026-06-16).
+# This is the project's sole TTS route (Gemini retired 2026-06-16; the MiMo
+# voice-design model + the "Calm Professor" persona retired 2026-07-05 -- the route
+# is now built-in voice "Dean" only, selected via audio.voice, no style/persona prompt).
 MIMO_BASE_URL = "https://api.xiaomimimo.com/v1"
-MIMO_BUILTIN_MODEL = "mimo-v2.5-tts"
-MIMO_VOICE_DESIGN_MODEL = "mimo-v2.5-tts-voicedesign"
-MIMO_MODEL = MIMO_VOICE_DESIGN_MODEL
-MIMO_BUILTIN_VOICE = "Mia"
-MIMO_VOICE = "Calm Professor"
-MIMO_STYLE = (
-    "A mature American university professor in his early 50s, clear baritone "
-    "voice, calm and authoritative without sounding stiff. Warm but precise, "
-    "measured medium pace, careful articulation of mathematical expressions, "
-    "with short natural pauses at clause boundaries."
-)
+MIMO_MODEL = "mimo-v2.5-tts"   # built-in voice model (sole model)
+MIMO_VOICE = "Dean"            # default built-in voice
+MIMO_STYLE = ""                # no persona/style prompt on the built-in route
 
 
 # design §10 batch-1 rollout allowlist for --unit auto. Recalibrate/extend to
@@ -64,17 +58,9 @@ def resolve_unit(unit: str, scene: dict[str, Any]) -> str:
     return "scene" if scene.get("template") in SCENE_UNIT_TEMPLATES else "beat"
 
 
-def is_voice_design_model(model: str) -> bool:
-    return model == MIMO_VOICE_DESIGN_MODEL or model.endswith("-voicedesign")
-
-
-def default_voice_for_model(model: str, meta: dict[str, Any] | None = None) -> str:
-    if is_voice_design_model(model):
-        return MIMO_VOICE
-    voice = (meta or {}).get("voice")
-    if voice and voice != MIMO_VOICE:
-        return voice
-    return MIMO_BUILTIN_VOICE
+def default_voice_for_model(meta: dict[str, Any] | None = None) -> str:
+    """Built-in voice: the storyboard's meta.voice if set, else the default (Dean)."""
+    return (meta or {}).get("voice") or MIMO_VOICE
 
 
 def load_dotenv() -> None:
@@ -148,8 +134,7 @@ class MimoTTSBackend:
     Mirrors the auth + retry shape pipeline/critic.py already uses for the MiMo
     vision model: custom ``api-key`` header (Bearer also sent, harmless if
     ignored), stdlib ``urllib`` so no extra deps. Text to speak goes in the
-    ``assistant`` message; the style/voice-design instruction goes in the
-    ``user`` message.
+    ``assistant`` message; the built-in voice is selected via ``audio.voice``.
     Unlike Gemini, MiMo does NOT read LaTeX -- callers must pass spoken-form text.
     """
 
@@ -172,11 +157,7 @@ class MimoTTSBackend:
         if request.style:
             messages.append({"role": "user", "content": request.style})
         messages.append({"role": "assistant", "content": request.text})
-        audio: dict[str, Any] = {"format": "wav"}
-        if is_voice_design_model(request.model):
-            audio["optimize_text_preview"] = False
-        else:
-            audio["voice"] = request.voice or MIMO_BUILTIN_VOICE
+        audio: dict[str, Any] = {"format": "wav", "voice": request.voice or MIMO_VOICE}
         body = json.dumps(
             {
                 "model": request.model,
@@ -528,7 +509,7 @@ def _synthesize_scene_beats(
     args: argparse.Namespace,
     reuse_index: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    voice = args.voice or default_voice_for_model(args.model, meta)
+    voice = args.voice or default_voice_for_model(meta)
     scene_id = scene["id"]
     entry: dict[str, Any] = {
         "scene_number": scene_number,
@@ -682,7 +663,7 @@ def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, 
     scene_wav = scenes_dir / f"{scene_number:02d}_{scene_id}.wav"
     words_file = align_dir / f"{scene_number:02d}_{scene_id}.words.json"
     aligned_file = align_dir / f"{scene_number:02d}_{scene_id}.aligned.json"
-    voice = args.voice or default_voice_for_model(args.model, meta)
+    voice = args.voice or default_voice_for_model(meta)
 
     def _ok(entry):
         return entry["validation"]["status"] in ("pass", "pass_with_warnings")
@@ -720,7 +701,7 @@ def _synthesize_scene_aligned(*, backend, meta, scene, scene_number, output_dir,
     gates pass, so a prior good WAV is never clobbered by a bad re-synth."""
     from pipeline import scene_align as SA
     from pipeline import scene_fallback as FB
-    voice = args.voice or default_voice_for_model(args.model, meta)
+    voice = args.voice or default_voice_for_model(meta)
     scene_id = scene["id"]
     plan = SA.build_scene_plan(scene)
     scenes_dir, align_dir = output_dir / "scenes", output_dir / "align"
@@ -771,7 +752,7 @@ def main() -> int:
         or (sec_dir / default_audio_subdir)
     ).resolve()
     manifest_path = (args.manifest or (output_dir / "manifest.json")).resolve()
-    voice = args.voice or default_voice_for_model(args.model, meta)
+    voice = args.voice or default_voice_for_model(meta)
     prior_manifest = load_prior_manifest(manifest_path) if args.reuse_existing else None
     reuse_index = build_reuse_index(prior_manifest)                 # per-beat (beat path)
     scene_reuse_index = build_scene_reuse_index(prior_manifest)     # per-scene (scene path)

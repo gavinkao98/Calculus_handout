@@ -50,6 +50,7 @@ video/
   storyboards/         Stage 2 工程稿（進版控）
     _demo_*.yml        模板示範／回歸樣本（asymptote／derivation／graph_compare／sign_chart／…）
     <deck>.yml         逐節正式 storyboard（依方法論產生）
+  experiments/         實驗線（不碰成熟產線；forced_alignment_dean 測整段音訊＋alignment）
   pipeline/assets/brand/  NTU logo 向量源（icon／lockup ×3 色；進版控）
   output/              ★ render 成品（gitignored，可重生），按 ch<NN>/s<X.Y>/ 歸類
     ch01/s1.1/         一節成品——mp4、audio/、critic/frames/、review/packets/
@@ -84,7 +85,7 @@ video/
 **目前檢查點（2026-06-16）：產線工具鏈穩定；第一章舊練習產物已全數廢棄，將從講義逐節重跑。**
 逐節進度與跨對話狀態以 [REBUILD_STATUS.md](REBUILD_STATUS.md) 為準（本檔不重複）。
 
-- **TTS 收斂為 MiMo/Mia 單一路線**（Gemini/Charon 已退場 2026-06-16）。
+- **TTS 收斂為 MiMo builtin voice `Dean` 單一路線**（Gemini/Charon 已退場 2026-06-16；2026-07-05 拍板走 `mimo-v2.5-tts` builtin voice `Dean`，voice-design 模型與「Calm Professor」persona 同日退役）。
 - **舊 `ch01_*` 內容稿／工程稿／旁白／hooks／per-deck 稽核報告與整個 `output/` 已刪除**——當時純為累積方法論經驗的練習；正式版從 HTML 講義 [`chapter1-print-standalone.html`](../handout/chapter1-print-standalone.html) 逐節重跑。
 - 引擎完整：`make.py` orchestrator、**三道 render 前閘（schema → lint → sizecheck）**、模板 catalog、`hook:` 機制、MiMo TTS、`timing.py` 同步守衛、五份判斷閘 SSOT rubric（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering）。
 - 音訊驅動對齊（每 beat 影片長度＝該 beat 音檔長度）為產線核心；mock 路徑（`make.py --backend mock`）離線、不計費，供版面／時序迭代。`video/output/` 是 gitignored。
@@ -160,7 +161,7 @@ manifest 為每 reveal beat 記一個 WAV、每內容場景記一個串接旁白
 
 ## MiMo 旁白／影片路線（口語雙版 · single-source · 2026-06-14）
 
-MiMo（小米 `mimo-v2.5-tts`，公測免費、OpenAI 相容、與 `critic.py` 共用 `MIMO_API_KEY`）是**唯一**
+MiMo（小米 `mimo-v2.5-tts` builtin voice `Dean`，公測免費、OpenAI 相容、與 `critic.py` 共用 `MIMO_API_KEY`）是**唯一**
 真旁白路線，但它**不讀 inline LaTeX**，需要「數學攤成口語」的旁白。此路線從**單一源**
 `content_scripts/<deck>.spoken.yml`（口語＋`{show}` 標記）派生兩件產物，杜絕手抄 drift。
 （內容稿正典 narration 仍內嵌 LaTeX，供閱讀版與 storyboard `say`；口語攤平只發生在本路線。）
@@ -173,12 +174,13 @@ python video\pipeline\derive_spoken.py --deck <deck>
 
 # 合成 beat 級真 MiMo 音訊（邊緣靜音自動裁）＋ render（reuse 真 manifest、不碰計費 gate）。
 $env:MIMO_API_KEY = "<key>"   # 或放 .env；批次合成前依 CLAUDE.md 報用量、徵同意
-python video\pipeline\tts.py  --storyboard video\storyboards\<deck>_mimo.yml --backend mimo --voice Mia
+python video\pipeline\tts.py  --storyboard video\storyboards\<deck>_mimo.yml --backend mimo
 python video\make.py          --storyboard video\storyboards\<deck>_mimo.yml --reuse-audio --quality high
 # → output/<deck>_mimo.mp4
 ```
 
-- `tts.py --backend mimo`：OpenAI 相容 `/chat/completions`，待唸文字放 `assistant`、風格放 `user`；預設 `MIMO_VOICE=Mia`、`MIMO_STYLE`＝YouTube 科普風（正常語速）；`MimoTTSBackend` 預設裁 beat 頭尾靜音（留 0.08s）。新 manifest 會記錄每 beat 的 `raw_audio_seconds`、`trimmed_audio_seconds`、`trimmed_silence_seconds`，方便追查 MiMo padding/裁切。
+- `tts.py --backend mimo`：OpenAI 相容 `/chat/completions`，待唸文字放 `assistant`；預設 `MIMO_MODEL=mimo-v2.5-tts`（builtin 模型）、`MIMO_VOICE=Dean`（經 `audio.voice` 選定）、`MIMO_STYLE`＝空（builtin 路線不送 persona/style prompt）。**2026-07-05 起 voice-design 模型與「Calm Professor」persona 已退役，唯一路線＝builtin voice Dean。** `MimoTTSBackend` 預設裁 beat 頭尾靜音（留 0.08s）。新 manifest 會記錄每 beat 的 `raw_audio_seconds`、`trimmed_audio_seconds`、`trimmed_silence_seconds`，方便追查 MiMo padding/裁切。
+- 要試聽別的 builtin voice 時手動指定，例如 `python video\pipeline\mimo_preview.py --spoken <..._narration_spoken.md> --voice Mia`。
 - `make.py --reuse-audio`：跳過 mock synth、直接讀 `tts.py` 的真 manifest render。非 reuse 但偵測到真 manifest 會**拒絕用 mock 覆蓋**；reuse 時也會 fail fast 檢查 deck id、scene、beat count、`{show}` target、`text_hash`、WAV 存在與 WAV 時長，避免 storyboard 改了卻沿用舊 take。
 - 同步 guard：`make.py` render 前會警告短 beat / reveal-only beat（例如連續 `{show a} {show b}` 造成 0.45s 靜音 beat，但 reveal 動畫本身較長）；render 後會用 ffprobe 檢查每個 content scene 的 video 長度是否足以容納 `lead + narration`，並提示 video 與 `lead + audio + tail` 的偏差。
 - 同步常數集中在 `pipeline/timing.py`：`SCENE_LEAD_SECONDS` 同時供 `scene.py`、`make.py`、`critic.py` 使用，避免 compose offset / critic 抽幀時間與實際場景 lead 漂移。
@@ -306,6 +308,7 @@ python video\pipeline\review_pack.py --storyboard video\storyboards\<deck>.yml
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools\setup.ps1   # 建 .venv＋裝 requirements.lock＋自動跑 doctor
 winget install --id Gyan.FFmpeg -e                          # 真 ffmpeg＋ffprobe 進 PATH（取代舊 shim）
+python -m pip install --upgrade whisper-timestamped          # 選用：forced-alignment 實驗線，本機 word timestamps
 python tools\doctor.py                                       # 確認全綠
 ```
 
@@ -318,9 +321,16 @@ python tools\doctor.py                                       # 確認全綠
 > 註：舊作法是把 `imageio-ffmpeg` 內附 binary 複製成 `.venv\ffmpeg_shim\ffmpeg.exe` 充當 `ffmpeg`，
 > 但它**不含 `ffprobe`**，compose 仍會卡。改裝 Gyan.FFmpeg 全套（含 ffprobe）後 shim 退役。`.venv` 不進版控。
 
-MiMo TTS（唯一旁白路線）透過 `--voice`（預設 `Mia`）使用平台預設語音；key 走
-env `MIMO_API_KEY`（公測免費，仍屬外部 API，依 CLAUDE.md 批次前徵同意）。TTS CLI
-亦有 `--backend mock`，不需網路／API 金鑰，適合驗 manifest 與改模板時的快速無聲預覽。
+MiMo TTS（唯一旁白路線）預設使用 `mimo-v2.5-tts` 的 builtin voice `Dean`
+（voice-design/Calm Professor 已於 2026-07-05 退役）；key 走 env `MIMO_API_KEY` 或 repo-local `.env`（公測免費，仍屬外部 API，依
+CLAUDE.md 批次前徵同意）。TTS CLI 亦有 `--backend mock`，不需網路／API 金鑰，適合驗
+manifest 與改模板時的快速無聲預覽。
+
+forced-alignment 實驗線在 `experiments/forced_alignment_dean/`。目前用全局安裝的
+`whisper_timestamped` CLI / Python package（`whisper-timestamped 1.15.9`、
+`openai-whisper 20250625`）替整段 Dean 音訊產生 word timestamps，再由
+`map_alignment_to_beats.py` 映回 storyboard beats。第一次跑 `base.en` 會下載約
+139 MB Whisper model cache；此線不影響正式 MiMo beat 成片流程。
 
 Render 註記：
 

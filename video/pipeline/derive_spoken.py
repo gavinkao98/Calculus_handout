@@ -4,7 +4,7 @@
 (math read aloud, with {show} markers). From it + the canonical storyboard this
 generates, deterministically:
 
-  - storyboards/<deck>_mimo.yml                  MiMo storyboard (say := spoken, meta._mimo, voice Mia)
+  - storyboards/<deck>_mimo.yml                  MiMo storyboard (say := spoken, meta._mimo, voice Dean)
   - content_scripts/<deck>_narration_spoken.md   the human reading view ({show} stripped)
 
 and `--check` validates parity against the canonical storyboard so the two
@@ -51,21 +51,13 @@ MD_CONFIG_AND_CONVENTIONS = """## 一、MiMo 合成設定（現用）
 
 | 項目 | 值 |
 |------|----|
-| `model` | `mimo-v2.5-tts` |
-| `audio.voice` | `Mia`（英文女聲）／備選 Dean·Milo·Chloe |
+| `model` | `mimo-v2.5-tts`（builtin voice 模型；唯一模型） |
+| `voice` | `Dean`（builtin；經 `audio.voice` 選定） |
 | `audio.format` | `wav`（24kHz/mono/PCM16，與產線 `write_pcm_wav` 相容；beat WAV 自動裁頭尾靜音） |
 
-**全域風格指令（放每次呼叫的 `user` 訊息）— YouTube 科普風、正常語速：**
+**風格提示：** 無——builtin Dean 路線**不送 persona/style prompt**（2026-07-05 起，voice-design 模型與「Calm Professor」persona 已退役）。節奏靠口語稿標點與句構。
 
-```
-Read like the narrator of a polished YouTube science explainer: clear, engaging,
-and conversational, at a normal talking pace — natural momentum, not slow or drawn
-out, and no long dramatic pauses, just ordinary pauses at sentence ends. Warm and
-lightly energetic, curious rather than solemn, like explaining an idea to a smart
-friend. Pronounce every mathematical expression clearly and correctly.
-```
-
-**Audio tag：** 維持預設**不啟用**（口語稿純文字，節奏靠風格指令＋標點）。
+**Audio tag：** 維持預設**不啟用**（口語稿純文字）。
 
 ## 二、數學念法慣例（全節通用；NFA 裁定）
 
@@ -115,7 +107,7 @@ def check(canon: dict, spoken: dict) -> list[str]:
 
 def gen_mimo(canon: dict, spoken: dict, deck: str) -> dict:
     canon["meta"]["id"] = f"{deck}_mimo"
-    canon["meta"]["voice"] = "Mia"
+    canon["meta"]["voice"] = "Dean"
     for scene in canon["scenes"]:
         if scene["id"] in spoken:
             scene["say"] = spoken[scene["id"]]

@@ -52,8 +52,8 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   寫乾淨的 REPORT-<deck>-narration-faithfulness.md。NFA 裁決寫進該次修正 commit 的 message body（CLAUDE.md，`git log --grep="NFA"`）。
 
 步驟 4 —（須先徵得使用者同意：MiMo 雖免費仍屬外部 API）合成＋render：
-- 確認 .env 有 MIMO_API_KEY。預設走 `mimo-v2.5-tts-voicedesign` 的 `Calm Professor`
-  prompt（中速、穩重美式教授聲線，`optimize_text_preview=false`，不讓平台改稿）。先 smoke
+- 確認 .env 有 MIMO_API_KEY。預設走 `mimo-v2.5-tts` 的 builtin voice `Dean`（經 `audio.voice` 選定、
+  不送 style/persona prompt；voice-design/Calm Professor 已於 2026-07-05 退役）。先 smoke
   （mimo_preview.py --smoke）確認回應形狀，報用量、徵同意後：
   python video/pipeline/tts.py  --storyboard video/storyboards/<deck>_mimo.yml --backend mimo
   python video/make.py          --storyboard video/storyboards/<deck>_mimo.yml --reuse-audio --quality high
