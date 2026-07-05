@@ -142,13 +142,14 @@ def _clamp_shrink(mob, max_w, cur_size_px):
     return mob
 
 
-def eyebrow(label: str, ground: str, *, role: str = "secondary") -> Tex:
+def eyebrow(label: str, ground: str, *, role: str = "secondary", size="eyebrow") -> Tex:
     """Mono uppercase tag, e.g. '[ DEFINITION ]' -- IBM Plex Mono via Tex ``\\texttt{}``.
     (Route A: was Pango Courier New.) No microtype ``\\textls`` tracking: it triggers a
     missing-Metafont makemf error on Plex Mono, and the mono advance already reads as a
-    tracked tag."""
+    tracked tag.
+    *size* is a scale token or raw px -- "tag" for the result-reason / pager tier."""
     return Tex(r"\texttt{" + _tex_text(label.upper()) + "}",
-               font_size=_text_fs("eyebrow"), color=T.color(ground, role))
+               font_size=_text_fs(size), color=T.color(ground, role))
 
 
 def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",

@@ -68,6 +68,7 @@ _SCALE_PX = {
     "prose": 42, "prose_sm": 35,
     "math": 48, "math_sm": 40,
     "caption": 30, "eyebrow": 26, "numeral": 104, "ghost_numeral": 520,
+    "tag": 30,   # mono nav/emphasis tag: derivation result-reason + part pager (was eyebrow=26 == floor; A/B may settle 32)
     # back-compat aliases (old Direction-B names -> nearest Direction-D size)
     "display": 112, "body": 42, "step": 42, "label": 30,
     "intro_headline": 92, "intro_subtitle": 35, "outro_headline": 78,

@@ -43,6 +43,7 @@ from ._common import (scene_head, example_head, motif_corner, place_body, body_z
 
 _ROW_GAP = 0.40       # between rows (min pitch; expands for tall rows)
 MIN_PITCH = _ROW_GAP  # tightest inter-row gap -- sizecheck's split-capacity trigger reads this
+_REASON_PX = T._SCALE_PX["prose_sm"]   # 一般 reason 的 authored px（A/B 開放值：35 或 38）
 
 
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
@@ -113,7 +114,7 @@ def _reason_mob(row: dict, ground: str):
     if not reason:
         return None
     if row["kind"] == "result":
-        return brand.eyebrow(str(reason), ground, role="amber_ink")
+        return brand.eyebrow(str(reason), ground, role="amber_ink", size="tag")
     # role="text" (ink_2), not "muted" (ink_3): the rail carries the reasoning the old
     # two-column walkthrough spent a whole column on -- it is teaching content, so it
     # must be readable. The smaller size + the dotted leader keep it subordinate to the
@@ -121,7 +122,7 @@ def _reason_mob(row: dict, ground: str):
     # Plain text and $math$-bearing reasons both render upright via prose() (Plex text +
     # Latin Modern math), so a math-bearing reason never looks different from a plain one
     # in the same rail (2026-06-21 A2 finding).
-    return brand.prose(str(reason), ground, role="text", size="prose_sm")
+    return brand.prose(str(reason), ground, role="text", size=_REASON_PX)
 
 
 def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
@@ -177,12 +178,12 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     heights: list[float] = []
     for r, eq, reason in zip(rows, eqs, reasons):
         if reason is not None and reason.width > reason_max_w > 0:
-            # NOTE (SP2): a `result`-kind reason renders as an eyebrow (26px == MIN_FONT_FLOOR), but
-            # we pass prose_sm (35) here for all reasons. Inert today (reason_max_w is too wide for a
-            # 26px mono eyebrow to overflow). The eyebrow is NOT _brand_prose, so the sizecheck floor
-            # check would not catch a sub-floor result reason either -- the clamp is the sole floor
-            # guard there. If a long result reason ever clamps, dispatch px by row kind.
-            brand._clamp_shrink(reason, reason_max_w, T._SCALE_PX['prose_sm'])
+            # px dispatched by row kind, SAME SOURCE as the authored sizes above: a result
+            # reason is an eyebrow at "tag", everything else at _REASON_PX -- keeps the clamp
+            # floor equal to the authored px (closes the SP2 note; and an A/B re-tune of
+            # _REASON_PX can never drift away from this guard).
+            floor_px = T._SCALE_PX["tag"] if r["kind"] == "result" else _REASON_PX
+            brand._clamp_shrink(reason, reason_max_w, floor_px)
         heights.append(max(eq.height, reason.height if reason is not None else 0.0))
 
     # spread rows so a short chain fills the body zone rather than stranding a dead band

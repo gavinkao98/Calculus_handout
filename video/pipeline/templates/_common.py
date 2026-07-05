@@ -279,7 +279,7 @@ def scene_head(spec: dict[str, Any], ctx: dict[str, Any], *, label: str) -> list
     # table) can paginate: the author repeats the title on each page and sets `part`.
     part = spec.get("part")
     if part:
-        pind = brand.eyebrow(_part_text(part), ground, role=role)
+        pind = brand.eyebrow(_part_text(part), ground, role=role, size="tag")
         pind.move_to([SPINE_X + CONTENT_W - pind.width / 2, top - pind.height / 2, 0])
         blocks.append(Block("part", pind, anim="fade", static=True, layer="decoration"))
 
@@ -375,7 +375,7 @@ def example_head(spec: dict[str, Any], ctx: dict[str, Any]) -> tuple[list[Block]
     if part:
         # part indicator reads in the scene's accent (was muted ink_3 -- too faint to
         # notice top-right); same hue family as the eyebrow, clearly visible.
-        pind = brand.eyebrow(_part_text(part), ground, role=role)
+        pind = brand.eyebrow(_part_text(part), ground, role=role, size="tag")
         right = SPINE_X + CONTENT_W
         pind.move_to([right - pind.width / 2, MASTHEAD_TOP - pind.height / 2, 0])
         blocks.append(Block("part", pind, anim="fade", static=True, layer="decoration"))
