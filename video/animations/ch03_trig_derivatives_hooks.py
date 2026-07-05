@@ -139,10 +139,21 @@ def sector_inequality(spec, ctx, blocks):
     lth = MathTex(r"\theta", color=text, font_size=T.fs("label")).move_to(
         O + 0.55 * np.array([np.cos(th / 2), np.sin(th / 2), 0.0]))
 
-    for m in (radius_OC, chord_OA, dots, lO, lA, lB, lC, arc_th, lth):
+    # dimension labels on the source construction so a paused viewer can see WHY
+    # each area is 1/2 sin, 1/2 theta, 1/2 tan: shared base = 1, the inner height
+    # sin(theta) (dropped from B to OA), the outer height tan(theta) (segment AC).
+    mid_OA = (O + A) / 2.0
+    l_base = MathTex("1", color=text, font_size=T.fs("label")).next_to(mid_OA, DOWN, buff=0.14)
+    footB = np.array([B[0], O[1], 0.0])
+    drop_sin = DashedLine(B, footB, color=mut, stroke_width=1.6, dash_length=0.06)
+    l_sin = MathTex(r"\sin\theta", color=text, font_size=T.fs("label")).next_to(drop_sin, LEFT, buff=0.05)
+    l_tan = MathTex(r"\tan\theta", color=text, font_size=T.fs("label")).next_to((A + C) / 2.0, RIGHT, buff=0.10)
+    dim = (l_base, drop_sin, l_sin, l_tan)
+
+    for m in (radius_OC, chord_OA, dots, lO, lA, lB, lC, arc_th, lth, *dim):
         m.set_z_index(5)
     scaffold = VGroup(quarter, xaxis, yaxis, tangent, radius_OC, chord_OA,
-                      dots, lO, lA, lB, lC, arc_th, lth)
+                      dots, lO, lA, lB, lC, arc_th, lth, *dim)
 
     src_inner = _tri(O, B_off, blue, 0.45, 2)
     src_sector = _sec(O, 0.30, 1)
@@ -216,11 +227,39 @@ def slope_equals_height(spec, ctx, blocks):
 
     amber = T.color(ground, "accent")
     green = T.color(ground, "success")
+    mut = T.color(ground, "muted")
 
-    marks = [(0.0, 1.0, "1"), (np.pi / 2, 0.0, "0"), (np.pi, -1.0, "-1")]  # (x0, cos x0, label)
+    # (x0, cos x0, full-identity label) -- the label reads the identity, not a
+    # bare number, so it does not collide in meaning with the sin curve's own
+    # "0" tick at the origin (two unrelated "0"s next to each other read as a
+    # mistake to a paused viewer).
+    marks = [(0.0, 1.0, r"\cos 0 = 1"), (np.pi / 2, 0.0, r"\cos\tfrac{\pi}{2} = 0"),
+             (np.pi, -1.0, r"\cos\pi = -1")]
+
+    # x-axis teaching ticks at the three named angles the narration reads, so a
+    # paused viewer can tell which x each slope/height belongs to (house style: a
+    # few labelled ticks, not a full number line). No tick glyph at x=0 -- it would
+    # sit on the y-axis; the "0" label alone anchors the origin.
+    xticks = VGroup()
+    for xv, xlab, draw_tick in [(0.0, "0", False), (np.pi / 2, r"\tfrac{\pi}{2}", True), (np.pi, r"\pi", True)]:
+        p = axes.c2p(xv, 0.0)
+        if draw_tick:
+            xticks.add(Line(p + 0.09 * UP, p + 0.09 * DOWN, color=mut, stroke_width=2.0))
+        xticks.add(MathTex(xlab, color=mut, font_size=T.fs("label")).next_to(p, DOWN, buff=0.20))
+
+    # Screen length, not data-space half-width, is held fixed across the three
+    # tangents: at this axes' aspect ratio a slope-0 segment of the old fixed
+    # data-width d=0.62 rendered visibly SHORTER on screen than the +-1 diagonal
+    # ones. Solve d per-slope so the drawn segment is the same length in scene
+    # units for all three, matching the "three equal tangents" reading the
+    # figure wants.
+    TARGET_LEN = 3.0
+    x_scale = axes.x_axis.get_unit_size()
+    y_scale = axes.y_axis.get_unit_size()
 
     def tangent(x0, slope):
-        d = 0.62
+        dir_len = np.hypot(x_scale, slope * y_scale)
+        d = TARGET_LEN / (2.0 * dir_len)
         p1 = axes.c2p(x0 - d, np.sin(x0) - d * slope)
         p2 = axes.c2p(x0 + d, np.sin(x0) + d * slope)
         seg = Line(p1, p2, color=green, stroke_width=5.0)
@@ -234,14 +273,35 @@ def slope_equals_height(spec, ctx, blocks):
     tan_halfpi = tangent(np.pi / 2, 0.0)
     tan_pi = tangent(np.pi, -1.0)
 
+    # Dashed connector ties each tangent point on sin (x0, sin x0) straight down
+    # (same x0) to its read-off dot on cos (x0, cos x0) -- "slope here = height
+    # there" made literal. Drawn together with cos_dots so it appears at the
+    # exact beat the narration reads the matching heights, not before.
+    DOT_R = 0.07
     cos_dots = VGroup()
     for x0, h, lab in marks:
-        dot = Dot(axes.c2p(x0, h), radius=0.07, color=amber)
+        sin_pt = axes.c2p(x0, np.sin(x0))
+        cos_pt = axes.c2p(x0, h)
+        # trim both ends past the dot radius (and off the curve point) so the
+        # dash pattern doesn't terminate a partial dash inside the dot itself.
+        gap = DOT_R + 0.03
+        v = cos_pt - sin_pt
+        v_hat = v / np.linalg.norm(v)
+        connector = DashedLine(sin_pt + gap * v_hat, cos_pt - gap * v_hat,
+                               color=mut, stroke_width=1.6, dash_length=0.07)
+        dot = Dot(cos_pt, radius=DOT_R, color=amber)
         ml = brand.math_line(lab, ground, role="accent", size="label")
-        ml.next_to(dot, UP if h >= 0 else DOWN, buff=0.14)
-        cos_dots.add(VGroup(dot, ml))
+        if x0 == 0.0:
+            # this dot sits ON the y-axis; a centred label above it would have
+            # the axis line run straight through the text, so offset sideways
+            # (up and clear to the right) instead of stacking straight up.
+            ml.next_to(dot, UP + RIGHT, buff=0.12)
+        else:
+            ml.next_to(dot, UP if h >= 0 else DOWN, buff=0.14)
+        cos_dots.add(VGroup(connector, dot, ml))
 
     out = list(blocks)
+    out.append(Block("xticks", xticks, static=True, layer="graph"))
     out.append(Block("tan_0", tan_0, anim=_draw, static=False, layer="graph"))
     out.append(Block("tan_halfpi", tan_halfpi, anim=_draw, static=False, layer="graph"))
     out.append(Block("tan_pi", tan_pi, anim=_draw, static=False, layer="graph"))
@@ -266,13 +326,13 @@ def shm_stacked_graphs(spec, ctx, blocks):
     green = T.color(ground, "success")
     mut = T.color(ground, "muted")
 
-    rows = [(np.sin, amber, r"s=\sin t"),
-            (np.cos, blue, r"s'=\cos t"),
-            (lambda t: -np.sin(t), green, r"s''=-\sin t")]
+    rows = [(np.sin, amber, r"s=\sin t", r"\text{Height}"),
+            (np.cos, blue, r"s'=\cos t", r"\text{Velocity}"),
+            (lambda t: -np.sin(t), green, r"s''=-\sin t", r"\text{Acceleration}")]
 
     groups = []
     axes_list = []
-    for i, (func, color, label_tex) in enumerate(rows):
+    for i, (func, color, label_tex, word_tex) in enumerate(rows):
         ax = Axes(x_range=[0, 2 * PI, PI / 2], y_range=[-1.2, 1.2, 1],
                   x_length=6.0, y_length=1.0, tips=False,
                   axis_config={"color": mut, "stroke_width": 1.4, "include_ticks": False})
@@ -280,7 +340,11 @@ def shm_stacked_graphs(spec, ctx, blocks):
         # move axes AND curve together (the curve is not a child of the axes, so
         # moving the axes alone leaves the curve behind on the origin band).
         plot_grp = VGroup(ax, curve).move_to([0.6, (1 - i) * 1.55, 0.0])
-        lab = brand.math_line(label_tex, ground, role="text", size="label")
+        # left label = physical name (Height/Velocity/Acceleration) over the formula,
+        # so the row reads as physics, not just symbols.
+        word = brand.math_line(word_tex, ground, role="text", size="label")
+        formula = brand.math_line(label_tex, ground, role="text", size="label")
+        lab = VGroup(word, formula).arrange(DOWN, buff=0.10, aligned_edge=RIGHT)
         lab.next_to(ax, LEFT, buff=0.3)
         groups.append(VGroup(lab, plot_grp))
         axes_list.append(ax)
