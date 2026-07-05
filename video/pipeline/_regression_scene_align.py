@@ -13,14 +13,6 @@ import json
 import sys
 from pathlib import Path
 
-# Drop THIS script's own dir (video/pipeline/, auto-prepended by Python) from
-# sys.path: it holds pipeline/coverage.py, whose bare name would shadow the
-# 'coverage' package that numba (pulled in by stable-ts -> whisper at align time)
-# optionally `import coverage`s -- the shadow lacks `.types` and crashes the aligner.
-# We only need video/ so `from pipeline import ...` resolves. (Qualified
-# `from pipeline import coverage` elsewhere is unaffected.)
-_HERE = str(Path(__file__).resolve().parent)
-sys.path[:] = [p for p in sys.path if p not in ("", _HERE)]
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import scene_align as SA  # noqa: E402
 from pipeline.audio import wav_duration  # noqa: E402

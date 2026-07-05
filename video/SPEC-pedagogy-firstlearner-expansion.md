@@ -82,16 +82,16 @@ screen_contract:
 
 | code | 型別 | blocking 條件 | 邊界 |
 |---|---|---|---|
-| **SC1** 步驟覆蓋 | **確定性**（`coverage.py`） | 某 `.md` 單元的**須顯示** `required_steps` id（＝除「有 `depends_on` 且無 `recap_required`」的純回指步驟外）未被「所有 `ref:` 該單元的場景之 `covers:` 聯集」蓋到 → 漏步驟 | 見 §8：非 PD1（PD1＝一 beat 多動作）、非 OF1（OF1＝超出源；SC1＝源的子集） |
-| **SC2** cash-in recap | **確定性**（`coverage.py`） | 帶 `depends_on`＋`recap_required: true` 的回指步驟（在別場推出）未被**本單元場景**在地覆蓋 → cash-in 缺在地 recap（SC1 的回指子集，另給訊息以利辨識） | 只在 `depends_on`+`recap_required` 標註時觸發；閘不推斷跨場依賴 |
+| **SC1** 步驟覆蓋 | **確定性**（`step_coverage.py`） | 某 `.md` 單元的**須顯示** `required_steps` id（＝除「有 `depends_on` 且無 `recap_required`」的純回指步驟外）未被「所有 `ref:` 該單元的場景之 `covers:` 聯集」蓋到 → 漏步驟 | 見 §8：非 PD1（PD1＝一 beat 多動作）、非 OF1（OF1＝超出源；SC1＝源的子集） |
+| **SC2** cash-in recap | **確定性**（`step_coverage.py`） | 帶 `depends_on`＋`recap_required: true` 的回指步驟（在別場推出）未被**本單元場景**在地覆蓋 → cash-in 缺在地 recap（SC1 的回指子集，另給訊息以利辨識） | 只在 `depends_on`+`recap_required` 標註時觸發；閘不推斷跨場依賴 |
 | **SC-adv** 疑似過度合併 | **gate-1 agent 判斷（advisory）** | 不 blocking：拿 `required_steps`／`covers` 對 **handout** 承重步驟比，疑似「併過頭、少了承重動作，初學者恐失去脈絡」→ 建議加 `required_step` | 最終校準是作者的；與 `L1`（`.md` 內容忠實）不同切片：SC-adv 問「screen contract 對初學者夠不夠」，非「`.md` 忠不忠於講義」 |
 | **SC-honesty** 覆蓋誠實性 | **gate-1 agent 判斷（evidence-based；opt-in 前必跑，Codex R2）** | 某場 `covers:` 宣告某 id、但其上畫面 payload 語義上**沒有**該步驟 → blocking。**每條 finding 必 cite 確切可見欄位／reveal target（`statement`／`proof.0`／`proof.1`／`qed`…），非泛稱。** 防 `covers:` 變橡皮圖章 | 不重算數學正確（`L5`）；**這是把「convention 當 contract」補實的關鍵——`coverage_enforce` sign-off 前 SC-honesty 不可略過** |
 
-- **確定性 vs 判斷分工（沿用框架）：** SC1/SC2 由新模組 [`pipeline/coverage.py`](pipeline/coverage.py) 確定性計算；gate-1 agent **只浮現**它們、並自有 SC-adv/SC-honesty 判斷層。
+- **確定性 vs 判斷分工（沿用框架）：** SC1/SC2 由新模組 [`pipeline/step_coverage.py`](pipeline/step_coverage.py) 確定性計算；gate-1 agent **只浮現**它們、並自有 SC-adv/SC-honesty 判斷層。
 - **warn-default／opt-in：** SC1/SC2 預設 `warn`；per-deck `meta.coverage_enforce: true` 才翻 `error`（比照 `otf_enforce`/`pedagogy_enforce`）。落地零行為改變（無 `screen_contract` 的單元＝no-op）。**但非永遠 no-op（Codex R2/R3）：** `coverage_enforce: true` 時，該 deck 範圍內的 proof/derivation 單元**須有 `screen_contract`**——帶 `required_steps`（受檢）**或** `coverage_exempt: true`（顯式豁免）；**兩者皆無即 `error`**（強迫作者顯式決定，否則 opt-in 形同虛設）。
 - **生命週期：** 同 OF——`md:` 契約在 deck `CONTENT_APPROVED=yes` 才 gating；DRAFT 期 dry-run。
 
-### 4.3 確定性演算法（`coverage.py`，unit 級）
+### 4.3 確定性演算法（`step_coverage.py`，unit 級）
 對每個帶 `screen_contract` 的 `.md` 單元 `U`：
 1. 收集所有 `ref: md:U` 的 storyboard 場景（`covers:` 只列本場 `ref` 單元的 id，故按**場級 `ref`** 分組即可；跨單元依賴走 `depends_on`、不進 `covers`），取其 `covers:` 聯集 `C`。
 2. **判「須顯示」集：** `required_steps` 中，除「有 `depends_on` 且無 `recap_required`」的純回指步驟（指向別場的引用、不強制在地重畫）外，其餘皆須在地顯示。
@@ -131,7 +131,7 @@ screen_contract:
 
 ## 7 · 確定性層與 schema/lint 增訂
 
-- **新模組 [`pipeline/coverage.py`](pipeline/coverage.py)：** `coverage_issues(data, md_contracts, enforce) -> [(sev,msg)]`（SC1/SC2）。純 stdlib、無模型。
+- **新模組 [`pipeline/step_coverage.py`](pipeline/step_coverage.py)：** `coverage_issues(data, md_contracts, enforce) -> [(sev,msg)]`（SC1/SC2）。純 stdlib、無模型。
 - **`.md` parser 擴充（成本比初稿大，Codex R2；已驗證）：** `.md` 用的是**刻意的行解析器**（非 YAML——freeform `source:` 值會讓嚴格 YAML 出錯），且**有鏡像解析器** [`narration_review.py`](pipeline/narration_review.py)（`:15` 明載「Keep in sync」，獨立重實作、同樣 `_commit()` 壓平、`screen_contract` 不在 `_FIELD_KEYS`）。故 `screen_contract` 的結構化解析（fenced 區塊 → `yaml.safe_load`，**不走 `_commit()` 壓平**）**必須**：抽成**共用解析模組**，或**同步改兩個解析器並各自加 test**；且**不得破壞既有 freeform 欄位（尤其 `source:`）**。其餘欄位行為不變。
 - **`schema.py` 接線：** 載入各單元 `screen_contract`（經 `Loci`/review_pack）、跑 `coverage_issues`，以 `[coverage]` 標頭印出；`meta.coverage_enforce` 才計入 exit code。零 opt-in deck 行為不變。
 - **storyboard schema：** 允許場級 `covers: [str]`（sibling，選用）；`.md` 單元允許 `screen_contract`，內含 `required_steps[]`（`id`/`tex`/`reason?`/`depends_on?`/`recap_required?`）**或** `coverage_exempt: true`（單元級顯式豁免旗標——`coverage_enforce` 下「缺 contract」的唯一合法出口，Codex R3）。
@@ -160,14 +160,14 @@ screen_contract:
 ## 9 · 變更落點清單（給 writing-plans）
 
 **新增：**
-- [`pipeline/coverage.py`](pipeline/coverage.py)（SC1/SC2 確定性 + self-test）。
+- [`pipeline/step_coverage.py`](pipeline/step_coverage.py)（SC1/SC2 確定性 + self-test）。
 - `video-amplification-audit` gate-1 subagent 定義 + `content_scripts/_audit/AMPLIFICATION-RUBRIC.md`（AMP1）。
 - storyboard fixture：覆蓋 covered/missing/merged/recap 案例。
 
 **修改：**
 - [`review_pack.py`](pipeline/review_pack.py)：`screen_contract` 結構化解析（不壓平）。
 - `schema.py`：接 `coverage_issues`、`meta.coverage_enforce` opt-in。
-- [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md)：新增 SC 家族（SC1/SC2 確定性、SC-adv/SC-honesty gate-1）+ §10 邊界列 + **VERDICT 計數約定（Codex R2，明確不混入 PD/OF）**：首行擴為 `VERDICT: <P> PD, <O> OF, <S> SC, <A> advisory`；`<S>` **只計 gate-1 自有的 SC-honesty blocking**；SC1/SC2 為確定性層（`schema.py`→`coverage.py`，`coverage_enforce` gating），以 `[Surface SC1-det|SC2-det]` 前綴列出、**不計入 VERDICT 整數**（同 OF2／PD2-4 待遇）；SC-adv 計入 advisory。
+- [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md)：新增 SC 家族（SC1/SC2 確定性、SC-adv/SC-honesty gate-1）+ §10 邊界列 + **VERDICT 計數約定（Codex R2，明確不混入 PD/OF）**：首行擴為 `VERDICT: <P> PD, <O> OF, <S> SC, <A> advisory`；`<S>` **只計 gate-1 自有的 SC-honesty blocking**；SC1/SC2 為確定性層（`schema.py`→`step_coverage.py`，`coverage_enforce` gating），以 `[Surface SC1-det|SC2-det]` 前綴列出、**不計入 VERDICT 整數**（同 OF2／PD2-4 待遇）；SC-adv 計入 advisory。
 - pedagogy-firstlearner-audit agent 定義：加載 `screen_contract`、surface SC1/SC2、擁有 SC-adv/SC-honesty。
 - [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md)：`screen_contract` authoring 規則、`covers:` 慣例、合併/不掉原則、correctness-caution→假設。
 - [`DESIGN.md`](DESIGN.md)：`covers:` 承載、authoring checklist。
@@ -187,7 +187,7 @@ screen_contract:
 
 ## 11 · 成功標準 / 驗證
 
-- SC：`coverage.py` self-test 綠；對未落 contract 的 deck **零行為改變**；對 `derivative_of_sine` 落 contract 後，砍掉 `def` 的 `covers` → SC1 紅、補回 → 綠。
+- SC：`step_coverage.py` self-test 綠；對未落 contract 的 deck **零行為改變**；對 `derivative_of_sine` 落 contract 後，砍掉 `def` 的 `covers` → SC1 紅、補回 → 綠。
 - AMP：對 §3.1 產出可讀 `missing`/`*-only`/`screened` 清單，假陽性可接受。
 - 六鏡/OTF/PD 回歸無新 blocking；`tools/doctor.py` 不受影響。
 - **收斂＝** SC blocking == 0（opt-in 後）；AMP 提議由使用者逐條裁決、不強制歸零。

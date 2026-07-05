@@ -197,7 +197,7 @@ def main(argv: "list[str] | None" = None) -> int:
             errors = errors + [m for s, m in ped if s == "error"]
 
     # SC step-coverage (warn-default; gates only when meta.coverage_enforce is True)
-    from pipeline import coverage as _cov
+    from pipeline import step_coverage as _cov
     from pipeline import review_pack as _rp
     cov_enforce = bool(meta.get("coverage_enforce"))
     deck_md = repo_root / "video" / "content_scripts" / f"{meta.get('id', '')}.md"

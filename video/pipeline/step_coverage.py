@@ -1,4 +1,4 @@
-"""coverage.py -- SC deterministic layer (spec §4): SC1 (a declared must-show
+"""step_coverage.py -- SC deterministic layer (spec §4): SC1 (a declared must-show
 step not covered on screen) + SC2 (a recap_required back-ref not locally
 covered) + orphan covers ids + missing-contract-under-enforce. Pure stdlib.
 warn-default; severity flips to 'error' under meta.coverage_enforce.

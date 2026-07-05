@@ -1,4 +1,4 @@
-"""Stdlib assert self-test for _screen_contract.py + coverage.py.
+"""Stdlib assert self-test for _screen_contract.py + step_coverage.py.
 Run: C:/Users/user/Desktop/Calculus_handout/.venv/Scripts/python.exe video/pipeline/_selftest_coverage.py"""
 import sys
 from pathlib import Path
@@ -50,7 +50,7 @@ def test_parser_wiring():
 
 
 def test_sc1_and_orphan():
-    from pipeline import coverage
+    from pipeline import step_coverage as coverage
     contract = SC.parse_block([
         "  required_steps:",
         "    - id: def",
@@ -75,7 +75,7 @@ def test_sc1_and_orphan():
 
 
 def test_sc2_and_missing_contract():
-    from pipeline import coverage
+    from pipeline import step_coverage as coverage
     # a recap_required back-ref, uncovered -> SC2 ONLY (not double-reported as SC1)
     contract = SC.parse_block([
         "  required_steps:",
@@ -111,7 +111,7 @@ def test_schema_integration():
 
 
 def test_non_dict_storyboard():
-    from pipeline import coverage
+    from pipeline import step_coverage as coverage
     # A malformed deck (yaml top-level null / scalar / list) must NOT crash the
     # coverage block -- schema_storyboard already reports the schema error; coverage
     # stays quiet (returns []/{}) rather than AttributeError or SC-spam. (Codex R4.)
