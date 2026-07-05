@@ -53,12 +53,24 @@ def _has_split_warn(issues) -> bool:
     return any("fit on one page" in m for _sev, m in issues)
 
 
+# G3 sparse advisory (single-block fill < SPARSE_FILL_MIN) -- separate matcher from the
+# split warn: EXPECT keys assert "fit on one page", these assert "single-block fill".
+SPARSE_EXPECT = {
+    "callout_sparse": True,
+    "callout_sparse_ok": False,   # sparse_ok: true acks the advisory -> silent
+}
+
+
+def _has_sparse_warn(issues) -> bool:
+    return any("single-block fill" in m for _sev, m in issues)
+
+
 def main() -> int:
     data = yaml.safe_load(_FIXTURE.read_text(encoding="utf-8"))
     meta = data["meta"]
     by_id = {s["id"]: s for s in data["scenes"]}
 
-    missing = [sid for sid in EXPECT if sid not in by_id]
+    missing = [sid for sid in list(EXPECT) + list(SPARSE_EXPECT) if sid not in by_id]
     if missing:
         print(f"[capacity] FIXTURE missing scene(s): {missing}", flush=True)
         return 1
@@ -74,11 +86,20 @@ def main() -> int:
         if not ok:
             failures += 1
 
+    for sid, expect_warn in SPARSE_EXPECT.items():
+        got_warn = _has_sparse_warn(check_scenes(meta, [by_id[sid]]))
+        ok = got_warn == expect_warn
+        mark = "ok  " if ok else "FAIL"
+        print(f"  [{mark}] {sid:<18} sparse expect={expect_warn} got={got_warn}", flush=True)
+        if not ok:
+            failures += 1
+
+    total = len(EXPECT) + len(SPARSE_EXPECT)
     if failures:
-        print(f"[capacity] {failures}/{len(EXPECT)} scene(s) mismatched the capacity "
+        print(f"[capacity] {failures}/{total} scene(s) mismatched the capacity "
               "contract -- a template's height model or pitch may have drifted.", flush=True)
         return 1
-    print(f"[capacity] all {len(EXPECT)} scenes match the capacity contract.", flush=True)
+    print(f"[capacity] all {total} scenes match the capacity contract.", flush=True)
     return 0
 
 

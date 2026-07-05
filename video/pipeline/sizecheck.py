@@ -438,6 +438,40 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     return []
 
 
+SPARSE_FILL_MIN = 0.35   # G3: single-block content below this fraction of the body zone -> advisory
+
+# G3 (2026-07-05): fill_gap needs n>=2 rows -- a SINGLE prose block (callout string body,
+# statement-only definition) has no inter-row gap to open, so a one-liner strands ~half the
+# zone (s3.1 frames 11/12/24). Advisory only; `sparse_ok: true` is the author's ack (read
+# HERE only -- render never reads it, so it is not a render-behaviour flag).
+def _sparse_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
+    from pipeline.visuals import theme as T   # sizecheck has no module-level T (helpers import locally)
+
+    if scene.get("sparse_ok"):
+        return []
+    tpl = scene.get("template")
+    if tpl == "callout" and isinstance(scene.get("body"), str):
+        target = "body"
+    elif tpl == "definition_math" and scene.get("statement") and not scene.get("math"):
+        target = "statement"
+    else:
+        return []
+    title = next((b.mobject for b in blocks if getattr(b, "id", "") == "title"), None)
+    mob = next((b.mobject for b in blocks if getattr(b, "id", "") == target), None)
+    if title is None or mob is None:
+        return []
+    zone_top = title.get_bottom()[1] - T.TITLE_GAP
+    zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
+    ratio = mob.height / max(zone_top - zone_bottom, 1e-6)
+    if ratio >= SPARSE_FILL_MIN:
+        return []
+    sid = scene.get("id", "?")
+    return [("warn",
+        f"{sid}: single-block fill {ratio:.0%} < {SPARSE_FILL_MIN:.0%} of body zone -- exits: "
+        f"(a) bullet the body (list form), (b) merge into a neighbour (scaffold.flag/aside), "
+        f"(c) `sparse_ok: true` to accept the calm whitespace")]
+
+
 def _effective_font_px(node) -> float:
     """The node's TRUE authored on-screen px, recovered from its manim font_size.
     text Tex renders at fs(px)*TEXT_SCALE; pure-math MathTex renders at fs(px)=px*PX_TO_FS.
@@ -525,6 +559,9 @@ def check_scenes(meta: dict, scenes: list[dict]) -> "list[tuple[str, str]]":
 
         # -- warn: content cannot fit one page even at tightest pitch -> split --
         issues += _capacity_issues(scene, blocks)
+
+        # -- warn: single content block strands most of the body zone -> sparse --
+        issues += _sparse_issues(scene, blocks)
 
         # -- error: stacked siblings at different sizes (shrunk not wrapped) --
         groups: dict[str, list[tuple[str, float]]] = {}
