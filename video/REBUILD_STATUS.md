@@ -4,6 +4,18 @@
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
 
+## ✅ 2026-07-05 容量契約 v2（G1–G6）落地＋回歸網收口（PLAN Phases 1–4 完成）
+
+承下「Step 0 落地」節，[`PLAN-step0-typepass-capacity-v2.md`](PLAN-step0-typepass-capacity-v2.md) 的 **Phases 1–4（Tasks 9–13）已執行完畢**（subagent-driven，逐 task failing 自測→實作→實作者外 reviewer 雙閘 全 APPROVED；phase 收尾 Codex read-only 覆核）。全為 **advisory（warn 不 error）**，離線零計費。結論頁 `output/_qa/REVIEW-capacityv2-applied.html`（gitignored）。
+
+- **六閘 commits：** G5 Playbook＋型階/語域/量測表＋rubric（`b43296`＋review-fix `e7f2c12`）｜G1 inline-register lint（`b36367a`）＋§3.1 4 處示範修（`e990325`）｜G4 card-widow lint（`d3f8494`）＋§3.1 1 處示範修（`c8ec453`）｜G3 sparse sizecheck＋`sparse_ok`＋fixtures（`6268cfa`）｜G6 muted-label fixture＋canary（`8dfa5b3`）。G2 承 Phase 0-a 的 `_carrier_label_role`。
+- **三 deck 命中（全 advisory，命中＝提示不擋 render）：** G1 §3.1 4 處（已示範修）＋ch01/ch03_chain 若干；G4 §3.1 continuity_statement（已修）＋短字支路若干；G3 §3.1 limit_not_identity/radians_essential＋ch01/ch03_chain 各一。§3.1 稀疏三景出口＝內容決策，列 Task 14 backlog。
+- **§3.1 示範修（visual-only、語意不動→NFA 不重開）：** 5 處 G1（textstyle/slash/→）＋1 處 G4（statement 前置 `$x_0$`）。**前幾輪未 commit 的 storyboard theorem-merge／MiMo 變更全程原封保留**——示範修用 `git stash push -- <storyboard>` 隔離自己 hunk、pop 後 63 行 foreign diff 逐字無損。
+- **回歸網（G6）：** muted-label fixture render 眼檢 G2 地板生效（暗曲線標籤升 ink_2、顯式 label_role 尊重、無過度校正）＋canary（破壞地板→`_selftest_graph_labels` 紅→還原綠）；全套自測 graph_labels 4／lint_registers 3／capacity_selftest 14 全綠。
+- **Codex v2 覆核（read-only，standing consent）：** 0 blocking；3 advisory＋1 nit 皆為 advisory 規則的邊界權衡（G4 `len<=4` 尾短字噪音、括號包裹 math widow 漏判、G3 definition_math+aside 理論偽陽、G3 definition_math 分支未覆蓋）——皆 plan 設計/verbatim、非 bug、非 blocking，記此供日後調參；本輪不動已核可規則。
+- **撰稿時抓到並修的 4 個 plan 文字 bug（TDD/review 攔截）：** DESIGN procedure pitch 值（1.25/0.95→實際 `procedure_steps.py` 的 0.2/0.35/1.4u）、recap.points[0] 建議仍含 `\lim_`（改箭頭形才真 G1-clean）、continuity「加 point」仍孤 `$x_0$`（改前置）、G4 widow threshold `<8` 使 7 字 fixture 永不觸發（→`<7`）。
+- **接續：** Task 14（§3.1 單景 VLM backlog＋G3 稀疏三景出口裁決）＝內容決策，可獨立排程／延後，交使用者定奪。
+
 ## ✅ 2026-07-05 Step 0（Layout & Type Pass）落地＋A/B sign-off「提案通過」＋Step 0-b 全回歸綠
 
 承下「計畫已出」節，[`PLAN-step0-typepass-capacity-v2.md`](PLAN-step0-typepass-capacity-v2.md) 的 **Phase 0-a（Tasks 1–8）已執行完畢**（subagent-driven，逐 task「failing 自測→實作→實作者外 reviewer 雙閘」；全程離線零計費）。分支 `video/template-redesign-navy-spine`，本地未 push。
