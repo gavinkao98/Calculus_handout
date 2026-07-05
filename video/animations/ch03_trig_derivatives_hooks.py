@@ -20,6 +20,8 @@ The four hooks (scene id -> Figure -> cue):
                                    (g_s, g_v, g_a, mirror)
   toward_the_chain_rule  end-of-section trio -> three chip cards, solved vs
                                    not-yet (math.0; Task 14 #6)
+  derivative_cycle       Remark 3.1 -> 4-node ring diagram, linear chain closed
+                                   into a cycle (math.0; Task 14 #3)
 """
 from __future__ import annotations
 
@@ -482,4 +484,120 @@ def toward_the_chain_rule(spec, ctx, blocks):
     trio.move_to(old_math.get_left(), aligned_edge=LEFT)
 
     ids["math.0"].mobject = trio
+    return blocks
+
+
+# ================================================================ hook 5
+# derivative_cycle (Remark 3.1) -- the old math.0 was a LINEAR chain,
+# $\sin x \to \cos x \to -\sin x \to -\cos x \to \sin x$, which visually
+# restates "and back to sin x" as a fifth node identical to the first (the
+# repetition IS the point -- "after 4 steps you are home" -- but a straight
+# line cannot show a closed loop, only imply one by repeating a label). A
+# 4-node ring closes the loop for real: one node per function, four short
+# clockwise arrows, the fourth looping back into the first -- so "four
+# derivatives and you are home" is a shape, not a repeated symbol. Reveal id
+# is unchanged (`math.0`), so the LOCKED narration + {show math.0} cue needs
+# no edit; only the block's mobject is swapped (same contract as hook 4).
+
+
+def derivative_cycle(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    old_math = ids["math.0"].mobject
+    statement = ids["statement"].mobject
+    math_1 = ids["math.1"].mobject
+
+    mut = T.color(ground, "muted")
+
+    # The old single LINE sat in a wide/short gap (statement above, math.1
+    # below), so the ring must be landscape (wide, short) rather than the
+    # tall diamond a "square" reading would suggest -- a diamond this tall
+    # collides with both neighbours. Four corners of a wide rectangle:
+    # sin (top-left) -> cos (top-right) -> -sin (bottom-right) -> -cos
+    # (bottom-left) -> back to sin (top-left), i.e. clockwise.
+    #
+    # Node panels use the smaller "label" size + tight padding (not math_sm):
+    # the gap this ring lives in is short enough that a math_sm-sized node is
+    # itself nearly as tall as the whole gap, leaving no room for the
+    # vertical connector arrows to have any visible length -- they collapsed
+    # to zero in an earlier pass. label-size keeps all four formulas legible
+    # while leaving an actual gap between the top and bottom row to draw
+    # into.
+    NODE_SIZE, NODE_PAD, NODE_PAD_X = "label", 0.14, 0.22
+
+    def _node(tex, role):
+        label = brand.math_line(tex, ground, role="primary", size=NODE_SIZE)
+        return brand.accent_panel(label, ground, bar_role=role, pad=NODE_PAD, pad_x=NODE_PAD_X)
+
+    node_specs = [
+        (r"\sin x", "TL", "success"),   # seed of the cycle
+        (r"\cos x", "TR", "secondary"),
+        (r"-\sin x", "BR", "accent"),
+        (r"-\cos x", "BL", "secondary"),
+    ]
+    nodes = [_node(tex, role) for tex, _, role in node_specs]
+    node_h = max(n.height for n in nodes)
+
+    HALF_W = 3.35
+    ARROW_GAP = 0.22                      # visible vertical-arrow length between rows
+    HALF_H = (node_h + ARROW_GAP) / 2
+    corners = {
+        "TL": np.array([-HALF_W, HALF_H, 0.0]),
+        "TR": np.array([HALF_W, HALF_H, 0.0]),
+        "BR": np.array([HALF_W, -HALF_H, 0.0]),
+        "BL": np.array([-HALF_W, -HALF_H, 0.0]),
+    }
+    for node, (_, corner, _) in zip(nodes, node_specs):
+        node.move_to(corners[corner])
+
+    # Straight arrows tracing the RECTANGLE'S PERIMETER (top edge L->R, right
+    # edge T->B, bottom edge R->L, left edge B->T) -- each pulled back off
+    # both nodes' facing edges so it never touches a panel. This reads as one
+    # unambiguous clockwise loop (unlike corner-to-corner diagonals, which
+    # cut through the centre and cross each other visually). The 4th arrow
+    # (left edge, bottom-left -> top-left) is the SAME straight-arrow style
+    # as the other three -- it closes the cycle instead of singling it out.
+    #
+    # get_edge_center(direction) reads each node's OWN bounding-box edge in
+    # the direction of travel -- unlike hand-computing "centre +/- half_size"
+    # (an earlier pass), it cannot overshoot past the midpoint and swap the
+    # two endpoints when the nodes sit close together (as the top/bottom rows
+    # here do), which is exactly the bug that flipped the vertical arrows'
+    # direction.
+    def _edge_arrow(a, b):
+        pa, pb = a.get_center(), b.get_center()
+        v_hat = (pb - pa) / np.linalg.norm(pb - pa)
+        gap = 0.10
+        start = a.get_edge_center(v_hat) + gap * v_hat
+        end = b.get_edge_center(-v_hat) - gap * v_hat
+        return Line(start, end, color=mut, stroke_width=3.0).add_tip(tip_length=0.18, tip_width=0.16)
+
+    pairs = [(0, 1), (1, 2), (2, 3), (3, 0)]
+    arrows = VGroup(*(_edge_arrow(nodes[i], nodes[j]) for i, j in pairs))
+
+    # one d/dx label on the top edge (sin -> cos) suffices to name what every
+    # arrow means without crowding all four edges with the same tag.
+    ddx = MathTex(r"\tfrac{d}{dx}", color=mut, font_size=T.fs("label"))
+    ddx.next_to(arrows[0], UP, buff=0.08)
+
+    ring = VGroup(arrows, *nodes, ddx)
+
+    # Hard clamp to whatever room actually exists between statement's bottom
+    # and math.1's top (measured on the REAL, already-built neighbours, not
+    # guessed): the node panels' font metrics make the ring's natural height
+    # a moving target, so shrink-to-fit is the robust guard against
+    # overlapping either neighbour, with a fixed margin breathing on both
+    # sides of the gap.
+    gap_top, gap_bottom = statement.get_bottom()[1], math_1.get_top()[1]
+    MARGIN = 0.16
+    available_h = (gap_top - gap_bottom) - 2 * MARGIN
+    if ring.height > available_h:
+        ring.scale_to_fit_height(available_h)
+
+    # Left-flush to the old line's left edge (== SPINE_X), matching the
+    # statement/math.1 above and below it; vertically centred in the gap.
+    ring.move_to(old_math.get_left(), aligned_edge=LEFT)
+    ring.set_y((gap_top + gap_bottom) / 2)
+
+    ids["math.0"].mobject = ring
     return blocks
