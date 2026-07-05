@@ -23,6 +23,17 @@
 - **執行順序（PLAN 內建）：** Step 0-a A/B 定字級（**使用者 sign-off 硬閘**：tag 30/32、刻度 40/35、reason 35/38、h1 78/68、authored graph 尺寸）→ Step 0-b 落地全回歸 → v2 文檔/lint/sizecheck/fixtures → §3.1 單景 backlog（VLM 迴圈）。容量預算只在定案尺寸上校一次。
 - **裁決稿（gitignored `output/_qa/`、可重生）：** `REVIEW-s31-scene-effect-analysis.html`／`PROPOSAL-universal-density-strategy.html`／`PROPOSAL-layout-type-pass.html`（各含 Codex findings 逐條 disposition 附錄）。
 
+## ✅ 2026-07-05 Calm Professor／voice-design 退役，旁白路線拍板 **builtin voice Dean**（全 §3.1 重合成 clean Dean）
+
+使用者裁決（2026-07-05）：**Calm Professor 路線確定退掉、以後走 Dean、把相關的都刪乾淨**，且**全 21 場重合成 clean Dean**（AskUserQuestion 定案：整條 voice-design code path 移除＋全 deck 重合成而非只補 11 場）。計費部分先報價徵同意（全 21 場 2504 字 ~16.7 分）。
+
+- **Code＋文檔（commit `refactor(video/tts): retire voice-design/Calm Professor…`）：** `tts.py` 移除 `MIMO_VOICE_DESIGN_MODEL`／`MIMO_BUILTIN_VOICE`(Mia)／`is_voice_design_model`／professor `MIMO_STYLE`；`MIMO_MODEL=mimo-v2.5-tts`(builtin)、`MIMO_VOICE=Dean`、`MIMO_STYLE=''`；`default_voice_for_model(meta)`→meta.voice or Dean；backend 恆送 `audio.voice`。`derive_spoken.py` 蓋 `meta.voice=Dean`＋MiMo-config 段改寫；`mimo_preview.py` 修簽名。`README`／`DESIGN`／`RUNBOOK` 活躍 config 描述改 Dean。**歷史稽核記錄（2026-07-02 節、REVIEW/REPORT/PLAN/DISCUSSION）保留不竄改。** 全 selftest 綠。
+- **重合成（clean Dean，`--unit scene --skip-qa --style ""`）：** 全 21 content 場 → **18 場 scene-level Dean FA 通過、3 場自動降級 beats**（`continuity_argument`／`derivative_of_cosine`／`shm_stacked_graphs`——FA＋resynth 都沒過就回退 beat-level Dean，ladder 正常）；2 場（`fundamental_limit`／`recap`）免費 small.en arbiter 過。manifest `voice=Dean style='' model=mimo-v2.5-tts` 全乾淨。
+- **CP 徹底清除＋canonical 換血：** 刪 `audio_mimo/`(CP 95M)＋舊 professor-style `audio_mimo_dean_scene/`(23M)＋`manifest.mia-beats.backup.json`＋過時成片（CP A-cut／professor-Dean B-cut／CP 全 deck mp4）＋過時幀；`audio_mimo_dean_v2/`→`audio_mimo/`（manifest 絕對路徑同步改寫、27 場全解析無斷檔）。**輸出區零 CP 殘留。**
+- **成片：** `make.py --reuse-audio --quality high` 全 27 場 render/compose 綠（`[sync] beat timing clean`）→ **`output/ch03/s3.1/ch03_trig_derivatives_mimo.mp4`（clean Dean、31.9MB、~16.2 分、1080p）**。真 4K final 另議。
+- **成本記帳：** 本輪真 MiMo billed ≈ 21 primary＋3 resynth＋3 降級場的 beats（~12）≈ 36 call（在報價信封 21＋每場 ≤2 fallback 內）。
+- **durable 教訓：** ① builtin voice 路線經 `audio.voice` 選定、**不送 style/persona prompt**（送了會被當 delivery 提示、污染「純 builtin」）。② 退某條 config 路線時分清「活躍 config（改）」vs「歷史稽核記錄（不竄改）」。③ CP→Dean 換 canonical 用「合成到新目錄→驗證→改路徑→刪舊→rename」的非破壞序，舊 CP 在新 deck 驗證前不動。
+
 ## ✅ 2026-07-05 scene-level TTS＋forced alignment **production 化 Phase A 落地**（scene_align 核心・消費端遷移・selftest／整合／真資料回歸全綠・全 deck mock 驗收）
 
 承前一節（設計拍板）。使用者「按照設計稿繼續動工」→ 依設計稿 `experiments/forced_alignment_dean/REVIEW-scene-tts-production-design.html` 出實作計畫 [`PLAN-scene-tts-forced-alignment.md`](PLAN-scene-tts-forced-alignment.md)、經**兩輪 Codex read-only 對抗式覆核**（8 BLOCKING＋4 ADVISORY，再 1 個 revision 自引入的 BLOCKING，dispositions 記在計畫末表）後執行。**全程離線零計費**（selftest／mock render／真資料回歸皆本機；Codex standing consent）。分支 `video/template-redesign-navy-spine`，本地未 push。
