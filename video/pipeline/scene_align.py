@@ -171,9 +171,14 @@ def map_to_beats(
     return out
 
 
-# 3-scene pilot (2026-07-05) initial thresholds -- RECALIBRATE after the first real
-# deck rollout (design §5, acceptance clause §10). Every gate value + its rationale
+# 3-scene pilot (2026-07-05) initial thresholds. Every gate value + its rationale
 # lives here so tuning is one edit.
+# RECALIBRATION 1 (2026-07-05, ch03 batch-1, 10 real Dean scenes): thresholds HELD --
+# zero false fails; every correctly-aligned beat-2..N boundary sat above 0.15, the
+# lowest being 0.176 (slope_equals_height) / 0.209 (shm_stacked_graphs), both in the
+# 0.15-0.35 WARN band. Kept as-is; the ~0.03 margin between the lowest real boundary
+# (0.176) and boundary_prob_fail (0.15) is thin -- if a future deck shows a correct
+# boundary at/under 0.15, lower boundary_prob_fail then.
 GATES = {
     "boundary_prob_fail": 0.15,   # observed normal boundary min 0.53 ("Look"); << this = untrustworthy
     "boundary_prob_warn": 0.35,   # 0.15-0.35 -> WARN
