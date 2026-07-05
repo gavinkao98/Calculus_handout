@@ -41,6 +41,7 @@ import yaml  # noqa: E402
 
 from pipeline.audio import concat_wavs, silence_pcm, wav_duration, write_pcm_wav  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
+from pipeline import house_audio  # noqa: E402
 from pipeline.timing import (  # noqa: E402
     SCENE_LEAD_SECONDS,
     SCENE_TAIL_SECONDS,
@@ -163,13 +164,62 @@ def synth(meta: dict, scenes: list[dict], scene_numbers: dict[str, int],
 def _beat_durations(manifest: dict) -> dict[str, list[float]]:
     out: dict[str, list[float]] = {}
     for s in manifest["scenes"]:
-        if s.get("narration_mode") == "beats":
+        if s.get("narration_mode") in ("beats", "scene_aligned"):
             out[s["scene_id"]] = [b["audio_seconds"] for b in s.get("beats", [])]
     return out
 
 
+def _check_manifest_schema(manifest: dict) -> None:
+    """Refuse a manifest newer than this make.py understands, rather than silently
+    misreading it. schema 1 (no field) and schema 2 are both supported."""
+    schema = int(manifest.get("schema", 1))
+    if schema > 2:
+        raise SystemExit(
+            f"audio manifest schema {schema} is newer than this make.py supports "
+            "(max 2); upgrade the pipeline."
+        )
+
+
 def _scene_manifest_map(manifest: dict) -> dict[str, dict]:
     return {s.get("scene_id", ""): s for s in manifest.get("scenes", [])}
+
+
+def _validate_scene_aligned(sid: str, scene: dict, beats: list, entry: dict, problems: list) -> None:
+    """Render-time freshness for a reused scene_aligned entry (design §3/§9 row 2):
+    scene WAV present + duration matches, alignment artifacts present, validation passed,
+    scene_text_hash + per-beat reveal/text_hash unchanged. NO per-beat audio_file
+    (scene_aligned stores one scene WAV). Deliberately does NOT check the aligner model:
+    make.py has no aligner config to compare against, and aligner freshness (§3 row 3) is
+    tts.py's job -- whatever model produced the persisted alignment (base.en normally,
+    small.en if the arbiter won) is fine to render."""
+    manifest_beats = entry.get("beats", [])
+    if len(manifest_beats) != len(beats):
+        problems.append(f"{sid}: beat count changed ({len(manifest_beats)} manifest, {len(beats)} storyboard)")
+        return
+    transcript = " ".join(b.text for b in beats if b.text).strip()
+    if entry.get("scene_text_hash") != text_hash(transcript):
+        problems.append(f"{sid}: scene_text_hash stale (storyboard text changed) -> resynthesize")
+    af = entry.get("audio_file"); ap = Path(af) if af else None
+    audio_seconds = float(entry.get("audio_seconds") or 0.0)
+    if ap is None or not ap.exists():
+        problems.append(f"{sid}: scene audio file missing: {af!r}")
+    elif abs(wav_duration(ap) - audio_seconds) > SYNC_TOLERANCE_SECONDS:
+        problems.append(f"{sid}: scene audio WAV duration differs from manifest")
+    if audio_seconds <= 0.0:
+        problems.append(f"{sid}: scene audio_seconds is not positive")
+    align = entry.get("alignment") or {}
+    for key in ("words_file", "aligned_file"):
+        p = align.get(key)
+        if not p or not Path(p).exists():
+            problems.append(f"{sid}: alignment {key} missing: {p!r}")
+    if (entry.get("validation") or {}).get("status") not in ("pass", "pass_with_warnings"):
+        problems.append(f"{sid}: validation.status={ (entry.get('validation') or {}).get('status')!r }")
+    for i, (b, mb) in enumerate(zip(beats, manifest_beats), start=1):
+        if mb.get("reveal") != b.reveal:
+            problems.append(f"{sid} beat {i:02d}: reveal changed (manifest={mb.get('reveal')!r}, storyboard={b.reveal!r})")
+        stored = mb.get("text_hash")
+        if stored and stored != text_hash(b.text):
+            problems.append(f"{sid} beat {i:02d}: text_hash changed")
 
 
 def _validate_reuse_manifest(meta: dict, scenes: list[dict], manifest: dict) -> None:
@@ -192,8 +242,12 @@ def _validate_reuse_manifest(meta: dict, scenes: list[dict], manifest: dict) -> 
         if entry is None:
             problems.append(f"{sid}: missing from audio manifest")
             continue
-        if entry.get("narration_mode") != "beats":
-            problems.append(f"{sid}: manifest narration_mode={entry.get('narration_mode')!r}, expected 'beats'")
+        mode = entry.get("narration_mode")
+        if mode not in ("beats", "scene_aligned"):
+            problems.append(f"{sid}: manifest narration_mode={mode!r}, expected 'beats' or 'scene_aligned'")
+            continue
+        if mode == "scene_aligned":
+            _validate_scene_aligned(sid, scene, beats, entry, problems)
             continue
 
         manifest_beats = entry.get("beats", [])
@@ -375,9 +429,16 @@ def _audit_render_sync(scenes: list[dict], manifest: dict, rendered: dict[str, P
         sid = scene["id"]
         entry = by_scene.get(sid)
         video = rendered.get(sid)
-        if not entry or entry.get("narration_mode") != "beats" or video is None:
+        if not entry or entry.get("narration_mode") not in ("beats", "scene_aligned") or video is None:
             continue
         audio_seconds = float(entry.get("audio_seconds") or 0.0)
+        if entry.get("narration_mode") == "scene_aligned":
+            # by construction sum(beat durations)==audio_seconds (mapper); a mismatch
+            # means a hand-edited manifest -> refuse rather than render out of sync.
+            beat_sum = sum(float(b.get("audio_seconds") or 0.0) for b in entry.get("beats", []))
+            if abs(beat_sum - audio_seconds) > SYNC_TOLERANCE_SECONDS:
+                fatals.append(f"{sid}: sum(beat durations)={beat_sum:.3f}s != audio_seconds="
+                              f"{audio_seconds:.3f}s (hand-edited manifest?)")
         actual = _probe_duration(video)
         audio_end = lead + audio_seconds
         expected = expected_content_video_seconds(audio_seconds, lead_seconds=lead)
@@ -462,6 +523,30 @@ def _mux_silent(video: Path, out: Path, abr: str, *, fade: float = 0.0) -> None:
     ])
 
 
+def _mux_cue(video: Path, cue: Path, out: Path, abr: str, *,
+             gain: float, fade_out: float, fade: float = 0.0) -> None:
+    """Lay a house cue (intro/outro bed or divider stinger) under a brand scene
+    that carries no narration. The cue is gained, faded out so it lands cleanly at
+    the scene's end (beds run longer than the intro scene, so they must fade rather
+    than clip), then padded with silence to the video length (apad + -shortest) --
+    the same full-length-audio discipline as _mux_silent/_mux_content, so the
+    concat demuxer keeps every segment in A/V sync. Cues are 48 kHz stereo (the
+    output format), so no resample is needed."""
+    vf = _fade_vf(video, fade)
+    vcodec = (["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p"]
+              if vf else ["-c:v", "copy"])
+    fade_out_start = max(_probe_duration(video) - fade_out, 0.0)
+    afilter = (f"[1:a]volume={gain:.3f},"
+               f"afade=t=out:st={fade_out_start:.3f}:d={fade_out:.3f},apad[a]")
+    _ffmpeg([
+        "ffmpeg", "-y", "-i", str(video), "-i", str(cue),
+        "-filter_complex", afilter,
+        "-map", "0:v:0", "-map", "[a]",
+        *vcodec, "-c:a", "aac", "-b:a", abr, "-ar", "48000", "-ac", "2",
+        "-shortest", str(out),
+    ])
+
+
 def _concat(segments: list[Path], out: Path, abr: str) -> None:
     list_file = out.parent / "_concat_av_list.txt"
     list_file.write_text(
@@ -483,10 +568,10 @@ def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None]
             fade: float = 0.0) -> Path | None:
     narration_by_scene: dict[str, Path] = {}
     for s in manifest["scenes"]:
-        if s.get("narration_mode") == "beats" and s.get("audio_file"):
+        if s.get("narration_mode") in ("beats", "scene_aligned") and s.get("audio_file"):
             narration_by_scene[s["scene_id"]] = Path(s["audio_file"])
 
-    av_dir = out_dir / "_av"
+    av_dir = out_dir / "_av" / _safe_stem(output.stem)
     av_dir.mkdir(parents=True, exist_ok=True)
     segments: list[Path] = []
     for scene in scenes:
@@ -497,10 +582,16 @@ def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None]
             return None
         av = av_dir / f"{sid}.mp4"
         narration = narration_by_scene.get(sid)
+        cue = house_audio.cue_for_scene(scene)
         if narration and narration.exists():
             print(f"[compose] {sid}: narration under video", flush=True)
             _mux_content(video, narration, av, lead, abr, fade=fade)
+        elif cue is not None and cue.path.exists():
+            print(f"[compose] {sid}: house cue {cue.path.name}", flush=True)
+            _mux_cue(video, cue.path, av, abr, gain=cue.gain, fade_out=cue.fade_out, fade=fade)
         else:
+            if cue is not None:
+                print(f"[compose] {sid}: house cue file missing ({cue.path}); silent", flush=True)
             print(f"[compose] {sid}: silent track", flush=True)
             _mux_silent(video, av, abr, fade=fade)
         segments.append(av)
@@ -644,6 +735,7 @@ def main() -> int:
             )
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         print(f"[synth] reusing existing audio manifest -> {manifest_path}", flush=True)
+        _check_manifest_schema(manifest)
         _validate_reuse_manifest(meta, scenes, manifest)
     else:
         # guard: don't silently overwrite real (billed) audio with mock silence.
@@ -676,7 +768,14 @@ def main() -> int:
 
     # compose
     sec_dir.mkdir(parents=True, exist_ok=True)
-    output = sec_dir / f"{meta['id']}.mp4"
+    if args.scene == "all":
+        output = sec_dir / f"{meta['id']}.mp4"
+    else:
+        output = sec_dir / f"{meta['id']}__{_safe_stem(args.scene)}.mp4"
+        print(
+            f"[compose] scene subset output -> {output} (full deck mp4 is untouched)",
+            flush=True,
+        )
     result = compose(scenes, manifest, rendered, out_dir,
                      lead=args.lead, abr=args.audio_bitrate, output=output,
                      fade=args.transition)
