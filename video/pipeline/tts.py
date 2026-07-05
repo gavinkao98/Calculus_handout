@@ -45,14 +45,19 @@ MIMO_VOICE = "Dean"            # default built-in voice
 MIMO_STYLE = ""                # no persona/style prompt on the built-in route
 
 
-# design §10 batch-1 rollout allowlist for --unit auto. Recalibrate/extend to
-# derivation+theorem_proof (batch 2) after the first real deck's gates are checked.
-SCENE_UNIT_TEMPLATES = frozenset({"definition_math", "graph", "callout", "recap_cards"})
+# design §10 rollout allowlist for --unit auto. batch-2 (2026-07-06) extends it to the full
+# content-template set. Evidence = the first real deck (ch03 §3.1, all 21 scenes forced
+# --unit scene): derivation 6/6 scene-aligned, theorem_proof 3/5 (the other 2 auto-demote to
+# beats via the fallback ladder -- safe, and already accepted as beat-level); the batch-1 four
+# (graph/definition_math/callout/recap_cards) shipped earlier. An over-broad allowlist is safe:
+# a scene whose FA fails still falls back to beats -- at most a billed attempt, never a broken deck.
+SCENE_UNIT_TEMPLATES = frozenset({"definition_math", "graph", "callout", "recap_cards",
+                                  "derivation", "theorem_proof"})
 
 
 def resolve_unit(unit: str, scene: dict[str, Any]) -> str:
-    """beat|scene forced; auto -> scene iff the scene's template is in the batch-1
-    allowlist, else beat (conservative default for unknown/heavy templates)."""
+    """beat|scene forced; auto -> scene iff the scene's template is in the rollout allowlist
+    (batch-2: all content templates), else beat (conservative default for unknown templates)."""
     if unit in ("beat", "scene"):
         return unit
     return "scene" if scene.get("template") in SCENE_UNIT_TEMPLATES else "beat"

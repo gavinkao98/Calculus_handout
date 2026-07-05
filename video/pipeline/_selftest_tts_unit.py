@@ -12,19 +12,21 @@ from pipeline import tts  # noqa: E402
 SCENE_ALLOWLIST = tts.SCENE_UNIT_TEMPLATES
 
 
-def test_unit_auto_allowlist_is_batch1():
-    # design §10 batch 1: four templates go scene; derivation/theorem_proof stay beats
-    assert {"definition_math", "graph", "callout", "recap_cards"} <= SCENE_ALLOWLIST
-    assert "derivation" not in SCENE_ALLOWLIST
-    assert "theorem_proof" not in SCENE_ALLOWLIST
+def test_unit_auto_allowlist_is_batch2():
+    # batch-2 (2026-07-06): the full content-template set goes scene under --unit auto
+    # (first real deck: derivation 6/6 + theorem_proof 3/5 scene-aligned; FA failures safe-demote)
+    assert {"definition_math", "graph", "callout", "recap_cards",
+            "derivation", "theorem_proof"} <= SCENE_ALLOWLIST
 
 
 def test_resolve_unit_for_scene():
     assert tts.resolve_unit("beat", {"template": "graph"}) == "beat"
-    assert tts.resolve_unit("scene", {"template": "derivation"}) == "scene"   # explicit override
+    assert tts.resolve_unit("scene", {"template": "derivation"}) == "scene"       # explicit override
     assert tts.resolve_unit("auto", {"template": "graph"}) == "scene"
-    assert tts.resolve_unit("auto", {"template": "derivation"}) == "beat"
-    assert tts.resolve_unit("auto", {}) == "beat"                             # unknown template -> conservative
+    assert tts.resolve_unit("auto", {"template": "derivation"}) == "scene"        # batch-2: now scene
+    assert tts.resolve_unit("auto", {"template": "theorem_proof"}) == "scene"     # batch-2: now scene
+    assert tts.resolve_unit("auto", {"template": "unknown_xyz"}) == "beat"        # unknown template -> beat
+    assert tts.resolve_unit("auto", {}) == "beat"                                 # no template -> beat
 
 
 def test_atomic_write_and_promote():
@@ -63,7 +65,7 @@ def test_scene_reuse_ok_freshness():
 
 
 if __name__ == "__main__":
-    test_unit_auto_allowlist_is_batch1()
+    test_unit_auto_allowlist_is_batch2()
     test_resolve_unit_for_scene()
     test_atomic_write_and_promote()
     test_scene_reuse_ok_freshness()
