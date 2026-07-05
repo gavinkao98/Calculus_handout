@@ -172,7 +172,7 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
     plan: list[dict] = []
     for sid in order:
         entry = by_id.get(sid)
-        if entry is None or entry.get("narration_mode") != "beats":
+        if entry is None or entry.get("narration_mode") not in ("beats", "scene_aligned"):
             continue  # intro/outro are silent brand templates -- skip for now
         beats = entry.get("beats", [])
         if not beats:
