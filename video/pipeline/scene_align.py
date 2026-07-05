@@ -122,3 +122,49 @@ def verify_plan_index(words: list[dict[str, Any]], plan: dict[str, Any]) -> None
                 "index-based beat mapping would be unsound"
             )
     raise AlignmentError(f"token count mismatch: aligned={len(got)} plan={len(plan_tokens)}")
+
+
+def _start_for_word(words: list[dict[str, Any]], index: int, audio_seconds: float) -> float:
+    """Onset of plan token `index`; 0.0 for index<=0; audio end when index runs past
+    the last word (last beat's end)."""
+    if not words or index <= 0:
+        return 0.0
+    if index < len(words):
+        return float(words[index]["start"])
+    return audio_seconds
+
+
+def map_to_beats(
+    plan: dict[str, Any],
+    words: list[dict[str, Any]],
+    audio_seconds: float,
+    *,
+    multi: dict[int, dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """Reveal boundary = beat's first-word onset; a beat runs to the next beat's
+    start, and the last beat runs to the audio end (inter-beat pause belongs to the
+    preceding beat -- design §14, matches the beat-level clock). Emits the shared
+    beats[] shape plus word_start/word_end and a boundary-quality record."""
+    multi = multi or {}
+    starts = [_start_for_word(words, int(b["word_start"]), audio_seconds) for b in plan["beats"]]
+    out: list[dict[str, Any]] = []
+    for i, beat in enumerate(plan["beats"]):
+        start = starts[i]
+        end = starts[i + 1] if i + 1 < len(starts) else audio_seconds
+        end = max(end, start)
+        wi = int(beat["word_start"])
+        # 0 <= wi (not 0 < wi): a spoken beat immediately after a leading/consecutive
+        # reveal-only beat legitimately has word_start==0 and IS a boundary beat that
+        # gate 3 must inspect. beats[0] also gets a prob here but run_gates skips it
+        # (iterates beats[1:]), so no false gate. wi==len(words) (trailing reveal-only)
+        # stays None.
+        prob = words[wi].get("probability") if 0 <= wi < len(words) else None
+        out.append({
+            "index": beat["index"], "id": beat["id"], "reveal": beat["reveal"],
+            "text": beat["text"], "text_hash": beat["text_hash"],
+            "word_start": beat["word_start"], "word_end": beat["word_end"],
+            "start_seconds": round(start, 3), "end_seconds": round(end, 3),
+            "audio_seconds": round(end - start, 3),
+            "boundary": {"prob": prob, "interpolated": wi in multi and multi[wi]["ordinal"] > 0},
+        })
+    return out

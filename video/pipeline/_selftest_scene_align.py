@@ -77,6 +77,54 @@ def test_verify_plan_index_raises_on_mismatch():
         raise AssertionError("expected AlignmentError on token mismatch")
 
 
+def test_map_to_beats_boundaries_and_shape():
+    # 3 beats over 6 tokens [0,2)[2,4)[4,6); words linear at 1s each, audio=6.0s
+    plan = SA.build_scene_plan({"id": "s", "say": "a b {show m.0} c d {show m.1} e f"})
+    words = [{"word": w, "start": float(i), "end": float(i) + 0.9, "probability": 0.8}
+             for i, w in enumerate(["a", "b", "c", "d", "e", "f"])]
+    beats = SA.map_to_beats(plan, words, audio_seconds=6.0)
+    # start = first-word onset of each beat; end = next beat start; last -> audio end
+    assert [b["start_seconds"] for b in beats] == [0.0, 2.0, 4.0]
+    assert [b["end_seconds"] for b in beats] == [2.0, 4.0, 6.0]
+    assert [b["audio_seconds"] for b in beats] == [2.0, 2.0, 2.0]
+    # beats[] shape shared with beats mode + word_start/word_end + boundary
+    b0 = beats[0]
+    assert set(b0) >= {"index", "id", "reveal", "text", "text_hash",
+                       "audio_seconds", "start_seconds", "end_seconds",
+                       "word_start", "word_end", "boundary"}
+    assert beats[1]["boundary"]["prob"] == 0.8            # boundary word's probability
+    assert beats[1]["boundary"]["interpolated"] is False  # not from a multi-token parent
+
+
+def test_map_to_beats_leading_reveal_only_then_spoken_boundary_has_prob():
+    # Consecutive {show} => a real leading reveal-only beat (word_start==word_end==0),
+    # then a spoken beat that ALSO starts at word_start==0. parse_say drops only the
+    # very first empty+no-reveal beat, so beat[0] here keeps reveal m.0 (0 words) and
+    # beat[1] is spoken from word 0. (A single leading {show} would be dropped, which
+    # is why the earlier draft's "{show m.0} hello world" tested the wrong thing.)
+    plan = SA.build_scene_plan({"id": "s", "say": "{show m.0} {show m.1} hello world"})
+    assert plan["beats"][0]["word_start"] == plan["beats"][0]["word_end"] == 0   # reveal-only
+    assert plan["beats"][1]["word_start"] == 0                                    # spoken from word 0
+    words = [{"word": "hello", "start": 0.3, "end": 0.8, "probability": 0.9},
+             {"word": "world", "start": 0.8, "end": 1.2, "probability": 0.9}]
+    beats = SA.map_to_beats(plan, words, audio_seconds=1.2)
+    assert beats[0]["start_seconds"] == 0.0
+    # beat[1] is a boundary beat starting at word 0 -> its boundary prob must be set
+    # (0 <= word_start), so run_gates gate 3 can inspect it. 0<word_start would drop it.
+    assert beats[1]["boundary"]["prob"] == 0.9
+
+
+def test_map_to_beats_interpolated_boundary_flagged():
+    # boundary token that came from a multi-token parent -> interpolated True
+    plan = SA.build_scene_plan({"id": "s", "say": "sum-to {show m.0} product now"})
+    # aligner emitted "sum-to-product" as ONE word; explode makes token 1 ("product") a boundary
+    aligned = [{"text": "sum-to-product", "start": 0.0, "end": 1.0, "probability": 0.7},
+               {"text": "now", "start": 1.0, "end": 1.4, "probability": 0.9}]
+    words, multi = SA.explode_to_plan_tokens(aligned)
+    beats = SA.map_to_beats(plan, words, audio_seconds=1.4, multi=multi)
+    assert beats[1]["boundary"]["interpolated"] is True
+
+
 if __name__ == "__main__":
     test_tokenize_matches_word_re()
     test_build_scene_plan_token_ranges_and_transcript()
@@ -84,4 +132,7 @@ if __name__ == "__main__":
     test_explode_splits_multitoken_words_by_char_share()
     test_explode_drops_punctuation_only_words()
     test_verify_plan_index_raises_on_mismatch()
-    print("OK scene_align self-test (Tasks 1-2)")
+    test_map_to_beats_boundaries_and_shape()
+    test_map_to_beats_leading_reveal_only_then_spoken_boundary_has_prob()
+    test_map_to_beats_interpolated_boundary_flagged()
+    print("OK scene_align self-test (Tasks 1-3)")
