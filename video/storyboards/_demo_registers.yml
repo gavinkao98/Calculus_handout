@@ -1,0 +1,35 @@
+# G1/G4 register-lint probes (demo fixture, underscore prefix = not a real section)
+meta:
+  id: demo_registers
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Register Lint Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Register Lint Demo" }
+
+scenes:
+  - id: bad_title
+    kind: content
+    template: definition_math
+    title: "The limit $\\lim_{x\\to0}\\frac{\\sin x}{x}$"
+    math: ["$\\frac{\\sin x}{x}$"]          # display 欄位用 \frac —— 必須不觸發
+    say: "probe. {show math.0}"
+  - id: bad_callout
+    kind: content
+    template: callout
+    type: caution
+    title: "A trap"
+    body: "At $\\theta=\\pi$ the ratio $\\frac{\\sin\\theta}{\\theta}$ is zero."
+    say: "probe."
+  - id: clean_scene
+    kind: content
+    template: callout
+    type: remark
+    title: "Fine"
+    body: "Here $\\sin\\theta/\\theta$ and $\\tfrac{d}{dx}\\sin x$ stay textstyle."
+    say: "probe."

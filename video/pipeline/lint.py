@@ -286,6 +286,58 @@ def _scene_role_issues(data: dict) -> "list[tuple[str, str]]":
     return issues
 
 
+_DISPLAY_IN_INLINE = re.compile(r"\\(?:d?frac(?![a-zA-Z])|lim_|sum_|int_)")
+
+# G1 (2026-07-05): inline registers must stay textstyle -- the preamble's
+# \everymath{\displaystyle} makes $\frac$ render display-height, so a stacked fraction
+# in a title/prose line bulges the line box (s3.1 frames 11/12/19/25). Display FIELDS
+# (statement/math/proof/formulas/scaffold.problem) keep \frac by contract -- not scanned.
+def _inline_register_strings(data):
+    out = []
+    for i, sc in enumerate(data.get("scenes", []) or []):
+        sid = sc.get("id", f"scene{i}")
+        def add(path, val):
+            if isinstance(val, str) and val.strip():
+                out.append((f"{sid}.{path}", val))
+        add("title", sc.get("title"))
+        add("prompt", sc.get("prompt"))
+        add("say", sc.get("say"))
+        body = sc.get("body")
+        if isinstance(body, str):
+            add("body", body)
+        elif isinstance(body, (list, tuple)):
+            for j, item in enumerate(body):
+                add(f"body[{j}]", item if isinstance(item, str) else None)
+        for j, item in enumerate(sc.get("points", []) or []):
+            add(f"points[{j}]", item if isinstance(item, str) else None)
+        sca = sc.get("scaffold") or {}
+        if isinstance(sca, dict):
+            add("scaffold.motive", sca.get("motive"))
+        for j, st in enumerate(sc.get("steps", []) or []):
+            if isinstance(st, dict):
+                add(f"steps[{j}].reason", st.get("reason"))
+        for key in ("result", "check"):
+            v = sc.get(key)
+            if isinstance(v, dict):
+                add(f"{key}.reason", v.get("reason"))
+        for j, ln in enumerate(sc.get("lines", []) or []):
+            if isinstance(ln, dict):
+                add(f"lines[{j}].reason", ln.get("reason"))
+    return out
+
+
+def _display_math_in_inline(data) -> "list[tuple[str, str]]":
+    issues = []
+    for path, s in _inline_register_strings(data):
+        for m in re.finditer(r"\$([^$]+)\$", s):
+            if _DISPLAY_IN_INLINE.search(m.group(1)):
+                issues.append(("warn",
+                    f"{path}: display-style math in an INLINE register ({_snippet(m.group(0))}) "
+                    f"-- use \\tfrac / slash form / inline lim (DESIGN.md display-style)"))
+                break
+    return issues
+
+
 def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
     """Return a list of (severity, message); severity is 'error' or 'warn'.
     'error' aborts the render (broken output); 'warn' is advisory (has rare
@@ -325,6 +377,7 @@ def lint_storyboard(data: dict) -> "list[tuple[str, str]]":
     issues += _quantitative_without_scale(data)
     issues += _example_missing_prompt(data)
     issues += _scene_role_issues(data)
+    issues += _display_math_in_inline(data)
     return issues
 
 
