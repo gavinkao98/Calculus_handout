@@ -314,7 +314,8 @@ gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第
 - `derivation`：理由 snap `RAIL_X`；dotted leader 改為**目錄式可變長 connector**
   （短式配長 leader，連接永遠成立）。無理由的純鏈仍置中（不變）。
 - `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
-- `recap_cards`：公式卡 snap `RAIL_X`（原魔術數字 1.15）。
+- `recap_cards`：**不用 rail**——改為單一全幅編號點欄（`points[]` 以 `01/02/03` ＋ 全寬 prose
+  左堆疊、`center_in_zone` 上偏置中）；舊「公式卡 snap `RAIL_X`」雙欄版已退場。
 - `theorem_proof`：左軸用 `SPINE_X`（proof 仍刻意 `+0.4` 縮排階層）。**statement 字卡採
   measure-driven regime（2026-07-05）**：塞得進 rail 舒適 measure（散文 ≤`RAIL_MAX_LINES`=3 行、
   或公式不寬於 rail 內寬）→ 右上 rail、**shrink-wrap、右緣貼 gutter**（短句更緊湊、退掉舊的滿-rail
