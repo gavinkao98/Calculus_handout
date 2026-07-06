@@ -1,0 +1,65 @@
+<!-- §C.4 Quadratic Forms and Definiteness.
+     Self-authored 2026-07-04 (authoring brief = CONTENT_SPEC §16.2/§16.3 + §3 register). Namespace "C",
+     continuing from sec-c-3: Definition C.3; Proposition C.3; Example C.4. No figures. This is the pure
+     linear algebra (2x2 definiteness test); the CALCULUS Hessian / second-derivative test is Ch14, built
+     on this. Last section of Appendix C.
+     Math verified: D=ac-b^2 test via completing the square; 2x^2+4xy+5y^2 = 2(x+y)^2+3y^2, D=10-4=6>0 pos def;
+     with c=1, D=2-4=-2<0 indefinite.
+     Codex gate-2 (gpt-5.5/xhigh): 1 blocking FIXED — proof assumed a!=0; added the a=0 & D<0 case
+     (then b!=0 and Q(x,1)=2bx+c is indefinite), noting D>0 already forces a!=0. Re-rendered clean.
+     Record: handout/_audit/REVIEW-appendix-clean-slate-design.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">C.4</span>Quadratic Forms and Definiteness</h2>
+  </header>
+
+  <p>The determinant read areas and volumes off the columns of a matrix. Turned on a <em>symmetric</em> matrix it does something different but just as useful to calculus: it decides the <em>sign</em> a quadratic expression is forced to keep. This is the algebra behind telling a peak from a valley from a saddle on a surface.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">C.3</span></p>
+    <div class="env-body">
+      <p>A <em>quadratic form</em> in two variables is an expression
+      \[ Q(x, y) = a x^2 + 2b\,xy + c y^2, \]
+      carried by the symmetric matrix \(\begin{pmatrix} a & b \\ b & c \end{pmatrix}\), in which the off-diagonal \(b\) is half the coefficient of \(xy\), shared evenly between the two symmetric slots. The form is <em>positive definite</em> if \(Q(x, y) > 0\) for every \((x, y) \neq (0, 0)\), <em>negative definite</em> if \(Q(x, y) < 0\) throughout, and <em>indefinite</em> if it takes both signs.</p>
+    </div>
+  </section>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">C.3</span><span class="env-name">Definiteness test</span></p>
+    <div class="env-body">
+      <p>Let \(D = ac - b^2\) be the determinant of the symmetric matrix. Then \(Q\) is
+      <em>positive definite</em> when \(D > 0\) and \(a > 0\); <em>negative definite</em> when \(D > 0\) and \(a < 0\); and <em>indefinite</em> when \(D < 0\). When \(D = 0\) the form is degenerate and the test is silent.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Suppose first \(a \neq 0\) and complete the square to absorb the cross-term:
+      \[ Q(x, y) = a\left(x + \tfrac{b}{a}\,y\right)^2 + \frac{ac - b^2}{a}\,y^2. \]
+      The two coefficients are \(a\) and \(\tfrac{ac - b^2}{a}\). When \(ac - b^2 > 0\) they share the sign of \(a\); the two squares can then never cancel, and \(Q\) holds that single sign everywhere off the origin — definite, positive or negative according to \(a\). When \(ac - b^2 < 0\) the coefficients carry opposite signs, so \(Q\) is positive along one direction and negative along another — indefinite. Assuming \(a \neq 0\) costs nothing in the definite case, since \(D > 0\) forces \(ac > b^2 \ge 0\) and so \(a \neq 0\) already. The one configuration left over is \(a = 0\) with \(D < 0\): then \(D = -b^2 < 0\) forces \(b \neq 0\), and \(Q(x, 1) = 2bx + c\) is linear in \(x\) with nonzero slope, running through both signs — indefinite, as claimed. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>This is exactly the <em>second-derivative test</em> of Chapter 14. There the symmetric matrix is the <em>Hessian</em> of a function \(f(x, y)\) — its array of second partial derivatives — and these same three cases stamp a critical point as a local minimum (positive definite), a local maximum (negative definite), or a saddle (indefinite). The linear algebra is finished here; the calculus that fills the entries with second derivatives waits for Chapter 14.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">C.4</span></p>
+      <div class="env-body">
+        <p>Classify \(Q(x, y) = 2x^2 + 4xy + 5y^2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Read off \(a = 2\); the coefficient of \(xy\) is \(4\), so \(b = 2\); and \(c = 5\). The determinant is
+        \[ D = ac - b^2 = 2\cdot 5 - 2^2 = 6 > 0, \]
+        and \(a = 2 > 0\), so the form is positive definite. Completing the square confirms it: \(2x^2 + 4xy + 5y^2 = 2(x + y)^2 + 3y^2\), a sum of squares that vanishes only at the origin. Had the last coefficient been \(1\) rather than \(5\), the determinant would have been \(D = 2 - 4 = -2 < 0\), and the form indefinite — the algebraic signature of a saddle.</p>
+      </div>
+    </section>
+  </div>
+
+</article>

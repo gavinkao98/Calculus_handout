@@ -1,0 +1,106 @@
+<!-- §5.8 Curve Sketching.
+     section-source: Stewart ET 9e §4.5 (Summary of Curve Sketching); cross-checked Thomas 14e §4.4,
+     Rogawski 4e §4.6. Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤). Counters continue
+     from §5.7: §5.8 mints Definition 5.7 (asymptotes), Strategy 5.6 (curve-sketching checklist),
+     Examples 5.22–5.23. Cautions UNNUMBERED. Synthesis section: gathers domain/intercepts/symmetry/
+     asymptotes (Ch1 infinite limits Def 1.11/1.12) + increase-decrease + extrema (§5.4) + concavity/
+     inflection (§5.6) + growth comparisons (§5.7 ln x << x^p << e^x). Introduces slant asymptotes.
+     Figures DEFERRED to the figure-opportunity gate (strong candidates: the two full sketches — but the
+     analysis is self-sufficient to draw them). Wide derivative computations pre-broken with aligned.
+     Math: 5.22 f=x²/(x²−1): f'=−2x/(x²−1)², f''=2(3x²+1)/(x²−1)³, VA x=±1, HA y=1, max (0,0);
+     5.23 f=x+1/x: f'=1−1/x², f''=2/x³, VA x=0, slant y=x, max (−1,−2), min (1,2).
+     Counters handed to §5.9: Definition 5.8, Theorem 5.6, Strategy 5.7, Example 5.24. Record: PLAN-ch05.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">5.8</span>Curve Sketching</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: assemble every tool into one procedure to draw a curve from its formula -->
+  <p>Everything this chapter built now converges on a single task: drawing the graph of a function from its formula alone, without plotting a cloud of points. Each tool contributes one layer. The domain says where the curve lives; limits at the edges and at infinity give its asymptotes; the first derivative marks where it rises and falls and locates its peaks and valleys; the second derivative says which way it bends and where it changes. Laid over one another, these layers determine the shape completely. What remains is to run them in a fixed order, so that nothing is missed.</p>
+
+  <h3 class="subsec-head">Asymptotes</h3>
+
+  <p>An <em>asymptote</em> is a straight line the curve approaches arbitrarily closely as \(x\) or \(y\) runs off to infinity. Three kinds arise: vertical asymptotes are detected by the infinite limits of Chapter 1, horizontal and slant asymptotes by limits as \(x \to \pm\infty\).</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">5.7</span><span class="env-name">Asymptotes</span></p>
+    <div class="env-body">
+      <p>The line \(x = a\) is a <em>vertical asymptote</em> of \(f\) if \(f(x) \to +\infty\) or \(-\infty\) as \(x \to a\) from one side or both.</p>
+      <p>The line \(y = L\) is a <em>horizontal asymptote</em> if \(f(x) \to L\) as \(x \to +\infty\) or \(x \to -\infty\).</p>
+      <p>The line \(y = mx + b\) (with \(m \ne 0\)) is a <em>slant asymptote</em> if \(f(x) - (mx + b) \to 0\) as \(x \to +\infty\) or \(x \to -\infty\): the curve draws ever closer to the line without leveling off.</p>
+    </div>
+  </section>
+
+  <p>Vertical-asymptote candidates come from zeros of a denominator or a logarithm's argument approaching \(0\), confirmed by a one-sided infinite limit — a factor that cancels leaves a hole, not an asymptote; horizontal ones are read from the limit at infinity; a slant asymptote appears when a function grows linearly but is not itself a line — for a rational function, when the numerator's degree is exactly one more than the denominator's, so that dividing out leaves a linear part plus a remainder that decays.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.6</span><span class="env-name">Sketching a curve</span></p>
+    <div class="env-body">
+      <p>To sketch \(y = f(x)\), gather the following in order and then draw what they dictate:</p>
+      <ol class="steps">
+        <li><strong>Domain.</strong> Where is \(f\) defined?</li>
+        <li><strong>Intercepts.</strong> The \(y\)-intercept \(f(0)\), and the \(x\)-intercepts where \(f(x) = 0\), when they are easy to find.</li>
+        <li><strong>Symmetry.</strong> Is \(f\) even (\(f(-x) = f(x)\), symmetric across the \(y\)-axis), odd (\(f(-x) = -f(x)\), symmetric through the origin), or periodic? Any symmetry halves the work.</li>
+        <li><strong>Asymptotes.</strong> Vertical (where \(f \to \pm\infty\)), horizontal (\(\lim_{x \to \pm\infty} f\)), and slant.</li>
+        <li><strong>Increase, decrease, and local extrema.</strong> From the sign of \(f'\) (§5.4).</li>
+        <li><strong>Concavity and inflection.</strong> From the sign of \(f''\) (§5.6).</li>
+        <li><strong>Assemble.</strong> Plot the intercepts, extrema, and inflection points, draw the asymptotes as guide lines, and connect the pieces so the rise-fall and concavity data are honoured.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 5.22: a rational function with vertical and horizontal asymptotes -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.22</span></p>
+      <div class="env-body">
+        <p>Sketch the curve \(y = \dfrac{x^{2}}{x^{2} - 1}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Run the checklist.</p>
+        <p><strong>Domain.</strong> The denominator vanishes at \(x = \pm 1\), so the domain is all \(x\) with \(x \ne \pm 1\). <strong>Intercepts.</strong> Both are at the origin: \(f(0) = 0\), and \(x^{2} = 0\) only at \(x = 0\). <strong>Symmetry.</strong> Replacing \(x\) by \(-x\) leaves the function unchanged, so it is even — symmetric across the \(y\)-axis.</p>
+        <p><strong>Asymptotes.</strong> Near \(x = 1\) and \(x = -1\) the denominator \(\to 0\) while the numerator \(\to 1\), so \(f \to \pm\infty\): vertical asymptotes \(x = \pm 1\). At infinity,</p>
+        <p>\[ \lim_{x \to \pm\infty} \frac{x^{2}}{x^{2} - 1} = 1, \]</p>
+        <p>so \(y = 1\) is a horizontal asymptote. <strong>First derivative.</strong> By the quotient rule,</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= \frac{2x(x^{2} - 1) - x^{2}(2x)}{(x^{2} - 1)^{2}} = \frac{-2x}{(x^{2} - 1)^{2}}.
+        \end{aligned} \]</p>
+        <p>The denominator is positive wherever it is defined, so \(f'\) has the sign of \(-2x\): positive for \(x < 0\), negative for \(x > 0\). Thus \(f\) increases on \((-\infty, -1)\) and \((-1, 0)\), decreases on \((0, 1)\) and \((1, \infty)\), with a local maximum at \((0, 0)\). <strong>Second derivative.</strong> Differentiating again and simplifying,</p>
+        <p>\[ f''(x) = \frac{2(3x^{2} + 1)}{(x^{2} - 1)^{3}}. \]</p>
+        <p>The numerator is always positive, so \(f''\) has the sign of \((x^{2} - 1)^{3}\), that is, of \(x^{2} - 1\): concave up on \((-\infty, -1)\) and \((1, \infty)\), concave down on \((-1, 1)\). There is no inflection point, since \(x = \pm 1\) are outside the domain.</p>
+        <p><strong>Assemble.</strong> Between the asymptotes lies an arch peaking at the origin and falling toward \(-\infty\) at both \(x = \pm 1\); outside them, two branches descend from \(+\infty\) at the asymptotes toward the horizontal line \(y = 1\), staying above it. The even symmetry mirrors the left half onto the right. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 5.23: a slant asymptote -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.23</span></p>
+      <div class="env-body">
+        <p>Sketch the curve \(y = x + \dfrac{1}{x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p><strong>Domain.</strong> All \(x \ne 0\). <strong>Intercepts.</strong> None: \(f(0)\) is undefined, and \(x + 1/x = 0\) would need \(x^{2} = -1\). <strong>Symmetry.</strong> \(f(-x) = -x - 1/x = -f(x)\), so \(f\) is odd — symmetric through the origin.</p>
+        <p><strong>Asymptotes.</strong> As \(x \to 0\), the term \(1/x \to \pm\infty\), so \(x = 0\) is a vertical asymptote. There is no horizontal asymptote, but the function is already split into a linear part and a decaying remainder: \(f(x) - x = 1/x \to 0\) as \(x \to \pm\infty\), so \(y = x\) is a slant asymptote. <strong>First derivative.</strong></p>
+        <p>\[ f'(x) = 1 - \frac{1}{x^{2}}, \]</p>
+        <p>which is zero at \(x = \pm 1\), positive for \(|x| > 1\), and negative for \(0 < |x| < 1\). So \(f\) has a local maximum at \((-1, -2)\) and a local minimum at \((1, 2)\) — the maximum value lying <em>below</em> the minimum value, which is possible here because the two sit on branches separated by the asymptote. <strong>Second derivative.</strong></p>
+        <p>\[ f''(x) = \frac{2}{x^{3}}, \]</p>
+        <p>positive for \(x > 0\) and negative for \(x < 0\): concave up on the right, concave down on the left, with no inflection (the sign change is across the excluded point \(x = 0\)).</p>
+        <p><strong>Assemble.</strong> For \(x > 0\) the curve falls from \(+\infty\) along the vertical asymptote to the minimum \((1, 2)\), then rises toward the slant line \(y = x\); the odd symmetry produces the mirror-image branch for \(x < 0\), rising to the maximum \((-1, -2)\) and dropping toward \(y = x\) from below. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close: shape fully readable from the formula; §5.9 turns to the inverse problem — finding a root numerically -->
+  <p>With the checklist, a formula unfolds into a shape: no plotting, just the systematic reading of domain, limits, and two derivatives. Every question this chapter posed about a function's behaviour — its rates, its extremes, its bends, its ends — now has a computable answer, and they combine into a single picture. The final section turns the machinery around. Instead of describing a known function, it asks how to <em>find</em> something a function conceals — a solution of \(f(x) = 0\) that no formula surrenders — by putting the tangent line to work as an engine of approximation.</p>
+
+</article>

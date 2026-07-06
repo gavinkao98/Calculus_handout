@@ -1,0 +1,101 @@
+<!-- Appendix A opener + §A.1 The Reciprocal Trigonometric Functions.
+     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Appendix established per user decision 2026-07-03: B-class
+     prerequisites worth a full treatment live here; the mainline keeps its shortest
+     in-place bridge and cross-refs this appendix (SPEC §16.2 處置慣例).
+     §A.1 is the appendix's first section, so it carries the appendix opener (a second
+     <article>), mirroring the chapter convention. Numbering is MANUAL, namespace "A":
+     Definition A.1; Proposition A.1; Example A.1; Caution unnumbered (per ch02+).
+     Counters continue into sec-a-2/sec-a-3. No figures (candidate figures are an
+     open question in CONTENT_ROADMAP's Appendix A entry).
+     Referenced from: §1.2 (reciprocal bridge), §3.1 (tan/sec derivatives context).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Appendix A</div>
+    <h1 class="ch-title">Precalculus Toolbox</h1>
+  </header>
+
+  <p class="lead">This appendix collects the precalculus tools you will want on hand but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions (§A.1), the product-to-sum and sum-to-product identities (§A.2), sigma notation, power sums, and the geometric series (§A.3), partial fractions (§A.4), a quick tour of the conic sections (§A.5), and absolute value and inequalities (§A.6). Some are pointed to from the main text at the moment they are first needed; others are here as a handy reference to reach for when you want them. The sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing here uses calculus, with one small exception flagged in §A.3, where an infinite sum is read as a limit.</p>
+
+  <p class="para-head">By the end of this appendix, you will be able to:</p>
+  <ul>
+    <li>evaluate the reciprocal trigonometric functions \(\sec\), \(\csc\), and \(\cot\), and apply their Pythagorean identities with the correct signs;</li>
+    <li>derive every product-to-sum and sum-to-product identity from the angle-sum formulas — and recover any one you forget;</li>
+    <li>manipulate sums in sigma notation, evaluate the power sums \(\sum k\), \(\sum k^{2}\), and \(\sum k^{3}\), and sum a geometric series, finite or infinite;</li>
+    <li>split a proper rational function into partial fractions;</li>
+    <li>read off each conic section’s key features — centre, vertices, foci, and axes — from its standard equation;</li>
+    <li>unpack an absolute-value inequality \(|x - a| < \delta\) into an interval, and apply the triangle inequality.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.1</span>The Reciprocal Trigonometric Functions</h2>
+  </header>
+
+  <p>The three primary trigonometric functions \(\sin\), \(\cos\), and \(\tan\) have three companions — two honest reciprocals and one inverted ratio. They carry no new information — every fact about them is a fact about \(\sin\) and \(\cos\) in disguise. Yet calculus speaks them fluently: the derivative of \(\tan x\) turns out to be \(\sec^{2} x\), the inverse secant needs a principal range of its own, and integral tables are full of secants and cosecants. This section gives them an honest introduction.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">A.1</span></p>
+    <div class="env-body">
+      <p>For any angle \(\theta\) at which the denominator is nonzero, the <em>secant</em>, <em>cosecant</em>, and <em>cotangent</em> functions are defined by
+      \[ \sec\theta = \frac{1}{\cos\theta}, \qquad \csc\theta = \frac{1}{\sin\theta}, \qquad \cot\theta = \frac{\cos\theta}{\sin\theta}. \]</p>
+      <p class="informal">Informally: secant is the reciprocal of cosine, cosecant is the reciprocal of sine, and cotangent flips the ratio that defines tangent. The names cross over historically — <em>se</em>cant with <em>co</em>sine, <em>co</em>secant with sine — and the pairing simply has to be memorized.</p>
+    </div>
+  </section>
+
+  <p>In a right triangle, the definitions invert the familiar ratios. Since \(\cos\theta\) is adjacent over hypotenuse, \(\sec\theta\) is hypotenuse over adjacent; since \(\sin\theta\) is opposite over hypotenuse, \(\csc\theta\) is hypotenuse over opposite; and \(\cot\theta\) is adjacent over opposite. Special-angle values follow instantly from the primary ones: for instance \(\sec\tfrac{\pi}{3} = 1/\cos\tfrac{\pi}{3} = 2\), and \(\cot\tfrac{\pi}{4} = 1\). Each function is undefined exactly where its denominator vanishes — \(\sec\) and \(\tan\) at odd multiples of \(\tfrac{\pi}{2}\), \(\csc\) and \(\cot\) at multiples of \(\pi\) — and near those angles its values blow up, producing the vertical asymptotes on their graphs.</p>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Cotangent is defined as \(\cos\theta/\sin\theta\), <em>not</em> as \(1/\tan\theta\). On most of the domain the two agree, but not everywhere: at \(\theta = \tfrac{\pi}{2}\) we have \(\cot\tfrac{\pi}{2} = \cos\tfrac{\pi}{2}/\sin\tfrac{\pi}{2} = 0/1 = 0\), a perfectly good value, while \(1/\tan\tfrac{\pi}{2}\) is meaningless — \(\tan\tfrac{\pi}{2}\) is undefined. The quotient \(\cos/\sin\) is the robust definition; \(1/\tan\) is a shortcut valid only where \(\tan\theta\) is defined and nonzero.</p>
+    </div>
+  </section>
+
+  <p>Dividing the Pythagorean identity \(\sin^{2}\theta + \cos^{2}\theta = 1\) by \(\cos^{2}\theta\) or by \(\sin^{2}\theta\) produces the two companion identities that calculus uses constantly.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.1</span><span class="env-name">Pythagorean companions</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} 1 + \tan^{2}\theta &= \sec^{2}\theta \qquad (\cos\theta \neq 0), \\ 1 + \cot^{2}\theta &= \csc^{2}\theta \qquad (\sin\theta \neq 0). \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Divide \(\sin^{2}\theta + \cos^{2}\theta = 1\) through by \(\cos^{2}\theta\):
+      \[ \frac{\sin^{2}\theta}{\cos^{2}\theta} + 1 = \frac{1}{\cos^{2}\theta}, \qquad\text{that is,}\qquad \tan^{2}\theta + 1 = \sec^{2}\theta. \]
+      Dividing instead by \(\sin^{2}\theta\) gives \(1 + \cot^{2}\theta = \csc^{2}\theta\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.1</span></p>
+      <div class="env-body">
+        <p>Evaluate the following.</p>
+        <ol class="prompt-list">
+          <li>\(\sec\!\left(\tfrac{2\pi}{3}\right)\) and \(\cot\!\left(-\tfrac{\pi}{4}\right)\).</li>
+          <li>Given that \(\tan\theta = 3\) and \(\theta\) lies in the third quadrant, find \(\sec\theta\) and \(\csc\theta\).</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>Since \(\cos\tfrac{2\pi}{3} = -\tfrac{1}{2}\), we get \(\sec\tfrac{2\pi}{3} = 1/(-\tfrac{1}{2}) = -2\). Since \(\cos(-\tfrac{\pi}{4}) = \tfrac{\sqrt{2}}{2}\) and \(\sin(-\tfrac{\pi}{4}) = -\tfrac{\sqrt{2}}{2}\), we get \(\cot(-\tfrac{\pi}{4}) = \frac{\sqrt{2}/2}{-\sqrt{2}/2} = -1\).</li>
+          <li>By Proposition A.1, \(\sec^{2}\theta = 1 + \tan^{2}\theta = 1 + 9 = 10\), so \(\sec\theta = \pm\sqrt{10}\). In the third quadrant \(\cos\theta < 0\), hence \(\sec\theta < 0\), and therefore \(\sec\theta = -\sqrt{10}\). For the cosecant, \(\cot\theta = 1/\tan\theta = \tfrac{1}{3}\) (legitimate here, since \(\tan\theta = 3\) is defined and nonzero), so \(\csc^{2}\theta = 1 + \cot^{2}\theta = 1 + \tfrac{1}{9} = \tfrac{10}{9}\) and \(\csc\theta = \pm\tfrac{\sqrt{10}}{3}\). In the third quadrant \(\sin\theta < 0\), so \(\csc\theta = -\tfrac{\sqrt{10}}{3}\). The squaring in Proposition A.1 forgets all signs; the quadrant restores them.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <p>That is the whole toolkit: three definitions, the right-triangle readings, and the two Pythagorean companions — every fact about \(\sec\), \(\csc\), and \(\cot\) reduced to a fact about \(\sin\) and \(\cos\).</p>
+
+</article>

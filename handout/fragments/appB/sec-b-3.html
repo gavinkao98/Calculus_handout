@@ -1,0 +1,85 @@
+<!-- §B.3 A Quantifier Toolbox.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Numbering is MANUAL, namespace "B", continuing from sec-b-2:
+     Strategy B.3 (negating a quantified statement); Example B.3 (negate a nested
+     for-all/there-exists statement); Caution unnumbered (order of unlike quantifiers).
+     The "for every eps>0 there is a delta>0" challenge-response pattern is presented
+     self-contained, forward-stocking the limit/continuity/convergence definitions WITHOUT
+     naming any Ch1-4 section (user directive: self-contained).
+     Logic verified during authoring: forall x exists y (y>x) TRUE vs exists y forall x
+     (y>x) FALSE over integers; negation rules ¬forall = exists, ¬exists = forall, order
+     preserved, kernel a_n<eps negates to a_n>=eps.
+     Record: handout/_audit/REVIEW-appendixB-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">B.3</span>A Quantifier Toolbox</h2>
+  </header>
+
+  <p>The two quantifiers <em>for all</em> and <em>there exists</em> — \(\forall\) and \(\exists\) — are the grammar of analysis. Nearly every definition and theorem past this point is built from them, often stacked two or three deep, and a statement's whole meaning can turn on how they are arranged. Three skills make that grammar readable: keeping the <em>order</em> of quantifiers straight, <em>negating</em> a quantified statement cleanly, and recognizing the one nested pattern that organizes much of the subject. This section is a short toolbox for all three.</p>
+
+  <p>The order of two <em>unlike</em> quantifiers is not interchangeable, and this is the most valuable single fact about them. Compare:</p>
+  <p style="text-align:center;">(i)&ensp;&ensp;for every integer \(x\) there is an integer \(y\) with \(y > x\),</p>
+  <p style="text-align:center;">(ii)&ensp;&ensp;there is an integer \(y\) such that for every integer \(x\), \(y > x\).</p>
+  <p>Statement (i) is true: given any \(x\), take \(y = x + 1\). Statement (ii) is false: it demands a <em>single</em> \(y\) larger than every integer at once, and there is no largest integer. The two sentences use the same words in the same breath; only the order of &ldquo;for every&rdquo; and &ldquo;there is&rdquo; differs, and that alone carries one from true to false.</p>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>When quantifiers of different type meet, the outer one is in charge, and the inner object may be <em>retuned for each choice</em> of the outer. &ldquo;For every \(x\) there is a \(y\)&rdquo; lets \(y\) depend on \(x\) — a different \(y\) is allowed for each. &ldquo;There is a \(y\) such that for every \(x\)&rdquo; demands one \(y\) that works for all \(x\) simultaneously; it is a far stronger, and usually far rarer, claim. Reading the first as though it were the second — or the reverse — is a classic and costly slip. Always check which quantifier comes first.</p>
+    </div>
+  </section>
+
+  <p>The second skill is denial. To disprove a quantified statement, or to state what a proof by contradiction must produce, you have to negate it correctly — and there is a mechanical rule that never fails.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.3</span><span class="env-name">Negating a quantified statement</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Sweep the negation across the quantifiers from left to right, flipping each as it passes: every <em>for all</em> becomes <em>there exists</em>, and every <em>there exists</em> becomes <em>for all</em>.</li>
+        <li>When the negation reaches the <em>kernel</em> — the part with no quantifiers left — negate that. An \(=\) becomes \(\neq\); a \(<\) becomes \(\ge\), not \(>\) (the denial of &ldquo;\(a < \varepsilon\)&rdquo; is &ldquo;\(a\) is not less than \(\varepsilon\)&rdquo;, which includes the boundary case \(a = \varepsilon\)); &ldquo;\(P\) and \(Q\)&rdquo; becomes &ldquo;not \(P\) or not \(Q\)&rdquo;, and so on.</li>
+        <li>Leave the quantifiers in their original order; only their <em>type</em> flips, never their sequence.</li>
+      </ol>
+      <p class="informal">In words: to deny that <em>everyone</em> clears the bar is to claim that <em>someone</em> fails it; to deny that <em>someone</em> succeeds is to claim that <em>everyone</em> fails. Negation trades the two quantifiers and moves the finish line.</p>
+    </div>
+  </section>
+
+  <p>The rule is easiest to trust on short statements, so build up to the long one. A single quantifier flips once: the negation of &ldquo;<em>every</em> integer is even&rdquo; is &ldquo;<em>there is</em> an integer that is not even&rdquo; — true, since \(3\) is one. Two quantifiers flip in turn. Negating the true statement from the start of this section, &ldquo;for every integer \(x\) there is an integer \(y\) with \(y > x\)&rdquo;, sweeps to &ldquo;there is an integer \(x\) such that for every integer \(y\), \(y \le x\)&rdquo; — a largest integer, which is false, exactly as the negation of a true statement should be. The next example carries the same rule to a statement three quantifiers deep, of the kind that runs through analysis; it is handled just as mechanically.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.3</span></p>
+      <div class="env-body">
+        <p>Negate the following statement, in which \(a_1, a_2, \ldots\) is a fixed sequence of positive numbers (it says the sequence eventually drops below every positive threshold):</p>
+        <p style="text-align:center;">for every \(\varepsilon > 0\), there exists an integer \(N\) such that \(a_n < \varepsilon\) for all \(n \ge N\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Flip each quantifier in turn, then negate the kernel:</p>
+        <ul class="sol-list">
+          <li>&ldquo;for every \(\varepsilon > 0\)&rdquo; becomes &ldquo;there exists \(\varepsilon > 0\)&rdquo;;</li>
+          <li>&ldquo;there exists an integer \(N\)&rdquo; becomes &ldquo;for every integer \(N\)&rdquo;;</li>
+          <li>&ldquo;for all \(n \ge N\)&rdquo; becomes &ldquo;there exists \(n \ge N\)&rdquo;;</li>
+          <li>the kernel \(a_n < \varepsilon\) negates to \(a_n \ge \varepsilon\).</li>
+        </ul>
+        <p>Assembling the pieces in the same order, the negation reads:</p>
+        <p style="text-align:center;">there exists \(\varepsilon > 0\) such that for every integer \(N\)<br>there is some \(n \ge N\) with \(a_n \ge \varepsilon\).</p>
+        <p>In words: some fixed threshold \(\varepsilon\) that the sequence meets or exceeds again and again, no matter how far out you look. The quantifiers kept their left-to-right order; only their types flipped, and the final \(<\) became \(\ge\).</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The third skill is recognition. One arrangement of nested quantifiers recurs so relentlessly that it deserves to be known on sight. It has the shape</p>
+
+  <p style="text-align:center;">for every \(\varepsilon > 0\) there is a \(\delta > 0\) such that [some closeness holds].</p>
+
+  <p>Read it as a contest. A skeptic names a tolerance \(\varepsilon\) — how close is &ldquo;close enough&rdquo; — and may drive it as small as they please. Your task is to answer, for that \(\varepsilon\), with a \(\delta\) that secures the required closeness. Because \(\varepsilon\) is chosen first, your \(\delta\) is <em>allowed to depend on it</em>: a stricter tolerance may call for a smaller \(\delta\). The statement is true precisely when you have a winning reply to <em>every</em> challenge, however small \(\varepsilon\) is pushed. You have, in fact, already read a statement of exactly this shape — the one you negated in Example B.3, where the response to each \(\varepsilon\) was an index \(N\), and the required closeness was that every term from the \(N\)-th onward falls below \(\varepsilon\). This &ldquo;for every tolerance, there is a response&rdquo; template is the skeleton of the definitions of limit, continuity, and convergence, and of the many proofs resting on them. When you meet it, ask at once: what plays the part of the challenge, what response must you supply, and how may the response lean on the challenge? Finding the right \(\delta\) in terms of \(\varepsilon\) is usually the entire game.</p>
+
+  <p>Negation and recognition now close a loop. To deny such a statement — to claim the closeness cannot always be met — is, by the negation rule, to assert that <em>there is one stubborn \(\varepsilon > 0\) for which every proposed \(\delta\) fails</em>. That single-\(\varepsilon\) form is exactly the target of any argument that something is <em>not</em> continuous, or a sequence does <em>not</em> converge: pin the one tolerance no response can satisfy, and the claim is refuted.</p>
+
+  <p>Quantifiers are terse, but their terseness is precision, not shorthand: they fix exactly which objects a claim ranges over, in what order those objects may be chosen, and what it would take to deny the claim. Read them slowly, mark their order, and know how to flip them — and a large part of analysis stops looking like code and starts reading like sentences.</p>
+
+</article>

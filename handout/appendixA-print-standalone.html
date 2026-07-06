@@ -1,0 +1,2209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Appendix A — Print build</title>
+
+<!-- ════════════════════════════════════════════════════════════════
+     圖片寬度控制面板 —— 直接改下面的數字即可（px 固定寬 / % 相對頁寬）
+     並排或多格圖（1.1 / 1.7 / 1.9）控制的是「每一格」的寬度。
+     ════════════════════════════════════════════════════════════════ -->
+<style>
+:root {
+  --fig-1-1:  250px;   /* Figure 1.1  horizontal line test (pair) */
+  --fig-1-2:  340px;   /* Figure 1.2  inverse mapping diagram */
+  --fig-1-3:  280px;   /* Figure 1.3  restricted x^2, sqrt x, y=x */
+  --fig-1-4:  500px;   /* Figure 1.4  sine not one-to-one (SVG 620×220, wide) */
+  --fig-1-5:  340px;   /* Figure 1.5  restricted sine (SVG 380×260) */
+  --fig-1-6:  200px;   /* Figure 1.6  arcsin right triangle (SVG 300×130) */
+  --fig-1-7:  340px;   /* Figure 1.7  restricted cosine (SVG 380×200) */
+  --fig-1-8:  300px;   /* Figure 1.8  restricted tangent (SVG 320×320) */
+  --fig-1-9:  500px;   /* Figure 1.9  arctan reflection */
+  --fig-1-10: 200px;   /* Figure 1.10 arctan 10 right triangle (SVG 240×180) */
+  --fig-1-11: 100%;    /* Figure 1.11 arctan x right triangle (SVG 240×180) */
+  --fig-1-12: 380px;   /* Figure 1.12 three functions, same limit (triple layout) */
+  --fig-1-13: 380px;   /* Figure 1.13 read-off-the-graph example */
+  --fig-1-14: 340px;   /* Figure 1.14 left/right limits differ */
+  --fig-1-15: 100%;    /* Figure 1.15 piecewise jump */
+  --fig-1-16: 200px;   /* Figure 1.16 1/x^2 vs 1/x */
+  --fig-1-17: 340px;   /* Figure 1.17 four one-sided infinite limits (grid layout) */
+  --fig-1-18: 360px;   /* Figure 1.18 vertical asymptote */
+  --fig-1-19: 400px;   /* Figure 1.19 ln asymptote */
+  --fig-1-20: 380px;   /* Figure 1.20 removable hole */
+  --fig-1-21: 350px;   /* Figure 1.21 floor function */
+  --fig-1-22: 420px;   /* Figure 1.22 squeeze theorem */
+  --fig-1-23: 400px;   /* Figure 1.23 x^2 sin(1/x) squeeze */
+  --fig-1-24: 360px;   /* Figure 1.24 epsilon-delta geometry */
+  --fig-1-25: 100%;    /* Figure 1.25 epsilon-delta dynamic pair */
+}
+</style>
+
+<!-- Google Fonts: Inter for UI -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- New Computer Modern (prose/text faces) — matches MathJax 4 "mathjax-newcm" math font.
+     Source: npm web-computer-modern@1.1.0-new-cm-7-0-2 via jsDelivr. License: GUST Font License.
+     10pt optical size ("Serif 10"). NOTE: filenames contain %20-encoded spaces — keep them. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+
+<!-- MathJax 4 (CHTML output with inline line-breaking) -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    macros: {
+      arccsc: '\\operatorname{arccsc}',
+      arcsec: '\\operatorname{arcsec}',
+      arccot: '\\operatorname{arccot}'
+    }
+  },
+  chtml: {
+    mtextInheritFont: true,
+    matchFontHeight: true
+  },
+  output: {
+    displayOverflow: 'linebreak',
+    linebreaks: {
+      inline: true,
+      width: '100%',
+      lineleading: 0.2
+    }
+  },
+  startup: { typeset: false }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+
+<style>
+/* ============================================================
+   skin-hs.css — inlined + modified: Times New Roman + MathJax
+   ============================================================ */
+.paper {
+  --c-primary: oklch(0.50 0.13 245);
+  --c-caution: oklch(0.50 0.155 25);
+  --c-aux: oklch(0.55 0.01 260);
+  --c-axis: #474b54;
+  --ink: #1b1c1f;
+  --ink-soft: #565a63;
+  --ink-faint: #8a8e98;
+  --paper: #ffffff;
+  --rule: #e5e7eb;
+  --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
+  --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
+  /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
+  --ui: "Inter", -apple-system, system-ui, sans-serif;
+  --a-concept:  oklch(0.50 0.13 55);
+  --a-result:   oklch(0.50 0.13 245);
+  --a-practice: oklch(0.50 0.13 152);
+  --a-aside:    oklch(0.50 0.02 260);
+  --a-caution:  oklch(0.50 0.155 25);
+  --a-strategy: oklch(0.50 0.13 290);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-base, 17.5px);
+  line-height: var(--lh-base, 1.62);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+.paper *, .paper *::before, .paper *::after { box-sizing: border-box; }
+.paper .page { padding: 52px 58px 64px; max-width: 760px; margin: 0 auto; }
+.skin-hs .page { hyphens: auto; -webkit-hyphens: auto; }
+.skin-hs p, .skin-hs li { text-align: justify; text-justify: inter-word; }
+.paper .ragged { text-align: left; }
+.paper p { margin: 0 0 .85em; text-wrap: pretty; }
+.paper em { font-style: italic; }
+.paper .informal { font-style: italic; color: var(--ink-soft); }
+.paper ol { margin: .2em 0 .9em; padding-left: 1.5em; }
+.paper li { margin: .35em 0; text-wrap: pretty; }
+.paper .warmup { counter-reset: wu; list-style: none; padding-left: 0; }
+.paper .warmup > li { counter-increment: wu; position: relative; padding-left: 2.1em; }
+.paper .warmup > li::before {
+  content: "(" counter(wu, lower-alpha) ")";
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
+}
+.paper mjx-container[display="true"] { margin: .55em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
+.paper .qed { display: block; text-align: right; margin: -1.62em 0 0; height: 1.62em; pointer-events: none; }
+.paper .qed::after {
+  content: ""; display: inline-block; width: .56em; height: .56em;
+  border: 1.3px solid var(--ink-soft);
+}
+.paper .env-body > :has(+ .qed) { margin-bottom: 0; display: flow-root; }
+.paper .env-body::after { content: ""; display: block; clear: both; }
+.paper .sec-head {
+  margin-top: 2.7em; padding-top: 1.35em;
+  border-top: 1px solid var(--rule); margin-bottom: 1.5em;
+}
+.sheet-body > .sec-head:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.paper .sec-kicker {
+  font-family: var(--ui); font-size: .7rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--c-primary); font-weight: 700; margin-bottom: .55em;
+}
+.paper .sec-title { font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -.012em; margin: 0; }
+.paper .sec-no { color: var(--c-primary); margin-right: .5em; font-weight: 600; }
+.paper .subsec-head {
+  font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
+  display: flex; align-items: center; gap: .55em; color: var(--ink);
+}
+.paper .page-break-before { break-before: page; page-break-before: always; }
+.paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
+.paper .figure { margin: 1.7em 0; text-align: center; }
+.paper .figure-art { display: flex; justify-content: center; }
+.paper .figure-art--pair { gap: 26px; }
+.paper .fig-svg { width: 100%; max-width: var(--fig-w, var(--fig-w-pair)); height: auto; }
+.paper .figure-art:not(.figure-art--pair) .fig-svg { max-width: var(--fig-w, var(--fig-w-single)); }
+.paper figcaption {
+  font-family: var(--ui); font-size: .8em; line-height: 1.5;
+  color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
+}
+.paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
+.paper figcaption mjx-container { font-size: .95em; }
+.paper .axis { stroke: var(--c-axis); stroke-width: 1.25; fill: none; stroke-linecap: round; }
+.paper .curve { stroke: var(--c-primary); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .dot { fill: var(--ink); }
+.paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
+.paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
+.paper .arrow-bwd { stroke: var(--c-caution); stroke-width: 2; fill: none; }
+.paper .fig-svg text { font-family: var(--ui); font-size: 13px; }
+.paper .axlab { fill: var(--c-aux); font-style: italic; }
+.paper .lab-curve { fill: var(--c-primary); font-style: italic; }
+.paper .lab-ref, .paper .lab-ref-b { fill: var(--c-caution); }
+.paper .ptlab { fill: var(--ink-soft); font-size: 12px; }
+.paper .setlab { fill: var(--ink); font-weight: 600; font-size: 14.5px; text-anchor: middle; }
+
+/* env blocks */
+.skin-hs .env {
+  --accent: var(--a-aside);
+  margin: 1.2em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--accent) 38%, var(--paper));
+}
+.skin-hs .env-definition  { --accent: var(--a-concept); }
+.skin-hs .env-theorem, .skin-hs .env-proposition, .skin-hs .env-corollary { --accent: var(--a-result); }
+.skin-hs .env-example, .skin-hs .env-solution, .skin-hs .env-exercise { --accent: var(--a-practice); }
+.skin-hs .env-remark { --accent: var(--a-aside); }
+.skin-hs .env-head {
+  display: flex; align-items: baseline; gap: .5em; flex-wrap: wrap;
+  margin: 0 0 .55em; font-family: var(--ui);
+}
+.skin-hs .env-kicker {
+  font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--accent); padding: 3px 10px; border-radius: 999px; line-height: 1.5;
+}
+.skin-hs .env-num { font-weight: 700; color: var(--accent); font-size: .94em; }
+.skin-hs .env-name { font-style: italic; font-weight: 400; color: var(--ink-soft); font-family: var(--serif); font-size: 1em; }
+.skin-hs .env-body > p:first-child { margin-top: 0; }
+.skin-hs .env-body > :last-child { margin-bottom: 0; }
+.skin-hs .env-theorem .env-body, .skin-hs .env-proposition .env-body { font-style: italic; }
+.skin-hs .env-theorem .env-body mjx-container, .skin-hs .env-proposition .env-body mjx-container { font-style: normal; }
+.skin-hs .env-definition em { font-style: italic; }
+.skin-hs .env-remark { color: var(--ink-soft); font-size: .97em; }
+.skin-hs .env-remark .env-kicker { background: transparent; color: var(--a-aside); border: 1px solid color-mix(in srgb, var(--a-aside) 45%, var(--paper)); }
+.skin-hs .env-proof { --accent: var(--a-result); }
+.skin-hs .env-proof .env-kicker {
+  background: transparent; color: var(--a-result); font-style: italic; letter-spacing: .04em;
+  border: 1px solid color-mix(in srgb, var(--a-result) 45%, var(--paper));
+}
+.skin-hs .qed-proof::after { border-color: var(--ink); }
+.skin-hs .workedexample {
+  margin: 1.6em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--a-practice) 38%, var(--paper));
+  display: flow-root;
+}
+.skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
+.skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
+.skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
+.skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
+.skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
+.skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
+.skin-hs .env-exercise .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid var(--a-practice); }
+.skin-hs .env-caution, .skin-hs .env-strategy {
+  padding: 15px 20px; border-radius: 8px; margin: 1.4em 0;
+  border-left-width: 4px; border-left-style: solid;
+}
+.skin-hs .env-caution {
+  --accent: var(--a-caution);
+  background: color-mix(in srgb, var(--a-caution) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-caution) 22%, var(--paper));
+  border-left-color: var(--a-caution);
+}
+.skin-hs .env-strategy {
+  --accent: var(--a-strategy);
+  background: color-mix(in srgb, var(--a-strategy) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-strategy) 22%, var(--paper));
+  border-left-color: var(--a-strategy);
+}
+.skin-hs .env-caution .env-name, .skin-hs .env-strategy .env-name { color: var(--ink-soft); }
+.skin-hs .env-strategy .steps { margin-bottom: 0; }
+.skin-hs.vivid .env { border-left-color: color-mix(in srgb, var(--accent) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .workedexample { border-left-color: color-mix(in srgb, var(--a-practice) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .env-kicker { font-size: .64rem; padding: 3.5px 11px; }
+
+/* ============================================================
+   figs.css — inlined + modified for MathJax
+   ============================================================ */
+.paper .fig-svg { height: auto; overflow: visible; }
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple { gap: 28px; flex-wrap: nowrap; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-panel { flex: 0 1 160px; max-width: 160px; min-width: 0; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-svg { width: 100% !important; max-width: 100%; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note mjx-container { font-size: .98em; }
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr { position: relative; width: 100%; height: 100%; font-family: var(--serif); }
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl mjx-container { font-size: 1em; }
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl mjx-container { font-size: .98em; }
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+
+/* ============================================================
+   print.css — inlined (A4 sheet layout + paginator)
+   ============================================================ */
+@page { size: A4; margin: 0; }
+.sheet {
+  position: relative; box-sizing: border-box;
+  width: 210mm; height: 297mm;
+  padding: 20mm 28mm 20mm 32mm;
+  background: #fff; overflow: hidden;
+}
+.sheet-header {
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
+  font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
+}
+.sheet-footer {
+  position: absolute; bottom: 8.5mm; left: 0; right: 0;
+  text-align: center; font: 500 9pt "Inter", sans-serif; color: #82868f;
+}
+.sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
+.sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
+.sheet-body .page { padding: 0; max-width: none; margin: 0; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
+.sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet-body > :first-child { margin-top: 0 !important; }
+.sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
+.sheet-body .qed { margin-top: -1.55em; height: 1.55em; }
+.sheet-body .env-body::after { display: none; content: none; }
+.sheet-body .env-cont { margin-top: 0; }
+.sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+@media screen {
+  body { background: #6f727b; margin: 0; }
+  .sheet { box-shadow: 0 3px 18px rgba(0,0,0,.3); margin: 9mm auto; }
+}
+@media print {
+  body { background: #fff; margin: 0; }
+  .sheet { box-shadow: none; margin: 0; break-after: page; }
+  .sheet:last-child { break-after: auto; }
+  .print-toolbar, #boot { display: none !important; }
+}
+
+/* ============================================================
+   page-level
+   ============================================================ */
+.print-toolbar {
+  position: fixed; top: 14px; right: 16px; z-index: 1000;
+  display: flex; align-items: center; gap: 10px; font-family: "Inter", system-ui, sans-serif;
+}
+.print-toolbar button {
+  font: 600 13px "Inter", sans-serif; color: #fff; background: oklch(0.50 0.13 245);
+  border: 0; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.print-toolbar button:disabled { opacity: .5; cursor: default; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
+.print-toolbar .status {
+  font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
+  padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
+}
+#boot {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
+}
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
+</style>
+</head>
+<body>
+
+<div id="boot">Preparing …</div>
+
+<div class="print-toolbar">
+  <span class="status" id="status">Preparing …</span>
+  <button id="printBtn" disabled>Print / Save as PDF</button>
+</div>
+
+<div id="source"><div class="paper skin-hs vivid"><div class="page" id="page"></div></div></div>
+<div id="pages"></div>
+
+<!-- Section fragments (inlined) -->
+
+<!-- BEGIN-CONTENT-FRAGMENTS -->
+<template id="frag-sec-a-1">
+<!-- Appendix A opener + §A.1 The Reciprocal Trigonometric Functions.
+     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Appendix established per user decision 2026-07-03: B-class
+     prerequisites worth a full treatment live here; the mainline keeps its shortest
+     in-place bridge and cross-refs this appendix (SPEC §16.2 處置慣例).
+     §A.1 is the appendix's first section, so it carries the appendix opener (a second
+     <article>), mirroring the chapter convention. Numbering is MANUAL, namespace "A":
+     Definition A.1; Proposition A.1; Example A.1; Caution unnumbered (per ch02+).
+     Counters continue into sec-a-2/sec-a-3. No figures (candidate figures are an
+     open question in CONTENT_ROADMAP's Appendix A entry).
+     Referenced from: §1.2 (reciprocal bridge), §3.1 (tan/sec derivatives context).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Appendix A</div>
+    <h1 class="ch-title">Precalculus Toolbox</h1>
+  </header>
+
+  <p class="lead">This appendix collects the precalculus tools you will want on hand but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions (§A.1), the product-to-sum and sum-to-product identities (§A.2), sigma notation, power sums, and the geometric series (§A.3), partial fractions (§A.4), a quick tour of the conic sections (§A.5), and absolute value and inequalities (§A.6). Some are pointed to from the main text at the moment they are first needed; others are here as a handy reference to reach for when you want them. The sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing here uses calculus, with one small exception flagged in §A.3, where an infinite sum is read as a limit.</p>
+
+  <p class="para-head">By the end of this appendix, you will be able to:</p>
+  <ul>
+    <li>evaluate the reciprocal trigonometric functions \(\sec\), \(\csc\), and \(\cot\), and apply their Pythagorean identities with the correct signs;</li>
+    <li>derive every product-to-sum and sum-to-product identity from the angle-sum formulas — and recover any one you forget;</li>
+    <li>manipulate sums in sigma notation, evaluate the power sums \(\sum k\), \(\sum k^{2}\), and \(\sum k^{3}\), and sum a geometric series, finite or infinite;</li>
+    <li>split a proper rational function into partial fractions;</li>
+    <li>read off each conic section’s key features — centre, vertices, foci, and axes — from its standard equation;</li>
+    <li>unpack an absolute-value inequality \(|x - a| < \delta\) into an interval, and apply the triangle inequality.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.1</span>The Reciprocal Trigonometric Functions</h2>
+  </header>
+
+  <p>The three primary trigonometric functions \(\sin\), \(\cos\), and \(\tan\) have three companions — two honest reciprocals and one inverted ratio. They carry no new information — every fact about them is a fact about \(\sin\) and \(\cos\) in disguise. Yet calculus speaks them fluently: the derivative of \(\tan x\) turns out to be \(\sec^{2} x\), the inverse secant needs a principal range of its own, and integral tables are full of secants and cosecants. This section gives them an honest introduction.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">A.1</span></p>
+    <div class="env-body">
+      <p>For any angle \(\theta\) at which the denominator is nonzero, the <em>secant</em>, <em>cosecant</em>, and <em>cotangent</em> functions are defined by
+      \[ \sec\theta = \frac{1}{\cos\theta}, \qquad \csc\theta = \frac{1}{\sin\theta}, \qquad \cot\theta = \frac{\cos\theta}{\sin\theta}. \]</p>
+      <p class="informal">Informally: secant is the reciprocal of cosine, cosecant is the reciprocal of sine, and cotangent flips the ratio that defines tangent. The names cross over historically — <em>se</em>cant with <em>co</em>sine, <em>co</em>secant with sine — and the pairing simply has to be memorized.</p>
+    </div>
+  </section>
+
+  <p>In a right triangle, the definitions invert the familiar ratios. Since \(\cos\theta\) is adjacent over hypotenuse, \(\sec\theta\) is hypotenuse over adjacent; since \(\sin\theta\) is opposite over hypotenuse, \(\csc\theta\) is hypotenuse over opposite; and \(\cot\theta\) is adjacent over opposite. Special-angle values follow instantly from the primary ones: for instance \(\sec\tfrac{\pi}{3} = 1/\cos\tfrac{\pi}{3} = 2\), and \(\cot\tfrac{\pi}{4} = 1\). Each function is undefined exactly where its denominator vanishes — \(\sec\) and \(\tan\) at odd multiples of \(\tfrac{\pi}{2}\), \(\csc\) and \(\cot\) at multiples of \(\pi\) — and near those angles its values blow up, producing the vertical asymptotes on their graphs.</p>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Cotangent is defined as \(\cos\theta/\sin\theta\), <em>not</em> as \(1/\tan\theta\). On most of the domain the two agree, but not everywhere: at \(\theta = \tfrac{\pi}{2}\) we have \(\cot\tfrac{\pi}{2} = \cos\tfrac{\pi}{2}/\sin\tfrac{\pi}{2} = 0/1 = 0\), a perfectly good value, while \(1/\tan\tfrac{\pi}{2}\) is meaningless — \(\tan\tfrac{\pi}{2}\) is undefined. The quotient \(\cos/\sin\) is the robust definition; \(1/\tan\) is a shortcut valid only where \(\tan\theta\) is defined and nonzero.</p>
+    </div>
+  </section>
+
+  <p>Dividing the Pythagorean identity \(\sin^{2}\theta + \cos^{2}\theta = 1\) by \(\cos^{2}\theta\) or by \(\sin^{2}\theta\) produces the two companion identities that calculus uses constantly.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.1</span><span class="env-name">Pythagorean companions</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} 1 + \tan^{2}\theta &= \sec^{2}\theta \qquad (\cos\theta \neq 0), \\ 1 + \cot^{2}\theta &= \csc^{2}\theta \qquad (\sin\theta \neq 0). \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Divide \(\sin^{2}\theta + \cos^{2}\theta = 1\) through by \(\cos^{2}\theta\):
+      \[ \frac{\sin^{2}\theta}{\cos^{2}\theta} + 1 = \frac{1}{\cos^{2}\theta}, \qquad\text{that is,}\qquad \tan^{2}\theta + 1 = \sec^{2}\theta. \]
+      Dividing instead by \(\sin^{2}\theta\) gives \(1 + \cot^{2}\theta = \csc^{2}\theta\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.1</span></p>
+      <div class="env-body">
+        <p>Evaluate the following.</p>
+        <ol class="prompt-list">
+          <li>\(\sec\!\left(\tfrac{2\pi}{3}\right)\) and \(\cot\!\left(-\tfrac{\pi}{4}\right)\).</li>
+          <li>Given that \(\tan\theta = 3\) and \(\theta\) lies in the third quadrant, find \(\sec\theta\) and \(\csc\theta\).</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>Since \(\cos\tfrac{2\pi}{3} = -\tfrac{1}{2}\), we get \(\sec\tfrac{2\pi}{3} = 1/(-\tfrac{1}{2}) = -2\). Since \(\cos(-\tfrac{\pi}{4}) = \tfrac{\sqrt{2}}{2}\) and \(\sin(-\tfrac{\pi}{4}) = -\tfrac{\sqrt{2}}{2}\), we get \(\cot(-\tfrac{\pi}{4}) = \frac{\sqrt{2}/2}{-\sqrt{2}/2} = -1\).</li>
+          <li>By Proposition A.1, \(\sec^{2}\theta = 1 + \tan^{2}\theta = 1 + 9 = 10\), so \(\sec\theta = \pm\sqrt{10}\). In the third quadrant \(\cos\theta < 0\), hence \(\sec\theta < 0\), and therefore \(\sec\theta = -\sqrt{10}\). For the cosecant, \(\cot\theta = 1/\tan\theta = \tfrac{1}{3}\) (legitimate here, since \(\tan\theta = 3\) is defined and nonzero), so \(\csc^{2}\theta = 1 + \cot^{2}\theta = 1 + \tfrac{1}{9} = \tfrac{10}{9}\) and \(\csc\theta = \pm\tfrac{\sqrt{10}}{3}\). In the third quadrant \(\sin\theta < 0\), so \(\csc\theta = -\tfrac{\sqrt{10}}{3}\). The squaring in Proposition A.1 forgets all signs; the quadrant restores them.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <p>That is the whole toolkit: three definitions, the right-triangle readings, and the two Pythagorean companions — every fact about \(\sec\), \(\csc\), and \(\cot\) reduced to a fact about \(\sin\) and \(\cos\).</p>
+
+</article>
+</template>
+
+<template id="frag-sec-a-2">
+<!-- §A.2 The Product-to-Sum and Sum-to-Product Identities.
+     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Numbering is MANUAL, namespace "A", continuing from sec-a-1:
+     Proposition A.2 (product-to-sum), A.3 (sum-to-product); Strategy A.1; Example A.2.
+     Math verified: the displayed identities (3 product-to-sum + 4 sum-to-product)
+     re-derived from the angle-sum formulas (u,v-substitution u=(A+B)/2, v=(A−B)/2)
+     during authoring.
+     2026-07-04 addition: an UNNUMBERED power-reduction paragraph (cos^2, sin^2) placed
+     after Proposition A.2's proof — it is a dividend of the product-to-sum identities at
+     u=v=theta, so no new numbered environment and no renumbering.
+     Referenced from: §3.1 (sum-to-product bridge — the derivative-of-sine hinge).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.2</span>The Product-to-Sum and Sum-to-Product Identities</h2>
+  </header>
+
+  <p>One algebraic step in this book carries more weight than any other: rewriting the difference \(\sin(x+h) - \sin x\) as a <em>product</em>, which is what makes the derivative of the sine function computable. The identity that does it belongs to a family — the product-to-sum and sum-to-product identities — that older curricula drilled and most current precalculus courses omit. The good news is that the whole family is nothing but the angle-sum formulas, added and subtracted in pairs. If you learn one thing from this section, learn how to <em>rebuild</em> the identities; the memorizing then becomes optional.</p>
+
+  <p>Everything starts from the four angle-sum and angle-difference formulas, which we assume and record here for reference:
+  \[ \begin{aligned} \sin(u + v) &= \sin u \cos v + \cos u \sin v, \\ \sin(u - v) &= \sin u \cos v - \cos u \sin v, \\ \cos(u + v) &= \cos u \cos v - \sin u \sin v, \\ \cos(u - v) &= \cos u \cos v + \sin u \sin v. \end{aligned} \]</p>
+
+  <p>Add or subtract these in matching pairs and half of each right-hand side cancels, leaving a single product.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.2</span><span class="env-name">Product-to-sum identities</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} \sin u \cos v &= \tfrac{1}{2}\bigl[\sin(u + v) + \sin(u - v)\bigr], \\ \cos u \cos v &= \tfrac{1}{2}\bigl[\cos(u + v) + \cos(u - v)\bigr], \\ \sin u \sin v &= \tfrac{1}{2}\bigl[\cos(u - v) - \cos(u + v)\bigr]. \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Add the two sine formulas: the \(\cos u \sin v\) terms cancel, leaving \(\sin(u+v) + \sin(u-v) = 2 \sin u \cos v\); divide by \(2\). Add the two cosine formulas: the \(\sin u \sin v\) terms cancel, giving \(\cos(u+v) + \cos(u-v) = 2 \cos u \cos v\). Subtract the cosine formulas instead — \(\cos(u-v) - \cos(u+v)\) — and the \(\cos u \cos v\) terms cancel, giving \(2 \sin u \sin v\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>Setting \(u = v = \theta\) in these product-to-sum identities pays an immediate dividend. The middle line becomes \(\cos^{2}\theta = \tfrac{1}{2}\bigl[\cos 2\theta + \cos 0\bigr]\) and the last becomes \(\sin^{2}\theta = \tfrac{1}{2}\bigl[\cos 0 - \cos 2\theta\bigr]\); since \(\cos 0 = 1\), these are the <em>power-reduction</em> formulas
+  \[ \cos^{2}\theta = \frac{1 + \cos 2\theta}{2}, \qquad \sin^{2}\theta = \frac{1 - \cos 2\theta}{2}, \]
+  which trade a <em>squared</em> trigonometric function for a plain one at twice the angle. (The first line, \(\sin\theta \cos\theta = \tfrac{1}{2}\sin 2\theta\), is the double-angle formula for sine read the same way.) These are the forms integration reaches for to handle \(\sin^{2}\) and \(\cos^{2}\) when the techniques of integration arrive.</p>
+
+  <p>The sum-to-product identities are the same cancellations read in the other direction. The only new idea is a change of names: given a sum like \(\sin A + \sin B\), arrange for the two angles to read \(u + v\) and \(u - v\) by choosing \(u\) and \(v\) so that \(u + v = A\) and \(u - v = B\). Adding these two equations gives \(2u = A + B\) and subtracting them gives \(2v = A - B\), so \(u\) is the <em>average</em> and \(v\) the <em>half-difference</em>:
+  \[ u = \frac{A + B}{2}, \qquad v = \frac{A - B}{2}. \]</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.3</span><span class="env-name">Sum-to-product identities</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} \sin A + \sin B &= 2 \sin\frac{A + B}{2} \cos\frac{A - B}{2}, \\ \sin A - \sin B &= 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}, \\ \cos A + \cos B &= 2 \cos\frac{A + B}{2} \cos\frac{A - B}{2}, \\ \cos A - \cos B &= -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}. \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>With \(u = \tfrac{A+B}{2}\) and \(v = \tfrac{A-B}{2}\) we have \(u + v = A\) and \(u - v = B\). Then, reading the cancellations in the previous proof from right to left,
+      \[ \begin{aligned} \sin A + \sin B &= \sin(u + v) + \sin(u - v) \\ &= 2 \sin u \cos v = 2 \sin\frac{A + B}{2} \cos\frac{A - B}{2}, \end{aligned} \]
+      and the other three lines follow the same way: \(\sin A - \sin B = \sin(u+v) - \sin(u-v) = 2 \cos u \sin v\) (this time subtracting the two sine expansions); \(\cos A + \cos B = 2 \cos u \cos v\); and \(\cos A - \cos B = \cos(u+v) - \cos(u-v) = -2 \sin u \sin v\). Note the minus sign in the last line — the only one in the family, and the easiest thing to misremember; the subtraction order \(\cos(u+v) - \cos(u-v)\) is where it comes from. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">A.1</span><span class="env-name">Recovering an identity you forgot</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Write down the two angle-sum (or angle-difference) expansions that contain the pieces you have, and add or subtract them so that the unwanted terms cancel.</li>
+        <li>If your expression is a sum of two trig values at angles \(A\) and \(B\), substitute the average \(u = \tfrac{A+B}{2}\) and half-difference \(v = \tfrac{A-B}{2}\), so that \(A = u + v\) and \(B = u - v\).</li>
+      </ol>
+      <p class="informal">Rebuilding takes perhaps a minute; a memorized list of eight is easy to get wrong by a sign. Verifying is even cheaper — expand the product side with the angle-sum formulas and watch the cross terms cancel.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.2</span></p>
+      <div class="env-body">
+        <p>Rewrite each expression as requested.</p>
+        <ol class="prompt-list">
+          <li>Write \(\sin(x + h) - \sin x\) as a product.</li>
+          <li>Write \(\sin 5x \, \sin 3x\) as a sum.</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>Apply the sum-to-product identity for \(\sin A - \sin B\) with \(A = x + h\) and \(B = x\). The average is \(\tfrac{A+B}{2} = x + \tfrac{h}{2}\) and the half-difference is \(\tfrac{A-B}{2} = \tfrac{h}{2}\), so
+          \[ \sin(x + h) - \sin x = 2 \cos\Bigl(x + \tfrac{h}{2}\Bigr) \sin\frac{h}{2}. \]
+          This is precisely the rewriting the derivative of sine turns on: the difference of two sines becomes a product with the small quantity \(h/2\) isolated inside a single sine.</li>
+          <li>Apply the third product-to-sum identity with \(u = 5x\) and \(v = 3x\):
+          \[ \begin{aligned} \sin 5x \, \sin 3x &= \tfrac{1}{2}\bigl[\cos(5x - 3x) - \cos(5x + 3x)\bigr] \\ &= \tfrac{1}{2}\bigl[\cos 2x - \cos 8x\bigr]. \end{aligned} \]
+          Turning products into sums is the direction integration will want: a sum of cosines is far easier to integrate than a product.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <p>Of the whole family, the identity for \(\sin A - \sin B\) in Proposition A.3 is the one worth keeping at your fingertips; the rest follow from the same two moves the moment you need them.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-a-3">
+<!-- §A.3 Sigma Notation and the Geometric Series.
+     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Numbering is MANUAL, namespace "A", continuing from sec-a-2:
+     Proposition A.4 (finite geom sum), A.5 (infinite geom sum), A.6 (power sums); Example A.3; Caution unnumbered.
+     2026-07-04 GAP-A: appended Proposition A.6 "Power sums" (Σk, Σk², Σk³ via telescoping) + a
+     concrete check + Ch6 Riemann-sum motivation; retitled section to add "Power Sums"; updated the
+     telescoping sentence and the closing to name both families. This shifts the partial-fraction
+     Proposition in sec-a-4 from A.6 to A.7 (its only downstream renumber; §A.3's A.4/A.5 untouched).
+     Math verified: Σk=n(n+1)/2, Σk²=n(n+1)(2n+1)/6 (n=3→14), Σk³=[n(n+1)/2]² (n=3→36), all telescoping.
+     Gates: quote-lint clean; MathJax render 0 errors / 0 column-overflow; Codex gate-2 (gpt-5.5/xhigh) 0 blocking,
+     2 advisory both fixed on regression — (1) expanded the Σk³ step [4Σk³=n²(n+1)²] instead of "identical step";
+     (2) synced the Appendix opener lead + learning objective in sec-a-1 to name power sums. Re-rendered clean.
+     (Separately, an appendix-wide quote --fix cleared 6 PRE-EXISTING §8 ASCII apostrophes in sec-a-1/4/5 — not GAP-A.)
+     2026-07-04 merge: retitled from "The Infinite Geometric Series"; prepended an UNNUMBERED
+     front-matter on sigma notation + index moves (re-index, peel, split-at-cutoff, telescoping),
+     per user decision to fold the Σ/index material in here rather than start a separate section.
+     Basic Σ is SPEC §16.2 A-class; the front-matter recaps it briefly and adds the moves Ch4 uses.
+     No new numbered environments — existing A.4/A.5/Example A.3/Caution untouched (including the
+     manual tweaks to the arrow-notation parenthetical and the Caution's "unless every term is zero").
+     Depth note: the infinite sum is read as a limit in the §1.3 sense (flagged in the
+     appendix opener); the fully rigorous convergence theory is explicitly fenced to
+     §4.1–§4.2 — this section stays at "limit of the partial sums" level.
+     Math verified: telescoping identity and a/(1−r) limit re-derived during authoring;
+     0.999… and 1/2+1/4+… examples recomputed.
+     Referenced from: §4.1 (Strategy 4.1 geometric tail bound bridge).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.3</span>Sigma Notation, Power Sums, and the Geometric Series</h2>
+  </header>
+
+  <p>Before the geometric series itself, a word on the notation that names it and a few moves for handling sums cleanly. The capital-sigma symbol \(\sum\) abbreviates a sum: \(\sum_{k=1}^{n} a_{k}\) means \(a_{1} + a_{2} + \cdots + a_{n}\), the terms \(a_{k}\) added as the <em>index</em> \(k\) climbs through the whole numbers from the lower limit to the upper. The index is only a placeholder — \(\sum_{k=1}^{n} a_{k}\) and \(\sum_{j=1}^{n} a_{j}\) denote the very same sum — and an upper limit of \(\infty\), as in \(\sum_{k=0}^{\infty} a_{k}\), signals a sum that never stops, to be read as the limit of its running totals in the sense settled just below.</p>
+
+  <p>Three moves are worth having at hand. <em>Re-indexing</em> renames the counter without disturbing the sum: setting \(j = k - 1\) rewrites \(\sum_{k=1}^{n} a_{k}\) as \(\sum_{j=0}^{n-1} a_{j+1}\), the same terms relabelled. <em>Peeling</em> detaches the first or last term, as in \(\sum_{k=0}^{n} a_{k} = a_{0} + \sum_{k=1}^{n} a_{k}\). And <em>splitting at a cutoff</em> \(n_{0}\) breaks a sum into a leading part and a <em>tail</em>,
+  \[ \sum_{k=0}^{n} a_{k} \;=\; \sum_{k=0}^{n_{0}} a_{k} \;+\; \sum_{k=n_{0}+1}^{n} a_{k}, \]
+  a standard way to control a series: bound its tail while the leading partial sum is set aside.</p>
+
+  <p>One special sum collapses outright. When each term is the <em>difference</em> of consecutive values of a sequence \(b_{k}\), the interior pieces cancel in pairs:
+  \[ \sum_{k=0}^{m} \bigl(b_{k} - b_{k+1}\bigr) = b_{0} - b_{m+1}, \]
+  since every \(b_{k}\) with \(1 \le k \le m\) is added once and subtracted once. A sum that collapses this way is said to <em>telescope</em>, after the way a spyglass folds shut — and it is the exact mechanism behind both the geometric-sum formula and the power sums below.</p>
+
+  <p>Those moves are all finite bookkeeping. Adding up <em>infinitely</em> many terms is a genuinely new act, and most of its theory belongs to a later chapter of calculus. But one infinite sum is so simple, and so useful so early, that it deserves to be settled now: the geometric series, in which each term is a fixed multiple \(r\) of the one before. It earns its keep everywhere — the <em>tail</em> of a series (its leftover terms past a cutoff) can often be trapped under a geometric tail and squeezed to nothing. Everything rests on one finite identity plus one limit.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.4</span><span class="env-name">Finite geometric sum</span></p>
+    <div class="env-body">
+      <p>For any number \(r \neq 1\) and any positive integer \(m\),
+      \[ 1 + r + r^{2} + \cdots + r^{m} = \frac{1 - r^{m+1}}{1 - r}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Write \(S = 1 + r + r^{2} + \cdots + r^{m}\) and multiply by \(1 - r\):
+      \[ (1 - r)S = \bigl(1 + r + \cdots + r^{m}\bigr) - \bigl(r + r^{2} + \cdots + r^{m+1}\bigr) = 1 - r^{m+1}, \]
+      because each power \(r, r^{2}, \ldots, r^{m}\) appears once in each bracket and cancels, leaving only the leading \(1\) and the final \(-r^{m+1}\) — the sum telescopes. Dividing by \(1 - r\) (legitimate, since \(r \neq 1\)) gives the identity. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>Now let the sum run on. If \(\lvert r \rvert < 1\), each multiplication by \(r\) shrinks the next term by a fixed factor, and the power \(r^{m+1}\) in the formula dies away: its size \(\lvert r \rvert^{m+1}\) drops below any positive threshold once \(m\) is large enough. In the arrow notation for a limit (here the whole-number index \(m\) runs off to infinity, rather than a variable approaching a finite point), \(r^{m+1} \to 0\) as \(m \to \infty\), so the running totals
+  \[ S_{m} = \frac{1 - r^{m+1}}{1 - r} \qquad\text{settle toward}\qquad \frac{1 - 0}{1 - r} = \frac{1}{1 - r}. \]
+  The value of an infinite sum <em>means</em> exactly this: the limit of its running totals. (The running totals also go by the name <em>partial sums</em>; the completeness facts behind general convergence arguments belong to a later chapter of calculus, and none of them are needed for the simple limit here.)</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.5</span><span class="env-name">Infinite geometric series</span></p>
+    <div class="env-body">
+      <p>If \(\lvert r \rvert < 1\), then for any number \(a\),
+      \[ \sum_{k = 0}^{\infty} a r^{k} = a + ar + ar^{2} + \cdots = \frac{a}{1 - r}, \]
+      and in particular the tail starting at \(k = 1\) sums to
+      \[ \sum_{k = 1}^{\infty} r^{k} = \frac{r}{1 - r}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By Proposition A.4 the \(m\)-th running total is \(a \cdot \dfrac{1 - r^{m+1}}{1 - r}\). As \(m \to \infty\) the power \(r^{m+1}\) tends to \(0\), so the totals tend to \(\dfrac{a}{1 - r}\). The tail formula is the case \(a = r\): \(r + r^{2} + r^{3} + \cdots = \dfrac{r}{1 - r}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.3</span></p>
+      <div class="env-body">
+        <p>Evaluate each infinite sum.</p>
+        <ol class="prompt-list">
+          <li>\(\dfrac{1}{2} + \dfrac{1}{4} + \dfrac{1}{8} + \cdots\)</li>
+          <li>\(0.999\ldots\), read as \(\dfrac{9}{10} + \dfrac{9}{100} + \dfrac{9}{1000} + \cdots\)</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>This is Proposition A.5 with \(a = \tfrac{1}{2}\) and \(r = \tfrac{1}{2}\):
+          \[ \frac{1}{2} + \frac{1}{4} + \frac{1}{8} + \cdots = \frac{1/2}{1 - 1/2} = 1. \]
+          The picture matches the algebra: eat half the cake, then half of what remains, then half of that — the running total approaches one whole cake, and in the limit exactly fills it.</li>
+          <li>Here \(a = \tfrac{9}{10}\) and \(r = \tfrac{1}{10}\):
+          \[ 0.999\ldots = \frac{9/10}{1 - 1/10} = \frac{9/10}{9/10} = 1. \]
+          Not approximately \(1\) — exactly \(1\). The two decimal expressions \(0.999\ldots\) and \(1\) are two names for the same number, and the infinite-sum reading is what makes that a computation rather than a debate.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The hypothesis \(\lvert r \rvert < 1\) is doing real work. For \(r = 2\) the series \(1 + 2 + 4 + 8 + \cdots\) grows without bound and has no sum, while the formula, applied blindly, would report \(\frac{1}{1 - 2} = -1\) — nonsense. The formula \(\frac{a}{1 - r}\) does not <em>create</em> a sum; it reports the limit of the running totals, and — unless every term is zero — that limit exists only when \(\lvert r \rvert < 1\).</p>
+    </div>
+  </section>
+
+  <p>The geometric series is one of two finite-sum patterns worth carrying forward. The other is a short family of <em>power sums</em> — the totals of the first \(n\) whole numbers, their squares, and their cubes — which surface the moment Chapter 6 builds the integral as a limit of sums over \(n\) equal pieces. Like the geometric sum, they drop straight out of telescoping.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.6</span><span class="env-name">Power sums</span></p>
+    <div class="env-body">
+      <p>For every positive integer \(n\),
+      \[ \sum_{k=1}^{n} k = \frac{n(n+1)}{2}, \qquad \sum_{k=1}^{n} k^{2} = \frac{n(n+1)(2n+1)}{6}, \qquad \sum_{k=1}^{n} k^{3} = \left[\frac{n(n+1)}{2}\right]^{2}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Each formula comes from the same collapse that gave the geometric sum. Telescoping supplies \(\sum_{k=1}^{n}\bigl[(k+1)^{2} - k^{2}\bigr] = (n+1)^{2} - 1\), since every interior square is added once and subtracted once; and expanding the summand, \((k+1)^{2} - k^{2} = 2k + 1\). Equating the two evaluations,
+      \[ 2\sum_{k=1}^{n} k + n = (n+1)^{2} - 1 = n^{2} + 2n, \]
+      which solves to \(\sum_{k=1}^{n} k = \tfrac{n(n+1)}{2}\). Climbing one power, \(\sum_{k=1}^{n}\bigl[(k+1)^{3} - k^{3}\bigr] = (n+1)^{3} - 1\) with \((k+1)^{3} - k^{3} = 3k^{2} + 3k + 1\) gives
+      \[ 3\sum_{k=1}^{n} k^{2} + 3\sum_{k=1}^{n} k + n = (n+1)^{3} - 1; \]
+      substituting the value of \(\sum k\) just found and solving leaves \(\sum_{k=1}^{n} k^{2} = \tfrac{n(n+1)(2n+1)}{6}\). The cube sum follows by the identical step one power higher: from \((k+1)^{4} - k^{4} = 4k^{3} + 6k^{2} + 4k + 1\), telescoping gives \(4\sum_{k=1}^{n} k^{3} + 6\sum k^{2} + 4\sum k + n = (n+1)^{4} - 1\), and substituting the two sums already found leaves \(4\sum k^{3} = n^{2}(n+1)^{2}\), that is \(\sum_{k=1}^{n} k^{3} = \bigl[\tfrac{n(n+1)}{2}\bigr]^{2}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>A quick check pins the shapes down: at \(n = 3\) the square sum reads \(1 + 4 + 9 = 14\), and \(\tfrac{3 \cdot 4 \cdot 7}{6} = 14\) agrees. What matters is less any single value than the whole shape at once — to add the areas of \(n\) thin rectangles under \(y = x^{2}\) and watch the total settle as \(n \to \infty\), one needs \(\sum k^{2}\) as a formula in \(n\), not a number. That is exactly the step behind the first integral computed from its definition in Chapter 6.</p>
+
+  <p>Two formulas from this section will see the most reuse: the geometric tail bound \(\sum_{k \ge 1} r^{k} = \frac{r}{1 - r}\) of Proposition A.5, behind any argument that traps a series under a geometric tail; and the square sum \(\sum_{k=1}^{n} k^{2} = \frac{n(n+1)(2n+1)}{6}\) of Proposition A.6, behind the first integrals Chapter 6 computes from scratch.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-a-4">
+<!-- §A.4 Partial Fractions.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Second-batch appendix section (user roster decision 2026-07-04).
+     Numbering is MANUAL, namespace "A", continuing from sec-a-3:
+     Proposition A.7; Strategy A.2; Example A.4, A.5; Caution unnumbered.
+     (2026-07-04 GAP-A: this Proposition renumbered A.6 → A.7 because sec-a-3 gained Proposition A.6 "Power sums".)
+     Depth note: the decomposition FORM (Proposition A.7) is stated; its existence/uniqueness
+     is a linear-algebra fact, taken as given (fenced) — the section teaches how to FIND the
+     constants across all three types (distinct linear, repeated linear, irreducible quadratic).
+     Forward-stock: Ch1–4 has no inbound reference (partial fractions is an integration tool);
+     added per user decision 2026-07-04 and registered in CONTENT_SPEC §16.2 as B-class.
+     No mainline cross-ref yet. The 1/(x(x+1)) opener ties back to §A.3's telescoping sum.
+     Math verified during authoring: Example A.4 (5x−1 cover-up), A.5(a) x/(x−1)^2,
+     A.5(b) (x+1)/(x(x^2+1)), and the improper division x^2/(x−1) = x+1 + 1/(x−1).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.4</span>Partial Fractions</h2>
+  </header>
+
+  <p>Adding two fractions over a common denominator is routine; the reverse — breaking one complicated fraction back into simple pieces — is <em>partial fractions</em>. A rational function is a quotient of polynomials \(P(x)/Q(x)\), and partial fractions rewrites it as a sum of fragments simple enough to handle one at a time. The smallest instance is worth seeing first:
+  \[ \frac{1}{x(x + 1)} = \frac{1}{x} - \frac{1}{x + 1}, \]
+  as recombining the right-hand side over a common denominator confirms. (Read left to right, this is exactly the split that makes \(\sum \tfrac{1}{k(k + 1)}\) telescope — §A.3’s collapsing sum in disguise.) Its real payoff is in integration, where each fragment turns out to have a standard antiderivative.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.7</span><span class="env-name">Partial-fraction decomposition</span></p>
+    <div class="env-body">
+      <p>Let \(P(x)/Q(x)\) be a <em>proper</em> rational function — one whose numerator has lower degree than its denominator — and factor \(Q\) completely into linear and irreducible quadratic factors. Then \(P/Q\) equals a sum of partial fractions, contributed factor by factor:</p>
+      <ul>
+        <li>each distinct linear factor \((x - a)\) contributes one term \(\dfrac{A}{x - a}\);</li>
+        <li>each repeated linear factor \((x - a)^{m}\) contributes \(\dfrac{A_{1}}{x - a} + \dfrac{A_{2}}{(x - a)^{2}} + \cdots + \dfrac{A_{m}}{(x - a)^{m}}\);</li>
+        <li>each irreducible quadratic factor \((x^{2} + px + q)\) — one with no real root, i.e. \(p^{2} < 4q\), so it cannot be split into real linear factors — contributes \(\dfrac{Bx + C}{x^{2} + px + q}\); a repeated one \((x^{2} + px + q)^{m}\) contributes one such term over each power up to \(m\).</li>
+      </ul>
+      <p>In every case the fragment’s numerator sits one degree below its denominator — a constant over a linear factor, a linear \(Bx + C\) over a quadratic — and a factor raised to a power gets one fragment for each power up to that exponent, exactly the freedom needed to match an arbitrary proper numerator. The constants are then uniquely determined by \(P\) and \(Q\).</p>
+    </div>
+  </section>
+
+  <p>That such a decomposition always exists, and with only one choice of constants, is a fact of linear algebra: matching numerators forces a system of linear equations in the unknowns that has exactly one solution. We take the <em>shape</em> as given and spend the effort where the work really is — pinning down the constants.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">A.2</span><span class="env-name">Finding the constants</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>If the fraction is <em>improper</em> (numerator degree \(\ge\) denominator degree), divide first: \(P/Q = (\text{a polynomial}) + (\text{proper remainder})/Q\), and decompose only the remainder.</li>
+        <li>Factor the denominator completely and write the template from Proposition A.7 with the constants left as unknowns.</li>
+        <li>Multiply through by \(Q(x)\) to clear denominators, then solve for the constants — either by matching coefficients of like powers of \(x\), or by substituting convenient values of \(x\) (a factor’s own root kills every other term at once).</li>
+      </ol>
+      <p class="informal">The substitution trick in step 3 is the <em>cover-up</em> shortcut: to get the constant over a <em>distinct</em> linear factor \((x - a)\), set \(x = a\) everywhere except in that one factor. It reaches only the top constant of a repeated factor, and an irreducible quadratic has no real root to substitute at all — those remaining constants come from matching coefficients.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.4</span></p>
+      <div class="env-body">
+        <p>Decompose \(\dfrac{5x - 1}{(x - 1)(x + 2)}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Two distinct linear factors call for the template \(\dfrac{5x - 1}{(x - 1)(x + 2)} = \dfrac{A}{x - 1} + \dfrac{B}{x + 2}\). Multiplying through by \((x - 1)(x + 2)\) gives
+        \[ 5x - 1 = A(x + 2) + B(x - 1). \]
+        Setting \(x = 1\) leaves \(4 = 3A\), so \(A = \tfrac{4}{3}\); setting \(x = -2\) leaves \(-11 = -3B\), so \(B = \tfrac{11}{3}\). Hence
+        \[ \frac{5x - 1}{(x - 1)(x + 2)} = \frac{4/3}{x - 1} + \frac{11/3}{x + 2}. \]
+        Each substitution was a root of one factor, which zeroed the other term and handed back a single constant — the cover-up shortcut in action.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.5</span></p>
+      <div class="env-body">
+        <p>Decompose each.</p>
+        <ol class="prompt-list">
+          <li>\(\dfrac{x}{(x - 1)^{2}}\), with a repeated linear factor.</li>
+          <li>\(\dfrac{x + 1}{x(x^{2} + 1)}\), with an irreducible quadratic factor.</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>The repeated factor \((x - 1)^{2}\) needs both powers: \(\dfrac{x}{(x - 1)^{2}} = \dfrac{A}{x - 1} + \dfrac{B}{(x - 1)^{2}}\). Clearing denominators, \(x = A(x - 1) + B\). Setting \(x = 1\) gives \(B = 1\); matching the coefficient of \(x\) gives \(A = 1\). So \(\dfrac{x}{(x - 1)^{2}} = \dfrac{1}{x - 1} + \dfrac{1}{(x - 1)^{2}}\).</li>
+          <li>The quadratic \(x^{2} + 1\) does not factor over the reals — there is no real root to cover up — so it carries a linear numerator, and its constants come from matching coefficients: \(\dfrac{x + 1}{x(x^{2} + 1)} = \dfrac{A}{x} + \dfrac{Bx + C}{x^{2} + 1}\). Clearing denominators, \(x + 1 = A(x^{2} + 1) + (Bx + C)x = (A + B)x^{2} + Cx + A\). Matching powers: the constant term gives \(A = 1\), the coefficient of \(x\) gives \(C = 1\), and the coefficient of \(x^{2}\) gives \(A + B = 0\), so \(B = -1\). Hence \(\dfrac{x + 1}{x(x^{2} + 1)} = \dfrac{1}{x} + \dfrac{1 - x}{x^{2} + 1}\).</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Partial fractions applies only to a <em>proper</em> fraction. Faced with \(\dfrac{x^{2}}{x - 1}\), divide first: \(x^{2} = (x - 1)(x + 1) + 1\), so \(\dfrac{x^{2}}{x - 1} = x + 1 + \dfrac{1}{x - 1}\). No combination of the form \(\dfrac{A}{x - 1}\) alone can reproduce a numerator that outgrows its denominator — the polynomial part must be divided out before the templates apply.</p>
+    </div>
+  </section>
+
+  <p>Every fragment this method produces — \(\dfrac{A}{x - a}\), \(\dfrac{A}{(x - a)^{k}}\), and \(\dfrac{Bx + C}{(x^{2} + px + q)^{k}}\) — has a standard antiderivative, which is why partial fractions is the standard opening move for integrating a rational function. The algebra that gets you there is complete here.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-a-5">
+<!-- §A.5 The Conic Sections.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Second-batch appendix section (user roster decision 2026-07-04),
+     written WITH figures (user directive "連圖一起寫").
+     Numbering is MANUAL, namespace "A", continuing from sec-a-4:
+     Example A.6; Figures A.1–A.4 (the appendix's first figures — A.1 circle,
+     A.2 parabola, A.3 ellipse, A.4 hyperbola).
+     Figure functions live in appendixA-print-standalone.html FIGS: conic-circle,
+     conic-parabola, conic-ellipse, conic-hyperbola (buildPlot curve-halves + dots/
+     reflines/labels; the circle uses an equal-aspect square plot so it renders round).
+     Depth note: a "quick tour" — standard forms centred/vertex at the origin, key
+     features stated, the distance definitions given informally. Forward-stock: Ch1–4
+     has no inbound reference; not registered as SPEC B-class (it is analytic geometry,
+     not a Ch1–4 prerequisite). Math verified during authoring: focus-directrix ⇒ x^2=4py,
+     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=±(b/a)x, Example A.6
+     (4x^2+9y^2=36 ⇒ x^2/9+y^2/4=1, foci (±√5,0)).
+     2026-07-04 GAP-F: appended a closing paragraph teaching completing-the-square (general 2nd-degree ->
+     standard form; worked circle x^2+y^2-6x+4y=12 => (x-3)^2+(y+2)^2=25, r=5 at (3,-2); single-quadratic
+     form (x+p/2)^2+(q-p^2/4) for Ch8 integrals). Prose only, no new numbered env (A.5 "quick tour" kept).
+     Completing-the-square is SPEC §16.2 A-class, folded here per the appendix clean-slate design
+     (handout/_audit/REVIEW-appendix-clean-slate-design.html). Math verified: 9+4 added both sides -> 25.
+     Codex gate-2 (gpt-5.5/xhigh): 0 blocking, 1 advisory FIXED — scoped "general 2nd-degree" to "no xy
+     cross-term" and noted a genuine xy term needs axis rotation (avoids overclaiming). Re-rendered clean.
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.5</span>The Conic Sections</h2>
+  </header>
+
+  <p>Slice a cone with a flat plane and the rim of the cut is a <em>conic section</em>: a circle, an ellipse, a parabola, or a hyperbola, according to the angle of the slice. Each also has a cleaner description in terms of distance, and each has a <em>standard equation</em> — the simplest form, obtained by placing the curve’s centre or vertex at the origin. This tour records the four standard forms and the features to read straight off them.</p>
+
+  <p><strong>The circle.</strong> A circle is the set of points a fixed distance \(r\) — the <em>radius</em> — from a centre; it is the conic already familiar from precalculus, and the template the other three vary. Centred at the origin, the condition \(\sqrt{x^2 + y^2} = r\) squares to the standard equation
+  \[ x^2 + y^2 = r^2. \]</p>
+
+  <figure class="figure" data-fig="conic-circle">
+    <figcaption><span class="fig-no">Figure A.1</span> A circle of radius \(r\) centred at the origin: \(x^2 + y^2 = r^2\).</figcaption>
+  </figure>
+
+  <p><strong>The parabola.</strong> Fix a point \(F\) (the <em>focus</em>) and a line (the <em>directrix</em>). A parabola is the set of points equidistant from the two. Take focus \(F = (0, p)\) with \(p > 0\) and directrix \(y = -p\). Equating a point’s distance to the focus with its distance to the directrix — the latter being the vertical gap \(y + p\) down to the line \(y = -p\) — gives \(x^2 + (y - p)^2 = (y + p)^2\), which simplifies to the standard equation
+  \[ x^2 = 4py, \]
+  a curve opening upward from its vertex at the origin. (Putting the focus on the \(x\)-axis instead gives the sideways form \(y^2 = 4px\).)</p>
+
+  <figure class="figure" data-fig="conic-parabola">
+    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+  </figure>
+
+  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+  \[ \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1, \qquad b^2 = a^2 - c^2, \]
+  with \(a > b > 0\). The number \(b\) has a clean meaning: at the top of the ellipse, \((0, b)\), symmetry makes the two focal distances equal, and since they sum to \(2a\) each equals \(a\); the right triangle with legs \(b\) and \(c\) and hypotenuse \(a\) then gives \(a^2 = b^2 + c^2\) — the relation above. The curve crosses the axes at \((\pm a, 0)\) and \((0, \pm b)\), and the longer semi-axis \(a\) runs along the line through the foci. Because the foci sit <em>inside</em> the curve, \(c < a\), and \(c = \sqrt{a^2 - b^2}\) places them between the centre and the vertices.</p>
+
+  <figure class="figure" data-fig="conic-ellipse">
+    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+  </figure>
+
+  <p><strong>The hyperbola.</strong> Keep two foci, but now ask for a fixed <em>difference</em> of distances rather than a sum. With foci at \((\pm c, 0)\) and the difference written \(2a\), the standard equation is
+  \[ \frac{x^2}{a^2} - \frac{y^2}{b^2} = 1, \qquad b^2 = c^2 - a^2. \]
+  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\) — the crossed lines whose slopes \(\pm b/a\) set how widely the branches open. This time the foci lie <em>beyond</em> the vertices, so \(c > a\), and the relation turns into \(c = \sqrt{a^2 + b^2}\): a <em>plus</em> where the ellipse had a minus, precisely because the focus has moved from inside the curve to outside it.</p>
+
+  <figure class="figure" data-fig="conic-hyperbola">
+    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.6</span></p>
+      <div class="env-body">
+        <p>Identify the curve \(4x^2 + 9y^2 = 36\) and locate its foci.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Divide through by \(36\) to reach standard form:
+        \[ \frac{x^2}{9} + \frac{y^2}{4} = 1. \]
+        Both squared terms are added, so the curve is an ellipse, with \(a^2 = 9\) and \(b^2 = 4\) — that is \(a = 3\) and \(b = 2\). Since \(a > b\), the major axis is horizontal, and \(c = \sqrt{a^2 - b^2} = \sqrt{9 - 4} = \sqrt{5}\). The foci therefore sit at \((\pm\sqrt{5},\, 0)\), about \((\pm 2.24,\, 0)\). Had the sign between the terms been a minus, the same reading would have named a hyperbola instead, with \(c = \sqrt{a^2 + b^2}\).</p>
+      </div>
+    </section>
+  </div>
+
+  <p>Those are the four curves, their standard equations, and the features — centre, radius, focus, directrix, foci, axes, and asymptotes — that each equation puts on display. Moving a centre or vertex off the origin only replaces \(x\) and \(y\) with \((x - h)\) and \((y - k)\); the shapes, and everything this tour named, are unchanged.</p>
+
+  <p>Read backwards, that last remark is a tool. A second-degree equation handed over in <em>expanded</em> form — \(x^2 + y^2 - 6x + 4y = 12\), say — hides its centre until you <em>complete the square</em> in each variable, grouping each pair and adding the square of half the linear coefficient to both sides:
+  \[ (x^2 - 6x + 9) + (y^2 + 4y + 4) = 12 + 9 + 4, \qquad\text{that is}\qquad (x - 3)^2 + (y + 2)^2 = 25, \]
+  a circle of radius \(5\) centred at \((3, -2)\). The same single move, \(x^2 + px + q = \left(x + \tfrac{p}{2}\right)^2 + \left(q - \tfrac{p^2}{4}\right)\), is what later lets an integral such as \(\int \dfrac{dx}{x^2 + px + q}\) be recentred and evaluated (Chapter 8). Completing the square is the one algebraic step that turns such an expression — one with no \(xy\) cross-term — into a standard one; a genuine \(xy\) term would call for a rotation of the axes as well, a step beyond this tour.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-a-6">
+<!-- §A.6 Absolute Value and Inequalities.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3 + §3 register).
+     GAP-E from the full-arc appendix clean-slate design: absolute-value inequalities are §16.2 C-class
+     that escalate to B when load-bearing (Ch1 ε-δ; Ch11 radius of convergence |x-a|<R). This section lays
+     out the distance interpretation, the |x-a|<δ <=> interval unpacking, and the triangle inequality (the
+     workhorse of ε-δ and convergence proofs, already used implicitly in Ch4).
+     Numbering is MANUAL, namespace "A", continuing from sec-a-5:
+     Proposition A.8 (triangle inequality); Example A.7; Caution unnumbered. No figures.
+     New section: registered in build.py CHAPTERS["appA"] fragment list (sec-a-6) 2026-07-04.
+     Opener (sec-a-1) lead + learning objective updated to name §A.6.
+     Math verified: |2x-3|<5 <=> -1<x<4, midpoint 3/2 half-width 5/2; triangle ineq from -|x|<=x<=|x|.
+     Record: handout/_audit/REVIEW-appendix-clean-slate-design.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.6</span>Absolute Value and Inequalities</h2>
+  </header>
+
+  <p>The absolute value \(|x|\) is the size of \(x\) with its sign discarded — \(|3| = 3\) and \(|-3| = 3\). Its real use in calculus is geometric: \(|x - a|\) is the <em>distance</em> between \(x\) and \(a\) on the number line, and every \(\varepsilon\)–\(\delta\) statement is a sentence about such distances. Reading absolute-value inequalities fluently, in both directions, is therefore a standing prerequisite rather than a one-off trick.</p>
+
+  <p>The single most useful reading turns a distance bound into an interval. For \(\delta > 0\),
+  \[ |x - a| < \delta \quad\Longleftrightarrow\quad a - \delta < x < a + \delta, \]
+  since “within \(\delta\) of \(a\)” is exactly “no further than \(\delta\) to either side.” The set on the right is the <em>\(\delta\)-neighbourhood</em> of \(a\): an open interval of width \(2\delta\) centred at \(a\). Closing the inequality closes the interval — \(|x - a| \le \delta \Leftrightarrow a - \delta \le x \le a + \delta\) — and reversing it turns the region inside out: \(|x - a| > \delta\) describes the two rays <em>outside</em>, \(x < a - \delta\) or \(x > a + \delta\). This is the unpacking behind every limit and continuity statement, and behind the interval of convergence of a power series, where \(|x - a| < R\) reads as “\(x\) lies within \(R\) of the centre \(a\).”</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.7</span></p>
+      <div class="env-body">
+        <p>Solve \(|2x - 3| < 5\), and describe the solution as a neighbourhood.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Unpack the bound into a double inequality and work the two sides together:
+        \[ |2x - 3| < 5 \;\Longleftrightarrow\; -5 < 2x - 3 < 5 \;\Longleftrightarrow\; -2 < 2x < 8 \;\Longleftrightarrow\; -1 < x < 4. \]
+        The solution is the open interval \((-1, 4)\). Its midpoint is \(\tfrac{-1 + 4}{2} = \tfrac{3}{2}\) and its half-width is \(\tfrac{5}{2}\), so the same set reads \(\left|x - \tfrac{3}{2}\right| < \tfrac{5}{2}\) — a neighbourhood of \(\tfrac{3}{2}\). Dividing the original bound by \(2\) shows why: \(|2x - 3| = 2\left|x - \tfrac{3}{2}\right|\), so \(|2x - 3| < 5\) is the same demand as \(\left|x - \tfrac{3}{2}\right| < \tfrac{5}{2}\).</p>
+      </div>
+    </section>
+  </div>
+
+  <p>One inequality outranks all others for the proofs in this book. It bounds the size of a sum by the sizes of its parts, and it is the lever behind almost every \(\varepsilon\)–\(\delta\) estimate.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.8</span><span class="env-name">Triangle inequality</span></p>
+    <div class="env-body">
+      <p>For all real numbers \(x\) and \(y\),
+      \[ |x + y| \le |x| + |y|, \]
+      and consequently \(\bigl||x| - |y|\bigr| \le |x - y|\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Every real number lies between the negative and the positive of its own size: \(-|x| \le x \le |x|\), and likewise \(-|y| \le y \le |y|\). Adding the two chains term by term,
+      \[ -\bigl(|x| + |y|\bigr) \le x + y \le |x| + |y|, \]
+      which says exactly that \(x + y\) is no further than \(|x| + |y|\) from zero — that is, \(|x + y| \le |x| + |y|\). For the second form, apply the first to \(|x| = |(x - y) + y| \le |x - y| + |y|\), so that \(|x| - |y| \le |x - y|\); swapping \(x\) and \(y\) gives \(|y| - |x| \le |x - y|\) as well, and the two together are precisely \(\bigl||x| - |y|\bigr| \le |x - y|\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>In practice the triangle inequality appears whenever an error must be split and controlled piece by piece: to force \(|f(x) - L|\) below \(\varepsilon\), bound it by a sum of quantities each held under \(\tfrac{\varepsilon}{2}\), and the total stays under \(\varepsilon\). The chapters that prove limits, continuity, and convergence lean on this move constantly.</p>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>An absolute-value inequality is <em>not</em> disposed of by simply dropping the bars. The statement \(|x - a| < \delta\) unpacks to the <em>pair</em> \(-\delta < x - a < \delta\), not to \(x - a < \delta\) alone — the lower bound is half of what was said. Keeping only the upper half retains the points on one side of \(a\) and silently discards the rest of the neighbourhood.</p>
+    </div>
+  </section>
+
+</article>
+</template>
+<!-- END-CONTENT-FRAGMENTS -->
+<!-- plot.js — inlined -->
+<script>
+(function () {
+  var uid = 0;
+  var PI = Math.PI;
+  function piTex(v) {
+    var map = {};
+    map[(-2 * PI).toFixed(4)] = "-2\\pi";
+    map[(-PI).toFixed(4)] = "-\\pi";
+    map[(-PI / 2).toFixed(4)] = "-\\tfrac{\\pi}{2}";
+    map[(PI / 2).toFixed(4)] = "\\tfrac{\\pi}{2}";
+    map[PI.toFixed(4)] = "\\pi";
+    map[(2 * PI).toFixed(4)] = "2\\pi";
+    map[(0).toFixed(4)] = "0";
+    var hit = map[v.toFixed(4)];
+    if (hit != null) return hit;
+    if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v)); // plain integers
+    return undefined;
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function anchorTransform(anchor, vAnchor) {
+    var tx = anchor === "start" ? "0" : anchor === "end" ? "-100%" : "-50%";
+    var ty = vAnchor === "top" ? "0" : vAnchor === "bottom" ? "-100%" : "-50%";
+    return "translate(" + tx + "," + ty + ")";
+  }
+  function buildPlot(cfg) {
+    var w = cfg.w, h = cfg.h;
+    var pad = Object.assign({ t: 16, r: 18, b: 20, l: 22 }, cfg.pad || {});
+    var xmin = cfg.xmin, xmax = cfg.xmax, ymin = cfg.ymin, ymax = cfg.ymax;
+    var iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    var SX = function(x) { return pad.l + ((x - xmin) / (xmax - xmin)) * iw; };
+    var SY = function(y) { return h - pad.b - ((y - ymin) / (ymax - ymin)) * ih; };
+    var id = "pl" + (++uid);
+    var parts = [], labels = [];
+    function pushLabel(o) { labels.push(o); }
+    parts.push('<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:' + w + 'px" class="fig-svg" role="img" aria-label="' + esc(cfg.aria || "graph") + '" preserveAspectRatio="xMidYMid meet">');
+    parts.push('<defs><marker id="' + id + 'a" markerWidth="8" markerHeight="8" refX="5.4" refY="2.8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5.4,2.8 L0,5.6" fill="none" stroke="var(--c-axis)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>');
+    if (cfg.axes !== false) {
+      var x0 = Math.min(Math.max(0, xmin), xmax), y0 = Math.min(Math.max(0, ymin), ymax);
+      var ax0 = SX(xmin), ax1 = SX(xmax), ayBase = SY(y0);
+      parts.push('<path d="M' + ax0.toFixed(1) + ',' + ayBase.toFixed(1) + ' H' + (ax1 - 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      var ay0 = SY(ymin), ay1 = SY(ymax), axBase = SX(x0);
+      parts.push('<path d="M' + axBase.toFixed(1) + ',' + ay0.toFixed(1) + ' V' + (ay1 + 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      if (cfg.xlabel) pushLabel({ px: ax1 + 1, py: ayBase + 4, tex: cfg.xlabel, anchor: "start", vAnchor: "top", cls: "a-ax", size: 13 });
+      if (cfg.ylabel) pushLabel({ px: axBase - 5, py: ay1 + 1, tex: cfg.ylabel, anchor: "end", vAnchor: "top", cls: "a-ax", size: 13 });
+      (cfg.xticks || []).forEach(function(t) {
+        var px = SX(t.x);
+        parts.push('<line x1="' + px.toFixed(1) + '" y1="' + (ayBase - 3).toFixed(1) + '" x2="' + px.toFixed(1) + '" y2="' + (ayBase + 3).toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.x));
+        if (tex != null) pushLabel({ px: px, py: ayBase + 6, tex: tex, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: px, py: ayBase + 6, text: t.label, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+      });
+      (cfg.yticks || []).forEach(function(t) {
+        var py = SY(t.y);
+        parts.push('<line x1="' + (axBase - 3).toFixed(1) + '" y1="' + py.toFixed(1) + '" x2="' + (axBase + 3).toFixed(1) + '" y2="' + py.toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.y));
+        if (tex != null) pushLabel({ px: axBase - 6, py: py, tex: tex, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: axBase - 6, py: py, text: t.label, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+      });
+    }
+    (cfg.items || []).forEach(function(it) {
+      if (it.type === "curve") {
+        var cls = it.cls || "curve", n = it.samples || 240, a = it.domain[0], b = it.domain[1];
+        var d = "", pen = false;
+        for (var i = 0; i <= n; i++) {
+          var x = a + (b - a) * (i / n), y = it.fn(x);
+          if (!isFinite(y) || y < ymin - (ymax - ymin) * 0.04 || y > ymax + (ymax - ymin) * 0.04) { pen = false; continue; }
+          var px = SX(x).toFixed(2), py = SY(y).toFixed(2);
+          d += (pen ? "L" : "M") + px + "," + py + " "; pen = true;
+        }
+        if (d) parts.push('<path d="' + d.trim() + '" class="' + cls + '"/>');
+      } else if (it.type === "vline") {
+        parts.push('<line x1="' + SX(it.x).toFixed(1) + '" y1="' + SY(ymin).toFixed(1) + '" x2="' + SX(it.x).toFixed(1) + '" y2="' + SY(ymax).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "hline") {
+        var ha = it.from != null ? it.from : xmin, hb = it.to != null ? it.to : xmax;
+        parts.push('<line x1="' + SX(ha).toFixed(1) + '" y1="' + SY(it.y).toFixed(1) + '" x2="' + SX(hb).toFixed(1) + '" y2="' + SY(it.y).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "seg") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="' + (it.cls || "curve") + '"/>');
+      } else if (it.type === "dot") {
+        var r = it.r || 3.0;
+        if (it.hollow) parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/>');
+        else parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" class="dot"/>');
+      } else if (it.type === "arrow") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      } else if (it.type === "text") {
+        pushLabel({ px: SX(it.x), py: SY(it.y), tex: it.tex, text: it.tex == null ? it.text : null, anchor: it.anchor || "middle", vAnchor: it.vAnchor || "middle", dx: it.dx || 0, dy: it.dy || 0, cls: it.cls || "a-pt", size: it.size });
+      }
+    });
+    if (labels.length) {
+      var M = 52;
+      var spans = labels.map(function(L) {
+        var left = (L.px + (L.dx || 0) + M).toFixed(1);
+        var top = (L.py + (L.dy || 0) + M).toFixed(1);
+        var tf = anchorTransform(L.anchor, L.vAnchor);
+        var fs = L.size ? "font-size:" + L.size + "px;" : "";
+        var body = L.tex != null ? "\\(" + L.tex + "\\)" : esc(L.text == null ? "" : L.text);
+        return '<span class="fig-lbl ' + (L.cls || "") + '" style="left:' + left + 'px;top:' + top + 'px;transform:' + tf + ';' + fs + '">' + body + '</span>';
+      }).join("");
+      parts.push('<foreignObject x="' + (-M) + '" y="' + (-M) + '" width="' + (w + 2 * M) + '" height="' + (h + 2 * M) + '" class="fig-fo" requiredExtensions="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml" class="fig-lyr">' + spans + '</div></foreignObject>');
+    }
+    parts.push('</svg>');
+    return parts.join("");
+  }
+  window.buildPlot = buildPlot;
+  window.PIVAL = PI;
+})();
+</script>
+
+<!-- ============================================================
+     figures.js — inlined (Chapter 1 figure registry)
+     ============================================================ -->
+<script>
+/* ============================================================
+   figures.js — Chapter 1 figure registry.
+   Each entry returns { layout, panels:[{svg, note}] } (note may
+   carry \( \) math, rendered by the page's MathJax pass afterward).
+   In-figure labels also carry TeX via { type:"text", tex:"…" } and
+   are typeset by the same MathJax pass — so every glyph in the graphs
+   matches the body equations (Computer Modern).
+   hydrateFigures(root) fills every <figure data-fig="id"> before
+   its <figcaption>.
+   ============================================================ */
+(function () {
+  const P = () => window.PIVAL;
+  const pow2 = (x) => Math.pow(2, x);
+
+  const FIGS = {
+    /* ---------------- Appendix A §A.5 — conic sections (self-authored 2026-07-04) ---------------- */
+    "conic-circle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 250, h: 250, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -2.8, xmax: 2.8, ymin: -2.8, ymax: 2.8,
+          xlabel: "x", ylabel: "y", aria: "A circle of radius r centred at the origin, with one radius drawn to the rim.",
+          items: [
+            { type: "curve", fn: (x) => Math.sqrt(Math.max(0, 4 - x * x)), domain: [-2, 2], samples: 320, cls: "curve" },
+            { type: "curve", fn: (x) => -Math.sqrt(Math.max(0, 4 - x * x)), domain: [-2, 2], samples: 320, cls: "curve" },
+            { type: "seg", x1: 0, y1: 0, x2: 1.414, y2: 1.414, cls: "refline" },
+            { type: "dot", x: 0, y: 0 },
+            { type: "text", x: 0.58, y: 0.86, tex: "r", cls: "a-ref", anchor: "end" },
+            { type: "text", x: -0.12, y: -0.12, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+          ],
+        }),
+        note: "A circle: every point lies a fixed distance \\(r\\) from the centre \\(O\\).",
+      }],
+    }),
+    "conic-parabola": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 270, h: 240, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -3.7, xmax: 3.7, ymin: -1.6, ymax: 4.8,
+          xlabel: "x", ylabel: "y", aria: "An upward parabola with its focus above the vertex and its directrix a dashed line below.",
+          items: [
+            { type: "curve", fn: (x) => x * x / 4, domain: [-3.7, 3.7], samples: 220, cls: "curve" },
+            { type: "hline", y: -1, from: -3.4, to: 3.4, cls: "refline" },
+            { type: "dot", x: 0, y: 1 },
+            { type: "text", x: 0.16, y: 1.08, tex: "F=(0,p)", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 3.4, y: -1, tex: "y=-p", cls: "a-ref", anchor: "end", vAnchor: "top", dy: 3 },
+            { type: "text", x: -0.14, y: 0.02, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+          ],
+        }),
+        note: "A parabola \\(x^2=4py\\): every point is equidistant from the focus \\(F\\) and the directrix \\(y=-p\\).",
+      }],
+    }),
+    "conic-ellipse": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -3.7, xmax: 3.7, ymin: -2.8, ymax: 2.8,
+          xlabel: "x", ylabel: "y", aria: "An ellipse wider than it is tall, with two foci on the horizontal axis.",
+          items: [
+            { type: "curve", fn: (x) => 2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+            { type: "curve", fn: (x) => -2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+            { type: "dot", x: 2.236, y: 0 },
+            { type: "dot", x: -2.236, y: 0 },
+            { type: "dot", x: 0, y: 0 },
+            { type: "text", x: 2.236, y: -0.12, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: -2.236, y: -0.12, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: 3.02, y: 0.12, tex: "(a,0)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+            { type: "text", x: 0.18, y: 2.05, tex: "(0,b)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+          ],
+        }),
+        note: "An ellipse \\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1\\) with \\(a>b\\): the distances to the two foci \\(F_1,F_2\\) sum to a constant.",
+      }],
+    }),
+    "conic-hyperbola": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -5.2, xmax: 5.2, ymin: -4, ymax: 4,
+          xlabel: "x", ylabel: "y", aria: "A hyperbola with two branches opening left and right, hugging two dashed asymptotes.",
+          items: [
+            { type: "seg", x1: -5, y1: -3.75, x2: 5, y2: 3.75, cls: "refline" },
+            { type: "seg", x1: -5, y1: 3.75, x2: 5, y2: -3.75, cls: "refline" },
+            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [-5.2, -2], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [-5.2, -2], samples: 200, cls: "curve" },
+            { type: "dot", x: 2.5, y: 0 },
+            { type: "dot", x: -2.5, y: 0 },
+            { type: "dot", x: 2, y: 0, hollow: true },
+            { type: "dot", x: -2, y: 0, hollow: true },
+            { type: "dot", x: 0, y: 0 },
+            { type: "text", x: 2.5, y: -0.16, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: -2.5, y: -0.16, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: 2, y: 0.18, tex: "(a,0)", cls: "a-pt", anchor: "middle", vAnchor: "bottom" },
+            { type: "text", x: 4.9, y: 3.68, tex: "y=\\tfrac{b}{a}x", cls: "a-ref", anchor: "end", vAnchor: "bottom" },
+            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+          ],
+        }),
+        note: "A hyperbola \\(\\frac{x^2}{a^2}-\\frac{y^2}{b^2}=1\\): two branches with vertices at \\((\\pm a,0)\\), approaching the asymptotes \\(y=\\pm\\frac{b}{a}x\\).",
+      }],
+    }),
+
+    /* ---------------- §1.1 ---------------- */
+    "hlt": () => ({
+      layout: "pair",
+      panels: [
+        {
+          svg: buildPlot({
+            w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3,
+            xlabel: "x", ylabel: "y", aria: "A one-to-one line crossed once by a horizontal line.",
+            items: [
+              { type: "curve", fn: (x) => x, domain: [-1.5, 1.45], cls: "curve" },
+              { type: "hline", y: 1, from: -2.1, to: 1.3, cls: "refline" },
+              { type: "dot", x: 1, y: 1 },
+              { type: "text", x: 1.55, y: 1.62, tex: "f", cls: "a-curve" },
+              { type: "text", x: 1.42, y: 1.0, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -2 },
+              { type: "text", x: 1.06, y: 0.46, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "start" },
+            ],
+          }),
+          note: "One-to-one \u2014 a line meets the graph at most once.",
+        },
+        {
+          svg: buildPlot({
+            w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3,
+            xlabel: "x", ylabel: "y", aria: "A parabola crossed twice by a horizontal line.",
+            items: [
+              { type: "curve", fn: (x) => 1.15 * x * x, domain: [-1.4, 1.4], cls: "curve" },
+              { type: "hline", y: 1.25, from: -1.85, to: 1.85, cls: "refline" },
+              { type: "dot", x: -1.043, y: 1.25 },
+              { type: "dot", x: 1.043, y: 1.25 },
+              { type: "text", x: 1.5, y: 2.18, tex: "f", cls: "a-curve" },
+              { type: "text", x: 1.9, y: 1.25, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 },
+              { type: "text", x: -1.2, y: 0.98, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "end" },
+              { type: "text", x: 1.2, y: 0.98, tex: "(x_2,\\,c)", cls: "a-pt", anchor: "start" },
+            ],
+          }),
+          note: "Not one-to-one \u2014 a line meets the graph more than once.",
+        },
+      ],
+    }),
+
+    "restrict-x2": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 300, h: 300, xmin: -0.4, xmax: 2.7, ymin: -0.4, ymax: 2.7,
+          xlabel: "x", ylabel: "y",
+          aria: "The squaring function restricted to the nonnegative reals, its inverse square root, and the mirror line y equals x.",
+          items: [
+            { type: "curve", fn: (x) => x, domain: [0, 2.5], cls: "refline" },
+            { type: "curve", fn: (x) => x * x, domain: [0, 1.6], cls: "curve" },
+            { type: "curve", fn: (x) => Math.sqrt(x), domain: [0, 2.5], cls: "curve" },
+            { type: "text", x: 1.02, y: 2.25, tex: "f(x)=x^{2}", cls: "a-curve", anchor: "end" },
+            { type: "text", x: 2.5, y: 1.5, tex: "f^{-1}(x)=\\sqrt{x}", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 2.32, y: 2.5, tex: "y=x", cls: "a-ref", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.2 ---------------- */
+    "sine-not-1to1": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 620, h: 220, xmin: -6.9, xmax: 7.4, ymin: -1.35, ymax: 1.35,
+          pad: { t: 16, r: 18, b: 26, l: 18 },
+          xlabel: "x", ylabel: "y", aria: "The sine function on the real line is not one-to-one.",
+          xticks: [{ x: -2 * P() }, { x: -P() }, { x: P() }, { x: 2 * P() }],
+          yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.sin(x), domain: [-6.8, 6.8], samples: 360, cls: "curve" },
+            { type: "hline", y: 0.5, from: -6.8, to: 6.8, cls: "refline" },
+            ...[0.5236, 2.618, 6.807, -3.6652, -5.7596].map((x) => ({ type: "dot", x, y: 0.5, r: 2.6 })),
+            { type: "text", x: 3.25, y: 1.0, tex: "\\sin x", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 6.95, y: 0.5, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 },
+          ],
+        }),
+      }],
+    }),
+    "restricted-sine": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 380, h: 260, xmin: -1.95, xmax: 1.95, ymin: -1.25, ymax: 1.25,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of sine.",
+          xticks: [{ x: -P() / 2 }, { x: P() / 2 }], yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.sin(x), domain: [-P() / 2, P() / 2], cls: "curve" },
+            { type: "text", x: 1.02, y: 1.12, tex: "\\sin x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "restricted-cosine": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 380, h: 200, xmin: -0.4, xmax: 3.6, ymin: -1.35, ymax: 1.75,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of cosine.",
+          xticks: [{ x: P() }], yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.cos(x), domain: [0, P()], cls: "curve" },
+            { type: "text", x: 1.25, y: 0.8, tex: "\\cos x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "restricted-tangent": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 320, h: 320, xmin: -1.95, xmax: 1.95, ymin: -5, ymax: 5,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of tangent.",
+          xticks: [{ x: -P() / 2 }, { x: P() / 2 }],
+          items: [
+            { type: "vline", x: -P() / 2, cls: "refline" },
+            { type: "vline", x: P() / 2, cls: "refline" },
+            { type: "curve", fn: (x) => Math.tan(x), domain: [-1.37, 1.37], samples: 300, cls: "curve" },
+            { type: "text", x: 0.35, y: 2.8, tex: "\\tan x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "arcsin-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 300, h: 130, xmin: -0.3, xmax: 3.5, ymin: -0.35, ymax: 1.45, axes: false,
+          aria: "Right triangle with angle theta, opposite 1, adjacent 2 root 2, hypotenuse 3.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 3, y2: 0, cls: "curve" },
+            { type: "seg", x1: 3, y1: 0, x2: 3, y2: 1, cls: "curve" },
+            { type: "seg", x1: 3, y1: 1, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2.78, y1: 0, x2: 2.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 2.78, y1: 0.22, x2: 3, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.66, y: 0.13, tex: "\\theta", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1.5, y: 0, tex: "2\\sqrt{2}", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 3, y: 0.5, tex: "1", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 1.25, y: 0.62, tex: "3", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+    "arctan10-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 240, h: 180, xmin: -0.3, xmax: 2.8, ymin: -0.35, ymax: 2.0, axes: false,
+          aria: "Right triangle with angle theta, adjacent 1, opposite 10, hypotenuse square root of 101.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 2, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2, y1: 0, x2: 2, y2: 1.5, cls: "curve" },
+            { type: "seg", x1: 2, y1: 1.5, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 1.78, y1: 0, x2: 1.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 1.78, y1: 0.22, x2: 2, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.46, y: 0.18, tex: "\\theta", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1, y: 0, tex: "1", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 2, y: 0.75, tex: "10", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 0.8, y: 0.9, tex: "\\sqrt{101}", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+    "arctan-general-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 240, h: 180, xmin: -0.3, xmax: 2.8, ymin: -0.35, ymax: 2.0, axes: false,
+          aria: "Right triangle with angle y, adjacent 1, opposite x, hypotenuse square root of 1 plus x squared.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 2, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2, y1: 0, x2: 2, y2: 1.5, cls: "curve" },
+            { type: "seg", x1: 2, y1: 1.5, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 1.78, y1: 0, x2: 1.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 1.78, y1: 0.22, x2: 2, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.46, y: 0.18, tex: "y", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1, y: 0, tex: "1", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 2, y: 0.75, tex: "x", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 0.8, y: 0.9, tex: "\\sqrt{1+x^{2}}", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.3 ---------------- */
+    "limit-same-near-a": () => {
+      const base = (extra) => buildPlot(Object.assign({
+        w: 250, h: 200, xmin: 0, xmax: 3.7, ymin: 0, ymax: 14,
+        pad: { t: 14, r: 16, b: 20, l: 18 }, xlabel: "x", ylabel: "y",
+        aria: "A function approaching L as x approaches a.",
+      }, extra));
+      const labels = [
+        { type: "hline", y: 8, from: 0, to: 3, cls: "refline" },
+        { type: "text", x: 3, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+        { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+      ];
+      return {
+        layout: "triple",
+        panels: [
+          {
+            svg: base({ items: [{ type: "curve", fn: pow2, domain: [0.45, 3.45], cls: "curve" }, ...labels, { type: "dot", x: 3, y: 8 }] }),
+            note: "\\(f(a) = L\\)",
+          },
+          {
+            svg: base({ items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              ...labels, { type: "dot", x: 3, y: 8, hollow: true }, { type: "dot", x: 3, y: 5 },
+            ] }),
+            note: "\\(f(a) \\neq L\\)",
+          },
+          {
+            svg: base({ items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              ...labels, { type: "dot", x: 3, y: 8, hollow: true },
+            ] }),
+            note: "\\(f(a)\\) is undefined",
+          },
+        ],
+      };
+    },
+
+    "read-limit-graph": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 460, h: 280, xmin: -3.3, xmax: 2.9, ymin: -2.7, ymax: 2.8,
+          xlabel: "x", ylabel: "y",
+          aria: "A function with limit 1 at x = -2, limit 0 at x = 0, and limit 2 at x = 2, although f(2) = -2.",
+          xticks: [{ x: -2, tex: "-2" }, { x: 2, tex: "2" }],
+          yticks: [{ y: -2, tex: "-2" }, { y: 1, tex: "1" }, { y: 2, tex: "2" }],
+          items: [
+            { type: "curve", fn: (x) => -0.0375 * x * x * x + 0.375 * x * x + 0.4 * x, domain: [-2.8, 1.98], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -0.0375 * x * x * x + 0.375 * x * x + 0.4 * x, domain: [2.02, 2.7], samples: 50, cls: "curve" },
+            { type: "dot", x: 2, y: 2, hollow: true },
+            { type: "dot", x: 2, y: -2 },
+            { type: "text", x: -2.7, y: 1.55, tex: "y=f(x)", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.4 ---------------- */
+    "one-sided-limits": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 260, xmin: -0.5, xmax: 4.5, ymin: -0.5, ymax: 3.2,
+          xlabel: "x", ylabel: "y", aria: "Different left and right limits at a.",
+          xticks: [{ x: 2, tex: "a" }], yticks: [{ y: 1, tex: "L_1" }, { y: 2, tex: "L_2" }],
+          items: [
+            { type: "curve", fn: (x) => 1 + 0.25 * (x - 2) * (x - 2), domain: [0.2, 1.95], cls: "curve" },
+            { type: "curve", fn: (x) => 2 + 0.2 * (x - 2) * (x - 2), domain: [2.05, 4.2], cls: "curve" },
+            { type: "dot", x: 2, y: 1, hollow: true }, { type: "dot", x: 2, y: 2, hollow: true },
+          ],
+        }),
+      }],
+    }),
+    "one-sided-infinite": () => {
+      const mk = (fn, dom, ymin, ymax) => buildPlot({
+        w: 240, h: 210, xmin: -0.2, xmax: 3.2, ymin, ymax,
+        pad: { t: 14, r: 14, b: 20, l: 16 }, xlabel: "x", ylabel: "y",
+        aria: "A one-sided infinite limit.",
+        xticks: [{ x: 2, tex: "a" }],
+        items: [{ type: "vline", x: 2, cls: "refline" }, { type: "curve", fn, domain: dom, samples: 200, cls: "curve" }],
+      });
+      return {
+        layout: "grid",
+        panels: [
+          { svg: mk((x) => 1 / (2 - x), [0.25, 1.68], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{-}} f(x)=\\infty\\)" },
+          { svg: mk((x) => 1 / (x - 2), [2.32, 3.0], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{+}} f(x)=\\infty\\)" },
+          { svg: mk((x) => -1 / (2 - x), [0.25, 1.68], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{-}} f(x)=-\\infty\\)" },
+          { svg: mk((x) => -1 / (x - 2), [2.32, 3.0], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{+}} f(x)=-\\infty\\)" },
+        ],
+      };
+    },
+    "vertical-asymptote": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 260, xmin: -1, xmax: 7, ymin: -20, ymax: 20,
+          xlabel: "x", ylabel: "y", aria: "Graph with a vertical asymptote at x = 3.",
+          xticks: [{ x: 3, tex: "3" }], yticks: [{ y: 2, tex: "2" }],
+          items: [
+            { type: "vline", x: 3, cls: "refline" },
+            { type: "curve", fn: (x) => (2 * x) / (x - 3), domain: [-0.8, 2.9], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => (2 * x) / (x - 3), domain: [3.1, 6.8], samples: 200, cls: "curve" },
+          ],
+        }),
+      }],
+    }),
+    "piecewise-jump": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 360, h: 240, xmin: -0.5, xmax: 5, ymin: -0.5, ymax: 4.5,
+          xlabel: "x", ylabel: "y",
+          aria: "Piecewise function with jump at x equals 2: left limit is 3, right limit is 2.",
+          xticks: [{ x: 2, tex: "2" }],
+          yticks: [{ y: 2, tex: "2" }, { y: 3, tex: "3" }],
+          items: [
+            { type: "curve", fn: (x) => x + 1, domain: [-0.3, 1.97], cls: "curve" },
+            { type: "curve", fn: (x) => 4 - x, domain: [2.03, 4.5], cls: "curve" },
+            { type: "dot", x: 2, y: 3, hollow: true },
+            { type: "dot", x: 2, y: 2 },
+            { type: "text", x: 0.05, y: 2.3, tex: "y=x+1", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 3.5, y: 1.0, tex: "y=4-x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "ln-asymptote": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 340, h: 260, xmin: -0.8, xmax: 5.5, ymin: -2.8, ymax: 2.5,
+          xlabel: "x", ylabel: "y",
+          aria: "Graph of y equals natural log of x approaching negative infinity near x equals 0.",
+          xticks: [{ x: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.log(x), domain: [0.09, 5.2], samples: 300, cls: "curve" },
+            { type: "text", x: 4.3, y: 2.0, tex: "y=\\ln x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.5 ---------------- */
+    "floor-function": () => {
+      const steps = [];
+      for (var n = -1; n <= 4; n++) {
+        steps.push({ type: "seg", x1: n, y1: n, x2: n + 1, y2: n, cls: "curve" });
+        steps.push({ type: "dot", x: n, y: n });
+        steps.push({ type: "dot", x: n + 1, y: n, hollow: true });
+      }
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 380, h: 320, xmin: -1.5, xmax: 5.5, ymin: -1.8, ymax: 4.8,
+            xlabel: "x", ylabel: "y",
+            aria: "The greatest integer function, a step function with jumps at each integer.",
+            xticks: [{ x: -1, tex: "-1" }, { x: 1, tex: "1" }, { x: 2, tex: "2" }, { x: 3, tex: "3" }, { x: 4, tex: "4" }],
+            yticks: [{ y: 1, tex: "1" }, { y: 2, tex: "2" }, { y: 3, tex: "3" }, { y: 4, tex: "4" }],
+            items: steps.concat([
+              { type: "text", x: 4.8, y: 4.5, tex: "y=[x]", cls: "a-curve", anchor: "start" },
+            ]),
+          }),
+        }],
+      };
+    },
+    "squeeze-theorem": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 280, xmin: -0.5, xmax: 5.5, ymin: -0.5, ymax: 4.2,
+          xlabel: "x", ylabel: "y",
+          aria: "Squeeze theorem: f is trapped between g and h, all converging to L at x equals a.",
+          xticks: [{ x: 2.5, tex: "a" }],
+          items: [
+            { type: "curve", fn: (x) => 2 + 0.4 * Math.pow(x - 2.5, 2), domain: [0.2, 4.9], cls: "refline" },
+            { type: "curve", fn: (x) => 2 - 0.4 * Math.pow(x - 2.5, 2), domain: [0.2, 4.9], cls: "refline" },
+            { type: "curve", fn: (x) => 2 + 0.3 * Math.pow(x - 2.5, 2) * Math.sin(5 * x), domain: [0.2, 4.9], samples: 400, cls: "curve" },
+            { type: "hline", y: 2, from: 0, to: 2.5, cls: "refline" },
+            { type: "dot", x: 2.5, y: 2 },
+            { type: "text", x: 0, y: 2, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+            { type: "text", x: 5, y: 3.8, tex: "h", cls: "a-ref", anchor: "start" },
+            { type: "text", x: 5, y: 0.2, tex: "g", cls: "a-ref", anchor: "start" },
+            { type: "text", x: 4.5, y: 2.7, tex: "f", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "squeeze-x2sin": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 400, h: 280, xmin: -1.2, xmax: 1.2, ymin: -0.8, ymax: 1.2,
+          xlabel: "x", ylabel: "y",
+          aria: "x squared sin(1/x) squeezed between y equals x squared and y equals negative x squared.",
+          items: [
+            { type: "curve", fn: (x) => x * x, domain: [-1.1, 1.1], cls: "refline" },
+            { type: "curve", fn: (x) => -x * x, domain: [-1.1, 1.1], cls: "refline" },
+            { type: "curve", fn: (x) => x * x * Math.sin(1 / x), domain: [-1.1, -0.01], samples: 600, cls: "curve" },
+            { type: "curve", fn: (x) => x * x * Math.sin(1 / x), domain: [0.01, 1.1], samples: 600, cls: "curve" },
+            { type: "text", x: 0.75, y: 0.85, tex: "x^{2}", cls: "a-ref", anchor: "end" },
+            { type: "text", x: 0.75, y: -0.55, tex: "-x^{2}", cls: "a-ref", anchor: "end" },
+            { type: "text", x: -0.35, y: 0.2, tex: "x^{2}\\!\\sin\\tfrac{1}{x}", cls: "a-curve", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.6 ---------------- */
+    "precise-limit": () => {
+      const Lm = 6.150845, Lp = 9.849155;
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 460, h: 300, xmin: 0, xmax: 3.8, ymin: 0, ymax: 14,
+            pad: { t: 16, r: 18, b: 24, l: 58 }, xlabel: "x", ylabel: "y",
+            aria: "Geometric interpretation of the epsilon-delta definition.",
+            items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              { type: "hline", y: Lm, from: 0, to: 3.8, cls: "refline" },
+              { type: "hline", y: Lp, from: 0, to: 3.8, cls: "refline" },
+              { type: "vline", x: 2.7, cls: "refline" },
+              { type: "vline", x: 3.3, cls: "refline" },
+              { type: "dot", x: 3, y: 8, hollow: true },
+              { type: "dot", x: 3, y: 11.6 },
+              { type: "dot", x: 3.3, y: Lp, r: 1.8 },
+              { type: "text", x: 2.7, y: 0, tex: "a-\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 3.02, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 3.32, y: 0, tex: "a+\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 0, y: Lm, tex: "L-\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 },
+              { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+              { type: "text", x: 0, y: Lp, tex: "L+\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 },
+            ],
+          }),
+        }],
+      };
+    },
+
+    /* §1.2 — arctan as the reflection of restricted tan across y=x (Figure 1.9).
+       Equal-aspect square window so the reflection reads true. Both curves
+       solid; y=x dashed (ch01 restrict-x2 convention). Vertical asymptotes of
+       tan at ±π/2 are drawn explicitly; the reflected arctan curve approaches
+       the corresponding horizontal levels (figure-opportunity audit 2026-06-21). */
+    "arctan-reflection": () => {
+      const h = Math.PI / 2;
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 300, h: 300, xmin: -3.3, xmax: 3.3, ymin: -3.3, ymax: 3.3,
+            pad: { t: 14, r: 14, b: 20, l: 22 },
+            aria: "The graph of arctan x is the reflection of the restricted tangent branch across the line y equals x; tangent's vertical asymptotes at x = plus or minus pi over 2 become arctan's horizontal asymptotes at y = plus or minus pi over 2.",
+            xticks: [{ x: -h }, { x: h }],
+            yticks: [{ y: -h }, { y: h }],
+            items: [
+              { type: "curve", fn: (x) => x, domain: [-3.3, 3.3], cls: "refline" },
+              { type: "vline", x: -h, cls: "refline" },
+              { type: "vline", x: h, cls: "refline" },
+              { type: "curve", fn: (x) => Math.tan(x), domain: [-1.3, 1.3], samples: 260, cls: "curve" },
+              { type: "curve", fn: (x) => Math.atan(x), domain: [-3.3, 3.3], samples: 220, cls: "curve" },
+              { type: "text", x: 1.42, y: 2.95, tex: "\\tan x", cls: "a-curve", anchor: "start" },
+              { type: "text", x: 3.05, y: 1.3, tex: "\\arctan x", cls: "a-curve", anchor: "end", dy: 13 },
+              { type: "text", x: 2.45, y: 2.85, tex: "y=x", cls: "a-ref", anchor: "start" },
+            ],
+          }),
+        }],
+      };
+    },
+
+    /* §1.4 — 1/x² (=∞) vs 1/x (DNE) at 0, same window (Figure 1.16).
+       Left: both branches → +∞ (same signed direction, write =∞). Right:
+       left → −∞, right → +∞ (disagree, DNE). x=0 undefined → no dot, curves
+       split at ±0.001 and break at the y-axis (figure-opportunity audit 2026-06-21). */
+    "recip-x-vs-x2": () => {
+      const win = { w: 244, h: 196, xmin: -2.2, xmax: 2.2, ymin: -7, ymax: 7, pad: { t: 12, r: 12, b: 22, l: 22 } };
+      const panel = (fn, note, aria) => ({
+        svg: buildPlot(Object.assign({}, win, {
+          aria: aria,
+          xticks: [{ x: 0 }],
+          items: [
+            { type: "curve", fn: fn, domain: [-2.2, -0.001], samples: 200, cls: "curve" },
+            { type: "curve", fn: fn, domain: [0.001, 2.2], samples: 200, cls: "curve" },
+          ],
+        })),
+        note: note,
+      });
+      return {
+        layout: "pair",
+        panels: [
+          panel((x) => 1 / (x * x), "y = 1/x²", "Graph of one over x squared: both branches rise toward plus infinity near zero."),
+          panel((x) => 1 / x, "y = 1/x", "Graph of one over x: the left branch falls to minus infinity, the right branch rises to plus infinity."),
+        ],
+      };
+    },
+
+    /* §1.5 — removable hole: (x-1)/(x²-1)=1/(x+1) with an open point at x=1,
+       height ½ (Figure 1.20). Crosshair reflines guide the eye to the hole;
+       limit = hole height. Fulfils the §1.5 placeholder (figure-opportunity
+       audit 2026-06-21). */
+    "removable-hole": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 320, h: 208, xmin: -0.4, xmax: 2.7, ymin: 0, ymax: 1.7,
+          pad: { t: 14, r: 14, b: 24, l: 26 },
+          aria: "Graph of (x minus 1) over (x squared minus 1), which equals 1 over (x plus 1) except at x = 1, where there is an open hole at height one half.",
+          xticks: [{ x: 1, tex: "1" }],
+          yticks: [{ y: 0.5, tex: "\\tfrac{1}{2}" }],
+          items: [
+            { type: "hline", y: 0.5, from: -0.4, to: 1, cls: "refline" },
+            { type: "vline", x: 1, cls: "refline" },
+            { type: "curve", fn: (x) => 1 / (x + 1), domain: [-0.35, 0.97], samples: 120, cls: "curve" },
+            { type: "curve", fn: (x) => 1 / (x + 1), domain: [1.03, 2.7], samples: 120, cls: "curve" },
+            { type: "dot", x: 1, y: 0.5, hollow: true },
+            { type: "text", x: 2.6, y: 0.62, tex: "y=\\tfrac{x-1}{x^{2}-1}", cls: "a-curve", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* §1.6 — ε→δ dynamic: shrink the ε-strip, the responding δ-band shrinks too
+       (Figure 1.25). f(x)=2x-1 at a=3, L=5, δ=ε/2 (the §1.6 worked example).
+       Two panels at the same window; companion to the static Figure 1.24
+       (figure-opportunity audit 2026-06-21). */
+    "epsilon-delta-dynamic": () => {
+      const f = (x) => 2 * x - 1, a = 3, L = 5;
+      const win = { w: 240, h: 220, xmin: 2.3, xmax: 3.7, ymin: 3.6, ymax: 6.4, pad: { t: 12, r: 12, b: 22, l: 26 } };
+      const panel = (eps, note) => {
+        const d = eps / 2;
+        return {
+          svg: buildPlot(Object.assign({}, win, {
+            aria: "Epsilon-delta box for f of x equals 2x minus 1 at a equals 3: a horizontal strip of half-height epsilon and a vertical band of half-width delta equal to epsilon over 2.",
+            xticks: [{ x: a, tex: "a" }],
+            yticks: [{ y: L, tex: "L" }],
+            items: [
+              { type: "hline", y: L + eps, cls: "refline" },
+              { type: "hline", y: L - eps, cls: "refline" },
+              { type: "vline", x: a - d, cls: "refline" },
+              { type: "vline", x: a + d, cls: "refline" },
+              { type: "curve", fn: f, domain: [2.3, 3.7], cls: "curve" },
+              { type: "dot", x: a, y: L },
+            ],
+          })),
+          note: note,
+        };
+      };
+      return {
+        layout: "pair",
+        panels: [panel(1, "ε = 1,  δ = ½"), panel(0.4, "ε = 0.4,  δ = 0.2")],
+      };
+    },
+
+  };
+
+  function hydrateFigures(root) {
+    (root || document).querySelectorAll("[data-fig]").forEach((el) => {
+      const def = FIGS[el.dataset.fig];
+      if (!def || el.dataset.figDone) return;
+      const { layout, panels } = def();
+      let html;
+      if (layout === "single" && panels.length === 1 && !panels[0].note) {
+        html = `<div class="figure-art">${panels[0].svg}</div>`;
+      } else {
+        const cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
+        html = `<div class="figure-art ${cls}">` +
+          panels.map((p) => `<div class="fig-panel">${p.svg}${p.note ? `<div class="fig-note">${p.note}</div>` : ""}</div>`).join("") +
+          `</div>`;
+      }
+      el.insertAdjacentHTML("afterbegin", html);
+
+      /* Connect per-figure CSS width variables (--fig-1-1 … --fig-1-25)
+         defined in :root to this figure's --fig-w so the control panel
+         actually takes effect. */
+      const figNo = el.querySelector(".fig-no");
+      if (figNo) {
+        const m = figNo.textContent.match(/Figure\s+(\d+)\.(\d+)/);
+        if (m) el.style.setProperty("--fig-w", `var(--fig-${m[1]}-${m[2]})`);
+      }
+
+      el.dataset.figDone = "1";
+    });
+  }
+
+  window.hydrateFigures = hydrateFigures;
+})();
+</script>
+
+<!-- Main build script (paginator + MathJax) -->
+<script>
+var CHAPTER = {
+  brand: "Appendix A",
+  runningHead: "Appendix A · Precalculus Toolbox",
+  fragments: ["sec-a-1", "sec-a-2", "sec-a-3", "sec-a-4", "sec-a-5", "sec-a-6"],
+};
+var FRAGMENTS = CHAPTER.fragments;
+var RUNNING_HEAD = CHAPTER.runningHead;
+
+function renderMath(root) {
+  if (!root) return Promise.resolve();
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    return MathJax.typesetPromise([root]).catch(function(e) { console.warn("mathjax", e); });
+  }
+  return Promise.resolve();
+}
+
+function waitFor(test, tries) {
+  return new Promise(function(resolve) {
+    var n = 0;
+    var tick = function() {
+      if (test()) return resolve(true);
+      if (n++ > (tries || 100)) return resolve(false);
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
+var isHeading = function(el) {
+  return el.matches && el.matches(".chapter-head, .sec-head, .subsec-head, .para-head, .env-head");
+};
+
+function isDisplayChild(n) {
+  if (n.nodeType !== 1) return false;
+  var tag = n.tagName && n.tagName.toLowerCase();
+  if (tag === "mjx-container" && n.getAttribute("display") === "true") return true;
+  if (n.querySelector && n.querySelector('mjx-container[display="true"]')) return true;
+  return false;
+}
+
+var SPLIT_ENVS = ".env-example, .env-solution, .env-proof, .env-definition, .env-theorem, .env-proposition, .env-corollary";
+var DISP_SEL = 'mjx-container[display="true"]';
+
+function liCount(el) { return [].filter.call(el.children, function(x) { return x.tagName === "LI"; }).length; }
+
+function countBodyUnits(bodyEl) {
+  var n = 0;
+  [].forEach.call(bodyEl.children, function(ch) {
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL)) n += explodeParagraph2(ch);
+    else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) n += liCount(ch);
+    else n++;
+  });
+  return n;
+}
+
+function isSplittable(block) {
+  if (!block.classList) return false;
+  if (block.classList.contains("workedexample")) return block.children.length >= 2;
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    return !!b && countBodyUnits(b) > 1;
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL)) {
+    return explodeParagraph2(block) > 1;
+  }
+  return false;
+}
+
+function onlyLists(bodyEl) {
+  var els = contentKids(bodyEl);
+  return els.length > 0 && els.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; });
+}
+
+function contentKids(bodyEl) {
+  return [].filter.call(bodyEl.children, function(c) {
+    return !(c.classList && c.classList.contains("qed")) && (c.textContent.trim() || c.querySelector("*"));
+  });
+}
+
+function splitMode(block) {
+  if (!block.classList) return "none";
+  if (block.classList.contains("workedexample")) return block.children.length >= 2 ? "free" : "none";
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    if (!b || countBodyUnits(b) <= 1) return "none";
+    var kids = contentKids(b);
+    var hasPara = kids.some(function(c) {
+      return c.tagName === "P" && c.querySelector(DISP_SEL) && explodeParagraph2(c) > 1;
+    });
+    if (hasPara || (kids.length >= 2 && !kids.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; }))) return "free";
+    return "list";
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL) && explodeParagraph2(block) > 1) return "free";
+  return "none";
+}
+
+function explodeParagraph2(p) {
+  var n = 0, hasBuf = false;
+  [].forEach.call(p.childNodes, function(node) {
+    if (isDisplayChild(node)) {
+      if (hasBuf) { n++; hasBuf = false; }
+      n++;
+    } else if ((node.textContent && node.textContent.trim()) || node.nodeType === 1) {
+      hasBuf = true;
+    }
+  });
+  if (hasBuf) n++;
+  return n;
+}
+
+function explodeParagraph(p) {
+  var parts = [], buf = [];
+  var flush = function() {
+    var hasContent = buf.some(function(n) { return (n.textContent && n.textContent.trim()) || n.nodeType === 1; });
+    if (hasContent) {
+      var np = document.createElement("p");
+      np.className = p.className;
+      buf.forEach(function(n) { np.appendChild(n); });
+      parts.push(np);
+    } else {
+      buf.forEach(function(n) { if (n.parentNode) n.parentNode.removeChild(n); });
+    }
+    buf = [];
+  };
+  [].slice.call(p.childNodes).forEach(function(node) {
+    if (isDisplayChild(node)) { flush(); var np = document.createElement("p"); np.className = p.className; np.appendChild(node); parts.push(np); }
+    else { buf.push(node); }
+  });
+  flush();
+  return parts;
+}
+
+function listToUnits(listEl) {
+  var items = [].filter.call(listEl.children, function(x) { return x.tagName === "LI"; });
+  if (items.length < 2) return [listEl];
+  var tag = listEl.tagName.toLowerCase();
+  return items.map(function(li, i) {
+    var nl = document.createElement(tag);
+    nl.className = listEl.className;
+    if (tag === "ol") nl.setAttribute("start", String(i + 1));
+    nl.appendChild(li);
+    return nl;
+  });
+}
+
+function bodyToUnits(bodyEl) {
+  var units = [];
+  [].forEach.call(bodyEl.children, function(ch) {
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL) && explodeParagraph2(ch) > 1) {
+      explodeParagraph(ch).forEach(function(u) { units.push(u); });
+    } else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) {
+      listToUnits(ch).forEach(function(u) { units.push(u); });
+    } else { units.push(ch); }
+  });
+  return units;
+}
+
+function splitEnvOverflow(env) {
+  var bodyEl = env.querySelector(":scope > .env-body");
+  if (!bodyEl) return null;
+  var kids = bodyToUnits(bodyEl);
+  if (kids.length < 2) return null;
+  bodyEl.innerHTML = "";
+  bodyEl.appendChild(kids.shift());
+  var parts = [env];
+  kids.forEach(function(k) {
+    if (k.classList && k.classList.contains("qed") && parts.length > 0) {
+      var prev = parts[parts.length - 1];
+      var prevBody = prev.querySelector(":scope > .env-body") || prev.querySelector(".env-body");
+      if (prevBody) { prevBody.appendChild(k); return; }
+    }
+    var cont = document.createElement("section");
+    cont.className = env.className + " env-cont";
+    var b = document.createElement("div");
+    b.className = "env-body";
+    b.appendChild(k);
+    cont.appendChild(b);
+    parts.push(cont);
+  });
+  return parts;
+}
+
+function splitParts(block) {
+  if (block.classList.contains("workedexample")) return [].slice.call(block.children);
+  if (block.matches(SPLIT_ENVS)) return splitEnvOverflow(block) || [block];
+  if (block.tagName === "P") { var ex = explodeParagraph(block); return ex.length > 1 ? ex : [block]; }
+  return [block];
+}
+
+function paginate(blocks) {
+  var pagesEl = document.getElementById("pages");
+  pagesEl.innerHTML = "";
+  var idx = 0, body = null;
+  var newSheet = function() {
+    var sheet = document.createElement("div");
+    sheet.className = "sheet";
+    var header = document.createElement("div");
+    header.className = "sheet-header";
+    header.textContent = idx === 0 ? "" : RUNNING_HEAD;
+    body = document.createElement("div");
+    body.className = "sheet-body paper skin-hs vivid";
+    var footer = document.createElement("div");
+    footer.className = "sheet-footer";
+    footer.textContent = String(idx + 1);
+    sheet.append(header, body, footer);
+    pagesEl.appendChild(sheet);
+    idx++;
+  };
+  newSheet();
+  var fits = function() { return body.scrollHeight <= body.clientHeight + 1; };
+  var FREE_THRESHOLD = 130;
+  var shouldBreakBefore = function(block) {
+    return block.classList && block.classList.contains("page-break-before") && body.childElementCount > 0;
+  };
+  var moveToFreshPage = function(block) {
+    var carry = null;
+    if (body.childElementCount > 0) {
+      var last = body.lastElementChild;
+      if (last && isHeading(last)) { carry = last; body.removeChild(last); }
+      newSheet();
+      if (carry) body.appendChild(carry);
+    }
+    body.appendChild(block);
+  };
+  var place = function(block) {
+    if (shouldBreakBefore(block)) newSheet();
+    body.appendChild(block);
+    if (fits()) {
+      /* ── Orphan heading prevention ──────────────────────────
+         After placing a heading that fits, check whether enough
+         room remains for content below it. If the remaining space
+         is too small, move the heading to a fresh page so it stays
+         with its following content — never stranded at the bottom. */
+      if (isHeading(block) && body.childElementCount > 1) {
+        var _bRect = block.getBoundingClientRect();
+        var _bodyRect = body.getBoundingClientRect();
+        var _rem = (_bodyRect.top + body.clientHeight) - _bRect.bottom;
+        /* Major section headers need more room; minor headings less */
+        var _threshold = block.matches(".sec-head, .chapter-head") ? 160 : 100;
+        if (_rem < _threshold) {
+          body.removeChild(block);
+          newSheet();
+          body.appendChild(block);
+        }
+      }
+      return;
+    }
+    var blockH = block.getBoundingClientRect().height;
+
+    /* ── Figure shrink-to-fit ──────────────────────────────────
+       When a figure *almost* fits the remaining page space,
+       scale the .figure-art only (≥55 %) — caption stays full size.
+       Measure art/caption while block is still in the DOM.       */
+    var isFigure = block.tagName === "FIGURE" || (block.classList && block.classList.contains("figure"));
+    var _figArt = isFigure ? block.querySelector(".figure-art") : null;
+    var _artH = 0, _capH = 0;
+    if (_figArt) {
+      _artH = _figArt.getBoundingClientRect().height;
+      var _figCap = block.querySelector("figcaption");
+      _capH = _figCap ? _figCap.getBoundingClientRect().height : 0;
+    }
+
+    body.removeChild(block);
+
+    if (_figArt && _artH > 0) {
+      /* Probe the actual insertion point to account for preceding margins */
+      var _probe = document.createElement("div");
+      _probe.style.height = "0";
+      _probe.style.margin = "0";
+      _probe.style.padding = "0";
+      body.appendChild(_probe);
+      var _remaining = body.clientHeight - (_probe.getBoundingClientRect().top - body.getBoundingClientRect().top);
+      body.removeChild(_probe);
+      var FIG_MIN_SCALE = 0.55;
+      var _figMargin = blockH - _artH - _capH;  /* top/bottom margins + gaps */
+      var _availForArt = _remaining - _capH - _figMargin;
+      var neededScale = _availForArt / _artH;
+      if (_availForArt > 60 && neededScale >= FIG_MIN_SCALE && neededScale < 1) {
+        var _oZ = _figArt.style.zoom;
+        var _oMt = block.style.marginTop, _oMb = block.style.marginBottom;
+        _figArt.style.zoom = neededScale;
+        block.style.marginTop = "0.3em";
+        block.style.marginBottom = "0";
+        body.appendChild(block);
+        if (fits()) return;           /* success — art shrunk, caption full size */
+        body.removeChild(block);      /* revert and fall through */
+        _figArt.style.zoom = _oZ;
+        block.style.marginTop = _oMt;
+        block.style.marginBottom = _oMb;
+      }
+    }
+
+    if (block.classList.contains && block.classList.contains("workedexample") && block.children.length >= 2) {
+      var lastEl = body.lastElementChild;
+      var used = lastEl ? lastEl.getBoundingClientRect().bottom - body.getBoundingClientRect().top : 0;
+      var remaining = body.clientHeight - used;
+      if (remaining < FREE_THRESHOLD && blockH <= body.clientHeight) {
+        moveToFreshPage(block);
+        if (fits()) return;
+        body.removeChild(block);
+      }
+      var kids = [].slice.call(block.children);
+      var ex = kids[0], sol = kids[1], extra = kids.slice(2);
+      block.removeChild(ex);
+      var solParts = splitParts(sol);
+      body.appendChild(ex);
+      if (!fits()) { body.removeChild(ex); moveToFreshPage(ex); }
+      var first = solParts[0];
+      body.appendChild(first);
+      if (!fits()) {
+        body.removeChild(first);
+        body.removeChild(ex);
+        moveToFreshPage(ex);
+        body.appendChild(first);
+        if (!fits()) { body.removeChild(first); place(first); }
+      }
+      for (var i = 1; i < solParts.length; i++) place(solParts[i]);
+      extra.forEach(place);
+      return;
+    }
+    var mode = splitMode(block);
+    var want = (mode !== "none" && blockH > body.clientHeight);
+    if (want) { var parts = splitParts(block); if (parts.length > 1) { parts.forEach(place); return; } }
+    moveToFreshPage(block);
+    if (!fits() && mode !== "none") {
+      var parts2 = splitParts(block);
+      if (parts2.length > 1) { body.removeChild(block); parts2.forEach(place); }
+    }
+  };
+  blocks.forEach(place);
+  return idx;
+}
+
+function build() {
+  var status = document.getElementById("status");
+
+  /* Load section fragments from inline <template> elements */
+  var page = document.getElementById("page");
+  var parts = FRAGMENTS.map(function(id) {
+    var tpl = document.getElementById("frag-" + id);
+    return tpl ? tpl.innerHTML : "";
+  });
+  page.innerHTML = parts.join("\n");
+
+  if (window.hydrateFigures) window.hydrateFigures(page);
+
+  /* Wait for MathJax to load, then typeset */
+  waitFor(function() { return window.MathJax && window.MathJax.typesetPromise; }, 200).then(function(ok) {
+    if (!ok) { status.textContent = "MathJax load timeout"; return; }
+    return renderMath(page);
+  }).then(function() {
+    var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    return fontsReady;
+  }).then(function() {
+    status.textContent = "Paginating …";
+    return new Promise(function(r) { setTimeout(r, 60); });
+  }).then(function() {
+    var blocks = [];
+    page.querySelectorAll(":scope > .sec").forEach(function(sec) {
+      [].forEach.call(sec.children, function(ch) { blocks.push(ch); });
+    });
+
+    var n = paginate(blocks);
+    var src = document.getElementById("source");
+    if (src) src.remove();
+
+    status.textContent = n + " page" + (n === 1 ? "" : "s") + " · A4";
+    var btn = document.getElementById("printBtn");
+    btn.disabled = false;
+    btn.addEventListener("click", function() { window.print(); });
+
+    var boot = document.getElementById("boot");
+    if (boot) boot.remove();
+  });
+}
+
+window.addEventListener("DOMContentLoaded", build);
+</script>
+</body>
+</html>

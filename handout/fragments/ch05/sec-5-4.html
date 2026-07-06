@@ -1,0 +1,160 @@
+<!-- §5.4 Maximum and Minimum Values.
+     section-source: Stewart ET 9e §4.1 (Maximum and Minimum Values) + §4.3 (first-derivative test part);
+     cross-checked Thomas 14e §4.1, Rogawski 4e §4.2. Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤).
+     Counters continue from §5.3: §5.4 mints Definition 5.3 (local extrema), Definition 5.4 (critical number),
+     Theorem 5.1 (First Derivative Test), Strategy 5.3 (Closed Interval Method), Examples 5.11–5.13. Cautions UNNUMBERED.
+     IMPORTS (cross-ref, do NOT re-prove — all in Ch4 §4.4): absolute max/min = Definition 4.3; EVT = Theorem 4.9(a);
+     Fermat/interior-extremum = Theorem 4.10; monotonicity Cor 4.3 (used to PROVE the First Derivative Test 5.1).
+     Second-derivative test is NOT here — it needs concavity (§5.6). Examples: 5.11 critical numbers of
+     x^{3/5}(4-x) → 0 (f' DNE) and 3/2 (f'=0); 5.12 closed-interval method x³-3x²+1 on [-1/2,4] → abs max 17,
+     abs min -3; 5.13 first-derivative test on x³-3x²+1 → x=0 local max (1), x=2 local min (-3).
+     Counters handed to §5.5: Definition 5.5, Theorem 5.2, Strategy 5.4, Example 5.14. Record: PLAN-ch05.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">5.4</span>Maximum and Minimum Values</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: the optimization question; global vs local extrema; the derivative locates candidates -->
+  <p>Of all the questions calculus answers, the most insistent in practice is: where is a quantity largest or smallest? Maximum profit, minimum cost, least material, greatest range — each asks for an extreme value of a function, and the derivative is built to find them. The strategy rests on a simple observation made rigorous in Chapter 4: at a smooth peak or valley in the interior of a curve, the tangent is horizontal, so the derivative vanishes. Extremes therefore hide at a short list of places, and the work is to enumerate the list and test it.</p>
+
+  <p>Two kinds of extreme must be kept apart. Chapter 4 defined the <em>absolute</em> (or global) maximum and minimum of a function on a domain (Definition 4.3): the single largest and smallest values it attains anywhere on that domain. Alongside these sits a local notion — largest or smallest only in comparison with nearby points.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">5.3</span><span class="env-name">Local maximum and minimum</span></p>
+    <div class="env-body">
+      <p>A function \(f\) has a <em>local maximum</em> (or <em>relative maximum</em>) at \(c\) if \(f(c) \ge f(x)\) for every \(x\) in the domain of \(f\) lying in some open interval around \(c\); it has a <em>local minimum</em> at \(c\) if \(f(c) \le f(x)\) for every such \(x\).</p>
+      <p class="informal">A local maximum is a point that is highest <em>in its own neighbourhood</em> — the top of one hill, not necessarily the highest hill. An absolute maximum is highest everywhere; a local one need only win locally.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Where extrema can occur: critical numbers</h3>
+
+  <p>The engine that narrows the search is Fermat's theorem from Chapter 4 (Theorem 4.10): if \(f\) has a local extremum at an <em>interior</em> point \(c\) and \(f'(c)\) exists, then \(f'(c) = 0\). Contrapositively, a local extremum in the interior can occur only where the derivative is zero or fails to exist. Those places deserve a name.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">5.4</span><span class="env-name">Critical number</span></p>
+    <div class="env-body">
+      <p>A <em>critical number</em> of \(f\) is a number \(c\) in the domain of \(f\) at which either \(f'(c) = 0\) or \(f'(c)\) does not exist.</p>
+    </div>
+  </section>
+
+  <p>Fermat's theorem, recast, reads: every interior local extremum occurs at a critical number. This is the workhorse — it shrinks the hunt for extrema from a whole interval to a finite list of suspects.</p>
+
+  <!-- expansion:caution — critical number is necessary, not sufficient: a critical number need not be an extremum -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>A critical number is a <em>candidate</em>, not a guarantee. The converse of Fermat's theorem is false: \(f'(c) = 0\) does not force an extremum at \(c\). The function \(f(x) = x^{3}\) has \(f'(0) = 0\), yet \(0\) is neither a maximum nor a minimum — the curve passes straight through with a momentary flat spot. Critical numbers must always be tested, never assumed to be extrema.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 5.11: finding critical numbers, exhibiting both f'=0 and f' DNE -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.11</span></p>
+      <div class="env-body">
+        <p>Find the critical numbers of \(f(x) = x^{3/5}(4 - x)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Expand and differentiate: \(f(x) = 4x^{3/5} - x^{8/5}\), so</p>
+        <p>\[ f'(x) = \tfrac{12}{5}x^{-2/5} - \tfrac{8}{5}x^{3/5} = \frac{4}{5}x^{-2/5}(3 - 2x) = \frac{4(3 - 2x)}{5\,x^{2/5}}. \]</p>
+        <p>Two kinds of critical number appear. Setting the numerator to zero, \(f'(x) = 0\) when \(3 - 2x = 0\), that is \(x = \tfrac{3}{2}\). And \(f'(x)\) <em>does not exist</em> where the denominator vanishes, at \(x = 0\) — yet \(x = 0\) is in the domain of \(f\) (indeed \(f(0) = 0\)), so it too is a critical number. The critical numbers are</p>
+        <p>\[ x = 0 \quad\text{and}\quad x = \tfrac{3}{2}. \]</p>
+        <p>Both must be kept: the first is where the tangent is vertical, the second where it is horizontal. Which, if either, is an extremum is a separate question, settled below. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Absolute extrema on a closed interval</h3>
+
+  <p>On a closed interval the search closes completely. The Extreme Value Theorem (Theorem 4.9(a)) guarantees that a function continuous on \([a, b]\) <em>attains</em> an absolute maximum and minimum there; Fermat's theorem says each is either an interior critical number or an endpoint. So the absolute extremes are found by checking a finite list.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.3</span><span class="env-name">The Closed Interval Method</span></p>
+    <div class="env-body">
+      <p>To find the absolute maximum and minimum of a function \(f\) continuous on a closed interval \([a, b]\):</p>
+      <ol class="steps">
+        <li>Find the critical numbers of \(f\) that lie in the open interval \((a, b)\), and evaluate \(f\) at each.</li>
+        <li>Evaluate \(f\) at the two endpoints \(a\) and \(b\).</li>
+        <li>The largest of these values is the absolute maximum; the smallest is the absolute minimum.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 5.12: the closed-interval method on a cubic -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.12</span></p>
+      <div class="env-body">
+        <p>Find the absolute maximum and minimum of \(f(x) = x^{3} - 3x^{2} + 1\) on \([-\tfrac{1}{2}, 4]\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The function is a polynomial, hence continuous on the closed interval, so the method applies. Its derivative is</p>
+        <p>\[ f'(x) = 3x^{2} - 6x = 3x(x - 2), \]</p>
+        <p>which is defined everywhere and zero at \(x = 0\) and \(x = 2\); both lie in \((-\tfrac{1}{2}, 4)\). Evaluate \(f\) at these critical numbers and at the endpoints:</p>
+        <p>\[ f(-\tfrac{1}{2}) = \tfrac{1}{8}, \qquad f(0) = 1, \qquad f(2) = -3, \qquad f(4) = 17. \]</p>
+        <p>The largest value is \(17\) and the smallest is \(-3\). So the absolute maximum is \(17\), attained at the endpoint \(x = 4\), and the absolute minimum is \(-3\), attained at the interior critical number \(x = 2\). Notice that the maximum sat at an endpoint, not a critical number — which is exactly why the endpoints must be checked. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Classifying local extrema: the First Derivative Test</h3>
+
+  <p>The Closed Interval Method finds absolute extremes by brute evaluation, but says nothing about the <em>character</em> of an interior critical number — whether it is a local max, a local min, or neither. The sign of the derivative on either side settles it, and the Mean Value Theorem's monotonicity corollary (Corollary 4.3) is what makes the reasoning rigorous.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.1</span><span class="env-name">First Derivative Test</span></p>
+    <div class="env-body">
+      <p>Suppose \(f\) is continuous at a critical number \(c\), and differentiable on an open interval around \(c\) except possibly at \(c\) itself.</p>
+      <ul>
+        <li>If \(f'\) changes from positive to negative at \(c\) — positive just left, negative just right — then \(f\) has a <em>local maximum</em> at \(c\).</li>
+        <li>If \(f'\) changes from negative to positive at \(c\), then \(f\) has a <em>local minimum</em> at \(c\).</li>
+        <li>If \(f'\) does not change sign at \(c\) (positive on both sides, or negative on both), then \(f\) has neither.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix a point \(u\) just left of \(c\) and a point \(v\) just right, both close enough that the stated sign conditions hold, so \(u < c < v\). On each side, \(f\) is continuous on the closed piece — \([u, c]\) or \([c, v]\) — and differentiable on its interior, so the monotonicity corollary (Corollary 4.3) governs each: applied to \(f\) directly wherever \(f' > 0\), and to \(-f\) wherever \(f' < 0\), since a negative derivative for \(f\) is a positive one for \(-f\), making \(-f\) strictly increase and \(f\) strictly decrease. Continuity of \(f\) at \(c\) lets each comparison reach the value \(f(c)\). The four sign patterns read off directly:</p>
+      <ul>
+        <li>positive then negative: \(f\) strictly increases up to \(c\) and strictly decreases after, so \(f(u) < f(c)\) and \(f(v) < f(c)\) — a <em>local maximum</em>;</li>
+        <li>negative then positive: the reverse, \(f(u) > f(c)\) and \(f(v) > f(c)\) — a <em>local minimum</em>;</li>
+        <li>positive on both sides: \(f(u) < f(c) < f(v)\), so \(f\) climbs straight through \(c\) — neither;</li>
+        <li>negative on both sides: \(f(u) > f(c) > f(v)\), so \(f\) falls straight through — neither.</li>
+      </ul>
+      <p>In the two changing cases \(f(c)\) beats its neighbours on both sides (or is beaten on both), delivering the local extremum; in the two unchanging cases \(f\) passes monotonically through \(c\), which is therefore neither. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 5.13: applying the first-derivative test, reusing the cubic to contrast with the closed-interval method -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.13</span></p>
+      <div class="env-body">
+        <p>Classify the local extrema of \(f(x) = x^{3} - 3x^{2} + 1\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>From \(f'(x) = 3x(x - 2)\), the critical numbers are \(x = 0\) and \(x = 2\). Track the sign of \(f'\) across them. The factors \(3x\) and \(x - 2\) give</p>
+        <p>\[ f'(x) > 0 \text{ on } (-\infty, 0), \qquad f'(x) < 0 \text{ on } (0, 2), \qquad f'(x) > 0 \text{ on } (2, \infty). \]</p>
+        <p>At \(x = 0\), \(f'\) changes from positive to negative: a <em>local maximum</em>, with value \(f(0) = 1\). At \(x = 2\), \(f'\) changes from negative to positive: a <em>local minimum</em>, with value \(f(2) = -3\). These are the same two interior values the Closed Interval Method turned up in Example 5.12; the First Derivative Test now explains their roles — the hill at \(x = 0\) and the valley at \(x = 2\) — independently of any interval. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close: extrema located and classified; §5.5 applies the machinery to real optimization; the second-derivative test waits for §5.6 -->
+  <p>The derivative has done its defining work: it flags where a function can turn, and its sign says which way. That is enough to solve genuine optimization problems, which the next section takes up — real quantities to maximize or minimize, with the modelling that turns a word problem into a function on an interval. A second, sometimes faster classifier — the sign of the <em>second</em> derivative — waits until §5.6, once concavity is in hand.</p>
+
+</article>

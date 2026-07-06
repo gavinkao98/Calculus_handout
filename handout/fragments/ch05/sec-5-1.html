@@ -1,0 +1,176 @@
+<!-- Chapter 5 opener + §5.1 Implicit Differentiation.
+     FIRST manuscript-free chapter. section-source: Stewart ET 9e §3.5 (Implicit Differentiation);
+     cross-checked Thomas 14e §3.7, Rogawski 4e §3.10. Authored 2026-07-06 per PLAN-ch05
+     (canon-as-spine, full-gate tier; Codex at ③/⑤ per user 2026-07-06 autonomy grant).
+     §5.1 carries the Chapter 5 opener (first <article>: chapter-head + lead + "By the end"),
+     mirroring ch01–ch04. Numbering fresh for Ch5: §5.1 mints Strategy 5.1, Examples 5.1–5.4.
+     No Definition/Theorem (implicit differentiation is a technique, introduced descriptively —
+     Stewart register). Cautions UNNUMBERED (Ch1–4 convention).
+     SEAM GUARD (full-arc Codex seam-hunt): do NOT state the general implicit-function formula
+     dy/dx = -F_x/F_y — it needs Ch14 partial derivatives. Operational/branch-based only; assume
+     y is a differentiable function of x where the method is applied. Example 5.3 re-derives arcsin'
+     via the framework, naming what Ch3 §3.3 (Example 3.14) did by the composition-identity route.
+     Counters handed to §5.2: Strategy 5.2, Example 5.5, Figure 5.1, (no Def/Thm/Prop/Cor/Rem yet).
+     Figures deferred to the figure-opportunity gate (candidate: circle x²+y²=25 with tangent at (3,4)).
+     Record: PLAN-ch05.md; handout/_audit/REVIEW-fullarc-seam-skeleton.html. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Chapter 5</div>
+    <h1 class="ch-title">Applications of Differentiation</h1>
+  </header>
+
+  <p class="lead">Chapters 2 through 4 built the derivative and the rules for computing it — the limit definition, the power, product, quotient, and chain rules, the derivatives of the exponential, logarithm, and trigonometric functions, and the Mean Value Theorem that ties the sign of a derivative to the behaviour of the function. That machinery is now an instrument. This chapter turns it on the questions calculus was invented to answer: how fast one quantity changes when another does, how good a straight-line estimate of a curved function is, where a function is largest or smallest, which way it bends, how to read a graph off its formula, and how to hunt down a root you cannot solve for. The derivative stops being an object to compute and becomes a tool to think with.</p>
+
+  <p class="para-head">By the end of this chapter, you will be able to:</p>
+  <ul>
+    <li>use implicit differentiation to find \(dy/dx\) for a curve defined by an equation;</li>
+    <li>solve related-rates problems by differentiating a relation with respect to time;</li>
+    <li>use linear approximation and differentials to estimate values and bound errors;</li>
+    <li>locate absolute and local extrema, and solve optimization problems;</li>
+    <li>determine concavity and inflection points, and apply the first- and second-derivative tests;</li>
+    <li>evaluate limits of indeterminate form with L'Hôpital's rule;</li>
+    <li>sketch a curve from its analytic features;</li>
+    <li>approximate a root with Newton's method.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">5.1</span>Implicit Differentiation</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: motivate implicit diff from curves that are not graphs; the crux is d/dx[y^n]=n y^{n-1} y' via the chain rule -->
+  <p>Every function we have differentiated so far arrived as a formula \(y = f(x)\), with \(y\) served up explicitly in terms of \(x\). But a great many curves are given instead by an <em>equation</em> relating \(x\) and \(y\) — the circle \(x^{2} + y^{2} = 25\), say, or the looping curve \(x^{3} + y^{3} = 6xy\) — where no single formula \(y = f(x)\) describes the whole picture. The circle fails the vertical-line test twice over; solving for \(y\) splits it into two half-circles \(y = \pm\sqrt{25 - x^{2}}\), and the second curve resists solving for \(y\) altogether. Yet each still has a tangent line at (almost) every point, and so a slope \(dy/dx\) worth computing.</p>
+
+  <p><em>Implicit differentiation</em> computes that slope directly from the equation, without first solving for \(y\). The device is the chain rule. We regard \(y\) as an (unspecified) differentiable function of \(x\) on the stretch of curve we care about, and differentiate both sides of the equation with respect to \(x\). Every term built from \(y\) then carries a factor \(dy/dx\): since \(y\) depends on \(x\),</p>
+  <p>\[ \frac{d}{dx}\bigl[y^{n}\bigr] = n\,y^{n-1}\,\frac{dy}{dx}, \qquad \frac{d}{dx}\bigl[\sin y\bigr] = \cos y\,\frac{dy}{dx}, \]</p>
+  <p>and so on, exactly as the chain rule (Theorem 3.3) demands. The differentiated equation is then a <em>linear</em> equation in the unknown \(dy/dx\), which we solve by ordinary algebra.</p>
+
+  <!-- expansion:caution — the single most common implicit-diff error: forgetting the dy/dx factor on a y-term -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The one indispensable habit is to attach \(dy/dx\) to every \(y\)-term. Differentiating \(x^{2}\) with respect to \(x\) gives \(2x\); differentiating \(y^{2}\) with respect to \(x\) gives \(2y\,\dfrac{dy}{dx}\), <em>not</em> \(2y\). The extra factor is the chain rule registering that \(y\) is itself a function of \(x\). Dropping it is the standard mistake, and it silently corrupts every line below.</p>
+    </div>
+  </section>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.1</span><span class="env-name">Implicit differentiation</span></p>
+    <div class="env-body">
+      <p>To find \(dy/dx\) for a curve given by an equation in \(x\) and \(y\):</p>
+      <ol class="steps">
+        <li>Differentiate both sides of the equation with respect to \(x\), treating \(y\) as a function of \(x\). Each \(y\)-term acquires a factor \(dy/dx\) through the chain rule; product and quotient terms such as \(xy\) still obey the product and quotient rules.</li>
+        <li>Gather every term containing \(dy/dx\) on one side and everything else on the other.</li>
+        <li>Factor out \(dy/dx\) and divide, solving for it. The result is generally an expression in <em>both</em> \(x\) and \(y\) — to get a numerical slope, substitute the coordinates of a point on the curve.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 5.1: the circle, the archetypal implicit curve; slope in terms of x and y -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.1</span></p>
+      <div class="env-body">
+        <p>The circle \(x^{2} + y^{2} = 25\) passes through \((3, 4)\). Find \(dy/dx\), and the equation of the tangent line there.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Differentiate both sides with respect to \(x\). The term \(x^{2}\) gives \(2x\); the term \(y^{2}\) gives \(2y\,\dfrac{dy}{dx}\) by the chain rule; the constant \(25\) gives \(0\):</p>
+        <p>\[ 2x + 2y\,\frac{dy}{dx} = 0. \]</p>
+        <p>Solving for the derivative,</p>
+        <p>\[ \frac{dy}{dx} = -\frac{x}{y}. \]</p>
+        <p>The slope depends on both coordinates, as implicit differentiation usually delivers. At \((3, 4)\) it is \(dy/dx = -\tfrac{3}{4}\), so the tangent line is</p>
+        <p>\[ y - 4 = -\tfrac{3}{4}(x - 3). \]</p>
+        <p>The answer squares with plain geometry: the radius to \((3, 4)\) has slope \(\tfrac{4}{3}\), and a tangent to a circle is perpendicular to the radius, with slope \(-\tfrac{3}{4}\) — the negative reciprocal, exactly as found. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 5.2: a curve that cannot be solved for y (folium-type); product rule inside implicit diff -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.2</span></p>
+      <div class="env-body">
+        <p>Find the slope of the curve \(x^{3} + y^{3} = 6xy\) at the point \((3, 3)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(y\) cannot be isolated, but the method does not need it. Differentiate both sides with respect to \(x\). On the left, \(x^{3}\) gives \(3x^{2}\) and \(y^{3}\) gives \(3y^{2}\,\dfrac{dy}{dx}\). On the right, \(6xy\) is a product, so the product rule applies — and the \(y\)-factor again carries its \(dy/dx\):</p>
+        <p>\[ 3x^{2} + 3y^{2}\,\frac{dy}{dx} = 6\!\left(y + x\,\frac{dy}{dx}\right). \]</p>
+        <p>Collect the \(dy/dx\) terms on the left and the rest on the right:</p>
+        <p>\[ 3y^{2}\,\frac{dy}{dx} - 6x\,\frac{dy}{dx} = 6y - 3x^{2}, \qquad (3y^{2} - 6x)\,\frac{dy}{dx} = 6y - 3x^{2}. \]</p>
+        <p>Dividing through (and cancelling the common factor \(3\)),</p>
+        <p>\[ \frac{dy}{dx} = \frac{2y - x^{2}}{y^{2} - 2x}. \]</p>
+        <p>At \((3, 3)\), which does lie on the curve since \(3^{3} + 3^{3} = 54 = 6\cdot 3\cdot 3\), this is</p>
+        <p>\[ \frac{dy}{dx} = \frac{2(3) - 3^{2}}{3^{2} - 2(3)} = \frac{6 - 9}{9 - 6} = \frac{-3}{3} = -1. \]</p>
+        <p>The tangent at \((3, 3)\) has slope \(-1\), a fact we could not have reached by solving for \(y\). <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 5.3: the inverse-function derivative via the framework; names what Ch3 §3.3 (Ex 3.14) did by the composition-identity route (closes Ch3 open-q) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.3</span></p>
+      <div class="env-body">
+        <p>Recover the derivative of \(\arcsin x\) by implicit differentiation.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Write \(y = \arcsin x\), so that \(y\) is the angle in \([-\tfrac{\pi}{2}, \tfrac{\pi}{2}]\) with</p>
+        <p>\[ \sin y = x. \]</p>
+        <p>This is exactly the kind of relation implicit differentiation is built for. Differentiate both sides with respect to \(x\); the left side gives \(\cos y\,\dfrac{dy}{dx}\) by the chain rule:</p>
+        <p>\[ \cos y\,\frac{dy}{dx} = 1, \qquad \frac{dy}{dx} = \frac{1}{\cos y}. \]</p>
+        <p>To express this in \(x\), use \(\cos^{2} y = 1 - \sin^{2} y = 1 - x^{2}\). On the principal interval \([-\tfrac{\pi}{2}, \tfrac{\pi}{2}]\) cosine is non-negative, so \(\cos y = \sqrt{1 - x^{2}}\), and</p>
+        <p>\[ \frac{d}{dx}\arcsin x = \frac{1}{\sqrt{1 - x^{2}}}, \qquad -1 < x < 1. \]</p>
+        <p>Chapter 3 obtained this same derivative (Example 3.14) by differentiating the identity \(\arcsin(\sin x) = x\) — the <em>composition-identity route</em>. Implicit differentiation is the general framework behind that manoeuvre: an inverse function, defined by a relation its defining function satisfies, yields its derivative the same way — differentiate the relation and solve — on any branch where it is differentiable and the division that solving requires is legitimate. The restriction to the open interval \((-1, 1)\) persists: at \(x = \pm 1\) the curve \(\sin y = x\) has a vertical tangent, and \(\cos y = 0\) makes \(1/\cos y\) undefined. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — the framework is honest only where y really is a differentiable function of x; flag the branch/vertical-tangent restriction (seam guard: no F_x/F_y / implicit function theorem — that is Ch14) -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Implicit differentiation assumes what it uses: that near the point in question, the curve <em>is</em> the graph of some differentiable function \(y\) of \(x\). Where that fails, the formula for \(dy/dx\) does too. On the circle \(x^{2} + y^{2} = 25\) the point \((5, 0)\) has \(y = 0\), and \(dy/dx = -x/y\) is undefined — the tangent there is vertical, and no function \(y = f(x)\) describes the curve through that point. The rule of thumb: a formula for \(dy/dx\) that goes infinite or turns into \(0/0\) is a warning that the branch assumption needs separate analysis — it may signal a vertical tangent, a self-crossing, or another singular point, a place where "\(y\) as a function of \(x\)" has broken down. (The precise conditions under which an equation \(F(x, y) = 0\) does define \(y\) as a differentiable function of \(x\) belong to the multivariable calculus of Chapter 14; here we work on the branches where it plainly does.)</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Higher derivatives</h3>
+
+  <p>The method feeds on its own output: once \(dy/dx\) is known implicitly, differentiating again gives \(d^{2}y/dx^{2}\).</p>
+
+  <!-- expansion:example — Example 5.4: second derivative implicitly; substitute the first derivative and the original equation to simplify -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.4</span></p>
+      <div class="env-body">
+        <p>For the circle \(x^{2} + y^{2} = 25\), find \(d^{2}y/dx^{2}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>From Example 5.1, \(dy/dx = -x/y\). Differentiate this quotient with respect to \(x\), remembering that \(y\) is a function of \(x\), so the quotient rule applies and \(y' = dy/dx\) reappears:</p>
+        <p>\[ \frac{d^{2}y}{dx^{2}} = -\frac{d}{dx}\!\left(\frac{x}{y}\right) = -\frac{(1)\,y - x\,\dfrac{dy}{dx}}{y^{2}} = -\frac{\,y - x\!\left(-\dfrac{x}{y}\right)}{y^{2}}. \]</p>
+        <p>Substituting \(dy/dx = -x/y\) has already cleared the derivative from the right-hand side. Simplify the numerator over the common denominator \(y\):</p>
+        <p>\[ \frac{d^{2}y}{dx^{2}} = -\frac{\dfrac{y^{2} + x^{2}}{y}}{y^{2}} = -\frac{x^{2} + y^{2}}{y^{3}}. \]</p>
+        <p>Finally, every point on the curve satisfies \(x^{2} + y^{2} = 25\), so the original equation simplifies the answer to</p>
+        <p>\[ \frac{d^{2}y}{dx^{2}} = -\frac{25}{y^{3}}. \]</p>
+        <p>Using the defining equation to tidy the result is a hallmark of implicit differentiation: the constraint that pins the curve down is available at every stage. On the upper half-circle \(y > 0\) the second derivative is negative, recording that the arc bends downward — the shape §5.6 will call concave down — as the picture of a circle's top demands. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close: implicit diff as a technique that unlocks §5.2 (related rates differentiate a relation w.r.t. t) without previewing its content -->
+  <p>Implicit differentiation is less a new rule than a new liberty: the chain rule, applied to an equation instead of a formula. That liberty is what the next section needs. There, the variable tying the equation together is not \(x\) but time, and differentiating a relation with respect to \(t\) turns known rates of change into unknown ones.</p>
+
+</article>

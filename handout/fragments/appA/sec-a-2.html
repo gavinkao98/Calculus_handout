@@ -1,0 +1,103 @@
+<!-- §A.2 The Product-to-Sum and Sum-to-Product Identities.
+     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Numbering is MANUAL, namespace "A", continuing from sec-a-1:
+     Proposition A.2 (product-to-sum), A.3 (sum-to-product); Strategy A.1; Example A.2.
+     Math verified: the displayed identities (3 product-to-sum + 4 sum-to-product)
+     re-derived from the angle-sum formulas (u,v-substitution u=(A+B)/2, v=(A−B)/2)
+     during authoring.
+     2026-07-04 addition: an UNNUMBERED power-reduction paragraph (cos^2, sin^2) placed
+     after Proposition A.2's proof — it is a dividend of the product-to-sum identities at
+     u=v=theta, so no new numbered environment and no renumbering.
+     Referenced from: §3.1 (sum-to-product bridge — the derivative-of-sine hinge).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.2</span>The Product-to-Sum and Sum-to-Product Identities</h2>
+  </header>
+
+  <p>One algebraic step in this book carries more weight than any other: rewriting the difference \(\sin(x+h) - \sin x\) as a <em>product</em>, which is what makes the derivative of the sine function computable. The identity that does it belongs to a family — the product-to-sum and sum-to-product identities — that older curricula drilled and most current precalculus courses omit. The good news is that the whole family is nothing but the angle-sum formulas, added and subtracted in pairs. If you learn one thing from this section, learn how to <em>rebuild</em> the identities; the memorizing then becomes optional.</p>
+
+  <p>Everything starts from the four angle-sum and angle-difference formulas, which we assume and record here for reference:
+  \[ \begin{aligned} \sin(u + v) &= \sin u \cos v + \cos u \sin v, \\ \sin(u - v) &= \sin u \cos v - \cos u \sin v, \\ \cos(u + v) &= \cos u \cos v - \sin u \sin v, \\ \cos(u - v) &= \cos u \cos v + \sin u \sin v. \end{aligned} \]</p>
+
+  <p>Add or subtract these in matching pairs and half of each right-hand side cancels, leaving a single product.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.2</span><span class="env-name">Product-to-sum identities</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} \sin u \cos v &= \tfrac{1}{2}\bigl[\sin(u + v) + \sin(u - v)\bigr], \\ \cos u \cos v &= \tfrac{1}{2}\bigl[\cos(u + v) + \cos(u - v)\bigr], \\ \sin u \sin v &= \tfrac{1}{2}\bigl[\cos(u - v) - \cos(u + v)\bigr]. \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Add the two sine formulas: the \(\cos u \sin v\) terms cancel, leaving \(\sin(u+v) + \sin(u-v) = 2 \sin u \cos v\); divide by \(2\). Add the two cosine formulas: the \(\sin u \sin v\) terms cancel, giving \(\cos(u+v) + \cos(u-v) = 2 \cos u \cos v\). Subtract the cosine formulas instead — \(\cos(u-v) - \cos(u+v)\) — and the \(\cos u \cos v\) terms cancel, giving \(2 \sin u \sin v\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>Setting \(u = v = \theta\) in these product-to-sum identities pays an immediate dividend. The middle line becomes \(\cos^{2}\theta = \tfrac{1}{2}\bigl[\cos 2\theta + \cos 0\bigr]\) and the last becomes \(\sin^{2}\theta = \tfrac{1}{2}\bigl[\cos 0 - \cos 2\theta\bigr]\); since \(\cos 0 = 1\), these are the <em>power-reduction</em> formulas
+  \[ \cos^{2}\theta = \frac{1 + \cos 2\theta}{2}, \qquad \sin^{2}\theta = \frac{1 - \cos 2\theta}{2}, \]
+  which trade a <em>squared</em> trigonometric function for a plain one at twice the angle. (The first line, \(\sin\theta \cos\theta = \tfrac{1}{2}\sin 2\theta\), is the double-angle formula for sine read the same way.) These are the forms integration reaches for to handle \(\sin^{2}\) and \(\cos^{2}\) when the techniques of integration arrive.</p>
+
+  <p>The sum-to-product identities are the same cancellations read in the other direction. The only new idea is a change of names: given a sum like \(\sin A + \sin B\), arrange for the two angles to read \(u + v\) and \(u - v\) by choosing \(u\) and \(v\) so that \(u + v = A\) and \(u - v = B\). Adding these two equations gives \(2u = A + B\) and subtracting them gives \(2v = A - B\), so \(u\) is the <em>average</em> and \(v\) the <em>half-difference</em>:
+  \[ u = \frac{A + B}{2}, \qquad v = \frac{A - B}{2}. \]</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.3</span><span class="env-name">Sum-to-product identities</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} \sin A + \sin B &= 2 \sin\frac{A + B}{2} \cos\frac{A - B}{2}, \\ \sin A - \sin B &= 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}, \\ \cos A + \cos B &= 2 \cos\frac{A + B}{2} \cos\frac{A - B}{2}, \\ \cos A - \cos B &= -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}. \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>With \(u = \tfrac{A+B}{2}\) and \(v = \tfrac{A-B}{2}\) we have \(u + v = A\) and \(u - v = B\). Then, reading the cancellations in the previous proof from right to left,
+      \[ \begin{aligned} \sin A + \sin B &= \sin(u + v) + \sin(u - v) \\ &= 2 \sin u \cos v = 2 \sin\frac{A + B}{2} \cos\frac{A - B}{2}, \end{aligned} \]
+      and the other three lines follow the same way: \(\sin A - \sin B = \sin(u+v) - \sin(u-v) = 2 \cos u \sin v\) (this time subtracting the two sine expansions); \(\cos A + \cos B = 2 \cos u \cos v\); and \(\cos A - \cos B = \cos(u+v) - \cos(u-v) = -2 \sin u \sin v\). Note the minus sign in the last line — the only one in the family, and the easiest thing to misremember; the subtraction order \(\cos(u+v) - \cos(u-v)\) is where it comes from. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">A.1</span><span class="env-name">Recovering an identity you forgot</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Write down the two angle-sum (or angle-difference) expansions that contain the pieces you have, and add or subtract them so that the unwanted terms cancel.</li>
+        <li>If your expression is a sum of two trig values at angles \(A\) and \(B\), substitute the average \(u = \tfrac{A+B}{2}\) and half-difference \(v = \tfrac{A-B}{2}\), so that \(A = u + v\) and \(B = u - v\).</li>
+      </ol>
+      <p class="informal">Rebuilding takes perhaps a minute; a memorized list of eight is easy to get wrong by a sign. Verifying is even cheaper — expand the product side with the angle-sum formulas and watch the cross terms cancel.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.2</span></p>
+      <div class="env-body">
+        <p>Rewrite each expression as requested.</p>
+        <ol class="prompt-list">
+          <li>Write \(\sin(x + h) - \sin x\) as a product.</li>
+          <li>Write \(\sin 5x \, \sin 3x\) as a sum.</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>Apply the sum-to-product identity for \(\sin A - \sin B\) with \(A = x + h\) and \(B = x\). The average is \(\tfrac{A+B}{2} = x + \tfrac{h}{2}\) and the half-difference is \(\tfrac{A-B}{2} = \tfrac{h}{2}\), so
+          \[ \sin(x + h) - \sin x = 2 \cos\Bigl(x + \tfrac{h}{2}\Bigr) \sin\frac{h}{2}. \]
+          This is precisely the rewriting the derivative of sine turns on: the difference of two sines becomes a product with the small quantity \(h/2\) isolated inside a single sine.</li>
+          <li>Apply the third product-to-sum identity with \(u = 5x\) and \(v = 3x\):
+          \[ \begin{aligned} \sin 5x \, \sin 3x &= \tfrac{1}{2}\bigl[\cos(5x - 3x) - \cos(5x + 3x)\bigr] \\ &= \tfrac{1}{2}\bigl[\cos 2x - \cos 8x\bigr]. \end{aligned} \]
+          Turning products into sums is the direction integration will want: a sum of cosines is far easier to integrate than a product.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <p>Of the whole family, the identity for \(\sin A - \sin B\) in Proposition A.3 is the one worth keeping at your fingertips; the rest follow from the same two moves the moment you need them.</p>
+
+</article>

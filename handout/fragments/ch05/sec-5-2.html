@@ -1,0 +1,114 @@
+<!-- §5.2 Related Rates.
+     section-source: Stewart ET 9e §3.9 (Related Rates); cross-checked Thomas 14e §3.8, Rogawski 4e §3.11.
+     Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤). Counters continue from §5.1
+     (Strategy 5.1, Examples 5.1–5.4): §5.2 mints Strategy 5.2, Examples 5.5–5.7. Introduces the
+     rate notation dx/dt. Cautions UNNUMBERED. Builds on §5.1 (implicit differentiation, now with
+     respect to t) and the chain rule (Theorem 3.3). Figures deferred to the figure-opportunity gate
+     (candidates: ladder right-triangle; lamppost similar-triangles).
+     Math: ladder x²+y²=100, dy/dt=−(x/y)dx/dt=−3/4 at x=6; balloon dr/dt=100/(4π·25²)=1/(25π);
+     shadow 9s=6x ⇒ ds/dt=10/3, tip 25/3.
+     Counters handed to §5.3: Strategy 5.3, Example 5.8. Record: PLAN-ch05.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">5.2</span>Related Rates</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: when quantities are tied by an equation and all move with time, their rates are tied too; differentiate the relation w.r.t. t -->
+  <p>The previous section differentiated an equation with respect to \(x\). Nothing forces the differentiating variable to be \(x\). When several quantities are bound together by an equation and all of them drift with time, differentiating that equation <em>with respect to time</em> binds their rates of change together in the same way. This is the setting of a <em>related-rates</em> problem: one rate is known, another is wanted, and an equation of geometry or physics links the quantities themselves. The link between the quantities becomes, on differentiation, a link between their speeds.</p>
+
+  <p>The mechanism is implicit differentiation with \(t\) in the driving seat. Each quantity is a function of time, so differentiating a term in it produces its rate through the chain rule: if \(V\) and \(r\) are related by \(V = \tfrac{4}{3}\pi r^{3}\), then</p>
+  <p>\[ \frac{dV}{dt} = 4\pi r^{2}\,\frac{dr}{dt}, \]</p>
+  <p>the factor \(dr/dt\) appearing for exactly the reason \(dy/dx\) appeared in §5.1 — \(r\) depends on \(t\). Read the equation as it stands and it relates a volume to a radius; differentiate it and it relates the rate the volume grows to the rate the radius grows. Here \(dx/dt\), \(dr/dt\), and their kin are <em>rates with respect to time</em>, the derivative measuring how fast a quantity changes as the clock runs.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.2</span><span class="env-name">Solving a related-rates problem</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Name the changing quantities and give them variables. Record which rates are <em>given</em> and which one is <em>wanted</em>, each as a derivative with respect to \(t\).</li>
+        <li>Find an equation relating the quantities — from geometry, similar triangles, or a physical law. It must hold at <em>every</em> instant, not only the one asked about.</li>
+        <li>Differentiate both sides with respect to \(t\). Each variable is a function of time, so the chain rule brings in its rate; the equation becomes a relation among the rates.</li>
+        <li>Now — and only now — substitute the numerical values that hold at the instant in question, and solve for the unknown rate.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- expansion:caution — THE related-rates pitfall: substitute the instant's values AFTER differentiating, never before -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Substitute the instant's numbers only after differentiating, never before. A quantity that is changing must be carried as a variable through the differentiation; if you fix it to its momentary value first, you have frozen something that is actually moving, and its rate — the very thing the chain rule was about to produce — silently drops to zero. Plug in the numbers on the last line, not the first.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 5.5: the sliding ladder — the archetypal related-rates problem, a right-triangle relation -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.5</span></p>
+      <div class="env-body">
+        <p>A \(10\)-foot ladder leans against a wall. Its base is pulled away from the wall at \(1\) foot per second. How fast is the top sliding down when the base is \(6\) feet from the wall?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Let \(x\) be the distance from the wall to the base and \(y\) the height of the top, both functions of time. The ladder's length is fixed, so the Pythagorean relation holds at every instant:</p>
+        <p>\[ x^{2} + y^{2} = 100. \]</p>
+        <p>We are given \(dx/dt = 1\) and want \(dy/dt\) at the moment \(x = 6\). Differentiate the relation with respect to \(t\) — <em>before</em> putting in any numbers:</p>
+        <p>\[ 2x\,\frac{dx}{dt} + 2y\,\frac{dy}{dt} = 0, \qquad \frac{dy}{dt} = -\frac{x}{y}\,\frac{dx}{dt}. \]</p>
+        <p>At the instant \(x = 6\), the relation gives \(y = \sqrt{100 - 36} = 8\). Substituting \(x = 6\), \(y = 8\), and \(dx/dt = 1\),</p>
+        <p>\[ \frac{dy}{dt} = -\frac{6}{8}\,(1) = -\frac{3}{4}. \]</p>
+        <p>The top slides down at \(\tfrac{3}{4}\) foot per second. The minus sign is the geometry speaking: as \(x\) grows, \(y\) shrinks, so \(dy/dt\) is negative. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 5.6: inflating sphere — a volume-radius relation; solving for the rate of the "inner" variable -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.6</span></p>
+      <div class="env-body">
+        <p>Air is pumped into a spherical balloon at \(100\) cubic centimetres per second. How fast is the radius growing when the radius is \(25\) centimetres?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Let \(V\) and \(r\) be the volume and radius at time \(t\). They are related by the volume of a sphere,</p>
+        <p>\[ V = \tfrac{4}{3}\pi r^{3}. \]</p>
+        <p>We are given \(dV/dt = 100\) and want \(dr/dt\) when \(r = 25\). Differentiating with respect to \(t\),</p>
+        <p>\[ \frac{dV}{dt} = 4\pi r^{2}\,\frac{dr}{dt}, \qquad \frac{dr}{dt} = \frac{1}{4\pi r^{2}}\,\frac{dV}{dt}. \]</p>
+        <p>At \(r = 25\),</p>
+        <p>\[ \frac{dr}{dt} = \frac{100}{4\pi (25)^{2}} = \frac{100}{2500\pi} = \frac{1}{25\pi} \ \text{cm/s} \approx 0.0127 \ \text{cm/s}. \]</p>
+        <p>The radius creeps outward even as the volume pours in quickly, because a large sphere hides a great deal of volume in a thin outer shell: the same \(100\ \text{cm}^{3}/\text{s}\) would swell a small balloon far faster. The factor \(r^{2}\) in the denominator is that shell effect made precise. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 5.7: the walking shadow — a similar-triangles relation; two rates from one setup -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.7</span></p>
+      <div class="env-body">
+        <p>A street lamp is \(15\) feet tall. A person \(6\) feet tall walks away from the lamp at \(5\) feet per second. How fast is the person's shadow lengthening, and how fast is the tip of the shadow moving?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Let \(x\) be the person's distance from the lamp and \(s\) the length of the shadow they cast beyond themselves. The lamp, the person, and the shadow's tip form two similar right triangles: the large one from the lamp's top down to the tip, base \(x + s\) and height \(15\); the small one from the person's head to the tip, base \(s\) and height \(6\). Similar triangles equate the ratios of height to base:</p>
+        <p>\[ \frac{15}{x + s} = \frac{6}{s}. \]</p>
+        <p>Cross-multiplying, \(15s = 6(x + s)\), so \(15s = 6x + 6s\) and \(9s = 6x\); that is, \(s = \tfrac{2}{3}x\). This relation holds at all times, so differentiate with respect to \(t\):</p>
+        <p>\[ \frac{ds}{dt} = \frac{2}{3}\,\frac{dx}{dt} = \frac{2}{3}\,(5) = \frac{10}{3} \ \text{ft/s}. \]</p>
+        <p>The shadow lengthens at \(\tfrac{10}{3}\) feet per second — and, notably, this rate does not depend on where the person is, since \(s\) is a fixed multiple of \(x\). The tip of the shadow sits at distance \(x + s\) from the lamp, so its speed is</p>
+        <p>\[ \frac{d}{dt}(x + s) = \frac{dx}{dt} + \frac{ds}{dt} = 5 + \frac{10}{3} = \frac{25}{3} \ \text{ft/s}. \]</p>
+        <p>The tip outruns the person: it carries the person's own \(5\ \text{ft/s}\) plus the shadow's growth. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close: the pattern is one relation differentiated once; §5.3 turns to the derivative as a local straight-line stand-in -->
+  <p>Every problem here followed one pattern: a single equation, differentiated once with respect to time, turning a known rate into an unknown one. What made it work was the chain rule ferrying each rate out of the relation that hid it. The next section stays local in a different sense — it asks how well the derivative, the rate at a single instant, approximates the function itself just next door.</p>
+
+</article>

@@ -1,0 +1,80 @@
+<!-- §D.2 The Existence Theorems for Continuous Functions.
+     Self-authored 2026-07-06 (no manuscript). Proofs of Theorem 4.9(a) EVT and 4.9(b) IVT, fenced
+     from §4.4. Both rest on completeness (Theorem 4.1); EVT also on Bolzano-Weierstrass (Theorem 4.4).
+     Lemma D.1 (LUB from Theorem 4.1) is appendix-local proof scaffolding (Codex-recommended so that
+     the EVT attainment step does not invoke sup naked). Proof approaches converged with Codex
+     (read-only): EVT boundedness by contradiction via B-W, attainment via M=sup + B-W squeeze;
+     IVT by bisection with the exact half-selection rule. Namespace "D": Lemma D.1. No new Theorem
+     numbers minted (the theorems live in §4.4). Math: standard analysis proofs, Codex-verified.
+     Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">D.2</span>The Existence Theorems for Continuous Functions</h2>
+  </header>
+
+  <p>Section 4.4 stated the two foundational theorems about a continuous function on a closed interval &mdash; that it attains its extreme values (Theorem 4.9(a), the Extreme Value Theorem) and that it takes every value in between (Theorem 4.9(b), the Intermediate Value Theorem) &mdash; and deferred both proofs to here. Each rests on the completeness of \(\mathbb{R}\) (Theorem 4.1): the statement that every non-decreasing sequence bounded above converges (and its mirror for non-increasing sequences bounded below). The Extreme Value Theorem needs one further consequence of completeness, which we isolate first, because we invoke it by name and it recurs.</p>
+
+  <h3 class="subsec-head">The least upper bound</h3>
+
+  <p>An <em>upper bound</em> of a set \(S \subseteq \mathbb{R}\) is a number that is \(\ge\) every element of \(S\). Completeness guarantees that a set bounded above has a <em>smallest</em> upper bound.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Lemma</span><span class="env-num">D.1</span><span class="env-name">Least upper bound</span></p>
+    <div class="env-body">
+      <p>Every nonempty set \(S \subseteq \mathbb{R}\) that is bounded above has a <em>least upper bound</em> \(M = \sup S\): a number \(M\) that is an upper bound of \(S\) and satisfies \(M \le B\) for every upper bound \(B\) of \(S\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Since \(S\) is nonempty, fix a point \(s_{0} \in S\); since \(S\) is bounded above, fix an upper bound \(B\). Set \(a_{0} = s_{0} - 1\) and \(b_{0} = B\). Then \(a_{0}\) is <em>not</em> an upper bound of \(S\) &mdash; the element \(s_{0}\) exceeds it &mdash; while \(b_{0}\) is; and \(a_{0} < b_{0}\), since \(s_{0} \le B\). We halve this interval repeatedly, preserving that contrast.</p>
+      <p>Given \([a_{n}, b_{n}]\) with \(a_{n}\) not an upper bound of \(S\) and \(b_{n}\) an upper bound, let \(m_{n} = \tfrac{1}{2}(a_{n} + b_{n})\). If \(m_{n}\) is an upper bound of \(S\), set \(a_{n+1} = a_{n}\) and \(b_{n+1} = m_{n}\); otherwise set \(a_{n+1} = m_{n}\) and \(b_{n+1} = b_{n}\). In either case \(a_{n+1}\) is still not an upper bound, \(b_{n+1}\) still is, and</p>
+      <p>\[ b_{n+1} - a_{n+1} = \tfrac{1}{2}(b_{n} - a_{n}), \qquad \text{so} \qquad b_{n} - a_{n} = \frac{b_{0} - a_{0}}{2^{n}} \to 0. \]</p>
+      <p>The sequence \(\{a_{n}\}\) is non-decreasing and bounded above (by \(b_{0}\)), so by Theorem 4.1 it converges to some \(M\). Because \(b_{n} - a_{n} \to 0\), the sequence \(\{b_{n}\}\) converges to the same \(M\). We claim \(M = \sup S\).</p>
+      <p><em>\(M\) is an upper bound.</em> For any \(s \in S\) and any \(n\), \(s \le b_{n}\) because \(b_{n}\) is an upper bound; letting \(n \to \infty\) gives \(s \le M\).</p>
+      <p><em>\(M\) is the least one.</em> Suppose some \(M' < M\) were also an upper bound. Since \(a_{n} \to M\), there is an \(n\) with \(a_{n} > M'\). But \(a_{n}\) is not an upper bound, so some \(s \in S\) has \(s > a_{n} > M'\), contradicting that \(M'\) bounds \(S\). Hence no upper bound is smaller than \(M\), and \(M = \sup S\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The mirror statement &mdash; a nonempty set bounded below has a <em>greatest lower bound</em> \(\inf S\) &mdash; follows by applying the lemma to \(\{-s : s \in S\}\).</p>
+
+  <h3 class="subsec-head">The Extreme Value Theorem</h3>
+
+  <p>Recall the statement: if \(f\) is continuous on a closed interval \([a, b]\), then \(f\) attains a maximum and a minimum on \([a, b]\). The proof runs in two stages &mdash; first that the values are bounded, then that the least upper bound is actually reached &mdash; and both stages extract a convergent subsequence with the Bolzano&ndash;Weierstrass theorem (Theorem 4.4).</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof of Theorem 4.9(a)</span></p>
+    <div class="env-body">
+      <p>We show \(f\) attains a maximum; the minimum then follows by applying the result to \(-f\).</p>
+      <p><strong>The values are bounded above.</strong> Suppose not. Then for each \(n \in \mathbb{N}\) there is a point \(x_{n} \in [a, b]\) with \(f(x_{n}) > n\). The sequence \(\{x_{n}\}\) lies in \([a, b]\), so it is bounded, and by the Bolzano&ndash;Weierstrass theorem (Theorem 4.4) some subsequence \(x_{n_{k}}\) converges to a point \(\xi\). Since \(a \le x_{n_{k}} \le b\) for every \(k\), the limit satisfies \(\xi \in [a, b]\), so \(f\) is defined and continuous there; continuity gives \(f(x_{n_{k}}) \to f(\xi)\), a finite real number. But \(f(x_{n_{k}}) > n_{k} \to \infty\), so the values cannot approach a finite limit &mdash; a contradiction. Hence \(f\) is bounded above on \([a, b]\).</p>
+      <p><strong>The bound is attained.</strong> The set of values \(f([a, b]) = \{\, f(x) : x \in [a, b] \,\}\) is nonempty and bounded above, so by Lemma D.1 it has a least upper bound \(M = \sup f([a, b])\). For each \(n\), the number \(M - \tfrac{1}{n}\) is smaller than \(M\), hence not an upper bound of the values, so there is a point \(x_{n} \in [a, b]\) with</p>
+      <p>\[ M - \tfrac{1}{n} < f(x_{n}) \le M. \]</p>
+      <p>By Bolzano&ndash;Weierstrass again, some subsequence \(x_{n_{k}} \to x_{M} \in [a, b]\). Continuity gives \(f(x_{n_{k}}) \to f(x_{M})\); but the displayed inequality forces \(f(x_{n_{k}}) \to M\) as \(k \to \infty\), since \(M - \tfrac{1}{n_{k}}\) and \(M\) both tend to \(M\). A sequence has only one limit, so \(f(x_{M}) = M\). Thus \(f\) attains its maximum value \(M\) at the point \(x_{M}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The Intermediate Value Theorem</h3>
+
+  <p>Recall the statement: if \(f\) is continuous on \([a, b]\) and \(y\) lies between \(f(a)\) and \(f(b)\), then \(f(c) = y\) for some \(c \in [a, b]\). Here completeness enters through bisection: we trap the crossing inside a shrinking interval whose endpoints keep \(y\) bracketed, and the shared limit of those endpoints is the point we want.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof of Theorem 4.9(b)</span></p>
+    <div class="env-body">
+      <p>If \(y\) equals \(f(a)\) or \(f(b)\) there is nothing to prove, so suppose it lies strictly between them. Relabel so that \(f(a) < y < f(b)\); the opposite case \(f(a) > y > f(b)\) reduces to this one by applying what follows to \(-f\) and \(-y\).</p>
+      <p>We keep \(y\) bracketed by the two endpoints, maintaining \(f(a_{n}) \le y \le f(b_{n})\) throughout. Start with \(a_{0} = a\) and \(b_{0} = b\), where \(f(a_{0}) < y < f(b_{0})\). Given \([a_{n}, b_{n}]\) with \(f(a_{n}) \le y \le f(b_{n})\), let \(m_{n} = \tfrac{1}{2}(a_{n} + b_{n})\) and compare \(f(m_{n})\) with \(y\):</p>
+      <ul>
+        <li>if \(f(m_{n}) = y\), the point \(c = m_{n}\) already satisfies the conclusion, and we stop;</li>
+        <li>if \(f(m_{n}) < y\), set \(a_{n+1} = m_{n}\) and \(b_{n+1} = b_{n}\);</li>
+        <li>if \(f(m_{n}) > y\), set \(a_{n+1} = a_{n}\) and \(b_{n+1} = m_{n}\).</li>
+      </ul>
+      <p>Each continuing case preserves \(f(a_{n+1}) \le y \le f(b_{n+1})\) and halves the interval, so \(b_{n} - a_{n} = (b - a)/2^{n} \to 0\). If the process ever stops we are done. Otherwise it produces a non-decreasing \(\{a_{n}\}\) and a non-increasing \(\{b_{n}\}\), both confined to \([a, b]\); by Theorem 4.1 each converges, and since their gap shrinks to \(0\) they share a single limit \(c \in [a, b]\).</p>
+      <p>Continuity gives \(f(a_{n}) \to f(c)\) and \(f(b_{n}) \to f(c)\). Passing to the limit in the standing inequality \(f(a_{n}) \le y \le f(b_{n})\) yields</p>
+      <p>\[ f(c) \le y \le f(c), \]</p>
+      <p>so \(f(c) = y\), as required. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+</article>

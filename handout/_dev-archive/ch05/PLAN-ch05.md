@@ -1,0 +1,92 @@
+# PLAN-ch05 — Chapter 5: Applications of Differentiation
+
+Chapter-level direction anchor + cross-session state. **First manuscript-free chapter.**
+
+## Workflow (manuscript-free, autonomous)
+
+- **Spine = canon** (Stewart ET 9e Ch4 primary; Thomas 14e / Rogawski 4e cross-check), authored to full-gate tier. No teacher manuscript exists Ch5–16.
+- **Provenance:** each fragment carries a `<!-- section-source: … -->` header naming the canonical section(s) it is built from; pedagogical add-ons keep the `expansion:<cat>` tag system.
+- **Human gates → Codex** (user 2026-07-06 autonomy grant: "決策點自行調用 codex 討論到收斂再實行，不用再問我"). So ③ direction gate and ⑤ advisory review both run against **Codex** (read-only, standing consent), not the user. Per section: draft against the brief + hypothesis ledger → Codex adversarial review (direction-conformance + math correctness + hypothesis hygiene) → iterate to 0 blocking.
+- **Anti-hallucination backstops** (replacing the lost ①-verify): (1) the section brief + hypothesis ledger reviewed before/at draft; (2) Codex adversarial; (3) the math double-gate (sympy recompute worked examples) at chapter end. Codex noted sympy checks numbers, not theorem hygiene — hence the **hypothesis ledger** per section (domains, continuity/differentiability assumptions, denominator ≠ 0, endpoint type, exported deps).
+- **Depth:** standard-rigorous (roadmap). Applications are computation-led; the one real theorem (L'Hôpital) is fully proved from a Generalized MVT introduced in §5.7.
+
+## Roster (Codex-reordered; roadmap "全局 seam ledger")
+
+| § | Title | new machinery | key imports |
+|---|---|---|---|
+| 5.1 | Implicit Differentiation | implicit-diff framework (closes Ch3 open-q) | chain rule **Thm 3.3** |
+| 5.2 | Related Rates | \(dy/dt\) | §5.1; chain rule |
+| 5.3 | Linear Approximation & Differentials | \(L(x)\), \(dy\) vs \(\Delta y\) | derivative **Def 2.2**; remainder-form **Def 3.1** |
+| 5.4 | Maximum and Minimum Values | critical numbers, closed-interval method, 1st-deriv test | **EVT 4.9(a)**, **Fermat 4.10**, **monotonicity Cor 4.3** |
+| 5.5 | Optimization Problems | applied extrema | §5.4 |
+| 5.6 | Shape of a Graph | concavity, inflection, **2nd-deriv test** (NEW) | **MVT 4.12**, Cor 4.3 |
+| 5.7 | L'Hôpital's Rule | **Generalized MVT (Cauchy's form)** lemma + indeterminate forms | **MVT 4.12** |
+| 5.8 | Curve Sketching | synthesis + asymptotes | §5.4–5.7; infinite limits **Def 1.11** |
+| 5.9 | Newton's Method | Newton iteration | §5.3; **IVT 4.9(b)** (root existence) |
+
+Excluded (roadmap): antiderivatives (→Ch6), graphing-with-technology.
+
+## Cross-chapter EXPORT (forward contract; keep exact)
+
+- **Generalized MVT (Cauchy's form)** §5.7 → Ch11 Taylor remainder.
+- **Linear approximation / differentials** §5.3 → Ch6 (\(du\)), Ch11, Ch14 tangent planes.
+- **Concavity / 2nd-derivative test** §5.6 → Ch14 Hessian (§C.4).
+
+## Per-section seam / fence guards (from full-arc Codex seam-hunt)
+
+- **§5.1:** do NOT state the general \(F_x/F_y\) implicit-function formula (needs Ch14 partials) — operational/branch-based; assume the implicitly-defined quantity is differentiable where the method is used. Re-derive an inverse-function derivative (e.g. \(\arcsin'\), \(\ln'\)) via the framework — connects to Ch3's composition-identity route.
+- **§5.3:** cross-ref Ch3 remainder-form differentiability (Def 3.1) — linear approximation is that idea, not wholly new.
+- **§5.6:** 2nd-derivative test — state clearly; the test is inconclusive when \(f''=0\) (caution).
+- **§5.7:** name the lemma "Generalized Mean Value Theorem (Cauchy's form)" (avoid clash with the Cauchy criterion, Thm 4.5). Fully prove the clean \(0/0\) finite case; \(\infty/\infty\) and \(x\to\infty\) — prove one carefully-stated extension or fence to Proof-Track (hypothesis sprawl risk, not truth). Make explicit: indeterminate forms beyond \(0/0,\infty/\infty\) (\(0\cdot\infty,\ \infty-\infty,\ 1^\infty,\ 0^0,\ \infty^0\)) via algebraic recasting.
+- **§5.8:** all asymptote types incl. slant; growth comparison \(\ln x \ll x^p \ll e^x\).
+- **§5.9:** convergence/failure discussion benefits from §5.6 concavity; may cite IVT 4.9(b).
+
+## Numbering ledger (Ch5 counters reset fresh; per-type continuous across sections)
+
+**Fill as each section reaches draft.** Cautions are UNNUMBERED (Ch1–4 convention).
+
+| type | allocated so far | next |
+|---|---|---|
+| Definition | — | 5.1 |
+| Theorem | — | 5.1 |
+| Proposition | — | 5.1 |
+| Corollary | — | 5.1 |
+| Lemma | — | 5.1 |
+| Strategy | — | 5.1 |
+| Example | — | 5.1 |
+| Figure | — | 5.1 |
+| Remark | — | 5.1 |
+
+> Chapter opener (chapter-head + "By the end…") lives in **sec-5-1.html** (first `<article>`), per handout convention (four chapters + appendices all do this).
+
+## Per-section status
+
+**Mode A (draft + ⑤ Codex) COMPLETE 2026-07-06 — all 9 sections + Appendix D §D.3.** Each section: build ✔ / linebreak-gate 0 / render katex 0 / Codex ⑤ 0 blocking (advisories applied). Full-chapter sweep: linebreak 0/0 (ch05+appD), katex 0, math=917.
+
+| § | stage | env minted | Codex ⑤ |
+|---|---|---|---|
+| 5.1 Implicit Differentiation | ✅ draft | Strategy 5.1; Ex 5.1–5.4 | 0 blocking, 3 adv applied |
+| 5.2 Related Rates | ✅ draft | Strategy 5.2; Ex 5.5–5.7 | 0 blocking (clean) |
+| 5.3 Linear Approx & Differentials | ✅ draft | Def 5.1–5.2; Ex 5.8–5.10 | 0 blocking, 3 adv applied |
+| 5.4 Max and Min Values | ✅ draft | Def 5.3–5.4; Thm 5.1 (FDT); Strategy 5.3; Ex 5.11–5.13 | 0 blocking, 2 adv (FDT proof rigor) applied |
+| 5.5 Optimization | ✅ draft | Strategy 5.4; Ex 5.14–5.16 | **1 blocking** (5.16 quarter-not-half) fixed + adv |
+| 5.6 Shape of a Graph | ✅ draft | Def 5.5–5.6; Thm 5.2 (Concavity), 5.3 (2nd-deriv); Ex 5.17–5.18 | 0 blocking, 3 adv (proof rigor) applied |
+| 5.7 L'Hôpital's Rule | ✅ draft | Thm 5.4 (Generalized MVT), 5.5 (L'Hôpital); Strategy 5.5; Ex 5.19–5.21; **+appD §D.3** | **2 blocking** (§D.3 reduction, x^x=Ex 3.10 not 3.7) fixed + adv |
+| 5.8 Curve Sketching | ✅ draft | Def 5.7 (asymptotes); Strategy 5.6; Ex 5.22–5.23 | 0 blocking, 3 adv applied |
+| 5.9 Newton's Method | ✅ draft | Strategy 5.7; Ex 5.24–5.25; **chapter summary** | **2 blocking** (cubic has Cardano; summary EVT/Fermat) fixed + adv |
+
+**Final numbering ledger (as-built):** Definition 5.1–5.7 · Theorem 5.1–5.5 · Strategy 5.1–5.7 · Example 5.1–5.25 · Corollary/Proposition/Lemma/Figure/Remark: none in Ch5. Appendix D grew to §D.1–§D.3 (Lemma D.1; proofs of Thm 4.9(a)/(b), Thm 5.5 ∞/∞).
+
+**Gate status (2026-07-06):** ✅ 逐節 Codex ⑤（0 blocking；5 blocking 沿途修）· ✅ **sympy 數學閘 33/33 PASS** · ✅ **章層 Codex review**（0 blocking，5 cross-section adv 套）· ✅ **圖機會閘**（13 候選：essential 6/strong 5/med 3/low 2，駁 6；見 `handout/_audit/REVIEW-ch05-figure-opportunity.html`）。
+**剩餘（後續 session，較大、宜 fresh context）：** 圖**繪製**＋圖正確性閘 D1–D8（採 tier-1/2 候選）· math M1–M8 gate-2（可選跨模型 Codex）· S·A·V 散文閘完整跑 · 難度 learner-sim（≥3 盲測）· Mode C ①課文範例補充 ②軟深度。
+
+## Chapter opener — "By the end of this chapter you will be able to"
+
+- use implicit differentiation to find \(dy/dx\) for curves defined by an equation;
+- solve related-rates problems by differentiating a relation with respect to time;
+- use linear approximation and differentials to estimate values and bound errors;
+- locate absolute and local extrema, and solve optimization problems;
+- determine concavity and inflection points, and apply the first- and second-derivative tests;
+- evaluate limits of indeterminate form with L'Hôpital's rule;
+- sketch a curve from its analytic features;
+- approximate a root with Newton's method.

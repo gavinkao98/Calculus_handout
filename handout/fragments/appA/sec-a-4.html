@@ -1,0 +1,104 @@
+<!-- §A.4 Partial Fractions.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Second-batch appendix section (user roster decision 2026-07-04).
+     Numbering is MANUAL, namespace "A", continuing from sec-a-3:
+     Proposition A.7; Strategy A.2; Example A.4, A.5; Caution unnumbered.
+     (2026-07-04 GAP-A: this Proposition renumbered A.6 → A.7 because sec-a-3 gained Proposition A.6 "Power sums".)
+     Depth note: the decomposition FORM (Proposition A.7) is stated; its existence/uniqueness
+     is a linear-algebra fact, taken as given (fenced) — the section teaches how to FIND the
+     constants across all three types (distinct linear, repeated linear, irreducible quadratic).
+     Forward-stock: Ch1–4 has no inbound reference (partial fractions is an integration tool);
+     added per user decision 2026-07-04 and registered in CONTENT_SPEC §16.2 as B-class.
+     No mainline cross-ref yet. The 1/(x(x+1)) opener ties back to §A.3's telescoping sum.
+     Math verified during authoring: Example A.4 (5x−1 cover-up), A.5(a) x/(x−1)^2,
+     A.5(b) (x+1)/(x(x^2+1)), and the improper division x^2/(x−1) = x+1 + 1/(x−1).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.4</span>Partial Fractions</h2>
+  </header>
+
+  <p>Adding two fractions over a common denominator is routine; the reverse — breaking one complicated fraction back into simple pieces — is <em>partial fractions</em>. A rational function is a quotient of polynomials \(P(x)/Q(x)\), and partial fractions rewrites it as a sum of fragments simple enough to handle one at a time. The smallest instance is worth seeing first:
+  \[ \frac{1}{x(x + 1)} = \frac{1}{x} - \frac{1}{x + 1}, \]
+  as recombining the right-hand side over a common denominator confirms. (Read left to right, this is exactly the split that makes \(\sum \tfrac{1}{k(k + 1)}\) telescope — §A.3’s collapsing sum in disguise.) Its real payoff is in integration, where each fragment turns out to have a standard antiderivative.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.7</span><span class="env-name">Partial-fraction decomposition</span></p>
+    <div class="env-body">
+      <p>Let \(P(x)/Q(x)\) be a <em>proper</em> rational function — one whose numerator has lower degree than its denominator — and factor \(Q\) completely into linear and irreducible quadratic factors. Then \(P/Q\) equals a sum of partial fractions, contributed factor by factor:</p>
+      <ul>
+        <li>each distinct linear factor \((x - a)\) contributes one term \(\dfrac{A}{x - a}\);</li>
+        <li>each repeated linear factor \((x - a)^{m}\) contributes \(\dfrac{A_{1}}{x - a} + \dfrac{A_{2}}{(x - a)^{2}} + \cdots + \dfrac{A_{m}}{(x - a)^{m}}\);</li>
+        <li>each irreducible quadratic factor \((x^{2} + px + q)\) — one with no real root, i.e. \(p^{2} < 4q\), so it cannot be split into real linear factors — contributes \(\dfrac{Bx + C}{x^{2} + px + q}\); a repeated one \((x^{2} + px + q)^{m}\) contributes one such term over each power up to \(m\).</li>
+      </ul>
+      <p>In every case the fragment’s numerator sits one degree below its denominator — a constant over a linear factor, a linear \(Bx + C\) over a quadratic — and a factor raised to a power gets one fragment for each power up to that exponent, exactly the freedom needed to match an arbitrary proper numerator. The constants are then uniquely determined by \(P\) and \(Q\).</p>
+    </div>
+  </section>
+
+  <p>That such a decomposition always exists, and with only one choice of constants, is a fact of linear algebra: matching numerators forces a system of linear equations in the unknowns that has exactly one solution. We take the <em>shape</em> as given and spend the effort where the work really is — pinning down the constants.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">A.2</span><span class="env-name">Finding the constants</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>If the fraction is <em>improper</em> (numerator degree \(\ge\) denominator degree), divide first: \(P/Q = (\text{a polynomial}) + (\text{proper remainder})/Q\), and decompose only the remainder.</li>
+        <li>Factor the denominator completely and write the template from Proposition A.7 with the constants left as unknowns.</li>
+        <li>Multiply through by \(Q(x)\) to clear denominators, then solve for the constants — either by matching coefficients of like powers of \(x\), or by substituting convenient values of \(x\) (a factor’s own root kills every other term at once).</li>
+      </ol>
+      <p class="informal">The substitution trick in step 3 is the <em>cover-up</em> shortcut: to get the constant over a <em>distinct</em> linear factor \((x - a)\), set \(x = a\) everywhere except in that one factor. It reaches only the top constant of a repeated factor, and an irreducible quadratic has no real root to substitute at all — those remaining constants come from matching coefficients.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.4</span></p>
+      <div class="env-body">
+        <p>Decompose \(\dfrac{5x - 1}{(x - 1)(x + 2)}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Two distinct linear factors call for the template \(\dfrac{5x - 1}{(x - 1)(x + 2)} = \dfrac{A}{x - 1} + \dfrac{B}{x + 2}\). Multiplying through by \((x - 1)(x + 2)\) gives
+        \[ 5x - 1 = A(x + 2) + B(x - 1). \]
+        Setting \(x = 1\) leaves \(4 = 3A\), so \(A = \tfrac{4}{3}\); setting \(x = -2\) leaves \(-11 = -3B\), so \(B = \tfrac{11}{3}\). Hence
+        \[ \frac{5x - 1}{(x - 1)(x + 2)} = \frac{4/3}{x - 1} + \frac{11/3}{x + 2}. \]
+        Each substitution was a root of one factor, which zeroed the other term and handed back a single constant — the cover-up shortcut in action.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.5</span></p>
+      <div class="env-body">
+        <p>Decompose each.</p>
+        <ol class="prompt-list">
+          <li>\(\dfrac{x}{(x - 1)^{2}}\), with a repeated linear factor.</li>
+          <li>\(\dfrac{x + 1}{x(x^{2} + 1)}\), with an irreducible quadratic factor.</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>The repeated factor \((x - 1)^{2}\) needs both powers: \(\dfrac{x}{(x - 1)^{2}} = \dfrac{A}{x - 1} + \dfrac{B}{(x - 1)^{2}}\). Clearing denominators, \(x = A(x - 1) + B\). Setting \(x = 1\) gives \(B = 1\); matching the coefficient of \(x\) gives \(A = 1\). So \(\dfrac{x}{(x - 1)^{2}} = \dfrac{1}{x - 1} + \dfrac{1}{(x - 1)^{2}}\).</li>
+          <li>The quadratic \(x^{2} + 1\) does not factor over the reals — there is no real root to cover up — so it carries a linear numerator, and its constants come from matching coefficients: \(\dfrac{x + 1}{x(x^{2} + 1)} = \dfrac{A}{x} + \dfrac{Bx + C}{x^{2} + 1}\). Clearing denominators, \(x + 1 = A(x^{2} + 1) + (Bx + C)x = (A + B)x^{2} + Cx + A\). Matching powers: the constant term gives \(A = 1\), the coefficient of \(x\) gives \(C = 1\), and the coefficient of \(x^{2}\) gives \(A + B = 0\), so \(B = -1\). Hence \(\dfrac{x + 1}{x(x^{2} + 1)} = \dfrac{1}{x} + \dfrac{1 - x}{x^{2} + 1}\).</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Partial fractions applies only to a <em>proper</em> fraction. Faced with \(\dfrac{x^{2}}{x - 1}\), divide first: \(x^{2} = (x - 1)(x + 1) + 1\), so \(\dfrac{x^{2}}{x - 1} = x + 1 + \dfrac{1}{x - 1}\). No combination of the form \(\dfrac{A}{x - 1}\) alone can reproduce a numerator that outgrows its denominator — the polynomial part must be divided out before the templates apply.</p>
+    </div>
+  </section>
+
+  <p>Every fragment this method produces — \(\dfrac{A}{x - a}\), \(\dfrac{A}{(x - a)^{k}}\), and \(\dfrac{Bx + C}{(x^{2} + px + q)^{k}}\) — has a standard antiderivative, which is why partial fractions is the standard opening move for integrating a rational function. The algebra that gets you there is complete here.</p>
+
+</article>

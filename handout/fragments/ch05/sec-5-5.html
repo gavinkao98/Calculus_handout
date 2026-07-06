@@ -1,0 +1,114 @@
+<!-- §5.5 Optimization Problems.
+     section-source: Stewart ET 9e §4.7 (Optimization Problems); cross-checked Thomas 14e §4.6, Rogawski 4e §4.6.
+     Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤). Counters continue from §5.4:
+     §5.5 mints Strategy 5.4, Examples 5.14–5.16. No Def/Thm (applied section). Cautions UNNUMBERED.
+     Uses §5.4 machinery (critical numbers, closed-interval method, first-derivative test). The
+     SECOND-derivative test is NOT available yet (§5.6), so every extremum is justified by the sign of
+     the first derivative or by endpoint/limit behaviour — never by f''.
+     Examples: 5.14 fence-by-river A=x(L−2x), x=L/4 (L=2400 ⇒ 600×1200, 720000 ft²); 5.15 minimal-surface
+     can, r³=V/(2π) ⇒ h=2r; 5.16 rectangle in a semicircle, x=R/√2 ⇒ area R².
+     Counters handed to §5.6: Definition 5.5, Theorem 5.2, Example 5.17. Record: PLAN-ch05.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">5.5</span>Optimization Problems</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: the hard part is modeling — words to a one-variable function on an interval; then §5.4 finishes it -->
+  <p>The previous section built the tools for finding extreme values; this one aims them at problems posed in words. A container is to hold a fixed volume with the least metal; a field is to enclose the most area with a fixed length of fence; a beam is to be as strong as the log allows. In every case a real quantity is to be made largest or smallest, and the calculus is the easy part. The work is the <em>modelling</em>: turning the situation into a function of a single variable on a definite interval, at which point Section 5.4 takes over.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.4</span><span class="env-name">Solving an optimization problem</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Identify the quantity to be optimized and name it; identify the quantities it depends on and give them symbols. A diagram almost always helps.</li>
+        <li>Write the target quantity as a formula in those symbols.</li>
+        <li>Use the <em>constraint</em> of the problem to eliminate all but one variable, so the target becomes a function of a single variable. Determine the interval of values that variable may take — the feasible domain.</li>
+        <li>Find the absolute extremum on that interval by the methods of §5.4: the Closed Interval Method when the domain is closed, or the sign of the derivative (with the behaviour at the ends) when it is open.</li>
+        <li>Translate the answer back into the terms of the original problem, and check that it is sensible.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the feasible domain and its ends are part of the problem, not an afterthought -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The feasible domain is part of the problem, not a formality. A length or radius cannot be negative, a fraction of a sheet cannot exceed the sheet, and these limits fix the interval on which the extremum is sought. When that interval is open — a radius ranging over \(r > 0\), say — the Closed Interval Method does not apply directly; instead confirm that the single interior critical number is the extremum by the sign of the derivative around it, and check that the quantity does not do better as the variable runs to the ends of its range.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 5.14: the fence-by-a-river problem, a fixed-perimeter area maximization -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.14</span></p>
+      <div class="env-body">
+        <p>A farmer has \(2400\) feet of fencing and wants to enclose a rectangular field bordering a straight river, with no fence needed along the river. What dimensions enclose the greatest area?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Let \(x\) be the length of each of the two sides perpendicular to the river and \(y\) the side parallel to it. Only three sides are fenced, so the constraint is</p>
+        <p>\[ 2x + y = 2400. \]</p>
+        <p>The area to maximize is \(A = xy\). Eliminate \(y\) with the constraint, \(y = 2400 - 2x\):</p>
+        <p>\[ A(x) = x(2400 - 2x) = 2400x - 2x^{2}, \qquad 0 \le x \le 1200. \]</p>
+        <p>The endpoints \(x = 0\) and \(x = 1200\) both give zero area (a degenerate rectangle), while interior values give positive area, so the maximum — which the Extreme Value Theorem guarantees on this closed interval — must be interior. Differentiating, \(A'(x) = 2400 - 4x\), which vanishes at \(x = 600\); and \(A'\) runs from positive to negative there, so by the First Derivative Test it is a maximum. Then \(y = 2400 - 1200 = 1200\), and</p>
+        <p>\[ A(600) = 600 \cdot 1200 = 720{,}000 \ \text{ft}^{2}. \]</p>
+        <p>The best field is \(600\) feet deep and \(1200\) feet along the river. The fence divides itself equally between the two directions — \(1200\) feet across the river side, \(1200\) feet split between the two perpendicular sides — a balance that recurs throughout these problems. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 5.15: the minimal-surface can, an open-domain minimization justified by the sign of the derivative -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.15</span></p>
+      <div class="env-body">
+        <p>A cylindrical can is to hold a fixed volume \(V\). What proportions use the least metal — that is, minimize the total surface area?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Let \(r\) be the radius and \(h\) the height. The can has two circular ends and a curved wall, so its surface area is \(A = 2\pi r^{2} + 2\pi r h\), and its volume fixes the constraint \(V = \pi r^{2} h\). Solve the constraint for \(h = V/(\pi r^{2})\) and substitute, leaving a function of \(r\) alone on the open domain \(r > 0\):</p>
+        <p>\[ A(r) = 2\pi r^{2} + 2\pi r \cdot \frac{V}{\pi r^{2}} = 2\pi r^{2} + \frac{2V}{r}. \]</p>
+        <p>Differentiate and set to zero:</p>
+        <p>\[ A'(r) = 4\pi r - \frac{2V}{r^{2}} = 0 \quad\Longrightarrow\quad 4\pi r^{3} = 2V \quad\Longrightarrow\quad r^{3} = \frac{V}{2\pi}. \]</p>
+        <p>This lone critical number is the minimum: \(A'(r) < 0\) for smaller \(r\) and \(A'(r) > 0\) for larger, and \(A(r) \to \infty\) both as \(r \to 0^{+}\) (the \(2V/r\) term) and as \(r \to \infty\) (the \(2\pi r^{2}\) term), so no boundary value competes. To read off the shape, note \(V = 2\pi r^{3}\) at the optimum, hence</p>
+        <p>\[ h = \frac{V}{\pi r^{2}} = \frac{2\pi r^{3}}{\pi r^{2}} = 2r. \]</p>
+        <p>The most economical can is exactly as tall as it is wide: the height equals the diameter. (Real cans are usually taller, because the top and bottom seams cost extra metal the bare-area model ignores — a reminder that the answer is only as good as the quantity it optimizes.) <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 5.16: geometry — the largest rectangle inscribed in a semicircle -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.16</span></p>
+      <div class="env-body">
+        <p>Find the dimensions of the rectangle of greatest area that can be inscribed in a semicircle of radius \(R\), with its base on the diameter.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Place the semicircle as the upper half of \(x^{2} + y^{2} = R^{2}\). Let the rectangle's upper-right corner be \((x, y)\) on the arc, with \(0 \le x \le R\). By symmetry the rectangle has width \(2x\) and height \(y = \sqrt{R^{2} - x^{2}}\), so its area is</p>
+        <p>\[ A(x) = 2x\sqrt{R^{2} - x^{2}}, \qquad 0 \le x \le R. \]</p>
+        <p>Both endpoints give \(A = 0\) while interior values give positive area, so the maximum is interior. Differentiate by the product rule:</p>
+        <p>\[ \begin{aligned}
+          A'(x) &= 2\sqrt{R^{2} - x^{2}} + 2x \cdot \frac{-x}{\sqrt{R^{2} - x^{2}}} \\
+          &= \frac{2(R^{2} - x^{2}) - 2x^{2}}{\sqrt{R^{2} - x^{2}}} = \frac{2(R^{2} - 2x^{2})}{\sqrt{R^{2} - x^{2}}}.
+        \end{aligned} \]</p>
+        <p>On \((0, R)\) the denominator is positive, so the sign of \(A'\) is the sign of \(R^{2} - 2x^{2}\): positive for \(x < R/\sqrt{2}\), negative beyond. The derivative changes from positive to negative at \(x = R/\sqrt{2}\), a maximum. There the height is \(y = \sqrt{R^{2} - R^{2}/2} = R/\sqrt{2}\), so the rectangle is \(R\sqrt{2}\) wide and \(R/\sqrt{2}\) tall, with area</p>
+        <p>\[ A = R\sqrt{2} \cdot \frac{R}{\sqrt{2}} = R^{2}. \]</p>
+        <p>The largest inscribed rectangle has area \(R^{2}\) — one quarter of the full circle's \(2R \times 2R\) bounding square, equivalently half of the semicircle's \(2R \times R\) bounding rectangle, and twice as wide as it is tall. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close: optimization = modeling + §5.4; §5.6 adds concavity, sharpening classification and completing the reading of a graph -->
+  <p>Every problem here reduced to the same two moves: model the quantity as a function on an interval, then locate its extreme with the derivative. The modelling changed from problem to problem; the calculus did not. Section 5.6 returns to the analytic side and adds the missing piece — how the <em>second</em> derivative records the way a curve bends, which both classifies extrema more quickly and, with everything gathered so far, lets a graph be read off its formula.</p>
+
+</article>

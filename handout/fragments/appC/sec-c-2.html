@@ -1,0 +1,47 @@
+<!-- §C.2 The Determinant as Signed Area and Volume.
+     Self-authored 2026-07-04 (authoring brief = CONTENT_SPEC §16.2/§16.3 + §3 register). Namespace "C",
+     continuing from sec-c-1: Proposition C.1; Example C.2. No figures (signed-area parallelogram is a
+     figure-opportunity candidate, deferred). Forward-motivates the Jacobian determinant (Ch15) as the
+     local area/volume scaling factor — the calculus object itself lives in Ch15, built on this fact.
+     Math verified: |det[[3,1],[1,4]]| = |12-1| = 11, triangle area 11/2.
+     Record: handout/_audit/REVIEW-appendix-clean-slate-design.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">C.2</span>The Determinant as Signed Area and Volume</h2>
+  </header>
+
+  <p>The determinant is not only an algebraic test for reversibility; it is a <em>measurement</em>. Read the columns of a square matrix as vectors placed tail to tail, and the determinant reports the size — carrying a sign — of the region they span.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">C.1</span><span class="env-name">Determinant as signed measure</span></p>
+    <div class="env-body">
+      <p>For a \(2\times 2\) matrix with columns \(\mathbf{u}\) and \(\mathbf{v}\),
+      \[ \left|\begin{vmatrix} a & b \\ c & d \end{vmatrix}\right| = \text{the area of the parallelogram spanned by } \mathbf{u} = (a, c) \text{ and } \mathbf{v} = (b, d), \]
+      and for a \(3\times 3\) matrix the absolute value of the determinant is the volume of the parallelepiped spanned by its three columns. Equivalently, the linear map with matrix \(A\) multiplies every area (in the plane) or volume (in space) by the constant factor \(\lvert\det A\rvert\).</p>
+    </div>
+  </section>
+
+  <p>The <em>sign</em> that the absolute value discards records <em>orientation</em>. A positive \(2\times 2\) determinant means the second column lies counterclockwise from the first, so the ordered pair keeps the plane’s standard orientation; a negative one means the pair is flipped into its mirror image. In space the sign separates right-handed triples from left-handed ones in the same way — the distinction Section C.3 makes precise.</p>
+
+  <p>This measuring role is what survives into calculus. A smooth change of variables is, examined closely enough, a linear map; the matrix of that map is the <em>Jacobian</em> (Chapter 15), and the reasoning here is exactly what makes \(\lvert\det\rvert\) of the Jacobian the local factor by which the substitution stretches area or volume — the factor that must ride along inside a transformed integral. The determinant is thus the bridge from linear algebra to the change-of-variables formula.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">C.2</span></p>
+      <div class="env-body">
+        <p>Find the area of the triangle with vertices \(O = (0, 0)\), \(P = (3, 1)\), and \(Q = (1, 4)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The two edges leaving \(O\) are the vectors \(\mathbf{u} = (3, 1)\) and \(\mathbf{v} = (1, 4)\). They span a parallelogram whose area is the absolute determinant
+        \[ \left|\begin{vmatrix} 3 & 1 \\ 1 & 4 \end{vmatrix}\right| = |12 - 1| = 11, \]
+        and the triangle is half of that, area \(\tfrac{11}{2}\). The determinant came out positive, so \(P\) and \(Q\) run counterclockwise about \(O\); listing the vertices in the opposite order would flip the sign while leaving the area — its absolute value — unchanged.</p>
+      </div>
+    </section>
+  </div>
+
+</article>

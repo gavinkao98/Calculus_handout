@@ -1,0 +1,68 @@
+<!-- Appendix C opener + §C.1 Matrices and Determinants.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3 + §3 register).
+     Appendix C established per user decision 2026-07-04 (full-arc appendix clean-slate design +
+     Codex independent design surfaced a Calc III linear-algebra toolbox): §16.2 B-class "determinants"
+     plus the load-bearing vector/orientation tools, laid out as a genuine PREREQUISITE (pure linear
+     algebra, no calculus). Jacobian & Hessian as CALCULUS objects live in Ch14/Ch15 and cross-ref here.
+     §C.1 is the first section, so it carries the appendix opener (a second <article>), mirroring appA/appB.
+     Numbering is MANUAL, namespace "C": Definition C.1; Example C.1. No figures (figure-opportunity
+     candidates — signed-area parallelogram, right-hand rule, parallelepiped — deferred, as with appA batch 1).
+     Referenced from (planned): Ch12 (cross product), Ch15 (Jacobian determinant), Ch14 (Hessian test).
+     Math verified: det[[2,0,1],[1,3,2],[-1,1,1]] = 2(1) - 0 + 1(4) = 6.
+     Record: handout/_audit/REVIEW-appendix-clean-slate-design.html. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Appendix C</div>
+    <h1 class="ch-title">Linear Algebra for Calculus</h1>
+  </header>
+
+  <p class="lead">This appendix collects the piece of linear algebra that multivariable calculus leans on — not a full course, but the handful of tools Chapters 12–16 reach for repeatedly. A single number attached to a square array, the <em>determinant</em>, turns out to measure area and volume, fix orientation, and drive the cross product; and — once calculus supplies the derivatives — the same number scales the change-of-variables formula and classifies critical points. These four sections build that one idea and its immediate companions. Read them before the multivariable chapters, or turn to them when those chapters send you; nothing here uses calculus.</p>
+
+  <p class="para-head">By the end of this appendix, you will be able to:</p>
+  <ul>
+    <li>compute \(2\times 2\) and \(3\times 3\) determinants by cofactor expansion;</li>
+    <li>read a determinant as the signed area or volume of the box its columns span, and as the scaling factor of a linear map;</li>
+    <li>use orientation and the right-hand rule, and evaluate a cross product and a scalar triple product as determinants;</li>
+    <li>classify a two-variable quadratic form as positive definite, negative definite, or indefinite.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">C.1</span>Matrices and Determinants</h2>
+  </header>
+
+  <p>A <em>matrix</em> is a rectangular array of numbers, set in brackets and addressed by row and column. A <em>square</em> matrix — as many rows as columns — carries an extra meaning: it encodes a <em>linear map</em>, a rule that sends each vector to another by a fixed pattern of multiplying and adding its entries. Most of what calculus asks of a square matrix is answered by a single number read off it, the <em>determinant</em>, written \(\det A\) or with vertical bars in place of the brackets.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">C.1</span></p>
+    <div class="env-body">
+      <p>The determinant of a \(2\times 2\) matrix is
+      \[ \begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad - bc. \]
+      The determinant of a \(3\times 3\) matrix is computed by <em>cofactor expansion along the first row</em>: each entry of the top row times the \(2\times 2\) determinant of what is left when that entry’s row and column are struck out, taken with the alternating signs \(+, -, +\):
+      \[ \begin{vmatrix} a_1 & a_2 & a_3 \\ b_1 & b_2 & b_3 \\ c_1 & c_2 & c_3 \end{vmatrix} = a_1\begin{vmatrix} b_2 & b_3 \\ c_2 & c_3 \end{vmatrix} - a_2\begin{vmatrix} b_1 & b_3 \\ c_1 & c_3 \end{vmatrix} + a_3\begin{vmatrix} b_1 & b_2 \\ c_1 & c_2 \end{vmatrix}. \]</p>
+    </div>
+  </section>
+
+  <p>The determinant is the exact test for whether the map can be undone. When \(\det A \neq 0\), the columns point in genuinely independent directions and the map has an inverse; when \(\det A = 0\), the columns collapse onto a line or plane, the map flattens space, and the information needed to reverse it is lost. The two sections after this one read the <em>size</em> and the <em>sign</em> of this number geometrically; the last turns it on a symmetric matrix. Expansion may be carried out along any row or column with the appropriate sign pattern, so a row or column carrying zeros is the one to choose.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">C.1</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\begin{vmatrix} 2 & 0 & 1 \\ 1 & 3 & 2 \\ -1 & 1 & 1 \end{vmatrix}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Expand along the first row. Its middle entry is \(0\), so that term vanishes and only two \(2\times 2\) determinants remain:
+        \[ 2\begin{vmatrix} 3 & 2 \\ 1 & 1 \end{vmatrix} - 0 + 1\begin{vmatrix} 1 & 3 \\ -1 & 1 \end{vmatrix} = 2\,(3 - 2) + (1 + 3) = 2 + 4 = 6. \]
+        The single \(0\) in the top row halved the labour — the reason one scans for a row or column of zeros before expanding.</p>
+      </div>
+    </section>
+  </div>
+
+</article>

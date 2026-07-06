@@ -1,0 +1,149 @@
+<!-- §5.6 Derivatives and the Shape of a Graph.
+     section-source: Stewart ET 9e §4.3 (What Derivatives Tell Us about the Shape of a Graph);
+     cross-checked Thomas 14e §4.4, Rogawski 4e §4.4/§4.5. Authored 2026-07-06 per PLAN-ch05
+     (manuscript-free; Codex ⑤). Counters continue from §5.5: §5.6 mints Definition 5.5 (concavity),
+     Definition 5.6 (inflection point), Theorem 5.2 (Concavity Test), Theorem 5.3 (Second Derivative Test),
+     Examples 5.17–5.18. Cautions UNNUMBERED. Concavity/inflection/second-derivative test are all NEW.
+     IMPORTS: monotonicity Corollary 4.3 (applied to f' to prove the Concavity Test); First Derivative
+     Test = Theorem 5.1 (used to prove the Second Derivative Test). EXPORTS the second-derivative test →
+     Ch14 Hessian (§C.4). Second-derivative test proved from the limit definition of f''(c) (with f'(c)=0).
+     Examples: 5.17 concavity/inflection of x⁴−4x³ (f''=12x(x−2), inflections 0 and 2); 5.18 second-derivative
+     test on x³−3x²+1 (reused from §5.4: f''=6x−6, x=0 local max, x=2 local min), contrasting the two tests.
+     Counters handed to §5.7: Definition 5.7, Theorem 5.4, Example 5.19. Record: PLAN-ch05.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">5.6</span>Derivatives and the Shape of a Graph</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: first derivative = rising/falling; second derivative = the way it bends (concavity) -->
+  <p>The first derivative reports whether a graph rises or falls; it does not report the <em>manner</em> of the rise. A curve can climb while easing off, bending like the top of a hill, or climb while steepening, cupped like the inside of a bowl. That distinction — the way a graph bends — is <em>concavity</em>, and it is exactly what the second derivative measures. With rise-and-fall from the first derivative and bend from the second, the qualitative shape of a graph is fully in hand.</p>
+
+  <h3 class="subsec-head">Concavity</h3>
+
+  <p>Bending is a statement about how the slope changes. Where a graph is cupped upward, the tangent lines turn steadily counter-clockwise as you move right — the slope <em>increases</em>. Where it is cupped downward, the slope <em>decreases</em>. Take that as the definition.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">5.5</span><span class="env-name">Concavity</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be differentiable on an open interval \(I\). The graph of \(f\) is <em>concave up</em> on \(I\) if \(f'\) is increasing on \(I\), and <em>concave down</em> on \(I\) if \(f'\) is decreasing on \(I\).</p>
+      <p class="informal">Equivalently: a concave-up graph lies <em>above</em> each of its tangent lines (it cups upward, holding water), and a concave-down graph lies <em>below</em> them (it sheds water). The tangent turning steadily one way is the slope moving steadily one way.</p>
+    </div>
+  </section>
+
+  <p>Since "\(f'\) increasing" is itself a statement the derivative can test — apply the sign of \((f')' = f''\) — concavity is read directly off the second derivative.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.2</span><span class="env-name">Concavity Test</span></p>
+    <div class="env-body">
+      <p>Suppose \(f''\) exists on an open interval \(I\).</p>
+      <ul>
+        <li>If \(f''(x) > 0\) for all \(x \in I\), then \(f\) is concave up on \(I\).</li>
+        <li>If \(f''(x) < 0\) for all \(x \in I\), then \(f\) is concave down on \(I\).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Suppose \(f''(x) > 0\) on \(I\). To show \(f'\) is increasing on \(I\), take any \(x_{1} < x_{2}\) in \(I\) and apply the monotonicity corollary (Corollary 4.3) to \(f'\) on the closed subinterval \([x_{1}, x_{2}]\): there \(f'\) is continuous and differentiable with derivative \((f')' = f'' > 0\), so \(f'(x_{1}) < f'(x_{2})\). Since this holds for every such pair, \(f'\) is increasing on \(I\), and by Definition 5.5 the graph is concave up. The concave-down case is the same argument applied to \(-f\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>Where concavity switches from one sense to the other, the graph has a special point.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">5.6</span><span class="env-name">Inflection point</span></p>
+    <div class="env-body">
+      <p>A point on the graph of \(f\), where \(f\) is continuous, is an <em>inflection point</em> if the concavity changes there — from up to down, or from down to up.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — inflection candidates are where f''=0 or DNE, but concavity must actually change -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>At an inflection point \(c\) where \(f''(c)\) exists, \(f''(c)\) must equal \(0\). For if the concavity changes at \(c\), then \(f'\) switches from increasing to decreasing (or the reverse) there, so \(f'\) has a local extremum at \(c\); Fermat's theorem (Theorem 4.10) applied to \(f'\) then forces its derivative \(f''(c) = 0\). So the candidates for inflection are the points where \(f'' = 0\) or \(f''\) fails to exist. But \(f''(c) = 0\) alone does <em>not</em> make an inflection: the concavity must genuinely change sign there. The function \(f(x) = x^{4}\) has \(f''(0) = 0\), yet it is concave up on both sides of \(0\) — no inflection. Always confirm the change, never infer it from \(f'' = 0\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 5.17: concavity intervals and inflection points from the sign of f'' -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.17</span></p>
+      <div class="env-body">
+        <p>Find the intervals of concavity and the inflection points of \(f(x) = x^{4} - 4x^{3}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Differentiate twice: \(f'(x) = 4x^{3} - 12x^{2}\), and</p>
+        <p>\[ f''(x) = 12x^{2} - 24x = 12x(x - 2). \]</p>
+        <p>The second derivative is zero at \(x = 0\) and \(x = 2\), the candidate inflection points. Its sign, from the factors \(12x\) and \(x - 2\), is</p>
+        <p>\[ \begin{aligned}
+          &f''(x) > 0 \text{ on } (-\infty, 0), \qquad f''(x) < 0 \text{ on } (0, 2), \\
+          &f''(x) > 0 \text{ on } (2, \infty).
+        \end{aligned} \]</p>
+        <p>So \(f\) is concave up on \((-\infty, 0)\), concave down on \((0, 2)\), and concave up again on \((2, \infty)\). The concavity genuinely changes at both candidates, so both are inflection points: \((0, 0)\) and \((2, -16)\), using \(f(2) = 16 - 32 = -16\). The curve cups upward, flattens and rolls over near the origin, sags through the middle, and cups upward once more past \(x = 2\). <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">The Second Derivative Test</h3>
+
+  <p>Concavity gives a second way to classify a critical number, often faster than tracking the sign of \(f'\) across it. At a point where the tangent is horizontal, the concavity alone decides max or min: a horizontal tangent in a valley (concave up) is a minimum; on a ridge (concave down), a maximum.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.3</span><span class="env-name">Second Derivative Test</span></p>
+    <div class="env-body">
+      <p>Suppose \(f'(c) = 0\) and \(f''(c)\) exists.</p>
+      <ul>
+        <li>If \(f''(c) > 0\), then \(f\) has a local minimum at \(c\).</li>
+        <li>If \(f''(c) < 0\), then \(f\) has a local maximum at \(c\).</li>
+        <li>If \(f''(c) = 0\), the test is inconclusive: \(c\) may be a local maximum, a local minimum, or neither.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Suppose \(f''(c) > 0\). By definition \(f''(c)\) is the derivative of \(f'\) at \(c\), and since \(f'(c) = 0\),</p>
+      <p>\[ f''(c) = \lim_{h \to 0} \frac{f'(c + h) - f'(c)}{h} = \lim_{h \to 0} \frac{f'(c + h)}{h} > 0. \]</p>
+      <p>A limit that is positive forces the quotient to be positive for all small nonzero \(h\): there is a \(\delta > 0\) with \(f'(c + h)/h > 0\) whenever \(0 < |h| < \delta\). So \(f'(c + h)\) shares the sign of \(h\) — it is negative for \(h < 0\) and positive for \(h > 0\). That is exactly \(f'\) changing from negative to positive at \(c\), and the First Derivative Test (Theorem 5.1) delivers a local minimum. The case \(f''(c) < 0\) is identical with signs reversed, giving a local maximum. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the inconclusive case: f''(c)=0 tells you nothing; fall back to the first-derivative test -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>When \(f''(c) = 0\) the test is silent — genuinely so, not merely cautious. At \(x = 0\), the three functions \(x^{4}\), \(-x^{4}\), and \(x^{3}\) all have first and second derivatives zero, yet the first has a minimum, the second a maximum, and the third neither (an inflection with a horizontal tangent). No amount of staring at \(f''(0) = 0\) distinguishes them. When the second derivative vanishes at a critical number, abandon it and return to the First Derivative Test, checking the sign of \(f'\) on either side.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — Example 5.18: second-derivative test on the §5.4 cubic, contrasting speed with the first-derivative test -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.18</span></p>
+      <div class="env-body">
+        <p>Use the Second Derivative Test to classify the critical numbers of \(f(x) = x^{3} - 3x^{2} + 1\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The critical numbers are the zeros of \(f'(x) = 3x^{2} - 6x = 3x(x - 2)\), namely \(x = 0\) and \(x = 2\). The second derivative is \(f''(x) = 6x - 6\). Evaluate it at each critical number:</p>
+        <p>\[ f''(0) = -6 < 0, \qquad f''(2) = 6 > 0. \]</p>
+        <p>So \(x = 0\) is a local maximum (value \(f(0) = 1\)) and \(x = 2\) is a local minimum (value \(f(2) = -3\)). This is the same verdict the First Derivative Test reached in Example 5.13, obtained here with two evaluations rather than a sign chart — the trade the Second Derivative Test offers when \(f''\) is easy to compute and nonzero. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close: shape toolkit complete; §5.7 adds L'Hôpital for the limits that govern behavior at infinity, before §5.8 synthesizes into a full sketch -->
+  <p>Rise and fall, peak and valley, cupping and inflection — the first two derivatives supply the entire vocabulary for the shape of a graph. Before assembling that vocabulary into a complete curve sketch, which §5.8 does, one gap remains: the behaviour of a graph far out and near its asymptotes is governed by limits that often arrive in indeterminate form. The next section supplies the tool for those — L'Hôpital's rule — after which every feature a sketch needs is computable.</p>
+
+</article>
