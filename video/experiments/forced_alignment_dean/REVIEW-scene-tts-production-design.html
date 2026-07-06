@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>裁決稿：scene-level TTS＋forced alignment production 化設計</title>
+<style>
+  :root { --ink:#1a1e24; --sub:#5a6472; --line:#d8dde4; --bg:#ffffff; --panel:#f5f7fa;
+          --accent:#0d5c8c; --ok:#1c7d43; --warn:#a06a00; --fail:#a4262c; --code:#eef1f5; }
+  * { box-sizing: border-box; }
+  body { margin:0 auto; max-width:60rem; padding:2.5rem 1.5rem 6rem; background:var(--bg);
+         color:var(--ink); font:16px/1.75 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; }
+  h1 { font-size:1.55rem; line-height:1.4; border-bottom:3px solid var(--accent); padding-bottom:.6rem; }
+  h2 { font-size:1.22rem; margin-top:2.6rem; color:var(--accent); border-left:5px solid var(--accent); padding-left:.6rem; }
+  h3 { font-size:1.02rem; margin-top:1.6rem; }
+  code, pre { font-family:"Cascadia Code",Consolas,Menlo,monospace; font-size:.86em; }
+  code { background:var(--code); padding:.1em .35em; border-radius:4px; }
+  pre { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:1rem; overflow-x:auto; line-height:1.55; }
+  pre code { background:none; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:1rem 0; font-size:.92rem; }
+  th, td { border:1px solid var(--line); padding:.45rem .6rem; vertical-align:top; text-align:left; }
+  th { background:var(--panel); }
+  .meta { color:var(--sub); font-size:.9rem; margin:.2rem 0 1.4rem; }
+  .meta code { font-size:.85em; }
+  .tag { display:inline-block; font-size:.78rem; font-weight:700; border-radius:4px; padding:.05rem .45rem; margin-right:.3rem; }
+  .t-fail { background:#fbe9ea; color:var(--fail); }
+  .t-warn { background:#fdf3e0; color:var(--warn); }
+  .t-ok   { background:#e6f4ea; color:var(--ok); }
+  .t-info { background:#e8f0f7; color:var(--accent); }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding: .9rem 1.1rem; margin:1rem 0; }
+  .panel.decided { border-left:5px solid var(--ok); }
+  .panel.ask { border-left:5px solid var(--warn); }
+  ul, ol { padding-left:1.4rem; }
+  li { margin:.3rem 0; }
+  .small { font-size:.88rem; color:var(--sub); }
+  .flow { font-family:Consolas,Menlo,monospace; font-size:.84rem; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<h1>裁決稿：scene-level TTS＋forced alignment 的 production 化設計</h1>
+<div class="meta">
+  2026-07-05・分支 <code>video/template-redesign-navy-spine</code>・狀態：<b>等使用者過目</b>（過目後出實作計畫，才動 code）<br>
+  前情：<a href="CLAUDE-DISCUSSION-SUMMARY-2026-07-05.md">討論總結</a>・
+  <a href="RESULTS-2026-07-05.md">三場景實測＋stable-ts 複驗（RESULTS）</a>・
+  進度錨 <code>video/REBUILD_STATUS.md</code> 2026-07-05 節
+</div>
+
+<h2>0. TL;DR 與已定案前提</h2>
+<div class="panel decided">
+<b>已定案（2026-07-05 使用者同意，不在本稿重議）：</b>
+<ul>
+  <li>走 <b>hybrid</b>：storyboard <code>{show}</code>／beat 契約不動；TTS 合成單位升到 content scene；<b>per-scene validation 決定</b>每個 scene 用 scene-level 或回退 beat-level。</li>
+  <li><b>計時來源＝<code>stable-ts</code> transcript-constrained forced alignment</b>（三類場景 197/197、209/209、99/99 全過，derivation 場景 beat 邊界誤差 0.06s）；<code>whisper-timestamped</code> 自由 ASR 降級為 QA 探針（抓「TTS 沒唸／唸錯」）。</li>
+  <li>不做「全節／全片一條音訊」；不做固定 2–3 beat chunk（chunk 只當 fallback、切句界）。</li>
+</ul>
+</div>
+<p>本稿把上述方向落成可實作的契約：<b>manifest schema 2</b>（新 <code>narration_mode: "scene_aligned"</code>）、新模組 <code>pipeline/scene_align.py</code>、validation gates（初始門檻含依據）、fallback ladder、reuse／freshness 規則、7 個消費端的遷移点。核心設計選擇是：<b>scene_aligned 條目保持與 beats 模式相同的 <code>beats[]</code> 形狀＋scene 級 <code>audio_file</code></b>——7 個既有消費端中，4 處只需把條件由 <code>== "beats"</code> 放寬為「兩模式皆可」、2 處零改動，只有 <code>_validate_reuse_manifest</code> 需要真正的新分支，改動面極小。</p>
+
+<h2>1. 目標／非目標</h2>
+<table>
+<tr><th>目標</th><th>非目標（明確不做）</th></tr>
+<tr><td>
+<ul>
+  <li>聲線連貫：一個 content scene 一次合成（beat 接縫的 prosody 斷裂與 drift 消失）。</li>
+  <li>API call 數降一個量級（§3.1：99 beats → 21 scenes）。</li>
+  <li>reveal 時序由 FA 回推、逐 scene 驗證，未通過自動走 fallback，<b>永遠有可出片的路</b>。</li>
+  <li>beat-level 路線原樣保留（pre-lock 迭代、mock、fallback 終點）。</li>
+</ul>
+</td><td>
+<ul>
+  <li>不動 storyboard 格式、不動 <code>{show}</code> 語義、不動 NFA／lock 流程（scene transcript＝同一批 beat 文字的 join，NFA 審的源文字不變）。</li>
+  <li>不動 intro／outro／divider（<code>kind != content</code>，house audio 路線照舊）。</li>
+  <li>不做 voice-design 克隆聲線；voice 仍是 <code>tts.py --voice</code> 參數（與本設計正交）。</li>
+  <li>不在 code 裡強制 lock 狀態檢查（lock 是 RUNBOOK 程序紀律，見 §10）。</li>
+</ul>
+</td></tr>
+</table>
+
+<h2>2. 資料流總覽</h2>
+<pre class="flow">storyboard (say + {show})                        ↓ 每個 content scene
+   └─ scene plan：transcript ＝ join(beat texts)；每 beat 的 token 範圍 [word_start, word_end)
+        └─ MiMo TTS（1 call／scene，計費）→ scene WAV
+             └─ stable-ts align(WAV, transcript)（本機 ~3s/scene）
+                  └─ explode 成 plan tokenization → 逐字驗 index（不符＝abort）
+                       └─ validation gates（§5）＋ ASR QA 探針（§6）
+                            ├─ PASS → aligned beats（每 beat start/dur）→ manifest scene_aligned
+                            └─ FAIL → fallback ladder（§7）→ 最終 beat-level（既有路線）
+manifest（schema 2）→ make.py --reuse-audio → render（beat durations 注入）→ compose（scene WAV 直接 mux）</pre>
+<p class="small">與實驗線的對應：plan＝<code>prepare_scene.py</code>、對位＝<code>run_stable_ts_align.py</code>、映射＝<code>map_alignment_to_beats.py</code>、render 注入＝<code>render_aligned_scene.py</code> 已各自驗證過；production 化＝把這四步的核心搬進 <code>pipeline/scene_align.py</code> 並接進 <code>tts.py</code>／<code>make.py</code>。實驗腳本不動（保留為 lab bench）。</p>
+
+<h2>3. Manifest schema 2（資料契約，落地後同步進 <code>DESIGN.md</code>）</h2>
+<ul>
+  <li>頂層加 <code>"schema": 2</code>。無 <code>schema</code> 欄位的舊 manifest 視為 schema 1（全 beats），照舊可用——<b>不需遷移舊檔</b>。</li>
+  <li><code>narration_mode</code> 值域：<code>"silent"</code>｜<code>"beats"</code>（既有，語義不變）｜<b><code>"scene_aligned"</code>（新）</b>。同一份 manifest 允許混用（per-scene 決定）。</li>
+  <li>chunk fallback（§7 第 3 級）<b>不新增 mode</b>：chunks 各自對位後合併 word timeline、WAV concat 成單一 scene 音檔，產出的仍是 <code>scene_aligned</code> 條目（多一個 <code>chunks</code> 紀錄欄）。下游不可見。</li>
+</ul>
+<pre><code>{
+  "schema": 2,
+  "deck_id": "ch03_trig_derivatives_mimo",
+  "backend": "mimo", "model": "mimo-v2.5-tts", "voice": "Dean", "style": "…",
+  "scenes": [
+    {
+      "scene_number": 7, "scene_id": "difference_quotient_for_sine", "kind": "content",
+      "narration_mode": "scene_aligned",
+      "audio_file": "…/scenes/07_difference_quotient_for_sine.wav",   // scene 級 WAV（唯一音檔）
+      "audio_seconds": 81.93,
+      "scene_text_hash": "…",                       // text_hash(transcript)
+      "script": "So let us transform …",            // 與 beats 模式同名同義
+      "beat_count": 5,
+      "beats": [                                    // ★ 形狀與 beats 模式一致（共用契約）
+        { "index": 1, "id": "beat_01", "reveal": null, "text": "…", "text_hash": "…",
+          "audio_seconds": 15.58, "start_seconds": 0.0, "end_seconds": 15.58,
+          "word_start": 0, "word_end": 30,
+          "boundary": { "prob": null, "interpolated": false } }   // 邊界品質（gate 依據）
+        // …差異：無 per-beat "audio_file"（beat WAV 不存在）
+      ],
+      "alignment": {
+        "words_file": "…/align/07_difference_quotient_for_sine.words.json",
+        "aligned_file": "…/align/07_difference_quotient_for_sine.aligned.json",
+        "aligner": { "tool": "stable-ts", "version": "2.19.1", "model": "base.en",
+                     "nonspeech_skip": 5.0, "failure_threshold": 0.2 },
+        "chunks": null                               // chunk fallback 時記 [{span, offset, wav}, …]
+      },
+      "validation": { "status": "pass",              // pass｜pass_with_warnings（fail 不會出現：fail 即回退）
+                      "warnings": ["…"], "metrics": { "prob_mean": 0.849, "low_prob_words": 22 } },
+      "fallback_history": []                         // 走過的 ladder 步驟，含原因
+    },
+    { "scene_id": "…", "narration_mode": "beats", "…": "（既有形狀，一字不改）" }
+  ]
+}</code></pre>
+<p><b>Freshness／reuse 規則（兩層獨立，這是 scene-level 的重要紅利）：</b></p>
+<table>
+<tr><th>變更</th><th>TTS（計費）</th><th>對位＋驗證（本機免費）</th><th>判定依據</th></tr>
+<tr><td>storyboard 該 scene 任一 beat 文字改了</td><td>重合成整個 scene</td><td>重跑</td><td><code>scene_text_hash</code>＋per-beat <code>text_hash</code> 不符</td></tr>
+<tr><td>reveal id／beat 數改了（文字沒改）</td><td>沿用 WAV</td><td>重跑映射＋驗證</td><td>per-beat <code>reveal</code>／<code>beat_count</code> 不符、<code>scene_text_hash</code> 相符</td></tr>
+<tr><td>aligner 升版／換 model／調參</td><td>沿用 WAV</td><td>重跑</td><td><code>alignment.aligner</code> 與現行設定不符</td></tr>
+<tr><td>backend／model／voice／style 改了</td><td>重合成</td><td>重跑</td><td>頂層四欄不符（沿用既有 <code>tts.py --reuse-existing</code> 紀律）</td></tr>
+<tr><td>WAV 實際時長 ≠ manifest <code>audio_seconds</code></td><td>視為 stale，重合成</td><td>重跑</td><td>檔案被動過／半寫入（沿用 make.py 既有檢查）</td></tr>
+</table>
+<ul>
+  <li><b>原子寫入：</b>words／aligned／manifest 一律寫 <code>.tmp</code> 再 rename，杜絕「舊 words.json 配新 WAV」。</li>
+  <li><b>fallback 產物驗證通過才覆蓋</b>既有 artifacts；覆蓋前舊檔不刪。</li>
+</ul>
+
+<h2>4. 模組與改動盤點</h2>
+<table>
+<tr><th>檔案</th><th>動作</th><th>內容</th><th>概估</th></tr>
+<tr><td><code>pipeline/scene_align.py</code></td><td><b>新增</b></td><td>本設計的核心，純函式為主：<code>WORD_RE</code>／<code>tokenize()</code>（正典家，收掉實驗線三份重複）、<code>build_scene_plan(scene)</code>（transcript＋beat token 範圍）、<code>align_scene(wav, plan)</code>（呼叫 stable-ts、explode、逐字驗 index）、<code>map_to_beats()</code>（邊界＝該 beat 首字 onset；末 beat 到音檔尾）、<code>run_gates()</code>（§5，門檻集中一個 <code>GATES</code> dict）、<code>qa_diff()</code>（§6）。不 import manim。</td><td>~250 行</td></tr>
+<tr><td><code>pipeline/tts.py</code></td><td>修改</td><td>加 <code>--unit beat|scene|auto</code>（預設 <code>auto</code>＝§10 rollout 政策）；scene 路徑：合成→對位→gates→寫 scene_aligned；gate FAIL 走 §7 ladder（最末端回到既有 beat 合成 code path，不重寫）；manifest 寫 schema 2；reuse 按 §3 矩陣。</td><td>~150 行</td></tr>
+<tr><td><code>video/make.py</code></td><td>修改</td><td>§9 表列：3 處條件放寬（<code>_beat_durations</code>／<code>_audit_render_sync</code>／<code>compose</code>）＋<code>_validate_reuse_manifest</code> 的 scene_aligned 分支＋sync audit 加「sum(beat durations)≈audio_seconds」斷言＋入口 schema 檢查。<code>_warn_short_beats</code> 隨 <code>_beat_durations</code> 自動生效、mock 路（<code>--backend mock</code>）完全不動——皆零改動。</td><td>~40 行</td></tr>
+<tr><td><code>pipeline/critic.py</code></td><td>修改</td><td>1 處條件放寬（<code>beats[]</code> 形狀相同，其餘零改動）。</td><td>~2 行</td></tr>
+<tr><td><code>pipeline/_selftest_scene_align.py</code></td><td><b>新增</b></td><td>§12 測試計畫的離線 selftest（不需 whisper model：gates／explode／映射全吃合成 fixture）。</td><td>~150 行</td></tr>
+<tr><td><code>DESIGN.md</code>／<code>RUNBOOK-mimo-narration-route.md</code>／<code>REBUILD_STATUS.md</code></td><td>修改</td><td>manifest 契約§、lock 後合成步驟改 scene 路線、落地紀錄。</td><td>文檔</td></tr>
+</table>
+
+<h2>5. Validation gates（boundary-focused）</h2>
+<p><b>原則（pilot 實測直接教的）：</b>reveal 時序只取決於「每個 beat 第一個字」的 timestamp——<b>閘門盯邊界字，beat 內部的低機率字只 WARN</b>。三場景的內部低機率字（<code>O A</code> 唸字母、<code>one half</code>）全是無害噪音，若拿「任何低機率 run 就 fail」會誤殺兩個完美場景。scene 平均 confidence 無鑑別力（壞場 0.776 vs 好場 0.833），不當閘。</p>
+<table>
+<tr><th>檢查</th><th>等級</th><th>初始門檻</th><th>依據（pilot 數據）</th></tr>
+<tr><td>stable-ts <code>failure_threshold</code> abort（對不上 transcript 的字超比例）</td><td><span class="tag t-fail">FAIL</span></td><td>0.2</td><td>音檔與 transcript 嚴重不符（合成錯檔、髒 WAV）時快速止血</td></tr>
+<tr><td>explode 後 token 序列 ≠ plan tokens（逐字）</td><td><span class="tag t-fail">FAIL</span></td><td>嚴格相等</td><td>by construction 不該發生；發生＝index 契約破裂，禁止產出時間軸</td></tr>
+<tr><td>word timestamps 非單調／重疊</td><td><span class="tag t-fail">FAIL</span></td><td>任一</td><td>aligner 異常輸出</td></tr>
+<tr><td>零時長字：連續 ≥2 個，或總數佔比 &gt;5%</td><td><span class="tag t-fail">FAIL</span></td><td>如左</td><td>pilot 僅見孤立 1 個（<code>'a'</code>），孤立屬無害（不動邊界）→ 孤立僅 WARN</td></tr>
+<tr><td>beat 邊界字（beat 2..N 首字）機率過低</td><td><span class="tag t-fail">FAIL</span></td><td>&lt;0.15（0.15–0.35 WARN）</td><td>觀測到的正常邊界字最低 0.53（<code>Look</code>）；遠低於此＝邊界不可信</td></tr>
+<tr><td>beat 邊界落在多 token 字內（timestamp 是內插值）</td><td><span class="tag t-warn">WARN</span>＋修正</td><td>邊界 <b>snap 到父字 start</b></td><td>三場景 0 例（全庫僅 1 個多 token 字）；snap 使 reveal 略早——「先亮再講」與契約同向，晚才有害</td></tr>
+<tr><td>scene 內部無法解釋的字間空洞（不在句界）</td><td><span class="tag t-fail">FAIL</span></td><td>&gt;2.0s</td><td>合法句間停頓最大 0.89s；大空洞＝TTS 出怪聲／重複的嫌疑位</td></tr>
+<tr><td>beat 時長 vs 字元占比（末 beat 以「末字 end」計，排除尾靜音）</td><td><span class="tag t-warn">WARN</span>／<span class="tag t-fail">FAIL</span></td><td>比值出 [0.6,1.6] WARN；出 [0.4,2.2] FAIL</td><td>pilot 正常比值 0.9–1.3；derivation 事故時壞 beat 曾灌到吸走鄰 beat（舊法 16.9s）</td></tr>
+<tr><td>beat 時長 &lt;0.05s</td><td><span class="tag t-warn">WARN</span></td><td>既有（沿用 mapper）</td><td>短 reveal 由 <code>_warn_short_beats</code> 的動畫墊時機制接手</td></tr>
+<tr><td>內部低機率 run（≥2 字 &lt;0.5）／<code>prob_mean</code> &lt;0.7</td><td><span class="tag t-warn">WARN</span></td><td>如左</td><td>記錄供人看，不擋（見上原則）</td></tr>
+</table>
+<p class="small">門檻全部集中在 <code>scene_align.GATES</code> 一個 dict（值＋註解），標注「以 3-scene pilot 校準的初值，首個真 deck rollout 後回校」。任何 FAIL → 該 scene 進 §7 ladder；WARN 進 manifest <code>validation.warnings</code>＋console。</p>
+
+<h2>6. ASR QA 探針（whisper-timestamped 的新職務）</h2>
+<p>transcript-constrained FA 結構上「找不到 transcript 沒有的東西」——<b>TTS 自己漏唸／重複／亂唸，FA 只會表現成低分或怪 gap，說不出是什麼</b>。ASR 探針補這一刀：對 scene WAV 跑自由 ASR，正規化後與 transcript 做 token diff（<code>difflib.SequenceMatcher</code>），用 FA 的 word timestamps 把 diff 定位到 beat。</p>
+<table>
+<tr><th>情形</th><th>判定</th><th>動作</th></tr>
+<tr><td>ASR 缺漏／插入叢集（≥3 tokens）<b>且</b>同區 FA 低機率或 gate 異常</td><td><span class="tag t-fail">FAIL</span>（suspect TTS misspeak）</td><td>進 §7 ladder（通常第 2 級重合成就解）</td></tr>
+<tr><td>ASR 缺漏但 FA 該區高分、靜音結構正常</td><td><span class="tag t-info">INFO</span>（ASR artifact）</td><td>記錄即可（derivation 事故正是此類——ASR 跳字、音檔無辜）</td></tr>
+<tr><td>兩組 ASR 設定（greedy vs beam）對同一 diff 意見一致</td><td>升級 confirmed</td><td>提高上表判定的信心；insertion 與 deletion 同權重</td></tr>
+</table>
+<p class="small">預設：真合成路徑<b>開</b>（本機 CPU，~20–60s/scene，只在合成後跑一次）；<code>--skip-qa</code> 可關；mock 路不跑。</p>
+
+<h2>7. Fallback ladder（per-scene、lazy、驗過才覆蓋）</h2>
+<ol>
+  <li><b>換 <code>small.en</code> 重對位</b>（本機、零 API）：當 arbiter 用——兩個 model 邊界一致＝FA 可信度升；仍 FAIL 才往下。</li>
+  <li><b>重合成該 scene 一次</b>（1 API call）：TTS 非決定性，重抽常直接解（尤其 suspect misspeak）。</li>
+  <li><b>句界 chunk</b>：transcript 按句界切 2–3 段（切點選最靠近 beat 邊界的句號），每 chunk 一次 TTS → <b>per-chunk FA</b> → word 時間軸加 offset 合併 → WAV concat 成單一 scene 音檔 → 重跑 gates。產物仍是 <code>scene_aligned</code>（<code>alignment.chunks</code> 記錄切法），下游不可見。</li>
+  <li><b>beat-level TTS</b>（既有路線，該 scene 寫回 <code>narration_mode: "beats"</code>）：永遠可用的終點。</li>
+</ol>
+<ul>
+  <li><b>lazy：</b>beat fallback 音訊只在走到第 4 級才合成，絕不預付雙倍 TTS。</li>
+  <li>每一步寫進 <code>fallback_history</code>（步驟＋觸發原因＋結果），事後可稽。</li>
+  <li>第 2、3 級是計費動作。CLAUDE.md 明定「重跑需重新徵同意」，所以<b>徵同意的聲明範圍要一開始就把 retry 預算列進去</b>：每次 scene-level 合成的報價一律寫明「N scenes ＋ fallback 第 2/3 級每 scene 至多 2 次額外 call」，核准即涵蓋；超出此預算（例如同一 scene 三修不過）停下來回報。整章重跑仍另行報價。</li>
+</ul>
+
+<h2>8. 儲存布局（沿用既有 audio 目錄慣例）</h2>
+<pre class="flow">video/output/&lt;ch&gt;/&lt;sec&gt;/audio_mimo/
+  manifest.json                     ← schema 2
+  scenes/07_&lt;scene_id&gt;.wav          ← scene 級 WAV（scene_aligned 唯一音檔；beats 模式此檔＝concat，既有）
+  align/07_&lt;scene_id&gt;.words.json    ← FA 輸出（plan tokenization＋機率＋summary）
+  align/07_&lt;scene_id&gt;.aligned.json  ← beat start/dur（render 消費）
+  beats/07_&lt;scene_id&gt;/…             ← 只有 beats 模式（含 fallback 第 4 級）才存在</pre>
+
+<h2>9. 消費端遷移（7 處，逐一）</h2>
+<table>
+<tr><th>位置</th><th>現況</th><th>改法</th></tr>
+<tr><td><code>make.py _beat_durations</code>（render 注入）</td><td>只收 <code>"beats"</code></td><td>條件放寬：兩模式的 <code>beats[].audio_seconds</code> 同形狀，直接共用</td></tr>
+<tr><td><code>make.py _validate_reuse_manifest</code></td><td>非 <code>"beats"</code> 即報 stale；逐 beat 驗 reveal／text_hash／<b>beat WAV 存在</b></td><td>scene_aligned 分支：reveal／text_hash／正時長檢查照舊；「beat WAV 存在」換成「scene WAV＋words／aligned 檔存在＋fresh（§3 矩陣）＋<code>validation.status ∈ {pass, pass_with_warnings}</code>」；另驗 <code>scene_text_hash</code></td></tr>
+<tr><td><code>make.py _audit_render_sync</code></td><td>只審 <code>"beats"</code></td><td>條件放寬（公式同：lead＋audio_seconds vs 成片長）；加斷言 <code>sum(beats)≈audio_seconds</code>（mapper by construction，防手改檔）</td></tr>
+<tr><td><code>make.py compose</code></td><td><code>"beats"</code>＋<code>audio_file</code> → <code>_mux_content</code></td><td>條件放寬：scene_aligned 也有 scene 級 <code>audio_file</code>，mux 路徑一字不改（實驗線已驗同款 adelay lead＋apad＋shortest）</td></tr>
+<tr><td><code>make.py _warn_short_beats</code></td><td>吃 <code>_beat_durations</code></td><td>隨 <code>_beat_durations</code> 放寬自動生效（短 beat 動畫墊時警告對 aligned 時長同樣該響）</td></tr>
+<tr><td><code>make.py synth_scene</code>（mock）</td><td>寫 <code>"beats"</code></td><td><b>不動</b>——mock 永遠 beats（pre-lock 迭代零計費、離線可跑）</td></tr>
+<tr><td><code>critic.py plan_frames</code></td><td>只收 <code>"beats"</code></td><td>條件放寬；<code>beats[]</code>／<code>script</code> 同形狀零改動</td></tr>
+</table>
+<p class="small">另：所有讀 manifest 的入口加一行 schema 檢查（<code>schema &gt; 2</code> → 明確報錯要求升級 code，而非靜默誤讀）。</p>
+
+<h2>10. Rollout 與工作流</h2>
+<ul>
+  <li><b>lock 紀律（程序，不進 code）：</b>scene-level 真合成只在 narration lock＋NFA 之後（RUNBOOK 更新步驟）；lock 前一律 <code>make.py --backend mock</code>（beats，零計費）。「改一個字→整 scene 重合成」的 blast radius 由此吃掉。</li>
+  <li><b>batch 1：</b><code>--unit auto</code> 對 template ∈ {<code>definition_math</code>, <code>graph</code>, <code>callout</code>, <code>recap_cards</code>} 走 scene；其餘（含 <code>derivation</code>／<code>theorem_proof</code>）暫走 beats。allowlist＝<code>tts.py</code> 一個常數。</li>
+  <li><b>batch 2：</b>首個真 deck 跑完、gate 行為與門檻回校後，把 derivation／theorem_proof 加進 allowlist（pilot 已證明 FA 過得了，保守只是 rollout 順序）。終態＝全 content template 走 scene、validation 當唯一裁判。</li>
+  <li><b>驗收（goal-driven）：</b>① selftest 全綠＋mock dry-run §3.1 全 deck render／sync／compose 綠（離線零計費）→ ② §3.1 真 scene-level 合成 21 scenes（<b>屆時依 CLAUDE.md 報價徵同意</b>）→ 與既有 beat-level MiMo 成片 A/B（聲線連貫、reveal 同步、VLM 抽幀）。</li>
+</ul>
+
+<h2>11. 測試計畫（先寫測試，離線可全跑）</h2>
+<ul>
+  <li><b>selftest（不需 whisper model，全吃合成 fixture）：</b>explode／tokenize 不變量（對全部現有 storyboard 的 say 文字：explode(合成 word dicts)＝WORD_RE(transcript)，含 <code>sum-to-product</code>、<code>--</code>、縮寫）；映射邊界政策（首字 onset／末 beat 到檔尾／pause 歸前 beat）；gates 逐條 RED→GREEN（非單調、零時長 run、大 gap、邊界低機率、char-share 離群、multi-token snap）；QA diff 分級三情形；manifest v2 round-trip＋freshness 矩陣每格一個 case。</li>
+  <li><b>整合（離線）：</b>mock scene WAV（靜音＋linear words，實驗線 <code>--linear-from-audio</code> 已有此模式）跑通 tts.py scene 路徑→make.py render/compose；fallback ladder 用注入的 gate 失敗驅動到第 3、4 級（chunk 合併與 beats 回退各驗一次）。</li>
+  <li><b>真資料回歸：</b>對磁碟上三個實驗 scene 的 WAV 重跑 production 模組，結果須與實驗線輸出一致（時間軸 bit-identical）。</li>
+</ul>
+
+<h2>12. 風險與緩解</h2>
+<table>
+<tr><th>風險</th><th>緩解</th></tr>
+<tr><td>stable-ts 上游已封存（2026-05-30）</td><td>釘 2.19.1（已驗證組合記於 <code>ENVIRONMENT.md</code> ⑤c）；備援＝torchaudio CTC forced alignment（依賴已在環境）；<code>scene_align.py</code> 把 aligner 呼叫隔離在單一函式後面，換 aligner 不動 gates／映射</td></tr>
+<tr><td>FA 局部漂移（如 beat_05 案例若反過來）</td><td>QA 探針交叉＋<code>small.en</code> arbiter＋邊界字機率閘；仲裁工具（ffmpeg silencedetect 比對停頓結構）已驗證可用，留在 RESULTS 供人工複核</td></tr>
+<tr><td>單 scene 合成失敗 blast radius</td><td>per-scene fallback 到 beats，deck 其餘 scene 不受影響；混模式 manifest 合法</td></tr>
+<tr><td>TTS 真的漏唸／亂唸（FA 看不見）</td><td>QA 探針 FAIL 路徑＋ladder 第 2 級重合成；<code>fallback_history</code> 留痕</td></tr>
+<tr><td>門檻初值失準</td><td>全集中 <code>GATES</code> dict；batch 1 真 deck 跑完回校一次（驗收條款）</td></tr>
+</table>
+
+<h2>13. 已否決方案（決策紀錄）</h2>
+<ul>
+  <li><b>全節／全片單一音訊：</b>blast radius 與定位成本不成比例；scene 是天然 hard sync point。</li>
+  <li><b>固定每 2–3 beat chunk 當預設：</b>重新引入 prosody 接縫（正是要解的問題）；built-in voice 跨 call 本就穩，chunk 只值得當 fallback、且切句界。</li>
+  <li><b>自由 ASR（whisper-timestamped）當計時來源：</b>對重複公式片語會 decoder 跳字（實測 -12 字→後續 beat 全錯位 4.6–7.0s），連當錨點都不可靠（beat_05 案例）；數學推導天生觸發此機制，換大 model 治標。</li>
+  <li><b>全域字數 delta ≤5% 當主閘：</b>index 對位下 delta≠0 即已壞；且 12/197=6.1% 剛好觸發、scene 再長就放行同級災難。被逐字 index 驗證＋boundary gates 取代。</li>
+  <li><b>scene 平均 confidence 當閘：</b>壞場 0.776 vs 好場 0.833，無鑑別力；平均稀釋局部災難。</li>
+</ul>
+
+<h2>14. 已取的預設值（不需裁決，但都可改）</h2>
+<ul>
+  <li>reveal 時點＝該 beat 首字 onset（與 beat-level 現行為一致；beat 間停頓歸前一 beat）。若 A/B 覺得想「提早一點亮」，留有一個全域 <code>reveal_lead</code> 偏移的位置，預設 0、本輪不實作。</li>
+  <li>QA 探針預設開（真合成路）、<code>--skip-qa</code> 可關；mock 不跑。</li>
+  <li>voice 沿用 <code>tts.py --voice</code>（實驗用 Dean；§3.1 既有音軌是 Mia——A/B 時用哪個 voice 屆時隨報價一併確認）。</li>
+  <li>aligner model 預設 <code>base.en</code>（3s/scene），<code>small.en</code> 只當 arbiter。</li>
+</ul>
+
+<div class="panel ask">
+<b>待你裁決（只有兩點，其餘上述即為提案預設）：</b>
+<ol>
+  <li><b>batch 1 範圍</b>照 §10（四個 template 先行、derivation／theorem_proof 第二批）？——若你想一步到位全開，機制上完全支援（validation 本來就是唯一裁判），差別只在首輪回校門檻時的樣本混雜度。</li>
+  <li>設計稿本身 OK 嗎？OK 我就出實作計畫（任務拆解＋每步驗證點），照計畫動工。</li>
+</ol>
+</div>
+
+<p class="small">零計費聲明：本設計的實作與測試（selftest、mock dry-run、真資料回歸）全程離線零計費；唯一計費點＝驗收 A/B 的真合成，屆時報價徵同意，且報價聲明會依 §7 一併列入 fallback retry 預算（每 scene 至多 2 次額外 call），核准即涵蓋、超出即停。</p>
+
+</body>
+</html>

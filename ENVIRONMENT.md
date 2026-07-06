@@ -29,11 +29,12 @@ python tools\doctor.py
 | **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/_render/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
+| **⑤c forced alignment（選用）** | `video/experiments/forced_alignment_dean/` 的本機 word-level timestamps，將整段 Dean 音訊對回 storyboard beats：`stable-ts`（transcript-constrained，**計時來源**）＋`whisper_timestamped`（自由 ASR，**QA 探針**） | 每台全局安裝一次：`python -m pip install --upgrade whisper-timestamped stable-ts`；第一次跑 `base.en` 會下載 Whisper model cache。缺它不擋核心產線，`doctor.py` 只 WARN |
 | **祕鑰** | `MIMO_API_KEY` / `GEMINI_API_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` | per-machine 設環境變數；**不進版控**（計費 API，依 [`CLAUDE.md`](CLAUDE.md) 徵同意） |
 
 ## 一次性安裝（每台機器各做一次）
 
-本機驗證過的版本：Python 3.12.10、Node v24、MiKTeX、ffmpeg 8.1.1、Vale 3.15.1（選用）。
+本機驗證過的版本：Python 3.12.10、Node v24、MiKTeX、ffmpeg 8.1.1、Vale 3.15.1（選用）、whisper-timestamped 1.15.9 / openai-whisper 20250625 / stable-ts 2.19.1 / torchaudio 2.11.0（forced-alignment 實驗用）。
 
 ```powershell
 # Python（lock 以 3.12 凍結，請用 3.12 以免 wheel 不相容）
@@ -50,6 +51,9 @@ winget install Google.Chrome
 
 # Vale（去 AI 味散文 lint；選用，跑 PLAN-deai-flavor 的 prose lint 才需要）— 裝完開新 shell 讓 PATH 生效
 winget install --id errata-ai.Vale -e
+
+# forced alignment（選用，video 實驗線用；全局裝，方便任何 thread 直接呼叫）
+python -m pip install --upgrade whisper-timestamped stable-ts
 
 # LaTeX：裝 MiKTeX（https://miktex.org）。latex/dvisvgm 會進 PATH；
 # video 文字＋數學皆走 LaTeX，需 plex(plex-sans/plex-mono)/lmodern/microtype 套件
@@ -143,6 +147,18 @@ copy tools\codex.cmd "%APPDATA%\npm\codex.cmd"
 - **定位：永遠 flag-only／advisory。** 嚴重度設 `warning`/`suggestion`、**不設 `error`**；決定性「擋不擋」交給 Mode B 人審維度 C，不在此。所以缺它不擋核心產線——`doctor.py` 判 **WARN 不 FAIL**（同 codex）。
 - 設定檔（`.vale.ini` + `styles/AItexture/` + `reject.txt`/`accept.txt`）隨 repo 進版控；裝好 binary 即可對 fragment 跑 `vale <file>`。
 - 換機後 `python tools\doctor.py` 的 `vale` 區會判「在 PATH／未安裝」並給補法。
+
+### ⑤c forced alignment — 本機 word timestamps（選用）
+
+`video/experiments/forced_alignment_dean/` 測「整段 Dean 音訊 → 對位 → storyboard beat durations → render/mux」的路線。這不是核心成片產線必需，所以缺了只在 `doctor.py` 顯示 WARN，不會讓一般 `make.py`／MiMo beat 流程 FAIL。兩個工具、兩種角色（2026-07-05 三場景實測拍板，詳見 [`RESULTS-2026-07-05.md`](video/experiments/forced_alignment_dean/RESULTS-2026-07-05.md)）：
+
+- **`stable-ts`＝計時來源：** transcript-constrained forced alignment（`stable_whisper.align()`），被 plan transcript 約束、結構上不可能漏字，每字附 timestamp＋機率。wrapper：[`run_stable_ts_align.py`](video/experiments/forced_alignment_dean/run_stable_ts_align.py)。
+- **`whisper_timestamped`＝QA 探針：** 自由 ASR＋DTW timestamps。ASR decoder 對重複的數學公式片語會跳字（實測 derivation 場景漏 12 字、後續 beat 全部錯位），**不可當計時來源**；改當獨立 QA——拿 ASR 文字 diff transcript，抓「TTS 沒唸／唸錯」這類 FA 結構上看不到的錯。wrapper：[`run_whisper_timestamped.py`](video/experiments/forced_alignment_dean/run_whisper_timestamped.py)。
+
+- **裝法（每台機器一次，全局）：** `python -m pip install --upgrade whisper-timestamped stable-ts`。pip 會安裝 `whisper_timestamped` CLI、`openai-whisper`、`dtw-python`、`numba`、`tiktoken`、`torchaudio` 等依賴。
+- **模型快取：** 兩者共用 openai-whisper 的 model cache（`base.en` 約 139 MB，第一次跑會下載；之後可離線重用）。模型下載不是計費 API，但仍需要網路。
+- **目前驗證版本：** `whisper-timestamped 1.15.9`、`openai-whisper 20250625`、`stable-ts 2.19.1`（連帶裝 `torchaudio 2.11.0`）。
+- **上游狀態注意：** `stable-ts` 上游（jianfch/stable-ts）已於 2026-05-30 封存（read-only、無後繼專案）。本機已驗證可用，故釘住上述版本組合；若未來 whisper／torch 升版造成不相容，備援路線是 `torchaudio` 的 CTC forced alignment（torchaudio 已隨 stable-ts 進環境）。
 
 ### 祕鑰
 - 全部走環境變數，**永不進版控、不寫檔、不記 log**。`.env` 已 gitignored。

@@ -45,7 +45,14 @@ def record(status: str, area: str, label: str, detail: str = "") -> None:
 
 def _run(cmd: list[str], timeout: int = 30) -> tuple[int, str]:
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        r = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=timeout,
+        )
         return r.returncode, ((r.stdout or "") + (r.stderr or "")).strip()
     except FileNotFoundError:
         return 127, "not found"
@@ -224,6 +231,47 @@ def check_vale() -> None:
 
 # ── ⑥ 內附資產（進版控，理應永遠在）────────────────────────────────────
 
+def check_forced_alignment() -> None:
+    """Optional local word-level alignment tools for video timing experiments."""
+    # QA probe: free ASR (can drop words on repeated math phrases; not a timing source).
+    exe = shutil.which("whisper_timestamped")
+    if not exe:
+        record(
+            WARN,
+            "forced-alignment",
+            "whisper_timestamped not on PATH",
+            "Optional for video forced-alignment experiments; install with "
+            "python -m pip install --upgrade whisper-timestamped",
+        )
+    else:
+        rc, out = _run([exe, "--versions"])
+        ver = out.splitlines()[0].strip() if (rc == 0 and out) else ""
+        if ver:
+            record(PASS, "forced-alignment", f"whisper_timestamped ({ver})", exe)
+        else:
+            record(WARN, "forced-alignment", "whisper_timestamped on PATH but version probe failed",
+                   f"{out or '?'} ({exe})")
+    # Timing source: transcript-constrained aligner (cannot drop words; upstream
+    # archived 2026-05-30, pinned version -- see ENVIRONMENT.md (5)c).
+    rc, out = _run(
+        [sys.executable, "-c", "import stable_whisper; print(stable_whisper.__version__)"],
+        timeout=60,
+    )
+    ver = ""
+    if rc == 0 and out:
+        for line in out.splitlines():
+            if re.match(r"^\d+\.\d+", line.strip()):
+                ver = line.strip()
+                break
+    if ver:
+        record(PASS, "forced-alignment", f"stable-ts ({ver})",
+               "video/experiments/forced_alignment_dean/run_stable_ts_align.py")
+    else:
+        record(WARN, "forced-alignment", "stable-ts (stable_whisper) not importable",
+               "Optional; transcript-constrained timing source for scene-level TTS; "
+               "install with python -m pip install --upgrade stable-ts")
+
+
 def check_assets() -> None:
     # The render-critical vendored asset is the outlined NTU lockup SVG -- brand
     # .logo_lockup_outlined() loads it for every intro/outro. (No design fonts are vendored:
@@ -395,6 +443,7 @@ def main() -> int:
     check_node_and_chrome()
     check_codex()
     check_vale()
+    check_forced_alignment()
     check_assets()
     check_fonts()
     check_tex_compiles()
