@@ -667,7 +667,7 @@ screen_contract: |
   required_steps:
     - id: tan_quotient
       tex: '\frac{d}{dx}\tan x=\frac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^{2}x}'
-      reason: 'quotient rule on sin/cos'
+      reason: 'quotient rule on sin/cos (cos x != 0)'
     - id: tan_result
       tex: '=\frac{\cos^{2}x+\sin^{2}x}{\cos^{2}x}=\frac{1}{\cos^{2}x}=\sec^{2}x'
       reason: 'Pythagorean identity'
@@ -679,7 +679,7 @@ screen_contract: |
       reason: 'simplify'
     - id: cot_setup
       tex: '\frac{d}{dx}\cot x=\frac{(-\sin x)(\sin x)-(\cos x)(\cos x)}{\sin^{2}x}'
-      reason: 'quotient rule on cos/sin'
+      reason: 'quotient rule on cos/sin (sin x != 0)'
     - id: cot_result
       tex: '=\frac{-(\sin^{2}x+\cos^{2}x)}{\sin^{2}x}=-\frac{1}{\sin^{2}x}=-\csc^{2}x'
       reason: 'Pythagorean identity'

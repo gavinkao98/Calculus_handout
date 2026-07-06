@@ -1,0 +1,2650 @@
+Reading prompt from stdin...
+OpenAI Codex v0.136.0
+--------
+workdir: C:\Users\Kao\Downloads\Calculus_handout
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019f1efe-9534-7c20-b0e1-fb293a355aaa
+--------
+user
+You are a **Narration Faithfulness Auditor (NFA / 旁白忠實稽核, formerly Mode B 審訂審查)** for a calculus teaching-video narration. You AUDIT and report findings; you do NOT edit any files.
+
+# First read these (judge from them, not memory)
+
+1. `video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md` — dimensions D1–D7, blocking line, reader split, non-findings, output format (**the audit contract**).
+2. Reading conventions: `video/pipeline/derive_spoken.py` (`MD_CONFIG_AND_CONVENTIONS`, §二 數學念法慣例) — the math read-aloud ledger this spoken track follows.
+3. The artifacts below.
+
+This prompt deliberately does NOT copy the rubric, to keep the two from drifting.
+
+# What you are reviewing
+
+Section **3.1 (Derivatives of Sine and Cosine)**, deck `ch03_trig_derivatives`, MiMo dual-version narration route. Content was user-approved: **yes** (LOCKED; detail-redo 2026-06-29 + sine/cosine single-page merge 2026-07-02).
+
+- **Source-of-truth (Version B derives from this):** `video/storyboards/ch03_trig_derivatives.yml` — the `say:` field of each content scene (English prose + inline LaTeX + `{show}` reveal markers). This is the LOCKED video narration.
+- **Version B — spoken (MiMo), the artifact under test:** `video/content_scripts/ch03_trig_derivatives_narration_spoken.md` — every LaTeX expression in each `say:` spelled into spoken English (no symbols, no `$`) for a TTS that cannot read LaTeX. Derived by `pipeline/derive_spoken.py` from `video/content_scripts/ch03_trig_derivatives.spoken.yml` (the spoken single source).
+- **Cross-reference only:** `video/content_scripts/ch03_trig_derivatives.md` (`narration:` field) and `video/content_scripts/ch03_trig_derivatives_narration.html` (Version A). NOTE: these two reflect the OLDER, longer content-script narration; the storyboard `say:` was re-authored (tightened) from them, so Version A/`.md` diverge in wording from `say:`/Version B by design. Treat that divergence as a **known, pre-existing doc-sync advisory (non-blocking)**, not a Version-B faithfulness break — judge Version B's faithfulness against the storyboard `say:`.
+
+Read all three. Silent units (intro/outro/divider) have no `say:` — audit only the 21 spoken content units.
+
+Mechanical parity is already green (`derive_spoken.py --check` → parity OK: all 21 content scenes map 1:1, every `{show}` marker matches `say:` exactly, no `$` leaks into the spoken text). Judge the semantic layer only.
+
+# How
+
+- Walk dimensions D1–D7 per the RUBRIC; blocking line per the RUBRIC (`blocking==0` to converge).
+- Focus: **D2** (Version B prose verbatim-equal to `say:`, only math spelled out), **D3 (HIGH PRIORITY)** (each spelled-out expression is math-equivalent to the written form AND unambiguous to a listener who cannot see symbols — grouping of powers/fractions, subscripts, `\le` → "at most", `-\sin x` → "negative sine x", `s''` → "s double prime", coordinates, full trig-function names), **D4** (spoken register / naturalness of what is read aloud), plus D5 conventions, D6 TTS sanity.
+- CONTENT_APPROVED is "yes": treat the approved teaching content/pedagogy as authorized; do not re-litigate it (still flag an outright math error under D7, which is lightweight here — spot-check obvious errors, no separate blind recompute reader).
+- Follow the RUBRIC's four-tier reporting, non-findings list, and read-only / propose-not-act guardrails. Do NOT over-report.
+
+# Output
+
+Exactly the RUBRIC's output format (`VERDICT:` line; per-line findings with `[Blocking|Advisory] [D#]` and `Keep|Rewrite|Cut` verdict; the `## Convention recommendations (D5)`, `## TTS sanity (D6)`, and `## Math-content check (D7)` sections; one line per clean dimension). Write no files.
+
+codex
+I’ll audit against the project’s own contract rather than assumptions. I’m reading `CLAUDE.md`, the rubric, the math read-aloud conventions, and the narration artifacts first.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -LiteralPath 'CLAUDE.md'" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -LiteralPath 'video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md'" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"MD_CONFIG_AND_CONVENTIONS|數學念法慣例|math|LaTeX|spoken\" 'video/pipeline/derive_spoken.py'" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 425ms:
+# CLAUDE.md
+
+?祆?獢?砍摮澈??蝯?AI 隞??嚗laude Code?odex 蝑???獢惜蝝?撘??舫遢????*甈??**嚗`AGENTS.md`](AGENTS.md) ????祆???璅??批捆銝?銴摮澈???渡?瑽?撱箇蔭閬?隞交?憡扳?隞?[`README.md`](README.md) ?箸?嚗摰寞撖怨??誑 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) ?箸???
+
+## ?Ｙ?銝閬?
+
+| ?Ｙ? | 頝臬? | 隤芣? |
+|------|------|------|
+| HTML 雓儔 | `handout/` | MathJax/KaTeX嚗S paginator嚗ragment ??print-standalone 蝯? |
+| Manim 敶梁? | `video/` | ?嚗??恬?TTS嚗make.py` 撱箇蔭嚗底閬?[`video/README.md`](video/README.md)嚗?|
+| ??LaTeX 雓儔 | `legacy/tex_handout/` | 撌脣?蝯???? |
+
+> **雓儔????蝡?摰????*嚗ode A ?剝? ??Mode B ??Mode C ??憿嚗頠楛摨???????甇?Ⅱ?????詨飛 M1?8 ??S繚A繚V嚗?? subagent嚗ubric嚗???Codex 隤輻蝝敺???摰???Ch1/Ch2 ????蝢抬?閬?憡蜇閬?[`handout/PIPELINE.md`](handout/PIPELINE.md)??
+
+## 撣貊?誘?
+
+```bash
+python handout/build.py           # 撱箇蔭?券雓儔蝡?嚗??ch01 ?芸遣銝蝡?
+python video/make.py --quality high  # 1080p 皜脫?敶梁?嚗?閮剖?鞈迎?
+python tools/doctor.py            # ?啣??亙熒瑼Ｘ
+tts.py --backend mock             # ?Ｙ? TTS mock嚗?閮祥嚗??嚗?
+```
+
+## ?辣?啣神隤?
+
+- **README 銝敺誑蝜?銝剜??詨神??* ???急?桅???[`README.md`](README.md) 隞亙?摮??冗銝剖惇?潭撠???README嚗?憒?[`video/README.md`](video/README.md)嚗憓?靽格 README ?瘥颲衣???
+- **敹?銋?靽???嚗?蝧餉陌嚗?* 蝔?蝣澆?憛?獢楝敺?????hell ?誘?憓??詻??亦Ⅳ嚗cene id?xport ?迂??雿?嚗誑????閰??銵?隤?Manim?aTeX?emini?TS?I?R?ode A/B/C 蝑???
+- ?園??????憿”?潛?隤芣???銝敺蝙?函?擃葉??
+- 蝚砌??嫣?鞈湛?`.deps/`?.deps_f5/`?.deps_voiceover/`嚗? git 撌乩?璅對?`.claude/worktrees/`嚗葉??README 銝甇方????嚗?閬??
+
+## 敶梁?皜脫?閫??摨?
+
+- **?日?雿輻??亥?瘙??血?銝敺誑 1080p 皜脫?**嚗make.py --quality high`嚗?
+
+## 隞祥 API 隤輻??蝬???
+
+- **瘥活隤輻隞颱?閮祥????API嚗? Gemini TTS?emini ??嚗蔣????嚗????賢?????雿輻??蝣箏???銝?芾?隤輻??* ?寞活??嚗?憒蝭? TTS?蝡?頝?銝敺?隤芣?嚗活閬矽?其?暻潭芋??隡啁??beat ?賂??唾?蝘嚗??嚗???敺??瑁???
+- 銝?鞎颯???雯?蝺楝敺??冽迨???舫??瑁???憒?`tts.py --backend mock`嚗神? WAV 撽?manifest嚗?摨????Manim render?fmpeg mux/concat??
+- ??銝甈∪??隞?”閰脫活?Ⅱ隤芣??極雿????蝭?霈嚗?璅∪????湔??頝???敺萄?????
+- **??026-07-01 雿輻??甈odex ?航?隤輻嚗eview嚗??賂?閰Ｗ???嚗econd-opinion嚗? standing consent嚗?仿????活敺菔岷嚗蒂?⊿???Codex ?誨??銝??蝙?刻?閬?撠??整?* 蝭?嚗?*`codex exec -s read-only`**嚗??恬?code嚗oc 撠?撘?review?噩蝚砌???嚗霈銝瑼?璅∪?韏?`~/.codex/config.toml` ?身 gpt-5.5嚗high嚗?*撌乩?憸冽嚗蝙?刻?瘙??閬??湔??暹???嚗?* ?芯蜓?券脯?閬祟?豢?蝚砌????矽 Codex ?? ping 雿輻??? (i) ?迤銝??撠?????ii) 閮祥??嚗?銝???iii) Codex嚗頨怠?瑚??⊥?閫??????iv) 瘚????蝙?刻?瘙箇? deliverable嚗?鈭支???sign-off嚗???銝?*甇斗?甈???Codex read-only ?誑 Codex 隞?閰Ｗ???*嚗? TTS??閫??皜脫??emini ??嚗蔣????閮祥 API **隞?**??孵噩??嚗??冽迨???改???
+
+## 摰??啣?嚗撩憟辣嚗?擃???憚摮隞??摰?唳?瑼?
+
+頝冽??啣???憡??桀 [`ENVIRONMENT.md`](ENVIRONMENT.md)嚗?瑁?? [`tools/doctor.py`](tools/doctor.py)嚗?璈?頝??撩隞暻潘??甇文???嚗?
+
+- **蝻箏?隞塚?頠???嚗?閬銵?鋆?* ?菜葫?唳璈撩??pip 憟辣?頂蝯?binary ?極?瘀?憒?`ffmpeg`?aTeX?ode?hrome????pip 憟辣嚗?嚗?*?牧??鋆?暻潦隞暻潦獐鋆??誘嚗?蝬蝙?刻???鋆?*嚗??航銵?`winget`嚗pip install`??憭??扳??[`requirements.lock`](requirements.lock)嚗ENVIRONMENT.md` **??歇霅啣????啣?**嚗?憒? `tools/setup.ps1` 敺?lock 鋆??舫?撱箝??啣?嚗????
+- **銝??芾??憚摮??蹂誨??* 蝻箸镼踵?**?身?迤??韏瑚?**嚗?閬鈭????餅隞??hack 銝璇?code path ?輸?蝻箇? binary?撖急隞?極?瘀??雿?瑟??隞??瘜Ⅱ撖行憟踝?**雓靘?雿輻??憟?*嚗?閬?暺?嚗?銝 Karpathy 禮1????具????????湛???靘?`ffmpeg`嚗ffprobe` ?詻???隞嗚?? code 蝜? `ffprobe`??蝑 A嚗? `video/REBUILD_STATUS.md`嚗?
+- **鋆?銝摰?啁??瑼?蝣箔??圈?血?敺???* 隞颱??啣?霈敺?銝頛芸鋆?嚗inned ???[`requirements.lock`](requirements.lock)嚗???`requirements.txt`??瘙神??[`ENVIRONMENT.md`](ENVIRONMENT.md)?炎?仿???[`tools/doctor.py`](tools/doctor.py)嚗?閬???`tools/setup.ps1`嚗?*撽璅?嚗?唳? `python tools/doctor.py` ?賣?甇斗??啣?撠??啣蝬?*
+
+## 頝典?閰梯??嗅神?脩??扳?瑼?銝神?砍 memory嚗?
+
+- **?蜇蝯?蝑???隞颱?頝典?閰梧?頝冽??函??亥???銝敺神?脫? git 銝??瑼?*嚗?*銝??芾??冽?啁? Claude memory**嚗~/.claude/.../memory/`嚗 `MEMORY.md`嚗?
+- **??嚗?* 雿輻?虜??虫?璆哨??砍 memory 銝 repo 韏啜?璈停瘨仃嚗???扳?瑼?頝? git ?唳??唳??具?
+- **撖怠鋆∴?** ?脣漲嚗??神?脰府?Ｙ???`REBUILD_STATUS.md`嚗??頝典?閰梢脣漲?剁?嚗極?瑞瘜??神?脣??? `README.md`嚗撘?鞈?瘚?蝝神??`DESIGN.md`嚗摰寞瘜?撖恍?`CONTENT_METHODOLOGY.md`?銝????瑼?嚗??蝙?刻??曉嚗?閬?暺閮脫??memory??
+
+## ?啣神嚗祟?亦??Ｘ????嚗?摮?砍 memory嚗?銝?閬??祇脩??改?
+
+- **?蝙?刻?閰曹?敺蝜?銝剜?**嚗aTeX嚗?撘Ⅳ??隞嗅?????銵?隤????璅????
+- **??doc嚗ode review ??皜?蝝?銝?瘛瑞銝隢?** ????蝒????Ｗ?閬?嚗?靽殷???discoverability gap嚗??辣?喳嚗??嚗 editorial drift 憸券嚗??芸?嚗???finding嚗 ??finding嚗?蝷箔?閬??Ｗ榆?堆???*Framing嚗?* 敺?◤ review ?邦?瘜?潘?銝???session ?扳 commit嚗 merge ???渡?Ｘ?鈭祕嚗?蝢拍??寧??刻?撌桃銝? inconsistency?ver-reporting ????甇???芸???
+- **銝?mode ?啣神瘚?嚗oot [`README.md`](README.md) 禮Mode B嚗?嚗ode B ?里?貉?瘙箄??潛撖恍脰府甈∩耨甇?commit ??message body**嚗ubject ??0 摮ody ??嚗??祆隞暻潦雿?憒乓鈭?暻潦??刻???嚗末霈靘?閰梁 `git log --grep="Mode B"` ??????commit嚗112aa5c`?0ef06ee`?? Mode A ??銵?bugfix 銝?具?
+  - **commit-grep ??嚗?026-06-15嚗?** 銝膩 `Mode B` ??*雓儔**蝺?*video ???撖衣里?詨歇?孵? NFA**嚗??賢?撖衣里?賂???video?ode B??憟? [`video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)嚗??嗉?瘙箏?璅?神?脖耨甇?commit body嚗???`git log --grep="NFA"` ??嚗?雓儔 `Mode B` ??嚗??拇?蝺毽?典?銝 grep嚗?
+- **蝯虫蝙?刻祟?貊?鈭支??抵??具??停?質???敶Ｗ?嚗?026-06-12 雿輻??瘙?嚗?* ?急摮詨??祟?豢?隞?*銝?**鈭文?皛輻? LaTeX ??`.md`嚗?Ｗ standalone HTML嚗athJax/KaTeX CDN嚗???摮詨皜脫?嚗??嗡??舐?仿霈?耦撘??抒??扯釭??瑼??冽迨???～?雿輻???株?瘙箝??梯正銝敺甇方齒??
+- **瘥???頛芣撖怠?銋???HTML ?勗?嚗?026-06-15 雿輻??瘙?嚗?* 銝??鋆捱???嚗indings 閬?HTML??*?∪???頛芸摰寞撖恬?Mode A嚗 蝑?嚗閬?撖阡?撖怠?摰孵?Ｖ?隞?standalone HTML ?勗?**嚗athJax/KaTeX CDN????摮詨皜脫?嚗?????撖急挾?踝?locus嚗[source:]`嚗府頛?Mode B 蝯?嚗?雿輻???殷?銝??芸撠店鋆∠策????????[`handout/_audit/REVIEW-ch01-modec-candidates.html`](handout/_audit/REVIEW-ch01-modec-candidates.html) ?耦撘?瑼???`REVIEW-??applied.html` 銋?嚗??嚗?瘙箇阮????
+- **撖拇 finding 靽桀?敺???甇詨祟?賂?2026-06-12 雿輻??瘙?嚗?* 靽桀? blocking嚗dvisory finding 敺?銝?湔摰??摰?????靽格????頝?頛芸祟?賂?Codex ????撠??荔?嚗Ⅱ隤耨?寞頨急????交????甇詨祟?貊?蝯???里?豢?瑼葉閮???
+
+## 蝔?嚗極蝔遙??銵皞?嚗arpathy guidelines嚗?
+
+皞 [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)嚗ndrej Karpathy 撠?LLM 撖怎?撘虜閬???閫撖???*?嚗?* ??雓寞??芸??潮漲嚗蝣遙?銵???*?拍蝭?隞?`video/` ?Ｙ??uild 撌亙??祉?蝔?嚗極蝔極雿??銝?冽雓儔?批捆?啣神**?ode A ???撖漲隞誑?refer richness?? `[source:]`???芣?撖拇?皞?閬?[`video/CONTENT_METHODOLOGY.md`](video/CONTENT_METHODOLOGY.md)嚗?銝蝚?2 璇???撠?撘Ⅳ?? code嚗??摰寧?撟?
+
+- **1. ?單?璆???嚗hink Before Coding嚗?閬?皜研?閬?韏瑕????日?雓?*
+  - ?Ⅱ隤芸?身嚗?蝣箏?撠勗?嚗?閬?暺???
+  - ??蝔株圾霈??典??箔?嚗?閬?暺銝??
+  - ?蝪∪??瘜停雓?敹??????准?
+  - ?∩?撠勗?銝????芾ㄐ銝?璆??嗅???
+- **2. 蝪∪?芸?嚗implicity First嚗?撠? code 閫?捱??嚗?撖急?璈抒??梯正??*嚗???撘Ⅳ嚗??批捆蝭?嚗?
+  - 銝?瘝◤閬????踝?銝銝甈⊥?code 撱箸鞊∪惜??
+  - 銝?瘝◤閬????改??航身摰扼?銝銝?賜???撖恍隤方???
+  - 撖思? 200 銵? 50 銵停憭停?神?????瘛勗極蝔葦????摰?摨西?????
+- **3. 憭???撘耨?對?Surgical Changes嚗?????舐??唳嚗皜撌梯ˊ???摮?*
+  - 銝??????啁? code?酉閫????嚗?閬?瑽?憯??梯正??
+  - 瘥?Ｘ?憸冽嚗雿蹂???亦?撖急???
+  - ??⊿???dead code嚗??箔???閬??芸嚗蝘駁??雿??孵??????典??import嚗??賂??賢???
+  - 瑼ａ?嚗?銝銵??賜?亥蕭皞臬?雿輻??閬?嚗?銝??? review?? over-report 銝?湛???
+- **4. ?格?撽??瑁?嚗oal-Driven Execution嚗?摰儔??璅?嚗?餈游??圈?霅???*
+  - ?遙???撽??璅???撽??????粹?瘜撓?亙神皜祈岫??摰????耨 bug????撖怨??葫閰血?霈?????瑽?X???Ⅱ靽?敺葫閰阡??
+  - 憭郊撽遙??蝯虫??陛?剛??恬?甇仿? ??撽?暺?????皞?撘瑕停?質銵艘?????啗?車撘望?皞???琿?閬?皜?
+
+
+ succeeded in 470ms:
+# ?敹祕蝔賣 ??蝬剖漲???嚗ARRATION-FAITHFULNESS-RUBRIC / NFA嚗?
+
+> ?祆??胯??賢?撖衣里?賂?Narration Faithfulness Audit, **NFA**嚗?憟???*?桐??靘?嚗ingle source of truth嚗?*?FA ?????*gate 1嚗laude subagent嚗?鞎鳴?** ??**gate 2嚗odex ?函?蝚砌?霈??閮祥嚗?*?霈?祆??斗嚗雁摨佗??嗆?蝺?*?芸?ㄐ?嫣?甈?*嚗rompt ?芥??具???餈啜??脫?蝘鳴???
+>
+> **銵蝯梧?lineage嚗?** NFA 嚗???video?ode B??撖抵?撖拇嚗閫??雓儔 Mode B ???啁儔???賢?銵?? 2026-06-15 ?孵?嚗雁摨?D1?7 **??銝?**瘝輻?? git ?脩 `git log --grep="Mode B"`?蝺??`git log --grep="NFA"`??*瘜冽?嚗?* 雓儔??Mode B嚗粥 `<!-- expansion: -->` marker?eep/Rewrite/**Move**/Cut??憡??[`../../../README.md`](../../../README.md)嚗**銝??Ｙ????**嚗??祆??⊿???
+>
+> ?寞?隢?鞈?瘚?**甈?閬?**閬?[`../../CONTENT_METHODOLOGY.md`](../../CONTENT_METHODOLOGY.md)嚗? ??箝牧?神?? ?批捆撅文?鞈芣炎?賂??`../../DESIGN.md`](../../DESIGN.md)嚗iMo ???頠erive parity嚗瑼摰祟?芯?蝬剖漲?鈭?蝔踴鈭?蝞?finding?獐???撟曉?reader??**銝?餈?*?寞?隢頨怒?
+
+## 撖拇撠情????
+
+NFA ??*?阮敺?*頝?? source 撌脰??胯歇 derive嚗???隞?narration source 銵????嚗?
+
+1. **Source narration嚗<deck>.md` ??`narration:` 甈?** ???望?嚗nline LaTeX??血歇雿輻????嚗?`CONTENT_APPROVED`嚗es/no嚗?
+2. **Version A ??HTML ?梯???`<deck>_narration.html`嚗?* ??蝬?MathJax 皜脫??詨飛??
+3. **Version B ???????`<deck>_narration_spoken.md`嚗?* ??瘥?LaTeX ?斗?????望?嚗蝚西?嚗?靘??質? LaTeX ??TTS??
+
+銝辣?刻??ntro嚗utro 蝑?*??桀???narration嚗?撖?*??
+
+- **撖?*嚗ource ???拙????祉?**敹祕頧?**?隤摮詨艙瘜?**蝑?甇抒儔**?隤?*??*?誑?摮詨摰?*甇?Ⅱ**嚗7嚗?隞嗅?嚗?
+- **銝祟**嚗歇隤 source ??摮詨摰對??飛瘜?`CONTENT_APPROVED=yes` ??敺?re-litigate嚗?隞?函?暹?憿舀摮賊?孛??D7嚗?擗?韐?撅?*?阮??* copyedit ??嚗? [`NARRATION-COPYEDIT-RUBRIC.md`](NARRATION-COPYEDIT-RUBRIC.md)嚗FA ?阮敺?*銝??芾冪**嚗??鋡怎??D2 ??嚗?
+
+## 撖拇蝬剖漲嚗1?7嚗?璇? Blocking / Advisory嚗?
+
+**D1 ??Version A嚗TML嚗?撖艾?* 瘥??narration ??source ??銝?湛?markdown `*x*` ??`<em>x</em>` ?荔?嚗瞍?嚗?摮??孵?嚗aTeX ?舀葡? malformed嚗ind 敺賜?甇?Ⅱ嚗???具d嚗?摨迤蝣箝?
+
+**D2 ??Version B嚗隤?敹祕??* ?望??????source **??蝑?**嚗?摮貉???隤?嚗遙雿?paraphrase嚗?嚗?嚗??摮詨摰???flag??
+
+**D3 ??????詨飛敹菜?甇?Ⅱ嚗IGH PRIORITY嚗?* 瘥隤??摮豢 (a) ?撖急摮?*?詨飛蝑**?? (b) 撠銝蝚西????質?*?⊥郁蝢?*??暺???寡?嚗活?對???黎蝯???銝?嚗??賣閮?敹萸?inverse???嚗?玨??閮? `^{-1}` ?泵??嚗遙雿?鋡怨?銝??摮?敹菜???蝑???source LaTeX 嚗隤耦撘?
+
+**D4 ??Version B 隤?嚗??喋?* 敹萄靘?瘝帘?玨??瘞??塚???spell-out ?????哨??he quantity ?艾??餅郁蝢抵?**?芰?函黎蝯???閬?*??????*敹萄靘???*???凌ource ????釭?舫?蝔踹? copyedit ??嚗FA 銝??剜??
+
+**D5 ??敹菜????鋆?嚗onvention ledger嚗?甈⊥扼?????* ?踹隤阮璅??遙雿?*?敹菜???**??虫???????亦??梧???*?扯釭嚗?* ?銝甈⊥抒? setup 鋆???蝭???嚗?璅艙瘜漣璅艙瘜he quantity?瘜佗?銝?血?獢?函?嚗楊蝭蝛拙?嚗?*蝛拇?銝嗾銋??lean??*嚗??舫???遛?虜?雁摨艾?
+
+**D6 ??TTS 閮剖????改?頛?嚗?撘梁雁摨佗???* ?辣????閮剖?嚗odel嚗oice嚗ormat嚗ample rate嚗essage shape嚗?刻瘣賬???*??flag ?＊??函??整?* ??Tier 0 ??`derive_spoken --check`嚗anifest-freshness 撠祕????瑼Ｘ?????祉雁?芰???隞嗅神?身摰?西瘣踝?????
+
+**D7 ???詨飛?批捆甇?Ⅱ嚗?隞嗅?嚗?* `CONTENT_APPROVED=no` ??**敹?**嚗=yes` ????flag ?＊?航炊??*?函???**?鋆∠?瘥?潦迤鞎????垢暺情??蝯???蝣箄??摮貊蝚佗?銝??D3 ?隤?vs ?詨神蝑?????其遙雿?蝚西???*??臭??閬?agent ??雁摨?*嚗?銝eader ??????蝞?????芸楛??隢嚗??航?餈啜?
+
+## ?嗆?蝺?blocking vs advisory嚗?
+
+- **?嗆??斗?**嚗FA ?? 嚗?**blocking findings = 0**?dvisory ?曹蝙?刻?鋆捱嚗?*銝撥?嗆飛??*嚗?雓儔 [`../../../handout/_audit/PROSE-AUDIT-RUBRIC.md`](../../../handout/_audit/PROSE-AUDIT-RUBRIC.md):40嚗?
+- **銝?governs Tier 0 ?單**嚗derive_spoken --check` 蝑Ⅱ摰折?隞?exit code ?嗆?嚗?憟?blocking/advisory??
+
+## ?拚?霈?? reader ??嚗rchestration嚗?
+
+NFA 韏?*雓儔?????敶?*嚗ate 1 餈凋誨?唳??gate 2 ?嗆?敺甈∠Ⅱ隤?
+
+- **gate 1 嚗?Claude subagent嚗?鞎颯翮隞? `blocking==0`嚗?* reader ??**???交芋撘??雁摨行**嚗?
+  - **瘞賊? 1 ?arration reader?gent**嚗? **D1?6**嚗? source嚗TML嚗隤?隞塚??文?撖佗?敹菜?嚗??喉????嚗身摰???銝隤璅∪?嚗???agent 銝甈∟?摰?頝?鞎餌? `derive_spoken --check` ??id嚗{show}` marker嚗$`-瞍??*璈１ parity** ?貉粥嚗eader ?芸隤儔撅扎?
+  - **`CONTENT_APPROVED=no` ??+1 ?ndependent recompute?gent**嚗? **D7**嚗蝯血?摨惜?詨飛嚗ource LaTeX嚗?蝢拍憓?嚗?*??銝策???隢?*嚗?摰??嗆撠????賢恐蝔梁??澆?撣喉??脯 anchoring嚗=yes` ??D7 ??????憿舫????reader agent ?澆?嚗?*銝??agent**??
+  - 蝛拇?嚗摰孵歇隤嚗? NFA ??**1 ??reader agent**??
+- **gate 2 嚗?Codex嚗?鞎颯???格活????嚗?* gate 1 撌?`blocking==0` 銝餈?蝔踵?嚗?**銝甈?* Codex ?嗚銝??撖西??? gate 1 ?芋?暺??株???甈⊿? D1?7嚗? fan-out嚗? [`../../../CLAUDE.md`](../../../CLAUDE.md) 隞祥 API 閬???`--dry-run` 隡啣潦噩????嚗?*?拚????蔥**???芰蝡??晞?
+
+## 銝? finding嚗隤文嚗?
+
+- `CONTENT_APPROVED=yes` ?歇隤??摮詨摰對??飛瘜?銝? re-litigate嚗?
+- 隤儔蝑?閰榆?啜arkdown?TML ???寡???`*x*`?<em>`嚗?
+- D3嚗4嚗黎蝯???閬??函??餅郁蝢抵?嚗he quantity ?艾?嚗??舐撩?瑯?
+- topic-term ?芰??嚗府蝭撠勗雓??敹蛛???
+
+## 霅瑟?
+
+- 蝔賣??*?航?**嚗?嚗??嫣遙雿?獢?propose-not-act嚗漱?蝙?刻?瘙綽???
+- **銝??孵歇隤 source**嚗?蝔踹?敹祕?折??′霅瑟?嚗?
+- ?萄??? finding ????*銝?over-report**嚗?*銋暹楊???蝬剖漲?舀?????*??
+
+## ?閬
+
+??嚗??tier 1??嚗? ?嚗?撖衣???銝皜脫?嚗摮賊 ??頧?撘??甇抒儔?霈?抒撩?瘀?嚗ier 3嚗? style drift嚗憭?銵?tier 4嚗?蝢拍??對??乓?
+
+**頛詨?澆?嚗?蝯??荔?銝神隞颱?瑼?嚗?**
+
+- 擐?嚗VERDICT: <X> blocking, <Y> advisory`
+- ??嚗?銵?蝑?嚗?
+  `- [Blocking|Advisory] [D#] unit-id ??issue嚗??典?????Verdict: Keep|Rewrite|Cut ??exact replacement if Rewrite`
+- ??`## Convention recommendations (D5)`?## TTS sanity (D6)`????D7 ??嚗## Math-content check (D7)`??
+- 瘥?*銋暹楊**蝬剖漲??銵?憒?`D1 clean`嚗?
+- 蝪⊥?????locus??
+
+**鈭支?蝯虫蝙?刻?瘙箸?**嚗? [`../../../CLAUDE.md`](../../../CLAUDE.md) 鈭支?閬?嚗?*瘥????Ｖ?隞?* standalone HTML 撖拇蝔選?MathJax CDN????摮詨皜脫?嚗?瘥? finding 璅帘摰楊??gate 1 ??`N1-?圳?ate 2 ??`N2-?圳嚗FA 鋆捱撖恍脰府甈∩耨甇?commit ??message body嚗ubject ??0?ody ?????穿??箔?銝戎嚗鈭?暻潘?霅???嚗? `git log --grep="NFA"` ?????蝝??憒 rubric?REPORT-*.md`嚗???HTML 銋???
+
+
+ succeeded in 473ms:
+1:"""Single-source derivation of the spoken-narration artifacts (any section).
+3:`content_scripts/<deck>.spoken.yml` is the ONE place the spoken narration lives
+4:(math read aloud, with {show} markers). From it + the canonical storyboard this
+7:  - storyboards/<deck>_mimo.yml                  MiMo storyboard (say := spoken, meta._mimo, voice Mia)
+8:  - content_scripts/<deck>_narration_spoken.md   the human reading view ({show} stripped)
+13:  - every canonical content scene with a `say` has a spoken entry (and vice-versa);
+14:  - the {show ...} markers in each spoken `say` match the canonical `say` exactly;
+15:  - no `$` (LaTeX) leaks into the spoken text.
+17:    python video/pipeline/derive_spoken.py --deck ch01_inverse_functions          # regenerate (runs --check first)
+18:    python video/pipeline/derive_spoken.py --deck ch01_inverse_functions --check   # validate only, write nothing
+38:# Optional advisory per-unit MiMo styling notes (NOT spoken text), keyed by deck
+50:MD_CONFIG_AND_CONVENTIONS = """## 一、MiMo 合成設定（現用）
+65:friend. Pronounce every mathematical expression clearly and correctly.
+70:## 二、數學念法慣例（全節通用；NFA 裁定）
+96:def check(canon: dict, spoken: dict) -> list[str]:
+101:    miss = set(content) - set(spoken)
+102:    extra = set(spoken) - set(content)
+104:        problems.append(f"canonical content scenes missing a spoken entry: {sorted(miss)}")
+106:        problems.append(f"spoken entries with no matching canonical scene: {sorted(extra)}")
+107:    for sid in sorted(set(content) & set(spoken)):
+108:        if "$" in spoken[sid]:
+109:            problems.append(f"{sid}: spoken text still contains '$' (LaTeX not spelled out)")
+110:        cm, sm = show_markers(content[sid]["say"]), show_markers(spoken[sid])
+112:            problems.append(f"{sid}: {{show}} markers differ\n    canonical: {cm}\n    spoken:    {sm}")
+116:def gen_mimo(canon: dict, spoken: dict, deck: str) -> dict:
+120:        if scene["id"] in spoken:
+121:            scene["say"] = spoken[scene["id"]]
+125:def gen_md(canon: dict, spoken: dict, deck: str) -> str:
+130:        f"> **此檔為生成檔（DO NOT EDIT）。** 由 `content_scripts/{deck}.spoken.yml`（口語單一源）"
+131:        f" 經 `pipeline/derive_spoken.py` 生成。要改旁白請改 `.spoken.yml` 後重生。\n"
+132:        f"> **性質：版本 B（口語 TTS 版）。** 英文散文逐字忠於內容稿 `narration`，**只把數學攤成口語**（無 LaTeX），"
+133:        f"供不能直讀 LaTeX 的 TTS（MiMo）照念。對照閱讀版（版本 A，數學渲染）＝ `{deck}_narration.html`。\n"
+135:        + MD_CONFIG_AND_CONVENTIONS
+142:    for sid, say in spoken.items():
+150:        f"- 口語文字單一源＝ `content_scripts/{deck}.spoken.yml`；本檔與 `storyboards/{deck}_mimo.yml` 皆由 `derive_spoken.py` 生成。\n"
+151:        "- `{show}` beat 切分與正典 storyboard 對齊（`derive_spoken.py --check` 守門）。\n"
+164:    spoken_path = CONTENT / f"{args.deck}.spoken.yml"
+165:    for p in (canon_path, spoken_path):
+167:            raise SystemExit(f"[derive_spoken] missing {p}")
+169:    spoken = load(spoken_path)
+171:    problems = check(canon, spoken)
+173:        print("[derive_spoken] PARITY ERRORS:", flush=True)
+177:    print("[derive_spoken] parity OK", flush=True)
+182:    md = CONTENT / f"{args.deck}_narration_spoken.md"
+184:        f"# GENERATED by pipeline/derive_spoken.py from {args.deck}.spoken.yml + the canonical\n"
+185:        "# storyboard. DO NOT EDIT -- change the .spoken.yml source and regenerate.\n\n"
+186:        + yaml.safe_dump(gen_mimo(load(canon_path), spoken, args.deck),
+190:    md.write_text(gen_md(canon, spoken, args.deck), encoding="utf-8")
+191:    print(f"[derive_spoken] wrote {mimo_yml}", flush=True)
+192:    print(f"[derive_spoken] wrote {md}", flush=True)
+
+codex
+The first pass shows the expected NFA contract and that the relevant convention block is inside `derive_spoken.py`, but the terminal encoding is mojibaking the Chinese text. I’m switching the shell output to UTF-8 before reading the files I need for line-level judgment.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); Get-Content -Raw -Encoding UTF8 -LiteralPath 'CLAUDE.md'" in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); Get-Content -Raw -Encoding UTF8 -LiteralPath 'CLAUDE.md'"` rejected: blocked by policy
+2026-07-01T18:44:23.323423Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); Get-Content -Raw -Encoding UTF8 -LiteralPath 'CLAUDE.md'"` rejected: blocked by policy
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); $lines = Get-Content -Encoding UTF8 -LiteralPath '"'video/pipeline/derive_spoken.py'; "'$lines[49..92]' in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); $lines = Get-Content -Encoding UTF8 -LiteralPath '"'video/pipeline/derive_spoken.py'; "'$lines[49..92]'` rejected: blocked by policy
+2026-07-01T18:44:23.370397Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); $lines = Get-Content -Encoding UTF8 -LiteralPath '"'video/pipeline/derive_spoken.py'; "'$lines[49..92]'` rejected: blocked by policy
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); Get-Content -Raw -Encoding UTF8 -LiteralPath 'video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md'" in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); Get-Content -Raw -Encoding UTF8 -LiteralPath 'video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md'"` rejected: blocked by policy
+2026-07-01T18:44:23.378932Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); Get-Content -Raw -Encoding UTF8 -LiteralPath 'video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md'"` rejected: blocked by policy
+codex
+That encoding tweak is blocked by the managed policy, so I’m keeping to plain read commands. The English math text and YAML structure are what matter for this audit; the rubric’s required format is still clear enough from the first read.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -Encoding UTF8 -LiteralPath 'video/storyboards/ch03_trig_derivatives.yml'" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -Encoding UTF8 -LiteralPath 'video/content_scripts/ch03_trig_derivatives.md'" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -Encoding UTF8 -LiteralPath 'video/content_scripts/ch03_trig_derivatives_narration.html'" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Raw -Encoding UTF8 -LiteralPath 'video/content_scripts/ch03_trig_derivatives_narration_spoken.md'" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 460ms:
+# §3.1 Derivatives of Sine and Cosine -- canonical storyboard.
+#
+# Stage-2 engineering storyboard, DETAIL-REDO (2026-06-29) authored from the
+# re-LOCKED content script (video/content_scripts/ch03_trig_derivatives.md,
+# detail-redo) and the HTML handout (handout/fragments/ch03/sec-3-1.html;
+# authoritative build handout/chapter3-print-standalone.html). Follows
+# CONTENT_METHODOLOGY.md (one teaching idea per scene, detail over compression,
+# faithful to the handout) and DESIGN.md (template catalog, say/{show} reveal,
+# capacity contract + multipage `part:`).
+#
+# DETAIL-REDO changes vs the prior compressed storyboard:
+#   * continuity SPLIT into two scenes (statement+sinθ→0 / the sum-to-product
+#     argument), part 1/2 + 2/2; the argument now SHOWS both sum-to-product
+#     identities on screen (the bound no longer appears from nowhere).
+#   * every proof/derivation payload enumerates the load-bearing steps on
+#     screen: derivative_of_sine gains the lim_{h→0} definition line;
+#     derivative_of_cosine shows the companion identity; all_six shows the
+#     sec' quotient-rule step.
+#   * 4 pivots carry L2 intuition in `say` (difference_quotient, sector,
+#     continuity, fundamental_limit). No new mathematics added.
+#
+# Three custom animation hooks (animations/ch03_trig_derivatives_hooks.py):
+#   * sector_inequality  (Figure 3.1) -- nested unit-circle areas
+#   * slope_equals_height(Figure 3.3) -- sin tangents vs cos heights
+#   * shm_stacked_graphs (Figure 3.4) -- s/s'/s'' over one time axis, s''=-s
+# Figure 3.2 (squeeze_graph) is a stock single-panel graph (no hook).
+
+meta:
+  id: ch03_trig_derivatives
+  chapter: "Chapter 3"
+  chapter_title: "Chain Rule and Trigonometric Derivatives"
+  section: "3.1"
+  title: "Derivatives of Sine and Cosine"
+  language: en
+  theme: midnight
+  voice: Mia
+  otf_enforce: true        # SP2: provenance gating (0 surface after backfill)
+  pedagogy_enforce: true   # SP2: PD2/3/4 gating (0 surface after backfill)
+  fontfloor_enforce: true  # SP2: font-floor gating (0 surface)
+  coverage_enforce: true   # SC step-coverage gating (0 SC1 after first-learner fixes)
+  assumptions:
+    - id: radians
+      text: "angles in radians (arc $=\\theta$)"
+      first_use_unit: why_trig_is_different
+      source: "chapter3-print-standalone.html SS3.1 . radian convention (Caution)"
+  video: { w: 3840, h: 2160, fps: 60 }   # 4K60 delivery; --quality high renders 1080p for QA
+  sections:
+    - { id: "3.1", title: "Derivatives of the Sine and Cosine Functions" }
+    - { id: "3.2", title: "The Chain Rule" }
+    - { id: "3.3", title: "Applications of the Chain Rule" }
+
+scenes:
+
+  # 0 ---------------------------------------------------------------- intro
+  - id: intro
+    kind: intro
+    tagline: "How fast does sine change?"
+    duration: 6.0
+
+  # 1 ------------------------------------------- divider: Stage 1 opener
+  - id: divider_limit
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 1"
+    title: "The Limit Behind the Slope"
+    subtitle: "Why a trig derivative needs a new idea."
+    ref: doc:frag-sec-3-1
+    scaffold: { problem: "$\\lim_{\\theta\\to 0}\\dfrac{\\sin\\theta}{\\theta}=\\;?$" }
+    ghost: "1"
+    progress: { current: 1, total: 4 }
+    duration: 4.0
+
+  # 2 --------------------------------------- motivation: the trig difference quotient
+  - id: why_trig_is_different
+    kind: content
+    template: definition_math
+    accent: definition
+    scene_role: motivation          # exposition beat -> chipless (not a definition)
+    ref: md:why_trig_is_different
+    scaffold: { flag: radians }     # PD4: first use of the radian assumption
+    source: "chapter3-print-standalone.html SS3.1 . opening prose (funnels to sin/theta over theta)"
+    title: "A Limit No Algebra Can Crack"
+    say: |
+      Every derivative so far has yielded to algebra. For a polynomial we
+      expanded $(x+h)^n$ and the binomial theorem handed us a factor of $h$ to
+      cancel; for $e^x$ the power series did the same job. The trigonometric
+      functions refuse to play along.
+      {show math.0} Write down the difference quotient for $\sin x$ and try the
+      usual move. You cannot simply set $h=0$: that gives $\tfrac00$, which
+      tells you nothing. And no identity cancels the $h$ in the denominator --
+      $\sin(x+h)$ simply does not break into pieces that conveniently subtract.
+      {show math.1} As we are about to see, the whole computation funnels down
+      to a single limit, the limit of $\sin\theta$ over $\theta$ -- again the
+      indeterminate form zero over zero, and one that no algebra will crack.
+      {show statement} Prying it open takes a genuinely new tool: a geometric
+      comparison of areas on the unit circle. And once we secure that one
+      limit, it unlocks the derivatives of both sine and cosine at once. One
+      ground rule, though: throughout, angles are measured in radians -- an
+      assumption that turns out to be essential.
+    statement: "Every trigonometric derivative funnels down to a single limit."
+    math:
+      - "$\\dfrac{\\sin(x+h)-\\sin x}{h}\\ \\xrightarrow{\\ h=0\\ }\\ \\dfrac{0}{0}\\quad(\\text{indeterminate})$"
+      - { tex: "$\\lim_{\\theta\\to 0}\\dfrac{\\sin\\theta}{\\theta}\\quad\\left(\\tfrac{0}{0},\\ \\text{no algebra}\\right)$", anim: highlight }
+
+  # 3 ------------------------------------ derivation: reduce the difference quotient (L2)
+  - id: difference_quotient_for_sine
+    kind: content
+    template: derivation
+    accent: definition
+    kicker: derivation
+    ref: md:difference_quotient_for_sine
+    covers: [identity, substitute, divide, factors]     # step.0/1/2 + result (all shown; root reduction)
+    scaffold: { motive: "Sum-to-product turns the difference of sines into a product." }
+    source: "chapter3-print-standalone.html SS3.1 . The difference quotient for sine (sum-to-product)"
+    title: "The Difference Quotient for Sine"
+    say: |
+      So let us transform that difference quotient instead of fighting it
+      head-on. The decisive step is one trigonometric identity -- sum-to-product
+      -- which turns a difference of sines into a product.
+      {show step.0} Here it is; and a product is exactly what we want, because
+      we can pull it apart and take limits one factor at a time.
+      {show step.1} Put $A=x+h$ and $B=x$, and the numerator becomes
+      $2\cos(x+\tfrac h2)\sin\tfrac h2$.
+      {show step.2} Now divide by $h$ -- and here is the small trick that makes
+      everything line up: write $h$ as $2$ times $\tfrac h2$, so the denominator
+      carries the very $\tfrac h2$ inside the sine. The quotient cleans up to
+      $\cos(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
+      {show result} Look at what we have: a product of two factors. The first
+      slides to $\cos x$, provided cosine is continuous; the second is exactly
+      $\sin\theta$ over $\theta$ with $\theta=\tfrac h2$. So the whole derivative
+      hangs on just two facts -- continuity, and that fundamental limit. We
+      secure both now.
+    steps:
+      - { math: "\\sin A-\\sin B = 2\\cos\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}", reason: "sum-to-product" }
+      - { math: "\\sin(x+h)-\\sin x = 2\\cos\\!\\left(x+\\frac h2\\right)\\sin\\frac h2", reason: "$A=x+h,\\ B=x$" }
+      - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\frac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot\\tfrac h2$" }
+    result: { math: "\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x\\quad\\text{and}\\quad \\frac{\\sin(h/2)}{h/2}\\to 1", reason: "continuity + the limit" }
+
+  # 4 ------------------------------------------- divider: Stage 2 opener
+  - id: divider_squeeze
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 2"
+    title: "A Geometric Squeeze"
+    subtitle: "Trapping a ratio between two areas."
+    ref: doc:frag-sec-3-1
+    scaffold: { problem: "$\\tfrac12\\sin\\theta\\;\\le\\;\\tfrac12\\theta\\;\\le\\;\\tfrac12\\tan\\theta$" }
+    ghost: "2"
+    progress: { current: 2, total: 4 }
+    duration: 4.0
+
+  # 5 ----------------------------- Figure 3.1: nested areas on the unit circle (HOOK, L2)
+  - id: sector_inequality
+    kind: content
+    template: graph
+    mode: single
+    accent: definition
+    hook: "animations.ch03_trig_derivatives_hooks:sector_inequality"
+    source: "chapter3-print-standalone.html SS3.1 . Figure 3.1 (sector-inequality) + area prose"
+    title: "A Squeeze on the Unit Circle"
+    say: |
+      Here is that new tool. We compare three areas on a circle of radius one.
+      But first, one convenience that saves us half the work. Replacing $\theta$
+      by $-\theta$ flips the sign of both $\theta$ and $\sin\theta$, so the
+      ratio $\sin\theta/\theta$ is even -- whatever we learn for positive angles
+      holds for negative ones, so it is enough to chase $\theta$ down to zero
+      from the positive side. Now the geometry. On the unit circle, $A$ is at
+      $(1,0)$, $B$ is the point at angle $\theta$, and extending the radius to
+      the tangent at $A$ gives $C=(1,\tan\theta)$.
+      {show tri_inner} The inner triangle $OAB$ has base one and height
+      $\sin\theta$, so its area is one half $\sin\theta$.
+      {show sector} The sector $OAB$ is the fraction $\theta$ over $2\pi$ of the
+      disc -- area one half $\theta$.
+      {show tri_outer} And the outer triangle $OAC$ has height $\tan\theta$, so
+      its area is one half $\tan\theta$.
+      {show ineq} Each region sits inside the next, so the areas line up in
+      order: one half $\sin\theta$, then one half $\theta$, then one half
+      $\tan\theta$. The whole argument hangs on that one picture.
+    axes:
+      x_range: [-0.45, 1.4, 1]
+      y_range: [-0.35, 1.65, 1]
+      x_length: 5.4
+      y_length: 5.4
+    plots: []
+
+  # 6 --------------------------------- derivation: areas -> cos t <= sin t/t <= 1 (L2)
+  - id: squeeze_to_the_bound
+    kind: content
+    template: derivation
+    accent: definition
+    kicker: derivation
+    ref: md:squeeze_to_the_bound
+    covers: [clear_halves, divide_sin, bound, abs_bound]     # step.0/1 + result + check (all shown)
+    scaffold: { motive: "Turn the chain of areas into bounds on $\\sin\\theta/\\theta$." }
+    source: "chapter3-print-standalone.html SS3.1 . algebra after Figure 3.1 (inequality 1)"
+    title: "Trapping the Ratio"
+    say: |
+      Now turn that chain of areas into a statement about $\sin\theta/\theta$,
+      one careful step at a time.
+      {show step.0} Multiply through by $2$ to clear the halves:
+      $\sin\theta\le\theta\le\tan\theta$.
+      {show step.1} Divide every part by $\sin\theta$, positive here, and
+      rewrite $\tan\theta$ as $\sin\theta$ over $\cos\theta$ -- giving $1$ at
+      most $\theta$ over $\sin\theta$ at most $1$ over $\cos\theta$.
+      {show result} The middle is upside down, so take reciprocals of all three.
+      They are positive, and flipping positives reverses the inequalities, so
+      the chain turns around: $\cos\theta\le\sin\theta/\theta\le 1$, for $\theta$
+      between zero and $\tfrac\pi2$.
+      {show check} And pocket one more consequence: from $\sin\theta\le\theta$ we
+      also get zero at most $|\sin\theta|$ at most $|\theta|$ near zero -- a
+      bound we lean on twice in a moment.
+    steps:
+      - { math: "\\sin\\theta \\;\\le\\; \\theta \\;\\le\\; \\tan\\theta", reason: "multiply areas by $2$" }
+      - { math: "1 \\;\\le\\; \\frac{\\theta}{\\sin\\theta} \\;\\le\\; \\frac{1}{\\cos\\theta}", reason: "$\\div\\sin\\theta$, $\\tan=\\tfrac{\\sin}{\\cos}$" }
+    result: { math: "\\cos\\theta \\;\\le\\; \\frac{\\sin\\theta}{\\theta} \\;\\le\\; 1 \\qquad (0<\\theta<\\frac{\\pi}{2})", reason: "reciprocate -- reverses" }
+    check:  { math: "0 \\;\\le\\; \\lvert\\sin\\theta\\rvert \\;\\le\\; \\lvert\\theta\\rvert", reason: "kept for later" }
+
+  # 7 ------------------- Proposition 3.1 (part 1/2): statement + lim sin theta = 0
+  - id: continuity_statement_sin_limit
+    kind: content
+    template: theorem_proof
+    accent: proposition
+    label: "[ proposition ]"
+    part: { current: 1, total: 2 }
+    ref: md:continuity_statement_sin_limit
+    covers: [bound, squeeze, qed]     # proof.0/1 + qed; bound recaps squeeze_to_the_bound.abs_bound
+    scaffold: { motive: "The bound is the key to continuity — first prove $\\sin\\theta\\to 0$." }
+    source: "chapter3-print-standalone.html SS3.1 . Proposition 3.1 (statement) + Proof (sin theta -> 0)"
+    title: "Sine and Cosine Are Continuous"
+    say: |
+      That little bound does more than help with the limit -- it is the key to
+      continuity. And continuity here means something concrete: nudge the angle
+      a little, and sine and cosine move only a little; they never jump. We even
+      have the tool that says so -- on the unit circle the half-chord
+      $\sin\theta$ is always shorter than the arc $\theta$ above it, which is
+      just $|\sin\theta|\le|\theta|$ read geometrically.
+      {show statement} So here is the claim, made precise: $\sin x$ and $\cos x$
+      are continuous at every real $x_0$.
+      {show proof.0} Build it from the ground up. Since zero at most
+      $|\sin\theta|$ at most $|\theta|$, and $|\theta|$ itself goes to zero,
+      {show proof.1} the squeeze theorem forces $\sin\theta\to 0$.
+      {show qed} That single limit is the seed; the full continuity grows
+      straight out of it, which is what we do next.
+    statement: "$\\sin x,\\ \\cos x$ are continuous at every $x_0$."
+    proof:
+      - "$0\\le|\\sin\\theta|\\le|\\theta|$ (chord $\\le$ arc)"
+      - "$|\\theta|\\to 0$, squeeze $\\Rightarrow\\ \\sin\\theta\\to 0$"
+    qed: "$\\lim_{\\theta\\to 0}\\sin\\theta = 0$"
+
+  # 8 ------------------- Proposition 3.1 (part 2/2): sum-to-product argument -> continuity
+  - id: continuity_argument
+    kind: content
+    template: theorem_proof
+    accent: proposition
+    label: "[ proof, cont. ]"
+    part: { current: 2, total: 2 }
+    ref: md:continuity_argument
+    covers: [cos_identity, sin_identity, bound, qed]     # proof.0/1/2 + qed (all shown)
+    scaffold: { motive: "Turn $\\sin\\theta\\to 0$ into full continuity, everywhere." }
+    source: "chapter3-print-standalone.html SS3.1 . Proposition 3.1 . Proof (sum-to-product bound + squeeze)"
+    title: "Sine and Cosine Are Continuous"
+    say: |
+      {show statement} Now turn that seed into full continuity. Fix a point
+      $x_0$, and ask how much $\cos x$ and $\sin x$ can change as $x$ moves
+      toward it.
+      {show proof.0} Sum-to-product answers both at once. For cosine,
+      $\cos x-\cos x_0$ is $-2\sin\tfrac{x-x_0}{2}\sin\tfrac{x+x_0}{2}$;
+      {show proof.1} and for sine, $\sin x-\sin x_0$ is
+      $2\cos\tfrac{x+x_0}{2}\sin\tfrac{x-x_0}{2}$. In each, the half-sum factor
+      never exceeds one in size.
+      {show proof.2} Drop it to its largest size, one, and both differences are
+      bounded by the same thing -- twice $|\sin\tfrac{x-x_0}{2}|$.
+      {show qed} Now let $x\to x_0$: the half-angle goes to zero, so that bound
+      collapses to zero. Squeeze one last time, and $\cos x\to\cos x_0$,
+      $\sin x\to\sin x_0$ -- both continuous everywhere.
+    statement: "Fix $x_0$: how far can $\\cos x,\\ \\sin x$ move?"
+    proof:
+      - "$\\cos x-\\cos x_0=-2\\sin\\frac{x-x_0}{2}\\,\\sin\\frac{x+x_0}{2}$"
+      - "$\\sin x-\\sin x_0=\\phantom{-}2\\cos\\frac{x+x_0}{2}\\,\\sin\\frac{x-x_0}{2}$"
+      - "$|\\cos x-\\cos x_0|,\\ |\\sin x-\\sin x_0|\\le 2|\\sin\\frac{x-x_0}{2}|$"
+    qed: "$x\\to x_0\\ \\Rightarrow\\ \\cos x\\to\\cos x_0,\\ \\sin x\\to\\sin x_0$"
+
+  # 9 --------------------------- Proposition 3.2 + Proof: the fundamental limit = 1 (L2)
+  - id: fundamental_limit
+    kind: content
+    template: theorem_proof
+    accent: proposition
+    label: "[ proposition ]"
+    ref: md:fundamental_limit
+    covers: [bound, squeeze, qed]     # proof.0/1 + qed; bound recaps squeeze_to_the_bound.bound (ineq (1))
+    scaffold: { motive: "Close the limit $\\sin\\theta/\\theta\\to 1$ the whole section is built on." }
+    source: "chapter3-print-standalone.html SS3.1 . Proposition 3.2 + Proof"
+    title: "The Fundamental Limit"
+    say: |
+      Now we can finally close the limit that started all of this.
+      {show statement} The claim is as clean as it gets: $\sin\theta$ over
+      $\theta$ tends to one as $\theta\to 0$.
+      {show proof.0} And we already built the trap. For $\theta$ between zero and
+      $\tfrac\pi2$, the ratio is pinned between a floor and a ceiling:
+      $\cos\theta\le\sin\theta/\theta\le 1$.
+      {show proof.1} The ceiling is the constant one. The floor is $\cos\theta$,
+      which tends to one now that we know cosine is continuous -- so the squeeze
+      pins the ratio to one from the right.
+      {show qed} And because the ratio is even, its left limit matches its right,
+      so the two-sided limit is one as well. That is the keystone.
+    statement: "$\\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1$"
+    proof:
+      - "$\\cos\\theta\\le\\frac{\\sin\\theta}{\\theta}\\le 1\\quad(0<\\theta<\\frac{\\pi}{2})$"
+      - "$\\cos\\theta\\to 1\\ \\Rightarrow\\ \\frac{\\sin\\theta}{\\theta}\\to 1$"
+    qed: "even $\\Rightarrow$ two-sided limit $=1$"
+
+  # 10 ------------------------------------- Figure 3.2: the squeeze as a graph (stock)
+  - id: squeeze_graph
+    kind: content
+    template: graph
+    mode: single
+    accent: definition
+    ref: md:squeeze_graph
+    source: "chapter3-print-standalone.html SS3.1 . Figure 3.2 (squeeze-limit)"
+    title: "The Squeeze, Drawn"
+    say: |
+      It helps to picture that squeeze.
+      {show plot.0} Here runs $\cos\theta$, the dashed floor.
+      {show plot.1} And the ceiling -- the constant line at height one.
+      {show plot.2} Between them, the ratio $\sin\theta$ over $\theta$, caught in
+      the narrowing gap. As $\theta$ slides toward zero the floor rises to one
+      and the ceiling already is one, so the curve is squeezed right to one.
+      {show plot.3} Notice the open circle at $\theta=0$: the ratio is undefined
+      there, zero over zero.
+      {show annotation.0} So what equals one is the limit -- the height the curve
+      is forced toward, not a value it ever takes.
+    axes:
+      x_range: [-1.5, 1.5, 0.5]
+      y_range: [0, 1.18, 0.5]
+      y_ticks: [{ at: 1, label: "$1$" }]
+      x_length: 6.4
+      y_length: 3.6
+    plots:
+      - { kind: function, expression: "cos(x)", x_range: [-1.5, 1.5], color_role: muted, dashed: true, label: "$\\cos\\theta$", reveal: true }
+      - { kind: line, start: [-1.5, 1], end: [1.5, 1], color_role: secondary, label: "$1$", label_point: [1.25, 1.08], reveal: true }
+      - { kind: function, expression: "sin(x)/x", x_range: [-1.5, 1.5], color_role: accent, label: "$\\dfrac{\\sin\\theta}{\\theta}$", label_point: [0.95, 0.86], reveal: true }
+      - { kind: point, point: [0, 1], hollow: true, hollow_reason: "ratio undefined at theta=0 (0/0)", color_role: accent, reveal: true }
+    annotations:
+      - "Trapped between $\\cos\\theta$ and $1$, the ratio is forced to $1$ -- undefined at $\\theta=0$."
+
+  # 11 --------------------------------------- Caution: a limit, not an identity
+  - id: limit_not_identity
+    kind: content
+    template: callout
+    type: caution
+    ref: md:limit_not_identity
+    source: "chapter3-print-standalone.html SS3.1 . Caution (limit not identity)"
+    title: "A Limit, Not an Identity"
+    say: |
+      One caution, because this result is easy to over-read.
+      {show body} The statement is about the limit as $\theta\to 0$ -- not an
+      identity. At a fixed angle the ratio is generally not one: at
+      $\theta=\tfrac\pi2$ it is two over $\pi$, about $0.64$, and at $\theta=\pi$
+      it is zero. The value one is reached only in the limit.
+    body: "The limit as $\\theta\\to 0$ is not an identity. At a fixed angle, $\\dfrac{\\sin\\theta}{\\theta}$ is generally not $1$: at $\\theta=\\tfrac{\\pi}{2}$ it is $\\dfrac{2}{\\pi}\\approx 0.64$, and at $\\theta=\\pi$ it is $0$."
+
+  # 12 -------------------------------------------- Caution: radians are essential
+  - id: radians_essential
+    kind: content
+    template: callout
+    type: caution
+    ref: md:radians_essential
+    source: "chapter3-print-standalone.html SS3.1 . Caution (radian convention)"
+    title: "Why Radians"
+    say: |
+      A second caution, and this one is structural.
+      {show body} Everything here depends on radians. The sector area one half
+      $\theta$ -- and with it the limit -- uses radian measure. Switch to degrees
+      and the limit is $\pi$ over $180$, not one, so the derivative drags that
+      factor along. The clean formulas $\sin'=\cos$ and $\cos'=-\sin$ hold only
+      in radians.
+    body: "Everything here needs radians. In degrees, $\\displaystyle\\lim_{x\\to 0}\\frac{\\sin(x^{\\circ})}{x}=\\frac{\\pi}{180}$, so $\\dfrac{d}{dx}\\sin(x^{\\circ})=\\dfrac{\\pi}{180}\\cos(x^{\\circ})$ --- the clean $\\sin'=\\cos$ holds only in radians."
+
+  # 13 ----------------------------------------- divider: Stage 3 opener
+  - id: divider_derivatives
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 3"
+    title: "The Two Derivatives"
+    subtitle: "Assembling the pieces."
+    ref: doc:frag-sec-3-1
+    scaffold: { problem: "$\\dfrac{d}{dx}\\sin x=\\;?\\qquad\\dfrac{d}{dx}\\cos x=\\;?$" }
+    ghost: "3"
+    progress: { current: 3, total: 4 }
+    duration: 4.0
+
+  # 14 ------------- Theorem 3.1 + Proof: definition -> reduced -> limit -> cos x
+  # Merged to ONE page (2026-07-02, user call): after the theorem_proof redesign the
+  # statement sits in the top-right rail, so 3 proof lines + qed fit a single page --
+  # the earlier 2-page split was a pre-redesign capacity artifact. covers union and
+  # md ref unchanged; non-part theorem_proof + motive matches fundamental_limit.
+  - id: derivative_of_sine
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    ref: md:derivative_of_sine
+    covers: [def, reduced, limits, qed]
+    scaffold: { motive: "Cash in continuity and the limit — sine's derivative falls out." }
+    source: "chapter3-print-standalone.html SS3.1 . Theorem 3.1 + Proof"
+    title: "The Derivative of Sine"
+    say: |
+      Now the payoff, and it falls into our hands.
+      {show statement} The claim: the derivative of $\sin x$ is $\cos x$, for
+      every real $x$.
+      {show proof.0} Start from the definition -- the derivative is the limit
+      of the difference quotient.
+      {show proof.1} But we already did the hard algebra: that quotient is
+      $\cos(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
+      {show proof.2} Let $h\to 0$: the first factor tends to $\cos x$ by
+      continuity, the second to one by the fundamental limit.
+      {show qed} A continuous thing times a limit -- the product is $\cos x$
+      times one, just $\cos x$.
+    statement: "$\\frac{d}{dx}\\sin x = \\cos x$"
+    proof:
+      - "$\\frac{d}{dx}\\sin x=\\lim_{h\\to 0}\\frac{\\sin(x+h)-\\sin x}{h}$"
+      - "$=\\lim_{h\\to 0}\\cos\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
+      - "$\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
+    qed: "$\\Rightarrow\\ \\cos x\\cdot 1=\\cos x$"
+
+  # 15 ------------- Theorem 3.2 + Proof: companion identity -> divided -> limit -> -sin x
+  # Merged to ONE page (2026-07-02, user call), same rationale as sine (see above).
+  - id: derivative_of_cosine
+    kind: content
+    template: theorem_proof
+    accent: theorem
+    ref: md:derivative_of_cosine
+    covers: [companion_identity, divide, limits, qed]
+    scaffold: { motive: "Same machinery, companion identity — now cosine." }
+    source: "chapter3-print-standalone.html SS3.1 . Theorem 3.2 + Proof"
+    title: "The Derivative of Cosine"
+    say: |
+      Cosine falls to the very same machinery -- only the identity changes, so
+      we go quickly.
+      {show statement} The claim: the derivative of $\cos x$ is $-\sin x$.
+      {show proof.0} This time use the companion sum-to-product formula.
+      {show proof.1} The same division by $h$ turns the difference quotient into
+      $-\sin(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
+      {show proof.2} Send $h$ to zero: the sine factor tends to $\sin x$ by
+      continuity, the second to one by the fundamental limit.
+      {show qed} The leading minus sign comes along -- leaving $-\sin x$. Same
+      two tools, one extra minus sign.
+    statement: "$\\frac{d}{dx}\\cos x = -\\sin x$"
+    proof:
+      - "$\\cos A-\\cos B=-2\\sin\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}$"
+      - "$\\frac{\\cos(x+h)-\\cos x}{h}=-\\sin\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
+      - "$-\\sin\\!\\left(x+\\frac h2\\right)\\to-\\sin x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
+    qed: "$\\Rightarrow\\ -\\sin x\\cdot 1=-\\sin x$"
+
+  # 16 ----------------------------- Figure 3.3: slope of sine = height of cosine (HOOK)
+  - id: slope_equals_height
+    kind: content
+    template: graph
+    mode: single
+    accent: definition
+    hook: "animations.ch03_trig_derivatives_hooks:slope_equals_height"
+    source: "chapter3-print-standalone.html SS3.1 . Figure 3.3 (sin-cos-slope)"
+    title: "Slope Equals Height"
+    say: |
+      Here is what that theorem looks like on the graph.
+      {show plot.0} Draw $y=\sin x$, and check the slope of its tangent at a few
+      points.
+      {show tan_0} At $x=0$ it is climbing at slope one.
+      {show tan_halfpi} At $x=\tfrac\pi2$, the top of the hump, the tangent is
+      flat -- slope zero.
+      {show tan_pi} At $x=\pi$ it is falling at slope minus one.
+      {show plot.1} Now lay $y=\cos x$ on top,
+      {show cos_dots} and read its heights at those same points: one, zero,
+      minus one. They match exactly -- the slope of sine is the height of
+      cosine, the theorem drawn.
+    axes:
+      x_range: [-0.25, 3.45, 1]
+      y_range: [-1.35, 1.35, 1]
+      x_length: 7.2
+      y_length: 4.0
+    plots:
+      - { kind: function, expression: "sin(x)", x_range: [0, 3.3], color_role: accent, label: "$y=\\sin x$", label_point: [1.4, 1.12], reveal: true }
+      - { kind: function, expression: "cos(x)", x_range: [0, 3.3], color_role: muted, dashed: true, label: "$y=\\cos x$", label_point: [2.95, 1.05], reveal: true }
+
+  # 17 -------------------------------------- Remark 3.1: the four-step derivative cycle
+  - id: derivative_cycle
+    kind: content
+    template: definition_math
+    accent: remark
+    scene_role: remark              # Remark 3.1 -> [ remark ] (was mislabelled [ proposition ])
+    ref: md:derivative_cycle
+    scaffold: { motive: "Step back: what pattern do these two derivatives make together?" }
+    source: "chapter3-print-standalone.html SS3.1 . Remark 3.1 (derivative cycle)"
+    title: "The Derivative Cycle"
+    say: |
+      Step back and watch the pattern these two derivatives make.
+      {show statement} Differentiation sends sine and cosine into each other,
+      with a minus sign that turns over every second step.
+      {show math.0} Writing an arrow for one derivative: $\sin x$ to $\cos x$ to
+      $-\sin x$ to $-\cos x$, and back to $\sin x$.
+      {show math.1} Four derivatives and you are home -- the fourth derivative of
+      sine is sine again. Where $e^x$ reproduces itself in a single step, these
+      do it in a cycle of four: the self-renewal that lets them oscillate forever
+      without winding down.
+    statement: "Differentiation cycles sine and cosine, with a sign flip every second step."
+    math:
+      - { tex: "$\\sin x \\;\\to\\; \\cos x \\;\\to\\; -\\sin x \\;\\to\\; -\\cos x \\;\\to\\; \\sin x$", anim: highlight }
+      - "$\\dfrac{d^{4}}{dx^{4}}\\sin x = \\sin x \\qquad\\text{vs.}\\qquad \\dfrac{d}{dx}e^{x}=e^{x}$"
+
+  # 18 ----------------------------------------- divider: Stage 4 opener
+  - id: divider_apply
+    kind: divider
+    accent: definition
+    eyebrow: "Stage 4"
+    title: "Consequences and Applications"
+    subtitle: "From the cycle to oscillation."
+    ref: doc:frag-sec-3-1
+    scaffold: { problem: "$\\dfrac{d}{dx}\\,\\tan x,\\ \\sec x,\\ \\cot x,\\ \\csc x=\\;?$" }
+    ghost: "4"
+    progress: { current: 4, total: 4 }
+    duration: 4.0
+
+  # 19 -------------------------------- Example 3.1: the companion limit (1-cos t)/t -> 0
+  - id: companion_limit
+    kind: content
+    template: derivation
+    accent: example
+    ref: md:companion_limit
+    covers: [conjugate, split, evaluate]     # step.0/1 + result (all shown)
+    scaffold: { motive: "Bank a companion limit: $(1-\\cos\\theta)/\\theta\\to 0$." }
+    source: "chapter3-print-standalone.html SS3.1 . Example 3.1 (companion limit)"
+    title: "A Companion Limit"
+    prompt: "Establish the companion limit $\\lim_{\\theta\\to 0}\\dfrac{1-\\cos\\theta}{\\theta}=0$."
+    say: |
+      The fundamental limit has a companion worth knowing: $(1-\cos\theta)$ over
+      $\theta$ tends to zero. It is again zero over zero, so we need a way in.
+      {show step.0} Multiply top and bottom by the conjugate $1+\cos\theta$; the
+      numerator becomes a difference of squares, $1-\cos^2\theta$.
+      {show step.1} And $1-\cos^2\theta$ is just $\sin^2\theta$, so the whole
+      thing splits into $\sin\theta$ over $\theta$ times $\sin\theta$ over
+      $1+\cos\theta$.
+      {show result} Let $\theta\to 0$: the first factor goes to one, the second
+      to zero over two. One times zero is zero.
+    steps:
+      - { math: "\\frac{1-\\cos\\theta}{\\theta} = \\frac{(1-\\cos\\theta)(1+\\cos\\theta)}{\\theta\\,(1+\\cos\\theta)} = \\frac{1-\\cos^{2}\\theta}{\\theta\\,(1+\\cos\\theta)}", reason: "multiply by $1+\\cos\\theta$" }
+      - { math: "= \\frac{\\sin^{2}\\theta}{\\theta\\,(1+\\cos\\theta)} = \\frac{\\sin\\theta}{\\theta}\\cdot\\frac{\\sin\\theta}{1+\\cos\\theta}", reason: "$1-\\cos^{2}\\theta=\\sin^{2}\\theta$" }
+    result: { math: "\\longrightarrow\\ 1\\cdot\\frac{0}{1+1} = 0", reason: "the limit, then continuity" }
+
+  # 20a ------------------- Example 3.2 (part 1/2): tan' and sec' via the quotient rule
+  - id: all_six_tan_sec
+    kind: content
+    template: derivation
+    accent: example
+    part: { current: 1, total: 2 }
+    ref: md:all_six_trig_derivatives
+    covers: [tan_quotient, tan_result, sec_setup, sec_result]     # step.0/1/2 + result
+    scaffold: { motive: "From $\\sin,\\cos$, the quotient rule gives the other four." }
+    source: "chapter3-print-standalone.html SS3.1 . Example 3.2 (tan', sec')"
+    title: "All Six Derivatives"
+    prompt: "Differentiate $\\tan x$ and $\\sec x$."
+    say: |
+      With sine and cosine in hand, the other four cost almost nothing -- just
+      the quotient rule.
+      {show step.0} Take $\tan x=\sin x$ over $\cos x$. The quotient rule gives
+      this.
+      {show step.1} The numerator is $\cos^2 x+\sin^2 x$, which is one -- so the
+      derivative of $\tan x$ is $\sec^2 x$.
+      {show step.2} Secant is the same idea on $1$ over $\cos x$: the quotient
+      rule, with a constant on top, gives this.
+      {show result} Clean it up, and secant's derivative is $\sec x\tan x$.
+    steps:
+      - { math: "\\frac{d}{dx}\\tan x = \\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{\\sin x}{\\cos x}$ ($\\cos x\\neq 0$)" }
+      - { math: "= \\frac{\\cos^{2} x+\\sin^{2} x}{\\cos^{2} x} = \\frac{1}{\\cos^{2} x} = \\sec^{2} x", reason: "Pythagorean identity" }
+      - { math: "\\frac{d}{dx}\\sec x = \\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{1}{\\cos x}$" }
+    result: { math: "= \\frac{\\sin x}{\\cos^{2} x} = \\sec x\\tan x" }
+
+  # 20b ------------------- Example 3.2 (part 2/2): cot' and csc' -- the same move
+  - id: all_six_cot_csc
+    kind: content
+    template: derivation
+    accent: example
+    part: { current: 2, total: 2 }
+    ref: md:all_six_trig_derivatives
+    covers: [cot_setup, cot_result, csc_setup, csc_result]     # step.0/1/2 + result
+    scaffold: { motive: "The same quotient rule finishes $\\cot x$ and $\\csc x$." }
+    source: "chapter3-print-standalone.html SS3.1 . Example 3.2 (cot', csc')"
+    title: "All Six Derivatives"
+    prompt: "And the same rule on $\\cot x$ and $\\csc x$."
+    say: |
+      The last two run exactly the same way.
+      {show step.0} Take $\cot x=\cos x$ over $\sin x$. The quotient rule gives
+      this.
+      {show step.1} The numerator is minus the quantity $\sin^2 x+\cos^2 x$,
+      again one -- so $\cot x$ differentiates to $-\csc^2 x$.
+      {show step.2} And $\csc x$ is $1$ over $\sin x$: the same rule lands this.
+      {show result} Cleaned up, that is $-\csc x\cot x$ -- and all six are done,
+      every one built on $\sin'=\cos$ and $\cos'=-\sin$.
+    steps:
+      - { math: "\\frac{d}{dx}\\cot x = \\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}", reason: "quotient rule on $\\tfrac{\\cos x}{\\sin x}$ ($\\sin x\\neq 0$)" }
+      - { math: "= \\frac{-(\\sin^{2} x+\\cos^{2} x)}{\\sin^{2} x} = -\\frac{1}{\\sin^{2} x} = -\\csc^{2} x", reason: "Pythagorean identity" }
+      - { math: "\\frac{d}{dx}\\csc x = \\frac{0\\cdot\\sin x-1\\cdot\\cos x}{\\sin^{2} x}", reason: "quotient rule on $\\tfrac{1}{\\sin x}$" }
+    result: { math: "= -\\frac{\\cos x}{\\sin^{2} x} = -\\csc x\\cot x" }
+
+  # 21 ------------------------------- Example 3.3: simple harmonic motion (s'' = -s)
+  - id: shm_compute
+    kind: content
+    template: derivation
+    accent: example
+    ref: md:shm_compute
+    covers: [height, velocity, acceleration, shm]     # step.0/1/2 + result (all shown)
+    scaffold: { motive: "Put the new derivatives to work: a weight on a spring." }
+    source: "chapter3-print-standalone.html SS3.1 . Example 3.3 (simple harmonic motion)"
+    title: "A Weight on a Spring"
+    prompt: "A weight on a spring has height $s(t)=\\sin t$. Find the velocity $s'(t)$ and acceleration $s''(t)$, and relate the acceleration to the height."
+    say: |
+      Let us put the new derivatives to work on something moving.
+      {show step.0} A weight on a spring has height $s(t)=\sin t$.
+      {show step.1} Velocity is its derivative, $s'(t)=\cos t$.
+      {show step.2} Acceleration is the next derivative, $s''(t)=-\sin t$.
+      {show result} But $-\sin t$ is just $-s(t)$ -- at every instant the weight
+      is pushed back toward rest. That relation, $s''=-s$, is the signature of
+      simple harmonic motion; sine and cosine are exactly the functions that
+      describe it.
+    steps:
+      - { math: "s(t) = \\sin t", reason: "height" }
+      - { math: "s'(t) = \\cos t", reason: "velocity" }
+      - { math: "s''(t) = -\\sin t", reason: "acceleration" }
+    result: { math: "s''(t) = -\\sin t = -\\,s(t)", reason: "simple harmonic motion" }
+
+  # 22 ------------------------- Figure 3.4: s/s'/s'' stacked over one time axis (HOOK)
+  - id: shm_stacked_graphs
+    kind: content
+    template: graph
+    mode: single
+    accent: example
+    hook: "animations.ch03_trig_derivatives_hooks:shm_stacked_graphs"
+    source: "chapter3-print-standalone.html SS3.1 . Figure 3.4 (shm-triple)"
+    title: "Height, Velocity, Acceleration"
+    say: |
+      Stack the three graphs over one time axis and the relationship jumps out.
+      {show g_s} On top, the height $s=\sin t$.
+      {show g_v} In the middle, the velocity $s'=\cos t$.
+      {show g_a} On the bottom, the acceleration $s''=-\sin t$. Watch where the
+      height hits a peak or a trough -- there the velocity passes through zero,
+      because at the extremes the weight momentarily stops.
+      {show mirror} And hold the bottom graph against the top: it is the top one
+      flipped upside down. That is $s''=-s$, drawn -- the very picture of an
+      oscillation.
+    axes:
+      x_range: [0, 6.4, 1.5708]
+      y_range: [-1.2, 1.2, 1]
+      x_length: 7.0
+      y_length: 4.2
+    plots: []
+
+  # 23 -------------------------------- forward-ref: toward the chain rule (no section no.)
+  - id: toward_the_chain_rule
+    kind: content
+    template: definition_math
+    accent: definition
+    scene_role: forward-ref         # exposition beat -> chipless (not a definition)
+    ref: md:toward_the_chain_rule
+    scaffold: { motive: "We can do bare trig functions -- but not yet composed ones." }
+    source: "chapter3-print-standalone.html SS3.1 . closing prose (forward-ref to the chain rule)"
+    title: "Toward the Chain Rule"
+    say: |
+      We can now differentiate every trigonometric function -- but only in its
+      bare form.
+      {show statement} We can handle $\sin x$, yet not $\sin(x^2)$ or
+      $\sin(3x+1)$, where the angle is itself a function tucked inside.
+      {show math.0} To reach a function buried inside another, we need one more
+      rule -- a way to differentiate a composition. That is the chain rule, and
+      it is what comes next; with it, every derivative we found today becomes the
+      seed of a whole family more.
+    statement: "We can differentiate $\\sin x$ --- but not yet $\\sin(x^{2})$ or $\\sin(3x+1)$."
+    math:
+      - { tex: "$\\sin x\\ \\checkmark \\qquad \\sin(x^{2})\\ ? \\qquad \\sin(3x+1)\\ ?$", anim: highlight }
+
+  # 24 ------------------------------------------------------------- recap (Key Takeaways)
+  - id: recap
+    kind: content
+    template: recap_cards
+    accent: recap
+    ref: md:recap
+    refs: { points.0: md:recap, points.1: md:recap, points.2: md:recap, points.3: md:recap }
+    source: "chapter3-print-standalone.html SS3.1 . whole-section synthesis"
+    title: "Key Takeaways"
+    say: |
+      Pull the section together.
+      {show point.0} Everything grew from one limit: $\sin\theta$ over $\theta$
+      tends to one, cracked by squeezing areas on the unit circle.
+      {show point.1} That limit, with continuity, gave the two derivatives at the
+      heart of the section -- sine differentiates to cosine, cosine to negative
+      sine.
+      {show point.2} From those two, the quotient rule delivered all the other
+      trig derivatives -- tangent, cotangent, secant, cosecant.
+      {show point.3} And keep the cycle in mind -- four derivatives of sine or
+      cosine bring you home -- with the fine print that it all depends on
+      radians.
+    points:
+      - "Fundamental limit: $\\displaystyle\\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1$, proved by squeezing areas on the unit circle."
+      - "Two core derivatives: $\\sin'=\\cos$ and $\\cos'=-\\sin$."
+      - "The quotient rule delivers all six trig derivatives: $\\tan,\\cot,\\sec,\\csc$."
+      - "Derivatives of $\\sin$ and $\\cos$ cycle with period four; the entire framework requires radians."
+
+  # 25 ------------------------------------------------------------------------- outro
+  - id: outro
+    kind: outro
+    duration: 8.0
+    next_section: "3.2"
+    next_title: "The Chain Rule"
+
+
+ succeeded in 472ms:
+# §3.1 Derivatives of Sine and Cosine — 影片內容稿（content script）
+
+> **產線：** 講義 → 影片，gen-2。Chapter 3 第一節，從 HTML 講義逐節重跑。
+> **權威來源：** [`../../handout/fragments/ch03/sec-3-1.html`](../../handout/fragments/ch03/sec-3-1.html)（建置版 `handout/chapter3-print-standalone.html` §3.1）。
+> **這是什麼：** 純內容中間產物（source of truth）。格式見 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) §6——只含 `id`／`source`／`learning_goal`／`kind`／`narration`／`visual_need`／`animation_cue`，**不含**任何工程欄位（template／`{show}`／accent／payload／divider）。工程是第二階段的事。
+> **階段：** **LOCKED（detail-redo，2026-06-29 使用者 sign-off；`CONTENT_APPROVED=yes`）**——使用者裁決「影片講解最大詳細、少省略；選材可少但講解要清楚」，全節重拆旁白＋visual_need（第1檔忠實全展開為基準＋4 樞紐加第2檔直覺鷹架），continuity 拆 2 單元、把畫面承載步驟（和差化積來源、`lim_{h→0}` setup、sec′ 步驟）補上。**取代前一次 LOCK**（2026-06-28 sign-off 的壓縮版，git 留存）。本輪六鏡（blocking==0、6 鏡 clean、L5 盲算 11 組 match）＋copyedit（7 tighten 全採納）＋使用者 sign-off 已完成 → LOCKED；後續忠實性由 NFA 把關，post-lock 改稿須對動到單元跑 scoped NFA 回歸（§8）。規格／計畫見 [`_audit/SPEC-ch03-s31-detail-redo.md`](_audit/SPEC-ch03-s31-detail-redo.md)／[`_audit/PLAN-ch03-s31-detail-redo.md`](_audit/PLAN-ch03-s31-detail-redo.md)。narration 認可在編譯出的 `_narration.html` 上進行；本 `.md` 為權威，兩者 MUST 一致。
+
+---
+
+## meta（intro/outro 定位資訊）
+
+- `id`: ch03_trig_derivatives
+- `section`: 3.1
+- `title`: Derivatives of Sine and Cosine
+- `chapter`: Chapter 3
+- `chapter_title`: Chain Rule and Trigonometric Derivatives
+- `tagline`（intro 引導問題）: How fast does sine change?
+- 章內節次（intro 章節地圖用）：
+  - 3.1 Derivatives of the Sine and Cosine Functions ← 本節
+  - 3.2 The Chain Rule
+  - 3.3 Applications of the Chain Rule
+
+> intro 與 outro 為純動畫、**無 narration**（gen-2 first-class）。Key Takeaways 在 `recap` 教學單元（有旁白），不在 outro。Stage divider（章內分段開場）是第二階段 storyboard 的結構元素，**不在本內容稿**。
+
+---
+
+## 教學單元（依教學自由重排；忠實仍可逐單元回溯講義）
+
+---
+
+### unit: intro
+
+```
+id: intro
+source: chapter3-print-standalone.html §3.1（Section Gate；定位資訊見上方 meta）
+learning_goal: 知道本節在章內的位置，並帶著「sine 變化得多快」這個問題進入。
+kind: motivation
+narration: （無——intro 為純動畫）
+visual_need: Section Gate——Chapter 3 章節地圖 → 聚焦 3.1 → logo／節號／標題／tagline 字卡 → 暗場交接。
+animation_cue: （由 intro 模板處理，內容稿不指定）
+```
+
+---
+
+### unit: why_trig_is_different
+
+```
+id: why_trig_is_different
+source: chapter3-print-standalone.html §3.1 · 開節散文（expansion:intuition，"So far every derivative has yielded to algebra … funnels down to a single limit"）+ "angles are measured in radians" 預告句
+learning_goal: 看出三角函數的導數卡在一個代數攻不下的 0/0 極限 sinθ/θ，需要全新的幾何工具。
+kind: motivation
+narration: |
+  Every derivative so far has yielded to algebra. For a polynomial we
+  expanded $(x+h)^n$ and the binomial theorem handed us a factor of $h$ to
+  cancel; for $e^x$ the power series did the same job. The trigonometric
+  functions refuse to play along. Write down the difference quotient for
+  $\sin x$ — $\dfrac{\sin(x+h)-\sin x}{h}$ — and try the usual move. You
+  cannot simply set $h=0$: that gives $\dfrac{0}{0}$, which tells you
+  nothing. And no identity cancels the $h$ in the denominator —
+  $\sin(x+h)$ simply does not break into pieces that conveniently subtract.
+  As we
+  are about to see, the whole computation funnels down to a single limit,
+  $\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}$ — again the indeterminate
+  form zero over zero, and one that no algebra will crack. Prying it open
+  takes a genuinely new tool: a geometric comparison of areas on the unit
+  circle. And once we secure that one limit, it unlocks the derivatives of
+  both sine and cosine at once. One ground rule, though: throughout, angles
+  are measured in radians — an assumption that turns out to be essential.
+visual_need: |
+  逐步顯示（每步一個 reveal）：
+   1. 差分商 $\dfrac{\sin(x+h)-\sin x}{h}$。
+   2. 天真代入 $h=0$ → $\dfrac{0}{0}$（標「indeterminate — 無資訊」）。
+   3. funnel 指向目標極限 $\displaystyle\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}$（標 0/0、no algebra）。
+  收尾標籤：tool = 單位圓面積比較；ground rule = radians。
+animation_cue: （無——靜態即可；funnel 的視覺收斂交給後續單元）
+```
+
+---
+
+### unit: difference_quotient_for_sine
+
+```
+id: difference_quotient_for_sine
+source: chapter3-print-standalone.html §3.1 · "The difference quotient for sine" 子節（sum-to-product 化簡 → cos(x+h/2)·sin(h/2)/(h/2)）
+learning_goal: 把 sine 的差分商化成「一個會趨近 cos x 的因子 × 一個基本極限因子」，看出整個導數靠哪兩件事。
+kind: derivation
+narration: |
+  So let us transform that difference quotient instead of fighting it
+  head-on. The decisive step is one trigonometric identity — sum-to-product —
+  which turns a difference of sines into a product:
+  $\sin A-\sin B=2\cos\frac{A+B}{2}\sin\frac{A-B}{2}$. A product is exactly
+  what we want, because we can pull it apart and take limits one factor at
+  a time. Put $A=x+h$ and $B=x$. The numerator becomes
+  $2\cos\!\left(x+\frac h2\right)\sin\frac h2$. Now divide by $h$ — and here
+  is the small trick that makes everything line up: write $h$ as
+  $2\cdot\frac h2$, so the denominator carries the very $\frac h2$ that sits
+  inside the sine. The quotient cleans up to
+  $\cos\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. Look at what we
+  have now: a product of two factors, and as $h\to 0$ each one moves on its
+  own. The first factor, $\cos\!\left(x+\frac h2\right)$, should slide to
+  $\cos x$ — provided cosine is continuous. The second factor is exactly
+  $\dfrac{\sin\theta}{\theta}$ in disguise, with $\theta=\frac h2$ shrinking
+  to zero. So the entire derivative now hangs on just two facts: that sine
+  and cosine are continuous, and the value of that one fundamental limit. We
+  secure both, in that order, and then come straight back to finish.
+visual_need: |
+  推導鏈，逐行 reveal（每行一個 step）：
+   1. 恆等式 $\sin A-\sin B=2\cos\tfrac{A+B}{2}\sin\tfrac{A-B}{2}$（理由：sum-to-product）。
+   2. 代入 $A=x+h,\ B=x$：$\sin(x+h)-\sin x=2\cos(x+\tfrac h2)\sin\tfrac h2$。
+   3. 除以 $h=2\cdot\tfrac h2$：$\dfrac{\sin(x+h)-\sin x}{h}=\cos(x+\tfrac h2)\cdot\dfrac{\sin(h/2)}{h/2}$。
+   4. 兩因子標去向：$\cos(x+\tfrac h2)\xrightarrow{\,h\to0\,}\cos x$（需「連續」）；$\dfrac{\sin(h/2)}{h/2}\xrightarrow{\,h\to0\,}?$（即 $\dfrac{\sin\theta}{\theta}$，需「基本極限」）。
+  收尾標籤：整個導數 = 兩因子的乘積 → 靠「連續」＋「基本極限」兩件事。
+animation_cue: （無——靜態推導鏈即可；兩因子去向用引線/同色標記）
+screen_contract: |
+  required_steps:
+    - id: identity
+      tex: '\sin A-\sin B=2\cos\frac{A+B}{2}\sin\frac{A-B}{2}'
+      reason: 'sum-to-product'
+    - id: substitute
+      tex: '\sin(x+h)-\sin x=2\cos(x+\tfrac h2)\sin\tfrac h2'
+      reason: 'A=x+h, B=x'
+    - id: divide
+      tex: '\frac{\sin(x+h)-\sin x}{h}=\cos(x+\tfrac h2)\frac{\sin(h/2)}{h/2}'
+      reason: 'write h=2*(h/2)'
+    - id: factors
+      tex: '\cos(x+\tfrac h2)\to\cos x;\ \frac{\sin(h/2)}{h/2}\to1'
+      reason: 'continuity + fundamental limit'
+```
+
+---
+
+### unit: sector_inequality
+
+```
+id: sector_inequality
+source: chapter3-print-standalone.html §3.1 · "A geometric inequality on the unit circle" 散文（含偶函數論證）+ Figure 3.1（data-fig: sector-inequality）
+learning_goal: 在單位圓上用三塊嵌套面積，幾何地夾出 sinθ ≤ θ ≤ tanθ。
+kind: visual
+narration: |
+  Here is that new tool. We compare three areas on a circle of radius one.
+  But first, one convenience that saves us half the work. Replacing $\theta$
+  by $-\theta$ flips the sign of both $\theta$ and $\sin\theta$, so their
+  ratio $\sin\theta/\theta$ is left unchanged — it is an even function. That
+  means whatever we learn for positive angles holds for negative ones, so it
+  is enough to chase $\theta$ down to zero from the positive side. Now the
+  geometry. On the unit circle, put $A$ at $(1,0)$ and let $B$ be the point at
+  angle $\theta$, so $B=(\cos\theta,\sin\theta)$. Extend the radius until it
+  meets the vertical tangent line at $A$, and call that meeting point
+  $C=(1,\tan\theta)$. Three regions now nest one inside the next, and each
+  area is easy to read off. The inner triangle $OAB$ has base one and height
+  $\sin\theta$, so its area is $\frac12\sin\theta$. The circular sector $OAB$
+  is the fraction $\theta$ over $2\pi$ of the whole disc, which comes out to
+  $\frac12\theta$. And the outer triangle $OAC$ has base one and height
+  $\tan\theta$, so its area is $\frac12\tan\theta$. Because each region sits
+  strictly inside the next, their areas must line up in the same order:
+  $\frac12\sin\theta \le \frac12\theta \le \frac12\tan\theta$. The whole
+  argument hangs on that one picture — a triangle inside a sector inside a
+  triangle.
+visual_need: |
+  單位圓（半徑 1），A=(1,0)、B=(cosθ,sinθ)、C=(1,tanθ)、射線 OB 延伸交切線於 C；
+  三塊嵌套區域：內接 △OAB、扇形 OAB、外切 △OAC，各標面積 ½sinθ／½θ／½tanθ；
+  逐塊高亮（內→中→外）以「一個包一個」成立；浮出 $\tfrac12\sin\theta \le \tfrac12\theta \le \tfrac12\tan\theta$；
+  旁標偶函數一句記號 $\sin(-\theta)/(-\theta)=\sin\theta/\theta$（只看 θ>0）。
+animation_cue: |
+  建議動畫：先畫單位圓與 A。掃出角 θ 標出 B，延伸 OB 交切線得 C。依序高亮
+  並標面積——內接三角形（½sinθ）→ 扇形（½θ）→ 外切三角形（½tanθ），讓「一個包
+  一個」在視覺上逐層成立，最後浮出三者面積的不等式。θ 可從中等角緩緩縮小，
+  預告後續要把它推向 0。
+```
+
+---
+
+### unit: squeeze_to_the_bound
+
+```
+id: squeeze_to_the_bound
+source: chapter3-print-standalone.html §3.1 · Fig 3.1 後代數（×2、÷sinθ、取倒數翻向 → 式(1)）+ "0 ≤ |sinθ| ≤ |θ|" 附帶界
+learning_goal: 把三塊面積的不等式代數地整理成 cosθ ≤ sinθ/θ ≤ 1，並收下 |sinθ|≤|θ| 這個附帶界。
+kind: derivation
+narration: |
+  Now turn that chain of areas into a statement about $\sin\theta/\theta$,
+  one careful step at a time. Start by multiplying through by $2$ to clear the
+  halves: $\sin\theta \le \theta \le \tan\theta$. Next, divide every part by
+  $\sin\theta$, which is positive for these angles, and rewrite $\tan\theta$
+  as $\sin\theta/\cos\theta$; that gives
+  $1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}$. We are close,
+  but the middle is upside down — it has $\theta$ over $\sin\theta$, and we
+  want $\sin\theta$ over $\theta$. So take reciprocals of all three parts. They
+  are all positive, and flipping positive quantities reverses the inequalities,
+  so the chain turns around and we land exactly on the bound we were after:
+  $\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$, for $\theta$ between zero
+  and $\frac\pi2$. One more thing worth pocketing before we move on: the very
+  first inequality, $\sin\theta \le \theta$, also gives
+  $0 \le |\sin\theta| \le |\theta|$ near zero — a small bound we will lean on
+  twice in just a moment.
+visual_need: |
+  推導鏈，逐行 reveal（每行附理由）：
+   1. $\sin\theta\le\theta\le\tan\theta$（理由：面積 ×2）。
+   2. $1\le\dfrac{\theta}{\sin\theta}\le\dfrac{1}{\cos\theta}$（理由：÷sinθ>0、$\tan=\tfrac{\sin}{\cos}$）。
+   3. $\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$（理由：取倒數→翻向；限 $0<\theta<\tfrac\pi2$）—— 標為「式 (1)」。
+  附帶界（另起一行、標「keep for later」）：$0\le|\sin\theta|\le|\theta|$。
+animation_cue: （無——靜態推導鏈即可；翻向那步可短暫強調不等號方向反轉）
+screen_contract: |
+  required_steps:
+    - id: clear_halves
+      tex: '\sin\theta\le\theta\le\tan\theta'
+      reason: 'multiply areas by 2'
+    - id: divide_sin
+      tex: '1\le\frac{\theta}{\sin\theta}\le\frac{1}{\cos\theta}'
+      reason: 'divide by sin>0, tan=sin/cos'
+    - id: bound
+      tex: '\cos\theta\le\frac{\sin\theta}{\theta}\le1\quad(0<\theta<\tfrac\pi2)'
+      reason: 'reciprocate reverses; inequality (1)'
+    - id: abs_bound
+      tex: '0\le|\sin\theta|\le|\theta|'
+      reason: 'kept for later'
+```
+
+---
+
+### unit: continuity_statement_sin_limit
+
+```
+id: continuity_statement_sin_limit
+source: chapter3-print-standalone.html §3.1 · Proposition 3.1（陳述）+ Proof 第一段（|sinθ|≤|θ| + squeeze ⇒ limθ→0 sinθ = 0）
+learning_goal: 先抓住「連續＝角度動一點、值只動一點」的直覺，並用 |sinθ|≤|θ| 與夾擠證出 limθ→0 sinθ = 0。
+kind: proposition
+narration: |
+  That little bound does more than help with the limit — it is also the key
+  to continuity. And continuity here means something very concrete: nudge the
+  angle by a little, and sine and cosine move only a little; they never jump.
+  We even have the tool that says so. On the unit circle the half-chord
+  $\sin\theta$ is always shorter than the arc $\theta$ above it, which is just
+  $|\sin\theta| \le |\theta|$ read geometrically — close up the angle and you
+  close up the sine. So here is the claim, made precise: $\sin x$ and $\cos x$
+  are continuous at every real $x_0$. Build it from the ground up. Since
+  $0 \le |\sin\theta| \le |\theta|$, and $|\theta|$ itself goes to zero as
+  $\theta\to 0$, the squeeze theorem pins $|\sin\theta|$ between zero and
+  something vanishing, and forces $\sin\theta \to 0$. That single limit,
+  $\lim_{\theta\to 0}\sin\theta = 0$, is the seed; the full continuity grows
+  straight out of it, which is what we do next.
+visual_need: |
+  Proposition 陳述卡：$\sin x,\ \cos x$ 在每個 $x_0$ 連續。
+  直覺小圖（mini，弦≤弧）：單位圓上半弦 $\sin\theta$ 短於弧 $\theta$ → $|\sin\theta|\le|\theta|$。
+  推導（逐行）：
+   1. $0\le|\sin\theta|\le|\theta|$，且 $|\theta|\to 0$。
+   2. squeeze ⇒ $\displaystyle\lim_{\theta\to 0}\sin\theta = 0$（標為下一場的「seed」）。
+animation_cue: |
+  （選用）建議動畫：單位圓上同時畫出半弦 $\sin\theta$ 與其上方的弧 $\theta$，讓
+  角 θ 收小，弦與弧一起縮向 0，直觀呈現「弦 ≤ 弧、且一起趨 0」＝ $|\sin\theta|\le|\theta|\to0$。
+screen_contract: |
+  required_steps:
+    - id: bound
+      tex: '0\le|\sin\theta|\le|\theta|\ (\text{chord}\le\text{arc})'
+      depends_on: squeeze_to_the_bound.abs_bound
+      recap_required: true
+    - id: squeeze
+      tex: '|\theta|\to0,\ \text{squeeze}\Rightarrow\sin\theta\to0'
+      reason: 'squeeze theorem'
+    - id: qed
+      tex: '\lim_{\theta\to0}\sin\theta=0'
+      reason: 'the seed'
+```
+
+---
+
+### unit: continuity_argument
+
+```
+id: continuity_argument
+source: chapter3-print-standalone.html §3.1 · Proposition 3.1 · Proof 第二段（sum-to-product 界住 |Δcos|、|Δsin| ≤ 2|sin((x−x₀)/2)| → squeeze ⇒ 連續）
+learning_goal: 看見連續性如何從「sum-to-product 把函數的變化界住、再夾擠」完整推出——畫面上顯示恆等式來源，界不再憑空出現。
+kind: proof
+narration: |
+  Now turn that seed into full continuity. Fix a point $x_0$, and ask how much
+  $\cos x$ and $\sin x$ can change as $x$ moves toward it. Sum-to-product
+  answers both at once. For cosine,
+  $\cos x-\cos x_0=-2\sin\frac{x-x_0}{2}\sin\frac{x+x_0}{2}$; and for sine,
+  $\sin x-\sin x_0=2\cos\frac{x+x_0}{2}\sin\frac{x-x_0}{2}$. In each line one
+  factor carries the half-difference $\frac{x-x_0}{2}$, and the other carries
+  the half-sum $\frac{x+x_0}{2}$ — and that second factor, a sine or a cosine,
+  never exceeds one in size. Drop it to its largest size, one, and both
+  differences are bounded by the same thing:
+  $|\cos x-\cos x_0|$ and $|\sin x-\sin x_0|$ are each at most
+  $2\,|\sin\frac{x-x_0}{2}|$. Now let $x\to x_0$. The half-angle
+  $\frac{x-x_0}{2}$ goes to zero, so by the limit we just established that
+  bound, $2\,|\sin\frac{x-x_0}{2}|$, collapses to zero. Squeeze one last time,
+  and the differences are crushed to nothing: $\cos x\to\cos x_0$ and
+  $\sin x\to\sin x_0$. Both functions are continuous everywhere.
+visual_need: |
+  證明鏈，逐行 reveal——關鍵：和差化積兩條恆等式**顯示在畫面上**（界的來源不再憑空）：
+   1. $\cos x-\cos x_0=-2\sin\tfrac{x-x_0}{2}\sin\tfrac{x+x_0}{2}$（理由：sum-to-product）。
+   2. $\sin x-\sin x_0=\phantom{-}2\cos\tfrac{x+x_0}{2}\sin\tfrac{x-x_0}{2}$（理由：sum-to-product，伴隨式）。
+   3. 半和因子 $\bigl|\sin\tfrac{x+x_0}{2}\bigr|\le1$、$\bigl|\cos\tfrac{x+x_0}{2}\bigr|\le1$ ⇒ $|\cos x-\cos x_0|,\ |\sin x-\sin x_0|\le 2\bigl|\sin\tfrac{x-x_0}{2}\bigr|$。
+   4. $x\to x_0 \Rightarrow \tfrac{x-x_0}{2}\to0 \Rightarrow 2\bigl|\sin\tfrac{x-x_0}{2}\bigr|\to0$（用上場 $\sin\theta\to0$）。
+   5. squeeze ⇒ $\cos x\to\cos x_0,\ \sin x\to\sin x_0$（QED：兩者連續）。
+animation_cue: （無——靜態證明鏈即可；步驟 3 可短暫強調「半和因子被丟成 1」這個放大動作）
+screen_contract: |
+  required_steps:
+    - id: cos_identity
+      tex: '\cos x-\cos x_0=-2\sin\frac{x-x_0}{2}\sin\frac{x+x_0}{2}'
+      reason: 'sum-to-product'
+    - id: sin_identity
+      tex: '\sin x-\sin x_0=2\cos\frac{x+x_0}{2}\sin\frac{x-x_0}{2}'
+      reason: 'sum-to-product companion'
+    - id: bound
+      tex: '|\cos x-\cos x_0|,\ |\sin x-\sin x_0|\le2|\sin\tfrac{x-x_0}{2}|'
+      reason: 'half-sum factor <= 1'
+    - id: qed
+      tex: 'x\to x_0\Rightarrow\cos x\to\cos x_0,\ \sin x\to\sin x_0'
+      reason: 'squeeze (uses sin theta -> 0)'
+```
+
+---
+
+### unit: fundamental_limit
+
+```
+id: fundamental_limit
+source: chapter3-print-standalone.html §3.1 · Proposition 3.2（lim sinθ/θ = 1）+ Proof
+learning_goal: 用 cosθ ≤ sinθ/θ ≤ 1、cosθ→1 與偶函數，夾擠出基本極限等於 1。
+kind: proposition
+narration: |
+  Now we can finally close the limit that started all of this. The claim is
+  as clean as it gets: $\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}=1$. And we
+  already built the trap for it. For $\theta$ between zero and $\frac\pi2$, our
+  bound reads $\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$ — the ratio is
+  pinned between a floor and a ceiling. The ceiling is the constant one, going
+  nowhere. The floor is $\cos\theta$, and now that we know cosine is
+  continuous, $\cos\theta \to \cos 0 = 1$ as $\theta\to 0$. So the ratio is
+  squeezed between two quantities both heading to one, and has nowhere to go
+  but there — at least as $\theta$ approaches from the right. And here the
+  even symmetry pays off: because $\sin\theta/\theta$ is unchanged when
+  $\theta$ flips sign, its left-hand limit must equal its right-hand limit, so
+  the full two-sided limit is one as well. That is the keystone — every result
+  in the rest of the section rests on this single value.
+visual_need: |
+  Proposition 陳述卡：$\displaystyle\lim_{\theta\to0}\dfrac{\sin\theta}{\theta}=1$。
+  證明鏈，逐行 reveal：
+   1. 式(1)：$\cos\theta\le\dfrac{\sin\theta}{\theta}\le1$（$0<\theta<\tfrac\pi2$）——標「floor / ceiling」。
+   2. ceiling $=1$；floor $\cos\theta\to\cos0=1$（理由：cos 連續，上場結果）。
+   3. squeeze ⇒ $\dfrac{\sin\theta}{\theta}\to1$（右極限）。
+   4. 偶函數 ⇒ 左 = 右 ⇒ 兩側極限 $=1$（標「keystone」）。
+animation_cue: （無——靜態陳述＋證明鏈即可；可把 floor/ceiling 兩界向 1 收攏短暫示意）
+screen_contract: |
+  required_steps:
+    - id: bound
+      tex: '\cos\theta\le\frac{\sin\theta}{\theta}\le1\quad(0<\theta<\tfrac\pi2)'
+      depends_on: squeeze_to_the_bound.bound
+      recap_required: true
+    - id: squeeze
+      tex: '\cos\theta\to1\Rightarrow\frac{\sin\theta}{\theta}\to1'
+      reason: 'cos continuous + squeeze'
+    - id: qed
+      tex: '\text{even}\Rightarrow\text{two-sided limit}=1'
+      reason: 'even symmetry'
+```
+
+---
+
+### unit: squeeze_graph
+
+```
+id: squeeze_graph
+source: chapter3-print-standalone.html §3.1 · Figure 3.2（data-fig: squeeze-limit；同一不等式讀成函數圖）
+learning_goal: 把基本極限的夾擠看成一張圖——sinθ/θ 被困在 cosθ 與 1 之間，θ=0 處是極限不是值。
+kind: visual
+narration: |
+  It helps to picture that squeeze. Plot the ratio
+  $\dfrac{\sin\theta}{\theta}$ near zero — the solid curve. Below it runs
+  $\cos\theta$, dashed, and above it sits the constant line at height one. The
+  ratio is trapped in the narrowing gap between them. As $\theta$ slides
+  toward zero, the floor $\cos\theta$ rises to one while the ceiling already
+  is one, so the curve caught between them is squeezed right up to one. And
+  notice the open circle at $\theta=0$: the ratio is undefined there — zero
+  over zero — so what equals one is the limit, the height the curve is forced
+  toward, not a value it ever actually takes.
+visual_need: |
+  函數圖（θ 近 0）：$\tfrac{\sin\theta}{\theta}$（實線）夾在 $\cos\theta$（虛線，下）
+  與常數 $1$（上）之間；θ=0 處開圓（open circle，標 undefined）；兩界皆 →1。
+animation_cue: |
+  建議動畫：先畫常數線 y=1 與 cosθ（虛線）。再 trace 出 sinθ/θ 落在兩者之間。
+  讓 θ 從兩側滑向 0，cosθ 抬升到 1、ratio 被擠到 1；最後在 θ=0 標一個空心圓，
+  凸顯「是極限、不是值」。
+```
+
+---
+
+### unit: limit_not_identity
+
+```
+id: limit_not_identity
+source: chapter3-print-standalone.html §3.1 · Caution（Proposition 3.2 是極限敘述、非恆等式；θ=π/2、θ=π 的值）
+learning_goal: 別把基本極限誤讀成恆等式——固定角下 sinθ/θ 一般不等於 1。
+kind: counterexample
+narration: |
+  One caution, because this result is easy to over-read. The statement is
+  about the limit as $\theta\to 0$ — it is not an identity. At a fixed angle
+  the ratio is generally not one. At $\theta=\frac\pi2$ it is
+  $\dfrac{\sin(\pi/2)}{\pi/2}=\dfrac{1}{\pi/2}=\dfrac{2}{\pi}$, about $0.64$;
+  and at $\theta=\pi$ it is $\dfrac{0}{\pi}$, which is just zero. The value one
+  is reached only in the limit, as $\theta$ shrinks to nothing.
+visual_need: |
+  警示卡：$\lim_{\theta\to0}\tfrac{\sin\theta}{\theta}=1$ 但固定角 ≠ 1——
+  $\tfrac{\sin(\pi/2)}{\pi/2}=\tfrac{2}{\pi}\approx0.64$、$\tfrac{\sin\pi}{\pi}=0$。
+animation_cue: （無——靜態警示即可）
+```
+
+---
+
+### unit: radians_essential
+
+```
+id: radians_essential
+source: chapter3-print-standalone.html §3.1 · Caution（弧度制必要；度數下極限為 π/180、sin' 帶 π/180 因子）
+learning_goal: 懂得弧度制不是慣例而是 sin'=cos、cos'=−sin 成立的前提——度數下公式會帶醜因子。
+kind: counterexample
+narration: |
+  A second caution, and this one is structural: everything here depends on
+  measuring angles in radians. The sector area $\frac12\theta$ — and through
+  it the limit $\sin\theta/\theta\to 1$ — relies on radian measure, where the
+  arc cut off on the unit circle has length exactly $\theta$. Switch to
+  degrees and the limit is no longer one. Since $x$ degrees is
+  $\frac{\pi}{180}x$ radians, you get $\lim_{x\to 0}\dfrac{\sin(x^\circ)}{x}=
+  \dfrac{\pi}{180}$, and the derivative drags that factor along:
+  $\dfrac{d}{dx}\sin(x^\circ)=\dfrac{\pi}{180}\cos(x^\circ)$. The clean
+  formulas we are about to prove, $\sin'=\cos$ and $\cos'=-\sin$, hold only in
+  radians. So radians are not a stylistic choice here — they are what keeps
+  the calculus tidy.
+visual_need: |
+  警示卡：弧度 → $\sin\theta/\theta\to1$、$\sin'=\cos$；度數 →
+  $\lim_{x\to0}\tfrac{\sin(x^\circ)}{x}=\tfrac{\pi}{180}$、
+  $\tfrac{d}{dx}\sin(x^\circ)=\tfrac{\pi}{180}\cos(x^\circ)$。
+animation_cue: （無——靜態警示即可）
+```
+
+---
+
+### unit: derivative_of_sine
+
+```
+id: derivative_of_sine
+source: chapter3-print-standalone.html §3.1 · Theorem 3.1（d/dx sin x = cos x）+ Proof
+learning_goal: 把連續與基本極限組裝起來，從差分商一路寫到 sin 的導數是 cos。
+kind: theorem
+narration: |
+  Now the payoff, and it falls into our hands. The claim:
+  $\dfrac{d}{dx}\sin x=\cos x$, for every real $x$. Start from the definition —
+  the derivative is the limit of the difference quotient,
+  $\dfrac{d}{dx}\sin x=\lim_{h\to 0}\dfrac{\sin(x+h)-\sin x}{h}$. But we
+  already did the hard algebra: that quotient is
+  $\cos\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. So the whole job
+  is to take the limit of this product as $h\to 0$. The first factor,
+  $\cos\!\left(x+\frac h2\right)$, tends to $\cos x$, because cosine is
+  continuous — that is exactly what we proved continuity for. The second
+  factor is $\dfrac{\sin(h/2)}{h/2}$, which is our fundamental limit with
+  $\theta=\frac h2$, so it tends to one. A continuous thing times a limit:
+  the product tends to $\cos x$ times one, which is simply $\cos x$. The
+  derivative of sine is cosine.
+visual_need: |
+  Theorem 陳述卡：$\dfrac{d}{dx}\sin x=\cos x$（for all real $x$）。
+  證明鏈，逐行 reveal（補回 setup 行）：
+   1. $\dfrac{d}{dx}\sin x=\displaystyle\lim_{h\to0}\dfrac{\sin(x+h)-\sin x}{h}$（理由：定義）。
+   2. $=\displaystyle\lim_{h\to0}\cos\!\left(x+\tfrac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$（理由：前面化簡）。
+   3. $\cos(x+\tfrac h2)\to\cos x$（連續）；$\dfrac{\sin(h/2)}{h/2}\to1$（基本極限，$\theta=\tfrac h2$）。
+   4. $=\cos x\cdot1=\cos x$（QED）。
+animation_cue: （無——靜態陳述＋證明鏈即可）
+screen_contract: |
+  required_steps:
+    - id: def
+      tex: '\frac{d}{dx}\sin x=\lim_{h\to0}\frac{\sin(x+h)-\sin x}{h}'
+      reason: '定義'
+    - id: reduced
+      tex: '=\lim_{h\to0}\cos(x+\tfrac h2)\frac{\sin(h/2)}{h/2}'
+      depends_on: difference_quotient_for_sine.result
+      recap_required: true
+    - id: limits
+      tex: '\cos(x+\tfrac h2)\to\cos x;\ \tfrac{\sin(h/2)}{h/2}\to1'
+      reason: '連續＋基本極限'
+    - id: qed
+      tex: '=\cos x\cdot1=\cos x'
+      reason: 'QED'
+```
+
+---
+
+### unit: derivative_of_cosine
+
+```
+id: derivative_of_cosine
+source: chapter3-print-standalone.html §3.1 · Theorem 3.2（d/dx cos x = −sin x）+ Proof（伴隨恆等式）
+learning_goal: 看出 cosine 走完全相同的機制（只換一條伴隨恆等式），導數是 −sin。
+kind: theorem
+narration: |
+  Cosine falls to the very same machinery — only the identity changes, so we
+  go quickly. This time use the companion sum-to-product formula,
+  $\cos A-\cos B=-2\sin\frac{A+B}{2}\sin\frac{A-B}{2}$. With $A=x+h$ and
+  $B=x$, the same division by $h=2\cdot\frac h2$ turns the difference quotient
+  into $-\sin\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. Send $h$ to
+  zero. The sine factor goes to $\sin x$ by continuity, the second factor goes
+  to one by the fundamental limit, and the leading minus sign comes along for
+  the ride — leaving $\dfrac{d}{dx}\cos x=-\sin x$. Same two tools, one extra
+  minus sign. That is the derivative of cosine.
+visual_need: |
+  Theorem 陳述卡：$\dfrac{d}{dx}\cos x=-\sin x$（for all real $x$）。
+  證明鏈，逐行 reveal——關鍵：**顯示伴隨恆等式**（唯一的新東西）：
+   1. $\cos A-\cos B=-2\sin\tfrac{A+B}{2}\sin\tfrac{A-B}{2}$（理由：companion 恆等式）。
+   2. $\dfrac{\cos(x+h)-\cos x}{h}=-\sin\!\left(x+\tfrac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$（理由：除以 $h=2\cdot\tfrac h2$）。
+   3. $-\sin(x+\tfrac h2)\to-\sin x$（連續）；$\dfrac{\sin(h/2)}{h/2}\to1$（基本極限）。
+   4. $=-\sin x$（QED）。
+animation_cue: （無——靜態陳述＋證明鏈即可；differece-quotient setup 走 repeat-pattern、不重述，只顯示新恆等式那行）
+screen_contract: |
+  required_steps:
+    - id: companion_identity
+      tex: '\cos A-\cos B=-2\sin\frac{A+B}{2}\sin\frac{A-B}{2}'
+      reason: 'companion sum-to-product'
+    - id: divide
+      tex: '\frac{\cos(x+h)-\cos x}{h}=-\sin(x+\tfrac h2)\frac{\sin(h/2)}{h/2}'
+      reason: 'divide by h=2*(h/2)'
+    - id: limits
+      tex: '-\sin(x+\tfrac h2)\to-\sin x;\ \frac{\sin(h/2)}{h/2}\to1'
+      reason: 'continuity + fundamental limit (merged into qed on screen)'
+    - id: qed
+      tex: '=-\sin x\cdot1=-\sin x'
+      reason: 'QED'
+```
+
+---
+
+### unit: slope_equals_height
+
+```
+id: slope_equals_height
+source: chapter3-print-standalone.html §3.1 · Figure 3.3（data-fig: sin-cos-slope；sin'=cos 讀成 slope=height）
+learning_goal: 在圖上看見「sin 的切線斜率 ＝ cos 的高度」，把 Theorem 3.1 視覺化。
+kind: visual
+narration: |
+  Here is what $\sin'=\cos$ looks like on the graph. Draw $y=\sin x$, and
+  check the slope of its tangent at a few points. At $x=0$ the sine curve is
+  climbing at slope one. At $x=\frac\pi2$, the top of the hump, the tangent is
+  flat — slope zero. At $x=\pi$ it is falling at slope minus one. Now lay
+  $y=\cos x$ on top and read its heights at those same points: one, zero,
+  minus one. They match exactly. The slope of sine at each $x$ is the height
+  of cosine right there — that is the theorem, drawn. And one more derivative
+  tips cosine down to $-\sin x$, which is where the next idea comes from.
+visual_need: |
+  同框 $y=\sin x$（實）與 $y=\cos x$（虛）；在 x=0,π/2,π 對 sin 畫切線段，
+  標斜率 1,0,−1；cos 在那三點放點、標高度 1,0,−1，一一對上「斜率＝高度」。
+animation_cue: |
+  建議動畫：先 trace 出 sin x。在 x=0、π/2、π 依序畫出切線小段、標其斜率
+  1／0／−1。再 trace 出 cos x（虛線），在同樣三個 x 放實心點、標高度
+  1／0／−1，用同色/引線把「sin 的斜率」對到「cos 的高度」上，凸顯兩者相等。
+```
+
+---
+
+### unit: derivative_cycle
+
+```
+id: derivative_cycle
+source: chapter3-print-standalone.html §3.1 · Remark 3.1（sin/cos 的四步導數循環；呼應 §2.4 e^x 自我複製）
+learning_goal: 看出微分把 sin、cos 循環送進彼此，四步回到原點（d⁴/dx⁴ sin = sin），並對照 e^x 的一步自我複製。
+kind: proposition
+narration: |
+  Step back and watch the pattern these two derivatives make. Differentiation
+  sends sine and cosine into each other, with a minus sign that turns over on
+  every second step. Writing an arrow for one derivative:
+  $\sin x \to \cos x \to -\sin x \to -\cos x \to \sin x$. Four derivatives,
+  and you are back exactly where you started — so the fourth derivative of
+  sine is sine again, and likewise for cosine. Compare that with $e^x$, which
+  reproduces itself in a single step; sine and cosine reproduce themselves in
+  a cycle of four. That is a kind of self-renewal, and it is exactly what lets
+  these functions describe motion that oscillates forever without ever winding
+  down — which is the application we turn to next.
+visual_need: |
+  四步循環圖：$\sin x \to \cos x \to -\sin x \to -\cos x \to \sin x$（一個 d/dx 一個箭頭）；
+  標 $\tfrac{d^4}{dx^4}\sin x=\sin x$；旁標對照 $e^x$ 一步自我複製（$\tfrac{d}{dx}e^x=e^x$）。
+animation_cue: |
+  （選用）建議動畫：四個節點 sin x、cos x、−sin x、−cos x 排成環，箭頭依序
+  點亮（每箭頭＝一次 d/dx），走完四步回到 sin x，凸顯「循環」與「四步歸位」；
+  可在一旁放 e^x 的自我箭頭（一步即回）作對照。
+```
+
+---
+
+### unit: companion_limit
+
+```
+id: companion_limit
+source: chapter3-print-standalone.html §3.1 · Example 3.1（伴隨極限 (1−cosθ)/θ → 0）
+learning_goal: 用「乘 1+cosθ」把另一個 0/0 極限化成基本極限的形式，得 0。
+kind: example
+narration: |
+  The fundamental limit has a companion worth knowing:
+  $\lim_{\theta\to 0}\dfrac{1-\cos\theta}{\theta}=0$. It is again of the form
+  zero over zero, so we need a way in. The trick is to multiply top and bottom
+  by $1+\cos\theta$ — the conjugate — which turns the numerator into a
+  difference of squares: $(1-\cos\theta)(1+\cos\theta)=1-\cos^2\theta$. And
+  $1-\cos^2\theta$ is just $\sin^2\theta$. So the expression becomes
+  $\dfrac{\sin^2\theta}{\theta(1+\cos\theta)}$, which we split deliberately
+  into two familiar pieces:
+  $\dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$. Now let
+  $\theta\to 0$. The first factor goes to one, by the fundamental limit we
+  just proved. The second goes to $\dfrac{0}{1+1}$, which is zero. One times
+  zero is zero — and there is the companion limit.
+visual_need: |
+  推導鏈，逐行 reveal（每步附理由）：
+   1. $\dfrac{1-\cos\theta}{\theta}=\dfrac{(1-\cos\theta)(1+\cos\theta)}{\theta(1+\cos\theta)}=\dfrac{1-\cos^2\theta}{\theta(1+\cos\theta)}$（理由：乘共軛 1+cosθ）。
+   2. $=\dfrac{\sin^2\theta}{\theta(1+\cos\theta)}=\dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$（理由：$1-\cos^2\theta=\sin^2\theta$、拆兩因子）。
+   3. $\to 1\cdot\dfrac{0}{1+1}=0$（理由：基本極限 + 連續）。
+animation_cue: （無——靜態推導鏈即可）
+screen_contract: |
+  required_steps:
+    - id: conjugate
+      tex: '\frac{1-\cos\theta}{\theta}=\frac{(1-\cos\theta)(1+\cos\theta)}{\theta(1+\cos\theta)}=\frac{1-\cos^{2}\theta}{\theta(1+\cos\theta)}'
+      reason: 'multiply by 1+cos'
+    - id: split
+      tex: '=\frac{\sin^{2}\theta}{\theta(1+\cos\theta)}=\frac{\sin\theta}{\theta}\cdot\frac{\sin\theta}{1+\cos\theta}'
+      reason: '1-cos^2=sin^2, split'
+    - id: evaluate
+      tex: '\to1\cdot\frac{0}{1+1}=0'
+      reason: 'fundamental limit + continuity'
+```
+
+---
+
+### unit: all_six_trig_derivatives
+
+```
+id: all_six_trig_derivatives
+source: chapter3-print-standalone.html §3.1 · Example 3.2（tan'、sec'、cot'、csc' 全用商法則逐步）
+learning_goal: 用商法則把 sin'/cos' 推到其餘四個三角函數，補齊全部六個導數。
+kind: example
+narration: |
+  With sine and cosine in hand, the other four trig functions cost almost
+  nothing — they are all just the quotient rule. Take $\tan x$, which is
+  $\dfrac{\sin x}{\cos x}$. The quotient rule gives
+  $\dfrac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^2 x}$, and the numerator is
+  $\cos^2 x+\sin^2 x$, which the Pythagorean identity collapses to one. So
+  $\dfrac{d}{dx}\tan x=\dfrac{1}{\cos^2 x}=\sec^2 x$. Secant is the same idea
+  on $\dfrac{1}{\cos x}$: the quotient rule, with a constant on top, gives
+  $\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}=\dfrac{\sin x}{\cos^2 x}$,
+  which we read as $\dfrac{1}{\cos x}\cdot\dfrac{\sin x}{\cos x}=\sec x\tan x$.
+  The last two run exactly the same way. Take $\cot x=\dfrac{\cos x}{\sin x}$;
+  the quotient rule gives
+  $\dfrac{(-\sin x)(\sin x)-(\cos x)(\cos x)}{\sin^2 x}$, whose numerator is
+  $-(\sin^2 x+\cos^2 x)=-1$, so
+  $\dfrac{d}{dx}\cot x=-\dfrac{1}{\sin^2 x}=-\csc^2 x$. And
+  $\csc x=\dfrac{1}{\sin x}$ gives
+  $\dfrac{0\cdot\sin x-1\cdot\cos x}{\sin^2 x}=-\dfrac{\cos x}{\sin^2 x}=
+  -\csc x\cot x$. That completes the derivatives of all six trigonometric
+  functions — every one built on $\sin'=\cos$ and $\cos'=-\sin$.
+visual_need: |
+  推導，逐行 reveal（拆兩場 part:；四個導數各顯示商法則步驟）：
+  Part 1（tan、sec）：
+   1. $\dfrac{d}{dx}\tan x=\dfrac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^2 x}$（理由：商法則於 $\tfrac{\sin}{\cos}$）。
+   2. $=\dfrac{\cos^2 x+\sin^2 x}{\cos^2 x}=\dfrac{1}{\cos^2 x}=\sec^2 x$（理由：Pythagorean）。
+   3. $\dfrac{d}{dx}\sec x=\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}$（理由：商法則於 $\tfrac1{\cos}$）。
+   4. $=\dfrac{\sin x}{\cos^2 x}=\sec x\tan x$。
+  Part 2（cot、csc）：
+   5. $\dfrac{d}{dx}\cot x=\dfrac{(-\sin x)(\sin x)-(\cos x)(\cos x)}{\sin^2 x}$（理由：商法則於 $\tfrac{\cos}{\sin}$）。
+   6. $=\dfrac{-(\sin^2 x+\cos^2 x)}{\sin^2 x}=-\dfrac{1}{\sin^2 x}=-\csc^2 x$（理由：Pythagorean）。
+   7. $\dfrac{d}{dx}\csc x=\dfrac{0\cdot\sin x-1\cdot\cos x}{\sin^2 x}$（理由：商法則於 $\tfrac1{\sin}$）。
+   8. $=-\dfrac{\cos x}{\sin^2 x}=-\csc x\cot x$。
+animation_cue: （無——靜態推導即可；已拆 tan/sec 與 cot/csc 兩場 part:，四個導數各展步驟）
+screen_contract: |
+  required_steps:
+    - id: tan_quotient
+      tex: '\frac{d}{dx}\tan x=\frac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^{2}x}'
+      reason: 'quotient rule on sin/cos (cos x != 0)'
+    - id: tan_result
+      tex: '=\frac{\cos^{2}x+\sin^{2}x}{\cos^{2}x}=\frac{1}{\cos^{2}x}=\sec^{2}x'
+      reason: 'Pythagorean identity'
+    - id: sec_setup
+      tex: '\frac{d}{dx}\sec x=\frac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^{2}x}'
+      reason: 'quotient rule on 1/cos'
+    - id: sec_result
+      tex: '=\frac{\sin x}{\cos^{2}x}=\sec x\tan x'
+      reason: 'simplify'
+    - id: cot_setup
+      tex: '\frac{d}{dx}\cot x=\frac{(-\sin x)(\sin x)-(\cos x)(\cos x)}{\sin^{2}x}'
+      reason: 'quotient rule on cos/sin (sin x != 0)'
+    - id: cot_result
+      tex: '=\frac{-(\sin^{2}x+\cos^{2}x)}{\sin^{2}x}=-\frac{1}{\sin^{2}x}=-\csc^{2}x'
+      reason: 'Pythagorean identity'
+    - id: csc_setup
+      tex: '\frac{d}{dx}\csc x=\frac{0\cdot\sin x-1\cdot\cos x}{\sin^{2}x}'
+      reason: 'quotient rule on 1/sin'
+    - id: csc_result
+      tex: '=-\frac{\cos x}{\sin^{2}x}=-\csc x\cot x'
+      reason: 'simplify'
+```
+
+---
+
+### unit: shm_compute
+
+```
+id: shm_compute
+source: chapter3-print-standalone.html §3.1 · Example 3.3（彈簧 s(t)=sin t，求 s'、s''，得 s''=−s）
+learning_goal: 只用 sin'/cos' 算出速度與加速度，發現加速度等於負的高度——簡諧運動的簽名。
+kind: example
+narration: |
+  Let us put the new derivatives to work on something that moves. A weight
+  bobbing on a spring sits at height $s(t)=\sin t$ above its rest level.
+  Velocity is the derivative of height, so $s'(t)=\cos t$. Acceleration is the
+  derivative of velocity, so $s''(t)=-\sin t$. But look at that last line:
+  $-\sin t$ is just $-s(t)$. The acceleration is the negative of the height.
+  So at every instant the weight is pushed back toward rest, and harder the
+  farther it has strayed. That relation, $s''=-s$, is the signature of simple
+  harmonic motion. And it is no accident that sine and cosine — the functions
+  whose second derivative is their own negative — are exactly the ones that
+  describe oscillation.
+visual_need: |
+  推導，逐行 reveal：
+   1. $s(t)=\sin t$（height）。
+   2. $s'(t)=\cos t$（velocity）。
+   3. $s''(t)=-\sin t$（acceleration）。
+   4. $-\sin t=-s(t)$ ⇒ $s''=-s$（標「signature of SHM」）。
+animation_cue: （無——靜態推導即可；幾何面交給 shm_stacked_graphs）
+screen_contract: |
+  required_steps:
+    - id: height
+      tex: 's(t)=\sin t'
+      reason: 'height'
+    - id: velocity
+      tex: "s'(t)=\\cos t"
+      reason: 'velocity'
+    - id: acceleration
+      tex: "s''(t)=-\\sin t"
+      reason: 'acceleration'
+    - id: shm
+      tex: "s''(t)=-\\sin t=-s(t)"
+      reason: 'simple harmonic motion'
+```
+
+---
+
+### unit: shm_stacked_graphs
+
+```
+id: shm_stacked_graphs
+source: chapter3-print-standalone.html §3.1 · Figure 3.4（data-fig: shm-triple；s/s'/s'' 三層堆疊，s''=−s 鏡像）
+learning_goal: 在三層共軸的圖上看見「峰谷處速度過零」與「加速度＝高度上下翻」＝ s''=−s。
+kind: visual
+narration: |
+  Stack the three graphs over one time axis and the relationship jumps out.
+  On top, the height $s=\sin t$. In the middle, the velocity $s'=\cos t$. On
+  the bottom, the acceleration $s''=-\sin t$. Watch the dashed lines where the
+  height hits a peak or a trough — at those instants the velocity, in the
+  middle graph, is passing through zero, because at the extremes the weight
+  momentarily stops. Now hold the bottom graph against the top: it is the top
+  one flipped upside down. That is $s''=-s$, drawn — acceleration mirroring
+  height, the very picture of an oscillation.
+visual_need: |
+  三層共用一條時間軸 t∈[0,2π]：頂 $s=\sin t$、中 $s'=\cos t$、底 $s''=-\sin t$；
+  t=π/2、3π/2 拉垂直虛線（頂峰/谷 ↔ 中圖過零）；底圖＝頂圖上下翻（$s''=-s$）。
+animation_cue: |
+  建議動畫：三個小圖垂直堆疊、共用時間軸。依序 trace 出 s（頂）、s'（中）、
+  s''（底）。在 t=π/2、3π/2 落下垂直虛線，凸顯頂圖峰/谷處中圖正好過零。
+  最後把底圖與頂圖並比（或底圖由頂圖翻摺生成），點出 s''=−s 的上下鏡射。
+```
+
+---
+
+### unit: toward_the_chain_rule
+
+```
+id: toward_the_chain_rule
+source: chapter3-print-standalone.html §3.1 · 收尾散文（forward-ref：只能微分裸三角函數，sin(x²) 等需連鎖律）
+learning_goal: 認清目前只能微分「裸」三角函數，要處理 sin(x²) 之類的合成需要下一個工具。
+kind: forward_ref
+narration: |
+  We can now differentiate every trigonometric function — but only in its bare
+  form. We can handle $\sin x$, yet not $\sin(x^2)$ or $\sin(3x+1)$, where the
+  angle is itself a function tucked inside. To reach a function buried inside
+  another, we need one more rule: a way to differentiate a composition. That
+  rule is the chain rule, and it is what comes next — and with it, every
+  derivative we found today becomes the seed of a whole family more.
+visual_need: |
+  對比：能做 $\sin x$；不能直接做 $\sin(x^2)$、$\sin(3x+1)$（角度是內層函數）→
+  指向「下一個工具：連鎖律」。MUST NOT 報節號。
+animation_cue: （無——靜態即可）
+```
+
+---
+
+### unit: recap
+
+```
+id: recap
+source: chapter3-print-standalone.html §3.1（全節重點凝煉；Key Takeaways 單元，有旁白）
+learning_goal: 把本節串成一條線——一個極限 → 兩個導數 → 其餘四個 → 四步循環 → 全靠弧度。
+kind: recap
+narration: |
+  Pull the section together. Everything grew from one limit:
+  $\dfrac{\sin\theta}{\theta}\to 1$ as $\theta\to 0$, which we cracked not with
+  algebra but by squeezing it between $\cos\theta$ and one on the unit circle.
+  That limit, together with the continuity of sine and cosine, gave the two
+  derivatives at the heart of the section: $\sin'=\cos$ and $\cos'=-\sin$.
+  From those two, the quotient rule delivered all the other trig derivatives.
+  Keep the cycle in mind — differentiating runs
+  $\sin\to\cos\to-\sin\to-\cos$ and back around, so the fourth derivative
+  brings you home. And remember the fine print: all of it depends on measuring
+  angles in radians.
+visual_need: |
+  Key Takeaways 卡片（5 點）＋ remember-formula 卡：
+  points：
+    • 基本極限：$\sin\theta/\theta \to 1$（θ→0），靠單位圓上的夾擠證得。
+    • $\tfrac{d}{dx}\sin x=\cos x$、$\tfrac{d}{dx}\cos x=-\sin x$。
+    • 由這兩個＋商法則，得全部六個三角函數的導數。
+    • 導數四步循環：$\sin\to\cos\to-\sin\to-\cos\to\sin$。
+    • 一切以弧度為前提。
+  formulas（保持短，避免出框）：
+    • $\lim_{\theta\to0}\dfrac{\sin\theta}{\theta}=1$
+    • $\dfrac{d}{dx}\sin x=\cos x,\quad \dfrac{d}{dx}\cos x=-\sin x$
+animation_cue: （無——靜態卡片即可）
+```
+
+---
+
+### unit: outro
+
+```
+id: outro
+source: chapter3-print-standalone.html §3.1（節末品牌字卡）
+learning_goal: （收尾；無教學內容）
+kind: recap
+narration: （無——outro 為純動畫，無 takeaways）
+visual_need: 兩段式 outro——暗轉亮橋接 → 最終 logo／節號／標題字卡（Next 3.2 The Chain Rule）。
+animation_cue: （由 outro 模板處理）
+```
+
+---
+
+## §7 拆解註記與內容層品質檢核
+
+### detail-redo（2026-06-29）相對前版的結構變動
+
+- **continuity 拆 2 單元（D2 旗艦改造）：** 前版 `continuity_of_sin_cos` 為單一 `theorem` 單元、旁白走「邏輯鏈」、畫面只擺 2–3 行骨架（界 `2|sin((x−x₀)/2)|` 在畫面上憑空出現——2026-06-29 密度稽核標出的唯一真缺口）。本版拆成 `continuity_statement_sin_limit`（陳述＋`limθ→0 sinθ=0`＋第2檔「弦≤弧」直覺）＋ `continuity_argument`（**畫面顯示和差化積兩條恆等式**＋界＋squeeze ∎），讓界有可見來源。**此舉取代前版 §7「連續性證明未拆」之決策**（該決策在「畫面只放骨架」前提下成立；改為第1檔全展開後，完整證明含兩條恆等式逐行，單頁過載，依 CONTENT_METHODOLOGY §3「>4 步拆 statement/proof」拆場）。
+- **第1檔忠實全展開（基準）：** 所有 proof/derivation 的 `visual_need` 改為**逐行列出畫面要顯示的承載步驟**（含理由），不再只寫「邏輯鏈」。具體補回：`derivative_of_sine` 的 `lim_{h→0}` 定義 setup 行；`derivative_of_cosine` 的伴隨恆等式行；`all_six_trig_derivatives` 的 sec′ 商法則步驟。Stage 2 據此把每步搬上畫面、超頁走 `part:`。
+- **第2檔直覺鷹架（僅 4 樞紐）：** `difference_quotient_for_sine`（「product 才能逐因子取極限」的動機）、`sector_inequality`（偶函數＋三嵌套「一個包一個」）、`continuity_statement_sin_limit`（「角度動一點、值只動一點」＋弦≤弧小圖）、`fundamental_limit`（floor/ceiling 向 1 收攏）。**硬護欄：不增刪任何數學**（CONTENT_METHODOLOGY §1）——所有新增為呈現/直覺，數學內容仍逐單元回溯講義。
+- **chord≤arc 小圖折進 `continuity_statement_sin_limit`（不另立場景）：** `|sinθ|≤|θ|` 的幾何直覺（弦短於弧）作為該單元的 mini-visual 與第2檔開場，不獨立成場（避免與 `sector_inequality` 已建立的 `sinθ≤θ` 重複）。
+- **選材全保留（D3）：** companion limit／all-six／SHM 三個不同模式全留，無折疊（只把講解加詳）。
+
+### 拆解／折疊決策（就近註明，杜絕 silent drop）
+
+- **N1 — 開節「angles in radians」預告句折進 `why_trig_is_different` 收尾。** full caution 留在 `radians_essential`，預告以一句承接、不重複。
+- **N2 — 偶函數論證折進 `sector_inequality` lead-in。** 講義在 Figure 3.1 前散文先講「even … enough to treat θ>0」，為 figure 動機，折進該視覺單元開頭。
+- **N3 — cot′、csc′ 折進 `all_six_trig_derivatives`（repeat-pattern 帶過）。** 同商法則、無新技巧，旁白以「the very same move … gives」一句涵蓋，不另立單元。
+- **N4 — expansion:intuition 過渡散文折進鄰接單元 lead-in（無 silent drop）：** 「With continuity secured …」→ `fundamental_limit`；「With continuity and the fundamental limit in hand …」→ `derivative_of_sine`；「Cosine yields to the very same machinery …」→ `derivative_of_cosine`；「The bound … makes sine and cosine continuous」→ `continuity_statement_sin_limit`。
+- **兩個 Caution 各自獨立成單元（未折疊）：** `limit_not_identity`、`radians_essential` 各為獨立教學點（標準誤解／結構性前提），依 §3「自成教學點才獨立」各立一單元（kind: counterexample）。
+
+### 例題：代表式涵蓋（§2；無同型 silent drop）
+
+- 三個 example 各帶不同模式，全數納入：Ex 3.1 伴隨極限（另一個 0/0、乘共軛）／Ex 3.2 商法則推其餘四個三角導數（新手法：外推 sin'/cos'）／Ex 3.3 簡諧運動（application：只用 sin'/cos'、引出 s''=−s）。**無同型折疊**。
+
+### 視覺／動畫盤點（§5；§3.1 約 50% 符號，medium——不套 symbol-heavy 例外，幾何吃重）
+
+- 四張講義圖全覆蓋：Figure 3.1 → `sector_inequality`（**客製 hook**）；Figure 3.2 → `squeeze_graph`（stock graph）；Figure 3.3 → `slope_equals_height`（**客製 hook**）；Figure 3.4 → `shm_stacked_graphs`（**客製 hook**）。
+- 另 detail-redo 新增一個輕量 mini-visual：`continuity_statement_sin_limit` 的「弦≤弧」（可選 hook 或 stock 弧/弦小圖）。
+- 吃重 `animation_cue`：sector_inequality、slope_equals_height、shm_stacked_graphs（會動的概念才動）。生成 manim code 視同 narration，**經使用者認可才定版**（§5），render 失敗走「由小到大逐層修補」。
+
+### 內容層 checklist（§7；detail-redo 本輪須重跑——前版 [x] 已作廢）
+
+- [ ] 每個 proposition（3.1、3.2）／theorem（3.1、3.2）有單元覆蓋；每個不同模式 example（3.1–3.3）有代表單元，無同型 silent drop。
+- [ ] 無 exercise 內容洩入。
+- [ ] intro（定位＋tagline）／recap（5 點 takeaway）／outro（無 takeaways）齊備。
+- [ ] 散文幾何主張（單位圓面積、弦≤弧、slope=height、SHM 鏡射）皆有視覺單元；其餘散文皆歸類折疊／升格，無 silent drop。
+- [ ] 每段環境之間散文已歸類（Incorporative／Bridge／Forward-pointing）。
+- [ ] narration 為「說」而寫：開頭 hook、結尾 takeaway、未犯 §4 禁則（不報節號／圖號、不念螢幕標題、不用 see/as shown）；cosine 導數＋cot/csc repeat-pattern 省 setup。
+- [ ] 每個承載步驟在 `visual_need` 逐行列出（第1檔——畫面顯示、不藏進旁白）；4 樞紐有第2檔直覺；數學不增刪、逐單元回溯講義。
+- [ ] 數學讀得順（直讀 LaTeX 或白話；對齊鏈不重念 LHS）。
+- [ ] 動畫建議用自然語言、聚焦教學意圖。
+- [ ] 每個 id 唯一、snake_case、描述教學重點。
+- [x] **六鏡稽核重跑 → blocking==0**（Workflow `wf_2a33636d-17d`；6 鏡全 clean、refute-by-default 後 0 blocking）。L5 隔離盲算 11 組關鍵數全 match。2 條 tier-3 advisory 已採納：continuity_statement kind theorem→proposition、squeeze_graph「see」→「picture」。
+- [x] **散文 copyedit pass 重跑（鎖稿前）**（`narration-copyedit` subagent；0 blocking、7 optional tighten 全採納——why_trig 雙從句拆＋radians 預告收、difference_quotient 去 fronting、sector 去「too」、continuity_argument「largest possible value of one」收、fundamental_limit 雙 one 去、all_six「riding on」→「built on」）。語義/數學未動。
+- [x] **重編 `ch03_trig_derivatives_narration.html` 審核稿**（22 單元，採納六鏡＋copyedit 後重編）。
+- [x] **使用者 sign-off（2026-06-29）→ LOCKED**。下一步：Stage 2 工程稿（模板化、拆場、`part:`、把每步搬上畫面）＋ 客製 hook → schema/lint/sizecheck → mock render → 視覺幀稽核 → HTML 報告。
+```
+
+
+ succeeded in 478ms:
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§3.1 Derivatives of Sine and Cosine — narration review</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+:root { --ink:#1a2233; --muted:#5a6b85; --line:#dce3ee; --bg:#f6f8fc;
+  --navy:#0a1322; --accent:#b0792a; --card:#fff; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink);
+  font:16px/1.65 -apple-system,"Segoe UI",Roboto,"Noto Sans TC",sans-serif; }
+.wrap { max-width:820px; margin:0 auto; padding:40px 22px 80px; }
+header.top { background:var(--navy); color:#fff; border-radius:14px;
+  padding:26px 28px; margin-bottom:14px; }
+header.top .eyebrow { font:600 12px/1 ui-monospace,monospace; letter-spacing:.14em;
+  text-transform:uppercase; color:#8fb0e6; }
+header.top h1 { margin:.35em 0 .15em; font-size:26px; }
+header.top .tag { color:#c4d2ec; font-style:italic; }
+.meta-grid { display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:14px;
+  font-size:13px; color:#c4d2ec; }
+.note { font-size:13px; color:var(--muted); margin:0 2px 26px;
+  padding:10px 14px; border-left:3px solid var(--accent); background:#fff8ec; border-radius:4px; }
+.unit { background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:18px 22px; margin:0 0 14px; }
+.u-head { display:flex; align-items:baseline; gap:10px; margin-bottom:8px; }
+.u-num { font:700 13px/1 ui-monospace,monospace; color:#fff; background:var(--navy);
+  border-radius:6px; padding:4px 7px; }
+.u-id { font:600 15px/1.2 ui-monospace,monospace; color:var(--ink); }
+.u-kind { margin-left:auto; font:600 11px/1 ui-monospace,monospace; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--accent); border:1px solid #e7d3ad;
+  background:#fdf6e8; border-radius:20px; padding:4px 10px; }
+.u-narr p { margin:.5em 0; }
+.narr-none { color:var(--muted); font-style:italic; }
+details { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+summary { cursor:pointer; font:600 12px/1.4 ui-monospace,monospace; color:var(--muted);
+  letter-spacing:.04em; }
+.d-row { display:flex; gap:12px; margin:8px 0; font-size:14px; }
+.d-key { flex:0 0 96px; color:var(--accent); font:600 12px/1.5 ui-monospace,monospace;
+  text-transform:uppercase; letter-spacing:.04em; }
+.d-val { color:#33415c; white-space:pre-wrap; }
+.d-na .d-val { color:var(--muted); font-style:italic; }
+</style></head><body><div class="wrap"><header class="top">
+  <div class="eyebrow">Chapter 3 · Narration review (DRAFT)</div>
+  <h1>§3.1 Derivatives of Sine and Cosine</h1>
+  <div class="tag">How fast does sine change?</div>
+  <div class="meta-grid"><span>chapter: Chapter 3</span><span>chapter_title: Chain Rule and Trigonometric Derivatives</span><span>section: 3.1</span><span>id: ch03_trig_derivatives</span></div>
+</header>
+<div class="note">純內容中間產物（source of truth＝.md）。本頁逐單元呈現旁白供 sign-off；
+math 由 MathJax 即時渲染。intro／outro 為純動畫無 narration。</div><section class="unit">
+  <div class="u-head"><span class="u-num">00</span>
+    <span class="u-id">intro</span><span class="u-kind">motivation</span></div>
+  <div class="u-narr"><p class="narr-none">（無——intro 為純動畫）</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1（Section Gate；定位資訊見上方 meta）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">知道本節在章內的位置，並帶著「sine 變化得多快」這個問題進入。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Section Gate——Chapter 3 章節地圖 → 聚焦 3.1 → logo／節號／標題／tagline 字卡 → 暗場交接。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（由 intro 模板處理，內容稿不指定）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">01</span>
+    <span class="u-id">why_trig_is_different</span><span class="u-kind">motivation</span></div>
+  <div class="u-narr"><p>Every derivative so far has yielded to algebra. For a polynomial we
+expanded $(x+h)^n$ and the binomial theorem handed us a factor of $h$ to
+cancel; for $e^x$ the power series did the same job. The trigonometric
+functions refuse to play along. Write down the difference quotient for
+$\sin x$ — $\dfrac{\sin(x+h)-\sin x}{h}$ — and try the usual move. You
+cannot simply set $h=0$: that gives $\dfrac{0}{0}$, which tells you
+nothing. And no identity cancels the $h$ in the denominator —
+$\sin(x+h)$ simply does not break into pieces that conveniently subtract.
+As we
+are about to see, the whole computation funnels down to a single limit,
+$\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}$ — again the indeterminate
+form zero over zero, and one that no algebra will crack. Prying it open
+takes a genuinely new tool: a geometric comparison of areas on the unit
+circle. And once we secure that one limit, it unlocks the derivatives of
+both sine and cosine at once. One ground rule, though: throughout, angles
+are measured in radians — an assumption that turns out to be essential.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · 開節散文（expansion:intuition，"So far every derivative has yielded to algebra … funnels down to a single limit"）+ "angles are measured in radians" 預告句</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看出三角函數的導數卡在一個代數攻不下的 0/0 極限 sinθ/θ，需要全新的幾何工具。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">逐步顯示（每步一個 reveal）：
+ 1. 差分商 $\dfrac{\sin(x+h)-\sin x}{h}$。
+ 2. 天真代入 $h=0$ → $\dfrac{0}{0}$（標「indeterminate — 無資訊」）。
+ 3. funnel 指向目標極限 $\displaystyle\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}$（標 0/0、no algebra）。
+收尾標籤：tool = 單位圓面積比較；ground rule = radians。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態即可；funnel 的視覺收斂交給後續單元）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">02</span>
+    <span class="u-id">difference_quotient_for_sine</span><span class="u-kind">derivation</span></div>
+  <div class="u-narr"><p>So let us transform that difference quotient instead of fighting it
+head-on. The decisive step is one trigonometric identity — sum-to-product —
+which turns a difference of sines into a product:
+$\sin A-\sin B=2\cos\frac{A+B}{2}\sin\frac{A-B}{2}$. A product is exactly
+what we want, because we can pull it apart and take limits one factor at
+a time. Put $A=x+h$ and $B=x$. The numerator becomes
+$2\cos\!\left(x+\frac h2\right)\sin\frac h2$. Now divide by $h$ — and here
+is the small trick that makes everything line up: write $h$ as
+$2\cdot\frac h2$, so the denominator carries the very $\frac h2$ that sits
+inside the sine. The quotient cleans up to
+$\cos\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. Look at what we
+have now: a product of two factors, and as $h\to 0$ each one moves on its
+own. The first factor, $\cos\!\left(x+\frac h2\right)$, should slide to
+$\cos x$ — provided cosine is continuous. The second factor is exactly
+$\dfrac{\sin\theta}{\theta}$ in disguise, with $\theta=\frac h2$ shrinking
+to zero. So the entire derivative now hangs on just two facts: that sine
+and cosine are continuous, and the value of that one fundamental limit. We
+secure both, in that order, and then come straight back to finish.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · "The difference quotient for sine" 子節（sum-to-product 化簡 → cos(x+h/2)·sin(h/2)/(h/2)）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把 sine 的差分商化成「一個會趨近 cos x 的因子 × 一個基本極限因子」，看出整個導數靠哪兩件事。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導鏈，逐行 reveal（每行一個 step）：
+ 1. 恆等式 $\sin A-\sin B=2\cos\tfrac{A+B}{2}\sin\tfrac{A-B}{2}$（理由：sum-to-product）。
+ 2. 代入 $A=x+h,\ B=x$：$\sin(x+h)-\sin x=2\cos(x+\tfrac h2)\sin\tfrac h2$。
+ 3. 除以 $h=2\cdot\tfrac h2$：$\dfrac{\sin(x+h)-\sin x}{h}=\cos(x+\tfrac h2)\cdot\dfrac{\sin(h/2)}{h/2}$。
+ 4. 兩因子標去向：$\cos(x+\tfrac h2)\xrightarrow{\,h\to0\,}\cos x$（需「連續」）；$\dfrac{\sin(h/2)}{h/2}\xrightarrow{\,h\to0\,}?$（即 $\dfrac{\sin\theta}{\theta}$，需「基本極限」）。
+收尾標籤：整個導數 = 兩因子的乘積 → 靠「連續」＋「基本極限」兩件事。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導鏈即可；兩因子去向用引線/同色標記）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">03</span>
+    <span class="u-id">sector_inequality</span><span class="u-kind">visual</span></div>
+  <div class="u-narr"><p>Here is that new tool. We compare three areas on a circle of radius one.
+But first, one convenience that saves us half the work. Replacing $\theta$
+by $-\theta$ flips the sign of both $\theta$ and $\sin\theta$, so their
+ratio $\sin\theta/\theta$ is left unchanged — it is an even function. That
+means whatever we learn for positive angles holds for negative ones, so it
+is enough to chase $\theta$ down to zero from the positive side. Now the
+geometry. On the unit circle, put $A$ at $(1,0)$ and let $B$ be the point at
+angle $\theta$, so $B=(\cos\theta,\sin\theta)$. Extend the radius until it
+meets the vertical tangent line at $A$, and call that meeting point
+$C=(1,\tan\theta)$. Three regions now nest one inside the next, and each
+area is easy to read off. The inner triangle $OAB$ has base one and height
+$\sin\theta$, so its area is $\frac12\sin\theta$. The circular sector $OAB$
+is the fraction $\theta$ over $2\pi$ of the whole disc, which comes out to
+$\frac12\theta$. And the outer triangle $OAC$ has base one and height
+$\tan\theta$, so its area is $\frac12\tan\theta$. Because each region sits
+strictly inside the next, their areas must line up in the same order:
+$\frac12\sin\theta \le \frac12\theta \le \frac12\tan\theta$. The whole
+argument hangs on that one picture — a triangle inside a sector inside a
+triangle.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · "A geometric inequality on the unit circle" 散文（含偶函數論證）+ Figure 3.1（data-fig: sector-inequality）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">在單位圓上用三塊嵌套面積，幾何地夾出 sinθ ≤ θ ≤ tanθ。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">單位圓（半徑 1），A=(1,0)、B=(cosθ,sinθ)、C=(1,tanθ)、射線 OB 延伸交切線於 C；
+三塊嵌套區域：內接 △OAB、扇形 OAB、外切 △OAC，各標面積 ½sinθ／½θ／½tanθ；
+逐塊高亮（內→中→外）以「一個包一個」成立；浮出 $\tfrac12\sin\theta \le \tfrac12\theta \le \tfrac12\tan\theta$；
+旁標偶函數一句記號 $\sin(-\theta)/(-\theta)=\sin\theta/\theta$（只看 θ&gt;0）。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">建議動畫：先畫單位圓與 A。掃出角 θ 標出 B，延伸 OB 交切線得 C。依序高亮
+並標面積——內接三角形（½sinθ）→ 扇形（½θ）→ 外切三角形（½tanθ），讓「一個包
+一個」在視覺上逐層成立，最後浮出三者面積的不等式。θ 可從中等角緩緩縮小，
+預告後續要把它推向 0。</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">04</span>
+    <span class="u-id">squeeze_to_the_bound</span><span class="u-kind">derivation</span></div>
+  <div class="u-narr"><p>Now turn that chain of areas into a statement about $\sin\theta/\theta$,
+one careful step at a time. Start by multiplying through by $2$ to clear the
+halves: $\sin\theta \le \theta \le \tan\theta$. Next, divide every part by
+$\sin\theta$, which is positive for these angles, and rewrite $\tan\theta$
+as $\sin\theta/\cos\theta$; that gives
+$1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}$. We are close,
+but the middle is upside down — it has $\theta$ over $\sin\theta$, and we
+want $\sin\theta$ over $\theta$. So take reciprocals of all three parts. They
+are all positive, and flipping positive quantities reverses the inequalities,
+so the chain turns around and we land exactly on the bound we were after:
+$\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$, for $\theta$ between zero
+and $\frac\pi2$. One more thing worth pocketing before we move on: the very
+first inequality, $\sin\theta \le \theta$, also gives
+$0 \le |\sin\theta| \le |\theta|$ near zero — a small bound we will lean on
+twice in just a moment.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Fig 3.1 後代數（×2、÷sinθ、取倒數翻向 → 式(1)）+ "0 ≤ |sinθ| ≤ |θ|" 附帶界</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把三塊面積的不等式代數地整理成 cosθ ≤ sinθ/θ ≤ 1，並收下 |sinθ|≤|θ| 這個附帶界。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導鏈，逐行 reveal（每行附理由）：
+ 1. $\sin\theta\le\theta\le\tan\theta$（理由：面積 ×2）。
+ 2. $1\le\dfrac{\theta}{\sin\theta}\le\dfrac{1}{\cos\theta}$（理由：÷sinθ&gt;0、$\tan=\tfrac{\sin}{\cos}$）。
+ 3. $\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$（理由：取倒數→翻向；限 $0&lt;\theta&lt;\tfrac\pi2$）—— 標為「式 (1)」。
+附帶界（另起一行、標「keep for later」）：$0\le|\sin\theta|\le|\theta|$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導鏈即可；翻向那步可短暫強調不等號方向反轉）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">05</span>
+    <span class="u-id">continuity_statement_sin_limit</span><span class="u-kind">proposition</span></div>
+  <div class="u-narr"><p>That little bound does more than help with the limit — it is also the key
+to continuity. And continuity here means something very concrete: nudge the
+angle by a little, and sine and cosine move only a little; they never jump.
+We even have the tool that says so. On the unit circle the half-chord
+$\sin\theta$ is always shorter than the arc $\theta$ above it, which is just
+$|\sin\theta| \le |\theta|$ read geometrically — close up the angle and you
+close up the sine. So here is the claim, made precise: $\sin x$ and $\cos x$
+are continuous at every real $x_0$. Build it from the ground up. Since
+$0 \le |\sin\theta| \le |\theta|$, and $|\theta|$ itself goes to zero as
+$\theta\to 0$, the squeeze theorem pins $|\sin\theta|$ between zero and
+something vanishing, and forces $\sin\theta \to 0$. That single limit,
+$\lim_{\theta\to 0}\sin\theta = 0$, is the seed; the full continuity grows
+straight out of it, which is what we do next.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Proposition 3.1（陳述）+ Proof 第一段（|sinθ|≤|θ| + squeeze ⇒ limθ→0 sinθ = 0）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">先抓住「連續＝角度動一點、值只動一點」的直覺，並用 |sinθ|≤|θ| 與夾擠證出 limθ→0 sinθ = 0。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Proposition 陳述卡：$\sin x,\ \cos x$ 在每個 $x_0$ 連續。
+直覺小圖（mini，弦≤弧）：單位圓上半弦 $\sin\theta$ 短於弧 $\theta$ → $|\sin\theta|\le|\theta|$。
+推導（逐行）：
+ 1. $0\le|\sin\theta|\le|\theta|$，且 $|\theta|\to 0$。
+ 2. squeeze ⇒ $\displaystyle\lim_{\theta\to 0}\sin\theta = 0$（標為下一場的「seed」）。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">（選用）建議動畫：單位圓上同時畫出半弦 $\sin\theta$ 與其上方的弧 $\theta$，讓
+角 θ 收小，弦與弧一起縮向 0，直觀呈現「弦 ≤ 弧、且一起趨 0」＝ $|\sin\theta|\le|\theta|\to0$。</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">06</span>
+    <span class="u-id">continuity_argument</span><span class="u-kind">proof</span></div>
+  <div class="u-narr"><p>Now turn that seed into full continuity. Fix a point $x_0$, and ask how much
+$\cos x$ and $\sin x$ can change as $x$ moves toward it. Sum-to-product
+answers both at once. For cosine,
+$\cos x-\cos x_0=-2\sin\frac{x-x_0}{2}\sin\frac{x+x_0}{2}$; and for sine,
+$\sin x-\sin x_0=2\cos\frac{x+x_0}{2}\sin\frac{x-x_0}{2}$. In each line one
+factor carries the half-difference $\frac{x-x_0}{2}$, and the other carries
+the half-sum $\frac{x+x_0}{2}$ — and that second factor, a sine or a cosine,
+never exceeds one in size. Drop it to its largest size, one, and both
+differences are bounded by the same thing:
+$|\cos x-\cos x_0|$ and $|\sin x-\sin x_0|$ are each at most
+$2\,|\sin\frac{x-x_0}{2}|$. Now let $x\to x_0$. The half-angle
+$\frac{x-x_0}{2}$ goes to zero, so by the limit we just established that
+bound, $2\,|\sin\frac{x-x_0}{2}|$, collapses to zero. Squeeze one last time,
+and the differences are crushed to nothing: $\cos x\to\cos x_0$ and
+$\sin x\to\sin x_0$. Both functions are continuous everywhere.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Proposition 3.1 · Proof 第二段（sum-to-product 界住 |Δcos|、|Δsin| ≤ 2|sin((x−x₀)/2)| → squeeze ⇒ 連續）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看見連續性如何從「sum-to-product 把函數的變化界住、再夾擠」完整推出——畫面上顯示恆等式來源，界不再憑空出現。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">證明鏈，逐行 reveal——關鍵：和差化積兩條恆等式**顯示在畫面上**（界的來源不再憑空）：
+ 1. $\cos x-\cos x_0=-2\sin\tfrac{x-x_0}{2}\sin\tfrac{x+x_0}{2}$（理由：sum-to-product）。
+ 2. $\sin x-\sin x_0=\phantom{-}2\cos\tfrac{x+x_0}{2}\sin\tfrac{x-x_0}{2}$（理由：sum-to-product，伴隨式）。
+ 3. 半和因子 $\bigl|\sin\tfrac{x+x_0}{2}\bigr|\le1$、$\bigl|\cos\tfrac{x+x_0}{2}\bigr|\le1$ ⇒ $|\cos x-\cos x_0|,\ |\sin x-\sin x_0|\le 2\bigl|\sin\tfrac{x-x_0}{2}\bigr|$。
+ 4. $x\to x_0 \Rightarrow \tfrac{x-x_0}{2}\to0 \Rightarrow 2\bigl|\sin\tfrac{x-x_0}{2}\bigr|\to0$（用上場 $\sin\theta\to0$）。
+ 5. squeeze ⇒ $\cos x\to\cos x_0,\ \sin x\to\sin x_0$（QED：兩者連續）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態證明鏈即可；步驟 3 可短暫強調「半和因子被丟成 1」這個放大動作）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">07</span>
+    <span class="u-id">fundamental_limit</span><span class="u-kind">proposition</span></div>
+  <div class="u-narr"><p>Now we can finally close the limit that started all of this. The claim is
+as clean as it gets: $\lim_{\theta\to 0}\dfrac{\sin\theta}{\theta}=1$. And we
+already built the trap for it. For $\theta$ between zero and $\frac\pi2$, our
+bound reads $\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1$ — the ratio is
+pinned between a floor and a ceiling. The ceiling is the constant one, going
+nowhere. The floor is $\cos\theta$, and now that we know cosine is
+continuous, $\cos\theta \to \cos 0 = 1$ as $\theta\to 0$. So the ratio is
+squeezed between two quantities both heading to one, and has nowhere to go
+but there — at least as $\theta$ approaches from the right. And here the
+even symmetry pays off: because $\sin\theta/\theta$ is unchanged when
+$\theta$ flips sign, its left-hand limit must equal its right-hand limit, so
+the full two-sided limit is one as well. That is the keystone — every result
+in the rest of the section rests on this single value.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Proposition 3.2（lim sinθ/θ = 1）+ Proof</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用 cosθ ≤ sinθ/θ ≤ 1、cosθ→1 與偶函數，夾擠出基本極限等於 1。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Proposition 陳述卡：$\displaystyle\lim_{\theta\to0}\dfrac{\sin\theta}{\theta}=1$。
+證明鏈，逐行 reveal：
+ 1. 式(1)：$\cos\theta\le\dfrac{\sin\theta}{\theta}\le1$（$0&lt;\theta&lt;\tfrac\pi2$）——標「floor / ceiling」。
+ 2. ceiling $=1$；floor $\cos\theta\to\cos0=1$（理由：cos 連續，上場結果）。
+ 3. squeeze ⇒ $\dfrac{\sin\theta}{\theta}\to1$（右極限）。
+ 4. 偶函數 ⇒ 左 = 右 ⇒ 兩側極限 $=1$（標「keystone」）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可；可把 floor/ceiling 兩界向 1 收攏短暫示意）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">08</span>
+    <span class="u-id">squeeze_graph</span><span class="u-kind">visual</span></div>
+  <div class="u-narr"><p>It helps to picture that squeeze. Plot the ratio
+$\dfrac{\sin\theta}{\theta}$ near zero — the solid curve. Below it runs
+$\cos\theta$, dashed, and above it sits the constant line at height one. The
+ratio is trapped in the narrowing gap between them. As $\theta$ slides
+toward zero, the floor $\cos\theta$ rises to one while the ceiling already
+is one, so the curve caught between them is squeezed right up to one. And
+notice the open circle at $\theta=0$: the ratio is undefined there — zero
+over zero — so what equals one is the limit, the height the curve is forced
+toward, not a value it ever actually takes.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Figure 3.2（data-fig: squeeze-limit；同一不等式讀成函數圖）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把基本極限的夾擠看成一張圖——sinθ/θ 被困在 cosθ 與 1 之間，θ=0 處是極限不是值。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">函數圖（θ 近 0）：$\tfrac{\sin\theta}{\theta}$（實線）夾在 $\cos\theta$（虛線，下）
+與常數 $1$（上）之間；θ=0 處開圓（open circle，標 undefined）；兩界皆 →1。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">建議動畫：先畫常數線 y=1 與 cosθ（虛線）。再 trace 出 sinθ/θ 落在兩者之間。
+讓 θ 從兩側滑向 0，cosθ 抬升到 1、ratio 被擠到 1；最後在 θ=0 標一個空心圓，
+凸顯「是極限、不是值」。</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">09</span>
+    <span class="u-id">limit_not_identity</span><span class="u-kind">counterexample</span></div>
+  <div class="u-narr"><p>One caution, because this result is easy to over-read. The statement is
+about the limit as $\theta\to 0$ — it is not an identity. At a fixed angle
+the ratio is generally not one. At $\theta=\frac\pi2$ it is
+$\dfrac{\sin(\pi/2)}{\pi/2}=\dfrac{1}{\pi/2}=\dfrac{2}{\pi}$, about $0.64$;
+and at $\theta=\pi$ it is $\dfrac{0}{\pi}$, which is just zero. The value one
+is reached only in the limit, as $\theta$ shrinks to nothing.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Caution（Proposition 3.2 是極限敘述、非恆等式；θ=π/2、θ=π 的值）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">別把基本極限誤讀成恆等式——固定角下 sinθ/θ 一般不等於 1。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">警示卡：$\lim_{\theta\to0}\tfrac{\sin\theta}{\theta}=1$ 但固定角 ≠ 1——
+$\tfrac{\sin(\pi/2)}{\pi/2}=\tfrac{2}{\pi}\approx0.64$、$\tfrac{\sin\pi}{\pi}=0$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態警示即可）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">10</span>
+    <span class="u-id">radians_essential</span><span class="u-kind">counterexample</span></div>
+  <div class="u-narr"><p>A second caution, and this one is structural: everything here depends on
+measuring angles in radians. The sector area $\frac12\theta$ — and through
+it the limit $\sin\theta/\theta\to 1$ — relies on radian measure, where the
+arc cut off on the unit circle has length exactly $\theta$. Switch to
+degrees and the limit is no longer one. Since $x$ degrees is
+$\frac{\pi}{180}x$ radians, you get $\lim_{x\to 0}\dfrac{\sin(x^\circ)}{x}=
+\dfrac{\pi}{180}$, and the derivative drags that factor along:
+$\dfrac{d}{dx}\sin(x^\circ)=\dfrac{\pi}{180}\cos(x^\circ)$. The clean
+formulas we are about to prove, $\sin'=\cos$ and $\cos'=-\sin$, hold only in
+radians. So radians are not a stylistic choice here — they are what keeps
+the calculus tidy.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Caution（弧度制必要；度數下極限為 π/180、sin' 帶 π/180 因子）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">懂得弧度制不是慣例而是 sin'=cos、cos'=−sin 成立的前提——度數下公式會帶醜因子。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">警示卡：弧度 → $\sin\theta/\theta\to1$、$\sin'=\cos$；度數 →
+$\lim_{x\to0}\tfrac{\sin(x^\circ)}{x}=\tfrac{\pi}{180}$、
+$\tfrac{d}{dx}\sin(x^\circ)=\tfrac{\pi}{180}\cos(x^\circ)$。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態警示即可）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">11</span>
+    <span class="u-id">derivative_of_sine</span><span class="u-kind">theorem</span></div>
+  <div class="u-narr"><p>Now the payoff, and it falls into our hands. The claim:
+$\dfrac{d}{dx}\sin x=\cos x$, for every real $x$. Start from the definition —
+the derivative is the limit of the difference quotient,
+$\dfrac{d}{dx}\sin x=\lim_{h\to 0}\dfrac{\sin(x+h)-\sin x}{h}$. But we
+already did the hard algebra: that quotient is
+$\cos\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. So the whole job
+is to take the limit of this product as $h\to 0$. The first factor,
+$\cos\!\left(x+\frac h2\right)$, tends to $\cos x$, because cosine is
+continuous — that is exactly what we proved continuity for. The second
+factor is $\dfrac{\sin(h/2)}{h/2}$, which is our fundamental limit with
+$\theta=\frac h2$, so it tends to one. A continuous thing times a limit:
+the product tends to $\cos x$ times one, which is simply $\cos x$. The
+derivative of sine is cosine.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Theorem 3.1（d/dx sin x = cos x）+ Proof</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把連續與基本極限組裝起來，從差分商一路寫到 sin 的導數是 cos。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Theorem 陳述卡：$\dfrac{d}{dx}\sin x=\cos x$（for all real $x$）。
+證明鏈，逐行 reveal（補回 setup 行）：
+ 1. $\dfrac{d}{dx}\sin x=\displaystyle\lim_{h\to0}\dfrac{\sin(x+h)-\sin x}{h}$（理由：定義）。
+ 2. $=\displaystyle\lim_{h\to0}\cos\!\left(x+\tfrac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$（理由：前面化簡）。
+ 3. $\cos(x+\tfrac h2)\to\cos x$（連續）；$\dfrac{\sin(h/2)}{h/2}\to1$（基本極限，$\theta=\tfrac h2$）。
+ 4. $=\cos x\cdot1=\cos x$（QED）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">12</span>
+    <span class="u-id">derivative_of_cosine</span><span class="u-kind">theorem</span></div>
+  <div class="u-narr"><p>Cosine falls to the very same machinery — only the identity changes, so we
+go quickly. This time use the companion sum-to-product formula,
+$\cos A-\cos B=-2\sin\frac{A+B}{2}\sin\frac{A-B}{2}$. With $A=x+h$ and
+$B=x$, the same division by $h=2\cdot\frac h2$ turns the difference quotient
+into $-\sin\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. Send $h$ to
+zero. The sine factor goes to $\sin x$ by continuity, the second factor goes
+to one by the fundamental limit, and the leading minus sign comes along for
+the ride — leaving $\dfrac{d}{dx}\cos x=-\sin x$. Same two tools, one extra
+minus sign. That is the derivative of cosine.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Theorem 3.2（d/dx cos x = −sin x）+ Proof（伴隨恆等式）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看出 cosine 走完全相同的機制（只換一條伴隨恆等式），導數是 −sin。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Theorem 陳述卡：$\dfrac{d}{dx}\cos x=-\sin x$（for all real $x$）。
+證明鏈，逐行 reveal——關鍵：**顯示伴隨恆等式**（唯一的新東西）：
+ 1. $\cos A-\cos B=-2\sin\tfrac{A+B}{2}\sin\tfrac{A-B}{2}$（理由：companion 恆等式）。
+ 2. $\dfrac{\cos(x+h)-\cos x}{h}=-\sin\!\left(x+\tfrac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$（理由：除以 $h=2\cdot\tfrac h2$）。
+ 3. $-\sin(x+\tfrac h2)\to-\sin x$（連續）；$\dfrac{\sin(h/2)}{h/2}\to1$（基本極限）。
+ 4. $=-\sin x$（QED）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態陳述＋證明鏈即可；differece-quotient setup 走 repeat-pattern、不重述，只顯示新恆等式那行）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">13</span>
+    <span class="u-id">slope_equals_height</span><span class="u-kind">visual</span></div>
+  <div class="u-narr"><p>Here is what $\sin'=\cos$ looks like on the graph. Draw $y=\sin x$, and
+check the slope of its tangent at a few points. At $x=0$ the sine curve is
+climbing at slope one. At $x=\frac\pi2$, the top of the hump, the tangent is
+flat — slope zero. At $x=\pi$ it is falling at slope minus one. Now lay
+$y=\cos x$ on top and read its heights at those same points: one, zero,
+minus one. They match exactly. The slope of sine at each $x$ is the height
+of cosine right there — that is the theorem, drawn. And one more derivative
+tips cosine down to $-\sin x$, which is where the next idea comes from.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Figure 3.3（data-fig: sin-cos-slope；sin'=cos 讀成 slope=height）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">在圖上看見「sin 的切線斜率 ＝ cos 的高度」，把 Theorem 3.1 視覺化。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">同框 $y=\sin x$（實）與 $y=\cos x$（虛）；在 x=0,π/2,π 對 sin 畫切線段，
+標斜率 1,0,−1；cos 在那三點放點、標高度 1,0,−1，一一對上「斜率＝高度」。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">建議動畫：先 trace 出 sin x。在 x=0、π/2、π 依序畫出切線小段、標其斜率
+1／0／−1。再 trace 出 cos x（虛線），在同樣三個 x 放實心點、標高度
+1／0／−1，用同色/引線把「sin 的斜率」對到「cos 的高度」上，凸顯兩者相等。</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">14</span>
+    <span class="u-id">derivative_cycle</span><span class="u-kind">proposition</span></div>
+  <div class="u-narr"><p>Step back and watch the pattern these two derivatives make. Differentiation
+sends sine and cosine into each other, with a minus sign that turns over on
+every second step. Writing an arrow for one derivative:
+$\sin x \to \cos x \to -\sin x \to -\cos x \to \sin x$. Four derivatives,
+and you are back exactly where you started — so the fourth derivative of
+sine is sine again, and likewise for cosine. Compare that with $e^x$, which
+reproduces itself in a single step; sine and cosine reproduce themselves in
+a cycle of four. That is a kind of self-renewal, and it is exactly what lets
+these functions describe motion that oscillates forever without ever winding
+down — which is the application we turn to next.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Remark 3.1（sin/cos 的四步導數循環；呼應 §2.4 e^x 自我複製）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">看出微分把 sin、cos 循環送進彼此，四步回到原點（d⁴/dx⁴ sin = sin），並對照 e^x 的一步自我複製。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">四步循環圖：$\sin x \to \cos x \to -\sin x \to -\cos x \to \sin x$（一個 d/dx 一個箭頭）；
+標 $\tfrac{d^4}{dx^4}\sin x=\sin x$；旁標對照 $e^x$ 一步自我複製（$\tfrac{d}{dx}e^x=e^x$）。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">（選用）建議動畫：四個節點 sin x、cos x、−sin x、−cos x 排成環，箭頭依序
+點亮（每箭頭＝一次 d/dx），走完四步回到 sin x，凸顯「循環」與「四步歸位」；
+可在一旁放 e^x 的自我箭頭（一步即回）作對照。</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">15</span>
+    <span class="u-id">companion_limit</span><span class="u-kind">example</span></div>
+  <div class="u-narr"><p>The fundamental limit has a companion worth knowing:
+$\lim_{\theta\to 0}\dfrac{1-\cos\theta}{\theta}=0$. It is again of the form
+zero over zero, so we need a way in. The trick is to multiply top and bottom
+by $1+\cos\theta$ — the conjugate — which turns the numerator into a
+difference of squares: $(1-\cos\theta)(1+\cos\theta)=1-\cos^2\theta$. And
+$1-\cos^2\theta$ is just $\sin^2\theta$. So the expression becomes
+$\dfrac{\sin^2\theta}{\theta(1+\cos\theta)}$, which we split deliberately
+into two familiar pieces:
+$\dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$. Now let
+$\theta\to 0$. The first factor goes to one, by the fundamental limit we
+just proved. The second goes to $\dfrac{0}{1+1}$, which is zero. One times
+zero is zero — and there is the companion limit.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Example 3.1（伴隨極限 (1−cosθ)/θ → 0）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用「乘 1+cosθ」把另一個 0/0 極限化成基本極限的形式，得 0。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導鏈，逐行 reveal（每步附理由）：
+ 1. $\dfrac{1-\cos\theta}{\theta}=\dfrac{(1-\cos\theta)(1+\cos\theta)}{\theta(1+\cos\theta)}=\dfrac{1-\cos^2\theta}{\theta(1+\cos\theta)}$（理由：乘共軛 1+cosθ）。
+ 2. $=\dfrac{\sin^2\theta}{\theta(1+\cos\theta)}=\dfrac{\sin\theta}{\theta}\cdot\dfrac{\sin\theta}{1+\cos\theta}$（理由：$1-\cos^2\theta=\sin^2\theta$、拆兩因子）。
+ 3. $\to 1\cdot\dfrac{0}{1+1}=0$（理由：基本極限 + 連續）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導鏈即可）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">16</span>
+    <span class="u-id">all_six_trig_derivatives</span><span class="u-kind">example</span></div>
+  <div class="u-narr"><p>With sine and cosine in hand, the other four trig functions cost almost
+nothing — they are all just the quotient rule. Take $\tan x$, which is
+$\dfrac{\sin x}{\cos x}$. The quotient rule gives
+$\dfrac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^2 x}$, and the numerator is
+$\cos^2 x+\sin^2 x$, which the Pythagorean identity collapses to one. So
+$\dfrac{d}{dx}\tan x=\dfrac{1}{\cos^2 x}=\sec^2 x$. Secant is the same idea
+on $\dfrac{1}{\cos x}$: the quotient rule, with a constant on top, gives
+$\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}=\dfrac{\sin x}{\cos^2 x}$,
+which we read as $\dfrac{1}{\cos x}\cdot\dfrac{\sin x}{\cos x}=\sec x\tan x$.
+And the very same move on $\cot x=\dfrac{\cos x}{\sin x}$ and
+$\csc x=\dfrac{1}{\sin x}$ gives $-\csc^2 x$ and $-\csc x\cot x$. That
+completes the derivatives of all six trigonometric functions — every one
+built on $\sin'=\cos$ and $\cos'=-\sin$.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Example 3.2（tan'、sec' 用商法則；cot'、csc' 同法帶過）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">用商法則把 sin'/cos' 推到其餘四個三角函數，補齊全部六個導數。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導，逐行 reveal（tan、sec 完整顯示步驟；cot、csc repeat-pattern 帶過）：
+ 1. $\dfrac{d}{dx}\tan x=\dfrac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^2 x}$（理由：商法則於 $\tfrac{\sin}{\cos}$）。
+ 2. $=\dfrac{\cos^2 x+\sin^2 x}{\cos^2 x}=\dfrac{1}{\cos^2 x}=\sec^2 x$（理由：Pythagorean）。
+ 3. $\dfrac{d}{dx}\sec x=\dfrac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^2 x}=\dfrac{\sin x}{\cos^2 x}=\sec x\tan x$（理由：商法則於 $\tfrac1{\cos}$）。
+ 4. （帶過）$\dfrac{d}{dx}\cot x=-\csc^2 x,\quad \dfrac{d}{dx}\csc x=-\csc x\cot x$（理由：同手法）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導即可；cot/csc 走 repeat-pattern 帶過。若容量溢出，Stage 2 可拆 tan/sec 與 cot/csc 兩場、設 part:）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">17</span>
+    <span class="u-id">shm_compute</span><span class="u-kind">example</span></div>
+  <div class="u-narr"><p>Let us put the new derivatives to work on something that moves. A weight
+bobbing on a spring sits at height $s(t)=\sin t$ above its rest level.
+Velocity is the derivative of height, so $s'(t)=\cos t$. Acceleration is the
+derivative of velocity, so $s''(t)=-\sin t$. But look at that last line:
+$-\sin t$ is just $-s(t)$. The acceleration is the negative of the height.
+So at every instant the weight is pushed back toward rest, and harder the
+farther it has strayed. That relation, $s''=-s$, is the signature of simple
+harmonic motion. And it is no accident that sine and cosine — the functions
+whose second derivative is their own negative — are exactly the ones that
+describe oscillation.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Example 3.3（彈簧 s(t)=sin t，求 s'、s''，得 s''=−s）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">只用 sin'/cos' 算出速度與加速度，發現加速度等於負的高度——簡諧運動的簽名。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">推導，逐行 reveal：
+ 1. $s(t)=\sin t$（height）。
+ 2. $s'(t)=\cos t$（velocity）。
+ 3. $s''(t)=-\sin t$（acceleration）。
+ 4. $-\sin t=-s(t)$ ⇒ $s''=-s$（標「signature of SHM」）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態推導即可；幾何面交給 shm_stacked_graphs）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">18</span>
+    <span class="u-id">shm_stacked_graphs</span><span class="u-kind">visual</span></div>
+  <div class="u-narr"><p>Stack the three graphs over one time axis and the relationship jumps out.
+On top, the height $s=\sin t$. In the middle, the velocity $s'=\cos t$. On
+the bottom, the acceleration $s''=-\sin t$. Watch the dashed lines where the
+height hits a peak or a trough — at those instants the velocity, in the
+middle graph, is passing through zero, because at the extremes the weight
+momentarily stops. Now hold the bottom graph against the top: it is the top
+one flipped upside down. That is $s''=-s$, drawn — acceleration mirroring
+height, the very picture of an oscillation.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · Figure 3.4（data-fig: shm-triple；s/s'/s'' 三層堆疊，s''=−s 鏡像）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">在三層共軸的圖上看見「峰谷處速度過零」與「加速度＝高度上下翻」＝ s''=−s。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">三層共用一條時間軸 t∈[0,2π]：頂 $s=\sin t$、中 $s'=\cos t$、底 $s''=-\sin t$；
+t=π/2、3π/2 拉垂直虛線（頂峰/谷 ↔ 中圖過零）；底圖＝頂圖上下翻（$s''=-s$）。</span></div><div class="d-row"><span class="d-key">animation cue</span><span class="d-val">建議動畫：三個小圖垂直堆疊、共用時間軸。依序 trace 出 s（頂）、s'（中）、
+s''（底）。在 t=π/2、3π/2 落下垂直虛線，凸顯頂圖峰/谷處中圖正好過零。
+最後把底圖與頂圖並比（或底圖由頂圖翻摺生成），點出 s''=−s 的上下鏡射。</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">19</span>
+    <span class="u-id">toward_the_chain_rule</span><span class="u-kind">forward_ref</span></div>
+  <div class="u-narr"><p>We can now differentiate every trigonometric function — but only in its bare
+form. We can handle $\sin x$, yet not $\sin(x^2)$ or $\sin(3x+1)$, where the
+angle is itself a function tucked inside. To reach a function buried inside
+another, we need one more rule: a way to differentiate a composition. That
+rule is the chain rule, and it is what comes next — and with it, every
+derivative we found today becomes the seed of a whole family more.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1 · 收尾散文（forward-ref：只能微分裸三角函數，sin(x²) 等需連鎖律）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">認清目前只能微分「裸」三角函數，要處理 sin(x²) 之類的合成需要下一個工具。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">對比：能做 $\sin x$；不能直接做 $\sin(x^2)$、$\sin(3x+1)$（角度是內層函數）→
+指向「下一個工具：連鎖律」。MUST NOT 報節號。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態即可）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">20</span>
+    <span class="u-id">recap</span><span class="u-kind">recap</span></div>
+  <div class="u-narr"><p>Pull the section together. Everything grew from one limit:
+$\dfrac{\sin\theta}{\theta}\to 1$ as $\theta\to 0$, which we cracked not with
+algebra but by squeezing it between $\cos\theta$ and one on the unit circle.
+That limit, together with the continuity of sine and cosine, gave the two
+derivatives at the heart of the section: $\sin'=\cos$ and $\cos'=-\sin$.
+From those two, the quotient rule delivered all the other trig derivatives.
+Keep the cycle in mind — differentiating runs
+$\sin\to\cos\to-\sin\to-\cos$ and back around, so the fourth derivative
+brings you home. And remember the fine print: all of it depends on measuring
+angles in radians.</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1（全節重點凝煉；Key Takeaways 單元，有旁白）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">把本節串成一條線——一個極限 → 兩個導數 → 其餘四個 → 四步循環 → 全靠弧度。</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">Key Takeaways 卡片（5 點）＋ remember-formula 卡：
+points：
+  • 基本極限：$\sin\theta/\theta \to 1$（θ→0），靠單位圓上的夾擠證得。
+  • $\tfrac{d}{dx}\sin x=\cos x$、$\tfrac{d}{dx}\cos x=-\sin x$。
+  • 由這兩個＋商法則，得全部六個三角函數的導數。
+  • 導數四步循環：$\sin\to\cos\to-\sin\to-\cos\to\sin$。
+  • 一切以弧度為前提。
+formulas（保持短，避免出框）：
+  • $\lim_{\theta\to0}\dfrac{\sin\theta}{\theta}=1$
+  • $\dfrac{d}{dx}\sin x=\cos x,\quad \dfrac{d}{dx}\cos x=-\sin x$</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（無——靜態卡片即可）</span></div></details>
+</section>
+<section class="unit">
+  <div class="u-head"><span class="u-num">21</span>
+    <span class="u-id">outro</span><span class="u-kind">recap</span></div>
+  <div class="u-narr"><p class="narr-none">（無——outro 為純動畫，無 takeaways）</p></div>
+  <details><summary>source · goal · visual · animation</summary><div class="d-row"><span class="d-key">source</span><span class="d-val">chapter3-print-standalone.html §3.1（節末品牌字卡）</span></div><div class="d-row"><span class="d-key">learning goal</span><span class="d-val">（收尾；無教學內容）</span></div><div class="d-row"><span class="d-key">visual need</span><span class="d-val">兩段式 outro——暗轉亮橋接 → 最終 logo／節號／標題字卡（Next 3.2 The Chain Rule）。</span></div><div class="d-row d-na"><span class="d-key">animation cue</span><span class="d-val">（由 outro 模板處理）</span></div></details>
+</section></div></body></html>
+
+ succeeded in 504ms:
+# §3.1 Derivatives of Sine and Cosine — 旁白口語版（版本 B · MiMo-V2.5-TTS 客製）
+
+> **此檔為生成檔（DO NOT EDIT）。** 由 `content_scripts/ch03_trig_derivatives.spoken.yml`（口語單一源） 經 `pipeline/derive_spoken.py` 生成。要改旁白請改 `.spoken.yml` 後重生。
+> **性質：版本 B（口語 TTS 版）。** 英文散文逐字忠於內容稿 `narration`，**只把數學攤成口語**（無 LaTeX），供不能直讀 LaTeX 的 TTS（MiMo）照念。對照閱讀版（版本 A，數學渲染）＝ `ch03_trig_derivatives_narration.html`。
+> **NFA 稽核狀態：** 見 `content_scripts/_audit/`（每節各自記錄）。
+
+---
+
+## 一、MiMo 合成設定（現用）
+
+| 項目 | 值 |
+|------|----|
+| `model` | `mimo-v2.5-tts` |
+| `audio.voice` | `Mia`（英文女聲）／備選 Dean·Milo·Chloe |
+| `audio.format` | `wav`（24kHz/mono/PCM16，與產線 `write_pcm_wav` 相容；beat WAV 自動裁頭尾靜音） |
+
+**全域風格指令（放每次呼叫的 `user` 訊息）— YouTube 科普風、正常語速：**
+
+```
+Read like the narrator of a polished YouTube science explainer: clear, engaging,
+and conversational, at a normal talking pace — natural momentum, not slow or drawn
+out, and no long dramatic pauses, just ordinary pauses at sentence ends. Warm and
+lightly energetic, curious rather than solemn, like explaining an idea to a smart
+friend. Pronounce every mathematical expression clearly and correctly.
+```
+
+**Audio tag：** 維持預設**不啟用**（口語稿純文字，節奏靠風格指令＋標點）。
+
+## 二、數學念法慣例（全節通用；NFA 裁定）
+
+| 數學 | 口語念法 | 備註 |
+|------|---------|------|
+| $f^{-1}$（反函數記號） | **“f inverse”** | 絕不念 “f to the minus one”。例外：若課文**刻意對比** $\sin^{-1}$ 記號與 $1/\sin$，該處照字面念 “sine to the minus one” 並講清不是倒數。 |
+| $x_1,\ x_2$（下標） | **“x sub one”, “x sub two”** | 正式定義／證明語境最無歧義。 |
+| $x^2,\ x^3$ | “x squared”, “x cubed” | |
+| $\sqrt[3]{x}$ / $\sqrt[3]{y-2}$ | “the cube root of x” / “…of **the quantity** y minus two” | 和/差根號加 “the quantity” 消歧義。 |
+| $(\sqrt[3]{x-2})^3$ / $(f^{-1}(x))^2$ | “…, **all cubed**” / “…, **all squared**” | 外層次方蓋整體。 |
+| 分數 $\tfrac{a}{b}$ | “a over b”（簡單分數念 “one half / one quarter / nine-fifths”…） | |
+| 複雜分數（分子或分母含乘積／根號） | “…, all over …” 或 “… divided by the quantity …” | 例：$\tfrac{1}{2\sqrt2}$→“one over the quantity two root two”（“the quantity” 群組分母、防 (1/2)√2 誤聽）；$-\tfrac{2\sqrt5}{5}$→“negative two root five over five”（兩種群組同值、免 quantity）（NFA §1.2 D5）。 |
+| 區間 $[a,b]$ / $(a,b)$ | “the (open) interval from a to b” | |
+| 座標點 $(a,b)$ | **“the point with coordinates a and b”** | 無視覺符號時最清楚。 |
+| $\pi/2$、$\arcsin$… | “pi over two”、“arcsine of …” | 反三角直接念 arc-名。 |
+| domain $A$ / range $B$ | “domain A / range B” | |
+
+## 三、逐段口語稿
+
+> 每段 `uNN · id` 即該單元 `assistant` 訊息內容（`{show}` 已移除）。intro/outro 無旁白，不列。
+
+### u3 · why_trig_is_different
+Every derivative so far has yielded to algebra. For a polynomial we expanded the quantity x plus h, to the n, and the binomial theorem handed us a factor of h to cancel; for e to the x the power series did the same job. The trigonometric functions refuse to play along. Write down the difference quotient for sine x and try the usual move. You cannot simply set h equal to zero: that gives zero over zero, which tells you nothing. And no identity cancels the h in the denominator -- sine of the quantity x plus h simply does not break into pieces that conveniently subtract. As we are about to see, the whole computation funnels down to a single limit, the limit of sine theta over theta -- again the indeterminate form zero over zero, and one that no algebra will crack. Prying it open takes a genuinely new tool: a geometric comparison of areas on the unit circle. And once we secure that one limit, it unlocks the derivatives of both sine and cosine at once. One ground rule, though: throughout, angles are measured in radians -- an assumption that turns out to be essential.
+
+### u4 · difference_quotient_for_sine
+So let us transform that difference quotient instead of fighting it head-on. The decisive step is one trigonometric identity -- sum-to-product -- which turns a difference of sines into a product. Here it is; and a product is exactly what we want, because we can pull it apart and take limits one factor at a time. Put A equals x plus h and B equals x, and the numerator becomes two cosine of the quantity x plus h over two, times sine of h over two. Now divide by h -- and here is the small trick that makes everything line up: write h as two times h over two, so the denominator carries the very h over two inside the sine. The quotient cleans up to cosine of the quantity x plus h over two, times sine of h over two, all over h over two. Look at what we have: a product of two factors. The first slides to cosine x, provided cosine is continuous; the second is exactly sine theta over theta with theta equals h over two. So the whole derivative hangs on just two facts -- continuity, and that fundamental limit. We secure both now.
+
+### u6 · sector_inequality
+Here is that new tool. We compare three areas on a circle of radius one. But first, one convenience that saves us half the work. Replacing theta by negative theta flips the sign of both theta and sine theta, so the ratio sine theta over theta is even -- whatever we learn for positive angles holds for negative ones, so it is enough to chase theta down to zero from the positive side. Now the geometry. On the unit circle, A is at the point with coordinates one and zero, B is the point at angle theta, and extending the radius to the tangent at A gives C equals the point with coordinates one and tangent theta. The inner triangle O A B has base one and height sine theta, so its area is one half sine theta. The sector O A B is the fraction theta over two pi of the disc -- area one half theta. And the outer triangle O A C has height tangent theta, so its area is one half tangent theta. Each region sits inside the next, so the areas line up in order: one half sine theta, then one half theta, then one half tangent theta. The whole argument hangs on that one picture.
+
+### u7 · squeeze_to_the_bound
+Now turn that chain of areas into a statement about sine theta over theta, one careful step at a time. Multiply through by two to clear the halves: sine theta at most theta at most tangent theta. Divide every part by sine theta, positive here, and rewrite tangent theta as sine theta over cosine theta -- giving one at most theta over sine theta at most one over cosine theta. The middle is upside down, so take reciprocals of all three. They are positive, and flipping positives reverses the inequalities, so the chain turns around: cosine theta at most sine theta over theta at most one, for theta between zero and pi over two. And pocket one more consequence: from sine theta at most theta we also get zero at most the absolute value of sine theta at most the absolute value of theta near zero -- a bound we lean on twice in a moment.
+
+### u8 · continuity_statement_sin_limit
+That little bound does more than help with the limit -- it is the key to continuity. And continuity here means something concrete: nudge the angle a little, and sine and cosine move only a little; they never jump. We even have the tool that says so -- on the unit circle the half-chord sine theta is always shorter than the arc theta above it, which is just the absolute value of sine theta at most the absolute value of theta read geometrically. So here is the claim, made precise: sine x and cosine x are continuous at every real x sub zero. Build it from the ground up. Since zero at most the absolute value of sine theta at most the absolute value of theta, and the absolute value of theta itself goes to zero, the squeeze theorem forces sine theta to go to zero. That single limit is the seed; the full continuity grows straight out of it, which is what we do next.
+
+### u9 · continuity_argument
+Now turn that seed into full continuity. Fix a point x sub zero, and ask how much cosine x and sine x can change as x moves toward it. Sum-to-product answers both at once. For cosine, cosine x minus cosine x sub zero is negative two sine of the quantity x minus x sub zero, over two, times sine of the quantity x plus x sub zero, over two; and for sine, sine x minus sine x sub zero is two cosine of the quantity x plus x sub zero, over two, times sine of the quantity x minus x sub zero, over two. In each, the half-sum factor never exceeds one in size. Drop it to its largest size, one, and both differences are bounded by the same thing -- twice the absolute value of sine of the quantity x minus x sub zero, over two. Now let x go to x sub zero: the half-angle goes to zero, so that bound collapses to zero. Squeeze one last time, and cosine x goes to cosine x sub zero, sine x goes to sine x sub zero -- both continuous everywhere.
+
+### u10 · fundamental_limit
+Now we can finally close the limit that started all of this. The claim is as clean as it gets: sine theta over theta tends to one as theta goes to zero. And we already built the trap. For theta between zero and pi over two, the ratio is pinned between a floor and a ceiling: cosine theta at most sine theta over theta at most one. The ceiling is the constant one. The floor is cosine theta, which tends to one now that we know cosine is continuous -- so the squeeze pins the ratio to one from the right. And because the ratio is even, its left limit matches its right, so the two-sided limit is one as well. That is the keystone.
+
+### u11 · squeeze_graph
+It helps to picture that squeeze. Here runs cosine theta, the dashed floor. And the ceiling -- the constant line at height one. Between them, the ratio sine theta over theta, caught in the narrowing gap. As theta slides toward zero the floor rises to one and the ceiling already is one, so the curve is squeezed right to one. Notice the open circle at theta equals zero: the ratio is undefined there, zero over zero. So what equals one is the limit -- the height the curve is forced toward, not a value it ever takes.
+
+### u12 · limit_not_identity
+One caution, because this result is easy to over-read. The statement is about the limit as theta goes to zero -- not an identity. At a fixed angle the ratio is generally not one: at theta equals pi over two it is two over pi, about zero point six four, and at theta equals pi it is zero. The value one is reached only in the limit.
+
+### u13 · radians_essential
+A second caution, and this one is structural. Everything here depends on radians. The sector area one half theta -- and with it the limit -- uses radian measure. Switch to degrees and the limit is pi over one hundred eighty, not one, so the derivative drags that factor along. The clean formulas sine prime equals cosine and cosine prime equals negative sine hold only in radians.
+
+### u15 · derivative_of_sine
+Now the payoff, and it falls into our hands. The claim: the derivative of sine x is cosine x, for every real x. Start from the definition -- the derivative is the limit of the difference quotient. But we already did the hard algebra: that quotient is cosine of the quantity x plus h over two, times sine of h over two, all over h over two. Let h go to zero: the first factor tends to cosine x by continuity, the second to one by the fundamental limit. A continuous thing times a limit -- the product is cosine x times one, just cosine x.
+
+### u16 · derivative_of_cosine
+Cosine falls to the very same machinery -- only the identity changes, so we go quickly. The claim: the derivative of cosine x is negative sine x. This time use the companion sum-to-product formula. The same division by h turns the difference quotient into negative sine of the quantity x plus h over two, times sine of h over two, all over h over two. Send h to zero: the sine factor tends to sine x by continuity, the second to one by the fundamental limit. The leading minus sign comes along -- leaving negative sine x. Same two tools, one extra minus sign.
+
+### u17 · slope_equals_height
+Here is what that theorem looks like on the graph. Draw y equals sine x, and check the slope of its tangent at a few points. At x equals zero it is climbing at slope one. At x equals pi over two, the top of the hump, the tangent is flat -- slope zero. At x equals pi it is falling at slope minus one. Now lay y equals cosine x on top, and read its heights at those same points: one, zero, minus one. They match exactly -- the slope of sine is the height of cosine, the theorem drawn.
+
+### u18 · derivative_cycle
+Step back and watch the pattern these two derivatives make. Differentiation sends sine and cosine into each other, with a minus sign that turns over every second step. Writing an arrow for one derivative: sine x to cosine x to negative sine x to negative cosine x, and back to sine x. Four derivatives and you are home -- the fourth derivative of sine is sine again. Where e to the x reproduces itself in a single step, these do it in a cycle of four: the self-renewal that lets them oscillate forever without winding down.
+
+### u20 · companion_limit
+The fundamental limit has a companion worth knowing: the quantity one minus cosine theta, over theta tends to zero. It is again zero over zero, so we need a way in. Multiply top and bottom by the conjugate one plus cosine theta; the numerator becomes a difference of squares, one minus cosine squared theta. And one minus cosine squared theta is just sine squared theta, so the whole thing splits into sine theta over theta times sine theta over the quantity one plus cosine theta. Let theta go to zero: the first factor goes to one, the second to zero over two. One times zero is zero.
+
+### u21 · all_six_tan_sec
+With sine and cosine in hand, the other four cost almost nothing -- just the quotient rule. Take tangent x equals sine x over cosine x. The quotient rule gives this. The numerator is cosine squared x plus sine squared x, which is one -- so the derivative of tangent x is secant squared x. Secant is the same idea on one over cosine x: the quotient rule, with a constant on top, gives this. Clean it up, and secant's derivative is secant x tangent x.
+
+### u22 · all_six_cot_csc
+The last two run exactly the same way. Take cotangent x equals cosine x over sine x. The quotient rule gives this. The numerator is minus the quantity sine squared x plus cosine squared x, again one -- so cotangent x differentiates to negative cosecant squared x. And cosecant x is one over sine x: the same rule lands this. Cleaned up, that is negative cosecant x cotangent x -- and all six are done, every one built on sine prime equals cosine and cosine prime equals negative sine.
+
+### u23 · shm_compute
+Let us put the new derivatives to work on something moving. A weight on a spring has height s of t equals sine t. Velocity is its derivative, s prime of t equals cosine t. Acceleration is the next derivative, s double prime of t equals negative sine t. But negative sine t is just negative s of t -- at every instant the weight is pushed back toward rest. That relation, s double prime equals negative s, is the signature of simple harmonic motion; sine and cosine are exactly the functions that describe it.
+
+### u24 · shm_stacked_graphs
+Stack the three graphs over one time axis and the relationship jumps out. On top, the height s equals sine t. In the middle, the velocity s prime equals cosine t. On the bottom, the acceleration s double prime equals negative sine t. Watch where the height hits a peak or a trough -- there the velocity passes through zero, because at the extremes the weight momentarily stops. And hold the bottom graph against the top: it is the top one flipped upside down. That is s double prime equals negative s, drawn -- the very picture of an oscillation.
+
+### u25 · toward_the_chain_rule
+We can now differentiate every trigonometric function -- but only in its bare form. We can handle sine x, yet not sine of x squared or sine of the quantity three x plus one, where the angle is itself a function tucked inside. To reach a function buried inside another, we need one more rule -- a way to differentiate a composition. That is the chain rule, and it is what comes next; with it, every derivative we found today becomes the seed of a whole family more.
+
+### u26 · recap
+Pull the section together. Everything grew from one limit: sine theta over theta tends to one, cracked by squeezing areas on the unit circle. That limit, with continuity, gave the two derivatives at the heart of the section -- sine differentiates to cosine, cosine to negative sine. From those two, the quotient rule delivered all the other trig derivatives -- tangent, cotangent, secant, cosecant. And keep the cycle in mind -- four derivatives of sine or cosine bring you home -- with the fine print that it all depends on radians.
+
+---
+
+## 四、備忘
+
+- 口語文字單一源＝ `content_scripts/ch03_trig_derivatives.spoken.yml`；本檔與 `storyboards/ch03_trig_derivatives_mimo.yml` 皆由 `derive_spoken.py` 生成。
+- `{show}` beat 切分與正典 storyboard 對齊（`derive_spoken.py --check` 守門）。
+- 計費：MiMo 公測限免但屬外部 API；批次合成前依 `CLAUDE.md` 報用量、徵同意。
+
+
+codex
+I’ve finished the source-versus-spoken pass and am checking the math read-aloud layer now. The only area that needs close judgment is fraction grouping inside trig arguments, especially the repeated `x + h/2` expressions.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"quantity x plus h over two|sine of h over two|x sub zero, over two|h over two\" 'video/content_scripts/ch03_trig_derivatives_narration_spoken.md'" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"x\\+\\\\tfrac h2|x\\+\\\\frac h2|sin\\(h/2\\)|\\\\sin\\\\frac h2|x-x_0|x\\+x_0\" 'video/storyboards/ch03_trig_derivatives.yml'" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"zero over zero|point|prime|squared|cubed|over|at most|negative\" 'video/content_scripts/ch03_trig_derivatives_narration_spoken.md'" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 398ms:
+53:So let us transform that difference quotient instead of fighting it head-on. The decisive step is one trigonometric identity -- sum-to-product -- which turns a difference of sines into a product. Here it is; and a product is exactly what we want, because we can pull it apart and take limits one factor at a time. Put A equals x plus h and B equals x, and the numerator becomes two cosine of the quantity x plus h over two, times sine of h over two. Now divide by h -- and here is the small trick that makes everything line up: write h as two times h over two, so the denominator carries the very h over two inside the sine. The quotient cleans up to cosine of the quantity x plus h over two, times sine of h over two, all over h over two. Look at what we have: a product of two factors. The first slides to cosine x, provided cosine is continuous; the second is exactly sine theta over theta with theta equals h over two. So the whole derivative hangs on just two facts -- continuity, and that fundamental limit. We secure both now.
+65:Now turn that seed into full continuity. Fix a point x sub zero, and ask how much cosine x and sine x can change as x moves toward it. Sum-to-product answers both at once. For cosine, cosine x minus cosine x sub zero is negative two sine of the quantity x minus x sub zero, over two, times sine of the quantity x plus x sub zero, over two; and for sine, sine x minus sine x sub zero is two cosine of the quantity x plus x sub zero, over two, times sine of the quantity x minus x sub zero, over two. In each, the half-sum factor never exceeds one in size. Drop it to its largest size, one, and both differences are bounded by the same thing -- twice the absolute value of sine of the quantity x minus x sub zero, over two. Now let x go to x sub zero: the half-angle goes to zero, so that bound collapses to zero. Squeeze one last time, and cosine x goes to cosine x sub zero, sine x goes to sine x sub zero -- both continuous everywhere.
+80:Now the payoff, and it falls into our hands. The claim: the derivative of sine x is cosine x, for every real x. Start from the definition -- the derivative is the limit of the difference quotient. But we already did the hard algebra: that quotient is cosine of the quantity x plus h over two, times sine of h over two, all over h over two. Let h go to zero: the first factor tends to cosine x by continuity, the second to one by the fundamental limit. A continuous thing times a limit -- the product is cosine x times one, just cosine x.
+83:Cosine falls to the very same machinery -- only the identity changes, so we go quickly. The claim: the derivative of cosine x is negative sine x. This time use the companion sum-to-product formula. The same division by h turns the difference quotient into negative sine of the quantity x plus h over two, times sine of h over two, all over h over two. Send h to zero: the sine factor tends to sine x by continuity, the second to one by the fundamental limit. The leading minus sign comes along -- leaving negative sine x. Same two tools, one extra minus sign.
+
+ succeeded in 365ms:
+123:      $2\cos(x+\tfrac h2)\sin\tfrac h2$.
+127:      $\cos(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
+136:      - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\frac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot\\tfrac h2$" }
+137:    result: { math: "\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x\\quad\\text{and}\\quad \\frac{\\sin(h/2)}{h/2}\\to 1", reason: "continuity + the limit" }
+267:      $\cos x-\cos x_0$ is $-2\sin\tfrac{x-x_0}{2}\sin\tfrac{x+x_0}{2}$;
+269:      $2\cos\tfrac{x+x_0}{2}\sin\tfrac{x-x_0}{2}$. In each, the half-sum factor
+272:      bounded by the same thing -- twice $|\sin\tfrac{x-x_0}{2}|$.
+278:      - "$\\cos x-\\cos x_0=-2\\sin\\frac{x-x_0}{2}\\,\\sin\\frac{x+x_0}{2}$"
+279:      - "$\\sin x-\\sin x_0=\\phantom{-}2\\cos\\frac{x+x_0}{2}\\,\\sin\\frac{x-x_0}{2}$"
+280:      - "$|\\cos x-\\cos x_0|,\\ |\\sin x-\\sin x_0|\\le 2|\\sin\\frac{x-x_0}{2}|$"
+413:      $\cos(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
+421:      - "$=\\lim_{h\\to 0}\\cos\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
+422:      - "$\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
+442:      $-\sin(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
+450:      - "$\\frac{\\cos(x+h)-\\cos x}{h}=-\\sin\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
+451:      - "$-\\sin\\!\\left(x+\\frac h2\\right)\\to-\\sin x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
+
+ succeeded in 383ms:
+35:| $x^2,\ x^3$ | “x squared”, “x cubed” | |
+37:| $(\sqrt[3]{x-2})^3$ / $(f^{-1}(x))^2$ | “…, **all cubed**” / “…, **all squared**” | 外層次方蓋整體。 |
+38:| 分數 $\tfrac{a}{b}$ | “a over b”（簡單分數念 “one half / one quarter / nine-fifths”…） | |
+39:| 複雜分數（分子或分母含乘積／根號） | “…, all over …” 或 “… divided by the quantity …” | 例：$\tfrac{1}{2\sqrt2}$→“one over the quantity two root two”（“the quantity” 群組分母、防 (1/2)√2 誤聽）；$-\tfrac{2\sqrt5}{5}$→“negative two root five over five”（兩種群組同值、免 quantity）（NFA §1.2 D5）。 |
+41:| 座標點 $(a,b)$ | **“the point with coordinates a and b”** | 無視覺符號時最清楚。 |
+42:| $\pi/2$、$\arcsin$… | “pi over two”、“arcsine of …” | 反三角直接念 arc-名。 |
+50:Every derivative so far has yielded to algebra. For a polynomial we expanded the quantity x plus h, to the n, and the binomial theorem handed us a factor of h to cancel; for e to the x the power series did the same job. The trigonometric functions refuse to play along. Write down the difference quotient for sine x and try the usual move. You cannot simply set h equal to zero: that gives zero over zero, which tells you nothing. And no identity cancels the h in the denominator -- sine of the quantity x plus h simply does not break into pieces that conveniently subtract. As we are about to see, the whole computation funnels down to a single limit, the limit of sine theta over theta -- again the indeterminate form zero over zero, and one that no algebra will crack. Prying it open takes a genuinely new tool: a geometric comparison of areas on the unit circle. And once we secure that one limit, it unlocks the derivatives of both sine and cosine at once. One ground rule, though: throughout, angles are measured in radians -- an assumption that turns out to be essential.
+53:So let us transform that difference quotient instead of fighting it head-on. The decisive step is one trigonometric identity -- sum-to-product -- which turns a difference of sines into a product. Here it is; and a product is exactly what we want, because we can pull it apart and take limits one factor at a time. Put A equals x plus h and B equals x, and the numerator becomes two cosine of the quantity x plus h over two, times sine of h over two. Now divide by h -- and here is the small trick that makes everything line up: write h as two times h over two, so the denominator carries the very h over two inside the sine. The quotient cleans up to cosine of the quantity x plus h over two, times sine of h over two, all over h over two. Look at what we have: a product of two factors. The first slides to cosine x, provided cosine is continuous; the second is exactly sine theta over theta with theta equals h over two. So the whole derivative hangs on just two facts -- continuity, and that fundamental limit. We secure both now.
+56:Here is that new tool. We compare three areas on a circle of radius one. But first, one convenience that saves us half the work. Replacing theta by negative theta flips the sign of both theta and sine theta, so the ratio sine theta over theta is even -- whatever we learn for positive angles holds for negative ones, so it is enough to chase theta down to zero from the positive side. Now the geometry. On the unit circle, A is at the point with coordinates one and zero, B is the point at angle theta, and extending the radius to the tangent at A gives C equals the point with coordinates one and tangent theta. The inner triangle O A B has base one and height sine theta, so its area is one half sine theta. The sector O A B is the fraction theta over two pi of the disc -- area one half theta. And the outer triangle O A C has height tangent theta, so its area is one half tangent theta. Each region sits inside the next, so the areas line up in order: one half sine theta, then one half theta, then one half tangent theta. The whole argument hangs on that one picture.
+59:Now turn that chain of areas into a statement about sine theta over theta, one careful step at a time. Multiply through by two to clear the halves: sine theta at most theta at most tangent theta. Divide every part by sine theta, positive here, and rewrite tangent theta as sine theta over cosine theta -- giving one at most theta over sine theta at most one over cosine theta. The middle is upside down, so take reciprocals of all three. They are positive, and flipping positives reverses the inequalities, so the chain turns around: cosine theta at most sine theta over theta at most one, for theta between zero and pi over two. And pocket one more consequence: from sine theta at most theta we also get zero at most the absolute value of sine theta at most the absolute value of theta near zero -- a bound we lean on twice in a moment.
+62:That little bound does more than help with the limit -- it is the key to continuity. And continuity here means something concrete: nudge the angle a little, and sine and cosine move only a little; they never jump. We even have the tool that says so -- on the unit circle the half-chord sine theta is always shorter than the arc theta above it, which is just the absolute value of sine theta at most the absolute value of theta read geometrically. So here is the claim, made precise: sine x and cosine x are continuous at every real x sub zero. Build it from the ground up. Since zero at most the absolute value of sine theta at most the absolute value of theta, and the absolute value of theta itself goes to zero, the squeeze theorem forces sine theta to go to zero. That single limit is the seed; the full continuity grows straight out of it, which is what we do next.
+65:Now turn that seed into full continuity. Fix a point x sub zero, and ask how much cosine x and sine x can change as x moves toward it. Sum-to-product answers both at once. For cosine, cosine x minus cosine x sub zero is negative two sine of the quantity x minus x sub zero, over two, times sine of the quantity x plus x sub zero, over two; and for sine, sine x minus sine x sub zero is two cosine of the quantity x plus x sub zero, over two, times sine of the quantity x minus x sub zero, over two. In each, the half-sum factor never exceeds one in size. Drop it to its largest size, one, and both differences are bounded by the same thing -- twice the absolute value of sine of the quantity x minus x sub zero, over two. Now let x go to x sub zero: the half-angle goes to zero, so that bound collapses to zero. Squeeze one last time, and cosine x goes to cosine x sub zero, sine x goes to sine x sub zero -- both continuous everywhere.
+68:Now we can finally close the limit that started all of this. The claim is as clean as it gets: sine theta over theta tends to one as theta goes to zero. And we already built the trap. For theta between zero and pi over two, the ratio is pinned between a floor and a ceiling: cosine theta at most sine theta over theta at most one. The ceiling is the constant one. The floor is cosine theta, which tends to one now that we know cosine is continuous -- so the squeeze pins the ratio to one from the right. And because the ratio is even, its left limit matches its right, so the two-sided limit is one as well. That is the keystone.
+71:It helps to picture that squeeze. Here runs cosine theta, the dashed floor. And the ceiling -- the constant line at height one. Between them, the ratio sine theta over theta, caught in the narrowing gap. As theta slides toward zero the floor rises to one and the ceiling already is one, so the curve is squeezed right to one. Notice the open circle at theta equals zero: the ratio is undefined there, zero over zero. So what equals one is the limit -- the height the curve is forced toward, not a value it ever takes.
+74:One caution, because this result is easy to over-read. The statement is about the limit as theta goes to zero -- not an identity. At a fixed angle the ratio is generally not one: at theta equals pi over two it is two over pi, about zero point six four, and at theta equals pi it is zero. The value one is reached only in the limit.
+77:A second caution, and this one is structural. Everything here depends on radians. The sector area one half theta -- and with it the limit -- uses radian measure. Switch to degrees and the limit is pi over one hundred eighty, not one, so the derivative drags that factor along. The clean formulas sine prime equals cosine and cosine prime equals negative sine hold only in radians.
+80:Now the payoff, and it falls into our hands. The claim: the derivative of sine x is cosine x, for every real x. Start from the definition -- the derivative is the limit of the difference quotient. But we already did the hard algebra: that quotient is cosine of the quantity x plus h over two, times sine of h over two, all over h over two. Let h go to zero: the first factor tends to cosine x by continuity, the second to one by the fundamental limit. A continuous thing times a limit -- the product is cosine x times one, just cosine x.
+83:Cosine falls to the very same machinery -- only the identity changes, so we go quickly. The claim: the derivative of cosine x is negative sine x. This time use the companion sum-to-product formula. The same division by h turns the difference quotient into negative sine of the quantity x plus h over two, times sine of h over two, all over h over two. Send h to zero: the sine factor tends to sine x by continuity, the second to one by the fundamental limit. The leading minus sign comes along -- leaving negative sine x. Same two tools, one extra minus sign.
+86:Here is what that theorem looks like on the graph. Draw y equals sine x, and check the slope of its tangent at a few points. At x equals zero it is climbing at slope one. At x equals pi over two, the top of the hump, the tangent is flat -- slope zero. At x equals pi it is falling at slope minus one. Now lay y equals cosine x on top, and read its heights at those same points: one, zero, minus one. They match exactly -- the slope of sine is the height of cosine, the theorem drawn.
+89:Step back and watch the pattern these two derivatives make. Differentiation sends sine and cosine into each other, with a minus sign that turns over every second step. Writing an arrow for one derivative: sine x to cosine x to negative sine x to negative cosine x, and back to sine x. Four derivatives and you are home -- the fourth derivative of sine is sine again. Where e to the x reproduces itself in a single step, these do it in a cycle of four: the self-renewal that lets them oscillate forever without winding down.
+92:The fundamental limit has a companion worth knowing: the quantity one minus cosine theta, over theta tends to zero. It is again zero over zero, so we need a way in. Multiply top and bottom by the conjugate one plus cosine theta; the numerator becomes a difference of squares, one minus cosine squared theta. And one minus cosine squared theta is just sine squared theta, so the whole thing splits into sine theta over theta times sine theta over the quantity one plus cosine theta. Let theta go to zero: the first factor goes to one, the second to zero over two. One times zero is zero.
+95:With sine and cosine in hand, the other four cost almost nothing -- just the quotient rule. Take tangent x equals sine x over cosine x. The quotient rule gives this. The numerator is cosine squared x plus sine squared x, which is one -- so the derivative of tangent x is secant squared x. Secant is the same idea on one over cosine x: the quotient rule, with a constant on top, gives this. Clean it up, and secant's derivative is secant x tangent x.
+98:The last two run exactly the same way. Take cotangent x equals cosine x over sine x. The quotient rule gives this. The numerator is minus the quantity sine squared x plus cosine squared x, again one -- so cotangent x differentiates to negative cosecant squared x. And cosecant x is one over sine x: the same rule lands this. Cleaned up, that is negative cosecant x cotangent x -- and all six are done, every one built on sine prime equals cosine and cosine prime equals negative sine.
+101:Let us put the new derivatives to work on something moving. A weight on a spring has height s of t equals sine t. Velocity is its derivative, s prime of t equals cosine t. Acceleration is the next derivative, s double prime of t equals negative sine t. But negative sine t is just negative s of t -- at every instant the weight is pushed back toward rest. That relation, s double prime equals negative s, is the signature of simple harmonic motion; sine and cosine are exactly the functions that describe it.
+104:Stack the three graphs over one time axis and the relationship jumps out. On top, the height s equals sine t. In the middle, the velocity s prime equals cosine t. On the bottom, the acceleration s double prime equals negative sine t. Watch where the height hits a peak or a trough -- there the velocity passes through zero, because at the extremes the weight momentarily stops. And hold the bottom graph against the top: it is the top one flipped upside down. That is s double prime equals negative s, drawn -- the very picture of an oscillation.
+107:We can now differentiate every trigonometric function -- but only in its bare form. We can handle sine x, yet not sine of x squared or sine of the quantity three x plus one, where the angle is itself a function tucked inside. To reach a function buried inside another, we need one more rule -- a way to differentiate a composition. That is the chain rule, and it is what comes next; with it, every derivative we found today becomes the seed of a whole family more.
+110:Pull the section together. Everything grew from one limit: sine theta over theta tends to one, cracked by squeezing areas on the unit circle. That limit, with continuity, gave the two derivatives at the heart of the section -- sine differentiates to cosine, cosine to negative sine. From those two, the quotient rule delivered all the other trig derivatives -- tangent, cotangent, secant, cosecant. And keep the cycle in mind -- four derivatives of sine or cosine bring you home -- with the fine print that it all depends on radians.
+
+codex
+The math expressions otherwise track the storyboard well: inequalities use “at most,” coordinates use “point with coordinates,” primes and double-primes are spoken correctly, and the old Version A divergence is only cross-reference context. I’m doing one final sanity pass before the verdict.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Get-Content -Encoding UTF8 -LiteralPath 'video/pipeline/derive_spoken.py' | Select-Object -Skip 156 -First 36" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'python video/pipeline/derive_spoken.py --deck ch03_trig_derivatives --check' in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'python video/pipeline/derive_spoken.py --deck ch03_trig_derivatives --check'` rejected: blocked by policy
+2026-07-01T18:47:11.017602Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'python video/pipeline/derive_spoken.py --deck ch03_trig_derivatives --check'` rejected: blocked by policy
+ succeeded in 361ms:
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--deck", required=True, help="deck id, e.g. ch01_inverse_functions")
+    ap.add_argument("--check", action="store_true", help="validate parity only; write nothing")
+    args = ap.parse_args()
+
+    canon_path = STORY / f"{args.deck}.yml"
+    spoken_path = CONTENT / f"{args.deck}.spoken.yml"
+    for p in (canon_path, spoken_path):
+        if not p.exists():
+            raise SystemExit(f"[derive_spoken] missing {p}")
+    canon = load(canon_path)
+    spoken = load(spoken_path)
+
+    problems = check(canon, spoken)
+    if problems:
+        print("[derive_spoken] PARITY ERRORS:", flush=True)
+        for p in problems:
+            print(f"  - {p}", flush=True)
+        return 1
+    print("[derive_spoken] parity OK", flush=True)
+    if args.check:
+        return 0
+
+    mimo_yml = STORY / f"{args.deck}_mimo.yml"
+    md = CONTENT / f"{args.deck}_narration_spoken.md"
+    mimo_yml.write_text(
+        f"# GENERATED by pipeline/derive_spoken.py from {args.deck}.spoken.yml + the canonical\n"
+        "# storyboard. DO NOT EDIT -- change the .spoken.yml source and regenerate.\n\n"
+        + yaml.safe_dump(gen_mimo(load(canon_path), spoken, args.deck),
+                         allow_unicode=True, sort_keys=False, width=4096),
+        encoding="utf-8",
+    )
+    md.write_text(gen_md(canon, spoken, args.deck), encoding="utf-8")
+    print(f"[derive_spoken] wrote {mimo_yml}", flush=True)
+    print(f"[derive_spoken] wrote {md}", flush=True)
+
+codex
+VERDICT: 1 blocking, 0 advisory
+
+- [Blocking] [D3] difference_quotient_for_sine / derivative_of_sine / derivative_of_cosine -- `$x+\tfrac h2$` is spoken as “the quantity x plus h over two,” which can be heard as `(x+h)/2` instead of `x+h/2`. Verdict: Rewrite -- use “x plus one half h” in these phrases:
+  - “two cosine of the quantity x plus one half h, times sine of one half h”
+  - “cosine of the quantity x plus one half h, times sine of one half h, all over one half h”
+  - “negative sine of the quantity x plus one half h, times sine of one half h, all over one half h”
+
+- D1 clean -- Version A / `.md` divergence is the stated pre-existing doc-sync advisory, not counted against Version B.
+- D2 clean -- prose tracks storyboard `say:`; differences are math spell-outs only.
+- D4 clean -- spoken register is natural aside from the D3 grouping ambiguity above.
+
+## Convention recommendations (D5)
+D5 clean -- current conventions are followed; future ledger could explicitly prefer “one half h” for `h/2` inside sums like `x+h/2`.
+
+## TTS sanity (D6)
+D6 clean -- no semantic TTS issue found in the spoken units. I accepted the prompt’s parity-green statement; my independent `derive_spoken.py --check` rerun was blocked by the managed execution policy.
+
+## Math-content check (D7)
+D7 clean -- no outright math-content error found under `CONTENT_APPROVED=yes`; issue is spoken grouping, not the approved mathematics.
+tokens used
+95,057
+VERDICT: 1 blocking, 0 advisory
+
+- [Blocking] [D3] difference_quotient_for_sine / derivative_of_sine / derivative_of_cosine -- `$x+\tfrac h2$` is spoken as “the quantity x plus h over two,” which can be heard as `(x+h)/2` instead of `x+h/2`. Verdict: Rewrite -- use “x plus one half h” in these phrases:
+  - “two cosine of the quantity x plus one half h, times sine of one half h”
+  - “cosine of the quantity x plus one half h, times sine of one half h, all over one half h”
+  - “negative sine of the quantity x plus one half h, times sine of one half h, all over one half h”
+
+- D1 clean -- Version A / `.md` divergence is the stated pre-existing doc-sync advisory, not counted against Version B.
+- D2 clean -- prose tracks storyboard `say:`; differences are math spell-outs only.
+- D4 clean -- spoken register is natural aside from the D3 grouping ambiguity above.
+
+## Convention recommendations (D5)
+D5 clean -- current conventions are followed; future ledger could explicitly prefer “one half h” for `h/2` inside sums like `x+h/2`.
+
+## TTS sanity (D6)
+D6 clean -- no semantic TTS issue found in the spoken units. I accepted the prompt’s parity-green statement; my independent `derive_spoken.py --check` rerun was blocked by the managed execution policy.
+
+## Math-content check (D7)
+D7 clean -- no outright math-content error found under `CONTENT_APPROVED=yes`; issue is spoken grouping, not the approved mathematics.

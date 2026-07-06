@@ -99,7 +99,7 @@ scenes:
       assumption that turns out to be essential.
     statement: "Every trigonometric derivative funnels down to a single limit."
     math:
-      - "$\\dfrac{\\sin(x+h)-\\sin x}{h}\\ \\xrightarrow{\\ h=0\\ }\\ \\dfrac{0}{0}\\quad(\\text{no information})$"
+      - "$\\dfrac{\\sin(x+h)-\\sin x}{h}\\ \\xrightarrow{\\ h=0\\ }\\ \\dfrac{0}{0}\\quad(\\text{indeterminate})$"
       - { tex: "$\\lim_{\\theta\\to 0}\\dfrac{\\sin\\theta}{\\theta}\\quad\\left(\\tfrac{0}{0},\\ \\text{no algebra}\\right)$", anim: highlight }
 
   # 3 ------------------------------------ derivation: reduce the difference quotient (L2)
@@ -392,14 +392,17 @@ scenes:
     progress: { current: 3, total: 4 }
     duration: 4.0
 
-  # 14 ------------------ Theorem 3.1 + Proof (part 1/2): definition -> reduced form
+  # 14 ------------- Theorem 3.1 + Proof: definition -> reduced -> limit -> cos x
+  # Merged to ONE page (2026-07-02, user call): after the theorem_proof redesign the
+  # statement sits in the top-right rail, so 3 proof lines + qed fit a single page --
+  # the earlier 2-page split was a pre-redesign capacity artifact. covers union and
+  # md ref unchanged; non-part theorem_proof + motive matches fundamental_limit.
   - id: derivative_of_sine
     kind: content
     template: theorem_proof
     accent: theorem
-    part: { current: 1, total: 2 }
     ref: md:derivative_of_sine
-    covers: [def, reduced]     # def restored (sweep fix -- SC1 def cleared); split for capacity
+    covers: [def, reduced, limits, qed]
     scaffold: { motive: "Cash in continuity and the limit — sine's derivative falls out." }
     source: "chapter3-print-standalone.html SS3.1 . Theorem 3.1 + Proof"
     title: "The Derivative of Sine"
@@ -411,40 +414,25 @@ scenes:
       of the difference quotient.
       {show proof.1} But we already did the hard algebra: that quotient is
       $\cos(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
-    statement: "$\\frac{d}{dx}\\sin x = \\cos x$"
-    proof:
-      - "$\\frac{d}{dx}\\sin x=\\lim_{h\\to 0}\\frac{\\sin(x+h)-\\sin x}{h}$"
-      - "$=\\lim_{h\\to 0}\\cos\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
-
-  # 14b ----------------- Theorem 3.1 + Proof (part 2/2): take the limit -> cos x
-  - id: derivative_of_sine_finish
-    kind: content
-    template: theorem_proof
-    accent: theorem
-    part: { current: 2, total: 2 }
-    ref: md:derivative_of_sine
-    covers: [limits, qed]
-    scaffold: { motive: "Send $h\\to 0$: continuity and the fundamental limit finish it." }
-    source: "chapter3-print-standalone.html SS3.1 . Theorem 3.1 + Proof"
-    title: "The Derivative of Sine"
-    say: |
-      {show proof.0} Let $h\to 0$: the first factor tends to $\cos x$ by
+      {show proof.2} Let $h\to 0$: the first factor tends to $\cos x$ by
       continuity, the second to one by the fundamental limit.
       {show qed} A continuous thing times a limit -- the product is $\cos x$
       times one, just $\cos x$.
     statement: "$\\frac{d}{dx}\\sin x = \\cos x$"
     proof:
+      - "$\\frac{d}{dx}\\sin x=\\lim_{h\\to 0}\\frac{\\sin(x+h)-\\sin x}{h}$"
+      - "$=\\lim_{h\\to 0}\\cos\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
       - "$\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
     qed: "$\\Rightarrow\\ \\cos x\\cdot 1=\\cos x$"
 
-  # 15 ------------------ Theorem 3.2 + Proof (part 1/2): companion identity -> divided form
+  # 15 ------------- Theorem 3.2 + Proof: companion identity -> divided -> limit -> -sin x
+  # Merged to ONE page (2026-07-02, user call), same rationale as sine (see above).
   - id: derivative_of_cosine
     kind: content
     template: theorem_proof
     accent: theorem
-    part: { current: 1, total: 2 }
     ref: md:derivative_of_cosine
-    covers: [companion_identity, divide]     # split for capacity
+    covers: [companion_identity, divide, limits, qed]
     scaffold: { motive: "Same machinery, companion identity — now cosine." }
     source: "chapter3-print-standalone.html SS3.1 . Theorem 3.2 + Proof"
     title: "The Derivative of Cosine"
@@ -455,29 +443,14 @@ scenes:
       {show proof.0} This time use the companion sum-to-product formula.
       {show proof.1} The same division by $h$ turns the difference quotient into
       $-\sin(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
-    statement: "$\\frac{d}{dx}\\cos x = -\\sin x$"
-    proof:
-      - "$\\cos A-\\cos B=-2\\sin\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}$"
-      - "$\\frac{\\cos(x+h)-\\cos x}{h}=-\\sin\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
-
-  # 15b ----------------- Theorem 3.2 + Proof (part 2/2): take the limit -> -sin x
-  - id: derivative_of_cosine_finish
-    kind: content
-    template: theorem_proof
-    accent: theorem
-    part: { current: 2, total: 2 }
-    ref: md:derivative_of_cosine
-    covers: [limits, qed]     # explicit limits reveal (sweep fix -- symmetry with sine)
-    scaffold: { motive: "Send $h\\to 0$: the same two tools, one extra minus sign." }
-    source: "chapter3-print-standalone.html SS3.1 . Theorem 3.2 + Proof"
-    title: "The Derivative of Cosine"
-    say: |
-      {show proof.0} Send $h$ to zero: the sine factor tends to $\sin x$ by
+      {show proof.2} Send $h$ to zero: the sine factor tends to $\sin x$ by
       continuity, the second to one by the fundamental limit.
       {show qed} The leading minus sign comes along -- leaving $-\sin x$. Same
       two tools, one extra minus sign.
     statement: "$\\frac{d}{dx}\\cos x = -\\sin x$"
     proof:
+      - "$\\cos A-\\cos B=-2\\sin\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}$"
+      - "$\\frac{\\cos(x+h)-\\cos x}{h}=-\\sin\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
       - "$-\\sin\\!\\left(x+\\frac h2\\right)\\to-\\sin x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
     qed: "$\\Rightarrow\\ -\\sin x\\cdot 1=-\\sin x$"
 
@@ -599,7 +572,7 @@ scenes:
       rule, with a constant on top, gives this.
       {show result} Clean it up, and secant's derivative is $\sec x\tan x$.
     steps:
-      - { math: "\\frac{d}{dx}\\tan x = \\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{\\sin x}{\\cos x}$" }
+      - { math: "\\frac{d}{dx}\\tan x = \\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{\\sin x}{\\cos x}$ ($\\cos x\\neq 0$)" }
       - { math: "= \\frac{\\cos^{2} x+\\sin^{2} x}{\\cos^{2} x} = \\frac{1}{\\cos^{2} x} = \\sec^{2} x", reason: "Pythagorean identity" }
       - { math: "\\frac{d}{dx}\\sec x = \\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{1}{\\cos x}$" }
     result: { math: "= \\frac{\\sin x}{\\cos^{2} x} = \\sec x\\tan x" }
@@ -626,7 +599,7 @@ scenes:
       {show result} Cleaned up, that is $-\csc x\cot x$ -- and all six are done,
       every one built on $\sin'=\cos$ and $\cos'=-\sin$.
     steps:
-      - { math: "\\frac{d}{dx}\\cot x = \\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}", reason: "quotient rule on $\\tfrac{\\cos x}{\\sin x}$" }
+      - { math: "\\frac{d}{dx}\\cot x = \\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}", reason: "quotient rule on $\\tfrac{\\cos x}{\\sin x}$ ($\\sin x\\neq 0$)" }
       - { math: "= \\frac{-(\\sin^{2} x+\\cos^{2} x)}{\\sin^{2} x} = -\\frac{1}{\\sin^{2} x} = -\\csc^{2} x", reason: "Pythagorean identity" }
       - { math: "\\frac{d}{dx}\\csc x = \\frac{0\\cdot\\sin x-1\\cdot\\cos x}{\\sin^{2} x}", reason: "quotient rule on $\\tfrac{1}{\\sin x}$" }
     result: { math: "= -\\frac{\\cos x}{\\sin^{2} x} = -\\csc x\\cot x" }

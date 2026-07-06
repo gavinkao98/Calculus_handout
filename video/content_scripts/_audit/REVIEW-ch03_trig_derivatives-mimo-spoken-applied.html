@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§3.1 MiMo Spoken Narration — Applied Review</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root { --ink:#172033; --muted:#5f6b7b; --line:#d7dde8; --paper:#f7f5ef; --panel:#fff;
+           --accent:#1f6feb; --ok:#1a7f4b; --warn:#9a6b00; --soft:#eef4ff; --spk:#f3faf5; }
+  body { margin:0; background:var(--paper); color:var(--ink);
+          font-family:"Segoe UI","Noto Sans TC",Arial,sans-serif; line-height:1.55; }
+  main { max-width:1080px; margin:0 auto; padding:34px 24px 60px; }
+  h1 { font-size:30px; margin:0 0 4px; }
+  h2 { font-size:21px; margin:34px 0 12px; border-top:1px solid var(--line); padding-top:22px; }
+  h3 { font-size:16px; margin:0 0 10px; font-weight:600; }
+  .lead { color:var(--muted); font-size:16px; margin:6px 0 18px; }
+  .pill { display:inline-block; padding:3px 10px; border-radius:999px; font-size:13px;
+           margin-right:6px; border:1px solid var(--line); }
+  .pill.ok { background:#e7f6ee; color:var(--ok); border-color:#bfe6cf; }
+  .pill.warn { background:#fdf3df; color:var(--warn); border-color:#f0dca6; }
+  table { width:100%; border-collapse:collapse; background:var(--panel);
+           border:1px solid var(--line); border-radius:8px; overflow:hidden; margin:10px 0; }
+  td { padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr:last-child td { border-bottom:0; }
+  td.g { width:34%; color:var(--muted); font-weight:600; }
+  code { font-family:Consolas,monospace; font-size:.92em; background:#eef0f4;
+          padding:1px 4px; border-radius:4px; }
+  .unit { background:var(--panel); border:1px solid var(--line); border-radius:8px;
+           padding:14px 16px; margin:12px 0; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:760px) { .cols { grid-template-columns:1fr; } }
+  .lab { font-size:12px; color:var(--muted); margin-bottom:5px; text-transform:none; }
+  .say { background:var(--soft); border:1px solid #cfe0ff; border-radius:6px; padding:10px 12px; }
+  .spk { background:var(--spk); border:1px solid #bfe6cf; border-radius:6px; padding:10px 12px; }
+  .note { background:var(--soft); border:1px solid #cfe0ff; border-radius:8px; padding:12px 14px; margin:14px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>§3.1 Derivatives of Sine and Cosine — MiMo 旁白（口語版）Applied Review</h1>
+  <p class="lead">deck <code>ch03_trig_derivatives</code> · CONTENT_APPROVED: yes (LOCKED)
+     · 2026-07-02 · 分支 video/template-redesign-navy-spine</p>
+  <p><span class="pill ok">MiMo spoken 就緒</span> <span class="pill ok">NFA 收斂 · 0 blocking</span> <span class="pill ok">House audio · Candidate B</span></p>
+
+  <div class="note">本輪產物：口語單一源 <code>ch03_trig_derivatives.spoken.yml</code>（21 個 content 場，英文散文逐字保留、
+  只把 LaTeX 攤成口語、<code>{show}</code> 原位保留）→ <code>derive_spoken.py</code> 生成
+  <code>ch03_trig_derivatives_mimo.yml</code>（MiMo 合成用）＋ <code>ch03_trig_derivatives_narration_spoken.md</code>（閱讀版）。
+  機械 parity（id 對映／<code>{show}</code> 一致／無 <code>$</code> 洩漏）由 <code>derive_spoken.py --check</code> 守門。</div>
+
+  <h2>NFA 忠實稽核（雙閘 + 回歸）</h2>
+  <table><tr><td class='g'>NFA gate-1 (Claude, free)</td><td>首輪 <b>0 blocking, 3 advisory</b>（3 條皆非 MiMo 雙版忠實破口：Version A HTML/`.md` 反映較舊較長 narration 的既有 doc-sync 落差 ×2，＋ u9 念起來稍密但忠實 ×1）。</td></tr><tr><td class='g'>NFA gate-2 (Codex gpt-5.5/xhigh, read-only)</td><td>抓到 gate-1 漏掉的 <b>1 blocking [D3]</b>：<code>x+h/2</code> 原念成「the quantity x plus h over two」會被聽成 <code>(x+h)/2</code>。修為「the quantity x plus one half h」（3 場 4 處）。</td></tr><tr><td class='g'>回歸複查 (Claude gate-1, scoped)</td><td>只複查 3 個修改場 → <b>VERDICT 0 blocking, 0 advisory</b>：「D3 fix confirmed clean, 0 new issue」，數學等價、無新歧義、D2 仍逐字忠實。</td></tr></table>
+
+  <h2>House audio（Candidate B）</h2>
+  <table><tr><td class='g'>整套 house style</td><td>Candidate B（溫暖低調）</td></tr><tr><td class='g'>intro / outro</td><td>candidate_b_intro_bed.wav / candidate_b_outro_bed.wav（一律使用）</td></tr><tr><td class='g'>divider ×4</td><td>candidate_b_divider_stinger.wav（gain 0.6，「音量淡」）</td></tr><tr><td class='g'>caution ping</td><td>不加（§3.1 兩個 caution 皆非 notation trap）</td></tr><tr><td class='g'>content 模板</td><td>全乾聲（narration-first）</td></tr></table>
+  <p class="lead">最終 render：✅ &lt;code&gt;output/ch03/s3.1/ch03_trig_derivatives_mimo.mp4&lt;/code&gt;（1080p · 17.75 min · 36 MB · h264+aac 48k stereo）。compose 路由正確：21 content 場=真 MiMo 旁白、intro/4 divider/outro=Candidate B cue；音訊分層：intro bed mean −27 dB（軟底）vs 旁白 mean −23 dB/max −3 dB（narration-first）；4 幀跨模板抽查 LaTeX 無亂碼；sync beat timing clean（4 條 within-frame length advisory，旁白未超框）。全 5 pre-render gate 綠（含修好的 provenance _mimo 解析）。</p>
+
+  <h2>逐段對照：Source <code>say:</code> → Spoken（MiMo 照念）</h2>
+  <p class="lead">左為已認可的 storyboard 旁白（數學以 MathJax 渲染）；右為攤成口語、無符號的實際朗讀文字。
+     <code>{show ...}</code> 為 beat 揭示標記，與正典對齊。</p>
+  
+      <section class="unit">
+        <h3>u1 · <code>why_trig_is_different</code> — A Limit No Algebra Can Crack</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Every derivative so far has yielded to algebra. For a polynomial we expanded $(x+h)^n$ and the binomial theorem handed us a factor of $h$ to cancel; for $e^x$ the power series did the same job. The trigonometric functions refuse to play along. {show math.0} Write down the difference quotient for $\sin x$ and try the usual move. You cannot simply set $h=0$: that gives $\tfrac00$, which tells you nothing. And no identity cancels the $h$ in the denominator -- $\sin(x+h)$ simply does not break into pieces that conveniently subtract. {show math.1} As we are about to see, the whole computation funnels down to a single limit, the limit of $\sin\theta$ over $\theta$ -- again the indeterminate form zero over zero, and one that no algebra will crack. {show statement} Prying it open takes a genuinely new tool: a geometric comparison of areas on the unit circle. And once we secure that one limit, it unlocks the derivatives of both sine and cosine at once. One ground rule, though: throughout, angles are measured in radians -- an assumption that turns out to be essential.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Every derivative so far has yielded to algebra. For a polynomial we expanded the quantity x plus h, to the n, and the binomial theorem handed us a factor of h to cancel; for e to the x the power series did the same job. The trigonometric functions refuse to play along. {show math.0} Write down the difference quotient for sine x and try the usual move. You cannot simply set h equal to zero: that gives zero over zero, which tells you nothing. And no identity cancels the h in the denominator -- sine of the quantity x plus h simply does not break into pieces that conveniently subtract. {show math.1} As we are about to see, the whole computation funnels down to a single limit, the limit of sine theta over theta -- again the indeterminate form zero over zero, and one that no algebra will crack. {show statement} Prying it open takes a genuinely new tool: a geometric comparison of areas on the unit circle. And once we secure that one limit, it unlocks the derivatives of both sine and cosine at once. One ground rule, though: throughout, angles are measured in radians -- an assumption that turns out to be essential.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u2 · <code>difference_quotient_for_sine</code> — The Difference Quotient for Sine</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">So let us transform that difference quotient instead of fighting it head-on. The decisive step is one trigonometric identity -- sum-to-product -- which turns a difference of sines into a product. {show step.0} Here it is; and a product is exactly what we want, because we can pull it apart and take limits one factor at a time. {show step.1} Put $A=x+h$ and $B=x$, and the numerator becomes $2\cos(x+\tfrac h2)\sin\tfrac h2$. {show step.2} Now divide by $h$ -- and here is the small trick that makes everything line up: write $h$ as $2$ times $\tfrac h2$, so the denominator carries the very $\tfrac h2$ inside the sine. The quotient cleans up to $\cos(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$. {show result} Look at what we have: a product of two factors. The first slides to $\cos x$, provided cosine is continuous; the second is exactly $\sin\theta$ over $\theta$ with $\theta=\tfrac h2$. So the whole derivative hangs on just two facts -- continuity, and that fundamental limit. We secure both now.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">So let us transform that difference quotient instead of fighting it head-on. The decisive step is one trigonometric identity -- sum-to-product -- which turns a difference of sines into a product. {show step.0} Here it is; and a product is exactly what we want, because we can pull it apart and take limits one factor at a time. {show step.1} Put A equals x plus h and B equals x, and the numerator becomes two cosine of the quantity x plus one half h, times sine of h over two. {show step.2} Now divide by h -- and here is the small trick that makes everything line up: write h as two times h over two, so the denominator carries the very h over two inside the sine. The quotient cleans up to cosine of the quantity x plus one half h, times sine of h over two, all over h over two. {show result} Look at what we have: a product of two factors. The first slides to cosine x, provided cosine is continuous; the second is exactly sine theta over theta with theta equals h over two. So the whole derivative hangs on just two facts -- continuity, and that fundamental limit. We secure both now.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u3 · <code>sector_inequality</code> — A Squeeze on the Unit Circle</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Here is that new tool. We compare three areas on a circle of radius one. But first, one convenience that saves us half the work. Replacing $\theta$ by $-\theta$ flips the sign of both $\theta$ and $\sin\theta$, so the ratio $\sin\theta/\theta$ is even -- whatever we learn for positive angles holds for negative ones, so it is enough to chase $\theta$ down to zero from the positive side. Now the geometry. On the unit circle, $A$ is at $(1,0)$, $B$ is the point at angle $\theta$, and extending the radius to the tangent at $A$ gives $C=(1,\tan\theta)$. {show tri_inner} The inner triangle $OAB$ has base one and height $\sin\theta$, so its area is one half $\sin\theta$. {show sector} The sector $OAB$ is the fraction $\theta$ over $2\pi$ of the disc -- area one half $\theta$. {show tri_outer} And the outer triangle $OAC$ has height $\tan\theta$, so its area is one half $\tan\theta$. {show ineq} Each region sits inside the next, so the areas line up in order: one half $\sin\theta$, then one half $\theta$, then one half $\tan\theta$. The whole argument hangs on that one picture.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Here is that new tool. We compare three areas on a circle of radius one. But first, one convenience that saves us half the work. Replacing theta by negative theta flips the sign of both theta and sine theta, so the ratio sine theta over theta is even -- whatever we learn for positive angles holds for negative ones, so it is enough to chase theta down to zero from the positive side. Now the geometry. On the unit circle, A is at the point with coordinates one and zero, B is the point at angle theta, and extending the radius to the tangent at A gives C equals the point with coordinates one and tangent theta. {show tri_inner} The inner triangle O A B has base one and height sine theta, so its area is one half sine theta. {show sector} The sector O A B is the fraction theta over two pi of the disc -- area one half theta. {show tri_outer} And the outer triangle O A C has height tangent theta, so its area is one half tangent theta. {show ineq} Each region sits inside the next, so the areas line up in order: one half sine theta, then one half theta, then one half tangent theta. The whole argument hangs on that one picture.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u4 · <code>squeeze_to_the_bound</code> — Trapping the Ratio</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Now turn that chain of areas into a statement about $\sin\theta/\theta$, one careful step at a time. {show step.0} Multiply through by $2$ to clear the halves: $\sin\theta\le\theta\le\tan\theta$. {show step.1} Divide every part by $\sin\theta$, positive here, and rewrite $\tan\theta$ as $\sin\theta$ over $\cos\theta$ -- giving $1$ at most $\theta$ over $\sin\theta$ at most $1$ over $\cos\theta$. {show result} The middle is upside down, so take reciprocals of all three. They are positive, and flipping positives reverses the inequalities, so the chain turns around: $\cos\theta\le\sin\theta/\theta\le 1$, for $\theta$ between zero and $\tfrac\pi2$. {show check} And pocket one more consequence: from $\sin\theta\le\theta$ we also get zero at most $|\sin\theta|$ at most $|\theta|$ near zero -- a bound we lean on twice in a moment.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Now turn that chain of areas into a statement about sine theta over theta, one careful step at a time. {show step.0} Multiply through by two to clear the halves: sine theta at most theta at most tangent theta. {show step.1} Divide every part by sine theta, positive here, and rewrite tangent theta as sine theta over cosine theta -- giving one at most theta over sine theta at most one over cosine theta. {show result} The middle is upside down, so take reciprocals of all three. They are positive, and flipping positives reverses the inequalities, so the chain turns around: cosine theta at most sine theta over theta at most one, for theta between zero and pi over two. {show check} And pocket one more consequence: from sine theta at most theta we also get zero at most the absolute value of sine theta at most the absolute value of theta near zero -- a bound we lean on twice in a moment.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u5 · <code>continuity_statement_sin_limit</code> — Sine and Cosine Are Continuous</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">That little bound does more than help with the limit -- it is the key to continuity. And continuity here means something concrete: nudge the angle a little, and sine and cosine move only a little; they never jump. We even have the tool that says so -- on the unit circle the half-chord $\sin\theta$ is always shorter than the arc $\theta$ above it, which is just $|\sin\theta|\le|\theta|$ read geometrically. {show statement} So here is the claim, made precise: $\sin x$ and $\cos x$ are continuous at every real $x_0$. {show proof.0} Build it from the ground up. Since zero at most $|\sin\theta|$ at most $|\theta|$, and $|\theta|$ itself goes to zero, {show proof.1} the squeeze theorem forces $\sin\theta\to 0$. {show qed} That single limit is the seed; the full continuity grows straight out of it, which is what we do next.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">That little bound does more than help with the limit -- it is the key to continuity. And continuity here means something concrete: nudge the angle a little, and sine and cosine move only a little; they never jump. We even have the tool that says so -- on the unit circle the half-chord sine theta is always shorter than the arc theta above it, which is just the absolute value of sine theta at most the absolute value of theta read geometrically. {show statement} So here is the claim, made precise: sine x and cosine x are continuous at every real x sub zero. {show proof.0} Build it from the ground up. Since zero at most the absolute value of sine theta at most the absolute value of theta, and the absolute value of theta itself goes to zero, {show proof.1} the squeeze theorem forces sine theta to go to zero. {show qed} That single limit is the seed; the full continuity grows straight out of it, which is what we do next.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u6 · <code>continuity_argument</code> — Sine and Cosine Are Continuous</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">{show statement} Now turn that seed into full continuity. Fix a point $x_0$, and ask how much $\cos x$ and $\sin x$ can change as $x$ moves toward it. {show proof.0} Sum-to-product answers both at once. For cosine, $\cos x-\cos x_0$ is $-2\sin\tfrac{x-x_0}{2}\sin\tfrac{x+x_0}{2}$; {show proof.1} and for sine, $\sin x-\sin x_0$ is $2\cos\tfrac{x+x_0}{2}\sin\tfrac{x-x_0}{2}$. In each, the half-sum factor never exceeds one in size. {show proof.2} Drop it to its largest size, one, and both differences are bounded by the same thing -- twice $|\sin\tfrac{x-x_0}{2}|$. {show qed} Now let $x\to x_0$: the half-angle goes to zero, so that bound collapses to zero. Squeeze one last time, and $\cos x\to\cos x_0$, $\sin x\to\sin x_0$ -- both continuous everywhere.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">{show statement} Now turn that seed into full continuity. Fix a point x sub zero, and ask how much cosine x and sine x can change as x moves toward it. {show proof.0} Sum-to-product answers both at once. For cosine, cosine x minus cosine x sub zero is negative two sine of the quantity x minus x sub zero, over two, times sine of the quantity x plus x sub zero, over two; {show proof.1} and for sine, sine x minus sine x sub zero is two cosine of the quantity x plus x sub zero, over two, times sine of the quantity x minus x sub zero, over two. In each, the half-sum factor never exceeds one in size. {show proof.2} Drop it to its largest size, one, and both differences are bounded by the same thing -- twice the absolute value of sine of the quantity x minus x sub zero, over two. {show qed} Now let x go to x sub zero: the half-angle goes to zero, so that bound collapses to zero. Squeeze one last time, and cosine x goes to cosine x sub zero, sine x goes to sine x sub zero -- both continuous everywhere.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u7 · <code>fundamental_limit</code> — The Fundamental Limit</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Now we can finally close the limit that started all of this. {show statement} The claim is as clean as it gets: $\sin\theta$ over $\theta$ tends to one as $\theta\to 0$. {show proof.0} And we already built the trap. For $\theta$ between zero and $\tfrac\pi2$, the ratio is pinned between a floor and a ceiling: $\cos\theta\le\sin\theta/\theta\le 1$. {show proof.1} The ceiling is the constant one. The floor is $\cos\theta$, which tends to one now that we know cosine is continuous -- so the squeeze pins the ratio to one from the right. {show qed} And because the ratio is even, its left limit matches its right, so the two-sided limit is one as well. That is the keystone.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Now we can finally close the limit that started all of this. {show statement} The claim is as clean as it gets: sine theta over theta tends to one as theta goes to zero. {show proof.0} And we already built the trap. For theta between zero and pi over two, the ratio is pinned between a floor and a ceiling: cosine theta at most sine theta over theta at most one. {show proof.1} The ceiling is the constant one. The floor is cosine theta, which tends to one now that we know cosine is continuous -- so the squeeze pins the ratio to one from the right. {show qed} And because the ratio is even, its left limit matches its right, so the two-sided limit is one as well. That is the keystone.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u8 · <code>squeeze_graph</code> — The Squeeze, Drawn</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">It helps to picture that squeeze. {show plot.0} Here runs $\cos\theta$, the dashed floor. {show plot.1} And the ceiling -- the constant line at height one. {show plot.2} Between them, the ratio $\sin\theta$ over $\theta$, caught in the narrowing gap. As $\theta$ slides toward zero the floor rises to one and the ceiling already is one, so the curve is squeezed right to one. {show plot.3} Notice the open circle at $\theta=0$: the ratio is undefined there, zero over zero. {show annotation.0} So what equals one is the limit -- the height the curve is forced toward, not a value it ever takes.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">It helps to picture that squeeze. {show plot.0} Here runs cosine theta, the dashed floor. {show plot.1} And the ceiling -- the constant line at height one. {show plot.2} Between them, the ratio sine theta over theta, caught in the narrowing gap. As theta slides toward zero the floor rises to one and the ceiling already is one, so the curve is squeezed right to one. {show plot.3} Notice the open circle at theta equals zero: the ratio is undefined there, zero over zero. {show annotation.0} So what equals one is the limit -- the height the curve is forced toward, not a value it ever takes.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u9 · <code>limit_not_identity</code> — A Limit, Not an Identity</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">One caution, because this result is easy to over-read. {show body} The statement is about the limit as $\theta\to 0$ -- not an identity. At a fixed angle the ratio is generally not one: at $\theta=\tfrac\pi2$ it is two over $\pi$, about $0.64$, and at $\theta=\pi$ it is zero. The value one is reached only in the limit.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">One caution, because this result is easy to over-read. {show body} The statement is about the limit as theta goes to zero -- not an identity. At a fixed angle the ratio is generally not one: at theta equals pi over two it is two over pi, about zero point six four, and at theta equals pi it is zero. The value one is reached only in the limit.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u10 · <code>radians_essential</code> — Why Radians</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">A second caution, and this one is structural. {show body} Everything here depends on radians. The sector area one half $\theta$ -- and with it the limit -- uses radian measure. Switch to degrees and the limit is $\pi$ over $180$, not one, so the derivative drags that factor along. The clean formulas $\sin'=\cos$ and $\cos'=-\sin$ hold only in radians.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">A second caution, and this one is structural. {show body} Everything here depends on radians. The sector area one half theta -- and with it the limit -- uses radian measure. Switch to degrees and the limit is pi over one hundred eighty, not one, so the derivative drags that factor along. The clean formulas sine prime equals cosine and cosine prime equals negative sine hold only in radians.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u11 · <code>derivative_of_sine</code> — The Derivative of Sine</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Now the payoff, and it falls into our hands. {show statement} The claim: the derivative of $\sin x$ is $\cos x$, for every real $x$. {show proof.0} Start from the definition -- the derivative is the limit of the difference quotient. {show proof.1} But we already did the hard algebra: that quotient is $\cos(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$. {show proof.2} Let $h\to 0$: the first factor tends to $\cos x$ by continuity, the second to one by the fundamental limit. {show qed} A continuous thing times a limit -- the product is $\cos x$ times one, just $\cos x$.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Now the payoff, and it falls into our hands. {show statement} The claim: the derivative of sine x is cosine x, for every real x. {show proof.0} Start from the definition -- the derivative is the limit of the difference quotient. {show proof.1} But we already did the hard algebra: that quotient is cosine of the quantity x plus one half h, times sine of h over two, all over h over two. {show proof.2} Let h go to zero: the first factor tends to cosine x by continuity, the second to one by the fundamental limit. {show qed} A continuous thing times a limit -- the product is cosine x times one, just cosine x.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u12 · <code>derivative_of_cosine</code> — The Derivative of Cosine</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Cosine falls to the very same machinery -- only the identity changes, so we go quickly. {show statement} The claim: the derivative of $\cos x$ is $-\sin x$. {show proof.0} This time use the companion sum-to-product formula. {show proof.1} The same division by $h$ turns the difference quotient into $-\sin(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$. {show proof.2} Send $h$ to zero: the sine factor tends to $\sin x$ by continuity, the second to one by the fundamental limit. {show qed} The leading minus sign comes along -- leaving $-\sin x$. Same two tools, one extra minus sign.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Cosine falls to the very same machinery -- only the identity changes, so we go quickly. {show statement} The claim: the derivative of cosine x is negative sine x. {show proof.0} This time use the companion sum-to-product formula. {show proof.1} The same division by h turns the difference quotient into negative sine of the quantity x plus one half h, times sine of h over two, all over h over two. {show proof.2} Send h to zero: the sine factor tends to sine x by continuity, the second to one by the fundamental limit. {show qed} The leading minus sign comes along -- leaving negative sine x. Same two tools, one extra minus sign.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u13 · <code>slope_equals_height</code> — Slope Equals Height</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Here is what that theorem looks like on the graph. {show plot.0} Draw $y=\sin x$, and check the slope of its tangent at a few points. {show tan_0} At $x=0$ it is climbing at slope one. {show tan_halfpi} At $x=\tfrac\pi2$, the top of the hump, the tangent is flat -- slope zero. {show tan_pi} At $x=\pi$ it is falling at slope minus one. {show plot.1} Now lay $y=\cos x$ on top, {show cos_dots} and read its heights at those same points: one, zero, minus one. They match exactly -- the slope of sine is the height of cosine, the theorem drawn.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Here is what that theorem looks like on the graph. {show plot.0} Draw y equals sine x, and check the slope of its tangent at a few points. {show tan_0} At x equals zero it is climbing at slope one. {show tan_halfpi} At x equals pi over two, the top of the hump, the tangent is flat -- slope zero. {show tan_pi} At x equals pi it is falling at slope minus one. {show plot.1} Now lay y equals cosine x on top, {show cos_dots} and read its heights at those same points: one, zero, minus one. They match exactly -- the slope of sine is the height of cosine, the theorem drawn.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u14 · <code>derivative_cycle</code> — The Derivative Cycle</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Step back and watch the pattern these two derivatives make. {show statement} Differentiation sends sine and cosine into each other, with a minus sign that turns over every second step. {show math.0} Writing an arrow for one derivative: $\sin x$ to $\cos x$ to $-\sin x$ to $-\cos x$, and back to $\sin x$. {show math.1} Four derivatives and you are home -- the fourth derivative of sine is sine again. Where $e^x$ reproduces itself in a single step, these do it in a cycle of four: the self-renewal that lets them oscillate forever without winding down.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Step back and watch the pattern these two derivatives make. {show statement} Differentiation sends sine and cosine into each other, with a minus sign that turns over every second step. {show math.0} Writing an arrow for one derivative: sine x to cosine x to negative sine x to negative cosine x, and back to sine x. {show math.1} Four derivatives and you are home -- the fourth derivative of sine is sine again. Where e to the x reproduces itself in a single step, these do it in a cycle of four: the self-renewal that lets them oscillate forever without winding down.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u15 · <code>companion_limit</code> — A Companion Limit</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">The fundamental limit has a companion worth knowing: $(1-\cos\theta)$ over $\theta$ tends to zero. It is again zero over zero, so we need a way in. {show step.0} Multiply top and bottom by the conjugate $1+\cos\theta$; the numerator becomes a difference of squares, $1-\cos^2\theta$. {show step.1} And $1-\cos^2\theta$ is just $\sin^2\theta$, so the whole thing splits into $\sin\theta$ over $\theta$ times $\sin\theta$ over $1+\cos\theta$. {show result} Let $\theta\to 0$: the first factor goes to one, the second to zero over two. One times zero is zero.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">The fundamental limit has a companion worth knowing: the quantity one minus cosine theta, over theta tends to zero. It is again zero over zero, so we need a way in. {show step.0} Multiply top and bottom by the conjugate one plus cosine theta; the numerator becomes a difference of squares, one minus cosine squared theta. {show step.1} And one minus cosine squared theta is just sine squared theta, so the whole thing splits into sine theta over theta times sine theta over the quantity one plus cosine theta. {show result} Let theta go to zero: the first factor goes to one, the second to zero over two. One times zero is zero.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u16 · <code>all_six_tan_sec</code> — All Six Derivatives</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">With sine and cosine in hand, the other four cost almost nothing -- just the quotient rule. {show step.0} Take $\tan x=\sin x$ over $\cos x$. The quotient rule gives this. {show step.1} The numerator is $\cos^2 x+\sin^2 x$, which is one -- so the derivative of $\tan x$ is $\sec^2 x$. {show step.2} Secant is the same idea on $1$ over $\cos x$: the quotient rule, with a constant on top, gives this. {show result} Clean it up, and secant's derivative is $\sec x\tan x$.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">With sine and cosine in hand, the other four cost almost nothing -- just the quotient rule. {show step.0} Take tangent x equals sine x over cosine x. The quotient rule gives this. {show step.1} The numerator is cosine squared x plus sine squared x, which is one -- so the derivative of tangent x is secant squared x. {show step.2} Secant is the same idea on one over cosine x: the quotient rule, with a constant on top, gives this. {show result} Clean it up, and secant's derivative is secant x tangent x.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u17 · <code>all_six_cot_csc</code> — All Six Derivatives</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">The last two run exactly the same way. {show step.0} Take $\cot x=\cos x$ over $\sin x$. The quotient rule gives this. {show step.1} The numerator is minus the quantity $\sin^2 x+\cos^2 x$, again one -- so $\cot x$ differentiates to $-\csc^2 x$. {show step.2} And $\csc x$ is $1$ over $\sin x$: the same rule lands this. {show result} Cleaned up, that is $-\csc x\cot x$ -- and all six are done, every one built on $\sin'=\cos$ and $\cos'=-\sin$.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">The last two run exactly the same way. {show step.0} Take cotangent x equals cosine x over sine x. The quotient rule gives this. {show step.1} The numerator is minus the quantity sine squared x plus cosine squared x, again one -- so cotangent x differentiates to negative cosecant squared x. {show step.2} And cosecant x is one over sine x: the same rule lands this. {show result} Cleaned up, that is negative cosecant x cotangent x -- and all six are done, every one built on sine prime equals cosine and cosine prime equals negative sine.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u18 · <code>shm_compute</code> — A Weight on a Spring</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Let us put the new derivatives to work on something moving. {show step.0} A weight on a spring has height $s(t)=\sin t$. {show step.1} Velocity is its derivative, $s'(t)=\cos t$. {show step.2} Acceleration is the next derivative, $s''(t)=-\sin t$. {show result} But $-\sin t$ is just $-s(t)$ -- at every instant the weight is pushed back toward rest. That relation, $s''=-s$, is the signature of simple harmonic motion; sine and cosine are exactly the functions that describe it.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Let us put the new derivatives to work on something moving. {show step.0} A weight on a spring has height s of t equals sine t. {show step.1} Velocity is its derivative, s prime of t equals cosine t. {show step.2} Acceleration is the next derivative, s double prime of t equals negative sine t. {show result} But negative sine t is just negative s of t -- at every instant the weight is pushed back toward rest. That relation, s double prime equals negative s, is the signature of simple harmonic motion; sine and cosine are exactly the functions that describe it.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u19 · <code>shm_stacked_graphs</code> — Height, Velocity, Acceleration</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Stack the three graphs over one time axis and the relationship jumps out. {show g_s} On top, the height $s=\sin t$. {show g_v} In the middle, the velocity $s'=\cos t$. {show g_a} On the bottom, the acceleration $s''=-\sin t$. Watch where the height hits a peak or a trough -- there the velocity passes through zero, because at the extremes the weight momentarily stops. {show mirror} And hold the bottom graph against the top: it is the top one flipped upside down. That is $s''=-s$, drawn -- the very picture of an oscillation.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Stack the three graphs over one time axis and the relationship jumps out. {show g_s} On top, the height s equals sine t. {show g_v} In the middle, the velocity s prime equals cosine t. {show g_a} On the bottom, the acceleration s double prime equals negative sine t. Watch where the height hits a peak or a trough -- there the velocity passes through zero, because at the extremes the weight momentarily stops. {show mirror} And hold the bottom graph against the top: it is the top one flipped upside down. That is s double prime equals negative s, drawn -- the very picture of an oscillation.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u20 · <code>toward_the_chain_rule</code> — Toward the Chain Rule</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">We can now differentiate every trigonometric function -- but only in its bare form. {show statement} We can handle $\sin x$, yet not $\sin(x^2)$ or $\sin(3x+1)$, where the angle is itself a function tucked inside. {show math.0} To reach a function buried inside another, we need one more rule -- a way to differentiate a composition. That is the chain rule, and it is what comes next; with it, every derivative we found today becomes the seed of a whole family more.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">We can now differentiate every trigonometric function -- but only in its bare form. {show statement} We can handle sine x, yet not sine of x squared or sine of the quantity three x plus one, where the angle is itself a function tucked inside. {show math.0} To reach a function buried inside another, we need one more rule -- a way to differentiate a composition. That is the chain rule, and it is what comes next; with it, every derivative we found today becomes the seed of a whole family more.</div>
+          </div>
+        </div>
+      </section>
+      <section class="unit">
+        <h3>u21 · <code>recap</code> — Key Takeaways</h3>
+        <div class="cols">
+          <div class="col">
+            <div class="lab">Source · storyboard <code>say:</code>（LOCKED；數學渲染）</div>
+            <div class="say">Pull the section together. {show point.0} Everything grew from one limit: $\sin\theta$ over $\theta$ tends to one, cracked by squeezing areas on the unit circle. {show point.1} That limit, with continuity, gave the two derivatives at the heart of the section -- sine differentiates to cosine, cosine to negative sine. {show point.2} From those two, the quotient rule delivered all the other trig derivatives -- tangent, cotangent, secant, cosecant. {show point.3} And keep the cycle in mind -- four derivatives of sine or cosine bring you home -- with the fine print that it all depends on radians.</div>
+          </div>
+          <div class="col">
+            <div class="lab">Spoken · MiMo 照念（數學攤成口語、無符號）</div>
+            <div class="spk">Pull the section together. {show point.0} Everything grew from one limit: sine theta over theta tends to one, cracked by squeezing areas on the unit circle. {show point.1} That limit, with continuity, gave the two derivatives at the heart of the section -- sine differentiates to cosine, cosine to negative sine. {show point.2} From those two, the quotient rule delivered all the other trig derivatives -- tangent, cotangent, secant, cosecant. {show point.3} And keep the cycle in mind -- four derivatives of sine or cosine bring you home -- with the fine print that it all depends on radians.</div>
+          </div>
+        </div>
+      </section>
+</main>
+</body>
+</html>
