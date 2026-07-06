@@ -130,6 +130,17 @@ def test_provenance_issues():
     assert len(nwarns) == 1
 
 
+def test_from_deck_strips_mimo_suffix():
+    # A generated spoken deck "<deck>_mimo" (derive_spoken.py) has no .md of its
+    # own; from_deck must resolve its md: refs against the base "<deck>.md", or the
+    # otf_enforce render of the _mimo storyboard aborts on unresolvable md: refs.
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    base = P.Loci.from_deck({"id": "_fixture_otf"}, repo_root)
+    mimo = P.Loci.from_deck({"id": "_fixture_otf_mimo"}, repo_root)
+    assert len(base.md_unit_ids) > 0                 # fixture .md has units
+    assert mimo.md_unit_ids == base.md_unit_ids      # _mimo resolves to the base .md
+
+
 def test_schema_integration():
     import subprocess
     py = sys.executable
@@ -165,5 +176,6 @@ if __name__ == "__main__":
     test_loci(None, None)
     test_scene_text_refs()
     test_provenance_issues()
+    test_from_deck_strips_mimo_suffix()
     test_schema_integration()
     print("OK provenance self-test")

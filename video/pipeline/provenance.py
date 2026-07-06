@@ -59,7 +59,10 @@ class Loci:
     def from_deck(cls, meta: dict, repo_root: Path) -> "Loci":
         from pipeline import review_pack
         deck_id = str(meta.get("id", ""))
-        md = repo_root / "video" / "content_scripts" / f"{deck_id}.md"
+        # A generated spoken deck "<deck>_mimo" (derive_spoken.py) shares the base
+        # deck's content-script units, so resolve its md: refs against "<deck>.md".
+        base_id = deck_id[:-len("_mimo")] if deck_id.endswith("_mimo") else deck_id
+        md = repo_root / "video" / "content_scripts" / f"{base_id}.md"
         unit_ids: set[str] = set()
         if md.exists():
             try:
