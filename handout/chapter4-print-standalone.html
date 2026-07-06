@@ -399,6 +399,11 @@ window.MathJax = {
      kit has no auto-counter); cross-references are plain prose. §4.1 is the
      chapter's first section, so it carries the chapter opener (a second
      <article>) and starts the Chapter 4 figure registry (Figures 4.1, 4.2).
+     2026-07-03 reading-track pass: chapter route map added to the opener
+     (foundation-chapter labeling) + Proof-track note before Theorem 4.2's proof.
+     2026-07-03 P1 ruling follow-up: infinite geometric sum derived in Strategy 4.1
+     step 3 (SPEC §16.2 rules it non-assumable — 108 curriculum moved it out of 必修).
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html.
      Math cross-checked against the signed legacy ground truth
      legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.1.
 
@@ -435,6 +440,9 @@ window.MathJax = {
     <li>use the Mean Value Theorem to show that \(f' \ge 0\) on an interval forces \(f\) to be increasing there;</li>
     <li>define \(\ln x\) as the inverse of \(e^{x}\), prove its continuity, and derive \(\dfrac{d}{dx} \ln x = \dfrac{1}{x}\) without circular reasoning.</li>
   </ul>
+
+  <!-- 2026-07-03 reading-track: chapter route map (foundation-chapter labeling; spec adjudicated with Codex). Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html -->
+  <p>A note on how to read this chapter. This is the book’s <em>foundation chapter</em> — the place where the tools used on credit since Chapter 2 are finally built for real — and more of its length is proof than computation. The results to carry forward are few: \(e^{x}\) exists, is continuous, and obeys \(e^{x} e^{y} = e^{x + y}\) (§4.1–§4.2); its derivative is itself, now proved honestly (§4.3); the Mean Value Theorem and its monotonicity consequences (§4.4); and the logarithm with \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) (§4.5). <em>Proof track</em> notes in the sections below mark the long arguments that can wait for a second pass: on a first reading, take the statements, work the examples of §4.4–§4.5, and come back later to watch the debt being paid in full.</p>
 </article>
 
 <article class="sec" lang="en">
@@ -521,7 +529,7 @@ window.MathJax = {
       <ol class="steps">
         <li>Find an index \(n_{0}\) beyond which the ratio of consecutive terms is at most some constant \(r < 1\): that is, \(a_{n + 1}/a_{n} \le r\) for \(n \ge n_{0}\).</li>
         <li>Conclude that the terms decay geometrically: \(a_{n} \le a_{n_{0}} \, r^{\,n - n_{0}}\) for \(n \ge n_{0}\).</li>
-        <li>Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\).</li>
+        <li>Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\). (If the infinite geometric sum is new to you: the finite sum is \(r + r^{2} + \cdots + r^{m} = \frac{r(1 - r^{m})}{1 - r}\) — multiply by \(1 - r\) and watch the telescoping — and since \(0 < r < 1\), the power \(r^{m}\) dies away as \(m\) grows, leaving \(\frac{r}{1 - r}\). Appendix A.3 gives the full account.)</li>
         <li>The partial sums are then bounded above, and (being a sum of positive terms) non-decreasing, so Theorem 4.1 gives the limit.</li>
       </ol>
     </div>
@@ -533,6 +541,8 @@ window.MathJax = {
       <p>For every \(x > 0\), the series \(\displaystyle\sum_{n = 0}^{\infty} \frac{x^{n}}{n!}\) converges to a finite real number.</p>
     </div>
   </section>
+
+  <p><em>Proof track: this argument earns the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof — on a first reading you may take both and move on.</em></p>
 
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
@@ -636,7 +646,18 @@ window.MathJax = {
          property [e3] without a separate proof.
        - No worked examples, no figures (proof section; no ROADMAP key figure).
      Counters handed to §4.3: Definition 4.2, Theorem 4.7, Proposition 4.1,
-     Corollary 4.1, Remark 4.2. -->
+     Corollary 4.1, Remark 4.2.
+
+     2026-07-03 difficulty-mitigation pass (5 edits, all sentence/paragraph level):
+     (1) section-opening difficulty signpost + first-reading navigation;
+     (2) (*) restated inline in Theorem 4.3's proof (was cited without restatement);
+     (3) "<3ε is as good as <ε" convention glossed at first occurrence;
+     (4) subsequence + double-subscript defined before Theorem 4.4 (first use in book);
+     (5) exponent-law Step 2 given a concrete k=2 expansion; Step 6 closing quantifier
+         corrected ("Since x and y were arbitrary" — L is chosen FOR the fixed x, y).
+     2026-07-03 P3 re-sim follow-up: Cauchy-proof n_j selection justified (both demands
+     met at once); Prop 4.1 tail-of-convergent-series step glossed.
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html. -->
 
 <article class="sec" lang="en">
 
@@ -646,6 +667,9 @@ window.MathJax = {
 
   <!-- expansion:intuition — section opener: §4.1 gave existence for x>0; this section gives good behavior (continuity, multiplicativity) and extends the definition to all of ℝ -->
   <p>Section 4.1 gave \(e^{x}\) an honest existence: for \(x > 0\) the defining series converges to a finite number, and the partial sums \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) close in on it at a geometric rate, captured by the tail bound \((*)\). What we have <em>not</em> yet shown is that \(e^{x}\) behaves the way the symbol promises. Three things remain: that it is continuous; that it obeys \(e^{x} e^{y} = e^{x + y}\); and that it even makes sense for \(x \le 0\). This section settles all three. The engine throughout is a single idea: approximate the transcendental function \(e^{x}\) by the polynomial \(P_{k}(x)\), and use \((*)\) to make the error uniformly small. Once the error is controlled, the polynomial carries the argument. The one genuinely new tool we need is a convergence test that survives sign changes, since the partial sums for \(x < 0\) are no longer monotone.</p>
+
+  <!-- 2026-07-03 difficulty-mitigation: honest difficulty signpost + first-reading navigation (this is the book's steepest section; readers were given no warning and no guidance on what is load-bearing) -->
+  <p>A word about the terrain before we set out. This is the steepest section of the book so far: it builds convergence machinery — Cauchy sequences and the Bolzano–Weierstrass theorem — that is usually first met in a dedicated analysis course, and it is all proofs, with no worked examples. What the rest of the book actually uses are the headline facts: the definition of \(e^{x}\) extended to all of \(\mathbb{R}\), continuity (Theorem 4.6), the exponent law (Theorem 4.7), and positivity (Corollary 4.1). So on a first reading it is perfectly legitimate to read each statement carefully, skim its proof for the shape of the argument, and return for a full pass once the rest of the chapter has shown you what this machinery buys.</p>
 
   <h3 class="subsec-head">Continuity for \(x > 0\)</h3>
 
@@ -661,7 +685,7 @@ window.MathJax = {
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
-      <p>Let \(x_{0} > 0\) and let \(\varepsilon > 0\) be given. Work on the interval \(0 < x < x_{0} + 1\), so we may take \(L = x_{0} + 1\) in the tail bound \((*)\). Choose integers \(k > n_{0} > 2(x_{0} + 1)\) large enough that</p>
+      <p>Let \(x_{0} > 0\) and let \(\varepsilon > 0\) be given. Work on the interval \(0 < x < x_{0} + 1\), so we may take \(L = x_{0} + 1\) in the tail bound \((*)\) of §4.1 — recall what it says: \(0 \le e^{x} - P_{k}(x) \le \dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\) for every \(x\) in \((0, L)\), provided \(k > n_{0} > 2L\). Choose integers \(k > n_{0} > 2(x_{0} + 1)\) large enough that</p>
       <p>\[ \frac{(x_{0} + 1)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} < \varepsilon. \]</p>
       <p>This is possible because the left-hand side tends to \(0\) as \(k \to \infty\). With \(k\) now fixed, \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) is a polynomial, and every polynomial is continuous, so there is a \(\delta > 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\) (the first bound keeps \(x > 0\), the second keeps \(x < x_{0} + 1\)), such that</p>
       <p>\[ \lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon \qquad \text{whenever } \lvert x - x_{0} \rvert < \delta. \]</p>
@@ -669,7 +693,7 @@ window.MathJax = {
       <p>\[ e^{x} - e^{x_{0}} = \bigl(e^{x} - P_{k}(x)\bigr) + \bigl(P_{k}(x) - P_{k}(x_{0})\bigr) + \bigl(P_{k}(x_{0}) - e^{x_{0}}\bigr). \]</p>
       <p>Suppose \(\lvert x - x_{0} \rvert < \delta\). Since \(\delta < x_{0}/2\), we have \(x > x_{0} - \delta > \tfrac{x_{0}}{2} > 0\) and \(x < x_{0} + \tfrac{1}{2} < x_{0} + 1\), so both \(x\) and \(x_{0}\) lie in \((0,\ x_{0} + 1)\); the bound \((*)\) controls the two outer terms, and the choice of \(\delta\) controls the middle one. By the triangle inequality,</p>
       <p>\[ \lvert e^{x} - e^{x_{0}} \rvert \le \underbrace{\lvert e^{x} - P_{k}(x) \rvert}_{< \varepsilon} + \underbrace{\lvert P_{k}(x) - P_{k}(x_{0}) \rvert}_{< \varepsilon} + \underbrace{\lvert P_{k}(x_{0}) - e^{x_{0}} \rvert}_{< \varepsilon} < 3\varepsilon. \]</p>
-      <p>Since \(\varepsilon > 0\) was arbitrary, \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). Thus \(e^{x}\) is continuous at every \(x_{0} > 0\). <span class="qed qed-proof"></span></p>
+      <p>(A bound of \(3\varepsilon\) for every \(\varepsilon > 0\) is exactly as good as a bound of \(\varepsilon\): to land on \(\varepsilon\) itself, run the same argument with \(\varepsilon/3\) in its place. This convention — collect a fixed number of \(\varepsilon\)-sized errors and do not fuss over the constant — recurs in the proofs below.) Since \(\varepsilon > 0\) was arbitrary, \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). Thus \(e^{x}\) is continuous at every \(x_{0} > 0\). <span class="qed qed-proof"></span></p>
     </div>
   </section>
 
@@ -708,6 +732,9 @@ window.MathJax = {
   <!-- expansion:intuition — D3① (user-directed): the manuscript writes "we shall not prove this theorem" for convergent⟺Cauchy; the handout supplies the full proof, which rests on Bolzano–Weierstrass, itself proved from completeness via the monotone-subsequence peak argument (ROADMAP resolved 2026-04-27) -->
   <p>That a sequence converges exactly when it is Cauchy is the bridge we need: it lets us certify the convergence of \(\sum a_{n}\) without naming the sum. This equivalence is often taken for granted and used directly; we prove it here instead, because the proof exposes a dependency worth seeing — the equivalence is, in the end, the completeness of \(\mathbb{R}\) (Theorem 4.1) wearing a different costume. The hinge is a classical existence theorem.</p>
 
+  <!-- 2026-07-03 difficulty-mitigation: subsequence + double-subscript notation defined before first use (the concept appears only in this section and was previously used undefined) -->
+  <p>The theorem below speaks of a <em>subsequence</em>: the sequence that remains when we keep only some of the terms of \(\{a_{n}\}\), in their original order. Formally, choose infinitely many indices \(n_{1} < n_{2} < n_{3} < \cdots\); the subsequence is \(\{a_{n_{j}}\}_{j = 1}^{\infty}\), and the double subscript simply reads “the term of the original sequence sitting at position \(n_{j}\).” For instance, keeping the even-indexed terms of \(a_{n} = (-1)^{n}\) gives the constant subsequence \(a_{2j} = 1\), which converges even though the original sequence does not — exactly the phenomenon the theorem trades on.</p>
+
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.4</span><span class="env-name">Bolzano–Weierstrass</span></p>
     <div class="env-body">
@@ -744,7 +771,7 @@ window.MathJax = {
       <p>\[ \lvert a_{m} - a_{n} \rvert \le \lvert a_{m} - A \rvert + \lvert A - a_{n} \rvert < \tfrac{\varepsilon}{2} + \tfrac{\varepsilon}{2} = \varepsilon, \]</p>
       <p>so the sequence is Cauchy.</p>
       <p class="para-head">Cauchy \(\Rightarrow\) convergent.</p>
-      <p>Suppose \(\{a_{n}\}\) is Cauchy. First it is bounded: taking \(\varepsilon = 1\), there is an \(N\) with \(\lvert a_{n} - a_{N} \rvert < 1\) for \(n \ge N\), hence \(\lvert a_{n} \rvert < \lvert a_{N} \rvert + 1\) for \(n \ge N\), and the finitely many earlier terms are bounded as well. By Bolzano–Weierstrass (Theorem 4.4) some subsequence converges, say \(a_{n_{j}} \to A\). We claim the whole sequence converges to \(A\). Given \(\varepsilon > 0\), choose \(N_{0}\) with \(\lvert a_{m} - a_{n} \rvert < \varepsilon/2\) for \(m, n \ge N_{0}\), and choose an index \(n_{j} \ge N_{0}\) with \(\lvert a_{n_{j}} - A \rvert < \varepsilon/2\). Then for every \(n \ge N_{0}\),</p>
+      <p>Suppose \(\{a_{n}\}\) is Cauchy. First it is bounded: taking \(\varepsilon = 1\), there is an \(N\) with \(\lvert a_{n} - a_{N} \rvert < 1\) for \(n \ge N\), hence \(\lvert a_{n} \rvert < \lvert a_{N} \rvert + 1\) for \(n \ge N\), and the finitely many earlier terms are bounded as well. By Bolzano–Weierstrass (Theorem 4.4) some subsequence converges, say \(a_{n_{j}} \to A\). We claim the whole sequence converges to \(A\). Given \(\varepsilon > 0\), choose \(N_{0}\) with \(\lvert a_{m} - a_{n} \rvert < \varepsilon/2\) for \(m, n \ge N_{0}\), and choose an index \(n_{j} \ge N_{0}\) with \(\lvert a_{n_{j}} - A \rvert < \varepsilon/2\) — both demands can be met at once, since \(a_{n_{j}} \to A\) gives the closeness for all large \(j\), while the strictly increasing indices \(n_{j}\) eventually exceed \(N_{0}\). Then for every \(n \ge N_{0}\),</p>
       <p>\[ \lvert a_{n} - A \rvert \le \lvert a_{n} - a_{n_{j}} \rvert + \lvert a_{n_{j}} - A \rvert < \tfrac{\varepsilon}{2} + \tfrac{\varepsilon}{2} = \varepsilon. \]</p>
       <p>Hence \(a_{n} \to A\). <span class="qed qed-proof"></span></p>
     </div>
@@ -763,7 +790,7 @@ window.MathJax = {
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Proposition 4.1</span></p>
     <div class="env-body">
-      <p>Set \(S_{n} = \sum_{k=1}^{n} a_{k}\) and assume \(\sum_{k=1}^{\infty} \lvert a_{k} \rvert < \infty\). By Theorem 4.5 it suffices to show \(\{S_{n}\}\) is Cauchy. Given \(\varepsilon > 0\), convergence of the absolute series gives an \(N_{0}\) with \(\sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon\). Then for any \(m > n \ge N_{0}\), the triangle inequality yields</p>
+      <p>Set \(S_{n} = \sum_{k=1}^{n} a_{k}\) and assume \(\sum_{k=1}^{\infty} \lvert a_{k} \rvert < \infty\). By Theorem 4.5 it suffices to show \(\{S_{n}\}\) is Cauchy. Given \(\varepsilon > 0\), convergence of the absolute series gives an \(N_{0}\) with \(\sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon\) — the tail is the gap between the full sum and the \(N_{0}\)-th partial sum, and partial sums close that gap. Then for any \(m > n \ge N_{0}\), the triangle inequality yields</p>
       <p>\[ \lvert S_{m} - S_{n} \rvert = \Bigl\lvert \sum_{k = n + 1}^{m} a_{k} \Bigr\rvert \le \sum_{k = n + 1}^{m} \lvert a_{k} \rvert \le \sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon. \]</p>
       <p>So \(\{S_{n}\}\) is Cauchy, hence convergent, which is what it means for \(\sum_{k=1}^{\infty} a_{k}\) to converge. <span class="qed qed-proof"></span></p>
     </div>
@@ -810,7 +837,7 @@ window.MathJax = {
     </div>
   </section>
 
-  <!-- expansion:intuition — D3② (user-directed): full proof, not a 4-step outline. Six steps: two estimates, the product split, the binomial collapse of (I), the (II) tail bound, the four-term telescope, and the double limit. -->
+  <!-- expansion:intuition — D3② (user-directed): full proof, not a 4-step outline. Six steps: two estimates, the product split, the binomial collapse of (I), the (II) tail bound, the four-term telescope, and the limit k→∞ (Step-6 closing quantifier corrected 2026-07-03: x, y are fixed at the outset and L is chosen for them, so the close is "x, y were arbitrary", not "L was arbitrary"). -->
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
@@ -823,6 +850,7 @@ window.MathJax = {
       <p>Multiplying the two finite sums and grouping the terms \(x^{i} y^{j}/(i!\,j!)\) by their total degree \(\ell = i + j\),</p>
       <p>\[ P_{k}(x)\, P_{k}(y) = \underbrace{\sum_{\ell = 0}^{k} \; \sum_{m = 0}^{\ell} \frac{x^{m} y^{\ell - m}}{m!\,(\ell - m)!}}_{\text{(I)}} \; + \; \underbrace{\sum_{\ell = k + 1}^{2k} \; \sum_{\substack{i + j = \ell \\ 0 \le i, j \le k}} \frac{x^{i} y^{j}}{i!\, j!}}_{\text{(II)}}. \]</p>
       <p>Group (I) collects every degree \(\ell \le k\), where no term is missing; group (II) collects the leftover high-degree terms \(k < \ell \le 2k\).</p>
+      <p>To see the split concretely, take \(k = 2\): multiplying out \(P_{2}(x)\,P_{2}(y) = \bigl(1 + x + \tfrac{x^{2}}{2}\bigr)\bigl(1 + y + \tfrac{y^{2}}{2}\bigr)\) gives nine terms. Sorted by total degree, the degrees \(\ell \le 2\) assemble exactly \(1 + (x + y) + \tfrac{(x + y)^{2}}{2} = P_{2}(x + y)\) — that is group (I) — while the leftovers \(\tfrac{x^{2} y}{2} + \tfrac{x y^{2}}{2} + \tfrac{x^{2} y^{2}}{4}\) form group (II). Notice that (II)’s degree-\(3\) layer is incomplete — \(x^{3}\) and \(y^{3}\) are absent, since neither factor carries a power beyond \(2\) — which is why (II) can only be <em>bounded</em> by a tail in Step 4, not collapsed by the binomial theorem.</p>
 
       <p class="para-head">Step 3: the binomial theorem collapses (I).</p>
       <p>Writing \(\dfrac{1}{m!\,(\ell - m)!} = \dfrac{1}{\ell!}\dbinom{\ell}{m}\) and applying the binomial theorem \((x + y)^{\ell} = \sum_{m=0}^{\ell} \binom{\ell}{m} x^{m} y^{\ell - m}\) (also written \(\binom{\ell}{m} = C^{\ell}_{m}\) in older notation),</p>
@@ -843,8 +871,8 @@ window.MathJax = {
       <p>Apply Step 1, Step 4, and the bound \((**)\) at \(x + y\) (valid since \(\lvert x + y \rvert \le 2L\), enlarging \(L\) to \(2L\) there). Each of the four pieces is at most a fixed constant times \(\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\):</p>
       <p>\[ \lvert e^{x} e^{y} - e^{x + y} \rvert \le 2\, e^{L}\, \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} + 2\, \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \]</p>
 
-      <p class="para-head">Step 6: let \(k \to \infty\), then \(L \to \infty\).</p>
-      <p>The right-hand side is independent of how the left-hand side was formed and tends to \(0\) as \(k \to \infty\), while the left-hand side does not depend on \(k\) at all. Therefore \(\lvert e^{x} e^{y} - e^{x + y} \rvert = 0\), i.e. \(e^{x} e^{y} = e^{x + y}\), for all \(x, y\) with \(\lvert x \rvert, \lvert y \rvert \le L\). Since \(L\) was arbitrary, the identity holds for all \(x, y \in \mathbb{R}\). <span class="qed qed-proof"></span></p>
+      <p class="para-head">Step 6: let \(k \to \infty\).</p>
+      <p>The right-hand side is independent of how the left-hand side was formed and tends to \(0\) as \(k \to \infty\), while the left-hand side does not depend on \(k\) at all. Therefore \(\lvert e^{x} e^{y} - e^{x + y} \rvert = 0\), i.e. \(e^{x} e^{y} = e^{x + y}\), for the pair \(x, y\) fixed at the outset. Since \(x\) and \(y\) were arbitrary, the identity holds for all \(x, y \in \mathbb{R}\). <span class="qed qed-proof"></span></p>
     </div>
   </section>
 
@@ -1011,6 +1039,15 @@ window.MathJax = {
 
 <template id="frag-sec-4-4">
 <!-- §4.4 Rolle's Theorem and the Mean Value Theorem.
+     2026-07-06 IVT/EVT amendment (full-arc seam fix, Codex-converged): Theorem 4.9 now bundles
+     part (a) EVT (statement unchanged) + part (b) IVT (NEW; previously used unproved in §4.5). Both
+     proofs fenced to the new Proof-Track appendix (Appendix D). Chosen for ZERO renumbering — no other
+     env number shifts. Cite EVT as "Theorem 4.9(a)", IVT as "Theorem 4.9(b)". Also: the old EVT
+     "state without proof / black box" note is replaced by a fence to Appendix D. Record:
+     handout/_audit/REVIEW-fullarc-seam-skeleton.html.
+     2026-07-03 reading-track pass: one Proof-track note before Theorem 4.10's proof
+     covers the three-proof ladder (Theorem A → Rolle → MVT).
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html.
      Authored into handout-kit semantic markup per CONTRACT-html-writing.md
      from _dev-archive/ch04/seed_ch04_s4.md (manuscript pp. 11–18). Direction
      brief brief_s44.md approved at ③ (2026-06-21, "全照提案核可" + all four
@@ -1077,7 +1114,7 @@ window.MathJax = {
   <!-- expansion:history [source: standard calculus-textbook historical note] — one-sentence attribution; not in the manuscript -->
   <p>The special case is named for Michel Rolle, who stated it for polynomials in 1691; the general theorem and its modern proof belong to the nineteenth-century analysts, Cauchy among them, who made the derivative rigorous.</p>
 
-  <h3 class="subsec-head">Maxima, minima, and the extreme value theorem</h3>
+  <h3 class="subsec-head">Maxima, minima, and two existence theorems</h3>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.3</span></p>
@@ -1091,18 +1128,20 @@ window.MathJax = {
 
   <p>For instance, \(x_{0} = 0\) is a maximum point of \(\cos x\) on \(\mathbb{R}\), with maximum value \(1\), since \(1 = \cos 0 \ge \cos x\) for every real \(x\).</p>
 
-  <p>Whether a function attains its extremes at all is a delicate matter on a general domain, but on a closed interval the answer is always yes. This is the foundational fact that drives everything below.</p>
+  <p>Whether a function attains its extremes at all is a delicate matter on a general domain, but on a closed interval the answer is always yes — and, just as basic, a continuous function skips no value on the way from one height to another. These two facts about continuity on a closed interval, the foundation for everything below, are gathered in the next theorem.</p>
 
   <section class="env env-theorem">
-    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.9</span><span class="env-name">Extreme Value Theorem</span></p>
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.9</span><span class="env-name">Extreme and Intermediate Value Theorems</span></p>
     <div class="env-body">
-      <p>If \(f\) is continuous on a closed interval \([a, b]\), then \(f\) attains both a maximum and a minimum on \([a, b]\): there exist points \(x_{M}, x_{m} \in [a, b]\) with</p>
+      <p>Let \(f\) be continuous on a closed interval \([a, b]\).</p>
+      <p><strong>(a) Extreme Value Theorem.</strong> \(f\) attains both a maximum and a minimum on \([a, b]\): there exist points \(x_{M}, x_{m} \in [a, b]\) with</p>
       <p>\[ f(x_{m}) \le f(x) \le f(x_{M}) \qquad \text{for every } x \in [a, b]. \]</p>
+      <p><strong>(b) Intermediate Value Theorem.</strong> \(f\) takes every value between its endpoint values: if \(y\) lies between \(f(a)\) and \(f(b)\), then \(f(c) = y\) for some \(c \in [a, b]\).</p>
     </div>
   </section>
 
-  <!-- expansion:intuition — the manuscript states this Fact without proof (completeness); record why, and that both hypotheses are essential -->
-  <p>We state this without proof. The argument rests on the completeness of \(\mathbb{R}\) (Theorem 4.1) and is the kind of lengthy analytic construction we set aside at this level; the theorem is used here as a black box. Both hypotheses are genuinely needed: on the <em>open</em> interval \((0, 1)\) the function \(f(x) = x\) attains no maximum — its values approach \(1\) without ever reaching it — and a discontinuous function can miss its extremes even on a closed interval. We will only ever apply the theorem to continuous functions on closed intervals, where it always delivers.</p>
+  <!-- expansion:intuition — both parts rest on completeness (Thm 4.1); proofs fenced to Appendix D (Proof Track). Hypotheses each part needs differ. IVT part (b) added 2026-07-06 (full-arc seam fix — previously used unproved in §4.5); EVT proof, formerly a bare black box, now has a real home. Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html -->
+  <p>Both parts rest on the completeness of \(\mathbb{R}\) (Theorem 4.1), and their proofs are exactly the kind of self-contained analytic construction we keep out of the main line. We therefore state them here and defer the proofs to the <em>Proof-Track appendix</em> (Appendix D), which derives them from completeness by way of a least-upper-bound lemma and the Bolzano–Weierstrass theorem. The hypotheses earn their keep, and differently for the two parts. The Extreme Value Theorem (a) needs continuity <em>and</em> a closed, bounded interval: on the <em>open</em> interval \((0, 1)\) the function \(f(x) = x\) attains no maximum — its values approach \(1\) without ever reaching it — and a discontinuous function can miss its extremes even on a closed interval. The Intermediate Value Theorem (b) leans on continuity alone, over an interval: a function with a jump can step over a value without ever equalling it, which is precisely what continuity forbids. We apply both only to continuous functions on closed intervals, where they always deliver.</p>
 
   <h3 class="subsec-head">Interior extrema: Theorem A</h3>
 
@@ -1114,6 +1153,9 @@ window.MathJax = {
       <p>Suppose \(f\) is defined on \([a, b]\), the point \(x_{M} \in (a, b)\) is a maximum (or minimum) point of \(f\) on \([a, b]\), and \(f'(x_{M})\) exists. Then \(f'(x_{M}) = 0\).</p>
     </div>
   </section>
+
+  <!-- 2026-07-03 reading-track: one Proof-track note covers the section's three-proof ladder (Theorem A → Rolle → MVT). Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html -->
+  <p><em>Proof track: this proof and the two after it (Rolle’s theorem, the Mean Value Theorem) earn the section’s three existence theorems. Later material uses the statements, not the proofs — on a first reading you may take the results and go straight to Strategy 4.2 and the examples.</em></p>
 
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
@@ -1163,7 +1205,7 @@ window.MathJax = {
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
-      <p>By the extreme value theorem (Theorem 4.9), \(f\) attains a maximum at some \(x_{M} \in [a, b]\) and a minimum at some \(x_{m} \in [a, b]\), with \(f(x_{m}) \le f(x) \le f(x_{M})\) for all \(x \in [a, b]\). Write \(m = f(x_{m})\) and \(M = f(x_{M})\).</p>
+      <p>By the Extreme Value Theorem (Theorem 4.9(a)), \(f\) attains a maximum at some \(x_{M} \in [a, b]\) and a minimum at some \(x_{m} \in [a, b]\), with \(f(x_{m}) \le f(x) \le f(x_{M})\) for all \(x \in [a, b]\). Write \(m = f(x_{m})\) and \(M = f(x_{M})\).</p>
       <p><strong>Case 1: \(m = M\).</strong> Together with \(f(a) = f(b)\) this forces \(m = M = f(a) = f(b)\), so the bounds \(m \le f(x) \le M\) collapse and \(f\) is constant on \([a, b]\). Then \(f'(c) = 0\) for every \(c \in (a, b)\); choose any.</p>
       <p><strong>Case 2: \(m &lt; M\).</strong> Since \(f(a)\) is a value of \(f\), the bounds give \(m \le f(a) \le M\). As \(f(a) = f(b)\) and \(m &lt; M\), the values \(m\) and \(M\) cannot both equal that common endpoint value, so at least one of</p>
       <p>\[ f(x_{M}) > f(a) \qquad \text{or} \qquad f(x_{m}) < f(a) \]</p>
@@ -1382,6 +1424,12 @@ window.MathJax = {
      fig:exp-and-log-reflection, remark line 807, application line 834,
      Summary line 841).
 
+     2026-07-03 difficulty-mitigation pass: sequence-witness step in Theorem 4.13's proof
+     given its §1.6 negation rationale (previously asserted without justification); unused
+     \tag{$\ast$} on the (ln x)' display removed (minted but never referenced).
+     2026-07-03 reading-track pass: Proof-track note before Theorem 4.13's proof.
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html.
+
      ③ decisions (brief §C/§D, all approved; all three optional add-ons taken):
        - §C-1: the range of e^x is (0, ∞); the manuscript asserts this via the
          limits lim_{x→±∞} e^x without proof. We assert it too, with a one-line
@@ -1421,8 +1469,8 @@ window.MathJax = {
 
   <h3 class="subsec-head">Defining the natural logarithm</h3>
 
-  <!-- expansion:intuition — §C-1: the range of e^x is (0,∞); assert with a one-line dependency note (manuscript + legacy both assert, do not prove) -->
-  <p>To invert \(e^{x}\) we need to know what values it takes. As \(x\) ranges over \(\mathbb{R}\), \(e^{x}\) is continuous (Theorem 4.6) and runs from \(\lim_{x \to -\infty} e^{x} = 0\) up to \(\lim_{x \to +\infty} e^{x} = +\infty\), passing through every value in between; its range is therefore the open interval \((0, \infty)\). We take this for granted here: the two limits follow from the series and the intermediate values from continuity, but the details would detain us. The consequence we need is what matters — for every \(x &gt; 0\) there is exactly one exponent producing it.</p>
+  <!-- expansion:formula — §C-1 upgraded 2026-07-06 (full-arc seam fix): the range of e^x is (0,∞), now PROVED via IVT (Theorem 4.9(b), added §4.4) rather than asserted. Uses e^x>0 (Cor 4.1), e^{-x}=1/e^x (Thm 4.7), continuity (Thm 4.6), IVT (Thm 4.9(b)). Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html -->
+  <p>To invert \(e^{x}\) we need to know exactly which values it takes. First, \(e^{x} &gt; 0\) for every real \(x\) (Corollary 4.1), so its values are positive. They range over <em>all</em> positive numbers, and the Intermediate Value Theorem makes that precise. Fix any target \(t &gt; 0\). Since \(e^{x} &gt; 1 + x\) for \(x &gt; 0\) — every term of the series past the first is positive — \(e^{x}\) exceeds \(t\) once \(x\) is large enough; and since \(e^{-x} = 1/e^{x}\) (Theorem 4.7), the values \(e^{x}\) fall below \(t\) once \(x\) is sufficiently negative. Pick points \(p &lt; q\) with \(e^{p} &lt; t &lt; e^{q}\). On \([p, q]\) the function \(e^{x}\) is continuous (Theorem 4.6), so by the Intermediate Value Theorem (Theorem 4.9(b)) there is a \(c \in [p, q]\) with \(e^{c} = t\). Every positive \(t\) is therefore attained, and the range of \(e^{x}\) is exactly the open interval \((0, \infty)\). Strict monotonicity makes the exponent unique — so for every \(x &gt; 0\) there is exactly one \(a\) with \(e^{a} = x\).</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.4</span><span class="env-name">Natural logarithm</span></p>
@@ -1460,11 +1508,14 @@ window.MathJax = {
     </div>
   </section>
 
+  <p><em>Proof track: this argument earns the theorem. What follows uses only the statement — the continuity of \(\ln\) — so on a first reading you may take it and move on.</em></p>
+
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
       <p>Fix \(x_{0} &gt; 0\) and suppose, for contradiction, that \(\ln\) is <em>not</em> continuous at \(x_{0}\). Then \(\lim_{x \to x_{0}} \ln x\) either fails to exist or exists but differs from \(\ln x_{0}\). In either case the failure is witnessed by a sequence: there is a number \(\delta &gt; 0\) and points \(y_{j} \to x_{0}\) (all in \((0, \infty)\)) with</p>
       <p>\[ \lvert \ln y_{j} - \ln x_{0} \rvert \ge \delta \qquad \text{for every } j = 1, 2, 3, \dots \]</p>
+      <p>(To see why failure is witnessed this way, negate the limit statement of §1.6: if \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) fails, there is some tolerance \(\delta &gt; 0\) that no input-closeness requirement can meet — for every \(d &gt; 0\), some point \(y\) with \(0 &lt; \lvert y - x_{0} \rvert &lt; d\) has \(\lvert \ln y - \ln x_{0} \rvert \ge \delta\). Picking one such point \(y_{j}\) for each \(d = \tfrac{1}{j}\) produces the sequence, and for small \(d\) these points stay inside \((0, \infty)\).)</p>
       <p>For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.6), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):</p>
       <ul>
         <li>if \(\ln y_{j} \le \ln x_{0} - \delta\), then \(x_{0} - y_{j} = e^{\ln x_{0}} - e^{\ln y_{j}} \ge e^{\ln x_{0}} - e^{\ln x_{0} - \delta} &gt; 0\);</li>
@@ -1502,7 +1553,7 @@ window.MathJax = {
       <p>Now let \(h \to 0\). By continuity of \(\ln\) (Theorem 4.13), \(y = \ln(x + h) \to \ln x = y_{0}\), and \(y \ne y_{0}\) all the while. The denominator is precisely the difference quotient of \(e^{y}\) at \(y_{0}\), so</p>
       <p>\[ \lim_{h \to 0} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \lim_{y \to y_{0}} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \left.\frac{d}{dy} e^{y}\right|_{y = y_{0}} = e^{y_{0}} = e^{\ln x} = x, \]</p>
       <p>using \((e^{y})' = e^{y}\) from Theorem 4.8. Taking the reciprocal,</p>
-      <p>\[ \frac{d}{dx}\ln x = \lim_{h \to 0} \frac{\ln(x + h) - \ln x}{h} = \frac{1}{x}. \tag{$\ast$} \]</p>
+      <p>\[ \frac{d}{dx}\ln x = \lim_{h \to 0} \frac{\ln(x + h) - \ln x}{h} = \frac{1}{x}. \]</p>
       <p><span class="qed qed-proof"></span></p>
     </div>
   </section>

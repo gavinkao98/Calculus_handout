@@ -21,6 +21,12 @@
      fig:exp-and-log-reflection, remark line 807, application line 834,
      Summary line 841).
 
+     2026-07-03 difficulty-mitigation pass: sequence-witness step in Theorem 4.13's proof
+     given its §1.6 negation rationale (previously asserted without justification); unused
+     \tag{$\ast$} on the (ln x)' display removed (minted but never referenced).
+     2026-07-03 reading-track pass: Proof-track note before Theorem 4.13's proof.
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html.
+
      ③ decisions (brief §C/§D, all approved; all three optional add-ons taken):
        - §C-1: the range of e^x is (0, ∞); the manuscript asserts this via the
          limits lim_{x→±∞} e^x without proof. We assert it too, with a one-line
@@ -60,8 +66,8 @@
 
   <h3 class="subsec-head">Defining the natural logarithm</h3>
 
-  <!-- expansion:intuition — §C-1: the range of e^x is (0,∞); assert with a one-line dependency note (manuscript + legacy both assert, do not prove) -->
-  <p>To invert \(e^{x}\) we need to know what values it takes. As \(x\) ranges over \(\mathbb{R}\), \(e^{x}\) is continuous (Theorem 4.6) and runs from \(\lim_{x \to -\infty} e^{x} = 0\) up to \(\lim_{x \to +\infty} e^{x} = +\infty\), passing through every value in between; its range is therefore the open interval \((0, \infty)\). We take this for granted here: the two limits follow from the series and the intermediate values from continuity, but the details would detain us. The consequence we need is what matters — for every \(x &gt; 0\) there is exactly one exponent producing it.</p>
+  <!-- expansion:formula — §C-1 upgraded 2026-07-06 (full-arc seam fix): the range of e^x is (0,∞), now PROVED via IVT (Theorem 4.9(b), added §4.4) rather than asserted. Uses e^x>0 (Cor 4.1), e^{-x}=1/e^x (Thm 4.7), continuity (Thm 4.6), IVT (Thm 4.9(b)). Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html -->
+  <p>To invert \(e^{x}\) we need to know exactly which values it takes. First, \(e^{x} &gt; 0\) for every real \(x\) (Corollary 4.1), so its values are positive. They range over <em>all</em> positive numbers, and the Intermediate Value Theorem makes that precise. Fix any target \(t &gt; 0\). Since \(e^{x} &gt; 1 + x\) for \(x &gt; 0\) — every term of the series past the first is positive — \(e^{x}\) exceeds \(t\) once \(x\) is large enough; and since \(e^{-x} = 1/e^{x}\) (Theorem 4.7), the values \(e^{x}\) fall below \(t\) once \(x\) is sufficiently negative. Pick points \(p &lt; q\) with \(e^{p} &lt; t &lt; e^{q}\). On \([p, q]\) the function \(e^{x}\) is continuous (Theorem 4.6), so by the Intermediate Value Theorem (Theorem 4.9(b)) there is a \(c \in [p, q]\) with \(e^{c} = t\). Every positive \(t\) is therefore attained, and the range of \(e^{x}\) is exactly the open interval \((0, \infty)\). Strict monotonicity makes the exponent unique — so for every \(x &gt; 0\) there is exactly one \(a\) with \(e^{a} = x\).</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.4</span><span class="env-name">Natural logarithm</span></p>
@@ -99,11 +105,14 @@
     </div>
   </section>
 
+  <p><em>Proof track: this argument earns the theorem. What follows uses only the statement — the continuity of \(\ln\) — so on a first reading you may take it and move on.</em></p>
+
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
       <p>Fix \(x_{0} &gt; 0\) and suppose, for contradiction, that \(\ln\) is <em>not</em> continuous at \(x_{0}\). Then \(\lim_{x \to x_{0}} \ln x\) either fails to exist or exists but differs from \(\ln x_{0}\). In either case the failure is witnessed by a sequence: there is a number \(\delta &gt; 0\) and points \(y_{j} \to x_{0}\) (all in \((0, \infty)\)) with</p>
       <p>\[ \lvert \ln y_{j} - \ln x_{0} \rvert \ge \delta \qquad \text{for every } j = 1, 2, 3, \dots \]</p>
+      <p>(To see why failure is witnessed this way, negate the limit statement of §1.6: if \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) fails, there is some tolerance \(\delta &gt; 0\) that no input-closeness requirement can meet — for every \(d &gt; 0\), some point \(y\) with \(0 &lt; \lvert y - x_{0} \rvert &lt; d\) has \(\lvert \ln y - \ln x_{0} \rvert \ge \delta\). Picking one such point \(y_{j}\) for each \(d = \tfrac{1}{j}\) produces the sequence, and for small \(d\) these points stay inside \((0, \infty)\).)</p>
       <p>For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.6), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):</p>
       <ul>
         <li>if \(\ln y_{j} \le \ln x_{0} - \delta\), then \(x_{0} - y_{j} = e^{\ln x_{0}} - e^{\ln y_{j}} \ge e^{\ln x_{0}} - e^{\ln x_{0} - \delta} &gt; 0\);</li>
@@ -141,7 +150,7 @@
       <p>Now let \(h \to 0\). By continuity of \(\ln\) (Theorem 4.13), \(y = \ln(x + h) \to \ln x = y_{0}\), and \(y \ne y_{0}\) all the while. The denominator is precisely the difference quotient of \(e^{y}\) at \(y_{0}\), so</p>
       <p>\[ \lim_{h \to 0} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \lim_{y \to y_{0}} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \left.\frac{d}{dy} e^{y}\right|_{y = y_{0}} = e^{y_{0}} = e^{\ln x} = x, \]</p>
       <p>using \((e^{y})' = e^{y}\) from Theorem 4.8. Taking the reciprocal,</p>
-      <p>\[ \frac{d}{dx}\ln x = \lim_{h \to 0} \frac{\ln(x + h) - \ln x}{h} = \frac{1}{x}. \tag{$\ast$} \]</p>
+      <p>\[ \frac{d}{dx}\ln x = \lim_{h \to 0} \frac{\ln(x + h) - \ln x}{h} = \frac{1}{x}. \]</p>
       <p><span class="qed qed-proof"></span></p>
     </div>
   </section>

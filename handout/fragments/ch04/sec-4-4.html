@@ -1,4 +1,13 @@
 <!-- §4.4 Rolle's Theorem and the Mean Value Theorem.
+     2026-07-06 IVT/EVT amendment (full-arc seam fix, Codex-converged): Theorem 4.9 now bundles
+     part (a) EVT (statement unchanged) + part (b) IVT (NEW; previously used unproved in §4.5). Both
+     proofs fenced to the new Proof-Track appendix (Appendix D). Chosen for ZERO renumbering — no other
+     env number shifts. Cite EVT as "Theorem 4.9(a)", IVT as "Theorem 4.9(b)". Also: the old EVT
+     "state without proof / black box" note is replaced by a fence to Appendix D. Record:
+     handout/_audit/REVIEW-fullarc-seam-skeleton.html.
+     2026-07-03 reading-track pass: one Proof-track note before Theorem 4.10's proof
+     covers the three-proof ladder (Theorem A → Rolle → MVT).
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html.
      Authored into handout-kit semantic markup per CONTRACT-html-writing.md
      from _dev-archive/ch04/seed_ch04_s4.md (manuscript pp. 11–18). Direction
      brief brief_s44.md approved at ③ (2026-06-21, "全照提案核可" + all four
@@ -24,6 +33,8 @@
          monotonicity (injectivity) to define ln x. Legacy states both.
        - §C-3: the EVT (Theorem 4.9) is stated WITHOUT proof (manuscript defers it
          to completeness); a compact note records that both hypotheses are essential.
+         [SUPERSEDED 2026-07-06: Theorem 4.9 now = EVT (a) + IVT (b); the note fences BOTH
+          proofs to Appendix D instead of leaving EVT unproved — see the top header note.]
        - §C-4 (ROADMAP key figure): Figure 4.4 — the MVT secant–tangent picture
          (was 4.2 before the figure-opportunity gate inserted Figure 4.3).
        - §C-5 (ROADMAP strategy): Strategy 4.2 — verifying the MVT hypotheses,
@@ -65,7 +76,7 @@
   <!-- expansion:history [source: standard calculus-textbook historical note] — one-sentence attribution; not in the manuscript -->
   <p>The special case is named for Michel Rolle, who stated it for polynomials in 1691; the general theorem and its modern proof belong to the nineteenth-century analysts, Cauchy among them, who made the derivative rigorous.</p>
 
-  <h3 class="subsec-head">Maxima, minima, and the extreme value theorem</h3>
+  <h3 class="subsec-head">Maxima, minima, and two existence theorems</h3>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.3</span></p>
@@ -79,18 +90,20 @@
 
   <p>For instance, \(x_{0} = 0\) is a maximum point of \(\cos x\) on \(\mathbb{R}\), with maximum value \(1\), since \(1 = \cos 0 \ge \cos x\) for every real \(x\).</p>
 
-  <p>Whether a function attains its extremes at all is a delicate matter on a general domain, but on a closed interval the answer is always yes. This is the foundational fact that drives everything below.</p>
+  <p>Whether a function attains its extremes at all is a delicate matter on a general domain, but on a closed interval the answer is always yes — and, just as basic, a continuous function skips no value on the way from one height to another. These two facts about continuity on a closed interval, the foundation for everything below, are gathered in the next theorem.</p>
 
   <section class="env env-theorem">
-    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.9</span><span class="env-name">Extreme Value Theorem</span></p>
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.9</span><span class="env-name">Extreme and Intermediate Value Theorems</span></p>
     <div class="env-body">
-      <p>If \(f\) is continuous on a closed interval \([a, b]\), then \(f\) attains both a maximum and a minimum on \([a, b]\): there exist points \(x_{M}, x_{m} \in [a, b]\) with</p>
+      <p>Let \(f\) be continuous on a closed interval \([a, b]\).</p>
+      <p><strong>(a) Extreme Value Theorem.</strong> \(f\) attains both a maximum and a minimum on \([a, b]\): there exist points \(x_{M}, x_{m} \in [a, b]\) with</p>
       <p>\[ f(x_{m}) \le f(x) \le f(x_{M}) \qquad \text{for every } x \in [a, b]. \]</p>
+      <p><strong>(b) Intermediate Value Theorem.</strong> \(f\) takes every value between its endpoint values: if \(y\) lies between \(f(a)\) and \(f(b)\), then \(f(c) = y\) for some \(c \in [a, b]\).</p>
     </div>
   </section>
 
-  <!-- expansion:intuition — the manuscript states this Fact without proof (completeness); record why, and that both hypotheses are essential -->
-  <p>We state this without proof. The argument rests on the completeness of \(\mathbb{R}\) (Theorem 4.1) and is the kind of lengthy analytic construction we set aside at this level; the theorem is used here as a black box. Both hypotheses are genuinely needed: on the <em>open</em> interval \((0, 1)\) the function \(f(x) = x\) attains no maximum — its values approach \(1\) without ever reaching it — and a discontinuous function can miss its extremes even on a closed interval. We will only ever apply the theorem to continuous functions on closed intervals, where it always delivers.</p>
+  <!-- expansion:intuition — both parts rest on completeness (Thm 4.1); proofs fenced to Appendix D (Proof Track). Hypotheses each part needs differ. IVT part (b) added 2026-07-06 (full-arc seam fix — previously used unproved in §4.5); EVT proof, formerly a bare black box, now has a real home. Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html -->
+  <p>Both parts rest on the completeness of \(\mathbb{R}\) (Theorem 4.1), and their proofs are exactly the kind of self-contained analytic construction we keep out of the main line. We therefore state them here and defer the proofs to the <em>Proof-Track appendix</em> (Appendix D), which derives them from completeness by way of a least-upper-bound lemma and the Bolzano–Weierstrass theorem. The hypotheses earn their keep, and differently for the two parts. The Extreme Value Theorem (a) needs continuity <em>and</em> a closed, bounded interval: on the <em>open</em> interval \((0, 1)\) the function \(f(x) = x\) attains no maximum — its values approach \(1\) without ever reaching it — and a discontinuous function can miss its extremes even on a closed interval. The Intermediate Value Theorem (b) leans on continuity alone, over an interval: a function with a jump can step over a value without ever equalling it, which is precisely what continuity forbids. We apply both only to continuous functions on closed intervals, where they always deliver.</p>
 
   <h3 class="subsec-head">Interior extrema: Theorem A</h3>
 
@@ -102,6 +115,9 @@
       <p>Suppose \(f\) is defined on \([a, b]\), the point \(x_{M} \in (a, b)\) is a maximum (or minimum) point of \(f\) on \([a, b]\), and \(f'(x_{M})\) exists. Then \(f'(x_{M}) = 0\).</p>
     </div>
   </section>
+
+  <!-- 2026-07-03 reading-track: one Proof-track note covers the section's three-proof ladder (Theorem A → Rolle → MVT). Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html -->
+  <p><em>Proof track: this proof and the two after it (Rolle’s theorem, the Mean Value Theorem) earn the section’s three existence theorems. Later material uses the statements, not the proofs — on a first reading you may take the results and go straight to Strategy 4.2 and the examples.</em></p>
 
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
@@ -151,7 +167,7 @@
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
-      <p>By the extreme value theorem (Theorem 4.9), \(f\) attains a maximum at some \(x_{M} \in [a, b]\) and a minimum at some \(x_{m} \in [a, b]\), with \(f(x_{m}) \le f(x) \le f(x_{M})\) for all \(x \in [a, b]\). Write \(m = f(x_{m})\) and \(M = f(x_{M})\).</p>
+      <p>By the Extreme Value Theorem (Theorem 4.9(a)), \(f\) attains a maximum at some \(x_{M} \in [a, b]\) and a minimum at some \(x_{m} \in [a, b]\), with \(f(x_{m}) \le f(x) \le f(x_{M})\) for all \(x \in [a, b]\). Write \(m = f(x_{m})\) and \(M = f(x_{M})\).</p>
       <p><strong>Case 1: \(m = M\).</strong> Together with \(f(a) = f(b)\) this forces \(m = M = f(a) = f(b)\), so the bounds \(m \le f(x) \le M\) collapse and \(f\) is constant on \([a, b]\). Then \(f'(c) = 0\) for every \(c \in (a, b)\); choose any.</p>
       <p><strong>Case 2: \(m &lt; M\).</strong> Since \(f(a)\) is a value of \(f\), the bounds give \(m \le f(a) \le M\). As \(f(a) = f(b)\) and \(m &lt; M\), the values \(m\) and \(M\) cannot both equal that common endpoint value, so at least one of</p>
       <p>\[ f(x_{M}) > f(a) \qquad \text{or} \qquad f(x_{m}) < f(a) \]</p>

@@ -5,6 +5,11 @@
      kit has no auto-counter); cross-references are plain prose. §4.1 is the
      chapter's first section, so it carries the chapter opener (a second
      <article>) and starts the Chapter 4 figure registry (Figures 4.1, 4.2).
+     2026-07-03 reading-track pass: chapter route map added to the opener
+     (foundation-chapter labeling) + Proof-track note before Theorem 4.2's proof.
+     2026-07-03 P1 ruling follow-up: infinite geometric sum derived in Strategy 4.1
+     step 3 (SPEC §16.2 rules it non-assumable — 108 curriculum moved it out of 必修).
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html.
      Math cross-checked against the signed legacy ground truth
      legacy/tex_handout/chapters/ch04_exponential_logarithm.tex §4.1.
 
@@ -41,6 +46,9 @@
     <li>use the Mean Value Theorem to show that \(f' \ge 0\) on an interval forces \(f\) to be increasing there;</li>
     <li>define \(\ln x\) as the inverse of \(e^{x}\), prove its continuity, and derive \(\dfrac{d}{dx} \ln x = \dfrac{1}{x}\) without circular reasoning.</li>
   </ul>
+
+  <!-- 2026-07-03 reading-track: chapter route map (foundation-chapter labeling; spec adjudicated with Codex). Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html -->
+  <p>A note on how to read this chapter. This is the book’s <em>foundation chapter</em> — the place where the tools used on credit since Chapter 2 are finally built for real — and more of its length is proof than computation. The results to carry forward are few: \(e^{x}\) exists, is continuous, and obeys \(e^{x} e^{y} = e^{x + y}\) (§4.1–§4.2); its derivative is itself, now proved honestly (§4.3); the Mean Value Theorem and its monotonicity consequences (§4.4); and the logarithm with \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) (§4.5). <em>Proof track</em> notes in the sections below mark the long arguments that can wait for a second pass: on a first reading, take the statements, work the examples of §4.4–§4.5, and come back later to watch the debt being paid in full.</p>
 </article>
 
 <article class="sec" lang="en">
@@ -127,7 +135,7 @@
       <ol class="steps">
         <li>Find an index \(n_{0}\) beyond which the ratio of consecutive terms is at most some constant \(r < 1\): that is, \(a_{n + 1}/a_{n} \le r\) for \(n \ge n_{0}\).</li>
         <li>Conclude that the terms decay geometrically: \(a_{n} \le a_{n_{0}} \, r^{\,n - n_{0}}\) for \(n \ge n_{0}\).</li>
-        <li>Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\).</li>
+        <li>Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\). (If the infinite geometric sum is new to you: the finite sum is \(r + r^{2} + \cdots + r^{m} = \frac{r(1 - r^{m})}{1 - r}\) — multiply by \(1 - r\) and watch the telescoping — and since \(0 < r < 1\), the power \(r^{m}\) dies away as \(m\) grows, leaving \(\frac{r}{1 - r}\). Appendix A.3 gives the full account.)</li>
         <li>The partial sums are then bounded above, and (being a sum of positive terms) non-decreasing, so Theorem 4.1 gives the limit.</li>
       </ol>
     </div>
@@ -139,6 +147,8 @@
       <p>For every \(x > 0\), the series \(\displaystyle\sum_{n = 0}^{\infty} \frac{x^{n}}{n!}\) converges to a finite real number.</p>
     </div>
   </section>
+
+  <p><em>Proof track: this argument earns the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof — on a first reading you may take both and move on.</em></p>
 
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>

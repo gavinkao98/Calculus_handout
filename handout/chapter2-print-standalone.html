@@ -883,7 +883,9 @@ window.MathJax = {
        (2026-06-22 example-supplement import: +E2.3-a vertical tangent = 2.12,
         +O2.3-a piecewise = 2.13; old higher-deriv example 2.12 → 2.14.)
      No exercises: self-authored problems are written as worked examples
-     (see brief_s23.md "題目政策"). -->
+     (see brief_s23.md "題目政策").
+     2026-07-03 difficulty-mitigation pass: h^{2/3} positivity glossed as (h^{1/3})².
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html. -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -948,7 +950,7 @@ window.MathJax = {
       <div class="env-body">
         <p>We form the difference quotient at \(a = 0\):</p>
         <p>\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{h^{1/3} - 0}{h} \;=\; \frac{1}{h^{2/3}}. \]</p>
-        <p>Since \(h^{2/3} > 0\) for all \(h \ne 0\), the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
+        <p>Since \(h^{2/3} = \bigl(h^{1/3}\bigr)^{2} > 0\) for all \(h \ne 0\) — a cube root squared is positive whatever the sign of \(h\) — the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
         <p>\[ \lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty. \]</p>
         <p>The limit does not exist as a <em>finite</em> number, so by Definition 2.3 the function is not differentiable at \(x = 0\).</p>
         <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)); here both one-sided limits agree — they both tend to \(+\infty\) — so there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative demands a finite limit, so differentiability fails here for a different reason than at a corner.</p>
@@ -1118,7 +1120,15 @@ window.MathJax = {
      level; the rigorous construction is deferred to Ch4 §4.3.
      One figure this section (Figure 2.8, e^x self-derivative). No exercises:
      self-authored problems are written
-     as worked examples (see brief_s24.md "題目政策"). -->
+     as worked examples (see brief_s24.md "題目政策").
+     2026-07-03 difficulty-mitigation pass: e^x series intro rewritten ("Recall" pointed to
+     material the reader never saw; infinite-sum on-ramp added); x^n − a^n factorization
+     given a verify-by-expanding note.
+     2026-07-03 reading-track pass: credit fence promoted to an unnumbered Caution box
+     ("on credit" marking made prominent per author request).
+     2026-07-03 P3 re-sim follow-up: "on credit" idiom glossed (non-native stumble);
+     precalculus-e sentence de-presumed (SPEC §16.2 rules e/ln non-assumable).
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html. -->
 <article class="sec" lang="en">
 
   <header class="sec-head">
@@ -1171,6 +1181,7 @@ window.MathJax = {
     <div class="env-body">
       <p>We use the equivalent \(x \to a\) form of the derivative (§2.1) together with the algebraic factorization</p>
       <p>\[ x^{n} - a^{n} = (x - a)\bigl(x^{n-1} + a\,x^{n-2} + a^{2}x^{n-3} + \cdots + a^{n-1}\bigr). \]</p>
+      <p>(To verify the factorization, multiply out the right-hand side: all the cross terms cancel in pairs, leaving only \(x^{n} - a^{n}\). The case \(n = 2\) is the familiar difference of squares \((x - a)(x + a)\).)</p>
       <p>Dividing by \(x - a\) cancels the factor that would make the quotient \(0/0\), and letting \(x \to a\),</p>
       <p>\[ \begin{aligned}
         f'(a) &= \lim_{x \to a} \frac{x^{n} - a^{n}}{x - a} \\[2pt]
@@ -1325,12 +1336,22 @@ window.MathJax = {
 
   <h3 class="subsec-head">The derivative of the exponential function</h3>
 
-  <!-- expansion:intuition — recall the series definition (seed Note) and fence its rigorous construction to Ch4 -->
-  <p>We close with a function of a different stripe: the natural exponential \(e^{x}\). Recall that it is defined by the power series</p>
+  <!-- expansion:intuition — introduce the series definition (reader's first exposure; on-ramp for the infinite sum) and fence its rigorous construction to Ch4 -->
+  <p>We close with a function of a different stripe: the natural exponential \(e^{x}\). The base \(e \approx 2.718\) may or may not have appeared in your precalculus course — nothing here assumes it did. In this text the official definition of \(e^{x}\) is a formula of a kind we have not used before — an <em>infinite sum</em>, called a power series:</p>
 
-  <p>\[ e^{x} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots + \frac{x^{n}}{n!} + \cdots, \]</p>
+  <p>\[ e^{x} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots + \frac{x^{n}}{n!} + \cdots. \]</p>
 
-  <p>a definition we take as given here; the convergence of this series and the careful construction of \(e^{x}\) are developed in Chapter 4 (§4.1–§4.2). Granting the series, the derivative falls out beautifully, by an informal term-by-term step. §4.3 makes that step rigorous, justifying it with the explicit bound \(\lvert (e^{h} - 1)/h - 1 \rvert \le \lvert h \rvert\).</p>
+  <p>Read the infinite sum the way the notation suggests: adding more and more terms produces ever-better approximations, and \(e^{x}\) is the value the running totals settle toward. For \(x = 1\), the totals are \(1,\ 2,\ 2.5,\ 2.66\ldots,\) closing in on \(e \approx 2.71828\). Making “settle toward” precise is a limit question, and we take the answer as given here — the caution below records exactly what is being borrowed.</p>
+
+  <!-- 2026-07-03 reading-track: credit fence promoted from running prose to an unnumbered Caution box (author request: make the temporary-acceptance marking more prominent) -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Everything about \(e^{x}\) in this section is <em>on credit</em> — borrowed now, to be repaid in Chapter 4. We take the power-series definition as given: the convergence of the series and the careful construction of \(e^{x}\) are the business of Chapter 4 (§4.1–§4.2), and the term-by-term differentiation about to be used is made rigorous in §4.3, with the explicit bound \(\lvert (e^{h} - 1)/h - 1 \rvert \le \lvert h \rvert\) for \(0 < \lvert h \rvert < \tfrac{1}{2}\). Nothing in Chapters 2–3 depends on those deferred proofs — only on the facts stated here.</p>
+    </div>
+  </section>
+
+  <p>Granting the series, the derivative falls out beautifully, by an informal term-by-term step.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.5</span><span class="env-name">Derivative of the natural exponential</span></p>

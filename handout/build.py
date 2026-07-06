@@ -93,6 +93,38 @@ CHAPTERS = {
         "target": "chapter4-print-standalone.html",
         # "screen": "chapter4-standalone.html",
     },
+    "ch05": {
+        # Fragments are appended as each section reaches draft (incremental build,
+        # so a single finished section can be built + render-checked on its own).
+        "fragments": [
+            "sec-5-1", "sec-5-2", "sec-5-3", "sec-5-4", "sec-5-5", "sec-5-6", "sec-5-7", "sec-5-8", "sec-5-9",
+        ],
+        "target": "chapter5-print-standalone.html",
+    },
+    "appA": {
+        "fragments": [
+            "sec-a-1", "sec-a-2", "sec-a-3", "sec-a-4", "sec-a-5", "sec-a-6",
+        ],
+        "target": "appendixA-print-standalone.html",
+    },
+    "appB": {
+        "fragments": [
+            "sec-b-1", "sec-b-2", "sec-b-3", "sec-b-4", "sec-b-5",
+        ],
+        "target": "appendixB-print-standalone.html",
+    },
+    "appC": {
+        "fragments": [
+            "sec-c-1", "sec-c-2", "sec-c-3", "sec-c-4",
+        ],
+        "target": "appendixC-print-standalone.html",
+    },
+    "appD": {
+        "fragments": [
+            "sec-d-1", "sec-d-2", "sec-d-3",
+        ],
+        "target": "appendixD-print-standalone.html",
+    },
 }
 
 # ── Build logic ──────────────────────────────────────────────────
