@@ -1,0 +1,668 @@
+OpenAI Codex v0.136.0
+--------
+workdir: C:\Users\Kao\Downloads\Calculus_handout
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019f2af5-db00-70b1-8678-083cfd3b6144
+--------
+user
+You are an independent cross-model reviewer (gate-2) for NEW material just added to a self-authored calculus-handout appendix. No source manuscript — independent re-derivation is the primary safeguard. Read-only: do NOT modify files. Report findings only.
+
+REPO ROOT: C:\Users\Kao\Downloads\Calculus_handout (paths below relative to it)
+
+CONTEXT: Appendix A "Precalculus Toolbox" (Taiwan 108 curriculum, Math A, no elective Math 甲). Authoring brief = CONTENT_SPEC.md §16.2/§16.3 + §3 register. Two additions were just made; review ONLY these two additions (the rest of the appendix is already gated).
+
+ADDITION 1 — power-reduction paragraph in handout/fragments/appA/sec-a-2.html
+Locate the UNNUMBERED paragraph beginning "Setting \(u = v = \theta\) in these product-to-sum identities pays an immediate dividend." It claims:
+  - cos^2 θ = 1/2[cos 2θ + cos 0] and sin^2 θ = 1/2[cos 0 − cos 2θ], obtained by setting u=v=θ in the product-to-sum identities (Proposition A.2, just above it in the same file);
+  - hence the power-reduction formulas cos^2 θ = (1+cos 2θ)/2 and sin^2 θ = (1−cos 2θ)/2;
+  - and the aside that the first product-to-sum line gives sin θ cos θ = 1/2 sin 2θ (the sine double-angle).
+VERIFY every one of these against Proposition A.2's three identities (read them in the same file). Confirm cos 0 = 1 usage and the algebra.
+
+ADDITION 2 — sigma-notation front-matter in handout/fragments/appA/sec-a-3.html
+The section was retitled "Sigma Notation and the Geometric Series". Locate the three NEW paragraphs at the top of the section body (before the paragraph beginning "Those moves are all finite bookkeeping."). They claim:
+  - Σ_{k=1}^n a_k = a_1 + a_2 + ... + a_n; the index is a dummy (Σ_{k=1}^n a_k = Σ_{j=1}^n a_j); Σ_{k=0}^∞ a_k means an infinite sum read as the limit of running totals;
+  - RE-INDEXING: setting j = k−1 rewrites Σ_{k=1}^n a_k as Σ_{j=0}^{n-1} a_{j+1};
+  - PEELING: Σ_{k=0}^n a_k = a_0 + Σ_{k=1}^n a_k;
+  - SPLIT AT CUTOFF n_0: Σ_{k=0}^n a_k = Σ_{k=0}^{n_0} a_k + Σ_{k=n_0+1}^n a_k;
+  - TELESCOPING: Σ_{k=0}^m (b_k − b_{k+1}) = b_0 − b_{m+1}, "since every b_k with 1 ≤ k ≤ m is added once and subtracted once".
+VERIFY each index identity by expanding. In particular check the re-indexing bounds (k from 1..n ⇒ j from 0..n-1, term a_{j+1}) and the telescoping cancellation claim (which b_k survive, which cancel). Confirm the telescoping identity is exactly the mechanism of Proposition A.4's finite-geometric-sum proof (read that proof in the same file: (1−r)S telescopes with b_k = r^k).
+
+TASK 1 — MATH CORRECTNESS (blocking if wrong): flag any error, sign slip, off-by-one in bounds, or unstated hypothesis in either addition.
+TASK 2 — REGISTER (advisory unless egregious): do the two additions read in the same Stewart/Rogawski voice as the surrounding appendix (motivation-first, warm, precise)? Compare against the existing prose in the same two files. Flag generic filler or tone break.
+TASK 3 — INTERNAL CONSISTENCY (blocking if a claim is false): the power-reduction paragraph says it follows from "these product-to-sum identities" — confirm it sits right after Proposition A.2 and the reference is correct. The sigma front-matter says the split-at-cutoff is "the move on which §4.1–§4.2 rest" and telescoping "is the exact mechanism behind the finite geometric-sum formula below" — confirm these are accurate.
+
+OUTPUT:
+  VERDICT: <n> blocking, <m> advisory
+  Then per finding: [BLOCKING|ADVISORY] <file>:<locus> — <defect> — <your independent computation> — <suggested minimal fix>.
+  List every item checked and found correct under CHECKED-CLEAN (one line each). If zero blocking, say so explicitly.
+Be rigorous; do not over-report register nitpicks as blocking.
+
+codex
+I’ll treat this as a read-only gate review. First I’m loading the project instructions, then I’ll inspect only the two specified appendix fragments and the cited spec context.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -Raw -LiteralPath CLAUDE.md' in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 631ms:
+# CLAUDE.md
+
+?祆?獢?砍摮澈??蝯?AI 隞??嚗laude Code?odex 蝑???獢惜蝝?撘??舫遢????*甈??**嚗`AGENTS.md`](AGENTS.md) ????祆???璅??批捆銝?銴摮澈???渡?瑽?撱箇蔭閬?隞交?憡扳?隞?[`README.md`](README.md) ?箸?嚗摰寞撖怨??誑 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) ?箸???
+
+## ?Ｙ?銝閬?
+
+| ?Ｙ? | 頝臬? | 隤芣? |
+|------|------|------|
+| HTML 雓儔 | `handout/` | MathJax/KaTeX嚗S paginator嚗ragment ??print-standalone 蝯? |
+| Manim 敶梁? | `video/` | ?嚗??恬?TTS嚗make.py` 撱箇蔭嚗底閬?[`video/README.md`](video/README.md)嚗?|
+| ??LaTeX 雓儔 | `legacy/tex_handout/` | 撌脣?蝯???? |
+
+> **雓儔????蝡?摰????*嚗ode A ?剝? ??Mode B ??Mode C ??憿嚗頠楛摨???????甇?Ⅱ?????詨飛 M1?8 ??S繚A繚V嚗?? subagent嚗ubric嚗???Codex 隤輻蝝敺???摰???Ch1/Ch2 ????蝢抬?閬?憡蜇閬?[`handout/PIPELINE.md`](handout/PIPELINE.md)??
+
+## 撣貊?誘?
+
+```bash
+python handout/build.py           # 撱箇蔭?券雓儔蝡?嚗??ch01 ?芸遣銝蝡?
+python video/make.py --quality high  # 1080p 皜脫?敶梁?嚗?閮剖?鞈迎?
+python tools/doctor.py            # ?啣??亙熒瑼Ｘ
+tts.py --backend mock             # ?Ｙ? TTS mock嚗?閮祥嚗??嚗?
+```
+
+## ?辣?啣神隤?
+
+- **README 銝敺誑蝜?銝剜??詨神??* ???急?桅???[`README.md`](README.md) 隞亙?摮??冗銝剖惇?潭撠???README嚗?憒?[`video/README.md`](video/README.md)嚗憓?靽格 README ?瘥颲衣???
+- **敹?銋?靽???嚗?蝧餉陌嚗?* 蝔?蝣澆?憛?獢楝敺?????hell ?誘?憓??詻??亦Ⅳ嚗cene id?xport ?迂??雿?嚗誑????閰??銵?隤?Manim?aTeX?emini?TS?I?R?ode A/B/C 蝑???
+- ?園??????憿”?潛?隤芣???銝敺蝙?函?擃葉??
+- 蝚砌??嫣?鞈湛?`.deps/`?.deps_f5/`?.deps_voiceover/`嚗? git 撌乩?璅對?`.claude/worktrees/`嚗葉??README 銝甇方????嚗?閬??
+
+## 敶梁?皜脫?閫??摨?
+
+- **?日?雿輻??亥?瘙??血?銝敺誑 1080p 皜脫?**嚗make.py --quality high`嚗?
+
+## 隞祥 API 隤輻??蝬???
+
+- **瘥活隤輻隞颱?閮祥????API嚗? Gemini TTS?emini ??嚗蔣????嚗????賢?????雿輻??蝣箏???銝?芾?隤輻??* ?寞活??嚗?憒蝭? TTS?蝡?頝?銝敺?隤芣?嚗活閬矽?其?暻潭芋??隡啁??beat ?賂??唾?蝘嚗??嚗???敺??瑁???
+- 銝?鞎颯???雯?蝺楝敺??冽迨???舫??瑁???憒?`tts.py --backend mock`嚗神? WAV 撽?manifest嚗?摨????Manim render?fmpeg mux/concat??
+- ??銝甈∪??隞?”閰脫活?Ⅱ隤芣??極雿????蝭?霈嚗?璅∪????湔??頝???敺萄?????
+- **??026-07-01 雿輻??甈odex ?航?隤輻嚗eview嚗??賂?閰Ｗ???嚗econd-opinion嚗? standing consent嚗?仿????活敺菔岷嚗蒂?⊿???Codex ?誨??銝??蝙?刻?閬?撠??整?* 蝭?嚗?*`codex exec -s read-only`**嚗??恬?code嚗oc 撠?撘?review?噩蝚砌???嚗霈銝瑼?璅∪?韏?`~/.codex/config.toml` ?身 gpt-5.5嚗high嚗?*撌乩?憸冽嚗蝙?刻?瘙??閬??湔??暹???嚗?* ?芯蜓?券脯?閬祟?豢?蝚砌????矽 Codex ?? ping 雿輻??? (i) ?迤銝??撠?????ii) 閮祥??嚗?銝???iii) Codex嚗頨怠?瑚??⊥?閫??????iv) 瘚????蝙?刻?瘙箇? deliverable嚗?鈭支???sign-off嚗???銝?*甇斗?甈???Codex read-only ?誑 Codex 隞?閰Ｗ???*嚗? TTS??閫??皜脫??emini ??嚗蔣????閮祥 API **隞?**??孵噩??嚗??冽迨???改???
+
+## 摰??啣?嚗撩憟辣嚗?擃???憚摮隞??摰?唳?瑼?
+
+頝冽??啣???憡??桀 [`ENVIRONMENT.md`](ENVIRONMENT.md)嚗?瑁?? [`tools/doctor.py`](tools/doctor.py)嚗?璈?頝??撩隞暻潘??甇文???嚗?
+
+- **蝻箏?隞塚?頠???嚗?閬銵?鋆?* ?菜葫?唳璈撩??pip 憟辣?頂蝯?binary ?極?瘀?憒?`ffmpeg`?aTeX?ode?hrome????pip 憟辣嚗?嚗?*?牧??鋆?暻潦隞暻潦獐鋆??誘嚗?蝬蝙?刻???鋆?*嚗??航銵?`winget`嚗pip install`??憭??扳??[`requirements.lock`](requirements.lock)嚗ENVIRONMENT.md` **??歇霅啣????啣?**嚗?憒? `tools/setup.ps1` 敺?lock 鋆??舫?撱箝??啣?嚗????
+- **銝??芾??憚摮??蹂誨??* 蝻箸镼踵?**?身?迤??韏瑚?**嚗?閬鈭????餅隞??hack 銝璇?code path ?輸?蝻箇? binary?撖急隞?極?瘀??雿?瑟??隞??瘜Ⅱ撖行憟踝?**雓靘?雿輻??憟?*嚗?閬?暺?嚗?銝 Karpathy 禮1????具????????湛???靘?`ffmpeg`嚗ffprobe` ?詻???隞嗚?? code 蝜? `ffprobe`??蝑 A嚗? `video/REBUILD_STATUS.md`嚗?
+- **鋆?銝摰?啁??瑼?蝣箔??圈?血?敺???* 隞颱??啣?霈敺?銝頛芸鋆?嚗inned ???[`requirements.lock`](requirements.lock)嚗???`requirements.txt`??瘙神??[`ENVIRONMENT.md`](ENVIRONMENT.md)?炎?仿???[`tools/doctor.py`](tools/doctor.py)嚗?閬???`tools/setup.ps1`嚗?*撽璅?嚗?唳? `python tools/doctor.py` ?賣?甇斗??啣?撠??啣蝬?*
+
+## 頝典?閰梯??嗅神?脩??扳?瑼?銝神?砍 memory嚗?
+
+- **?蜇蝯?蝑???隞颱?頝典?閰梧?頝冽??函??亥???銝敺神?脫? git 銝??瑼?*嚗?*銝??芾??冽?啁? Claude memory**嚗~/.claude/.../memory/`嚗 `MEMORY.md`嚗?
+- **??嚗?* 雿輻?虜??虫?璆哨??砍 memory 銝 repo 韏啜?璈停瘨仃嚗???扳?瑼?頝? git ?唳??唳??具?
+- **撖怠鋆∴?** ?脣漲嚗??神?脰府?Ｙ???`REBUILD_STATUS.md`嚗??頝典?閰梢脣漲?剁?嚗極?瑞瘜??神?脣??? `README.md`嚗撘?鞈?瘚?蝝神??`DESIGN.md`嚗摰寞瘜?撖恍?`CONTENT_METHODOLOGY.md`?銝????瑼?嚗??蝙?刻??曉嚗?閬?暺閮脫??memory??
+
+## ?啣神嚗祟?亦??Ｘ????嚗?摮?砍 memory嚗?銝?閬??祇脩??改?
+
+- **?蝙?刻?閰曹?敺蝜?銝剜?**嚗aTeX嚗?撘Ⅳ??隞嗅?????銵?隤????璅????
+- **??doc嚗ode review ??皜?蝝?銝?瘛瑞銝隢?** ????蝒????Ｗ?閬?嚗?靽殷???discoverability gap嚗??辣?喳嚗??嚗 editorial drift 憸券嚗??芸?嚗???finding嚗 ??finding嚗?蝷箔?閬??Ｗ榆?堆???*Framing嚗?* 敺?◤ review ?邦?瘜?潘?銝???session ?扳 commit嚗 merge ???渡?Ｘ?鈭祕嚗?蝢拍??寧??刻?撌桃銝? inconsistency?ver-reporting ????甇???芸???
+- **銝?mode ?啣神瘚?嚗oot [`README.md`](README.md) 禮Mode B嚗?嚗ode B ?里?貉?瘙箄??潛撖恍脰府甈∩耨甇?commit ??message body**嚗ubject ??0 摮ody ??嚗??祆隞暻潦雿?憒乓鈭?暻潦??刻???嚗末霈靘?閰梁 `git log --grep="Mode B"` ??????commit嚗112aa5c`?0ef06ee`?? Mode A ??銵?bugfix 銝?具?
+  - **commit-grep ??嚗?026-06-15嚗?** 銝膩 `Mode B` ??*雓儔**蝺?*video ???撖衣里?詨歇?孵? NFA**嚗??賢?撖衣里?賂???video?ode B??憟? [`video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)嚗??嗉?瘙箏?璅?神?脖耨甇?commit body嚗???`git log --grep="NFA"` ??嚗?雓儔 `Mode B` ??嚗??拇?蝺毽?典?銝 grep嚗?
+- **蝯虫蝙?刻祟?貊?鈭支??抵??具??停?質???敶Ｗ?嚗?026-06-12 雿輻??瘙?嚗?* ?急摮詨??祟?豢?隞?*銝?**鈭文?皛輻? LaTeX ??`.md`嚗?Ｗ standalone HTML嚗athJax/KaTeX CDN嚗???摮詨皜脫?嚗??嗡??舐?仿霈?耦撘??抒??扯釭??瑼??冽迨???～?雿輻???株?瘙箝??梯正銝敺甇方齒??
+- **瘥???頛芣撖怠?銋???HTML ?勗?嚗?026-06-15 雿輻??瘙?嚗?* 銝??鋆捱???嚗indings 閬?HTML??*?∪???頛芸摰寞撖恬?Mode A嚗 蝑?嚗閬?撖阡?撖怠?摰孵?Ｖ?隞?standalone HTML ?勗?**嚗athJax/KaTeX CDN????摮詨皜脫?嚗?????撖急挾?踝?locus嚗[source:]`嚗府頛?Mode B 蝯?嚗?雿輻???殷?銝??芸撠店鋆∠策????????[`handout/_audit/REVIEW-ch01-modec-candidates.html`](handout/_audit/REVIEW-ch01-modec-candidates.html) ?耦撘?瑼???`REVIEW-??applied.html` 銋?嚗??嚗?瘙箇阮????
+- **撖拇 finding 靽桀?敺???甇詨祟?賂?2026-06-12 雿輻??瘙?嚗?* 靽桀? blocking嚗dvisory finding 敺?銝?湔摰??摰?????靽格????頝?頛芸祟?賂?Codex ????撠??荔?嚗Ⅱ隤耨?寞頨急????交????甇詨祟?貊?蝯???里?豢?瑼葉閮???
+
+## 蝔?嚗極蝔遙??銵皞?嚗arpathy guidelines嚗?
+
+皞 [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)嚗ndrej Karpathy 撠?LLM 撖怎?撘虜閬???閫撖???*?嚗?* ??雓寞??芸??潮漲嚗蝣遙?銵???*?拍蝭?隞?`video/` ?Ｙ??uild 撌亙??祉?蝔?嚗極蝔極雿??銝?冽雓儔?批捆?啣神**?ode A ???撖漲隞誑?refer richness?? `[source:]`???芣?撖拇?皞?閬?[`video/CONTENT_METHODOLOGY.md`](video/CONTENT_METHODOLOGY.md)嚗?銝蝚?2 璇???撠?撘Ⅳ?? code嚗??摰寧?撟?
+
+- **1. ?單?璆???嚗hink Before Coding嚗?閬?皜研?閬?韏瑕????日?雓?*
+  - ?Ⅱ隤芸?身嚗?蝣箏?撠勗?嚗?閬?暺???
+  - ??蝔株圾霈??典??箔?嚗?閬?暺銝??
+  - ?蝪∪??瘜停雓?敹??????准?
+  - ?∩?撠勗?銝????芾ㄐ銝?璆??嗅???
+- **2. 蝪∪?芸?嚗implicity First嚗?撠? code 閫?捱??嚗?撖急?璈抒??梯正??*嚗???撘Ⅳ嚗??批捆蝭?嚗?
+  - 銝?瘝◤閬????踝?銝銝甈⊥?code 撱箸鞊∪惜??
+  - 銝?瘝◤閬????改??航身摰扼?銝銝?賜???撖恍隤方???
+  - 撖思? 200 銵? 50 銵停憭停?神?????瘛勗極蝔葦????摰?摨西?????
+- **3. 憭???撘耨?對?Surgical Changes嚗?????舐??唳嚗皜撌梯ˊ???摮?*
+  - 銝??????啁? code?酉閫????嚗?閬?瑽?憯??梯正??
+  - 瘥?Ｘ?憸冽嚗雿蹂???亦?撖急???
+  - ??⊿???dead code嚗??箔???閬??芸嚗蝘駁??雿??孵??????典??import嚗??賂??賢???
+  - 瑼ａ?嚗?銝銵??賜?亥蕭皞臬?雿輻??閬?嚗?銝??? review?? over-report 銝?湛???
+- **4. ?格?撽??瑁?嚗oal-Driven Execution嚗?摰儔??璅?嚗?餈游??圈?霅???*
+  - ?遙???撽??璅???撽??????粹?瘜撓?亙神皜祈岫??摰????耨 bug????撖怨??葫閰血?霈?????瑽?X???Ⅱ靽?敺葫閰阡??
+  - 憭郊撽遙??蝯虫??陛?剛??恬?甇仿? ??撽?暺?????皞?撘瑕停?質銵艘?????啗?車撘望?皞???琿?閬?皜?
+
+
+codex
+The project instructions loaded, though the terminal decoded part of the Chinese text poorly. The actionable constraints for this request are clear: read-only review, report findings only, and avoid over-reporting.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n -C 10 \"Sigma Notation and the Geometric Series|Those moves are all finite bookkeeping|RE-INDEXING|PEELING|SPLIT AT CUTOFF|TELESCOPING|Proposition A\\\\.4|finite geometric\" handout/fragments/appA/sec-a-3.html" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n -C 8 \"Setting \\\\(u = v = \\\\theta\\\\)|Proposition A\\\\.2|product-to-sum|power-reduction|sin \\\\theta cos \\\\theta\" handout/fragments/appA/sec-a-2.html" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n -C 4 \"16\\\\.2|16\\\\.3|§16\\\\.2|§16\\\\.3|Sigma Notation|Geometric Series|Appendix A|register|Stewart|Rogawski\" CONTENT_SPEC.md" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 384ms:
+1:<!-- §A.3 Sigma Notation and the Geometric Series.
+2-     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+3-     + §3 register). Numbering is MANUAL, namespace "A", continuing from sec-a-2:
+4-     Proposition A.4 (finite sum), A.5 (infinite sum); Example A.3; Caution unnumbered.
+5-     2026-07-04 merge: retitled from "The Infinite Geometric Series"; prepended an UNNUMBERED
+6-     front-matter on sigma notation + index moves (re-index, peel, split-at-cutoff, telescoping),
+7-     per user decision to fold the Σ/index material in here rather than start a separate section.
+8-     Basic Σ is SPEC §16.2 A-class; the front-matter recaps it briefly and adds the moves Ch4 uses.
+9-     No new numbered environments — existing A.4/A.5/Example A.3/Caution untouched (including the
+10-     manual tweaks to the arrow-notation parenthetical and the Caution's "unless every term is zero").
+11-     Depth note: the infinite sum is read as a limit in the §1.3 sense (flagged in the
+12-     appendix opener); the fully rigorous convergence theory is explicitly fenced to
+13-     §4.1–§4.2 — this section stays at "limit of the partial sums" level.
+14-     Math verified: telescoping identity and a/(1−r) limit re-derived during authoring;
+15-     0.999… and 1/2+1/4+… examples recomputed.
+16-     Referenced from: §4.1 (Strategy 4.1 geometric tail bound bridge).
+17-     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+18-
+19-<article class="sec" lang="en">
+20-
+21-  <header class="sec-head">
+22:    <h2 class="sec-title"><span class="sec-no">A.3</span>Sigma Notation and the Geometric Series</h2>
+23-  </header>
+24-
+25-  <p>Before the geometric series itself, a word on the notation that names it and a few moves for handling sums that the main text uses without fuss. The capital-sigma symbol \(\sum\) abbreviates a sum: \(\sum_{k=1}^{n} a_{k}\) means \(a_{1} + a_{2} + \cdots + a_{n}\), the terms \(a_{k}\) added as the <em>index</em> \(k\) climbs through the whole numbers from the lower limit to the upper. The index is only a placeholder — \(\sum_{k=1}^{n} a_{k}\) and \(\sum_{j=1}^{n} a_{j}\) denote the very same sum — and an upper limit of \(\infty\), as in \(\sum_{k=0}^{\infty} a_{k}\), signals a sum that never stops, to be read as the limit of its running totals in the sense settled just below.</p>
+26-
+27-  <p>Three moves recur throughout the calculus chapters. <em>Re-indexing</em> renames the counter without disturbing the sum: setting \(j = k - 1\) rewrites \(\sum_{k=1}^{n} a_{k}\) as \(\sum_{j=0}^{n-1} a_{j+1}\), the same terms relabelled. <em>Peeling</em> detaches the first or last term, as in \(\sum_{k=0}^{n} a_{k} = a_{0} + \sum_{k=1}^{n} a_{k}\). And <em>splitting at a cutoff</em> \(n_{0}\) breaks a sum into a leading part and a <em>tail</em>,
+28-  \[ \sum_{k=0}^{n} a_{k} \;=\; \sum_{k=0}^{n_{0}} a_{k} \;+\; \sum_{k=n_{0}+1}^{n} a_{k}, \]
+29-  the move on which §4.1–§4.2 rest, where a series is controlled by bounding its tail while the leading partial sum is set aside.</p>
+30-
+31-  <p>One special sum collapses outright. When each term is the <em>difference</em> of consecutive values of a sequence \(b_{k}\), the interior pieces cancel in pairs:
+32-  \[ \sum_{k=0}^{m} \bigl(b_{k} - b_{k+1}\bigr) = b_{0} - b_{m+1}, \]
+33:  since every \(b_{k}\) with \(1 \le k \le m\) is added once and subtracted once. A sum that collapses this way is said to <em>telescope</em>, after the way a spyglass folds shut — and it is the exact mechanism behind the finite geometric-sum formula below.</p>
+34-
+35:  <p>Those moves are all finite bookkeeping. Adding up <em>infinitely</em> many terms is a genuinely new act, and most of its theory belongs to a later chapter of calculus. But one infinite sum is so simple, and so useful so early, that it deserves to be settled now: the geometric series, in which each term is a fixed multiple \(r\) of the one before. The main text leans on it in §4.1, where the <em>tails</em> — the leftover terms past a cutoff — of the series defining \(e^{x}\) are trapped under geometric tails with ratio \(r = \tfrac{1}{2}\). Everything rests on one finite identity plus one limit.</p>
+36-
+37-  <section class="env env-proposition">
+38-    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.4</span><span class="env-name">Finite geometric sum</span></p>
+39-    <div class="env-body">
+40-      <p>For any number \(r \neq 1\) and any positive integer \(m\),
+41-      \[ 1 + r + r^{2} + \cdots + r^{m} = \frac{1 - r^{m+1}}{1 - r}. \]</p>
+42-    </div>
+43-  </section>
+44-
+45-  <section class="env env-proof">
+--
+49-      \[ (1 - r)S = \bigl(1 + r + \cdots + r^{m}\bigr) - \bigl(r + r^{2} + \cdots + r^{m+1}\bigr) = 1 - r^{m+1}, \]
+50-      because each power \(r, r^{2}, \ldots, r^{m}\) appears once in each bracket and cancels, leaving only the leading \(1\) and the final \(-r^{m+1}\) — the sum telescopes. Dividing by \(1 - r\) (legitimate, since \(r \neq 1\)) gives the identity. <span class="qed qed-proof"></span></p>
+51-    </div>
+52-  </section>
+53-
+54-  <p>Now let the sum run on. If \(\lvert r \rvert < 1\), each multiplication by \(r\) shrinks the next term by a fixed factor, and the power \(r^{m+1}\) in the formula dies away: its size \(\lvert r \rvert^{m+1}\) drops below any positive threshold once \(m\) is large enough. In the arrow notation of §1.3 (here the whole-number index \(m\) runs off to infinity, rather than a variable approaching a finite point), \(r^{m+1} \to 0\) as \(m \to \infty\), so the running totals
+55-  \[ S_{m} = \frac{1 - r^{m+1}}{1 - r} \qquad\text{settle toward}\qquad \frac{1 - 0}{1 - r} = \frac{1}{1 - r}. \]
+56-  The value of an infinite sum <em>means</em> exactly this: the limit of its running totals. (That reading is made official in §4.2, where the running totals go by the name <em>partial sums</em>. The completeness facts behind general convergence arguments are the business of §4.1–§4.2; none of them are needed for the simple limit here.)</p>
+57-
+58-  <section class="env env-proposition">
+59:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.5</span><span class="env-name">Infinite geometric series</span></p>
+60-    <div class="env-body">
+61-      <p>If \(\lvert r \rvert < 1\), then for any number \(a\),
+62-      \[ \sum_{k = 0}^{\infty} a r^{k} = a + ar + ar^{2} + \cdots = \frac{a}{1 - r}, \]
+63-      and in particular the tail starting at \(k = 1\) sums to
+64-      \[ \sum_{k = 1}^{\infty} r^{k} = \frac{r}{1 - r}. \]</p>
+65-    </div>
+66-  </section>
+67-
+68-  <section class="env env-proof">
+69-    <p class="env-head"><span class="env-kicker">Proof</span></p>
+
+ succeeded in 423ms:
+1-<!-- §A.2 The Product-to-Sum and Sum-to-Product Identities.
+2-     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+3-     + §3 register). Numbering is MANUAL, namespace "A", continuing from sec-a-1:
+4:     Proposition A.2 (product-to-sum), A.3 (sum-to-product); Strategy A.1; Example A.2.
+5:     Math verified: the displayed identities (3 product-to-sum + 4 sum-to-product)
+6-     re-derived from the angle-sum formulas (u,v-substitution u=(A+B)/2, v=(A−B)/2)
+7-     during authoring.
+8:     2026-07-04 addition: an UNNUMBERED power-reduction paragraph (cos^2, sin^2) placed
+9:     after Proposition A.2's proof — it is a dividend of the product-to-sum identities at
+10-     u=v=theta, so no new numbered environment and no renumbering.
+11-     Referenced from: §3.1 (sum-to-product bridge — the derivative-of-sine hinge).
+12-     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+13-
+14-<article class="sec" lang="en">
+15-
+16-  <header class="sec-head">
+17-    <h2 class="sec-title"><span class="sec-no">A.2</span>The Product-to-Sum and Sum-to-Product Identities</h2>
+18-  </header>
+19-
+20:  <p>One algebraic step in this book carries more weight than any other: rewriting the difference \(\sin(x+h) - \sin x\) as a <em>product</em>, which is what makes the derivative of the sine function computable in §3.1. The identity that does it belongs to a family — the product-to-sum and sum-to-product identities — that older curricula drilled and most current precalculus courses omit. The good news is that the whole family is nothing but the angle-sum formulas, added and subtracted in pairs. If you learn one thing from this section, learn how to <em>rebuild</em> the identities; the memorizing then becomes optional.</p>
+21-
+22-  <p>Everything starts from the four angle-sum and angle-difference formulas, which we assume and record here for reference:
+23-  \[ \begin{aligned} \sin(u + v) &= \sin u \cos v + \cos u \sin v, \\ \sin(u - v) &= \sin u \cos v - \cos u \sin v, \\ \cos(u + v) &= \cos u \cos v - \sin u \sin v, \\ \cos(u - v) &= \cos u \cos v + \sin u \sin v. \end{aligned} \]</p>
+24-
+25-  <p>Add or subtract these in matching pairs and half of each right-hand side cancels, leaving a single product.</p>
+26-
+27-  <section class="env env-proposition">
+28-    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.2</span><span class="env-name">Product-to-sum identities</span></p>
+--
+33-
+34-  <section class="env env-proof">
+35-    <p class="env-head"><span class="env-kicker">Proof</span></p>
+36-    <div class="env-body">
+37-      <p>Add the two sine formulas: the \(\cos u \sin v\) terms cancel, leaving \(\sin(u+v) + \sin(u-v) = 2 \sin u \cos v\); divide by \(2\). Add the two cosine formulas: the \(\sin u \sin v\) terms cancel, giving \(\cos(u+v) + \cos(u-v) = 2 \cos u \cos v\). Subtract the cosine formulas instead — \(\cos(u-v) - \cos(u+v)\) — and the \(\cos u \cos v\) terms cancel, giving \(2 \sin u \sin v\). <span class="qed qed-proof"></span></p>
+38-    </div>
+39-  </section>
+40-
+41:  <p>Setting \(u = v = \theta\) in these product-to-sum identities pays an immediate dividend. The middle line becomes \(\cos^{2}\theta = \tfrac{1}{2}\bigl[\cos 2\theta + \cos 0\bigr]\) and the last becomes \(\sin^{2}\theta = \tfrac{1}{2}\bigl[\cos 0 - \cos 2\theta\bigr]\); since \(\cos 0 = 1\), these are the <em>power-reduction</em> formulas
+42-  \[ \cos^{2}\theta = \frac{1 + \cos 2\theta}{2}, \qquad \sin^{2}\theta = \frac{1 - \cos 2\theta}{2}, \]
+43-  which trade a <em>squared</em> trigonometric function for a plain one at twice the angle. (The first line, \(\sin\theta \cos\theta = \tfrac{1}{2}\sin 2\theta\), is the double-angle formula for sine read the same way.) These are the forms integration reaches for to handle \(\sin^{2}\) and \(\cos^{2}\) when the techniques of integration arrive.</p>
+44-
+45-  <p>The sum-to-product identities are the same cancellations read in the other direction. The only new idea is a change of names: given a sum like \(\sin A + \sin B\), arrange for the two angles to read \(u + v\) and \(u - v\) by choosing \(u\) and \(v\) so that \(u + v = A\) and \(u - v = B\). Adding these two equations gives \(2u = A + B\) and subtracting them gives \(2v = A - B\), so \(u\) is the <em>average</em> and \(v\) the <em>half-difference</em>:
+46-  \[ u = \frac{A + B}{2}, \qquad v = \frac{A - B}{2}. \]</p>
+47-
+48-  <section class="env env-proposition">
+49-    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.3</span><span class="env-name">Sum-to-product identities</span></p>
+--
+85-    </section>
+86-    <section class="env env-solution">
+87-      <p class="env-head"><span class="env-kicker">Solution</span></p>
+88-      <div class="env-body">
+89-        <ol class="sol-list">
+90-          <li>Apply the sum-to-product identity for \(\sin A - \sin B\) with \(A = x + h\) and \(B = x\). The average is \(\tfrac{A+B}{2} = x + \tfrac{h}{2}\) and the half-difference is \(\tfrac{A-B}{2} = \tfrac{h}{2}\), so
+91-          \[ \sin(x + h) - \sin x = 2 \cos\Bigl(x + \tfrac{h}{2}\Bigr) \sin\frac{h}{2}. \]
+92-          This is precisely the rewriting on which §3.1's derivative of sine turns: the difference of two sines becomes a product with the small quantity \(h/2\) isolated inside a single sine.</li>
+93:          <li>Apply the third product-to-sum identity with \(u = 5x\) and \(v = 3x\):
+94-          \[ \begin{aligned} \sin 5x \, \sin 3x &= \tfrac{1}{2}\bigl[\cos(5x - 3x) - \cos(5x + 3x)\bigr] \\ &= \tfrac{1}{2}\bigl[\cos 2x - \cos 8x\bigr]. \end{aligned} \]
+95-          Turning products into sums is the direction integration will want: a sum of cosines is far easier to integrate than a product, and this identity family returns for exactly that purpose when the techniques of integration arrive.</li>
+96-        </ol>
+97-      </div>
+98-    </section>
+99-  </div>
+100-
+101-  <p>In the main text, the identity for \(\sin A - \sin B\) in Proposition A.3 is the decisive step in §3.1's difference quotient for sine, its \(\cos\) companion handles the derivative of cosine, and the pair together power the continuity proof for both functions.</p>
+
+ succeeded in 379ms:
+1-# 微積分講義：排版總規範
+2-
+3:**Version 3.3**——單點新增：§16「難度定位與先備知識基線」（2026-07-03 與使用者議定）——雙軸難度定位（深度軸允許向數學分析靠攏的誠實構造；語域軸維持 Stewart / Rogawski 由深入淺）＋ 108 課綱數A（不含選修數甲）的 A／B／C 三類先備清單（B 類首次使用必須就地建立，違者為 blocking）＋ precalculus 附錄收納政策＋新章（含無手稿自產）的深度決策程序；原 §16 Changelog 順延為 §17。其餘內容承襲 v3.2（習題移出講義本體）與 v3.1／v3.0——v3.0 是從零重寫取代 v1.x 和 v2.x，圍繞一個明確的產品定義重新組織規則書：一份 single-sided A4 英文講義，對象為準備自修大學微積分的高中生，搭配影片，以 Stewart / Rogawski 語域撰寫。Changelog（§17）列出具體差異。
+4-
+5----
+6-
+7-## 1. 目的與受眾
+--
+55-## 3. 語域與語聲
+56-
+57-### 目標語域
+58-
+59:講義以 **Stewart / Rogawski** 的語域撰寫：讓自學的高中讀者能讀懂、溫暖但不話嘮、對數學嚴謹但對讀者不冷淡。
+60-
+61-校準用：
+62-
+63-- **太 formal**：Spivak、Apostol、Rudin。短的陳述句、只用 "we"、直覺住在 formal environment 之外、歷史和應用筆記罕見。有動機的大學生能讀；自學的高中生往往不行。
+64-- **太 informal**：某些課堂筆記 PDF、通俗數學書。不完整的句子、大量俚語、ad-hoc 結構。
+65:- **目標**：Stewart。完整句子帶明確 connective、直覺穿插在散文中偶爾進入 definition environment、chapter 和 section opening 有動機段落、大量 worked example、頻繁的圖表。
+66-
+67-語域**不是**非正式數學的藉口。Definition 仍精確；proof 仍完整；limit law 仍是 limit law。放鬆的是圍繞數學的散文，不是數學本身。
+68-
+69-### Pronoun 策略
+70-
+71:主要代名詞為 **"we"**，將讀者納入論證中。這是 Stewart / Apostol 傳統。
+72-
+73-**"You"** 在兩個特定情境中允許：
+74-
+75-1. **溫和提醒或驗證**，短暫轉向讀者：*"You should verify that $f^{-1}(f(x)) = x$ in this example."*
+--
+99-`definition` body **MAY** 以一句 *"Informally, this means..."* 的口語化 restatement 結尾，**當 formal statement 在語法上很重**時——即它使用了巢狀 quantifier（如 $\varepsilon$-$\delta$）、多個邏輯子句、或初讀時難以解析的 symbol-dense notation。**當 formal statement 已接近英語且只有一兩個符號**時（如 $f^{-1}(y) = x \Longleftrightarrow f(x) = y$），跳過 inline gloss；此時動機屬於 definition **之前**的散文或後面的 remark。
+100-
+101-Informal 句子 **MUST NOT** 引入 example、figure 或新 notation——如果 restatement 需要這些，提升為 definition 之後的獨立 remark 或散文段落。
+102-
+103:Rationale：Stewart 語域加上自足的 handout 意味著讀者無法依賴老師即時「翻譯」formal statement。講義本身必須做這個翻譯，通常做兩次——一次在 formal statement 之前的動機散文中，一次（當語法上很重的形式主義有必要時，如 $\varepsilon$-$\delta$）作為 definition 內部的 inline gloss。「接近英語時跳過」的條款存在是為了防止 inline gloss 變成反射動作：一個 symbolic body 本身就是口語化的 definition 從 paraphrase 中得不到任何好處。
+104-
+105-### 風格 do / don't
+106-
+107-**偏好：**
+--
+132-- **substance**：每句掙得位置——診斷「rely too much on guesswork」這個具體局限，再用它 motivate 代數方法；非貼到任何節都成立的通用填充。
+133-- **altitude**：對自學者剛好——不重講怎麼讀表，也不揮手帶過為何需要更難的方法。
+134-- **voice**：§3 那點暖到位但不話嘮——motivation-before-formalism、主代名詞 "we"、真連接詞 "However"，對讀者誠實而非乾巴巴斷言。
+135-
+136:**範文 2（concrete-to-abstract，OpenStax §3.1）——** 與範文 1 互補：從可觸摸的物件（$\sqrt{x}$、收緊的區間）建起 local-linearity，最後才命名概念，示範 Stewart 招牌的 concrete-to-abstract：
+137-
+138-> In Figure 3.5 we show the graph of $f(x)=\sqrt{x}$ and its tangent line at $(1,1)$ in a series of tighter intervals about $x=1$. As the intervals become narrower, the graph of the function and its tangent line appear to coincide, making the values on the tangent line a good approximation to the values of the function for choices of $x$ close to $1$. In fact, the graph of $f(x)$ itself appears to be locally linear in the immediate vicinity of $x=1$.
+139-
+140-〔source: OpenStax Calculus Vol.1, §3.1, CC BY-NC-SA〕關鍵特徵：
+--
+200-### 標題大小寫
+201-
+202-- 章標題（`ch-title`）和節標題（`sec-title`）：**Title Case**（如 *Inverse Functions and Limits*、*The Precise Definition of a Limit*）。
+203-- 小節標題（`subsec-head`）和段落小標（`para-head`）：**sentence case**（如 *Computing limits algebraically*、*Restricted sine and arcsine*）。
+204:- Proper noun 無論大小寫風格一律大寫（如 *Newton's method*、*Stewart's notation*）。
+205-
+206-Rationale：大小寫對比在視覺上標示層級。Title-case section 讀起來像學生在 ToC 中查找的具名 landmark；sentence-case subsection 讀起來像 running argument 的延續。
+207-
+208-### Section title 內容
+--
+444-- *"Strategy for finding an inverse: (1) Verify the function is one-to-one (optionally by the horizontal line test). (2) Solve $y = f(x)$ for $x$. (3) Swap $x$ and $y$."*
+445-
+446-`strategy` 通常是一個短的編號列表，偶爾是一段散文。
+447-
+448:Rationale：Stewart-style 的解題策略框是自學讀者最明顯受益的功能之一。此 environment 使策略可透過掃視而非重讀 worked example 並逆向工程模式來發現。
+449-
+450-#### `workedexample`
+451-
+452-語義 wrapper，測量合併的 `example` + `solution` body（上限 16 baselines）並預留等量的垂直空間，使短 example 不會擱淺在頁底而其 solution 滑到下一頁。
+--
+755-- solution 內部：當解題步驟涉及幾何設定、積分區域、截面形狀、向量分解等空間或圖形推理時，在該步驟處加圖——這類圖是解題論證的一部分，不只是題目的配圖。
+756-
+757-不要加裝飾性圖表。不要加一張目的是填充半空頁面的圖。
+758-
+759:Rationale：自學讀者嚴重依賴視覺直覺。一章每五頁一張圖對高中讀者而言太稀疏；Stewart 密度（視覺豐富主題中接近每頁一張圖）是正確的鄰域。
+760-
+761-### 主動標記圖機會
+762-
+763-撰寫內容時（Mode A），**MUST** 在每個符合上述「SHOULD 加圖」條件的位置插入佔位符，即使當下不立即繪圖：
+--
+818-圖表 **MAY** 包含指向特定特徵的帶短文字 label 的箭頭（"callout"）（*"Here the function is not defined."*、*"Inflection point."*、*"Asymptote."*）。
+819-
+820-Callout 文字 **SHOULD** 是完整句子或完整名詞片語；句子以句號結尾，名詞片語不加。
+821-
+822:Rationale：自學讀者從有 annotation 的圖表中吸收資訊的速度顯著快於無 annotation 的。Stewart-style callout 是目標語域中最高槓桿的視覺元素。
+823-
+824-### Label economy
+825-
+826-圖表只承載*閱讀*它所需的 label：axis name、讀者必須辨識的尺寸或 point、curve label（見下方 "Redundant encoding"）、以及短 callout。其他一切——命名每個 region 或 area、重述公式、拼出 construction——屬於 **caption 和 body prose**，不要塞進圖畫上。
+--
+1093----
+1094-
+1095-## 16. 難度定位與先備知識基線
+1096-
+1097:（2026-07-03 新增。緣起：前四章難度評估發現難度落差源於多作者手稿在「深度軸」上各帶預設——本 spec 原僅定義語域（§3）、未定義深度，兩位作者遂各自填入了 Stewart 深度與分析深度。全程紀錄：`handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`。）
+1098-
+1099-### 16.1 雙軸難度定位
+1100-
+1101-- **深度軸——允許並預期向數學分析靠攏的「誠實構造」。** 重要結果要嘛當場證明、要嘛明文掛帳（on-credit fence 到補證處，比照 §2.4 的不編號 Caution box 前例）；MUST NOT 假證或含糊帶過。Ch4（\(e^x\) 級數構造、Bolzano–Weierstrass、MVT）為深度上限的既有範例。
+1102:- **語域軸——講解一律維持 §3 的 Stewart / Rogawski 語域**：動機先行、由深入淺、informal gloss、分級 worked example。深度的提升 MUST NOT 以語域緊縮支付——內容再難，講法仍是溫暖的教科書，不是分析講義。
+1103-- **難度預算**：mainline 節以「§16.2 基線讀者 effortful 但可自行走完」為上限；超出者 MUST 標為 foundation 章／Proof track（機制見 `handout/TYPESETTING_GUIDE.md` §10）並提供初讀路徑。
+1104-- **護欄**：(1) foundation／Proof-track 標示；(2) §16.2 先備基線（違反 B 類＝blocking finding）；(3) 初學者模擬複驗（persona＝§16.2 基線讀者；納入正式章完成閘序另議，現行慣例見上述 audit 紀錄）。
+1105-
+1106-### 16.2 先備知識基線（108 課綱數A、不含選修數甲）
+--
+1120-新章 MUST 在 roadmap entry 階段做深度決策：哪些結果誠實證明、哪些 on-credit 掛帳（fence 到補證處）、哪些引用不證（明文告知讀者）。無手稿的自產章節以本節＋§3 語域為 authoring brief；整合多作者手稿時，以本節取代作者個人預設作為深度仲裁基準。
+1121-
+1122-## 17. Changelog
+1123-
+1124:- **v3.3**——新增 §16「難度定位與先備知識基線」（2026-07-03 與使用者議定）：雙軸難度定位（深度軸允許分析式誠實構造；語域軸維持 Stewart/Rogawski 由深入淺）；108 課綱數A（不含選修數甲）A／B／C 三類先備清單（B 類首次使用必須就地建立，違者 blocking——sec/csc/cot、和差化積、e 與 ln、極限、無窮等比級數等均屬 B 類）；precalculus 附錄收納政策；新章（含無手稿自產）深度決策程序。原 §16 Changelog 順延為 §17（版本頭與 §13 內的兩處參照已同步）。緣起與證據：前四章難度評估、多作者深度落差討論與兩輪修補（`handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`）。
+1125-
+1126-- **v3.2**——習題退出講義本體（使用者 2026-06-12 定案：講義不收習題，習題以獨立習題本呈現）。`exercise` environment 自 §5 移除（12 → 11 個），手稿 Homework / Practice 標籤改歸習題本，§6 的 exercise 編號例外移除，§14 改寫為定案紀錄，§15 移除習題檢查項，各章源檔的 Exercises placeholder 與佔位句移除。文件家族中 `CONTENT_EXERCISES.md`（最低習題骨架）刪除；課文範例的題源工作流程（開放題庫、provenance、授權——2026-06-11／12 兩日定案）移至新檔 `CONTENT_SOURCING.md`。
+1127-
+1128-- **v3.1**——framework split 和 implementation 落地。v3.0 文件被拆分為四個以作者實際使用方式為 key 的 author-facing 檔案：本檔（authoritative spec）、[`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)（1–2 頁日常參考）、[`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)（course arc、chapter order、prerequisite、per-chapter core skills）、以及 `CONTENT_EXERCISES.md`（完整延後設計前的最低習題骨架；v3.2 已刪除）。v3.0 下標記為 pending 的 preamble 和 template implementation 現已落地：per-env chapter-scoped counter（透過個別 `\newtheorem`）、`caution` 和 `strategy` environment（透過 `\newmdtheoremenv`）、`preamble/colors.tex` 中的 three-role semantic palette、擴展的 `tools/book_style_lint.py` 規則、以及更新的 `_chapter_template.tex`。本次 pass 中新增的 content-level 精煉：remark policy 擴展為 usefulness test 附明確的好壞範例；figure 在 §10 新增 "Redundant encoding for grayscale and accessibility" subsection，要求 line-style / label / marker 與色彩並行；index policy 在 §11 新增覆蓋性的 "lookup test" 判斷準則。§5 中的 `example` + `solution` pairing rule 現在在本文件和 `chapters/_chapter_template.tex` 之間已對齊（每個 `example` MUST 包在 `workedexample` 中；standalone `example` 不再允許）。Exercise 編號現為 per-section（Exercise 1, 2, ...，每 `\section` reset）而非 chapter-scoped，反映 end-of-section exercise block 是 locally consume 的。
+1129-
+1130:- **v3.0**——從零重寫。目標語域從 Spivak / Apostol（shared formal-statement counter、austere pronoun、strict definition purity、sparse figure 和 remark）轉為 Stewart / Rogawski（per-type counter、特定 context 中允許 "you"、`definition` 中允許 *"Informally, ..."* gloss、denser figure 和更大方的 remark）。新增 `caution` 和 `strategy` environment 以支持 notation-trap warning 和解題策略框；`lemma` 移除。Display-helper set 從 7 減為 5（移除 `\iffstackeddisplay` 和 `\iffwithconditions`）。Display Block Cohesion 從 MUST 降為 SHOULD。Index policy 擴展以涵蓋 key example、notation trap 和首次提及的 applied setting。Chapter opening 新增 mandatory learning-outcomes bullet list；chapter closing 新增 mandatory `\section*{Summary}` block。動機散文中允許 `\emph{...}` 用於術語首次出現。Exercise-system design 延後至主要內容完成。CI 檢查擴展以涵蓋新規則。Notation policy 整合為獨立的 section（§9）。語聲參考範文以 Stewart tone 重寫。
+1131-
+1132-  （v3.0 是 positioning-level rewrite；其標記為 pending 的具體 preamble 和 template implementation 已落地——見上方 v3.1。）
+1133-
+1134-- **v2.x**——早期版本（v2.0 到 v2.0.11）透過 per-chapter review 累積規則新增；所得文件以新增日期而非主題組織。v2.x 中原封保留至 v3.0 的重要決策包括：cleveref-only cross-reference、`[H]` 預設 figure placement 附 Exception Protocol、shared formula-display helper `aligneddisplay` / `conditiondisplay` / `\pairdisplay`、chapter-scoped counter、paired-definition cross-reference rule、`workedexample` wrapper semantics、`solution` 最後 display 行的 `\qedhere`、以及 three-layer CI（style lint + preamble smoketest + latexmk）。
+
+codex
+I’ve located both additions. Next I’m reading the exact displayed identities and the nearby Chapter 4 usage so the internal-consistency claims are checked against the actual downstream text, not just the local paragraph.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -LiteralPath handout/fragments/appA/sec-a-2.html | Select-Object -Index 26..32' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -LiteralPath CONTENT_SPEC.md | Select-Object -Index 1105..1119' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n "geometric tail|tail|partial sum|partial sums|split|cutoff|n_0|n0|finite geometric|geometric-sum|geometric series" handout/fragments -g "*.html"' in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 412ms:
+handout/fragments\ch04\sec-4-5.html:70:  <p>To invert \(e^{x}\) we need to know what values it takes. As \(x\) ranges over \(\mathbb{R}\), \(e^{x}\) is continuous (Theorem 4.6) and runs from \(\lim_{x \to -\infty} e^{x} = 0\) up to \(\lim_{x \to +\infty} e^{x} = +\infty\), passing through every value in between; its range is therefore the open interval \((0, \infty)\). We take this for granted here: the two limits follow from the series and the intermediate values from continuity, but the details would detain us. The consequence we need is what matters — for every \(x &gt; 0\) there is exactly one exponent producing it.</p>
+handout/fragments\ch04\sec-4-5.html:266:    <li><strong>The exponential function.</strong> \(e^{x} := \sum_{n=0}^{\infty} x^{n}/n!\) is defined by a power series (§4.1), shown convergent for every real \(x\) by geometric tail bounds; it is continuous on \(\mathbb{R}\) and obeys the exponent law \(e^{x}e^{y} = e^{x+y}\) (§4.2); and its derivative is itself, \((e^{x})' = e^{x}\), proved with the explicit bound \(\lvert (e^{h}-1)/h - 1 \rvert \le \lvert h \rvert\) for \(\lvert h \rvert &lt; \tfrac{1}{2}\) (§4.3).</li>
+handout/fragments\ch04\sec-4-2.html:22:         (binomial reorganization, explicit (II) tail bound, four-term split,
+handout/fragments\ch04\sec-4-2.html:41:     met at once); Prop 4.1 tail-of-convergent-series step glossed.
+handout/fragments\ch04\sec-4-2.html:51:  <p>Section 4.1 gave \(e^{x}\) an honest existence: for \(x > 0\) the defining series converges to a finite number, and the partial sums \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) close in on it at a geometric rate, captured by the tail bound \((*)\). What we have <em>not</em> yet shown is that \(e^{x}\) behaves the way the symbol promises. Three things remain: that it is continuous; that it obeys \(e^{x} e^{y} = e^{x + y}\); and that it even makes sense for \(x \le 0\). This section settles all three. The engine throughout is a single idea: approximate the transcendental function \(e^{x}\) by the polynomial \(P_{k}(x)\), and use \((*)\) to make the error uniformly small. Once the error is controlled, the polynomial carries the argument. The one genuinely new tool we need is a convergence test that survives sign changes, since the partial sums for \(x < 0\) are no longer monotone.</p>
+handout/fragments\ch04\sec-4-2.html:58:  <p>Fix a base point \(x_{0} > 0\). We want \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). The difficulty is that \(e^{x}\) is an infinite series, not a polynomial; but its partial sum \(P_{k}\) <em>is</em> a polynomial, hence continuous, and the bound \((*)\) says \(P_{k}\) is uniformly close to \(e^{x}\) for every \(x\) in a fixed interval at once. The proof simply routes the comparison \(e^{x}\) versus \(e^{x_{0}}\) through \(P_{k}\) at both points.</p>
+handout/fragments\ch04\sec-4-2.html:70:      <p>Let \(x_{0} > 0\) and let \(\varepsilon > 0\) be given. Work on the interval \(0 < x < x_{0} + 1\), so we may take \(L = x_{0} + 1\) in the tail bound \((*)\) of §4.1 — recall what it says: \(0 \le e^{x} - P_{k}(x) \le \dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\) for every \(x\) in \((0, L)\), provided \(k > n_{0} > 2L\). Choose integers \(k > n_{0} > 2(x_{0} + 1)\) large enough that</p>
+handout/fragments\ch04\sec-4-2.html:74:      <p>Now split the difference \(e^{x} - e^{x_{0}}\) by inserting and removing the common polynomial:</p>
+handout/fragments\ch04\sec-4-2.html:86:  <!-- expansion:intuition — why x<0 needs a new tool (Remark 4.2): the monotone-bounded argument of §4.1 fails for alternating partial sums -->
+handout/fragments\ch04\sec-4-2.html:90:      <p>For \(x < 0\) the terms \(x^{n}/n!\) alternate in sign, so the partial sums no longer increase steadily, and the monotone-bounded argument behind Theorem 4.2 simply does not apply. We need a convergence criterion that ignores signs. The natural one is: if the series of <em>absolute values</em> converges, the original series should converge too — its terms cannot accumulate any net oscillation that the absolute series has already shown to be summable.</p>
+handout/fragments\ch04\sec-4-2.html:103:  <p>To say that \(\sum_{n=1}^{\infty} a_{n}\) <em>converges</em> means precisely that its sequence of partial sums \(S_{k} = \sum_{n=1}^{k} a_{n}\) has a limit, i.e. \(\lim_{k \to \infty} S_{k}\) exists. The trouble is that for a series with mixed signs we have no candidate value for that limit and no monotonicity to fall back on. The way out is to recognize convergence from the <em>internal</em> behavior of the partial sums alone.</p>
+handout/fragments\ch04\sec-4-2.html:166:      <p>The Cauchy criterion is not an extra axiom; it is completeness in disguise. Trace the chain: Theorem 4.5 rests on Bolzano–Weierstrass (Theorem 4.4), which rests on the monotone-convergence property of \(\mathbb{R}\) (Theorem 4.1). Over the rationals every link breaks — there are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach \(e\) — a number noted in §4.1 to be irrational). So “Cauchy \(\Rightarrow\) convergent” is a statement about \(\mathbb{R}\) specifically, logically equivalent to its completeness.</p>
+handout/fragments\ch04\sec-4-2.html:175:      <p>Set \(S_{n} = \sum_{k=1}^{n} a_{k}\) and assume \(\sum_{k=1}^{\infty} \lvert a_{k} \rvert < \infty\). By Theorem 4.5 it suffices to show \(\{S_{n}\}\) is Cauchy. Given \(\varepsilon > 0\), convergence of the absolute series gives an \(N_{0}\) with \(\sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon\) — the tail is the gap between the full sum and the \(N_{0}\)-th partial sum, and partial sums close that gap. Then for any \(m > n \ge N_{0}\), the triangle inequality yields</p>
+handout/fragments\ch04\sec-4-2.html:183:  <!-- expansion:intuition — use Proposition 4.1 to define e^x for x<0; record the absolute-value tail bound (**) that upgrades (*) to all real x -->
+handout/fragments\ch04\sec-4-2.html:189:  <p>in agreement with Definition 4.1 when \(x > 0\), and giving \(e^{0} = 1\). Moreover the tail bound upgrades to absolute values with no extra work: for \(\lvert x \rvert \le L\) and any \(k > n_{0} > 2L\), bounding each term of the remainder by its absolute value and reusing the geometric-tail estimate of \((*)\) (Strategy 4.1) gives</p>
+handout/fragments\ch04\sec-4-2.html:191:  <!-- expansion:formula — absolute-value form of the §4.1 tail bound, valid for all |x| ≤ L -->
+handout/fragments\ch04\sec-4-2.html:207:      <p>Fix any \(x_{0} \in \mathbb{R}\) and set \(L = \lvert x_{0} \rvert + 1\), so that every \(x\) with \(\lvert x - x_{0} \rvert < 1\) satisfies \(\lvert x \rvert \le L\). Repeat the argument of Theorem 4.3 word for word, with the one-sided bound \((*)\) replaced by its two-sided form \((**)\): given \(\varepsilon > 0\), choose \(k > n_{0} > 2L\) so that \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}} < \varepsilon\), then use the continuity of the polynomial \(P_{k}\) to get \(\delta \in (0, 1)\) with \(\lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon\) whenever \(\lvert x - x_{0} \rvert < \delta\). The same three-term split gives \(\lvert e^{x} - e^{x_{0}} \rvert < 3\varepsilon\). Hence \(e^{x}\) is continuous at \(x_{0}\), and \(x_{0}\) was arbitrary. <span class="qed qed-proof"></span></p>
+handout/fragments\ch04\sec-4-2.html:213:  <p>Everything is now in place for the multiplicative identity \(e^{x} e^{y} = e^{x + y}\). The proof is the continuity argument writ large: replace each exponential by its polynomial partial sum, recognize that the <em>product</em> of two partial sums reorganizes — through the binomial theorem — into the partial sum of \(e^{x+y}\) plus a controllable remainder, and let \((**)\) sweep the errors to zero.</p>
+handout/fragments\ch04\sec-4-2.html:222:  <!-- expansion:intuition — D3② (user-directed): full proof, not a 4-step outline. Six steps: two estimates, the product split, the binomial collapse of (I), the (II) tail bound, the four-term telescope, and the limit k→∞ (Step-6 closing quantifier corrected 2026-07-03: x, y are fixed at the outset and L is chosen for them, so the close is "x, y were arbitrary", not "L was arbitrary"). -->
+handout/fragments\ch04\sec-4-2.html:226:      <p>Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k > n_{0} > 8L\) (the factor \(8\) is calibrated in Step 4, where it forces the tail ratio below \(\tfrac{1}{2}\)). Recall \(P_{k}(t) = \sum_{n=0}^{k} t^{n}/n!\).</p>
+handout/fragments\ch04\sec-4-2.html:231:      <p class="para-head">Step 2: split the product.</p>
+handout/fragments\ch04\sec-4-2.html:235:      <p>To see the split concretely, take \(k = 2\): multiplying out \(P_{2}(x)\,P_{2}(y) = \bigl(1 + x + \tfrac{x^{2}}{2}\bigr)\bigl(1 + y + \tfrac{y^{2}}{2}\bigr)\) gives nine terms. Sorted by total degree, the degrees \(\ell \le 2\) assemble exactly \(1 + (x + y) + \tfrac{(x + y)^{2}}{2} = P_{2}(x + y)\) — that is group (I) — while the leftovers \(\tfrac{x^{2} y}{2} + \tfrac{x y^{2}}{2} + \tfrac{x^{2} y^{2}}{4}\) form group (II). Notice that (II)’s degree-\(3\) layer is incomplete — \(x^{3}\) and \(y^{3}\) are absent, since neither factor carries a power beyond \(2\) — which is why (II) can only be <em>bounded</em> by a tail in Step 4, not collapsed by the binomial theorem.</p>
+handout/fragments\ch04\sec-4-2.html:241:      <p class="para-head">Step 4: the leftover (II) is a tail.</p>
+handout/fragments\ch04\sec-4-2.html:251:      <p>Insert and remove the partial sums to compare \(e^{x} e^{y}\) with \(e^{x + y}\):</p>
+handout/fragments\ch04\sec-4-1.html:10:     2026-07-03 P1 ruling follow-up: infinite geometric sum derived in Strategy 4.1
+handout/fragments\ch04\sec-4-1.html:19:       Strategy 4.1 (geometric-tail bound); Example 4.1 (partial sums of e);
+handout/fragments\ch04\sec-4-1.html:27:     derive" caution, the geometric-tail strategy box, and the ℝ-vs-ℚ remark
+handout/fragments\ch04\sec-4-1.html:42:    <li>state the power-series definition of \(e^{x}\) and bound the tail of the series to prove it converges on all of \(\mathbb{R}\);</li>
+handout/fragments\ch04\sec-4-1.html:97:  <p>A series is the limit of its partial sums, and to know that a limit exists we need some guarantee built into the number system itself. The guarantee we use is that a sequence which climbs steadily but is held below some ceiling must approach a limiting value — and the mirror statement for decreasing sequences.</p>
+handout/fragments\ch04\sec-4-1.html:128:  <p>The plan is to trap the tail of the series \(\sum x^{n}/n!\) inside a geometric series. Once the tail is controlled, the partial sums form a non-decreasing sequence that is bounded above, and Theorem 4.1 hands us the limit. The technique is worth isolating, because it returns several times in this section and the next.</p>
+handout/fragments\ch04\sec-4-1.html:130:  <!-- expansion:strategy — name the geometric-tail technique once; reused in the §4.1 convergence proof and throughout §4.2 -->
+handout/fragments\ch04\sec-4-1.html:132:    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">4.1</span><span class="env-name">Bounding a series by a geometric tail</span></p>
+handout/fragments\ch04\sec-4-1.html:138:        <li>Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\). (If the infinite geometric sum is new to you: the finite sum is \(r + r^{2} + \cdots + r^{m} = \frac{r(1 - r^{m})}{1 - r}\) — multiply by \(1 - r\) and watch the telescoping — and since \(0 < r < 1\), the power \(r^{m}\) dies away as \(m\) grows, leaving \(\frac{r}{1 - r}\). Appendix A.3 gives the full account.)</li>
+handout/fragments\ch04\sec-4-1.html:139:        <li>The partial sums are then bounded above, and (being a sum of positive terms) non-decreasing, so Theorem 4.1 gives the limit.</li>
+handout/fragments\ch04\sec-4-1.html:151:  <p><em>Proof track: this argument earns the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof — on a first reading you may take both and move on.</em></p>
+handout/fragments\ch04\sec-4-1.html:160:      Split a partial sum at the index \(n_{0}\):
+handout/fragments\ch04\sec-4-1.html:166:      The right-hand side is a fixed real number, independent of \(N\). The partial sums on the left are non-decreasing (each new term is positive) and bounded above, so by Theorem 4.1 the series converges to a finite real number. <span class="qed qed-proof"></span></p>
+handout/fragments\ch04\sec-4-1.html:174:  <p>for the \(k\)-th partial sum. The estimate inside the proof does more than establish convergence: it measures how fast the partial sums close in on \(e^{x}\). Now fix an interval \(0 < x < L\) and pick \(n_{0} > 2L\) once, so the same threshold serves every such \(x\); bounding each term by \(x^{n}/n! \le L^{n}/n!\) and repeating the geometric collapse from the proof gives, for \(k > n_{0}\),</p>
+handout/fragments\ch04\sec-4-1.html:176:  <!-- expansion:formula — the explicit partial-sum tail bound, isolated for reuse; §4.2's continuity and exponent-law proofs invoke it repeatedly -->
+handout/fragments\ch04\sec-4-1.html:190:  <p>The number \(e\) is known to be both irrational and transcendental, though we prove neither fact here. What we <em>can</em> see at once is how quickly the partial sums settle, exactly as the tail bound \((*)\) predicts.</p>
+handout/fragments\ch04\sec-4-1.html:192:  <!-- expansion:example — partial sums of e, making the rapid convergence tangible (manuscript has no worked examples) -->
+handout/fragments\ch04\sec-4-1.html:197:        <p>Compute the partial sums \(P_{k}(1) = \displaystyle\sum_{n = 0}^{k} \frac{1}{n!}\) for \(k = 0, 1, \dots, 5\), and compare with \(e\).</p>
+handout/fragments\ch04\sec-4-1.html:205:        <p>The partial sums climb toward \(e \approx 2.7183\) from below, and they do so fast: already \(P_{10}(1) \approx 2.7182818\), so by the tenth term all four decimal places are correct. This is the rapid, geometric closing-in promised by the bound \((*)\) — each extra term cuts the remaining gap by more than half.</p>
+handout/fragments\ch04\sec-4-1.html:215:    <figcaption><span class="fig-no">Figure 4.2</span> Polynomial partial sums \(P_{1}, \dots, P_{4}\) compared with the exponential curve \(e^{x}\).</figcaption>
+handout/fragments\ch04\sec-4-1.html:219:  <p>Theorem 4.2 shows that \(e^{x}\) is well defined for every \(x > 0\). The case \(x < 0\) is genuinely harder: the terms then alternate in sign, the partial sums are no longer non-decreasing, and Theorem 4.1 does not apply directly. Handling it calls for a more flexible convergence tool — the fact that a series whose absolute values converge must itself converge — which, together with the uniform tail bound \((*)\) and a careful product argument, also yields the continuity of \(e^{x}\) and the exponent law. The next section assembles all three.</p>
+handout/fragments\ch03\sec-3-1.html:98:  Equivalently, split the outer triangle as \(OAC = OAB \cup ABC\): the corner piece \(ABC\) is what \(OAC\) adds to the inscribed triangle \(OAB\), and it contains the circular segment between the chord \(AB\) and the arc. Multiplying through by \(2\) gives \(\sin\theta \le \theta \le \tan\theta\). Dividing by \(\sin\theta > 0\) and using \(\tan\theta = \sin\theta/\cos\theta\) turns this into \(1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}\), and taking reciprocals of these positive quantities reverses the inequalities:
+handout/fragments\ch03\sec-3-2.html:155:      <!-- expansion:formula — the manuscript leaves the splitting and the easy term m₂R₁(h)/h → 0 implicit; we make it explicit -->
+handout/fragments\ch03\sec-3-2.html:265:        <p>The two rules cooperate: the product rule splits the work into two terms, and the chain rule supplies the slope factor inside the second. Neither alone differentiates this function.</p>
+handout/fragments\appA\sec-a-3.html:6:     front-matter on sigma notation + index moves (re-index, peel, split-at-cutoff, telescoping),
+handout/fragments\appA\sec-a-3.html:13:     §4.1–§4.2 — this section stays at "limit of the partial sums" level.
+handout/fragments\appA\sec-a-3.html:16:     Referenced from: §4.1 (Strategy 4.1 geometric tail bound bridge).
+handout/fragments\appA\sec-a-3.html:25:  <p>Before the geometric series itself, a word on the notation that names it and a few moves for handling sums that the main text uses without fuss. The capital-sigma symbol \(\sum\) abbreviates a sum: \(\sum_{k=1}^{n} a_{k}\) means \(a_{1} + a_{2} + \cdots + a_{n}\), the terms \(a_{k}\) added as the <em>index</em> \(k\) climbs through the whole numbers from the lower limit to the upper. The index is only a placeholder — \(\sum_{k=1}^{n} a_{k}\) and \(\sum_{j=1}^{n} a_{j}\) denote the very same sum — and an upper limit of \(\infty\), as in \(\sum_{k=0}^{\infty} a_{k}\), signals a sum that never stops, to be read as the limit of its running totals in the sense settled just below.</p>
+handout/fragments\appA\sec-a-3.html:27:  <p>Three moves recur throughout the calculus chapters. <em>Re-indexing</em> renames the counter without disturbing the sum: setting \(j = k - 1\) rewrites \(\sum_{k=1}^{n} a_{k}\) as \(\sum_{j=0}^{n-1} a_{j+1}\), the same terms relabelled. <em>Peeling</em> detaches the first or last term, as in \(\sum_{k=0}^{n} a_{k} = a_{0} + \sum_{k=1}^{n} a_{k}\). And <em>splitting at a cutoff</em> \(n_{0}\) breaks a sum into a leading part and a <em>tail</em>,
+handout/fragments\appA\sec-a-3.html:29:  the move on which §4.1–§4.2 rest, where a series is controlled by bounding its tail while the leading partial sum is set aside.</p>
+handout/fragments\appA\sec-a-3.html:33:  since every \(b_{k}\) with \(1 \le k \le m\) is added once and subtracted once. A sum that collapses this way is said to <em>telescope</em>, after the way a spyglass folds shut — and it is the exact mechanism behind the finite geometric-sum formula below.</p>
+handout/fragments\appA\sec-a-3.html:35:  <p>Those moves are all finite bookkeeping. Adding up <em>infinitely</em> many terms is a genuinely new act, and most of its theory belongs to a later chapter of calculus. But one infinite sum is so simple, and so useful so early, that it deserves to be settled now: the geometric series, in which each term is a fixed multiple \(r\) of the one before. The main text leans on it in §4.1, where the <em>tails</em> — the leftover terms past a cutoff — of the series defining \(e^{x}\) are trapped under geometric tails with ratio \(r = \tfrac{1}{2}\). Everything rests on one finite identity plus one limit.</p>
+handout/fragments\appA\sec-a-3.html:56:  The value of an infinite sum <em>means</em> exactly this: the limit of its running totals. (That reading is made official in §4.2, where the running totals go by the name <em>partial sums</em>. The completeness facts behind general convergence arguments are the business of §4.1–§4.2; none of them are needed for the simple limit here.)</p>
+handout/fragments\appA\sec-a-3.html:59:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.5</span><span class="env-name">Infinite geometric series</span></p>
+handout/fragments\appA\sec-a-3.html:63:      and in particular the tail starting at \(k = 1\) sums to
+handout/fragments\appA\sec-a-3.html:71:      <p>By Proposition A.4 the \(m\)-th running total is \(a \cdot \dfrac{1 - r^{m+1}}{1 - r}\). As \(m \to \infty\) the power \(r^{m+1}\) tends to \(0\), so the totals tend to \(\dfrac{a}{1 - r}\). The tail formula is the case \(a = r\): \(r + r^{2} + r^{3} + \cdots = \dfrac{r}{1 - r}\). <span class="qed qed-proof"></span></p>
+handout/fragments\appA\sec-a-3.html:108:  <p>In the main text this series first works for a living in §4.1, where Strategy 4.1 bounds the tail of \(\sum x^{n}/n!\) by a geometric tail with ratio \(\tfrac{1}{2}\); the bound \(\sum_{k \ge 1} r^{k} = \frac{r}{1 - r}\) of Proposition A.5 is exactly the step used there. The series keeps working throughout §4.2's convergence arguments.</p>
+handout/fragments\appA\sec-a-1.html:20:  <p class="lead">This appendix collects three pieces of precalculus that the main text needs but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions, the product-to-sum and sum-to-product identities, and the infinite geometric series. Wherever the main text first needs one of these tools, it builds a short bridge on the spot — just enough to keep reading — and points here for the full account. The three sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing in this appendix uses calculus, with one small exception flagged in §A.3, where an infinite sum is understood as a limit in the sense of §1.3.</p>
+handout/fragments\appA\sec-a-1.html:26:    <li>sum an infinite geometric series, and recognize when the formula \(a/(1 - r)\) applies and when it does not.</li>
+handout/fragments\ch02\sec-2-2.html:164:  <!-- expansion:caution — dy/dx is one symbol for the derivative, not a fraction to split or cancel [pass: enrichment] -->
+handout/fragments\ch02\sec-2-3.html:196:      <p>Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\), and — as Remark 2.5 noted — the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\). The \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\); it does not mean \(d(x^{2})\), where the \(x\) itself would be squared. And it is not an algebraic denominator to cancel or split.</p>
+handout/fragments\ch02\sec-2-4.html:136:      <p>Both are read straight off the limit laws. For the sum rule, the difference quotient of \(f + g\) splits into two:</p>
+handout/fragments\ch02\sec-2-4.html:178:        <p>We apply the power rule to each term, letting the sum and constant-multiple rules split the expression and carry the coefficients; the constant \(-7\) differentiates to \(0\):</p>
+handout/fragments\ch02\sec-2-4.html:322:      <p>Keep the exponential and power functions apart. In \(e^{x}\) the base is the fixed number \(e\) and the exponent varies, so it is an <em>exponential</em> function with \(\dfrac{d}{dx}e^{x} = e^{x}\). In \(x^{e}\) the exponent is the fixed number \(e \approx 2.718\) and the base varies, so it is a <em>power</em> function, differentiated by the power rule: \(\dfrac{d}{dx}x^{e} = e\,x^{e-1}\). The two obey different rules, and in particular \(\dfrac{d}{dx}x^{e} \ne x^{e}\). The general split is \(\dfrac{d}{dx}b^{x} = b^{x}\ln b\) for an exponential against \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for a power — decide which form you are looking at before you differentiate.</p>
+handout/fragments\ch02\sec-2-5.html:51:  <!-- expansion:intuition — geometric motivation: read fg as the area of a rectangle and watch the increment split into two strips plus a negligible corner; this is the picture the algebraic proof makes rigorous -->
+handout/fragments\ch02\sec-2-5.html:58:           aria-label="A rectangle of width f and height g, with the area increment when the sides grow by Δf and Δg split into a strip g times Δf, a strip f times Δg, and a small corner Δf times Δg.">
+handout/fragments\ch02\sec-2-5.html:64:        <!-- dimension ticks below (split f | Δf) and at left (split g | Δg) -->
+
+ exited 1 in 536ms:
+Select-Object : 無法繫結 'Index' 參數。無法將 "26..32" 值轉換為 "System.Int32" 型別。錯誤: "輸入字串格式不正確。"
+位於 線路:2 字元:85
++ ... ath handout/fragments/appA/sec-a-2.html | Select-Object -Index 26..32
++                                                                    ~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Select-Object]，ParameterBindingException
+    + FullyQualifiedErrorId : CannotConvertArgumentNoMessage,Microsoft.PowerShell.Commands.SelectObjectCommand
+ 
+
+ exited 1 in 534ms:
+Select-Object : 無法繫結 'Index' 參數。無法將 "1105..1119" 值轉換為 "System.Int32" 型別。錯誤: "輸入字串格式不正確。"
+位於 線路:2 字元:65
++ ... ontent -LiteralPath CONTENT_SPEC.md | Select-Object -Index 1105..1119
++                                                                ~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Select-Object]，ParameterBindingException
+    + FullyQualifiedErrorId : CannotConvertArgumentNoMessage,Microsoft.PowerShell.Commands.SelectObjectCommand
+ 
+
+2026-07-04T02:30:28.217083Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.5 seconds
+Output:
+Select-Object : 無法繫結 'Index' 參數。無法將 "26..32" 值轉換為 "System.Int32" 型別。錯誤: "輸入字串格式不正確。"
+位於 線路:2 字元:85
++ ... ath handout/fragments/appA/sec-a-2.html | Select-Object -Index 26..32
++                                                                    ~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Select-Object]，ParameterBindingException
+    + FullyQualifiedErrorId : CannotConvertArgumentNoMessage,Microsoft.PowerShell.Commands.SelectObjectCommand
+ 
+
+2026-07-04T02:30:28.219039Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.5 seconds
+Output:
+Select-Object : 無法繫結 'Index' 參數。無法將 "1105..1119" 值轉換為 "System.Int32" 型別。錯誤: "輸入字串格式不正確。"
+位於 線路:2 字元:65
++ ... ontent -LiteralPath CONTENT_SPEC.md | Select-Object -Index 1105..1119
++                                                                ~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Select-Object]，ParameterBindingException
+    + FullyQualifiedErrorId : CannotConvertArgumentNoMessage,Microsoft.PowerShell.Commands.SelectObjectCommand
+ 
+
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -LiteralPath handout/fragments/appA/sec-a-2.html | Select-Object -Skip 26 -First 8' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -LiteralPath CONTENT_SPEC.md | Select-Object -Skip 1105 -First 15' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -LiteralPath handout/fragments/ch04/sec-4-1.html | Select-Object -Skip 126 -First 42' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -LiteralPath handout/fragments/ch04/sec-4-2.html | Select-Object -Skip 168 -First 27' in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 446ms:
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.2</span><span class="env-name">Product-to-sum identities</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} \sin u \cos v &= \tfrac{1}{2}\bigl[\sin(u + v) + \sin(u - v)\bigr], \\ \cos u \cos v &= \tfrac{1}{2}\bigl[\cos(u + v) + \cos(u - v)\bigr], \\ \sin u \sin v &= \tfrac{1}{2}\bigl[\cos(u - v) - \cos(u + v)\bigr]. \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+
+ succeeded in 510ms:
+### 16.2 ???亥??箇?嚗?08 隤脩雇?睪???恍靽格?莎?
+
+霈?蝺?摰? 108 隤脩雇?睪?靽桅靽格?脩?憭找??啁?嚗???蝔漲?摮賊?銝剔?嚗?甇支???嚗?026-07-03 ?蝙?刻?霅啣?嚗?
+
+**A 憿?湔?身嚗蝙?冽?銝?閫??**嚗???????撘?擗?摰?嚗?撠潸??箸銝?撘???? \(\cup\)嚗(\cap\) 閮?嚗??砍?????賂???敺?敶ｇ?嚗(\sin/\cos/\tan\)?雿??憫摨艾誨蝢抵??畾??喟???閫?敶Ｚ??望?嚗?閫?撌株?嚗??砍?嚗???\(a\sin\theta+b\cos\theta=R\sin(\theta+\varphi)\)嚗(\Sigma\) 閮?????撌殷?蝑?蝝嚗???摰?嚗?銝剛? \(C^n_k\)?撘?\(\binom{n}{k}\) 擐活?箇??SHOULD 撠銝?伐?嚗摮豢飛蝝?嚗蝺?暺?撘?
+
+**B 憿??臬?閮准?甈∩蝙??MUST 撠勗摰儔?撠???blocking finding**嚗(\sec/\csc/\cot\)嚗?撌桀?蝛?蝛??榆嚗?銝??賣嚗 \(e\) ??嗅???\(\ln\)嚗扔??銝???怠?氬蝒柴(\varepsilon\)-\(\delta\)嚗??∠狙蝝???敹萸蝒桃?瘥???\(\sum_{k\ge1} r^k = \frac{r}{1-r}\)嚗?08 撌脩宏?箏?靽殷?嚗?閰?雿?隞亙?霅??箔蜓???神雿?銝銝撠?嚗??賣???祉?隢?撠????銝??銝?閮剜?莎???
+
+**C 憿?脣葆??身?????輸?雿輻??SHOULD 撠勗蝯虫?銵???*嚗?撠潔?蝑? \(|x-a|<\delta\) ?????\((a-\delta,\,a+\delta)\) ???拇?閫??\(x^n-a^n\) 銝?砍?撘?閫????????嚗???陛??
+
+**?蔭???**嚗 憿?撠勗鋆神?箔??單銵?bridge嚗??靘?禮1.2 ?銝?摰儔??.1 ?榆???典???.4 ?∠狙??on-ramp??.1 ?∠狙蝑?蝝?典?嚗澆?摰?芷???銝剖 **precalculus ??**嚗?026-07-03 雿輻??蝷綽?蝡?閬?閬?`CONTENT_ROADMAP.md`嚗玨?停?唬?????bridge 銝?cross-ref ??嚗??????刻??餃停??bridge??
+
+### 16.3 ?啁?蝭嚗?⊥?蝔輯?Ｗ摰對??楛摨行捱蝑?
+
+?啁? MUST ??roadmap entry ?挾?楛摨行捱蝑??芯?蝯?隤祕霅??鈭?on-credit ?董嚗ence ?啗?霅?嚗鈭??其?霅????霈????阮??Ｙ?蝭隞交蝭嚗? 隤???authoring brief嚗??雿?蝔踵?嚗誑?祉??誨雿犖?身雿瘛勗漲隞脰??箸???
+
+ succeeded in 460ms:
+
+  <p>The plan is to trap the tail of the series \(\sum x^{n}/n!\) inside a geometric series. Once the tail is controlled, the partial sums form a non-decreasing sequence that is bounded above, and Theorem 4.1 hands us the limit. The technique is worth isolating, because it returns several times in this section and the next.</p>
+
+  <!-- expansion:strategy ??name the geometric-tail technique once; reused in the 禮4.1 convergence proof and throughout 禮4.2 -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">4.1</span><span class="env-name">Bounding a series by a geometric tail</span></p>
+    <div class="env-body">
+      <p>To show that a series of positive terms \(\sum a_{n}\) converges:</p>
+      <ol class="steps">
+        <li>Find an index \(n_{0}\) beyond which the ratio of consecutive terms is at most some constant \(r < 1\): that is, \(a_{n + 1}/a_{n} \le r\) for \(n \ge n_{0}\).</li>
+        <li>Conclude that the terms decay geometrically: \(a_{n} \le a_{n_{0}} \, r^{\,n - n_{0}}\) for \(n \ge n_{0}\).</li>
+        <li>Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\). (If the infinite geometric sum is new to you: the finite sum is \(r + r^{2} + \cdots + r^{m} = \frac{r(1 - r^{m})}{1 - r}\) ??multiply by \(1 - r\) and watch the telescoping ??and since \(0 < r < 1\), the power \(r^{m}\) dies away as \(m\) grows, leaving \(\frac{r}{1 - r}\). Appendix A.3 gives the full account.)</li>
+        <li>The partial sums are then bounded above, and (being a sum of positive terms) non-decreasing, so Theorem 4.1 gives the limit.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.2</span></p>
+    <div class="env-body">
+      <p>For every \(x > 0\), the series \(\displaystyle\sum_{n = 0}^{\infty} \frac{x^{n}}{n!}\) converges to a finite real number.</p>
+    </div>
+  </section>
+
+  <p><em>Proof track: this argument earns the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof ??on a first reading you may take both and move on.</em></p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x > 0\) and choose a positive integer \(n_{0}\) with \(n_{0} > 2x\). The ratio of successive terms is
+      \[ \frac{x^{n + 1}/(n + 1)!}{x^{n}/n!} = \frac{x}{n + 1}, \]
+      and for \(n \ge n_{0}\) this is at most \(\dfrac{x}{n_{0} + 1} < \dfrac{x}{n_{0}} < \dfrac{1}{2}\), by the choice of \(n_{0}\). Iterating from \(n_{0}\), every later term obeys
+      \[ \frac{x^{n}}{n!} \le \frac{x^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{n - n_{0}} \qquad (n > n_{0}). \]
+      Split a partial sum at the index \(n_{0}\):
+      \[ \sum_{n = 0}^{N} \frac{x^{n}}{n!} = \underbrace{\sum_{n = 0}^{n_{0}} \frac{x^{n}}{n!}}_{\text{(I)}} + \underbrace{\sum_{n = n_{0} + 1}^{N} \frac{x^{n}}{n!}}_{\text{(II)}}. \]
+      Piece (I) is a fixed finite sum. Piece (II) is bounded, using the geometric estimate above, by
+      \[ \text{(II)} \le \frac{x^{n_{0}}}{n_{0}!} \sum_{n = n_{0} + 1}^{\infty} \left(\frac{1}{2}\right)^{n - n_{0}} = \frac{x^{n_{0}}}{n_{0}!}. \]
+      Therefore
+      \[ \sum_{n = 0}^{N} \frac{x^{n}}{n!} \le \sum_{n = 0}^{n_{0}} \frac{x^{n}}{n!} + \frac{x^{n_{0}}}{n_{0}!} \qquad \text{for every } N > n_{0}. \]
+      The right-hand side is a fixed real number, independent of \(N\). The partial sums on the left are non-decreasing (each new term is positive) and bounded above, so by Theorem 4.1 the series converges to a finite real number. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+ succeeded in 477ms:
+
+  <p>We can now discharge the deferred proof.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Proposition 4.1</span></p>
+    <div class="env-body">
+      <p>Set \(S_{n} = \sum_{k=1}^{n} a_{k}\) and assume \(\sum_{k=1}^{\infty} \lvert a_{k} \rvert < \infty\). By Theorem 4.5 it suffices to show \(\{S_{n}\}\) is Cauchy. Given \(\varepsilon > 0\), convergence of the absolute series gives an \(N_{0}\) with \(\sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon\) ??the tail is the gap between the full sum and the \(N_{0}\)-th partial sum, and partial sums close that gap. Then for any \(m > n \ge N_{0}\), the triangle inequality yields</p>
+      <p>\[ \lvert S_{m} - S_{n} \rvert = \Bigl\lvert \sum_{k = n + 1}^{m} a_{k} \Bigr\rvert \le \sum_{k = n + 1}^{m} \lvert a_{k} \rvert \le \sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon. \]</p>
+      <p>So \(\{S_{n}\}\) is Cauchy, hence convergent, which is what it means for \(\sum_{k=1}^{\infty} a_{k}\) to converge. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Extending \(e^{x}\) to all of \(\mathbb{R}\)</h3>
+
+  <!-- expansion:intuition ??use Proposition 4.1 to define e^x for x<0; record the absolute-value tail bound (**) that upgrades (*) to all real x -->
+  <p>The convergence test does exactly the job we set it. For any real \(x\), the series of absolute values is \(\sum_{n=0}^{\infty} \lvert x \rvert^{n}/n! = e^{\lvert x \rvert}\), which is finite by Theorem 4.2 (or equals \(1\) when \(x = 0\)). Proposition 4.1 then guarantees that \(\sum_{n=0}^{\infty} x^{n}/n!\) itself converges. This defines</p>
+
+  <!-- expansion:formula ??the definition now covers all of ?? agreeing with Definition 4.1 for x>0 -->
+  <p>\[ e^{x} = \sum_{n=0}^{\infty} \frac{x^{n}}{n!} \qquad \text{for every } x \in \mathbb{R}, \]</p>
+
+  <p>in agreement with Definition 4.1 when \(x > 0\), and giving \(e^{0} = 1\). Moreover the tail bound upgrades to absolute values with no extra work: for \(\lvert x \rvert \le L\) and any \(k > n_{0} > 2L\), bounding each term of the remainder by its absolute value and reusing the geometric-tail estimate of \((*)\) (Strategy 4.1) gives</p>
+
+  <!-- expansion:formula ??absolute-value form of the 禮4.1 tail bound, valid for all |x| ??L -->
+  <p>\[ \lvert e^{x} - P_{k}(x) \rvert \le \sum_{n = k + 1}^{\infty} \frac{\lvert x \rvert^{n}}{n!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$**$} \]</p>
+
+  <p>The bound \((**)\) is the two-sided workhorse for the rest of the section: it is uniform over the whole symmetric interval \(\lvert x \rvert \le L\) and shrinks geometrically in \(k\). With it, the continuity proof for \(x > 0\) extends verbatim to every real base point.</p>
+
+
+codex
+VERDICT: 0 blocking, 0 advisory
+
+Zero blocking findings. No advisory register findings.
+
+CHECKED-CLEAN
+
+- `handout/fragments/appA/sec-a-2.html:30,41-43` — Power reduction from Proposition A.2 is correct: with \(u=v=\theta\), \(\cos u\cos v=\frac12[\cos(u+v)+\cos(u-v)]\) gives \(\cos^2\theta=\frac12[\cos2\theta+\cos0]\), hence \((1+\cos2\theta)/2\).
+- `handout/fragments/appA/sec-a-2.html:30,41-43` — Sine power reduction is correct: \(\sin u\sin v=\frac12[\cos(u-v)-\cos(u+v)]\) gives \(\sin^2\theta=\frac12[\cos0-\cos2\theta]\), hence \((1-\cos2\theta)/2\).
+- `handout/fragments/appA/sec-a-2.html:30,43` — Aside is correct: \(\sin u\cos v=\frac12[\sin(u+v)+\sin(u-v)]\) gives \(\sin\theta\cos\theta=\frac12[\sin2\theta+\sin0]=\frac12\sin2\theta\).
+- `handout/fragments/appA/sec-a-2.html:34-43` — Internal reference is correct: the paragraph sits immediately after Proposition A.2 and its proof.
+- `handout/fragments/appA/sec-a-3.html:25` — Sigma definition, dummy-index claim, and infinite-sum-as-limit-of-running-totals reading are correct in the local context.
+- `handout/fragments/appA/sec-a-3.html:27` — Re-indexing is correct: \(k=1,\dots,n\) maps to \(j=0,\dots,n-1\), with term \(a_{j+1}\).
+- `handout/fragments/appA/sec-a-3.html:27-29` — Peeling and split-at-cutoff identities expand correctly, with the standard cutoff condition \(0\le n_0\le n\) understood from context.
+- `handout/fragments/appA/sec-a-3.html:31-33` — Telescoping is correct: \(b_1,\dots,b_m\) cancel; only \(b_0\) and \(-b_{m+1}\) survive.
+- `handout/fragments/appA/sec-a-3.html:45-50` — Proposition A.4 uses exactly this telescoping mechanism: \((1-r)S=\sum_{k=0}^{m}(r^k-r^{k+1})=1-r^{m+1}\), i.e. \(b_k=r^k\).
+- `handout/fragments/ch04/sec-4-1.html:128-166` and `handout/fragments/ch04/sec-4-2.html:175-193` — The claim that §4.1–§4.2 rest on splitting off and bounding tails is accurate.
+- Register check — Both additions match the surrounding appendix voice: motivated before formalism, warm but precise, and not generic filler.
+tokens used
+66,048
+VERDICT: 0 blocking, 0 advisory
+
+Zero blocking findings. No advisory register findings.
+
+CHECKED-CLEAN
+
+- `handout/fragments/appA/sec-a-2.html:30,41-43` — Power reduction from Proposition A.2 is correct: with \(u=v=\theta\), \(\cos u\cos v=\frac12[\cos(u+v)+\cos(u-v)]\) gives \(\cos^2\theta=\frac12[\cos2\theta+\cos0]\), hence \((1+\cos2\theta)/2\).
+- `handout/fragments/appA/sec-a-2.html:30,41-43` — Sine power reduction is correct: \(\sin u\sin v=\frac12[\cos(u-v)-\cos(u+v)]\) gives \(\sin^2\theta=\frac12[\cos0-\cos2\theta]\), hence \((1-\cos2\theta)/2\).
+- `handout/fragments/appA/sec-a-2.html:30,43` — Aside is correct: \(\sin u\cos v=\frac12[\sin(u+v)+\sin(u-v)]\) gives \(\sin\theta\cos\theta=\frac12[\sin2\theta+\sin0]=\frac12\sin2\theta\).
+- `handout/fragments/appA/sec-a-2.html:34-43` — Internal reference is correct: the paragraph sits immediately after Proposition A.2 and its proof.
+- `handout/fragments/appA/sec-a-3.html:25` — Sigma definition, dummy-index claim, and infinite-sum-as-limit-of-running-totals reading are correct in the local context.
+- `handout/fragments/appA/sec-a-3.html:27` — Re-indexing is correct: \(k=1,\dots,n\) maps to \(j=0,\dots,n-1\), with term \(a_{j+1}\).
+- `handout/fragments/appA/sec-a-3.html:27-29` — Peeling and split-at-cutoff identities expand correctly, with the standard cutoff condition \(0\le n_0\le n\) understood from context.
+- `handout/fragments/appA/sec-a-3.html:31-33` — Telescoping is correct: \(b_1,\dots,b_m\) cancel; only \(b_0\) and \(-b_{m+1}\) survive.
+- `handout/fragments/appA/sec-a-3.html:45-50` — Proposition A.4 uses exactly this telescoping mechanism: \((1-r)S=\sum_{k=0}^{m}(r^k-r^{k+1})=1-r^{m+1}\), i.e. \(b_k=r^k\).
+- `handout/fragments/ch04/sec-4-1.html:128-166` and `handout/fragments/ch04/sec-4-2.html:175-193` — The claim that §4.1–§4.2 rest on splitting off and bounding tails is accurate.
+- Register check — Both additions match the surrounding appendix voice: motivated before formalism, warm but precise, and not generic filler.

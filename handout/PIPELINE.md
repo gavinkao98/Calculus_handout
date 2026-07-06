@@ -21,7 +21,8 @@
 | 4 | **圖正確性閘 D1–D8** | 畫出來對不對（render 後） | `handout-figure-audit` subagent（吃 `shot.mjs` 圖 PNG） | Codex 視覺第二讀者（`-i` 餵 PNG） | 修法裁決 | `REVIEW-ch{NN}-figure-audit{,-gate2}.html` | [`_audit/FIGURE-AUDIT-RUBRIC.md`](_audit/FIGURE-AUDIT-RUBRIC.md) |
 | 5 | **數學正確性閘 M1–M8** | 教什麼、對不對 | Claude/Mode B 走查（sympy 重算 worked example） | Codex 獨立複核 | 逐條裁決 | `REVIEW-ch{NN}-math-audit.html`＋`-gate2.md` | [`_audit/MATH-CORRECTNESS-RUBRIC.md`](_audit/MATH-CORRECTNESS-RUBRIC.md) |
 | 6 | **S·A·V 散文閘**（含易懂性 A／流暢性 B） | 去 AI 味語意收斂 | `handout-prose-audit` subagent（三維＋錨組） | Codex 同 rubric 複核 | 逐條裁決改寫/刪 | `REVIEW-ch{NN}-svc-gate{1,2}.html` | [`_audit/PROSE-AUDIT-RUBRIC.md`](_audit/PROSE-AUDIT-RUBRIC.md)、[`../PLAN-deai-semantic-critic-implementation.md`](../PLAN-deai-semantic-critic-implementation.md)（Task 8 逐章鋪） |
-| 7 | **收尾** | ROADMAP status 標「與 Ch1/Ch2 同級全跑」 | — | — | 確認 | ROADMAP 更新 | [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) |
+| 7 | **難度閘（初學者模擬）** | 定稿前實測難度：3 份以上盲測 learner-sim 逐節模擬閱讀＋難度 1–5 評分（見下方「難度閘」節） | learner-sim agents（免費；persona＝SPEC §16.2 基線讀者） | 可選（Codex 抽驗 sim 主張對回原文） | 裁決修不修 | `REVIEW-ch{NN}-difficulty-sim.html`＋逐節難度評分記入 ROADMAP entry | [`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) §16 |
+| 8 | **收尾** | ROADMAP status 標「與 Ch1/Ch2 同級全跑」 | — | — | 確認 | ROADMAP 更新 | [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) |
 
 > **順序不是死管線**：0→1 是 Mode A 內建；簽核後 2–6 是可獨立補跑的閘（互相大致獨立，建議「數學→圖→散文」或「圖→數學→散文」皆可；②軟深度宜在數學/散文閘之前，使新增內容一併被後閘審到）。每個 ⛳ 停下等使用者裁決。
 
@@ -31,6 +32,16 @@
 - **①波 補題目＝worked example**：服務對象是 `example`＋`solution`；流程 [`../CONTENT_SOURCING.md`](../CONTENT_SOURCING.md)（手稿→題庫 CLP-1/APEX/Mooculus 對症選題→AI 備援）；subagent [`../.claude/agents/example-supplement.md`](../.claude/agents/example-supplement.md)；產 `ch{NN}_example-supplement-review.html`。
 - **②波 軟深度**＝intuition/caution/application/strategy/summary/history（**不含 example**）；依 [`README.md`](README.md) §Mode C 的 9 鏡頭擴增檢查表；subagent [`../.claude/agents/mode-c-gapwalk.md`](../.claude/agents/mode-c-gapwalk.md)；產 `REVIEW-ch{NN}-modec-enrichment.html`。
 - 兩波都標 `<!-- expansion:<cat> [pass: enrichment] [source: …] -->`（`[pass:]` 在 `[source:]` 前），且**都必接範圍限定的 Mode B**（README 硬規則）。
+
+## 難度閘（gate 7，2026-07-03 新增）
+
+源起與首次全流程執行紀錄：[`_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`](_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html)（Ch1–Ch4 難度評估＋修補＋複驗三輪）。規格：
+
+- **Persona（釘死）**＝[`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) §16.2 基線讀者：108 課綱數A（不含選修數甲）、無微積分先備、英文中等的自學大一新生；已讀過本章之前的所有章節（吸收不完美）。
+- **怎麼跑**：每章 ≥3 份**盲測** learner-sim（不要先告訴 sim 哪裡難），逐節回報：總判定 ok／effortful／stuck、卡點清單（locus＋引文＋severity：blocking／slowdown／minor）、逐節難度 1–5。
+- **判準**：任何 **stuck（卡死需外援）＝blocking**；**B 類先備違規**（SPEC §16.2：未就地建立即使用）＝blocking——此項可先用 grep 對 B 類清單機械預檢。mainline 節難度上限＝「effortful 但可自行走完」（SPEC §16.1 難度預算）；超限者要嘛修、要嘛標 foundation／Proof track（[`TYPESETTING_GUIDE.md`](TYPESETTING_GUIDE.md) §10）。slowdown 級為 advisory，逐條裁決。
+- **基線比對**：與 Ch1–Ch4 的難度曲線（Ch1–3≈3/5、Ch4=4/5、尖峰 §4.2=4.5——記錄於上述 audit HTML）比對；新章若出現高於 §4.2 的尖峰或整章 >4，屬**弧線層異常**，回 roadmap entry 的深度決策（SPEC §16.3）重議，不在散文層硬修。
+- **修完必回歸**：blocking 修補後對修過的節**重跑盲測 sim**（比照 Ch1–Ch4 P3 複驗），確認卡點實際消失、且未引入新卡點。
 
 ## 通用紀律
 

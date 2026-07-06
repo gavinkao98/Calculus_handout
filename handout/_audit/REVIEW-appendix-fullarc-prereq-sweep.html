@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全 arc 先備掃描 — 附錄 roster（Ch5–14）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --purple:#6c2bd9; --orange:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1040px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.62; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  h3 { font-size: 1rem; margin: 1.3rem 0 .3rem; }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .summary { background:#f0f6ff; border:1px solid #cfe0fb; border-radius:8px; padding:.8rem 1rem; font-size:.92rem; margin:0 0 1.4rem; }
+  .summary b { color: var(--blue); }
+  .pass { color: var(--green); font-weight: 700; }
+  .fail { color: var(--red); font-weight: 700; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem 1rem; margin: .7rem 0; }
+  .card.now { border-left: 4px solid var(--red); }
+  .card.decide { border-left: 4px solid var(--orange); }
+  .card.defer { border-left: 4px solid var(--gray); }
+  .card.na { border-left: 4px solid #cbd2da; background:#fcfcfd; }
+  .card.stock { border-left: 4px solid var(--green); }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; display:inline-block; }
+  .b-now { background:#fdeceb; color:var(--red); } .b-decide { background:#fef0e7; color:var(--orange); }
+  .b-defer { background:#eef1f4; color:var(--gray); } .b-stock { background:#e7f5ee; color:var(--green); }
+  .b-cat { background:#e8f0fb; color:var(--blue); } .b-na { background:#eef1f4; color:var(--gray); }
+  .why { font-size:.9rem; color:#333; margin-top:.5rem; }
+  .why b { color:#1a1a1a; }
+  .meta { font-size:.82rem; color:var(--gray); margin-top:.55rem; }
+  .meta code, .why code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  table { border-collapse: collapse; width:100%; font-size:.86rem; margin:.4rem 0; }
+  th, td { border:1px solid var(--line); padding:.4rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f3f4f6; }
+  .tag { font-size:.72rem; font-weight:600; padding:.05rem .4rem; border-radius:4px; white-space:nowrap; }
+  .t-A { background:#e7f5ee; color:var(--green); } .t-B { background:#fdeceb; color:var(--red); }
+  .t-C { background:#fef0e7; color:var(--orange); } .t-U { background:#f3ecfd; color:var(--purple); }
+  .t-ch { background:#eef1f4; color:var(--gray); }
+  a { color: var(--blue); }
+  .note { font-size:.85rem; color:#667085; }
+  ul { margin:.3rem 0 .3rem; padding-left:1.3rem; } li { margin:.15rem 0; }
+  .legend span { margin-right:.9rem; }
+</style>
+</head>
+<body>
+<h1>全 arc 先備掃描 —— 附錄 roster（剩餘 Ch5–14）</h1>
+<p class="sub">2026-07-04　唯讀偵察：掃 roadmap 目標弧線（Calc I 剩餘＋Calc II＋Calc III，12 個主題區）的先備需求,逐項對 §16.2 分類,映射「該進附錄／章內建／已覆蓋」。<b>不改任何講義檔</b>。緣起：使用者提案「掃一遍整本會用到的東西、一次處理進附錄」＋質疑 §16.2 是否該留。</p>
+
+<div class="summary">
+<b>最重要的發現：<span class="pass">剩餘全書的「precalc 附錄」表面積出乎意料地小、而且現在就能列完。</span></b> 掃完 12 個主題區後,真正<b>尚未有家、屬 precalc 工具箱、且值得進附錄</b>的淨新項只有 <b>3 個</b>：冪次和 \(\sum k^2,\sum k^3\)、複數 primer、行列式 primer。其餘要嘛<b>已 forward-stock</b>（A.2/A.4/A.5 當初就是為 Calc II 積分/極座標鋪的,現在確認精準命中）、要嘛是<b>章內容</b>（向量、極座標系、收斂測試…）、要嘛<b>A 類可假設</b>。<br>
+<b>對你提案的結論：</b>你「一次掃完、別零碎」的直覺<span class="pass">對且可行——但範圍是 Appendix A（precalc 工具箱）</span>：它<b>再一批就能收尾</b>（冪次和現在收＋複數/行列式待 §16.2 定位）。但<b>§16.2 該「補完」不是「刪除」</b>：它還扛著 §16.1 難度錨與難度閘 persona,刪了會波及所有章;缺的只是 3 個未分類項——補上即可止住打補丁。
+</div>
+
+<h2>一、方法</h2>
+<p class="note" style="background:#fff8ec;border:1px solid #f0dcae;border-radius:6px;padding:.5rem .8rem;"><b>「14 章」是軟參考數,不是硬承諾。</b>它來自 <code>CONTENT_ROADMAP.md</code>：「目標範圍 Calc I+II+III…以 Stewart/Rogawski 目錄作為<u>參考</u>弧線…完整弧線<u>大約</u> 14 章」（Calc I=Ch1–4、II=Ch5–9、III=Ch10–14）。實際本書<b>已偏離這個骨架</b>：參考弧線的「Ch1–4」是 反函/極限→導數→<u>微分應用→積分</u>,但本書實寫的 Ch1–4 是 反函/極限→導數→<u>chain rule/三角導數→指對數</u>——本書切得更細、更深(chain rule、嚴格指對數各自成章),參考弧線的「微分應用」「積分」<b>其實還沒寫、仍在後面</b>。所以真實章數多半<b>會超過 14</b>。<b>本掃描不依賴這個數字</b>：它按 <b>主題區</b>（12 個,見下）組織,先備需求綁在主題上(積分需冪次和、級數需收斂半徑、Calc III 需行列式),不管怎麼分章都一樣。</p>
+<p>全書骨架 14 章只寫了 4 章,其餘主題連手稿多半未有,故無法掃「實際課文」——改掃 <b>roadmap 目標弧線的規劃主題</b>（Stewart/Rogawski 骨架）。每個主題區問三件事：(1) 它引入哪些 <u>Ch1–4＋現有附錄尚未建立</u> 的先備？(2) 依 §16.2 屬 A/B/C（或未分類）？(3) 記法穩定（可現在批次建）還是設計相依（跟章走）？分類圖例：</p>
+<p class="legend note">
+<span><span class="tag t-A">A</span> 可假設</span>
+<span><span class="tag t-B">B</span> 需就地建立/附錄</span>
+<span><span class="tag t-C">C</span> 灰色帶·一行提醒</span>
+<span><span class="tag t-U">U</span> §16.2 未分類（缺口）</span>
+<span><span class="tag t-ch">CH</span> 章內容·非附錄</span>
+</p>
+
+<h2>二、逐主題區掃描表</h2>
+<table>
+<tr><th>主題區（弧線）</th><th>新引入的先備</th><th>類</th><th>處置</th></tr>
+
+<tr><td><b>Applications of Differentiation</b><br>（極值/最佳化/相關變率/L'Hôpital/描圖/Newton/線性近似）</td>
+<td>解 \(f'(x)=0\) 的代數；漸近線分析；<b>隱微分</b>（roadmap 已記為延後的專門主題）；不定型 \(0/0,\infty/\infty\)</td>
+<td><span class="tag t-A">A</span> <span class="tag t-ch">CH</span></td>
+<td>無新 precalc 附錄項。隱微分、L'Hôpital、Newton、微分近似都是<b>章內技巧</b>。</td></tr>
+
+<tr><td><b>Integrals</b><br>（原函數/黎曼和/定積分/FTC/代換）</td>
+<td><b>冪次和封閉式 \(\sum k^2,\ \sum k^3\)</b>（黎曼和從定義算）；\(\sum k\)（等差,A 類）</td>
+<td><span class="tag t-U">U</span></td>
+<td><b>→ 附錄（擴充 §A.3）。</b>記法穩定,現在就能批次建。這是全 arc 最早、最硬的淨新項。</td></tr>
+
+<tr><td><b>Applications of Integration</b><br>（面積/旋轉體/弧長/表面積/功/平均值/形心）</td>
+<td>標準立體的面積體積幾何式（錐/球）；弧長 \(\sqrt{1+(f')^2}\) 積分</td>
+<td><span class="tag t-A">A</span> <span class="tag t-ch">CH</span></td>
+<td>幾何式多屬可假設。若要,僅「參考卡」等級（低優先）。</td></tr>
+
+<tr><td><b>Techniques of Integration</b><br>（分部/三角積分/三角代換/部分分式/瑕積分）</td>
+<td>三角積分需<b>積化和差＋降冪</b>；三角代換需<b>完全平方＋反三角＋畢氏</b>；有理式需<b>部分分式</b></td>
+<td><span class="tag t-A">A</span></td>
+<td class="pass"><b>幾乎全部已 forward-stock！</b>積化和差/降冪＝A.2、部分分式＝A.4、反三角＝§1.2、完全平方＝A 類。<b>此區零淨新附錄項</b>——A.2/A.4 當初就是為它鋪的。</td></tr>
+
+<tr><td><b>Differential Equations</b><br>（可分離/一階線性/成長衰變/(二階?)）</td>
+<td>積分因子（技巧）；\(y'=ky\)（已有 §2.4/§4.5）；<b>二階線性 → 特徵方程複根</b></td>
+<td><span class="tag t-U">U</span> <span class="tag t-ch">CH</span></td>
+<td>一階全屬章內技巧。<b>若涵蓋二階 → 需複數</b>（見下 GAP-B）。設計相依。</td></tr>
+
+<tr><td><b>Parametric &amp; Polar</b><br>（參數曲線/參數微積分/極座標/極座標面積/極座標圓錐）</td>
+<td><b>極座標系</b> \(x=r\cos\theta\)；<b>圓錐曲線</b>（焦點-準線,極式）</td>
+<td><span class="tag t-ch">CH</span> <span class="tag t-A">A</span></td>
+<td class="pass">圓錐曲線＝<b>A.5 已 forward-stock</b>。極座標系是<b>章內容</b>（一個座標系,章內從頭建,非 precalc 附錄）。此區零淨新附錄項。</td></tr>
+
+<tr><td><b>Infinite Sequences &amp; Series</b><br>（數列/級數/斂散測試/冪級數/Taylor）</td>
+<td><b>幾何級數＋telescoping</b>（已有 A.3）；<b>冪次和</b>（GAP-A）；歸納法(A)；二項式(A)；階乘 \(n!\)(A)；<b>收斂半徑 \(|x-a|<R\)</b>；<b>Euler 連結 \(e^x/\sin/\cos\)</b></td>
+<td><span class="tag t-C">C</span> <span class="tag t-U">U</span></td>
+<td>幾何/telescoping 已有。<b>兩個要注意：</b>(i) 收斂半徑讓<b>絕對值不等式 \(|x-a|<R\)（C 類,你先前於 A 批未選）在這裡變承重</b>——建議重估;(ii) 若採 Euler 連結 → 需複數（GAP-B）。</td></tr>
+
+<tr><td><b>Vectors &amp; Geometry of Space</b><br>（3D 座標/向量/點積/叉積/線面/二次曲面）</td>
+<td>3D 距離式；<b>向量</b>（分量/長度/運算）；點積；<b>叉積 → 3×3 行列式</b>；二次曲面</td>
+<td><span class="tag t-ch">CH</span> <span class="tag t-U">U</span></td>
+<td>向量＝<b>章內容</b>（Calc III 核心,章內從頭建,非附錄）。二次曲面建在 A.5 上。<b>叉積的行列式記法 → GAP-C</b>。</td></tr>
+
+<tr><td><b>Vector Functions</b><br>（空間曲線/向量函數微積分/弧長/曲率/運動）</td>
+<td>（全建於向量＋單變數導數之上）</td>
+<td><span class="tag t-ch">CH</span></td>
+<td>零淨新 precalc。曲率/TNB 皆章內容。</td></tr>
+
+<tr><td><b>Partial Derivatives</b><br>（多變數/偏導/多變數鏈rule/梯度/Lagrange）</td>
+<td>多變數函數/等高線（建於圓錐/二次曲面）；<b>Clairaut 混合偏導對稱（證明可能 fence）</b>；聯立方程(A)</td>
+<td><span class="tag t-A">A</span> <span class="tag t-ch">CH</span></td>
+<td>多變數是章內容。<b>Clairaut 證明若 fence → 補證處附錄</b>（GAP-D,§16.1 基建）。</td></tr>
+
+<tr><td><b>Multiple Integrals</b><br>（二重/三重/極柱球座標/變數變換 Jacobian）</td>
+<td>柱/球座標（建於極座標,章內）；<b>Jacobian → 行列式</b></td>
+<td><span class="tag t-ch">CH</span> <span class="tag t-U">U</span></td>
+<td>座標系＝章內容。<b>Jacobian 的行列式 → GAP-C</b>（與叉積共用同一個 primer）。</td></tr>
+
+<tr><td><b>Vector Calculus</b><br>（向量場/線積分/Green/旋度散度/面積分/Stokes/散度定理）</td>
+<td>向量場（章內）；<b>旋度 \(\nabla\times\mathbf F\) → 行列式</b>；參數化曲面</td>
+<td><span class="tag t-ch">CH</span> <span class="tag t-U">U</span></td>
+<td>三大定理皆章內容。<b>旋度的行列式 → GAP-C</b>（第三次用到行列式）。</td></tr>
+</table>
+
+<h2>三、淨新附錄候選（全 arc 收斂後,只有這些）</h2>
+
+<div class="card now">
+<span class="badge b-now">現在就建</span><span class="badge b-cat">記法穩定</span><span class="id">GAP-A</span> <b>冪次和 \(\sum_{k=1}^n k^2=\frac{n(n+1)(2n+1)}{6},\ \ \sum k^3=\big(\frac{n(n+1)}{2}\big)^2\)</b>
+<div class="why"><b>最早需求：</b>Integrals（黎曼和從定義）。記法穩定,不管積分章怎麼寫都需要。<b>家：</b>擴充 §A.3（已含 telescoping,正是導出 \(\sum k^2\) 的機制）。與 A.4 forward-stock 同邏輯。</div>
+</div>
+
+<div class="card decide">
+<span class="badge b-decide">待 §16.2 定位</span><span class="id">GAP-B</span> <b>複數 primer（四則/共軛/模/極式/棣美弗/根 → \(e^{i\theta}\)）</b>
+<div class="why"><b>需求：</b>Series（Euler 連結,設計相依）、DE（二階複根,設計相依）。basics 記法穩定;calculus hook（Euler）設計相依。<b>§16.2 未分類</b>——需先裁複數歸 A 還 B,才知寫多完整（見 §五）。</div>
+</div>
+
+<div class="card decide">
+<span class="badge b-decide">待決·但會用 3 次</span><span class="id">GAP-C</span> <b>行列式 primer（\(2\times2,3\times3\) 餘因子）</b>
+<div class="why"><b>需求：</b>叉積（Vectors）、Jacobian（Multiple Integrals）、旋度（Vector Calculus）——<b>Calc III 共用到 3 次</b>。這個「反覆出現」是升級成附錄小節（而非三次各自就地 bridge）的理由。記法穩定。<b>§16.2 未分類</b>。</div>
+<div class="meta"><b>第二意見校正：分類應為 B,不建議 C。</b>行列式的符號、定向（右手系）、Jacobian 正負號都不是「一行提醒」能安全承重的——需要一份短 appendix/reference 正經鋪。但叉積／Jacobian <b>首次出現時仍要章內就地定義</b>（附錄補全套、章內給即時語意）。</div>
+</div>
+
+<div class="card defer">
+<span class="badge b-defer">§16.1 基建·觸發才建</span><span class="id">GAP-D</span> <b>延後證明的補證處附錄（Proof Track）</b>
+<div class="why">§16.1 明訂「on-credit fence 到補證處」,但補證處無實體。典型會 fence 的：limit laws 全套 \(\varepsilon\)-\(\delta\)、Clairaut 混合偏導、IVT/EVT。<b>第一個被 fence 的證明出現時同批立</b>,現在非缺口。</div>
+</div>
+
+<div class="card decide">
+<span class="badge b-decide">建議重估</span><span class="id">GAP-E</span> <b>絕對值不等式 \(|x-a|<\delta \leftrightarrow (a-\delta,a+\delta)\)</b>
+<div class="why">§16.2 C 類,你於 Appendix A 第二批<b>明確未選</b>。但掃描發現：<b>Series 的收斂半徑 \(|x-a|<R\) 讓它從「灰色帶」變承重</b>（且 \(\varepsilon\)-\(\delta\) 也一直在用）。建議連同這次一起重估要不要補一節/一塊。</div>
+</div>
+
+<div class="card decide">
+<span class="badge b-decide">建議重估（第二意見補列）</span><span class="id">GAP-F</span> <b>完全平方／二次標準形（completing the square）</b>
+<div class="why"><b>Codex 補抓的漏項。</b>目前 completing the square 列在 roadmap 的 Ch1 precalc 先備（＝當可假設）——但它<b>下游反覆承重</b>：三角代換 \(\int \frac{dx}{x^2+px+q}\)、把一般二次式化成 A.5 的置中標準形 \((x-h)^2+(y-k)^2\)、Calc III 的 quadric surfaces 都要它。現 A.5 只給<b>已置中</b>的標準式,A.4 提到 irreducible quadratic 但不教配方。<b>建議：</b>不另開大節,併一小塊進 A.4 或 A.5(把「一般二次式 → 標準形」補上)。與 GAP-E 同性質：本是可假設,但承重升級,值得一併重估。</div>
+</div>
+
+<h2>四、確認「已 forward-stock,精準命中」（無需動作,佐證附錄規劃良好）</h2>
+<div class="card stock">
+<span class="badge b-stock">已覆蓋</span> <b>A.2 積化和差＋降冪</b> → Techniques of Integration 的三角積分。　<b>A.4 部分分式</b> → 有理式積分。　<b>A.5 圓錐曲線</b> → Parametric/Polar ＋ 二次曲面。　<b>A.3 幾何級數＋telescoping</b> → Series。
+<div class="meta">這四項當初的 forward-stock 決策,經全 arc 掃描確認全部精準命中。你擔心的「零碎」在 Calc II 積分這塊其實已被超前部署掉了。</div>
+</div>
+
+<h2>五、明確「章內容,不進附錄」（防止過度 appendix 化）</h2>
+<div class="card na">
+<span class="badge b-na">CH</span> 隱微分、L'Hôpital、Newton 法、線性近似/微分（App of Diff）；<b>向量與點/叉積機制</b>、<b>極座標/柱/球座標系</b>（章內從頭建）；收斂測試、Taylor 級數、曲率、Lagrange、Green/Stokes/散度定理——全是各章的<b>實質內容</b>,非先備工具箱。
+</div>
+<div class="card na">
+<span class="badge b-na">CH＋flag</span> <b>雙曲函數 \(\sinh/\cosh\)</b>——非 108 課綱,但標準教科書是<b>章節小節</b>（Stewart §6.7）,非附錄。若積分章用到需章內就地建;順帶提醒它在難度基線上是個 B 類式的新面孔。
+</div>
+
+<h2>六、對 §16.2 的裁決建議：<span class="pass">補完,不要刪</span></h2>
+<p><b>為什麼不能刪：</b>§16.2 不只管附錄,它是全書的難度錨——</p>
+<ul>
+<li>§16.1 難度預算字面定義為「<b>§16.2 基線讀者</b> effortful 但可自行走完」;</li>
+<li>每章＋兩附錄都跑的<b>難度 learner-sim 閘,persona ＝ §16.2 基線讀者</b>;</li>
+<li>「假設 vs 就地建」那條線需要基線才有原則性答案(否則要嘛解釋分數、要嘛學生一直翻附錄);</li>
+<li>B 類的處置是「就地最短 bridge <b>＋</b> cross-ref 附錄」,不是「只放附錄」——刪基線＝失去就地 bridge 的校準,傷 self-sufficiency。</li>
+</ul>
+<p><b>該補什麼（止住打補丁的真正解）：</b>掃描顯示 §16.2 的清單只缺 <b>3 處分類</b>——把它們一次補進去,清單就對這整條 arc 完整了：</p>
+<table>
+<tr><th>補入項</th><th>建議分類</th><th>理由</th></tr>
+<tr><td>複數（四則/極式/棣美弗/根）</td><td>裁 A 或 B（請定）</td><td>108 數A 有複數 basics,但 §16.2 A 類清單漏列 → 現在不能合規地假設。歸 A＝可假設 basics（只附錄補 Euler hook）;歸 B＝完整 primer。</td></tr>
+<tr><td>行列式（2×2/3×3）</td><td>建議 B（<s>非 C</s>）</td><td>符號/定向/Jacobian 正負號不是「一行提醒」能安全承重(第二意見)。B＝附錄小節（GAP-C）＋章內首次仍就地定義。</td></tr>
+<tr><td>\(\sum k^2,\sum k^3\)（冪次和,非線性）</td><td>建議 B（附錄）</td><td>§16.2 現只列「有限等差/等比＝A」,冪次和落在縫裡。明列為 B＋附錄（GAP-A）。</td></tr>
+</table>
+<p class="note">另建議在 Series 語境下重估兩個「本可假設、但承重升級」項：<b>GAP-E 絕對值不等式</b>（收斂半徑 \(|x-a|<R\)）與 <b>GAP-F 完全平方</b>（三角代換/二次標準形）。</p>
+<p class="note"><b>一條中間路線（第二意見提出,供參考）：</b>若你未來想讓附錄長成「完整 precalc 先修課」,§16.2 可<u>瘦身</u>成更薄的「基線＋bridge 政策」表(把清單本體移進附錄),但<b>仍不是刪</b>——基線/難度錨那段要留。這剛好部分接住你原本「東西都進附錄」的想法,又不犧牲難度校準。</p>
+
+<h2>七、建議的執行順序</h2>
+<ol>
+<li><b>現在可動（記法穩定、零投機）：</b>GAP-A 冪次和進 §A.3。走既有縮閘。</li>
+<li><b>一個小裁決解鎖一批：</b>你裁複數（A/B）＋行列式（C/B）＋絕對值不等式（補/不補）三個 §16.2 定位 → 我就能把 <b>Appendix A（precalc 工具箱）一次收尾</b>（GAP-A 現建、GAP-B/C 依裁決建或掛就地 bridge）。這正是你要的「一次處理完」,範圍是可行的 Appendix A。</li>
+<li><b>設計相依,跟章走：</b>GAP-D 補證處（第一個 fence 出現時）、複數的 Euler hook（Series 章設計時）。</li>
+<li><b>§16.2：</b>補 3 分類、保留基線/難度錨。不刪。</li>
+</ol>
+<p class="note">本報告唯讀,未改任何講義檔。附錄收錄一律待你裁決後才動筆（2026-07-04 紀律）。</p>
+
+<h2>八、Codex 對抗式覆核（gpt-5.5/xhigh, read-only, 121,622 tokens）已完成並折入</h2>
+<p class="sub">獨立讀了 §16、roadmap、appA/appB 後回三點,均採納。</p>
+<table>
+<tr><th>面向</th><th>Codex 結論</th><th>折入</th></tr>
+<tr><td>(1) 掃描完整性</td><td>大致完整。唯一補：<b>completing the square / 二次標準形</b>（積分三角代換、conic/quadric 標準化反覆用;A.5 只給已置中式、A.4 不教配方）。其餘章內容判斷無誤。</td><td>新增 <b>GAP-F</b>（建議併小塊進 A.4/A.5）。</td></tr>
+<tr><td>(2) 三處分類</td><td><b>冪次和＝B</b>(表內可含 \(\sum k\) 收束較乾淨)；<b>複數＝B 或暫不列,不能列 A</b>(輕＝章內盒子、承重＝附錄 primer)；<b>行列式＝B 不建議 C</b>(符號/定向/Jacobian 正負號)。</td><td>GAP-C 改 B;§六表更新;複數 fork 保留。</td></tr>
+<tr><td>(3) §16.2 去留</td><td><b>「補完不刪」成立。</b>§16.1 難度預算、blocking 判準、learner-sim persona 皆依賴之。唯一支持大改的路：附錄長成完整 precalc 課時,§16.2 可<b>瘦身</b>成薄「baseline+bridge」表,但非刪。</td><td>§六加「中間路線」段。</td></tr>
+</table>
+
+</body>
+</html>

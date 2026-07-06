@@ -1,0 +1,1226 @@
+OpenAI Codex v0.136.0
+--------
+workdir: C:\Users\Kao\Downloads\Calculus_handout
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019f2b11-8728-7121-ac6f-cc46908ed599
+--------
+user
+You are an independent cross-model reviewer (gate-2) for a NEW self-authored appendix section WITH figures. No source manuscript — independent re-derivation is the primary safeguard. Read-only: do NOT modify files. Report findings only.
+
+REPO ROOT: C:\Users\Kao\Downloads\Calculus_handout (paths relative to it)
+
+CONTEXT: Appendix A "Precalculus Toolbox" (Taiwan 108 curriculum). Authoring brief = CONTENT_SPEC.md §16.2/§16.3 + §3 register. NEW section §A.5 "The Conic Sections" (second-batch, user roster decision 2026-07-04), a quick tour with four figures. Forward-stock (Ch1–4 no inbound reference).
+
+FILES TO REVIEW:
+- handout/fragments/appA/sec-a-5.html  (the prose + standard forms + Example A.6 + four <figure> tags A.1–A.4)
+- handout/appendixA-print-standalone.html — the FIGS object entries "conic-circle", "conic-parabola", "conic-ellipse", "conic-hyperbola" (search for them; they set the numeric parameters of each figure).
+
+TASK 1 — MATH CORRECTNESS OF THE PROSE (blocking if wrong). Independently verify:
+  1. Circle: sqrt(x^2+y^2)=r squares to x^2+y^2=r^2.
+  2. Parabola: focus (0,p), directrix y=−p; the text claims equating distances x^2+(y−p)^2=(y+p)^2 simplifies to x^2=4py. Verify.
+  3. Ellipse: standard form x^2/a^2+y^2/b^2=1 with b^2=a^2−c^2 (so c=sqrt(a^2−b^2)), a>b, foci (±c,0), axis crossings (±a,0),(0,±b). Verify the relation and that a>b ⟺ foci on the x-axis.
+  4. Hyperbola: standard form x^2/a^2−y^2/b^2=1 with b^2=c^2−a^2 (so c=sqrt(a^2+b^2)), vertices (±a,0), asymptotes y=±(b/a)x. Verify the relation and the asymptote slopes.
+  5. Example A.6: 4x^2+9y^2=36 ⇒ x^2/9+y^2/4=1; ellipse a=3,b=2; c=sqrt(9−4)=sqrt(5); foci (±sqrt(5),0)≈(±2.24,0). Verify, and the closing remark that a minus sign would give a hyperbola with c=sqrt(a^2+b^2).
+
+TASK 2 — FIGURE NUMERIC CONSISTENCY (blocking if a figure's numbers contradict the math). Read the four FIGS entries and check the plotted parameters are internally consistent conics:
+  - conic-circle: radius 2 (curve sqrt(4−x^2)); radius segment endpoint (1.414,1.414) should lie on the circle (1.414^2+1.414^2≈4). Verify.
+  - conic-parabola: curve y=x^2/4 means 4p=4 ⇒ p=1; focus dot at (0,1) and directrix hline at y=−1 must match p=1. Verify.
+  - conic-ellipse: curve 2*sqrt(1−x^2/9) means a=3,b=2; foci dots at (±2.236,0) must equal (±sqrt(a^2−b^2),0)=(±sqrt5,0)=±2.236. Verify.
+  - conic-hyperbola: curve 1.5*sqrt(x^2/4−1) means a=2,b=1.5; foci dots at (±2.5,0) must equal (±sqrt(a^2+b^2),0)=(±sqrt(6.25),0)=±2.5; asymptote segments have slope 3.75/5=0.75 which must equal b/a=1.5/2=0.75; vertices (hollow dots) at (±2,0)=(±a,0). Verify each.
+
+TASK 3 — REGISTER / 语域 (advisory unless egregious): is the prose consistent with the Stewart/Rogawski voice of the rest of the appendix? Compare to handout/fragments/appA/sec-a-4.html and sec-a-1.html. Flag generic filler or tone break. Also confirm the figure captions and in-figure labels match the prose (e.g. F1,F2 foci, y=±(b/a)x, directrix y=−p).
+
+OUTPUT:
+  VERDICT: <n> blocking, <m> advisory
+  Then per finding: [BLOCKING|ADVISORY] <file>:<locus> — <defect> — <your independent computation> — <suggested minimal fix>.
+  List every item checked and found correct under CHECKED-CLEAN (one line each). If zero blocking, say so explicitly.
+Be rigorous; do not over-report register nitpicks as blocking.
+
+codex
+I’ll treat this as a read-only gate review. First I’m reading the project instructions and the appendix sections the new material should match, then I’ll independently recompute the conic parameters against the figure definitions.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -Raw handout/fragments/appA/sec-a-4.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -Raw handout/fragments/appA/sec-a-5.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -Raw CLAUDE.md' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -Raw handout/fragments/appA/sec-a-1.html' in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 566ms:
+<!-- 禮A.5 The Conic Sections.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC 禮16.2/禮16.3
+     + 禮3 register). Second-batch appendix section (user roster decision 2026-07-04),
+     written WITH figures (user directive "???銝韏瑕神").
+     Numbering is MANUAL, namespace "A", continuing from sec-a-4:
+     Example A.6; Figures A.1?.4 (the appendix's first figures ??A.1 circle,
+     A.2 parabola, A.3 ellipse, A.4 hyperbola).
+     Figure functions live in appendixA-print-standalone.html FIGS: conic-circle,
+     conic-parabola, conic-ellipse, conic-hyperbola (buildPlot curve-halves + dots/
+     reflines/labels; the circle uses an equal-aspect square plot so it renders round).
+     Depth note: a "quick tour" ??standard forms centred/vertex at the origin, key
+     features stated, the distance definitions given informally. Forward-stock: Ch1??
+     has no inbound reference; not registered as SPEC B-class (it is analytic geometry,
+     not a Ch1?? prerequisite). Math verified during authoring: focus-directrix ??x^2=4py,
+     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=簣(b/a)x, Example A.6
+     (4x^2+9y^2=36 ??x^2/9+y^2/4=1, foci (簣??,0)).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.5</span>The Conic Sections</h2>
+  </header>
+
+  <p>Slice a cone with a flat plane and the rim of the cut is a <em>conic section</em>: a circle, an ellipse, a parabola, or a hyperbola, according to the angle of the slice. Each also has a cleaner description in terms of distance, and each has a <em>standard equation</em> ??the simplest form, obtained by placing the curve's centre or vertex at the origin. This tour records the four standard forms and the features to read straight off them. Like partial fractions, the conics are stocked here for later chapters; the main text of Chapters 1?? does not call on them.</p>
+
+  <p><strong>The circle.</strong> A circle is the set of points a fixed distance \(r\) ??the <em>radius</em> ??from a centre. Centred at the origin, the condition \(\sqrt{x^2 + y^2} = r\) squares to the standard equation
+  \[ x^2 + y^2 = r^2. \]</p>
+
+  <figure class="figure" data-fig="conic-circle">
+    <figcaption><span class="fig-no">Figure A.1</span> A circle of radius \(r\) centred at the origin: \(x^2 + y^2 = r^2\).</figcaption>
+  </figure>
+
+  <p><strong>The parabola.</strong> Fix a point \(F\) (the <em>focus</em>) and a line (the <em>directrix</em>). A parabola is the set of points equidistant from the two. With focus \(F = (0, p)\) and directrix \(y = -p\), equating the two distances ??\(x^2 + (y - p)^2 = (y + p)^2\) ??and simplifying gives the standard equation
+  \[ x^2 = 4py, \]
+  a curve opening upward from its vertex at the origin. (Putting the focus on the \(x\)-axis instead gives the sideways form \(y^2 = 4px\).)</p>
+
+  <figure class="figure" data-fig="conic-parabola">
+    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+  </figure>
+
+  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+  \[ \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1, \qquad b^2 = a^2 - c^2, \]
+  with \(a > b > 0\). The curve crosses the axes at \((\pm a, 0)\) and \((0, \pm b)\); the longer semi-axis \(a\) runs along the line through the foci, and \(c = \sqrt{a^2 - b^2}\) locates them.</p>
+
+  <figure class="figure" data-fig="conic-ellipse">
+    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+  </figure>
+
+  <p><strong>The hyperbola.</strong> Keep two foci, but now ask for a fixed <em>difference</em> of distances rather than a sum. With foci at \((\pm c, 0)\) and the difference written \(2a\), the standard equation is
+  \[ \frac{x^2}{a^2} - \frac{y^2}{b^2} = 1, \qquad b^2 = c^2 - a^2. \]
+  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\), the crossed lines that govern its opening. Here \(c = \sqrt{a^2 + b^2}\), so the foci lie beyond the vertices.</p>
+
+  <figure class="figure" data-fig="conic-hyperbola">
+    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.6</span></p>
+      <div class="env-body">
+        <p>Identify the curve \(4x^2 + 9y^2 = 36\) and locate its foci.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Divide through by \(36\) to reach standard form:
+        \[ \frac{x^2}{9} + \frac{y^2}{4} = 1. \]
+        Both squared terms are added, so the curve is an ellipse, with \(a^2 = 9\) and \(b^2 = 4\) ??that is \(a = 3\) and \(b = 2\). Since \(a > b\), the major axis is horizontal, and \(c = \sqrt{a^2 - b^2} = \sqrt{9 - 4} = \sqrt{5}\). The foci therefore sit at \((\pm\sqrt{5},\, 0)\), about \((\pm 2.24,\, 0)\). Had the sign between the terms been a minus, the same reading would have named a hyperbola instead, with \(c = \sqrt{a^2 + b^2}\).</p>
+      </div>
+    </section>
+  </div>
+
+  <p>Those are the four curves, their standard equations, and the features ??centre, radius, focus, directrix, foci, axes, and asymptotes ??that each equation puts on display. Moving a centre or vertex off the origin only replaces \(x\) and \(y\) with \((x - h)\) and \((y - k)\); the shapes, and everything this tour named, are unchanged.</p>
+
+</article>
+
+
+ succeeded in 567ms:
+<!-- 禮A.4 Partial Fractions.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC 禮16.2/禮16.3
+     + 禮3 register). Second-batch appendix section (user roster decision 2026-07-04).
+     Numbering is MANUAL, namespace "A", continuing from sec-a-3:
+     Proposition A.6; Strategy A.2; Example A.4, A.5; Caution unnumbered.
+     Depth note: the decomposition FORM (Proposition A.6) is stated; its existence/uniqueness
+     is a linear-algebra fact, taken as given (fenced) ??the section teaches how to FIND the
+     constants across all three types (distinct linear, repeated linear, irreducible quadratic).
+     Forward-stock: Ch1?? has no inbound reference (partial fractions is an integration tool);
+     added per user decision 2026-07-04 and registered in CONTENT_SPEC 禮16.2 as B-class.
+     No mainline cross-ref yet. The 1/(x(x+1)) opener ties back to 禮A.3's telescoping sum.
+     Math verified during authoring: Example A.4 (5x?? cover-up), A.5(a) x/(x??)^2,
+     A.5(b) (x+1)/(x(x^2+1)), and the improper division x^2/(x??) = x+1 + 1/(x??).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.4</span>Partial Fractions</h2>
+  </header>
+
+  <p>Adding two fractions over a common denominator is routine; the reverse ??breaking one complicated fraction back into simple pieces ??is <em>partial fractions</em>. A rational function is a quotient of polynomials \(P(x)/Q(x)\), and partial fractions rewrites it as a sum of fragments simple enough to handle one at a time. The smallest instance is worth seeing first:
+  \[ \frac{1}{x(x + 1)} = \frac{1}{x} - \frac{1}{x + 1}, \]
+  as recombining the right-hand side over a common denominator confirms. (Read left to right, this is exactly the split that makes \(\sum \tfrac{1}{k(k + 1)}\) telescope ??禮A.3's collapsing sum in disguise.) The main text does not yet call on this tool; it is stocked here for the integration chapters, where each fragment turns out to have a known antiderivative.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.6</span><span class="env-name">Partial-fraction decomposition</span></p>
+    <div class="env-body">
+      <p>Let \(P(x)/Q(x)\) be a <em>proper</em> rational function ??one whose numerator has lower degree than its denominator ??and factor \(Q\) completely into linear and irreducible quadratic factors. Then \(P/Q\) equals a sum of partial fractions, contributed factor by factor:</p>
+      <ul>
+        <li>each distinct linear factor \((x - a)\) contributes one term \(\dfrac{A}{x - a}\);</li>
+        <li>each repeated linear factor \((x - a)^{m}\) contributes \(\dfrac{A_{1}}{x - a} + \dfrac{A_{2}}{(x - a)^{2}} + \cdots + \dfrac{A_{m}}{(x - a)^{m}}\);</li>
+        <li>each irreducible quadratic factor \((x^{2} + px + q)\) ??one with no real root, i.e. \(p^{2} < 4q\), so it cannot be split into real linear factors ??contributes \(\dfrac{Bx + C}{x^{2} + px + q}\); a repeated one \((x^{2} + px + q)^{m}\) contributes one such term over each power up to \(m\).</li>
+      </ul>
+      <p>In every case the fragment's numerator sits one degree below its denominator ??a constant over a linear factor, a linear \(Bx + C\) over a quadratic ??and a factor raised to a power gets one fragment for each power up to that exponent, exactly the freedom needed to match an arbitrary proper numerator. The constants are then uniquely determined by \(P\) and \(Q\).</p>
+    </div>
+  </section>
+
+  <p>That such a decomposition always exists, and with only one choice of constants, is a fact of linear algebra: matching numerators forces a system of linear equations in the unknowns that has exactly one solution. We take the <em>shape</em> as given and spend the effort where the work really is ??pinning down the constants.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">A.2</span><span class="env-name">Finding the constants</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>If the fraction is <em>improper</em> (numerator degree \(\ge\) denominator degree), divide first: \(P/Q = (\text{a polynomial}) + (\text{proper remainder})/Q\), and decompose only the remainder.</li>
+        <li>Factor the denominator completely and write the template from Proposition A.6 with the constants left as unknowns.</li>
+        <li>Multiply through by \(Q(x)\) to clear denominators, then solve for the constants ??either by matching coefficients of like powers of \(x\), or by substituting convenient values of \(x\) (a factor's own root kills every other term at once).</li>
+      </ol>
+      <p class="informal">The substitution trick in step 3 is the <em>cover-up</em> shortcut: to get the constant over a <em>distinct</em> linear factor \((x - a)\), set \(x = a\) everywhere except in that one factor. It reaches only the top constant of a repeated factor, and an irreducible quadratic has no real root to substitute at all ??those remaining constants come from matching coefficients.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.4</span></p>
+      <div class="env-body">
+        <p>Decompose \(\dfrac{5x - 1}{(x - 1)(x + 2)}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Two distinct linear factors call for the template \(\dfrac{5x - 1}{(x - 1)(x + 2)} = \dfrac{A}{x - 1} + \dfrac{B}{x + 2}\). Multiplying through by \((x - 1)(x + 2)\) gives
+        \[ 5x - 1 = A(x + 2) + B(x - 1). \]
+        Setting \(x = 1\) leaves \(4 = 3A\), so \(A = \tfrac{4}{3}\); setting \(x = -2\) leaves \(-11 = -3B\), so \(B = \tfrac{11}{3}\). Hence
+        \[ \frac{5x - 1}{(x - 1)(x + 2)} = \frac{4/3}{x - 1} + \frac{11/3}{x + 2}. \]
+        Each substitution was a root of one factor, which zeroed the other term and handed back a single constant ??the cover-up shortcut in action.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.5</span></p>
+      <div class="env-body">
+        <p>Decompose each.</p>
+        <ol class="prompt-list">
+          <li>\(\dfrac{x}{(x - 1)^{2}}\), with a repeated linear factor.</li>
+          <li>\(\dfrac{x + 1}{x(x^{2} + 1)}\), with an irreducible quadratic factor.</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>The repeated factor \((x - 1)^{2}\) needs both powers: \(\dfrac{x}{(x - 1)^{2}} = \dfrac{A}{x - 1} + \dfrac{B}{(x - 1)^{2}}\). Clearing denominators, \(x = A(x - 1) + B\). Setting \(x = 1\) gives \(B = 1\); matching the coefficient of \(x\) gives \(A = 1\). So \(\dfrac{x}{(x - 1)^{2}} = \dfrac{1}{x - 1} + \dfrac{1}{(x - 1)^{2}}\).</li>
+          <li>The quadratic \(x^{2} + 1\) does not factor over the reals ??there is no real root to cover up ??so it carries a linear numerator, and its constants come from matching coefficients: \(\dfrac{x + 1}{x(x^{2} + 1)} = \dfrac{A}{x} + \dfrac{Bx + C}{x^{2} + 1}\). Clearing denominators, \(x + 1 = A(x^{2} + 1) + (Bx + C)x = (A + B)x^{2} + Cx + A\). Matching powers: the constant term gives \(A = 1\), the coefficient of \(x\) gives \(C = 1\), and the coefficient of \(x^{2}\) gives \(A + B = 0\), so \(B = -1\). Hence \(\dfrac{x + 1}{x(x^{2} + 1)} = \dfrac{1}{x} + \dfrac{1 - x}{x^{2} + 1}\).</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Partial fractions applies only to a <em>proper</em> fraction. Faced with \(\dfrac{x^{2}}{x - 1}\), divide first: \(x^{2} = (x - 1)(x + 1) + 1\), so \(\dfrac{x^{2}}{x - 1} = x + 1 + \dfrac{1}{x - 1}\). No combination of the form \(\dfrac{A}{x - 1}\) alone can reproduce a numerator that outgrows its denominator ??the polynomial part must be divided out before the templates apply.</p>
+    </div>
+  </section>
+
+  <p>Every fragment this method produces ??\(\dfrac{A}{x - a}\), \(\dfrac{A}{(x - a)^{k}}\), and \(\dfrac{Bx + C}{(x^{2} + px + q)^{k}}\) ??has a standard antiderivative, which is why partial fractions is the opening move for integrating a rational function. That payoff belongs to the integration chapters; the algebra it rests on is complete here.</p>
+
+</article>
+
+
+ succeeded in 583ms:
+# CLAUDE.md
+
+?祆?獢?砍摮澈??蝯?AI 隞??嚗laude Code?odex 蝑???獢惜蝝?撘??舫遢????*甈??**嚗`AGENTS.md`](AGENTS.md) ????祆???璅??批捆銝?銴摮澈???渡?瑽?撱箇蔭閬?隞交?憡扳?隞?[`README.md`](README.md) ?箸?嚗摰寞撖怨??誑 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) ?箸???
+
+## ?Ｙ?銝閬?
+
+| ?Ｙ? | 頝臬? | 隤芣? |
+|------|------|------|
+| HTML 雓儔 | `handout/` | MathJax/KaTeX嚗S paginator嚗ragment ??print-standalone 蝯? |
+| Manim 敶梁? | `video/` | ?嚗??恬?TTS嚗make.py` 撱箇蔭嚗底閬?[`video/README.md`](video/README.md)嚗?|
+| ??LaTeX 雓儔 | `legacy/tex_handout/` | 撌脣?蝯???? |
+
+> **雓儔????蝡?摰????*嚗ode A ?剝? ??Mode B ??Mode C ??憿嚗頠楛摨???????甇?Ⅱ?????詨飛 M1?8 ??S繚A繚V嚗?? subagent嚗ubric嚗???Codex 隤輻蝝敺???摰???Ch1/Ch2 ????蝢抬?閬?憡蜇閬?[`handout/PIPELINE.md`](handout/PIPELINE.md)??
+
+## 撣貊?誘?
+
+```bash
+python handout/build.py           # 撱箇蔭?券雓儔蝡?嚗??ch01 ?芸遣銝蝡?
+python video/make.py --quality high  # 1080p 皜脫?敶梁?嚗?閮剖?鞈迎?
+python tools/doctor.py            # ?啣??亙熒瑼Ｘ
+tts.py --backend mock             # ?Ｙ? TTS mock嚗?閮祥嚗??嚗?
+```
+
+## ?辣?啣神隤?
+
+- **README 銝敺誑蝜?銝剜??詨神??* ???急?桅???[`README.md`](README.md) 隞亙?摮??冗銝剖惇?潭撠???README嚗?憒?[`video/README.md`](video/README.md)嚗憓?靽格 README ?瘥颲衣???
+- **敹?銋?靽???嚗?蝧餉陌嚗?* 蝔?蝣澆?憛?獢楝敺?????hell ?誘?憓??詻??亦Ⅳ嚗cene id?xport ?迂??雿?嚗誑????閰??銵?隤?Manim?aTeX?emini?TS?I?R?ode A/B/C 蝑???
+- ?園??????憿”?潛?隤芣???銝敺蝙?函?擃葉??
+- 蝚砌??嫣?鞈湛?`.deps/`?.deps_f5/`?.deps_voiceover/`嚗? git 撌乩?璅對?`.claude/worktrees/`嚗葉??README 銝甇方????嚗?閬??
+
+## 敶梁?皜脫?閫??摨?
+
+- **?日?雿輻??亥?瘙??血?銝敺誑 1080p 皜脫?**嚗make.py --quality high`嚗?
+
+## 隞祥 API 隤輻??蝬???
+
+- **瘥活隤輻隞颱?閮祥????API嚗? Gemini TTS?emini ??嚗蔣????嚗????賢?????雿輻??蝣箏???銝?芾?隤輻??* ?寞活??嚗?憒蝭? TTS?蝡?頝?銝敺?隤芣?嚗活閬矽?其?暻潭芋??隡啁??beat ?賂??唾?蝘嚗??嚗???敺??瑁???
+- 銝?鞎颯???雯?蝺楝敺??冽迨???舫??瑁???憒?`tts.py --backend mock`嚗神? WAV 撽?manifest嚗?摨????Manim render?fmpeg mux/concat??
+- ??銝甈∪??隞?”閰脫活?Ⅱ隤芣??極雿????蝭?霈嚗?璅∪????湔??頝???敺萄?????
+- **??026-07-01 雿輻??甈odex ?航?隤輻嚗eview嚗??賂?閰Ｗ???嚗econd-opinion嚗? standing consent嚗?仿????活敺菔岷嚗蒂?⊿???Codex ?誨??銝??蝙?刻?閬?撠??整?* 蝭?嚗?*`codex exec -s read-only`**嚗??恬?code嚗oc 撠?撘?review?噩蝚砌???嚗霈銝瑼?璅∪?韏?`~/.codex/config.toml` ?身 gpt-5.5嚗high嚗?*撌乩?憸冽嚗蝙?刻?瘙??閬??湔??暹???嚗?* ?芯蜓?券脯?閬祟?豢?蝚砌????矽 Codex ?? ping 雿輻??? (i) ?迤銝??撠?????ii) 閮祥??嚗?銝???iii) Codex嚗頨怠?瑚??⊥?閫??????iv) 瘚????蝙?刻?瘙箇? deliverable嚗?鈭支???sign-off嚗???銝?*甇斗?甈???Codex read-only ?誑 Codex 隞?閰Ｗ???*嚗? TTS??閫??皜脫??emini ??嚗蔣????閮祥 API **隞?**??孵噩??嚗??冽迨???改???
+
+## 摰??啣?嚗撩憟辣嚗?擃???憚摮隞??摰?唳?瑼?
+
+頝冽??啣???憡??桀 [`ENVIRONMENT.md`](ENVIRONMENT.md)嚗?瑁?? [`tools/doctor.py`](tools/doctor.py)嚗?璈?頝??撩隞暻潘??甇文???嚗?
+
+- **蝻箏?隞塚?頠???嚗?閬銵?鋆?* ?菜葫?唳璈撩??pip 憟辣?頂蝯?binary ?極?瘀?憒?`ffmpeg`?aTeX?ode?hrome????pip 憟辣嚗?嚗?*?牧??鋆?暻潦隞暻潦獐鋆??誘嚗?蝬蝙?刻???鋆?*嚗??航銵?`winget`嚗pip install`??憭??扳??[`requirements.lock`](requirements.lock)嚗ENVIRONMENT.md` **??歇霅啣????啣?**嚗?憒? `tools/setup.ps1` 敺?lock 鋆??舫?撱箝??啣?嚗????
+- **銝??芾??憚摮??蹂誨??* 蝻箸镼踵?**?身?迤??韏瑚?**嚗?閬鈭????餅隞??hack 銝璇?code path ?輸?蝻箇? binary?撖急隞?極?瘀??雿?瑟??隞??瘜Ⅱ撖行憟踝?**雓靘?雿輻??憟?*嚗?閬?暺?嚗?銝 Karpathy 禮1????具????????湛???靘?`ffmpeg`嚗ffprobe` ?詻???隞嗚?? code 蝜? `ffprobe`??蝑 A嚗? `video/REBUILD_STATUS.md`嚗?
+- **鋆?銝摰?啁??瑼?蝣箔??圈?血?敺???* 隞颱??啣?霈敺?銝頛芸鋆?嚗inned ???[`requirements.lock`](requirements.lock)嚗???`requirements.txt`??瘙神??[`ENVIRONMENT.md`](ENVIRONMENT.md)?炎?仿???[`tools/doctor.py`](tools/doctor.py)嚗?閬???`tools/setup.ps1`嚗?*撽璅?嚗?唳? `python tools/doctor.py` ?賣?甇斗??啣?撠??啣蝬?*
+
+## 頝典?閰梯??嗅神?脩??扳?瑼?銝神?砍 memory嚗?
+
+- **?蜇蝯?蝑???隞颱?頝典?閰梧?頝冽??函??亥???銝敺神?脫? git 銝??瑼?*嚗?*銝??芾??冽?啁? Claude memory**嚗~/.claude/.../memory/`嚗 `MEMORY.md`嚗?
+- **??嚗?* 雿輻?虜??虫?璆哨??砍 memory 銝 repo 韏啜?璈停瘨仃嚗???扳?瑼?頝? git ?唳??唳??具?
+- **撖怠鋆∴?** ?脣漲嚗??神?脰府?Ｙ???`REBUILD_STATUS.md`嚗??頝典?閰梢脣漲?剁?嚗極?瑞瘜??神?脣??? `README.md`嚗撘?鞈?瘚?蝝神??`DESIGN.md`嚗摰寞瘜?撖恍?`CONTENT_METHODOLOGY.md`?銝????瑼?嚗??蝙?刻??曉嚗?閬?暺閮脫??memory??
+
+## ?啣神嚗祟?亦??Ｘ????嚗?摮?砍 memory嚗?銝?閬??祇脩??改?
+
+- **?蝙?刻?閰曹?敺蝜?銝剜?**嚗aTeX嚗?撘Ⅳ??隞嗅?????銵?隤????璅????
+- **??doc嚗ode review ??皜?蝝?銝?瘛瑞銝隢?** ????蝒????Ｗ?閬?嚗?靽殷???discoverability gap嚗??辣?喳嚗??嚗 editorial drift 憸券嚗??芸?嚗???finding嚗 ??finding嚗?蝷箔?閬??Ｗ榆?堆???*Framing嚗?* 敺?◤ review ?邦?瘜?潘?銝???session ?扳 commit嚗 merge ???渡?Ｘ?鈭祕嚗?蝢拍??寧??刻?撌桃銝? inconsistency?ver-reporting ????甇???芸???
+- **銝?mode ?啣神瘚?嚗oot [`README.md`](README.md) 禮Mode B嚗?嚗ode B ?里?貉?瘙箄??潛撖恍脰府甈∩耨甇?commit ??message body**嚗ubject ??0 摮ody ??嚗??祆隞暻潦雿?憒乓鈭?暻潦??刻???嚗末霈靘?閰梁 `git log --grep="Mode B"` ??????commit嚗112aa5c`?0ef06ee`?? Mode A ??銵?bugfix 銝?具?
+  - **commit-grep ??嚗?026-06-15嚗?** 銝膩 `Mode B` ??*雓儔**蝺?*video ???撖衣里?詨歇?孵? NFA**嚗??賢?撖衣里?賂???video?ode B??憟? [`video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)嚗??嗉?瘙箏?璅?神?脖耨甇?commit body嚗???`git log --grep="NFA"` ??嚗?雓儔 `Mode B` ??嚗??拇?蝺毽?典?銝 grep嚗?
+- **蝯虫蝙?刻祟?貊?鈭支??抵??具??停?質???敶Ｗ?嚗?026-06-12 雿輻??瘙?嚗?* ?急摮詨??祟?豢?隞?*銝?**鈭文?皛輻? LaTeX ??`.md`嚗?Ｗ standalone HTML嚗athJax/KaTeX CDN嚗???摮詨皜脫?嚗??嗡??舐?仿霈?耦撘??抒??扯釭??瑼??冽迨???～?雿輻???株?瘙箝??梯正銝敺甇方齒??
+- **瘥???頛芣撖怠?銋???HTML ?勗?嚗?026-06-15 雿輻??瘙?嚗?* 銝??鋆捱???嚗indings 閬?HTML??*?∪???頛芸摰寞撖恬?Mode A嚗 蝑?嚗閬?撖阡?撖怠?摰孵?Ｖ?隞?standalone HTML ?勗?**嚗athJax/KaTeX CDN????摮詨皜脫?嚗?????撖急挾?踝?locus嚗[source:]`嚗府頛?Mode B 蝯?嚗?雿輻???殷?銝??芸撠店鋆∠策????????[`handout/_audit/REVIEW-ch01-modec-candidates.html`](handout/_audit/REVIEW-ch01-modec-candidates.html) ?耦撘?瑼???`REVIEW-??applied.html` 銋?嚗??嚗?瘙箇阮????
+- **撖拇 finding 靽桀?敺???甇詨祟?賂?2026-06-12 雿輻??瘙?嚗?* 靽桀? blocking嚗dvisory finding 敺?銝?湔摰??摰?????靽格????頝?頛芸祟?賂?Codex ????撠??荔?嚗Ⅱ隤耨?寞頨急????交????甇詨祟?貊?蝯???里?豢?瑼葉閮???
+
+## 蝔?嚗極蝔遙??銵皞?嚗arpathy guidelines嚗?
+
+皞 [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)嚗ndrej Karpathy 撠?LLM 撖怎?撘虜閬???閫撖???*?嚗?* ??雓寞??芸??潮漲嚗蝣遙?銵???*?拍蝭?隞?`video/` ?Ｙ??uild 撌亙??祉?蝔?嚗極蝔極雿??銝?冽雓儔?批捆?啣神**?ode A ???撖漲隞誑?refer richness?? `[source:]`???芣?撖拇?皞?閬?[`video/CONTENT_METHODOLOGY.md`](video/CONTENT_METHODOLOGY.md)嚗?銝蝚?2 璇???撠?撘Ⅳ?? code嚗??摰寧?撟?
+
+- **1. ?單?璆???嚗hink Before Coding嚗?閬?皜研?閬?韏瑕????日?雓?*
+  - ?Ⅱ隤芸?身嚗?蝣箏?撠勗?嚗?閬?暺???
+  - ??蝔株圾霈??典??箔?嚗?閬?暺銝??
+  - ?蝪∪??瘜停雓?敹??????准?
+  - ?∩?撠勗?銝????芾ㄐ銝?璆??嗅???
+- **2. 蝪∪?芸?嚗implicity First嚗?撠? code 閫?捱??嚗?撖急?璈抒??梯正??*嚗???撘Ⅳ嚗??批捆蝭?嚗?
+  - 銝?瘝◤閬????踝?銝銝甈⊥?code 撱箸鞊∪惜??
+  - 銝?瘝◤閬????改??航身摰扼?銝銝?賜???撖恍隤方???
+  - 撖思? 200 銵? 50 銵停憭停?神?????瘛勗極蝔葦????摰?摨西?????
+- **3. 憭???撘耨?對?Surgical Changes嚗?????舐??唳嚗皜撌梯ˊ???摮?*
+  - 銝??????啁? code?酉閫????嚗?閬?瑽?憯??梯正??
+  - 瘥?Ｘ?憸冽嚗雿蹂???亦?撖急???
+  - ??⊿???dead code嚗??箔???閬??芸嚗蝘駁??雿??孵??????典??import嚗??賂??賢???
+  - 瑼ａ?嚗?銝銵??賜?亥蕭皞臬?雿輻??閬?嚗?銝??? review?? over-report 銝?湛???
+- **4. ?格?撽??瑁?嚗oal-Driven Execution嚗?摰儔??璅?嚗?餈游??圈?霅???*
+  - ?遙???撽??璅???撽??????粹?瘜撓?亙神皜祈岫??摰????耨 bug????撖怨??葫閰血?霈?????瑽?X???Ⅱ靽?敺葫閰阡??
+  - 憭郊撽遙??蝯虫??陛?剛??恬?甇仿? ??撽?暺?????皞?撘瑕停?質銵艘?????啗?車撘望?皞???琿?閬?皜?
+
+
+ succeeded in 617ms:
+<!-- Appendix A opener + 禮A.1 The Reciprocal Trigonometric Functions.
+     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC 禮16.2/禮16.3
+     + 禮3 register). Appendix established per user decision 2026-07-03: B-class
+     prerequisites worth a full treatment live here; the mainline keeps its shortest
+     in-place bridge and cross-refs this appendix (SPEC 禮16.2 ?蔭???).
+     禮A.1 is the appendix's first section, so it carries the appendix opener (a second
+     <article>), mirroring the chapter convention. Numbering is MANUAL, namespace "A":
+     Definition A.1; Proposition A.1; Example A.1; Caution unnumbered (per ch02+).
+     Counters continue into sec-a-2/sec-a-3. No figures (candidate figures are an
+     open question in CONTENT_ROADMAP's Appendix A entry).
+     Referenced from: 禮1.2 (reciprocal bridge), 禮3.1 (tan/sec derivatives context).
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Appendix A</div>
+    <h1 class="ch-title">Precalculus Toolbox</h1>
+  </header>
+
+  <p class="lead">This appendix collects the precalculus tools the main text needs but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions (禮A.1), the product-to-sum and sum-to-product identities (禮A.2), sigma notation and the geometric series (禮A.3), partial fractions (禮A.4), and a quick tour of the conic sections (禮A.5). Most are pointed to from the main text at the moment they are first needed; partial fractions and the conics are stocked ahead, for chapters still to come. The sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing here uses calculus, with one small exception flagged in 禮A.3, where an infinite sum is read as a limit in the sense of 禮1.3.</p>
+
+  <p class="para-head">By the end of this appendix, you will be able to:</p>
+  <ul>
+    <li>evaluate the reciprocal trigonometric functions \(\sec\), \(\csc\), and \(\cot\), and apply their Pythagorean identities with the correct signs;</li>
+    <li>derive every product-to-sum and sum-to-product identity from the angle-sum formulas ??and recover any one you forget;</li>
+    <li>manipulate sums in sigma notation and sum a geometric series, finite or infinite;</li>
+    <li>split a proper rational function into partial fractions;</li>
+    <li>read off each conic section's key features ??centre, vertices, foci, and axes ??from its standard equation.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.1</span>The Reciprocal Trigonometric Functions</h2>
+  </header>
+
+  <p>The three primary trigonometric functions \(\sin\), \(\cos\), and \(\tan\) have three companions ??two honest reciprocals and one inverted ratio. They carry no new information ??every fact about them is a fact about \(\sin\) and \(\cos\) in disguise. Yet calculus speaks them fluently: the derivative of \(\tan x\) turns out to be \(\sec^{2} x\) (禮3.1), the inverse secant needs its own principal range (禮1.2), and integral tables are full of secants and cosecants. This section gives them an honest introduction.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">A.1</span></p>
+    <div class="env-body">
+      <p>For any angle \(\theta\) at which the denominator is nonzero, the <em>secant</em>, <em>cosecant</em>, and <em>cotangent</em> functions are defined by
+      \[ \sec\theta = \frac{1}{\cos\theta}, \qquad \csc\theta = \frac{1}{\sin\theta}, \qquad \cot\theta = \frac{\cos\theta}{\sin\theta}. \]</p>
+      <p class="informal">Informally: secant is the reciprocal of cosine, cosecant is the reciprocal of sine, and cotangent flips the ratio that defines tangent. The names cross over historically ??<em>se</em>cant with <em>co</em>sine, <em>co</em>secant with sine ??and the pairing simply has to be memorized.</p>
+    </div>
+  </section>
+
+  <p>In a right triangle, the definitions invert the familiar ratios. Since \(\cos\theta\) is adjacent over hypotenuse, \(\sec\theta\) is hypotenuse over adjacent; since \(\sin\theta\) is opposite over hypotenuse, \(\csc\theta\) is hypotenuse over opposite; and \(\cot\theta\) is adjacent over opposite. Special-angle values follow instantly from the primary ones: for instance \(\sec\tfrac{\pi}{3} = 1/\cos\tfrac{\pi}{3} = 2\), and \(\cot\tfrac{\pi}{4} = 1\). Each function is undefined exactly where its denominator vanishes ??\(\sec\) and \(\tan\) at odd multiples of \(\tfrac{\pi}{2}\), \(\csc\) and \(\cot\) at multiples of \(\pi\) ??and near those angles its values blow up, producing the vertical asymptotes on their graphs.</p>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Cotangent is defined as \(\cos\theta/\sin\theta\), <em>not</em> as \(1/\tan\theta\). On most of the domain the two agree, but not everywhere: at \(\theta = \tfrac{\pi}{2}\) we have \(\cot\tfrac{\pi}{2} = \cos\tfrac{\pi}{2}/\sin\tfrac{\pi}{2} = 0/1 = 0\), a perfectly good value, while \(1/\tan\tfrac{\pi}{2}\) is meaningless ??\(\tan\tfrac{\pi}{2}\) is undefined. The quotient \(\cos/\sin\) is the robust definition; \(1/\tan\) is a shortcut valid only where \(\tan\theta\) is defined and nonzero.</p>
+    </div>
+  </section>
+
+  <p>Dividing the Pythagorean identity \(\sin^{2}\theta + \cos^{2}\theta = 1\) by \(\cos^{2}\theta\) or by \(\sin^{2}\theta\) produces the two companion identities that calculus uses constantly.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.1</span><span class="env-name">Pythagorean companions</span></p>
+    <div class="env-body">
+      <p>\[ \begin{aligned} 1 + \tan^{2}\theta &= \sec^{2}\theta \qquad (\cos\theta \neq 0), \\ 1 + \cot^{2}\theta &= \csc^{2}\theta \qquad (\sin\theta \neq 0). \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Divide \(\sin^{2}\theta + \cos^{2}\theta = 1\) through by \(\cos^{2}\theta\):
+      \[ \frac{\sin^{2}\theta}{\cos^{2}\theta} + 1 = \frac{1}{\cos^{2}\theta}, \qquad\text{that is,}\qquad \tan^{2}\theta + 1 = \sec^{2}\theta. \]
+      Dividing instead by \(\sin^{2}\theta\) gives \(1 + \cot^{2}\theta = \csc^{2}\theta\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.1</span></p>
+      <div class="env-body">
+        <p>Evaluate the following.</p>
+        <ol class="prompt-list">
+          <li>\(\sec\!\left(\tfrac{2\pi}{3}\right)\) and \(\cot\!\left(-\tfrac{\pi}{4}\right)\).</li>
+          <li>Given that \(\tan\theta = 3\) and \(\theta\) lies in the third quadrant, find \(\sec\theta\) and \(\csc\theta\).</li>
+        </ol>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ol class="sol-list">
+          <li>Since \(\cos\tfrac{2\pi}{3} = -\tfrac{1}{2}\), we get \(\sec\tfrac{2\pi}{3} = 1/(-\tfrac{1}{2}) = -2\). Since \(\cos(-\tfrac{\pi}{4}) = \tfrac{\sqrt{2}}{2}\) and \(\sin(-\tfrac{\pi}{4}) = -\tfrac{\sqrt{2}}{2}\), we get \(\cot(-\tfrac{\pi}{4}) = \frac{\sqrt{2}/2}{-\sqrt{2}/2} = -1\).</li>
+          <li>By Proposition A.1, \(\sec^{2}\theta = 1 + \tan^{2}\theta = 1 + 9 = 10\), so \(\sec\theta = \pm\sqrt{10}\). In the third quadrant \(\cos\theta < 0\), hence \(\sec\theta < 0\), and therefore \(\sec\theta = -\sqrt{10}\). For the cosecant, \(\cot\theta = 1/\tan\theta = \tfrac{1}{3}\) (legitimate here, since \(\tan\theta = 3\) is defined and nonzero), so \(\csc^{2}\theta = 1 + \cot^{2}\theta = 1 + \tfrac{1}{9} = \tfrac{10}{9}\) and \(\csc\theta = \pm\tfrac{\sqrt{10}}{3}\). In the third quadrant \(\sin\theta < 0\), so \(\csc\theta = -\tfrac{\sqrt{10}}{3}\). The squaring in Proposition A.1 forgets all signs; the quadrant restores them.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <p>That is the whole toolkit: three definitions, the right-triangle readings, and the two Pythagorean companions. In the main text these functions first appear in 禮1.2, where the inverse secant and cosecant need principal ranges of their own, and they return in 禮3.1, where the derivative of \(\tan x\) lands on \(\sec^{2} x\).</p>
+
+</article>
+
+
+codex
+The section text is readable despite some mojibake in comments; the mathematical prose itself is intact. I’m now locating the four plotted figure definitions and the spec register notes so the numeric checks and tone comparison are tied to exact loci.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n -C 12 "conic-circle|conic-parabola|conic-ellipse|conic-hyperbola" handout/appendixA-print-standalone.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"<p>|<figure|figcaption|Example|Solution|x\\"'^2|b'"\\"'^2|c =|asymptotes|4x'"\\"'^2" handout/fragments/appA/sec-a-5.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"16\\.2|16\\.3|register|Stewart|Rogawski|tone|voice|語域|禮3|§3|Chapter voice|style\" CONTENT_SPEC.md" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"conic|A\\.5|Precalculus Toolbox|quick tour|stocked\" CONTENT_SPEC.md" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 456ms:
+831-
+832-</article>
+833-</template>
+834-
+835-<template id="frag-sec-a-5">
+836-<!-- §A.5 The Conic Sections.
+837-     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+838-     + §3 register). Second-batch appendix section (user roster decision 2026-07-04),
+839-     written WITH figures (user directive "連圖一起寫").
+840-     Numbering is MANUAL, namespace "A", continuing from sec-a-4:
+841-     Example A.6; Figures A.1–A.4 (the appendix's first figures — A.1 circle,
+842-     A.2 parabola, A.3 ellipse, A.4 hyperbola).
+843:     Figure functions live in appendixA-print-standalone.html FIGS: conic-circle,
+844:     conic-parabola, conic-ellipse, conic-hyperbola (buildPlot curve-halves + dots/
+845-     reflines/labels; the circle uses an equal-aspect square plot so it renders round).
+846-     Depth note: a "quick tour" — standard forms centred/vertex at the origin, key
+847-     features stated, the distance definitions given informally. Forward-stock: Ch1–4
+848-     has no inbound reference; not registered as SPEC B-class (it is analytic geometry,
+849-     not a Ch1–4 prerequisite). Math verified during authoring: focus-directrix ⇒ x^2=4py,
+850-     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=±(b/a)x, Example A.6
+851-     (4x^2+9y^2=36 ⇒ x^2/9+y^2/4=1, foci (±√5,0)).
+852-     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+853-
+854-<article class="sec" lang="en">
+855-
+856-  <header class="sec-head">
+857-    <h2 class="sec-title"><span class="sec-no">A.5</span>The Conic Sections</h2>
+858-  </header>
+859-
+860-  <p>Slice a cone with a flat plane and the rim of the cut is a <em>conic section</em>: a circle, an ellipse, a parabola, or a hyperbola, according to the angle of the slice. Each also has a cleaner description in terms of distance, and each has a <em>standard equation</em> — the simplest form, obtained by placing the curve's centre or vertex at the origin. This tour records the four standard forms and the features to read straight off them. Like partial fractions, the conics are stocked here for later chapters; the main text of Chapters 1–4 does not call on them.</p>
+861-
+862-  <p><strong>The circle.</strong> A circle is the set of points a fixed distance \(r\) — the <em>radius</em> — from a centre. Centred at the origin, the condition \(\sqrt{x^2 + y^2} = r\) squares to the standard equation
+863-  \[ x^2 + y^2 = r^2. \]</p>
+864-
+865:  <figure class="figure" data-fig="conic-circle">
+866-    <figcaption><span class="fig-no">Figure A.1</span> A circle of radius \(r\) centred at the origin: \(x^2 + y^2 = r^2\).</figcaption>
+867-  </figure>
+868-
+869-  <p><strong>The parabola.</strong> Fix a point \(F\) (the <em>focus</em>) and a line (the <em>directrix</em>). A parabola is the set of points equidistant from the two. With focus \(F = (0, p)\) and directrix \(y = -p\), equating the two distances — \(x^2 + (y - p)^2 = (y + p)^2\) — and simplifying gives the standard equation
+870-  \[ x^2 = 4py, \]
+871-  a curve opening upward from its vertex at the origin. (Putting the focus on the \(x\)-axis instead gives the sideways form \(y^2 = 4px\).)</p>
+872-
+873:  <figure class="figure" data-fig="conic-parabola">
+874-    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+875-  </figure>
+876-
+877-  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+878-  \[ \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1, \qquad b^2 = a^2 - c^2, \]
+879-  with \(a > b > 0\). The curve crosses the axes at \((\pm a, 0)\) and \((0, \pm b)\); the longer semi-axis \(a\) runs along the line through the foci, and \(c = \sqrt{a^2 - b^2}\) locates them.</p>
+880-
+881:  <figure class="figure" data-fig="conic-ellipse">
+882-    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+883-  </figure>
+884-
+885-  <p><strong>The hyperbola.</strong> Keep two foci, but now ask for a fixed <em>difference</em> of distances rather than a sum. With foci at \((\pm c, 0)\) and the difference written \(2a\), the standard equation is
+886-  \[ \frac{x^2}{a^2} - \frac{y^2}{b^2} = 1, \qquad b^2 = c^2 - a^2. \]
+887-  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\), the crossed lines that govern its opening. Here \(c = \sqrt{a^2 + b^2}\), so the foci lie beyond the vertices.</p>
+888-
+889:  <figure class="figure" data-fig="conic-hyperbola">
+890-    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+891-  </figure>
+892-
+893-  <div class="workedexample">
+894-    <section class="env env-example">
+895-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.6</span></p>
+896-      <div class="env-body">
+897-        <p>Identify the curve \(4x^2 + 9y^2 = 36\) and locate its foci.</p>
+898-      </div>
+899-    </section>
+900-    <section class="env env-solution">
+901-      <p class="env-head"><span class="env-kicker">Solution</span></p>
+--
+1031-   In-figure labels also carry TeX via { type:"text", tex:"…" } and
+1032-   are typeset by the same MathJax pass — so every glyph in the graphs
+1033-   matches the body equations (Computer Modern).
+1034-   hydrateFigures(root) fills every <figure data-fig="id"> before
+1035-   its <figcaption>.
+1036-   ============================================================ */
+1037-(function () {
+1038-  const P = () => window.PIVAL;
+1039-  const pow2 = (x) => Math.pow(2, x);
+1040-
+1041-  const FIGS = {
+1042-    /* ---------------- Appendix A §A.5 — conic sections (self-authored 2026-07-04) ---------------- */
+1043:    "conic-circle": () => ({
+1044-      layout: "single",
+1045-      panels: [{
+1046-        svg: buildPlot({
+1047-          w: 250, h: 250, pad: { t: 18, r: 18, b: 18, l: 18 },
+1048-          xmin: -2.8, xmax: 2.8, ymin: -2.8, ymax: 2.8,
+1049-          xlabel: "x", ylabel: "y", aria: "A circle of radius r centred at the origin, with one radius drawn to the rim.",
+1050-          items: [
+1051-            { type: "curve", fn: (x) => Math.sqrt(Math.max(0, 4 - x * x)), domain: [-2, 2], samples: 320, cls: "curve" },
+1052-            { type: "curve", fn: (x) => -Math.sqrt(Math.max(0, 4 - x * x)), domain: [-2, 2], samples: 320, cls: "curve" },
+1053-            { type: "seg", x1: 0, y1: 0, x2: 1.414, y2: 1.414, cls: "refline" },
+1054-            { type: "dot", x: 0, y: 0 },
+1055-            { type: "text", x: 0.58, y: 0.86, tex: "r", cls: "a-ref", anchor: "end" },
+1056-            { type: "text", x: -0.12, y: -0.12, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+1057-          ],
+1058-        }),
+1059-        note: "A circle: every point lies a fixed distance \\(r\\) from the centre \\(O\\).",
+1060-      }],
+1061-    }),
+1062:    "conic-parabola": () => ({
+1063-      layout: "single",
+1064-      panels: [{
+1065-        svg: buildPlot({
+1066-          w: 270, h: 240, pad: { t: 18, r: 18, b: 18, l: 18 },
+1067-          xmin: -3.7, xmax: 3.7, ymin: -1.6, ymax: 4.8,
+1068-          xlabel: "x", ylabel: "y", aria: "An upward parabola with its focus above the vertex and its directrix a dashed line below.",
+1069-          items: [
+1070-            { type: "curve", fn: (x) => x * x / 4, domain: [-3.7, 3.7], samples: 220, cls: "curve" },
+1071-            { type: "hline", y: -1, from: -3.4, to: 3.4, cls: "refline" },
+1072-            { type: "dot", x: 0, y: 1 },
+1073-            { type: "text", x: 0.16, y: 1.08, tex: "F=(0,p)", cls: "a-pt", anchor: "start" },
+1074-            { type: "text", x: 3.4, y: -1, tex: "y=-p", cls: "a-ref", anchor: "end", vAnchor: "top", dy: 3 },
+1075-            { type: "text", x: -0.14, y: 0.02, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+1076-          ],
+1077-        }),
+1078-        note: "A parabola \\(x^2=4py\\): every point is equidistant from the focus \\(F\\) and the directrix \\(y=-p\\).",
+1079-      }],
+1080-    }),
+1081:    "conic-ellipse": () => ({
+1082-      layout: "single",
+1083-      panels: [{
+1084-        svg: buildPlot({
+1085-          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+1086-          xmin: -3.7, xmax: 3.7, ymin: -2.8, ymax: 2.8,
+1087-          xlabel: "x", ylabel: "y", aria: "An ellipse wider than it is tall, with two foci on the horizontal axis.",
+1088-          items: [
+1089-            { type: "curve", fn: (x) => 2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+1090-            { type: "curve", fn: (x) => -2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+1091-            { type: "dot", x: 2.236, y: 0 },
+1092-            { type: "dot", x: -2.236, y: 0 },
+1093-            { type: "dot", x: 0, y: 0 },
+1094-            { type: "text", x: 2.236, y: -0.12, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1095-            { type: "text", x: -2.236, y: -0.12, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1096-            { type: "text", x: 3.02, y: 0.12, tex: "(a,0)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+1097-            { type: "text", x: 0.14, y: 2.0, tex: "(0,b)", cls: "a-pt", anchor: "start", vAnchor: "middle" },
+1098-            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+1099-          ],
+1100-        }),
+1101-        note: "An ellipse \\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1\\) with \\(a>b\\): the distances to the two foci \\(F_1,F_2\\) sum to a constant.",
+1102-      }],
+1103-    }),
+1104:    "conic-hyperbola": () => ({
+1105-      layout: "single",
+1106-      panels: [{
+1107-        svg: buildPlot({
+1108-          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+1109-          xmin: -5.2, xmax: 5.2, ymin: -4, ymax: 4,
+1110-          xlabel: "x", ylabel: "y", aria: "A hyperbola with two branches opening left and right, hugging two dashed asymptotes.",
+1111-          items: [
+1112-            { type: "seg", x1: -5, y1: -3.75, x2: 5, y2: 3.75, cls: "refline" },
+1113-            { type: "seg", x1: -5, y1: 3.75, x2: 5, y2: -3.75, cls: "refline" },
+1114-            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+1115-            { type: "curve", fn: (x) => -1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+1116-            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [-5.2, -2], samples: 200, cls: "curve" },
+
+ succeeded in 485ms:
+6:     Example A.6; Figures A.1–A.4 (the appendix's first figures — A.1 circle,
+14:     not a Ch1–4 prerequisite). Math verified during authoring: focus-directrix ⇒ x^2=4py,
+15:     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=±(b/a)x, Example A.6
+16:     (4x^2+9y^2=36 ⇒ x^2/9+y^2/4=1, foci (±√5,0)).
+25:  <p>Slice a cone with a flat plane and the rim of the cut is a <em>conic section</em>: a circle, an ellipse, a parabola, or a hyperbola, according to the angle of the slice. Each also has a cleaner description in terms of distance, and each has a <em>standard equation</em> — the simplest form, obtained by placing the curve's centre or vertex at the origin. This tour records the four standard forms and the features to read straight off them. Like partial fractions, the conics are stocked here for later chapters; the main text of Chapters 1–4 does not call on them.</p>
+27:  <p><strong>The circle.</strong> A circle is the set of points a fixed distance \(r\) — the <em>radius</em> — from a centre. Centred at the origin, the condition \(\sqrt{x^2 + y^2} = r\) squares to the standard equation
+28:  \[ x^2 + y^2 = r^2. \]</p>
+30:  <figure class="figure" data-fig="conic-circle">
+31:    <figcaption><span class="fig-no">Figure A.1</span> A circle of radius \(r\) centred at the origin: \(x^2 + y^2 = r^2\).</figcaption>
+34:  <p><strong>The parabola.</strong> Fix a point \(F\) (the <em>focus</em>) and a line (the <em>directrix</em>). A parabola is the set of points equidistant from the two. With focus \(F = (0, p)\) and directrix \(y = -p\), equating the two distances — \(x^2 + (y - p)^2 = (y + p)^2\) — and simplifying gives the standard equation
+35:  \[ x^2 = 4py, \]
+38:  <figure class="figure" data-fig="conic-parabola">
+39:    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+42:  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+43:  \[ \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1, \qquad b^2 = a^2 - c^2, \]
+44:  with \(a > b > 0\). The curve crosses the axes at \((\pm a, 0)\) and \((0, \pm b)\); the longer semi-axis \(a\) runs along the line through the foci, and \(c = \sqrt{a^2 - b^2}\) locates them.</p>
+46:  <figure class="figure" data-fig="conic-ellipse">
+47:    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+50:  <p><strong>The hyperbola.</strong> Keep two foci, but now ask for a fixed <em>difference</em> of distances rather than a sum. With foci at \((\pm c, 0)\) and the difference written \(2a\), the standard equation is
+51:  \[ \frac{x^2}{a^2} - \frac{y^2}{b^2} = 1, \qquad b^2 = c^2 - a^2. \]
+52:  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\), the crossed lines that govern its opening. Here \(c = \sqrt{a^2 + b^2}\), so the foci lie beyond the vertices.</p>
+54:  <figure class="figure" data-fig="conic-hyperbola">
+55:    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+60:      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.6</span></p>
+62:        <p>Identify the curve \(4x^2 + 9y^2 = 36\) and locate its foci.</p>
+66:      <p class="env-head"><span class="env-kicker">Solution</span></p>
+68:        <p>Divide through by \(36\) to reach standard form:
+69:        \[ \frac{x^2}{9} + \frac{y^2}{4} = 1. \]
+70:        Both squared terms are added, so the curve is an ellipse, with \(a^2 = 9\) and \(b^2 = 4\) — that is \(a = 3\) and \(b = 2\). Since \(a > b\), the major axis is horizontal, and \(c = \sqrt{a^2 - b^2} = \sqrt{9 - 4} = \sqrt{5}\). The foci therefore sit at \((\pm\sqrt{5},\, 0)\), about \((\pm 2.24,\, 0)\). Had the sign between the terms been a minus, the same reading would have named a hyperbola instead, with \(c = \sqrt{a^2 + b^2}\).</p>
+75:  <p>Those are the four curves, their standard equations, and the features — centre, radius, focus, directrix, foci, axes, and asymptotes — that each equation puts on display. Moving a centre or vertex off the origin only replaces \(x\) and \(y\) with \((x - h)\) and \((y - k)\); the shapes, and everything this tour named, are unchanged.</p>
+
+ succeeded in 490ms:
+3:**Version 3.3**——單點新增：§16「難度定位與先備知識基線」（2026-07-03 與使用者議定）——雙軸難度定位（深度軸允許向數學分析靠攏的誠實構造；語域軸維持 Stewart / Rogawski 由深入淺）＋ 108 課綱數A（不含選修數甲）的 A／B／C 三類先備清單（B 類首次使用必須就地建立，違者為 blocking）＋ precalculus 附錄收納政策＋新章（含無手稿自產）的深度決策程序；原 §16 Changelog 順延為 §17。其餘內容承襲 v3.2（習題移出講義本體）與 v3.1／v3.0——v3.0 是從零重寫取代 v1.x 和 v2.x，圍繞一個明確的產品定義重新組織規則書：一份 single-sided A4 英文講義，對象為準備自修大學微積分的高中生，搭配影片，以 Stewart / Rogawski 語域撰寫。Changelog（§17）列出具體差異。
+55:## 3. 語域與語聲
+57:### 目標語域
+59:講義以 **Stewart / Rogawski** 的語域撰寫：讓自學的高中讀者能讀懂、溫暖但不話嘮、對數學嚴謹但對讀者不冷淡。
+65:- **目標**：Stewart。完整句子帶明確 connective、直覺穿插在散文中偶爾進入 definition environment、chapter 和 section opening 有動機段落、大量 worked example、頻繁的圖表。
+67:語域**不是**非正式數學的藉口。Definition 仍精確；proof 仍完整；limit law 仍是 limit law。放鬆的是圍繞數學的散文，不是數學本身。
+71:主要代名詞為 **"we"**，將讀者納入論證中。這是 Stewart / Apostol 傳統。
+84:以下用語受到鼓勵，能幫助自學讀者追蹤論證。它們不是 MUST——過度使用任何一句都比隱含的轉折更糟——但零銜接用語的草稿對目標語域而言幾乎總是太緊。
+103:Rationale：Stewart 語域加上自足的 handout 意味著讀者無法依賴老師即時「翻譯」formal statement。講義本身必須做這個翻譯，通常做兩次——一次在 formal statement 之前的動機散文中，一次（當語法上很重的形式主義有必要時，如 $\varepsilon$-$\delta$）作為 definition 內部的 inline gloss。「接近英語時跳過」的條款存在是為了防止 inline gloss 變成反射動作：一個 symbolic body 本身就是口語化的 definition 從 paraphrase 中得不到任何好處。
+122:以下範文示範目標語聲，涵蓋講義四種主要散文型別：① 動機鋪陳、② worked solution（全書大宗）、③ 歷史／應用旁註、④ 直覺 gloss。對語域有疑問時，把草稿與**對應型別**的範文對照。**所有範文逐字取自開放授權的真人微積分教材**（OpenStax Calculus Volume 1、CLP-1 Calculus，皆 **CC BY-NC-SA**，各標出處）——刻意用真人範本、不取本書 Chapter 1，以免「拿 Ch1 對 Ch1」的循環標靶（見 [`PLAN-deai-semantic-critic.md`](PLAN-deai-semantic-critic.md) §0／§3）。數學內容未改，僅把來源的純文字行內數學依本節 Markdown 慣例正規化為 `$...$`／`$$...$$`／`*…*`。型① 的兩段同時是語意/聲音 critic 的正面錨（[`handout/_audit/anchors/svc-exemplars.md`](handout/_audit/anchors/svc-exemplars.md)）。
+134:- **voice**：§3 那點暖到位但不話嘮——motivation-before-formalism、主代名詞 "we"、真連接詞 "However"，對讀者誠實而非乾巴巴斷言。
+136:**範文 2（concrete-to-abstract，OpenStax §3.1）——** 與範文 1 互補：從可觸摸的物件（$\sqrt{x}$、收緊的區間）建起 local-linearity，最後才命名概念，示範 Stewart 招牌的 concrete-to-abstract：
+140:〔source: OpenStax Calculus Vol.1, §3.1, CC BY-NC-SA〕關鍵特徵：
+143:- **voice**："In fact, … locally linear" 把直覺當小小揭示而非平板定義——concrete-to-abstract 的那點暖。
+161:**OpenStax §3.1**（微積分歸屬於 Newton／Leibniz）：
+165:〔source: OpenStax Calculus Vol.1, §3.1, CC BY-NC-SA〕關鍵特徵：
+204:- Proper noun 無論大小寫風格一律大寫（如 *Newton's method*、*Stewart's notation*）。
+412:- *應用動機*：*"Exponential functions model radioactive decay, continuously compounded interest, and population growth under constant per-capita rates. We will return to each in §3.6."*
+423:在 chapter 或 section 開頭、或關鍵概念緊前方的短歷史或應用動機筆記（2–5 句）是 `remark` 的好用法，直接支持目標語域。
+448:Rationale：Stewart-style 的解題策略框是自學讀者最明顯受益的功能之一。此 environment 使策略可透過掃視而非重讀 worked example 並逆向工程模式來發現。
+629:### Inline `\displaystyle`
+631:**謹慎地**使用 `\(\displaystyle ...\)`，僅在以下兩項同時成立時：
+636:*允許的例子*：*"the difference quotient $\displaystyle \frac{f(x+h) - f(x)}{h}$"*。
+638:不要將 `\displaystyle` 作為讓公式看起來「重要」的預設方式。如果一個公式重要到需要突出，把它移到 display math。
+656:| 帶 large operator 的 inline formula，句子不能斷 | `\(\displaystyle ...\)` |
+696:Rationale：單一強調機制意味著讀者學一個 visual cue。Running prose 中多種強調機制稀釋信號並迫使作者做出應被預先決定的 style 選擇。
+705:Rationale：色彩編碼承載教學意義，文字 label 確保語義不只靠色彩傳達（與 §10 的冗餘編碼一致）。色彩在 `shared/skin-hs.css` 集中定義一次，作者不在 fragment 內寫 inline `style=`。
+728:| Trigonometric function | `\sin`、`\cos`、`\tan` 等（皆透過 `\operatorname`-style macro，非斜體字母） |
+759:Rationale：自學讀者嚴重依賴視覺直覺。一章每五頁一張圖對高中讀者而言太稀疏；Stewart 密度（視覺豐富主題中接近每頁一張圖）是正確的鄰域。
+822:Rationale：自學讀者從有 annotation 的圖表中吸收資訊的速度顯著快於無 annotation 的。Stewart-style callout 是目標語域中最高槓桿的視覺元素。
+851:- **Line style**——solid 用於 primary curve、`dashed` 用於 reference line 和 asymptote、`dotted` 用於 auxiliary / scaffolding construction；
+863:圖表 **MUST** 在 grayscale 下保持可讀——色彩是語義的，疊加在 line-style 和 marker 資訊之上，而非取代之。
+895:如果手稿已包含 figure idea，保留其數學目的。以上方指定的乾淨教科書 style 重繪；不保留手寫或黑板 styling。
+909:未通過 lookup test 的項目**不**屬於 index，即使作者碰巧給它們了名字：單一 proof 中的一次性 substitution variable、僅在自身段落中使用的 throwaway example label、proof 從不再引用的 intermediate lemma-style claim、只在 context 中有意義的 mnemonic。加入這些會弄亂 index 並降低讀者真正需要找到的項目的品質。
+952:- inline `style=` 或 fragment 內的 `<style>`／`<script>`（render 由 chapter template 與 `shared/` 供給；色彩等樣式集中在 skin CSS）。
+976:（legacy 註記：凍結的 LaTeX book 曾由 `.github/workflows/latex-checks.yml` 跑 `tools/book_style_lint.py`／`book_preamble_smoketest.py`／`book_docs_lint.py` 與 `latexmk -pdf … main.tex` 四項檢查；`book_*.py` 工具已移至 `legacy/tex_handout/tools/`，原 `latex-checks.yml` 已移除、HTML handout 改由 `.github/workflows/handout-checks.yml` 建置，皆不再 gate 內容規則。）
+1029:**定位與語域**
+1031:- [ ] Pronoun 遵循 §3："we" 為預設；"you" 僅用於溫和提醒或 forward reference。
+1084:- [ ] Fragment 中無 inline `style=`／`<style>`／`<script>`、無 per-section 自訂數學巨集。
+1097:（2026-07-03 新增。緣起：前四章難度評估發現難度落差源於多作者手稿在「深度軸」上各帶預設——本 spec 原僅定義語域（§3）、未定義深度，兩位作者遂各自填入了 Stewart 深度與分析深度。全程紀錄：`handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`。）
+1102:- **語域軸——講解一律維持 §3 的 Stewart / Rogawski 語域**：動機先行、由深入淺、informal gloss、分級 worked example。深度的提升 MUST NOT 以語域緊縮支付——內容再難，講法仍是溫暖的教科書，不是分析講義。
+1103:- **難度預算**：mainline 節以「§16.2 基線讀者 effortful 但可自行走完」為上限；超出者 MUST 標為 foundation 章／Proof track（機制見 `handout/TYPESETTING_GUIDE.md` §10）並提供初讀路徑。
+1104:- **護欄**：(1) foundation／Proof-track 標示；(2) §16.2 先備基線（違反 B 類＝blocking finding）；(3) 初學者模擬複驗（persona＝§16.2 基線讀者；納入正式章完成閘序另議，現行慣例見上述 audit 紀錄）。
+1106:### 16.2 先備知識基線（108 課綱數A、不含選修數甲）
+1116:**處置慣例**：B 類的就地補寫為一至數行 bridge（既有範例：§1.2 倒數三角定義、§3.1 和差化積推導、§2.4 無窮和 on-ramp、§4.1 無窮等比級數推導）。值得完整鋪開者集中到 **precalculus 附錄**（2026-07-03 使用者裁示；立項規劃見 `CONTENT_ROADMAP.md`）——課文就地保留最短 bridge 並 cross-ref 附錄，不因附錄存在而省去就地 bridge。
+1118:### 16.3 新章節（含無手稿自產內容）的深度決策
+1120:新章 MUST 在 roadmap entry 階段做深度決策：哪些結果誠實證明、哪些 on-credit 掛帳（fence 到補證處）、哪些引用不證（明文告知讀者）。無手稿的自產章節以本節＋§3 語域為 authoring brief；整合多作者手稿時，以本節取代作者個人預設作為深度仲裁基準。
+1124:- **v3.3（2026-07-04 addendum）**——§16.2 B 類清單新增「部分分式分解」（rational function 拆解，積分技巧先備；precalculus 附錄 A.4 完整鋪開；forward-stock，Ch1–4 無 inbound 引用）。緣起：Appendix A 第二批 roster（使用者 2026-07-04 裁決）。
+1126:- **v3.3**——新增 §16「難度定位與先備知識基線」（2026-07-03 與使用者議定）：雙軸難度定位（深度軸允許分析式誠實構造；語域軸維持 Stewart/Rogawski 由深入淺）；108 課綱數A（不含選修數甲）A／B／C 三類先備清單（B 類首次使用必須就地建立，違者 blocking——sec/csc/cot、和差化積、e 與 ln、極限、無窮等比級數等均屬 B 類）；precalculus 附錄收納政策；新章（含無手稿自產）深度決策程序。原 §16 Changelog 順延為 §17（版本頭與 §13 內的兩處參照已同步）。緣起與證據：前四章難度評估、多作者深度落差討論與兩輪修補（`handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`）。
+1130:- **v3.1**——framework split 和 implementation 落地。v3.0 文件被拆分為四個以作者實際使用方式為 key 的 author-facing 檔案：本檔（authoritative spec）、[`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)（1–2 頁日常參考）、[`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)（course arc、chapter order、prerequisite、per-chapter core skills）、以及 `CONTENT_EXERCISES.md`（完整延後設計前的最低習題骨架；v3.2 已刪除）。v3.0 下標記為 pending 的 preamble 和 template implementation 現已落地：per-env chapter-scoped counter（透過個別 `\newtheorem`）、`caution` 和 `strategy` environment（透過 `\newmdtheoremenv`）、`preamble/colors.tex` 中的 three-role semantic palette、擴展的 `tools/book_style_lint.py` 規則、以及更新的 `_chapter_template.tex`。本次 pass 中新增的 content-level 精煉：remark policy 擴展為 usefulness test 附明確的好壞範例；figure 在 §10 新增 "Redundant encoding for grayscale and accessibility" subsection，要求 line-style / label / marker 與色彩並行；index policy 在 §11 新增覆蓋性的 "lookup test" 判斷準則。§5 中的 `example` + `solution` pairing rule 現在在本文件和 `chapters/_chapter_template.tex` 之間已對齊（每個 `example` MUST 包在 `workedexample` 中；standalone `example` 不再允許）。Exercise 編號現為 per-section（Exercise 1, 2, ...，每 `\section` reset）而非 chapter-scoped，反映 end-of-section exercise block 是 locally consume 的。
+1132:- **v3.0**——從零重寫。目標語域從 Spivak / Apostol（shared formal-statement counter、austere pronoun、strict definition purity、sparse figure 和 remark）轉為 Stewart / Rogawski（per-type counter、特定 context 中允許 "you"、`definition` 中允許 *"Informally, ..."* gloss、denser figure 和更大方的 remark）。新增 `caution` 和 `strategy` environment 以支持 notation-trap warning 和解題策略框；`lemma` 移除。Display-helper set 從 7 減為 5（移除 `\iffstackeddisplay` 和 `\iffwithconditions`）。Display Block Cohesion 從 MUST 降為 SHOULD。Index policy 擴展以涵蓋 key example、notation trap 和首次提及的 applied setting。Chapter opening 新增 mandatory learning-outcomes bullet list；chapter closing 新增 mandatory `\section*{Summary}` block。動機散文中允許 `\emph{...}` 用於術語首次出現。Exercise-system design 延後至主要內容完成。CI 檢查擴展以涵蓋新規則。Notation policy 整合為獨立的 section（§9）。語聲參考範文以 Stewart tone 重寫。
+1136:- **v2.x**——早期版本（v2.0 到 v2.0.11）透過 per-chapter review 累積規則新增；所得文件以新增日期而非主題組織。v2.x 中原封保留至 v3.0 的重要決策包括：cleveref-only cross-reference、`[H]` 預設 figure placement 附 Exception Protocol、shared formula-display helper `aligneddisplay` / `conditiondisplay` / `\pairdisplay`、chapter-scoped counter、paired-definition cross-reference rule、`workedexample` wrapper semantics、`solution` 最後 display 行的 `\qedhere`、以及 three-layer CI（style lint + preamble smoketest + latexmk）。
+
+ exited 1 in 529ms:
+2026-07-04T03:00:27.346579Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.5 seconds
+Output:
+
+codex
+The prose matches the appendix pattern at a first pass: motivated opener, compact definitions, worked example, and a closing summary. I’m checking the remaining hyperbola figure lines now, including labels for foci, vertices, and asymptotes.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n -C 25 "conic-ellipse" handout/appendixA-print-standalone.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n -C 35 "conic-hyperbola" handout/appendixA-print-standalone.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"F_1|F_2|y=\\\\pm|y=-p|F=\\(0,p\\)|\\(a,0\\)|\\(0,b\\)|\\(-a,0\\)|\\(c,0\\)|asymptote|vertex|directrix\" handout/appendixA-print-standalone.html" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"the conic sections|conic sections|A\\.5|Conic\" CONTENT_ROADMAP.md handout/fragments/appA/*.html handout/appendixA-print-standalone.html" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 431ms:
+809-        </ol>
+810-      </div>
+811-    </section>
+812-    <section class="env env-solution">
+813-      <p class="env-head"><span class="env-kicker">Solution</span></p>
+814-      <div class="env-body">
+815-        <ol class="sol-list">
+816-          <li>The repeated factor \((x - 1)^{2}\) needs both powers: \(\dfrac{x}{(x - 1)^{2}} = \dfrac{A}{x - 1} + \dfrac{B}{(x - 1)^{2}}\). Clearing denominators, \(x = A(x - 1) + B\). Setting \(x = 1\) gives \(B = 1\); matching the coefficient of \(x\) gives \(A = 1\). So \(\dfrac{x}{(x - 1)^{2}} = \dfrac{1}{x - 1} + \dfrac{1}{(x - 1)^{2}}\).</li>
+817-          <li>The quadratic \(x^{2} + 1\) does not factor over the reals — there is no real root to cover up — so it carries a linear numerator, and its constants come from matching coefficients: \(\dfrac{x + 1}{x(x^{2} + 1)} = \dfrac{A}{x} + \dfrac{Bx + C}{x^{2} + 1}\). Clearing denominators, \(x + 1 = A(x^{2} + 1) + (Bx + C)x = (A + B)x^{2} + Cx + A\). Matching powers: the constant term gives \(A = 1\), the coefficient of \(x\) gives \(C = 1\), and the coefficient of \(x^{2}\) gives \(A + B = 0\), so \(B = -1\). Hence \(\dfrac{x + 1}{x(x^{2} + 1)} = \dfrac{1}{x} + \dfrac{1 - x}{x^{2} + 1}\).</li>
+818-        </ol>
+819-      </div>
+820-    </section>
+821-  </div>
+822-
+823-  <section class="env env-caution">
+824-    <p class="env-head"><span class="env-kicker">Caution</span></p>
+825-    <div class="env-body">
+826-      <p>Partial fractions applies only to a <em>proper</em> fraction. Faced with \(\dfrac{x^{2}}{x - 1}\), divide first: \(x^{2} = (x - 1)(x + 1) + 1\), so \(\dfrac{x^{2}}{x - 1} = x + 1 + \dfrac{1}{x - 1}\). No combination of the form \(\dfrac{A}{x - 1}\) alone can reproduce a numerator that outgrows its denominator — the polynomial part must be divided out before the templates apply.</p>
+827-    </div>
+828-  </section>
+829-
+830-  <p>Every fragment this method produces — \(\dfrac{A}{x - a}\), \(\dfrac{A}{(x - a)^{k}}\), and \(\dfrac{Bx + C}{(x^{2} + px + q)^{k}}\) — has a standard antiderivative, which is why partial fractions is the opening move for integrating a rational function. That payoff belongs to the integration chapters; the algebra it rests on is complete here.</p>
+831-
+832-</article>
+833-</template>
+834-
+835-<template id="frag-sec-a-5">
+836-<!-- §A.5 The Conic Sections.
+837-     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+838-     + §3 register). Second-batch appendix section (user roster decision 2026-07-04),
+839-     written WITH figures (user directive "連圖一起寫").
+840-     Numbering is MANUAL, namespace "A", continuing from sec-a-4:
+841-     Example A.6; Figures A.1–A.4 (the appendix's first figures — A.1 circle,
+842-     A.2 parabola, A.3 ellipse, A.4 hyperbola).
+843-     Figure functions live in appendixA-print-standalone.html FIGS: conic-circle,
+844:     conic-parabola, conic-ellipse, conic-hyperbola (buildPlot curve-halves + dots/
+845-     reflines/labels; the circle uses an equal-aspect square plot so it renders round).
+846-     Depth note: a "quick tour" — standard forms centred/vertex at the origin, key
+847-     features stated, the distance definitions given informally. Forward-stock: Ch1–4
+848-     has no inbound reference; not registered as SPEC B-class (it is analytic geometry,
+849-     not a Ch1–4 prerequisite). Math verified during authoring: focus-directrix ⇒ x^2=4py,
+850-     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=±(b/a)x, Example A.6
+851-     (4x^2+9y^2=36 ⇒ x^2/9+y^2/4=1, foci (±√5,0)).
+852-     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+853-
+854-<article class="sec" lang="en">
+855-
+856-  <header class="sec-head">
+857-    <h2 class="sec-title"><span class="sec-no">A.5</span>The Conic Sections</h2>
+858-  </header>
+859-
+860-  <p>Slice a cone with a flat plane and the rim of the cut is a <em>conic section</em>: a circle, an ellipse, a parabola, or a hyperbola, according to the angle of the slice. Each also has a cleaner description in terms of distance, and each has a <em>standard equation</em> — the simplest form, obtained by placing the curve's centre or vertex at the origin. This tour records the four standard forms and the features to read straight off them. Like partial fractions, the conics are stocked here for later chapters; the main text of Chapters 1–4 does not call on them.</p>
+861-
+862-  <p><strong>The circle.</strong> A circle is the set of points a fixed distance \(r\) — the <em>radius</em> — from a centre. Centred at the origin, the condition \(\sqrt{x^2 + y^2} = r\) squares to the standard equation
+863-  \[ x^2 + y^2 = r^2. \]</p>
+864-
+865-  <figure class="figure" data-fig="conic-circle">
+866-    <figcaption><span class="fig-no">Figure A.1</span> A circle of radius \(r\) centred at the origin: \(x^2 + y^2 = r^2\).</figcaption>
+867-  </figure>
+868-
+869-  <p><strong>The parabola.</strong> Fix a point \(F\) (the <em>focus</em>) and a line (the <em>directrix</em>). A parabola is the set of points equidistant from the two. With focus \(F = (0, p)\) and directrix \(y = -p\), equating the two distances — \(x^2 + (y - p)^2 = (y + p)^2\) — and simplifying gives the standard equation
+870-  \[ x^2 = 4py, \]
+871-  a curve opening upward from its vertex at the origin. (Putting the focus on the \(x\)-axis instead gives the sideways form \(y^2 = 4px\).)</p>
+872-
+873-  <figure class="figure" data-fig="conic-parabola">
+874-    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+875-  </figure>
+876-
+877-  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+878-  \[ \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1, \qquad b^2 = a^2 - c^2, \]
+879-  with \(a > b > 0\). The curve crosses the axes at \((\pm a, 0)\) and \((0, \pm b)\); the longer semi-axis \(a\) runs along the line through the foci, and \(c = \sqrt{a^2 - b^2}\) locates them.</p>
+880-
+881-  <figure class="figure" data-fig="conic-ellipse">
+882-    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+883-  </figure>
+884-
+885-  <p><strong>The hyperbola.</strong> Keep two foci, but now ask for a fixed <em>difference</em> of distances rather than a sum. With foci at \((\pm c, 0)\) and the difference written \(2a\), the standard equation is
+886-  \[ \frac{x^2}{a^2} - \frac{y^2}{b^2} = 1, \qquad b^2 = c^2 - a^2. \]
+887-  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\), the crossed lines that govern its opening. Here \(c = \sqrt{a^2 + b^2}\), so the foci lie beyond the vertices.</p>
+888-
+889:  <figure class="figure" data-fig="conic-hyperbola">
+890-    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+891-  </figure>
+892-
+893-  <div class="workedexample">
+894-    <section class="env env-example">
+895-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.6</span></p>
+896-      <div class="env-body">
+897-        <p>Identify the curve \(4x^2 + 9y^2 = 36\) and locate its foci.</p>
+898-      </div>
+899-    </section>
+900-    <section class="env env-solution">
+901-      <p class="env-head"><span class="env-kicker">Solution</span></p>
+902-      <div class="env-body">
+903-        <p>Divide through by \(36\) to reach standard form:
+904-        \[ \frac{x^2}{9} + \frac{y^2}{4} = 1. \]
+905-        Both squared terms are added, so the curve is an ellipse, with \(a^2 = 9\) and \(b^2 = 4\) — that is \(a = 3\) and \(b = 2\). Since \(a > b\), the major axis is horizontal, and \(c = \sqrt{a^2 - b^2} = \sqrt{9 - 4} = \sqrt{5}\). The foci therefore sit at \((\pm\sqrt{5},\, 0)\), about \((\pm 2.24,\, 0)\). Had the sign between the terms been a minus, the same reading would have named a hyperbola instead, with \(c = \sqrt{a^2 + b^2}\).</p>
+906-      </div>
+907-    </section>
+908-  </div>
+909-
+910-  <p>Those are the four curves, their standard equations, and the features — centre, radius, focus, directrix, foci, axes, and asymptotes — that each equation puts on display. Moving a centre or vertex off the origin only replaces \(x\) and \(y\) with \((x - h)\) and \((y - k)\); the shapes, and everything this tour named, are unchanged.</p>
+911-
+912-</article>
+913-</template>
+914-<!-- END-CONTENT-FRAGMENTS -->
+915-<!-- plot.js — inlined -->
+916-<script>
+917-(function () {
+918-  var uid = 0;
+919-  var PI = Math.PI;
+920-  function piTex(v) {
+921-    var map = {};
+922-    map[(-2 * PI).toFixed(4)] = "-2\\pi";
+923-    map[(-PI).toFixed(4)] = "-\\pi";
+924-    map[(-PI / 2).toFixed(4)] = "-\\tfrac{\\pi}{2}";
+--
+1069-          items: [
+1070-            { type: "curve", fn: (x) => x * x / 4, domain: [-3.7, 3.7], samples: 220, cls: "curve" },
+1071-            { type: "hline", y: -1, from: -3.4, to: 3.4, cls: "refline" },
+1072-            { type: "dot", x: 0, y: 1 },
+1073-            { type: "text", x: 0.16, y: 1.08, tex: "F=(0,p)", cls: "a-pt", anchor: "start" },
+1074-            { type: "text", x: 3.4, y: -1, tex: "y=-p", cls: "a-ref", anchor: "end", vAnchor: "top", dy: 3 },
+1075-            { type: "text", x: -0.14, y: 0.02, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+1076-          ],
+1077-        }),
+1078-        note: "A parabola \\(x^2=4py\\): every point is equidistant from the focus \\(F\\) and the directrix \\(y=-p\\).",
+1079-      }],
+1080-    }),
+1081-    "conic-ellipse": () => ({
+1082-      layout: "single",
+1083-      panels: [{
+1084-        svg: buildPlot({
+1085-          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+1086-          xmin: -3.7, xmax: 3.7, ymin: -2.8, ymax: 2.8,
+1087-          xlabel: "x", ylabel: "y", aria: "An ellipse wider than it is tall, with two foci on the horizontal axis.",
+1088-          items: [
+1089-            { type: "curve", fn: (x) => 2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+1090-            { type: "curve", fn: (x) => -2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+1091-            { type: "dot", x: 2.236, y: 0 },
+1092-            { type: "dot", x: -2.236, y: 0 },
+1093-            { type: "dot", x: 0, y: 0 },
+1094-            { type: "text", x: 2.236, y: -0.12, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1095-            { type: "text", x: -2.236, y: -0.12, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1096-            { type: "text", x: 3.02, y: 0.12, tex: "(a,0)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+1097-            { type: "text", x: 0.14, y: 2.0, tex: "(0,b)", cls: "a-pt", anchor: "start", vAnchor: "middle" },
+1098-            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+1099-          ],
+1100-        }),
+1101-        note: "An ellipse \\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1\\) with \\(a>b\\): the distances to the two foci \\(F_1,F_2\\) sum to a constant.",
+1102-      }],
+1103-    }),
+1104:    "conic-hyperbola": () => ({
+1105-      layout: "single",
+1106-      panels: [{
+1107-        svg: buildPlot({
+1108-          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+1109-          xmin: -5.2, xmax: 5.2, ymin: -4, ymax: 4,
+1110-          xlabel: "x", ylabel: "y", aria: "A hyperbola with two branches opening left and right, hugging two dashed asymptotes.",
+1111-          items: [
+1112-            { type: "seg", x1: -5, y1: -3.75, x2: 5, y2: 3.75, cls: "refline" },
+1113-            { type: "seg", x1: -5, y1: 3.75, x2: 5, y2: -3.75, cls: "refline" },
+1114-            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+1115-            { type: "curve", fn: (x) => -1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+1116-            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [-5.2, -2], samples: 200, cls: "curve" },
+1117-            { type: "curve", fn: (x) => -1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [-5.2, -2], samples: 200, cls: "curve" },
+1118-            { type: "dot", x: 2.5, y: 0 },
+1119-            { type: "dot", x: -2.5, y: 0 },
+1120-            { type: "dot", x: 2, y: 0, hollow: true },
+1121-            { type: "dot", x: -2, y: 0, hollow: true },
+1122-            { type: "dot", x: 0, y: 0 },
+1123-            { type: "text", x: 2.5, y: -0.16, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1124-            { type: "text", x: -2.5, y: -0.16, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1125-            { type: "text", x: 4.9, y: 3.68, tex: "y=\\tfrac{b}{a}x", cls: "a-ref", anchor: "end", vAnchor: "bottom" },
+1126-            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+1127-          ],
+1128-        }),
+1129-        note: "A hyperbola \\(\\frac{x^2}{a^2}-\\frac{y^2}{b^2}=1\\): two branches with vertices at \\((\\pm a,0)\\), approaching the asymptotes \\(y=\\pm\\frac{b}{a}x\\).",
+1130-      }],
+1131-    }),
+1132-
+1133-    /* ---------------- §1.1 ---------------- */
+1134-    "hlt": () => ({
+1135-      layout: "pair",
+1136-      panels: [
+1137-        {
+1138-          svg: buildPlot({
+1139-            w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3,
+
+ succeeded in 440ms:
+819-      </div>
+820-    </section>
+821-  </div>
+822-
+823-  <section class="env env-caution">
+824-    <p class="env-head"><span class="env-kicker">Caution</span></p>
+825-    <div class="env-body">
+826-      <p>Partial fractions applies only to a <em>proper</em> fraction. Faced with \(\dfrac{x^{2}}{x - 1}\), divide first: \(x^{2} = (x - 1)(x + 1) + 1\), so \(\dfrac{x^{2}}{x - 1} = x + 1 + \dfrac{1}{x - 1}\). No combination of the form \(\dfrac{A}{x - 1}\) alone can reproduce a numerator that outgrows its denominator — the polynomial part must be divided out before the templates apply.</p>
+827-    </div>
+828-  </section>
+829-
+830-  <p>Every fragment this method produces — \(\dfrac{A}{x - a}\), \(\dfrac{A}{(x - a)^{k}}\), and \(\dfrac{Bx + C}{(x^{2} + px + q)^{k}}\) — has a standard antiderivative, which is why partial fractions is the opening move for integrating a rational function. That payoff belongs to the integration chapters; the algebra it rests on is complete here.</p>
+831-
+832-</article>
+833-</template>
+834-
+835-<template id="frag-sec-a-5">
+836-<!-- §A.5 The Conic Sections.
+837-     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+838-     + §3 register). Second-batch appendix section (user roster decision 2026-07-04),
+839-     written WITH figures (user directive "連圖一起寫").
+840-     Numbering is MANUAL, namespace "A", continuing from sec-a-4:
+841-     Example A.6; Figures A.1–A.4 (the appendix's first figures — A.1 circle,
+842-     A.2 parabola, A.3 ellipse, A.4 hyperbola).
+843-     Figure functions live in appendixA-print-standalone.html FIGS: conic-circle,
+844:     conic-parabola, conic-ellipse, conic-hyperbola (buildPlot curve-halves + dots/
+845-     reflines/labels; the circle uses an equal-aspect square plot so it renders round).
+846-     Depth note: a "quick tour" — standard forms centred/vertex at the origin, key
+847-     features stated, the distance definitions given informally. Forward-stock: Ch1–4
+848-     has no inbound reference; not registered as SPEC B-class (it is analytic geometry,
+849-     not a Ch1–4 prerequisite). Math verified during authoring: focus-directrix ⇒ x^2=4py,
+850-     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=±(b/a)x, Example A.6
+851-     (4x^2+9y^2=36 ⇒ x^2/9+y^2/4=1, foci (±√5,0)).
+852-     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+853-
+854-<article class="sec" lang="en">
+855-
+856-  <header class="sec-head">
+857-    <h2 class="sec-title"><span class="sec-no">A.5</span>The Conic Sections</h2>
+858-  </header>
+859-
+860-  <p>Slice a cone with a flat plane and the rim of the cut is a <em>conic section</em>: a circle, an ellipse, a parabola, or a hyperbola, according to the angle of the slice. Each also has a cleaner description in terms of distance, and each has a <em>standard equation</em> — the simplest form, obtained by placing the curve's centre or vertex at the origin. This tour records the four standard forms and the features to read straight off them. Like partial fractions, the conics are stocked here for later chapters; the main text of Chapters 1–4 does not call on them.</p>
+861-
+862-  <p><strong>The circle.</strong> A circle is the set of points a fixed distance \(r\) — the <em>radius</em> — from a centre. Centred at the origin, the condition \(\sqrt{x^2 + y^2} = r\) squares to the standard equation
+863-  \[ x^2 + y^2 = r^2. \]</p>
+864-
+865-  <figure class="figure" data-fig="conic-circle">
+866-    <figcaption><span class="fig-no">Figure A.1</span> A circle of radius \(r\) centred at the origin: \(x^2 + y^2 = r^2\).</figcaption>
+867-  </figure>
+868-
+869-  <p><strong>The parabola.</strong> Fix a point \(F\) (the <em>focus</em>) and a line (the <em>directrix</em>). A parabola is the set of points equidistant from the two. With focus \(F = (0, p)\) and directrix \(y = -p\), equating the two distances — \(x^2 + (y - p)^2 = (y + p)^2\) — and simplifying gives the standard equation
+870-  \[ x^2 = 4py, \]
+871-  a curve opening upward from its vertex at the origin. (Putting the focus on the \(x\)-axis instead gives the sideways form \(y^2 = 4px\).)</p>
+872-
+873-  <figure class="figure" data-fig="conic-parabola">
+874-    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+875-  </figure>
+876-
+877-  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+878-  \[ \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1, \qquad b^2 = a^2 - c^2, \]
+879-  with \(a > b > 0\). The curve crosses the axes at \((\pm a, 0)\) and \((0, \pm b)\); the longer semi-axis \(a\) runs along the line through the foci, and \(c = \sqrt{a^2 - b^2}\) locates them.</p>
+880-
+881:  <figure class="figure" data-fig="conic-ellipse">
+882-    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+883-  </figure>
+884-
+885-  <p><strong>The hyperbola.</strong> Keep two foci, but now ask for a fixed <em>difference</em> of distances rather than a sum. With foci at \((\pm c, 0)\) and the difference written \(2a\), the standard equation is
+886-  \[ \frac{x^2}{a^2} - \frac{y^2}{b^2} = 1, \qquad b^2 = c^2 - a^2. \]
+887-  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\), the crossed lines that govern its opening. Here \(c = \sqrt{a^2 + b^2}\), so the foci lie beyond the vertices.</p>
+888-
+889-  <figure class="figure" data-fig="conic-hyperbola">
+890-    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+891-  </figure>
+892-
+893-  <div class="workedexample">
+894-    <section class="env env-example">
+895-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.6</span></p>
+896-      <div class="env-body">
+897-        <p>Identify the curve \(4x^2 + 9y^2 = 36\) and locate its foci.</p>
+898-      </div>
+899-    </section>
+900-    <section class="env env-solution">
+901-      <p class="env-head"><span class="env-kicker">Solution</span></p>
+902-      <div class="env-body">
+903-        <p>Divide through by \(36\) to reach standard form:
+904-        \[ \frac{x^2}{9} + \frac{y^2}{4} = 1. \]
+905-        Both squared terms are added, so the curve is an ellipse, with \(a^2 = 9\) and \(b^2 = 4\) — that is \(a = 3\) and \(b = 2\). Since \(a > b\), the major axis is horizontal, and \(c = \sqrt{a^2 - b^2} = \sqrt{9 - 4} = \sqrt{5}\). The foci therefore sit at \((\pm\sqrt{5},\, 0)\), about \((\pm 2.24,\, 0)\). Had the sign between the terms been a minus, the same reading would have named a hyperbola instead, with \(c = \sqrt{a^2 + b^2}\).</p>
+906-      </div>
+--
+1056-            { type: "text", x: -0.12, y: -0.12, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+1057-          ],
+1058-        }),
+1059-        note: "A circle: every point lies a fixed distance \\(r\\) from the centre \\(O\\).",
+1060-      }],
+1061-    }),
+1062-    "conic-parabola": () => ({
+1063-      layout: "single",
+1064-      panels: [{
+1065-        svg: buildPlot({
+1066-          w: 270, h: 240, pad: { t: 18, r: 18, b: 18, l: 18 },
+1067-          xmin: -3.7, xmax: 3.7, ymin: -1.6, ymax: 4.8,
+1068-          xlabel: "x", ylabel: "y", aria: "An upward parabola with its focus above the vertex and its directrix a dashed line below.",
+1069-          items: [
+1070-            { type: "curve", fn: (x) => x * x / 4, domain: [-3.7, 3.7], samples: 220, cls: "curve" },
+1071-            { type: "hline", y: -1, from: -3.4, to: 3.4, cls: "refline" },
+1072-            { type: "dot", x: 0, y: 1 },
+1073-            { type: "text", x: 0.16, y: 1.08, tex: "F=(0,p)", cls: "a-pt", anchor: "start" },
+1074-            { type: "text", x: 3.4, y: -1, tex: "y=-p", cls: "a-ref", anchor: "end", vAnchor: "top", dy: 3 },
+1075-            { type: "text", x: -0.14, y: 0.02, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+1076-          ],
+1077-        }),
+1078-        note: "A parabola \\(x^2=4py\\): every point is equidistant from the focus \\(F\\) and the directrix \\(y=-p\\).",
+1079-      }],
+1080-    }),
+1081:    "conic-ellipse": () => ({
+1082-      layout: "single",
+1083-      panels: [{
+1084-        svg: buildPlot({
+1085-          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+1086-          xmin: -3.7, xmax: 3.7, ymin: -2.8, ymax: 2.8,
+1087-          xlabel: "x", ylabel: "y", aria: "An ellipse wider than it is tall, with two foci on the horizontal axis.",
+1088-          items: [
+1089-            { type: "curve", fn: (x) => 2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+1090-            { type: "curve", fn: (x) => -2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+1091-            { type: "dot", x: 2.236, y: 0 },
+1092-            { type: "dot", x: -2.236, y: 0 },
+1093-            { type: "dot", x: 0, y: 0 },
+1094-            { type: "text", x: 2.236, y: -0.12, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1095-            { type: "text", x: -2.236, y: -0.12, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1096-            { type: "text", x: 3.02, y: 0.12, tex: "(a,0)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+1097-            { type: "text", x: 0.14, y: 2.0, tex: "(0,b)", cls: "a-pt", anchor: "start", vAnchor: "middle" },
+1098-            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+1099-          ],
+1100-        }),
+1101-        note: "An ellipse \\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1\\) with \\(a>b\\): the distances to the two foci \\(F_1,F_2\\) sum to a constant.",
+1102-      }],
+1103-    }),
+1104-    "conic-hyperbola": () => ({
+1105-      layout: "single",
+1106-      panels: [{
+
+ succeeded in 458ms:
+31:  --fig-1-18: 360px;   /* Figure 1.18 vertical asymptote */
+32:  --fig-1-19: 400px;   /* Figure 1.19 ln asymptote */
+456:  <p>In a right triangle, the definitions invert the familiar ratios. Since \(\cos\theta\) is adjacent over hypotenuse, \(\sec\theta\) is hypotenuse over adjacent; since \(\sin\theta\) is opposite over hypotenuse, \(\csc\theta\) is hypotenuse over opposite; and \(\cot\theta\) is adjacent over opposite. Special-angle values follow instantly from the primary ones: for instance \(\sec\tfrac{\pi}{3} = 1/\cos\tfrac{\pi}{3} = 2\), and \(\cot\tfrac{\pi}{4} = 1\). Each function is undefined exactly where its denominator vanishes — \(\sec\) and \(\tan\) at odd multiples of \(\tfrac{\pi}{2}\), \(\csc\) and \(\cot\) at multiples of \(\pi\) — and near those angles its values blow up, producing the vertical asymptotes on their graphs.</p>
+846:     Depth note: a "quick tour" — standard forms centred/vertex at the origin, key
+849:     not a Ch1–4 prerequisite). Math verified during authoring: focus-directrix ⇒ x^2=4py,
+850:     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=±(b/a)x, Example A.6
+860:  <p>Slice a cone with a flat plane and the rim of the cut is a <em>conic section</em>: a circle, an ellipse, a parabola, or a hyperbola, according to the angle of the slice. Each also has a cleaner description in terms of distance, and each has a <em>standard equation</em> — the simplest form, obtained by placing the curve's centre or vertex at the origin. This tour records the four standard forms and the features to read straight off them. Like partial fractions, the conics are stocked here for later chapters; the main text of Chapters 1–4 does not call on them.</p>
+869:  <p><strong>The parabola.</strong> Fix a point \(F\) (the <em>focus</em>) and a line (the <em>directrix</em>). A parabola is the set of points equidistant from the two. With focus \(F = (0, p)\) and directrix \(y = -p\), equating the two distances — \(x^2 + (y - p)^2 = (y + p)^2\) — and simplifying gives the standard equation
+871:  a curve opening upward from its vertex at the origin. (Putting the focus on the \(x\)-axis instead gives the sideways form \(y^2 = 4px\).)</p>
+874:    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+877:  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+882:    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+887:  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\), the crossed lines that govern its opening. Here \(c = \sqrt{a^2 + b^2}\), so the foci lie beyond the vertices.</p>
+890:    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+910:  <p>Those are the four curves, their standard equations, and the features — centre, radius, focus, directrix, foci, axes, and asymptotes — that each equation puts on display. Moving a centre or vertex off the origin only replaces \(x\) and \(y\) with \((x - h)\) and \((y - k)\); the shapes, and everything this tour named, are unchanged.</p>
+1068:          xlabel: "x", ylabel: "y", aria: "An upward parabola with its focus above the vertex and its directrix a dashed line below.",
+1073:            { type: "text", x: 0.16, y: 1.08, tex: "F=(0,p)", cls: "a-pt", anchor: "start" },
+1074:            { type: "text", x: 3.4, y: -1, tex: "y=-p", cls: "a-ref", anchor: "end", vAnchor: "top", dy: 3 },
+1078:        note: "A parabola \\(x^2=4py\\): every point is equidistant from the focus \\(F\\) and the directrix \\(y=-p\\).",
+1094:            { type: "text", x: 2.236, y: -0.12, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1095:            { type: "text", x: -2.236, y: -0.12, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1096:            { type: "text", x: 3.02, y: 0.12, tex: "(a,0)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+1097:            { type: "text", x: 0.14, y: 2.0, tex: "(0,b)", cls: "a-pt", anchor: "start", vAnchor: "middle" },
+1101:        note: "An ellipse \\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1\\) with \\(a>b\\): the distances to the two foci \\(F_1,F_2\\) sum to a constant.",
+1110:          xlabel: "x", ylabel: "y", aria: "A hyperbola with two branches opening left and right, hugging two dashed asymptotes.",
+1123:            { type: "text", x: 2.5, y: -0.16, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1124:            { type: "text", x: -2.5, y: -0.16, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+1129:        note: "A hyperbola \\(\\frac{x^2}{a^2}-\\frac{y^2}{b^2}=1\\): two branches with vertices at \\((\\pm a,0)\\), approaching the asymptotes \\(y=\\pm\\frac{b}{a}x\\).",
+1409:    "vertical-asymptote": () => ({
+1414:          xlabel: "x", ylabel: "y", aria: "Graph with a vertical asymptote at x = 3.",
+1444:    "ln-asymptote": () => ({
+1560:       solid; y=x dashed (ch01 restrict-x2 convention). Vertical asymptotes of
+1571:            aria: "The graph of arctan x is the reflection of the restricted tangent branch across the line y equals x; tangent's vertical asymptotes at x = plus or minus pi over 2 become arctan's horizontal asymptotes at y = plus or minus pi over 2.",
+
+ exited 1 in 394ms:
+CONTENT_ROADMAP.md:46:**Appendix A — Precalculus Toolbox（2026-07-03 立項，status: draft）**：`CONTENT_SPEC.md` §16.2 的 B 類先備中「值得完整鋪開」者的家（使用者 2026-07-03 裁示立項）。**收錄**：A.1 The Reciprocal Trigonometric Functions（Definition A.1、Proposition A.1、Example A.1）；A.2 The Product-to-Sum and Sum-to-Product Identities（Proposition A.2/A.3、Strategy A.1、Example A.2）；A.3 The Infinite Geometric Series（Proposition A.4/A.5、Example A.3）。**機制**：獨立編號 namespace「A」（per-type counter 跨三節連續）、`handout/fragments/appA/`、`build.py` registry `appA` → `appendixA-print-standalone.html`（shell 複製自 ch01，title/brand/runningHead 已改；FIGS registry 沿用 ch01 副本、惰性未用）。**被引用**：§1.2（倒數三角 bridge）、§3.1（和差化積 bridge）、§4.1（無窮等比 bridge）——三處主線 bridge 均保留並 cross-ref 附錄（spec §16.2 處置慣例）。**刻意偏離章規格**：無 chapter summary（工具箱非敘事章）；暫無圖。**閘計畫**（support 材料、縮閘）：prose audit gate-1＋Codex 數學/語域 gate-2＋難度閘 sim＋render 自驗；六閘全套不適用。**Open questions**：(i) 要不要為 A.1 補倒數函數圖形（與 §1.2 arccsc/arcsec 分支無圖的 figure-opportunity 候選同批裁決）；(ii) 未來章節出現新的 B 類「值得鋪開」項時擴充。
+CONTENT_ROADMAP.md:47:**2026-07-04 使用者裁決（第二批 roster，待撰寫）**：A.2 內擴充降冪公式（一小段）；新增 **A.5 Σ 記號與 index 操作**、**A.6 部分分式分解**（並補進 SPEC §16.2 B 類）、**A.7 圓錐曲線速覽（連圖一起寫**——需進 appendixA standalone 的 FIGS＋跑圖正確性閘）；**絕對值不等式一節使用者未選＝不寫**。另立 **Appendix B「讀定理與證明」**（獨立 build 單元 appB、namespace B；結構已核：B.1 讀陳述／B.2 主力證明形狀／B.3 量詞工具箱（與 §1.6 分工）／B.4 憑空一步招式表／B.5 主動閱讀術；素材=Ch1–4 實例錨點清單，見 audit HTML）。**紀律（使用者 2026-07-04 兩度強調）：附錄收錄條目一律先與使用者討論裁決，不得自行決定。**
+handout/appendixA-print-standalone.html:427:  <p class="lead">This appendix collects the precalculus tools the main text needs but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions (§A.1), the product-to-sum and sum-to-product identities (§A.2), sigma notation and the geometric series (§A.3), partial fractions (§A.4), and a quick tour of the conic sections (§A.5). Most are pointed to from the main text at the moment they are first needed; partial fractions and the conics are stocked ahead, for chapters still to come. The sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing here uses calculus, with one small exception flagged in §A.3, where an infinite sum is read as a limit in the sense of §1.3.</p>
+handout/appendixA-print-standalone.html:620:     Proposition A.4 (finite sum), A.5 (infinite sum); Example A.3; Caution unnumbered.
+handout/appendixA-print-standalone.html:625:     No new numbered environments — existing A.4/A.5/Example A.3/Caution untouched (including the
+handout/appendixA-print-standalone.html:675:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.5</span><span class="env-name">Infinite geometric series</span></p>
+handout/appendixA-print-standalone.html:706:          <li>This is Proposition A.5 with \(a = \tfrac{1}{2}\) and \(r = \tfrac{1}{2}\):
+handout/appendixA-print-standalone.html:724:  <p>In the main text this series first works for a living in §4.1, where Strategy 4.1 bounds the tail of \(\sum x^{n}/n!\) by a geometric tail with ratio \(\tfrac{1}{2}\); the bound \(\sum_{k \ge 1} r^{k} = \frac{r}{1 - r}\) of Proposition A.5 is exactly the step used there. The series keeps working throughout §4.2's convergence arguments.</p>
+handout/appendixA-print-standalone.html:734:     Proposition A.6; Strategy A.2; Example A.4, A.5; Caution unnumbered.
+handout/appendixA-print-standalone.html:741:     Math verified during authoring: Example A.4 (5x−1 cover-up), A.5(a) x/(x−1)^2,
+handout/appendixA-print-standalone.html:742:     A.5(b) (x+1)/(x(x^2+1)), and the improper division x^2/(x−1) = x+1 + 1/(x−1).
+handout/appendixA-print-standalone.html:803:      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.5</span></p>
+handout/appendixA-print-standalone.html:836:<!-- §A.5 The Conic Sections.
+handout/appendixA-print-standalone.html:857:    <h2 class="sec-title"><span class="sec-no">A.5</span>The Conic Sections</h2>
+handout/appendixA-print-standalone.html:1042:    /* ---------------- Appendix A §A.5 — conic sections (self-authored 2026-07-04) ---------------- */
+rg: handout/fragments/appA/*.html: 檔案名稱、目錄名稱或磁碟區標籤語法錯誤。 (os error 123)
+
+2026-07-04T03:00:40.391378Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.4 seconds
+Output:
+CONTENT_ROADMAP.md:46:**Appendix A — Precalculus Toolbox（2026-07-03 立項，status: draft）**：`CONTENT_SPEC.md` §16.2 的 B 類先備中「值得完整鋪開」者的家（使用者 2026-07-03 裁示立項）。**收錄**：A.1 The Reciprocal Trigonometric Functions（Definition A.1、Proposition A.1、Example A.1）；A.2 The Product-to-Sum and Sum-to-Product Identities（Proposition A.2/A.3、Strategy A.1、Example A.2）；A.3 The Infinite Geometric Series（Proposition A.4/A.5、Example A.3）。**機制**：獨立編號 namespace「A」（per-type counter 跨三節連續）、`handout/fragments/appA/`、`build.py` registry `appA` → `appendixA-print-standalone.html`（shell 複製自 ch01，title/brand/runningHead 已改；FIGS registry 沿用 ch01 副本、惰性未用）。**被引用**：§1.2（倒數三角 bridge）、§3.1（和差化積 bridge）、§4.1（無窮等比 bridge）——三處主線 bridge 均保留並 cross-ref 附錄（spec §16.2 處置慣例）。**刻意偏離章規格**：無 chapter summary（工具箱非敘事章）；暫無圖。**閘計畫**（support 材料、縮閘）：prose audit gate-1＋Codex 數學/語域 gate-2＋難度閘 sim＋render 自驗；六閘全套不適用。**Open questions**：(i) 要不要為 A.1 補倒數函數圖形（與 §1.2 arccsc/arcsec 分支無圖的 figure-opportunity 候選同批裁決）；(ii) 未來章節出現新的 B 類「值得鋪開」項時擴充。
+CONTENT_ROADMAP.md:47:**2026-07-04 使用者裁決（第二批 roster，待撰寫）**：A.2 內擴充降冪公式（一小段）；新增 **A.5 Σ 記號與 index 操作**、**A.6 部分分式分解**（並補進 SPEC §16.2 B 類）、**A.7 圓錐曲線速覽（連圖一起寫**——需進 appendixA standalone 的 FIGS＋跑圖正確性閘）；**絕對值不等式一節使用者未選＝不寫**。另立 **Appendix B「讀定理與證明」**（獨立 build 單元 appB、namespace B；結構已核：B.1 讀陳述／B.2 主力證明形狀／B.3 量詞工具箱（與 §1.6 分工）／B.4 憑空一步招式表／B.5 主動閱讀術；素材=Ch1–4 實例錨點清單，見 audit HTML）。**紀律（使用者 2026-07-04 兩度強調）：附錄收錄條目一律先與使用者討論裁決，不得自行決定。**
+handout/appendixA-print-standalone.html:427:  <p class="lead">This appendix collects the precalculus tools the main text needs but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions (§A.1), the product-to-sum and sum-to-product identities (§A.2), sigma notation and the geometric series (§A.3), partial fractions (§A.4), and a quick tour of the conic sections (§A.5). Most are pointed to from the main text at the moment they are first needed; partial fractions and the conics are stocked ahead, for chapters still to come. The sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing here uses calculus, with one small exception flagged in §A.3, where an infinite sum is read as a limit in the sense of §1.3.</p>
+handout/appendixA-print-standalone.html:620:     Proposition A.4 (finite sum), A.5 (infinite sum); Example A.3; Caution unnumbered.
+handout/appendixA-print-standalone.html:625:     No new numbered environments — existing A.4/A.5/Example A.3/Caution untouched (including the
+handout/appendixA-print-standalone.html:675:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.5</span><span class="env-name">Infinite geometric series</span></p>
+handout/appendixA-print-standalone.html:706:          <li>This is Proposition A.5 with \(a = \tfrac{1}{2}\) and \(r = \tfrac{1}{2}\):
+handout/appendixA-print-standalone.html:724:  <p>In the main text this series first works for a living in §4.1, where Strategy 4.1 bounds the tail of \(\sum x^{n}/n!\) by a geometric tail with ratio \(\tfrac{1}{2}\); the bound \(\sum_{k \ge 1} r^{k} = \frac{r}{1 - r}\) of Proposition A.5 is exactly the step used there. The series keeps working throughout §4.2's convergence arguments.</p>
+handout/appendixA-print-standalone.html:734:     Proposition A.6; Strategy A.2; Example A.4, A.5; Caution unnumbered.
+handout/appendixA-print-standalone.html:741:     Math verified during authoring: Example A.4 (5x−1 cover-up), A.5(a) x/(x−1)^2,
+handout/appendixA-print-standalone.html:742:     A.5(b) (x+1)/(x(x^2+1)), and the improper division x^2/(x−1) = x+1 + 1/(x−1).
+handout/appendixA-print-standalone.html:803:      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.5</span></p>
+handout/appendixA-print-standalone.html:836:<!-- §A.5 The Conic Sections.
+handout/appendixA-print-standalone.html:857:    <h2 class="sec-title"><span class="sec-no">A.5</span>The Conic Sections</h2>
+handout/appendixA-print-standalone.html:1042:    /* ---------------- Appendix A §A.5 — conic sections (self-authored 2026-07-04) ---------------- */
+rg: handout/fragments/appA/*.html: 檔案名稱、目錄名稱或磁碟區標籤語法錯誤。 (os error 123)
+
+codex
+The plotted data now all has exact loci. I’m doing the last arithmetic pass on the rounded coordinates and slopes, especially the places where a decimal point could silently drift from the symbolic equation.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$vals = [ordered]@{
+  circleRadiusResidual = [math]::Pow(1.414,2) + [math]::Pow(1.414,2) - 4
+  sqrt5 = [math]::Sqrt(5)
+  ellipseFocusResidual = 2.236 - [math]::Sqrt(5)
+  hyperbolaC = [math]::Sqrt([math]::Pow(2,2) + [math]::Pow(1.5,2))
+  hyperbolaSlopeSegment = 3.75 / 5
+  hyperbolaSlopeExpected = 1.5 / 2
+  exampleFociApprox = [math]::Round([math]::Sqrt(5), 2)
+}; $vals.GetEnumerator() | ForEach-Object { "{0} = {1}" -f $_.Key, $_.Value }' in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$vals = [ordered]@{
+  circleRadiusResidual = [math]::Pow(1.414,2) + [math]::Pow(1.414,2) - 4
+  sqrt5 = [math]::Sqrt(5)
+  ellipseFocusResidual = 2.236 - [math]::Sqrt(5)
+  hyperbolaC = [math]::Sqrt([math]::Pow(2,2) + [math]::Pow(1.5,2))
+  hyperbolaSlopeSegment = 3.75 / 5
+  hyperbolaSlopeExpected = 1.5 / 2
+  exampleFociApprox = [math]::Round([math]::Sqrt(5), 2)
+}; $vals.GetEnumerator() | ForEach-Object { "{0} = {1}" -f $_.Key, $_.Value }'` rejected: blocked by policy
+2026-07-04T03:01:38.072428Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$vals = [ordered]@{
+  circleRadiusResidual = [math]::Pow(1.414,2) + [math]::Pow(1.414,2) - 4
+  sqrt5 = [math]::Sqrt(5)
+  ellipseFocusResidual = 2.236 - [math]::Sqrt(5)
+  hyperbolaC = [math]::Sqrt([math]::Pow(2,2) + [math]::Pow(1.5,2))
+  hyperbolaSlopeSegment = 3.75 / 5
+  hyperbolaSlopeExpected = 1.5 / 2
+  exampleFociApprox = [math]::Round([math]::Sqrt(5), 2)
+}; $vals.GetEnumerator() | ForEach-Object { "{0} = {1}" -f $_.Key, $_.Value }'` rejected: blocked by policy
+codex
+The independent derivations are complete. I’m only cross-checking the appendix voice anchors now, so the final verdict can separate math/figure correctness from any style concern.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n "This section gives|That is the whole toolkit|warm-up|main text|workedexample|stocked here|That payoff belongs|The main text does not yet call" handout/fragments/appA/sec-a-1.html handout/fragments/appA/sec-a-4.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"Figure A\\.1|Figure A\\.2|Figure A\\.3|Figure A\\.4|F_1|F_2|y=-p|y=\\\\tfrac\\{b\\}\\{a\\}x|vertices|asymptotes\" handout/appendixA-print-standalone.html handout/fragments/appA/sec-a-5.html" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 357ms:
+handout/fragments/appA/sec-a-4.html:24:  as recombining the right-hand side over a common denominator confirms. (Read left to right, this is exactly the split that makes \(\sum \tfrac{1}{k(k + 1)}\) telescope — §A.3's collapsing sum in disguise.) The main text does not yet call on this tool; it is stocked here for the integration chapters, where each fragment turns out to have a known antiderivative.</p>
+handout/fragments/appA/sec-a-4.html:53:  <div class="workedexample">
+handout/fragments/appA/sec-a-4.html:72:  <div class="workedexample">
+handout/fragments/appA/sec-a-4.html:101:  <p>Every fragment this method produces — \(\dfrac{A}{x - a}\), \(\dfrac{A}{(x - a)^{k}}\), and \(\dfrac{Bx + C}{(x^{2} + px + q)^{k}}\) — has a standard antiderivative, which is why partial fractions is the opening move for integrating a rational function. That payoff belongs to the integration chapters; the algebra it rests on is complete here.</p>
+handout/fragments/appA/sec-a-1.html:20:  <p class="lead">This appendix collects the precalculus tools the main text needs but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions (§A.1), the product-to-sum and sum-to-product identities (§A.2), sigma notation and the geometric series (§A.3), partial fractions (§A.4), and a quick tour of the conic sections (§A.5). Most are pointed to from the main text at the moment they are first needed; partial fractions and the conics are stocked ahead, for chapters still to come. The sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing here uses calculus, with one small exception flagged in §A.3, where an infinite sum is read as a limit in the sense of §1.3.</p>
+handout/fragments/appA/sec-a-1.html:38:  <p>The three primary trigonometric functions \(\sin\), \(\cos\), and \(\tan\) have three companions — two honest reciprocals and one inverted ratio. They carry no new information — every fact about them is a fact about \(\sin\) and \(\cos\) in disguise. Yet calculus speaks them fluently: the derivative of \(\tan x\) turns out to be \(\sec^{2} x\) (§3.1), the inverse secant needs its own principal range (§1.2), and integral tables are full of secants and cosecants. This section gives them an honest introduction.</p>
+handout/fragments/appA/sec-a-1.html:76:  <div class="workedexample">
+handout/fragments/appA/sec-a-1.html:98:  <p>That is the whole toolkit: three definitions, the right-triangle readings, and the two Pythagorean companions. In the main text these functions first appear in §1.2, where the inverse secant and cosecant need principal ranges of their own, and they return in §3.1, where the derivative of \(\tan x\) lands on \(\sec^{2} x\).</p>
+
+ succeeded in 364ms:
+handout/fragments/appA/sec-a-5.html:15:     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=±(b/a)x, Example A.6
+handout/fragments/appA/sec-a-5.html:31:    <figcaption><span class="fig-no">Figure A.1</span> A circle of radius \(r\) centred at the origin: \(x^2 + y^2 = r^2\).</figcaption>
+handout/fragments/appA/sec-a-5.html:39:    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+handout/fragments/appA/sec-a-5.html:42:  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+handout/fragments/appA/sec-a-5.html:47:    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+handout/fragments/appA/sec-a-5.html:52:  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\), the crossed lines that govern its opening. Here \(c = \sqrt{a^2 + b^2}\), so the foci lie beyond the vertices.</p>
+handout/fragments/appA/sec-a-5.html:55:    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+handout/fragments/appA/sec-a-5.html:75:  <p>Those are the four curves, their standard equations, and the features — centre, radius, focus, directrix, foci, axes, and asymptotes — that each equation puts on display. Moving a centre or vertex off the origin only replaces \(x\) and \(y\) with \((x - h)\) and \((y - k)\); the shapes, and everything this tour named, are unchanged.</p>
+handout/appendixA-print-standalone.html:435:    <li>read off each conic section's key features — centre, vertices, foci, and axes — from its standard equation.</li>
+handout/appendixA-print-standalone.html:456:  <p>In a right triangle, the definitions invert the familiar ratios. Since \(\cos\theta\) is adjacent over hypotenuse, \(\sec\theta\) is hypotenuse over adjacent; since \(\sin\theta\) is opposite over hypotenuse, \(\csc\theta\) is hypotenuse over opposite; and \(\cot\theta\) is adjacent over opposite. Special-angle values follow instantly from the primary ones: for instance \(\sec\tfrac{\pi}{3} = 1/\cos\tfrac{\pi}{3} = 2\), and \(\cot\tfrac{\pi}{4} = 1\). Each function is undefined exactly where its denominator vanishes — \(\sec\) and \(\tan\) at odd multiples of \(\tfrac{\pi}{2}\), \(\csc\) and \(\cot\) at multiples of \(\pi\) — and near those angles its values blow up, producing the vertical asymptotes on their graphs.</p>
+handout/appendixA-print-standalone.html:850:     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=±(b/a)x, Example A.6
+handout/appendixA-print-standalone.html:866:    <figcaption><span class="fig-no">Figure A.1</span> A circle of radius \(r\) centred at the origin: \(x^2 + y^2 = r^2\).</figcaption>
+handout/appendixA-print-standalone.html:874:    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+handout/appendixA-print-standalone.html:877:  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+handout/appendixA-print-standalone.html:882:    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+handout/appendixA-print-standalone.html:887:  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\), the crossed lines that govern its opening. Here \(c = \sqrt{a^2 + b^2}\), so the foci lie beyond the vertices.</p>
+handout/appendixA-print-standalone.html:890:    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+handout/appendixA-print-standalone.html:910:  <p>Those are the four curves, their standard equations, and the features — centre, radius, focus, directrix, foci, axes, and asymptotes — that each equation puts on display. Moving a centre or vertex off the origin only replaces \(x\) and \(y\) with \((x - h)\) and \((y - k)\); the shapes, and everything this tour named, are unchanged.</p>
+handout/appendixA-print-standalone.html:1074:            { type: "text", x: 3.4, y: -1, tex: "y=-p", cls: "a-ref", anchor: "end", vAnchor: "top", dy: 3 },
+handout/appendixA-print-standalone.html:1078:        note: "A parabola \\(x^2=4py\\): every point is equidistant from the focus \\(F\\) and the directrix \\(y=-p\\).",
+handout/appendixA-print-standalone.html:1094:            { type: "text", x: 2.236, y: -0.12, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+handout/appendixA-print-standalone.html:1095:            { type: "text", x: -2.236, y: -0.12, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+handout/appendixA-print-standalone.html:1101:        note: "An ellipse \\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1\\) with \\(a>b\\): the distances to the two foci \\(F_1,F_2\\) sum to a constant.",
+handout/appendixA-print-standalone.html:1110:          xlabel: "x", ylabel: "y", aria: "A hyperbola with two branches opening left and right, hugging two dashed asymptotes.",
+handout/appendixA-print-standalone.html:1123:            { type: "text", x: 2.5, y: -0.16, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+handout/appendixA-print-standalone.html:1124:            { type: "text", x: -2.5, y: -0.16, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+handout/appendixA-print-standalone.html:1129:        note: "A hyperbola \\(\\frac{x^2}{a^2}-\\frac{y^2}{b^2}=1\\): two branches with vertices at \\((\\pm a,0)\\), approaching the asymptotes \\(y=\\pm\\frac{b}{a}x\\).",
+handout/appendixA-print-standalone.html:1560:       solid; y=x dashed (ch01 restrict-x2 convention). Vertical asymptotes of
+handout/appendixA-print-standalone.html:1571:            aria: "The graph of arctan x is the reflection of the restricted tangent branch across the line y equals x; tangent's vertical asymptotes at x = plus or minus pi over 2 become arctan's horizontal asymptotes at y = plus or minus pi over 2.",
+
+codex
+VERDICT: 0 blocking, 1 advisory
+
+No blocking findings.
+
+[ADVISORY] `handout/fragments/appA/sec-a-5.html:34-36` — The parabola paragraph says the curve opens upward, but does not explicitly state \(p>0\). Since \(x^2=4py\) gives \(y=x^2/(4p)\), \(p<0\) would open downward. Minimal fix: write “With \(p>0\), focus \(F=(0,p)\)…” or “for \(p>0\)” before “opening upward.”
+
+CHECKED-CLEAN
+
+- Circle prose: \(\sqrt{x^2+y^2}=r\) squares to \(x^2+y^2=r^2\).
+- Parabola derivation: \(x^2+(y-p)^2=(y+p)^2\) expands to \(x^2=4py\).
+- Ellipse prose: \(b^2=a^2-c^2\), so \(c=\sqrt{a^2-b^2}\); with \(a>b\), foci are on the \(x\)-axis and intercepts are \((\pm a,0),(0,\pm b)\).
+- Hyperbola prose: \(b^2=c^2-a^2\), so \(c=\sqrt{a^2+b^2}\); vertices \((\pm a,0)\), asymptotes \(y=\pm(b/a)x\).
+- Example A.6: \(4x^2+9y^2=36\Rightarrow x^2/9+y^2/4=1\), \(a=3,b=2,c=\sqrt5\approx2.24\); minus sign case correctly uses hyperbola \(c=\sqrt{a^2+b^2}\).
+- `conic-circle`: radius \(2\); segment endpoint \((1.414,1.414)\) has \(1.414^2+1.414^2=3.998792\approx4\).
+- `conic-parabola`: \(y=x^2/4\Rightarrow4p=4,p=1\); focus \((0,1)\), directrix \(y=-1\), and labels match.
+- `conic-ellipse`: \(a=3,b=2\); foci at \(\pm\sqrt{9-4}=\pm\sqrt5\approx\pm2.236\), matching dots.
+- `conic-hyperbola`: \(a=2,b=1.5\); \(c=\sqrt{4+2.25}=2.5\), foci match; asymptote slope \(3.75/5=0.75=b/a\); vertices at \((\pm2,0)\).
+- Captions/figure labels are consistent with prose: \(F_1,F_2\), directrix \(y=-p\), vertices/foci/asymptotes are represented.
+- Register: prose is consistent with §A.1/§A.4 Stewart/Rogawski appendix voice; no generic filler or tone break found.
+tokens used
+66,530
+VERDICT: 0 blocking, 1 advisory
+
+No blocking findings.
+
+[ADVISORY] `handout/fragments/appA/sec-a-5.html:34-36` — The parabola paragraph says the curve opens upward, but does not explicitly state \(p>0\). Since \(x^2=4py\) gives \(y=x^2/(4p)\), \(p<0\) would open downward. Minimal fix: write “With \(p>0\), focus \(F=(0,p)\)…” or “for \(p>0\)” before “opening upward.”
+
+CHECKED-CLEAN
+
+- Circle prose: \(\sqrt{x^2+y^2}=r\) squares to \(x^2+y^2=r^2\).
+- Parabola derivation: \(x^2+(y-p)^2=(y+p)^2\) expands to \(x^2=4py\).
+- Ellipse prose: \(b^2=a^2-c^2\), so \(c=\sqrt{a^2-b^2}\); with \(a>b\), foci are on the \(x\)-axis and intercepts are \((\pm a,0),(0,\pm b)\).
+- Hyperbola prose: \(b^2=c^2-a^2\), so \(c=\sqrt{a^2+b^2}\); vertices \((\pm a,0)\), asymptotes \(y=\pm(b/a)x\).
+- Example A.6: \(4x^2+9y^2=36\Rightarrow x^2/9+y^2/4=1\), \(a=3,b=2,c=\sqrt5\approx2.24\); minus sign case correctly uses hyperbola \(c=\sqrt{a^2+b^2}\).
+- `conic-circle`: radius \(2\); segment endpoint \((1.414,1.414)\) has \(1.414^2+1.414^2=3.998792\approx4\).
+- `conic-parabola`: \(y=x^2/4\Rightarrow4p=4,p=1\); focus \((0,1)\), directrix \(y=-1\), and labels match.
+- `conic-ellipse`: \(a=3,b=2\); foci at \(\pm\sqrt{9-4}=\pm\sqrt5\approx\pm2.236\), matching dots.
+- `conic-hyperbola`: \(a=2,b=1.5\); \(c=\sqrt{4+2.25}=2.5\), foci match; asymptote slope \(3.75/5=0.75=b/a\); vertices at \((\pm2,0)\).
+- Captions/figure labels are consistent with prose: \(F_1,F_2\), directrix \(y=-p\), vertices/foci/asymptotes are represented.
+- Register: prose is consistent with §A.1/§A.4 Stewart/Rogawski appendix voice; no generic filler or tone break found.

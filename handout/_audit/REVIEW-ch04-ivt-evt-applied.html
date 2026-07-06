@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch4 IVT/EVT 補嚴謹 ＋ Appendix D — applied 報告</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)'],['$','$']], displayMath: [['\\[','\\]'],['$$','$$']] }, svg:{fontCache:'global'} };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+ :root{--navy:#1f3a5f;--ink:#1a1a1a;--mut:#5a6472;--line:#d9dee6;--bg:#fbfcfe;--ok:#1f6b45;--okbg:#eef7f1;--prov:#7a5a12;--provbg:#fdf8ea}
+ *{box-sizing:border-box} body{font:16px/1.65 -apple-system,"Segoe UI","Noto Sans TC",sans-serif;color:var(--ink);max-width:980px;margin:0 auto;padding:2rem 1.3rem 5rem;background:var(--bg)}
+ h1{font-size:1.55rem;color:var(--navy);margin:.2em 0} h2{font-size:1.2rem;color:var(--navy);margin:1.8em 0 .5em;border-bottom:2px solid var(--navy);padding-bottom:.2em}
+ h3{font-size:1.03rem;color:var(--navy);margin:1.2em 0 .3em}
+ .sub{color:var(--mut);font-size:.95rem} .prov{background:var(--provbg);border:1px solid #e7d9ac;border-radius:8px;padding:.5em .8em;font-size:.88rem;margin:1em 0}
+ table{border-collapse:collapse;width:100%;margin:.6em 0;font-size:.9rem} th,td{border:1px solid var(--line);padding:.4em .55em;text-align:left;vertical-align:top} th{background:#eef2f8;color:var(--navy)} tr:nth-child(even) td{background:#f6f8fb}
+ code{background:#eef1f5;padding:.05em .35em;border-radius:4px;font-size:.86em} .ok{color:var(--ok);font-weight:600}
+ .box{border-left:4px solid var(--navy);background:#fff;padding:.5em .9em;margin:.7em 0;border-radius:0 8px 8px 0}
+ .pass{background:var(--okbg);border:1px solid #bfe0cc;border-radius:8px;padding:.5em .8em;margin:.8em 0}
+ ul{padding-left:1.25em} li{margin:.15em 0} .mut{color:var(--mut);font-size:.85rem}
+</style>
+</head>
+<body>
+<h1>Chapter 4 IVT/EVT 補嚴謹 ＋ Appendix D（The Proof Track）— applied 報告</h1>
+<div class="sub">2026-07-06 · Phase A of the manuscript-free full-arc build · 「無手稿全閘」流程首跑</div>
+
+<div class="prov">
+<b>由來：</b> 全書 seam skeleton 的撈底（<a href="REVIEW-fullarc-seam-skeleton.html">REVIEW-fullarc-seam-skeleton.html</a>）發現 <b>IVT 在 Ch1–4 從未陳述、卻在 §4.5 被默借</b>（撐 \(e^x\) 值域 \((0,\infty)\) 使 \(\ln\) 有定義），且 <b>EVT（Thm 4.9）陳述未證</b>。使用者裁決：兩者一併陳述於 §4.4、證明 fence 至新建 Proof-Track 附錄。設計＋證明經 <b>Codex</b>（gpt-5.5/xhigh，唯讀）兩輪收斂（設計閘＋對抗式數學閘）。
+</div>
+
+<div class="pass"><b class="ok">✔ 閘全綠：</b> `build.py appD/ch04` ✔ ／ linebreak-gate <b>0 自動斷行、0 渲染錯誤</b> ／ render <b>katex-errors=0</b>（appD math=158）／ Codex 對抗式數學閘 <b>0 blocking</b>（2 微 advisory，未改）。</div>
+
+<h2>1 · 寫了什麼（loci ＋ source ＋ gate）</h2>
+<table>
+<tr><th>單元</th><th>locus</th><th>source</th><th>備註</th></tr>
+<tr><td><b>Theorem 4.9 → 兩部</b></td><td>ch04/sec-4-4.html</td><td>self-authored（canon）</td><td>EVT (a)＋<b>IVT (b) NEW</b>；Codex <b>option c 綁併＝零重編號</b>（EVT 仍 4.9、MVT 仍 4.12、§4.5 號不動）</td></tr>
+<tr><td>Thm 4.9 note</td><td>ch04/sec-4-4.html</td><td>self-authored</td><td>舊「陳述不證/黑箱」→ fence 至 Appendix D；分述 (a)(b) 各自吃的假設</td></tr>
+<tr><td><b>§4.5 值域全證</b></td><td>ch04/sec-4-5.html</td><td>self-authored</td><td>默借 → <b>IVT 全證</b>（bracket＋IVT 4.9(b)，用 Cor 4.1／Thm 4.6／4.7）</td></tr>
+<tr><td>§D.1 Using the Proof Track</td><td>appD/sec-d-1.html</td><td>self-authored</td><td>opener＋how-to＋「Fenced so far」定理假設 summary</td></tr>
+<tr><td><b>§D.2 存在定理</b></td><td>appD/sec-d-2.html</td><td>self-authored</td><td><b>Lemma D.1</b> LUB from Thm 4.1＋<b>EVT proof</b>＋<b>IVT proof</b></td></tr>
+<tr><td>build 接線</td><td>build.py；appendixD-print-standalone.html</td><td>—</td><td>registry 加 `appD`；shell 複製 appC、title/brand/runningHead 改</td></tr>
+</table>
+
+<h2>2 · 新增的數學（render 版）</h2>
+
+<h3>Theorem 4.9（Extreme and Intermediate Value Theorems）</h3>
+<div class="box">
+<p>設 \(f\) 在閉區間 \([a,b]\) 連續。</p>
+<p><b>(a) EVT.</b> \(f\) 在 \([a,b]\) 取到最大與最小：存在 \(x_M,x_m\in[a,b]\) 使 \(f(x_m)\le f(x)\le f(x_M)\) 對所有 \(x\in[a,b]\)。</p>
+<p><b>(b) IVT.</b> 若 \(y\) 介於 \(f(a)\) 與 \(f(b)\) 之間，則存在 \(c\in[a,b]\) 使 \(f(c)=y\)。</p>
+</div>
+
+<h3>Lemma D.1（Least upper bound，appendix-local scaffolding）</h3>
+<div class="box">
+<p>每個非空、有上界的 \(S\subseteq\mathbb{R}\) 有最小上界 \(M=\sup S\)。</p>
+<p class="mut">證：由 \(s_0-1\)（非上界）與上界 \(B\) 起始二分，維持「\(a_n\) 非上界、\(b_n\) 上界」，\(a_n\uparrow\) 有界 \(\Rightarrow\)（Thm 4.1）收斂到 \(M\)，\(b_n\to M\)；驗 \(M\) 是上界且最小。</p>
+</div>
+
+<h3>證明策略（fence 到 §D.2）</h3>
+<ul>
+<li><b>EVT：</b> ① 有界 —— 反證＋Bolzano–Weierstrass（Thm 4.4）抽收斂子列＋連續性導矛盾；② 取到 —— \(M=\sup f([a,b])\)（Lemma D.1），取 \(f(x_n)\gt M-\tfrac1n\)，B-W 抽子列 \(x_{n_k}\to x_M\)，連續＋夾擠得 \(f(x_M)=M\)；min 對 \(-f\)。</li>
+<li><b>IVT：</b> 二分，維持 \(f(a_n)\le y\le f(b_n)\)（半選規則：\(f(m)=y\) 停／\(\lt y\) 留右／\(\gt y\) 留左），\(a_n,b_n\to c\)（Thm 4.1），連續取極限得 \(f(c)=y\)。不依賴 EVT（無循環）。</li>
+<li><b>§4.5：</b> \(e^x\gt 1+x\)（\(x\gt0\)）→ 高過任意 \(t\)；\(e^{-x}=1/e^x\) → 低於任意 \(t\)；夾出 \(p\lt q\) 使 \(e^p\lt t\lt e^q\)，IVT 4.9(b) 給 \(e^c=t\)；值域 \((0,\infty)\)。</li>
+</ul>
+
+<h2>3 · 設計裁決（Codex 收斂）</h2>
+<ul>
+<li><b>IVT 落點 = option c</b>（綁進 Thm 4.9）：Codex 判為最不侵入、零重編號、雙生定理同框；按 part 引用（4.9(a)/(b)）。捨 option (a) 端點另編（動 §4.5 號）與 (b) EVT 後另編（動 MVT 鏈＋export 契約）。</li>
+<li><b>Lemma D.1</b>：Codex 指出 EVT attainment 不可裸用 \(\sup\)，故補此 appendix-local lemma（由 Thm 4.1 二分證），非新 export。</li>
+<li><b>Appendix D 結構</b>：proofs 按 home theorem 索引、不另鑄 Theorem 號；namespace D 僅 Lemma D.1。定理假設 summary 先以結構化散文（兩列），日後多列再轉 styled table。</li>
+<li><b>兩 \(e^x\) 極限</b>：就地證（短），不另 fence。<b>Ch6 連續⇒可積</b>：延到 Ch6 定義積分後才入 appD（不能在物件未定義前立）。</li>
+</ul>
+
+<p class="mut">Codex 數學閘逐項判：Lemma D.1 ✔ · EVT ✔ · IVT ✔（僅用二分＋Thm 4.1＋連續，非 EVT）· §4.5 ✔（不假設所證值域）· 綁併 statement ✔。2 advisory：EVT 的「for each \(n\)」指 \(n\ge1\)（本書 \(\mathbb{N}\) 自 1 起，無需改）；§4.5 門檻可更顯式（現散文已足夠嚴謹、可讀優先，保留）。</p>
+
+<hr style="margin:2em 0 1em;border:none;border-top:1px solid var(--line)">
+<p class="mut">下一步：Phase B — Ch5 開章（build infra＋PLAN-ch05＋§5.1 六階）。Ch6 起草時，§D.2 加入「連續⇒可積 / uniform continuity」（compactness 群，與 EVT/IVT 同家）。</p>
+</body>
+</html>

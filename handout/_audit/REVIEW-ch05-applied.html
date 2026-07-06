@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 5 Applications of Differentiation — applied 報告</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)'],['$','$']], displayMath: [['\\[','\\]'],['$$','$$']] }, svg:{fontCache:'global'} };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+ :root{--navy:#1f3a5f;--ink:#1a1a1a;--mut:#5a6472;--line:#d9dee6;--bg:#fbfcfe;--ok:#1f6b45;--okbg:#eef7f1;--prov:#7a5a12;--provbg:#fdf8ea;--warn:#b4341f}
+ *{box-sizing:border-box} body{font:16px/1.65 -apple-system,"Segoe UI","Noto Sans TC",sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;padding:2rem 1.3rem 5rem;background:var(--bg)}
+ h1{font-size:1.6rem;color:var(--navy);margin:.2em 0} h2{font-size:1.22rem;color:var(--navy);margin:1.9em 0 .5em;border-bottom:2px solid var(--navy);padding-bottom:.2em} h3{font-size:1.04rem;color:var(--navy);margin:1.2em 0 .3em}
+ .sub{color:var(--mut);font-size:.95rem} .prov{background:var(--provbg);border:1px solid #e7d9ac;border-radius:8px;padding:.5em .8em;font-size:.88rem;margin:1em 0}
+ table{border-collapse:collapse;width:100%;margin:.6em 0;font-size:.88rem} .scroll{overflow-x:auto} th,td{border:1px solid var(--line);padding:.4em .55em;text-align:left;vertical-align:top} th{background:#eef2f8;color:var(--navy)} tr:nth-child(even) td{background:#f6f8fb}
+ code{background:#eef1f5;padding:.05em .35em;border-radius:4px;font-size:.85em} .ok{color:var(--ok);font-weight:700} .warn{color:var(--warn);font-weight:600}
+ .box{border-left:4px solid var(--navy);background:#fff;padding:.5em .9em;margin:.7em 0;border-radius:0 8px 8px 0}
+ .pass{background:var(--okbg);border:1px solid #bfe0cc;border-radius:8px;padding:.6em .9em;margin:.8em 0}
+ ul{padding-left:1.25em} li{margin:.18em 0} .mut{color:var(--mut);font-size:.85rem} .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:.05em .5em;border-radius:20px;background:#eaf0fb;color:#274b8f}
+</style>
+</head>
+<body>
+<h1>Chapter 5 — Applications of Differentiation（applied 報告）</h1>
+<div class="sub">2026-07-06 · <b>本書第一個「無老師手稿」章</b> · Mode A（canon-as-spine，Codex 在 ⑤ 閘）＋ 數學閘</div>
+
+<div class="prov">
+<b>流程：</b> Ch5–16 已無老師手稿 → 產線改 <b>canon 為軸＋全閘</b>（Stewart ET 9e §§3.5–4.8 為主，Thomas/Rogawski 覆核；每 fragment 標 <code>section-source</code>）。使用者 2026-07-06 授權自主推進，決策點以 <b>Codex</b>（gpt-5.5/xhigh，唯讀）代替詢問。<b>③ 方向閘＋⑤ 審查閘皆對 Codex 跑</b>（非人）。每節：draft → build/linebreak/render → Codex ⑤（數學正確＋方向符合＋假設衛生）→ 套 advisory → 收斂。Roster 採 Codex 全弧 seam-hunt 重排。
+</div>
+
+<div class="pass"><b class="ok">✔ Mode A 完成：</b> 9 節全草稿 · 每節 <b>Codex ⑤ 0 blocking</b>（blocking 皆當場修＋advisory 套用）· <b>sympy 數學閘 33/33 PASS</b>（獨立重算所有 worked example）· build/linebreak-gate 0 自動斷行 / render <b>katex-errors=0</b>（math=917）· L'Hôpital ∞/∞ 補證入 <b>Appendix D §D.3</b>。 <span class="warn">剩餘全閘（圖／S·A·V／難度 sim／Mode C）待後續。</span></div>
+
+<h2>1 · 逐節 as-built</h2>
+<div class="scroll">
+<table>
+<tr><th>§</th><th>標題 / 內容</th><th>env minted</th><th>Codex ⑤</th></tr>
+<tr><td>5.1</td><td><b>Implicit Differentiation</b> — 隱微分＝鏈式法則用在方程式；圓/folium 斜率、arcsin′ 由框架重推（收 Ch3 open-q）、圓的 \(y''\)。<b>seam：</b>不寫一般 \(F_x/F_y\)（Ch14 偏導），branch-based。</td><td>Strategy 5.1；Ex 5.1–5.4</td><td>0 blk；3 adv 套（過度一般化收斂、\(0/0\) 措辭、Ex 5.4「the point」）</td></tr>
+<tr><td>5.2</td><td><b>Related Rates</b> — 對 \(t\) 隱微分；梯／氣球／影子三型。<b>caution：</b>先微分再代值。</td><td>Strategy 5.2；Ex 5.5–5.7</td><td>0 blk（clean）</td></tr>
+<tr><td>5.3</td><td><b>Linear Approximation & Differentials</b> — 線性化 \(L(x)\)、微分 \(dy\) vs \(\Delta y\)。<b>seam：</b>cross-ref Ch3 remainder-form（Def 3.1），\(\Delta y-dy=R_x(h)\) 恰為餘項。</td><td>Def 5.1–5.2；Ex 5.8–5.10</td><td>0 blk；3 adv 套（局部誤差措辭、\((1+x)^n\) 正底、base-point 餘項）</td></tr>
+<tr><td>5.4</td><td><b>Maximum and Minimum Values</b> — 局部極值、critical numbers、閉區間法、<b>First Derivative Test（證）</b>。import EVT 4.9(a)/Fermat 4.10/單調性 Cor 4.3。</td><td>Def 5.3–5.4；Thm 5.1；Strategy 5.3；Ex 5.11–5.13</td><td>0 blk；2 adv 套（FDT 證改逐對用 Cor 4.3＋−f、Def 域衛生）</td></tr>
+<tr><td>5.5</td><td><b>Optimization</b> — modeling→§5.4；柵欄/易開罐/半圓內接矩形，皆以一階/端點論證（二階判別法尚未到）。</td><td>Strategy 5.4；Ex 5.14–5.16</td><td><b class="warn">1 blk 修</b>（Ex 5.16 面積 \(R^2\)＝\(2R\times2R\) 方的<b>四分之一</b>非一半）＋adv</td></tr>
+<tr><td>5.6</td><td><b>Shape of a Graph</b> — 凹性、拐點、<b>Concavity Test（證）</b>、<b>Second Derivative Test（證，limit-def of \(f''\)）</b>。export 二階判別法→Ch14 Hessian。</td><td>Def 5.5–5.6；Thm 5.2–5.3；Ex 5.17–5.18</td><td>0 blk；3 adv 套（Concavity 證逐對閉子區間、拐點候選改用 Fermat-on-\(f'\)、softening）</td></tr>
+<tr><td>5.7</td><td><b>L'Hôpital's Rule</b> — <b>Generalized MVT（Cauchy's form）Thm 5.4（證，via Rolle）</b>→export Ch11；<b>L'Hôpital Thm 5.5</b>：\(0/0\) 就地全證，\(\ast/\infty\) fence 至 §D.3；不定型 recast；成長比較 \(\ln x\ll x^p\ll e^x\)。</td><td>Thm 5.4–5.5；Strategy 5.5；Ex 5.19–5.21；<b>+appD §D.3</b></td><td><b class="warn">2 blk 修</b>（§D.3 \(a=\pm\infty\) reduction 需分 \(0/0\) vs \(\ast/\infty\)；\(x^x\)＝Ex <b>3.10</b> 非 3.7）＋adv</td></tr>
+<tr><td>5.8</td><td><b>Curve Sketching</b> — 漸近線（垂直/水平/斜）Def 5.7；描繪 checklist；\(x^2/(x^2-1)\)（V+H 漸近線）、\(x+1/x\)（斜漸近線）。</td><td>Def 5.7；Strategy 5.6；Ex 5.22–5.23</td><td>0 blk；3 adv 套（消去因子＝洞非漸近線、Ch1 vs 無窮極限歸屬、softening）</td></tr>
+<tr><td>5.9</td><td><b>Newton's Method</b>（章末＋<b>章總結</b>）— 切線→x 截距迭代；\(\sqrt2\)（Babylonian）、\(x^3-x-1\)（IVT 4.9(b) 證存在）；收斂/失敗 caution。</td><td>Strategy 5.7；Ex 5.24–5.25</td><td><b class="warn">2 blk 修</b>（cubic 有 Cardano 式非「無公式」；章總結 EVT/Fermat 過度壓縮）＋adv</td></tr>
+</table>
+</div>
+
+<h2>2 · 新增的關鍵定理（render 版）</h2>
+
+<div class="box">
+<h3>Theorem 5.4 — Generalized Mean Value Theorem (Cauchy's form) <span class="tag">export → Ch11</span></h3>
+<p>\(f,g\) 在 \([a,b]\) 連續、\((a,b)\) 可微 ⟹ 存在 \(c\in(a,b)\)：\([f(b)-f(a)]g'(c)=[g(b)-g(a)]f'(c)\)；若 \(g'\ne0\) 則 \(\dfrac{f(b)-f(a)}{g(b)-g(a)}=\dfrac{f'(c)}{g'(c)}\)。 <span class="mut">證：輔助 \(h=[f(b)-f(a)]g-[g(b)-g(a)]f\)，\(h(a)=h(b)\)，Rolle（Thm 4.11）。</span></p>
+</div>
+<div class="box">
+<h3>Theorem 5.5 — L'Hôpital's Rule</h3>
+<p>\(g'\ne0\) 近 \(a\)（\(a\) 實或 \(\pm\infty\)），\(\lim f'/g'=L\)，且 \(f,g\to0\)（\(0/0\)）或 \(g\to\pm\infty\)（\(\ast/\infty\)）⟹ \(\lim f/g=L\)。 <span class="mut">\(0/0\) 有限點就地證（Thm 5.4，設 \(f(a)=g(a)=0\)）；\(\ast/\infty\)＋無窮點 fence §D.3。</span></p>
+</div>
+<div class="box">
+<h3>Theorem 5.1 / 5.2 / 5.3 — 判別法</h3>
+<p><b>First Derivative Test</b>（\(f'\) 變號分四情形，證 via Cor 4.3＋\(-f\)）· <b>Concavity Test</b>（\(f''>0\Rightarrow\) 凹上，逐對閉子區間 Cor 4.3）· <b>Second Derivative Test</b>（\(f'(c)=0,f''(c)>0\Rightarrow\) 局部極小，證 via \(f''(c)=\lim f'(c+h)/h>0\)；\(f''=0\) 不定）。</p>
+</div>
+
+<h2>3 · sympy 數學閘（獨立重算，33/33 PASS）</h2>
+<p>對每個 worked example 的關鍵結果以 sympy 獨立符號/數值重算並斷言。全 PASS（2 個初判 FAIL 經確認為測試腳本 <code>real</code> vs <code>positive</code> 假設瑕疵，內容正確：\(r^3=V/(2\pi)\)、內接矩形面積 \(=R^2\)）。涵蓋：隱微分斜率/二階、線性化/微分、critical numbers/閉區間值、最佳化臨界點、\(f''\)/拐點、L'Hôpital 四極限、描繪 \(f'/f''\)/漸近線。Newton 迭代另以 Python 逐步驗（\(\sqrt2\)、cubic）。</p>
+
+<h2>4 · Appendix D（The Proof Track）成長</h2>
+<p>Phase A 立 §D.1（how-to＋假設 summary）／§D.2（Lemma D.1 LUB＋EVT/IVT 證）。Ch5 §5.7 fence 使 Appendix D 得<b>第二 customer §D.3</b>（L'Hôpital \(\ast/\infty\) 證：\(f/g=f(d)/g(x)+(f'(\xi)/g'(\xi))(1-g(d)/g(x))\)＋limsup，＋ \(a=\pm\infty\) via \(x=1/t\)）。§D.1 summary 已加 Thm 5.5 列。<b>Proof Track 按設計運作</b>：主線只留 GMVT＋\(0/0\)，重證下放。</p>
+
+<h2>5 · 刻意偏離／延後</h2>
+<ul>
+<li><b>所有圖延後</b>至 figure-opportunity 閘（強候選：§5.1 圓＋切線、§5.8 兩描繪、§5.9 Newton 切線圖）——分析自足可據以手繪。</li>
+<li><b>原函數</b>（Stewart 4.9）不收（→ Ch6）；<b>科技繪圖</b>不收（非嚴謹軌）。</li>
+<li><b>第二導數判別法</b>刻意排在 §5.5 最佳化<b>之後</b>（§5.6）；故 §5.5 極值全以一階/端點論證。</li>
+<li>§5.1 不引入隱函數定理／\(F_x/F_y\)（需 Ch14 偏導）——operational/branch-based。</li>
+</ul>
+
+<h2>6 · 剩餘閘（与 Ch1/Ch2 同級，待後續 session）</h2>
+<ul>
+<li><b>數學 M1–M8 gate-2</b>：Codex 跨模型複核（gate-1 已含逐節 Codex ⑤＋sympy；可加一輪整章 Codex 數學閘）。</li>
+<li><b>圖機會閘＋圖正確性閘</b>：識別該加哪些圖、畫出後 D1–D8 視覺審。</li>
+<li><b>S·A·V 散文閘</b>（去 AI 味 gate-1+2）。</li>
+<li><b>難度 learner-sim</b>（≥3 盲測，比對 Ch1–4 難度曲線）。</li>
+<li><b>Mode C</b>：①課文範例補充（題庫）②軟深度（intuition/caution/application/history）。</li>
+</ul>
+
+<hr style="margin:2em 0 1em;border:none;border-top:1px solid var(--line)">
+<p class="mut">loci：<code>handout/fragments/ch05/sec-5-1..9.html</code>、<code>handout/fragments/appD/sec-d-3.html</code>、<code>build.py</code>（ch05/appD registry）、<code>chapter5-print-standalone.html</code>。編排：<code>handout/_dev-archive/ch05/PLAN-ch05.md</code>。全在工作樹、依慣例未 commit。</p>
+</body>
+</html>

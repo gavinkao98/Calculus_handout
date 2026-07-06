@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>章節弧線提案 — 對標大一微積分</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --purple:#6c2bd9; --orange:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1080px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.6; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  h3 { font-size: 1rem; margin: 1.3rem 0 .3rem; }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .summary { background:#f0f6ff; border:1px solid #cfe0fb; border-radius:8px; padding:.8rem 1rem; font-size:.92rem; margin:0 0 1.4rem; }
+  .summary b { color: var(--blue); }
+  .pass { color: var(--green); font-weight: 700; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem 1rem; margin: .7rem 0; }
+  .card.decide { border-left: 4px solid var(--orange); }
+  .id { font-family: ui-monospace, monospace; font-weight: 700; font-size: .82rem; background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem; text-transform: uppercase; letter-spacing: .02em; display:inline-block; }
+  .b-decide { background:#fef0e7; color:var(--orange); } .b-done { background:#e7f5ee; color:var(--green); }
+  .b-prop { background:#e8f0fb; color:var(--blue); } .b-split { background:#f3ecfd; color:var(--purple); }
+  table { border-collapse: collapse; width:100%; font-size:.82rem; margin:.4rem 0; }
+  th, td { border:1px solid var(--line); padding:.35rem .5rem; text-align:left; vertical-align:top; }
+  th { background:#f3f4f6; }
+  .done td { background:#f2faf5; }
+  .why { font-size:.9rem; color:#333; margin-top:.5rem; }
+  .meta { font-size:.82rem; color:var(--gray); margin-top:.5rem; }
+  .meta code, .why code, td code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  a { color: var(--blue); }
+  .note { font-size:.85rem; color:#667085; }
+  ul { margin:.3rem 0; padding-left:1.3rem; } li { margin:.15rem 0; }
+  .yes { color:var(--green); font-weight:700; } .diff { color:var(--orange); font-weight:600; }
+</style>
+</head>
+<body>
+<h1>章節弧線提案 —— 把全書章節定下來（對標大一微積分／NTU 微積分甲）</h1>
+<p class="sub">2026-07-04　唯讀研究＋提案：查證 Stewart／Thomas／Rogawski／NTU 微積分甲的章節結構,提出本書完整章節弧線供裁決。<b>不改任何檔</b>（含 roadmap——依 roadmap-first 紀律,經你裁定後才更新 <code>CONTENT_ROADMAP.md</code>）。緣起：使用者提議先把章節全部定下來,再回頭處理附錄／§16.2。</p>
+
+<div class="summary">
+<b>研究結論：<span class="pass">你的直覺對——經典教科書在主題骨架上高度收斂,而且本書對標的 NTU 微積分甲本身就是 Stewart 骨架。</span></b> 四本參考（Stewart ET／Thomas／Rogawski／NTU）走同一條 16 主題的脊椎、同一順序;差異只在<b>三個放置選擇</b>（transcendentals 早/晚、series 相對 parametric 的前後、vector calculus 併 1 章或拆 2 章）。<br>
+<b>但不能照抄 14/16 章：</b>本書 (i) 走 <b>Early Transcendentals</b>（指對數已在 Ch4 早鋪,且用級數嚴格構造）、(ii) precalc 走<b>附錄</b>不設複習章、(iii) <b>微分段切得更細</b>（Stewart 用 3 章的料本書用了 4 章＋應用還在後面）、(iv) 深度<b>向分析靠攏</b>。<br>
+<b>提案：一條 16 主題脊椎</b>（Ch1–4 已完成、Ch5–16 擬定,見 §三）;在本書的分析深度下 <b>Ch11 與 Ch16 建議各拆 2 章 → 實務約 18 章</b>（Ch14 待觀察）。需你拍板的只有 <b>4 個結構選擇</b>（§四）。
+</div>
+
+<h2>一、四本參考的章節對照（證明「大同小異」）</h2>
+<p class="note">Stewart＝Early Transcendentals 9e;Thomas＝14e;Rogawski＝4e;NTU＝微積分甲（甲上單變數＋甲下級數/多變數,查證其甲上即 Stewart Ch1–10）。<span class="diff">橘色＝各本真正分歧處</span>。</p>
+<table>
+<tr><th>主題脊椎</th><th>Stewart ET 9e</th><th>Thomas 14e</th><th>Rogawski 4e</th><th>NTU 微積分甲</th></tr>
+<tr><td>Precalc review</td><td>1 Functions and Models</td><td>1 Functions</td><td>1 Precalculus Review</td><td>（診斷/自習）</td></tr>
+<tr><td>極限（＋連續）</td><td>2 Limits and Derivatives</td><td>2 Limits and Continuity</td><td>2 Limits</td><td rowspan="6">甲上<br>（≈ Stewart 1–10）</td></tr>
+<tr><td>導數＋微分規則</td><td>3 Differentiation Rules</td><td>3 Derivatives</td><td>3 Differentiation</td></tr>
+<tr><td>微分應用</td><td>4 App of Differentiation</td><td>4 App of Derivatives</td><td>4 App of the Derivative</td></tr>
+<tr><td>積分</td><td>5 Integrals</td><td>5 Integrals</td><td>5 Integration</td></tr>
+<tr><td>積分應用</td><td>6 App of Integration</td><td>6 App of Definite Integrals</td><td>6 App of the Integral</td></tr>
+<tr><td class="diff">超越函數（指/對/三角）</td><td class="diff">早鋪（1,3,6 交織,ET）</td><td class="diff">7 Transcendental Functions（晚）</td><td class="diff">7 Exp &amp; Log（晚,LT 版）</td></tr>
+<tr><td>積分技巧</td><td>7 Techniques of Integration</td><td>8 Techniques of Integration</td><td>8 Techniques of Integration</td><td rowspan="2">甲上末</td></tr>
+<tr><td class="diff">積分進階應用</td><td class="diff">8 Further App of Integration</td><td class="diff">（併入 6）</td><td class="diff">9 Further App of the Integral</td></tr>
+<tr><td>微分方程</td><td>9 Differential Equations</td><td>9 First-Order DE</td><td>10 Intro to DE</td><td>甲上末</td></tr>
+<tr><td class="diff">參數式與極座標</td><td>10 Parametric/Polar</td><td class="diff">11 Parametric/Polar</td><td>12 Param/Polar/Conics</td><td>甲上末</td></tr>
+<tr><td class="diff">無窮級數</td><td>11 Infinite Sequences and Series</td><td class="diff">10 Series（在 parametric 之前）</td><td>11 Infinite Series</td><td>甲下</td></tr>
+<tr><td>向量與空間幾何</td><td>12 Vectors/Geometry of Space</td><td>12 Vectors/Geometry of Space</td><td>13 Vector Geometry</td><td rowspan="5">甲下<br>（多變數）</td></tr>
+<tr><td>向量函數</td><td>13 Vector Functions</td><td>13 Vector-Valued Functions</td><td>14 Calc of Vector-Valued Fns</td></tr>
+<tr><td>偏導數</td><td>14 Partial Derivatives</td><td>14 Partial Derivatives</td><td>15 Diff in Several Variables</td></tr>
+<tr><td>重積分</td><td>15 Multiple Integrals</td><td>15 Multiple Integrals</td><td>16 Multiple Integration</td></tr>
+<tr><td class="diff">向量微積分</td><td>16 Vector Calculus</td><td>16 Integrals and Vector Fields</td><td class="diff">17 Line/Surface ＋ 18 Fund. Thms（拆 2 章）</td></tr>
+<tr><td>（二階 ODE）</td><td>17（選）</td><td>（線上）</td><td>—</td><td>—</td></tr>
+</table>
+<p class="note">總章數：Stewart 16（＋1 選）、Thomas 16、Rogawski 18、NTU 甲＝跟 Stewart。<b>脊椎完全一致</b>,真正分歧只有橘色那幾格。</p>
+
+<h2>二、收斂結論 ＋ 本書為何不能照抄</h2>
+<p><b>收斂（你是對的）：</b>16 個主題、同一順序,四本一致。三個「分歧」其實都小：</p>
+<ul>
+<li><b>超越函數早/晚（ET vs LT）：</b>唯一實質選擇。<b>本書已定＝ET</b>（指對數在 Ch4 早鋪、級數構造）,所以中段<u>不再有</u>獨立的 transcendentals 章（省下 Thomas/Rogawski 的 Ch7）。</li>
+<li><b>series 相對 parametric 的前後：</b>Thomas 把 series 排 parametric 前,其餘排後。純順序,無關對錯。</li>
+<li><b>vector calculus 併 1 章 vs 拆 2 章：</b>深度取捨(Rogawski 拆線/面積分與三大定理)。</li>
+</ul>
+<p><b>本書的定位差異（所以要校準,不能貼 Stewart）：</b></p>
+<ul>
+<li><b>Early Transcendentals</b>——指對數 Ch4 已鋪且以冪級數嚴格構造（非 \(\int 1/t\) 的 LT 路線）。</li>
+<li><b>precalc 走附錄</b>——不設 Ch1 複習章（Appendix A 已立）。</li>
+<li><b>微分段切得更細</b>——Stewart 的 Ch2–3（極限+導數+規則）本書拆成 Ch1（極限）＋Ch2（導數）＋Ch3（chain/三角）＋Ch4（指對數,含 MVT/單調性）;Stewart 的「微分應用」本書<u>還沒寫</u>。</li>
+<li><b>深度向分析靠攏</b>（§16.1）——如 Ch4 的 Bolzano–Weierstrass、Cauchy、\(e^x\) 級數構造。這使某些章比 Stewart 厚,可能需要拆。</li>
+</ul>
+
+<h2>三、本書擬定章節弧線（16 章脊椎）</h2>
+<p class="note">Ch1–4＝已完成（綠底）。Ch5–16＝擬定。「可能再拆」＝本書深度/granularity 可能把它分兩章,待該章手稿/深度決策時定。</p>
+<table>
+<tr><th>#</th><th>擬定標題</th><th>角色</th><th>對應標準</th><th>狀態</th></tr>
+<tr class="done"><td>1</td><td>Inverse Functions and Limits</td><td>基礎機器：反函數＋極限</td><td>Stewart 1–2 部分</td><td><span class="badge b-done">已完成</span></td></tr>
+<tr class="done"><td>2</td><td>Derivatives</td><td>導數定義＋基本規則</td><td>Stewart 2–3 部分</td><td><span class="badge b-done">已完成</span></td></tr>
+<tr class="done"><td>3</td><td>Chain Rule and Trigonometric Derivatives</td><td>複合規則＋三角導數</td><td>Stewart 3 部分</td><td><span class="badge b-done">已完成</span></td></tr>
+<tr class="done"><td>4</td><td>The Exponential and Logarithmic Functions</td><td>指對數嚴格構造＋MVT＋單調性</td><td>Stewart 3/6 部分（ET 早鋪）</td><td><span class="badge b-done">已完成</span></td></tr>
+<tr><td>5</td><td>Applications of Differentiation</td><td>極值/最佳化/相關變率/L'Hôpital/描圖/Newton 法;隱微分、線性近似 differentials（MVT 已在 Ch4;反三角導數已在 Ch3）</td><td>Stewart 4</td><td><span class="badge b-prop">擬定</span> <span class="note">（拆優先低）</span></td></tr>
+<tr><td>6</td><td>Integrals</td><td>原函數/黎曼和/定積分/FTC/代換</td><td>Stewart 5</td><td><span class="badge b-prop">擬定</span></td></tr>
+<tr><td>7</td><td>Applications of Integration</td><td>面積/體積/弧長/表面積/平均值/功（含 further applications）</td><td>Stewart 6(+8)</td><td><span class="badge b-prop">擬定</span></td></tr>
+<tr><td>8</td><td>Techniques of Integration</td><td>分部/三角積分/三角代換/部分分式/瑕積分/數值積分（strategy of integration;inverse hyperbolic 可放這）</td><td>Stewart 7</td><td><span class="badge b-prop">擬定</span> <span class="note">（拆優先低）</span></td></tr>
+<tr><td>9</td><td>Differential Equations</td><td>可分離/一階線性/成長衰變建模</td><td>Stewart 9</td><td><span class="badge b-prop">擬定</span></td></tr>
+<tr><td>10</td><td>Parametric Equations and Polar Coordinates</td><td>參數微積分/極座標/極座標面積（＋conics,銜接 A.5）</td><td>Stewart 10</td><td><span class="badge b-prop">擬定</span></td></tr>
+<tr><td>11</td><td>Infinite Sequences and Series<br><span class="note">建議拆：11a Sequences &amp; Numerical Series／11b Power Series &amp; Taylor's Theorem</span></td><td>數列/數項級數/斂散測試 ・ 冪級數/Taylor 定理</td><td>Stewart 11</td><td><span class="badge b-prop">擬定</span> <span class="badge b-split">建議拆 2 章</span></td></tr>
+<tr><td>12</td><td>Vectors and the Geometry of Space</td><td>3D 座標/向量/點積/叉積/線面/二次曲面</td><td>Stewart 12</td><td><span class="badge b-prop">擬定</span></td></tr>
+<tr><td>13</td><td>Vector Functions</td><td>空間曲線/向量函數微積分/弧長/曲率/運動</td><td>Stewart 13</td><td><span class="badge b-prop">擬定</span></td></tr>
+<tr><td>14</td><td>Partial Derivatives</td><td>多變數極限/連續/可微性、偏導、多變數 chain rule、方向導數/梯度、Lagrange 乘子</td><td>Stewart 14</td><td><span class="badge b-prop">擬定</span> <span class="badge b-split">可能需拆（sleeper）</span></td></tr>
+<tr><td>15</td><td>Multiple Integrals</td><td>二重/三重積分、極座標二重積分、柱/球座標、變數變換 Jacobian</td><td>Stewart 15</td><td><span class="badge b-prop">擬定</span></td></tr>
+<tr><td>16</td><td>Vector Calculus<br><span class="note">建議拆：16a 線積分/保守場/Green／16b 面積分/Stokes/散度定理</span></td><td>向量場、線積分、<b>保守場/路徑無關/線積分基本定理</b>、Green;面積分、Stokes、散度定理</td><td>Stewart 16</td><td><span class="badge b-prop">擬定</span> <span class="badge b-split">建議拆 2 章</span></td></tr>
+</table>
+<p class="note"><b>Granularity（經 Codex 覆核修正）：</b>16 是<b>脊椎主題數</b>。在本書的分析深度下,<b>Ch11 與 Ch16 建議各拆 2 章</b>（→ 實務約 <b>18 章</b>）;<b>Ch14 偏導</b>是待觀察的潛在大章（多變數極限/可微性/chain/梯度/Lagrange 若都認真做會過載,比 Ch5 更可能需拆）;<b>Ch5、Ch8 維持一章</b>（Codex 把我原標的「可能再拆」降級）。脊椎主題不變,拆的是承載——「現在定脊椎、細節跟章走」仍成立。</p>
+
+<h2>四、需你拍板的結構選擇（只有 4 個）</h2>
+<div class="card decide"><span class="badge b-decide">選擇 1</span><span class="id">超越函數</span> <b>維持 Early Transcendentals</b>（指對數留 Ch4、中段不設 transcendentals 章）。<div class="why"><b>建議：維持（其實已定）。</b>Ch4 已把指對數以級數嚴格鋪完,回頭改 LT 等於推翻 Ch4。此格勾選即確認。</div><div class="meta"><b>Codex 提醒的前向依賴：</b>Ch4 用 \(e^x\) 級數構造＝提前借用了級數機器,所以 <b>Ch11 必須回收並一般化</b>級數理論（比照「\(\ln\) 在 Ch3 非正式、Ch4 才嚴格」的模式,附 forward fence）,否則讀者會覺得 Ch11 不是第一次建立級數。<b>雙曲函數</b>：\(\sinh/\cosh\) 若收放 Ch4/Ch5 選讀,inverse hyperbolic 放 Ch8,均不需獨立章。</div></div>
+<div class="card decide"><span class="badge b-decide">選擇 2</span><span class="id">積分應用</span> <b>「積分進階應用」併入 Ch7 還是獨立一章？</b><div class="why"><b>建議：併入 Ch7</b>（如 Thomas）。Stewart/Rogawski 另立「Further Applications」多為篇幅考量;本書可併。若你要獨立則 +1 章。</div><div class="meta"><b>Codex 提醒：併入只在「選材節制」時成立。</b>若把 moments、center of mass、hydrostatic force、probability、arc length、surface area 全收進 Ch7,它會比 Ch5 更腫——屆時反而該獨立。所以此選擇與「Ch7 收多少」綁在一起。</div></div>
+<div class="card decide"><span class="badge b-decide">選擇 3</span><span class="id">級數</span> <b>無窮級數 1 章還是 2 章？</b><div class="why"><b>建議（經 Codex 修正）：直接拆 2 章。</b>本書的分析深度下,一章塞「數列＋數項級數＋冪級數＋Taylor」會過載。切法：<b>11a Sequences &amp; Numerical Series</b>／<b>11b Power Series &amp; Taylor's Theorem</b>（Taylor 不必獨立成第三章,與 power series 同一 chapter-level unit 即可）。</div></div>
+<div class="card decide"><span class="badge b-decide">選擇 4</span><span class="id">微分方程</span> <b>DE 的範圍（freshman 一章 intro 即可？）</b><div class="why"><b>建議：一章 intro</b>（可分離＋一階線性＋成長衰變建模,銜接 Ch4 的 \(y'=ky\)）。位置在 Ch8 積分技巧後合理。</div><div class="meta"><b>Codex 提醒：章名要框住範圍。</b>「Differential Equations」會暗示更大範圍——需在章內明確排除 Stewart-style 二階線性 DE／冪級數解,否則名實不符。可考慮章名或開場明示「first-order intro」。</div></div>
+
+<h2>五、與 roadmap 紀律的關係 ＋ 建議</h2>
+<p><code>CONTENT_ROADMAP.md</code> 現行政策是「Ch3 以後標題<b>不承諾</b>,待前驅到 draft 才填」——理由是上游決策影響下游要教什麼。這與你「現在全定下來」有張力,但可調和：</p>
+<ul>
+<li><b>那條政策主要防的是「節層細節」</b>（章內要教哪些、順序、哪些延後）——我們<u>不</u>在這裡承諾節層。</li>
+<li><b>脊椎（章標題＋角色）現在定下來風險低</b>：主題收斂＋NTU 對標＋Ch1–4 深度已確立,當初那條政策要防的不確定性（多深、什麼語域）大多已解。</li>
+<li><b>拆章不破壞前向引用</b>：一章之後要一分為二,只是 11→11+12 順延,cross-ref 易調。所以「定脊椎」安全,「鎖死 granularity」才是那條政策真正警告的。</li>
+</ul>
+<p><b>建議：現在定 16 章脊椎（Ch1–4 固定、Ch5–16 擬定＋3 個可拆點）,節層細節仍按既有「前驅到 draft 才填 entry」逐章填。</b>這給你要的holistic 穩定靶,又不違背 roadmap 程序。裁定後我更新 <code>CONTENT_ROADMAP.md</code> 的章節列表與各章 entry 骨架。</p>
+<p class="note"><b>本報告唯讀,未改任何檔</b>（含 roadmap）。你裁定 4 個選擇後,我才更新 <code>CONTENT_ROADMAP.md</code> 的章節列表與各章 entry 骨架。</p>
+
+<h2>六、Codex 對抗式覆核（gpt-5.5/xhigh, read-only）已完成並折入</h2>
+<p class="sub">獨立審脊椎完整性/順序、granularity、四選擇盲點後回三點,均採納。</p>
+<table>
+<tr><th>面向</th><th>Codex 結論</th><th>折入</th></tr>
+<tr><td>(1) 完整性/順序</td><td>順序標準無問題（DE 在技巧後、series 在多變數前）。但幾個「章內不可省略」主題別被章名遮掉：Ch5 Newton/differentials、Ch8 數值積分、<b>Ch14 多變數極限/可微/chain/梯度/Lagrange</b>、Ch15 極/柱/球座標＋Jacobian、<b>Ch16 保守場/路徑無關/線積分基本定理</b>。conics 不需獨立章（附錄+Ch10）。</td><td>各章角色欄補齊核心清單。</td></tr>
+<tr><td>(2) Granularity</td><td>優先序修正：<b>Ch11、Ch16 最該拆 2 章</b>；<b>Ch14 是被我漏標的潛在大章</b>（比 Ch5 更可能需拆）；<b>Ch5、Ch8 不必然拆</b>（降級）。</td><td>§三表格與 note 全面改標。</td></tr>
+<tr><td>(3) 四選擇盲點</td><td>ET：Ch4 提前借級數機器,Ch11 須回收一般化。further-app 併入僅在選材節制時成立。series 應拆 2 章。DE 章名要框住範圍（排除二階/級數解）。</td><td>§四各卡加 meta 提醒;選擇 3 建議改「拆 2 章」。</td></tr>
+</table>
+
+<h2>資料來源</h2>
+<ul class="note">
+<li><a href="https://math.libretexts.org/Bookshelves/Calculus/Map:_Calculus__Early_Transcendentals_(Stewart)/00:_Front_Matter/03:_Table_of_Contents">Stewart, Calculus: Early Transcendentals — Table of Contents (LibreTexts)</a></li>
+<li><a href="https://www.pearson.com/en-us/subject-catalog/p/thomas-calculus/P200000006210/9780134438986">Thomas' Calculus, 14th edition (Pearson)</a></li>
+<li><a href="https://store.macmillanlearning.com/us/product/Calculus/p/1319050735">Rogawski, Calculus, 4th Edition (Macmillan Learning)</a></li>
+<li><a href="https://ocw.aca.ntu.edu.tw/courses/100S111">臺大開放式課程 — 微積分（NTU OCW）</a>；<a href="https://nol.ntu.edu.tw/nol/coursesearch/print_table.php?course_id=201+101A1&class=02&dpt_code=9010&ser_no=06218&semester=105-1">臺大微積分甲上課程大綱</a></li>
+</ul>
+
+</body>
+</html>

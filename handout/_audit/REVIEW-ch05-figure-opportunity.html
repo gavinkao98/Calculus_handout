@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch5 圖機會閘 — 候選裁決稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)'],['$','$']], displayMath: [['\\[','\\]'],['$$','$$']] }, svg:{fontCache:'global'} };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+ :root{--navy:#1f3a5f;--ink:#1a1a1a;--mut:#5a6472;--line:#d9dee6;--bg:#fbfcfe;--hi:#274b8f;--hibg:#eaf0fb;--drop:#8a4b3a;--dropbg:#f7ede9}
+ *{box-sizing:border-box} body{font:16px/1.6 -apple-system,"Segoe UI","Noto Sans TC",sans-serif;color:var(--ink);max-width:1020px;margin:0 auto;padding:2rem 1.3rem 5rem;background:var(--bg)}
+ h1{font-size:1.55rem;color:var(--navy);margin:.2em 0} h2{font-size:1.2rem;color:var(--navy);margin:1.7em 0 .5em;border-bottom:2px solid var(--navy);padding-bottom:.2em}
+ .sub{color:var(--mut);font-size:.94rem} .intro{background:#fdf8ea;border:1px solid #e7d9ac;border-radius:8px;padding:.6em .9em;font-size:.9rem;margin:1em 0}
+ table{border-collapse:collapse;width:100%;margin:.6em 0;font-size:.86rem} .scroll{overflow-x:auto} th,td{border:1px solid var(--line);padding:.4em .5em;text-align:left;vertical-align:top} th{background:#eef2f8;color:var(--navy)} tr:nth-child(even) td{background:#f6f8fb}
+ .t{display:inline-block;font-size:.7rem;font-weight:700;padding:.05em .5em;border-radius:20px}
+ .t-ess{background:#dcecdc;color:#1f6b45}.t-hi{background:var(--hibg);color:var(--hi)}.t-med{background:#f0ece4;color:#6b5730}.t-low{background:#eee;color:#666}
+ code{background:#eef1f5;padding:.05em .3em;border-radius:4px;font-size:.85em} .ns{color:var(--drop);font-weight:600}
+ .drop{background:var(--dropbg);border:1px solid #e2c4b8;border-radius:8px;padding:.5em .8em;font-size:.86rem;margin:.6em 0}
+ ul{padding-left:1.2em} li{margin:.15em 0} .mut{color:var(--mut);font-size:.85rem}
+</style>
+</head>
+<body>
+<h1>Chapter 5 — 圖機會閘（candidate 裁決稿）</h1>
+<div class="sub">2026-07-06 · <code>handout-figure-opportunity-audit</code> subagent（唯讀）· FIGURE-OPPORTUNITY-RUBRIC ＋ CONTENT_SPEC §10</div>
+
+<div class="intro">
+<b>背景：</b> Ch5 Mode A 撰寫時<b>所有圖延後至本閘</b>——全 9 節 0 圖，是全書最大密度缺口（Ch1–4 平均 ~2 圖/節）。各節 header 已預標 deferred 候選。 <b>結論：13 候選（essential 6／strong 5／medium 3／low 2；駁回 9 項合 6 群）。全部 kit 可畫</b>（buildPlot 座標圖＋虛線漸近線／raw SVG 幾何圖；無需 fill primitive）。 <b>下一步（後續 session）：</b> 裁決要畫哪些 → 加 <code>&lt;figure&gt;</code> 至 fragment＋FIGS 函數至 standalone → render → 圖正確性閘 D1–D8。
+</div>
+
+<h2>Tier 1 — essential（優先畫，6）</h2>
+<div class="scroll">
+<table>
+<tr><th>圖</th><th>locus</th><th>教學功能 / why 圖&gt;prose</th><th>型別</th><th>關鍵事實 ＋ <span class="ns">no-spoiler</span></th></tr>
+<tr><td><span class="t t-ess">ess</span> Newton 迭代步</td><td>§5.9 opener/Strategy 5.7</td><td>Newton＝「切線當引擎」的定義圖：曲線過根 \(r\)、猜 \(x_0\)、切線滑到軸交於 \(x_1\)（更近 \(r\)）。公式 \(x_{n+1}=x_n-f/f'\) 非此圖無視覺意義。</td><td>graph/SVG</td><td>generic 遞增曲線過 \(r\)；\((x_0,f(x_0))\) 實心；切線交軸 \(x_1\)；軸標 \(x_0,x_1,r\)。\(f'(x_0)\ne0\)（明顯斜切線）。無 spoiler（一般法）。</td></tr>
+<tr><td><span class="t t-ess">ess</span> \(x+1/x\) 斜漸近線</td><td>§5.8 Ex 5.23 Assemble</td><td>本節<b>新概念斜漸近線</b>：曲線兩端貼 \(y=x\)、\(x=0\) 切成兩支；反直覺「max 值(−2)&lt;min 值(2)」一眼可見（prose 要解釋開）。</td><td>graph</td><td>domain \(x\ne0\)；VA \(x=0\) 虛線；<b>slant \(y=x\)</b> 虛線；min (1,2)、max (−1,−2) 實心；奇對稱；無拐點。</td></tr>
+<tr><td><span class="t t-ess">ess</span> \(x^2/(x^2-1)\) 全描繪</td><td>§5.8 Ex 5.22 Assemble</td><td>綜合章旗艦圖：中央拱峰 (0,0)、VA \(x=\pm1\)、HA \(y=1\)、外兩支——多特徵佈局 prose 難、圖全給。</td><td>graph</td><td>domain \(x\ne\pm1\)；VA \(x=\pm1\)＋HA \(y=1\) 虛線；max (0,0) 實心；偶對稱；漸近線上不放點；無拐點。carrying 圖（座標要準）。</td></tr>
+<tr><td><span class="t t-ess">ess</span> 凹性定義（上/下）</td><td>§5.6 Def 5.5 gloss</td><td>凹上＝在切線上方（cups up, holds water）／凹下＝在切線下方。同時視覺化「\(f'\) 遞增 ⇔ 凹上」＋「在切線上方」——Concavity Test 的概念核心。</td><td>雙 panel graph</td><td>兩 generic 弧（\(x^2\) 凹上、\(-x^2\) 凹下）各畫 2–3 條切線；panel 標 Concave up/down；無數字。</td></tr>
+<tr><td><span class="t t-ess">ess</span> \(\sqrt x\) 切線近似</td><td>§5.3 Def 5.1/Ex 5.8</td><td>全節主圖＋「近看似直線」開場：\(y=\sqrt x\)、切線 \(L\) at (4,2)、\(x=4.05\) 處近乎重合。示近好遠差（Caution 的 √9 差）。</td><td>graph</td><td>anchor (4,2) 實心；切線斜 ¼；窗 [1,9]；概念圖，「2.0125」留 prose。</td></tr>
+<tr><td><span class="t t-ess">ess</span> 路燈影子相似三角形</td><td>§5.2 Ex 5.7</td><td>相似三角形 15/(x+s)=6/s：大三角（高 15、底 x+s）套小三角（高 6、底 s）共頂於影尖。§5.2 最密 setup 句，圖即解。</td><td>SVG diagram</td><td>燈高 15、人高 6（常數可標）、距 x、影 s、尖 x+s。<span class="ns">藏 s=⅔x、ds/dt=10/3、尖速 25/3</span>。</td></tr>
+</table>
+</div>
+
+<h2>Tier 2 — strong（5）</h2>
+<div class="scroll">
+<table>
+<tr><th>圖</th><th>locus</th><th>要點</th><th><span class="ns">no-spoiler</span></th></tr>
+<tr><td><span class="t t-hi">hi</span> 圓＋切線⊥半徑</td><td>§5.1 Ex 5.1</td><td>\(dy/dx=-x/y\)＝半徑斜率負倒數；切線⊥半徑一眼確認。圓 r=5、(3,4) 實心、右角記號。</td><td>藏 −3/4；標點不標斜率</td></tr>
+<tr><td><span class="t t-hi">hi</span> 梯子直角三角形</td><td>§5.2 Ex 5.5</td><td>牆(y)-地(x)-梯(10) 直角三角＋底向外箭頭＋頂下滑。related-rates 最常錯在 setup。</td><td>藏 x=6,y=8,dy/dt=−¾；標邊名＋1 ft/s（given）</td></tr>
+<tr><td><span class="t t-hi">hi</span> \(dy\) vs \(\Delta y\)</td><td>§5.3 differentials</td><td>同 \(dx\) 上切線升 \(dy\) vs 曲線升 \(\Delta y\)，差＝餘項 \(R\)。微分定義的唯一具象圖。畫凹上弧使 \(\Delta y>dy\)。</td><td>generic，無數字</td></tr>
+<tr><td><span class="t t-hi">hi</span> 河邊柵欄矩形</td><td>§5.5 Ex 5.14</td><td>三面圍（河在第四面不圍）：2x+y=2400 非 2x+2y——setup 陷阱靠圖破。</td><td>藏 600/1200/720000；標邊名</td></tr>
+<tr><td><span class="t t-hi">hi</span> 半圓內接矩形</td><td>§5.5 Ex 5.16</td><td>半圓 R＋內接矩形，角 (x,y) 在弧上、寬 2x、高 \(\sqrt{R^2-x^2}\)。</td><td>藏 R/√2、面積 R²；標 x,y,R</td></tr>
+</table>
+</div>
+
+<h2>Tier 3 — medium（3）／ low（2）</h2>
+<ul>
+<li><span class="t t-med">med</span> <b>§5.4 FDT 符號表</b>（cubic \(x^3-3x^2+1\)，\(f'\) 號 +−+，山/谷）——程序模板；prose 已清故 medium。</li>
+<li><span class="t t-med">med</span> <b>§5.6 \(x^4-4x^3\) 拐點</b>（\(f''=12x(x-2)\)，凹上/下/上、拐點 (0,0),(2,−16)）——prose 描述已生動故 medium。</li>
+<li><span class="t t-med">med</span> <b>§5.7 成長比較</b> \(\ln x\ll x^p\ll e^x\)（三曲線）——漸近速率視覺化；標「for large x」（小 x 序不同）；三線用線型區分。</li>
+<li><span class="t t-low">low</span> §5.5 易開罐（cylinder r,h）——setup 圖但近裝飾。 · <span class="t t-low">low</span> §5.9 Newton 失敗模式（水平切線甩飛）——次於主 Newton 圖。</li>
+</ul>
+
+<h2>駁回（6 群，附理由碼）</h2>
+<div class="drop">
+<b>§5.1 folium</b>（D5 隱式自交難繪＋D1 例題重點正是「無需圖」）· <b>§5.1 arcsin 反射</b>（D2/D4 重複 Ch1/Ch3 反函數圖）· <b>§5.1 圓二階導</b>（D1 一句自足＋前置 §5.6）· <b>§5.2 氣球</b>（D1 裝飾，無 2D 關係）· <b>§5.4 \(x^{3/5}(4-x)\) 尖點</b>（D1/D5 cusp 難繪、prose 已清）· <b>§5.4 局部 vs 絕對 schematic</b>（D2 屬 Ch4）· <b>§5.6 SDT 谷/脊</b>（D1/D2 凹性圖已涵蓋）· <b>§5.7 Cauchy MVT 參數幾何</b>（D5 需參數平面＋D4 非本節證法）· <b>§5.7 \(x^x\) 極限</b>（D1 屬 Ch3）。
+</div>
+
+<h2>密度 ＆ 可行性</h2>
+<ul>
+<li><b>密度：</b> 0→採 tier-1/2 後 geometry-heavy 節（§5.1/5.2×2/5.3×2/5.5×2/5.6/5.8×2/5.9）約 1 圖/節＝Stewart 密度鄰域；§5.4/§5.7 保持輕（符號表/成長圖）＝procedural/algebraic 節適當。</li>
+<li><b>kit（D5）全可畫：</b> 座標圖含 V/H/<b>slant</b> 漸近線用 <code>buildPlot</code> 虛線 refline（<code>.refline</code>/<code>.idline</code>）；排除點 <code>hollow</code>；幾何圖（梯/相似/柵欄/罐/Newton）raw SVG（同 §3.1 sector）。<b>無候選需 fill primitive</b>。</li>
+<li><b>與 Ch4 一致：</b> \(e^x\)/\(\ln x\) 樣式沿用 Ch4 <code>exp-log-reflection</code> 慣例；成長圖非反射圖、無 D2 衝突。</li>
+</ul>
+
+<hr style="margin:2em 0 1em;border:none;border-top:1px solid var(--line)">
+<p class="mut">全 13 候選 card（含完整 domain_facts）在 subagent 分析；本稿為裁決摘要。裁決後進圖繪＋圖正確性閘 D1–D8。loci：<code>handout/fragments/ch05/sec-5-*.html</code>。</p>
+</body>
+</html>

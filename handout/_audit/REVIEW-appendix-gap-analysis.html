@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>附錄缺口分析 — 對標大一微積分</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --purple:#6c2bd9; --orange:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.65; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  h3 { font-size: 1rem; margin: 1.3rem 0 .3rem; }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .summary { background:#f0f6ff; border:1px solid #cfe0fb; border-radius:8px; padding:.8rem 1rem; font-size:.92rem; margin:0 0 1.4rem; }
+  .summary b { color: var(--blue); }
+  .pass { color: var(--green); font-weight: 700; }
+  .fail { color: var(--red); font-weight: 700; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem 1rem; margin: .7rem 0; }
+  .card.t1 { border-left: 4px solid var(--red); }
+  .card.t2 { border-left: 4px solid var(--orange); }
+  .card.t3 { border-left: 4px solid var(--gray); }
+  .card.na { border-left: 4px solid #cbd2da; background:#fcfcfd; }
+  .card.open { border-left: 4px solid var(--purple); }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; display:inline-block; }
+  .b-t1 { background:#fdeceb; color:var(--red); }  .b-t2 { background:#fef0e7; color:var(--orange); }
+  .b-t3 { background:#eef1f4; color:var(--gray); } .b-na { background:#eef1f4; color:var(--gray); }
+  .b-open { background:#f3ecfd; color:var(--purple); }
+  .b-cat { background:#e8f0fb; color:var(--blue); }
+  .why { font-size:.9rem; color:#333; margin-top:.5rem; }
+  .why b { color:#1a1a1a; }
+  .meta { font-size:.82rem; color:var(--gray); margin-top:.55rem; }
+  .meta code, .why code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.4rem 0; }
+  th, td { border:1px solid var(--line); padding:.4rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#f3f4f6; }
+  .yes { color:var(--green); font-weight:700; }
+  .no { color:var(--red); font-weight:700; }
+  a { color: var(--blue); }
+  .note { font-size:.85rem; color:#667085; }
+  ul { margin:.3rem 0 .3rem; padding-left:1.3rem; }
+  li { margin:.15rem 0; }
+</style>
+</head>
+<body>
+<h1>附錄缺口分析 —— 對標大一微積分（Calc I+II+III 全弧）</h1>
+<p class="sub">2026-07-04　唯讀偵察（read-only reconnaissance）：只盤點與提議，<b>不改任何檔</b>。判準＝<code>CONTENT_SPEC.md</code> §16.2 先備知識基線＋<code>CONTENT_ROADMAP.md</code> 目標範圍（Calc I+II+III，約 14 章）。紀律：<b>附錄收錄條目一律先與使用者裁決</b>（使用者 2026-07-04 兩度強調），本報告為裁決用候選清單。</p>
+
+<div class="summary">
+<b>一句話結論：<span class="pass">相對於已寫的 Ch1–4，附錄是「完整」的——沒有當前缺口。</span></b> 所有 §16.2 B 類先備（Ch1–4 會用到者）都已由附錄或主線覆蓋。<b>真正該補的全是前瞻性項目</b>（Calc II/III 章 Ch5–14 尚未浮現的工具），這正是路線圖說「附錄隨未來章節浮現新 B 類值得鋪開項而擴充」的機制。<br>
+<b>最該優先立項的一項：</b><span class="fail">冪次和封閉式 \(\sum k^2,\ \sum k^3\)</span>（Tier&nbsp;1；\(\sum k\) 屬 A 類可假設，不算缺口）——積分章從定義算黎曼和必需，且與 A.4 部分分式「forward-stock 給積分技巧」的既有裁量邏輯完全平行。其餘為 scope-dependent（複數、補證處）或邊際（行列式、參考卡）。<br>
+<span class="note">本報告經 <b>Codex（gpt-5.5/xhigh, read-only）第二意見</b>複核並折入 7 條精修（見文末附記）。</span>
+</div>
+
+<h2>一、現況盤點（附錄 A/B，共 10 節）</h2>
+<table>
+<tr><th>節</th><th>內容</th><th>對應 §16.2 B 類項</th></tr>
+<tr><td><code>A.1</code> Reciprocal Trigonometric Functions</td><td>Def A.1（\(\sec/\csc/\cot\)）＋Caution（\(\cot=\cos/\sin\ne 1/\tan\)）＋Prop A.1（畢氏 companion）＋Ex A.1</td><td>\(\sec/\csc/\cot\)</td></tr>
+<tr><td><code>A.2</code> Product-to-Sum &amp; Sum-to-Product</td><td>Prop A.2（積化和差）＋Prop A.3（和差化積）＋降冪公式＋Strategy A.1＋Ex A.2</td><td>和差化積／積化和差</td></tr>
+<tr><td><code>A.3</code> Sigma Notation &amp; the Geometric Series</td><td>Σ 操作（re-index／peel／split／telescope）＋Prop A.4（有限等比）＋Prop A.5（無窮等比＋tail）＋Ex A.3＋Caution</td><td>無窮等比級數；Σ 操作（A 類，順帶鋪開）</td></tr>
+<tr><td><code>A.4</code> Partial Fractions</td><td>Prop A.6（三型模板）＋Strategy A.2＋Ex A.4/A.5＋Caution　<span class="note">（forward-stock：Ch1–4 無 inbound）</span></td><td>部分分式分解</td></tr>
+<tr><td><code>A.5</code> The Conic Sections</td><td>圓/拋/橢/雙標準式＋Ex A.6＋Fig A.1–A.4　<span class="note">（analytic geometry，不列 B 類）</span></td><td>—（§16.3 深度預留給 Ch8 極座標/Ch10 二次曲面）</td></tr>
+<tr><td><code>B.1–B.5</code> Reading Theorems and Proofs</td><td>讀敘述（converse/contrapositive）／證明形狀（直證·反證√2·反例·分案·歸納）／量詞工具箱（∀∃順序·否定·ε∃δ）／憑空步驟（add-subtract·3ε·min·輔助函數·WLOG）／主動閱讀（鴿籠·⇒≠⇔）</td><td>量詞操作與以反證法為主的證明寫作</td></tr>
+</table>
+
+<h2>二、判準：附錄的職責邊界（§16.2）</h2>
+<p>附錄不是「把所有 precalculus 塞進來」，而是 <b>§16.2 B 類先備中「值得完整鋪開」者的家</b>。因此「還缺什麼」＝在<b>目標弧線（Calc I+II+III）</b>裡，找出「未來章節會承重使用、屬 B 類（不可假設）、且值得完整鋪開（非一行 bridge 能了）」而<b>尚未有家</b>的工具。三分類複習：</p>
+<ul>
+<li><b>A 類（可直接假設）</b>：多項式/因式餘式、絕對值與基本不等式、指對數、\(\sin/\cos/\tan\)/單位圓/和差倍角、疊合、<b>Σ 記號與有限等差/等比</b>、二項式定理、數學歸納法、直線點斜式。→ 不需附錄。</li>
+<li><b>B 類（不可假設，違者 blocking）</b>：\(\sec/\csc/\cot\)、和差化積、反三角、\(e\) 與 \(\ln\)、極限一切、無窮級數/收斂/無窮等比、量詞與反證法、反函數理論、部分分式、導數積分一切。→ 值得鋪開者進附錄。</li>
+<li><b>C 類（灰色帶）</b>：絕對值不等式、\(x^n-a^n\) 因式分解、重手有理化。→ 承重時就地一行提醒即可。</li>
+</ul>
+<p class="note">路線圖 Appendix A entry 明載擴充機制：「未來章節出現新的 B 類『值得鋪開』項時擴充」。本分析即依此把 Ch5–14 的先備需求前瞻映射到附錄。</p>
+<p class="note"><b>憲章實務比 §16.2 略寬：</b>A.5 圓錐曲線<u>不是</u> §16.2 B 類命中項（是 analytic geometry），卻已收錄——所以附錄的<b>實際</b>範圍＝「§16.2 B 類值得鋪開者」<b>＋</b>「未來章節承重的標準 precalc／analytic-geometry review（A.5 為先例）」。下列候選凡非 B 類命中者（如冪次和、行列式），皆循此 A.5 先例判斷，不因「不在 B 類清單」而自動排除。</p>
+
+<h2>三、覆蓋核對：Ch1–4 的 B 類先備全部有家</h2>
+<table>
+<tr><th>§16.2 B 類項</th><th>Ch1–4 是否承重</th><th>落點</th><th>附錄缺口？</th></tr>
+<tr><td>\(\sec/\csc/\cot\)</td><td>是（§3.1）</td><td>附錄 A.1</td><td class="yes">否</td></tr>
+<tr><td>和差化積</td><td>是（§3.1）</td><td>附錄 A.2</td><td class="yes">否</td></tr>
+<tr><td>反三角函數</td><td>是（§1.2、§3.3）</td><td>主線 §1.2（刻意）</td><td class="yes">否（設計選擇）</td></tr>
+<tr><td>\(e\) 與 \(\ln\)</td><td>是（Ch4）</td><td>主線 Ch4（嚴格構造）</td><td class="yes">否</td></tr>
+<tr><td>極限一切（單側/無窮/εδ）</td><td>是（Ch1）</td><td>主線 Ch1</td><td class="yes">否</td></tr>
+<tr><td>無窮級數/無窮等比</td><td>是（§4.1 tail bound）</td><td>附錄 A.3 ＋主線 Ch4</td><td class="yes">否</td></tr>
+<tr><td>量詞與反證法證明寫作</td><td>是（全書散文）</td><td>附錄 B.1–B.5</td><td class="yes">否</td></tr>
+<tr><td>一一對應/反函數理論</td><td>是（§1.1）</td><td>主線 §1.1（刻意）</td><td class="yes">否</td></tr>
+<tr><td>部分分式分解</td><td>否（forward-stock）</td><td>附錄 A.4</td><td class="yes">否（已預置）</td></tr>
+<tr><td>導數/積分一切</td><td>導數是（Ch2–4）</td><td>主線章節</td><td class="yes">否</td></tr>
+</table>
+<p><b>結論：附錄相對於 Ch1–4 無缺口。</b>反三角（§1.2）與反函數理論（§1.1）是<b>刻意放主線</b>而非附錄，屬設計選擇非遺漏。以下全部候選皆為<b>前瞻性</b>（Ch5–14）。</p>
+
+<h2>四、前瞻缺口候選（分三 tier，供裁決）</h2>
+
+<div class="card t1">
+<span class="badge b-t1">Tier 1 · 高信心</span><span class="badge b-cat">非 B 類命中（循 A.5 先例）</span><span class="id">GAP-1</span> <b>平方和／立方和封閉式 \(\sum_{k=1}^{n} k^2,\ \sum k^3\)</b>
+<div class="why"><b>需求章：</b>Ch5 積分——從定義算黎曼和時必需，例如 \(\displaystyle\int_0^1 x^2\,dx=\lim_{n\to\infty}\sum_{k=1}^{n}\Big(\frac{k}{n}\Big)^2\frac1n\) 要用到 \(\sum k^2=\frac{n(n+1)(2n+1)}{6}\)。這是積分章開篇第一個真正的計算。</div>
+<div class="why"><b>為何屬缺口（範圍已收窄）：</b>§16.2 把「Σ 記號與<u>有限等差/等比</u>」列 A 類，故 \(\sum k=\frac{n(n+1)}{2}\)（等差）<b>可假設、不算缺口</b>。真正缺的是 \(\sum k^2,\ \sum k^3\)——封閉式高中不必記，承重使用（黎曼和）時需就地建立。現 A.3 只有等比與 Σ 操作（re-index/peel/split/telescope），<b>沒有這兩條冪次和</b>。</div>
+<div class="why"><b>標準先例：</b>Stewart <i>Appendix E「Sigma Notation」</i>正是 \(\sum c,\ \sum i,\ \sum i^2,\ \sum i^3\) 四條＋歸納法證明。</div>
+<div class="meta"><b>建議家：</b>擴充 <code>§A.3</code>（已是 “Sigma Notation and the Geometric Series”，天然歸屬；A.3 現有的 telescoping 正是導出 \(\sum k^2\) 的機制之一，銜接無縫）。<b>裁量平行：</b>與 A.4 部分分式「forward-stock 給積分技巧、Ch1–4 無 inbound」同一邏輯。</div>
+</div>
+
+<div class="card t2">
+<span class="badge b-t2">§16.1 基建（非 §16.2 缺口）</span><span class="id">GAP-2</span> <b>延後證明的「補證處」附錄（Appendix C：Deferred Proofs / Proof Track）</b>
+<div class="why"><b>定性（經第二意見校正）：</b>這<u>不是</u> §16.2 先備缺口，而是 §16.1 深度軸／Proof-track 的<b>基礎設施</b>。§16.1 明訂「重要結果要嘛當場證明、要嘛<u>明文掛帳（on-credit fence 到補證處）</u>」——但「補證處」目前無實體，全都 inline。</div>
+<div class="why"><b>標準先例：</b>Stewart <i>App F「Proofs of Theorems」</i>、Thomas 「Proofs of Limit Theorems」＋A.9「Mixed Derivative &amp; Increment Theorems」。過重證明（limit laws 全套 \(\varepsilon\)-\(\delta\)、IVT/EVT from completeness、Clairaut 混合偏導對稱）是典型會被 fence 的對象。</div>
+<div class="meta"><b>現況與觸發：</b>Ch1–4 尚無 fence-out 的證明（都 inline 或 on-credit 到後續正式章），故<b>現在非當前缺口</b>。但一旦有任一章開始把 on-credit 證明延後，它就<b>不再是 scope-dependent，而是結構性必需</b>（fence 指向的目的地必須存在）。建議：<b>第一個被 fence 的證明出現時同批立項</b>。</div>
+</div>
+
+<div class="card t2">
+<span class="badge b-t2">Tier 2 · scope-dependent</span><span class="badge b-cat">§16.2 未分類</span><span class="id">GAP-3</span> <b>自足複數 primer（四則/共軛/模/極式/棣美弗/根 →\(e^{i\theta}\)、複指數）</b>
+<div class="why"><b>需求章：</b>Ch9 級數（Euler 公式連結 \(e^x,\sin x,\cos x\) 的 Maclaurin 級數）、Ch7 ODE（特徵方程複根）。</div>
+<div class="why"><b>範圍已校正（第二意見）：</b>原本我判「複數屬 108 數A＝可假設、只缺 Euler 脈絡」——但 <b>§16.2 的 A 類清單根本沒有列複數</b>，依本書<u>自己的規則</u>不能直接假設。故若採用，應是一份<b>自足的 complex primer</b>（四則、共軛、模長、極式、De Moivre、方根，再接 \(e^{i\theta}\)），不是只補微積分脈絡那一句。</div>
+<div class="meta"><b>連帶 spec 缺口：</b>§16.2 三分類（A/B/C）目前<b>完全沒有替複數定位</b>——建議一併請使用者裁決複數歸 A（可假設）還是 B（需就地/附錄鋪開），這會直接決定本候選要不要立、寫多完整。<b>標準先例：</b>Stewart App H、Thomas「Complex Numbers」。<b>建議：</b>待級數章（Ch9）設計時連同 §16.2 定位一起定。</div>
+</div>
+
+<div class="card t3">
+<span class="badge b-t3">Tier 3 · 邊際</span><span class="badge b-cat">§16.2 未分類</span><span class="id">GAP-4</span> <b>行列式 primer（\(2\times2\)、\(3\times3\) 餘因子展開）</b>
+<div class="why"><b>需求章：</b>Ch10 向量（叉積的行列式記法 \(\mathbf a\times\mathbf b=\det[\,\mathbf i\,\mathbf j\,\mathbf k;\dots]\)）、Ch13 重積分（Jacobian）。</div>
+<div class="meta"><b>判斷（理由已校正）：</b>§16.2 A 類清單並<u>未</u>列行列式，故不能以「108 數A 可假設」為由排除。優先度仍低，但理由改為：叉積／Jacobian <b>首次出現時就地 bridge 即可</b>（記法層，非理論）；<b>除非後文多次依賴行列式技術</b>（如展開性質、Cramer），才升級為完整附錄節。</div>
+</div>
+
+<h2>五、明確不建議（N/A）與已裁決項</h2>
+<div class="card na">
+<span class="badge b-na">N/A</span> <b>函數／圖形／變換 review</b>（定義域值域、composition、基本圖形、平移伸縮、奇偶性）——Thomas/Rogawski 常見的 precalc review 附錄（比希臘字母更標準的一塊，第二意見補列）。<b>本書不需：</b>這些多屬 §16.2 A 類，且 §1.1（反函數/composition）與各章動機已就地自然建立；無獨立附錄之需。
+</div>
+<div class="card na">
+<span class="badge b-na">N/A</span> <b>對數以積分定義</b>（Stewart App G）——本書已用冪級數構造 \(e^x\)（Ch4）、\(\ln\) 為其反函數（§4.5），構造路線已定，此替代路徑不需要。
+</div>
+<div class="card na">
+<span class="badge b-na">N/A</span> <b>雙曲函數 \(\sinh/\cosh\)、L'Hôpital 法則</b>——標準教科書均為<b>章節</b>內容（Stewart §6.7／§4.4），非附錄。將於對應正式章處理。
+</div>
+<div class="card na">
+<span class="badge b-na">已裁決</span> <b>絕對值不等式 \(|x-a|<\delta\leftrightarrow\) 區間</b>（§16.2 C 類）——使用者已於 Appendix A 第二批 roster <b>明確不選</b>；此處僅記錄，不重提。
+</div>
+<div class="card na">
+<span class="badge b-na">低優先</span> <b>參考卡型附錄</b>（導數/積分表、三角恆等式總表、希臘字母）——本書是<b>教學型非參考型</b>（lookup-friendliness 靠散文交叉引用，非表/索引）；與定位不完全契合，建議留待 arc 收尾階段再議。
+</div>
+
+<h2>六、既有 open question 待關閉（不在附錄「加新節」範圍，但相關）</h2>
+<div class="card open">
+<span class="badge b-open">OPEN</span> <b>A.1 倒數三角函數<u>圖形</u></b>（路線圖 Appendix A open question (i)，第二意見已拆為兩件事）：<br>
+&nbsp;&nbsp;• <b>\(\sec/\csc/\cot\) 圖</b>——若 A.1 要作為 reciprocal trig 的<b>完整鋪開</b>，此圖值得補，屬 §A.1 的圖機會（非新節）。<br>
+&nbsp;&nbsp;• <b>\(\operatorname{arccsc}/\operatorname{arcsec}\) 分支圖</b>——這比較像 <b>inverse-trig 主線材料（§1.2）</b>，應由 §1.2 的使用情境決定，<b>不必因 A.1 自動補</b>。兩者分開裁決。
+</div>
+
+<h2>七、建議</h2>
+<ol>
+<li><b>立即可裁決：</b>GAP-1 冪次和 \(\sum k,\sum k^2,\sum k^3\)——建議核可、擴充 §A.3。這是唯一「現在就該補」的項（積分章一開篇即需，且裁量與 A.4 完全平行）。走既有縮閘（prose gate-1＋難度 sim＋Codex 數學/語域 gate-2＋render 自驗）。</li>
+<li><b>待章節設計時再定：</b>GAP-2（補證處附錄）、GAP-3（複數/Euler）——皆 scope-dependent，建議掛在 Ch9/相關章的 roadmap entry，待該章草擬時一併裁決。</li>
+<li><b>邊際/暫緩：</b>GAP-4（行列式）多半就地 bridge 即可；參考卡型留待收尾。</li>
+<li><b>順帶：</b>可一併裁決 A.1 圖形 open question。</li>
+</ol>
+<p class="note">本報告為唯讀偵察，未改任何講義檔（僅產出本 HTML）。附錄收錄一律待使用者裁決後才動筆（2026-07-04 紀律）。</p>
+
+<h2>附記：Codex 第二意見（gpt-5.5/xhigh, read-only）7 條全數折入</h2>
+<p class="sub">依 standing consent 逕行的唯讀 second opinion，用意是抓盲點與分類誤判。下列 7 條均採納並已反映於上文對應處。</p>
+<table>
+<tr><th>#</th><th>Codex finding</th><th>折入處置</th></tr>
+<tr><td>1</td><td>複數被低估且與 §16.2 不一致——A 類清單根本沒列複數，不能自動假設；若用應為自足 primer。</td><td>GAP-3 改為「自足複數 primer」＋標「§16.2 未分類」＋加連帶 spec 缺口（請使用者替複數定位）。</td></tr>
+<tr><td>2</td><td>漏列標準的「functions/graphs/transformations」review 附錄。</td><td>§五新增 N/A 卡：承認是標準項，但本書屬 A 類＋§1.1 已建，不需。</td></tr>
+<tr><td>3</td><td>\(\sum k\) 不該與 \(\sum k^2,\sum k^3\) 同級標缺口（等差是 A 類）。</td><td>GAP-1 收窄為 \(\sum k^2,\sum k^3\)；\(\sum k\) 明列為 A 類可假設。</td></tr>
+<tr><td>4</td><td>行列式「多半 108 A 類」理由不成立（§16.2 A 類無行列式）。</td><td>GAP-4 理由改為「§16.2 未分類；首次就地 bridge，除非重度依賴才升級」，優先度不變。</td></tr>
+<tr><td>5</td><td>A.1 圖形應拆：\(\sec/\csc/\cot\) 圖屬 A.1 完整性；arcsec/arccsc 分支圖屬主線。</td><td>§六 OPEN 拆為兩件分開裁決。</td></tr>
+<tr><td>6</td><td>「補證處」非 §16.2 缺口而是 §16.1 基建；一旦 fence 就是結構性必需（非 scope-dependent）。</td><td>GAP-2 重定性為 §16.1 Proof-track 基建＋觸發條件改為「第一個 fence 出現時同批立」。</td></tr>
+<tr><td>7</td><td>A.5 圓錐曲線非 B 類命中，別當作「B 類完整鋪開」的證據。</td><td>§二加「憲章實務比 §16.2 略寬」段：附錄實際範圍＝B 類值得鋪開 ＋ 標準 analytic-geometry review（A.5 先例）。</td></tr>
+</table>
+
+</body>
+</html>

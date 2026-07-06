@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>附錄 clean-slate 設計 — 從全 arc 從頭</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --purple:#6c2bd9; --orange:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1060px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.6; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.18rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  h3 { font-size: 1.02rem; margin: 1.4rem 0 .3rem; color:#111; }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .summary { background:#f0f6ff; border:1px solid #cfe0fb; border-radius:8px; padding:.8rem 1rem; font-size:.92rem; margin:0 0 1.4rem; }
+  .summary b { color: var(--blue); }
+  .pass { color: var(--green); font-weight: 700; }
+  .fnc { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.2rem 1rem 1rem; margin:1rem 0; }
+  .fnc.A { border-top:4px solid var(--blue); } .fnc.B { border-top:4px solid var(--green); }
+  .fnc.C { border-top:4px solid var(--purple); } .fnc.D { border-top:4px solid var(--gray); }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem; text-transform: uppercase; letter-spacing:.02em; display:inline-block;}
+  .b-have { background:#e7f5ee; color:var(--green); } .b-new { background:#fdeceb; color:var(--red); }
+  .b-cond { background:#fef0e7; color:var(--orange); } .b-opt { background:#eef1f4; color:var(--gray); }
+  table { border-collapse: collapse; width:100%; font-size:.84rem; margin:.5rem 0; }
+  th, td { border:1px solid var(--line); padding:.4rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f3f4f6; }
+  .have td:first-child { border-left:3px solid var(--green); }
+  .new td:first-child { border-left:3px solid var(--red); }
+  .tag { font-size:.7rem; font-weight:700; padding:.05rem .4rem; border-radius:4px; white-space:nowrap; }
+  .t-have { background:#e7f5ee; color:var(--green); } .t-new { background:#fdeceb; color:var(--red); }
+  .t-cond { background:#fef0e7; color:var(--orange); }
+  a { color: var(--blue); } .note { font-size:.85rem; color:#667085; }
+  ul { margin:.3rem 0; padding-left:1.25rem; } li { margin:.18rem 0; }
+  .k { font-weight:700; }
+</style>
+</head>
+<body>
+<h1>附錄 clean-slate 設計 —— 從全 arc、不被現有附錄綁住,從頭一遍</h1>
+<p class="sub">2026-07-04　唯讀設計：<b>忽略已寫的 A.1–A.5／B.1–B.5</b>,從剛定案的 16 章弧線＋深度政策 (B)＋§16.2 判準,<b>按「附錄的功能」第一性原理重建</b>該有哪些附錄、各含什麼,再回頭與現有調和。<b>不改任何檔</b>；附錄收錄待你逐項裁決。使用者指示：「從全局所有章節的角度從頭分析一遍」。</p>
+
+<div class="summary">
+<b>兩個頭條：</b><br>
+① <span class="pass">從零重建的結果,現有 A.1–A.5／B.1–B.5 全部「命中」</span>——每一節都對得上全 arc 的真實需求,<b>沒有廢料、沒有放錯</b>。這是好消息:先前逐項裁決是穩的。<br>
+② <b>但 clean-slate＋深度政策 (B) 冒出一個結構級新東西：需要一個「補證處」附錄（Proof Track）。</b>先前掃描把它列「contingent」;現在我們<b>已經裁定 (B) 要 fence 掉 Ch14/15/16/11 的最重證明</b>,fence 的目的地就<u>必須存在</u>——它從「可選」升成「已規劃」。<br>
+<b>從全局看,理想附錄體系＝4 個功能：</b> <span class="badge b-have">A 已有骨幹</span> Precalc/代數工具箱・ <span class="badge b-have">B 已有</span> 讀證明・ <span class="badge b-new">C 新</span> 補證處・ <span class="badge b-opt">D 可選</span> 參考表。<br>
+③ <b>Codex 獨立版(未看現有附錄)又補了 3 個我漏的真項</b>(見「四、Codex 對照」):<b>Hessian／二次型</b>(Ch14 極值判別本質是線性代數)、<b>orientation／右手定則</b>(不只行列式)、<b>定理假設表</b>(既守「不假證」就該讓學生看見每定理吃哪些假設);並提出「<b>實數完備性/分析基礎</b>要不要抽成獨立附錄」這個深度決策。
+</div>
+
+<h2>一、方法：按「功能」而非「現有小節」重建</h2>
+<p>「附錄該放什麼」的第一性問法不是「A.1–A.5 缺哪幾項」,而是<b>「這本書的附錄要承擔哪些功能?每個功能在全 16 章的需求下該收什麼?」</b> 掃完全 arc,附錄要承擔 4 個彼此不同的功能:</p>
+<table>
+<tr><th>功能</th><th>它回答的問題</th><th>時間向</th><th>對應</th></tr>
+<tr><td><span class="k" style="color:var(--blue)">A 工具箱</span></td><td>「讀本書前/中,你需要、但 108 數A 不能假設的 precalc/代數」</td><td>前向(先備)</td><td>現 A.1–A.5</td></tr>
+<tr><td><span class="k" style="color:var(--green)">B 讀證明</span></td><td>「怎麼讀本書裡的證明」(後設閱讀技能)</td><td>伴隨</td><td>現 B.1–B.5</td></tr>
+<tr><td><span class="k" style="color:var(--purple)">C 補證處</span></td><td>「主文 fence 掉的重證明,完整版在哪」</td><td>後向(補主文)</td><td><b>尚無</b></td></tr>
+<tr><td><span class="k" style="color:var(--gray)">D 參考表</span></td><td>「導數/積分/恆等式速查」(lookup)</td><td>伴隨</td><td>尚無(可選)</td></tr>
+</table>
+<p class="note">下面每個功能,從 16 章的需求重新推它該收什麼,標 <span class="tag t-have">已寫</span>／<span class="tag t-new">新</span>／<span class="tag t-cond">條件</span>。判準:A 類不進附錄(可假設)、B 類值得鋪開者進、章內容不進。</p>
+
+<div class="fnc A">
+<h3>功能 A —— Precalculus &amp; 代數工具箱</h3>
+<p class="note">全 arc 掃描:哪些 precalc/代數是 §16.2 <b>不可假設(B 類)或未分類、且值得完整鋪開</b>,而非章內容。共 10 項:</p>
+<table>
+<tr><th>#</th><th>項目</th><th>哪章承重</th><th>§16.2</th><th>狀態</th></tr>
+<tr class="have"><td>1</td><td>倒數三角 \(\sec/\csc/\cot\)</td><td>Ch3、Ch8</td><td>B</td><td><span class="tag t-have">A.1 已寫</span></td></tr>
+<tr class="have"><td>2</td><td>積化和差/和差化積/降冪</td><td>Ch3、Ch8 三角積分</td><td>B</td><td><span class="tag t-have">A.2 已寫</span></td></tr>
+<tr class="have"><td>3</td><td>Σ 記號 ＋ 有限/無窮等比級數</td><td>Ch4、Ch11</td><td>A/B</td><td><span class="tag t-have">A.3 已寫</span></td></tr>
+<tr class="have"><td>4</td><td>部分分式分解</td><td>Ch8</td><td>B</td><td><span class="tag t-have">A.4 已寫</span></td></tr>
+<tr class="have"><td>5</td><td>圓錐曲線(標準式)</td><td>Ch10、Ch12 二次曲面</td><td>analytic geom</td><td><span class="tag t-have">A.5 已寫</span></td></tr>
+<tr class="new"><td>6</td><td><b>冪次和 \(\sum k^2,\sum k^3\)</b></td><td>Ch6 黎曼和</td><td>未分類→B</td><td><span class="tag t-new">新(擴 A.3)</span></td></tr>
+<tr class="new"><td>7</td><td><b>完全平方/二次標準形</b></td><td>Ch8 三角代換、Ch10/12 標準化</td><td>A 類但承重</td><td><span class="tag t-new">新(併 A.4/A.5)</span></td></tr>
+<tr class="new"><td>8</td><td><b>行列式 \(2\times2,3\times3\)</b></td><td>Ch12 叉積、Ch15 Jacobian、Ch16 旋度</td><td>未分類→B</td><td><span class="tag t-new">新(用 3 次)</span></td></tr>
+<tr class="new"><td>9</td><td><b>絕對值不等式 \(|x-a|<R\)</b></td><td>Ch1 εδ、Ch11 收斂半徑</td><td>C→承重升 B</td><td><span class="tag t-new">重估</span></td></tr>
+<tr><td>10</td><td>複數 primer(→\(e^{i\theta}\))</td><td>Ch11 Euler(若採)</td><td>未分類</td><td><span class="tag t-cond">條件</span></td></tr>
+</table>
+<p class="note"><b>結論:</b>工具箱功能＝現有 5 節(1–5 全命中)＋<b>4 個新增</b>(冪次和、完全平方、行列式、絕對值不等式)＋1 條件項(複數)。這就是「一次把 Appendix A 收尾」的完整 roster。</p>
+</div>
+
+<div class="fnc B">
+<h3>功能 B —— Reading Theorems and Proofs（讀證明）</h3>
+<p>現 B.1–B.5(讀敘述/證明形狀/量詞/憑空步驟/主動閱讀)。<b>Clean-slate 判定:完全命中,而且深度政策 (B) 讓它比先前<u>更</u>該存在</b>——本書理論核心章(Ch4/6/11/14)有大量真證明,一份「怎麼讀證明」primer 是讀者撐過那些章的關鍵。<b>無需改動;定位從「B 類先備」升級理解為「支撐全書分析深度的閱讀鷹架」。</b></p>
+</div>
+
+<div class="fnc C">
+<h3>功能 C —— Proof Track / 延後證明的補證處　<span class="badge b-new">新·結構級</span></h3>
+<p>§16.1 深度軸明訂「重要結果…明文掛帳（on-credit fence <b>到補證處</b>）」。先前 Ch1–4 都 inline 證,補證處沒實體,故列「contingent」。<b>但深度政策 (B) 已裁定要 fence 掉一批最重的證明——fence 的目的地必須存在,所以補證處現在是「已規劃」不是「可選」。</b> 從 (B) 的基調表,會被 fence 進 Appendix C 的重證明:</p>
+<table>
+<tr><th>來源章</th><th>被 fence 的證明</th></tr>
+<tr><td>Ch6 積分</td><td>連續 ⇒ 可積(Riemann/Darboux 可積性刻畫)</td></tr>
+<tr><td>Ch11 級數</td><td>重排定理、一致收斂的細節(Taylor 餘項若太重亦可)</td></tr>
+<tr><td>Ch14 偏導</td><td>Clairaut 混合偏導對稱</td></tr>
+<tr><td>Ch15 重積分</td><td>一般變數變換 / Jacobian 定理</td></tr>
+<tr><td>Ch16 向量微積分</td><td>一般 Green / Stokes / 散度定理</td></tr>
+</table>
+<p class="note"><b>這是本次 clean-slate 最重要的發現。</b>標準先例:Stewart App F「Proofs of Theorems」、Thomas「Proofs of Limit Theorems」＋A.9。收錄機制、要不要編號、初讀路徑等待立項時定。<b>不必現在寫</b>(第一個 fence 隨 Ch6 到來才需要),但<b>現在就該在 roadmap 立項</b>,讓 Ch6+ 的 fence 有指向。</p>
+</div>
+
+<div class="fnc D">
+<h3>功能 D —— 參考表（導數/積分/恆等式速查）　<span class="badge b-opt">可選·低優先</span></h3>
+<p>標準大厚本(Stewart 蝴蝶頁)有積分表等。<b>但本書是教學型非參考型</b>——lookup 靠散文交叉引用與 index,非速查表。與定位不完全契合。<b>建議:預設不設;若後期覺得全書夠厚、學生需要速查,再議。</b> 希臘字母/記號表同理(低優先)。</p>
+</div>
+
+<h2>二、與「已寫出來的」調和</h2>
+<ul>
+<li><b>A.1–A.5 全部 validated</b>——clean-slate 重推的工具箱前 5 項與它們一一對應,<b>沒有一節是廢料或放錯</b>。</li>
+<li><b>B.1–B.5 validated 且升級</b>——政策 (B) 下更該存在。</li>
+<li><b>工具箱新增 4 項</b>(冪次和/完全平方/行列式/絕對值不等式)＋複數(條件)。</li>
+<li><b>新開 Appendix C（補證處）</b>——政策 (B) 把它從可選變必需。</li>
+<li>Appendix D(參考表)＝預設不做。</li>
+</ul>
+<p class="note">換句話說:從零設計<b>不推翻</b>你已寫的,只<b>補</b>(A 加 4 項、新增 C)。這反過來確認了現有附錄的品質。</p>
+
+<h2>四、Codex 獨立設計對照（未看現有附錄，121k+ tokens）</h2>
+<p>Codex 從零提了 <b>8 個附錄</b>：A 數學語言/證明・B 實數完備性與分析基礎・C 初等代數/函數・D 三角/反三角・E 座標幾何/圓錐/二次曲面・F 微積分用線性代數/行列式/方向・G 補證處・H 公式/符號/假設表。<b>兩版核心一致</b>（工具箱・讀證明・補證處），但 Codex 是 unanchored，所以 (a) 補了我漏的真項、(b) 把本書刻意放主線的東西也搬進附錄、(c) 傾向拆更多本。逐條裁：</p>
+
+<h3>採納（我漏的真項）</h3>
+<table>
+<tr><th>項</th><th>為何該收</th></tr>
+<tr class="new"><td><b>Hessian／二次型</b></td><td>Ch14 多變數極值判別（二階導數判別）本質是線性代數——我漏了。應收進線性代數工具。</td></tr>
+<tr class="new"><td><b>方向／orientation／右手定則</b></td><td>比「行列式」更完整：叉積、Stokes、散度定理都靠它。行列式項擴成「Calc III 線性代數工具箱」（行列式＋orientation＋叉積＋Jacobian 矩陣＋Hessian）。</td></tr>
+<tr class="new"><td><b>定理假設表</b></td><td>本書既守「不假證」，就該讓學生看見每個定理吃哪些假設（continuity／\(C^1\)／simple region／orientation）。此 kernel 值得，即使不做完整參考表。</td></tr>
+<tr><td><b>實數完備性／分析基礎</b>（完備性/緊緻/一致連續/B–W）</td><td><b>真議題（深度決策）</b>：Ch4/6/11/14 都靠它，但現在各章 inline。抽成獨立「基礎」附錄可省重複；但一整本完備性/緊緻性會逼近 Rudin，和「108 數A 可讀」有張力。<b>三選項</b>：獨立附錄／併進補證處 C／維持章內。待你定深度界線。</td></tr>
+</table>
+
+<h3>不採納／校正（Codex unanchored 的偏差）</h3>
+<ul>
+<li><b>反函數理論、反三角</b>——Codex 搬進附錄，但<b>本書刻意放主線</b>（§1.1／§1.2）。維持主線。（Codex 不知情反而<b>確認</b>那是有意識的選擇。）</li>
+<li><b>函數/圖形/變換 review</b>——§16.2 A 類可假設＋Ch1 已建，不必附錄。</li>
+<li><b>完整公式/積分表</b>——本書教學型、lookup 靠散文，不做；只留<b>假設表</b> kernel。</li>
+</ul>
+
+<h3>組織問題（Codex 拆 8 本 vs 現在 1 本 Appendix A）</h3>
+<p>工具箱長到 9–10 項＋新增線性代數一整組時，<b>要不要像 Stewart 拆主題本</b>（三角／代數／座標幾何／線性代數各一附錄），還是維持單一 Appendix A 多節？Stewart 正是拆的（App B 座標、C 圓錐、D 三角、E sigma）。<b>這是要你定的組織決策</b>——內容一樣，只是編排。</p>
+
+<h2>五、待你裁決（更新後）</h2>
+<ol>
+<li><b>Appendix A 收尾 roster</b>：核可新增 冪次和／完全平方／絕對值不等式（＋複數要不要收）？</li>
+<li><b>線性代數工具箱</b>（Codex 補）：行列式＋orientation＋叉積＋Jacobian 矩陣＋<b>Hessian/二次型</b>——收成獨立附錄還是併 A？</li>
+<li><b>Appendix C（補證處）立項</b>：政策 (B) 的必然配套，同意現在在 roadmap 立項（內容隨各章 fence 填）？</li>
+<li><b>實數完備性/分析基礎</b>（深度決策）：獨立附錄／併補證處／維持章內——哪個？</li>
+<li><b>假設表</b>：做不做這個「每定理吃哪些假設」的速查（與「不假證」定位相配）？</li>
+<li><b>組織</b>：工具箱維持單一 Appendix A，還是拆主題本（Stewart 式）？</li>
+<li><b>§16.2 補分類</b>：冪次和/行列式/複數（＋絕對值不等式升級）——建議都歸 B。</li>
+</ol>
+<p class="note">本報告唯讀，未改任何講義檔；Codex 獨立設計已折入（採納 3 真項＋1 深度議題，校正 3 處 unanchored 偏差）。附錄收錄一律待你逐項裁決（2026-07-04 紀律）。</p>
+
+</body>
+</html>

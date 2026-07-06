@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appendix A — 撰寫＋縮閘驗證報告</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --purple:#6c2bd9; --orange:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.65; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  h3 { font-size: 1rem; margin: 1.3rem 0 .3rem; }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .summary { background:#f0f6ff; border:1px solid #cfe0fb; border-radius:8px; padding:.8rem 1rem; font-size:.92rem; margin:0 0 1.4rem; }
+  .summary b { color: var(--blue); }
+  .pass { color: var(--green); font-weight: 700; }
+  .fail { color: var(--red); font-weight: 700; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem 1rem; margin: .7rem 0; }
+  .card.fix { border-left: 4px solid var(--red); }
+  .card.adv { border-left: 4px solid var(--orange); }
+  .card.keep { border-left: 4px solid var(--gray); }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+  .b-fix { background:#fdeceb; color:var(--red); }  .b-adv { background:#fef0e7; color:var(--orange); }
+  .b-keep { background:#eef1f4; color:var(--gray); }
+  .loc { font-size:.82rem; color:var(--gray); margin:.3rem 0 .6rem; }
+  .loc code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .content { background:#fcfcfd; border:1px dashed var(--line); border-radius:6px; padding:.6rem .9rem; font-size:.95rem; }
+  .content .envlabel { font-weight:700; font-size:.85rem; color:#333; display:block; margin-bottom:.25rem; }
+  .why { font-size:.85rem; color:#444; margin-top:.5rem; }
+  .why b { color:var(--red); }
+  .src { font-size:.78rem; color:var(--gray); margin-top:.55rem; }
+  .src code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  del { color:#a33; background:#fdf0ef; text-decoration-color:#c66; }
+  ins { color:#155e33; background:#ecf8f0; text-decoration:none; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.4rem 0; }
+  th, td { border:1px solid var(--line); padding:.35rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#f3f4f6; }
+  a { color: var(--blue); }
+  .note { font-size:.85rem; color:#667085; }
+</style>
+</head>
+<body>
+<h1>Appendix A「Precalculus Toolbox」— 撰寫＋縮閘驗證報告</h1>
+<p class="summary" style="border-color:#c9b3f0;background:#f7f2fe;"><b style="color:#6c2bd9;">本報告涵蓋兩批。</b>　<b>第一批（2026-07-03）</b>：§A.1 倒數三角・§A.2 積化和差・§A.3 幾何級數（下方「一～六」，本地 blocking＝§A.3 a=0 已修）。　<b>第二批（2026-07-04，使用者裁決 roster）</b>：§A.2 內擴充降冪（不編號）・§A.3 <b>併入 Σ 記號/index 並 retitle</b>・§A.4 部分分式（新）・§A.5 圓錐曲線（新，含 4 圖）（下方「七～十」）。結構決策（節連號、Σ 併入 §A.3、conics 四曲線各一圖）經 AskUserQuestion 逐項裁定。</p>
+<p class="sub">2026-07-03 撰寫（無手稿自產；authoring brief＝<code>CONTENT_SPEC.md</code> §16.2/§16.3＋§3 語域）→ 2026-07-04 收尾縮閘。此附錄是 <code>CONTENT_SPEC.md</code> §16.2 B 類先備中「值得完整鋪開」者的家（使用者 2026-07-03 裁示立項）。緣起：Ch1–Ch4 難度緩解（見 <a href="REVIEW-ch01-ch04-difficulty-mitigation-applied.html">REVIEW-ch01-ch04-difficulty-mitigation-applied.html</a>）確立 B 類先備政策後，把三個最承重的 B 類項集中鋪開。<b>support 材料、縮閘</b>（<code>CONTENT_ROADMAP.md</code> Appendix A entry）：prose gate-1＋難度閘 sim＋Codex 數學/語域 gate-2＋render 自驗；六閘全套不適用。</p>
+
+<div class="summary">
+<b>總結：<span class="pass">四閘通過，1 blocking 已修並回歸。</span></b><br>
+① prose gate-1（Claude）：<span class="pass">0 blocking</span>（3 advisory）。②難度 sim（3 份盲測，persona＝§16.2 基線讀者）：<span class="pass">0 stuck、0 B 類先備違規</span>，逐節難度 2–3/5（全在 Ch1–3≈3 基線內、遠低於 §4.2 尖峰 4.5）。③ render 自驗（headless Chrome）：<span class="pass">ready、math=176、katex-errors=0</span>，環境框＋全部數學視覺乾淨。④ <b>Codex gate-2（gpt-5.5/xhigh, read-only）：<span class="fail">1 blocking</span></b>（§A.3 Caution 收斂條件在 a=0 退化情形 overstate）＋ 0 advisory，其餘全部數學與六處 cross-ref 主張 <span class="pass">CHECKED-CLEAN</span>、register 無 finding。<br>
+<b>套修：</b>1 blocking（Codex）＋ 2 收斂 advisory（難度 sim 多來源）＝共 3 筆 finding，全句子級、不動編號/結構；其中 B1 措辭經回歸盲測再精修一次（guard→白話自明）。修後重建、三輪 re-render（<span class="pass">katex-errors=0</span>）、scoped 盲測回歸複驗確認卡點消失、未引入新卡點。爭議/單來源項維持作者聲音不動（見「查證後不改」）。<b>本地未 commit</b>（分支為 video 線 <code>video/template-redesign-navy-spine</code>；建議另開 handout 分支收錄，同難度緩解那批）。
+</div>
+
+<h2>一、內容盤點（3 節、獨立編號 namespace「A」）</h2>
+<table>
+<tr><th>節（fragment）</th><th>環境（per-type counter 跨節連續）</th><th>被主線引用</th></tr>
+<tr><td><code>appA/sec-a-1.html</code><br>§A.1 The Reciprocal Trigonometric Functions</td><td>附錄 opener（第二 <code>&lt;article&gt;</code>，比照章慣例）＋ Definition A.1（sec/csc/cot）＋ Caution（cot=cos/sin≠1/tan）＋ Proposition A.1（Pythagorean companions）＋ Proof ＋ Example A.1</td><td>§1.2（倒數三角 bridge）、§3.1（tan′=sec² 脈絡）</td></tr>
+<tr><td><code>appA/sec-a-2.html</code><br>§A.2 Product-to-Sum / Sum-to-Product</td><td>Proposition A.2（積化和差 ×3）＋ Proof ＋ Proposition A.3（和差化積 ×4）＋ Proof ＋ Strategy A.1（重建忘掉的恆等式）＋ Example A.2</td><td>§3.1（sin A−sin B＝sin 導數樞紐）</td></tr>
+<tr><td><code>appA/sec-a-3.html</code><br>§A.3 The Infinite Geometric Series</td><td>Proposition A.4（有限和）＋ Proof（telescoping）＋ Proposition A.5（無窮和＋tail）＋ Proof ＋ Example A.3（½+¼+…、0.999…）＋ Caution（|r|&lt;1 載重）</td><td>§4.1（Strategy 4.1 geometric tail bound）</td></tr>
+</table>
+<p class="note">深度決策（SPEC §16.3）：§A.3 的無窮和讀為 §1.3 意義下的極限（附錄 opener 明示），嚴格收斂理論明文 fence 到 §4.1–§4.2；其餘皆 precalculus、不用微積分。<b>刻意偏離章規格：</b>無 chapter summary（工具箱非敘事章）、暫無圖（figure-opportunity 候選，見 open questions）。build.py registry <code>appA</code> → <code>appendixA-print-standalone.html</code>（shell 複製自 ch01，title/brand/runningHead 已改）。三處主線 bridge 均保留最短就地版並 cross-ref 附錄（SPEC §16.2 處置慣例）。</p>
+
+<h2>二、閘結果</h2>
+
+<h3>① Prose gate-1（<code>handout-prose-audit</code>，Claude，免費）</h3>
+<p><span class="pass">0 blocking（易懂性 A＝0、S/A＝0）。</span>三節動機皆 object-specific 先行，B 類術語在被送達時點均已就地建立或合法 back-reference，與對照組 <code>ch01/sec-1-2.html</code>、<code>ch03/sec-3-1.html</code> 同語域，對齊 svc-exemplars 正錨。餘 3 條全 advisory：§A.1 開場「warm-up」語域略平（voice）；§A.1 Caution 末句 robust-vs-shortcut 收束（tighten，可判 clean）；§A.3 箭頭記號 <code>x→a</code>→<code>m→∞</code> 可補半句（optional）。</p>
+
+<h3>② 難度閘（3 份盲測 learner-sim，persona＝SPEC §16.2 基線讀者：108 數A、無數甲、零微積分、英文中等、已讀到 §1.3）</h3>
+<table>
+<tr><th></th><th>§A.1</th><th>§A.2</th><th>§A.3</th><th>總判定</th></tr>
+<tr><td>Sim #1</td><td>2/5</td><td>3/5</td><td>2/5</td><td>三節 ok / 無 stuck</td></tr>
+<tr><td>Sim #2</td><td>2/5</td><td>3/5</td><td>3/5</td><td>三節 ok / 無 stuck</td></tr>
+<tr><td>Sim #3</td><td>3/5</td><td>2/5</td><td>3/5</td><td>三節 ok / 無 stuck</td></tr>
+</table>
+<p><span class="pass">判準：任何 stuck＝blocking；B 類先備違規＝blocking → 0 blocking。</span>三 sim 一致確認附錄「不用微積分、唯一例外 §A.3 極限只到 §1.3 程度」的承諾守住；四項指定驗算（§A.2 加兩條 sine 消 cos u sin v、Prop A.3 負號來歷、§A.3 telescoping、第三象限定號＋0.999…）全部自行推過。收斂 advisory 見下方修補 <span class="id">X1</span><span class="id">X2</span>；有爭議/單來源項見「查證後不改」。</p>
+
+<h3>③ Render 自驗（<code>handout/_render/shot.mjs</code>，headless Chrome，full mode）</h3>
+<p><span class="pass">ready=true（#boot 簾幕移除＝fragments 組裝＋MathJax 排版＋分頁全跑完）、math=176、katex-errors=0。</span>結構自檢：build 可重現、編號連續且分型正確（Definition A.1；Proposition A.1–A.5；Example A.1–A.3；Strategy A.1；兩 Caution 不編號）、MathJax 分隔對稱、HTML 標籤平衡（與正典章結構一致）。視覺抽驗：Definition/Caution/Proposition/Proof/Example/Solution 環境 chip 配色＋全部數學（√10、繁分數、對齊 display、qed、aligned domain 條件）渲染乾淨、分頁與 running head 正確。</p>
+
+<h3>④ Codex 數學/語域 gate-2（<code>codex exec -s read-only</code>, gpt-5.5/xhigh, standing consent）</h3>
+<p><b><span class="fail">VERDICT: 1 blocking, 0 advisory</span></b>（raw：<a href="REPORT-appendixA-math-register.gate2.raw.txt">REPORT-appendixA-math-register.gate2.raw.txt</a>）。blocking 見 <span class="id">B1</span>。其餘 <span class="pass">CHECKED-CLEAN</span>：§A.1 兩 Pythagorean companion 推導（帶 cos/sin≠0）＋cot caution＋Example A.1 三值與第三象限定號；§A.2 全 3 積化和差＋全 4 和差化積（含 cos A−cos B 負號）＋u/v 代換＋Example A.2 兩式；§A.3 有限和/telescoping（r≠1）＋無窮和（|r|&lt;1）＋tail＋Example A.3 兩值＋r=2 caution。<b>CROSS-REFS CHECKED-CLEAN：</b>六處主張逐一對回主線檔屬實（§1.2 principal ranges @ sec-1-2:220/276-302；§3.1 sin A−sin B @ sec-3-1:70-76、tan′=sec² @ 248-259、cos companion＋continuity @ 119-122/195-210；§4.1 r=1/2 geometric tail @ sec-4-1:138/156-163；§4.2 partial-sum 定義 @ sec-4-2:103）。<b>REGISTER：</b>無 advisory，「motivation-first, warm, precise，與 §1.2/§3.1 同 mode，無 filler、無 tone break」。</p>
+
+<h2>三、套用的修補（1 blocking＋2 收斂 advisory）</h2>
+
+<div class="card fix"><span class="id">B1</span><span class="badge b-fix">blocking · Codex gate-2</span><b>§A.3 Caution — 收斂條件補「a≠0」限定（避免 a=0 退化反例）</b>
+<p class="loc"><code>fragments/appA/sec-a-3.html</code>　Caution 末句</p>
+<div class="content">…it reports the limit of the running totals, <del>and only when \(\lvert r \rvert &lt; 1\) does that limit exist.</del><ins>and — unless every term is zero — that limit exists only when \(\lvert r \rvert &lt; 1\).</ins></div>
+<p class="why"><b>Codex 獨立反例：</b>若 \(a=0\)，則 \(0+0r+0r^2+\cdots\) 對任何 \(r\) 都收斂到 \(0\)，故「only when \(|r|&lt;1\) does that limit exist」無限定即為 false。此句落在以「精準陳述假設」為職的 Caution 框，屬數學精準度缺陷（SPEC §16.1 深度軸：不得含糊帶過）。獨立覆核成立。<b>兩步定稿：</b>初採 Codex 建議措辭「for a nonzero first term \(a\)」；回歸盲測 sim 判此 guard「使用處未給理由、讀者停半拍問為何 nonzero」（effortful、非 stuck）→ 改白話自明的「unless every term is zero」（全零級數顯然和為 0、無需追問；數學上「每項為零 ⟺ \(a=0\)」精確等價），sim 顧慮消解。</p>
+<p class="src">évidence：Codex gate-2 blocking（<code>sec-a-3.html:88</code>）；自身覆核 a=0 反例屬實。</p></div>
+
+<div class="card adv"><span class="id">X1</span><span class="badge b-adv">advisory · 難度 sim（多來源）</span><b>§A.2 — u,v 代換補「解聯立」半步</b>
+<p class="loc"><code>fragments/appA/sec-a-2.html</code>　sum-to-product 導入段</p>
+<div class="content">…by choosing \(u\) and \(v\) so that \(u + v = A\) and \(u - v = B\)<del> — that is, let</del><ins>. Adding these two equations gives \(2u = A + B\) and subtracting them gives \(2v = A - B\), so</ins> \(u\) <del>be</del> <ins>is</ins> the <em>average</em> and \(v\) the <em>half-difference</em>: \[ u = \tfrac{A+B}{2}, \quad v = \tfrac{A-B}{2}. \]</div>
+<p class="why"><b>sim#1＋sim#2 收斂</b>（全附錄唯一被兩位獨立指出的真跳步）：原文從 \(u+v=A,\ u-v=B\) 直接跳到 \(u=(A+B)/2,\ v=(A-B)/2\)，中間「兩式相加得 \(2u\)、相減得 \(2v\)」被「that is」帶過。數A 讀者補得起來（故只 slowdown），但 sim#1 明言「補一句就能讓 §A.2 從 effortful 變 ok」。補一行解聯立、不新增環境。</p>
+<p class="src">évidence：難度 sim #1、#2（§A.2 slowdown）；Codex CHECKED-CLEAN 確認 u/v 代換數學正確（本修不動數學、只補推導可見性）。</p></div>
+
+<div class="card adv"><span class="id">X2</span><span class="badge b-adv">advisory · prose＋難度 sim（三來源）</span><b>§A.3 — 箭頭記號 <code>x→a</code>→<code>m→∞</code> 補半句銜接</b>
+<p class="loc"><code>fragments/appA/sec-a-3.html</code>　"Now let the sum run on…" 段</p>
+<div class="content">In the arrow notation of §1.3<ins> (here the whole-number index \(m\) runs off to infinity, rather than a variable approaching a finite point)</ins>, \(r^{m+1} \to 0\) as \(m \to \infty\), so the running totals…</div>
+<p class="why"><b>prose gate-1＋sim#1＋sim#2 三來源收斂</b>（皆 minor/optional）：§1.3 教的箭頭是「\(x\) 趨近有限點 \(a\)」，此處首次用於「離散整數 \(m\) 趨無窮」。原文靠散文 gloss（"drops below any positive threshold"）已可撐住（故非 blocking），補一個輕量括號把記號用法差異點明，降低那半秒遲疑。keep 短、不改後續數學。</p>
+<p class="src">évidence：prose gate-1（optional）、難度 sim #1、#2（minor）；深度 fence 到 §4.1–§4.2 不變。</p></div>
+
+<h2>四、查證後不改（維持作者聲音／單來源／非 finding）</h2>
+<table>
+<tr><th>項</th><th>來源</th><th>查證與處置</th></tr>
+<tr><td>§A.1「two honest reciprocals and one inverted ratio」／「cross over historically — se-cant with co-sine」</td><td>難度 sim #3（判空轉修辭 slowdown）</td><td><b>sim 對衝：</b>sim#1 判「先講很好、正是我會困惑的點」＝有幫助；sim#3 判「空轉」。prose gate-1 判開場為 diagnose-then-motivate、clean。兩位讀者對同一句相反 → 屬作者聲音、不動（避 editorial drift）。</td></tr>
+<tr><td>§A.3 以 \(e^x\)／\(\sum x^n/n!\) 當動機（讀者尚未學 e）</td><td>難度 sim #3</td><td>sim#3 自評「非 finding、供參考」。此為附錄本職（動機正是 §4.1 的 \(e^x\) 工作），且比照本書 forward-fence 慣例（「You will use this in Chapter X」）。具體前指優於含糊。不動。</td></tr>
+<tr><td>慣用語：blow up／dies away／works for a living／warm-up／on the spot／power the continuity proof</td><td>難度 sim #3（minor）、prose voice（warm-up）</td><td>polish 級。prose gate-1 僅 warm-up 一條 voice advisory；Codex register「無 tone break」。屬 Stewart 語域內的暖度用語，逐條裁決留待批次美化，本輪不動。</td></tr>
+<tr><td>§A.1「\(\cos\theta=0\) ⟺ \(\tfrac\pi2\) 的奇數倍」未展開；§A.3 \(\sum_{k=0}^\infty\) 無窮上界首次出現未正式引入；Prop A.4 \(m=1\) 邊界</td><td>難度 sim #2（minor）</td><td>皆 sim 自行由上下文補回、非卡點。數A 讀者可補；就地展開會稀釋節奏。不動、記錄備查。</td></tr>
+</table>
+
+<h2>五、回歸複驗（修完必回歸）</h2>
+<div class="summary" id="regression">
+<b>回歸複驗（scoped 盲測 sim，重讀 3 處修改，persona＝§16.2 基線讀者）：<span class="pass">卡點消失、無 blocking regression。</span></b><br>
+<b>X1（§A.2 半步）：</b>ok、順讀，「不必停下來重建任何東西」——加的消去法正是 persona 工具箱裡的二元一次聯立，卡點消失、無新彆扭。<br>
+<b>X2（§A.3 arrow bridge）：</b>ok、順讀，「括號正好點出與 §1.3 的差異、先擋掉了 trip」，非承重、無新困惑。<br>
+<b>B1（§A.3 Caution）：</b>核心警示乾淨落地、無矛盾，但 sim 指出初版 guard「for a nonzero first term \(a\)」<b>使用處未給理由</b>，讀者停半拍問「為何 nonzero」（effortful、非 stuck）——此即回歸新引入的小 beat。<b>→ 二次修：</b>改為白話自明的「unless every term is zero」，全零級數顯然和為 0、無需追問；重建＋re-render <span class="pass">ready、math=179、katex-errors=0</span>、視覺確認紅框無爆框、句子自然。二次修後 sim 顧慮的「未給理由」直接消解（白話已自帶理由），數學仍精確排除 \(a=0\)。<br>
+機械層：3（後 4）筆修補套用 → <code>build.py appA</code> 重建通過 → 新文字入 standalone → 三輪 re-render 皆 <span class="pass">katex-errors=0</span>、MathJax 分隔平衡 → 視覺確認 §A.2/§A.3 全部修改處無爆框。
+</div>
+
+<h2>六、驗證紀錄</h2>
+<p style="font-size:.9rem">
+① 撰寫階段 authoring 自驗（數學逐式重算，見 fragment header 註記）。<br>
+② prose gate-1（Claude 免費 subagent）：0 blocking。<br>
+③ 難度閘 3 份盲測 sim：0 stuck、0 B 類違規、難度 2–3/5。<br>
+④ render 自驗（headless Chrome）：ready、math=176、katex-errors=0；結構＋視覺乾淨。<br>
+⑤ Codex gate-2（gpt-5.5/xhigh, read-only）：1 blocking（已修 B1）＋數學/cross-ref/register 全 CHECKED-CLEAN。<br>
+⑥ 套修 3 筆後重建＋re-render：katex-errors=0、分隔平衡；scoped 盲測回歸（見上）。<br>
+⑦ 全程離線／免費（Codex read-only 經 standing consent）；<b>未 commit</b>，建議另開 handout 分支與難度緩解那批一同收錄。
+</p>
+
+<h2 style="border-top:3px solid #6c2bd9;">七、第二批（2026-07-04）內容盤點</h2>
+<p>使用者 2026-07-04 裁決 roster（<code>CONTENT_ROADMAP.md</code> Appendix A entry）。結構決策經 AskUserQuestion 逐項裁定：<b>節連號 §A.4/§A.5</b>；Σ 材料<b>併入 §A.3</b>（非獨立節——避免「§A.3 已用 Σ_∞、下一節才介紹」的順序倒錯＋重編號）；A.6 部分分式<b>完整三型</b>；圓錐曲線<b>四曲線各一圖</b>。</p>
+<table>
+<tr><th>項目</th><th>內容</th><th>新環境（namespace A 續號）</th></tr>
+<tr><td>§A.2 降冪擴充</td><td>\(u=v=\theta\) 代入積化和差 ⇒ \(\cos^2\theta=\tfrac{1+\cos2\theta}{2}\)、\(\sin^2\theta=\tfrac{1-\cos2\theta}{2}\)；置於 Prop A.2 之後</td><td><b>不編號</b>（避免插在 §A.3 之前觸發 cascade）</td></tr>
+<tr><td>§A.3 retitle「Sigma Notation and the Geometric Series」</td><td>前段補基礎 Σ 複習＋index 操作（re-index／peel／split-at-cutoff／telescoping），接現有 Prop A.4/A.5＋Ex A.3＋Caution（<b>保留手動微調</b>：arrow 括號、"unless every term is zero"）</td><td><b>不編號</b>（前段全散文/display）</td></tr>
+<tr><td>§A.4 Partial Fractions（新節）</td><td>Prop A.6 三型分解＋線代 fence＋Strategy A.2＋Ex A.4（相異一次 cover-up）＋Ex A.5（重根/不可約二次）＋Caution（proper fraction）；forward-stock</td><td>Prop A.6・Strategy A.2・Ex A.4/A.5</td></tr>
+<tr><td>§A.5 The Conic Sections（新節，4 圖）</td><td>圓/拋物線/橢圓/雙曲線標準式＋距離定義＋關鍵特徵＋Ex A.6（\(4x^2+9y^2=36\)）；forward-stock（analytic geometry，<b>不列</b>B 類）</td><td>Ex A.6・Figure A.1–A.4</td></tr>
+</table>
+<p class="note">機制：<code>build.py</code> registry 加 sec-a-4/sec-a-5；<b>opener 重寫</b>涵蓋 A.1–A.5（sigma merge、partial-fractions/conics 標 forward-stock）；<code>CONTENT_SPEC.md</code> §16.2 B 類加「部分分式」＋§17 changelog addendum。4 個 conic 圖＝standalone <code>FIGS</code>（conic-circle/parabola/ellipse/hyperbola，buildPlot curve-halves＋dots/reflines/labels；<b>圓用等比方形 plot 故渲成正圓</b>）＋fragment <code>&lt;figure data-fig&gt;</code>。</p>
+
+<h2>八、第二批閘結果</h2>
+<h3>組 A — §A.2 降冪 ＋ §A.3 Σ 併入（兩處加法一起審）</h3>
+<p>prose gate-1 <span class="pass">0 blocking</span>（2 voice advisory，taste，留原文）；難度 sim <span class="pass">ok、0 blocking</span>（親驗降冪代入、三個 index 操作、telescoping m=2）；<b>Codex gate-2 <span class="pass">0 blocking, 0 advisory</span></b>——降冪雙式、正弦倍角 aside、Σ 定義、reindex 邊界、peel、split、telescoping、「Prop A.4 用同機制 \(b_k=r^k\)」、「§4.1–4.2 靠 tail-split」全 CHECKED-CLEAN，register 一致。raw：<a href="REPORT-appendixA-b2a-pieces12.gate2.raw.txt">REPORT-appendixA-b2a-pieces12.gate2.raw.txt</a>。<b>零修</b>。</p>
+<h3>組 B — §A.4 部分分式</h3>
+<p>prose gate-1 <span class="pass">0 blocking</span>（1 tighten＋2 optional＋1 voice）；難度 sim <span class="pass">3/5、0 blocking</span>（例題數學親算全對；slowdown：irreducible 未就地定義、cover-up 範圍、重根/二次分子「只給規則」、A.5(b) 為何比係數）；<b>Codex gate-2 <span class="fail">1 blocking</span>＋2 advisory</b>——blocking＝<b>opener 過時</b>（仍寫「three pieces」但已 4 節）；advisory＝cover-up 措辭過廣、收尾清單漏 \((Bx+C)/(x^2+px+q)^k\)；其餘數學＋uniqueness＋forward-stock 全 CHECKED-CLEAN。raw：<a href="REPORT-appendixA-b2b-a4.gate2.raw.txt">REPORT-appendixA-b2b-a4.gate2.raw.txt</a>。</p>
+<h3>組 C — §A.5 圓錐曲線（含圖）</h3>
+<p>prose gate-1 <span class="pass">0 blocking</span>（1 tighten＋2 optional＋1 voice）；難度 sim <span class="pass">3/5、0 blocking</span>（拋物線推導、Ex A.6 親算全對；slowdown：橢圓/雙曲線推導略去、<b>plus/minus 會記反</b>、拋物線準線距離）；<b>圖正確性閘 <span class="pass">0 blocking</span></b>＋2 advisory（橢圓 (0,b) 壓頂弧、雙曲線頂點缺座標標籤）——<b>四圖幾何全 CHECKED-CLEAN</b>（等比、焦點位置、漸近線斜率、對稱）；<b>Codex gate-2 <span class="pass">0 blocking</span>＋1 advisory</b>（拋物線未明說 \(p>0\)）——散文數學＋<b>四圖數值參數</b>（圓半徑端點在圓上、拋物線 p=1、橢圓 foci ±√5、雙曲線 foci ±2.5/漸近線 0.75/頂點 ±2）全 CHECKED-CLEAN。raw：<a href="REPORT-appendixA-b2c-a5.gate2.raw.txt">REPORT-appendixA-b2c-a5.gate2.raw.txt</a>。</p>
+
+<h2>九、第二批套用的修補</h2>
+<div class="card fix"><span class="id">§A.4-B</span><span class="badge b-fix">blocking · Codex</span><b>opener 重寫（過時 → 涵蓋 A.1–A.5 全 roster）</b>
+<p class="loc"><code>fragments/appA/sec-a-1.html</code>　lead ＋ outcomes 清單</p>
+<div class="content"><del>collects three pieces … the infinite geometric series … The three sections are independent</del><ins>collects the precalculus tools … reciprocal trig (§A.1), product-to-sum (§A.2), sigma notation and the geometric series (§A.3), partial fractions (§A.4), and a quick tour of the conic sections (§A.5). … partial fractions and the conics are stocked ahead …</ins>（outcomes 3→5 條）</div>
+<p class="why">§A.3 retitle（sigma 併入）＋§A.4/§A.5 新增後 opener 全面過時（Codex blocking）。一次重寫涵蓋鎖定的 A.1–A.5，並標 partial-fractions/conics 為 forward-stock（無主線 inbound）。</p></div>
+<div class="card adv"><span class="id">§A.4-1~5</span><span class="badge b-adv">advisory · sim＋Codex 收斂</span><b>§A.4 五處可懂性/精確澄清</b>
+<p class="loc"><code>fragments/appA/sec-a-4.html</code></p>
+<div class="content"><b>①</b> Prop A.6 irreducible 就地 gloss＋判別式 <ins>\(p^2<4q\)</ins>（sim：讀者無法自判可約性）；<b>②</b> 三 bullet 後補<ins>「分子低分母一階、每冪一項＝匹配任意分子所需自由度」</ins>統一原則（sim：只給規則無理由）；<b>③</b> cover-up 範圍收窄為<ins>「相異一次因式；重根只得最高次、不可約二次無實根可代→比係數」</ins>（Codex＋sim 收斂）；<b>④</b> Ex A.5(b) 補<ins>「無實根可代→比係數」</ins>signpost；<b>⑤</b> 收尾清單 \((Bx+C)/(x^2+px+q)\)→<ins>\(^k\)</ins>＋"unlocks"→<ins>"rests on"</ins>（Codex＋prose F1）。</div>
+<p class="why">全 §A.4 範圍內澄清、非 roster 增減。判別式 \(p^2<4q\) 為新數學，經自驗（\(x^2+px+q\) 實不可約 ⟺ 判別式 \(p^2-4q<0\)）＋回歸 sim 獨立覆核（\(x^2+1\)：\(-4<0\)）。</p></div>
+<div class="card adv"><span class="id">§A.5-1~6</span><span class="badge b-adv">advisory · sim＋Codex＋圖閘收斂</span><b>§A.5 四散文＋兩圖修</b>
+<p class="loc"><code>fragments/appA/sec-a-5.html</code>＋<code>appendixA-print-standalone.html</code> FIGS</p>
+<div class="content"><b>散文：</b>拋物線補 <ins>\(p>0\)</ins>（Codex）＋<ins>「到準線距離＝\(y+p\)」</ins>（sim）；橢圓補<ins>「余頂點 (0,b) 直角三角形 \(a^2=b^2+c^2\)」</ins>（解釋 b 來歷＋減號因果＋prose F4 斷句）；雙曲線把加號寫成<ins>「焦點在外→\(c>a\)→\(c=\sqrt{a^2+b^2}\)，對比橢圓焦點在內用減」</ins>因果（化解 sim「plus/minus 記反」）＋漸近線斜率連上 b；圓補一句定位（V1）。<b>圖：</b>橢圓 (0,b) `vAnchor:middle→bottom`（上移離頂弧）；雙曲線加 (a,0) 頂點標籤（補齊 caption 承諾、對齊 A.3）。</div>
+<p class="why">最高值＝雙曲線 plus/minus 因果——sim 明言原版「幾乎注定記反」，改後回歸 sim「不會再記反、從死背升級為 focus 內/外→誰大→加/減」。新數學（橢圓 \(a^2=b^2+c^2\)）自驗＋回歸 sim 覆核。</p></div>
+
+<h2>十、第二批回歸＋驗證紀錄</h2>
+<p style="font-size:.9rem">
+① 組 A（降冪＋Σ）：三閘全綠、零修。<br>
+② 組 B（§A.4）：套 7 筆修（opener＋①~⑤＋F1）→ 重建 → <b>scoped 盲測回歸</b>：irreducible 判別式「gap closed、可自判」、分子一階「從規則變理由」、cover-up「pre-warned」、A.5(b)「順、與 1/3 連成一線」，<span class="pass">無新卡點</span>。<br>
+③ 組 C（§A.5）：套 6 筆修（4 散文＋2 圖）→ 重建＋重抽圖 → <b>2 圖目視</b>（橢圓 (0,b) 已離頂弧、雙曲線 (a,0) 已加）＋<b>scoped 盲測回歸</b>：拋物線「準線距離已給、p>0 定向」、橢圓「b＝上頂點高度、\(a^2=b^2+c^2\) 被畢氏錨死、減號因果清楚」、雙曲線「<b>不會再記反</b>、因果錨得住」，<span class="pass">三段全 PASS、無新卡點</span>。<br>
+④ 全批機械層：每次 <code>build.py appA</code> 通過、每輪 re-render <span class="pass">katex-errors=0</span>、<code>linebreak-gate</code> <span class="pass">[OK] 無自動斷行無渲染錯誤</span>、MathJax 分隔平衡；§A.5 四圖 figures-mode 抽 PNG 過圖正確性閘。<br>
+⑤ 全程離線／免費（Codex read-only 經 standing consent）；<b>未 commit</b>（沿用 2026-07-04「先不 commit」裁決；batch-2 一併留工作樹）。<br>
+⑥ <b>Appendix B（B.1–B.5「讀定理與證明」）為獨立 build 單元 appB、另立階段</b>，將另產 <code>REVIEW-appendixB-applied.html</code>。
+</p>
+
+<h2 style="border-top:3px solid #9a5b00;">十一、去章節連結（2026-07-04，使用者裁決）</h2>
+<p>使用者觀察：「appendix 不用硬去跟前面的課文章節做聯繫，大部分教科書的 appendix 也不會這樣做。」經 AskUserQuestion 裁定：<b>①</b> Appendix A 去掉「附錄→課文」的 §編號與「用於 §X／stocked for 章節」editorializing，保留一般化動機；<b>②</b> 「課文→附錄」的 bridge（§1.2/§3.1/§4.1 末尾指向 Appendix，在課文那側）<b>保留不動</b>；<b>③</b> Appendix B 改自足、用通用例子（見 prompt）。</p>
+<table>
+<tr><th>方向</th><th>處置</th><th>例</th></tr>
+<tr><td><b>附錄 → 課文</b>（我多加的 editorializing）</td><td><b>移除/一般化（17 處）</b></td><td>§A.1「first appear in §1.2… return in §3.1」→「every fact about sec/csc/cot reduced to a fact about sin and cos」；§A.2「decisive step in §3.1's difference quotient」→「the one worth keeping at your fingertips」；§A.3「works for a living in §4.1… §4.2's convergence arguments」→「the step behind any argument that traps a series under a geometric tail」、「arrow notation of §1.3」→「arrow notation for a limit」、「made official in §4.2」→「also go by the name partial sums」、「recur throughout the calculus chapters」→「worth having at hand」；§A.4「stocked for the integration chapters」→「its real payoff is in integration」；§A.5「stocked here for later chapters; Chapters 1–4 does not call on them」整句刪；opener「the main text needs／stocked ahead for chapters still to come」→「you will want on hand／a handy reference」</td></tr>
+<tr><td><b>課文 → 附錄</b>（標準做法）</td><td><b>保留</b></td><td>opener「pointed to from the main text… / read each when the main text sends you」；ch01/ch03/ch04 主線 bridge 的「見 Appendix A.x」完全未動</td></tr>
+<tr><td><b>內部 §A.x 互引</b></td><td><b>保留（7 處）</b></td><td>opener 目錄、§A.4→§A.3 telescoping、§A.5→partial fractions 等</td></tr>
+</table>
+<p><b>驗證：</b>渲染 body 章節 §-ref＝<span class="pass">0</span>、向外 usage framing＝<span class="pass">0</span>；build／re-render <span class="pass">katex-errors=0</span>、linebreak-gate <span class="pass">[OK]</span>。<b>Codex read-only 自足性複核</b>（<a href="REPORT-appendixA-delink.raw.txt">REPORT-appendixA-delink.raw.txt</a>）：§A.1/§A.2/§A.3 新收束<span class="pass">讀來乾淨自足、register 無問題</span>；抓到 2 處我漏掉的殘留（§A.3「the main text uses without fuss」「recur throughout the calculus chapters」）→ 已修。此輪為編輯性去連結、不動數學/編號/結構。</p>
+
+</body>
+</html>

@@ -314,3 +314,36 @@ staging 文字寬 = `#source` 寬 − `.paper .page` 左右 padding（2×58px = 
 ### 9.5 四章 standalone 各自帶一份相同 CSS
 
 四個 `chapter{N}-print-standalone.html` 的 `<head>` CSS 是**各自獨立的副本**（無共用樣式表）。上述任一全域樣式（字體、版心、`#source`、表格 padding）變更時，**四個檔都要一起改**，否則章節間排版不一致。`build.py` 只替換內容區、不動 CSS shell。
+
+
+## 10. Reading-track 標示（2026-07-03 拍板）
+
+主線／證明補充的**閱讀路徑標示**系統。緣起：作者提議把「主線學習」與「嚴格補債」拆成兩軌（拆章重排）；經兩輪 Codex 仲裁定案為**不動章界、不動編號的文字層標示**（全程紀錄見 `handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`）。
+
+### 10.1 兩種標示與統一措辭
+
+- **`First reading:`**——節級，標「初讀可整節後補」的嚴格化層。措辭型：說明本節在做什麼＋後文用到的是什麼＋何時回來（指出第一個真正需要它的位置）。
+- **`Proof track:`**——證明塊級，標「初讀可先取結論」的長證明。措辭型：`Proof track: this argument earns the theorem. <後文用的是陳述而非證明> — on a first reading you may take the result and move on.`（"earns" 呼應 §3.2 既有橋接句的聲音；「後文用什麼」子句依落點事實微調，不得套用不實的統一句）。
+
+### 10.2 HTML 形式與落點
+
+一律用普通段落 `<p><em>…</em></p>`：**不進 env、不編號、不觸發任何 counter**。落點：節級標示放 `<header class="sec-head">` 之後；證明塊級放對應 `<section class="env env-proof">` 之前；章級路線圖（僅 foundation 章）放 chapter opener 的 "By the end of this chapter" 清單之後。
+
+### 10.3 掛標原則：主線預設隱形、寧缺勿濫
+
+- 只標非主線單元；mainline 不掛標（徽章噪音會稀釋導航價值、侵蝕本書「誠實構造」的身份）。標示是**導航**，不是內容降級。
+- 已有 skip 路標／signpost 的單元不重貼（§3.2 證明塊、§4.2 節首 signpost 屬前一輪難度緩解，功能等價）。
+- 不做 badge 系統、不做雙目錄、不改 `build.py`。
+
+### 10.4 現行掛標清單（Ch1–Ch4，2026-07-03）
+
+| 落點 | 標示 |
+|------|------|
+| §1.6 節首 | `First reading:`（ε-δ 嚴格化層；Ch2 只用 limit laws——已 grep 驗證 ch02 零 ε-δ；第一個需要處為 §3.2 證明） |
+| Ch4 opener | 章級路線圖（全書唯一 foundation 章） |
+| §4.1 Theorem 4.2 證明前 | `Proof track:`（後文用收斂事實＋尾項 bound (*)） |
+| §4.4 Theorem 4.10 證明前 | `Proof track:` 一則涵蓋 Theorem A → Rolle → MVT 三連證明梯 |
+| §4.5 Theorem 4.13 證明前 | `Proof track:`（後文只用 ln 連續性的陳述） |
+| §2.4 e^x 級數段 | 不編號 Caution box 標「on credit」（credit fence 的醒目化，非 reading-track 句型但同屬本輪） |
+
+Ch2 全章、§3.1／§3.3、§4.2（已有 signpost）、§4.3（短、核心 payoff）**不掛**。後續新章沿用本節原則；新增掛標時更新上表。

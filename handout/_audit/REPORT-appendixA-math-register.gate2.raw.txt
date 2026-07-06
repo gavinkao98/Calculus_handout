@@ -1,0 +1,1433 @@
+OpenAI Codex v0.136.0
+--------
+workdir: C:\Users\Kao\Downloads\Calculus_handout
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019f2a14-6643-7a81-bf86-d439cceed252
+--------
+user
+You are an independent cross-model reviewer (gate-2) for a self-authored appendix in a calculus handout. There is NO source manuscript — the content was written from scratch — so your independent re-derivation of every mathematical claim is the primary safeguard. Read-only: do NOT modify any file. Report findings only.
+
+REPO ROOT: C:\Users\Kao\Downloads\Calculus_handout  (all paths below are relative to it)
+
+WHAT THIS IS
+Appendix A "Precalculus Toolbox" collects three B-class prerequisites the main text needs but that the Taiwan 108 curriculum (Math A, no elective Math 甲) drops: reciprocal trig functions, product-to-sum / sum-to-product identities, and the infinite geometric series. Authoring brief = CONTENT_SPEC.md §16.2/§16.3 (difficulty positioning + prerequisite baseline) and §3 (Stewart/Rogawski register). The mainline keeps a short in-place bridge at each first-use site and cross-refs this appendix.
+
+FILES TO REVIEW (the appendix):
+- handout/fragments/appA/sec-a-1.html   (§A.1 reciprocal trig: Definition A.1, Proposition A.1, Example A.1, one Caution)
+- handout/fragments/appA/sec-a-2.html   (§A.2 product-to-sum / sum-to-product: Prop A.2, Prop A.3, Strategy A.1, Example A.2)
+- handout/fragments/appA/sec-a-3.html   (§A.3 infinite geometric series: Prop A.4, Prop A.5, Example A.3, one Caution)
+
+MAINLINE FILES the appendix's cross-reference CLAIMS point at (verify the claims against these):
+- handout/fragments/ch01/sec-1-2.html   (inverse trig; the appendix claims §1.2 needs principal ranges for inverse sec/csc)
+- handout/fragments/ch03/sec-3-1.html   (derivative of sine; appendix claims the sin A − sin B sum-to-product is the decisive step, and d/dx tan x = sec^2 x)
+- handout/fragments/ch04/sec-4-1.html   (Strategy 4.1; appendix claims §4.1 bounds the tail of Σ x^n/n! by a geometric tail with ratio r = 1/2, using Σ_{k≥1} r^k = r/(1−r))
+
+TASK 1 — MATH CORRECTNESS (blocking if wrong). Independently re-derive / recompute EVERY one of these; flag any error, unstated hypothesis, or sign slip:
+  §A.1: (a) 1+tan^2 = sec^2 and 1+cot^2 = csc^2 derivations; (b) the Caution's claim cot = cos/sin ≠ 1/tan with the θ=π/2 example (cot(π/2)=0 vs 1/tan(π/2) undefined); (c) Example A.1: sec(2π/3) = −2; cot(−π/4) = −1; given tanθ=3 in Q3 ⇒ sec θ = −√10 and csc θ = −√10/3. Check the quadrant sign logic.
+  §A.2: (a) all THREE product-to-sum identities; (b) all FOUR sum-to-product identities, ESPECIALLY the minus sign in cos A − cos B = −2 sin((A+B)/2) sin((A−B)/2); (c) the u=(A+B)/2, v=(A−B)/2 substitution and the "cross terms cancel" claims in both proofs — actually expand and confirm; (d) Example A.2: sin(x+h) − sin x = 2 cos(x + h/2) sin(h/2), and sin 5x sin 3x = ½[cos 2x − cos 8x].
+  §A.3: (a) finite sum 1+r+…+r^m = (1−r^{m+1})/(1−r) and the telescoping proof; (b) infinite Σ_{k=0}^∞ a r^k = a/(1−r) for |r|<1 and the tail Σ_{k≥1} r^k = r/(1−r); (c) Example A.3: ½+¼+…=1 and 0.999…=1; (d) the Caution: r=2 gives divergence while the formula would report 1/(1−2) = −1.
+  Pay special attention to boundary hypotheses (r≠1 for the finite sum, |r|<1 for the infinite sum, denominator-nonzero domains for sec/csc/cot) — are they stated exactly where needed?
+
+TASK 2 — REGISTER / 語域 (advisory unless egregious). Is the prose consistent with Stewart/Rogawski textbook English as used elsewhere in this book (motivation-first, informal gloss, warm but precise)? Compare tone against handout/fragments/ch01/sec-1-2.html and ch03/sec-3-1.html. Flag anything that reads as generic AI filler, hollow transition, or a register break (too terse/too chatty/lecture-notes voice).
+
+TASK 3 — CROSS-REFERENCE ACCURACY (blocking if a claim is false). The appendix repeatedly tells the reader "in the main text this first appears in §X, where …". For EACH such claim, open the cited mainline file and confirm the claim is literally true — e.g. does §3.1 actually hinge on sin A − sin B sum-to-product? does §4.1 actually use a geometric tail with r=1/2 and the r/(1−r) tail sum? does §1.2 actually give inverse sec/csc their own principal ranges? Flag any over-claim or mismatch. Also confirm internal cross-refs are consistent (e.g. §A.3 says the "official" partial-sum reading is made precise in §4.2 — check that is where it lives).
+
+OUTPUT FORMAT (plain text):
+  VERDICT: <n> blocking, <m> advisory
+  Then per finding: [BLOCKING|ADVISORY] <file>:<locus> — <the defect> — <why / your independent computation> — <suggested minimal fix>.
+  For every math item you checked and found CORRECT, list it briefly under a "CHECKED-CLEAN" section so I can see coverage (one line each). If you find zero blocking, say so explicitly.
+Be rigorous and skeptical; this is the cross-model gate whose whole job is to catch what the first (Claude) gate missed. Do not over-report register nitpicks as blocking.
+
+codex
+I’ll read the project-level instructions first, then inspect the appendix and cited mainline sections with line numbers so the review can tie each claim to exact loci.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -Path CLAUDE.md' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$i=0; Get-Content -Path handout/fragments/appA/sec-a-1.html | ForEach-Object { $i++; '"'{0,5}: {1}' -f "'$i, $_ }' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$i=0; Get-Content -Path handout/fragments/appA/sec-a-3.html | ForEach-Object { $i++; '"'{0,5}: {1}' -f "'$i, $_ }' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$i=0; Get-Content -Path handout/fragments/appA/sec-a-2.html | ForEach-Object { $i++; '"'{0,5}: {1}' -f "'$i, $_ }' in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$i=0; Get-Content -Path handout/fragments/appA/sec-a-1.html | ForEach-Object { $i++; '"'{0,5}: {1}' -f "'$i, $_ }'` rejected: blocked by policy
+2026-07-03T22:23:43.345435Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$i=0; Get-Content -Path handout/fragments/appA/sec-a-3.html | ForEach-Object { $i++; '"'{0,5}: {1}' -f "'$i, $_ }'` rejected: blocked by policy
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$i=0; Get-Content -Path handout/fragments/appA/sec-a-3.html | ForEach-Object { $i++; '"'{0,5}: {1}' -f "'$i, $_ }'` rejected: blocked by policy
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$i=0; Get-Content -Path handout/fragments/appA/sec-a-2.html | ForEach-Object { $i++; '"'{0,5}: {1}' -f "'$i, $_ }'` rejected: blocked by policy
+2026-07-03T22:23:43.345850Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$i=0; Get-Content -Path handout/fragments/appA/sec-a-1.html | ForEach-Object { $i++; '"'{0,5}: {1}' -f "'$i, $_ }'` rejected: blocked by policy
+2026-07-03T22:23:43.345986Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$i=0; Get-Content -Path handout/fragments/appA/sec-a-2.html | ForEach-Object { $i++; '"'{0,5}: {1}' -f "'$i, $_ }'` rejected: blocked by policy
+ succeeded in 354ms:
+# CLAUDE.md
+
+?祆?獢?砍摮澈??蝯?AI 隞??嚗laude Code?odex 蝑???獢惜蝝?撘??舫遢????*甈??**嚗`AGENTS.md`](AGENTS.md) ????祆???璅??批捆銝?銴摮澈???渡?瑽?撱箇蔭閬?隞交?憡扳?隞?[`README.md`](README.md) ?箸?嚗摰寞撖怨??誑 [`CONTENT_SPEC.md`](CONTENT_SPEC.md) ?箸???
+
+## ?Ｙ?銝閬?
+
+| ?Ｙ? | 頝臬? | 隤芣? |
+|------|------|------|
+| HTML 雓儔 | `handout/` | MathJax/KaTeX嚗S paginator嚗ragment ??print-standalone 蝯? |
+| Manim 敶梁? | `video/` | ?嚗??恬?TTS嚗make.py` 撱箇蔭嚗底閬?[`video/README.md`](video/README.md)嚗?|
+| ??LaTeX 雓儔 | `legacy/tex_handout/` | 撌脣?蝯???? |
+
+> **雓儔????蝡?摰????*嚗ode A ?剝? ??Mode B ??Mode C ??憿嚗頠楛摨???????甇?Ⅱ?????詨飛 M1?8 ??S繚A繚V嚗?? subagent嚗ubric嚗???Codex 隤輻蝝敺???摰???Ch1/Ch2 ????蝢抬?閬?憡蜇閬?[`handout/PIPELINE.md`](handout/PIPELINE.md)??
+
+## 撣貊?誘?
+
+```bash
+python handout/build.py           # 撱箇蔭?券雓儔蝡?嚗??ch01 ?芸遣銝蝡?
+python video/make.py --quality high  # 1080p 皜脫?敶梁?嚗?閮剖?鞈迎?
+python tools/doctor.py            # ?啣??亙熒瑼Ｘ
+tts.py --backend mock             # ?Ｙ? TTS mock嚗?閮祥嚗??嚗?
+```
+
+## ?辣?啣神隤?
+
+- **README 銝敺誑蝜?銝剜??詨神??* ???急?桅???[`README.md`](README.md) 隞亙?摮??冗銝剖惇?潭撠???README嚗?憒?[`video/README.md`](video/README.md)嚗憓?靽格 README ?瘥颲衣???
+- **敹?銋?靽???嚗?蝧餉陌嚗?* 蝔?蝣澆?憛?獢楝敺?????hell ?誘?憓??詻??亦Ⅳ嚗cene id?xport ?迂??雿?嚗誑????閰??銵?隤?Manim?aTeX?emini?TS?I?R?ode A/B/C 蝑???
+- ?園??????憿”?潛?隤芣???銝敺蝙?函?擃葉??
+- 蝚砌??嫣?鞈湛?`.deps/`?.deps_f5/`?.deps_voiceover/`嚗? git 撌乩?璅對?`.claude/worktrees/`嚗葉??README 銝甇方????嚗?閬??
+
+## 敶梁?皜脫?閫??摨?
+
+- **?日?雿輻??亥?瘙??血?銝敺誑 1080p 皜脫?**嚗make.py --quality high`嚗?
+
+## 隞祥 API 隤輻??蝬???
+
+- **瘥活隤輻隞颱?閮祥????API嚗? Gemini TTS?emini ??嚗蔣????嚗????賢?????雿輻??蝣箏???銝?芾?隤輻??* ?寞活??嚗?憒蝭? TTS?蝡?頝?銝敺?隤芣?嚗活閬矽?其?暻潭芋??隡啁??beat ?賂??唾?蝘嚗??嚗???敺??瑁???
+- 銝?鞎颯???雯?蝺楝敺??冽迨???舫??瑁???憒?`tts.py --backend mock`嚗神? WAV 撽?manifest嚗?摨????Manim render?fmpeg mux/concat??
+- ??銝甈∪??隞?”閰脫活?Ⅱ隤芣??極雿????蝭?霈嚗?璅∪????湔??頝???敺萄?????
+- **??026-07-01 雿輻??甈odex ?航?隤輻嚗eview嚗??賂?閰Ｗ???嚗econd-opinion嚗? standing consent嚗?仿????活敺菔岷嚗蒂?⊿???Codex ?誨??銝??蝙?刻?閬?撠??整?* 蝭?嚗?*`codex exec -s read-only`**嚗??恬?code嚗oc 撠?撘?review?噩蝚砌???嚗霈銝瑼?璅∪?韏?`~/.codex/config.toml` ?身 gpt-5.5嚗high嚗?*撌乩?憸冽嚗蝙?刻?瘙??閬??湔??暹???嚗?* ?芯蜓?券脯?閬祟?豢?蝚砌????矽 Codex ?? ping 雿輻??? (i) ?迤銝??撠?????ii) 閮祥??嚗?銝???iii) Codex嚗頨怠?瑚??⊥?閫??????iv) 瘚????蝙?刻?瘙箇? deliverable嚗?鈭支???sign-off嚗???銝?*甇斗?甈???Codex read-only ?誑 Codex 隞?閰Ｗ???*嚗? TTS??閫??皜脫??emini ??嚗蔣????閮祥 API **隞?**??孵噩??嚗??冽迨???改???
+
+## 摰??啣?嚗撩憟辣嚗?擃???憚摮隞??摰?唳?瑼?
+
+頝冽??啣???憡??桀 [`ENVIRONMENT.md`](ENVIRONMENT.md)嚗?瑁?? [`tools/doctor.py`](tools/doctor.py)嚗?璈?頝??撩隞暻潘??甇文???嚗?
+
+- **蝻箏?隞塚?頠???嚗?閬銵?鋆?* ?菜葫?唳璈撩??pip 憟辣?頂蝯?binary ?極?瘀?憒?`ffmpeg`?aTeX?ode?hrome????pip 憟辣嚗?嚗?*?牧??鋆?暻潦隞暻潦獐鋆??誘嚗?蝬蝙?刻???鋆?*嚗??航銵?`winget`嚗pip install`??憭??扳??[`requirements.lock`](requirements.lock)嚗ENVIRONMENT.md` **??歇霅啣????啣?**嚗?憒? `tools/setup.ps1` 敺?lock 鋆??舫?撱箝??啣?嚗????
+- **銝??芾??憚摮??蹂誨??* 蝻箸镼踵?**?身?迤??韏瑚?**嚗?閬鈭????餅隞??hack 銝璇?code path ?輸?蝻箇? binary?撖急隞?極?瘀??雿?瑟??隞??瘜Ⅱ撖行憟踝?**雓靘?雿輻??憟?*嚗?閬?暺?嚗?銝 Karpathy 禮1????具????????湛???靘?`ffmpeg`嚗ffprobe` ?詻???隞嗚?? code 蝜? `ffprobe`??蝑 A嚗? `video/REBUILD_STATUS.md`嚗?
+- **鋆?銝摰?啁??瑼?蝣箔??圈?血?敺???* 隞颱??啣?霈敺?銝頛芸鋆?嚗inned ???[`requirements.lock`](requirements.lock)嚗???`requirements.txt`??瘙神??[`ENVIRONMENT.md`](ENVIRONMENT.md)?炎?仿???[`tools/doctor.py`](tools/doctor.py)嚗?閬???`tools/setup.ps1`嚗?*撽璅?嚗?唳? `python tools/doctor.py` ?賣?甇斗??啣?撠??啣蝬?*
+
+## 頝典?閰梯??嗅神?脩??扳?瑼?銝神?砍 memory嚗?
+
+- **?蜇蝯?蝑???隞颱?頝典?閰梧?頝冽??函??亥???銝敺神?脫? git 銝??瑼?*嚗?*銝??芾??冽?啁? Claude memory**嚗~/.claude/.../memory/`嚗 `MEMORY.md`嚗?
+- **??嚗?* 雿輻?虜??虫?璆哨??砍 memory 銝 repo 韏啜?璈停瘨仃嚗???扳?瑼?頝? git ?唳??唳??具?
+- **撖怠鋆∴?** ?脣漲嚗??神?脰府?Ｙ???`REBUILD_STATUS.md`嚗??頝典?閰梢脣漲?剁?嚗極?瑞瘜??神?脣??? `README.md`嚗撘?鞈?瘚?蝝神??`DESIGN.md`嚗摰寞瘜?撖恍?`CONTENT_METHODOLOGY.md`?銝????瑼?嚗??蝙?刻??曉嚗?閬?暺閮脫??memory??
+
+## ?啣神嚗祟?亦??Ｘ????嚗?摮?砍 memory嚗?銝?閬??祇脩??改?
+
+- **?蝙?刻?閰曹?敺蝜?銝剜?**嚗aTeX嚗?撘Ⅳ??隞嗅?????銵?隤????璅????
+- **??doc嚗ode review ??皜?蝝?銝?瘛瑞銝隢?** ????蝒????Ｗ?閬?嚗?靽殷???discoverability gap嚗??辣?喳嚗??嚗 editorial drift 憸券嚗??芸?嚗???finding嚗 ??finding嚗?蝷箔?閬??Ｗ榆?堆???*Framing嚗?* 敺?◤ review ?邦?瘜?潘?銝???session ?扳 commit嚗 merge ???渡?Ｘ?鈭祕嚗?蝢拍??寧??刻?撌桃銝? inconsistency?ver-reporting ????甇???芸???
+- **銝?mode ?啣神瘚?嚗oot [`README.md`](README.md) 禮Mode B嚗?嚗ode B ?里?貉?瘙箄??潛撖恍脰府甈∩耨甇?commit ??message body**嚗ubject ??0 摮ody ??嚗??祆隞暻潦雿?憒乓鈭?暻潦??刻???嚗末霈靘?閰梁 `git log --grep="Mode B"` ??????commit嚗112aa5c`?0ef06ee`?? Mode A ??銵?bugfix 銝?具?
+  - **commit-grep ??嚗?026-06-15嚗?** 銝膩 `Mode B` ??*雓儔**蝺?*video ???撖衣里?詨歇?孵? NFA**嚗??賢?撖衣里?賂???video?ode B??憟? [`video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)嚗??嗉?瘙箏?璅?神?脖耨甇?commit body嚗???`git log --grep="NFA"` ??嚗?雓儔 `Mode B` ??嚗??拇?蝺毽?典?銝 grep嚗?
+- **蝯虫蝙?刻祟?貊?鈭支??抵??具??停?質???敶Ｗ?嚗?026-06-12 雿輻??瘙?嚗?* ?急摮詨??祟?豢?隞?*銝?**鈭文?皛輻? LaTeX ??`.md`嚗?Ｗ standalone HTML嚗athJax/KaTeX CDN嚗???摮詨皜脫?嚗??嗡??舐?仿霈?耦撘??抒??扯釭??瑼??冽迨???～?雿輻???株?瘙箝??梯正銝敺甇方齒??
+- **瘥???頛芣撖怠?銋???HTML ?勗?嚗?026-06-15 雿輻??瘙?嚗?* 銝??鋆捱???嚗indings 閬?HTML??*?∪???頛芸摰寞撖恬?Mode A嚗 蝑?嚗閬?撖阡?撖怠?摰孵?Ｖ?隞?standalone HTML ?勗?**嚗athJax/KaTeX CDN????摮詨皜脫?嚗?????撖急挾?踝?locus嚗[source:]`嚗府頛?Mode B 蝯?嚗?雿輻???殷?銝??芸撠店鋆∠策????????[`handout/_audit/REVIEW-ch01-modec-candidates.html`](handout/_audit/REVIEW-ch01-modec-candidates.html) ?耦撘?瑼???`REVIEW-??applied.html` 銋?嚗??嚗?瘙箇阮????
+- **撖拇 finding 靽桀?敺???甇詨祟?賂?2026-06-12 雿輻??瘙?嚗?* 靽桀? blocking嚗dvisory finding 敺?銝?湔摰??摰?????靽格????頝?頛芸祟?賂?Codex ????撠??荔?嚗Ⅱ隤耨?寞頨急????交????甇詨祟?貊?蝯???里?豢?瑼葉閮???
+
+## 蝔?嚗極蝔遙??銵皞?嚗arpathy guidelines嚗?
+
+皞 [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)嚗ndrej Karpathy 撠?LLM 撖怎?撘虜閬???閫撖???*?嚗?* ??雓寞??芸??潮漲嚗蝣遙?銵???*?拍蝭?隞?`video/` ?Ｙ??uild 撌亙??祉?蝔?嚗極蝔極雿??銝?冽雓儔?批捆?啣神**?ode A ???撖漲隞誑?refer richness?? `[source:]`???芣?撖拇?皞?閬?[`video/CONTENT_METHODOLOGY.md`](video/CONTENT_METHODOLOGY.md)嚗?銝蝚?2 璇???撠?撘Ⅳ?? code嚗??摰寧?撟?
+
+- **1. ?單?璆???嚗hink Before Coding嚗?閬?皜研?閬?韏瑕????日?雓?*
+  - ?Ⅱ隤芸?身嚗?蝣箏?撠勗?嚗?閬?暺???
+  - ??蝔株圾霈??典??箔?嚗?閬?暺銝??
+  - ?蝪∪??瘜停雓?敹??????准?
+  - ?∩?撠勗?銝????芾ㄐ銝?璆??嗅???
+- **2. 蝪∪?芸?嚗implicity First嚗?撠? code 閫?捱??嚗?撖急?璈抒??梯正??*嚗???撘Ⅳ嚗??批捆蝭?嚗?
+  - 銝?瘝◤閬????踝?銝銝甈⊥?code 撱箸鞊∪惜??
+  - 銝?瘝◤閬????改??航身摰扼?銝銝?賜???撖恍隤方???
+  - 撖思? 200 銵? 50 銵停憭停?神?????瘛勗極蝔葦????摰?摨西?????
+- **3. 憭???撘耨?對?Surgical Changes嚗?????舐??唳嚗皜撌梯ˊ???摮?*
+  - 銝??????啁? code?酉閫????嚗?閬?瑽?憯??梯正??
+  - 瘥?Ｘ?憸冽嚗雿蹂???亦?撖急???
+  - ??⊿???dead code嚗??箔???閬??芸嚗蝘駁??雿??孵??????典??import嚗??賂??賢???
+  - 瑼ａ?嚗?銝銵??賜?亥蕭皞臬?雿輻??閬?嚗?銝??? review?? over-report 銝?湛???
+- **4. ?格?撽??瑁?嚗oal-Driven Execution嚗?摰儔??璅?嚗?餈游??圈?霅???*
+  - ?遙???撽??璅???撽??????粹?瘜撓?亙神皜祈岫??摰????耨 bug????撖怨??葫閰血?霈?????瑽?X???Ⅱ靽?敺葫閰阡??
+  - 憭郊撽遙??蝯虫??陛?剛??恬?甇仿? ??撽?暺?????皞?撘瑕停?質銵艘?????啗?車撘望?皞???琿?閬?皜?
+
+codex
+The project instructions file appears to be mojibake in this shell output, but it confirms the repo treats read-only review as an expected workflow. I’m switching to simpler line-number commands because the initial formatting command was blocked by the sandbox policy.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Select-String -Path handout/fragments/appA/sec-a-1.html -Pattern ".*"' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Select-String -Path handout/fragments/appA/sec-a-3.html -Pattern ".*"' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Select-String -Path handout/fragments/appA/sec-a-2.html -Pattern ".*"' in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 564ms:
+
+handout\fragments\appA\sec-a-1.html:1:<!-- Appendix A opener + §A.1 The Reciprocal Trigonometric Functions.
+handout\fragments\appA\sec-a-1.html:2:     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.
+2/§16.3
+handout\fragments\appA\sec-a-1.html:3:     + §3 register). Appendix established per user decision 2026-07-03: B-class
+handout\fragments\appA\sec-a-1.html:4:     prerequisites worth a full treatment live here; the mainline keeps its short
+est
+handout\fragments\appA\sec-a-1.html:5:     in-place bridge and cross-refs this appendix (SPEC §16.2 處置慣例).
+handout\fragments\appA\sec-a-1.html:6:     §A.1 is the appendix's first section, so it carries the appendix opener (a s
+econd
+handout\fragments\appA\sec-a-1.html:7:     <article>), mirroring the chapter convention. Numbering is MANUAL, namespace
+ "A":
+handout\fragments\appA\sec-a-1.html:8:     Definition A.1; Proposition A.1; Example A.1; Caution unnumbered (per ch02+)
+.
+handout\fragments\appA\sec-a-1.html:9:     Counters continue into sec-a-2/sec-a-3. No figures (candidate figures are an
+handout\fragments\appA\sec-a-1.html:10:     open question in CONTENT_ROADMAP's Appendix A entry).
+handout\fragments\appA\sec-a-1.html:11:     Referenced from: §1.2 (reciprocal bridge), §3.1 (tan/sec derivatives contex
+t).
+handout\fragments\appA\sec-a-1.html:12:     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+handout\fragments\appA\sec-a-1.html:13:
+handout\fragments\appA\sec-a-1.html:14:<article class="sec" lang="en">
+handout\fragments\appA\sec-a-1.html:15:  <header class="chapter-head">
+handout\fragments\appA\sec-a-1.html:16:    <div class="ch-kicker">Appendix A</div>
+handout\fragments\appA\sec-a-1.html:17:    <h1 class="ch-title">Precalculus Toolbox</h1>
+handout\fragments\appA\sec-a-1.html:18:  </header>
+handout\fragments\appA\sec-a-1.html:19:
+handout\fragments\appA\sec-a-1.html:20:  <p class="lead">This appendix collects three pieces of precalculus that the ma
+in text needs but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions, the 
+product-to-sum and sum-to-product identities, and the infinite geometric series. Wherever the main text first needs one
+ of these tools, it builds a short bridge on the spot — just enough to keep reading — and points here for the full acco
+unt. The three sections are independent of one another; read each when the main text sends you, or straight through as 
+a warm-up. Nothing in this appendix uses calculus, with one small exception flagged in §A.3, where an infinite sum is u
+nderstood as a limit in the sense of §1.3.</p>
+handout\fragments\appA\sec-a-1.html:21:
+handout\fragments\appA\sec-a-1.html:22:  <p class="para-head">By the end of this appendix, you will be able to:</p>
+handout\fragments\appA\sec-a-1.html:23:  <ul>
+handout\fragments\appA\sec-a-1.html:24:    <li>evaluate the reciprocal trigonometric functions \(\sec\), \(\csc\), and 
+\(\cot\), and apply their Pythagorean identities with the correct signs;</li>
+handout\fragments\appA\sec-a-1.html:25:    <li>derive every product-to-sum and sum-to-product identity from the angle-s
+um formulas — and recover any one you forget;</li>
+handout\fragments\appA\sec-a-1.html:26:    <li>sum an infinite geometric series, and recognize when the formula \(a/(1 
+- r)\) applies and when it does not.</li>
+handout\fragments\appA\sec-a-1.html:27:  </ul>
+handout\fragments\appA\sec-a-1.html:28:</article>
+handout\fragments\appA\sec-a-1.html:29:
+handout\fragments\appA\sec-a-1.html:30:<article class="sec" lang="en">
+handout\fragments\appA\sec-a-1.html:31:
+handout\fragments\appA\sec-a-1.html:32:  <header class="sec-head">
+handout\fragments\appA\sec-a-1.html:33:    <h2 class="sec-title"><span class="sec-no">A.1</span>The Reciprocal Trigonom
+etric Functions</h2>
+handout\fragments\appA\sec-a-1.html:34:  </header>
+handout\fragments\appA\sec-a-1.html:35:
+handout\fragments\appA\sec-a-1.html:36:  <p>The three primary trigonometric functions \(\sin\), \(\cos\), and \(\tan\) 
+have three companions — two honest reciprocals and one inverted ratio. They carry no new information — every fact about
+ them is a fact about \(\sin\) and \(\cos\) in disguise. Yet calculus speaks them fluently: the derivative of \(\tan x\
+) turns out to be \(\sec^{2} x\) (§3.1), the inverse secant needs its own principal range (§1.2), and integral tables a
+re full of secants and cosecants. This section gives them an honest introduction.</p>
+handout\fragments\appA\sec-a-1.html:37:
+handout\fragments\appA\sec-a-1.html:38:  <section class="env env-definition">
+handout\fragments\appA\sec-a-1.html:39:    <p class="env-head"><span class="env-kicker">Definition</span><span class="e
+nv-num">A.1</span></p>
+handout\fragments\appA\sec-a-1.html:40:    <div class="env-body">
+handout\fragments\appA\sec-a-1.html:41:      <p>For any angle \(\theta\) at which the denominator is nonzero, the <em>s
+ecant</em>, <em>cosecant</em>, and <em>cotangent</em> functions are defined by
+handout\fragments\appA\sec-a-1.html:42:      \[ \sec\theta = \frac{1}{\cos\theta}, \qquad \csc\theta = \frac{1}{\sin\th
+eta}, \qquad \cot\theta = \frac{\cos\theta}{\sin\theta}. \]</p>
+handout\fragments\appA\sec-a-1.html:43:      <p class="informal">Informally: secant is the reciprocal of cosine, coseca
+nt is the reciprocal of sine, and cotangent flips the ratio that defines tangent. The names cross over historically — <
+em>se</em>cant with <em>co</em>sine, <em>co</em>secant with sine — and the pairing simply has to be memorized.</p>
+handout\fragments\appA\sec-a-1.html:44:    </div>
+handout\fragments\appA\sec-a-1.html:45:  </section>
+handout\fragments\appA\sec-a-1.html:46:
+handout\fragments\appA\sec-a-1.html:47:  <p>In a right triangle, the definitions invert the familiar ratios. Since \(\c
+os\theta\) is adjacent over hypotenuse, \(\sec\theta\) is hypotenuse over adjacent; since \(\sin\theta\) is opposite ov
+er hypotenuse, \(\csc\theta\) is hypotenuse over opposite; and \(\cot\theta\) is adjacent over opposite. Special-angle 
+values follow instantly from the primary ones: for instance \(\sec\tfrac{\pi}{3} = 1/\cos\tfrac{\pi}{3} = 2\), and \(\c
+ot\tfrac{\pi}{4} = 1\). Each function is undefined exactly where its denominator vanishes — \(\sec\) and \(\tan\) at od
+d multiples of \(\tfrac{\pi}{2}\), \(\csc\) and \(\cot\) at multiples of \(\pi\) — and near those angles its values blo
+w up, producing the vertical asymptotes on their graphs.</p>
+handout\fragments\appA\sec-a-1.html:48:
+handout\fragments\appA\sec-a-1.html:49:  <section class="env env-caution">
+handout\fragments\appA\sec-a-1.html:50:    <p class="env-head"><span class="env-kicker">Caution</span></p>
+handout\fragments\appA\sec-a-1.html:51:    <div class="env-body">
+handout\fragments\appA\sec-a-1.html:52:      <p>Cotangent is defined as \(\cos\theta/\sin\theta\), <em>not</em> as \(1/
+\tan\theta\). On most of the domain the two agree, but not everywhere: at \(\theta = \tfrac{\pi}{2}\) we have \(\cot\tf
+rac{\pi}{2} = \cos\tfrac{\pi}{2}/\sin\tfrac{\pi}{2} = 0/1 = 0\), a perfectly good value, while \(1/\tan\tfrac{\pi}{2}\)
+ is meaningless — \(\tan\tfrac{\pi}{2}\) is undefined. The quotient \(\cos/\sin\) is the robust definition; \(1/\tan\) 
+is a shortcut valid only where \(\tan\theta\) is defined and nonzero.</p>
+handout\fragments\appA\sec-a-1.html:53:    </div>
+handout\fragments\appA\sec-a-1.html:54:  </section>
+handout\fragments\appA\sec-a-1.html:55:
+handout\fragments\appA\sec-a-1.html:56:  <p>Dividing the Pythagorean identity \(\sin^{2}\theta + \cos^{2}\theta = 1\) b
+y \(\cos^{2}\theta\) or by \(\sin^{2}\theta\) produces the two companion identities that calculus uses constantly.</p>
+handout\fragments\appA\sec-a-1.html:57:
+handout\fragments\appA\sec-a-1.html:58:  <section class="env env-proposition">
+handout\fragments\appA\sec-a-1.html:59:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="
+env-num">A.1</span><span class="env-name">Pythagorean companions</span></p>
+handout\fragments\appA\sec-a-1.html:60:    <div class="env-body">
+handout\fragments\appA\sec-a-1.html:61:      <p>\[ \begin{aligned} 1 + \tan^{2}\theta &= \sec^{2}\theta \qquad (\cos\th
+eta \neq 0), \\ 1 + \cot^{2}\theta &= \csc^{2}\theta \qquad (\sin\theta \neq 0). \end{aligned} \]</p>
+handout\fragments\appA\sec-a-1.html:62:    </div>
+handout\fragments\appA\sec-a-1.html:63:  </section>
+handout\fragments\appA\sec-a-1.html:64:
+handout\fragments\appA\sec-a-1.html:65:  <section class="env env-proof">
+handout\fragments\appA\sec-a-1.html:66:    <p class="env-head"><span class="env-kicker">Proof</span></p>
+handout\fragments\appA\sec-a-1.html:67:    <div class="env-body">
+handout\fragments\appA\sec-a-1.html:68:      <p>Divide \(\sin^{2}\theta + \cos^{2}\theta = 1\) through by \(\cos^{2}\th
+eta\):
+handout\fragments\appA\sec-a-1.html:69:      \[ \frac{\sin^{2}\theta}{\cos^{2}\theta} + 1 = \frac{1}{\cos^{2}\theta}, \
+qquad\text{that is,}\qquad \tan^{2}\theta + 1 = \sec^{2}\theta. \]
+handout\fragments\appA\sec-a-1.html:70:      Dividing instead by \(\sin^{2}\theta\) gives \(1 + \cot^{2}\theta = \csc^{
+2}\theta\). <span class="qed qed-proof"></span></p>
+handout\fragments\appA\sec-a-1.html:71:    </div>
+handout\fragments\appA\sec-a-1.html:72:  </section>
+handout\fragments\appA\sec-a-1.html:73:
+handout\fragments\appA\sec-a-1.html:74:  <div class="workedexample">
+handout\fragments\appA\sec-a-1.html:75:    <section class="env env-example">
+handout\fragments\appA\sec-a-1.html:76:      <p class="env-head"><span class="env-kicker">Example</span><span class="en
+v-num">A.1</span></p>
+handout\fragments\appA\sec-a-1.html:77:      <div class="env-body">
+handout\fragments\appA\sec-a-1.html:78:        <p>Evaluate the following.</p>
+handout\fragments\appA\sec-a-1.html:79:        <ol class="prompt-list">
+handout\fragments\appA\sec-a-1.html:80:          <li>\(\sec\!\left(\tfrac{2\pi}{3}\right)\) and \(\cot\!\left(-\tfrac{\
+pi}{4}\right)\).</li>
+handout\fragments\appA\sec-a-1.html:81:          <li>Given that \(\tan\theta = 3\) and \(\theta\) lies in the third qua
+drant, find \(\sec\theta\) and \(\csc\theta\).</li>
+handout\fragments\appA\sec-a-1.html:82:        </ol>
+handout\fragments\appA\sec-a-1.html:83:      </div>
+handout\fragments\appA\sec-a-1.html:84:    </section>
+handout\fragments\appA\sec-a-1.html:85:    <section class="env env-solution">
+handout\fragments\appA\sec-a-1.html:86:      <p class="env-head"><span class="env-kicker">Solution</span></p>
+handout\fragments\appA\sec-a-1.html:87:      <div class="env-body">
+handout\fragments\appA\sec-a-1.html:88:        <ol class="sol-list">
+handout\fragments\appA\sec-a-1.html:89:          <li>Since \(\cos\tfrac{2\pi}{3} = -\tfrac{1}{2}\), we get \(\sec\tfrac
+{2\pi}{3} = 1/(-\tfrac{1}{2}) = -2\). Since \(\cos(-\tfrac{\pi}{4}) = \tfrac{\sqrt{2}}{2}\) and \(\sin(-\tfrac{\pi}{4})
+ = -\tfrac{\sqrt{2}}{2}\), we get \(\cot(-\tfrac{\pi}{4}) = \frac{\sqrt{2}/2}{-\sqrt{2}/2} = -1\).</li>
+handout\fragments\appA\sec-a-1.html:90:          <li>By Proposition A.1, \(\sec^{2}\theta = 1 + \tan^{2}\theta = 1 + 9 
+= 10\), so \(\sec\theta = \pm\sqrt{10}\). In the third quadrant \(\cos\theta < 0\), hence \(\sec\theta < 0\), and there
+fore \(\sec\theta = -\sqrt{10}\). For the cosecant, \(\cot\theta = 1/\tan\theta = \tfrac{1}{3}\) (legitimate here, sinc
+e \(\tan\theta = 3\) is defined and nonzero), so \(\csc^{2}\theta = 1 + \cot^{2}\theta = 1 + \tfrac{1}{9} = \tfrac{10}{
+9}\) and \(\csc\theta = \pm\tfrac{\sqrt{10}}{3}\). In the third quadrant \(\sin\theta < 0\), so \(\csc\theta = -\tfrac{
+\sqrt{10}}{3}\). The squaring in Proposition A.1 forgets all signs; the quadrant restores them.</li>
+handout\fragments\appA\sec-a-1.html:91:        </ol>
+handout\fragments\appA\sec-a-1.html:92:      </div>
+handout\fragments\appA\sec-a-1.html:93:    </section>
+handout\fragments\appA\sec-a-1.html:94:  </div>
+handout\fragments\appA\sec-a-1.html:95:
+handout\fragments\appA\sec-a-1.html:96:  <p>That is the whole toolkit: three definitions, the right-triangle readings, 
+and the two Pythagorean companions. In the main text these functions first appear in §1.2, where the inverse secant and
+ cosecant need principal ranges of their own, and they return in §3.1, where the derivative of \(\tan x\) lands on \(\s
+ec^{2} x\).</p>
+handout\fragments\appA\sec-a-1.html:97:
+handout\fragments\appA\sec-a-1.html:98:</article>
+
+
+
+ succeeded in 532ms:
+
+handout\fragments\appA\sec-a-3.html:1:<!-- §A.3 The Infinite Geometric Series.
+handout\fragments\appA\sec-a-3.html:2:     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.
+2/§16.3
+handout\fragments\appA\sec-a-3.html:3:     + §3 register). Numbering is MANUAL, namespace "A", continuing from sec-a-2:
+handout\fragments\appA\sec-a-3.html:4:     Proposition A.4 (finite sum), A.5 (infinite sum); Example A.3; Caution unnum
+bered.
+handout\fragments\appA\sec-a-3.html:5:     Depth note: the infinite sum is read as a limit in the §1.3 sense (flagged i
+n the
+handout\fragments\appA\sec-a-3.html:6:     appendix opener); the fully rigorous convergence theory is explicitly fenced
+ to
+handout\fragments\appA\sec-a-3.html:7:     §4.1–§4.2 — this section stays at "limit of the partial sums" level.
+handout\fragments\appA\sec-a-3.html:8:     Math verified: telescoping identity and a/(1−r) limit re-derived during auth
+oring;
+handout\fragments\appA\sec-a-3.html:9:     0.999… and 1/2+1/4+… examples recomputed.
+handout\fragments\appA\sec-a-3.html:10:     Referenced from: §4.1 (Strategy 4.1 geometric tail bound bridge).
+handout\fragments\appA\sec-a-3.html:11:     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+handout\fragments\appA\sec-a-3.html:12:
+handout\fragments\appA\sec-a-3.html:13:<article class="sec" lang="en">
+handout\fragments\appA\sec-a-3.html:14:
+handout\fragments\appA\sec-a-3.html:15:  <header class="sec-head">
+handout\fragments\appA\sec-a-3.html:16:    <h2 class="sec-title"><span class="sec-no">A.3</span>The Infinite Geometric 
+Series</h2>
+handout\fragments\appA\sec-a-3.html:17:  </header>
+handout\fragments\appA\sec-a-3.html:18:
+handout\fragments\appA\sec-a-3.html:19:  <p>Adding up finitely many numbers needs no theory. Adding up <em>infinitely</
+em> many is a genuinely new act, and most of its theory belongs to a later chapter of calculus. But one infinite sum is
+ so simple, and so useful so early, that it deserves to be settled now: the geometric series, in which each term is a f
+ixed multiple \(r\) of the one before. The main text leans on it in §4.1, where the <em>tails</em> — the leftover terms
+ past a cutoff — of the series defining \(e^{x}\) are trapped under geometric tails with ratio \(r = \tfrac{1}{2}\). Ev
+erything rests on one finite identity plus one limit.</p>
+handout\fragments\appA\sec-a-3.html:20:
+handout\fragments\appA\sec-a-3.html:21:  <section class="env env-proposition">
+handout\fragments\appA\sec-a-3.html:22:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="
+env-num">A.4</span><span class="env-name">Finite geometric sum</span></p>
+handout\fragments\appA\sec-a-3.html:23:    <div class="env-body">
+handout\fragments\appA\sec-a-3.html:24:      <p>For any number \(r \neq 1\) and any positive integer \(m\),
+handout\fragments\appA\sec-a-3.html:25:      \[ 1 + r + r^{2} + \cdots + r^{m} = \frac{1 - r^{m+1}}{1 - r}. \]</p>
+handout\fragments\appA\sec-a-3.html:26:    </div>
+handout\fragments\appA\sec-a-3.html:27:  </section>
+handout\fragments\appA\sec-a-3.html:28:
+handout\fragments\appA\sec-a-3.html:29:  <section class="env env-proof">
+handout\fragments\appA\sec-a-3.html:30:    <p class="env-head"><span class="env-kicker">Proof</span></p>
+handout\fragments\appA\sec-a-3.html:31:    <div class="env-body">
+handout\fragments\appA\sec-a-3.html:32:      <p>Write \(S = 1 + r + r^{2} + \cdots + r^{m}\) and multiply by \(1 - r\):
+handout\fragments\appA\sec-a-3.html:33:      \[ (1 - r)S = \bigl(1 + r + \cdots + r^{m}\bigr) - \bigl(r + r^{2} + \cdot
+s + r^{m+1}\bigr) = 1 - r^{m+1}, \]
+handout\fragments\appA\sec-a-3.html:34:      because each power \(r, r^{2}, \ldots, r^{m}\) appears once in each bracke
+t and cancels, leaving only the leading \(1\) and the final \(-r^{m+1}\) — the sum telescopes. Dividing by \(1 - r\) (l
+egitimate, since \(r \neq 1\)) gives the identity. <span class="qed qed-proof"></span></p>
+handout\fragments\appA\sec-a-3.html:35:    </div>
+handout\fragments\appA\sec-a-3.html:36:  </section>
+handout\fragments\appA\sec-a-3.html:37:
+handout\fragments\appA\sec-a-3.html:38:  <p>Now let the sum run on. If \(\lvert r \rvert < 1\), each multiplication by 
+\(r\) shrinks the next term by a fixed factor, and the power \(r^{m+1}\) in the formula dies away: its size \(\lvert r 
+\rvert^{m+1}\) drops below any positive threshold once \(m\) is large enough. In the arrow notation of §1.3, \(r^{m+1} 
+\to 0\) as \(m \to \infty\), so the running totals
+handout\fragments\appA\sec-a-3.html:39:  \[ S_{m} = \frac{1 - r^{m+1}}{1 - r} \qquad\text{settle toward}\qquad \frac{1 
+- 0}{1 - r} = \frac{1}{1 - r}. \]
+handout\fragments\appA\sec-a-3.html:40:  The value of an infinite sum <em>means</em> exactly this: the limit of its run
+ning totals. (That reading is made official in §4.2, where the running totals go by the name <em>partial sums</em>. The
+ completeness facts behind general convergence arguments are the business of §4.1–§4.2; none of them are needed for the
+ simple limit here.)</p>
+handout\fragments\appA\sec-a-3.html:41:
+handout\fragments\appA\sec-a-3.html:42:  <section class="env env-proposition">
+handout\fragments\appA\sec-a-3.html:43:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="
+env-num">A.5</span><span class="env-name">Infinite geometric series</span></p>
+handout\fragments\appA\sec-a-3.html:44:    <div class="env-body">
+handout\fragments\appA\sec-a-3.html:45:      <p>If \(\lvert r \rvert < 1\), then for any number \(a\),
+handout\fragments\appA\sec-a-3.html:46:      \[ \sum_{k = 0}^{\infty} a r^{k} = a + ar + ar^{2} + \cdots = \frac{a}{1 -
+ r}, \]
+handout\fragments\appA\sec-a-3.html:47:      and in particular the tail starting at \(k = 1\) sums to
+handout\fragments\appA\sec-a-3.html:48:      \[ \sum_{k = 1}^{\infty} r^{k} = \frac{r}{1 - r}. \]</p>
+handout\fragments\appA\sec-a-3.html:49:    </div>
+handout\fragments\appA\sec-a-3.html:50:  </section>
+handout\fragments\appA\sec-a-3.html:51:
+handout\fragments\appA\sec-a-3.html:52:  <section class="env env-proof">
+handout\fragments\appA\sec-a-3.html:53:    <p class="env-head"><span class="env-kicker">Proof</span></p>
+handout\fragments\appA\sec-a-3.html:54:    <div class="env-body">
+handout\fragments\appA\sec-a-3.html:55:      <p>By Proposition A.4 the \(m\)-th running total is \(a \cdot \dfrac{1 - r
+^{m+1}}{1 - r}\). As \(m \to \infty\) the power \(r^{m+1}\) tends to \(0\), so the totals tend to \(\dfrac{a}{1 - r}\).
+ The tail formula is the case \(a = r\): \(r + r^{2} + r^{3} + \cdots = \dfrac{r}{1 - r}\). <span class="qed qed-proof"
+></span></p>
+handout\fragments\appA\sec-a-3.html:56:    </div>
+handout\fragments\appA\sec-a-3.html:57:  </section>
+handout\fragments\appA\sec-a-3.html:58:
+handout\fragments\appA\sec-a-3.html:59:  <div class="workedexample">
+handout\fragments\appA\sec-a-3.html:60:    <section class="env env-example">
+handout\fragments\appA\sec-a-3.html:61:      <p class="env-head"><span class="env-kicker">Example</span><span class="en
+v-num">A.3</span></p>
+handout\fragments\appA\sec-a-3.html:62:      <div class="env-body">
+handout\fragments\appA\sec-a-3.html:63:        <p>Evaluate each infinite sum.</p>
+handout\fragments\appA\sec-a-3.html:64:        <ol class="prompt-list">
+handout\fragments\appA\sec-a-3.html:65:          <li>\(\dfrac{1}{2} + \dfrac{1}{4} + \dfrac{1}{8} + \cdots\)</li>
+handout\fragments\appA\sec-a-3.html:66:          <li>\(0.999\ldots\), read as \(\dfrac{9}{10} + \dfrac{9}{100} + \dfrac
+{9}{1000} + \cdots\)</li>
+handout\fragments\appA\sec-a-3.html:67:        </ol>
+handout\fragments\appA\sec-a-3.html:68:      </div>
+handout\fragments\appA\sec-a-3.html:69:    </section>
+handout\fragments\appA\sec-a-3.html:70:    <section class="env env-solution">
+handout\fragments\appA\sec-a-3.html:71:      <p class="env-head"><span class="env-kicker">Solution</span></p>
+handout\fragments\appA\sec-a-3.html:72:      <div class="env-body">
+handout\fragments\appA\sec-a-3.html:73:        <ol class="sol-list">
+handout\fragments\appA\sec-a-3.html:74:          <li>This is Proposition A.5 with \(a = \tfrac{1}{2}\) and \(r = \tfrac
+{1}{2}\):
+handout\fragments\appA\sec-a-3.html:75:          \[ \frac{1}{2} + \frac{1}{4} + \frac{1}{8} + \cdots = \frac{1/2}{1 - 1
+/2} = 1. \]
+handout\fragments\appA\sec-a-3.html:76:          The picture matches the algebra: eat half the cake, then half of what 
+remains, then half of that — the running total approaches one whole cake, and in the limit exactly fills it.</li>
+handout\fragments\appA\sec-a-3.html:77:          <li>Here \(a = \tfrac{9}{10}\) and \(r = \tfrac{1}{10}\):
+handout\fragments\appA\sec-a-3.html:78:          \[ 0.999\ldots = \frac{9/10}{1 - 1/10} = \frac{9/10}{9/10} = 1. \]
+handout\fragments\appA\sec-a-3.html:79:          Not approximately \(1\) — exactly \(1\). The two decimal expressions \
+(0.999\ldots\) and \(1\) are two names for the same number, and the infinite-sum reading is what makes that a computati
+on rather than a debate.</li>
+handout\fragments\appA\sec-a-3.html:80:        </ol>
+handout\fragments\appA\sec-a-3.html:81:      </div>
+handout\fragments\appA\sec-a-3.html:82:    </section>
+handout\fragments\appA\sec-a-3.html:83:  </div>
+handout\fragments\appA\sec-a-3.html:84:
+handout\fragments\appA\sec-a-3.html:85:  <section class="env env-caution">
+handout\fragments\appA\sec-a-3.html:86:    <p class="env-head"><span class="env-kicker">Caution</span></p>
+handout\fragments\appA\sec-a-3.html:87:    <div class="env-body">
+handout\fragments\appA\sec-a-3.html:88:      <p>The hypothesis \(\lvert r \rvert < 1\) is doing real work. For \(r = 2\
+) the series \(1 + 2 + 4 + 8 + \cdots\) grows without bound and has no sum, while the formula, applied blindly, would r
+eport \(\frac{1}{1 - 2} = -1\) — nonsense. The formula \(\frac{a}{1 - r}\) does not <em>create</em> a sum; it reports t
+he limit of the running totals, and only when \(\lvert r \rvert < 1\) does that limit exist.</p>
+handout\fragments\appA\sec-a-3.html:89:    </div>
+handout\fragments\appA\sec-a-3.html:90:  </section>
+handout\fragments\appA\sec-a-3.html:91:
+handout\fragments\appA\sec-a-3.html:92:  <p>In the main text this series first works for a living in §4.1, where Strate
+gy 4.1 bounds the tail of \(\sum x^{n}/n!\) by a geometric tail with ratio \(\tfrac{1}{2}\); the bound \(\sum_{k \ge 1}
+ r^{k} = \frac{r}{1 - r}\) of Proposition A.5 is exactly the step used there. The series keeps working throughout §4.2'
+s convergence arguments.</p>
+handout\fragments\appA\sec-a-3.html:93:
+handout\fragments\appA\sec-a-3.html:94:</article>
+
+
+
+ succeeded in 564ms:
+
+handout\fragments\appA\sec-a-2.html:1:<!-- §A.2 The Product-to-Sum and Sum-to-Product Identities.
+handout\fragments\appA\sec-a-2.html:2:     Self-authored 2026-07-03 (no manuscript; authoring brief = CONTENT_SPEC §16.
+2/§16.3
+handout\fragments\appA\sec-a-2.html:3:     + §3 register). Numbering is MANUAL, namespace "A", continuing from sec-a-1:
+handout\fragments\appA\sec-a-2.html:4:     Proposition A.2 (product-to-sum), A.3 (sum-to-product); Strategy A.1; Exampl
+e A.2.
+handout\fragments\appA\sec-a-2.html:5:     Math verified: the displayed identities (3 product-to-sum + 4 sum-to-product
+)
+handout\fragments\appA\sec-a-2.html:6:     re-derived from the angle-sum formulas (u,v-substitution u=(A+B)/2, v=(A−B)/
+2)
+handout\fragments\appA\sec-a-2.html:7:     during authoring.
+handout\fragments\appA\sec-a-2.html:8:     Referenced from: §3.1 (sum-to-product bridge — the derivative-of-sine hinge)
+.
+handout\fragments\appA\sec-a-2.html:9:     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+handout\fragments\appA\sec-a-2.html:10:
+handout\fragments\appA\sec-a-2.html:11:<article class="sec" lang="en">
+handout\fragments\appA\sec-a-2.html:12:
+handout\fragments\appA\sec-a-2.html:13:  <header class="sec-head">
+handout\fragments\appA\sec-a-2.html:14:    <h2 class="sec-title"><span class="sec-no">A.2</span>The Product-to-Sum and 
+Sum-to-Product Identities</h2>
+handout\fragments\appA\sec-a-2.html:15:  </header>
+handout\fragments\appA\sec-a-2.html:16:
+handout\fragments\appA\sec-a-2.html:17:  <p>One algebraic step in this book carries more weight than any other: rewriti
+ng the difference \(\sin(x+h) - \sin x\) as a <em>product</em>, which is what makes the derivative of the sine function
+ computable in §3.1. The identity that does it belongs to a family — the product-to-sum and sum-to-product identities —
+ that older curricula drilled and most current precalculus courses omit. The good news is that the whole family is noth
+ing but the angle-sum formulas, added and subtracted in pairs. If you learn one thing from this section, learn how to <
+em>rebuild</em> the identities; the memorizing then becomes optional.</p>
+handout\fragments\appA\sec-a-2.html:18:
+handout\fragments\appA\sec-a-2.html:19:  <p>Everything starts from the four angle-sum and angle-difference formulas, wh
+ich we assume and record here for reference:
+handout\fragments\appA\sec-a-2.html:20:  \[ \begin{aligned} \sin(u + v) &= \sin u \cos v + \cos u \sin v, \\ \sin(u - v
+) &= \sin u \cos v - \cos u \sin v, \\ \cos(u + v) &= \cos u \cos v - \sin u \sin v, \\ \cos(u - v) &= \cos u \cos v + 
+\sin u \sin v. \end{aligned} \]</p>
+handout\fragments\appA\sec-a-2.html:21:
+handout\fragments\appA\sec-a-2.html:22:  <p>Add or subtract these in matching pairs and half of each right-hand side ca
+ncels, leaving a single product.</p>
+handout\fragments\appA\sec-a-2.html:23:
+handout\fragments\appA\sec-a-2.html:24:  <section class="env env-proposition">
+handout\fragments\appA\sec-a-2.html:25:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="
+env-num">A.2</span><span class="env-name">Product-to-sum identities</span></p>
+handout\fragments\appA\sec-a-2.html:26:    <div class="env-body">
+handout\fragments\appA\sec-a-2.html:27:      <p>\[ \begin{aligned} \sin u \cos v &= \tfrac{1}{2}\bigl[\sin(u + v) + \si
+n(u - v)\bigr], \\ \cos u \cos v &= \tfrac{1}{2}\bigl[\cos(u + v) + \cos(u - v)\bigr], \\ \sin u \sin v &= \tfrac{1}{2}
+\bigl[\cos(u - v) - \cos(u + v)\bigr]. \end{aligned} \]</p>
+handout\fragments\appA\sec-a-2.html:28:    </div>
+handout\fragments\appA\sec-a-2.html:29:  </section>
+handout\fragments\appA\sec-a-2.html:30:
+handout\fragments\appA\sec-a-2.html:31:  <section class="env env-proof">
+handout\fragments\appA\sec-a-2.html:32:    <p class="env-head"><span class="env-kicker">Proof</span></p>
+handout\fragments\appA\sec-a-2.html:33:    <div class="env-body">
+handout\fragments\appA\sec-a-2.html:34:      <p>Add the two sine formulas: the \(\cos u \sin v\) terms cancel, leaving 
+\(\sin(u+v) + \sin(u-v) = 2 \sin u \cos v\); divide by \(2\). Add the two cosine formulas: the \(\sin u \sin v\) terms 
+cancel, giving \(\cos(u+v) + \cos(u-v) = 2 \cos u \cos v\). Subtract the cosine formulas instead — \(\cos(u-v) - \cos(u
++v)\) — and the \(\cos u \cos v\) terms cancel, giving \(2 \sin u \sin v\). <span class="qed qed-proof"></span></p>
+handout\fragments\appA\sec-a-2.html:35:    </div>
+handout\fragments\appA\sec-a-2.html:36:  </section>
+handout\fragments\appA\sec-a-2.html:37:
+handout\fragments\appA\sec-a-2.html:38:  <p>The sum-to-product identities are the same cancellations read in the other 
+direction. The only new idea is a change of names: given a sum like \(\sin A + \sin B\), arrange for the two angles to 
+read \(u + v\) and \(u - v\) by choosing \(u\) and \(v\) so that \(u + v = A\) and \(u - v = B\) — that is, let \(u\) b
+e the <em>average</em> and \(v\) the <em>half-difference</em>:
+handout\fragments\appA\sec-a-2.html:39:  \[ u = \frac{A + B}{2}, \qquad v = \frac{A - B}{2}. \]</p>
+handout\fragments\appA\sec-a-2.html:40:
+handout\fragments\appA\sec-a-2.html:41:  <section class="env env-proposition">
+handout\fragments\appA\sec-a-2.html:42:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="
+env-num">A.3</span><span class="env-name">Sum-to-product identities</span></p>
+handout\fragments\appA\sec-a-2.html:43:    <div class="env-body">
+handout\fragments\appA\sec-a-2.html:44:      <p>\[ \begin{aligned} \sin A + \sin B &= 2 \sin\frac{A + B}{2} \cos\frac{A
+ - B}{2}, \\ \sin A - \sin B &= 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}, \\ \cos A + \cos B &= 2 \cos\frac{A + B}{2} 
+\cos\frac{A - B}{2}, \\ \cos A - \cos B &= -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}. \end{aligned} \]</p>
+handout\fragments\appA\sec-a-2.html:45:    </div>
+handout\fragments\appA\sec-a-2.html:46:  </section>
+handout\fragments\appA\sec-a-2.html:47:
+handout\fragments\appA\sec-a-2.html:48:  <section class="env env-proof">
+handout\fragments\appA\sec-a-2.html:49:    <p class="env-head"><span class="env-kicker">Proof</span></p>
+handout\fragments\appA\sec-a-2.html:50:    <div class="env-body">
+handout\fragments\appA\sec-a-2.html:51:      <p>With \(u = \tfrac{A+B}{2}\) and \(v = \tfrac{A-B}{2}\) we have \(u + v 
+= A\) and \(u - v = B\). Then, reading the cancellations in the previous proof from right to left,
+handout\fragments\appA\sec-a-2.html:52:      \[ \begin{aligned} \sin A + \sin B &= \sin(u + v) + \sin(u - v) \\ &= 2 \s
+in u \cos v = 2 \sin\frac{A + B}{2} \cos\frac{A - B}{2}, \end{aligned} \]
+handout\fragments\appA\sec-a-2.html:53:      and the other three lines follow the same way: \(\sin A - \sin B = \sin(u+
+v) - \sin(u-v) = 2 \cos u \sin v\) (this time subtracting the two sine expansions); \(\cos A + \cos B = 2 \cos u \cos v
+\); and \(\cos A - \cos B = \cos(u+v) - \cos(u-v) = -2 \sin u \sin v\). Note the minus sign in the last line — the only
+ one in the family, and the easiest thing to misremember; the subtraction order \(\cos(u+v) - \cos(u-v)\) is where it c
+omes from. <span class="qed qed-proof"></span></p>
+handout\fragments\appA\sec-a-2.html:54:    </div>
+handout\fragments\appA\sec-a-2.html:55:  </section>
+handout\fragments\appA\sec-a-2.html:56:
+handout\fragments\appA\sec-a-2.html:57:  <section class="env env-strategy">
+handout\fragments\appA\sec-a-2.html:58:    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env
+-num">A.1</span><span class="env-name">Recovering an identity you forgot</span></p>
+handout\fragments\appA\sec-a-2.html:59:    <div class="env-body">
+handout\fragments\appA\sec-a-2.html:60:      <ol class="steps">
+handout\fragments\appA\sec-a-2.html:61:        <li>Write down the two angle-sum (or angle-difference) expansions that c
+ontain the pieces you have, and add or subtract them so that the unwanted terms cancel.</li>
+handout\fragments\appA\sec-a-2.html:62:        <li>If your expression is a sum of two trig values at angles \(A\) and \
+(B\), substitute the average \(u = \tfrac{A+B}{2}\) and half-difference \(v = \tfrac{A-B}{2}\), so that \(A = u + v\) a
+nd \(B = u - v\).</li>
+handout\fragments\appA\sec-a-2.html:63:      </ol>
+handout\fragments\appA\sec-a-2.html:64:      <p class="informal">Rebuilding takes perhaps a minute; a memorized list of
+ eight is easy to get wrong by a sign. Verifying is even cheaper — expand the product side with the angle-sum formulas 
+and watch the cross terms cancel.</p>
+handout\fragments\appA\sec-a-2.html:65:    </div>
+handout\fragments\appA\sec-a-2.html:66:  </section>
+handout\fragments\appA\sec-a-2.html:67:
+handout\fragments\appA\sec-a-2.html:68:  <div class="workedexample">
+handout\fragments\appA\sec-a-2.html:69:    <section class="env env-example">
+handout\fragments\appA\sec-a-2.html:70:      <p class="env-head"><span class="env-kicker">Example</span><span class="en
+v-num">A.2</span></p>
+handout\fragments\appA\sec-a-2.html:71:      <div class="env-body">
+handout\fragments\appA\sec-a-2.html:72:        <p>Rewrite each expression as requested.</p>
+handout\fragments\appA\sec-a-2.html:73:        <ol class="prompt-list">
+handout\fragments\appA\sec-a-2.html:74:          <li>Write \(\sin(x + h) - \sin x\) as a product.</li>
+handout\fragments\appA\sec-a-2.html:75:          <li>Write \(\sin 5x \, \sin 3x\) as a sum.</li>
+handout\fragments\appA\sec-a-2.html:76:        </ol>
+handout\fragments\appA\sec-a-2.html:77:      </div>
+handout\fragments\appA\sec-a-2.html:78:    </section>
+handout\fragments\appA\sec-a-2.html:79:    <section class="env env-solution">
+handout\fragments\appA\sec-a-2.html:80:      <p class="env-head"><span class="env-kicker">Solution</span></p>
+handout\fragments\appA\sec-a-2.html:81:      <div class="env-body">
+handout\fragments\appA\sec-a-2.html:82:        <ol class="sol-list">
+handout\fragments\appA\sec-a-2.html:83:          <li>Apply the sum-to-product identity for \(\sin A - \sin B\) with \(A
+ = x + h\) and \(B = x\). The average is \(\tfrac{A+B}{2} = x + \tfrac{h}{2}\) and the half-difference is \(\tfrac{A-B}
+{2} = \tfrac{h}{2}\), so
+handout\fragments\appA\sec-a-2.html:84:          \[ \sin(x + h) - \sin x = 2 \cos\Bigl(x + \tfrac{h}{2}\Bigr) \sin\frac
+{h}{2}. \]
+handout\fragments\appA\sec-a-2.html:85:          This is precisely the rewriting on which §3.1's derivative of sine tur
+ns: the difference of two sines becomes a product with the small quantity \(h/2\) isolated inside a single sine.</li>
+handout\fragments\appA\sec-a-2.html:86:          <li>Apply the third product-to-sum identity with \(u = 5x\) and \(v = 
+3x\):
+handout\fragments\appA\sec-a-2.html:87:          \[ \begin{aligned} \sin 5x \, \sin 3x &= \tfrac{1}{2}\bigl[\cos(5x - 3
+x) - \cos(5x + 3x)\bigr] \\ &= \tfrac{1}{2}\bigl[\cos 2x - \cos 8x\bigr]. \end{aligned} \]
+handout\fragments\appA\sec-a-2.html:88:          Turning products into sums is the direction integration will want: a s
+um of cosines is far easier to integrate than a product, and this identity family returns for exactly that purpose when
+ the techniques of integration arrive.</li>
+handout\fragments\appA\sec-a-2.html:89:        </ol>
+handout\fragments\appA\sec-a-2.html:90:      </div>
+handout\fragments\appA\sec-a-2.html:91:    </section>
+handout\fragments\appA\sec-a-2.html:92:  </div>
+handout\fragments\appA\sec-a-2.html:93:
+handout\fragments\appA\sec-a-2.html:94:  <p>In the main text, the identity for \(\sin A - \sin B\) in Proposition A.3 i
+s the decisive step in §3.1's difference quotient for sine, its \(\cos\) companion handles the derivative of cosine, an
+d the pair together power the continuity proof for both functions.</p>
+handout\fragments\appA\sec-a-2.html:95:
+handout\fragments\appA\sec-a-2.html:96:</article>
+
+
+
+codex
+I have the appendix text with line numbers. Next I’m checking the cited mainline sections and the nearby §4.2 reference, focusing on the exact phrases the appendix claims are used there.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"sin\\(A|sin A|sin\\(x \\+ h\\)|sum-to-product|product-to-sum|derivative of sine|tan|sec\\"'^|sec'"\\{2\\}|cosine|continuity\" handout/fragments/ch03/sec-3-1.html" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n "sec|csc|cot|principal|reciprocal|inverse" handout/fragments/ch01/sec-1-2.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"Strategy 4\\.1|geometric|tail|1/2|r\\"'^'"\\{k\\}|r/\\(1|partial|sum x|x\\"'^'"\\{n\\}/n"'!|n!" handout/fragments/ch04/sec-4-1.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n "partial sums|running totals|geometric|series|official|sum" handout/fragments/ch04/sec-4-2.html' in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 456ms:
+12:       Example 3.1 (companion limit), 3.2 (tan' & sec'), 3.3 (SHM);
+19:     ③ decisions D1–D4: tan' as a worked example, not a theorem (D1); sec'
+20:     pulled into §3.1 beside tan' (same quotient-rule technique); the
+21:     companion limit (1−cosθ)/θ → 0 added as a standard limit (D2);
+22:     continuity slimmed (D3) — the cos/sin continuity PROOF is kept (the
+23:     derivative limits need it), but the definition of continuity is
+27:     to §1.5, not re-stated (D4). Figure 3.1 uses the standard nesting
+28:     △OAB ⊆ sector OAB ⊆ △OAC (½sinθ ≤ ½θ ≤ ½tanθ); the manuscript's
+31:     2026-07-03 difficulty-mitigation pass: sum-to-product identities glossed with their
+42:  <p class="lead">Chapter 2 built the derivative from the ground up — as the limit of a difference quotient — and turned it into a working toolkit: rules for constants, powers, sums, products, quotients, and the exponential. Yet a whole world of functions still lies just out of reach. How fast does \(\sin x\) change? And what is the derivative of a <em>composition</em> such as \(\sqrt{1 + x^{2}}\) or \(\sin(x^{2})\), where one function is fed into another? This chapter supplies the two ideas that complete the differentiation toolkit. First we differentiate the trigonometric functions, which forces us to confront a limit no algebra can crack and to break through it with a piece of geometry. Then we prove the <em>chain rule</em>, the single rule that differentiates any composition, and use it to unlock the derivatives of inverse and implicitly defined functions.</p>
+46:    <li>differentiate \(\sin x\), \(\cos x\), \(\tan x\), and the other trigonometric functions, and combine them with the rules of Chapter 2;</li>
+49:    <li>derive the derivatives of \(\arcsin x\), \(\arctan x\), and \(\ln x\) from their inverse-function relations.</li>
+61:  \[ \frac{\sin(x + h) - \sin x}{h}. \]
+62:  No algebraic identity cancels the \(h\) in the denominator against the numerator — \(\sin(x + h)\) does not break into pieces that conveniently subtract. As we are about to see, the entire computation funnels down to a single limit,
+70:  <p>Fix \(x\) and form the difference quotient for \(f(x) = \sin x\). The decisive algebraic step is the sum-to-product identity \(\sin A - \sin B = 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}\). If this identity is not at your fingertips, it is the angle-sum formulas in disguise: set \(u = \frac{A + B}{2}\) and \(v = \frac{A - B}{2}\), so that \(A = u + v\) and \(B = u - v\); expanding \(\sin(u + v) - \sin(u - v)\) by the angle-sum formulas cancels the \(\sin u \cos v\) terms and leaves exactly \(2 \cos u \sin v\). (Appendix A.2 derives the whole family of such identities.) Applied with \(A = x + h\) and \(B = x\):
+71:  \[ \sin(x + h) - \sin x = 2 \cos\Bigl(x + \tfrac{h}{2}\Bigr) \sin\frac{h}{2}. \]
+74:  <p>\[ \frac{\sin(x + h) - \sin x}{h} = \cos\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}. \]</p>
+76:  <p>As \(h \to 0\), two things happen at once. The factor \(\cos\bigl(x + \tfrac{h}{2}\bigr)\) ought to tend to \(\cos x\) — provided \(\cos\) is continuous — and the factor \(\dfrac{\sin(h/2)}{h/2}\) is exactly \(\dfrac{\sin\theta}{\theta}\) with \(\theta = h/2 \to 0\). So the derivative rests on two facts: that sine and cosine are continuous, and the value of \(\lim_{\theta \to 0}\sin\theta/\theta\). We secure both now.</p>
+85:    <figcaption><span class="fig-no">Figure 3.1</span> The unit-circle area comparison behind \(\sin\theta \le \theta \le \tan\theta\).</figcaption>
+88:  <p>Here \(A = (1, 0)\) lies on the circle, \(B = (\cos\theta, \sin\theta)\) is the point at angle \(\theta\), and \(C = (1, \tan\theta)\) is where the radius \(OB\), extended, meets the vertical tangent line at \(A\). Three nested regions appear, and their areas are easy to read off:</p>
+93:    <li>the larger triangle \(OAC\) has base \(OA = 1\) and height \(AC = \tan\theta\), so its area is \(\tfrac12 \tan\theta\).</li>
+97:  \[ \tfrac12 \sin\theta \;\le\; \tfrac12 \theta \;\le\; \tfrac12 \tan\theta. \]
+98:  Equivalently, split the outer triangle as \(OAC = OAB \cup ABC\): the corner piece \(ABC\) is what \(OAC\) adds to the inscribed triangle \(OAB\), and it contains the circular segment between the chord \(AB\) and the arc. Multiplying through by \(2\) gives \(\sin\theta \le \theta \le \tan\theta\). Dividing by \(\sin\theta > 0\) and using \(\tan\theta = \sin\theta/\cos\theta\) turns this into \(1 \le \dfrac{\theta}{\sin\theta} \le \dfrac{1}{\cos\theta}\), and taking reciprocals of these positive quantities reverses the inequalities:
+102:  <h3 class="subsec-head">Continuity of sine and cosine</h3>
+104:  <!-- expansion:intuition — why continuity is needed here; cross-ref the Ch1 notion of continuity, do not restate its definition (D3) -->
+105:  <p>The bound \(\lvert \sin\theta \rvert \le \lvert \theta \rvert\) does more than help with the fundamental limit: it is also what makes sine and cosine continuous, in the sense introduced in Chapter 1. Continuity is exactly what the two factors of the difference quotient need in order to settle to their values as \(h \to 0\), so we establish it now.</p>
+108:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.1</span><span class="env-name">Continuity of sine and cosine</span></p>
+119:      <p>Now fix \(x_{0}\). The sum-to-product identities give</p>
+126:      <p>As \(x \to x_{0}\) the angle \(\tfrac{x - x_{0}}{2} \to 0\), so by the limit just established both right-hand sides tend to \(0\). The squeeze theorem then gives \(\cos x \to \cos x_{0}\) and \(\sin x \to \sin x_{0}\); that is, cosine and sine are continuous at \(x_{0}\).</p>
+133:  <p>With continuity secured, we can finally squeeze \(\sin\theta/\theta\) to its limit (Figure 3.2).</p>
+145:      <p>For \(0 < \theta < \tfrac{\pi}{2}\), inequality (1) reads \(\cos\theta \le \dfrac{\sin\theta}{\theta} \le 1\). As \(\theta \to 0^{+}\) the upper bound is the constant \(1\), while the lower bound satisfies \(\cos\theta \to \cos 0 = 1\) by the continuity of cosine (Proposition 3.1). The squeeze theorem (§1.5) pins the quantity between them: \(\lim_{\theta \to 0^{+}} \sin\theta/\theta = 1\). Finally \(\sin\theta/\theta\) is even, so its left-hand limit at \(0\) equals its right-hand limit, and the two-sided limit is \(1\) as well.</p>
+170:  <h3 class="subsec-head">The derivatives of sine and cosine</h3>
+173:  <p>With continuity and the fundamental limit in hand, the difference quotient for \(\sin\) all but evaluates itself.</p>
+187:        \frac{d}{dx}\sin x &= \lim_{h \to 0} \frac{\sin(x + h) - \sin x}{h} \\[2pt]
+190:      <p>As \(h \to 0\), the first factor tends to \(\cos x\) because cosine is continuous (Proposition 3.1), and the second tends to \(1\) by the fundamental limit (Proposition 3.2), with \(\theta = h/2 \to 0\). The product therefore tends to \(\cos x \cdot 1 = \cos x\).</p>
+198:    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.2</span><span class="env-name">Derivative of cosine</span></p>
+209:      <p>Letting \(h \to 0\), the factor \(\sin\bigl(x + \tfrac{h}{2}\bigr) \to \sin x\) by continuity (Proposition 3.1) and \(\dfrac{\sin(h/2)}{h/2} \to 1\) by Proposition 3.2, so</p>
+214:  <!-- expansion:figure — sin'=cos as slope=height: tangents of sin x vs heights of cos x (registered in figures.js as "sin-cos-slope") -->
+219:  <!-- expansion:example — companion fundamental limit (1−cosθ)/θ → 0 (D2; standard companion to Proposition 3.2) -->
+238:        <p>As \(\theta \to 0\), the first factor tends to \(1\) by Proposition 3.2, while the second tends to \(\dfrac{0}{1 + 1} = 0\) by the continuity of sine and cosine (Proposition 3.1). The product tends to \(1 \cdot 0 = 0\).</p>
+243:  <!-- expansion:example — tan' (D1, manuscript HW) and sec' (③ pull-in, manuscript HW), both via the quotient rule of §2.5 -->
+248:        <p>Using \(\sin' = \cos\) and \(\cos' = -\sin\) together with the quotient rule (§2.5), differentiate (a) \(\tan x\) and (b) \(\sec x\), wherever \(\cos x \ne 0\).</p>
+254:        <p>For (a), write \(\tan x = \dfrac{\sin x}{\cos x}\) and apply the quotient rule:</p>
+256:          \frac{d}{dx}\tan x
+259:             = \frac{1}{\cos^{2} x} = \sec^{2} x,
+262:        <p>For (b), write \(\sec x = \dfrac{1}{\cos x}\). The quotient rule, with the constant numerator \(1\), gives</p>
+268:             = \sec x \tan x.
+288:        <p>Thus \(s''(t) = -\sin t = -s(t)\): at every instant the weight accelerates back toward its rest level, by an amount proportional to how far it has strayed. This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em> (Figure 3.4), and it is no accident that sine and cosine — the functions whose second derivative is their own negative — are precisely the ones that describe oscillation.</p>
+300:    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">3.1</span><span class="env-name">The derivative cycle of sine and cosine</span></p>
+302:      <p>Differentiation sends sine and cosine into each other, with a sign that turns over every second step (Figure 3.3). Writing \(\to\) for one application of \(\dfrac{d}{dx}\),</p>
+304:      <p>After four derivatives we are back where we started, so \(\dfrac{d^{4}}{dx^{4}}\sin x = \sin x\), and likewise for cosine. Where \(e^{x}\) reproduces itself in a single step (§2.4), sine and cosine reproduce themselves in a cycle of four — the same self-renewal that lets \(s'' = -s\) describe an oscillation that never winds down.</p>
+
+ succeeded in 455ms:
+7:     2026-07-03 difficulty-mitigation pass: reciprocal trig definitions before Example 1.12;
+8:     forward fence to Chapter 3 in the section lead.
+10:<article class="sec" lang="en">
+12:  <header class="sec-head">
+13:    <h2 class="sec-title"><span class="sec-no">1.2</span>Inverse Trigonometric Functions</h2>
+16:  <p>The trigonometric functions are not one-to-one on all of \(\mathbb{R}\), so they do not have inverse functions on their full domains. Inverse trigonometric functions arise whenever we know a ratio and want to recover an angle: from the slope of a ramp, we get an angle of inclination via \(\arctan\); from a ratio of sides in a right triangle, we get an angle via \(\arcsin\) or \(\arccos\). To build these inverses, we must first restrict the domain of each trigonometric function to an interval on which it is one-to-one. You will use these functions again in Chapter 3, where the derivatives of \(\arcsin\), \(\arccos\), and \(\arctan\) are computed — and the principal ranges fixed in this section are exactly what determine those formulas.</p>
+18:  <p>Consider the sine function on \(\mathbb{R}\). As Figure 1.4 shows, a horizontal line can intersect the graph of \(y = \sin x\) more than once, so \(\sin\) is not one-to-one on \(\mathbb{R}\).</p>
+24:  <h3 class="subsec-head">The inverse sine function</h3>
+26:  <p>To define the inverse sine, we restrict \(\sin x\) to the interval
+34:  <section class="env env-definition">
+37:      <p>The <em>inverse sine function</em>, denoted \(\arcsin x\) or \(\sin^{-1} x\), is defined by
+41:  </section>
+43:  <section class="env env-caution">
+46:      <p>The notation \(\sin^{-1} x\) is also used for \(\arcsin x\). It does <em>not</em> mean the reciprocal \(\bigl(\sin x\bigr)^{-1} = 1 / \sin x\). When reading a source that uses \(\sin^{-1}\), check the context to decide which is meant.</p>
+48:  </section>
+52:  <section class="env env-proposition">
+57:  </section>
+59:  <section class="env env-caution">
+65:  </section>
+67:  <!-- expansion:strategy — the reference-triangle method for evaluating trig(inverse-trig) expressions [source: CLP-1 §2.12; Stewart §1.6] -->
+68:  <section class="env env-strategy">
+71:      <p>To evaluate a trigonometric function of an inverse trigonometric expression — such as \(\tan(\arcsin x)\) or \(\cos(\arctan x)\):</p>
+73:        <li>Set \(\theta\) equal to the inverse trigonometric expression, so that the known ratio is read directly from the definition (e.g. \(\theta = \arcsin x\) gives \(\sin\theta = x\)).</li>
+74:        <li>Draw a right triangle whose side lengths are the magnitudes (absolute values) of the known ratio. Keep the sign separate, and use the principal-value interval — the range fixed in the inverse function's definition — to settle it.</li>
+76:        <li>Read the desired value from the completed triangle. Determine the sign from the principal-value interval, not from the triangle alone.</li>
+79:  </section>
+82:    <section class="env env-example">
+91:    </section>
+92:    <section class="env env-solution">
+105:    </section>
+108:  <h3 class="subsec-head">The inverse cosine function</h3>
+119:  <section class="env env-definition">
+122:      <p>The <em>inverse cosine function</em>, denoted \(\arccos x\) or \(\cos^{-1} x\), is defined by
+126:  </section>
+128:  <section class="env env-proposition">
+133:  </section>
+137:    <section class="env env-example">
+146:    </section>
+147:    <section class="env env-solution">
+156:    </section>
+159:  <!-- expansion:example — principal value as an applied trap (arccos returns one value, not all) [source: CLP-1 §2.12 #2] -->
+161:    <section class="env env-example">
+166:    </section>
+167:    <section class="env env-solution">
+170:        <p>False. The equation \(\cos t = 1\) holds for infinitely many \(t\), but \(\arccos\) returns only the principal value \(t = 0\) — and the particle is not even moving at \(t = 0\), since its motion starts at \(t = 10\). The particle does reach height \(1\) at the times \(t = 2\pi n\) for integer \(n\); because the motion exists only for \(t \ge 10\), this requires \(2\pi n \ge 10\), i.e. \(n \ge 2\), but \(\arccos(1) = 0\) is not one of them.</p>
+172:    </section>
+175:  <h3 class="subsec-head">The inverse tangent function</h3>
+178:  <p>On the open interval \(\left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\), the tangent function climbs continuously from \(-\infty\) to \(+\infty\), taking each real number as a value exactly once. This is why the inverse tangent, unlike \(\arcsin\) and \(\arccos\), accepts <em>every</em> real number as input: its domain is all of \(\mathbb{R}\) (Figure 1.9).</p>
+186:  <section class="env env-definition">
+189:      <p>The <em>inverse tangent function</em>, denoted \(\arctan x\) or \(\tan^{-1} x\), is defined by
+193:  </section>
+195:  <p>Figure 1.9 shows this reflection. In the reflected graph, the vertical asymptotes of the restricted tangent branch become horizontal asymptotes of the inverse tangent graph.</p>
+199:    <figcaption><span class="fig-no">Figure 1.9</span> The restricted tangent branch and its inverse, reflected across \(y = x\).</figcaption>
+202:  <section class="env env-proposition">
+207:  </section>
+210:  <section class="env env-caution">
+213:      <p>As with the sine case, the “cancellation” identities hold only on each principal range. That is, \(\arccos(\cos x) = x\) only when \(x \in [0, \pi]\), and \(\arctan(\tan x) = x\) only when \(x \in \left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\). Outside these intervals the left-hand side returns the equivalent angle that <em>does</em> lie in the principal range; for instance,
+217:  </section>
+219:  <!-- 2026-07-03 difficulty-mitigation: sec/csc/cot defined before first use — they were used from Example 1.12 on but never defined anywhere in the text; blocking for readers whose precalculus omitted the reciprocal functions. Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html -->
+220:  <p>The next two examples involve the <em>reciprocal</em> trigonometric functions secant, cosecant, and cotangent. If your precalculus course made little use of them, their definitions are all you need: for any angle \(\theta\) at which the denominator is nonzero,
+221:  \[ \sec\theta = \frac{1}{\cos\theta}, \qquad \csc\theta = \frac{1}{\sin\theta}, \qquad \cot\theta = \frac{\cos\theta}{\sin\theta}. \]
+222:  Since \(\cos\theta\) is the ratio adjacent over hypotenuse in a right triangle, \(\sec\theta\) is the ratio hypotenuse over adjacent, and similarly for the other two. Dividing the Pythagorean identity \(\sin^{2}\theta + \cos^{2}\theta = 1\) through by \(\cos^{2}\theta\) gives the companion identity \(1 + \tan^{2}\theta = \sec^{2}\theta\), which Example 1.13 puts to work. Note the contrast with Caution 1.2: the superscript in \(\sin^{-1} x\) does <em>not</em> denote a reciprocal, but \(\sec\) and \(\csc\) are honest reciprocals (and \(\cot\) is the inverted ratio \(\cos/\sin\)). Appendix A.1 develops these three functions more fully.</p>
+224:  <!-- expansion:example — exact values with negative inputs, obtuse principal value, and the triangle method [source: Stitz-Zeager via Mooculus 10_06_ex_131-154] -->
+226:    <section class="env env-example">
+232:          <li>\(\sec(\arctan 10)\).</li>
+236:    </section>
+237:    <section class="env env-solution">
+241:          <li>\(\arccos(-\tfrac{1}{2})\) is the angle in \([0, \pi]\) whose cosine is \(-\tfrac{1}{2}\): that is \(\tfrac{2\pi}{3}\), and \(\sin\tfrac{2\pi}{3} = \tfrac{\sqrt{3}}{2}\). Note the principal value lands in the <em>second</em> quadrant — negative inputs to \(\arccos\) always do.</li>
+242:          <li>Let \(\theta = \arctan 10\), so \(\tan\theta = 10\) with \(\theta \in \left(0, \tfrac{\pi}{2}\right)\). In a right triangle with opposite side \(10\) and adjacent side \(1\), the hypotenuse is \(\sqrt{101}\), so \(\sec(\arctan 10) = \sqrt{101}\).
+250:    </section>
+254:    <section class="env env-example">
+259:    </section>
+260:    <section class="env env-solution">
+263:        <p>Let \(y = \arctan x\), so \(\tan y = x\) with \(-\tfrac{\pi}{2} < y < \tfrac{\pi}{2}\). We want \(\cos y\). Using the identity \(1 + \tan^{2} y = \sec^{2} y\),
+264:        \[ \sec^{2} y = 1 + x^{2}. \]
+265:        Since \(y \in \left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\) we have \(\cos y > 0\) and hence \(\sec y > 0\), so \(\sec y = \sqrt{1 + x^{2}}\). Therefore
+266:        \[ \cos(\arctan x) = \cos y = \frac{1}{\sec y} = \frac{1}{\sqrt{1 + x^{2}}}. \]</p>
+271:    </section>
+274:  <h3 class="subsec-head">The remaining inverse trigonometric functions</h3>
+276:  <p>The remaining inverse trigonometric functions are used less frequently, but they follow the same pattern: restrict each to a one-to-one branch, then invert. Each definition below specifies a <em>principal range</em> — the interval its output angle is restricted to; the corresponding input domains are collected together after all three.</p>
+278:  <section class="env env-definition">
+281:      <p>The <em>inverse cosecant function</em>, denoted \(\arccsc x\) or \(\csc^{-1} x\), is defined by
+282:      \[ \arccsc x = y \quad \Longleftrightarrow \quad \csc y = x \ \text{ and } \ y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]. \]</p>
+284:  </section>
+286:  <section class="env env-definition">
+289:      <p>The <em>inverse secant function</em>, denoted \(\arcsec x\) or \(\sec^{-1} x\), is defined by
+290:      \[ \arcsec x = y \quad \Longleftrightarrow \quad \sec y = x \ \text{ and } \ y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right). \]</p>
+292:  </section>
+294:  <section class="env env-definition">
+297:      <p>The <em>inverse cotangent function</em>, denoted \(\arccot x\) or \(\cot^{-1} x\), is defined by
+298:      \[ \arccot x = y \quad \Longleftrightarrow \quad \cot y = x \ \text{ and } \ y \in (0, \pi). \]</p>
+300:  </section>
+302:  <p>The domains of \(\arccsc\) and \(\arcsec\) are \((-\infty, -1] \cup [1, \infty)\), while the domain of \(\arccot\) is \(\mathbb{R}\). The principal ranges are the intervals specified in the definitions above.</p>
+304:  <section class="env env-remark">
+307:      <p>For \(\arcsec x\), another common choice of principal range is \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left(\tfrac{\pi}{2}, \pi\right]\). In this text we use \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right)\) because it makes the later derivative formula for the inverse secant simpler. When consulting other sources or software, always check which convention is in use, since different branch choices can lead to different values.</p>
+309:  </section>
+311:  <section class="env env-remark">
+314:      <p>For \(\arccsc x\), another common choice of principal range is \(y \in \left[-\tfrac{\pi}{2}, 0\right) \cup \left(0, \tfrac{\pi}{2}\right]\). In this text we use \(y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]\) so that the chosen branch parallels the one selected for \(\arcsec x\). Once the principal range is fixed consistently, either convention gives a valid inverse function.</p>
+316:  </section>
+318:  <!-- expansion:example — domains of the remaining inverse trig functions + the branch convention has visible consequences [source: CLP-1 §2.12 #5, recomputed for this text's arccsc principal range] -->
+320:    <section class="env env-example">
+323:        <p>Let \(f(x) = \arcsin x + \arccsc x\). Find the domain of \(f\), and evaluate \(f\) at every point of its domain.</p>
+325:    </section>
+326:    <section class="env env-solution">
+329:        <p>\(\arcsin\) requires \(|x| \le 1\) while \(\arccsc\) requires \(|x| \ge 1\), so the domain is just the two points \(x = \pm 1\). At \(x = 1\): \(\arcsin 1 = \tfrac{\pi}{2}\) and \(\arccsc 1 = \tfrac{\pi}{2}\) (the angle in \(\left(0, \tfrac{\pi}{2}\right]\) with cosecant \(1\)), so \(f(1) = \pi\). At \(x = -1\): \(\arcsin(-1) = -\tfrac{\pi}{2}\), and under this text’s principal range for \(\arccsc\) the angle with cosecant \(-1\) is \(\arccsc(-1) = \tfrac{3\pi}{2}\), so \(f(-1) = -\tfrac{\pi}{2} + \tfrac{3\pi}{2} = \pi\). So \(f\) is the constant \(\pi\) on its two-point domain.</p>
+330:        <p>Under the alternative convention of Remark 1.4 (\(\arccsc(-1) = -\tfrac{\pi}{2}\)) one gets \(f(-1) = -\pi\) instead — a concrete instance of branch conventions changing answers, which is why this text fixes its conventions explicitly.</p>
+332:    </section>
+
+ succeeded in 459ms:
+10:     2026-07-03 P1 ruling follow-up: infinite geometric sum derived in Strategy 4.1
+19:       Strategy 4.1 (geometric-tail bound); Example 4.1 (partial sums of e);
+20:       Figure 4.2 (partial-sum convergence) and Figure 4.1 (completeness,
+25:     ③ decisions (brief §D): the value of e and its partial-sum worked
+26:     example, the partial-sum convergence figure, the "series defines, doesn't
+27:     derive" caution, the geometric-tail strategy box, and the ℝ-vs-ℚ remark
+42:    <li>state the power-series definition of \(e^{x}\) and bound the tail of the series to prove it converges on all of \(\mathbb{R}\);</li>
+78:      \[ e^{x} = \sum_{n = 0}^{\infty} \frac{x^{n}}{n!} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots, \]
+79:      where by convention \(0! = 1\) and \(n! = 1 \cdot 2 \cdot 3 \cdots n\). (The same series turns out to converge for every real \(x\); we establish the case \(x > 0\) here and extend it to all of \(\mathbb{R}\) in §4.2.)</p>
+97:  <p>A series is the limit of its partial sums, and to know that a limit exists we need some guarantee built into the number system itself. The guarantee we use is that a sequence which climbs steadily but is held below some ceiling must approach a limiting value — and the mirror statement for decreasing sequences.</p>
+128:  <p>The plan is to trap the tail of the series \(\sum x^{n}/n!\) inside a geometric series. Once the tail is controlled, the partial sums form a non-decreasing sequence that is bounded above, and Theorem 4.1 hands us the limit. The technique is worth isolating, because it returns several times in this section and the next.</p>
+130:  <!-- expansion:strategy — name the geometric-tail technique once; reused in the §4.1 convergence proof and throughout §4.2 -->
+132:    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">4.1</span><span class="env-name">Bounding a series by a geometric tail</span></p>
+137:        <li>Conclude that the terms decay geometrically: \(a_{n} \le a_{n_{0}} \, r^{\,n - n_{0}}\) for \(n \ge n_{0}\).</li>
+138:        <li>Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\). (If the infinite geometric sum is new to you: the finite sum is \(r + r^{2} + \cdots + r^{m} = \frac{r(1 - r^{m})}{1 - r}\) — multiply by \(1 - r\) and watch the telescoping — and since \(0 < r < 1\), the power \(r^{m}\) dies away as \(m\) grows, leaving \(\frac{r}{1 - r}\). Appendix A.3 gives the full account.)</li>
+139:        <li>The partial sums are then bounded above, and (being a sum of positive terms) non-decreasing, so Theorem 4.1 gives the limit.</li>
+147:      <p>For every \(x > 0\), the series \(\displaystyle\sum_{n = 0}^{\infty} \frac{x^{n}}{n!}\) converges to a finite real number.</p>
+151:  <p><em>Proof track: this argument earns the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof — on a first reading you may take both and move on.</em></p>
+157:      \[ \frac{x^{n + 1}/(n + 1)!}{x^{n}/n!} = \frac{x}{n + 1}, \]
+159:      \[ \frac{x^{n}}{n!} \le \frac{x^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{n - n_{0}} \qquad (n > n_{0}). \]
+160:      Split a partial sum at the index \(n_{0}\):
+161:      \[ \sum_{n = 0}^{N} \frac{x^{n}}{n!} = \underbrace{\sum_{n = 0}^{n_{0}} \frac{x^{n}}{n!}}_{\text{(I)}} + \underbrace{\sum_{n = n_{0} + 1}^{N} \frac{x^{n}}{n!}}_{\text{(II)}}. \]
+162:      Piece (I) is a fixed finite sum. Piece (II) is bounded, using the geometric estimate above, by
+165:      \[ \sum_{n = 0}^{N} \frac{x^{n}}{n!} \le \sum_{n = 0}^{n_{0}} \frac{x^{n}}{n!} + \frac{x^{n_{0}}}{n_{0}!} \qquad \text{for every } N > n_{0}. \]
+166:      The right-hand side is a fixed real number, independent of \(N\). The partial sums on the left are non-decreasing (each new term is positive) and bounded above, so by Theorem 4.1 the series converges to a finite real number. <span class="qed qed-proof"></span></p>
+172:  <p>\[ P_{k}(x) = \sum_{n = 0}^{k} \frac{x^{n}}{n!} \]</p>
+174:  <p>for the \(k\)-th partial sum. The estimate inside the proof does more than establish convergence: it measures how fast the partial sums close in on \(e^{x}\). Now fix an interval \(0 < x < L\) and pick \(n_{0} > 2L\) once, so the same threshold serves every such \(x\); bounding each term by \(x^{n}/n! \le L^{n}/n!\) and repeating the geometric collapse from the proof gives, for \(k > n_{0}\),</p>
+176:  <!-- expansion:formula — the explicit partial-sum tail bound, isolated for reuse; §4.2's continuity and exponent-law proofs invoke it repeatedly -->
+179:  <p>Because the bound \((*)\) shrinks geometrically in \(k\) while staying uniform over the whole interval \(0 < x < L\), it is the workhorse of the next section, where the same single polynomial \(P_{k}\) is used to approximate \(e^{x}\) at two nearby points at once.</p>
+187:  <p>\[ e = e^{1} = \sum_{n = 0}^{\infty} \frac{1}{n!} = 1 + 1 + \frac{1}{2} + \frac{1}{6} + \frac{1}{24} + \cdots \approx 2.71828. \]</p>
+190:  <p>The number \(e\) is known to be both irrational and transcendental, though we prove neither fact here. What we <em>can</em> see at once is how quickly the partial sums settle, exactly as the tail bound \((*)\) predicts.</p>
+192:  <!-- expansion:example — partial sums of e, making the rapid convergence tangible (manuscript has no worked examples) -->
+197:        <p>Compute the partial sums \(P_{k}(1) = \displaystyle\sum_{n = 0}^{k} \frac{1}{n!}\) for \(k = 0, 1, \dots, 5\), and compare with \(e\).</p>
+205:        <p>The partial sums climb toward \(e \approx 2.7183\) from below, and they do so fast: already \(P_{10}(1) \approx 2.7182818\), so by the tenth term all four decimal places are correct. This is the rapid, geometric closing-in promised by the bound \((*)\) — each extra term cuts the remaining gap by more than half.</p>
+213:  <!-- expansion:figure — the partial-sum convergence picture (ROADMAP §4.1 key figure); registered in chapter4 FIGS as "partial-sums-exp" -->
+214:  <figure class="figure" data-fig="partial-sums-exp">
+215:    <figcaption><span class="fig-no">Figure 4.2</span> Polynomial partial sums \(P_{1}, \dots, P_{4}\) compared with the exponential curve \(e^{x}\).</figcaption>
+219:  <p>Theorem 4.2 shows that \(e^{x}\) is well defined for every \(x > 0\). The case \(x < 0\) is genuinely harder: the terms then alternate in sign, the partial sums are no longer non-decreasing, and Theorem 4.1 does not apply directly. Handling it calls for a more flexible convergence tool — the fact that a series whose absolute values converge must itself converge — which, together with the uniform tail bound \((*)\) and a careful product argument, also yields the continuity of \(e^{x}\) and the exponent law. The next section assembles all three.</p>
+
+ succeeded in 465ms:
+41:     met at once); Prop 4.1 tail-of-convergent-series step glossed.
+51:  <p>Section 4.1 gave \(e^{x}\) an honest existence: for \(x > 0\) the defining series converges to a finite number, and the partial sums \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) close in on it at a geometric rate, captured by the tail bound \((*)\). What we have <em>not</em> yet shown is that \(e^{x}\) behaves the way the symbol promises. Three things remain: that it is continuous; that it obeys \(e^{x} e^{y} = e^{x + y}\); and that it even makes sense for \(x \le 0\). This section settles all three. The engine throughout is a single idea: approximate the transcendental function \(e^{x}\) by the polynomial \(P_{k}(x)\), and use \((*)\) to make the error uniformly small. Once the error is controlled, the polynomial carries the argument. The one genuinely new tool we need is a convergence test that survives sign changes, since the partial sums for \(x < 0\) are no longer monotone.</p>
+58:  <p>Fix a base point \(x_{0} > 0\). We want \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). The difficulty is that \(e^{x}\) is an infinite series, not a polynomial; but its partial sum \(P_{k}\) <em>is</em> a polynomial, hence continuous, and the bound \((*)\) says \(P_{k}\) is uniformly close to \(e^{x}\) for every \(x\) in a fixed interval at once. The proof simply routes the comparison \(e^{x}\) versus \(e^{x_{0}}\) through \(P_{k}\) at both points.</p>
+72:      <p>This is possible because the left-hand side tends to \(0\) as \(k \to \infty\). With \(k\) now fixed, \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) is a polynomial, and every polynomial is continuous, so there is a \(\delta > 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\) (the first bound keeps \(x > 0\), the second keeps \(x < x_{0} + 1\)), such that</p>
+86:  <!-- expansion:intuition — why x<0 needs a new tool (Remark 4.2): the monotone-bounded argument of §4.1 fails for alternating partial sums -->
+90:      <p>For \(x < 0\) the terms \(x^{n}/n!\) alternate in sign, so the partial sums no longer increase steadily, and the monotone-bounded argument behind Theorem 4.2 simply does not apply. We need a convergence criterion that ignores signs. The natural one is: if the series of <em>absolute values</em> converges, the original series should converge too — its terms cannot accumulate any net oscillation that the absolute series has already shown to be summable.</p>
+99:      <p>Let \(\{a_{n}\}_{n=1}^{\infty}\) be a sequence of real numbers. If \(\displaystyle\sum_{n=1}^{\infty} \lvert a_{n} \rvert < \infty\), then \(\displaystyle\sum_{n=1}^{\infty} a_{n}\) converges.</p>
+103:  <p>To say that \(\sum_{n=1}^{\infty} a_{n}\) <em>converges</em> means precisely that its sequence of partial sums \(S_{k} = \sum_{n=1}^{k} a_{n}\) has a limit, i.e. \(\lim_{k \to \infty} S_{k}\) exists. The trouble is that for a series with mixed signs we have no candidate value for that limit and no monotonicity to fall back on. The way out is to recognize convergence from the <em>internal</em> behavior of the partial sums alone.</p>
+115:  <p>That a sequence converges exactly when it is Cauchy is the bridge we need: it lets us certify the convergence of \(\sum a_{n}\) without naming the sum. This equivalence is often taken for granted and used directly; we prove it here instead, because the proof exposes a dependency worth seeing — the equivalence is, in the end, the completeness of \(\mathbb{R}\) (Theorem 4.1) wearing a different costume. The hinge is a classical existence theorem.</p>
+166:      <p>The Cauchy criterion is not an extra axiom; it is completeness in disguise. Trace the chain: Theorem 4.5 rests on Bolzano–Weierstrass (Theorem 4.4), which rests on the monotone-convergence property of \(\mathbb{R}\) (Theorem 4.1). Over the rationals every link breaks — there are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach \(e\) — a number noted in §4.1 to be irrational). So “Cauchy \(\Rightarrow\) convergent” is a statement about \(\mathbb{R}\) specifically, logically equivalent to its completeness.</p>
+175:      <p>Set \(S_{n} = \sum_{k=1}^{n} a_{k}\) and assume \(\sum_{k=1}^{\infty} \lvert a_{k} \rvert < \infty\). By Theorem 4.5 it suffices to show \(\{S_{n}\}\) is Cauchy. Given \(\varepsilon > 0\), convergence of the absolute series gives an \(N_{0}\) with \(\sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon\) — the tail is the gap between the full sum and the \(N_{0}\)-th partial sum, and partial sums close that gap. Then for any \(m > n \ge N_{0}\), the triangle inequality yields</p>
+176:      <p>\[ \lvert S_{m} - S_{n} \rvert = \Bigl\lvert \sum_{k = n + 1}^{m} a_{k} \Bigr\rvert \le \sum_{k = n + 1}^{m} \lvert a_{k} \rvert \le \sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon. \]</p>
+177:      <p>So \(\{S_{n}\}\) is Cauchy, hence convergent, which is what it means for \(\sum_{k=1}^{\infty} a_{k}\) to converge. <span class="qed qed-proof"></span></p>
+184:  <p>The convergence test does exactly the job we set it. For any real \(x\), the series of absolute values is \(\sum_{n=0}^{\infty} \lvert x \rvert^{n}/n! = e^{\lvert x \rvert}\), which is finite by Theorem 4.2 (or equals \(1\) when \(x = 0\)). Proposition 4.1 then guarantees that \(\sum_{n=0}^{\infty} x^{n}/n!\) itself converges. This defines</p>
+187:  <p>\[ e^{x} = \sum_{n=0}^{\infty} \frac{x^{n}}{n!} \qquad \text{for every } x \in \mathbb{R}, \]</p>
+189:  <p>in agreement with Definition 4.1 when \(x > 0\), and giving \(e^{0} = 1\). Moreover the tail bound upgrades to absolute values with no extra work: for \(\lvert x \rvert \le L\) and any \(k > n_{0} > 2L\), bounding each term of the remainder by its absolute value and reusing the geometric-tail estimate of \((*)\) (Strategy 4.1) gives</p>
+192:  <p>\[ \lvert e^{x} - P_{k}(x) \rvert \le \sum_{n = k + 1}^{\infty} \frac{\lvert x \rvert^{n}}{n!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$**$} \]</p>
+194:  <p>The bound \((**)\) is the two-sided workhorse for the rest of the section: it is uniform over the whole symmetric interval \(\lvert x \rvert \le L\) and shrinks geometrically in \(k\). With it, the continuity proof for \(x > 0\) extends verbatim to every real base point.</p>
+213:  <p>Everything is now in place for the multiplicative identity \(e^{x} e^{y} = e^{x + y}\). The proof is the continuity argument writ large: replace each exponential by its polynomial partial sum, recognize that the <em>product</em> of two partial sums reorganizes — through the binomial theorem — into the partial sum of \(e^{x+y}\) plus a controllable remainder, and let \((**)\) sweep the errors to zero.</p>
+226:      <p>Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k > n_{0} > 8L\) (the factor \(8\) is calibrated in Step 4, where it forces the tail ratio below \(\tfrac{1}{2}\)). Recall \(P_{k}(t) = \sum_{n=0}^{k} t^{n}/n!\).</p>
+229:      <p>From \((**)\), both \(\lvert e^{x} - P_{k}(x) \rvert\) and \(\lvert e^{y} - P_{k}(y) \rvert\) are at most \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\). Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\) (term by term, since \(\lvert y \rvert \le L\) gives \(\lvert y \rvert^{n} \le L^{n}\); monotonicity of \(e^{t}\) is not yet available), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).</p>
+232:      <p>Multiplying the two finite sums and grouping the terms \(x^{i} y^{j}/(i!\,j!)\) by their total degree \(\ell = i + j\),</p>
+233:      <p>\[ P_{k}(x)\, P_{k}(y) = \underbrace{\sum_{\ell = 0}^{k} \; \sum_{m = 0}^{\ell} \frac{x^{m} y^{\ell - m}}{m!\,(\ell - m)!}}_{\text{(I)}} \; + \; \underbrace{\sum_{\ell = k + 1}^{2k} \; \sum_{\substack{i + j = \ell \\ 0 \le i, j \le k}} \frac{x^{i} y^{j}}{i!\, j!}}_{\text{(II)}}. \]</p>
+238:      <p>Writing \(\dfrac{1}{m!\,(\ell - m)!} = \dfrac{1}{\ell!}\dbinom{\ell}{m}\) and applying the binomial theorem \((x + y)^{\ell} = \sum_{m=0}^{\ell} \binom{\ell}{m} x^{m} y^{\ell - m}\) (also written \(\binom{\ell}{m} = C^{\ell}_{m}\) in older notation),</p>
+239:      <p>\[ \text{(I)} = \sum_{\ell = 0}^{k} \frac{1}{\ell!} (x + y)^{\ell} = P_{k}(x + y). \]</p>
+242:      <p>Enlarging the inner sum in (II) to all \(m\) with \(0 \le m \le \ell\) and passing to absolute values can only increase it, so</p>
+243:      <p>\[ \lvert \text{(II)} \rvert \le \sum_{\ell = k + 1}^{2k} \frac{1}{\ell!} \sum_{m = 0}^{\ell} \binom{\ell}{m} \lvert x \rvert^{m} \lvert y \rvert^{\ell - m} = \sum_{\ell = k + 1}^{2k} \frac{(\lvert x \rvert + \lvert y \rvert)^{\ell}}{\ell!} \le \sum_{\ell = k + 1}^{\infty} \frac{(2L)^{\ell}}{\ell!}. \]</p>
+244:      <p>Since \(\ell > n_{0} > 8L\), each ratio \((2L)/\ell < \tfrac{1}{4} < \tfrac{1}{2}\), so the same geometric estimate that produced \((*)\) gives</p>
+251:      <p>Insert and remove the partial sums to compare \(e^{x} e^{y}\) with \(e^{x + y}\):</p>
+278:  <!-- expansion:summary — collect the section's results and hand off to §4.3 (the derivative) -->
+279:  <p>Collecting the results of this section: the series</p>
+281:  <p>\[ e^{x} = \sum_{n=0}^{\infty} \frac{x^{n}}{n!}, \qquad x \in \mathbb{R}, \]</p>
+283:  <p>defines a function that is continuous on all of \(\mathbb{R}\) (Theorem 4.6), strictly positive (Corollary 4.1), and satisfies the exponent law \(e^{x} e^{y} = e^{x + y}\) (Theorem 4.7). The convergence that makes the definition legitimate for \(x < 0\) came from absolute convergence (Proposition 4.1), and that in turn from the Cauchy criterion (Theorem 4.5) and Bolzano–Weierstrass (Theorem 4.4) — the completeness of \(\mathbb{R}\) reappearing at every level. With \(e^{x}\) now established as a bona fide continuous, multiplicative, positive function, we are ready to return to the question that Chapter 2 answered only informally: its derivative. That rigorous re-derivation is the subject of §4.3, which leans on the same partial-sum machinery developed here.</p>
+
+codex
+The cited mainline hooks are present at first pass: §1.2 has the reciprocal bridge and inverse sec/csc ranges, §3.1 names the sine sum-to-product step, and §4.1 has Strategy 4.1. I’m now pulling the surrounding passages where exact wording matters, plus the register brief.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"§3|Stewart|Rogawski|register|§16\\.2|16\\.2|§16\\.3|16\\.3|B-class|Prerequisite|prerequisite|difficulty\" CONTENT_SPEC.md" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -Path handout/fragments/ch04/sec-4-1.html -Pattern \"Strategy.*4\\.1|geometric series|sum_\\{k|1 - r|n_\\{0\\}|Piece \\(II\\)|bounded, using\" -Context 2,4" in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -Path handout/fragments/ch04/sec-4-1.html -Pattern \"Strategy.*4\\.1|geometric series|sum_\\{k|1 - r|n_\\{0\\}|Piece \\(II\\)|bounded, using\" -Context 2,4"` rejected: blocked by policy
+2026-07-03T22:24:23.356241Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -Path handout/fragments/ch04/sec-4-1.html -Pattern \"Strategy.*4\\.1|geometric series|sum_\\{k|1 - r|n_\\{0\\}|Piece \\(II\\)|bounded, using\" -Context 2,4"` rejected: blocked by policy
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -Path handout/fragments/ch03/sec-3-1.html -Pattern \"sum-to-product identities give|cos x - cos|sin x - sin|derivative of cosine|dfrac\\{d\\}\\{dx\\}\\\\cos|sin\\(u|cos\\(u\" -Context 2,4" in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -Path handout/fragments/ch03/sec-3-1.html -Pattern \"sum-to-product identities give|cos x - cos|sin x - sin|derivative of cosine|dfrac\\{d\\}\\{dx\\}\\\\cos|sin\\(u|cos\\(u\" -Context 2,4"` rejected: blocked by policy
+2026-07-03T22:24:23.366708Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Select-String -Path handout/fragments/ch03/sec-3-1.html -Pattern \"sum-to-product identities give|cos x - cos|sin x - sin|derivative of cosine|dfrac\\{d\\}\\{dx\\}\\\\cos|sin\\(u|cos\\(u\" -Context 2,4"` rejected: blocked by policy
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Select-String -Path handout/fragments/ch04/sec-4-2.html -Pattern "converges.*means|partial sums|running totals|official|go by the name|series.*limit" -Context 2,3' in C:\Users\Kao\Downloads\Calculus_handout
+ declined in 0ms:
+`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Select-String -Path handout/fragments/ch04/sec-4-2.html -Pattern "converges.*means|partial sums|running totals|official|go by the name|series.*limit" -Context 2,3'` rejected: blocked by policy
+2026-07-03T22:24:23.402570Z ERROR codex_core::tools::router: error=`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Select-String -Path handout/fragments/ch04/sec-4-2.html -Pattern "converges.*means|partial sums|running totals|official|go by the name|series.*limit" -Context 2,3'` rejected: blocked by policy
+ succeeded in 327ms:
+3:**Version 3.3**——單點新增：§16「難度定位與先備知識基線」（2026-07-03 與使用者議定）——雙軸難度定位（深度軸允許向數學分析靠攏的誠實構造；語域軸維持 Stewart / Rogawski 由深入淺）＋ 108 課綱數A（不含選修數甲）的 A／B／C 三類先備清單（B 類首次使用必須就地建立，違者為 blocking）＋ precalculus 附錄收納政策＋新章（含無手稿自產）的深度決策程序；原 §16 Changelog 順延為 §17。其餘內容承襲 v3.2（習題移出講義本體）與 v3.1／v3.0——v3.0 是從零重寫取代 v1.x 和 v2.x，圍繞一個明確的產品定義重新組織規則書：一份 single-sided A4 英文講義，對象為準備自修大學微積分的高中生，搭配影片，以 Stewart / Rogawski 語域撰寫。Changelog（§17）列出具體差異。
+47:- [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)——課程弧線、章節順序、prerequisites、per-chapter core skills。
+59:講義以 **Stewart / Rogawski** 的語域撰寫：讓自學的高中讀者能讀懂、溫暖但不話嘮、對數學嚴謹但對讀者不冷淡。
+65:- **目標**：Stewart。完整句子帶明確 connective、直覺穿插在散文中偶爾進入 definition environment、chapter 和 section opening 有動機段落、大量 worked example、頻繁的圖表。
+71:主要代名詞為 **"we"**，將讀者納入論證中。這是 Stewart / Apostol 傳統。
+103:Rationale：Stewart 語域加上自足的 handout 意味著讀者無法依賴老師即時「翻譯」formal statement。講義本身必須做這個翻譯，通常做兩次——一次在 formal statement 之前的動機散文中，一次（當語法上很重的形式主義有必要時，如 $\varepsilon$-$\delta$）作為 definition 內部的 inline gloss。「接近英語時跳過」的條款存在是為了防止 inline gloss 變成反射動作：一個 symbolic body 本身就是口語化的 definition 從 paraphrase 中得不到任何好處。
+122:以下範文示範目標語聲，涵蓋講義四種主要散文型別：① 動機鋪陳、② worked solution（全書大宗）、③ 歷史／應用旁註、④ 直覺 gloss。對語域有疑問時，把草稿與**對應型別**的範文對照。**所有範文逐字取自開放授權的真人微積分教材**（OpenStax Calculus Volume 1、CLP-1 Calculus，皆 **CC BY-NC-SA**，各標出處）——刻意用真人範本、不取本書 Chapter 1，以免「拿 Ch1 對 Ch1」的循環標靶（見 [`PLAN-deai-semantic-critic.md`](PLAN-deai-semantic-critic.md) §0／§3）。數學內容未改，僅把來源的純文字行內數學依本節 Markdown 慣例正規化為 `$...$`／`$$...$$`／`*…*`。型① 的兩段同時是語意/聲音 critic 的正面錨（[`handout/_audit/anchors/svc-exemplars.md`](handout/_audit/anchors/svc-exemplars.md)）。
+134:- **voice**：§3 那點暖到位但不話嘮——motivation-before-formalism、主代名詞 "we"、真連接詞 "However"，對讀者誠實而非乾巴巴斷言。
+136:**範文 2（concrete-to-abstract，OpenStax §3.1）——** 與範文 1 互補：從可觸摸的物件（$\sqrt{x}$、收緊的區間）建起 local-linearity，最後才命名概念，示範 Stewart 招牌的 concrete-to-abstract：
+140:〔source: OpenStax Calculus Vol.1, §3.1, CC BY-NC-SA〕關鍵特徵：
+161:**OpenStax §3.1**（微積分歸屬於 Newton／Leibniz）：
+165:〔source: OpenStax Calculus Vol.1, §3.1, CC BY-NC-SA〕關鍵特徵：
+204:- Proper noun 無論大小寫風格一律大寫（如 *Newton's method*、*Stewart's notation*）。
+412:- *應用動機*：*"Exponential functions model radioactive decay, continuously compounded interest, and population growth under constant per-capita rates. We will return to each in §3.6."*
+448:Rationale：Stewart-style 的解題策略框是自學讀者最明顯受益的功能之一。此 environment 使策略可透過掃視而非重讀 worked example 並逆向工程模式來發現。
+759:Rationale：自學讀者嚴重依賴視覺直覺。一章每五頁一張圖對高中讀者而言太稀疏；Stewart 密度（視覺豐富主題中接近每頁一張圖）是正確的鄰域。
+822:Rationale：自學讀者從有 annotation 的圖表中吸收資訊的速度顯著快於無 annotation 的。Stewart-style callout 是目標語域中最高槓桿的視覺元素。
+1031:- [ ] Pronoun 遵循 §3："we" 為預設；"you" 僅用於溫和提醒或 forward reference。
+1097:（2026-07-03 新增。緣起：前四章難度評估發現難度落差源於多作者手稿在「深度軸」上各帶預設——本 spec 原僅定義語域（§3）、未定義深度，兩位作者遂各自填入了 Stewart 深度與分析深度。全程紀錄：`handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`。）
+1102:- **語域軸——講解一律維持 §3 的 Stewart / Rogawski 語域**：動機先行、由深入淺、informal gloss、分級 worked example。深度的提升 MUST NOT 以語域緊縮支付——內容再難，講法仍是溫暖的教科書，不是分析講義。
+1103:- **難度預算**：mainline 節以「§16.2 基線讀者 effortful 但可自行走完」為上限；超出者 MUST 標為 foundation 章／Proof track（機制見 `handout/TYPESETTING_GUIDE.md` §10）並提供初讀路徑。
+1104:- **護欄**：(1) foundation／Proof-track 標示；(2) §16.2 先備基線（違反 B 類＝blocking finding）；(3) 初學者模擬複驗（persona＝§16.2 基線讀者；納入正式章完成閘序另議，現行慣例見上述 audit 紀錄）。
+1106:### 16.2 先備知識基線（108 課綱數A、不含選修數甲）
+1116:**處置慣例**：B 類的就地補寫為一至數行 bridge（既有範例：§1.2 倒數三角定義、§3.1 和差化積推導、§2.4 無窮和 on-ramp、§4.1 無窮等比級數推導）。值得完整鋪開者集中到 **precalculus 附錄**（2026-07-03 使用者裁示；立項規劃見 `CONTENT_ROADMAP.md`）——課文就地保留最短 bridge 並 cross-ref 附錄，不因附錄存在而省去就地 bridge。
+1118:### 16.3 新章節（含無手稿自產內容）的深度決策
+1120:新章 MUST 在 roadmap entry 階段做深度決策：哪些結果誠實證明、哪些 on-credit 掛帳（fence 到補證處）、哪些引用不證（明文告知讀者）。無手稿的自產章節以本節＋§3 語域為 authoring brief；整合多作者手稿時，以本節取代作者個人預設作為深度仲裁基準。
+1124:- **v3.3**——新增 §16「難度定位與先備知識基線」（2026-07-03 與使用者議定）：雙軸難度定位（深度軸允許分析式誠實構造；語域軸維持 Stewart/Rogawski 由深入淺）；108 課綱數A（不含選修數甲）A／B／C 三類先備清單（B 類首次使用必須就地建立，違者 blocking——sec/csc/cot、和差化積、e 與 ln、極限、無窮等比級數等均屬 B 類）；precalculus 附錄收納政策；新章（含無手稿自產）深度決策程序。原 §16 Changelog 順延為 §17（版本頭與 §13 內的兩處參照已同步）。緣起與證據：前四章難度評估、多作者深度落差討論與兩輪修補（`handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`）。
+1128:- **v3.1**——framework split 和 implementation 落地。v3.0 文件被拆分為四個以作者實際使用方式為 key 的 author-facing 檔案：本檔（authoritative spec）、[`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)（1–2 頁日常參考）、[`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)（course arc、chapter order、prerequisite、per-chapter core skills）、以及 `CONTENT_EXERCISES.md`（完整延後設計前的最低習題骨架；v3.2 已刪除）。v3.0 下標記為 pending 的 preamble 和 template implementation 現已落地：per-env chapter-scoped counter（透過個別 `\newtheorem`）、`caution` 和 `strategy` environment（透過 `\newmdtheoremenv`）、`preamble/colors.tex` 中的 three-role semantic palette、擴展的 `tools/book_style_lint.py` 規則、以及更新的 `_chapter_template.tex`。本次 pass 中新增的 content-level 精煉：remark policy 擴展為 usefulness test 附明確的好壞範例；figure 在 §10 新增 "Redundant encoding for grayscale and accessibility" subsection，要求 line-style / label / marker 與色彩並行；index policy 在 §11 新增覆蓋性的 "lookup test" 判斷準則。§5 中的 `example` + `solution` pairing rule 現在在本文件和 `chapters/_chapter_template.tex` 之間已對齊（每個 `example` MUST 包在 `workedexample` 中；standalone `example` 不再允許）。Exercise 編號現為 per-section（Exercise 1, 2, ...，每 `\section` reset）而非 chapter-scoped，反映 end-of-section exercise block 是 locally consume 的。
+1130:- **v3.0**——從零重寫。目標語域從 Spivak / Apostol（shared formal-statement counter、austere pronoun、strict definition purity、sparse figure 和 remark）轉為 Stewart / Rogawski（per-type counter、特定 context 中允許 "you"、`definition` 中允許 *"Informally, ..."* gloss、denser figure 和更大方的 remark）。新增 `caution` 和 `strategy` environment 以支持 notation-trap warning 和解題策略框；`lemma` 移除。Display-helper set 從 7 減為 5（移除 `\iffstackeddisplay` 和 `\iffwithconditions`）。Display Block Cohesion 從 MUST 降為 SHOULD。Index policy 擴展以涵蓋 key example、notation trap 和首次提及的 applied setting。Chapter opening 新增 mandatory learning-outcomes bullet list；chapter closing 新增 mandatory `\section*{Summary}` block。動機散文中允許 `\emph{...}` 用於術語首次出現。Exercise-system design 延後至主要內容完成。CI 檢查擴展以涵蓋新規則。Notation policy 整合為獨立的 section（§9）。語聲參考範文以 Stewart tone 重寫。
+
+codex
+The register brief confirms the target voice: motivation first, informal gloss, warm but precise, not analysis-notes terse. A few `Select-String -Context` calls were blocked, so I’ll use `rg -C` for the remaining local passages.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n -C 3 \"sum-to-product identities give|cos x - cos|sin x - sin|Derivative of cosine|The derivative of cosine|sin\\(u \\+ v\\)\" handout/fragments/ch03/sec-3-1.html" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n -C 3 \"Strategy 4\\.1|geometric series|sum_\\{k|frac\\{r\\}\\{1 - r\\}|Piece \\(II\\)|bounded, using|left\\(\\\\frac\\{1\\}\\{2\\}\" handout/fragments/ch04/sec-4-1.html" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n -C 3 "converges.*means|partial sums|running totals|official|go by the name|sequence of partial sums" handout/fragments/ch04/sec-4-2.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n -C 3 "inverse cosecant|inverse secant|principal range|arcsec|arccsc|reciprocal trigonometric" handout/fragments/ch01/sec-1-2.html' in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 513ms:
+67-
+68-  <h3 class="subsec-head">The difference quotient for sine</h3>
+69-
+70:  <p>Fix \(x\) and form the difference quotient for \(f(x) = \sin x\). The decisive algebraic step is the sum-to-product identity \(\sin A - \sin B = 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}\). If this identity is not at your fingertips, it is the angle-sum formulas in disguise: set \(u = \frac{A + B}{2}\) and \(v = \frac{A - B}{2}\), so that \(A = u + v\) and \(B = u - v\); expanding \(\sin(u + v) - \sin(u - v)\) by the angle-sum formulas cancels the \(\sin u \cos v\) terms and leaves exactly \(2 \cos u \sin v\). (Appendix A.2 derives the whole family of such identities.) Applied with \(A = x + h\) and \(B = x\):
+71-  \[ \sin(x + h) - \sin x = 2 \cos\Bigl(x + \tfrac{h}{2}\Bigr) \sin\frac{h}{2}. \]
+72-  Dividing by \(h\) and writing the denominator as \(h = 2 \cdot \tfrac{h}{2}\), to match the \(\tfrac{h}{2}\) inside the sine, gives</p>
+73-
+--
+116-    <div class="env-body">
+117-      <p>Everything rests on one bound: \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) near \(\theta = 0\), from inequality (1). Since \(\lvert \theta \rvert \to 0\) as \(\theta \to 0\), the squeeze theorem (§1.5) forces \(\lvert \sin\theta \rvert \to 0\), so</p>
+118-      <p>\[ \lim_{\theta \to 0} \sin\theta = 0. \]</p>
+119:      <p>Now fix \(x_{0}\). The sum-to-product identities give</p>
+120-      <p>\[ \begin{aligned}
+121-        \cos x - \cos x_{0} &= -2 \sin\frac{x - x_{0}}{2}\, \sin\frac{x + x_{0}}{2}, \\
+122-        \sin x - \sin x_{0} &= \phantom{-}2 \cos\frac{x + x_{0}}{2}\, \sin\frac{x - x_{0}}{2}.
+--
+195-  <p>Cosine yields to the very same machinery, this time through the companion identity \(\cos A - \cos B = -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}\) — obtained just like the sine version, by expanding \(\cos(u + v) - \cos(u - v)\) with the angle-sum formulas.</p>
+196-
+197-  <section class="env env-theorem">
+198:    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.2</span><span class="env-name">Derivative of cosine</span></p>
+199-    <div class="env-body">
+200-      <p>\[ \frac{d}{dx}\cos x = -\sin x \qquad \text{for all } x \in \mathbb{R}. \]</p>
+201-    </div>
+
+ succeeded in 535ms:
+7-     <article>) and starts the Chapter 4 figure registry (Figures 4.1, 4.2).
+8-     2026-07-03 reading-track pass: chapter route map added to the opener
+9-     (foundation-chapter labeling) + Proof-track note before Theorem 4.2's proof.
+10:     2026-07-03 P1 ruling follow-up: infinite geometric sum derived in Strategy 4.1
+11-     step 3 (SPEC §16.2 rules it non-assumable — 108 curriculum moved it out of 必修).
+12-     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html.
+13-     Math cross-checked against the signed legacy ground truth
+--
+16-     Counters start fresh for Chapter 4:
+17-       Definition 4.1 (the exponential series);
+18-       Theorem 4.1 (Completeness, stated not proved), 4.2 (series converges, x>0);
+19:       Strategy 4.1 (geometric-tail bound); Example 4.1 (partial sums of e);
+20-       Figure 4.2 (partial-sum convergence) and Figure 4.1 (completeness,
+21-       ℝ vs ℚ — added by the figure-opportunity gate, 2026-06-27); Remark 4.1 (ℝ vs ℚ).
+22-       Caution is unnumbered (per ch02/ch03). §4.2 continues from Theorem 4.3,
+--
+125-
+126-  <h3 class="subsec-head">Convergence of the series for \(x > 0\)</h3>
+127-
+128:  <p>The plan is to trap the tail of the series \(\sum x^{n}/n!\) inside a geometric series. Once the tail is controlled, the partial sums form a non-decreasing sequence that is bounded above, and Theorem 4.1 hands us the limit. The technique is worth isolating, because it returns several times in this section and the next.</p>
+129-
+130-  <!-- expansion:strategy — name the geometric-tail technique once; reused in the §4.1 convergence proof and throughout §4.2 -->
+131-  <section class="env env-strategy">
+--
+135-      <ol class="steps">
+136-        <li>Find an index \(n_{0}\) beyond which the ratio of consecutive terms is at most some constant \(r < 1\): that is, \(a_{n + 1}/a_{n} \le r\) for \(n \ge n_{0}\).</li>
+137-        <li>Conclude that the terms decay geometrically: \(a_{n} \le a_{n_{0}} \, r^{\,n - n_{0}}\) for \(n \ge n_{0}\).</li>
+138:        <li>Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\). (If the infinite geometric sum is new to you: the finite sum is \(r + r^{2} + \cdots + r^{m} = \frac{r(1 - r^{m})}{1 - r}\) — multiply by \(1 - r\) and watch the telescoping — and since \(0 < r < 1\), the power \(r^{m}\) dies away as \(m\) grows, leaving \(\frac{r}{1 - r}\). Appendix A.3 gives the full account.)</li>
+139-        <li>The partial sums are then bounded above, and (being a sum of positive terms) non-decreasing, so Theorem 4.1 gives the limit.</li>
+140-      </ol>
+141-    </div>
+--
+156-      <p>Fix \(x > 0\) and choose a positive integer \(n_{0}\) with \(n_{0} > 2x\). The ratio of successive terms is
+157-      \[ \frac{x^{n + 1}/(n + 1)!}{x^{n}/n!} = \frac{x}{n + 1}, \]
+158-      and for \(n \ge n_{0}\) this is at most \(\dfrac{x}{n_{0} + 1} < \dfrac{x}{n_{0}} < \dfrac{1}{2}\), by the choice of \(n_{0}\). Iterating from \(n_{0}\), every later term obeys
+159:      \[ \frac{x^{n}}{n!} \le \frac{x^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{n - n_{0}} \qquad (n > n_{0}). \]
+160-      Split a partial sum at the index \(n_{0}\):
+161-      \[ \sum_{n = 0}^{N} \frac{x^{n}}{n!} = \underbrace{\sum_{n = 0}^{n_{0}} \frac{x^{n}}{n!}}_{\text{(I)}} + \underbrace{\sum_{n = n_{0} + 1}^{N} \frac{x^{n}}{n!}}_{\text{(II)}}. \]
+162:      Piece (I) is a fixed finite sum. Piece (II) is bounded, using the geometric estimate above, by
+163:      \[ \text{(II)} \le \frac{x^{n_{0}}}{n_{0}!} \sum_{n = n_{0} + 1}^{\infty} \left(\frac{1}{2}\right)^{n - n_{0}} = \frac{x^{n_{0}}}{n_{0}!}. \]
+164-      Therefore
+165-      \[ \sum_{n = 0}^{N} \frac{x^{n}}{n!} \le \sum_{n = 0}^{n_{0}} \frac{x^{n}}{n!} + \frac{x^{n_{0}}}{n_{0}!} \qquad \text{for every } N > n_{0}. \]
+166-      The right-hand side is a fixed real number, independent of \(N\). The partial sums on the left are non-decreasing (each new term is positive) and bounded above, so by Theorem 4.1 the series converges to a finite real number. <span class="qed qed-proof"></span></p>
+--
+174-  <p>for the \(k\)-th partial sum. The estimate inside the proof does more than establish convergence: it measures how fast the partial sums close in on \(e^{x}\). Now fix an interval \(0 < x < L\) and pick \(n_{0} > 2L\) once, so the same threshold serves every such \(x\); bounding each term by \(x^{n}/n! \le L^{n}/n!\) and repeating the geometric collapse from the proof gives, for \(k > n_{0}\),</p>
+175-
+176-  <!-- expansion:formula — the explicit partial-sum tail bound, isolated for reuse; §4.2's continuity and exponent-law proofs invoke it repeatedly -->
+177:  <p>\[ 0 \le e^{x} - P_{k}(x) \le \frac{L^{k}}{k!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$*$} \]</p>
+178-
+179-  <p>Because the bound \((*)\) shrinks geometrically in \(k\) while staying uniform over the whole interval \(0 < x < L\), it is the workhorse of the next section, where the same single polynomial \(P_{k}\) is used to approximate \(e^{x}\) at two nearby points at once.</p>
+180-
+
+ succeeded in 537ms:
+48-  </header>
+49-
+50-  <!-- expansion:intuition — section opener: §4.1 gave existence for x>0; this section gives good behavior (continuity, multiplicativity) and extends the definition to all of ℝ -->
+51:  <p>Section 4.1 gave \(e^{x}\) an honest existence: for \(x > 0\) the defining series converges to a finite number, and the partial sums \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) close in on it at a geometric rate, captured by the tail bound \((*)\). What we have <em>not</em> yet shown is that \(e^{x}\) behaves the way the symbol promises. Three things remain: that it is continuous; that it obeys \(e^{x} e^{y} = e^{x + y}\); and that it even makes sense for \(x \le 0\). This section settles all three. The engine throughout is a single idea: approximate the transcendental function \(e^{x}\) by the polynomial \(P_{k}(x)\), and use \((*)\) to make the error uniformly small. Once the error is controlled, the polynomial carries the argument. The one genuinely new tool we need is a convergence test that survives sign changes, since the partial sums for \(x < 0\) are no longer monotone.</p>
+52-
+53-  <!-- 2026-07-03 difficulty-mitigation: honest difficulty signpost + first-reading navigation (this is the book's steepest section; readers were given no warning and no guidance on what is load-bearing) -->
+54-  <p>A word about the terrain before we set out. This is the steepest section of the book so far: it builds convergence machinery — Cauchy sequences and the Bolzano–Weierstrass theorem — that is usually first met in a dedicated analysis course, and it is all proofs, with no worked examples. What the rest of the book actually uses are the headline facts: the definition of \(e^{x}\) extended to all of \(\mathbb{R}\), continuity (Theorem 4.6), the exponent law (Theorem 4.7), and positivity (Corollary 4.1). So on a first reading it is perfectly legitimate to read each statement carefully, skim its proof for the shape of the argument, and return for a full pass once the rest of the chapter has shown you what this machinery buys.</p>
+--
+83-
+84-  <h3 class="subsec-head">A convergence test that survives sign changes</h3>
+85-
+86:  <!-- expansion:intuition — why x<0 needs a new tool (Remark 4.2): the monotone-bounded argument of §4.1 fails for alternating partial sums -->
+87-  <section class="env env-remark">
+88-    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.2</span></p>
+89-    <div class="env-body">
+90:      <p>For \(x < 0\) the terms \(x^{n}/n!\) alternate in sign, so the partial sums no longer increase steadily, and the monotone-bounded argument behind Theorem 4.2 simply does not apply. We need a convergence criterion that ignores signs. The natural one is: if the series of <em>absolute values</em> converges, the original series should converge too — its terms cannot accumulate any net oscillation that the absolute series has already shown to be summable.</p>
+91-    </div>
+92-  </section>
+93-
+--
+100-    </div>
+101-  </section>
+102-
+103:  <p>To say that \(\sum_{n=1}^{\infty} a_{n}\) <em>converges</em> means precisely that its sequence of partial sums \(S_{k} = \sum_{n=1}^{k} a_{n}\) has a limit, i.e. \(\lim_{k \to \infty} S_{k}\) exists. The trouble is that for a series with mixed signs we have no candidate value for that limit and no monotonicity to fall back on. The way out is to recognize convergence from the <em>internal</em> behavior of the partial sums alone.</p>
+104-
+105-  <section class="env env-definition">
+106-    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.2</span></p>
+--
+163-  <section class="env env-caution">
+164-    <p class="env-head"><span class="env-kicker">Caution</span></p>
+165-    <div class="env-body">
+166:      <p>The Cauchy criterion is not an extra axiom; it is completeness in disguise. Trace the chain: Theorem 4.5 rests on Bolzano–Weierstrass (Theorem 4.4), which rests on the monotone-convergence property of \(\mathbb{R}\) (Theorem 4.1). Over the rationals every link breaks — there are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach \(e\) — a number noted in §4.1 to be irrational). So “Cauchy \(\Rightarrow\) convergent” is a statement about \(\mathbb{R}\) specifically, logically equivalent to its completeness.</p>
+167-    </div>
+168-  </section>
+169-
+--
+172-  <section class="env env-proof">
+173-    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Proposition 4.1</span></p>
+174-    <div class="env-body">
+175:      <p>Set \(S_{n} = \sum_{k=1}^{n} a_{k}\) and assume \(\sum_{k=1}^{\infty} \lvert a_{k} \rvert < \infty\). By Theorem 4.5 it suffices to show \(\{S_{n}\}\) is Cauchy. Given \(\varepsilon > 0\), convergence of the absolute series gives an \(N_{0}\) with \(\sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon\) — the tail is the gap between the full sum and the \(N_{0}\)-th partial sum, and partial sums close that gap. Then for any \(m > n \ge N_{0}\), the triangle inequality yields</p>
+176-      <p>\[ \lvert S_{m} - S_{n} \rvert = \Bigl\lvert \sum_{k = n + 1}^{m} a_{k} \Bigr\rvert \le \sum_{k = n + 1}^{m} \lvert a_{k} \rvert \le \sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon. \]</p>
+177-      <p>So \(\{S_{n}\}\) is Cauchy, hence convergent, which is what it means for \(\sum_{k=1}^{\infty} a_{k}\) to converge. <span class="qed qed-proof"></span></p>
+178-    </div>
+--
+210-
+211-  <h3 class="subsec-head">The exponent law</h3>
+212-
+213:  <p>Everything is now in place for the multiplicative identity \(e^{x} e^{y} = e^{x + y}\). The proof is the continuity argument writ large: replace each exponential by its polynomial partial sum, recognize that the <em>product</em> of two partial sums reorganizes — through the binomial theorem — into the partial sum of \(e^{x+y}\) plus a controllable remainder, and let \((**)\) sweep the errors to zero.</p>
+214-
+215-  <section class="env env-theorem">
+216-    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.7</span><span class="env-name">Exponent law</span></p>
+--
+248-      \end{aligned} \]</p>
+249-
+250-      <p class="para-head">Step 5: telescope the difference.</p>
+251:      <p>Insert and remove the partial sums to compare \(e^{x} e^{y}\) with \(e^{x + y}\):</p>
+252-      <p>\[ \begin{aligned} e^{x} e^{y} - e^{x + y} = {}&\bigl(e^{x} - P_{k}(x)\bigr) e^{y} + P_{k}(x)\bigl(e^{y} - P_{k}(y)\bigr) \\ &+ \bigl(P_{k}(x) P_{k}(y) - P_{k}(x + y)\bigr) + \bigl(P_{k}(x + y) - e^{x + y}\bigr). \end{aligned} \]</p>
+253-      <p>Apply Step 1, Step 4, and the bound \((**)\) at \(x + y\) (valid since \(\lvert x + y \rvert \le 2L\), enlarging \(L\) to \(2L\) there). Each of the four pieces is at most a fixed constant times \(\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\):</p>
+254-      <p>\[ \lvert e^{x} e^{y} - e^{x + y} \rvert \le 2\, e^{L}\, \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} + 2\, \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \]</p>
+
+ succeeded in 532ms:
+13-    <h2 class="sec-title"><span class="sec-no">1.2</span>Inverse Trigonometric Functions</h2>
+14-  </header>
+15-
+16:  <p>The trigonometric functions are not one-to-one on all of \(\mathbb{R}\), so they do not have inverse functions on their full domains. Inverse trigonometric functions arise whenever we know a ratio and want to recover an angle: from the slope of a ramp, we get an angle of inclination via \(\arctan\); from a ratio of sides in a right triangle, we get an angle via \(\arcsin\) or \(\arccos\). To build these inverses, we must first restrict the domain of each trigonometric function to an interval on which it is one-to-one. You will use these functions again in Chapter 3, where the derivatives of \(\arcsin\), \(\arccos\), and \(\arctan\) are computed — and the principal ranges fixed in this section are exactly what determine those formulas.</p>
+17-
+18-  <p>Consider the sine function on \(\mathbb{R}\). As Figure 1.4 shows, a horizontal line can intersect the graph of \(y = \sin x\) more than once, so \(\sin\) is not one-to-one on \(\mathbb{R}\).</p>
+19-
+--
+210-  <section class="env env-caution">
+211-    <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.4</span></p>
+212-    <div class="env-body">
+213:      <p>As with the sine case, the “cancellation” identities hold only on each principal range. That is, \(\arccos(\cos x) = x\) only when \(x \in [0, \pi]\), and \(\arctan(\tan x) = x\) only when \(x \in \left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\). Outside these intervals the left-hand side returns the equivalent angle that <em>does</em> lie in the principal range; for instance,
+214-      \[ \begin{aligned} \arccos(\cos 2\pi) &= \arccos(1) = 0 \neq 2\pi, \\ \arctan(\tan \pi) &= \arctan(0) = 0 \neq \pi. \end{aligned} \]
+215-      By contrast, the reverse direction is always safe on the natural domain: \(\cos(\arccos y) = y\) for every \(y \in [-1, 1]\), and \(\tan(\arctan y) = y\) for every real \(y\).</p>
+216-    </div>
+--
+273-
+274-  <h3 class="subsec-head">The remaining inverse trigonometric functions</h3>
+275-
+276:  <p>The remaining inverse trigonometric functions are used less frequently, but they follow the same pattern: restrict each to a one-to-one branch, then invert. Each definition below specifies a <em>principal range</em> — the interval its output angle is restricted to; the corresponding input domains are collected together after all three.</p>
+277-
+278-  <section class="env env-definition">
+279-    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.6</span></p>
+280-    <div class="env-body">
+281:      <p>The <em>inverse cosecant function</em>, denoted \(\arccsc x\) or \(\csc^{-1} x\), is defined by
+282:      \[ \arccsc x = y \quad \Longleftrightarrow \quad \csc y = x \ \text{ and } \ y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]. \]</p>
+283-    </div>
+284-  </section>
+285-
+286-  <section class="env env-definition">
+287-    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">1.7</span></p>
+288-    <div class="env-body">
+289:      <p>The <em>inverse secant function</em>, denoted \(\arcsec x\) or \(\sec^{-1} x\), is defined by
+290:      \[ \arcsec x = y \quad \Longleftrightarrow \quad \sec y = x \ \text{ and } \ y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right). \]</p>
+291-    </div>
+292-  </section>
+293-
+--
+299-    </div>
+300-  </section>
+301-
+302:  <p>The domains of \(\arccsc\) and \(\arcsec\) are \((-\infty, -1] \cup [1, \infty)\), while the domain of \(\arccot\) is \(\mathbb{R}\). The principal ranges are the intervals specified in the definitions above.</p>
+303-
+304-  <section class="env env-remark">
+305-    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.3</span></p>
+306-    <div class="env-body">
+307:      <p>For \(\arcsec x\), another common choice of principal range is \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left(\tfrac{\pi}{2}, \pi\right]\). In this text we use \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right)\) because it makes the later derivative formula for the inverse secant simpler. When consulting other sources or software, always check which convention is in use, since different branch choices can lead to different values.</p>
+308-    </div>
+309-  </section>
+310-
+311-  <section class="env env-remark">
+312-    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">1.4</span></p>
+313-    <div class="env-body">
+314:      <p>For \(\arccsc x\), another common choice of principal range is \(y \in \left[-\tfrac{\pi}{2}, 0\right) \cup \left(0, \tfrac{\pi}{2}\right]\). In this text we use \(y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]\) so that the chosen branch parallels the one selected for \(\arcsec x\). Once the principal range is fixed consistently, either convention gives a valid inverse function.</p>
+315-    </div>
+316-  </section>
+317-
+318:  <!-- expansion:example — domains of the remaining inverse trig functions + the branch convention has visible consequences [source: CLP-1 §2.12 #5, recomputed for this text's arccsc principal range] -->
+319-  <div class="workedexample">
+320-    <section class="env env-example">
+321-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">1.14</span></p>
+322-      <div class="env-body">
+323:        <p>Let \(f(x) = \arcsin x + \arccsc x\). Find the domain of \(f\), and evaluate \(f\) at every point of its domain.</p>
+324-      </div>
+325-    </section>
+326-    <section class="env env-solution">
+327-      <p class="env-head"><span class="env-kicker">Solution</span></p>
+328-      <div class="env-body">
+329:        <p>\(\arcsin\) requires \(|x| \le 1\) while \(\arccsc\) requires \(|x| \ge 1\), so the domain is just the two points \(x = \pm 1\). At \(x = 1\): \(\arcsin 1 = \tfrac{\pi}{2}\) and \(\arccsc 1 = \tfrac{\pi}{2}\) (the angle in \(\left(0, \tfrac{\pi}{2}\right]\) with cosecant \(1\)), so \(f(1) = \pi\). At \(x = -1\): \(\arcsin(-1) = -\tfrac{\pi}{2}\), and under this text’s principal range for \(\arccsc\) the angle with cosecant \(-1\) is \(\arccsc(-1) = \tfrac{3\pi}{2}\), so \(f(-1) = -\tfrac{\pi}{2} + \tfrac{3\pi}{2} = \pi\). So \(f\) is the constant \(\pi\) on its two-point domain.</p>
+330:        <p>Under the alternative convention of Remark 1.4 (\(\arccsc(-1) = -\tfrac{\pi}{2}\)) one gets \(f(-1) = -\pi\) instead — a concrete instance of branch conventions changing answers, which is why this text fixes its conventions explicitly.</p>
+331-      </div>
+332-    </section>
+333-  </div>
+
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n -C 2 \"cos\\(x \\+ h\\) - cos x|dfrac\\{\\\\sin\\(h/2\\)\\}\\{h/2\\}|Letting \\\\(h \\\\to 0|Derivative of cosine\" handout/fragments/ch03/sec-3-1.html" in C:\Users\Kao\Downloads\Calculus_handout
+ exited 1 in 345ms:
+rg: regex parse error:
+    (?:cos\(x \+ h\) - cos x|dfrac\{\\sin\(h/2\)\}\{h/2\}|Letting \\(h \\to 0|Derivative of cosine)
+    ^
+error: unclosed group
+
+2026-07-03T22:24:43.170777Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.3 seconds
+Output:
+rg: regex parse error:
+    (?:cos\(x \+ h\) - cos x|dfrac\{\\sin\(h/2\)\}\{h/2\}|Letting \\(h \\to 0|Derivative of cosine)
+    ^
+error: unclosed group
+
+codex
+I hit a regex parse issue on one narrow search; I’m rerunning that as fixed-string searches.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n -F "cos(x + h) - cos x" handout/fragments/ch03/sec-3-1.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n -F \"Letting \\(h \\to 0\\)\" handout/fragments/ch03/sec-3-1.html" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n -F "Derivative of cosine" handout/fragments/ch03/sec-3-1.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n -F \"\\frac{d}{dx}\\tan x\" handout/fragments/ch03/sec-3-1.html" in C:\Users\Kao\Downloads\Calculus_handout
+ exited 1 in 518ms:
+2026-07-03T22:24:55.723486Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.5 seconds
+Output:
+
+ succeeded in 547ms:
+209:      <p>Letting \(h \to 0\), the factor \(\sin\bigl(x + \tfrac{h}{2}\bigr) \to \sin x\) by continuity (Proposition 3.1) and \(\dfrac{\sin(h/2)}{h/2} \to 1\) by Proposition 3.2, so</p>
+
+ succeeded in 529ms:
+198:    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.2</span><span class="env-name">Derivative of cosine</span></p>
+
+ succeeded in 544ms:
+256:          \frac{d}{dx}\tan x
+
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n -C 5 -F \"Letting \\(h \\to 0\\)\" handout/fragments/ch03/sec-3-1.html" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 436ms:
+204-  <section class="env env-proof">
+205-    <p class="env-head"><span class="env-kicker">Proof</span></p>
+206-    <div class="env-body">
+207-      <p>With \(A = x + h\) and \(B = x\), the identity gives \(\cos(x + h) - \cos x = -2 \sin\bigl(x + \tfrac{h}{2}\bigr) \sin\tfrac{h}{2}\), so</p>
+208-      <p>\[ \frac{\cos(x + h) - \cos x}{h} = -\sin\Bigl(x + \tfrac{h}{2}\Bigr) \cdot \frac{\sin(h/2)}{h/2}. \]</p>
+209:      <p>Letting \(h \to 0\), the factor \(\sin\bigl(x + \tfrac{h}{2}\bigr) \to \sin x\) by continuity (Proposition 3.1) and \(\dfrac{\sin(h/2)}{h/2} \to 1\) by Proposition 3.2, so</p>
+210-      <p>\[ \frac{d}{dx}\cos x = -\sin x \cdot 1 = -\sin x. \]</p>
+211-    </div>
+212-  </section>
+213-
+214-  <!-- expansion:figure — sin'=cos as slope=height: tangents of sin x vs heights of cos x (registered in figures.js as "sin-cos-slope") -->
+
+codex
+The appendix’s math statements are checking out so far. I’m doing one extra internal-cross-reference check for the §1.3 “arrow notation” mention, since §A.3 relies on it alongside the §4.2 partial-sums reference.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"sec\\)|cosecant|cosecants|cosine|warm-up|honest|good news|decisive|works for a living|nonsense|debate\" handout/fragments/appA/sec-a-1.html handout/fragments/appA/sec-a-2.html handout/fragments/appA/sec-a-3.html" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n "arrow notation|to 0|tends to|limit|as .*to" handout/fragments/ch01/sec-1-3.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg -n "The good news|honest|decisive|nothing but|warm|nonsense|works for a living|debate|perhaps a minute" handout/fragments/ch01/sec-1-2.html handout/fragments/ch03/sec-3-1.html' in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"list of eight|Product-to-sum identities|cos u \\\\sin v|sin v \\\\cos u\" handout/fragments/appA/sec-a-2.html" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 471ms:
+handout/fragments/appA/sec-a-3.html:79:          Not approximately \(1\) — exactly \(1\). The two decimal expressions \(0.999\ldots\) and \(1\) are two names for the same number, and the infinite-sum reading is what makes that a computation rather than a debate.</li>
+handout/fragments/appA/sec-a-3.html:88:      <p>The hypothesis \(\lvert r \rvert < 1\) is doing real work. For \(r = 2\) the series \(1 + 2 + 4 + 8 + \cdots\) grows without bound and has no sum, while the formula, applied blindly, would report \(\frac{1}{1 - 2} = -1\) — nonsense. The formula \(\frac{a}{1 - r}\) does not <em>create</em> a sum; it reports the limit of the running totals, and only when \(\lvert r \rvert < 1\) does that limit exist.</p>
+handout/fragments/appA/sec-a-3.html:92:  <p>In the main text this series first works for a living in §4.1, where Strategy 4.1 bounds the tail of \(\sum x^{n}/n!\) by a geometric tail with ratio \(\tfrac{1}{2}\); the bound \(\sum_{k \ge 1} r^{k} = \frac{r}{1 - r}\) of Proposition A.5 is exactly the step used there. The series keeps working throughout §4.2's convergence arguments.</p>
+handout/fragments/appA/sec-a-2.html:17:  <p>One algebraic step in this book carries more weight than any other: rewriting the difference \(\sin(x+h) - \sin x\) as a <em>product</em>, which is what makes the derivative of the sine function computable in §3.1. The identity that does it belongs to a family — the product-to-sum and sum-to-product identities — that older curricula drilled and most current precalculus courses omit. The good news is that the whole family is nothing but the angle-sum formulas, added and subtracted in pairs. If you learn one thing from this section, learn how to <em>rebuild</em> the identities; the memorizing then becomes optional.</p>
+handout/fragments/appA/sec-a-2.html:34:      <p>Add the two sine formulas: the \(\cos u \sin v\) terms cancel, leaving \(\sin(u+v) + \sin(u-v) = 2 \sin u \cos v\); divide by \(2\). Add the two cosine formulas: the \(\sin u \sin v\) terms cancel, giving \(\cos(u+v) + \cos(u-v) = 2 \cos u \cos v\). Subtract the cosine formulas instead — \(\cos(u-v) - \cos(u+v)\) — and the \(\cos u \cos v\) terms cancel, giving \(2 \sin u \sin v\). <span class="qed qed-proof"></span></p>
+handout/fragments/appA/sec-a-2.html:88:          Turning products into sums is the direction integration will want: a sum of cosines is far easier to integrate than a product, and this identity family returns for exactly that purpose when the techniques of integration arrive.</li>
+handout/fragments/appA/sec-a-2.html:94:  <p>In the main text, the identity for \(\sin A - \sin B\) in Proposition A.3 is the decisive step in §3.1's difference quotient for sine, its \(\cos\) companion handles the derivative of cosine, and the pair together power the continuity proof for both functions.</p>
+handout/fragments/appA/sec-a-1.html:20:  <p class="lead">This appendix collects three pieces of precalculus that the main text needs but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions, the product-to-sum and sum-to-product identities, and the infinite geometric series. Wherever the main text first needs one of these tools, it builds a short bridge on the spot — just enough to keep reading — and points here for the full account. The three sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing in this appendix uses calculus, with one small exception flagged in §A.3, where an infinite sum is understood as a limit in the sense of §1.3.</p>
+handout/fragments/appA/sec-a-1.html:36:  <p>The three primary trigonometric functions \(\sin\), \(\cos\), and \(\tan\) have three companions — two honest reciprocals and one inverted ratio. They carry no new information — every fact about them is a fact about \(\sin\) and \(\cos\) in disguise. Yet calculus speaks them fluently: the derivative of \(\tan x\) turns out to be \(\sec^{2} x\) (§3.1), the inverse secant needs its own principal range (§1.2), and integral tables are full of secants and cosecants. This section gives them an honest introduction.</p>
+handout/fragments/appA/sec-a-1.html:41:      <p>For any angle \(\theta\) at which the denominator is nonzero, the <em>secant</em>, <em>cosecant</em>, and <em>cotangent</em> functions are defined by
+handout/fragments/appA/sec-a-1.html:43:      <p class="informal">Informally: secant is the reciprocal of cosine, cosecant is the reciprocal of sine, and cotangent flips the ratio that defines tangent. The names cross over historically — <em>se</em>cant with <em>co</em>sine, <em>co</em>secant with sine — and the pairing simply has to be memorized.</p>
+handout/fragments/appA/sec-a-1.html:90:          <li>By Proposition A.1, \(\sec^{2}\theta = 1 + \tan^{2}\theta = 1 + 9 = 10\), so \(\sec\theta = \pm\sqrt{10}\). In the third quadrant \(\cos\theta < 0\), hence \(\sec\theta < 0\), and therefore \(\sec\theta = -\sqrt{10}\). For the cosecant, \(\cot\theta = 1/\tan\theta = \tfrac{1}{3}\) (legitimate here, since \(\tan\theta = 3\) is defined and nonzero), so \(\csc^{2}\theta = 1 + \cot^{2}\theta = 1 + \tfrac{1}{9} = \tfrac{10}{9}\) and \(\csc\theta = \pm\tfrac{\sqrt{10}}{3}\). In the third quadrant \(\sin\theta < 0\), so \(\csc\theta = -\tfrac{\sqrt{10}}{3}\). The squaring in Proposition A.1 forgets all signs; the quadrant restores them.</li>
+handout/fragments/appA/sec-a-1.html:96:  <p>That is the whole toolkit: three definitions, the right-triangle readings, and the two Pythagorean companions. In the main text these functions first appear in §1.2, where the inverse secant and cosecant need principal ranges of their own, and they return in §3.1, where the derivative of \(\tan x\) lands on \(\sec^{2} x\).</p>
+
+ succeeded in 483ms:
+4:     Fig 1.12 (three functions, same limit) + 1.13 (read-from-graph).
+16:  measures how \(f\) changes between two inputs. We may want to know what this ratio does as \(y\) gets closer and closer to \(x\), without ever equalling \(x\). This is the motivation for the concept of a limit.</p>
+23:      and say that the <em>limit</em> of \(f(x)\) as \(x\) approaches \(a\) is \(L\) if \(f(x)\) can be made arbitrarily close to \(L\) whenever \(x\) is sufficiently close to \(a\) but not equal to \(a\).</p>
+28:  \[ f(x) \to L \qquad \text{as } x \to a, \]
+29:  read “\(f(x)\) tends to \(L\) as \(x\) tends to \(a\).”</p>
+31:  <p>Notice that the definition deliberately sidesteps \(f(a)\): when we consider \(\lim_{x \to a} f(x)\), we are concerned with the values of \(f(x)\) for \(x\) near \(a\), not with the value of \(f(a)\). In particular, \(f(a)\) need not be defined at all. Figure 1.12 shows three functions whose values at \(a\) are different (and one is undefined), yet which all share the same limit as \(x \to a\).</p>
+33:  <figure class="figure" data-fig="limit-same-near-a">
+34:    <figcaption><span class="fig-no">Figure 1.12</span> Three functions with the same limit as \(x \to a\).</figcaption>
+37:  <!-- expansion:example — read limits off a graph, including a point where the limit differs from f(a) [source: CLP-1 §1.3 #1] -->
+42:        <p>The graph of a function \(f\) is shown in Figure 1.13. Evaluate the following, or state that the limit does not exist:</p>
+45:          <li>\(\lim_{x \to 0} f(x)\).</li>
+48:        <figure class="figure" data-fig="read-limit-graph">
+49:          <figcaption><span class="fig-no">Figure 1.13</span> A function whose limit at \(x = 2\) differs from its value there.</figcaption>
+58:          <li>As \(x\) approaches \(0\), the curve approaches height \(0\), so \(\lim_{x \to 0} f(x) = 0\).</li>
+59:          <li>As \(x\) approaches \(2\), the curve approaches height \(2\). The open dot at \((2, 2)\) and the solid dot at \((2, -2)\) tell us \(f(2) = -2\), but the limit ignores the value <em>at</em> the point: \(\lim_{x \to 2} f(x) = 2\), even though \(f(2) = -2\).</li>
+65:  <!-- expansion:example — construct a curve with a prescribed limit/value mismatch (the reverse skill) [source: CLP-1 §1.3 #5] -->
+76:        <p>Many answers are possible. Take any curve that approaches height \(10\) as \(x \to 3\) — for instance a straight line through \((3, 10)\) — and then move the single point at \(x = 3\) down to height \(0\), marking an open dot at \((3, 10)\) and a solid dot at \((3, 0)\). Near \(x = 3\), but not at it, the values approach \(10\), so \(\lim_{x \to 3} f(x) = 10\); the relocated point makes \(f(3) = 0\). The limit and the value at the point are independent, so nothing prevents this mismatch.</p>
+114:        \[ \lim_{t \to 0} \frac{\sqrt{t^{2} + 9} - 3}{t^{2}}. \]</p>
+132:        \[ \lim_{t \to 0} \frac{\sqrt{t^{2} + 9} - 3}{t^{2}} = \tfrac{1}{6}. \]</p>
+137:  <!-- expansion:caution — a finite table can suggest a limit that does not exist [pass: enrichment] [source: Mooculus digInWhatIsALimit, sin(pi/x) two-table example] -->
+141:      <p class="ragged">A table of values can only ever <em>suggest</em> a limit; it can never confirm one, and it can mislead. Consider \(f(x) = \sin(\pi / x)\) as \(x \to 0\). Sampling \(x = 0.1, 0.01, 0.001, \dots\) gives \(\sin(10\pi), \sin(100\pi), \dots = 0\) every time, suggesting the limit is \(0\). But sampling \(x = 0.3, 0.03, 0.003, \dots\) gives \(\sin\!\left(\tfrac{10\pi}{3}\right), \sin\!\left(\tfrac{100\pi}{3}\right), \dots = -\tfrac{\sqrt{3}}{2}\) every time, suggesting \(-\tfrac{\sqrt{3}}{2}\).</p>
+142:      <p class="ragged">Because \(\pi / x\) grows without bound as \(x \to 0\), the sine runs through more and more complete cycles. In truth, near \(0\) the graph keeps oscillating between \(-1\) and \(1\), no matter how closely we zoom in — \(f\) runs through every value in \([-1, 1]\) infinitely often as \(x \to 0\), so the limit does not exist. The definition requires \(f(x)\) to be close to a single \(L\) for <em>all</em> \(x\) sufficiently near \(0\) — not merely for a convenient list of samples.</p>
+147:  <p>We can now close the loop opened at the start of the section. Suppose a ball thrown upward has height \(s(t) = 30t - 5t^{2}\) metres at time \(t\) seconds. Its average velocity over the interval from \(t\) to \(4\) is</p>
+155:  <p>The <em>instantaneous</em> velocity at \(t = 4\), written \(v(4)\), is the value this average approaches as the interval shrinks to nothing:</p>
+157:  <p>Notice that the original ratio has the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) (a form taken up systematically in §1.5) — both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\) — so the cancellation that produced \(-5(t - 2)\) was what made the limit accessible.</p>
+159:  <p>The limits above were guessed by looking at function values near the point of interest. In the following sections, we will develop systematic methods for evaluating limits and study more subtle behavior such as one-sided limits and infinite limits.</p>
+
+ succeeded in 464ms:
+20:  \[ \begin{aligned} \sin(u + v) &= \sin u \cos v + \cos u \sin v, \\ \sin(u - v) &= \sin u \cos v - \cos u \sin v, \\ \cos(u + v) &= \cos u \cos v - \sin u \sin v, \\ \cos(u - v) &= \cos u \cos v + \sin u \sin v. \end{aligned} \]</p>
+25:    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">A.2</span><span class="env-name">Product-to-sum identities</span></p>
+34:      <p>Add the two sine formulas: the \(\cos u \sin v\) terms cancel, leaving \(\sin(u+v) + \sin(u-v) = 2 \sin u \cos v\); divide by \(2\). Add the two cosine formulas: the \(\sin u \sin v\) terms cancel, giving \(\cos(u+v) + \cos(u-v) = 2 \cos u \cos v\). Subtract the cosine formulas instead — \(\cos(u-v) - \cos(u+v)\) — and the \(\cos u \cos v\) terms cancel, giving \(2 \sin u \sin v\). <span class="qed qed-proof"></span></p>
+53:      and the other three lines follow the same way: \(\sin A - \sin B = \sin(u+v) - \sin(u-v) = 2 \cos u \sin v\) (this time subtracting the two sine expansions); \(\cos A + \cos B = 2 \cos u \cos v\); and \(\cos A - \cos B = \cos(u+v) - \cos(u-v) = -2 \sin u \sin v\). Note the minus sign in the last line — the only one in the family, and the easiest thing to misremember; the subtraction order \(\cos(u+v) - \cos(u-v)\) is where it comes from. <span class="qed qed-proof"></span></p>
+64:      <p class="informal">Rebuilding takes perhaps a minute; a memorized list of eight is easy to get wrong by a sign. Verifying is even cheaper — expand the product side with the angle-sum formulas and watch the cross terms cancel.</p>
+
+ succeeded in 474ms:
+handout/fragments/ch03/sec-3-1.html:70:  <p>Fix \(x\) and form the difference quotient for \(f(x) = \sin x\). The decisive algebraic step is the sum-to-product identity \(\sin A - \sin B = 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}\). If this identity is not at your fingertips, it is the angle-sum formulas in disguise: set \(u = \frac{A + B}{2}\) and \(v = \frac{A - B}{2}\), so that \(A = u + v\) and \(B = u - v\); expanding \(\sin(u + v) - \sin(u - v)\) by the angle-sum formulas cancels the \(\sin u \cos v\) terms and leaves exactly \(2 \cos u \sin v\). (Appendix A.2 derives the whole family of such identities.) Applied with \(A = x + h\) and \(B = x\):
+handout/fragments/ch01/sec-1-2.html:222:  Since \(\cos\theta\) is the ratio adjacent over hypotenuse in a right triangle, \(\sec\theta\) is the ratio hypotenuse over adjacent, and similarly for the other two. Dividing the Pythagorean identity \(\sin^{2}\theta + \cos^{2}\theta = 1\) through by \(\cos^{2}\theta\) gives the companion identity \(1 + \tan^{2}\theta = \sec^{2}\theta\), which Example 1.13 puts to work. Note the contrast with Caution 1.2: the superscript in \(\sin^{-1} x\) does <em>not</em> denote a reciprocal, but \(\sec\) and \(\csc\) are honest reciprocals (and \(\cot\) is the inverted ratio \(\cos/\sin\)). Appendix A.1 develops these three functions more fully.</p>
+
+codex
+The §1.3 and §4.2 internal references are consistent: §1.3 introduces \(f(x)\to L\) notation, and §4.2 explicitly defines convergence by partial sums. I’m checking “first appears” claims with a repo search for reciprocal trig before deciding findings.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"\\\\sec|\\\\csc|\\\\cot|secant|cosecant|cotangent|arcsec|arccsc|arccot\" handout/fragments/ch01 handout/fragments/ch02 handout/fragments/ch03 handout/fragments/ch04 handout/fragments/appA" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"product-to-sum|sum-to-product|sin A - sin B|cos A - cos B|sin\\(x \\+ h\\) - sin x\" handout/fragments/ch01 handout/fragments/ch02 handout/fragments/ch03 handout/fragments/ch04 handout/fragments/appA" in C:\Users\Kao\Downloads\Calculus_handout
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "rg -n \"infinite geometric|geometric tail|sum_\\{k \\\\ge 1\\}|r/\\(1|frac\\{r\\}\\{1 - r\\}|1/2\\)\\"'^|left'"\\(\\\\frac\\{1\\}\\{2\\}\" handout/fragments/ch01 handout/fragments/ch02 handout/fragments/ch03 handout/fragments/ch04 handout/fragments/appA" in C:\Users\Kao\Downloads\Calculus_handout
+ succeeded in 501ms:
+handout/fragments/appA\sec-a-1.html:24:    <li>evaluate the reciprocal trigonometric functions \(\sec\), \(\csc\), and \(\cot\), and apply their Pythagorean identities with the correct signs;</li>
+handout/fragments/appA\sec-a-1.html:36:  <p>The three primary trigonometric functions \(\sin\), \(\cos\), and \(\tan\) have three companions — two honest reciprocals and one inverted ratio. They carry no new information — every fact about them is a fact about \(\sin\) and \(\cos\) in disguise. Yet calculus speaks them fluently: the derivative of \(\tan x\) turns out to be \(\sec^{2} x\) (§3.1), the inverse secant needs its own principal range (§1.2), and integral tables are full of secants and cosecants. This section gives them an honest introduction.</p>
+handout/fragments/appA\sec-a-1.html:41:      <p>For any angle \(\theta\) at which the denominator is nonzero, the <em>secant</em>, <em>cosecant</em>, and <em>cotangent</em> functions are defined by
+handout/fragments/appA\sec-a-1.html:42:      \[ \sec\theta = \frac{1}{\cos\theta}, \qquad \csc\theta = \frac{1}{\sin\theta}, \qquad \cot\theta = \frac{\cos\theta}{\sin\theta}. \]</p>
+handout/fragments/appA\sec-a-1.html:43:      <p class="informal">Informally: secant is the reciprocal of cosine, cosecant is the reciprocal of sine, and cotangent flips the ratio that defines tangent. The names cross over historically — <em>se</em>cant with <em>co</em>sine, <em>co</em>secant with sine — and the pairing simply has to be memorized.</p>
+handout/fragments/appA\sec-a-1.html:47:  <p>In a right triangle, the definitions invert the familiar ratios. Since \(\cos\theta\) is adjacent over hypotenuse, \(\sec\theta\) is hypotenuse over adjacent; since \(\sin\theta\) is opposite over hypotenuse, \(\csc\theta\) is hypotenuse over opposite; and \(\cot\theta\) is adjacent over opposite. Special-angle values follow instantly from the primary ones: for instance \(\sec\tfrac{\pi}{3} = 1/\cos\tfrac{\pi}{3} = 2\), and \(\cot\tfrac{\pi}{4} = 1\). Each function is undefined exactly where its denominator vanishes — \(\sec\) and \(\tan\) at odd multiples of \(\tfrac{\pi}{2}\), \(\csc\) and \(\cot\) at multiples of \(\pi\) — and near those angles its values blow up, producing the vertical asymptotes on their graphs.</p>
+handout/fragments/appA\sec-a-1.html:52:      <p>Cotangent is defined as \(\cos\theta/\sin\theta\), <em>not</em> as \(1/\tan\theta\). On most of the domain the two agree, but not everywhere: at \(\theta = \tfrac{\pi}{2}\) we have \(\cot\tfrac{\pi}{2} = \cos\tfrac{\pi}{2}/\sin\tfrac{\pi}{2} = 0/1 = 0\), a perfectly good value, while \(1/\tan\tfrac{\pi}{2}\) is meaningless — \(\tan\tfrac{\pi}{2}\) is undefined. The quotient \(\cos/\sin\) is the robust definition; \(1/\tan\) is a shortcut valid only where \(\tan\theta\) is defined and nonzero.</p>
+handout/fragments/appA\sec-a-1.html:61:      <p>\[ \begin{aligned} 1 + \tan^{2}\theta &= \sec^{2}\theta \qquad (\cos\theta \neq 0), \\ 1 + \cot^{2}\theta &= \csc^{2}\theta \qquad (\sin\theta \neq 0). \end{aligned} \]</p>
+handout/fragments/appA\sec-a-1.html:69:      \[ \frac{\sin^{2}\theta}{\cos^{2}\theta} + 1 = \frac{1}{\cos^{2}\theta}, \qquad\text{that is,}\qquad \tan^{2}\theta + 1 = \sec^{2}\theta. \]
+handout/fragments/appA\sec-a-1.html:70:      Dividing instead by \(\sin^{2}\theta\) gives \(1 + \cot^{2}\theta = \csc^{2}\theta\). <span class="qed qed-proof"></span></p>
+handout/fragments/appA\sec-a-1.html:80:          <li>\(\sec\!\left(\tfrac{2\pi}{3}\right)\) and \(\cot\!\left(-\tfrac{\pi}{4}\right)\).</li>
+handout/fragments/appA\sec-a-1.html:81:          <li>Given that \(\tan\theta = 3\) and \(\theta\) lies in the third quadrant, find \(\sec\theta\) and \(\csc\theta\).</li>
+handout/fragments/appA\sec-a-1.html:89:          <li>Since \(\cos\tfrac{2\pi}{3} = -\tfrac{1}{2}\), we get \(\sec\tfrac{2\pi}{3} = 1/(-\tfrac{1}{2}) = -2\). Since \(\cos(-\tfrac{\pi}{4}) = \tfrac{\sqrt{2}}{2}\) and \(\sin(-\tfrac{\pi}{4}) = -\tfrac{\sqrt{2}}{2}\), we get \(\cot(-\tfrac{\pi}{4}) = \frac{\sqrt{2}/2}{-\sqrt{2}/2} = -1\).</li>
+handout/fragments/appA\sec-a-1.html:90:          <li>By Proposition A.1, \(\sec^{2}\theta = 1 + \tan^{2}\theta = 1 + 9 = 10\), so \(\sec\theta = \pm\sqrt{10}\). In the third quadrant \(\cos\theta < 0\), hence \(\sec\theta < 0\), and therefore \(\sec\theta = -\sqrt{10}\). For the cosecant, \(\cot\theta = 1/\tan\theta = \tfrac{1}{3}\) (legitimate here, since \(\tan\theta = 3\) is defined and nonzero), so \(\csc^{2}\theta = 1 + \cot^{2}\theta = 1 + \tfrac{1}{9} = \tfrac{10}{9}\) and \(\csc\theta = \pm\tfrac{\sqrt{10}}{3}\). In the third quadrant \(\sin\theta < 0\), so \(\csc\theta = -\tfrac{\sqrt{10}}{3}\). The squaring in Proposition A.1 forgets all signs; the quadrant restores them.</li>
+handout/fragments/appA\sec-a-1.html:96:  <p>That is the whole toolkit: three definitions, the right-triangle readings, and the two Pythagorean companions. In the main text these functions first appear in §1.2, where the inverse secant and cosecant need principal ranges of their own, and they return in §3.1, where the derivative of \(\tan x\) lands on \(\sec^{2} x\).</p>
+handout/fragments/ch03\sec-3-1.html:248:        <p>Using \(\sin' = \cos\) and \(\cos' = -\sin\) together with the quotient rule (§2.5), differentiate (a) \(\tan x\) and (b) \(\sec x\), wherever \(\cos x \ne 0\).</p>
+handout/fragments/ch03\sec-3-1.html:259:             = \frac{1}{\cos^{2} x} = \sec^{2} x,
+handout/fragments/ch03\sec-3-1.html:262:        <p>For (b), write \(\sec x = \dfrac{1}{\cos x}\). The quotient rule, with the constant numerator \(1\), gives</p>
+handout/fragments/ch03\sec-3-1.html:264:          \frac{d}{dx}\sec x
+handout/fragments/ch03\sec-3-1.html:268:             = \sec x \tan x.
+handout/fragments/ch03\sec-3-1.html:270:        <p>The same technique applied to \(\cot x = \dfrac{\cos x}{\sin x}\) and \(\csc x = \dfrac{1}{\sin x}\) gives \(\dfrac{d}{dx}\cot x = -\csc^{2} x\) and \(\dfrac{d}{dx}\csc x = -\csc x \cot x\) (where \(\sin x \ne 0\)), completing the derivatives of all six trigonometric functions.</p>
+handout/fragments/ch03\sec-3-3.html:246:        <p>Once more the same lever. Recall that \(\arctan\) is the inverse of tangent on the branch \(\bigl(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr)\), so \(\arctan(\tan x) = x\). Differentiating with respect to \(x\), and using \(\dfrac{d}{dx}\tan x = \sec^{2} x\) (Example 3.2),</p>
+handout/fragments/ch03\sec-3-3.html:247:        <p>\[ 1 = (\arctan)'(\tan x)\cdot\sec^{2} x, \qquad\text{so}\qquad (\arctan)'(\tan x) = \frac{1}{\sec^{2} x}. \]</p>
+handout/fragments/ch03\sec-3-3.html:248:        <p>Now write \(y = \tan x\) and use the Pythagorean identity \(\sec^{2} x = 1 + \tan^{2} x = 1 + y^{2}\):</p>
+handout/fragments/ch02\sec-2-1.html:16:  <p class="lead">The limit machinery of Chapter 1 was developed in part to make precise the idea of a function approaching a value as its input approaches some target. The principal payoff of that machinery, and the subject of this chapter, is the <em>derivative</em>: an operator that takes a function and returns another function describing how fast it is changing. Geometrically the derivative gives the slope of the tangent line at each point of a curve; physically it gives the instantaneous rate of change of a quantity that varies in time; algebraically it satisfies a small set of arithmetic rules that turn differentiation into a procedure rather than a per-problem invention. We meet the derivative first at a single point, as a limit of secant slopes, then as a function in its own right. A subtler point comes next: its existence at a point implies continuity, but continuity does not imply it. Finally we treat it as an operator we can compute on polynomials, on the natural exponential, and on products and quotients of differentiable functions.</p>
+handout/fragments/ch02\sec-2-1.html:44:  <p>The idea is to use a nearby point as a temporary stand-in. Pick a second point \(Q = (x,\, f(x))\) on the curve, with \(x \ne a\). The line through \(P\) and \(Q\) is called a <em>secant line</em>, and its slope is the <em>difference quotient</em></p>
+handout/fragments/ch02\sec-2-1.html:48:  <p>As \(Q\) slides along the curve toward \(P\) — that is, as \(x \to a\) — the secant line rotates and approaches a limiting position. If that limiting position exists, it is the tangent line we are after, and its slope is the limit of the difference quotients.</p>
+handout/fragments/ch02\sec-2-1.html:50:  <!-- expansion:figure — secant-to-tangent convergence diagram (seed had placeholder, no art) -->
+handout/fragments/ch02\sec-2-1.html:51:  <figure class="figure" data-fig="secant-to-tangent">
+handout/fragments/ch02\sec-2-1.html:80:  <!-- expansion:figure — anatomy of the difference quotient: increment h and rise f(a+h)−f(a) on one secant (figure-opportunity F-2.1-A) [pass: enrichment] -->
+handout/fragments/ch02\sec-2-1.html:82:    <figcaption><span class="fig-no">Figure 2.2</span> The \(h\)-form difference quotient on one secant: run \(h\), rise \(f(a+h)-f(a)\).</figcaption>
+handout/fragments/ch02\sec-2-1.html:181:  <!-- expansion:example — numerical secant→tangent: watch the difference quotient converge (approved 2026-06-07; new type: numerical/tabular limit, reinforces Figure 2.1) -->
+handout/fragments/ch02\sec-2-1.html:186:        <p>For \(y = x^{2}\) and \(P = (1, 1)\), compute the slope of the secant line through \(P\) and the nearby point \(\bigl(1 + h,\, (1 + h)^{2}\bigr)\) for \(h = 0.5,\ 0.1,\ 0.01\). What value do the secant slopes approach, and what is the slope of the tangent at \(P\)?</p>
+handout/fragments/ch02\sec-2-1.html:192:        <p>The secant slope is the difference quotient, which simplifies even before we take a limit:</p>
+handout/fragments/ch02\sec-2-1.html:198:            <tbody><tr><td class="rowlab">secant slope \(\,2 + h\)</td><td>\(2.5\)</td><td>\(2.1\)</td><td>\(2.01\)</td></tr></tbody>
+handout/fragments/ch02\sec-2-1.html:201:        <p>The secant slopes march toward \(2\), and indeed \(\lim_{h \to 0}(2 + h) = 2\). The tangent slope at \(P\) is therefore \(2\) — the value the secants converge to, exactly the rotation of secants into the tangent pictured in Figure 2.1.</p>
+handout/fragments/ch02\sec-2-3.html:56:        <!-- expansion:figure — |x| corner with left/right secant slopes (ROADMAP key figure) -->
+handout/fragments/ch02\sec-2-3.html:58:          <figcaption><span class="fig-no">Figure 2.5</span> The graph of \(f(x) = \lvert x \rvert\) near the origin, with secant lines from each side.</figcaption>
+handout/fragments/ch02\sec-2-3.html:64:  <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.5). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line — exactly the geometric meaning of non-differentiability.</p>
+handout/fragments/ch02\sec-2-3.html:82:        <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)); here both one-sided limits agree — they both tend to \(+\infty\) — so there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative demands a finite limit, so differentiability fails here for a different reason than at a corner.</p>
+handout/fragments/ch02\sec-2-3.html:86:          <figcaption><span class="fig-no">Figure 2.6</span> The graph of \(f(x) = \sqrt[3]{x}\) near the origin, with secants steepening toward a vertical tangent.</figcaption>
+handout/fragments/ch01\sec-1-2.html:220:  <p>The next two examples involve the <em>reciprocal</em> trigonometric functions secant, cosecant, and cotangent. If your precalculus course made little use of them, their definitions are all you need: for any angle \(\theta\) at which the denominator is nonzero,
+handout/fragments/ch01\sec-1-2.html:221:  \[ \sec\theta = \frac{1}{\cos\theta}, \qquad \csc\theta = \frac{1}{\sin\theta}, \qquad \cot\theta = \frac{\cos\theta}{\sin\theta}. \]
+handout/fragments/ch01\sec-1-2.html:222:  Since \(\cos\theta\) is the ratio adjacent over hypotenuse in a right triangle, \(\sec\theta\) is the ratio hypotenuse over adjacent, and similarly for the other two. Dividing the Pythagorean identity \(\sin^{2}\theta + \cos^{2}\theta = 1\) through by \(\cos^{2}\theta\) gives the companion identity \(1 + \tan^{2}\theta = \sec^{2}\theta\), which Example 1.13 puts to work. Note the contrast with Caution 1.2: the superscript in \(\sin^{-1} x\) does <em>not</em> denote a reciprocal, but \(\sec\) and \(\csc\) are honest reciprocals (and \(\cot\) is the inverted ratio \(\cos/\sin\)). Appendix A.1 develops these three functions more fully.</p>
+handout/fragments/ch01\sec-1-2.html:232:          <li>\(\sec(\arctan 10)\).</li>
+handout/fragments/ch01\sec-1-2.html:242:          <li>Let \(\theta = \arctan 10\), so \(\tan\theta = 10\) with \(\theta \in \left(0, \tfrac{\pi}{2}\right)\). In a right triangle with opposite side \(10\) and adjacent side \(1\), the hypotenuse is \(\sqrt{101}\), so \(\sec(\arctan 10) = \sqrt{101}\).
+handout/fragments/ch01\sec-1-2.html:263:        <p>Let \(y = \arctan x\), so \(\tan y = x\) with \(-\tfrac{\pi}{2} < y < \tfrac{\pi}{2}\). We want \(\cos y\). Using the identity \(1 + \tan^{2} y = \sec^{2} y\),
+handout/fragments/ch01\sec-1-2.html:264:        \[ \sec^{2} y = 1 + x^{2}. \]
+handout/fragments/ch01\sec-1-2.html:265:        Since \(y \in \left(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\right)\) we have \(\cos y > 0\) and hence \(\sec y > 0\), so \(\sec y = \sqrt{1 + x^{2}}\). Therefore
+handout/fragments/ch01\sec-1-2.html:266:        \[ \cos(\arctan x) = \cos y = \frac{1}{\sec y} = \frac{1}{\sqrt{1 + x^{2}}}. \]</p>
+handout/fragments/ch01\sec-1-2.html:281:      <p>The <em>inverse cosecant function</em>, denoted \(\arccsc x\) or \(\csc^{-1} x\), is defined by
+handout/fragments/ch01\sec-1-2.html:282:      \[ \arccsc x = y \quad \Longleftrightarrow \quad \csc y = x \ \text{ and } \ y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]. \]</p>
+handout/fragments/ch01\sec-1-2.html:289:      <p>The <em>inverse secant function</em>, denoted \(\arcsec x\) or \(\sec^{-1} x\), is defined by
+handout/fragments/ch01\sec-1-2.html:290:      \[ \arcsec x = y \quad \Longleftrightarrow \quad \sec y = x \ \text{ and } \ y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right). \]</p>
+handout/fragments/ch01\sec-1-2.html:297:      <p>The <em>inverse cotangent function</em>, denoted \(\arccot x\) or \(\cot^{-1} x\), is defined by
+handout/fragments/ch01\sec-1-2.html:298:      \[ \arccot x = y \quad \Longleftrightarrow \quad \cot y = x \ \text{ and } \ y \in (0, \pi). \]</p>
+handout/fragments/ch01\sec-1-2.html:302:  <p>The domains of \(\arccsc\) and \(\arcsec\) are \((-\infty, -1] \cup [1, \infty)\), while the domain of \(\arccot\) is \(\mathbb{R}\). The principal ranges are the intervals specified in the definitions above.</p>
+handout/fragments/ch01\sec-1-2.html:307:      <p>For \(\arcsec x\), another common choice of principal range is \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left(\tfrac{\pi}{2}, \pi\right]\). In this text we use \(y \in \left[0, \tfrac{\pi}{2}\right) \cup \left[\pi, \tfrac{3\pi}{2}\right)\) because it makes the later derivative formula for the inverse secant simpler. When consulting other sources or software, always check which convention is in use, since different branch choices can lead to different values.</p>
+handout/fragments/ch01\sec-1-2.html:314:      <p>For \(\arccsc x\), another common choice of principal range is \(y \in \left[-\tfrac{\pi}{2}, 0\right) \cup \left(0, \tfrac{\pi}{2}\right]\). In this text we use \(y \in \left(0, \tfrac{\pi}{2}\right] \cup \left(\pi, \tfrac{3\pi}{2}\right]\) so that the chosen branch parallels the one selected for \(\arcsec x\). Once the principal range is fixed consistently, either convention gives a valid inverse function.</p>
+handout/fragments/ch01\sec-1-2.html:318:  <!-- expansion:example — domains of the remaining inverse trig functions + the branch convention has visible consequences [source: CLP-1 §2.12 #5, recomputed for this text's arccsc principal range] -->
+handout/fragments/ch01\sec-1-2.html:323:        <p>Let \(f(x) = \arcsin x + \arccsc x\). Find the domain of \(f\), and evaluate \(f\) at every point of its domain.</p>
+handout/fragments/ch01\sec-1-2.html:329:        <p>\(\arcsin\) requires \(|x| \le 1\) while \(\arccsc\) requires \(|x| \ge 1\), so the domain is just the two points \(x = \pm 1\). At \(x = 1\): \(\arcsin 1 = \tfrac{\pi}{2}\) and \(\arccsc 1 = \tfrac{\pi}{2}\) (the angle in \(\left(0, \tfrac{\pi}{2}\right]\) with cosecant \(1\)), so \(f(1) = \pi\). At \(x = -1\): \(\arcsin(-1) = -\tfrac{\pi}{2}\), and under this text’s principal range for \(\arccsc\) the angle with cosecant \(-1\) is \(\arccsc(-1) = \tfrac{3\pi}{2}\), so \(f(-1) = -\tfrac{\pi}{2} + \tfrac{3\pi}{2} = \pi\). So \(f\) is the constant \(\pi\) on its two-point domain.</p>
+handout/fragments/ch01\sec-1-2.html:330:        <p>Under the alternative convention of Remark 1.4 (\(\arccsc(-1) = -\tfrac{\pi}{2}\)) one gets \(f(-1) = -\pi\) instead — a concrete instance of branch conventions changing answers, which is why this text fixes its conventions explicitly.</p>
+handout/fragments/ch02\sec-2-5.html:331:  <p>Chapter 2 built the derivative in stages. At a single point it is a limit of secant slopes,
+handout/fragments/ch04\sec-4-4.html:30:       - §C-4 (ROADMAP key figure): Figure 4.4 — the MVT secant–tangent picture
+handout/fragments/ch04\sec-4-4.html:131:  <p>Figure 4.3 packages the maximum case of the proof: the left and right secants approach the same derivative from opposite sides.</p>
+handout/fragments/ch04\sec-4-4.html:135:    <figcaption><span class="fig-no">Figure 4.3</span> Two-sided secants at an interior maximum, forcing the tangent slope to be \(0\).</figcaption>
+handout/fragments/ch04\sec-4-4.html:170:  <p>The MVT lifts the equal-endpoints restriction. Allow any two endpoint values, and the conclusion becomes that the derivative somewhere equals the <em>average</em> rate of change \((f(b) - f(a))/(b - a)\) — the slope of the secant joining the two endpoints.</p>
+handout/fragments/ch04\sec-4-4.html:182:  <!-- expansion:figure — the canonical MVT picture (ROADMAP §4.4 key figure); registered in chapter4 FIGS as "mvt-secant-tangent" -->
+handout/fragments/ch04\sec-4-4.html:183:  <figure class="figure" data-fig="mvt-secant-tangent">
+handout/fragments/ch04\sec-4-4.html:184:    <figcaption><span class="fig-no">Figure 4.4</span> The MVT secant–tangent picture: an interior tangent parallel to the secant through the endpoints.</figcaption>
+handout/fragments/ch04\sec-4-4.html:190:      <p>Subtract the secant line from \(f\). Define the auxiliary function</p>
+handout/fragments/ch04\sec-4-4.html:192:      <p>The bracketed term is exactly the secant line through \((a, f(a))\) and \((b, f(b))\), so \(g(x)\) measures the vertical gap between the curve and that secant. It inherits the hypotheses of Rolle’s theorem:</p>
+handout/fragments/ch04\sec-4-4.html:207:      <p>Rolle’s theorem is precisely the MVT in the case \(f(a) = f(b)\), where the average slope is \(0\) — yet we proved Rolle <em>first</em> and recovered the MVT from it, because subtracting the secant always tilts the general situation back to level endpoints. The three results form a ladder: Theorem A, a statement about the derivative at one point, supports Rolle; Rolle adds the equal-endpoints hypothesis, and Rolle in turn supports the MVT for arbitrary endpoints. The MVT is the load-bearing rung. It is the standard device for turning pointwise information about \(f'\) into behavior of \(f\) across an interval, and it returns every time we make that move — immediately below to read monotonicity off the sign of \(f'\), and later for Taylor’s theorem and the error estimates that lean on it.</p>
+handout/fragments/ch04\sec-4-4.html:221:      <p>Skipping the checks is the usual mistake, and the conclusion can then be false. Take \(\lvert x \rvert\) on \([-1, 1]\): it is continuous everywhere but not differentiable at \(0\), so step 2 fails. The secant slope is \((\lvert 1 \rvert - \lvert -1 \rvert)/(1 - (-1)) = 0\), yet \(\lvert x \rvert' = \pm 1\) wherever it is defined and never \(0\) — there is no valid \(c\), exactly because the differentiability hypothesis was missing.</p>
+handout/fragments/ch01\sec-1-6.html:279:  <p>The precise \(\varepsilon\)-\(\delta\) definition (Definition 1.13) finally placed every preceding limit argument on a rigorous footing (§1.6): \(\lim_{x \to a} f(x) = L\) means that for every \(\varepsilon > 0\) there is a \(\delta > 0\) with \(\lvert f(x) - L \rvert < \varepsilon\) whenever \(0 < \lvert x - a \rvert < \delta\), and from it we proved that a limit, when it exists, is unique (Proposition 1.7). The chapter closed by naming the property that limits make precise — \(f\) is continuous at \(a\) when \(\lim_{x \to a} f(x) = f(a)\) — and it is on this machinery that Chapter 2 is built: the derivative is itself a limit, the limit of secant slopes.</p>
+
+ succeeded in 463ms:
+handout/fragments/appA\sec-a-2.html:4:     Proposition A.2 (product-to-sum), A.3 (sum-to-product); Strategy A.1; Example A.2.
+handout/fragments/appA\sec-a-2.html:5:     Math verified: the displayed identities (3 product-to-sum + 4 sum-to-product)
+handout/fragments/appA\sec-a-2.html:8:     Referenced from: §3.1 (sum-to-product bridge — the derivative-of-sine hinge).
+handout/fragments/appA\sec-a-2.html:17:  <p>One algebraic step in this book carries more weight than any other: rewriting the difference \(\sin(x+h) - \sin x\) as a <em>product</em>, which is what makes the derivative of the sine function computable in §3.1. The identity that does it belongs to a family — the product-to-sum and sum-to-product identities — that older curricula drilled and most current precalculus courses omit. The good news is that the whole family is nothing but the angle-sum formulas, added and subtracted in pairs. If you learn one thing from this section, learn how to <em>rebuild</em> the identities; the memorizing then becomes optional.</p>
+handout/fragments/appA\sec-a-2.html:38:  <p>The sum-to-product identities are the same cancellations read in the other direction. The only new idea is a change of names: given a sum like \(\sin A + \sin B\), arrange for the two angles to read \(u + v\) and \(u - v\) by choosing \(u\) and \(v\) so that \(u + v = A\) and \(u - v = B\) — that is, let \(u\) be the <em>average</em> and \(v\) the <em>half-difference</em>:
+handout/fragments/appA\sec-a-2.html:83:          <li>Apply the sum-to-product identity for \(\sin A - \sin B\) with \(A = x + h\) and \(B = x\). The average is \(\tfrac{A+B}{2} = x + \tfrac{h}{2}\) and the half-difference is \(\tfrac{A-B}{2} = \tfrac{h}{2}\), so
+handout/fragments/appA\sec-a-2.html:86:          <li>Apply the third product-to-sum identity with \(u = 5x\) and \(v = 3x\):
+handout/fragments/appA\sec-a-1.html:20:  <p class="lead">This appendix collects three pieces of precalculus that the main text needs but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions, the product-to-sum and sum-to-product identities, and the infinite geometric series. Wherever the main text first needs one of these tools, it builds a short bridge on the spot — just enough to keep reading — and points here for the full account. The three sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing in this appendix uses calculus, with one small exception flagged in §A.3, where an infinite sum is understood as a limit in the sense of §1.3.</p>
+handout/fragments/appA\sec-a-1.html:25:    <li>derive every product-to-sum and sum-to-product identity from the angle-sum formulas — and recover any one you forget;</li>
+handout/fragments/ch03\sec-3-1.html:31:     2026-07-03 difficulty-mitigation pass: sum-to-product identities glossed with their
+handout/fragments/ch03\sec-3-1.html:70:  <p>Fix \(x\) and form the difference quotient for \(f(x) = \sin x\). The decisive algebraic step is the sum-to-product identity \(\sin A - \sin B = 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}\). If this identity is not at your fingertips, it is the angle-sum formulas in disguise: set \(u = \frac{A + B}{2}\) and \(v = \frac{A - B}{2}\), so that \(A = u + v\) and \(B = u - v\); expanding \(\sin(u + v) - \sin(u - v)\) by the angle-sum formulas cancels the \(\sin u \cos v\) terms and leaves exactly \(2 \cos u \sin v\). (Appendix A.2 derives the whole family of such identities.) Applied with \(A = x + h\) and \(B = x\):
+handout/fragments/ch03\sec-3-1.html:119:      <p>Now fix \(x_{0}\). The sum-to-product identities give</p>
+
+ succeeded in 483ms:
+handout/fragments/appA\sec-a-3.html:10:     Referenced from: §4.1 (Strategy 4.1 geometric tail bound bridge).
+handout/fragments/appA\sec-a-3.html:19:  <p>Adding up finitely many numbers needs no theory. Adding up <em>infinitely</em> many is a genuinely new act, and most of its theory belongs to a later chapter of calculus. But one infinite sum is so simple, and so useful so early, that it deserves to be settled now: the geometric series, in which each term is a fixed multiple \(r\) of the one before. The main text leans on it in §4.1, where the <em>tails</em> — the leftover terms past a cutoff — of the series defining \(e^{x}\) are trapped under geometric tails with ratio \(r = \tfrac{1}{2}\). Everything rests on one finite identity plus one limit.</p>
+handout/fragments/appA\sec-a-3.html:48:      \[ \sum_{k = 1}^{\infty} r^{k} = \frac{r}{1 - r}. \]</p>
+handout/fragments/appA\sec-a-3.html:55:      <p>By Proposition A.4 the \(m\)-th running total is \(a \cdot \dfrac{1 - r^{m+1}}{1 - r}\). As \(m \to \infty\) the power \(r^{m+1}\) tends to \(0\), so the totals tend to \(\dfrac{a}{1 - r}\). The tail formula is the case \(a = r\): \(r + r^{2} + r^{3} + \cdots = \dfrac{r}{1 - r}\). <span class="qed qed-proof"></span></p>
+handout/fragments/appA\sec-a-3.html:92:  <p>In the main text this series first works for a living in §4.1, where Strategy 4.1 bounds the tail of \(\sum x^{n}/n!\) by a geometric tail with ratio \(\tfrac{1}{2}\); the bound \(\sum_{k \ge 1} r^{k} = \frac{r}{1 - r}\) of Proposition A.5 is exactly the step used there. The series keeps working throughout §4.2's convergence arguments.</p>
+handout/fragments/ch04\sec-4-1.html:10:     2026-07-03 P1 ruling follow-up: infinite geometric sum derived in Strategy 4.1
+handout/fragments/ch04\sec-4-1.html:132:    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">4.1</span><span class="env-name">Bounding a series by a geometric tail</span></p>
+handout/fragments/ch04\sec-4-1.html:138:        <li>Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\). (If the infinite geometric sum is new to you: the finite sum is \(r + r^{2} + \cdots + r^{m} = \frac{r(1 - r^{m})}{1 - r}\) — multiply by \(1 - r\) and watch the telescoping — and since \(0 < r < 1\), the power \(r^{m}\) dies away as \(m\) grows, leaving \(\frac{r}{1 - r}\). Appendix A.3 gives the full account.)</li>
+handout/fragments/ch04\sec-4-1.html:159:      \[ \frac{x^{n}}{n!} \le \frac{x^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{n - n_{0}} \qquad (n > n_{0}). \]
+handout/fragments/ch04\sec-4-1.html:163:      \[ \text{(II)} \le \frac{x^{n_{0}}}{n_{0}!} \sum_{n = n_{0} + 1}^{\infty} \left(\frac{1}{2}\right)^{n - n_{0}} = \frac{x^{n_{0}}}{n_{0}!}. \]
+handout/fragments/ch04\sec-4-1.html:177:  <p>\[ 0 \le e^{x} - P_{k}(x) \le \frac{L^{k}}{k!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$*$} \]</p>
+handout/fragments/appA\sec-a-1.html:20:  <p class="lead">This appendix collects three pieces of precalculus that the main text needs but that many precalculus courses now treat briefly or omit: the reciprocal trigonometric functions, the product-to-sum and sum-to-product identities, and the infinite geometric series. Wherever the main text first needs one of these tools, it builds a short bridge on the spot — just enough to keep reading — and points here for the full account. The three sections are independent of one another; read each when the main text sends you, or straight through as a warm-up. Nothing in this appendix uses calculus, with one small exception flagged in §A.3, where an infinite sum is understood as a limit in the sense of §1.3.</p>
+handout/fragments/appA\sec-a-1.html:26:    <li>sum an infinite geometric series, and recognize when the formula \(a/(1 - r)\) applies and when it does not.</li>
+handout/fragments/ch04\sec-4-2.html:71:      <p>\[ \frac{(x_{0} + 1)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} < \varepsilon. \]</p>
+handout/fragments/ch04\sec-4-2.html:192:  <p>\[ \lvert e^{x} - P_{k}(x) \rvert \le \sum_{n = k + 1}^{\infty} \frac{\lvert x \rvert^{n}}{n!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$**$} \]</p>
+handout/fragments/ch04\sec-4-2.html:246:        &\lvert \text{(II)} \rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}, \\[2pt]
+handout/fragments/ch04\sec-4-2.html:247:        &\text{hence}\quad \bigl\lvert P_{k}(x) P_{k}(y) - P_{k}(x + y) \bigr\rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}.
+handout/fragments/ch04\sec-4-2.html:254:      <p>\[ \lvert e^{x} e^{y} - e^{x + y} \rvert \le 2\, e^{L}\, \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} + 2\, \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \]</p>
+handout/fragments/ch04\sec-4-5.html:266:    <li><strong>The exponential function.</strong> \(e^{x} := \sum_{n=0}^{\infty} x^{n}/n!\) is defined by a power series (§4.1), shown convergent for every real \(x\) by geometric tail bounds; it is continuous on \(\mathbb{R}\) and obeys the exponent law \(e^{x}e^{y} = e^{x+y}\) (§4.2); and its derivative is itself, \((e^{x})' = e^{x}\), proved with the explicit bound \(\lvert (e^{h}-1)/h - 1 \rvert \le \lvert h \rvert\) for \(\lvert h \rvert &lt; \tfrac{1}{2}\) (§4.3).</li>
+
+codex
+VERDICT: 1 blocking, 0 advisory
+
+[BLOCKING] handout/fragments/appA/sec-a-3.html:88 — The final sentence overstates the convergence condition for `sum a r^k` — independently: if `a = 0`, then `0 + 0r + 0r^2 + ...` converges to `0` for any `r`, so it is not true without qualification that the running-total limit exists “only when |r| < 1” — suggested minimal fix: say “apart from the trivial all-zero case” or “for a nonzero first term `a`”.
+
+CHECKED-CLEAN
+
+- §A.1: `1 + tan^2 theta = sec^2 theta` follows by dividing `sin^2 + cos^2 = 1` by `cos^2`, with `cos theta != 0`.
+- §A.1: `1 + cot^2 theta = csc^2 theta` follows by dividing by `sin^2`, with `sin theta != 0`.
+- §A.1: cotangent caution is correct: at `theta = pi/2`, `cot theta = 0` but `1/tan theta` is undefined.
+- §A.1 Example A.1: `sec(2pi/3) = -2`; `cot(-pi/4) = -1`; `tan theta = 3` in QIII gives `sec theta = -sqrt(10)` and `csc theta = -sqrt(10)/3`.
+- §A.2: all three displayed product-to-sum identities rederive correctly from angle-sum formulas.
+- §A.2: all four sum-to-product identities are correct, including `cos A - cos B = -2 sin((A+B)/2) sin((A-B)/2)`.
+- §A.2: `u=(A+B)/2`, `v=(A-B)/2` gives `u+v=A`, `u-v=B`; the stated cancellations check out.
+- §A.2 Example A.2: `sin(x+h)-sin x = 2 cos(x+h/2) sin(h/2)` and `sin 5x sin 3x = 1/2[cos 2x - cos 8x]`.
+- §A.3: finite geometric sum and telescoping proof are correct for `r != 1`.
+- §A.3: infinite geometric formula is correct under `|r| < 1`; tail `sum_{k>=1} r^k = r/(1-r)` checks.
+- §A.3 Example A.3: `1/2+1/4+...=1`; `0.999...=1`.
+- §A.3 caution example: for `r=2`, `1+2+4+...` diverges while blind substitution gives `-1`.
+
+CROSS-REFS CHECKED-CLEAN
+
+- §1.2 really gives reciprocal trig bridge and separate principal ranges for `arccsc` and `arcsec` at handout/fragments/ch01/sec-1-2.html:220 and :276-302.
+- §3.1 really makes `sin A - sin B` the decisive sine derivative step at handout/fragments/ch03/sec-3-1.html:70-76.
+- §3.1 really derives `d/dx tan x = sec^2 x` at handout/fragments/ch03/sec-3-1.html:248-259.
+- §3.1 really uses the cosine companion for `d/dx cos x` and both identities in continuity at handout/fragments/ch03/sec-3-1.html:119-122 and :195-210.
+- §4.1 really bounds the `sum x^n/n!` tail by a geometric tail with ratio `1/2`, using `sum_{k>=1} r^k = r/(1-r)`, at handout/fragments/ch04/sec-4-1.html:138 and :156-163.
+- §4.2 really makes the partial-sum definition of convergence explicit at handout/fragments/ch04/sec-4-2.html:103.
+
+REGISTER
+
+No advisory register findings. The appendix is motivation-first, warm, and precise in the same mode as §1.2 and §3.1; no generic filler or serious tone break stood out.
+tokens used
+90,359
+VERDICT: 1 blocking, 0 advisory
+
+[BLOCKING] handout/fragments/appA/sec-a-3.html:88 — The final sentence overstates the convergence condition for `sum a r^k` — independently: if `a = 0`, then `0 + 0r + 0r^2 + ...` converges to `0` for any `r`, so it is not true without qualification that the running-total limit exists “only when |r| < 1” — suggested minimal fix: say “apart from the trivial all-zero case” or “for a nonzero first term `a`”.
+
+CHECKED-CLEAN
+
+- §A.1: `1 + tan^2 theta = sec^2 theta` follows by dividing `sin^2 + cos^2 = 1` by `cos^2`, with `cos theta != 0`.
+- §A.1: `1 + cot^2 theta = csc^2 theta` follows by dividing by `sin^2`, with `sin theta != 0`.
+- §A.1: cotangent caution is correct: at `theta = pi/2`, `cot theta = 0` but `1/tan theta` is undefined.
+- §A.1 Example A.1: `sec(2pi/3) = -2`; `cot(-pi/4) = -1`; `tan theta = 3` in QIII gives `sec theta = -sqrt(10)` and `csc theta = -sqrt(10)/3`.
+- §A.2: all three displayed product-to-sum identities rederive correctly from angle-sum formulas.
+- §A.2: all four sum-to-product identities are correct, including `cos A - cos B = -2 sin((A+B)/2) sin((A-B)/2)`.
+- §A.2: `u=(A+B)/2`, `v=(A-B)/2` gives `u+v=A`, `u-v=B`; the stated cancellations check out.
+- §A.2 Example A.2: `sin(x+h)-sin x = 2 cos(x+h/2) sin(h/2)` and `sin 5x sin 3x = 1/2[cos 2x - cos 8x]`.
+- §A.3: finite geometric sum and telescoping proof are correct for `r != 1`.
+- §A.3: infinite geometric formula is correct under `|r| < 1`; tail `sum_{k>=1} r^k = r/(1-r)` checks.
+- §A.3 Example A.3: `1/2+1/4+...=1`; `0.999...=1`.
+- §A.3 caution example: for `r=2`, `1+2+4+...` diverges while blind substitution gives `-1`.
+
+CROSS-REFS CHECKED-CLEAN
+
+- §1.2 really gives reciprocal trig bridge and separate principal ranges for `arccsc` and `arcsec` at handout/fragments/ch01/sec-1-2.html:220 and :276-302.
+- §3.1 really makes `sin A - sin B` the decisive sine derivative step at handout/fragments/ch03/sec-3-1.html:70-76.
+- §3.1 really derives `d/dx tan x = sec^2 x` at handout/fragments/ch03/sec-3-1.html:248-259.
+- §3.1 really uses the cosine companion for `d/dx cos x` and both identities in continuity at handout/fragments/ch03/sec-3-1.html:119-122 and :195-210.
+- §4.1 really bounds the `sum x^n/n!` tail by a geometric tail with ratio `1/2`, using `sum_{k>=1} r^k = r/(1-r)`, at handout/fragments/ch04/sec-4-1.html:138 and :156-163.
+- §4.2 really makes the partial-sum definition of convergence explicit at handout/fragments/ch04/sec-4-2.html:103.
+
+REGISTER
+
+No advisory register findings. The appendix is motivation-first, warm, and precise in the same mode as §1.2 and §3.1; no generic filler or serious tone break stood out.

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全書 arc seam skeleton — 裁決稿</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)'], ['$','$']], displayMath: [['\\[','\\]'], ['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{ --navy:#1f3a5f; --ink:#1a1a1a; --mut:#5a6472; --line:#d9dee6; --bg:#fbfcfe;
+         --warn:#b4341f; --warnbg:#fdf1ee; --ok:#1f6b45; --okbg:#eef7f1; --prov:#7a5a12; --provbg:#fdf8ea; }
+  *{box-sizing:border-box}
+  body{font:16px/1.65 -apple-system,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;color:var(--ink);
+       max-width:1000px;margin:0 auto;padding:2.2rem 1.3rem 6rem;background:var(--bg)}
+  h1{font-size:1.7rem;color:var(--navy);margin:.2em 0 .1em;line-height:1.25}
+  h2{font-size:1.28rem;color:var(--navy);margin:2.4em 0 .5em;padding-bottom:.25em;border-bottom:2px solid var(--navy)}
+  h3{font-size:1.08rem;color:var(--navy);margin:1.6em 0 .35em}
+  .sub{color:var(--mut);font-size:.96rem;margin:.1em 0 .2em}
+  .prov{background:var(--provbg);border:1px solid #e7d9ac;color:#5c470f;border-radius:8px;
+        padding:.5em .8em;font-size:.85rem;margin:1em 0}
+  table{border-collapse:collapse;width:100%;margin:.7em 0;font-size:.9rem}
+  .scroll{overflow-x:auto}
+  th,td{border:1px solid var(--line);padding:.4em .55em;text-align:left;vertical-align:top}
+  th{background:#eef2f8;color:var(--navy);font-weight:600}
+  tr:nth-child(even) td{background:#f6f8fb}
+  code{background:#eef1f5;padding:.05em .35em;border-radius:4px;font-size:.86em}
+  .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:.08em .5em;border-radius:20px;vertical-align:middle}
+  .t-new{background:#eaf0fb;color:#274b8f}.t-imp{background:#f0ece4;color:#6b5730}
+  .t-prov{background:#fff3d6;color:#7a5a12}.t-fixed{background:var(--okbg);color:var(--ok)}
+  .call{border-left:4px solid var(--navy);background:#fff;padding:.6em .9em;margin:.8em 0;border-radius:0 8px 8px 0;
+        box-shadow:0 1px 3px rgba(31,58,95,.06)}
+  .decide{border:1px solid #e6c9c2;background:var(--warnbg);border-radius:10px;padding:.9em 1.1em;margin:1em 0}
+  .decide h3{margin-top:.1em;color:var(--warn)}
+  .rec{color:var(--ok);font-weight:600}
+  .lede{color:var(--mut)}
+  ul,ol{padding-left:1.3em}li{margin:.15em 0}
+  nav{background:#fff;border:1px solid var(--line);border-radius:10px;padding:.7em 1em;margin:1.2em 0;font-size:.9rem}
+  nav a{color:var(--navy);text-decoration:none;margin-right:.4em}
+  nav a:hover{text-decoration:underline}
+  .imp{color:var(--mut);font-size:.82rem}
+  .flag{color:var(--warn);font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>全書 arc seam skeleton — 裁決稿</h1>
+<div class="sub">Ch1–16 節/依賴骨架 ＋ Ch1–4 節序 review。除「export 定理號 / 跨章依賴」外一律 <b>provisional</b>（暫定、跟章可改）。</div>
+<div class="prov">
+<b>本稿由來（2026-07-05）：</b> 承接「Ch5 無老師手稿」的產線決策（採 <b>canon 為軸＋全閘</b>）。使用者提「先定全書大綱再逐章寫」＋「Ch1–4 亦可動」。經 <b>Codex</b>（gpt-5.5／xhigh，唯讀，92.5k tok）第二意見＋兩支唯讀 subagent 撈底（Ch1–4 精確 export ledger／既有 arc 決策 digest）三方收斂：<b>front-load 薄骨架、細節跟章 JIT</b>。本稿＝待你裁決的骨架；裁決後寫進 <code>CONTENT_ROADMAP.md</code>，再進 Ch5 詳細 plan＋§5.1。
+</div>
+
+<div class="decide" style="border-color:#c9b96c;background:var(--provbg)">
+<h3 style="color:var(--prov)">⟳ 2026-07-06 更新 — Codex 全弧 seam-hunt（本頁下方部分表格已被 roadmap 取代為權威）</h3>
+<p>對 Ch6–16 rosters＋ledger 跑了第二輪 Codex 對抗審（唯讀）。<b>成果＋更正已寫進 <code>CONTENT_ROADMAP.md</code> §「全局 seam ledger」，以該處為準：</b></p>
+<ul>
+<li><b>更正 appendix 事實：</b> 本頁 §5/§6 原標 GAP-A/E/F「待裁/pending」<b>是錯的</b>——as-built <code>appA</code> 已建：GAP-A→§A.3（Prop A.6）、GAP-E→新 §A.6（Prop A.8）、GAP-F→§A.5；部分分式重編號 <b>Prop A.7</b>。唯一未建 GAP＝<b>GAP-B 複數</b>（觸發改 Ch11）。</li>
+<li><b>~20 條跨章 blocking 接縫</b>（front-load 的 payoff）：Ch6 連續⇒可積＋$\ln|x|$／Ch7 積分均值(EVT+IVT)＋C¹弧長／Ch8 FTA 因式分解／Ch10 局部可逆／Ch11 冪級數 LUB＋逐項微分／Ch12 Cauchy–Schwarz／Ch14 多變數 EVT＋二階 Taylor＋Jacobian matrix＋Lagrange/IFT／Ch15 Fubini／Ch16 reparam invariance＋單連通＋正則曲面——全折入 roadmap 各章 build/fence 清單。</li>
+<li><b>Proof Track 首批</b>擴為 EVT＋IVT＋連續⇒可積（compactness 群）；<b>Ch14</b> 傾向拆 14a/14b（最終仍 JIT）。</li>
+</ul>
+</div>
+
+<nav>
+<b>目錄：</b>
+<a href="#now">0 現在要裁決</a> ·
+<a href="#ch5">1 Ch5 roster</a> ·
+<a href="#ch6-16">2 Ch6–16 provisional</a> ·
+<a href="#ledger">3 export/import 契約</a> ·
+<a href="#notation">4 記號串接</a> ·
+<a href="#fence">5 fence/hook 觸發</a> ·
+<a href="#defer">6 跨 arc 待裁決</a> ·
+<a href="#ch1-4">7 Ch1–4 節序 review</a>
+</nav>
+
+<h2 id="now">0 · 現在要裁決（其餘皆記錄、跟章觸發）</h2>
+<p class="lede">下列 5 項需你現在拍板，才能鎖骨架＋開 Ch5。每項附建議。第 3、4 項是本次撈底新浮現、也是最實質的。</p>
+
+<div class="decide">
+<h3>D1 · 政策微調：採 hybrid front-load？</h3>
+<p><code>CONTENT_ROADMAP</code> 現行「<b>脊椎現在鎖、節層跟章走</b>」→ 改為「<b>脊椎＋全局 seam ledger 現在鎖、完整節層 brief 跟章走</b>」。理由：沒手稿後「等手稿 cascade」的 JIT 理由消失，canon 現在就定範圍；且 Ch4→Ch5 seam（見下）證明接縫會跨章移動、純 JIT 差點漏掉。<span class="rec">建議：採。</span> 代價＝多一份會過期的 artifact → 解法：除 export 定理號與跨章依賴外全標 provisional。</p>
+</div>
+
+<div class="decide">
+<h3>D2 · Ch5 roster（Codex 重排版）確認？</h3>
+<p>9 節，optimization 緊接 max/min、curve sketching 殿後綜合（詳見 <a href="#ch5">§1</a>）。<span class="rec">建議：採。</span></p>
+</div>
+
+<div class="decide">
+<h3>D3 · <span class="flag">IVT 缺口</span>（撈底新發現，最實質）</h3>
+<p><b>中間值定理（IVT）在 Ch1–4 從未陳述、也從未證。</b> 它只在 §4.5 被<b>默默借用一次</b>——用來說「\(e^x\) 值域是 \((0,\infty)\)（連續且穿過每個中間值）」，好讓 \(\ln x\) 對每個 \(x>0\) 有定義（Definition 4.4 的前提）。原文明說「the details would detain us」＝當場不證。這是真的先備缺口。</p>
+<p>你已開放 Ch1–4 可動，正好現在補。IVT 與 <b>EVT（Thm 4.9，目前也只陳述不證）</b>是連續性的雙生存在定理。選項：</p>
+<ul>
+<li><b>(a)</b> <span class="rec">建議</span>：把 IVT 與 EVT 一起放 <b>Ch4 §4.4</b>（就在 §4.5 用到 IVT 之前），比照 EVT 現況以「Fact/陳述」呈現，<b>證明 fence 到新的 Proof Track 附錄</b>（見 D4）。對稱、最小擾動、給 §4.5 一個真引用。</li>
+<li><b>(b)</b> 更早放 Ch1（連續性主場）——Ch1 是「limits」章、連續著墨輕，改動較大。</li>
+<li><b>(c)</b> 放 Ch5 開頭（其應用 Newton 找根在此）——但 §4.5 的借用仍懸空。</li>
+</ul>
+<p class="imp">註：IVT 非 Ch5 硬阻塞（Newton 收斂靠二階導＋MVT，不必然靠 IVT），但缺口本身已存在（§4.5），趁 Ch1–4 開放一併補最省。</p>
+</div>
+
+<div class="decide">
+<h3>D4 · EVT/IVT 的嚴謹度 ＋ Proof Track 附錄現在立？</h3>
+<p>深度政策是「<b>不假證</b>，最重證明 on-credit fence 到 proof-track 附錄」。但 <b>EVT（Thm 4.9）目前是無家可歸的 fence</b>（陳述不證、卻無附錄可指）。兩條路：</p>
+<ul>
+<li><b>(i)</b> <span class="rec">建議</span>：<b>現在正式立 Proof Track 附錄</b>（原為 planned），首批收 EVT＋IVT 的完備性證明（\(\mathbb{R}\) 完備＝Thm 4.1 已備）。與 Ch4 已做的完備性功夫一致，也替 Ch6+ 的 fence 建好目的地。</li>
+<li><b>(ii)</b> 把 EVT／IVT 當本書公理級「Fact」接受、不設證明附錄。榮譽課常見，但與「不假證」ethos 略拉扯。</li>
+</ul>
+<p class="imp">附錄收錄需你裁決（既定紀律）。D3＋D4 綁一起：選 D3(a)＋D4(i) 是最一致的組合。</p>
+</div>
+
+<div class="decide">
+<h3>D5 · §1.2 反三角是否趁窗口移動？</h3>
+<p>Roadmap 記錄的舊提案：把 §1.2 反三角詳細計算移到 §3.3 反三角導數之前。曾兩輪 Codex 仲裁＋閱讀模擬判「教學論點成立，但非 hotfix；Stewart／Thomas 同樣把反三角放 Ch1＝主流；移動觸發 Ch1＋Ch3 全重編號」。<span class="rec">建議：維持現狀（reconfirm keep）</span>——arc 窗口開了，但先前分析未變、無新證據支持移動。若你仍想移，這是唯一時機。</p>
+</div>
+
+<h2 id="ch5">1 · Ch5 Applications of Differentiation <span class="tag t-imp">標準嚴謹 · Stewart 4</span></h2>
+<p class="lede">採 Codex 重排：extrema→optimization 緊鄰（optimization 只依賴 §5.4），graphing 群組（shape→L'Hôpital→curve sketching）成塊，curve sketching 殿後綜合。</p>
+<div class="scroll">
+<table>
+<tr><th>§</th><th>標題</th><th>新機器 / 焦點</th><th>import（精確號）</th><th>地雷 / 備註</th></tr>
+<tr><td>5.1</td><td>Implicit Differentiation</td><td>隱微分框架（收 Ch3 open-q）</td><td>chain rule <b>Thm 3.3</b></td><td class="flag">不寫一般 \(F_x/F_y\)（需 Ch14 偏導）；operational/branch-based、用到處假設可微</td></tr>
+<tr><td>5.2</td><td>Related Rates</td><td>對 \(t\) 隱微分</td><td>§5.1；chain rule <b>Thm 3.3</b></td><td>具體錨定型例先行</td></tr>
+<tr><td>5.3</td><td>Linear Approximation &amp; Differentials</td><td>\(L(x)\)、\(dy\)、誤差</td><td>導數 <b>Def 2.2</b>；remainder-form <b>Def 3.1</b></td><td>cross-ref Ch3 局部線性（非全新）；引入 \(dy,\Delta y\) 記號</td></tr>
+<tr><td>5.4</td><td>Maximum and Minimum Values</td><td>局部/絕對、critical numbers、閉區間法、一階判別法</td><td><b>EVT Thm 4.9</b>、<b>Fermat Thm 4.10</b>、<b>單調性 Cor 4.3</b></td><td>cross-ref 不重證；一階判別法用單調性</td></tr>
+<tr><td>5.5</td><td>Optimization Problems</td><td>應用極值建模</td><td>§5.4</td><td>用閉區間法／一階判別法分類（二階判別法尚未到）</td></tr>
+<tr><td>5.6</td><td>Derivatives and the Shape of a Graph</td><td>凹性、拐點、二階判別法 <span class="tag t-new">NEW</span></td><td><b>MVT Thm 4.12</b>；單調性 <b>Cor 4.3</b></td><td>export 二階判別法 → Ch14 Hessian</td></tr>
+<tr><td>5.7</td><td>L'Hôpital's Rule</td><td>不定型；<b>export: Generalized MVT (Cauchy's form)</b> lemma <span class="tag t-new">NEW</span></td><td><b>MVT Thm 4.12</b></td><td class="flag">命名「Generalized MVT」避撞 Cauchy criterion (Thm 4.5)；全證乾淨 0/0，\(\infty/\infty\)、\(x\to\infty\) fence/小心陳述（假設暴增風險）</td></tr>
+<tr><td>5.8</td><td>Curve Sketching</td><td>綜合：極值＋凹性＋各型漸近線（含斜）</td><td>§5.4–5.7；無窮極限 <b>Def 1.11</b></td><td>點名成長比較 \(\ln x \ll x^p \ll e^x\)</td></tr>
+<tr><td>5.9</td><td>Newton's Method</td><td>迭代＋收斂直覺</td><td>§5.3；<span class="flag">IVT（見 D3）</span></td><td>收斂/失敗討論得益於 §5.6 凹性</td></tr>
+</table>
+</div>
+<p class="imp"><b>排除</b>（照 roadmap）：原函數（→Ch6）、科技繪圖。 <b>fold 候選</b>（若篇幅緊）：§5.3＋§5.9「線性近似與牛頓法」；<b>不是</b> 5.4/5.5。 <b>canon 要點名</b>：增減區間、垂直/水平/斜漸近線、\(0/0\) 與 \(\infty/\infty\) 外的不定型（\(0\cdot\infty,\ \infty-\infty,\ 1^\infty,\ 0^0,\ \infty^0\)）、成長比較。</p>
+
+<h2 id="ch6-16">2 · Ch6–16 provisional 節 roster</h2>
+<p class="lede">全 provisional（節數/標題暫定、跟章可改）。深度基調 roadmap 已定，附於各章。</p>
+
+<h3>Ch6 Integrals <span class="tag t-imp">深理論核心 · Stewart 5</span></h3>
+<p>§6.1 Areas and Distances（Riemann sums；import <b>GAP-A 冪次和</b>）· §6.2 The Definite Integral · §6.3 The Fundamental Theorem of Calculus（<b>export FTC</b>，當場證）· §6.4 Indefinite Integrals and the Net Change Theorem · §6.5 The Substitution Rule。 <span class="flag">fence</span>：連續⇒可積 / 可積性刻畫 → Proof Track（首個「正式」fence 觸發）。</p>
+
+<h3>Ch7 Applications of Integration <span class="tag t-imp">標準嚴謹 · Stewart 6+8</span></h3>
+<p>§7.1 Areas Between Curves · §7.2 Volumes · §7.3 Volumes by Cylindrical Shells · §7.4 Work · §7.5 Average Value · §7.6 Arc Length · §7.7 Surface Area。「選材節制以免比 Ch5 腫」→ §7.4/§7.5 或 §7.6/§7.7 為可縮候選（決策 <a href="#defer">D-δ</a>）。</p>
+
+<h3>Ch8 Techniques of Integration <span class="tag t-imp">標準/計算 · Stewart 7</span></h3>
+<p>§8.1 by Parts · §8.2 Trig Integrals（import <b>A.2</b>）· §8.3 Trig Substitution（import <b>GAP-F 完全平方</b>）· §8.4 Partial Fractions（import <b>A.4</b>）· §8.5 Strategy · §8.6 Improper Integrals · §8.7 Approximate Integration。inverse hyperbolic 可置此。</p>
+
+<h3>Ch9 Differential Equations <span class="tag t-imp">標準嚴謹 · Stewart 9 · first-order intro</span></h3>
+<p>§9.1 Modeling（+direction fields）· §9.2 Separable · §9.3 First-Order Linear · §9.4 Growth and Decay（import Ch4 \(y'=ky\)）。章名/開場框 first-order（決策 <a href="#defer">D-ε</a>）。<span class="flag">fence</span>：存在唯一性 / Picard（若用唯一性語言）。possible import <b>GAP-B 複數</b>（若含二階/Euler）。</p>
+
+<h3>Ch10 Parametric Equations and Polar Coordinates <span class="tag t-imp">標準嚴謹 · Stewart 10</span></h3>
+<p>§10.1 Parametric Curves · §10.2 Calculus with Parametric Curves · §10.3 Polar Coordinates · §10.4 Areas and Lengths in Polar · §10.5 Conic Sections in Polar（import <b>A.5</b>）。</p>
+
+<h3>Ch11 Infinite Sequences and Series <span class="tag t-imp">深理論核心 · Stewart 11 · 確認拆 11a/11b</span></h3>
+<p><b>11a</b>：§11.1 Sequences（<b>回收/一般化 Ch4 收斂機器</b>）· §11.2 Series（import <b>A.3</b>）· §11.3 Integral Test · §11.4 Comparison Tests · §11.5 Alternating &amp; Absolute · §11.6 Ratio &amp; Root。 <b>11b</b>：§11.7 Power Series（import <b>GAP-E</b> \(|x-a|\lt R\)）· §11.8 Function Representations · §11.9 Taylor &amp; Maclaurin（帶餘項，當場證；<b>可能 import Ch5 Generalized MVT</b>）· §11.10 Applications。<span class="flag">fence</span>：重排/一致收斂。</p>
+
+<h3>Ch12 Vectors and the Geometry of Space <span class="tag t-imp">標準嚴謹 · Stewart 12</span></h3>
+<p>§12.1 3D Coordinates · §12.2 Vectors · §12.3 Dot Product · §12.4 Cross Product（import <b>附錄 C / GAP-C 行列式</b>）· §12.5 Lines and Planes · §12.6 Cylinders and Quadric Surfaces（import <b>A.5</b>）。</p>
+
+<h3>Ch13 Vector Functions <span class="tag t-imp">標準嚴謹 · Stewart 13</span></h3>
+<p>§13.1 Vector Functions and Space Curves · §13.2 Derivatives and Integrals · §13.3 Arc Length and Curvature · §13.4 Motion in Space。import Ch6 積分。</p>
+
+<h3>Ch14 Partial Derivatives <span class="tag t-imp">深理論核心 · Stewart 14 · sleeper（可能拆）</span></h3>
+<p>§14.1 Functions of Several Variables · §14.2 Limits and Continuity · §14.3 Partial Derivatives · §14.4 Differentiability and Tangent Planes（<b>可微性嚴謹定義</b>）· §14.5 Chain Rule · §14.6 Directional Derivatives and Gradient · §14.7 Max/Min（import <b>附錄 C.4 Hessian</b>；<b>Ch5 §5.6 二階判別法一般化</b>）· §14.8 Lagrange Multipliers。<span class="flag">fence</span>：Clairaut → <b>GAP-D</b>。<b>拆章 watch</b>（8 節全做→過載）。</p>
+
+<h3>Ch15 Multiple Integrals <span class="tag t-imp">嚴謹設定＋最重 fence · Stewart 15</span></h3>
+<p>§15.1 Double Integrals over Rectangles · §15.2 over General Regions · §15.3 in Polar · §15.4 Applications · §15.5 Triple Integrals · §15.6 Cylindrical &amp; Spherical · §15.7 Change of Variables（Jacobian；import <b>GAP-C/附錄 C</b>）。<span class="flag">fence</span>：一般變數變換定理。</p>
+
+<h3>Ch16 Vector Calculus <span class="tag t-imp">嚴謹陳述＋一般定理 fence · Stewart 16 · 確認拆 16a/16b</span></h3>
+<p><b>16a</b>：§16.1 Vector Fields · §16.2 Line Integrals · §16.3 FTC for Line Integrals（保守場/路徑無關）· §16.4 Green's Theorem。 <b>16b</b>：§16.5 Curl and Divergence（import <b>GAP-C</b>）· §16.6 Parametric Surfaces · §16.7 Surface Integrals · §16.8 Stokes · §16.9 Divergence Theorem。<span class="flag">fence</span>：一般 Green/Stokes/散度。</p>
+
+<h2 id="ledger">3 · 跨章 export/import 契約 <span class="tag t-imp">非 provisional</span></h2>
+<p class="lede">這是骨架裡<b>唯一當契約守</b>的部分——後章 cross-ref 前章的精確 env-num。Ch1–4 號經撈底核對 built standalone，無 discrepancy。</p>
+
+<h3>Ch1–4 提供、Ch5+ 會 import 的關鍵 export（精確號）</h3>
+<div class="scroll">
+<table>
+<tr><th>Export</th><th>號</th><th>誰 import</th></tr>
+<tr><td>Limit laws</td><td>Ch1 <b>Thm 1.2</b></td><td>全書極限計算</td></tr>
+<tr><td>Squeeze theorem</td><td>Ch1 <b>Thm 1.3</b></td><td>Ch11 收斂</td></tr>
+<tr><td>Infinite limits / vertical asymptote</td><td>Ch1 <b>Def 1.11 / 1.12</b></td><td>Ch5.8 漸近線</td></tr>
+<tr><td>ε–δ definition</td><td>Ch1 <b>Def 1.13</b></td><td>Ch11、Ch14 多變數極限</td></tr>
+<tr><td>Differentiable ⇒ continuous</td><td>Ch2 <b>Thm 2.1</b></td><td>Ch5、Ch14</td></tr>
+<tr><td>Power / Product / Quotient rules</td><td>Ch2 <b>Thm 2.3 / 2.6 / 2.7</b></td><td>全書微分</td></tr>
+<tr><td>Chain rule</td><td>Ch3 <b>Thm 3.3</b></td><td>Ch5.1/5.2 隱微分·相關變率；Ch14 一般化</td></tr>
+<tr><td>Remainder-form differentiability</td><td>Ch3 <b>Def 3.1</b></td><td>Ch5.3 線性近似；Ch14 可微性</td></tr>
+<tr><td>arcsin/arccos/arctan 導數</td><td>Ch3 <b>Ex 3.14/3.15/3.16</b></td><td>Ch5.1（另路）、Ch8 三角代換</td></tr>
+<tr><td>Completeness of \(\mathbb{R}\)</td><td>Ch4 <b>Thm 4.1</b></td><td>Ch11；<b>IVT/EVT 證明之基</b></td></tr>
+<tr><td>Bolzano–Weierstrass / Cauchy criterion</td><td>Ch4 <b>Thm 4.4 / 4.5</b></td><td>Ch11</td></tr>
+<tr><td>Extreme Value Theorem</td><td>Ch4 <b>Thm 4.9</b> <span class="flag">(陳述未證)</span></td><td>Ch5.4</td></tr>
+<tr><td>Fermat / interior extremum</td><td>Ch4 <b>Thm 4.10</b></td><td>Ch5.4</td></tr>
+<tr><td>Rolle / Mean Value Theorem</td><td>Ch4 <b>Thm 4.11 / 4.12</b></td><td>Ch5.4–5.7；Ch11 Taylor</td></tr>
+<tr><td>Monotonicity (\(f'\ge0\Rightarrow\)↑) / Constancy</td><td>Ch4 <b>Cor 4.3 / 4.4</b></td><td>Ch5.4/5.6；Ch9</td></tr>
+<tr><td>\((e^x)'=e^x\) / \((\ln x)'=1/x\)</td><td>Ch4 <b>Thm 4.8 / 4.14</b></td><td>全書；Ch5 例、Ch8/Ch9</td></tr>
+<tr><td><span class="flag">Intermediate Value Theorem</span></td><td class="flag">缺（見 D3）——§4.5 默借未證</td><td>Ch5.9 Newton；§4.5 ln 值域</td></tr>
+</table>
+</div>
+
+<h3>Ch5+ 新 export（forward 契約）</h3>
+<ul>
+<li><b>Generalized MVT (Cauchy's form)</b> — Ch5 §5.7 → Ch11 Taylor 餘項。</li>
+<li><b>Linear approximation / differentials</b> — Ch5 §5.3 → Ch6 代換的 \(du\)、Ch11 Taylor、Ch14 切平面。</li>
+<li><b>Concavity / second-derivative test</b> — Ch5 §5.6 → Ch14 Hessian 判別（§C.4）。</li>
+<li><b>FTC</b> — Ch6 §6.3 → Ch7–8、Ch11 積分判別、Ch13、Ch15–16。</li>
+<li><b>Power-series / convergence machinery</b> — Ch4 提前借、Ch11 回收一般化 → Ch11b Taylor。</li>
+<li><b>Determinant / cross product / orientation</b> — 附錄 C → Ch12/14/15/16。</li>
+</ul>
+
+<h2 id="notation">4 · 記號串接（跨章一次拉通）</h2>
+<div class="scroll">
+<table>
+<tr><th>記號</th><th>首引</th><th>下游</th></tr>
+<tr><td>\(f'\)、Leibniz \(dy/dx\)、\(f'',f^{(n)}\)</td><td>Ch2（§2.2–2.3）</td><td>全書</td></tr>
+<tr><td>remainder form \(f(x_0+h)=f(x_0)+mh+R(h)\)</td><td>Ch3 Def 3.1</td><td>Ch5.3、Ch14</td></tr>
+<tr><td>\(dy,\ \Delta y\)（微分 vs 增量）</td><td><b>Ch5 §5.3</b>（新）</td><td>Ch6 \(du\)、Ch11</td></tr>
+<tr><td>\(dy/dt\)（對時間）</td><td><b>Ch5 §5.2</b>（新）</td><td>Ch9 ODE、Ch13 運動</td></tr>
+<tr><td>\(\int,\ \int_a^b,\ \sum\)（Riemann/Σ）</td><td>Ch6（Σ 先備 A.3）</td><td>Ch7–8、Ch11、Ch13、Ch15–16</td></tr>
+<tr><td>數列 \(\{a_n\}\)、收斂/Cauchy</td><td>Ch4（§4.1–4.2）→ Ch11 回收</td><td>Ch11</td></tr>
+<tr><td>向量 \(\mathbf{v},\ \cdot,\ \times\)、\(\det\)</td><td>Ch12（附錄 C）</td><td>Ch13–16</td></tr>
+<tr><td>偏導 \(\partial\)、\(\nabla\)、Jacobian、orientation</td><td>Ch14–15（附錄 C 供先備）</td><td>Ch14–16</td></tr>
+</table>
+</div>
+<p class="imp">跨章記號慣例的權威落點仍是 <code>CONTENT_ROADMAP.md</code> §跨章記號串聯；本表是它的 Ch5–16 前瞻擴充。</p>
+
+<h2 id="fence">5 · fence / proof-track / 附錄 hook 觸發表</h2>
+<div class="scroll">
+<table>
+<tr><th>Hook</th><th>是什麼</th><th>觸發章</th><th>現況</th></tr>
+<tr><td><b>GAP-A</b></td><td>冪次和 \(\sum k^2,\sum k^3\)</td><td>Ch6</td><td>ready；擴 §A.3</td></tr>
+<tr><td><b>GAP-B</b></td><td>複數 primer</td><td>Ch9 / Ch11</td><td class="flag">待裁 A/B 類（D-α）</td></tr>
+<tr><td><b>GAP-C</b></td><td>行列式 2×2/3×3</td><td>Ch12/15/16</td><td class="t-fixed">已成 附錄 C</td></tr>
+<tr><td><b>GAP-D</b></td><td>Proof Track（補證處）</td><td>Ch4 已有 EVT 未證；Ch6+ fence</td><td class="flag">待裁現在立（D4）</td></tr>
+<tr><td><b>GAP-E</b></td><td>\(|x-a|<\delta\) 不等式</td><td>Ch11（收斂半徑）</td><td class="flag">待裁升 B（D-β）</td></tr>
+<tr><td><b>GAP-F</b></td><td>完全平方</td><td>Ch8/10/15</td><td class="flag">待裁併 A.4/A.5（D-γ）</td></tr>
+</table>
+</div>
+<p class="imp"><b>已 forward-stock：</b> A.2→Ch8；A.4→Ch8；A.5→Ch10+Ch12；A.3→Ch11。 <b>Proof Track 收錄</b>（隨 fence 填）：EVT+IVT（Ch4，見 D3/D4）、連續⇒可積（Ch6）、重排/一致收斂（Ch11）、Clairaut（Ch14）、一般變數變換（Ch15）、一般 Green/Stokes/散度（Ch16）。</p>
+
+<h2 id="defer">6 · 跨 arc 待裁決（記觸發點，非現在阻塞）</h2>
+<div class="scroll">
+<table>
+<tr><th>#</th><th>決策</th><th>觸發章</th><th>現況</th></tr>
+<tr><td>D-α</td><td>GAP-B 複數 A/B 類？收多深</td><td>Ch9</td><td>§16.2 undefined</td></tr>
+<tr><td>D-β</td><td>GAP-E \(|x-a|<\delta\) 升 B？</td><td>Ch11</td><td>C 類、批二未選</td></tr>
+<tr><td>D-γ</td><td>GAP-F 完全平方併 A.4/A.5？</td><td>Ch8</td><td>A 類、Codex flag</td></tr>
+<tr><td>D-δ</td><td>Ch7 further-applications 選材紀律（併 vs 拆）</td><td>Ch7</td><td>建議併、節制</td></tr>
+<tr><td>D-ε</td><td>Ch9 章名/開場框 first-order intro</td><td>Ch9</td><td>建議採</td></tr>
+<tr><td>D-ζ</td><td>Ch14 是否拆（sleeper）</td><td>Ch14 draft 後</td><td>watch</td></tr>
+</table>
+</div>
+
+<h2 id="ch1-4">7 · Ch1–4 節序 review（你已開放可動）</h2>
+<table>
+<tr><th>項</th><th>發現</th><th>建議</th></tr>
+<tr><td><b>IVT 缺口</b></td><td>Ch1–4 never state/prove IVT；§4.5 默借（見 D3）</td><td class="flag">補（D3(a)：入 Ch4 §4.4 陪 EVT，證 fence）</td></tr>
+<tr><td><b>EVT 未證</b></td><td>Thm 4.9 陳述不證、無附錄可指（見 D4）</td><td class="flag">立 Proof Track、fence 證（D4(i)）</td></tr>
+<tr><td>§1.2 反三角後移</td><td>舊提案、兩輪仲裁判「非 hotfix、主流放 Ch1」</td><td>維持現狀（D5）</td></tr>
+<tr><td>MVT 落點</td><td>是否從 Ch4 搬 Ch5</td><td>留 Ch4——§4.5 ln 需單調性 Cor 4.3（源自 MVT）；搬走拆 Ch4 邏輯鏈</td></tr>
+<tr><td>\((e^x)'\) 雙證</td><td>Thm 2.5 informal（§2.4）＋ Thm 4.8 rigorous（§4.3）</td><td>維持——Ch2 動機、Ch4 discharge；PLAN-ch04 已刻意 defer 重構</td></tr>
+<tr><td>\(\ln\) 雙處理</td><td>Ch3 Ex 3.9 informal ＋ Ch4 Thm 4.14 rigorous</td><td>維持——刻意 forward-fence、Remark 4.5 已閉環</td></tr>
+</table>
+<p class="imp">結論：Ch1–4 <b>結構大體 validated</b>，唯一該動的是補 <b>IVT</b>（＋替 EVT/IVT 立 Proof Track）——兩者本就是撈底新浮現的真缺口，非為改而改。§1.2 與兩處刻意冗餘維持現狀。</p>
+
+<hr style="margin:3em 0 1em;border:none;border-top:1px solid var(--line)">
+<p class="imp">裁決後：把定案 roster/ledger/policy 寫進 <code>CONTENT_ROADMAP.md</code>（＋若採 D4(i) 立 Proof Track 附錄 entry）→ 寫 Ch5 詳細 plan（含「假設 ledger」紀律：每節開寫前先列定義域/連續可微假設/分母≠0/端點型/export 依賴，過人審再寫散文，補 sympy 只驗算不驗定理衛生的缺口）→ 開 §5.1。</p>
+
+</body>
+</html>

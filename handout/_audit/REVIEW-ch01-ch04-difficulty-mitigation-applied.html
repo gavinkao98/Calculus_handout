@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch1–Ch4 難度緩解 — 已寫入內容報告</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --purple:#6c2bd9; --orange:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.65; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .summary { background:#f0f6ff; border:1px solid #cfe0fb; border-radius:8px; padding:.8rem 1rem; font-size:.92rem; margin:0 0 1.4rem; }
+  .summary b { color: var(--blue); }
+  .pass { color: var(--green); font-weight: 700; }
+  .fail { color: var(--red); font-weight: 700; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem 1rem; margin: .7rem 0; }
+  .card.fix { border-left: 4px solid var(--red); }
+  .card.gls { border-left: 4px solid var(--blue); }
+  .card.nav { border-left: 4px solid var(--green); }
+  .card.fen { border-left: 4px solid var(--purple); }
+  .card.cln { border-left: 4px solid var(--orange); }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+  .b-fix { background:#fdeceb; color:var(--red); }  .b-gls { background:#e7f0fb; color:var(--blue); }
+  .b-nav { background:#e9f7ef; color:var(--green); } .b-fen { background:#f3e8fd; color:var(--purple); }
+  .b-cln { background:#fef0e7; color:var(--orange); }
+  .loc { font-size:.82rem; color:var(--gray); margin:.3rem 0 .6rem; }
+  .loc code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .content { background:#fcfcfd; border:1px dashed var(--line); border-radius:6px; padding:.6rem .9rem; font-size:.95rem; }
+  .content .envlabel { font-weight:700; font-size:.85rem; color:#333; display:block; margin-bottom:.25rem; }
+  .why { font-size:.85rem; color:#444; margin-top:.5rem; }
+  .why b { color:var(--red); }
+  .src { font-size:.78rem; color:var(--gray); margin-top:.55rem; }
+  .src code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  del { color:#a33; background:#fdf0ef; text-decoration-color:#c66; }
+  ins { color:#155e33; background:#ecf8f0; text-decoration:none; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; }
+  th, td { border:1px solid var(--line); padding:.35rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#f3f4f6; }
+  a { color: var(--blue); }
+</style>
+</head>
+<body>
+<h1>Ch1–Ch4 難度緩解 — 已寫入內容（2026-07-03，三輪）</h1>
+<p class="sub">第一輪：源自同日「前四章難度評估」（4 章深讀＋7 份初學者模擬＋結構分析＋雙懷疑者覆核＋Codex 第二意見），使用者核可後套用 <b>10 個 fragment、20 筆課文修改</b>。第二輪：作者提出「主線／證明補債分軌」重排提案，經兩輪 Codex 仲裁定案為 <b>reading-track 標示系統</b>（保骨架、不拆章），GO 後套用 <b>7 筆標示層新增</b>。全部句子級到段落級，<b>不動章界、不動編號</b>。每輪改畢 <code>python handout/build.py</code> 重組通過。</p>
+
+<div class="summary">
+<b>回歸審核（Codex read-only，兩輪）：</b><br>
+<b>第一輪（全 diff 逐 hunk）：<span class="fail">2 blocking</span></b> — ① §2.4 保留句的 \(\lvert (e^{h}-1)/h - 1 \rvert \le \lvert h \rvert\) 漏成立條件 \(0&lt;\lvert h\rvert&lt;\tfrac12\)；② §4.2 signpost 稱「\((**)\) 為 §4.3 所 reuse」過強（§4.3 實際依賴的是全 \(\mathbb{R}\) 級數定義）。其餘抽驗（sec/csc/cot、sum-to-product、Ex 1.28(b)、\(h^{2/3}\)、部分和數值、\((*)\) 重述、\(k=2\) 展開、subsequence、witness、Step 6 量詞、刪 tag）<span class="pass">全數無 blocking</span>。兩處已依建議修正（見 C2-d、C4-a）。<br>
+<b>第二輪（僅驗兩處修正）：<span class="pass">2/2 PASS → 通過</span>。</b>① 條件與 §4.3 Proposition 4.2（"nonzero \(h\) with \(\lvert h\rvert&lt;\tfrac12\)"）完全一致；② §4.3–§4.5 實際依賴（全 \(\mathbb{R}\) 定義、連續性、指數律、正值性）被清單涵蓋，Cauchy／B–W／Proposition 4.1 未作為後文獨立依賴，主張不再過強。
+</div>
+
+<h2>對照表：評估 finding → 修補</h2>
+<table>
+<tr><th>優先序（評估報告）</th><th>Finding</th><th>修補卡</th></tr>
+<tr><td>1（唯一 blocking）</td><td>§1.2 sec/csc/cot 全書未定義即使用</td><td>C1-a</td></tr>
+<tr><td>2</td><td>§3.1 和差化積三度承重、零推導</td><td>C3-a、C3-b</td></tr>
+<tr><td>3</td><td>§3.2 證明塊無 skip 授權；§4.2 無難度預警</td><td>C3-c、C4-a</td></tr>
+<tr><td>4</td><td>§4.2 四筆（subsequence／3ε／Step 2 小例／Step 6 量詞）</td><td>C4-c〜C4-f</td></tr>
+<tr><td>5</td><td>§2.4「Recall」誤導＋無窮和無 on-ramp；x^n−a^n 無驗證提示</td><td>C2-b、C2-c</td></tr>
+<tr><td>6</td><td>Ch1 前兩節零指向兌現章的 forward fence</td><td>C1-b、C1-c</td></tr>
+<tr><td>7（零散）</td><td>§1.4 ln 無鋪墊；§1.5 Ex 1.28(b) 只給結論；§2.3 h^{2/3} 正性；§4.5 witness 無理由；懸空 (∗)</td><td>C1-d、C1-e、C2-a、C4-g、C4-h</td></tr>
+</table>
+
+<h2>Chapter 1</h2>
+
+<div class="card fix"><span class="id">C1-a</span><span class="badge b-fix">blocking fix</span><b>§1.2 — 倒數三角函數先定義再使用</b>
+<p class="loc"><code>fragments/ch01/sec-1-2.html</code>　Caution 1.4 之後、Example 1.12 之前（sec 首次登場處）</p>
+<div class="content"><span class="envlabel">新增段（全文）</span>
+The next two examples involve the <em>reciprocal</em> trigonometric functions secant, cosecant, and cotangent. If your precalculus course made little use of them, their definitions are all you need: for any angle \(\theta\) at which the denominator is nonzero,
+\[ \sec\theta = \frac{1}{\cos\theta}, \qquad \csc\theta = \frac{1}{\sin\theta}, \qquad \cot\theta = \frac{\cos\theta}{\sin\theta}. \]
+Since \(\cos\theta\) is the ratio adjacent over hypotenuse in a right triangle, \(\sec\theta\) is the ratio hypotenuse over adjacent, and similarly for the other two. Dividing the Pythagorean identity \(\sin^{2}\theta + \cos^{2}\theta = 1\) through by \(\cos^{2}\theta\) gives the companion identity \(1 + \tan^{2}\theta = \sec^{2}\theta\), which Example 1.13 puts to work. Note the contrast with Caution 1.2: the superscript in \(\sin^{-1} x\) does <em>not</em> denote a reciprocal, but \(\sec\), \(\csc\), and \(\cot\) are honest reciprocals.</div>
+<p class="why"><b>唯一被模擬閱讀判為 blocking 的缺口</b>：Example 1.12(b) 直接考 \(\sec(\arctan 10)\)、Example 1.13 連用 \(1+\tan^2 y=\sec^2 y\) 與 \(\cos y = 1/\sec y\)、Definitions 1.6–1.8 以 csc/sec/cot 定義反函數——但倒數三角函數全書無定義（108 課綱已刪）。此段一次補齊：定義、直角三角形讀法（1.12(b) 需要）、\(1+\tan^2=\sec^2\) 的來源（1.13 需要）、與 Caution 1.2 的對照（原 Caution 只警告 sin⁻¹ 非倒數，反而把不知情讀者推向反方向）。</p>
+<p class="src">évidence：模擬閱讀（§1.2）blocking；兩位懷疑者逐行核實 holds；Codex 第二意見同意 blocking。回歸：第一輪抽驗無 blocking。</p></div>
+
+<div class="card fen"><span class="id">C1-b</span><span class="badge b-fen">forward fence</span><b>§1.2 — lead 段補 Chapter 3 兌現點</b>
+<p class="loc"><code>fragments/ch01/sec-1-2.html</code>　節首段末</p>
+<div class="content">…To build these inverses, we must first restrict the domain of each trigonometric function to an interval on which it is one-to-one. <ins>You will use these functions again in Chapter 3, where the derivatives of \(\arcsin\), \(\arccos\), and \(\arctan\) are computed — and the principal ranges fixed in this section are exactly what determine those formulas.</ins></div>
+<p class="why">結構分析：讀者讀完 45KB 反三角材料「完全不知道這套機器何時派上用場」。用 spec §3 明文允許的 "You will use this idea again…" 句型。初稿寫「their derivatives」，經查 §3.3 只算 arcsin/arccos/arctan 三主角（arcsec 系列不在 Ch3），已收窄點名以免過度承諾。</p>
+<p class="src">évidence：結構分析 §5-Ch1；懷疑者二對「零 forward reference」判 overstated（Remark 1.3 已有一處無座標前指）→ 本 fence 補的是「有章節座標的兌現預告」。</p></div>
+
+<div class="card fen"><span class="id">C1-c</span><span class="badge b-fen">forward fence</span><b>§1.1 — 鏡射段補 Chapter 4 兌現點</b>
+<p class="loc"><code>fragments/ch01/sec-1-1.html</code>　y=x 反射段末（Figure 1.2 之後）</p>
+<div class="content">…The point \((a, b)\) lies on the graph of \(f\) exactly when \((b, a)\) lies on the graph of \(f^{-1}\). <ins>You will use this machinery again in Chapter 4, where the natural logarithm is defined as the inverse of the exponential function — and its graph is exactly this kind of reflection.</ins></div>
+<p class="why">§4.5 正是以「e^x 嚴格遞增 ⇒ 可逆」定義 ln、Figure 4.5 正是這個反射——反函數機器最重要的兌現點，原文零預告。掛在鏡射段是因為 ln 的圖形正是此反射的實例。</p>
+<p class="src">évidence：結構分析 §5-Ch1 建議「§1.1 加一句指向 §4.5」。</p></div>
+
+<div class="card gls"><span class="id">C1-d</span><span class="badge b-gls">gloss</span><b>§1.4 — Example 1.25 的 ln 首次亮相補一句</b>
+<p class="loc"><code>fragments/ch01/sec-1-4.html</code>　Example 1.25 解答首句前</p>
+<div class="content"><ins>The natural logarithm \(\ln x\) is the logarithm to the base \(e \approx 2.718\); it is studied thoroughly in Chapter 4, and for now the graph in Figure 1.19 supplies everything we need.</ins> Since \(\ln x\) is defined only for \(x &gt; 0\), …</div>
+<p class="why">ln 在全書此前（含章開場能力清單）從未出現，原文直接引用其圖形行為。以高中已知的「對數＋特殊底」一句接上，並誠實標注只需圖形事實。</p>
+<p class="src">évidence：深讀評估 §1.4 hardest_points（presentation）。</p></div>
+
+<div class="card gls"><span class="id">C1-e</span><span class="badge b-gls">gloss</span><b>§1.5 — Example 1.28(b) 三個構造補化簡</b>
+<p class="loc"><code>fragments/ch01/sec-1-5.html</code>　Example 1.28 解答清單第 2 項</p>
+<div class="content">The choice \(f(x) = x - 3\), \(g(x) = (x - 3)^{3}\) gives \(\infty\)<ins>, since the quotient simplifies to \(\frac{1}{(x - 3)^{2}}\)</ins>; reversing the sign of \(g\) <ins>turns the quotient into \(-\frac{1}{(x - 3)^{2}}\), which</ins> gives \(-\infty\). Finally, \(f(x) = x - 3\), \(g(x) = |x - 3|\) makes the limit fail to exist<ins>: this quotient is \(1\) for \(x &gt; 3\) but \(-1\) for \(x &lt; 3\), so the two one-sided limits disagree</ins>.</div>
+<p class="why">原文三個構造只給結論不給計算，讀者須自行化出 \(1/(x-3)^2\) 與 \((x-3)/|x-3|\)——「0/0 可以是任何值」是本節最重要的洞見，不該卡在沒展示的算術上。</p>
+<p class="src">évidence：深讀評估 §1.5 hardest_points（presentation：「各補半行化簡即可消除」）。</p></div>
+
+<h2>Chapter 2</h2>
+
+<div class="card gls"><span class="id">C2-a</span><span class="badge b-gls">gloss</span><b>§2.3 — \(h^{2/3}\) 的正性一眼可驗</b>
+<p class="loc"><code>fragments/ch02/sec-2-3.html</code>　立方根不可微例</p>
+<div class="content">Since \(h^{2/3} <ins>= \bigl(h^{1/3}\bigr)^{2}</ins> &gt; 0\) for all \(h \ne 0\)<ins> — a cube root squared is positive whatever the sign of \(h\)</ins>, the quotient is always positive.</div>
+<p class="why">「負 h 的 2/3 次方為何是正的」是初學者滑點；改寫成立方根的平方後一眼可驗。</p>
+<p class="src">évidence：深讀評估 §2.3 hardest_points（minor）。</p></div>
+
+<div class="card fix"><span class="id">C2-b</span><span class="badge b-fix">rewrite</span><b>§2.4 — e^x 級數引入：「Recall」改為誠實首次曝光＋無窮和 on-ramp</b>
+<p class="loc"><code>fragments/ch02/sec-2-4.html</code>　"The derivative of the exponential function" 小節首兩段</p>
+<div class="content"><span class="envlabel">改寫前</span>
+We close with a function of a different stripe: the natural exponential \(e^{x}\). <del>Recall that it is defined by the power series</del> \(\;e^{x} = 1 + x + \cdots\;\) <del>a definition we take as given here; …</del>
+<span class="envlabel" style="margin-top:.6rem">改寫後</span>
+We close with a function of a different stripe: the natural exponential \(e^{x}\). <ins>You may have met \(e^{x}\) in precalculus as an exponential function with the special base \(e \approx 2.718\); in this text its official definition is a formula of a kind we have not used before — an <em>infinite sum</em>, called a power series:</ins>
+\[ e^{x} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots + \frac{x^{n}}{n!} + \cdots. \]
+<ins>Read the infinite sum the way the notation suggests: adding more and more terms produces ever-better approximations, and \(e^{x}\) is the value the running totals settle toward. For \(x = 1\), the totals are \(1,\ 2,\ 2.5,\ 2.66\ldots,\) closing in on \(e \approx 2.71828\). Making “settle toward” precise is a limit question, and we take the answer as given here:</ins> the convergence of this series and the careful construction of \(e^{x}\) are developed in Chapter 4 (§4.1–§4.2). …</div>
+<p class="why">「Recall」回指一個不存在的先前段落（grep 證實 series 在 ch01 全六節零命中）；模擬讀者「懷疑自己漏讀了哪一章、來回讀三次」。改寫接上高中已知（指數函數＋特殊底），無窮和用部分和數值（\(1, 2, 2.5, 2.66\ldots \to 2.71828\)）給直觀。既有的 Ch4 fence 原樣保留。</p>
+<p class="src">évidence：深讀評估＋模擬閱讀（§2.4）一致；兩位懷疑者核實 holds。</p></div>
+
+<div class="card gls"><span class="id">C2-c</span><span class="badge b-gls">gloss</span><b>§2.4 — \(x^{n}-a^{n}\) 因式分解補驗證提示</b>
+<p class="loc"><code>fragments/ch02/sec-2-4.html</code>　power rule 第一證明（factorization）</p>
+<div class="content"><ins>(To verify the factorization, multiply out the right-hand side: all the cross terms cancel in pairs, leaving only \(x^{n} - a^{n}\). The case \(n = 2\) is the familiar difference of squares \((x - a)(x + a)\).)</ins></div>
+<p class="why">一般次分解式高中未必教過；一句「乘開驗證＋n=2 特例」讓讀者能自行閉合。</p>
+<p class="src">évidence：深讀評估 §2.4 prerequisite gap。</p></div>
+
+<div class="card fix"><span class="id">C2-d</span><span class="badge b-fix">regression fix</span><b>§2.4 — 保留句補 bound 成立條件（Codex 第一輪 blocking ①）</b>
+<p class="loc"><code>fragments/ch02/sec-2-4.html</code>　同段末句</p>
+<div class="content">…justifying it with the explicit bound \(\lvert (e^{h} - 1)/h - 1 \rvert \le \lvert h \rvert\) <ins>for \(0 &lt; \lvert h \rvert &lt; \tfrac{1}{2}\)</ins>.</div>
+<p class="why">此句為改寫段保留的既有句；Codex 指出 bound 只在 \(0&lt;\lvert h\rvert&lt;\tfrac12\) 成立（§4.3 Proposition 4.2 原文如此陳述，Ch4 chapter summary 亦帶條件）。已對照 <code>sec-4-3.html</code> Proposition 4.2 補上一致的條件。</p>
+<p class="src">évidence：Codex 回歸第一輪 blocking；條件對照 §4.3 Proposition 4.2（"For every nonzero \(h\) with \(\lvert h \rvert &lt; \tfrac{1}{2}\)"）。</p></div>
+
+<h2>Chapter 3</h2>
+
+<div class="card gls"><span class="id">C3-a</span><span class="badge b-gls">gloss</span><b>§3.1 — 和差化積（sin 版）補角和公式推導</b>
+<p class="loc"><code>fragments/ch03/sec-3-1.html</code>　"The difference quotient for sine" 首段（首次調用處）</p>
+<div class="content">The decisive algebraic step is the sum-to-product identity \(\sin A - \sin B = 2 \cos\frac{A + B}{2} \sin\frac{A - B}{2}\). <ins>If this identity is not at your fingertips, it is the angle-sum formulas in disguise: set \(u = \frac{A + B}{2}\) and \(v = \frac{A - B}{2}\), so that \(A = u + v\) and \(B = u - v\); expanding \(\sin(u + v) - \sin(u - v)\) by the angle-sum formulas cancels the \(\sin u \cos v\) terms and leaves exactly \(2 \cos u \sin v\).</ins> Applied with \(A = x + h\) and \(B = x\): …</div>
+<p class="why">和差化積三度作為 "decisive algebraic step" 承重（sin 導數、連續性、cos 導數），全書零推導零出處，108 課綱多已不教——開場即卡風險。從讀者必有的角和公式一行推出。</p>
+<p class="src">évidence：深讀評估＋模擬閱讀＋兩位懷疑者 holds＋Codex 同意；優先序 2。</p></div>
+
+<div class="card gls"><span class="id">C3-b</span><span class="badge b-gls">gloss</span><b>§3.1 — companion identity（cos 版）補同法一句</b>
+<p class="loc"><code>fragments/ch03/sec-3-1.html</code>　Theorem 3.2 前導句</p>
+<div class="content">…this time through the companion identity \(\cos A - \cos B = -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}\) <ins>— obtained just like the sine version, by expanding \(\cos(u + v) - \cos(u - v)\) with the angle-sum formulas</ins>.</div>
+<p class="why">cos 版在 sin 版推導建立後一句帶過即可閉合，不重複展開。</p>
+<p class="src">évidence：同 C3-a（第三處承重點；連續性證明處的兩條由 C3-a 的推導覆蓋）。</p></div>
+
+<div class="card nav"><span class="id">C3-c</span><span class="badge b-nav">navigation</span><b>§3.2 — 證明塊前加明確 skip 授權</b>
+<p class="loc"><code>fragments/ch03/sec-3-2.html</code>　"Why the rule is true" 橋接段</p>
+<div class="content">The rule is already usable — the rest of this section earns it. <ins>On a first reading you may jump straight to the subsection “Using the rule” below and return to this proof later; none of the examples depend on it.</ins> To prove that the two slopes really do multiply, …</div>
+<p class="why">證明塊（81 行，含 ε-δ 雙層量詞與退化分案）橫在 Strategy 3.1 與第一個例題之間；模擬讀者實測在 case split 卡住、自行決定跳過後全節順讀——證明了「缺的只是一句授權」。原文只有暗示（"the rest earns it"），未明說可跳。</p>
+<p class="src">évidence：模擬閱讀（§3.2）blocking @ case split；綜合報告衝突裁決二（難度 intrinsic、位置 presentation）；兩位懷疑者 holds。</p></div>
+
+<h2>Chapter 4</h2>
+
+<div class="card nav"><span class="id">C4-a</span><span class="badge b-nav">navigation</span><b>§4.2 — 節首難度 signpost＋初讀導航</b>
+<p class="loc"><code>fragments/ch04/sec-4-2.html</code>　節首段後新增一段</p>
+<div class="content">A word about the terrain before we set out. This is the steepest section of the book so far: it builds convergence machinery — Cauchy sequences and the Bolzano–Weierstrass theorem — that is usually first met in a dedicated analysis course, and it is all proofs, with no worked examples. What the rest of the book actually uses are the headline facts: <ins>the definition of \(e^{x}\) extended to all of \(\mathbb{R}\), continuity (Theorem 4.6), the exponent law (Theorem 4.7), and positivity (Corollary 4.1)</ins>. So on a first reading it is perfectly legitimate to read each statement carefully, skim its proof for the shape of the argument, and return for a full pass once the rest of the chapter has shown you what this machinery buys.</div>
+<p class="why">§4.2 是全書難度尖峰（4.5/5，Analysis I 素材），原文零預警零導航。Codex 第二意見特別把此項優先序調高：「對大一新生，不必降低主線嚴謹性，但要給『哪些 proof 可先略讀、哪些結果必用』的導航」。<b>回歸修正（Codex 第一輪 blocking ②）</b>：初稿寫「together with the two-sided tail bound \((**)\), which §4.3 reuses」——§4.3 實際未引用 \((**)\) 標籤（依賴的是全 \(\mathbb{R}\) 級數定義），已改為上列 ins 部分的四事實清單。</p>
+<p class="src">évidence：深讀評估 audience_fit（§4.2 貼近下限讀者能力上緣）＋Codex 第二意見；回歸第一輪 blocking ② 已修。</p></div>
+
+<div class="card gls"><span class="id">C4-b</span><span class="badge b-gls">gloss</span><b>§4.2 — Theorem 4.3 證明內重述 \((*)\)</b>
+<p class="loc"><code>fragments/ch04/sec-4-2.html</code>　Theorem 4.3 證明首句</p>
+<div class="content">…so we may take \(L = x_{0} + 1\) in the tail bound \((*)\) <ins>of §4.1 — recall what it says: \(0 \le e^{x} - P_{k}(x) \le \dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\) for every \(x\) in \((0, L)\), provided \(k &gt; n_{0} &gt; 2L\)</ins>. Choose integers \(k &gt; n_{0} &gt; 2(x_{0} + 1)\) large enough that …</div>
+<p class="why">模擬讀者：「開頭直接引用從未重述的 \((*)\) 並指定 \(k &gt; n_0 &gt; 2(x_0+1)\)，我得翻回 §4.1 解碼」。就地重述（與 §4.1 原式逐字核對過），\(2(x_0+1)=2L\) 的來歷同時透明化。評估清單原列「§4.1 (*) 推導展開兩行」；經查 §4.1 的推導本身已完整（逐步交代），真正痛點在引用端，故改修此處、§4.1 不動。</p>
+<p class="src">évidence：模擬閱讀（§4.2）slowdown；\((*)\) 原式對照 <code>sec-4-1.html</code>。</p></div>
+
+<div class="card gls"><span class="id">C4-c</span><span class="badge b-gls">gloss</span><b>§4.2 — 「&lt;3ε 即可」慣例首次出現補註解</b>
+<p class="loc"><code>fragments/ch04/sec-4-2.html</code>　Theorem 4.3 證明收尾</p>
+<div class="content"><ins>(A bound of \(3\varepsilon\) for every \(\varepsilon &gt; 0\) is exactly as good as a bound of \(\varepsilon\): to land on \(\varepsilon\) itself, run the same argument with \(\varepsilon/3\) in its place. This convention — collect a fixed number of \(\varepsilon\)-sized errors and do not fuss over the constant — recurs in the proofs below.)</ins> Since \(\varepsilon &gt; 0\) was arbitrary, …</div>
+<p class="why">模擬讀者：「與 ch01 訓練出的『必須恰好收在 &lt;ε』直覺衝突，一度以為證明壞了」。全書首例（§1.6 的 \(2\varepsilon=|L-M|\) 是反證法取特定 ε 的另一手法），Theorem 4.6 再用一次，註明「recurs below」一次講清。</p>
+<p class="src">évidence：模擬閱讀（§4.2）＋深讀評估；懷疑者一核實「全書首例」屬實。</p></div>
+
+<div class="card fix"><span class="id">C4-d</span><span class="badge b-fix">definition</span><b>§4.2 — subsequence＋雙下標記法先定義再使用</b>
+<p class="loc"><code>fragments/ch04/sec-4-2.html</code>　Theorem 4.4（Bolzano–Weierstrass）前</p>
+<div class="content">The theorem below speaks of a <em>subsequence</em>: the sequence that remains when we keep only some of the terms of \(\{a_{n}\}\), in their original order. Formally, choose infinitely many indices \(n_{1} &lt; n_{2} &lt; n_{3} &lt; \cdots\); the subsequence is \(\{a_{n_{j}}\}_{j = 1}^{\infty}\), and the double subscript simply reads “the term of the original sequence sitting at position \(n_{j}\).” For instance, keeping the even-indexed terms of \(a_{n} = (-1)^{n}\) gives the constant subsequence \(a_{2j} = 1\), which converges even though the original sequence does not — exactly the phenomenon the theorem trades on.</div>
+<p class="why">subsequence 全書僅此節使用（grep 8 次命中全在本檔）、雙下標 \(a_{n_j}\)／\(a_{p_j}\) 未解釋就在 B–W 與 Cauchy 證明登場。\((-1)^n\) 例同時預示 B–W 的內容（發散序列仍有收斂子序列）。</p>
+<p class="src">évidence：深讀評估三缺口之一；模擬閱讀獨立證實；兩位懷疑者 holds（grep 佐證）。</p></div>
+
+<div class="card gls"><span class="id">C4-e</span><span class="badge b-gls">example</span><b>§4.2 — 指數律 Step 2 補 \(k=2\) 具體展開</b>
+<p class="loc"><code>fragments/ch04/sec-4-2.html</code>　Theorem 4.7 證明 Step 2 之後</p>
+<div class="content">To see the split concretely, take \(k = 2\): multiplying out \(P_{2}(x)\,P_{2}(y) = \bigl(1 + x + \tfrac{x^{2}}{2}\bigr)\bigl(1 + y + \tfrac{y^{2}}{2}\bigr)\) gives nine terms. Sorted by total degree, the degrees \(\ell \le 2\) assemble exactly \(1 + (x + y) + \tfrac{(x + y)^{2}}{2} = P_{2}(x + y)\) — that is group (I) — while the leftovers \(\tfrac{x^{2} y}{2} + \tfrac{x y^{2}}{2} + \tfrac{x^{2} y^{2}}{4}\) form group (II). Notice that (II)’s degree-\(3\) layer is incomplete — \(x^{3}\) and \(y^{3}\) are absent, since neither factor carries a power beyond \(2\) — which is why (II) can only be <em>bounded</em> by a tail in Step 4, not collapsed by the binomial theorem.</div>
+<p class="why">「雙重和按總次數重排」是六步證明最抽象的一步（模擬讀者在此「紙上畫格子點」自救）；\(k=2\) 九項小例讓 (I)/(II) 的分組與「(II) 不完整、只能 bound 不能 collapse」都變得可見。展開已逐項驗算（\(\ell\le2\) 六項合成 \(P_2(x+y)\)；leftovers 三項如列）。</p>
+<p class="src">évidence：深讀評估（Step 2 無小例）＋模擬閱讀獨立證實。</p></div>
+
+<div class="card fix"><span class="id">C4-f</span><span class="badge b-fix">math fix</span><b>§4.2 — Step 6 量詞收尾改寫（真簿記錯誤）</b>
+<p class="loc"><code>fragments/ch04/sec-4-2.html</code>　Theorem 4.7 證明 Step 6</p>
+<div class="content"><span class="envlabel">改寫前</span>
+<del>Step 6: let \(k \to \infty\), then \(L \to \infty\).</del> … Therefore …, i.e. \(e^{x} e^{y} = e^{x + y}\), <del>for all \(x, y\) with \(\lvert x \rvert, \lvert y \rvert \le L\). Since \(L\) was arbitrary,</del> the identity holds for all \(x, y \in \mathbb{R}\).
+<span class="envlabel" style="margin-top:.6rem">改寫後</span>
+<ins>Step 6: let \(k \to \infty\).</ins> … Therefore …, i.e. \(e^{x} e^{y} = e^{x + y}\), <ins>for the pair \(x, y\) fixed at the outset. Since \(x\) and \(y\) were arbitrary,</ins> the identity holds for all \(x, y \in \mathbb{R}\).</div>
+<p class="why">證明開場是「Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x\rvert,\lvert y\rvert \le L\)」——\(L\) 是為固定的 \(x, y\) 挑的，收尾卻寫「Since \(L\) was arbitrary」，量詞角色與自己的開場相反。最小修法：收尾改回「\(x, y\) was arbitrary」，步驟標題的「then \(L \to \infty\)」一併移除（修正後不存在 \(L\to\infty\) 這一步）。數學內容不變，只修簿記。</p>
+<p class="src">évidence：深讀評估發現；模擬閱讀、兩位懷疑者、Codex 第二意見四路一致；回歸第一輪抽驗 pass。</p></div>
+
+<div class="card gls"><span class="id">C4-g</span><span class="badge b-gls">gloss</span><b>§4.5 — 序列見證步驟補 §1.6 否定論證</b>
+<p class="loc"><code>fragments/ch04/sec-4-5.html</code>　Theorem 4.13（ln 連續）證明</p>
+<div class="content">…there is a number \(\delta &gt; 0\) and points \(y_{j} \to x_{0}\) (all in \((0, \infty)\)) with \(\lvert \ln y_{j} - \ln x_{0} \rvert \ge \delta\) for every \(j\). <ins>(To see why failure is witnessed this way, negate the limit statement of §1.6: if \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) fails, there is some tolerance \(\delta &gt; 0\) that no input-closeness requirement can meet — for every \(d &gt; 0\), some point \(y\) with \(0 &lt; \lvert y - x_{0} \rvert &lt; d\) has \(\lvert \ln y - \ln x_{0} \rvert \ge \delta\). Picking one such point \(y_{j}\) for each \(d = \tfrac{1}{j}\) produces the sequence, and for small \(d\) these points stay inside \((0, \infty)\).)</ins></div>
+<p class="why">「不連續 ⇒ 存在序列見證」用到未建立的 sequential criterion 否定式，是「全章最真實的『假設了未給的東西』」；模擬讀者只能「信仰式放行」。補的兩行把它化約回讀者已有的 §1.6 ε-δ 否定，並交代 \(d=1/j\) 的取點來源。</p>
+<p class="src">évidence：深讀評估＋模擬閱讀（§4.5）一致；綜合報告優先序 7。</p></div>
+
+<div class="card cln"><span class="id">C4-h</span><span class="badge b-cln">cleanup</span><b>§4.5 — 移除懸空的 \(\tag{\ast}\)</b>
+<p class="loc"><code>fragments/ch04/sec-4-5.html</code>　Theorem 4.14 證明末的 \((\ln x)' = 1/x\) display</p>
+<div class="content">\[ \frac{d}{dx}\ln x = \lim_{h \to 0} \frac{\ln(x + h) - \ln x}{h} = \frac{1}{x}. \; <del>\tag{\(\ast\)}</del> \]</div>
+<p class="why">此 tag 全檔（含全書）僅出現這一次、從未被引用——懸空標籤會讓讀者以為後面有回指。內容與 Theorem 4.14 陳述重複，移除無資訊損失。</p>
+<p class="src">évidence：綜合報告零散項；grep 全 19 fragment 佐證無引用。</p></div>
+
+<h2>第二輪：Reading-track 標示（重排提案的仲裁結果實作）</h2>
+
+<div class="summary">
+<b>提案與仲裁：</b>作者提議把前四章重排成「主線教材＋Proof Track 附錄」六章制（Ch1 移出 inverse trig、Ch3 倒序 chain-rule-first、Ch4 拆使用版＋附錄）。兩輪 Codex 仲裁（A–G 七項逐項、事實進 repo 驗證、刻意替作者方辯護）結論：<b>保骨架、不拆章、不倒序</b>——「主線／補債分離」已是現行架構（§2.4/§3.3 on credit、Ch4 還債），採<b>標示層</b>實現分軌。Ch3 倒序駁回（Stewart 3.3→3.4、Thomas 3.5→3.6、Rogawski 3.6→3.7 全為三角在前；§3.2 例題依賴 §3.1）；Ch4 拆章駁回（使用版已存在、重複＋重編號＋閘重跑成本）；§1.2 後移 deferred（記入 CONTENT_ROADMAP Ch1 open questions）；applications 擴充記入 Ch4 open questions（§4.5 已有 growth/decay/half-life capstone）。<br>
+<b>回歸審核（Codex read-only）：<span class="pass">7/7 PASS → 通過</span></b>（含每句「後文依賴」主張的事實查核：ch02 零 ε-δ、(*) 位置與 §4.2 引用、§4.4 證明梯順序、Thm 4.14 只用 4.13 陳述、box bound 與 §4.3 一致；語氣貼本書、與既有 skip/signpost 分工不打架）。
+</div>
+
+<table>
+<tr><th>#</th><th>落點</th><th>新增</th></tr>
+<tr><td>R1</td><td><code>ch01/sec-1-6.html</code> 節首</td><td><em>First reading</em> 段：ε-δ 為嚴格化層；Ch2 只用 limit laws（grep 驗證零 ε-δ）；第一個需要處＝§3.2 證明</td></tr>
+<tr><td>R2</td><td><code>ch04/sec-4-1.html</code> opener</td><td>章級路線圖：明標 foundation chapter＋carry-forward 四事實＋初讀路徑（"take the statements, work the examples of §4.4–§4.5, and come back later to watch the debt being paid in full"）</td></tr>
+<tr><td>R3</td><td><code>ch04/sec-4-1.html</code> Theorem 4.2 證明前</td><td><em>Proof track</em>：後文用收斂事實＋證明後記錄的尾項 bound \((*)\)</td></tr>
+<tr><td>R4</td><td><code>ch04/sec-4-4.html</code> Theorem 4.10 證明前</td><td><em>Proof track</em> 一則涵蓋 Theorem A → Rolle → MVT 三連證明梯；導向 Strategy 4.2 與例題</td></tr>
+<tr><td>R5</td><td><code>ch04/sec-4-5.html</code> Theorem 4.13 證明前</td><td><em>Proof track</em>：後文只用 ln 連續性的陳述（Theorem 4.14）</td></tr>
+<tr><td>R6</td><td><code>ch02/sec-2-4.html</code> e^x 級數段</td><td>credit fence 升級為<b>不編號 Caution box</b>（"Everything about \(e^{x}\) in this section is on credit…"，含 §4.3 bound 與條件；作者要求的醒目化）</td></tr>
+<tr><td>R7</td><td><code>handout/TYPESETTING_GUIDE.md</code> §10、<code>CONTENT_ROADMAP.md</code></td><td>reading-track 慣例入版控（措辭型、落點、寧缺勿濫原則、現行清單）；Ch1 記 §1.2 後移 deferred、Ch4 記 applications 擴充 recorded</td></tr>
+</table>
+<p style="font-size:.85rem;color:#667085">掛標原則（TYPESETTING_GUIDE §10）：主線預設隱形、只標非主線；已有 skip/signpost 的單元（§3.2、§4.2）不重貼；Ch2 全章、§3.1/§3.3、§4.3 不掛。不做 badge、不做雙目錄、不改 build.py。</p>
+
+<h2>第三輪：P1 先備基線入 spec ＋ P3 修補效果複驗</h2>
+
+<div class="summary">
+<b>P3 複驗（三份盲測模擬閱讀，同一 persona 重讀修補後的 §1.2／§2.4／§4.2）：<span class="pass">修補全部生效、零 blocking</span>。</b>
+§1.2 由 effortful＋blocking 升到 <b>ok</b>（「若沒有這段〔倒數定義橋〕，1.12(b) 的 sec 對我就是無處可查的硬卡死」）；§2.4 不再懷疑漏讀前章（原本來回讀三次）、Caution box 被評「非常有用」；§4.2 signpost 有實際行為影響、(*) 重述後「全程沒翻回 §4.1」、3ε 括號「完全沒停」、k=2 段「沒有那段我覺得這裡會直接卡死」。<br>
+<b>P1（與使用者問答議定四裁決）：</b>基線＝108 課綱數A（不含選修數甲）；難度定位＝雙軸（深度軸允許分析式誠實構造、語域軸維持 Stewart 由深入淺）；和差角／倍角／疊合／單位圓＝A 類可假設；無窮等比級數＝B 類不可假設。成文為 <code>CONTENT_SPEC.md</code> <b>§16「難度定位與先備知識基線」</b>（A/B/C 三類清單＋附錄收納政策＋新章深度決策程序；Changelog 順延 §17、版本 bump v3.3）。使用者另裁示：值得完整鋪開的 B 類集中到 <b>precalculus 附錄</b>——提案塊已立於 <code>CONTENT_ROADMAP.md</code>（Appendix A 獨立編號、不動既有章節；候選：三角恆等式工具箱、倒數三角、無窮等比級數；<b>立項待裁決</b>）。<br>
+<b>回歸審核（Codex read-only）：<span class="pass">7/7 PASS → 通過</span></b>（含等比推導代數、n_j 雙條件論證、尾項＝全和−部分和、spec B 類逐項抽查「四章首次使用處皆有就地 bridge」、無舊 §16 殘留參照）。
+</div>
+
+<table>
+<tr><th>#</th><th>落點</th><th>修補（P3 發現＋P1 裁決的後續）</th></tr>
+<tr><td>F1</td><td><code>ch04/sec-4-1.html</code> Strategy 4.1 step 3</td><td>無窮等比級數補完整推導（有限和 \(\frac{r(1-r^{m})}{1-r}\)＋telescoping 驗證＋\(r^{m}\to 0\)）——Q4 裁決 B 類的直接落地</td></tr>
+<tr><td>F2</td><td><code>ch02/sec-2-4.html</code> e^x 引入句</td><td>「You may have met \(e^{x}\) in precalculus…」改為「The base \(e \approx 2.718\) may or may not have appeared… — nothing here assumes it did」（e 已裁定 B 類，原句造成 108 讀者一瞬自我懷疑）</td></tr>
+<tr><td>F3</td><td><code>ch02/sec-2-4.html</code> Caution box 首句</td><td>「on credit」慣用語補 gloss「— borrowed now, to be repaid in Chapter 4」（非母語讀者首句空轉）</td></tr>
+<tr><td>F4</td><td><code>ch04/sec-4-2.html</code> Cauchy 證明</td><td>「choose an index \(n_{j} \ge N_{0}\)…」補「both demands can be met at once…」（模擬讀者停一分鐘自行補的空隙）</td></tr>
+<tr><td>F5</td><td><code>ch04/sec-4-2.html</code> Prop 4.1 證明</td><td>「尾項 &lt; ε」補「the tail is the gap between the full sum and the \(N_{0}\)-th partial sum…」（被當已知的一步）</td></tr>
+</table>
+<p style="font-size:.85rem;color:#667085">P3 殘餘未動：§1.2 的 arccsc/arcsec/arccot 小節無圖（模擬讀者無法自行驗證分支一對一，slowdown 級）→ 記為 figure-opportunity 閘候選，下次跑該閘一併裁決；Strategy 1.2 抽象步驟先於例題（先霧後亮）→ 標準教學型態，非 finding。</p>
+
+<h2>查證後不動的項目（non-actions）</h2>
+<table>
+<tr><th>評估清單項</th><th>查證結果</th><th>處置</th></tr>
+<tr><td>§4.1 \((*)\) 推導展開兩行</td><td>§4.1 的推導（<code>sec-4-1.html</code> tail-bound 段）已逐步完整；實測痛點在 §4.2 引用端</td><td>改做 C4-b（引用處重述），§4.1 不動</td></tr>
+<tr><td>§4.4 MVT 在 chapter summary 顯眼化</td><td>Ch4 summary 已有獨立 strand「Existence theorems for differentiation」完整陳述 Theorem A→Rolle→MVT（§4.4）</td><td>已足，不動；index 一項留待全書 index 建立時處理</td></tr>
+<tr><td>（審核途中疑似）summary <code>&lt;\strong&gt;</code> 壞標籤</td><td>讀原檔逐字核對為正常 <code>&lt;/strong&gt;</code>——grep 顯示層的轉義假象</td><td>誤報，不動</td></tr>
+<tr><td>§3.3 節層級一拆為二</td><td>結構性變更（重編號），評估報告即列為中低優先「待下次實質修訂順帶做」</td><td>本輪不做，維持評估建議</td></tr>
+<tr><td>ROADMAP「MVT placement」open question 結案</td><td>屬專案決策文檔變更，未在使用者核可清單內</td><td>建議使用者於 CONTENT_ROADMAP.md 正式結案為「MVT 定居 Ch4」</td></tr>
+</table>
+
+<h2>驗證紀錄</h2>
+<p style="font-size:.9rem">
+① 20 筆修改全數套用後 <code>python handout/build.py</code> 重組四章 print-standalone：<span class="pass">通過</span>（兩次：初次套用後、回歸修正後）。<br>
+② Codex read-only 回歸第一輪（全 diff 逐 hunk＋數學逐條驗算）：<span class="fail">FAIL（2 blocking）</span>→ 兩處均已修正（C2-d、C4-a）；其餘全部抽驗項 pass、無語義漂移、無風格 finding。<br>
+③ Codex read-only 回歸第二輪（僅驗兩處修正）：<span class="pass">2/2 PASS → 通過</span><br>
+④ Reading-track 輪（7 筆標示層新增）套用後 <code>python handout/build.py</code>：<span class="pass">通過</span>；Codex read-only 回歸：<span class="pass">7/7 PASS → 通過</span>。<br>
+⑤ 第三輪（P3 複驗三模擬＋5 筆後續修＋spec §16／ROADMAP 附錄提案）：build <span class="pass">通過</span>；Codex read-only 回歸 <span class="pass">7/7 PASS → 通過</span>。<br>
+⑥ 三輪均未 commit（目前分支為 video 線 <code>video/template-redesign-navy-spine</code>，且使用者未指示 commit）；建議另開 handout 分支收錄。
+</p>
+
+</body>
+</html>
