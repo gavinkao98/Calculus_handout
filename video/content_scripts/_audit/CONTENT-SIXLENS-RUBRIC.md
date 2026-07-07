@@ -1,6 +1,6 @@
 # 內容稿六鏡稽核 — 維度與收斂線（CONTENT-SIXLENS-RUBRIC）
 
-> 本檔是「Mode A 內容稿六鏡稽核（six-lens content audit）」的契約與**單一真相來源**。六鏡在**撰稿 DRAFT 階段**跑（內容稿成形、鎖稿前），是產線**最前面**的判斷閘。維度／收斂線**只在這裡改一次**。
+> 本檔是「Stage-1 內容稿六鏡稽核（six-lens content audit）」的契約與**單一真相來源**。六鏡在**撰稿 DRAFT 階段**跑（內容稿成形、鎖稿前），是產線**最前面**的判斷閘。維度／收斂線**只在這裡改一次**。
 >
 > **被審物：** 一節的內容稿 [`content_scripts/<deck>.md`](.)（純內容中間產物：`id`／`source`／`learning_goal`／`kind`／`narration`／`visual_need`／`animation_cue`）＋ 其權威來源講義 fragment。**規範權威**見 [`../../CONTENT_METHODOLOGY.md`](../../CONTENT_METHODOLOGY.md)（§1 核心理念與硬規則、§2 scope、§3 拆解、§4 narration/register、§5 視覺、§7 品質檢核）；本檔只定「審哪六鏡、哪些擋稿、哪些不算 finding、怎麼回報、怎麼跑」，**不重述**方法論。
 >

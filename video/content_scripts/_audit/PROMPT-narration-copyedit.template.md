@@ -1,7 +1,7 @@
 <!--
 Narration COPYEDIT prompt TEMPLATE (散文潤稿; reusable across sections).
 
-WHAT THIS IS: a Mode A-side prose-quality pass on the narration SOURCE, run
+WHAT THIS IS: a Stage-1 (DRAFT-side) prose-quality pass on the narration SOURCE, run
 BEFORE the source is locked and derived into the HTML + spoken versions. It MAY
 propose edits to the source wording. Dimensions / guardrail / non-findings /
 output format live in NARRATION-COPYEDIT-RUBRIC.md (single source of truth); this

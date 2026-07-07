@@ -6,11 +6,11 @@
 
 ## 審查對象與邊界（與 NFA 的分工）
 
-潤稿是 **Mode A 側**對 narration **source** 的散文品質 pass，在 source **鎖稿並 derive 成 HTML／口語版之前**跑。**這是 copyedit（*怎麼說*），不是內容審查（*教什麼*），也不是忠實稽核。**
+潤稿是 **Stage-1（DRAFT）側**對 narration **source** 的散文品質 pass，在 source **鎖稿並 derive 成 HTML／口語版之前**跑。**這是 copyedit（*怎麼說*），不是內容審查（*教什麼*），也不是忠實稽核。**
 
 - **可以**提議改 source 措辭（收緊、去重、順耳）。
 - **時機關鍵：** 冗餘／贅字一旦進了認可 source 就改不動了——鎖稿後的忠實性 NFA（[`NARRATION-FAITHFULNESS-RUBRIC.md`](NARRATION-FAITHFULNESS-RUBRIC.md)）明令不 re-litigate 已認可內容、且 D2 要求口語版逐字照 source，去重會被當成 D2 違規。**所以冗餘只能在這個鎖稿前的 pass 攔下。** 分工：潤稿管 *how*（鎖稿前、可改 source），NFA 管 *faithful＋數學正確*（鎖稿後、不改 source）。
-- **不要**拿本 pass 去重開已鎖稿、已認可的 source；那正是 NFA 禁止的。（已鎖稿 source 若仍須動，由使用者明確授權為一次 Mode A 編修，不走本 pass；若改到已合成 beat 要重 derive ＋重 TTS，計費。）
+- **不要**拿本 pass 去重開已鎖稿、已認可的 source；那正是 NFA 禁止的。（已鎖稿 source 若仍須動，由使用者明確授權為一次 Stage-1 源稿編修，不走本 pass；若改到已合成 beat 要重 derive ＋重 TTS，計費。）
 
 ## 唯一硬護欄（先讀這條）
 
