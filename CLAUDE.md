@@ -10,7 +10,7 @@
 | Manim 影片 | `video/` | 旁白＋動畫＋TTS；`make.py` 建置（詳見 [`video/README.md`](video/README.md)） |
 | 舊 LaTeX 講義 | `legacy/tex_handout/` | 已凍結，僅供參照 |
 
-> **講義「完成一章的完整閘序」**（Mode A 六階 → Mode B → Mode C ①補題目＋②軟深度 → 圖機會/正確性 → 數學 M1–M8 → S·A·V，含各閘 subagent／rubric／雙閘／Codex 調用紀律／「做完＝與 Ch1/Ch2 同級」定義）見權威總覽 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
+> **講義「完成一章的完整閘序」**見權威總覽 [`handout/PIPELINE.md`](handout/PIPELINE.md)（手稿章 Ch1–4 的 gate 0–8 既成；Ch5 起無手稿 canon 章採 **5-milestone 閘序**＋gate-2 風險分層；含各閘 subagent／rubric／Codex 調用紀律／「做完一章」定義與各章狀態 dashboard）。撰稿模式（Mode A/B/C、手稿與 canon 兩變體）見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md)。
 
 ## 常用指令速查
 
@@ -34,7 +34,7 @@ tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
 
 ## 付費 API 調用須先經同意
 
-- **每次調用任何計費的外部 API（如 Gemini TTS、Gemini 文字／影像生成等）之前，都必須先取得使用者明確同意，不可自行調用。** 批次合成（例如整節旁白 TTS、整章重跑）一律先說明：這次要調用什麼模型、預估用量（beat 數／音訊秒數）與成本，經同意後才執行。
+- **每次調用任何計費／外部的生成式 API（如 MiMo TTS 批次合成、MiMo-V2.5 VLM 批改、Gemini 文字／影像生成等）之前，都必須先取得使用者明確同意，不可自行調用**（公測免費者仍屬外部 API，同樣先報量徵同意）。批次合成（例如整節旁白 TTS、整章重跑）一律先說明：這次要調用什麼模型、預估用量（場數／beat 數／音訊秒數）與成本，經同意後才執行。
 - 不計費、不連網的離線路徑不在此限，可逕行執行——例如 `tts.py --backend mock`（寫靜音 WAV 驗 manifest／時序）、本地 Manim render、ffmpeg mux/concat。
 - 取得一次同意即代表該次明確說明的工作範圍獲准；範圍變更（換模型、加場景、重跑）需重新徵得同意。
 - **〔2026-07-01 使用者授權〕Codex 唯讀調用（review／覆核／詢問意見／second-opinion）有 standing consent，直接逕行、不逐次徵詢；並盡量用 Codex 取代「停下來問使用者意見」、減少打擾。** 範圍＝**`codex exec -s read-only`**（計畫／code／doc 對抗式 review、徵第二意見，唯讀不改檔；模型走 `~/.codex/config.toml` 預設 gpt-5.5／xhigh）。**工作風格（使用者要求「盡量不要一直打擾我」）：** 自主推進、需要審核或第二意見時調 Codex 而非 ping 使用者；僅在 (i) 真正不可逆／對外動作、(ii) 計費生成（見下）、(iii) Codex＋自身判斷仍無法解的真兩難、(iv) 流程明定須使用者裁決的 deliverable（如交付物 sign-off）時才停下。**此授權僅及 Codex read-only 與「以 Codex 代替詢問」**；真 TTS、高解析渲染、Gemini 文字／影像生成等計費 API **仍須**先報價徵同意（不在此授權內）。
@@ -57,7 +57,7 @@ tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
 
 - **與使用者對話一律用繁體中文**（LaTeX／程式碼、套件名、檔名、技術術語保持英文原樣）。
 - **做 doc／code review 時分清四級，不要混為一談：** ① 真衝突／違反既定規則（要修）② discoverability gap（補文件即可，非矛盾）③ editorial drift 風險（低優先，不是 finding）④ 非 finding（如示例覆蓋面差異）。**Framing：** 從「目前被 review 的樹的現況」出發，不要把 session 內未 commit／未 merge 的變更當既成事實；語義等價的用詞差異不算 inconsistency。Over-reporting 會稀釋真正高優先項。
-- **三-mode 撰寫流程（root [`README.md`](README.md) §Mode B）下，Mode B 的稽核裁決與發現寫進該次修正 commit 的 message body**（subject ≤70 字、body 逐條：原本是什麼、為何不妥、改了什麼、引用證據），好讓未來對話用 `git log --grep="Mode B"` 撈回。參考 commit：`112aa5c`、`0ef06ee`。純 Mode A 或例行 bugfix 不適用。
+- **三-mode 撰寫流程（[`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §Mode B）下，Mode B 的稽核裁決與發現寫進該次修正 commit 的 message body**（subject ≤70 字、body 逐條：原本是什麼、為何不妥、改了什麼、引用證據），好讓未來對話用 `git log --grep="Mode B"` 撈回。參考 commit：`112aa5c`、`0ef06ee`。純 Mode A 或例行 bugfix 不適用。
   - **commit-grep 分流（2026-06-15）：** 上述 `Mode B` 是**講義**線。**video 旁白的忠實稽核已改名 NFA**（旁白忠實稽核，原 video「Mode B」；契約 [`video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)），其裁決同樣寫進修正 commit body，但用 `git log --grep="NFA"` 撈回（與講義 `Mode B` 分流，免兩條線混在同一 grep）。
 - **給使用者審核的交付物要用「打開就能讀」的形式（2026-06-12 使用者要求）：** 含數學式的審核文件**不要**交塞滿生 LaTeX 的 `.md`，改產出 standalone HTML（MathJax/KaTeX CDN，雙擊即開、數學即渲染）或其他可直接閱讀的形式。版控紀錄性質的文檔不在此限；凡「等使用者過目裁決」的東西一律照此辦理。
 - **每完成一輪撰寫後也要產 HTML 報告（2026-06-15 使用者要求）：** 不只「待裁決」的候選／findings 要 HTML——**凡完成一輪內容撰寫（Mode A／C 等），都要對實際寫入的內容另產一份 standalone HTML 報告**（MathJax/KaTeX CDN、雙擊即開、數學即渲染），逐條呈現所寫段落＋locus＋`[source:]`＋該輪 Mode B 結果，供使用者過目，不要只在對話裡給文字摘要。比照 [`handout/_audit/REVIEW-ch01-modec-candidates.html`](handout/_audit/REVIEW-ch01-modec-candidates.html) 的形式，檔名用 `REVIEW-…-applied.html` 之類，與「候選／裁決稿」分開。
@@ -65,7 +65,7 @@ tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
 
 ## 程式／工程任務的行為準則（Karpathy guidelines）
 
-源自 [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)（Andrej Karpathy 對 LLM 寫程式常見毛病的觀察）。**取捨：** 偏向謹慎優先於速度；瑣碎任務自行斟酌。**適用範圍以 `video/` 產線、build 工具、腳本等程式／工程工作為限；不適用於講義內容撰寫**——Mode A 散文密度仍以「prefer richness、標 `[source:]`、不自我審查」為準（見 [`video/CONTENT_METHODOLOGY.md`](video/CONTENT_METHODOLOGY.md)），下方第 2 條的「最少程式碼」指 code，不指內容篇幅。
+源自 [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)（Andrej Karpathy 對 LLM 寫程式常見毛病的觀察）。**取捨：** 偏向謹慎優先於速度；瑣碎任務自行斟酌。**適用範圍以 `video/` 產線、build 工具、腳本等程式／工程工作為限；不適用於講義內容撰寫**——Mode A 散文密度仍以「傾向更多擴充（帶標記）、標 `[source:]`、不自我審查」為準（見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §擴充密度的校準、§具名內容），下方第 2 條的「最少程式碼」指 code，不指內容篇幅。
 
 - **1. 想清楚再動手（Think Before Coding）——不要臆測、不要藏起困惑、把取捨攤開講。**
   - 明確說出假設；不確定就問，不要默默猜。

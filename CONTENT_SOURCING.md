@@ -1,17 +1,19 @@
 # 題源與選題流程（課文範例）
 
 服務對象：**講義課文內的 worked examples**（`example`＋`solution`，[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5；
-HTML 線為 `env-example`＋`env-solution`，見 [`handout/_dev-archive/general/CONTRACT-html-writing.md`](handout/_dev-archive/general/CONTRACT-html-writing.md)）。
+HTML 線為 `env-example`＋`env-solution`，見 [`handout/CONTRACT-html-writing.md`](handout/CONTRACT-html-writing.md)）。
 
 > **講義本體不收習題**（使用者 2026-06-12 定案，[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14）。
 > 習題將以**獨立的習題本**呈現，屆時另立規格、沿用本檔的題源與授權框架；
 > 舊的習題骨架（`CONTENT_EXERCISES.md`）與 Ch 1 習題候選文件可從 git 歷史取回（commit `7d6fde9` 前的樹）。
 
-## 流程（manuscript 優先 → 題庫補缺 → AI 備援）
+## 流程（spine 範例優先 → 題庫補缺 → AI 備援）
 
-範例從三個來源進入課文，按優先順序，每筆追蹤 provenance：
+範例從三個來源進入課文，按優先順序，每筆追蹤 provenance（撰稿變體定義見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md)）：
 
-1. **手稿範例——必要核心。** 教師手稿中的每個例子都出貨，經 Mode A 擴寫成正式 worked example。
+1. **Spine 範例——必要核心。**
+   - **手稿變體（Ch1–4）**：教師手稿中的每個例子都出貨，經 Mode A 擴寫成正式 worked example。
+   - **canon 變體（Ch5 起）**：例題在 Mode A brief 的「worked example 清單」就規劃齊（自撰或 canon 改寫，經 ⑤ Codex 審＋章末 sympy 重算把關）；Ch5 實績＝Ex 5.1–5.25 全數此途。
 2. **開放題庫——示範缺口填補。** 該節主要內容寫好之後：
    1. **缺口分析＋題庫選題**（Claude subagent [`example-supplement`](.claude/agents/example-supplement.md)，
       比照 Ch 1 實績一氣呵成）：讀整章 fragment，盤點教學點與 worked examples 的對應關係，

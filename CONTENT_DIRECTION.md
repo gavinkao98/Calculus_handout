@@ -1,13 +1,13 @@
 # 內容方向準則（Content Direction）—— 從手稿到一節的「方向層」
 
-> **本檔是 HTML 講義「每節內容方向」的權威流程文件。** 它在「老師掃描手稿 → 完整講義一節」之間補上一道**方向層**，讓「**這是不是我要的方向**」從不可檢核變可檢核。已在 ch01 §1.1–§1.2、§4.2、ch02 §2.1–§2.5、ch03 端到端跑過六階並收斂（committed）；逐節驗證紀錄存於 [`authoring/direction_layer/`](authoring/direction_layer/)（`ch01/`、`test/`）。
+> **本檔是 HTML 講義「每節內容方向」的權威流程文件。** 它在「spine 素材（老師掃描手稿，或 Ch5 起的 canon 藍本）→ 完整講義一節」之間補上一道**方向層**，讓「**這是不是我要的方向**」從不可檢核變可檢核。已在 ch01 §1.1–§1.2、§4.2、ch02 §2.1–§2.5、ch03 端到端跑過六階並收斂（committed）；逐節驗證紀錄存於 [`authoring/direction_layer/`](authoring/direction_layer/)（`ch01/`、`test/`）。Ch5 起的無手稿章以 canon 為 spine 走同一套六階，各階對應差異見 §1.6（先例 [`handout/_dev-archive/ch05/PLAN-ch05.md`](handout/_dev-archive/ch05/PLAN-ch05.md)）。
 >
 > 一句話定位：六階流程把「**模型提案、人定奪**」的契約，從「對不對」延伸到「**是不是我要的方向**」，並**前置到擴寫之前**。
 >
 > **適用範圍：** 每節、每章同一套，治理講義內容的擴寫。**不碰** video/ pipeline、**不碰**已凍結的 legacy LaTeX 書（`legacy/tex_handout/chapters/*.tex`）。
 >
 > **與既有文件的關係（引用、不複述）：**
-> - [`README.md`](README.md) §撰稿工作流程 —— Mode A/B/C、expansion 標記與類別、具名內容政策、密度校準、擴增稽核。本準則**保留**這些零件，只在頂層改寫流程敘事（見 §4）。
+> - [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md)（2026-07-07 自根 README 遷出）—— Mode A/B/C、兩種撰稿變體、expansion 標記與類別、具名內容政策、密度校準、擴增稽核。本準則**保留**這些零件，只在頂層改寫流程敘事（見 §4）。
 > - [`CONTENT_SPEC.md`](CONTENT_SPEC.md) —— 排版、環境集、顯示模式、記號（HOW to write，權威）。
 > - [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) —— 章節弧、每章 core skills、key figures。**本流程的 macro 北極星**：每節 brief 以對應章條目為輸入並保持一致、方向叉路回填其「Open questions」（見 §3.5）。
 > - [`authoring/seed_converge/SYNTHESIS.md`](authoring/seed_converge/SYNTHESIS.md) —— 機制實驗教訓（advisory 迴圈、blocking/advisory 分流、訂閱、圖 critic），本準則**折入**。
@@ -68,8 +68,8 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
   - **seed 轉錄語法（輕量可讀，2026-06-07 定）：** seed 是給人讀的轉錄（`①-verify` 拿它逐字對掃描），**純文字好讀為第一優先**。數學一律**反引號行內＋Unicode**（`≤ ≥ ≠ ⟺ ⟹ → ∞ √ ± · π θ ε Σ`、上標 `x² xⁿ x⁻¹`、複合次方用 `x^(n−1)`、分數 `a/b`、`lim_{h→0} (…)`），**不要 `$$…$$`／`\[…\]` 顯示區塊、不要 `\frac`／`\quad`／`\text` 等巨集**；複雜到 Unicode 會歧義時才退回**短**的行內 `\(…\)`（用 kit delimiter，絕不用 `$$`）。seed 為**稀疏骨架**：記手稿有的（含其 worked example）但別展開成多步排版——漂亮 KaTeX 留給 ④ 輸出。可疑／非標準數學標 **[請查核]**。風格範本：[`authoring/direction_layer/ch01/seed_s12.md`](authoring/direction_layer/ch01/seed_s12.md)。
 - **② 方向提案：** Claude 把 §2 的 brief 填好，薄的地方提案要補哪些例子／應用。**輸入除了手稿＋薄度，還有該章的 `CONTENT_ROADMAP` 條目**（core skills／key figures／pitfalls／open questions）——讓節層 brief 與章層弧一致，且 brief **引用不複述** ROADMAP（見 §3.5）。
 - **③ 方向閘（新）：** 使用者改或核可。**實驗版沒有這一環**——seed→擴寫→審，中間沒有人定方向的關卡，所以迴圈只能查「對不對」、永遠查不到「是不是你要的」。插入 ③ 即補上此缺口。brief 維持**輕量**〔流程選擇丙〕，讓這道人閘快到你願意每節都過。
-- **④ 擴寫：** Claude 是**唯一寫手**，朝已核可方向擴寫；手稿數學為主軸，每一處非翻譯的增添都加 expansion 標記（沿用 README 的類別與政策）。HTML 講義的標記語法是 HTML 註解 `<!-- expansion:<cat> … -->`（LaTeX 的 `% expansion:` 只存在於 legacy），類別與 `[pass:]`／`[source:]` 規則不變。
-- **⑤ advisory 審查迴圈：** Codex CLI（走訂閱、唯讀 reviewer）出 findings。**blocking 只留數學／忠實度／方向符合度**〔方向符合度＝blocking，流程選擇乙〕；格式（`<!-- expansion: -->`／register 等 HTML house rule）一律 advisory、交 deterministic linter、**不准擋收斂**。**Vale AItexture lint（去 AI 味）降為這條 lane 的免費低優先 pre-flag 護欄**（見 [`PLAN-deai-semantic-critic.md`](PLAN-deai-semantic-critic.md)）：banned-list 對「數學教科書」這個窄語域預期 **~0 命中、本就 0 誤砍**，留作零成本預標即可——flag-only、advisory、不擋收斂。**決定性的「去 AI 味」偵測已移到 handout prose gate 的 Dimension C＝語意/聲音 S/A/V 人審 critic**（空句／錯高度才 blocking），不在此 Vale lane；舊的 banned-list／密度叢集偵測法已退役（spec §0／§6）。停在**一次乾淨 audit**（別停在未經審核的 revise）。reasoning 模型 run-to-run 會飄 → 重要判斷**多跑取聯集**。（Codex 接法、訂閱認證、`codex exec`／schema、配額 caveat 的**具體實作**見 [`authoring/seed_converge/PLAN_codex_subscription_loop.md`](authoring/seed_converge/PLAN_codex_subscription_loop.md)。）
+- **④ 擴寫：** Claude 是**唯一寫手**，朝已核可方向擴寫；spine 數學為主軸，每一處非翻譯的增添都加 expansion 標記（沿用 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) 的類別與政策）。HTML 講義的標記語法是 HTML 註解 `<!-- expansion:<cat> … -->`（LaTeX 的 `% expansion:` 只存在於 legacy），類別與 `[pass:]`／`[source:]` 規則不變。
+- **⑤ advisory 審查迴圈：** Codex CLI（走訂閱、唯讀 reviewer）出 findings。**blocking 只留數學／忠實度／方向符合度**〔方向符合度＝blocking，流程選擇乙〕；格式（`<!-- expansion: -->`／register 等 HTML house rule）一律 advisory、交 deterministic linter、**不准擋收斂**。**Vale AItexture lint（去 AI 味）降為這條 lane 的免費低優先 pre-flag 護欄**（見 [`PLAN-deai-semantic-critic.md`](authoring/_archive/deai/PLAN-deai-semantic-critic.md)）：banned-list 對「數學教科書」這個窄語域預期 **~0 命中、本就 0 誤砍**，留作零成本預標即可——flag-only、advisory、不擋收斂。**決定性的「去 AI 味」偵測已移到 handout prose gate 的 Dimension C＝語意/聲音 S/A/V 人審 critic**（空句／錯高度才 blocking），不在此 Vale lane；舊的 banned-list／密度叢集偵測法已退役（spec §0／§6）。停在**一次乾淨 audit**（別停在未經審核的 revise）。reasoning 模型 run-to-run 會飄 → 重要判斷**多跑取聯集**。（Codex 接法、訂閱認證、`codex exec`／schema、配額 caveat 的**具體實作**見 [`authoring/seed_converge/PLAN_codex_subscription_loop.md`](authoring/seed_converge/PLAN_codex_subscription_loop.md)。）
 - **⑥ 收斂閘：** 使用者最終裁決；格式 nit 交 linter。
 
 ---
@@ -100,6 +100,23 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
 
 ---
 
+## 1.6 無手稿章節（canon 變體）的六階對應（2026-07-07 正典化；先例 Ch5）
+
+Ch5 起無老師手稿（權威：[`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md)、[`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) 全局 seam ledger）。六階骨架不變，各階對應如下：
+
+| 階 | 手稿變體 | canon 變體 |
+|---|---|---|
+| ① intake | 掃描→轉錄 seed→**①-verify** 人核對 | **canon 盤點**（該章 ROADMAP entry＋seam ledger＋canon 節對應）＋**hypothesis ledger** 起帳；**無 ①-verify**（沒有轉錄可核） |
+| ② 方向提案 | 手稿＋薄度＋ROADMAP entry | canon 覆蓋義務＋深度政策（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §16.3）＋ROADMAP entry；brief 增列 `figure_opportunities` 與例題／軟深度計畫 |
+| ③ 方向閘 | 人定奪 | **對 Codex 跑**（使用者 2026-07-06 授權「決策點自行調用 codex 討論到收斂再實行」） |
+| ④ 擴寫 | 手稿＝數學主軸 | canon＝數學主軸；fragment 頂部 `<!-- section-source: -->` header、教學增添標 `expansion:` |
+| ⑤ advisory 迴圈 | blocking＝數學／忠實度／方向符合度 | blocking＝數學／**canon 覆蓋＋hypothesis hygiene**／方向符合度；對 Codex 跑至 0 blocking |
+| ⑥ 收斂閘 | 人定奪 | 章層 Codex review＋`REVIEW-ch{NN}-applied.html` 交使用者過目 |
+
+反幻覺備援（取代失去的 ①-verify）＝ brief＋hypothesis ledger、Codex 對抗審、章末 sympy 全例重算——見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §無手稿章節。新章編排檔抄 ch05 範本（[`handout/_dev-archive/ch05/PLAN-ch05.md`](handout/_dev-archive/ch05/PLAN-ch05.md)）；閘序層面（milestone 與 gate-2 風險分層）見 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
+
+---
+
 ## 2. 方向 brief 模板（每節填、人在 ③ 核可）
 
 輕量、bullet 級、約半頁。每欄：**捕捉什麼** ＋ **決策程序（泛用，怎麼從任一手稿決定它）**。
@@ -110,8 +127,9 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
 | **薄度剖析** | 哪裡撐不起教科書密度 | 對每塊標 **{夠／薄／無}**：「夠」＝已達 Stewart 密度；「薄」＝有骨架但缺動機／例子／圖；「無」＝該有卻完全沒有。可疑／非標準數學標「**請查核**」丟使用者（手稿＝數學主軸，**不靜默改**）。輸出指向「加法該往哪去」。 |
 | **範圍與深度** | 本節邊界與嚴謹度 | 只吃手稿那一叢主題、不外擴；後面章節才系統處理的概念用**一行 forward-ref** fence 掉（不 preview-creep）。結構結果決定「**證或只陳述**」：證明**短、標準、具啟發**就補（`expansion:formula`／`example`）；多頁或需未引入材料的證明，標記**待使用者授權**。<br>**節內出場序（introduce-before-use，2026-06-28 加）：** 每個記號／術語／非正式記法在**首次被用之前**須已被介紹或當場 gloss；尤其新記號（如 `=∞`）別在 example 用掉後才正式定義（ch01 §1.4 的真實案例）。這類排序問題在此階段（**編號未鎖**）最便宜修；留到定稿散文閘才搬會 cascade 編號與 cross-ref（對應 [`handout/_audit/PROSE-AUDIT-RUBRIC.md`](handout/_audit/PROSE-AUDIT-RUBRIC.md) 的 U4）。 |
 | **承重直覺** | 最該先講通的那一個直覺 | 找出「**為何天真／直接做法會壞**」的關鍵，用一個**具體碰撞／失敗例**先打臉、再形式化；其次才是「這概念在做什麼」的心像。**一節只挑一個承重直覺領頭**，其餘為它服務。 |
-| **worked example 清單** | 例子的選取與順序 | 每技巧 ≥1 例。預設序：**真實情境/具體錨 → 判別/診斷 → 建構/計算 → 驗證/反思**。手稿薄的技巧**慷慨新增**（低風險、`expansion:example`、可刪），清單標出哪些是新增。同型第二例**跳過**已建立 setup。手稿自帶足量例子者不硬加。<br>**自創題政策（使用者 2026-06-07 定）：** 可自創新題，但 (1) 須經**使用者批准**、(2) 題型須與既有 example **不同**（非換數字／係數的同型題）、(3) 一律寫成 **worked example**（含 solution＋講解），不產 bare your-turn exercise。理由：bare 自創習題受 root [`README.md`](README.md) §防護欄「自創習題——習題庫來自手稿」所禁、設計 deferred（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14）；但含解的 worked example 屬闡述（Mode A），不在此限。 |
+| **worked example 清單** | 例子的選取與順序 | 每技巧 ≥1 例。預設序：**真實情境/具體錨 → 判別/診斷 → 建構/計算 → 驗證/反思**。手稿薄的技巧**慷慨新增**（低風險、`expansion:example`、可刪），清單標出哪些是新增。同型第二例**跳過**已建立 setup。手稿自帶足量例子者不硬加。<br>**自創題政策（使用者 2026-06-07 定）：** 可自創新題，但 (1) 須經**使用者批准**、(2) 題型須與既有 example **不同**（非換數字／係數的同型題）、(3) 一律寫成 **worked example**（含 solution＋講解），不產 bare your-turn exercise。理由：bare 自創習題受 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §草擬模式中仍然禁止的事「自創習題」所禁、設計 deferred（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14）；但含解的 worked example 屬闡述（Mode A），不在此限。 |
 | **history／application** | 要不要放史／應用、放什麼 | `application` 只在有**忠實的真實實例**時放（非裝飾）；薄手稿寧可開節放**一個強錨**，不散落弱錨。`history` 只在概念有**可考起源／記號故事**時放，且**標來源**（特定來源或 `[source: standard calculus-textbook historical note]`；直接引文必須特定來源，否則改釋義）。兩者皆不自然 → **留白勝過 padding**。 |
+| **figure_opportunities** | 本節該有哪些圖（機會前置，2026-07-07 加） | 對齊章層 key figures（ROADMAP entry）；列候選圖（位置＋教學功能＋型別＋一句「為何圖優於純文字」）。Mode A 收尾以 `handout-figure-opportunity-audit` 覆核缺漏（擴增稽核第 7 項）；「**畫哪些**」在章批次裁決點（[`handout/PIPELINE.md`](handout/PIPELINE.md) M2）決定，繪製本身可延後。 |
 | **強調／takeaway** | 讀者該帶走什麼 | 點名**一個概念樞紐**（邏輯支點）＋**一個可攜技能**（學生能帶去別處的操作）。寫進 brief，讓 ④ 朝它寫、⑤ 查它有沒有真的落地。 |
 | **刻意不寫** | 本節的「反方向」 | 列出模型在此**會自然手癢多加、但不該加**的東西（forward 主題、岔題、過度推廣、本可省的形式證明），各附一行理由＋它該去哪。**此清單餵給 auditor 當方向符合度的反向檢查**（多寫了不該寫的＝違反方向）。 |
 | **篇幅帶** | 體量護欄 | 由主題份量＋簽核深度推一個**軟帶**（行數／頁數區間），**當護欄不當預算**——篇幅是好拆解的結果。明顯超出 → 回頭查是否某塊過度擴寫或漏 fence 的 forward 主題。 |
@@ -151,7 +169,7 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
 
 ## 4. 承接 A/B/C：keep / add / fold
 
-本準則**改進、不打掉** README 的 Mode A/B/C。被取代的只有**頂層的 A/B/C 狀態機敘事**（升級成 §1 的六階流程）；其餘零件全用 reference 沿用、不重寫 README／CONTENT_SPEC。
+本準則**改進、不打掉** Mode A/B/C（權威全文現存 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md)，2026-07-07 自根 README 遷出）。被取代的只有**頂層的 A/B/C 狀態機敘事**（升級成 §1 的六階流程）；其餘零件全用 reference 沿用、不重寫該檔／CONTENT_SPEC。
 
 | 原件 | 處置 |
 |---|---|
