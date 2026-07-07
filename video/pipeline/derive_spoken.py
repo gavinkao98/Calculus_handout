@@ -14,8 +14,8 @@ narration tracks can't silently drift:
   - the {show ...} markers in each spoken `say` match the canonical `say` exactly;
   - no `$` (LaTeX) leaks into the spoken text.
 
-    python video/pipeline/derive_spoken.py --deck ch01_inverse_functions          # regenerate (runs --check first)
-    python video/pipeline/derive_spoken.py --deck ch01_inverse_functions --check   # validate only, write nothing
+    python video/pipeline/derive_spoken.py --deck ch03_trig_derivatives          # regenerate (runs --check first)
+    python video/pipeline/derive_spoken.py --deck ch03_trig_derivatives --check   # validate only, write nothing
 """
 from __future__ import annotations
 
@@ -37,14 +37,9 @@ _SHOW = re.compile(r"\{show\s+([^}]+)\}")
 
 # Optional advisory per-unit MiMo styling notes (NOT spoken text), keyed by deck
 # then scene id. New sections may omit; they simply get no notes in the md view.
-STYLE_NOTES: dict[str, dict[str, str]] = {
-    "ch01_inverse_functions": {
-        "can_we_go_backwards": "到 “something breaks” 給一絲好奇的輕揚，收尾句放緩、定下基調。",
-        "first_inverses": "“starting small” 帶一點鼓勵、輕快；驗證句給確認感。",
-        "repair_by_restricting": "開頭回收開場反例，用會心、略帶默契的語氣；“positive” 一字輕微加重。",
-        "recap": "整段放緩半拍、收束感；四個 take-away 之間各留一個明顯停頓。",
-    },
-}
+# (ch01 practice-era notes removed 2026-07-07 — that deck's spoken route was
+#  discarded with the practice artifacts; see git history if ever needed.)
+STYLE_NOTES: dict[str, dict[str, str]] = {}
 
 # §1 (MiMo config) and §2 (reading conventions) are UNIVERSAL across sections.
 MD_CONFIG_AND_CONVENTIONS = """## 一、MiMo 合成設定（現用）

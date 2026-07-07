@@ -11,7 +11,16 @@
 產線分**七個產物層**，每層各有審核閘。能真正**擋住 render** 的只有 storyboard/timing 與兩軌 parity 的幾個**自動腳本閘**；
 內容／旁白／視覺層全為 **advisory**——模型（Codex / MiMo / Claude）或人提案，最後由人裁決，**稽核者一律唯讀、不自己改檔**。
 
-流向：講義散文 →（Mode A）內容稿 → 旁白稿 → 口語版 → manim hook code → storyboard/timing → render 成品。
+流向：講義散文 →（Stage-1）內容稿 → 旁白稿 → 口語版 → manim hook code → storyboard/timing → render 成品。（「Mode」一詞專留講義 A/B/C；影片內容稿階段稱 **Stage-1**——見 [REVIEW_MODEL_DECISIONS.md](REVIEW_MODEL_DECISIONS.md) 詞彙紀律。）
+
+**Phase 索引**（同一條線的四段粗分，方便對話指稱；不是新狀態機）：
+
+| Phase | 涵蓋層 | 主要閘 |
+|---|---|---|
+| Content | 層 2–3 | six-lens、copyedit、旁白 sign-off（lock） |
+| Derivation | 層 4 | derive parity、NFA |
+| Storyboard | 層 5–6 | 工程鏡、schema/lint/sizecheck、pedagogy/OTF/SC、amplification |
+| Render | 層 7 | 視覺 gate1/gate2、人工驗收 |
 
 圖例：**■ 自動腳本・可擋 render**　**□ LLM 稽核・advisory**　**◆ 人工閘**　**◷ 未建（TODO）**
 
@@ -21,7 +30,7 @@
 
 ## 一、各產物層的審核閘
 
-### 層 2｜Mode A 內容稿（`content_scripts/<deck>.md`）
+### 層 2｜Stage-1 內容稿（`content_scripts/<deck>.md`）
 
 | 閘 | 執行者 | 性質 | 把關內容 | 權威文檔 |
 |---|---|---|---|---|
@@ -55,7 +64,7 @@
 | `lint.py` | 腳本，make.py render 前跑（`--skip-lint` 可繞） | ■ error／warn | error（abort）：純文字欄出現 `$`／反斜線、`$` 不成對；warn：手動 `\\`、空心點用在已達值 | [DESIGN.md](DESIGN.md)、[README.md](README.md) |
 | `sizecheck.py` | 腳本，與 lint 並行（`--skip-sizecheck` 可繞） | ■ error／warn | error（abort）：同層 prose 字級不一、元素出框；warn：教學散文用 muted 色、超安全邊界、內容塊重疊。**盲點**：只查 `brand.prose`，不查直接構造的 `MathTex/Text` | [DESIGN.md](DESIGN.md) |
 | `sizecheck.py` fontfloor 最小字級 floor | 腳本，與 sizecheck 同跑（make.py-time、確定性） | ■ warn（warn-default；`meta.fontfloor_enforce` 開才 error／abort，預設關、landing 不擋） | 浮現「真實上螢幕字級 < `MIN_FONT_FLOOR`＝26px」的 `_brand_prose` 節點（render 前的工程對應物）；配 render 期 clamp（把縮過頭的節點托回 floor）＋ agent 在幀上肉眼施作的**手機寬尺標**（P6，~360–414px 視窗仍要讀得到）。與 VISUAL-FRAME V4／A6 配對：floor 浮現「小到讀不到」、V4 升 blocking／A6 扣分 | [pipeline/visuals/theme.py](pipeline/visuals/theme.py)（`MIN_FONT_FLOOR`，SPEC §8）／[pipeline/sizecheck.py](pipeline/sizecheck.py)（floor check）／[pipeline/brand.py](pipeline/brand.py)；rubric [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md) V4／A6 |
-| `schema.py` | 腳本，make.py render 前跑（`--skip-schema` 可繞） | ■ error／warn | **已建（2026-06-16）**：結構驗證（meta.id／section 必填、scene kind∈intro/content/divider/outro、id 唯一、content 需 template＋say、`{show}` 不閉合→error）＋列舉每場 `{show}` reveal 目標（`--list`）。**不**驗 target 是否存在於模板 payload（需 `reveal_targets()`／manim，屬 task #6）。**2026-06-30 增掛（2026-07-01 加 SC）**：OTF provenance／pedagogy ＋ **SC step-coverage** 結構 warn-checks 在此並跑（warn-default，`meta.otf_enforce`／`meta.pedagogy_enforce`／`meta.coverage_enforce` 開才 abort、預設關），即下方 `pedagogy-firstlearner-audit` 判斷閘的確定性底材 | [DESIGN.md](DESIGN.md)、[README.md](README.md)；source [pipeline/schema.py](pipeline/schema.py)（provenance／pedagogy／coverage 落地 [pipeline/provenance.py](pipeline/provenance.py)／[pipeline/pedagogy.py](pipeline/pedagogy.py)／[pipeline/coverage.py](pipeline/coverage.py)） |
+| `schema.py` | 腳本，make.py render 前跑（`--skip-schema` 可繞） | ■ error／warn | **已建（2026-06-16）**：結構驗證（meta.id／section 必填、scene kind∈intro/content/divider/outro、id 唯一、content 需 template＋say、`{show}` 不閉合→error）＋列舉每場 `{show}` reveal 目標（`--list`）。**不**驗 target 是否存在於模板 payload（需 `reveal_targets()`／manim，屬 task #6）。**2026-06-30 增掛（2026-07-01 加 SC）**：OTF provenance／pedagogy ＋ **SC step-coverage** 結構 warn-checks 在此並跑（warn-default，`meta.otf_enforce`／`meta.pedagogy_enforce`／`meta.coverage_enforce` 開才 abort、預設關），即下方 `pedagogy-firstlearner-audit` 判斷閘的確定性底材 | [DESIGN.md](DESIGN.md)、[README.md](README.md)；source [pipeline/schema.py](pipeline/schema.py)（provenance／pedagogy／coverage 落地 [pipeline/provenance.py](pipeline/provenance.py)／[pipeline/pedagogy.py](pipeline/pedagogy.py)／[pipeline/step_coverage.py](pipeline/step_coverage.py)） |
 | `pedagogy-firstlearner-audit`（初學者教學＋上畫面文字忠實） | gate1 Claude subagent（免費；讀 storyboard＋cited `.md`＋handout，**PRE-render**；同 `visual-frame-audit` 的免費 gate1 tier、但不同 stage——它讀 render 後幀，本閘讀 storyboard 源） | □（PD／OF／SC blocking 分開計數；warn-default、per-deck opt-in，landing 不擋） | PD1–PD4 教學品質（beat 粒度、`scaffold.motive` 動機、divider `scaffold.problem`、前提首用 `scaffold.flag`）＋ OF1–OF2 上畫面文字 vs 核准源忠實／可回溯 ＋ **SC1–SC2／SC-honesty／SC-adv 推導步驟覆蓋**（storyboard `covers:` vs `.md screen_contract`：漏步驟／缺 recap／覆蓋誠實；可合併不可掉）；確定性底材＝上列 `schema.py` 並跑的 provenance／pedagogy／**coverage** warn-checks（gate-1 自有 blocking＝PD1＋OF1＋**SC-honesty**，其餘結構存在性由確定性層算、本閘 surface＋給脈絡） | **SSOT [PEDAGOGY-FIRSTLEARNER-RUBRIC.md](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md)**；agent [`../.claude/agents/pedagogy-firstlearner-audit.md`](../.claude/agents/pedagogy-firstlearner-audit.md) |
 | `video-amplification-audit`（敘述放大機會稽核；expansion 層 M2） | gate1 Claude subagent（免費；讀 storyboard＋cited `.md`＋handout `expansion:*`，**PRE-render**、propose-not-act） | □（AMP1 advisory；**永不 blocking**、只提候選、逐筆人裁） | 掃 handout `expansion:intuition`／`application` 判影片四態（screened／narration-only／visual-only／missing），只提 `missing` 的承重直覺（綁 `doc:` ＋標記短引文）；correctness caution 路由假設機制、example 歸 `example-supplement`。講義線 `mode-c-gapwalk` 的影片側對應，產 standalone HTML 裁決稿 | **SSOT [AMPLIFICATION-RUBRIC.md](content_scripts/_audit/AMPLIFICATION-RUBRIC.md)**；agent [`../.claude/agents/video-amplification-audit.md`](../.claude/agents/video-amplification-audit.md) |
 | make.py manifest-freshness（`--reuse-audio`） | 腳本 | ■（fail-fast） | 比對 manifest 與 `<deck>_mimo.yml`（deck id／scene／beat 數／`{show}`／text_hash／WAV 存在與時長），防複用過期音檔；非 reuse 跑時拒絕用 mock 覆蓋真 manifest | [DESIGN.md](DESIGN.md)、[README.md](README.md)；RUNBOOK step 4 |
@@ -80,7 +89,19 @@
 3. **付費 API 先同意**——任何計費呼叫前要使用者明確同意；腳本以 `--dry-run`（估 token／USD、不送請求）＋ `--confirm`（讀 env key）落實。離線路徑（mock TTS、本地 render、ffmpeg）免。[`../CLAUDE.md`](../CLAUDE.md)。
 4. **NFA 裁決寫進 commit message**——subject ≤70、body 逐條「原本／為何不妥／改了什麼／證據」，供 `git log --grep="NFA"` 撈回（講義 Mode B 仍用 `git log --grep="Mode B"`）。[`../CLAUDE.md`](../CLAUDE.md)。
 5. **交付物用 standalone HTML**——等使用者過目的稽核產物一律出可雙擊渲染的 HTML。[`../CLAUDE.md`](../CLAUDE.md)。
-6. **每判斷閘一條收斂線**——所有 LLM 判斷閘（六-lens／copyedit／NFA／視覺／工程鏡）收斂判準＝**blocking findings==0**；advisory 逐筆人裁、不強制歸零。**不** governs Tier 0 確定性腳本（以 exit code 收斂）。散文類兩讀者（gate1 Claude 免費迭代→gate2 Codex 收斂後單次、需同意），**gate2 只套 copyedit／NFA**——six-lens 本身 multi-agent＋對抗複驗，不再疊 Codex。
+6. **每判斷閘一條收斂線**——所有 LLM 判斷閘（六-lens／copyedit／NFA／視覺／工程鏡）收斂判準＝**blocking findings==0**；advisory 逐筆人裁、不強制歸零。**不** governs Tier 0 確定性腳本（以 exit code 收斂）。散文類兩讀者（gate1 Claude 免費迭代→gate2 Codex 收斂後單次、需同意），**gate2 只套 copyedit／NFA**——six-lens 本身 multi-agent＋對抗複驗，不再疊 Codex。gate2 的**頻率**依下條矩陣分層。
+8. **gate 頻率矩陣（2026-07-07 修訂；理由＝規模從數節變 30+ 節，修訂紀錄見 [REVIEW_MODEL_DECISIONS.md](REVIEW_MODEL_DECISIONS.md) §九）：**
+
+   | 閘 | gate-1（免費） | gate-2（計費） |
+   |---|---|---|
+   | Tier-0 確定性腳本 | 每次 render | — |
+   | six-lens | 每節 | 無（維持既有拍板） |
+   | copyedit | 每節 | **每章抽樣＋出版前抽查；高風險節全跑**（原：每節單次） |
+   | NFA | 每節 | **每節**（§3.1 實證 gate-2 抓到 gate-1 漏的 D3 blocking） |
+   | 工程鏡（hook） | 每個有 hook 的節 | 高風險才跑 |
+   | pedagogy-firstlearner | 每節（pre-render） | 無 |
+   | 視覺 frame audit | 每次 final render | VLM＝高風險／出版前抽樣 |
+   | amplification | **每章一次**（原：每節） | 無 |
 7. **撰稿兩階段（phase，非 mode）**——**DRAFT**（pre-lock：寫稿→`_narration.html`→copyedit，唯一能改稿窗口）／**LOCKED**（post-lock：derive→NFA→TTS，source 凍結、稽核唯讀）。綁在 `CONTENT_APPROVED` sign-off 這條不可逆邊界；post-lock 改稿須對動到的單元跑一次 scoped NFA 回歸。「Mode」一詞專留給講義 A/B/C。
 
 ---
@@ -92,20 +113,9 @@
 
 ---
 
-## 四、目前各節（§1.x）通過狀況
+## 四、目前各節通過狀況
 
-> 以 [REBUILD_STATUS.md](REBUILD_STATUS.md) 為準；本表為快照（2026-06-15）。**註：講義已再次修訂，舊片全屬練習、將以本次重構後的新流程整批重跑——下表轉為歷史快照，重跑後重填。**
-
-| 節 | 六-lens | 旁白 sign-off | parity | NFA | 抽幀目視 | critic.py VLM |
-|---|---|---|---|---|---|---|
-| §1.1 | （改用 critic＋review_pack） | ✅ | ✅ | ✅ | ✅ | ✅（4 缺陷修＋複驗） |
-| §1.2 | ✅（13→1） | ⏳ | ✅ | ✅ | ✅ | ⏳ |
-| §1.3 | ✅ | ⏳ | ✅ | ✅（收斂，commit `cb98ebf`） | ✅ | ⏳ |
-| §1.4 | ✅（全乾淨） | ⏳ | spoken 未寫 | ❌ | ✅（480p） | ⏳ |
-| §1.5 | ✅（5→0 blocking） | ✅ | spoken 未寫 | ❌ | ✅（480p） | ⏳ |
-| §1.6 ε-δ | ✅ 全節六鏡（2026-06-16；SL-1 折進 u2、SL-2 已修，clean） | legacy 核可 | spoken 未寫 | ❌ | ✅（8 關鍵幀） | ⏳ |
-
-§1.6 是覆蓋最薄的一節（無六-lens、storyboard 未同步、ε-δ 動畫 3 個問題未修、NFA／MiMo 未起步）。
+逐節狀態以 [REBUILD_STATUS.md](REBUILD_STATUS.md) 頂部現況快照為準（本檔不再維護逐節表；舊 §1.x 練習時代快照見 git 歷史）。快照要點（2026-07-07）：**§3.1 `ch03_trig_derivatives`＝首個走完整條 MiMo 真旁白路線的正典節**（六-lens／copyedit／sign-off／parity／NFA 雙閘／視覺迭代全過，clean Dean 成片）；§3.2 `ch03_chain_rule` 內容稿 LOCKED（Stage-1 完成，待 spoken／render）；ch01 舊練習產物已刪、屆時整批重跑（`ch01_inverse_functions.yml` 留作版面回歸 deck）。
 
 ---
 

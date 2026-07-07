@@ -1,3 +1,5 @@
+> **Status: archived / completed（2026-07-07 歸檔）** — 本計畫已全數落地（執行紀錄見 `video/_archive/REBUILD_LOG-2026-05-to-07.md` 對應節）。活的權威見 `video/REVIEW_GATES.md`／`video/DESIGN.md`／`video/SPEC-pedagogy-firstlearner-*.md`。本檔為歷史施工紀錄，內含相對路徑可能已過時。
+
 # Visual Extension (min-size floor + A7 figure-prominence + mobile yardstick) — Implementation Plan (SP1, Plan 4 of 5)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. All self-tests run with the **repo venv python** `.venv/Scripts/python.exe` (it has `manim-0.20.1` + vendored PyYAML; bare `python` misjudges).

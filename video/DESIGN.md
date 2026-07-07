@@ -161,8 +161,8 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 
 > **Direction D（2026-06-20 視覺重設計）後的目錄。** 標 ★ 者 schema 有變或全新。
 > `definition_math` / `theorem_proof` / `procedure_steps` / `value_table` / `sign_chart`
-> / `recap_cards` 的 payload 欄位**不變**（只是視覺重皮）。standalone 驗證稿見
-> [`storyboards/_demo_redesign.yml`](storyboards/_demo_redesign.yml)。
+> / `recap_cards` 的 payload 欄位**不變**（只是視覺重皮）。落地時的暫存驗證稿
+> `_demo_redesign.yml` 已清（git 歷史可取回）；活的回歸樣本＝上述 `storyboards/_demo_*.yml`。
 
 | template | 教學形狀 | payload 欄位 | reveal target |
 |---|---|---|---|

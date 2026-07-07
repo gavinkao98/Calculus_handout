@@ -5,8 +5,8 @@
 > `video/DESIGN.md` §「MiMo 口語軌」、`video/REBUILD_STATUS.md` 2026-06-14 節。
 
 **前提（重要）：** 此路線需要該節的**正典 storyboard** `video/storyboards/<deck>.yml`（含 `say` ＋ `{show}`）。
-目前 `storyboards/` 僅存 `_demo_*.yml`（模板示範／回歸樣本），**無任何正典章節 storyboard**——
-舊 ch01_* 練習已於 2026-06-16 全數廢棄、將從講義逐節重跑。故任一章節節在**該節 storyboard 落地前
+`storyboards/` 現況＝`_demo_*.yml`（模板示範／回歸樣本）＋已落地的正典 deck（如 `ch03_trig_derivatives.yml`——
+首個走完本路線全程的節）＋版面回歸 deck（`ch01_inverse_functions.yml`）。任一章節在**該節 storyboard 落地前
 先別跑本路線的影片步驟**；可先用下方「念法慣例」＋ NFA（旁白忠實稽核，原 Mode B）把口語版納入認可包，
 storyboard 落地後再走完整流程。
 
@@ -26,7 +26,7 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
 步驟 1 — 寫口語單一源 content_scripts/<deck>.spoken.yml：
 - 每個 content scene 一筆 `scene_id: | <口語旁白>`；把該 scene 已認可 narration 的英文散文「逐字保留」，
   只把每個 LaTeX 數學式攤成口語，並把 {show ...} 標記留在與正典 say 相同的位置（順序/目標一致）。
-- 念法慣例（務必遵守）：
+- 念法慣例（務必遵守；**權威＝NARRATION-FAITHFULNESS-RUBRIC.md 的念法慣例節**，此處為操作摘錄、衝突時以 rubric 為準）：
   · f^{-1} → "f inverse"（絕不 "f to the minus one"；例外：課文刻意對比 sin^{-1} 與 1/sin 時，該處照字面念）
   · 下標 x_1,x_2 → "x sub one / x sub two"
   · 和/差根號 √(y-2) → "the cube root of the quantity y minus two"
@@ -47,7 +47,8 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
 - cp content_scripts/_audit/PROMPT-narration-faithfulness.template.md → _audit/PROMPT-<deck>-narration-faithfulness.md，填 {{...}}。
   該節旁白「尚未經使用者認可」就把 CONTENT_APPROVED 設為 no（會打開 D7 數學內容正確性維度）。
   gate2 範例：codex exec -s read-only < video/content_scripts/_audit/PROMPT-<deck>-narration-faithfulness.md \
-      > video/content_scripts/_audit/REPORT-<deck>-narration-faithfulness.raw.txt 2>&1
+      > <gitignored scratchpad>/REPORT-<deck>-narration-faithfulness.raw.txt 2>&1
+  （**raw 輸出不進版控**——落 scratchpad，findings 與裁決轉錄進下行的版控 REPORT-<deck>-….md；2026-07-07 與講義線統一。）
 - 收斂：依 Keep/Rewrite/Cut 改 <deck>.spoken.yml → 重跑 derive --check → 回歸審核 →
   寫乾淨的 REPORT-<deck>-narration-faithfulness.md。NFA 裁決寫進該次修正 commit 的 message body（CLAUDE.md，`git log --grep="NFA"`）。
 

@@ -173,3 +173,9 @@ minimal-unify 主體已落地（地圖 [REVIEW_GATES.md](REVIEW_GATES.md) 已同
 10. **`schema.py` 已建**（render 前第三閘，接進 make.py：schema→lint→sizecheck）——原列產線 backlog，本輪完成。
 
 > **仍屬產線 backlog（非本重構）：** VISUAL-FRAME detection 面驗證（併入第一個真正重跑的節）、`{show}` target-vs-payload 交叉驗證（task #6、需 manim）。續追 [REBUILD_STATUS.md](REBUILD_STATUS.md)。
+
+---
+
+## 九、修訂紀錄
+
+- **2026-07-07 gate-2 頻率矩陣（部分修訂 §八拍板 2）：** 規模前提改變（從數節練習變 30+ 節量產）＋copyedit gate-2 歷史 findings 率低（blocking 結構恆 0 的純潤稿閘），經 Claude 主審＋Codex 兩輪對抗收斂：**copyedit gate-2 從「每節收斂後單次」改「每章抽樣＋出版前抽查、高風險節全跑」；NFA gate-2 維持每節**（§3.1 實證 gate-2 抓到 gate-1 漏的 D3 blocking）；amplification 改每章一次；工程鏡 gate-2 高風險才跑；視覺 VLM gate-2 維持間歇（高風險／出版前抽樣）。權威矩陣見 [REVIEW_GATES.md](REVIEW_GATES.md) meta-gate 8。其餘 §八拍板（copyedit/NFA 分離、six-lens 無 gate-2、不造狀態機）**不變**。

@@ -14,7 +14,7 @@
 video/
   README.md            你在這裡
   DESIGN.md            格式 + 資料流契約（先讀這個）
-  CONTENT_METHODOLOGY.md   內容稿撰寫方法論（Mode A／C 散文密度、來源標註）
+  CONTENT_METHODOLOGY.md   Stage-1 內容稿撰寫方法論（拆解、narration、來源標註）
   REBUILD_STATUS.md    跨對話進度錨（逐節狀態以此為準）
   REVIEW_GATES.md / REVIEW_MODEL_DECISIONS.md / RUNBOOK-*.md   審核層／決策／流程
   make.py              單一入口 orchestrator：parse → synth → render → compose（離線、不計費）
@@ -39,7 +39,7 @@ video/
     <deck>.md          內容稿（教學單元拆解、`[source:]` 標註）
     <deck>_narration.html   旁白 sign-off 稿（淺色、MathJax、雙擊即開）
     _audit/            稽核資產（進版控）
-      *-RUBRIC.md      五份判斷閘 SSOT（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering）
+      *-RUBRIC.md      七份判斷閘 SSOT（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering／pedagogy-firstlearner／amplification）
       PROMPT-*.md      thin prompt（template + per-deck）
       REPORT-*.html / REVIEW-*.html   稽核／完工報告（self-contained，圖 base64 內嵌）
       _gen/            報告產生器 + 資料（進版控；見下節「版控策略」）
@@ -65,7 +65,8 @@ video/
 | 類別 | 範例 | 進 git？ | 規則 / 位置 |
 |---|---|:---:|---|
 | 文檔・引擎・源 | `*.md`、`make.py`、`pipeline/**`、`storyboards/*.yml`、`content_scripts/*.md`／`*.html`、`animations/**` | ✅ 進 | 預設追蹤 |
-| 稽核資產 | `_audit/*-RUBRIC.md`、`PROMPT-*.md`、`REPORT-*.html`、`REVIEW-*.html`、`*.raw.txt` | ✅ 進 | HTML 報告須 **self-contained**（見下） |
+| 稽核資產 | `_audit/*-RUBRIC.md`、`PROMPT-*.md`、`REPORT-*.{md,html}`、`REVIEW-*.html` | ✅ 進 | HTML 報告須 **self-contained**（見下） |
+| 模型 raw 輸出 | `*.raw.txt`（Codex／VLM 原始 dump） | ❌ 不進 | 落 gitignored scratchpad；findings 與裁決**轉錄**進版控 REPORT／REVIEW（2026-07-07 與講義線統一） |
 | 報告產生器＋資料 | `_audit/_gen/*.gen.py`、`*.digest.json`、`frames_before/` | ✅ 進 | 放在 tracked 位置，**不要**留在 `output/` 內 |
 | 品牌 logo 資產 | `pipeline/assets/brand/*.svg`、`pipeline/assets/lockup-color-outlined.svg` | ✅ 進 | NTU logo 向量源＋`_outline_text.py` 產的 outlined 版（render 用） |
 | render 成品 | `output/**`：`*.mp4`、`*.wav`、`critic/frames/*.png`、`manifest.json`、`review/packets/` | ❌ 不進 | `.gitignore`：`/video/output/` |
@@ -78,19 +79,20 @@ video/
 2. **產生器、digest、不可重生的 `frames_before/` 一律放 `_audit/_gen/`（進版控）**，不要留在會被清掉的 `output/` 內——否則 `output/` 一清，committed HTML 就永久 dangling、且無從重生。
 3. 可重生的 `final.png` 仍由 `output/` 供應（重跑該節即重生）；產生器在 `output/` 被清空時，對缺幀的 `final.png` 退回 SVG placeholder，不會壞掉。
 
-範式：[`content_scripts/_audit/_gen/REVIEW-ch01_inverse_functions-visualframe.gen.py`](content_scripts/_audit/_gen/REVIEW-ch01_inverse_functions-visualframe.gen.py)。
+範式：[`content_scripts/_audit/_gen/build_spoken_review.py`](content_scripts/_audit/_gen/build_spoken_review.py)（ch01 時代的 visualframe 產生器已隨舊練習產物刪除）。
 
 ## 狀態
 
-**目前檢查點（2026-06-16）：產線工具鏈穩定；第一章舊練習產物已全數廢棄，將從講義逐節重跑。**
-逐節進度與跨對話狀態以 [REBUILD_STATUS.md](REBUILD_STATUS.md) 為準（本檔不重複）。
+**目前檢查點（2026-07-07）：產線工具鏈穩定；ch03 §3.1 為首個走完整條 MiMo 真旁白路線的正典節（clean Dean 成片），§3.2 內容稿已 LOCKED。**
+逐節進度與跨對話狀態以 [REBUILD_STATUS.md](REBUILD_STATUS.md) 頂部現況快照為準（本檔不重複）。
 
-- **TTS 收斂為 MiMo builtin voice `Dean` 單一路線**（Gemini/Charon 已退場 2026-06-16；2026-07-05 拍板走 `mimo-v2.5-tts` builtin voice `Dean`，voice-design 模型與「Calm Professor」persona 同日退役）。
-- **舊 `ch01_*` 內容稿／工程稿／旁白／hooks／per-deck 稽核報告與整個 `output/` 已刪除**——當時純為累積方法論經驗的練習；正式版從 HTML 講義 [`chapter1-print-standalone.html`](../handout/chapter1-print-standalone.html) 逐節重跑。
-- 引擎完整：`make.py` orchestrator、**三道 render 前閘（schema → lint → sizecheck）**、模板 catalog、`hook:` 機制、MiMo TTS、`timing.py` 同步守衛、五份判斷閘 SSOT rubric（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering）。
-- 音訊驅動對齊（每 beat 影片長度＝該 beat 音檔長度）為產線核心；mock 路徑（`make.py --backend mock`）離線、不計費，供版面／時序迭代。`video/output/` 是 gitignored。
+- **TTS＝MiMo builtin voice `Dean` 單一路線**（Gemini/Charon 已退場 2026-06-16；voice-design／「Calm Professor」persona 2026-07-05 退役）；**scene-level TTS＋forced alignment（stable-ts）為正式路線**，`--unit auto` 涵蓋全部 content template。
+- **文字渲染＝Route A（全 LaTeX/pdflatex，2026-06-25 落地）**：內文/標題 IBM Plex Sans、eyebrow IBM Plex Mono、數學 Latin Modern（見下方「文字渲染」節與 [DESIGN.md](DESIGN.md)）。
+- 引擎完整：`make.py` orchestrator、**五道 render 前確定性檢查（schema → provenance → pedagogy → lint → sizecheck，後兩者 warn-default）**、模板 catalog＋容量契約 G1–G6、`hook:` 機制、MiMo TTS、`timing.py` 同步守衛、**七份判斷閘 SSOT rubric**（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering／pedagogy-firstlearner／amplification）。
+- 音訊驅動對齊（beat-level：每 beat 影片長度＝該 beat 音檔長度；scene-level：FA 逐字對位映回 beat）為產線核心；mock 路徑（`make.py --backend mock`）離線、不計費，供版面／時序迭代。`video/output/` 是 gitignored。
+- 舊 ch01 練習產物（內容稿／旁白／per-deck 稽核報告）已於 2026-06-16 刪除；**`storyboards/ch01_inverse_functions.yml`＋`animations/ch01_inverse_functions_hooks.py` 保留作版面回歸 deck**（G1–G6／Step 0 回歸即用它），正式 ch01 影片屆時仍從講義逐節重跑。
 
-`storyboards/` 目前只餘 `_demo_*.yml` 模板示範／回歸樣本；逐節正式 storyboard 於重跑時依方法論產生。
+`storyboards/` 現況：`_demo_*.yml` 模板示範／回歸樣本＋正典 deck（`ch03_trig_derivatives{,_mimo}.yml`、`ch03_chain_rule.yml`）＋版面回歸 deck（`ch01_inverse_functions.yml`）。
 
 已實作的可重用模板：
 
@@ -186,23 +188,16 @@ python video\make.py          --storyboard video\storyboards\<deck>_mimo.yml --r
 - 同步常數集中在 `pipeline/timing.py`：`SCENE_LEAD_SECONDS` 同時供 `scene.py`、`make.py`、`critic.py` 使用，避免 compose offset / critic 抽幀時間與實際場景 lead 漂移。
 - 只想聽聲音不要影片：`python video\pipeline\mimo_preview.py --spoken <..._narration_spoken.md>`（逐單元串成 `preview.wav`；`--dry-run` 不呼叫 API、`--smoke` 只合首段）。
 - **MiMo 非決定性**：同文字每次合成是不同 take（±~10% 長度），重跑不保證同長度；要鎖定某 take 就別重合成。
-- 念法慣例（`f inverse` 不念 reciprocal、`x sub one`、和/差根號加 “the quantity”、座標 “the point with coordinates a and b”…）見生成的 `_narration_spoken.md` §2，或 NFA 契約 `content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`（旁白忠實稽核，原 Mode B）。
+- 念法慣例（`f inverse` 不念 reciprocal、`x sub one`、和/差根號加 “the quantity”、座標 “the point with coordinates a and b”…）**權威＝NFA 契約 [`content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md) 的念法慣例節**；生成的 `_narration_spoken.md` §2 為其摘錄（由 `derive_spoken.py` 產生）。
 
 ## 文字渲染（避免亂碼）
 
-> **⚠️ 2026-06-24 改 Route A（已決議、待實作）：** 文字將**全改走 LaTeX/pdflatex**（內文/標題 IBM Plex Sans、eyebrow IBM Plex Mono、數學 Latin Modern），因實測 manim `Text`（Pango）不套 kerning。落地後本節重寫、Pango 路徑與 `TEX_TEXT_SCALE` 等機制移除。詳見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「2026-06-24」節與 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。**以下為落地前現況。**
-
-畫面上的字走兩條渲染路徑，**`Text`（Pango）走 Times New Roman、`Tex`（LaTeX）走 newtx，
-manim 對相同 `font_size` 的呈現大小不同**（`Text` 約比 `Tex` 大 1.36 倍，已由 `theme.TEX_TEXT_SCALE` 校準對齊）：
-
-- **`Text`（Pango，OTF 字型）** —— 純文字，**不認得 LaTeX**。`$f$`、`\\` 會被原樣印出（亂碼）。
-- **`Tex` / `MathTex`（LaTeX）** —— 認得 inline `$math$` 與 `\\` 換行。
+**Route A（2026-06-25 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以取得正確 kerning——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**（實測 manim `Text`/Pango 不套 kerning，故 Pango 路徑與 `TEX_TEXT_SCALE` 拼接機制已全部移除）。角色分派表、display-style 慣例（`\frac` vs `\tfrac`）、wrap-don't-shrink 規則的權威描述見 [`DESIGN.md`](DESIGN.md) §Text rendering；落地計畫存 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
 
 > **鐵則:任何作者可能填入 `$` 或 `\` 的散文／標題欄位，模板一律用 `brand.prose`
 > 或 `brand.heading_rich` 渲染，不要直接用 `body_text` / `heading`。**
 
-這兩個共用渲染器會依內容自動路由（有標記→Tex，否則→可換行的 Text），是「Text vs Tex」
-判斷的**唯一**決策點。`math:` / `formulas:` 等純數學欄位仍走 `brand.math_line`。
+這兩個共用渲染器是 markup routing 的**唯一**決策點（有 `$math$` → Tex text-mode；純文字也走 Tex 取 kerning）。`math:` / `formulas:` 等純數學欄位仍走 `brand.math_line`。
 
 render 前會自動跑 lint 擋下亂碼（純文字欄位含標記、不平衡的 `$`）；也可獨立執行：
 
@@ -294,14 +289,8 @@ python video\pipeline\review_pack.py --storyboard video\storyboards\<deck>.yml
 > 換電腦時 `import manim/yaml` 會直接失敗。若它們不在,改建一個本機 venv
 > （與 `.deps*` 互不影響,`_bootstrap` 找不到 `.deps*` 時就用 venv 的套件）。
 
-> ⚠️ **環境依機器而定——換機後先驗證、別照搬（使用者常換電腦）。** 各機差異大，**跑前先驗一遍**：`.venv\Scripts\python -c "import yaml, manim"` 與（PowerShell）`Get-Command ffmpeg, ffprobe`。
->
-> **本次這台（2026-06-17 實測）：**
-> - **用 repo 根的 `.venv`（`.venv\Scripts\python.exe`）跑整條產線**——它有 **manim 0.20.1 ＋ PyYAML 6.0.3**。**全域 `python`（Python 3.12）有 manim 但缺 PyYAML**，故 `python video\make.py …` 會在 `import yaml` 直接掛（本次首跑就是這樣失敗）。MiKTeX（`latex`／`dvisvgm`）在 PATH、可用。
-> - **✅ `ffmpeg`＋`ffprobe` 現皆在 PATH（2026-06-17 裝 Gyan.FFmpeg 8.1.1 全套後）。** make.py 的 render→`_audit_render_sync`→compose 全程暢通，**§1.1 合併 mock 成片已產出**（`output/ch01/s1.1/ch01_inverse_functions.mp4`，1080p、~12:53）。
-> - **（歷史·安裝 ffprobe 前）** 當時 `ffmpeg`／`ffprobe` 都不在 PATH：manim render 靠 `.venv` 內 bundled `imageio_ffmpeg` 自帶 ffmpeg 故**場景 mp4 照常 render**，但 `make.py` compose／`_audit_render_sync` 與 `critic.py` 用**裸名**呼叫——`.venv\ffmpeg_shim\ffmpeg.exe`（真 ffmpeg 7.1）補得了 `ffmpeg`、**`ffprobe` 整台沒有**，故 (a) 場景 mp4 OK 但 (b) render 後 ffprobe 健檢崩、compose 跑不了、(c) `critic.py --dry-run`（per=scene 靠 ffprobe）抽不到幀。**裝 ffprobe 後 (b)(c) 解除。**
-> - **抽幀繞法（本次採用，免 ffprobe）：** 直接用 shim ffmpeg 從檔尾回退抓場景 mp4 最末（最滿）幀：`.venv\ffmpeg_shim\ffmpeg.exe -sseof -0.4 -i <scene>.mp4 -frames:v 1 -q:v 2 <out>.png`。輸出落在 `output/ch01/s1.1/critic/frames/NN_<scene_id>/final.png`（與 critic.py 同位）。
-> - **✅ 2026-06-17 已解（裝 Gyan.FFmpeg 全套，`ffmpeg`＋`ffprobe` 一起進 PATH；見 [`ENVIRONMENT.md`](../ENVIRONMENT.md)、`tools/doctor.py`）。以下為原待補記錄：** 要產合併片（含 MiMo 成片）或跑 `critic.py` 都需要 `ffprobe`。imageio_ffmpeg／shim 只給 ffmpeg、**不含 ffprobe**；屆時需在 PATH 放一個真 `ffprobe.exe`（完整 ffmpeg 套件），或把 `make.py`／`critic.py` 的 `_probe_duration`／`_ffprobe_duration` 改用 shim ffmpeg 探時長。
+> ⚠️ **環境依機器而定——換機後先驗證、別照搬（使用者常換電腦）。** 各機差異大，**跑前先驗一遍**：`.venv\Scripts\python -c "import yaml, manim"` 與（PowerShell）`Get-Command ffmpeg, ffprobe`；缺什麼跑 `python tools\doctor.py` 對照 [`ENVIRONMENT.md`](../ENVIRONMENT.md) 補齊。
+> 用 **repo 根的 `.venv`** 跑整條產線（manim＋PyYAML 齊；全域 python 可能缺 PyYAML）；ffmpeg **裝 Gyan.FFmpeg 全套**（`ffmpeg`＋`ffprobe` 一起進 PATH——compose 與 `critic.py` 都要 `ffprobe`，只有 ffmpeg 的 shim 不夠；策略 A，2026-06-17 定）。單機偵錯歷史帳見 `video/_archive/` 的 REBUILD 歸檔。
 
 **換新電腦的一次性設定**——完整見 [`ENVIRONMENT.md`](../ENVIRONMENT.md)。摘要：
 

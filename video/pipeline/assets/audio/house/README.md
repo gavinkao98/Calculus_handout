@@ -4,16 +4,17 @@
 [`generate_house_cues.py`](generate_house_cues.py) 由純 Python 標準函式庫合成，
 沒有使用第三方 sample、素材庫音檔或外部 API。
 
-使用者裁決稿：[`REVIEW-house-audio-candidates.html`](REVIEW-house-audio-candidates.html)。
-回家後可直接雙擊 HTML 試聽 A/B/C 三套。
+使用者裁決稿：[`REVIEW-house-audio-candidates.html`](REVIEW-house-audio-candidates.html)（歷史紀錄）。
 
-## 候選組
+## 裁決結果（2026-07-02 定案；2026-07-07 清理落選檔）
 
-| 組別 | 風格 | 檔案 |
-|---|---|---|
-| A | 清亮品牌感 | `calculus_intro_bed.wav`、`calculus_outro_bed.wav`、`calculus_divider_stinger.wav`、`calculus_caution_ping.wav` |
-| B | 溫暖低調（目前建議） | `candidate_b_intro_bed.wav`、`candidate_b_outro_bed.wav`、`candidate_b_divider_stinger.wav`、`candidate_b_caution_ping.wav` |
-| C | 極簡自然 | `candidate_c_intro_bed.wav`、`candidate_c_outro_bed.wav`、`candidate_c_divider_stinger.wav`、`candidate_c_caution_ping.wav` |
+**Candidate B（溫暖低調）獲採用**，接進 compose（政策表 `pipeline/house_audio.py`：intro/outro bed＋divider stinger gain 0.6；content 場全乾聲；**caution ping 不用**）。落選的 A（`calculus_*`）、C（`candidate_c_*`）全套與所有 `*_caution_ping.wav` 已於 2026-07-07 刪除（可從 git 歷史取回；裁決稿 HTML 內的 A/C 試聽連結因此失效）。現存檔案：
+
+| 檔案 | 用途 |
+|---|---|
+| `candidate_b_intro_bed.wav` | intro 開場底樂（6–8 秒，淡入淡出） |
+| `candidate_b_outro_bed.wav` | outro 結尾底樂 |
+| `candidate_b_divider_stinger.wav` | divider 一次性 stinger（gain 0.6） |
 
 ## 預期使用決策
 

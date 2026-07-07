@@ -17,7 +17,10 @@ recompute" reader for D7 ONLY when CONTENT_APPROVED=no.
 
 USAGE: copy to PROMPT-<deck>-narration-faithfulness.md, fill the {{...}}
 placeholders, then feed to the reviewer. For the Codex gate-2 pass:
-    codex exec -s read-only < PROMPT-<deck>-narration-faithfulness.md > REPORT-<deck>-narration-faithfulness.raw.txt 2>&1
+    codex exec -s read-only < PROMPT-<deck>-narration-faithfulness.md > <gitignored scratchpad>/REPORT-<deck>-narration-faithfulness.raw.txt 2>&1
+RAW OUTPUT IS NOT COMMITTED (2026-07-07, unified with the handout line): it goes
+to the gitignored scratchpad; transcribe findings + dispositions into the
+version-controlled REPORT-<deck>-narration-faithfulness.md.
 
 {{SECTION}}        e.g. "1.1 (Inverse Functions)"
 {{SOURCE_MD}}      content script with the narration: field

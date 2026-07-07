@@ -2,7 +2,7 @@
 
 > 本檔是「旁白忠實稽核（Narration Faithfulness Audit, **NFA**）」的契約與**單一真相來源（single source of truth）**。NFA 的兩道讀者——**gate 1（Claude subagent，免費）** 與 **gate 2（Codex 獨立第二讀者，計費）**——都讀本檔判斷；維度／收斂線**只在這裡改一次**，prompt 只「引用」不「複述」（防漂移）。
 >
-> **血統（lineage）：** NFA ＝ 原 video「Mode B」（審訂審查）。為解「與講義 Mode B 同名異義」的命名衝突而於 2026-06-15 改名；維度 D1–D7 **原封不動**沿用。舊 git 史用 `git log --grep="Mode B"`、本線改用 `git log --grep="NFA"`。**注意：** 講義的 Mode B（走 `<!-- expansion: -->` marker、Keep/Rewrite/**Move**/Cut、權威在根 [`../../../README.md`](../../../README.md)）是**不同產物的不同閘**，與本檔無關。
+> **血統（lineage）：** NFA ＝ 原 video「Mode B」（審訂審查）。為解「與講義 Mode B 同名異義」的命名衝突而於 2026-06-15 改名；維度 D1–D7 **原封不動**沿用。舊 git 史用 `git log --grep="Mode B"`、本線改用 `git log --grep="NFA"`。**注意：** 講義的 Mode B（走 `<!-- expansion: -->` marker、Keep/Rewrite/**Move**/Cut、權威在 [`../../../CONTENT_AUTHORING_WORKFLOW.md`](../../../CONTENT_AUTHORING_WORKFLOW.md)，2026-07-07 自根 README 遷出）是**不同產物的不同閘**，與本檔無關。
 >
 > 方法論與資料流的**權威規範**見 [`../../CONTENT_METHODOLOGY.md`](../../CONTENT_METHODOLOGY.md)（§4 旁白為「說」而寫、§7 內容層品質檢核）、[`../../DESIGN.md`](../../DESIGN.md)（MiMo 口語軌、derive parity）。本檔只定「審哪些維度、哪些擋稿、哪些不算 finding、怎麼回報、開幾個 reader」，**不重述**方法論本身。
 
@@ -34,6 +34,18 @@ NFA 在**鎖稿後**跑（旁白 source 已認可、已 derive）。從同一份
 **D6 — TTS 設定合理性（輕量，最弱維度）。** 文件化的合成設定（model／voice／format／sample rate／message shape）內部自洽、合理。**只 flag 明顯的內部矛盾。** 與 Tier 0 的 `derive_spoken --check`／manifest-freshness 對「實際合成」的檢查有重疊；本維只看「文件寫的設定」是否自洽，量低。
 
 **D7 — 數學內容正確（條件式）。** `CONTENT_APPROVED=no` → **必跑**；`=yes` → 只 flag 明顯錯誤。**獨立重算**旁白裡的每個數值、正負號、區間端點、象限、最終結果，確認與數學相符（不只是 D3 的「口語 vs 書寫等價」）。引用任何不符處。**這是唯一需要 agent 隔離的維度**（見下「reader 拆法」）——重算必須對旁白自己的結論盲，否則只是覆述。
+
+## 念法慣例（權威表；D3／D5 的裁定基準）
+
+> 本表為 MiMo 口語數學念法的**單一權威**（2026-07-07 自 RUNBOOK／生成稿收斂至此）。[`../../RUNBOOK-mimo-narration-route.md`](../../RUNBOOK-mimo-narration-route.md) 步驟 1 與 `derive_spoken.py` 生成的 `_narration_spoken.md` §2 為其**摘錄**，衝突時以本表為準；D5 的新裁定定案後**回寫本表**。
+
+- `f^{-1}` → “f inverse”（絕不 “f to the minus one”；例外：課文刻意對比 `\sin^{-1}` 與 `1/\sin` 這個記號時照字面念）
+- 下標 `x_1, x_2` → “x sub one / x sub two”
+- 和／差的根號 `\sqrt[3]{y-2}` → “the cube root of the quantity y minus two”（「the quantity」只在群組真的需要去歧義時用）
+- 群組次方 `(\sqrt[3]{x-2})^3`／`(f^{-1}(x))^2` → “…, all cubed ／ all squared”
+- 座標 `(a,b)` → “the point with coordinates a and b”；區間 `[a,b]` → “the interval from a to b”
+- 反三角 `\arcsin` → “arcsine of …”；`\pi/2` → “pi over two”；常見分數念 “one half ／ nine-fifths” 等
+- `x+\tfrac h2` → “x plus one half h”——**不可** “x plus h over two”（會被聽成 `(x+h)/2`；§3.1 gate-2 實證的 D3 blocking）
 
 ## 收斂線（blocking vs advisory）
 
