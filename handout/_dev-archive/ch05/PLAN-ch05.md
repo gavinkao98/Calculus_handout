@@ -78,7 +78,19 @@ Excluded (roadmap): antiderivatives (→Ch6), graphing-with-technology.
 **Final numbering ledger (as-built):** Definition 5.1–5.7 · Theorem 5.1–5.5 · Strategy 5.1–5.7 · Example 5.1–5.25 · Corollary/Proposition/Lemma/Figure/Remark: none in Ch5. Appendix D grew to §D.1–§D.3 (Lemma D.1; proofs of Thm 4.9(a)/(b), Thm 5.5 ∞/∞).
 
 **Gate status (2026-07-06):** ✅ 逐節 Codex ⑤（0 blocking；5 blocking 沿途修）· ✅ **sympy 數學閘 33/33 PASS** · ✅ **章層 Codex review**（0 blocking，5 cross-section adv 套）· ✅ **圖機會閘**（13 候選：essential 6/strong 5/med 3/low 2，駁 6；見 `handout/_audit/REVIEW-ch05-figure-opportunity.html`）。
-**剩餘（後續 session，較大、宜 fresh context）：** 圖**繪製**＋圖正確性閘 D1–D8（採 tier-1/2 候選）· math M1–M8 gate-2（可選跨模型 Codex）· S·A·V 散文閘完整跑 · 難度 learner-sim（≥3 盲測）· Mode C ①課文範例補充 ②軟深度。
+**剩餘（後續 session，較大、宜 fresh context）：** 圖**繪製**＋圖正確性閘 D1–D8（採 tier-1/2 候選）· math M1–M8 gate-2（依 PIPELINE 風險判準：Ch5 屬標準嚴謹章＝抽樣層）· S·A·V＋難度 learner-sim（PIPELINE M3 合一輪）· Mode C 條件式 gap-check（PIPELINE M4）。
+
+## Gate-family checklist（與 `handout/PIPELINE.md` dashboard 同步；2026-07-07 制）
+
+| 閘家族 | 狀態 | 日期／備註 |
+|---|---|---|
+| M1 Mode A′（brief＋⑤＋sympy＋章層 review） | ✅ | 2026-07-06；5 blocking 沿途修 |
+| M2 圖機會（候選） | ✅ | 2026-07-06；13 候選待裁「畫哪些」 |
+| M2 圖繪製＋D1–D8 | ⏳ | 待裁決後跑 |
+| 數學 M gate-2（跨模型） | ⏳ | 風險判準＝抽樣層（標準嚴謹章） |
+| M3 散文 S·A·V＋難度 learner-sim（合一輪） | ⏳ | ≥3 盲測 |
+| M4 Mode C gap-check（①②合一） | ⏳ | brief 覆蓋完整可跳過，記錄即可 |
+| M5 收尾（dashboard＋ROADMAP open-q） | ⏳ | |
 
 ## Chapter opener — "By the end of this chapter you will be able to"
 

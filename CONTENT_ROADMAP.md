@@ -342,7 +342,7 @@ Chapter 4 為 Calc I 的微分章節收尾嚴謹基礎。Ch 2 非正式地引入
 
 > 研究（Stewart ET 9e／Thomas 14e／Rogawski 4e／NTU 微積分甲）＋Codex 覆核見 [`handout/_audit/REVIEW-chapter-arc-proposal.html`](handout/_audit/REVIEW-chapter-arc-proposal.html)。深度政策＝[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §16.1 雙軸＋§16.3 逐章深度決策；使用者裁定 **(B) 分章校準**——「不假證」全程守住，主線嚴謹交付到 §16.2 難度預算為止，最重的定理 on-credit fence（Ch4 為既有深度上限）。深度基調三層：**深理論核心（Ch4 級）**／**標準嚴謹（rigorous-Stewart）**／**嚴謹陳述＋最重的 fence**。以下為脊椎骨架，非完整 entry；core skills／key figures／notation／確切各節與 Ch11/Ch16 拆章的最終編號待該章前驅到 `draft` 才填。
 
-**Ch5 Applications of Differentiation** — *Role*：把 Ch2–4 的導數機器轉成分析工具。含極值/最佳化/相關變率/L'Hôpital/曲線描繪/Newton 法、隱微分、線性近似 differentials。*Prereq*：Ch2–4（尤 Ch4 MVT／單調性；反三角導數已在 Ch3）。*對應*：Stewart 4。*深度*：**標準嚴謹**（L'Hôpital 靠 §5.7 就地引入的 **Generalized MVT（Cauchy's form）** 可全證——Ch4 只有普通 MVT Thm 4.12、無 Cauchy 形；其餘應用計算為主）。節 roster（Codex 重排 9 節）見下方「全局 seam ledger」。 **〔as-built 2026-07-06，first manuscript-free chapter〕** Mode A 全 9 節草稿完成（canon-as-spine；每節 Codex ⑤ 逐節審至 0 blocking，advisories 已套）＋**sympy 數學閘 33/33 PASS**（獨立重算所有 worked example）＋build/linebreak/render 全綠（math=917）；L'Hôpital ∞/∞ 補證入 **Appendix D §D.3**（Proof Track 第二 customer）。編號 as-built：Def 5.1–5.7／Thm 5.1–5.5／Strategy 5.1–5.7／Ex 5.1–5.25。詳見 [`handout/_dev-archive/ch05/PLAN-ch05.md`](handout/_dev-archive/ch05/PLAN-ch05.md)、applied 報告 [`handout/_audit/REVIEW-ch05-applied.html`](handout/_audit/REVIEW-ch05-applied.html)。**剩餘全閘**（圖機會/正確性／S·A·V 散文／難度 learner-sim／Mode C ①②）待後續 session。
+**Ch5 Applications of Differentiation** — *Role*：把 Ch2–4 的導數機器轉成分析工具。含極值/最佳化/相關變率/L'Hôpital/曲線描繪/Newton 法、隱微分、線性近似 differentials。*Prereq*：Ch2–4（尤 Ch4 MVT／單調性；反三角導數已在 Ch3）。*對應*：Stewart 4。*深度*：**標準嚴謹**（L'Hôpital 靠 §5.7 就地引入的 **Generalized MVT（Cauchy's form）** 可全證——Ch4 只有普通 MVT Thm 4.12、無 Cauchy 形；其餘應用計算為主）。節 roster（Codex 重排 9 節）見下方「全局 seam ledger」。 **〔2026-07-06 起 as-built〕** 首個無手稿章（canon-as-spine），Mode A（M1）完成；L'Hôpital ∞/∞ 補證入 **Appendix D §D.3**（Proof Track 第二 customer）。**閘狀態唯一表＝[`handout/PIPELINE.md`](handout/PIPELINE.md) dashboard；as-built 編號與逐節 ledger＝[`handout/_dev-archive/ch05/PLAN-ch05.md`](handout/_dev-archive/ch05/PLAN-ch05.md)**（2026-07-07 三檔分工制：本 entry 只留弧線／契約／open questions）；applied 報告 [`handout/_audit/REVIEW-ch05-applied.html`](handout/_audit/REVIEW-ch05-applied.html)。
 
 **Ch6 Integrals** — *Role*：定積分與 FTC，接起微分與積分。含原函數/黎曼和/定積分/FTC/代換。*Prereq*：Ch5、Ch1 極限；附錄 GAP-A 冪次和（黎曼和從定義）。*對應*：Stewart 5。*深度*：**深理論核心**（FTC 當場證；最重的可積性刻畫 fence）。
 
@@ -422,7 +422,7 @@ $dy,\ \Delta y$（微分 vs 增量，Ch5 §5.3 新）｜$dy/dt$（對時間，Ch
 一份學生會翻回去查的微積分講義，需要記號一旦引入就保持穩定。首次做出決定時記錄在此；後續章節引用本節而非重新決定。
 
 - `\arcsin` / `\arccos` / `\arctan` 是本書使用的 operator。`\sin^{-1}`、`\cos^{-1}`、`\tan^{-1}` 僅在首次警告 reciprocal 誤讀時出現在 caution box 中。
-- Domain restriction 在適用於單一公式時以 inline 方式寫在 condition 區塊中；容易忘記時則移入 caution 區塊。HTML 對應的 markup 見 [`handout/_dev-archive/general/CONTRACT-html-writing.md`](handout/_dev-archive/general/CONTRACT-html-writing.md)。
+- Domain restriction 在適用於單一公式時以 inline 方式寫在 condition 區塊中；容易忘記時則移入 caution 區塊。HTML 對應的 markup 見 [`handout/CONTRACT-html-writing.md`](handout/CONTRACT-html-writing.md)。
 - 方程式編號為 per-chapter（`(1.3)`、`(2.7)`），且僅在方程式被後續引用或為 formal statement 時出現（見 spec §6）。
 
 *（後續章節引入新的慣例決策時擴展此列表。）*
