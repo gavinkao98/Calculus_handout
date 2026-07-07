@@ -4,7 +4,7 @@
 
 如果你是新加入的作者，另請瀏覽一次 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)，了解你負責的章節在整體弧線中的位置。
 
-**內容寫在哪裡。** 正式講義是 HTML：內容以每節一個片段撰寫於 `handout/fragments/chNN/sec-*.html`，由 `python handout/build.py` 組成 `handout/chapterN-print-standalone.html`（print standalone，A4 分頁由 JS paginator 處理）。HTML 標記契約見 [`handout/_dev-archive/general/CONTRACT-html-writing.md`](handout/_dev-archive/general/CONTRACT-html-writing.md)，排版規範見 [`handout/TYPESETTING_GUIDE.md`](handout/TYPESETTING_GUIDE.md)。（舊的 LaTeX 講義已移入 `legacy/tex_handout/`。）
+**內容寫在哪裡。** 正式講義是 HTML：內容以每節一個片段撰寫於 `handout/fragments/chNN/sec-*.html`，由 `python handout/build.py` 組成 `handout/chapterN-print-standalone.html`（print standalone，A4 分頁由 JS paginator 處理）。HTML 標記契約見 [`handout/CONTRACT-html-writing.md`](handout/CONTRACT-html-writing.md)，排版規範見 [`handout/TYPESETTING_GUIDE.md`](handout/TYPESETTING_GUIDE.md)。（舊的 LaTeX 講義已移入 `legacy/tex_handout/`。）
 
 ---
 
@@ -110,7 +110,7 @@ HTML 講義目前沒有自動 back-of-book index 機制（原 LaTeX `\index{...}
 
 ## Cross-reference 與編號
 
-HTML 講義沒有 `\cref`/`\label`/`\eqref` 自動交叉參照機制；改用散文直接引用手寫編號（例：*"by Theorem 4.2"*、*"as in §1.3"*）。標記方式見 [`handout/_dev-archive/general/CONTRACT-html-writing.md`](handout/_dev-archive/general/CONTRACT-html-writing.md)。
+HTML 講義沒有 `\cref`/`\label`/`\eqref` 自動交叉參照機制；改用散文直接引用手寫編號（例：*"by Theorem 4.2"*、*"as in §1.3"*）。標記方式見 [`handout/CONTRACT-html-writing.md`](handout/CONTRACT-html-writing.md)。
 
 - 引用定理／圖／節時，直接寫出手寫編號（*"by Theorem 4.2"*、*"see Figure 2.5"*），不要重述其內容。
 - 方程式編號僅用於後續會被引用或屬於 formal statement 的方程式。

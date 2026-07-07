@@ -28,7 +28,7 @@ python tools\doctor.py
 | **①b 影片字型** | **全走 LaTeX**：文字 IBM Plex Sans/Mono、數學 Latin Modern（套件見 ③）。**不再用 Pango 系統字型**（Times/Courier 已棄） | 無需安裝系統字型；只要 ③ 的 MiKTeX 套件在即可（`doctor.py` 以 kpsewhich 驗）。video 不 vendored 任何字型 |
 | **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/_render/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
-| **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
+| **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](authoring/_archive/deai/PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
 | **⑤c forced alignment（選用）** | `video/experiments/forced_alignment_dean/` 的本機 word-level timestamps，將整段 Dean 音訊對回 storyboard beats：`stable-ts`（transcript-constrained，**計時來源**）＋`whisper_timestamped`（自由 ASR，**QA 探針**） | 每台全局安裝一次：`python -m pip install --upgrade whisper-timestamped stable-ts`；第一次跑 `base.en` 會下載 Whisper model cache。缺它不擋核心產線，`doctor.py` 只 WARN |
 | **祕鑰** | `MIMO_API_KEY` / `GEMINI_API_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` | per-machine 設環境變數；**不進版控**（計費 API，依 [`CLAUDE.md`](CLAUDE.md) 徵同意） |
 
@@ -141,7 +141,7 @@ copy tools\codex.cmd "%APPDATA%\npm\codex.cmd"
 
 ### ⑤b Vale — 去 AI 味散文 lint（選用、flag-only）
 
-去 AI 味方案（[`PLAN-deai-flavor.md`](PLAN-deai-flavor.md)）的決定性 lint 引擎。選 Vale 的理由：**markup-aware**（自動排除 `$...$`／`\(...\)`／LaTeX 命令／`<code>`，數學符號不會淹沒訊號）、單一 Go binary、跨平台、零 AI-detector 風險。
+去 AI 味方案（[`PLAN-deai-flavor.md`](authoring/_archive/deai/PLAN-deai-flavor.md)）的決定性 lint 引擎。選 Vale 的理由：**markup-aware**（自動排除 `$...$`／`\(...\)`／LaTeX 命令／`<code>`，數學符號不會淹沒訊號）、單一 Go binary、跨平台、零 AI-detector 風險。
 
 - **裝法（每台機器一次）：** `winget install --id errata-ai.Vale -e`（備援 `scoop install vale`，或自 <https://github.com/errata-ai/vale/releases> 下載 binary 放 PATH）。裝完開新 shell 讓 PATH 生效。**pinned 版本：3.15.1。**
 - **定位：永遠 flag-only／advisory。** 嚴重度設 `warning`/`suggestion`、**不設 `error`**；決定性「擋不擋」交給 Mode B 人審維度 C，不在此。所以缺它不擋核心產線——`doctor.py` 判 **WARN 不 FAIL**（同 codex）。

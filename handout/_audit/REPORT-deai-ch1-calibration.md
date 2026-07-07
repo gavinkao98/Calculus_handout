@@ -1,6 +1,6 @@
 # Ch1 去 AI 味校準報告（REPORT-deai-ch1-calibration）
 
-> **本檔是什麼：** 去 AI 味方案（[`../../PLAN-deai-flavor.md`](../../PLAN-deai-flavor.md)）Phase 1 / Task 1.2 的校準掃描交付物。對全書唯一已簽核、已過 prose audit 的 **Ch1** 做唯讀掃描，量測兩層（Vale 決定性 lint + 人審 Dimension C）的命中與**誤砍率**，據此提出「高密度叢集」**門檻建議值**供使用者拍板（PLAN §6-2/§6-3）。
+> **本檔是什麼：** 去 AI 味方案（[`../../PLAN-deai-flavor.md`](../../authoring/_archive/deai/PLAN-deai-flavor.md)）Phase 1 / Task 1.2 的校準掃描交付物。對全書唯一已簽核、已過 prose audit 的 **Ch1** 做唯讀掃描，量測兩層（Vale 決定性 lint + 人審 Dimension C）的命中與**誤砍率**，據此提出「高密度叢集」**門檻建議值**供使用者拍板（PLAN §6-2/§6-3）。
 >
 > **唯讀：** 本輪不改任何 fragment、不改 `reject.txt`/`accept.txt`。所有改動建議列在 §6，等使用者 ⛳ 拍板後才動。
 >

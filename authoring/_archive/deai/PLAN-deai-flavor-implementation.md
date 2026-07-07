@@ -1,3 +1,5 @@
+> **Status: archived / completed（2026-07-07 歸檔）** — 本計畫已落地：Vale lane＝advisory 預標（`ENVIRONMENT.md` §⑤b）、語意/聲音 S·A·V critic＝`handout/_audit/PROSE-AUDIT-RUBRIC.md` Dimension C。本檔為歷史施工紀錄，勿當現行流程；內含相對路徑可能已過時。
+
 # 去「AI 味」方案 Implementation Plan
 
 > ⚠️ **偵測層已 SUPERSEDED（2026-06-26）。** 本檔 Phase 0–2 的「Vale 清單＋Dimension C 數 tell／密度」偵測實作，已由 [`PLAN-deai-semantic-critic.md`](PLAN-deai-semantic-critic.md)（語意/聲音 S/A/V critic）取代；緣由見該檔 §0。下方 Phase 0–4 步驟保留作**已完成工作的紀錄**，但 Dimension C（數 tell/密度）、Ch1 校準門檻、§3 的 Ch1 voice corpus 等均退役或替換——新的逐 task 展開以 semantic-critic 的 implementation plan 為準。

@@ -23,6 +23,12 @@ jobs:
       - name: Lint prose quotes (CONTENT_SPEC §8)
         run: python handout/quote_lint.py
 
+      # doc_lint.py is stdlib-only; verifies relative markdown links in active
+      # guidance docs resolve to existing files (archives / legacy excluded).
+      # A failure means a doc references a moved/renamed/deleted file.
+      - name: Lint doc links (broken relative links)
+        run: python tools/doc_lint.py
+
       # build.py is stdlib-only (pathlib/re); no pip install needed.
       - name: Assemble handout (fragments -> print standalone)
         run: python handout/build.py

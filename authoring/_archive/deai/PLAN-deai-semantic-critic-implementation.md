@@ -1,3 +1,5 @@
+> **Status: archived / completed（2026-07-07 歸檔）** — 本計畫已落地：Vale lane＝advisory 預標（`ENVIRONMENT.md` §⑤b）、語意/聲音 S·A·V critic＝`handout/_audit/PROSE-AUDIT-RUBRIC.md` Dimension C。本檔為歷史施工紀錄，勿當現行流程；內含相對路徑可能已過時。
+
 # 語意/聲音 critic Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL：用 superpowers:subagent-driven-development（推薦）或 superpowers:executing-plans 逐 task 實作。步驟用 `- [ ]` checkbox 追蹤。

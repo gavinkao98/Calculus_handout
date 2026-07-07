@@ -38,7 +38,7 @@
 
 ### C. 語意／聲音 Substance／Altitude／Voice（S/A/V 語意層 critic；部分 BLOCKING）
 
-讀者「會不會覺得這是機器寫的」——但**不是數 tell／密度，是讀意思**。**中性 ≠ AI；中性＋空才是 AI**（[`PLAN-deai-semantic-critic.md`](../../PLAN-deai-semantic-critic.md) §0）。對每個候選句/段跑下面三組診斷，**每條 finding 強制附證據**。
+讀者「會不會覺得這是機器寫的」——但**不是數 tell／密度，是讀意思**。**中性 ≠ AI；中性＋空才是 AI**（[`PLAN-deai-semantic-critic.md`](../../authoring/_archive/deai/PLAN-deai-semantic-critic.md) §0）。對每個候選句/段跑下面三組診斷，**每條 finding 強制附證據**。
 
 **S — Substance（這句掙得它的位置嗎？）**
 - **S1 資訊** — 相對前句、相對數學式本身，有沒有加**新洞見**？（只把算式翻成英文卻沒加東西＝空）
@@ -113,4 +113,4 @@
 - 每個**乾淨**的維度各一行（如 `F2 贅字: clean`、`S/A/V: clean`）。
 - 末行：對「**易懂性＋S/A 的 blocking 是否歸零**」給一句明確結論（prose gate 收斂判準）。
 
-**交付給使用者裁決時**：**每道閘各產一份** standalone HTML 審核稿（MathJax CDN、雙擊即開、數學即渲染、頂部摘要表、逐條卡片含 `<del>`／`<ins>` diff）。正常流程：gate 1（Claude）審完交 `REVIEW-ch{NN}-prose-audit-gate1.html`，再換 gate 2（Codex）審完交 `REVIEW-ch{NN}-prose-audit-gate2.html`——**兩份各自獨立、不合併**（對應 Claude 先審、Codex 再審的兩步）。格式參照 [`REVIEW-ch01-prose-audit-gate1.html`](REVIEW-ch01-prose-audit-gate1.html)／[`REVIEW-ch01-prose-audit-gate2.html`](REVIEW-ch01-prose-audit-gate2.html)（源自 [`../../video/content_scripts/_audit/REVIEW-ch01-narration-copyedit.html`](../../video/content_scripts/_audit/REVIEW-ch01-narration-copyedit.html)）。**不要**交塞滿生 LaTeX 的 `.md`（CLAUDE.md 規則）。純版控紀錄（如本 rubric、驗證報告）不在此限。每條 finding 標**穩定編號**（gate 1 用 `G1-1…`、gate 2 用 `G2-1…`），方便使用者逐條報編號討論與回覆裁決。
+**交付給使用者裁決時**：**每道閘各產一份** standalone HTML 審核稿（MathJax CDN、雙擊即開、數學即渲染、頂部摘要表、逐條卡片含 `<del>`／`<ins>` diff）。正常流程：gate 1（Claude）審完交 `REVIEW-ch{NN}-prose-audit-gate1.html`，再換 gate 2（Codex）審完交 `REVIEW-ch{NN}-prose-audit-gate2.html`——**兩份各自獨立、不合併**（對應 Claude 先審、Codex 再審的兩步）。格式參照 [`REVIEW-ch01-prose-audit-gate1.html`](REVIEW-ch01-prose-audit-gate1.html)／[`REVIEW-ch01-prose-audit-gate2.html`](REVIEW-ch01-prose-audit-gate2.html)（版型最初源自 video 線 ch01 copyedit 審核稿；該練習產物已刪，樣式由前述兩份 gate HTML 承繼）。**不要**交塞滿生 LaTeX 的 `.md`（CLAUDE.md 規則）。純版控紀錄（如本 rubric、驗證報告）不在此限。每條 finding 標**穩定編號**（gate 1 用 `G1-1…`、gate 2 用 `G2-1…`），方便使用者逐條報編號討論與回覆裁決。

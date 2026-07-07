@@ -1,3 +1,5 @@
+> **Status: archived / completed（2026-07-07 歸檔）** — 本計畫已落地：Vale lane＝advisory 預標（`ENVIRONMENT.md` §⑤b）、語意/聲音 S·A·V critic＝`handout/_audit/PROSE-AUDIT-RUBRIC.md` Dimension C。本檔為歷史施工紀錄，勿當現行流程；內含相對路徑可能已過時。
+
 # PLAN-deai-flavor — 去「AI 味」完整方案計畫書
 
 > ⚠️ **偵測層已 SUPERSEDED（2026-06-26）。** 本檔的「Vale 清單＋Dimension C 數 tell／密度」偵測設計，因真人語料校準證明其在「數學教科書」這個窄語域天花板過低（真人 em-dash 跨度 10×、講義落在人類區間內），已由 [`PLAN-deai-semantic-critic.md`](PLAN-deai-semantic-critic.md)（語意/聲音 S/A/V critic）取代。本檔保留作**決策史**與**仍有效的部分**（三層架構框架、不用 AI-detector 鐵律、授權政策、§3 語域權威）。

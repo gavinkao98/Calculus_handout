@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>產線與文檔體系總體檢（2026-07-07）</title>
+<style>
+  :root{
+    --ink:#1a1f2e; --muted:#5c6470; --bg:#ffffff; --soft:#f4f6f9; --line:#d9dee6;
+    --navy:#16294e; --red:#ba2c3f; --amber:#a86a00; --green:#1c7a4c; --blue:#1d5fa6;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;color:var(--ink);background:var(--bg);
+       margin:0;padding:2.2rem 1.4rem 5rem;line-height:1.75;font-size:15.5px}
+  main{max-width:1000px;margin:0 auto}
+  h1{font-size:1.7rem;color:var(--navy);border-bottom:3px solid var(--navy);padding-bottom:.5rem;margin:.2rem 0 .4rem}
+  h2{font-size:1.28rem;color:var(--navy);margin:2.6rem 0 .6rem;border-left:5px solid var(--navy);padding-left:.6rem}
+  h3{font-size:1.08rem;margin:1.8rem 0 .4rem;color:var(--ink)}
+  .meta{color:var(--muted);font-size:.92em;margin-bottom:1.6rem}
+  code{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:0 .3em;font-size:.88em;
+       font-family:Consolas,"Courier New",monospace;word-break:break-all}
+  table{border-collapse:collapse;width:100%;margin:.8rem 0 1.4rem;font-size:.93em}
+  th{background:var(--navy);color:#fff;text-align:left;padding:.45rem .6rem;font-weight:600}
+  td{border:1px solid var(--line);padding:.45rem .6rem;vertical-align:top}
+  tr:nth-child(even) td{background:var(--soft)}
+  .wrap{overflow-x:auto}
+  .b{display:inline-block;border-radius:4px;padding:.05rem .45rem;font-size:.8em;font-weight:700;color:#fff;white-space:nowrap}
+  .b-fix{background:var(--red)} .b-rec{background:var(--blue)} .b-user{background:var(--amber)}
+  .b-back{background:var(--muted)} .b-no{background:#444} .b-done{background:var(--green)}
+  .card{background:var(--soft);border:1px solid var(--line);border-left:5px solid var(--blue);
+        border-radius:6px;padding:.9rem 1.1rem;margin:1rem 0}
+  .card.warn{border-left-color:var(--red)}
+  .card.decide{border-left-color:var(--amber)}
+  .small{font-size:.88em;color:var(--muted)}
+  ul{margin:.3rem 0 .9rem 1.3rem;padding:0}
+  li{margin:.28rem 0}
+  .verdict{font-weight:700;color:var(--green)}
+  details{margin:.6rem 0}
+  summary{cursor:pointer;font-weight:600;color:var(--navy)}
+  .toc{background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:.8rem 1.2rem;margin:1rem 0}
+  .toc a{color:var(--blue);text-decoration:none}
+</style>
+</head>
+<body>
+<main>
+
+<h1>產線與文檔體系總體檢 — 講義線・影片線・指引文檔</h1>
+<div class="meta">
+  2026-07-07 ・ 審查範圍：handout 講義產線、video 影片產線、全部指引文檔 ・
+  方法：Claude 主審精讀核心權威文檔 ＋ 3 個唯讀盤點 subagent（文檔體系／講義線實況／影片線實況）＋
+  <strong>Codex 兩輪對抗審</strong>（r1 獨立審查、r2 對提案集逐條裁決；gpt-5.5 read-only，standing consent）。
+  <strong>執行狀態（2026-07-07 稍晚）：使用者核准「按照建議開始修改」後，除 V4（spoken auto-prefill，backlog）與 V1（成本量測，隨下一節啟動）外，全部批次已落地</strong>——含 CONTENT_AUTHORING_WORKFLOW.md 新檔、PIPELINE 雙軌重寫、gate-2 頻率矩陣、REBUILD_STATUS 瘦身、歸檔與清理、tools/doc_lint.py 進 CI（全庫 clean）。
+</div>
+
+<div class="toc">
+<strong>目錄</strong>：
+<a href="#s0">0 裁決總表</a> ・
+<a href="#s1">1 核心診斷</a> ・
+<a href="#s2">2 講義線</a> ・
+<a href="#s3">3 影片線</a> ・
+<a href="#s4">4 文檔體系（含實錘缺陷清單）</a> ・
+<a href="#s5">5 已否決的大架構案</a> ・
+<a href="#s6">6 建議執行順序</a> ・
+<a href="#s7">7 本輪已完成</a>
+</div>
+
+<div class="card">
+<strong>圖例</strong>：
+<span class="b b-fix">立即修</span> 客觀事實缺陷，修正無爭議，批准即可執行 ・
+<span class="b b-rec">建議</span> 雙模型收斂後的流程／文檔調整建議 ・
+<span class="b b-user">待你裁決</span> 涉及品質門檻或結構取捨，需要你拍板 ・
+<span class="b b-back">backlog</span> 有價值但不急的工程投資 ・
+<span class="b b-no">不採</span> 討論後否決、留紀錄防復活 ・
+<span class="b b-done">已完成</span>
+</div>
+
+<h2 id="s0">0. 裁決總表</h2>
+<div class="wrap">
+<table>
+<tr><th style="width:4.5em">編號</th><th style="width:5.5em">等級</th><th>一句話</th><th style="width:11em">Codex 收斂</th></tr>
+<tr><td>H1</td><td><span class="b b-rec">建議</span></td><td>把 Ch5 已實證的「無手稿 canon-as-spine 流程」寫成正式文檔預設；手稿模式保留為 Ch1–4 變體</td><td>同意（雙變體並存）</td></tr>
+<tr><td>H2</td><td><span class="b b-user">待你裁決</span></td><td>Ch6+ 閘序由 9 階段壓成 5 個 milestone；M1–M8 gate-2 改風險制</td><td>修改後同意</td></tr>
+<tr><td>H3</td><td><span class="b b-rec">建議</span></td><td>Mode B 去獨立閘化（只留 Mode C 後 scoped＋點名週期審）</td><td>同意</td></tr>
+<tr><td>H4</td><td><span class="b b-user">待你裁決</span></td><td>易懂性單一錨：learner-sim 為 blocking 主證據、SAV-A 降預篩；獨立 readability 輪停用</td><td>採方案甲（含保留條款）</td></tr>
+<tr><td>H5</td><td><span class="b b-no">不採</span></td><td>（Codex r1 提案）Ch5+ 廢 expansion 標記改 section manifest —— 推回成功，維持現制</td><td>接受推回</td></tr>
+<tr><td>H6</td><td><span class="b b-rec">建議</span></td><td>圖機會併入 Mode A brief／收尾檢查表；保留「畫哪些」章批次裁決點；D1–D8 不動</td><td>修改後同意</td></tr>
+<tr><td>H7</td><td><span class="b b-rec">建議</span></td><td>learner-sim 固化為具名 subagent（比照其他 gate-1）</td><td>—（無異議）</td></tr>
+<tr><td>V1</td><td><span class="b b-rec">建議</span></td><td>影片每節量測成本（token／工時／render／hook／TTS call），三節後定 hook 上限</td><td>同意</td></tr>
+<tr><td>V2</td><td><span class="b b-user">待你裁決</span></td><td>影片 gate-2 頻率矩陣（copyedit gate-2 改抽樣；NFA gate-2 維持每節）</td><td>給出最終矩陣</td></tr>
+<tr><td>V3</td><td><span class="b b-no">不採</span></td><td>（Codex r1 提案）REVIEW_GATES 重寫為四 phase —— 只加一張 phase 索引表</td><td>反對大改</td></tr>
+<tr><td>V4</td><td><span class="b b-back">backlog</span></td><td>spoken.yml 自動攤平：先做白名單 auto-prefill，回測低漏率後才收斂 overrides-only</td><td>修改後同意</td></tr>
+<tr><td>V5</td><td><span class="b b-rec">建議</span></td><td>REBUILD_STATUS 瘦身：頂部 ≤50 行現況快照＋歷史移 archive</td><td>同意</td></tr>
+<tr><td>V6</td><td><span class="b b-fix">立即修</span></td><td>Route A 已於 2026-06-25 落地，video/README「待實作」橫幅與整節 Pango 描述過時</td><td>證實（DESIGN.md:678-691）</td></tr>
+<tr><td>V7</td><td><span class="b b-rec">建議</span></td><td>未消費產物清理（house audio A/C＋caution ping、孤兒 hook 檔、derive_spoken ch01 殘留）</td><td>同意（留 Candidate B）</td></tr>
+<tr><td>D-0</td><td><span class="b b-fix">立即修</span></td><td>實錘文檔缺陷 13 項（連結指錯檔、計數過時、斷鏈、宣稱與現況相反——見 §4.1 逐項表）</td><td>雙方一致</td></tr>
+<tr><td>D1</td><td><span class="b b-user">待你裁決</span></td><td>root README 回歸 hub：抽出 CONTENT_AUTHORING_WORKFLOW.md 作內容流程權威</td><td>採「大搬」</td></tr>
+<tr><td>D2</td><td><span class="b b-rec">建議</span></td><td>README legacy 段落（~90 行）壓成短段指向 legacy/</td><td>同意</td></tr>
+<tr><td>D3</td><td><span class="b b-rec">建議</span></td><td>完工 PLAN／HANDOFF 歸檔制度（root PLAN-deai-*→authoring/_archive/；video→video/_archive/plans/；加 Status 頭）</td><td>修改後同意</td></tr>
+<tr><td>D4</td><td><span class="b b-rec">建議</span></td><td>章狀態三檔分工：PIPELINE=dashboard、ROADMAP=弧線/契約、PLAN-chNN=as-built ledger</td><td>同意</td></tr>
+<tr><td>D5</td><td><span class="b b-rec">建議</span></td><td>CONTRACT-html-writing.md 搬出 _dev-archive 至 handout/ 頂層（舊路徑留 stub）</td><td>同意（不併入 TYPESETTING）</td></tr>
+<tr><td>D6</td><td><span class="b b-rec">建議</span></td><td>MiMo 念法慣例權威收斂到 NFA rubric；video/README 單機環境歷史帳搬走</td><td>修改後同意</td></tr>
+<tr><td>D7</td><td><span class="b b-rec">建議</span></td><td>術語衛生：影片「Mode A 內容稿」改稱 Stage-1 content script</td><td>同意</td></tr>
+<tr><td>D8</td><td><span class="b b-no">不採</span></td><td>（Codex r1 提案）stable claim/example ID 體系＋machine-readable 狀態機 —— 均否決</td><td>接受推回</td></tr>
+<tr><td>D9</td><td><span class="b b-rec">建議</span></td><td>_audit 不改層級目錄；只清 committed raw.txt＋立 forward rule</td><td>修改後同意</td></tr>
+<tr><td>X1</td><td><span class="b b-rec">建議</span></td><td>【Codex 補漏】建文檔斷鏈 lint（legacy book_docs_lint.py 本有此功能，可復活精簡版進 CI）</td><td>Codex 提出、Claude 同意</td></tr>
+<tr><td>X2</td><td><span class="b b-rec">建議</span></td><td>【Codex 補漏】raw artifact 政策兩線統一（video README 目前允許 *.raw.txt 進版控、handout 紀律禁止）</td><td>Codex 提出、Claude 同意</td></tr>
+<tr><td>X3</td><td><span class="b b-rec">建議</span></td><td>【Codex 補漏】PLAN-chNN 加「閘家族 checklist」小表（不造狀態機，但一眼看出哪些閘已過）</td><td>Codex 提出、Claude 同意</td></tr>
+<tr><td>M</td><td><span class="b b-done">已完成</span></td><td>本地 memory 兩條過時條目（「拍板維持 Gemini」）已標 superseded＋修索引</td><td>—</td></tr>
+</table>
+</div>
+
+<h2 id="s1">1. 核心診斷（三句話）</h2>
+<div class="card">
+<p><strong>① 無手稿時代已經開始，但文檔還活在手稿時代。</strong>
+Ch5 已用「canon 為軸（Stewart ET 9e 主脊、Thomas/Rogawski 交叉核對）＋<code>&lt;!-- section-source: --&gt;</code> header＋hypothesis ledger＋③⑤人閘改 Codex＋sympy 章末重算 33/33＋章層 Codex review」完成 Mode A（9 節、沿途修 5 個 blocking），流程實證有效。但根 README 的 Mode A/B/C 敘事、CONTENT_DIRECTION 六階（掃描手稿→seed→①-verify）、CONTENT_SOURCING（「手稿範例——必要核心」）、PIPELINE gate 0 全部仍以手稿為前提——新流程只活在 <code>PLAN-ch05.md</code> 和 ROADMAP seam ledger 裡。Ch6–16 還有約 12–14 個章位要走這條路，正典化是第一優先。</p>
+<p><strong>② 兩線的閘都長出了可觀的重疊，且「事實上的合併」已在發生。</strong>
+講義線一章過 9 個階段、十多個裁決點：易懂性被三個閘重複查（S·A·V 維度 A／難度 learner-sim／歷史 readability 輪，persona 同源）；Mode B 一章出現 ≥3 次；圖機會閘＝Mode A 收尾檢查表第 7 項；六階⑤與 Mode B 在 CONTENT_DIRECTION §4 已明言是同一格。Ch5 實務已把數學 gate-1 吸進 Mode A（sympy＋Codex ⑤）、把 M gate-2 標為「可選」——文檔應追認並系統化這個方向。影片線每節 15+ 審核活動，架構本身健康（minimal-unify 已收斂），要調的是 gate-2 的<em>頻率</em>而非結構。</p>
+<p><strong>③ 文檔的問題不是缺，是「多、散、舊」。</strong>
+指引文檔品質整體高（SSOT rubric、引用不複述、權威指標鏈清楚），但有 13 項實錘缺陷（指錯檔、斷鏈、計數過時、與現況相反的宣稱）、約 13 份已完工的一次性 PLAN/HANDOFF 混在活文檔之間、REBUILD_STATUS 肥大到 26k tokens 單次讀不完、root README 同時當 hub 又當內容流程權威（366 行）。這批全是機械可修的，且大部分斷鏈本可被 lint 抓到——legacy 的 <code>book_docs_lint.py</code> 本來就做這件事，跟 LaTeX 樹一起被封存了。</p>
+</div>
+
+<h2 id="s2">2. 講義線</h2>
+
+<h3>H1 <span class="b b-rec">建議</span> 無手稿流程正典化（雙變體並存）</h3>
+<ul>
+<li><strong>現況</strong>：<code>README.md:23</code>「各章源自由不同老師撰寫的手稿」；<code>CONTENT_DIRECTION.md:44-67</code> 六階從掃描手稿轉錄 seed 起步；<code>CONTENT_SOURCING.md:14</code>「手稿範例——必要核心」；而 <code>PLAN-ch05.md:5-11</code> 的實際流程已完全不同。</li>
+<li><strong>建議</strong>：CONTENT_DIRECTION 增「無手稿章節變體」節——①intake＝canon 盤點（Stewart 對應＋export/import 契約＋hypothesis ledger），①-verify 廢（無轉錄可核），③⑤依 2026-07-06 授權對 Codex 跑，⑥收斂閘保留；README／SOURCING／PIPELINE 同步改寫。<strong>手稿模式不刪</strong>，標為 Ch1–4 既成變體（Codex r2 特別要求保留成可用狀態）。</li>
+<li><strong>Provenance 明文化</strong>：canon 主軸不標、教學增添才標 <code>expansion:&lt;cat&gt;</code>＋fragment 頂部 <code>section-source</code> header——ch05 實測每節仍有 4–8 個 expansion 標記（ch04 為 6–16），語義健在，寫進文檔即可。</li>
+</ul>
+
+<h3>H2 <span class="b b-user">待你裁決</span> Ch6+ 閘序壓成 5 個 milestone</h3>
+<div class="card decide">
+<p>現行 gate 0–8（<code>handout/PIPELINE.md:14-25</code>）是手稿時代逐步長出來的；對 Ch6–16 建議改為：</p>
+<ol>
+<li><strong>M1 Mode A′（canon draft）</strong>：brief（含例題計畫、軟深度計畫、figure_opportunities）→ 逐節 draft → 逐節 Codex ⑤（direction-conformance＋數學＋hypothesis hygiene）→ 章層收尾 sweep：sympy 全例重算＋hypothesis ledger 覆核＋章層 Codex review。<strong>Codex r2 修正：sweep 須明列對應 M1–M8 各維度</strong>（不能只說「被吸收」），確保覆蓋面可稽核。</li>
+<li><strong>M2 圖批次</strong>：brief／檢查表產生的候選 → ⛳ 章批次裁決「畫哪些」→ 繪圖 → D1–D8 gate-1（＋視覺 gate-2 抽樣）。D1–D8 不可省。</li>
+<li><strong>M3 散文＋難度合一輪</strong>：S·A·V gate-1 與 learner-sim ≥3 份<strong>盲測</strong>（Codex r2：盲測性質不可犧牲）同批跑、產一份合併裁決稿。</li>
+<li><strong>M4 Mode C 條件式輕量化</strong>：①例題缺口＋②軟深度合成單輪 gapwalk；brief 覆蓋已完整者可跳過；有增補才接 scoped Mode B。</li>
+<li><strong>M5 收尾</strong>：PIPELINE dashboard 更新＋PLAN-chNN 閘家族 checklist（見 X3）。</li>
+</ol>
+<p><strong>M1–M8 數學 gate-2 改風險制</strong>（Codex r2 最終判準）：深理論核心章（Ch6 FTC／Ch11 級數／Ch14 多變數微分）<strong>必跑</strong>；Ch15/16 或任何 theorem/proof/fence-heavy、引入新特殊函數、含非平凡自創例題的章<strong>也必跑</strong>；其餘（計算為主章）抽樣。<br>
+<span class="small">效益估計：每章省 2–3 輪獨立裁決往返＋約 100–170k Codex tokens（Ch4 實測 M gate-2 173k、S·A·V gate-2 155k）。風險：抽樣章漏數學錯的機率上升——但 M1 內已有 sympy 全例重算＋兩層 Codex 審，Ch5 的 5 個 blocking 全在 ⑤ 就被抓到。<strong>需要你裁決，因為這動的是你的品質門檻。</strong></span></p>
+</div>
+
+<h3>H3 <span class="b b-rec">建議</span> Mode B 去獨立閘化</h3>
+<ul>
+<li><code>CONTENT_DIRECTION.md:162</code> 已明言 advisory 迴圈「折入 Mode B 那格」；Ch5 流程中 Mode B 已實際不存在為獨立階段。保留兩個觸發點：Mode C 增補後的 scoped 稽核（必接、README 硬規則不變）＋你點名的週期審。PIPELINE 表對應更新，消除「一章 ≥3 次 Mode B」。</li>
+</ul>
+
+<h3>H4 <span class="b b-user">待你裁決</span> 易懂性單一錨（Codex 裁定採方案甲）</h3>
+<ul>
+<li><strong>現況</strong>：同一個「高中生／L2／第一次線性讀」persona 在三處查——S·A·V 維度 A（blocking）、難度閘 learner-sim（stuck＝blocking）、歷史獨立 readability 輪（<code>REVIEW-ch0{1..4}-readability-*.html</code>）。</li>
+<li><strong>收斂案（甲＋保留條款）</strong>：learner-sim 盲測為易懂性 blocking 的<strong>主證據</strong>（真人視角實測卡點，比 rubric 判讀接地）；SAV-A 降為上游預篩／triage 輸入；<strong>但 U1–U4 類客觀缺陷（術語先用後定義、邏輯跳躍等）prose gate 仍可直接擋，不必等 sim</strong>；獨立 readability 輪對新章停用。</li>
+</ul>
+
+<h3>H5 <span class="b b-no">不採</span>（防復活紀錄）section manifest 取代 expansion 標記</h3>
+<ul>
+<li>Codex r1 曾提「Ch5+ 全內容非手稿，expansion 標記失去語義，改建 <code>section_manifest.yml</code>」。<strong>推回成功</strong>：ch05 實務是「canon 主軸不標、教學增添才標」，標記語義健在且已 committed 9 節；另建 manifest＝平行第二套簿記（repo 自身反覆引用的反模式），且會造成 Ch5 與 Ch6+ 兩制。Codex r2 同意。<span class="verdict">維持 section-source header＋expansion 標記，寫進文檔（併入 H1）。</span></li>
+</ul>
+
+<h3>H6 <span class="b b-rec">建議</span> 圖機會前移、批次裁決保留</h3>
+<ul>
+<li>圖機會偵察本來就是 Mode A 收尾檢查表第 7 項（<code>README.md:158</code> 直接叫同一個 subagent）。Ch6+ 改為：brief 增 <code>figure_opportunities</code> 欄（方向層決定）＋Mode A 收尾跑偵察產候選 → <strong>保留一次章批次 ⛳「畫哪些」</strong>（真正成本在繪圖與 D1–D8）→ 畫完 D1–D8 照舊。獨立的 gate 3 從閘序表移除。</li>
+</ul>
+
+<h3>H7 <span class="b b-rec">建議</span> learner-sim 固化為具名 subagent</h3>
+<ul>
+<li><code>PIPELINE.md:24,41</code> 反覆稱「learner-sim agents」但 <code>.claude/agents/</code> 無此檔，實務靠臨時 persona。比照其他 gate-1 寫成 <code>.claude/agents/learner-sim.md</code>（persona 釘死＝SPEC §16.2）並 force-add，跨機可重現。</li>
+</ul>
+
+<h2 id="s3">3. 影片線</h2>
+
+<h3>V2 <span class="b b-user">待你裁決</span> gate-2 頻率矩陣（Codex r2 最終版）</h3>
+<div class="card decide">
+<div class="wrap">
+<table>
+<tr><th>閘</th><th>gate-1（Claude，免費）</th><th>gate-2（計費）</th></tr>
+<tr><td>Tier-0 確定性腳本（schema/lint/sizecheck/parity/manifest/sync）</td><td colspan="2">每次 render 必跑（不變）</td></tr>
+<tr><td>six-lens 內容稽核</td><td>每節</td><td>無（維持既有拍板：multi-agent 已足）</td></tr>
+<tr><td>copyedit 潤稿</td><td>每節</td><td><strong>每章抽樣＋出版前抽查；高風險節全跑</strong>（原：每節單次）</td></tr>
+<tr><td>NFA 旁白忠實</td><td>每節</td><td><strong>維持每節</strong>（§3.1 實證 gate-2 抓到 gate-1 漏的 D3 blocking：x+h/2 誤聽案）</td></tr>
+<tr><td>hook 工程鏡</td><td>每個有 hook 的節</td><td>高風險才跑</td></tr>
+<tr><td>pedagogy-firstlearner</td><td>每節（pre-render）</td><td>無</td></tr>
+<tr><td>視覺 frame audit</td><td>每次 final render</td><td>VLM 高風險／出版前抽樣（現已如此，明文化）</td></tr>
+<tr><td>amplification 放大機會</td><td><strong>每章一次</strong>（原：每節）</td><td>無</td></tr>
+</table>
+</div>
+<p class="small">此案動到 2026-06-15 的 REVIEW_MODEL_DECISIONS 拍板（copyedit/NFA 配 gate-2），重議理由＝規模從「幾節」變「30+ 節」；copyedit 的 blocking 結構上恆 0（純潤稿），gate-2 邊際價值最低。<strong>需你確認</strong>。若同意，落點：更新 REVIEW_GATES meta-gate ＋ REVIEW_MODEL_DECISIONS 加一條 dated 修訂紀錄（保持 ADR 完整性）。</p>
+</div>
+
+<h3>V1 <span class="b b-rec">建議</span> 規模化成本量測</h3>
+<ul>
+<li>§3.1 是唯一完整節，成本高（單景打磨每項 80–216k tokens；spoken 全手寫；15+ 審核活動）。從下一節起記錄：token、工時、render 次數、hook 數、TTS call、回歸次數；<strong>三節後</strong>檢視模板紅利是否顯現，未顯現則設 per-scene 客製 hook 上限。落點：REBUILD_STATUS 現況快照加一張小表。</li>
+</ul>
+
+<h3>V4 <span class="b b-back">backlog</span> spoken.yml 自動攤平（分兩階段）</h3>
+<ul>
+<li>每節手寫 <code>.spoken.yml</code> 是真實的重複成本（§3.1＝21 場 99 beats 全手寫）。Codex r2 定案：<strong>第一階段做白名單式 auto-prefill</strong>——只自動攤平安全 LaTeX pattern（分數、上下標、f⁻¹ 等已有念法慣例表者），其餘留人工；產物照走 parity＋NFA。回測 ch03 兩個新節漏率低後，<strong>才</strong>考慮把 spoken.yml 收斂為 overrides-only。不是本輪 blocking。</li>
+</ul>
+
+<h3>V5 <span class="b b-rec">建議</span>／V6 <span class="b b-fix">立即修</span>／V7 <span class="b b-rec">建議</span></h3>
+<ul>
+<li><strong>V5</strong>：REBUILD_STATUS.md 已 789 行／26k tokens，超過單次可讀上限，作為「每個新 session 第一個讀」的進度錨已失能。改制：頂部固定「現況快照」（≤50 行：現役路線、各節狀態表、open items），歷史輪次移 <code>video/_archive/REBUILD_LOG-*.md</code>；之後每輪只更新快照＋append 歸檔。</li>
+<li><strong>V6</strong>：Route A（全螢幕文字改 LaTeX/pdflatex）<strong>2026-06-25 已落地</strong>（<code>REBUILD_STATUS.md:310</code>、<code>DESIGN.md:678-691</code>），但 <code>video/README.md:193</code> 仍掛「已決議、待實作／以下為落地前現況」橫幅並以 Pango 路徑描述現況——該節按落地後現實重寫。</li>
+<li><strong>V7</strong>：清理未消費產物——house audio Candidate A/C 全套 WAV＋所有 caution ping（裁決已定 B、ping OFF）；孤兒 <code>animations/ch01_inverse_trig_functions_hooks.py</code>（無對應 storyboard／內容稿）；<code>derive_spoken.py</code> 的 ch01 STYLE_NOTES 殘留。Candidate B 現役三檔保留。</li>
+</ul>
+
+<h2 id="s4">4. 文檔體系</h2>
+
+<h3 id="s41">4.1 <span class="b b-fix">立即修</span> 實錘缺陷清單（13 項，批准後可一次修完）</h3>
+<div class="wrap">
+<table>
+<tr><th style="width:2.5em">#</th><th>檔案</th><th>缺陷</th></tr>
+<tr><td>1</td><td><code>handout/README.md</code></td><td>整檔嚴重過時：仍掛「隔離實驗，experiment/seed-converge 分支」banner（2026-06-15 已升格正式版）；章節表只列 Ch1–3（實際 Ch1–5＋附錄 A–D）；稱 ch01「7 files: sec-intro…」（實際 6 檔、無 sec-intro）。</td></tr>
+<tr><td>2</td><td><code>handout/PIPELINE.md</code></td><td>多處 <code>[README.md](README.md)</code> 相對連結解析到 handout/README.md，但被引用的 Mode A/B/C、九項擴增稽核內容在<strong>根</strong> README——讀者點進去讀不到規格。</td></tr>
+<tr><td>3</td><td><code>handout/PIPELINE.md:60</code></td><td>「9 個 subagent 皆 force-add」→ 實際 11 個（漏 pedagogy-firstlearner-audit、video-amplification-audit）。</td></tr>
+<tr><td>4</td><td><code>handout/PIPELINE.md:24</code></td><td>gate 7 宣稱產物 <code>REVIEW-ch{NN}-difficulty-sim.html</code> 從未存在（實際為 <code>REVIEW-ch01-ch04-difficulty-mitigation-applied.html</code>）。</td></tr>
+<tr><td>5</td><td><code>handout/PIPELINE.md:9-10</code></td><td>「做完一章」定義（6 閘族，引 ROADMAP Ch2 status）不含難度閘，與同檔 gate 0–8 總表自相矛盾；各章現況表（2026-06-27）無 Ch5。</td></tr>
+<tr><td>6</td><td><code>CLAUDE.md</code>（Karpathy 節）</td><td>「Mode A 散文密度…見 video/CONTENT_METHODOLOGY.md」指錯檔——該檔無此內容（grep 0 命中），實在根 README §Mode A。付費 API 例「Gemini TTS」已非現役路線。</td></tr>
+<tr><td>7</td><td>根 <code>README.md</code>（影片段）</td><td>Golden path 指向不存在的 <code>video/pipeline/build.py</code>（實為 make.py）；備註「目前檢查點＝§1.1 低畫質無聲預覽」停在 6/10 前（實況：§3.1 Dean 真旁白成片、§3.2 LOCKED）；文件地圖缺 REVIEW_GATES／CONTENT_METHODOLOGY／REBUILD_STATUS。</td></tr>
+<tr><td>8</td><td><code>video/README.md</code></td><td>「五份判斷閘 SSOT rubric」→ 實際 7 份；「三道 render 前閘」→ 實際 5 道（多 provenance/pedagogy）；「storyboards 只餘 _demo」→ 實有 4 個正典 deck；「ch01 產物已刪」→ ch01 storyboard＋hooks 現存（版面回歸 deck）；:81 範式檔 <code>_gen/REVIEW-ch01_..._visualframe.gen.py</code> 不存在。</td></tr>
+<tr><td>9</td><td><code>video/README.md:193</code></td><td>Route A「待實作」橫幅＋Pango 現況描述——已於 2026-06-25 落地（＝V6）。</td></tr>
+<tr><td>10</td><td>三份指引檔</td><td>斷鏈 <code>pipeline/coverage.py</code>（已改名 <code>step_coverage.py</code>）：CONTENT_METHODOLOGY.md:165、REVIEW_GATES.md:58、PEDAGOGY-FIRSTLEARNER-RUBRIC.md ×3；REBUILD_STATUS 與 SPEC-expansion 新舊名混用。</td></tr>
+<tr><td>11</td><td><code>RUNBOOK-mimo-narration-route.md:8</code></td><td>前提「storyboards/ 無任何正典 deck」stale（同 #8）。</td></tr>
+<tr><td>12</td><td><code>handout/_audit/</code></td><td>committed 的 <code>REPORT-*gate2.raw.txt</code>（88–299KB ×7）違反自家「raw 落 scratchpad、轉錄進 _dev-archive」紀律（＝D9 清理對象）。</td></tr>
+<tr><td>13</td><td><code>video/REVIEW_GATES.md</code> §四</td><td>§1.x 通過狀況表為 2026-06-15 歷史快照（自標轉歷史）；重跑已開始（§3.1 完成），表未重填——依 V3 結論同步時一併處理。</td></tr>
+</table>
+</div>
+
+<h3>4.2 結構性調整（D1–D9、X1–X3）</h3>
+<ul>
+<li><strong>D1</strong> <span class="b b-user">待你裁決</span>：root README（366 行）同時當 repo hub 與內容流程權威。Codex r2 裁「大搬」：抽出 <code>CONTENT_AUTHORING_WORKFLOW.md</code> 承載 Mode A/B/C＋無手稿流程（與 H1 一次做完），README 回歸 hub（結構＋建置＋文件地圖）；PIPELINE 只管 lifecycle/gates；CONTENT_DIRECTION 只管方向層。<span class="small">代價：一次較大的連結重寫；收益：內容流程從此單一權威、H1 的改寫有乾淨落點。若你偏好保守，備選＝小修（只修連結＋補無手稿註記），但 Codex 認為小修會讓 PIPELINE 繼續腫。</span></li>
+<li><strong>D2</strong>：README 的 legacy Preamble 對照等 ~90 行壓成短段指向 <code>legacy/</code>。</li>
+<li><strong>D3</strong>：歸檔制度——root 4 份 <code>PLAN-deai-*</code>（合計 ~1,383 行，已落地）→ <code>authoring/_archive/deai/</code>；video 已完工 <code>PLAN-/HANDOFF-*</code>（~9 份）→ <code>video/_archive/plans/</code>；每檔頂部加 <code>Status: archived/completed · superseded by …</code>。<code>REVIEW_MODEL_DECISIONS.md</code> 留在 video/ 當 ADR 不搬。</li>
+<li><strong>D4</strong>：章狀態三檔分工明文化——PIPELINE＝章狀態 dashboard（唯一狀態表）；ROADMAP＝弧線／契約／open questions（as-built 細節搬出）；PLAN-chNN＝as-built／編號 ledger。ROADMAP 現已 452 行過載。</li>
+<li><strong>D5</strong>：<code>CONTRACT-html-writing.md</code>（權威 HTML 契約、被 SPEC/README 多處引用）住在自稱 frozen 的 <code>_dev-archive/</code> → 搬 <code>handout/CONTRACT-html-writing.md</code>，舊路徑留一行 stub 轉址。不併入 TYPESETTING_GUIDE。</li>
+<li><strong>D6</strong>：MiMo 念法慣例現散於 4 檔 → 權威收斂到 NFA rubric，RUNBOOK/README/derive_spoken 只引用；video/README §環境的單機歷史帳（2026-06-17 那台的 ffmpeg 考古）搬 ENVIRONMENT／REBUILD_STATUS 歸檔。</li>
+<li><strong>D7</strong>：影片線殘存「Mode A 內容稿」用語（REVIEW_GATES 層 2 標題等）與「Mode 專留講義」拍板衝突 → 統一改稱 Stage-1 content script。</li>
+<li><strong>D9</strong>：_audit 目錄<strong>不</strong>改層級結構（108 檔連結重寫成本＞收益；REVIEW-/REPORT-/PROMPT-/RUBRIC 前綴已可辨識）；只清 #12 的 raw.txt＋立 forward rule。</li>
+<li><strong>X1【Codex 補漏】</strong>：建輕量文檔 lint（相對連結存在性＋引用的 <code>*.py</code>／產物檔名存在性），接進 <code>handout-checks.yml</code> CI——本次 13 項缺陷中過半可被機械抓到。可從 <code>legacy/tex_handout/tools/book_docs_lint.py</code> 復活精簡版。</li>
+<li><strong>X2【Codex 補漏】</strong>：raw artifact 政策統一——video/README 版控表允許 <code>*.raw.txt</code> 進 git、handout PIPELINE 紀律禁止；擇一（建議：統一禁、摘要轉錄進版控報告，與 D9 forward rule 合併）。</li>
+<li><strong>X3【Codex 補漏】</strong>：PLAN-chNN 範本加一張「閘家族 checklist」小表（六階／圖／數學／散文／難度／Mode C，各欄 done/date）——不造狀態機，但新 session 一眼看出該章缺哪些閘。</li>
+</ul>
+
+<h2 id="s5">5. 已否決的大架構案（防復活紀錄）</h2>
+<div class="wrap">
+<table>
+<tr><th>提案（Codex r1）</th><th>否決理由（r2 收斂一致）</th></tr>
+<tr><td>Ch5+ 廢 expansion 標記、建 section/chapter manifest（brief_id/canon_refs/…）</td><td>ch05 實務「主軸不標、增添才標」語義健在；manifest＝平行第二套簿記，且造成 Ch5 vs Ch6+ 兩制。</td></tr>
+<tr><td>講義→影片 stable claim/example/figure ID 體系</td><td>需講義 HTML 全面注入 ID、churn 大；現行 per-unit <code>source</code> 欄＋手寫編號已可回溯；等 provenance 實際出錯再上最小 ID。</td></tr>
+<tr><td>machine-readable lifecycle 狀態機（兩線統一 state model）</td><td>直接違反 REVIEW_MODEL_DECISIONS「不造狀態機——手寫欄位會說謊、真正把關的是確定性腳本」的既有裁決；X3 的靜態 checklist 已滿足可視性需求。</td></tr>
+<tr><td>REVIEW_GATES 重寫為四 phase 敘事</td><td>實質收益只有 gate-2 頻率政策（已由 V2 承載）；加一張 phase 索引表即可，不重寫。</td></tr>
+<tr><td>audit artifacts 改層級目錄（audit/rubrics/、audit/reports/chNN/）</td><td>108 檔連結重寫成本＞收益；命名前綴已區分。只清 raw＋立規則。</td></tr>
+</table>
+</div>
+
+<h2 id="s6">6. 建議執行順序（Codex r2 排序＋Claude 微調）</h2>
+<ol>
+<li><strong>批次 1（立即修，低風險）</strong>：§4.1 的 13 項實錘缺陷一次修完（D-0＋V6）。純事實對齊，不動任何流程語義。</li>
+<li><strong>批次 2（正典化）</strong>：H1＋D1 一起做——抽 CONTENT_AUTHORING_WORKFLOW.md、寫入無手稿變體與 provenance 規則、README 回 hub、SOURCING/DIRECTION/PIPELINE 同步。</li>
+<li><strong>批次 3（閘政策，需你先裁 H2/H4/V2）</strong>：改 PIPELINE 為 5-milestone dashboard＋M gate-2 風險判準；更新 REVIEW_GATES 頻率矩陣＋REVIEW_MODEL_DECISIONS 修訂紀錄；H3/H6/H7 一併落地。<em>建議以 Ch6 當試點章驗證新閘序，跑完一章後回顧再定版。</em></li>
+<li><strong>批次 4（分工與歸檔）</strong>：D4 三檔分工、V5 REBUILD_STATUS 瘦身、D3 歸檔、D5 契約搬家、D6/D7 收斂。</li>
+<li><strong>批次 5（工具與清理）</strong>：X1 文檔 lint 進 CI、X2 raw 政策統一＋D9 清 raw、V7 未消費產物、X3 checklist 範本。</li>
+<li><strong>持續</strong>：V1 成本量測（下一節起）；V4 spoken auto-prefill 於量測顯示 spoken 手寫是主要成本時啟動。</li>
+</ol>
+
+<h2 id="s7">7. 本輪已完成（無需裁決）</h2>
+<ul>
+<li><span class="b b-done">已完成</span> 本地 memory 修正：<code>finding_tts_latex_reading</code>（「拍板維持 Gemini」已標 SUPERSEDED，保留仍有效的「MiMo 不讀 LaTeX」實測——它正是現行 spoken.yml 設計的原因）；<code>project_video_pipeline_redesign</code> 標為歷史日誌；MEMORY.md 索引同步。</li>
+<li><span class="b b-done">已完成</span> Codex 兩輪對抗審（r1 獨立審＋r2 對 29 條提案逐條裁決）；本報告即為收斂結果的完整轉錄（原始輸出在 session scratchpad，依「raw 不進版控、結論轉錄」紀律處理）。</li>
+</ul>
+
+<div class="card">
+<strong>審查方法與材料</strong>：Claude 精讀——根 README、CLAUDE.md、handout/PIPELINE.md、CONTENT_DIRECTION.md、CONTENT_SOURCING.md、CONTENT_QUICKSTART.md、CONTENT_ROADMAP.md（Ch5–16 節）、PLAN-ch05.md、video/README.md、REVIEW_GATES.md、REVIEW_MODEL_DECISIONS.md、CONTENT_METHODOLOGY.md、REBUILD_STATUS.md（現況區）、handout/README.md、handout/CLAUDE.md；3 個唯讀 subagent 分別盤點文檔體系（含 git 日期／行數／連結圖）、講義線實況（build.py／閘序／ch05 計畫）、影片線實況（端到端流程／TTS 路線／閘地圖）；Codex r1（獨立審查）＋r2（逐條裁決）。文中所有宣稱均附檔案證據，統計數字（expansion 標記密度、行數、檔數）為實測。
+</div>
+
+</main>
+</body>
+</html>

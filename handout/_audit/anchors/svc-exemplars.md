@@ -1,6 +1,6 @@
 # 語意/聲音 critic 固定錨組（svc-exemplars）
 
-> **用途：** 本檔是 [`PLAN-deai-semantic-critic.md`](../../../PLAN-deai-semantic-critic.md) §3 的「範本錨」，固定 **2 正 ＋ 1 負**。
+> **用途：** 本檔是 [`PLAN-deai-semantic-critic.md`](../../../authoring/_archive/deai/PLAN-deai-semantic-critic.md) §3 的「範本錨」，固定 **2 正 ＋ 1 負**。
 > 兩用途：①掛在 prose-audit **Dimension C（S/A/V）** gate 的 prompt 末尾，當 few-shot 錨——critic 對著**正面 bar** 判稿、把**負面**當「該被 flag 長這樣」的示範；②2 段正例同時當 `CONTENT_SPEC.md` §3 的真人 **voice corpus** 替換（Task 6 消費，撤掉 Ch1 循環標靶）。
 >
 > **核心信念（spec §0）：** 中性 **≠** AI；**中性＋空**才是 AI。正例示範「中性但言之有物」，負例示範「中性但空」。
