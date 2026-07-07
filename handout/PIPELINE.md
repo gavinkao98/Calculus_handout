@@ -84,6 +84,6 @@ handout 線 6 個（`example-supplement`、`handout-prose-audit`、`handout-figu
 | Ch2 | ✅ 手稿六階 | ✅ 雙閘 | ✅／✅ | ✅ gate-1+2 | ✅ | ✅ ①② | **全閘完成** |
 | Ch3 | ✅ 手稿六階 | ✅ 雙閘（2026-06-27 補齊） | ✅／✅ | ✅ gate-1+2 | ✅ | ✅ ①② | **全閘完成** |
 | Ch4 | ✅ 手稿六階 | ✅ 雙閘（gate-2 173.7k tok） | ✅／✅ | ✅ gate-1+2（154.7k tok） | ✅ | ✅ ①② | **全閘完成** |
-| Ch5 | ✅ **canon M1**（2026-07-06：逐節 Codex ⑤＋sympy 33/33＋章層 review＋圖機會） | M1 sweep ✅；gate-2 依風險判準待裁 | 候選 ✅／**繪圖＋D1–D8 待跑** | ⏳ M3 待跑 | ⏳ M3 待跑 | ⏳ M4 待跑 | **M1 完成，M2–M5 待收** |
+| Ch5 | ✅ **canon M1**（2026-07-06） | ✅ M1 sweep＋**gate-2 抽樣樣本**（1 blocking [M7] 修＋回歸→0；2026-07-07） | ✅／✅ **Figure 5.1–5.11**（D1–D8 gate-1 0/0；視覺 gate-2 出版前抽樣） | ⏳ M3（額度中斷待重跑） | ⏳ M3（同左） | ✅ **M4**（ADOPT 4：Ex 5.14/5.22＋2 軟深度；Ex 5.1–5.27） | **M1/M2/M4/數學 gate-2 完成；M3→M5 待收** |
 | App A–D | ✅ 自撰（無手稿先例） | A/B math-register gate-2 ✅ | — | — | — | — | 服務性附錄，按需維護 |
 | Ch6+ | 未開章（依 [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) 弧線骨架；Ch6 為 5-milestone 試點） | | | | | | |

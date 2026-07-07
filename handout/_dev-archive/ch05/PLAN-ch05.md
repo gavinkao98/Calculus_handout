@@ -87,8 +87,8 @@ Excluded (roadmap): antiderivatives (→Ch6), graphing-with-technology.
 | M1 Mode A′（brief＋⑤＋sympy＋章層 review） | ✅ | 2026-07-06；5 blocking 沿途修 |
 | M2 圖機會（候選） | ✅ | 2026-07-06；13 候選 |
 | M2 圖繪製＋D1–D8 | ✅ | 2026-07-07；tier-1/2 共 11 張（Figure 5.1–5.11）；gate-1 **blocking=0, advisory=0**（自檢修 7 缺陷後送審）；視覺 gate-2 依頻率矩陣＝出版前抽樣 |
-| 數學 M gate-2（跨模型） | ⏳ | 風險判準＝抽樣層（標準嚴謹章） |
-| M3 散文 S·A·V＋難度 learner-sim（合一輪） | 🔄 | 2026-07-07 啟動（prose-audit ×3 批＋learner-sim ×3 盲測） |
+| 數學 M gate-2（跨模型） | ✅ | 2026-07-07；Ch5 作抽樣層樣本章全章複核：**1 blocking [M7]**（M4 新增 caution 的 VA 絕對化陳述）→ 修＋scoped 回歸「解除、無新問題」→ **blocking=0**；紀錄 `ch05_math-gate2-audit.md` |
+| M3 散文 S·A·V＋難度 learner-sim（合一輪） | ⛔→⏳ | 2026-07-07 首發 6 agent（prose ×3＋sim ×3）全數撞 Claude session 額度牆（reset 12:40am）；**新 session 重跑即可**：prose-audit 三批（5-1~5-3／5-4~5-6／5-7~5-9，含 figcaption 與 M4 增補）＋learner-sim ×3 盲測（讀 built standalone），合併產 `REVIEW-ch05-prose-difficulty.html` 裁決稿 |
 | M4 Mode C gap-check（①②合一） | ✅ | 2026-07-07；偵察 Layer-1=0；Codex 裁決 **ADOPT 4**（Ex 5.14、Ex 5.22、§5.3 intuition、§5.8 caution）／DEFER 5；sympy 驗證＋scoped Mode B 過；報告 `_audit/REVIEW-ch05-modec-gapcheck.html`、imports `ch05_example-imports.md` |
 | M5 收尾（dashboard＋ROADMAP open-q） | ⏳ | |
 
