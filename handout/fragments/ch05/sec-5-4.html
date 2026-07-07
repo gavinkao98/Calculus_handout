@@ -2,13 +2,15 @@
      section-source: Stewart ET 9e §4.1 (Maximum and Minimum Values) + §4.3 (first-derivative test part);
      cross-checked Thomas 14e §4.1, Rogawski 4e §4.2. Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤).
      Counters continue from §5.3: §5.4 mints Definition 5.3 (local extrema), Definition 5.4 (critical number),
-     Theorem 5.1 (First Derivative Test), Strategy 5.3 (Closed Interval Method), Examples 5.11–5.13. Cautions UNNUMBERED.
+     Theorem 5.1 (First Derivative Test), Strategy 5.3 (Closed Interval Method), Examples 5.11–5.14
+     (5.14 = M4 enrichment, 2026-07-07). Cautions UNNUMBERED.
      IMPORTS (cross-ref, do NOT re-prove — all in Ch4 §4.4): absolute max/min = Definition 4.3; EVT = Theorem 4.9(a);
      Fermat/interior-extremum = Theorem 4.10; monotonicity Cor 4.3 (used to PROVE the First Derivative Test 5.1).
      Second-derivative test is NOT here — it needs concavity (§5.6). Examples: 5.11 critical numbers of
      x^{3/5}(4-x) → 0 (f' DNE) and 3/2 (f'=0); 5.12 closed-interval method x³-3x²+1 on [-1/2,4] → abs max 17,
-     abs min -3; 5.13 first-derivative test on x³-3x²+1 → x=0 local max (1), x=2 local min (-3).
-     Counters handed to §5.5: Definition 5.5, Theorem 5.2, Strategy 5.4, Example 5.14. Record: PLAN-ch05.md. -->
+     abs min -3; 5.13 first-derivative test on x³-3x²+1 → x=0 local max (1), x=2 local min (-3);
+     5.14 (M4) FDT classifies 5.11's critical numbers: x=0 neither (f' DNE, no sign change, vertical tangent), x=3/2 local max ≈3.19.
+     Counters handed to §5.5: Definition 5.5, Theorem 5.2, Strategy 5.4, Example 5.15. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
@@ -31,7 +33,7 @@
 
   <h3 class="subsec-head">Where extrema can occur: critical numbers</h3>
 
-  <p>The engine that narrows the search is Fermat's theorem from Chapter 4 (Theorem 4.10): if \(f\) has a local extremum at an <em>interior</em> point \(c\) and \(f'(c)\) exists, then \(f'(c) = 0\). Contrapositively, a local extremum in the interior can occur only where the derivative is zero or fails to exist. Those places deserve a name.</p>
+  <p>The engine that narrows the search is Fermat’s theorem from Chapter 4 (Theorem 4.10): if \(f\) has a local extremum at an <em>interior</em> point \(c\) and \(f'(c)\) exists, then \(f'(c) = 0\). Contrapositively, a local extremum in the interior can occur only where the derivative is zero or fails to exist. Those places deserve a name.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">5.4</span><span class="env-name">Critical number</span></p>
@@ -40,13 +42,13 @@
     </div>
   </section>
 
-  <p>Fermat's theorem, recast, reads: every interior local extremum occurs at a critical number. This is the workhorse — it shrinks the hunt for extrema from a whole interval to a finite list of suspects.</p>
+  <p>Fermat’s theorem, recast, reads: every interior local extremum occurs at a critical number. This is the workhorse — it shrinks the hunt for extrema from a whole interval to a finite list of suspects.</p>
 
   <!-- expansion:caution — critical number is necessary, not sufficient: a critical number need not be an extremum -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>A critical number is a <em>candidate</em>, not a guarantee. The converse of Fermat's theorem is false: \(f'(c) = 0\) does not force an extremum at \(c\). The function \(f(x) = x^{3}\) has \(f'(0) = 0\), yet \(0\) is neither a maximum nor a minimum — the curve passes straight through with a momentary flat spot. Critical numbers must always be tested, never assumed to be extrema.</p>
+      <p>A critical number is a <em>candidate</em>, not a guarantee. The converse of Fermat’s theorem is false: \(f'(c) = 0\) does not force an extremum at \(c\). The function \(f(x) = x^{3}\) has \(f'(0) = 0\), yet \(0\) is neither a maximum nor a minimum — the curve passes straight through with a momentary flat spot. Critical numbers must always be tested, never assumed to be extrema.</p>
     </div>
   </section>
 
@@ -72,7 +74,7 @@
 
   <h3 class="subsec-head">Absolute extrema on a closed interval</h3>
 
-  <p>On a closed interval the search closes completely. The Extreme Value Theorem (Theorem 4.9(a)) guarantees that a function continuous on \([a, b]\) <em>attains</em> an absolute maximum and minimum there; Fermat's theorem says each is either an interior critical number or an endpoint. So the absolute extremes are found by checking a finite list.</p>
+  <p>On a closed interval the search closes completely. The Extreme Value Theorem (Theorem 4.9(a)) guarantees that a function continuous on \([a, b]\) <em>attains</em> an absolute maximum and minimum there; Fermat’s theorem says each is either an interior critical number or an endpoint. So the absolute extremes are found by checking a finite list.</p>
 
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.3</span><span class="env-name">The Closed Interval Method</span></p>
@@ -108,7 +110,7 @@
 
   <h3 class="subsec-head">Classifying local extrema: the First Derivative Test</h3>
 
-  <p>The Closed Interval Method finds absolute extremes by brute evaluation, but says nothing about the <em>character</em> of an interior critical number — whether it is a local max, a local min, or neither. The sign of the derivative on either side settles it, and the Mean Value Theorem's monotonicity corollary (Corollary 4.3) is what makes the reasoning rigorous.</p>
+  <p>The Closed Interval Method finds absolute extremes by brute evaluation, but says nothing about the <em>character</em> of an interior critical number — whether it is a local max, a local min, or neither. The sign of the derivative on either side settles it, and the Mean Value Theorem’s monotonicity corollary (Corollary 4.3) is what makes the reasoning rigorous.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.1</span><span class="env-name">First Derivative Test</span></p>
@@ -150,6 +152,25 @@
         <p>From \(f'(x) = 3x(x - 2)\), the critical numbers are \(x = 0\) and \(x = 2\). Track the sign of \(f'\) across them. The factors \(3x\) and \(x - 2\) give</p>
         <p>\[ f'(x) > 0 \text{ on } (-\infty, 0), \qquad f'(x) < 0 \text{ on } (0, 2), \qquad f'(x) > 0 \text{ on } (2, \infty). \]</p>
         <p>At \(x = 0\), \(f'\) changes from positive to negative: a <em>local maximum</em>, with value \(f(0) = 1\). At \(x = 2\), \(f'\) changes from negative to positive: a <em>local minimum</em>, with value \(f(2) = -3\). These are the same two interior values the Closed Interval Method turned up in Example 5.12; the First Derivative Test now explains their roles — the hill at \(x = 0\) and the valley at \(x = 2\) — independently of any interval. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example [pass: enrichment] [source: AI — running-example extension honouring Ex 5.11's "settled below"; adjudicated ADOPT in the M4 gap-check (Codex, 2026-07-07); sympy-recomputed] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.14</span></p>
+      <div class="env-body">
+        <p>Classify the critical numbers of \(f(x) = x^{3/5}(4 - x)\) found in Example 5.11.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Example 5.11 produced two critical numbers: \(x = \tfrac{3}{2}\), where \(f'\) vanishes, and \(x = 0\), where \(f'\) does not exist. The First Derivative Test handles both — its hypotheses ask only that \(f\) be continuous at the critical number and differentiable on either side, not at the point itself. From</p>
+        <p>\[ f'(x) = \frac{4(3 - 2x)}{5x^{2/5}}, \]</p>
+        <p>the denominator \(5x^{2/5} = 5\bigl(x^{1/5}\bigr)^{2}\) is positive for every \(x \ne 0\), so the sign of \(f'\) is the sign of \(3 - 2x\): positive on \((-\infty, 0)\), positive again on \((0, \tfrac{3}{2})\), and negative on \((\tfrac{3}{2}, \infty)\).</p>
+        <p>At \(x = \tfrac{3}{2}\) the derivative changes from positive to negative, so \(f\) has a local maximum there, of value \(f\bigl(\tfrac{3}{2}\bigr) = \bigl(\tfrac{3}{2}\bigr)^{3/5} \cdot \tfrac{5}{2} \approx 3.19\). At \(x = 0\) the derivative does not change sign — positive on both sides — so \(x = 0\) is neither a maximum nor a minimum: the graph climbs through the origin with a vertical tangent and keeps climbing. A critical number can fail to be an extremum in two ways, and this function exhibits the second — not a flat spot on a rising curve (that was \(x^{3}\) at \(0\)), but a point of vertical tangency the curve simply passes through. <span class="qed"></span></p>
       </div>
     </section>
   </div>

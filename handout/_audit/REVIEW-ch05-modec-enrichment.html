@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 5 Mode C — 充實候選裁決稿</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.6; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .strong { background: #fff7ed; border-left: 3px solid #e0a106; padding: .5rem .8rem; border-radius: 4px;
+            font-size: .9rem; color: #7a5b00; margin: .3rem 0 1rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem;
+          margin: .6rem 0; }
+  .card.hi { border-left: 4px solid var(--blue); }
+  .card.med { border-left: 4px solid var(--gray); }
+  .card.lo { border-left: 4px solid var(--line); opacity: .92; }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+  .b-int { background:#e7f0fb; color:var(--blue); }
+  .b-cau { background:#fdeceb; color:var(--red); }
+  .b-app { background:#e9f7ef; color:#1a7f47; }
+  .b-str { background:#f3e8fd; color:#6c2bd9; }
+  .b-fig { background:#eef1f4; color:var(--gray); }
+  .b-his { background:#fef0e7; color:#9a5b00; }
+  .conf { font-size:.72rem; color:var(--gray); float:right; }
+  .conf.hi { color:var(--blue); font-weight:700; }
+  .loc { font-size:.82rem; color:var(--gray); margin:.25rem 0; }
+  .prop { margin:.35rem 0; }
+  .variant { font-size:.86rem; color:#475467; margin:.35rem 0; padding:.35rem .6rem; background:#f8f9fb;
+             border-radius:4px; }
+  .src { font-size:.78rem; color:var(--gray); margin-top:.3rem; }
+  .src code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .why { font-size:.84rem; color:#475467; margin:.25rem 0 0; }
+  .done { background:#f2f7f3; border-left:3px solid #1a7f47; padding:.5rem .8rem; border-radius:4px;
+          font-size:.9rem; color:#1a5c36; margin:.6rem 0; }
+  code.kw { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; font-size:.85em; }
+  .legend { font-size:.82rem; color:var(--gray); margin:.5rem 0 0; }
+  details { margin:1rem 0; font-size:.88rem; }
+  summary { cursor:pointer; color:var(--gray); font-weight:600; }
+  details ul { margin:.5rem 0 0 1rem; color:#475467; }
+</style>
+</head>
+<body>
+<h1>Chapter 5 — Mode C 充實候選裁決稿（②波 軟深度）</h1>
+<p class="sub">2026-07-07　逐節偵察產出（9 節全讀）　·　範圍＝軟深度（intuition／application／caution／history）　·　主軸已凍結，全為「新增」、不動既有內容　·　本稿為 M4 單一裁決稿（<code>REVIEW-ch05-modec-gapcheck.html</code>）的 ②波輸入，由主審與 ①波合併</p>
+
+<p class="strong"><b>怎麼用：</b>逐條看，告訴主審要寫哪些（用左邊的 ID，如「寫 5.3-1、5.8-1」或「全部 high＋指定 medium」）。<b>history</b> 類（5.1-1、5.7-1）需先驗證來源才動筆。<b>figure-note 本輪 0 筆</b>——M2 圖機會閘已跑完（<code>REVIEW-ch05-figure-opportunity.html</code>，13 候選待裁），不重複掃。凡收錄者套用時標 <code class="kw">&lt;!-- expansion:&lt;cat&gt; [pass: enrichment] [source: …] --&gt;</code>，並必接範圍限定 Mode B。</p>
+
+<p class="strong"><b>密度前提：</b>ch05 為首個 canon-as-spine 章，Mode A 每節 brief 已規劃軟深度並經 Codex ⑤ 審至 0 blocking——偵察結論與此一致：<b>9 節中 4 節（§5.2／§5.4／§5.5／§5.9）判飽和、0 候選</b>；全章僅 5 筆真缺口，克制於個位數。落選項見末段 cut log。</p>
+
+<p class="legend">徽章：<span class="badge b-int">intuition</span><span class="badge b-cau">caution</span><span class="badge b-app">application</span><span class="badge b-str">strategy</span><span class="badge b-fig">figure-note</span><span class="badge b-his">history</span>　·　左框色：<span style="color:var(--blue)">藍＝high</span> / 灰＝medium / 淡＝low confidence。</p>
+
+<h2>§5.1 Implicit Differentiation</h2>
+<p class="sub">已飽和：opener 三段動機（curves-not-graphs → chain rule 樞紐）＋雙 caution（漏 \(dy/dx\) 因子；branch 假設＋Ch14 fence）＋Strategy 5.1＋收尾 handoff 至 §5.2。軟深度近滿，僅餘一筆命名／史註。</p>
+
+<div class="card med"><span class="conf">medium</span><span class="id">5.1-1</span><span class="badge b-his">history</span>
+<div class="loc">locus：就地補名——opener 的 “the looping curve \(x^{3}+y^{3}=6xy\)” 與 Example 5.2 陳述句同步；軼事變體則接在 Ex 5.2 solution 末。</div>
+<div class="prop">把 \(x^{3}+y^{3}=6xy\) 命名為 <em>folium of Descartes</em>（標準 folium \(x^{3}+y^{3}=3axy\) 取 \(a=2\)）。目前曲線出現兩次皆匿名，而 fragment 的 HTML 註解自己都寫 “folium-type”——名字已知、只差寫進散文；具名曲線亦是 §11 index target。</div>
+<div class="variant"><b>變體（可選軼事）：</b>Ex 5.2 末補一句——Descartes 1638 年以此曲線向 Fermat 下切線挑戰，Fermat 以其極值前身方法解出；正是「解不出 \(y\) 也能求切線」的歷史原型。<span style="color:var(--gray)">此句動筆前需對 Stewart §3.5 margin note／標準數學史覆核年份與情節。</span></div>
+<div class="why">why：命名成本一個片語、零風險（曲線身分可即時驗證）；Stewart 同節（其 §3.5 Example 2）即具名。軼事部分另計，故整筆 medium。</div>
+<div class="src">source：<code>[source: Stewart ET 9e §3.5 Example 2（命名）；margin note（軼事，需驗證）]</code></div></div>
+
+<h2>§5.2 Related Rates</h2>
+<div class="done"><b>§5.2 軟深度＝0 候選。</b>opener 兩段（\(t\) 接手 §5.1 的差異化變數）＋Strategy 5.2（含「關係式須恆時成立」）＋本節唯一大坑的 caution（先微分、後代值，凍結變數＝率歸零）＋三例全是實境 application（ladder／balloon 的 thin-shell 直覺／shadow 的兩速讀法）＋收尾。無承重缺口。</div>
+
+<h2>§5.3 Linear Approximation and Differentials</h2>
+<p class="sub">已飽和：opener 直接回收 Ch3 Def 3.1 remainder form（「不是比喻，是導數的內容」）＋\(dy\) vs \(\Delta y\) 直覺段＋局部性 caution（錨點距離與彎曲度）＋誤差傳播 application（Ex 5.10 相對誤差 ×3 規律）。唯一缺口＝Leibniz 記號收口。</p>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">5.3-1</span><span class="badge b-int">intuition</span>
+<div class="loc">locus：after Definition 5.2（Differential）——可獨立一小段，或併入其後 “The point of the notation is a contrast” 段落。</div>
+<div class="prop">收口 Leibniz 記號弧線：既然 \(dx\) 與 \(dy\) 如今各有獨立意義，兩者相除得 \(dy/dx = f'(x)\)——迄今只能當「不可拆整體記號」讀的 \(dy/dx\)，從此可誠實讀成<em>微分之比</em>。點名回收 Ch3 Remark 3.2 的警告（\(dy/du\)、\(du/dx\) are limits, not fractions——當時為真，因 \(du\) 尚無獨立定義），並一句前指 Ch6：代換法對 \(du\) 的整套操作，正是靠這裡建立的文法。</div>
+<div class="why">why：全書 Leibniz 記號的關鍵 payoff。Ch3 欠讀者「為何之後可以像分數一樣操作」的交代，本節定義了 differential 卻未收這個口；且 §5.3 的 export 合約明列 Ch6 \(du\)——這段是 seam 所繫、承重而非裝飾。</div>
+<div class="src">source：<code>[source: Stewart ET 9e §3.10（differentials 定義後的 dy/dx-as-ratio note）]</code>＋ cross-ref 本書 Remark 3.2</div></div>
+
+<h2>§5.4 Maximum and Minimum Values　·　§5.5 Optimization Problems</h2>
+<div class="done"><b>§5.4／§5.5 軟深度＝0 候選。</b>§5.4：Def 5.3 帶 informal gloss（「一座山的山頂，不必是最高的山」）＋\(x^{3}\) converse-of-Fermat caution＋FDT 連證明帶動機＋Ex 5.11 同時展示 \(f'=0\) 與 \(f'\) DNE；EVT 前提反例（\(x\) on \((0,1)\)、不連續）<b>已在 Ch4 §4.4</b>，此處為 import、不重複。§5.5：本身即 application 節（fence／can／semicircle），Strategy 5.4 含 feasible-domain 步驟、caution 管開區間端點行為，Ex 5.15 還有「真罐頭較高＝模型忽略接縫」的 realism 註。落選項見 cut log。</div>
+
+<h2>§5.6 Derivatives and the Shape of a Graph</h2>
+<p class="sub">已飽和：opener（「上升的方式」）＋Def 5.5 informal gloss（holds water／sheds water、tangent 上方下方）＋雙 caution（\(f''=0\) 不保證 inflection 的 \(x^{4}\)；test 靜默 trio \(x^{4},-x^{4},x^{3}\)）＋兩定理全證。唯一缺口＝應用讀法。</p>
+
+<div class="card med"><span class="conf">medium</span><span class="id">5.6-1</span><span class="badge b-app">application</span>
+<div class="loc">locus：after Example 5.17、進入 “The Second Derivative Test” subsec 之前——一段散文即可（Ch5 未鑄 Remark 環境，無需新 env）。</div>
+<div class="prop">把凹性翻成變化率語言的一段 gloss：\(f\) 遞增且凹上＝「以<em>遞增</em>速率增長」（增長在加速），遞增且凹下＝「以<em>遞減</em>速率增長」（增長在踩剎車）；inflection point＝增長最快的一刻。錨一個具體情境——如流行病累積病例曲線或人口曲線：拐點正是單日新增的峰值、「the curve is flattening」開始為真之處。</div>
+<div class="why">why：本節詞彙全程停在幾何（cup／hill／water），全節零應用錨，而「increasing at a decreasing rate」是自學者最常被考的詮釋技能；凹性詞彙又 export 至 Ch14 Hessian。一段補齊，與 Ch2 §2.3 的 acceleration 直覺（已有）互補不重複。</div>
+<div class="src">source：<code>authored</code>（標準教學詮釋，不掛具名事實與數據）</div></div>
+
+<h2>§5.7 L'Hôpital's Rule</h2>
+<p class="sub">已飽和：opener（\(f'/g'\)＝兩個消失速率的比、破 \(0/0\) 僵局）＋GMVT 帶 informal（\(g(x)=x\) 回收 MVT）＋三合一 caution（先驗形式／分開微分非商法則／單向性）＋Strategy 5.5 覆蓋全部七種 indeterminate forms＋\(0/0\) 全證與 §D.3 fence。唯一缺口＝history。</p>
+
+<div class="card med"><span class="conf">medium</span><span class="id">5.7-1</span><span class="badge b-his">history</span>
+<div class="loc">locus：Theorem 5.5 之後（caution 或 Strategy 附近皆可），2–3 句史註。</div>
+<div class="prop">正名史：規則刊於 l'Hôpital 1696 年《Analyse des infiniment petits》——史上第一本微分學教科書——但實為 Johann Bernoulli 的發現，兩人間有付酬供稿的約定，故「以出版者為名、非發現者」。順帶一句拼寫註：他書常作 “l'Hospital”（同一人的舊式拼法），讀者跨教材不迷路。</div>
+<div class="why">why：全章 9 節 0 條 history（CONTENT_SPEC §3 的語域校準把「歷史／應用註罕見」列為 too-formal 訊號），而這是本章素材中最 canonical 的史註——把奇特的規則名與拼寫變體一次交代，有實用 payoff、非名人軼事。動筆前需驗證年份與約定細節。</div>
+<div class="src">source：<code>[source: Stewart ET 9e §4.4 margin note；需驗證後動筆]</code></div></div>
+
+<h2>§5.8 Curve Sketching</h2>
+<p class="sub">已飽和（近滿）：opener（各層疊出形狀）＋Strategy 5.6 七步 checklist＋「cancelled factor 是 hole 不是 asymptote」已折進 Def 5.7 後散文＋兩個全套 sketch（含 slant）。缺口＝「asymptote 可穿過」的澄清。</p>
+
+<div class="card hi"><span class="conf hi">high</span><span class="id">5.8-1</span><span class="badge b-cau">caution</span>
+<div class="loc">locus：after Definition 5.7（與其後 “Vertical-asymptote candidates…” 散文段相鄰），unnumbered Caution。</div>
+<div class="prop">澄清「asymptote 是終局行為的描述、不是圍欄」：horizontal／slant asymptote <em>可以</em>被曲線穿過——甚至無限多次，如 \(y = \dfrac{\sin x}{x}\) 每隔 \(\pi\) 就穿過其 horizontal asymptote \(y=0\) 一次（由 \(\bigl|\sin x / x\bigr| \le 1/|x| \to 0\)）；定義只要求「最終貼近」，不禁止途中相交。Vertical asymptote 則不同——函數值在該處脫韁，曲線無從穿越。</div>
+<div class="why">why：「圖不會碰 asymptote」是教科書級常見誤解，而本節兩個 worked example（\(x^{2}/(x^{2}-1)\) 不觸 \(y=1\)、\(x+1/x\) 不觸 \(y=x\)）恰好都不穿過，誤解全程未被挑戰；全書其他章也未講過此點（已 grep 確認）。直接影響讀者日後畫 \(xe^{-x}\)、\((\ln x)/x\) 這類圖的正確性。</div>
+<div class="src">source：<code>[source: OpenStax Calculus Vol.1 §4.6（“a graph … may cross a horizontal asymptote”；動筆前覆核精確位置）]</code>；數學內容自足</div></div>
+
+<h2>§5.9 Newton's Method（含 chapter summary）</h2>
+<div class="done"><b>§5.9 軟深度＝0 候選。</b>opener（tangent 作為引擎）＋公式從切線推導＋Strategy 5.7（含 \(f'\ne 0\) 停擺註）＋失敗模式 caution（發散／循環／凹性導引，回收 §5.6）＋Ex 5.24 自帶 Babylonian 史味與「位數翻倍」收斂直覺＋Ex 5.25 用 IVT 認證根存在＋四股 chapter summary 收全章並前指 Ch6。無承重缺口。</div>
+
+<details>
+<summary>Cut log（考慮過但刷掉的候選，供主審覆核不重掃）</summary>
+<ul>
+<li><b>§5.1</b> orthogonal trajectories／經濟學隱式曲線應用：worked-example 領域（①波 example-supplement 線），非軟深度。</li>
+<li><b>§5.2</b>「給定 rate 的正負號」caution（如朝牆走則 \(dx/dt=-1\)）：本節三例皆無此設定、無錨可掛，加了是 padding；既有 caution 已守住最大坑。</li>
+<li><b>§5.4</b> EVT／Closed Interval Method 前提反例 caution：Ch4 §4.4 已有完整版（\(x\) on \((0,1)\)＋不連續），此處為 import，重複即冗餘。</li>
+<li><b>§5.4</b> endpoint 可否算 local extremum 的定義口徑（Stewart vs Thomas 分歧）：簿記型微妙點，本書 Def 5.3 用 domain-restricted 形、Fermat（Thm 4.10）陳述已限 interior，加註反增混淆。</li>
+<li><b>§5.7</b> L'Hôpital 循環／失效反例（如 \(\sqrt{x^{2}+1}/x\) 型自我循環）：example 領域（①波）。</li>
+<li><b>§5.8</b> growth comparison（§5.7 鑄的 \(\ln x \ll x^{p} \ll e^{x}\)）在本節<em>沒有任何 example 用到</em>（兩例皆有理函數）——這是 ①波 worked-example 缺口（候選題型：sketch \(xe^{-x}\) 或 \((\ln x)/x\)），移交 example-supplement 線裁決，非軟深度、不佔本稿名額。</li>
+<li><b>§5.9</b> Newton–Raphson 命名史：Ex 5.24 已有 Babylonian 史味；同章第二條純 history 邊際效益遞減，且細節（Newton 1669 非迭代形式、Raphson 1690 簡化、Simpson 給出微積分形式）驗證成本高。</li>
+<li><b>§5.6</b> Rossi／Nixon「第三導數」quip（“rate of increase of inflation is decreasing”）：有趣但語域風險＋需驗證，讓位給乾淨的 rate-language gloss（5.6-1）。</li>
+<li><b>figure-note 全數不提</b>：M2 圖機會閘已產 13 筆 vetted 候選（essential 6／strong 5／med 3／low 2），本輪重掃只會灌水。</li>
+</ul>
+</details>
+
+<p class="sub" style="margin-top:1.5rem">裁決後流程：收錄者由主審（或指派 agent）撰寫 → 標 <code>&lt;!-- expansion:&lt;cat&gt; [pass: enrichment] [source: …] --&gt;</code>（<code>[pass:]</code> 在 <code>[source:]</code> 前）→ <b>必接</b>範圍限定 Mode B（僅審新 <code>[pass: enrichment]</code> 標記）→ <code>python handout/build.py ch05</code> → commit。全數不收亦為有效結果：記入 PLAN-ch05 閘家族 checklist 與 ROADMAP ch05 Open questions（「②波：4 節飽和、5 候選之裁決」），M4 即可收尾。</p>
+
+</body>
+</html>

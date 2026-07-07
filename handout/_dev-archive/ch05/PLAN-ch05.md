@@ -75,7 +75,7 @@ Excluded (roadmap): antiderivatives (→Ch6), graphing-with-technology.
 | 5.8 Curve Sketching | ✅ draft | Def 5.7 (asymptotes); Strategy 5.6; Ex 5.22–5.23 | 0 blocking, 3 adv applied |
 | 5.9 Newton's Method | ✅ draft | Strategy 5.7; Ex 5.24–5.25; **chapter summary** | **2 blocking** (cubic has Cardano; summary EVT/Fermat) fixed + adv |
 
-**Final numbering ledger (as-built):** Definition 5.1–5.7 · Theorem 5.1–5.5 · Strategy 5.1–5.7 · Example 5.1–5.25 · Corollary/Proposition/Lemma/Figure/Remark: none in Ch5. Appendix D grew to §D.1–§D.3 (Lemma D.1; proofs of Thm 4.9(a)/(b), Thm 5.5 ∞/∞).
+**Final numbering ledger (as-built, updated 2026-07-07):** Definition 5.1–5.7 · Theorem 5.1–5.5 · Strategy 5.1–5.7 · **Example 5.1–5.27**（M4 新增 5.14＝FDT on x^{3/5}(4−x)、5.22＝ln x/x at 0⁺；舊 5.14–5.20→5.15–5.21、5.21–5.25→5.23–5.27 一次 cascade）· **Figure 5.1–5.11**（M2 圖批次 2026-07-07，tier-1/2 全採）· Corollary/Proposition/Lemma/Remark: none in Ch5（另 +2 個 M4 unnumbered enrichment：§5.3 Leibniz-notation intuition、§5.8 asymptote-crossing caution）. Appendix D grew to §D.1–§D.3 (Lemma D.1; proofs of Thm 4.9(a)/(b), Thm 5.5 ∞/∞).
 
 **Gate status (2026-07-06):** ✅ 逐節 Codex ⑤（0 blocking；5 blocking 沿途修）· ✅ **sympy 數學閘 33/33 PASS** · ✅ **章層 Codex review**（0 blocking，5 cross-section adv 套）· ✅ **圖機會閘**（13 候選：essential 6/strong 5/med 3/low 2，駁 6；見 `handout/_audit/REVIEW-ch05-figure-opportunity.html`）。
 **剩餘（後續 session，較大、宜 fresh context）：** 圖**繪製**＋圖正確性閘 D1–D8（採 tier-1/2 候選）· math M1–M8 gate-2（依 PIPELINE 風險判準：Ch5 屬標準嚴謹章＝抽樣層）· S·A·V＋難度 learner-sim（PIPELINE M3 合一輪）· Mode C 條件式 gap-check（PIPELINE M4）。
@@ -85,11 +85,11 @@ Excluded (roadmap): antiderivatives (→Ch6), graphing-with-technology.
 | 閘家族 | 狀態 | 日期／備註 |
 |---|---|---|
 | M1 Mode A′（brief＋⑤＋sympy＋章層 review） | ✅ | 2026-07-06；5 blocking 沿途修 |
-| M2 圖機會（候選） | ✅ | 2026-07-06；13 候選待裁「畫哪些」 |
-| M2 圖繪製＋D1–D8 | ⏳ | 待裁決後跑 |
+| M2 圖機會（候選） | ✅ | 2026-07-06；13 候選 |
+| M2 圖繪製＋D1–D8 | ✅ | 2026-07-07；tier-1/2 共 11 張（Figure 5.1–5.11）；gate-1 **blocking=0, advisory=0**（自檢修 7 缺陷後送審）；視覺 gate-2 依頻率矩陣＝出版前抽樣 |
 | 數學 M gate-2（跨模型） | ⏳ | 風險判準＝抽樣層（標準嚴謹章） |
-| M3 散文 S·A·V＋難度 learner-sim（合一輪） | ⏳ | ≥3 盲測 |
-| M4 Mode C gap-check（①②合一） | ⏳ | brief 覆蓋完整可跳過，記錄即可 |
+| M3 散文 S·A·V＋難度 learner-sim（合一輪） | 🔄 | 2026-07-07 啟動（prose-audit ×3 批＋learner-sim ×3 盲測） |
+| M4 Mode C gap-check（①②合一） | ✅ | 2026-07-07；偵察 Layer-1=0；Codex 裁決 **ADOPT 4**（Ex 5.14、Ex 5.22、§5.3 intuition、§5.8 caution）／DEFER 5；sympy 驗證＋scoped Mode B 過；報告 `_audit/REVIEW-ch05-modec-gapcheck.html`、imports `ch05_example-imports.md` |
 | M5 收尾（dashboard＋ROADMAP open-q） | ⏳ | |
 
 ## Chapter opener — "By the end of this chapter you will be able to"

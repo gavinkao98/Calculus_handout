@@ -7,7 +7,7 @@
      the first derivative or by endpoint/limit behaviour — never by f''.
      Examples: 5.14 fence-by-river A=x(L−2x), x=L/4 (L=2400 ⇒ 600×1200, 720000 ft²); 5.15 minimal-surface
      can, r³=V/(2π) ⇒ h=2r; 5.16 rectangle in a semicircle, x=R/√2 ⇒ area R².
-     Counters handed to §5.6: Definition 5.5, Theorem 5.2, Example 5.17. Record: PLAN-ch05.md. -->
+     Counters handed to §5.6: Definition 5.5, Theorem 5.2, Example 5.18. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
@@ -39,10 +39,10 @@
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.14: the fence-by-a-river problem, a fixed-perimeter area maximization -->
+  <!-- expansion:example — Example 5.15: the fence-by-a-river problem, a fixed-perimeter area maximization -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.14</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.15</span></p>
       <div class="env-body">
         <p>A farmer has \(2400\) feet of fencing and wants to enclose a rectangular field bordering a straight river, with no fence needed along the river. What dimensions enclose the greatest area?</p>
       </div>
@@ -58,13 +58,18 @@
         <p>\[ A(600) = 600 \cdot 1200 = 720{,}000 \ \text{ft}^{2}. \]</p>
         <p>The best field is \(600\) feet deep and \(1200\) feet along the river. The fence divides itself equally between the two directions — \(1200\) feet across the river side, \(1200\) feet split between the two perpendicular sides — a balance that recurs throughout these problems. <span class="qed"></span></p>
       </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — riverside fence, three fenced sides (Ex 5.15); registered in chapter5 FIGS as "fence-river"] -->
+  <figure class="figure" data-fig="fence-river">
+    <figcaption><span class="fig-no">Figure 5.6</span> The riverside field of Example 5.15: only three sides are fenced — two of length \(x\) and one of length \(y\) — because the river bounds the fourth.</figcaption>
+  </figure>
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.15: the minimal-surface can, an open-domain minimization justified by the sign of the derivative -->
+  <!-- expansion:example — Example 5.16: the minimal-surface can, an open-domain minimization justified by the sign of the derivative -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.15</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.16</span></p>
       <div class="env-body">
         <p>A cylindrical can is to hold a fixed volume \(V\). What proportions use the least metal — that is, minimize the total surface area?</p>
       </div>
@@ -83,10 +88,10 @@
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.16: geometry — the largest rectangle inscribed in a semicircle -->
+  <!-- expansion:example — Example 5.17: geometry — the largest rectangle inscribed in a semicircle -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.16</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.17</span></p>
       <div class="env-body">
         <p>Find the dimensions of the rectangle of greatest area that can be inscribed in a semicircle of radius \(R\), with its base on the diameter.</p>
       </div>
@@ -94,19 +99,24 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Place the semicircle as the upper half of \(x^{2} + y^{2} = R^{2}\). Let the rectangle's upper-right corner be \((x, y)\) on the arc, with \(0 \le x \le R\). By symmetry the rectangle has width \(2x\) and height \(y = \sqrt{R^{2} - x^{2}}\), so its area is</p>
+        <p>Place the semicircle as the upper half of \(x^{2} + y^{2} = R^{2}\). Let the rectangle’s upper-right corner be \((x, y)\) on the arc, with \(0 \le x \le R\). By symmetry the rectangle has width \(2x\) and height \(y = \sqrt{R^{2} - x^{2}}\), so its area is</p>
         <p>\[ A(x) = 2x\sqrt{R^{2} - x^{2}}, \qquad 0 \le x \le R. \]</p>
         <p>Both endpoints give \(A = 0\) while interior values give positive area, so the maximum is interior. Differentiate by the product rule:</p>
         <p>\[ \begin{aligned}
-          A'(x) &= 2\sqrt{R^{2} - x^{2}} + 2x \cdot \frac{-x}{\sqrt{R^{2} - x^{2}}} \\
+          A’(x) &= 2\sqrt{R^{2} - x^{2}} + 2x \cdot \frac{-x}{\sqrt{R^{2} - x^{2}}} \\
           &= \frac{2(R^{2} - x^{2}) - 2x^{2}}{\sqrt{R^{2} - x^{2}}} = \frac{2(R^{2} - 2x^{2})}{\sqrt{R^{2} - x^{2}}}.
         \end{aligned} \]</p>
         <p>On \((0, R)\) the denominator is positive, so the sign of \(A'\) is the sign of \(R^{2} - 2x^{2}\): positive for \(x < R/\sqrt{2}\), negative beyond. The derivative changes from positive to negative at \(x = R/\sqrt{2}\), a maximum. There the height is \(y = \sqrt{R^{2} - R^{2}/2} = R/\sqrt{2}\), so the rectangle is \(R\sqrt{2}\) wide and \(R/\sqrt{2}\) tall, with area</p>
         <p>\[ A = R\sqrt{2} \cdot \frac{R}{\sqrt{2}} = R^{2}. \]</p>
-        <p>The largest inscribed rectangle has area \(R^{2}\) — one quarter of the full circle's \(2R \times 2R\) bounding square, equivalently half of the semicircle's \(2R \times R\) bounding rectangle, and twice as wide as it is tall. <span class="qed"></span></p>
+        <p>The largest inscribed rectangle has area \(R^{2}\) — one quarter of the full circle’s \(2R \times 2R\) bounding square, equivalently half of the semicircle’s \(2R \times R\) bounding rectangle, and twice as wide as it is tall. <span class="qed"></span></p>
       </div>
     </section>
   </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — rectangle inscribed in a semicircle (Ex 5.17); registered in chapter5 FIGS as "semicircle-rectangle"] -->
+  <figure class="figure" data-fig="semicircle-rectangle">
+    <figcaption><span class="fig-no">Figure 5.7</span> A rectangle inscribed in a semicircle of radius \(R\) (Example 5.17): the upper corner \((x, y)\) rides on the arc, so the width is \(2x\) and the height is \(y = \sqrt{R^{2} - x^{2}}\).</figcaption>
+  </figure>
 
   <!-- expansion:summary — close: optimization = modeling + §5.4; §5.6 adds concavity, sharpening classification and completing the reading of a graph -->
   <p>Every problem here reduced to the same two moves: model the quantity as a function on an interval, then locate its extreme with the derivative. The modelling changed from problem to problem; the calculus did not. Section 5.6 returns to the analytic side and adds the missing piece — how the <em>second</em> derivative records the way a curve bends, which both classifies extrema more quickly and, with everything gathered so far, lets a graph be read off its formula.</p>

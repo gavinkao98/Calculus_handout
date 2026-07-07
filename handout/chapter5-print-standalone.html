@@ -11,20 +11,30 @@
      ════════════════════════════════════════════════════════════════ -->
 <style>
 :root {
-  --fig-4-1:  100%;    /* Figure 4.1  Completeness bound */
-  --fig-4-2:  100%;    /* Figure 4.2  Partial sums converging to e^x */
-  --fig-4-3:  100%;    /* Figure 4.3  Interior extremum squeeze */
-  --fig-4-4:  100%;    /* Figure 4.4  MVT secant-tangent */
-  --fig-4-5:  100%;    /* Figure 4.5  e^x / ln x reflection */
-  --fig-4-6:  100%;    /* Figure 4.6  Reciprocal-slope geometry */
+  --fig-5-1:  100%;    /* Figure 5.1  Circle tangent-radius */
+  --fig-5-2:  100%;    /* Figure 5.2  Ladder right triangle */
+  --fig-5-3:  100%;    /* Figure 5.3  Streetlight similar triangles */
+  --fig-5-4:  100%;    /* Figure 5.4  sqrt(x) linearization */
+  --fig-5-5:  100%;    /* Figure 5.5  dy vs Delta-y */
+  --fig-5-6:  100%;    /* Figure 5.6  Riverside fence */
+  --fig-5-7:  100%;    /* Figure 5.7  Semicircle rectangle */
+  --fig-5-8:  100%;    /* Figure 5.8  Concavity vs tangents (pair) */
+  --fig-5-9:  100%;    /* Figure 5.9  Rational full sketch */
+  --fig-5-10: 100%;    /* Figure 5.10 Slant asymptote */
+  --fig-5-11: 100%;    /* Figure 5.11 Newton step */
 }
 
-.paper figure[data-fig="completeness-bound"] { --fig-w: var(--fig-4-1); }
-.paper figure[data-fig="partial-sums-exp"] { --fig-w: var(--fig-4-2); }
-.paper figure[data-fig="interior-extremum-squeeze"] { --fig-w: var(--fig-4-3); }
-.paper figure[data-fig="mvt-secant-tangent"] { --fig-w: var(--fig-4-4); }
-.paper figure[data-fig="exp-log-reflection"] { --fig-w: var(--fig-4-5); }
-.paper figure[data-fig="reciprocal-slope-log"] { --fig-w: var(--fig-4-6); }
+.paper figure[data-fig="tangent-radius-circle"] { --fig-w: var(--fig-5-1); }
+.paper figure[data-fig="ladder-triangle"] { --fig-w: var(--fig-5-2); }
+.paper figure[data-fig="streetlight-similar"] { --fig-w: var(--fig-5-3); }
+.paper figure[data-fig="sqrt-linearization"] { --fig-w: var(--fig-5-4); }
+.paper figure[data-fig="dy-vs-deltay"] { --fig-w: var(--fig-5-5); }
+.paper figure[data-fig="fence-river"] { --fig-w: var(--fig-5-6); }
+.paper figure[data-fig="semicircle-rectangle"] { --fig-w: var(--fig-5-7); }
+.paper figure[data-fig="concavity-tangents"] { --fig-w: var(--fig-5-8); }
+.paper figure[data-fig="rational-asymptotes"] { --fig-w: var(--fig-5-9); }
+.paper figure[data-fig="slant-asymptote"] { --fig-w: var(--fig-5-10); }
+.paper figure[data-fig="newton-step"] { --fig-w: var(--fig-5-11); }
 </style>
 
 <!-- Google Fonts: Inter for UI -->
@@ -423,9 +433,9 @@ window.MathJax = {
     <li>use linear approximation and differentials to estimate values and bound errors;</li>
     <li>locate absolute and local extrema, and solve optimization problems;</li>
     <li>determine concavity and inflection points, and apply the first- and second-derivative tests;</li>
-    <li>evaluate limits of indeterminate form with L'Hôpital's rule;</li>
+    <li>evaluate limits of indeterminate form with L’Hôpital’s rule;</li>
     <li>sketch a curve from its analytic features;</li>
-    <li>approximate a root with Newton's method.</li>
+    <li>approximate a root with Newton’s method.</li>
   </ul>
 </article>
 
@@ -484,6 +494,11 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — circle + tangent perpendicular to radius (Ex 5.1); registered in chapter5 FIGS as "tangent-radius-circle"] -->
+  <figure class="figure" data-fig="tangent-radius-circle">
+    <figcaption><span class="fig-no">Figure 5.1</span> The circle \(x^{2} + y^{2} = 25\) with its tangent line at \((3, 4)\): the tangent is perpendicular to the radius, so its slope is the negative reciprocal of the radius’s slope \(\tfrac{4}{3}\).</figcaption>
+  </figure>
+
   <!-- expansion:example — Example 5.2: a curve that cannot be solved for y (folium-type); product rule inside implicit diff -->
   <div class="workedexample">
     <section class="env env-example">
@@ -534,7 +549,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Implicit differentiation assumes what it uses: that near the point in question, the curve <em>is</em> the graph of some differentiable function \(y\) of \(x\). Where that fails, the formula for \(dy/dx\) does too. On the circle \(x^{2} + y^{2} = 25\) the point \((5, 0)\) has \(y = 0\), and \(dy/dx = -x/y\) is undefined — the tangent there is vertical, and no function \(y = f(x)\) describes the curve through that point. The rule of thumb: a formula for \(dy/dx\) that goes infinite or turns into \(0/0\) is a warning that the branch assumption needs separate analysis — it may signal a vertical tangent, a self-crossing, or another singular point, a place where "\(y\) as a function of \(x\)" has broken down. (The precise conditions under which an equation \(F(x, y) = 0\) does define \(y\) as a differentiable function of \(x\) belong to the multivariable calculus of Chapter 14; here we work on the branches where it plainly does.)</p>
+      <p>Implicit differentiation assumes what it uses: that near the point in question, the curve <em>is</em> the graph of some differentiable function \(y\) of \(x\). Where that fails, the formula for \(dy/dx\) does too. On the circle \(x^{2} + y^{2} = 25\) the point \((5, 0)\) has \(y = 0\), and \(dy/dx = -x/y\) is undefined — the tangent there is vertical, and no function \(y = f(x)\) describes the curve through that point. The rule of thumb: a formula for \(dy/dx\) that goes infinite or turns into \(0/0\) is a warning that the branch assumption needs separate analysis — it may signal a vertical tangent, a self-crossing, or another singular point, a place where “\(y\) as a function of \(x\)” has broken down. (The precise conditions under which an equation \(F(x, y) = 0\) does define \(y\) as a differentiable function of \(x\) belong to the multivariable calculus of Chapter 14; here we work on the branches where it plainly does.)</p>
     </div>
   </section>
 
@@ -559,7 +574,7 @@ window.MathJax = {
         <p>\[ \frac{d^{2}y}{dx^{2}} = -\frac{\dfrac{y^{2} + x^{2}}{y}}{y^{2}} = -\frac{x^{2} + y^{2}}{y^{3}}. \]</p>
         <p>Finally, every point on the curve satisfies \(x^{2} + y^{2} = 25\), so the original equation simplifies the answer to</p>
         <p>\[ \frac{d^{2}y}{dx^{2}} = -\frac{25}{y^{3}}. \]</p>
-        <p>Using the defining equation to tidy the result is a hallmark of implicit differentiation: the constraint that pins the curve down is available at every stage. On the upper half-circle \(y > 0\) the second derivative is negative, recording that the arc bends downward — the shape §5.6 will call concave down — as the picture of a circle's top demands. <span class="qed"></span></p>
+        <p>Using the defining equation to tidy the result is a hallmark of implicit differentiation: the constraint that pins the curve down is available at every stage. On the upper half-circle \(y > 0\) the second derivative is negative, recording that the arc bends downward — the shape §5.6 will call concave down — as the picture of a circle’s top demands. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -611,7 +626,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Substitute the instant's numbers only after differentiating, never before. A quantity that is changing must be carried as a variable through the differentiation; if you fix it to its momentary value first, you have frozen something that is actually moving, and its rate — the very thing the chain rule was about to produce — silently drops to zero. Plug in the numbers on the last line, not the first.</p>
+      <p>Substitute the instant’s numbers only after differentiating, never before. A quantity that is changing must be carried as a variable through the differentiation; if you fix it to its momentary value first, you have frozen something that is actually moving, and its rate — the very thing the chain rule was about to produce — silently drops to zero. Plug in the numbers on the last line, not the first.</p>
     </div>
   </section>
 
@@ -626,7 +641,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Let \(x\) be the distance from the wall to the base and \(y\) the height of the top, both functions of time. The ladder's length is fixed, so the Pythagorean relation holds at every instant:</p>
+        <p>Let \(x\) be the distance from the wall to the base and \(y\) the height of the top, both functions of time. The ladder’s length is fixed, so the Pythagorean relation holds at every instant:</p>
         <p>\[ x^{2} + y^{2} = 100. \]</p>
         <p>We are given \(dx/dt = 1\) and want \(dy/dt\) at the moment \(x = 6\). Differentiate the relation with respect to \(t\) — <em>before</em> putting in any numbers:</p>
         <p>\[ 2x\,\frac{dx}{dt} + 2y\,\frac{dy}{dt} = 0, \qquad \frac{dy}{dt} = -\frac{x}{y}\,\frac{dx}{dt}. \]</p>
@@ -636,6 +651,11 @@ window.MathJax = {
       </div>
     </section>
   </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — sliding-ladder right triangle (Ex 5.5); registered in chapter5 FIGS as "ladder-triangle"] -->
+  <figure class="figure" data-fig="ladder-triangle">
+    <figcaption><span class="fig-no">Figure 5.2</span> The sliding ladder of Example 5.5: wall, ground, and ladder form a right triangle with legs \(x\) and \(y\) and fixed hypotenuse \(10\); the base slides outward at \(1\ \text{ft/s}\) while the top slides down.</figcaption>
+  </figure>
 
   <!-- expansion:example — Example 5.6: inflating sphere — a volume-radius relation; solving for the rate of the "inner" variable -->
   <div class="workedexample">
@@ -664,22 +684,27 @@ window.MathJax = {
     <section class="env env-example">
       <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.7</span></p>
       <div class="env-body">
-        <p>A street lamp is \(15\) feet tall. A person \(6\) feet tall walks away from the lamp at \(5\) feet per second. How fast is the person's shadow lengthening, and how fast is the tip of the shadow moving?</p>
+        <p>A street lamp is \(15\) feet tall. A person \(6\) feet tall walks away from the lamp at \(5\) feet per second. How fast is the person’s shadow lengthening, and how fast is the tip of the shadow moving?</p>
       </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Let \(x\) be the person's distance from the lamp and \(s\) the length of the shadow they cast beyond themselves. The lamp, the person, and the shadow's tip form two similar right triangles: the large one from the lamp's top down to the tip, base \(x + s\) and height \(15\); the small one from the person's head to the tip, base \(s\) and height \(6\). Similar triangles equate the ratios of height to base:</p>
+        <p>Let \(x\) be the person’s distance from the lamp and \(s\) the length of the shadow they cast beyond themselves. The lamp, the person, and the shadow’s tip form two similar right triangles: the large one from the lamp’s top down to the tip, base \(x + s\) and height \(15\); the small one from the person’s head to the tip, base \(s\) and height \(6\). Similar triangles equate the ratios of height to base:</p>
         <p>\[ \frac{15}{x + s} = \frac{6}{s}. \]</p>
         <p>Cross-multiplying, \(15s = 6(x + s)\), so \(15s = 6x + 6s\) and \(9s = 6x\); that is, \(s = \tfrac{2}{3}x\). This relation holds at all times, so differentiate with respect to \(t\):</p>
         <p>\[ \frac{ds}{dt} = \frac{2}{3}\,\frac{dx}{dt} = \frac{2}{3}\,(5) = \frac{10}{3} \ \text{ft/s}. \]</p>
         <p>The shadow lengthens at \(\tfrac{10}{3}\) feet per second — and, notably, this rate does not depend on where the person is, since \(s\) is a fixed multiple of \(x\). The tip of the shadow sits at distance \(x + s\) from the lamp, so its speed is</p>
         <p>\[ \frac{d}{dt}(x + s) = \frac{dx}{dt} + \frac{ds}{dt} = 5 + \frac{10}{3} = \frac{25}{3} \ \text{ft/s}. \]</p>
-        <p>The tip outruns the person: it carries the person's own \(5\ \text{ft/s}\) plus the shadow's growth. <span class="qed"></span></p>
+        <p>The tip outruns the person: it carries the person’s own \(5\ \text{ft/s}\) plus the shadow’s growth. <span class="qed"></span></p>
       </div>
     </section>
   </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — streetlight similar triangles (Ex 5.7); registered in chapter5 FIGS as "streetlight-similar"] -->
+  <figure class="figure" data-fig="streetlight-similar">
+    <figcaption><span class="fig-no">Figure 5.3</span> The streetlight of Example 5.7: the lamp of height \(15\), the walker of height \(6\), and the shadow tip line up, so the large triangle with base \(x + s\) and the small one with base \(s\) are similar.</figcaption>
+  </figure>
 
   <!-- expansion:summary — close: the pattern is one relation differentiated once; §5.3 turns to the derivative as a local straight-line stand-in -->
   <p>Every problem here followed one pattern: a single equation, differentiated once with respect to time, turning a known rate into an unknown one. What made it work was the chain rule ferrying each rate out of the relation that hid it. The next section stays local in a different sense — it asks how well the derivative, the rate at a single instant, approximates the function itself just next door.</p>
@@ -711,6 +736,11 @@ window.MathJax = {
   <p>A differentiable function, seen up close, looks straight. This is not a metaphor but the content of the derivative: Chapter 3 recorded differentiability at \(x_{0}\) in its remainder form (Definition 3.1),</p>
   <p>\[ f(x_{0} + h) = f(x_{0}) + f'(x_{0})\,h + R(h), \qquad \frac{R(h)}{h} \to 0 \ \text{ as } h \to 0, \]</p>
   <p>which says that the curve equals a straight line — the one through \((x_{0}, f(x_{0}))\) with slope \(f'(x_{0})\) — plus a remainder \(R(h)\) that dies away faster than \(h\) itself. Drop the remainder and a usable approximation is left: near \(x_{0}\), the function is very nearly its tangent line. This section takes that idea at face value and puts it to work estimating values, and then repackages it in the language of <em>differentials</em>.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — tangent-line approximation of sqrt(x) at 4 (Def 5.1 / Ex 5.8); registered in chapter5 FIGS as "sqrt-linearization"] -->
+  <figure class="figure" data-fig="sqrt-linearization">
+    <figcaption><span class="fig-no">Figure 5.4</span> Linear approximation near \(x = 4\): the tangent line \(L\) is barely distinguishable from \(y = \sqrt{x}\) close to the point of tangency and drifts away far from it — compare the two at \(x = 9\).</figcaption>
+  </figure>
 
   <h3 class="subsec-head">Linearization</h3>
 
@@ -782,6 +812,14 @@ window.MathJax = {
   <p>\[ \Delta y = f(x + \Delta x) - f(x), \]</p>
   <p>the rise along the <em>curve</em>; the differential \(dy = f'(x)\,dx\) is the rise along the <em>tangent</em>. They are not equal — they differ by exactly the remainder \(R\) of Definition 3.1 attached to the base point \(x\) — but for small \(dx\) the difference is negligible, and \(dy \approx \Delta y\) is the linear approximation wearing new clothes. This form is the natural one for propagating a measurement error: a small uncertainty \(dx\) in a measured quantity produces an uncertainty of about \(dy = f'(x)\,dx\) in anything computed from it.</p>
 
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — dy along tangent vs Delta-y along curve (Def 5.2); registered in chapter5 FIGS as "dy-vs-deltay"] -->
+  <figure class="figure" data-fig="dy-vs-deltay">
+    <figcaption><span class="fig-no">Figure 5.5</span> Over the same step \(dx\), the differential \(dy\) is the rise of the tangent line, while \(\Delta y\) is the rise of the curve; their gap is the remainder \(R\), which dies away faster than \(dx\).</figcaption>
+  </figure>
+
+  <!-- expansion:intuition [pass: enrichment] — Leibniz-notation closure: with Definition 5.2, dy/dx is an honest ratio of differentials (recalls Remark 3.2's "single symbol" caution; forward seam to the substitution method's du); adjudicated ADOPT in the M4 gap-check (Codex, 2026-07-07) -->
+  <p>The differential notation also settles an old account. When \(dy/dx\) first appeared, Remark 3.2 was careful to call it a single symbol — suggestive, but not a fraction. Definition 5.2 upgrades it: with \(dx\) an independent quantity and \(dy = f'(x)\,dx\) built from it, the quotient \(dy/dx\) is a genuine ratio of two numbers, and it equals the derivative exactly. Leibniz’s fraction bar is now honest. The upgrade works forward, not backward — the chain-rule manipulations that <em>looked</em> like cancelling \(dx\)’s were licensed by Theorem 3.3, not by this definition — but from here on the bookkeeping power of treating \(dx\) as a real quantity is available, and integral calculus will lean on it heavily when a change of variable rides entirely on the differential.</p>
+
   <!-- expansion:example — Example 5.10 (differentials): error propagation, the canonical use of differentials -->
   <div class="workedexample">
     <section class="env env-example">
@@ -811,7 +849,7 @@ window.MathJax = {
   </section>
 
   <!-- expansion:summary — close: linear approximation = derivative as local model; §5.4 turns from local behavior to the global question of largest/smallest -->
-  <p>Linear approximation is the derivative cashing in its definition: the number \(f'(a)\) is not only a slope but a working forecast of the function's values nearby. That local reading — the function as its tangent line — recurs throughout calculus, generalized to curved approximations in Chapter 11 and to surfaces in Chapter 14. The next section changes the question entirely, from how a function behaves <em>near</em> a point to where, across a whole interval, it takes its largest and smallest values.</p>
+  <p>Linear approximation is the derivative cashing in its definition: the number \(f'(a)\) is not only a slope but a working forecast of the function’s values nearby. That local reading — the function as its tangent line — recurs throughout calculus, generalized to curved approximations in Chapter 11 and to surfaces in Chapter 14. The next section changes the question entirely, from how a function behaves <em>near</em> a point to where, across a whole interval, it takes its largest and smallest values.</p>
 
 </article>
 </template>
@@ -821,13 +859,15 @@ window.MathJax = {
      section-source: Stewart ET 9e §4.1 (Maximum and Minimum Values) + §4.3 (first-derivative test part);
      cross-checked Thomas 14e §4.1, Rogawski 4e §4.2. Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤).
      Counters continue from §5.3: §5.4 mints Definition 5.3 (local extrema), Definition 5.4 (critical number),
-     Theorem 5.1 (First Derivative Test), Strategy 5.3 (Closed Interval Method), Examples 5.11–5.13. Cautions UNNUMBERED.
+     Theorem 5.1 (First Derivative Test), Strategy 5.3 (Closed Interval Method), Examples 5.11–5.14
+     (5.14 = M4 enrichment, 2026-07-07). Cautions UNNUMBERED.
      IMPORTS (cross-ref, do NOT re-prove — all in Ch4 §4.4): absolute max/min = Definition 4.3; EVT = Theorem 4.9(a);
      Fermat/interior-extremum = Theorem 4.10; monotonicity Cor 4.3 (used to PROVE the First Derivative Test 5.1).
      Second-derivative test is NOT here — it needs concavity (§5.6). Examples: 5.11 critical numbers of
      x^{3/5}(4-x) → 0 (f' DNE) and 3/2 (f'=0); 5.12 closed-interval method x³-3x²+1 on [-1/2,4] → abs max 17,
-     abs min -3; 5.13 first-derivative test on x³-3x²+1 → x=0 local max (1), x=2 local min (-3).
-     Counters handed to §5.5: Definition 5.5, Theorem 5.2, Strategy 5.4, Example 5.14. Record: PLAN-ch05.md. -->
+     abs min -3; 5.13 first-derivative test on x³-3x²+1 → x=0 local max (1), x=2 local min (-3);
+     5.14 (M4) FDT classifies 5.11's critical numbers: x=0 neither (f' DNE, no sign change, vertical tangent), x=3/2 local max ≈3.19.
+     Counters handed to §5.5: Definition 5.5, Theorem 5.2, Strategy 5.4, Example 5.15. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
@@ -850,7 +890,7 @@ window.MathJax = {
 
   <h3 class="subsec-head">Where extrema can occur: critical numbers</h3>
 
-  <p>The engine that narrows the search is Fermat's theorem from Chapter 4 (Theorem 4.10): if \(f\) has a local extremum at an <em>interior</em> point \(c\) and \(f'(c)\) exists, then \(f'(c) = 0\). Contrapositively, a local extremum in the interior can occur only where the derivative is zero or fails to exist. Those places deserve a name.</p>
+  <p>The engine that narrows the search is Fermat’s theorem from Chapter 4 (Theorem 4.10): if \(f\) has a local extremum at an <em>interior</em> point \(c\) and \(f'(c)\) exists, then \(f'(c) = 0\). Contrapositively, a local extremum in the interior can occur only where the derivative is zero or fails to exist. Those places deserve a name.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">5.4</span><span class="env-name">Critical number</span></p>
@@ -859,13 +899,13 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>Fermat's theorem, recast, reads: every interior local extremum occurs at a critical number. This is the workhorse — it shrinks the hunt for extrema from a whole interval to a finite list of suspects.</p>
+  <p>Fermat’s theorem, recast, reads: every interior local extremum occurs at a critical number. This is the workhorse — it shrinks the hunt for extrema from a whole interval to a finite list of suspects.</p>
 
   <!-- expansion:caution — critical number is necessary, not sufficient: a critical number need not be an extremum -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>A critical number is a <em>candidate</em>, not a guarantee. The converse of Fermat's theorem is false: \(f'(c) = 0\) does not force an extremum at \(c\). The function \(f(x) = x^{3}\) has \(f'(0) = 0\), yet \(0\) is neither a maximum nor a minimum — the curve passes straight through with a momentary flat spot. Critical numbers must always be tested, never assumed to be extrema.</p>
+      <p>A critical number is a <em>candidate</em>, not a guarantee. The converse of Fermat’s theorem is false: \(f'(c) = 0\) does not force an extremum at \(c\). The function \(f(x) = x^{3}\) has \(f'(0) = 0\), yet \(0\) is neither a maximum nor a minimum — the curve passes straight through with a momentary flat spot. Critical numbers must always be tested, never assumed to be extrema.</p>
     </div>
   </section>
 
@@ -891,7 +931,7 @@ window.MathJax = {
 
   <h3 class="subsec-head">Absolute extrema on a closed interval</h3>
 
-  <p>On a closed interval the search closes completely. The Extreme Value Theorem (Theorem 4.9(a)) guarantees that a function continuous on \([a, b]\) <em>attains</em> an absolute maximum and minimum there; Fermat's theorem says each is either an interior critical number or an endpoint. So the absolute extremes are found by checking a finite list.</p>
+  <p>On a closed interval the search closes completely. The Extreme Value Theorem (Theorem 4.9(a)) guarantees that a function continuous on \([a, b]\) <em>attains</em> an absolute maximum and minimum there; Fermat’s theorem says each is either an interior critical number or an endpoint. So the absolute extremes are found by checking a finite list.</p>
 
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.3</span><span class="env-name">The Closed Interval Method</span></p>
@@ -927,7 +967,7 @@ window.MathJax = {
 
   <h3 class="subsec-head">Classifying local extrema: the First Derivative Test</h3>
 
-  <p>The Closed Interval Method finds absolute extremes by brute evaluation, but says nothing about the <em>character</em> of an interior critical number — whether it is a local max, a local min, or neither. The sign of the derivative on either side settles it, and the Mean Value Theorem's monotonicity corollary (Corollary 4.3) is what makes the reasoning rigorous.</p>
+  <p>The Closed Interval Method finds absolute extremes by brute evaluation, but says nothing about the <em>character</em> of an interior critical number — whether it is a local max, a local min, or neither. The sign of the derivative on either side settles it, and the Mean Value Theorem’s monotonicity corollary (Corollary 4.3) is what makes the reasoning rigorous.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.1</span><span class="env-name">First Derivative Test</span></p>
@@ -973,6 +1013,25 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:example [pass: enrichment] [source: AI — running-example extension honouring Ex 5.11's "settled below"; adjudicated ADOPT in the M4 gap-check (Codex, 2026-07-07); sympy-recomputed] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.14</span></p>
+      <div class="env-body">
+        <p>Classify the critical numbers of \(f(x) = x^{3/5}(4 - x)\) found in Example 5.11.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Example 5.11 produced two critical numbers: \(x = \tfrac{3}{2}\), where \(f'\) vanishes, and \(x = 0\), where \(f'\) does not exist. The First Derivative Test handles both — its hypotheses ask only that \(f\) be continuous at the critical number and differentiable on either side, not at the point itself. From</p>
+        <p>\[ f'(x) = \frac{4(3 - 2x)}{5x^{2/5}}, \]</p>
+        <p>the denominator \(5x^{2/5} = 5\bigl(x^{1/5}\bigr)^{2}\) is positive for every \(x \ne 0\), so the sign of \(f'\) is the sign of \(3 - 2x\): positive on \((-\infty, 0)\), positive again on \((0, \tfrac{3}{2})\), and negative on \((\tfrac{3}{2}, \infty)\).</p>
+        <p>At \(x = \tfrac{3}{2}\) the derivative changes from positive to negative, so \(f\) has a local maximum there, of value \(f\bigl(\tfrac{3}{2}\bigr) = \bigl(\tfrac{3}{2}\bigr)^{3/5} \cdot \tfrac{5}{2} \approx 3.19\). At \(x = 0\) the derivative does not change sign — positive on both sides — so \(x = 0\) is neither a maximum nor a minimum: the graph climbs through the origin with a vertical tangent and keeps climbing. A critical number can fail to be an extremum in two ways, and this function exhibits the second — not a flat spot on a rising curve (that was \(x^{3}\) at \(0\)), but a point of vertical tangency the curve simply passes through. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
   <!-- expansion:summary — close: extrema located and classified; §5.5 applies the machinery to real optimization; the second-derivative test waits for §5.6 -->
   <p>The derivative has done its defining work: it flags where a function can turn, and its sign says which way. That is enough to solve genuine optimization problems, which the next section takes up — real quantities to maximize or minimize, with the modelling that turns a word problem into a function on an interval. A second, sometimes faster classifier — the sign of the <em>second</em> derivative — waits until §5.6, once concavity is in hand.</p>
 
@@ -989,7 +1048,7 @@ window.MathJax = {
      the first derivative or by endpoint/limit behaviour — never by f''.
      Examples: 5.14 fence-by-river A=x(L−2x), x=L/4 (L=2400 ⇒ 600×1200, 720000 ft²); 5.15 minimal-surface
      can, r³=V/(2π) ⇒ h=2r; 5.16 rectangle in a semicircle, x=R/√2 ⇒ area R².
-     Counters handed to §5.6: Definition 5.5, Theorem 5.2, Example 5.17. Record: PLAN-ch05.md. -->
+     Counters handed to §5.6: Definition 5.5, Theorem 5.2, Example 5.18. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
@@ -1021,10 +1080,10 @@ window.MathJax = {
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.14: the fence-by-a-river problem, a fixed-perimeter area maximization -->
+  <!-- expansion:example — Example 5.15: the fence-by-a-river problem, a fixed-perimeter area maximization -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.14</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.15</span></p>
       <div class="env-body">
         <p>A farmer has \(2400\) feet of fencing and wants to enclose a rectangular field bordering a straight river, with no fence needed along the river. What dimensions enclose the greatest area?</p>
       </div>
@@ -1040,13 +1099,18 @@ window.MathJax = {
         <p>\[ A(600) = 600 \cdot 1200 = 720{,}000 \ \text{ft}^{2}. \]</p>
         <p>The best field is \(600\) feet deep and \(1200\) feet along the river. The fence divides itself equally between the two directions — \(1200\) feet across the river side, \(1200\) feet split between the two perpendicular sides — a balance that recurs throughout these problems. <span class="qed"></span></p>
       </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — riverside fence, three fenced sides (Ex 5.15); registered in chapter5 FIGS as "fence-river"] -->
+  <figure class="figure" data-fig="fence-river">
+    <figcaption><span class="fig-no">Figure 5.6</span> The riverside field of Example 5.15: only three sides are fenced — two of length \(x\) and one of length \(y\) — because the river bounds the fourth.</figcaption>
+  </figure>
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.15: the minimal-surface can, an open-domain minimization justified by the sign of the derivative -->
+  <!-- expansion:example — Example 5.16: the minimal-surface can, an open-domain minimization justified by the sign of the derivative -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.15</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.16</span></p>
       <div class="env-body">
         <p>A cylindrical can is to hold a fixed volume \(V\). What proportions use the least metal — that is, minimize the total surface area?</p>
       </div>
@@ -1065,10 +1129,10 @@ window.MathJax = {
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.16: geometry — the largest rectangle inscribed in a semicircle -->
+  <!-- expansion:example — Example 5.17: geometry — the largest rectangle inscribed in a semicircle -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.16</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.17</span></p>
       <div class="env-body">
         <p>Find the dimensions of the rectangle of greatest area that can be inscribed in a semicircle of radius \(R\), with its base on the diameter.</p>
       </div>
@@ -1076,19 +1140,24 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Place the semicircle as the upper half of \(x^{2} + y^{2} = R^{2}\). Let the rectangle's upper-right corner be \((x, y)\) on the arc, with \(0 \le x \le R\). By symmetry the rectangle has width \(2x\) and height \(y = \sqrt{R^{2} - x^{2}}\), so its area is</p>
+        <p>Place the semicircle as the upper half of \(x^{2} + y^{2} = R^{2}\). Let the rectangle’s upper-right corner be \((x, y)\) on the arc, with \(0 \le x \le R\). By symmetry the rectangle has width \(2x\) and height \(y = \sqrt{R^{2} - x^{2}}\), so its area is</p>
         <p>\[ A(x) = 2x\sqrt{R^{2} - x^{2}}, \qquad 0 \le x \le R. \]</p>
         <p>Both endpoints give \(A = 0\) while interior values give positive area, so the maximum is interior. Differentiate by the product rule:</p>
         <p>\[ \begin{aligned}
-          A'(x) &= 2\sqrt{R^{2} - x^{2}} + 2x \cdot \frac{-x}{\sqrt{R^{2} - x^{2}}} \\
+          A’(x) &= 2\sqrt{R^{2} - x^{2}} + 2x \cdot \frac{-x}{\sqrt{R^{2} - x^{2}}} \\
           &= \frac{2(R^{2} - x^{2}) - 2x^{2}}{\sqrt{R^{2} - x^{2}}} = \frac{2(R^{2} - 2x^{2})}{\sqrt{R^{2} - x^{2}}}.
         \end{aligned} \]</p>
         <p>On \((0, R)\) the denominator is positive, so the sign of \(A'\) is the sign of \(R^{2} - 2x^{2}\): positive for \(x < R/\sqrt{2}\), negative beyond. The derivative changes from positive to negative at \(x = R/\sqrt{2}\), a maximum. There the height is \(y = \sqrt{R^{2} - R^{2}/2} = R/\sqrt{2}\), so the rectangle is \(R\sqrt{2}\) wide and \(R/\sqrt{2}\) tall, with area</p>
         <p>\[ A = R\sqrt{2} \cdot \frac{R}{\sqrt{2}} = R^{2}. \]</p>
-        <p>The largest inscribed rectangle has area \(R^{2}\) — one quarter of the full circle's \(2R \times 2R\) bounding square, equivalently half of the semicircle's \(2R \times R\) bounding rectangle, and twice as wide as it is tall. <span class="qed"></span></p>
+        <p>The largest inscribed rectangle has area \(R^{2}\) — one quarter of the full circle’s \(2R \times 2R\) bounding square, equivalently half of the semicircle’s \(2R \times R\) bounding rectangle, and twice as wide as it is tall. <span class="qed"></span></p>
       </div>
     </section>
   </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — rectangle inscribed in a semicircle (Ex 5.17); registered in chapter5 FIGS as "semicircle-rectangle"] -->
+  <figure class="figure" data-fig="semicircle-rectangle">
+    <figcaption><span class="fig-no">Figure 5.7</span> A rectangle inscribed in a semicircle of radius \(R\) (Example 5.17): the upper corner \((x, y)\) rides on the arc, so the width is \(2x\) and the height is \(y = \sqrt{R^{2} - x^{2}}\).</figcaption>
+  </figure>
 
   <!-- expansion:summary — close: optimization = modeling + §5.4; §5.6 adds concavity, sharpening classification and completing the reading of a graph -->
   <p>Every problem here reduced to the same two moves: model the quantity as a function on an interval, then locate its extreme with the derivative. The modelling changed from problem to problem; the calculus did not. Section 5.6 returns to the analytic side and adds the missing piece — how the <em>second</em> derivative records the way a curve bends, which both classifies extrema more quickly and, with everything gathered so far, lets a graph be read off its formula.</p>
@@ -1108,7 +1177,7 @@ window.MathJax = {
      Ch14 Hessian (§C.4). Second-derivative test proved from the limit definition of f''(c) (with f'(c)=0).
      Examples: 5.17 concavity/inflection of x⁴−4x³ (f''=12x(x−2), inflections 0 and 2); 5.18 second-derivative
      test on x³−3x²+1 (reused from §5.4: f''=6x−6, x=0 local max, x=2 local min), contrasting the two tests.
-     Counters handed to §5.7: Definition 5.7, Theorem 5.4, Example 5.19. Record: PLAN-ch05.md. -->
+     Counters handed to §5.7: Definition 5.7, Theorem 5.4, Example 5.20. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
@@ -1131,7 +1200,12 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>Since "\(f'\) increasing" is itself a statement the derivative can test — apply the sign of \((f')' = f''\) — concavity is read directly off the second derivative.</p>
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — concave up/down vs tangent lines (Def 5.5); registered in chapter5 FIGS as "concavity-tangents"] -->
+  <figure class="figure" data-fig="concavity-tangents">
+    <figcaption><span class="fig-no">Figure 5.8</span> Concavity read from tangent lines: a concave-up arc lies above every tangent and its slopes increase from left to right; a concave-down arc lies below its tangents, with decreasing slopes.</figcaption>
+  </figure>
+
+  <p>Since “\(f'\) increasing” is itself a statement the derivative can test — apply the sign of \((f')' = f''\) — concavity is read directly off the second derivative.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.2</span><span class="env-name">Concavity Test</span></p>
@@ -1164,14 +1238,14 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>At an inflection point \(c\) where \(f''(c)\) exists, \(f''(c)\) must equal \(0\). For if the concavity changes at \(c\), then \(f'\) switches from increasing to decreasing (or the reverse) there, so \(f'\) has a local extremum at \(c\); Fermat's theorem (Theorem 4.10) applied to \(f'\) then forces its derivative \(f''(c) = 0\). So the candidates for inflection are the points where \(f'' = 0\) or \(f''\) fails to exist. But \(f''(c) = 0\) alone does <em>not</em> make an inflection: the concavity must genuinely change sign there. The function \(f(x) = x^{4}\) has \(f''(0) = 0\), yet it is concave up on both sides of \(0\) — no inflection. Always confirm the change, never infer it from \(f'' = 0\).</p>
+      <p>At an inflection point \(c\) where \(f''(c)\) exists, \(f''(c)\) must equal \(0\). For if the concavity changes at \(c\), then \(f'\) switches from increasing to decreasing (or the reverse) there, so \(f'\) has a local extremum at \(c\); Fermat’s theorem (Theorem 4.10) applied to \(f'\) then forces its derivative \(f''(c) = 0\). So the candidates for inflection are the points where \(f'' = 0\) or \(f''\) fails to exist. But \(f''(c) = 0\) alone does <em>not</em> make an inflection: the concavity must genuinely change sign there. The function \(f(x) = x^{4}\) has \(f''(0) = 0\), yet it is concave up on both sides of \(0\) — no inflection. Always confirm the change, never infer it from \(f'' = 0\).</p>
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.17: concavity intervals and inflection points from the sign of f'' -->
+  <!-- expansion:example — Example 5.18: concavity intervals and inflection points from the sign of f'' -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.17</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.18</span></p>
       <div class="env-body">
         <p>Find the intervals of concavity and the inflection points of \(f(x) = x^{4} - 4x^{3}\).</p>
       </div>
@@ -1183,8 +1257,8 @@ window.MathJax = {
         <p>\[ f''(x) = 12x^{2} - 24x = 12x(x - 2). \]</p>
         <p>The second derivative is zero at \(x = 0\) and \(x = 2\), the candidate inflection points. Its sign, from the factors \(12x\) and \(x - 2\), is</p>
         <p>\[ \begin{aligned}
-          &f''(x) > 0 \text{ on } (-\infty, 0), \qquad f''(x) < 0 \text{ on } (0, 2), \\
-          &f''(x) > 0 \text{ on } (2, \infty).
+          &f’’(x) > 0 \text{ on } (-\infty, 0), \qquad f’’(x) < 0 \text{ on } (0, 2), \\
+          &f’’(x) > 0 \text{ on } (2, \infty).
         \end{aligned} \]</p>
         <p>So \(f\) is concave up on \((-\infty, 0)\), concave down on \((0, 2)\), and concave up again on \((2, \infty)\). The concavity genuinely changes at both candidates, so both are inflection points: \((0, 0)\) and \((2, -16)\), using \(f(2) = 16 - 32 = -16\). The curve cups upward, flattens and rolls over near the origin, sags through the middle, and cups upward once more past \(x = 2\). <span class="qed"></span></p>
       </div>
@@ -1224,10 +1298,10 @@ window.MathJax = {
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.18: second-derivative test on the §5.4 cubic, contrasting speed with the first-derivative test -->
+  <!-- expansion:example — Example 5.19: second-derivative test on the §5.4 cubic, contrasting speed with the first-derivative test -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.18</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.19</span></p>
       <div class="env-body">
         <p>Use the Second Derivative Test to classify the critical numbers of \(f(x) = x^{3} - 3x^{2} + 1\).</p>
       </div>
@@ -1243,7 +1317,7 @@ window.MathJax = {
   </div>
 
   <!-- expansion:summary — close: shape toolkit complete; §5.7 adds L'Hôpital for the limits that govern behavior at infinity, before §5.8 synthesizes into a full sketch -->
-  <p>Rise and fall, peak and valley, cupping and inflection — the first two derivatives supply the entire vocabulary for the shape of a graph. Before assembling that vocabulary into a complete curve sketch, which §5.8 does, one gap remains: the behaviour of a graph far out and near its asymptotes is governed by limits that often arrive in indeterminate form. The next section supplies the tool for those — L'Hôpital's rule — after which every feature a sketch needs is computable.</p>
+  <p>Rise and fall, peak and valley, cupping and inflection — the first two derivatives supply the entire vocabulary for the shape of a graph. Before assembling that vocabulary into a complete curve sketch, which §5.8 does, one gap remains: the behaviour of a graph far out and near its asymptotes is governed by limits that often arrive in indeterminate form. The next section supplies the tool for those — L’Hôpital’s rule — after which every feature a sketch needs is computable.</p>
 
 </article>
 </template>
@@ -1253,31 +1327,33 @@ window.MathJax = {
      section-source: Stewart ET 9e §4.4 (Indeterminate Forms and l'Hospital's Rule); cross-checked
      Thomas 14e §4.5, Rogawski 4e §4.5. Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤).
      Counters continue from §5.6: §5.7 mints Theorem 5.4 (Generalized MVT / Cauchy's form),
-     Theorem 5.5 (L'Hopital's Rule), Strategy 5.5, Examples 5.19–5.21. Cautions UNNUMBERED.
+     Theorem 5.5 (L'Hopital's Rule), Strategy 5.5, Examples 5.20–5.23
+     (5.22 = M4 enrichment, 2026-07-07). Cautions UNNUMBERED.
      SEAM (full-arc review): Generalized MVT is named "Generalized Mean Value Theorem (Cauchy's form)"
      to avoid clashing with the Cauchy criterion (Theorem 4.5). It is EXPORTED to Ch11 (Taylor remainder).
      Proved via Rolle (Theorem 4.11). L'Hopital's 0/0 finite case is proved IN SECTION via the Generalized MVT;
      the infinity/infinity and infinite-point cases are STATED and their proof FENCED to the Proof-Track
      appendix (new §D.3) — depth policy fences the heaviest proofs; §D.3 is Appendix D's second customer.
      Growth comparison ln x << x^p << e^x is established here (feeds §5.8 asymptotics).
-     Math: (e^x-1-x)/x^2 -> 1/2 (L'Hopital twice); ln x / x -> 0; x ln x -> 0 (0*inf) and x^x -> 1 (0^0).
-     Counters handed to §5.8: Definition 5.7, Theorem 5.6, Strategy 5.6, Example 5.22. Record: PLAN-ch05.md. -->
+     Math: (e^x-1-x)/x^2 -> 1/2 (L'Hopital twice); ln x / x -> 0; x ln x -> 0 (0*inf) and x^x -> 1 (0^0);
+     5.22 (M4): lim_{x->0+} ln x / x = -inf — form (-inf)/0+ is NOT indeterminate; blind L'Hopital would give +inf (wrong sign).
+     Counters handed to §5.8: Definition 5.7, Theorem 5.6, Strategy 5.6, Example 5.24. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
   <header class="sec-head">
-    <h2 class="sec-title"><span class="sec-no">5.7</span>L'Hôpital's Rule</h2>
+    <h2 class="sec-title"><span class="sec-no">5.7</span>L’Hôpital’s Rule</h2>
   </header>
 
   <!-- expansion:intuition — section opener: indeterminate forms; the ratio of derivatives resolves them; but the tool needs a stronger MVT -->
-  <p>Some limits refuse to be read off. When \(x \to a\) drives both \(f(x)\) and \(g(x)\) to \(0\), the quotient \(f(x)/g(x)\) approaches the meaningless symbol \(\tfrac{0}{0}\): the answer could be anything, depending on how fast each part vanishes. The same impasse arises when both race to \(\infty\), giving \(\tfrac{\infty}{\infty}\). These are the <em>indeterminate forms</em>, and \(f'\!/g'\) — the ratio of the <em>rates</em> at which numerator and denominator move — is exactly the extra information needed to break the tie. <em>L'Hôpital's rule</em> makes that precise: under the right conditions, the limit of \(f/g\) equals the limit of \(f'\!/g'\). Proving it needs a two-function refinement of the Mean Value Theorem, which is worth having in its own right.</p>
+  <p>Some limits refuse to be read off. When \(x \to a\) drives both \(f(x)\) and \(g(x)\) to \(0\), the quotient \(f(x)/g(x)\) approaches the meaningless symbol \(\tfrac{0}{0}\): the answer could be anything, depending on how fast each part vanishes. The same impasse arises when both race to \(\infty\), giving \(\tfrac{\infty}{\infty}\). These are the <em>indeterminate forms</em>, and \(f'\!/g'\) — the ratio of the <em>rates</em> at which numerator and denominator move — is exactly the extra information needed to break the tie. <em>L’Hôpital’s rule</em> makes that precise: under the right conditions, the limit of \(f/g\) equals the limit of \(f'\!/g'\). Proving it needs a two-function refinement of the Mean Value Theorem, which is worth having in its own right.</p>
 
   <h3 class="subsec-head">The Generalized Mean Value Theorem</h3>
 
-  <p>The Mean Value Theorem compares a function's rise to the run of \(x\). The generalization compares the rises of <em>two</em> functions to each other, as both traverse the same interval.</p>
+  <p>The Mean Value Theorem compares a function’s rise to the run of \(x\). The generalization compares the rises of <em>two</em> functions to each other, as both traverse the same interval.</p>
 
   <section class="env env-theorem">
-    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.4</span><span class="env-name">Generalized Mean Value Theorem (Cauchy's form)</span></p>
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.4</span><span class="env-name">Generalized Mean Value Theorem (Cauchy’s form)</span></p>
     <div class="env-body">
       <p>If \(f\) and \(g\) are continuous on \([a, b]\) and differentiable on \((a, b)\), then there is a point \(c \in (a, b)\) with</p>
       <p>\[ \bigl[f(b) - f(a)\bigr]\,g'(c) = \bigl[g(b) - g(a)\bigr]\,f'(c). \]</p>
@@ -1289,11 +1365,11 @@ window.MathJax = {
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
-      <p>Imitate the Mean Value Theorem's proof, using an auxiliary function tuned to have equal endpoint values. Set</p>
+      <p>Imitate the Mean Value Theorem’s proof, using an auxiliary function tuned to have equal endpoint values. Set</p>
       <p>\[ h(x) = \bigl[f(b) - f(a)\bigr]\,g(x) - \bigl[g(b) - g(a)\bigr]\,f(x). \]</p>
       <p>As a combination of \(f\) and \(g\), \(h\) is continuous on \([a, b]\) and differentiable on \((a, b)\). At the endpoints,</p>
       <p>\[ h(a) = f(b)g(a) - g(b)f(a) = h(b), \]</p>
-      <p>as a short expansion of each side confirms, so \(h(a) = h(b)\). By Rolle's theorem (Theorem 4.11) there is a \(c \in (a, b)\) with \(h'(c) = 0\). Since</p>
+      <p>as a short expansion of each side confirms, so \(h(a) = h(b)\). By Rolle’s theorem (Theorem 4.11) there is a \(c \in (a, b)\) with \(h'(c) = 0\). Since</p>
       <p>\[ h'(x) = \bigl[f(b) - f(a)\bigr]\,g'(x) - \bigl[g(b) - g(a)\bigr]\,f'(x), \]</p>
       <p>setting \(h'(c) = 0\) gives the stated identity. For the ratio form, note that if \(g'(x) \ne 0\) on \((a, b)\) then \(g(b) \ne g(a)\) — otherwise Rolle applied to \(g\) alone would produce a zero of \(g'\) — so dividing by \([g(b) - g(a)]\,g'(c)\) is legitimate. <span class="qed qed-proof"></span></p>
     </div>
@@ -1301,10 +1377,10 @@ window.MathJax = {
 
   <p class="informal">Taking \(g(x) = x\) recovers the ordinary Mean Value Theorem: \(g'(c) = 1\) and \(g(b) - g(a) = b - a\), and the identity becomes \(f(b) - f(a) = (b - a)f'(c)\). The generalization is the Mean Value Theorem with the run measured by a second function instead of by \(x\).</p>
 
-  <h3 class="subsec-head">L'Hôpital's rule</h3>
+  <h3 class="subsec-head">L’Hôpital’s rule</h3>
 
   <section class="env env-theorem">
-    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.5</span><span class="env-name">L'Hôpital's Rule</span></p>
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.5</span><span class="env-name">L’Hôpital’s Rule</span></p>
     <div class="env-body">
       <p>Suppose \(f\) and \(g\) are differentiable with \(g'(x) \ne 0\) near \(a\) (except possibly at \(a\)), where \(a\) may be a real number or \(\pm\infty\). Suppose further that</p>
       <p>\[ \lim_{x \to a} \frac{f'(x)}{g'(x)} = L \qquad (L \text{ finite or } \pm\infty). \]</p>
@@ -1328,13 +1404,13 @@ window.MathJax = {
   </section>
 
   <!-- expansion:formula — the remaining cases are fenced to the Proof-Track appendix (§D.3) per the depth policy -->
-  <p>The \(\tfrac{\ast}{\infty}\) case and the cases where \(a = \pm\infty\) hold under the same hypotheses, but their proofs are more delicate — the tidy substitution \(f(a) = g(a) = 0\) is unavailable when the functions blow up, and the estimate must be managed by hand. Following this handout's proof-track policy of keeping the heaviest arguments out of the main line, we state these cases as part of Theorem 5.5 and defer their proof to the Proof-Track appendix (§D.3).</p>
+  <p>The \(\tfrac{\ast}{\infty}\) case and the cases where \(a = \pm\infty\) hold under the same hypotheses, but their proofs are more delicate — the tidy substitution \(f(a) = g(a) = 0\) is unavailable when the functions blow up, and the estimate must be managed by hand. Following this handout’s proof-track policy of keeping the heaviest arguments out of the main line, we state these cases as part of Theorem 5.5 and defer their proof to the Proof-Track appendix (§D.3).</p>
 
   <!-- expansion:caution — L'Hopital's three traps: wrong form, quotient rule, and the converse -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Three cautions travel with the rule. First, <em>check the form</em>: L'Hôpital applies only to \(\tfrac{0}{0}\) and \(\tfrac{\ast}{\infty}\). Applied to a limit that is not indeterminate — where the numerator and denominator have honest finite limits — it is unjustified and may give a wrong answer. Second, differentiate the numerator and denominator <em>separately</em>: \(f'\!/g'\) is not the derivative of the quotient \(f/g\), and the quotient rule has no place here. Third, the rule is one-directional: if \(\lim f'\!/g'\) fails to exist, that says nothing about \(\lim f/g\), which may still exist — so a failed application is inconclusive, not a proof of divergence.</p>
+      <p>Three cautions travel with the rule. First, <em>check the form</em>: L’Hôpital applies only to \(\tfrac{0}{0}\) and \(\tfrac{\ast}{\infty}\). Applied to a limit that is not indeterminate — where the numerator and denominator have honest finite limits — it is unjustified and may give a wrong answer. Second, differentiate the numerator and denominator <em>separately</em>: \(f'\!/g'\) is not the derivative of the quotient \(f/g\), and the quotient rule has no place here. Third, the rule is one-directional: if \(\lim f'\!/g'\) fails to exist, that says nothing about \(\lim f/g\), which may still exist — so a failed application is inconclusive, not a proof of divergence.</p>
     </div>
   </section>
 
@@ -1343,7 +1419,7 @@ window.MathJax = {
     <div class="env-body">
       <p>To evaluate an indeterminate limit:</p>
       <ol class="steps">
-        <li><strong>\(\tfrac{0}{0}\) or \(\tfrac{\ast}{\infty}\):</strong> apply L'Hôpital's rule directly. If the resulting limit is again indeterminate, apply it again — differentiating repeatedly until an answer emerges.</li>
+        <li><strong>\(\tfrac{0}{0}\) or \(\tfrac{\ast}{\infty}\):</strong> apply L’Hôpital’s rule directly. If the resulting limit is again indeterminate, apply it again — differentiating repeatedly until an answer emerges.</li>
         <li><strong>\(0 \cdot \infty\):</strong> rewrite the product \(f\cdot g\) as a quotient, \(\dfrac{f}{1/g}\) or \(\dfrac{g}{1/f}\), turning it into \(\tfrac{0}{0}\) or \(\tfrac{\infty}{\infty}\).</li>
         <li><strong>\(\infty - \infty\):</strong> combine over a common denominator (or otherwise rearrange) to reach a single quotient.</li>
         <li><strong>\(1^{\infty}\), \(0^{0}\), \(\infty^{0}\):</strong> take logarithms. If \(y = f^{g}\) with \(f > 0\) near the point, then \(\ln y = g\ln f\), a \(0 \cdot \infty\) form; find \(\lim \ln y\), then exponentiate — \(\lim y = e^{\lim \ln y}\).</li>
@@ -1351,10 +1427,10 @@ window.MathJax = {
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.19: 0/0 requiring L'Hopital twice -->
+  <!-- expansion:example — Example 5.20: 0/0 requiring L'Hopital twice -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.19</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.20</span></p>
       <div class="env-body">
         <p>Evaluate \(\displaystyle \lim_{x \to 0} \frac{e^{x} - 1 - x}{x^{2}}\).</p>
       </div>
@@ -1362,7 +1438,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>As \(x \to 0\), numerator and denominator both tend to \(0\): the form is \(\tfrac{0}{0}\). Apply L'Hôpital's rule, differentiating top and bottom:</p>
+        <p>As \(x \to 0\), numerator and denominator both tend to \(0\): the form is \(\tfrac{0}{0}\). Apply L’Hôpital’s rule, differentiating top and bottom:</p>
         <p>\[ \lim_{x \to 0} \frac{e^{x} - 1 - x}{x^{2}} = \lim_{x \to 0} \frac{e^{x} - 1}{2x}. \]</p>
         <p>This is again \(\tfrac{0}{0}\), so apply the rule a second time:</p>
         <p>\[ \lim_{x \to 0} \frac{e^{x} - 1}{2x} = \lim_{x \to 0} \frac{e^{x}}{2} = \frac{1}{2}. \]</p>
@@ -1371,10 +1447,10 @@ window.MathJax = {
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.20: infinity/infinity, establishing the log-vs-power growth comparison -->
+  <!-- expansion:example — Example 5.21: infinity/infinity, establishing the log-vs-power growth comparison -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.20</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.21</span></p>
       <div class="env-body">
         <p>Evaluate \(\displaystyle \lim_{x \to \infty} \frac{\ln x}{x}\), and more generally \(\displaystyle \lim_{x \to \infty} \frac{\ln x}{x^{p}}\) for any \(p > 0\).</p>
       </div>
@@ -1382,7 +1458,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Both \(\ln x\) and \(x\) tend to \(\infty\), the form \(\tfrac{\infty}{\infty}\). By L'Hôpital's rule,</p>
+        <p>Both \(\ln x\) and \(x\) tend to \(\infty\), the form \(\tfrac{\infty}{\infty}\). By L’Hôpital’s rule,</p>
         <p>\[ \lim_{x \to \infty} \frac{\ln x}{x} = \lim_{x \to \infty} \frac{1/x}{1} = \lim_{x \to \infty} \frac{1}{x} = 0. \]</p>
         <p>The same computation with \(x^{p}\) below gives \(\dfrac{1/x}{p\,x^{p-1}} = \dfrac{1}{p\,x^{p}} \to 0\). So</p>
         <p>\[ \lim_{x \to \infty} \frac{\ln x}{x^{p}} = 0 \qquad \text{for every } p > 0. \]</p>
@@ -1393,10 +1469,28 @@ window.MathJax = {
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.21: 0*inf recast, then 0^0 via logarithms; connects to Ch3 x^x -->
+  <!-- expansion:example [pass: enrichment] [source: CLP-1 §3.7 problem "2010H" (limit of log x over x as x→0+), official solution incl. the misuse remark, CC BY-NC-SA 4.0; adjudicated ADOPT in the M4 gap-check (Codex, 2026-07-07)] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.21</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.22</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle \lim_{x \to 0^{+}} \frac{\ln x}{x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Check the form first. As \(x \to 0^{+}\) the numerator \(\ln x \to -\infty\) while the denominator \(x \to 0^{+}\): a hugely negative number divided by a tiny positive one. This is not an indeterminate form at all — nothing competes — so the quotient simply runs away:</p>
+        <p>\[ \lim_{x \to 0^{+}} \frac{\ln x}{x} = -\infty. \]</p>
+        <p>Now watch what happens if the form-check is skipped. Differentiating top and bottom as though L’Hôpital’s rule applied would give \(\dfrac{1/x}{1} = \dfrac{1}{x} \to +\infty\) — not merely the wrong magnitude but the wrong <em>sign</em>. The hypotheses of Theorem 5.5 are not decoration. Note the contrast with Example 5.21: the same quotient \(\ln x / x\) taken at \(x \to \infty\) genuinely is \(\infty/\infty\), and there the rule legitimately gave \(0\). Whether the rule applies is a property of the <em>point</em>, not of the formula. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 5.23: 0*inf recast, then 0^0 via logarithms; connects to Ch3 x^x -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.23</span></p>
       <div class="env-body">
         <p>Evaluate \(\displaystyle \lim_{x \to 0^{+}} x \ln x\), and use it to find \(\displaystyle \lim_{x \to 0^{+}} x^{x}\).</p>
       </div>
@@ -1406,7 +1500,7 @@ window.MathJax = {
       <div class="env-body">
         <p>As \(x \to 0^{+}\), \(x \to 0\) while \(\ln x \to -\infty\): the product is the indeterminate form \(0 \cdot \infty\). Recast it as a quotient to expose a form the rule accepts — put the \(\ln x\) on top and \(1/x\) below:</p>
         <p>\[ \lim_{x \to 0^{+}} x \ln x = \lim_{x \to 0^{+}} \frac{\ln x}{1/x}, \]</p>
-        <p>now \(\tfrac{-\infty}{\infty}\). L'Hôpital's rule gives</p>
+        <p>now \(\tfrac{-\infty}{\infty}\). L’Hôpital’s rule gives</p>
         <p>\[ \lim_{x \to 0^{+}} \frac{\ln x}{1/x} = \lim_{x \to 0^{+}} \frac{1/x}{-1/x^{2}} = \lim_{x \to 0^{+}} (-x) = 0. \]</p>
         <p>So \(x \ln x \to 0\). For \(x^{x}\), the form is \(0^{0}\); take logarithms. Since \(\ln(x^{x}) = x \ln x \to 0\), and the exponential is continuous,</p>
         <p>\[ \lim_{x \to 0^{+}} x^{x} = \lim_{x \to 0^{+}} e^{x \ln x} = e^{0} = 1. \]</p>
@@ -1416,7 +1510,7 @@ window.MathJax = {
   </div>
 
   <!-- expansion:summary — close: L'Hopital completes the limit toolkit; §5.8 assembles everything into curve sketching -->
-  <p>L'Hôpital's rule closes the last gap in the analytic toolkit. Every feature a graph can show — where it rises and falls, peaks and dips, bends and inflects, and how it behaves far out and near its asymptotes — is now computable, the last of these through the indeterminate limits this section resolved. Section 5.8 gathers the whole apparatus into a single disciplined procedure: reading a curve's complete shape off its formula.</p>
+  <p>L’Hôpital’s rule closes the last gap in the analytic toolkit. Every feature a graph can show — where it rises and falls, peaks and dips, bends and inflects, and how it behaves far out and near its asymptotes — is now computable, the last of these through the indeterminate limits this section resolved. Section 5.8 gathers the whole apparatus into a single disciplined procedure: reading a curve’s complete shape off its formula.</p>
 
 </article>
 </template>
@@ -1426,14 +1520,14 @@ window.MathJax = {
      section-source: Stewart ET 9e §4.5 (Summary of Curve Sketching); cross-checked Thomas 14e §4.4,
      Rogawski 4e §4.6. Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤). Counters continue
      from §5.7: §5.8 mints Definition 5.7 (asymptotes), Strategy 5.6 (curve-sketching checklist),
-     Examples 5.22–5.23. Cautions UNNUMBERED. Synthesis section: gathers domain/intercepts/symmetry/
+     Examples 5.24–5.25. Cautions UNNUMBERED (+1 M4 caution, 2026-07-07). Synthesis section: gathers domain/intercepts/symmetry/
      asymptotes (Ch1 infinite limits Def 1.11/1.12) + increase-decrease + extrema (§5.4) + concavity/
      inflection (§5.6) + growth comparisons (§5.7 ln x << x^p << e^x). Introduces slant asymptotes.
      Figures DEFERRED to the figure-opportunity gate (strong candidates: the two full sketches — but the
      analysis is self-sufficient to draw them). Wide derivative computations pre-broken with aligned.
-     Math: 5.22 f=x²/(x²−1): f'=−2x/(x²−1)², f''=2(3x²+1)/(x²−1)³, VA x=±1, HA y=1, max (0,0);
-     5.23 f=x+1/x: f'=1−1/x², f''=2/x³, VA x=0, slant y=x, max (−1,−2), min (1,2).
-     Counters handed to §5.9: Definition 5.8, Theorem 5.6, Strategy 5.7, Example 5.24. Record: PLAN-ch05.md. -->
+     Math: 5.24 f=x²/(x²−1): f'=−2x/(x²−1)², f''=2(3x²+1)/(x²−1)³, VA x=±1, HA y=1, max (0,0);
+     5.25 f=x+1/x: f'=1−1/x², f''=2/x³, VA x=0, slant y=x, max (−1,−2), min (1,2).
+     Counters handed to §5.9: Definition 5.8, Theorem 5.6, Strategy 5.7, Example 5.26. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
@@ -1457,7 +1551,7 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>Vertical-asymptote candidates come from zeros of a denominator or a logarithm's argument approaching \(0\), confirmed by a one-sided infinite limit — a factor that cancels leaves a hole, not an asymptote; horizontal ones are read from the limit at infinity; a slant asymptote appears when a function grows linearly but is not itself a line — for a rational function, when the numerator's degree is exactly one more than the denominator's, so that dividing out leaves a linear part plus a remainder that decays.</p>
+  <p>Vertical-asymptote candidates come from zeros of a denominator or a logarithm’s argument approaching \(0\), confirmed by a one-sided infinite limit — a factor that cancels leaves a hole, not an asymptote; horizontal ones are read from the limit at infinity; a slant asymptote appears when a function grows linearly but is not itself a line — for a rational function, when the numerator’s degree is exactly one more than the denominator’s, so that dividing out leaves a linear part plus a remainder that decays.</p>
 
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.6</span><span class="env-name">Sketching a curve</span></p>
@@ -1475,10 +1569,10 @@ window.MathJax = {
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.22: a rational function with vertical and horizontal asymptotes -->
+  <!-- expansion:example — Example 5.24: a rational function with vertical and horizontal asymptotes -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.22</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.24</span></p>
       <div class="env-body">
         <p>Sketch the curve \(y = \dfrac{x^{2}}{x^{2} - 1}\).</p>
       </div>
@@ -1492,7 +1586,7 @@ window.MathJax = {
         <p>\[ \lim_{x \to \pm\infty} \frac{x^{2}}{x^{2} - 1} = 1, \]</p>
         <p>so \(y = 1\) is a horizontal asymptote. <strong>First derivative.</strong> By the quotient rule,</p>
         <p>\[ \begin{aligned}
-          f'(x) &= \frac{2x(x^{2} - 1) - x^{2}(2x)}{(x^{2} - 1)^{2}} = \frac{-2x}{(x^{2} - 1)^{2}}.
+          f’(x) &= \frac{2x(x^{2} - 1) - x^{2}(2x)}{(x^{2} - 1)^{2}} = \frac{-2x}{(x^{2} - 1)^{2}}.
         \end{aligned} \]</p>
         <p>The denominator is positive wherever it is defined, so \(f'\) has the sign of \(-2x\): positive for \(x < 0\), negative for \(x > 0\). Thus \(f\) increases on \((-\infty, -1)\) and \((-1, 0)\), decreases on \((0, 1)\) and \((1, \infty)\), with a local maximum at \((0, 0)\). <strong>Second derivative.</strong> Differentiating again and simplifying,</p>
         <p>\[ f''(x) = \frac{2(3x^{2} + 1)}{(x^{2} - 1)^{3}}. \]</p>
@@ -1502,10 +1596,15 @@ window.MathJax = {
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.23: a slant asymptote -->
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — full sketch of x^2/(x^2-1) (Ex 5.24); registered in chapter5 FIGS as "rational-asymptotes"] -->
+  <figure class="figure" data-fig="rational-asymptotes">
+    <figcaption><span class="fig-no">Figure 5.9</span> The completed graph of \(y = x^{2}/(x^{2} - 1)\) from Example 5.24: vertical asymptotes \(x = \pm 1\), horizontal asymptote \(y = 1\), a central arch with its local maximum at the origin, and two outer branches — all read off the checklist.</figcaption>
+  </figure>
+
+  <!-- expansion:example — Example 5.25: a slant asymptote -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.23</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.25</span></p>
       <div class="env-body">
         <p>Sketch the curve \(y = x + \dfrac{1}{x}\).</p>
       </div>
@@ -1524,8 +1623,21 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — slant asymptote of x + 1/x (Ex 5.25); registered in chapter5 FIGS as "slant-asymptote"] -->
+  <figure class="figure" data-fig="slant-asymptote">
+    <figcaption><span class="fig-no">Figure 5.10</span> The graph of \(y = x + 1/x\) from Example 5.25 hugs the slant asymptote \(y = x\) at both ends, with the \(y\)-axis as its vertical asymptote; the local maximum value \(-2\) sits below the local minimum value \(2\).</figcaption>
+  </figure>
+
+  <!-- expansion:caution [pass: enrichment] — asymptotes describe end behaviour, not forbidden territory (sin x / x crosses its horizontal asymptote infinitely often); adjudicated ADOPT in the M4 gap-check (Codex, 2026-07-07) -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>An asymptote describes where a curve is <em>heading</em>, not territory it may never touch. Both graphs in this section happen to stay on one side of their horizontal and slant asymptotes, which can plant a false rule: nothing prevents a curve from crossing such an asymptote — even infinitely often. The graph of \(y = (\sin x)/x\) has the horizontal asymptote \(y = 0\), yet it crosses that line at every nonzero multiple of \(\pi\). Only a <em>vertical</em> asymptote is uncrossable at the point itself, because the function has no value there. Approach is a statement about the far end of the graph; en route, anything is allowed.</p>
+    </div>
+  </section>
+
   <!-- expansion:summary — close: shape fully readable from the formula; §5.9 turns to the inverse problem — finding a root numerically -->
-  <p>With the checklist, a formula unfolds into a shape: no plotting, just the systematic reading of domain, limits, and two derivatives. Every question this chapter posed about a function's behaviour — its rates, its extremes, its bends, its ends — now has a computable answer, and they combine into a single picture. The final section turns the machinery around. Instead of describing a known function, it asks how to <em>find</em> something a function conceals — a solution of \(f(x) = 0\) that no formula surrenders — by putting the tangent line to work as an engine of approximation.</p>
+  <p>With the checklist, a formula unfolds into a shape: no plotting, just the systematic reading of domain, limits, and two derivatives. Every question this chapter posed about a function’s behaviour — its rates, its extremes, its bends, its ends — now has a computable answer, and they combine into a single picture. The final section turns the machinery around. Instead of describing a known function, it asks how to <em>find</em> something a function conceals — a solution of \(f(x) = 0\) that no formula surrenders — by putting the tangent line to work as an engine of approximation.</p>
 
 </article>
 </template>
@@ -1534,12 +1646,12 @@ window.MathJax = {
 <!-- §5.9 Newton's Method. FINAL section of Chapter 5 — carries the chapter summary.
      section-source: Stewart ET 9e §4.8 (Newton's Method); cross-checked Thomas 14e §4.7, Rogawski 4e §4.7.
      Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤). Counters continue from §5.8:
-     §5.9 mints Strategy 5.7, Examples 5.24–5.25. No Def/Thm (Newton is a procedure; convergence stated
+     §5.9 mints Strategy 5.7, Examples 5.26–5.27. No Def/Thm (Newton is a procedure; convergence stated
      informally at this level). Cautions UNNUMBERED. Builds on §5.3 (linear approximation = the tangent
      line, whose x-intercept is the next iterate) and §5.6 (concavity governs convergence). May cite IVT
      (Theorem 4.9(b)) for root existence when f changes sign. Per-type counters reset at Chapter 6.
-     Math: 5.24 sqrt2 via x_{n+1}=(x_n+2/x_n)/2, x0=1.5 -> 1.41667 -> 1.414216 -> 1.4142136 (Babylonian);
-     5.25 x³−x−1=0, x0=1.5 -> 1.34783 -> 1.32520 -> 1.324718 (root ~1.324718).
+     Math: 5.26 sqrt2 via x_{n+1}=(x_n+2/x_n)/2, x0=1.5 -> 1.41667 -> 1.414216 -> 1.4142136 (Babylonian);
+     5.27 x³−x−1=0, x0=1.5 -> 1.34783 -> 1.32520 -> 1.324718 (root ~1.324718).
      Chapter summary: four strands (local tools; extrema & optimization; shape & indeterminate limits;
      numerical root-finding). Figures deferred (candidate: the tangent-to-x-intercept Newton picture).
      Record: PLAN-ch05.md. -->
@@ -1547,11 +1659,11 @@ window.MathJax = {
 <article class="sec" lang="en">
 
   <header class="sec-head">
-    <h2 class="sec-title"><span class="sec-no">5.9</span>Newton's Method</h2>
+    <h2 class="sec-title"><span class="sec-no">5.9</span>Newton’s Method</h2>
   </header>
 
   <!-- expansion:intuition — section opener: solving f(x)=0 when no formula gives the root; the tangent line as an engine -->
-  <p>The chapter closes by turning the derivative to a new purpose: not describing a function, but <em>solving</em> one. Many equations \(f(x) = 0\) have roots that resist an explicit formula — the cubic \(x^{3} - x - 1 = 0\) yields nothing to simple factoring, and a transcendental equation like \(\cos x = x\) has no elementary closed form at all — yet the roots are real and can be pinned down to any precision. <em>Newton's method</em> does the pinning, and its engine is the linear approximation of §5.3: near a point, a curve is almost its tangent line, and a line's root is trivial to find. Follow the tangent to where it crosses the axis, and — from a good starting guess — you land nearer the curve's own root; repeat, and you close in fast.</p>
+  <p>The chapter closes by turning the derivative to a new purpose: not describing a function, but <em>solving</em> one. Many equations \(f(x) = 0\) have roots that resist an explicit formula — the cubic \(x^{3} - x - 1 = 0\) yields nothing to simple factoring, and a transcendental equation like \(\cos x = x\) has no elementary closed form at all — yet the roots are real and can be pinned down to any precision. <em>Newton’s method</em> does the pinning, and its engine is the linear approximation of §5.3: near a point, a curve is almost its tangent line, and a line’s root is trivial to find. Follow the tangent to where it crosses the axis, and — from a good starting guess — you land nearer the curve’s own root; repeat, and you close in fast.</p>
 
   <p>Make it precise. Start with a guess \(x_{0}\) near the root. The tangent line to \(y = f(x)\) at \(\bigl(x_{0}, f(x_{0})\bigr)\) is</p>
   <p>\[ y - f(x_{0}) = f'(x_{0})(x - x_{0}). \]</p>
@@ -1559,8 +1671,13 @@ window.MathJax = {
   <p>\[ x_{1} = x_{0} - \frac{f(x_{0})}{f'(x_{0})}. \]</p>
   <p>Now \(x_{1}\) is a better guess. Repeating from \(x_{1}\) gives \(x_{2}\), and in general each guess produces the next by the same rule.</p>
 
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — one Newton step: slide down the tangent (opener / Strategy 5.7); registered in chapter5 FIGS as "newton-step"] -->
+  <figure class="figure" data-fig="newton-step">
+    <figcaption><span class="fig-no">Figure 5.11</span> One step of Newton’s method: from the guess \(x_{0}\), slide down the tangent line to where it crosses the axis; that crossing \(x_{1}\) is already much closer to the root \(r\).</figcaption>
+  </figure>
+
   <section class="env env-strategy">
-    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.7</span><span class="env-name">Newton's method</span></p>
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.7</span><span class="env-name">Newton’s method</span></p>
     <div class="env-body">
       <p>To approximate a root of \(f(x) = 0\):</p>
       <ol class="steps">
@@ -1572,12 +1689,12 @@ window.MathJax = {
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.24: sqrt(2) via Newton — the ancient Babylonian iteration as a special case -->
+  <!-- expansion:example — Example 5.26: sqrt(2) via Newton — the ancient Babylonian iteration as a special case -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.24</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.26</span></p>
       <div class="env-body">
-        <p>Use Newton's method to approximate \(\sqrt{2}\).</p>
+        <p>Use Newton’s method to approximate \(\sqrt{2}\).</p>
       </div>
     </section>
     <section class="env env-solution">
@@ -1587,15 +1704,15 @@ window.MathJax = {
         <p>\[ x_{n+1} = x_{n} - \frac{x_{n}^{2} - 2}{2x_{n}} = \frac{1}{2}\left(x_{n} + \frac{2}{x_{n}}\right), \]</p>
         <p>a formula that averages each guess with the number it divides into \(2\). Starting from \(x_{0} = 1.5\):</p>
         <p>\[ x_{1} = \tfrac{1}{2}\!\left(1.5 + \tfrac{2}{1.5}\right) = 1.41667, \quad x_{2} = 1.414216, \quad x_{3} = 1.4142136. \]</p>
-        <p>Against the true value \(\sqrt{2} = 1.41421356\ldots\), the third step is already correct to seven decimals. The number of correct digits roughly <em>doubles</em> at each step — the hallmark of Newton's method near a simple root. This particular iteration is ancient: it is the Babylonian rule for square roots, which turns out to be Newton's method applied to \(x^{2} - 2\). <span class="qed"></span></p>
+        <p>Against the true value \(\sqrt{2} = 1.41421356\ldots\), the third step is already correct to seven decimals. The number of correct digits roughly <em>doubles</em> at each step — the hallmark of Newton’s method near a simple root. This particular iteration is ancient: it is the Babylonian rule for square roots, which turns out to be Newton’s method applied to \(x^{2} - 2\). <span class="qed"></span></p>
       </div>
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.25: a root no formula gives -->
+  <!-- expansion:example — Example 5.27: a root no formula gives -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.25</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.27</span></p>
       <div class="env-body">
         <p>Approximate the real root of \(x^{3} - x - 1 = 0\).</p>
       </div>
@@ -1607,7 +1724,7 @@ window.MathJax = {
         <p>\[ x_{n+1} = x_{n} - \frac{x_{n}^{3} - x_{n} - 1}{3x_{n}^{2} - 1}. \]</p>
         <p>Starting from \(x_{0} = 1.5\):</p>
         <p>\[ x_{1} = 1.34783, \quad x_{2} = 1.32520, \quad x_{3} = 1.324718, \quad x_{4} = 1.324718. \]</p>
-        <p>The values have settled by the fourth step, so the root is \(1.324718\) to six decimals — a value beyond the reach of simple factoring, yet found in four steps of arithmetic. The Intermediate Value Theorem certified that the root exists; Newton's method located it. <span class="qed"></span></p>
+        <p>The values have settled by the fourth step, so the root is \(1.324718\) to six decimals — a value beyond the reach of simple factoring, yet found in four steps of arithmetic. The Intermediate Value Theorem certified that the root exists; Newton’s method located it. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -1616,7 +1733,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Newton's method is fast but not foolproof. It requires \(f'(x_{n}) \ne 0\) at every step; a guess landing where the tangent is horizontal has nowhere to go. More subtly, the method is only <em>locally</em> reliable: started too far from a root, or near a point where the curve turns the wrong way, the iterates can overshoot, wander off to infinity, or fall into a repeating cycle that never converges. The concavity of §5.6 is a reliable guide: on an arc where \(f''\) keeps one sign and \(f' \ne 0\), a guess started on the side where \(f\) and \(f''\) agree in sign closes in steadily, while a poorly placed start can be thrown clear. In practice a rough sketch to seed the first guess is worth more than any number of blind iterations.</p>
+      <p>Newton’s method is fast but not foolproof. It requires \(f'(x_{n}) \ne 0\) at every step; a guess landing where the tangent is horizontal has nowhere to go. More subtly, the method is only <em>locally</em> reliable: started too far from a root, or near a point where the curve turns the wrong way, the iterates can overshoot, wander off to infinity, or fall into a repeating cycle that never converges. The concavity of §5.6 is a reliable guide: on an arc where \(f''\) keeps one sign and \(f' \ne 0\), a guess started on the side where \(f\) and \(f''\) agree in sign closes in steadily, while a poorly placed start can be thrown clear. In practice a rough sketch to seed the first guess is worth more than any number of blind iterations.</p>
     </div>
   </section>
 
@@ -1625,10 +1742,10 @@ window.MathJax = {
   <!-- expansion:summary — chapter-level 4-strand summary (final section of Chapter 5), per CONTENT_SPEC §4 -->
   <p>Chapter 5 set out to turn the derivative from an object of study into an instrument, and it did so along four strands.</p>
   <ul>
-    <li><strong>Local tools.</strong> Implicit differentiation freed the derivative from explicit formulas, differentiating equations and inverse relations directly (§5.1); related rates ran the same move with time as the variable, converting one known rate into another (§5.2); and linear approximation read the derivative as the function's best straight-line stand-in, with differentials propagating small errors (§5.3).</li>
-    <li><strong>Extremes and optimization.</strong> Chapter 4's Extreme Value Theorem guaranteed absolute extrema on closed intervals, and Fermat's theorem narrowed interior extrema to critical numbers; the Closed Interval Method checked critical numbers and endpoints, and the First and Second Derivative Tests (§5.4, §5.6) classified the local extrema at critical numbers; and optimization applied the whole machinery to quantities worth making largest or smallest (§5.5).</li>
-    <li><strong>Shape and indeterminate limits.</strong> Concavity and inflection completed the reading of a graph (§5.6); L'Hôpital's rule, powered by a generalized Mean Value Theorem, resolved the indeterminate limits that govern behaviour at infinity (§5.7); and curve sketching gathered every feature into one disciplined procedure (§5.8).</li>
-    <li><strong>Numerical root-finding.</strong> Newton's method turned the tangent line into an engine for solving \(f(x) = 0\), reaching roots no formula can express (§5.9).</li>
+    <li><strong>Local tools.</strong> Implicit differentiation freed the derivative from explicit formulas, differentiating equations and inverse relations directly (§5.1); related rates ran the same move with time as the variable, converting one known rate into another (§5.2); and linear approximation read the derivative as the function’s best straight-line stand-in, with differentials propagating small errors (§5.3).</li>
+    <li><strong>Extremes and optimization.</strong> Chapter 4’s Extreme Value Theorem guaranteed absolute extrema on closed intervals, and Fermat’s theorem narrowed interior extrema to critical numbers; the Closed Interval Method checked critical numbers and endpoints, and the First and Second Derivative Tests (§5.4, §5.6) classified the local extrema at critical numbers; and optimization applied the whole machinery to quantities worth making largest or smallest (§5.5).</li>
+    <li><strong>Shape and indeterminate limits.</strong> Concavity and inflection completed the reading of a graph (§5.6); L’Hôpital’s rule, powered by a generalized Mean Value Theorem, resolved the indeterminate limits that govern behaviour at infinity (§5.7); and curve sketching gathered every feature into one disciplined procedure (§5.8).</li>
+    <li><strong>Numerical root-finding.</strong> Newton’s method turned the tangent line into an engine for solving \(f(x) = 0\), reaching roots no formula can express (§5.9).</li>
   </ul>
   <p>Underneath all four runs a single idea: the derivative, a statement about one instant, controls the behaviour of a function across whole intervals — its rise and fall, its extremes, its bends, its roots. The next chapter reverses the direction of travel. Having spent three chapters taking functions apart with the derivative, it asks the opposite question — how to build a function up by accumulation — and finds, in the Fundamental Theorem of Calculus, that the two operations are inverse to one another.</p>
 
@@ -1744,11 +1861,11 @@ window.MathJax = {
 </script>
 
 <!-- ============================================================
-     figures.js — inlined (Chapter 4 figure registry)
+     figures.js — inlined (Chapter 5 figure registry)
      ============================================================ -->
 <script>
 /* ============================================================
-   figures.js — Chapter 4 figure registry.
+   figures.js — Chapter 5 figure registry.
    Each entry returns { layout, panels:[{svg, note}] }.
    Most chapter figures use buildPlot() (shared/plot.js) for
    function graphs. buildPlot has NO fill/sector primitive, so
@@ -1764,203 +1881,305 @@ window.MathJax = {
 
   const FIGS = {
 
-    /* §4.1 — Partial sums of the exponential series converging to e^x.
-       P_k(x) = sum_{n=0}^k x^n/n! for k = 1..4 (gray, --c-aux via .bubble) rise
-       to meet the smooth curve e^x (blue, --c-primary via .curve). All pass
-       through (0,1) = e^0; for x<0 the low-order sums oscillate around e^x,
-       previewing why the negative case is harder (handled in 4.2). Labels limited
-       to e^x and P_1; the family and the rate live in the caption (CONTENT_SPEC 10). */
-    "partial-sums-exp": () => {
-      const P1 = (x) => 1 + x;
-      const P2 = (x) => 1 + x + x*x/2;
-      const P3 = (x) => 1 + x + x*x/2 + x*x*x/6;
-      const P4 = (x) => 1 + x + x*x/2 + x*x*x/6 + x*x*x*x/24;
+    /* §5.1 — The circle x^2+y^2=25 with tangent at (3,4).
+       Implicit differentiation gives dy/dx = -x/y = -3/4 there; the picture
+       grounds it: tangent ⊥ radius, slopes negative reciprocals. Circle drawn
+       as two half-curves (buildPlot has no circle primitive); radius as a gray
+       auxiliary segment; right-angle tick at the point of tangency. Labels
+       limited to the equation and the point (CONTENT_SPEC §10 label economy);
+       the slope values live in Example 5.1's solution. */
+    "tangent-radius-circle": () => {
       const svg = buildPlot({
-        w: 300, h: 250,
-        xmin: -2.1, xmax: 1.55, ymin: -0.6, ymax: 4.6,
+        w: 290, h: 260, xmin: -6.8, xmax: 7.8, ymin: -6.35, ymax: 6.73,
         xlabel: "x", ylabel: "y",
-        xticks: [{ x: -2, tex: "-2" }, { x: -1, tex: "-1" }, { x: 1, tex: "1" }],
-        yticks: [{ y: 1, tex: "1" }, { y: 2, tex: "2" }, { y: 3, tex: "3" }, { y: 4, tex: "4" }],
+        aria: "Circle of radius five centred at the origin, with the radius to the point three comma four and the tangent line at that point; a small square marks the right angle between radius and tangent.",
         items: [
-          { type: "curve", fn: P1, domain: [-2.1, 1.55], samples: 80,  cls: "bubble" },
-          { type: "curve", fn: P2, domain: [-2.1, 1.55], samples: 160, cls: "bubble" },
-          { type: "curve", fn: P3, domain: [-2.1, 1.55], samples: 160, cls: "bubble" },
-          { type: "curve", fn: P4, domain: [-2.1, 1.55], samples: 160, cls: "bubble" },
-          { type: "curve", fn: (x) => Math.exp(x), domain: [-2.1, 1.55], samples: 200, cls: "curve" },
-          { type: "dot", x: 0, y: 1, r: 2.5 },
-          { type: "text", x: 1.5, y: Math.exp(1.5) - 0.05, tex: "e^{x}", cls: "a-curve", anchor: "end", vAnchor: "bottom" },
-          { type: "text", x: 1.55, y: P1(1.55), tex: "P_{1}", cls: "a-pt", anchor: "start" }
+          { type: "curve", fn: (x) => Math.sqrt(Math.max(25 - x * x, 0)), domain: [-5, 5], samples: 300 },
+          { type: "curve", fn: (x) => -Math.sqrt(Math.max(25 - x * x, 0)), domain: [-5, 5], samples: 300 },
+          { type: "seg", x1: 0, y1: 0, x2: 3, y2: 4, cls: "bubble" },
+          { type: "seg", x1: 0.2, y1: 6.1, x2: 7.4, y2: 0.7, cls: "tangent" },
+          { type: "seg", x1: 2.67, y1: 3.56, x2: 2.23, y2: 3.89, cls: "bubble" },
+          { type: "seg", x1: 2.23, y1: 3.89, x2: 2.56, y2: 4.33, cls: "bubble" },
+          { type: "dot", x: 3, y: 4 },
+          { type: "dot", x: 0, y: 0, r: 2.2 },
+          { type: "text", x: 4.4, y: -4.6, tex: "x^{2}+y^{2}=25", anchor: "start", cls: "a-pt", size: 12 },
+          { type: "text", x: 3.35, y: 4.75, tex: "(3,4)", anchor: "start", cls: "a-pt", size: 12 },
         ],
-        aria: "Polynomial partial sums P k of the exponential series for k = 1 to 4, in gray, rising to meet the smooth blue exponential curve e to the x. All pass through the point (0, 1). Near x = 0 they hug the curve; higher-order sums stay close over a wider range, while for x < 0 the low-order sums oscillate around the curve."
       });
       return { layout: "single", panels: [{ svg }] };
     },
 
-    /* §4.4 — The Mean Value Theorem: secant vs. parallel interior tangent.
-       A generic smooth curve y = f(x) (here one arch of sine, used only as a
-       nondescript rising curve — no axis names it) over [a, b]. The dashed gray
-       secant (.secant) joins (a, f(a)) and (b, f(b)); the solid caution-coloured
-       tangent (.tangent) touches at the interior c where f'(c) equals the secant
-       slope, so it is both tangent and parallel by construction. c is found
-       numerically. Labels limited to a, c, b plus "secant"/"tangent"; the slopes
-       and the (a,f(a))/(b,f(b)) coordinates live in the caption (CONTENT_SPEC 10). */
-    "mvt-secant-tangent": () => {
-      const f  = (x) => Math.sin(x);
-      const fp = (x) => Math.cos(x);
-      const a = 0.3, b = 2.3;
-      const fa = f(a), fb = f(b);
-      const m = (fb - fa) / (b - a);           // secant slope = average rate of change
-      let c = a, best = Infinity;              // interior c with f'(c) = m (parallel tangent)
-      for (let t = a + 0.002; t < b; t += 0.002) {
-        const d = Math.abs(fp(t) - m);
-        if (d < best) { best = d; c = t; }
-      }
-      const fc = f(c), hx = 0.62;              // tangent drawn ± hx in x about c
+    /* §5.2 — The sliding ladder (Example 5.5), raw SVG schematic.
+       Wall–ground–ladder right triangle: legs x (ground) and y (wall),
+       hypotenuse 10 fixed. The base arrow carries the given rate 1 ft/s;
+       the wall arrow shows the top sliding down (rate hidden — it is the
+       thing the example computes). */
+    "ladder-triangle": () => {
+      const svg =
+        `<svg viewBox="0 0 300 230" style="width:280px" class="fig-svg" role="img"` +
+        ` aria-label="A ladder leaning against a wall forms a right triangle: vertical leg y along the wall, horizontal leg x along the ground, hypotenuse ten. An arrow at the base points away from the wall labelled one foot per second; an arrow beside the wall points downward.">` +
+        `<line x1="20" y1="200" x2="285" y2="200" stroke="var(--ink)" stroke-width="1.3"/>` +
+        `<line x1="60" y1="30" x2="60" y2="200" stroke="var(--ink)" stroke-width="1.3"/>` +
+        `<path d="M72,200 L72,188 L60,188" fill="none" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        `<line x1="60" y1="72" x2="210" y2="200" stroke="var(--c-primary)" stroke-width="2.2" stroke-linecap="round"/>` +
+        `<circle cx="60" cy="72" r="2.5" class="dot"/>` +
+        `<circle cx="210" cy="200" r="2.5" class="dot"/>` +
+        `<line x1="216" y1="192" x2="248" y2="192" stroke="var(--ink)" stroke-width="1.3"/>` +
+        `<polygon points="252,192 244,188.6 244,195.4" fill="var(--ink)"/>` +
+        `<text x="254" y="187" text-anchor="start" class="ptlab">1 ft/s</text>` +
+        `<line x1="48" y1="84" x2="48" y2="114" stroke="var(--ink)" stroke-width="1.3"/>` +
+        `<polygon points="48,118 44.6,110 51.4,110" fill="var(--ink)"/>` +
+        `<text x="40" y="145" text-anchor="end" class="ptlab" font-style="italic">y</text>` +
+        `<text x="135" y="217" text-anchor="middle" class="ptlab" font-style="italic">x</text>` +
+        `<text x="143" y="128" text-anchor="start" class="ptlab">10</text>` +
+        `</svg>`;
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §5.2 — The streetlight and the walking shadow (Example 5.7), raw SVG.
+       Lamp top (height 15), the walker's head (height 6) and the shadow tip
+       are collinear — the dashed sight line makes the similar triangles
+       visible: big base x+s, small base s. Pixel geometry is exact
+       (pole 150 px : person 60 px = 15 : 6; s = 80 px solves 15/(120+s)=6/s),
+       so the three points truly align. Only the given constants 15 and 6 are
+       shown; s = (2/3)x and both rates stay in the solution (no-spoiler). */
+    "streetlight-similar": () => {
+      const svg =
+        `<svg viewBox="0 0 320 240" style="width:300px" class="fig-svg" role="img"` +
+        ` aria-label="A streetlight of height fifteen on the left, a walker of height six to its right, and the tip of the walker's shadow further right on the ground. A dashed line runs from the lamp over the walker's head to the shadow tip, showing two similar right triangles with bases x plus s and s.">` +
+        `<line x1="20" y1="205" x2="300" y2="205" stroke="var(--ink)" stroke-width="1.3"/>` +
+        `<line x1="55" y1="205" x2="55" y2="55" stroke="var(--ink)" stroke-width="2"/>` +
+        `<circle cx="55" cy="52" r="3.5" class="dot"/>` +
+        `<line x1="175" y1="205" x2="175" y2="145" stroke="var(--ink)" stroke-width="2"/>` +
+        `<circle cx="175" cy="141" r="3" class="dot"/>` +
+        `<line x1="55" y1="55" x2="255" y2="205" stroke="var(--c-aux)" stroke-width="1.3" stroke-dasharray="4.5 3.5"/>` +
+        `<circle cx="255" cy="205" r="2.5" class="dot"/>` +
+        `<line x1="55" y1="215" x2="55" y2="223" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        `<line x1="175" y1="215" x2="175" y2="223" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        `<line x1="255" y1="215" x2="255" y2="223" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        `<line x1="55" y1="219" x2="175" y2="219" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        `<line x1="175" y1="219" x2="255" y2="219" stroke="var(--ink-soft)" stroke-width="1"/>` +
+        `<text x="115" y="234" text-anchor="middle" class="ptlab" font-style="italic">x</text>` +
+        `<text x="215" y="234" text-anchor="middle" class="ptlab" font-style="italic">s</text>` +
+        `<text x="43" y="133" text-anchor="end" class="ptlab">15</text>` +
+        `<text x="183" y="178" text-anchor="start" class="ptlab">6</text>` +
+        `</svg>`;
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §5.3 — Linearization of sqrt(x) at x=4 (Definition 5.1 / Example 5.8).
+       The tangent line L(x) = 2 + (x-4)/4 is visually indistinguishable from
+       the curve near x=4 and visibly above it by x=9 (hollow dot on the curve,
+       short dashed gap up to the tangent) — near good, far bad, the section's
+       whole message. The numbers (2.0125 vs 3 vs 3.25) stay in the prose. */
+    "sqrt-linearization": () => {
       const svg = buildPlot({
-        w: 320, h: 250,
-        xmin: -0.15, xmax: 2.7, ymin: -0.12, ymax: 1.2,
+        w: 300, h: 225, xmin: 0, xmax: 9.6, ymin: 0, ymax: 3.5,
         xlabel: "x", ylabel: "y",
-        xticks: [{ x: a, tex: "a" }, { x: c, tex: "c" }, { x: b, tex: "b" }],
-        yticks: [],
+        xticks: [{ x: 4, tex: "4" }, { x: 9, tex: "9" }],
+        aria: "The curve y equals square root of x with its tangent line at the point four comma two. Near x equals four the two are indistinguishable; at x equals nine the tangent sits visibly above the curve, the gap marked by a short dashed segment.",
         items: [
-          { type: "curve", fn: f, domain: [-0.05, 2.55], samples: 200, cls: "curve" },
-          { type: "seg", x1: a, y1: fa, x2: b, y2: fb, cls: "secant" },
-          { type: "seg", x1: c - hx, y1: fc - hx * m, x2: c + hx, y2: fc + hx * m, cls: "tangent" },
-          { type: "dot", x: a, y: fa, r: 2.5 },
-          { type: "dot", x: b, y: fb, r: 2.5 },
-          { type: "dot", x: c, y: fc, r: 2.5 },
-          { type: "text", x: 1.7, y: 0.42, text: "secant", cls: "a-pt", anchor: "middle" },
-          { type: "text", x: c + hx + 0.03, y: fc + hx * m, text: "tangent", cls: "a-pt", anchor: "start", vAnchor: "middle" }
+          { type: "curve", fn: (x) => Math.sqrt(Math.max(x, 0)), domain: [0, 9.35], samples: 300 },
+          { type: "seg", x1: 0.5, y1: 1.125, x2: 9.2, y2: 3.3, cls: "tangent" },
+          { type: "seg", x1: 9, y1: 3, x2: 9, y2: 3.25, cls: "refline" },
+          { type: "dot", x: 4, y: 2 },
+          { type: "dot", x: 9, y: 3, hollow: true },
+          { type: "text", x: 6.9, y: 2.42, tex: "y=\\sqrt{x}", anchor: "start", vAnchor: "top", cls: "a-pt", size: 12 },
+          { type: "text", x: 1.6, y: 1.6, tex: "L", anchor: "end", cls: "a-pt", size: 13 },
         ],
-        aria: "A smooth curve y = f of x rising over the interval from a to b. A dashed secant line joins the endpoints (a, f(a)) and (b, f(b)). A solid tangent line touches the curve at an interior point c and is parallel to the secant, illustrating the Mean Value Theorem: some interior slope equals the average slope."
       });
       return { layout: "single", panels: [{ svg }] };
     },
 
-    /* §4.5 — e^x and ln x as reflections across y = x.
-       The blue exponential (.curve, --c-primary) and the red logarithm
-       (.curve-log, --c-caution) are mirror images across the dashed gray
-       identity line y = x (.idline, --c-aux), as the inverse relation
-       ln(e^x) = x requires. The point (0,1) on e^x reflects to (1,0) on ln x
-       (both dotted). The window is set so the inner box is square and the x
-       and y spans are equal (iw == ih, both span 6.3 units), which keeps the
-       45-degree reflection honest. Labels limited to the three curves; the
-       reflected point pair lives in the caption (CONTENT_SPEC 10). */
-    "exp-log-reflection": () => {
+    /* §5.3 — dy along the tangent vs Δy along the curve (Definition 5.2).
+       One step dx from a: the tangent rises by dy (solid caution segment),
+       the concave-up curve rises by Δy (bracketed at the right); the leftover
+       piece between tangent height and curve height is the remainder R of
+       Definition 3.1. Curve chosen concave up so Δy > dy visibly. Generic
+       labels only — a, a+dx, dx, dy, Δy. */
+    "dy-vs-deltay": () => {
+      const f = (x) => 0.55 + 0.28 * (x - 0.8) * (x - 0.8);
       const svg = buildPlot({
-        w: 300, h: 296,
-        xmin: -2.3, xmax: 4.0, ymin: -2.3, ymax: 4.0,
+        w: 300, h: 240, xmin: 0, xmax: 3.25, ymin: 0, ymax: 2.6,
         xlabel: "x", ylabel: "y",
-        xticks: [{ x: 1, tex: "1" }],
-        yticks: [{ y: 1, tex: "1" }],
+        xticks: [{ x: 1.2, tex: "a" }, { x: 2.4, tex: "a+dx" }],
+        aria: "A concave-up curve with its tangent line at the point above a. Over the step d x, the tangent rises by d y while the curve rises by the larger amount delta y; the difference between the two heights is the remainder.",
         items: [
-          { type: "seg", x1: -2.3, y1: -2.3, x2: 4.0, y2: 4.0, cls: "idline" },
-          { type: "curve", fn: (x) => Math.exp(x), domain: [-2.3, 1.4], samples: 200, cls: "curve" },
-          { type: "curve", fn: (x) => Math.log(x), domain: [0.1, 4.0], samples: 200, cls: "curve-log" },
-          { type: "dot", x: 0, y: 1, r: 2.5 },
-          { type: "dot", x: 1, y: 0, r: 2.5 },
-          { type: "text", x: 1.35, y: 3.95, tex: "e^{x}", cls: "a-curve", anchor: "end", vAnchor: "bottom" },
-          { type: "text", x: 3.95, y: 1.35, tex: "\\ln x", cls: "a-ref", anchor: "start", vAnchor: "top" },
-          { type: "text", x: 3.55, y: 3.4, text: "y = x", cls: "a-ax", anchor: "start", vAnchor: "top" }
+          { type: "curve", fn: f, domain: [0.15, 3.05], samples: 260 },
+          { type: "seg", x1: 0.7, y1: 0.483, x2: 2.85, y2: 0.9646, cls: "tangent" },
+          { type: "seg", x1: 1.2, y1: 0, x2: 1.2, y2: 0.5948, cls: "idline" },
+          { type: "seg", x1: 2.4, y1: 0, x2: 2.4, y2: 1.2668, cls: "idline" },
+          { type: "seg", x1: 1.2, y1: 0.5948, x2: 2.4, y2: 0.5948, cls: "idline" },
+          { type: "seg", x1: 2.4, y1: 0.5948, x2: 2.4, y2: 0.8636, cls: "tangent" },
+          { type: "seg", x1: 2.52, y1: 0.5948, x2: 2.64, y2: 0.5948, cls: "bubble" },
+          { type: "seg", x1: 2.52, y1: 1.2668, x2: 2.64, y2: 1.2668, cls: "bubble" },
+          { type: "seg", x1: 2.58, y1: 0.5948, x2: 2.58, y2: 1.2668, cls: "bubble" },
+          { type: "dot", x: 1.2, y: 0.5948 },
+          { type: "dot", x: 2.4, y: 1.2668 },
+          { type: "dot", x: 2.4, y: 0.8636, hollow: true },
+          { type: "text", x: 1.8, y: 0.53, tex: "dx", anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 },
+          { type: "text", x: 2.33, y: 0.73, tex: "dy", anchor: "end", cls: "a-pt", size: 12 },
+          { type: "text", x: 2.66, y: 1.14, tex: "\\Delta y", anchor: "start", cls: "a-pt", size: 12 },
+          { type: "text", x: 3.0, y: 2.12, tex: "y=f(x)", anchor: "end", cls: "a-pt", size: 12 },
         ],
-        aria: "The blue curve y = e to the x and the red curve y = ln x are reflections of each other across the dashed diagonal line y = x. The point (0, 1) on the exponential curve reflects to the point (1, 0) on the logarithm curve."
       });
       return { layout: "single", panels: [{ svg }] };
     },
 
-    /* §4.1 — Completeness: a monotone, bounded sequence is forced to converge.
-       Discrete terms a_n (dots, not joined — a sequence, not a curve) rise while
-       staying under the upper bound M (gray dashed); pinned below M they have
-       nowhere to go but toward a limit L (red dashed), which exists because R is
-       complete. Illustration of the stated-not-proved Property (Theorem 4.1); the
-       concrete instance 3, 3.1, 3.14, … -> pi under M = 4 lives in the caption.
-       Labels limited to M and L. */
-    "completeness-bound": () => {
-      const L = 3, M = 3.5;
-      const a = (n) => L - 1.5 * Math.pow(0.62, n);
-      const items = [
-        { type: "hline", y: M, cls: "idline" },
-        { type: "hline", y: L, cls: "refline" },
-        { type: "text", x: 7.7, y: M, tex: "M", cls: "a-pt", anchor: "start", vAnchor: "middle" },
-        { type: "text", x: 7.7, y: L, tex: "L", cls: "a-ref", anchor: "start", vAnchor: "middle" }
-      ];
-      for (let n = 1; n <= 7; n++) items.push({ type: "dot", x: n, y: a(n), r: 2.6 });
-      const svg = buildPlot({
-        w: 322, h: 244,
-        xmin: 0, xmax: 8.5, ymin: 1.7, ymax: 3.8,
-        xlabel: "n", ylabel: "",
-        xticks: [{ x: 1, tex: "1" }, { x: 2, tex: "2" }, { x: 3, tex: "3" }],
-        yticks: [],
-        items: items,
-        aria: "Dots representing the terms of an increasing sequence rise from left to right while staying below a gray dashed horizontal upper bound M. Pinned beneath M, the terms crowd toward a red dashed limit line L just below M, which the completeness of the real numbers guarantees exists."
-      });
+    /* §5.5 — The riverside fence (Example 5.15), raw SVG schematic.
+       River along the top; the field's fourth side is the river bank, drawn
+       dashed (unfenced). Three solid fenced sides: two of length x, one of
+       length y. The optimal numbers stay in the solution (no-spoiler). */
+    "fence-river": () => {
+      const wave = (y) =>
+        `<path d="M20,${y} q20,-6 40,0 t40,0 t40,0 t40,0 t40,0 t40,0 t20,0" fill="none" stroke="var(--c-primary)" stroke-width="1.2" opacity="0.55"/>`;
+      const svg =
+        `<svg viewBox="0 0 300 205" style="width:280px" class="fig-svg" role="img"` +
+        ` aria-label="A rectangular field beside a river. The river runs along the top; the top side of the rectangle is dashed because it is not fenced. The two vertical sides are labelled x and the bottom side is labelled y.">` +
+        wave(34) + wave(46) +
+        `<text x="266" y="22" text-anchor="start" class="ptlab" font-style="italic">river</text>` +
+        `<line x1="70" y1="52" x2="230" y2="52" stroke="var(--c-aux)" stroke-width="1.3" stroke-dasharray="4.5 3.5"/>` +
+        `<line x1="70" y1="52" x2="70" y2="160" stroke="var(--ink)" stroke-width="1.8"/>` +
+        `<line x1="230" y1="52" x2="230" y2="160" stroke="var(--ink)" stroke-width="1.8"/>` +
+        `<line x1="70" y1="160" x2="230" y2="160" stroke="var(--ink)" stroke-width="1.8"/>` +
+        `<text x="58" y="110" text-anchor="end" class="ptlab" font-style="italic">x</text>` +
+        `<text x="242" y="110" text-anchor="start" class="ptlab" font-style="italic">x</text>` +
+        `<text x="150" y="178" text-anchor="middle" class="ptlab" font-style="italic">y</text>` +
+        `</svg>`;
       return { layout: "single", panels: [{ svg }] };
     },
 
-    /* §4.4 — Interior extremum (Theorem A): the two-sided squeeze forcing f'(x_M)=0.
-       A curve peaking at an interior maximum x_M. From the peak the right secant
-       (h>0) slopes down and the left secant (h<0) slopes up (both dashed, gray):
-       the right difference quotient stays <=0, the left stays >=0, so the single
-       value f'(x_M) is caught between and must be 0 — the horizontal tangent
-       (solid). Only works in the open interior, where both one-sided increments
-       exist (the endpoint caution). Labels limited to x_M and f'(x_M)=0. */
-    "interior-extremum-squeeze": () => {
-      const f = (x) => 1 - 0.5 * (x - 1.5) * (x - 1.5);
-      const xM = 1.5, hh = 0.8;
-      const xr = xM + hh, xl = xM - hh;
+    /* §5.5 — Rectangle inscribed in a semicircle of radius R (Example 5.17).
+       The upper-right corner (x, y) rides on the arc; the dashed radius R to
+       that corner shows why y = sqrt(R^2 - x^2). Width 2x is implicit in the
+       symmetric base; the optimal x = R/sqrt2 stays in the solution. */
+    "semicircle-rectangle": () => {
+      const x0 = 0.62, y0 = Math.sqrt(1 - 0.62 * 0.62);
       const svg = buildPlot({
-        w: 322, h: 244,
-        xmin: -0.1, xmax: 3.1, ymin: -0.05, ymax: 1.3,
-        xlabel: "x", ylabel: "",
-        xticks: [{ x: xM, tex: "x_{M}" }],
-        yticks: [],
+        w: 300, h: 175, xmin: -1.35, xmax: 1.35, ymin: -0.14, ymax: 1.30,
+        xlabel: "x",
+        xticks: [{ x: 0.62, tex: "x" }],
+        aria: "A semicircle of radius R on the horizontal axis with an inscribed rectangle. The rectangle's upper right corner sits on the arc at the point x comma y, and a dashed radius of length R runs from the centre to that corner.",
         items: [
-          { type: "curve", fn: f, domain: [0.2, 2.8], samples: 200, cls: "curve" },
-          { type: "seg", x1: xM, y1: f(xM), x2: xr, y2: f(xr), cls: "secant" },
-          { type: "seg", x1: xl, y1: f(xl), x2: xM, y2: f(xM), cls: "secant" },
-          { type: "seg", x1: xM - 0.62, y1: f(xM), x2: xM + 0.62, y2: f(xM), cls: "tangent" },
-          { type: "dot", x: xM, y: f(xM), r: 2.6 },
-          { type: "dot", x: xr, y: f(xr), r: 2.4 },
-          { type: "dot", x: xl, y: f(xl), r: 2.4 },
-          { type: "text", x: xM, y: f(xM) + 0.13, tex: "f'(x_{M})=0", cls: "a-pt", anchor: "middle", vAnchor: "bottom" }
+          { type: "curve", fn: (x) => Math.sqrt(Math.max(1 - x * x, 0)), domain: [-1, 1], samples: 300 },
+          { type: "seg", x1: -x0, y1: 0, x2: -x0, y2: y0, cls: "bubble" },
+          { type: "seg", x1: -x0, y1: y0, x2: x0, y2: y0, cls: "bubble" },
+          { type: "seg", x1: x0, y1: 0, x2: x0, y2: y0, cls: "bubble" },
+          { type: "seg", x1: 0, y1: 0, x2: x0, y2: y0, cls: "idline" },
+          { type: "dot", x: x0, y: y0 },
+          { type: "dot", x: 1, y: 0, r: 2.2 },
+          { type: "dot", x: -1, y: 0, r: 2.2 },
+          { type: "text", x: 0.24, y: 0.5, tex: "R", anchor: "end", cls: "a-pt", size: 12 },
+          { type: "text", x: 0.68, y: 0.88, tex: "(x,\\,y)", anchor: "start", cls: "a-pt", size: 12 },
+          { type: "text", x: 0.68, y: 0.38, tex: "y", anchor: "start", cls: "a-pt", size: 12 },
         ],
-        aria: "A smooth curve rising to an interior maximum at x sub M and falling again. From the peak a dashed secant goes down to the right and another dashed secant comes up from the left; the right difference quotient is at most zero and the left at least zero, trapping the derivative at the peak between them. The solid horizontal tangent at the peak shows that this trapped value is zero."
       });
       return { layout: "single", panels: [{ svg }] };
     },
 
-    /* §4.5 — Why (ln x)' = 1/x: reflection makes the tangent slopes reciprocal.
-       e^x (blue) and ln x (red) mirror across y = x (gray dashed). At the mirror
-       pair P = (ln 2, 2) on e^x and Q = (2, ln 2) on ln x, the tangents (solid)
-       are themselves mirror images: e^x has slope e^{ln 2} = 2 there, so its
-       reflection — the tangent to ln at Q — has the reciprocal slope 1/2.
-       Reflection swaps rise and run, which is exactly (ln x)' = 1/e^{ln x} = 1/x.
-       Equal axis scales keep the 45-degree reflection honest. Labels: three curves. */
-    "reciprocal-slope-log": () => {
-      const a = Math.log(2);          // P=(a, 2) on e^x, slope e^a = 2; Q=(2, a) on ln x, slope 1/2
+    /* §5.6 — Concavity vs tangent lines (Definition 5.5), two panels.
+       Concave up: the arc lies above each of its three tangents and the
+       tangent slopes increase left to right; concave down: mirrored. Pure
+       concept picture — no axes, no numbers. */
+    "concavity-tangents": () => {
+      const up = (x) => 0.4 + 0.35 * (x - 2) * (x - 2);
+      const dn = (x) => 1.8 - 0.35 * (x - 2) * (x - 2);
+      const mk = (fn, tangents, aria) => buildPlot({
+        w: 230, h: 175, xmin: 0, xmax: 4, ymin: 0, ymax: 2.2, axes: false, aria,
+        items: [
+          { type: "curve", fn, domain: [0.35, 3.65], samples: 200 },
+          ...tangents,
+          { type: "dot", x: 1, y: fn(1) }, { type: "dot", x: 2, y: fn(2) }, { type: "dot", x: 3, y: fn(3) },
+        ],
+      });
+      const svgUp = mk(up, [
+        { type: "seg", x1: 0.35, y1: 1.205, x2: 1.75, y2: 0.225, cls: "tangent" },
+        { type: "seg", x1: 1.25, y1: 0.4, x2: 2.75, y2: 0.4, cls: "tangent" },
+        { type: "seg", x1: 2.25, y1: 0.225, x2: 3.65, y2: 1.205, cls: "tangent" },
+      ], "A concave-up arc with tangent lines at three points; the arc stays above every tangent and the tangent slopes increase from left to right.");
+      const svgDn = mk(dn, [
+        { type: "seg", x1: 0.35, y1: 0.995, x2: 1.75, y2: 1.975, cls: "tangent" },
+        { type: "seg", x1: 1.25, y1: 1.8, x2: 2.75, y2: 1.8, cls: "tangent" },
+        { type: "seg", x1: 2.25, y1: 1.975, x2: 3.65, y2: 0.995, cls: "tangent" },
+      ], "A concave-down arc with tangent lines at three points; the arc stays below every tangent and the tangent slopes decrease from left to right.");
+      return { layout: "pair", panels: [
+        { svg: svgUp, note: "Concave up: above its tangents, slopes increasing." },
+        { svg: svgDn, note: "Concave down: below its tangents, slopes decreasing." },
+      ] };
+    },
+
+    /* §5.8 — The finished sketch of y = x^2/(x^2-1) (Example 5.24).
+       Flagship synthesis figure: central arch peaking at the origin, vertical
+       asymptotes x = ±1, horizontal asymptote y = 1, two outer branches
+       descending toward it from above. buildPlot's window clipping breaks the
+       curve at the poles automatically. */
+    "rational-asymptotes": () => {
       const svg = buildPlot({
-        w: 300, h: 296,
-        xmin: -0.4, xmax: 3.2, ymin: -0.4, ymax: 3.2,
+        w: 320, h: 250, xmin: -3.6, xmax: 3.6, ymin: -3.2, ymax: 4.2,
         xlabel: "x", ylabel: "y",
-        xticks: [{ x: 1, tex: "1" }],
-        yticks: [{ y: 1, tex: "1" }],
+        aria: "The graph of y equals x squared over x squared minus one: a central arch between the vertical asymptotes x equals minus one and x equals one, peaking at the origin, and two outer branches falling from plus infinity toward the horizontal asymptote y equals one.",
         items: [
-          { type: "seg", x1: -0.4, y1: -0.4, x2: 3.2, y2: 3.2, cls: "idline" },
-          { type: "curve", fn: (x) => Math.exp(x), domain: [-0.4, 1.18], samples: 200, cls: "curve" },
-          { type: "curve", fn: (x) => Math.log(x), domain: [0.08, 3.2], samples: 200, cls: "curve-log" },
-          { type: "seg", x1: a - 0.4, y1: 2 - 0.8, x2: a + 0.4, y2: 2 + 0.8, cls: "tangent" },
-          { type: "seg", x1: 2 - 0.8, y1: a - 0.4, x2: 2 + 0.8, y2: a + 0.4, cls: "tangent" },
-          { type: "dot", x: a, y: 2, r: 2.5 },
-          { type: "dot", x: 2, y: a, r: 2.5 },
-          { type: "text", x: 1.12, y: 3.05, tex: "e^{x}", cls: "a-curve", anchor: "end", vAnchor: "bottom" },
-          { type: "text", x: 3.15, y: 1.18, tex: "\\ln x", cls: "a-ref", anchor: "start", vAnchor: "top" },
-          { type: "text", x: 2.46, y: 3.08, text: "y = x", cls: "a-ax", anchor: "start", vAnchor: "bottom" }
+          { type: "curve", fn: (x) => (x * x) / (x * x - 1), domain: [-3.5, 3.5], samples: 560 },
+          { type: "vline", x: 1, cls: "refline" },
+          { type: "vline", x: -1, cls: "refline" },
+          { type: "hline", y: 1, cls: "refline" },
+          { type: "dot", x: 0, y: 0 },
+          { type: "text", x: 3.45, y: 0.66, tex: "y=1", anchor: "end", cls: "a-ax", size: 12 },
+          { type: "text", x: -1.12, y: -2.75, tex: "x=-1", anchor: "end", cls: "a-ax", size: 12 },
+          { type: "text", x: 1.12, y: -2.75, tex: "x=1", anchor: "start", cls: "a-ax", size: 12 },
         ],
-        aria: "The blue curve e to the x and the red curve ln x are mirror images across the dashed line y = x. At the matching pair of points ln 2 comma 2 on the exponential and 2 comma ln 2 on the logarithm, the two solid tangent lines are also mirror images: the steep one on the exponential has slope 2, and its reflection on the logarithm has the reciprocal slope one half. Reflection swaps rise and run, which is why the derivative of ln x is one over x."
       });
       return { layout: "single", panels: [{ svg }] };
     },
 
+    /* §5.8 — y = x + 1/x and its slant asymptote y = x (Example 5.25).
+       Both ends hug the dashed line y = x; the y-axis is the vertical
+       asymptote (the axis itself — no extra line drawn). The two marked
+       extrema make the surprising order visible: the local maximum value -2
+       sits below the local minimum value 2. */
+    "slant-asymptote": () => {
+      const svg = buildPlot({
+        w: 300, h: 265, xmin: -4.3, xmax: 4.3, ymin: -5.3, ymax: 5.3,
+        xlabel: "x", ylabel: "y",
+        xticks: [{ x: 1, tex: "1" }, { x: -1, tex: "-1" }],
+        yticks: [{ y: 2, tex: "2" }, { y: -2, tex: "-2" }],
+        aria: "The two branches of y equals x plus one over x, hugging the dashed slant asymptote y equals x at both ends, with the vertical axis as vertical asymptote. The local minimum at one comma two and the local maximum at minus one comma minus two are marked.",
+        items: [
+          { type: "seg", x1: -4.15, y1: -4.15, x2: 4.15, y2: 4.15, cls: "idline" },
+          { type: "curve", fn: (x) => x + 1 / x, domain: [-4.15, 4.15], samples: 560 },
+          { type: "dot", x: 1, y: 2 },
+          { type: "dot", x: -1, y: -2 },
+          { type: "text", x: 3.3, y: 2.72, tex: "y=x", anchor: "start", cls: "a-ax", size: 12 },
+        ],
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §5.9 — One Newton step (opener / Strategy 5.7).
+       Generic convex increasing curve (drawn with f(x) = x^2 - 2, but no
+       formula shown): from the guess x0, ride the tangent down to the axis;
+       the crossing x1 lands much nearer the root r. Axis ticks name x0, x1, r;
+       the iteration formula lives in the prose above. f'(x0) is visibly
+       nonzero (steep tangent). */
+    "newton-step": () => {
+      const svg = buildPlot({
+        w: 320, h: 235, xmin: -0.15, xmax: 2.95, ymin: -2.5, ymax: 4.9,
+        xlabel: "x", ylabel: "y",
+        xticks: [{ x: 1.4142, tex: "r" }, { x: 1.6006 }, { x: 2.35, tex: "x_{0}" }],
+        aria: "An increasing curve crossing the axis at the root r. From the guess x zero, a dashed vertical rises to the curve; the tangent line there slides down and crosses the axis at x one, which lies much closer to r than x zero did.",
+        items: [
+          { type: "curve", fn: (x) => x * x - 2, domain: [0, 2.6], samples: 240 },
+          { type: "seg", x1: 1.5, y1: -0.47, x2: 2.6, y2: 4.7, cls: "tangent" },
+          { type: "seg", x1: 2.35, y1: 0, x2: 2.35, y2: 3.5225, cls: "idline" },
+          { type: "dot", x: 2.35, y: 3.5225 },
+          { type: "dot", x: 1.6006, y: 0, r: 2.6 },
+          { type: "text", x: 1.62, y: -0.62, tex: "x_{1}", anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 },
+          { type: "dot", x: 1.4142, y: 0, r: 2.6 },
+          { type: "text", x: 0.32, y: -2.1, tex: "y=f(x)", anchor: "start", cls: "a-pt", size: 12 },
+        ],
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
   };
 
   /* ---- hydrateFigures: fills every <figure data-fig="id"> ---- */

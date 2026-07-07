@@ -22,6 +22,11 @@
   <p>\[ f(x_{0} + h) = f(x_{0}) + f'(x_{0})\,h + R(h), \qquad \frac{R(h)}{h} \to 0 \ \text{ as } h \to 0, \]</p>
   <p>which says that the curve equals a straight line — the one through \((x_{0}, f(x_{0}))\) with slope \(f'(x_{0})\) — plus a remainder \(R(h)\) that dies away faster than \(h\) itself. Drop the remainder and a usable approximation is left: near \(x_{0}\), the function is very nearly its tangent line. This section takes that idea at face value and puts it to work estimating values, and then repackages it in the language of <em>differentials</em>.</p>
 
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — tangent-line approximation of sqrt(x) at 4 (Def 5.1 / Ex 5.8); registered in chapter5 FIGS as "sqrt-linearization"] -->
+  <figure class="figure" data-fig="sqrt-linearization">
+    <figcaption><span class="fig-no">Figure 5.4</span> Linear approximation near \(x = 4\): the tangent line \(L\) is barely distinguishable from \(y = \sqrt{x}\) close to the point of tangency and drifts away far from it — compare the two at \(x = 9\).</figcaption>
+  </figure>
+
   <h3 class="subsec-head">Linearization</h3>
 
   <section class="env env-definition">
@@ -92,6 +97,14 @@
   <p>\[ \Delta y = f(x + \Delta x) - f(x), \]</p>
   <p>the rise along the <em>curve</em>; the differential \(dy = f'(x)\,dx\) is the rise along the <em>tangent</em>. They are not equal — they differ by exactly the remainder \(R\) of Definition 3.1 attached to the base point \(x\) — but for small \(dx\) the difference is negligible, and \(dy \approx \Delta y\) is the linear approximation wearing new clothes. This form is the natural one for propagating a measurement error: a small uncertainty \(dx\) in a measured quantity produces an uncertainty of about \(dy = f'(x)\,dx\) in anything computed from it.</p>
 
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — dy along tangent vs Delta-y along curve (Def 5.2); registered in chapter5 FIGS as "dy-vs-deltay"] -->
+  <figure class="figure" data-fig="dy-vs-deltay">
+    <figcaption><span class="fig-no">Figure 5.5</span> Over the same step \(dx\), the differential \(dy\) is the rise of the tangent line, while \(\Delta y\) is the rise of the curve; their gap is the remainder \(R\), which dies away faster than \(dx\).</figcaption>
+  </figure>
+
+  <!-- expansion:intuition [pass: enrichment] — Leibniz-notation closure: with Definition 5.2, dy/dx is an honest ratio of differentials (recalls Remark 3.2's "single symbol" caution; forward seam to the substitution method's du); adjudicated ADOPT in the M4 gap-check (Codex, 2026-07-07) -->
+  <p>The differential notation also settles an old account. When \(dy/dx\) first appeared, Remark 3.2 was careful to call it a single symbol — suggestive, but not a fraction. Definition 5.2 upgrades it: with \(dx\) an independent quantity and \(dy = f'(x)\,dx\) built from it, the quotient \(dy/dx\) is a genuine ratio of two numbers, and it equals the derivative exactly. Leibniz’s fraction bar is now honest. The upgrade works forward, not backward — the chain-rule manipulations that <em>looked</em> like cancelling \(dx\)’s were licensed by Theorem 3.3, not by this definition — but from here on the bookkeeping power of treating \(dx\) as a real quantity is available, and integral calculus will lean on it heavily when a change of variable rides entirely on the differential.</p>
+
   <!-- expansion:example — Example 5.10 (differentials): error propagation, the canonical use of differentials -->
   <div class="workedexample">
     <section class="env env-example">
@@ -121,6 +134,6 @@
   </section>
 
   <!-- expansion:summary — close: linear approximation = derivative as local model; §5.4 turns from local behavior to the global question of largest/smallest -->
-  <p>Linear approximation is the derivative cashing in its definition: the number \(f'(a)\) is not only a slope but a working forecast of the function's values nearby. That local reading — the function as its tangent line — recurs throughout calculus, generalized to curved approximations in Chapter 11 and to surfaces in Chapter 14. The next section changes the question entirely, from how a function behaves <em>near</em> a point to where, across a whole interval, it takes its largest and smallest values.</p>
+  <p>Linear approximation is the derivative cashing in its definition: the number \(f'(a)\) is not only a slope but a working forecast of the function’s values nearby. That local reading — the function as its tangent line — recurs throughout calculus, generalized to curved approximations in Chapter 11 and to surfaces in Chapter 14. The next section changes the question entirely, from how a function behaves <em>near</em> a point to where, across a whole interval, it takes its largest and smallest values.</p>
 
 </article>

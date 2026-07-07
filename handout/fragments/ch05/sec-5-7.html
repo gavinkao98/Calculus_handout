@@ -2,31 +2,33 @@
      section-source: Stewart ET 9e §4.4 (Indeterminate Forms and l'Hospital's Rule); cross-checked
      Thomas 14e §4.5, Rogawski 4e §4.5. Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤).
      Counters continue from §5.6: §5.7 mints Theorem 5.4 (Generalized MVT / Cauchy's form),
-     Theorem 5.5 (L'Hopital's Rule), Strategy 5.5, Examples 5.19–5.21. Cautions UNNUMBERED.
+     Theorem 5.5 (L'Hopital's Rule), Strategy 5.5, Examples 5.20–5.23
+     (5.22 = M4 enrichment, 2026-07-07). Cautions UNNUMBERED.
      SEAM (full-arc review): Generalized MVT is named "Generalized Mean Value Theorem (Cauchy's form)"
      to avoid clashing with the Cauchy criterion (Theorem 4.5). It is EXPORTED to Ch11 (Taylor remainder).
      Proved via Rolle (Theorem 4.11). L'Hopital's 0/0 finite case is proved IN SECTION via the Generalized MVT;
      the infinity/infinity and infinite-point cases are STATED and their proof FENCED to the Proof-Track
      appendix (new §D.3) — depth policy fences the heaviest proofs; §D.3 is Appendix D's second customer.
      Growth comparison ln x << x^p << e^x is established here (feeds §5.8 asymptotics).
-     Math: (e^x-1-x)/x^2 -> 1/2 (L'Hopital twice); ln x / x -> 0; x ln x -> 0 (0*inf) and x^x -> 1 (0^0).
-     Counters handed to §5.8: Definition 5.7, Theorem 5.6, Strategy 5.6, Example 5.22. Record: PLAN-ch05.md. -->
+     Math: (e^x-1-x)/x^2 -> 1/2 (L'Hopital twice); ln x / x -> 0; x ln x -> 0 (0*inf) and x^x -> 1 (0^0);
+     5.22 (M4): lim_{x->0+} ln x / x = -inf — form (-inf)/0+ is NOT indeterminate; blind L'Hopital would give +inf (wrong sign).
+     Counters handed to §5.8: Definition 5.7, Theorem 5.6, Strategy 5.6, Example 5.24. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
   <header class="sec-head">
-    <h2 class="sec-title"><span class="sec-no">5.7</span>L'Hôpital's Rule</h2>
+    <h2 class="sec-title"><span class="sec-no">5.7</span>L’Hôpital’s Rule</h2>
   </header>
 
   <!-- expansion:intuition — section opener: indeterminate forms; the ratio of derivatives resolves them; but the tool needs a stronger MVT -->
-  <p>Some limits refuse to be read off. When \(x \to a\) drives both \(f(x)\) and \(g(x)\) to \(0\), the quotient \(f(x)/g(x)\) approaches the meaningless symbol \(\tfrac{0}{0}\): the answer could be anything, depending on how fast each part vanishes. The same impasse arises when both race to \(\infty\), giving \(\tfrac{\infty}{\infty}\). These are the <em>indeterminate forms</em>, and \(f'\!/g'\) — the ratio of the <em>rates</em> at which numerator and denominator move — is exactly the extra information needed to break the tie. <em>L'Hôpital's rule</em> makes that precise: under the right conditions, the limit of \(f/g\) equals the limit of \(f'\!/g'\). Proving it needs a two-function refinement of the Mean Value Theorem, which is worth having in its own right.</p>
+  <p>Some limits refuse to be read off. When \(x \to a\) drives both \(f(x)\) and \(g(x)\) to \(0\), the quotient \(f(x)/g(x)\) approaches the meaningless symbol \(\tfrac{0}{0}\): the answer could be anything, depending on how fast each part vanishes. The same impasse arises when both race to \(\infty\), giving \(\tfrac{\infty}{\infty}\). These are the <em>indeterminate forms</em>, and \(f'\!/g'\) — the ratio of the <em>rates</em> at which numerator and denominator move — is exactly the extra information needed to break the tie. <em>L’Hôpital’s rule</em> makes that precise: under the right conditions, the limit of \(f/g\) equals the limit of \(f'\!/g'\). Proving it needs a two-function refinement of the Mean Value Theorem, which is worth having in its own right.</p>
 
   <h3 class="subsec-head">The Generalized Mean Value Theorem</h3>
 
-  <p>The Mean Value Theorem compares a function's rise to the run of \(x\). The generalization compares the rises of <em>two</em> functions to each other, as both traverse the same interval.</p>
+  <p>The Mean Value Theorem compares a function’s rise to the run of \(x\). The generalization compares the rises of <em>two</em> functions to each other, as both traverse the same interval.</p>
 
   <section class="env env-theorem">
-    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.4</span><span class="env-name">Generalized Mean Value Theorem (Cauchy's form)</span></p>
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.4</span><span class="env-name">Generalized Mean Value Theorem (Cauchy’s form)</span></p>
     <div class="env-body">
       <p>If \(f\) and \(g\) are continuous on \([a, b]\) and differentiable on \((a, b)\), then there is a point \(c \in (a, b)\) with</p>
       <p>\[ \bigl[f(b) - f(a)\bigr]\,g'(c) = \bigl[g(b) - g(a)\bigr]\,f'(c). \]</p>
@@ -38,11 +40,11 @@
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
-      <p>Imitate the Mean Value Theorem's proof, using an auxiliary function tuned to have equal endpoint values. Set</p>
+      <p>Imitate the Mean Value Theorem’s proof, using an auxiliary function tuned to have equal endpoint values. Set</p>
       <p>\[ h(x) = \bigl[f(b) - f(a)\bigr]\,g(x) - \bigl[g(b) - g(a)\bigr]\,f(x). \]</p>
       <p>As a combination of \(f\) and \(g\), \(h\) is continuous on \([a, b]\) and differentiable on \((a, b)\). At the endpoints,</p>
       <p>\[ h(a) = f(b)g(a) - g(b)f(a) = h(b), \]</p>
-      <p>as a short expansion of each side confirms, so \(h(a) = h(b)\). By Rolle's theorem (Theorem 4.11) there is a \(c \in (a, b)\) with \(h'(c) = 0\). Since</p>
+      <p>as a short expansion of each side confirms, so \(h(a) = h(b)\). By Rolle’s theorem (Theorem 4.11) there is a \(c \in (a, b)\) with \(h'(c) = 0\). Since</p>
       <p>\[ h'(x) = \bigl[f(b) - f(a)\bigr]\,g'(x) - \bigl[g(b) - g(a)\bigr]\,f'(x), \]</p>
       <p>setting \(h'(c) = 0\) gives the stated identity. For the ratio form, note that if \(g'(x) \ne 0\) on \((a, b)\) then \(g(b) \ne g(a)\) — otherwise Rolle applied to \(g\) alone would produce a zero of \(g'\) — so dividing by \([g(b) - g(a)]\,g'(c)\) is legitimate. <span class="qed qed-proof"></span></p>
     </div>
@@ -50,10 +52,10 @@
 
   <p class="informal">Taking \(g(x) = x\) recovers the ordinary Mean Value Theorem: \(g'(c) = 1\) and \(g(b) - g(a) = b - a\), and the identity becomes \(f(b) - f(a) = (b - a)f'(c)\). The generalization is the Mean Value Theorem with the run measured by a second function instead of by \(x\).</p>
 
-  <h3 class="subsec-head">L'Hôpital's rule</h3>
+  <h3 class="subsec-head">L’Hôpital’s rule</h3>
 
   <section class="env env-theorem">
-    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.5</span><span class="env-name">L'Hôpital's Rule</span></p>
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.5</span><span class="env-name">L’Hôpital’s Rule</span></p>
     <div class="env-body">
       <p>Suppose \(f\) and \(g\) are differentiable with \(g'(x) \ne 0\) near \(a\) (except possibly at \(a\)), where \(a\) may be a real number or \(\pm\infty\). Suppose further that</p>
       <p>\[ \lim_{x \to a} \frac{f'(x)}{g'(x)} = L \qquad (L \text{ finite or } \pm\infty). \]</p>
@@ -77,13 +79,13 @@
   </section>
 
   <!-- expansion:formula — the remaining cases are fenced to the Proof-Track appendix (§D.3) per the depth policy -->
-  <p>The \(\tfrac{\ast}{\infty}\) case and the cases where \(a = \pm\infty\) hold under the same hypotheses, but their proofs are more delicate — the tidy substitution \(f(a) = g(a) = 0\) is unavailable when the functions blow up, and the estimate must be managed by hand. Following this handout's proof-track policy of keeping the heaviest arguments out of the main line, we state these cases as part of Theorem 5.5 and defer their proof to the Proof-Track appendix (§D.3).</p>
+  <p>The \(\tfrac{\ast}{\infty}\) case and the cases where \(a = \pm\infty\) hold under the same hypotheses, but their proofs are more delicate — the tidy substitution \(f(a) = g(a) = 0\) is unavailable when the functions blow up, and the estimate must be managed by hand. Following this handout’s proof-track policy of keeping the heaviest arguments out of the main line, we state these cases as part of Theorem 5.5 and defer their proof to the Proof-Track appendix (§D.3).</p>
 
   <!-- expansion:caution — L'Hopital's three traps: wrong form, quotient rule, and the converse -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Three cautions travel with the rule. First, <em>check the form</em>: L'Hôpital applies only to \(\tfrac{0}{0}\) and \(\tfrac{\ast}{\infty}\). Applied to a limit that is not indeterminate — where the numerator and denominator have honest finite limits — it is unjustified and may give a wrong answer. Second, differentiate the numerator and denominator <em>separately</em>: \(f'\!/g'\) is not the derivative of the quotient \(f/g\), and the quotient rule has no place here. Third, the rule is one-directional: if \(\lim f'\!/g'\) fails to exist, that says nothing about \(\lim f/g\), which may still exist — so a failed application is inconclusive, not a proof of divergence.</p>
+      <p>Three cautions travel with the rule. First, <em>check the form</em>: L’Hôpital applies only to \(\tfrac{0}{0}\) and \(\tfrac{\ast}{\infty}\). Applied to a limit that is not indeterminate — where the numerator and denominator have honest finite limits — it is unjustified and may give a wrong answer. Second, differentiate the numerator and denominator <em>separately</em>: \(f'\!/g'\) is not the derivative of the quotient \(f/g\), and the quotient rule has no place here. Third, the rule is one-directional: if \(\lim f'\!/g'\) fails to exist, that says nothing about \(\lim f/g\), which may still exist — so a failed application is inconclusive, not a proof of divergence.</p>
     </div>
   </section>
 
@@ -92,7 +94,7 @@
     <div class="env-body">
       <p>To evaluate an indeterminate limit:</p>
       <ol class="steps">
-        <li><strong>\(\tfrac{0}{0}\) or \(\tfrac{\ast}{\infty}\):</strong> apply L'Hôpital's rule directly. If the resulting limit is again indeterminate, apply it again — differentiating repeatedly until an answer emerges.</li>
+        <li><strong>\(\tfrac{0}{0}\) or \(\tfrac{\ast}{\infty}\):</strong> apply L’Hôpital’s rule directly. If the resulting limit is again indeterminate, apply it again — differentiating repeatedly until an answer emerges.</li>
         <li><strong>\(0 \cdot \infty\):</strong> rewrite the product \(f\cdot g\) as a quotient, \(\dfrac{f}{1/g}\) or \(\dfrac{g}{1/f}\), turning it into \(\tfrac{0}{0}\) or \(\tfrac{\infty}{\infty}\).</li>
         <li><strong>\(\infty - \infty\):</strong> combine over a common denominator (or otherwise rearrange) to reach a single quotient.</li>
         <li><strong>\(1^{\infty}\), \(0^{0}\), \(\infty^{0}\):</strong> take logarithms. If \(y = f^{g}\) with \(f > 0\) near the point, then \(\ln y = g\ln f\), a \(0 \cdot \infty\) form; find \(\lim \ln y\), then exponentiate — \(\lim y = e^{\lim \ln y}\).</li>
@@ -100,10 +102,10 @@
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.19: 0/0 requiring L'Hopital twice -->
+  <!-- expansion:example — Example 5.20: 0/0 requiring L'Hopital twice -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.19</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.20</span></p>
       <div class="env-body">
         <p>Evaluate \(\displaystyle \lim_{x \to 0} \frac{e^{x} - 1 - x}{x^{2}}\).</p>
       </div>
@@ -111,7 +113,7 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>As \(x \to 0\), numerator and denominator both tend to \(0\): the form is \(\tfrac{0}{0}\). Apply L'Hôpital's rule, differentiating top and bottom:</p>
+        <p>As \(x \to 0\), numerator and denominator both tend to \(0\): the form is \(\tfrac{0}{0}\). Apply L’Hôpital’s rule, differentiating top and bottom:</p>
         <p>\[ \lim_{x \to 0} \frac{e^{x} - 1 - x}{x^{2}} = \lim_{x \to 0} \frac{e^{x} - 1}{2x}. \]</p>
         <p>This is again \(\tfrac{0}{0}\), so apply the rule a second time:</p>
         <p>\[ \lim_{x \to 0} \frac{e^{x} - 1}{2x} = \lim_{x \to 0} \frac{e^{x}}{2} = \frac{1}{2}. \]</p>
@@ -120,10 +122,10 @@
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.20: infinity/infinity, establishing the log-vs-power growth comparison -->
+  <!-- expansion:example — Example 5.21: infinity/infinity, establishing the log-vs-power growth comparison -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.20</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.21</span></p>
       <div class="env-body">
         <p>Evaluate \(\displaystyle \lim_{x \to \infty} \frac{\ln x}{x}\), and more generally \(\displaystyle \lim_{x \to \infty} \frac{\ln x}{x^{p}}\) for any \(p > 0\).</p>
       </div>
@@ -131,7 +133,7 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Both \(\ln x\) and \(x\) tend to \(\infty\), the form \(\tfrac{\infty}{\infty}\). By L'Hôpital's rule,</p>
+        <p>Both \(\ln x\) and \(x\) tend to \(\infty\), the form \(\tfrac{\infty}{\infty}\). By L’Hôpital’s rule,</p>
         <p>\[ \lim_{x \to \infty} \frac{\ln x}{x} = \lim_{x \to \infty} \frac{1/x}{1} = \lim_{x \to \infty} \frac{1}{x} = 0. \]</p>
         <p>The same computation with \(x^{p}\) below gives \(\dfrac{1/x}{p\,x^{p-1}} = \dfrac{1}{p\,x^{p}} \to 0\). So</p>
         <p>\[ \lim_{x \to \infty} \frac{\ln x}{x^{p}} = 0 \qquad \text{for every } p > 0. \]</p>
@@ -142,10 +144,28 @@
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.21: 0*inf recast, then 0^0 via logarithms; connects to Ch3 x^x -->
+  <!-- expansion:example [pass: enrichment] [source: CLP-1 §3.7 problem "2010H" (limit of log x over x as x→0+), official solution incl. the misuse remark, CC BY-NC-SA 4.0; adjudicated ADOPT in the M4 gap-check (Codex, 2026-07-07)] -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.21</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.22</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle \lim_{x \to 0^{+}} \frac{\ln x}{x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Check the form first. As \(x \to 0^{+}\) the numerator \(\ln x \to -\infty\) while the denominator \(x \to 0^{+}\): a hugely negative number divided by a tiny positive one. This is not an indeterminate form at all — nothing competes — so the quotient simply runs away:</p>
+        <p>\[ \lim_{x \to 0^{+}} \frac{\ln x}{x} = -\infty. \]</p>
+        <p>Now watch what happens if the form-check is skipped. Differentiating top and bottom as though L’Hôpital’s rule applied would give \(\dfrac{1/x}{1} = \dfrac{1}{x} \to +\infty\) — not merely the wrong magnitude but the wrong <em>sign</em>. The hypotheses of Theorem 5.5 are not decoration. Note the contrast with Example 5.21: the same quotient \(\ln x / x\) taken at \(x \to \infty\) genuinely is \(\infty/\infty\), and there the rule legitimately gave \(0\). Whether the rule applies is a property of the <em>point</em>, not of the formula. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — Example 5.23: 0*inf recast, then 0^0 via logarithms; connects to Ch3 x^x -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.23</span></p>
       <div class="env-body">
         <p>Evaluate \(\displaystyle \lim_{x \to 0^{+}} x \ln x\), and use it to find \(\displaystyle \lim_{x \to 0^{+}} x^{x}\).</p>
       </div>
@@ -155,7 +175,7 @@
       <div class="env-body">
         <p>As \(x \to 0^{+}\), \(x \to 0\) while \(\ln x \to -\infty\): the product is the indeterminate form \(0 \cdot \infty\). Recast it as a quotient to expose a form the rule accepts — put the \(\ln x\) on top and \(1/x\) below:</p>
         <p>\[ \lim_{x \to 0^{+}} x \ln x = \lim_{x \to 0^{+}} \frac{\ln x}{1/x}, \]</p>
-        <p>now \(\tfrac{-\infty}{\infty}\). L'Hôpital's rule gives</p>
+        <p>now \(\tfrac{-\infty}{\infty}\). L’Hôpital’s rule gives</p>
         <p>\[ \lim_{x \to 0^{+}} \frac{\ln x}{1/x} = \lim_{x \to 0^{+}} \frac{1/x}{-1/x^{2}} = \lim_{x \to 0^{+}} (-x) = 0. \]</p>
         <p>So \(x \ln x \to 0\). For \(x^{x}\), the form is \(0^{0}\); take logarithms. Since \(\ln(x^{x}) = x \ln x \to 0\), and the exponential is continuous,</p>
         <p>\[ \lim_{x \to 0^{+}} x^{x} = \lim_{x \to 0^{+}} e^{x \ln x} = e^{0} = 1. \]</p>
@@ -165,6 +185,6 @@
   </div>
 
   <!-- expansion:summary — close: L'Hopital completes the limit toolkit; §5.8 assembles everything into curve sketching -->
-  <p>L'Hôpital's rule closes the last gap in the analytic toolkit. Every feature a graph can show — where it rises and falls, peaks and dips, bends and inflects, and how it behaves far out and near its asymptotes — is now computable, the last of these through the indeterminate limits this section resolved. Section 5.8 gathers the whole apparatus into a single disciplined procedure: reading a curve's complete shape off its formula.</p>
+  <p>L’Hôpital’s rule closes the last gap in the analytic toolkit. Every feature a graph can show — where it rises and falls, peaks and dips, bends and inflects, and how it behaves far out and near its asymptotes — is now computable, the last of these through the indeterminate limits this section resolved. Section 5.8 gathers the whole apparatus into a single disciplined procedure: reading a curve’s complete shape off its formula.</p>
 
 </article>

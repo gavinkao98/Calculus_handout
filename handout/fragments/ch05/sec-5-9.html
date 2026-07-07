@@ -1,12 +1,12 @@
 <!-- §5.9 Newton's Method. FINAL section of Chapter 5 — carries the chapter summary.
      section-source: Stewart ET 9e §4.8 (Newton's Method); cross-checked Thomas 14e §4.7, Rogawski 4e §4.7.
      Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤). Counters continue from §5.8:
-     §5.9 mints Strategy 5.7, Examples 5.24–5.25. No Def/Thm (Newton is a procedure; convergence stated
+     §5.9 mints Strategy 5.7, Examples 5.26–5.27. No Def/Thm (Newton is a procedure; convergence stated
      informally at this level). Cautions UNNUMBERED. Builds on §5.3 (linear approximation = the tangent
      line, whose x-intercept is the next iterate) and §5.6 (concavity governs convergence). May cite IVT
      (Theorem 4.9(b)) for root existence when f changes sign. Per-type counters reset at Chapter 6.
-     Math: 5.24 sqrt2 via x_{n+1}=(x_n+2/x_n)/2, x0=1.5 -> 1.41667 -> 1.414216 -> 1.4142136 (Babylonian);
-     5.25 x³−x−1=0, x0=1.5 -> 1.34783 -> 1.32520 -> 1.324718 (root ~1.324718).
+     Math: 5.26 sqrt2 via x_{n+1}=(x_n+2/x_n)/2, x0=1.5 -> 1.41667 -> 1.414216 -> 1.4142136 (Babylonian);
+     5.27 x³−x−1=0, x0=1.5 -> 1.34783 -> 1.32520 -> 1.324718 (root ~1.324718).
      Chapter summary: four strands (local tools; extrema & optimization; shape & indeterminate limits;
      numerical root-finding). Figures deferred (candidate: the tangent-to-x-intercept Newton picture).
      Record: PLAN-ch05.md. -->
@@ -14,11 +14,11 @@
 <article class="sec" lang="en">
 
   <header class="sec-head">
-    <h2 class="sec-title"><span class="sec-no">5.9</span>Newton's Method</h2>
+    <h2 class="sec-title"><span class="sec-no">5.9</span>Newton’s Method</h2>
   </header>
 
   <!-- expansion:intuition — section opener: solving f(x)=0 when no formula gives the root; the tangent line as an engine -->
-  <p>The chapter closes by turning the derivative to a new purpose: not describing a function, but <em>solving</em> one. Many equations \(f(x) = 0\) have roots that resist an explicit formula — the cubic \(x^{3} - x - 1 = 0\) yields nothing to simple factoring, and a transcendental equation like \(\cos x = x\) has no elementary closed form at all — yet the roots are real and can be pinned down to any precision. <em>Newton's method</em> does the pinning, and its engine is the linear approximation of §5.3: near a point, a curve is almost its tangent line, and a line's root is trivial to find. Follow the tangent to where it crosses the axis, and — from a good starting guess — you land nearer the curve's own root; repeat, and you close in fast.</p>
+  <p>The chapter closes by turning the derivative to a new purpose: not describing a function, but <em>solving</em> one. Many equations \(f(x) = 0\) have roots that resist an explicit formula — the cubic \(x^{3} - x - 1 = 0\) yields nothing to simple factoring, and a transcendental equation like \(\cos x = x\) has no elementary closed form at all — yet the roots are real and can be pinned down to any precision. <em>Newton’s method</em> does the pinning, and its engine is the linear approximation of §5.3: near a point, a curve is almost its tangent line, and a line’s root is trivial to find. Follow the tangent to where it crosses the axis, and — from a good starting guess — you land nearer the curve’s own root; repeat, and you close in fast.</p>
 
   <p>Make it precise. Start with a guess \(x_{0}\) near the root. The tangent line to \(y = f(x)\) at \(\bigl(x_{0}, f(x_{0})\bigr)\) is</p>
   <p>\[ y - f(x_{0}) = f'(x_{0})(x - x_{0}). \]</p>
@@ -26,8 +26,13 @@
   <p>\[ x_{1} = x_{0} - \frac{f(x_{0})}{f'(x_{0})}. \]</p>
   <p>Now \(x_{1}\) is a better guess. Repeating from \(x_{1}\) gives \(x_{2}\), and in general each guess produces the next by the same rule.</p>
 
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — one Newton step: slide down the tangent (opener / Strategy 5.7); registered in chapter5 FIGS as "newton-step"] -->
+  <figure class="figure" data-fig="newton-step">
+    <figcaption><span class="fig-no">Figure 5.11</span> One step of Newton’s method: from the guess \(x_{0}\), slide down the tangent line to where it crosses the axis; that crossing \(x_{1}\) is already much closer to the root \(r\).</figcaption>
+  </figure>
+
   <section class="env env-strategy">
-    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.7</span><span class="env-name">Newton's method</span></p>
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.7</span><span class="env-name">Newton’s method</span></p>
     <div class="env-body">
       <p>To approximate a root of \(f(x) = 0\):</p>
       <ol class="steps">
@@ -39,12 +44,12 @@
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.24: sqrt(2) via Newton — the ancient Babylonian iteration as a special case -->
+  <!-- expansion:example — Example 5.26: sqrt(2) via Newton — the ancient Babylonian iteration as a special case -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.24</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.26</span></p>
       <div class="env-body">
-        <p>Use Newton's method to approximate \(\sqrt{2}\).</p>
+        <p>Use Newton’s method to approximate \(\sqrt{2}\).</p>
       </div>
     </section>
     <section class="env env-solution">
@@ -54,15 +59,15 @@
         <p>\[ x_{n+1} = x_{n} - \frac{x_{n}^{2} - 2}{2x_{n}} = \frac{1}{2}\left(x_{n} + \frac{2}{x_{n}}\right), \]</p>
         <p>a formula that averages each guess with the number it divides into \(2\). Starting from \(x_{0} = 1.5\):</p>
         <p>\[ x_{1} = \tfrac{1}{2}\!\left(1.5 + \tfrac{2}{1.5}\right) = 1.41667, \quad x_{2} = 1.414216, \quad x_{3} = 1.4142136. \]</p>
-        <p>Against the true value \(\sqrt{2} = 1.41421356\ldots\), the third step is already correct to seven decimals. The number of correct digits roughly <em>doubles</em> at each step — the hallmark of Newton's method near a simple root. This particular iteration is ancient: it is the Babylonian rule for square roots, which turns out to be Newton's method applied to \(x^{2} - 2\). <span class="qed"></span></p>
+        <p>Against the true value \(\sqrt{2} = 1.41421356\ldots\), the third step is already correct to seven decimals. The number of correct digits roughly <em>doubles</em> at each step — the hallmark of Newton’s method near a simple root. This particular iteration is ancient: it is the Babylonian rule for square roots, which turns out to be Newton’s method applied to \(x^{2} - 2\). <span class="qed"></span></p>
       </div>
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.25: a root no formula gives -->
+  <!-- expansion:example — Example 5.27: a root no formula gives -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.25</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.27</span></p>
       <div class="env-body">
         <p>Approximate the real root of \(x^{3} - x - 1 = 0\).</p>
       </div>
@@ -74,7 +79,7 @@
         <p>\[ x_{n+1} = x_{n} - \frac{x_{n}^{3} - x_{n} - 1}{3x_{n}^{2} - 1}. \]</p>
         <p>Starting from \(x_{0} = 1.5\):</p>
         <p>\[ x_{1} = 1.34783, \quad x_{2} = 1.32520, \quad x_{3} = 1.324718, \quad x_{4} = 1.324718. \]</p>
-        <p>The values have settled by the fourth step, so the root is \(1.324718\) to six decimals — a value beyond the reach of simple factoring, yet found in four steps of arithmetic. The Intermediate Value Theorem certified that the root exists; Newton's method located it. <span class="qed"></span></p>
+        <p>The values have settled by the fourth step, so the root is \(1.324718\) to six decimals — a value beyond the reach of simple factoring, yet found in four steps of arithmetic. The Intermediate Value Theorem certified that the root exists; Newton’s method located it. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -83,7 +88,7 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Newton's method is fast but not foolproof. It requires \(f'(x_{n}) \ne 0\) at every step; a guess landing where the tangent is horizontal has nowhere to go. More subtly, the method is only <em>locally</em> reliable: started too far from a root, or near a point where the curve turns the wrong way, the iterates can overshoot, wander off to infinity, or fall into a repeating cycle that never converges. The concavity of §5.6 is a reliable guide: on an arc where \(f''\) keeps one sign and \(f' \ne 0\), a guess started on the side where \(f\) and \(f''\) agree in sign closes in steadily, while a poorly placed start can be thrown clear. In practice a rough sketch to seed the first guess is worth more than any number of blind iterations.</p>
+      <p>Newton’s method is fast but not foolproof. It requires \(f'(x_{n}) \ne 0\) at every step; a guess landing where the tangent is horizontal has nowhere to go. More subtly, the method is only <em>locally</em> reliable: started too far from a root, or near a point where the curve turns the wrong way, the iterates can overshoot, wander off to infinity, or fall into a repeating cycle that never converges. The concavity of §5.6 is a reliable guide: on an arc where \(f''\) keeps one sign and \(f' \ne 0\), a guess started on the side where \(f\) and \(f''\) agree in sign closes in steadily, while a poorly placed start can be thrown clear. In practice a rough sketch to seed the first guess is worth more than any number of blind iterations.</p>
     </div>
   </section>
 
@@ -92,10 +97,10 @@
   <!-- expansion:summary — chapter-level 4-strand summary (final section of Chapter 5), per CONTENT_SPEC §4 -->
   <p>Chapter 5 set out to turn the derivative from an object of study into an instrument, and it did so along four strands.</p>
   <ul>
-    <li><strong>Local tools.</strong> Implicit differentiation freed the derivative from explicit formulas, differentiating equations and inverse relations directly (§5.1); related rates ran the same move with time as the variable, converting one known rate into another (§5.2); and linear approximation read the derivative as the function's best straight-line stand-in, with differentials propagating small errors (§5.3).</li>
-    <li><strong>Extremes and optimization.</strong> Chapter 4's Extreme Value Theorem guaranteed absolute extrema on closed intervals, and Fermat's theorem narrowed interior extrema to critical numbers; the Closed Interval Method checked critical numbers and endpoints, and the First and Second Derivative Tests (§5.4, §5.6) classified the local extrema at critical numbers; and optimization applied the whole machinery to quantities worth making largest or smallest (§5.5).</li>
-    <li><strong>Shape and indeterminate limits.</strong> Concavity and inflection completed the reading of a graph (§5.6); L'Hôpital's rule, powered by a generalized Mean Value Theorem, resolved the indeterminate limits that govern behaviour at infinity (§5.7); and curve sketching gathered every feature into one disciplined procedure (§5.8).</li>
-    <li><strong>Numerical root-finding.</strong> Newton's method turned the tangent line into an engine for solving \(f(x) = 0\), reaching roots no formula can express (§5.9).</li>
+    <li><strong>Local tools.</strong> Implicit differentiation freed the derivative from explicit formulas, differentiating equations and inverse relations directly (§5.1); related rates ran the same move with time as the variable, converting one known rate into another (§5.2); and linear approximation read the derivative as the function’s best straight-line stand-in, with differentials propagating small errors (§5.3).</li>
+    <li><strong>Extremes and optimization.</strong> Chapter 4’s Extreme Value Theorem guaranteed absolute extrema on closed intervals, and Fermat’s theorem narrowed interior extrema to critical numbers; the Closed Interval Method checked critical numbers and endpoints, and the First and Second Derivative Tests (§5.4, §5.6) classified the local extrema at critical numbers; and optimization applied the whole machinery to quantities worth making largest or smallest (§5.5).</li>
+    <li><strong>Shape and indeterminate limits.</strong> Concavity and inflection completed the reading of a graph (§5.6); L’Hôpital’s rule, powered by a generalized Mean Value Theorem, resolved the indeterminate limits that govern behaviour at infinity (§5.7); and curve sketching gathered every feature into one disciplined procedure (§5.8).</li>
+    <li><strong>Numerical root-finding.</strong> Newton’s method turned the tangent line into an engine for solving \(f(x) = 0\), reaching roots no formula can express (§5.9).</li>
   </ul>
   <p>Underneath all four runs a single idea: the derivative, a statement about one instant, controls the behaviour of a function across whole intervals — its rise and fall, its extremes, its bends, its roots. The next chapter reverses the direction of travel. Having spent three chapters taking functions apart with the derivative, it asks the opposite question — how to build a function up by accumulation — and finds, in the Fundamental Theorem of Calculus, that the two operations are inverse to one another.</p>
 

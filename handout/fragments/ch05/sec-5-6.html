@@ -9,7 +9,7 @@
      Ch14 Hessian (§C.4). Second-derivative test proved from the limit definition of f''(c) (with f'(c)=0).
      Examples: 5.17 concavity/inflection of x⁴−4x³ (f''=12x(x−2), inflections 0 and 2); 5.18 second-derivative
      test on x³−3x²+1 (reused from §5.4: f''=6x−6, x=0 local max, x=2 local min), contrasting the two tests.
-     Counters handed to §5.7: Definition 5.7, Theorem 5.4, Example 5.19. Record: PLAN-ch05.md. -->
+     Counters handed to §5.7: Definition 5.7, Theorem 5.4, Example 5.20. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
@@ -32,7 +32,12 @@
     </div>
   </section>
 
-  <p>Since "\(f'\) increasing" is itself a statement the derivative can test — apply the sign of \((f')' = f''\) — concavity is read directly off the second derivative.</p>
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — concave up/down vs tangent lines (Def 5.5); registered in chapter5 FIGS as "concavity-tangents"] -->
+  <figure class="figure" data-fig="concavity-tangents">
+    <figcaption><span class="fig-no">Figure 5.8</span> Concavity read from tangent lines: a concave-up arc lies above every tangent and its slopes increase from left to right; a concave-down arc lies below its tangents, with decreasing slopes.</figcaption>
+  </figure>
+
+  <p>Since “\(f'\) increasing” is itself a statement the derivative can test — apply the sign of \((f')' = f''\) — concavity is read directly off the second derivative.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">5.2</span><span class="env-name">Concavity Test</span></p>
@@ -65,14 +70,14 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>At an inflection point \(c\) where \(f''(c)\) exists, \(f''(c)\) must equal \(0\). For if the concavity changes at \(c\), then \(f'\) switches from increasing to decreasing (or the reverse) there, so \(f'\) has a local extremum at \(c\); Fermat's theorem (Theorem 4.10) applied to \(f'\) then forces its derivative \(f''(c) = 0\). So the candidates for inflection are the points where \(f'' = 0\) or \(f''\) fails to exist. But \(f''(c) = 0\) alone does <em>not</em> make an inflection: the concavity must genuinely change sign there. The function \(f(x) = x^{4}\) has \(f''(0) = 0\), yet it is concave up on both sides of \(0\) — no inflection. Always confirm the change, never infer it from \(f'' = 0\).</p>
+      <p>At an inflection point \(c\) where \(f''(c)\) exists, \(f''(c)\) must equal \(0\). For if the concavity changes at \(c\), then \(f'\) switches from increasing to decreasing (or the reverse) there, so \(f'\) has a local extremum at \(c\); Fermat’s theorem (Theorem 4.10) applied to \(f'\) then forces its derivative \(f''(c) = 0\). So the candidates for inflection are the points where \(f'' = 0\) or \(f''\) fails to exist. But \(f''(c) = 0\) alone does <em>not</em> make an inflection: the concavity must genuinely change sign there. The function \(f(x) = x^{4}\) has \(f''(0) = 0\), yet it is concave up on both sides of \(0\) — no inflection. Always confirm the change, never infer it from \(f'' = 0\).</p>
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.17: concavity intervals and inflection points from the sign of f'' -->
+  <!-- expansion:example — Example 5.18: concavity intervals and inflection points from the sign of f'' -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.17</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.18</span></p>
       <div class="env-body">
         <p>Find the intervals of concavity and the inflection points of \(f(x) = x^{4} - 4x^{3}\).</p>
       </div>
@@ -84,8 +89,8 @@
         <p>\[ f''(x) = 12x^{2} - 24x = 12x(x - 2). \]</p>
         <p>The second derivative is zero at \(x = 0\) and \(x = 2\), the candidate inflection points. Its sign, from the factors \(12x\) and \(x - 2\), is</p>
         <p>\[ \begin{aligned}
-          &f''(x) > 0 \text{ on } (-\infty, 0), \qquad f''(x) < 0 \text{ on } (0, 2), \\
-          &f''(x) > 0 \text{ on } (2, \infty).
+          &f’’(x) > 0 \text{ on } (-\infty, 0), \qquad f’’(x) < 0 \text{ on } (0, 2), \\
+          &f’’(x) > 0 \text{ on } (2, \infty).
         \end{aligned} \]</p>
         <p>So \(f\) is concave up on \((-\infty, 0)\), concave down on \((0, 2)\), and concave up again on \((2, \infty)\). The concavity genuinely changes at both candidates, so both are inflection points: \((0, 0)\) and \((2, -16)\), using \(f(2) = 16 - 32 = -16\). The curve cups upward, flattens and rolls over near the origin, sags through the middle, and cups upward once more past \(x = 2\). <span class="qed"></span></p>
       </div>
@@ -125,10 +130,10 @@
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.18: second-derivative test on the §5.4 cubic, contrasting speed with the first-derivative test -->
+  <!-- expansion:example — Example 5.19: second-derivative test on the §5.4 cubic, contrasting speed with the first-derivative test -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.18</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.19</span></p>
       <div class="env-body">
         <p>Use the Second Derivative Test to classify the critical numbers of \(f(x) = x^{3} - 3x^{2} + 1\).</p>
       </div>
@@ -144,6 +149,6 @@
   </div>
 
   <!-- expansion:summary — close: shape toolkit complete; §5.7 adds L'Hôpital for the limits that govern behavior at infinity, before §5.8 synthesizes into a full sketch -->
-  <p>Rise and fall, peak and valley, cupping and inflection — the first two derivatives supply the entire vocabulary for the shape of a graph. Before assembling that vocabulary into a complete curve sketch, which §5.8 does, one gap remains: the behaviour of a graph far out and near its asymptotes is governed by limits that often arrive in indeterminate form. The next section supplies the tool for those — L'Hôpital's rule — after which every feature a sketch needs is computable.</p>
+  <p>Rise and fall, peak and valley, cupping and inflection — the first two derivatives supply the entire vocabulary for the shape of a graph. Before assembling that vocabulary into a complete curve sketch, which §5.8 does, one gap remains: the behaviour of a graph far out and near its asymptotes is governed by limits that often arrive in indeterminate form. The next section supplies the tool for those — L’Hôpital’s rule — after which every feature a sketch needs is computable.</p>
 
 </article>

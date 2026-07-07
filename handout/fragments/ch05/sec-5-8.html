@@ -2,14 +2,14 @@
      section-source: Stewart ET 9e §4.5 (Summary of Curve Sketching); cross-checked Thomas 14e §4.4,
      Rogawski 4e §4.6. Authored 2026-07-06 per PLAN-ch05 (manuscript-free; Codex ⑤). Counters continue
      from §5.7: §5.8 mints Definition 5.7 (asymptotes), Strategy 5.6 (curve-sketching checklist),
-     Examples 5.22–5.23. Cautions UNNUMBERED. Synthesis section: gathers domain/intercepts/symmetry/
+     Examples 5.24–5.25. Cautions UNNUMBERED (+1 M4 caution, 2026-07-07). Synthesis section: gathers domain/intercepts/symmetry/
      asymptotes (Ch1 infinite limits Def 1.11/1.12) + increase-decrease + extrema (§5.4) + concavity/
      inflection (§5.6) + growth comparisons (§5.7 ln x << x^p << e^x). Introduces slant asymptotes.
      Figures DEFERRED to the figure-opportunity gate (strong candidates: the two full sketches — but the
      analysis is self-sufficient to draw them). Wide derivative computations pre-broken with aligned.
-     Math: 5.22 f=x²/(x²−1): f'=−2x/(x²−1)², f''=2(3x²+1)/(x²−1)³, VA x=±1, HA y=1, max (0,0);
-     5.23 f=x+1/x: f'=1−1/x², f''=2/x³, VA x=0, slant y=x, max (−1,−2), min (1,2).
-     Counters handed to §5.9: Definition 5.8, Theorem 5.6, Strategy 5.7, Example 5.24. Record: PLAN-ch05.md. -->
+     Math: 5.24 f=x²/(x²−1): f'=−2x/(x²−1)², f''=2(3x²+1)/(x²−1)³, VA x=±1, HA y=1, max (0,0);
+     5.25 f=x+1/x: f'=1−1/x², f''=2/x³, VA x=0, slant y=x, max (−1,−2), min (1,2).
+     Counters handed to §5.9: Definition 5.8, Theorem 5.6, Strategy 5.7, Example 5.26. Record: PLAN-ch05.md. -->
 
 <article class="sec" lang="en">
 
@@ -33,7 +33,7 @@
     </div>
   </section>
 
-  <p>Vertical-asymptote candidates come from zeros of a denominator or a logarithm's argument approaching \(0\), confirmed by a one-sided infinite limit — a factor that cancels leaves a hole, not an asymptote; horizontal ones are read from the limit at infinity; a slant asymptote appears when a function grows linearly but is not itself a line — for a rational function, when the numerator's degree is exactly one more than the denominator's, so that dividing out leaves a linear part plus a remainder that decays.</p>
+  <p>Vertical-asymptote candidates come from zeros of a denominator or a logarithm’s argument approaching \(0\), confirmed by a one-sided infinite limit — a factor that cancels leaves a hole, not an asymptote; horizontal ones are read from the limit at infinity; a slant asymptote appears when a function grows linearly but is not itself a line — for a rational function, when the numerator’s degree is exactly one more than the denominator’s, so that dividing out leaves a linear part plus a remainder that decays.</p>
 
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">5.6</span><span class="env-name">Sketching a curve</span></p>
@@ -51,10 +51,10 @@
     </div>
   </section>
 
-  <!-- expansion:example — Example 5.22: a rational function with vertical and horizontal asymptotes -->
+  <!-- expansion:example — Example 5.24: a rational function with vertical and horizontal asymptotes -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.22</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.24</span></p>
       <div class="env-body">
         <p>Sketch the curve \(y = \dfrac{x^{2}}{x^{2} - 1}\).</p>
       </div>
@@ -68,7 +68,7 @@
         <p>\[ \lim_{x \to \pm\infty} \frac{x^{2}}{x^{2} - 1} = 1, \]</p>
         <p>so \(y = 1\) is a horizontal asymptote. <strong>First derivative.</strong> By the quotient rule,</p>
         <p>\[ \begin{aligned}
-          f'(x) &= \frac{2x(x^{2} - 1) - x^{2}(2x)}{(x^{2} - 1)^{2}} = \frac{-2x}{(x^{2} - 1)^{2}}.
+          f’(x) &= \frac{2x(x^{2} - 1) - x^{2}(2x)}{(x^{2} - 1)^{2}} = \frac{-2x}{(x^{2} - 1)^{2}}.
         \end{aligned} \]</p>
         <p>The denominator is positive wherever it is defined, so \(f'\) has the sign of \(-2x\): positive for \(x < 0\), negative for \(x > 0\). Thus \(f\) increases on \((-\infty, -1)\) and \((-1, 0)\), decreases on \((0, 1)\) and \((1, \infty)\), with a local maximum at \((0, 0)\). <strong>Second derivative.</strong> Differentiating again and simplifying,</p>
         <p>\[ f''(x) = \frac{2(3x^{2} + 1)}{(x^{2} - 1)^{3}}. \]</p>
@@ -78,10 +78,15 @@
     </section>
   </div>
 
-  <!-- expansion:example — Example 5.23: a slant asymptote -->
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — full sketch of x^2/(x^2-1) (Ex 5.24); registered in chapter5 FIGS as "rational-asymptotes"] -->
+  <figure class="figure" data-fig="rational-asymptotes">
+    <figcaption><span class="fig-no">Figure 5.9</span> The completed graph of \(y = x^{2}/(x^{2} - 1)\) from Example 5.24: vertical asymptotes \(x = \pm 1\), horizontal asymptote \(y = 1\), a central arch with its local maximum at the origin, and two outer branches — all read off the checklist.</figcaption>
+  </figure>
+
+  <!-- expansion:example — Example 5.25: a slant asymptote -->
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.23</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">5.25</span></p>
       <div class="env-body">
         <p>Sketch the curve \(y = x + \dfrac{1}{x}\).</p>
       </div>
@@ -100,7 +105,20 @@
     </section>
   </div>
 
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — slant asymptote of x + 1/x (Ex 5.25); registered in chapter5 FIGS as "slant-asymptote"] -->
+  <figure class="figure" data-fig="slant-asymptote">
+    <figcaption><span class="fig-no">Figure 5.10</span> The graph of \(y = x + 1/x\) from Example 5.25 hugs the slant asymptote \(y = x\) at both ends, with the \(y\)-axis as its vertical asymptote; the local maximum value \(-2\) sits below the local minimum value \(2\).</figcaption>
+  </figure>
+
+  <!-- expansion:caution [pass: enrichment] — asymptotes describe end behaviour, not forbidden territory (sin x / x crosses its horizontal asymptote infinitely often); adjudicated ADOPT in the M4 gap-check (Codex, 2026-07-07) -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>An asymptote describes where a curve is <em>heading</em>, not territory it may never touch. Both graphs in this section happen to stay on one side of their horizontal and slant asymptotes, which can plant a false rule: nothing prevents a curve from crossing such an asymptote — even infinitely often. The graph of \(y = (\sin x)/x\) has the horizontal asymptote \(y = 0\), yet it crosses that line at every nonzero multiple of \(\pi\). Only a <em>vertical</em> asymptote is uncrossable at the point itself, because the function has no value there. Approach is a statement about the far end of the graph; en route, anything is allowed.</p>
+    </div>
+  </section>
+
   <!-- expansion:summary — close: shape fully readable from the formula; §5.9 turns to the inverse problem — finding a root numerically -->
-  <p>With the checklist, a formula unfolds into a shape: no plotting, just the systematic reading of domain, limits, and two derivatives. Every question this chapter posed about a function's behaviour — its rates, its extremes, its bends, its ends — now has a computable answer, and they combine into a single picture. The final section turns the machinery around. Instead of describing a known function, it asks how to <em>find</em> something a function conceals — a solution of \(f(x) = 0\) that no formula surrenders — by putting the tangent line to work as an engine of approximation.</p>
+  <p>With the checklist, a formula unfolds into a shape: no plotting, just the systematic reading of domain, limits, and two derivatives. Every question this chapter posed about a function’s behaviour — its rates, its extremes, its bends, its ends — now has a computable answer, and they combine into a single picture. The final section turns the machinery around. Instead of describing a known function, it asks how to <em>find</em> something a function conceals — a solution of \(f(x) = 0\) that no formula surrenders — by putting the tangent line to work as an engine of approximation.</p>
 
 </article>
