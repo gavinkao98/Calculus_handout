@@ -88,9 +88,9 @@ Excluded (roadmap): antiderivatives (→Ch6), graphing-with-technology.
 | M2 圖機會（候選） | ✅ | 2026-07-06；13 候選 |
 | M2 圖繪製＋D1–D8 | ✅ | 2026-07-07；tier-1/2 共 11 張（Figure 5.1–5.11）；gate-1 **blocking=0, advisory=0**（自檢修 7 缺陷後送審）；視覺 gate-2 依頻率矩陣＝出版前抽樣 |
 | 數學 M gate-2（跨模型） | ✅ | 2026-07-07；Ch5 作抽樣層樣本章全章複核：**1 blocking [M7]**（M4 新增 caution 的 VA 絕對化陳述）→ 修＋scoped 回歸「解除、無新問題」→ **blocking=0**；紀錄 `ch05_math-gate2-audit.md` |
-| M3 散文 S·A·V＋難度 learner-sim（合一輪） | ⛔→⏳ | 2026-07-07 首發 6 agent（prose ×3＋sim ×3）全數撞 Claude session 額度牆（reset 12:40am）；**新 session 重跑即可**：prose-audit 三批（5-1~5-3／5-4~5-6／5-7~5-9，含 figcaption 與 M4 增補）＋learner-sim ×3 盲測（讀 built standalone），合併產 `REVIEW-ch05-prose-difficulty.html` 裁決稿 |
+| M3 散文 S·A·V＋難度 learner-sim（合一輪） | ✅ | 2026-07-08（新 session 重跑，分兩批避額度牆）；**blocking=0**：散文 gate-1 三組 0 blocking（36 tighten／14 opt／2 voice 全 advisory）＋難度盲測 ×3 全 **0 blocking／0 B 類違規**。難度曲線均值 §5.1→5.9＝2.7/3.0/3.2/3.7/3.2/3.3/**4.0(§5.7 尖峰)**/3.2/2.5，尖峰 4<Ch4 §4.2 的 4.5、全章<4 → 無弧線層異常。**1 客觀修復落地**：P1-12（§5.3 Leibniz 段「single symbol」caution 誤引 Remark 3.2→改「a caution in §2.2」＋同步修註解）＋scoped §5.3 回歸「0/0/0/0、無新問題」。彎撇號-as-prime 經隔離渲染證實 render-safe→另開衛生 chip；ch02 §2.2「we do not do in this book」被 Def 5.2 推翻→另開跨章 chip。合併裁決稿 `_audit/REVIEW-ch05-prose-difficulty.html`；S·A·V gate-2 依頻率矩陣＝非高風險章不跑 |
 | M4 Mode C gap-check（①②合一） | ✅ | 2026-07-07；偵察 Layer-1=0；Codex 裁決 **ADOPT 4**（Ex 5.14、Ex 5.22、§5.3 intuition、§5.8 caution）／DEFER 5；sympy 驗證＋scoped Mode B 過；報告 `_audit/REVIEW-ch05-modec-gapcheck.html`、imports `ch05_example-imports.md` |
-| M5 收尾（dashboard＋ROADMAP open-q） | ⏳ | |
+| M5 收尾（dashboard＋ROADMAP open-q） | ✅ | 2026-07-08；PIPELINE dashboard Ch5→「全閘完成（canon 首例）」、本 checklist M3/M5→✅、ROADMAP Ch5 弧線 entry 補 gates-complete＋M3 難度曲線一行＋Open questions 收（無懸而未決方向叉路） |
 
 ## Chapter opener — "By the end of this chapter you will be able to"
 

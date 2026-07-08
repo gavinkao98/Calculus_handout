@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch5 M3 散文＋難度合一輪 合併裁決稿（2026-07-08）</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+ body{font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;color:#1a1f2e;max-width:1040px;margin:0 auto;padding:2rem 1.2rem 4rem;line-height:1.7;font-size:15.5px}
+ h1{font-size:1.5rem;color:#16294e;border-bottom:3px solid #16294e;padding-bottom:.4rem}
+ h2{font-size:1.2rem;color:#16294e;margin-top:2.4rem;border-left:5px solid #16294e;padding-left:.55rem}
+ h3{font-size:1.03rem;color:#22345c;margin-top:1.5rem}
+ table{border-collapse:collapse;width:100%;margin:.8rem 0;font-size:.9em}
+ th{background:#16294e;color:#fff;text-align:left;padding:.4rem .5rem}
+ td{border:1px solid #d9dee6;padding:.38rem .5rem;vertical-align:top}
+ tr:nth-child(even) td{background:#f4f6f9}
+ code{background:#eef1f6;border:1px solid #d9dee6;border-radius:4px;padding:0 .3em;font-size:.86em}
+ .ok{color:#1c7a4c;font-weight:700}.no{color:#a12a2a;font-weight:700}.warn{color:#b26a00;font-weight:700}
+ .meta{color:#5c6470;font-size:.9em}
+ .card{background:#f4f6f9;border:1px solid #d9dee6;border-left:5px solid #1d5fa6;border-radius:6px;padding:.85rem 1.05rem;margin:.9rem 0}
+ .verdict{background:#eaf5ee;border-left-color:#1c7a4c}
+ .applied{background:#fff6e9;border-left-color:#b26a00}
+ .tag{display:inline-block;font-size:.74em;font-weight:700;border-radius:4px;padding:.05em .45em;margin-right:.3em;vertical-align:middle}
+ .t-blk{background:#a12a2a;color:#fff}.t-tgt{background:#1d5fa6;color:#fff}.t-opt{background:#6c757d;color:#fff}.t-voi{background:#7a4fb0;color:#fff}.t-app{background:#b26a00;color:#fff}
+ del{color:#a12a2a;text-decoration:line-through}ins{color:#1c7a4c;text-decoration:none;background:#eaf5ee}
+ .mini{font-size:.82em;color:#5c6470}
+ .curve{font-variant-numeric:tabular-nums;letter-spacing:.02em}
+ .peak{background:#fdecec;font-weight:700}
+</style>
+</head>
+<body>
+<h1>Chapter 5 — M3「散文 S·A·V ＋ 難度 learner-sim」合一輪：合併裁決稿</h1>
+<p class="meta">2026-07-08 ・ 產線 canon 章 5-milestone 之 M3（<code>handout/PIPELINE.md</code>）・ gate-1（Claude subagent，免費）：散文閘 <code>handout-prose-audit</code> ×3（各審三節）＋難度閘盲測 <code>learner-sim</code> ×3（讀 <code>chapter5-print-standalone.html</code> 全章）・ 契約：<code>_audit/PROSE-AUDIT-RUBRIC.md</code>（三維 A 易懂／B 流暢／C 語意聲音）＋<code>CONTENT_SPEC.md</code> §16（難度預算／§16.2 基線讀者 A/B 類先備）。稽核全唯讀、propose-not-act。</p>
+
+<div class="card verdict">
+<b>M3 收斂結論：blocking = 0，散文閘＋難度閘（gate-1）通過。</b>
+<ul style="margin:.5rem 0 0">
+<li><b>散文閘：</b>三組（P1 §5.1–5.3／P2 §5.4–5.6／P3 §5.7–5.9）合計 <b>0 blocking</b>／36 tighten／14 optional／2 voice。全部 advisory，逐條裁決、不強制歸零。</li>
+<li><b>難度閘（3 份盲測）：</b>三份 <b>0 blocking／0 B 類先備違規</b>；slowdown 9／9／8。全章難度均值 ≈ <b>3.2/5</b>，尖峰 <b>§5.7 = 4.0/5</b>（三份一致）。</li>
+<li><b>與基線比較：</b>尖峰 §5.7 = 4 &lt; Ch4 尖峰 §4.2 = 4.5，全章 &lt; 4 → <span class="ok">無弧線層異常</span>，不需回 ROADMAP 深度重議（<code>SPEC §16.3</code>）。</li>
+<li><b>本輪落地內容修復：</b>僅 <b>1 筆</b>（P1-12 客觀引用錯誤，見「裁決與落地」）；其餘 advisory 留待使用者逐條裁。</li>
+</ul>
+</div>
+
+<h2>A. 頂部摘要表：逐節 散文findings × 三份 sim 難度</h2>
+<table>
+<tr>
+ <th rowspan="2">§</th><th colspan="4">散文閘 gate-1（findings 數）</th><th colspan="4">難度閘（3 份盲測難度 1–5）</th><th rowspan="2">總判定（s1／s2／s3）</th>
+</tr>
+<tr><th>Blk</th><th>Tighten</th><th>Opt</th><th>Voice</th><th>s1</th><th>s2</th><th>s3</th><th>均值</th></tr>
+<tr><td>5.1</td><td>0</td><td>2</td><td>2</td><td>0</td><td>2</td><td>3</td><td>3</td><td>2.7</td><td>ok／ok／effortful</td></tr>
+<tr><td>5.2</td><td>0</td><td>1</td><td>2</td><td>0</td><td>3</td><td>3</td><td>3</td><td>3.0</td><td>ok／ok／ok</td></tr>
+<tr><td>5.3</td><td>0</td><td>2<span class="mini"> (含 P1-12★)</span></td><td>0</td><td>1</td><td>3</td><td>3.5</td><td>3</td><td>3.2</td><td>ok／effortful／effortful</td></tr>
+<tr><td>5.4</td><td>0</td><td>4</td><td>3</td><td>0</td><td>3.5</td><td>4</td><td>3.5</td><td>3.7</td><td>effortful ×3</td></tr>
+<tr><td>5.5</td><td>0</td><td>4</td><td>1</td><td>1</td><td>3</td><td>3</td><td>3.5</td><td>3.2</td><td>ok／ok／effortful</td></tr>
+<tr><td>5.6</td><td>0</td><td>6</td><td>0</td><td>0</td><td>3</td><td>3.5</td><td>3.5</td><td>3.3</td><td>ok／effortful／effortful</td></tr>
+<tr class="peak"><td>5.7</td><td>0</td><td>4</td><td>3</td><td>0</td><td>4</td><td>4</td><td>4</td><td>4.0</td><td>effortful ×3（尖峰）</td></tr>
+<tr><td>5.8</td><td>0</td><td>3</td><td>2</td><td>0</td><td>3</td><td>3</td><td>3.5</td><td>3.2</td><td>ok／ok／effortful</td></tr>
+<tr><td>5.9</td><td>0</td><td>6</td><td>1</td><td>0</td><td>2</td><td>2.5</td><td>3</td><td>2.5</td><td>ok ×3</td></tr>
+<tr style="font-weight:700"><td>計</td><td class="ok">0</td><td>32*</td><td>14</td><td>2</td><td colspan="3">blocking 0／0／0 · slowdown 9／9／8</td><td>≈3.2</td><td>—</td></tr>
+</table>
+<p class="mini">* 散文 tighten 逐節相加 = 32（P1:9＋P2:14＋P3:13 − 反覆計於節內者的呈現差異；逐條清單見 §D，以編號為準）。P1-12★＝本輪唯一落地修復。難度「均值」為三份算術平均，僅供曲線比對，非正式評分。</p>
+
+<h2>B. 難度曲線 vs 前四章基線</h2>
+<table>
+<tr><th>來源</th><th>§5.1</th><th>§5.2</th><th>§5.3</th><th>§5.4</th><th>§5.5</th><th>§5.6</th><th>§5.7</th><th>§5.8</th><th>§5.9</th></tr>
+<tr><td>Sim 1</td><td class="curve">2</td><td>3</td><td>3</td><td>3.5</td><td>3</td><td>3</td><td class="peak">4</td><td>3</td><td>2</td></tr>
+<tr><td>Sim 2</td><td class="curve">3</td><td>3</td><td>3.5</td><td class="peak">4</td><td>3</td><td>3.5</td><td class="peak">4</td><td>3</td><td>2.5</td></tr>
+<tr><td>Sim 3</td><td class="curve">3</td><td>3</td><td>3</td><td>3.5</td><td>3.5</td><td>3.5</td><td class="peak">4</td><td>3.5</td><td>3</td></tr>
+<tr style="font-weight:700"><td>均值</td><td>2.7</td><td>3.0</td><td>3.2</td><td>3.7</td><td>3.2</td><td>3.3</td><td class="peak">4.0</td><td>3.2</td><td>2.5</td></tr>
+</table>
+<div class="card">
+<b>基線（記錄於 <code>_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html</code>）：</b>Ch1–3 ≈ 3/5、Ch4 = 4/5、尖峰 §4.2 = 4.5。<br>
+<b>Ch5 定位：</b>三份一致 <b>尖峰 §5.7 = 4</b>，未觸及 §4.2 的 4.5 天花板；全章均值 ≈ 3.2。結構＝「應用為主（§5.1/5.2/5.5/5.8/5.9 落 2.5–3.2）＋四處帶證明的深度凸起（§5.4/5.6/5.7 與 §5.3 概念層）」。<b>與 Ch4 相比偏低</b>（Ch4 整章壓在 4；Ch5 只有 §5.7 到 4），<b>與 Ch1–3 持平略偏高</b>（理論節高約半級，仍在 persona「effortful 但自力走得完」預算內）。→ 這是「重用既有機器」的應用章該有的曲線，<b>符合 roadmap 對 Ch5「標準嚴謹」的深度裁定</b>，無異常。
+</div>
+
+<h2>C. 裁決與落地（易懂性單一錨）</h2>
+
+<div class="card applied">
+<p><span class="tag t-app">APPLIED</span><b>P1-12 ｜ [U4 客觀缺陷] §5.3 Leibniz-notation 增補段：Remark 3.2 回指錯掛 → §2.2</b></p>
+<p><b>問題：</b>M4 增補的 Leibniz 段寫「當 \(dy/dx\) 首次出現時，<b>Remark 3.2</b> 謹慎地稱它為單一符號——suggestive 但非分數」。但佐證（讀 fragment 源）確認：「single object／deliberately suggestive／one indivisible name」實際出自 <b>§2.2 的無編號 Caution</b>；而 <b>Remark 3.2（§3.2「The Leibniz form」）</b>講的是 chain-rule cancellation 為助記非證明——正是同段<em>後</em>一句已正確引用 Theorem 3.3 所回收的內容。翻回 Remark 3.2 查證的自學讀者會找不到被引述的說法（客觀引用錯誤）。</p>
+<p><b>修法（fragment <code>sec-5-3.html</code>，散文＋註解兩處）：</b></p>
+<p style="margin-left:1rem">散文：When \(dy/dx\) first appeared, <del>Remark 3.2</del> <ins>a caution in §2.2</ins> was careful to call it a single symbol — suggestive, but not a fraction.</p>
+<p style="margin-left:1rem" class="mini">註解：<del>recalls Remark 3.2's "single symbol" caution</del> → <ins>recalls the §2.2 caution that names dy/dx a single symbol</ins></p>
+<p><b>為何屬「怎麼說」不動「教什麼」：</b>僅更正引用指標，未改該段教的內容（Def 5.2 使 \(dy/dx\) 成誠實比值）、未動數學。後句仍以 Theorem 3.3 正確交代 chain-rule cancellation，故 Remark 3.2 的正確角色不需另補（保持外科手術式最小改動）。</p>
+<p><b>驗證：</b>build ch05 ✓／linebreak 0/0 ✓／quote_lint ch05 = 0 ✓／doc_lint clean ✓／修正字串已進 built standalone ✓。</p>
+<p><b>回歸（scoped §5.3 prose-audit，獨立複核）：</b><span id="regress" class="ok">通過 — VERDICT 0 blocking / 0 tighten / 0 optional / 0 voice</span>。獨立稽核員自行佐證 referent（<code>ch02/sec-2-2.html</code> 的無編號 Caution，內容「single object … deliberately suggestive … not a fraction」與回指措辭相符；全書 Caution 不編號，故 descriptive 引法「a caution in §2.2」為唯一正確且最利首讀的引法），並確認：(1) 替換未動句構、主謂一致、指代清楚、無新 U/F/S/A/V 缺陷；(2)「§」到 §5.3 已反覆出現、非新摩擦，不定冠詞「a」契合「讀者未持編號把手」情境，idiomatic；(3) 段落邏輯連貫未破壞、<b>反更精確</b>——\(dy/dx\) 確在 §2.2 首度作為 Leibniz 記號出現，故「first appeared … §2.2」時序一致（改前指 §3.2 反不合「first appeared」）；兩個回指（此句 → §2.2、後句 chain-rule cancellation → Thm 3.3）現各歸其位、不再串線。<b>確認修改無新問題、卡點無（本就無）、無新卡點。</b>
+</div>
+
+<div class="card">
+<p><b>連帶發現（跨章，非本輪 M3 scope → 已開背景任務卡）：</b>ch02 §2.2 的該 Caution 末句「until those parts are defined on their own <b>(which we do not do in this book)</b>」已被 Ch5 <b>Definition 5.2</b>（differentials 給 \(dy,dx\) 獨立定義）推翻。此為跨章 seam 矛盾，需 ch02 上游把括號改為 forward 指涉（例：「— which Chapter 5 will do —」）。已建 task chip，不在本輪動。</p>
+</div>
+
+<h3>Advisory 處置：不強制歸零，交使用者逐條裁</h3>
+<p>36 tighten／14 optional／2 voice 全數 advisory（清單見 §D）。以下為<strong>最值得優先裁決</strong>者——依「三份 sim 交集強度」與「客觀誤述」排序：</p>
+<table>
+<tr><th>優先</th><th>項</th><th>類</th><th>理由（為何優先）</th></tr>
+<tr><td>★★★</td><td><b>§5.8 Ex 5.24 略過的 \(f''\) 計算</b>（sim 交集 3/3；散文側對應可補一行過渡）</td><td>難度 slowdown</td><td><b>三份盲測全部主動指認</b>為卡點：「Differentiating again and simplifying」把 \(f'=\frac{-2x}{(x^2-1)^2}\) 到 \(f''=\frac{2(3x^2+1)}{(x^2-1)^3}\) 的商法則＋約分整段略過。兩份 sim 主動建議補一行。<b>建議：</b>補一句中間步或明講「此處略去代數，讀者可用商法則自驗」。屬「怎麼說」（同例同數學、只多顯一步）。</td></tr>
+<tr><td>★★</td><td>分數次方／含根式代數的中間步壓縮（§5.4 Ex 5.11、§5.5 Ex 5.17，另 §5.4 Ex 5.14）</td><td>難度 slowdown</td><td>Sim 1 收束觀察點名：「若要再降一格難度，最省力槓桿＝把這幾處代數的中間步補一兩行；證明段維持現狀即可」。屬全章一致的密度政策問題（≥3 個 locus），宜一次裁。</td></tr>
+<tr><td>★★</td><td>P3-5 §5.7 Caution 首戒的涵蓋不全（原文「not indeterminate — where numerator and denominator have honest finite limits」漏掉 Ex 5.22 的 \((-\infty)/0^+\) 型）</td><td>F3 誤述</td><td>與本節 Ex 5.22 自身反例對照會卡；改「for instance where…」即足。近客觀。</td></tr>
+<tr><td>★★</td><td>P3-12 §5.8 M4 Caution「stay on one side」對 Ex 5.24 不成立（中央拱在 HA 下、外支在上）</td><td>F3 誤述</td><td>真命題是「兩圖恰好都不<em>穿越</em>其 HA/slant」；此句是 caution 要拆的 false rule 的鋪墊，對照圖會先絆。改「never cross」。近客觀。</td></tr>
+<tr><td>★</td><td>P2-1 §5.4「the first／the second」順序歧義（vertical/horizontal 可能對調）</td><td>F3 歧義</td><td>就近 display 順序（x=0, 3/2）解得對，但與前段討論順序相反；改「at x=0…vertical, at x=3/2…horizontal」消歧。</td></tr>
+<tr><td>★</td><td>英式拼法系統性殘留（behaviour/neighbourhood/modelling/manoeuvre/honoured/centimetres/counter-clockwise）</td><td>F5／§15</td><td>散見 §5.1/5.2/5.3/5.4/5.5/5.6/5.8/5.9；<code>§15</code> 定美式、且 ch01/02/04 canon 為美式。<b>建議整章一次 sweep</b>（純一致性、零理解風險）。</td></tr>
+</table>
+<p class="mini">S·A·V gate-2（Codex prose 跨模型複核）：依 <code>PIPELINE.md</code> 頻率矩陣＝高風險章或出版前抽樣；Ch5 屬標準嚴謹應用章、非高風險，<b>本輪不跑</b>（一行記錄；未來出版前抽樣批次可納）。</p>
+
+<h2>D. 散文閘 gate-1 逐條 findings（穩定編號）</h2>
+<p class="mini">格式：<code>[類別] [維度] §節:locus — 議題 → 建議</code>。維度：U＝易懂性、F＝流暢性、S/A/V＝語意/高度/聲音。全部 advisory（blocking = 0）。</p>
+
+<h3>P1 組（§5.1–5.3；14 筆）</h3>
+<table>
+<tr><th>ID</th><th>類</th><th>維</th><th>§:locus</th><th>議題 → 建議</th></tr>
+<tr><td>P1-1</td><td>Tighten</td><td>F5</td><td>5.1 lead/Ex5.3</td><td>英式拼法 behaviour／manoeuvre → behavior／maneuver（§15 美式）</td></tr>
+<tr><td>P1-2</td><td>Optional</td><td>S3</td><td>5.1 lead</td><td>「That machinery is now an instrument.」踩刪除測試（下句已更具體）→【刪】併句</td></tr>
+<tr><td>P1-3</td><td>Tighten</td><td>F3</td><td>5.1 Ex5.1</td><td>「as implicit differentiation usually delivers」省略式主詞斷裂 → 「the usual output of implicit differentiation」</td></tr>
+<tr><td>P1-4</td><td>Tighten</td><td>F5</td><td>5.1 Ex5.1</td><td>「squares with plain geometry」中 squares 與平方技術義相撞 → 「agrees with」</td></tr>
+<tr><td>P1-5</td><td>Tighten</td><td>F4</td><td>5.1 Ex5.3</td><td>收尾句四層巢狀＋語義發虛（滿足關係式者是點非 defining function）→ 切兩句、借 Ch3 §3.3 措辭</td></tr>
+<tr><td>P1-6</td><td>Optional</td><td>F5</td><td>5.1 Caution2</td><td>「The rule of thumb:」無動詞導語片段 → 「As a rule of thumb, …」</td></tr>
+<tr><td>P1-7</td><td>Tighten</td><td>F3</td><td>5.1 節末</td><td>「turns known rates into unknown ones」方向倒置 → 「turns rates you know into the rate you want」</td></tr>
+<tr><td>P1-8</td><td>Tighten</td><td>F5</td><td>5.2 Ex5.6/機制段</td><td>centimetres → centimeters；「driving seat」→「driver's seat」</td></tr>
+<tr><td>P1-9</td><td>Optional</td><td>F3</td><td>5.2 機制段</td><td>代名詞密度「a term in it produces its rate」→「differentiating any term built from it produces that quantity's rate」</td></tr>
+<tr><td>P1-10</td><td>Optional</td><td>F1</td><td>5.2 opener</td><td>近義重述（很可能刻意教學結晶，§3 保護）→ 維持或砍第三句尾「in the same way」</td></tr>
+<tr><td>P1-11</td><td>Tighten</td><td>F3</td><td>5.2 節末</td><td>同 P1-7 方向倒置構式 →「turning a known rate into the wanted one」</td></tr>
+<tr style="background:#fff6e9"><td><b>P1-12★</b></td><td>Tighten→<b>APPLIED</b></td><td>U4</td><td>5.3 Leibniz段</td><td>Remark 3.2 回指錯掛 → §2.2（見 §C，已落地）</td></tr>
+<tr><td>P1-13</td><td>Tighten</td><td>F5</td><td>5.3 Ex5.10/Caution</td><td>millimetre／neighbourhood → millimeter／neighborhood</td></tr>
+<tr><td>P1-14</td><td>Optional</td><td>V1</td><td>5.3 Caution</td><td>V1 寬報：「poor」停在定性；補實際數字 \(L(9)=3.25\) vs 真值 3 收攏圖文（機會型）</td></tr>
+</table>
+
+<h3>P2 組（§5.4–5.6；19 筆）</h3>
+<table>
+<tr><th>ID</th><th>類</th><th>維</th><th>§:locus</th><th>議題 → 建議</th></tr>
+<tr><td>P2-1</td><td>Tighten</td><td>F3</td><td>5.4 Ex5.11</td><td>「the first／the second」先行詞順序歧義（vertical/horizontal 可對調）→ 明寫 x=0／x=3/2（見 §C 優先表）</td></tr>
+<tr><td>P2-2</td><td>Tighten</td><td>F4</td><td>5.4 Thm5.1 proof</td><td>一句扛五件事 → 冒號處切句</td></tr>
+<tr><td>P2-3</td><td>Tighten</td><td>F5</td><td>5.4 L113</td><td>黑板縮寫「max／min」→ maximum／minimum</td></tr>
+<tr><td>P2-4</td><td>Tighten</td><td>F5</td><td>5.4 L30/137/179</td><td>neighbourhood／neighbours／modelling → 美式</td></tr>
+<tr><td>P2-5</td><td>Optional</td><td>F3</td><td>5.4 Ex5.11</td><td>嵌套疑問子句作主語＋雙 is 易 garden-path → 「Which of them — if either — …」</td></tr>
+<tr><td>P2-6</td><td>Optional</td><td>F3</td><td>5.4 L77</td><td>值/位置混同 → 「attained either at an interior critical number or at an endpoint」</td></tr>
+<tr><td>P2-7</td><td>Optional</td><td>U3</td><td>5.4 Thm5.1 proof</td><td>「為何在 c 需連續」橋被壓成一 clause → 展開一句</td></tr>
+<tr><td>P2-8</td><td>Tighten</td><td>U3</td><td>5.5 Ex5.15</td><td>可行域 \(0\le x\le1200\) 憑空出現未示範推導 → 補「both x,y nonnegative ⇒」半句</td></tr>
+<tr><td>P2-9</td><td>Tighten</td><td>F3</td><td>5.5 Ex5.15</td><td>「across the river side」歧義 → 「the side parallel to the river」</td></tr>
+<tr><td>P2-10</td><td>Tighten</td><td>F5/排版</td><td>5.5 Ex5.17 (L106)</td><td>display 內 U+2019 彎撇號當 prime（<code>A'(x)</code>）→ ASCII。<b>已驗證 MathJax v3 渲染正常、非讀者可見缺陷</b>；純衛生，已另開 chip</td></tr>
+<tr><td>P2-11</td><td>Tighten</td><td>F5</td><td>5.5 L19/28/122</td><td>modelling／behaviour → 美式</td></tr>
+<tr><td>P2-12</td><td>Optional</td><td>F3</td><td>5.5 Fig5.7 cap</td><td>「upper corner」→「upper-right corner」（與解文一致）</td></tr>
+<tr><td>P2-13</td><td>Voice</td><td>V1</td><td>5.5 L19→21</td><td>Strategy box 前缺 §3 式承接半句 → 加「The following routine organizes the modelling.」（advisory）</td></tr>
+<tr><td>P2-14</td><td>Tighten</td><td>F5</td><td>5.6 L25</td><td>「you」不在 §3 允許情境 → 「we move right」／「moving from left to right」</td></tr>
+<tr><td>P2-15</td><td>Tighten</td><td>F3</td><td>5.6 Def5.6</td><td>逗號夾注把承重連續性 hypothesis 讀成非限定補充 → 改限定關係子句</td></tr>
+<tr><td>P2-16</td><td>Tighten</td><td>F5/排版</td><td>5.6 Ex5.18 (L92-93)</td><td>display 內 U+2019 <code>f''</code> ×3 → ASCII（同 P2-10，render-safe、衛生）</td></tr>
+<tr><td>P2-17</td><td>Tighten</td><td>F5</td><td>5.6 L102</td><td>黑板縮寫「max or min」→ maximum／minimum</td></tr>
+<tr><td>P2-18</td><td>Tighten</td><td>F3</td><td>5.6 Caution</td><td>「abandon it」最近先行詞＝critical number，誤讀為「放棄該臨界點」→ 「the test has nothing more to say; return to the FDT…」</td></tr>
+<tr><td>P2-19</td><td>Tighten</td><td>F5</td><td>5.6 L25/152</td><td>counter-clockwise → counterclockwise；behaviour → behavior</td></tr>
+</table>
+
+<h3>P3 組（§5.7–5.9；19 筆）</h3>
+<table>
+<tr><th>ID</th><th>類</th><th>維</th><th>§:locus</th><th>議題 → 建議</th></tr>
+<tr><td>P3-1</td><td>Optional</td><td>F3</td><td>5.7 opener</td><td>「These are the indeterminate forms」定冠詞暗示窮舉（與 Strategy 5.5 五型相牴）→ 「the two basic」</td></tr>
+<tr><td>P3-2</td><td>Tighten</td><td>F1</td><td>5.7 Thm5.4 proof</td><td>display 已斷言 h(a)=h(b)，句尾「so h(a)=h(b)」零新資訊 →【刪】</td></tr>
+<tr><td>P3-3</td><td>Optional</td><td>U1/V1</td><td>5.7 Thm5.5 前</td><td>Theorem 5.5 冷開場無承接 → 加一句橋接（動機存在於節首，屬輕微）</td></tr>
+<tr><td>P3-4</td><td>Tighten</td><td>U4</td><td>5.7 Thm5.5</td><td>\(\ast/\infty\) 星號全書首用無 gloss（下游三處倚賴）→ 首用補「the numerator may do anything」</td></tr>
+<tr><td>P3-5</td><td>Tighten</td><td>F3</td><td>5.7 Caution</td><td>首戒同位語涵蓋不全（漏 Ex 5.22 的 \((-\infty)/0^+\)）→ 「for instance where…」（見 §C 優先表）</td></tr>
+<tr><td>P3-6</td><td>Optional</td><td>U4</td><td>5.7 Ex5.21</td><td>\(\lceil p\rceil\) ceiling 記號全書唯一、未 gloss → 「— p rounded up to a whole number」</td></tr>
+<tr><td>P3-7</td><td>Tighten</td><td>F3</td><td>5.7 Ex5.22</td><td>「wrong magnitude」不成立（真值 \(-\infty\) 與誤算 \(+\infty\) 大小同、錯的是正負）→ 「a wrong value but the wrong sign」</td></tr>
+<tr><td>P3-8</td><td>Tighten</td><td>F4</td><td>5.8 Def5.7 後</td><td>單句 ~70 字＋garden-path（「zeros of a logarithm's argument」誤掛）→ 切三句</td></tr>
+<tr><td>P3-9</td><td>Tighten</td><td>F5</td><td>5.8 L49/122</td><td>honoured／behaviour → honored／behavior</td></tr>
+<tr><td>P3-10</td><td>Optional</td><td>U3</td><td>5.8 Ex5.24</td><td>Asymptotes 步未給哪側 \(\pm\infty\)（符號判定留讀者）→ 補「negative between, positive outside」</td></tr>
+<tr><td>P3-11</td><td>Optional</td><td>U3</td><td>5.8 Ex5.25</td><td>「no horizontal asymptote」未附本檢查表正在示範的一行檢查 → 補「\(f\to\pm\infty\)」</td></tr>
+<tr><td>P3-12</td><td>Tighten</td><td>F3</td><td>5.8 M4 Caution</td><td>「stay on one side」對 Ex 5.24 不成立 → 「never cross」（見 §C 優先表）</td></tr>
+<tr><td>P3-13</td><td>Optional</td><td>F3</td><td>5.9 Strategy5.7</td><td>「no finite intercept」誤 hedge（水平線根本不交軸）→ 「never meets the axis」</td></tr>
+<tr><td>P3-14</td><td>Tighten</td><td>F3</td><td>5.9 Ex5.26</td><td>「the number it divides into 2」需拆 divides-into 慣用語 → 「2 divided by the guess」</td></tr>
+<tr><td>P3-15</td><td>Tighten</td><td>U4</td><td>5.9 Ex5.26</td><td>「simple root」術語全書首用未 gloss → 「— one where \(f'(r)\ne0\)」</td></tr>
+<tr><td>P3-16</td><td>Tighten</td><td>F1</td><td>5.9 Ex5.26</td><td>「which turns out to be Newton's method…」把三行前推導當新資訊 → 「here rediscovered as」</td></tr>
+<tr><td>P3-17</td><td>Tighten</td><td>U3</td><td>5.9 Ex5.27</td><td>「a glance shows it is near 1.3」無從重建且隨後未用（起點取 1.5）→【刪】或落地為 \(f(1.3)\approx-0.10\)</td></tr>
+<tr><td>P3-18</td><td>Tighten</td><td>F5</td><td>5.9 L102/105</td><td>behaviour → behavior ×2</td></tr>
+<tr><td>P3-19</td><td>Tighten</td><td>F3</td><td>5.9 summary</td><td>懸垂分詞「Having spent three chapters… it asks」→ 「After three chapters spent…」</td></tr>
+</table>
+<p class="mini">P3 各節乾淨維度：§5.7 U2/U3/U5/F2/F4/F5/S/A/V clean；§5.8 U1/U2/U4/U5/F1/F2/S/A/V clean；§5.9 U1/U2/U5/F2/F4/S/A/V clean。P1/P2 同理各節多數維度 clean（詳原始輸出）。三組一致記錄：Ch5 散文 substance 顯著高於錨組正面 bar，無 AI-default 空句，S/A/V 近全綠。</p>
+
+<h2>E. 難度閘：三份盲測 learner-sim 全文轉錄</h2>
+<p class="mini">persona＝<code>SPEC §16.2</code> 基線讀者（108 數A、無微積分先備、英文 L2、已讀 Ch1–4 吸收不完美、自學無師）。盲測：呼叫端未預告任何難點、未提及 M4 增補位置。三份獨立實例。</p>
+
+<h3>三份交集（≥2 份共同指認的 slowdown）</h3>
+<table>
+<tr><th>locus</th><th>slowdown 內容</th><th>s1</th><th>s2</th><th>s3</th></tr>
+<tr class="peak"><td>§5.7 Thm 5.4 proof</td><td><b>Generalized MVT 輔助函數 \(h\)「像從帽子變出」，端點相等要自行展開驗——三份皆稱全章最硬單步</b></td><td>✔</td><td>✔</td><td>✔</td></tr>
+<tr class="peak"><td>§5.8 Ex 5.24</td><td><b>「Differentiating again and simplifying」略過 \(f''\) 的商法則大計算（兩份主動建議補過渡）</b></td><td>✔</td><td>✔</td><td>✔</td></tr>
+<tr><td>§5.4 Thm 5.1 proof</td><td>FDT 證明對 \(f\) 與 \(-f\) 套單調性推論（需翻回 Cor 4.3）</td><td>✔</td><td>✔</td><td>✔</td></tr>
+<tr><td>§5.4 Ex 5.11</td><td>分數次方 \(x^{-2/5}\) 提公因式的代數要動筆驗</td><td>✔</td><td>✔</td><td>✔</td></tr>
+<tr><td>§5.5 Ex 5.17</td><td>半圓內接矩形 \(A'(x)\) 含根式乘積律通分</td><td>✔</td><td>✔</td><td>✔</td></tr>
+<tr><td>§5.6 Thm 5.3 proof</td><td>二階導判定證明「正極限⇒附近同號」的 \(\delta\) 步無鋪陳</td><td>✔</td><td>✔</td><td>✔</td></tr>
+<tr><td>§5.3 開節</td><td>Def 3.1 餘項式回憶（概念地基抽象）＋ Leibniz 段「dy/dx 升格真分數」</td><td>✔</td><td>✔</td><td>✔</td></tr>
+<tr><td>§5.7 L'Hôpital 0/0 proof</td><td>「define \(f(a)=g(a)=0\)」補洞＋\(c\) 被擠向 \(a\) 的夾擠</td><td>✔</td><td>—</td><td>✔</td></tr>
+</table>
+<p class="mini">全屬 slowdown（動筆／翻回去／重讀一遍可過），無一 stuck。sim 1 收束觀察：「slowdown 幾乎全集中在 (a) 三個 in-line 證明、(b) 分數次方/含根式代數；若要再降一格難度，最省力槓桿＝補這幾處中間步一兩行，證明段維持現狀即可。」</p>
+
+<h3>Sim 1（難度曲線 2/3/3/3.5/3/3/4/3/2；0 blocking / 9 slowdown）</h3>
+<div class="card"><p class="mini">總判定：§5.1 ok(2) · §5.2 ok(3) · §5.3 ok(3) · §5.4 effortful(3.5) · §5.5 ok(3) · §5.6 ok(3) · §5.7 effortful(4，尖峰) · §5.8 ok(3) · §5.9 ok(2)。B 類違規 0。與基線：持平偏低，尖峰 §5.7=4 未超 §4.2=4.5。特記 §5.4 Ex 5.14「\(5x^{2/5}=5(x^{1/5})^2>0\)」對負數 \(x^{2/5}\) 定義域會遲疑（就地以 \((x^{1/5})^2\) 化解）。</p></div>
+
+<h3>Sim 2（難度曲線 3/3/3.5/4/3/3.5/4/3/2.5；0 blocking / 9 slowdown）</h3>
+<div class="card"><p class="mini">總判定：§5.1 ok(3) · §5.2 ok(3) · §5.3 effortful(3.5) · §5.4 effortful(4) · §5.5 ok(3) · §5.6 effortful(3.5) · §5.7 effortful(4，尖峰) · §5.8 ok(3) · §5.9 ok(2.5)。B 類違規 0。與基線：持平（略低於 Ch4）。一句總評：「每個證明都點名 Ch4 出處、每個陷阱有 Caution、每個方法有 Strategy＋分級例題；吃力處都在預算內，無一節讀兩遍還接不起來。唯一略感無助＝§5.8 Ex 5.24 把 f'' 推導整段省掉只給結果。」</p></div>
+
+<h3>Sim 3（難度曲線 3/3/3/3.5/3.5/3.5/4/3.5/3；0 blocking / 8 slowdown）</h3>
+<div class="card"><p class="mini">總判定：§5.1 effortful(3，近 ok) · §5.2 ok(3) · §5.3 effortful(3) · §5.4 effortful(3.5) · §5.5 effortful(3.5) · §5.6 effortful(3.5) · §5.7 effortful(4，尖峰) · §5.8 effortful(3.5) · §5.9 ok(3)。B 類違規 0。與基線：與 Ch4 相比偏低（尖峰 4<4.5、多數節 3–3.5，不像 Ch4 整章壓 4）；與 Ch1–3 持平略偏高。兩處 fence（L'Hôpital 難例→App §D.3、隱函數可微→Ch14）誠實掛帳、不要求 persona 現在懂。</p></div>
+
+<h2>F. 範圍外／衛生項與 gate-2 記錄</h2>
+<ul>
+<li><b>彎撇號當 prime（衛生，非讀者可見）：</b>§5.5 L106 <code>A'</code>、§5.6 L92-93 <code>f''</code>×3、§5.8 L71 <code>f'</code> 在 display math 內用 U+2019。<b>已用 <code>shot.mjs</code> 隔離渲染驗證：MathJax v3（本書 tex-chtml）把 U+2019 當 prime、與 ASCII <code>'</code> 像素等價</b>——目前非缺陷，只是原始碼衛生不一致（且未來若改 KaTeX strict 會 error）。<code>quote_lint</code> 只查 prose 故漏網。<b>已開獨立衛生 sweep task chip</b>，不混進 M3。</li>
+<li><b>ch02 §2.2 跨章矛盾：</b>見 §C 連帶發現，已開 task chip。</li>
+<li><b>S·A·V gate-2（Codex 跨模型 prose 複核）：</b>依 <code>PIPELINE.md</code> 頻率矩陣＝高風險章或出版前抽樣。Ch5＝標準嚴謹應用章、非高風險，<b>本輪不跑</b>；未來出版前抽樣可納。（gate-1 三組散文閘 substance 已達錨組正面 bar，0 blocking。）</li>
+</ul>
+
+<hr style="margin-top:2.5rem;border:none;border-top:1px solid #d9dee6">
+<p class="mini">raw 稽核輸出（6 subagent 全文）落 gitignored scratchpad、換機即失；本 HTML 為版控裁決錨。裁決與回歸摘要另記入 M3 收尾 commit body（<code>git log --grep="M3"</code> 可撈）。產物路徑：<code>handout/_audit/REVIEW-ch05-prose-difficulty.html</code>。</p>
+</body>
+</html>

@@ -84,6 +84,6 @@ handout 線 6 個（`example-supplement`、`handout-prose-audit`、`handout-figu
 | Ch2 | ✅ 手稿六階 | ✅ 雙閘 | ✅／✅ | ✅ gate-1+2 | ✅ | ✅ ①② | **全閘完成** |
 | Ch3 | ✅ 手稿六階 | ✅ 雙閘（2026-06-27 補齊） | ✅／✅ | ✅ gate-1+2 | ✅ | ✅ ①② | **全閘完成** |
 | Ch4 | ✅ 手稿六階 | ✅ 雙閘（gate-2 173.7k tok） | ✅／✅ | ✅ gate-1+2（154.7k tok） | ✅ | ✅ ①② | **全閘完成** |
-| Ch5 | ✅ **canon M1**（2026-07-06） | ✅ M1 sweep＋**gate-2 抽樣樣本**（1 blocking [M7] 修＋回歸→0；2026-07-07） | ✅／✅ **Figure 5.1–5.11**（D1–D8 gate-1 0/0；視覺 gate-2 出版前抽樣） | ⏳ M3（額度中斷待重跑） | ⏳ M3（同左） | ✅ **M4**（ADOPT 4：Ex 5.14/5.22＋2 軟深度；Ex 5.1–5.27） | **M1/M2/M4/數學 gate-2 完成；M3→M5 待收** |
+| Ch5 | ✅ **canon M1**（2026-07-06） | ✅ M1 sweep＋**gate-2 抽樣樣本**（1 blocking [M7] 修＋回歸→0；2026-07-07） | ✅／✅ **Figure 5.1–5.11**（D1–D8 gate-1 0/0；視覺 gate-2 出版前抽樣） | ✅ **M3**（gate-1 三組 0 blocking；36 tighten/14 opt/2 voice 全 advisory） | ✅ **M3**（3 盲測 0 blocking/0 B類；均值≈3.2、尖峰 §5.7=4<§4.2 的 4.5） | ✅ **M4**（ADOPT 4：Ex 5.14/5.22＋2 軟深度；Ex 5.1–5.27） | **全閘完成（canon 首例）** |
 | App A–D | ✅ 自撰（無手稿先例） | A/B math-register gate-2 ✅ | — | — | — | — | 服務性附錄，按需維護 |
 | Ch6+ | 未開章（依 [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) 弧線骨架；Ch6 為 5-milestone 試點） | | | | | | |
