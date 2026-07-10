@@ -86,11 +86,11 @@ Excluded (roadmap): antiderivatives (→Ch6), graphing-with-technology.
 |---|---|---|
 | M1 Mode A′（brief＋⑤＋sympy＋章層 review） | ✅ | 2026-07-06；5 blocking 沿途修 |
 | M2 圖機會（候選） | ✅ | 2026-07-06；13 候選 |
-| M2 圖繪製＋D1–D8 | ✅ | 2026-07-07；tier-1/2 共 11 張（Figure 5.1–5.11）；gate-1 **blocking=0, advisory=0**（自檢修 7 缺陷後送審）；視覺 gate-2 依頻率矩陣＝出版前抽樣 |
+| M2 圖繪製＋D1–D8 | ✅ | 2026-07-07；tier-1/2 共 11 張（Figure 5.1–5.11）；gate-1 **blocking=0, advisory=0**（自檢修 7 缺陷後送審）；**視覺 gate-2（2026-07-10 三閘全跑補收）blocking=0／0 findings，D1–D8 全 clean**（Codex 第二讀者 gpt-5.6-terra，39.8k tok；`ch05_figure-gate2-audit.md`） |
 | 數學 M gate-2（跨模型） | ✅ | 2026-07-07；Ch5 作抽樣層樣本章全章複核：**1 blocking [M7]**（M4 新增 caution 的 VA 絕對化陳述）→ 修＋scoped 回歸「解除、無新問題」→ **blocking=0**；紀錄 `ch05_math-gate2-audit.md` |
-| M3 散文 S·A·V＋難度 learner-sim（合一輪） | ✅ | 2026-07-08（新 session 重跑，分兩批避額度牆）；**blocking=0**：散文 gate-1 三組 0 blocking（36 tighten／14 opt／2 voice 全 advisory）＋難度盲測 ×3 全 **0 blocking／0 B 類違規**。難度曲線均值 §5.1→5.9＝2.7/3.0/3.2/3.7/3.2/3.3/**4.0(§5.7 尖峰)**/3.2/2.5，尖峰 4<Ch4 §4.2 的 4.5、全章<4 → 無弧線層異常。**1 客觀修復落地**：P1-12（§5.3 Leibniz 段「single symbol」caution 誤引 Remark 3.2→改「a caution in §2.2」＋同步修註解）＋scoped §5.3 回歸「0/0/0/0、無新問題」。彎撇號-as-prime 經隔離渲染證實 render-safe→另開衛生 chip；ch02 §2.2「we do not do in this book」被 Def 5.2 推翻→另開跨章 chip。合併裁決稿 `_audit/REVIEW-ch05-prose-difficulty.html`；S·A·V gate-2 依頻率矩陣＝非高風險章不跑 |
+| M3 散文 S·A·V＋難度 learner-sim（合一輪） | ✅ | 2026-07-08（新 session 重跑，分兩批避額度牆）；**blocking=0**：散文 gate-1 三組 0 blocking（36 tighten／14 opt／2 voice 全 advisory）＋難度盲測 ×3 全 **0 blocking／0 B 類違規**。難度曲線均值 §5.1→5.9＝2.7/3.0/3.2/3.7/3.2/3.3/**4.0(§5.7 尖峰)**/3.2/2.5，尖峰 4<Ch4 §4.2 的 4.5、全章<4 → 無弧線層異常。**1 客觀修復落地**：P1-12（§5.3 Leibniz 段「single symbol」caution 誤引 Remark 3.2→改「a caution in §2.2」＋同步修註解）＋scoped §5.3 回歸「0/0/0/0、無新問題」。彎撇號-as-prime 經隔離渲染證實 render-safe→另開衛生 chip；ch02 §2.2「we do not do in this book」被 Def 5.2 推翻→另開跨章 chip。合併裁決稿 `_audit/REVIEW-ch05-prose-difficulty.html`；**S·A·V gate-2（2026-07-10 三閘全跑補收）blocking=0**（1 advisory F4 句長，§5.4 Thm 5.1 證明第二句，**已套用**＝拆短句、保留 strictly／區間名，scoped 回歸 katex=0 通過；Codex 64.3k tok；`ch05_prose-gate2-audit.md`） |
 | M4 Mode C gap-check（①②合一） | ✅ | 2026-07-07；偵察 Layer-1=0；Codex 裁決 **ADOPT 4**（Ex 5.14、Ex 5.22、§5.3 intuition、§5.8 caution）／DEFER 5；sympy 驗證＋scoped Mode B 過；報告 `_audit/REVIEW-ch05-modec-gapcheck.html`、imports `ch05_example-imports.md` |
-| M5 收尾（dashboard＋ROADMAP open-q） | ✅ | 2026-07-08；PIPELINE dashboard Ch5→「全閘完成（canon 首例）」、本 checklist M3/M5→✅、ROADMAP Ch5 弧線 entry 補 gates-complete＋M3 難度曲線一行＋Open questions 收（無懸而未決方向叉路） |
+| M5 收尾（dashboard＋ROADMAP open-q） | ✅ | 2026-07-08 初收；**2026-07-10 三閘 gate-2 全跑補收**（PIPELINE 新政策取代風險分層）：散文＋圖 gate-2 各 **blocking=0**、數學 gate-2（2026-07-07 全章）已收 → Ch5 於新政策下真正定版；dashboard Ch5 三 gate-2 cell 同步更新、批次報告 `_audit/REVIEW-ch05-gate2-batch.html`。原 2026-07-08：dashboard Ch5→「全閘完成（canon 首例）」、ROADMAP entry 補 gates-complete＋難度曲線＋Open questions 收 |
 
 ## Chapter opener — "By the end of this chapter you will be able to"
 

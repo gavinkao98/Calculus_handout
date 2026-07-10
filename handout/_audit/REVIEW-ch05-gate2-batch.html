@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch5 定版前三閘 gate-2 全跑批次報告（2026-07-10）</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+ body{font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;color:#1a1f2e;max-width:1040px;margin:0 auto;padding:2rem 1.2rem 4rem;line-height:1.7;font-size:15.5px}
+ h1{font-size:1.5rem;color:#16294e;border-bottom:3px solid #16294e;padding-bottom:.4rem}
+ h2{font-size:1.2rem;color:#16294e;margin-top:2.4rem;border-left:5px solid #16294e;padding-left:.55rem}
+ h3{font-size:1.03rem;color:#22345c;margin-top:1.5rem}
+ table{border-collapse:collapse;width:100%;margin:.8rem 0;font-size:.9em}
+ th{background:#16294e;color:#fff;text-align:left;padding:.4rem .5rem}
+ td{border:1px solid #d9dee6;padding:.38rem .5rem;vertical-align:top}
+ tr:nth-child(even) td{background:#f4f6f9}
+ code{background:#eef1f6;border:1px solid #d9dee6;border-radius:4px;padding:0 .3em;font-size:.86em}
+ .ok{color:#1c7a4c;font-weight:700}.no{color:#a12a2a;font-weight:700}.warn{color:#b26a00;font-weight:700}
+ .meta{color:#5c6470;font-size:.9em}
+ .card{background:#f4f6f9;border:1px solid #d9dee6;border-left:5px solid #1d5fa6;border-radius:6px;padding:.85rem 1.05rem;margin:.9rem 0}
+ .verdict{background:#eaf5ee;border-left-color:#1c7a4c}
+ .applied{background:#fff6e9;border-left-color:#b26a00}
+ .tag{display:inline-block;font-size:.74em;font-weight:700;border-radius:4px;padding:.05em .45em;margin-right:.3em;vertical-align:middle}
+ .t-blk{background:#a12a2a;color:#fff}.t-tgt{background:#1d5fa6;color:#fff}.t-opt{background:#6c757d;color:#fff}.t-voi{background:#7a4fb0;color:#fff}.t-app{background:#b26a00;color:#fff}
+ del{color:#a12a2a;text-decoration:line-through}ins{color:#1c7a4c;text-decoration:none;background:#eaf5ee}
+ .mini{font-size:.82em;color:#5c6470}
+</style>
+</head>
+<body>
+<h1>Chapter 5 — 定版前三閘 gate-2 全跑批次報告</h1>
+<p class="meta">2026-07-10 ・ 依 <code>handout/PIPELINE.md</code> 新政策「gate-2 全跑：三閘每章必跑到定版」（2026-07-10 使用者拍板，取代原風險分層／出版前抽樣）補收 Ch5 尚缺的兩道 gate-2，連同 2026-07-07 已收的數學 gate-2 構成完整批次。執行：<code>codex exec -s read-only</code>（standing consent；<code>gpt-5.6-terra</code>／xhigh 依 <code>~/.codex/config.toml</code>）。所有稽核唯讀、propose-not-act；raw 落 gitignored scratchpad，轉錄見各 <code>_dev-archive/ch05/ch05_*-gate2-audit.md</code>。</p>
+
+<div class="card verdict">
+<b>批次收斂結論：三閘 gate-2 全數 blocking = 0 → Ch5 於新政策下真正定版。</b>
+<ul style="margin:.5rem 0 0">
+<li><b>數學 M1–M8 gate-2</b>（2026-07-07，全章）：1 blocking [M7]（M4 新增 caution 的 VA 絕對化陳述）→ 修＋scoped 回歸「解除、無新問題」→ <span class="ok">blocking = 0</span>。</li>
+<li><b>散文 S·A·V gate-2</b>（2026-07-10，全九節）：<span class="ok">blocking = 0</span>；1 advisory（F4 句長，待裁決）。</li>
+<li><b>圖視覺 gate-2</b>（2026-07-10，11 張全數）：<span class="ok">blocking = 0 ／ 0 findings</span>；D1–D8 全 clean。</li>
+<li><b>散文 1 筆 advisory（F4 句長）：使用者拍板<span class="ok">已套用</span></b>——拆短句、保留 <code>strictly</code>／區間名（下方 §2），scoped 回歸 <code>katex=0</code> 通過。</li>
+</ul>
+</div>
+
+<h2>1. 批次總表</h2>
+<table>
+<tr><th>gate-2 閘</th><th>日期</th><th>被審物</th><th>契約 rubric</th><th>Codex 用量</th><th>結果</th><th>轉錄</th></tr>
+<tr><td>數學 M1–M8</td><td>2026-07-07</td><td>全 9 節 as-built（Def/Thm/Strategy/Ex 5.1–5.27／Figure／appD §D.3）</td><td><code>MATH-CORRECTNESS-RUBRIC.md</code></td><td class="mini">～120k tok</td><td class="ok">0 blocking（1 修＋回歸）</td><td><code>ch05_math-gate2-audit.md</code></td></tr>
+<tr><td>散文 S·A·V</td><td>2026-07-10</td><td>九節 fragment 散文（inline UTF-8）＋svc-exemplars 錨</td><td><code>PROSE-AUDIT-RUBRIC.md</code></td><td class="mini">64,287 tok</td><td class="ok">0 blocking</td><td><span class="warn">＋1 advisory</span> ・ <code>ch05_prose-gate2-audit.md</code></td></tr>
+<tr><td>圖視覺</td><td>2026-07-10</td><td>11 張 2× PNG＋<code>const FIGS</code> 原始碼＋11 figcaption</td><td><code>FIGURE-AUDIT-RUBRIC.md</code></td><td class="mini">39,787 tok</td><td class="ok">0 blocking／0 finding</td><td><code>ch05_figure-gate2-audit.md</code></td></tr>
+</table>
+<p class="mini">雙閘價值：每閘 gate-1（Claude，免費）先審 → gate-2（Codex，跨模型獨立）再審，幻覺須穿過兩個獨立模型才漏。三閘 gate-1 先前均 0 blocking，gate-2 獨立盲審一致收斂。</p>
+
+<h2>2. 散文 S·A·V gate-2 — 唯一 advisory（已套用 2026-07-10）</h2>
+<div class="card verdict">
+<div><span class="tag t-app">已套用</span><span class="tag t-tgt">F4 句長</span> <b>G2-1 ・ §5.4 Theorem 5.1 證明第二句</b></div>
+<p style="margin:.5rem 0"><b>問題：</b>一句包進區間前提＋兩種單調情形＋符號反轉，first-pass ESL 讀者要同時扛好幾個條件才讀到主結論。（證據：F4——一次線性讀需暫存多個區間條件與符號反轉論證才到主結論。）</p>
+<p style="margin:.5rem 0"><b>落地 diff（拆一長句為四句；語意不變）：</b></p>
+<p style="margin:.3rem 0"><del>On each side, \(f\) is continuous on the closed piece — \([u, c]\) or \([c, v]\) — and differentiable on its interior, so the monotonicity corollary (Corollary 4.3) governs each: applied to \(f\) directly wherever \(f' &gt; 0\), and to \(-f\) wherever \(f' &lt; 0\), since a negative derivative for \(f\) is a positive one for \(-f\), making \(-f\) strictly increase and \(f\) strictly decrease.</del></p>
+<p style="margin:.3rem 0"><ins>On each side, \(f\) is continuous on the closed piece — \([u, c]\) or \([c, v]\) — and differentiable on its interior, so Corollary 4.3 applies. Where \(f' &gt; 0\), it governs \(f\) directly, so \(f\) strictly increases. Where \(f' &lt; 0\), apply it to \(-f\): a negative derivative for \(f\) is a positive one for \(-f\), so \(-f\) strictly increases and \(f\) strictly decreases.</ins></p>
+<p class="mini" style="margin-top:.5rem"><b>與 Codex 逐字草案的差異（審慎採納）：</b>Codex 草案順手把 <code>strictly</code> 與區間名 <code>\([u,c]\)／\([c,v]\)</code> 一併簡化掉；因證明下方 bullet 需 \(f(u)&lt;f(c)\) 嚴格不等式，strictness 承重，故落地版**保留 strictly 與區間名**、只採「拆短句」的核心。<b>scoped 回歸：</b><code>build.py ch05</code> → <code>katex-errors=0</code>（math 1035→1036）＋ linebreak-gate 0 條；四 bullet 邏輯照舊、未引入新問題 → 回歸通過。</p>
+</div>
+<p class="mini">其餘散文維度 U1–U5／F1–F3／F5／S1–S3／A1–A2／V1 全 clean（第二模型與 M3 gate-1 三組 0 blocking 一致）。</p>
+
+<h2>3. 圖視覺 gate-2 — 11 張全 clean</h2>
+<table>
+<tr><th>Figure</th><th>figure_id</th><th>節</th><th>D1–D8</th></tr>
+<tr><td>5.1</td><td><code>tangent-radius-circle</code></td><td>§5.1</td><td class="ok">clean</td></tr>
+<tr><td>5.2</td><td><code>ladder-triangle</code></td><td>§5.2</td><td class="ok">clean</td></tr>
+<tr><td>5.3</td><td><code>streetlight-similar</code></td><td>§5.2</td><td class="ok">clean</td></tr>
+<tr><td>5.4</td><td><code>sqrt-linearization</code></td><td>§5.3</td><td class="ok">clean</td></tr>
+<tr><td>5.5</td><td><code>dy-vs-deltay</code></td><td>§5.3</td><td class="ok">clean</td></tr>
+<tr><td>5.6</td><td><code>fence-river</code></td><td>§5.5</td><td class="ok">clean</td></tr>
+<tr><td>5.7</td><td><code>semicircle-rectangle</code></td><td>§5.5</td><td class="ok">clean</td></tr>
+<tr><td>5.8</td><td><code>concavity-tangents</code></td><td>§5.6</td><td class="ok">clean</td></tr>
+<tr><td>5.9</td><td><code>rational-asymptotes</code></td><td>§5.8</td><td class="ok">clean</td></tr>
+<tr><td>5.10</td><td><code>slant-asymptote</code></td><td>§5.8</td><td class="ok">clean</td></tr>
+<tr><td>5.11</td><td><code>newton-step</code></td><td>§5.9</td><td class="ok">clean</td></tr>
+</table>
+<p class="mini">D1 label collision／D2 out-of-bounds／D3 viewing-window／D4 tick labels／D5 figure↔caption 一致／D6 math correctness vs <code>const FIGS</code>／D7 no-spoiler／D8 grayscale 存活——全維度 clean。對抗式複核硬要求（D5/D6 指控須回原始碼逐字核對、警覺 VLM 小字級上下標誤讀）在 prompt 內生效，本輪無指控成立、亦無假陽性需擋。</p>
+
+<h2>4. 定版狀態</h2>
+<div class="card verdict">
+<p style="margin:0"><b>Ch5 三閘 gate-2 全跑完成、blocking 全歸零，於 2026-07-10 新政策下真正定版；唯一 advisory（G2-1）亦已套用＋回歸通過，無懸而未決項。</b>已同步：<code>PIPELINE.md</code> dashboard Ch5 列（三 gate-2 cell）、<code>PLAN-ch05.md</code> gate-family checklist（M2／M3／M5 rows）、兩份 <code>ch05_*-gate2-audit.md</code> 轉錄、<code>fragments/ch05/sec-5-4.html</code>＋重建的 standalone。</p>
+</div>
+</body>
+</html>
