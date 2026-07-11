@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<title>Loudness A/B — ch03_s31</title>
+<style>
+ body{font-family:system-ui,"Noto Sans TC",sans-serif;margin:1.5rem;max-width:64rem;color:#111;line-height:1.55}
+ h1{font-size:1.3rem} .banner{background:#fff3cd;border:1px solid #e0c060;padding:.6rem .9rem;border-radius:6px;font-weight:600}
+ .grid{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem}
+ .col{flex:1;min-width:15rem;border:1px solid #ddd;border-radius:8px;padding:.8rem}
+ .col h3{margin:.2rem 0 .5rem} audio{width:100%}
+ code{background:#f0f0f0;padding:.1rem .3rem;border-radius:3px;font-size:.85em}
+ .dim{color:#777;font-size:.85rem} .sha{color:#999;font-size:.72rem}
+</style></head><body>
+<h1>Loudness A/B — ch03_s31</h1>
+<p class="banner">狀態：<b>awaiting adjudication</b>（等使用者裁決）。裁決後由執行者把選定 target 以 two-pass
+loudnorm（I／TP）接進 <code>make.py</code> <code>_concat</code>（T10-3），並在 <code>compose()</code> 尾端印整片
+I／TP 報告、超容差印 WARN。</p>
+<p>樣本＝<code>10_fundamental_limit.wav</code>（§3.1 代表性場，實測 -18.9 LUFS）。三版皆
+<b>two-pass loudnorm</b>（先量測、再以 measured 值 <code>linear=true</code> 套用，非 one-pass dynamic），
+true-peak 上限 <b>-1.5 dBTP</b>。<b>脈絡：</b>YouTube 參考位準約 <b>-14 LUFS</b>，且平台只會把過響的內容
+<b>往下 normalize</b>（不會把安靜的內容拉響）——故 target 訂在 -14 以下較安全、避免被平台再壓一次。</p>
+<div class="grid">
+<div class="col"><h3>target -19 LUFS</h3><audio controls preload="none" src="../output/_loudness_ab/ch03_s31_LUFS_m19.wav"></audio><p class="dim">實測：-19.0 LUFS · -4.5 dBTP</p><p class="sha">ch03_s31_LUFS_m19.wav</p></div><div class="col"><h3>target -17 LUFS</h3><audio controls preload="none" src="../output/_loudness_ab/ch03_s31_LUFS_m17.wav"></audio><p class="dim">實測：-17.1 LUFS · -4.5 dBTP</p><p class="sha">ch03_s31_LUFS_m17.wav</p></div><div class="col"><h3>target -15.5 LUFS</h3><audio controls preload="none" src="../output/_loudness_ab/ch03_s31_LUFS_m15_5.wav"></audio><p class="dim">實測：-15.8 LUFS · -4.5 dBTP</p><p class="sha">ch03_s31_LUFS_m15_5.wav</p></div>
+</div>
+<h2>取捨</h2>
+<ul>
+ <li><b>-19 LUFS</b>：最保守、動態最寬；教學乾聲清楚，但整體偏小聲，觀眾可能需調大音量。</li>
+ <li><b>-17 LUFS</b>：折衷；比 -19 響、仍在 YouTube 上傳不被大幅壓的區間。</li>
+ <li><b>-15.5 LUFS</b>：最接近平台常見響度、開箱即聽感足；動態略窄，接近 -14 上限。</li>
+</ul>
+<p class="dim">WAV 在 gitignored 的 output/scratch；本說明 HTML 在 tracked 的 <code>video/_audit/</code>。</p>
+</body></html>
