@@ -31,7 +31,7 @@
   2. **教學增添**（canon 沒有、為本書教學而加的 intuition／caution／history／application／補例等）照舊標 `<!-- expansion:<cat> [source: …] -->`；**canon 主軸內容不標**。
   `[source:]` 用於 history、application、外部題源等「正確性繫於特定參考」的增添；標準微積分定理不逐段硬塞 `[source:]`。（2026-07-07 與 Codex 收斂裁決：**不**另建 section manifest——現制語義健在，manifest 是平行第二套簿記。）
 - **反幻覺備援（取代失去的 ①-verify）：** (a) 每節 brief＋**hypothesis ledger**（定義域、連續／可微假設、分母≠0、端點型、export 依賴——sympy 只驗數字不驗定理衛生，故需此帳）；(b) Codex 對抗審（⑤：direction-conformance＋數學正確＋hypothesis hygiene）；(c) 章末 **sympy 全例重算**。
-- **人閘配置：** ③ 方向閘與 ⑤ advisory 對 Codex 跑到收斂（2026-07-06 授權）；⑥ 章層收尾＝章層 Codex review＋applied 報告交使用者過目。付費 gate-2 的風險分層見 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
+- **人閘配置：** ③ 方向閘與 ⑤ advisory 對 Codex 跑到收斂（2026-07-06 授權）；⑥ 章層收尾＝章層 Codex review＋applied 報告交使用者過目。付費 gate-2 的頻率規則（三閘每章全跑）見 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
 - **Worked example 來源優先序（canon 時代）：** ① Mode A brief 內規劃（自撰或 canon 改寫，經 ⑤＋sympy 把關）→ ② 開放題庫補缺（[`CONTENT_SOURCING.md`](CONTENT_SOURCING.md)，CLP-1 優先）→ ③ AI 備援（經使用者審核）。
 - **Mode C 條件式：** canon 章的例題與軟深度應在 brief 就規劃齊全；Mode C 降為簽核後的**條件式 gap-check**（單輪偵察①②合一、有缺才補、補必接範圍限定 Mode B；brief 覆蓋完整即可跳過——見 [`handout/PIPELINE.md`](handout/PIPELINE.md) M4）。
 

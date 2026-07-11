@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 6 Integrals — M1 Applied Report</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --ink:#1a1a1a; --muted:#666; --line:#ddd; --ok:#1a7f37; --warn:#9a6700; --bg:#fafafa; --card:#fff; --accent:#0b5; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 5rem; color: var(--ink); background: var(--bg); line-height: 1.6; }
+  h1 { font-size: 1.7rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.25rem; margin: 2.2rem 0 .6rem; border-bottom: 2px solid var(--ink); padding-bottom: .25rem; }
+  h3 { font-size: 1.05rem; margin: 1.3rem 0 .35rem; }
+  .sub { color: var(--muted); margin: 0 0 1.5rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+  .dash { width:100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  .dash th, .dash td { border: 1px solid var(--line); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  .dash th { background: #f0f0f0; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .warn { color: var(--warn); }
+  code { background: #f0f0f0; padding: .05rem .3rem; border-radius: 3px; font-size: .88em; }
+  .tag { display:inline-block; background:#eef; border:1px solid #ccd; border-radius:4px; padding:.05rem .4rem; font-size:.8rem; margin:.1rem .2rem .1rem 0; }
+  .src { color: var(--muted); font-size: .85rem; }
+  ul { margin: .4rem 0; padding-left: 1.3rem; }
+  li { margin: .2rem 0; }
+  .lead { background:#eefbf3; border-left:4px solid var(--accent); padding:.8rem 1rem; border-radius:0 6px 6px 0; }
+</style>
+</head>
+<body>
+
+<h1>Chapter 6 — Integrals</h1>
+<p class="sub">M1 (Mode A′, canon 草擬) applied report · 2026-07-10 · 第二個無手稿 canon 章、5-milestone 閘序首個全程試點</p>
+
+<div class="lead">
+<strong>M1 完成。</strong>五節全數草擬完畢，各節 Codex ⑤ 對抗審收斂到 <strong>0 blocking</strong>，章層收尾 sweep 全綠：<strong>sympy 29/29 PASS</strong>、<strong>章層 Codex review M1–M8 clean</strong>。深度＝<strong>深理論核心</strong>（同 Ch4 級）：FTC 兩部<strong>當場全證</strong>，「連續⇒可積」on-credit fence。<br>
+建置：<code>build.py ch06</code> ✔ · linebreak 自動斷 0 · render katex 0 / math=612 / 全 hydrate。
+</div>
+
+<h2>閘狀態總表</h2>
+<table class="dash">
+<tr><th>節</th><th>對應 canon</th><th>環境（as-built）</th><th>Codex ⑤</th></tr>
+<tr><td><strong>6.1</strong> Areas and Distances</td><td>Stewart §5.1</td><td>Def 6.1（面積）；Ex 6.1–6.3</td><td class="ok">0 blocking</td></tr>
+<tr><td><strong>6.2</strong> The Definite Integral</td><td>Stewart §5.2</td><td>Def 6.2；Thm 6.1（可積，fence）、6.2（性質）；Ex 6.4–6.6</td><td class="ok">0 blocking</td></tr>
+<tr><td><strong>6.3</strong> Fundamental Theorem of Calculus</td><td>Stewart §5.3</td><td>Def 6.3（antiderivative）；<strong>Thm 6.3（FTC-1）、6.4（FTC-2）當場全證</strong>；Strategy 6.1；Ex 6.7–6.9</td><td class="ok">0 blocking</td></tr>
+<tr><td><strong>6.4</strong> Indefinite Integrals & Net Change</td><td>Stewart §5.4</td><td>Def 6.4；Thm 6.5（Net Change）；Ex 6.10–6.12</td><td class="ok">0 blocking</td></tr>
+<tr><td><strong>6.5</strong> The Substitution Rule</td><td>Stewart §5.5</td><td>Thm 6.6/6.7/6.8（全證）；Strategy 6.2；Ex 6.13–6.16；<strong>章末總結</strong></td><td class="ok">0 blocking（首過即 clean）</td></tr>
+</table>
+<p class="src">as-built 編號：Definition 6.1–6.4 · Theorem 6.1–6.8 · Strategy 6.1–6.2 · Example 6.1–6.16 · Cautions 不編號 · Figures 0（延至 M2 圖批次）。無 Proposition/Corollary/Lemma/Remark。</p>
+
+<h2>各節寫了什麼</h2>
+
+<div class="card">
+<h3>§6.1 Areas and Distances <span class="src">— fragments/ch06/sec-6-1.html</span></h3>
+<p>章開場＋動機層：curved region 無面積公式 → <em>trap-and-squeeze</em>（用可算的矩形和夾擠 \(n\to\infty\)）。右/左端點和 \(R_n,L_n\)、\(\Sigma\) 記號（A 類）。<strong>Ex 6.1</strong> \(n=4\) 數值估計（\(L_4=\tfrac{7}{32}<A<R_4=\tfrac{15}{32}\)）；<strong>Ex 6.2</strong> 用冪次和 \(\sum i^2=\tfrac{n(n+1)(2n+1)}{6}\)（cross-ref 附錄 A Prop A.6，B 類先備）取極限 \(=\tfrac13\)；<strong>Def 6.1</strong>（面積＝極限）；<strong>Ex 6.3</strong> 由速度表估距離——面積與距離是同一個和。</p>
+<p class="src"><span class="tag">expansion:intuition</span><span class="tag">expansion:history（Archimedes）</span><span class="tag">seam：不引入 ∫／不證可積</span></p>
+</div>
+
+<div class="card">
+<h3>§6.2 The Definite Integral <span class="src">— fragments/ch06/sec-6-2.html</span></h3>
+<p>引入 \(\int_a^b f\,dx\) 記號（Leibniz 的 summa）與任意取樣點 Riemann 和（<strong>Def 6.2</strong>）；符號慣例 \(\int_a^a=0,\ \int_b^a=-\int_a^b\)。<strong>Thm 6.1</strong>（連續⇒可積，陳述＋<strong>on-credit fence</strong> 到 uniform continuity）。<strong>net signed area</strong>（軸上減軸下）。<strong>Thm 6.2</strong>（常數/線性/可加/比較——短證由 Riemann 和逐項取極限）。<strong>Ex 6.4</strong> \(\int_0^1 x^2=\tfrac13\)（承 §6.1）；<strong>Ex 6.5</strong> \(\int_0^2(x-1)=0\)（號面積）；<strong>Ex 6.6</strong> 用比較性質框 \(3\le\int_1^4\sqrt x\le6\)。</p>
+<p class="src"><span class="tag">expansion:intuition</span><span class="tag">expansion:history（∫ 記號）</span><span class="tag">seam：可積 fence、不做 FTC 捷徑</span></p>
+</div>
+
+<div class="card">
+<h3>§6.3 The Fundamental Theorem of Calculus <span class="src">— fragments/ch06/sec-6-3.html（章之樞紐）</span></h3>
+<p><strong>Def 6.3</strong>（antiderivative，開區間）。累積函數 \(g(x)=\int_a^x f\)。<strong>Thm 6.3（FTC-1）</strong> \(g'(x)=f(x)\)——<strong>全證</strong>：差商 \(\tfrac1h\int_x^{x+h}f\) 由比較性質＋EVT（Thm 4.9(a)）夾在 \(m_h,M_h\) 間，兩者依連續性 \(\to f(x)\)，Squeeze（Thm 1.3）收；\(g\) 在 \([a,b]\) 連續由 \(|g(x+h)-g(x)|\le M|h|\) 得。<strong>Thm 6.4（FTC-2）</strong> \(\int_a^b f=F(b)-F(a)\)——<strong>全證</strong>：\(F-g\) 連續且導數 0 → 常數（Cor 4.4）。<strong>Strategy 6.1</strong>（用 FTC-2 求值）。<strong>Ex 6.7</strong> 微分累積函數（含 chain rule；\(\int_0^x e^{-t^2}\) 無初等原函數仍可微）；<strong>Ex 6.8</strong> \(\int_0^1 x^2=\tfrac13\)、\(\int_1^4\sqrt x=\tfrac{14}3\)（一行取代 §6.1–6.2 的極限）；<strong>Ex 6.9</strong> \(\int_0^\pi\sin=2\)。</p>
+<p class="src"><span class="tag">expansion:intuition ×2</span><span class="tag">expansion:caution（dummy t、無初等原函數）</span><span class="tag">expansion:history（Newton/Leibniz）</span></p>
+</div>
+
+<div class="card">
+<h3>§6.4 Indefinite Integrals and the Net Change Theorem <span class="src">— fragments/ch06/sec-6-4.html</span></h3>
+<p><strong>Def 6.4</strong>（indefinite integral \(\int f\,dx=F+C\)，是 <em>函數族</em>，對比定積分的 <em>數</em>）。原函數表（Ch2–4 導數逆讀）＋域限一句。<strong>export：\(\int\tfrac1x\,dx=\ln|x|+C\)</strong>——證絕對值（\(x<0\) 支 \(\tfrac{d}{dx}\ln(-x)=\tfrac1x\)）、域 \(x\ne0\) 兩支。<strong>Thm 6.5（Net Change）</strong>＝FTC-2 重讀（\(f=F'\)，不重證）：率的積分＝淨變化。displacement \(\int v\) vs total distance \(\int|v|\)。<strong>Ex 6.10</strong> 不定積分（含 \(\ln|x|\)）；<strong>Ex 6.11</strong> \(\int_1^2\tfrac1x=\ln2\)；<strong>Ex 6.12</strong> \(v=t^2-4\) 於 \([0,3]\)：位移 \(-3\) m、總路程 \(\tfrac{23}3\) m（於 \(t=2\) 分段）。</p>
+<p class="src"><span class="tag">expansion:intuition ×2</span><span class="tag">expansion:formula（ln|x|）</span><span class="tag">expansion:caution（族 vs 數；位移 vs 路程）</span><span class="tag">export shipped：ln|x|</span></p>
+</div>
+
+<div class="card">
+<h3>§6.5 The Substitution Rule <span class="src">— fragments/ch06/sec-6-5.html（末節＋章末總結）</span></h3>
+<p>substitution＝反向 chain rule，\(du=g'(x)\,dx\)（承 §5.3 differentials）。<strong>Thm 6.6</strong>（\(\int f(g(x))g'(x)\,dx=\int f(u)\,du\)，全證）；<strong>Strategy 6.2</strong>；<strong>Thm 6.7</strong>（定積分換元＝換上下限，全證，經 FTC-2）＋caution（換限 <em>或</em> 回代，不可混）；<strong>Thm 6.8</strong>（偶/奇對稱，由 \(u=-x\) 全證）。<strong>Ex 6.13</strong> \(\int 2x\sqrt{1+x^2}\)；<strong>Ex 6.14</strong> 常數調整；<strong>Ex 6.15</strong> \(\int_0^2 2x(1+x^2)^3=156\)（換限）；<strong>Ex 6.16</strong> \(\int_{-1}^1(x^4+x^3)=\tfrac25\)（對稱）。<strong>章末總結</strong>：弧線 §6.1→6.5、五條核心公式、forward fence 到 Ch7/8。</p>
+<p class="src"><span class="tag">expansion:intuition ×2</span><span class="tag">expansion:caution（換限陷阱）</span><span class="tag">expansion:summary（章末）</span><span class="tag">seam：僅 u-sub，其餘技巧 →Ch8</span></p>
+</div>
+
+<h2>Codex ⑤ 對抗審——抓到並修掉的真問題</h2>
+<p>雙閘的價值：幻覺／不嚴謹要穿過兩個獨立模型才會漏。逐節裁決與修補全紀錄於 <code>_dev-archive/ch06/ch06_s6-*-codex5-audit.md</code>。摘要：</p>
+<table class="dash">
+<tr><th>節</th><th>⑤ 首輪</th><th>代表性 finding（已修＋回歸）</th></tr>
+<tr><td>6.1</td><td>4 blocking＋2 回歸</td><td><strong>真數學錯</strong>：caution 稱「左/右端點和會對不同值收斂」——錯，等距分割 \(R_n-L_n=\tfrac{b-a}{n}(f(b)-f(a))\to0\)；分歧在<strong>取樣點</strong>不在左右端。＋距離 hygiene（speed≥0）。</td></tr>
+<tr><td>6.2</td><td>4 blocking＋2 回歸</td><td>additivity「證明」對<strong>等寬</strong>分割不成立（任意 \(c\) 非格點）；Thm 6.2 假設由「可積」收緊為「<strong>連續</strong>」使四性質全可證；記號衝突 \(c\)（常數 vs 分點）→ 改 \(k\)。</td></tr>
+<tr><td>6.3</td><td>2 blocking＋1 回歸</td><td>antiderivative 開/閉區間 scoping；Cor 4.4 套用前補足 \(F-g\) 連續＋導數 0 之假設；\(g\) 連續改用 Lipschitz 界證。（數學本身首過即對。）</td></tr>
+<tr><td>6.4</td><td>2 blocking＋1 回歸</td><td>原函數表缺域限（sec²、arcsin、負冪）；<strong>Ex 6.12 收尾誤述</strong>「backward leg undone and then some」（前腿 \(\tfrac73\)＜後腿 \(\tfrac{16}3\)，只抵一部分）。</td></tr>
+<tr><td>6.5</td><td class="ok">0 blocking（clean）</td><td>三證＋四例＋章末總結交叉引用全對，首過通過。</td></tr>
+</table>
+
+<h2>章層收尾 sweep</h2>
+<div class="card">
+<p><strong>① sympy 全例重算：29/29 PASS</strong> — §6.1–6.5 每個 worked example 的數值/符號結果＋冪次和 import 全部以 sympy 獨立重算核對（<code>scratchpad/sympy_ch6.py</code>）。</p>
+<p><strong>② hypothesis ledger 覆核：clean</strong> — 連續性（可積/FTC）、域限（\(\ln|x|\ x\ne0\)、arcsin \(|x|<1\)、sec² \(\cos x\ne0\)）、原函數開區間 scoping、換元 \(g'\) 連續、對稱 \(f\) 連續、路程 speed≥0——全數就位並明述。可積性 on-credit fence（uniform continuity），<strong>未寫 App D §D.4</strong>（Codex 建議：待後章有實際用途再補）。</p>
+<p><strong>③ 章層 Codex review（M1–M8）：clean</strong> — M1 定義／M2 定理／M3 邏輯／M4 步驟答案／M5 域邊界／M6 記號一致／M8 import 假設 全 clean；<strong>M7 跨節</strong>抓到 1 blocking：§6.3 Ex 6.8 誤寫「§6.6」（實為 <strong>Example 6.6</strong>，在 §6.2）→ 已修，grep 確認全章無其他 §6.6–6.9 懸空引用；1 metadata advisory（header 註解）→ 已修。</p>
+</div>
+
+<h2>契約與決策</h2>
+<ul>
+<li><strong>Exports shipped</strong>（roadmap 全局 seam ledger）：<strong>FTC</strong>（§6.3）→ Ch7–8·11·13·15–16；<strong>\(\int\tfrac1x\,dx=\ln|x|+C\)</strong>（§6.4）→ Ch8·9。</li>
+<li><strong>Imports</strong>（皆存在、用於假設內）：冪次和 Prop A.6；Thm 1.2/1.3/2.1/3.3/4.9(a)/4.14；Cor 4.4；§5.3 differentials。</li>
+<li><strong>深度決策</strong>：FTC 兩部當場全證；可積性刻畫 on-credit fence（無 §D.4 dangling ref）——已解 PLAN 之 open decision。</li>
+<li><strong>難度</strong>：§6.3 為預期尖峰（深理論核心）；難度盲測（learner-sim）在 M3 跑，屆時對照 §16.3。</li>
+</ul>
+
+<h2>下一步（M2–M5）</h2>
+<p>M1 gate-1 側全綠。尚待：<strong>M2</strong> 圖（機會稽核→繪製→D1–D8；候選已於各節 brief 標 <code>figure_opportunities</code>）· <strong>M3</strong> 散文 S·A·V＋難度 learner-sim（合一輪）· <strong>M4</strong> Mode C 條件式 gap-check · <strong>三閘 gate-2</strong>（數學/散文/圖 跨模型複核，M4 後批次、每章必跑）· <strong>M5</strong> 收尾（dashboard＋roadmap）。閘序權威＝<code>handout/PIPELINE.md</code>。</p>
+
+<p class="src" style="margin-top:2.5rem">審核用：直接開 <code>handout/chapter6-print-standalone.html</code> 讀成稿（純靜態、數學即渲染）。本報告與各節 <code>_dev-archive/ch06/ch06_s6-*-codex5-audit.md</code> 為裁決/findings 版控紀錄。</p>
+
+</body>
+</html>

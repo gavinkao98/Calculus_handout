@@ -34,7 +34,7 @@
 | 3 | Chain Rule and Trigonometric Derivatives | draft | 3.1 Derivatives of the Sine and Cosine Functions; 3.2 The Chain Rule; 3.3 Applications of the Chain Rule |
 | 4 | The Exponential and Logarithmic Functions | draft | 4.1 Construction of the Exponential Function; 4.2 Continuity and the Exponent Law for $e^x$; 4.3 The Derivative of $e^x$; 4.4 Rolle's Theorem and the Mean Value Theorem; 4.5 Monotonicity and the Logarithmic Function |
 | 5 | Applications of Differentiation | draft | 5.1 Implicit Differentiation; 5.2 Related Rates; 5.3 Linear Approximation and Differentials; 5.4 Maximum and Minimum Values; 5.5 Optimization Problems; 5.6 Derivatives and the Shape of a Graph; 5.7 L'Hôpital's Rule; 5.8 Curve Sketching; 5.9 Newton's Method |
-| 6 | Integrals | planned | *脊椎；深度：深理論核心（FTC 當場證）* |
+| 6 | Integrals | draft | 6.1 Areas and Distances; 6.2 The Definite Integral; 6.3 The Fundamental Theorem of Calculus; 6.4 Indefinite Integrals and the Net Change Theorem; 6.5 The Substitution Rule |
 | 7 | Applications of Integration | planned | *脊椎；深度：標準（含 further applications，選材節制）* |
 | 8 | Techniques of Integration | planned | *脊椎；深度：標準/計算* |
 | 9 | Differential Equations | planned | *脊椎；first-order intro（章名框住範圍）；深度：標準* |

@@ -1,0 +1,182 @@
+<!-- Chapter 6 opener + §6.1 Areas and Distances.
+     SECOND manuscript-free chapter; first full 5-milestone pilot. section-source: Stewart ET 9e §5.1
+     (Areas and Distances); cross-checked Thomas 14e §5.1, Rogawski 4e §5.1. Authored 2026-07-10 per
+     PLAN-ch06 + brief-6-1 (canon-as-spine, full-gate tier; Codex at ③/⑤ per user 2026-07-06 grant).
+     §6.1 carries the Chapter 6 opener (first <article>: chapter-head + lead + "By the end"), mirroring
+     ch01–ch05. Numbering fresh for Ch6: §6.1 mints Definition 6.1 (Area under a curve), Examples 6.1–6.3.
+     No Theorem/Strategy yet. Cautions UNNUMBERED (Ch1–5 convention).
+     SEAM GUARD (full-arc Codex seam-hunt + brief-6-1): §6.1 is the MOTIVATION section — limits of
+     Riemann sums for area and distance. Do NOT define the definite integral or introduce the ∫ symbol
+     (that is §6.2 — one-line forward fence only). Do NOT prove convergence/integrability (§6.2 states it;
+     the continuous⟹integrable proof is fenced to the Proof Track). Do NOT tease the FTC antiderivative
+     shortcut (§6.3) — §6.1 earns the limit honestly. INTRODUCE-BEFORE-USE: Σ and finite arithmetic sums
+     are A-class (assumable); the power sum Σi² is B-class (SPEC §16.2) — one-line in-place bridge +
+     cross-ref Appendix A §A.3 Proposition A.6 BEFORE Example 6.2 uses it.
+     Counters handed to §6.2: Definition 6.2, Example 6.4, (no Thm/Strat/Prop/Cor/Lem/Rem yet).
+     M2 FIGURES (2026-07-10, DRAWN+AUDITED): §6.1 mints Figure 6.1 (riemann-lr-x2), Figure 6.2 (refinement-rn-x2,
+     Ex 6.1→6.2) and Figure 6.3 (velocity-distance-steps, Ex 6.3). All Ch6 M2 figures 6.1–6.8 cleared gate-1 D1–D8
+     + gate-2 (Codex -i) at 0 blocking. See PLAN-ch06 "M2 figure batch".
+     Record: PLAN-ch06.md, brief-6-1.md; CONTENT_ROADMAP.md §6 seam ledger. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Chapter 6</div>
+    <h1 class="ch-title">Integrals</h1>
+  </header>
+
+  <p class="lead">The first five chapters were about the derivative — the instantaneous rate at which one quantity changes as another does. This chapter turns to the opposite question, and to a problem far older than the derivative: how to measure the <em>total</em> accumulated from a rate, or the <em>area</em> enclosed by a curve. The Greeks computed areas of curved regions by exhausting them with polygons; the same idea, sharpened into a limit, becomes the <em>definite integral</em>. We build it from the ground up as a limit of sums, and then — in the Fundamental Theorem of Calculus, the summit of the chapter and arguably of the whole subject — we discover that this process of summation and the derivative are two sides of a single coin, inverse to each other. That deep and unexpected link between areas and slopes is what ties the two halves of calculus together, and this chapter is where it is forged.</p>
+
+  <p class="para-head">By the end of this chapter, you will be able to:</p>
+  <ul>
+    <li>express areas and distances as limits of Riemann sums;</li>
+    <li>define the definite integral and evaluate simple cases directly from the definition;</li>
+    <li>state and apply both parts of the Fundamental Theorem of Calculus;</li>
+    <li>use the Fundamental Theorem to evaluate definite integrals through antiderivatives;</li>
+    <li>find indefinite integrals and read the integral of a rate as a net change;</li>
+    <li>evaluate integrals by the substitution rule, including definite integrals and problems with symmetry.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">6.1</span>Areas and Distances</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: motivate the whole chapter from the area problem; the crux is trap-and-squeeze, and its twin (distance from velocity) is the same sum -->
+  <p>We know the area of a rectangle, a triangle, or any polygon: cut it into pieces whose areas we already have and add them up. But what is the area of a region with a <em>curved</em> boundary — the region under the parabola \(y = x^{2}\) from \(x = 0\) to \(x = 1\), say? There is no elementary formula, because there is no way to tile a curved region exactly with finitely many rectangles. The way forward is the oldest idea in the subject: <em>approximate</em> the region by rectangles we <em>can</em> measure, make the approximation finer, and see what number the areas approach. That number, when it exists, is what we <em>mean</em> by the area. The same manoeuvre — approximate by simple pieces, then refine to a limit — will, a little later, compute a distance from a record of velocities. The two problems turn out to be one.</p>
+
+  <h3 class="subsec-head">The area problem</h3>
+
+  <p>Let \(f\) be continuous and non-negative on \([a, b]\), and let \(S\) be the region bounded above by \(y = f(x)\), below by the \(x\)-axis, and on the sides by the vertical lines \(x = a\) and \(x = b\). To approximate the area of \(S\), divide \([a, b]\) into \(n\) strips of equal width</p>
+  <p>\[ \Delta x = \frac{b - a}{n}, \]</p>
+  <p>by the points \(x_{0} = a,\ x_{1},\ x_{2},\ \dots,\ x_{n} = b\), where \(x_{i} = a + i\,\Delta x\). Over each strip \([x_{i-1}, x_{i}]\) build a rectangle whose height is the value of \(f\) at the <em>right</em> endpoint, \(f(x_{i})\). The combined area of these \(n\) rectangles is the <em>right endpoint sum</em></p>
+  <p>\[ R_{n} = f(x_{1})\,\Delta x + f(x_{2})\,\Delta x + \dots + f(x_{n})\,\Delta x = \sum_{i=1}^{n} f(x_{i})\,\Delta x, \]</p>
+  <p>where \(\sum_{i=1}^{n}\) is the sigma notation for the sum of the listed terms as \(i\) runs from \(1\) to \(n\). Choosing instead the <em>left</em> endpoint of each strip gives the <em>left endpoint sum</em> \(L_{n} = \sum_{i=1}^{n} f(x_{i-1})\,\Delta x\). Each is a sum of rectangle areas — an approximation to the area of \(S\) that we expect to sharpen as the strips grow thinner.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.1</span></p>
+      <div class="env-body">
+        <p>Estimate the area under \(y = x^{2}\) from \(0\) to \(1\) using \(n = 4\) rectangles of equal width, with heights taken at the right endpoints. Then do the same with the left endpoints, and read off what the two estimates say about the true area.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(\Delta x = \tfrac{1}{4}\), and the division points are \(0, \tfrac14, \tfrac12, \tfrac34, 1\). With \(f(x) = x^{2}\), the right endpoints are \(\tfrac14, \tfrac12, \tfrac34, 1\), so</p>
+        <p>\[ \begin{aligned}
+          R_{4} &= \tfrac{1}{4}\!\left[\left(\tfrac14\right)^{2} + \left(\tfrac12\right)^{2} + \left(\tfrac34\right)^{2} + 1^{2}\right] \\[2pt]
+                &= \tfrac{1}{4}\cdot\frac{1 + 4 + 9 + 16}{16} = \frac{30}{64} = \frac{15}{32} \approx 0.469.
+        \end{aligned} \]</p>
+        <p>The left endpoints are \(0, \tfrac14, \tfrac12, \tfrac34\), which drop the tallest rectangle and add a flat one of height \(0\):</p>
+        <p>\[ \begin{aligned}
+          L_{4} &= \tfrac{1}{4}\!\left[0^{2} + \left(\tfrac14\right)^{2} + \left(\tfrac12\right)^{2} + \left(\tfrac34\right)^{2}\right] \\[2pt]
+                &= \tfrac{1}{4}\cdot\frac{0 + 1 + 4 + 9}{16} = \frac{14}{64} = \frac{7}{32} \approx 0.219.
+        \end{aligned} \]</p>
+        <p>Because \(x^{2}\) is increasing on \([0, 1]\), each right rectangle rises above the curve and each left rectangle falls below it, so the two sums bracket the true area \(A\):</p>
+        <p>\[ 0.219 \approx L_{4} < A < R_{4} \approx 0.469. \]</p>
+        <!-- expansion:caution [pass: enrichment] [source: mode-c gap-check 2026-07-11 — L/R over/under-estimation depends on monotonicity, not on which side; Ch6's two examples are both increasing, guard against over-generalizing] -->
+        <p>The direction of this bracket is a fact about the <em>increase</em> of \(x^{2}\), not about which endpoint is read: on an interval where \(f\) <em>decreases</em>, the roles swap — the right endpoints undershoot and the left endpoints overshoot — and where \(f\) both rises and falls, over- and under-estimation must be judged piece by piece.</p>
+        <p>Four rectangles give only a loose verdict. The bracket will tighten as \(n\) grows — and the next example takes \(n\) all the way to infinity. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-essential — Riemann L/R rectangles under x²; registered in chapter6 FIGS as "riemann-lr-x2"] -->
+  <figure class="figure" data-fig="riemann-lr-x2">
+    <figcaption><span class="fig-no">Figure 6.1</span> Approximating the area under \(y = x^{2}\) on \([0, 1]\) with four equal strips. Reading each rectangle’s height at the <em>left</em> endpoint (left panel) keeps every rectangle below the curve, so \(L_{4} = \tfrac{7}{32}\) underestimates; reading it at the <em>right</em> endpoint (right panel) lifts every rectangle above the curve, so \(R_{4} = \tfrac{15}{32}\) overestimates. The true area is trapped between.</figcaption>
+  </figure>
+
+  <p>To let \(n \to \infty\) we need the right endpoint sum as an explicit function of \(n\). For \(f(x) = x^{2}\) on \([0, 1]\) the width is \(\Delta x = \tfrac{1}{n}\) and the right endpoints are \(x_{i} = \tfrac{i}{n}\), so \(f(x_{i}) = \tfrac{i^{2}}{n^{2}}\) and</p>
+  <p>\[ R_{n} = \sum_{i=1}^{n} \frac{i^{2}}{n^{2}}\cdot\frac{1}{n} = \frac{1}{n^{3}} \sum_{i=1}^{n} i^{2}. \]</p>
+  <p>The remaining sum \(\sum_{i=1}^{n} i^{2}\) is a <em>power sum</em>. Unlike the arithmetic sum \(\sum_{i=1}^{n} i = \tfrac{n(n+1)}{2}\), it has the less familiar closed form</p>
+  <p>\[ \sum_{i=1}^{n} i^{2} = \frac{n(n+1)(2n+1)}{6}, \]</p>
+  <p>proved by telescoping in Appendix A (Proposition A.6). With that closed form in hand, the limit is a routine computation.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-strong — refinement of the right sum Rₙ closing the bracket as n grows; registered in chapter6 FIGS as "refinement-rn-x2"] -->
+  <figure class="figure" data-fig="refinement-rn-x2">
+    <figcaption><span class="fig-no">Figure 6.2</span> Refining the right endpoint sum for \(y = x^{2}\) on \([0, 1]\). With \(n = 4, 8, 16\) strips the rectangles overshoot the curve on every strip, but by less and less as \(n\) grows, so the overestimates close in on the true area from above.</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.2</span></p>
+      <div class="env-body">
+        <p>Find the exact area under \(y = x^{2}\) from \(0\) to \(1\) as the limit of the right endpoint sums.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Substitute the closed form for \(\sum i^{2}\) into \(R_{n}\) and simplify, keeping the powers of \(n\) grouped so the limit is easy to read:</p>
+        <p>\[ \begin{aligned}
+          R_{n} &= \frac{1}{n^{3}} \sum_{i=1}^{n} i^{2} \\[2pt]
+                &= \frac{1}{n^{3}}\cdot\frac{n(n+1)(2n+1)}{6} \\[2pt]
+                &= \frac{(n+1)(2n+1)}{6 n^{2}} \\[2pt]
+                &= \frac{1}{6}\left(1 + \frac{1}{n}\right)\!\left(2 + \frac{1}{n}\right).
+        \end{aligned} \]</p>
+        <p>As \(n \to \infty\), both \(\tfrac{1}{n}\) terms vanish, so</p>
+        <p>\[ A = \lim_{n \to \infty} R_{n} = \frac{1}{6}\,(1)(2) = \frac{1}{3}. \]</p>
+        <p>The exact area is \(\tfrac{1}{3}\) — comfortably inside the bracket \(0.219 < A < 0.469\) from Example 6.1. The same limit results from the left endpoint sums \(L_{n}\): they differ from \(R_{n}\) by only the single end rectangle \(\tfrac{1}{n}\bigl(f(1) - f(0)\bigr) = \tfrac{1}{n}\), which itself tends to \(0\). Approaching the area from below or from above, we arrive at the one number. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <p>That the left and right sums close on a single value is exactly what lets us <em>define</em> the area to be that value.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.1</span><span class="env-name">Area under a curve</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be continuous and non-negative on \([a, b]\). The <em>area</em> of the region under the graph of \(f\) from \(a\) to \(b\) is</p>
+      <p>\[ A = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_{i})\,\Delta x, \qquad \Delta x = \frac{b - a}{n},\quad x_{i} = a + i\,\Delta x, \]</p>
+      <p>provided this limit exists. For a continuous \(f\) it does, and the left endpoint sums, the right endpoint sums, and in fact the sums built from <em>any</em> choice of sample point in each strip all approach the same value.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the honest fence: existence and choice-independence of the limit is asserted here, proved (as integrability) in §6.2 and the Proof Track; do not let the reader think it is free -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The clause “provided this limit exists” is not a formality. That the approximating sums converge at all — and that the choice of sample point cannot change the answer — is a genuine theorem, resting on the continuity of \(f\). We rely on it here to make the definition well posed, and the next section states it precisely (continuity guarantees the limit); its proof, which turns on how tightly a continuous function can be trapped on a closed interval, is carried in the Proof-Track appendix. For a badly discontinuous \(f\), sums built from different choices of sample point really can disagree — driving every sample to where the function misbehaves gives one value, steering clear of those places gives another — so no single limit, and hence no area, is defined. (For the equal-width left and right sums themselves the gap is only \(\bigl(f(b) - f(a)\bigr)\,\Delta x\), which closes regardless; it is the freedom in the sample points, not the side of the strip, that continuity has to tame.)</p>
+    </div>
+  </section>
+
+  <!-- expansion:history [source: standard calculus-textbook historical note] — Archimedes' quadrature of the parabola as the ancestor of the limit-of-sums, motivating (not decorating) the method -->
+  <p>The method is old. In the third century BCE Archimedes found the area of a parabolic segment by trapping it between inscribed and circumscribed rectilinear figures and squeezing them together — the same bracket, computed by hand, that Examples 6.1 and 6.2 tightened into a limit. What the seventeenth century added was not the idea but the machinery to carry the limit out in general, which is the business of this chapter.</p>
+
+  <h3 class="subsec-head">The distance problem</h3>
+
+  <!-- expansion:intuition — motivate the distance problem as the SAME sum, so the definite integral of §6.2 lands as the common answer to two questions, not one -->
+  <p>Suppose we know the <em>speed</em> of a moving object at every instant, but not its position, and we want the <em>total distance</em> it travels over a time interval. Speed is never negative — it measures how fast the object moves, whichever way it is heading — and we take it to vary continuously. If it were <em>constant</em>, the distance would be just speed times elapsed time. It is not constant — but over a <em>short</em> stretch of time it is nearly so, and on that stretch \(\text{speed} \times \text{time}\) is a good estimate of the distance covered. Add these estimates over the whole interval and the total distance is approximated by a sum of exactly the form \(\sum v(t_{i})\,\Delta t\) — a Riemann sum again, now with speed in place of \(f\) and elapsed time in place of width.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.3</span></p>
+      <div class="env-body">
+        <p>A runner starts from rest and speeds up, her speed recorded every second for five seconds:</p>
+        <p>\[ \begin{array}{c|cccccc} t\ (\text{s}) & 0 & 1 & 2 & 3 & 4 & 5 \\ \hline v\ (\text{m/s}) & 0 & 4 & 7 & 9 & 10 & 10 \end{array} \]</p>
+        <p>Assuming her speed climbs continuously and never falls back over this interval, estimate the distance she covers.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Take \(\Delta t = 1\) second. Using the speed at the <em>left</em> end of each one-second interval (the readings at \(t = 0, 1, 2, 3, 4\)) gives the underestimate</p>
+        <p>\[ L = 1\cdot(0 + 4 + 7 + 9 + 10) = 30 \text{ m}, \]</p>
+        <p>while the speed at the <em>right</em> end of each interval (the readings at \(t = 1, 2, 3, 4, 5\)) gives the overestimate</p>
+        <p>\[ R = 1\cdot(4 + 7 + 9 + 10 + 10) = 40 \text{ m}. \]</p>
+        <p>Because the speed never falls back, on each one-second stretch it stays no lower than the left reading and no higher than the right, so the left sum is a lower estimate of the distance and the right sum an upper one: the true distance lies between them, \(30 \text{ m} \le \text{distance} \le 40 \text{ m}\), about \(35\) metres. The readings alone fix only the sampled values; the bracket rests on the modelling assumption that the speed climbs without falling back between them. Readings taken every half-second, then every tenth of a second, would squeeze the two estimates together — the identical refinement that Example 6.2 carried to the limit. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-strong — v–t step graph, distance as area under the velocity curve; registered in chapter6 FIGS as "velocity-distance-steps"] -->
+  <figure class="figure" data-fig="velocity-distance-steps">
+    <figcaption><span class="fig-no">Figure 6.3</span> The runner’s recorded speeds at one-second marks (Example 6.3), with the right endpoint rectangles whose areas sum to the overestimate \(R\). Since distance accumulates speed times time, the distance travelled is the area under the speed–time graph; the dashed line only suggests the unrecorded speed between readings.</figcaption>
+  </figure>
+
+  <!-- expansion:summary — close: the two problems are one limit-of-sums; name-drop that §6.2 will christen it, WITHOUT introducing the integral symbol or its mechanics (seam guard) -->
+  <p>Set the two computations side by side. The area under a curve is \(\lim_{n\to\infty}\sum f(x_{i})\,\Delta x\); the distance from a speed is \(\lim_{n\to\infty}\sum v(t_{i})\,\Delta t\). They are the <em>same</em> limit of the <em>same</em> kind of sum, differing only in what the quantities are called — and indeed for a non-negative speed the distance is nothing but the area under the speed-versus-time graph. Whenever a quantity accumulates from a varying rate, the same construction returns: chop the interval, multiply rate by width, sum, and refine. The next section gives this common limit a name and a symbol of its own — the <em>definite integral</em> — and settles the promise made above that, for a continuous function, the limit is really there.</p>
+
+</article>

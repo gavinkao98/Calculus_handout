@@ -1,0 +1,169 @@
+<!-- §6.4 Indefinite Integrals and the Net Change Theorem. section-source: Stewart ET 9e §5.4;
+     cross-checked Thomas 14e §5.4, Rogawski 4e §5.6 / §6.1. Authored 2026-07-10 per PLAN-ch06 + brief-6-4
+     (canon-as-spine; Codex ⑤ per user 2026-07-06 grant). Numbering continues from §6.3: mints
+     Definition 6.4 (Indefinite integral), Theorem 6.5 (Net Change Theorem), Examples 6.13–6.16 (M4 added Ex 6.15 arctan; old 6.10–6.12 → 6.13/6.14/6.16).
+     Cautions UNNUMBERED. Builds on Def 6.3 (antiderivative) and Theorem 6.4 (FTC-2).
+     KEY EXPORT: ∫(1/x)dx = ln|x| + C (justify the absolute value via the x<0 branch; domain x≠0) → Ch8, Ch9.
+     SEAM GUARD (brief-6-4): the Net Change Theorem is FTC-2 REREAD (f=F') — state, do NOT re-prove. Basic
+     antiderivative table only (reverse of Ch2–4 derivative rules) — NO integration technique. Do NOT do
+     substitution (§6.5). Displacement (∫v) vs total distance (∫|v|) closes the §6.1 speed loop.
+     Counters handed to §6.5: Theorem 6.6, Strategy 6.2, Example 6.17, Figure 6.10 (§6.4 minted Ex 6.13–6.16, Fig 6.9 through M4; §6.5 mints no figure).
+     FIGURES (M2; renumbered by M4): §6.4 carries Figure 6.9 (velocity-signed-area, Ex 6.16); cleared gate-1
+     D1–D8 + gate-2 at 0 blocking.
+     Record: PLAN-ch06.md, brief-6-4.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">6.4</span>Indefinite Integrals and the Net Change Theorem</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: FTC-2 needs an antiderivative; give the notation for the whole family of them, and reread the theorem as a net-change identity -->
+  <p>The Fundamental Theorem turns every definite integral into a hunt for an antiderivative, so antiderivatives now deserve a notation and a working table. This section supplies both, and then rereads the theorem itself in the language of accumulated change — the form in which it does most of its practical work.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.4</span><span class="env-name">Indefinite integral</span></p>
+    <div class="env-body">
+      <p>The <em>indefinite integral</em> of \(f\), written \(\int f(x)\,dx\), denotes the family of all antiderivatives of \(f\). The statement</p>
+      <p>\[ \int f(x)\,dx = F(x) + C \]</p>
+      <p>means that \(F' = f\), where \(C\) is an arbitrary constant — the <em>constant of integration</em>. As \(C\) ranges over all real numbers, \(F + C\) ranges over every antiderivative of \(f\) on the interval in question.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the notation trap: indefinite integral is a FUNCTION family, definite integral is a NUMBER -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Keep the two integrals apart. The <em>definite</em> integral \(\int_{a}^{b} f(x)\,dx\) is a <em>number</em>; the <em>indefinite</em> integral \(\int f(x)\,dx\) is a <em>family of functions</em>. They share a symbol because the Fundamental Theorem links them — the definite integral is evaluated <em>through</em> an antiderivative — but a number and a family of functions are not the same kind of object. The limits of integration \(a\) and \(b\) are what distinguish the two on the page.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">A table of antiderivatives</h3>
+
+  <p>Every differentiation rule from Chapters 2 through 4, read backwards, is an antiderivative formula. The most useful ones (each carrying an implied \(+C\)) are worth collecting:</p>
+  <p>\[ \begin{aligned}
+    &\int x^{n}\,dx = \frac{x^{n+1}}{n+1} \ \ (n \ne -1), &\qquad &\int \frac{1}{x}\,dx = \ln\lvert x\rvert, \\[4pt]
+    &\int e^{x}\,dx = e^{x}, &\qquad &\int \cos x\,dx = \sin x, \\[4pt]
+    &\int \sin x\,dx = -\cos x, &\qquad &\int \sec^{2} x\,dx = \tan x, \\[4pt]
+    &\int \frac{1}{1 + x^{2}}\,dx = \arctan x, &\qquad &\int \frac{1}{\sqrt{1 - x^{2}}}\,dx = \arcsin x.
+  \end{aligned} \]</p>
+
+  <p>The trigonometric and inverse-trigonometric entries are the Chapter 3 derivative rules read backwards — for instance \(\int \sec^{2} x\,dx = \tan x\) because \((\tan x)' = \sec^{2} x\), and \(\arctan\) and \(\arcsin\) likewise reverse the derivatives found there. Each identity holds on any interval where both the integrand and the stated antiderivative are defined: the \(\sec^{2}\) formula where \(\cos x \ne 0\), the \(\arcsin\) formula on \(-1 < x < 1\), and — for a negative or fractional exponent — the power rule on an interval avoiding the points where \(x^{n}\) is undefined. The power rule covers every exponent except \(n = -1\), where the formula \(\tfrac{x^{n+1}}{n+1}\) would divide by zero. That missing case is filled by the logarithm — and the reason an absolute value appears there is worth seeing.</p>
+
+  <!-- expansion:formula — the ln|x| export: justify the absolute value via the x<0 branch, and flag the domain (x≠0, two branches) -->
+  <p>For \(x > 0\), \(\lvert x\rvert = x\) and \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), as established in Chapter 4 (Theorem 4.14). For \(x < 0\), \(\lvert x\rvert = -x\), and the chain rule gives</p>
+  <p>\[ \frac{d}{dx}\ln(-x) = \frac{1}{-x}\cdot(-1) = \frac{1}{x}. \]</p>
+  <p>So on either side of the origin \(\dfrac{d}{dx}\ln\lvert x\rvert = \dfrac{1}{x}\), which is why</p>
+  <p>\[ \int \frac{1}{x}\,dx = \ln\lvert x\rvert + C. \]</p>
+  <p>The absolute value extends the antiderivative to negative \(x\) as well as positive. One caution: \(1/x\) is undefined at \(x = 0\), and its domain falls into the two separate intervals \((-\infty, 0)\) and \((0, \infty)\); the formula is valid on any interval that avoids the origin, but \(C\) may take different values on the two sides.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.13</span></p>
+      <div class="env-body">
+        <p>Find (a) \(\displaystyle\int \bigl(x^{3} - 6x\bigr)\,dx\) and (b) \(\displaystyle\int \left(2e^{x} - \frac{5}{x}\right)dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Integrate term by term, using the table and the linearity that the derivative rules pass to antiderivatives. (a)</p>
+        <p>\[ \int \bigl(x^{3} - 6x\bigr)\,dx = \frac{x^{4}}{4} - 6\cdot\frac{x^{2}}{2} + C = \frac{x^{4}}{4} - 3x^{2} + C. \]</p>
+        <p>(b) The term \(5/x\) draws on the logarithm:</p>
+        <p>\[ \int \left(2e^{x} - \frac{5}{x}\right)dx = 2e^{x} - 5\ln\lvert x\rvert + C. \]</p>
+        <p>A single constant \(C\) absorbs the constants from every term. We can always check an indefinite integral by differentiating the answer: \(\dfrac{d}{dx}\bigl(2e^{x} - 5\ln\lvert x\rvert\bigr) = 2e^{x} - \dfrac{5}{x}\), as required. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.14</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{1}^{2} \frac{1}{x}\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>An antiderivative of \(1/x\) is \(\ln\lvert x\rvert\), and on \([1, 2]\) the variable is positive, so \(\ln\lvert x\rvert = \ln x\). By the Fundamental Theorem,</p>
+        <p>\[ \int_{1}^{2} \frac{1}{x}\,dx = \bigl[\ln\lvert x\rvert\bigr]_{1}^{2} = \ln 2 - \ln 1 = \ln 2. \]</p>
+        <p>The area under \(y = 1/x\) from \(1\) to \(2\) is exactly \(\ln 2 \approx 0.693\). <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 — Layer-2: exercise the inverse-trig table row (arctan), untouched by Ex 6.13–6.14; ties a bare table entry to π/4 via FTC; authored stem+solution, CLP-1 §4.1 corroborates the row] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.15</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{1} \frac{1}{1 + x^{2}}\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The table records \(\int \dfrac{1}{1 + x^{2}}\,dx = \arctan x\) — the reverse of \((\arctan x)' = \dfrac{1}{1 + x^{2}}\) established in Chapter 3. By the Fundamental Theorem,</p>
+        <p>\[ \int_{0}^{1} \frac{1}{1 + x^{2}}\,dx = \bigl[\arctan x\bigr]_{0}^{1} = \arctan 1 - \arctan 0 = \frac{\pi}{4}. \]</p>
+        <p>A rational integrand with no area to read off has produced the number \(\tfrac{\pi}{4}\) — one of the standard ways \(\pi\) arrives through integration. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">The Net Change Theorem</h3>
+
+  <!-- expansion:intuition — reread FTC-2 with f = F': the integral of a rate is the net change. This is the practical face of the FTC. -->
+  <p>Read the Fundamental Theorem with the integrand named as a derivative. If a quantity \(F\) changes at the rate \(F'\), then integrating that rate over \([a, b]\) recovers the total change in \(F\).</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.5</span><span class="env-name">Net Change Theorem</span></p>
+    <div class="env-body">
+      <p>If \(F'\) is continuous on \([a, b]\), then</p>
+      <p>\[ \int_{a}^{b} F'(x)\,dx = F(b) - F(a). \]</p>
+      <p>The integral of a rate of change is the net change in the quantity.</p>
+    </div>
+  </section>
+
+  <p>This is nothing more than Part 2 of the Fundamental Theorem (Theorem 6.4) with the integrand written as \(F'\): \(F\) is an antiderivative of \(F'\), so the theorem applies verbatim. Its value is in the reading. If \(V'(t)\) is the rate at which water flows into a tank, \(\int_{t_{1}}^{t_{2}} V'(t)\,dt\) is the net volume added; if \(C'(x)\) is a marginal cost, \(\int_{x_{1}}^{x_{2}} C'(x)\,dx\) is the added cost of raising production from \(x_{1}\) to \(x_{2}\). The most important case is motion.</p>
+
+  <!-- expansion:caution — displacement (∫v, signed) vs total distance (∫|v|); split at sign changes. Closes the §6.1 speed loop. -->
+  <p>For an object moving along a line with velocity \(v(t)\), position is an antiderivative of velocity, so the Net Change Theorem gives the <em>displacement</em> — the net change in position — as</p>
+  <p>\[ \text{displacement} = \int_{a}^{b} v(t)\,dt. \]</p>
+  <p>This is a signed quantity: motion in the negative direction subtracts. The <em>total distance travelled</em>, which never subtracts, integrates the <em>speed</em> \(\lvert v(t)\rvert\) instead — recovering the reading of §6.1:</p>
+  <p>\[ \text{total distance} = \int_{a}^{b} \lvert v(t)\rvert\,dt. \]</p>
+  <p>To compute the distance we split the interval at the instants where \(v\) changes sign, integrate \(v\) on each piece, and add the absolute values.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.16</span></p>
+      <div class="env-body">
+        <p>A particle moves along a line with velocity \(v(t) = t^{2} - 4\) (in m/s) for \(0 \le t \le 3\). Find its displacement and the total distance it travels.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The displacement is the integral of the velocity over \([0, 3]\):</p>
+        <p>\[ \int_{0}^{3} \bigl(t^{2} - 4\bigr)\,dt = \left[\frac{t^{3}}{3} - 4t\right]_{0}^{3} = (9 - 12) - 0 = -3 \text{ m}. \]</p>
+        <p>The particle ends \(3\) metres behind where it started. For the total distance, note \(v(t) = t^{2} - 4 = 0\) at \(t = 2\); the velocity is negative on \([0, 2)\) (the particle moves backward), zero at \(t = 2\), and positive on \((2, 3]\). Splitting there,</p>
+        <p>\[ \begin{aligned}
+          \int_{0}^{2} \bigl(t^{2} - 4\bigr)\,dt &= \left[\frac{t^{3}}{3} - 4t\right]_{0}^{2} = \frac{8}{3} - 8 = -\frac{16}{3}, \\[2pt]
+          \int_{2}^{3} \bigl(t^{2} - 4\bigr)\,dt &= (9 - 12) - \left(\frac{8}{3} - 8\right) = -3 + \frac{16}{3} = \frac{7}{3}.
+        \end{aligned} \]</p>
+        <p>The total distance adds the absolute values of the two signed pieces:</p>
+        <p>\[ \text{distance} = \left\lvert -\frac{16}{3}\right\rvert + \left\lvert \frac{7}{3}\right\rvert = \frac{16}{3} + \frac{7}{3} = \frac{23}{3} \approx 7.67 \text{ m}. \]</p>
+        <p>The particle covers \(\tfrac{23}{3}\) metres of ground while ending only \(3\) metres from its start: the forward leg of \(\tfrac{7}{3}\) m undoes only part of the backward leg of \(\tfrac{16}{3}\) m, leaving it \(3\) metres behind. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-essential — velocity v=t²−4 signed regions, displacement vs distance; registered in chapter6 FIGS as "velocity-signed-area"] -->
+  <figure class="figure" data-fig="velocity-signed-area">
+    <figcaption><span class="fig-no">Figure 6.9</span> Displacement versus distance for \(v(t) = t^{2} - 4\) on \([0, 3]\) (Example 6.16). The velocity is negative on \([0, 2)\) — the region below the axis, marked \(-\), of area \(\tfrac{16}{3}\) — and positive on \((2, 3]\) — the region above, marked \(+\), of area \(\tfrac{7}{3}\). The displacement is the net \(\tfrac{7}{3} - \tfrac{16}{3} = -3\) m, while the total distance adds the magnitudes, \(\tfrac{16}{3} + \tfrac{7}{3} = \tfrac{23}{3}\) m.</figcaption>
+  </figure>
+
+  <!-- expansion:summary — close: antiderivatives now have notation and a table; the FTC reads as net change. Forward-fence to §6.5 (substitution) WITHOUT its mechanics. -->
+  <p>The definite integral is now, in principle, a solved problem: find an antiderivative, subtract its values, and read the result as an area or a net change. In practice a gap remains. The table above antidifferentiates only functions that are visibly some derivative run backwards; a mild disguise — an inner function tucked inside another — defeats it. The next section restores the chain rule to the antiderivative side of the ledger, and with it the single most useful technique for finding antiderivatives that the table alone cannot.</p>
+
+</article>

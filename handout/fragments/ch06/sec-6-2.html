@@ -1,0 +1,202 @@
+<!-- §6.2 The Definite Integral. section-source: Stewart ET 9e §5.2 (The Definite Integral);
+     cross-checked Thomas 14e §5.3, Rogawski 4e §5.2. Authored 2026-07-10 per PLAN-ch06 + brief-6-2
+     (canon-as-spine; Codex ⑤ per user 2026-07-06 grant). Numbering continues from §6.1:
+     mints Definition 6.2, Theorem 6.1 (first Thm of Ch6), Theorem 6.2, Examples 6.4–6.8 (M4 added Ex 6.6 semicircle + Ex 6.7 linearity).
+     Cautions UNNUMBERED. This section introduces the ∫ symbol and net signed area (both deferred from §6.1).
+     SEAM GUARD (brief-6-2 + full-arc seam-hunt): STATE Theorem 6.1 (continuous ⟹ integrable) and FENCE its
+     proof ON CREDIT (uniform continuity on a closed interval) — 深理論核心 permits on-credit fencing of the
+     single heaviest result (SPEC §16.1). Do NOT prove a Riemann-integrability criterion. Do NOT introduce the
+     FTC/antiderivative shortcut (§6.3 — one-line forward fence only) or any integration technique / numerical
+     rule (Midpoint/Trapezoid/Simpson RULES are Ch8 §8.7 — the midpoint sample POINT may appear only as an
+     instance of "any sample point works"). NO dangling cross-ref: App D is currently §D.1–D.3, so do NOT cite a
+     §D.4 that does not exist — fence on-credit generically (whether to write §D.4 is an open ⑤ decision, PLAN-ch06).
+     Counters handed to §6.3: Definition 6.3, Theorem 6.3, Example 6.9, Figure 6.7 (§6.2 minted Ex 6.4–6.8, Fig 6.4–6.6 through M4).
+     FIGURES (M2+M4): §6.2 now carries Figure 6.4 (signed-area-line, Ex 6.5), Figure 6.5 (semicircle-area, Ex 6.6 — M4)
+     and Figure 6.6 (minmax-sqrt, Ex 6.8 — was Fig 6.5 pre-M4). M2 pair gate-1+gate-2 0 blocking; semicircle gate-1 0 blocking, gate-2 batched. Record: PLAN-ch06.md, brief-6-2.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">6.2</span>The Definite Integral</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: §6.1 produced a common limit for two problems; name it, and extend it from area (f≥0) to any continuous f, where it becomes net signed area -->
+  <p>Section 6.1 ended on a coincidence too strong to be one: the area under a curve and the distance from a velocity were the <em>same</em> limit of the <em>same</em> kind of sum. A construction that keeps returning deserves a name and a symbol of its own. Here we give it both — the <em>definite integral</em> — and at the same time free it from the assumption that \(f\) is non-negative. For a function that dips below the axis the same limit still makes perfect sense; it simply measures area with a sign, and that signed quantity is what the integral records.</p>
+
+  <p>Fix a function \(f\) on \([a, b]\). Exactly as before, cut \([a, b]\) into \(n\) strips of equal width \(\Delta x = (b - a)/n\) by points \(a = x_{0} < x_{1} < \dots < x_{n} = b\); but now, in each strip \([x_{i-1}, x_{i}]\), allow the height to be read at <em>any</em> point \(x_{i}^{*}\) of that strip, not just an endpoint. The resulting sum</p>
+  <p>\[ \sum_{i=1}^{n} f(x_{i}^{*})\,\Delta x \]</p>
+  <p>is called a <em>Riemann sum</em> for \(f\) on \([a, b]\), after Bernhard Riemann. The left, right, and midpoint sums are the special cases \(x_{i}^{*} = x_{i-1}\), \(x_{i}^{*} = x_{i}\), and \(x_{i}^{*} = \tfrac{1}{2}(x_{i-1} + x_{i})\). The definite integral is what these sums approach.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.2</span><span class="env-name">Definite integral</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be defined on \([a, b]\). The <em>definite integral of \(f\) from \(a\) to \(b\)</em> is</p>
+      <p>\[ \int_{a}^{b} f(x)\,dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_{i}^{*})\,\Delta x, \qquad \Delta x = \frac{b - a}{n}, \]</p>
+      <p>provided this limit exists and takes the <em>same</em> value for every choice of the sample points \(x_{i}^{*}\). When it does, \(f\) is called <em>integrable</em> on \([a, b]\).</p>
+    </div>
+  </section>
+
+  <p>The symbol \(\int\), an elongated \(S\) for <em>summa</em>, was Leibniz’s; it keeps the Riemann sum in view even after the limit has erased the individual rectangles. In \(\displaystyle\int_{a}^{b} f(x)\,dx\), the numbers \(a\) and \(b\) are the <em>limits of integration</em> (lower and upper), \(f(x)\) is the <em>integrand</em>, and the \(dx\) marks the variable with respect to which we sum — the surviving trace of the width \(\Delta x\). The integral is a <em>number</em>, not a function of \(x\); the \(x\) inside is a placeholder, so</p>
+  <p>\[ \int_{a}^{b} f(x)\,dx = \int_{a}^{b} f(t)\,dt = \int_{a}^{b} f(u)\,du. \]</p>
+
+  <!-- expansion:history [source: standard calculus-textbook historical note] — Leibniz's 1675 elongated-S notation for the integral as "summa" -->
+  <p>Leibniz settled on the elongated \(S\) in 1675, writing the integral as a continuous analogue of a sum of infinitely many infinitely thin rectangles. The notation has outlived the shaky infinitesimals it was born with precisely because it survives translation into the honest limit of Definition 6.2.</p>
+
+  <p>To use the integral freely we extend it to the cases \(a = b\) and \(a > b\) by convention, so that the limits of integration may sit in either order:</p>
+  <p>\[ \int_{a}^{a} f(x)\,dx = 0, \qquad \int_{b}^{a} f(x)\,dx = -\int_{a}^{b} f(x)\,dx. \]</p>
+  <p>Reversing the limits reverses the sign — natural, since running the strips from \(b\) back to \(a\) turns each width \(\Delta x\) into its negative.</p>
+
+  <h3 class="subsec-head">When does the limit exist?</h3>
+
+  <p>Definition 6.2 asks a great deal: one number approached by <em>every</em> choice of sample points. For a wild enough function the demand fails — recall the caution of §6.1, where samples steered onto and off the misbehaviour of \(f\) gave different answers. What rescues the functions we actually meet is continuity.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.1</span><span class="env-name">Integrability of continuous functions</span></p>
+    <div class="env-body">
+      <p>If \(f\) is continuous on \([a, b]\), then \(f\) is integrable on \([a, b]\): the Riemann sums approach a single limit — the same for every way of slicing \([a, b]\) into strips whose widths shrink to zero, and every choice of sample points within them. The same holds if \(f\) is bounded on \([a, b]\) and continuous there except at finitely many points.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — honest on-credit fence for Theorem 6.1: name uniform continuity as the engine, take the theorem on credit, do NOT gesture at a proof we are not giving (seam guard: no §D.4 dangling ref) -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Theorem 6.1 is the one result of this chapter we do not prove. Its proof turns on a property of a continuous function on a <em>closed</em> interval subtler than continuity at each point — <em>uniform</em> continuity, a single rate of continuity good across the whole interval — which forces the gap between the largest and smallest Riemann sums to shrink to zero as the strips narrow. We take the theorem on credit and use what it grants: for a continuous integrand the limit is always there, and the sample points may be chosen for convenience. This is the honest boundary of the chapter — everything else is earned in full.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Net signed area</h3>
+
+  <!-- expansion:intuition — the payoff of dropping f≥0: the integral of a sign-changing f is area above minus area below; this is the new content §6.1 deferred -->
+  <p>When \(f\) can be negative, a strip where \(f(x_{i}^{*}) < 0\) contributes a <em>negative</em> term \(f(x_{i}^{*})\,\Delta x\) to the Riemann sum. So the integral counts area above the \(x\)-axis as positive and area below it as negative:</p>
+  <p>\[ \int_{a}^{b} f(x)\,dx = \bigl(\text{area above the axis}\bigr) - \bigl(\text{area below the axis}\bigr), \]</p>
+  <p>the <em>net signed area</em> between the graph and the axis. For a non-negative \(f\) nothing lies below the axis and this reduces to the area of Definition 6.1; the definite integral is the honest generalization.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.4</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{1} x^{2}\,dx\) directly from the definition.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The integrand \(x^{2}\) is continuous, so Theorem 6.1 promises the limit exists and is blind to the choice of sample points; we may therefore use the right-endpoint sums already computed in §6.1 (Example 6.2), where they were found to converge to \(\tfrac{1}{3}\). Hence</p>
+        <p>\[ \int_{0}^{1} x^{2}\,dx = \frac{1}{3}. \]</p>
+        <p>What §6.1 called “the area under \(y = x^{2}\)” is now, with the axis label supplied, the value of a definite integral — and because \(x^{2} \ge 0\), the signed area is the plain area. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.5</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{2} (x - 1)\,dx\) using net signed area.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The graph of \(y = x - 1\) is a straight line crossing the axis at \(x = 1\). Over \([0, 1]\) it lies <em>below</em> the axis, bounding a triangle with legs \(1\) and \(1\), of area \(\tfrac{1}{2}\); over \([1, 2]\) it lies <em>above</em> the axis, bounding a congruent triangle of area \(\tfrac{1}{2}\). The integral is the area above minus the area below:</p>
+        <p>\[ \int_{0}^{2} (x - 1)\,dx = \tfrac{1}{2} - \tfrac{1}{2} = 0. \]</p>
+        <p>The two signed pieces cancel exactly. Note the contrast with the <em>total</em> area enclosed between the line and the axis, which is \(\tfrac{1}{2} + \tfrac{1}{2} = 1\): the integral reports the net, not the total. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-essential — net signed area of y=x−1, two congruent triangles cancelling; registered in chapter6 FIGS as "signed-area-line"] -->
+  <figure class="figure" data-fig="signed-area-line">
+    <figcaption><span class="fig-no">Figure 6.4</span> The integral \(\int_{0}^{2} (x - 1)\,dx\) as net signed area. The line crosses the axis at \(x = 1\); the triangle below the axis (marked \(-\), area \(\tfrac{1}{2}\)) cancels the congruent triangle above it (marked \(+\), area \(\tfrac{1}{2}\)), so the integral is \(0\) even though the total area enclosed is \(1\).</figcaption>
+  </figure>
+
+  <!-- expansion:example [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 — Layer-2: evaluate a definite integral via a known curved area (semicircle), a nonzero net signed area; authored stem+solution, Stewart ET 9e §5.2 staple] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.6</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{-1}^{1} \sqrt{1 - x^{2}}\,dx\) by interpreting it as an area.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The graph of \(y = \sqrt{1 - x^{2}}\) is the upper half of the unit circle: squaring gives \(y^{2} = 1 - x^{2}\), that is \(x^{2} + y^{2} = 1\), and the requirement \(y \ge 0\) keeps only the top. Over \([-1, 1]\) the region between this graph and the axis is therefore a semicircular disc of radius \(1\), of area \(\tfrac{1}{2}\pi(1)^{2} = \tfrac{\pi}{2}\). Since the integrand is non-negative, the definite integral is exactly that area:</p>
+        <p>\[ \int_{-1}^{1} \sqrt{1 - x^{2}}\,dx = \frac{\pi}{2}. \]</p>
+        <p>When an integrand's graph bounds a region whose area we already know, geometry reads the integral off at sight — no formula to hunt down, no limit of sums. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 tier-example-support — Example 6.6 semicircle: y=√(1−x²) is the upper unit half-circle, shaded region area π/2; registered in chapter6 FIGS as "semicircle-area"] -->
+  <figure class="figure" data-fig="semicircle-area">
+    <figcaption><span class="fig-no">Figure 6.5</span> Reading \(\int_{-1}^{1} \sqrt{1 - x^{2}}\,dx\) as an area (Example 6.6). The graph \(y = \sqrt{1 - x^{2}}\) is the upper half of the unit circle, so the shaded region is a semicircle of radius \(1\); its area \(\tfrac{\pi}{2}\) is the value of the integral.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">Properties of the integral</h3>
+
+  <p>Because the integral is a limit of sums, the arithmetic of sums passes to it in the limit. The following properties hold for continuous \(f\) and \(g\); each is the limit of the corresponding statement about Riemann sums.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.2</span><span class="env-name">Properties of the definite integral</span></p>
+    <div class="env-body">
+      <p>Let \(f\) and \(g\) be continuous on \([a, b]\) with \(a \le b\); let \(k\) be a constant; and let \(c\) satisfy \(a \le c \le b\).</p>
+      <ol class="steps">
+        <li><em>Constant.</em> \(\displaystyle\int_{a}^{b} k\,dx = k\,(b - a)\).</li>
+        <li><em>Linearity.</em> \(\displaystyle\int_{a}^{b}\bigl[f(x) + g(x)\bigr]dx = \int_{a}^{b} f(x)\,dx + \int_{a}^{b} g(x)\,dx\) and \(\displaystyle\int_{a}^{b} k\,f(x)\,dx = k\int_{a}^{b} f(x)\,dx\).</li>
+        <li><em>Additivity over intervals.</em> \(\displaystyle\int_{a}^{c} f(x)\,dx + \int_{c}^{b} f(x)\,dx = \int_{a}^{b} f(x)\,dx\).</li>
+        <li><em>Comparison.</em> If \(f(x) \ge 0\) on \([a, b]\), then \(\displaystyle\int_{a}^{b} f(x)\,dx \ge 0\). More generally, if \(f(x) \le g(x)\) on \([a, b]\), then \(\displaystyle\int_{a}^{b} f(x)\,dx \le \int_{a}^{b} g(x)\,dx\); and if \(m \le f(x) \le M\) on \([a, b]\), then \(\displaystyle m\,(b - a) \le \int_{a}^{b} f(x)\,dx \le M\,(b - a)\).</li>
+      </ol>
+    </div>
+  </section>
+
+  <p>The constant and scalar rules are a line each: \(\sum k\,\Delta x = k\,(b - a)\), since the \(n\) equal widths total \(n\,\Delta x = b - a\), and \(\sum k\,f(x_{i}^{*})\,\Delta x = k \sum f(x_{i}^{*})\,\Delta x\). For the sum half of linearity, every Riemann sum splits termwise, \(\sum \bigl[f(x_{i}^{*}) + g(x_{i}^{*})\bigr]\Delta x = \sum f(x_{i}^{*})\,\Delta x + \sum g(x_{i}^{*})\,\Delta x\), and the limit of a sum is the sum of the limits (limit laws, Theorem 1.2). For comparison, if \(f \ge 0\) then every term \(f(x_{i}^{*})\,\Delta x \ge 0\), so each Riemann sum is \(\ge 0\), and a limit of non-negative numbers is non-negative. Applying this to \(g - f\), which is \(\ge 0\) exactly when \(f \le g\), and using linearity gives \(\int f \le \int g\). Squeezing \(f\) between the constants \(m\) and \(M\) then yields the two-sided bound through the constant rule. Additivity is the geometric fact that the signed area over \([a, b]\) is the signed area over \([a, c]\) together with that over \([c, b]\) — the region divides at the vertical line \(x = c\). (Being continuous on \([a, b]\), \(f\) is continuous on \([a, c]\) and \([c, b]\) as well, so both pieces are themselves integrals; a sum-based proof slices \([a, b]\) with a division point at \(c\), where the Riemann sum splits outright into a part over \([a, c]\) and a part over \([c, b]\), and Theorem 6.1 guarantees the same limit whichever way we slice. The sign convention \(\int_{b}^{a} = -\int_{a}^{b}\) then extends the identity to a \(c\) lying outside \([a, b]\), as long as \(f\) is continuous on the whole interval that \(a\), \(b\), and \(c\) span.)</p>
+
+  <!-- expansion:example [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 — Layer-1 orphan: Theorem 6.2 linearity/constant proved but never used numerically; pre-FTC leverage of a known integral; authored stem+solution] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.7</span></p>
+      <div class="env-body">
+        <p>Given that \(\displaystyle\int_{0}^{1} x^{2}\,dx = \tfrac{1}{3}\) (Example 6.4), and without evaluating any new limit, find \(\displaystyle\int_{0}^{1} \bigl(3x^{2} - 4\bigr)\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The properties turn one known integral into many. Linearity (Theorem 6.2, part 2) splits the integral and pulls out the constant factor, and the constant rule (part 1) evaluates the remaining piece directly:</p>
+        <p>\[ \begin{aligned}
+          \int_{0}^{1} \bigl(3x^{2} - 4\bigr)\,dx &= 3\int_{0}^{1} x^{2}\,dx - \int_{0}^{1} 4\,dx \\[2pt]
+                                                   &= 3\cdot\tfrac{1}{3} - 4\,(1 - 0) = 1 - 4 = -3.
+        \end{aligned} \]</p>
+        <p>No new Riemann sum was evaluated: the single value \(\int_{0}^{1} x^{2} = \tfrac{1}{3}\), run through linearity, settles it. This is how the integral is used in practice — most integrals are reached not from the definition but by reducing them to ones already known. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.8</span></p>
+      <div class="env-body">
+        <p>Show that \(\displaystyle 3 \le \int_{1}^{4} \sqrt{x}\,dx \le 6\) without evaluating the integral.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Since \(\sqrt{x}\) is continuous on \([1, 4]\), it is integrable there by Theorem 6.1, so the properties apply. On \([1, 4]\) the integrand is increasing, running from \(\sqrt{1} = 1\) up to \(\sqrt{4} = 2\), so \(1 \le \sqrt{x} \le 2\) throughout, and the bounding property (Theorem 6.2, part 4) with \(m = 1\), \(M = 2\), and \(b - a = 3\) gives</p>
+        <p>\[ 1 \cdot 3 \le \int_{1}^{4} \sqrt{x}\,dx \le 2 \cdot 3, \qquad\text{that is}\qquad 3 \le \int_{1}^{4} \sqrt{x}\,dx \le 6. \]</p>
+        <p>A single comparison, no limit computed, pins the integral to a modest range. The exact value, \(\tfrac{14}{3} \approx 4.67\), which §6.3 will make painless to find, indeed sits inside. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-strong — min/max bounding rectangles of √x on [1,4]; registered in chapter6 FIGS as "minmax-sqrt"] -->
+  <figure class="figure" data-fig="minmax-sqrt">
+    <figcaption><span class="fig-no">Figure 6.6</span> Bounding \(\int_{1}^{4} \sqrt{x}\,dx\) without evaluating it (Example 6.8). On \([1, 4]\) the integrand runs from its minimum \(m = 1\) to its maximum \(M = 2\); the inscribed rectangle (area \(1 \cdot 3 = 3\)) and the circumscribed rectangle (area \(2 \cdot 3 = 6\)) trap the integral, so \(3 \le \int_{1}^{4} \sqrt{x}\,dx \le 6\).</figcaption>
+  </figure>
+
+  <!-- expansion:summary — close: the integral is now defined, guaranteed to exist for continuous integrands, and manipulable through its properties; but every value so far came from a limit or a picture. Forward-fence to §6.3 FTC WITHOUT its mechanics. -->
+  <p>We now have the definite integral on a firm footing: a number defined as a limit of Riemann sums, guaranteed to exist whenever the integrand is continuous, measuring net signed area, and obeying the linearity, additivity, and comparison rules that make it possible to reason about it. Yet every value we have produced has come the hard way — from a limit of sums, as in Example 6.4, or from a picture, as in Example 6.5. Only the smallest handful of integrals yields to either method. The next section removes the obstacle at a stroke: the Fundamental Theorem of Calculus connects the definite integral to the derivative, and makes the great majority of integrals painless to evaluate.</p>
+
+</article>

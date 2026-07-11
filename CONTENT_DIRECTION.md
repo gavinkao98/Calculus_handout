@@ -113,7 +113,7 @@ Ch5 起無老師手稿（權威：[`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTH
 | ⑤ advisory 迴圈 | blocking＝數學／忠實度／方向符合度 | blocking＝數學／**canon 覆蓋＋hypothesis hygiene**／方向符合度；對 Codex 跑至 0 blocking |
 | ⑥ 收斂閘 | 人定奪 | 章層 Codex review＋`REVIEW-ch{NN}-applied.html` 交使用者過目 |
 
-反幻覺備援（取代失去的 ①-verify）＝ brief＋hypothesis ledger、Codex 對抗審、章末 sympy 全例重算——見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §無手稿章節。新章編排檔抄 ch05 範本（[`handout/_dev-archive/ch05/PLAN-ch05.md`](handout/_dev-archive/ch05/PLAN-ch05.md)）；閘序層面（milestone 與 gate-2 風險分層）見 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
+反幻覺備援（取代失去的 ①-verify）＝ brief＋hypothesis ledger、Codex 對抗審、章末 sympy 全例重算——見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §無手稿章節。新章編排檔抄 ch05 範本（[`handout/_dev-archive/ch05/PLAN-ch05.md`](handout/_dev-archive/ch05/PLAN-ch05.md)）；閘序層面（milestone 與 gate-2 全跑規則）見 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
 
 ---
 

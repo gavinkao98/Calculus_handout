@@ -101,6 +101,13 @@ CHAPTERS = {
         ],
         "target": "chapter5-print-standalone.html",
     },
+    "ch06": {
+        # Fragments appended as each section reaches draft (incremental build).
+        "fragments": [
+            "sec-6-1", "sec-6-2", "sec-6-3", "sec-6-4", "sec-6-5",
+        ],
+        "target": "chapter6-print-standalone.html",
+    },
     "appA": {
         "fragments": [
             "sec-a-1", "sec-a-2", "sec-a-3", "sec-a-4", "sec-a-5", "sec-a-6",

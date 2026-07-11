@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REVIEW — Ch6 三閘 gate-2（定版前跨模型複核）</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+ :root{--ink:#1a2230;--soft:#5a6675;--line:#dfe4ea;--bg:#f6f8fa;--card:#fff;--blue:#1f4e79;--green:#1e7a46;--red:#c0392b;--amber:#b06f00;}
+ *{box-sizing:border-box;} body{margin:0;padding:30px 18px 90px;background:var(--bg);color:var(--ink);
+   font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.7;}
+ .wrap{max-width:960px;margin:0 auto;} h1{font-size:1.5rem;margin:0 0 .15em;}
+ h2{font-size:1.12rem;margin:1.6em 0 .5em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+ .sub{color:var(--soft);font-size:.9rem;margin:0 0 1.2em;}
+ .banner{background:#e7f4ec;border:1px solid #bfe3cd;border-radius:12px;padding:16px 20px;margin-bottom:14px;}
+ .banner .big{font-size:1.14rem;font-weight:700;color:var(--green);}
+ .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+ .gate{font-weight:700;font-size:1.02rem;} .gate .n{color:var(--soft);font-weight:400;font-size:.85rem;}
+ .f{border-left:3px solid var(--line);padding:3px 0 3px 13px;margin:.7em 0;} .f.fix{border-left-color:var(--green);} .f.hold{border-left-color:var(--amber);} .f.fp{border-left-color:var(--blue);}
+ .f .hd{font-weight:600;font-size:.92rem;} .row{font-size:.89rem;margin:.15em 0;} .k{color:var(--soft);font-weight:600;}
+ code{font-family:"SF Mono",Consolas,monospace;font-size:.82em;background:#eef1f5;padding:1px 5px;border-radius:4px;}
+ .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:999px;}
+ .t-fix{background:#e7f4ec;color:var(--green);border:1px solid #bfe3cd;} .t-hold{background:#fff4d6;color:var(--amber);border:1px solid #eaddaa;} .t-fp{background:#eef4fb;color:var(--blue);border:1px solid #cfe0f2;}
+ .mini{font-size:.83rem;color:var(--soft);} ul{margin:.3em 0;padding-left:1.2em;} li{margin:.3em 0;font-size:.9rem;}
+</style></head><body><div class="wrap">
+ <h1>Chapter 6 — 三閘 gate-2：定版前跨模型複核</h1>
+ <p class="sub">分支 <code>video/template-redesign-navy-spine</code> · 2026-07-11 · 三獨立 Codex 閘，<b>model <code>gpt-5.6-sol</code>／reasoning effort <code>max</code></b>，唯讀（standing consent）</p>
+
+ <div class="banner"><div class="big">✓ 三閘 gate-2 = 0 blocking（fixes 套用＋回歸畢）→ Ch6 可定版</div>
+   <div style="font-size:.92rem;margin-top:.3em;">數學 1 blocking＋1 advisory 全修；散文 0 blocking（4 advisory，3 客觀套用）；圖 8 clean＋1 false-positive（複核駁回、改修 readability）。
+   全部 rebuild＋linebreak 0＋katex 0＋env-num 6.1–6.21 連續。<b>雙閘精神：幻覺要穿過兩個獨立模型才會漏</b>——本輪 sol 抓到 M2 圖閘與 M3 散文閘都漏掉的一條 caption 數學錯。</div></div>
+
+ <div class="card"><b>複核紀律（對抗式，先核對 source 再行動）：</b>Codex 會 over-report。本輪 4 條被標的 finding 中，<b>2 條經回原始碼複核後駁回或重構</b>——圖閘的「ylabel 應為 v」是把斜體 \(v\) 誤讀為 \(y\)（source 本就是 v，未依誤讀改標）；數學閘的 Fig 6.2 caption 指控則<b>確認為真</b>並修正。逐條核對是雙閘不誤傷正確內容的關鍵。</div>
+
+ <h2>1 · 數學閘（M1–M8）— 1 blocking + 1 advisory，皆已修</h2>
+ <div class="card">
+   <div class="f fix"><div class="hd">M4 blocking · Figure 6.2 caption · <span class="tag t-fix">已修＋回歸</span></div>
+     <div class="row"><span class="k">指控（確認為真）：</span>原 caption 稱右和「overshoot above the curve — a single end strip of width \(1/n\)」。但曲線上方的 overshoot＝\(R_n-A\)，分布在<b>每個</b>子區間；\(1/n\) 是左右和之差 \(R_n-L_n\)，不是 \(R_n-A=\tfrac{1}{2n}+\tfrac{1}{6n^2}\)。結論（趨零）對，但機制敘述錯，會誤導。</div>
+     <div class="row"><span class="k">修法：</span>改為 qualitatively 正確且不洩答案（no-spoiler D7）、不 forward-ref Ex 6.2 的敘述——「the rectangles overshoot the curve on <b>every strip</b>, but by less and less as \(n\) grows, so the overestimates close in on the true area from above」。</div>
+     <div class="row"><span class="k">為何前面漏掉：</span>M2 圖 gate-1／gate-2 判「畫得對不對」（看 PNG），caption 的 prose-math 概念錯要數學讀者解析 caption 文字才抓得到——正是三閘不同鏡頭的價值。</div></div>
+   <div class="f fix"><div class="hd">M7 advisory · §6.1 Σi² 交叉引用 · <span class="tag t-fix">已修</span></div>
+     <div class="row"><span class="k">指控（確認為真）：</span>原文「proved by <b>induction</b> in Appendix A (Proposition A.6)」，但 App A §A.3 實際以 <b>telescoping</b>（\(\sum[(k+1)^2-k^2]=(n+1)^2-1\)）證明，非歸納法。</div>
+     <div class="row"><span class="k">修法：</span>「proved by <b>telescoping</b> in Appendix A (Proposition A.6)」。</div></div>
+   <div class="row" style="margin-top:.6em;"><b>獨立複核 PASS（無 finding）：</b>5 個 M4 authored 例題（6.6 π/2、6.7 −3、6.10 兩導數、6.15 π/4、6.19 ln(1+x²)/ln5）、FTC-1／FTC-2 兩證（含 \(h<0\) 分支、EVT／Squeeze／Cor 4.4 引用）、換元三證（Thm 6.6–6.8）、全章數值與圖說值、編號一致性。</div>
+ </div>
+
+ <h2>2 · 散文閘（S·A·V）— 0 blocking，4 advisory（3 套用／1 held）</h2>
+ <div class="card">
+   <div class="f fix"><div class="hd">A · §6.3 開場「Two chapters of work」 <span class="tag t-fix">已修</span></div>
+     <div class="row">定積分建於 §6.1–6.2（本章<b>兩節</b>，非兩章）；線性讀者會誤解回指。→「Two <b>sections</b> of work」。</div></div>
+   <div class="f fix"><div class="hd">U4 · §6.3「the constant of integration」 <span class="tag t-fix">已修</span></div>
+     <div class="row">此正式名詞於 §6.4 Def 6.4 才定義，早用一節。→「any added constant」（forward-term，同 M4 類客觀修）。</div></div>
+   <div class="f fix"><div class="hd">A · §6.5 對稱幾何直覺（M4 段） <span class="tag t-fix">已修（精確化）</span></div>
+     <div class="row">原「equal areas on the same side of the axis」對<b>會過軸的偶函數</b>過度斷言。改講「對應薄片<b>同高同號</b>相加（偶）／<b>反號</b>相消（奇）」，避免 same-side 的不精確。</div></div>
+   <div class="f hold"><div class="hd">F4 · §6.2 additivity 括號密度 <span class="tag t-hold">held（結構性，交裁決）</span></div>
+     <div class="row">Thm 6.2 後 additivity 的括號句資訊量高。屬證明鋪陳的結構性重排、且 M3 已動過此段——不逕自重構，列為 advisory 供你裁決是否把 additivity 拆成獨立段。</div></div>
+ </div>
+
+ <h2>3 · 圖視覺閘 — 8 clean + 1 false-positive（已釐清）</h2>
+ <div class="card">
+   <div class="f fp"><div class="hd">Figure 6.9（velocity）· 指控「ylabel 標 y 應為 v」 <span class="tag t-fp">false-positive，未植入改動</span></div>
+     <div class="row"><span class="k">複核：</span>繪圖 source 本就 <code>ylabel: "v"</code>，且曲線標 \(v=t^2-4\)、aria、caption 全用 v；render zoom 確認是斜體 <b>v</b>。Codex 把小字級斜體 \(v\) 誤讀為 \(y\)（rubric 明列的 VLM 小字誤讀）。<b>未依誤讀把 v 改掉</b>（那會破壞正確圖）。</div>
+     <div class="row"><span class="k">但根因為真＝可讀性：</span>該 label 原本緊貼頂端「5」刻度、擠到會被誤讀。→ 加頂部 headroom（ymax 5.7→6.5），zoom 複驗 v 清楚分離。8 張其餘（6.1–6.8）全 clean。</div></div>
+ </div>
+
+ <p class="mini">raw 三閘輸出（sol/max）落 scratchpad（不進版控）；durable：本報告＋<code>PLAN-ch06.md</code> 三閘 gate-2 列。結論：三閘 0 blocking，Ch6 as-built（Def 6.1–6.4／Thm 6.1–6.8／Strategy 6.1–6.2／Example 6.1–6.21／Figure 6.1–6.9）**可定版**，進 M5 收尾。</p>
+</div></body></html>

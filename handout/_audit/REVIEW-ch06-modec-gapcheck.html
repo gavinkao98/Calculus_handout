@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REVIEW — Ch6 M4 Mode C gap-check（裁決稿）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --ink:#1a2230; --soft:#5a6675; --line:#dfe4ea; --bg:#f6f8fa; --card:#fff;
+          --blue:#1f4e79; --red:#c0392b; --green:#1e7a46; --gold:#8a6d00; --amber:#b06f00; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:30px 18px 90px; background:var(--bg); color:var(--ink);
+         font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","Microsoft JhengHei",sans-serif; line-height:1.7; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { font-size:1.5rem; margin:0 0 .15em; }
+  h2 { font-size:1.15rem; margin:1.7em 0 .5em; padding-bottom:.25em; border-bottom:2px solid var(--line); }
+  h3 { font-size:1rem; margin:1.1em 0 .4em; color:var(--blue); }
+  .sub { color:var(--soft); font-size:.9rem; margin:0 0 1.2em; }
+  .banner { background:#eef4fb; border:1px solid #cfe0f2; border-radius:12px; padding:16px 20px; margin-bottom:14px; }
+  .banner .big { font-size:1.12rem; font-weight:700; color:var(--blue); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 20px;
+          margin-bottom:16px; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  code { font-family:"SF Mono",Consolas,monospace; font-size:.85em; background:#eef1f5; padding:1px 5px; border-radius:4px; }
+  .tag { display:inline-block; font-size:.72rem; font-weight:700; padding:1px 8px; border-radius:999px; }
+  .t-adopt{background:#e7f4ec;color:var(--green);border:1px solid #bfe3cd}
+  .t-opt{background:#fff4d6;color:var(--amber);border:1px solid #eaddaa}
+  .t-decline{background:#eef1f5;color:var(--soft);border:1px solid var(--line)}
+  .t-high{background:#fbeceb;color:var(--red);border:1px solid #f1c9c5}
+  .cand { border-left:3px solid var(--line); padding:4px 0 4px 14px; margin:.9em 0; }
+  .cand.adopt{border-left-color:var(--green)} .cand.opt{border-left-color:var(--amber)} .cand.decline{border-left-color:var(--soft)}
+  .cand .hd { font-weight:700; font-size:.95rem; margin-bottom:.2em; }
+  .cand .row { font-size:.88rem; margin:.15em 0; }
+  .cand .k { color:var(--soft); font-weight:600; }
+  ul { margin:.3em 0; padding-left:1.25em; } li { margin:.3em 0; font-size:.9rem; }
+  .mini { font-size:.83rem; color:var(--soft); }
+  .warn { background:#fdf6e3; border:1px solid #eaddaa; border-radius:8px; padding:10px 14px; font-size:.88rem; margin:.5em 0; }
+  table { border-collapse:collapse; width:100%; font-size:.86rem; margin:.4em 0; }
+  th,td { border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
+  th { background:#f0f3f6; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Chapter 6 — M4：Mode C 條件式 gap-check（裁決稿）</h1>
+  <p class="sub">合併偵察 · 分支 <code>video/template-redesign-navy-spine</code> · 2026-07-11 ·
+     <code>mode-c-gapwalk</code>（軟深度②）＋ <code>example-supplement</code>（補例①），皆唯讀偵察、只提案</p>
+
+  <div class="banner">
+    <div class="big">偵察結論：Ch6 M1 覆蓋紮實，未製造缺口——8 條候選（6 例題＋2 軟深度），§6.1 例題判 clean</div>
+    <div style="font-size:.92rem;margin-top:.35em;">兩個 subagent 都判本章「例題已命中每個核心教學點、軟深度異常飽和」，並透明列出「考慮後駁回」項。
+      這是 ⛳ <b>裁決補哪些</b> 的停點——採用任何一條都會接 scoped Mode B；<b>例題插入會觸發編號 cascade</b>（見下方成本）。</div>
+  </div>
+
+  <div class="card">
+    <h3>我的建議（分層，供你勾選）</h3>
+    <table>
+      <tr><th>層級</th><th>候選</th><th>為何</th></tr>
+      <tr><td><b>最小</b></td><td>6.2-E1</td><td>全章<b>唯一真 Layer-1 orphan</b>——Theorem 6.2 的線性/常數性質「證了卻從未用在數字上」。非補不可。</td></tr>
+      <tr><td><b>建議</b>（最小＋3）</td><td>+ 6.5-E1、6.4-E1、6.5-1(軟)</td><td>各教一個<b>新動作/表徵</b>且無圖成本：代換→log（強化 \(\ln|x|\) export）、反三角表列首次被操作（\(\pi/4\)）、對稱性的幾何直覺（本章唯一前導偏薄的 formal，且不編號＝零 cascade）。</td></tr>
+      <tr><td><b>完整</b>（再＋2）</td><td>+ 6.3-E1、6.1-1(軟)</td><td>FTC-1 下限變號技能、L/R 高低估取決於單調性的 caution。合理但邊際遞減。</td></tr>
+      <tr><td><b>建議不採/緩議</b></td><td>6.2-E2、6.5-E2</td><td>6.2-E2 需<b>新圖</b>（重開 M2）且動作與 Ex 6.5 重疊；6.5-E2 動作與 Ex 6.14 重疊（僅 provenance 最穩）。</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>採用的成本（先看再決定）</h3>
+    <div class="warn"><b>① 編號 cascade（最大錯誤來源）：</b>插入 Example 會把該節之後<b>全部 Example 編號 +1</b>＋所有散文 cross-ref 連動（PIPELINE「先建完整編號地圖再動手，改完 grep 核對」）。
+      例：6.2-E1 插在 Thm 6.2 後 → 現 Ex 6.6→6.7、6.7→6.8…6.16→6.17，且「Example 6.6/6.8…」等引用全要改。<b>軟深度（caution/intuition）不編號、零 cascade。</b></div>
+    <div class="warn"><b>② 解答 provenance：</b>本地題庫 <code>problem_banks</code> 的 CLP-2（積分）<b>未 clone</b>；APEX Ch5–6／Mooculus 積分題多為 answer-only。故除 <b>6.5-E2</b>（CLP-1 §4.1 有官方完整解、CC BY-NC-SA）外，其餘候選<b>解答為本次撰寫</b>（CONTENT_SOURCING 允許）→ 需 <b>sympy 重算驗證</b>；動用題庫者接 Codex 選題 gate-2。</div>
+    <div class="warn"><b>③ 6.2-E2 需新 <code>data-fig</code>＋FIGS（semicircle）</b>——會重開 M2 圖批次的繪製＋D1–D8＋gate-2。這是它被降評的主因之一。</div>
+    <div class="warn"><b>④ 採用任一條 → 接 scoped Mode B</b>（對新增內容跑散文稽核），再併入 M4 後的三閘 gate-2 批次。</div>
+  </div>
+
+  <h2>1 · 例題候選（<code>example-supplement</code>，6 條；§6.1 clean）</h2>
+  <div class="card">
+
+    <div class="cand adopt"><div class="hd">6.2-E1 · §6.2 · Layer-1 orphan <span class="tag t-high">HIGH</span> <span class="tag t-adopt">建議採用</span></div>
+      <div class="row"><span class="k">缺口：</span>Theorem 6.2 的常數/線性性質（parts 1–2）證了但<b>全章從未用在數字上</b>；part 4 有 Ex 6.6、parts 1–3 掛零。這是本章唯一 Layer-1 orphan。</div>
+      <div class="row"><span class="k">題＋解（authored）：</span>「已知 \(\int_0^1 x^2\,dx=\tfrac13\)（Ex 6.4、6.8），<b>不算任何新極限</b>，求 \(\int_0^1(3x^2-4)\,dx\)。」→ 由線性＋常數律（Thm 6.2 parts 1–2）\(=3\cdot\tfrac13-4\cdot1=1-4=-3\)。</div>
+      <div class="row"><span class="k">locus：</span>Thm 6.2 證明段之後、Ex 6.6 之前 ｜ <span class="k">來源：</span>authored（重用本書自己的 \(x^2=\tfrac13\) 與 Thm 6.2）｜ <span class="k">圖：</span>無 ｜ <span class="k">sympy：</span>可驗（−3）</div>
+      <div class="row"><span class="k">為何強：</span>「pre-FTC——此刻拿到 \(\int_0^1 3x^2\) 的唯一路就是從已知積分用線性」，是<b>與圖/極限不同的動作</b>；結構完美（貼在 Thm 6.2 後）；延續 \(x^2=\tfrac13\) 主線。</div>
+    </div>
+
+    <div class="cand adopt"><div class="hd">6.5-E1 · §6.5 · Layer-2 <span class="tag t-high">HIGH</span> <span class="tag t-adopt">建議採用</span></div>
+      <div class="row"><span class="k">缺口：</span>§6.5 非對稱例（6.13–6.15）全部落在「\(u\) 的冪次」；<b>代換→對數（\(\int f'/f=\ln|f|\)）</b>的動作缺席。</div>
+      <div class="row"><span class="k">題＋解（authored）：</span>「求 \(\int \dfrac{2x}{1+x^2}\,dx\)。」→ \(u=1+x^2,\ du=2x\,dx\)（恰在）；\(\int\frac{du}{u}=\ln|u|+C=\ln(1+x^2)+C\)（\(1+x^2>0\) 免絕對值）。定積 \(\int_0^2=[\ln u]_1^5=\ln 5\)。</div>
+      <div class="row"><span class="k">locus：</span>Ex 6.14 之後 ｜ <span class="k">來源：</span>authored；型別前例 APEX 06_01（answer-only, CC BY-NC）｜ <span class="k">圖：</span>無 ｜ <span class="k">sympy：</span>可驗</div>
+      <div class="row"><span class="k">為何強：</span>教<b>新輸出型別（log）</b>、與已知代換 \(u=1+x^2\) 最小對比、且<b>回扣 §6.4 的 \(\ln|x|\) export</b>——§6.5 單條最強。</div>
+    </div>
+
+    <div class="cand adopt"><div class="hd">6.4-E1 · §6.4 · Layer-2 <span class="tag t-opt">MED-HIGH</span> <span class="tag t-adopt">建議採用</span></div>
+      <div class="row"><span class="k">缺口：</span>反導數表列 \(\int\frac{1}{1+x^2}=\arctan x\)、\(\arcsin\)、\(\sec^2\to\tan\) <b>從未被任何例題操作</b>（Ex 6.10/6.11 只用 \(x^n,e^x,1/x\)）。</div>
+      <div class="row"><span class="k">題＋解（canonical）：</span>「求 \(\int_0^1 \dfrac{1}{1+x^2}\,dx\)。」→ 原函數 \(\arctan x\)；\([\arctan x]_0^1=\tfrac{\pi}{4}-0=\tfrac{\pi}{4}\)。</div>
+      <div class="row"><span class="k">locus：</span>Ex 6.10/6.11 之後 ｜ <span class="k">來源：</span>authored；CLP-1 §4.1 佐證表列（CC BY-NC-SA）｜ <span class="k">圖：</span>無 ｜ <span class="k">sympy：</span>可驗</div>
+      <div class="row"><span class="k">為何強：</span>價值最高的未操作表列、令人印象深刻的常數 \(\pi/4\)、把裸表列經 FTC 綁到結果。替代：\(\arcsin\to\pi/6\) 或 \(\sec^2\) 定積。</div>
+    </div>
+
+    <div class="cand opt"><div class="hd">6.3-E1 · §6.3 · Layer-2 <span class="tag t-opt">MEDIUM</span> <span class="tag t-opt">選配</span></div>
+      <div class="row"><span class="k">缺口：</span>FTC-1 微分技能不全：(a) 變數在<b>下限</b>→反轉變號 \(\frac{d}{dx}\int_x^b=-f(x)\)（經典錯點）；(b) <b>雙</b>限皆函數→拆常數點各用鏈鎖。Ex 6.7 只示範上限為 \(x\)、上限為 \(x^3\)。</div>
+      <div class="row"><span class="k">題＋解（authored）：</span>「微分 (a) \(g(x)=\int_x^1\sqrt{1+t^2}\,dt\)；(b) \(h(x)=\int_{x^2}^{x^3}\cos t\,dt\)。」→ (a) \(g'=-\sqrt{1+x^2}\)；(b) \(h'=3x^2\cos(x^3)-2x\cos(x^2)\)。</div>
+      <div class="row"><span class="k">locus：</span>Ex 6.7 之後 ｜ <span class="k">圖：</span>無 ｜ <span class="k">sympy：</span>可驗 ｜ <span class="k">註：</span>加在難度尖峰節，但屬機械微分、不升理論難度；(b) 可略。</div>
+    </div>
+
+    <div class="cand decline"><div class="hd">6.2-E2 · §6.2 · Layer-2 <span class="tag t-opt">MEDIUM</span> <span class="tag t-decline">建議不採（圖成本）</span></div>
+      <div class="row"><span class="k">缺口：</span>以幾何讀積分且<b>非零</b>（半圓）。「\(\int_{-1}^1\sqrt{1-x^2}\,dx\)」→ 上半單位圓，半圓面積 \(\tfrac{\pi}{2}\)。</div>
+      <div class="row"><span class="k">降評：</span>動作（∫ via 幾何）Ex 6.5 已有；且<b>需新圖</b>（semicircle）→ 重開 M2。純供你權衡。</div>
+    </div>
+
+    <div class="cand decline"><div class="hd">6.5-E2 · §6.5 · Layer-2 <span class="tag t-decline">LOW</span> <span class="tag t-decline">建議不採（動作重疊）</span></div>
+      <div class="row"><span class="k">缺口：</span>代換於指數整式。「\(\int 3x^2 e^{x^3}\,dx\)」→ \(u=x^3\)，\(e^{x^3}+C\)。</div>
+      <div class="row"><span class="k">降評：</span>動作與 Ex 6.14 重疊（湊常數＋套表），僅整式型別多樣。<b>唯一有官方完整解者</b>（CLP-1 §4.1，CC BY-NC-SA）——若你要「provenance 最穩、易採」的一條，這是它。</div>
+    </div>
+
+  </div>
+
+  <h2>2 · 軟深度候選（<code>mode-c-gapwalk</code>，2 條；不編號＝零 cascade）</h2>
+  <div class="card">
+
+    <div class="cand adopt"><div class="hd">6.5-1 · §6.5 Symmetry · intuition <span class="tag t-opt">MEDIUM</span> <span class="tag t-adopt">建議採用</span></div>
+      <div class="row"><span class="k">缺口：</span>依 §15「formal 前 1–2 段直覺」走查，<b>Theorem 6.8（對稱）是全章唯一前導直覺偏薄的 formal</b>。現有 line 140–141 只講「有什麼好處」，沒講「幾何上為什麼」；讀者只拿到 \(u=-x\) 代數證明，缺可記憶圖像。</div>
+      <div class="row"><span class="k">提議：</span>一句幾何 gloss——偶函數 \([-a,0]\) 圖是 \([0,a]\) 的鏡像、面積相等故加倍；奇函數 \([-a,0]\) 圖繞原點翻轉、面積相等但正負相反故抵消為 0。</div>
+      <div class="row"><span class="k">來源：</span>Thm 6.8＋既有 intuition、even/odd（Ch1 既建）、Stewart §5.5 ｜ <span class="k">註：</span>理想載體其實是對稱面積圖，但 §6.5 圖已依 seam guard「deferred」——故以<b>散文直覺</b>提；若要改圖需另裁是否推翻 defer。</div>
+    </div>
+
+    <div class="cand opt"><div class="hd">6.1-1 · §6.1 Ex 6.1 後 · caution（兼 intuition） <span class="tag t-decline">MED-LOW</span> <span class="tag t-opt">選配</span></div>
+      <div class="row"><span class="k">缺口：</span>§6.1 兩例（Ex 6.1 遞增 \(x^2\)、Ex 6.3 非遞減速度）<b>都</b>得「left 低估、right 高估」，全章無遞減反例。讀者易把「右和恆高估」內化成通則，遇遞減函數（\(1/x,e^{-x}\)）方向全錯。</div>
+      <div class="row"><span class="k">提議：</span>一句點明 L/R 高低估取決於<b>單調性</b>而非「哪一側」：遞增→右高左低、遞減→互換、非單調→分段。</div>
+      <div class="row"><span class="k">註：</span>line 77 已有「Because \(x^2\) is increasing」條件子句，故「補了更穩、不補也非錯」；極簡傾向可捨。</div>
+    </div>
+
+  </div>
+
+  <h2>3 · 考慮後駁回（透明——確認沒漏真缺口）</h2>
+  <div class="card">
+    <ul>
+      <li><b>§6.1 直線/他函數的 area-from-definition</b>——與 Ex 6.2 同動作、novelty 低；\(\sum i^3\)（\(x^3\)）不在 Prop A.6。駁回。</li>
+      <li><b>§6.3 FTC-2 誤套於間斷被積</b>（\(\int_{-1}^3 dx/x^2\to-\tfrac43\) 荒謬）——經典誤解，但唯一解法是 Ch8 瑕積分（越界），且兩 Thm 已強調「\(f\) continuous on \([a,b]\)」。宜作 prose Caution（散文閘域），非例題。駁回。</li>
+      <li><b>§6.4 非運動的 net-change</b>（水流/邊際成本）——動作與 Ex 6.12 同（rate 積分＝淨變化），非運動版屬「同型換情境」；且題庫應用題多帶內函數（需代換，超前 §6.4 裸表）。駁回。</li>
+      <li><b>§6.3 FTC-2 連續性 caution / §6.4 微分驗證 box</b>——後者已具名於 Ex 6.10 散文（違不重複）；前者同上越界。駁回。</li>
+      <li><b>§6.2 符號約定 \(\int_a^a=0,\ \int_b^a=-\int_a^b\)</b> 述而未練——太小、不值獨立例題；如要可折進 6.2-E1。</li>
+    </ul>
+  </div>
+
+  <p class="mini">偵察原始輸出屬 ephemeral；本裁決稿為 durable 紀錄。裁決後：採用項 → 建完整編號地圖（若含例題）→ 撰寫（解 authored 者標「解為本次撰寫」）→ sympy 重算 →
+    scoped Mode B → 併入 M4 後三閘 gate-2 批次（含 Codex 選題稽核，若動用題庫）。範圍柵欄自檢：8 條全在 Ch6 機制內，無一觸 Ch7（面積之間/體積/功/平均值）或 Ch8（其餘技巧/瑕積分）。</p>
+</div>
+</body>
+</html>
