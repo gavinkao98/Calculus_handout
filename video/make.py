@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import traceback
@@ -40,7 +41,8 @@ _bootstrap.bootstrap()  # must precede any manim / yaml import
 import yaml  # noqa: E402
 
 from pipeline.audio import concat_wavs, silence_pcm, wav_duration, write_pcm_wav  # noqa: E402
-from pipeline.derived_check import check_derived_freshness  # noqa: E402
+from pipeline import captions  # noqa: E402
+from pipeline.derived_check import check_derived_freshness, text_sha256  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 from pipeline import house_audio  # noqa: E402
 from pipeline.timing import (  # noqa: E402
@@ -418,6 +420,22 @@ def _probe_duration(path: Path) -> float:
         return 0.0
 
 
+def _git_commit() -> str:
+    """Short HEAD for timeline provenance; 'unknown' if git is unavailable."""
+    try:
+        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                             capture_output=True, text=True, cwd=str(_bootstrap.REPO_ROOT))
+        return out.stdout.strip() or "unknown"
+    except Exception:  # noqa: BLE001 - provenance nicety, never fatal
+        return "unknown"
+
+
+def _write_text_atomic(path: Path, text: str) -> None:
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
+
+
 def _audit_render_sync(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None],
                        *, lead: float) -> bool:
     """Return True if rendered scene lengths are compatible with manifest audio."""
@@ -578,16 +596,27 @@ def _concat(segments: list[Path], out: Path, abr: str) -> None:
 
 
 def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None],
-            out_dir: Path, *, lead: float, abr: str, output: Path,
-            fade: float = 0.0) -> Path | None:
+            out_dir: Path, *, lead: float, abr: str, output: Path, fade: float = 0.0,
+            meta: dict, quality: str, storyboard_path: Path, manifest_path: Path) -> Path | None:
+    # NB4: --lead only shifts the muxed audio; render() does NOT take lead (LessonScene
+    # always waits SCENE_LEAD_SECONDS), so a non-default lead desyncs A/V and subtitles.
+    # We don't touch render here -- just warn loudly. Acceptance never ships a non-default lead.
+    if abs(lead - SCENE_LEAD_SECONDS) > 1e-6:
+        print(f"[compose] WARN: --lead {lead} != render lead {SCENE_LEAD_SECONDS}s; audio and "
+              f"subtitles will desync from on-screen reveals (render does not take lead)", flush=True)
+
     narration_by_scene: dict[str, Path] = {}
+    mode_by_scene: dict[str, str | None] = {}
     for s in manifest["scenes"]:
+        mode_by_scene[s["scene_id"]] = s.get("narration_mode")
         if s.get("narration_mode") in ("beats", "scene_aligned") and s.get("audio_file"):
             narration_by_scene[s["scene_id"]] = Path(s["audio_file"])
 
     av_dir = out_dir / "_av" / _safe_stem(output.stem)
     av_dir.mkdir(parents=True, exist_ok=True)
     segments: list[Path] = []
+    timeline_scenes: list[dict] = []
+    offset = 0.0
     for scene in scenes:
         sid = scene["id"]
         video = rendered.get(sid)
@@ -609,10 +638,45 @@ def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None]
             print(f"[compose] {sid}: silent track", flush=True)
             _mux_silent(video, av, abr, fade=fade)
         segments.append(av)
+        seg_dur = _probe_duration(av)
+        timeline_scenes.append(captions.build_timeline_scene(
+            scene, meta, start=offset, end=offset + seg_dur,
+            narration_mode=mode_by_scene.get(sid)))
+        offset += seg_dur
 
     print(f"[compose] concat {len(segments)} scenes -> {output}", flush=True)
     _concat(segments, output, abr)
+
+    # sidecars (only after concat succeeds; atomic, so a failure leaves no half file).
+    # names bound to the OUTPUT STEM (B6) so a --scene subset / A-B run never clobbers
+    # another run's sidecars. lead_seconds is recorded so captions time off it, not the
+    # render's hard-coded lead (B6).
+    stem = output.with_suffix("")
+    timeline = {
+        "deck_id": meta.get("id"), "output": output.name, "quality": quality,
+        "lead_seconds": lead, "scenes": timeline_scenes,
+        "provenance": {
+            "storyboard_sha256": _safe_storyboard_sha(storyboard_path),
+            "manifest_path": str(manifest_path),
+            "git_commit": _git_commit(),
+        },
+    }
+    _write_text_atomic(Path(f"{stem}.timeline.json"),
+                       json.dumps(timeline, indent=2, ensure_ascii=False) + "\n")
+    _write_text_atomic(Path(f"{stem}.vtt"), captions.to_vtt(manifest, timeline))
+    chapters = captions.to_chapters(timeline)
+    if chapters.strip():
+        _write_text_atomic(Path(f"{stem}.chapters.txt"), chapters)
+    print(f"[compose] sidecars -> {stem.name}.timeline.json / .vtt"
+          f"{' / .chapters.txt' if chapters.strip() else ''}", flush=True)
     return output
+
+
+def _safe_storyboard_sha(path: Path) -> str:
+    try:
+        return text_sha256(Path(path))
+    except Exception:  # noqa: BLE001 - provenance nicety, never fatal
+        return "unknown"
 
 
 # ---- orchestrate --------------------------------------------------------
@@ -798,7 +862,8 @@ def main() -> int:
         )
     result = compose(scenes, manifest, rendered, out_dir,
                      lead=args.lead, abr=args.audio_bitrate, output=output,
-                     fade=args.transition)
+                     fade=args.transition, meta=meta, quality=args.quality,
+                     storyboard_path=args.storyboard, manifest_path=manifest_path)
     if result is None:
         return 1
     print(f"[done] {result}", flush=True)
