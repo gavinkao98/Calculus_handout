@@ -487,6 +487,20 @@ def _fade_vf(video: Path, fade: float) -> str:
             f"fade=t=out:st={dur - fade:.3f}:d={fade:.3f}")
 
 
+# Single, uniform video encode for every muxed segment (T8/F13). Encoding ONCE here
+# (even when there is no fade) lets _concat stream-copy instead of re-encoding, so the
+# chain is manim-render -> one mux encode -> concat copy, not up to three generations.
+# CRF 18 (visually lossless-ish), explicit BT.709 primaries/transfer/matrix (tag the
+# HD colour space instead of leaving it unspecified), yuv420p for broad playback.
+# The x264-params ARE needed on top of ffmpeg's -color_* flags: libx264 alone writes
+# only matrix_coefficients into the H.264 VUI, leaving colour_primaries/transfer
+# "unknown" (verified empirically); colorprim/transfer/colormatrix make all three land.
+ENCODE_V = ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
+            "-pix_fmt", "yuv420p", "-color_primaries", "bt709",
+            "-color_trc", "bt709", "-colorspace", "bt709",
+            "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709"]
+
+
 def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
                  *, fade: float = 0.0) -> None:
     """Lay narration under video as a FULL-LENGTH track whose duration matches the
@@ -499,8 +513,7 @@ def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
     A/V drift apart scene by scene (and the gap grows with lead/tail). A
     video-length audio stream keeps every segment in sync, like _mux_silent."""
     vf = _fade_vf(video, fade)
-    vcodec = (["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p"]
-              if vf else ["-c:v", "copy"])
+    vcodec = ["-vf", vf, *ENCODE_V] if vf else [*ENCODE_V]   # always encode once (T8)
     lead_ms = max(int(round(lead * 1000)), 0)
     _ffmpeg([
         "ffmpeg", "-y", "-i", str(video), "-i", str(narration),
@@ -513,8 +526,7 @@ def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
 
 def _mux_silent(video: Path, out: Path, abr: str, *, fade: float = 0.0) -> None:
     vf = _fade_vf(video, fade)
-    vcodec = (["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p"]
-              if vf else ["-c:v", "copy"])
+    vcodec = ["-vf", vf, *ENCODE_V] if vf else [*ENCODE_V]   # always encode once (T8)
     _ffmpeg([
         "ffmpeg", "-y", "-i", str(video),
         "-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=48000",
@@ -534,8 +546,7 @@ def _mux_cue(video: Path, cue: Path, out: Path, abr: str, *,
     concat demuxer keeps every segment in A/V sync. Cues are 48 kHz stereo (the
     output format), so no resample is needed."""
     vf = _fade_vf(video, fade)
-    vcodec = (["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p"]
-              if vf else ["-c:v", "copy"])
+    vcodec = ["-vf", vf, *ENCODE_V] if vf else [*ENCODE_V]   # always encode once (T8)
     fade_out_start = max(_probe_duration(video) - fade_out, 0.0)
     afilter = (f"[1:a]volume={gain:.3f},"
                f"afade=t=out:st={fade_out_start:.3f}:d={fade_out:.3f},apad[a]")
@@ -555,10 +566,12 @@ def _concat(segments: list[Path], out: Path, abr: str) -> None:
         encoding="utf-8",
     )
     try:
+        # Every segment is already encoded identically (ENCODE_V) + AAC, so concat
+        # stream-copies -- no extra video generation -- and +faststart moves the moov
+        # atom to the front for progressive playback (T8/F13).
         _ffmpeg([
             "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(list_file),
-            "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p",
-            "-c:a", "aac", "-b:a", abr, str(out),
+            "-c", "copy", "-movflags", "+faststart", str(out),
         ])
     finally:
         list_file.unlink(missing_ok=True)
