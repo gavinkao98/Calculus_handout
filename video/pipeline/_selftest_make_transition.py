@@ -1,10 +1,25 @@
 """Offline self-test for make.py per-boundary transition logic (T9 _segment_fades).
 Run: python video/pipeline/_selftest_make_transition.py"""
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import make  # noqa: E402
+
+
+def test_mock_synth_guard():   # Codex blocking-1: mock must not clobber real Dean WAVs
+    with tempfile.TemporaryDirectory() as d:
+        empty = Path(d) / "empty"; empty.mkdir()
+        g = make._mock_synth_guard
+        assert g(status="corrupt", existing=None, audio_dir=empty, force_clobber=False)         # corrupt -> abort
+        wav = Path(d) / "aud"; (wav / "scenes").mkdir(parents=True)
+        (wav / "scenes" / "07_x.wav").write_bytes(b"RIFF")
+        assert g(status="absent", existing=None, audio_dir=wav, force_clobber=False)             # missing manifest + WAVs -> abort
+        assert g(status="ok", existing={"backend": "mimo"}, audio_dir=empty, force_clobber=False)   # real backend -> abort
+        assert g(status="ok", existing={"backend": "mock"}, audio_dir=empty, force_clobber=False) is None   # re-mock ok
+        assert g(status="absent", existing=None, audio_dir=empty, force_clobber=False) is None    # first mock run ok
+        assert g(status="corrupt", existing=None, audio_dir=wav, force_clobber=True) is None       # --force-clobber overrides
 
 
 def test_segment_fades_brand_vs_content():

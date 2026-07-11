@@ -59,10 +59,20 @@ def check_derived_freshness(storyboard_path: Path, data: Any) -> str | None:
     inputs = derived.get("inputs") if isinstance(derived, dict) else None
     if not isinstance(inputs, list) or not inputs:
         return f"{storyboard_path.name}: no derived_from stamp -- {hint}"
-    base = storyboard_path.parent
     for item in inputs:
         if not isinstance(item, dict) or "path" not in item or "sha256" not in item:
             return f"{storyboard_path.name}: malformed derived_from stamp -- {hint}"
+    # Enforce the dual-input contract (B1): the stamp must be EXACTLY the canonical +
+    # spoken pair, distinct. A degenerate stamp (single canonical, or canonical stamped
+    # twice) otherwise hash-checks fine and silently bypasses the spoken-drift half of the
+    # gate -- the gate must ENFORCE the contract, not trust the stamp's completeness.
+    expected = {f"{deck}.yml", f"../content_scripts/{deck}.spoken.yml"}
+    stamped = [str(item["path"]) for item in inputs]
+    if len(stamped) != 2 or set(stamped) != expected:
+        return (f"{storyboard_path.name}: derived_from must stamp exactly the canonical + spoken "
+                f"pair {sorted(expected)}, got {stamped} -- {hint}")
+    base = storyboard_path.parent
+    for item in inputs:
         src = (base / str(item["path"])).resolve()
         if not src.exists():
             return f"{storyboard_path.name}: stamped source {item['path']} not found -- {hint}"

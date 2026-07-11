@@ -1,10 +1,23 @@
 """Offline self-test for pipeline/loudness_ab.py (no API, no manim, no render).
 Run: python video/pipeline/_selftest_loudness_ab.py"""
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import loudness_ab as LA  # noqa: E402
+
+
+def test_cli_runs_direct_no_module_error():   # Codex blocking-3: direct CLI must self-bootstrap
+    with tempfile.TemporaryDirectory() as d:
+        script = str(Path(__file__).resolve().parent / "loudness_ab.py")
+        out = subprocess.run([sys.executable, script, "--sample", str(Path(d) / "nope.wav"),
+                              "--out-dir", str(Path(d) / "o"), "--deck", "t"],
+                             capture_output=True, text=True, timeout=120,
+                             cwd=str(Path(__file__).resolve().parents[2]))   # repo root, where it used to break
+        assert "ModuleNotFoundError" not in out.stderr, out.stderr
+        assert out.returncode == 0, out.stderr    # missing sample degrades gracefully (error cells), no crash
 
 
 def test_parse_loudnorm_json():

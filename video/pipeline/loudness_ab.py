@@ -13,8 +13,14 @@ import json
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
+
+# Run-as-script bootstrap: put video/ on sys.path so `from pipeline.listening_pack ...`
+# resolves when invoked directly (python video/pipeline/loudness_ab.py), not only when
+# imported by a test that already inserted it (that gap made the CLI ModuleNotFoundError).
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 TARGETS = (-19.0, -17.0, -15.5)   # candidate integrated-loudness targets (LUFS)
 TRUE_PEAK = -1.5                    # dBTP ceiling (loudnorm never exceeds this)

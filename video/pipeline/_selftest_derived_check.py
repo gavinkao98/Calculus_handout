@@ -59,6 +59,22 @@ def test_crlf_lf_hash_is_stable():   # B1: autocrlf must not false-flag
         assert text_sha256(crlf) == text_sha256(lf)
 
 
+def test_incomplete_stamp_single_input_is_flagged():   # Codex: single-canonical stamp bypasses spoken-drift
+    with tempfile.TemporaryDirectory() as d:
+        derived, _canon, _spoken, data = _fixture(Path(d))
+        assert check_derived_freshness(derived, data) is None                 # the real dual stamp passes
+        data["meta"]["derived_from"]["inputs"] = data["meta"]["derived_from"]["inputs"][:1]   # drop spoken
+        assert "exactly" in (check_derived_freshness(derived, data) or "")
+
+
+def test_duplicate_canonical_stamp_is_flagged():   # Codex: canonical stamped twice, spoken missing
+    with tempfile.TemporaryDirectory() as d:
+        derived, _canon, _spoken, data = _fixture(Path(d))
+        canon = data["meta"]["derived_from"]["inputs"][0]
+        data["meta"]["derived_from"]["inputs"] = [canon, dict(canon)]         # canonical x2, no spoken
+        assert "exactly" in (check_derived_freshness(derived, data) or "")
+
+
 if __name__ == "__main__":
     for name in sorted(n for n in dir() if n.startswith("test_")):
         globals()[name]()

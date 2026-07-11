@@ -44,6 +44,7 @@ from pipeline.audio import concat_wavs, silence_pcm, wav_duration, write_pcm_wav
 from pipeline import captions  # noqa: E402
 from pipeline.derived_check import check_derived_freshness, text_sha256  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
+from pipeline.tts import read_manifest_status, _has_audio  # noqa: E402 (manim-free fail-closed guard reuse)
 from pipeline import house_audio  # noqa: E402
 from pipeline.timing import (  # noqa: E402
     SCENE_LEAD_SECONDS,
@@ -436,6 +437,27 @@ def _write_text_atomic(path: Path, text: str) -> None:
     os.replace(tmp, path)
 
 
+def _mock_synth_guard(*, status: str, existing: dict | None, audio_dir: Path,
+                      force_clobber: bool) -> str | None:
+    """Abort message (else None) BEFORE mock synth would overwrite audio -- mock silence
+    must never clobber real Dean WAVs. The old make.py guard only aborted on a VALID
+    non-mock backend string, so a corrupt manifest (json fails -> backend=None) or a
+    deleted manifest with WAVs still present fell through to synth() and overwrote real
+    audio. read_manifest_status catches both; this mirrors tts.py's overwrite_guard."""
+    if force_clobber:
+        return None
+    if status == "corrupt":
+        return ("manifest is corrupt/invalid and may shadow real WAVs; refusing to mock-overwrite. "
+                "Pass --reuse-audio, or --force-clobber to rebuild with mock.")
+    if status == "absent" and _has_audio(audio_dir):
+        return (f"no valid manifest but WAVs already exist under {audio_dir}; refusing to "
+                "mock-overwrite. Pass --reuse-audio, or --force-clobber.")
+    if status == "ok" and (existing or {}).get("backend") not in (None, "mock"):
+        return (f"existing manifest backend={(existing or {}).get('backend')!r} is real; refusing "
+                "to overwrite with mock. Pass --reuse-audio, or --force-clobber.")
+    return None
+
+
 def _audit_render_sync(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None],
                        *, lead: float) -> bool:
     """Return True if rendered scene lengths are compatible with manifest audio."""
@@ -710,6 +732,9 @@ def main() -> int:
     parser.add_argument("--storyboard", required=True, type=Path)
     parser.add_argument("--backend", default="mock", choices=("mock",),
                         help="only mock (silent) is wired here; real audio = tts.py mimo + --reuse-audio")
+    parser.add_argument("--force-clobber", action="store_true",
+                        help="allow mock synth to overwrite a corrupt/real audio manifest or orphan "
+                             "WAVs (default: fail-closed so mock silence never clobbers real Dean audio)")
     parser.add_argument("--scene", default="all", help="id, 'a,b,c', or 'all'")
     parser.add_argument("--quality", default="high", choices=("low", "medium", "high", "4k"),
                         help="low/medium = fast scratch (480p/720p); high = 1080p testing "
@@ -853,18 +878,12 @@ def main() -> int:
         _check_manifest_schema(manifest)
         _validate_reuse_manifest(meta, scenes, manifest)
     else:
-        # guard: don't silently overwrite real (billed) audio with mock silence.
-        if manifest_path.exists():
-            try:
-                prev_backend = json.loads(manifest_path.read_text(encoding="utf-8")).get("backend")
-            except (ValueError, OSError):
-                prev_backend = None
-            if prev_backend and prev_backend != "mock":
-                raise SystemExit(
-                    f"refusing to overwrite a real audio manifest (backend={prev_backend}) "
-                    f"at {manifest_path} with mock. Pass --reuse-audio to render with that "
-                    "audio, or delete the manifest first if you really want mock."
-                )
+        # Fail-closed (mirrors tts.py T2a): mock silence must never clobber real Dean WAVs.
+        existing, status = read_manifest_status(manifest_path)
+        abort = _mock_synth_guard(status=status, existing=existing, audio_dir=audio_dir,
+                                  force_clobber=args.force_clobber)
+        if abort:
+            raise SystemExit(f"[synth] {abort}")
         manifest = synth(meta, scenes, scene_numbers, audio_dir, args.backend,
                          empty_seconds=args.empty_beat_seconds)
         manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
