@@ -128,8 +128,10 @@ class MockTTSBackend:
 
     def __init__(self, empty_seconds: float) -> None:
         self.empty_seconds = empty_seconds
+        self.stats = {"calls": 0, "retries": 0}
 
     def synthesize(self, request: TTSRequest) -> TTSResult:
+        self.stats["calls"] += 1
         seconds = self.empty_seconds if not request.text else estimate_seconds(request.text)
         return TTSResult(silence_pcm(seconds))
 
@@ -154,11 +156,13 @@ class MimoTTSBackend:
         self._timeout = timeout
         self._trim = trim          # MiMo pads each clip with ~0.4s trailing silence
         self._trim_pad = trim_pad
+        self.stats = {"calls": 0, "retries": 0}
 
     def synthesize(self, request: TTSRequest) -> TTSResult:
         import urllib.error
         import urllib.request
 
+        self.stats["calls"] += 1
         messages: list[dict[str, str]] = []
         if request.style:
             messages.append({"role": "user", "content": request.style})
@@ -193,11 +197,13 @@ class MimoTTSBackend:
                         f"(attempt {attempt + 1}/{self._max_retries})",
                         flush=True,
                     )
+                    self.stats["retries"] += 1
                     time.sleep(wait)
                     continue
                 raise
             except (urllib.error.URLError, TimeoutError):
                 if attempt < self._max_retries:
+                    self.stats["retries"] += 1
                     time.sleep((2 ** attempt) * 2)
                     continue
                 raise
@@ -1066,6 +1072,18 @@ def main() -> int:
                 scene_reuse_index=scene_reuse_index,
             )
         )
+
+    # Billing receipt for THIS run (added to the fresh manifest BEFORE any merge, so
+    # merged_manifest's fresh-top-level-wins keeps this run's numbers). beat mode:
+    # backend_calls == non-empty beats (empty beats never reach the backend).
+    manifest["receipt"] = {
+        "backend_calls": getattr(backend, "stats", {}).get("calls", 0),
+        "backend_retries": getattr(backend, "stats", {}).get("retries", 0),
+        "modes": {m: sum(1 for e in manifest["scenes"] if e.get("narration_mode") == m)
+                  for m in ("scene_aligned", "beats", "silent")},
+        "fallback_scenes": [e["scene_id"] for e in manifest["scenes"] if e.get("fallback_history")],
+    }
+    print(f"[tts] receipt: {json.dumps(manifest['receipt'], ensure_ascii=False)}", flush=True)
 
     if args.scene != "all":
         # F5: a subset run must merge into the prior manifest, not overwrite it whole

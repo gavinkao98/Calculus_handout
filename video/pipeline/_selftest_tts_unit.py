@@ -194,6 +194,16 @@ def test_merge_refuses_identity_mismatch():
         pass
 
 
+# ---- T2d: backend billing stats feed the manifest receipt ----
+
+def test_mock_backend_counts_calls():
+    b = tts.MockTTSBackend(0.4)
+    assert b.stats == {"calls": 0, "retries": 0}
+    b.synthesize(tts.TTSRequest(text="hi", model="m", voice="v", style=""))
+    b.synthesize(tts.TTSRequest(text="", model="m", voice="v", style=""))   # empty still counts a call here;
+    assert b.stats["calls"] == 2 and b.stats["retries"] == 0                 # main() just never calls synth for empties
+
+
 if __name__ == "__main__":
     test_unit_auto_allowlist_is_batch2()
     test_resolve_unit_for_scene()
@@ -204,4 +214,5 @@ if __name__ == "__main__":
     test_main_guard_blocks_before_synth()
     test_scene_subset_merges_into_prior_manifest()
     test_merge_refuses_identity_mismatch()
+    test_mock_backend_counts_calls()
     print("OK tts unit-routing self-test (Task 8)")
