@@ -488,21 +488,37 @@ def _audit_render_sync(scenes: list[dict], manifest: dict, rendered: dict[str, P
     return True
 
 
-def _fade_vf(video: Path, fade: float) -> str:
-    """Video filter: fade in from black at the start, fade out to black at the
-    end. Empty when fade<=0 or the clip is too short to carry both fades. Clips
-    faded this way then concatenated yield a ~2*fade dip through black at every
-    scene boundary (and open/close the film on black) -- the inter-scene
-    transition, applied uniformly at compose with no per-scene manim change,
-    matching the intro/outro dark-handoff motif.
-    """
-    if fade <= 0:
-        return ""
+def _fade_vf(video: Path, fade_in: float, fade_out: float) -> str:
+    """Video filter: fade in from black at the start (fade_in) and/or out to black at
+    the end (fade_out); either side may be 0 for a hard edge there. Per-boundary values
+    (T9) let brand-frame boundaries keep the dark handoff while content-content
+    boundaries are tightened independently. Empty when neither side fades or the clip is
+    too short to carry a requested fade. Concatenated, faded edges give a ~(in+out) dip
+    through black at each boundary (matching the intro/outro dark-handoff motif)."""
     dur = _probe_duration(video)
-    if dur <= 2.5 * fade:
-        return ""  # too short to fade cleanly -- leave a hard edge
-    return (f"fade=t=in:st=0:d={fade:.3f},"
-            f"fade=t=out:st={dur - fade:.3f}:d={fade:.3f}")
+    parts = []
+    if fade_in > 0 and dur > 2.5 * fade_in:
+        parts.append(f"fade=t=in:st=0:d={fade_in:.3f}")
+    if fade_out > 0 and dur > 2.5 * fade_out:
+        parts.append(f"fade=t=out:st={dur - fade_out:.3f}:d={fade_out:.3f}")
+    return ",".join(parts)
+
+
+_BRAND_KINDS = {"intro", "outro", "divider"}
+
+
+def _segment_fades(kinds: list[str], transition: float, intra_act: float) -> list[tuple[float, float]]:
+    """(fade_in, fade_out) per segment (T9). Every boundary touching a brand frame
+    (intro/outro/divider) and the film's own open/close uses `transition`; a
+    content-content boundary uses `intra_act`. Both sides of one boundary get the SAME
+    value, so the dip through black at that boundary is symmetric."""
+    n = len(kinds)
+
+    def boundary(a: int, b: int) -> float:
+        return transition if (kinds[a] in _BRAND_KINDS or kinds[b] in _BRAND_KINDS) else intra_act
+
+    return [(transition if i == 0 else boundary(i - 1, i),
+             transition if i == n - 1 else boundary(i, i + 1)) for i in range(n)]
 
 
 # Single, uniform video encode for every muxed segment (T8/F13). Encoding ONCE here
@@ -520,7 +536,7 @@ ENCODE_V = ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
 
 
 def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
-                 *, fade: float = 0.0) -> None:
+                 *, fade_in: float = 0.0, fade_out: float = 0.0) -> None:
     """Lay narration under video as a FULL-LENGTH track whose duration matches the
     video exactly: real silence for the lead-in (adelay), the narration, then
     silence padding out to the video's end (apad, capped by -shortest).
@@ -530,7 +546,7 @@ def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
     advances audio and video by each stream's own length, so the shortfall makes
     A/V drift apart scene by scene (and the gap grows with lead/tail). A
     video-length audio stream keeps every segment in sync, like _mux_silent."""
-    vf = _fade_vf(video, fade)
+    vf = _fade_vf(video, fade_in, fade_out)
     vcodec = ["-vf", vf, *ENCODE_V] if vf else [*ENCODE_V]   # always encode once (T8)
     lead_ms = max(int(round(lead * 1000)), 0)
     _ffmpeg([
@@ -542,8 +558,8 @@ def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
     ])
 
 
-def _mux_silent(video: Path, out: Path, abr: str, *, fade: float = 0.0) -> None:
-    vf = _fade_vf(video, fade)
+def _mux_silent(video: Path, out: Path, abr: str, *, fade_in: float = 0.0, fade_out: float = 0.0) -> None:
+    vf = _fade_vf(video, fade_in, fade_out)
     vcodec = ["-vf", vf, *ENCODE_V] if vf else [*ENCODE_V]   # always encode once (T8)
     _ffmpeg([
         "ffmpeg", "-y", "-i", str(video),
@@ -555,7 +571,7 @@ def _mux_silent(video: Path, out: Path, abr: str, *, fade: float = 0.0) -> None:
 
 
 def _mux_cue(video: Path, cue: Path, out: Path, abr: str, *,
-             gain: float, fade_out: float, fade: float = 0.0) -> None:
+             gain: float, cue_fade_out: float, fade_in: float = 0.0, fade_out: float = 0.0) -> None:
     """Lay a house cue (intro/outro bed or divider stinger) under a brand scene
     that carries no narration. The cue is gained, faded out so it lands cleanly at
     the scene's end (beds run longer than the intro scene, so they must fade rather
@@ -563,11 +579,11 @@ def _mux_cue(video: Path, cue: Path, out: Path, abr: str, *,
     the same full-length-audio discipline as _mux_silent/_mux_content, so the
     concat demuxer keeps every segment in A/V sync. Cues are 48 kHz stereo (the
     output format), so no resample is needed."""
-    vf = _fade_vf(video, fade)
+    vf = _fade_vf(video, fade_in, fade_out)
     vcodec = ["-vf", vf, *ENCODE_V] if vf else [*ENCODE_V]   # always encode once (T8)
-    fade_out_start = max(_probe_duration(video) - fade_out, 0.0)
+    cue_fade_start = max(_probe_duration(video) - cue_fade_out, 0.0)
     afilter = (f"[1:a]volume={gain:.3f},"
-               f"afade=t=out:st={fade_out_start:.3f}:d={fade_out:.3f},apad[a]")
+               f"afade=t=out:st={cue_fade_start:.3f}:d={cue_fade_out:.3f},apad[a]")
     _ffmpeg([
         "ffmpeg", "-y", "-i", str(video), "-i", str(cue),
         "-filter_complex", afilter,
@@ -596,14 +612,20 @@ def _concat(segments: list[Path], out: Path, abr: str) -> None:
 
 
 def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None],
-            out_dir: Path, *, lead: float, abr: str, output: Path, fade: float = 0.0,
-            meta: dict, quality: str, storyboard_path: Path, manifest_path: Path) -> Path | None:
+            out_dir: Path, *, lead: float, abr: str, output: Path, transition: float = 0.0,
+            intra_act: float | None = None, meta: dict, quality: str,
+            storyboard_path: Path, manifest_path: Path) -> Path | None:
     # NB4: --lead only shifts the muxed audio; render() does NOT take lead (LessonScene
     # always waits SCENE_LEAD_SECONDS), so a non-default lead desyncs A/V and subtitles.
     # We don't touch render here -- just warn loudly. Acceptance never ships a non-default lead.
     if abs(lead - SCENE_LEAD_SECONDS) > 1e-6:
         print(f"[compose] WARN: --lead {lead} != render lead {SCENE_LEAD_SECONDS}s; audio and "
               f"subtitles will desync from on-screen reveals (render does not take lead)", flush=True)
+
+    # T9: per-boundary fade. intra_act defaults to `transition` (behaviour unchanged);
+    # an A/B pass can set --intra-act-transition 0 to tighten only content-content cuts.
+    intra = intra_act if intra_act is not None else transition
+    seg_fades = _segment_fades([s.get("kind", "content") for s in scenes], transition, intra)
 
     narration_by_scene: dict[str, Path] = {}
     mode_by_scene: dict[str, str | None] = {}
@@ -617,26 +639,28 @@ def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None]
     segments: list[Path] = []
     timeline_scenes: list[dict] = []
     offset = 0.0
-    for scene in scenes:
+    for i, scene in enumerate(scenes):
         sid = scene["id"]
         video = rendered.get(sid)
         if video is None:
             print(f"[compose] missing rendered scene '{sid}'", flush=True)
             return None
         av = av_dir / f"{sid}.mp4"
+        fin, fout = seg_fades[i]
         narration = narration_by_scene.get(sid)
         cue = house_audio.cue_for_scene(scene)
         if narration and narration.exists():
             print(f"[compose] {sid}: narration under video", flush=True)
-            _mux_content(video, narration, av, lead, abr, fade=fade)
+            _mux_content(video, narration, av, lead, abr, fade_in=fin, fade_out=fout)
         elif cue is not None and cue.path.exists():
             print(f"[compose] {sid}: house cue {cue.path.name}", flush=True)
-            _mux_cue(video, cue.path, av, abr, gain=cue.gain, fade_out=cue.fade_out, fade=fade)
+            _mux_cue(video, cue.path, av, abr, gain=cue.gain, cue_fade_out=cue.fade_out,
+                     fade_in=fin, fade_out=fout)
         else:
             if cue is not None:
                 print(f"[compose] {sid}: house cue file missing ({cue.path}); silent", flush=True)
             print(f"[compose] {sid}: silent track", flush=True)
-            _mux_silent(video, av, abr, fade=fade)
+            _mux_silent(video, av, abr, fade_in=fin, fade_out=fout)
         segments.append(av)
         seg_dur = _probe_duration(av)
         timeline_scenes.append(captions.build_timeline_scene(
@@ -696,6 +720,13 @@ def main() -> int:
                         help="per-side fade-through-black at every scene boundary, "
                              "in seconds (0 = hard cuts). The black dip between two "
                              "scenes is ~2x this; the film also opens/closes on black.")
+    parser.add_argument("--intra-act-transition", type=float, default=None,
+                        help="per-side fade at CONTENT-CONTENT boundaries only (default: "
+                             "same as --transition). Set 0 to hard-cut within an act while "
+                             "brand-frame boundaries keep --transition (T9 A/B knob).")
+    parser.add_argument("--output", type=Path, default=None,
+                        help="explicit output mp4 path (default: derived from meta.id / --scene; "
+                             "give distinct names for A/B builds so they don't overwrite).")
     parser.add_argument("--empty-beat-seconds", type=float, default=0.45)
     parser.add_argument("--reuse-audio", action="store_true",
                         help="skip synth; reuse the audio manifest already produced by "
@@ -852,7 +883,10 @@ def main() -> int:
 
     # compose
     sec_dir.mkdir(parents=True, exist_ok=True)
-    if args.scene == "all":
+    if args.output:
+        output = args.output
+        output.parent.mkdir(parents=True, exist_ok=True)
+    elif args.scene == "all":
         output = sec_dir / f"{meta['id']}.mp4"
     else:
         output = sec_dir / f"{meta['id']}__{_safe_stem(args.scene)}.mp4"
@@ -862,7 +896,8 @@ def main() -> int:
         )
     result = compose(scenes, manifest, rendered, out_dir,
                      lead=args.lead, abr=args.audio_bitrate, output=output,
-                     fade=args.transition, meta=meta, quality=args.quality,
+                     transition=args.transition, intra_act=args.intra_act_transition,
+                     meta=meta, quality=args.quality,
                      storyboard_path=args.storyboard, manifest_path=manifest_path)
     if result is None:
         return 1
