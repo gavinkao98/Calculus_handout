@@ -23,6 +23,7 @@
 
 ## Open items
 
+- **[進行中] 產線硬化**（kickoff [`KICKOFF-pipeline-hardening.md`](KICKOFF-pipeline-hardening.md)，分支 `video/pipeline-hardening`）：**Phase 0＋1 完成（2026-07-11）**。Phase 0：分支自 `84c2799`、綠基線 selftest 全綠。Phase 1（T1–T4，7 commits `0d6954e`→`320871f`）：T1 `_mimo.yml` freshness gate（`derived_check.py` 雙輸入 LF-norm stamp）；T2 tts.py 計費面（`--backend` 必填＋preflight fail-closed guard／dry-run planned-worst 報表／`--scene` 併回 prior／計費收據）；T3 `--unit auto` allowlist 單一源（`template_names.py`＋parity）；T4 ASR QA verdict 三態落 manifest。17 selftest 全綠、demo mock 整合驗收過。**Codex 對抗 review（Terra/max）usage-limited 中斷**，浮現 1 edge（null-char audio_file str 過 type check 但 `build_reuse_index` `Path()` crash）＝評估非 blocking（自產 manifest 不可能、fail-safe pre-synth、Karpathy §2；詳 scratch `codex-phase1-assessment.md`）；quota reset 後 Phase 2 收尾一併跑完整 Codex 回歸。**§3.2 進真 TTS 前必做硬化＝達成**。下一步 Phase 2（T5 `{show}` cross-check）→ Phase 3（T6–T11，含 T9/T10 裁決件）。
 - §3.2 走完 MiMo 路線（spoken → NFA → render）＝下一個正典節。
 - `{show}` target-vs-payload 交叉驗證（task #6，需 manim）；VISUAL-FRAME detection 面驗證（併入下一個重跑節）。
 - 真 4K final render（§3.1）另議。
