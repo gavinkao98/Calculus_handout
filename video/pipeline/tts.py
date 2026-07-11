@@ -931,6 +931,8 @@ def write_manifest(path: Path, manifest: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
+    if args.fallback_budget < 0:                       # NA2: unconditional, not just in dry-run
+        raise SystemExit("[tts] --fallback-budget must be >= 0")
     data = load_storyboard(args.storyboard)
     stale = check_derived_freshness(args.storyboard.resolve(), data)
     if stale:
@@ -974,10 +976,33 @@ def main() -> int:
         # dry-run to still print an estimate), but surface that a real run WOULD abort.
         if abort:
             print(f"[dry-run] NOTE: a real run WOULD abort -> {abort}")
-        print(
-            f"Would synthesize {beat_count} beat(s) across {content_count} content scene(s) "
-            f"with backend={args.backend}, model={args.model}, voice={voice}."
-        )
+        # planned = first-round calls; worst = incl. fallback ladder. Both IGNORE
+        # --reuse-existing (reuse can only lower actual calls; never overstate the quote).
+        # Empty beats write silence without hitting the backend (synthesize_beat:539),
+        # so they count 0 calls. Scene unit: 1 synth + budget billed rungs 2-3 + one
+        # billed beat per NON-EMPTY beat at the terminal (F6/T3-2).
+        rows, planned, worst, est_secs = [], 0, 0, 0.0
+        for scene in scenes:
+            if scene.get("kind", "content") != "content":
+                continue
+            unit = resolve_unit(args.unit, scene)
+            beats = scene_beats(scene)
+            nonempty = [b for b in beats if (b.get("text") or "").strip()]
+            est_secs += sum(estimate_seconds(b["text"]) if (b.get("text") or "").strip()
+                            else args.empty_beat_seconds for b in beats)
+            if unit == "scene":
+                p, wc = 1, 1 + args.fallback_budget + len(nonempty)
+            else:
+                p = wc = len(nonempty)
+            planned += p; worst += wc
+            rows.append((scene["id"], unit, len(beats), len(nonempty), p, wc))
+        print(f"[dry-run] backend={args.backend} model={args.model} voice={voice} unit={args.unit} "
+              f"(planned counts IGNORE --reuse-existing)")
+        print(f"[dry-run] {'scene':<30}{'unit':<7}{'beats':>6}{'calls':>6}{'plan':>5}{'worst':>7}")
+        for sid, unit, nb, nc, p, wc in rows:
+            print(f"[dry-run] {sid:<30}{unit:<7}{nb:>6}{nc:>6}{p:>5}{wc:>7}")
+        print(f"[dry-run] TOTAL content-scenes={len(rows)}  planned first-round calls={planned}  "
+              f"worst-case incl. fallback ladder={worst}  est narration ~{est_secs/60:.1f} min")
         return 0
     if abort:
         raise SystemExit(f"[tts] {abort}")
