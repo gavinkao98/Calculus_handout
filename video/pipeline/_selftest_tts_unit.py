@@ -8,15 +8,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import tts  # noqa: E402
+from pipeline.template_names import CONTENT_TEMPLATES  # noqa: E402
 
 SCENE_ALLOWLIST = tts.SCENE_UNIT_TEMPLATES
 
 
-def test_unit_auto_allowlist_is_batch2():
-    # batch-2 (2026-07-06): the full content-template set goes scene under --unit auto
-    # (first real deck: derivation 6/6 + theorem_proof 3/5 scene-aligned; FA failures safe-demote)
-    assert {"definition_math", "graph", "callout", "recap_cards",
-            "derivation", "theorem_proof"} <= SCENE_ALLOWLIST
+def test_unit_auto_matches_content_templates():
+    # --unit auto routes EVERY content template to scene; the allowlist derives from the
+    # single manim-free source (template_names.py) so it can't drift from the registry (F10).
+    assert SCENE_ALLOWLIST == set(CONTENT_TEMPLATES)
 
 
 def test_resolve_unit_for_scene():
@@ -25,6 +25,9 @@ def test_resolve_unit_for_scene():
     assert tts.resolve_unit("auto", {"template": "graph"}) == "scene"
     assert tts.resolve_unit("auto", {"template": "derivation"}) == "scene"        # batch-2: now scene
     assert tts.resolve_unit("auto", {"template": "theorem_proof"}) == "scene"     # batch-2: now scene
+    assert tts.resolve_unit("auto", {"template": "procedure_steps"}) == "scene"   # T3: was missing from allowlist
+    assert tts.resolve_unit("auto", {"template": "value_table"}) == "scene"       # T3: was missing
+    assert tts.resolve_unit("auto", {"template": "sign_chart"}) == "scene"        # T3: was missing
     assert tts.resolve_unit("auto", {"template": "unknown_xyz"}) == "beat"        # unknown template -> beat
     assert tts.resolve_unit("auto", {}) == "beat"                                 # no template -> beat
 
@@ -205,7 +208,7 @@ def test_mock_backend_counts_calls():
 
 
 if __name__ == "__main__":
-    test_unit_auto_allowlist_is_batch2()
+    test_unit_auto_matches_content_templates()
     test_resolve_unit_for_scene()
     test_atomic_write_and_promote()
     test_scene_reuse_ok_freshness()

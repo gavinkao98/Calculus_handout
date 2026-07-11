@@ -31,6 +31,7 @@ import yaml  # noqa: E402
 from pipeline.audio import concat_wavs, pcm_duration, silence_pcm, trim_silence, wav_duration, write_pcm_wav  # noqa: E402
 from pipeline.derived_check import check_derived_freshness  # noqa: E402  (manim-free, F11-safe)
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
+from pipeline.template_names import CONTENT_TEMPLATES  # noqa: E402  (manim-free single source, F11-safe)
 from pipeline.timing import text_hash  # noqa: E402
 
 
@@ -46,14 +47,15 @@ MIMO_VOICE = "Dean"            # default built-in voice
 MIMO_STYLE = ""                # no persona/style prompt on the built-in route
 
 
-# design §10 rollout allowlist for --unit auto. batch-2 (2026-07-06) extends it to the full
-# content-template set. Evidence = the first real deck (ch03 §3.1, all 21 scenes forced
-# --unit scene): derivation 6/6 scene-aligned, theorem_proof 3/5 (the other 2 auto-demote to
-# beats via the fallback ladder -- safe, and already accepted as beat-level); the batch-1 four
-# (graph/definition_math/callout/recap_cards) shipped earlier. An over-broad allowlist is safe:
-# a scene whose FA fails still falls back to beats -- at most a billed attempt, never a broken deck.
-SCENE_UNIT_TEMPLATES = frozenset({"definition_math", "graph", "callout", "recap_cards",
-                                  "derivation", "theorem_proof"})
+# --unit auto routes every KNOWN content template to scene-level TTS. History:
+# batch-1 four (2026-07-05), batch-2 six (2026-07-06); 2026-07-11 the hand-kept
+# list was found missing procedure_steps/value_table/sign_chart vs the registry,
+# so it now derives from pipeline/template_names.py (parity selftest guards it).
+# Unknown templates still fall back to beat. An over-broad allowlist is bounded but
+# NOT free: a scene whose FA fails demotes down the ladder to the beats terminal,
+# which under MiMo bills once PER non-empty beat (not "one attempt"); dry-run's
+# worst-case column already accounts for that fan-out.
+SCENE_UNIT_TEMPLATES = frozenset(CONTENT_TEMPLATES)
 
 
 def resolve_unit(unit: str, scene: dict[str, Any]) -> str:
