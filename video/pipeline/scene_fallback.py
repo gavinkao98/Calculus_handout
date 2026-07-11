@@ -34,9 +34,10 @@ def run_ladder(*, scene_id: str, rungs: list[tuple[str, bool, Rung]], budget: Re
                ctx: dict[str, Any] | None = None) -> dict[str, Any]:
     """Walk rungs until one returns status=="pass". Each rung is (name, billed,
     callable) -- billedness is DECLARED, not inferred by name or self-reported. A
-    billed rung is skipped (recorded) when the budget is exhausted; the non-billed
-    'beats' terminal is never skipped. The chosen entry carries the full history in
-    its fallback_history (design §7). Returns {"entry", "history"}."""
+    billed rung is skipped (recorded) when the budget is exhausted; the budget-exempt
+    'beats' terminal (billed=False -- never skipped for budget, but note it still bills
+    once per non-empty beat under MiMo, NOT free) is never skipped. The chosen entry
+    carries the full history in its fallback_history (design §7). Returns {"entry", "history"}."""
     ctx = ctx or {}
     history: list[dict[str, Any]] = []
     for name, billed, rung in rungs:
@@ -54,6 +55,6 @@ def run_ladder(*, scene_id: str, rungs: list[tuple[str, bool, Rung]], budget: Re
                 entry.setdefault("fallback_history", [])
                 entry["fallback_history"] = list(entry["fallback_history"]) + history
             return {"entry": entry, "history": history}
-    # Exhausted without a pass -> caller must ensure the last rung is the free beats
-    # terminal (always passes); reaching here means a wiring bug -- surface it.
+    # Exhausted without a pass -> caller must ensure the last rung is the budget-exempt
+    # beats terminal (always passes); reaching here means a wiring bug -- surface it.
     return {"entry": history[-1].get("entry") if history else None, "history": history}

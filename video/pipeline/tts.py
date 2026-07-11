@@ -837,7 +837,8 @@ def _cleanup_chunk_temps(chunk_dir: Path, concat_tmp: Path) -> None:
 
 def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, plan, reuse_index):
     """Design §7 ladder rungs for one failed scene: arbiter (free small.en re-align) ->
-    resynth (1 billed call) -> chunk (sentence-chunk resynth+merge) -> beats (free terminal).
+    resynth (1 billed call) -> chunk (sentence-chunk resynth+merge) -> beats (budget-exempt
+    terminal -- still bills once per non-empty beat under MiMo, NOT free).
     Each rung callable takes the ctx dict from _synthesize_scene_aligned, which carries the
     RetryBudget. The chunk rung is declared NOT billed to run_ladder because it fans out to ONE
     TTS call per sentence and must account for that itself: it RESERVES N units of the budget up

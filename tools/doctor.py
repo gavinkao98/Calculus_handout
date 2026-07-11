@@ -232,7 +232,11 @@ def check_vale() -> None:
 # ── ⑥ 內附資產（進版控，理應永遠在）────────────────────────────────────
 
 def check_forced_alignment() -> None:
-    """Optional local word-level alignment tools for video timing experiments."""
+    """Word-level alignment tools for the PRODUCTION scene-level FA path
+    (video/pipeline/scene_align.py): stable-ts is the timing source, whisper_timestamped
+    the ASR QA probe. Needed to produce narrated masters; mock iteration does not need
+    them (so still WARN, not FAIL). Not an experiment -- experiments/forced_alignment_dean/
+    is only the historical origin."""
     # QA probe: free ASR (can drop words on repeated math phrases; not a timing source).
     exe = shutil.which("whisper_timestamped")
     if not exe:
@@ -240,7 +244,8 @@ def check_forced_alignment() -> None:
             WARN,
             "forced-alignment",
             "whisper_timestamped not on PATH",
-            "Optional for video forced-alignment experiments; install with "
+            "Needed for narrated masters (production scene-level FA QA probe, "
+            "pipeline/scene_align.py); install with "
             "python -m pip install --upgrade whisper-timestamped",
         )
     else:

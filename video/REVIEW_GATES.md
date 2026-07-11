@@ -126,7 +126,7 @@
 - ✅ **~~`schema.py` 未建~~（2026-06-16 已建）**：結構驗證＋`{show}` 目標列舉，已接進 make.py render 前閘（`--skip-schema` 可繞）。target-vs-payload 交叉驗證仍待 `reveal_targets()`（task #6、需 manim）。
 - **直接構造的 `MathTex/Text` 標籤是 sizecheck 盲點**（只靠 VISUAL-FRAME／人眼）；hook code 的數學保真由 review_pack engineering 鏡（advisory）查。
 - **整節合併影片**（§1.2／§1.4／§1.5）因 Defender Tex-cache race 尚未驗（逐場已驗）。
-- **TTS 發音正確性無自動 listen-back**，只靠 NFA 上游規約＋人工抽驗。
+- **TTS 發音正確性無逐字自動 listen-back**（只靠 NFA 上游規約＋人工抽驗）；但**離線 listening pack**（`pipeline/listening_pack.py`，2026-07-11 T6）已補「逐 take 聽感驗收」——讀 manifest 產 standalone HTML（每場 `<audio>`＋WPM＋validation/qa＋fallback＋ebur128 LUFS/TP，依風險排序），正式交付前仍應完整聽一次全片。
 - **權威來源（NFA 已收回）**：video NFA 的維度／收斂線權威已從「借根 README §Mode B」收回到 [NARRATION-FAITHFULNESS-RUBRIC.md](content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)（SSOT）；commit 慣例權威仍在 `../CLAUDE.md`。講義 Mode B 的權威仍在**根 README**（不同產物，不混用）。
 
 > **重構落地狀態：已採用·收尾（2026-06-16）。** [REVIEW_MODEL_DECISIONS.md](REVIEW_MODEL_DECISIONS.md) 的 minimal-unify **全主體＋code 回報層 normalize 皆已落地**：NFA 改名＋五份判斷閘 SSOT rubric（NFA/copyedit/VISUAL-FRAME/SIXLENS/HOOK-ENGINEERING）＋thin prompt＋每閘收斂線＋gate1→gate2＋視覺層 figure-audit 鏡像＋DRAFT/LOCKED phase；**code 收尾**＝critic.py 接 VISUAL-FRAME（runtime inject＋V1–V9＋A1–A7＋抽幀新鮮度＋MiMo 免費定價），review_pack.py 收斂為 engineering 鏡＋脫離 `.tex`，兩者 §1.1 dry-run 驗過。**本重構無 open item**；schema.py、VISUAL-FRAME detection 面驗證屬產線 backlog（見 [REBUILD_STATUS.md](REBUILD_STATUS.md)）。
