@@ -29,6 +29,7 @@ _bootstrap.bootstrap()
 import yaml  # noqa: E402
 
 from pipeline.audio import concat_wavs, pcm_duration, silence_pcm, trim_silence, wav_duration, write_pcm_wav  # noqa: E402
+from pipeline.derived_check import check_derived_freshness  # noqa: E402  (manim-free, F11-safe)
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 from pipeline.timing import text_hash  # noqa: E402
 
@@ -848,6 +849,9 @@ def write_manifest(path: Path, manifest: dict[str, Any]) -> None:
 def main() -> int:
     args = parse_args()
     data = load_storyboard(args.storyboard)
+    stale = check_derived_freshness(args.storyboard.resolve(), data)
+    if stale:
+        raise SystemExit(f"[freshness] {stale}")
     meta = data["meta"]
     scenes = wanted_scenes(data["scenes"], args.scene)
     sec_dir = _bootstrap.section_output_dir(meta)

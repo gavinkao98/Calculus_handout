@@ -40,6 +40,7 @@ _bootstrap.bootstrap()  # must precede any manim / yaml import
 import yaml  # noqa: E402
 
 from pipeline.audio import concat_wavs, silence_pcm, wav_duration, write_pcm_wav  # noqa: E402
+from pipeline.derived_check import check_derived_freshness  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 from pipeline import house_audio  # noqa: E402
 from pipeline.timing import (  # noqa: E402
@@ -631,6 +632,12 @@ def main() -> int:
     args = parser.parse_args()
 
     data = load_storyboard(args.storyboard)
+
+    # refuse a stale *_mimo.yml before any schema/render work (F2 drift guard);
+    # returns None for non-generated/malformed decks, so schema still owns those.
+    stale = check_derived_freshness(args.storyboard.resolve(), data)
+    if stale:
+        raise SystemExit(f"[freshness] {stale}")
 
     # validate structure first -- a malformed storyboard (missing meta/scenes, bad
     # scene kind, duplicate id, unclosed {show}) is caught before lint/render.

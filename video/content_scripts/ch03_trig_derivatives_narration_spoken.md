@@ -10,21 +10,13 @@
 
 | 項目 | 值 |
 |------|----|
-| `model` | `mimo-v2.5-tts-voicedesign` |
-| `voice design` | `Calm Professor`（預設角色；不送 `audio.voice`） |
+| `model` | `mimo-v2.5-tts`（builtin voice 模型；唯一模型） |
+| `voice` | `Dean`（builtin；經 `audio.voice` 選定） |
 | `audio.format` | `wav`（24kHz/mono/PCM16，與產線 `write_pcm_wav` 相容；beat WAV 自動裁頭尾靜音） |
-| `optimize_text_preview` | `false`（照原旁白念，不讓平台自動改稿） |
 
-**全域 voice-design prompt（放每次呼叫的 `user` 訊息）：**
+**風格提示：** 無——builtin Dean 路線**不送 persona/style prompt**（2026-07-05 起，voice-design 模型與「Calm Professor」persona 已退役）。節奏靠口語稿標點與句構。
 
-```
-A mature American university professor in his early 50s, clear baritone voice,
-calm and authoritative without sounding stiff. Warm but precise, measured medium
-pace, careful articulation of mathematical expressions, with short natural pauses
-at clause boundaries.
-```
-
-**Audio tag：** 維持預設**不啟用**（口語稿純文字，節奏靠風格指令＋標點）。
+**Audio tag：** 維持預設**不啟用**（口語稿純文字）。
 
 ## 二、數學念法慣例（全節通用；NFA 裁定）
 
