@@ -615,6 +615,38 @@ def _mux_cue(video: Path, cue: Path, out: Path, abr: str, *,
     ])
 
 
+# House integrated-loudness target (T10, adjudicated 2026-07-11): the final film's audio
+# is two-pass loudnorm'd to this LUFS (video stream-copied). TP ceiling + WARN tolerance.
+HOUSE_LUFS = -19.0
+LOUDNORM_TP = -1.5
+LOUDNORM_TOL_I = 1.0   # WARN when the delivered integrated loudness misses target by > this
+
+
+def _loudnorm_final(src: Path, out: Path, abr: str, target_i: float,
+                    target_tp: float = LOUDNORM_TP) -> dict:
+    """Two-pass loudnorm the AUDIO of `src` to target_i LUFS -> `out` (video stream-COPIED,
+    preserving the single T8 video encode; linear gain keeps A/V sync). Returns the output's
+    measured {I, TP} via ebur128, or {'error':...} with `out` left unwritten (caller falls
+    back to the un-normalized concat)."""
+    from pipeline.loudness_ab import _parse_loudnorm_json
+    from pipeline.listening_pack import measure_loudness
+    p1 = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-i", str(src), "-vn",
+         "-af", f"loudnorm=I={target_i}:TP={target_tp}:print_format=json", "-f", "null", "-"],
+        capture_output=True, text=True)
+    meas = _parse_loudnorm_json(p1.stderr or "")
+    if not all(k in meas for k in ("input_i", "input_tp", "input_lra", "input_thresh", "target_offset")):
+        return {"error": "loudnorm pass-1 measurement failed"}
+    af = (f"loudnorm=I={target_i}:TP={target_tp}:linear=true:"
+          f"measured_I={meas['input_i']}:measured_TP={meas['input_tp']}:"
+          f"measured_LRA={meas['input_lra']}:measured_thresh={meas['input_thresh']}:"
+          f"offset={meas['target_offset']}")
+    _ffmpeg(["ffmpeg", "-y", "-i", str(src), "-map", "0:v:0", "-map", "0:a:0",
+             "-c:v", "copy", "-af", af, "-c:a", "aac", "-b:a", abr,
+             "-ar", "48000", "-ac", "2", str(out)])
+    return measure_loudness(out)
+
+
 def _concat(segments: list[Path], out: Path, abr: str) -> None:
     list_file = out.parent / "_concat_av_list.txt"
     list_file.write_text(
@@ -636,7 +668,8 @@ def _concat(segments: list[Path], out: Path, abr: str) -> None:
 def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None],
             out_dir: Path, *, lead: float, abr: str, output: Path, transition: float = 0.0,
             intra_act: float | None = None, meta: dict, quality: str,
-            storyboard_path: Path, manifest_path: Path) -> Path | None:
+            storyboard_path: Path, manifest_path: Path,
+            apply_loudnorm: bool = False, loudness_target: float = HOUSE_LUFS) -> Path | None:
     # NB4: --lead only shifts the muxed audio; render() does NOT take lead (LessonScene
     # always waits SCENE_LEAD_SECONDS), so a non-default lead desyncs A/V and subtitles.
     # We don't touch render here -- just warn loudly. Acceptance never ships a non-default lead.
@@ -691,7 +724,27 @@ def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None]
         offset += seg_dur
 
     print(f"[compose] concat {len(segments)} scenes -> {output}", flush=True)
-    _concat(segments, output, abr)
+    if apply_loudnorm:
+        # T10: two-pass loudnorm the whole film to the house target (real-audio path only;
+        # mock silence is never normalized). video stays copy (single T8 encode); on failure
+        # fall back to the un-normalized concat rather than ship nothing.
+        concat_tmp = av_dir / "_concat_preloudnorm.mp4"
+        _concat(segments, concat_tmp, abr)
+        loud = _loudnorm_final(concat_tmp, output, abr, loudness_target)
+        concat_tmp.unlink(missing_ok=True)
+        if "error" in loud:
+            print(f"[loudness] WARN loudnorm failed ({loud['error']}); shipping un-normalized concat", flush=True)
+            _concat(segments, output, abr)
+        else:
+            i, tp = loud.get("I"), loud.get("TP")
+            print(f"[loudness] integrated I={i} LUFS  TP={tp} dBTP  (target {loudness_target} LUFS)", flush=True)
+            if i is not None and abs(i - loudness_target) > LOUDNORM_TOL_I:
+                print(f"[loudness] WARN: integrated {i} LUFS is outside +/-{LOUDNORM_TOL_I} LU of "
+                      f"target {loudness_target}", flush=True)
+            if tp is not None and tp > LOUDNORM_TP + 0.1:
+                print(f"[loudness] WARN: true peak {tp} dBTP exceeds {LOUDNORM_TP} ceiling", flush=True)
+    else:
+        _concat(segments, output, abr)
 
     # sidecars (only after concat succeeds; atomic, so a failure leaves no half file).
     # names bound to the OUTPUT STEM (B6) so a --scene subset / A-B run never clobbers
@@ -741,6 +794,11 @@ def main() -> int:
                              "standard (default); 4k = final delivery")
     parser.add_argument("--lead", type=float, default=LEAD_SECONDS)
     parser.add_argument("--audio-bitrate", default="192k")
+    parser.add_argument("--loudness-target", type=float, default=HOUSE_LUFS,
+                        help=f"integrated-loudness target (LUFS) for the final two-pass loudnorm on "
+                             f"the real-audio (--reuse-audio) path (default: house {HOUSE_LUFS})")
+    parser.add_argument("--skip-loudnorm", action="store_true",
+                        help="skip the final loudness normalization even on the real-audio path")
     parser.add_argument("--transition", type=float, default=0.2,
                         help="per-side fade-through-black at every scene boundary, "
                              "in seconds (0 = hard cuts). The black dip between two "
@@ -917,7 +975,9 @@ def main() -> int:
                      lead=args.lead, abr=args.audio_bitrate, output=output,
                      transition=args.transition, intra_act=args.intra_act_transition,
                      meta=meta, quality=args.quality,
-                     storyboard_path=args.storyboard, manifest_path=manifest_path)
+                     storyboard_path=args.storyboard, manifest_path=manifest_path,
+                     apply_loudnorm=args.reuse_audio and not args.skip_loudnorm,
+                     loudness_target=args.loudness_target)
     if result is None:
         return 1
     print(f"[done] {result}", flush=True)
