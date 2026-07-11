@@ -1,9 +1,11 @@
 """Offline self-test for tts.py scene-unit routing (no API, no model).
 Run: python video/pipeline/_selftest_tts_unit.py"""
 import argparse
+import io
 import json
 import sys
 import tempfile
+from contextlib import redirect_stdout
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -207,6 +209,64 @@ def test_mock_backend_counts_calls():
     assert b.stats["calls"] == 2 and b.stats["retries"] == 0                 # main() just never calls synth for empties
 
 
+# ---- T4: ASR QA verdict persists into manifest (F8), three-state, loud on silent skip ----
+
+def test_build_entry_carries_qa():   # T4-3 serialization: qa lands in validation
+    from pipeline import scene_align as SA
+    entry = SA.build_scene_aligned_entry(
+        scene_number=7, plan={"scene_id": "s", "scene_text_hash": "h"},
+        beats=[{"text": "hi"}], audio_seconds=1.0, audio_file="x.wav",
+        summary={"aligner": "base.en"}, words_file="w.json", aligned_file="a.json",
+        gates={"status": "pass", "warnings": [], "metrics": {},
+               "qa": {"status": "skipped", "reason": "x"}})
+    assert entry["validation"]["qa"] == {"status": "skipped", "reason": "x"}
+
+
+def _run_finalize(monkey_asr, *, skip_qa=False, qa_wav_none=False, qa_verdict="ok"):
+    """Drive _finalize_aligned with fake SA primitives + a monkeypatched
+    _asr_probe_tokens; return (entry, captured_stdout). Fully offline (no model)."""
+    from pipeline import scene_align as SA
+    keys = ("map_to_beats", "run_gates", "qa_diff", "boundary_weak_spans", "tokenize")
+    saved = {k: getattr(SA, k) for k in keys}
+    saved_probe = tts._asr_probe_tokens
+    SA.map_to_beats = lambda plan, words, secs, multi=None: [{"text": "hi", "start_seconds": 0.0, "end_seconds": 1.0}]
+    SA.run_gates = lambda *a, **k: {"status": "pass", "warnings": [], "metrics": {}, "failures": []}
+    SA.qa_diff = lambda *a, **k: {"verdict": qa_verdict, "score": 1.0}
+    SA.boundary_weak_spans = lambda beats: []
+    SA.tokenize = lambda text: text.split()
+    tts._asr_probe_tokens = monkey_asr
+    buf = io.StringIO()
+    try:
+        with tempfile.TemporaryDirectory() as d, redirect_stdout(buf):
+            dd = Path(d)
+            plan = {"scene_id": "s", "transcript": "hi there", "scene_text_hash": "h"}
+            entry = tts._finalize_aligned(
+                plan=plan, words=[{"probability": 0.9}], multi={}, segments=[],
+                summary={"aligner": "base.en"}, audio_seconds=1.0, scene_number=7,
+                words_file=dd / "w.json", aligned_file=dd / "a.json", audio_file=dd / "07_s.wav",
+                args=argparse.Namespace(skip_qa=skip_qa, aligner_model="base.en", aligner_device="cpu"),
+                qa_wav=None if qa_wav_none else dd / "qa.wav", promote_from=None)
+    finally:
+        for k, v in saved.items():
+            setattr(SA, k, v)
+        tts._asr_probe_tokens = saved_probe
+    return entry, buf.getvalue()
+
+
+def test_finalize_records_qa_state():   # F8 / Adv2 / B5: control flow, not just serialization
+    entry, out = _run_finalize(lambda w, a: (["w"], "ran"), qa_verdict="fail")      # ran + fail
+    assert entry["validation"]["qa"]["status"] == "ran"
+    assert entry["validation"]["status"] == "fail"                                  # qa fail overrides
+    entry, out = _run_finalize(lambda w, a: (None, "skipped: whisper_timestamped not installed"))
+    assert entry["validation"]["qa"]["status"] == "skipped" and "WARN" in out and "NOT a pass" in out
+    entry, out = _run_finalize(lambda w, a: (None, "error: boom"))                  # probe error
+    assert entry["validation"]["qa"]["status"] == "error" and "WARN" in out
+    entry, out = _run_finalize(lambda w, a: (None, "unused"), skip_qa=True)         # intentional opt-out
+    assert entry["validation"]["qa"]["status"] == "skipped" and "WARN" not in out   # silent by policy
+    entry, out = _run_finalize(lambda w, a: (None, "unused"), qa_wav_none=True)     # should-have-but-didn't
+    assert entry["validation"]["qa"]["status"] == "skipped" and "WARN" in out
+
+
 if __name__ == "__main__":
     test_unit_auto_matches_content_templates()
     test_resolve_unit_for_scene()
@@ -218,4 +278,6 @@ if __name__ == "__main__":
     test_scene_subset_merges_into_prior_manifest()
     test_merge_refuses_identity_mismatch()
     test_mock_backend_counts_calls()
+    test_build_entry_carries_qa()
+    test_finalize_records_qa_state()
     print("OK tts unit-routing self-test (Task 8)")

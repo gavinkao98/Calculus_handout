@@ -703,22 +703,23 @@ def _synth_scene_wav(backend: TTSBackend, plan: dict[str, Any], out_path: Path,
                   channels=result.channels, sample_width=result.sample_width)
 
 
-def _asr_probe_tokens(wav: Path, args: argparse.Namespace) -> list[str] | None:
-    """Free ASR (whisper-timestamped) -> normalized token list for the QA probe
-    (design §6). Advisory: returns None if the probe cannot run (missing dep/model),
-    so a probe failure never blocks synthesis."""
+def _asr_probe_tokens(wav: Path, args: argparse.Namespace) -> tuple[list | None, str]:
+    """Free ASR (whisper-timestamped) -> (normalized tokens, reason) for the QA probe
+    (design §6). Advisory: (None, reason) if the probe cannot run (missing dep/model),
+    so a probe failure never blocks synthesis -- but the reason is RECORDED (F8) so a
+    silent skip is never mistaken for a pass. success -> (tokens, "ran")."""
     from pipeline import scene_align as SA
     try:
         import whisper_timestamped as wt
     except ImportError:
-        return None
+        return None, "skipped: whisper_timestamped not installed"
     try:
         model = wt.load_model(args.aligner_model, device=args.aligner_device)
         result = wt.transcribe(model, str(wav), language="en")
-    except Exception:  # noqa: BLE001 - probe is advisory, never fatal
-        return None
+    except Exception as exc:  # noqa: BLE001 - probe is advisory, never fatal
+        return None, f"error: {exc}"
     text = " ".join(seg.get("text", "") for seg in result.get("segments", []))
-    return SA.tokenize(text)
+    return SA.tokenize(text), "ran"
 
 
 def _finalize_aligned(*, plan: dict[str, Any], words: list[dict[str, Any]],
@@ -735,13 +736,25 @@ def _finalize_aligned(*, plan: dict[str, Any], words: list[dict[str, Any]],
     from pipeline import atomicio
     beats = SA.map_to_beats(plan, words, audio_seconds, multi=multi)
     gates = SA.run_gates(plan, words, beats, audio_seconds)
-    if not getattr(args, "skip_qa", False) and qa_wav is not None:
-        asr = _asr_probe_tokens(qa_wav, args)
-        if asr is not None:
+    # QA probe outcome ALWAYS lands in gates["qa"] as one of ran/skipped/error (F8:
+    # previously the verdict was dropped and a missing dep skipped silently). Adv2
+    # policy: only an intentional --skip-qa is silent; any other "should have run but
+    # didn't" (no dep, exception, unexpectedly no qa wav) prints a loud "NOT a pass".
+    if getattr(args, "skip_qa", False):
+        gates = {**gates, "qa": {"status": "skipped", "reason": "--skip-qa (intentional)"}}
+    else:
+        asr, note = (None, "skipped: no qa wav on this path") if qa_wav is None \
+            else _asr_probe_tokens(qa_wav, args)
+        if asr is None:
+            status = "error" if note.startswith("error") else "skipped"
+            gates = {**gates, "qa": {"status": status, "reason": note}}
+            print(f"[tts] WARN {plan['scene_id']}: ASR QA probe did not run ({note}) -- "
+                  f"this is NOT a pass", flush=True)
+        else:
             fa_probs = [w.get("probability") for w in words]
             qa = SA.qa_diff(SA.tokenize(plan["transcript"]), asr, fa_probs,
                             weak_spans=SA.boundary_weak_spans(beats))
-            gates = {**gates, "qa": qa}
+            gates = {**gates, "qa": {"status": "ran", **qa}}
             if qa["verdict"] == "fail":
                 gates["status"] = "fail"
                 gates["failures"] = gates["failures"] + ["QA probe: suspect TTS misspeak"]
