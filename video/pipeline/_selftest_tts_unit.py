@@ -173,6 +173,27 @@ def test_main_guard_blocks_before_synth():   # R3-A2: guard fires BEFORE any syn
         assert sentinel.read_bytes() == before, "sentinel WAV must be untouched by an aborted run"
 
 
+# ---- T2c: --scene subset merges into prior manifest (identity-checked) ----
+
+def test_scene_subset_merges_into_prior_manifest():
+    prior = {**_BASE_ID, "scenes": [{"scene_id": "a", "x": 1}, {"scene_id": "b", "x": 2}]}
+    fresh = {**_BASE_ID, "scenes": [{"scene_id": "b", "x": 99}]}
+    out = tts.merged_manifest(prior, fresh, ["a", "b", "c"])
+    assert [e["scene_id"] for e in out["scenes"]] == ["a", "b"]        # order follows storyboard; c absent
+    assert out["scenes"][0]["x"] == 1 and out["scenes"][1]["x"] == 99  # untouched a kept, b wins fresh
+    assert tts.merged_manifest(None, fresh, ["b"]) is fresh            # no prior -> fresh as-is
+
+
+def test_merge_refuses_identity_mismatch():
+    prior = {**_BASE_ID, "scenes": [{"scene_id": "a", "x": 1}]}
+    fresh = {**_BASE_ID, "voice": "Mia", "scenes": [{"scene_id": "b", "x": 2}]}   # voice differs
+    try:
+        tts.merged_manifest(prior, fresh, ["a", "b"])
+        assert False, "should have raised"
+    except SystemExit:
+        pass
+
+
 if __name__ == "__main__":
     test_unit_auto_allowlist_is_batch2()
     test_resolve_unit_for_scene()
@@ -181,4 +202,6 @@ if __name__ == "__main__":
     test_read_manifest_status_shape_contract()
     test_overwrite_guard_states()
     test_main_guard_blocks_before_synth()
+    test_scene_subset_merges_into_prior_manifest()
+    test_merge_refuses_identity_mismatch()
     print("OK tts unit-routing self-test (Task 8)")

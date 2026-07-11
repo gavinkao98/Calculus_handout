@@ -403,6 +403,27 @@ def overwrite_guard(*, status: str, existing: dict | None, intended: dict, scene
     return None
 
 
+def merged_manifest(prior: dict[str, Any] | None, fresh: dict[str, Any],
+                    storyboard_scene_ids: list[str]) -> dict[str, Any]:
+    """--scene subset merges INTO the prior manifest: fresh entries win per
+    scene_id, untouched prior entries survive, order follows the storyboard.
+    Backstop only (T2a preflight already blocked identity mismatch before any
+    synthesis): if identity somehow still differs, REFUSE rather than merge.
+    No prior manifest -> just the fresh subset."""
+    if not prior:
+        return fresh
+    mismatch = [k for k in _IDENTITY_KEYS if prior.get(k) != fresh.get(k)]
+    if mismatch:
+        raise SystemExit(
+            f"[tts] refusing to merge a --scene subset into a manifest that differs on "
+            f"{mismatch}; re-run the whole deck (--scene all) to rebuild it consistently.")
+    by_id = {e["scene_id"]: e for e in prior.get("scenes", []) if e.get("scene_id")}
+    by_id.update({e["scene_id"]: e for e in fresh.get("scenes", []) if e.get("scene_id")})
+    out = {**prior, **{k: v for k, v in fresh.items() if k != "scenes"}}
+    out["scenes"] = [by_id[sid] for sid in storyboard_scene_ids if sid in by_id]
+    return out
+
+
 def build_reuse_index(manifest: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
     if not manifest:
         return {}
@@ -1046,6 +1067,11 @@ def main() -> int:
             )
         )
 
+    if args.scene != "all":
+        # F5: a subset run must merge into the prior manifest, not overwrite it whole
+        # (identity already vetted by the T2a preflight guard; merged_manifest re-checks
+        # as a backstop). `existing` is the prior manifest read at the top of main().
+        manifest = merged_manifest(existing, manifest, [s["id"] for s in all_scenes])
     write_manifest(manifest_path, manifest)
     print(f"[done] wrote {manifest_path}", flush=True)
     return 0
