@@ -261,7 +261,13 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--storyboard", required=True, type=Path)
     parser.add_argument("--scene", default="all", help="id, comma-separated ids, or 'all'")
-    parser.add_argument("--backend", choices=("mimo", "mock"), default="mimo")
+    parser.add_argument("--backend", choices=("mimo", "mock"), required=True,
+                        help="TTS backend; REQUIRED (no default) so a bare run can neither "
+                             "silently bill MiMo nor silently clobber real WAVs with mock")
+    parser.add_argument("--force-backend-switch", action="store_true",
+                        help="allow overwriting a manifest whose backend differs (only with --scene all)")
+    parser.add_argument("--force-clobber", action="store_true",
+                        help="overwrite a corrupt manifest or orphan WAVs (only with --scene all)")
     parser.add_argument("--model", default=os.environ.get("MIMO_TTS_MODEL", MIMO_MODEL))
     parser.add_argument("--voice", default=os.environ.get("MIMO_TTS_VOICE"))
     parser.add_argument("--style", default=os.environ.get("MIMO_TTS_STYLE", MIMO_STYLE))
@@ -318,6 +324,83 @@ def load_prior_manifest(path: Path) -> dict[str, Any] | None:
     except (OSError, ValueError) as exc:
         print(f"[tts] cannot read prior manifest for reuse ({path}): {exc}", flush=True)
         return None
+
+
+_IDENTITY_KEYS = ("deck_id", "backend", "model", "voice", "style",
+                  "sample_rate", "channels", "sample_width", "output_dir")
+
+
+def read_manifest_status(path: Path) -> tuple[dict | None, str]:
+    """('ok'|'absent'|'corrupt'). 'ok' is a PROMISE that every prior-manifest consumer
+    runs without crashing on a shape it assumed. Beyond the top level (dict + str
+    'backend' + list-of-dict 'scenes') we validate exactly the per-scene fields those
+    consumers dereference by TYPE (R3-B1, Codex option a -- bounded to real derefs,
+    not speculative):
+      - scene_id: str                    -> dict key in build_scene_reuse_index / merged_manifest
+      - beats (only if the KEY exists):  -> build_reuse_index does `for beat in scene["beats"]`
+          list of dicts, and each beat's audio_file (if present) a str  (Path(audio_file))
+          (test `"beats" in s`, NOT .get() -- explicit null must fail, since
+           scene.get("beats", []) returns None for a present-but-null key)
+      - audio_seconds (scene_aligned only, if present): a real number   (scene_reuse_ok float())
+    Anything else -- truncation, non-dict JSON, a wrong type above -- is 'corrupt'
+    (fail CLOSED). Beat text/hash/timing are NOT validated (nothing keys on their
+    type). Keep this in sync if a consumer starts dereferencing a new field."""
+    if not path.exists():
+        return None, "absent"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None, "corrupt"
+    scenes = data.get("scenes") if isinstance(data, dict) else None
+    if (not isinstance(data, dict) or not isinstance(data.get("backend"), str)
+            or not isinstance(scenes, list) or not all(isinstance(e, dict) for e in scenes)):
+        return None, "corrupt"
+    for s in scenes:
+        if not isinstance(s.get("scene_id"), str):
+            return None, "corrupt"
+        if "beats" in s:
+            beats = s["beats"]
+            if (not isinstance(beats, list) or not all(isinstance(b, dict) for b in beats)
+                    or any(b.get("audio_file") is not None
+                           and not isinstance(b.get("audio_file"), str) for b in beats)):
+                return None, "corrupt"
+        if s.get("narration_mode") == "scene_aligned":
+            secs = s.get("audio_seconds")
+            if secs is not None and (isinstance(secs, bool) or not isinstance(secs, (int, float))):
+                return None, "corrupt"
+    return data, "ok"
+
+
+def _has_audio(output_dir: Path) -> bool:
+    return any((output_dir / "scenes").glob("*.wav")) or any((output_dir / "beats").rglob("*.wav"))
+
+
+def overwrite_guard(*, status: str, existing: dict | None, intended: dict, scene_sel: str,
+                    output_dir: Path, force_backend_switch: bool, force_clobber: bool) -> str | None:
+    """Abort message (else None), computed BEFORE any synthesis/write so a bad run
+    never bills a call or clobbers a WAV first (NB1). `intended` = the identity this
+    run would write. Recovering a corrupt/orphaned output needs --force-clobber AND
+    --scene all (a forced subset would leave un-accounted WAVs; NB2)."""
+    need_full = "recovery needs --force-clobber AND --scene all"
+    if status == "corrupt":
+        if not force_clobber:
+            return ("manifest present but corrupt/semantically invalid; refusing to overwrite "
+                    "(it may still shadow real WAVs). Re-synthesize the whole deck or --force-clobber.")
+        return None if scene_sel == "all" else need_full
+    if status == "absent" and _has_audio(output_dir):
+        if not force_clobber:
+            return ("no valid manifest but WAVs already exist under the output dir; refusing to "
+                    "overwrite unmanaged audio. Pass --force-clobber (with --scene all).")
+        return None if scene_sel == "all" else need_full
+    if status == "ok":
+        diff = [k for k in _IDENTITY_KEYS if (existing or {}).get(k) != intended.get(k)]
+        if diff and scene_sel != "all":
+            return (f"this run's identity differs from the existing manifest on {diff}; a --scene "
+                    f"subset can't safely merge into it. Re-run --scene all to rebuild.")
+        if "backend" in diff and not force_backend_switch:
+            return (f"existing manifest backend={(existing or {}).get('backend')!r} != "
+                    f"{intended.get('backend')!r}; pass --force-backend-switch (with --scene all).")
+    return None
 
 
 def build_reuse_index(manifest: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
@@ -862,12 +945,24 @@ def main() -> int:
     ).resolve()
     manifest_path = (args.manifest or (output_dir / "manifest.json")).resolve()
     voice = args.voice or default_voice_for_model(meta)
-    prior_manifest = load_prior_manifest(manifest_path) if args.reuse_existing else None
-    reuse_index = build_reuse_index(prior_manifest)                 # per-beat (beat path)
-    scene_reuse_index = build_scene_reuse_index(prior_manifest)     # per-scene (scene path)
-    if args.reuse_existing and prior_manifest is None:
+    existing, status = read_manifest_status(manifest_path)
+    intended = {"deck_id": meta["id"], "backend": args.backend, "model": args.model,
+                "voice": voice, "style": args.style, "sample_rate": 24_000, "channels": 1,
+                "sample_width": 2, "output_dir": str(output_dir)}
+    abort = overwrite_guard(status=status, existing=existing, intended=intended,
+                            scene_sel=args.scene, output_dir=output_dir,
+                            force_backend_switch=args.force_backend_switch,
+                            force_clobber=args.force_clobber)
+    identity_diff = status == "ok" and any((existing or {}).get(k) != intended.get(k)
+                                           for k in _IDENTITY_KEYS)
+    # reuse index only when asked AND identity unchanged (R3-B2) AND not a dry-run
+    # (dry-run writes nothing and never reads these -- don't build unused indexes).
+    use_reuse = args.reuse_existing and not identity_diff and not args.dry_run
+    reuse_index = build_reuse_index(existing) if use_reuse else {}              # per-beat (beat path)
+    scene_reuse_index = build_scene_reuse_index(existing) if use_reuse else {}  # per-scene (scene path)
+    if args.reuse_existing and existing is None:
         print(
-            "[tts] --reuse-existing requested but no prior manifest was found; "
+            "[tts] --reuse-existing requested but no valid prior manifest was found; "
             "existing WAV files will not be trusted blindly.",
             flush=True,
         )
@@ -875,11 +970,17 @@ def main() -> int:
     content_count = sum(1 for scene in scenes if scene.get("kind", "content") == "content")
     beat_count = sum(len(scene_beats(scene)) for scene in scenes if scene.get("kind", "content") == "content")
     if args.dry_run:
+        # dry-run is read-only: never enforce the guard (R3-A1 -- the quote flow needs
+        # dry-run to still print an estimate), but surface that a real run WOULD abort.
+        if abort:
+            print(f"[dry-run] NOTE: a real run WOULD abort -> {abort}")
         print(
             f"Would synthesize {beat_count} beat(s) across {content_count} content scene(s) "
             f"with backend={args.backend}, model={args.model}, voice={voice}."
         )
         return 0
+    if abort:
+        raise SystemExit(f"[tts] {abort}")
 
     backend = build_backend(args)
     output_dir.mkdir(parents=True, exist_ok=True)
