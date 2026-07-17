@@ -40,12 +40,20 @@
   BoldItalicFont = NewCM10-BoldItalic.otf,
 ]
 \setmathfont{NewCMMath-Book.otf}
+% Renderer=HarfBuzz 為必要，不可拿掉：Inter 4.001 的 static OTF 其 CFF charset 內含
+% 重複字形名稱（直立體 123 個、義體 92 個，首見 GID 151 `G.1`）。LuaTeX 預設的 node
+% mode 以「字形名稱」索引字形，重複名會塌陷，導致 GID 151 之後的輪廓與 charset 錯位
+% ——PDF 的 CID／ToUnicode 全對、印出來卻是別的字（實測全篇 67 個字形：頁碼 9 印成 7、
+% EXAMPLE 印成 EWALjŒKE、頁眉整條亂碼；文字層正確故 pdftotext 系的閘全驗不出來）。
+% HarfBuzz 以 GID 索引，不受重複名影響。回歸閘＝`check_glyphs.py`（KICKOFF §4.5 閘 4）。
 \newfontfamily\cbuiregular{Inter-Regular.otf}[
-  Path = \cbfontsdir, ItalicFont = Inter-Italic.otf, BoldFont = Inter-Bold.otf]
-\newfontfamily\cbuimedium{Inter-Medium.otf}[Path = \cbfontsdir]
-\newfontfamily\cbuisemibold{Inter-SemiBold.otf}[Path = \cbfontsdir]
+  Path = \cbfontsdir, Renderer = HarfBuzz,
+  ItalicFont = Inter-Italic.otf, BoldFont = Inter-Bold.otf]
+\newfontfamily\cbuimedium{Inter-Medium.otf}[Path = \cbfontsdir, Renderer = HarfBuzz]
+\newfontfamily\cbuisemibold{Inter-SemiBold.otf}[Path = \cbfontsdir, Renderer = HarfBuzz]
 \newfontfamily\cbuibold{Inter-Bold.otf}[
-  Path = \cbfontsdir, ItalicFont = Inter-BoldItalic.otf]
+  Path = \cbfontsdir, Renderer = HarfBuzz,
+  ItalicFont = Inter-BoldItalic.otf]
 
 % microtype 在字體之後。protrusion＋expansion＝出版級的「最後 5%」（kickoff §4.2）。
 \usepackage{microtype}

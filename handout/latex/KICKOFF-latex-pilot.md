@@ -30,6 +30,23 @@
 > M-B0 對 §1 初步盤點的更正見 `chapters/appB/DIALECT-appB.md` §6。v1 `shell/` 已歸檔
 > `_dev-archive/tex_export-v1-shell/`。後續＝§9 rollout（屆時另開計畫）。
 
+> **⚠️ 上面兩段「四閘全綠」的成品其實印錯字——2026-07-17 稍晚由使用者看 PDF 發現、當日修訖。**
+> 病灶：vendored 的 **Inter 4.001 static OTF 其 CFF charset 含重複字形名稱**（直立體 123 個、
+> 義體 92 個，首見 GID 151 `G.1`）。LuaTeX 預設的 **node mode 以字形名稱索引字形**，重複名
+> 塌陷後輪廓與 charset 錯位 → **PDF 的 CID／ToUnicode／charset 全對，印出來卻是別的字**：
+> 全篇 **67 個 Inter 字形**印錯（頁碼 `9` 印成 `7`、`EXAMPLE` 印成 `EWALjŒKE`、頁眉整條亂碼）；
+> 正文 NCM 與數學不受影響（其 charset 無重複名）。
+> **修法**：`calcbook.sty` 給四個 Inter family 指定 `Renderer = HarfBuzz`（以 GID 索引，不受
+> 重複名影響）——該處註解寫明「不可拿掉」，勿當成冗餘設定清掉。實測 `Renderer=HarfBuzz`
+> 與現行 microtype（protrusion＋expansion＋tracking）相容，且重編前後 **24/24 頁字詞座標
+> 完全相同**（只換輪廓、不動版面）。
+> **為什麼四閘全綠**：閘 1 只問 missing character、閘 2 只問 hbox、閘 3 的 `check_prose.py`
+> 走 `pdftotext` 讀 ToUnicode 文字層——**沒有一個閘看像素或看字形**，結構上看不見這個 bug。
+> 故同時新增 **§4.5 閘 4 字形閘**（`check_glyphs.py`）作為回歸閘；已實測對修正前的 PDF
+> FAIL（67 個）、對修正後 PASS（360 個嵌入字形全對）。
+> **rollout 注意**：任何在此修正前用本模板建的 PDF 都帶同樣的 bug（`build/` 下的 ch03、
+> sampler、diag 等開發產物即是），要用得重編。
+
 > **給新 session 的開場**：本檔是 2026-07-15/16 兩輪討論的完整交接（v2）。接手流程——
 > ① 先讀本檔全文；② 再讀 [`../html/CONTRACT-html-writing.md`](../html/CONTRACT-html-writing.md)（輸入方言契約）、
 > [`../html/TYPESETTING_GUIDE.md`](../html/TYPESETTING_GUIDE.md) §9（版心／字體拍板）、[`../../CLAUDE.md`](../../CLAUDE.md)（行為準則，尤其「缺套件先問」「commit 需授權」）、
@@ -100,6 +117,7 @@ handout/latex/
   test_convert.py       # v1 資產：golden tests＋數學逐位元組驗證（M-B2 已擴 appB）
   dialect_inventory.py  # v1 資產：方言盤點器（rollout 逐章跑）
   check_prose.py        # v1 資產：pdftotext 散文子序列閘
+  check_glyphs.py       # 字形閘（§4.5 閘 4）：嵌入字形的輪廓是不是它宣稱的字
   export_figs.mjs       # v1 資產：圖匯出（rollout 首個有圖章驗收）
   template/             # 共用模板（樣式層＋語意指令層；sampler.tex＝拍板樣張）
   chapters/             # 章節資產各住一夾：DIALECT-<ch>.md＋driver .tex＋對照報告＋figs
@@ -133,8 +151,13 @@ appB 無圖。`export_figs.mjs`＋`chapters/ch03/figs/` 保留原樣；正式驗
 1. **編譯閘**：`latexmk -lualatex` 0 error；0 missing character。
 2. **版面閘**：overfull `\hbox` >2pt＝0；underfull 逐條目視。寬顯示式維持手動斷行政策。
 3. **完整性閘**：coverage 100%＋`check_prose.py` appB 通過＋數學逐位元組測試綠。
-4. **人眼閘**：appB 全頁看一遍；抽樣公式並排比對。
-5. **交付**：PDF＋對照報告 → 使用者 **GO／NO-GO**（流程明定使用者裁決項）。
+4. **字形閘**（2026-07-17 新增）：`python check_glyphs.py <pdf>` 通過——PDF 每個嵌入字形的
+   輪廓都必須是它宣稱的那個字。**閘 1–3 結構上看不到這個維度**：閘 1 只問 missing
+   character、閘 2 只問 hbox、閘 3 的 `check_prose.py` 走 `pdftotext` 讀的是 ToUnicode
+   文字層。2026-07-17 的 Inter node-mode bug 正是這樣全綠通過的——文字層一字不差，
+   印出來 67 個字形是別的字。判準與已知極限見該檔 docstring。
+5. **人眼閘**：appB 全頁看一遍；抽樣公式並排比對。
+6. **交付**：PDF＋對照報告 → 使用者 **GO／NO-GO**（流程明定使用者裁決項）。
 
 ## 5. Milestones（v2；M-B* 以別於 v1 的 M-P*）
 

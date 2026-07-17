@@ -73,6 +73,10 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   [`authoring/seed_converge/requirements.txt`](authoring/seed_converge/requirements.txt)。
 - **曾漏裝、現已納入：** `fonttools`（logo 外框一次性工具）、`pymupdf`/`fitz`（authoring 圖稽核）
   以前沒宣告也沒裝，換機重跑會 ImportError；現都進 lock。
+  2026-07-17 起這兩個**還背著 LaTeX 出版線的字形閘**（[`handout/latex/check_glyphs.py`](handout/latex/check_glyphs.py)，
+  KICKOFF §4.5 閘 4）：fonttools 讀原始字型輪廓、pymupdf 讀 PDF 嵌入字型。缺了閘跑不動，
+  而該閘擋的是「PDF 文字層全對、印出來是別的字」這種 pdftotext 驗不出來的病（沿革見 KICKOFF
+  狀態區塊的 Inter node-mode bug）——別因為它們在 doctor 裡標 optional 就跳過不裝。
 
 ### ② ffmpeg / ffprobe — 裝真正的全套（策略 A）
 - `make.py` 的 compose 與 `critic.py` 抽幀用**裸名** `ffmpeg`／`ffprobe` 呼叫，必須在 PATH 上。

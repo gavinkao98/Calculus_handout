@@ -69,8 +69,8 @@ _VENV_MODS = [
     ("ManimPango", "manimpango", "critical", "manim 文字排版／註冊內附字型"),
     ("pillow", "PIL", "critical", "幀處理／稽核報告 base64 內嵌圖"),
     ("imageio-ffmpeg", "imageio_ffmpeg", "optional", "內附 ffmpeg 二進位（裝了系統 ffmpeg 後非必要）"),
-    ("fonttools", "fontTools", "optional", "一次性產 logo 外框 SVG（_outline_text.py）"),
-    ("pymupdf", "fitz", "optional", "authoring 圖稽核 PDF 轉點陣（figure_critic.py）"),
+    ("fonttools", "fontTools", "optional", "LaTeX 字形閘讀原始字型輪廓（handout/latex/check_glyphs.py）；產 logo 外框 SVG"),
+    ("pymupdf", "fitz", "optional", "LaTeX 字形閘讀 PDF 嵌入字型（handout/latex/check_glyphs.py）；authoring 圖稽核轉點陣"),
 ]
 
 

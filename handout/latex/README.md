@@ -40,6 +40,7 @@ latex/
   test_convert.py         # golden tests＋數學逐位元組不變式
   dialect_inventory.py    # 方言盤點器（rollout 逐章：python dialect_inventory.py ch04）
   check_prose.py          # 完整性閘：散文子序列＋圖內文字（pdftotext）
+  check_glyphs.py         # 字形閘：嵌入字形的輪廓是不是它宣稱的字（pdftotext 那層看不到）
   export_figs.mjs         # 圖匯出：standalone → 每 panel 一張向量 PDF
   print_html.mjs          # HTML 印 A4 PDF（對照報告的 HTML 側）
   dist/<ch>/              # ★ 成品夾：<name>.pdf＋<name>.tex（自足成品源），永遠只有兩檔
