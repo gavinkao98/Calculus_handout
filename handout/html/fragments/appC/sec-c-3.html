@@ -1,0 +1,68 @@
+<!-- §C.3 Orientation and the Cross Product.
+     Self-authored 2026-07-04 (authoring brief = CONTENT_SPEC §16.2/§16.3 + §3 register). Namespace "C",
+     continuing from sec-c-2: Definition C.2; Proposition C.2; Example C.3. No figures (right-hand rule +
+     parallelepiped are figure-opportunity candidates, deferred). The cross product is given here as the
+     determinant TOOL; Ch12 develops the vector geometry/applications (normals, planes) on top of it.
+     Math verified: (1,2,0)x(0,3,1) = (2,-1,3), perp to both; triple product det[[1,2,0],[0,3,1],[1,0,2]] = 8.
+     Codex gate-2 (gpt-5.5/xhigh): 1 advisory FIXED — qualified "right-hand rule" to nonzero/nonparallel
+     a,b (parallel => sin0=0 => cross product is the zero vector, no direction). Re-rendered clean.
+     Record: handout/_audit/REVIEW-appendix-clean-slate-design.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">C.3</span>Orientation and the Cross Product</h2>
+  </header>
+
+  <p>Two independent vectors in the plane span a parallelogram, and Section C.2 measured it. In space a second question joins the size: two vectors lie in a plane, and <em>two</em> opposite directions stand perpendicular to it — which one to name. Fixing that choice consistently is the work of <em>orientation</em>, and the rule that fixes it is the <em>right-hand rule</em>: point the fingers of the right hand along the first vector and curl them toward the second, and the outstretched thumb selects the perpendicular direction. The cross product bundles this choice together with an area into a single vector — and computes it as a determinant.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">C.2</span></p>
+    <div class="env-body">
+      <p>The <em>cross product</em> of \(\mathbf{a} = (a_1, a_2, a_3)\) and \(\mathbf{b} = (b_1, b_2, b_3)\) is the vector produced by expanding, along its first row, the symbolic determinant whose top row holds the standard basis vectors \(\mathbf{i}, \mathbf{j}, \mathbf{k}\):
+      \[ \begin{aligned}
+        \mathbf{a} \times \mathbf{b}
+          &= \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ a_1 & a_2 & a_3 \\ b_1 & b_2 & b_3 \end{vmatrix} \\[2pt]
+          &= (a_2 b_3 - a_3 b_2)\,\mathbf{i} - (a_1 b_3 - a_3 b_1)\,\mathbf{j} + (a_1 b_2 - a_2 b_1)\,\mathbf{k}.
+      \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">C.2</span><span class="env-name">Geometry of the cross and triple products</span></p>
+    <div class="env-body">
+      <p>The vector \(\mathbf{a} \times \mathbf{b}\) is perpendicular to both \(\mathbf{a}\) and \(\mathbf{b}\); when the two are nonzero and nonparallel it is directed by the right-hand rule, and its length
+      \[ |\mathbf{a} \times \mathbf{b}| = |\mathbf{a}|\,|\mathbf{b}|\sin\theta \]
+      is the area of the parallelogram they span, where \(\theta\) is the angle between them. Parallel vectors span no parallelogram, and there \(\sin\theta = 0\) collapses the product to the zero vector — which has no direction to name. The related <em>scalar triple product</em> is an ordinary determinant,
+      \[ \mathbf{a} \cdot (\mathbf{b} \times \mathbf{c}) = \begin{vmatrix} a_1 & a_2 & a_3 \\ b_1 & b_2 & b_3 \\ c_1 & c_2 & c_3 \end{vmatrix}, \]
+      whose absolute value is the volume of the parallelepiped spanned by the three vectors — the space version of Proposition C.1 — and whose sign tells whether the ordered triple is right- or left-handed.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">C.3</span></p>
+      <div class="env-body">
+        <p>Compute \(\mathbf{a} \times \mathbf{b}\) for \(\mathbf{a} = (1, 2, 0)\) and \(\mathbf{b} = (0, 3, 1)\), and then the volume of the box that \(\mathbf{a}\), \(\mathbf{b}\), and \(\mathbf{c} = (1, 0, 2)\) enclose.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Expand the symbolic determinant along its top row:
+        \[ \begin{aligned}
+          \mathbf{a} \times \mathbf{b}
+            &= \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 1 & 2 & 0 \\ 0 & 3 & 1 \end{vmatrix} \\[2pt]
+            &= (2\cdot 1 - 0\cdot 3)\,\mathbf{i} - (1\cdot 1 - 0\cdot 0)\,\mathbf{j} + (1\cdot 3 - 2\cdot 0)\,\mathbf{k} \\[2pt]
+            &= (2, -1, 3).
+        \end{aligned} \]
+        A pair of dot products confirms the perpendicularity: \(\mathbf{a} \cdot (\mathbf{a} \times \mathbf{b}) = 2 - 2 + 0 = 0\) and \(\mathbf{b} \cdot (\mathbf{a} \times \mathbf{b}) = 0 - 3 + 3 = 0\). For the volume, take the scalar triple product
+        \[ \mathbf{a} \cdot (\mathbf{b} \times \mathbf{c}) = \begin{vmatrix} 1 & 2 & 0 \\ 0 & 3 & 1 \\ 1 & 0 & 2 \end{vmatrix} = 1\,(6 - 0) - 2\,(0 - 1) + 0 = 8, \]
+        so the three edges enclose a parallelepiped of volume \(8\), and the positive sign marks the triple as right-handed.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The multivariable chapters develop these products in full — the cross product as the source of normal vectors to planes and surfaces (Chapter 12), the triple product wherever an oriented volume is wanted. What this section supplies is their engine: both are determinants, and the right-hand rule is what the determinant’s sign <em>means</em> in space.</p>
+
+</article>

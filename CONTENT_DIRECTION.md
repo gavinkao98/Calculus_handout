@@ -1,6 +1,6 @@
 # 內容方向準則（Content Direction）—— 從手稿到一節的「方向層」
 
-> **本檔是 HTML 講義「每節內容方向」的權威流程文件。** 它在「spine 素材（老師掃描手稿，或 Ch5 起的 canon 藍本）→ 完整講義一節」之間補上一道**方向層**，讓「**這是不是我要的方向**」從不可檢核變可檢核。已在 ch01 §1.1–§1.2、§4.2、ch02 §2.1–§2.5、ch03 端到端跑過六階並收斂（committed）；逐節驗證紀錄存於 [`authoring/direction_layer/`](authoring/direction_layer/)（`ch01/`、`test/`）。Ch5 起的無手稿章以 canon 為 spine 走同一套六階，各階對應差異見 §1.6（先例 [`handout/_dev-archive/ch05/PLAN-ch05.md`](handout/_dev-archive/ch05/PLAN-ch05.md)）。
+> **本檔是 HTML 講義「每節內容方向」的權威流程文件。** 它在「spine 素材（老師掃描手稿，或 Ch5 起的 canon 藍本）→ 完整講義一節」之間補上一道**方向層**，讓「**這是不是我要的方向**」從不可檢核變可檢核。已在 ch01 §1.1–§1.2、§4.2、ch02 §2.1–§2.5、ch03 端到端跑過六階並收斂（committed）；逐節驗證紀錄存於 [`authoring/direction_layer/`](authoring/direction_layer/)（`ch01/`、`test/`）。Ch5 起的無手稿章以 canon 為 spine 走同一套六階，各階對應差異見 §1.6（先例 [`handout/html/_dev-archive/ch05/PLAN-ch05.md`](handout/html/_dev-archive/ch05/PLAN-ch05.md)）。
 >
 > 一句話定位：六階流程把「**模型提案、人定奪**」的契約，從「對不對」延伸到「**是不是我要的方向**」，並**前置到擴寫之前**。
 >
@@ -80,7 +80,7 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
 
 **工作模型：** 每節各開一個**新 session**（fresh context、無前對話記憶）。Claude 是**唯一寫手**（single-writer）；使用者只在三道人閘介入：`①-verify`（seed 忠實度）、`③`（方向閘）、`⑥`（收斂閘）。新 session 靠下列**版控編排檔**自帶脈絡、不靠對話記憶——這正是 root [`CLAUDE.md`](CLAUDE.md)「跨對話知識寫進會 git 的文檔、不寫本地 memory」的落地。
 
-**每章兩類編排檔**（住在 [`handout/_dev-archive/`](handout/_dev-archive/) 的 `chNN/`；輸出目前走 handout HTML，但本編排與輸出格式無關）：
+**每章兩類編排檔**（住在 [`handout/html/_dev-archive/`](handout/html/_dev-archive/) 的 `chNN/`；輸出目前走 handout HTML，但本編排與輸出格式無關）：
 
 | 檔 | 是什麼 | 誰讀 |
 |---|---|---|
@@ -94,8 +94,8 @@ Claude 先從手稿提一份**方向 brief** → **你核可**（方向在此由
 **編號跨 session 交接（kit 無 auto-counter，最大風險點）：** 章內每型獨立 counter、跨節連續（Theorem 3.1, 3.2…）。後節 session **讀前節成品 HTML 末尾**確認各型 counter 用到哪、再續編；實際號回填 PLAN 的 ledger 表。交叉引用一律純文字，寫完**自查每個引用都對得到一個存在的 `env-num`**。
 
 **新章怎麼起：** 抄 ch02／ch03 範本，改章號／節號／ROADMAP 行號／手稿頁範圍即可——
-- master kickoff 範本：[`handout/_dev-archive/ch02/PROMPT-ch02-kickoff.md`](handout/_dev-archive/ch02/PROMPT-ch02-kickoff.md)（明示「ch03/ch04 換章號即可重用」）；
-- per-section 範本：`handout/_dev-archive/ch02/PROMPT-s2*-kickoff.md`；含 PLAN 的全套範本：`handout/_dev-archive/ch03/PLAN-ch03.md` ＋ `PROMPT-s3*-kickoff.md`。
+- master kickoff 範本：[`handout/html/_dev-archive/ch02/PROMPT-ch02-kickoff.md`](handout/html/_dev-archive/ch02/PROMPT-ch02-kickoff.md)（明示「ch03/ch04 換章號即可重用」）；
+- per-section 範本：`handout/html/_dev-archive/ch02/PROMPT-s2*-kickoff.md`；含 PLAN 的全套範本：`handout/html/_dev-archive/ch03/PLAN-ch03.md` ＋ `PROMPT-s3*-kickoff.md`。
 > 註：上述 `_dev-archive/` 編排檔為歷史開發紀錄，內含的相對路徑可能過時（見該資料夾的 README）；以本檔的六階流程敘事為準。
 
 ---
@@ -113,7 +113,7 @@ Ch5 起無老師手稿（權威：[`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTH
 | ⑤ advisory 迴圈 | blocking＝數學／忠實度／方向符合度 | blocking＝數學／**canon 覆蓋＋hypothesis hygiene**／方向符合度；對 Codex 跑至 0 blocking |
 | ⑥ 收斂閘 | 人定奪 | 章層 Codex review＋`REVIEW-ch{NN}-applied.html` 交使用者過目 |
 
-反幻覺備援（取代失去的 ①-verify）＝ brief＋hypothesis ledger、Codex 對抗審、章末 sympy 全例重算——見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §無手稿章節。新章編排檔抄 ch05 範本（[`handout/_dev-archive/ch05/PLAN-ch05.md`](handout/_dev-archive/ch05/PLAN-ch05.md)）；閘序層面（milestone 與 gate-2 全跑規則）見 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
+反幻覺備援（取代失去的 ①-verify）＝ brief＋hypothesis ledger、Codex 對抗審、章末 sympy 全例重算——見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §無手稿章節。新章編排檔抄 ch05 範本（[`handout/html/_dev-archive/ch05/PLAN-ch05.md`](handout/html/_dev-archive/ch05/PLAN-ch05.md)）；閘序層面（milestone 與 gate-2 全跑規則）見 [`handout/PIPELINE.md`](handout/PIPELINE.md)。
 
 ---
 
@@ -125,7 +125,7 @@ Ch5 起無老師手稿（權威：[`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTH
 |---|---|---|
 | **手稿盤點** | 本節手稿實際有什麼 | 照原順序列出手稿的主題、定義、定理（含證明與否）、worked example、圖、具名結果（人物／日期／命名定理）。 |
 | **薄度剖析** | 哪裡撐不起教科書密度 | 對每塊標 **{夠／薄／無}**：「夠」＝已達 Stewart 密度；「薄」＝有骨架但缺動機／例子／圖；「無」＝該有卻完全沒有。可疑／非標準數學標「**請查核**」丟使用者（手稿＝數學主軸，**不靜默改**）。輸出指向「加法該往哪去」。 |
-| **範圍與深度** | 本節邊界與嚴謹度 | 只吃手稿那一叢主題、不外擴；後面章節才系統處理的概念用**一行 forward-ref** fence 掉（不 preview-creep）。結構結果決定「**證或只陳述**」：證明**短、標準、具啟發**就補（`expansion:formula`／`example`）；多頁或需未引入材料的證明，標記**待使用者授權**。<br>**節內出場序（introduce-before-use，2026-06-28 加）：** 每個記號／術語／非正式記法在**首次被用之前**須已被介紹或當場 gloss；尤其新記號（如 `=∞`）別在 example 用掉後才正式定義（ch01 §1.4 的真實案例）。這類排序問題在此階段（**編號未鎖**）最便宜修；留到定稿散文閘才搬會 cascade 編號與 cross-ref（對應 [`handout/_audit/PROSE-AUDIT-RUBRIC.md`](handout/_audit/PROSE-AUDIT-RUBRIC.md) 的 U4）。 |
+| **範圍與深度** | 本節邊界與嚴謹度 | 只吃手稿那一叢主題、不外擴；後面章節才系統處理的概念用**一行 forward-ref** fence 掉（不 preview-creep）。結構結果決定「**證或只陳述**」：證明**短、標準、具啟發**就補（`expansion:formula`／`example`）；多頁或需未引入材料的證明，標記**待使用者授權**。<br>**節內出場序（introduce-before-use，2026-06-28 加）：** 每個記號／術語／非正式記法在**首次被用之前**須已被介紹或當場 gloss；尤其新記號（如 `=∞`）別在 example 用掉後才正式定義（ch01 §1.4 的真實案例）。這類排序問題在此階段（**編號未鎖**）最便宜修；留到定稿散文閘才搬會 cascade 編號與 cross-ref（對應 [`handout/html/_audit/PROSE-AUDIT-RUBRIC.md`](handout/html/_audit/PROSE-AUDIT-RUBRIC.md) 的 U4）。 |
 | **承重直覺** | 最該先講通的那一個直覺 | 找出「**為何天真／直接做法會壞**」的關鍵，用一個**具體碰撞／失敗例**先打臉、再形式化；其次才是「這概念在做什麼」的心像。**一節只挑一個承重直覺領頭**，其餘為它服務。 |
 | **worked example 清單** | 例子的選取與順序 | 每技巧 ≥1 例。預設序：**真實情境/具體錨 → 判別/診斷 → 建構/計算 → 驗證/反思**。手稿薄的技巧**慷慨新增**（低風險、`expansion:example`、可刪），清單標出哪些是新增。同型第二例**跳過**已建立 setup。手稿自帶足量例子者不硬加。<br>**自創題政策（使用者 2026-06-07 定）：** 可自創新題，但 (1) 須經**使用者批准**、(2) 題型須與既有 example **不同**（非換數字／係數的同型題）、(3) 一律寫成 **worked example**（含 solution＋講解），不產 bare your-turn exercise。理由：bare 自創習題受 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §草擬模式中仍然禁止的事「自創習題」所禁、設計 deferred（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14）；但含解的 worked example 屬闡述（Mode A），不在此限。 |
 | **history／application** | 要不要放史／應用、放什麼 | `application` 只在有**忠實的真實實例**時放（非裝飾）；薄手稿寧可開節放**一個強錨**，不散落弱錨。`history` 只在概念有**可考起源／記號故事**時放，且**標來源**（特定來源或 `[source: standard calculus-textbook historical note]`；直接引文必須特定來源，否則改釋義）。兩者皆不自然 → **留白勝過 padding**。 |
@@ -189,7 +189,7 @@ Ch5 起無老師手稿（權威：[`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTH
 - **核心幻覺假說：樣本仍少（最關鍵 open question）：** 「兩模型會不會一起替同一個幻覺背書」尚未在最硬的具名結果上窮盡。已跑的高風險節（§4.2 eˣ 連續＋指數律、ch02 §2.3 首個定理＋證明）中 auditor 都抓到真問題、**未見幻覺穿過**——正面但**樣本有限**的證據。仍待更多高風險節（如 Ch4 Bolzano–Weierstrass、Cauchy 收斂）持續壓測。見 [`authoring/seed_converge/SYNTHESIS.md`](authoring/seed_converge/SYNTHESIS.md) §4。
 - **丟了「中立第三方評分」那層：** 實驗原讓 Claude 在迴圈外當中立評分；本流程把 Claude 拉進當寫手後，外部裁判只剩「人」。不致命（人本在閘），但可考慮**偶爾請第三模型（如 Gemini）對成稿抽查**，補回外部視角。
 - **配額管理：** 訂閱用量上限（per-5h／每週）是硬牆，且 CLI 撞牆後回退 API key 不可靠。per-section 限次、人在收斂閘是唯一可靠防線。別把架構建立在「撞牆無縫切 API」上。
-- **多節端到端驗證紀錄（詳見 [`authoring/direction_layer/ch01/RESULT_ch01.md`](authoring/direction_layer/ch01/RESULT_ch01.md)、[`handout/_dev-archive/ch02/`](handout/_dev-archive/ch02/)）：** ch01 §1.1（低風險對照節）、§1.2（中風險，direction-conformance 抓到一個真 blocking＝漏畫 brief 指定的圖）、§4.2（高風險，第二模型抓到一處擴寫引入的過度推廣）、ch02 §2.1–§2.5（全數收斂 `blocking=0`）皆跑完六階。
+- **多節端到端驗證紀錄（詳見 [`authoring/direction_layer/ch01/RESULT_ch01.md`](authoring/direction_layer/ch01/RESULT_ch01.md)、[`handout/html/_dev-archive/ch02/`](handout/html/_dev-archive/ch02/)）：** ch01 §1.1（低風險對照節）、§1.2（中風險，direction-conformance 抓到一個真 blocking＝漏畫 brief 指定的圖）、§4.2（高風險，第二模型抓到一處擴寫引入的過度推廣）、ch02 §2.1–§2.5（全數收斂 `blocking=0`）皆跑完六階。
 - **工程坑（§4.2 首跑實證）：** 組 ⑤ 的 prompt 時，非 ASCII（中文／Unicode 數學符號）會被 `Get-Content`（ANSI 預設）＋ PowerShell pipe 重編碼成亂碼，auditor 收到糊掉的 seed/brief。修法：`[IO.File]::ReadAllText` 讀 UTF-8 ＋ `cmd /c "codex exec - … < prompt"` 餵原始 bytes ＋ 一道 CJK 護欄。
 
 ---

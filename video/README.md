@@ -5,7 +5,7 @@
 
 - **改了什麼、為什麼：** [DESIGN.md](DESIGN.md)
 - **所有審核閘一覽（七層 + meta-gate + 各節狀態）：** [REVIEW_GATES.md](REVIEW_GATES.md)
-- **輸入：** HTML 講義（handout kit，[`../handout/`](../handout/)）的各節（由人閱讀、手寫產出內容稿）。**各章權威檔**——ch01：[`chapter1-print-standalone.html`](../handout/chapter1-print-standalone.html)（2026-06-10 拍板；原 `chapter1-standalone.html`，2026-06-13 重組後改此名，編輯源在 `fragments/ch01/sec-*.html`）；ch02+ 屆時在此補。2026-06-10 前的輸入源為 `../chapters/*.tex`（已換源，§1.1/§1.6 原型基於它）。
+- **輸入：** HTML 講義（handout kit，[`../handout/`](../handout/)）的各節（由人閱讀、手寫產出內容稿）。**各章權威檔**——ch01：[`chapter1-print-standalone.html`](../handout/html/standalone/chapter1-print-standalone.html)（2026-06-10 拍板；原 `chapter1-standalone.html`，2026-06-13 重組後改此名，編輯源在 `handout/html/fragments/ch01/sec-*.html`）；ch02+ 屆時在此補。2026-06-10 前的輸入源為 `../chapters/*.tex`（已換源，§1.1/§1.6 原型基於它）。
 - **輸出：** `output/`（gitignored）
 
 ## 結構

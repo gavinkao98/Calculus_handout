@@ -1,0 +1,488 @@
+% !TeX program = lualatex
+% ============================================================
+% appendixB.tex — appB 出版成品（自動產生，勿手改）
+% 產生：cd handout/latex && python make_dist.py appB
+%   內容源＝handout/html/fragments/appB/（fragment 唯讀；數學逐位元組 pass-through）
+%   樣式源＝../../template/calcbook.sty（M-B1 拍板模板）
+% 直接重編（本資料夾為 CWD；aux 進 build/、資料夾保持兩檔）：
+%   latexmk -lualatex -auxdir=../../build/aux-appB appendixB.tex
+% ============================================================
+\documentclass[a4paper,12pt,oneside]{memoir}
+\makeatletter\def\input@path{{../../template/}}\makeatother
+\def\cbfontsdir{../../template/fonts/inter/}
+\usepackage{calcbook}
+\begin{document}
+\appendixopener{Appendix B}{Reading and Writing Proofs}
+\begin{lead}
+Calculus is, for many readers, the first place mathematics is written as a chain of \emph{theorems} and \emph{proofs} rather than a list of recipes to run. Reading that language — following an argument, and knowing when you have understood it — is a skill of its own, and one seldom taught head-on. This appendix is a short primer on it: how to take a statement apart (§B.1), the handful of proof shapes that recur (§B.2), the quantifiers that run through analysis (§B.3), the standard steps that seem to come from nowhere (§B.4), and how to read a proof actively rather than let it wash over you (§B.5). The last section turns the same habits around and points them at a blank page: planning, drafting, checking, and revising a short proof of your own (§B.6). That is enough structure to begin writing rigorous elementary proofs, though fluency here, as everywhere, comes from writing them and then writing them again. Everything is illustrated with small, classic examples — integers, primes, the irrationality of \(\sqrt{2}\) — so nothing here leans on calculus itself. Read it straight through, or reach for a section when a proof stops making sense.
+\end{lead}
+\parahead{By the end of this appendix, you will be able to:}
+\begin{objectives}
+  \item take a statement apart into its hypothesis, conclusion, and quantifiers, and tell it apart from its converse;
+  \item recognize the five shapes you meet most often — the four that build a proof (direct, contradiction, cases, and induction) and the counterexample that tears one down;
+  \item read the quantifiers \(\forall\) and \(\exists\), negate a quantified statement, and keep their order straight;
+  \item see the purpose behind the standard moves — adding and subtracting a term, splitting an \(\varepsilon\), taking a minimum, and the rest — that otherwise look like rabbits from a hat;
+  \item read a proof actively: checking each step, locating where every hypothesis is used, and separating \emph{why} a result is true from \emph{how} it is proved;
+  \item plan, draft, check, and revise a short elementary proof of your own;
+  \item distinguish a promising argument from a complete proof.
+\end{objectives}
+\sechead{B.1}{Reading a Statement}
+A theorem is a promise, and like any promise it comes with conditions. Before you can follow a proof — let alone trust it — you have to know exactly what is being claimed: what you are handed, what you must produce, and how much the statement really commits to. Reading the statement closely is the first of these skills, and the one that repays itself most often. A surprising share of the confusion inside a proof turns out to be confusion about the statement it is proving.
+
+Most theorems can be put in the form \emph{if \(P\), then \(Q\)}. The clause \(P\) is the \emph{hypothesis} — what you are allowed to assume — and \(Q\) is the \emph{conclusion} — what you are then obliged to establish. Even a theorem with no visible “if” usually has this skeleton inside it. “Every integer divisible by \(6\) is divisible by \(3\)” is the same claim as “if an integer \(n\) is divisible by \(6\), then \(n\) is divisible by \(3\)” wearing plainer clothes: the word \emph{every} carries the unstated “for all”, while the hypothesis — that \(n\) is divisible by \(6\) — hides inside the description of the subject. Learning to hear the \emph{if–then} inside an ordinary sentence is half of reading a statement.
+
+Once a statement is in \emph{if \(P\), then \(Q\)} form, two rearrangements of it are worth naming — precisely because they are so easily mistaken for the original.
+
+\begin{envdefinition}{Definition}{B.1}{}
+Given an implication \emph{if \(P\), then \(Q\)}:
+
+\begin{itemize}
+  \item its \emph{converse} is the implication \emph{if \(Q\), then \(P\)} — hypothesis and conclusion swapped;
+  \item its \emph{contrapositive} is the implication \emph{if not \(Q\), then not \(P\)} — both parts negated \emph{and} swapped.
+\end{itemize}
+\end{envdefinition}
+The contrapositive says the very same thing as the original, read from the other end: if \(Q\) must hold whenever \(P\) does, then a failure of \(Q\) leaves no room for \(P\) — so “if \(P\) then \(Q\)” and “if not \(Q\) then not \(P\)” stand or fall together. They are \emph{logically equivalent} — each is true exactly when the other is — so proving one proves the other, a fact the indirect arguments of §B.2 lean on. The converse is a different matter: it is a genuinely new claim, which may be true or false on its own. Our sample statement “if \(n\) is divisible by \(6\), then \(n\) is divisible by \(3\)” is true, while its converse “if \(n\) is divisible by \(3\), then \(n\) is divisible by \(6\)” is false, as \(n = 9\) shows. Its contrapositive “if \(n\) is not divisible by \(3\), then \(n\) is not divisible by \(6\)” is true again, in lockstep with the original.
+
+\begin{envcaution}{Caution}{}{}
+The single most common misreading of a theorem is to help yourself to its converse. “If \(P\), then \(Q\)” hands you \(Q\) whenever you have \(P\); it promises nothing when you instead have \(Q\), and nothing when you merely lack \(P\). A statement and its converse must be proved separately, and either can hold while the other fails. When a result really does run both ways — \emph{\(P\) if and only if \(Q\)} — that is a strictly stronger claim, and it has to be earned in both directions.
+\end{envcaution}
+Two small words decide the meaning of most statements: \emph{for all} and \emph{there exists}. The first, written \(\forall\), claims something about \emph{every} object in some collection; the second, written \(\exists\), claims only that \emph{at least one} object works. They rarely announce themselves. “Let \(n\) be an integer; then …” is a \emph{for all} in disguise — the claim must hold no matter which integer you were handed — while “the equation has a solution” is a \emph{there exists}. A statement can stack the two, as in “for every \(x\) there is a \(y\) such that …”, and then, as §B.3 will insist, the order is not decoration — it changes the meaning. For now the goal is just to notice them: mark every \emph{for all} and every \emph{there exists}, stated or disguised, before you read on.
+
+\begin{envstrategy}{Strategy}{B.1}{Taking a statement apart}
+\begin{steps}
+  \item Find the quantifiers. Rewrite any disguised ones — \emph{let}, \emph{any}, \emph{some}, \emph{there is} — as an explicit \emph{for all} or \emph{there exists}, and note the order in which they come.
+  \item Find the \emph{if–then} skeleton: name the hypothesis \(P\) (all you may assume) and the conclusion \(Q\) (all you must show).
+  \item Write down the converse \emph{if \(Q\), then \(P\)} and ask whether you actually believe it. This is the quickest way to see what the statement does \emph{not} claim.
+  \item Try the statement on one small object, to be sure you have read it the way its author meant.
+\end{steps}
+\begin{informal}
+The whole exercise takes under a minute and heads off the most expensive error there is — proving, or trusting, a different statement than the one in front of you.
+\end{informal}
+\end{envstrategy}
+\begin{workedexample}
+\begin{envexample}{Example}{B.1}{}
+Take the statement apart: \emph{for every integer \(n\), if \(n^{2}\) is even, then \(n\) is even.}
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+\begin{sollist}
+  \item \runin{Quantifier.} A single \emph{for every integer \(n\)}, with no \emph{there exists} inside — the claim must hold for each integer at once.
+  \item \runin{Hypothesis and conclusion.} With \(n\) fixed, \(P\) is “\(n^{2}\) is even” and \(Q\) is “\(n\) is even”.
+  \item \runin{Converse.} \emph{If \(n\) is even, then \(n^{2}\) is even} — a different statement. It happens to be true as well, but that is a separate fact to prove, not something the original grants for free.
+  \item \runin{Contrapositive.} \emph{If \(n\) is odd, then \(n^{2}\) is odd} — equivalent to the original, and, as it turns out, the more convenient direction to attack. Proposition B.1 proves exactly this.
+  \item \runin{Small test.} \(n = 6\) gives \(n^{2} = 36\), even, and \(n\) is even — consistent. What the statement forbids is an integer with \(n^{2}\) even yet \(n\) odd, and there is none.
+\end{sollist}
+\end{envsolution}
+\end{workedexample}
+A statement read this way — quantifiers marked, hypothesis and conclusion named, converse held at arm’s length — is one you can prove, or look up, or use with confidence. The rest of this appendix assumes you have done this first; everything else is easier once the claim itself is pinned down.
+
+
+\sechead{B.2}{The Main Proof Shapes}
+A proof is an argument, and arguments come in shapes. A reader who knows the shapes has a head start: recognizing that a proof is, say, an induction or an argument by contradiction tells you what its author is trying to do before you have followed a single line of it. Five shapes cover the great majority of what you meet early on. We name them first, then watch each one at work on a small, classic claim.
+
+\begin{envstrategy}{Strategy}{B.2}{Recognizing the shape of a proof}
+\begin{bulletsteps}
+  \item \runin{Direct.} Assume the hypothesis and move, one justified step at a time, to the conclusion. The default — try it first.
+  \item \runin{Contradiction.} Assume the claim \emph{fails}, and reason until something impossible appears. The tell: an opening like “suppose not” or “assume \(\sqrt{2}\) is rational” when the claim says the opposite. A near relative, \emph{contraposition}, proves “if \(P\) then \(Q\)” by proving its contrapositive “if not \(Q\) then not \(P\)” outright — see Proposition B.1.
+  \item \runin{Counterexample.} To \emph{disprove} a \emph{for all} claim, exhibit one object meeting the hypothesis but breaking the conclusion. Demolishes; never builds.
+  \item \runin{Cases.} Split the objects into a few situations that together cover every possibility, and settle each. The tell: “if … ; if instead …”.
+  \item \runin{Induction.} For a claim about every positive integer, prove the first case, then show each case forces the next. The tell: a statement indexed by \(n = 1, 2, 3, \ldots\).
+\end{bulletsteps}
+\end{envstrategy}
+\runin{Direct proof.} The plainest shape assumes the hypothesis and walks, step by justified step, to the conclusion. Most proofs are direct, and it is the shape to try first. Here is one about the odd integers.
+
+\begin{envproposition}{Proposition}{B.1}{}
+If \(n\) is an odd integer, then \(n^{2}\) is odd.
+\end{envproposition}
+\begin{envproof}{Proof}{}{}
+By definition an odd integer has the form \(n = 2k + 1\) for some integer \(k\), just as an even one has the form \(2k\). Squaring, \[ n^{2} = (2k + 1)^{2} = 4k^{2} + 4k + 1 = 2\bigl(2k^{2} + 2k\bigr) + 1. \] The right-hand side is twice an integer plus one, which is exactly what it means to be odd. \qedmark
+\end{envproof}
+The small square at the end is the customary sign-off: it announces that the proof is finished, and you will meet it — or the older letters \emph{Q.E.D.} — at the close of proofs everywhere. As for the proof itself: nothing was assumed but the hypothesis, and each line followed from the one before — the signature of a direct proof. This one does double duty. The same proof also settles “if \(n^{2}\) is even, then \(n\) is even” — the claim dissected in Example B.1 — because that statement’s contrapositive is exactly “if \(n\) is odd, then \(n^{2}\) is odd”, which we have just proved. A statement and its contrapositive are logically equivalent, so proving the one proves the other. Deliberately proving the contrapositive in place of the original is a standard move of its own, \emph{proof by contraposition}, and the quiet cousin of the contradiction argument next.
+
+\runin{Proof by contradiction.} Sometimes the cleanest route to a claim is to suppose it false and watch the supposition collapse. To argue by \emph{contradiction}, assume the claim is false, reason until you reach something impossible — a statement that contradicts a hypothesis, a known fact, or itself — and conclude that the assumption could not have held. Why does that settle the matter? Because a true premise can never force an impossibility: if assuming the claim false leads somewhere that cannot be, then that assumption cannot stand, and the claim must be true. The most famous instance in all of mathematics is barely a paragraph.
+
+\begin{envproposition}{Proposition}{B.2}{}
+\(\sqrt{2}\) is irrational: it cannot be written as a ratio \(a/b\) of integers.
+\end{envproposition}
+\begin{envproof}{Proof}{}{}
+Suppose, to the contrary, that \(\sqrt{2} = a/b\) for integers \(a\) and \(b\) with \(b \neq 0\), and take the fraction in \emph{lowest terms} — so that \(a\) and \(b\) share no common factor larger than \(1\). Squaring gives \(2 = a^{2}/b^{2}\), that is, \[ a^{2} = 2b^{2}. \] Then \(a^{2}\) is even, and therefore \(a\) is even — this is the statement dissected in Example B.1, equivalent to the contrapositive we proved as Proposition B.1. Write \(a = 2c\). Substituting, \((2c)^{2} = 2b^{2}\), so \(4c^{2} = 2b^{2}\), and hence \(b^{2} = 2c^{2}\). The same reasoning now applies to \(b\): since \(b^{2}\) is even, \(b\) is even. But then \(a\) and \(b\) are \emph{both} even, sharing the factor \(2\) — contradicting our arrangement that the fraction was in lowest terms. The assumption that \(\sqrt{2}\) is a ratio of integers is therefore untenable. \qedmark
+\end{envproof}
+The engine of the argument is the collision at the end: two consequences that cannot both hold. Notice, too, where a hypothesis did its work — reducing the fraction to lowest terms is precisely what turns “both even” into a contradiction rather than a shrug.
+
+\runin{Disproof by counterexample.} The shapes so far \emph{establish} claims; the next one \emph{demolishes} them. A statement of the form \emph{for all} promises that every object in its range clears some bar. To knock it down, you need just one object that does not — a \emph{counterexample}.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.2}{}
+Show that the claim \emph{every prime number is odd} is false.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The claim is a \emph{for all}: for every prime \(p\), the number \(p\) is odd. To refute it we produce a single prime that is not odd. The number \(2\) is prime — its only positive divisors are \(1\) and itself — and \(2\) is even. So \(2\) meets the hypothesis (it is prime) while breaking the conclusion (it is not odd), and the universal claim collapses.
+
+Two features make this work and are worth carrying with you. First, \emph{one} counterexample is enough: proving a \emph{for all} means handling every case, but disproving it means exhibiting a single failure. Second, the counterexample must be honest — it has to genuinely satisfy the hypothesis (\(2\) really is prime) and genuinely violate the conclusion (\(2\) really is not odd). An object that fails the hypothesis in the first place refutes nothing.
+\end{envsolution}
+\end{workedexample}
+\runin{Proof by cases.} When no single argument reaches every object at once, split the objects into a few situations that \emph{together} exhaust all possibilities, and settle each on its own. The one demand is completeness: the cases must leave nothing out.
+
+\begin{envproposition}{Proposition}{B.3}{}
+For every integer \(n\), the number \(n^{2} + n\) is even.
+\end{envproposition}
+\begin{envproof}{Proof}{}{}
+Every integer is either even or odd, and we take the two cases in turn. If \(n\) is even, write \(n = 2k\); then \[ n^{2} + n = n(n + 1) = 2k(2k + 1), \] which is even. If \(n\) is odd, write \(n = 2k + 1\); then \(n + 1 = 2(k + 1)\), so \[ n^{2} + n = n(n + 1) = (2k + 1)\cdot 2(k + 1), \] even again. The two cases cover every integer, so \(n^{2} + n\) is even in all of them. \qedmark
+\end{envproof}
+A case split divides the \emph{problem}, not the claim — the conclusion is the same in every branch. And a shrewd split can sometimes be avoided altogether: here \(n^{2} + n = n(n + 1)\) is a product of two consecutive integers, one of which is always even, which settles the matter in a single line. Seeing when a case analysis collapses to one clean observation is part of reading proofs well.
+
+\runin{Induction.} A claim about \emph{every positive integer} invites a shape of its own. Induction proves it in two strokes: verify the claim for the first integer, then show that its truth at any stage forces its truth at the next. Like a line of dominoes, the first fall together with “each one topples the next” brings them all down.
+
+\begin{envproposition}{Proposition}{B.4}{}
+For every positive integer \(n\), \[ 1 + 2 + \cdots + n = \frac{n(n + 1)}{2}. \]
+\end{envproposition}
+\begin{envproof}{Proof}{}{}
+\emph{Base case.} For \(n = 1\) the left side is \(1\) and the right side is \(\frac{1 \cdot 2}{2} = 1\); they agree.
+
+\emph{Inductive step.} Suppose the formula holds for some positive integer \(k\), so that \(1 + 2 + \cdots + k = \frac{k(k + 1)}{2}\). (This supposition is the \emph{inductive hypothesis}.) Adding the next term \(k + 1\) to both sides, \[ \begin{aligned} 1 + 2 + \cdots + k + (k + 1) &= \frac{k(k + 1)}{2} + (k + 1) \\ &= (k + 1)\!\left(\frac{k}{2} + 1\right) = \frac{(k + 1)(k + 2)}{2}, \end{aligned} \] which is the formula with \(n = k + 1\). So whenever it holds at \(k\), it holds at \(k + 1\); and since it holds at \(n = 1\), it holds for every positive integer. \qedmark
+\end{envproof}
+The inductive hypothesis is not cheating: we do not assume what we set out to prove. We assume the statement at one stage only to \emph{deduce} it at the next, and the base case gets the chain moving. Watching for exactly these two parts — a base case, and a step that carries \(k\) to \(k + 1\) — is how you read, and check, any induction.
+
+These five — direct, contradiction, counterexample, cases, induction — are enough to recognize the architecture of most proofs you will meet for a good while. A longer proof is usually several of them nested: an induction whose step is a short direct argument, or an argument by contradiction that breaks into cases. Naming the outer shape first, and then the inner ones, turns a wall of text into a plan you can follow.
+
+
+\sechead{B.3}{A Quantifier Toolbox}
+The two quantifiers \emph{for all} and \emph{there exists} — \(\forall\) and \(\exists\) — are the grammar of analysis. Nearly every definition and theorem past this point is built from them, often stacked two or three deep, and a statement’s whole meaning can turn on how they are arranged. Three skills make that grammar readable: keeping the \emph{order} of quantifiers straight, \emph{negating} a quantified statement cleanly, and recognizing the one nested pattern that organizes much of the subject. This section is a short toolbox for all three.
+
+The order of two \emph{unlike} quantifiers is not interchangeable, and this is the most valuable single fact about them. Compare:
+
+\begin{centerstatement}
+(i)\enspace{}\enspace{}for every integer \(x\) there is an integer \(y\) with \(y > x\),
+\end{centerstatement}
+\begin{centerstatement}
+(ii)\enspace{}\enspace{}there is an integer \(y\) such that for every integer \(x\), \(y > x\).
+\end{centerstatement}
+Statement (i) is true: given any \(x\), take \(y = x + 1\). Statement (ii) is false: it demands a \emph{single} \(y\) larger than every integer at once, and there is no largest integer. The two sentences use the same words in the same breath; only the order of “for every” and “there is” differs, and that alone carries one from true to false.
+
+\begin{envcaution}{Caution}{}{}
+When quantifiers of different type meet, the outer one is in charge, and the inner object may be \emph{retuned for each choice} of the outer. “For every \(x\) there is a \(y\)” lets \(y\) depend on \(x\) — a different \(y\) is allowed for each. “There is a \(y\) such that for every \(x\)” demands one \(y\) that works for all \(x\) simultaneously; it is a far stronger, and usually far rarer, claim. Reading the first as though it were the second — or the reverse — is a classic and costly slip. Always check which quantifier comes first.
+\end{envcaution}
+The second skill is denial. To disprove a quantified statement, or to state what a proof by contradiction must produce, you have to negate it correctly — and there is a mechanical rule that never fails.
+
+\begin{envstrategy}{Strategy}{B.3}{Negating a quantified statement}
+\begin{steps}
+  \item Sweep the negation across the quantifiers from left to right, flipping each as it passes: every \emph{for all} becomes \emph{there exists}, and every \emph{there exists} becomes \emph{for all}.
+  \item When the negation reaches the \emph{kernel} — the part with no quantifiers left — negate that. An \(=\) becomes \(\neq\); a \(<\) becomes \(\ge\), not \(>\) (the denial of “\(a < \varepsilon\)” is “\(a\) is not less than \(\varepsilon\)”, which includes the boundary case \(a = \varepsilon\)); “\(P\) and \(Q\)” becomes “not \(P\) or not \(Q\)”, and so on.
+  \item Leave the quantifiers in their original order; only their \emph{type} flips, never their sequence.
+\end{steps}
+\begin{informal}
+In words: to deny that \emph{everyone} clears the bar is to claim that \emph{someone} fails it; to deny that \emph{someone} succeeds is to claim that \emph{everyone} fails. Negation trades the two quantifiers and moves the finish line.
+\end{informal}
+\end{envstrategy}
+The rule is easiest to trust on short statements, so build up to the long one. A single quantifier flips once: the negation of “\emph{every} integer is even” is “\emph{there is} an integer that is not even” — true, since \(3\) is one. Two quantifiers flip in turn. Negating the true statement from the start of this section, “for every integer \(x\) there is an integer \(y\) with \(y > x\)”, sweeps to “there is an integer \(x\) such that for every integer \(y\), \(y \le x\)” — a largest integer, which is false, exactly as the negation of a true statement should be. The next example carries the same rule to a statement three quantifiers deep, of the kind that runs through analysis; it is handled just as mechanically.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.3}{}
+Negate the following statement, in which \(a_1, a_2, \ldots\) is a fixed sequence of positive numbers (it says the sequence eventually drops below every positive threshold):
+
+\begin{centerstatement}
+for every \(\varepsilon > 0\), there exists a positive integer \(N\) such that \(a_n < \varepsilon\) for all \(n \ge N\).
+\end{centerstatement}
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+First put the quantifiers where the rule can see them. Strategy B.1 asks for them explicit and in order; explicit they already are, but English likes to trail a \emph{for all} behind the clause it governs, so the last of the three has ended up sitting behind the kernel instead of in front of it. Set out in order, the statement reads \emph{for every \(\varepsilon > 0\), there exists a positive integer \(N\), such that for every \(n \ge N\), \(a_n < \varepsilon\)}. Notice that no quantifier has moved past another — the order is still \(\varepsilon\), then \(N\), then \(n\), exactly as it was, which is what keeps the meaning intact; only the kernel has slid to the end, where the rule expects to find it. Now flip each quantifier in turn, and negate the kernel:
+
+\begin{sollist}
+  \item “for every \(\varepsilon > 0\)” becomes “there exists \(\varepsilon > 0\)”;
+  \item “there exists a positive integer \(N\)” becomes “for every positive integer \(N\)”;
+  \item “for every \(n \ge N\)” becomes “there exists \(n \ge N\)”;
+  \item the kernel \(a_n < \varepsilon\) negates to \(a_n \ge \varepsilon\).
+\end{sollist}
+Assembling the pieces in the same order, the negation reads:
+
+\begin{centerstatement}
+there exists \(\varepsilon > 0\) such that for every positive integer \(N\)\\
+there is some \(n \ge N\) with \(a_n \ge \varepsilon\).
+\end{centerstatement}
+In words: some fixed threshold \(\varepsilon\) that the sequence meets or exceeds again and again, no matter how far out you look. The quantifiers kept their left-to-right order; only their types flipped, and the final \(<\) became \(\ge\).
+\end{envsolution}
+\end{workedexample}
+The third skill is recognition. One arrangement of nested quantifiers recurs so relentlessly that it deserves to be known on sight. It has the shape
+
+\begin{centerstatement}
+for every \(\varepsilon > 0\) there is a \(\delta > 0\) such that [some closeness holds].
+\end{centerstatement}
+Read it as a contest. The two Greek letters are traditional, and worth being able to say out loud: \(\varepsilon\) is \emph{epsilon} and \(\delta\) is \emph{delta}, and both have long been the names of a small positive quantity. A skeptic names a tolerance \(\varepsilon\) — how close is “close enough” — and may drive it as small as they please. Your task is to answer, for that \(\varepsilon\), with a \(\delta\) that secures the required closeness. Because \(\varepsilon\) is chosen first, your \(\delta\) is \emph{allowed to depend on it}: a stricter tolerance may call for a smaller \(\delta\).
+
+Here is one round of the contest, with the bracket filled in. Suppose the closeness demanded is this: \emph{if \(|x - 2| < \delta\), then \(|2x - 4| < \varepsilon\)}. Read the two roles off it. The skeptic’s \(\varepsilon\) fixes how near \(2x\) is required to come to \(4\); your \(\delta\) is the answer to \emph{how near must \(x\) come to \(2\) to force that?} Since \(|2x - 4| = 2|x - 2|\), the reply \(\delta = \varepsilon/2\) wins: if \(|x - 2| < \tfrac{\varepsilon}{2}\), then \(|2x - 4| = 2|x - 2| < 2 \cdot \tfrac{\varepsilon}{2} = \varepsilon\), which is what was demanded. Halve the tolerance and the reply halves with it — that is what it means for \(\delta\) to depend on \(\varepsilon\).
+
+The statement is true precisely when you have a winning reply to \emph{every} challenge, however small \(\varepsilon\) is pushed. You have, in fact, already read a statement of exactly this shape — the one you negated in Example B.3, where the response to each \(\varepsilon\) was an index \(N\), and the required closeness was that every term from the \(N\)-th onward falls below \(\varepsilon\). This “for every tolerance, there is a response” template is the skeleton of the definitions of limit, continuity, and convergence, and of the many proofs resting on them. When you meet it, ask at once: what plays the part of the challenge, what response must you supply, and how may the response lean on the challenge? Finding the right \(\delta\) in terms of \(\varepsilon\) is usually the entire game.
+
+Negation and recognition now close a loop. To deny such a statement — to claim the closeness cannot always be met — is, by the negation rule, to assert that \emph{there is one stubborn \(\varepsilon > 0\) for which every proposed \(\delta\) fails}. That single-\(\varepsilon\) form is exactly the target of any argument that something is \emph{not} continuous, or a sequence does \emph{not} converge: pin the one tolerance no response can satisfy, and the claim is refuted.
+
+Quantifiers are terse, but their terseness is precision, not shorthand: they fix exactly which objects a claim ranges over, in what order those objects may be chosen, and what it would take to deny the claim. Read them slowly, mark their order, and know how to flip them — and a large part of analysis stops looking like code and starts reading like sentences.
+
+
+\sechead{B.4}{Steps That Come From Nowhere}
+Every reader of proofs meets the same frustration sooner or later: a line appears that seems conjured from thin air. A term is added and subtracted for no visible reason; a threshold is defined as the minimum of two others; a tolerance is carved into thirds; a brand-new function is introduced that the statement never mentioned. These steps look like inspiration, but they are not — they are standard moves, a short catalogue of them, each with a fixed purpose. Once you can name the move, the question “how would anyone think of that?” turns into the far smaller “ah, that one again — what is it buying here?”
+
+\begin{envstrategy}{Strategy}{B.4}{A catalogue of standard steps}
+\begin{bulletsteps}
+  \item \runin{Add and subtract a term.} Rewrite \(a - c\) as \((a - b) + (b - c)\) for a convenient \(b\). Legal because the inserted terms cancel; used to compare two quantities through an intermediate you can actually control.
+  \item \runin{Split the tolerance.} To force a sum of \(k\) terms below \(\varepsilon\), keep each term below \(\varepsilon/k\). Legal because \(k \cdot (\varepsilon/k) = \varepsilon\); used whenever an estimate breaks into several pieces. The “\(\varepsilon/3\) trick” you see in print is this move with \(k = 3\).
+  \item \runin{Take a minimum (or maximum).} To meet two “small enough” conditions at once, set \(\delta = \min\{\delta_1, \delta_2\}\); for two “large enough” conditions, set \(N = \max\{N_1, N_2\}\). Legal because the minimum is \(\le\) each of the two (and the maximum \(\ge\) each); used to satisfy several thresholds with a single one.
+  \item \runin{Introduce an auxiliary function.} Build a helper the statement never mentioned — often the difference \(h = f - g\) — so that a tool you already have applies to it. Legal because you are free to define what you like; used to turn an unfamiliar problem into a familiar one.
+  \item \runin{Without loss of generality.} Assume the convenient one of several interchangeable cases. Legal exactly when a relabeling carries the other cases onto the one you kept; used to avoid writing the same argument twice.
+\end{bulletsteps}
+\end{envstrategy}
+The first two moves travel together so often that it is worth seeing them combined. The setting is the most common one in analysis: we want to know that two quantities are close, but we can only measure closeness through intermediate steps.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.4}{}
+Let \(\varepsilon > 0\), and suppose four numbers satisfy \(|a - b| < \tfrac{\varepsilon}{3}\), \(|b - c| < \tfrac{\varepsilon}{3}\), and \(|c - d| < \tfrac{\varepsilon}{3}\). Show that \(|a - d| < \varepsilon\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+We have no direct grip on \(a - d\), so we manufacture one by inserting the intermediate values \(b\) and \(c\) — adding and subtracting each: \[ a - d = (a - b) + (b - c) + (c - d). \] This costs nothing, since the inserted terms cancel, but the right-hand side is now built from the three differences we \emph{can} bound. By the triangle inequality \(|x + y| \le |x| + |y|\), applied twice, \[ |a - d| \le |a - b| + |b - c| + |c - d| < \frac{\varepsilon}{3} + \frac{\varepsilon}{3} + \frac{\varepsilon}{3} = \varepsilon. \] Two moves did the work. The \emph{add-and-subtract} traded one uncontrollable quantity for a sum of controllable ones; the \emph{split into thirds} set three allowances of \(\varepsilon/3\), which together come to exactly \(\varepsilon\), so the three pieces they cover must come to less. Together they are the skeleton of every argument that chains approximations — \(a\) near \(b\) near \(c\) near \(d\), and therefore \(a\) near \(d\) — with the tolerance shared out among the links.
+\end{envsolution}
+\end{workedexample}
+The third move settles a different recurring difficulty: two requirements that each demand their own threshold.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.5}{}
+Suppose one quantity is under control whenever \(|x| < \delta_1\), and a second whenever \(|x| < \delta_2\), where \(\delta_1\) and \(\delta_2\) are both positive. Produce a single \(\delta > 0\) that brings both under control at once.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Take \(\delta = \min\{\delta_1, \delta_2\}\), the smaller of the two thresholds — and \(\delta > 0\), since \(\delta_1\) and \(\delta_2\) are both positive. If \(|x| < \delta\), then \(|x| < \delta \le \delta_1\), so the first condition holds, and \(|x| < \delta \le \delta_2\), so the second holds too. One threshold, chosen as the stricter of the two, secures both.
+
+The step \(\delta = \min\{\delta_1, \delta_2\}\) reads like a rabbit from a hat the first time, but it says only this: when two requirements each ask for “small enough,” obey the stricter and you have obeyed both. Its mirror image uses a \emph{maximum} — when two conditions each need a threshold \emph{exceeded}, \(N = \max\{N_1, N_2\}\) clears them together.
+\end{envsolution}
+\end{workedexample}
+The last two moves of the catalogue are less about estimates than about reshaping a problem. An \emph{auxiliary function} is a helper invented mid-proof to convert an awkward question into a standard one. Faced with a claim comparing two quantities \(f\) and \(g\), a proof will often introduce \(h = f - g\) out of the blue and argue about \(h\) alone: the two-object question “is \(f\) always at least \(g\)?” becomes the one-object question “is \(h\) always at least \(0\)?”, which some fact already in hand can attack. The tell is a function or quantity defined partway through a proof that appears nowhere in the statement — it exists only to be handed to a tool you already own.
+
+That description is abstract, and the move is easiest to believe once you have watched it do something. Here it is on a claim small enough to check by eye.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.6}{}
+Show that \(x^{2} + 1 > x\) for every real number \(x\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The statement compares two quantities, \(x^{2} + 1\) and \(x\), and mentions nothing else. Introduce something else: let \[ h(x) = (x^{2} + 1) - x, \] the difference of the two sides. The comparison \emph{is \(x^{2}+1\) always bigger than \(x\)?} has become the one-object question \emph{is \(h\) always positive?} — and a fact already in hand can settle that question. Complete the square: \[ h(x) = x^{2} - x + 1 = \Bigl(x - \tfrac{1}{2}\Bigr)^{2} + \tfrac{3}{4}. \] A square is never negative, so \(h(x) \ge \tfrac{3}{4} > 0\) for every real \(x\). Now go back to what was asked: \(h(x) > 0\) says precisely that \((x^{2} + 1) - x > 0\), that is, \(x^{2} + 1 > x\).
+
+Notice what \(h\) bought, because that is the whole of the move. The statement never mentioned it, and nothing about it was clever — it is the plain difference, which is this move’s usual form. What it did was convert a comparison, which we had no grip on, into a question about one quantity being positive, which completing the square answers in a line. The tool was in your hands the whole time; \(h\) is what put the problem within its reach.
+\end{envsolution}
+\end{workedexample}
+The fifth move also reshapes a problem, but by shrinking it rather than by adding to it. \emph{Without loss of generality} — abbreviated \emph{WLOG} in most books, though we write it out — trims repeated work. Suppose a claim concerns two numbers \(a\) and \(b\) and says the same thing whichever of the two is called which. A proof may then announce “without loss of generality, assume \(a \le b\)” and treat only that case. This is sound exactly when the cases are interchangeable by symmetry: if instead \(a > b\), swapping the names of \(a\) and \(b\) turns the situation into the one already handled, and the claim, saying the same thing either way, is undisturbed by the swap. The move spares you from writing the same argument a second time — but only when the relabeling genuinely leaves the problem unchanged, which is precisely what a careful reader stops to confirm. Invoked over cases that are \emph{not} symmetric, it quietly skips real work.
+
+None of these steps is inspiration; each is a reflex with a purpose, and the purposes are few. When a proof does something that seems to come from nowhere, the odds are strong that it is one of these five — or a close cousin — and the useful question is never “how would I have thought of that?” but “which standard move is this, and what is it buying?” That question almost always has an answer, and finding it is most of what active reading, the subject of §B.5, amounts to.
+
+
+\sechead{B.5}{Reading Actively}
+A proof is not prose to be read at prose speed. The words on the page are the compressed record of an argument, and following the record is not the same as reconstructing the argument — that takes work the page leaves to you. Reading a proof \emph{actively} means doing that work deliberately: interrogating each line, testing the machinery, and asking not just whether the proof is correct but why it had to go the way it did. Five habits make the difference, and together they complete the reading side of this appendix’s toolkit.
+
+\begin{envstrategy}{Strategy}{B.5}{Reading a proof actively}
+\begin{steps}
+  \item \runin{Check that each step follows.} For every line, name the warrant — a definition, a hypothesis, an earlier line, a result already known. If you cannot say what justifies a step, you have not yet read it.
+  \item \runin{Find where each hypothesis is used.} Every assumption in the statement should earn its place at some specific line. A hypothesis that is never used is a warning sign — the proof is incomplete, or the assumption was not needed. Locate the moment each one does its work.
+  \item \runin{Test on a small example.} Run the proof’s machinery on the smallest concrete case you can find. It exposes a misreading within seconds and turns abstract lines into something you can watch happen.
+  \item \runin{Separate \emph{why} it is true from \emph{how} it is proved.} The idea and the mechanism are different things. A good proof supplies a rigorous mechanism for an idea you can usually state in one sentence; keep both in view, since each checks the other.
+  \item \runin{Watch the direction of every implication.} Note which steps run one way and which run both. In symbols, \(P \Rightarrow Q\) is \emph{if \(P\), then \(Q\)}, while \(P \Leftrightarrow Q\) says that each of the two implies the other — the \emph{if and only if} of §B.1. Reading a one-way step backward is the commonest way a correct proof is misremembered into a false claim.
+\end{steps}
+\end{envstrategy}
+Habits are learned on examples, so here is a small, complete theorem to practice on. It is famous, one line to state, and its proof is an argument by contradiction of the kind §B.2 laid out.
+
+\begin{envproposition}{Proposition}{B.5}{The pigeonhole principle}
+For every positive integer \(n\), if \(n + 1\) objects are distributed among \(n\) boxes, then at least one box contains two or more objects.
+\end{envproposition}
+\begin{envproof}{Proof}{}{}
+Suppose, to the contrary, that no box contains two or more objects — that is, every box contains at most one. Then the total number of objects, counted box by box, is at most \[ \underbrace{1 + 1 + \cdots + 1}_{n\ \text{boxes}} = n. \] But \(n + 1\) objects were distributed, and \(n + 1 > n\). So the objects both do and do not number more than \(n\) — a contradiction. The assumption fails, and therefore some box contains at least two objects. \qedmark
+\end{envproof}
+\begin{envremark}{Pause}{}{}
+Before reading on, try the five habits on this proof yourself. Ask:
+
+\begin{steps}
+  \item Which line carries the contradiction, and which two facts collide there?
+  \item Where is each hypothesis — the \(n + 1\) objects and the \(n\) boxes — actually used?
+  \item Run the argument on three objects in two boxes: what does it force?
+  \item Is the converse true? If some box holds two objects, must there have been more objects than boxes?
+\end{steps}
+\end{envremark}
+\pagebreakbefore
+Now read that proof the way this section is urging, running the five habits across it in turn.
+
+\begin{sollist}
+  \item \runin{Each step follows.} There are only two inequalities to warrant. “Total \(\le n\)” is justified by the assumption (at most one per box) times \(n\) boxes; “\(n + 1 > n\)” is arithmetic. Both hold, so the collision between them is real.
+  \item \runin{Every hypothesis is used.} The count of boxes, \(n\), is what caps the total at \(n\); the count of objects, \(n + 1\), is what overshoots it. Take away either margin — put \(n\) objects into \(n\) boxes — and the proof correctly stops working, because one-per-box is now possible and there is no contradiction. The inequality \(n + 1 > n\) is the whole engine.
+  \item \runin{A small example.} Three objects in two boxes: some box holds two. Thirteen people, twelve months: two of them share a birth month. Running the argument on these makes its inevitability concrete.
+  \item \runin{Why versus how.} \emph{Why} it is true: you cannot fit more things than slots without doubling up somewhere — obvious the moment it is said. \emph{How} it is proved: assume you could, count the maximum, and watch the count contradict the supply. The proof is the mechanism that makes an obvious idea rigorous; the idea is what makes the mechanism memorable.
+  \item \runin{Direction.} The principle runs one way — more objects than boxes \(\Rightarrow\) some box is doubled. It does \emph{not} run backward, as the Caution below spells out.
+\end{sollist}
+\begin{envcaution}{Caution}{}{}
+An implication \(P \Rightarrow Q\) is a one-way street. It licenses the move from \(P\) to \(Q\), never from \(Q\) back to \(P\) — that reverse trip is the converse of §B.1, a separate claim needing its own proof. For the pigeonhole principle the converse is plainly false: a box can be doubled without there being more objects than boxes at all, as putting two objects into one of five boxes shows. Only a biconditional \(P \Leftrightarrow Q\), established in both directions, lets you travel either way. As you read, mark each implication with its direction, and never silently promote a \(\Rightarrow\) into a \(\Leftrightarrow\); a good share of confidently misremembered “theorems” are true ones with the arrow turned the wrong way.
+\end{envcaution}
+These five habits are what separate reading a proof from watching one go past. To read actively is to take the statement apart (§B.1), recognize the shape of the argument (§B.2), track the quantifiers running through it (§B.3), and name the standard moves it makes (§B.4) — and then to check, test, and question until the argument belongs to you and not only to its author. Proof literacy, on the reading side of it, is not a talent you are born with but a habit, and it repays every hour you spend on it.
+
+Notice, though, what all five habits have in common: every one is a question put to somebody else’s page. What justifies this step? Where is that hypothesis used? Which way does this arrow run? Those questions have a second use. Turn them on a page you are writing yourself, and they stop being a way of checking an argument and become a way of building one — which is where the last section goes.
+
+
+\sechead{B.6}{Writing a Proof}
+Every section so far has put somebody else’s mathematics in front of you and asked what it was doing. Now the page is blank and the proof is yours. The skills do not change — you still take the statement apart, choose a shape, watch the quantifiers — but they run in the other direction, and one new difficulty appears with them: what you discover and what you write down are not the same thing.
+
+A proof is not a transcript of everything you tried. It is a carefully arranged argument showing why the conclusion follows from the hypotheses. The false starts, the case that ate an hour before it collapsed, the algebra done three times — none of it belongs on the page, however hard it was won. Discovery is allowed to be a mess; presentation is not. Nearly every beginner’s proof confuses the two in one direction or the other: either the page becomes a diary of the search, or — far more often — the search is so vivid in the author’s mind that half of it never reaches the page at all.
+
+It is worth saying plainly what rigor asks of you, because it is less than most beginners fear and more than most beginners supply. Rigor does not mean writing out every arithmetic step; a reader who can be trusted with \(6k = 3(2k)\) can be trusted to do it silently. It means that every step doing real logical work carries a reason. The test is never length. The test is whether a stranger can check you — and a stranger cannot, if they must guess the range of a variable, the meaning of a symbol, the definition you unpacked, or the direction in which an implication was used.
+
+\begin{envstrategy}{Strategy}{B.6}{From statement to proof}
+\begin{steps}
+  \item \runin{Rewrite the statement.} Mark the quantifiers, name the hypothesis, name the conclusion — the work of Strategy B.1. Until you can say what you are given and what you must show, there is nothing to plan.
+  \item \runin{Unpack the definitions.} Turn every defined word — \emph{even}, \emph{divisible}, \emph{rational}, \emph{prime} — into the condition it abbreviates. Definitions are where a proof gets its handles: a word you have not unpacked is a door you have not tried.
+  \item \runin{Choose a shape.} Direct first (§B.2). If the hypothesis is awkward to use, or the conclusion is itself a denial, try contraposition or contradiction. If the claim is indexed by \(n = 1, 2, 3, \ldots\), try induction — though a claim can range over every \(n\) and still want some other shape, as Proposition B.5 does. If it asserts that something exists, plan to build it.
+  \item \runin{Write a skeleton.} Before any real content, put down the lines you already know: what is fixed, what is assumed, what must be shown, and the sentence that will end it. If you can already see the key claim the argument will have to pass through, add that too. The unknown part of the proof is now a gap of known size.
+  \item \runin{Fill every logical gap.} Work through the skeleton giving each step its warrant — a definition, a hypothesis, a result already known, or an earlier line. This is the first habit of Strategy B.5, turned on your own writing.
+  \item \runin{Revise for the reader.} Cut what you tried and abandoned, supply what you know and never said. Strategy B.7 is the checklist.
+\end{steps}
+\begin{informal}
+Steps 1–4 involve no proving at all. You can plan a proof before you can prove it, and should: the usual alternative is to start writing at the top of the page and hope the argument arrives before the bottom — which is how proofs pick up their worst habit, helping themselves at line one to what is not earned until line ten.
+\end{informal}
+\end{envstrategy}
+The arrangements below cover most of what you will be asked to write, and each has a skeleton worth knowing by heart. They are not forms to fill in — the mathematics still has to be yours — but they settle the shape of the page, which frees your attention for the argument.
+
+\runin{A universal implication.} The commonest task of all: prove that \emph{for every \(x\) in \(S\), if \(P(x)\), then \(Q(x)\)}. Here \(S\) is whatever collection the claim ranges over — the integers, say — while \(P(x)\) and \(Q(x)\) are the \(P\) and \(Q\) of §B.1, now written with the object they speak about; and \(x \in S\), in the skeleton below, is the usual shorthand for \emph{\(x\) is in \(S\)}. The skeleton runs
+
+\begin{steps}
+  \item Let \(x \in S\) be arbitrary.
+  \item Assume \(P(x)\).
+  \item … (the argument) …
+  \item Therefore \(Q(x)\).
+  \item Since \(x\) was arbitrary, the claim holds for every \(x \in S\).
+\end{steps}
+The first line carries more weight than it appears to. \emph{Arbitrary} means you are forbidden to choose: you take whatever \(x\) you are handed, and may use nothing about it beyond its membership in \(S\) and the hypothesis \(P(x)\). A proof that quietly helps itself to a convenient \(x\) — an even one, a positive one, a small one — has proved something, but not the claim. The last line is not a flourish either. It is the step that converts one anonymous case into all of them, and it is worth writing precisely because it reminds you to check that you earned it.
+
+\runin{An existence claim.} To prove that \emph{there exists an \(x\) in \(S\) with \(P(x)\)}, the direct route — and the one to try first — is to hand the reader an object:
+
+\begin{steps}
+  \item Let \(x = \cdots\) (or: define \(x\) by \(\cdots\)).
+  \item Then \(x \in S\), because …
+  \item And \(P(x)\) holds, because …
+  \item Hence such an \(x\) exists.
+\end{steps}
+The object you produce is called a \emph{witness}. Note that it must be checked twice — a witness has to lie in \(S\), and it has to do the job — and that skipping the first check is the standard error. Where the witness came from is nobody’s business: you may have found it by trial, by symmetry, or by luck, and none of that need appear. That it works must appear. “Clearly such an \(x\) exists” is not an existence proof; it is a promise to write one. (An indirect route exists too: assume that nothing in \(S\) satisfies \(P\), and derive an impossibility — §B.2’s contradiction pointed at an existence claim. It settles that some \(x\) is there without ever saying which, which is why you produce a witness whenever you can.)
+
+\runin{Contraposition, or contradiction.} Two ways of reaching a claim without attacking it head-on, and it matters that you do not blur them. They differ in what the outer argument aims at. To prove \emph{if \(P\), then \(Q\)} \emph{by contraposition}, aim at \emph{not \(P\)}:
+
+\begin{steps}
+  \item Assume \emph{not \(Q\)}.
+  \item … (the argument) …
+  \item Therefore \emph{not \(P\)}.
+  \item That proves the contrapositive, and the contrapositive is the original claim in other words (§B.1).
+\end{steps}
+Notice that there is no contradiction anywhere in that skeleton — and, for that matter, nothing indirect about the reasoning either. What you have written is a plain direct chain. The indirectness of a contraposition is in \emph{what} it establishes, not in \emph{how}: you never laid a finger on the original claim, you proved a different sentence and let §B.1 carry the result across. That is also why the roster of §B.2 stops at five — a contraposition is not a sixth shape, but the first shape aimed at the equivalent sentence.
+
+To prove that same \emph{if \(P\), then \(Q\)} \emph{by contradiction}, aim instead at an impossibility:
+
+\begin{steps}
+  \item Suppose the claim fails — that is, suppose \(P\) holds and \(Q\) does not.
+  \item … (the argument) …
+  \item But that contradicts \emph{(name it)}.
+  \item So the claim cannot fail, and therefore it holds.
+\end{steps}
+Step 1 is where beginners slip, so take it slowly. §B.1 called a theorem a promise; ask what would break this one, and the answer is that \(P\) would have to hold while \(Q\) failed — nothing else would do it. That is Strategy B.3’s second step, its kernel rule, filled in for an implication. And if the claim carries a \emph{for every \(x\) in \(S\)} in front of it, as the first skeleton did, then Strategy B.3’s first step flips that quantifier as well, and the negation hands you something sharper: \emph{one} \(x\) in \(S\) for which \(P(x)\) holds and \(Q(x)\) fails. That \(x\) is then what you argue about. Step 3 is the other place to be careful, because “this is absurd” is not a contradiction — name what it collides with: a hypothesis, a known fact, or an earlier line.
+
+The tell, then, is what the outer argument ends with: a contraposition ends with \emph{not \(P\)} and stops, while a contradiction ends by naming a collision. Either may have anything you please nested inside it — §B.2 noted that shapes combine, and a contraposition whose inner step runs by contradiction is still a contraposition — but the outer aim is one or the other, and your reader needs to know which. Proposition B.1 is the first of these, once you recall the double duty §B.2 pointed out: its direct proof of \emph{if \(n\) is odd, then \(n^{2}\) is odd} is, read the other way round, a contraposition of \emph{if \(n^{2}\) is even, then \(n\) is even}. Proposition B.2 is the second. Read the two side by side if the distinction is not yet crisp. Announcing “suppose, for contradiction” over an argument that merely derives \emph{not \(P\)} from \emph{not \(Q\)} is confusing; announcing a contradiction and never naming the contradiction is worse than confusing, because then nothing has been established at all.
+
+For induction there is a skeleton too, but you have already seen it laid out: the proof of Proposition B.4 names its base case, states its inductive hypothesis in full, and derives the case \(k + 1\) from the case \(k\), in that order. Copy that arrangement. The one rule beginners break is to invoke induction before both parts are done — a base case with no step, or a step with no base case, proves nothing whatever.
+
+Enough skeletons. The best way to see what separates a draft from a proof is to watch one become the other, so we take a claim you have already met and write it up three times over.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.7}{}
+Write a proof of the statement §B.1 opened with: \emph{every integer divisible by \(6\) is divisible by \(3\).} Show the planning, a first attempt, and the finished proof.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+\begin{sollist}
+  \item \runin{Planning notes.} These are for you alone, and they are allowed to look like this: \emph{Universal implication, one quantifier — for every integer \(n\), if \(n\) is divisible by \(6\) then it is divisible by \(3\). Unpack: divisible by \(6\) means \(n = 6k\), some integer \(k\). Want \(n = 3 \cdot (\text{integer})\). But \(6k = 3 \cdot 2k\). Direct proof; nothing else needed.} Scribbled in under a minute, and the proof is already decided — that was the planning half of Strategy B.6, and no proving happened anywhere in it.
+  \item \runin{A weak draft.} A first attempt often comes out like this: “\(n = 6k\), so \(n = 3(2k)\), done.” Every symbol in it is true, and it would earn very little. Where did \(n\) come from — is it one integer or every integer? Where did \(6k\) come from — the reader is left to supply the definition of divisibility unaided. Why does \(n = 3(2k)\) finish the matter — the reader must know both that \(2k\) is an integer and that this is precisely what it means to be divisible by \(3\). The algebra is right and the argument is missing. This draft is not a bad discovery; it is a bad presentation of a good one.
+  \item \runin{The revised proof.} Let \(n\) be an integer, and suppose \(n\) is divisible by \(6\). By the definition of divisibility, there is an integer \(k\) with \(n = 6k\). Then \[ n = 6k = 3(2k), \] and \(2k\) is an integer, so \(n\) is \(3\) times an integer — which is what it means for \(n\) to be divisible by \(3\). Since \(n\) was an arbitrary integer divisible by \(6\), every integer divisible by \(6\) is divisible by \(3\).
+\end{sollist}
+Count the lines. The finished proof is four sentences where the draft was one, and none of the difference is padding: it supplies the range of \(n\), the definition being unpacked, the reason \(3(2k)\) settles the question, and the step from one \(n\) to all of them. Each is something the reader cannot be asked to supply. This is the whole lesson of the section in one example — a rigorous proof is seldom much longer than a sloppy one. It is the same argument with its reasons attached.
+\end{envsolution}
+\end{workedexample}
+That example had a single skeleton. More often two are nested, and the next one shows the commonest pairing: a universal claim on the outside whose conclusion is an existence claim on the inside.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.8}{}
+Prove that the sum of two rational numbers is rational. (Recall that a number is \emph{rational} when it can be written as a ratio \(a/b\) of integers with \(b \neq 0\) — the notion that Proposition B.2 showed \(\sqrt{2}\) escapes.)
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Plan first. The claim is universal on the outside — for all rational \(r\) and \(s\) — and its conclusion, \emph{\(r + s\) is rational}, unpacks into an existence claim: there is a ratio of integers, with nonzero denominator, equal to \(r + s\). So the outer skeleton fixes an arbitrary \(r\) and \(s\), and the inner skeleton owes a witness.
+
+Let \(r\) and \(s\) be rational numbers. By the definition of a rational number there are integers \(a, b\) with \(b \neq 0\) and \(r = a/b\), and integers \(c, d\) with \(d \neq 0\) and \(s = c/d\). Putting the two over a common denominator, \[ r + s = \frac{a}{b} + \frac{c}{d} = \frac{ad + bc}{bd}. \] The witness is the fraction \((ad + bc)/(bd)\), and it must now be checked rather than merely displayed. Its numerator \(ad + bc\) is an integer, being a sum of products of integers. Its denominator \(bd\) is an integer for the same reason, and \(bd \neq 0\), because a product of two nonzero integers is nonzero and both \(b \neq 0\) and \(d \neq 0\). So \(r + s\) is a ratio of integers with nonzero denominator — that is, \(r + s\) is rational. Since \(r\) and \(s\) were arbitrary rationals, the sum of any two rational numbers is rational.
+
+The clause beginners drop is \(bd \neq 0\). It is one line, it is easy, and it is exactly the difference between exhibiting a candidate and verifying a witness: without it we have produced an expression, not a rational number. Notice also where the hypotheses went. The conditions \(b \neq 0\) and \(d \neq 0\) arrived with the definition and did their work in that single clause, and nowhere else. Strategy B.5 taught you to hunt for the line where each hypothesis earns its place when reading; when writing, you are the one who must put it there.
+\end{envsolution}
+\end{workedexample}
+So much for proofs that work. It is at least as instructive to take apart two that do not — and both of the following argue for claims that are perfectly true, which is what makes them worth the trouble. An invalid argument for a true statement is the hardest kind of error to see, because nothing at the end looks wrong.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.9}{}
+A student offers the argument below. Find the first step that does not follow, say why, and repair the proof if the claim can be saved.
+
+\emph{Claim.} For every integer \(n\), if \(n^{2}\) is even, then \(n\) is even.
+
+\emph{Proposed proof.} If \(n\) is even, then \(n^{2}\) is even. Since \(n^{2}\) is even, \(n\) is even.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The claim is true — it is the statement dissected in Example B.1 — and that is exactly what makes the argument dangerous. It arrives at a correct conclusion by a route that is not allowed.
+
+The first sentence is unobjectionable, and it is true — Example B.1 flagged it as a separate fact needing its own proof, and that proof is one line: if \(n\) is even then \(n = 2k\) for some integer \(k\), so \(n^{2} = 2(2k^{2})\), which is twice an integer and therefore even. The second sentence is where the argument fails. It takes “if \(n\) is even, then \(n^{2}\) is even”, receives \(n^{2}\) even, and concludes \(n\) even — traveling the implication backwards, from \(Q\) to \(P\). What that step needs is the \emph{converse}, “if \(n^{2}\) is even, then \(n\) is even”, which §B.1 warned is a separate claim requiring its own proof. And it is not just any separate claim: it is the very statement we were asked to prove. The argument assumes what it set out to establish.
+
+The claim can be saved, and §B.2 already saved it. Prove the contrapositive instead — \emph{if \(n\) is odd, then \(n^{2}\) is odd} — which is Proposition B.1, proved there directly in three lines. A statement and its contrapositive are logically equivalent, so that proof settles this claim. Notice how little the repair costs and how much it changes: the same two facts about parity, arranged so that every arrow points the way it is used.
+
+The lesson generalizes past this example. An implication is a one-way street (§B.5). When you have \(Q\) in hand and want \(P\), no theorem of the form \(P \Rightarrow Q\) will carry you there — you need the converse, and the converse has to be earned.
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{B.10}{}
+The same request for the argument below.
+
+\emph{Claim.} For every integer \(n\), the number \(n^{2} + n\) is even.
+
+\emph{Proposed proof.} \(1^{2} + 1 = 2\), \(2^{2} + 2 = 6\), and \(3^{2} + 3 = 12\) are all even. So \(n^{2} + n\) is even for every integer \(n\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Once again the claim is true — it is Proposition B.3 — and once again the argument does not prove it.
+
+Three integers were checked. The claim ranges over every integer, of which there are infinitely many, and no finite list exhausts them. What the computation supplies is \emph{evidence}: a good reason to believe the claim, and trying small cases before proving anything is a habit worth keeping — it is the third habit of Strategy B.5. But evidence is not proof. The distance between “true in the cases I tried” and “true in all cases” is precisely the distance a proof exists to cross, and here nothing crosses it. Had the three cases been the only integers, the argument would have been complete; the flaw is not the method but the mismatch between three objects and infinitely many.
+
+Compare Proposition B.3, which proves this claim by splitting into the cases \(n\) even and \(n\) odd. That argument reaches every integer at once, and it does so because the two cases \emph{together cover all of them} — completeness of the split, not a longer list of examples, is what does the work. Two well-chosen cases beat three thousand well-checked ones.
+
+The asymmetry here is worth carrying away: short of checking every object the claim ranges over — and over the integers you never can — no number of confirming examples establishes a \emph{for all}, while a single counterexample destroys one (§B.2). Examples are decisive when they refute; when they confirm, they are evidence, and over the integers never more than that.
+\end{envsolution}
+\end{workedexample}
+\begin{envcaution}{Caution}{}{}
+The subtlest way to break a proof is to assume, somewhere in the middle, the very thing being proved. It seldom looks as blunt as Example B.9; more often it slips in through notation, as when a proof about an unspecified integer \(n\) opens “let \(n = 2k\)” — a perfectly good line once you know \(n\) is even, and a fatal one while that is still the conclusion. Ask it of every assumption you write: was I \emph{given} this, or do I \emph{want} it? A step you want is a step you have yet to earn.
+\end{envcaution}
+\begin{envremark}{Pause}{}{}
+Two short claims to write up now, before you read on. Both use a skeleton from the pages above, and for both the skeleton is named for you — the work here is in the writing, not in finding the idea.
+
+\begin{steps}
+  \item Prove: \emph{if \(a\) and \(b\) are even integers, then \(a + b\) is even.} A universal implication — use the first skeleton, and unpack \emph{even} before you do anything else.
+  \item Prove: \emph{for every integer \(n\), there is an integer strictly between \(n\) and \(n + 2\).} An existence claim inside a \emph{for all} — fix an arbitrary \(n\), then produce a witness and check it.
+\end{steps}
+Write both before reading on. The checklist that follows is what you will run over them, and it is worth arriving at with something of your own in hand.
+\end{envremark}
+Your draft is written. Now read it as a stranger would, which is a different act from proofreading it: you are not hunting typos but checking whether the argument in your head actually reached the page. The list below is short, and every item on it is a question a reader will ask.
+
+\begin{envstrategy}{Strategy}{B.7}{Revising your proof}
+\begin{steps}
+  \item \runin{Is every variable’s range on the page, and is it clear what is arbitrary?} A reader who cannot tell whether \(n\) is one integer or every integer cannot check a single line that follows.
+  \item \runin{Is every definition you leaned on unpacked?} If a word such as \emph{even} or \emph{rational} does real work, the condition it abbreviates should appear where it does that work.
+  \item \runin{Does every step doing logical work carry a reason?} A definition, a hypothesis, a known result, or an earlier line. \emph{Obviously} and \emph{clearly} are not reasons; wherever one appears, either supply the reason or cut the step.
+  \item \runin{Is each hypothesis used, and can you point to where?} An unused hypothesis means one of two things, and both are worth knowing: you have proved something stronger than the claim, or you have overlooked something.
+  \item \runin{Does every implication run the way you needed it to?} Mark the arrows. A step read backwards is the commonest fatal error there is, and the hardest to catch in your own writing.
+  \item \runin{If you claimed existence, did you settle it one way or the other?} If you argued directly, that means producing a witness and running both checks on it — that the object lies in the set, and that it does what was asked. If you argued indirectly, it means negating the existence claim correctly and naming the contradiction you reached.
+  \item \runin{If you argued by contradiction, did you name the contradiction?} “This is absurd” is not a collision. Say which two facts cannot both hold.
+  \item \runin{Does your last sentence establish exactly the claim as stated?} Not something near it, and not its converse.
+  \item \runin{Can any sentence go without breaking the argument?} If so, let it go. Length is not rigor, and a shorter proof is a proof more people will finish checking.
+\end{steps}
+\begin{informal}
+A first draft discovers the argument; revision makes the argument inspectable.
+\end{informal}
+\end{envstrategy}
+Run that list over the two proofs from the Pause above, and then — only then — here are two things to look for, one in each. On the first: what did you call the two even integers? If both came out as \(2k\), you have proved something true but far smaller than the claim, namely that \(a + b\) is even whenever \(a = b\). Two independent objects need two independent names. On the second: did you do more than write down \(n + 1\)? A witness is not verified until you have said why it is an integer and why it lies strictly between \(n\) and \(n + 2\) — item 6, and the item that catches the most first drafts there are.
+
+Reading and writing proofs are one skill practiced in opposite directions, and the questions do not change when you turn around. §B.5 asked you to find the warrant for every line, locate each hypothesis, and watch the arrows in somebody else’s argument; Strategy B.7 asks exactly that of your own. This is why the two directions belong together — what makes a proof checkable is what makes it writable, and an author who cannot read their own page as a stranger would has no way of knowing whether the argument arrived. Rigor, in the end, is the discipline of leaving nothing load-bearing unsaid: of writing so that someone who does not already believe you, and who cannot ask you what you meant, can rebuild the argument line by line and see for themselves that it holds. That is a craft rather than a talent, and like any craft it is built by writing something, finding out what a reader could not follow, and writing it again.
+\end{document}

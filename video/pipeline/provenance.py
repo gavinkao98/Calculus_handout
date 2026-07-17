@@ -75,11 +75,11 @@ class Loci:
 
     @staticmethod
     def _handout_anchors(meta: dict, repo_root: Path) -> "set[str]":
-        # chapter "Chapter 3" -> handout/chapter3-print-standalone.html
+        # chapter "Chapter 3" -> handout/html/standalone/chapter3-print-standalone.html
         m = re.search(r"(\d+)", str(meta.get("chapter", "")))
         if not m:
             return set()
-        html = repo_root / "handout" / f"chapter{m.group(1)}-print-standalone.html"
+        html = repo_root / "handout" / "html" / "standalone" / f"chapter{m.group(1)}-print-standalone.html"
         if not html.exists():
             return set()
         text = html.read_text(encoding="utf-8", errors="replace")

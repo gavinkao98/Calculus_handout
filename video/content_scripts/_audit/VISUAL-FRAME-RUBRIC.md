@@ -1,6 +1,6 @@
 # 影片視覺幀稽核 — 維度與收斂線（VISUAL-FRAME-RUBRIC）
 
-> 本檔是「影片視覺幀稽核」的契約與**單一真相來源**。視覺層走**講義 figure-audit 的鏡像**（見 [`../../../handout/_audit/FIGURE-AUDIT-RUBRIC.md`](../../../handout/_audit/FIGURE-AUDIT-RUBRIC.md)）：
+> 本檔是「影片視覺幀稽核」的契約與**單一真相來源**。視覺層走**講義 figure-audit 的鏡像**（見 [`../../../handout/html/_audit/FIGURE-AUDIT-RUBRIC.md`](../../../handout/html/_audit/FIGURE-AUDIT-RUBRIC.md)）：
 > - **gate 1 ＝ Claude 抽幀 subagent**（免費、每次 render 跑）——讀 [`../../pipeline/critic.py`](../../pipeline/critic.py) `--dry-run` 抽出的幀（一個 content scene 一張 fullest 幀），對照本檔判斷。
 > - **gate 2 ＝ 外部 VLM 信心複核**（MiMo-V2.5 via `critic.py --confirm`，間歇、計費、需同意）——定稿前非每輪必跑，補 gate 1 的模型盲點。
 >

@@ -15,7 +15,7 @@
 ## 開工前必讀：現況與脈絡（新對話零脈絡也能照做）
 
 - **倉庫：** `C:\Users\Kao\Downloads\Calculus_handout`。影片產線在 `video/`。**分支：續用 `video/template-redesign-navy-spine`**（Route A Plex+LaTeX 最新模板，render 時自動套，**不另開分支**）。
-- **講義輸入源（權威、忠實對象）：** [`handout/fragments/ch03/sec-3-1.html`](../../../handout/fragments/ch03/sec-3-1.html)。檔頭含本節的編號契約（Prop 3.1/3.2、Thm 3.1/3.2、Ex 3.1/3.2/3.3、Fig 3.1–3.4、Remark 3.1、兩個未編號 Caution）與 ③ 決策 D1–D4。
+- **講義輸入源（權威、忠實對象）：** [`handout/html/fragments/ch03/sec-3-1.html`](../../../handout/html/fragments/ch03/sec-3-1.html)。檔頭含本節的編號契約（Prop 3.1/3.2、Thm 3.1/3.2、Ex 3.1/3.2/3.3、Fig 3.1–3.4、Remark 3.1、兩個未編號 Caution）與 ③ 決策 D1–D4。
 - **跑 manim 的方式：** deps 在 repo 根 `.deps_voiceover`（manim 0.20.1）、`.deps`（PyYAML）；`video/pipeline/_bootstrap.bootstrap()` 會把它們上 `sys.path` 並設 TeX template（每景重套，見 REBUILD_STATUS「tempconfig 坑」）。環境檢查：`python tools/doctor.py` 應全綠（manim／MiKTeX `plex-sans`/`plex-mono`/`lmodern`／ffmpeg）。
 - **確切指令（已驗 CLI）：**
   - 結構驗證＋列舉 reveal 目標：`python video/pipeline/schema.py <yml> --list`

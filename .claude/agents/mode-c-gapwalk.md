@@ -18,7 +18,7 @@ model: inherit
 
 1. `README.md` — 找「Mode C」段落，瞭解 Mode C 的可做／不可做邊界（只增添、絕不重構）。
 2. `CONTENT_SPEC.md` §3（語域與語聲）、§10（圖規則，供 figure-note 判斷）、§15（最終一致性檢查清單——「直覺先於 formal」「Informally gloss」「每節 1–2 段動機」等項是缺口線索）。
-3. 呼叫者指定章號的所有 fragment：`handout/fragments/chNN/sec-*.html`（**全部讀完**，一節一節來）。
+3. 呼叫者指定章號的所有 fragment：`handout/html/fragments/chNN/sec-*.html`（**全部讀完**，一節一節來）。
 4. （如存在）先前同章的 Mode C 產出——瞭解是否已有分析、避免重複。
 
 若上述文件與呼叫者當下指示衝突，以當下指示為準，並在輸出指出衝突。
@@ -71,13 +71,13 @@ model: inherit
 
 把所有節的候選彙整成一份 standalone HTML 裁決稿。
 
-路徑：`handout/_audit/REVIEW-chNN-modec-enrichment.html`（NN 為章號，如 `ch03`；此為 `handout/PIPELINE.md` row 2b 釘死的②波候選稿命名）。
+路徑：`handout/html/_audit/REVIEW-chNN-modec-enrichment.html`（NN 為章號，如 `ch03`；此為 `handout/PIPELINE.md` row 2b 釘死的②波候選稿命名）。
 
 ---
 
 # HTML 輸出格式
 
-比照 Ch 3 的實際產出（`handout/_audit/REVIEW-ch03-modec-enrichment.html`），結構如下：
+比照 Ch 3 的實際產出（`handout/html/_audit/REVIEW-ch03-modec-enrichment.html`），結構如下：
 
 1. **標題**：`Chapter N — Mode C 充實候選裁決稿`
 2. **副標**（`.sub`）：日期、方法（逐節偵察）、範圍（軟深度：intuition／application／caution）

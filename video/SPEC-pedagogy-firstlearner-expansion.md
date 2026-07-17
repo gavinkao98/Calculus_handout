@@ -16,7 +16,7 @@
 **實證錨（`derivative_of_sine`）：**
 - storyboard `proof:`（[`ch03_trig_derivatives.yml`](storyboards/ch03_trig_derivatives.yml:400)）＝ `d/dx sin x = lim cos(x+h/2)·sin(h/2)/(h/2)` → 兩因子 → `cos x`。
 - 但 cited `.md` `visual_need`（[`ch03_trig_derivatives.md`](content_scripts/ch03_trig_derivatives.md:396)）**明列 4 行**，第 1 行是定義行 `d/dx sin x = lim (sin(x+h)−sin x)/h`。
-- handout（[`sec-3-1.html`](../handout/fragments/ch03/sec-3-1.html:181)）也顯示該定義行。
+- handout（[`sec-3-1.html`](../handout/html/fragments/ch03/sec-3-1.html:181)）也顯示該定義行。
 - → **storyboard 在最後一跳 `.md`→yml 掉了定義橋接行**；且它 cash-in 了 ~10 場前 `difference_quotient_for_sine` 的代數而**畫面無 recap**（線性影片翻不回去 → product form 像憑空出現）。
 
 ---

@@ -2,26 +2,26 @@
 
 > **本檔是什麼：** 把一章講義從 spine 素材（手稿或 canon 藍本）推到「定稿」要經過的**完整閘序**之**權威總覽**，兼任**各章狀態 dashboard**。
 > 各閘的細節規格不在此重複——本檔給「順序、各閘用什麼、哪裡停下、產出什麼」，細節指向既有 sub-doc。
-> 撰稿模式（Mode A／B／C、兩種變體）以 [`../CONTENT_AUTHORING_WORKFLOW.md`](../CONTENT_AUTHORING_WORKFLOW.md) 為準；內容撰寫規則以 [`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) 為準；改課文只改 `fragments/`、再 `python build.py ch{NN}`（見 [`README.md`](README.md)）。
+> 撰稿模式（Mode A／B／C、兩種變體）以 [`../CONTENT_AUTHORING_WORKFLOW.md`](../CONTENT_AUTHORING_WORKFLOW.md) 為準；內容撰寫規則以 [`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) 為準；改課文只改 `html/fragments/`、再 `python html/build.py ch{NN}`（見 [`README.md`](README.md)）。
 
 ## 「做完一章」的定義
 
 = **與 Ch1–Ch4 同級全跑，共七個閘家族**：
 **Mode A（六階定稿）＋ Mode C gap-check ＋ 數學正確性 ＋ 圖機會／圖正確性 ＋ 去 AI 味 S·A·V ＋ 難度閘（learner-sim）＋ 收尾 dashboard 更新。**
-（Ch1–Ch4 依手稿時代 gate 0–8 全跑完成，含 2026-07-03 補跑的難度閘；權威敘述見 [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) 各章 status 與 [`_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`](_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html)。）
+（Ch1–Ch4 依手稿時代 gate 0–8 全跑完成，含 2026-07-03 補跑的難度閘；權威敘述見 [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) 各章 status 與 [`html/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`](html/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html)。）
 
 ## 兩軌閘序（2026-07-07 起）
 
-- **手稿章（Ch1–4，既成）**：原 gate 0–8 閘序已全數跑完，本檔尾端的 dashboard 記其狀態；該閘序的歷史細節見 git 歷史版 PIPELINE 與各章 `_dev-archive/ch{NN}/PLAN-ch{NN}.md`。
-- **canon 章（Ch5 起，預設）**：採下方 **5-milestone 閘序**。Ch5 為過渡章——Mode A 已按 M1 完成（[`_dev-archive/ch05/PLAN-ch05.md`](_dev-archive/ch05/PLAN-ch05.md)），剩餘閘照 M2–M5 收。
+- **手稿章（Ch1–4，既成）**：原 gate 0–8 閘序已全數跑完，本檔尾端的 dashboard 記其狀態；該閘序的歷史細節見 git 歷史版 PIPELINE 與各章 `html/_dev-archive/ch{NN}/PLAN-ch{NN}.md`。
+- **canon 章（Ch5 起，預設）**：採下方 **5-milestone 閘序**。Ch5 為過渡章——Mode A 已按 M1 完成（[`html/_dev-archive/ch05/PLAN-ch05.md`](html/_dev-archive/ch05/PLAN-ch05.md)），剩餘閘照 M2–M5 收。
 
 ## Canon 章 5-milestone 閘序（Ch6+ 預設；Ch6 為首個全程試點章，跑完一章後回顧定版）
 
 | # | Milestone | 做什麼 | gate-1（Claude，免費） | gate-2（計費） | ⛳ 使用者停點 | 產物 | 權威 sub-doc |
 |---|---|---|---|---|---|---|---|
-| M1 | **Mode A′（canon 草擬）** | 章層 canon 盤點 → 逐節：brief（含例題計畫、軟深度計畫、`figure_opportunities`）→ 擴寫 → Codex ⑤（direction-conformance＋數學＋hypothesis hygiene）至 0 blocking → 章層收尾 sweep：**sympy 全例重算＋hypothesis ledger 覆核＋章層 Codex review（明列對應 M1–M8 各維，不可只稱「已吸收」）** | 各節 ④；章層 sweep | Codex ⑤（每節）＋章層 review（standing consent 內） | 章完成後過目 `REVIEW-ch{NN}-applied.html` | `sec-{N}.html`＋章 opener＋PLAN-ch{NN} ledger | [`../CONTENT_AUTHORING_WORKFLOW.md`](../CONTENT_AUTHORING_WORKFLOW.md)、[`../CONTENT_DIRECTION.md`](../CONTENT_DIRECTION.md)、[`_audit/MATH-CORRECTNESS-RUBRIC.md`](_audit/MATH-CORRECTNESS-RUBRIC.md)（M1–M8 維度定義） |
-| M2 | **圖批次** | brief／擴增稽核第 7 項產出的候選 → 裁決「畫哪些」→ 繪圖（fragment＋FIGS 兩處同改）→ 圖正確性 D1–D8 | `handout-figure-opportunity-audit`（候選覆核）；`handout-figure-audit`（吃 `shot.mjs` 圖 PNG） | Codex 視覺第二讀者（`-i` 餵 PNG）——每章必跑，批次見「gate-2 全跑」 | **章批次裁決畫哪些**＋修法裁決 | `REVIEW-ch{NN}-figure-opportunity.html`、`REVIEW-ch{NN}-figure-audit.html` | [`_audit/FIGURE-OPPORTUNITY-RUBRIC.md`](_audit/FIGURE-OPPORTUNITY-RUBRIC.md)、[`_audit/FIGURE-AUDIT-RUBRIC.md`](_audit/FIGURE-AUDIT-RUBRIC.md) |
-| M3 | **散文＋難度合一輪** | S·A·V 散文閘（三維：易懂 A／流暢 B／語意聲音 C）與 **≥3 份盲測 learner-sim**（盲測性質不可犧牲）同批跑，產**一份合併裁決稿** | `handout-prose-audit`＋`learner-sim` subagents | Codex prose S·A·V 複核——每章必跑，批次見「gate-2 全跑」 | 逐條裁決（一次） | `REVIEW-ch{NN}-prose-difficulty.html`（合併稿） | [`_audit/PROSE-AUDIT-RUBRIC.md`](_audit/PROSE-AUDIT-RUBRIC.md)、[`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) §16、[`../.claude/agents/learner-sim.md`](../.claude/agents/learner-sim.md) |
+| M1 | **Mode A′（canon 草擬）** | 章層 canon 盤點 → 逐節：brief（含例題計畫、軟深度計畫、`figure_opportunities`）→ 擴寫 → Codex ⑤（direction-conformance＋數學＋hypothesis hygiene）至 0 blocking → 章層收尾 sweep：**sympy 全例重算＋hypothesis ledger 覆核＋章層 Codex review（明列對應 M1–M8 各維，不可只稱「已吸收」）** | 各節 ④；章層 sweep | Codex ⑤（每節）＋章層 review（**逐次徵詢**，見下方「通用紀律」） | 章完成後過目 `REVIEW-ch{NN}-applied.html` | `sec-{N}.html`＋章 opener＋PLAN-ch{NN} ledger | [`../CONTENT_AUTHORING_WORKFLOW.md`](../CONTENT_AUTHORING_WORKFLOW.md)、[`../CONTENT_DIRECTION.md`](../CONTENT_DIRECTION.md)、[`html/_audit/MATH-CORRECTNESS-RUBRIC.md`](html/_audit/MATH-CORRECTNESS-RUBRIC.md)（M1–M8 維度定義） |
+| M2 | **圖批次** | brief／擴增稽核第 7 項產出的候選 → 裁決「畫哪些」→ 繪圖（fragment＋FIGS 兩處同改）→ 圖正確性 D1–D8 | `handout-figure-opportunity-audit`（候選覆核）；`handout-figure-audit`（吃 `shot.mjs` 圖 PNG） | Codex 視覺第二讀者（`-i` 餵 PNG）——每章必跑，批次見「gate-2 全跑」 | **章批次裁決畫哪些**＋修法裁決 | `REVIEW-ch{NN}-figure-opportunity.html`、`REVIEW-ch{NN}-figure-audit.html` | [`html/_audit/FIGURE-OPPORTUNITY-RUBRIC.md`](html/_audit/FIGURE-OPPORTUNITY-RUBRIC.md)、[`html/_audit/FIGURE-AUDIT-RUBRIC.md`](html/_audit/FIGURE-AUDIT-RUBRIC.md) |
+| M3 | **散文＋難度合一輪** | S·A·V 散文閘（三維：易懂 A／流暢 B／語意聲音 C）與 **≥3 份盲測 learner-sim**（盲測性質不可犧牲）同批跑，產**一份合併裁決稿** | `handout-prose-audit`＋`learner-sim` subagents | Codex prose S·A·V 複核——每章必跑，批次見「gate-2 全跑」 | 逐條裁決（一次） | `REVIEW-ch{NN}-prose-difficulty.html`（合併稿） | [`html/_audit/PROSE-AUDIT-RUBRIC.md`](html/_audit/PROSE-AUDIT-RUBRIC.md)、[`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) §16、[`../.claude/agents/learner-sim.md`](../.claude/agents/learner-sim.md) |
 | M4 | **Mode C 條件式 gap-check** | 單輪偵察（①補例＋②軟深度合一）；brief 覆蓋完整即記錄後跳過；有增補 → 必接範圍限定 Mode B | `mode-c-gapwalk`＋`example-supplement` | 選題稽核（僅動用題庫時） | 裁決補哪些 | `REVIEW-ch{NN}-modec-gapcheck.html`（單稿） | [`../CONTENT_AUTHORING_WORKFLOW.md`](../CONTENT_AUTHORING_WORKFLOW.md) §Mode C、[`../CONTENT_SOURCING.md`](../CONTENT_SOURCING.md) |
 | M5 | **收尾** | dashboard 更新＋PLAN-ch{NN} 閘家族 checklist 補滿＋ROADMAP entry 收 Open questions | — | — | 確認 | 本檔 dashboard＋PLAN checklist | [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) |
 
@@ -33,8 +33,8 @@
 **三個 gate-2（數學 M1–M8／散文 S·A·V／圖視覺）一律每章必跑到 0 blocking，該章才定版——取消「按章深度抽樣」「高風險才跑」「出版前抽樣」等所有分層與風險判斷。** 定案理由：Codex gate-2 走訂閱配額、邊際金錢≈0，分層省的只是配額／時間，卻要把 gate-2 延後＝章節不真正定版、出版前得回頭改已完成章（context 重載＋編號 cascade＋回歸滾雪球）；使用者取「心智負擔歸零＋章內不留 gate-2 債」，接受代價（散文／圖配額用在邊際較低處、潛在文風 churn）。gpt-5.5＋xhigh 對抗曾傾向「數學必跑＋散文／圖觸發式」的 A 案，使用者權衡後改採三閘全跑 B 案（詳見本次 commit body）。
 
 - **統一位置＝M4 之後、M5 之前**跑「定版前跨模型複核批次」。理由：M4（Mode C gap-check）可能新增 example／caution／軟深度，動到編號與數學——**Ch5 的 [M7] blocking 正是 M4 新增的 caution**，數學 gate-2 若停在 M1 就會漏掉它；三閘一起在 M4 後跑，才覆蓋得到全部 as-built。
-- **數學 M1–M8 gate-2**：Codex 依 [`_audit/MATH-CORRECTNESS-RUBRIC.md`](_audit/MATH-CORRECTNESS-RUBRIC.md) 全章複核。
-- **散文 S·A·V gate-2**：Codex 依 [`_audit/PROSE-AUDIT-RUBRIC.md`](_audit/PROSE-AUDIT-RUBRIC.md) 全章複核（易懂性 blocking 主錨仍是 M3 的 learner-sim 盲測，見下節「易懂性單一錨」；S·A·V gate-2 為第二模型補充，非主錨）。
+- **數學 M1–M8 gate-2**：Codex 依 [`html/_audit/MATH-CORRECTNESS-RUBRIC.md`](html/_audit/MATH-CORRECTNESS-RUBRIC.md) 全章複核。
+- **散文 S·A·V gate-2**：Codex 依 [`html/_audit/PROSE-AUDIT-RUBRIC.md`](html/_audit/PROSE-AUDIT-RUBRIC.md) 全章複核（易懂性 blocking 主錨仍是 M3 的 learner-sim 盲測，見下節「易懂性單一錨」；S·A·V gate-2 為第二模型補充，非主錨）。
 - **圖視覺 gate-2**：Codex 視覺第二讀者（`-i` 餵 render 後 PNG）。
 - 實測成本參考：Ch4 數學 gate-2＝173,720 tok、S·A·V gate-2＝154,714 tok；一章三閘約 400–450k tok。撞額度牆時**分批／跨 session 跑，但都在該章定版前收完**（分批 ≠ 延後到出版前）。
 
@@ -52,38 +52,47 @@
 
 ## 難度閘（learner-sim；2026-07-03 新增，M3 的一半）
 
-源起與首次全流程執行紀錄：[`_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`](_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html)（Ch1–Ch4 難度評估＋修補＋複驗三輪；新章產物併入 M3 合併稿 `REVIEW-ch{NN}-prose-difficulty.html`）。規格：
+源起與首次全流程執行紀錄：[`html/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html`](html/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html)（Ch1–Ch4 難度評估＋修補＋複驗三輪；新章產物併入 M3 合併稿 `REVIEW-ch{NN}-prose-difficulty.html`）。規格：
 
 - **Persona（釘死）**＝[`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) §16.2 基線讀者：108 課綱數A（不含選修數甲）、無微積分先備、英文中等的自學大一新生；已讀過本章之前的所有章節（吸收不完美）。執行用具名 subagent [`../.claude/agents/learner-sim.md`](../.claude/agents/learner-sim.md)。
 - **怎麼跑**：每章 ≥3 份**盲測** learner-sim（不要先告訴 sim 哪裡難），逐節回報：總判定 ok／effortful／stuck、卡點清單（locus＋引文＋severity：blocking／slowdown／minor）、逐節難度 1–5。
-- **判準**：任何 **stuck（卡死需外援）＝blocking**；**B 類先備違規**（SPEC §16.2：未就地建立即使用）＝blocking——此項可先用 grep 對 B 類清單機械預檢。mainline 節難度上限＝「effortful 但可自行走完」（SPEC §16.1 難度預算）；超限者要嘛修、要嘛標 foundation／Proof track（[`TYPESETTING_GUIDE.md`](TYPESETTING_GUIDE.md) §10）。slowdown 級為 advisory，逐條裁決。
+- **判準**：任何 **stuck（卡死需外援）＝blocking**；**B 類先備違規**（SPEC §16.2：未就地建立即使用）＝blocking——此項可先用 grep 對 B 類清單機械預檢。mainline 節難度上限＝「effortful 但可自行走完」（SPEC §16.1 難度預算）；超限者要嘛修、要嘛標 foundation／Proof track（[`html/TYPESETTING_GUIDE.md`](html/TYPESETTING_GUIDE.md) §10）。slowdown 級為 advisory，逐條裁決。
 - **基線比對**：與 Ch1–Ch4 的難度曲線（Ch1–3≈3/5、Ch4=4/5、尖峰 §4.2=4.5——記錄於上述 audit HTML）比對；新章若出現高於 §4.2 的尖峰或整章 >4，屬**弧線層異常**，回 roadmap entry 的深度決策（SPEC §16.3）重議，不在散文層硬修。
 - **修完必回歸**：blocking 修補後對修過的節**重跑盲測 sim**（比照 Ch1–Ch4 P3 複驗），確認卡點實際消失、且未引入新卡點。
 
 ## 通用紀律
 
 - **雙閘精神不變、三閘每章全跑**：gate-1 Claude（免費）→ ⛳ 裁決 → 回歸審核 → gate-2 跨模型獨立複核（計費徵同意）。幻覺要穿過兩個獨立模型才會漏——這是雙閘的價值；2026-07-10 起 gate-2 三閘（數學／散文／圖）**每章必跑到定版**（取代原風險分層；見上方「gate-2 全跑」），章內不留 gate-2 債。
-- **易懂性 reader-persona（M3，不新開關）：** 易懂性 A 以「**高中生／英文 L2／第一次線性讀**」為錨判（見 [`_audit/PROSE-AUDIT-RUBRIC.md`](_audit/PROSE-AUDIT-RUBRIC.md) 維度 A）。「先用後定義」的**結構性排序**宜更早在 Mode A 方向層攔（[`../CONTENT_DIRECTION.md`](../CONTENT_DIRECTION.md) §2），別留到散文閘才搬而 cascade 編號。
-- **Codex 調用（實證，照這個）**：用 **PATH 上的 `codex`**（npm `codex-cli`，已登入 ChatGPT、走訂閱配額；**2026-07-10 起 0.144.1**，`~/.codex/config.toml` 預設 `model="gpt-5.6-terra"`／`model_reasoning_effort="xhigh"`／`service_tier="default"` 可直接跑、免加 `-m`。歷史坑：0.136.0 不認 terra 會 `400 requires a newer version`，升級前須 `-m gpt-5.5` 暫繞；`%LOCALAPPDATA%\OpenAI\Codex\bin` 底下的舊 build 亦可能拒新 model／config key，`tools/codex.cmd` shim 動態解析最新版避此坑，見 [`../ENVIRONMENT.md`](../ENVIRONMENT.md) ⑤）。指令：`codex exec -s read-only -C <repo> --output-schema <s.json> -o <out.json> - < <prompt.txt>`（Bash 工具、prompt 經 stdin 餵 raw UTF-8 避 PowerShell CJK 重編碼；prompt/schema 用 Write 寫檔不用 heredoc）。schema 全欄 required、`additionalProperties:false`、enum、無 min/max。每輪 ~120k tokens。**付費調用前一律先說明模型/用量/成本徵同意**（[`../CLAUDE.md`](../CLAUDE.md)）；read-only review 有 standing consent。
-- **findings 留版控（raw 不進版控）**：Codex／外部模型原始輸出落 gitignored scratchpad、換機即失 → 摘要與裁決**轉錄**進 `handout/_dev-archive/ch{NN}/ch{NN}_<gate>-audit.md`（範本 `_dev-archive/ch03/ch03_example-supplement-audit.md`）或正式 REVIEW 報告；**`*.raw.txt` 一律不進版控**（2026-07-07 與 video 線統一）。
-- **render 自驗**：node v22＋Chrome。`handout/_render/shot.mjs <url> <out/prefix> {full|figures}`（`figures` 逐圖截 2× PNG 餵圖閘）。驗收：0 KaTeX/MathJax err、0 未渲染 `\(`、env-num 連續無斷號、cross-ref 0 dangling、圖全 hydrate。
-- **版面閘（顯示式斷行）**：`node handout/_render/linebreak-gate.mjs`（不帶參數＝掃全部 standalone；或接檔名只掃指定章）。抓被 MathJax `displayOverflow:'linebreak'` **自動硬斷**的顯示式（偵測 `mjx-linestack`，再對回原始 TeX），這類自動斷點常很醜。撰寫規則「寬式一律手動斷行」見 [`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) §數學排版「寬顯示式的斷行」。驗收：自動斷行 0 條（退出碼 0）；改完數學式或新增章節後重建再跑一次。
-- **編號 ledger 手動**（kit 無 auto-counter，**最大錯誤來源**）：每型獨立 counter、跨節連續；插 example/figure 會 cascade 其後全部編號＋散文 cross-ref。**先建完整編號地圖再動手**，改完 grep 核對連續性與引用解析。ledger 權威表在各章 `_dev-archive/ch{NN}/PLAN-ch{NN}.md` §5。
+- **易懂性 reader-persona（M3，不新開關）：** 易懂性 A 以「**高中生／英文 L2／第一次線性讀**」為錨判（見 [`html/_audit/PROSE-AUDIT-RUBRIC.md`](html/_audit/PROSE-AUDIT-RUBRIC.md) 維度 A）。「先用後定義」的**結構性排序**宜更早在 Mode A 方向層攔（[`../CONTENT_DIRECTION.md`](../CONTENT_DIRECTION.md) §2），別留到散文閘才搬而 cascade 編號。
+- **Codex 調用（實證，照這個）**：用 **PATH 上的 `codex`**（npm `codex-cli`，已登入 ChatGPT、走訂閱配額；**2026-07-10 起 0.144.1**，`~/.codex/config.toml` 預設 `model="gpt-5.6-terra"`／`model_reasoning_effort="xhigh"`／`service_tier="default"` 可直接跑、免加 `-m`。歷史坑：0.136.0 不認 terra 會 `400 requires a newer version`，升級前須 `-m gpt-5.5` 暫繞；`%LOCALAPPDATA%\OpenAI\Codex\bin` 底下的舊 build 亦可能拒新 model／config key，`tools/codex.cmd` shim 動態解析最新版避此坑，見 [`../ENVIRONMENT.md`](../ENVIRONMENT.md) ⑤）。指令：`codex exec -s read-only -C <repo> --output-schema <s.json> -o <out.json> - < <prompt.txt>`（Bash 工具、prompt 經 stdin 餵 raw UTF-8 避 PowerShell CJK 重編碼；prompt/schema 用 Write 寫檔不用 heredoc）。schema 全欄 required、`additionalProperties:false`、enum、無 min/max。每輪 ~120k tokens。**付費調用前一律先說明模型/用量/成本徵同意**（[`../CLAUDE.md`](../CLAUDE.md)）；**read-only review 亦須逐次徵詢**（2026-07-17 使用者裁決：本檔原寫「read-only review 有 standing consent」，與 [`../CLAUDE.md`](../CLAUDE.md)「Codex 唯讀調用…需逐次徵詢」直接衝突；使用者裁定 **CLAUDE.md 為準**，本檔兩處 standing consent 字樣同批改正）。
+- **findings 留版控（raw 不進版控）**：Codex／外部模型原始輸出落 gitignored scratchpad、換機即失 → 摘要與裁決**轉錄**進 `handout/html/_dev-archive/ch{NN}/ch{NN}_<gate>-audit.md`（範本 `html/_dev-archive/ch03/ch03_example-supplement-audit.md`）或正式 REVIEW 報告；**`*.raw.txt` 一律不進版控**（2026-07-07 與 video 線統一）。
+- **render 自驗**：node v22＋Chrome。`handout/html/_render/shot.mjs <url> <out/prefix> {full|figures}`（`figures` 逐圖截 2× PNG 餵圖閘）。驗收：0 KaTeX/MathJax err、0 未渲染 `\(`、env-num 連續無斷號、cross-ref 0 dangling、圖全 hydrate。
+- **版面閘（顯示式斷行）**：`node handout/html/_render/linebreak-gate.mjs`（不帶參數＝掃全部 standalone；或接檔名只掃指定章）。抓被 MathJax `displayOverflow:'linebreak'` **自動硬斷**的顯示式（偵測 `mjx-linestack`，再對回原始 TeX），這類自動斷點常很醜。撰寫規則「寬式一律手動斷行」見 [`../CONTENT_SPEC.md`](../CONTENT_SPEC.md) §數學排版「寬顯示式的斷行」。驗收：自動斷行 0 條（退出碼 0）；改完數學式或新增章節後重建再跑一次。
+- **編號 ledger 手動**（kit 無 auto-counter，**最大錯誤來源**）：每型獨立 counter、跨節連續；插 example/figure 會 cascade 其後全部編號＋散文 cross-ref。**先建完整編號地圖再動手**，改完 grep 核對連續性與引用解析。ledger 權威表在各章 `html/_dev-archive/ch{NN}/PLAN-ch{NN}.md` §5。
 - **交付物「打開就能讀」**：含數學的待裁決/已套用報告產 standalone HTML（MathJax/KaTeX CDN、雙擊即開）。每完成一輪撰寫都產 `REVIEW-…-applied.html`。
 - **commit**：經授權才 commit；繁中、body 逐條記裁決（供 `git log --grep` 撈回）、結尾 `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`。
 
 ## 出版排版線（HTML→LaTeX；pilot GO 2026-07-17）
 
 上面的內容 QA 閘鏈讀 **fragment 源**、與排版引擎無關；出版級排版是一條**下游線**在
-[`tex_export/`](tex_export/)：`convert.py`（確定性轉換：數學逐位元組 pass-through、
+[`latex/`](latex/)：`convert.py`（確定性轉換：數學逐位元組 pass-through、
 表外標記硬錯、fragment 唯讀）→ `template/calcbook.sty`（memoir；語意層＋樣式層分離，
-模板拍板紀錄 [`tex_export/template/M-B1-DECISIONS.md`](tex_export/template/M-B1-DECISIONS.md)）→
-`latexmk -lualatex` 出 A4 PDF，四閘驗收（編譯／版面／完整性／人眼，kickoff §4.5）。
-appB pilot 已 GO（同內容 HTML 20 頁 → LaTeX 14 頁，四閘全綠）。**逐章 rollout**（建議順序
+模板拍板紀錄 [`latex/template/M-B1-DECISIONS.md`](latex/template/M-B1-DECISIONS.md)）→
+`latexmk -lualatex` 出 A4 PDF，四閘驗收（編譯／版面／完整性／人眼，kickoff §4.5）；**成品收在 `latex/dist/<ch>/`（每單元恰兩檔：pdf＋自足 tex，`make_dist.py` 產）**。
+appB pilot 已 GO（收案當時：同內容 HTML 20 頁 → LaTeX 14 頁，四閘全綠）；**2026-07-17 appB 加 §B.6 後重跑並重新凍結＝24 頁、四閘仍全綠**，成品 `latex/dist/appB/` 已更新（沿革見 [`latex/KICKOFF-latex-pilot.md`](latex/KICKOFF-latex-pilot.md) 頭段）。**逐章 rollout**（建議順序
 ch03→ch01→ch06→其餘附錄；屆時另開計畫）每章＝方言差集盤點（`dialect_inventory.py`）→
-補 mapping（權威表 `DIALECT-<ch>.md`）→ 四閘；完整沿革與 rollout 預告見
-[`KICKOFF-latex-pilot.md`](KICKOFF-latex-pilot.md)。HTML standalone 自此定位＝
+補 mapping（權威表 `chapters/<ch>/DIALECT-<ch>.md`）→ 四閘；完整沿革與 rollout 預告見
+[`latex/KICKOFF-latex-pilot.md`](latex/KICKOFF-latex-pilot.md)。HTML standalone 自此定位＝
 **撰稿預覽＋圖閘 render 載體**（D2／D6），內容閘鏈照舊跑 fragment、不受影響。
+
+> **兩線分工拍板（2026-07-17 使用者裁決）**：**整體仍先做 HTML 講義**（`html/`＝撰稿製作線，
+> 內容撰寫、QA 閘鏈、圖系統照舊在此線推進）；**「為了好看，最後定稿的講義把 HTML 轉成 LaTeX」**
+> （`latex/`＝定稿出版線，rollout 時點跟各章／全書定稿走，不搶在內容前面）。fragment 仍是唯一
+> 內容源、`.tex` 是 build 產物不進版控（無雙源）。**本拍板 supersede kickoff §9 的 rollout
+> 時點**（原「pilot GO 即全面 rollout」→ 逐章轉換改跟定稿走）；kickoff 的 D2「排版的家＝LaTeX，
+> 現在就定」與 §9 的建議順序不受影響。同日資料夾重整：`handout/` 依兩線分家——
+> 原 `handout/tex_export/` → `handout/latex/`（章節資產再各歸 `latex/chapters/<ch>/`）；fragment／standalone／`_render`／`_audit`／
+> `_dev-archive`（撰稿部分）→ `handout/html/`；standalone 集中進 `html/standalone/`。
 
 ## 工程注意：subagent 持久化
 

@@ -1,0 +1,1769 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Appendix D — Print build</title>
+
+<!-- ════════════════════════════════════════════════════════════════
+     圖片寬度控制面板 —— 直接改下面的數字即可（px 固定寬 / % 相對頁寬）
+     並排或多格圖（1.1 / 1.7 / 1.9）控制的是「每一格」的寬度。
+     ════════════════════════════════════════════════════════════════ -->
+<style>
+:root {
+  --fig-1-1:  250px;   /* Figure 1.1  horizontal line test (pair) */
+  --fig-1-2:  340px;   /* Figure 1.2  inverse mapping diagram */
+  --fig-1-3:  280px;   /* Figure 1.3  restricted x^2, sqrt x, y=x */
+  --fig-1-4:  500px;   /* Figure 1.4  sine not one-to-one (SVG 620×220, wide) */
+  --fig-1-5:  340px;   /* Figure 1.5  restricted sine (SVG 380×260) */
+  --fig-1-6:  200px;   /* Figure 1.6  arcsin right triangle (SVG 300×130) */
+  --fig-1-7:  340px;   /* Figure 1.7  restricted cosine (SVG 380×200) */
+  --fig-1-8:  300px;   /* Figure 1.8  restricted tangent (SVG 320×320) */
+  --fig-1-9:  500px;   /* Figure 1.9  arctan reflection */
+  --fig-1-10: 200px;   /* Figure 1.10 arctan 10 right triangle (SVG 240×180) */
+  --fig-1-11: 100%;    /* Figure 1.11 arctan x right triangle (SVG 240×180) */
+  --fig-1-12: 380px;   /* Figure 1.12 three functions, same limit (triple layout) */
+  --fig-1-13: 380px;   /* Figure 1.13 read-off-the-graph example */
+  --fig-1-14: 340px;   /* Figure 1.14 left/right limits differ */
+  --fig-1-15: 100%;    /* Figure 1.15 piecewise jump */
+  --fig-1-16: 200px;   /* Figure 1.16 1/x^2 vs 1/x */
+  --fig-1-17: 340px;   /* Figure 1.17 four one-sided infinite limits (grid layout) */
+  --fig-1-18: 360px;   /* Figure 1.18 vertical asymptote */
+  --fig-1-19: 400px;   /* Figure 1.19 ln asymptote */
+  --fig-1-20: 380px;   /* Figure 1.20 removable hole */
+  --fig-1-21: 350px;   /* Figure 1.21 floor function */
+  --fig-1-22: 420px;   /* Figure 1.22 squeeze theorem */
+  --fig-1-23: 400px;   /* Figure 1.23 x^2 sin(1/x) squeeze */
+  --fig-1-24: 360px;   /* Figure 1.24 epsilon-delta geometry */
+  --fig-1-25: 100%;    /* Figure 1.25 epsilon-delta dynamic pair */
+}
+</style>
+
+<!-- Google Fonts: Inter for UI -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- New Computer Modern (prose/text faces) — matches MathJax 4 "mathjax-newcm" math font.
+     Source: npm web-computer-modern@1.1.0-new-cm-7-0-2 via jsDelivr. License: GUST Font License.
+     10pt optical size ("Serif 10"). NOTE: filenames contain %20-encoded spaces — keep them. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+
+<!-- MathJax 4 (CHTML output with inline line-breaking) -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    macros: {
+      arccsc: '\\operatorname{arccsc}',
+      arcsec: '\\operatorname{arcsec}',
+      arccot: '\\operatorname{arccot}'
+    }
+  },
+  chtml: {
+    mtextInheritFont: true,
+    matchFontHeight: true
+  },
+  output: {
+    displayOverflow: 'linebreak',
+    linebreaks: {
+      inline: true,
+      width: '100%',
+      lineleading: 0.2
+    }
+  },
+  startup: { typeset: false }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+
+<style>
+/* ============================================================
+   skin-hs.css — inlined + modified: Times New Roman + MathJax
+   ============================================================ */
+.paper {
+  --c-primary: oklch(0.50 0.13 245);
+  --c-caution: oklch(0.50 0.155 25);
+  --c-aux: oklch(0.55 0.01 260);
+  --c-axis: #474b54;
+  --ink: #1b1c1f;
+  --ink-soft: #565a63;
+  --ink-faint: #8a8e98;
+  --paper: #ffffff;
+  --rule: #e5e7eb;
+  --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
+  --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
+  /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
+  --ui: "Inter", -apple-system, system-ui, sans-serif;
+  --a-concept:  oklch(0.50 0.13 55);
+  --a-result:   oklch(0.50 0.13 245);
+  --a-practice: oklch(0.50 0.13 152);
+  --a-aside:    oklch(0.50 0.02 260);
+  --a-caution:  oklch(0.50 0.155 25);
+  --a-strategy: oklch(0.50 0.13 290);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-base, 17.5px);
+  line-height: var(--lh-base, 1.62);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+.paper *, .paper *::before, .paper *::after { box-sizing: border-box; }
+.paper .page { padding: 52px 58px 64px; max-width: 760px; margin: 0 auto; }
+.skin-hs .page { hyphens: auto; -webkit-hyphens: auto; }
+.skin-hs p, .skin-hs li { text-align: justify; text-justify: inter-word; }
+.paper .ragged { text-align: left; }
+.paper p { margin: 0 0 .85em; text-wrap: pretty; }
+.paper em { font-style: italic; }
+.paper .informal { font-style: italic; color: var(--ink-soft); }
+.paper ol { margin: .2em 0 .9em; padding-left: 1.5em; }
+.paper li { margin: .35em 0; text-wrap: pretty; }
+.paper .warmup { counter-reset: wu; list-style: none; padding-left: 0; }
+.paper .warmup > li { counter-increment: wu; position: relative; padding-left: 2.1em; }
+.paper .warmup > li::before {
+  content: "(" counter(wu, lower-alpha) ")";
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
+}
+.paper mjx-container[display="true"] { margin: .55em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
+.paper .qed { display: block; text-align: right; margin: -1.62em 0 0; height: 1.62em; pointer-events: none; }
+.paper .qed::after {
+  content: ""; display: inline-block; width: .56em; height: .56em;
+  border: 1.3px solid var(--ink-soft);
+}
+.paper .env-body > :has(+ .qed) { margin-bottom: 0; display: flow-root; }
+.paper .env-body::after { content: ""; display: block; clear: both; }
+.paper .sec-head {
+  margin-top: 2.7em; padding-top: 1.35em;
+  border-top: 1px solid var(--rule); margin-bottom: 1.5em;
+}
+.sheet-body > .sec-head:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.paper .sec-kicker {
+  font-family: var(--ui); font-size: .7rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--c-primary); font-weight: 700; margin-bottom: .55em;
+}
+.paper .sec-title { font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -.012em; margin: 0; }
+.paper .sec-no { color: var(--c-primary); margin-right: .5em; font-weight: 600; }
+.paper .subsec-head {
+  font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
+  display: flex; align-items: center; gap: .55em; color: var(--ink);
+}
+.paper .page-break-before { break-before: page; page-break-before: always; }
+.paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
+.paper .figure { margin: 1.7em 0; text-align: center; }
+.paper .figure-art { display: flex; justify-content: center; }
+.paper .figure-art--pair { gap: 26px; }
+.paper .fig-svg { width: 100%; max-width: var(--fig-w, var(--fig-w-pair)); height: auto; }
+.paper .figure-art:not(.figure-art--pair) .fig-svg { max-width: var(--fig-w, var(--fig-w-single)); }
+.paper figcaption {
+  font-family: var(--ui); font-size: .8em; line-height: 1.5;
+  color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
+}
+.paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
+.paper figcaption mjx-container { font-size: .95em; }
+.paper .axis { stroke: var(--c-axis); stroke-width: 1.25; fill: none; stroke-linecap: round; }
+.paper .curve { stroke: var(--c-primary); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .dot { fill: var(--ink); }
+.paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
+.paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
+.paper .arrow-bwd { stroke: var(--c-caution); stroke-width: 2; fill: none; }
+.paper .fig-svg text { font-family: var(--ui); font-size: 13px; }
+.paper .axlab { fill: var(--c-aux); font-style: italic; }
+.paper .lab-curve { fill: var(--c-primary); font-style: italic; }
+.paper .lab-ref, .paper .lab-ref-b { fill: var(--c-caution); }
+.paper .ptlab { fill: var(--ink-soft); font-size: 12px; }
+.paper .setlab { fill: var(--ink); font-weight: 600; font-size: 14.5px; text-anchor: middle; }
+
+/* env blocks */
+.skin-hs .env {
+  --accent: var(--a-aside);
+  margin: 1.2em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--accent) 38%, var(--paper));
+}
+.skin-hs .env-definition  { --accent: var(--a-concept); }
+.skin-hs .env-theorem, .skin-hs .env-proposition, .skin-hs .env-corollary { --accent: var(--a-result); }
+.skin-hs .env-example, .skin-hs .env-solution, .skin-hs .env-exercise { --accent: var(--a-practice); }
+.skin-hs .env-remark { --accent: var(--a-aside); }
+.skin-hs .env-head {
+  display: flex; align-items: baseline; gap: .5em; flex-wrap: wrap;
+  margin: 0 0 .55em; font-family: var(--ui);
+}
+.skin-hs .env-kicker {
+  font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--accent); padding: 3px 10px; border-radius: 999px; line-height: 1.5;
+}
+.skin-hs .env-num { font-weight: 700; color: var(--accent); font-size: .94em; }
+.skin-hs .env-name { font-style: italic; font-weight: 400; color: var(--ink-soft); font-family: var(--serif); font-size: 1em; }
+.skin-hs .env-body > p:first-child { margin-top: 0; }
+.skin-hs .env-body > :last-child { margin-bottom: 0; }
+.skin-hs .env-theorem .env-body, .skin-hs .env-proposition .env-body { font-style: italic; }
+.skin-hs .env-theorem .env-body mjx-container, .skin-hs .env-proposition .env-body mjx-container { font-style: normal; }
+.skin-hs .env-definition em { font-style: italic; }
+.skin-hs .env-remark { color: var(--ink-soft); font-size: .97em; }
+.skin-hs .env-remark .env-kicker { background: transparent; color: var(--a-aside); border: 1px solid color-mix(in srgb, var(--a-aside) 45%, var(--paper)); }
+.skin-hs .env-proof { --accent: var(--a-result); }
+.skin-hs .env-proof .env-kicker {
+  background: transparent; color: var(--a-result); font-style: italic; letter-spacing: .04em;
+  border: 1px solid color-mix(in srgb, var(--a-result) 45%, var(--paper));
+}
+.skin-hs .qed-proof::after { border-color: var(--ink); }
+.skin-hs .workedexample {
+  margin: 1.6em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--a-practice) 38%, var(--paper));
+  display: flow-root;
+}
+.skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
+.skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
+.skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
+.skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
+.skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
+.skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
+.skin-hs .env-exercise .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid var(--a-practice); }
+.skin-hs .env-caution, .skin-hs .env-strategy {
+  padding: 15px 20px; border-radius: 8px; margin: 1.4em 0;
+  border-left-width: 4px; border-left-style: solid;
+}
+.skin-hs .env-caution {
+  --accent: var(--a-caution);
+  background: color-mix(in srgb, var(--a-caution) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-caution) 22%, var(--paper));
+  border-left-color: var(--a-caution);
+}
+.skin-hs .env-strategy {
+  --accent: var(--a-strategy);
+  background: color-mix(in srgb, var(--a-strategy) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-strategy) 22%, var(--paper));
+  border-left-color: var(--a-strategy);
+}
+.skin-hs .env-caution .env-name, .skin-hs .env-strategy .env-name { color: var(--ink-soft); }
+.skin-hs .env-strategy .steps { margin-bottom: 0; }
+.skin-hs.vivid .env { border-left-color: color-mix(in srgb, var(--accent) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .workedexample { border-left-color: color-mix(in srgb, var(--a-practice) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .env-kicker { font-size: .64rem; padding: 3.5px 11px; }
+
+/* ============================================================
+   figs.css — inlined + modified for MathJax
+   ============================================================ */
+.paper .fig-svg { height: auto; overflow: visible; }
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple { gap: 28px; flex-wrap: nowrap; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-panel { flex: 0 1 160px; max-width: 160px; min-width: 0; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-svg { width: 100% !important; max-width: 100%; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note mjx-container { font-size: .98em; }
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr { position: relative; width: 100%; height: 100%; font-family: var(--serif); }
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl mjx-container { font-size: 1em; }
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl mjx-container { font-size: .98em; }
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+
+/* ============================================================
+   print.css — inlined (A4 sheet layout + paginator)
+   ============================================================ */
+@page { size: A4; margin: 0; }
+.sheet {
+  position: relative; box-sizing: border-box;
+  width: 210mm; height: 297mm;
+  padding: 20mm 28mm 20mm 32mm;
+  background: #fff; overflow: hidden;
+}
+.sheet-header {
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
+  font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
+}
+.sheet-footer {
+  position: absolute; bottom: 8.5mm; left: 0; right: 0;
+  text-align: center; font: 500 9pt "Inter", sans-serif; color: #82868f;
+}
+.sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
+.sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
+.sheet-body .page { padding: 0; max-width: none; margin: 0; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
+.sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet-body > :first-child { margin-top: 0 !important; }
+.sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
+.sheet-body .qed { margin-top: -1.55em; height: 1.55em; }
+.sheet-body .env-body::after { display: none; content: none; }
+.sheet-body .env-cont { margin-top: 0; }
+.sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+@media screen {
+  body { background: #6f727b; margin: 0; }
+  .sheet { box-shadow: 0 3px 18px rgba(0,0,0,.3); margin: 9mm auto; }
+}
+@media print {
+  body { background: #fff; margin: 0; }
+  .sheet { box-shadow: none; margin: 0; break-after: page; }
+  .sheet:last-child { break-after: auto; }
+  .print-toolbar, #boot { display: none !important; }
+}
+
+/* ============================================================
+   page-level
+   ============================================================ */
+.print-toolbar {
+  position: fixed; top: 14px; right: 16px; z-index: 1000;
+  display: flex; align-items: center; gap: 10px; font-family: "Inter", system-ui, sans-serif;
+}
+.print-toolbar button {
+  font: 600 13px "Inter", sans-serif; color: #fff; background: oklch(0.50 0.13 245);
+  border: 0; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.print-toolbar button:disabled { opacity: .5; cursor: default; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
+.print-toolbar .status {
+  font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
+  padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
+}
+#boot {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
+}
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
+</style>
+</head>
+<body>
+
+<div id="boot">Preparing …</div>
+
+<div class="print-toolbar">
+  <span class="status" id="status">Preparing …</span>
+  <button id="printBtn" disabled>Print / Save as PDF</button>
+</div>
+
+<div id="source"><div class="paper skin-hs vivid"><div class="page" id="page"></div></div></div>
+<div id="pages"></div>
+
+<!-- Section fragments (inlined) -->
+
+<!-- BEGIN-CONTENT-FRAGMENTS -->
+<template id="frag-sec-d-1">
+<!-- Appendix D opener + §D.1 Using the Proof Track.
+     Self-authored 2026-07-06 (no manuscript). Proof-Track appendix established per the full-arc
+     seam skeleton (CONTENT_ROADMAP §"全局 seam ledger", ratified 2026-07-06): §16.1 depth policy
+     fences the heaviest proofs "on credit" to a home; this is that home. First customers: EVT + IVT
+     (Theorem 4.9(a)/(b)), whose proofs §4.4 defers. Design + proofs converged with Codex (read-only,
+     gpt-5.5/xhigh): bundle IVT into Theorem 4.9(a)/(b) [zero renumber]; EVT via Lemma D.1 (LUB) + B-W;
+     IVT via bisection. Namespace "D": Lemma D.1 lives in §D.2 (the appendix mints no new THEOREM
+     numbers — entries are indexed by their home theorem — but appendix-local support lemmas are fine).
+     §D.1 carries the appendix opener (a second <article>), mirroring appA/appB/appC. Hypothesis "table"
+     rendered as structured prose for the two-row first batch (kit table.tbl is nowrap/centred, unfit
+     for prose cells); convert to a styled table once later chapters add rows.
+     Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Appendix D</div>
+    <h1 class="ch-title">The Proof Track</h1>
+  </header>
+
+  <p class="lead">A handful of theorems in the main text are stated, used at once, and then have their proofs deferred &mdash; on credit &mdash; to here. The reason is always the same: the result keeps a chapter moving, but its proof is a self-contained analytic construction that would interrupt the line of thought if inserted where the theorem is used. This appendix is the home for those proofs. Nothing in it introduces a new result the chapters depend on: each entry proves a theorem already stated and numbered where it appeared, and you can read it whenever you want the argument behind a result you have been taking on trust.</p>
+
+  <p class="para-head">How to use this appendix:</p>
+  <ul>
+    <li>find a deferred proof by the number of the theorem it establishes &mdash; entries are indexed by their home theorem, not renumbered;</li>
+    <li>use the hypothesis summary in \(\S\)D.1 to see, at a glance, exactly which assumptions each fenced theorem consumes and what deeper fact it rests on;</li>
+    <li>read an entry only when you want it &mdash; the main text is self-contained on the <em>statements</em>, and later material never leans on the proofs collected here.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">D.1</span>Using the Proof Track</h2>
+  </header>
+
+  <p>The main line of this book proves what it can afford to prove and fences the rest. A <em>fenced</em> theorem is stated in full &mdash; hypotheses, conclusion, and a note on why it holds &mdash; and applied immediately; only its proof is moved here, so that a first reading meets the idea without the machinery. This is a deliberate depth choice rather than an omission: every fenced theorem has a complete proof, and it lives at a fixed address you can always turn to.</p>
+
+  <p>Each fenced theorem carries a short record of the assumptions it actually uses and the deeper facts it leans on. Reading that record tells you exactly what you are trusting when you apply the theorem &mdash; and, just as usefully, what you are <em>not</em> assuming.</p>
+
+  <h3 class="subsec-head">Fenced so far</h3>
+
+  <p><strong>Theorem 4.9(a), the Extreme Value Theorem</strong> &mdash; that a continuous function on a closed interval attains a maximum and a minimum. <em>Uses:</em> continuity, and a <em>closed, bounded</em> interval \([a, b]\); both are essential. <em>Rests on:</em> the completeness of \(\mathbb{R}\) (Theorem 4.1), by way of the least-upper-bound lemma and the Bolzano&ndash;Weierstrass theorem (Theorem 4.4). <em>Proved in</em> \(\S\)D.2.</p>
+
+  <p><strong>Theorem 4.9(b), the Intermediate Value Theorem</strong> &mdash; that a continuous function on \([a, b]\) attains every value between \(f(a)\) and \(f(b)\). <em>Uses:</em> continuity, and an interval domain with no gaps; a jump discontinuity is exactly what would let a value be skipped. <em>Rests on:</em> the completeness of \(\mathbb{R}\) (Theorem 4.1), by repeated bisection. <em>Proved in</em> \(\S\)D.2.</p>
+
+  <p><strong>Theorem 5.5, L’Hôpital’s Rule</strong> &mdash; that an indeterminate quotient \(f/g\) of type \(\tfrac{0}{0}\) or \(\tfrac{\ast}{\infty}\) has the same limit as \(f'/g'\), when that limit exists. <em>Uses:</em> differentiability near the point, \(g' \ne 0\) there, and a genuinely indeterminate form. <em>Rests on:</em> the Generalized Mean Value Theorem (Theorem 5.4). The \(\tfrac{0}{0}\) case at a finite point is proved in \(\S\)5.7; the \(\tfrac{\ast}{\infty}\) and infinite-point cases are <em>proved in</em> \(\S\)D.3.</p>
+
+  <p>This record will lengthen as later chapters fence their own heaviest results &mdash; the characterisation of which functions are integrable, the symmetry of mixed partial derivatives, the general change-of-variables formula, and the integral theorems of vector calculus among them. Each will arrive with its hypotheses named here, so that the cost of trusting it is always in plain view.</p>
+</article>
+</template>
+
+<template id="frag-sec-d-2">
+<!-- §D.2 The Existence Theorems for Continuous Functions.
+     Self-authored 2026-07-06 (no manuscript). Proofs of Theorem 4.9(a) EVT and 4.9(b) IVT, fenced
+     from §4.4. Both rest on completeness (Theorem 4.1); EVT also on Bolzano-Weierstrass (Theorem 4.4).
+     Lemma D.1 (LUB from Theorem 4.1) is appendix-local proof scaffolding (Codex-recommended so that
+     the EVT attainment step does not invoke sup naked). Proof approaches converged with Codex
+     (read-only): EVT boundedness by contradiction via B-W, attainment via M=sup + B-W squeeze;
+     IVT by bisection with the exact half-selection rule. Namespace "D": Lemma D.1. No new Theorem
+     numbers minted (the theorems live in §4.4). Math: standard analysis proofs, Codex-verified.
+     Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">D.2</span>The Existence Theorems for Continuous Functions</h2>
+  </header>
+
+  <p>Section 4.4 stated the two foundational theorems about a continuous function on a closed interval &mdash; that it attains its extreme values (Theorem 4.9(a), the Extreme Value Theorem) and that it takes every value in between (Theorem 4.9(b), the Intermediate Value Theorem) &mdash; and deferred both proofs to here. Each rests on the completeness of \(\mathbb{R}\) (Theorem 4.1): the statement that every non-decreasing sequence bounded above converges (and its mirror for non-increasing sequences bounded below). The Extreme Value Theorem needs one further consequence of completeness, which we isolate first, because we invoke it by name and it recurs.</p>
+
+  <h3 class="subsec-head">The least upper bound</h3>
+
+  <p>An <em>upper bound</em> of a set \(S \subseteq \mathbb{R}\) is a number that is \(\ge\) every element of \(S\). Completeness guarantees that a set bounded above has a <em>smallest</em> upper bound.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Lemma</span><span class="env-num">D.1</span><span class="env-name">Least upper bound</span></p>
+    <div class="env-body">
+      <p>Every nonempty set \(S \subseteq \mathbb{R}\) that is bounded above has a <em>least upper bound</em> \(M = \sup S\): a number \(M\) that is an upper bound of \(S\) and satisfies \(M \le B\) for every upper bound \(B\) of \(S\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Since \(S\) is nonempty, fix a point \(s_{0} \in S\); since \(S\) is bounded above, fix an upper bound \(B\). Set \(a_{0} = s_{0} - 1\) and \(b_{0} = B\). Then \(a_{0}\) is <em>not</em> an upper bound of \(S\) &mdash; the element \(s_{0}\) exceeds it &mdash; while \(b_{0}\) is; and \(a_{0} < b_{0}\), since \(s_{0} \le B\). We halve this interval repeatedly, preserving that contrast.</p>
+      <p>Given \([a_{n}, b_{n}]\) with \(a_{n}\) not an upper bound of \(S\) and \(b_{n}\) an upper bound, let \(m_{n} = \tfrac{1}{2}(a_{n} + b_{n})\). If \(m_{n}\) is an upper bound of \(S\), set \(a_{n+1} = a_{n}\) and \(b_{n+1} = m_{n}\); otherwise set \(a_{n+1} = m_{n}\) and \(b_{n+1} = b_{n}\). In either case \(a_{n+1}\) is still not an upper bound, \(b_{n+1}\) still is, and</p>
+      <p>\[ b_{n+1} - a_{n+1} = \tfrac{1}{2}(b_{n} - a_{n}), \qquad \text{so} \qquad b_{n} - a_{n} = \frac{b_{0} - a_{0}}{2^{n}} \to 0. \]</p>
+      <p>The sequence \(\{a_{n}\}\) is non-decreasing and bounded above (by \(b_{0}\)), so by Theorem 4.1 it converges to some \(M\). Because \(b_{n} - a_{n} \to 0\), the sequence \(\{b_{n}\}\) converges to the same \(M\). We claim \(M = \sup S\).</p>
+      <p><em>\(M\) is an upper bound.</em> For any \(s \in S\) and any \(n\), \(s \le b_{n}\) because \(b_{n}\) is an upper bound; letting \(n \to \infty\) gives \(s \le M\).</p>
+      <p><em>\(M\) is the least one.</em> Suppose some \(M' < M\) were also an upper bound. Since \(a_{n} \to M\), there is an \(n\) with \(a_{n} > M'\). But \(a_{n}\) is not an upper bound, so some \(s \in S\) has \(s > a_{n} > M'\), contradicting that \(M'\) bounds \(S\). Hence no upper bound is smaller than \(M\), and \(M = \sup S\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The mirror statement &mdash; a nonempty set bounded below has a <em>greatest lower bound</em> \(\inf S\) &mdash; follows by applying the lemma to \(\{-s : s \in S\}\).</p>
+
+  <h3 class="subsec-head">The Extreme Value Theorem</h3>
+
+  <p>Recall the statement: if \(f\) is continuous on a closed interval \([a, b]\), then \(f\) attains a maximum and a minimum on \([a, b]\). The proof runs in two stages &mdash; first that the values are bounded, then that the least upper bound is actually reached &mdash; and both stages extract a convergent subsequence with the Bolzano&ndash;Weierstrass theorem (Theorem 4.4).</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof of Theorem 4.9(a)</span></p>
+    <div class="env-body">
+      <p>We show \(f\) attains a maximum; the minimum then follows by applying the result to \(-f\).</p>
+      <p><strong>The values are bounded above.</strong> Suppose not. Then for each \(n \in \mathbb{N}\) there is a point \(x_{n} \in [a, b]\) with \(f(x_{n}) > n\). The sequence \(\{x_{n}\}\) lies in \([a, b]\), so it is bounded, and by the Bolzano&ndash;Weierstrass theorem (Theorem 4.4) some subsequence \(x_{n_{k}}\) converges to a point \(\xi\). Since \(a \le x_{n_{k}} \le b\) for every \(k\), the limit satisfies \(\xi \in [a, b]\), so \(f\) is defined and continuous there; continuity gives \(f(x_{n_{k}}) \to f(\xi)\), a finite real number. But \(f(x_{n_{k}}) > n_{k} \to \infty\), so the values cannot approach a finite limit &mdash; a contradiction. Hence \(f\) is bounded above on \([a, b]\).</p>
+      <p><strong>The bound is attained.</strong> The set of values \(f([a, b]) = \{\, f(x) : x \in [a, b] \,\}\) is nonempty and bounded above, so by Lemma D.1 it has a least upper bound \(M = \sup f([a, b])\). For each \(n\), the number \(M - \tfrac{1}{n}\) is smaller than \(M\), hence not an upper bound of the values, so there is a point \(x_{n} \in [a, b]\) with</p>
+      <p>\[ M - \tfrac{1}{n} < f(x_{n}) \le M. \]</p>
+      <p>By Bolzano&ndash;Weierstrass again, some subsequence \(x_{n_{k}} \to x_{M} \in [a, b]\). Continuity gives \(f(x_{n_{k}}) \to f(x_{M})\); but the displayed inequality forces \(f(x_{n_{k}}) \to M\) as \(k \to \infty\), since \(M - \tfrac{1}{n_{k}}\) and \(M\) both tend to \(M\). A sequence has only one limit, so \(f(x_{M}) = M\). Thus \(f\) attains its maximum value \(M\) at the point \(x_{M}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The Intermediate Value Theorem</h3>
+
+  <p>Recall the statement: if \(f\) is continuous on \([a, b]\) and \(y\) lies between \(f(a)\) and \(f(b)\), then \(f(c) = y\) for some \(c \in [a, b]\). Here completeness enters through bisection: we trap the crossing inside a shrinking interval whose endpoints keep \(y\) bracketed, and the shared limit of those endpoints is the point we want.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof of Theorem 4.9(b)</span></p>
+    <div class="env-body">
+      <p>If \(y\) equals \(f(a)\) or \(f(b)\) there is nothing to prove, so suppose it lies strictly between them. Relabel so that \(f(a) < y < f(b)\); the opposite case \(f(a) > y > f(b)\) reduces to this one by applying what follows to \(-f\) and \(-y\).</p>
+      <p>We keep \(y\) bracketed by the two endpoints, maintaining \(f(a_{n}) \le y \le f(b_{n})\) throughout. Start with \(a_{0} = a\) and \(b_{0} = b\), where \(f(a_{0}) < y < f(b_{0})\). Given \([a_{n}, b_{n}]\) with \(f(a_{n}) \le y \le f(b_{n})\), let \(m_{n} = \tfrac{1}{2}(a_{n} + b_{n})\) and compare \(f(m_{n})\) with \(y\):</p>
+      <ul>
+        <li>if \(f(m_{n}) = y\), the point \(c = m_{n}\) already satisfies the conclusion, and we stop;</li>
+        <li>if \(f(m_{n}) < y\), set \(a_{n+1} = m_{n}\) and \(b_{n+1} = b_{n}\);</li>
+        <li>if \(f(m_{n}) > y\), set \(a_{n+1} = a_{n}\) and \(b_{n+1} = m_{n}\).</li>
+      </ul>
+      <p>Each continuing case preserves \(f(a_{n+1}) \le y \le f(b_{n+1})\) and halves the interval, so \(b_{n} - a_{n} = (b - a)/2^{n} \to 0\). If the process ever stops we are done. Otherwise it produces a non-decreasing \(\{a_{n}\}\) and a non-increasing \(\{b_{n}\}\), both confined to \([a, b]\); by Theorem 4.1 each converges, and since their gap shrinks to \(0\) they share a single limit \(c \in [a, b]\).</p>
+      <p>Continuity gives \(f(a_{n}) \to f(c)\) and \(f(b_{n}) \to f(c)\). Passing to the limit in the standing inequality \(f(a_{n}) \le y \le f(b_{n})\) yields</p>
+      <p>\[ f(c) \le y \le f(c), \]</p>
+      <p>so \(f(c) = y\), as required. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+</article>
+</template>
+
+<template id="frag-sec-d-3">
+<!-- §D.3 L'Hopital's Rule: the remaining cases.
+     Self-authored 2026-07-06 (no manuscript). Proof of the fenced cases of Theorem 5.5 (L'Hopital),
+     deferred from §5.7: the */infinity form and the cases a = +/-infinity. The 0/0 finite case is
+     proved IN §5.7 via the Generalized Mean Value Theorem (Theorem 5.4). This is Appendix D's second
+     customer. Proof approach: the standard f(x)/g(x) = f(d)/g(x) + (f'(xi)/g'(xi))(1 - g(d)/g(x))
+     manipulation (Generalized MVT on [x,d]), then g(x) -> infinity kills the correction terms.
+     No new Theorem numbers minted (entry indexed by home Theorem 5.5). Math: standard analysis, Codex-verified.
+     Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html; PLAN-ch05.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">D.3</span>L’Hôpital’s Rule: the Remaining Cases</h2>
+  </header>
+
+  <p>Section 5.7 proved L’Hôpital’s rule (Theorem 5.5) for the form \(\tfrac{0}{0}\) at a finite point, where the trick was to <em>define</em> \(f(a) = g(a) = 0\) and read the ratio off the Generalized Mean Value Theorem. That trick is unavailable when the functions grow without bound, and the argument must instead control an error term by hand. Here we prove the \(\tfrac{\ast}{\infty}\) form, and then reduce the infinite-point cases to the corresponding finite-point cases.</p>
+
+  <h3 class="subsec-head">The \(\tfrac{\ast}{\infty}\) form at a finite point</h3>
+
+  <p>We prove the representative case: \(x \to a^{+}\) at a finite \(a\), with \(g(x) \to +\infty\) and a finite limit \(L = \lim_{x \to a^{+}} f'(x)/g'(x)\). The left-hand version is identical, the case \(g \to -\infty\) follows by replacing \(g\) with \(-g\), and \(L = \pm\infty\) is a routine variant noted at the end.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof of Theorem 5.5 (\(\tfrac{\ast}{\infty}\) case)</span></p>
+    <div class="env-body">
+      <p>Let \(\varepsilon > 0\). Since \(f'(x)/g'(x) \to L\) as \(x \to a^{+}\), choose a point \(d\) to the right of \(a\) such that</p>
+      <p>\[ \left\lvert \frac{f'(t)}{g'(t)} - L \right\rvert < \varepsilon \qquad \text{for all } t \in (a, d). \]</p>
+      <p>Fix any \(x \in (a, d)\). On the interval \([x, d]\) the Generalized Mean Value Theorem (Theorem 5.4) supplies a point \(\xi \in (x, d)\) with</p>
+      <p>\[ \frac{f(x) - f(d)}{g(x) - g(d)} = \frac{f'(\xi)}{g'(\xi)}, \]</p>
+      <p>and since \(\xi \in (a, d)\), the right side lies within \(\varepsilon\) of \(L\). Now split \(f(x)/g(x)\) so this ratio appears:</p>
+      <p>\[ \frac{f(x)}{g(x)} = \frac{f(d)}{g(x)} + \frac{f(x) - f(d)}{g(x)} = \frac{f(d)}{g(x)} + \frac{f'(\xi)}{g'(\xi)}\left(1 - \frac{g(d)}{g(x)}\right), \]</p>
+      <p>where the last step multiplied and divided by \(g(x) - g(d)\). Write \(f'(\xi)/g'(\xi) = L + \eta\) with \(\lvert \eta \rvert < \varepsilon\). Subtracting \(L\) and grouping,</p>
+      <p>\[ \frac{f(x)}{g(x)} - L = \frac{f(d)}{g(x)} - L\,\frac{g(d)}{g(x)} + \eta\left(1 - \frac{g(d)}{g(x)}\right). \]</p>
+      <p>The point \(d\) is now fixed, while \(g(x) \to +\infty\) as \(x \to a^{+}\). Hence the first two terms tend to \(0\), and \(g(d)/g(x) \to 0\), so \(\lvert 1 - g(d)/g(x) \rvert \to 1\). Taking the limit superior of the absolute value,</p>
+      <p>\[ \limsup_{x \to a^{+}} \left\lvert \frac{f(x)}{g(x)} - L \right\rvert \le 0 + 0 + \varepsilon \cdot 1 = \varepsilon. \]</p>
+      <p>Since \(\varepsilon > 0\) was arbitrary, the limit superior is \(0\), which is to say \(\lim_{x \to a^{+}} f(x)/g(x) = L\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p class="informal">Only \(g(x) \to \infty\) was used, never \(f(x) \to \infty\): the rule holds in the form \(\tfrac{\ast}{\infty}\), whatever the numerator does. This is why Theorem 5.5 states the second hypothesis as a condition on \(g\) alone.</p>
+
+  <h3 class="subsec-head">The remaining reductions</h3>
+
+  <ul>
+    <li><strong>\(L = \pm\infty\).</strong> The same splitting works with the bound “within \(\varepsilon\) of \(L\)” replaced by “eventually larger than any fixed \(M\)”: if \(f'/g' \to +\infty\), then for \(x\) near \(a\) the ratio \((f(x)-f(d))/(g(x)-g(d))\) exceeds any \(M\), and the correction terms, tending to \(0\) and \(1\), leave \(f(x)/g(x) \to +\infty\).</li>
+    <li><strong>\(a = \pm\infty\).</strong> Substitute \(x = 1/t\), so \(x \to +\infty\) becomes \(t \to 0^{+}\). Writing \(F(t) = f(1/t)\) and \(G(t) = g(1/t)\), the chain rule gives \(F'(t)/G'(t) = f'(1/t)/g'(1/t)\) — the \(-1/t^{2}\) factors cancel — so the hypothesis on \(f'/g'\) at \(\infty\) becomes the same hypothesis on \(F'/G'\) at \(0^{+}\). The reduction then follows the form: if the original limit is \(\tfrac{0}{0}\), then \(F, G \to 0\) and the finite-point \(\tfrac{0}{0}\) proof of §5.7 applies to \(F/G\) at \(0^{+}\); if it is \(\tfrac{\ast}{\infty}\), then \(G \to \pm\infty\) and the finite-point \(\tfrac{\ast}{\infty}\) proof above applies. The case \(a = -\infty\) uses \(x = -1/t\).</li>
+  </ul>
+
+  <p>With these, Theorem 5.5 holds in full generality: the \(\tfrac{0}{0}\) case from §5.7 and the \(\tfrac{\ast}{\infty}\) and infinite-point cases here, at a finite endpoint or at \(\pm\infty\).</p>
+
+</article>
+</template>
+<!-- END-CONTENT-FRAGMENTS -->
+<!-- plot.js — inlined -->
+<script>
+(function () {
+  var uid = 0;
+  var PI = Math.PI;
+  function piTex(v) {
+    var map = {};
+    map[(-2 * PI).toFixed(4)] = "-2\\pi";
+    map[(-PI).toFixed(4)] = "-\\pi";
+    map[(-PI / 2).toFixed(4)] = "-\\tfrac{\\pi}{2}";
+    map[(PI / 2).toFixed(4)] = "\\tfrac{\\pi}{2}";
+    map[PI.toFixed(4)] = "\\pi";
+    map[(2 * PI).toFixed(4)] = "2\\pi";
+    map[(0).toFixed(4)] = "0";
+    var hit = map[v.toFixed(4)];
+    if (hit != null) return hit;
+    if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v)); // plain integers
+    return undefined;
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function anchorTransform(anchor, vAnchor) {
+    var tx = anchor === "start" ? "0" : anchor === "end" ? "-100%" : "-50%";
+    var ty = vAnchor === "top" ? "0" : vAnchor === "bottom" ? "-100%" : "-50%";
+    return "translate(" + tx + "," + ty + ")";
+  }
+  function buildPlot(cfg) {
+    var w = cfg.w, h = cfg.h;
+    var pad = Object.assign({ t: 16, r: 18, b: 20, l: 22 }, cfg.pad || {});
+    var xmin = cfg.xmin, xmax = cfg.xmax, ymin = cfg.ymin, ymax = cfg.ymax;
+    var iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    var SX = function(x) { return pad.l + ((x - xmin) / (xmax - xmin)) * iw; };
+    var SY = function(y) { return h - pad.b - ((y - ymin) / (ymax - ymin)) * ih; };
+    var id = "pl" + (++uid);
+    var parts = [], labels = [];
+    function pushLabel(o) { labels.push(o); }
+    parts.push('<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:' + w + 'px" class="fig-svg" role="img" aria-label="' + esc(cfg.aria || "graph") + '" preserveAspectRatio="xMidYMid meet">');
+    parts.push('<defs><marker id="' + id + 'a" markerWidth="8" markerHeight="8" refX="5.4" refY="2.8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5.4,2.8 L0,5.6" fill="none" stroke="var(--c-axis)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>');
+    if (cfg.axes !== false) {
+      var x0 = Math.min(Math.max(0, xmin), xmax), y0 = Math.min(Math.max(0, ymin), ymax);
+      var ax0 = SX(xmin), ax1 = SX(xmax), ayBase = SY(y0);
+      parts.push('<path d="M' + ax0.toFixed(1) + ',' + ayBase.toFixed(1) + ' H' + (ax1 - 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      var ay0 = SY(ymin), ay1 = SY(ymax), axBase = SX(x0);
+      parts.push('<path d="M' + axBase.toFixed(1) + ',' + ay0.toFixed(1) + ' V' + (ay1 + 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      if (cfg.xlabel) pushLabel({ px: ax1 + 1, py: ayBase + 4, tex: cfg.xlabel, anchor: "start", vAnchor: "top", cls: "a-ax", size: 13 });
+      if (cfg.ylabel) pushLabel({ px: axBase - 5, py: ay1 + 1, tex: cfg.ylabel, anchor: "end", vAnchor: "top", cls: "a-ax", size: 13 });
+      (cfg.xticks || []).forEach(function(t) {
+        var px = SX(t.x);
+        parts.push('<line x1="' + px.toFixed(1) + '" y1="' + (ayBase - 3).toFixed(1) + '" x2="' + px.toFixed(1) + '" y2="' + (ayBase + 3).toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.x));
+        if (tex != null) pushLabel({ px: px, py: ayBase + 6, tex: tex, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: px, py: ayBase + 6, text: t.label, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+      });
+      (cfg.yticks || []).forEach(function(t) {
+        var py = SY(t.y);
+        parts.push('<line x1="' + (axBase - 3).toFixed(1) + '" y1="' + py.toFixed(1) + '" x2="' + (axBase + 3).toFixed(1) + '" y2="' + py.toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.y));
+        if (tex != null) pushLabel({ px: axBase - 6, py: py, tex: tex, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: axBase - 6, py: py, text: t.label, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+      });
+    }
+    (cfg.items || []).forEach(function(it) {
+      if (it.type === "curve") {
+        var cls = it.cls || "curve", n = it.samples || 240, a = it.domain[0], b = it.domain[1];
+        var d = "", pen = false;
+        for (var i = 0; i <= n; i++) {
+          var x = a + (b - a) * (i / n), y = it.fn(x);
+          if (!isFinite(y) || y < ymin - (ymax - ymin) * 0.04 || y > ymax + (ymax - ymin) * 0.04) { pen = false; continue; }
+          var px = SX(x).toFixed(2), py = SY(y).toFixed(2);
+          d += (pen ? "L" : "M") + px + "," + py + " "; pen = true;
+        }
+        if (d) parts.push('<path d="' + d.trim() + '" class="' + cls + '"/>');
+      } else if (it.type === "vline") {
+        parts.push('<line x1="' + SX(it.x).toFixed(1) + '" y1="' + SY(ymin).toFixed(1) + '" x2="' + SX(it.x).toFixed(1) + '" y2="' + SY(ymax).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "hline") {
+        var ha = it.from != null ? it.from : xmin, hb = it.to != null ? it.to : xmax;
+        parts.push('<line x1="' + SX(ha).toFixed(1) + '" y1="' + SY(it.y).toFixed(1) + '" x2="' + SX(hb).toFixed(1) + '" y2="' + SY(it.y).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "seg") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="' + (it.cls || "curve") + '"/>');
+      } else if (it.type === "dot") {
+        var r = it.r || 3.0;
+        if (it.hollow) parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/>');
+        else parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" class="dot"/>');
+      } else if (it.type === "arrow") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      } else if (it.type === "text") {
+        pushLabel({ px: SX(it.x), py: SY(it.y), tex: it.tex, text: it.tex == null ? it.text : null, anchor: it.anchor || "middle", vAnchor: it.vAnchor || "middle", dx: it.dx || 0, dy: it.dy || 0, cls: it.cls || "a-pt", size: it.size });
+      }
+    });
+    if (labels.length) {
+      var M = 52;
+      var spans = labels.map(function(L) {
+        var left = (L.px + (L.dx || 0) + M).toFixed(1);
+        var top = (L.py + (L.dy || 0) + M).toFixed(1);
+        var tf = anchorTransform(L.anchor, L.vAnchor);
+        var fs = L.size ? "font-size:" + L.size + "px;" : "";
+        var body = L.tex != null ? "\\(" + L.tex + "\\)" : esc(L.text == null ? "" : L.text);
+        return '<span class="fig-lbl ' + (L.cls || "") + '" style="left:' + left + 'px;top:' + top + 'px;transform:' + tf + ';' + fs + '">' + body + '</span>';
+      }).join("");
+      parts.push('<foreignObject x="' + (-M) + '" y="' + (-M) + '" width="' + (w + 2 * M) + '" height="' + (h + 2 * M) + '" class="fig-fo" requiredExtensions="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml" class="fig-lyr">' + spans + '</div></foreignObject>');
+    }
+    parts.push('</svg>');
+    return parts.join("");
+  }
+  window.buildPlot = buildPlot;
+  window.PIVAL = PI;
+})();
+</script>
+
+<!-- ============================================================
+     figures.js — inlined (Chapter 1 figure registry)
+     ============================================================ -->
+<script>
+/* ============================================================
+   figures.js — Chapter 1 figure registry.
+   Each entry returns { layout, panels:[{svg, note}] } (note may
+   carry \( \) math, rendered by the page's MathJax pass afterward).
+   In-figure labels also carry TeX via { type:"text", tex:"…" } and
+   are typeset by the same MathJax pass — so every glyph in the graphs
+   matches the body equations (Computer Modern).
+   hydrateFigures(root) fills every <figure data-fig="id"> before
+   its <figcaption>.
+   ============================================================ */
+(function () {
+  const P = () => window.PIVAL;
+  const pow2 = (x) => Math.pow(2, x);
+
+  const FIGS = {
+    /* ---------------- Appendix A §A.5 — conic sections (self-authored 2026-07-04) ---------------- */
+    "conic-circle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 250, h: 250, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -2.8, xmax: 2.8, ymin: -2.8, ymax: 2.8,
+          xlabel: "x", ylabel: "y", aria: "A circle of radius r centred at the origin, with one radius drawn to the rim.",
+          items: [
+            { type: "curve", fn: (x) => Math.sqrt(Math.max(0, 4 - x * x)), domain: [-2, 2], samples: 320, cls: "curve" },
+            { type: "curve", fn: (x) => -Math.sqrt(Math.max(0, 4 - x * x)), domain: [-2, 2], samples: 320, cls: "curve" },
+            { type: "seg", x1: 0, y1: 0, x2: 1.414, y2: 1.414, cls: "refline" },
+            { type: "dot", x: 0, y: 0 },
+            { type: "text", x: 0.58, y: 0.86, tex: "r", cls: "a-ref", anchor: "end" },
+            { type: "text", x: -0.12, y: -0.12, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+          ],
+        }),
+        note: "A circle: every point lies a fixed distance \\(r\\) from the centre \\(O\\).",
+      }],
+    }),
+    "conic-parabola": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 270, h: 240, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -3.7, xmax: 3.7, ymin: -1.6, ymax: 4.8,
+          xlabel: "x", ylabel: "y", aria: "An upward parabola with its focus above the vertex and its directrix a dashed line below.",
+          items: [
+            { type: "curve", fn: (x) => x * x / 4, domain: [-3.7, 3.7], samples: 220, cls: "curve" },
+            { type: "hline", y: -1, from: -3.4, to: 3.4, cls: "refline" },
+            { type: "dot", x: 0, y: 1 },
+            { type: "text", x: 0.16, y: 1.08, tex: "F=(0,p)", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 3.4, y: -1, tex: "y=-p", cls: "a-ref", anchor: "end", vAnchor: "top", dy: 3 },
+            { type: "text", x: -0.14, y: 0.02, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+          ],
+        }),
+        note: "A parabola \\(x^2=4py\\): every point is equidistant from the focus \\(F\\) and the directrix \\(y=-p\\).",
+      }],
+    }),
+    "conic-ellipse": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -3.7, xmax: 3.7, ymin: -2.8, ymax: 2.8,
+          xlabel: "x", ylabel: "y", aria: "An ellipse wider than it is tall, with two foci on the horizontal axis.",
+          items: [
+            { type: "curve", fn: (x) => 2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+            { type: "curve", fn: (x) => -2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+            { type: "dot", x: 2.236, y: 0 },
+            { type: "dot", x: -2.236, y: 0 },
+            { type: "dot", x: 0, y: 0 },
+            { type: "text", x: 2.236, y: -0.12, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: -2.236, y: -0.12, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: 3.02, y: 0.12, tex: "(a,0)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+            { type: "text", x: 0.18, y: 2.05, tex: "(0,b)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+          ],
+        }),
+        note: "An ellipse \\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1\\) with \\(a>b\\): the distances to the two foci \\(F_1,F_2\\) sum to a constant.",
+      }],
+    }),
+    "conic-hyperbola": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -5.2, xmax: 5.2, ymin: -4, ymax: 4,
+          xlabel: "x", ylabel: "y", aria: "A hyperbola with two branches opening left and right, hugging two dashed asymptotes.",
+          items: [
+            { type: "seg", x1: -5, y1: -3.75, x2: 5, y2: 3.75, cls: "refline" },
+            { type: "seg", x1: -5, y1: 3.75, x2: 5, y2: -3.75, cls: "refline" },
+            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [-5.2, -2], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [-5.2, -2], samples: 200, cls: "curve" },
+            { type: "dot", x: 2.5, y: 0 },
+            { type: "dot", x: -2.5, y: 0 },
+            { type: "dot", x: 2, y: 0, hollow: true },
+            { type: "dot", x: -2, y: 0, hollow: true },
+            { type: "dot", x: 0, y: 0 },
+            { type: "text", x: 2.5, y: -0.16, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: -2.5, y: -0.16, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: 2, y: 0.18, tex: "(a,0)", cls: "a-pt", anchor: "middle", vAnchor: "bottom" },
+            { type: "text", x: 4.9, y: 3.68, tex: "y=\\tfrac{b}{a}x", cls: "a-ref", anchor: "end", vAnchor: "bottom" },
+            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+          ],
+        }),
+        note: "A hyperbola \\(\\frac{x^2}{a^2}-\\frac{y^2}{b^2}=1\\): two branches with vertices at \\((\\pm a,0)\\), approaching the asymptotes \\(y=\\pm\\frac{b}{a}x\\).",
+      }],
+    }),
+
+    /* ---------------- §1.1 ---------------- */
+    "hlt": () => ({
+      layout: "pair",
+      panels: [
+        {
+          svg: buildPlot({
+            w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3,
+            xlabel: "x", ylabel: "y", aria: "A one-to-one line crossed once by a horizontal line.",
+            items: [
+              { type: "curve", fn: (x) => x, domain: [-1.5, 1.45], cls: "curve" },
+              { type: "hline", y: 1, from: -2.1, to: 1.3, cls: "refline" },
+              { type: "dot", x: 1, y: 1 },
+              { type: "text", x: 1.55, y: 1.62, tex: "f", cls: "a-curve" },
+              { type: "text", x: 1.42, y: 1.0, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -2 },
+              { type: "text", x: 1.06, y: 0.46, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "start" },
+            ],
+          }),
+          note: "One-to-one \u2014 a line meets the graph at most once.",
+        },
+        {
+          svg: buildPlot({
+            w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3,
+            xlabel: "x", ylabel: "y", aria: "A parabola crossed twice by a horizontal line.",
+            items: [
+              { type: "curve", fn: (x) => 1.15 * x * x, domain: [-1.4, 1.4], cls: "curve" },
+              { type: "hline", y: 1.25, from: -1.85, to: 1.85, cls: "refline" },
+              { type: "dot", x: -1.043, y: 1.25 },
+              { type: "dot", x: 1.043, y: 1.25 },
+              { type: "text", x: 1.5, y: 2.18, tex: "f", cls: "a-curve" },
+              { type: "text", x: 1.9, y: 1.25, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 },
+              { type: "text", x: -1.2, y: 0.98, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "end" },
+              { type: "text", x: 1.2, y: 0.98, tex: "(x_2,\\,c)", cls: "a-pt", anchor: "start" },
+            ],
+          }),
+          note: "Not one-to-one \u2014 a line meets the graph more than once.",
+        },
+      ],
+    }),
+
+    "restrict-x2": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 300, h: 300, xmin: -0.4, xmax: 2.7, ymin: -0.4, ymax: 2.7,
+          xlabel: "x", ylabel: "y",
+          aria: "The squaring function restricted to the nonnegative reals, its inverse square root, and the mirror line y equals x.",
+          items: [
+            { type: "curve", fn: (x) => x, domain: [0, 2.5], cls: "refline" },
+            { type: "curve", fn: (x) => x * x, domain: [0, 1.6], cls: "curve" },
+            { type: "curve", fn: (x) => Math.sqrt(x), domain: [0, 2.5], cls: "curve" },
+            { type: "text", x: 1.02, y: 2.25, tex: "f(x)=x^{2}", cls: "a-curve", anchor: "end" },
+            { type: "text", x: 2.5, y: 1.5, tex: "f^{-1}(x)=\\sqrt{x}", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 2.32, y: 2.5, tex: "y=x", cls: "a-ref", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.2 ---------------- */
+    "sine-not-1to1": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 620, h: 220, xmin: -6.9, xmax: 7.4, ymin: -1.35, ymax: 1.35,
+          pad: { t: 16, r: 18, b: 26, l: 18 },
+          xlabel: "x", ylabel: "y", aria: "The sine function on the real line is not one-to-one.",
+          xticks: [{ x: -2 * P() }, { x: -P() }, { x: P() }, { x: 2 * P() }],
+          yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.sin(x), domain: [-6.8, 6.8], samples: 360, cls: "curve" },
+            { type: "hline", y: 0.5, from: -6.8, to: 6.8, cls: "refline" },
+            ...[0.5236, 2.618, 6.807, -3.6652, -5.7596].map((x) => ({ type: "dot", x, y: 0.5, r: 2.6 })),
+            { type: "text", x: 3.25, y: 1.0, tex: "\\sin x", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 6.95, y: 0.5, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 },
+          ],
+        }),
+      }],
+    }),
+    "restricted-sine": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 380, h: 260, xmin: -1.95, xmax: 1.95, ymin: -1.25, ymax: 1.25,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of sine.",
+          xticks: [{ x: -P() / 2 }, { x: P() / 2 }], yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.sin(x), domain: [-P() / 2, P() / 2], cls: "curve" },
+            { type: "text", x: 1.02, y: 1.12, tex: "\\sin x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "restricted-cosine": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 380, h: 200, xmin: -0.4, xmax: 3.6, ymin: -1.35, ymax: 1.75,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of cosine.",
+          xticks: [{ x: P() }], yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.cos(x), domain: [0, P()], cls: "curve" },
+            { type: "text", x: 1.25, y: 0.8, tex: "\\cos x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "restricted-tangent": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 320, h: 320, xmin: -1.95, xmax: 1.95, ymin: -5, ymax: 5,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of tangent.",
+          xticks: [{ x: -P() / 2 }, { x: P() / 2 }],
+          items: [
+            { type: "vline", x: -P() / 2, cls: "refline" },
+            { type: "vline", x: P() / 2, cls: "refline" },
+            { type: "curve", fn: (x) => Math.tan(x), domain: [-1.37, 1.37], samples: 300, cls: "curve" },
+            { type: "text", x: 0.35, y: 2.8, tex: "\\tan x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "arcsin-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 300, h: 130, xmin: -0.3, xmax: 3.5, ymin: -0.35, ymax: 1.45, axes: false,
+          aria: "Right triangle with angle theta, opposite 1, adjacent 2 root 2, hypotenuse 3.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 3, y2: 0, cls: "curve" },
+            { type: "seg", x1: 3, y1: 0, x2: 3, y2: 1, cls: "curve" },
+            { type: "seg", x1: 3, y1: 1, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2.78, y1: 0, x2: 2.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 2.78, y1: 0.22, x2: 3, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.66, y: 0.13, tex: "\\theta", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1.5, y: 0, tex: "2\\sqrt{2}", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 3, y: 0.5, tex: "1", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 1.25, y: 0.62, tex: "3", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+    "arctan10-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 240, h: 180, xmin: -0.3, xmax: 2.8, ymin: -0.35, ymax: 2.0, axes: false,
+          aria: "Right triangle with angle theta, adjacent 1, opposite 10, hypotenuse square root of 101.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 2, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2, y1: 0, x2: 2, y2: 1.5, cls: "curve" },
+            { type: "seg", x1: 2, y1: 1.5, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 1.78, y1: 0, x2: 1.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 1.78, y1: 0.22, x2: 2, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.46, y: 0.18, tex: "\\theta", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1, y: 0, tex: "1", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 2, y: 0.75, tex: "10", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 0.8, y: 0.9, tex: "\\sqrt{101}", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+    "arctan-general-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 240, h: 180, xmin: -0.3, xmax: 2.8, ymin: -0.35, ymax: 2.0, axes: false,
+          aria: "Right triangle with angle y, adjacent 1, opposite x, hypotenuse square root of 1 plus x squared.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 2, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2, y1: 0, x2: 2, y2: 1.5, cls: "curve" },
+            { type: "seg", x1: 2, y1: 1.5, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 1.78, y1: 0, x2: 1.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 1.78, y1: 0.22, x2: 2, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.46, y: 0.18, tex: "y", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1, y: 0, tex: "1", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 2, y: 0.75, tex: "x", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 0.8, y: 0.9, tex: "\\sqrt{1+x^{2}}", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.3 ---------------- */
+    "limit-same-near-a": () => {
+      const base = (extra) => buildPlot(Object.assign({
+        w: 250, h: 200, xmin: 0, xmax: 3.7, ymin: 0, ymax: 14,
+        pad: { t: 14, r: 16, b: 20, l: 18 }, xlabel: "x", ylabel: "y",
+        aria: "A function approaching L as x approaches a.",
+      }, extra));
+      const labels = [
+        { type: "hline", y: 8, from: 0, to: 3, cls: "refline" },
+        { type: "text", x: 3, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+        { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+      ];
+      return {
+        layout: "triple",
+        panels: [
+          {
+            svg: base({ items: [{ type: "curve", fn: pow2, domain: [0.45, 3.45], cls: "curve" }, ...labels, { type: "dot", x: 3, y: 8 }] }),
+            note: "\\(f(a) = L\\)",
+          },
+          {
+            svg: base({ items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              ...labels, { type: "dot", x: 3, y: 8, hollow: true }, { type: "dot", x: 3, y: 5 },
+            ] }),
+            note: "\\(f(a) \\neq L\\)",
+          },
+          {
+            svg: base({ items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              ...labels, { type: "dot", x: 3, y: 8, hollow: true },
+            ] }),
+            note: "\\(f(a)\\) is undefined",
+          },
+        ],
+      };
+    },
+
+    "read-limit-graph": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 460, h: 280, xmin: -3.3, xmax: 2.9, ymin: -2.7, ymax: 2.8,
+          xlabel: "x", ylabel: "y",
+          aria: "A function with limit 1 at x = -2, limit 0 at x = 0, and limit 2 at x = 2, although f(2) = -2.",
+          xticks: [{ x: -2, tex: "-2" }, { x: 2, tex: "2" }],
+          yticks: [{ y: -2, tex: "-2" }, { y: 1, tex: "1" }, { y: 2, tex: "2" }],
+          items: [
+            { type: "curve", fn: (x) => -0.0375 * x * x * x + 0.375 * x * x + 0.4 * x, domain: [-2.8, 1.98], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -0.0375 * x * x * x + 0.375 * x * x + 0.4 * x, domain: [2.02, 2.7], samples: 50, cls: "curve" },
+            { type: "dot", x: 2, y: 2, hollow: true },
+            { type: "dot", x: 2, y: -2 },
+            { type: "text", x: -2.7, y: 1.55, tex: "y=f(x)", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.4 ---------------- */
+    "one-sided-limits": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 260, xmin: -0.5, xmax: 4.5, ymin: -0.5, ymax: 3.2,
+          xlabel: "x", ylabel: "y", aria: "Different left and right limits at a.",
+          xticks: [{ x: 2, tex: "a" }], yticks: [{ y: 1, tex: "L_1" }, { y: 2, tex: "L_2" }],
+          items: [
+            { type: "curve", fn: (x) => 1 + 0.25 * (x - 2) * (x - 2), domain: [0.2, 1.95], cls: "curve" },
+            { type: "curve", fn: (x) => 2 + 0.2 * (x - 2) * (x - 2), domain: [2.05, 4.2], cls: "curve" },
+            { type: "dot", x: 2, y: 1, hollow: true }, { type: "dot", x: 2, y: 2, hollow: true },
+          ],
+        }),
+      }],
+    }),
+    "one-sided-infinite": () => {
+      const mk = (fn, dom, ymin, ymax) => buildPlot({
+        w: 240, h: 210, xmin: -0.2, xmax: 3.2, ymin, ymax,
+        pad: { t: 14, r: 14, b: 20, l: 16 }, xlabel: "x", ylabel: "y",
+        aria: "A one-sided infinite limit.",
+        xticks: [{ x: 2, tex: "a" }],
+        items: [{ type: "vline", x: 2, cls: "refline" }, { type: "curve", fn, domain: dom, samples: 200, cls: "curve" }],
+      });
+      return {
+        layout: "grid",
+        panels: [
+          { svg: mk((x) => 1 / (2 - x), [0.25, 1.68], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{-}} f(x)=\\infty\\)" },
+          { svg: mk((x) => 1 / (x - 2), [2.32, 3.0], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{+}} f(x)=\\infty\\)" },
+          { svg: mk((x) => -1 / (2 - x), [0.25, 1.68], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{-}} f(x)=-\\infty\\)" },
+          { svg: mk((x) => -1 / (x - 2), [2.32, 3.0], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{+}} f(x)=-\\infty\\)" },
+        ],
+      };
+    },
+    "vertical-asymptote": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 260, xmin: -1, xmax: 7, ymin: -20, ymax: 20,
+          xlabel: "x", ylabel: "y", aria: "Graph with a vertical asymptote at x = 3.",
+          xticks: [{ x: 3, tex: "3" }], yticks: [{ y: 2, tex: "2" }],
+          items: [
+            { type: "vline", x: 3, cls: "refline" },
+            { type: "curve", fn: (x) => (2 * x) / (x - 3), domain: [-0.8, 2.9], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => (2 * x) / (x - 3), domain: [3.1, 6.8], samples: 200, cls: "curve" },
+          ],
+        }),
+      }],
+    }),
+    "piecewise-jump": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 360, h: 240, xmin: -0.5, xmax: 5, ymin: -0.5, ymax: 4.5,
+          xlabel: "x", ylabel: "y",
+          aria: "Piecewise function with jump at x equals 2: left limit is 3, right limit is 2.",
+          xticks: [{ x: 2, tex: "2" }],
+          yticks: [{ y: 2, tex: "2" }, { y: 3, tex: "3" }],
+          items: [
+            { type: "curve", fn: (x) => x + 1, domain: [-0.3, 1.97], cls: "curve" },
+            { type: "curve", fn: (x) => 4 - x, domain: [2.03, 4.5], cls: "curve" },
+            { type: "dot", x: 2, y: 3, hollow: true },
+            { type: "dot", x: 2, y: 2 },
+            { type: "text", x: 0.05, y: 2.3, tex: "y=x+1", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 3.5, y: 1.0, tex: "y=4-x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "ln-asymptote": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 340, h: 260, xmin: -0.8, xmax: 5.5, ymin: -2.8, ymax: 2.5,
+          xlabel: "x", ylabel: "y",
+          aria: "Graph of y equals natural log of x approaching negative infinity near x equals 0.",
+          xticks: [{ x: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.log(x), domain: [0.09, 5.2], samples: 300, cls: "curve" },
+            { type: "text", x: 4.3, y: 2.0, tex: "y=\\ln x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.5 ---------------- */
+    "floor-function": () => {
+      const steps = [];
+      for (var n = -1; n <= 4; n++) {
+        steps.push({ type: "seg", x1: n, y1: n, x2: n + 1, y2: n, cls: "curve" });
+        steps.push({ type: "dot", x: n, y: n });
+        steps.push({ type: "dot", x: n + 1, y: n, hollow: true });
+      }
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 380, h: 320, xmin: -1.5, xmax: 5.5, ymin: -1.8, ymax: 4.8,
+            xlabel: "x", ylabel: "y",
+            aria: "The greatest integer function, a step function with jumps at each integer.",
+            xticks: [{ x: -1, tex: "-1" }, { x: 1, tex: "1" }, { x: 2, tex: "2" }, { x: 3, tex: "3" }, { x: 4, tex: "4" }],
+            yticks: [{ y: 1, tex: "1" }, { y: 2, tex: "2" }, { y: 3, tex: "3" }, { y: 4, tex: "4" }],
+            items: steps.concat([
+              { type: "text", x: 4.8, y: 4.5, tex: "y=[x]", cls: "a-curve", anchor: "start" },
+            ]),
+          }),
+        }],
+      };
+    },
+    "squeeze-theorem": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 280, xmin: -0.5, xmax: 5.5, ymin: -0.5, ymax: 4.2,
+          xlabel: "x", ylabel: "y",
+          aria: "Squeeze theorem: f is trapped between g and h, all converging to L at x equals a.",
+          xticks: [{ x: 2.5, tex: "a" }],
+          items: [
+            { type: "curve", fn: (x) => 2 + 0.4 * Math.pow(x - 2.5, 2), domain: [0.2, 4.9], cls: "refline" },
+            { type: "curve", fn: (x) => 2 - 0.4 * Math.pow(x - 2.5, 2), domain: [0.2, 4.9], cls: "refline" },
+            { type: "curve", fn: (x) => 2 + 0.3 * Math.pow(x - 2.5, 2) * Math.sin(5 * x), domain: [0.2, 4.9], samples: 400, cls: "curve" },
+            { type: "hline", y: 2, from: 0, to: 2.5, cls: "refline" },
+            { type: "dot", x: 2.5, y: 2 },
+            { type: "text", x: 0, y: 2, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+            { type: "text", x: 5, y: 3.8, tex: "h", cls: "a-ref", anchor: "start" },
+            { type: "text", x: 5, y: 0.2, tex: "g", cls: "a-ref", anchor: "start" },
+            { type: "text", x: 4.5, y: 2.7, tex: "f", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "squeeze-x2sin": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 400, h: 280, xmin: -1.2, xmax: 1.2, ymin: -0.8, ymax: 1.2,
+          xlabel: "x", ylabel: "y",
+          aria: "x squared sin(1/x) squeezed between y equals x squared and y equals negative x squared.",
+          items: [
+            { type: "curve", fn: (x) => x * x, domain: [-1.1, 1.1], cls: "refline" },
+            { type: "curve", fn: (x) => -x * x, domain: [-1.1, 1.1], cls: "refline" },
+            { type: "curve", fn: (x) => x * x * Math.sin(1 / x), domain: [-1.1, -0.01], samples: 600, cls: "curve" },
+            { type: "curve", fn: (x) => x * x * Math.sin(1 / x), domain: [0.01, 1.1], samples: 600, cls: "curve" },
+            { type: "text", x: 0.75, y: 0.85, tex: "x^{2}", cls: "a-ref", anchor: "end" },
+            { type: "text", x: 0.75, y: -0.55, tex: "-x^{2}", cls: "a-ref", anchor: "end" },
+            { type: "text", x: -0.35, y: 0.2, tex: "x^{2}\\!\\sin\\tfrac{1}{x}", cls: "a-curve", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.6 ---------------- */
+    "precise-limit": () => {
+      const Lm = 6.150845, Lp = 9.849155;
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 460, h: 300, xmin: 0, xmax: 3.8, ymin: 0, ymax: 14,
+            pad: { t: 16, r: 18, b: 24, l: 58 }, xlabel: "x", ylabel: "y",
+            aria: "Geometric interpretation of the epsilon-delta definition.",
+            items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              { type: "hline", y: Lm, from: 0, to: 3.8, cls: "refline" },
+              { type: "hline", y: Lp, from: 0, to: 3.8, cls: "refline" },
+              { type: "vline", x: 2.7, cls: "refline" },
+              { type: "vline", x: 3.3, cls: "refline" },
+              { type: "dot", x: 3, y: 8, hollow: true },
+              { type: "dot", x: 3, y: 11.6 },
+              { type: "dot", x: 3.3, y: Lp, r: 1.8 },
+              { type: "text", x: 2.7, y: 0, tex: "a-\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 3.02, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 3.32, y: 0, tex: "a+\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 0, y: Lm, tex: "L-\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 },
+              { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+              { type: "text", x: 0, y: Lp, tex: "L+\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 },
+            ],
+          }),
+        }],
+      };
+    },
+
+    /* §1.2 — arctan as the reflection of restricted tan across y=x (Figure 1.9).
+       Equal-aspect square window so the reflection reads true. Both curves
+       solid; y=x dashed (ch01 restrict-x2 convention). Vertical asymptotes of
+       tan at ±π/2 are drawn explicitly; the reflected arctan curve approaches
+       the corresponding horizontal levels (figure-opportunity audit 2026-06-21). */
+    "arctan-reflection": () => {
+      const h = Math.PI / 2;
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 300, h: 300, xmin: -3.3, xmax: 3.3, ymin: -3.3, ymax: 3.3,
+            pad: { t: 14, r: 14, b: 20, l: 22 },
+            aria: "The graph of arctan x is the reflection of the restricted tangent branch across the line y equals x; tangent's vertical asymptotes at x = plus or minus pi over 2 become arctan's horizontal asymptotes at y = plus or minus pi over 2.",
+            xticks: [{ x: -h }, { x: h }],
+            yticks: [{ y: -h }, { y: h }],
+            items: [
+              { type: "curve", fn: (x) => x, domain: [-3.3, 3.3], cls: "refline" },
+              { type: "vline", x: -h, cls: "refline" },
+              { type: "vline", x: h, cls: "refline" },
+              { type: "curve", fn: (x) => Math.tan(x), domain: [-1.3, 1.3], samples: 260, cls: "curve" },
+              { type: "curve", fn: (x) => Math.atan(x), domain: [-3.3, 3.3], samples: 220, cls: "curve" },
+              { type: "text", x: 1.42, y: 2.95, tex: "\\tan x", cls: "a-curve", anchor: "start" },
+              { type: "text", x: 3.05, y: 1.3, tex: "\\arctan x", cls: "a-curve", anchor: "end", dy: 13 },
+              { type: "text", x: 2.45, y: 2.85, tex: "y=x", cls: "a-ref", anchor: "start" },
+            ],
+          }),
+        }],
+      };
+    },
+
+    /* §1.4 — 1/x² (=∞) vs 1/x (DNE) at 0, same window (Figure 1.16).
+       Left: both branches → +∞ (same signed direction, write =∞). Right:
+       left → −∞, right → +∞ (disagree, DNE). x=0 undefined → no dot, curves
+       split at ±0.001 and break at the y-axis (figure-opportunity audit 2026-06-21). */
+    "recip-x-vs-x2": () => {
+      const win = { w: 244, h: 196, xmin: -2.2, xmax: 2.2, ymin: -7, ymax: 7, pad: { t: 12, r: 12, b: 22, l: 22 } };
+      const panel = (fn, note, aria) => ({
+        svg: buildPlot(Object.assign({}, win, {
+          aria: aria,
+          xticks: [{ x: 0 }],
+          items: [
+            { type: "curve", fn: fn, domain: [-2.2, -0.001], samples: 200, cls: "curve" },
+            { type: "curve", fn: fn, domain: [0.001, 2.2], samples: 200, cls: "curve" },
+          ],
+        })),
+        note: note,
+      });
+      return {
+        layout: "pair",
+        panels: [
+          panel((x) => 1 / (x * x), "y = 1/x²", "Graph of one over x squared: both branches rise toward plus infinity near zero."),
+          panel((x) => 1 / x, "y = 1/x", "Graph of one over x: the left branch falls to minus infinity, the right branch rises to plus infinity."),
+        ],
+      };
+    },
+
+    /* §1.5 — removable hole: (x-1)/(x²-1)=1/(x+1) with an open point at x=1,
+       height ½ (Figure 1.20). Crosshair reflines guide the eye to the hole;
+       limit = hole height. Fulfils the §1.5 placeholder (figure-opportunity
+       audit 2026-06-21). */
+    "removable-hole": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 320, h: 208, xmin: -0.4, xmax: 2.7, ymin: 0, ymax: 1.7,
+          pad: { t: 14, r: 14, b: 24, l: 26 },
+          aria: "Graph of (x minus 1) over (x squared minus 1), which equals 1 over (x plus 1) except at x = 1, where there is an open hole at height one half.",
+          xticks: [{ x: 1, tex: "1" }],
+          yticks: [{ y: 0.5, tex: "\\tfrac{1}{2}" }],
+          items: [
+            { type: "hline", y: 0.5, from: -0.4, to: 1, cls: "refline" },
+            { type: "vline", x: 1, cls: "refline" },
+            { type: "curve", fn: (x) => 1 / (x + 1), domain: [-0.35, 0.97], samples: 120, cls: "curve" },
+            { type: "curve", fn: (x) => 1 / (x + 1), domain: [1.03, 2.7], samples: 120, cls: "curve" },
+            { type: "dot", x: 1, y: 0.5, hollow: true },
+            { type: "text", x: 2.6, y: 0.62, tex: "y=\\tfrac{x-1}{x^{2}-1}", cls: "a-curve", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* §1.6 — ε→δ dynamic: shrink the ε-strip, the responding δ-band shrinks too
+       (Figure 1.25). f(x)=2x-1 at a=3, L=5, δ=ε/2 (the §1.6 worked example).
+       Two panels at the same window; companion to the static Figure 1.24
+       (figure-opportunity audit 2026-06-21). */
+    "epsilon-delta-dynamic": () => {
+      const f = (x) => 2 * x - 1, a = 3, L = 5;
+      const win = { w: 240, h: 220, xmin: 2.3, xmax: 3.7, ymin: 3.6, ymax: 6.4, pad: { t: 12, r: 12, b: 22, l: 26 } };
+      const panel = (eps, note) => {
+        const d = eps / 2;
+        return {
+          svg: buildPlot(Object.assign({}, win, {
+            aria: "Epsilon-delta box for f of x equals 2x minus 1 at a equals 3: a horizontal strip of half-height epsilon and a vertical band of half-width delta equal to epsilon over 2.",
+            xticks: [{ x: a, tex: "a" }],
+            yticks: [{ y: L, tex: "L" }],
+            items: [
+              { type: "hline", y: L + eps, cls: "refline" },
+              { type: "hline", y: L - eps, cls: "refline" },
+              { type: "vline", x: a - d, cls: "refline" },
+              { type: "vline", x: a + d, cls: "refline" },
+              { type: "curve", fn: f, domain: [2.3, 3.7], cls: "curve" },
+              { type: "dot", x: a, y: L },
+            ],
+          })),
+          note: note,
+        };
+      };
+      return {
+        layout: "pair",
+        panels: [panel(1, "ε = 1,  δ = ½"), panel(0.4, "ε = 0.4,  δ = 0.2")],
+      };
+    },
+
+  };
+
+  function hydrateFigures(root) {
+    (root || document).querySelectorAll("[data-fig]").forEach((el) => {
+      const def = FIGS[el.dataset.fig];
+      if (!def || el.dataset.figDone) return;
+      const { layout, panels } = def();
+      let html;
+      if (layout === "single" && panels.length === 1 && !panels[0].note) {
+        html = `<div class="figure-art">${panels[0].svg}</div>`;
+      } else {
+        const cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
+        html = `<div class="figure-art ${cls}">` +
+          panels.map((p) => `<div class="fig-panel">${p.svg}${p.note ? `<div class="fig-note">${p.note}</div>` : ""}</div>`).join("") +
+          `</div>`;
+      }
+      el.insertAdjacentHTML("afterbegin", html);
+
+      /* Connect per-figure CSS width variables (--fig-1-1 … --fig-1-25)
+         defined in :root to this figure's --fig-w so the control panel
+         actually takes effect. */
+      const figNo = el.querySelector(".fig-no");
+      if (figNo) {
+        const m = figNo.textContent.match(/Figure\s+(\d+)\.(\d+)/);
+        if (m) el.style.setProperty("--fig-w", `var(--fig-${m[1]}-${m[2]})`);
+      }
+
+      el.dataset.figDone = "1";
+    });
+  }
+
+  window.hydrateFigures = hydrateFigures;
+})();
+</script>
+
+<!-- Main build script (paginator + MathJax) -->
+<script>
+var CHAPTER = {
+  brand: "Appendix D",
+  runningHead: "Appendix D · The Proof Track",
+  fragments: ["sec-d-1", "sec-d-2", "sec-d-3"],
+};
+var FRAGMENTS = CHAPTER.fragments;
+var RUNNING_HEAD = CHAPTER.runningHead;
+
+function renderMath(root) {
+  if (!root) return Promise.resolve();
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    return MathJax.typesetPromise([root]).catch(function(e) { console.warn("mathjax", e); });
+  }
+  return Promise.resolve();
+}
+
+function waitFor(test, tries) {
+  return new Promise(function(resolve) {
+    var n = 0;
+    var tick = function() {
+      if (test()) return resolve(true);
+      if (n++ > (tries || 100)) return resolve(false);
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
+var isHeading = function(el) {
+  return el.matches && el.matches(".chapter-head, .sec-head, .subsec-head, .para-head, .env-head");
+};
+
+function isDisplayChild(n) {
+  if (n.nodeType !== 1) return false;
+  var tag = n.tagName && n.tagName.toLowerCase();
+  if (tag === "mjx-container" && n.getAttribute("display") === "true") return true;
+  if (n.querySelector && n.querySelector('mjx-container[display="true"]')) return true;
+  return false;
+}
+
+var SPLIT_ENVS = ".env-example, .env-solution, .env-proof, .env-definition, .env-theorem, .env-proposition, .env-corollary";
+var DISP_SEL = 'mjx-container[display="true"]';
+
+function liCount(el) { return [].filter.call(el.children, function(x) { return x.tagName === "LI"; }).length; }
+
+function countBodyUnits(bodyEl) {
+  var n = 0;
+  [].forEach.call(bodyEl.children, function(ch) {
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL)) n += explodeParagraph2(ch);
+    else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) n += liCount(ch);
+    else n++;
+  });
+  return n;
+}
+
+function isSplittable(block) {
+  if (!block.classList) return false;
+  if (block.classList.contains("workedexample")) return block.children.length >= 2;
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    return !!b && countBodyUnits(b) > 1;
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL)) {
+    return explodeParagraph2(block) > 1;
+  }
+  return false;
+}
+
+function onlyLists(bodyEl) {
+  var els = contentKids(bodyEl);
+  return els.length > 0 && els.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; });
+}
+
+function contentKids(bodyEl) {
+  return [].filter.call(bodyEl.children, function(c) {
+    return !(c.classList && c.classList.contains("qed")) && (c.textContent.trim() || c.querySelector("*"));
+  });
+}
+
+function splitMode(block) {
+  if (!block.classList) return "none";
+  if (block.classList.contains("workedexample")) return block.children.length >= 2 ? "free" : "none";
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    if (!b || countBodyUnits(b) <= 1) return "none";
+    var kids = contentKids(b);
+    var hasPara = kids.some(function(c) {
+      return c.tagName === "P" && c.querySelector(DISP_SEL) && explodeParagraph2(c) > 1;
+    });
+    if (hasPara || (kids.length >= 2 && !kids.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; }))) return "free";
+    return "list";
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL) && explodeParagraph2(block) > 1) return "free";
+  return "none";
+}
+
+function explodeParagraph2(p) {
+  var n = 0, hasBuf = false;
+  [].forEach.call(p.childNodes, function(node) {
+    if (isDisplayChild(node)) {
+      if (hasBuf) { n++; hasBuf = false; }
+      n++;
+    } else if ((node.textContent && node.textContent.trim()) || node.nodeType === 1) {
+      hasBuf = true;
+    }
+  });
+  if (hasBuf) n++;
+  return n;
+}
+
+function explodeParagraph(p) {
+  var parts = [], buf = [];
+  var flush = function() {
+    var hasContent = buf.some(function(n) { return (n.textContent && n.textContent.trim()) || n.nodeType === 1; });
+    if (hasContent) {
+      var np = document.createElement("p");
+      np.className = p.className;
+      buf.forEach(function(n) { np.appendChild(n); });
+      parts.push(np);
+    } else {
+      buf.forEach(function(n) { if (n.parentNode) n.parentNode.removeChild(n); });
+    }
+    buf = [];
+  };
+  [].slice.call(p.childNodes).forEach(function(node) {
+    if (isDisplayChild(node)) { flush(); var np = document.createElement("p"); np.className = p.className; np.appendChild(node); parts.push(np); }
+    else { buf.push(node); }
+  });
+  flush();
+  return parts;
+}
+
+function listToUnits(listEl) {
+  var items = [].filter.call(listEl.children, function(x) { return x.tagName === "LI"; });
+  if (items.length < 2) return [listEl];
+  var tag = listEl.tagName.toLowerCase();
+  return items.map(function(li, i) {
+    var nl = document.createElement(tag);
+    nl.className = listEl.className;
+    if (tag === "ol") nl.setAttribute("start", String(i + 1));
+    nl.appendChild(li);
+    return nl;
+  });
+}
+
+function bodyToUnits(bodyEl) {
+  var units = [];
+  [].forEach.call(bodyEl.children, function(ch) {
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL) && explodeParagraph2(ch) > 1) {
+      explodeParagraph(ch).forEach(function(u) { units.push(u); });
+    } else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) {
+      listToUnits(ch).forEach(function(u) { units.push(u); });
+    } else { units.push(ch); }
+  });
+  return units;
+}
+
+function splitEnvOverflow(env) {
+  var bodyEl = env.querySelector(":scope > .env-body");
+  if (!bodyEl) return null;
+  var kids = bodyToUnits(bodyEl);
+  if (kids.length < 2) return null;
+  bodyEl.innerHTML = "";
+  bodyEl.appendChild(kids.shift());
+  var parts = [env];
+  kids.forEach(function(k) {
+    if (k.classList && k.classList.contains("qed") && parts.length > 0) {
+      var prev = parts[parts.length - 1];
+      var prevBody = prev.querySelector(":scope > .env-body") || prev.querySelector(".env-body");
+      if (prevBody) { prevBody.appendChild(k); return; }
+    }
+    var cont = document.createElement("section");
+    cont.className = env.className + " env-cont";
+    var b = document.createElement("div");
+    b.className = "env-body";
+    b.appendChild(k);
+    cont.appendChild(b);
+    parts.push(cont);
+  });
+  return parts;
+}
+
+function splitParts(block) {
+  if (block.classList.contains("workedexample")) return [].slice.call(block.children);
+  if (block.matches(SPLIT_ENVS)) return splitEnvOverflow(block) || [block];
+  if (block.tagName === "P") { var ex = explodeParagraph(block); return ex.length > 1 ? ex : [block]; }
+  return [block];
+}
+
+function paginate(blocks) {
+  var pagesEl = document.getElementById("pages");
+  pagesEl.innerHTML = "";
+  var idx = 0, body = null;
+  var newSheet = function() {
+    var sheet = document.createElement("div");
+    sheet.className = "sheet";
+    var header = document.createElement("div");
+    header.className = "sheet-header";
+    header.textContent = idx === 0 ? "" : RUNNING_HEAD;
+    body = document.createElement("div");
+    body.className = "sheet-body paper skin-hs vivid";
+    var footer = document.createElement("div");
+    footer.className = "sheet-footer";
+    footer.textContent = String(idx + 1);
+    sheet.append(header, body, footer);
+    pagesEl.appendChild(sheet);
+    idx++;
+  };
+  newSheet();
+  var fits = function() { return body.scrollHeight <= body.clientHeight + 1; };
+  var FREE_THRESHOLD = 130;
+  var shouldBreakBefore = function(block) {
+    return block.classList && block.classList.contains("page-break-before") && body.childElementCount > 0;
+  };
+  var moveToFreshPage = function(block) {
+    var carry = null;
+    if (body.childElementCount > 0) {
+      var last = body.lastElementChild;
+      if (last && isHeading(last)) { carry = last; body.removeChild(last); }
+      newSheet();
+      if (carry) body.appendChild(carry);
+    }
+    body.appendChild(block);
+  };
+  var place = function(block) {
+    if (shouldBreakBefore(block)) newSheet();
+    body.appendChild(block);
+    if (fits()) {
+      /* ── Orphan heading prevention ──────────────────────────
+         After placing a heading that fits, check whether enough
+         room remains for content below it. If the remaining space
+         is too small, move the heading to a fresh page so it stays
+         with its following content — never stranded at the bottom. */
+      if (isHeading(block) && body.childElementCount > 1) {
+        var _bRect = block.getBoundingClientRect();
+        var _bodyRect = body.getBoundingClientRect();
+        var _rem = (_bodyRect.top + body.clientHeight) - _bRect.bottom;
+        /* Major section headers need more room; minor headings less */
+        var _threshold = block.matches(".sec-head, .chapter-head") ? 160 : 100;
+        if (_rem < _threshold) {
+          body.removeChild(block);
+          newSheet();
+          body.appendChild(block);
+        }
+      }
+      return;
+    }
+    var blockH = block.getBoundingClientRect().height;
+
+    /* ── Figure shrink-to-fit ──────────────────────────────────
+       When a figure *almost* fits the remaining page space,
+       scale the .figure-art only (≥55 %) — caption stays full size.
+       Measure art/caption while block is still in the DOM.       */
+    var isFigure = block.tagName === "FIGURE" || (block.classList && block.classList.contains("figure"));
+    var _figArt = isFigure ? block.querySelector(".figure-art") : null;
+    var _artH = 0, _capH = 0;
+    if (_figArt) {
+      _artH = _figArt.getBoundingClientRect().height;
+      var _figCap = block.querySelector("figcaption");
+      _capH = _figCap ? _figCap.getBoundingClientRect().height : 0;
+    }
+
+    body.removeChild(block);
+
+    if (_figArt && _artH > 0) {
+      /* Probe the actual insertion point to account for preceding margins */
+      var _probe = document.createElement("div");
+      _probe.style.height = "0";
+      _probe.style.margin = "0";
+      _probe.style.padding = "0";
+      body.appendChild(_probe);
+      var _remaining = body.clientHeight - (_probe.getBoundingClientRect().top - body.getBoundingClientRect().top);
+      body.removeChild(_probe);
+      var FIG_MIN_SCALE = 0.55;
+      var _figMargin = blockH - _artH - _capH;  /* top/bottom margins + gaps */
+      var _availForArt = _remaining - _capH - _figMargin;
+      var neededScale = _availForArt / _artH;
+      if (_availForArt > 60 && neededScale >= FIG_MIN_SCALE && neededScale < 1) {
+        var _oZ = _figArt.style.zoom;
+        var _oMt = block.style.marginTop, _oMb = block.style.marginBottom;
+        _figArt.style.zoom = neededScale;
+        block.style.marginTop = "0.3em";
+        block.style.marginBottom = "0";
+        body.appendChild(block);
+        if (fits()) return;           /* success — art shrunk, caption full size */
+        body.removeChild(block);      /* revert and fall through */
+        _figArt.style.zoom = _oZ;
+        block.style.marginTop = _oMt;
+        block.style.marginBottom = _oMb;
+      }
+    }
+
+    if (block.classList.contains && block.classList.contains("workedexample") && block.children.length >= 2) {
+      var lastEl = body.lastElementChild;
+      var used = lastEl ? lastEl.getBoundingClientRect().bottom - body.getBoundingClientRect().top : 0;
+      var remaining = body.clientHeight - used;
+      if (remaining < FREE_THRESHOLD && blockH <= body.clientHeight) {
+        moveToFreshPage(block);
+        if (fits()) return;
+        body.removeChild(block);
+      }
+      var kids = [].slice.call(block.children);
+      var ex = kids[0], sol = kids[1], extra = kids.slice(2);
+      block.removeChild(ex);
+      var solParts = splitParts(sol);
+      body.appendChild(ex);
+      if (!fits()) { body.removeChild(ex); moveToFreshPage(ex); }
+      var first = solParts[0];
+      body.appendChild(first);
+      if (!fits()) {
+        body.removeChild(first);
+        body.removeChild(ex);
+        moveToFreshPage(ex);
+        body.appendChild(first);
+        if (!fits()) { body.removeChild(first); place(first); }
+      }
+      for (var i = 1; i < solParts.length; i++) place(solParts[i]);
+      extra.forEach(place);
+      return;
+    }
+    var mode = splitMode(block);
+    var want = (mode !== "none" && blockH > body.clientHeight);
+    if (want) { var parts = splitParts(block); if (parts.length > 1) { parts.forEach(place); return; } }
+    moveToFreshPage(block);
+    if (!fits() && mode !== "none") {
+      var parts2 = splitParts(block);
+      if (parts2.length > 1) { body.removeChild(block); parts2.forEach(place); }
+    }
+  };
+  blocks.forEach(place);
+  return idx;
+}
+
+function build() {
+  var status = document.getElementById("status");
+
+  /* Load section fragments from inline <template> elements */
+  var page = document.getElementById("page");
+  var parts = FRAGMENTS.map(function(id) {
+    var tpl = document.getElementById("frag-" + id);
+    return tpl ? tpl.innerHTML : "";
+  });
+  page.innerHTML = parts.join("\n");
+
+  if (window.hydrateFigures) window.hydrateFigures(page);
+
+  /* Wait for MathJax to load, then typeset */
+  waitFor(function() { return window.MathJax && window.MathJax.typesetPromise; }, 200).then(function(ok) {
+    if (!ok) { status.textContent = "MathJax load timeout"; return; }
+    return renderMath(page);
+  }).then(function() {
+    var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    return fontsReady;
+  }).then(function() {
+    status.textContent = "Paginating …";
+    return new Promise(function(r) { setTimeout(r, 60); });
+  }).then(function() {
+    var blocks = [];
+    page.querySelectorAll(":scope > .sec").forEach(function(sec) {
+      [].forEach.call(sec.children, function(ch) { blocks.push(ch); });
+    });
+
+    var n = paginate(blocks);
+    var src = document.getElementById("source");
+    if (src) src.remove();
+
+    status.textContent = n + " page" + (n === 1 ? "" : "s") + " · A4";
+    var btn = document.getElementById("printBtn");
+    btn.disabled = false;
+    btn.addEventListener("click", function() { window.print(); });
+
+    var boot = document.getElementById("boot");
+    if (boot) boot.remove();
+  });
+}
+
+window.addEventListener("DOMContentLoaded", build);
+</script>
+</body>
+</html>

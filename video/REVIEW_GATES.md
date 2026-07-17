@@ -74,7 +74,7 @@
 
 | 閘 | 執行者 | 性質 | 把關內容 | 權威文檔 |
 |---|---|---|---|---|
-| 視覺 gate1 ＝ Claude 抽幀 subagent | Claude 讀 `critic.py --dry-run` 抽出的幀（多模態、免費、每次 render） | □（收斂＝**視覺 blocking==0**） | 逐場 V1–V9 blocking＋A1–A7 magnitude：數學渲染完整、圖正確、表不溢出、reveal 同步、端點實心／空心、✓／✗ 正確（蓋資訊的相撞／關鍵元素出框／reveal 不同步＝blocking） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)（比照 [`../handout/_audit/FIGURE-AUDIT-RUBRIC.md`](../handout/_audit/FIGURE-AUDIT-RUBRIC.md)）；機制 [pipeline/critic.py](pipeline/critic.py) `--dry-run` |
+| 視覺 gate1 ＝ Claude 抽幀 subagent | Claude 讀 `critic.py --dry-run` 抽出的幀（多模態、免費、每次 render） | □（收斂＝**視覺 blocking==0**） | 逐場 V1–V9 blocking＋A1–A7 magnitude：數學渲染完整、圖正確、表不溢出、reveal 同步、端點實心／空心、✓／✗ 正確（蓋資訊的相撞／關鍵元素出框／reveal 不同步＝blocking） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)（比照 [`../handout/html/_audit/FIGURE-AUDIT-RUBRIC.md`](../handout/html/_audit/FIGURE-AUDIT-RUBRIC.md)）；機制 [pipeline/critic.py](pipeline/critic.py) `--dry-run` |
 | 視覺 gate2 ＝ 外部 VLM 信心複核 | ffmpeg 抽幀（免費）→ MiMo-V2.5（外部 API；**公測免費**、間歇、`--confirm`、仍需同意） | □（**不接進 make.py**；定稿前非每輪必跑） | **2026-06-16 已接 VISUAL-FRAME-RUBRIC**：runtime verbatim-inject 整份 rubric body，輸出 V1–V9 blocking findings＋`VERDICT` 行＋A1–A7（每維 0–100，**驅動重 render／排優先的 magnitude**）＋具體缺陷；專抓 sizecheck 漏掉的標籤壓線／碰撞。驅動「判→採→重 render→複驗」迴圈（停止條件＝視覺 blocking==0） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)；[README.md](README.md) §VLM 視覺批改、[DESIGN.md](DESIGN.md)；source [pipeline/critic.py](pipeline/critic.py) |
 | 人工 frame-grab 驗收 | 人工（MiMo route step 4） | ◆ | 在 reveal 時間點抽幀確認 reveal 準時、LaTeX 無亂碼，才 compose／交付 | [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 4 |
 

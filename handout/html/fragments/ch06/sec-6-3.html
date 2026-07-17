@@ -1,0 +1,219 @@
+<!-- §6.3 The Fundamental Theorem of Calculus. section-source: Stewart ET 9e §5.3 (The Fundamental
+     Theorem of Calculus); cross-checked Thomas 14e §5.4, Rogawski 4e §5.4. Authored 2026-07-10 per
+     PLAN-ch06 + brief-6-3 (canon-as-spine; Codex ⑤ per user 2026-07-06 grant). CHAPTER CRUX — 深理論核心:
+     BOTH parts proved on the spot. Numbering continues from §6.2: mints Definition 6.3 (Antiderivative),
+     Theorem 6.3 (FTC-1), Theorem 6.4 (FTC-2), Strategy 6.1, Examples 6.9–6.12 (M4 added Ex 6.10; old 6.7–6.9 → 6.9/6.11/6.12). Cautions UNNUMBERED.
+     PROOF IMPORTS: additivity + comparison bound (Theorem 6.2), Extreme Value Theorem (Theorem 4.9(a),
+     proved App D §D.1), Squeeze Theorem (Theorem 1.3), constant-difference corollary (Cor 4.4),
+     chain rule (Theorem 3.3). All EXIST — no dangling refs.
+     SEAM GUARD (brief-6-3): PROVE both parts. Do NOT develop the indefinite-integral ∫f dx family or the
+     "+C" bookkeeping (§6.4 — one-line forward fence), the Net Change Theorem (§6.4), substitution (§6.5),
+     or ∫(1/x)=ln|x| (§6.4 — avoid 1/x integrands here). Introduce the antiderivative (Def 6.3) since Ch5
+     deferred it. Counters handed to §6.4: Definition 6.4, Example 6.13, Strategy 6.2, Figure 6.9 (§6.3 minted Ex 6.9–6.12, Fig 6.7–6.8 through M4).
+     FIGURES (M2; renumbered +1 by M4's §6.2 Fig 6.5): §6.3 carries Figure 6.7 (accumulation-sliver, FTC-1 anchor) and Figure 6.8
+     (ftc-trap, FTC-1 proof trapping step); both cleared gate-1 D1–D8 + gate-2 at 0 blocking.
+     Record: PLAN-ch06.md, brief-6-3.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">6.3</span>The Fundamental Theorem of Calculus</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: §6.2 made evaluation hard; the FTC ties the integral to the derivative and makes it easy. Name the two parts without proving them yet. -->
+  <p>Two sections of work have built the definite integral into a well-defined number, but left it laborious to compute: every value so far came from a limit of Riemann sums or from a picture. The <em>Fundamental Theorem of Calculus</em> ends that difficulty, and in doing so reveals why the subject is called <em>calculus</em> — a single method. It comes in two parts. The first says that integrating a continuous function and then differentiating recovers the function: differentiation undoes integration. The second turns that fact into a tool, evaluating a definite integral from any single antiderivative of the integrand, with no sums at all. The engine behind both is a function that measures accumulated area.</p>
+
+  <p>The reverse of differentiation earns a name of its own.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.3</span><span class="env-name">Antiderivative</span></p>
+    <div class="env-body">
+      <p>A function \(F\) is an <em>antiderivative</em> of \(f\) on an open interval \(I\) if \(F'(x) = f(x)\) for every \(x\) in \(I\).</p>
+    </div>
+  </section>
+
+  <p>For example, \(\tfrac{1}{3}x^{3}\) is an antiderivative of \(x^{2}\), since its derivative is \(x^{2}\); so is \(\tfrac{1}{3}x^{3} + 5\). Reading each differentiation rule of Chapters 2–4 backwards produces an antiderivative, and the Fundamental Theorem is about to make antiderivatives the key to every definite integral.</p>
+
+  <h3 class="subsec-head">The accumulation function</h3>
+
+  <!-- expansion:intuition — the load-bearing intuition: g(x)=∫_a^x f accumulates area; its rate of change is the current height f(x). This IS FTC-1. -->
+  <p>Fix a continuous function \(f\) on \([a, b]\) and, for each \(x\) in \([a, b]\), record the signed area accumulated from \(a\) up to \(x\):</p>
+  <p>\[ g(x) = \int_{a}^{x} f(t)\,dt. \]</p>
+  <p>The variable of integration is written \(t\) to keep it distinct from the upper limit \(x\), which is now the input of a new function \(g\). As \(x\) advances, \(g(x)\) accumulates more area. How fast? Nudging \(x\) rightward by a small \(h\) appends a thin strip under the graph, of width \(h\) and height about \(f(x)\), so \(g\) gains roughly \(f(x)\,h\) — its rate of increase is the current height \(f(x)\). That guess is exactly right, and it is the first half of the theorem.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-essential — accumulation function g(x) with the added sliver f(x)h (FTC-1 anchor); registered in chapter6 FIGS as "accumulation-sliver"] -->
+  <figure class="figure" data-fig="accumulation-sliver">
+    <figcaption><span class="fig-no">Figure 6.7</span> The accumulation function \(g(x) = \int_{a}^{x} f(t)\,dt\) is the shaded area up to \(x\). Advancing \(x\) by a small \(h\) adds the thin strip over \([x, x + h]\), of width \(h\) and height about \(f(x)\), so \(g\) grows by roughly \(f(x)\,h\) — its rate of change is the current height \(f(x)\). The strip is widened for visibility.</figcaption>
+  </figure>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.3</span><span class="env-name">Fundamental Theorem of Calculus, Part 1</span></p>
+    <div class="env-body">
+      <p>If \(f\) is continuous on \([a, b]\), then the function \(g\) defined by</p>
+      <p>\[ g(x) = \int_{a}^{x} f(t)\,dt, \qquad a \le x \le b, \]</p>
+      <p>is continuous on \([a, b]\) and differentiable on \((a, b)\), and</p>
+      <p>\[ g'(x) = f(x). \]</p>
+      <p>In Leibniz notation, \(\displaystyle\frac{d}{dx}\int_{a}^{x} f(t)\,dt = f(x)\): the accumulation function \(g\) is an antiderivative of \(f\) on \((a, b)\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x\) in \((a, b)\) and take \(h \ne 0\) small enough that \(x + h\) lies in \([a, b]\). By additivity of the integral (Theorem 6.2),</p>
+      <p>\[ \begin{aligned}
+        g(x + h) - g(x) &= \int_{a}^{x+h} f(t)\,dt - \int_{a}^{x} f(t)\,dt \\[2pt]
+                        &= \int_{x}^{x+h} f(t)\,dt.
+      \end{aligned} \]</p>
+      <p>Consider the difference quotient \(\dfrac{g(x + h) - g(x)}{h} = \dfrac{1}{h}\displaystyle\int_{x}^{x+h} f(t)\,dt\). We claim it lies between the least and greatest values of \(f\) on the closed interval joining \(x\) and \(x + h\). For \(h > 0\), the comparison bound (Theorem 6.2, part 4) applied on \([x, x+h]\) gives, with \(m_{h}\) and \(M_{h}\) the minimum and maximum of \(f\) there,</p>
+      <p>\[ m_{h}\,h \le \int_{x}^{x+h} f(t)\,dt \le M_{h}\,h, \]</p>
+      <p>and dividing by \(h > 0\) yields \(m_{h} \le \dfrac{g(x+h) - g(x)}{h} \le M_{h}\). For \(h < 0\) the same bracketing holds on the interval \([x + h, x]\): with \(m_{h}, M_{h}\) now its minimum and maximum, \(m_{h}\lvert h\rvert \le \int_{x+h}^{x} f \le M_{h}\lvert h\rvert\); since \(\int_{x}^{x+h} f = -\int_{x+h}^{x} f\) and \(h = -\lvert h\rvert\), the quotient \(\dfrac{1}{h}\int_{x}^{x+h} f\) again lies between \(m_{h}\) and \(M_{h}\). Now by the Extreme Value Theorem (Theorem 4.9(a)), \(m_{h} = f(u_{h})\) and \(M_{h} = f(v_{h})\) for some points \(u_{h}, v_{h}\) in the interval. As \(h \to 0\), that interval collapses onto \(x\), forcing \(u_{h} \to x\) and \(v_{h} \to x\), so by the continuity of \(f\),</p>
+      <p>\[ m_{h} = f(u_{h}) \to f(x) \qquad\text{and}\qquad M_{h} = f(v_{h}) \to f(x). \]</p>
+      <p>The difference quotient is squeezed between two quantities both tending to \(f(x)\), so by the Squeeze Theorem (Theorem 1.3),</p>
+      <p>\[ g'(x) = \lim_{h \to 0} \frac{g(x + h) - g(x)}{h} = f(x). \]</p>
+      <p>It remains to see that \(g\) is continuous on the whole closed interval, endpoints included. Since \(f\) is continuous on \([a, b]\) it is bounded there, say \(\lvert f\rvert \le M\) (Theorem 4.9(a)); then for \(x\) and \(x + h\) in \([a, b]\) the comparison bound gives \(\bigl\lvert g(x+h) - g(x)\bigr\rvert = \bigl\lvert\int_{x}^{x+h} f\bigr\rvert \le M\,\lvert h\rvert\), which tends to \(0\) with \(h\). So \(g\) is continuous at every point of \([a, b]\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-strong — trapping step of the FTC-1 proof, inscribed m_h vs circumscribed M_h; registered in chapter6 FIGS as "ftc-trap"] -->
+  <figure class="figure" data-fig="ftc-trap">
+    <figcaption><span class="fig-no">Figure 6.8</span> The trapping step in the proof of Part 1. Over \([x, x + h]\) the added area \(\int_{x}^{x+h} f\) lies between the inscribed rectangle of height \(m_{h} = \min f\) and the circumscribed rectangle of height \(M_{h} = \max f\), attained at points \(u_{h}, v_{h}\) in the interval. Dividing by \(h\) brackets the difference quotient between \(m_{h}\) and \(M_{h}\); as \(h \to 0\) both tend to \(f(x)\).</figcaption>
+  </figure>
+
+  <!-- expansion:caution — two traps: the dummy variable t vs the limit x; and that g' = f holds even when f has NO elementary antiderivative -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Two points. First, the letter under the integral sign is a placeholder — \(\int_{a}^{x} f(t)\,dt\) and \(\int_{a}^{x} f(s)\,ds\) are the same function of \(x\); writing \(\int_{a}^{x} f(x)\,dx\), with \(x\) doing double duty as both limit and dummy, is a genuine error. Second, Part 1 asks nothing of \(f\) beyond continuity, so it differentiates accumulation functions we cannot evaluate: \(g(x) = \int_{0}^{x} e^{-t^{2}}\,dt\) has \(g'(x) = e^{-x^{2}}\) exactly, even though \(e^{-t^{2}}\) has no antiderivative expressible in elementary functions. The theorem <em>constructs</em> an antiderivative where no formula for one exists.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.9</span></p>
+      <div class="env-body">
+        <p>Differentiate: (a) \(\displaystyle g(x) = \int_{1}^{x} \sqrt{1 + t^{2}}\,dt\); and (b) \(\displaystyle h(x) = \int_{0}^{x^{3}} \cos t\,dt\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>(a) The integrand \(\sqrt{1 + t^{2}}\) is continuous, so Part 1 applies directly:</p>
+        <p>\[ g'(x) = \sqrt{1 + x^{2}}. \]</p>
+        <p>(b) The upper limit is now \(x^{3}\), not \(x\), so \(h\) is a composition. Write \(H(u) = \int_{0}^{u} \cos t\,dt\), so that \(h(x) = H(x^{3})\). Part 1 gives \(H'(u) = \cos u\), and the chain rule (Theorem 3.3) supplies the outer factor:</p>
+        <p>\[ h'(x) = H'(x^{3})\cdot \frac{d}{dx}\bigl(x^{3}\bigr) = \cos(x^{3})\cdot 3x^{2} = 3x^{2}\cos(x^{3}). \]</p>
+        <p>A variable limit of integration is differentiated by Part 1; a <em>function</em> in the limit calls for the chain rule on top. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 — Layer-2: complete the FTC-1 skill — variable LOWER limit (sign-flip) + both limits functions; authored stem+solution] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.10</span></p>
+      <div class="env-body">
+        <p>Differentiate (a) \(\displaystyle g(x) = \int_{x}^{1} \sqrt{1 + t^{2}}\,dt\); and (b) \(\displaystyle h(x) = \int_{x^{2}}^{x^{3}} \cos t\,dt\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>(a) The variable now sits in the <em>lower</em> limit. Reversing the limits flips the sign, \(g(x) = -\int_{1}^{x} \sqrt{1 + t^{2}}\,dt\), and Part 1 differentiates the reversed integral:</p>
+        <p>\[ g'(x) = -\sqrt{1 + x^{2}}. \]</p>
+        <p>The minus sign is the whole point: advancing the <em>lower</em> limit eats into the accumulated area, so the rate of change is the negative of the integrand.</p>
+        <p>(b) Both limits are functions of \(x\). Split at any constant — \(0\) will do — into two variable-upper-limit pieces, \(h(x) = \int_{0}^{x^{3}} \cos t\,dt - \int_{0}^{x^{2}} \cos t\,dt\), and apply Part 1 with the chain rule to each end:</p>
+        <p>\[ h'(x) = \cos(x^{3})\cdot 3x^{2} - \cos(x^{2})\cdot 2x = 3x^{2}\cos(x^{3}) - 2x\cos(x^{2}). \]</p>
+        <p>Each end contributes the integrand evaluated at that limit, times the limit’s own derivative; the lower end enters with a minus. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Evaluating integrals</h3>
+
+  <p>Part 1 built one antiderivative of \(f\) — the accumulation function. Part 2 turns the tables: it evaluates a definite integral from <em>any</em> antiderivative whatsoever, and most antiderivatives are far easier to write down than \(\int_{a}^{x} f\).</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.4</span><span class="env-name">Fundamental Theorem of Calculus, Part 2</span></p>
+    <div class="env-body">
+      <p>If \(f\) is continuous on \([a, b]\) and \(F\) is <em>any</em> antiderivative of \(f\) on an open interval containing \([a, b]\), then</p>
+      <p>\[ \int_{a}^{b} f(x)\,dx = F(b) - F(a). \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Let \(g(x) = \int_{a}^{x} f(t)\,dt\). By Part 1, \(g\) is an antiderivative of \(f\) on \((a, b)\) and is continuous on \([a, b]\); the given \(F\), being differentiable on an open interval containing \([a, b]\), is continuous there too (Theorem 2.1). Their difference \(F - g\) is therefore continuous on \([a, b]\), and on \((a, b)\) its derivative is \((F - g)' = f - f = 0\). A function continuous on a closed interval whose derivative vanishes throughout the interior is constant (Corollary 4.4), so \(F(x) = g(x) + C\) for some constant \(C\) and all \(x\) in \([a, b]\). Evaluating at the endpoints, the constant cancels:</p>
+      <p>\[ \begin{aligned}
+        F(b) - F(a) &= \bigl[g(b) + C\bigr] - \bigl[g(a) + C\bigr] \\[2pt]
+                    &= g(b) - g(a).
+      \end{aligned} \]</p>
+      <p>Finally \(g(b) = \int_{a}^{b} f(t)\,dt\) and \(g(a) = \int_{a}^{a} f(t)\,dt = 0\), so \(F(b) - F(a) = \int_{a}^{b} f(t)\,dt\), which is the claim. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The difference \(F(b) - F(a)\) is written \(\bigl[F(x)\bigr]_{a}^{b}\) (or \(F(x)\big|_{a}^{b}\)) when the antiderivative is displayed. Because any antiderivative serves, any added constant is pointless here — it cancels in the subtraction — so we take the simplest antiderivative available.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">6.1</span><span class="env-name">Evaluating a definite integral</span></p>
+    <div class="env-body">
+      <p>To evaluate \(\displaystyle\int_{a}^{b} f(x)\,dx\) by the Fundamental Theorem:</p>
+      <ol class="steps">
+        <li>Find an antiderivative \(F\) of \(f\) — a function with \(F' = f\) — by reading the derivative rules of Chapters 2–4 backwards.</li>
+        <li>Evaluate at the upper and lower limits and subtract: \(\displaystyle\int_{a}^{b} f(x)\,dx = \bigl[F(x)\bigr]_{a}^{b} = F(b) - F(a)\).</li>
+        <li>Any antiderivative works, since the additive constant cancels — so choose the simplest.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.11</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{1} x^{2}\,dx\) and \(\displaystyle\int_{1}^{4} \sqrt{x}\,dx\) by the Fundamental Theorem, and compare with the earlier sections.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>An antiderivative of \(x^{2}\) is \(\tfrac{1}{3}x^{3}\), so</p>
+        <p>\[ \int_{0}^{1} x^{2}\,dx = \left[\frac{x^{3}}{3}\right]_{0}^{1} = \frac{1}{3} - 0 = \frac{1}{3}. \]</p>
+        <p>The whole limit-of-Riemann-sums computation of §6.1–6.2 collapses to one line. For the second, write \(\sqrt{x} = x^{1/2}\), whose antiderivative is \(\tfrac{x^{3/2}}{3/2} = \tfrac{2}{3}x^{3/2}\):</p>
+        <p>\[ \begin{aligned}
+          \int_{1}^{4} \sqrt{x}\,dx &= \left[\frac{2}{3}x^{3/2}\right]_{1}^{4}
+                                     = \frac{2}{3}\bigl(4^{3/2} - 1^{3/2}\bigr) \\[2pt]
+                                    &= \frac{2}{3}(8 - 1) = \frac{14}{3}.
+        \end{aligned} \]</p>
+        <p>In Example 6.8 the bounding property could only pen this integral into the range \([3, 6]\); the Fundamental Theorem delivers the exact \(\tfrac{14}{3} \approx 4.67\), which indeed sits there. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.12</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{\pi} \sin x\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Since \(\dfrac{d}{dx}(-\cos x) = \sin x\), an antiderivative of \(\sin x\) is \(-\cos x\), and</p>
+        <p>\[ \begin{aligned}
+          \int_{0}^{\pi} \sin x\,dx &= \bigl[-\cos x\bigr]_{0}^{\pi}
+                                     = (-\cos \pi) - (-\cos 0) \\[2pt]
+                                    &= -(-1) - (-1) = 2.
+        \end{aligned} \]</p>
+        <p>The answer is positive, as it must be: over \([0, \pi]\) the sine curve rises in a single hump above the axis, so its signed area is a genuine, positive area. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:history [source: standard calculus-textbook historical note] — the FTC as Newton and Leibniz's central discovery, the inverse link making calculus one subject -->
+  <p>This inverse link is the discovery, made independently by Newton in the 1660s and Leibniz in the 1670s, that founded calculus as one subject rather than two. The area problem and the tangent problem had been studied for centuries in isolation; the recognition that they are inverse — that the derivative of an accumulated area is the height, and so an area is recovered from an antiderivative — is what turned a collection of clever area computations into a method.</p>
+
+  <!-- expansion:summary — close: the two parts are two faces of one inverse relationship; forward-fence to §6.4 (antiderivative notation + net change) WITHOUT its mechanics -->
+  <p>The two parts are one statement seen from opposite ends. Part 1 differentiates an integral and returns the integrand; Part 2 integrates using an antiderivative and returns a difference of its values. Together they say that differentiation and integration are inverse processes — the central fact of the subject. What remains is to make antiderivatives easy to produce and to read. The next section sets up a notation for the whole family of antiderivatives of a function and reads the Fundamental Theorem as a statement about accumulated change.</p>
+
+</article>

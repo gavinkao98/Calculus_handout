@@ -1,0 +1,2177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chapter 6 — Print build</title>
+
+<!-- ════════════════════════════════════════════════════════════════
+     圖片寬度控制面板 —— 直接改下面的數字即可（px 固定寬 / % 相對頁寬）
+     並排或多格圖（1.1 / 1.7 / 1.9）控制的是「每一格」的寬度。
+     ════════════════════════════════════════════════════════════════ -->
+<style>
+:root {
+}
+
+</style>
+
+<!-- Google Fonts: Inter for UI -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- New Computer Modern (prose/text faces) — matches MathJax 4 "mathjax-newcm" math font.
+     Source: npm web-computer-modern@1.1.0-new-cm-7-0-2 via jsDelivr. License: GUST Font License.
+     10pt optical size ("Serif 10"). NOTE: filenames contain %20-encoded spaces — keep them. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+
+<!-- MathJax 4 (CHTML output with inline line-breaking) -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    macros: {
+      arccsc: '\\operatorname{arccsc}',
+      arcsec: '\\operatorname{arcsec}',
+      arccot: '\\operatorname{arccot}'
+    }
+  },
+  chtml: {
+    mtextInheritFont: true,
+    matchFontHeight: true
+  },
+  output: {
+    displayOverflow: 'linebreak',
+    linebreaks: {
+      inline: true,
+      width: '100%',
+      lineleading: 0.2
+    }
+  },
+  startup: { typeset: false }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+
+<style>
+/* ============================================================
+   skin-hs.css — inlined + modified: Times New Roman + MathJax
+   ============================================================ */
+.paper {
+  --c-primary: oklch(0.50 0.13 245);
+  --c-caution: oklch(0.50 0.155 25);
+  --c-aux: oklch(0.55 0.01 260);
+  --c-axis: #474b54;
+  --ink: #1b1c1f;
+  --ink-soft: #565a63;
+  --ink-faint: #8a8e98;
+  --paper: #ffffff;
+  --rule: #e5e7eb;
+  --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
+  --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
+  /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
+  --ui: "Inter", -apple-system, system-ui, sans-serif;
+  --a-concept:  oklch(0.50 0.13 55);
+  --a-result:   oklch(0.50 0.13 245);
+  --a-practice: oklch(0.50 0.13 152);
+  --a-aside:    oklch(0.50 0.02 260);
+  --a-caution:  oklch(0.50 0.155 25);
+  --a-strategy: oklch(0.50 0.13 290);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-base, 17.5px);
+  line-height: var(--lh-base, 1.62);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+.paper *, .paper *::before, .paper *::after { box-sizing: border-box; }
+.paper .page { padding: 52px 58px 64px; max-width: 760px; margin: 0 auto; }
+.skin-hs .page { hyphens: auto; -webkit-hyphens: auto; }
+.skin-hs p, .skin-hs li { text-align: justify; text-justify: inter-word; }
+.paper p { margin: 0 0 .85em; text-wrap: pretty; }
+.paper em { font-style: italic; }
+.paper .informal { font-style: italic; color: var(--ink-soft); }
+.paper ol { margin: .2em 0 .9em; padding-left: 1.5em; }
+.paper li { margin: .35em 0; text-wrap: pretty; }
+.paper .warmup { counter-reset: wu; list-style: none; padding-left: 0; }
+.paper .warmup > li { counter-increment: wu; position: relative; padding-left: 2.1em; }
+.paper .warmup > li::before {
+  content: "(" counter(wu, lower-alpha) ")";
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
+}
+.paper mjx-container[display="true"] { margin: .55em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
+.paper .qed { display: block; text-align: right; margin: -1.62em 0 0; height: 1.62em; pointer-events: none; }
+.paper .qed::after {
+  content: ""; display: inline-block; width: .56em; height: .56em;
+  border: 1.3px solid var(--ink-soft);
+}
+.paper .env-body > :has(+ .qed) { margin-bottom: 0; display: flow-root; }
+.paper .env-body::after { content: ""; display: block; clear: both; }
+.paper .sec-head {
+  margin-top: 2.7em; padding-top: 1.35em;
+  border-top: 1px solid var(--rule); margin-bottom: 1.5em;
+}
+.sheet-body > .sec-head:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.paper .sec-kicker {
+  font-family: var(--ui); font-size: .7rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--c-primary); font-weight: 700; margin-bottom: .55em;
+}
+.paper .sec-title { font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -.012em; margin: 0; }
+.paper .sec-no { color: var(--c-primary); margin-right: .5em; font-weight: 600; }
+.paper .subsec-head {
+  font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
+  display: flex; align-items: center; gap: .55em; color: var(--ink);
+}
+.paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
+.paper .figure { margin: 1.7em 0; text-align: center; }
+.paper .figure-art { display: flex; justify-content: center; }
+.paper .figure-art--pair { gap: 26px; }
+.paper .fig-svg { width: 100%; max-width: var(--fig-w, var(--fig-w-pair)); height: auto; }
+.paper .figure-art:not(.figure-art--pair) .fig-svg { max-width: var(--fig-w, var(--fig-w-single)); }
+.paper figcaption {
+  font-family: var(--ui); font-size: .8em; line-height: 1.5;
+  color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
+}
+.paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
+.paper figcaption mjx-container { font-size: .95em; }
+.paper .axis { stroke: var(--c-axis); stroke-width: 1.25; fill: none; stroke-linecap: round; }
+.paper .curve { stroke: var(--c-primary); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .secant { stroke: var(--c-aux); stroke-width: 1.6; stroke-dasharray: 5 3.5; fill: none; stroke-linecap: round; }
+.paper .tangent { stroke: var(--c-caution); stroke-width: 2; fill: none; stroke-linecap: round; }
+/* fill primitives (ch6 M2: rect + area items in buildPlot) */
+.paper .fill-area { fill: color-mix(in srgb, var(--c-primary) 15%, transparent); stroke: none; }
+.paper .fill-pos  { fill: color-mix(in srgb, var(--c-primary) 17%, transparent); stroke: none; }
+.paper .fill-neg  { fill: color-mix(in srgb, var(--c-caution) 22%, transparent); stroke: none; }
+.paper .rect-lo   { fill: color-mix(in srgb, var(--ink) 9%, transparent); stroke: var(--c-primary); stroke-width: 1.1; }
+.paper .rect-hi   { fill: none; stroke: var(--c-primary); stroke-width: 1.4; stroke-dasharray: 4 2.5; }
+.paper .rect-sum  { fill: color-mix(in srgb, var(--c-primary) 13%, transparent); stroke: var(--c-primary); stroke-width: 1.1; }
+.paper .curve-log { stroke: var(--c-caution); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .idline { stroke: var(--c-aux); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .dot { fill: var(--ink); }
+.paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
+.paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
+.paper .arrow-bwd { stroke: var(--c-caution); stroke-width: 2; fill: none; }
+.paper .fig-svg text { font-family: var(--ui); font-size: 13px; }
+.paper .axlab { fill: var(--c-aux); font-style: italic; }
+.paper .lab-curve { fill: var(--c-primary); font-style: italic; }
+.paper .lab-ref, .paper .lab-ref-b { fill: var(--c-caution); }
+.paper .ptlab { fill: var(--ink-soft); font-size: 12px; }
+.paper .setlab { fill: var(--ink); font-weight: 600; font-size: 14.5px; text-anchor: middle; }
+
+/* env blocks */
+.skin-hs .env {
+  --accent: var(--a-aside);
+  margin: 1.2em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--accent) 38%, var(--paper));
+}
+.skin-hs .env-definition  { --accent: var(--a-concept); }
+.skin-hs .env-theorem, .skin-hs .env-proposition, .skin-hs .env-corollary { --accent: var(--a-result); }
+.skin-hs .env-example, .skin-hs .env-solution, .skin-hs .env-exercise { --accent: var(--a-practice); }
+.skin-hs .env-remark { --accent: var(--a-aside); }
+.skin-hs .env-head {
+  display: flex; align-items: baseline; gap: .5em; flex-wrap: wrap;
+  margin: 0 0 .55em; font-family: var(--ui);
+}
+.skin-hs .env-kicker {
+  font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--accent); padding: 3px 10px; border-radius: 999px; line-height: 1.5;
+}
+.skin-hs .env-num { font-weight: 700; color: var(--accent); font-size: .94em; }
+.skin-hs .env-name { font-style: italic; font-weight: 400; color: var(--ink-soft); font-family: var(--serif); font-size: 1em; }
+.skin-hs .env-body > p:first-child { margin-top: 0; }
+.skin-hs .env-body > :last-child { margin-bottom: 0; }
+.skin-hs .env-theorem .env-body, .skin-hs .env-proposition .env-body { font-style: italic; }
+.skin-hs .env-theorem .env-body mjx-container, .skin-hs .env-proposition .env-body mjx-container { font-style: normal; }
+.skin-hs .env-definition em { font-style: italic; }
+.skin-hs .env-remark { color: var(--ink-soft); font-size: .97em; }
+.skin-hs .env-remark .env-kicker { background: transparent; color: var(--a-aside); border: 1px solid color-mix(in srgb, var(--a-aside) 45%, var(--paper)); }
+.skin-hs .env-proof { --accent: var(--a-result); }
+.skin-hs .env-proof .env-kicker {
+  background: transparent; color: var(--a-result); font-style: italic; letter-spacing: .04em;
+  border: 1px solid color-mix(in srgb, var(--a-result) 45%, var(--paper));
+}
+.skin-hs .qed-proof::after { border-color: var(--ink); }
+.skin-hs .workedexample {
+  margin: 1.6em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--a-practice) 38%, var(--paper));
+  display: flow-root;
+}
+.skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
+.skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
+.skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
+.skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
+.skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
+.skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
+.skin-hs .env-exercise .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid var(--a-practice); }
+.skin-hs .env-caution, .skin-hs .env-strategy {
+  padding: 15px 20px; border-radius: 8px; margin: 1.4em 0;
+  border-left-width: 4px; border-left-style: solid;
+}
+.skin-hs .env-caution {
+  --accent: var(--a-caution);
+  background: color-mix(in srgb, var(--a-caution) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-caution) 22%, var(--paper));
+  border-left-color: var(--a-caution);
+}
+.skin-hs .env-strategy {
+  --accent: var(--a-strategy);
+  background: color-mix(in srgb, var(--a-strategy) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-strategy) 22%, var(--paper));
+  border-left-color: var(--a-strategy);
+}
+.skin-hs .env-caution .env-name, .skin-hs .env-strategy .env-name { color: var(--ink-soft); }
+.skin-hs .env-strategy .steps { margin-bottom: 0; }
+.skin-hs.vivid .env { border-left-color: color-mix(in srgb, var(--accent) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .workedexample { border-left-color: color-mix(in srgb, var(--a-practice) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .env-kicker { font-size: .64rem; padding: 3.5px 11px; }
+
+/* ============================================================
+   figs.css — inlined + modified for MathJax
+   ============================================================ */
+.paper .fig-svg { height: auto; max-width: 100%; overflow: visible; }
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note mjx-container { font-size: .98em; }
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr { position: relative; width: 100%; height: 100%; font-family: var(--serif); }
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl mjx-container { font-size: 1em; }
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl mjx-container { font-size: .98em; }
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+
+/* ============================================================
+   print.css — inlined (A4 sheet layout + paginator)
+   ============================================================ */
+@page { size: A4; margin: 0; }
+.sheet {
+  position: relative; box-sizing: border-box;
+  width: 210mm; height: 297mm;
+  padding: 20mm 28mm 20mm 32mm;
+  background: #fff; overflow: hidden;
+}
+.sheet-header {
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
+  font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
+}
+.sheet-footer {
+  position: absolute; bottom: 8.5mm; left: 0; right: 0;
+  text-align: center; font: 500 9pt "Inter", sans-serif; color: #82868f;
+}
+.sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
+.sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
+.sheet-body .page { padding: 0; max-width: none; margin: 0; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
+.sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet-body > :first-child { margin-top: 0 !important; }
+.sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
+.sheet-body .qed { margin-top: -1.55em; height: 1.55em; }
+.sheet-body .env-body::after { display: none; content: none; }
+.sheet-body .env-cont { margin-top: 0; }
+.sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+@media screen {
+  body { background: #6f727b; margin: 0; }
+  .sheet { box-shadow: 0 3px 18px rgba(0,0,0,.3); margin: 9mm auto; }
+}
+@media print {
+  body { background: #fff; margin: 0; }
+  .sheet { box-shadow: none; margin: 0; break-after: page; }
+  .sheet:last-child { break-after: auto; }
+  .print-toolbar, #boot { display: none !important; }
+}
+
+/* ============================================================
+   page-level
+   ============================================================ */
+.print-toolbar {
+  position: fixed; top: 14px; right: 16px; z-index: 1000;
+  display: flex; align-items: center; gap: 10px; font-family: "Inter", system-ui, sans-serif;
+}
+.print-toolbar button {
+  font: 600 13px "Inter", sans-serif; color: #fff; background: oklch(0.50 0.13 245);
+  border: 0; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.print-toolbar button:disabled { opacity: .5; cursor: default; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
+.print-toolbar .status {
+  font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
+  padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
+}
+#boot {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
+}
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
+</style>
+</head>
+<body>
+
+<div id="boot">Preparing …</div>
+
+<div class="print-toolbar">
+  <span class="status" id="status">Preparing …</span>
+  <button id="printBtn" disabled>Print / Save as PDF</button>
+</div>
+
+<div id="source"><div class="paper skin-hs vivid"><div class="page" id="page"></div></div></div>
+<div id="pages"></div>
+
+<!-- Section fragments (inlined) -->
+
+<!-- BEGIN-CONTENT-FRAGMENTS -->
+<template id="frag-sec-6-1">
+<!-- Chapter 6 opener + §6.1 Areas and Distances.
+     SECOND manuscript-free chapter; first full 5-milestone pilot. section-source: Stewart ET 9e §5.1
+     (Areas and Distances); cross-checked Thomas 14e §5.1, Rogawski 4e §5.1. Authored 2026-07-10 per
+     PLAN-ch06 + brief-6-1 (canon-as-spine, full-gate tier; Codex at ③/⑤ per user 2026-07-06 grant).
+     §6.1 carries the Chapter 6 opener (first <article>: chapter-head + lead + "By the end"), mirroring
+     ch01–ch05. Numbering fresh for Ch6: §6.1 mints Definition 6.1 (Area under a curve), Examples 6.1–6.3.
+     No Theorem/Strategy yet. Cautions UNNUMBERED (Ch1–5 convention).
+     SEAM GUARD (full-arc Codex seam-hunt + brief-6-1): §6.1 is the MOTIVATION section — limits of
+     Riemann sums for area and distance. Do NOT define the definite integral or introduce the ∫ symbol
+     (that is §6.2 — one-line forward fence only). Do NOT prove convergence/integrability (§6.2 states it;
+     the continuous⟹integrable proof is fenced to the Proof Track). Do NOT tease the FTC antiderivative
+     shortcut (§6.3) — §6.1 earns the limit honestly. INTRODUCE-BEFORE-USE: Σ and finite arithmetic sums
+     are A-class (assumable); the power sum Σi² is B-class (SPEC §16.2) — one-line in-place bridge +
+     cross-ref Appendix A §A.3 Proposition A.6 BEFORE Example 6.2 uses it.
+     Counters handed to §6.2: Definition 6.2, Example 6.4, (no Thm/Strat/Prop/Cor/Lem/Rem yet).
+     M2 FIGURES (2026-07-10, DRAWN+AUDITED): §6.1 mints Figure 6.1 (riemann-lr-x2), Figure 6.2 (refinement-rn-x2,
+     Ex 6.1→6.2) and Figure 6.3 (velocity-distance-steps, Ex 6.3). All Ch6 M2 figures 6.1–6.8 cleared gate-1 D1–D8
+     + gate-2 (Codex -i) at 0 blocking. See PLAN-ch06 "M2 figure batch".
+     Record: PLAN-ch06.md, brief-6-1.md; CONTENT_ROADMAP.md §6 seam ledger. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Chapter 6</div>
+    <h1 class="ch-title">Integrals</h1>
+  </header>
+
+  <p class="lead">The first five chapters were about the derivative — the instantaneous rate at which one quantity changes as another does. This chapter turns to the opposite question, and to a problem far older than the derivative: how to measure the <em>total</em> accumulated from a rate, or the <em>area</em> enclosed by a curve. The Greeks computed areas of curved regions by exhausting them with polygons; the same idea, sharpened into a limit, becomes the <em>definite integral</em>. We build it from the ground up as a limit of sums, and then — in the Fundamental Theorem of Calculus, the summit of the chapter and arguably of the whole subject — we discover that this process of summation and the derivative are two sides of a single coin, inverse to each other. That deep and unexpected link between areas and slopes is what ties the two halves of calculus together, and this chapter is where it is forged.</p>
+
+  <p class="para-head">By the end of this chapter, you will be able to:</p>
+  <ul>
+    <li>express areas and distances as limits of Riemann sums;</li>
+    <li>define the definite integral and evaluate simple cases directly from the definition;</li>
+    <li>state and apply both parts of the Fundamental Theorem of Calculus;</li>
+    <li>use the Fundamental Theorem to evaluate definite integrals through antiderivatives;</li>
+    <li>find indefinite integrals and read the integral of a rate as a net change;</li>
+    <li>evaluate integrals by the substitution rule, including definite integrals and problems with symmetry.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">6.1</span>Areas and Distances</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: motivate the whole chapter from the area problem; the crux is trap-and-squeeze, and its twin (distance from velocity) is the same sum -->
+  <p>We know the area of a rectangle, a triangle, or any polygon: cut it into pieces whose areas we already have and add them up. But what is the area of a region with a <em>curved</em> boundary — the region under the parabola \(y = x^{2}\) from \(x = 0\) to \(x = 1\), say? There is no elementary formula, because there is no way to tile a curved region exactly with finitely many rectangles. The way forward is the oldest idea in the subject: <em>approximate</em> the region by rectangles we <em>can</em> measure, make the approximation finer, and see what number the areas approach. That number, when it exists, is what we <em>mean</em> by the area. The same manoeuvre — approximate by simple pieces, then refine to a limit — will, a little later, compute a distance from a record of velocities. The two problems turn out to be one.</p>
+
+  <h3 class="subsec-head">The area problem</h3>
+
+  <p>Let \(f\) be continuous and non-negative on \([a, b]\), and let \(S\) be the region bounded above by \(y = f(x)\), below by the \(x\)-axis, and on the sides by the vertical lines \(x = a\) and \(x = b\). To approximate the area of \(S\), divide \([a, b]\) into \(n\) strips of equal width</p>
+  <p>\[ \Delta x = \frac{b - a}{n}, \]</p>
+  <p>by the points \(x_{0} = a,\ x_{1},\ x_{2},\ \dots,\ x_{n} = b\), where \(x_{i} = a + i\,\Delta x\). Over each strip \([x_{i-1}, x_{i}]\) build a rectangle whose height is the value of \(f\) at the <em>right</em> endpoint, \(f(x_{i})\). The combined area of these \(n\) rectangles is the <em>right endpoint sum</em></p>
+  <p>\[ R_{n} = f(x_{1})\,\Delta x + f(x_{2})\,\Delta x + \dots + f(x_{n})\,\Delta x = \sum_{i=1}^{n} f(x_{i})\,\Delta x, \]</p>
+  <p>where \(\sum_{i=1}^{n}\) is the sigma notation for the sum of the listed terms as \(i\) runs from \(1\) to \(n\). Choosing instead the <em>left</em> endpoint of each strip gives the <em>left endpoint sum</em> \(L_{n} = \sum_{i=1}^{n} f(x_{i-1})\,\Delta x\). Each is a sum of rectangle areas — an approximation to the area of \(S\) that we expect to sharpen as the strips grow thinner.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.1</span></p>
+      <div class="env-body">
+        <p>Estimate the area under \(y = x^{2}\) from \(0\) to \(1\) using \(n = 4\) rectangles of equal width, with heights taken at the right endpoints. Then do the same with the left endpoints, and read off what the two estimates say about the true area.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(\Delta x = \tfrac{1}{4}\), and the division points are \(0, \tfrac14, \tfrac12, \tfrac34, 1\). With \(f(x) = x^{2}\), the right endpoints are \(\tfrac14, \tfrac12, \tfrac34, 1\), so</p>
+        <p>\[ \begin{aligned}
+          R_{4} &= \tfrac{1}{4}\!\left[\left(\tfrac14\right)^{2} + \left(\tfrac12\right)^{2} + \left(\tfrac34\right)^{2} + 1^{2}\right] \\[2pt]
+                &= \tfrac{1}{4}\cdot\frac{1 + 4 + 9 + 16}{16} = \frac{30}{64} = \frac{15}{32} \approx 0.469.
+        \end{aligned} \]</p>
+        <p>The left endpoints are \(0, \tfrac14, \tfrac12, \tfrac34\), which drop the tallest rectangle and add a flat one of height \(0\):</p>
+        <p>\[ \begin{aligned}
+          L_{4} &= \tfrac{1}{4}\!\left[0^{2} + \left(\tfrac14\right)^{2} + \left(\tfrac12\right)^{2} + \left(\tfrac34\right)^{2}\right] \\[2pt]
+                &= \tfrac{1}{4}\cdot\frac{0 + 1 + 4 + 9}{16} = \frac{14}{64} = \frac{7}{32} \approx 0.219.
+        \end{aligned} \]</p>
+        <p>Because \(x^{2}\) is increasing on \([0, 1]\), each right rectangle rises above the curve and each left rectangle falls below it, so the two sums bracket the true area \(A\):</p>
+        <p>\[ 0.219 \approx L_{4} < A < R_{4} \approx 0.469. \]</p>
+        <!-- expansion:caution [pass: enrichment] [source: mode-c gap-check 2026-07-11 — L/R over/under-estimation depends on monotonicity, not on which side; Ch6's two examples are both increasing, guard against over-generalizing] -->
+        <p>The direction of this bracket is a fact about the <em>increase</em> of \(x^{2}\), not about which endpoint is read: on an interval where \(f\) <em>decreases</em>, the roles swap — the right endpoints undershoot and the left endpoints overshoot — and where \(f\) both rises and falls, over- and under-estimation must be judged piece by piece.</p>
+        <p>Four rectangles give only a loose verdict. The bracket will tighten as \(n\) grows — and the next example takes \(n\) all the way to infinity. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-essential — Riemann L/R rectangles under x²; registered in chapter6 FIGS as "riemann-lr-x2"] -->
+  <figure class="figure" data-fig="riemann-lr-x2">
+    <figcaption><span class="fig-no">Figure 6.1</span> Approximating the area under \(y = x^{2}\) on \([0, 1]\) with four equal strips. Reading each rectangle’s height at the <em>left</em> endpoint (left panel) keeps every rectangle below the curve, so \(L_{4} = \tfrac{7}{32}\) underestimates; reading it at the <em>right</em> endpoint (right panel) lifts every rectangle above the curve, so \(R_{4} = \tfrac{15}{32}\) overestimates. The true area is trapped between.</figcaption>
+  </figure>
+
+  <p>To let \(n \to \infty\) we need the right endpoint sum as an explicit function of \(n\). For \(f(x) = x^{2}\) on \([0, 1]\) the width is \(\Delta x = \tfrac{1}{n}\) and the right endpoints are \(x_{i} = \tfrac{i}{n}\), so \(f(x_{i}) = \tfrac{i^{2}}{n^{2}}\) and</p>
+  <p>\[ R_{n} = \sum_{i=1}^{n} \frac{i^{2}}{n^{2}}\cdot\frac{1}{n} = \frac{1}{n^{3}} \sum_{i=1}^{n} i^{2}. \]</p>
+  <p>The remaining sum \(\sum_{i=1}^{n} i^{2}\) is a <em>power sum</em>. Unlike the arithmetic sum \(\sum_{i=1}^{n} i = \tfrac{n(n+1)}{2}\), it has the less familiar closed form</p>
+  <p>\[ \sum_{i=1}^{n} i^{2} = \frac{n(n+1)(2n+1)}{6}, \]</p>
+  <p>proved by telescoping in Appendix A (Proposition A.6). With that closed form in hand, the limit is a routine computation.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-strong — refinement of the right sum Rₙ closing the bracket as n grows; registered in chapter6 FIGS as "refinement-rn-x2"] -->
+  <figure class="figure" data-fig="refinement-rn-x2">
+    <figcaption><span class="fig-no">Figure 6.2</span> Refining the right endpoint sum for \(y = x^{2}\) on \([0, 1]\). With \(n = 4, 8, 16\) strips the rectangles overshoot the curve on every strip, but by less and less as \(n\) grows, so the overestimates close in on the true area from above.</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.2</span></p>
+      <div class="env-body">
+        <p>Find the exact area under \(y = x^{2}\) from \(0\) to \(1\) as the limit of the right endpoint sums.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Substitute the closed form for \(\sum i^{2}\) into \(R_{n}\) and simplify, keeping the powers of \(n\) grouped so the limit is easy to read:</p>
+        <p>\[ \begin{aligned}
+          R_{n} &= \frac{1}{n^{3}} \sum_{i=1}^{n} i^{2} \\[2pt]
+                &= \frac{1}{n^{3}}\cdot\frac{n(n+1)(2n+1)}{6} \\[2pt]
+                &= \frac{(n+1)(2n+1)}{6 n^{2}} \\[2pt]
+                &= \frac{1}{6}\left(1 + \frac{1}{n}\right)\!\left(2 + \frac{1}{n}\right).
+        \end{aligned} \]</p>
+        <p>As \(n \to \infty\), both \(\tfrac{1}{n}\) terms vanish, so</p>
+        <p>\[ A = \lim_{n \to \infty} R_{n} = \frac{1}{6}\,(1)(2) = \frac{1}{3}. \]</p>
+        <p>The exact area is \(\tfrac{1}{3}\) — comfortably inside the bracket \(0.219 < A < 0.469\) from Example 6.1. The same limit results from the left endpoint sums \(L_{n}\): they differ from \(R_{n}\) by only the single end rectangle \(\tfrac{1}{n}\bigl(f(1) - f(0)\bigr) = \tfrac{1}{n}\), which itself tends to \(0\). Approaching the area from below or from above, we arrive at the one number. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <p>That the left and right sums close on a single value is exactly what lets us <em>define</em> the area to be that value.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.1</span><span class="env-name">Area under a curve</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be continuous and non-negative on \([a, b]\). The <em>area</em> of the region under the graph of \(f\) from \(a\) to \(b\) is</p>
+      <p>\[ A = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_{i})\,\Delta x, \qquad \Delta x = \frac{b - a}{n},\quad x_{i} = a + i\,\Delta x, \]</p>
+      <p>provided this limit exists. For a continuous \(f\) it does, and the left endpoint sums, the right endpoint sums, and in fact the sums built from <em>any</em> choice of sample point in each strip all approach the same value.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the honest fence: existence and choice-independence of the limit is asserted here, proved (as integrability) in §6.2 and the Proof Track; do not let the reader think it is free -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The clause “provided this limit exists” is not a formality. That the approximating sums converge at all — and that the choice of sample point cannot change the answer — is a genuine theorem, resting on the continuity of \(f\). We rely on it here to make the definition well posed, and the next section states it precisely (continuity guarantees the limit); its proof, which turns on how tightly a continuous function can be trapped on a closed interval, is carried in the Proof-Track appendix. For a badly discontinuous \(f\), sums built from different choices of sample point really can disagree — driving every sample to where the function misbehaves gives one value, steering clear of those places gives another — so no single limit, and hence no area, is defined. (For the equal-width left and right sums themselves the gap is only \(\bigl(f(b) - f(a)\bigr)\,\Delta x\), which closes regardless; it is the freedom in the sample points, not the side of the strip, that continuity has to tame.)</p>
+    </div>
+  </section>
+
+  <!-- expansion:history [source: standard calculus-textbook historical note] — Archimedes' quadrature of the parabola as the ancestor of the limit-of-sums, motivating (not decorating) the method -->
+  <p>The method is old. In the third century BCE Archimedes found the area of a parabolic segment by trapping it between inscribed and circumscribed rectilinear figures and squeezing them together — the same bracket, computed by hand, that Examples 6.1 and 6.2 tightened into a limit. What the seventeenth century added was not the idea but the machinery to carry the limit out in general, which is the business of this chapter.</p>
+
+  <h3 class="subsec-head">The distance problem</h3>
+
+  <!-- expansion:intuition — motivate the distance problem as the SAME sum, so the definite integral of §6.2 lands as the common answer to two questions, not one -->
+  <p>Suppose we know the <em>speed</em> of a moving object at every instant, but not its position, and we want the <em>total distance</em> it travels over a time interval. Speed is never negative — it measures how fast the object moves, whichever way it is heading — and we take it to vary continuously. If it were <em>constant</em>, the distance would be just speed times elapsed time. It is not constant — but over a <em>short</em> stretch of time it is nearly so, and on that stretch \(\text{speed} \times \text{time}\) is a good estimate of the distance covered. Add these estimates over the whole interval and the total distance is approximated by a sum of exactly the form \(\sum v(t_{i})\,\Delta t\) — a Riemann sum again, now with speed in place of \(f\) and elapsed time in place of width.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.3</span></p>
+      <div class="env-body">
+        <p>A runner starts from rest and speeds up, her speed recorded every second for five seconds:</p>
+        <p>\[ \begin{array}{c|cccccc} t\ (\text{s}) & 0 & 1 & 2 & 3 & 4 & 5 \\ \hline v\ (\text{m/s}) & 0 & 4 & 7 & 9 & 10 & 10 \end{array} \]</p>
+        <p>Assuming her speed climbs continuously and never falls back over this interval, estimate the distance she covers.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Take \(\Delta t = 1\) second. Using the speed at the <em>left</em> end of each one-second interval (the readings at \(t = 0, 1, 2, 3, 4\)) gives the underestimate</p>
+        <p>\[ L = 1\cdot(0 + 4 + 7 + 9 + 10) = 30 \text{ m}, \]</p>
+        <p>while the speed at the <em>right</em> end of each interval (the readings at \(t = 1, 2, 3, 4, 5\)) gives the overestimate</p>
+        <p>\[ R = 1\cdot(4 + 7 + 9 + 10 + 10) = 40 \text{ m}. \]</p>
+        <p>Because the speed never falls back, on each one-second stretch it stays no lower than the left reading and no higher than the right, so the left sum is a lower estimate of the distance and the right sum an upper one: the true distance lies between them, \(30 \text{ m} \le \text{distance} \le 40 \text{ m}\), about \(35\) metres. The readings alone fix only the sampled values; the bracket rests on the modelling assumption that the speed climbs without falling back between them. Readings taken every half-second, then every tenth of a second, would squeeze the two estimates together — the identical refinement that Example 6.2 carried to the limit. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-strong — v–t step graph, distance as area under the velocity curve; registered in chapter6 FIGS as "velocity-distance-steps"] -->
+  <figure class="figure" data-fig="velocity-distance-steps">
+    <figcaption><span class="fig-no">Figure 6.3</span> The runner’s recorded speeds at one-second marks (Example 6.3), with the right endpoint rectangles whose areas sum to the overestimate \(R\). Since distance accumulates speed times time, the distance travelled is the area under the speed–time graph; the dashed line only suggests the unrecorded speed between readings.</figcaption>
+  </figure>
+
+  <!-- expansion:summary — close: the two problems are one limit-of-sums; name-drop that §6.2 will christen it, WITHOUT introducing the integral symbol or its mechanics (seam guard) -->
+  <p>Set the two computations side by side. The area under a curve is \(\lim_{n\to\infty}\sum f(x_{i})\,\Delta x\); the distance from a speed is \(\lim_{n\to\infty}\sum v(t_{i})\,\Delta t\). They are the <em>same</em> limit of the <em>same</em> kind of sum, differing only in what the quantities are called — and indeed for a non-negative speed the distance is nothing but the area under the speed-versus-time graph. Whenever a quantity accumulates from a varying rate, the same construction returns: chop the interval, multiply rate by width, sum, and refine. The next section gives this common limit a name and a symbol of its own — the <em>definite integral</em> — and settles the promise made above that, for a continuous function, the limit is really there.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-6-2">
+<!-- §6.2 The Definite Integral. section-source: Stewart ET 9e §5.2 (The Definite Integral);
+     cross-checked Thomas 14e §5.3, Rogawski 4e §5.2. Authored 2026-07-10 per PLAN-ch06 + brief-6-2
+     (canon-as-spine; Codex ⑤ per user 2026-07-06 grant). Numbering continues from §6.1:
+     mints Definition 6.2, Theorem 6.1 (first Thm of Ch6), Theorem 6.2, Examples 6.4–6.8 (M4 added Ex 6.6 semicircle + Ex 6.7 linearity).
+     Cautions UNNUMBERED. This section introduces the ∫ symbol and net signed area (both deferred from §6.1).
+     SEAM GUARD (brief-6-2 + full-arc seam-hunt): STATE Theorem 6.1 (continuous ⟹ integrable) and FENCE its
+     proof ON CREDIT (uniform continuity on a closed interval) — 深理論核心 permits on-credit fencing of the
+     single heaviest result (SPEC §16.1). Do NOT prove a Riemann-integrability criterion. Do NOT introduce the
+     FTC/antiderivative shortcut (§6.3 — one-line forward fence only) or any integration technique / numerical
+     rule (Midpoint/Trapezoid/Simpson RULES are Ch8 §8.7 — the midpoint sample POINT may appear only as an
+     instance of "any sample point works"). NO dangling cross-ref: App D is currently §D.1–D.3, so do NOT cite a
+     §D.4 that does not exist — fence on-credit generically (whether to write §D.4 is an open ⑤ decision, PLAN-ch06).
+     Counters handed to §6.3: Definition 6.3, Theorem 6.3, Example 6.9, Figure 6.7 (§6.2 minted Ex 6.4–6.8, Fig 6.4–6.6 through M4).
+     FIGURES (M2+M4): §6.2 now carries Figure 6.4 (signed-area-line, Ex 6.5), Figure 6.5 (semicircle-area, Ex 6.6 — M4)
+     and Figure 6.6 (minmax-sqrt, Ex 6.8 — was Fig 6.5 pre-M4). M2 pair gate-1+gate-2 0 blocking; semicircle gate-1 0 blocking, gate-2 batched. Record: PLAN-ch06.md, brief-6-2.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">6.2</span>The Definite Integral</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: §6.1 produced a common limit for two problems; name it, and extend it from area (f≥0) to any continuous f, where it becomes net signed area -->
+  <p>Section 6.1 ended on a coincidence too strong to be one: the area under a curve and the distance from a velocity were the <em>same</em> limit of the <em>same</em> kind of sum. A construction that keeps returning deserves a name and a symbol of its own. Here we give it both — the <em>definite integral</em> — and at the same time free it from the assumption that \(f\) is non-negative. For a function that dips below the axis the same limit still makes perfect sense; it simply measures area with a sign, and that signed quantity is what the integral records.</p>
+
+  <p>Fix a function \(f\) on \([a, b]\). Exactly as before, cut \([a, b]\) into \(n\) strips of equal width \(\Delta x = (b - a)/n\) by points \(a = x_{0} < x_{1} < \dots < x_{n} = b\); but now, in each strip \([x_{i-1}, x_{i}]\), allow the height to be read at <em>any</em> point \(x_{i}^{*}\) of that strip, not just an endpoint. The resulting sum</p>
+  <p>\[ \sum_{i=1}^{n} f(x_{i}^{*})\,\Delta x \]</p>
+  <p>is called a <em>Riemann sum</em> for \(f\) on \([a, b]\), after Bernhard Riemann. The left, right, and midpoint sums are the special cases \(x_{i}^{*} = x_{i-1}\), \(x_{i}^{*} = x_{i}\), and \(x_{i}^{*} = \tfrac{1}{2}(x_{i-1} + x_{i})\). The definite integral is what these sums approach.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.2</span><span class="env-name">Definite integral</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be defined on \([a, b]\). The <em>definite integral of \(f\) from \(a\) to \(b\)</em> is</p>
+      <p>\[ \int_{a}^{b} f(x)\,dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_{i}^{*})\,\Delta x, \qquad \Delta x = \frac{b - a}{n}, \]</p>
+      <p>provided this limit exists and takes the <em>same</em> value for every choice of the sample points \(x_{i}^{*}\). When it does, \(f\) is called <em>integrable</em> on \([a, b]\).</p>
+    </div>
+  </section>
+
+  <p>The symbol \(\int\), an elongated \(S\) for <em>summa</em>, was Leibniz’s; it keeps the Riemann sum in view even after the limit has erased the individual rectangles. In \(\displaystyle\int_{a}^{b} f(x)\,dx\), the numbers \(a\) and \(b\) are the <em>limits of integration</em> (lower and upper), \(f(x)\) is the <em>integrand</em>, and the \(dx\) marks the variable with respect to which we sum — the surviving trace of the width \(\Delta x\). The integral is a <em>number</em>, not a function of \(x\); the \(x\) inside is a placeholder, so</p>
+  <p>\[ \int_{a}^{b} f(x)\,dx = \int_{a}^{b} f(t)\,dt = \int_{a}^{b} f(u)\,du. \]</p>
+
+  <!-- expansion:history [source: standard calculus-textbook historical note] — Leibniz's 1675 elongated-S notation for the integral as "summa" -->
+  <p>Leibniz settled on the elongated \(S\) in 1675, writing the integral as a continuous analogue of a sum of infinitely many infinitely thin rectangles. The notation has outlived the shaky infinitesimals it was born with precisely because it survives translation into the honest limit of Definition 6.2.</p>
+
+  <p>To use the integral freely we extend it to the cases \(a = b\) and \(a > b\) by convention, so that the limits of integration may sit in either order:</p>
+  <p>\[ \int_{a}^{a} f(x)\,dx = 0, \qquad \int_{b}^{a} f(x)\,dx = -\int_{a}^{b} f(x)\,dx. \]</p>
+  <p>Reversing the limits reverses the sign — natural, since running the strips from \(b\) back to \(a\) turns each width \(\Delta x\) into its negative.</p>
+
+  <h3 class="subsec-head">When does the limit exist?</h3>
+
+  <p>Definition 6.2 asks a great deal: one number approached by <em>every</em> choice of sample points. For a wild enough function the demand fails — recall the caution of §6.1, where samples steered onto and off the misbehaviour of \(f\) gave different answers. What rescues the functions we actually meet is continuity.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.1</span><span class="env-name">Integrability of continuous functions</span></p>
+    <div class="env-body">
+      <p>If \(f\) is continuous on \([a, b]\), then \(f\) is integrable on \([a, b]\): the Riemann sums approach a single limit — the same for every way of slicing \([a, b]\) into strips whose widths shrink to zero, and every choice of sample points within them. The same holds if \(f\) is bounded on \([a, b]\) and continuous there except at finitely many points.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — honest on-credit fence for Theorem 6.1: name uniform continuity as the engine, take the theorem on credit, do NOT gesture at a proof we are not giving (seam guard: no §D.4 dangling ref) -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Theorem 6.1 is the one result of this chapter we do not prove. Its proof turns on a property of a continuous function on a <em>closed</em> interval subtler than continuity at each point — <em>uniform</em> continuity, a single rate of continuity good across the whole interval — which forces the gap between the largest and smallest Riemann sums to shrink to zero as the strips narrow. We take the theorem on credit and use what it grants: for a continuous integrand the limit is always there, and the sample points may be chosen for convenience. This is the honest boundary of the chapter — everything else is earned in full.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Net signed area</h3>
+
+  <!-- expansion:intuition — the payoff of dropping f≥0: the integral of a sign-changing f is area above minus area below; this is the new content §6.1 deferred -->
+  <p>When \(f\) can be negative, a strip where \(f(x_{i}^{*}) < 0\) contributes a <em>negative</em> term \(f(x_{i}^{*})\,\Delta x\) to the Riemann sum. So the integral counts area above the \(x\)-axis as positive and area below it as negative:</p>
+  <p>\[ \int_{a}^{b} f(x)\,dx = \bigl(\text{area above the axis}\bigr) - \bigl(\text{area below the axis}\bigr), \]</p>
+  <p>the <em>net signed area</em> between the graph and the axis. For a non-negative \(f\) nothing lies below the axis and this reduces to the area of Definition 6.1; the definite integral is the honest generalization.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.4</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{1} x^{2}\,dx\) directly from the definition.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The integrand \(x^{2}\) is continuous, so Theorem 6.1 promises the limit exists and is blind to the choice of sample points; we may therefore use the right-endpoint sums already computed in §6.1 (Example 6.2), where they were found to converge to \(\tfrac{1}{3}\). Hence</p>
+        <p>\[ \int_{0}^{1} x^{2}\,dx = \frac{1}{3}. \]</p>
+        <p>What §6.1 called “the area under \(y = x^{2}\)” is now, with the axis label supplied, the value of a definite integral — and because \(x^{2} \ge 0\), the signed area is the plain area. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.5</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{2} (x - 1)\,dx\) using net signed area.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The graph of \(y = x - 1\) is a straight line crossing the axis at \(x = 1\). Over \([0, 1]\) it lies <em>below</em> the axis, bounding a triangle with legs \(1\) and \(1\), of area \(\tfrac{1}{2}\); over \([1, 2]\) it lies <em>above</em> the axis, bounding a congruent triangle of area \(\tfrac{1}{2}\). The integral is the area above minus the area below:</p>
+        <p>\[ \int_{0}^{2} (x - 1)\,dx = \tfrac{1}{2} - \tfrac{1}{2} = 0. \]</p>
+        <p>The two signed pieces cancel exactly. Note the contrast with the <em>total</em> area enclosed between the line and the axis, which is \(\tfrac{1}{2} + \tfrac{1}{2} = 1\): the integral reports the net, not the total. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-essential — net signed area of y=x−1, two congruent triangles cancelling; registered in chapter6 FIGS as "signed-area-line"] -->
+  <figure class="figure" data-fig="signed-area-line">
+    <figcaption><span class="fig-no">Figure 6.4</span> The integral \(\int_{0}^{2} (x - 1)\,dx\) as net signed area. The line crosses the axis at \(x = 1\); the triangle below the axis (marked \(-\), area \(\tfrac{1}{2}\)) cancels the congruent triangle above it (marked \(+\), area \(\tfrac{1}{2}\)), so the integral is \(0\) even though the total area enclosed is \(1\).</figcaption>
+  </figure>
+
+  <!-- expansion:example [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 — Layer-2: evaluate a definite integral via a known curved area (semicircle), a nonzero net signed area; authored stem+solution, Stewart ET 9e §5.2 staple] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.6</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{-1}^{1} \sqrt{1 - x^{2}}\,dx\) by interpreting it as an area.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The graph of \(y = \sqrt{1 - x^{2}}\) is the upper half of the unit circle: squaring gives \(y^{2} = 1 - x^{2}\), that is \(x^{2} + y^{2} = 1\), and the requirement \(y \ge 0\) keeps only the top. Over \([-1, 1]\) the region between this graph and the axis is therefore a semicircular disc of radius \(1\), of area \(\tfrac{1}{2}\pi(1)^{2} = \tfrac{\pi}{2}\). Since the integrand is non-negative, the definite integral is exactly that area:</p>
+        <p>\[ \int_{-1}^{1} \sqrt{1 - x^{2}}\,dx = \frac{\pi}{2}. \]</p>
+        <p>When an integrand’s graph bounds a region whose area we already know, geometry reads the integral off at sight — no formula to hunt down, no limit of sums. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 tier-example-support — Example 6.6 semicircle: y=√(1−x²) is the upper unit half-circle, shaded region area π/2; registered in chapter6 FIGS as "semicircle-area"] -->
+  <figure class="figure" data-fig="semicircle-area">
+    <figcaption><span class="fig-no">Figure 6.5</span> Reading \(\int_{-1}^{1} \sqrt{1 - x^{2}}\,dx\) as an area (Example 6.6). The graph \(y = \sqrt{1 - x^{2}}\) is the upper half of the unit circle, so the shaded region is a semicircle of radius \(1\); its area \(\tfrac{\pi}{2}\) is the value of the integral.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">Properties of the integral</h3>
+
+  <p>Because the integral is a limit of sums, the arithmetic of sums passes to it in the limit. The following properties hold for continuous \(f\) and \(g\); each is the limit of the corresponding statement about Riemann sums.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.2</span><span class="env-name">Properties of the definite integral</span></p>
+    <div class="env-body">
+      <p>Let \(f\) and \(g\) be continuous on \([a, b]\) with \(a \le b\); let \(k\) be a constant; and let \(c\) satisfy \(a \le c \le b\).</p>
+      <ol class="steps">
+        <li><em>Constant.</em> \(\displaystyle\int_{a}^{b} k\,dx = k\,(b - a)\).</li>
+        <li><em>Linearity.</em> \(\displaystyle\int_{a}^{b}\bigl[f(x) + g(x)\bigr]dx = \int_{a}^{b} f(x)\,dx + \int_{a}^{b} g(x)\,dx\) and \(\displaystyle\int_{a}^{b} k\,f(x)\,dx = k\int_{a}^{b} f(x)\,dx\).</li>
+        <li><em>Additivity over intervals.</em> \(\displaystyle\int_{a}^{c} f(x)\,dx + \int_{c}^{b} f(x)\,dx = \int_{a}^{b} f(x)\,dx\).</li>
+        <li><em>Comparison.</em> If \(f(x) \ge 0\) on \([a, b]\), then \(\displaystyle\int_{a}^{b} f(x)\,dx \ge 0\). More generally, if \(f(x) \le g(x)\) on \([a, b]\), then \(\displaystyle\int_{a}^{b} f(x)\,dx \le \int_{a}^{b} g(x)\,dx\); and if \(m \le f(x) \le M\) on \([a, b]\), then \(\displaystyle m\,(b - a) \le \int_{a}^{b} f(x)\,dx \le M\,(b - a)\).</li>
+      </ol>
+    </div>
+  </section>
+
+  <p>The constant and scalar rules are a line each: \(\sum k\,\Delta x = k\,(b - a)\), since the \(n\) equal widths total \(n\,\Delta x = b - a\), and \(\sum k\,f(x_{i}^{*})\,\Delta x = k \sum f(x_{i}^{*})\,\Delta x\). For the sum half of linearity, every Riemann sum splits termwise, \(\sum \bigl[f(x_{i}^{*}) + g(x_{i}^{*})\bigr]\Delta x = \sum f(x_{i}^{*})\,\Delta x + \sum g(x_{i}^{*})\,\Delta x\), and the limit of a sum is the sum of the limits (limit laws, Theorem 1.2). For comparison, if \(f \ge 0\) then every term \(f(x_{i}^{*})\,\Delta x \ge 0\), so each Riemann sum is \(\ge 0\), and a limit of non-negative numbers is non-negative. Applying this to \(g - f\), which is \(\ge 0\) exactly when \(f \le g\), and using linearity gives \(\int f \le \int g\). Squeezing \(f\) between the constants \(m\) and \(M\) then yields the two-sided bound through the constant rule. Additivity is the geometric fact that the signed area over \([a, b]\) is the signed area over \([a, c]\) together with that over \([c, b]\) — the region divides at the vertical line \(x = c\). (Being continuous on \([a, b]\), \(f\) is continuous on \([a, c]\) and \([c, b]\) as well, so both pieces are themselves integrals; a sum-based proof slices \([a, b]\) with a division point at \(c\), where the Riemann sum splits outright into a part over \([a, c]\) and a part over \([c, b]\), and Theorem 6.1 guarantees the same limit whichever way we slice. The sign convention \(\int_{b}^{a} = -\int_{a}^{b}\) then extends the identity to a \(c\) lying outside \([a, b]\), as long as \(f\) is continuous on the whole interval that \(a\), \(b\), and \(c\) span.)</p>
+
+  <!-- expansion:example [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 — Layer-1 orphan: Theorem 6.2 linearity/constant proved but never used numerically; pre-FTC leverage of a known integral; authored stem+solution] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.7</span></p>
+      <div class="env-body">
+        <p>Given that \(\displaystyle\int_{0}^{1} x^{2}\,dx = \tfrac{1}{3}\) (Example 6.4), and without evaluating any new limit, find \(\displaystyle\int_{0}^{1} \bigl(3x^{2} - 4\bigr)\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The properties turn one known integral into many. Linearity (Theorem 6.2, part 2) splits the integral and pulls out the constant factor, and the constant rule (part 1) evaluates the remaining piece directly:</p>
+        <p>\[ \begin{aligned}
+          \int_{0}^{1} \bigl(3x^{2} - 4\bigr)\,dx &= 3\int_{0}^{1} x^{2}\,dx - \int_{0}^{1} 4\,dx \\[2pt]
+                                                   &= 3\cdot\tfrac{1}{3} - 4\,(1 - 0) = 1 - 4 = -3.
+        \end{aligned} \]</p>
+        <p>No new Riemann sum was evaluated: the single value \(\int_{0}^{1} x^{2} = \tfrac{1}{3}\), run through linearity, settles it. This is how the integral is used in practice — most integrals are reached not from the definition but by reducing them to ones already known. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.8</span></p>
+      <div class="env-body">
+        <p>Show that \(\displaystyle 3 \le \int_{1}^{4} \sqrt{x}\,dx \le 6\) without evaluating the integral.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Since \(\sqrt{x}\) is continuous on \([1, 4]\), it is integrable there by Theorem 6.1, so the properties apply. On \([1, 4]\) the integrand is increasing, running from \(\sqrt{1} = 1\) up to \(\sqrt{4} = 2\), so \(1 \le \sqrt{x} \le 2\) throughout, and the bounding property (Theorem 6.2, part 4) with \(m = 1\), \(M = 2\), and \(b - a = 3\) gives</p>
+        <p>\[ 1 \cdot 3 \le \int_{1}^{4} \sqrt{x}\,dx \le 2 \cdot 3, \qquad\text{that is}\qquad 3 \le \int_{1}^{4} \sqrt{x}\,dx \le 6. \]</p>
+        <p>A single comparison, no limit computed, pins the integral to a modest range. The exact value, \(\tfrac{14}{3} \approx 4.67\), which §6.3 will make painless to find, indeed sits inside. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-strong — min/max bounding rectangles of √x on [1,4]; registered in chapter6 FIGS as "minmax-sqrt"] -->
+  <figure class="figure" data-fig="minmax-sqrt">
+    <figcaption><span class="fig-no">Figure 6.6</span> Bounding \(\int_{1}^{4} \sqrt{x}\,dx\) without evaluating it (Example 6.8). On \([1, 4]\) the integrand runs from its minimum \(m = 1\) to its maximum \(M = 2\); the inscribed rectangle (area \(1 \cdot 3 = 3\)) and the circumscribed rectangle (area \(2 \cdot 3 = 6\)) trap the integral, so \(3 \le \int_{1}^{4} \sqrt{x}\,dx \le 6\).</figcaption>
+  </figure>
+
+  <!-- expansion:summary — close: the integral is now defined, guaranteed to exist for continuous integrands, and manipulable through its properties; but every value so far came from a limit or a picture. Forward-fence to §6.3 FTC WITHOUT its mechanics. -->
+  <p>We now have the definite integral on a firm footing: a number defined as a limit of Riemann sums, guaranteed to exist whenever the integrand is continuous, measuring net signed area, and obeying the linearity, additivity, and comparison rules that make it possible to reason about it. Yet every value we have produced has come the hard way — from a limit of sums, as in Example 6.4, or from a picture, as in Example 6.5. Only the smallest handful of integrals yields to either method. The next section removes the obstacle at a stroke: the Fundamental Theorem of Calculus connects the definite integral to the derivative, and makes the great majority of integrals painless to evaluate.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-6-3">
+<!-- §6.3 The Fundamental Theorem of Calculus. section-source: Stewart ET 9e §5.3 (The Fundamental
+     Theorem of Calculus); cross-checked Thomas 14e §5.4, Rogawski 4e §5.4. Authored 2026-07-10 per
+     PLAN-ch06 + brief-6-3 (canon-as-spine; Codex ⑤ per user 2026-07-06 grant). CHAPTER CRUX — 深理論核心:
+     BOTH parts proved on the spot. Numbering continues from §6.2: mints Definition 6.3 (Antiderivative),
+     Theorem 6.3 (FTC-1), Theorem 6.4 (FTC-2), Strategy 6.1, Examples 6.9–6.12 (M4 added Ex 6.10; old 6.7–6.9 → 6.9/6.11/6.12). Cautions UNNUMBERED.
+     PROOF IMPORTS: additivity + comparison bound (Theorem 6.2), Extreme Value Theorem (Theorem 4.9(a),
+     proved App D §D.1), Squeeze Theorem (Theorem 1.3), constant-difference corollary (Cor 4.4),
+     chain rule (Theorem 3.3). All EXIST — no dangling refs.
+     SEAM GUARD (brief-6-3): PROVE both parts. Do NOT develop the indefinite-integral ∫f dx family or the
+     "+C" bookkeeping (§6.4 — one-line forward fence), the Net Change Theorem (§6.4), substitution (§6.5),
+     or ∫(1/x)=ln|x| (§6.4 — avoid 1/x integrands here). Introduce the antiderivative (Def 6.3) since Ch5
+     deferred it. Counters handed to §6.4: Definition 6.4, Example 6.13, Strategy 6.2, Figure 6.9 (§6.3 minted Ex 6.9–6.12, Fig 6.7–6.8 through M4).
+     FIGURES (M2; renumbered +1 by M4's §6.2 Fig 6.5): §6.3 carries Figure 6.7 (accumulation-sliver, FTC-1 anchor) and Figure 6.8
+     (ftc-trap, FTC-1 proof trapping step); both cleared gate-1 D1–D8 + gate-2 at 0 blocking.
+     Record: PLAN-ch06.md, brief-6-3.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">6.3</span>The Fundamental Theorem of Calculus</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: §6.2 made evaluation hard; the FTC ties the integral to the derivative and makes it easy. Name the two parts without proving them yet. -->
+  <p>Two sections of work have built the definite integral into a well-defined number, but left it laborious to compute: every value so far came from a limit of Riemann sums or from a picture. The <em>Fundamental Theorem of Calculus</em> ends that difficulty, and in doing so reveals why the subject is called <em>calculus</em> — a single method. It comes in two parts. The first says that integrating a continuous function and then differentiating recovers the function: differentiation undoes integration. The second turns that fact into a tool, evaluating a definite integral from any single antiderivative of the integrand, with no sums at all. The engine behind both is a function that measures accumulated area.</p>
+
+  <p>The reverse of differentiation earns a name of its own.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.3</span><span class="env-name">Antiderivative</span></p>
+    <div class="env-body">
+      <p>A function \(F\) is an <em>antiderivative</em> of \(f\) on an open interval \(I\) if \(F'(x) = f(x)\) for every \(x\) in \(I\).</p>
+    </div>
+  </section>
+
+  <p>For example, \(\tfrac{1}{3}x^{3}\) is an antiderivative of \(x^{2}\), since its derivative is \(x^{2}\); so is \(\tfrac{1}{3}x^{3} + 5\). Reading each differentiation rule of Chapters 2–4 backwards produces an antiderivative, and the Fundamental Theorem is about to make antiderivatives the key to every definite integral.</p>
+
+  <h3 class="subsec-head">The accumulation function</h3>
+
+  <!-- expansion:intuition — the load-bearing intuition: g(x)=∫_a^x f accumulates area; its rate of change is the current height f(x). This IS FTC-1. -->
+  <p>Fix a continuous function \(f\) on \([a, b]\) and, for each \(x\) in \([a, b]\), record the signed area accumulated from \(a\) up to \(x\):</p>
+  <p>\[ g(x) = \int_{a}^{x} f(t)\,dt. \]</p>
+  <p>The variable of integration is written \(t\) to keep it distinct from the upper limit \(x\), which is now the input of a new function \(g\). As \(x\) advances, \(g(x)\) accumulates more area. How fast? Nudging \(x\) rightward by a small \(h\) appends a thin strip under the graph, of width \(h\) and height about \(f(x)\), so \(g\) gains roughly \(f(x)\,h\) — its rate of increase is the current height \(f(x)\). That guess is exactly right, and it is the first half of the theorem.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-essential — accumulation function g(x) with the added sliver f(x)h (FTC-1 anchor); registered in chapter6 FIGS as "accumulation-sliver"] -->
+  <figure class="figure" data-fig="accumulation-sliver">
+    <figcaption><span class="fig-no">Figure 6.7</span> The accumulation function \(g(x) = \int_{a}^{x} f(t)\,dt\) is the shaded area up to \(x\). Advancing \(x\) by a small \(h\) adds the thin strip over \([x, x + h]\), of width \(h\) and height about \(f(x)\), so \(g\) grows by roughly \(f(x)\,h\) — its rate of change is the current height \(f(x)\). The strip is widened for visibility.</figcaption>
+  </figure>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.3</span><span class="env-name">Fundamental Theorem of Calculus, Part 1</span></p>
+    <div class="env-body">
+      <p>If \(f\) is continuous on \([a, b]\), then the function \(g\) defined by</p>
+      <p>\[ g(x) = \int_{a}^{x} f(t)\,dt, \qquad a \le x \le b, \]</p>
+      <p>is continuous on \([a, b]\) and differentiable on \((a, b)\), and</p>
+      <p>\[ g'(x) = f(x). \]</p>
+      <p>In Leibniz notation, \(\displaystyle\frac{d}{dx}\int_{a}^{x} f(t)\,dt = f(x)\): the accumulation function \(g\) is an antiderivative of \(f\) on \((a, b)\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Fix \(x\) in \((a, b)\) and take \(h \ne 0\) small enough that \(x + h\) lies in \([a, b]\). By additivity of the integral (Theorem 6.2),</p>
+      <p>\[ \begin{aligned}
+        g(x + h) - g(x) &= \int_{a}^{x+h} f(t)\,dt - \int_{a}^{x} f(t)\,dt \\[2pt]
+                        &= \int_{x}^{x+h} f(t)\,dt.
+      \end{aligned} \]</p>
+      <p>Consider the difference quotient \(\dfrac{g(x + h) - g(x)}{h} = \dfrac{1}{h}\displaystyle\int_{x}^{x+h} f(t)\,dt\). We claim it lies between the least and greatest values of \(f\) on the closed interval joining \(x\) and \(x + h\). For \(h > 0\), the comparison bound (Theorem 6.2, part 4) applied on \([x, x+h]\) gives, with \(m_{h}\) and \(M_{h}\) the minimum and maximum of \(f\) there,</p>
+      <p>\[ m_{h}\,h \le \int_{x}^{x+h} f(t)\,dt \le M_{h}\,h, \]</p>
+      <p>and dividing by \(h > 0\) yields \(m_{h} \le \dfrac{g(x+h) - g(x)}{h} \le M_{h}\). For \(h < 0\) the same bracketing holds on the interval \([x + h, x]\): with \(m_{h}, M_{h}\) now its minimum and maximum, \(m_{h}\lvert h\rvert \le \int_{x+h}^{x} f \le M_{h}\lvert h\rvert\); since \(\int_{x}^{x+h} f = -\int_{x+h}^{x} f\) and \(h = -\lvert h\rvert\), the quotient \(\dfrac{1}{h}\int_{x}^{x+h} f\) again lies between \(m_{h}\) and \(M_{h}\). Now by the Extreme Value Theorem (Theorem 4.9(a)), \(m_{h} = f(u_{h})\) and \(M_{h} = f(v_{h})\) for some points \(u_{h}, v_{h}\) in the interval. As \(h \to 0\), that interval collapses onto \(x\), forcing \(u_{h} \to x\) and \(v_{h} \to x\), so by the continuity of \(f\),</p>
+      <p>\[ m_{h} = f(u_{h}) \to f(x) \qquad\text{and}\qquad M_{h} = f(v_{h}) \to f(x). \]</p>
+      <p>The difference quotient is squeezed between two quantities both tending to \(f(x)\), so by the Squeeze Theorem (Theorem 1.3),</p>
+      <p>\[ g'(x) = \lim_{h \to 0} \frac{g(x + h) - g(x)}{h} = f(x). \]</p>
+      <p>It remains to see that \(g\) is continuous on the whole closed interval, endpoints included. Since \(f\) is continuous on \([a, b]\) it is bounded there, say \(\lvert f\rvert \le M\) (Theorem 4.9(a)); then for \(x\) and \(x + h\) in \([a, b]\) the comparison bound gives \(\bigl\lvert g(x+h) - g(x)\bigr\rvert = \bigl\lvert\int_{x}^{x+h} f\bigr\rvert \le M\,\lvert h\rvert\), which tends to \(0\) with \(h\). So \(g\) is continuous at every point of \([a, b]\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-strong — trapping step of the FTC-1 proof, inscribed m_h vs circumscribed M_h; registered in chapter6 FIGS as "ftc-trap"] -->
+  <figure class="figure" data-fig="ftc-trap">
+    <figcaption><span class="fig-no">Figure 6.8</span> The trapping step in the proof of Part 1. Over \([x, x + h]\) the added area \(\int_{x}^{x+h} f\) lies between the inscribed rectangle of height \(m_{h} = \min f\) and the circumscribed rectangle of height \(M_{h} = \max f\), attained at points \(u_{h}, v_{h}\) in the interval. Dividing by \(h\) brackets the difference quotient between \(m_{h}\) and \(M_{h}\); as \(h \to 0\) both tend to \(f(x)\).</figcaption>
+  </figure>
+
+  <!-- expansion:caution — two traps: the dummy variable t vs the limit x; and that g' = f holds even when f has NO elementary antiderivative -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Two points. First, the letter under the integral sign is a placeholder — \(\int_{a}^{x} f(t)\,dt\) and \(\int_{a}^{x} f(s)\,ds\) are the same function of \(x\); writing \(\int_{a}^{x} f(x)\,dx\), with \(x\) doing double duty as both limit and dummy, is a genuine error. Second, Part 1 asks nothing of \(f\) beyond continuity, so it differentiates accumulation functions we cannot evaluate: \(g(x) = \int_{0}^{x} e^{-t^{2}}\,dt\) has \(g'(x) = e^{-x^{2}}\) exactly, even though \(e^{-t^{2}}\) has no antiderivative expressible in elementary functions. The theorem <em>constructs</em> an antiderivative where no formula for one exists.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.9</span></p>
+      <div class="env-body">
+        <p>Differentiate: (a) \(\displaystyle g(x) = \int_{1}^{x} \sqrt{1 + t^{2}}\,dt\); and (b) \(\displaystyle h(x) = \int_{0}^{x^{3}} \cos t\,dt\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>(a) The integrand \(\sqrt{1 + t^{2}}\) is continuous, so Part 1 applies directly:</p>
+        <p>\[ g'(x) = \sqrt{1 + x^{2}}. \]</p>
+        <p>(b) The upper limit is now \(x^{3}\), not \(x\), so \(h\) is a composition. Write \(H(u) = \int_{0}^{u} \cos t\,dt\), so that \(h(x) = H(x^{3})\). Part 1 gives \(H'(u) = \cos u\), and the chain rule (Theorem 3.3) supplies the outer factor:</p>
+        <p>\[ h'(x) = H'(x^{3})\cdot \frac{d}{dx}\bigl(x^{3}\bigr) = \cos(x^{3})\cdot 3x^{2} = 3x^{2}\cos(x^{3}). \]</p>
+        <p>A variable limit of integration is differentiated by Part 1; a <em>function</em> in the limit calls for the chain rule on top. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 — Layer-2: complete the FTC-1 skill — variable LOWER limit (sign-flip) + both limits functions; authored stem+solution] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.10</span></p>
+      <div class="env-body">
+        <p>Differentiate (a) \(\displaystyle g(x) = \int_{x}^{1} \sqrt{1 + t^{2}}\,dt\); and (b) \(\displaystyle h(x) = \int_{x^{2}}^{x^{3}} \cos t\,dt\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>(a) The variable now sits in the <em>lower</em> limit. Reversing the limits flips the sign, \(g(x) = -\int_{1}^{x} \sqrt{1 + t^{2}}\,dt\), and Part 1 differentiates the reversed integral:</p>
+        <p>\[ g'(x) = -\sqrt{1 + x^{2}}. \]</p>
+        <p>The minus sign is the whole point: advancing the <em>lower</em> limit eats into the accumulated area, so the rate of change is the negative of the integrand.</p>
+        <p>(b) Both limits are functions of \(x\). Split at any constant — \(0\) will do — into two variable-upper-limit pieces, \(h(x) = \int_{0}^{x^{3}} \cos t\,dt - \int_{0}^{x^{2}} \cos t\,dt\), and apply Part 1 with the chain rule to each end:</p>
+        <p>\[ h'(x) = \cos(x^{3})\cdot 3x^{2} - \cos(x^{2})\cdot 2x = 3x^{2}\cos(x^{3}) - 2x\cos(x^{2}). \]</p>
+        <p>Each end contributes the integrand evaluated at that limit, times the limit’s own derivative; the lower end enters with a minus. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Evaluating integrals</h3>
+
+  <p>Part 1 built one antiderivative of \(f\) — the accumulation function. Part 2 turns the tables: it evaluates a definite integral from <em>any</em> antiderivative whatsoever, and most antiderivatives are far easier to write down than \(\int_{a}^{x} f\).</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.4</span><span class="env-name">Fundamental Theorem of Calculus, Part 2</span></p>
+    <div class="env-body">
+      <p>If \(f\) is continuous on \([a, b]\) and \(F\) is <em>any</em> antiderivative of \(f\) on an open interval containing \([a, b]\), then</p>
+      <p>\[ \int_{a}^{b} f(x)\,dx = F(b) - F(a). \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Let \(g(x) = \int_{a}^{x} f(t)\,dt\). By Part 1, \(g\) is an antiderivative of \(f\) on \((a, b)\) and is continuous on \([a, b]\); the given \(F\), being differentiable on an open interval containing \([a, b]\), is continuous there too (Theorem 2.1). Their difference \(F - g\) is therefore continuous on \([a, b]\), and on \((a, b)\) its derivative is \((F - g)' = f - f = 0\). A function continuous on a closed interval whose derivative vanishes throughout the interior is constant (Corollary 4.4), so \(F(x) = g(x) + C\) for some constant \(C\) and all \(x\) in \([a, b]\). Evaluating at the endpoints, the constant cancels:</p>
+      <p>\[ \begin{aligned}
+        F(b) - F(a) &= \bigl[g(b) + C\bigr] - \bigl[g(a) + C\bigr] \\[2pt]
+                    &= g(b) - g(a).
+      \end{aligned} \]</p>
+      <p>Finally \(g(b) = \int_{a}^{b} f(t)\,dt\) and \(g(a) = \int_{a}^{a} f(t)\,dt = 0\), so \(F(b) - F(a) = \int_{a}^{b} f(t)\,dt\), which is the claim. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The difference \(F(b) - F(a)\) is written \(\bigl[F(x)\bigr]_{a}^{b}\) (or \(F(x)\big|_{a}^{b}\)) when the antiderivative is displayed. Because any antiderivative serves, any added constant is pointless here — it cancels in the subtraction — so we take the simplest antiderivative available.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">6.1</span><span class="env-name">Evaluating a definite integral</span></p>
+    <div class="env-body">
+      <p>To evaluate \(\displaystyle\int_{a}^{b} f(x)\,dx\) by the Fundamental Theorem:</p>
+      <ol class="steps">
+        <li>Find an antiderivative \(F\) of \(f\) — a function with \(F' = f\) — by reading the derivative rules of Chapters 2–4 backwards.</li>
+        <li>Evaluate at the upper and lower limits and subtract: \(\displaystyle\int_{a}^{b} f(x)\,dx = \bigl[F(x)\bigr]_{a}^{b} = F(b) - F(a)\).</li>
+        <li>Any antiderivative works, since the additive constant cancels — so choose the simplest.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.11</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{1} x^{2}\,dx\) and \(\displaystyle\int_{1}^{4} \sqrt{x}\,dx\) by the Fundamental Theorem, and compare with the earlier sections.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>An antiderivative of \(x^{2}\) is \(\tfrac{1}{3}x^{3}\), so</p>
+        <p>\[ \int_{0}^{1} x^{2}\,dx = \left[\frac{x^{3}}{3}\right]_{0}^{1} = \frac{1}{3} - 0 = \frac{1}{3}. \]</p>
+        <p>The whole limit-of-Riemann-sums computation of §6.1–6.2 collapses to one line. For the second, write \(\sqrt{x} = x^{1/2}\), whose antiderivative is \(\tfrac{x^{3/2}}{3/2} = \tfrac{2}{3}x^{3/2}\):</p>
+        <p>\[ \begin{aligned}
+          \int_{1}^{4} \sqrt{x}\,dx &= \left[\frac{2}{3}x^{3/2}\right]_{1}^{4}
+                                     = \frac{2}{3}\bigl(4^{3/2} - 1^{3/2}\bigr) \\[2pt]
+                                    &= \frac{2}{3}(8 - 1) = \frac{14}{3}.
+        \end{aligned} \]</p>
+        <p>In Example 6.8 the bounding property could only pen this integral into the range \([3, 6]\); the Fundamental Theorem delivers the exact \(\tfrac{14}{3} \approx 4.67\), which indeed sits there. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.12</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{\pi} \sin x\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Since \(\dfrac{d}{dx}(-\cos x) = \sin x\), an antiderivative of \(\sin x\) is \(-\cos x\), and</p>
+        <p>\[ \begin{aligned}
+          \int_{0}^{\pi} \sin x\,dx &= \bigl[-\cos x\bigr]_{0}^{\pi}
+                                     = (-\cos \pi) - (-\cos 0) \\[2pt]
+                                    &= -(-1) - (-1) = 2.
+        \end{aligned} \]</p>
+        <p>The answer is positive, as it must be: over \([0, \pi]\) the sine curve rises in a single hump above the axis, so its signed area is a genuine, positive area. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:history [source: standard calculus-textbook historical note] — the FTC as Newton and Leibniz's central discovery, the inverse link making calculus one subject -->
+  <p>This inverse link is the discovery, made independently by Newton in the 1660s and Leibniz in the 1670s, that founded calculus as one subject rather than two. The area problem and the tangent problem had been studied for centuries in isolation; the recognition that they are inverse — that the derivative of an accumulated area is the height, and so an area is recovered from an antiderivative — is what turned a collection of clever area computations into a method.</p>
+
+  <!-- expansion:summary — close: the two parts are two faces of one inverse relationship; forward-fence to §6.4 (antiderivative notation + net change) WITHOUT its mechanics -->
+  <p>The two parts are one statement seen from opposite ends. Part 1 differentiates an integral and returns the integrand; Part 2 integrates using an antiderivative and returns a difference of its values. Together they say that differentiation and integration are inverse processes — the central fact of the subject. What remains is to make antiderivatives easy to produce and to read. The next section sets up a notation for the whole family of antiderivatives of a function and reads the Fundamental Theorem as a statement about accumulated change.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-6-4">
+<!-- §6.4 Indefinite Integrals and the Net Change Theorem. section-source: Stewart ET 9e §5.4;
+     cross-checked Thomas 14e §5.4, Rogawski 4e §5.6 / §6.1. Authored 2026-07-10 per PLAN-ch06 + brief-6-4
+     (canon-as-spine; Codex ⑤ per user 2026-07-06 grant). Numbering continues from §6.3: mints
+     Definition 6.4 (Indefinite integral), Theorem 6.5 (Net Change Theorem), Examples 6.13–6.16 (M4 added Ex 6.15 arctan; old 6.10–6.12 → 6.13/6.14/6.16).
+     Cautions UNNUMBERED. Builds on Def 6.3 (antiderivative) and Theorem 6.4 (FTC-2).
+     KEY EXPORT: ∫(1/x)dx = ln|x| + C (justify the absolute value via the x<0 branch; domain x≠0) → Ch8, Ch9.
+     SEAM GUARD (brief-6-4): the Net Change Theorem is FTC-2 REREAD (f=F') — state, do NOT re-prove. Basic
+     antiderivative table only (reverse of Ch2–4 derivative rules) — NO integration technique. Do NOT do
+     substitution (§6.5). Displacement (∫v) vs total distance (∫|v|) closes the §6.1 speed loop.
+     Counters handed to §6.5: Theorem 6.6, Strategy 6.2, Example 6.17, Figure 6.10 (§6.4 minted Ex 6.13–6.16, Fig 6.9 through M4; §6.5 mints no figure).
+     FIGURES (M2; renumbered by M4): §6.4 carries Figure 6.9 (velocity-signed-area, Ex 6.16); cleared gate-1
+     D1–D8 + gate-2 at 0 blocking.
+     Record: PLAN-ch06.md, brief-6-4.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">6.4</span>Indefinite Integrals and the Net Change Theorem</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: FTC-2 needs an antiderivative; give the notation for the whole family of them, and reread the theorem as a net-change identity -->
+  <p>The Fundamental Theorem turns every definite integral into a hunt for an antiderivative, so antiderivatives now deserve a notation and a working table. This section supplies both, and then rereads the theorem itself in the language of accumulated change — the form in which it does most of its practical work.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.4</span><span class="env-name">Indefinite integral</span></p>
+    <div class="env-body">
+      <p>The <em>indefinite integral</em> of \(f\), written \(\int f(x)\,dx\), denotes the family of all antiderivatives of \(f\). The statement</p>
+      <p>\[ \int f(x)\,dx = F(x) + C \]</p>
+      <p>means that \(F' = f\), where \(C\) is an arbitrary constant — the <em>constant of integration</em>. As \(C\) ranges over all real numbers, \(F + C\) ranges over every antiderivative of \(f\) on the interval in question.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the notation trap: indefinite integral is a FUNCTION family, definite integral is a NUMBER -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Keep the two integrals apart. The <em>definite</em> integral \(\int_{a}^{b} f(x)\,dx\) is a <em>number</em>; the <em>indefinite</em> integral \(\int f(x)\,dx\) is a <em>family of functions</em>. They share a symbol because the Fundamental Theorem links them — the definite integral is evaluated <em>through</em> an antiderivative — but a number and a family of functions are not the same kind of object. The limits of integration \(a\) and \(b\) are what distinguish the two on the page.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">A table of antiderivatives</h3>
+
+  <p>Every differentiation rule from Chapters 2 through 4, read backwards, is an antiderivative formula. The most useful ones (each carrying an implied \(+C\)) are worth collecting:</p>
+  <p>\[ \begin{aligned}
+    &\int x^{n}\,dx = \frac{x^{n+1}}{n+1} \ \ (n \ne -1), &\qquad &\int \frac{1}{x}\,dx = \ln\lvert x\rvert, \\[4pt]
+    &\int e^{x}\,dx = e^{x}, &\qquad &\int \cos x\,dx = \sin x, \\[4pt]
+    &\int \sin x\,dx = -\cos x, &\qquad &\int \sec^{2} x\,dx = \tan x, \\[4pt]
+    &\int \frac{1}{1 + x^{2}}\,dx = \arctan x, &\qquad &\int \frac{1}{\sqrt{1 - x^{2}}}\,dx = \arcsin x.
+  \end{aligned} \]</p>
+
+  <p>The trigonometric and inverse-trigonometric entries are the Chapter 3 derivative rules read backwards — for instance \(\int \sec^{2} x\,dx = \tan x\) because \((\tan x)' = \sec^{2} x\), and \(\arctan\) and \(\arcsin\) likewise reverse the derivatives found there. Each identity holds on any interval where both the integrand and the stated antiderivative are defined: the \(\sec^{2}\) formula where \(\cos x \ne 0\), the \(\arcsin\) formula on \(-1 < x < 1\), and — for a negative or fractional exponent — the power rule on an interval avoiding the points where \(x^{n}\) is undefined. The power rule covers every exponent except \(n = -1\), where the formula \(\tfrac{x^{n+1}}{n+1}\) would divide by zero. That missing case is filled by the logarithm — and the reason an absolute value appears there is worth seeing.</p>
+
+  <!-- expansion:formula — the ln|x| export: justify the absolute value via the x<0 branch, and flag the domain (x≠0, two branches) -->
+  <p>For \(x > 0\), \(\lvert x\rvert = x\) and \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), as established in Chapter 4 (Theorem 4.14). For \(x < 0\), \(\lvert x\rvert = -x\), and the chain rule gives</p>
+  <p>\[ \frac{d}{dx}\ln(-x) = \frac{1}{-x}\cdot(-1) = \frac{1}{x}. \]</p>
+  <p>So on either side of the origin \(\dfrac{d}{dx}\ln\lvert x\rvert = \dfrac{1}{x}\), which is why</p>
+  <p>\[ \int \frac{1}{x}\,dx = \ln\lvert x\rvert + C. \]</p>
+  <p>The absolute value extends the antiderivative to negative \(x\) as well as positive. One caution: \(1/x\) is undefined at \(x = 0\), and its domain falls into the two separate intervals \((-\infty, 0)\) and \((0, \infty)\); the formula is valid on any interval that avoids the origin, but \(C\) may take different values on the two sides.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.13</span></p>
+      <div class="env-body">
+        <p>Find (a) \(\displaystyle\int \bigl(x^{3} - 6x\bigr)\,dx\) and (b) \(\displaystyle\int \left(2e^{x} - \frac{5}{x}\right)dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Integrate term by term, using the table and the linearity that the derivative rules pass to antiderivatives. (a)</p>
+        <p>\[ \int \bigl(x^{3} - 6x\bigr)\,dx = \frac{x^{4}}{4} - 6\cdot\frac{x^{2}}{2} + C = \frac{x^{4}}{4} - 3x^{2} + C. \]</p>
+        <p>(b) The term \(5/x\) draws on the logarithm:</p>
+        <p>\[ \int \left(2e^{x} - \frac{5}{x}\right)dx = 2e^{x} - 5\ln\lvert x\rvert + C. \]</p>
+        <p>A single constant \(C\) absorbs the constants from every term. We can always check an indefinite integral by differentiating the answer: \(\dfrac{d}{dx}\bigl(2e^{x} - 5\ln\lvert x\rvert\bigr) = 2e^{x} - \dfrac{5}{x}\), as required. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.14</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{1}^{2} \frac{1}{x}\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>An antiderivative of \(1/x\) is \(\ln\lvert x\rvert\), and on \([1, 2]\) the variable is positive, so \(\ln\lvert x\rvert = \ln x\). By the Fundamental Theorem,</p>
+        <p>\[ \int_{1}^{2} \frac{1}{x}\,dx = \bigl[\ln\lvert x\rvert\bigr]_{1}^{2} = \ln 2 - \ln 1 = \ln 2. \]</p>
+        <p>The area under \(y = 1/x\) from \(1\) to \(2\) is exactly \(\ln 2 \approx 0.693\). <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 — Layer-2: exercise the inverse-trig table row (arctan), untouched by Ex 6.13–6.14; ties a bare table entry to π/4 via FTC; authored stem+solution, CLP-1 §4.1 corroborates the row] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.15</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{1} \frac{1}{1 + x^{2}}\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The table records \(\int \dfrac{1}{1 + x^{2}}\,dx = \arctan x\) — the reverse of \((\arctan x)' = \dfrac{1}{1 + x^{2}}\) established in Chapter 3. By the Fundamental Theorem,</p>
+        <p>\[ \int_{0}^{1} \frac{1}{1 + x^{2}}\,dx = \bigl[\arctan x\bigr]_{0}^{1} = \arctan 1 - \arctan 0 = \frac{\pi}{4}. \]</p>
+        <p>A rational integrand with no area to read off has produced the number \(\tfrac{\pi}{4}\) — one of the standard ways \(\pi\) arrives through integration. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">The Net Change Theorem</h3>
+
+  <!-- expansion:intuition — reread FTC-2 with f = F': the integral of a rate is the net change. This is the practical face of the FTC. -->
+  <p>Read the Fundamental Theorem with the integrand named as a derivative. If a quantity \(F\) changes at the rate \(F'\), then integrating that rate over \([a, b]\) recovers the total change in \(F\).</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.5</span><span class="env-name">Net Change Theorem</span></p>
+    <div class="env-body">
+      <p>If \(F'\) is continuous on \([a, b]\), then</p>
+      <p>\[ \int_{a}^{b} F'(x)\,dx = F(b) - F(a). \]</p>
+      <p>The integral of a rate of change is the net change in the quantity.</p>
+    </div>
+  </section>
+
+  <p>This is nothing more than Part 2 of the Fundamental Theorem (Theorem 6.4) with the integrand written as \(F'\): \(F\) is an antiderivative of \(F'\), so the theorem applies verbatim. Its value is in the reading. If \(V'(t)\) is the rate at which water flows into a tank, \(\int_{t_{1}}^{t_{2}} V'(t)\,dt\) is the net volume added; if \(C'(x)\) is a marginal cost, \(\int_{x_{1}}^{x_{2}} C'(x)\,dx\) is the added cost of raising production from \(x_{1}\) to \(x_{2}\). The most important case is motion.</p>
+
+  <!-- expansion:caution — displacement (∫v, signed) vs total distance (∫|v|); split at sign changes. Closes the §6.1 speed loop. -->
+  <p>For an object moving along a line with velocity \(v(t)\), position is an antiderivative of velocity, so the Net Change Theorem gives the <em>displacement</em> — the net change in position — as</p>
+  <p>\[ \text{displacement} = \int_{a}^{b} v(t)\,dt. \]</p>
+  <p>This is a signed quantity: motion in the negative direction subtracts. The <em>total distance travelled</em>, which never subtracts, integrates the <em>speed</em> \(\lvert v(t)\rvert\) instead — recovering the reading of §6.1:</p>
+  <p>\[ \text{total distance} = \int_{a}^{b} \lvert v(t)\rvert\,dt. \]</p>
+  <p>To compute the distance we split the interval at the instants where \(v\) changes sign, integrate \(v\) on each piece, and add the absolute values.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.16</span></p>
+      <div class="env-body">
+        <p>A particle moves along a line with velocity \(v(t) = t^{2} - 4\) (in m/s) for \(0 \le t \le 3\). Find its displacement and the total distance it travels.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The displacement is the integral of the velocity over \([0, 3]\):</p>
+        <p>\[ \int_{0}^{3} \bigl(t^{2} - 4\bigr)\,dt = \left[\frac{t^{3}}{3} - 4t\right]_{0}^{3} = (9 - 12) - 0 = -3 \text{ m}. \]</p>
+        <p>The particle ends \(3\) metres behind where it started. For the total distance, note \(v(t) = t^{2} - 4 = 0\) at \(t = 2\); the velocity is negative on \([0, 2)\) (the particle moves backward), zero at \(t = 2\), and positive on \((2, 3]\). Splitting there,</p>
+        <p>\[ \begin{aligned}
+          \int_{0}^{2} \bigl(t^{2} - 4\bigr)\,dt &= \left[\frac{t^{3}}{3} - 4t\right]_{0}^{2} = \frac{8}{3} - 8 = -\frac{16}{3}, \\[2pt]
+          \int_{2}^{3} \bigl(t^{2} - 4\bigr)\,dt &= (9 - 12) - \left(\frac{8}{3} - 8\right) = -3 + \frac{16}{3} = \frac{7}{3}.
+        \end{aligned} \]</p>
+        <p>The total distance adds the absolute values of the two signed pieces:</p>
+        <p>\[ \text{distance} = \left\lvert -\frac{16}{3}\right\rvert + \left\lvert \frac{7}{3}\right\rvert = \frac{16}{3} + \frac{7}{3} = \frac{23}{3} \approx 7.67 \text{ m}. \]</p>
+        <p>The particle covers \(\tfrac{23}{3}\) metres of ground while ending only \(3\) metres from its start: the forward leg of \(\tfrac{7}{3}\) m undoes only part of the backward leg of \(\tfrac{16}{3}\) m, leaving it \(3\) metres behind. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-essential — velocity v=t²−4 signed regions, displacement vs distance; registered in chapter6 FIGS as "velocity-signed-area"] -->
+  <figure class="figure" data-fig="velocity-signed-area">
+    <figcaption><span class="fig-no">Figure 6.9</span> Displacement versus distance for \(v(t) = t^{2} - 4\) on \([0, 3]\) (Example 6.16). The velocity is negative on \([0, 2)\) — the region below the axis, marked \(-\), of area \(\tfrac{16}{3}\) — and positive on \((2, 3]\) — the region above, marked \(+\), of area \(\tfrac{7}{3}\). The displacement is the net \(\tfrac{7}{3} - \tfrac{16}{3} = -3\) m, while the total distance adds the magnitudes, \(\tfrac{16}{3} + \tfrac{7}{3} = \tfrac{23}{3}\) m.</figcaption>
+  </figure>
+
+  <!-- expansion:summary — close: antiderivatives now have notation and a table; the FTC reads as net change. Forward-fence to §6.5 (substitution) WITHOUT its mechanics. -->
+  <p>The definite integral is now, in principle, a solved problem: find an antiderivative, subtract its values, and read the result as an area or a net change. In practice a gap remains. The table above antidifferentiates only functions that are visibly some derivative run backwards; a mild disguise — an inner function tucked inside another — defeats it. The next section restores the chain rule to the antiderivative side of the ledger, and with it the single most useful technique for finding antiderivatives that the table alone cannot.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-6-5">
+<!-- §6.5 The Substitution Rule + Chapter 6 summary. section-source: Stewart ET 9e §5.5;
+     cross-checked Thomas 14e §5.5, Rogawski 4e §5.6/§5.7. Authored 2026-07-10 per PLAN-ch06 + brief-6-5
+     (canon-as-spine; Codex ⑤ per user 2026-07-06 grant). LAST section of Ch6 — carries the mandatory
+     Chapter summary (SPEC §4). Numbering continues from §6.4: mints Theorem 6.6 (Substitution Rule),
+     Theorem 6.7 (Substitution in definite integrals), Theorem 6.8 (Integrals of symmetric functions),
+     Strategy 6.2, Examples 6.17–6.21 (M4 added Ex 6.19 sub→log; old 6.13–6.16 → 6.17/6.18/6.20/6.21). Cautions UNNUMBERED.
+     PROOF IMPORTS: chain rule (Theorem 3.3), FTC-2 (Theorem 6.4), differentials du=g'(x)dx (§5.3). All exist.
+     SEAM GUARD (brief-6-5): u-substitution ONLY. Do NOT do integration by parts / trig integrals / trig
+     substitution / partial fractions / numerical / improper — ALL Ch8 (one-line fence). Definite integrals:
+     change limits OR back-substitute, never mix (caution). Symmetry is a substitution corollary.
+     Counters handed forward: Ch7 resets its own. Figures deferred to M2 (low-priority change-of-limits pic).
+     Record: PLAN-ch06.md, brief-6-5.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">6.5</span>The Substitution Rule</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: the table antidifferentiates only bare derivatives; substitution reverses the chain rule to handle an inner function -->
+  <p>The table of §6.4 antidifferentiates a function only when it recognizes it as some derivative written plainly. But most integrands wear a disguise: an inner function tucked inside another, the fingerprint of the chain rule. To integrate \(\int 2x\sqrt{1 + x^{2}}\,dx\) there is no table entry — yet the \(2x\) is exactly the derivative of the inside \(1 + x^{2}\), and that is no accident. Running the chain rule backwards strips the disguise. The technique is <em>substitution</em>, and it is the single most useful method of integration.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.6</span><span class="env-name">The Substitution Rule</span></p>
+    <div class="env-body">
+      <p>If \(u = g(x)\) is differentiable and \(f\) is continuous on the range of \(g\), then</p>
+      <p>\[ \int f\bigl(g(x)\bigr)\,g'(x)\,dx = \int f(u)\,du. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Let \(F\) be an antiderivative of \(f\), so \(F' = f\). By the chain rule (Theorem 3.3),</p>
+      <p>\[ \frac{d}{dx}\,F\bigl(g(x)\bigr) = F'\bigl(g(x)\bigr)\,g'(x) = f\bigl(g(x)\bigr)\,g'(x). \]</p>
+      <p>So \(F(g(x))\) is an antiderivative of \(f(g(x))\,g'(x)\), which means \(\int f(g(x))\,g'(x)\,dx = F(g(x)) + C\). On the other side, \(\int f(u)\,du = F(u) + C\), and substituting \(u = g(x)\) turns this into \(F(g(x)) + C\) as well. The two are equal. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>In practice the rule is applied through the differential notation of §5.3. Setting \(u = g(x)\) gives \(du = g'(x)\,dx\), and the rule reads as the literal replacement of \(g(x)\) by \(u\) and of \(g'(x)\,dx\) by \(du\). The art is entirely in the choice of \(u\): pick an inner function whose derivative is also present, up to a constant factor.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">6.2</span><span class="env-name">Integration by substitution</span></p>
+    <div class="env-body">
+      <p>To evaluate an integral by substitution:</p>
+      <ol class="steps">
+        <li>Choose \(u = g(x)\) — usually an inner function whose derivative \(g'(x)\) also appears in the integrand, up to a constant multiple.</li>
+        <li>Compute \(du = g'(x)\,dx\) and rewrite the <em>entire</em> integral in terms of \(u\); every \(x\), the \(dx\) included, must disappear. If it cannot, the choice of \(u\) was wrong.</li>
+        <li>Integrate in \(u\) using the table.</li>
+        <li>For an indefinite integral, back-substitute \(u = g(x)\). For a definite integral, either back-substitute, or convert the limits to \(u = g(a)\) and \(u = g(b)\) and finish in \(u\) — never leave \(x\)-limits on a \(u\)-integrand.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.17</span></p>
+      <div class="env-body">
+        <p>Find \(\displaystyle\int 2x\sqrt{1 + x^{2}}\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The inside of the square root is \(1 + x^{2}\), and its derivative \(2x\) stands ready in the integrand. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\). The integral becomes one the table knows:</p>
+        <p>\[ \int 2x\sqrt{1 + x^{2}}\,dx = \int \sqrt{u}\,du = \frac{2}{3}u^{3/2} + C = \frac{2}{3}\bigl(1 + x^{2}\bigr)^{3/2} + C. \]</p>
+        <p>Differentiating the answer returns \(2x\sqrt{1 + x^{2}}\), confirming it. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.18</span></p>
+      <div class="env-body">
+        <p>Find \(\displaystyle\int x^{2}\bigl(x^{3} + 1\bigr)^{5}\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Take \(u = x^{3} + 1\), the inner function; then \(du = 3x^{2}\,dx\). The integrand offers \(x^{2}\,dx\), not \(3x^{2}\,dx\), but the constant is easily supplied: \(x^{2}\,dx = \tfrac{1}{3}\,du\). So</p>
+        <p>\[ \int x^{2}\bigl(x^{3} + 1\bigr)^{5}\,dx = \frac{1}{3}\int u^{5}\,du = \frac{1}{3}\cdot\frac{u^{6}}{6} + C = \frac{\bigl(x^{3} + 1\bigr)^{6}}{18} + C. \]</p>
+        <p>Only a <em>constant</em> factor may be moved across the integral sign in this way; a missing factor of \(x\) could not be, and would signal a poor choice of \(u\). <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example [pass: enrichment] [source: mode-c example-supplement gate 2026-07-11 — Layer-2: substitution whose output is a logarithm (∫f'/f=ln|f|), reinforcing the §6.4 ln|x| export; reuses the book's own u=1+x²; authored stem+solution, APEX 06_01 f'/f family corroborates] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.19</span></p>
+      <div class="env-body">
+        <p>Find \(\displaystyle\int \frac{2x}{1 + x^{2}}\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The derivative of the denominator is \(2x\), exactly the numerator — the fingerprint of a substitution whose result is a logarithm rather than a power. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\), and the integral becomes \(\int \tfrac{1}{u}\,du\):</p>
+        <p>\[ \int \frac{2x}{1 + x^{2}}\,dx = \int \frac{du}{u} = \ln\lvert u\rvert + C = \ln\bigl(1 + x^{2}\bigr) + C, \]</p>
+        <p>where the absolute value is dropped because \(1 + x^{2} > 0\) throughout. This is the pattern \(\int \dfrac{f'(x)}{f(x)}\,dx = \ln\lvert f(x)\rvert + C\): when the numerator is the derivative of the denominator, substitution collapses the integral to the logarithm introduced in §6.4. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Substitution in definite integrals</h3>
+
+  <p>A definite integral can be substituted just as an indefinite one, provided the limits are handled with care. There are two honest options: finish the antiderivative and restore \(x\) before applying the limits, or — usually cleaner — carry the substitution through the limits themselves.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.7</span><span class="env-name">Substitution in a definite integral</span></p>
+    <div class="env-body">
+      <p>If \(g'\) is continuous on \([a, b]\) and \(f\) is continuous on the range of \(g\), then</p>
+      <p>\[ \int_{a}^{b} f\bigl(g(x)\bigr)\,g'(x)\,dx = \int_{g(a)}^{g(b)} f(u)\,du. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Let \(F\) be an antiderivative of \(f\). As in Theorem 6.6, \(F(g(x))\) is an antiderivative of \(f(g(x))\,g'(x)\), so by Part 2 of the Fundamental Theorem (Theorem 6.4),</p>
+      <p>\[ \begin{aligned}
+        \int_{a}^{b} f\bigl(g(x)\bigr)\,g'(x)\,dx &= \Bigl[F\bigl(g(x)\bigr)\Bigr]_{a}^{b} = F\bigl(g(b)\bigr) - F\bigl(g(a)\bigr) \\[2pt]
+                                                  &= \Bigl[F(u)\Bigr]_{g(a)}^{g(b)} = \int_{g(a)}^{g(b)} f(u)\,du.
+      \end{aligned} \]</p>
+      <p>Both sides equal \(F(g(b)) - F(g(a))\); the substitution merely reads the same difference off the \(u\)-axis. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the definite-substitution trap: change the limits OR back-substitute, never leave the old x-limits on a u-integrand -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>When a definite integral is converted to \(u\), the limits must be converted too. Writing \(\int_{a}^{b} \dots\,du\) with the <em>original</em> \(x\)-limits still attached to a \(u\)-integrand is a common and costly error: the numbers \(a\) and \(b\) are values of \(x\), not of \(u\). Either change the limits to \(g(a)\) and \(g(b)\) and evaluate in \(u\), or return to \(x\) first and use the original limits — but never blend the two.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.20</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{0}^{2} 2x\bigl(1 + x^{2}\bigr)^{3}\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Let \(u = 1 + x^{2}\), so \(du = 2x\,dx\). Convert the limits: when \(x = 0\), \(u = 1\); when \(x = 2\), \(u = 5\). The integral passes entirely into \(u\):</p>
+        <p>\[ \int_{0}^{2} 2x\bigl(1 + x^{2}\bigr)^{3}\,dx = \int_{1}^{5} u^{3}\,du = \left[\frac{u^{4}}{4}\right]_{1}^{5} = \frac{625 - 1}{4} = 156. \]</p>
+        <p>Changing the limits removes any need to return to \(x\); the answer emerges directly from the \(u\)-integral. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Symmetry</h3>
+
+  <!-- expansion:intuition — symmetry as a substitution corollary: even/odd functions over [-a,a] -->
+  <p>When the interval is symmetric about the origin, the symmetry of the integrand — if it has any — can halve the work or eliminate it entirely. This is substitution in one of its tidiest applications.</p>
+
+  <!-- expansion:intuition [pass: enrichment] [source: mode-c gap-check 2026-07-11 — Theorem 6.8 had the thinnest formal lead-in; add the even/odd geometric picture (mirror doubles, half-turn cancels) before the u=-x proof] -->
+  <p>Picture the two cases. An even function has the same graph on \([-a, 0]\) as on \([0, a]\), mirror-reflected across the vertical axis, so each thin strip on the left has an identical twin on the right — same height, hence the same sign — and the matched signed areas <em>add</em>: the integral is twice the integral over \([0, a]\). An odd function’s graph on \([-a, 0]\) is the \([0, a]\) graph turned a half-turn about the origin, so each left strip is the mirror of a right strip carrying the <em>opposite</em> sign; the matched contributions <em>cancel</em> and the integral is zero. The substitution \(u = -x\) below turns this picture into a proof.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.8</span><span class="env-name">Integrals of symmetric functions</span></p>
+    <div class="env-body">
+      <p>Suppose \(f\) is continuous on \([-a, a]\).</p>
+      <ol class="steps">
+        <li>If \(f\) is <em>even</em> — that is, \(f(-x) = f(x)\) — then \(\displaystyle\int_{-a}^{a} f(x)\,dx = 2\int_{0}^{a} f(x)\,dx\).</li>
+        <li>If \(f\) is <em>odd</em> — that is, \(f(-x) = -f(x)\) — then \(\displaystyle\int_{-a}^{a} f(x)\,dx = 0\).</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Split at the origin: \(\int_{-a}^{a} f = \int_{-a}^{0} f + \int_{0}^{a} f\). In the first piece substitute \(u = -x\), so \(du = -dx\), and the limits \(x = -a, 0\) become \(u = a, 0\):</p>
+      <p>\[ \int_{-a}^{0} f(x)\,dx = \int_{a}^{0} f(-u)\,(-du) = \int_{0}^{a} f(-u)\,du. \]</p>
+      <p>If \(f\) is even, \(f(-u) = f(u)\), so this equals \(\int_{0}^{a} f(u)\,du\) and the two pieces add to \(2\int_{0}^{a} f\). If \(f\) is odd, \(f(-u) = -f(u)\), so it equals \(-\int_{0}^{a} f(u)\,du\), which cancels the second piece and leaves \(0\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">6.21</span></p>
+      <div class="env-body">
+        <p>Evaluate \(\displaystyle\int_{-1}^{1} \bigl(x^{4} + x^{3}\bigr)\,dx\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The integrand splits into an even part and an odd part. Over the symmetric interval \([-1, 1]\), the even \(x^{4}\) doubles its integral over \([0, 1]\), while the odd \(x^{3}\) integrates to zero (Theorem 6.8):</p>
+        <p>\[ \int_{-1}^{1} \bigl(x^{4} + x^{3}\bigr)\,dx = 2\int_{0}^{1} x^{4}\,dx + 0 = 2\left[\frac{x^{5}}{5}\right]_{0}^{1} = \frac{2}{5}. \]</p>
+        <p>The odd term contributes nothing at all — recognizing it saves the work of integrating it. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close §6.5: substitution is the first technique; the rest wait for Ch8. One-line fence, no mechanics. -->
+  <p>Substitution is the reverse of the chain rule, and the first entry in the toolkit of integration techniques. It reaches every integrand that hides a single inner function whose derivative is present — a wide class, but not all. Products of unrelated functions, powers of trigonometric functions, and rational functions each need their own device; those techniques, which begin where substitution leaves off, are the business of Chapter 8.</p>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <p>This chapter built the integral from the ground up and bound it to the derivative. Section 6.1 met the area and distance problems and discovered them to be one limit of Riemann sums. Section 6.2 named that limit the <em>definite integral</em> \(\int_{a}^{b} f(x)\,dx\) (Definition 6.2), established that a continuous integrand is integrable (Theorem 6.1, taken on credit), read the integral as net signed area, and collected its properties (Theorem 6.2). Section 6.3 proved the <em>Fundamental Theorem of Calculus</em>: Part 1 (Theorem 6.3) shows the accumulation function \(\int_{a}^{x} f\) is an antiderivative of \(f\), so differentiating an integral returns the integrand; Part 2 (Theorem 6.4) evaluates any definite integral from a single antiderivative. That the derivative of an accumulated area is the height, and that an area is therefore recovered from an antiderivative, is the hinge on which calculus turns. Section 6.4 gave antiderivatives a notation — the indefinite integral (Definition 6.4) — and a working table, singled out \(\int \tfrac{1}{x}\,dx = \ln\lvert x\rvert + C\), and reread the theorem as the Net Change Theorem (Theorem 6.5). Section 6.5 turned the chain rule around into the Substitution Rule (Theorems 6.6–6.7) and used it to exploit symmetry (Theorem 6.8).</p>
+
+  <p>The results worth carrying forward are few and central:</p>
+  <p>\[ \int_{a}^{b} f(x)\,dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_{i}^{*})\,\Delta x, \qquad \frac{d}{dx}\int_{a}^{x} f(t)\,dt = f(x), \]</p>
+  <p>\[ \int_{a}^{b} f(x)\,dx = F(b) - F(a), \qquad \int \frac{1}{x}\,dx = \ln\lvert x\rvert + C, \]</p>
+  <p>\[ \int f\bigl(g(x)\bigr)g'(x)\,dx = \int f(u)\,du. \]</p>
+
+  <p>The debt the chapter leaves to the rest of the book is a single instrument used everywhere. Chapter 7 applies the Fundamental Theorem to areas between curves, volumes, and arc lengths; Chapter 8 extends substitution into a full set of techniques for finding the antiderivatives that evaluation demands; and the integral returns, transformed, in the study of series, of differential equations, and of the calculus of several variables. Every one of those chapters rests on the two theorems proved in §6.3.</p>
+
+</article>
+</template>
+<!-- END-CONTENT-FRAGMENTS -->
+<!-- plot.js — inlined -->
+<script>
+(function () {
+  var uid = 0;
+  var PI = Math.PI;
+  function piTex(v) {
+    var map = {};
+    map[(-2 * PI).toFixed(4)] = "-2\\pi";
+    map[(-PI).toFixed(4)] = "-\\pi";
+    map[(-PI / 2).toFixed(4)] = "-\\tfrac{\\pi}{2}";
+    map[(PI / 2).toFixed(4)] = "\\tfrac{\\pi}{2}";
+    map[PI.toFixed(4)] = "\\pi";
+    map[(2 * PI).toFixed(4)] = "2\\pi";
+    map[(0).toFixed(4)] = "0";
+    var hit = map[v.toFixed(4)];
+    if (hit != null) return hit;
+    if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v)); // plain integers
+    return undefined;
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function anchorTransform(anchor, vAnchor) {
+    var tx = anchor === "start" ? "0" : anchor === "end" ? "-100%" : "-50%";
+    var ty = vAnchor === "top" ? "0" : vAnchor === "bottom" ? "-100%" : "-50%";
+    return "translate(" + tx + "," + ty + ")";
+  }
+  function buildPlot(cfg) {
+    var w = cfg.w, h = cfg.h;
+    var pad = Object.assign({ t: 16, r: 18, b: 20, l: 22 }, cfg.pad || {});
+    var xmin = cfg.xmin, xmax = cfg.xmax, ymin = cfg.ymin, ymax = cfg.ymax;
+    var iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    var SX = function(x) { return pad.l + ((x - xmin) / (xmax - xmin)) * iw; };
+    var SY = function(y) { return h - pad.b - ((y - ymin) / (ymax - ymin)) * ih; };
+    var id = "pl" + (++uid);
+    var parts = [], labels = [];
+    function pushLabel(o) { labels.push(o); }
+    parts.push('<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:' + w + 'px" class="fig-svg" role="img" aria-label="' + esc(cfg.aria || "graph") + '" preserveAspectRatio="xMidYMid meet">');
+    parts.push('<defs><marker id="' + id + 'a" markerWidth="8" markerHeight="8" refX="5.4" refY="2.8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5.4,2.8 L0,5.6" fill="none" stroke="var(--c-axis)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>');
+    if (cfg.axes !== false) {
+      var x0 = Math.min(Math.max(0, xmin), xmax), y0 = Math.min(Math.max(0, ymin), ymax);
+      var ax0 = SX(xmin), ax1 = SX(xmax), ayBase = SY(y0);
+      parts.push('<path d="M' + ax0.toFixed(1) + ',' + ayBase.toFixed(1) + ' H' + (ax1 - 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      var ay0 = SY(ymin), ay1 = SY(ymax), axBase = SX(x0);
+      parts.push('<path d="M' + axBase.toFixed(1) + ',' + ay0.toFixed(1) + ' V' + (ay1 + 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      if (cfg.xlabel) pushLabel({ px: ax1 + 1, py: ayBase + 4, tex: cfg.xlabel, anchor: "start", vAnchor: "top", cls: "a-ax", size: 13 });
+      if (cfg.ylabel) pushLabel({ px: axBase - 5, py: ay1 + 1, tex: cfg.ylabel, anchor: "end", vAnchor: "top", cls: "a-ax", size: 13 });
+      (cfg.xticks || []).forEach(function(t) {
+        var px = SX(t.x);
+        parts.push('<line x1="' + px.toFixed(1) + '" y1="' + (ayBase - 3).toFixed(1) + '" x2="' + px.toFixed(1) + '" y2="' + (ayBase + 3).toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.x));
+        if (tex != null) pushLabel({ px: px, py: ayBase + 6, tex: tex, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: px, py: ayBase + 6, text: t.label, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+      });
+      (cfg.yticks || []).forEach(function(t) {
+        var py = SY(t.y);
+        parts.push('<line x1="' + (axBase - 3).toFixed(1) + '" y1="' + py.toFixed(1) + '" x2="' + (axBase + 3).toFixed(1) + '" y2="' + py.toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.y));
+        if (tex != null) pushLabel({ px: axBase - 6, py: py, tex: tex, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: axBase - 6, py: py, text: t.label, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+      });
+    }
+    (cfg.items || []).forEach(function(it) {
+      if (it.type === "curve") {
+        var cls = it.cls || "curve", n = it.samples || 240, a = it.domain[0], b = it.domain[1];
+        var d = "", pen = false;
+        for (var i = 0; i <= n; i++) {
+          var x = a + (b - a) * (i / n), y = it.fn(x);
+          if (!isFinite(y) || y < ymin - (ymax - ymin) * 0.04 || y > ymax + (ymax - ymin) * 0.04) { pen = false; continue; }
+          var px = SX(x).toFixed(2), py = SY(y).toFixed(2);
+          d += (pen ? "L" : "M") + px + "," + py + " "; pen = true;
+        }
+        if (d) parts.push('<path d="' + d.trim() + '" class="' + cls + '"/>');
+      } else if (it.type === "vline") {
+        parts.push('<line x1="' + SX(it.x).toFixed(1) + '" y1="' + SY(ymin).toFixed(1) + '" x2="' + SX(it.x).toFixed(1) + '" y2="' + SY(ymax).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "hline") {
+        var ha = it.from != null ? it.from : xmin, hb = it.to != null ? it.to : xmax;
+        parts.push('<line x1="' + SX(ha).toFixed(1) + '" y1="' + SY(it.y).toFixed(1) + '" x2="' + SX(hb).toFixed(1) + '" y2="' + SY(it.y).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "seg") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="' + (it.cls || "curve") + '"/>');
+      } else if (it.type === "dot") {
+        var r = it.r || 3.0;
+        if (it.hollow) parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/>');
+        else parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" class="dot"/>');
+      } else if (it.type === "rect") {
+        var rTop = SY(it.y1), rBot = SY(it.y0 != null ? it.y0 : 0), rL = SX(it.x1), rR = SX(it.x2);
+        parts.push('<rect x="' + Math.min(rL, rR).toFixed(1) + '" y="' + Math.min(rTop, rBot).toFixed(1) + '" width="' + Math.abs(rR - rL).toFixed(1) + '" height="' + Math.abs(rBot - rTop).toFixed(1) + '" class="' + (it.cls || "fill-area") + '"/>');
+      } else if (it.type === "area") {
+        var aN = it.samples || 160, aA = it.domain[0], aB = it.domain[1], aBase = (it.base != null ? it.base : 0);
+        var aD = "M" + SX(aA).toFixed(2) + "," + SY(aBase).toFixed(2) + " ";
+        for (var aI = 0; aI <= aN; aI++) { var aX = aA + (aB - aA) * (aI / aN); aD += "L" + SX(aX).toFixed(2) + "," + SY(it.fn(aX)).toFixed(2) + " "; }
+        aD += "L" + SX(aB).toFixed(2) + "," + SY(aBase).toFixed(2) + " Z";
+        parts.push('<path d="' + aD.trim() + '" class="' + (it.cls || "fill-area") + '"/>');
+      } else if (it.type === "arrow") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      } else if (it.type === "text") {
+        pushLabel({ px: SX(it.x), py: SY(it.y), tex: it.tex, text: it.tex == null ? it.text : null, anchor: it.anchor || "middle", vAnchor: it.vAnchor || "middle", dx: it.dx || 0, dy: it.dy || 0, cls: it.cls || "a-pt", size: it.size });
+      }
+    });
+    if (labels.length) {
+      var M = 52;
+      var spans = labels.map(function(L) {
+        var left = (L.px + (L.dx || 0) + M).toFixed(1);
+        var top = (L.py + (L.dy || 0) + M).toFixed(1);
+        var tf = anchorTransform(L.anchor, L.vAnchor);
+        var fs = L.size ? "font-size:" + L.size + "px;" : "";
+        var body = L.tex != null ? "\\(" + L.tex + "\\)" : esc(L.text == null ? "" : L.text);
+        return '<span class="fig-lbl ' + (L.cls || "") + '" style="left:' + left + 'px;top:' + top + 'px;transform:' + tf + ';' + fs + '">' + body + '</span>';
+      }).join("");
+      parts.push('<foreignObject x="' + (-M) + '" y="' + (-M) + '" width="' + (w + 2 * M) + '" height="' + (h + 2 * M) + '" class="fig-fo" requiredExtensions="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml" class="fig-lyr">' + spans + '</div></foreignObject>');
+    }
+    parts.push('</svg>');
+    return parts.join("");
+  }
+  window.buildPlot = buildPlot;
+  window.PIVAL = PI;
+})();
+</script>
+
+<!-- ============================================================
+     figures.js — inlined (Chapter 6 figure registry)
+     ============================================================ -->
+<script>
+/* ============================================================
+   figures.js — Chapter 6 figure registry.
+   Each entry returns { layout, panels:[{svg, note}] }.
+   Most chapter figures use buildPlot() (shared/plot.js) for
+   function graphs. buildPlot has NO fill/sector primitive, so
+   region-area schematics (e.g. the §3.1 sector inequality) are
+   hand-built raw SVG here, inheriting the figure vocabulary
+   (.fig-svg, .ptlab, var(--c-primary)/--ink…) from skin-hs.css.
+   Labels are kept to single symbols (O, A, B, C, θ, 1); the
+   areas and the inequality live in the caption and body prose
+   (CONTENT_SPEC §10 "Label economy").
+   Appended across sections — never overwrite.
+   ============================================================ */
+(function () {
+
+  const FIGS = {
+
+    /* §6.1 Figure 6.1 — Riemann rectangles under y=x² on [0,1], n=4, left vs right.
+       Left endpoints sit BELOW the increasing curve (L₄ under); right endpoints poke
+       ABOVE it (R₄ over) — the bracket L₄ < A < R₄. Leftmost left-rectangle has height
+       f(0)=0 (absent). Numeric sums 7/32, 15/32 live in Example 6.1 (label economy).
+       Uses the ch6 rect fill primitive. */
+    "riemann-lr-x2": () => {
+      const f = (x) => x * x, dx = 0.25;
+      const mk = (side) => {
+        const rects = [];
+        for (let k = 0; k < 4; k++) {
+          const xL = k * dx, xR = (k + 1) * dx, hgt = side === "L" ? f(xL) : f(xR);
+          if (hgt > 0) rects.push({ type: "rect", x1: xL, x2: xR, y1: hgt, y0: 0, cls: "rect-sum" });
+        }
+        return buildPlot({
+          w: 250, h: 205, xmin: -0.09, xmax: 1.17, ymin: -0.09, ymax: 1.17,
+          xlabel: "x", ylabel: "y", xticks: [{ x: 1, tex: "1" }], yticks: [{ y: 1, tex: "1" }],
+          aria: side === "L"
+            ? "Four left-endpoint rectangles under the curve y equals x squared on zero to one; each rectangle lies below the curve, so the left sum underestimates the area."
+            : "Four right-endpoint rectangles on the curve y equals x squared on zero to one; each rectangle rises above the curve, so the right sum overestimates the area.",
+          items: [
+            ...rects,
+            { type: "curve", fn: f, domain: [0, 1.13], samples: 200 },
+            { type: "text", x: 0.5, y: 1.0, tex: "y=x^{2}", anchor: "start", cls: "a-pt", size: 12 },
+          ],
+        });
+      };
+      return { layout: "pair", panels: [
+        { svg: mk("L"), note: "Left endpoints — under" },
+        { svg: mk("R"), note: "Right endpoints — over" },
+      ] };
+    },
+
+    /* §6.1 Figure 6.2 — refinement of the right sum R₄→R₈→R₁₆ under y=x² on [0,1].
+       The over-estimate's overshoot above the curve is a single end rectangle of
+       area 1/n, so it shrinks as n grows: the three panels show the bracket closing.
+       NO "=1/3" or limit value on the figure (that is Example 6.2's answer — no-spoiler,
+       D7). Same curve, same rect fill as Figure 6.1; only n varies across panels. */
+    "refinement-rn-x2": () => {
+      const f = (x) => x * x;
+      const mk = (n) => {
+        const dx = 1 / n, rects = [];
+        for (let k = 1; k <= n; k++) {
+          rects.push({ type: "rect", x1: (k - 1) * dx, x2: k * dx, y1: f(k * dx), y0: 0, cls: "rect-sum" });
+        }
+        return buildPlot({
+          w: 215, h: 182, xmin: -0.09, xmax: 1.16, ymin: -0.09, ymax: 1.16,
+          xlabel: "x", ylabel: "y", xticks: [{ x: 1, tex: "1" }], yticks: [{ y: 1, tex: "1" }],
+          aria: "Right-endpoint rectangles under the curve y equals x squared on zero to one with "
+            + n + " strips; each rectangle rises just above the curve, and the total overshoot shrinks as the number of strips grows.",
+          items: [
+            ...rects,
+            { type: "curve", fn: f, domain: [0, 1.12], samples: 200 },
+          ],
+        });
+      };
+      return { layout: "triple", panels: [
+        { svg: mk(4), note: "n=4" },
+        { svg: mk(8), note: "n=8" },
+        { svg: mk(16), note: "n=16" },
+      ] };
+    },
+
+    /* §6.1 Figure 6.3 — velocity–time step graph (Example 6.3). Six discrete speed
+       readings (0,0)(1,4)(2,7)(3,9)(4,10)(5,10); RIGHT-endpoint rectangles of width
+       Δt=1 whose total area estimates the distance. Right-sum heights are the readings
+       at t=1..5, so the last two rectangles ([3,4] and [4,5]) are BOTH height 10.
+       The data are discrete: the run-to-run interpolation is drawn as a soft DASHED
+       polyline (a modelling assumption), never a solid curve. Numbers 30 m / 40 m stay
+       in the Example (label economy). Message: distance = area under the v–t graph. */
+    "velocity-distance-steps": () => {
+      const pts = [[0, 0], [1, 4], [2, 7], [3, 9], [4, 10], [5, 10]];
+      const rects = [], segs = [];
+      for (let k = 1; k <= 5; k++) rects.push({ type: "rect", x1: k - 1, x2: k, y1: pts[k][1], y0: 0, cls: "rect-sum" });
+      for (let k = 0; k < 5; k++) segs.push({ type: "seg", x1: pts[k][0], y1: pts[k][1], x2: pts[k + 1][0], y2: pts[k + 1][1], cls: "secant" });
+      const svg = buildPlot({
+        w: 305, h: 225, xmin: -0.5, xmax: 5.75, ymin: -0.95, ymax: 11.7,
+        xlabel: "t\\,(\\text{s})", ylabel: "v\\,(\\text{m/s})",
+        xticks: [1, 2, 3, 4, 5].map((x) => ({ x, tex: String(x) })),
+        yticks: [{ y: 5, tex: "5" }, { y: 10, tex: "10" }],
+        aria: "A velocity versus time step graph: six speed readings from zero up to ten metres per second at times zero through five seconds, with right-endpoint rectangles of width one second whose combined area estimates the distance travelled; a dashed line links the readings.",
+        items: [
+          ...rects,
+          ...segs,
+          ...pts.map((p) => ({ type: "dot", x: p[0], y: p[1], r: 2.6 })),
+        ],
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §6.2 Figure 6.4 — net signed area of y=x−1 on [0,2] (Example 6.5). The line
+       crosses the axis at x=1: on [0,1] it is BELOW (a triangle of area ½, marked "−",
+       red tone fill-neg), on [1,2] ABOVE (a congruent triangle of area ½, marked "+",
+       blue tone fill-pos). The +/− glyphs carry the sign independently of colour, so the
+       figure survives grayscale (D8). Net 0 vs total 1 live in the caption / Example. */
+    "signed-area-line": () => {
+      const f = (x) => x - 1;
+      const svg = buildPlot({
+        w: 300, h: 232, xmin: -0.3, xmax: 2.35, ymin: -1.4, ymax: 1.4,
+        xlabel: "x", ylabel: "y",
+        xticks: [{ x: 1, tex: "1" }, { x: 2, tex: "2" }],
+        yticks: [{ y: 1, tex: "1" }, { y: -1, tex: "-1" }],
+        aria: "The line y equals x minus one on zero to two crosses the axis at x equals one; the triangle below the axis on the left is marked minus and the congruent triangle above the axis on the right is marked plus, so the two signed areas cancel.",
+        items: [
+          { type: "area", fn: f, domain: [0, 1], base: 0, cls: "fill-neg" },
+          { type: "area", fn: f, domain: [1, 2], base: 0, cls: "fill-pos" },
+          { type: "curve", fn: f, domain: [0, 2], samples: 2 },
+          { type: "dot", x: 1, y: 0, r: 2.6 },
+          { type: "text", x: 0.4, y: -0.36, tex: "-", cls: "a-pt", size: 21 },
+          { type: "text", x: 1.62, y: 0.34, tex: "+", cls: "a-pt", size: 19 },
+          { type: "text", x: 0.1, y: 0.86, tex: "y=x-1", anchor: "start", cls: "a-curve", size: 12 },
+        ],
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §6.2 Figure 6.5 — min/max bounding rectangles of √x on [1,4] (Example 6.6).
+       √x is increasing and concave down; its minimum on [1,4] is m=1 (left end) and its
+       maximum M=2 (right end). The inscribed rectangle (height 1, solid border rect-lo)
+       lies under the curve, touching only at (1,1); the circumscribed rectangle (height 2,
+       DASHED border rect-hi) covers it, touching only at (4,2). Solid vs dashed borders
+       distinguish the two in grayscale (D8). Areas 1·3=3 and 2·3=6 stay in the caption. */
+    "minmax-sqrt": () => {
+      const f = (x) => Math.sqrt(x);
+      const svg = buildPlot({
+        w: 300, h: 225, xmin: -0.25, xmax: 4.6, ymin: -0.28, ymax: 2.5,
+        xlabel: "x", ylabel: "y",
+        xticks: [{ x: 1, tex: "1" }, { x: 4, tex: "4" }],
+        yticks: [{ y: 1, tex: "1" }, { y: 2, tex: "2" }],
+        aria: "The increasing concave-down curve y equals root x on the interval one to four, boxed below by an inscribed rectangle of height one and above by a dashed circumscribed rectangle of height two; the curve touches the lower rectangle only at the left end and the upper rectangle only at the right end.",
+        items: [
+          { type: "rect", x1: 1, x2: 4, y1: 2, y0: 0, cls: "rect-hi" },
+          { type: "rect", x1: 1, x2: 4, y1: 1, y0: 0, cls: "rect-lo" },
+          { type: "curve", fn: f, domain: [1, 4], samples: 200 },
+          { type: "dot", x: 1, y: 1, r: 2.6 },
+          { type: "dot", x: 4, y: 2, r: 2.6 },
+          { type: "text", x: 1.12, y: 1.12, tex: "m", anchor: "start", cls: "a-pt", size: 12 },
+          { type: "text", x: 1.12, y: 2.12, tex: "M", anchor: "start", cls: "a-pt", size: 12 },
+          { type: "text", x: 3.05, y: 1.46, tex: "y=\\sqrt{x}", anchor: "start", cls: "a-curve", size: 12 },
+        ],
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §6.3 Figure 6.6 — the accumulation function g(x)=∫ₐˣ f and the added sliver
+       (FTC-1 anchor). f>0; the area from a to x is shaded (fill-area) as g(x); nudging
+       x by h appends a thin strip [x,x+h] (rect-sum) of width h and height ≈ f(x), so g
+       gains about f(x)·h. The strip is drawn WIDE (not to scale) so it is visible. Axis
+       ticks a, x, x+h. Schematic f, no y-values (label economy). */
+    "accumulation-sliver": () => {
+      const f = (t) => 1 + 0.45 * t - 0.05 * t * t;
+      const a = 0.6, X = 2.4, h = 0.8;
+      const svg = buildPlot({
+        w: 320, h: 228, xmin: -0.2, xmax: 4.15, ymin: -0.35, ymax: 2.45,
+        xlabel: "t", ylabel: "y",
+        xticks: [{ x: a, tex: "a" }, { x: X, tex: "x" }, { x: X + h, tex: "x+h" }],
+        yticks: [],
+        aria: "A positive curve y equals f of t; the area under it from a to x is shaded as the accumulated value g of x, and a narrow strip from x to x plus h — drawn wide and not to scale — is the extra area added, of width h and height about f of x.",
+        items: [
+          { type: "area", fn: f, domain: [a, X], base: 0, cls: "fill-area" },
+          { type: "rect", x1: X, x2: X + h, y1: f(X), y0: 0, cls: "rect-sum" },
+          { type: "curve", fn: f, domain: [-0.1, 4.05], samples: 200 },
+          { type: "text", x: 1.35, y: 0.6, tex: "g(x)", cls: "a-pt", size: 13 },
+          { type: "text", x: X + h + 0.07, y: f(X) * 0.5, tex: "f(x)", anchor: "start", cls: "a-pt", size: 12 },
+          { type: "text", x: 3.35, y: 2.2, tex: "y=f(t)", anchor: "start", cls: "a-curve", size: 12 },
+        ],
+      });
+      return { layout: "single", panels: [{ svg, note: "The strip is drawn wide — not to scale." }] };
+    },
+
+    /* §6.3 Figure 6.7 — the trapped difference quotient in the FTC-1 proof. On the short
+       window [x,x+h] the true added area ∫ₓ^{x+h} f (blue, fill-area, top = curve) is
+       trapped between an inscribed rectangle of height m_h=min f (solid border rect-lo)
+       and a circumscribed rectangle of height M_h=max f (DASHED border rect-hi). For this
+       increasing sample the minimum sits at u_h (left) and the maximum at v_h (right).
+       As h→0 both m_h and M_h close on f(x) — the squeeze (rest of the statement in caption). */
+    "ftc-trap": () => {
+      const f = (t) => 0.9 + 0.62 * t - 0.05 * t * t;
+      const X = 1, h = 1.4, xh = X + h;
+      const mh = f(X), Mh = f(xh);
+      const svg = buildPlot({
+        w: 320, h: 235, xmin: 0.3, xmax: 3.2, ymin: 0, ymax: 2.5,
+        xlabel: "t", ylabel: "y",
+        xticks: [{ x: X, tex: "x" }, { x: xh, tex: "x+h" }],
+        yticks: [{ y: mh, tex: "m_h" }, { y: Mh, tex: "M_h" }],
+        aria: "On the short interval from x to x plus h the thin area under the curve is trapped between an inscribed rectangle of height m sub h, the minimum of f, and a taller dashed circumscribed rectangle of height M sub h, the maximum; as h shrinks both heights close on f of x.",
+        items: [
+          { type: "area", fn: f, domain: [X, xh], base: 0, cls: "fill-area" },
+          { type: "rect", x1: X, x2: xh, y1: mh, y0: 0, cls: "rect-lo" },
+          { type: "rect", x1: X, x2: xh, y1: Mh, y0: 0, cls: "rect-hi" },
+          { type: "curve", fn: f, domain: [0.35, 3.15], samples: 220 },
+          { type: "dot", x: X, y: mh, r: 2.6 },
+          { type: "dot", x: xh, y: Mh, r: 2.6 },
+          { type: "text", x: X, y: mh, tex: "u_h", anchor: "end", vAnchor: "top", dx: -3, dy: 3, cls: "a-pt", size: 12 },
+          { type: "text", x: xh, y: Mh, tex: "v_h", anchor: "start", vAnchor: "bottom", dx: 3, dy: -3, cls: "a-pt", size: 12 },
+          { type: "text", x: 1.7, y: 2.34, tex: "m_h,\\,M_h\\to f(x)", anchor: "middle", cls: "a-pt", size: 11 },
+        ],
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §6.4 Figure 6.8 — velocity v=t²−4 on [0,3], signed regions (Example 6.12).
+       v(0)=−4, root at t=2, v(3)=5. On [0,2) the velocity is negative (motion backward):
+       region BELOW the axis, marked "−" (red tone fill-neg), area 16/3. On (2,3] positive:
+       region ABOVE the axis, marked "+" (blue tone fill-pos), area 7/3. The two regions
+       meet at (2,0). The +/− glyphs carry the sign in grayscale (D8). Displacement −3 vs
+       total distance 23/3 live in the caption / Example. */
+    "velocity-signed-area": () => {
+      const v = (t) => t * t - 4;
+      const svg = buildPlot({
+        w: 300, h: 268, xmin: -0.35, xmax: 3.45, ymin: -4.9, ymax: 6.5,
+        xlabel: "t", ylabel: "v",
+        xticks: [{ x: 2, tex: "2" }, { x: 3, tex: "3" }],
+        yticks: [{ y: -4, tex: "-4" }, { y: 5, tex: "5" }],
+        aria: "The velocity v equals t squared minus four on zero to three starts at minus four, crosses zero at t equals two, and rises to five; the larger region below the axis on zero to two is marked minus and the smaller region above the axis on two to three is marked plus.",
+        items: [
+          { type: "area", fn: v, domain: [0, 2], base: 0, cls: "fill-neg" },
+          { type: "area", fn: v, domain: [2, 3], base: 0, cls: "fill-pos" },
+          { type: "curve", fn: v, domain: [0, 3], samples: 200 },
+          { type: "dot", x: 2, y: 0, r: 2.6 },
+          { type: "text", x: 0.75, y: -2.15, tex: "-", cls: "a-pt", size: 23 },
+          { type: "text", x: 2.62, y: 1.5, tex: "+", cls: "a-pt", size: 20 },
+          { type: "text", x: 1.05, y: 3.7, tex: "v=t^{2}-4", anchor: "start", cls: "a-curve", size: 12 },
+        ],
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+    /* §6.2 Figure 6.5 — the semicircle y=√(1−x²) on [−1,1] (Example 6.6, M4 supplement).
+       Reading ∫₋₁¹√(1−x²)dx as the area of the upper unit half-circle = π/2. Shaded region =
+       the semicircular disc; a gray radius to the arc marks r=1. The value π/2 lives in the
+       caption / Example (label economy). Uses the ch6 area fill primitive. */
+    "semicircle-area": () => {
+      const f = (x) => Math.sqrt(Math.max(1 - x * x, 0));
+      const svg = buildPlot({
+        w: 300, h: 200, xmin: -1.3, xmax: 1.3, ymin: -0.34, ymax: 1.3,
+        xlabel: "x", ylabel: "y",
+        xticks: [{ x: -1, tex: "-1" }, { x: 1, tex: "1" }],
+        yticks: [{ y: 1, tex: "1" }],
+        aria: "The upper half of the unit circle, y equals the square root of one minus x squared, on minus one to one; the shaded semicircular region beneath it has area pi over two, the value of the integral.",
+        items: [
+          { type: "area", fn: f, domain: [-1, 1], base: 0, cls: "fill-area" },
+          { type: "curve", fn: f, domain: [-1, 1], samples: 260 },
+          { type: "seg", x1: 0, y1: 0, x2: 0.707, y2: 0.707, cls: "bubble" },
+          { type: "dot", x: 0, y: 0, r: 2.2 },
+          { type: "text", x: 0.5, y: 0.3, tex: "1", cls: "a-pt", size: 12 },
+          { type: "text", x: 0.12, y: 1.12, tex: "y=\\sqrt{1-x^{2}}", anchor: "start", cls: "a-curve", size: 12 },
+        ],
+      });
+      return { layout: "single", panels: [{ svg }] };
+    },
+
+  };
+
+  /* ---- hydrateFigures: fills every <figure data-fig="id"> ---- */
+  function hydrateFigures(root) {
+    (root || document).querySelectorAll("[data-fig]").forEach(function (el) {
+      var def = FIGS[el.dataset.fig];
+      if (!def || el.dataset.figDone) return;
+      var r = def();
+      var layout = r.layout, panels = r.panels;
+      var html;
+      if (layout === "single" && panels.length === 1 && !panels[0].note) {
+        html = '<div class="figure-art">' + panels[0].svg + '</div>';
+      } else {
+        var cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
+        html = '<div class="figure-art ' + cls + '">' +
+          panels.map(function (p) {
+            return '<div class="fig-panel">' + p.svg + (p.note ? '<div class="fig-note">' + p.note + '</div>' : '') + '</div>';
+          }).join("") + '</div>';
+      }
+      el.insertAdjacentHTML("afterbegin", html);
+      el.dataset.figDone = "1";
+    });
+  }
+  window.hydrateFigures = hydrateFigures;
+})();
+</script>
+
+<!-- Main build script (paginator + MathJax) -->
+<script>
+var CHAPTER = {
+  brand: "Chapter 6 — Integrals",
+  runningHead: "Chapter 6 · Integrals",
+  fragments: ["sec-6-1", "sec-6-2", "sec-6-3", "sec-6-4", "sec-6-5"],
+};
+var FRAGMENTS = CHAPTER.fragments;
+var RUNNING_HEAD = CHAPTER.runningHead;
+
+function renderMath(root) {
+  if (!root) return Promise.resolve();
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    return MathJax.typesetPromise([root]).catch(function(e) { console.warn("mathjax", e); });
+  }
+  return Promise.resolve();
+}
+
+function waitFor(test, tries) {
+  return new Promise(function(resolve) {
+    var n = 0;
+    var tick = function() {
+      if (test()) return resolve(true);
+      if (n++ > (tries || 100)) return resolve(false);
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
+var isHeading = function(el) {
+  return el.matches && el.matches(".chapter-head, .sec-head, .subsec-head, .para-head, .env-head");
+};
+
+function isDisplayChild(n) {
+  if (n.nodeType !== 1) return false;
+  var tag = n.tagName && n.tagName.toLowerCase();
+  if (tag === "mjx-container" && n.getAttribute("display") === "true") return true;
+  if (n.querySelector && n.querySelector('mjx-container[display="true"]')) return true;
+  return false;
+}
+
+var SPLIT_ENVS = ".env-example, .env-solution, .env-proof, .env-definition, .env-theorem, .env-proposition, .env-corollary";
+var DISP_SEL = 'mjx-container[display="true"]';
+
+function liCount(el) { return [].filter.call(el.children, function(x) { return x.tagName === "LI"; }).length; }
+
+function countBodyUnits(bodyEl) {
+  var n = 0;
+  [].forEach.call(bodyEl.children, function(ch) {
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL)) n += explodeParagraph2(ch);
+    else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) n += liCount(ch);
+    else n++;
+  });
+  return n;
+}
+
+function isSplittable(block) {
+  if (!block.classList) return false;
+  if (block.classList.contains("workedexample")) return block.children.length >= 2;
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    return !!b && countBodyUnits(b) > 1;
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL)) {
+    return explodeParagraph2(block) > 1;
+  }
+  return false;
+}
+
+function onlyLists(bodyEl) {
+  var els = contentKids(bodyEl);
+  return els.length > 0 && els.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; });
+}
+
+function contentKids(bodyEl) {
+  return [].filter.call(bodyEl.children, function(c) {
+    return !(c.classList && c.classList.contains("qed")) && (c.textContent.trim() || c.querySelector("*"));
+  });
+}
+
+function splitMode(block) {
+  if (!block.classList) return "none";
+  if (block.classList.contains("workedexample")) return block.children.length >= 2 ? "free" : "none";
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    if (!b || countBodyUnits(b) <= 1) return "none";
+    var kids = contentKids(b);
+    var hasPara = kids.some(function(c) {
+      return c.tagName === "P" && c.querySelector(DISP_SEL) && explodeParagraph2(c) > 1;
+    });
+    if (hasPara || (kids.length >= 2 && !kids.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; }))) return "free";
+    return "list";
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL) && explodeParagraph2(block) > 1) return "free";
+  return "none";
+}
+
+function explodeParagraph2(p) {
+  var n = 0, hasBuf = false;
+  [].forEach.call(p.childNodes, function(node) {
+    if (isDisplayChild(node)) {
+      if (hasBuf) { n++; hasBuf = false; }
+      n++;
+    } else if ((node.textContent && node.textContent.trim()) || node.nodeType === 1) {
+      hasBuf = true;
+    }
+  });
+  if (hasBuf) n++;
+  return n;
+}
+
+function explodeParagraph(p) {
+  var parts = [], buf = [];
+  var flush = function() {
+    var hasContent = buf.some(function(n) { return (n.textContent && n.textContent.trim()) || n.nodeType === 1; });
+    if (hasContent) {
+      var np = document.createElement("p");
+      np.className = p.className;
+      buf.forEach(function(n) { np.appendChild(n); });
+      parts.push(np);
+    } else {
+      buf.forEach(function(n) { if (n.parentNode) n.parentNode.removeChild(n); });
+    }
+    buf = [];
+  };
+  [].slice.call(p.childNodes).forEach(function(node) {
+    if (isDisplayChild(node)) { flush(); var np = document.createElement("p"); np.className = p.className; np.appendChild(node); parts.push(np); }
+    else { buf.push(node); }
+  });
+  flush();
+  return parts;
+}
+
+function listToUnits(listEl) {
+  var items = [].filter.call(listEl.children, function(x) { return x.tagName === "LI"; });
+  if (items.length < 2) return [listEl];
+  var tag = listEl.tagName.toLowerCase();
+  return items.map(function(li, i) {
+    var nl = document.createElement(tag);
+    nl.className = listEl.className;
+    if (tag === "ol") nl.setAttribute("start", String(i + 1));
+    nl.appendChild(li);
+    return nl;
+  });
+}
+
+function bodyToUnits(bodyEl) {
+  var units = [];
+  [].forEach.call(bodyEl.children, function(ch) {
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL) && explodeParagraph2(ch) > 1) {
+      explodeParagraph(ch).forEach(function(u) { units.push(u); });
+    } else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) {
+      listToUnits(ch).forEach(function(u) { units.push(u); });
+    } else { units.push(ch); }
+  });
+  return units;
+}
+
+function splitEnvOverflow(env) {
+  var bodyEl = env.querySelector(":scope > .env-body");
+  if (!bodyEl) return null;
+  var kids = bodyToUnits(bodyEl);
+  if (kids.length < 2) return null;
+  bodyEl.innerHTML = "";
+  bodyEl.appendChild(kids.shift());
+  var parts = [env];
+  kids.forEach(function(k) {
+    if (k.classList && k.classList.contains("qed") && parts.length > 0) {
+      var prev = parts[parts.length - 1];
+      var prevBody = prev.querySelector(":scope > .env-body") || prev.querySelector(".env-body");
+      if (prevBody) { prevBody.appendChild(k); return; }
+    }
+    var cont = document.createElement("section");
+    cont.className = env.className + " env-cont";
+    var b = document.createElement("div");
+    b.className = "env-body";
+    b.appendChild(k);
+    cont.appendChild(b);
+    parts.push(cont);
+  });
+  return parts;
+}
+
+function splitParts(block) {
+  if (block.classList.contains("workedexample")) return [].slice.call(block.children);
+  if (block.matches(SPLIT_ENVS)) return splitEnvOverflow(block) || [block];
+  if (block.tagName === "P") { var ex = explodeParagraph(block); return ex.length > 1 ? ex : [block]; }
+  return [block];
+}
+
+function paginate(blocks) {
+  var pagesEl = document.getElementById("pages");
+  pagesEl.innerHTML = "";
+  var idx = 0, body = null;
+  var newSheet = function() {
+    var sheet = document.createElement("div");
+    sheet.className = "sheet";
+    var header = document.createElement("div");
+    header.className = "sheet-header";
+    header.textContent = idx === 0 ? "" : RUNNING_HEAD;
+    body = document.createElement("div");
+    body.className = "sheet-body paper skin-hs vivid";
+    var footer = document.createElement("div");
+    footer.className = "sheet-footer";
+    footer.textContent = String(idx + 1);
+    sheet.append(header, body, footer);
+    pagesEl.appendChild(sheet);
+    idx++;
+  };
+  newSheet();
+  var fits = function() { return body.scrollHeight <= body.clientHeight + 1; };
+  var FREE_THRESHOLD = 130;
+  var moveToFreshPage = function(block) {
+    var carry = null;
+    if (body.childElementCount > 0) {
+      var last = body.lastElementChild;
+      if (last && isHeading(last)) { carry = last; body.removeChild(last); }
+      newSheet();
+      if (carry) body.appendChild(carry);
+    }
+    body.appendChild(block);
+  };
+  var place = function(block) {
+    body.appendChild(block);
+    if (fits()) {
+      if (isHeading(block) && body.childElementCount > 1) {
+        var _bRect = block.getBoundingClientRect();
+        var _bodyRect = body.getBoundingClientRect();
+        var _rem = (_bodyRect.top + body.clientHeight) - _bRect.bottom;
+        var _threshold = block.matches(".sec-head, .chapter-head") ? 160 : 100;
+        if (_rem < _threshold) {
+          body.removeChild(block);
+          newSheet();
+          body.appendChild(block);
+        }
+      }
+      return;
+    }
+    var blockH = block.getBoundingClientRect().height;
+
+    var isFigure = block.tagName === "FIGURE" || (block.classList && block.classList.contains("figure"));
+    var _figArt = isFigure ? block.querySelector(".figure-art") : null;
+    var _artH = 0, _capH = 0;
+    if (_figArt) {
+      _artH = _figArt.getBoundingClientRect().height;
+      var _figCap = block.querySelector("figcaption");
+      _capH = _figCap ? _figCap.getBoundingClientRect().height : 0;
+    }
+
+    body.removeChild(block);
+
+    if (_figArt && _artH > 0) {
+      var _probe = document.createElement("div");
+      _probe.style.height = "0"; _probe.style.margin = "0"; _probe.style.padding = "0";
+      body.appendChild(_probe);
+      var _remaining = body.clientHeight - (_probe.getBoundingClientRect().top - body.getBoundingClientRect().top);
+      body.removeChild(_probe);
+      var FIG_MIN_SCALE = 0.55;
+      var _figMargin = blockH - _artH - _capH;
+      var _availForArt = _remaining - _capH - _figMargin;
+      var neededScale = _availForArt / _artH;
+      if (_availForArt > 60 && neededScale >= FIG_MIN_SCALE && neededScale < 1) {
+        var _oZ = _figArt.style.zoom;
+        var _oMt = block.style.marginTop, _oMb = block.style.marginBottom;
+        _figArt.style.zoom = neededScale;
+        block.style.marginTop = "0.3em"; block.style.marginBottom = "0";
+        body.appendChild(block);
+        if (fits()) return;
+        body.removeChild(block);
+        _figArt.style.zoom = _oZ;
+        block.style.marginTop = _oMt; block.style.marginBottom = _oMb;
+      }
+    }
+
+    if (block.classList.contains && block.classList.contains("workedexample") && block.children.length >= 2) {
+      var lastEl = body.lastElementChild;
+      var used = lastEl ? lastEl.getBoundingClientRect().bottom - body.getBoundingClientRect().top : 0;
+      var remaining = body.clientHeight - used;
+      if (remaining < FREE_THRESHOLD && blockH <= body.clientHeight) {
+        moveToFreshPage(block);
+        if (fits()) return;
+        body.removeChild(block);
+      }
+      var kids = [].slice.call(block.children);
+      var ex = kids[0], sol = kids[1], extra = kids.slice(2);
+      block.removeChild(ex);
+      var solParts = splitParts(sol);
+      body.appendChild(ex);
+      if (!fits()) { body.removeChild(ex); moveToFreshPage(ex); }
+      var first = solParts[0];
+      body.appendChild(first);
+      if (!fits()) {
+        body.removeChild(first);
+        body.removeChild(ex);
+        moveToFreshPage(ex);
+        body.appendChild(first);
+        if (!fits()) { body.removeChild(first); place(first); }
+      }
+      for (var i = 1; i < solParts.length; i++) place(solParts[i]);
+      extra.forEach(place);
+      return;
+    }
+    var mode = splitMode(block);
+    var remainingAtInsert = 0;
+    if (mode !== "none") {
+      var splitProbe = document.createElement("div");
+      splitProbe.style.height = "0"; splitProbe.style.margin = "0"; splitProbe.style.padding = "0";
+      body.appendChild(splitProbe);
+      remainingAtInsert = body.clientHeight - (splitProbe.getBoundingClientRect().top - body.getBoundingClientRect().top);
+      body.removeChild(splitProbe);
+    }
+    var want = (mode !== "none" && (blockH > body.clientHeight || remainingAtInsert >= FREE_THRESHOLD));
+    if (want) { var parts = splitParts(block); if (parts.length > 1) { parts.forEach(place); return; } }
+    moveToFreshPage(block);
+    if (!fits() && mode !== "none") {
+      var parts2 = splitParts(block);
+      if (parts2.length > 1) { body.removeChild(block); parts2.forEach(place); }
+    }
+  };
+  blocks.forEach(place);
+  return idx;
+}
+
+function build() {
+  var status = document.getElementById("status");
+
+  /* Load section fragments from inline <template> elements */
+  var page = document.getElementById("page");
+  var parts = FRAGMENTS.map(function(id) {
+    var tpl = document.getElementById("frag-" + id);
+    return tpl ? tpl.innerHTML : "";
+  });
+  page.innerHTML = parts.join("\n");
+
+  if (window.hydrateFigures) window.hydrateFigures(page);
+
+  /* Wait for MathJax to load, then typeset */
+  waitFor(function() { return window.MathJax && window.MathJax.typesetPromise; }, 200).then(function(ok) {
+    if (!ok) { status.textContent = "MathJax load timeout"; return; }
+    return renderMath(page);
+  }).then(function() {
+    var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    return fontsReady;
+  }).then(function() {
+    status.textContent = "Paginating …";
+    return new Promise(function(r) { setTimeout(r, 60); });
+  }).then(function() {
+    var blocks = [];
+    page.querySelectorAll(":scope > .sec").forEach(function(sec) {
+      [].forEach.call(sec.children, function(ch) { blocks.push(ch); });
+    });
+
+    var n = paginate(blocks);
+    var src = document.getElementById("source");
+    if (src) src.remove();
+
+    status.textContent = n + " page" + (n === 1 ? "" : "s") + " · A4";
+    var btn = document.getElementById("printBtn");
+    btn.disabled = false;
+    btn.addEventListener("click", function() { window.print(); });
+
+    var boot = document.getElementById("boot");
+    if (boot) boot.remove();
+  });
+}
+
+window.addEventListener("DOMContentLoaded", build);
+</script>
+</body>
+</html>

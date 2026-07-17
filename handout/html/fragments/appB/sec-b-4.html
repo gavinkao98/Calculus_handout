@@ -1,0 +1,146 @@
+<!-- §B.4 Steps That Come From Nowhere.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Numbering is MANUAL, namespace "B", continuing from sec-b-3:
+     Strategy B.4 (catalogue of 5 standard moves); Example B.4 (add-and-subtract + split
+     the tolerance into thirds = the "eps/3 trick"); Example B.5 (delta = min{delta1,delta2});
+     Example B.6 (auxiliary function, added 2026-07-17 -- see below).
+
+     2026-07-17 additions:
+     (a) Example B.4's prompt now opens "Let eps > 0" -- eps was a free variable one section
+         after §B.3 trains the reader to mark every quantifier. Same defect family as the
+         same-day fixes to Prop B.5 and Example B.3.
+     (b) NEW Example B.6 = the auxiliary function worked end to end: x^2 + 1 > x for every
+         real x, via h(x) = (x^2+1) - x = (x - 1/2)^2 + 3/4 > 0. Reason: of the catalogue's
+         five moves, three had worked examples and two had only prose, and the prose promised
+         "some fact already in hand can attack it" to a reader who has no theorems in hand --
+         so this move alone never showed what it buys, in the one section whose whole thesis
+         is "name the move and see what it buys". Prose cannot fix an asymmetry that IS the
+         missing example. Calculus-free: completing the square is A-class (SPEC §16.2).
+         The four beats the example must keep: (1) the statement never mentions h;
+         (2) why h is defined at all; (3) the new object turns a two-quantity comparison into
+         a one-quantity question a known fact settles; (4) the return to the original claim.
+     (c) WLOG was CONSIDERED for the same treatment and DECLINED. The external reviewer asked
+         for a WLOG worked example plus a non-example, but the WLOG paragraph already carries
+         both inline (assume a <= b; if a > b, swap the names) and its own caution ("Invoked
+         over cases that are NOT symmetric, it quietly skips real work") -- and, decisively,
+         no blind reader flagged it, while the auxiliary function was flagged independently
+         by the reviewer and three separate simulations. Adopt what the evidence covers.
+     NUMBERING: (b) inserts a new Example in the middle of the namespace, so §B.6's examples
+     cascaded B.6->B.7, B.7->B.8, B.8->B.9, B.9->B.10, plus the §B.6 Caution's cross-ref.
+     This is the appendix's ONLY cascade to date; verify with the ledger check before commit.
+     2026-07-17 (third-party review; adjudication in
+     handout/html/_audit/REVIEW-appendixB-b6-design.html): the "Split the tolerance" bullet
+     used to close "The '3eps' you see in print is this move with k = 3." That was not a
+     math error -- the 3eps argument is a real convention in print -- but it hung the
+     SIBLING move's name on this one: the move described here divides the tolerance, which
+     is the eps/3 trick, whereas an author who writes "< 3eps" precisely did NOT divide.
+     Renamed to "eps/3 trick"; roster unchanged (still 5 moves, no new example).
+
+     DO NOT re-add a mention of the 3eps variant here. Two drafts tried and both failed,
+     for opposite reasons, and the failure is structural rather than a matter of wording:
+       - Explain how it closes ("the total is below 3eps, and eps was arbitrary") and you
+         silently import a step this appendix never establishes -- from "x < 3eps for every
+         eps > 0" conclude "x <= 0" -- inside the one section whose whole thesis is that no
+         step comes from nowhere.
+       - Name it without explaining, and you raise a question the reader cannot answer with
+         anything the appendix has given them: the target was eps, so why does handing over
+         3eps count?
+     Either way the cost lands on the reader and the payload is somebody else's naming
+     habit. The variant needs a quantifier argument this appendix does not carry; until it
+     does, the honest move is silence.
+     Auxiliary-function and WLOG are treated in prose (no numbered environment). All
+     demonstrations generic and self-contained; the triangle inequality is glossed inline
+     (|x+y| <= |x|+|y|), an A-class fact per SPEC §16.2, so nothing calculus is assumed.
+     Math verified during authoring: a-d = (a-b)+(b-c)+(c-d) => |a-d| < eps via thirds;
+     |x| < min{d1,d2} implies |x| < d1 and |x| < d2.
+     Record: handout/_audit/REVIEW-appendixB-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">B.4</span>Steps That Come From Nowhere</h2>
+  </header>
+
+  <p>Every reader of proofs meets the same frustration sooner or later: a line appears that seems conjured from thin air. A term is added and subtracted for no visible reason; a threshold is defined as the minimum of two others; a tolerance is carved into thirds; a brand-new function is introduced that the statement never mentioned. These steps look like inspiration, but they are not — they are standard moves, a short catalogue of them, each with a fixed purpose. Once you can name the move, the question &ldquo;how would anyone think of that?&rdquo; turns into the far smaller &ldquo;ah, that one again — what is it buying here?&rdquo;</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.4</span><span class="env-name">A catalogue of standard steps</span></p>
+    <div class="env-body">
+      <ul class="steps">
+        <li><strong>Add and subtract a term.</strong> Rewrite \(a - c\) as \((a - b) + (b - c)\) for a convenient \(b\). Legal because the inserted terms cancel; used to compare two quantities through an intermediate you can actually control.</li>
+        <li><strong>Split the tolerance.</strong> To force a sum of \(k\) terms below \(\varepsilon\), keep each term below \(\varepsilon/k\). Legal because \(k \cdot (\varepsilon/k) = \varepsilon\); used whenever an estimate breaks into several pieces. The &ldquo;\(\varepsilon/3\) trick&rdquo; you see in print is this move with \(k = 3\).</li>
+        <li><strong>Take a minimum (or maximum).</strong> To meet two &ldquo;small enough&rdquo; conditions at once, set \(\delta = \min\{\delta_1, \delta_2\}\); for two &ldquo;large enough&rdquo; conditions, set \(N = \max\{N_1, N_2\}\). Legal because the minimum is \(\le\) each of the two (and the maximum \(\ge\) each); used to satisfy several thresholds with a single one.</li>
+        <li><strong>Introduce an auxiliary function.</strong> Build a helper the statement never mentioned — often the difference \(h = f - g\) — so that a tool you already have applies to it. Legal because you are free to define what you like; used to turn an unfamiliar problem into a familiar one.</li>
+        <li><strong>Without loss of generality.</strong> Assume the convenient one of several interchangeable cases. Legal exactly when a relabeling carries the other cases onto the one you kept; used to avoid writing the same argument twice.</li>
+      </ul>
+    </div>
+  </section>
+
+  <p>The first two moves travel together so often that it is worth seeing them combined. The setting is the most common one in analysis: we want to know that two quantities are close, but we can only measure closeness through intermediate steps.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.4</span></p>
+      <div class="env-body">
+        <p>Let \(\varepsilon > 0\), and suppose four numbers satisfy \(|a - b| < \tfrac{\varepsilon}{3}\), \(|b - c| < \tfrac{\varepsilon}{3}\), and \(|c - d| < \tfrac{\varepsilon}{3}\). Show that \(|a - d| < \varepsilon\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We have no direct grip on \(a - d\), so we manufacture one by inserting the intermediate values \(b\) and \(c\) — adding and subtracting each:
+        \[ a - d = (a - b) + (b - c) + (c - d). \]
+        This costs nothing, since the inserted terms cancel, but the right-hand side is now built from the three differences we <em>can</em> bound. By the triangle inequality \(|x + y| \le |x| + |y|\), applied twice,
+        \[ |a - d| \le |a - b| + |b - c| + |c - d| < \frac{\varepsilon}{3} + \frac{\varepsilon}{3} + \frac{\varepsilon}{3} = \varepsilon. \]
+        Two moves did the work. The <em>add-and-subtract</em> traded one uncontrollable quantity for a sum of controllable ones; the <em>split into thirds</em> set three allowances of \(\varepsilon/3\), which together come to exactly \(\varepsilon\), so the three pieces they cover must come to less. Together they are the skeleton of every argument that chains approximations — \(a\) near \(b\) near \(c\) near \(d\), and therefore \(a\) near \(d\) — with the tolerance shared out among the links.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The third move settles a different recurring difficulty: two requirements that each demand their own threshold.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.5</span></p>
+      <div class="env-body">
+        <p>Suppose one quantity is under control whenever \(|x| < \delta_1\), and a second whenever \(|x| < \delta_2\), where \(\delta_1\) and \(\delta_2\) are both positive. Produce a single \(\delta > 0\) that brings both under control at once.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Take \(\delta = \min\{\delta_1, \delta_2\}\), the smaller of the two thresholds — and \(\delta > 0\), since \(\delta_1\) and \(\delta_2\) are both positive. If \(|x| < \delta\), then \(|x| < \delta \le \delta_1\), so the first condition holds, and \(|x| < \delta \le \delta_2\), so the second holds too. One threshold, chosen as the stricter of the two, secures both.</p>
+        <p>The step \(\delta = \min\{\delta_1, \delta_2\}\) reads like a rabbit from a hat the first time, but it says only this: when two requirements each ask for &ldquo;small enough,&rdquo; obey the stricter and you have obeyed both. Its mirror image uses a <em>maximum</em> — when two conditions each need a threshold <em>exceeded</em>, \(N = \max\{N_1, N_2\}\) clears them together.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The last two moves of the catalogue are less about estimates than about reshaping a problem. An <em>auxiliary function</em> is a helper invented mid-proof to convert an awkward question into a standard one. Faced with a claim comparing two quantities \(f\) and \(g\), a proof will often introduce \(h = f - g\) out of the blue and argue about \(h\) alone: the two-object question &ldquo;is \(f\) always at least \(g\)?&rdquo; becomes the one-object question &ldquo;is \(h\) always at least \(0\)?&rdquo;, which some fact already in hand can attack. The tell is a function or quantity defined partway through a proof that appears nowhere in the statement — it exists only to be handed to a tool you already own.</p>
+
+  <p>That description is abstract, and the move is easiest to believe once you have watched it do something. Here it is on a claim small enough to check by eye.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.6</span></p>
+      <div class="env-body">
+        <p>Show that \(x^{2} + 1 > x\) for every real number \(x\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The statement compares two quantities, \(x^{2} + 1\) and \(x\), and mentions nothing else. Introduce something else: let
+        \[ h(x) = (x^{2} + 1) - x, \]
+        the difference of the two sides. The comparison <em>is \(x^{2}+1\) always bigger than \(x\)?</em> has become the one-object question <em>is \(h\) always positive?</em> — and a fact already in hand can settle that question. Complete the square:
+        \[ h(x) = x^{2} - x + 1 = \Bigl(x - \tfrac{1}{2}\Bigr)^{2} + \tfrac{3}{4}. \]
+        A square is never negative, so \(h(x) \ge \tfrac{3}{4} > 0\) for every real \(x\). Now go back to what was asked: \(h(x) > 0\) says precisely that \((x^{2} + 1) - x > 0\), that is, \(x^{2} + 1 > x\).</p>
+        <p>Notice what \(h\) bought, because that is the whole of the move. The statement never mentioned it, and nothing about it was clever — it is the plain difference, which is this move’s usual form. What it did was convert a comparison, which we had no grip on, into a question about one quantity being positive, which completing the square answers in a line. The tool was in your hands the whole time; \(h\) is what put the problem within its reach.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The fifth move also reshapes a problem, but by shrinking it rather than by adding to it. <em>Without loss of generality</em> — abbreviated <em>WLOG</em> in most books, though we write it out — trims repeated work. Suppose a claim concerns two numbers \(a\) and \(b\) and says the same thing whichever of the two is called which. A proof may then announce &ldquo;without loss of generality, assume \(a \le b\)&rdquo; and treat only that case. This is sound exactly when the cases are interchangeable by symmetry: if instead \(a > b\), swapping the names of \(a\) and \(b\) turns the situation into the one already handled, and the claim, saying the same thing either way, is undisturbed by the swap. The move spares you from writing the same argument a second time — but only when the relabeling genuinely leaves the problem unchanged, which is precisely what a careful reader stops to confirm. Invoked over cases that are <em>not</em> symmetric, it quietly skips real work.</p>
+
+  <p>None of these steps is inspiration; each is a reflex with a purpose, and the purposes are few. When a proof does something that seems to come from nowhere, the odds are strong that it is one of these five — or a close cousin — and the useful question is never &ldquo;how would I have thought of that?&rdquo; but &ldquo;which standard move is this, and what is it buying?&rdquo; That question almost always has an answer, and finding it is most of what active reading, the subject of §B.5, amounts to.</p>
+
+</article>

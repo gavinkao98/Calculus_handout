@@ -180,8 +180,8 @@ def build(deck):
     H.append('  <h1>%s — 旁白審核稿</h1>' % esc(title))
     H.append('  <p class="sub">deck <code>%s</code> · %s「%s」· %s</p>'
              % (esc(meta['id']), esc(meta['chapter']), esc(meta['chapter_title']), st['pill']))
-    H.append('  <p class="sub">權威來源：<code>handout/chapter1-print-standalone.html</code> §%s'
-             '（編輯源 <code>fragments/ch01/sec-%s.html</code>）· source of truth：'
+    H.append('  <p class="sub">權威來源：<code>handout/html/standalone/chapter1-print-standalone.html</code> §%s'
+             '（編輯源 <code>handout/html/fragments/ch01/sec-%s.html</code>）· source of truth：'
              '<code>video/content_scripts/%s.md</code> · %s</p>'
              % (esc(meta['section']), esc(meta['section'].replace('.', '-')), esc(meta['id']), st['date']))
     H.append('  <p class="sub">引導問題（intro tagline）：<i>“%s”</i></p>' % esc(meta['tagline']))

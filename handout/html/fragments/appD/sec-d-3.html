@@ -1,0 +1,50 @@
+<!-- §D.3 L'Hopital's Rule: the remaining cases.
+     Self-authored 2026-07-06 (no manuscript). Proof of the fenced cases of Theorem 5.5 (L'Hopital),
+     deferred from §5.7: the */infinity form and the cases a = +/-infinity. The 0/0 finite case is
+     proved IN §5.7 via the Generalized Mean Value Theorem (Theorem 5.4). This is Appendix D's second
+     customer. Proof approach: the standard f(x)/g(x) = f(d)/g(x) + (f'(xi)/g'(xi))(1 - g(d)/g(x))
+     manipulation (Generalized MVT on [x,d]), then g(x) -> infinity kills the correction terms.
+     No new Theorem numbers minted (entry indexed by home Theorem 5.5). Math: standard analysis, Codex-verified.
+     Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html; PLAN-ch05.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">D.3</span>L’Hôpital’s Rule: the Remaining Cases</h2>
+  </header>
+
+  <p>Section 5.7 proved L’Hôpital’s rule (Theorem 5.5) for the form \(\tfrac{0}{0}\) at a finite point, where the trick was to <em>define</em> \(f(a) = g(a) = 0\) and read the ratio off the Generalized Mean Value Theorem. That trick is unavailable when the functions grow without bound, and the argument must instead control an error term by hand. Here we prove the \(\tfrac{\ast}{\infty}\) form, and then reduce the infinite-point cases to the corresponding finite-point cases.</p>
+
+  <h3 class="subsec-head">The \(\tfrac{\ast}{\infty}\) form at a finite point</h3>
+
+  <p>We prove the representative case: \(x \to a^{+}\) at a finite \(a\), with \(g(x) \to +\infty\) and a finite limit \(L = \lim_{x \to a^{+}} f'(x)/g'(x)\). The left-hand version is identical, the case \(g \to -\infty\) follows by replacing \(g\) with \(-g\), and \(L = \pm\infty\) is a routine variant noted at the end.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof of Theorem 5.5 (\(\tfrac{\ast}{\infty}\) case)</span></p>
+    <div class="env-body">
+      <p>Let \(\varepsilon > 0\). Since \(f'(x)/g'(x) \to L\) as \(x \to a^{+}\), choose a point \(d\) to the right of \(a\) such that</p>
+      <p>\[ \left\lvert \frac{f'(t)}{g'(t)} - L \right\rvert < \varepsilon \qquad \text{for all } t \in (a, d). \]</p>
+      <p>Fix any \(x \in (a, d)\). On the interval \([x, d]\) the Generalized Mean Value Theorem (Theorem 5.4) supplies a point \(\xi \in (x, d)\) with</p>
+      <p>\[ \frac{f(x) - f(d)}{g(x) - g(d)} = \frac{f'(\xi)}{g'(\xi)}, \]</p>
+      <p>and since \(\xi \in (a, d)\), the right side lies within \(\varepsilon\) of \(L\). Now split \(f(x)/g(x)\) so this ratio appears:</p>
+      <p>\[ \frac{f(x)}{g(x)} = \frac{f(d)}{g(x)} + \frac{f(x) - f(d)}{g(x)} = \frac{f(d)}{g(x)} + \frac{f'(\xi)}{g'(\xi)}\left(1 - \frac{g(d)}{g(x)}\right), \]</p>
+      <p>where the last step multiplied and divided by \(g(x) - g(d)\). Write \(f'(\xi)/g'(\xi) = L + \eta\) with \(\lvert \eta \rvert < \varepsilon\). Subtracting \(L\) and grouping,</p>
+      <p>\[ \frac{f(x)}{g(x)} - L = \frac{f(d)}{g(x)} - L\,\frac{g(d)}{g(x)} + \eta\left(1 - \frac{g(d)}{g(x)}\right). \]</p>
+      <p>The point \(d\) is now fixed, while \(g(x) \to +\infty\) as \(x \to a^{+}\). Hence the first two terms tend to \(0\), and \(g(d)/g(x) \to 0\), so \(\lvert 1 - g(d)/g(x) \rvert \to 1\). Taking the limit superior of the absolute value,</p>
+      <p>\[ \limsup_{x \to a^{+}} \left\lvert \frac{f(x)}{g(x)} - L \right\rvert \le 0 + 0 + \varepsilon \cdot 1 = \varepsilon. \]</p>
+      <p>Since \(\varepsilon > 0\) was arbitrary, the limit superior is \(0\), which is to say \(\lim_{x \to a^{+}} f(x)/g(x) = L\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p class="informal">Only \(g(x) \to \infty\) was used, never \(f(x) \to \infty\): the rule holds in the form \(\tfrac{\ast}{\infty}\), whatever the numerator does. This is why Theorem 5.5 states the second hypothesis as a condition on \(g\) alone.</p>
+
+  <h3 class="subsec-head">The remaining reductions</h3>
+
+  <ul>
+    <li><strong>\(L = \pm\infty\).</strong> The same splitting works with the bound “within \(\varepsilon\) of \(L\)” replaced by “eventually larger than any fixed \(M\)”: if \(f'/g' \to +\infty\), then for \(x\) near \(a\) the ratio \((f(x)-f(d))/(g(x)-g(d))\) exceeds any \(M\), and the correction terms, tending to \(0\) and \(1\), leave \(f(x)/g(x) \to +\infty\).</li>
+    <li><strong>\(a = \pm\infty\).</strong> Substitute \(x = 1/t\), so \(x \to +\infty\) becomes \(t \to 0^{+}\). Writing \(F(t) = f(1/t)\) and \(G(t) = g(1/t)\), the chain rule gives \(F'(t)/G'(t) = f'(1/t)/g'(1/t)\) — the \(-1/t^{2}\) factors cancel — so the hypothesis on \(f'/g'\) at \(\infty\) becomes the same hypothesis on \(F'/G'\) at \(0^{+}\). The reduction then follows the form: if the original limit is \(\tfrac{0}{0}\), then \(F, G \to 0\) and the finite-point \(\tfrac{0}{0}\) proof of §5.7 applies to \(F/G\) at \(0^{+}\); if it is \(\tfrac{\ast}{\infty}\), then \(G \to \pm\infty\) and the finite-point \(\tfrac{\ast}{\infty}\) proof above applies. The case \(a = -\infty\) uses \(x = -1/t\).</li>
+  </ul>
+
+  <p>With these, Theorem 5.5 holds in full generality: the \(\tfrac{0}{0}\) case from §5.7 and the \(\tfrac{\ast}{\infty}\) and infinite-point cases here, at a finite endpoint or at \(\pm\infty\).</p>
+
+</article>

@@ -6,7 +6,7 @@
 >
 > **血統與定位：** 萃取自 [`legacy/MANIM_STORYBOARD.md`](../legacy/MANIM_STORYBOARD.md)（gen-1, v1.6）的教學精神，**剝離**其 gen-1 工程約束（spoken-math 改寫大表、reveal 策略、9-template catalog、lint／schema），**適配** gen-2（正典 narration 內嵌 LaTeX 只寫一次；真旁白走 MiMo＝逐節輕量口語派生，非大規則表；intro／outro first-class）。它是 gen-1 方法論在 gen-2 的繼任者。
 >
-> **相關文件：** 視覺系統見 [`DESIGN.md`](DESIGN.md) 與 [`pipeline/visuals/theme.py`](pipeline/visuals/theme.py)（Direction D 版面＋Times 字型）；講義（HTML handout kit）的撰寫契約與環境詞彙見 [`../handout/CONTRACT-html-writing.md`](../handout/CONTRACT-html-writing.md)；本產線總覽見 [`README.md`](README.md)。
+> **相關文件：** 視覺系統見 [`DESIGN.md`](DESIGN.md) 與 [`pipeline/visuals/theme.py`](pipeline/visuals/theme.py)（Direction D 版面＋Times 字型）；講義（HTML handout kit）的撰寫契約與環境詞彙見 [`../handout/html/CONTRACT-html-writing.md`](../handout/html/CONTRACT-html-writing.md)；本產線總覽見 [`README.md`](README.md)。
 >
 > **交付物：** 每節一份**內容稿**（格式見 §6）——`.md` 為 source of truth，且**一律附上編譯後的 standalone HTML 審核稿**供使用者閱讀（見 §6「交付形式」，2026-06-14 使用者指示）。
 
@@ -52,7 +52,7 @@
 
 ### 環境 → 教學單元對應
 
-第一刀照下表切；邊角看註解。（講義環境詞彙定義在 [`../handout/CONTRACT-html-writing.md`](../handout/CONTRACT-html-writing.md)。）**注意：下表給的是教學單元的 `kind`（教學角色），不是工程 template——template 是第二階段的事。**
+第一刀照下表切；邊角看註解。（講義環境詞彙定義在 [`../handout/html/CONTRACT-html-writing.md`](../handout/html/CONTRACT-html-writing.md)。）**注意：下表給的是教學單元的 `kind`（教學角色），不是工程 template——template 是第二階段的事。**
 
 | 講義環境（kit class） | 單元 `kind` | 處理 |
 |---|---|---|

@@ -1,0 +1,2632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chapter 2 — Print build</title>
+
+<!-- ════════════════════════════════════════════════════════════════
+     圖片寬度控制面板 —— 直接改下面的數字即可（px 固定寬 / % 相對頁寬）
+     並排或多格圖（1.1 / 1.7 / 1.9）控制的是「每一格」的寬度。
+     ════════════════════════════════════════════════════════════════ -->
+<style>
+:root {
+  --fig-2-1:  100%;    /* Figure 2.1   Secant-to-tangent */
+  --fig-2-2:  80%;    /* Figure 2.2   Difference quotient anatomy */
+  --fig-2-3:  100%;    /* Figure 2.3   Tangent approximation */
+  --fig-2-4:  80%;    /* Figure 2.4   f and f-prime */
+  --fig-2-5:  100%;    /* Figure 2.5   |x| corner */
+  --fig-2-6:  80%;    /* Figure 2.6   Cube-root vertical tangent */
+  --fig-2-7:  100%;    /* Figure 2.7   Differentiable vs. continuous */
+  --fig-2-8:  100%;    /* Figure 2.8   e^x self-derivative */
+  --fig-2-9:  100%;    /* Figure 2.9   Product-rule rectangle (inline SVG) */
+  --fig-2-10: 100%;    /* Figure 2.10  Quotient-rule graph */
+}
+
+.paper figure[data-fig="secant-to-tangent"] { --fig-w: var(--fig-2-1); }
+.paper figure[data-fig="difference-quotient-anatomy"] { --fig-w: var(--fig-2-2); }
+.paper figure[data-fig="tangent-approx"] { --fig-w: var(--fig-2-3); }
+.paper figure[data-fig="f-and-fprime"] { --fig-w: var(--fig-2-4); }
+.paper figure[data-fig="abs-corner"] { --fig-w: var(--fig-2-5); }
+.paper figure[data-fig="cbrt-vertical-tangent"] { --fig-w: var(--fig-2-6); }
+.paper figure#fig-diff-cont { --fig-w: var(--fig-2-7); }
+.paper figure[data-fig="exp-self-derivative"] { --fig-w: var(--fig-2-8); }
+.paper figure#fig-product-area { --fig-w: var(--fig-2-9); }
+.paper figure[data-fig="quotient-example-graph"] { --fig-w: var(--fig-2-10); }
+</style>
+
+<!-- Google Fonts: Inter for UI -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- New Computer Modern (prose/text faces) — matches MathJax 4 "mathjax-newcm" math font.
+     Source: npm web-computer-modern@1.1.0-new-cm-7-0-2 via jsDelivr. License: GUST Font License.
+     10pt optical size ("Serif 10"). NOTE: filenames contain %20-encoded spaces — keep them. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+
+<!-- MathJax 4 (CHTML output with inline line-breaking) -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    macros: {
+      arccsc: '\\operatorname{arccsc}',
+      arcsec: '\\operatorname{arcsec}',
+      arccot: '\\operatorname{arccot}'
+    }
+  },
+  chtml: {
+    mtextInheritFont: true,
+    matchFontHeight: true
+  },
+  output: {
+    displayOverflow: 'linebreak',
+    linebreaks: {
+      inline: true,
+      width: '100%',
+      lineleading: 0.2
+    }
+  },
+  startup: { typeset: false }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+
+<style>
+/* ============================================================
+   skin-hs.css — inlined + modified: Times New Roman + MathJax
+   ============================================================ */
+.paper {
+  --c-primary: oklch(0.50 0.13 245);
+  --c-caution: oklch(0.50 0.155 25);
+  --c-aux: oklch(0.55 0.01 260);
+  --c-axis: #474b54;
+  --ink: #1b1c1f;
+  --ink-soft: #565a63;
+  --ink-faint: #8a8e98;
+  --paper: #ffffff;
+  --rule: #e5e7eb;
+  --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
+  --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
+  /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
+  --ui: "Inter", -apple-system, system-ui, sans-serif;
+  --a-concept:  oklch(0.50 0.13 55);
+  --a-result:   oklch(0.50 0.13 245);
+  --a-practice: oklch(0.50 0.13 152);
+  --a-aside:    oklch(0.50 0.02 260);
+  --a-caution:  oklch(0.50 0.155 25);
+  --a-strategy: oklch(0.50 0.13 290);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-base, 17.5px);
+  line-height: var(--lh-base, 1.62);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+.paper *, .paper *::before, .paper *::after { box-sizing: border-box; }
+.paper .page { padding: 52px 58px 64px; max-width: 760px; margin: 0 auto; }
+.skin-hs .page { hyphens: auto; -webkit-hyphens: auto; }
+.skin-hs p, .skin-hs li { text-align: justify; text-justify: inter-word; }
+.paper p { margin: 0 0 .85em; text-wrap: pretty; }
+.paper em { font-style: italic; }
+.paper .informal { font-style: italic; color: var(--ink-soft); }
+.paper ol { margin: .2em 0 .9em; padding-left: 1.5em; }
+.paper li { margin: .35em 0; text-wrap: pretty; }
+.paper .warmup { counter-reset: wu; list-style: none; padding-left: 0; }
+.paper .warmup > li { counter-increment: wu; position: relative; padding-left: 2.1em; }
+.paper .warmup > li::before {
+  content: "(" counter(wu, lower-alpha) ")";
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
+}
+.paper mjx-container[display="true"] { margin: .55em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
+.paper .qed { display: block; text-align: right; margin: -1.62em 0 0; height: 1.62em; pointer-events: none; }
+.paper .qed::after {
+  content: ""; display: inline-block; width: .56em; height: .56em;
+  border: 1.3px solid var(--ink-soft);
+}
+.paper .env-body > :has(+ .qed) { margin-bottom: 0; display: flow-root; }
+.paper .env-body::after { content: ""; display: block; clear: both; }
+.paper .sec-head {
+  margin-top: 2.7em; padding-top: 1.35em;
+  border-top: 1px solid var(--rule); margin-bottom: 1.5em;
+}
+.sheet-body > .sec-head:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.paper .sec-kicker {
+  font-family: var(--ui); font-size: .7rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--c-primary); font-weight: 700; margin-bottom: .55em;
+}
+.paper .sec-title { font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -.012em; margin: 0; }
+.paper .sec-no { color: var(--c-primary); margin-right: .5em; font-weight: 600; }
+.paper .subsec-head {
+  font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
+  display: flex; align-items: center; gap: .55em; color: var(--ink);
+}
+.paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
+.paper .figure { margin: 1.7em 0; text-align: center; }
+.paper .figure-art { display: flex; justify-content: center; }
+.paper .figure-art--pair { gap: 26px; }
+.paper .fig-svg { width: 100%; max-width: var(--fig-w, var(--fig-w-pair)); height: auto; }
+.paper .figure-art:not(.figure-art--pair) .fig-svg { max-width: var(--fig-w, var(--fig-w-single)); }
+.paper figcaption {
+  font-family: var(--ui); font-size: .8em; line-height: 1.5;
+  color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
+}
+.paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
+.paper figcaption mjx-container { font-size: .95em; }
+.paper .axis { stroke: var(--c-axis); stroke-width: 1.25; fill: none; stroke-linecap: round; }
+.paper .curve { stroke: var(--c-primary); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .dot { fill: var(--ink); }
+.paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
+.paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
+.paper .arrow-bwd { stroke: var(--c-caution); stroke-width: 2; fill: none; }
+.paper .fig-svg text { font-family: var(--ui); font-size: 13px; }
+.paper .axlab { fill: var(--c-aux); font-style: italic; }
+.paper .lab-curve { fill: var(--c-primary); font-style: italic; }
+.paper .lab-ref, .paper .lab-ref-b { fill: var(--c-caution); }
+.paper .ptlab { fill: var(--ink-soft); font-size: 12px; }
+.paper .setlab { fill: var(--ink); font-weight: 600; font-size: 14.5px; text-anchor: middle; }
+
+/* env blocks */
+.skin-hs .env {
+  --accent: var(--a-aside);
+  margin: 1.2em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--accent) 38%, var(--paper));
+}
+.skin-hs .env-definition  { --accent: var(--a-concept); }
+.skin-hs .env-theorem, .skin-hs .env-proposition, .skin-hs .env-corollary { --accent: var(--a-result); }
+.skin-hs .env-example, .skin-hs .env-solution, .skin-hs .env-exercise { --accent: var(--a-practice); }
+.skin-hs .env-remark { --accent: var(--a-aside); }
+.skin-hs .env-head {
+  display: flex; align-items: baseline; gap: .5em; flex-wrap: wrap;
+  margin: 0 0 .55em; font-family: var(--ui);
+}
+.skin-hs .env-kicker {
+  font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--accent); padding: 3px 10px; border-radius: 999px; line-height: 1.5;
+}
+.skin-hs .env-num { font-weight: 700; color: var(--accent); font-size: .94em; }
+.skin-hs .env-name { font-style: italic; font-weight: 400; color: var(--ink-soft); font-family: var(--serif); font-size: 1em; }
+.skin-hs .env-body > p:first-child { margin-top: 0; }
+.skin-hs .env-body > :last-child { margin-bottom: 0; }
+.skin-hs .env-theorem .env-body, .skin-hs .env-proposition .env-body { font-style: italic; }
+.skin-hs .env-theorem .env-body mjx-container, .skin-hs .env-proposition .env-body mjx-container { font-style: normal; }
+.skin-hs .env-definition em { font-style: italic; }
+.skin-hs .env-remark { color: var(--ink-soft); font-size: .97em; }
+.skin-hs .env-remark .env-kicker { background: transparent; color: var(--a-aside); border: 1px solid color-mix(in srgb, var(--a-aside) 45%, var(--paper)); }
+.skin-hs .env-proof { --accent: var(--a-result); }
+.skin-hs .env-proof .env-kicker {
+  background: transparent; color: var(--a-result); font-style: italic; letter-spacing: .04em;
+  border: 1px solid color-mix(in srgb, var(--a-result) 45%, var(--paper));
+}
+.skin-hs .qed-proof::after { border-color: var(--ink); }
+.skin-hs .workedexample {
+  margin: 1.6em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--a-practice) 38%, var(--paper));
+  display: flow-root;
+}
+.skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
+.skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
+.skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
+.skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
+.skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
+.skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
+.skin-hs .env-exercise .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid var(--a-practice); }
+.skin-hs .env-caution, .skin-hs .env-strategy {
+  padding: 15px 20px; border-radius: 8px; margin: 1.4em 0;
+  border-left-width: 4px; border-left-style: solid;
+}
+.skin-hs .env-caution {
+  --accent: var(--a-caution);
+  background: color-mix(in srgb, var(--a-caution) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-caution) 22%, var(--paper));
+  border-left-color: var(--a-caution);
+}
+.skin-hs .env-strategy {
+  --accent: var(--a-strategy);
+  background: color-mix(in srgb, var(--a-strategy) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-strategy) 22%, var(--paper));
+  border-left-color: var(--a-strategy);
+}
+.skin-hs .env-caution .env-name, .skin-hs .env-strategy .env-name { color: var(--ink-soft); }
+.skin-hs .env-strategy .steps { margin-bottom: 0; }
+.skin-hs.vivid .env { border-left-color: color-mix(in srgb, var(--accent) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .workedexample { border-left-color: color-mix(in srgb, var(--a-practice) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .env-kicker { font-size: .64rem; padding: 3.5px 11px; }
+
+/* ============================================================
+   figs.css — inlined + modified for MathJax
+   ============================================================ */
+.paper .fig-svg { height: auto; overflow: visible; }
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note mjx-container { font-size: .98em; }
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr { position: relative; width: 100%; height: 100%; font-family: var(--serif); }
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl mjx-container { font-size: 1em; }
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl mjx-container { font-size: .98em; }
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+
+/* ============================================================
+   print.css — inlined (A4 sheet layout + paginator)
+   ============================================================ */
+@page { size: A4; margin: 0; }
+.sheet {
+  position: relative; box-sizing: border-box;
+  width: 210mm; height: 297mm;
+  padding: 20mm 28mm 20mm 32mm;
+  background: #fff; overflow: hidden;
+}
+.sheet-header {
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
+  font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
+}
+.sheet-footer {
+  position: absolute; bottom: 8.5mm; left: 0; right: 0;
+  text-align: center; font: 500 9pt "Inter", sans-serif; color: #82868f;
+}
+.sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
+.sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
+.sheet-body .page { padding: 0; max-width: none; margin: 0; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
+.sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet-body > :first-child { margin-top: 0 !important; }
+.sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
+.sheet-body .qed { margin-top: -1.55em; height: 1.55em; }
+.sheet-body .env-body::after { display: none; content: none; }
+.sheet-body .env-cont { margin-top: 0; }
+.sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+.sheet-body .split-unit > :first-child { margin-top: 0; }
+.sheet-body .split-unit > :last-child { margin-bottom: 0; }
+@media screen {
+  body { background: #6f727b; margin: 0; }
+  .sheet { box-shadow: 0 3px 18px rgba(0,0,0,.3); margin: 9mm auto; }
+}
+@media print {
+  body { background: #fff; margin: 0; }
+  .sheet { box-shadow: none; margin: 0; break-after: page; }
+  .sheet:last-child { break-after: auto; }
+  .print-toolbar, #boot { display: none !important; }
+}
+
+/* ============================================================
+   page-level
+   ============================================================ */
+.print-toolbar {
+  position: fixed; top: 14px; right: 16px; z-index: 1000;
+  display: flex; align-items: center; gap: 10px; font-family: "Inter", system-ui, sans-serif;
+}
+.print-toolbar button {
+  font: 600 13px "Inter", sans-serif; color: #fff; background: oklch(0.50 0.13 245);
+  border: 0; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.print-toolbar button:disabled { opacity: .5; cursor: default; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
+.print-toolbar .status {
+  font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
+  padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
+}
+#boot {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
+}
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
+</style>
+</head>
+<body>
+
+<div id="boot">Preparing …</div>
+
+<div class="print-toolbar">
+  <span class="status" id="status">Preparing …</span>
+  <button id="printBtn" disabled>Print / Save as PDF</button>
+</div>
+
+<div id="source"><div class="paper skin-hs vivid"><div class="page" id="page"></div></div></div>
+<div id="pages"></div>
+
+<!-- Section fragments (inlined) -->
+
+<!-- BEGIN-CONTENT-FRAGMENTS -->
+<template id="frag-sec-2-1">
+<!-- §2.1 The Tangent Line and the Derivative at a Point.
+     Generated from exp-ch02/seed_ch02_s1.md (manuscript pp. 1–3),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references
+     are plain prose. §2.1 is the chapter's first section, so it carries
+     the chapter opener (a second <article>), per Ch3/Ch4 convention.
+     Opener content adapted from legacy ch02_derivatives.tex chapter overview. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Chapter 2</div>
+    <h1 class="ch-title">Derivatives</h1>
+  </header>
+
+  <p class="lead">The limit machinery of Chapter 1 was developed in part to make precise the idea of a function approaching a value as its input approaches some target. The principal payoff of that machinery, and the subject of this chapter, is the <em>derivative</em>: an operator that takes a function and returns another function describing how fast it is changing. Geometrically the derivative gives the slope of the tangent line at each point of a curve; physically it gives the instantaneous rate of change of a quantity that varies in time; algebraically it satisfies a small set of arithmetic rules that turn differentiation into a procedure rather than a per-problem invention. We meet the derivative first at a single point, as a limit of secant slopes, then as a function in its own right. A subtler point comes next: its existence at a point implies continuity, but continuity does not imply it. Finally we treat it as an operator we can compute on polynomials, on the natural exponential, and on products and quotients of differentiable functions.</p>
+
+  <p class="para-head">By the end of this chapter, you will be able to:</p>
+  <ul>
+    <li>state the limit definition of the derivative, move fluently between the equivalent forms \(\lim_{x \to a} \tfrac{f(x) - f(a)}{x - a}\) and \(\lim_{h \to 0} \tfrac{f(a + h) - f(a)}{h}\), and apply it to compute derivatives from first principles for polynomial, root, and exponential functions;</li>
+    <li>read the derivative as the slope of the tangent line, and pass from the derivative at a point to the derivative as a function;</li>
+    <li>recognize where a function fails to be differentiable, and explain why differentiability implies continuity but not the reverse;</li>
+    <li>differentiate any polynomial and the exponential function \(e^{x}\) using the power rule, the constant-multiple rule, the sum rule, and the series-based derivation of \((e^{x})' = e^{x}\), and compute higher-order derivatives \(f''\), \(f'''\), \(f^{(n)}\);</li>
+    <li>differentiate products and quotients of differentiable functions using the product and quotient rules.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.1</span>The Tangent Line and the Derivative at a Point</h2>
+  </header>
+
+  <!-- expansion:application — tangent-as-approximation anchor to open the section -->
+  <p>Suppose you need a quick estimate of \(\sqrt{4.01}\) without a calculator. The function \(f(x) = \sqrt{x}\) passes through the convenient point \((4, 2)\), and near that point the curve is almost straight — so a well-chosen line through \((4, 2)\) should give a good approximation. But which line? The answer is the <em>tangent line</em>: intuitively, the line that grazes the curve at that point, matching its direction. To pin down this line we need to determine its slope, and that quest leads directly to the central idea of differential calculus.</p>
+
+  <!-- expansion:intuition — "why can't we just measure the slope?" collision -->
+  <h3 class="subsec-head">The problem with tangent lines</h3>
+
+  <p>Given a curve \(y = f(x)\) and a point \(P = (a,\, f(a))\) on it, we want the tangent line at \(P\). Since the line passes through \(P\), all we need is its slope. For a line through <em>two</em> points the slope is the familiar rise-over-run ratio — but for the tangent line at \(P\) we start with only the single point \(P\) itself. With no second point there is no rise and no run; trying to compute “slope \(= (f(a) - f(a))/(a - a)\)” gives the meaningless expression \(0/0\). We need a different strategy.</p>
+
+  <h3 class="subsec-head">Secant lines and the limiting slope</h3>
+
+  <p>The idea is to use a nearby point as a temporary stand-in. Pick a second point \(Q = (x,\, f(x))\) on the curve, with \(x \ne a\). The line through \(P\) and \(Q\) is called a <em>secant line</em>, and its slope is the <em>difference quotient</em></p>
+
+  <p>\[ m_{PQ} \;=\; \frac{f(x) - f(a)}{x - a}. \]</p>
+
+  <p>As \(Q\) slides along the curve toward \(P\) — that is, as \(x \to a\) — the secant line rotates and approaches a limiting position. If that limiting position exists, it is the tangent line we are after, and its slope is the limit of the difference quotients.</p>
+
+  <!-- expansion:figure — secant-to-tangent convergence diagram (seed had placeholder, no art) -->
+  <figure class="figure" data-fig="secant-to-tangent">
+    <figcaption><span class="fig-no">Figure 2.1</span> Secant lines \(PQ\) approaching the tangent line at \(P\).</figcaption>
+  </figure>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">2.1</span><span class="env-name">Tangent line</span></p>
+    <div class="env-body">
+      <p>The <em>tangent line</em> to the curve \(y = f(x)\) at the point \(P = (a,\, f(a))\) is the line through \(P\) with slope
+      \[ m \;=\; \lim_{x \to a} \frac{f(x) - f(a)}{x - a}, \]
+      provided this limit exists.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The \(h\)-form of the slope</h3>
+
+  <p>Since \(x\) is near \(a\), we can write \(x = a + h\), where \(h\) is a small increment (\(h \ne 0\)). Then \(x - a = h\) and \(x \to a\) becomes \(h \to 0\), so the tangent slope takes the equivalent form</p>
+
+  <p>\[ m \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]</p>
+
+  <p>This “\(h\)-form” is often more convenient for computation: expand \(f(a + h)\), subtract \(f(a)\), cancel the factor of \(h\) from the denominator, then let \(h \to 0\).</p>
+
+  <!-- expansion:caution — the difference-quotient numerator is f(a+h)−f(a), not f(h); h is an increment from the base point a [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>A common slip is to read the numerator \(f(a + h) - f(a)\) as \(f(h)\). The symbol \(h\) is an <em>increment</em> — a small step away from the base point \(a\) — not an input in its own right. When you expand the difference quotient, substitute \(a + h\) into the function, writing \(f(a + h)\); never replace it with \(f(h)\) alone.</p>
+    </div>
+  </section>
+
+  <!-- expansion:figure — anatomy of the difference quotient: increment h and rise f(a+h)−f(a) on one secant (figure-opportunity F-2.1-A) [pass: enrichment] -->
+  <figure class="figure" data-fig="difference-quotient-anatomy">
+    <figcaption><span class="fig-no">Figure 2.2</span> The \(h\)-form difference quotient on one secant: run \(h\), rise \(f(a+h)-f(a)\).</figcaption>
+  </figure>
+
+  <!-- expansion:formula — name the limit as "derivative at a point"; brief: introduce f'(a) as slope alias -->
+  <p>When this limit exists, the slope of the tangent line at \((a, f(a))\) is called the <em>derivative of \(f\) at \(a\)</em> and is written \(f'(a)\) (read “\(f\) prime of \(a\)”). Thus</p>
+
+  <p>\[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]</p>
+
+  <p>For now, \(f'(a)\) is simply a number — the slope of one tangent line at one specific point. In §2.2 we will let \(a\) vary and study \(f'\) as a function in its own right.</p>
+
+  <!-- expansion:intuition — expand the seed's one-line zoom-in remark into local linearity -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.1</span><span class="env-name">Local linearity</span></p>
+    <div class="env-body">
+      <p>If you zoom in on the curve at \(P\), the curve looks increasingly like a straight line — the tangent line. In other words, near \(P\) the function \(f\) behaves almost like the linear function \(f(a) + f'(a)(x - a)\). This is the principle of <em>local linearity</em>: a differentiable curve can be approximated by its tangent line near the point of tangency. The closer \(x\) is to \(a\), the better the approximation. We will return to this idea at the end of the section.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — transition paragraph setting up the computation pattern -->
+  <p>We now practice computing tangent lines from the definition. The routine is the same each time: form the difference quotient, simplify algebraically until the factor that makes the denominator zero cancels, then take the limit.</p>
+
+  <!-- expansion:example — polynomial example; simplest type first (brief) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.1</span></p>
+      <div class="env-body">
+        <p>Find the equation of the tangent line to \(y = x^{2} - 3x\) at the point \((2,\, -2)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(f(x) = x^{2} - 3x\) and \(a = 2\). The slope is</p>
+        <p>\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{f(2 + h) - f(2)}{h} \\
+            &= \lim_{h \to 0} \frac{\bigl[(2+h)^{2} - 3(2+h)\bigr] - [4 - 6]}{h} \\
+            &= \lim_{h \to 0} \frac{(4 + 4h + h^{2} - 6 - 3h) - (-2)}{h} \\
+            &= \lim_{h \to 0} \frac{h + h^{2}}{h}
+             = \lim_{h \to 0} (1 + h) = 1.
+        \end{aligned} \]</p>
+        <p>The tangent line passes through \((2, -2)\) with slope \(1\):
+        \[ y - (-2) = 1 \cdot (x - 2), \quad \text{i.e.} \quad y = x - 4. \]</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.2</span></p>
+      <div class="env-body">
+        <p>Find the equation of the tangent line to \(y = \dfrac{3}{x}\), \(x > 0\), at the point \((3,\, 1)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>With \(f(x) = 3/x\) and \(a = 3\),</p>
+        <p>\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{f(3 + h) - f(3)}{h}
+             = \lim_{h \to 0} \frac{\dfrac{3}{3 + h} - 1}{h} \\[6pt]
+            &= \lim_{h \to 0} \frac{\dfrac{3 - (3 + h)}{3 + h}}{h}
+             = \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h} \\[6pt]
+            &= \lim_{h \to 0} \frac{-1}{3 + h} = -\frac{1}{3}.
+        \end{aligned} \]</p>
+        <p>The tangent line through \((3, 1)\) with slope \(-\tfrac{1}{3}\) is
+        \[ y - 1 = -\tfrac{1}{3}(x - 3), \quad \text{i.e.} \quad x + 3y - 6 = 0. \]</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — root example with conjugate technique (brief) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.3</span></p>
+      <div class="env-body">
+        <p>Find the equation of the tangent line to \(y = \sqrt{x + 1}\) at the point \((3,\, 2)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(f(x) = \sqrt{x + 1}\) and \(a = 3\). To handle the square root, we multiply numerator and denominator by the conjugate:</p>
+        <p>\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{\sqrt{(3+h)+1} - \sqrt{3+1}}{h}
+             = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} \\[6pt]
+            &= \lim_{h \to 0}
+               \frac{(\sqrt{4+h}-2)(\sqrt{4+h}+2)}
+                    {h\,(\sqrt{4+h}+2)}
+             = \lim_{h \to 0}
+               \frac{(4+h)-4}{h\,(\sqrt{4+h}+2)} \\[6pt]
+            &= \lim_{h \to 0} \frac{1}{\sqrt{4+h}+2}
+             = \frac{1}{4}.
+        \end{aligned} \]</p>
+        <p>The tangent line is
+        \[ y - 2 = \tfrac{1}{4}(x - 3), \quad \text{i.e.} \quad y = \tfrac{1}{4}x + \tfrac{5}{4}. \]</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — numerical secant→tangent: watch the difference quotient converge (approved 2026-06-07; new type: numerical/tabular limit, reinforces Figure 2.1) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.4</span></p>
+      <div class="env-body">
+        <p>For \(y = x^{2}\) and \(P = (1, 1)\), compute the slope of the secant line through \(P\) and the nearby point \(\bigl(1 + h,\, (1 + h)^{2}\bigr)\) for \(h = 0.5,\ 0.1,\ 0.01\). What value do the secant slopes approach, and what is the slope of the tangent at \(P\)?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The secant slope is the difference quotient, which simplifies even before we take a limit:</p>
+        <p>\[ \frac{(1 + h)^{2} - 1}{h} = \frac{2h + h^{2}}{h} = 2 + h. \]</p>
+        <p>Tabulating \(2 + h\) as \(h\) shrinks:</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>\(h\)</th><th>\(0.5\)</th><th>\(0.1\)</th><th>\(0.01\)</th></tr></thead>
+            <tbody><tr><td class="rowlab">secant slope \(\,2 + h\)</td><td>\(2.5\)</td><td>\(2.1\)</td><td>\(2.01\)</td></tr></tbody>
+          </table>
+        </div>
+        <p>The secant slopes march toward \(2\), and indeed \(\lim_{h \to 0}(2 + h) = 2\). The tangent slope at \(P\) is therefore \(2\) — the value the secants converge to, exactly the rotation of secants into the tangent pictured in Figure 2.1.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — tangent-line (linear) approximation: use the tangent to estimate a value (approved 2026-06-07; new type: apply local linearity, not find the tangent) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.5</span></p>
+      <div class="env-body">
+        <p>Use the tangent line to \(y = \dfrac{1}{x}\) at \(\bigl(2,\, \tfrac{1}{2}\bigr)\) to estimate \(\dfrac{1}{2.05}\) without a calculator.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>First find the slope at \(x = 2\). With \(f(x) = 1/x\),
+        \[ f'(2) = \lim_{h \to 0} \frac{\dfrac{1}{2 + h} - \dfrac{1}{2}}{h} = \lim_{h \to 0} \frac{-1}{2(2 + h)} = -\frac{1}{4}, \]
+        so the tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\) is \(y = \tfrac{1}{2} - \tfrac{1}{4}(x - 2)\). Near \(x = 2\) the curve hugs this line (local linearity, Remark 2.1), so substituting \(x = 2.05\) gives</p>
+        <p>\[ \frac{1}{2.05} \;\approx\; \tfrac{1}{2} - \tfrac{1}{4}(0.05) = 0.5 - 0.0125 = 0.4875. \]</p>
+        <p>A calculator gives \(1/2.05 = 0.48780\ldots\), so the estimate is accurate to three decimal places.</p>
+
+        <figure class="figure" data-fig="tangent-approx">
+          <figcaption><span class="fig-no">Figure 2.3</span> The curve \(y = \tfrac{1}{x}\) and its tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\), used for the approximation in Example 2.5.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:application — return to the opening approximation question (bookend) -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.2</span><span class="env-name">Tangent-line approximation</span></p>
+    <div class="env-body">
+      <p>We can now answer the opening question. The tangent line to \(y = \sqrt{x}\) at \((4,\, 2)\) has slope
+      \[ f'(4) = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} = \frac{1}{4} \]
+      (the same conjugate technique as Example 2.3), so the tangent line is \(y = 2 + \tfrac{1}{4}(x - 4) = \tfrac{1}{4}x + 1\). Substituting \(x = 4.01\) gives
+      \[ \sqrt{4.01} \;\approx\; \tfrac{1}{4}(4.01) + 1 = 2.0025. \]
+      A calculator confirms \(\sqrt{4.01} = 2.00249844\ldots\), so the tangent-line estimate is accurate to four decimal places. This is the tangent-line approximation of Example 2.5 — the principle of local linearity (Remark 2.1) — applied to the question we opened the section with.</p>
+    </div>
+  </section>
+
+  <!-- expansion:application — the tangent line as linearization, used throughout applied mathematics [pass: enrichment] -->
+  <p>The move we just made — replacing a curve by its tangent line over a small range — is used throughout applied science and engineering, where it is called <em>linearization</em>. A navigation system linearizes the equations relating its position to satellite distances; a physicist replaces \(\sin\theta\) by \(\theta\) for the small swings of a pendulum; an economist treats a marginal cost as the slope of a cost curve. Each time, a hard curved problem is traded, near a point of interest, for an easy straight-line one — the practical payoff of local linearity.</p>
+
+  <!-- expansion:summary — forward-ref to §2.2 -->
+  <p>In the next section we turn the slope formula into a <em>function</em>: instead of computing the tangent slope at one fixed point \(a\), we let \(a\) vary and obtain a new function \(f'(x)\) that records the slope at every point where the limit exists.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-2-2">
+<!-- §2.2 The Derivative as a Function.
+     Generated from exp-ch02/seed_ch02_s2.md (manuscript pp. 4–5),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief brief_s22.md approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references are
+     plain prose. Counters continue from §2.1:
+       Definition 2.1 → 2.2;  Figure 2.1 → 2.2;  Remark 2.2 → 2.3, 2.4;
+       Example 2.5 → 2.6, 2.7, 2.8, 2.9, 2.10;  Strategy box: first → 2.1.
+     No exercises: self-authored problems are written as worked examples
+     (see brief_s22.md "題目政策"). -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.2</span>The Derivative as a Function</h2>
+  </header>
+
+  <!-- expansion:application — velocity-as-a-function anchor to open the section -->
+  <p>Imagine a car moving along a straight road, its position at time \(t\) recorded as \(s(t)\). Over the short interval from \(t\) to \(t + h\), the car’s <em>average</em> velocity is the change in position divided by the elapsed time, \(\bigl(s(t+h) - s(t)\bigr)/h\) — exactly the difference quotient of §2.1. Letting \(h \to 0\) gives the <em>instantaneous</em> velocity at the single instant \(t\). But we rarely care about one instant in isolation; we want to know the velocity at <em>every</em> instant — that is, we want velocity as a <em>function</em> of time. Making this shift, from the derivative at one point to the derivative as a function, is the work of this section.</p>
+
+  <h3 class="subsec-head">From a number to a function</h3>
+
+  <!-- expansion:intuition — load-bearing collision: point-by-point is endless; keep the point symbolic -->
+  <p>In §2.1 we fixed a point \(a\) and computed the derivative \(f'(a)\), a single number recording the slope of the tangent line — equivalently, the instantaneous rate of change of \(f\) — at that one point. To find the slope at a <em>different</em> point we would have to run the entire limit again, and to know the slope at <em>every</em> point we would have to repeat the computation infinitely many times. Worse, a table of separate values \(f'(2),\, f'(3),\, f'(\tfrac{7}{2}),\, \ldots\) never reveals the underlying <em>pattern</em>.</p>
+
+  <p>There is a far better way. Instead of substituting a specific number for the point, we leave it <em>symbolic</em> — call it \(x\) — and carry out the limit just once. The outcome is no longer a single number but a formula in \(x\): a brand-new function that returns the slope at every point at once. This function is called the <em>derivative of \(f\)</em>.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">2.2</span><span class="env-name">The derivative as a function</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be a function. The <em>derivative of \(f\)</em> is the function \(f'\) defined by
+      \[ f'(x) \;=\; \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}, \]
+      whose domain is the set of all \(x\) for which this limit exists. The value \(f'(x)\) is the slope of the tangent line to \(y = f(x)\) at \(\bigl(x,\, f(x)\bigr)\) — equivalently, the instantaneous rate of change of \(f\) at \(x\).</p>
+      <!-- expansion:intuition — "slope machine" informal gloss -->
+      <p class="informal">Informally, \(f'\) is the “slope machine” of \(f\): feed it any input \(x\), and it returns the slope of \(f\) there.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — the x→a form was established in §2.1; recall it, don't reprove -->
+  <p>This is the same limit we met in §2.1: the substitution \(x = a + h\) turns it into \(\lim_{x \to a}\bigl(f(x) - f(a)\bigr)/(x - a)\) with the fixed point renamed. The \(h\)-form above is usually the more convenient one to compute with, and the recipe is the same one we used at a single point — only now the point stays symbolic.</p>
+
+  <!-- expansion:strategy — ROADMAP places the 3-step limit-definition procedure in §2.2 -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">2.1</span><span class="env-name">Computing a derivative from the definition</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Form the difference quotient \(\dfrac{f(x + h) - f(x)}{h}\), expanding \(f(x + h)\).</li>
+        <li>Simplify the quotient algebraically — by expanding, rationalizing, or combining fractions — until the \(h\) that makes the denominator vanish cancels.</li>
+        <li>Evaluate the limit as \(h \to 0\) in the simplified expression.</li>
+      </ol>
+      <p>These are the same three steps we used at a fixed point in §2.1; the only change is that \(x\) now stays symbolic, so the answer emerges as a function rather than a number. The algebra in step 2 takes a different form for each function — expansion, conjugates, common denominators — but its job is always to clear the \(0/0\); for the polynomial, root, and rational functions of this chapter a factor of \(h\) always cancels and leaves a limit we can evaluate.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.6</span></p>
+      <div class="env-body">
+        <p>Find the derivative of \(f(x) = x^{2} + 4x - 2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Following the three steps,</p>
+        <p>\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{\bigl[(x + h)^{2} + 4(x + h) - 2\bigr] - \bigl[x^{2} + 4x - 2\bigr]}{h} \\[2pt]
+            &= \frac{\bigl(x^{2} + 2xh + h^{2} + 4x + 4h - 2\bigr) - \bigl(x^{2} + 4x - 2\bigr)}{h} \\[2pt]
+            &= \frac{2xh + h^{2} + 4h}{h} \;=\; 2x + h + 4.
+        \end{aligned} \]</p>
+        <p>Hence
+        \[ f'(x) = \lim_{h \to 0} (2x + h + 4) = 2x + 4. \]
+        Nothing in this computation relied on \(x\) being any particular number, so the single formula \(f'(x) = 2x + 4\) delivers the slope at every point: for instance \(f'(0) = 4\), while \(f'(-2) = 0\), signalling a horizontal tangent at \(x = -2\).</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.7</span></p>
+      <div class="env-body">
+        <p>Find the derivative of \(f(x) = \sqrt{x}\), \(x > 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The difference quotient contains a difference of square roots, which we clear by multiplying by the conjugate \(\sqrt{x + h} + \sqrt{x}\):</p>
+        <p>\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{\sqrt{x + h} - \sqrt{x}}{h} \\[4pt]
+            &= \frac{\bigl(\sqrt{x + h} - \sqrt{x}\bigr)\bigl(\sqrt{x + h} + \sqrt{x}\bigr)}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)} \\[4pt]
+            &= \frac{(x + h) - x}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)} \\[4pt]
+            &= \frac{1}{\sqrt{x + h} + \sqrt{x}}.
+        \end{aligned} \]</p>
+        <p>The denominator no longer vanishes as \(h \to 0\), so
+        \[ f'(x) = \lim_{h \to 0} \frac{1}{\sqrt{x + h} + \sqrt{x}} = \frac{1}{2\sqrt{x}}. \]
+        As a check, at \(x = 4\) this gives \(f'(4) = 1/(2 \cdot 2) = \tfrac{1}{4}\) — precisely the slope we found for \(\sqrt{x}\) at \((4, 2)\) in §2.1 (Remark 2.2). The function \(f'(x) = 1/(2\sqrt{x})\) packages that slope, and the slope at every other positive \(x\), into one formula.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — rational 1/x from the definition (approved 2026-06-07; new type: combine fractions, completes the polynomial/root/rational trio) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.8</span></p>
+      <div class="env-body">
+        <p>Find the derivative of \(f(x) = \dfrac{1}{x}\), \(x \ne 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This time the difference quotient is a difference of fractions, which we combine over a common denominator:</p>
+        <p>\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{1}{h}\left( \frac{1}{x + h} - \frac{1}{x} \right)
+             = \frac{1}{h} \cdot \frac{x - (x + h)}{x(x + h)} \\[4pt]
+            &= \frac{1}{h} \cdot \frac{-h}{x(x + h)}
+             = \frac{-1}{x(x + h)}.
+        \end{aligned} \]</p>
+        <p>Letting \(h \to 0\),
+        \[ f'(x) = \lim_{h \to 0} \frac{-1}{x(x + h)} = -\frac{1}{x^{2}}. \]
+        The manipulation is new — clear the fractions, then cancel the \(h\) — yet the three-step pattern is unchanged, and the result \(f'(x) = -1/x^{2}\) is once more a function, defined for all \(x \ne 0\). We will recover it in one line from the power and quotient rules of §2.4–§2.5.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — the domain of f' may be smaller than that of f; one-line fence to §2.3 -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.3</span><span class="env-name">The domain of \(f'\)</span></p>
+    <div class="env-body">
+      <p>Being a function in its own right, \(f'\) has its own domain, which may be <em>smaller</em> than that of \(f\). Although Example 2.7 worked with \(x > 0\), the square-root function is defined for all \(x \ge 0\), whereas its derivative \(f'(x) = 1/(2\sqrt{x})\) is defined only for \(x > 0\) — so the domain of \(f'\) can be a proper subset of the domain of \(f\). Precisely when a derivative fails to exist is taken up in §2.3.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — using the derivative function: solve f'(x)=given slope (approved 2026-06-07; new type: apply/invert f', not compute it) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.9</span></p>
+      <div class="env-body">
+        <p>For \(f(x) = x^{2} + 4x - 2\), find the point on the curve at which the tangent line has slope \(2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The slope of the tangent at \(x\) is the value of the derivative there, and from Example 2.6 we already have the derivative function \(f'(x) = 2x + 4\). We therefore want the input \(x\) at which</p>
+        <p>\[ f'(x) = 2 \quad\Longrightarrow\quad 2x + 4 = 2 \quad\Longrightarrow\quad x = -1. \]</p>
+        <p>The point on the curve is \(\bigl(-1,\, f(-1)\bigr) = (-1,\, -5)\). Note the change of viewpoint: we did not compute a derivative here — we already had \(f'\) as a function and <em>solved</em> it for the input producing a prescribed slope. Being able to run \(f'\) forward (input \(\to\) slope) and backward (slope \(\to\) input) is precisely what having the derivative as a function buys us.</p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Notation</h3>
+
+  <!-- expansion:formula — Leibniz / operator notation; ROADMAP assigns it to Ch2, and §2.4–§2.5 use d/dx -->
+  <p>So far we have written the derivative as \(f'(x)\), the compact <em>prime notation</em>. When \(y = f(x)\), the same derivative is also written</p>
+
+  <p>\[ f'(x) \;=\; y' \;=\; \frac{dy}{dx} \;=\; \frac{df}{dx} \;=\; \frac{d}{dx}\,f(x), \]</p>
+
+  <p>the last three being <em>Leibniz notation</em>. Here \(\dfrac{d}{dx}\) is an <em>operator</em> — it acts on a function and returns its derivative — and the symbol deliberately echoes the difference quotient \(\Delta y / \Delta x\), which becomes \(dy/dx\) as the increment \(\Delta x\) (our \(h\)) shrinks to zero. Leibniz notation has the merit of displaying the variable we differentiate with respect to, which becomes valuable once a problem involves more than one variable; prime notation is lighter when the variable is understood. We will use whichever is clearer, and we state the rules of the coming sections most often with \(\dfrac{d}{dx}\). Thus the two results above may equally be written \(\dfrac{d}{dx}(x^{2} + 4x - 2) = 2x + 4\) and \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\).</p>
+
+  <!-- expansion:caution — dy/dx is one symbol for the derivative, not a fraction to split or cancel [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The symbol \(\dfrac{dy}{dx}\) names the derivative as a single object; it is <em>not</em> a fraction with numerator \(dy\) and denominator \(dx\). On its own, neither \(dy\) nor \(dx\) has been given a separate meaning here, so the pieces cannot be cancelled or cross-multiplied the way the parts of an ordinary fraction can. The notation is deliberately suggestive — it remembers that the derivative grew out of the quotient \(\Delta y / \Delta x\) — but until those parts are defined on their own (which we do not do in this book), read \(dy/dx\) as one indivisible name for \(f'(x)\).</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">Reading \(f'\) from the graph of \(f\)</h3>
+
+  <!-- expansion:figure — derivative-as-a-function: f above, f' below on a common x-axis (ROADMAP key figure) -->
+  <figure class="figure" data-fig="f-and-fprime">
+    <figcaption><span class="fig-no">Figure 2.4</span> The graph of \(f(x) = x^{2} + 4x - 2\) above its derivative \(f'(x) = 2x + 4\), aligned at \(x = -2\).</figcaption>
+  </figure>
+
+  <!-- expansion:intuition — the sign-correspondence reading principle -->
+  <p>Drawing a derivative as a function in its own right exposes a vivid link between the graphs of \(f\) and \(f'\). Figure 2.4 places the parabola \(f(x) = x^{2} + 4x - 2\) of Example 2.6 directly above its derivative \(f'(x) = 2x + 4\). Since \(f'(x)\) is by definition the <em>slope of the tangent line</em> at \(x\), we can read its sign straight off the graph of \(f\):</p>
+
+  <ul>
+    <li>where the tangent line slopes upward, \(f' > 0\);</li>
+    <li>where the tangent line slopes downward, \(f' < 0\);</li>
+    <li>where the tangent line is horizontal, \(f' = 0\) — as at the lowest point of the parabola, \(x = -2\).</li>
+  </ul>
+
+  <p>The link runs the other way too: where \(f' > 0\) the graph of \(f\) rises, and where \(f' < 0\) it falls. So we can sketch the shape of \(f'\) straight from the graph of \(f\), with no formula at all.</p>
+
+  <!-- expansion:example — read f' signs/zeros directly from Figure 2.2's f-graph, then verify against the f'-panel (brief: 由 Figure 2.2 的 f 圖判讀) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.10</span></p>
+      <div class="env-body">
+        <p>Cover the lower panel of Figure 2.4 and look only at the graph of \(f\) on top. Using its shape alone — not the formula — say where \(f'\) is positive, where it is negative, and where it is zero. Then uncover the lower panel and check.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Reading the top graph: \(f\) falls until \(x = -2\), so its tangents slope downward and \(f' < 0\) there; the curve is momentarily flat at its lowest point \(x = -2\), so \(f'(-2) = 0\); and \(f\) rises for \(x > -2\), so \(f' > 0\). Uncovering the lower panel confirms it exactly — the line \(f'(x) = 2x + 4\) lies below the axis for \(x < -2\), crosses zero at \(x = -2\), and lies above it for \(x > -2\). We recovered the sign of \(f'\) everywhere from the <em>shape</em> of \(f\) alone.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:application — bookend: the rate-of-change reading of f', back to velocity -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.4</span><span class="env-name">Derivative as rate of change</span></p>
+    <div class="env-body">
+      <p>Return to the moving car of the opening. If \(s(t)\) is its position, the derivative function \(s'(t)\) is its <em>velocity</em> \(v(t)\) at every time \(t\). The slope reading and the rate-of-change reading are two faces of the same limit: \(f'(x)\) measures how fast the output of \(f\) changes per unit change in the input — whether that output is read as a height (slope) or a position (velocity). This is why the derivative function is one of the central objects of calculus: it turns any varying quantity into a record of how fast it varies.</p>
+    </div>
+  </section>
+
+  <!-- expansion:application — rate of change beyond velocity: acceleration, population growth, marginal cost [pass: enrichment] [source: CLP-1 §2.4 population-growth example; marginal cost standard] -->
+  <p>Velocity is only the most familiar of these rates. Whenever one quantity depends on another, the derivative measures a rate of change with its own meaning. If \(s(t)\) is position, the derivative of the velocity \(s'(t)\) is the <em>acceleration</em> \(s''(t)\), the rate at which velocity itself changes — a second derivative we take up in §2.3. If \(P(t)\) is the size of a population, then \(P'(t)\) is its growth rate, in individuals per unit time. If \(C(q)\) is the cost of producing \(q\) units of a good, then \(C'(q)\) is the <em>marginal cost</em>, the added cost of producing one more unit. One limit, read in different settings, becomes a velocity, an acceleration, a growth rate, or a marginal cost.</p>
+
+  <!-- expansion:summary — forward-ref to §2.3 -->
+  <p>Throughout this section we assumed the defining limit exists. It need not: at some points a function may have no well-defined slope at all. In the next section we ask precisely when \(f'\) exists — the question of <em>differentiability</em> — uncover its close tie to continuity, and form the derivative of a derivative.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-2-3">
+<!-- §2.3 Differentiability, Continuity, and Higher Derivatives.
+     Generated from exp-ch02/seed_ch02_s3.md (manuscript pp. 6–7),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief brief_s23.md approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references are
+     plain prose. Counters continue from §2.2:
+       Definition 2.2 → 2.3;  Theorem: first → 2.1;  Figure 2.2 → 2.3;
+       Example 2.10 → 2.11, 2.12, 2.13, 2.14;  Remark 2.4 → 2.5.
+       (2026-06-22 example-supplement import: +E2.3-a vertical tangent = 2.12,
+        +O2.3-a piecewise = 2.13; old higher-deriv example 2.12 → 2.14.)
+     No exercises: self-authored problems are written as worked examples
+     (see brief_s23.md "題目政策").
+     2026-07-03 difficulty-mitigation pass: h^{2/3} positivity glossed as (h^{1/3})².
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html. -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.3</span>Differentiability, Continuity, and Higher Derivatives</h2>
+  </header>
+
+  <!-- expansion:intuition — motivation: §2.2 assumed the limit always exists; it need not -->
+  <p>Throughout §2.2 we freely computed \(f'(x)\) by taking the limit of the difference quotient — but we never stopped to ask whether that limit <em>exists</em>. For the polynomial, root, and rational functions we worked with, it always did, and we might be tempted to believe that every function has a derivative at every point of its domain. This section shows that the temptation is wrong: at certain points the limit can fail, and recognizing those failures is an essential part of understanding what the derivative means. Along the way we prove the first theorem of the chapter — differentiability guarantees continuity — and extend the derivative idea to second, third, and higher orders.</p>
+
+  <h3 class="subsec-head">When does the derivative exist?</h3>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">2.3</span><span class="env-name">Differentiable</span></p>
+    <div class="env-body">
+      <p>A function \(f\) is <em>differentiable at \(a\)</em> if the limit
+      \[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} \]
+      exists (as a finite number). We say \(f\) is <em>differentiable on an open interval \((a, b)\)</em> if it is differentiable at every point of that interval.</p>
+      <p class="informal">Informally, differentiability at a point means the graph has a single, well-defined tangent direction there — no sharp corner, no vertical spike, and no break.</p>
+    </div>
+  </section>
+
+  <p>The definition asks exactly what we have been computing: can the difference quotient settle on a single value as \(h \to 0\)? When it can, the function is differentiable and the derivative equals that value. When it cannot — because the left-hand and right-hand limits disagree, or because the quotient blows up — the function is <em>not</em> differentiable at that point. The simplest failure mode is a corner.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.11</span><span class="env-name">A corner: \(f(x) = \lvert x \rvert\) at \(x = 0\)</span></p>
+      <div class="env-body">
+        <p>Show that \(f(x) = \lvert x \rvert\) is not differentiable at \(x = 0\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We form the difference quotient at \(a = 0\):</p>
+        <p>\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{\lvert h \rvert - 0}{h} \;=\; \frac{\lvert h \rvert}{h}. \]</p>
+        <p>Now examine the one-sided limits separately. For \(h > 0\) we have \(\lvert h \rvert = h\), so</p>
+        <p>\[ \lim_{h \to 0^{+}} \frac{\lvert h \rvert}{h} = \lim_{h \to 0^{+}} \frac{h}{h} = 1. \]</p>
+        <p>For \(h < 0\) we have \(\lvert h \rvert = -h\), so</p>
+        <p>\[ \lim_{h \to 0^{-}} \frac{\lvert h \rvert}{h} = \lim_{h \to 0^{-}} \frac{-h}{h} = -1. \]</p>
+        <p>Since the right-hand limit (\(1\)) and the left-hand limit (\(-1\)) are not equal, the two-sided limit \(\lim_{h \to 0} \lvert h \rvert / h\) does not exist. By Definition 2.3, \(f(x) = \lvert x \rvert\) is <em>not</em> differentiable at \(x = 0\).</p>
+
+        <!-- expansion:figure — |x| corner with left/right secant slopes (ROADMAP key figure) -->
+        <figure class="figure" data-fig="abs-corner">
+          <figcaption><span class="fig-no">Figure 2.5</span> The graph of \(f(x) = \lvert x \rvert\) near the origin, with secant lines from each side.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.5). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line — exactly the geometric meaning of non-differentiability.</p>
+
+  <!-- expansion:example — a second failure mode distinct from the corner: a vertical tangent, where the difference quotient is unbounded [source: CLP-1 §2.2 prob_s2.2 vertical-tangent remark + standard textbook example; solution authored] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.12</span><span class="env-name">A vertical tangent: \(f(x) = \sqrt[3]{x}\) at \(x = 0\)</span></p>
+      <div class="env-body">
+        <p>Show that \(f(x) = \sqrt[3]{x} = x^{1/3}\) is <em>not</em> differentiable at \(x = 0\), even though its graph has no corner there.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We form the difference quotient at \(a = 0\):</p>
+        <p>\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{h^{1/3} - 0}{h} \;=\; \frac{1}{h^{2/3}}. \]</p>
+        <p>Since \(h^{2/3} = \bigl(h^{1/3}\bigr)^{2} > 0\) for all \(h \ne 0\) — a cube root squared is positive whatever the sign of \(h\) — the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
+        <p>\[ \lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty. \]</p>
+        <p>The limit does not exist as a <em>finite</em> number, so by Definition 2.3 the function is not differentiable at \(x = 0\).</p>
+        <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)); here both one-sided limits agree — they both tend to \(+\infty\) — so there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative demands a finite limit, so differentiability fails here for a different reason than at a corner.</p>
+
+        <!-- expansion:figure — ∛x vertical tangent: the non-corner differentiability failure of Example 2.12 (figure-opportunity F-2.3-A) [pass: enrichment] -->
+        <figure class="figure" data-fig="cbrt-vertical-tangent">
+          <figcaption><span class="fig-no">Figure 2.6</span> The graph of \(f(x) = \sqrt[3]{x}\) near the origin, with secants steepening toward a vertical tangent.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Differentiability and continuity</h3>
+
+  <!-- expansion:intuition — set up the theorem: differentiable is a stronger condition than continuous -->
+  <p>We now ask: what does differentiability <em>give</em> us beyond just having a tangent line? The answer is a clean logical relationship with continuity.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.1</span><span class="env-name">Differentiable implies continuous</span></p>
+    <div class="env-body">
+      <p>If \(f\) is differentiable at \(a\), then \(f\) is continuous at \(a\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>We must show \(\displaystyle\lim_{x \to a} f(x) = f(a)\), which is equivalent to showing \(\displaystyle\lim_{x \to a} \bigl[f(x) - f(a)\bigr] = 0\).</p>
+      <p>For \(x \ne a\), write</p>
+      <p>\[ f(x) - f(a) \;=\; \frac{f(x) - f(a)}{x - a} \;\cdot\; (x - a). \]</p>
+      <p>As \(x \to a\), both factors on the right have limits that exist:</p>
+      <ul>
+        <li>\(\displaystyle\lim_{x \to a} \frac{f(x) - f(a)}{x - a} = f'(a)\) (by hypothesis, since \(f\) is differentiable at \(a\));</li>
+        <li>\(\displaystyle\lim_{x \to a} (x - a) = 0\).</li>
+      </ul>
+      <p>By the product rule for limits,</p>
+      <p>\[ \lim_{x \to a} \bigl[f(x) - f(a)\bigr] = f'(a) \cdot 0 = 0. \]</p>
+      <p>Hence \(\lim_{x \to a} f(x) = f(a)\), so \(f\) is continuous at \(a\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — the picture behind Theorem 2.1: a single tangent direction leaves no room to jump [pass: enrichment] -->
+  <p>The proof is short, but the picture behind it is worth keeping. To be differentiable at \(a\) is to have one definite tangent direction there, and a curve smooth enough to settle on a single tangent has no room to jump — so differentiability forces continuity. The converse fails because continuity asks far less: it only forbids breaks, and an unbroken curve is still free to have a sharp corner, where no single tangent direction exists.</p>
+
+  <figure class="figure" id="fig-diff-cont">
+    <div class="figure-art">
+      <svg viewBox="0 -20 380 220" style="width:380px" class="fig-svg" role="img"
+           aria-label="Inclusion diagram: differentiable functions form a proper subset of continuous functions. |x| at x=0 is continuous but not differentiable.">
+        <ellipse cx="175" cy="105" rx="170" ry="88" fill="none" stroke="var(--c-primary)" stroke-width="1.5" stroke-dasharray="6 3"/>
+        <ellipse cx="150" cy="108" rx="110" ry="62" fill="var(--c-primary)" fill-opacity="0.08" stroke="var(--c-primary)" stroke-width="1.5"/>
+        <text x="150" y="104" text-anchor="middle" fill="var(--ink)" font-size="14" font-weight="500">Differentiable</text>
+        <text x="150" y="124" text-anchor="middle" fill="var(--ink-soft)" font-size="12" font-style="italic">x&#xB2;, &#x221A;x, e&#x02E3;</text>
+        <text x="175" y="4" text-anchor="middle" fill="var(--ink)" font-size="14" font-weight="500">Continuous</text>
+        <text x="300" y="122" text-anchor="middle" fill="var(--c-caution)" font-size="12">|x| at x = 0</text>
+      </svg>
+    </div>
+    <figcaption><span class="fig-no">Figure 2.7</span> Differentiable functions sit inside the continuous functions; \(\lvert x \rvert\) at \(x = 0\) marks the continuous-but-not-differentiable case.</figcaption>
+  </figure>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The converse of Theorem 2.1 is <em>false</em>: continuity does <em>not</em> imply differentiability. The function \(f(x) = \lvert x \rvert\) is continuous at \(x = 0\) (the left and right limits both equal \(f(0) = 0\)), yet Example 2.11 shows it is not differentiable there. Differentiability is a strictly stronger condition than continuity.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — using differentiability in reverse: choose constants so a piecewise function is differentiable, a direct application of Theorem 2.1 [source: CLP-1 §2.2 prob_s2.2 "2006H piecewise x^2 / ax+b"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.13</span></p>
+      <div class="env-body">
+        <p>Find the values of the constants \(a\) and \(b\) for which the function
+        \[ f(x) = \begin{cases} x^{2} & x \le 2, \\ ax + b & x > 2 \end{cases} \]
+        is differentiable everywhere.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Away from \(x = 2\) each piece is a polynomial and therefore differentiable, so the only point in question is \(x = 2\).</p>
+        <p><em>Step 1 — Continuity.</em> By Theorem 2.1, differentiability at \(x = 2\) requires continuity there, which forces the two pieces to meet:</p>
+        <p>\[ \lim_{x \to 2^{-}} f(x) = 2^{2} = 4 \quad\text{and}\quad \lim_{x \to 2^{+}} f(x) = 2a + b, \]</p>
+        <p>so we need \(2a + b = 4\).</p>
+        <p><em>Step 2 — Matching derivatives.</em> The left-hand derivative at \(x = 2\) uses the \(x^{2}\) branch, whose derivative \(2x\) follows in one line from the difference quotient (the same technique used in §2.2 Example 2.6); it gives slope \(4\) at \(x = 2\). The right-hand derivative uses the \(ax + b\) branch, whose derivative is the constant \(a\) (the slope of that line). For the two-sided limit of the difference quotient to exist, these must agree:</p>
+        <p>\[ a = 4. \]</p>
+        <p>Substituting \(a = 4\) into \(2a + b = 4\) gives \(b = -4\). With \(a = 4\) and \(b = -4\) the two pieces meet smoothly, and the difference quotient at \(x = 2\) has a well-defined limit equal to \(4\).</p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Higher derivatives</h3>
+
+  <p>If \(f\) is differentiable, then its derivative \(f'\) is itself a function — and we can ask whether \(f'\) is differentiable. When it is, the derivative of \(f'\) is called the <em>second derivative</em> of \(f\), written \(f''\). Repeating the process gives the third derivative \(f'''\), the fourth derivative \(f^{(4)}\), and in general the \(n\)-th derivative \(f^{(n)}\):</p>
+
+  <p>\[ f,\quad f',\quad f'',\quad f''',\quad f^{(4)},\quad \ldots,\quad f^{(n)},\quad \ldots \]</p>
+
+  <p>Each is obtained by differentiating the previous one. By convention, \(f^{(0)} = f\) and \(f^{(1)} = f'\).</p>
+
+  <!-- expansion:intuition — physical meaning of higher derivatives: acceleration and jerk [pass: enrichment] -->
+  <p>Higher derivatives are more than a formal exercise in differentiating again; the low-order ones carry concrete meaning. If \(s(t)\) is the position of a moving object, the first derivative \(s'(t)\) is its velocity and the second derivative \(s''(t)\) is its <em>acceleration</em> — the rate at which the velocity changes, felt as the push that presses you back when a car speeds up. The third derivative \(s'''(t)\), the rate of change of acceleration, is called the <em>jerk</em>; engineers keep it small when designing elevators and trains so that changes in acceleration come on smoothly rather than as an abrupt lurch.</p>
+
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.5</span><span class="env-name">Higher-derivative notation</span></p>
+    <div class="env-body">
+      <p>In Leibniz notation the second derivative of \(y = f(x)\) is written</p>
+      <p>\[ f''(x) \;=\; \frac{d^{2}y}{dx^{2}} \;=\; \frac{d^{2}f}{dx^{2}} \;=\; \frac{d^{2}}{dx^{2}}\,f(x), \]</p>
+      <p>and in general the \(n\)-th derivative is</p>
+      <p>\[ f^{(n)}(x) \;=\; \frac{d^{n}y}{dx^{n}}. \]</p>
+      <p>The superscript in \(d^{n}y/dx^{n}\) is <em>not</em> an exponent — it records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesized form \(f^{(n)}\) avoids a forest of primes.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — reading d²y/dx² as one operator symbol: not d(x²), not d·2y, not a fraction to cancel; the 2's only count differentiations [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\), and — as Remark 2.5 noted — the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\). The \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\); it does not mean \(d(x^{2})\), where the \(x\) itself would be squared. And it is not an algebraic denominator to cancel or split.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — higher-derivative computation using §2.2 result (approved in brief; new type) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.14</span></p>
+      <div class="env-body">
+        <p>Find \(f''(x)\) and \(f'''(x)\) for \(f(x) = x^{2} + 4x - 2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>In Example 2.6 we found \(f'(x) = 2x + 4\). To get the second derivative, we differentiate \(f'\) from the definition:</p>
+        <p>\[ \begin{aligned}
+          f''(x) &= \lim_{h \to 0} \frac{f'(x + h) - f'(x)}{h} \\[2pt]
+                 &= \lim_{h \to 0} \frac{\bigl[2(x + h) + 4\bigr] - \bigl[2x + 4\bigr]}{h} \\[2pt]
+                 &= \lim_{h \to 0} \frac{2h}{h} = 2.
+        \end{aligned} \]</p>
+        <p>The second derivative is the constant \(2\) — the slope of the linear function \(f'(x) = 2x + 4\). Differentiating once more,</p>
+        <p>\[ f'''(x) = \lim_{h \to 0} \frac{f''(x + h) - f''(x)}{h} = \lim_{h \to 0} \frac{2 - 2}{h} = 0. \]</p>
+        <p>Every subsequent derivative is likewise \(0\): once we reach a constant function, further differentiation produces zero. In Leibniz notation, \(\dfrac{d^{2}y}{dx^{2}} = 2\) and \(\dfrac{d^{3}y}{dx^{3}} = 0\).</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — forward-ref to differentiation rules -->
+  <p>With the concepts of differentiability, its tie to continuity, and higher-order derivatives in hand, we turn in the next sections to the rules that make differentiation <em>efficient</em> — systematic shortcuts that bypass the limit computation entirely.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-2-4">
+<!-- §2.4 Derivatives of Polynomials and the Exponential Function.
+     Generated from exp-ch02/seed_ch02_s4.md (manuscript pp. 8–10),
+     authored directly into the handout-kit semantic markup per
+     CONTRACT-html-writing.md. Direction brief brief_s24.md approved at ③.
+     Numbering is MANUAL (kit has no auto-counter); cross-references are
+     plain prose. Counters continue from §2.3:
+       Theorem 2.1 → 2.2, 2.3, 2.4, 2.5;  Corollary: first → 2.1;
+       Example 2.14 → 2.15, 2.16, 2.17, 2.18;  Remark 2.5 → 2.6.
+       (2026-06-22 example-supplement import: old polynomial example 2.13 → 2.15,
+        +E2.4-a negative exponent = 2.16, +E2.4-b fractional exponent = 2.17;
+        old e^x higher-deriv example 2.14 → 2.18.)
+     Power rule proved for positive integer n with TWO proofs (manuscript's
+     teaching choice); the negative-integer case is flagged in an unnumbered
+     Caution and the full real-exponent version deferred (ROADMAP pitfall).
+     The e^x derivative follows the manuscript's series argument at intuitive
+     level; the rigorous construction is deferred to Ch4 §4.3.
+     One figure this section (Figure 2.8, e^x self-derivative). No exercises:
+     self-authored problems are written
+     as worked examples (see brief_s24.md "題目政策").
+     2026-07-03 difficulty-mitigation pass: e^x series intro rewritten ("Recall" pointed to
+     material the reader never saw; infinite-sum on-ramp added); x^n − a^n factorization
+     given a verify-by-expanding note.
+     2026-07-03 reading-track pass: credit fence promoted to an unnumbered Caution box
+     ("on credit" marking made prominent per author request).
+     2026-07-03 P3 re-sim follow-up: "on credit" idiom glossed (non-native stumble);
+     precalculus-e sentence de-presumed (SPEC §16.2 rules e/ln non-assumable).
+     Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html. -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.4</span>Derivatives of Polynomials and the Exponential Function</h2>
+  </header>
+
+  <!-- expansion:intuition — load-bearing intuition: prove each rule once, reuse it as algebra; the limit→shortcut payoff -->
+  <p>In the previous sections every derivative was earned the hard way — by forming the difference quotient and grinding the limit down to a value. That is bearable for one function, but imagine differentiating \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\) straight from the definition: we would expand \((x + h)^{4}\), cancel, and take a limit, only to face the same labor for the next polynomial, and the next. This section ends the drudgery. We prove, once and for all, a short list of differentiation <em>rules</em> — for constants, powers, sums, and constant multiples — each established from the limit definition but thereafter usable as a purely algebraic shortcut. With them, differentiating any polynomial collapses to a one-line, mechanical operation, and we never touch a limit again for these functions. We then turn the same lens on the natural exponential \(e^{x}\) and uncover its remarkable signature: it is its own derivative.</p>
+
+  <h3 class="subsec-head">The constant and power rules</h3>
+
+  <!-- expansion:intuition — motivate the constant rule geometrically before stating it -->
+  <p>The simplest function of all is a constant, \(f(x) = c\), whose graph is a horizontal line. A horizontal line has slope zero everywhere, so we should expect its derivative to vanish identically. The definition confirms it immediately.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.2</span><span class="env-name">Derivative of a constant</span></p>
+    <div class="env-body">
+      <p>If \(f(x) = c\) for a constant \(c\), then \(f\) is differentiable everywhere and \(f'(x) = 0\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Straight from the definition,</p>
+      <p>\[ f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} = \lim_{h \to 0} \frac{c - c}{h} = \lim_{h \to 0} 0 = 0. \]</p>
+      <p>The difference quotient is identically zero before we even take the limit.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — set up the power rule as the single formula behind the one-off cases of §2.2 -->
+  <p>Next come the power functions \(x^{n}\). We met a few of their derivatives one exponent at a time in §2.2 — for example \(\dfrac{d}{dx}x^{2} = 2x\) — but a single formula governs them all. For now we prove it for a positive integer exponent; the case of other exponents is discussed in the caution that follows.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.3</span><span class="env-name">The power rule</span></p>
+    <div class="env-body">
+      <p>For every positive integer \(n = 1, 2, 3, \ldots\),
+      \[ \frac{d}{dx}\,x^{n} = n\,x^{n-1}. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — spot the pattern n·x^(n-1) in the known cases before proving it [pass: enrichment] -->
+  <p>Before proving it, notice the pattern the rule records. List the first few cases: \(x\) has derivative \(1\), the function \(x^{2}\) has derivative \(2x\) (computed in §2.2), and \(x^{3}\) has derivative \(3x^{2}\). In each one the exponent drops to the front as a multiplier and the power itself decreases by one — exactly \(n\,x^{n-1}\). The power rule claims that this pattern never breaks, for every positive integer \(n\). Showing that it <em>must</em> continue, rather than merely holding for the small cases we can check by hand, is the work of the proofs.</p>
+
+  <!-- expansion:intuition — frame the manuscript's deliberate two-proof choice for the power rule -->
+  <p>There are two proofs, each lighting the result from a different angle; we give both.</p>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">factorization</span></p>
+    <div class="env-body">
+      <p>We use the equivalent \(x \to a\) form of the derivative (§2.1) together with the algebraic factorization</p>
+      <p>\[ x^{n} - a^{n} = (x - a)\bigl(x^{n-1} + a\,x^{n-2} + a^{2}x^{n-3} + \cdots + a^{n-1}\bigr). \]</p>
+      <p>(To verify the factorization, multiply out the right-hand side: all the cross terms cancel in pairs, leaving only \(x^{n} - a^{n}\). The case \(n = 2\) is the familiar difference of squares \((x - a)(x + a)\).)</p>
+      <p>Dividing by \(x - a\) cancels the factor that would make the quotient \(0/0\), and letting \(x \to a\),</p>
+      <p>\[ \begin{aligned}
+        f'(a) &= \lim_{x \to a} \frac{x^{n} - a^{n}}{x - a} \\[2pt]
+              &= \lim_{x \to a} \bigl(x^{n-1} + a\,x^{n-2} + \cdots + a^{n-1}\bigr) \\[2pt]
+              &= \underbrace{a^{n-1} + a^{n-1} + \cdots + a^{n-1}}_{n \text{ equal terms}} = n\,a^{n-1}.
+      \end{aligned} \]</p>
+      <p>Since the point \(a\) was arbitrary, \(f'(x) = n\,x^{n-1}\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">alternative — binomial expansion</span></p>
+    <div class="env-body">
+      <p>This time we use the \(h\)-form together with the binomial theorem (a precalculus prerequisite), which expands</p>
+      <p>\[ (x + h)^{n} = x^{n} + \binom{n}{1} x^{n-1} h + \binom{n}{2} x^{n-2} h^{2} + \cdots + h^{n}. \]</p>
+      <p>Subtracting \(x^{n}\) and dividing by \(h\),</p>
+      <p>\[ \frac{(x + h)^{n} - x^{n}}{h} = \binom{n}{1} x^{n-1} + \binom{n}{2} x^{n-2} h + \cdots + h^{n-1}. \]</p>
+      <p>Every term after the first carries a factor of \(h\), so all of them vanish as \(h \to 0\), leaving</p>
+      <p>\[ f'(x) = \binom{n}{1} x^{n-1} = n\,x^{n-1}, \]</p>
+      <p>since \(\binom{n}{1} = n\).</p>
+    </div>
+  </section>
+
+  <!-- expansion:history — two proofs, two 17th-century strands: Newton's binomial theorem (c.1665) and Fermat's increment method (1630s) [pass: enrichment] [source: standard history of calculus — Newton's generalized binomial theorem, c.1665; Fermat's method of adequality for tangents and extrema, 1636] -->
+  <p>The two proofs trace two strands in the early history of the derivative. The binomial-expansion argument rests on Newton’s generalized binomial theorem, which he developed around 1665 as part of the calculus he was then inventing; expanding \((x + h)^{n}\) and letting \(h \to 0\) is descended from the increment-and-discard method Fermat had used in the 1630s to find tangents and extrema. The factorization argument, by contrast, leans on no infinitesimal at all — it is ordinary algebra turned to the same purpose.</p>
+
+  <!-- expansion:example — quick inline illustrations of the power rule -->
+  <p>The rule is now a reflex. For instance,</p>
+  <p>\[ \frac{d}{dx}\,x^{5} = 5x^{4}, \qquad \frac{d}{dx}\,x^{10} = 10x^{9}, \qquad \frac{d}{dx}\,x = 1, \]</p>
+  <p>the last because \(x = x^{1}\) has derivative \(1 \cdot x^{0} = 1\) — the slope of the line \(y = x\), as it must be.</p>
+
+  <!-- expansion:caution — ROADMAP pitfall: power-rule domain (positive integer proved; negative integer = manuscript exercise; full real exponent deferred) -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>So far the power rule is proved only for <em>positive integer</em> exponents. For a <em>negative</em> integer \(n = -1, -2, \ldots\) the identical formula \(\dfrac{d}{dx}x^{n} = n\,x^{n-1}\) still holds wherever \(x \ne 0\) — this can be checked by applying the same factorization idea to \(1/x^{m}\) (where \(m = -n > 0\)). The fully general statement \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for an <em>arbitrary real</em> exponent \(r\) holds as well — for \(x > 0\), where \(x^{r}\) is defined through the logarithm — but its proof needs the chain rule, so we defer it to a later chapter.</p>
+    </div>
+  </section>
+
+  <h3 class="subsec-head">The sum, constant-multiple, and polynomial rules</h3>
+
+  <!-- expansion:intuition — motivate the two linearity rules as what lets us assemble building blocks into polynomials -->
+  <p>Constants and powers are the building blocks; to assemble them into polynomials we need to know how differentiation interacts with addition and with multiplication by a constant. Both behave as nicely as we could hope, and both follow at once from the matching limit laws of Chapter 1.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.4</span><span class="env-name">The sum and constant-multiple rules</span></p>
+    <div class="env-body">
+      <p>If \(f\) and \(g\) are differentiable and \(c\) is a constant, then \(f + g\) and \(cf\) are differentiable, and</p>
+      <p>\[ (f + g)'(x) = f'(x) + g'(x), \qquad (cf)'(x) = c\,f'(x). \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Both are read straight off the limit laws. For the sum rule, the difference quotient of \(f + g\) splits into two:</p>
+      <p>\[ \begin{aligned}
+        (f + g)'(x) &= \lim_{h \to 0} \frac{\bigl[f(x+h) + g(x+h)\bigr] - \bigl[f(x) + g(x)\bigr]}{h} \\[2pt]
+        &= \lim_{h \to 0} \left( \frac{f(x+h) - f(x)}{h} + \frac{g(x+h) - g(x)}{h} \right) \\[2pt]
+        &= f'(x) + g'(x),
+      \end{aligned} \]</p>
+      <p>using the law that the limit of a sum is the sum of the limits. For the constant-multiple rule, the constant factors out of the quotient and then out of the limit:</p>
+      <p>\[ (cf)'(x) = \lim_{h \to 0} \frac{c\,f(x+h) - c\,f(x)}{h} = c \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} = c\,f'(x). \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — one-line forward fence: addition is clean, multiplication is not; full product-rule caution lives in §2.5 -->
+  <p>Notice how cleanly differentiation distributes over addition and slips past constant factors. Multiplication is not so docile — in general \((fg)' \ne f'g'\) — and finding the correct rule for a product takes more care; that is the business of §2.5.</p>
+
+  <!-- expansion:intuition — the three rules combine into term-by-term polynomial differentiation -->
+  <p>Combining the three rules just proved, we can differentiate any polynomial in a single pass.</p>
+
+  <section class="env env-corollary">
+    <p class="env-head"><span class="env-kicker">Corollary</span><span class="env-num">2.1</span><span class="env-name">Derivative of a polynomial</span></p>
+    <div class="env-body">
+      <p>If \(f(x) = a_{n}x^{n} + a_{n-1}x^{n-1} + \cdots + a_{1}x + a_{0}\), then</p>
+      <p>\[ f'(x) = n\,a_{n}x^{n-1} + (n-1)\,a_{n-1}x^{n-2} + \cdots + a_{1}. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:formula — justify the corollary by naming which rule does what -->
+  <p>The reasoning is exactly the three rules acting in concert: the sum rule lets the derivative act term by term; the constant-multiple rule carries each coefficient \(a_{k}\) along untouched; and the power rule turns each \(x^{k}\) into \(k\,x^{k-1}\). The constant term \(a_{0}\) contributes \(0\), and the linear term \(a_{1}x\) contributes \(a_{1}\). Assembling the pieces gives the stated formula.</p>
+
+  <!-- expansion:application — the polynomial rule as the workhorse of kinematics: position → velocity in one line [pass: enrichment] -->
+  <p>This corollary is the workhorse of kinematics. If a moving object has a polynomial position \(s(t) = a_{n}t^{n} + \cdots + a_{1}t + a_{0}\), its velocity \(s'(t)\) follows in a single line by the same term-by-term rule, each power of \(t\) dropping by one. The car of §2.2, whose velocity we could there describe only in principle, is now a function we can differentiate at sight.</p>
+
+  <!-- expansion:example — apply power + constant-multiple + sum to a polynomial (approved 2026-06-08; new type: rule-application, not first-principles) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.15</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We apply the power rule to each term, letting the sum and constant-multiple rules split the expression and carry the coefficients; the constant \(-7\) differentiates to \(0\):</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= 3\cdot\frac{d}{dx}x^{4} \;-\; 5\cdot\frac{d}{dx}x^{2} \;+\; 2\cdot\frac{d}{dx}x \;-\; \frac{d}{dx}\,7 \\[2pt]
+                &= 3(4x^{3}) - 5(2x) + 2(1) - 0 \\[2pt]
+                &= 12x^{3} - 10x + 2.
+        \end{aligned} \]</p>
+        <p>Not a single limit was computed — the rules did all the work, exactly the shortcut this section was built to deliver.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — the power rule on a negative exponent: rewrite 1/t as t^{-1}, the case flagged in the Caution above; result matches §2.2 Example 2.8 [source: CLP-1 §2.6 prob_s2.6 "s(t)=3t^4+5t^3-1/t"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.16</span></p>
+      <div class="env-body">
+        <p>Differentiate \(s(t) = 3t^{4} + 5t^{3} - \dfrac{1}{t}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>To use the power rule on every term, we first rewrite \(1/t\) as a power: \(s(t) = 3t^{4} + 5t^{3} - t^{-1}\). Applying the power rule — including the negative-exponent case noted in the Caution above — to each term,</p>
+        <p>\[ \begin{aligned}
+          s'(t) &= 3 \cdot 4t^{3} + 5 \cdot 3t^{2} - (-1)\,t^{-2} \\[2pt]
+                &= 12t^{3} + 15t^{2} + \frac{1}{t^{2}}.
+        \end{aligned} \]</p>
+        <p>The key step was rewriting \(1/t\) as \(t^{-1}\) so the power rule could act on it: the exponent drops by one (\(-1 \to -2\)) and the old exponent \(-1\) comes out front, producing the \(+1/t^{2}\) term — matching what we would obtain from the quotient rule (§2.5) or from the limit definition (§2.2 Example 2.8).</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — the power rule on a fractional exponent, then a tangent line tying back to §2.1; reproduces the §2.2 Example 2.7 limit result in one step [source: CLP-1 §2.4 prob_s2.4 "f(x)=3x^2+4x^(1/2)"; official solution, tangent-line part added] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.17</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = 3x^{2} + 4\sqrt{x}\) for \(x > 0\), and find the equation of the tangent line at \(x = 1\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Writing \(\sqrt{x} = x^{1/2}\), we differentiate term by term. The power rule applies directly to \(3x^{2}\). For \(4\sqrt{x}\) the exponent \(\tfrac{1}{2}\) is not an integer — the very case the Caution above defers for a general proof — but this particular derivative is already secured: §2.2 Example 2.7 found \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\) straight from the definition. Using it,</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= 3 \cdot 2x + 4 \cdot \tfrac{1}{2}\,x^{-1/2} \\[2pt]
+                &= 6x + \frac{2}{\sqrt{x}}.
+        \end{aligned} \]</p>
+        <p>The power rule’s bookkeeping — drop the exponent by one (\(\tfrac{1}{2} \to -\tfrac{1}{2}\)) and bring the old exponent out front — reproduces in a single line exactly the value the limit gave in §2.2.</p>
+        <p>At \(x = 1\): \(f(1) = 3 + 4 = 7\) and \(f'(1) = 6 + 2 = 8\). The tangent line through \((1, 7)\) with slope \(8\) is</p>
+        <p>\[ y - 7 = 8(x - 1), \quad\text{i.e.}\quad y = 8x - 1. \]</p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">The derivative of the exponential function</h3>
+
+  <!-- expansion:intuition — introduce the series definition (reader's first exposure; on-ramp for the infinite sum) and fence its rigorous construction to Ch4 -->
+  <p>We close with a function of a different stripe: the natural exponential \(e^{x}\). The base \(e \approx 2.718\) may or may not have appeared in your precalculus course — nothing here assumes it did. In this text the official definition of \(e^{x}\) is a formula of a kind we have not used before — an <em>infinite sum</em>, called a power series:</p>
+
+  <p>\[ e^{x} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots + \frac{x^{n}}{n!} + \cdots. \]</p>
+
+  <p>Read the infinite sum the way the notation suggests: adding more and more terms produces ever-better approximations, and \(e^{x}\) is the value the running totals settle toward. For \(x = 1\), the totals are \(1,\ 2,\ 2.5,\ 2.66\ldots,\) closing in on \(e \approx 2.71828\). Making “settle toward” precise is a limit question, and we take the answer as given here — the caution below records exactly what is being borrowed.</p>
+
+  <!-- 2026-07-03 reading-track: credit fence promoted from running prose to an unnumbered Caution box (author request: make the temporary-acceptance marking more prominent) -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Everything about \(e^{x}\) in this section is <em>on credit</em> — borrowed now, to be repaid in Chapter 4. We take the power-series definition as given: the convergence of the series and the careful construction of \(e^{x}\) are the business of Chapter 4 (§4.1–§4.2), and the term-by-term differentiation about to be used is made rigorous in §4.3, with the explicit bound \(\lvert (e^{h} - 1)/h - 1 \rvert \le \lvert h \rvert\) for \(0 < \lvert h \rvert < \tfrac{1}{2}\). Nothing in Chapters 2–3 depends on those deferred proofs — only on the facts stated here.</p>
+    </div>
+  </section>
+
+  <p>Granting the series, the derivative falls out beautifully, by an informal term-by-term step.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.5</span><span class="env-name">Derivative of the natural exponential</span></p>
+    <div class="env-body">
+      <p>The natural exponential function is its own derivative:
+      \[ \frac{d}{dx}\,e^{x} = e^{x}. \]
+      Consequently every higher derivative is \(e^{x}\) as well: \(f^{(n)}(x) = e^{x}\) for all \(n\).</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>From the definition, and factoring out \(e^{x}\) (which does not depend on \(h\)),</p>
+      <p>\[ \frac{d}{dx}\,e^{x} = \lim_{h \to 0} \frac{e^{x+h} - e^{x}}{h} = \lim_{h \to 0} \frac{e^{x}\bigl(e^{h} - 1\bigr)}{h} = e^{x} \lim_{h \to 0} \frac{e^{h} - 1}{h}. \]</p>
+      <p>It remains to evaluate that last limit. Using the series for \(e^{h}\),</p>
+      <p>\[ e^{h} - 1 = h + \frac{h^{2}}{2!} + \frac{h^{3}}{3!} + \cdots, \qquad\text{so}\qquad \frac{e^{h} - 1}{h} = 1 + \frac{h}{2!} + \frac{h^{2}}{3!} + \cdots. \]</p>
+      <p>Every term past the first carries a factor of \(h\), so as \(h \to 0\) they all vanish and the limit equals \(1\). Therefore</p>
+      <p>\[ \frac{d}{dx}\,e^{x} = e^{x} \cdot 1 = e^{x}. \]</p>
+      <p>Differentiating again returns \(e^{x}\) unchanged, so \(f''(x) = e^{x}\), and by repetition \(f^{(n)}(x) = e^{x}\) for every \(n\).</p>
+    </div>
+  </section>
+
+  <figure class="figure" data-fig="exp-self-derivative">
+    <figcaption><span class="fig-no">Figure 2.8</span> The graph of \(y = e^{x}\) with tangent lines at \(x = 0\) and \(x = 1\).</figcaption>
+  </figure>
+
+  <!-- expansion:intuition — the takeaway: self-replication is what makes e^x "natural" -->
+  <p>Figure 2.8 shows this self-replicating property at two points: the tangent slope is \(1=e^{0}\) at \((0,1)\) and \(e=e^{1}\) at \((1,e)\). That same slope-equals-height rule is exactly what singles \(e^{x}\) out among all exponential functions and earns it the name <em>natural</em> exponential: at every point its rate of change equals its current value.</p>
+
+  <!-- expansion:intuition — why e^x is everywhere: any quantity whose growth rate is proportional to its size (y'=ky) [pass: enrichment] -->
+  <p>That one property — rate of change equal to current size — is why \(e^{x}\) governs so much of the world. Any quantity whose growth rate is proportional to how much is already present obeys a relation of the form \(y' = ky\), and its solution is built from \(e^{x}\). Money under continuous compounding grows in proportion to the balance; a radioactive sample decays in proportion to the amount remaining; an unchecked population grows in proportion to its current size. In every case the rate is tied to the level, and \(e^{x}\) is the function that ties them.</p>
+
+  <!-- expansion:example — e^x with the linearity rules, plus higher derivatives showing e^x persists while the polynomial dies (approved 2026-06-08; new type) -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.18</span></p>
+      <div class="env-body">
+        <p>Let \(g(x) = 4e^{x} - x^{3} + 2x\). Find \(g'(x)\), and then compute \(g''(x)\), \(g'''(x)\), and \(g^{(4)}(x)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The sum and constant-multiple rules let us differentiate term by term, using \(\dfrac{d}{dx}e^{x} = e^{x}\) for the exponential and the power rule for the rest:</p>
+        <p>\[ g'(x) = 4e^{x} - 3x^{2} + 2. \]</p>
+        <p>Differentiating repeatedly, the polynomial part erodes by one degree each time while the exponential part is untouched:</p>
+        <p>\[ \begin{aligned}
+          g''(x)   &= 4e^{x} - 6x, \\[2pt]
+          g'''(x)  &= 4e^{x} - 6, \\[2pt]
+          g^{(4)}(x) &= 4e^{x}.
+        \end{aligned} \]</p>
+        <p>From the fourth derivative onward every \(g^{(n)}(x) = 4e^{x}\): the polynomial has been differentiated away to nothing, while the \(e^{x}\) term survives every round — a vivid reminder that \(e^{x}\) is its own derivative.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:intuition — Remark on b^x (seed) plus a tie-back to why base e is the natural one -->
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.6</span><span class="env-name">Derivative of \(b^{x}\)</span></p>
+    <div class="env-body">
+      <p>For a general base \(b > 0\), the exponential \(b^{x}\) is differentiable too, with</p>
+      <p>\[ \frac{d}{dx}\,b^{x} = b^{x}\,\ln b, \]</p>
+      <p>where \(\ln b = \log_{e} b\). We will be able to derive this cleanly once the chain rule is available (Chapter 3). Notice that the extra factor \(\ln b\) equals \(1\) precisely when \(b = e\) — yet another way of seeing why base \(e\) is the natural choice: only for it does the derivative arrive with no stray constant attached.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — e^x (exponential) vs x^e (power): different rules; d/dx x^e ≠ x^e [pass: enrichment] [source: CLP-1 §2.6 Conceptual "is d/dx(2^x)=x·2^(x-1)?"] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Keep the exponential and power functions apart. In \(e^{x}\) the base is the fixed number \(e\) and the exponent varies, so it is an <em>exponential</em> function with \(\dfrac{d}{dx}e^{x} = e^{x}\). In \(x^{e}\) the exponent is the fixed number \(e \approx 2.718\) and the base varies, so it is a <em>power</em> function, differentiated by the power rule: \(\dfrac{d}{dx}x^{e} = e\,x^{e-1}\). The two obey different rules, and in particular \(\dfrac{d}{dx}x^{e} \ne x^{e}\). The general split is \(\dfrac{d}{dx}b^{x} = b^{x}\ln b\) for an exponential against \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for a power — decide which form you are looking at before you differentiate.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — forward-ref to §2.5 (product and quotient rules) -->
+  <p>We now have fast, limit-free derivatives for every polynomial and for the natural exponential. What we still lack are <em>general</em> rules for products and quotients of functions — and, as we saw, the naive guess \((fg)' = f'g'\) is wrong. Supplying those rules is the task of the next section.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-2-5">
+<!-- §2.5 The Product and Quotient Rules.
+     Generated from exp-ch02/seed_ch02_s5.md (manuscript pp. 11–13, the FINAL
+     manuscript section), authored directly into the handout-kit semantic markup
+     per CONTRACT-html-writing.md. Direction brief brief_s25.md approved at ③
+     (2026-06-08) with these gate decisions:
+       (A) domain hypotheses made explicit on both rules;
+       (B) all three ROADMAP cautions included, spread across the two subsections
+           ((fg)'≠f'g'; Δx≡h; quotient asymmetry);
+       (C) Strategy 2.2 as a 3-step box including "simplify first";
+       (D) Figure 2.4 = product-rule rectangle-area interpretation ADDED at user
+           request — rendered as inline schematic SVG (plot.js/buildPlot has no
+           fill primitive), so there is NO figures.js entry for this section;
+       (E) all three worked examples approved; (F) Ex 2.16 → 2.20 uses x/(x^2+1);
+       (G) closing fence to Ch3 chain rule only (no preview).
+     Numbering is MANUAL (kit has no auto-counter); cross-references are plain
+     prose. Counters continue from §2.4:
+       Theorem 2.5 → 2.6, 2.7;  Example 2.18 → 2.19, 2.20, 2.21, 2.22, 2.23;
+       (2026-06-22 example-supplement import: old 2.15 → 2.19, old 2.16 → 2.20,
+        +E2.5-a quotient error-spotting = 2.21, old 2.17 → 2.22,
+        +O2.5-a quotient × exponential = 2.23.)
+       Strategy 2.1 → 2.2;  Figure 2.3 → 2.4.  Cautions are unnumbered.
+     Both proofs follow the manuscript's add-and-subtract technique; the quotient
+     proof keeps the manuscript's Δx notation (a caution notes Δx ≡ h). The product
+     proof cites §2.3 Theorem 2.1 (differentiable ⇒ continuous) for lim g(x+h)=g(x);
+     the quotient proof needs g(x) ≠ 0. No exercises: self-authored problems are
+     written as worked examples (see brief_s25.md "題目政策"). -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.5</span>The Product and Quotient Rules</h2>
+  </header>
+
+  <!-- expansion:intuition — open by recalling §2.4's clean sum/difference behavior, then flag that products and quotients are the unfinished business -->
+  <p>In §2.4 we learned that differentiation behaves beautifully with respect to addition: the derivative of a sum is the sum of the derivatives, and the same holds for differences, \((f \pm g)' = f' \pm g'\) (Theorem 2.4). It is tempting to hope that products and quotients are just as docile — that the derivative of a product is the product of the derivatives. This section shows that they are <em>not</em>, finds the correct rules, and so completes the toolkit of basic differentiation rules begun in §2.4. We treat the two cases in turn: first \(\dfrac{d}{dx}(fg)\), then \(\dfrac{d}{dx}\!\left(\dfrac{f}{g}\right)\).</p>
+
+  <h3 class="subsec-head">The product rule</h3>
+
+  <!-- expansion:intuition — set up the naive guess so the counterexample can demolish it (failure-first) -->
+  <p>The cleanest guess one could make is that derivatives pass through a product untouched, \((fg)' = f'g'\). A single example shows this is false.</p>
+
+  <!-- expansion:caution — headline pitfall (fg)'≠f'g'; preserves the manuscript's own counterexample f=x, g=x^2. §2.4 prose-fenced this; here it becomes the formal caution -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>In general \((fg)' \ne f'g'\). Take \(f(x) = x\) and \(g(x) = x^{2}\), so that \(fg = x^{3}\). Then \((fg)' = 3x^{2}\), whereas</p>
+      <p>\[ f'(x)\,g'(x) = (1)(2x) = 2x \ne 3x^{2}. \]</p>
+      <p>Differentiating a product is <em>not</em> a term-by-term operation. This is the single most common error with the rules of this chapter; the correct rule is below.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — geometric motivation: read fg as the area of a rectangle and watch the increment split into two strips plus a negligible corner; this is the picture the algebraic proof makes rigorous -->
+  <p>To see where the correct rule comes from, picture \(f(x)\) and \(g(x)\) as the two side lengths of a rectangle, so that the product \(f(x)\,g(x)\) is its area. Increase \(x\) by a small amount \(h\): the width grows by \(\Delta f = f(x+h) - f(x)\) and the height by \(\Delta g = g(x+h) - g(x)\). The extra area is an L-shaped border made of three pieces (Figure 2.9): a strip \(g\,\Delta f\) along one side, a strip \(f\,\Delta g\) along the other, and a small corner \(\Delta f\,\Delta g\).</p>
+
+  <!-- expansion:figure — product-rule rectangle-area decomposition (ADDED at ③ decision D). Inline schematic SVG per CONTRACT (no fill primitive in plot.js); not a figures.js entry. Regions: base fg (neutral), the two first-order strips g·Δf and f·Δg (primary/blue tint), the second-order corner Δf·Δg (caution/red tint) -->
+  <figure class="figure" id="fig-product-area">
+    <div class="figure-art">
+      <svg viewBox="0 0 330 244" style="width:330px" class="fig-svg" role="img"
+           aria-label="A rectangle of width f and height g, with the area increment when the sides grow by Δf and Δg split into a strip g times Δf, a strip f times Δg, and a small corner Δf times Δg.">
+        <!-- four area regions -->
+        <rect x="60" y="100" width="130" height="100" fill="var(--ink)" fill-opacity="0.05" stroke="var(--ink-soft)" stroke-width="1"/>
+        <rect x="190" y="100" width="80" height="100" fill="var(--c-primary)" fill-opacity="0.14" stroke="var(--ink-soft)" stroke-width="1"/>
+        <rect x="60" y="40" width="130" height="60" fill="var(--c-primary)" fill-opacity="0.14" stroke="var(--ink-soft)" stroke-width="1"/>
+        <rect x="190" y="40" width="80" height="60" fill="var(--c-caution)" fill-opacity="0.16" stroke="var(--ink-soft)" stroke-width="1"/>
+        <!-- dimension ticks below (split f | Δf) and at left (split g | Δg) -->
+        <line x1="60" y1="200" x2="60" y2="214" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="190" y1="200" x2="190" y2="214" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="270" y1="200" x2="270" y2="214" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="60" y1="200" x2="46" y2="200" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="60" y1="100" x2="46" y2="100" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="60" y1="40" x2="46" y2="40" stroke="var(--ink-soft)" stroke-width="1"/>
+        <!-- single anchor label in the base region; the strip/corner areas are named in the caption and body prose, keeping the drawing label-light -->
+        <text x="125" y="155" text-anchor="middle" fill="var(--ink)" font-size="15" font-style="italic">fg</text>
+        <!-- dimension labels -->
+        <text x="125" y="230" text-anchor="middle" class="ptlab" font-style="italic">f</text>
+        <text x="230" y="230" text-anchor="middle" class="ptlab">Δ<tspan font-style="italic">f</tspan></text>
+        <text x="38" y="154" text-anchor="end" class="ptlab" font-style="italic">g</text>
+        <text x="38" y="74" text-anchor="end" class="ptlab">Δ<tspan font-style="italic">g</tspan></text>
+      </svg>
+    </div>
+    <figcaption><span class="fig-no">Figure 2.9</span> Area model for the product rule: base \(fg\), two strips, and the corner \(\Delta f\,\Delta g\).</figcaption>
+  </figure>
+
+  <!-- expansion:intuition — convert the picture into the formula: the two strips give f'g and fg'; the corner is second-order and vanishes -->
+  <p>Dividing the added area by \(h\) and letting \(h \to 0\), the two strips contribute \(g\,\dfrac{\Delta f}{h} \to g\,f'\) and \(f\,\dfrac{\Delta g}{h} \to f\,g'\). The corner contributes \(\dfrac{\Delta f\,\Delta g}{h} = \dfrac{\Delta f}{h}\,\Delta g \to f' \cdot 0 = 0\), since \(\Delta f/h\) stays finite (tending to \(f'\)) while \(\Delta g \to 0\). The surviving pieces are exactly the two terms of the product rule.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.6</span><span class="env-name">The product rule</span></p>
+    <div class="env-body">
+      <p>If \(f\) and \(g\) are differentiable at \(x\), then their product \(fg\) is differentiable at \(x\), and</p>
+      <p>\[ \begin{aligned}
+        &(fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x), \\[2pt]
+        &\text{i.e.}\quad \frac{d}{dx}(fg) = \left(\frac{d}{dx}f\right)g + f\left(\frac{d}{dx}g\right).
+      \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <!-- proof follows the manuscript's add-and-subtract technique (seed); the lim g(x+h)=g(x) step is justified by §2.3 Theorem 2.1 (faithfulness: supply the hypothesis the manuscript uses implicitly) -->
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>We start from the definition and apply a useful trick: add and subtract \(f(x)\,g(x+h)\) in the numerator, which lets us isolate the change in \(f\) from the change in \(g\):</p>
+      <p>\[ \begin{aligned}
+        &f(x+h)g(x+h) - f(x)g(x) \\
+        &= \bigl[f(x+h)g(x+h) - f(x)g(x+h)\bigr] + \bigl[f(x)g(x+h) - f(x)g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+h) - f(x)\bigr]\,g(x+h) + f(x)\,\bigl[g(x+h) - g(x)\bigr].
+      \end{aligned} \]</p>
+      <p>Dividing by \(h\),</p>
+      <p>\[ \begin{aligned}
+        &\frac{f(x+h)g(x+h) - f(x)g(x)}{h} \\[2pt]
+        &= \frac{f(x+h) - f(x)}{h}\,g(x+h) \;+\; f(x)\,\frac{g(x+h) - g(x)}{h}.
+      \end{aligned} \]</p>
+      <p>Now let \(h \to 0\) and evaluate each piece with the limit laws of §1.5. The two difference quotients tend to \(f'(x)\) and \(g'(x)\). For the remaining factor, \(g(x+h) \to g(x)\): this is exactly the statement that \(g\) is continuous at \(x\), which holds because \(g\), being differentiable at \(x\), is continuous there (Theorem 2.1, §2.3). Therefore</p>
+      <p>\[ (fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x). \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — inline mini-application of the product rule, anchoring it before the manuscript's worked example -->
+  <p>The rule is quick to apply once it is in hand. For instance,</p>
+  <p>\[ \frac{d}{dx}\bigl(x^{2} e^{x}\bigr) = (2x)\,e^{x} + x^{2}\,e^{x} = x(x + 2)\,e^{x}, \]</p>
+  <p>where we used the power rule (Theorem 2.3) for \(x^{2}\) and \((e^{x})' = e^{x}\) (Theorem 2.5) for the exponential factor. The next example isolates the same product-rule pattern.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.19</span></p>
+      <div class="env-body">
+        <p>Differentiate \(h(x) = x\,e^{x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(h\) is a product of \(f(x) = x\) and \(g(x) = e^{x}\), with \(f'(x) = 1\) and \(g'(x) = e^{x}\) (Theorem 2.5). The product rule gives</p>
+        <p>\[ h'(x) = f'(x)\,g(x) + f(x)\,g'(x) = (1)\,e^{x} + x\,e^{x} = e^{x}(1 + x). \]</p>
+        <p>Notice that neither factor alone produces the answer: the term \(e^{x}\) comes from differentiating \(x\) while keeping \(e^{x}\), and the term \(x\,e^{x}\) from keeping \(x\) while differentiating \(e^{x}\) — the two strips of Figure 2.9 in algebraic form.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:application — product rule in economics: marginal revenue R'(q)=p'(q)q+p(q) [pass: enrichment] -->
+  <p>The product rule has a clean reading in economics. Suppose a firm sells \(q\) units at a price \(p(q)\) that depends on how many are sold; its revenue is the product \(R(q) = p(q)\,q\). The product rule gives the <em>marginal revenue</em> \(R'(q) = p'(q)\,q + p(q)\): selling one more unit changes revenue in two ways at once — through the price change \(p'(q)\) spread over all \(q\) units, and through the price \(p(q)\) fetched by the extra unit itself. The two strips of Figure 2.9 return here as two competing economic effects.</p>
+
+  <h3 class="subsec-head">The quotient rule</h3>
+
+  <!-- expansion:intuition — bridge to the quotient, reusing the same add-and-subtract idea; introduce the manuscript's Δx notation -->
+  <p>The same add-and-subtract idea handles a quotient \(f/g\). From here we write the increment as \(\Delta x\) rather than \(h\); the two symbols mean the same thing, as the next caution records.</p>
+
+  <!-- expansion:caution — ROADMAP notation pitfall, deliberately deferred from §2.2 to here: Δx ≡ h -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The increment in the variable is written either \(h\) or \(\Delta x\); in derivative computations the two are synonymous. Reading \(\Delta x\) as “a small change in \(x\),” the difference quotient \(\bigl(f(x + \Delta x) - f(x)\bigr)/\Delta x\) is identical to the \(h\)-form, and \(\Delta x \to 0\) means the same as \(h \to 0\). We use \(\Delta x\) below; it is the same increment, just a different letter.</p>
+    </div>
+  </section>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.7</span><span class="env-name">The quotient rule</span></p>
+    <div class="env-body">
+      <p>If \(f\) and \(g\) are differentiable at \(x\) and \(g(x) \ne 0\), then the quotient \(f/g\) is differentiable at \(x\), and</p>
+      <p>\[ \left(\frac{f}{g}\right)'(x) = \frac{f'(x)\,g(x) - f(x)\,g'(x)}{\bigl[g(x)\bigr]^{2}}. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — why the quotient rule carries a minus sign and a g²: g sits in the denominator [pass: enrichment] -->
+  <p>Before the proof, it helps to see why the rule has this shape. Like the product rule, its numerator pairs each function with the derivative of the other — but joined by a <em>minus</em> sign instead of a plus, and the whole expression is divided by \(g^{2}\). The minus sign reflects that \(g\) sits in the denominator: making \(g\) larger makes the quotient \(f/g\) smaller, so the effect of \(g'\) is subtracted rather than added. The \(g^{2}\) is the footprint of differentiating \(1/g\): take the simplest denominator \(g(x) = x\) with numerator \(f(x) = 1\), so that \(f/g = 1/x\), whose derivative was \(-1/x^{2}\) in §2.2 — the same minus sign and the same square that the quotient rule carries in general.</p>
+
+  <!-- proof follows the manuscript: combine over a common denominator, add and subtract f(x)g(x) on the numerator, keep Δx notation; needs g continuous (so g(x+Δx)→g(x)) and g(x)≠0 (so the denominator tends to g(x)^2 ≠ 0) -->
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Combining the two fractions over a common denominator,</p>
+      <p>\[ \frac{f(x+\Delta x)}{g(x+\Delta x)} - \frac{f(x)}{g(x)} = \frac{f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x)}{g(x+\Delta x)\,g(x)}. \]</p>
+      <p>On the numerator we play the same trick as before, now adding and subtracting \(f(x)\,g(x)\):</p>
+      <p>\[ \begin{aligned}
+        &f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x) \\[2pt]
+        &= \bigl[f(x+\Delta x)\,g(x) - f(x)\,g(x)\bigr] - \bigl[f(x)\,g(x+\Delta x) - f(x)\,g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+\Delta x) - f(x)\bigr]\,g(x) - f(x)\,\bigl[g(x+\Delta x) - g(x)\bigr].
+      \end{aligned} \]</p>
+      <p>Dividing the whole difference by \(\Delta x\), the difference quotient becomes</p>
+      <p>\[ \frac{1}{g(x+\Delta x)\,g(x)}\left( \frac{f(x+\Delta x) - f(x)}{\Delta x}\,g(x) - f(x)\,\frac{g(x+\Delta x) - g(x)}{\Delta x} \right). \]</p>
+      <p>Let \(\Delta x \to 0\). The two difference quotients tend to \(f'(x)\) and \(g'(x)\); and \(g(x+\Delta x) \to g(x)\) because \(g\) is continuous at \(x\) (Theorem 2.1, §2.3), so the denominator tends to \(g(x)\,g(x) = \bigl[g(x)\bigr]^{2}\), which is nonzero since \(g(x) \ne 0\). Hence</p>
+      <p>\[ \left(\frac{f}{g}\right)'(x) = \frac{f'(x)\,g(x) - f(x)\,g'(x)}{\bigl[g(x)\bigr]^{2}}. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — ROADMAP pitfall: quotient-rule asymmetry; numerator term order matters -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Unlike the product rule, the quotient rule is <em>not</em> symmetric in \(f\) and \(g\): the numerator is \(f'g - f g'\), with the derivative of the <em>top</em> coming first. Swapping the order to \(f g' - f' g\) flips the sign of the whole derivative, and forgetting the \(g^{2}\) in the denominator changes the answer entirely. A reliable mnemonic reads the numerator as “(derivative of top)(bottom) minus (top)(derivative of bottom), all over bottom squared.”</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — inline mini-application that fulfils the promise made in §2.2 (Example 2.8): recover (1/x)' = −1/x^2 in one line -->
+  <p>As a first check, the quotient rule recovers a derivative we computed laboriously from first principles in §2.2. Taking the numerator to be the constant \(1\) and the denominator \(x\),</p>
+  <p>\[ \frac{d}{dx}\!\left(\frac{1}{x}\right) = \frac{(0)(x) - (1)(1)}{x^{2}} = -\frac{1}{x^{2}}, \]</p>
+  <p>matching the derivative \(-1/x^{2}\) found in Example 2.8 — obtained here in a single line, exactly as promised there.</p>
+
+  <!-- expansion:example — new worked example (approved 2026-06-08, decision E/F): a genuine rational quotient that exercises the full formula and the numerator order -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.20</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = \dfrac{x}{x^{2} + 1}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This is a genuine quotient — no algebra simplifies it to a power — so the quotient rule applies, with top \(x\) and bottom \(x^{2} + 1\). Their derivatives are \(1\) and \(2x\), and the bottom never vanishes, so the rule is valid for every \(x\). Taking care with the order of the numerator terms,</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= \frac{(1)\bigl(x^{2} + 1\bigr) - (x)(2x)}{\bigl(x^{2} + 1\bigr)^{2}} \\[2pt]
+                &= \frac{x^{2} + 1 - 2x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}
+                 = \frac{1 - x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}.
+        \end{aligned} \]</p>
+        <p>Had we mistakenly written the numerator as \((x)(2x) - (1)(x^{2}+1)\), every sign would be wrong. As a sanity check on the result, \(f'(0) = 1 > 0\) (the curve rises through the origin) and \(f'(\pm 1) = 0\), the two points where \(x/(x^{2}+1)\) reaches its largest and smallest values.</p>
+
+        <figure class="figure" data-fig="quotient-example-graph">
+          <figcaption><span class="fig-no">Figure 2.10</span> The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom), from Example 2.20.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — error-spotting on the quotient rule, the worked counterpart to the asymmetry Caution above [source: CLP-1 §2.6 prob_s2.6 Conceptual Q1 "spot the error: 2x/(x+1)"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.21</span></p>
+      <div class="env-body">
+        <p>A student differentiates \(f(x) = \dfrac{2x}{x + 1}\) as follows:</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= \frac{2(x + 1) + 2x}{(x + 1)^{2}} \\[4pt]
+                &= \frac{2(x + 1)}{(x + 1)^{2}} = \frac{2}{x + 1}.
+        \end{aligned} \]</p>
+        <p>Spot <em>all</em> the errors in this work, and give the correct derivative.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>There are two errors.</p>
+        <p><em>Error 1 — wrong sign in the quotient rule.</em> The quotient rule carries a <em>minus</em> sign in the numerator,</p>
+        <p>\[ \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \]</p>
+        <p>but the student wrote a plus. With top \(2x\) and bottom \(x + 1\), the correct numerator is</p>
+        <p>\[ (2)(x + 1) - (2x)(1) = 2x + 2 - 2x = 2, \]</p>
+        <p>not \(2(x + 1) + 2x\).</p>
+        <p><em>Error 2 — incorrect simplification.</em> Even within the student’s own (wrong) numerator, \(2(x + 1) + 2x = 4x + 2\), not \(2(x + 1)\); the \(2x\) term was simply dropped.</p>
+        <p>Carrying out the rule correctly,</p>
+        <p>\[ f'(x) = \frac{(2)(x + 1) - (2x)(1)}{(x + 1)^{2}} = \frac{2}{(x + 1)^{2}}. \]</p>
+        <p>Note that the denominator is \((x + 1)^{2}\), not \((x + 1)\) — a third common slip the student was heading toward.</p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Choosing the right rule</h3>
+
+  <!-- expansion:intuition — motivate the strategy box: with several rules now available, the first task on any problem is to read its shape and pick the rule -->
+  <p>With the constant, power, sum, constant-multiple, product, and quotient rules all in hand, differentiating a given expression is now less about computing limits and more about <em>recognizing</em> which rule its structure calls for. Reading that structure — and simplifying first when possible — is the skill the next box organizes.</p>
+
+  <!-- expansion:strategy — ROADMAP assigns "Selecting among the basic rules" to §2.5; 3 steps incl. the "simplify first" judgment (decision C) -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">2.2</span><span class="env-name">Selecting among the basic rules</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Read the <em>outermost</em> structure of the expression. Is it a single power or polynomial, a sum or difference, a product of two functions, or a quotient of two functions?</li>
+        <li>Before reaching for the product or quotient rule, ask whether algebra simplifies the expression first: a quotient like \(\dfrac{x^{4} - x}{x}\) becomes the polynomial \(x^{3} - 1\), and a product like \(x^{2}\cdot x^{3}\) becomes \(x^{5}\). A rule you can avoid is a rule you cannot misapply.</li>
+        <li>Apply the matching rule: the power, sum, and constant-multiple rules for polynomials and powers; the product rule (Theorem 2.6) for a genuine product; the quotient rule (Theorem 2.7) for a genuine quotient. For compound expressions, the rules combine — a sum of products, a product with a polynomial factor, and so on.</li>
+      </ol>
+      <p>The point is to spend a moment on the shape of the problem before computing: the same expression can be far easier under one rule than another, and some apparent quotients are not quotients at all once simplified.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — a constant factor or constant denominator needs the constant-multiple rule, not the product/quotient rule [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Not every product or quotient on the page calls for the product or quotient rule. A constant factor is handled by the constant-multiple rule: \(\dfrac{d}{dx}(5x^{3}) = 5 \cdot 3x^{2} = 15x^{2}\), with no need to “differentiate” the \(5\). A constant denominator is likewise just a constant multiple, since \(\dfrac{x^{2}}{3} = \tfrac{1}{3}x^{2}\) gives \(\dfrac{d}{dx}\dfrac{x^{2}}{3} = \tfrac{2}{3}x\). The product and quotient rules are needed only when <em>both</em> parts genuinely depend on \(x\); using them when one part is constant still reaches the answer, but by a longer route with more chances to slip.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — new worked example (approved 2026-06-08, decision E): rule-selection/diagnosis anchoring Strategy 2.2; (b) is the simplify-first lesson -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.22</span></p>
+      <div class="env-body">
+        <p>For each function, first decide which rule applies, then differentiate:
+        \[ \text{(a)}\ \ y = x^{3} e^{x}, \qquad \text{(b)}\ \ y = \frac{x^{4} - x}{x}, \qquad \text{(c)}\ \ y = \frac{x^{2}}{e^{x}}. \]</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p><em>(a)</em> A genuine product of \(x^{3}\) and \(e^{x}\); use the product rule:</p>
+        <p>\[ y' = (3x^{2})\,e^{x} + x^{3}\,e^{x} = x^{2} e^{x}(3 + x). \]</p>
+        <p><em>(b)</em> This <em>looks</em> like a quotient, but it simplifies first — for \(x \ne 0\), \(\dfrac{x^{4} - x}{x} = x^{3} - 1\) — so the power rule finishes it with no quotient rule at all:</p>
+        <p>\[ y' = 3x^{2}. \]</p>
+        <p><em>(c)</em> A genuine quotient that does not simplify; use the quotient rule, with top \(x^{2}\) and bottom \(e^{x}\):</p>
+        <p>\[ y' = \frac{(2x)\,e^{x} - x^{2}\,e^{x}}{\bigl(e^{x}\bigr)^{2}} = \frac{e^{x}\bigl(2x - x^{2}\bigr)}{e^{2x}} = \frac{2x - x^{2}}{e^{x}}. \]</p>
+        <p>The three parts share no single rule; the work was choosing correctly, and in (b) recognizing that the cleanest move was not to use the quotient rule at all.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — quotient rule with the exponential in the numerator (opposite arrangement to Example 2.22(c)); the sign of f' locates where the function rises and falls [source: CLP-1 §2.7 prob_s2.7 Procedural "f(x)=e^x/(2x)"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.23</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = \dfrac{e^{x}}{2x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The quotient rule with top \(e^{x}\) and bottom \(2x\) gives</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= \frac{(e^{x})(2x) - (e^{x})(2)}{(2x)^{2}} \\[2pt]
+                &= \frac{2e^{x}(x - 1)}{4x^{2}}
+                 = \frac{(x - 1)\,e^{x}}{2x^{2}}.
+        \end{aligned} \]</p>
+        <p>The derivative of the top is again \(e^{x}\) (Theorem 2.5), and the derivative of the bottom is just \(2\). The sign of \(f'(x)\) changes at \(x = 1\): for \(0 < x < 1\) we have \(f'(x) < 0\) (the function is decreasing), while for \(x > 1\) we have \(f'(x) > 0\) (the function is increasing).</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close the chapter's differentiation rules; one-line forward fence to Ch3 chain rule (no preview), per decision G -->
+  <p>The product and quotient rules complete the basic differentiation toolkit of this chapter: together with the constant, power, sum, and constant-multiple rules and the derivative of \(e^{x}\), they let us differentiate any algebraic or exponential combination built by adding, scaling, multiplying, and dividing. One important way of combining functions remains untouched — <em>composition</em>, forming \(f\bigl(g(x)\bigr)\) — and it needs a rule of its own, the chain rule, which opens the next chapter.</p>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <!-- expansion:summary — chapter-level summary (ch02's final section): point→function→existence→rules arc + forward fence to Ch3 (chain rule, integer-only power rule) and Ch4 (rigorous e^x) -->
+  <p>Chapter 2 built the derivative in stages. At a single point it is a limit of secant slopes,
+  \[ f'(a) = \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} = \lim_{x \to a} \frac{f(x) - f(a)}{x - a}, \]
+  the slope of the tangent line \(y - f(a) = f'(a)(x - a)\) and, read locally, the best linear approximation to \(f\) near \(a\) (§2.1). Letting the basepoint vary turns this number into a function \(f'\) — the derivative — recoverable from the graph of \(f\) and written interchangeably as \(f'\), \(\tfrac{df}{dx}\), or \(\tfrac{d}{dx}[f]\) (§2.2).</p>
+
+  <p>Not every function has a derivative everywhere. The limit can fail at a corner (\(\lvert x \rvert\) at \(0\)), at a vertical tangent (\(\sqrt[3]{x}\) at \(0\)), or at any discontinuity, so differentiability is a genuinely stronger condition than continuity: differentiable \(\Rightarrow\) continuous (Theorem 2.1), but the converse is false. Iterating the operation gives the higher derivatives \(f''\), \(f'''\), \(\dots\), \(f^{(n)}\) (§2.3).</p>
+
+  <p>The rest of the chapter replaced the limit, case by case, with arithmetic. The constant rule \((c)' = 0\) (Theorem 2.2), the power rule \((x^{n})' = n x^{n - 1}\) for positive integers \(n\) (Theorem 2.3), and linearity — the sum and constant-multiple rules (Theorem 2.4) — together differentiate every polynomial term by term (Corollary 2.1). The natural exponential earned its defining property \((e^{x})' = e^{x}\) (Theorem 2.5), proved here from the series for \(e^{x}\) (§2.4); Chapter 4 will make that step fully rigorous. Products and quotients then closed the toolkit:
+  \[ (fg)' = f'g + fg', \qquad \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \]
+  the first emphatically <em>not</em> \(f'g'\), the second sensitive to the order of its numerator (§2.5).</p>
+
+  <p>With these rules we can differentiate any function assembled from powers and the exponential by adding, scaling, multiplying, and dividing. Two things still lie outside their reach: <em>composition</em>, \(f\bigl(g(x)\bigr)\), which no rule here touches, and the power rule itself, so far secured only for integer exponents. Both are the business of Chapter 3, which opens with the rule for compositions — the chain rule — and uses it to extend the power rule and to differentiate the trigonometric, logarithmic, and inverse functions.</p>
+
+</article>
+</template>
+<!-- END-CONTENT-FRAGMENTS -->
+<!-- plot.js — inlined -->
+<script>
+(function () {
+  var uid = 0;
+  var PI = Math.PI;
+  function piTex(v) {
+    var map = {};
+    map[(-2 * PI).toFixed(4)] = "-2\\pi";
+    map[(-PI).toFixed(4)] = "-\\pi";
+    map[(-PI / 2).toFixed(4)] = "-\\tfrac{\\pi}{2}";
+    map[(PI / 2).toFixed(4)] = "\\tfrac{\\pi}{2}";
+    map[PI.toFixed(4)] = "\\pi";
+    map[(2 * PI).toFixed(4)] = "2\\pi";
+    map[(0).toFixed(4)] = "0";
+    var hit = map[v.toFixed(4)];
+    if (hit != null) return hit;
+    if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v)); // plain integers
+    return undefined;
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function anchorTransform(anchor, vAnchor) {
+    var tx = anchor === "start" ? "0" : anchor === "end" ? "-100%" : "-50%";
+    var ty = vAnchor === "top" ? "0" : vAnchor === "bottom" ? "-100%" : "-50%";
+    return "translate(" + tx + "," + ty + ")";
+  }
+  function buildPlot(cfg) {
+    var w = cfg.w, h = cfg.h;
+    var pad = Object.assign({ t: 16, r: 18, b: 20, l: 22 }, cfg.pad || {});
+    var xmin = cfg.xmin, xmax = cfg.xmax, ymin = cfg.ymin, ymax = cfg.ymax;
+    var iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    var SX = function(x) { return pad.l + ((x - xmin) / (xmax - xmin)) * iw; };
+    var SY = function(y) { return h - pad.b - ((y - ymin) / (ymax - ymin)) * ih; };
+    var id = "pl" + (++uid);
+    var parts = [], labels = [];
+    function pushLabel(o) { labels.push(o); }
+    parts.push('<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:' + w + 'px" class="fig-svg" role="img" aria-label="' + esc(cfg.aria || "graph") + '" preserveAspectRatio="xMidYMid meet">');
+    parts.push('<defs><marker id="' + id + 'a" markerWidth="8" markerHeight="8" refX="5.4" refY="2.8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5.4,2.8 L0,5.6" fill="none" stroke="var(--c-axis)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>');
+    if (cfg.axes !== false) {
+      var x0 = Math.min(Math.max(0, xmin), xmax), y0 = Math.min(Math.max(0, ymin), ymax);
+      var ax0 = SX(xmin), ax1 = SX(xmax), ayBase = SY(y0);
+      parts.push('<path d="M' + ax0.toFixed(1) + ',' + ayBase.toFixed(1) + ' H' + (ax1 - 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      var ay0 = SY(ymin), ay1 = SY(ymax), axBase = SX(x0);
+      parts.push('<path d="M' + axBase.toFixed(1) + ',' + ay0.toFixed(1) + ' V' + (ay1 + 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      if (cfg.xlabel) pushLabel({ px: ax1 + 1, py: ayBase + 4, tex: cfg.xlabel, anchor: "start", vAnchor: "top", cls: "a-ax", size: 13 });
+      if (cfg.ylabel) pushLabel({ px: axBase - 5, py: ay1 + 1, tex: cfg.ylabel, anchor: "end", vAnchor: "top", cls: "a-ax", size: 13 });
+      (cfg.xticks || []).forEach(function(t) {
+        var px = SX(t.x);
+        parts.push('<line x1="' + px.toFixed(1) + '" y1="' + (ayBase - 3).toFixed(1) + '" x2="' + px.toFixed(1) + '" y2="' + (ayBase + 3).toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.x));
+        if (tex != null) pushLabel({ px: px, py: ayBase + 6, tex: tex, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: px, py: ayBase + 6, text: t.label, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+      });
+      (cfg.yticks || []).forEach(function(t) {
+        var py = SY(t.y);
+        parts.push('<line x1="' + (axBase - 3).toFixed(1) + '" y1="' + py.toFixed(1) + '" x2="' + (axBase + 3).toFixed(1) + '" y2="' + py.toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.y));
+        if (tex != null) pushLabel({ px: axBase - 6, py: py, tex: tex, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: axBase - 6, py: py, text: t.label, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+      });
+    }
+    (cfg.items || []).forEach(function(it) {
+      if (it.type === "curve") {
+        var cls = it.cls || "curve", n = it.samples || 240, a = it.domain[0], b = it.domain[1];
+        var d = "", pen = false;
+        for (var i = 0; i <= n; i++) {
+          var x = a + (b - a) * (i / n), y = it.fn(x);
+          if (!isFinite(y) || y < ymin - (ymax - ymin) * 0.04 || y > ymax + (ymax - ymin) * 0.04) { pen = false; continue; }
+          var px = SX(x).toFixed(2), py = SY(y).toFixed(2);
+          d += (pen ? "L" : "M") + px + "," + py + " "; pen = true;
+        }
+        if (d) parts.push('<path d="' + d.trim() + '" class="' + cls + '"/>');
+      } else if (it.type === "vline") {
+        parts.push('<line x1="' + SX(it.x).toFixed(1) + '" y1="' + SY(ymin).toFixed(1) + '" x2="' + SX(it.x).toFixed(1) + '" y2="' + SY(ymax).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "hline") {
+        var ha = it.from != null ? it.from : xmin, hb = it.to != null ? it.to : xmax;
+        parts.push('<line x1="' + SX(ha).toFixed(1) + '" y1="' + SY(it.y).toFixed(1) + '" x2="' + SX(hb).toFixed(1) + '" y2="' + SY(it.y).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "seg") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="' + (it.cls || "curve") + '"/>');
+      } else if (it.type === "dot") {
+        var r = it.r || 3.0;
+        if (it.hollow) parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/>');
+        else parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" class="dot"/>');
+      } else if (it.type === "arrow") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      } else if (it.type === "text") {
+        pushLabel({ px: SX(it.x), py: SY(it.y), tex: it.tex, text: it.tex == null ? it.text : null, anchor: it.anchor || "middle", vAnchor: it.vAnchor || "middle", dx: it.dx || 0, dy: it.dy || 0, cls: it.cls || "a-pt", size: it.size });
+      }
+    });
+    if (labels.length) {
+      var M = 52;
+      var spans = labels.map(function(L) {
+        var left = (L.px + (L.dx || 0) + M).toFixed(1);
+        var top = (L.py + (L.dy || 0) + M).toFixed(1);
+        var tf = anchorTransform(L.anchor, L.vAnchor);
+        var fs = L.size ? "font-size:" + L.size + "px;" : "";
+        var body = L.tex != null ? "\\(" + L.tex + "\\)" : esc(L.text == null ? "" : L.text);
+        return '<span class="fig-lbl ' + (L.cls || "") + '" style="left:' + left + 'px;top:' + top + 'px;transform:' + tf + ';' + fs + '">' + body + '</span>';
+      }).join("");
+      parts.push('<foreignObject x="' + (-M) + '" y="' + (-M) + '" width="' + (w + 2 * M) + '" height="' + (h + 2 * M) + '" class="fig-fo" requiredExtensions="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml" class="fig-lyr">' + spans + '</div></foreignObject>');
+    }
+    parts.push('</svg>');
+    return parts.join("");
+  }
+  window.buildPlot = buildPlot;
+  window.PIVAL = PI;
+})();
+</script>
+
+<!-- ============================================================
+     figures.js — inlined (Chapter 2 figure registry)
+     ============================================================ -->
+<script>
+/* ============================================================
+   figures.js — Chapter 2 figure registry.
+   Each entry returns { layout, panels:[{svg, note}] }.
+   Labels carry \( \) TeX, typeset by MathJax.
+   ============================================================ */
+(function () {
+  const sqrt = Math.sqrt;
+
+  const FIGS = {
+
+    /* §2.1 — Secant lines converging to the tangent line at P.
+       Design: P at lower-left on a concave-up parabola; three Q points
+       well-spaced to the right → secant lines fan out; tangent line in
+       a distinct colour (caution/red) below the fan. */
+    "secant-to-tangent": () => {
+      var f = function (x) { return 0.1 * x * x + 0.5; };
+      var c = 1, fc = 0.6, fprime = 0.2;
+      var qxs = [7, 5, 3];                        // Q₁ farthest, Q₃ closest
+      var slopes = qxs.map(function (qx) { return (f(qx) - fc) / (qx - c); });
+      //  slopes = [0.8, 0.6, 0.4] — evenly spaced fan
+
+      var xL = -0.3, xR = 8.5;
+      var items = [
+        // --- secant lines (dashed, extend as full lines) ---
+        { type: "curve", fn: function (x) { return fc + slopes[0] * (x - c); },
+          domain: [xL, xR], samples: 10, cls: "refline" },
+        { type: "curve", fn: function (x) { return fc + slopes[1] * (x - c); },
+          domain: [xL, xR], samples: 10, cls: "refline" },
+        { type: "curve", fn: function (x) { return fc + slopes[2] * (x - c); },
+          domain: [xL, xR], samples: 10, cls: "refline" },
+        // --- tangent line (solid caution/red — visually distinct) ---
+        { type: "curve", fn: function (x) { return fc + fprime * (x - c); },
+          domain: [xL, xR], samples: 10, cls: "arrow-bwd" },
+        // --- main curve (drawn last, on top) ---
+        { type: "curve", fn: f, domain: [0, 8.2], samples: 200, cls: "curve" },
+        // --- dots ---
+        { type: "dot", x: c, y: fc, r: 3.5 },
+        { type: "dot", x: 7, y: f(7), r: 2.5 },
+        { type: "dot", x: 5, y: f(5), r: 2.5 },
+        { type: "dot", x: 3, y: f(3), r: 2.5 },
+        // --- P label (below-left) ---
+        { type: "text", x: c - 0.1, y: fc - 0.4,
+          tex: "P", cls: "a-pt", anchor: "end" },
+        // --- Q labels (above-right of each dot) ---
+        { type: "text", x: 7.25, y: f(7) + 0.35,
+          tex: "Q_1", cls: "a-pt", anchor: "start" },
+        { type: "text", x: 5.25, y: f(5) + 0.35,
+          tex: "Q_2", cls: "a-pt", anchor: "start" },
+        { type: "text", x: 3.25, y: f(3) + 0.35,
+          tex: "Q_3", cls: "a-pt", anchor: "start" },
+        // --- "Secant lines" group label (right side, between l1 and l3) ---
+        { type: "text", x: xR + 0.2, y: fc + slopes[1] * (xR - c),
+          tex: "\\text{Secant lines}", cls: "a-ref", anchor: "start", size: 12 },
+        // --- "Tangent line" full label (right side) ---
+        { type: "text", x: xR + 0.2, y: fc + fprime * (xR - c),
+          tex: "\\text{Tangent line}", cls: "a-ref", anchor: "start", size: 12 },
+        // --- curve label ---
+        { type: "text", x: 8, y: f(8) + 0.8,
+          tex: "y\\!=\\!f(x)", cls: "a-curve", anchor: "start" },
+      ];
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 460, h: 300, xmin: -1, xmax: 10, ymin: -1, ymax: 7.5,
+            xlabel: "x", ylabel: "y",
+            xticks: [
+              { x: c, tex: "c" },
+              { x: 3, tex: "x_3" },
+              { x: 5, tex: "x_2" },
+              { x: 7, tex: "x_1" },
+            ],
+            aria: "Three secant lines through P fanning out as Q1, Q2, Q3 approach P from the right, converging toward the tangent line at P.",
+            items: items,
+          }),
+        }],
+      };
+    },
+
+    /* §2.1 — Tangent-line approximation: y = 1/x with tangent at (2, 1/2).
+       Shows the curve hugging the tangent near the point of tangency,
+       illustrating local linearity (Remark 2.1) and Example 2.5. */
+    "tangent-approx": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 380, h: 260, xmin: 0.2, xmax: 4.5, ymin: -0.3, ymax: 2.5,
+          xlabel: "x", ylabel: "y",
+          aria: "Graph of y equals 1 over x with tangent line at (2, one half), showing the curve hugging the tangent near the point of tangency.",
+          xticks: [{ x: 2, tex: "2" }],
+          yticks: [{ y: 0.5, tex: "\\tfrac{1}{2}" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => 1 / x, domain: [0.45, 4.3], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -0.25 * x + 1, domain: [0.5, 3.8], cls: "refline" },
+            { type: "dot", x: 2, y: 0.5 },
+            { type: "text", x: 3.8, y: 0.55, tex: "y=\\tfrac{1}{x}", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 0.8, y: 0.42, tex: "\\text{tangent}", cls: "a-ref", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* §2.2 — The derivative as a function: f above, f' below, drawn on a
+       common x-axis. Top: parabola f(x)=x²+4x−2 (minimum at x=−2, f=−6).
+       Bottom: line f'(x)=2x+4 (zero at x=−2). A shared dashed vertical at
+       x=−2 links the minimum of f to the zero of f'. Both SVGs use the same
+       w / pad / xmin / xmax, so a given x maps to the same horizontal pixel;
+       returned as ONE panel whose .fig-panel column layout stacks them
+       centred → the x-axes line up. Uses only the in-section result. */
+    /* §2.3 — Non-differentiability at a corner: |x| near 0.
+       Design: V-shape of |x|, two secant lines from the right (slope +1)
+       and two from the left (slope −1), labeled to show disagreement.
+       A dot at the origin marks the corner. */
+    "abs-corner": () => {
+      var f = function (x) { return Math.abs(x); };
+      var dom = [-4, 4];
+      // secant points: two from the right, two from the left
+      var rPts = [3, 1.5];
+      var lPts = [-3, -1.5];
+
+      var items = [
+        // --- secant lines from the right (slope +1, dashed) ---
+        { type: "curve", fn: function (x) { return x; },
+          domain: [-0.5, 4.2], samples: 10, cls: "refline" },
+        // --- secant lines from the left (slope −1, dashed) ---
+        { type: "curve", fn: function (x) { return -x; },
+          domain: [-4.2, 0.5], samples: 10, cls: "refline" },
+        // --- main curve |x| (solid, on top) ---
+        { type: "curve", fn: f, domain: dom, samples: 200, cls: "curve" },
+        // --- dots on secant endpoints ---
+        { type: "dot", x: 3, y: 3, r: 2.5 },
+        { type: "dot", x: 1.5, y: 1.5, r: 2.5 },
+        { type: "dot", x: -3, y: 3, r: 2.5 },
+        { type: "dot", x: -1.5, y: 1.5, r: 2.5 },
+        // --- corner dot (origin) ---
+        { type: "dot", x: 0, y: 0, r: 3.5 },
+        // --- slope labels ---
+        { type: "text", x: 3.2, y: 1.8,
+          tex: "\\text{slope}=+1", cls: "a-pt", anchor: "start", size: 12 },
+        { type: "text", x: -3.2, y: 1.8,
+          tex: "\\text{slope}=-1", cls: "a-pt", anchor: "end", size: 12 },
+        // --- curve label ---
+        { type: "text", x: 3.8, y: 4.1,
+          tex: "y\\!=\\!|x|", cls: "a-curve", anchor: "start" },
+      ];
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 420, h: 280, xmin: -5, xmax: 5, ymin: -1, ymax: 5,
+            xlabel: "x", ylabel: "y",
+            xticks: [{ x: 0, tex: "0" }],
+            aria: "V-shaped graph of |x| with secant lines from the left having slope -1 and from the right having slope +1, meeting at a corner at the origin where no single tangent exists.",
+            items: items,
+          }),
+        }],
+      };
+    },
+
+    "f-and-fprime": () => {
+      var f  = function (x) { return x * x + 4 * x - 2; };
+      var fp = function (x) { return 2 * x + 4; };
+      var dom = [-6.4, 2.4];
+      var common = { w: 460, xmin: -6.8, xmax: 2.8, xlabel: "x", ylabel: "y" };
+
+      // --- top panel: f ---
+      var top = buildPlot(Object.assign({}, common, {
+        h: 250, ymin: -8, ymax: 14,
+        xticks: [{ x: -2, tex: "-2" }],
+        aria: "Graph of f(x)=x^2+4x-2, a parabola with its minimum at x=-2 where f=-6.",
+        items: [
+          { type: "vline", x: -2, cls: "refline" },
+          { type: "curve", fn: f, domain: dom, samples: 200, cls: "curve" },
+          { type: "dot", x: -2, y: -6, r: 3 },
+          { type: "text", x: 2.45, y: 12, tex: "y\\!=\\!f(x)", cls: "a-curve", anchor: "start" },
+          { type: "text", x: -2.35, y: -6, tex: "\\text{min}", cls: "a-pt", anchor: "end" },
+        ],
+      }));
+
+      // --- bottom panel: f' (same horizontal scale as the top) ---
+      var bot = buildPlot(Object.assign({}, common, {
+        h: 210, ymin: -9, ymax: 9,
+        xticks: [{ x: -2, tex: "-2" }],
+        aria: "Graph of f'(x)=2x+4, a line crossing zero at x=-2; negative to the left, positive to the right.",
+        items: [
+          { type: "vline", x: -2, cls: "refline" },
+          { type: "curve", fn: fp, domain: dom, samples: 12, cls: "curve" },
+          { type: "dot", x: -2, y: 0, r: 3 },
+          { type: "text", x: 2.45, y: 7, tex: "y\\!=\\!f'(x)", cls: "a-curve", anchor: "start" },
+          { type: "text", x: -5.6, y: -4.5, tex: "f'<0", cls: "a-pt", anchor: "start" },
+          { type: "text", x: -1.4, y: 4.5, tex: "f'>0", cls: "a-pt", anchor: "start" },
+        ],
+      }));
+
+      return { layout: "stack", panels: [{ svg: top + bot }] };
+    },
+
+    /* §2.4 — e^x is its own derivative: tangent lines at x=0 and x=1
+       showing that slope = function value at each point. */
+    "exp-self-derivative": () => {
+      var e1 = Math.exp(1);
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 400, h: 300, xmin: -2, xmax: 3, ymin: -1, ymax: 8.5,
+            xlabel: "x", ylabel: "y",
+            aria: "Graph of y equals e to the x with tangent lines at x equals 0 and x equals 1, showing that the slope at each point equals the function value.",
+            xticks: [{ x: 1, tex: "1" }],
+            yticks: [{ y: 1, tex: "1" }, { y: e1, tex: "e" }],
+            items: [
+              { type: "curve", fn: (x) => Math.exp(x), domain: [-1.8, 2.15], samples: 200, cls: "curve" },
+              { type: "curve", fn: (x) => x + 1, domain: [-1.3, 1.5], cls: "refline" },
+              { type: "curve", fn: (x) => e1 * x, domain: [0, 2.5], cls: "refline" },
+              { type: "dot", x: 0, y: 1 },
+              { type: "dot", x: 1, y: e1 },
+              { type: "text", x: 2.5, y: 7.8, tex: "y=e^{x}", cls: "a-curve", anchor: "start" },
+              { type: "text", x: -1.3, y: 0.2, tex: "\\text{slope}=1=e^{0}", cls: "a-ref", anchor: "start" },
+              { type: "text", x: 1.8, y: 5.2, tex: "\\text{slope}=e=e^{1}", cls: "a-ref", anchor: "start" },
+            ],
+          }),
+        }],
+      };
+    },
+
+    /* §2.5 — f(x)=x/(x²+1) and its derivative, stacked.
+       Top: f with horizontal tangents at x=±1. Bottom: f' with zeros
+       at ±1 and f'(0)=1, confirming Example 2.16's sanity check. */
+    "quotient-example-graph": () => {
+      var f = function (x) { return x / (x * x + 1); };
+      var fp = function (x) { return (1 - x * x) / Math.pow(x * x + 1, 2); };
+      var dom = [-4.5, 4.5];
+      var common = { w: 420, xmin: -5, xmax: 5, xlabel: "x" };
+
+      var top = buildPlot(Object.assign({}, common, {
+        h: 200, ymin: -0.65, ymax: 0.65, ylabel: "y",
+        xticks: [{ x: -1, tex: "-1" }, { x: 1, tex: "1" }],
+        yticks: [{ y: 0.5, tex: "\\tfrac{1}{2}" }, { y: -0.5, tex: "-\\tfrac{1}{2}" }],
+        aria: "Graph of f(x) = x over (x squared plus 1), with horizontal tangents at x = plus or minus 1.",
+        items: [
+          { type: "curve", fn: f, domain: dom, samples: 300, cls: "curve" },
+          { type: "dot", x: 1, y: 0.5 },
+          { type: "dot", x: -1, y: -0.5 },
+          { type: "hline", y: 0.5, from: 0.5, to: 1.5, cls: "refline" },
+          { type: "hline", y: -0.5, from: -1.5, to: -0.5, cls: "refline" },
+          { type: "text", x: 4.2, y: -0.3, tex: "f(x)=\\tfrac{x}{x^{2}+1}", cls: "a-curve", anchor: "end" },
+        ],
+      }));
+
+      var bot = buildPlot(Object.assign({}, common, {
+        h: 200, ymin: -0.5, ymax: 1.2, ylabel: "y",
+        xticks: [{ x: -1, tex: "-1" }, { x: 1, tex: "1" }],
+        aria: "Graph of f prime of x equals (1 minus x squared) over (x squared plus 1) squared, zero at x = plus or minus 1.",
+        items: [
+          { type: "curve", fn: fp, domain: dom, samples: 300, cls: "curve" },
+          { type: "dot", x: 1, y: 0 },
+          { type: "dot", x: -1, y: 0 },
+          { type: "text", x: 4.2, y: 0.6, tex: "f'(x)=\\tfrac{1-x^{2}}{(x^{2}+1)^{2}}", cls: "a-curve", anchor: "end" },
+          { type: "text", x: 0.3, y: 1.1, tex: "f'(0)=1", cls: "a-pt", anchor: "start" },
+        ],
+      }));
+
+      return { layout: "stack", panels: [{ svg: top + bot }] };
+    },
+
+    /* §2.3 (enrichment) — f(x)=∛x: vertical tangent at the origin (Example 2.12).
+       S-shaped curve through the origin (solid dot — f(0) exists); secant lines
+       from the origin steepen toward vertical as Q→0 (slope→∞), so f'(0) does not
+       exist — a non-corner failure of differentiability (contrast Figure 2.3). */
+    "cbrt-vertical-tangent": () => {
+      var f = function (x) { return Math.cbrt(x); };
+      var sec = function (qx) {
+        var m = f(qx) / qx;
+        return { type: "curve", fn: function (x) { return m * x; }, domain: [-4.5, 4.5], samples: 6, cls: "refline" };
+      };
+      var items = [
+        sec(2.6), sec(1.0), sec(0.35),
+        { type: "curve", fn: f, domain: [-4.5, 4.5], samples: 260, cls: "curve" },
+        { type: "dot", x: 0, y: 0, r: 3.5 },
+        { type: "dot", x: 2.6, y: f(2.6), r: 2.2 },
+        { type: "dot", x: 1.0, y: f(1.0), r: 2.2 },
+        { type: "dot", x: 0.35, y: f(0.35), r: 2.2 },
+        { type: "text", x: 3.4, y: f(3.4) + 0.2, tex: "y=\\sqrt[3]{x}", cls: "a-curve", anchor: "start" },
+        { type: "text", x: -0.25, y: 1.62, tex: "\\text{vertical tangent}", cls: "a-ref", anchor: "end", size: 12 },
+        { type: "text", x: -0.25, y: 1.18, tex: "(\\text{slope} \\to \\infty)", cls: "a-ref", anchor: "end", size: 12 },
+      ];
+      return { layout: "single", panels: [{ svg: buildPlot({
+        w: 420, h: 290, xmin: -4.5, xmax: 4.5, ymin: -1.9, ymax: 1.9,
+        xlabel: "x", ylabel: "y",
+        aria: "Graph of y equals cube root of x, an S-shaped curve through the origin with a vertical tangent there; secant lines from the origin steepen toward vertical as the second point approaches the origin, so the derivative at zero does not exist.",
+        items: items,
+      }) }] };
+    },
+
+    /* §2.1 (enrichment) — anatomy of the difference quotient (h-form + Caution).
+       One secant from P=(a,f(a)) to Q=(a+h,f(a+h)); the run leg h and the rise
+       leg f(a+h)-f(a) make slope = rise/run visible and cement that the
+       numerator is f(a+h)-f(a), not f(h). */
+    "difference-quotient-anatomy": () => {
+      var f = function (x) { return 0.2 * x * x + 0.5; };
+      var a = 1.5, h = 2.5, b = a + h;
+      var fa = f(a), fb = f(b);
+      var m = (fb - fa) / h;
+      var items = [
+        { type: "curve", fn: f, domain: [0.1, 5.05], samples: 200, cls: "curve" },
+        { type: "curve", fn: function (x) { return fa + m * (x - a); }, domain: [0.85, 4.7], samples: 6, cls: "arrow-bwd" },
+        { type: "seg", x1: a, y1: fa, x2: b, y2: fa, cls: "refline" },
+        { type: "seg", x1: b, y1: fa, x2: b, y2: fb, cls: "refline" },
+        { type: "dot", x: a, y: fa, r: 3.2 },
+        { type: "dot", x: b, y: fb, r: 3.2 },
+        { type: "text", x: a - 0.12, y: fa - 0.34, tex: "P", cls: "a-pt", anchor: "end" },
+        { type: "text", x: b + 0.15, y: fb + 0.08, tex: "Q", cls: "a-pt", anchor: "start" },
+        { type: "text", x: (a + b) / 2, y: fa - 0.36, tex: "h", cls: "a-ref", anchor: "middle" },
+        { type: "text", x: b + 0.18, y: (fa + fb) / 2, tex: "f(a+h)-f(a)", cls: "a-ref", anchor: "start", size: 12 },
+        { type: "text", x: 1.05, y: 4.15, tex: "y=f(x)", cls: "a-curve", anchor: "start" },
+      ];
+      return { layout: "single", panels: [{ svg: buildPlot({
+        w: 440, h: 300, xmin: -0.3, xmax: 6, ymin: -0.3, ymax: 5,
+        xlabel: "x", ylabel: "y",
+        xticks: [{ x: a, tex: "a" }, { x: b, tex: "a+h" }],
+        aria: "A curve y equals f of x with a secant line from P at (a, f of a) to Q at (a plus h, f of a plus h); a horizontal leg labeled h and a vertical leg labeled f of a plus h minus f of a form the run and rise whose ratio is the slope of the secant.",
+        items: items,
+      }) }] };
+    },
+
+  };
+
+  /* ---- hydrateFigures: fills every <figure data-fig="id"> ---- */
+  function hydrateFigures(root) {
+    (root || document).querySelectorAll("[data-fig]").forEach(function (el) {
+      var def = FIGS[el.dataset.fig];
+      if (!def || el.dataset.figDone) return;
+      var r = def();
+      var layout = r.layout, panels = r.panels;
+      var html;
+      if (layout === "single" && panels.length === 1 && !panels[0].note) {
+        html = '<div class="figure-art">' + panels[0].svg + '</div>';
+      } else {
+        var cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
+        html = '<div class="figure-art ' + cls + '">' +
+          panels.map(function (p) {
+            return '<div class="fig-panel">' + p.svg + (p.note ? '<div class="fig-note">' + p.note + '</div>' : '') + '</div>';
+          }).join("") + '</div>';
+      }
+      el.insertAdjacentHTML("afterbegin", html);
+      el.dataset.figDone = "1";
+    });
+  }
+  window.hydrateFigures = hydrateFigures;
+})();
+</script>
+
+<!-- Main build script (paginator + MathJax) -->
+<script>
+var CHAPTER = {
+  brand: "Chapter 2 — Derivatives",
+  runningHead: "Chapter 2 · Derivatives",
+  fragments: ["sec-2-1", "sec-2-2", "sec-2-3", "sec-2-4", "sec-2-5"],
+};
+var FRAGMENTS = CHAPTER.fragments;
+var RUNNING_HEAD = CHAPTER.runningHead;
+
+function renderMath(root) {
+  if (!root) return Promise.resolve();
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    return MathJax.typesetPromise([root]).catch(function(e) { console.warn("mathjax", e); });
+  }
+  return Promise.resolve();
+}
+
+function waitFor(test, tries) {
+  return new Promise(function(resolve) {
+    var n = 0;
+    var tick = function() {
+      if (test()) return resolve(true);
+      if (n++ > (tries || 100)) return resolve(false);
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
+var isHeading = function(el) {
+  return el.matches && el.matches(".chapter-head, .sec-head, .subsec-head, .para-head, .env-head");
+};
+
+function isDisplayChild(n) {
+  if (n.nodeType !== 1) return false;
+  var tag = n.tagName && n.tagName.toLowerCase();
+  if (tag === "mjx-container" && n.getAttribute("display") === "true") return true;
+  if (n.querySelector && n.querySelector('mjx-container[display="true"]')) return true;
+  return false;
+}
+
+var SPLIT_ENVS = ".env-example, .env-solution, .env-proof, .env-definition, .env-theorem, .env-proposition, .env-corollary";
+var DISP_SEL = 'mjx-container[display="true"]';
+
+function liCount(el) { return [].filter.call(el.children, function(x) { return x.tagName === "LI"; }).length; }
+
+function countBodyUnits(bodyEl) {
+  var n = 0;
+  [].forEach.call(bodyEl.children, function(ch) {
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL)) n += explodeParagraph2(ch);
+    else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) n += liCount(ch);
+    else n++;
+  });
+  return n;
+}
+
+function isSplittable(block) {
+  if (!block.classList) return false;
+  if (block.classList.contains("workedexample")) return block.children.length >= 2;
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    return !!b && countBodyUnits(b) > 1;
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL)) {
+    return explodeParagraph2(block) > 1;
+  }
+  return false;
+}
+
+function onlyLists(bodyEl) {
+  var els = contentKids(bodyEl);
+  return els.length > 0 && els.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; });
+}
+
+function contentKids(bodyEl) {
+  return [].filter.call(bodyEl.children, function(c) {
+    return !(c.classList && c.classList.contains("qed")) && (c.textContent.trim() || c.querySelector("*"));
+  });
+}
+
+function splitMode(block) {
+  if (!block.classList) return "none";
+  if (block.classList.contains("workedexample")) return block.children.length >= 2 ? "free" : "none";
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    if (!b || countBodyUnits(b) <= 1) return "none";
+    var kids = contentKids(b);
+    var hasPara = kids.some(function(c) {
+      return c.tagName === "P" && c.querySelector(DISP_SEL) && explodeParagraph2(c) > 1;
+    });
+    if (hasPara || (kids.length >= 2 && !kids.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; }))) return "free";
+    return "list";
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL) && explodeParagraph2(block) > 1) return "free";
+  return "none";
+}
+
+function explodeParagraph2(p) {
+  var n = 0, hasBuf = false;
+  [].forEach.call(p.childNodes, function(node) {
+    if (isDisplayChild(node)) {
+      if (hasBuf) { n++; hasBuf = false; }
+      n++;
+    } else if ((node.textContent && node.textContent.trim()) || node.nodeType === 1) {
+      hasBuf = true;
+    }
+  });
+  if (hasBuf) n++;
+  return n;
+}
+
+function explodeParagraph(p) {
+  var parts = [], buf = [];
+  var flush = function() {
+    var hasContent = buf.some(function(n) { return (n.textContent && n.textContent.trim()) || n.nodeType === 1; });
+    if (hasContent) {
+      var np = document.createElement("p");
+      np.className = p.className;
+      buf.forEach(function(n) { np.appendChild(n); });
+      parts.push(np);
+    } else {
+      buf.forEach(function(n) { if (n.parentNode) n.parentNode.removeChild(n); });
+    }
+    buf = [];
+  };
+  [].slice.call(p.childNodes).forEach(function(node) {
+    if (isDisplayChild(node)) { flush(); var np = document.createElement("p"); np.className = p.className; np.appendChild(node); parts.push(np); }
+    else { buf.push(node); }
+  });
+  flush();
+  return parts;
+}
+
+function listToUnits(listEl) {
+  var items = [].filter.call(listEl.children, function(x) { return x.tagName === "LI"; });
+  if (items.length < 2) return [listEl];
+  var tag = listEl.tagName.toLowerCase();
+  return items.map(function(li, i) {
+    var nl = document.createElement(tag);
+    nl.className = listEl.className;
+    if (tag === "ol") nl.setAttribute("start", String(i + 1));
+    nl.appendChild(li);
+    return nl;
+  });
+}
+
+function isDisplayOnlyParagraph(p) {
+  if (!p || p.tagName !== "P") return false;
+  var content = [].filter.call(p.childNodes, function(node) {
+    return (node.textContent && node.textContent.trim()) || node.nodeType === 1;
+  });
+  return content.length === 1 && isDisplayChild(content[0]);
+}
+
+function mathLeadUnit(lead, display) {
+  var unit = document.createElement("div");
+  unit.className = "split-unit";
+  unit.appendChild(lead);
+  unit.appendChild(display);
+  return unit;
+}
+
+function bodyToUnits(bodyEl, keepMathPairs) {
+  var units = [];
+  var children = [].slice.call(bodyEl.children);
+  for (var i = 0; i < children.length; i++) {
+    var ch = children[i];
+    if (keepMathPairs && ch.tagName === "P" && !ch.querySelector(DISP_SEL) && isDisplayOnlyParagraph(children[i + 1])) {
+      units.push(mathLeadUnit(ch, children[i + 1]));
+      i++;
+      continue;
+    }
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL) && explodeParagraph2(ch) > 1) {
+      explodeParagraph(ch).forEach(function(u) { units.push(u); });
+    } else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) {
+      listToUnits(ch).forEach(function(u) { units.push(u); });
+    } else { units.push(ch); }
+  }
+  return units;
+}
+
+function splitEnvOverflow(env) {
+  var bodyEl = env.querySelector(":scope > .env-body");
+  if (!bodyEl) return null;
+  var kids = bodyToUnits(bodyEl, env.classList && env.classList.contains("env-proof"));
+  if (kids.length < 2) return null;
+  bodyEl.innerHTML = "";
+  bodyEl.appendChild(kids.shift());
+  var parts = [env];
+  kids.forEach(function(k) {
+    if (k.classList && k.classList.contains("qed") && parts.length > 0) {
+      var prev = parts[parts.length - 1];
+      var prevBody = prev.querySelector(":scope > .env-body") || prev.querySelector(".env-body");
+      if (prevBody) { prevBody.appendChild(k); return; }
+    }
+    var cont = document.createElement("section");
+    cont.className = env.className + " env-cont";
+    var b = document.createElement("div");
+    b.className = "env-body";
+    b.appendChild(k);
+    cont.appendChild(b);
+    parts.push(cont);
+  });
+  return parts;
+}
+
+function splitParts(block) {
+  if (block.classList.contains("workedexample")) return [].slice.call(block.children);
+  if (block.matches(SPLIT_ENVS)) return splitEnvOverflow(block) || [block];
+  if (block.tagName === "P") { var ex = explodeParagraph(block); return ex.length > 1 ? ex : [block]; }
+  return [block];
+}
+
+function paginate(blocks) {
+  var pagesEl = document.getElementById("pages");
+  pagesEl.innerHTML = "";
+  var idx = 0, body = null;
+  var newSheet = function() {
+    var sheet = document.createElement("div");
+    sheet.className = "sheet";
+    var header = document.createElement("div");
+    header.className = "sheet-header";
+    header.textContent = idx === 0 ? "" : RUNNING_HEAD;
+    body = document.createElement("div");
+    body.className = "sheet-body paper skin-hs vivid";
+    var footer = document.createElement("div");
+    footer.className = "sheet-footer";
+    footer.textContent = String(idx + 1);
+    sheet.append(header, body, footer);
+    pagesEl.appendChild(sheet);
+    idx++;
+  };
+  newSheet();
+  var fits = function() { return body.scrollHeight <= body.clientHeight + 1; };
+  var FREE_THRESHOLD = 130;
+  var moveToFreshPage = function(block) {
+    var carry = null;
+    if (body.childElementCount > 0) {
+      var last = body.lastElementChild;
+      if (last && isHeading(last)) { carry = last; body.removeChild(last); }
+      newSheet();
+      if (carry) body.appendChild(carry);
+    }
+    body.appendChild(block);
+  };
+  var place = function(block) {
+    body.appendChild(block);
+    if (fits()) {
+      if (isHeading(block) && body.childElementCount > 1) {
+        var _bRect = block.getBoundingClientRect();
+        var _bodyRect = body.getBoundingClientRect();
+        var _rem = (_bodyRect.top + body.clientHeight) - _bRect.bottom;
+        var _threshold = block.matches(".sec-head, .chapter-head") ? 160 : 100;
+        if (_rem < _threshold) {
+          body.removeChild(block);
+          newSheet();
+          body.appendChild(block);
+        }
+      }
+      return;
+    }
+    var blockH = block.getBoundingClientRect().height;
+
+    var isFigure = block.tagName === "FIGURE" || (block.classList && block.classList.contains("figure"));
+    var _figArt = isFigure ? block.querySelector(".figure-art") : null;
+    var _artH = 0, _capH = 0;
+    if (_figArt) {
+      _artH = _figArt.getBoundingClientRect().height;
+      var _figCap = block.querySelector("figcaption");
+      _capH = _figCap ? _figCap.getBoundingClientRect().height : 0;
+    }
+
+    body.removeChild(block);
+
+    if (_figArt && _artH > 0) {
+      var _probe = document.createElement("div");
+      _probe.style.height = "0"; _probe.style.margin = "0"; _probe.style.padding = "0";
+      body.appendChild(_probe);
+      var _remaining = body.clientHeight - (_probe.getBoundingClientRect().top - body.getBoundingClientRect().top);
+      body.removeChild(_probe);
+      var FIG_MIN_SCALE = 0.55;
+      var _figMargin = blockH - _artH - _capH;
+      var _availForArt = _remaining - _capH - _figMargin;
+      var neededScale = _availForArt / _artH;
+      if (_availForArt > 60 && neededScale >= FIG_MIN_SCALE && neededScale < 1) {
+        var _oZ = _figArt.style.zoom;
+        var _oMt = block.style.marginTop, _oMb = block.style.marginBottom;
+        _figArt.style.zoom = neededScale;
+        block.style.marginTop = "0.3em"; block.style.marginBottom = "0";
+        body.appendChild(block);
+        if (fits()) return;
+        body.removeChild(block);
+        _figArt.style.zoom = _oZ;
+        block.style.marginTop = _oMt; block.style.marginBottom = _oMb;
+      }
+    }
+
+    if (block.classList.contains && block.classList.contains("workedexample") && block.children.length >= 2) {
+      var lastEl = body.lastElementChild;
+      var used = lastEl ? lastEl.getBoundingClientRect().bottom - body.getBoundingClientRect().top : 0;
+      var remaining = body.clientHeight - used;
+      if (remaining < FREE_THRESHOLD && blockH <= body.clientHeight) {
+        moveToFreshPage(block);
+        if (fits()) return;
+        body.removeChild(block);
+      }
+      var kids = [].slice.call(block.children);
+      var ex = kids[0], sol = kids[1], extra = kids.slice(2);
+      block.removeChild(ex);
+      var solParts = splitParts(sol);
+      body.appendChild(ex);
+      if (!fits()) { body.removeChild(ex); moveToFreshPage(ex); }
+      var first = solParts[0];
+      body.appendChild(first);
+      if (!fits()) {
+        body.removeChild(first);
+        body.removeChild(ex);
+        moveToFreshPage(ex);
+        body.appendChild(first);
+        if (!fits()) { body.removeChild(first); place(first); }
+      }
+      for (var i = 1; i < solParts.length; i++) place(solParts[i]);
+      extra.forEach(place);
+      return;
+    }
+    var mode = splitMode(block);
+    var splitProofOnOverflow = block.classList && block.classList.contains("env-proof");
+    var want = (mode !== "none" && (blockH > body.clientHeight || splitProofOnOverflow));
+    if (want) { var parts = splitParts(block); if (parts.length > 1) { parts.forEach(place); return; } }
+    moveToFreshPage(block);
+    if (!fits() && mode !== "none") {
+      var parts2 = splitParts(block);
+      if (parts2.length > 1) { body.removeChild(block); parts2.forEach(place); }
+    }
+  };
+  blocks.forEach(place);
+  return idx;
+}
+
+function build() {
+  var status = document.getElementById("status");
+
+  /* Load section fragments from inline <template> elements */
+  var page = document.getElementById("page");
+  var parts = FRAGMENTS.map(function(id) {
+    var tpl = document.getElementById("frag-" + id);
+    return tpl ? tpl.innerHTML : "";
+  });
+  page.innerHTML = parts.join("\n");
+
+  if (window.hydrateFigures) window.hydrateFigures(page);
+
+  /* Wait for MathJax to load, then typeset */
+  waitFor(function() { return window.MathJax && window.MathJax.typesetPromise; }, 200).then(function(ok) {
+    if (!ok) { status.textContent = "MathJax load timeout"; return; }
+    return renderMath(page);
+  }).then(function() {
+    var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    return fontsReady;
+  }).then(function() {
+    status.textContent = "Paginating …";
+    return new Promise(function(r) { setTimeout(r, 60); });
+  }).then(function() {
+    var blocks = [];
+    page.querySelectorAll(":scope > .sec").forEach(function(sec) {
+      [].forEach.call(sec.children, function(ch) { blocks.push(ch); });
+    });
+
+    var n = paginate(blocks);
+    var src = document.getElementById("source");
+    if (src) src.remove();
+
+    status.textContent = n + " page" + (n === 1 ? "" : "s") + " · A4";
+    var btn = document.getElementById("printBtn");
+    btn.disabled = false;
+    btn.addEventListener("click", function() { window.print(); });
+
+    var boot = document.getElementById("boot");
+    if (boot) boot.remove();
+  });
+}
+
+window.addEventListener("DOMContentLoaded", build);
+</script>
+</body>
+</html>

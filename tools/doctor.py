@@ -363,7 +363,7 @@ def check_tex_compiles() -> None:
 # ── ⑥c handout LaTeX 排版線（pilot v2：lualatex＋latexmk＋NCM＋vendored Inter）──
 
 def check_handout_latex() -> None:
-    """講義出版排版線（handout/tex_export/，KICKOFF-latex-pilot.md）：模板走 lualatex＋
+    """講義出版排版線（handout/latex/，KICKOFF-latex-pilot.md）：模板走 lualatex＋
     memoir＋NewComputerModern，UI sans＝repo 內 vendored Inter（fontspec Path= 載入，
     換機零安裝——git 帶著走，這裡只驗檔案在）；完整性閘 check_prose.py 需 pdftotext。"""
     for name, why in (
@@ -385,7 +385,7 @@ def check_handout_latex() -> None:
                    "MiKTeX 首次編譯通常自動補裝 newcomputermodern；或 `mpm --install newcomputermodern`")
     else:
         record(WARN, "handout-tex", "kpsewhich 不在 PATH，略過 NCM 檢查", "裝 MiKTeX 後會進 PATH")
-    inter_dir = REPO / "handout" / "tex_export" / "template" / "fonts" / "inter"
+    inter_dir = REPO / "handout" / "latex" / "template" / "fonts" / "inter"
     missing = [f"Inter-{w}.otf" for w in ("Regular", "Italic", "Medium", "SemiBold", "Bold", "BoldItalic")
                if not (inter_dir / f"Inter-{w}.otf").exists()]
     if not missing:

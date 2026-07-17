@@ -20,7 +20,7 @@ model: inherit
 2. handout `expansion:*` 標記的權威定義：`README.md` §撰稿工作流程。
 
 # 你要審什麼（一次讀齊）
-1. **handout fragment**：`handout/fragments/chNN/sec-*.html`——盤點該節所有 `<!-- expansion:intuition|application … -->` 標記所承載的直覺（＝候選來源池），**並另掃 `expansion:caution`**（僅為把 correctness-critical 者路由到末段假設清單，**不當 intuition 候選**）。
+1. **handout fragment**：`handout/html/fragments/chNN/sec-*.html`——盤點該節所有 `<!-- expansion:intuition|application … -->` 標記所承載的直覺（＝候選來源池），**並另掃 `expansion:caution`**（僅為把 correctness-critical 者路由到末段假設清單，**不當 intuition 候選**）。
 2. **影片 storyboard**：`video/storyboards/<deck>.yml`——各場**上畫面文字**（`statement`／`annotations`／`scaffold`／divider 文字／callout `body`…）＋ **`say`（旁白）** ＋ **`# HOOK`／animation（視覺）**。
 3. **cited `.md`**：`video/content_scripts/<deck>.md`——單元 `narration`／`visual_need`，佐證某直覺是否已在旁白／視覺承載。
 

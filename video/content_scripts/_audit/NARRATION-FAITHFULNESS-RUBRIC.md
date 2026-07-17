@@ -49,7 +49,7 @@ NFA 在**鎖稿後**跑（旁白 source 已認可、已 derive）。從同一份
 
 ## 收斂線（blocking vs advisory）
 
-- **收斂判準**：NFA 通過 ＝ **blocking findings = 0**。advisory 由使用者逐條裁決，**不強制歸零**（同講義 [`../../../handout/_audit/PROSE-AUDIT-RUBRIC.md`](../../../handout/_audit/PROSE-AUDIT-RUBRIC.md):40）。
+- **收斂判準**：NFA 通過 ＝ **blocking findings = 0**。advisory 由使用者逐條裁決，**不強制歸零**（同講義 [`../../../handout/html/_audit/PROSE-AUDIT-RUBRIC.md`](../../../handout/html/_audit/PROSE-AUDIT-RUBRIC.md):40）。
 - **不 governs Tier 0 腳本**：`derive_spoken --check` 等確定性閘以 exit code 收斂，不套 blocking/advisory。
 
 ## 兩道讀者與 reader 拆法（orchestration）

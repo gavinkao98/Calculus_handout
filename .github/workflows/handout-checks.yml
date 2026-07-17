@@ -21,7 +21,7 @@ jobs:
       # curly apostrophe) on rendered prose, excluding math primes, attributes,
       # code and comments. A failure means a fragment has an ASCII " or ' in prose.
       - name: Lint prose quotes (CONTENT_SPEC §8)
-        run: python handout/quote_lint.py
+        run: python handout/html/quote_lint.py
 
       # doc_lint.py is stdlib-only; verifies relative markdown links in active
       # guidance docs resolve to existing files (archives / legacy excluded).
@@ -31,11 +31,11 @@ jobs:
 
       # build.py is stdlib-only (pathlib/re); no pip install needed.
       - name: Assemble handout (fragments -> print standalone)
-        run: python handout/build.py
+        run: python handout/html/build.py
 
       # The print standalones are committed; a fresh build must reproduce them
       # byte-for-byte. A diff here means a fragment was edited without re-running
-      # build.py (or build is out of sync). Run `python handout/build.py` locally
+      # build.py (or build is out of sync). Run `python handout/html/build.py` locally
       # and commit the regenerated chapterN-print-standalone.html.
       - name: Verify committed standalones are in sync with fragments
-        run: git diff --exit-code -- 'handout/chapter*-print-standalone.html'
+        run: git diff --exit-code -- 'handout/html/standalone/chapter*-print-standalone.html'

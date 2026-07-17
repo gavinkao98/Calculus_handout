@@ -23,7 +23,7 @@
 
 # LaTeX 排版線的 lualatex 工作目錄（KICKOFF-latex-pilot.md §4.1；轉出 body、
 # 頁面 PNG、aux 皆可由 convert.py＋latexmk 重生）
-handout/tex_export/build/
+handout/latex/build/
 
 # Generated media pipeline outputs (frozen gen-0/gen-1, now archived under legacy/)
 /legacy/artifacts/*
@@ -49,7 +49,7 @@ media/
 
 # Authoring R&D run outputs + handout render screenshots (regenerable; contain raw model responses)
 authoring/**/out/
-handout/_render/out/
+handout/html/_render/out/
 
 # Third-party reference scans (copyrighted; not for distribution)
 stewart/
@@ -125,3 +125,14 @@ tmp_*.pdf
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# LaTeX 成品夾（handout/latex/dist/<ch>/＝一 tex 一 pdf，皆進版控）——
+# 成品 PDF 是 *.pdf 全域忽略的例外；編譯殘渣（若有人用非 latexmk 流程）不進
+!handout/latex/dist/**/*.pdf
+handout/latex/dist/**/*.aux
+handout/latex/dist/**/*.log
+handout/latex/dist/**/*.fls
+handout/latex/dist/**/*.fdb_latexmk
+handout/latex/dist/**/*.synctex.gz
+handout/latex/dist/**/*.out
+handout/latex/dist/**/*.toc

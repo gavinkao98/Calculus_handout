@@ -1,7 +1,7 @@
 # §3.1 Derivatives of Sine and Cosine — 影片內容稿（content script）
 
 > **產線：** 講義 → 影片，gen-2。Chapter 3 第一節，從 HTML 講義逐節重跑。
-> **權威來源：** [`../../handout/fragments/ch03/sec-3-1.html`](../../handout/fragments/ch03/sec-3-1.html)（建置版 `handout/chapter3-print-standalone.html` §3.1）。
+> **權威來源：** [`../../handout/html/fragments/ch03/sec-3-1.html`](../../handout/html/fragments/ch03/sec-3-1.html)（建置版 `handout/html/standalone/chapter3-print-standalone.html` §3.1）。
 > **這是什麼：** 純內容中間產物（source of truth）。格式見 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) §6——只含 `id`／`source`／`learning_goal`／`kind`／`narration`／`visual_need`／`animation_cue`，**不含**任何工程欄位（template／`{show}`／accent／payload／divider）。工程是第二階段的事。
 > **階段：** **LOCKED（detail-redo，2026-06-29 使用者 sign-off；`CONTENT_APPROVED=yes`）**——使用者裁決「影片講解最大詳細、少省略；選材可少但講解要清楚」，全節重拆旁白＋visual_need（第1檔忠實全展開為基準＋4 樞紐加第2檔直覺鷹架），continuity 拆 2 單元、把畫面承載步驟（和差化積來源、`lim_{h→0}` setup、sec′ 步驟）補上。**取代前一次 LOCK**（2026-06-28 sign-off 的壓縮版，git 留存）。本輪六鏡（blocking==0、6 鏡 clean、L5 盲算 11 組 match）＋copyedit（7 tighten 全採納）＋使用者 sign-off 已完成 → LOCKED；後續忠實性由 NFA 把關，post-lock 改稿須對動到單元跑 scoped NFA 回歸（§8）。規格／計畫見 [`_audit/SPEC-ch03-s31-detail-redo.md`](_audit/SPEC-ch03-s31-detail-redo.md)／[`_audit/PLAN-ch03-s31-detail-redo.md`](_audit/PLAN-ch03-s31-detail-redo.md)。narration 認可在編譯出的 `_narration.html` 上進行；本 `.md` 為權威，兩者 MUST 一致。
 

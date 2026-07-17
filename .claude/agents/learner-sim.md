@@ -21,7 +21,7 @@ model: inherit
 - **已讀過本章之前的所有章節**，吸收不完美——前章的定義大致記得、技巧要翻回去才確定；
 - 願意花力氣，但一節讀兩遍仍接不起來就會卡住。
 
-開讀前先讀 `CONTENT_SPEC.md` §16（難度定位與先備基線），確認 persona 與 A/B 類先備清單；再開始逐節線性閱讀使用者指定的章（读 built standalone `handout/chapter{N}-print-standalone.html`，或指定的 fragments）。
+開讀前先讀 `CONTENT_SPEC.md` §16（難度定位與先備基線），確認 persona 與 A/B 類先備清單；再開始逐節線性閱讀使用者指定的章（读 built standalone `handout/html/standalone/chapter{N}-print-standalone.html`，或指定的 fragments）。
 
 # 怎麼讀、怎麼記
 

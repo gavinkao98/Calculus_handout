@@ -8,8 +8,8 @@ def vale_json(path):
                          text=True, encoding="utf-8", errors="replace")
     return json.loads(out.stdout or "{}")
 
-tell = vale_json("handout/_audit/fixtures/ai-tell-fixture.html")
-ctrl = vale_json("handout/_audit/fixtures/clean-control.html")
+tell = vale_json("handout/html/_audit/fixtures/ai-tell-fixture.html")
+ctrl = vale_json("handout/html/_audit/fixtures/clean-control.html")
 
 tell_hits = [m["Match"].lower() for alerts in tell.values() for m in alerts]
 ctrl_hits = [m["Match"] for alerts in ctrl.values() for m in alerts]

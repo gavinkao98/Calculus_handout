@@ -6,16 +6,17 @@
 
 | 產線 | 路徑 | 說明 |
 |------|------|------|
-| HTML 講義 | `handout/` | MathJax/KaTeX＋JS paginator；fragment → print-standalone 組裝 |
+| HTML 講義（撰稿製作線） | `handout/html/` | MathJax/KaTeX＋JS paginator；fragment → `standalone/` 組裝。**整體先做 HTML 講義（2026-07-17 拍板）** |
+| LaTeX 出版排版線 | `handout/latex/` | 定稿時 fragment 確定性轉換 → memoir 模板 → 出版級 A4 PDF（appB pilot GO） |
 | Manim 影片 | `video/` | 旁白＋動畫＋TTS；`make.py` 建置（詳見 [`video/README.md`](video/README.md)） |
-| 舊 LaTeX 講義 | `legacy/tex_handout/` | 已凍結，僅供參照 |
+| 舊 LaTeX 講義 | `legacy/tex_handout/` | 已凍結，僅供參照（與 `handout/latex/` 無關） |
 
 > **講義「完成一章的完整閘序」**見權威總覽 [`handout/PIPELINE.md`](handout/PIPELINE.md)（手稿章 Ch1–4 的 gate 0–8 既成；Ch5 起無手稿 canon 章採 **5-milestone 閘序**＋gate-2 全跑（三閘每章必跑）；含各閘 subagent／rubric／Codex 調用紀律／「做完一章」定義與各章狀態 dashboard）。撰稿模式（Mode A/B/C、手稿與 canon 兩變體）見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md)。
 
 ## 常用指令速查
 
 ```bash
-python handout/build.py           # 建置全部講義章節（可接 ch01 只建一章）
+python handout/html/build.py           # 建置全部講義章節（可接 ch01 只建一章）
 python video/make.py --quality high  # 1080p 渲染影片（預設品質）
 python tools/doctor.py            # 環境健康檢查
 tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
@@ -37,7 +38,7 @@ tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
 - **每次調用任何計費／外部的生成式 API（如 MiMo TTS 批次合成、MiMo-V2.5 VLM 批改、Gemini 文字／影像生成等）之前，都必須先取得使用者明確同意，不可自行調用**（公測免費者仍屬外部 API，同樣先報量徵同意）。批次合成（例如整節旁白 TTS、整章重跑）一律先說明：這次要調用什麼模型、預估用量（場數／beat 數／音訊秒數）與成本，經同意後才執行。
 - 不計費、不連網的離線路徑不在此限，可逕行執行——例如 `tts.py --backend mock`（寫靜音 WAV 驗 manifest／時序）、本地 Manim render、ffmpeg mux/concat。
 - 取得一次同意即代表該次明確說明的工作範圍獲准；範圍變更（換模型、加場景、重跑）需重新徵得同意。
-- **〔2026-07-01 使用者授權〕Codex 唯讀調用（review／覆核／詢問意見／second-opinion）有 standing consent，直接逕行、不逐次徵詢；並盡量用 Codex 取代「停下來問使用者意見」、減少打擾。** 範圍＝**`codex exec -s read-only`**（計畫／code／doc 對抗式 review、徵第二意見，唯讀不改檔；模型走 `~/.codex/config.toml` 預設 gpt-5.6-terra／max）。**工作風格（使用者要求「盡量不要一直打擾我」）：** 自主推進、需要審核或第二意見時調 Codex 而非 ping 使用者；僅在 (i) 真正不可逆／對外動作、(ii) 計費生成（見下）、(iii) Codex＋自身判斷仍無法解的真兩難、(iv) 流程明定須使用者裁決的 deliverable（如交付物 sign-off）時才停下。**此授權僅及 Codex read-only 與「以 Codex 代替詢問」**；真 TTS、高解析渲染、Gemini 文字／影像生成等計費 API **仍須**先報價徵同意（不在此授權內）。
+- **〔2026-07-01 使用者授權〕Codex 唯讀調用（review／覆核／詢問意見／second-opinion）需逐次徵詢。** 範圍＝**`codex exec -s read-only`**（計畫／code／doc 對抗式 review、徵第二意見，唯讀不改檔；模型走 `~/.codex/config.toml` 預設 gpt-5.6-terra／max）。
 
 ## 安裝環境：缺套件／軟體先問、勿造輪子替代、裝完更新文檔
 
@@ -60,7 +61,7 @@ tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
 - **三-mode 撰寫流程（[`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) §Mode B）下，Mode B 的稽核裁決與發現寫進該次修正 commit 的 message body**（subject ≤70 字、body 逐條：原本是什麼、為何不妥、改了什麼、引用證據），好讓未來對話用 `git log --grep="Mode B"` 撈回。參考 commit：`112aa5c`、`0ef06ee`。純 Mode A 或例行 bugfix 不適用。
   - **commit-grep 分流（2026-06-15）：** 上述 `Mode B` 是**講義**線。**video 旁白的忠實稽核已改名 NFA**（旁白忠實稽核，原 video「Mode B」；契約 [`video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md`](video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)），其裁決同樣寫進修正 commit body，但用 `git log --grep="NFA"` 撈回（與講義 `Mode B` 分流，免兩條線混在同一 grep）。
 - **給使用者審核的交付物要用「打開就能讀」的形式（2026-06-12 使用者要求）：** 含數學式的審核文件**不要**交塞滿生 LaTeX 的 `.md`，改產出 standalone HTML（MathJax/KaTeX CDN，雙擊即開、數學即渲染）或其他可直接閱讀的形式。版控紀錄性質的文檔不在此限；凡「等使用者過目裁決」的東西一律照此辦理。**報告的框架／說明文字一律繁體中文（2026-07-11 使用者提醒）**——比照上方「與使用者對話一律用繁體中文」規則，僅**引文原句、數學式（LaTeX）、識別碼（finding ID／維度碼 D1–D8 等）、檔名／路徑、shell、技術術語**保留英文原樣；書中被審的英文課文引文照登不譯。
-- **每完成一輪撰寫後也要產 HTML 報告（2026-06-15 使用者要求）：** 不只「待裁決」的候選／findings 要 HTML——**凡完成一輪內容撰寫（Mode A／C 等），都要對實際寫入的內容另產一份 standalone HTML 報告**（MathJax/KaTeX CDN、雙擊即開、數學即渲染），逐條呈現所寫段落＋locus＋`[source:]`＋該輪 Mode B 結果，供使用者過目，不要只在對話裡給文字摘要。比照 [`handout/_audit/REVIEW-ch01-modec-candidates.html`](handout/_audit/REVIEW-ch01-modec-candidates.html) 的形式，檔名用 `REVIEW-…-applied.html` 之類，與「候選／裁決稿」分開。
+- **每完成一輪撰寫後也要產 HTML 報告（2026-06-15 使用者要求）：** 不只「待裁決」的候選／findings 要 HTML——**凡完成一輪內容撰寫（Mode A／C 等），都要對實際寫入的內容另產一份 standalone HTML 報告**（MathJax/KaTeX CDN、雙擊即開、數學即渲染），逐條呈現所寫段落＋locus＋`[source:]`＋該輪 Mode B 結果，供使用者過目，不要只在對話裡給文字摘要。比照 [`handout/html/_audit/REVIEW-ch01-modec-candidates.html`](handout/html/_audit/REVIEW-ch01-modec-candidates.html) 的形式，檔名用 `REVIEW-…-applied.html` 之類，與「候選／裁決稿」分開。
 - **審核 finding 修完後必須回歸審核（2026-06-12 使用者要求）：** 修完 blocking／advisory finding 後，不可直接宣告完成——必須對修改過的項目重新跑一輪審核（Codex 或手動比對均可），確認修改本身沒有引入新問題。回歸審核的結果附在原稽核文檔中記錄。
 
 ## 程式／工程任務的行為準則（Karpathy guidelines）

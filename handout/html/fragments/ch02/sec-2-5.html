@@ -1,0 +1,343 @@
+<!-- §2.5 The Product and Quotient Rules.
+     Generated from exp-ch02/seed_ch02_s5.md (manuscript pp. 11–13, the FINAL
+     manuscript section), authored directly into the handout-kit semantic markup
+     per CONTRACT-html-writing.md. Direction brief brief_s25.md approved at ③
+     (2026-06-08) with these gate decisions:
+       (A) domain hypotheses made explicit on both rules;
+       (B) all three ROADMAP cautions included, spread across the two subsections
+           ((fg)'≠f'g'; Δx≡h; quotient asymmetry);
+       (C) Strategy 2.2 as a 3-step box including "simplify first";
+       (D) Figure 2.4 = product-rule rectangle-area interpretation ADDED at user
+           request — rendered as inline schematic SVG (plot.js/buildPlot has no
+           fill primitive), so there is NO figures.js entry for this section;
+       (E) all three worked examples approved; (F) Ex 2.16 → 2.20 uses x/(x^2+1);
+       (G) closing fence to Ch3 chain rule only (no preview).
+     Numbering is MANUAL (kit has no auto-counter); cross-references are plain
+     prose. Counters continue from §2.4:
+       Theorem 2.5 → 2.6, 2.7;  Example 2.18 → 2.19, 2.20, 2.21, 2.22, 2.23;
+       (2026-06-22 example-supplement import: old 2.15 → 2.19, old 2.16 → 2.20,
+        +E2.5-a quotient error-spotting = 2.21, old 2.17 → 2.22,
+        +O2.5-a quotient × exponential = 2.23.)
+       Strategy 2.1 → 2.2;  Figure 2.3 → 2.4.  Cautions are unnumbered.
+     Both proofs follow the manuscript's add-and-subtract technique; the quotient
+     proof keeps the manuscript's Δx notation (a caution notes Δx ≡ h). The product
+     proof cites §2.3 Theorem 2.1 (differentiable ⇒ continuous) for lim g(x+h)=g(x);
+     the quotient proof needs g(x) ≠ 0. No exercises: self-authored problems are
+     written as worked examples (see brief_s25.md "題目政策"). -->
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">2.5</span>The Product and Quotient Rules</h2>
+  </header>
+
+  <!-- expansion:intuition — open by recalling §2.4's clean sum/difference behavior, then flag that products and quotients are the unfinished business -->
+  <p>In §2.4 we learned that differentiation behaves beautifully with respect to addition: the derivative of a sum is the sum of the derivatives, and the same holds for differences, \((f \pm g)' = f' \pm g'\) (Theorem 2.4). It is tempting to hope that products and quotients are just as docile — that the derivative of a product is the product of the derivatives. This section shows that they are <em>not</em>, finds the correct rules, and so completes the toolkit of basic differentiation rules begun in §2.4. We treat the two cases in turn: first \(\dfrac{d}{dx}(fg)\), then \(\dfrac{d}{dx}\!\left(\dfrac{f}{g}\right)\).</p>
+
+  <h3 class="subsec-head">The product rule</h3>
+
+  <!-- expansion:intuition — set up the naive guess so the counterexample can demolish it (failure-first) -->
+  <p>The cleanest guess one could make is that derivatives pass through a product untouched, \((fg)' = f'g'\). A single example shows this is false.</p>
+
+  <!-- expansion:caution — headline pitfall (fg)'≠f'g'; preserves the manuscript's own counterexample f=x, g=x^2. §2.4 prose-fenced this; here it becomes the formal caution -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>In general \((fg)' \ne f'g'\). Take \(f(x) = x\) and \(g(x) = x^{2}\), so that \(fg = x^{3}\). Then \((fg)' = 3x^{2}\), whereas</p>
+      <p>\[ f'(x)\,g'(x) = (1)(2x) = 2x \ne 3x^{2}. \]</p>
+      <p>Differentiating a product is <em>not</em> a term-by-term operation. This is the single most common error with the rules of this chapter; the correct rule is below.</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — geometric motivation: read fg as the area of a rectangle and watch the increment split into two strips plus a negligible corner; this is the picture the algebraic proof makes rigorous -->
+  <p>To see where the correct rule comes from, picture \(f(x)\) and \(g(x)\) as the two side lengths of a rectangle, so that the product \(f(x)\,g(x)\) is its area. Increase \(x\) by a small amount \(h\): the width grows by \(\Delta f = f(x+h) - f(x)\) and the height by \(\Delta g = g(x+h) - g(x)\). The extra area is an L-shaped border made of three pieces (Figure 2.9): a strip \(g\,\Delta f\) along one side, a strip \(f\,\Delta g\) along the other, and a small corner \(\Delta f\,\Delta g\).</p>
+
+  <!-- expansion:figure — product-rule rectangle-area decomposition (ADDED at ③ decision D). Inline schematic SVG per CONTRACT (no fill primitive in plot.js); not a figures.js entry. Regions: base fg (neutral), the two first-order strips g·Δf and f·Δg (primary/blue tint), the second-order corner Δf·Δg (caution/red tint) -->
+  <figure class="figure" id="fig-product-area">
+    <div class="figure-art">
+      <svg viewBox="0 0 330 244" style="width:330px" class="fig-svg" role="img"
+           aria-label="A rectangle of width f and height g, with the area increment when the sides grow by Δf and Δg split into a strip g times Δf, a strip f times Δg, and a small corner Δf times Δg.">
+        <!-- four area regions -->
+        <rect x="60" y="100" width="130" height="100" fill="var(--ink)" fill-opacity="0.05" stroke="var(--ink-soft)" stroke-width="1"/>
+        <rect x="190" y="100" width="80" height="100" fill="var(--c-primary)" fill-opacity="0.14" stroke="var(--ink-soft)" stroke-width="1"/>
+        <rect x="60" y="40" width="130" height="60" fill="var(--c-primary)" fill-opacity="0.14" stroke="var(--ink-soft)" stroke-width="1"/>
+        <rect x="190" y="40" width="80" height="60" fill="var(--c-caution)" fill-opacity="0.16" stroke="var(--ink-soft)" stroke-width="1"/>
+        <!-- dimension ticks below (split f | Δf) and at left (split g | Δg) -->
+        <line x1="60" y1="200" x2="60" y2="214" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="190" y1="200" x2="190" y2="214" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="270" y1="200" x2="270" y2="214" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="60" y1="200" x2="46" y2="200" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="60" y1="100" x2="46" y2="100" stroke="var(--ink-soft)" stroke-width="1"/>
+        <line x1="60" y1="40" x2="46" y2="40" stroke="var(--ink-soft)" stroke-width="1"/>
+        <!-- single anchor label in the base region; the strip/corner areas are named in the caption and body prose, keeping the drawing label-light -->
+        <text x="125" y="155" text-anchor="middle" fill="var(--ink)" font-size="15" font-style="italic">fg</text>
+        <!-- dimension labels -->
+        <text x="125" y="230" text-anchor="middle" class="ptlab" font-style="italic">f</text>
+        <text x="230" y="230" text-anchor="middle" class="ptlab">Δ<tspan font-style="italic">f</tspan></text>
+        <text x="38" y="154" text-anchor="end" class="ptlab" font-style="italic">g</text>
+        <text x="38" y="74" text-anchor="end" class="ptlab">Δ<tspan font-style="italic">g</tspan></text>
+      </svg>
+    </div>
+    <figcaption><span class="fig-no">Figure 2.9</span> Area model for the product rule: base \(fg\), two strips, and the corner \(\Delta f\,\Delta g\).</figcaption>
+  </figure>
+
+  <!-- expansion:intuition — convert the picture into the formula: the two strips give f'g and fg'; the corner is second-order and vanishes -->
+  <p>Dividing the added area by \(h\) and letting \(h \to 0\), the two strips contribute \(g\,\dfrac{\Delta f}{h} \to g\,f'\) and \(f\,\dfrac{\Delta g}{h} \to f\,g'\). The corner contributes \(\dfrac{\Delta f\,\Delta g}{h} = \dfrac{\Delta f}{h}\,\Delta g \to f' \cdot 0 = 0\), since \(\Delta f/h\) stays finite (tending to \(f'\)) while \(\Delta g \to 0\). The surviving pieces are exactly the two terms of the product rule.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.6</span><span class="env-name">The product rule</span></p>
+    <div class="env-body">
+      <p>If \(f\) and \(g\) are differentiable at \(x\), then their product \(fg\) is differentiable at \(x\), and</p>
+      <p>\[ \begin{aligned}
+        &(fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x), \\[2pt]
+        &\text{i.e.}\quad \frac{d}{dx}(fg) = \left(\frac{d}{dx}f\right)g + f\left(\frac{d}{dx}g\right).
+      \end{aligned} \]</p>
+    </div>
+  </section>
+
+  <!-- proof follows the manuscript's add-and-subtract technique (seed); the lim g(x+h)=g(x) step is justified by §2.3 Theorem 2.1 (faithfulness: supply the hypothesis the manuscript uses implicitly) -->
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>We start from the definition and apply a useful trick: add and subtract \(f(x)\,g(x+h)\) in the numerator, which lets us isolate the change in \(f\) from the change in \(g\):</p>
+      <p>\[ \begin{aligned}
+        &f(x+h)g(x+h) - f(x)g(x) \\
+        &= \bigl[f(x+h)g(x+h) - f(x)g(x+h)\bigr] + \bigl[f(x)g(x+h) - f(x)g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+h) - f(x)\bigr]\,g(x+h) + f(x)\,\bigl[g(x+h) - g(x)\bigr].
+      \end{aligned} \]</p>
+      <p>Dividing by \(h\),</p>
+      <p>\[ \begin{aligned}
+        &\frac{f(x+h)g(x+h) - f(x)g(x)}{h} \\[2pt]
+        &= \frac{f(x+h) - f(x)}{h}\,g(x+h) \;+\; f(x)\,\frac{g(x+h) - g(x)}{h}.
+      \end{aligned} \]</p>
+      <p>Now let \(h \to 0\) and evaluate each piece with the limit laws of §1.5. The two difference quotients tend to \(f'(x)\) and \(g'(x)\). For the remaining factor, \(g(x+h) \to g(x)\): this is exactly the statement that \(g\) is continuous at \(x\), which holds because \(g\), being differentiable at \(x\), is continuous there (Theorem 2.1, §2.3). Therefore</p>
+      <p>\[ (fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x). \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — inline mini-application of the product rule, anchoring it before the manuscript's worked example -->
+  <p>The rule is quick to apply once it is in hand. For instance,</p>
+  <p>\[ \frac{d}{dx}\bigl(x^{2} e^{x}\bigr) = (2x)\,e^{x} + x^{2}\,e^{x} = x(x + 2)\,e^{x}, \]</p>
+  <p>where we used the power rule (Theorem 2.3) for \(x^{2}\) and \((e^{x})' = e^{x}\) (Theorem 2.5) for the exponential factor. The next example isolates the same product-rule pattern.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.19</span></p>
+      <div class="env-body">
+        <p>Differentiate \(h(x) = x\,e^{x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(h\) is a product of \(f(x) = x\) and \(g(x) = e^{x}\), with \(f'(x) = 1\) and \(g'(x) = e^{x}\) (Theorem 2.5). The product rule gives</p>
+        <p>\[ h'(x) = f'(x)\,g(x) + f(x)\,g'(x) = (1)\,e^{x} + x\,e^{x} = e^{x}(1 + x). \]</p>
+        <p>Notice that neither factor alone produces the answer: the term \(e^{x}\) comes from differentiating \(x\) while keeping \(e^{x}\), and the term \(x\,e^{x}\) from keeping \(x\) while differentiating \(e^{x}\) — the two strips of Figure 2.9 in algebraic form.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:application — product rule in economics: marginal revenue R'(q)=p'(q)q+p(q) [pass: enrichment] -->
+  <p>The product rule has a clean reading in economics. Suppose a firm sells \(q\) units at a price \(p(q)\) that depends on how many are sold; its revenue is the product \(R(q) = p(q)\,q\). The product rule gives the <em>marginal revenue</em> \(R'(q) = p'(q)\,q + p(q)\): selling one more unit changes revenue in two ways at once — through the price change \(p'(q)\) spread over all \(q\) units, and through the price \(p(q)\) fetched by the extra unit itself. The two strips of Figure 2.9 return here as two competing economic effects.</p>
+
+  <h3 class="subsec-head">The quotient rule</h3>
+
+  <!-- expansion:intuition — bridge to the quotient, reusing the same add-and-subtract idea; introduce the manuscript's Δx notation -->
+  <p>The same add-and-subtract idea handles a quotient \(f/g\). From here we write the increment as \(\Delta x\) rather than \(h\); the two symbols mean the same thing, as the next caution records.</p>
+
+  <!-- expansion:caution — ROADMAP notation pitfall, deliberately deferred from §2.2 to here: Δx ≡ h -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The increment in the variable is written either \(h\) or \(\Delta x\); in derivative computations the two are synonymous. Reading \(\Delta x\) as “a small change in \(x\),” the difference quotient \(\bigl(f(x + \Delta x) - f(x)\bigr)/\Delta x\) is identical to the \(h\)-form, and \(\Delta x \to 0\) means the same as \(h \to 0\). We use \(\Delta x\) below; it is the same increment, just a different letter.</p>
+    </div>
+  </section>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.7</span><span class="env-name">The quotient rule</span></p>
+    <div class="env-body">
+      <p>If \(f\) and \(g\) are differentiable at \(x\) and \(g(x) \ne 0\), then the quotient \(f/g\) is differentiable at \(x\), and</p>
+      <p>\[ \left(\frac{f}{g}\right)'(x) = \frac{f'(x)\,g(x) - f(x)\,g'(x)}{\bigl[g(x)\bigr]^{2}}. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:intuition — why the quotient rule carries a minus sign and a g²: g sits in the denominator [pass: enrichment] -->
+  <p>Before the proof, it helps to see why the rule has this shape. Like the product rule, its numerator pairs each function with the derivative of the other — but joined by a <em>minus</em> sign instead of a plus, and the whole expression is divided by \(g^{2}\). The minus sign reflects that \(g\) sits in the denominator: making \(g\) larger makes the quotient \(f/g\) smaller, so the effect of \(g'\) is subtracted rather than added. The \(g^{2}\) is the footprint of differentiating \(1/g\): take the simplest denominator \(g(x) = x\) with numerator \(f(x) = 1\), so that \(f/g = 1/x\), whose derivative was \(-1/x^{2}\) in §2.2 — the same minus sign and the same square that the quotient rule carries in general.</p>
+
+  <!-- proof follows the manuscript: combine over a common denominator, add and subtract f(x)g(x) on the numerator, keep Δx notation; needs g continuous (so g(x+Δx)→g(x)) and g(x)≠0 (so the denominator tends to g(x)^2 ≠ 0) -->
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Combining the two fractions over a common denominator,</p>
+      <p>\[ \frac{f(x+\Delta x)}{g(x+\Delta x)} - \frac{f(x)}{g(x)} = \frac{f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x)}{g(x+\Delta x)\,g(x)}. \]</p>
+      <p>On the numerator we play the same trick as before, now adding and subtracting \(f(x)\,g(x)\):</p>
+      <p>\[ \begin{aligned}
+        &f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x) \\[2pt]
+        &= \bigl[f(x+\Delta x)\,g(x) - f(x)\,g(x)\bigr] - \bigl[f(x)\,g(x+\Delta x) - f(x)\,g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+\Delta x) - f(x)\bigr]\,g(x) - f(x)\,\bigl[g(x+\Delta x) - g(x)\bigr].
+      \end{aligned} \]</p>
+      <p>Dividing the whole difference by \(\Delta x\), the difference quotient becomes</p>
+      <p>\[ \frac{1}{g(x+\Delta x)\,g(x)}\left( \frac{f(x+\Delta x) - f(x)}{\Delta x}\,g(x) - f(x)\,\frac{g(x+\Delta x) - g(x)}{\Delta x} \right). \]</p>
+      <p>Let \(\Delta x \to 0\). The two difference quotients tend to \(f'(x)\) and \(g'(x)\); and \(g(x+\Delta x) \to g(x)\) because \(g\) is continuous at \(x\) (Theorem 2.1, §2.3), so the denominator tends to \(g(x)\,g(x) = \bigl[g(x)\bigr]^{2}\), which is nonzero since \(g(x) \ne 0\). Hence</p>
+      <p>\[ \left(\frac{f}{g}\right)'(x) = \frac{f'(x)\,g(x) - f(x)\,g'(x)}{\bigl[g(x)\bigr]^{2}}. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — ROADMAP pitfall: quotient-rule asymmetry; numerator term order matters -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Unlike the product rule, the quotient rule is <em>not</em> symmetric in \(f\) and \(g\): the numerator is \(f'g - f g'\), with the derivative of the <em>top</em> coming first. Swapping the order to \(f g' - f' g\) flips the sign of the whole derivative, and forgetting the \(g^{2}\) in the denominator changes the answer entirely. A reliable mnemonic reads the numerator as “(derivative of top)(bottom) minus (top)(derivative of bottom), all over bottom squared.”</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — inline mini-application that fulfils the promise made in §2.2 (Example 2.8): recover (1/x)' = −1/x^2 in one line -->
+  <p>As a first check, the quotient rule recovers a derivative we computed laboriously from first principles in §2.2. Taking the numerator to be the constant \(1\) and the denominator \(x\),</p>
+  <p>\[ \frac{d}{dx}\!\left(\frac{1}{x}\right) = \frac{(0)(x) - (1)(1)}{x^{2}} = -\frac{1}{x^{2}}, \]</p>
+  <p>matching the derivative \(-1/x^{2}\) found in Example 2.8 — obtained here in a single line, exactly as promised there.</p>
+
+  <!-- expansion:example — new worked example (approved 2026-06-08, decision E/F): a genuine rational quotient that exercises the full formula and the numerator order -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.20</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = \dfrac{x}{x^{2} + 1}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This is a genuine quotient — no algebra simplifies it to a power — so the quotient rule applies, with top \(x\) and bottom \(x^{2} + 1\). Their derivatives are \(1\) and \(2x\), and the bottom never vanishes, so the rule is valid for every \(x\). Taking care with the order of the numerator terms,</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= \frac{(1)\bigl(x^{2} + 1\bigr) - (x)(2x)}{\bigl(x^{2} + 1\bigr)^{2}} \\[2pt]
+                &= \frac{x^{2} + 1 - 2x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}
+                 = \frac{1 - x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}.
+        \end{aligned} \]</p>
+        <p>Had we mistakenly written the numerator as \((x)(2x) - (1)(x^{2}+1)\), every sign would be wrong. As a sanity check on the result, \(f'(0) = 1 > 0\) (the curve rises through the origin) and \(f'(\pm 1) = 0\), the two points where \(x/(x^{2}+1)\) reaches its largest and smallest values.</p>
+
+        <figure class="figure" data-fig="quotient-example-graph">
+          <figcaption><span class="fig-no">Figure 2.10</span> The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom), from Example 2.20.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — error-spotting on the quotient rule, the worked counterpart to the asymmetry Caution above [source: CLP-1 §2.6 prob_s2.6 Conceptual Q1 "spot the error: 2x/(x+1)"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.21</span></p>
+      <div class="env-body">
+        <p>A student differentiates \(f(x) = \dfrac{2x}{x + 1}\) as follows:</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= \frac{2(x + 1) + 2x}{(x + 1)^{2}} \\[4pt]
+                &= \frac{2(x + 1)}{(x + 1)^{2}} = \frac{2}{x + 1}.
+        \end{aligned} \]</p>
+        <p>Spot <em>all</em> the errors in this work, and give the correct derivative.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>There are two errors.</p>
+        <p><em>Error 1 — wrong sign in the quotient rule.</em> The quotient rule carries a <em>minus</em> sign in the numerator,</p>
+        <p>\[ \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \]</p>
+        <p>but the student wrote a plus. With top \(2x\) and bottom \(x + 1\), the correct numerator is</p>
+        <p>\[ (2)(x + 1) - (2x)(1) = 2x + 2 - 2x = 2, \]</p>
+        <p>not \(2(x + 1) + 2x\).</p>
+        <p><em>Error 2 — incorrect simplification.</em> Even within the student’s own (wrong) numerator, \(2(x + 1) + 2x = 4x + 2\), not \(2(x + 1)\); the \(2x\) term was simply dropped.</p>
+        <p>Carrying out the rule correctly,</p>
+        <p>\[ f'(x) = \frac{(2)(x + 1) - (2x)(1)}{(x + 1)^{2}} = \frac{2}{(x + 1)^{2}}. \]</p>
+        <p>Note that the denominator is \((x + 1)^{2}\), not \((x + 1)\) — a third common slip the student was heading toward.</p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Choosing the right rule</h3>
+
+  <!-- expansion:intuition — motivate the strategy box: with several rules now available, the first task on any problem is to read its shape and pick the rule -->
+  <p>With the constant, power, sum, constant-multiple, product, and quotient rules all in hand, differentiating a given expression is now less about computing limits and more about <em>recognizing</em> which rule its structure calls for. Reading that structure — and simplifying first when possible — is the skill the next box organizes.</p>
+
+  <!-- expansion:strategy — ROADMAP assigns "Selecting among the basic rules" to §2.5; 3 steps incl. the "simplify first" judgment (decision C) -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">2.2</span><span class="env-name">Selecting among the basic rules</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Read the <em>outermost</em> structure of the expression. Is it a single power or polynomial, a sum or difference, a product of two functions, or a quotient of two functions?</li>
+        <li>Before reaching for the product or quotient rule, ask whether algebra simplifies the expression first: a quotient like \(\dfrac{x^{4} - x}{x}\) becomes the polynomial \(x^{3} - 1\), and a product like \(x^{2}\cdot x^{3}\) becomes \(x^{5}\). A rule you can avoid is a rule you cannot misapply.</li>
+        <li>Apply the matching rule: the power, sum, and constant-multiple rules for polynomials and powers; the product rule (Theorem 2.6) for a genuine product; the quotient rule (Theorem 2.7) for a genuine quotient. For compound expressions, the rules combine — a sum of products, a product with a polynomial factor, and so on.</li>
+      </ol>
+      <p>The point is to spend a moment on the shape of the problem before computing: the same expression can be far easier under one rule than another, and some apparent quotients are not quotients at all once simplified.</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — a constant factor or constant denominator needs the constant-multiple rule, not the product/quotient rule [pass: enrichment] -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Not every product or quotient on the page calls for the product or quotient rule. A constant factor is handled by the constant-multiple rule: \(\dfrac{d}{dx}(5x^{3}) = 5 \cdot 3x^{2} = 15x^{2}\), with no need to “differentiate” the \(5\). A constant denominator is likewise just a constant multiple, since \(\dfrac{x^{2}}{3} = \tfrac{1}{3}x^{2}\) gives \(\dfrac{d}{dx}\dfrac{x^{2}}{3} = \tfrac{2}{3}x\). The product and quotient rules are needed only when <em>both</em> parts genuinely depend on \(x\); using them when one part is constant still reaches the answer, but by a longer route with more chances to slip.</p>
+    </div>
+  </section>
+
+  <!-- expansion:example — new worked example (approved 2026-06-08, decision E): rule-selection/diagnosis anchoring Strategy 2.2; (b) is the simplify-first lesson -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.22</span></p>
+      <div class="env-body">
+        <p>For each function, first decide which rule applies, then differentiate:
+        \[ \text{(a)}\ \ y = x^{3} e^{x}, \qquad \text{(b)}\ \ y = \frac{x^{4} - x}{x}, \qquad \text{(c)}\ \ y = \frac{x^{2}}{e^{x}}. \]</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p><em>(a)</em> A genuine product of \(x^{3}\) and \(e^{x}\); use the product rule:</p>
+        <p>\[ y' = (3x^{2})\,e^{x} + x^{3}\,e^{x} = x^{2} e^{x}(3 + x). \]</p>
+        <p><em>(b)</em> This <em>looks</em> like a quotient, but it simplifies first — for \(x \ne 0\), \(\dfrac{x^{4} - x}{x} = x^{3} - 1\) — so the power rule finishes it with no quotient rule at all:</p>
+        <p>\[ y' = 3x^{2}. \]</p>
+        <p><em>(c)</em> A genuine quotient that does not simplify; use the quotient rule, with top \(x^{2}\) and bottom \(e^{x}\):</p>
+        <p>\[ y' = \frac{(2x)\,e^{x} - x^{2}\,e^{x}}{\bigl(e^{x}\bigr)^{2}} = \frac{e^{x}\bigl(2x - x^{2}\bigr)}{e^{2x}} = \frac{2x - x^{2}}{e^{x}}. \]</p>
+        <p>The three parts share no single rule; the work was choosing correctly, and in (b) recognizing that the cleanest move was not to use the quotient rule at all.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example — quotient rule with the exponential in the numerator (opposite arrangement to Example 2.22(c)); the sign of f' locates where the function rises and falls [source: CLP-1 §2.7 prob_s2.7 Procedural "f(x)=e^x/(2x)"; official solution, rewritten] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">2.23</span></p>
+      <div class="env-body">
+        <p>Differentiate \(f(x) = \dfrac{e^{x}}{2x}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The quotient rule with top \(e^{x}\) and bottom \(2x\) gives</p>
+        <p>\[ \begin{aligned}
+          f'(x) &= \frac{(e^{x})(2x) - (e^{x})(2)}{(2x)^{2}} \\[2pt]
+                &= \frac{2e^{x}(x - 1)}{4x^{2}}
+                 = \frac{(x - 1)\,e^{x}}{2x^{2}}.
+        \end{aligned} \]</p>
+        <p>The derivative of the top is again \(e^{x}\) (Theorem 2.5), and the derivative of the bottom is just \(2\). The sign of \(f'(x)\) changes at \(x = 1\): for \(0 < x < 1\) we have \(f'(x) < 0\) (the function is decreasing), while for \(x > 1\) we have \(f'(x) > 0\) (the function is increasing).</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close the chapter's differentiation rules; one-line forward fence to Ch3 chain rule (no preview), per decision G -->
+  <p>The product and quotient rules complete the basic differentiation toolkit of this chapter: together with the constant, power, sum, and constant-multiple rules and the derivative of \(e^{x}\), they let us differentiate any algebraic or exponential combination built by adding, scaling, multiplying, and dividing. One important way of combining functions remains untouched — <em>composition</em>, forming \(f\bigl(g(x)\bigr)\) — and it needs a rule of its own, the chain rule, which opens the next chapter.</p>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <!-- expansion:summary — chapter-level summary (ch02's final section): point→function→existence→rules arc + forward fence to Ch3 (chain rule, integer-only power rule) and Ch4 (rigorous e^x) -->
+  <p>Chapter 2 built the derivative in stages. At a single point it is a limit of secant slopes,
+  \[ f'(a) = \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} = \lim_{x \to a} \frac{f(x) - f(a)}{x - a}, \]
+  the slope of the tangent line \(y - f(a) = f'(a)(x - a)\) and, read locally, the best linear approximation to \(f\) near \(a\) (§2.1). Letting the basepoint vary turns this number into a function \(f'\) — the derivative — recoverable from the graph of \(f\) and written interchangeably as \(f'\), \(\tfrac{df}{dx}\), or \(\tfrac{d}{dx}[f]\) (§2.2).</p>
+
+  <p>Not every function has a derivative everywhere. The limit can fail at a corner (\(\lvert x \rvert\) at \(0\)), at a vertical tangent (\(\sqrt[3]{x}\) at \(0\)), or at any discontinuity, so differentiability is a genuinely stronger condition than continuity: differentiable \(\Rightarrow\) continuous (Theorem 2.1), but the converse is false. Iterating the operation gives the higher derivatives \(f''\), \(f'''\), \(\dots\), \(f^{(n)}\) (§2.3).</p>
+
+  <p>The rest of the chapter replaced the limit, case by case, with arithmetic. The constant rule \((c)' = 0\) (Theorem 2.2), the power rule \((x^{n})' = n x^{n - 1}\) for positive integers \(n\) (Theorem 2.3), and linearity — the sum and constant-multiple rules (Theorem 2.4) — together differentiate every polynomial term by term (Corollary 2.1). The natural exponential earned its defining property \((e^{x})' = e^{x}\) (Theorem 2.5), proved here from the series for \(e^{x}\) (§2.4); Chapter 4 will make that step fully rigorous. Products and quotients then closed the toolkit:
+  \[ (fg)' = f'g + fg', \qquad \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \]
+  the first emphatically <em>not</em> \(f'g'\), the second sensitive to the order of its numerator (§2.5).</p>
+
+  <p>With these rules we can differentiate any function assembled from powers and the exponential by adding, scaling, multiplying, and dividing. Two things still lie outside their reach: <em>composition</em>, \(f\bigl(g(x)\bigr)\), which no rule here touches, and the power rule itself, so far secured only for integer exponents. Both are the business of Chapter 3, which opens with the rule for compositions — the chain rule — and uses it to extend the power rule and to differentiate the trigonometric, logarithmic, and inverse functions.</p>
+
+</article>

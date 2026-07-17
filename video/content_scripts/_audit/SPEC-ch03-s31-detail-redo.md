@@ -51,7 +51,7 @@
 
 ## 3. 場景藍圖（current 19 內容場 → 約 22–26）
 
-> 仍是四階段結構（intro／4 divider／outro 不變）。下表是**內容場**的重做意向；正式逐場欄位於 Stage 1 內容稿撰寫時定稿。忠實對象：[`handout/fragments/ch03/sec-3-1.html`](../../../handout/fragments/ch03/sec-3-1.html)。
+> 仍是四階段結構（intro／4 divider／outro 不變）。下表是**內容場**的重做意向；正式逐場欄位於 Stage 1 內容稿撰寫時定稿。忠實對象：[`handout/html/fragments/ch03/sec-3-1.html`](../../../handout/html/fragments/ch03/sec-3-1.html)。
 
 ### Stage 1 — The Limit Behind the Slope
 - **why_trig_is_different**（motivation）— 小改。保留「funnels to `lim sinθ/θ`（0/0）」的課本路線；加一個 beat 把 0/0 障礙講得更生動（不引入 angle-addition 新路線，維持課本 sum-to-product 進路）。
@@ -121,7 +121,7 @@
 
 ## 9. 參照
 
-- 忠實來源：[`handout/fragments/ch03/sec-3-1.html`](../../../handout/fragments/ch03/sec-3-1.html)
+- 忠實來源：[`handout/html/fragments/ch03/sec-3-1.html`](../../../handout/html/fragments/ch03/sec-3-1.html)
 - 方法論：[`CONTENT_METHODOLOGY.md`](../../CONTENT_METHODOLOGY.md)（§1 detail-over-compression、§3 proof split、§8 維護）
 - 視覺/容量：[`DESIGN.md`](../../DESIGN.md)（容量契約、多頁 `part:`、template catalog）
 - 前版計畫：[`PLAN-ch03-s31-video.md`](PLAN-ch03-s31-video.md)（工程節奏沿用、密度假設被本檔取代）

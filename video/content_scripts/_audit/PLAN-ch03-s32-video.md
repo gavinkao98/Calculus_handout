@@ -17,7 +17,7 @@
 ## 開工前必讀：現況與脈絡（新對話零脈絡也能照做）
 
 - **倉庫：** 影片產線在 `video/`。**分支：續用 `video/template-redesign-navy-spine`**（不另開分支）。
-- **講義輸入源（權威、忠實對象）：** [`../../../handout/fragments/ch03/sec-3-2.html`](../../../handout/fragments/ch03/sec-3-2.html)（建置版 `handout/chapter3-print-standalone.html` §3.2）。檔頭含編號契約：Thm 3.3（chain rule）、Prop 3.3（兩形式等價）、Def 3.1（餘項形式）、Ex 3.4–3.8、Fig 3.5（composed mapping）／3.6（remainder-tangent）、Remark 3.2（Leibniz）、Strategy 3.1（分解）、未編號 Caution。③ 決策 D5（Def 用 Option B：§2.2 極限定義不重編，只鑄餘項形式為 Def 3.1、等價為 Prop 3.3）、敘事 intuition-first、D6（積法則 §2.5／可微⇒連續 §2.3 Thm 2.1 引用不重證）、D7（ln／arcsin／x^x 留 §3.3）、D10（不做隱函數微分）。
+- **講義輸入源（權威、忠實對象）：** [`../../../handout/html/fragments/ch03/sec-3-2.html`](../../../handout/html/fragments/ch03/sec-3-2.html)（建置版 `handout/html/standalone/chapter3-print-standalone.html` §3.2）。檔頭含編號契約：Thm 3.3（chain rule）、Prop 3.3（兩形式等價）、Def 3.1（餘項形式）、Ex 3.4–3.8、Fig 3.5（composed mapping）／3.6（remainder-tangent）、Remark 3.2（Leibniz）、Strategy 3.1（分解）、未編號 Caution。③ 決策 D5（Def 用 Option B：§2.2 極限定義不重編，只鑄餘項形式為 Def 3.1、等價為 Prop 3.3）、敘事 intuition-first、D6（積法則 §2.5／可微⇒連續 §2.3 Thm 2.1 引用不重證）、D7（ln／arcsin／x^x 留 §3.3）、D10（不做隱函數微分）。
 - **格式範本（照抄結構與風格）：** [`../ch03_trig_derivatives.md`](../ch03_trig_derivatives.md)（§3.1 內容稿，LOCKED）＋其審核稿 [`../ch03_trig_derivatives_narration.html`](../ch03_trig_derivatives_narration.html)。
 - **deck id：** `ch03_chain_rule`。**承接：** §3.1 outro 指向「3.2 The Chain Rule」；本節 intro 接續 §3.1（「sin x 會微，但 sin(x²) 不會」），outro 指向「3.3 Applications of the Chain Rule」。
 - **§3.2 教學重量：** 概念＋符號混合，但證明段（Stage 2「Why」）符號吃重（餘項形式＋ε-δ）。整節**非 ≥70% 符號**（前有 statement/figure/strategy、後有 5 個例子），故**不套 §5 symbol-heavy 條件化**，但 Fig 3.5／3.6 兩張圖吃重、全視覺處理。
@@ -87,7 +87,7 @@
 
 ### Task 0 — 前置與範本就位
 - [ ] 確認分支 `video/template-redesign-navy-spine`、工作樹狀態：`git status`。
-- [ ] 通讀 [`sec-3-2.html`](../../../handout/fragments/ch03/sec-3-2.html) 與 §3.1 內容稿範本（已讀）。
+- [ ] 通讀 [`sec-3-2.html`](../../../handout/html/fragments/ch03/sec-3-2.html) 與 §3.1 內容稿範本（已讀）。
 - **驗證點：** 範本可讀、§3.2 編號契約掌握。
 
 ### Task 1 — 內容稿：header＋meta＋intro＋Act 1（units 1–6）

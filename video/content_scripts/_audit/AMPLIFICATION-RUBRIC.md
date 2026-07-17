@@ -6,7 +6,7 @@
 
 ## 錨與範圍
 
-- **錨＝ handout 的 `expansion:*` 標記**（HTML 註解 `<!-- expansion:<cat> … -->`，權威定義見 [`../../../README.md`](../../../README.md) §撰稿工作流程）。系統性遍布 `handout/fragments/**`（`intuition`／`example`／`figure`／`caution`／`application`／`formula`／`strategy`／`summary`／`history`）。
+- **錨＝ handout 的 `expansion:*` 標記**（HTML 註解 `<!-- expansion:<cat> … -->`，權威定義見 [`../../../README.md`](../../../README.md) §撰稿工作流程）。系統性遍布 `handout/html/fragments/**`（`intuition`／`example`／`figure`／`caution`／`application`／`formula`／`strategy`／`summary`／`history`）。
 - **本審只主管兩類承重敘述：**
   - **`intuition`（最高優先）**：白話直覺、動機、informal gloss——讓初學者先有畫面再看形式。
   - **`application`**：真實情境／應用例。

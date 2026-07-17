@@ -1,0 +1,2524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Appendix B — Print build</title>
+
+<!-- ════════════════════════════════════════════════════════════════
+     圖片寬度控制面板 —— 直接改下面的數字即可（px 固定寬 / % 相對頁寬）
+     並排或多格圖（1.1 / 1.7 / 1.9）控制的是「每一格」的寬度。
+     ════════════════════════════════════════════════════════════════ -->
+<style>
+:root {
+  --fig-1-1:  250px;   /* Figure 1.1  horizontal line test (pair) */
+  --fig-1-2:  340px;   /* Figure 1.2  inverse mapping diagram */
+  --fig-1-3:  280px;   /* Figure 1.3  restricted x^2, sqrt x, y=x */
+  --fig-1-4:  500px;   /* Figure 1.4  sine not one-to-one (SVG 620×220, wide) */
+  --fig-1-5:  340px;   /* Figure 1.5  restricted sine (SVG 380×260) */
+  --fig-1-6:  200px;   /* Figure 1.6  arcsin right triangle (SVG 300×130) */
+  --fig-1-7:  340px;   /* Figure 1.7  restricted cosine (SVG 380×200) */
+  --fig-1-8:  300px;   /* Figure 1.8  restricted tangent (SVG 320×320) */
+  --fig-1-9:  500px;   /* Figure 1.9  arctan reflection */
+  --fig-1-10: 200px;   /* Figure 1.10 arctan 10 right triangle (SVG 240×180) */
+  --fig-1-11: 100%;    /* Figure 1.11 arctan x right triangle (SVG 240×180) */
+  --fig-1-12: 380px;   /* Figure 1.12 three functions, same limit (triple layout) */
+  --fig-1-13: 380px;   /* Figure 1.13 read-off-the-graph example */
+  --fig-1-14: 340px;   /* Figure 1.14 left/right limits differ */
+  --fig-1-15: 100%;    /* Figure 1.15 piecewise jump */
+  --fig-1-16: 200px;   /* Figure 1.16 1/x^2 vs 1/x */
+  --fig-1-17: 340px;   /* Figure 1.17 four one-sided infinite limits (grid layout) */
+  --fig-1-18: 360px;   /* Figure 1.18 vertical asymptote */
+  --fig-1-19: 400px;   /* Figure 1.19 ln asymptote */
+  --fig-1-20: 380px;   /* Figure 1.20 removable hole */
+  --fig-1-21: 350px;   /* Figure 1.21 floor function */
+  --fig-1-22: 420px;   /* Figure 1.22 squeeze theorem */
+  --fig-1-23: 400px;   /* Figure 1.23 x^2 sin(1/x) squeeze */
+  --fig-1-24: 360px;   /* Figure 1.24 epsilon-delta geometry */
+  --fig-1-25: 100%;    /* Figure 1.25 epsilon-delta dynamic pair */
+}
+</style>
+
+<!-- Google Fonts: Inter for UI -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- New Computer Modern (prose/text faces) — matches MathJax 4 "mathjax-newcm" math font.
+     Source: npm web-computer-modern@1.1.0-new-cm-7-0-2 via jsDelivr. License: GUST Font License.
+     10pt optical size ("Serif 10"). NOTE: filenames contain %20-encoded spaces — keep them. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+
+<!-- MathJax 4 (CHTML output with inline line-breaking) -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    macros: {
+      arccsc: '\\operatorname{arccsc}',
+      arcsec: '\\operatorname{arcsec}',
+      arccot: '\\operatorname{arccot}'
+    }
+  },
+  chtml: {
+    mtextInheritFont: true,
+    matchFontHeight: true
+  },
+  output: {
+    displayOverflow: 'linebreak',
+    linebreaks: {
+      inline: true,
+      width: '100%',
+      lineleading: 0.2
+    }
+  },
+  startup: { typeset: false }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+
+<style>
+/* ============================================================
+   skin-hs.css — inlined + modified: Times New Roman + MathJax
+   ============================================================ */
+.paper {
+  --c-primary: oklch(0.50 0.13 245);
+  --c-caution: oklch(0.50 0.155 25);
+  --c-aux: oklch(0.55 0.01 260);
+  --c-axis: #474b54;
+  --ink: #1b1c1f;
+  --ink-soft: #565a63;
+  --ink-faint: #8a8e98;
+  --paper: #ffffff;
+  --rule: #e5e7eb;
+  --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
+  --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
+  /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
+  --ui: "Inter", -apple-system, system-ui, sans-serif;
+  --a-concept:  oklch(0.50 0.13 55);
+  --a-result:   oklch(0.50 0.13 245);
+  --a-practice: oklch(0.50 0.13 152);
+  --a-aside:    oklch(0.50 0.02 260);
+  --a-caution:  oklch(0.50 0.155 25);
+  --a-strategy: oklch(0.50 0.13 290);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-base, 17.5px);
+  line-height: var(--lh-base, 1.62);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+.paper *, .paper *::before, .paper *::after { box-sizing: border-box; }
+.paper .page { padding: 52px 58px 64px; max-width: 760px; margin: 0 auto; }
+.skin-hs .page { hyphens: auto; -webkit-hyphens: auto; }
+.skin-hs p, .skin-hs li { text-align: justify; text-justify: inter-word; }
+.paper .ragged { text-align: left; }
+.paper p { margin: 0 0 .85em; text-wrap: pretty; }
+.paper em { font-style: italic; }
+.paper .informal { font-style: italic; color: var(--ink-soft); }
+.paper ol { margin: .2em 0 .9em; padding-left: 1.5em; }
+.paper li { margin: .35em 0; text-wrap: pretty; }
+.paper .warmup { counter-reset: wu; list-style: none; padding-left: 0; }
+.paper .warmup > li { counter-increment: wu; position: relative; padding-left: 2.1em; }
+.paper .warmup > li::before {
+  content: "(" counter(wu, lower-alpha) ")";
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
+}
+.paper mjx-container[display="true"] { margin: .55em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
+.paper .qed { display: block; text-align: right; margin: -1.62em 0 0; height: 1.62em; pointer-events: none; }
+.paper .qed::after {
+  content: ""; display: inline-block; width: .56em; height: .56em;
+  border: 1.3px solid var(--ink-soft);
+}
+.paper .env-body > :has(+ .qed) { margin-bottom: 0; display: flow-root; }
+.paper .env-body::after { content: ""; display: block; clear: both; }
+.paper .sec-head {
+  margin-top: 2.7em; padding-top: 1.35em;
+  border-top: 1px solid var(--rule); margin-bottom: 1.5em;
+}
+.sheet-body > .sec-head:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.paper .sec-kicker {
+  font-family: var(--ui); font-size: .7rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--c-primary); font-weight: 700; margin-bottom: .55em;
+}
+.paper .sec-title { font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -.012em; margin: 0; }
+.paper .sec-no { color: var(--c-primary); margin-right: .5em; font-weight: 600; }
+.paper .subsec-head {
+  font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
+  display: flex; align-items: center; gap: .55em; color: var(--ink);
+}
+.paper .page-break-before { break-before: page; page-break-before: always; }
+.paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
+.paper .figure { margin: 1.7em 0; text-align: center; }
+.paper .figure-art { display: flex; justify-content: center; }
+.paper .figure-art--pair { gap: 26px; }
+.paper .fig-svg { width: 100%; max-width: var(--fig-w, var(--fig-w-pair)); height: auto; }
+.paper .figure-art:not(.figure-art--pair) .fig-svg { max-width: var(--fig-w, var(--fig-w-single)); }
+.paper figcaption {
+  font-family: var(--ui); font-size: .8em; line-height: 1.5;
+  color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
+}
+.paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
+.paper figcaption mjx-container { font-size: .95em; }
+.paper .axis { stroke: var(--c-axis); stroke-width: 1.25; fill: none; stroke-linecap: round; }
+.paper .curve { stroke: var(--c-primary); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .dot { fill: var(--ink); }
+.paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
+.paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
+.paper .arrow-bwd { stroke: var(--c-caution); stroke-width: 2; fill: none; }
+.paper .fig-svg text { font-family: var(--ui); font-size: 13px; }
+.paper .axlab { fill: var(--c-aux); font-style: italic; }
+.paper .lab-curve { fill: var(--c-primary); font-style: italic; }
+.paper .lab-ref, .paper .lab-ref-b { fill: var(--c-caution); }
+.paper .ptlab { fill: var(--ink-soft); font-size: 12px; }
+.paper .setlab { fill: var(--ink); font-weight: 600; font-size: 14.5px; text-anchor: middle; }
+
+/* env blocks */
+.skin-hs .env {
+  --accent: var(--a-aside);
+  margin: 1.2em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--accent) 38%, var(--paper));
+}
+.skin-hs .env-definition  { --accent: var(--a-concept); }
+.skin-hs .env-theorem, .skin-hs .env-proposition, .skin-hs .env-corollary { --accent: var(--a-result); }
+.skin-hs .env-example, .skin-hs .env-solution, .skin-hs .env-exercise { --accent: var(--a-practice); }
+.skin-hs .env-remark { --accent: var(--a-aside); }
+.skin-hs .env-head {
+  display: flex; align-items: baseline; gap: .5em; flex-wrap: wrap;
+  margin: 0 0 .55em; font-family: var(--ui);
+}
+.skin-hs .env-kicker {
+  font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--accent); padding: 3px 10px; border-radius: 999px; line-height: 1.5;
+}
+.skin-hs .env-num { font-weight: 700; color: var(--accent); font-size: .94em; }
+.skin-hs .env-name { font-style: italic; font-weight: 400; color: var(--ink-soft); font-family: var(--serif); font-size: 1em; }
+.skin-hs .env-body > p:first-child { margin-top: 0; }
+.skin-hs .env-body > :last-child { margin-bottom: 0; }
+.skin-hs .env-theorem .env-body, .skin-hs .env-proposition .env-body { font-style: italic; }
+.skin-hs .env-theorem .env-body mjx-container, .skin-hs .env-proposition .env-body mjx-container { font-style: normal; }
+.skin-hs .env-definition em { font-style: italic; }
+.skin-hs .env-remark { color: var(--ink-soft); font-size: .97em; }
+.skin-hs .env-remark .env-kicker { background: transparent; color: var(--a-aside); border: 1px solid color-mix(in srgb, var(--a-aside) 45%, var(--paper)); }
+.skin-hs .env-proof { --accent: var(--a-result); }
+.skin-hs .env-proof .env-kicker {
+  background: transparent; color: var(--a-result); font-style: italic; letter-spacing: .04em;
+  border: 1px solid color-mix(in srgb, var(--a-result) 45%, var(--paper));
+}
+.skin-hs .qed-proof::after { border-color: var(--ink); }
+.skin-hs .workedexample {
+  margin: 1.6em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--a-practice) 38%, var(--paper));
+  display: flow-root;
+}
+.skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
+.skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
+.skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
+.skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
+.skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
+.skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
+.skin-hs .env-exercise .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid var(--a-practice); }
+.skin-hs .env-caution, .skin-hs .env-strategy {
+  padding: 15px 20px; border-radius: 8px; margin: 1.4em 0;
+  border-left-width: 4px; border-left-style: solid;
+}
+.skin-hs .env-caution {
+  --accent: var(--a-caution);
+  background: color-mix(in srgb, var(--a-caution) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-caution) 22%, var(--paper));
+  border-left-color: var(--a-caution);
+}
+.skin-hs .env-strategy {
+  --accent: var(--a-strategy);
+  background: color-mix(in srgb, var(--a-strategy) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-strategy) 22%, var(--paper));
+  border-left-color: var(--a-strategy);
+}
+.skin-hs .env-caution .env-name, .skin-hs .env-strategy .env-name { color: var(--ink-soft); }
+.skin-hs .env-strategy .steps { margin-bottom: 0; }
+.skin-hs.vivid .env { border-left-color: color-mix(in srgb, var(--accent) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .workedexample { border-left-color: color-mix(in srgb, var(--a-practice) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .env-kicker { font-size: .64rem; padding: 3.5px 11px; }
+
+/* ============================================================
+   figs.css — inlined + modified for MathJax
+   ============================================================ */
+.paper .fig-svg { height: auto; overflow: visible; }
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple { gap: 28px; flex-wrap: nowrap; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-panel { flex: 0 1 160px; max-width: 160px; min-width: 0; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-svg { width: 100% !important; max-width: 100%; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note mjx-container { font-size: .98em; }
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr { position: relative; width: 100%; height: 100%; font-family: var(--serif); }
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl mjx-container { font-size: 1em; }
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl mjx-container { font-size: .98em; }
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+
+/* ============================================================
+   print.css — inlined (A4 sheet layout + paginator)
+   ============================================================ */
+@page { size: A4; margin: 0; }
+.sheet {
+  position: relative; box-sizing: border-box;
+  width: 210mm; height: 297mm;
+  padding: 20mm 28mm 20mm 32mm;
+  background: #fff; overflow: hidden;
+}
+.sheet-header {
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
+  font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
+}
+.sheet-footer {
+  position: absolute; bottom: 8.5mm; left: 0; right: 0;
+  text-align: center; font: 500 9pt "Inter", sans-serif; color: #82868f;
+}
+.sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
+.sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
+.sheet-body .page { padding: 0; max-width: none; margin: 0; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
+.sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet-body > :first-child { margin-top: 0 !important; }
+.sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
+.sheet-body .qed { margin-top: -1.55em; height: 1.55em; }
+.sheet-body .env-body::after { display: none; content: none; }
+.sheet-body .env-cont { margin-top: 0; }
+.sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+@media screen {
+  body { background: #6f727b; margin: 0; }
+  .sheet { box-shadow: 0 3px 18px rgba(0,0,0,.3); margin: 9mm auto; }
+}
+@media print {
+  body { background: #fff; margin: 0; }
+  .sheet { box-shadow: none; margin: 0; break-after: page; }
+  .sheet:last-child { break-after: auto; }
+  .print-toolbar, #boot { display: none !important; }
+}
+
+/* ============================================================
+   page-level
+   ============================================================ */
+.print-toolbar {
+  position: fixed; top: 14px; right: 16px; z-index: 1000;
+  display: flex; align-items: center; gap: 10px; font-family: "Inter", system-ui, sans-serif;
+}
+.print-toolbar button {
+  font: 600 13px "Inter", sans-serif; color: #fff; background: oklch(0.50 0.13 245);
+  border: 0; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.print-toolbar button:disabled { opacity: .5; cursor: default; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
+.print-toolbar .status {
+  font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
+  padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
+}
+#boot {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
+}
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
+</style>
+</head>
+<body>
+
+<div id="boot">Preparing …</div>
+
+<div class="print-toolbar">
+  <span class="status" id="status">Preparing …</span>
+  <button id="printBtn" disabled>Print / Save as PDF</button>
+</div>
+
+<div id="source"><div class="paper skin-hs vivid"><div class="page" id="page"></div></div></div>
+<div id="pages"></div>
+
+<!-- Section fragments (inlined) -->
+
+<!-- BEGIN-CONTENT-FRAGMENTS -->
+<template id="frag-sec-b-1">
+<!-- Appendix B opener + §B.1 Reading a Statement.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Appendix B established per user decision 2026-07-04: proof literacy
+     is a SPEC §16.2 B-class prerequisite ("量詞操作與以反證法為主的證明寫作") and gets a
+     self-contained primer here, illustrated with classic calculus-free examples
+     (integers, primes, sqrt(2), pigeonhole) — NOT anchored to this book's Ch1-4 proofs
+     (user directive 2026-07-04: self-contained, generic examples).
+     §B.1 is the appendix's first section, so it carries the appendix opener (a second
+     <article>), mirroring the chapter/appendix convention. Numbering is MANUAL, namespace "B":
+     Definition B.1 (converse/contrapositive); Strategy B.1; Example B.1; Caution unnumbered.
+     Counters continue into sec-b-2..sec-b-6. No figures.
+     2026-07-17: §B.6 (Writing a Proof) added after a third-party review; the appendix
+     charter widened from reading to reading+writing, so the title became "Reading and
+     Writing Proofs" (was "Reading Theorems and Proofs"; runningHead in the shell tracks
+     it), the lead gained §B.6 plus a no-overselling clause, and the objectives gained two
+     items. The old "five proof shapes" objective miscounted the counterexample as a proof
+     shape and was reworded (roster still 5 -- user decision 2026-07-04 stands).
+     Adjudication: handout/html/_audit/REVIEW-appendixB-b6-design.html.
+     Self-contained: no outward section-refs to Ch1-4; internal §B.x cross-refs allowed.
+     Math verified during authoring: 6|n=>3|n (converse false at n=9); n^2 even => n even
+     (contrapositive n odd => n^2 odd).
+     Record: handout/_audit/REVIEW-appendixB-applied.html. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Appendix B</div>
+    <h1 class="ch-title">Reading and Writing Proofs</h1>
+  </header>
+
+  <p class="lead">Calculus is, for many readers, the first place mathematics is written as a chain of <em>theorems</em> and <em>proofs</em> rather than a list of recipes to run. Reading that language — following an argument, and knowing when you have understood it — is a skill of its own, and one seldom taught head-on. This appendix is a short primer on it: how to take a statement apart (§B.1), the handful of proof shapes that recur (§B.2), the quantifiers that run through analysis (§B.3), the standard steps that seem to come from nowhere (§B.4), and how to read a proof actively rather than let it wash over you (§B.5). The last section turns the same habits around and points them at a blank page: planning, drafting, checking, and revising a short proof of your own (§B.6). That is enough structure to begin writing rigorous elementary proofs, though fluency here, as everywhere, comes from writing them and then writing them again. Everything is illustrated with small, classic examples — integers, primes, the irrationality of \(\sqrt{2}\) — so nothing here leans on calculus itself. Read it straight through, or reach for a section when a proof stops making sense.</p>
+
+  <p class="para-head">By the end of this appendix, you will be able to:</p>
+  <ul>
+    <li>take a statement apart into its hypothesis, conclusion, and quantifiers, and tell it apart from its converse;</li>
+    <li>recognize the five shapes you meet most often — the four that build a proof (direct, contradiction, cases, and induction) and the counterexample that tears one down;</li>
+    <li>read the quantifiers \(\forall\) and \(\exists\), negate a quantified statement, and keep their order straight;</li>
+    <li>see the purpose behind the standard moves — adding and subtracting a term, splitting an \(\varepsilon\), taking a minimum, and the rest — that otherwise look like rabbits from a hat;</li>
+    <li>read a proof actively: checking each step, locating where every hypothesis is used, and separating <em>why</em> a result is true from <em>how</em> it is proved;</li>
+    <li>plan, draft, check, and revise a short elementary proof of your own;</li>
+    <li>distinguish a promising argument from a complete proof.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">B.1</span>Reading a Statement</h2>
+  </header>
+
+  <p>A theorem is a promise, and like any promise it comes with conditions. Before you can follow a proof — let alone trust it — you have to know exactly what is being claimed: what you are handed, what you must produce, and how much the statement really commits to. Reading the statement closely is the first of these skills, and the one that repays itself most often. A surprising share of the confusion inside a proof turns out to be confusion about the statement it is proving.</p>
+
+  <p>Most theorems can be put in the form <em>if \(P\), then \(Q\)</em>. The clause \(P\) is the <em>hypothesis</em> — what you are allowed to assume — and \(Q\) is the <em>conclusion</em> — what you are then obliged to establish. Even a theorem with no visible &ldquo;if&rdquo; usually has this skeleton inside it. &ldquo;Every integer divisible by \(6\) is divisible by \(3\)&rdquo; is the same claim as &ldquo;if an integer \(n\) is divisible by \(6\), then \(n\) is divisible by \(3\)&rdquo; wearing plainer clothes: the word <em>every</em> carries the unstated &ldquo;for all&rdquo;, while the hypothesis — that \(n\) is divisible by \(6\) — hides inside the description of the subject. Learning to hear the <em>if&ndash;then</em> inside an ordinary sentence is half of reading a statement.</p>
+
+  <p>Once a statement is in <em>if \(P\), then \(Q\)</em> form, two rearrangements of it are worth naming — precisely because they are so easily mistaken for the original.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">B.1</span></p>
+    <div class="env-body">
+      <p>Given an implication <em>if \(P\), then \(Q\)</em>:</p>
+      <ul>
+        <li>its <em>converse</em> is the implication <em>if \(Q\), then \(P\)</em> — hypothesis and conclusion swapped;</li>
+        <li>its <em>contrapositive</em> is the implication <em>if not \(Q\), then not \(P\)</em> — both parts negated <em>and</em> swapped.</li>
+      </ul>
+    </div>
+  </section>
+
+  <p>The contrapositive says the very same thing as the original, read from the other end: if \(Q\) must hold whenever \(P\) does, then a failure of \(Q\) leaves no room for \(P\) — so &ldquo;if \(P\) then \(Q\)&rdquo; and &ldquo;if not \(Q\) then not \(P\)&rdquo; stand or fall together. They are <em>logically equivalent</em> — each is true exactly when the other is — so proving one proves the other, a fact the indirect arguments of §B.2 lean on. The converse is a different matter: it is a genuinely new claim, which may be true or false on its own. Our sample statement &ldquo;if \(n\) is divisible by \(6\), then \(n\) is divisible by \(3\)&rdquo; is true, while its converse &ldquo;if \(n\) is divisible by \(3\), then \(n\) is divisible by \(6\)&rdquo; is false, as \(n = 9\) shows. Its contrapositive &ldquo;if \(n\) is not divisible by \(3\), then \(n\) is not divisible by \(6\)&rdquo; is true again, in lockstep with the original.</p>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The single most common misreading of a theorem is to help yourself to its converse. &ldquo;If \(P\), then \(Q\)&rdquo; hands you \(Q\) whenever you have \(P\); it promises nothing when you instead have \(Q\), and nothing when you merely lack \(P\). A statement and its converse must be proved separately, and either can hold while the other fails. When a result really does run both ways — <em>\(P\) if and only if \(Q\)</em> — that is a strictly stronger claim, and it has to be earned in both directions.</p>
+    </div>
+  </section>
+
+  <p>Two small words decide the meaning of most statements: <em>for all</em> and <em>there exists</em>. The first, written \(\forall\), claims something about <em>every</em> object in some collection; the second, written \(\exists\), claims only that <em>at least one</em> object works. They rarely announce themselves. &ldquo;Let \(n\) be an integer; then &hellip;&rdquo; is a <em>for all</em> in disguise — the claim must hold no matter which integer you were handed — while &ldquo;the equation has a solution&rdquo; is a <em>there exists</em>. A statement can stack the two, as in &ldquo;for every \(x\) there is a \(y\) such that &hellip;&rdquo;, and then, as §B.3 will insist, the order is not decoration — it changes the meaning. For now the goal is just to notice them: mark every <em>for all</em> and every <em>there exists</em>, stated or disguised, before you read on.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.1</span><span class="env-name">Taking a statement apart</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Find the quantifiers. Rewrite any disguised ones — <em>let</em>, <em>any</em>, <em>some</em>, <em>there is</em> — as an explicit <em>for all</em> or <em>there exists</em>, and note the order in which they come.</li>
+        <li>Find the <em>if&ndash;then</em> skeleton: name the hypothesis \(P\) (all you may assume) and the conclusion \(Q\) (all you must show).</li>
+        <li>Write down the converse <em>if \(Q\), then \(P\)</em> and ask whether you actually believe it. This is the quickest way to see what the statement does <em>not</em> claim.</li>
+        <li>Try the statement on one small object, to be sure you have read it the way its author meant.</li>
+      </ol>
+      <p class="informal">The whole exercise takes under a minute and heads off the most expensive error there is — proving, or trusting, a different statement than the one in front of you.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.1</span></p>
+      <div class="env-body">
+        <p>Take the statement apart: <em>for every integer \(n\), if \(n^{2}\) is even, then \(n\) is even.</em></p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ul class="sol-list">
+          <li><strong>Quantifier.</strong> A single <em>for every integer \(n\)</em>, with no <em>there exists</em> inside — the claim must hold for each integer at once.</li>
+          <li><strong>Hypothesis and conclusion.</strong> With \(n\) fixed, \(P\) is &ldquo;\(n^{2}\) is even&rdquo; and \(Q\) is &ldquo;\(n\) is even&rdquo;.</li>
+          <li><strong>Converse.</strong> <em>If \(n\) is even, then \(n^{2}\) is even</em> — a different statement. It happens to be true as well, but that is a separate fact to prove, not something the original grants for free.</li>
+          <li><strong>Contrapositive.</strong> <em>If \(n\) is odd, then \(n^{2}\) is odd</em> — equivalent to the original, and, as it turns out, the more convenient direction to attack. Proposition B.1 proves exactly this.</li>
+          <li><strong>Small test.</strong> \(n = 6\) gives \(n^{2} = 36\), even, and \(n\) is even — consistent. What the statement forbids is an integer with \(n^{2}\) even yet \(n\) odd, and there is none.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <p>A statement read this way — quantifiers marked, hypothesis and conclusion named, converse held at arm’s length — is one you can prove, or look up, or use with confidence. The rest of this appendix assumes you have done this first; everything else is easier once the claim itself is pinned down.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-b-2">
+<!-- §B.2 The Main Proof Shapes.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Numbering is MANUAL, namespace "B", continuing from sec-b-1:
+     Strategy B.2 (the five shapes); Proposition B.1 (direct), B.2 (contradiction),
+     B.3 (cases), B.4 (induction); Example B.2 (disproof by counterexample). No Caution here.
+     Classic calculus-free specimens: n odd => n^2 odd (direct); sqrt(2) irrational
+     (contradiction); "every prime is odd" false at p=2 (counterexample); n^2+n even (cases);
+     1+..+n = n(n+1)/2 (induction). The sqrt(2) proof reuses "a^2 even => a even" = the
+     statement of Example B.1, equivalent to the contrapositive proved as Proposition B.1 —
+     an internal thread, still self-contained (no Ch1-4 refs).
+     Math verified during authoring: (2k+1)^2 = 2(2k^2+2k)+1; a^2=2b^2 lowest-terms
+     contradiction; p=2 prime and even; n(n+1) even by parity cases; induction step
+     k(k+1)/2 + (k+1) = (k+1)(k+2)/2.
+     Record: handout/_audit/REVIEW-appendixB-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">B.2</span>The Main Proof Shapes</h2>
+  </header>
+
+  <p>A proof is an argument, and arguments come in shapes. A reader who knows the shapes has a head start: recognizing that a proof is, say, an induction or an argument by contradiction tells you what its author is trying to do before you have followed a single line of it. Five shapes cover the great majority of what you meet early on. We name them first, then watch each one at work on a small, classic claim.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.2</span><span class="env-name">Recognizing the shape of a proof</span></p>
+    <div class="env-body">
+      <ul class="steps">
+        <li><strong>Direct.</strong> Assume the hypothesis and move, one justified step at a time, to the conclusion. The default — try it first.</li>
+        <li><strong>Contradiction.</strong> Assume the claim <em>fails</em>, and reason until something impossible appears. The tell: an opening like &ldquo;suppose not&rdquo; or &ldquo;assume \(\sqrt{2}\) is rational&rdquo; when the claim says the opposite. A near relative, <em>contraposition</em>, proves &ldquo;if \(P\) then \(Q\)&rdquo; by proving its contrapositive &ldquo;if not \(Q\) then not \(P\)&rdquo; outright — see Proposition B.1.</li>
+        <li><strong>Counterexample.</strong> To <em>disprove</em> a <em>for all</em> claim, exhibit one object meeting the hypothesis but breaking the conclusion. Demolishes; never builds.</li>
+        <li><strong>Cases.</strong> Split the objects into a few situations that together cover every possibility, and settle each. The tell: &ldquo;if &hellip; ; if instead &hellip;&rdquo;.</li>
+        <li><strong>Induction.</strong> For a claim about every positive integer, prove the first case, then show each case forces the next. The tell: a statement indexed by \(n = 1, 2, 3, \ldots\).</li>
+      </ul>
+    </div>
+  </section>
+
+  <p><strong>Direct proof.</strong> The plainest shape assumes the hypothesis and walks, step by justified step, to the conclusion. Most proofs are direct, and it is the shape to try first. Here is one about the odd integers.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">B.1</span></p>
+    <div class="env-body">
+      <p>If \(n\) is an odd integer, then \(n^{2}\) is odd.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By definition an odd integer has the form \(n = 2k + 1\) for some integer \(k\), just as an even one has the form \(2k\). Squaring,
+      \[ n^{2} = (2k + 1)^{2} = 4k^{2} + 4k + 1 = 2\bigl(2k^{2} + 2k\bigr) + 1. \]
+      The right-hand side is twice an integer plus one, which is exactly what it means to be odd. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The small square at the end is the customary sign-off: it announces that the proof is finished, and you will meet it — or the older letters <em>Q.E.D.</em> — at the close of proofs everywhere. As for the proof itself: nothing was assumed but the hypothesis, and each line followed from the one before — the signature of a direct proof. This one does double duty. The same proof also settles &ldquo;if \(n^{2}\) is even, then \(n\) is even&rdquo; — the claim dissected in Example B.1 — because that statement’s contrapositive is exactly &ldquo;if \(n\) is odd, then \(n^{2}\) is odd&rdquo;, which we have just proved. A statement and its contrapositive are logically equivalent, so proving the one proves the other. Deliberately proving the contrapositive in place of the original is a standard move of its own, <em>proof by contraposition</em>, and the quiet cousin of the contradiction argument next.</p>
+
+  <p><strong>Proof by contradiction.</strong> Sometimes the cleanest route to a claim is to suppose it false and watch the supposition collapse. To argue by <em>contradiction</em>, assume the claim is false, reason until you reach something impossible — a statement that contradicts a hypothesis, a known fact, or itself — and conclude that the assumption could not have held. Why does that settle the matter? Because a true premise can never force an impossibility: if assuming the claim false leads somewhere that cannot be, then that assumption cannot stand, and the claim must be true. The most famous instance in all of mathematics is barely a paragraph.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">B.2</span></p>
+    <div class="env-body">
+      <p>\(\sqrt{2}\) is irrational: it cannot be written as a ratio \(a/b\) of integers.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Suppose, to the contrary, that \(\sqrt{2} = a/b\) for integers \(a\) and \(b\) with \(b \neq 0\), and take the fraction in <em>lowest terms</em> — so that \(a\) and \(b\) share no common factor larger than \(1\). Squaring gives \(2 = a^{2}/b^{2}\), that is,
+      \[ a^{2} = 2b^{2}. \]
+      Then \(a^{2}\) is even, and therefore \(a\) is even — this is the statement dissected in Example B.1, equivalent to the contrapositive we proved as Proposition B.1. Write \(a = 2c\). Substituting, \((2c)^{2} = 2b^{2}\), so \(4c^{2} = 2b^{2}\), and hence \(b^{2} = 2c^{2}\). The same reasoning now applies to \(b\): since \(b^{2}\) is even, \(b\) is even. But then \(a\) and \(b\) are <em>both</em> even, sharing the factor \(2\) — contradicting our arrangement that the fraction was in lowest terms. The assumption that \(\sqrt{2}\) is a ratio of integers is therefore untenable. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The engine of the argument is the collision at the end: two consequences that cannot both hold. Notice, too, where a hypothesis did its work — reducing the fraction to lowest terms is precisely what turns &ldquo;both even&rdquo; into a contradiction rather than a shrug.</p>
+
+  <p><strong>Disproof by counterexample.</strong> The shapes so far <em>establish</em> claims; the next one <em>demolishes</em> them. A statement of the form <em>for all</em> promises that every object in its range clears some bar. To knock it down, you need just one object that does not — a <em>counterexample</em>.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.2</span></p>
+      <div class="env-body">
+        <p>Show that the claim <em>every prime number is odd</em> is false.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The claim is a <em>for all</em>: for every prime \(p\), the number \(p\) is odd. To refute it we produce a single prime that is not odd. The number \(2\) is prime — its only positive divisors are \(1\) and itself — and \(2\) is even. So \(2\) meets the hypothesis (it is prime) while breaking the conclusion (it is not odd), and the universal claim collapses.</p>
+        <p>Two features make this work and are worth carrying with you. First, <em>one</em> counterexample is enough: proving a <em>for all</em> means handling every case, but disproving it means exhibiting a single failure. Second, the counterexample must be honest — it has to genuinely satisfy the hypothesis (\(2\) really is prime) and genuinely violate the conclusion (\(2\) really is not odd). An object that fails the hypothesis in the first place refutes nothing.</p>
+      </div>
+    </section>
+  </div>
+
+  <p><strong>Proof by cases.</strong> When no single argument reaches every object at once, split the objects into a few situations that <em>together</em> exhaust all possibilities, and settle each on its own. The one demand is completeness: the cases must leave nothing out.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">B.3</span></p>
+    <div class="env-body">
+      <p>For every integer \(n\), the number \(n^{2} + n\) is even.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Every integer is either even or odd, and we take the two cases in turn. If \(n\) is even, write \(n = 2k\); then
+      \[ n^{2} + n = n(n + 1) = 2k(2k + 1), \]
+      which is even. If \(n\) is odd, write \(n = 2k + 1\); then \(n + 1 = 2(k + 1)\), so
+      \[ n^{2} + n = n(n + 1) = (2k + 1)\cdot 2(k + 1), \]
+      even again. The two cases cover every integer, so \(n^{2} + n\) is even in all of them. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>A case split divides the <em>problem</em>, not the claim — the conclusion is the same in every branch. And a shrewd split can sometimes be avoided altogether: here \(n^{2} + n = n(n + 1)\) is a product of two consecutive integers, one of which is always even, which settles the matter in a single line. Seeing when a case analysis collapses to one clean observation is part of reading proofs well.</p>
+
+  <p><strong>Induction.</strong> A claim about <em>every positive integer</em> invites a shape of its own. Induction proves it in two strokes: verify the claim for the first integer, then show that its truth at any stage forces its truth at the next. Like a line of dominoes, the first fall together with &ldquo;each one topples the next&rdquo; brings them all down.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">B.4</span></p>
+    <div class="env-body">
+      <p>For every positive integer \(n\),
+      \[ 1 + 2 + \cdots + n = \frac{n(n + 1)}{2}. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p><em>Base case.</em> For \(n = 1\) the left side is \(1\) and the right side is \(\frac{1 \cdot 2}{2} = 1\); they agree.</p>
+      <p><em>Inductive step.</em> Suppose the formula holds for some positive integer \(k\), so that \(1 + 2 + \cdots + k = \frac{k(k + 1)}{2}\). (This supposition is the <em>inductive hypothesis</em>.) Adding the next term \(k + 1\) to both sides,
+      \[ \begin{aligned} 1 + 2 + \cdots + k + (k + 1) &= \frac{k(k + 1)}{2} + (k + 1) \\ &= (k + 1)\!\left(\frac{k}{2} + 1\right) = \frac{(k + 1)(k + 2)}{2}, \end{aligned} \]
+      which is the formula with \(n = k + 1\). So whenever it holds at \(k\), it holds at \(k + 1\); and since it holds at \(n = 1\), it holds for every positive integer. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The inductive hypothesis is not cheating: we do not assume what we set out to prove. We assume the statement at one stage only to <em>deduce</em> it at the next, and the base case gets the chain moving. Watching for exactly these two parts — a base case, and a step that carries \(k\) to \(k + 1\) — is how you read, and check, any induction.</p>
+
+  <p>These five — direct, contradiction, counterexample, cases, induction — are enough to recognize the architecture of most proofs you will meet for a good while. A longer proof is usually several of them nested: an induction whose step is a short direct argument, or an argument by contradiction that breaks into cases. Naming the outer shape first, and then the inner ones, turns a wall of text into a plan you can follow.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-b-3">
+<!-- §B.3 A Quantifier Toolbox.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Numbering is MANUAL, namespace "B", continuing from sec-b-2:
+     Strategy B.3 (negating a quantified statement); Example B.3 (negate a nested
+     for-all/there-exists statement); Caution unnumbered (order of unlike quantifiers).
+     The "for every eps>0 there is a delta>0" challenge-response pattern is presented
+     self-contained, forward-stocking the limit/continuity/convergence definitions WITHOUT
+     naming any Ch1-4 section (user directive: self-contained).
+     Logic verified during authoring: forall x exists y (y>x) TRUE vs exists y forall x
+     (y>x) FALSE over integers; negation rules ¬forall = exists, ¬exists = forall, order
+     preserved, kernel a_n<eps negates to a_n>=eps.
+     2026-07-17 (third-party review; adjudication in
+     handout/html/_audit/REVIEW-appendixB-b6-design.html): Example B.3's N is now a
+     "positive integer" (3 places: prompt, solution bullet, assembled negation). The
+     sequence is indexed a_1, a_2, ..., so an N <= 0 would point "a_n for all n >= N" at
+     terms that do not exist. Note this was convention-conforming, not wrong -- Rudin writes
+     "there is an integer N such that n >= N implies ..." -- but a section whose subject is
+     quantifier hygiene should be the one place that is strict. The reviewer's stronger form
+     (display "N in NN, n in NN") was DECLINED: set notation is not the SPEC §3 Stewart
+     register, and the reviewer's own brief forbids turning the appendix into discrete math.
+     Two further 2026-07-17 additions, both unnumbered prose (no new counter, no cascade):
+     (a) Example B.3's Solution now opens by putting the quantifiers in PREFIX order before
+         sweeping. Reason: the prompt is written in the idiomatic English order, with the
+         third quantifier ("for all n >= N") TRAILING the kernel -- so a reader following
+         Strategy B.3 step 1 literally ("sweep from left to right") hits the kernel while a
+         quantifier is still to its right, and step 2's "the part with no quantifiers left"
+         does not yet apply. The Solution silently reordered and then claimed "the
+         quantifiers kept their left-to-right order". Keep the idiomatic prompt -- that is
+         the form students meet in print -- and make the normalisation an explicit step;
+         it is Strategy B.1 step 1's job and this is the best place in the appendix to
+         show it.
+     (b) The "third skill is recognition" paragraph now plays ONE round of the
+         challenge-response game with the bracket filled in. Reason: the paragraph asserted
+         "finding the right delta in terms of eps is usually the entire game" and "a
+         stricter tolerance may call for a smaller delta" while never once producing a
+         delta -- the bracket [some closeness holds] stayed a bracket, and Example B.3's
+         response is an index N (which GROWS as eps shrinks, the opposite direction), so the
+         reader had nothing to picture. Constant 2 is deliberate: eps/2 here, NOT eps/3, so
+         this does not collide with §B.4's "split the tolerance into k pieces" move, which
+         divides for an entirely different reason. Stays calculus-free (pure algebra on
+         absolute values, A-class per SPEC §16.2).
+         CONSTRAINT for anyone editing this round: [some closeness holds] must be filled
+         with the WHOLE CONDITIONAL -- "if |x-2| < delta, then |2x-4| < eps" -- and both
+         roles must be read off it. A first draft filled the bracket with the CONSEQUENT
+         only ("what must be secured is |2x-4| < eps"), which leaves delta with no job in
+         the template it is supposed to illustrate, and then makes |x-2| < delta arrive from
+         nowhere. A blind reader stopped dead there. The template's whole point is that the
+         response constrains the INPUT so as to force the OUTPUT; a closeness clause naming
+         only the output cannot show that.
+     Record: handout/_audit/REVIEW-appendixB-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">B.3</span>A Quantifier Toolbox</h2>
+  </header>
+
+  <p>The two quantifiers <em>for all</em> and <em>there exists</em> — \(\forall\) and \(\exists\) — are the grammar of analysis. Nearly every definition and theorem past this point is built from them, often stacked two or three deep, and a statement’s whole meaning can turn on how they are arranged. Three skills make that grammar readable: keeping the <em>order</em> of quantifiers straight, <em>negating</em> a quantified statement cleanly, and recognizing the one nested pattern that organizes much of the subject. This section is a short toolbox for all three.</p>
+
+  <p>The order of two <em>unlike</em> quantifiers is not interchangeable, and this is the most valuable single fact about them. Compare:</p>
+  <p style="text-align:center;">(i)&ensp;&ensp;for every integer \(x\) there is an integer \(y\) with \(y > x\),</p>
+  <p style="text-align:center;">(ii)&ensp;&ensp;there is an integer \(y\) such that for every integer \(x\), \(y > x\).</p>
+  <p>Statement (i) is true: given any \(x\), take \(y = x + 1\). Statement (ii) is false: it demands a <em>single</em> \(y\) larger than every integer at once, and there is no largest integer. The two sentences use the same words in the same breath; only the order of &ldquo;for every&rdquo; and &ldquo;there is&rdquo; differs, and that alone carries one from true to false.</p>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>When quantifiers of different type meet, the outer one is in charge, and the inner object may be <em>retuned for each choice</em> of the outer. &ldquo;For every \(x\) there is a \(y\)&rdquo; lets \(y\) depend on \(x\) — a different \(y\) is allowed for each. &ldquo;There is a \(y\) such that for every \(x\)&rdquo; demands one \(y\) that works for all \(x\) simultaneously; it is a far stronger, and usually far rarer, claim. Reading the first as though it were the second — or the reverse — is a classic and costly slip. Always check which quantifier comes first.</p>
+    </div>
+  </section>
+
+  <p>The second skill is denial. To disprove a quantified statement, or to state what a proof by contradiction must produce, you have to negate it correctly — and there is a mechanical rule that never fails.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.3</span><span class="env-name">Negating a quantified statement</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li>Sweep the negation across the quantifiers from left to right, flipping each as it passes: every <em>for all</em> becomes <em>there exists</em>, and every <em>there exists</em> becomes <em>for all</em>.</li>
+        <li>When the negation reaches the <em>kernel</em> — the part with no quantifiers left — negate that. An \(=\) becomes \(\neq\); a \(<\) becomes \(\ge\), not \(>\) (the denial of &ldquo;\(a < \varepsilon\)&rdquo; is &ldquo;\(a\) is not less than \(\varepsilon\)&rdquo;, which includes the boundary case \(a = \varepsilon\)); &ldquo;\(P\) and \(Q\)&rdquo; becomes &ldquo;not \(P\) or not \(Q\)&rdquo;, and so on.</li>
+        <li>Leave the quantifiers in their original order; only their <em>type</em> flips, never their sequence.</li>
+      </ol>
+      <p class="informal">In words: to deny that <em>everyone</em> clears the bar is to claim that <em>someone</em> fails it; to deny that <em>someone</em> succeeds is to claim that <em>everyone</em> fails. Negation trades the two quantifiers and moves the finish line.</p>
+    </div>
+  </section>
+
+  <p>The rule is easiest to trust on short statements, so build up to the long one. A single quantifier flips once: the negation of &ldquo;<em>every</em> integer is even&rdquo; is &ldquo;<em>there is</em> an integer that is not even&rdquo; — true, since \(3\) is one. Two quantifiers flip in turn. Negating the true statement from the start of this section, &ldquo;for every integer \(x\) there is an integer \(y\) with \(y > x\)&rdquo;, sweeps to &ldquo;there is an integer \(x\) such that for every integer \(y\), \(y \le x\)&rdquo; — a largest integer, which is false, exactly as the negation of a true statement should be. The next example carries the same rule to a statement three quantifiers deep, of the kind that runs through analysis; it is handled just as mechanically.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.3</span></p>
+      <div class="env-body">
+        <p>Negate the following statement, in which \(a_1, a_2, \ldots\) is a fixed sequence of positive numbers (it says the sequence eventually drops below every positive threshold):</p>
+        <p style="text-align:center;">for every \(\varepsilon > 0\), there exists a positive integer \(N\) such that \(a_n < \varepsilon\) for all \(n \ge N\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>First put the quantifiers where the rule can see them. Strategy B.1 asks for them explicit and in order; explicit they already are, but English likes to trail a <em>for all</em> behind the clause it governs, so the last of the three has ended up sitting behind the kernel instead of in front of it. Set out in order, the statement reads <em>for every \(\varepsilon > 0\), there exists a positive integer \(N\), such that for every \(n \ge N\), \(a_n < \varepsilon\)</em>. Notice that no quantifier has moved past another — the order is still \(\varepsilon\), then \(N\), then \(n\), exactly as it was, which is what keeps the meaning intact; only the kernel has slid to the end, where the rule expects to find it. Now flip each quantifier in turn, and negate the kernel:</p>
+        <ul class="sol-list">
+          <li>&ldquo;for every \(\varepsilon > 0\)&rdquo; becomes &ldquo;there exists \(\varepsilon > 0\)&rdquo;;</li>
+          <li>&ldquo;there exists a positive integer \(N\)&rdquo; becomes &ldquo;for every positive integer \(N\)&rdquo;;</li>
+          <li>&ldquo;for every \(n \ge N\)&rdquo; becomes &ldquo;there exists \(n \ge N\)&rdquo;;</li>
+          <li>the kernel \(a_n < \varepsilon\) negates to \(a_n \ge \varepsilon\).</li>
+        </ul>
+        <p>Assembling the pieces in the same order, the negation reads:</p>
+        <p style="text-align:center;">there exists \(\varepsilon > 0\) such that for every positive integer \(N\)<br>there is some \(n \ge N\) with \(a_n \ge \varepsilon\).</p>
+        <p>In words: some fixed threshold \(\varepsilon\) that the sequence meets or exceeds again and again, no matter how far out you look. The quantifiers kept their left-to-right order; only their types flipped, and the final \(<\) became \(\ge\).</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The third skill is recognition. One arrangement of nested quantifiers recurs so relentlessly that it deserves to be known on sight. It has the shape</p>
+
+  <p style="text-align:center;">for every \(\varepsilon > 0\) there is a \(\delta > 0\) such that [some closeness holds].</p>
+
+  <p>Read it as a contest. The two Greek letters are traditional, and worth being able to say out loud: \(\varepsilon\) is <em>epsilon</em> and \(\delta\) is <em>delta</em>, and both have long been the names of a small positive quantity. A skeptic names a tolerance \(\varepsilon\) — how close is &ldquo;close enough&rdquo; — and may drive it as small as they please. Your task is to answer, for that \(\varepsilon\), with a \(\delta\) that secures the required closeness. Because \(\varepsilon\) is chosen first, your \(\delta\) is <em>allowed to depend on it</em>: a stricter tolerance may call for a smaller \(\delta\).</p>
+
+  <p>Here is one round of the contest, with the bracket filled in. Suppose the closeness demanded is this: <em>if \(|x - 2| < \delta\), then \(|2x - 4| < \varepsilon\)</em>. Read the two roles off it. The skeptic’s \(\varepsilon\) fixes how near \(2x\) is required to come to \(4\); your \(\delta\) is the answer to <em>how near must \(x\) come to \(2\) to force that?</em> Since \(|2x - 4| = 2|x - 2|\), the reply \(\delta = \varepsilon/2\) wins: if \(|x - 2| < \tfrac{\varepsilon}{2}\), then \(|2x - 4| = 2|x - 2| < 2 \cdot \tfrac{\varepsilon}{2} = \varepsilon\), which is what was demanded. Halve the tolerance and the reply halves with it — that is what it means for \(\delta\) to depend on \(\varepsilon\).</p>
+
+  <p>The statement is true precisely when you have a winning reply to <em>every</em> challenge, however small \(\varepsilon\) is pushed. You have, in fact, already read a statement of exactly this shape — the one you negated in Example B.3, where the response to each \(\varepsilon\) was an index \(N\), and the required closeness was that every term from the \(N\)-th onward falls below \(\varepsilon\). This &ldquo;for every tolerance, there is a response&rdquo; template is the skeleton of the definitions of limit, continuity, and convergence, and of the many proofs resting on them. When you meet it, ask at once: what plays the part of the challenge, what response must you supply, and how may the response lean on the challenge? Finding the right \(\delta\) in terms of \(\varepsilon\) is usually the entire game.</p>
+
+  <p>Negation and recognition now close a loop. To deny such a statement — to claim the closeness cannot always be met — is, by the negation rule, to assert that <em>there is one stubborn \(\varepsilon > 0\) for which every proposed \(\delta\) fails</em>. That single-\(\varepsilon\) form is exactly the target of any argument that something is <em>not</em> continuous, or a sequence does <em>not</em> converge: pin the one tolerance no response can satisfy, and the claim is refuted.</p>
+
+  <p>Quantifiers are terse, but their terseness is precision, not shorthand: they fix exactly which objects a claim ranges over, in what order those objects may be chosen, and what it would take to deny the claim. Read them slowly, mark their order, and know how to flip them — and a large part of analysis stops looking like code and starts reading like sentences.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-b-4">
+<!-- §B.4 Steps That Come From Nowhere.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Numbering is MANUAL, namespace "B", continuing from sec-b-3:
+     Strategy B.4 (catalogue of 5 standard moves); Example B.4 (add-and-subtract + split
+     the tolerance into thirds = the "eps/3 trick"); Example B.5 (delta = min{delta1,delta2});
+     Example B.6 (auxiliary function, added 2026-07-17 -- see below).
+
+     2026-07-17 additions:
+     (a) Example B.4's prompt now opens "Let eps > 0" -- eps was a free variable one section
+         after §B.3 trains the reader to mark every quantifier. Same defect family as the
+         same-day fixes to Prop B.5 and Example B.3.
+     (b) NEW Example B.6 = the auxiliary function worked end to end: x^2 + 1 > x for every
+         real x, via h(x) = (x^2+1) - x = (x - 1/2)^2 + 3/4 > 0. Reason: of the catalogue's
+         five moves, three had worked examples and two had only prose, and the prose promised
+         "some fact already in hand can attack it" to a reader who has no theorems in hand --
+         so this move alone never showed what it buys, in the one section whose whole thesis
+         is "name the move and see what it buys". Prose cannot fix an asymmetry that IS the
+         missing example. Calculus-free: completing the square is A-class (SPEC §16.2).
+         The four beats the example must keep: (1) the statement never mentions h;
+         (2) why h is defined at all; (3) the new object turns a two-quantity comparison into
+         a one-quantity question a known fact settles; (4) the return to the original claim.
+     (c) WLOG was CONSIDERED for the same treatment and DECLINED. The external reviewer asked
+         for a WLOG worked example plus a non-example, but the WLOG paragraph already carries
+         both inline (assume a <= b; if a > b, swap the names) and its own caution ("Invoked
+         over cases that are NOT symmetric, it quietly skips real work") -- and, decisively,
+         no blind reader flagged it, while the auxiliary function was flagged independently
+         by the reviewer and three separate simulations. Adopt what the evidence covers.
+     NUMBERING: (b) inserts a new Example in the middle of the namespace, so §B.6's examples
+     cascaded B.6->B.7, B.7->B.8, B.8->B.9, B.9->B.10, plus the §B.6 Caution's cross-ref.
+     This is the appendix's ONLY cascade to date; verify with the ledger check before commit.
+     2026-07-17 (third-party review; adjudication in
+     handout/html/_audit/REVIEW-appendixB-b6-design.html): the "Split the tolerance" bullet
+     used to close "The '3eps' you see in print is this move with k = 3." That was not a
+     math error -- the 3eps argument is a real convention in print -- but it hung the
+     SIBLING move's name on this one: the move described here divides the tolerance, which
+     is the eps/3 trick, whereas an author who writes "< 3eps" precisely did NOT divide.
+     Renamed to "eps/3 trick"; roster unchanged (still 5 moves, no new example).
+
+     DO NOT re-add a mention of the 3eps variant here. Two drafts tried and both failed,
+     for opposite reasons, and the failure is structural rather than a matter of wording:
+       - Explain how it closes ("the total is below 3eps, and eps was arbitrary") and you
+         silently import a step this appendix never establishes -- from "x < 3eps for every
+         eps > 0" conclude "x <= 0" -- inside the one section whose whole thesis is that no
+         step comes from nowhere.
+       - Name it without explaining, and you raise a question the reader cannot answer with
+         anything the appendix has given them: the target was eps, so why does handing over
+         3eps count?
+     Either way the cost lands on the reader and the payload is somebody else's naming
+     habit. The variant needs a quantifier argument this appendix does not carry; until it
+     does, the honest move is silence.
+     Auxiliary-function and WLOG are treated in prose (no numbered environment). All
+     demonstrations generic and self-contained; the triangle inequality is glossed inline
+     (|x+y| <= |x|+|y|), an A-class fact per SPEC §16.2, so nothing calculus is assumed.
+     Math verified during authoring: a-d = (a-b)+(b-c)+(c-d) => |a-d| < eps via thirds;
+     |x| < min{d1,d2} implies |x| < d1 and |x| < d2.
+     Record: handout/_audit/REVIEW-appendixB-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">B.4</span>Steps That Come From Nowhere</h2>
+  </header>
+
+  <p>Every reader of proofs meets the same frustration sooner or later: a line appears that seems conjured from thin air. A term is added and subtracted for no visible reason; a threshold is defined as the minimum of two others; a tolerance is carved into thirds; a brand-new function is introduced that the statement never mentioned. These steps look like inspiration, but they are not — they are standard moves, a short catalogue of them, each with a fixed purpose. Once you can name the move, the question &ldquo;how would anyone think of that?&rdquo; turns into the far smaller &ldquo;ah, that one again — what is it buying here?&rdquo;</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.4</span><span class="env-name">A catalogue of standard steps</span></p>
+    <div class="env-body">
+      <ul class="steps">
+        <li><strong>Add and subtract a term.</strong> Rewrite \(a - c\) as \((a - b) + (b - c)\) for a convenient \(b\). Legal because the inserted terms cancel; used to compare two quantities through an intermediate you can actually control.</li>
+        <li><strong>Split the tolerance.</strong> To force a sum of \(k\) terms below \(\varepsilon\), keep each term below \(\varepsilon/k\). Legal because \(k \cdot (\varepsilon/k) = \varepsilon\); used whenever an estimate breaks into several pieces. The &ldquo;\(\varepsilon/3\) trick&rdquo; you see in print is this move with \(k = 3\).</li>
+        <li><strong>Take a minimum (or maximum).</strong> To meet two &ldquo;small enough&rdquo; conditions at once, set \(\delta = \min\{\delta_1, \delta_2\}\); for two &ldquo;large enough&rdquo; conditions, set \(N = \max\{N_1, N_2\}\). Legal because the minimum is \(\le\) each of the two (and the maximum \(\ge\) each); used to satisfy several thresholds with a single one.</li>
+        <li><strong>Introduce an auxiliary function.</strong> Build a helper the statement never mentioned — often the difference \(h = f - g\) — so that a tool you already have applies to it. Legal because you are free to define what you like; used to turn an unfamiliar problem into a familiar one.</li>
+        <li><strong>Without loss of generality.</strong> Assume the convenient one of several interchangeable cases. Legal exactly when a relabeling carries the other cases onto the one you kept; used to avoid writing the same argument twice.</li>
+      </ul>
+    </div>
+  </section>
+
+  <p>The first two moves travel together so often that it is worth seeing them combined. The setting is the most common one in analysis: we want to know that two quantities are close, but we can only measure closeness through intermediate steps.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.4</span></p>
+      <div class="env-body">
+        <p>Let \(\varepsilon > 0\), and suppose four numbers satisfy \(|a - b| < \tfrac{\varepsilon}{3}\), \(|b - c| < \tfrac{\varepsilon}{3}\), and \(|c - d| < \tfrac{\varepsilon}{3}\). Show that \(|a - d| < \varepsilon\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>We have no direct grip on \(a - d\), so we manufacture one by inserting the intermediate values \(b\) and \(c\) — adding and subtracting each:
+        \[ a - d = (a - b) + (b - c) + (c - d). \]
+        This costs nothing, since the inserted terms cancel, but the right-hand side is now built from the three differences we <em>can</em> bound. By the triangle inequality \(|x + y| \le |x| + |y|\), applied twice,
+        \[ |a - d| \le |a - b| + |b - c| + |c - d| < \frac{\varepsilon}{3} + \frac{\varepsilon}{3} + \frac{\varepsilon}{3} = \varepsilon. \]
+        Two moves did the work. The <em>add-and-subtract</em> traded one uncontrollable quantity for a sum of controllable ones; the <em>split into thirds</em> set three allowances of \(\varepsilon/3\), which together come to exactly \(\varepsilon\), so the three pieces they cover must come to less. Together they are the skeleton of every argument that chains approximations — \(a\) near \(b\) near \(c\) near \(d\), and therefore \(a\) near \(d\) — with the tolerance shared out among the links.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The third move settles a different recurring difficulty: two requirements that each demand their own threshold.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.5</span></p>
+      <div class="env-body">
+        <p>Suppose one quantity is under control whenever \(|x| < \delta_1\), and a second whenever \(|x| < \delta_2\), where \(\delta_1\) and \(\delta_2\) are both positive. Produce a single \(\delta > 0\) that brings both under control at once.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Take \(\delta = \min\{\delta_1, \delta_2\}\), the smaller of the two thresholds — and \(\delta > 0\), since \(\delta_1\) and \(\delta_2\) are both positive. If \(|x| < \delta\), then \(|x| < \delta \le \delta_1\), so the first condition holds, and \(|x| < \delta \le \delta_2\), so the second holds too. One threshold, chosen as the stricter of the two, secures both.</p>
+        <p>The step \(\delta = \min\{\delta_1, \delta_2\}\) reads like a rabbit from a hat the first time, but it says only this: when two requirements each ask for &ldquo;small enough,&rdquo; obey the stricter and you have obeyed both. Its mirror image uses a <em>maximum</em> — when two conditions each need a threshold <em>exceeded</em>, \(N = \max\{N_1, N_2\}\) clears them together.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The last two moves of the catalogue are less about estimates than about reshaping a problem. An <em>auxiliary function</em> is a helper invented mid-proof to convert an awkward question into a standard one. Faced with a claim comparing two quantities \(f\) and \(g\), a proof will often introduce \(h = f - g\) out of the blue and argue about \(h\) alone: the two-object question &ldquo;is \(f\) always at least \(g\)?&rdquo; becomes the one-object question &ldquo;is \(h\) always at least \(0\)?&rdquo;, which some fact already in hand can attack. The tell is a function or quantity defined partway through a proof that appears nowhere in the statement — it exists only to be handed to a tool you already own.</p>
+
+  <p>That description is abstract, and the move is easiest to believe once you have watched it do something. Here it is on a claim small enough to check by eye.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.6</span></p>
+      <div class="env-body">
+        <p>Show that \(x^{2} + 1 > x\) for every real number \(x\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The statement compares two quantities, \(x^{2} + 1\) and \(x\), and mentions nothing else. Introduce something else: let
+        \[ h(x) = (x^{2} + 1) - x, \]
+        the difference of the two sides. The comparison <em>is \(x^{2}+1\) always bigger than \(x\)?</em> has become the one-object question <em>is \(h\) always positive?</em> — and a fact already in hand can settle that question. Complete the square:
+        \[ h(x) = x^{2} - x + 1 = \Bigl(x - \tfrac{1}{2}\Bigr)^{2} + \tfrac{3}{4}. \]
+        A square is never negative, so \(h(x) \ge \tfrac{3}{4} > 0\) for every real \(x\). Now go back to what was asked: \(h(x) > 0\) says precisely that \((x^{2} + 1) - x > 0\), that is, \(x^{2} + 1 > x\).</p>
+        <p>Notice what \(h\) bought, because that is the whole of the move. The statement never mentioned it, and nothing about it was clever — it is the plain difference, which is this move’s usual form. What it did was convert a comparison, which we had no grip on, into a question about one quantity being positive, which completing the square answers in a line. The tool was in your hands the whole time; \(h\) is what put the problem within its reach.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>The fifth move also reshapes a problem, but by shrinking it rather than by adding to it. <em>Without loss of generality</em> — abbreviated <em>WLOG</em> in most books, though we write it out — trims repeated work. Suppose a claim concerns two numbers \(a\) and \(b\) and says the same thing whichever of the two is called which. A proof may then announce &ldquo;without loss of generality, assume \(a \le b\)&rdquo; and treat only that case. This is sound exactly when the cases are interchangeable by symmetry: if instead \(a > b\), swapping the names of \(a\) and \(b\) turns the situation into the one already handled, and the claim, saying the same thing either way, is undisturbed by the swap. The move spares you from writing the same argument a second time — but only when the relabeling genuinely leaves the problem unchanged, which is precisely what a careful reader stops to confirm. Invoked over cases that are <em>not</em> symmetric, it quietly skips real work.</p>
+
+  <p>None of these steps is inspiration; each is a reflex with a purpose, and the purposes are few. When a proof does something that seems to come from nowhere, the odds are strong that it is one of these five — or a close cousin — and the useful question is never &ldquo;how would I have thought of that?&rdquo; but &ldquo;which standard move is this, and what is it buying?&rdquo; That question almost always has an answer, and finding it is most of what active reading, the subject of §B.5, amounts to.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-b-5">
+<!-- §B.5 Reading Actively.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Numbering is MANUAL, namespace "B", continuing from sec-b-4:
+     Strategy B.5 (reading a proof actively — 5 habits); Proposition B.5 (pigeonhole
+     principle) + Proof (by contradiction, drawing on B.2's contradiction shape and B.3's
+     "some box" existential); Caution unnumbered (=> is one-directional, not <=>).
+     The pigeonhole proof is the specimen the five habits are walked over.
+     Self-contained (objects/boxes/integers); internal §B.x cross-refs to B.1-B.4 allowed,
+     no Ch1-4 refs.
+     2026-07-17 (two edits, both from the third-party review of B.1-B.5; adjudication in
+     handout/html/_audit/REVIEW-appendixB-b6-design.html):
+     (1) Prop B.5 gained "For every positive integer n" -- it was the appendix's only
+         statement with a free variable and no quantifier, while Prop B.4 already used
+         exactly this wording and Strategy B.1 step 1 tells the reader to hunt quantifiers.
+         n >= 1 is also genuinely needed (n = 0 makes the proof's 1+...+1 = n vacuous).
+     (2) This section is no longer the capstone: §B.6 (Writing a Proof) now follows, so the
+         closing paragraph handed its appendix-wide summation to §B.6 and became a
+         transition -- the five reading habits are re-pointed at the reader's own page.
+     (3) Strategy B.5 habit 5 now GLOSSES the arrows on first use: "P => Q is if P, then Q,
+         while P <=> Q says that each of the two implies the other -- the if and only if of
+         §B.1". They are the appendix's first and only appearance of => and <=>, and they
+         used to arrive inside a bare parenthesis; the appendix glosses forall and exists
+         ("The first, written ..."), declined set notation on register grounds, and this
+         same day retired \neg and \mid for being unintroduced -- so a bare arrow was the
+         last symbol living below the appendix's own standard.
+     (4) The walkthrough that follows the Pause box now carries class="page-break-before".
+         Reason: the Pause says "Before reading on, try the five habits on this proof
+         yourself", and its four questions map ONE-TO-ONE onto the four bullets immediately
+         below it, separated by a single sentence. On a single-sided printed A4 the reader's
+         eye is already on the answers while reading "try it yourself" -- the exercise does
+         not slow anyone down, it silently does not happen. The kit has carried this hook all
+         along (shell CSS .paper .page-break-before; the paginator honours it and refuses to
+         break onto an empty page), and ch01/sec-1-1.html already uses it twice, so this is
+         precedent rather than invention. NOTE for the LaTeX line: this is appB's first use,
+         so DIALECT-appB gains one combination (p.page-break-before) needing an M-B2 mapping
+         -- \newpage or equivalent; ch01 will need the same when it rolls out.
+     Math verified: n+1 objects among n boxes, at most one each => total <= n, contradicting
+     n+1 > n; converse fails (2 objects in 1 of 5 boxes doubles a box with fewer objects
+     than boxes).
+     Record: handout/_audit/REVIEW-appendixB-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">B.5</span>Reading Actively</h2>
+  </header>
+
+  <p>A proof is not prose to be read at prose speed. The words on the page are the compressed record of an argument, and following the record is not the same as reconstructing the argument — that takes work the page leaves to you. Reading a proof <em>actively</em> means doing that work deliberately: interrogating each line, testing the machinery, and asking not just whether the proof is correct but why it had to go the way it did. Five habits make the difference, and together they complete the reading side of this appendix’s toolkit.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.5</span><span class="env-name">Reading a proof actively</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li><strong>Check that each step follows.</strong> For every line, name the warrant — a definition, a hypothesis, an earlier line, a result already known. If you cannot say what justifies a step, you have not yet read it.</li>
+        <li><strong>Find where each hypothesis is used.</strong> Every assumption in the statement should earn its place at some specific line. A hypothesis that is never used is a warning sign — the proof is incomplete, or the assumption was not needed. Locate the moment each one does its work.</li>
+        <li><strong>Test on a small example.</strong> Run the proof’s machinery on the smallest concrete case you can find. It exposes a misreading within seconds and turns abstract lines into something you can watch happen.</li>
+        <li><strong>Separate <em>why</em> it is true from <em>how</em> it is proved.</strong> The idea and the mechanism are different things. A good proof supplies a rigorous mechanism for an idea you can usually state in one sentence; keep both in view, since each checks the other.</li>
+        <li><strong>Watch the direction of every implication.</strong> Note which steps run one way and which run both. In symbols, \(P \Rightarrow Q\) is <em>if \(P\), then \(Q\)</em>, while \(P \Leftrightarrow Q\) says that each of the two implies the other — the <em>if and only if</em> of §B.1. Reading a one-way step backward is the commonest way a correct proof is misremembered into a false claim.</li>
+      </ol>
+    </div>
+  </section>
+
+  <p>Habits are learned on examples, so here is a small, complete theorem to practice on. It is famous, one line to state, and its proof is an argument by contradiction of the kind §B.2 laid out.</p>
+
+  <section class="env env-proposition">
+    <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">B.5</span><span class="env-name">The pigeonhole principle</span></p>
+    <div class="env-body">
+      <p>For every positive integer \(n\), if \(n + 1\) objects are distributed among \(n\) boxes, then at least one box contains two or more objects.</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Suppose, to the contrary, that no box contains two or more objects — that is, every box contains at most one. Then the total number of objects, counted box by box, is at most
+      \[ \underbrace{1 + 1 + \cdots + 1}_{n\ \text{boxes}} = n. \]
+      But \(n + 1\) objects were distributed, and \(n + 1 > n\). So the objects both do and do not number more than \(n\) — a contradiction. The assumption fails, and therefore some box contains at least two objects. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Pause</span></p>
+    <div class="env-body">
+      <p>Before reading on, try the five habits on this proof yourself. Ask:</p>
+      <ol class="steps">
+        <li>Which line carries the contradiction, and which two facts collide there?</li>
+        <li>Where is each hypothesis — the \(n + 1\) objects and the \(n\) boxes — actually used?</li>
+        <li>Run the argument on three objects in two boxes: what does it force?</li>
+        <li>Is the converse true? If some box holds two objects, must there have been more objects than boxes?</li>
+      </ol>
+    </div>
+  </section>
+
+  <p class="page-break-before">Now read that proof the way this section is urging, running the five habits across it in turn.</p>
+
+  <ul class="sol-list">
+    <li><strong>Each step follows.</strong> There are only two inequalities to warrant. &ldquo;Total \(\le n\)&rdquo; is justified by the assumption (at most one per box) times \(n\) boxes; &ldquo;\(n + 1 > n\)&rdquo; is arithmetic. Both hold, so the collision between them is real.</li>
+    <li><strong>Every hypothesis is used.</strong> The count of boxes, \(n\), is what caps the total at \(n\); the count of objects, \(n + 1\), is what overshoots it. Take away either margin — put \(n\) objects into \(n\) boxes — and the proof correctly stops working, because one-per-box is now possible and there is no contradiction. The inequality \(n + 1 > n\) is the whole engine.</li>
+    <li><strong>A small example.</strong> Three objects in two boxes: some box holds two. Thirteen people, twelve months: two of them share a birth month. Running the argument on these makes its inevitability concrete.</li>
+    <li><strong>Why versus how.</strong> <em>Why</em> it is true: you cannot fit more things than slots without doubling up somewhere — obvious the moment it is said. <em>How</em> it is proved: assume you could, count the maximum, and watch the count contradict the supply. The proof is the mechanism that makes an obvious idea rigorous; the idea is what makes the mechanism memorable.</li>
+    <li><strong>Direction.</strong> The principle runs one way — more objects than boxes \(\Rightarrow\) some box is doubled. It does <em>not</em> run backward, as the Caution below spells out.</li>
+  </ul>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>An implication \(P \Rightarrow Q\) is a one-way street. It licenses the move from \(P\) to \(Q\), never from \(Q\) back to \(P\) — that reverse trip is the converse of §B.1, a separate claim needing its own proof. For the pigeonhole principle the converse is plainly false: a box can be doubled without there being more objects than boxes at all, as putting two objects into one of five boxes shows. Only a biconditional \(P \Leftrightarrow Q\), established in both directions, lets you travel either way. As you read, mark each implication with its direction, and never silently promote a \(\Rightarrow\) into a \(\Leftrightarrow\); a good share of confidently misremembered &ldquo;theorems&rdquo; are true ones with the arrow turned the wrong way.</p>
+    </div>
+  </section>
+
+  <p>These five habits are what separate reading a proof from watching one go past. To read actively is to take the statement apart (§B.1), recognize the shape of the argument (§B.2), track the quantifiers running through it (§B.3), and name the standard moves it makes (§B.4) — and then to check, test, and question until the argument belongs to you and not only to its author. Proof literacy, on the reading side of it, is not a talent you are born with but a habit, and it repays every hour you spend on it.</p>
+
+  <p>Notice, though, what all five habits have in common: every one is a question put to somebody else’s page. What justifies this step? Where is that hypothesis used? Which way does this arrow run? Those questions have a second use. Turn them on a page you are writing yourself, and they stop being a way of checking an argument and become a way of building one — which is where the last section goes.</p>
+
+</article>
+</template>
+
+<template id="frag-sec-b-6">
+<!-- §B.6 Writing a Proof.
+     Self-authored 2026-07-17 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Added per user decision 2026-07-17, after a third-party review of
+     B.1-B.5: the appendix charter widens from "reading" to "reading and writing", and the
+     title is retitled "Reading and Writing Proofs". Roster adjudicated item-by-item in
+     handout/html/_audit/REVIEW-appendixB-b6-design.html (精簡版: NO exercise ladder --
+     CONTENT_SPEC §14 puts exercises in a separate workbook and the CONTRACT marks the
+     exercise environment do-not-emit -- and NO grading rubric, an instructor-facing genre
+     that does not belong in a student handout).
+     Numbering is MANUAL, namespace "B", continuing from sec-b-5:
+     Strategy B.6 (from statement to proof); Strategy B.7 (revising your proof);
+     Example B.7 (three layers: planning notes / weak draft / revised proof);
+     Example B.8 (existence + witness); Example B.9 (flawed: uses the converse);
+     Example B.10 (flawed: examples do not prove a universal); Caution unnumbered
+     (assuming the conclusion); Pause box (env-remark, unnumbered, NO answers -- the
+     §14-compliant practice mechanism established in sec-b-5, per user decision 2026-07-04).
+     The Strategy numbers are a pure append (B.6-B.7 land after B.1-B.5). The EXAMPLE numbers
+     are NOT: sec-b-4 gained Example B.6 (the auxiliary function) later on 2026-07-17, which
+     pushed this section's four examples from B.6-B.9 to B.7-B.10 and moved the Caution's
+     cross-reference with them. If anything is ever inserted before this section again, the
+     same cascade applies -- run the ledger check, do not eyeball it.
+     DELIBERATE CALLBACKS -- every specimen is a statement B.1-B.5 already handled, so the
+     section closes threads rather than opening new mathematics:
+       Ex B.7 claim  = the sample statement of the §B.1 opener (6|n => 3|n, converse false
+                       at n=9). B.1 takes it apart; B.6 writes it up.
+       Ex B.8        = rational = a/b echoes Prop B.2 (sqrt 2); the outer forall + inner
+                       exists composes the two skeletons of this section.
+       Ex B.9        = Example B.1 (the statement) + Prop B.1 (its contrapositive, proved)
+                       + §B.5 Caution (=> is one-way). Three earlier threads collect here.
+       Ex B.10 claim = Prop B.3, which proves the SAME claim properly by cases -- the fake
+                       and the real proof of one statement can be compared directly.
+     Self-contained: no Ch1-4 refs; internal §B.x cross-refs allowed. No figures.
+     MARKUP: only the existing appB vocabulary, so DIALECT-appB gains 0 new combinations
+     (see latex/chapters/appB/DIALECT-appB.md, frozen 2026-07-16; appB is the LaTeX pilot
+     GO unit). Specifically: ul.sol-list + run-in <strong> mirrors Example B.1's solution;
+     ol.steps in strategy boxes per CONTRACT and Strategy B.1/B.3/B.5; no qed on solutions
+     (appB puts qed in env-proof only); &ldquo;/&rdquo; entities but raw em-dash, matching
+     this appendix's source dialect.
+     Math verified during authoring: 6|n => n=6k => n=3(2k) with 2k in Z => 3|n;
+     a/b + c/d = (ad+bc)/(bd), numerator in Z, bd in Z and bd != 0 since b,d != 0;
+     n^2 even does NOT yield n even via "n even => n^2 even" (that is the converse) --
+     the honest route is the contrapositive n odd => n^2 odd = Prop B.1;
+     1^2+1=2, 2^2+2=6, 3^2+3=12 all even = evidence only; Prop B.3 proves the universal.
+     Pause: a,b even => a+b even (trap: reusing one letter k for both witnesses);
+     n < n+1 < n+2 with n+1 in Z (trap: witness produced but not verified).
+
+     Notation is deliberately spare, matching §B.1-§B.5: divisibility is written in words
+     ("divisible by 6", as §B.1 does), negation is written in words ("not Q", as
+     Definition B.1 does). No \mid, no \neg, no set-builder, no blackboard bold -- §B.3
+     declined "N in NN" on SPEC §3 register grounds, and the same line holds here.
+     S, x in S, and P(x)/Q(x) are the only symbols §B.6 adds, and all three are glossed
+     where the first skeleton introduces them. Keep it that way.
+
+     CONSTRAINT -- the contradiction half of "Contraposition, or contradiction". Three
+     drafts got this wrong in three different ways, so the division of labour is deliberate
+     and worth stating: Strategy B.3 step 1 flips the QUANTIFIER, and §B.6 fills in B.3's
+     step-2 kernel rule for the IMPLICATION case (B.3's step 2 lists =, <, and/or and then
+     says "and so on" -- it never covers implications, so §B.6 must not outsource this to
+     it). Both halves have to be on the page. Give only the kernel ("assume P and not Q")
+     and you have taught, right after the universally quantified skeleton, exactly the
+     quantifier-scope error §B.3 exists to prevent; the negation of "for every x in S, if
+     P(x) then Q(x)" is existential. Give only the quantifier flip and the kernel is an
+     unjustified assertion in the one section insisting every step carry a reason.
+     Two other places must agree with the existence skeleton's "the direct route -- and the
+     one to try first": the parenthesis naming the indirect route, and Strategy B.7's
+     existence item. An earlier draft fixed the skeleton and left B.7 categorical, which
+     put the section in contradiction with itself.
+     Provenance and the reason behind a decision belong in this comment; audit results and
+     findings lists do not -- they go to the record below. (Keep it that way: some reviewers
+     of this file are meant to come to it cold, and a summary of what earlier reviewers
+     found would tell them what to see.)
+     Record: handout/html/_audit/REVIEW-appendixB-b6-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">B.6</span>Writing a Proof</h2>
+  </header>
+
+  <p>Every section so far has put somebody else’s mathematics in front of you and asked what it was doing. Now the page is blank and the proof is yours. The skills do not change — you still take the statement apart, choose a shape, watch the quantifiers — but they run in the other direction, and one new difficulty appears with them: what you discover and what you write down are not the same thing.</p>
+
+  <p>A proof is not a transcript of everything you tried. It is a carefully arranged argument showing why the conclusion follows from the hypotheses. The false starts, the case that ate an hour before it collapsed, the algebra done three times — none of it belongs on the page, however hard it was won. Discovery is allowed to be a mess; presentation is not. Nearly every beginner’s proof confuses the two in one direction or the other: either the page becomes a diary of the search, or — far more often — the search is so vivid in the author’s mind that half of it never reaches the page at all.</p>
+
+  <p>It is worth saying plainly what rigor asks of you, because it is less than most beginners fear and more than most beginners supply. Rigor does not mean writing out every arithmetic step; a reader who can be trusted with \(6k = 3(2k)\) can be trusted to do it silently. It means that every step doing real logical work carries a reason. The test is never length. The test is whether a stranger can check you — and a stranger cannot, if they must guess the range of a variable, the meaning of a symbol, the definition you unpacked, or the direction in which an implication was used.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.6</span><span class="env-name">From statement to proof</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li><strong>Rewrite the statement.</strong> Mark the quantifiers, name the hypothesis, name the conclusion — the work of Strategy B.1. Until you can say what you are given and what you must show, there is nothing to plan.</li>
+        <li><strong>Unpack the definitions.</strong> Turn every defined word — <em>even</em>, <em>divisible</em>, <em>rational</em>, <em>prime</em> — into the condition it abbreviates. Definitions are where a proof gets its handles: a word you have not unpacked is a door you have not tried.</li>
+        <li><strong>Choose a shape.</strong> Direct first (§B.2). If the hypothesis is awkward to use, or the conclusion is itself a denial, try contraposition or contradiction. If the claim is indexed by \(n = 1, 2, 3, \ldots\), try induction — though a claim can range over every \(n\) and still want some other shape, as Proposition B.5 does. If it asserts that something exists, plan to build it.</li>
+        <li><strong>Write a skeleton.</strong> Before any real content, put down the lines you already know: what is fixed, what is assumed, what must be shown, and the sentence that will end it. If you can already see the key claim the argument will have to pass through, add that too. The unknown part of the proof is now a gap of known size.</li>
+        <li><strong>Fill every logical gap.</strong> Work through the skeleton giving each step its warrant — a definition, a hypothesis, a result already known, or an earlier line. This is the first habit of Strategy B.5, turned on your own writing.</li>
+        <li><strong>Revise for the reader.</strong> Cut what you tried and abandoned, supply what you know and never said. Strategy B.7 is the checklist.</li>
+      </ol>
+      <p class="informal">Steps 1–4 involve no proving at all. You can plan a proof before you can prove it, and should: the usual alternative is to start writing at the top of the page and hope the argument arrives before the bottom — which is how proofs pick up their worst habit, helping themselves at line one to what is not earned until line ten.</p>
+    </div>
+  </section>
+
+  <p>The arrangements below cover most of what you will be asked to write, and each has a skeleton worth knowing by heart. They are not forms to fill in — the mathematics still has to be yours — but they settle the shape of the page, which frees your attention for the argument.</p>
+
+  <p><strong>A universal implication.</strong> The commonest task of all: prove that <em>for every \(x\) in \(S\), if \(P(x)\), then \(Q(x)\)</em>. Here \(S\) is whatever collection the claim ranges over — the integers, say — while \(P(x)\) and \(Q(x)\) are the \(P\) and \(Q\) of §B.1, now written with the object they speak about; and \(x \in S\), in the skeleton below, is the usual shorthand for <em>\(x\) is in \(S\)</em>. The skeleton runs</p>
+
+  <ol class="steps">
+    <li>Let \(x \in S\) be arbitrary.</li>
+    <li>Assume \(P(x)\).</li>
+    <li>&hellip; (the argument) &hellip;</li>
+    <li>Therefore \(Q(x)\).</li>
+    <li>Since \(x\) was arbitrary, the claim holds for every \(x \in S\).</li>
+  </ol>
+
+  <p>The first line carries more weight than it appears to. <em>Arbitrary</em> means you are forbidden to choose: you take whatever \(x\) you are handed, and may use nothing about it beyond its membership in \(S\) and the hypothesis \(P(x)\). A proof that quietly helps itself to a convenient \(x\) — an even one, a positive one, a small one — has proved something, but not the claim. The last line is not a flourish either. It is the step that converts one anonymous case into all of them, and it is worth writing precisely because it reminds you to check that you earned it.</p>
+
+  <p><strong>An existence claim.</strong> To prove that <em>there exists an \(x\) in \(S\) with \(P(x)\)</em>, the direct route — and the one to try first — is to hand the reader an object:</p>
+
+  <ol class="steps">
+    <li>Let \(x = \cdots\) (or: define \(x\) by \(\cdots\)).</li>
+    <li>Then \(x \in S\), because &hellip;</li>
+    <li>And \(P(x)\) holds, because &hellip;</li>
+    <li>Hence such an \(x\) exists.</li>
+  </ol>
+
+  <p>The object you produce is called a <em>witness</em>. Note that it must be checked twice — a witness has to lie in \(S\), and it has to do the job — and that skipping the first check is the standard error. Where the witness came from is nobody’s business: you may have found it by trial, by symmetry, or by luck, and none of that need appear. That it works must appear. &ldquo;Clearly such an \(x\) exists&rdquo; is not an existence proof; it is a promise to write one. (An indirect route exists too: assume that nothing in \(S\) satisfies \(P\), and derive an impossibility — §B.2’s contradiction pointed at an existence claim. It settles that some \(x\) is there without ever saying which, which is why you produce a witness whenever you can.)</p>
+
+  <p><strong>Contraposition, or contradiction.</strong> Two ways of reaching a claim without attacking it head-on, and it matters that you do not blur them. They differ in what the outer argument aims at. To prove <em>if \(P\), then \(Q\)</em> <em>by contraposition</em>, aim at <em>not \(P\)</em>:</p>
+
+  <ol class="steps">
+    <li>Assume <em>not \(Q\)</em>.</li>
+    <li>&hellip; (the argument) &hellip;</li>
+    <li>Therefore <em>not \(P\)</em>.</li>
+    <li>That proves the contrapositive, and the contrapositive is the original claim in other words (§B.1).</li>
+  </ol>
+
+  <p>Notice that there is no contradiction anywhere in that skeleton — and, for that matter, nothing indirect about the reasoning either. What you have written is a plain direct chain. The indirectness of a contraposition is in <em>what</em> it establishes, not in <em>how</em>: you never laid a finger on the original claim, you proved a different sentence and let §B.1 carry the result across. That is also why the roster of §B.2 stops at five — a contraposition is not a sixth shape, but the first shape aimed at the equivalent sentence.</p>
+
+  <p>To prove that same <em>if \(P\), then \(Q\)</em> <em>by contradiction</em>, aim instead at an impossibility:</p>
+
+  <ol class="steps">
+    <li>Suppose the claim fails — that is, suppose \(P\) holds and \(Q\) does not.</li>
+    <li>&hellip; (the argument) &hellip;</li>
+    <li>But that contradicts <em>(name it)</em>.</li>
+    <li>So the claim cannot fail, and therefore it holds.</li>
+  </ol>
+
+  <p>Step 1 is where beginners slip, so take it slowly. §B.1 called a theorem a promise; ask what would break this one, and the answer is that \(P\) would have to hold while \(Q\) failed — nothing else would do it. That is Strategy B.3’s second step, its kernel rule, filled in for an implication. And if the claim carries a <em>for every \(x\) in \(S\)</em> in front of it, as the first skeleton did, then Strategy B.3’s first step flips that quantifier as well, and the negation hands you something sharper: <em>one</em> \(x\) in \(S\) for which \(P(x)\) holds and \(Q(x)\) fails. That \(x\) is then what you argue about. Step 3 is the other place to be careful, because &ldquo;this is absurd&rdquo; is not a contradiction — name what it collides with: a hypothesis, a known fact, or an earlier line.</p>
+
+  <p>The tell, then, is what the outer argument ends with: a contraposition ends with <em>not \(P\)</em> and stops, while a contradiction ends by naming a collision. Either may have anything you please nested inside it — §B.2 noted that shapes combine, and a contraposition whose inner step runs by contradiction is still a contraposition — but the outer aim is one or the other, and your reader needs to know which. Proposition B.1 is the first of these, once you recall the double duty §B.2 pointed out: its direct proof of <em>if \(n\) is odd, then \(n^{2}\) is odd</em> is, read the other way round, a contraposition of <em>if \(n^{2}\) is even, then \(n\) is even</em>. Proposition B.2 is the second. Read the two side by side if the distinction is not yet crisp. Announcing &ldquo;suppose, for contradiction&rdquo; over an argument that merely derives <em>not \(P\)</em> from <em>not \(Q\)</em> is confusing; announcing a contradiction and never naming the contradiction is worse than confusing, because then nothing has been established at all.</p>
+
+  <p>For induction there is a skeleton too, but you have already seen it laid out: the proof of Proposition B.4 names its base case, states its inductive hypothesis in full, and derives the case \(k + 1\) from the case \(k\), in that order. Copy that arrangement. The one rule beginners break is to invoke induction before both parts are done — a base case with no step, or a step with no base case, proves nothing whatever.</p>
+
+  <p>Enough skeletons. The best way to see what separates a draft from a proof is to watch one become the other, so we take a claim you have already met and write it up three times over.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.7</span></p>
+      <div class="env-body">
+        <p>Write a proof of the statement §B.1 opened with: <em>every integer divisible by \(6\) is divisible by \(3\).</em> Show the planning, a first attempt, and the finished proof.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <ul class="sol-list">
+          <li><strong>Planning notes.</strong> These are for you alone, and they are allowed to look like this: <em>Universal implication, one quantifier — for every integer \(n\), if \(n\) is divisible by \(6\) then it is divisible by \(3\). Unpack: divisible by \(6\) means \(n = 6k\), some integer \(k\). Want \(n = 3 \cdot (\text{integer})\). But \(6k = 3 \cdot 2k\). Direct proof; nothing else needed.</em> Scribbled in under a minute, and the proof is already decided — that was the planning half of Strategy B.6, and no proving happened anywhere in it.</li>
+          <li><strong>A weak draft.</strong> A first attempt often comes out like this: &ldquo;\(n = 6k\), so \(n = 3(2k)\), done.&rdquo; Every symbol in it is true, and it would earn very little. Where did \(n\) come from — is it one integer or every integer? Where did \(6k\) come from — the reader is left to supply the definition of divisibility unaided. Why does \(n = 3(2k)\) finish the matter — the reader must know both that \(2k\) is an integer and that this is precisely what it means to be divisible by \(3\). The algebra is right and the argument is missing. This draft is not a bad discovery; it is a bad presentation of a good one.</li>
+          <li><strong>The revised proof.</strong> Let \(n\) be an integer, and suppose \(n\) is divisible by \(6\). By the definition of divisibility, there is an integer \(k\) with \(n = 6k\). Then
+          \[ n = 6k = 3(2k), \]
+          and \(2k\) is an integer, so \(n\) is \(3\) times an integer — which is what it means for \(n\) to be divisible by \(3\). Since \(n\) was an arbitrary integer divisible by \(6\), every integer divisible by \(6\) is divisible by \(3\).</li>
+        </ul>
+        <p>Count the lines. The finished proof is four sentences where the draft was one, and none of the difference is padding: it supplies the range of \(n\), the definition being unpacked, the reason \(3(2k)\) settles the question, and the step from one \(n\) to all of them. Each is something the reader cannot be asked to supply. This is the whole lesson of the section in one example — a rigorous proof is seldom much longer than a sloppy one. It is the same argument with its reasons attached.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>That example had a single skeleton. More often two are nested, and the next one shows the commonest pairing: a universal claim on the outside whose conclusion is an existence claim on the inside.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.8</span></p>
+      <div class="env-body">
+        <p>Prove that the sum of two rational numbers is rational. (Recall that a number is <em>rational</em> when it can be written as a ratio \(a/b\) of integers with \(b \neq 0\) — the notion that Proposition B.2 showed \(\sqrt{2}\) escapes.)</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Plan first. The claim is universal on the outside — for all rational \(r\) and \(s\) — and its conclusion, <em>\(r + s\) is rational</em>, unpacks into an existence claim: there is a ratio of integers, with nonzero denominator, equal to \(r + s\). So the outer skeleton fixes an arbitrary \(r\) and \(s\), and the inner skeleton owes a witness.</p>
+        <p>Let \(r\) and \(s\) be rational numbers. By the definition of a rational number there are integers \(a, b\) with \(b \neq 0\) and \(r = a/b\), and integers \(c, d\) with \(d \neq 0\) and \(s = c/d\). Putting the two over a common denominator,
+        \[ r + s = \frac{a}{b} + \frac{c}{d} = \frac{ad + bc}{bd}. \]
+        The witness is the fraction \((ad + bc)/(bd)\), and it must now be checked rather than merely displayed. Its numerator \(ad + bc\) is an integer, being a sum of products of integers. Its denominator \(bd\) is an integer for the same reason, and \(bd \neq 0\), because a product of two nonzero integers is nonzero and both \(b \neq 0\) and \(d \neq 0\). So \(r + s\) is a ratio of integers with nonzero denominator — that is, \(r + s\) is rational. Since \(r\) and \(s\) were arbitrary rationals, the sum of any two rational numbers is rational.</p>
+        <p>The clause beginners drop is \(bd \neq 0\). It is one line, it is easy, and it is exactly the difference between exhibiting a candidate and verifying a witness: without it we have produced an expression, not a rational number. Notice also where the hypotheses went. The conditions \(b \neq 0\) and \(d \neq 0\) arrived with the definition and did their work in that single clause, and nowhere else. Strategy B.5 taught you to hunt for the line where each hypothesis earns its place when reading; when writing, you are the one who must put it there.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>So much for proofs that work. It is at least as instructive to take apart two that do not — and both of the following argue for claims that are perfectly true, which is what makes them worth the trouble. An invalid argument for a true statement is the hardest kind of error to see, because nothing at the end looks wrong.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.9</span></p>
+      <div class="env-body">
+        <p>A student offers the argument below. Find the first step that does not follow, say why, and repair the proof if the claim can be saved.</p>
+        <p><em>Claim.</em> For every integer \(n\), if \(n^{2}\) is even, then \(n\) is even.</p>
+        <p><em>Proposed proof.</em> If \(n\) is even, then \(n^{2}\) is even. Since \(n^{2}\) is even, \(n\) is even.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The claim is true — it is the statement dissected in Example B.1 — and that is exactly what makes the argument dangerous. It arrives at a correct conclusion by a route that is not allowed.</p>
+        <p>The first sentence is unobjectionable, and it is true — Example B.1 flagged it as a separate fact needing its own proof, and that proof is one line: if \(n\) is even then \(n = 2k\) for some integer \(k\), so \(n^{2} = 2(2k^{2})\), which is twice an integer and therefore even. The second sentence is where the argument fails. It takes &ldquo;if \(n\) is even, then \(n^{2}\) is even&rdquo;, receives \(n^{2}\) even, and concludes \(n\) even — traveling the implication backwards, from \(Q\) to \(P\). What that step needs is the <em>converse</em>, &ldquo;if \(n^{2}\) is even, then \(n\) is even&rdquo;, which §B.1 warned is a separate claim requiring its own proof. And it is not just any separate claim: it is the very statement we were asked to prove. The argument assumes what it set out to establish.</p>
+        <p>The claim can be saved, and §B.2 already saved it. Prove the contrapositive instead — <em>if \(n\) is odd, then \(n^{2}\) is odd</em> — which is Proposition B.1, proved there directly in three lines. A statement and its contrapositive are logically equivalent, so that proof settles this claim. Notice how little the repair costs and how much it changes: the same two facts about parity, arranged so that every arrow points the way it is used.</p>
+        <p>The lesson generalizes past this example. An implication is a one-way street (§B.5). When you have \(Q\) in hand and want \(P\), no theorem of the form \(P \Rightarrow Q\) will carry you there — you need the converse, and the converse has to be earned.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.10</span></p>
+      <div class="env-body">
+        <p>The same request for the argument below.</p>
+        <p><em>Claim.</em> For every integer \(n\), the number \(n^{2} + n\) is even.</p>
+        <p><em>Proposed proof.</em> \(1^{2} + 1 = 2\), \(2^{2} + 2 = 6\), and \(3^{2} + 3 = 12\) are all even. So \(n^{2} + n\) is even for every integer \(n\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Once again the claim is true — it is Proposition B.3 — and once again the argument does not prove it.</p>
+        <p>Three integers were checked. The claim ranges over every integer, of which there are infinitely many, and no finite list exhausts them. What the computation supplies is <em>evidence</em>: a good reason to believe the claim, and trying small cases before proving anything is a habit worth keeping — it is the third habit of Strategy B.5. But evidence is not proof. The distance between &ldquo;true in the cases I tried&rdquo; and &ldquo;true in all cases&rdquo; is precisely the distance a proof exists to cross, and here nothing crosses it. Had the three cases been the only integers, the argument would have been complete; the flaw is not the method but the mismatch between three objects and infinitely many.</p>
+        <p>Compare Proposition B.3, which proves this claim by splitting into the cases \(n\) even and \(n\) odd. That argument reaches every integer at once, and it does so because the two cases <em>together cover all of them</em> — completeness of the split, not a longer list of examples, is what does the work. Two well-chosen cases beat three thousand well-checked ones.</p>
+        <p>The asymmetry here is worth carrying away: short of checking every object the claim ranges over — and over the integers you never can — no number of confirming examples establishes a <em>for all</em>, while a single counterexample destroys one (§B.2). Examples are decisive when they refute; when they confirm, they are evidence, and over the integers never more than that.</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The subtlest way to break a proof is to assume, somewhere in the middle, the very thing being proved. It seldom looks as blunt as Example B.9; more often it slips in through notation, as when a proof about an unspecified integer \(n\) opens &ldquo;let \(n = 2k\)&rdquo; — a perfectly good line once you know \(n\) is even, and a fatal one while that is still the conclusion. Ask it of every assumption you write: was I <em>given</em> this, or do I <em>want</em> it? A step you want is a step you have yet to earn.</p>
+    </div>
+  </section>
+
+  <section class="env env-remark">
+    <p class="env-head"><span class="env-kicker">Pause</span></p>
+    <div class="env-body">
+      <p>Two short claims to write up now, before you read on. Both use a skeleton from the pages above, and for both the skeleton is named for you — the work here is in the writing, not in finding the idea.</p>
+      <ol class="steps">
+        <li>Prove: <em>if \(a\) and \(b\) are even integers, then \(a + b\) is even.</em> A universal implication — use the first skeleton, and unpack <em>even</em> before you do anything else.</li>
+        <li>Prove: <em>for every integer \(n\), there is an integer strictly between \(n\) and \(n + 2\).</em> An existence claim inside a <em>for all</em> — fix an arbitrary \(n\), then produce a witness and check it.</li>
+      </ol>
+      <p>Write both before reading on. The checklist that follows is what you will run over them, and it is worth arriving at with something of your own in hand.</p>
+    </div>
+  </section>
+
+  <p>Your draft is written. Now read it as a stranger would, which is a different act from proofreading it: you are not hunting typos but checking whether the argument in your head actually reached the page. The list below is short, and every item on it is a question a reader will ask.</p>
+
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.7</span><span class="env-name">Revising your proof</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li><strong>Is every variable’s range on the page, and is it clear what is arbitrary?</strong> A reader who cannot tell whether \(n\) is one integer or every integer cannot check a single line that follows.</li>
+        <li><strong>Is every definition you leaned on unpacked?</strong> If a word such as <em>even</em> or <em>rational</em> does real work, the condition it abbreviates should appear where it does that work.</li>
+        <li><strong>Does every step doing logical work carry a reason?</strong> A definition, a hypothesis, a known result, or an earlier line. <em>Obviously</em> and <em>clearly</em> are not reasons; wherever one appears, either supply the reason or cut the step.</li>
+        <li><strong>Is each hypothesis used, and can you point to where?</strong> An unused hypothesis means one of two things, and both are worth knowing: you have proved something stronger than the claim, or you have overlooked something.</li>
+        <li><strong>Does every implication run the way you needed it to?</strong> Mark the arrows. A step read backwards is the commonest fatal error there is, and the hardest to catch in your own writing.</li>
+        <li><strong>If you claimed existence, did you settle it one way or the other?</strong> If you argued directly, that means producing a witness and running both checks on it — that the object lies in the set, and that it does what was asked. If you argued indirectly, it means negating the existence claim correctly and naming the contradiction you reached.</li>
+        <li><strong>If you argued by contradiction, did you name the contradiction?</strong> &ldquo;This is absurd&rdquo; is not a collision. Say which two facts cannot both hold.</li>
+        <li><strong>Does your last sentence establish exactly the claim as stated?</strong> Not something near it, and not its converse.</li>
+        <li><strong>Can any sentence go without breaking the argument?</strong> If so, let it go. Length is not rigor, and a shorter proof is a proof more people will finish checking.</li>
+      </ol>
+      <p class="informal">A first draft discovers the argument; revision makes the argument inspectable.</p>
+    </div>
+  </section>
+
+  <p>Run that list over the two proofs from the Pause above, and then — only then — here are two things to look for, one in each. On the first: what did you call the two even integers? If both came out as \(2k\), you have proved something true but far smaller than the claim, namely that \(a + b\) is even whenever \(a = b\). Two independent objects need two independent names. On the second: did you do more than write down \(n + 1\)? A witness is not verified until you have said why it is an integer and why it lies strictly between \(n\) and \(n + 2\) — item 6, and the item that catches the most first drafts there are.</p>
+
+  <p>Reading and writing proofs are one skill practiced in opposite directions, and the questions do not change when you turn around. §B.5 asked you to find the warrant for every line, locate each hypothesis, and watch the arrows in somebody else’s argument; Strategy B.7 asks exactly that of your own. This is why the two directions belong together — what makes a proof checkable is what makes it writable, and an author who cannot read their own page as a stranger would has no way of knowing whether the argument arrived. Rigor, in the end, is the discipline of leaving nothing load-bearing unsaid: of writing so that someone who does not already believe you, and who cannot ask you what you meant, can rebuild the argument line by line and see for themselves that it holds. That is a craft rather than a talent, and like any craft it is built by writing something, finding out what a reader could not follow, and writing it again.</p>
+
+</article>
+</template>
+<!-- END-CONTENT-FRAGMENTS -->
+<!-- plot.js — inlined -->
+<script>
+(function () {
+  var uid = 0;
+  var PI = Math.PI;
+  function piTex(v) {
+    var map = {};
+    map[(-2 * PI).toFixed(4)] = "-2\\pi";
+    map[(-PI).toFixed(4)] = "-\\pi";
+    map[(-PI / 2).toFixed(4)] = "-\\tfrac{\\pi}{2}";
+    map[(PI / 2).toFixed(4)] = "\\tfrac{\\pi}{2}";
+    map[PI.toFixed(4)] = "\\pi";
+    map[(2 * PI).toFixed(4)] = "2\\pi";
+    map[(0).toFixed(4)] = "0";
+    var hit = map[v.toFixed(4)];
+    if (hit != null) return hit;
+    if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v)); // plain integers
+    return undefined;
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function anchorTransform(anchor, vAnchor) {
+    var tx = anchor === "start" ? "0" : anchor === "end" ? "-100%" : "-50%";
+    var ty = vAnchor === "top" ? "0" : vAnchor === "bottom" ? "-100%" : "-50%";
+    return "translate(" + tx + "," + ty + ")";
+  }
+  function buildPlot(cfg) {
+    var w = cfg.w, h = cfg.h;
+    var pad = Object.assign({ t: 16, r: 18, b: 20, l: 22 }, cfg.pad || {});
+    var xmin = cfg.xmin, xmax = cfg.xmax, ymin = cfg.ymin, ymax = cfg.ymax;
+    var iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    var SX = function(x) { return pad.l + ((x - xmin) / (xmax - xmin)) * iw; };
+    var SY = function(y) { return h - pad.b - ((y - ymin) / (ymax - ymin)) * ih; };
+    var id = "pl" + (++uid);
+    var parts = [], labels = [];
+    function pushLabel(o) { labels.push(o); }
+    parts.push('<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:' + w + 'px" class="fig-svg" role="img" aria-label="' + esc(cfg.aria || "graph") + '" preserveAspectRatio="xMidYMid meet">');
+    parts.push('<defs><marker id="' + id + 'a" markerWidth="8" markerHeight="8" refX="5.4" refY="2.8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5.4,2.8 L0,5.6" fill="none" stroke="var(--c-axis)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>');
+    if (cfg.axes !== false) {
+      var x0 = Math.min(Math.max(0, xmin), xmax), y0 = Math.min(Math.max(0, ymin), ymax);
+      var ax0 = SX(xmin), ax1 = SX(xmax), ayBase = SY(y0);
+      parts.push('<path d="M' + ax0.toFixed(1) + ',' + ayBase.toFixed(1) + ' H' + (ax1 - 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      var ay0 = SY(ymin), ay1 = SY(ymax), axBase = SX(x0);
+      parts.push('<path d="M' + axBase.toFixed(1) + ',' + ay0.toFixed(1) + ' V' + (ay1 + 1).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      if (cfg.xlabel) pushLabel({ px: ax1 + 1, py: ayBase + 4, tex: cfg.xlabel, anchor: "start", vAnchor: "top", cls: "a-ax", size: 13 });
+      if (cfg.ylabel) pushLabel({ px: axBase - 5, py: ay1 + 1, tex: cfg.ylabel, anchor: "end", vAnchor: "top", cls: "a-ax", size: 13 });
+      (cfg.xticks || []).forEach(function(t) {
+        var px = SX(t.x);
+        parts.push('<line x1="' + px.toFixed(1) + '" y1="' + (ayBase - 3).toFixed(1) + '" x2="' + px.toFixed(1) + '" y2="' + (ayBase + 3).toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.x));
+        if (tex != null) pushLabel({ px: px, py: ayBase + 6, tex: tex, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: px, py: ayBase + 6, text: t.label, anchor: "middle", vAnchor: "top", cls: "a-pt", size: 12 });
+      });
+      (cfg.yticks || []).forEach(function(t) {
+        var py = SY(t.y);
+        parts.push('<line x1="' + (axBase - 3).toFixed(1) + '" y1="' + py.toFixed(1) + '" x2="' + (axBase + 3).toFixed(1) + '" y2="' + py.toFixed(1) + '" class="axis"/>');
+        var tex = t.tex != null ? t.tex : (t.label != null ? null : piTex(t.y));
+        if (tex != null) pushLabel({ px: axBase - 6, py: py, tex: tex, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+        else if (t.label != null) pushLabel({ px: axBase - 6, py: py, text: t.label, anchor: "end", vAnchor: "middle", cls: "a-pt", size: 12 });
+      });
+    }
+    (cfg.items || []).forEach(function(it) {
+      if (it.type === "curve") {
+        var cls = it.cls || "curve", n = it.samples || 240, a = it.domain[0], b = it.domain[1];
+        var d = "", pen = false;
+        for (var i = 0; i <= n; i++) {
+          var x = a + (b - a) * (i / n), y = it.fn(x);
+          if (!isFinite(y) || y < ymin - (ymax - ymin) * 0.04 || y > ymax + (ymax - ymin) * 0.04) { pen = false; continue; }
+          var px = SX(x).toFixed(2), py = SY(y).toFixed(2);
+          d += (pen ? "L" : "M") + px + "," + py + " "; pen = true;
+        }
+        if (d) parts.push('<path d="' + d.trim() + '" class="' + cls + '"/>');
+      } else if (it.type === "vline") {
+        parts.push('<line x1="' + SX(it.x).toFixed(1) + '" y1="' + SY(ymin).toFixed(1) + '" x2="' + SX(it.x).toFixed(1) + '" y2="' + SY(ymax).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "hline") {
+        var ha = it.from != null ? it.from : xmin, hb = it.to != null ? it.to : xmax;
+        parts.push('<line x1="' + SX(ha).toFixed(1) + '" y1="' + SY(it.y).toFixed(1) + '" x2="' + SX(hb).toFixed(1) + '" y2="' + SY(it.y).toFixed(1) + '" class="' + (it.cls || "refline") + '"/>');
+      } else if (it.type === "seg") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="' + (it.cls || "curve") + '"/>');
+      } else if (it.type === "dot") {
+        var r = it.r || 3.0;
+        if (it.hollow) parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/>');
+        else parts.push('<circle cx="' + SX(it.x).toFixed(1) + '" cy="' + SY(it.y).toFixed(1) + '" r="' + r + '" class="dot"/>');
+      } else if (it.type === "arrow") {
+        parts.push('<line x1="' + SX(it.x1).toFixed(1) + '" y1="' + SY(it.y1).toFixed(1) + '" x2="' + SX(it.x2).toFixed(1) + '" y2="' + SY(it.y2).toFixed(1) + '" class="axis" marker-end="url(#' + id + 'a)"/>');
+      } else if (it.type === "text") {
+        pushLabel({ px: SX(it.x), py: SY(it.y), tex: it.tex, text: it.tex == null ? it.text : null, anchor: it.anchor || "middle", vAnchor: it.vAnchor || "middle", dx: it.dx || 0, dy: it.dy || 0, cls: it.cls || "a-pt", size: it.size });
+      }
+    });
+    if (labels.length) {
+      var M = 52;
+      var spans = labels.map(function(L) {
+        var left = (L.px + (L.dx || 0) + M).toFixed(1);
+        var top = (L.py + (L.dy || 0) + M).toFixed(1);
+        var tf = anchorTransform(L.anchor, L.vAnchor);
+        var fs = L.size ? "font-size:" + L.size + "px;" : "";
+        var body = L.tex != null ? "\\(" + L.tex + "\\)" : esc(L.text == null ? "" : L.text);
+        return '<span class="fig-lbl ' + (L.cls || "") + '" style="left:' + left + 'px;top:' + top + 'px;transform:' + tf + ';' + fs + '">' + body + '</span>';
+      }).join("");
+      parts.push('<foreignObject x="' + (-M) + '" y="' + (-M) + '" width="' + (w + 2 * M) + '" height="' + (h + 2 * M) + '" class="fig-fo" requiredExtensions="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml" class="fig-lyr">' + spans + '</div></foreignObject>');
+    }
+    parts.push('</svg>');
+    return parts.join("");
+  }
+  window.buildPlot = buildPlot;
+  window.PIVAL = PI;
+})();
+</script>
+
+<!-- ============================================================
+     figures.js — inlined (Chapter 1 figure registry)
+     ============================================================ -->
+<script>
+/* ============================================================
+   figures.js — Chapter 1 figure registry.
+   Each entry returns { layout, panels:[{svg, note}] } (note may
+   carry \( \) math, rendered by the page's MathJax pass afterward).
+   In-figure labels also carry TeX via { type:"text", tex:"…" } and
+   are typeset by the same MathJax pass — so every glyph in the graphs
+   matches the body equations (Computer Modern).
+   hydrateFigures(root) fills every <figure data-fig="id"> before
+   its <figcaption>.
+   ============================================================ */
+(function () {
+  const P = () => window.PIVAL;
+  const pow2 = (x) => Math.pow(2, x);
+
+  const FIGS = {
+    /* ---------------- Appendix A §A.5 — conic sections (self-authored 2026-07-04) ---------------- */
+    "conic-circle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 250, h: 250, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -2.8, xmax: 2.8, ymin: -2.8, ymax: 2.8,
+          xlabel: "x", ylabel: "y", aria: "A circle of radius r centred at the origin, with one radius drawn to the rim.",
+          items: [
+            { type: "curve", fn: (x) => Math.sqrt(Math.max(0, 4 - x * x)), domain: [-2, 2], samples: 320, cls: "curve" },
+            { type: "curve", fn: (x) => -Math.sqrt(Math.max(0, 4 - x * x)), domain: [-2, 2], samples: 320, cls: "curve" },
+            { type: "seg", x1: 0, y1: 0, x2: 1.414, y2: 1.414, cls: "refline" },
+            { type: "dot", x: 0, y: 0 },
+            { type: "text", x: 0.58, y: 0.86, tex: "r", cls: "a-ref", anchor: "end" },
+            { type: "text", x: -0.12, y: -0.12, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+          ],
+        }),
+        note: "A circle: every point lies a fixed distance \\(r\\) from the centre \\(O\\).",
+      }],
+    }),
+    "conic-parabola": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 270, h: 240, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -3.7, xmax: 3.7, ymin: -1.6, ymax: 4.8,
+          xlabel: "x", ylabel: "y", aria: "An upward parabola with its focus above the vertex and its directrix a dashed line below.",
+          items: [
+            { type: "curve", fn: (x) => x * x / 4, domain: [-3.7, 3.7], samples: 220, cls: "curve" },
+            { type: "hline", y: -1, from: -3.4, to: 3.4, cls: "refline" },
+            { type: "dot", x: 0, y: 1 },
+            { type: "text", x: 0.16, y: 1.08, tex: "F=(0,p)", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 3.4, y: -1, tex: "y=-p", cls: "a-ref", anchor: "end", vAnchor: "top", dy: 3 },
+            { type: "text", x: -0.14, y: 0.02, tex: "O", cls: "a-pt", anchor: "end", vAnchor: "top" },
+          ],
+        }),
+        note: "A parabola \\(x^2=4py\\): every point is equidistant from the focus \\(F\\) and the directrix \\(y=-p\\).",
+      }],
+    }),
+    "conic-ellipse": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -3.7, xmax: 3.7, ymin: -2.8, ymax: 2.8,
+          xlabel: "x", ylabel: "y", aria: "An ellipse wider than it is tall, with two foci on the horizontal axis.",
+          items: [
+            { type: "curve", fn: (x) => 2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+            { type: "curve", fn: (x) => -2 * Math.sqrt(Math.max(0, 1 - x * x / 9)), domain: [-3, 3], samples: 320, cls: "curve" },
+            { type: "dot", x: 2.236, y: 0 },
+            { type: "dot", x: -2.236, y: 0 },
+            { type: "dot", x: 0, y: 0 },
+            { type: "text", x: 2.236, y: -0.12, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: -2.236, y: -0.12, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: 3.02, y: 0.12, tex: "(a,0)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+            { type: "text", x: 0.18, y: 2.05, tex: "(0,b)", cls: "a-pt", anchor: "start", vAnchor: "bottom" },
+            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+          ],
+        }),
+        note: "An ellipse \\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1\\) with \\(a>b\\): the distances to the two foci \\(F_1,F_2\\) sum to a constant.",
+      }],
+    }),
+    "conic-hyperbola": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 290, h: 230, pad: { t: 18, r: 18, b: 18, l: 18 },
+          xmin: -5.2, xmax: 5.2, ymin: -4, ymax: 4,
+          xlabel: "x", ylabel: "y", aria: "A hyperbola with two branches opening left and right, hugging two dashed asymptotes.",
+          items: [
+            { type: "seg", x1: -5, y1: -3.75, x2: 5, y2: 3.75, cls: "refline" },
+            { type: "seg", x1: -5, y1: 3.75, x2: 5, y2: -3.75, cls: "refline" },
+            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [2, 5.2], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => 1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [-5.2, -2], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -1.5 * Math.sqrt(Math.max(0, x * x / 4 - 1)), domain: [-5.2, -2], samples: 200, cls: "curve" },
+            { type: "dot", x: 2.5, y: 0 },
+            { type: "dot", x: -2.5, y: 0 },
+            { type: "dot", x: 2, y: 0, hollow: true },
+            { type: "dot", x: -2, y: 0, hollow: true },
+            { type: "dot", x: 0, y: 0 },
+            { type: "text", x: 2.5, y: -0.16, tex: "F_2", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: -2.5, y: -0.16, tex: "F_1", cls: "a-pt", anchor: "middle", vAnchor: "top" },
+            { type: "text", x: 2, y: 0.18, tex: "(a,0)", cls: "a-pt", anchor: "middle", vAnchor: "bottom" },
+            { type: "text", x: 4.9, y: 3.68, tex: "y=\\tfrac{b}{a}x", cls: "a-ref", anchor: "end", vAnchor: "bottom" },
+            { type: "text", x: 0.14, y: -0.14, tex: "O", cls: "a-pt", anchor: "start", vAnchor: "top" },
+          ],
+        }),
+        note: "A hyperbola \\(\\frac{x^2}{a^2}-\\frac{y^2}{b^2}=1\\): two branches with vertices at \\((\\pm a,0)\\), approaching the asymptotes \\(y=\\pm\\frac{b}{a}x\\).",
+      }],
+    }),
+
+    /* ---------------- §1.1 ---------------- */
+    "hlt": () => ({
+      layout: "pair",
+      panels: [
+        {
+          svg: buildPlot({
+            w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3,
+            xlabel: "x", ylabel: "y", aria: "A one-to-one line crossed once by a horizontal line.",
+            items: [
+              { type: "curve", fn: (x) => x, domain: [-1.5, 1.45], cls: "curve" },
+              { type: "hline", y: 1, from: -2.1, to: 1.3, cls: "refline" },
+              { type: "dot", x: 1, y: 1 },
+              { type: "text", x: 1.55, y: 1.62, tex: "f", cls: "a-curve" },
+              { type: "text", x: 1.42, y: 1.0, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -2 },
+              { type: "text", x: 1.06, y: 0.46, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "start" },
+            ],
+          }),
+          note: "One-to-one \u2014 a line meets the graph at most once.",
+        },
+        {
+          svg: buildPlot({
+            w: 250, h: 200, xmin: -2.3, xmax: 2.2, ymin: -2.1, ymax: 2.3,
+            xlabel: "x", ylabel: "y", aria: "A parabola crossed twice by a horizontal line.",
+            items: [
+              { type: "curve", fn: (x) => 1.15 * x * x, domain: [-1.4, 1.4], cls: "curve" },
+              { type: "hline", y: 1.25, from: -1.85, to: 1.85, cls: "refline" },
+              { type: "dot", x: -1.043, y: 1.25 },
+              { type: "dot", x: 1.043, y: 1.25 },
+              { type: "text", x: 1.5, y: 2.18, tex: "f", cls: "a-curve" },
+              { type: "text", x: 1.9, y: 1.25, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 },
+              { type: "text", x: -1.2, y: 0.98, tex: "(x_1,\\,c)", cls: "a-pt", anchor: "end" },
+              { type: "text", x: 1.2, y: 0.98, tex: "(x_2,\\,c)", cls: "a-pt", anchor: "start" },
+            ],
+          }),
+          note: "Not one-to-one \u2014 a line meets the graph more than once.",
+        },
+      ],
+    }),
+
+    "restrict-x2": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 300, h: 300, xmin: -0.4, xmax: 2.7, ymin: -0.4, ymax: 2.7,
+          xlabel: "x", ylabel: "y",
+          aria: "The squaring function restricted to the nonnegative reals, its inverse square root, and the mirror line y equals x.",
+          items: [
+            { type: "curve", fn: (x) => x, domain: [0, 2.5], cls: "refline" },
+            { type: "curve", fn: (x) => x * x, domain: [0, 1.6], cls: "curve" },
+            { type: "curve", fn: (x) => Math.sqrt(x), domain: [0, 2.5], cls: "curve" },
+            { type: "text", x: 1.02, y: 2.25, tex: "f(x)=x^{2}", cls: "a-curve", anchor: "end" },
+            { type: "text", x: 2.5, y: 1.5, tex: "f^{-1}(x)=\\sqrt{x}", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 2.32, y: 2.5, tex: "y=x", cls: "a-ref", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.2 ---------------- */
+    "sine-not-1to1": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 620, h: 220, xmin: -6.9, xmax: 7.4, ymin: -1.35, ymax: 1.35,
+          pad: { t: 16, r: 18, b: 26, l: 18 },
+          xlabel: "x", ylabel: "y", aria: "The sine function on the real line is not one-to-one.",
+          xticks: [{ x: -2 * P() }, { x: -P() }, { x: P() }, { x: 2 * P() }],
+          yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.sin(x), domain: [-6.8, 6.8], samples: 360, cls: "curve" },
+            { type: "hline", y: 0.5, from: -6.8, to: 6.8, cls: "refline" },
+            ...[0.5236, 2.618, 6.807, -3.6652, -5.7596].map((x) => ({ type: "dot", x, y: 0.5, r: 2.6 })),
+            { type: "text", x: 3.25, y: 1.0, tex: "\\sin x", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 6.95, y: 0.5, tex: "y=c", cls: "a-ref", anchor: "start", vAnchor: "bottom", dy: -1 },
+          ],
+        }),
+      }],
+    }),
+    "restricted-sine": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 380, h: 260, xmin: -1.95, xmax: 1.95, ymin: -1.25, ymax: 1.25,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of sine.",
+          xticks: [{ x: -P() / 2 }, { x: P() / 2 }], yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.sin(x), domain: [-P() / 2, P() / 2], cls: "curve" },
+            { type: "text", x: 1.02, y: 1.12, tex: "\\sin x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "restricted-cosine": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 380, h: 200, xmin: -0.4, xmax: 3.6, ymin: -1.35, ymax: 1.75,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of cosine.",
+          xticks: [{ x: P() }], yticks: [{ y: -1, tex: "-1" }, { y: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.cos(x), domain: [0, P()], cls: "curve" },
+            { type: "text", x: 1.25, y: 0.8, tex: "\\cos x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "restricted-tangent": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 320, h: 320, xmin: -1.95, xmax: 1.95, ymin: -5, ymax: 5,
+          xlabel: "x", ylabel: "y", aria: "Restricted branch of tangent.",
+          xticks: [{ x: -P() / 2 }, { x: P() / 2 }],
+          items: [
+            { type: "vline", x: -P() / 2, cls: "refline" },
+            { type: "vline", x: P() / 2, cls: "refline" },
+            { type: "curve", fn: (x) => Math.tan(x), domain: [-1.37, 1.37], samples: 300, cls: "curve" },
+            { type: "text", x: 0.35, y: 2.8, tex: "\\tan x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "arcsin-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 300, h: 130, xmin: -0.3, xmax: 3.5, ymin: -0.35, ymax: 1.45, axes: false,
+          aria: "Right triangle with angle theta, opposite 1, adjacent 2 root 2, hypotenuse 3.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 3, y2: 0, cls: "curve" },
+            { type: "seg", x1: 3, y1: 0, x2: 3, y2: 1, cls: "curve" },
+            { type: "seg", x1: 3, y1: 1, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2.78, y1: 0, x2: 2.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 2.78, y1: 0.22, x2: 3, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.66, y: 0.13, tex: "\\theta", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1.5, y: 0, tex: "2\\sqrt{2}", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 3, y: 0.5, tex: "1", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 1.25, y: 0.62, tex: "3", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+    "arctan10-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 240, h: 180, xmin: -0.3, xmax: 2.8, ymin: -0.35, ymax: 2.0, axes: false,
+          aria: "Right triangle with angle theta, adjacent 1, opposite 10, hypotenuse square root of 101.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 2, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2, y1: 0, x2: 2, y2: 1.5, cls: "curve" },
+            { type: "seg", x1: 2, y1: 1.5, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 1.78, y1: 0, x2: 1.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 1.78, y1: 0.22, x2: 2, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.46, y: 0.18, tex: "\\theta", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1, y: 0, tex: "1", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 2, y: 0.75, tex: "10", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 0.8, y: 0.9, tex: "\\sqrt{101}", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+    "arctan-general-triangle": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 240, h: 180, xmin: -0.3, xmax: 2.8, ymin: -0.35, ymax: 2.0, axes: false,
+          aria: "Right triangle with angle y, adjacent 1, opposite x, hypotenuse square root of 1 plus x squared.",
+          items: [
+            { type: "seg", x1: 0, y1: 0, x2: 2, y2: 0, cls: "curve" },
+            { type: "seg", x1: 2, y1: 0, x2: 2, y2: 1.5, cls: "curve" },
+            { type: "seg", x1: 2, y1: 1.5, x2: 0, y2: 0, cls: "curve" },
+            { type: "seg", x1: 1.78, y1: 0, x2: 1.78, y2: 0.22, cls: "axis" },
+            { type: "seg", x1: 1.78, y1: 0.22, x2: 2, y2: 0.22, cls: "axis" },
+            { type: "text", x: 0.46, y: 0.18, tex: "y", cls: "a-pt", anchor: "start" },
+            { type: "text", x: 1, y: 0, tex: "1", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 4 },
+            { type: "text", x: 2, y: 0.75, tex: "x", cls: "a-pt", anchor: "start", dx: 4 },
+            { type: "text", x: 0.8, y: 0.9, tex: "\\sqrt{1+x^{2}}", cls: "a-pt", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.3 ---------------- */
+    "limit-same-near-a": () => {
+      const base = (extra) => buildPlot(Object.assign({
+        w: 250, h: 200, xmin: 0, xmax: 3.7, ymin: 0, ymax: 14,
+        pad: { t: 14, r: 16, b: 20, l: 18 }, xlabel: "x", ylabel: "y",
+        aria: "A function approaching L as x approaches a.",
+      }, extra));
+      const labels = [
+        { type: "hline", y: 8, from: 0, to: 3, cls: "refline" },
+        { type: "text", x: 3, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+        { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+      ];
+      return {
+        layout: "triple",
+        panels: [
+          {
+            svg: base({ items: [{ type: "curve", fn: pow2, domain: [0.45, 3.45], cls: "curve" }, ...labels, { type: "dot", x: 3, y: 8 }] }),
+            note: "\\(f(a) = L\\)",
+          },
+          {
+            svg: base({ items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              ...labels, { type: "dot", x: 3, y: 8, hollow: true }, { type: "dot", x: 3, y: 5 },
+            ] }),
+            note: "\\(f(a) \\neq L\\)",
+          },
+          {
+            svg: base({ items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              ...labels, { type: "dot", x: 3, y: 8, hollow: true },
+            ] }),
+            note: "\\(f(a)\\) is undefined",
+          },
+        ],
+      };
+    },
+
+    "read-limit-graph": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 460, h: 280, xmin: -3.3, xmax: 2.9, ymin: -2.7, ymax: 2.8,
+          xlabel: "x", ylabel: "y",
+          aria: "A function with limit 1 at x = -2, limit 0 at x = 0, and limit 2 at x = 2, although f(2) = -2.",
+          xticks: [{ x: -2, tex: "-2" }, { x: 2, tex: "2" }],
+          yticks: [{ y: -2, tex: "-2" }, { y: 1, tex: "1" }, { y: 2, tex: "2" }],
+          items: [
+            { type: "curve", fn: (x) => -0.0375 * x * x * x + 0.375 * x * x + 0.4 * x, domain: [-2.8, 1.98], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => -0.0375 * x * x * x + 0.375 * x * x + 0.4 * x, domain: [2.02, 2.7], samples: 50, cls: "curve" },
+            { type: "dot", x: 2, y: 2, hollow: true },
+            { type: "dot", x: 2, y: -2 },
+            { type: "text", x: -2.7, y: 1.55, tex: "y=f(x)", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.4 ---------------- */
+    "one-sided-limits": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 260, xmin: -0.5, xmax: 4.5, ymin: -0.5, ymax: 3.2,
+          xlabel: "x", ylabel: "y", aria: "Different left and right limits at a.",
+          xticks: [{ x: 2, tex: "a" }], yticks: [{ y: 1, tex: "L_1" }, { y: 2, tex: "L_2" }],
+          items: [
+            { type: "curve", fn: (x) => 1 + 0.25 * (x - 2) * (x - 2), domain: [0.2, 1.95], cls: "curve" },
+            { type: "curve", fn: (x) => 2 + 0.2 * (x - 2) * (x - 2), domain: [2.05, 4.2], cls: "curve" },
+            { type: "dot", x: 2, y: 1, hollow: true }, { type: "dot", x: 2, y: 2, hollow: true },
+          ],
+        }),
+      }],
+    }),
+    "one-sided-infinite": () => {
+      const mk = (fn, dom, ymin, ymax) => buildPlot({
+        w: 240, h: 210, xmin: -0.2, xmax: 3.2, ymin, ymax,
+        pad: { t: 14, r: 14, b: 20, l: 16 }, xlabel: "x", ylabel: "y",
+        aria: "A one-sided infinite limit.",
+        xticks: [{ x: 2, tex: "a" }],
+        items: [{ type: "vline", x: 2, cls: "refline" }, { type: "curve", fn, domain: dom, samples: 200, cls: "curve" }],
+      });
+      return {
+        layout: "grid",
+        panels: [
+          { svg: mk((x) => 1 / (2 - x), [0.25, 1.68], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{-}} f(x)=\\infty\\)" },
+          { svg: mk((x) => 1 / (x - 2), [2.32, 3.0], -0.55, 3.2), note: "\\(\\lim_{x\\to a^{+}} f(x)=\\infty\\)" },
+          { svg: mk((x) => -1 / (2 - x), [0.25, 1.68], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{-}} f(x)=-\\infty\\)" },
+          { svg: mk((x) => -1 / (x - 2), [2.32, 3.0], -3.0, 0.75), note: "\\(\\lim_{x\\to a^{+}} f(x)=-\\infty\\)" },
+        ],
+      };
+    },
+    "vertical-asymptote": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 260, xmin: -1, xmax: 7, ymin: -20, ymax: 20,
+          xlabel: "x", ylabel: "y", aria: "Graph with a vertical asymptote at x = 3.",
+          xticks: [{ x: 3, tex: "3" }], yticks: [{ y: 2, tex: "2" }],
+          items: [
+            { type: "vline", x: 3, cls: "refline" },
+            { type: "curve", fn: (x) => (2 * x) / (x - 3), domain: [-0.8, 2.9], samples: 200, cls: "curve" },
+            { type: "curve", fn: (x) => (2 * x) / (x - 3), domain: [3.1, 6.8], samples: 200, cls: "curve" },
+          ],
+        }),
+      }],
+    }),
+    "piecewise-jump": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 360, h: 240, xmin: -0.5, xmax: 5, ymin: -0.5, ymax: 4.5,
+          xlabel: "x", ylabel: "y",
+          aria: "Piecewise function with jump at x equals 2: left limit is 3, right limit is 2.",
+          xticks: [{ x: 2, tex: "2" }],
+          yticks: [{ y: 2, tex: "2" }, { y: 3, tex: "3" }],
+          items: [
+            { type: "curve", fn: (x) => x + 1, domain: [-0.3, 1.97], cls: "curve" },
+            { type: "curve", fn: (x) => 4 - x, domain: [2.03, 4.5], cls: "curve" },
+            { type: "dot", x: 2, y: 3, hollow: true },
+            { type: "dot", x: 2, y: 2 },
+            { type: "text", x: 0.05, y: 2.3, tex: "y=x+1", cls: "a-curve", anchor: "start" },
+            { type: "text", x: 3.5, y: 1.0, tex: "y=4-x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "ln-asymptote": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 340, h: 260, xmin: -0.8, xmax: 5.5, ymin: -2.8, ymax: 2.5,
+          xlabel: "x", ylabel: "y",
+          aria: "Graph of y equals natural log of x approaching negative infinity near x equals 0.",
+          xticks: [{ x: 1, tex: "1" }],
+          items: [
+            { type: "curve", fn: (x) => Math.log(x), domain: [0.09, 5.2], samples: 300, cls: "curve" },
+            { type: "text", x: 4.3, y: 2.0, tex: "y=\\ln x", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.5 ---------------- */
+    "floor-function": () => {
+      const steps = [];
+      for (var n = -1; n <= 4; n++) {
+        steps.push({ type: "seg", x1: n, y1: n, x2: n + 1, y2: n, cls: "curve" });
+        steps.push({ type: "dot", x: n, y: n });
+        steps.push({ type: "dot", x: n + 1, y: n, hollow: true });
+      }
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 380, h: 320, xmin: -1.5, xmax: 5.5, ymin: -1.8, ymax: 4.8,
+            xlabel: "x", ylabel: "y",
+            aria: "The greatest integer function, a step function with jumps at each integer.",
+            xticks: [{ x: -1, tex: "-1" }, { x: 1, tex: "1" }, { x: 2, tex: "2" }, { x: 3, tex: "3" }, { x: 4, tex: "4" }],
+            yticks: [{ y: 1, tex: "1" }, { y: 2, tex: "2" }, { y: 3, tex: "3" }, { y: 4, tex: "4" }],
+            items: steps.concat([
+              { type: "text", x: 4.8, y: 4.5, tex: "y=[x]", cls: "a-curve", anchor: "start" },
+            ]),
+          }),
+        }],
+      };
+    },
+    "squeeze-theorem": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 420, h: 280, xmin: -0.5, xmax: 5.5, ymin: -0.5, ymax: 4.2,
+          xlabel: "x", ylabel: "y",
+          aria: "Squeeze theorem: f is trapped between g and h, all converging to L at x equals a.",
+          xticks: [{ x: 2.5, tex: "a" }],
+          items: [
+            { type: "curve", fn: (x) => 2 + 0.4 * Math.pow(x - 2.5, 2), domain: [0.2, 4.9], cls: "refline" },
+            { type: "curve", fn: (x) => 2 - 0.4 * Math.pow(x - 2.5, 2), domain: [0.2, 4.9], cls: "refline" },
+            { type: "curve", fn: (x) => 2 + 0.3 * Math.pow(x - 2.5, 2) * Math.sin(5 * x), domain: [0.2, 4.9], samples: 400, cls: "curve" },
+            { type: "hline", y: 2, from: 0, to: 2.5, cls: "refline" },
+            { type: "dot", x: 2.5, y: 2 },
+            { type: "text", x: 0, y: 2, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+            { type: "text", x: 5, y: 3.8, tex: "h", cls: "a-ref", anchor: "start" },
+            { type: "text", x: 5, y: 0.2, tex: "g", cls: "a-ref", anchor: "start" },
+            { type: "text", x: 4.5, y: 2.7, tex: "f", cls: "a-curve", anchor: "start" },
+          ],
+        }),
+      }],
+    }),
+    "squeeze-x2sin": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 400, h: 280, xmin: -1.2, xmax: 1.2, ymin: -0.8, ymax: 1.2,
+          xlabel: "x", ylabel: "y",
+          aria: "x squared sin(1/x) squeezed between y equals x squared and y equals negative x squared.",
+          items: [
+            { type: "curve", fn: (x) => x * x, domain: [-1.1, 1.1], cls: "refline" },
+            { type: "curve", fn: (x) => -x * x, domain: [-1.1, 1.1], cls: "refline" },
+            { type: "curve", fn: (x) => x * x * Math.sin(1 / x), domain: [-1.1, -0.01], samples: 600, cls: "curve" },
+            { type: "curve", fn: (x) => x * x * Math.sin(1 / x), domain: [0.01, 1.1], samples: 600, cls: "curve" },
+            { type: "text", x: 0.75, y: 0.85, tex: "x^{2}", cls: "a-ref", anchor: "end" },
+            { type: "text", x: 0.75, y: -0.55, tex: "-x^{2}", cls: "a-ref", anchor: "end" },
+            { type: "text", x: -0.35, y: 0.2, tex: "x^{2}\\!\\sin\\tfrac{1}{x}", cls: "a-curve", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* ---------------- §1.6 ---------------- */
+    "precise-limit": () => {
+      const Lm = 6.150845, Lp = 9.849155;
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 460, h: 300, xmin: 0, xmax: 3.8, ymin: 0, ymax: 14,
+            pad: { t: 16, r: 18, b: 24, l: 58 }, xlabel: "x", ylabel: "y",
+            aria: "Geometric interpretation of the epsilon-delta definition.",
+            items: [
+              { type: "curve", fn: pow2, domain: [0.45, 2.95], cls: "curve" },
+              { type: "curve", fn: pow2, domain: [3.05, 3.45], cls: "curve" },
+              { type: "hline", y: Lm, from: 0, to: 3.8, cls: "refline" },
+              { type: "hline", y: Lp, from: 0, to: 3.8, cls: "refline" },
+              { type: "vline", x: 2.7, cls: "refline" },
+              { type: "vline", x: 3.3, cls: "refline" },
+              { type: "dot", x: 3, y: 8, hollow: true },
+              { type: "dot", x: 3, y: 11.6 },
+              { type: "dot", x: 3.3, y: Lp, r: 1.8 },
+              { type: "text", x: 2.7, y: 0, tex: "a-\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 3.02, y: 0, tex: "a", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 3.32, y: 0, tex: "a+\\delta", cls: "a-pt", anchor: "middle", vAnchor: "top", dy: 5 },
+              { type: "text", x: 0, y: Lm, tex: "L-\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 },
+              { type: "text", x: 0, y: 8, tex: "L", cls: "a-pt", anchor: "end", dx: -4 },
+              { type: "text", x: 0, y: Lp, tex: "L+\\varepsilon", cls: "a-pt", anchor: "end", dx: -4 },
+            ],
+          }),
+        }],
+      };
+    },
+
+    /* §1.2 — arctan as the reflection of restricted tan across y=x (Figure 1.9).
+       Equal-aspect square window so the reflection reads true. Both curves
+       solid; y=x dashed (ch01 restrict-x2 convention). Vertical asymptotes of
+       tan at ±π/2 are drawn explicitly; the reflected arctan curve approaches
+       the corresponding horizontal levels (figure-opportunity audit 2026-06-21). */
+    "arctan-reflection": () => {
+      const h = Math.PI / 2;
+      return {
+        layout: "single",
+        panels: [{
+          svg: buildPlot({
+            w: 300, h: 300, xmin: -3.3, xmax: 3.3, ymin: -3.3, ymax: 3.3,
+            pad: { t: 14, r: 14, b: 20, l: 22 },
+            aria: "The graph of arctan x is the reflection of the restricted tangent branch across the line y equals x; tangent's vertical asymptotes at x = plus or minus pi over 2 become arctan's horizontal asymptotes at y = plus or minus pi over 2.",
+            xticks: [{ x: -h }, { x: h }],
+            yticks: [{ y: -h }, { y: h }],
+            items: [
+              { type: "curve", fn: (x) => x, domain: [-3.3, 3.3], cls: "refline" },
+              { type: "vline", x: -h, cls: "refline" },
+              { type: "vline", x: h, cls: "refline" },
+              { type: "curve", fn: (x) => Math.tan(x), domain: [-1.3, 1.3], samples: 260, cls: "curve" },
+              { type: "curve", fn: (x) => Math.atan(x), domain: [-3.3, 3.3], samples: 220, cls: "curve" },
+              { type: "text", x: 1.42, y: 2.95, tex: "\\tan x", cls: "a-curve", anchor: "start" },
+              { type: "text", x: 3.05, y: 1.3, tex: "\\arctan x", cls: "a-curve", anchor: "end", dy: 13 },
+              { type: "text", x: 2.45, y: 2.85, tex: "y=x", cls: "a-ref", anchor: "start" },
+            ],
+          }),
+        }],
+      };
+    },
+
+    /* §1.4 — 1/x² (=∞) vs 1/x (DNE) at 0, same window (Figure 1.16).
+       Left: both branches → +∞ (same signed direction, write =∞). Right:
+       left → −∞, right → +∞ (disagree, DNE). x=0 undefined → no dot, curves
+       split at ±0.001 and break at the y-axis (figure-opportunity audit 2026-06-21). */
+    "recip-x-vs-x2": () => {
+      const win = { w: 244, h: 196, xmin: -2.2, xmax: 2.2, ymin: -7, ymax: 7, pad: { t: 12, r: 12, b: 22, l: 22 } };
+      const panel = (fn, note, aria) => ({
+        svg: buildPlot(Object.assign({}, win, {
+          aria: aria,
+          xticks: [{ x: 0 }],
+          items: [
+            { type: "curve", fn: fn, domain: [-2.2, -0.001], samples: 200, cls: "curve" },
+            { type: "curve", fn: fn, domain: [0.001, 2.2], samples: 200, cls: "curve" },
+          ],
+        })),
+        note: note,
+      });
+      return {
+        layout: "pair",
+        panels: [
+          panel((x) => 1 / (x * x), "y = 1/x²", "Graph of one over x squared: both branches rise toward plus infinity near zero."),
+          panel((x) => 1 / x, "y = 1/x", "Graph of one over x: the left branch falls to minus infinity, the right branch rises to plus infinity."),
+        ],
+      };
+    },
+
+    /* §1.5 — removable hole: (x-1)/(x²-1)=1/(x+1) with an open point at x=1,
+       height ½ (Figure 1.20). Crosshair reflines guide the eye to the hole;
+       limit = hole height. Fulfils the §1.5 placeholder (figure-opportunity
+       audit 2026-06-21). */
+    "removable-hole": () => ({
+      layout: "single",
+      panels: [{
+        svg: buildPlot({
+          w: 320, h: 208, xmin: -0.4, xmax: 2.7, ymin: 0, ymax: 1.7,
+          pad: { t: 14, r: 14, b: 24, l: 26 },
+          aria: "Graph of (x minus 1) over (x squared minus 1), which equals 1 over (x plus 1) except at x = 1, where there is an open hole at height one half.",
+          xticks: [{ x: 1, tex: "1" }],
+          yticks: [{ y: 0.5, tex: "\\tfrac{1}{2}" }],
+          items: [
+            { type: "hline", y: 0.5, from: -0.4, to: 1, cls: "refline" },
+            { type: "vline", x: 1, cls: "refline" },
+            { type: "curve", fn: (x) => 1 / (x + 1), domain: [-0.35, 0.97], samples: 120, cls: "curve" },
+            { type: "curve", fn: (x) => 1 / (x + 1), domain: [1.03, 2.7], samples: 120, cls: "curve" },
+            { type: "dot", x: 1, y: 0.5, hollow: true },
+            { type: "text", x: 2.6, y: 0.62, tex: "y=\\tfrac{x-1}{x^{2}-1}", cls: "a-curve", anchor: "end" },
+          ],
+        }),
+      }],
+    }),
+
+    /* §1.6 — ε→δ dynamic: shrink the ε-strip, the responding δ-band shrinks too
+       (Figure 1.25). f(x)=2x-1 at a=3, L=5, δ=ε/2 (the §1.6 worked example).
+       Two panels at the same window; companion to the static Figure 1.24
+       (figure-opportunity audit 2026-06-21). */
+    "epsilon-delta-dynamic": () => {
+      const f = (x) => 2 * x - 1, a = 3, L = 5;
+      const win = { w: 240, h: 220, xmin: 2.3, xmax: 3.7, ymin: 3.6, ymax: 6.4, pad: { t: 12, r: 12, b: 22, l: 26 } };
+      const panel = (eps, note) => {
+        const d = eps / 2;
+        return {
+          svg: buildPlot(Object.assign({}, win, {
+            aria: "Epsilon-delta box for f of x equals 2x minus 1 at a equals 3: a horizontal strip of half-height epsilon and a vertical band of half-width delta equal to epsilon over 2.",
+            xticks: [{ x: a, tex: "a" }],
+            yticks: [{ y: L, tex: "L" }],
+            items: [
+              { type: "hline", y: L + eps, cls: "refline" },
+              { type: "hline", y: L - eps, cls: "refline" },
+              { type: "vline", x: a - d, cls: "refline" },
+              { type: "vline", x: a + d, cls: "refline" },
+              { type: "curve", fn: f, domain: [2.3, 3.7], cls: "curve" },
+              { type: "dot", x: a, y: L },
+            ],
+          })),
+          note: note,
+        };
+      };
+      return {
+        layout: "pair",
+        panels: [panel(1, "ε = 1,  δ = ½"), panel(0.4, "ε = 0.4,  δ = 0.2")],
+      };
+    },
+
+  };
+
+  function hydrateFigures(root) {
+    (root || document).querySelectorAll("[data-fig]").forEach((el) => {
+      const def = FIGS[el.dataset.fig];
+      if (!def || el.dataset.figDone) return;
+      const { layout, panels } = def();
+      let html;
+      if (layout === "single" && panels.length === 1 && !panels[0].note) {
+        html = `<div class="figure-art">${panels[0].svg}</div>`;
+      } else {
+        const cls = { pair: "figure-art--pair", triple: "figure-art--triple", grid: "figure-art--grid" }[layout] || "";
+        html = `<div class="figure-art ${cls}">` +
+          panels.map((p) => `<div class="fig-panel">${p.svg}${p.note ? `<div class="fig-note">${p.note}</div>` : ""}</div>`).join("") +
+          `</div>`;
+      }
+      el.insertAdjacentHTML("afterbegin", html);
+
+      /* Connect per-figure CSS width variables (--fig-1-1 … --fig-1-25)
+         defined in :root to this figure's --fig-w so the control panel
+         actually takes effect. */
+      const figNo = el.querySelector(".fig-no");
+      if (figNo) {
+        const m = figNo.textContent.match(/Figure\s+(\d+)\.(\d+)/);
+        if (m) el.style.setProperty("--fig-w", `var(--fig-${m[1]}-${m[2]})`);
+      }
+
+      el.dataset.figDone = "1";
+    });
+  }
+
+  window.hydrateFigures = hydrateFigures;
+})();
+</script>
+
+<!-- Main build script (paginator + MathJax) -->
+<script>
+var CHAPTER = {
+  brand: "Appendix B",
+  runningHead: "Appendix B · Reading and Writing Proofs",
+  fragments: ["sec-b-1", "sec-b-2", "sec-b-3", "sec-b-4", "sec-b-5", "sec-b-6"],
+};
+var FRAGMENTS = CHAPTER.fragments;
+var RUNNING_HEAD = CHAPTER.runningHead;
+
+function renderMath(root) {
+  if (!root) return Promise.resolve();
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    return MathJax.typesetPromise([root]).catch(function(e) { console.warn("mathjax", e); });
+  }
+  return Promise.resolve();
+}
+
+function waitFor(test, tries) {
+  return new Promise(function(resolve) {
+    var n = 0;
+    var tick = function() {
+      if (test()) return resolve(true);
+      if (n++ > (tries || 100)) return resolve(false);
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
+var isHeading = function(el) {
+  return el.matches && el.matches(".chapter-head, .sec-head, .subsec-head, .para-head, .env-head");
+};
+
+function isDisplayChild(n) {
+  if (n.nodeType !== 1) return false;
+  var tag = n.tagName && n.tagName.toLowerCase();
+  if (tag === "mjx-container" && n.getAttribute("display") === "true") return true;
+  if (n.querySelector && n.querySelector('mjx-container[display="true"]')) return true;
+  return false;
+}
+
+var SPLIT_ENVS = ".env-example, .env-solution, .env-proof, .env-definition, .env-theorem, .env-proposition, .env-corollary";
+var DISP_SEL = 'mjx-container[display="true"]';
+
+function liCount(el) { return [].filter.call(el.children, function(x) { return x.tagName === "LI"; }).length; }
+
+function countBodyUnits(bodyEl) {
+  var n = 0;
+  [].forEach.call(bodyEl.children, function(ch) {
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL)) n += explodeParagraph2(ch);
+    else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) n += liCount(ch);
+    else n++;
+  });
+  return n;
+}
+
+function isSplittable(block) {
+  if (!block.classList) return false;
+  if (block.classList.contains("workedexample")) return block.children.length >= 2;
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    return !!b && countBodyUnits(b) > 1;
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL)) {
+    return explodeParagraph2(block) > 1;
+  }
+  return false;
+}
+
+function onlyLists(bodyEl) {
+  var els = contentKids(bodyEl);
+  return els.length > 0 && els.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; });
+}
+
+function contentKids(bodyEl) {
+  return [].filter.call(bodyEl.children, function(c) {
+    return !(c.classList && c.classList.contains("qed")) && (c.textContent.trim() || c.querySelector("*"));
+  });
+}
+
+function splitMode(block) {
+  if (!block.classList) return "none";
+  if (block.classList.contains("workedexample")) return block.children.length >= 2 ? "free" : "none";
+  if (block.matches(SPLIT_ENVS)) {
+    var b = block.querySelector(":scope > .env-body");
+    if (!b || countBodyUnits(b) <= 1) return "none";
+    var kids = contentKids(b);
+    var hasPara = kids.some(function(c) {
+      return c.tagName === "P" && c.querySelector(DISP_SEL) && explodeParagraph2(c) > 1;
+    });
+    if (hasPara || (kids.length >= 2 && !kids.every(function(c) { return c.tagName === "OL" || c.tagName === "UL"; }))) return "free";
+    return "list";
+  }
+  if (block.tagName === "P" && block.querySelector(DISP_SEL) && explodeParagraph2(block) > 1) return "free";
+  return "none";
+}
+
+function explodeParagraph2(p) {
+  var n = 0, hasBuf = false;
+  [].forEach.call(p.childNodes, function(node) {
+    if (isDisplayChild(node)) {
+      if (hasBuf) { n++; hasBuf = false; }
+      n++;
+    } else if ((node.textContent && node.textContent.trim()) || node.nodeType === 1) {
+      hasBuf = true;
+    }
+  });
+  if (hasBuf) n++;
+  return n;
+}
+
+function explodeParagraph(p) {
+  var parts = [], buf = [];
+  var flush = function() {
+    var hasContent = buf.some(function(n) { return (n.textContent && n.textContent.trim()) || n.nodeType === 1; });
+    if (hasContent) {
+      var np = document.createElement("p");
+      np.className = p.className;
+      buf.forEach(function(n) { np.appendChild(n); });
+      parts.push(np);
+    } else {
+      buf.forEach(function(n) { if (n.parentNode) n.parentNode.removeChild(n); });
+    }
+    buf = [];
+  };
+  [].slice.call(p.childNodes).forEach(function(node) {
+    if (isDisplayChild(node)) { flush(); var np = document.createElement("p"); np.className = p.className; np.appendChild(node); parts.push(np); }
+    else { buf.push(node); }
+  });
+  flush();
+  return parts;
+}
+
+function listToUnits(listEl) {
+  var items = [].filter.call(listEl.children, function(x) { return x.tagName === "LI"; });
+  if (items.length < 2) return [listEl];
+  var tag = listEl.tagName.toLowerCase();
+  return items.map(function(li, i) {
+    var nl = document.createElement(tag);
+    nl.className = listEl.className;
+    if (tag === "ol") nl.setAttribute("start", String(i + 1));
+    nl.appendChild(li);
+    return nl;
+  });
+}
+
+function bodyToUnits(bodyEl) {
+  var units = [];
+  [].forEach.call(bodyEl.children, function(ch) {
+    if (ch.tagName === "P" && ch.querySelector(DISP_SEL) && explodeParagraph2(ch) > 1) {
+      explodeParagraph(ch).forEach(function(u) { units.push(u); });
+    } else if ((ch.tagName === "OL" || ch.tagName === "UL") && liCount(ch) >= 2) {
+      listToUnits(ch).forEach(function(u) { units.push(u); });
+    } else { units.push(ch); }
+  });
+  return units;
+}
+
+function splitEnvOverflow(env) {
+  var bodyEl = env.querySelector(":scope > .env-body");
+  if (!bodyEl) return null;
+  var kids = bodyToUnits(bodyEl);
+  if (kids.length < 2) return null;
+  bodyEl.innerHTML = "";
+  bodyEl.appendChild(kids.shift());
+  var parts = [env];
+  kids.forEach(function(k) {
+    if (k.classList && k.classList.contains("qed") && parts.length > 0) {
+      var prev = parts[parts.length - 1];
+      var prevBody = prev.querySelector(":scope > .env-body") || prev.querySelector(".env-body");
+      if (prevBody) { prevBody.appendChild(k); return; }
+    }
+    var cont = document.createElement("section");
+    cont.className = env.className + " env-cont";
+    var b = document.createElement("div");
+    b.className = "env-body";
+    b.appendChild(k);
+    cont.appendChild(b);
+    parts.push(cont);
+  });
+  return parts;
+}
+
+function splitParts(block) {
+  if (block.classList.contains("workedexample")) return [].slice.call(block.children);
+  if (block.matches(SPLIT_ENVS)) return splitEnvOverflow(block) || [block];
+  if (block.tagName === "P") { var ex = explodeParagraph(block); return ex.length > 1 ? ex : [block]; }
+  return [block];
+}
+
+function paginate(blocks) {
+  var pagesEl = document.getElementById("pages");
+  pagesEl.innerHTML = "";
+  var idx = 0, body = null;
+  var newSheet = function() {
+    var sheet = document.createElement("div");
+    sheet.className = "sheet";
+    var header = document.createElement("div");
+    header.className = "sheet-header";
+    header.textContent = idx === 0 ? "" : RUNNING_HEAD;
+    body = document.createElement("div");
+    body.className = "sheet-body paper skin-hs vivid";
+    var footer = document.createElement("div");
+    footer.className = "sheet-footer";
+    footer.textContent = String(idx + 1);
+    sheet.append(header, body, footer);
+    pagesEl.appendChild(sheet);
+    idx++;
+  };
+  newSheet();
+  var fits = function() { return body.scrollHeight <= body.clientHeight + 1; };
+  var FREE_THRESHOLD = 130;
+  var shouldBreakBefore = function(block) {
+    return block.classList && block.classList.contains("page-break-before") && body.childElementCount > 0;
+  };
+  var moveToFreshPage = function(block) {
+    var carry = null;
+    if (body.childElementCount > 0) {
+      var last = body.lastElementChild;
+      if (last && isHeading(last)) { carry = last; body.removeChild(last); }
+      newSheet();
+      if (carry) body.appendChild(carry);
+    }
+    body.appendChild(block);
+  };
+  var place = function(block) {
+    if (shouldBreakBefore(block)) newSheet();
+    body.appendChild(block);
+    if (fits()) {
+      /* ── Orphan heading prevention ──────────────────────────
+         After placing a heading that fits, check whether enough
+         room remains for content below it. If the remaining space
+         is too small, move the heading to a fresh page so it stays
+         with its following content — never stranded at the bottom. */
+      if (isHeading(block) && body.childElementCount > 1) {
+        var _bRect = block.getBoundingClientRect();
+        var _bodyRect = body.getBoundingClientRect();
+        var _rem = (_bodyRect.top + body.clientHeight) - _bRect.bottom;
+        /* Major section headers need more room; minor headings less */
+        var _threshold = block.matches(".sec-head, .chapter-head") ? 160 : 100;
+        if (_rem < _threshold) {
+          body.removeChild(block);
+          newSheet();
+          body.appendChild(block);
+        }
+      }
+      return;
+    }
+    var blockH = block.getBoundingClientRect().height;
+
+    /* ── Figure shrink-to-fit ──────────────────────────────────
+       When a figure *almost* fits the remaining page space,
+       scale the .figure-art only (≥55 %) — caption stays full size.
+       Measure art/caption while block is still in the DOM.       */
+    var isFigure = block.tagName === "FIGURE" || (block.classList && block.classList.contains("figure"));
+    var _figArt = isFigure ? block.querySelector(".figure-art") : null;
+    var _artH = 0, _capH = 0;
+    if (_figArt) {
+      _artH = _figArt.getBoundingClientRect().height;
+      var _figCap = block.querySelector("figcaption");
+      _capH = _figCap ? _figCap.getBoundingClientRect().height : 0;
+    }
+
+    body.removeChild(block);
+
+    if (_figArt && _artH > 0) {
+      /* Probe the actual insertion point to account for preceding margins */
+      var _probe = document.createElement("div");
+      _probe.style.height = "0";
+      _probe.style.margin = "0";
+      _probe.style.padding = "0";
+      body.appendChild(_probe);
+      var _remaining = body.clientHeight - (_probe.getBoundingClientRect().top - body.getBoundingClientRect().top);
+      body.removeChild(_probe);
+      var FIG_MIN_SCALE = 0.55;
+      var _figMargin = blockH - _artH - _capH;  /* top/bottom margins + gaps */
+      var _availForArt = _remaining - _capH - _figMargin;
+      var neededScale = _availForArt / _artH;
+      if (_availForArt > 60 && neededScale >= FIG_MIN_SCALE && neededScale < 1) {
+        var _oZ = _figArt.style.zoom;
+        var _oMt = block.style.marginTop, _oMb = block.style.marginBottom;
+        _figArt.style.zoom = neededScale;
+        block.style.marginTop = "0.3em";
+        block.style.marginBottom = "0";
+        body.appendChild(block);
+        if (fits()) return;           /* success — art shrunk, caption full size */
+        body.removeChild(block);      /* revert and fall through */
+        _figArt.style.zoom = _oZ;
+        block.style.marginTop = _oMt;
+        block.style.marginBottom = _oMb;
+      }
+    }
+
+    if (block.classList.contains && block.classList.contains("workedexample") && block.children.length >= 2) {
+      var lastEl = body.lastElementChild;
+      var used = lastEl ? lastEl.getBoundingClientRect().bottom - body.getBoundingClientRect().top : 0;
+      var remaining = body.clientHeight - used;
+      if (remaining < FREE_THRESHOLD && blockH <= body.clientHeight) {
+        moveToFreshPage(block);
+        if (fits()) return;
+        body.removeChild(block);
+      }
+      var kids = [].slice.call(block.children);
+      var ex = kids[0], sol = kids[1], extra = kids.slice(2);
+      block.removeChild(ex);
+      var solParts = splitParts(sol);
+      body.appendChild(ex);
+      if (!fits()) { body.removeChild(ex); moveToFreshPage(ex); }
+      var first = solParts[0];
+      body.appendChild(first);
+      if (!fits()) {
+        body.removeChild(first);
+        body.removeChild(ex);
+        moveToFreshPage(ex);
+        body.appendChild(first);
+        if (!fits()) { body.removeChild(first); place(first); }
+      }
+      for (var i = 1; i < solParts.length; i++) place(solParts[i]);
+      extra.forEach(place);
+      return;
+    }
+    var mode = splitMode(block);
+    var want = (mode !== "none" && blockH > body.clientHeight);
+    if (want) { var parts = splitParts(block); if (parts.length > 1) { parts.forEach(place); return; } }
+    moveToFreshPage(block);
+    if (!fits() && mode !== "none") {
+      var parts2 = splitParts(block);
+      if (parts2.length > 1) { body.removeChild(block); parts2.forEach(place); }
+    }
+  };
+  blocks.forEach(place);
+  return idx;
+}
+
+function build() {
+  var status = document.getElementById("status");
+
+  /* Load section fragments from inline <template> elements */
+  var page = document.getElementById("page");
+  var parts = FRAGMENTS.map(function(id) {
+    var tpl = document.getElementById("frag-" + id);
+    return tpl ? tpl.innerHTML : "";
+  });
+  page.innerHTML = parts.join("\n");
+
+  if (window.hydrateFigures) window.hydrateFigures(page);
+
+  /* Wait for MathJax to load, then typeset */
+  waitFor(function() { return window.MathJax && window.MathJax.typesetPromise; }, 200).then(function(ok) {
+    if (!ok) { status.textContent = "MathJax load timeout"; return; }
+    return renderMath(page);
+  }).then(function() {
+    var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    return fontsReady;
+  }).then(function() {
+    status.textContent = "Paginating …";
+    return new Promise(function(r) { setTimeout(r, 60); });
+  }).then(function() {
+    var blocks = [];
+    page.querySelectorAll(":scope > .sec").forEach(function(sec) {
+      [].forEach.call(sec.children, function(ch) { blocks.push(ch); });
+    });
+
+    var n = paginate(blocks);
+    var src = document.getElementById("source");
+    if (src) src.remove();
+
+    status.textContent = n + " page" + (n === 1 ? "" : "s") + " · A4";
+    var btn = document.getElementById("printBtn");
+    btn.disabled = false;
+    btn.addEventListener("click", function() { window.print(); });
+
+    var boot = document.getElementById("boot");
+    if (boot) boot.remove();
+  });
+}
+
+window.addEventListener("DOMContentLoaded", build);
+</script>
+</body>
+</html>

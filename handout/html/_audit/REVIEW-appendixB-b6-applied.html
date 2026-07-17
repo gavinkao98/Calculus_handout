@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appendix B §B.6「Writing a Proof」— 撰寫＋全閘驗證報告（已套用）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --blue:#1c5fb4; --red:#b42318; --green:#1a7f47; --purple:#6c2bd9; --orange:#9a5b00; --gray:#667085; --bg:#fbfbfa; --card:#fff; --line:#e4e7ec; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; max-width: 1000px; margin: 0 auto;
+         padding: 2rem 1.5rem 5rem; background: var(--bg); color: #1a1a1a; line-height: 1.65; }
+  h1 { font-size: 1.5rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .4rem; padding-top: .6rem; border-top: 2px solid var(--line); }
+  h3 { font-size: 1rem; margin: 1.3rem 0 .3rem; }
+  .sub { color: var(--gray); font-size: .9rem; margin: 0 0 1.2rem; }
+  .summary { background:#f0f6ff; border:1px solid #cfe0fb; border-radius:8px; padding:.8rem 1rem; font-size:.92rem; margin:0 0 1.4rem; }
+  .summary b { color: var(--blue); }
+  .pass { color: var(--green); font-weight: 700; }
+  .fail { color: var(--red); font-weight: 700; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem 1rem; margin: .7rem 0; }
+  .card.fix { border-left: 4px solid var(--green); }
+  .card.adv { border-left: 4px solid var(--orange); }
+  .card.keep { border-left: 4px solid var(--red); }
+  .card.q { border-left: 4px solid var(--purple); background:#fdfcff; }
+  .card.oops { border-left: 4px solid var(--red); background:#fffafa; }
+  .id { font-family: ui-monospace, "Cascadia Code", monospace; font-weight: 700; font-size: .82rem;
+        background: #eef2f7; padding: .1rem .45rem; border-radius: 4px; margin-right: .5rem; }
+  .badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; margin-right: .35rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+  .b-fix { background:#ecf8f0; color:var(--green); }  .b-adv { background:#fef0e7; color:var(--orange); }
+  .b-keep { background:#fdeceb; color:var(--red); }   .b-q { background:#f3ecfe; color:var(--purple); }
+  .loc { font-size:.82rem; color:var(--gray); margin:.3rem 0 .6rem; }
+  .loc code { background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .content { background:#fcfcfd; border:1px dashed var(--line); border-radius:6px; padding:.6rem .9rem; font-size:.95rem; }
+  .why { font-size:.85rem; color:#444; margin-top:.5rem; }
+  .src { font-size:.78rem; color:var(--gray); margin-top:.55rem; }
+  del { color:#a33; background:#fdf0ef; text-decoration-color:#c66; }
+  ins { color:#155e33; background:#ecf8f0; text-decoration:none; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.4rem 0; }
+  th, td { border:1px solid var(--line); padding:.35rem .6rem; text-align:left; vertical-align:top; }
+  th { background:#f3f4f6; }
+  a { color: var(--blue); }
+  .note { font-size:.85rem; color:#667085; }
+  code.k { font-family: ui-monospace, "Cascadia Code", monospace; font-size:.85em; background:#f3f4f6; padding:.05rem .3rem; border-radius:3px; }
+  .en { font-family: Georgia, "Times New Roman", serif; }
+</style>
+</head>
+<body>
+
+<h1>Appendix B §B.6「Writing a Proof」— 撰寫＋全閘驗證報告（已套用）</h1>
+<p class="sub">2026-07-17。緣起＝使用者收到的第二份第三方修改意見（新增 B.6、修 B.1–B.5、加練習、縮 5–10%）。逐條裁決稿＝<a href="REVIEW-appendixB-b6-design.html">REVIEW-appendixB-b6-design.html</a>；首撰紀錄＝<a href="REVIEW-appendixB-applied.html">REVIEW-appendixB-applied.html</a>。本檔記 as-built、閘結果、與待裁決清單。</p>
+
+<div class="summary">
+<b>總結：<span class="pass">Appendix B 全部做完、三閘全綠、定版。</span></b>　附錄憲章由「讀」擴為「讀＋寫」，標題改 <b>Reading and Writing Proofs</b>；六節、Example B.1–B.10。<br>
+<b>兩批工作：</b>（一）新增 §B.6＋修 B.1–B.5 三項真缺陷（第一～六節）；（二）**六項待裁決全數裁決並落地**（使用者 2026-07-17 授權「你都幫我裁決」；見<b>第七節</b>）。<br>
+<b>最終閘（第二批後）：</b>prose gate-1 <span class="pass">0 blocking</span>（5 tighten／1 optional，全套用）＋ <b>learner-sim ×3 乾淨盲測</b> <span class="pass">全 0 blocking、0 B 類違規</span>（曲線均值 3.0／2.9／2.8，尖峰 4 ＝ Ch4、＜ §4.2 的 4.5）＋ <b>Codex gate-2 收尾輪 <span class="pass">PASS 0 blocking</span></b> ＋ sympy 重算＋build／quote_lint／doc_lint／linebreak-gate 0/0／shot.mjs（<span class="pass">math=545、katex=0</span>）＋編號 ledger 連續＋cross-ref 0 dangling。<br>
+<b>全程 learner-sim 共 10 份盲測，全數 0 blocking、0 B 類違規；Codex gate-2 共 6 輪，收在 PASS。</b><br>
+<b style="color:#b42318;">我在本輪做錯、且靠閘才抓回來的事，完整列於第五、六、九節</b>——重點三件：① 把閘 findings 寫進 fragment 溯源註解，<b>污染了兩份回歸盲測</b>（sim 主動揭露；已清除並改跑乾淨盲測）② 對 ε/3 的處置建議<b>連錯兩次</b>，三輪後回到第三方意見最初的版本 ③ Codex 六輪裡有三輪的 blocking <b>是我前一輪的修正造成的</b>。
+</div>
+
+<h2>一、as-built：§B.6 roster（11 條，全部落地）</h2>
+<p class="note">使用者 2026-07-17 裁決＝<b>精簡版</b>。相對意見書<b>已砍</b>：四級練習梯（↔ <code>CONTENT_SPEC.md</code> §14「講義本體不收習題」，且 CONTRACT 標 exercise environment do-not-emit）、評分 rubric（教師面 genre，學生講義不放）、Template D 獨立化（Prop B.4 的證明已擺明三段）、意見書 §4.3「必要資訊 checklist」（與 §4.7 revision checklist 重疊約八成 → 合併為 Strategy B.7）。</p>
+
+<table>
+<tr><th>#</th><th>條目</th><th>as-built 要點</th><th>回扣</th></tr>
+<tr><td>1</td><td>開場散文（3 段）</td><td>discovery／presentation 兩階段；<span class="en">“A proof is not a transcript of everything you tried.”</span>；嚴謹＝每個有邏輯作用的步驟有依據，<b>不是</b>每步算術都寫；測試不是長度，是陌生人能否查你</td><td>—</td></tr>
+<tr><td>2</td><td><b>Strategy B.6</b> <span class="en">From statement to proof</span></td><td>六步＋<code class="k">p.informal</code> 收尾：「步驟 1–4 完全不涉及證明。<b>你可以在會證之前先規劃</b>」</td><td>①＝Strategy B.1、③＝Strategy B.2、⑤＝Strategy B.5 習慣 1</td></tr>
+<tr><td>3</td><td>三個 skeleton</td><td><b>各配一個 <code class="k">ol.steps</code> 骨架</b>（見第五節「最後一次結構修正」）：universal implication（講 <em>arbitrary</em> 禁止挑選）／existence（引入 <b>witness</b>、驗兩次、非構造式路線一個括號）／contraposition vs contradiction（兩個 4 步骨架，外層目標分開）</td><td>§B.3 的 ∀／∃；Prop B.1 vs Prop B.2</td></tr>
+<tr><td>4</td><td>歸納</td><td>不另立 template，一句指回 Prop B.4 的證明</td><td>Prop B.4</td></tr>
+<tr><td>5</td><td><b>Example B.6</b> 三層</td><td>命題＝<span class="en">Every integer divisible by 6 is divisible by 3</span>。planning notes → weak draft（<span class="en">“\(n = 6k\), so \(n = 3(2k)\), done.”</span>）→ revised proof。收尾：<span class="en">「a rigorous proof is seldom much longer than a sloppy one. It is the same argument with its reasons attached.」</span></td><td><b style="color:#1a7f47;">§B.1 開場拆解的正是這句</b></td></tr>
+<tr><td>6</td><td><b>Example B.7</b></td><td>兩有理數之和為有理數。witness＝\(\frac{ad+bc}{bd}\)；<b>\(bd \neq 0\)</b> 那一擊＝「exhibiting a candidate」與「verifying a witness」的差別</td><td>Prop B.2（\(\sqrt2\) 的 \(a/b\)）</td></tr>
+<tr><td>7</td><td><b>Example B.8</b> flawed ①</td><td>反向用 implication；診斷＝在用 converse、且那正是待證命題；修法＝走 contraposition</td><td><b style="color:#1a7f47;">Example B.1＋Prop B.1＋§B.5 Caution 三條伏筆在此收</b></td></tr>
+<tr><td>8</td><td><b>Example B.9</b> flawed ②</td><td>從三個例子推 universal；<b>Prop B.3 用分案正證過同一句</b>，假證明與真證明可並排</td><td><b style="color:#1a7f47;">Prop B.3</b></td></tr>
+<tr><td>9</td><td>Caution（不編號，第 4 個）</td><td>偷用結論。<span class="en">「Ask it of every assumption you write: was I <em>given</em> this, or do I <em>want</em> it?」</span></td><td>Example B.8</td></tr>
+<tr><td>10</td><td>Pause 框（不編號，第 2 個）</td><td>2 題（a,b even ⇒ a+b even；∃ 整數介於 n 與 n+2），點名骨架、無答案。<b>陷阱提示已移出框外</b>（見第五節）</td><td>§B.5 的 Pause 是先例＝§14-compliant 的練習機制</td></tr>
+<tr><td>11</td><td><b>Strategy B.7</b> ＋ 附錄結尾段</td><td>revision checklist 九項＋<code class="k">p.informal</code>：<span class="en">「A first draft discovers the argument; revision makes the argument inspectable.」</span>；結尾段收束全附錄（reading／writing 互為表裡）</td><td>與 Strategy B.5 正反對稱</td></tr>
+</table>
+
+<h3>編號 ledger（純 append、零 cascade——已驗證）</h3>
+<table>
+<tr><th>型</th><th>B.6 前</th><th>B.6 後</th><th>cascade</th></tr>
+<tr><td>Definition</td><td>B.1</td><td>B.1（不變；witness 以 <code class="k">em</code> 首現 gloss，不進 Definition env）</td><td class="pass">無</td></tr>
+<tr><td>Proposition</td><td>B.1–B.5</td><td>B.1–B.5（不變；flawed proofs 以 Example 呈現）</td><td class="pass">無</td></tr>
+<tr><td>Strategy</td><td>B.1–B.5</td><td><b>B.1–B.7</b></td><td class="pass">無</td></tr>
+<tr><td>Example</td><td>B.1–B.5</td><td><b>B.1–B.9</b></td><td class="pass">無</td></tr>
+<tr><td>Caution／Pause</td><td>3／1（不編號）</td><td>4／2（不編號）</td><td class="pass">無</td></tr>
+</table>
+<p class="note">驗證：cross-ref <b>11 引用／22 labels → 0 dangling</b>。<code>handout/PIPELINE.md</code> 把手動編號列為「最大錯誤來源」並警告插 example 會 cascade——<b>本案完全避開</b>，因為 B.6 是最後一節。</p>
+
+<h2>二、同批修 B.1–B.5：三項真缺陷</h2>
+
+<div class="card fix">
+<p><span class="id">FIX-1</span><span class="badge b-fix">已修</span><b>Prop B.5（鴿籠）補量詞</b>　<span class="loc"><code>sec-b-5.html</code></span></p>
+<div class="content"><p class="en"><ins>For every positive integer \(n\), if</ins> \(n + 1\) objects are distributed among \(n\) boxes, then at least one box contains two or more objects.</p></div>
+<p class="why">全附錄<b>唯一</b>有自由變數卻無量詞的命題，而 Prop B.4 已用同一句式、Strategy B.1 第 1 步正是「Find the quantifiers」。\(n \ge 1\) 數學上也真的需要（\(n=0\) 使證明的 \(1+\cdots+1=n\) 無意義）。</p>
+</div>
+
+<div class="card fix">
+<p><span class="id">FIX-2</span><span class="badge b-fix">已修（最小版）</span><b>Example B.3 的 \(N\) 限正（3 處）</b>　<span class="loc"><code>sec-b-3.html</code>：題幹／Solution bullet／組裝後的否定式</span></p>
+<p class="why">序列自 \(a_1\) 起，\(N \le 0\) 會指到不存在的項。<b>但這是文獻通例</b>（Rudin 即寫 “there is an integer \(N\)…”），屬「比通例再嚴一格」，非改錯。<b>意見書的 \(N\in\mathbb N\) 版本已拒</b>——集合記號不是 SPEC §3 的 Stewart 語域，且意見書自己也寫「不要把附錄改成離散數學章節」。<b>此拒絕後來成了本輪的一致性標尺</b>（見第五節 \(\mid\)）。</p>
+</div>
+
+<div class="card fix">
+<p><span class="id">FIX-3</span><span class="badge b-fix">已修（三輪後回到最初建議）</span><b>§B.4「\(3\varepsilon\)」正名</b>　<span class="loc"><code>sec-b-4.html</code> Strategy B.4 bullet 2</span></p>
+<div class="content"><p class="en"><del>The “\(3\varepsilon\)” you see in print is this move with \(k = 3\).</del><br><ins>The “\(\varepsilon/3\) trick” you see in print is this move with \(k = 3\).</ins></p></div>
+<p class="why"><b>不是數學錯</b>——「3ε argument」是真實印刷慣例；是把姊妹招式的名字掛到本招式上（本 bullet 描述的動作是「除以 \(k\)」＝ε/3 trick，而寫「\(<3\varepsilon\)」的作者恰恰<b>沒有</b>除）。<b>本輪最大的自我修正見第六節。</b></p>
+</div>
+
+<h2>三、不採納（撞既定決策）</h2>
+<table>
+<tr><th>意見書要求</th><th>撞什麼</th><th>證據</th></tr>
+<tr><td>B.1–B.5 各節加 2–4 題練習＋B.6 四級練習梯</td><td><b>SPEC §14</b>「2026-06-12 定案：講義本體不收習題」；<code>exercise</code> env 已自 §5 移除（12→11）；CONTRACT 標 do-not-emit</td><td><b>2026-07-04 那份外部 review 已提過同一項並被以「↔§14」駁回</b>；當時採納的折衷正是 §B.5 的「Pause」框（<code>CONTENT_ROADMAP.md:58</code>）</td></tr>
+<tr><td>B.2 改「Proof and Disproof Shapes」、六形狀</td><td><b>2026-07-04 裁決「roster 仍 5 形狀」</b></td><td>同一份 review 的處置紀錄。且現行文本<b>不含糊</b>——Strategy B.2 寫「Demolishes; never builds」、散文寫「The shapes so far <i>establish</i>…the next one <i>demolishes</i>」。真正不精確的只有 objectives／節末的<b>計數措辭</b> → 已修</td></tr>
+<tr><td>B.1 補 inverse</td><td>§1.1/§1.2 的<b>刻意主線</b>就是 inverse function</td><td><code>CONTENT_ROADMAP.md:62</code>「反函數/反三角（<b>刻意主線</b> §1.1/§1.2）」——自製撞名；且意見書自己說可省</td></tr>
+<tr><td>B.6 評分 rubric</td><td>genre 錯位（教師面）</td><td>本書無習題、無評分情境</td></tr>
+<tr><td>B.1–B.5 整體縮 5–10%</td><td>無動機重編輯＝churn</td><td>那批文字已過 prose gate-1＋Codex gate-2＋3 份盲測；重編輯會作廢三閘結果。<b>散文閘本輪覆核：21 段全部掙得位置、無純贅述段落</b>——意見書的前提不成立</td></tr>
+</table>
+<p class="note">Q2 措辭修（已套）：objectives「<del>the five proof shapes…direct, contradiction, counterexample, cases, and induction</del>」→「<ins>the five shapes you meet most often — the four that build a proof (direct, contradiction, cases, and induction) and the counterexample that tears one down</ins>」；節末同理。<b>§B.6 另加一句解釋 roster 為何停在五</b>：「a contraposition is not a sixth shape, but the first shape pointed at the equivalent sentence」——把外部意見的反對意見轉成教學點，而非只是斷言。</p>
+
+<h2>四、閘結果</h2>
+
+<h3>gate-1 散文（<code class="k">handout-prose-audit</code>）</h3>
+<p><span class="pass">0 blocking</span>／9 tighten／5 optional／0 voice。<b>兩個被指名的設計問題都是乾淨結果：</b></p>
+<ul class="note">
+<li><b>回扣是資產不是負擔</b>——逐條驗過 9/9，設計一致是 <b>restate-then-point</b>（先在使用處把命題完整重述，§B.x 只當獎賞）。<b>沒有一處必須翻回去才讀得懂。</b></li>
+<li><b>無純贅述段落</b>——21 段跑 S3 刪除測試全部掙得位置。唯一真重複是 <code class="k">length ≠ rigor</code> 的第 4 次 → 已併句。</li>
+</ul>
+
+<h3>難度閘（<code class="k">learner-sim</code> ×7 盲測）</h3>
+<table>
+<tr><th>批次</th><th>結果</th><th>難度曲線（B.1→B.6）</th></tr>
+<tr><td>首輪 ×3</td><td><span class="pass">0 blocking ×3、0 B 類違規 ×3</span></td><td>2/3/3.5/3.5/2/3.5（2.9）｜3/3/4/3/2/3（3.0）｜2/3/3/3/2/4（2.8）</td></tr>
+<tr><td>回歸 ×2（<b>被污染</b>，見第五節）</td><td><span class="pass">0 blocking ×2</span></td><td>2/3/3/3/2/3.5（2.75）｜2.5/3/3.5/3/2/3.5（2.9）</td></tr>
+<tr><td>乾淨回歸 ×2</td><td><span class="pass">0 blocking ×2</span></td><td>2/3/4/3/2/4（3.0）｜2/3/3.5/3/2/4（2.9）</td></tr>
+</table>
+<p class="note"><b>與基線比對：偏低。</b>尖峰 4 ＜ Ch4 的 4/5、遠 ＜ §4.2 的 4.5；均值與 Ch1–3 的 ≈3 持平或略低。對「補先備」的 primer 是對的位置，mainline 上限「effortful 但可自行走完」全程守住。<b>B 類先備違規 0（七份一致）</b>——limit／continuity／convergence 僅前指不承重，導數與積分一次未出現。</p>
+
+<h3>gate-2（Codex gpt-5.6-terra／xhigh，read-only；四輪，逐次徵詢）</h3>
+<table>
+<tr><th>輪</th><th>verdict</th><th>內容</th></tr>
+<tr><td>R1</td><td><span class="fail">4 blocking</span></td><td>MATH／WITNESS／CROSS-REF／REGISTER 全 CHECKED-CLEAN、無 Ch1–4 洩漏。四條見下</td></tr>
+<tr><td>R2</td><td><span class="fail">NEW_BLOCKING_INTRODUCED（2）</span></td><td>4/6 resolved；<b>2 條新 blocking 由 R1 的修正本身造成</b></td></tr>
+<tr><td>R3</td><td><span class="fail">NEW_BLOCKING_INTRODUCED（1）</span></td><td>3/4 resolved；<b>1 條新 blocking 由 R2 的修正本身造成</b></td></tr>
+<tr><td>R4</td><td><span class="pass">PASS（0 blocking／0 new findings）</span></td><td>「此一單句修改未引入其他缺陷」</td></tr>
+</table>
+
+<div class="card fix">
+<p><span class="id">R1-1</span><b>「Examples are decisive when they refute, and never when they confirm」對有限定義域是錯的</b></p>
+<p class="why">Codex：「<b>前一段的『Had the three cases been the only integers, the argument would have been complete』也正確地承認此例外</b>」——<b>同一個 solution 裡先承認例外、再下否定例外的總結</b>，在一個教精確的章節裡自打嘴巴。已改為 scoped：「short of checking every object the claim ranges over — and over the integers you never can —」。</p>
+</div>
+<div class="card fix">
+<p><span class="id">R1-2</span><b>contraposition「there is no contradiction anywhere in it」不是一般特徵</b></p>
+<p class="why">證明形狀可以巢狀（§B.2 自己說「A longer proof is usually several of them nested」）。已把區別限定到<b>外層結構</b>，並把巢狀明講出來（「a contraposition whose inner step runs by contradiction is still a contraposition」）——反而把 §B.2 的巢狀觀念教進來了。</p>
+</div>
+<div class="card fix">
+<p><span class="id">R1-2a</span><span class="badge b-fix">五個閘都沒完整指出</span><b>「negated by the rule of Strategy B.3」指向一條不存在的規則</b></p>
+<p class="why">追 R1-2 時發現：Strategy B.3 的 kernel 規則只列 <code>=</code>、<code>&lt;</code>、and／or，然後用 “and so on” 帶過，<b>從沒教怎麼否定 implication</b>。一份 sim 曾說那句 “and so on”「後文從沒用到、不承重」——<b>§B.6 讓它回溯地承重了</b>。最終修法把分工講明：<b>Strategy B.3 步驟 1 翻量詞、§B.6 填步驟 2 的 implication kernel</b>。</p>
+</div>
+<div class="card fix">
+<p><span class="id">R1-3 / R1-4</span><b>existence「you owe the reader an object」過強；裸 \(\neg\) 未定義</b></p>
+<p class="why">前者：非構造式存在證明合法 → 改「the direct route — and the one to try first」＋一個括號點名間接路線（順帶展示 §B.2 的形狀可組合）。後者：<b>3 份 sim ＋散文閘＋Codex 五個獨立來源確認</b>；Codex 建議 gloss，實際採更好的作法——<b>刪符號</b>，對齊 Definition B.1 的白話。</p>
+</div>
+
+<h2>五、方法論事故與最後兩次結構修正（自記）</h2>
+
+<div class="card oops">
+<p><span class="id">事故</span><span class="badge b-keep">我的錯</span><b>閘 findings 寫進 fragment 註解，污染了兩份回歸盲測</b></p>
+<p class="why">我把前三輪 sim 的卡點清單＋一份「NOT fixed」欄寫進 <code>sec-b-6.html</code> 的溯源註解。兩份回歸 sim 都讀到了並<b>主動揭露</b>。這方向的偏誤特別糟——sim 讀到「X 已修」可能就不再回報 X，<b>正好是回歸最不該有的偏誤</b>。<br>
+<b>違反兩條既有規定：</b>① <code>PIPELINE.md</code> §通用紀律「findings 留版控：摘要與裁決<b>轉錄進 <code>_dev-archive/</code> 或正式 REVIEW 報告</b>」；② appB 既有慣例——sec-b-1..5 的註解只寫溯源＋一行 <code class="k">Record: …</code> <b>指向</b>紀錄。<br>
+<b>處置：</b>清除；改跑兩份乾淨盲測（結果見上表，0 blocking，且被修項目全數未復現）。<b>分界線寫進 fragment：溯源／裁決理由留註解，閘結果與 findings 清單一律只進 <code>_audit/</code>。</b><br>
+<b>全書掃描：</b>另有 26 個 fragment 的註解含閘字樣，但性質不同——那些是 <b>pass 紀錄</b>（如 ch06「both cleared gate-1 D1–D8 + gate-2 at 0 blocking」、ch05「Codex ⑤」），屬溯源；我寫的是 findings 清單＋NOT fixed 欄。<b>未動全書那個較輕的樣態</b>，記此供日後裁決。</p>
+</div>
+
+<div class="card fix">
+<p><span class="id">結構-1</span><span class="badge b-fix">已修</span><b>三個 template 只有兩個有骨架</b></p>
+<p class="why">兩份<b>乾淨</b>盲測獨立收斂，且都說「若只修一處就修這裡」：<br>
+&nbsp;&nbsp;· sim A：「這裡把兩條間接路線的分辨（初學者公認最難的一點）<b>壓成兩段純散文</b>……前五節每教一個形狀就配一個 Prop＋Proof」<br>
+&nbsp;&nbsp;· sim B：「唯一一個『<b>內容全對、理由全給，但形式（純散文、無 display、無自己的 example）把可讀性吃掉</b>』的地方，而且它扛的正是 §16.2 B 類的核心」<br>
+診斷是<b>節內自我不對稱</b>：universal implication 與 existence 各有 <code class="k">ol.steps</code> 骨架，contraposition／contradiction 沒有。已補上兩個 4 步骨架（Codex R3 覆核：「Both outer skeletons are correct and complete」）。</p>
+</div>
+
+<div class="card fix">
+<p><span class="id">結構-2</span><span class="badge b-fix">已修</span><b>Pause 框自己劇透陷阱</b></p>
+<p class="why">sim B：「這一格自己把自己的陷阱講掉了：<b>我必須讀完整格才知道題目是什麼，而讀完的同時我已經知道</b> (1) 不能兩個都叫 k、(2) witness 是 n+1。兩個陷阱都彈不起來了。」陷阱提示已移出框外、置於 Strategy B.7 之後——讀者<b>已經動筆並跑過 checklist</b> 才讀到。（另修一個更早的順序矛盾：框內同時要求「先別往下讀」與「用 Strategy B.7」，而 B.7 在框後。）</p>
+</div>
+
+<h3>我在同一節裡犯的、被閘抓到的錯（完整列表）</h3>
+<table>
+<tr><th>錯</th><th>誰抓到</th><th>為何難堪</th></tr>
+<tr><td>「三個新句子」列了<b>四</b>件事</td><td>sim ＋散文閘</td><td>在一個把讀者訓練成「逐行查帳」的節裡算錯帳</td></tr>
+<tr><td>「Four scribbled lines」實為五句、且排成連續散文根本沒得數</td><td>sim</td><td>同一個例子<b>第二次</b>數錯，兩段後課文自己說「Count the lines」</td></tr>
+<tr><td>「steps 1 to 4」實為步驟 1–3</td><td>sim</td><td>同一個例子<b>第三次</b>數錯 → 最終全部改為不數</td></tr>
+<tr><td><span class="en">「both of the following <b>prove</b> claims」</span></td><td>散文閘</td><td><code>prove</code> 字面＝成功證明，正是本節（與 objectives 第 7 條）要讀者分辨的東西</td></tr>
+<tr><td>b-6:68「pretending at line one to know what was only <b>discovered</b> at line ten」</td><td>散文閘</td><td>與本節 b-6:53「Discovery is allowed to be a mess; presentation is not」直接打架</td></tr>
+<tr><td>\(\mid\)（整除）未引入即用、與 §B.4 絕對值直槓撞義</td><td>3 份 sim</td><td>一個通篇在講「不該讓讀者猜符號」的章節，自己讓讀者猜。sim 2 另指出 inline gloss 為何救不了：<b>它住在「These are for you alone」的斜體塗鴉區塊裡</b>，讀者讀成「筆記長這樣」而非「這裡在定義記號」</td></tr>
+<tr><td><b>語域不一致</b>：以「set notation 不是 Stewart 語域」拒了 \(N\in\mathbb N\)，卻自己用 \(\mid\)（Stewart 從不寫）</td><td>sim 2、sim A 獨立各推一次</td><td>同一輪內自相矛盾。修法＝\(\mid\) 全改英文，對齊 §B.1</td></tr>
+<tr><td>Example B.8 稱一個附錄從沒證過的命題為 <span class="en">“a genuine theorem”</span></td><td>sim 2</td><td>在要求「禁得起陌生人查」的節裡斷言沒證的東西</td></tr>
+<tr><td>補上的行內證明<b>沒說 \(k\) 是整數</b></td><td>Codex R3</td><td><b>修「不嚴謹」的補丁自己不嚴謹</b>，且「直接違反 §B.6 自己『變數範圍必須寫在紙上』的要求，並重複了 Example B.6 所批評的那個省略」</td></tr>
+<tr><td>Strategy B.7 的 existence 項與新加的「間接路線也行」自相矛盾</td><td>Codex R2</td><td>修了骨架、忘了 checklist</td></tr>
+<tr><td>蘊含否定的<b>量詞範圍</b>被略過</td><td>Codex R2</td><td>「正好會訓練出 §B.3 要防止的那個量詞錯誤」</td></tr>
+<tr><td>「item 1 is what catches it」指錯 checklist 項</td><td>sim 2</td><td>sim 照著查，item 1 照字面過關、抓不到 k 撞名</td></tr>
+</table>
+
+<h2>六、ε/3：我連錯兩次，最後回到第三方意見最初的版本</h2>
+<div class="card oops">
+<p><b>裁決稿（Q5）我的建議＝長版</b>（＋1 句認出兩個慣例），理由是「§B.4 的全部意義就是讓學生在印刷品上撞到怪東西時能叫出名字」。使用者照建議批准。</p>
+<p class="why">
+<b>第 1 次錯——長版。</b>三份獨立盲測<b>全數</b>卡在同一句。sim 2 的說法最狠：「<b>整節的主旨是『這些步驟不是靈感』，結果這句本身就是一隻沒被拆開的兔子</b>」。那句附帶的正當化（「\(\varepsilon\) 任意所以 \(3\varepsilon\) 可以收尾」）隱含一個附錄從未建立的邏輯步（從 \(x < 3\varepsilon\ \forall \varepsilon>0\) 推 \(x \le 0\)），而它只是個講別人慣例的旁註。<b>最高成本、最低承載，還正好違反該節自己的主旨。</b>散文閘另算出該 bullet 已膨脹到 77 字（兄弟 bullet 31–47）。<br>
+<b>第 2 次錯——精簡版</b>（點名但不主張如何收尾，37 字）。回歸 sim B：「<b>我停在這裡出不去。目標明明是壓到 \(\varepsilon\)，為什麼交出 \(3\varepsilon\) 也算數？</b>……這一句<b>主動製造了一個我無法用手上工具回答的疑問</b>。」<br>
+<b>結論——路走完了：</b>解釋它 → 引入未建立的邏輯步；只點名 → 製造答不了的疑問。<b>這個提及在這個閱讀水平上救不回來。</b>第三方意見最初的建議（單純改名為 ε/3 trick）從頭就是對的；我把一個一字修正搞成三輪。<b>已全砍</b>，並在 <code>sec-b-4.html</code> 的註解留下「DO NOT re-add」的約束＋兩次失敗的理由，免得未來有人「好心」再加回去。<br>
+<b>閘之間的分歧記此：</b>散文閘主張留著、只解 garden-path；三份 sim 主張刪。兩者<b>審的不是同一件事</b>——散文閘審那句好不好讀，sim 審讀者能不能接受那個斷言。<code>PIPELINE.md</code> §易懂性單一錨明訂「blocking 主證據＝learner-sim 盲測，S·A·V 維度 A 降為上游預篩」，故以 sim 為錨。Codex R2 亦判精簡版「no false conclusion」——<b>不衝突</b>：它審的是「是否為假」，sim 審的是「是否讀得下去」。
+</p>
+</div>
+
+<h2>七、六項待裁決——全數裁決並落地（第二批）</h2>
+<p class="note">使用者 2026-07-17 授權「待裁決的，你都幫我裁決吧。把 Appendix B 全部都做完」。<b>六項全採納，另一項（意見書的 WLOG worked example）不採納</b>。裁法原則：<b>採納盲測確認的，不採納它們沒確認的</b>。</p>
+<table>
+<tr><th>#</th><th>項</th><th>證據</th><th>裁決與作法</th></tr>
+<tr><td>1</td><td>§B.3 的 \(\delta\) 從未被生產過一次</td><td>2 份 sim</td><td><b>採納</b>。散文內打一局（不編號、不 cascade）：closeness＝<em>if \(|x-2|<\delta\), then \(|2x-4|<\varepsilon\)</em>，答 \(\delta=\varepsilon/2\)。<b>刻意用 \(\varepsilon/2\) 不用 \(\varepsilon/3\)</b>——§B.4 的除法是為了完全不同的理由，撞在一起會製造新混淆</td></tr>
+<tr><td>2</td><td>Example B.3 的 trailing 量詞與 Strategy B.3 規則字面衝突</td><td>2 份 sim</td><td><b>採納</b>。<b>保留慣用語序</b>（那才是學生在印刷品上會遇到的），Solution 開頭補 prefix 正規化，並明講「<b>沒有任何量詞越過另一個</b>」——散文閘指出關鍵：§B.3 前三分之一才剛教「動量詞＝變真假」，安撫必須落在讀者發毛的那一刻</td></tr>
+<tr><td>3</td><td>Example B.4 的 \(\varepsilon\) 未量詞化</td><td>2 份 sim</td><td><b>採納</b>。加 <span class="en">Let \(\varepsilon > 0\)</span>，一句</td></tr>
+<tr><td>4</td><td>§B.4 輔助函數無 worked example</td><td><b>外部意見＋3 份 sim</b></td><td><b>採納，吃 cascade</b>。新增 <b>Example B.6</b>：\(x^{2}+1>x\)，令 \(h(x)=(x^{2}+1)-x=(x-\tfrac12)^{2}+\tfrac34>0\)。calculus-free（配方屬 A 類）。<b>散文補不了這個洞——那個不對稱本身就是「缺一個例子」</b></td></tr>
+<tr><td>5</td><td>§B.5 的 \(\Rightarrow\)／\(\Leftrightarrow\) 首用只有裸括號</td><td>1 份 sim</td><td><b>採納</b>。首用處 gloss、接回 §B.1 的 <em>if and only if</em>。散文閘 grep 驗證：\(\Rightarrow\)／\(\Leftrightarrow\) 在 sec-b-1..b-4 <b>零出現</b>，gloss 確實落在 first use 上</td></tr>
+<tr><td>6</td><td>§B.5 Pause 的「先自試」在版面上失效</td><td>1 份 sim</td><td><b>採納</b>。走查段加 <code class="k">page-break-before</code>。<b>不是發明</b>——kit 的 shell CSS 定義它、分頁器認它，且 <code>ch01/sec-1-1.html</code> 已用兩次。代價＝appB ＋1 DIALECT 組合（見第八節）</td></tr>
+<tr><td>—</td><td><b>WLOG worked example＋反例</b>（意見書要求）</td><td><b>0/5 sim 提過</b></td><td><b>不採納</b>。該段散文本已自帶正例（\(a\le b\)／交換名稱）與 caution（<span class="en">“Invoked over cases that are <i>not</i> symmetric, it quietly skips real work”</span>）。散文閘明確支持此裁決，並指出「冷落感」的真正來源是 <b>signposting 不對稱</b>（五招四招有接手句，WLOG 沒有——它的被輔助函數的框架吃掉了）→ 補一句接手句即平反，不動選題</td></tr>
+</table>
+
+<h3>首次 cascade（本附錄唯一一次）</h3>
+<p class="note">④在 Example 計數器<b>中段</b>插入，故 §B.6 四例 B.6–B.9 → <b>B.7–B.10</b>，§B.6 Caution 的 cross-ref 同動。腳本驗證：<b>Example B.1–B.10 連續、cross-ref 13 引用 0 dangling</b>。Codex 覆核：「編號 cascade 正確；Caution 現指向 Example B.9，<b>仍是原先 Example B.8 的 converse 錯誤內容</b>」——即 reference 不只 resolve 得到，指的還是同一個數學內容（這正是 cascade 最容易壞的地方）。</p>
+
+<h3>順帶補上的記號稽核缺口</h3>
+<p class="note">一份 sim 交了完整的「我在讀 vs 我在猜」清單，五項全補：<b>qed □</b>（首見處 gloss——sim 的話：「諷刺的是這正是『教人讀證明』的附錄，初次讀證明的人第一個遇到的陌生符號就是它」）／<b>\(\varepsilon\)、\(\delta\) 念出名字</b>（「全附錄用最多次、卻是唯一沒有配一個詞介紹的符號……我自學、沒老師可問，連唸都唸不出來」）／<b>WLOG 縮寫寫出來</b>（原本只說「會被縮寫」不說縮成什麼——而 §B.4 全節主旨正是「在印刷品上叫得出名字」）／<b>even 與 odd 同處 unpack</b>（原本只 unpack odd，但 §B.6 step 2 把 <em>even</em> 列為該 unpack 的詞）。</p>
+
+<h3>第二批的閘</h3>
+<table>
+<tr><th>閘</th><th>結果</th></tr>
+<tr><td>learner-sim ×3（乾淨盲測）</td><td><span class="pass">0 blocking ×3、0 B 類違規 ×3</span>；曲線 2/3/4/3/2/4、2/3/4/3/2/3.5、2/3/3.5/3/2/3.5（均值 3.0／2.9／2.8，尖峰 4 ＝ Ch4、＜ §4.2 的 4.5）</td></tr>
+<tr><td>prose gate-1</td><td><span class="pass">0 blocking</span>／5 tighten／1 optional／0 voice，<b>全數套用</b></td></tr>
+<tr><td>Codex gate-2（收尾兩輪）</td><td>六項全 <span class="pass">CHECKED-CLEAN</span>；另抓 <span class="fail">2 blocking</span>（見下）→ 修 → <span class="pass">PASS 0 blocking</span></td></tr>
+<tr><td>sympy 重算</td><td><span class="pass">全綠</span>：配方恆等、\(\min h = \tfrac34\) 正是課文宣稱的界、\(x^{2}+1>x\) 反例集合為空集、\(|2x-4|=2|x-2|\)、\(2\cdot(\varepsilon/2)=\varepsilon\)</td></tr>
+</table>
+
+<div class="card oops">
+<p><span class="id">收尾</span><b>Codex 抓到 2 條五份 sim 與散文閘都沒抓到的既存缺陷</b></p>
+<p class="why"><b>① Example B.4 有一句字面為假</b>（既存內容，非本輪引入）：<span class="en">“three pieces, each held below \(\varepsilon/3\), <b>to total exactly \(\varepsilon\)</b>”</span>——三個實際量各<b>嚴格</b>小於 \(\varepsilon/3\)，總和<b>嚴格</b>小於 \(\varepsilon\)；恰好等於 \(\varepsilon\) 的是三個<b>上界</b>。一份 sim 碰到了這句（判 minor、「五秒的疙瘩」），Codex 升為 blocking——它是對的。已改為區分 allowance 與其涵蓋的 piece。<br>
+<b>② §B.5 開場殘留過期的結構宣稱</b>：<span class="en">“Five habits make the difference, and they are <b>the last tools this appendix has to offer</b>.”</span>——我改了 §B.5 的<b>結尾</b>讓它變成過渡，卻<b>漏了開場</b>。已改為「complete the reading side of this appendix’s toolkit」。<br>
+<b>這條屬於一個「類別」</b>（加了 §B.6 後，B.1–B.5 還有哪些結構宣稱過期），所以另跑一次全面掃描——我自己掃 ＋ Codex 獨立掃，<b>兩邊都確認無其他漏網</b>。</p>
+</div>
+
+<h2>八、連帶改動與 LaTeX 線</h2>
+<table>
+<tr><th>檔</th><th>改了什麼</th></tr>
+<tr><td><code>sec-b-1.html</code></td><td><code class="k">&lt;h1&gt;</code> → <b>Reading and Writing Proofs</b>；lead 加 §B.6＋不誇大句（「enough structure to begin…though fluency comes from writing them and then writing them again」）並依散文閘斷成兩句；objectives 修計數措辭＋加 2 條（「plan, draft, check, and revise a short elementary proof of your own」／「distinguish a promising argument from a complete proof」）</td></tr>
+<tr><td><code>sec-b-5.html</code></td><td>Prop B.5 加量詞；<b>末段拆兩段</b>——原收束段讓出全附錄的收束位給 §B.6，改為過渡（五個閱讀習慣「every one is a question put to somebody else’s page…Turn them on a page you are writing yourself」）</td></tr>
+<tr><td><code>appendixB-print-standalone.html</code></td><td><code class="k">runningHead</code> → 「Appendix B · Reading and Writing Proofs」</td></tr>
+<tr><td><code>build.py</code></td><td><code class="k">CHAPTERS["appB"]</code> 加 <code class="k">sec-b-6</code>（<code class="k">CHAPTER.fragments</code> 由 build 自動同步）</td></tr>
+<tr><td><code>PIPELINE.md</code></td><td><b>修一條真衝突</b>：本檔原寫「read-only review 有 standing consent」（兩處），與 <code>CLAUDE.md</code>「Codex 唯讀調用…需逐次徵詢」直接矛盾。<b>使用者 2026-07-17 裁定 CLAUDE.md 為準</b>，兩處已改正並留裁決理由</td></tr>
+<tr><td><code>DIALECT-appB.md</code></td><td>標記計數過期＋記錄定稿後實況：<b>35 種組合，＋1</b>。§3 差集<b>只需新增一項＝<code class="k">p.page-break-before</code></b>（§B.5 走查段；語意＝強制換頁；LaTeX 對映 <code class="k">\newpage</code> 之流，非難題；<b><code>ch01/sec-1-1.html</code> 已用同一 class 兩次</b>，故宜在 M-B1 一併凍結正式名稱、非 appB 獨有）。另記 <code class="k">ol.steps</code> 多了父元素 <code class="k">article.sec</code>（非新組合，但語意指令若假設 steps 必在 env 內就會踩到）。<b>未刷新逐項計數欄</b>——因 appB pilot 四閘與 <code>latex/dist/appB/</code> 成品亦同步過期（20→14 頁的比較基於舊內容），只更新計數會讓該檔宣稱一種它沒有的新鮮度；正確作法是 appB 重跑 pilot 時一併重新凍結</td></tr>
+</table>
+
+<h3>唯一剩下的開放問題：§B.6 的篇幅</h3>
+<div class="card q">
+<p><span class="id">OPEN</span><span class="badge b-q">待裁決</span><b>§B.6 ≈3960 字，其他各節 ≈1000–1400 字（3.3×）</b></p>
+<p class="why"><b>三份最終盲測全部把篇幅列為 slowdown</b>（「中段明顯開始滑掉」／<span class="en">“attention was clearly gone by Strategy B.7’s nine items”</span>／「我中途要放下來休息」），且它們估的「2–2.5 倍」還低估了實際的 3.3 倍。這是本輪唯一收斂、但<b>未處理</b>的發現。<br>
+<b>可能的解：</b>把 §B.6 拆成「寫」與「檢查自己的證明」兩節——那會與閱讀側對稱（§B.1–B.4 讀 → §B.5 主動檢查）。<br>
+<b>我的建議：不拆。</b>① 十份盲測全把 §B.6 判在難度上限內（3.5–4 ≤ Ch4 的 4），0 blocking。② 散文閘找不到可刪的（21 段跑 S3 刪除測試全部掙得位置；唯一真重複的第 4 次 <code class="k">length ≠ rigor</code> 已併句）。③ 篇幅是<b>內生的</b>——它是唯一涵蓋「規劃→修訂」兩階段活動的節，也是讀者唯一要動手的節。④ sim 的抱怨是「我累了」，不是「我跟不上」。⑤ 拆節會讓一份 short primer 變成七節，並需再跑一輪完整的閘。<br>
+<b>屬結構決定，不在使用者授權的六項內，故未自行處理。</b></p>
+</div>
+
+<h3>其餘：屬 spec／全書／習題本層，非附錄缺陷</h3>
+<p class="note">① <b>§B.1 objectives 7 條 vs SPEC §15 的「3–5 項」</b>——全書實況 ch05=8、ch04/ch06/appA=6，<b>該動的是 spec 條文</b>（散文閘判定：editorial drift，四級之第③級）。② <b>英式拼法混用</b>（appA <code>centre</code>、ch05 <code>behaviour</code>、ch01 <code>analyse</code>…）——<b>只修了我自己寫的兩個</b>（traveling／practiced），其餘交排版閘全書一次處理，免製造新的不一致。③ <b>objective #6 依賴不存在的習題本階梯</b>——一份 sim 誠實檢查後判「plan, draft, check, and revise」<b>打折交付</b>：Strategy B.6 第 3 步「Choose a shape」一次沒練到（Pause 兩題都替讀者點名了形狀），且「check」對沒有老師的自學者沒有答案可對。sim 的結論：「<b>這是系統層的洞、不是本附錄的缺陷……習題本若沒有對應的 appB 練習階梯，目標 #6 在讀者這一側就是懸空的</b>」——這正是 B.6 那題當初的上游決策，回 roadmap 層。</p>
+
+<h3>驗收</h3>
+<table>
+<tr><th>檢查</th><th>結果</th></tr>
+<tr><td><code class="k">python handout/html/build.py appB</code></td><td><span class="pass">OK</span>，registry 同步</td></tr>
+<tr><td><code class="k">python handout/html/quote_lint.py</code>（CI 閘）</td><td><span class="pass">clean，52 檔</span></td></tr>
+<tr><td><code class="k">python tools/doc_lint.py</code>（CI 閘）</td><td><span class="pass">clean</span></td></tr>
+<tr><td><code class="k">linebreak-gate.mjs</code></td><td><span class="pass">自動斷行 0 條、渲染錯誤 0</span></td></tr>
+<tr><td><code class="k">shot.mjs … full</code></td><td><span class="pass">ready=true、math=545、katex-errors=0</span>（B.6 前 298）</td></tr>
+<tr><td>編號 ledger</td><td><span class="pass">Definition B.1／Proposition B.1–B.5／Strategy B.1–B.7／Example B.1–B.10 全連續</span>（含首次 cascade 後）</td></tr>
+<tr><td>cross-ref</td><td><span class="pass">13 引用／23 labels → 0 dangling</span>；Codex 另覆核「指的還是同一個數學內容」</td></tr>
+<tr><td>契約</td><td><span class="pass">0 個 live exercise 標記；SPEC 的 11 個 env 未動</span></td></tr>
+<tr><td><code class="k">dialect_inventory.py appB</code></td><td><span class="pass">35 種組合、＋1</span>（<code class="k">p.page-break-before</code>，已記入 §3 差集）</td></tr>
+<tr><td>sympy 重算</td><td><span class="pass">全綠</span>（新 Example B.6 的配方與最小值、\(\delta\) 回合、既有 \(\varepsilon/3\) 鏈回歸）</td></tr>
+</table>
+
+<p class="sub" style="margin-top:2rem;"><b>未 commit</b>（依 <code>CLAUDE.md</code>「經授權才 commit」）。裁決稿＝<a href="REVIEW-appendixB-b6-design.html">REVIEW-appendixB-b6-design.html</a>。</p>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!-- §A.5 The Conic Sections.
+     Self-authored 2026-07-04 (no manuscript; authoring brief = CONTENT_SPEC §16.2/§16.3
+     + §3 register). Second-batch appendix section (user roster decision 2026-07-04),
+     written WITH figures (user directive "連圖一起寫").
+     Numbering is MANUAL, namespace "A", continuing from sec-a-4:
+     Example A.6; Figures A.1–A.4 (the appendix's first figures — A.1 circle,
+     A.2 parabola, A.3 ellipse, A.4 hyperbola).
+     Figure functions live in appendixA-print-standalone.html FIGS: conic-circle,
+     conic-parabola, conic-ellipse, conic-hyperbola (buildPlot curve-halves + dots/
+     reflines/labels; the circle uses an equal-aspect square plot so it renders round).
+     Depth note: a "quick tour" — standard forms centred/vertex at the origin, key
+     features stated, the distance definitions given informally. Forward-stock: Ch1–4
+     has no inbound reference; not registered as SPEC B-class (it is analytic geometry,
+     not a Ch1–4 prerequisite). Math verified during authoring: focus-directrix ⇒ x^2=4py,
+     ellipse c^2=a^2-b^2, hyperbola c^2=a^2+b^2, asymptotes y=±(b/a)x, Example A.6
+     (4x^2+9y^2=36 ⇒ x^2/9+y^2/4=1, foci (±√5,0)).
+     2026-07-04 GAP-F: appended a closing paragraph teaching completing-the-square (general 2nd-degree ->
+     standard form; worked circle x^2+y^2-6x+4y=12 => (x-3)^2+(y+2)^2=25, r=5 at (3,-2); single-quadratic
+     form (x+p/2)^2+(q-p^2/4) for Ch8 integrals). Prose only, no new numbered env (A.5 "quick tour" kept).
+     Completing-the-square is SPEC §16.2 A-class, folded here per the appendix clean-slate design
+     (handout/_audit/REVIEW-appendix-clean-slate-design.html). Math verified: 9+4 added both sides -> 25.
+     Codex gate-2 (gpt-5.5/xhigh): 0 blocking, 1 advisory FIXED — scoped "general 2nd-degree" to "no xy
+     cross-term" and noted a genuine xy term needs axis rotation (avoids overclaiming). Re-rendered clean.
+     Record: handout/_audit/REVIEW-appendixA-applied.html. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">A.5</span>The Conic Sections</h2>
+  </header>
+
+  <p>Slice a cone with a flat plane and the rim of the cut is a <em>conic section</em>: a circle, an ellipse, a parabola, or a hyperbola, according to the angle of the slice. Each also has a cleaner description in terms of distance, and each has a <em>standard equation</em> — the simplest form, obtained by placing the curve’s centre or vertex at the origin. This tour records the four standard forms and the features to read straight off them.</p>
+
+  <p><strong>The circle.</strong> A circle is the set of points a fixed distance \(r\) — the <em>radius</em> — from a centre; it is the conic already familiar from precalculus, and the template the other three vary. Centred at the origin, the condition \(\sqrt{x^2 + y^2} = r\) squares to the standard equation
+  \[ x^2 + y^2 = r^2. \]</p>
+
+  <figure class="figure" data-fig="conic-circle">
+    <figcaption><span class="fig-no">Figure A.1</span> A circle of radius \(r\) centred at the origin: \(x^2 + y^2 = r^2\).</figcaption>
+  </figure>
+
+  <p><strong>The parabola.</strong> Fix a point \(F\) (the <em>focus</em>) and a line (the <em>directrix</em>). A parabola is the set of points equidistant from the two. Take focus \(F = (0, p)\) with \(p > 0\) and directrix \(y = -p\). Equating a point’s distance to the focus with its distance to the directrix — the latter being the vertical gap \(y + p\) down to the line \(y = -p\) — gives \(x^2 + (y - p)^2 = (y + p)^2\), which simplifies to the standard equation
+  \[ x^2 = 4py, \]
+  a curve opening upward from its vertex at the origin. (Putting the focus on the \(x\)-axis instead gives the sideways form \(y^2 = 4px\).)</p>
+
+  <figure class="figure" data-fig="conic-parabola">
+    <figcaption><span class="fig-no">Figure A.2</span> A parabola \(x^2 = 4py\), with focus \(F = (0, p)\) and directrix \(y = -p\).</figcaption>
+  </figure>
+
+  <p><strong>The ellipse.</strong> Fix two points \(F_1, F_2\) (the <em>foci</em>). An ellipse is the set of points whose distances to the two foci add to a fixed total. Placing the foci at \((\pm c, 0)\) and writing the total as \(2a\) leads to the standard equation
+  \[ \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1, \qquad b^2 = a^2 - c^2, \]
+  with \(a > b > 0\). The number \(b\) has a clean meaning: at the top of the ellipse, \((0, b)\), symmetry makes the two focal distances equal, and since they sum to \(2a\) each equals \(a\); the right triangle with legs \(b\) and \(c\) and hypotenuse \(a\) then gives \(a^2 = b^2 + c^2\) — the relation above. The curve crosses the axes at \((\pm a, 0)\) and \((0, \pm b)\), and the longer semi-axis \(a\) runs along the line through the foci. Because the foci sit <em>inside</em> the curve, \(c < a\), and \(c = \sqrt{a^2 - b^2}\) places them between the centre and the vertices.</p>
+
+  <figure class="figure" data-fig="conic-ellipse">
+    <figcaption><span class="fig-no">Figure A.3</span> An ellipse \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\) with foci \(F_1, F_2\) at \((\pm c, 0)\), where \(c = \sqrt{a^2 - b^2}\).</figcaption>
+  </figure>
+
+  <p><strong>The hyperbola.</strong> Keep two foci, but now ask for a fixed <em>difference</em> of distances rather than a sum. With foci at \((\pm c, 0)\) and the difference written \(2a\), the standard equation is
+  \[ \frac{x^2}{a^2} - \frac{y^2}{b^2} = 1, \qquad b^2 = c^2 - a^2. \]
+  The curve has two branches with vertices at \((\pm a, 0)\), and far from the centre it draws arbitrarily close to the two <em>asymptotes</em> \(y = \pm\frac{b}{a}x\) — the crossed lines whose slopes \(\pm b/a\) set how widely the branches open. This time the foci lie <em>beyond</em> the vertices, so \(c > a\), and the relation turns into \(c = \sqrt{a^2 + b^2}\): a <em>plus</em> where the ellipse had a minus, precisely because the focus has moved from inside the curve to outside it.</p>
+
+  <figure class="figure" data-fig="conic-hyperbola">
+    <figcaption><span class="fig-no">Figure A.4</span> A hyperbola \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\), with vertices \((\pm a, 0)\), foci \((\pm c, 0)\), and asymptotes \(y = \pm\frac{b}{a}x\).</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">A.6</span></p>
+      <div class="env-body">
+        <p>Identify the curve \(4x^2 + 9y^2 = 36\) and locate its foci.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Divide through by \(36\) to reach standard form:
+        \[ \frac{x^2}{9} + \frac{y^2}{4} = 1. \]
+        Both squared terms are added, so the curve is an ellipse, with \(a^2 = 9\) and \(b^2 = 4\) — that is \(a = 3\) and \(b = 2\). Since \(a > b\), the major axis is horizontal, and \(c = \sqrt{a^2 - b^2} = \sqrt{9 - 4} = \sqrt{5}\). The foci therefore sit at \((\pm\sqrt{5},\, 0)\), about \((\pm 2.24,\, 0)\). Had the sign between the terms been a minus, the same reading would have named a hyperbola instead, with \(c = \sqrt{a^2 + b^2}\).</p>
+      </div>
+    </section>
+  </div>
+
+  <p>Those are the four curves, their standard equations, and the features — centre, radius, focus, directrix, foci, axes, and asymptotes — that each equation puts on display. Moving a centre or vertex off the origin only replaces \(x\) and \(y\) with \((x - h)\) and \((y - k)\); the shapes, and everything this tour named, are unchanged.</p>
+
+  <p>Read backwards, that last remark is a tool. A second-degree equation handed over in <em>expanded</em> form — \(x^2 + y^2 - 6x + 4y = 12\), say — hides its centre until you <em>complete the square</em> in each variable, grouping each pair and adding the square of half the linear coefficient to both sides:
+  \[ \begin{aligned}
+    &(x^2 - 6x + 9) + (y^2 + 4y + 4) = 12 + 9 + 4, \\
+    &\text{that is}\qquad (x - 3)^2 + (y + 2)^2 = 25,
+  \end{aligned} \]
+  a circle of radius \(5\) centred at \((3, -2)\). The same single move, \(x^2 + px + q = \left(x + \tfrac{p}{2}\right)^2 + \left(q - \tfrac{p^2}{4}\right)\), is what later lets an integral such as \(\int \dfrac{dx}{x^2 + px + q}\) be recentred and evaluated (Chapter 8). Completing the square is the one algebraic step that turns such an expression — one with no \(xy\) cross-term — into a standard one; a genuine \(xy\) term would call for a rotation of the axes as well, a step beyond this tour.</p>
+
+</article>

@@ -3,8 +3,8 @@
 > **Frozen artifact (LaTeX-era).** This is the distilled writing contract that was
 > fed to the seed_converge experiment, which ran against the LaTeX format. The live
 > handout switched to HTML on 2026-06-13 and now has its own writing contract at
-> [`handout/CONTRACT-html-writing.md`](../../handout/CONTRACT-html-writing.md)
-> (typesetting in [`handout/TYPESETTING_GUIDE.md`](../../handout/TYPESETTING_GUIDE.md)).
+> [`handout/CONTRACT-html-writing.md`](../../handout/html/CONTRACT-html-writing.md)
+> (typesetting in [`handout/TYPESETTING_GUIDE.md`](../../handout/html/TYPESETTING_GUIDE.md)).
 > The LaTeX-mechanics rules below (environments, `\index`, TikZ/`[H]`, math delimiters,
 > `\emph`/`\textbf`, TeX quotes, `\cref`, `% expansion:` comment syntax) describe the
 > frozen experiment; for the current handout follow the HTML contract instead. The
@@ -24,7 +24,7 @@ models. Not the full spec (keeps prompts and cost down).
 
 ## Environments / semantic blocks (use these; do not invent new ones)
 *(LaTeX-era environment names; for the HTML handout these are the structural blocks in
-[`CONTRACT-html-writing.md`](../../handout/CONTRACT-html-writing.md).)*
+[`CONTRACT-html-writing.md`](../../handout/html/CONTRACT-html-writing.md).)*
 - `definition`, `theorem[Name]`, `proposition`, `corollary`.
 - `example` + `solution`, always wrapped in `workedexample` (no solo `example`).
 - `remark` (aside / notation note), `caution` (one notation trap, 1–3 sentences),
@@ -36,7 +36,7 @@ models. Not the full spec (keeps prompts and cost down).
 
 ## Formula display (one mode per local unit)
 *(LaTeX-era delimiters below; in the HTML handout math goes through MathJax/KaTeX — see
-[`TYPESETTING_GUIDE.md`](../../handout/TYPESETTING_GUIDE.md). The one-mode-per-unit intent
+[`TYPESETTING_GUIDE.md`](../../handout/html/TYPESETTING_GUIDE.md). The one-mode-per-unit intent
 is format-independent.)*
 - inline `\(...\)`; display `\[...\]`; aligned derivation steps; a condition
   display with a trailing domain/branch condition; two compared formulas side by
@@ -45,7 +45,7 @@ is format-independent.)*
 ## Prose typography
 *(LaTeX-era markup below; in the HTML handout emphasis/quotes/dashes are HTML or Unicode
 and cross-references are plain-prose references to the hand-written number (no `\cref`, no hyperlink) — see
-[`CONTRACT-html-writing.md`](../../handout/CONTRACT-html-writing.md).
+[`CONTRACT-html-writing.md`](../../handout/html/CONTRACT-html-writing.md).
 Each rule's intent is format-independent.)*
 - emphasis: `\emph{...}` only — **no** `\textbf{...}` / `\textit{...}` in prose
   (HTML: `<em>` only, no `<b>`/`<strong>`).

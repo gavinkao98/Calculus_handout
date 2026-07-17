@@ -26,7 +26,7 @@ python tools\doctor.py
 | **② 系統 binary** | `ffmpeg`、`ffprobe` | 每台 `winget install --id Gyan.FFmpeg -e`（**含 ffprobe**） |
 | **③ LaTeX** | MiKTeX：`latex`、`dvisvgm` + `plex-sans`/`plex-mono`/`lmodern`/`microtype`（Route A：video 文字＋數學皆走 LaTeX；MiKTeX 首編自動補裝） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法） |
 | **①b 影片字型** | **全走 LaTeX**：文字 IBM Plex Sans/Mono、數學 Latin Modern（套件見 ③）。**不再用 Pango 系統字型**（Times/Courier 已棄） | 無需安裝系統字型；只要 ③ 的 MiKTeX 套件在即可（`doctor.py` 以 kpsewhich 驗）。video 不 vendored 任何字型 |
-| **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/_render/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
+| **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/html/_render/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](authoring/_archive/deai/PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
 | **⑤c forced alignment（選用）** | `video/experiments/forced_alignment_dean/` 的本機 word-level timestamps，將整段 Dean 音訊對回 storyboard beats：`stable-ts`（transcript-constrained，**計時來源**）＋`whisper_timestamped`（自由 ASR，**QA 探針**） | 每台全局安裝一次：`python -m pip install --upgrade whisper-timestamped stable-ts`；第一次跑 `base.en` 會下載 Whisper model cache。缺它不擋核心產線，`doctor.py` 只 WARN |
@@ -89,7 +89,7 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址，故排除需 fontspec 的 `newcomputermodern`。
   （`newtx` 已不再是 video 需求，但仍是 `legacy/tex_handout/` 的需求。）
 - handout 的 HTML 講義**不需要** LaTeX（數學走 MathJax/KaTeX CDN）；`video/` render 需要 pdflatex 路徑，
-  出版排版線（`handout/tex_export/`）另需 lualatex 路徑（見 ③b）——同一套 MiKTeX、兩條互不干擾。
+  出版排版線（`handout/latex/`）另需 lualatex 路徑（見 ③b）——同一套 MiKTeX、兩條互不干擾。
 - **踩坑（2026-06-25）：Plex 文字 render 成空白／場景一開頭 `IndexError` 崩。** 症狀：含文字的場景 render 崩在
   `IndexError: too many indices for array`（標題 Tex 沒有任何點），或 latex 印 `'miktex-makemf.exe…plxSans-…mf'
   is not recognized`。**不是缺套件**——`kpsewhich plex-sans.sty` 找得到——而是這台 MiKTeX 的**字型檔名庫（FNDB）
@@ -104,13 +104,13 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   開一次 MiKTeX Console → Check for updates 可消。
 
 ### ③b handout LaTeX 出版排版線 — lualatex + memoir + NCM + vendored Inter
-- **這條線是講義的出版排版（`handout/tex_export/`，[`handout/KICKOFF-latex-pilot.md`](handout/KICKOFF-latex-pilot.md)）**：
+- **這條線是講義的出版排版（`handout/latex/`，[`handout/latex/KICKOFF-latex-pilot.md`](handout/latex/KICKOFF-latex-pilot.md)）**：
   fragment 經 `convert.py` 確定性轉換 → `template/calcbook.sty`（memoir）→ `latexmk -lualatex` 出 A4 PDF。
   與 video 的「只能 pdflatex」硬約束**不衝突**——兩條線各走各的引擎，同一套 MiKTeX。
 - 需求全在 MiKTeX 內：`lualatex`／`latexmk` 內建；`newcomputermodern`（本文＋數學字體）首次編譯自動補裝；
   `pdftotext`（完整性閘 `check_prose.py`）MiKTeX 也自帶（poppler 系工具）。
 - **UI sans＝vendored Inter（2026-07-16，M-B1 議題⑦ 拍板）**：字體檔在
-  `handout/tex_export/template/fonts/inter/`（六字重 OTF＋OFL 授權，來源＝rsms/inter release v4.1 的
+  `handout/latex/template/fonts/inter/`（六字重 OTF＋OFL 授權，來源＝rsms/inter release v4.1 的
   `extras/otf`），`calcbook.sty` 以 `fontspec Path=` 載入。**隨 repo 走、換機零安裝**；對映 HTML 側的
   Inter（圖內標籤已嵌同字體，本文側圖說用它才同族）。
 - `doctor.py` 的 `check_handout_latex`（區名 `handout-tex`）驗上述全部：lualatex／latexmk／pdftotext 在 PATH、
@@ -126,8 +126,8 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   `pipeline/assets/_outline_text.py` 用）。
 
 ### ④ Node + Chrome — 只給 handout 圖 render 用
-- [`handout/build.py`](handout/build.py) 組裝 HTML 是**純 Python stdlib**，任何 python 都能跑、無額外需求。
-- [`handout/_render/shot.mjs`](handout/_render/shot.mjs)（render `.sheet` 成 PNG 餵 figure 稽核）需要
+- [`handout/html/build.py`](handout/html/build.py) 組裝 HTML 是**純 Python stdlib**，任何 python 都能跑、無額外需求。
+- [`handout/html/_render/shot.mjs`](handout/html/_render/shot.mjs)（render `.sheet` 成 PNG 餵 figure 稽核）需要
   **Node ≥21**（global WebSocket/fetch）＋ **Google Chrome**。Chrome 路徑現在會先讀 `CHROME` 環境變數、
   再退回常見安裝位置（不再寫死單一路徑）。
 - standalone HTML **檢視時需連網**載 MathJax/KaTeX CDN（非安裝需求）。
@@ -181,7 +181,7 @@ copy tools\codex.cmd "%APPDATA%\npm\codex.cmd"
 
 ## 在用 / 不在用
 
-- **在用：** `video/`（影片產線）、`handout/`（HTML 講義 + `_render/shot.mjs`）、
+- **在用：** `video/`（影片產線）、`handout/html/`（HTML 講義 + `_render/shot.mjs`）、
   `authoring/seed_converge/`（圖稽核 R&D，當前 `experiment/seed-converge` 分支）。
 - **凍結（不在 doctor 檢查範圍）：** `legacy/tex_handout/tools/`（第一代 LaTeX 講義 linter）、
   `legacy/` 其餘第一代產物。要跑它們才另需完整 TeX，平時不需要。

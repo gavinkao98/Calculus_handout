@@ -1,7 +1,7 @@
 # 題源與選題流程（課文範例）
 
 服務對象：**講義課文內的 worked examples**（`example`＋`solution`，[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §5；
-HTML 線為 `env-example`＋`env-solution`，見 [`handout/CONTRACT-html-writing.md`](handout/CONTRACT-html-writing.md)）。
+HTML 線為 `env-example`＋`env-solution`，見 [`handout/html/CONTRACT-html-writing.md`](handout/html/CONTRACT-html-writing.md)）。
 
 > **講義本體不收習題**（使用者 2026-06-12 定案，[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14）。
 > 習題將以**獨立的習題本**呈現，屆時另立規格、沿用本檔的題源與授權框架；
@@ -25,7 +25,7 @@ HTML 線為 `env-example`＋`env-solution`，見 [`handout/CONTRACT-html-writing
       接著在本地題庫（[`problem_banks/README.md`](problem_banks/README.md)）搜尋候選
       （CLP1 優先、其次 APEX／Mooculus），改寫為本書語域與記號，
       產出**一份 standalone HTML 審核文件**
-      （路徑 `handout/_dev-archive/chNN/chNN_example-supplement-review.html`，
+      （路徑 `handout/html/_dev-archive/chNN/chNN_example-supplement-review.html`，
       缺口盤點在前、候選全文在後、裁決表在頂，數學即渲染）供使用者裁決。
       題庫的分類法只是搜尋索引——缺口永遠由講義自身內容定義。
    2. **官方完整 solution 是硬條件**：worked example 必須附解，只收解材完整的源
@@ -37,10 +37,10 @@ HTML 線為 `env-example`＋`env-solution`，見 [`handout/CONTRACT-html-writing
       （數學／忠實度／對症性為 blocking；格式為 advisory），**含圖的數學正確性與視覺可讀性**
       （standalone HTML 內 `FIGS` 物件的繪圖函式、domain、特殊點、標記文字 vs 課文描述；viewing window 是否讓教學特徵可辨識——range 過大壓縮曲線形狀等同圖畫錯），收斂到 blocking=0 再交使用者裁決。
       **findings 必須留版控**：Codex 原始輸出落在 `.tmp/`（gitignored、換機即失、使用者看不到），
-      因此每輪稽核的 findings 原文＋Claude 的 triage 處置要存進 `handout/_dev-archive/chNN/`
-      下的 `chNN_<artifact>-audit.md`（範例：`handout/_dev-archive/ch01/ch01_example-supplement-audit.md`），不可只留在 commit message 摘要。
+      因此每輪稽核的 findings 原文＋Claude 的 triage 處置要存進 `handout/html/_dev-archive/chNN/`
+      下的 `chNN_<artifact>-audit.md`（範例：`handout/html/_dev-archive/ch01/ch01_example-supplement-audit.md`），不可只留在 commit message 摘要。
 
-      **本選題稽核只審例題候選**（數學／來源／圖）；該節**手寫說明散文**的易懂性／流暢性由**獨立的一道散文稽核**負責（gate 1 Claude `handout-prose-audit` subagent ＋ gate 2 Codex，契約見 [`handout/_audit/PROSE-AUDIT-RUBRIC.md`](handout/_audit/PROSE-AUDIT-RUBRIC.md)），與本稽核平行、互不重疊。
+      **本選題稽核只審例題候選**（數學／來源／圖）；該節**手寫說明散文**的易懂性／流暢性由**獨立的一道散文稽核**負責（gate 1 Claude `handout-prose-audit` subagent ＋ gate 2 Codex，契約見 [`handout/html/_audit/PROSE-AUDIT-RUBRIC.md`](handout/html/_audit/PROSE-AUDIT-RUBRIC.md)），與本稽核平行、互不重疊。
    4. 通過裁決後改寫為本書語域與記號（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §3、§9），
       插入課文中教學上正確的位置（緊跟相關 definition／theorem／strategy）。
 3. **AI 出題——備援。** 僅用於題庫填不了的缺口（如緊扣手稿 running example 的延伸、
@@ -97,7 +97,7 @@ HTML 線為 `env-example`＋`env-solution`，見 [`handout/CONTRACT-html-writing
   `% expansion:example — <一行說明> [source: CLP-1 §1.4 #25]`（LaTeX）或
   `<!-- expansion:example — … [source: …] -->`（HTML）。三分類：手稿／`[source: 題庫…]`／`[source: AI]`。
 - **匯入當下**把題源的官方 hint／answer／solution 全文、授權標記、改寫差異說明存入
-  `handout/_dev-archive/chNN/` 下的 `chNN_example-imports.md`（如 `handout/_dev-archive/ch01/ch01_example-imports.md`）。
+  `handout/html/_dev-archive/chNN/` 下的 `chNN_example-imports.md`（如 `handout/html/_dev-archive/ch01/ch01_example-imports.md`）。
   改寫若更動數學實質（例如依本書 principal-range 約定重算），必須在 import record 中逐筆說明。
 
 ## 授權

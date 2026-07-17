@@ -13,7 +13,7 @@
 **關鍵路徑（已驗 CLI）：**
 - storyboard：`video/storyboards/ch03_trig_derivatives.yml`
 - 內容稿：`video/content_scripts/ch03_trig_derivatives.md`（SSOT）／審核稿 `..._narration.html`
-- 忠實來源：`handout/fragments/ch03/sec-3-1.html`
+- 忠實來源：`handout/html/fragments/ch03/sec-3-1.html`
 - schema：`python video/pipeline/schema.py <yml> --list`／lint：`python video/pipeline/lint.py <yml>`／sizecheck：`python video/pipeline/sizecheck.py <yml>`
 - 單景 mock：`python video/make.py --storyboard <yml> --scene <id> --backend mock --quality low`
 - 全片 mock 1080p：`python video/make.py --storyboard <yml> --scene all --backend mock --quality high`
@@ -39,7 +39,7 @@
 ### Task 0 — 前置與基線就位
 **Files:** 讀 only。
 - [ ] 確認分支 `video/template-redesign-navy-spine`、工作樹狀態：`git status`。
-- [ ] 讀基線：現有 `ch03_trig_derivatives.md`、`handout/fragments/ch03/sec-3-1.html`、`REVIEW-ch03-s31-density-audit.html`、`SPEC-ch03-s31-detail-redo.md`。
+- [ ] 讀基線：現有 `ch03_trig_derivatives.md`、`handout/html/fragments/ch03/sec-3-1.html`、`REVIEW-ch03-s31-density-audit.html`、`SPEC-ch03-s31-detail-redo.md`。
 - [ ] 環境：`python tools/doctor.py`（fonts 段綠：plex-sans/plex-mono/lmodern）。
 - **驗證點：** 基線可讀、doctor 全綠、SPEC §3 場景藍圖在手。
 

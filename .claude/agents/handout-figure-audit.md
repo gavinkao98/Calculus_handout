@@ -14,12 +14,12 @@ model: inherit
 
 視覺缺陷（label 碰撞、出界、viewing window 過大、刻度沒文字、灰階失效）**只在 render 後才看得到**——光讀 `FIGS` 的 JS 原始碼會漏掉。所以：
 
-- 呼叫者會給你**一張或多張 PNG**（由 [`handout/_render/shot.mjs`](../../handout/_render/shot.mjs) 從 standalone 截圖）。用 `Read` **打開那張 PNG 親眼看**。
+- 呼叫者會給你**一張或多張 PNG**（由 [`handout/html/_render/shot.mjs`](../../handout/html/_render/shot.mjs) 從 standalone 截圖）。用 `Read` **打開那張 PNG 親眼看**。
 - 若呼叫者**沒給 PNG**，先說明你需要 render 後的圖（請先跑 shot.mjs 產 PNG），**不要只憑原始碼硬審**——那會漏掉正是本閘要抓的視覺缺陷。
 
 # 開審前先讀（權威依據，勿憑記憶）
 
-1. `handout/_audit/FIGURE-AUDIT-RUBRIC.md` — 維度 D1–D8、blocking 線、non-findings、輸出格式（**本審契約**）。
+1. `handout/html/_audit/FIGURE-AUDIT-RUBRIC.md` — 維度 D1–D8、blocking 線、non-findings、輸出格式（**本審契約**）。
 2. `CONTENT_SPEC.md` §10（圖規則）。
 3. 該節 fragment 的 `<figure>`／`figcaption`、相關定義／範例陳述——判 D5（圖↔文一致）、D7（不洩露）的語境。
 4. 需查座標／數值正確性（D6）時，才去讀 standalone 的 `const FIGS` 對應繪圖函數。

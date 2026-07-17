@@ -93,7 +93,7 @@ OF／SC-honesty findings **只有當 cited content-script 的 deck 級 `CONTENT_
 ## 收斂線（§9.3）
 
 - **收斂判準**：本閘收斂 ＝ **PD blocking == 0 AND OF blocking == 0 AND SC blocking == 0**（此處 PD/OF/SC blocking 指 **gate-1 自有層**＝PD1＋OF1＋SC-honesty，計數約定見 §回報規格；確定性層 PD2/3/4＋OF2＋SC1/SC2 另由 `schema.py` 以 `pedagogy_enforce`／`otf_enforce`／`coverage_enforce` 收斂），是 **per-deck opt-in 後**的收斂目標，**NOT 落地門檻**（落地當下一切 warn/dry-run，見上「兩軸澄清」）。
-- advisory 由使用者**逐條裁決**，**不強制歸零**（同 [`NARRATION-FAITHFULNESS-RUBRIC.md`](NARRATION-FAITHFULNESS-RUBRIC.md):40、[`../../../handout/_audit/PROSE-AUDIT-RUBRIC.md`](../../../handout/_audit/PROSE-AUDIT-RUBRIC.md):40）。
+- advisory 由使用者**逐條裁決**，**不強制歸零**（同 [`NARRATION-FAITHFULNESS-RUBRIC.md`](NARRATION-FAITHFULNESS-RUBRIC.md):40、[`../../../handout/html/_audit/PROSE-AUDIT-RUBRIC.md`](../../../handout/html/_audit/PROSE-AUDIT-RUBRIC.md):40）。
 
 ## 不算 finding（別誤報）
 
