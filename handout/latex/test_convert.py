@@ -418,7 +418,7 @@ class AppBMappings(unittest.TestCase):
     def test_appB_converts_with_no_hard_errors(self):
         # M-B2 驗證點：appB 全節點 100% 交代（mapped 或硬錯；無表外標記）
         tex, stats = convert_chapter("appB", Path(__file__).parent / "chapters" / "appB" / "figs" / "figures.json")
-        self.assertEqual(stats["mapped"], 716)   # 鎖實值（gate-2 A2：>300 太弱）；2026-07-17 定稿後 440→695（新增 §B.6）、695→716（r3 新增 Example B.11）
+        self.assertEqual(stats["mapped"], 717)   # 鎖實值（gate-2 A2：>300 太弱）；2026-07-17 定稿後 440→695（新增 §B.6）、695→716（r3 新增 Example B.11）、716→717（r3 二輪：§B.3 指路子句的 <em>if–then</em>）
         self.assertEqual(stats["math"], 566)
         # emitter 重定向的 aggregate 斷言：v1 book-class 詞彙（hk*）不得殘留
         self.assertIsNone(re.search(r"\\hk[a-z]", tex), "輸出殘留 v1 hk* 詞彙")

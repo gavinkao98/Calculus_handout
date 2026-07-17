@@ -322,7 +322,80 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
 </table>
 <p class="note"><b><code class="k">test_convert.py</code> 鎖實值同步</b>（ledger lock 正常維護，非 bug）：<code class="k">mapped</code> 695→<b>716</b>、<code class="k">math</code> 545→<b>566</b>。改動前這兩條會硬錯，正是它們該有的行為。<b>編號帳</b>：<code class="k">span.env-num</code> ×24＝Definition 1＋Strategy 7＋Example <b>11</b>＋Proposition 5，Example B.1–B.11 連續、零 cascade。</p>
 
-<p class="note" style="margin-top:1.5rem;"><b>紀律備查：</b><code>CONTENT_ROADMAP.md:58</code>——「使用者 2026-07-04 兩度強調：附錄收錄條目一律先與使用者討論裁決，不得自行決定。」<code>FIX-2</code>（Example B.11）為新增收錄條目，<b>已於 2026-07-17 經使用者裁決授權</b>後方落地。<code>Q1</code>／<code>Q2</code> 未獲授權，未動。</p>
+<h2>八、第二輪落地（使用者 2026-07-17 裁決：「這四件事情你自己判斷全部做完，一頁式總表就不做了」）</h2>
+
+<div class="summary">
+<b><span class="pass">Q2 ＋ R-9 兩條既有 advisory 全數落地；<code>Q1</code> 一頁式總表經使用者裁決不做（與本檔第五節建議一致）。</span></b><br>
+回歸審核兩節<b>皆 0 blocking</b>：<code>sec-b-3</code> <b>0 tighten</b>／1 optional／1 voice；<code>sec-b-2</code> <b>0 tighten</b>／2 optional／1 voice。<b>本輪三處改動零 finding 需修</b>——與第一輪（6 條自造缺陷）對比明顯，因為這三處都是<b>照第一輪稽核已給出的具體修法</b>做的。
+</div>
+
+<h3>as-built</h3>
+<table>
+<tr><th>來源</th><th>落地內容</th><th>檔</th></tr>
+<tr><td><code>Q2</code>／<code>HOLD-1</code> 第三條路</td><td>Strategy B.3 步驟 2 末尾加<b>指路子句</b>：「<span class="en">…and so on. For the denial of an <i>if&ndash;then</i> — the kernel an argument by contradiction most often has to produce — see §B.6, which takes it up at the point where a proof needs it.</span>」<br><b>只加指路、不搬規則</b>——§B.6 的兩半原封不動，`sec-b-6.html` CONSTRAINT 未動。</td><td><code>sec-b-3.html</code></td></tr>
+<tr><td><code>R-9</code> ①</td><td>分案段：<span class="en">「And a <del>shrewd</del> split can sometimes be avoided altogether<del> by a shrewd observation</del>: here …」</span>——<b>改用刪除而非搬移</b>（見 R-10）</td><td><code>sec-b-2.html</code></td></tr>
+<tr><td><code>R-9</code> ②</td><td>歸納段：<span class="en">「<del>Like a line of dominoes, the first fall together with “each one topples the next” brings them all down.</del><ins>Like a line of dominoes: knocking the first one over, together with the guarantee that each topples the next, brings them all down.</ins>」</span></td><td><code>sec-b-2.html</code></td></tr>
+</table>
+
+<div class="card fix">
+<p><span class="id">R-10</span><span class="badge b-fix">改法被稽核者改進</span><b>「shrewd」該用刪除、不是搬移</b></p>
+<p class="why" style="color:#444;">我的第一版把 <span class="en">shrewd</span> 從 <span class="en">split</span> 搬到 <span class="en">observation</span>（「avoided altogether <b>by a shrewd observation</b>」）。稽核者指出這雖修好誤掛，卻<b>讓 <span class="en">observation</span> 在相鄰兩句連用</b>，且<b>第一句提前點名了第二句本來要揭示的機制</b>（<span class="en">「Seeing when a case analysis collapses to <b>one clean observation</b>…」</span>）。<br>
+<b>改用刪除</b>：<span class="en">shrewd</span> 直接拿掉 → 誤掛的東西不存在了；冒號直接交付那個觀察（＝本節自己的 announce-then-deliver 節奏，全節約 <b>14 處</b>冒號）；下一句恢復「首次揭示」的功能，<span class="en">clean</span> 承接舊句的 <span class="en">shrewd</span>。<b>更外科、無回音、語意零損。</b></p>
+</div>
+
+<div class="card fix">
+<p><span class="id">R-11</span><span class="badge b-fix">已驗</span><b>骨牌句：主謂一致與殘留誤讀都查過了</b></p>
+<p class="why"><b>主謂一致正確</b>：主語＝動名詞片語 <span class="en">knocking the first one over</span>（單數），<span class="en">together with …</span> 是<b>附加語不是對等連接詞</b>，不改變主語數 → 單數 <span class="en">brings</span> 對。<br>
+<b>殘留誤讀已雙重擋住</b>：理論上 <span class="en">the guarantee that each topples the next, brings them all down</span> 可誤讀成「the guarantee 一個人 brings them all down」（正是本句要防的半截 payload）——擋住它的是 <span class="en">brings</span> 前那個逗號（主語與動詞之間不下逗號）＋<span class="en">together with</span> 已預告附加語開啟。<br>
+<b>兩處映射反而收緊</b>：<span class="en">the first fall</span>（被動事件）→ <span class="en">knocking the first one over</span>（施事動作），對上前一句自己的 <span class="en">verify the claim for the first integer</span>；<span class="en">“each one topples the next”</span>（引號命題浮在主語裡）→ <span class="en">the guarantee that…</span>，對上前一句的 <span class="en">forces</span>。<b>§B.6 回扣同步收緊</b>：Example B.11 的 <span class="en">nobody ever pushed the first</span> 同為施事，<span class="en">knocking</span> 比 <span class="en">the first fall</span> 貼得緊。</p>
+</div>
+
+<div class="card fix">
+<p><span class="id">R-12</span><span class="badge b-fix">值得記</span><b>稽核者查完樹後<i>撤回</i>了一條 finding</b></p>
+<p class="why" style="color:#444;">它原本要對骨牌句的<b>冒號用法</b>開 finding（「Like a line of dominoes: …」＝片語＋冒號＋獨立子句，且與前一句的 <span class="en">in two strokes:</span> 背靠背）。<b>實查全節後撤回</b>：running prose 有約 14 處冒號＝本節招牌節奏，且兩個疑慮各有先例——<span class="en">「As for the proof itself: nothing was assumed but the hypothesis…」</span>結構完全相同（介系詞片語＋冒號＋獨立子句），而它與前面的 <span class="en">「…the customary sign-off: …」</span>正是背靠背兩句冒號。<br>
+它自己的評語：「<b>這是憑通用文體規則會誤報、憑實查才擋得住的一條</b>」——正是 <code>CLAUDE.md</code>「從目前被 review 的樹的現況出發、不 over-report」的實例。</p>
+</div>
+
+<div class="card fix">
+<p><span class="id">R-13</span><span class="badge b-fix">已驗</span><b>§B.3 指路子句：三項對抗性檢驗全過</b></p>
+<p class="why"><b>① 不是「打發走」</b>：子句給了四件事——點名缺口（if–then 不在表上）／說明缺口為何要緊／確切去處／為何擺那裡。稽核者判與錨組正例同型（「被命名的局限＋向前動機」），並指出<b>改前才是真正把人晾住的版本</b>（撞上 "and so on" 後既不知缺什麼、也不知去哪找）。<br>
+<b>② 不是 A2 blocking</b>（唯一可能的 blocking 位置，已對抗性檢驗）：\(\neg(P\Rightarrow Q)=P\wedge\neg Q\) 對初學者確實難，揮手帶過就是 A2——但「指路 ≠ 揮手」：有確切去處、去處真的交貨、去處還自報「我就是 B.3 步驟 2 的那條」。<b>「反倒是改前的狀態比較接近 A2……這條子句正是該 A2 的解藥；把解藥判成 A2 是反過來了。」</b><br>
+<b>③ 迴路雙向閉合</b>：<code>sec-b-6.html</code> 在反證法骨架處用同一套詞回頭認領（<span class="en">“That is <b>Strategy B.3's second step, its kernel rule, filled in for an implication</b>”</span>），且落點真的給了規則（<span class="en">“P would have to hold while Q failed”</span>）。<b>無虛指、無 overclaim。</b><br>
+<b>「produce」不是自由選字</b>：是同節七行前的原話（<span class="en">“to state what a proof by contradiction <b>must produce</b>”</span>）。這也擋掉唯一的語意風險——「produce」單看可能被讀成「論證的產出＝結論」（錯：反證法產出的是原命題不是否定），但前面的定調已把它釘死在「必須先寫出來的那句開場假設」。<b>:86 與 :93 的回音不是 F1</b>：strategy box 是 §11 lookup 目標、讀者冷翻回來，box 內回收動機段關鍵詞屬 §3-protected 的「回查用重述」。</p>
+</div>
+
+<div class="card hold">
+<p><span class="id">R-14</span><span class="badge b-hold">已裁：接受</span><b>Strategy B.3 步驟 2 的長度失衡（實測 28／<b>84</b>／14 字）</b></p>
+<p class="why" style="color:#444;">步驟 2 對最長手足 <b>3.0×</b>（改前 1.9×）。<b>接受，且與 <code>R-8</code> 的先例一致——舉重以明輕</b>：§B.2 條目 2 是 <b>83</b> 字對 19–25（倍率 3.3–4.4×）已裁接受，B.3 這裡<b>絕對長度幾乎等同（84 vs 83）、倍率反而更低</b>；而 §B.2 那 83 字是<b>必讀警語</b>，B.3 這 31 字是<b>可跳過的指路</b>（不追 if–then 的讀者一眼掠過）。另：失衡是內容驅動的——步驟 1／3 是機械操作與一句 caveat，步驟 2 是唯一有 case 分析的一步，長度誠實反映負載。</p>
+</div>
+
+<div class="card hold">
+<p><span class="id">R-15</span><span class="badge b-hold">已裁：不採</span><b>三條 optional（兩節合計）——全部維持現狀</b></p>
+<p class="why"><b>① <code>sec-b-3</code> [F3] 補回關係代名詞 <span class="en">that</span></b>（「the kernel <ins>that</ins> an argument by contradiction most often has to produce」）→ <b>不採</b>。稽核者自陳<b>低信心、傾向不改</b>：限定詞 <span class="en">an</span> 當場擋掉「kernel an argument」的合併誤讀，且 <span class="en">an argument by contradiction</span> 經 §B.2 整節操練已是單一 chunk，實際跨距只有「the kernel [CHUNK] most often has to produce」。<br>
+<b>② <code>sec-b-3</code> [V1] <span class="en">a proof needs it</span> → <span class="en">you need it</span></b> → <b>不採</b>。V1 寬報、never blocking；稽核者判現行非人稱式「也站得住——它陳述的是<b>書的編排</b>而非讀者的任務」，而這正是該子句的主題。<br>
+<b>③ <code>sec-b-2</code> [V1] cases 導言最平</b> → <b>不採</b>。稽核者明言「<b>不必動</b>」、「對 svc 正例錨 bar 判是<b>達標的</b>」，僅依 V1 寬報規則列出，<b>最低優先</b>。<br>
+<b>理由總則</b>：三條皆為已過閘散文上的零／負收益改動。不為湊零而 churn。</p>
+</div>
+
+<div class="card adv">
+<p><span class="id">R-16</span><span class="badge b-adv">未修，呈報</span><b>post-Prop B.1 段約 150 字、三個主題（<code>sec-b-2</code>，[F4] optional）</b></p>
+<p class="why" style="color:#444;">稽核者：該段是全節次長段（約 65 字）的 <b>2 倍</b>，載三個主題（QED 符號慣例／direct 診斷／double-duty＋contraposition＋轉場），且正落在<b>讀者讀完本附錄第一個證明的最高負荷點</b>上。建議切點現成且免費——在 <span class="en">“As for the proof itself:”</span> 與 <span class="en">“This one does double duty.”</span> 各切一刀（QED 是純記號旁註，與後兩個主題無關）。純分段、零語意變動。<br>
+<b>裁決：不做，呈報。</b>三個理由：① <b>約 89% 是既有的</b>——該段本輪前已約 135 字，<code>FIX-1</code> 的過渡句只加了約 16 字（約 11%），不是我造成的問題 ② 它是 <b>optional</b>，且該段已通過 10 份盲測與多輪散文閘、無人卡住 ③ 切點之一正好落在 <b>Prop B.1 回馬槍</b>那個受保護結構的正前方——把「This one does double duty.」提為段首會改變該揭露的節奏（從「行進中的意外」變成「預告後的揭曉」），<b>那是編輯判斷、不是句法修補，值得你親自定奪</b>，不宜我單方順手做掉。</p>
+</div>
+
+<h3>閘結果（r3 第二輪，全綠）</h3>
+<table>
+<tr><th>閘</th><th>結果</th></tr>
+<tr><td>散文 gate-1 ×2</td><td><span class="pass">0 blocking</span>；<b>0 tighten</b>（<code>sec-b-2</code> 2 optional＋1 voice／<code>sec-b-3</code> 1 optional＋1 voice，皆已裁）</td></tr>
+<tr><td>編譯／版面</td><td><span class="pass">0 error／0 missing char</span>（25 頁）｜<span class="pass">0 overfull／0 underfull</span></td></tr>
+<tr><td>完整性</td><td><span class="pass">coverage 100%</span>（<b>717</b> mapped／0 skipped）＋<code class="k">check_prose.py</code> PASS（0 真落差）＋數學逐位元組 <b>566/566</b>＋<code class="k">test_convert.py</code> <b>81/81</b></td></tr>
+<tr><td>字形</td><td><span class="pass">PASS</span>（361 字形輪廓全符 CID）</td></tr>
+<tr><td>人眼</td><td>改動落點逐頁：<b>p6</b>（分案段）／<b>p7</b>（骨牌句）／<b>p8</b>（Strategy B.3 box）＋全 25 頁低密度掃描（唯一低密度＝p25 收束段＝正常尾頁）</td></tr>
+<tr><td>HTML 線交叉驗證</td><td><b>566 個 MathJax 容器／0 error</b>——與 LaTeX 線的 566 段數學 pass-through <b>完全一致</b>；<code class="k">.env-num</code> ×24，展開 <code>B.1 B.1 B.1｜B.2 B.1 B.2 B.2 B.3 B.4｜B.3 B.3｜B.4 B.4 B.5 B.6｜B.5 B.5｜B.6 B.7 B.8 B.9 B.10 B.11 B.7</code> 逐節對得上文件順序，<b>Example B.1–B.11 連續、零 cascade</b></td></tr>
+</table>
+<p class="note"><b><code class="k">test_convert.py</code> 鎖實值再同步</b>：<code class="k">mapped</code> 716→<b>717</b>（＝§B.3 指路子句新增的 <code class="k">&lt;em&gt;if&ndash;then&lt;/em&gt;</code> 節點，精確可解釋）；<code class="k">math</code> 維持 566（本輪三處改動皆未觸及數學）。方言仍 <b>35 種組合、＋0</b>。</p>
+
+<p class="note" style="margin-top:1.5rem;"><b>紀律備查：</b><code>CONTENT_ROADMAP.md:58</code>——「使用者 2026-07-04 兩度強調：附錄收錄條目一律先與使用者討論裁決，不得自行決定。」<code>FIX-2</code>（Example B.11）與本節三項均<b>已於 2026-07-17 經使用者裁決授權</b>後方落地；<code>Q1</code>（一頁式總表）經使用者裁決<b>不做</b>。<b>Appendix B 至此定案。</b></p>
 
 </body>
 </html>

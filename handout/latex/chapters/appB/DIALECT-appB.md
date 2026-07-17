@@ -16,17 +16,23 @@
 > 過渡句改口；**roster 仍 5 形狀、回馬槍不動**）② §B.6 新增 **Example B.11**（歸納法斷鏈：步驟有效、
 > 無 base case）＋其框架段落由「two／both … perfectly true」改為三分流。裁決稿見
 > [`../../../html/_audit/REVIEW-appendixB-r3-adjudication.html`](../../../html/_audit/REVIEW-appendixB-r3-adjudication.html)。
-> **r3 對本表的影響＝方言零成長**（兩項都刻意只用既有詞彙），僅計數與頁數變動。
+> **r3 第二輪（同日，使用者裁決「四件事你自己判斷全部做完，一頁式總表就不做了」）**再落地三項純散文改動：
+> ③ **§B.3 Strategy B.3 步驟 2 加指路子句**（只指路、不搬規則——`sec-b-6.html` 的 implication-kernel
+> 分工 CONSTRAINT 未動）④ §B.2 分案段「a **shrewd** split…」修飾語誤掛（改用刪除而非搬移）
+> ⑤ §B.2 歸納段骨牌句重寫（懸垂修飾＋「the first fall」名詞/動詞 garden-path）。
+> **一頁式總表經使用者裁決不做**——動機成立但成本被低估（全書 fragment `<table>` 命中數＝**0**，
+> 將是全書第一個表，須進 CONTRACT＋mapping＋模板＋四閘；且與 Strategy B.2＋§B.6 骨架重疊約八成）。
+> **r3 對本表的影響＝方言零成長**（五項都刻意只用既有詞彙），僅計數與頁數變動。
 > **本表下方 §2 的逐項「次數」欄仍是 M-B0（5 節）的歷史凍結值；下表為現況權威。**
 >
-> | | M-B0 凍結（5 節、415 行） | §B.6 定版（6 節、925 行） | **r3 現況凍結（6 節、1009 行）** |
+> | | M-B0 凍結（5 節、415 行） | §B.6 定版（6 節、925 行） | **r3 現況凍結（6 節、1089 行）** |
 > |---|---|---|---|
 > | **tag＋class 組合** | 34 種 | 35 種——＋1（見下） | **35 種——r3 ＋0** |
 > | 數學 inline `\(…\)` | 308 | 532 | **550** |
 > | 數學 display `\[…\]` | 9 | 13 | **16**（`aligned` 仍僅 1，在 sec-b-2；r3 ＋3＝Ex B.11 的宣稱／歸納步驟／Prop B.4 對照式） |
 > | inline `style=` | 5（僅 sec-b-3） | 5 | **5**（仍僅 sec-b-3，未新增） |
 > | 圖／表 | 0／0 | 0／0 | **0／0** |
-> | 活散文非 ASCII | `—`×98 `§`×14 `’`×4 | `—`×171 `§`×31 `’`×17 `–`×1 | **`—`×173 `§`×33 `’`×17 `–`×1** |
+> | 活散文非 ASCII（**raw**） | `—`×98 `§`×14 `’`×4 | `—`×171 `§`×31 `’`×17 `–`×1 | **`—`×174 `§`×34 `’`×17 `–`×1** |
 > | PDF 頁數 | 14（HTML 20） | 24 | **25** |
 > | `span.env-num` 編號帳 | — | 23 | **24**＝Definition 1＋Strategy 7＋Example **11**＋Proposition 5 |
 >
@@ -50,12 +56,15 @@
 > **模板連帶**：人眼閘抓到 `\cb@needspace` 的誤觸發（詳見 `../../template/calcbook.sty` 該處註解
 > 與 `../../template/M-B1-DECISIONS.md` 沿革），已修並回歸——25 頁→24 頁、近空白頁消失。
 >
-> **四閘（r3 重跑，全綠）**：編譯 0 error／0 missing char｜版面 0 overfull／0 underfull｜
-> 完整性 coverage 100%（**716** mapped／0 skipped）＋`check_prose.py` PASS（**14** 處 pdftotext
+> **四閘（r3 重跑，全綠；下列為第二輪收案值）**：編譯 0 error／0 missing char｜版面 0 overfull／0 underfull｜
+> 完整性 coverage 100%（**717** mapped／0 skipped）＋`check_prose.py` PASS（**14** 處 pdftotext
 > 抽取假象、**0 真落差**）＋數學逐位元組 **81 測試全過**｜人眼見下。`make_dist.py appB` 一把跑完，
 > 成品 `../../dist/appB/` 已更新（25 頁）。
-> **`test_convert.py` 的鎖實值同步**（ledger lock，非 bug）：`mapped` 695→**716**、`math` 545→**566**
-> ＝inline 550＋display 16。改動前這兩條會硬錯，正是它們該有的行為。
+> **`test_convert.py` 的鎖實值同步**（ledger lock，非 bug）：`mapped` 695→716→**717**（716→717＝
+> §B.3 指路子句新增的 `<em>if–then</em>` 節點，精確可解釋）、`math` 545→**566**＝inline 550＋
+> display 16。改動前這幾條會硬錯，正是它們該有的行為。
+> **HTML 線交叉驗證**：standalone 實測 **566 個 MathJax 容器／0 error**，與 LaTeX 線的 566 段數學
+> pass-through **完全一致**；`.env-num` ×24，展開逐節對得上文件順序，**Example B.1–B.11 連續、零 cascade**。
 > **人眼閘（r3 範圍說明，據實記載）**：FIX-1 使 p4 的 Strategy B.2 條目 2 長約 4 行，故 **p4 以後
 > 全篇位移**，不能宣稱「其餘頁未動」。實際做法＝① 改動落點逐頁看（**p4–5** FIX-1；**p20–23** FIX-2，
 > 含 Ex B.11 跨 p22–23 的 workedexample keep-together）② 全 25 頁做低密度掃描以攔上一輪那個

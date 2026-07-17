@@ -579,6 +579,32 @@ window.MathJax = {
      reason it stops at five). The Prop B.1 double-duty callback is intact; only the kinship
      clause after it moved. Do NOT re-file contraposition under contradiction: §B.2 and §B.6
      would then disagree about which shape it is, which is the defect this edit removed.
+     2026-07-17 (r3, second pass) -- two sentences carried since 2026-07-04 fixed. Both are
+     prose-gate findings, both independent of the contraposition edit above (they surfaced
+     while auditing it), and both are parsing defects rather than content errors:
+       - Cases discussion: "a SHREWD split can sometimes be avoided altogether" misattached
+         its modifier. What is shrewd is the observation that lets you skip the split, not
+         the split -- and the next sentence ("Seeing when a case analysis collapses to one
+         clean observation is part of reading proofs well") already said exactly that, so
+         the two were fighting. Fixed by DELETING the modifier, NOT by relocating it: the
+         first draft of this fix moved it ("avoided altogether by a shrewd observation"),
+         which put "observation" in adjacent sentences and let the first sentence pre-empt
+         the very reveal the second one exists to make. With "shrewd" simply gone the colon
+         delivers the observation unannounced -- this section's own announce-then-deliver
+         rhythm, ~14 colons of it -- and the next sentence is free to name it, with "clean"
+         carrying what "shrewd" was doing. Now: "And a split can sometimes be avoided
+         altogether: here ...".
+       - Induction paragraph: "Like a line of dominoes, the first fall together with 'each
+         one topples the next' brings them all down" carried three problems at once -- a
+         dangling modifier (what resembles dominoes is the chain of inference, not a single
+         fall), a noun/verb garden path on "the first fall" (it reads as "the first
+         [dominoes] fall" until the singular "brings" forces a re-parse), and a subject that
+         conjoined an event with a quoted proposition. Now "Like a line of dominoes:
+         knocking the first one over, together with the guarantee that each topples the
+         next, brings them all down." KEEP the "together with": it is the payload -- neither
+         part alone brings the line down, which is the whole analogy. Incidental gain:
+         §B.6's Example B.11 closes on this image ("nobody ever pushed the first"), and
+         "knocking the first one over" echoes that more tightly than "the first fall" did.
      Record: handout/html/_audit/REVIEW-appendixB-r3-adjudication.html.
      Record (first authoring): handout/_audit/REVIEW-appendixB-applied.html. -->
 
@@ -681,9 +707,9 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>A case split divides the <em>problem</em>, not the claim — the conclusion is the same in every branch. And a shrewd split can sometimes be avoided altogether: here \(n^{2} + n = n(n + 1)\) is a product of two consecutive integers, one of which is always even, which settles the matter in a single line. Seeing when a case analysis collapses to one clean observation is part of reading proofs well.</p>
+  <p>A case split divides the <em>problem</em>, not the claim — the conclusion is the same in every branch. And a split can sometimes be avoided altogether: here \(n^{2} + n = n(n + 1)\) is a product of two consecutive integers, one of which is always even, which settles the matter in a single line. Seeing when a case analysis collapses to one clean observation is part of reading proofs well.</p>
 
-  <p><strong>Induction.</strong> A claim about <em>every positive integer</em> invites a shape of its own. Induction proves it in two strokes: verify the claim for the first integer, then show that its truth at any stage forces its truth at the next. Like a line of dominoes, the first fall together with &ldquo;each one topples the next&rdquo; brings them all down.</p>
+  <p><strong>Induction.</strong> A claim about <em>every positive integer</em> invites a shape of its own. Induction proves it in two strokes: verify the claim for the first integer, then show that its truth at any stage forces its truth at the next. Like a line of dominoes: knocking the first one over, together with the guarantee that each topples the next, brings them all down.</p>
 
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">B.4</span></p>
@@ -760,7 +786,21 @@ window.MathJax = {
          nowhere. A blind reader stopped dead there. The template's whole point is that the
          response constrains the INPUT so as to force the OUTPUT; a closeness clause naming
          only the output cannot show that.
-     Record: handout/_audit/REVIEW-appendixB-applied.html. -->
+     2026-07-17 (r3) -- Strategy B.3 step 2 gained a POINTER, not the rule. The kernel list
+     (=, <, and/or) closes with "and so on" and never covers the implication -- which is the
+     kernel an argument by contradiction most often has to produce, so a reader who turns
+     here for the negation rule does not find the one they came for, and "and so on" does not
+     tell them where to look. The clause now names the gap and says where it is filled.
+     DO NOT "finish the job" by moving the rule itself here. The division of labour is
+     adjudicated and frozen in sec-b-6.html's CONSTRAINT (three drafts got it wrong in three
+     different ways): Strategy B.3 step 1 flips the QUANTIFIER, and §B.6 fills in this
+     step-2 kernel for the IMPLICATION case with BOTH halves on §B.6's own page -- because
+     giving only the kernel, right after a universally quantified skeleton, teaches exactly
+     the quantifier-scope error THIS section exists to prevent (the negation of "for every x
+     in S, if P(x) then Q(x)" is existential). A pointer costs nothing and breaks nothing;
+     relocating the rule reopens all of that.
+     Record: handout/html/_audit/REVIEW-appendixB-r3-adjudication.html.
+     Record (first authoring): handout/_audit/REVIEW-appendixB-applied.html. -->
 
 <article class="sec" lang="en">
 
@@ -789,7 +829,7 @@ window.MathJax = {
     <div class="env-body">
       <ol class="steps">
         <li>Sweep the negation across the quantifiers from left to right, flipping each as it passes: every <em>for all</em> becomes <em>there exists</em>, and every <em>there exists</em> becomes <em>for all</em>.</li>
-        <li>When the negation reaches the <em>kernel</em> — the part with no quantifiers left — negate that. An \(=\) becomes \(\neq\); a \(<\) becomes \(\ge\), not \(>\) (the denial of &ldquo;\(a < \varepsilon\)&rdquo; is &ldquo;\(a\) is not less than \(\varepsilon\)&rdquo;, which includes the boundary case \(a = \varepsilon\)); &ldquo;\(P\) and \(Q\)&rdquo; becomes &ldquo;not \(P\) or not \(Q\)&rdquo;, and so on.</li>
+        <li>When the negation reaches the <em>kernel</em> — the part with no quantifiers left — negate that. An \(=\) becomes \(\neq\); a \(<\) becomes \(\ge\), not \(>\) (the denial of &ldquo;\(a < \varepsilon\)&rdquo; is &ldquo;\(a\) is not less than \(\varepsilon\)&rdquo;, which includes the boundary case \(a = \varepsilon\)); &ldquo;\(P\) and \(Q\)&rdquo; becomes &ldquo;not \(P\) or not \(Q\)&rdquo;, and so on. For the denial of an <em>if&ndash;then</em> — the kernel an argument by contradiction most often has to produce — see §B.6, which takes it up at the point where a proof needs it.</li>
         <li>Leave the quantifiers in their original order; only their <em>type</em> flips, never their sequence.</li>
       </ol>
       <p class="informal">In words: to deny that <em>everyone</em> clears the bar is to claim that <em>someone</em> fails it; to deny that <em>someone</em> succeeds is to claim that <em>everyone</em> fails. Negation trades the two quantifiers and moves the finish line.</p>
