@@ -1,0 +1,268 @@
+% ═══════════════════════════════════════════════════════════════════════════
+% sampler.tex — M-B1 模板拍板樣張（KICKOFF-latex-pilot.md §3 交付物 1）
+%
+% 手寫 showcase（非轉換器產物；D3 的禁人工重打是對正式書稿，本檔是設計樣張、不進書）。
+% 素材＝appB fragment 的真實選段，好讓樣張與 HTML 現況直接可比。
+% 覆蓋：附錄開場／節標題／appB 全部 env 家族／workedexample／steps・sol-list（含 ul 變體）
+% ／aligned／置中陳述＋手動斷行／informal／qed／run-in 標籤／reading-track／subsec（rollout 預覽）
+% ／節級動態頁眉。最後一頁＝刻意判斷點清單（拍板用）。
+%
+% 建置：cd handout/tex_export/template && latexmk -lualatex -output-directory=../build/sampler sampler.tex
+% ═══════════════════════════════════════════════════════════════════════════
+\documentclass[a4paper,12pt,oneside]{memoir}
+\usepackage{calcbook}
+
+\begin{document}
+
+% ─────────────────────────────────────────────── 頁 1：附錄開場＋B.1 選段
+\appendixopener{Appendix B}{Reading Theorems and Proofs}
+
+\begin{lead}
+Calculus is, for many readers, the first place mathematics is written as a chain of \emph{theorems} and \emph{proofs} rather than a list of recipes to run. Reading that language — following an argument, and knowing when you have understood it — is a skill of its own, and one seldom taught head-on. This appendix is a short primer on it: how to take a statement apart (§B.1), the handful of proof shapes that recur (§B.2), the quantifiers that run through analysis (§B.3), the standard steps that seem to come from nowhere (§B.4), and how to read a proof actively rather than let it wash over you (§B.5). Everything is illustrated with small, classic examples — integers, primes, the irrationality of \(\sqrt{2}\) — so nothing here leans on calculus itself.
+\end{lead}
+
+\parahead{By the end of this appendix, you will be able to:}
+\begin{objectives}
+  \item take a statement apart into its hypothesis, conclusion, and quantifiers, and tell it apart from its converse;
+  \item recognize the five proof shapes you meet most often — direct, contradiction, counterexample, cases, and induction;
+  \item read the quantifiers \(\forall\) and \(\exists\), negate a quantified statement, and keep their order straight;
+  \item read a proof actively: checking each step, locating where every hypothesis is used, and separating \emph{why} a result is true from \emph{how} it is proved.
+\end{objectives}
+
+\sechead{B.1}{Reading a Statement}
+
+A theorem is a promise, and like any promise it comes with conditions. Before you can follow a proof — let alone trust it — you have to know exactly what is being claimed: what you are handed, what you must produce, and how much the statement really commits to. Reading the statement closely is the first of these skills, and the one that repays itself most often.
+
+Most theorems can be put in the form \emph{if \(P\), then \(Q\)}. The clause \(P\) is the \emph{hypothesis} — what you are allowed to assume — and \(Q\) is the \emph{conclusion} — what you are then obliged to establish. “Every integer divisible by \(6\) is divisible by \(3\)” is the same claim as “if an integer \(n\) is divisible by \(6\), then \(n\) is divisible by \(3\)” wearing plainer clothes. Learning to hear the \emph{if–then} inside an ordinary sentence is half of reading a statement.
+
+\begin{envdefinition}{Definition}{B.1}{}
+Given an implication \emph{if \(P\), then \(Q\)}:
+\begin{itemize}
+  \item its \emph{converse} is the implication \emph{if \(Q\), then \(P\)} — hypothesis and conclusion swapped;
+  \item its \emph{contrapositive} is the implication \emph{if not \(Q\), then not \(P\)} — both parts negated \emph{and} swapped.
+\end{itemize}
+\end{envdefinition}
+
+The contrapositive says the very same thing as the original, read from the other end: if \(Q\) must hold whenever \(P\) does, then a failure of \(Q\) leaves no room for \(P\). They are \emph{logically equivalent} — each is true exactly when the other is. The converse is a different matter: it is a genuinely new claim, which may be true or false on its own, as \(n = 9\) shows for divisibility by \(3\) versus by \(6\).
+
+\begin{envcaution}{Caution}{}{}
+The single most common misreading of a theorem is to help yourself to its converse. “If \(P\), then \(Q\)” hands you \(Q\) whenever you have \(P\); it promises nothing when you instead have \(Q\), and nothing when you merely lack \(P\). A statement and its converse must be proved separately, and either can hold while the other fails. When a result really does run both ways — \emph{\(P\) if and only if \(Q\)} — that is a strictly stronger claim, and it has to be earned in both directions.
+\end{envcaution}
+
+% ─────────────────────────────────────────────── 頁 2 前後：strategy＋workedexample
+\begin{envstrategy}{Strategy}{B.1}{Taking a statement apart}
+\begin{steps}
+  \item Find the quantifiers. Rewrite any disguised ones — \emph{let}, \emph{any}, \emph{some}, \emph{there is} — as an explicit \emph{for all} or \emph{there exists}, and note the order in which they come.
+  \item Find the \emph{if–then} skeleton: name the hypothesis \(P\) (all you may assume) and the conclusion \(Q\) (all you must show).
+  \item Write down the converse \emph{if \(Q\), then \(P\)} and ask whether you actually believe it. This is the quickest way to see what the statement does \emph{not} claim.
+  \item Try the statement on one small object, to be sure you have read it the way its author meant.
+\end{steps}
+\begin{informal}
+The whole exercise takes under a minute and heads off the most expensive error there is — proving, or trusting, a different statement than the one in front of you.
+\end{informal}
+\end{envstrategy}
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.1}{}
+Take the statement apart: \emph{for every integer \(n\), if \(n^{2}\) is even, then \(n\) is even.}
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+\begin{sollist}
+  \item \runin{Quantifier.} A single \emph{for every integer \(n\)}, with no \emph{there exists} inside — the claim must hold for each integer at once.
+  \item \runin{Hypothesis and conclusion.} With \(n\) fixed, \(P\) is “\(n^{2}\) is even” and \(Q\) is “\(n\) is even”.
+  \item \runin{Converse.} \emph{If \(n\) is even, then \(n^{2}\) is even} — a different statement. It happens to be true as well, but that is a separate fact to prove, not something the original grants for free.
+  \item \runin{Contrapositive.} \emph{If \(n\) is odd, then \(n^{2}\) is odd} — equivalent to the original, and, as it turns out, the more convenient direction to attack. Proposition B.1 proves exactly this.
+  \item \runin{Small test.} \(n = 6\) gives \(n^{2} = 36\), even, and \(n\) is even — consistent. What the statement forbids is an integer with \(n^{2}\) even yet \(n\) odd, and there is none.
+\end{sollist}
+\end{envsolution}
+\end{workedexample}
+
+% ─────────────────────────────────────────────── B.2 選段：bulletsteps＋命題＋證明
+\sechead{B.2}{The Main Proof Shapes}
+
+A proof is an argument, and arguments come in shapes. A reader who knows the shapes has a head start: recognizing that a proof is, say, an induction or an argument by contradiction tells you what its author is trying to do before you have followed a single line of it. Five shapes cover the great majority of what you meet early on.
+
+\begin{envstrategy}{Strategy}{B.2}{Recognizing the shape of a proof}
+\begin{bulletsteps}
+  \item \runin{Direct.} Assume the hypothesis and move, one justified step at a time, to the conclusion. The default — try it first.
+  \item \runin{Contradiction.} Assume the claim \emph{fails}, and reason until something impossible appears. The tell: an opening like “suppose not” or “assume \(\sqrt{2}\) is rational” when the claim says the opposite.
+  \item \runin{Counterexample.} To \emph{disprove} a \emph{for all} claim, exhibit one object meeting the hypothesis but breaking the conclusion. Demolishes; never builds.
+  \item \runin{Cases.} Split the objects into a few situations that together cover every possibility, and settle each. The tell: “if …\ ; if instead …”.
+  \item \runin{Induction.} For a claim about every positive integer, prove the first case, then show each case forces the next. The tell: a statement indexed by \(n = 1, 2, 3, \ldots\).
+\end{bulletsteps}
+\end{envstrategy}
+
+\runin{Direct proof.} The plainest shape assumes the hypothesis and walks, step by justified step, to the conclusion. Most proofs are direct, and it is the shape to try first. Here is one about the odd integers.
+
+\begin{envproposition}{Proposition}{B.1}{}
+If \(n\) is an odd integer, then \(n^{2}\) is odd.
+\end{envproposition}
+
+\begin{envproof}{Proof}{}{}
+By definition an odd integer has the form \(n = 2k + 1\) for some integer \(k\). Squaring,
+\[ n^{2} = (2k + 1)^{2} = 4k^{2} + 4k + 1 = 2\bigl(2k^{2} + 2k\bigr) + 1. \]
+The right-hand side is twice an integer plus one, which is exactly what it means to be odd. \qedmark
+\end{envproof}
+
+Nothing was assumed but the hypothesis, and each line followed from the one before — the signature of a direct proof. Deliberately proving the contrapositive in place of the original is a standard move of its own, \emph{proof by contraposition}, and the quiet cousin of the contradiction argument next.
+
+\begin{envproposition}{Proposition}{B.4}{}
+For every positive integer \(n\),
+\[ 1 + 2 + \cdots + n = \frac{n(n + 1)}{2}. \]
+\end{envproposition}
+
+\begin{envproof}{Proof}{}{}
+\emph{Base case.} For \(n = 1\) the left side is \(1\) and the right side is \(\frac{1 \cdot 2}{2} = 1\); they agree.
+
+\emph{Inductive step.} Suppose the formula holds for some positive integer \(k\), so that \(1 + 2 + \cdots + k = \frac{k(k + 1)}{2}\). (This supposition is the \emph{inductive hypothesis}.) Adding the next term \(k + 1\) to both sides,
+\[ \begin{aligned} 1 + 2 + \cdots + k + (k + 1) &= \frac{k(k + 1)}{2} + (k + 1) \\ &= (k + 1)\!\left(\frac{k}{2} + 1\right) = \frac{(k + 1)(k + 2)}{2}, \end{aligned} \]
+which is the formula with \(n = k + 1\). So whenever it holds at \(k\), it holds at \(k + 1\); and since it holds at \(n = 1\), it holds for every positive integer. \qedmark
+\end{envproof}
+
+% ─────────────────────────────────────────────── B.3 選段：置中陳述＋量詞
+\sechead{B.3}{A Quantifier Toolbox}
+
+The order of two \emph{unlike} quantifiers is not interchangeable, and this is the most valuable single fact about them. Compare:
+
+\begin{centerstatement}
+(i)\enspace\enspace for every integer \(x\) there is an integer \(y\) with \(y > x\),
+\end{centerstatement}
+\begin{centerstatement}
+(ii)\enspace\enspace there is an integer \(y\) such that for every integer \(x\), \(y > x\).
+\end{centerstatement}
+
+Statement (i) is true: given any \(x\), take \(y = x + 1\). Statement (ii) is false: it demands a \emph{single} \(y\) larger than every integer at once, and there is no largest integer. The two sentences use the same words in the same breath; only the order of “for every” and “there is” differs, and that alone carries one from true to false.
+
+\begin{envcaution}{Caution}{}{}
+When quantifiers of different type meet, the outer one is in charge, and the inner object may be \emph{retuned for each choice} of the outer. “For every \(x\) there is a \(y\)” lets \(y\) depend on \(x\) — a different \(y\) is allowed for each. “There is a \(y\) such that for every \(x\)” demands one \(y\) that works for all \(x\) simultaneously; it is a far stronger, and usually far rarer, claim.
+\end{envcaution}
+
+\begin{envstrategy}{Strategy}{B.3}{Negating a quantified statement}
+\begin{steps}
+  \item Sweep the negation across the quantifiers from left to right, flipping each as it passes: every \emph{for all} becomes \emph{there exists}, and every \emph{there exists} becomes \emph{for all}.
+  \item When the negation reaches the \emph{kernel} — the part with no quantifiers left — negate that. An \(=\) becomes \(\neq\); a \(<\) becomes \(\ge\), not \(>\).
+  \item Leave the quantifiers in their original order; only their \emph{type} flips, never their sequence.
+\end{steps}
+\begin{informal}
+In words: to deny that \emph{everyone} clears the bar is to claim that \emph{someone} fails it; to deny that \emph{someone} succeeds is to claim that \emph{everyone} fails. Negation trades the two quantifiers and moves the finish line.
+\end{informal}
+\end{envstrategy}
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.3}{}
+Negate the following statement, in which \(a_1, a_2, \ldots\) is a fixed sequence of positive numbers (it says the sequence eventually drops below every positive threshold):
+\begin{centerstatement}
+for every \(\varepsilon > 0\), there exists an integer \(N\) such that \(a_n < \varepsilon\) for all \(n \ge N\).
+\end{centerstatement}
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Flip each quantifier in turn, then negate the kernel:
+\begin{sollist}
+  \item “for every \(\varepsilon > 0\)” becomes “there exists \(\varepsilon > 0\)”;
+  \item “there exists an integer \(N\)” becomes “for every integer \(N\)”;
+  \item “for all \(n \ge N\)” becomes “there exists \(n \ge N\)”;
+  \item the kernel \(a_n < \varepsilon\) negates to \(a_n \ge \varepsilon\).
+\end{sollist}
+Assembling the pieces in the same order, the negation reads:
+\begin{centerstatement}
+there exists \(\varepsilon > 0\) such that for every integer \(N\)\\
+there is some \(n \ge N\) with \(a_n \ge \varepsilon\).
+\end{centerstatement}
+In words: some fixed threshold \(\varepsilon\) that the sequence meets or exceeds again and again, no matter how far out you look. The quantifiers kept their left-to-right order; only their types flipped, and the final \(<\) became \(\ge\).
+\end{envsolution}
+\end{workedexample}
+
+% ─────────────────────────────────────────────── B.5 選段：Pause remark＋散文位置 sol-list
+\sechead{B.5}{Reading Actively}
+
+Habits are learned on examples, so here is a small, complete theorem to practice on. It is famous, one line to state, and its proof is an argument by contradiction of the kind §B.2 laid out.
+
+\begin{envproposition}{Proposition}{B.5}{The pigeonhole principle}
+If \(n + 1\) objects are distributed among \(n\) boxes, then at least one box contains two or more objects.
+\end{envproposition}
+
+\begin{envproof}{Proof}{}{}
+Suppose, to the contrary, that no box contains two or more objects — that is, every box contains at most one. Then the total number of objects, counted box by box, is at most
+\[ \underbrace{1 + 1 + \cdots + 1}_{n\ \text{boxes}} = n. \]
+But \(n + 1\) objects were distributed, and \(n + 1 > n\). So the objects both do and do not number more than \(n\) — a contradiction. The assumption fails, and therefore some box contains at least two objects. \qedmark
+\end{envproof}
+
+\begin{envremark}{Pause}{}{}
+Before reading on, try the five habits on this proof yourself. Ask:
+\begin{steps}
+  \item Which line carries the contradiction, and which two facts collide there?
+  \item Where is each hypothesis — the \(n + 1\) objects and the \(n\) boxes — actually used?
+  \item Run the argument on three objects in two boxes: what does it force?
+  \item Is the converse true? If some box holds two objects, must there have been more objects than boxes?
+\end{steps}
+\end{envremark}
+
+Now read that proof the way this section is urging, running the five habits across it in turn.
+
+\begin{sollist}
+  \item \runin{Each step follows.} There are only two inequalities to warrant. “Total \(\le n\)” is justified by the assumption (at most one per box) times \(n\) boxes; “\(n + 1 > n\)” is arithmetic. Both hold, so the collision between them is real.
+  \item \runin{A small example.} Three objects in two boxes: some box holds two. Thirteen people, twelve months: two of them share a birth month. Running the argument on these makes its inevitability concrete.
+  \item \runin{Direction.} The principle runs one way — more objects than boxes \(\Rightarrow\) some box is doubled. It does \emph{not} run backward.
+\end{sollist}
+
+% ─────────────────────────────────────────────── rollout 預覽頁（appB 未用的槽位）
+\sechead{B.6}{Rollout Preview (sampler only)}
+
+This page exercises the semantic slots that appendix~B itself never uses, so the template is judged on all of them at once: the theorem and corollary blocks (the first sets its body in italic, mathematics upright; the second stays upright), the subsection head, the reading-track marker from Chapter~1, the non-float figure slot, and — at the end — a worked example long enough to be forced across a page break, so the green-rule continuation of decision ⑤ can be seen rather than taken on faith.
+
+\readingtrack{First reading: this section builds the \(\varepsilon\)–\(\delta\) machinery used from §3.2 onward; on a first pass you may take the limit laws on trust and return once §3.2 asks for them.}
+
+\begin{envtheorem}{Theorem}{1.7}{Uniqueness of limits}
+If \(\lim_{x \to a} f(x) = L\) and \(\lim_{x \to a} f(x) = M\), then \(L = M\): a function approaches at most one value at a point.
+\end{envtheorem}
+
+\begin{envproof}{Proof}{}{sketch}
+Suppose \(L \neq M\), and take \(\varepsilon = \tfrac{1}{2}\lvert L - M \rvert > 0\). Close enough to \(a\), the values \(f(x)\) would have to lie within \(\varepsilon\) of \(L\) and within \(\varepsilon\) of \(M\) at once — two disjoint windows, by the triangle inequality \(\lvert x + y \rvert \le \lvert x \rvert + \lvert y \rvert\). No number lies in both, so no such \(x\) exists, a contradiction. \qedmark
+\end{envproof}
+
+\begin{envcorollary}{Corollary}{1.8}{}
+A convergent limit can be named without ambiguity: one may write \(\lim_{x \to a} f(x)\) and speak of \emph{the} limit. Unlike the theorem above, this body stays upright — matching the HTML anchor, where only theorem and proposition bodies italicize.
+\end{envcorollary}
+
+\subsechead{A subsection head, for the record}
+
+The subsection head above is the Chapter 1–6 slot (\emph{Inter} semibold with the primary-blue tick); appendix B has none, but the rollout chapters use it throughout. A worked example paragraph after it, with an inline computation \(\frac{d}{dx}\bigl(x^{2}\sin x\bigr) = 2x\sin x + x^{2}\cos x\), shows body text against it. Below, the non-float figure slot (decision D8: placed exactly where the author put it, at its manifest width) is fed one of the chapter-3 exports from the v1 pilot:
+
+\begin{figureblock}
+\includegraphics[width=79.90mm]{ch03/png-sector-inequality.png}
+\figcaption{Figure 3.1}{The sector-inequality construction on the unit circle — a chapter 3 export placed at its \emph{figures.json} width of 79.90mm, exercising the literal fig-no and caption slots.}
+\end{figureblock}
+
+Finally, the cross-page worked example. The filler sentences before it exist only to position the group near the bottom of this page, so that the break lands inside the solution and the green rule can be seen continuing on the next page — with the head protected from being stranded alone.
+
+This second filler paragraph pushes the group a few lines further down. In the real appendix the paginator never needs such staging, of course; a group simply falls where the text falls, and the template's only promises are the two being demonstrated here — the rule continues across the break, and a head near the page bottom takes its first lines of body along rather than dangling alone.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.4}{}
+Suppose four numbers satisfy \(|a - b| < \tfrac{\varepsilon}{3}\), \(|b - c| < \tfrac{\varepsilon}{3}\), and \(|c - d| < \tfrac{\varepsilon}{3}\). Show that \(|a - d| < \varepsilon\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+We have no direct grip on \(a - d\), so we manufacture one by inserting the intermediate values \(b\) and \(c\) — adding and subtracting each:
+\[ a - d = (a - b) + (b - c) + (c - d). \]
+This costs nothing, since the inserted terms cancel, but the right-hand side is now built from the three differences we \emph{can} bound. By the triangle inequality \(|x + y| \le |x| + |y|\), applied twice,
+\[ |a - d| \le |a - b| + |b - c| + |c - d| < \frac{\varepsilon}{3} + \frac{\varepsilon}{3} + \frac{\varepsilon}{3} = \varepsilon. \]
+Two moves did the work. The \emph{add-and-subtract} traded one uncontrollable quantity for a sum of controllable ones; the \emph{split into thirds} arranged for three pieces, each held below \(\varepsilon/3\), to total exactly \(\varepsilon\). Together they are the skeleton of every argument that chains approximations — \(a\) near \(b\) near \(c\) near \(d\), and therefore \(a\) near \(d\) — with the tolerance shared out among the links.
+\end{envsolution}
+\end{workedexample}
+
+% ─────────────────────────────────────────────── 判斷點清單（拍板用）
+\sechead{B.7}{Deliberate judgment calls (for sign-off)}
+
+This closing page lists every place the sampler deliberately deviates from, or sharpens, the HTML anchor. Each is a one-line change to flip; none touches the semantic layer.
+
+\begin{steps}
+  \item \runin{Paragraph model.} Book convention here: indent 1.5em, no inter-paragraph gap (carried over from the v1 pilot). The HTML handout instead uses block paragraphs — no indent, 0.85em gaps. Flipping back costs two lines in the style layer.
+  \item \runin{Title sizes.} Section 20pt and chapter 26pt (decision ③, down from the HTML-equivalent 24pt/30pt). The rule, blue number, and typeface language are unchanged.
+  \item \runin{Body ink.} Pure black for print, versus the HTML soft-black \#1B1C1F. Avoids four-colour grey in publication printing.
+  \item \runin{Running head.} Section-level and dynamic (decision ⑧). Tie-break: when a new section starts partway down a page, the header names the \emph{incoming} section — the standard LaTeX book convention (see page 5, where B.3 opens mid-page).
+  \item \runin{QED.} Mark-driven (\emph{qedmark} emitted only where the fragment carries the span) — appendix B has it on all five proofs, so nothing changes visually; chapter 3's proofs, which lack the span, would print none until the fragments gain them.
+  \item \runin{Leading.} 16pt baseline on the 12pt body (ratio 1.33 — the classic mathematics-textbook band, near the 10/12 tradition), signed off 2026-07-17 against the HTML rhythm of 18.6pt; the trade buys 45 lines per page instead of 39.
+  \item \runin{Vertical margins.} 17mm top / 23mm bottom (signed off 2026-07-17), replacing the HTML sheet's uniform 20/20: the book-style weighting lifts the visual centre at zero density cost.
+\end{steps}
+
+\end{document}

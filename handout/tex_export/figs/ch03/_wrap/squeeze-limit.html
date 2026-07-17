@@ -1,0 +1,2217 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><style>
+:root {
+  --fig-3-1:  100%;    /* Figure 3.1  Sector inequality */
+  --fig-3-2:  100%;    /* Figure 3.2  Squeeze graph */
+  --fig-3-3:  100%;    /* Figure 3.3  Sine slope vs cosine height */
+  --fig-3-4:  100%;    /* Figure 3.4  Simple harmonic motion */
+  --fig-3-5:  100%;    /* Figure 3.5  Composed mapping */
+  --fig-3-6:  100%;    /* Figure 3.6  Remainder-form tangent fit */
+  --fig-3-7:  100%;    /* Figure 3.7  Arcsin endpoint tangents */
+}
+
+.paper figure[data-fig="sector-inequality"] { --fig-w: var(--fig-3-1); }
+.paper figure[data-fig="squeeze-limit"] { --fig-w: var(--fig-3-2); }
+.paper figure[data-fig="sin-cos-slope"] { --fig-w: var(--fig-3-3); }
+.paper figure[data-fig="shm-triple"] { --fig-w: var(--fig-3-4); }
+.paper figure[data-fig="composed-mapping"] { --fig-w: var(--fig-3-5); }
+.paper figure[data-fig="remainder-tangent"] { --fig-w: var(--fig-3-6); }
+.paper figure[data-fig="arcsin-vertical-tangent"] { --fig-w: var(--fig-3-7); }
+</style>
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+<style>
+/* ============================================================
+   skin-hs.css — inlined + modified: Times New Roman + MathJax
+   ============================================================ */
+.paper {
+  --c-primary: oklch(0.50 0.13 245);
+  --c-caution: oklch(0.50 0.155 25);
+  --c-aux: oklch(0.55 0.01 260);
+  --c-axis: #474b54;
+  --ink: #1b1c1f;
+  --ink-soft: #565a63;
+  --ink-faint: #8a8e98;
+  --paper: #ffffff;
+  --rule: #e5e7eb;
+  --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
+  --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
+  /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
+  --ui: "Inter", -apple-system, system-ui, sans-serif;
+  --a-concept:  oklch(0.50 0.13 55);
+  --a-result:   oklch(0.50 0.13 245);
+  --a-practice: oklch(0.50 0.13 152);
+  --a-aside:    oklch(0.50 0.02 260);
+  --a-caution:  oklch(0.50 0.155 25);
+  --a-strategy: oklch(0.50 0.13 290);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-base, 17.5px);
+  line-height: var(--lh-base, 1.62);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+.paper *, .paper *::before, .paper *::after { box-sizing: border-box; }
+.paper .page { padding: 52px 58px 64px; max-width: 760px; margin: 0 auto; }
+.skin-hs .page { hyphens: auto; -webkit-hyphens: auto; }
+.skin-hs p, .skin-hs li { text-align: justify; text-justify: inter-word; }
+.paper p { margin: 0 0 .85em; text-wrap: pretty; }
+.paper em { font-style: italic; }
+.paper .informal { font-style: italic; color: var(--ink-soft); }
+.paper ol { margin: .2em 0 .9em; padding-left: 1.5em; }
+.paper li { margin: .35em 0; text-wrap: pretty; }
+.paper .warmup { counter-reset: wu; list-style: none; padding-left: 0; }
+.paper .warmup > li { counter-increment: wu; position: relative; padding-left: 2.1em; }
+.paper .warmup > li::before {
+  content: "(" counter(wu, lower-alpha) ")";
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
+}
+.paper mjx-container[display="true"] { margin: .55em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
+.paper .qed { display: block; text-align: right; margin: -1.62em 0 0; height: 1.62em; pointer-events: none; }
+.paper .qed::after {
+  content: ""; display: inline-block; width: .56em; height: .56em;
+  border: 1.3px solid var(--ink-soft);
+}
+.paper .env-body > :has(+ .qed) { margin-bottom: 0; display: flow-root; }
+.paper .env-body::after { content: ""; display: block; clear: both; }
+.paper .sec-head {
+  margin-top: 2.7em; padding-top: 1.35em;
+  border-top: 1px solid var(--rule); margin-bottom: 1.5em;
+}
+.sheet-body > .sec-head:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.paper .sec-kicker {
+  font-family: var(--ui); font-size: .7rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--c-primary); font-weight: 700; margin-bottom: .55em;
+}
+.paper .sec-title { font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -.012em; margin: 0; }
+.paper .sec-no { color: var(--c-primary); margin-right: .5em; font-weight: 600; }
+.paper .subsec-head {
+  font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
+  display: flex; align-items: center; gap: .55em; color: var(--ink);
+}
+.paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
+.paper .figure { margin: 1.7em 0; text-align: center; }
+.paper .figure-art { display: flex; justify-content: center; }
+.paper .figure-art--pair { gap: 26px; }
+.paper .fig-svg { width: 100%; max-width: var(--fig-w, var(--fig-w-pair)); height: auto; }
+.paper .figure-art:not(.figure-art--pair) .fig-svg { max-width: var(--fig-w, var(--fig-w-single)); }
+.paper figcaption {
+  font-family: var(--ui); font-size: .8em; line-height: 1.5;
+  color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
+}
+.paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
+.paper figcaption mjx-container { font-size: .95em; }
+.paper .axis { stroke: var(--c-axis); stroke-width: 1.25; fill: none; stroke-linecap: round; }
+.paper .curve { stroke: var(--c-primary); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .dot { fill: var(--ink); }
+.paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
+.paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
+.paper .arrow-bwd { stroke: var(--c-caution); stroke-width: 2; fill: none; }
+.paper .fig-svg text { font-family: var(--ui); font-size: 13px; }
+.paper .axlab { fill: var(--c-aux); font-style: italic; }
+.paper .lab-curve { fill: var(--c-primary); font-style: italic; }
+.paper .lab-ref, .paper .lab-ref-b { fill: var(--c-caution); }
+.paper .ptlab { fill: var(--ink-soft); font-size: 12px; }
+.paper .setlab { fill: var(--ink); font-weight: 600; font-size: 14.5px; text-anchor: middle; }
+
+/* env blocks */
+.skin-hs .env {
+  --accent: var(--a-aside);
+  margin: 1.2em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--accent) 38%, var(--paper));
+}
+.skin-hs .env-definition  { --accent: var(--a-concept); }
+.skin-hs .env-theorem, .skin-hs .env-proposition, .skin-hs .env-corollary { --accent: var(--a-result); }
+.skin-hs .env-example, .skin-hs .env-solution, .skin-hs .env-exercise { --accent: var(--a-practice); }
+.skin-hs .env-remark { --accent: var(--a-aside); }
+.skin-hs .env-head {
+  display: flex; align-items: baseline; gap: .5em; flex-wrap: wrap;
+  margin: 0 0 .55em; font-family: var(--ui);
+}
+.skin-hs .env-kicker {
+  font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--accent); padding: 3px 10px; border-radius: 999px; line-height: 1.5;
+}
+.skin-hs .env-num { font-weight: 700; color: var(--accent); font-size: .94em; }
+.skin-hs .env-name { font-style: italic; font-weight: 400; color: var(--ink-soft); font-family: var(--serif); font-size: 1em; }
+.skin-hs .env-body > p:first-child { margin-top: 0; }
+.skin-hs .env-body > :last-child { margin-bottom: 0; }
+.skin-hs .env-theorem .env-body, .skin-hs .env-proposition .env-body { font-style: italic; }
+.skin-hs .env-theorem .env-body mjx-container, .skin-hs .env-proposition .env-body mjx-container { font-style: normal; }
+.skin-hs .env-definition em { font-style: italic; }
+.skin-hs .env-remark { color: var(--ink-soft); font-size: .97em; }
+.skin-hs .env-remark .env-kicker { background: transparent; color: var(--a-aside); border: 1px solid color-mix(in srgb, var(--a-aside) 45%, var(--paper)); }
+.skin-hs .env-proof { --accent: var(--a-result); }
+.skin-hs .env-proof .env-kicker {
+  background: transparent; color: var(--a-result); font-style: italic; letter-spacing: .04em;
+  border: 1px solid color-mix(in srgb, var(--a-result) 45%, var(--paper));
+}
+.skin-hs .qed-proof::after { border-color: var(--ink); }
+.skin-hs .workedexample {
+  margin: 1.6em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--a-practice) 38%, var(--paper));
+  display: flow-root;
+}
+.skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
+.skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
+.skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
+.skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
+.skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
+.skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
+.skin-hs .env-exercise .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid var(--a-practice); }
+.skin-hs .env-caution, .skin-hs .env-strategy {
+  padding: 15px 20px; border-radius: 8px; margin: 1.4em 0;
+  border-left-width: 4px; border-left-style: solid;
+}
+.skin-hs .env-caution {
+  --accent: var(--a-caution);
+  background: color-mix(in srgb, var(--a-caution) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-caution) 22%, var(--paper));
+  border-left-color: var(--a-caution);
+}
+.skin-hs .env-strategy {
+  --accent: var(--a-strategy);
+  background: color-mix(in srgb, var(--a-strategy) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-strategy) 22%, var(--paper));
+  border-left-color: var(--a-strategy);
+}
+.skin-hs .env-caution .env-name, .skin-hs .env-strategy .env-name { color: var(--ink-soft); }
+.skin-hs .env-strategy .steps { margin-bottom: 0; }
+.skin-hs.vivid .env { border-left-color: color-mix(in srgb, var(--accent) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .workedexample { border-left-color: color-mix(in srgb, var(--a-practice) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .env-kicker { font-size: .64rem; padding: 3.5px 11px; }
+
+/* ============================================================
+   figs.css — inlined + modified for MathJax
+   ============================================================ */
+.paper .fig-svg { height: auto; max-width: 100%; overflow: visible; }
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note mjx-container { font-size: .98em; }
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr { position: relative; width: 100%; height: 100%; font-family: var(--serif); }
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl mjx-container { font-size: 1em; }
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl mjx-container { font-size: .98em; }
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+
+/* ============================================================
+   print.css — inlined (A4 sheet layout + paginator)
+   ============================================================ */
+@page { size: A4; margin: 0; }
+.sheet {
+  position: relative; box-sizing: border-box;
+  width: 210mm; height: 297mm;
+  padding: 20mm 28mm 20mm 32mm;
+  background: #fff; overflow: hidden;
+}
+.sheet-header {
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
+  font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
+}
+.sheet-footer {
+  position: absolute; bottom: 8.5mm; left: 0; right: 0;
+  text-align: center; font: 500 9pt "Inter", sans-serif; color: #82868f;
+}
+.sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
+.sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
+.sheet-body .page { padding: 0; max-width: none; margin: 0; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
+.sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet-body > :first-child { margin-top: 0 !important; }
+.sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
+.sheet-body .qed { margin-top: -1.55em; height: 1.55em; }
+.sheet-body .env-body::after { display: none; content: none; }
+.sheet-body .env-cont { margin-top: 0; }
+.sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+@media screen {
+  body { background: #6f727b; margin: 0; }
+  .sheet { box-shadow: 0 3px 18px rgba(0,0,0,.3); margin: 9mm auto; }
+}
+@media print {
+  body { background: #fff; margin: 0; }
+  .sheet { box-shadow: none; margin: 0; break-after: page; }
+  .sheet:last-child { break-after: auto; }
+  .print-toolbar, #boot { display: none !important; }
+}
+
+/* ============================================================
+   page-level
+   ============================================================ */
+.print-toolbar {
+  position: fixed; top: 14px; right: 16px; z-index: 1000;
+  display: flex; align-items: center; gap: 10px; font-family: "Inter", system-ui, sans-serif;
+}
+.print-toolbar button {
+  font: 600 13px "Inter", sans-serif; color: #fff; background: oklch(0.50 0.13 245);
+  border: 0; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.print-toolbar button:disabled { opacity: .5; cursor: default; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
+.print-toolbar .status {
+  font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
+  padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
+}
+#boot {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
+}
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
+</style>
+<style>:root {
+  --mjx-fg-red: 255, 0, 0;
+  --mjx-fg-green: 0, 255, 0;
+  --mjx-fg-blue: 0, 0, 255;
+  --mjx-fg-yellow: 255, 255, 0;
+  --mjx-fg-cyan: 0, 255, 255;
+  --mjx-fg-magenta: 255, 0, 255;
+  --mjx-fg-white: 255, 255, 255;
+  --mjx-fg-black: 0, 0, 0;
+  --mjx-bg-red: 255, 0, 0;
+  --mjx-bg-green: 0, 255, 0;
+  --mjx-bg-blue: 0, 0, 255;
+  --mjx-bg-yellow: 255, 255, 0;
+  --mjx-bg-cyan: 0, 255, 255;
+  --mjx-bg-magenta: 255, 0, 255;
+  --mjx-bg-white: 255, 255, 255;
+  --mjx-bg-black: 0, 0, 0;
+  --mjx-live-bg-color: white;
+  --mjx-live-shadow-color: #888;
+  --mjx-live-border-color: #CCCCCC;
+  --mjx-bg1-color: rgba(var(--mjx-bg-blue), var(--mjx-bg1-alpha));
+  --mjx-fg1-color: rgba(var(--mjx-fg-black), 1);
+  --mjx-bg2-color: rgba(var(--mjx-bg-red), 1);
+  --mjx-fg2-color: rgba(var(--mjx-fg-black), 1);
+  --mjx-bg1-alpha: 0.2;
+  --mjx-fg1-alpha: 1;
+  --mjx-bg2-alpha: 1;
+  --mjx-fg2-alpha: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mjx-bg-blue: 132, 132, 255;
+      --mjx-bg-white: 0, 0, 0;
+      --mjx-bg-black: 255, 255, 255;
+      --mjx-fg-white: 0, 0, 0;
+      --mjx-fg-black: 255, 255, 255;
+      --mjx-live-bg-color: #222025;
+      --mjx-live-shadow-color: black;
+      --mjx-live-border-color: #7C7C7C;
+      --mjx-bg1-alpha: 0.3;
+      --mjx-fg1-alpha: 1;
+      --mjx-bg2-alpha: 1;
+      --mjx-fg2-alpha: 1;
+  }
+}
+
+.MJX_LiveRegion {
+  position: absolute;
+  top: 0;
+  display: none;
+  width: auto;
+  height: auto;
+  padding: 0;
+  opacity: 1;
+  z-index: 202;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: var(--mjx-live-bg-color);
+  box-shadow: 0px 5px 20px var(--mjx-live-shadow-color);
+  border: 2px solid var(--mjx-live-border-color);
+}
+
+.MJX_LiveRegion_Show {
+  display: block;
+}
+
+.MJX_LiveRegion > div {
+  color: var(--mjx-fg1-color);
+  background-color: var(--mjx-bg1-color);
+}
+
+mjx-container [data-sre-highlight-1]:not([data-mjx-collapsed], rect) {
+  color: var(--mjx-fg1-color) ! important;
+  fill: var(--mjx-fg1-color) ! important;
+}
+
+mjx-container:not([data-mjx-clone-container]) [data-sre-highlight-1]:not([data-sre-enclosed], rect) {
+  background-color: var(--mjx-bg1-color) ! important;
+}
+
+mjx-container rect[data-sre-highlight-1]:not([data-sre-enclosed]) {
+  fill: var(--mjx-bg1-color) ! important;
+}
+
+mjx-container [data-sre-highlight-2] {
+  color: var(--mjx-fg2-color) ! important;
+  background-color: var(--mjx-bg2-color) ! important;
+  fill: var(--mjx-fg2-color) ! important;
+}
+
+mjx-container rect[data-sre-highlight-2] {
+  fill: var(--mjx-bg2-color) ! important;
+}</style>
+<style>.MJX_HoverRegion {
+  display: block;
+  position: absolute;
+  width: max-content;
+  height: auto;
+  padding: 0;
+  opacity: 1;
+  z-index: 202;
+  margin: 0 auto;
+  background-color: white;
+  line-height: 0;
+  box-shadow: 0px 10px 20px #888;
+  border: 2px solid #CCCCCC;
+}
+
+.MJX_HoverRegion > div {
+  overflow: hidden;
+  color: var(--mjx-fg1-color);
+  background-color: var(--mjx-bg1-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .MJX_HoverRegion {
+    background-color: #222025;
+      box-shadow: 0px 5px 20px #000;
+      border: 1px solid #7C7C7C;
+  }
+}
+
+mjx-container[data-mjx-clone-container] {
+  padding: 2px ! important;
+}
+
+mjx-math > mjx-mlabeledtr {
+  display: inline-block;
+  margin-right: .5em ! important;
+}
+
+mjx-math > mjx-mtd {
+  float: right;
+}</style>
+<style>.MJX_ToolTip {
+  width: auto;
+  height: auto;
+  opacity: 1;
+  text-align: center;
+  border-radius: 4px;
+  padding: 0;
+  border-bottom: 1px dotted black;
+  position: absolute;
+  display: inline-block;
+  background-color: white;
+  z-index: 202;
+}
+
+.MJX_ToolTip > div {
+  border-radius: inherit;
+  padding: 0 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .MJX_ToolTip {
+    background-color: #222025;
+      box-shadow: 0px 5px 20px #000;
+      border: 1px solid #7C7C7C;
+  }
+}</style>
+<style>.CtxtMenu_Menu {
+  position: absolute;
+  background-color: white;
+  color: black;
+  width: auto;
+  padding: 5px 0px;
+  border: 1px solid #CCCCCC;
+  margin: 0;
+  cursor: default;
+  font: menu;
+  text-align: left;
+  text-indent: 0;
+  text-transform: none;
+  line-height: normal;
+  letter-spacing: normal;
+  word-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  float: none;
+  z-index: 1001;
+  border-radius: 5px;
+  box-shadow: 0px 10px 20px #808080;
+}
+.CtxtMenu_MenuItem {
+  padding: 1px 2em;
+  background: transparent;
+}
+.CtxtMenu_MenuArrow {
+  position: absolute;
+  right: 0.5em;
+  padding-top: 0.25em;
+  color: #666666;
+  font-family: null;
+  font-size: 0.75em;
+}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {
+  color: white;
+}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {
+  left: 0.5em;
+  right: auto;
+}
+.CtxtMenu_MenuCheck {
+  position: absolute;
+  left: 0.7em;
+  font-family: null;
+}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL {
+  right: 0.7em;
+  left: auto;
+}
+.CtxtMenu_MenuRadioCheck {
+  position: absolute;
+  left: 0.7em;
+}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {
+  right: 0.7em;
+  left: auto;
+}
+.CtxtMenu_MenuInputBox {
+  padding-left: 1em;
+  right: 0.5em;
+  color: #666666;
+  font-family: null;
+}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {
+  left: 0.1em;
+}
+.CtxtMenu_MenuComboBox {
+  left: 0.1em;
+  padding-bottom: 0.5em;
+}
+.CtxtMenu_MenuSlider {
+  left: 0.1em;
+}
+.CtxtMenu_SliderValue {
+  position: absolute;
+  right: 0.1em;
+  padding-top: 0.25em;
+  color: #333333;
+  font-size: 0.75em;
+}
+.CtxtMenu_MenuActive .CtxtMenu_SliderValue {
+  color: #DDDDDD;
+}
+.CtxtMenu_SliderBar {
+  outline: none;
+  background: #D3D3D3;
+}
+.CtxtMenu_MenuLabel {
+  padding: 1px 2em 3px 1.33em;
+  font-style: italic;
+}
+.CtxtMenu_MenuRule {
+  border-top: 1px solid #DDDDDD;
+  margin: 4px 3px;
+}
+.CtxtMenu_MenuDisabled {
+  color: #999;
+}
+.CtxtMenu_MenuActive {
+  background-color: #606872;
+  color: white;
+}
+.CtxtMenu_MenuDisabled:focus {
+  background-color: #E8E8E8;
+}
+.CtxtMenu_MenuLabel:focus {
+  background-color: #E8E8E8;
+}
+.CtxtMenu_ContextMenu:focus {
+  outline: none;
+}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {
+  outline: none;
+}
+.CtxtMenu_SelectionMenu {
+  position: relative;
+  float: left;
+  border-bottom: none;
+  box-shadow: none ! important;
+  border-radius: 0px !important;
+}
+.CtxtMenu_SelectionItem {
+  padding-right: 1em;
+}
+.CtxtMenu_Selection {
+  right: 40%;
+  width: 50%;
+}
+.CtxtMenu_SelectionBox {
+  padding: 0em;
+  max-height: 20em;
+  max-width: none;
+  background-color: #FFFFFF;
+}
+.CtxtMenu_SelectionDivider {
+  clear: both;
+  border-top: 2px solid #000000;
+}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {
+  top: -10px;
+  left: -10px;
+}
+@media (prefers-color-scheme: dark) /* menu */ {
+  .CtxtMenu_Menu {
+  color: #E0E0E0;
+  background-color: #242436;
+  box-shadow: 0px 10px 20px #000;
+  border: 1px solid #808080;
+}
+  .CtxtMenu_SliderValue {
+  color: #D0D0D0;
+}
+  .CtxtMenu_MenuDisabled:focus {
+  background-color: #383838;
+}
+  .CtxtMenu_MenuLabel:focus {
+  background-color: #585858;
+}
+  .CtxtMenu_MenuRule {
+  border-top: 1px solid #808080;
+}
+  .CtxtMenu_SelectionDivider {
+  border-top: 2px solid #808080;
+};
+}
+.CtxtMenu_MenuClose {
+  position: absolute;
+  cursor: pointer;
+  display: inline-block;
+  border: 2px solid #AAA;
+  border-radius: 18px;
+  font-family:  "Courier New", Courier;
+  font-size: 24px;
+  color: #F0F0F0;
+}
+.CtxtMenu_MenuClose span {
+  display: block;
+  background-color: #AAA;
+  border: 1.5px solid;
+  border-radius: 18px;
+  line-height: 0;
+  padding: 8px 0 6px;
+}
+.CtxtMenu_MenuClose:hover {
+  color: white !important;
+  border: 2px solid #CCC !important;
+}
+.CtxtMenu_MenuClose:hover span {
+  background-color: #CCC !important;
+}
+.CtxtMenu_MenuClose:hover:focus {
+  outline: none;
+}</style>
+<style>
+mjx-container[overflow="scroll"][display] {
+  overflow: auto clip;
+  min-width: initial !important;
+}
+
+mjx-container[overflow="truncate"][display] {
+  overflow: hidden clip;
+  min-width: initial !important;
+}
+
+mjx-container[display] {
+  display: block;
+  text-align: center;
+  justify-content: center;
+  margin: .7em 0;
+  padding: .3em 2px;
+}
+
+mjx-container[display][width="full"] {
+  display: flex;
+}
+
+mjx-container[justify="left"] {
+  text-align: left;
+  justify-content: left;
+}
+
+mjx-container[justify="right"] {
+  text-align: right;
+  justify-content: right;
+}
+
+mjx-container[jax="CHTML"] {
+  white-space: nowrap;
+}
+
+mjx-mo > mjx-c, mjx-mi > mjx-c, mjx-mn > mjx-c, mjx-ms > mjx-c, mjx-mtext > mjx-c {
+  clip-path: padding-box polygon(-1em -2px, calc(100% + 1em) -2px, calc(100% + 1em) calc(100% + 2px), -1em calc(100% + 2px));
+}
+
+mjx-stretchy-h {
+  clip-path: padding-box polygon(0 -2px, 100% -2px, 100% calc(100% + 2px), 0 calc(100% + 2px));
+  display: inline-block;
+}
+
+mjx-stretchy-v {
+  clip-path: padding-box polygon(-2px 0, calc(100% + 2px) 0, calc(100% + 2px) 100%, -2px 100%);
+  display: inline-block;
+  text-align: center;
+}
+
+mjx-container [space="1"] {
+  margin-left: .111em;
+}
+
+mjx-container [space="2"] {
+  margin-left: .167em;
+}
+
+mjx-container [space="3"] {
+  margin-left: .222em;
+}
+
+mjx-container [space="4"] {
+  margin-left: .278em;
+}
+
+mjx-container [space="5"] {
+  margin-left: .333em;
+}
+
+mjx-container [rspace="1"] {
+  margin-right: .111em;
+}
+
+mjx-container [rspace="2"] {
+  margin-right: .167em;
+}
+
+mjx-container [rspace="3"] {
+  margin-right: .222em;
+}
+
+mjx-container [rspace="4"] {
+  margin-right: .278em;
+}
+
+mjx-container [rspace="5"] {
+  margin-right: .333em;
+}
+
+mjx-container [size="s"] {
+  font-size: 70.7%;
+}
+
+mjx-container [size="ss"] {
+  font-size: 50%;
+}
+
+mjx-container [size="Tn"] {
+  font-size: 60%;
+}
+
+mjx-container [size="sm"] {
+  font-size: 85%;
+}
+
+mjx-container [size="lg"] {
+  font-size: 120%;
+}
+
+mjx-container [size="Lg"] {
+  font-size: 144%;
+}
+
+mjx-container [size="LG"] {
+  font-size: 173%;
+}
+
+mjx-container [size="hg"] {
+  font-size: 207%;
+}
+
+mjx-container [size="HG"] {
+  font-size: 249%;
+}
+
+mjx-container [width="full"] {
+  width: 100%;
+}
+
+mjx-box {
+  display: inline-block;
+}
+
+mjx-block {
+  display: block;
+}
+
+mjx-itable {
+  display: inline-table;
+}
+
+mjx-row {
+  display: table-row;
+}
+
+mjx-row > mjx-cell, mjx-row > mjx-base, mjx-row > mjx-under, mjx-row > mjx-over, mjx-row > mjx-den {
+  display: table-cell;
+}
+
+mjx-container [inline-breaks] {
+  display: inline;
+}
+
+mjx-container .mjx-selected {
+  outline: 2px solid black;
+}
+
+@media (prefers-color-scheme: dark) {
+  mjx-container .mjx-selected {
+    outline: 2px solid #C8C8C8;
+  }
+}
+
+mjx-mtext {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mstyle {
+  display: inline-block;
+}
+
+mjx-merror {
+  display: inline-block;
+  color: red;
+  background-color: yellow;
+}
+
+mjx-mphantom {
+  visibility: hidden;
+}
+
+mjx-container[has-speech="true"] {
+  position: relative;
+  cursor: default;
+}
+
+mjx-speech {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+}
+
+mjx-speech:focus {
+  outline: none;
+}
+
+mjx-container a[data-mjx-href] {
+  color: LinkText;
+  cursor: pointer;
+}
+
+mjx-container a[data-mjx-href].mjx-visited {
+  color: VisitedText;
+}
+
+mjx-container > mjx-help {
+  display: none;
+  position: absolute;
+  top: -.3em;
+  right: -.5em;
+  width: .6em;
+  height: .6em;
+  cursor: pointer;
+}
+
+mjx-container[display="true"] > mjx-help {
+  position: sticky;
+  inset: -100% 0 100% 0;
+  margin: -.3em -.5em 0 -.1em;
+  right: 0;
+  top: initial;
+}
+
+mjx-help > svg {
+  stroke: black;
+  width: 100%;
+  height: 100%;
+}
+
+mjx-help > svg > circle {
+  stroke-width: 1.5px;
+  cx: 9px;
+  cy: 9px;
+  r: 9px;
+  fill: white;
+}
+
+mjx-help > svg > circle:nth-child(2) {
+  fill: var(--mjx-bg1-color);
+  r: 7px;
+}
+
+mjx-help > svg > line {
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+}
+
+mjx-help:hover > svg > circle:nth-child(2) {
+  fill: white;
+}
+
+mjx-container.mjx-explorer-active > mjx-help {
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (prefers-color-scheme: dark) /* explorer */ {
+  mjx-help > svg {
+    stroke: #E0E0E0;
+  }
+  mjx-help > svg > circle {
+    fill: #404040;
+  }
+  mjx-help > svg > circle:nth-child(2) {
+    fill: rgba(132, 132, 255, .3);
+  }
+  mjx-help:hover > svg > circle:nth-child(2) {
+    stroke: #AAAAAA;
+      fill: #404040;
+  }
+}
+
+mjx-math {
+  display: inline-block;
+  text-align: left;
+  line-height: 0;
+  text-indent: 0;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 100%;
+  font-size-adjust: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  word-spacing: normal;
+  direction: ltr;
+  padding: 1px 0;
+}
+
+mjx-container[jax="CHTML"][display="true"] mjx-math {
+  padding: 0;
+}
+
+mjx-math[breakable] {
+  display: inline;
+}
+
+mjx-container[jax="CHTML"] mjx-break {
+  white-space: normal;
+  line-height: 0;
+  clip-path: rect(0 0 0 0);
+  font-family: MJX-BRK !important;
+}
+
+mjx-break[size="0"] {
+  letter-spacing: -0.999em;
+}
+
+mjx-break[size="1"] {
+  letter-spacing: -0.889em;
+}
+
+mjx-break[size="2"] {
+  letter-spacing: -0.833em;
+}
+
+mjx-break[size="3"] {
+  letter-spacing: -0.778em;
+}
+
+mjx-break[size="4"] {
+  letter-spacing: -0.722em;
+}
+
+mjx-break[size="5"] {
+  letter-spacing: -0.667em;
+}
+
+mjx-mi {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-c {
+  display: inline-block;
+  width: 0;
+  text-align: right;
+}
+
+mjx-utext {
+  display: inline-block;
+  padding: .75em 0 .2em 0;
+}
+
+mjx-mo {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-stretchy-h > mjx-beg, mjx-stretchy-h > mjx-ext, mjx-stretchy-h > mjx-end, mjx-stretchy-h > mjx-mid {
+  display: inline-block;
+  width: 0;
+  text-align: right;
+}
+
+mjx-stretchy-h > mjx-ext {
+  clip-path: padding-box polygon(0 -1em, 100% -1em, 100% calc(100% + 1em), 0 calc(100% + 1em));
+  width: 100%;
+  border: 0px solid transparent;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+mjx-stretchy-v > mjx-beg, mjx-stretchy-v > mjx-ext, mjx-stretchy-v > mjx-end, mjx-stretchy-v > mjx-mid {
+  display: block;
+  height: 0;
+  margin: 0 auto;
+}
+
+mjx-stretchy-v > mjx-ext > mjx-spacer {
+  display: block;
+}
+
+mjx-stretchy-v > mjx-ext {
+  clip-path: padding-box polygon(-1em 0, calc(100% + 1em) 0, calc(100% + 1em) 100%, -1em 100%);
+  height: 100%;
+  border: 0.1px solid transparent;
+  box-sizing: border-box;
+  white-space: pre;
+}
+
+mjx-mark {
+  display: inline-block;
+  height: 0;
+}
+
+mjx-msqrt {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-root {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+mjx-surd {
+  display: inline-block;
+  vertical-align: top;
+}
+
+mjx-sqrt {
+  display: inline-block;
+  padding-top: .075em;
+}
+
+mjx-sqrt > mjx-box {
+  border-top: .075em solid;
+  padding-left: .03em;
+  margin-left: -.03em;
+}
+
+mjx-sqrt.mjx-tall > mjx-box {
+  padding-left: .3em;
+  margin-left: -.3em;
+}
+
+mjx-mrow {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-linestack, mjx-mrow[break-top] {
+  display: inline-table;
+  width: 100%;
+}
+
+mjx-linestack[break-align="bottom"], mjx-mrow[break-top][break-align="bottom"] {
+  display: inline-block;
+}
+
+mjx-linestack[break-align="middle"], mjx-mrow[break-top][break-align="middle"] {
+  vertical-align: middle;
+}
+
+mjx-linestack[break-align="center"], mjx-mrow[break-top][break-align="center"] {
+  vertical-align: middle;
+}
+
+mjx-linestack[breakable] {
+  display: inline;
+}
+
+mjx-linestack[breakable] > mjx-linebox {
+  display: inline;
+}
+
+mjx-linestack[breakable] > mjx-linebox::before {
+  white-space: pre;
+  content: "\A";
+}
+
+mjx-linestack[breakable] > mjx-linebox::after {
+  white-space: normal;
+  content: " ";
+  letter-spacing: -.999em;
+  font-family: MJX-BRK;
+}
+
+mjx-linestack[breakable] > mjx-linebox:first-of-type::before {
+  display: none;
+}
+
+mjx-linestack[breakable] > mjx-linebox:last-of-type::after {
+  display: none;
+}
+
+mjx-linebox {
+  display: block;
+}
+
+mjx-linebox[align="left"] {
+  text-align: left;
+}
+
+mjx-linebox[align="center"] {
+  text-align: center;
+}
+
+mjx-linebox[align="right"] {
+  text-align: right;
+}
+
+mjx-linestrut {
+  display: inline-block;
+  height: 1em;
+  vertical-align: -.25em;
+}
+
+mjx-mn {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-msup {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-msubsup {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-script {
+  display: inline-block;
+  padding-right: .05em;
+  padding-left: .033em;
+}
+
+mjx-script > mjx-spacer {
+  display: block;
+}
+
+mjx-TeXAtom {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mfrac {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-frac {
+  display: inline-block;
+  vertical-align: 0.17em;
+  padding: 0 .22em;
+}
+
+mjx-frac[type="d"] {
+  vertical-align: .04em;
+}
+
+mjx-frac[delims] {
+  padding: 0 .1em;
+}
+
+mjx-frac[atop] {
+  padding: 0 .12em;
+}
+
+mjx-frac[atop][delims] {
+  padding: 0;
+}
+
+mjx-dtable {
+  display: inline-table;
+  width: 100%;
+}
+
+mjx-dtable > mjx-line, mjx-dtable > mjx-row {
+  font-size: 2000%;
+}
+
+mjx-dbox {
+  display: block;
+  font-size: 5%;
+}
+
+mjx-num {
+  display: block;
+  text-align: center;
+}
+
+mjx-den {
+  display: block;
+  text-align: center;
+}
+
+mjx-mfrac[bevelled] > mjx-num {
+  display: inline-block;
+}
+
+mjx-mfrac[bevelled] > mjx-den {
+  display: inline-block;
+}
+
+mjx-den[align="right"], mjx-num[align="right"] {
+  text-align: right;
+}
+
+mjx-den[align="left"], mjx-num[align="left"] {
+  text-align: left;
+}
+
+mjx-nstrut {
+  display: inline-block;
+  height: .054em;
+  width: 0;
+  vertical-align: -.054em;
+}
+
+mjx-nstrut[type="d"] {
+  height: .217em;
+  vertical-align: -.217em;
+}
+
+mjx-dstrut {
+  display: inline-block;
+  height: .505em;
+  width: 0;
+}
+
+mjx-dstrut[type="d"] {
+  height: .726em;
+}
+
+mjx-line {
+  display: block;
+  box-sizing: border-box;
+  min-height: 1px;
+  height: .06em;
+  border-top: .075em solid;
+  margin: .06em -.1em;
+  overflow: hidden;
+}
+
+mjx-line[type="d"] {
+  margin: .18em -.1em;
+}
+
+mjx-munder {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-over {
+  text-align: left;
+}
+
+mjx-munder:not([limits="false"]) {
+  display: inline-table;
+}
+
+mjx-munder > mjx-row {
+  text-align: left;
+}
+
+mjx-under {
+  padding-bottom: .1em;
+}
+
+mjx-mspace {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mtable {
+  display: inline-block;
+  text-align: center;
+  vertical-align: .25em;
+  position: relative;
+  box-sizing: border-box;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+mjx-mstyle[size="s"] mjx-mtable {
+  vertical-align: .354em;
+}
+
+mjx-labels {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+mjx-table {
+  display: inline-block;
+  vertical-align: -.5ex;
+  box-sizing: border-box;
+}
+
+mjx-table > mjx-itable {
+  vertical-align: middle;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+mjx-labels > mjx-itable {
+  position: absolute;
+  top: 0;
+}
+
+mjx-mtable[justify="left"] {
+  text-align: left;
+}
+
+mjx-mtable[justify="right"] {
+  text-align: right;
+}
+
+mjx-mtable[justify="left"][side="left"] {
+  padding-right: 0 ! important;
+}
+
+mjx-mtable[justify="left"][side="right"] {
+  padding-left: 0 ! important;
+}
+
+mjx-mtable[justify="right"][side="left"] {
+  padding-right: 0 ! important;
+}
+
+mjx-mtable[justify="right"][side="right"] {
+  padding-left: 0 ! important;
+}
+
+mjx-mtable[align] {
+  vertical-align: baseline;
+}
+
+mjx-mtable[align="top"] > mjx-table {
+  vertical-align: top;
+}
+
+mjx-mtable[align="bottom"] > mjx-table {
+  vertical-align: bottom;
+}
+
+mjx-mtable[side="right"] mjx-labels {
+  min-width: 100%;
+}
+
+mjx-mlabeledtr {
+  display: table-row;
+  text-align: left;
+}
+
+mjx-mlabeledtr[rowalign="top"] > mjx-mtd {
+  vertical-align: top;
+}
+
+mjx-mlabeledtr[rowalign="center"] > mjx-mtd {
+  vertical-align: middle;
+}
+
+mjx-mlabeledtr[rowalign="bottom"] > mjx-mtd {
+  vertical-align: bottom;
+}
+
+mjx-mlabeledtr[rowalign="baseline"] > mjx-mtd {
+  vertical-align: baseline;
+}
+
+mjx-mlabeledtr[rowalign="axis"] > mjx-mtd {
+  vertical-align: .25em;
+}
+
+mjx-mtr {
+  display: table-row;
+  text-align: left;
+}
+
+mjx-mtr[rowalign="top"] > mjx-mtd {
+  vertical-align: top;
+}
+
+mjx-mtr[rowalign="center"] > mjx-mtd {
+  vertical-align: middle;
+}
+
+mjx-mtr[rowalign="bottom"] > mjx-mtd {
+  vertical-align: bottom;
+}
+
+mjx-mtr[rowalign="baseline"] > mjx-mtd {
+  vertical-align: baseline;
+}
+
+mjx-mtr[rowalign="axis"] > mjx-mtd {
+  vertical-align: .25em;
+}
+
+mjx-mtd {
+  display: table-cell;
+  text-align: center;
+  padding: .215em .4em;
+}
+
+mjx-mtd:first-child {
+  padding-left: 0;
+}
+
+mjx-mtd:last-child {
+  padding-right: 0;
+}
+
+mjx-mtable > * > mjx-itable > *:first-child > mjx-mtd {
+  padding-top: 0;
+}
+
+mjx-mtable > * > mjx-itable > *:last-child > mjx-mtd {
+  padding-bottom: 0;
+}
+
+mjx-tstrut {
+  display: inline-block;
+  height: 1em;
+  vertical-align: -.25em;
+}
+
+mjx-labels[align="left"] > mjx-mtr > mjx-mtd {
+  text-align: left;
+}
+
+mjx-labels[align="right"] > mjx-mtr > mjx-mtd {
+  text-align: right;
+}
+
+mjx-mtd[extra] {
+  padding: 0;
+}
+
+mjx-mtd[rowalign="top"] {
+  vertical-align: top;
+}
+
+mjx-mtd[rowalign="center"] {
+  vertical-align: middle;
+}
+
+mjx-mtd[rowalign="bottom"] {
+  vertical-align: bottom;
+}
+
+mjx-mtd[rowalign="baseline"] {
+  vertical-align: baseline;
+}
+
+mjx-mtd[rowalign="axis"] {
+  vertical-align: .25em;
+}
+
+mjx-msub {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-container[jax="CHTML"] > mjx-math.NCM-N[breakable] > * {
+  font-family: MJX-NCM-ZERO, MJX-NCM-N;
+}
+
+.NCM-N {
+  font-family: MJX-NCM-ZERO, MJX-NCM-N;
+}
+
+.NCM-B {
+  font-family: MJX-NCM-ZERO, MJX-NCM-B;
+}
+
+.NCM-I {
+  font-family: MJX-NCM-ZERO, MJX-NCM-I;
+}
+
+.NCM-BI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-BI;
+}
+
+.NCM-DS {
+  font-family: MJX-NCM-ZERO, MJX-NCM-DS;
+}
+
+.NCM-F {
+  font-family: MJX-NCM-ZERO, MJX-NCM-F;
+}
+
+.NCM-FB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-FB;
+}
+
+.NCM-SS {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SS;
+}
+
+.NCM-SSB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SSB;
+}
+
+.NCM-SSI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SSI;
+}
+
+.NCM-SSBI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SSBI;
+}
+
+.NCM-M {
+  font-family: MJX-NCM-ZERO, MJX-NCM-M;
+}
+
+.NCM-SO {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SO;
+}
+
+.NCM-LO {
+  font-family: MJX-NCM-ZERO, MJX-NCM-LO;
+}
+
+.NCM-S3 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S3;
+}
+
+.NCM-S4 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S4;
+}
+
+.NCM-S5 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S5;
+}
+
+.NCM-S6 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S6;
+}
+
+.NCM-S7 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S7;
+}
+
+.NCM-MI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-MI;
+}
+
+.NCM-C {
+  font-family: MJX-NCM-ZERO, MJX-NCM-C;
+}
+
+.NCM-CB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-CB;
+}
+
+.NCM-OS {
+  font-family: MJX-NCM-ZERO, MJX-NCM-OS;
+}
+
+.NCM-OB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-OB;
+}
+
+.NCM-V {
+  font-family: MJX-NCM-ZERO, MJX-NCM-V;
+}
+
+.NCM-LT {
+  font-family: MJX-NCM-ZERO, MJX-NCM-LT;
+}
+
+.NCM-RB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-RB;
+}
+
+.NCM-EM {
+  font-family: MJX-NCM-ZERO, MJX-NCM-EM;
+}
+
+.NCM-B-a {
+  font-family: MJX-NCM-ZERO, MJX-NCM-B-a;
+}
+
+.NCM-U {
+  font-family: MJX-NCM-ZERO, MJX-NCM-U;
+}
+
+.NCM-U-a {
+  font-family: MJX-NCM-ZERO, MJX-NCM-U-a;
+}
+
+.NCM-S {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S;
+}
+
+.NCM-SB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SB;
+}
+
+@font-face /* MJX-NCM-ZERO */ {
+  font-family: MJX-NCM-ZERO;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-zero.woff2") format("woff2");
+}
+
+@font-face /* MJX-BRK */ {
+  font-family: MJX-BRK;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-brk.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-N */ {
+  font-family: MJX-NCM-N;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-n.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-B */ {
+  font-family: MJX-NCM-B;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-b.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-I */ {
+  font-family: MJX-NCM-I;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-i.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-BI */ {
+  font-family: MJX-NCM-BI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-bi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-DS */ {
+  font-family: MJX-NCM-DS;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ds.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-F */ {
+  font-family: MJX-NCM-F;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-f.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-FB */ {
+  font-family: MJX-NCM-FB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-fb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SS */ {
+  font-family: MJX-NCM-SS;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ss.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SSB */ {
+  font-family: MJX-NCM-SSB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ssb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SSI */ {
+  font-family: MJX-NCM-SSI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ssi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SSBI */ {
+  font-family: MJX-NCM-SSBI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ssbi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-M */ {
+  font-family: MJX-NCM-M;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-m.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SO */ {
+  font-family: MJX-NCM-SO;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-so.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-LO */ {
+  font-family: MJX-NCM-LO;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-lo.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S3 */ {
+  font-family: MJX-NCM-S3;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s3.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S4 */ {
+  font-family: MJX-NCM-S4;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s4.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S5 */ {
+  font-family: MJX-NCM-S5;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s5.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S6 */ {
+  font-family: MJX-NCM-S6;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s6.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S7 */ {
+  font-family: MJX-NCM-S7;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s7.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-MI */ {
+  font-family: MJX-NCM-MI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-mi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-C */ {
+  font-family: MJX-NCM-C;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-c.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-CB */ {
+  font-family: MJX-NCM-CB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-cb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-OS */ {
+  font-family: MJX-NCM-OS;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-os.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-OB */ {
+  font-family: MJX-NCM-OB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ob.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-V */ {
+  font-family: MJX-NCM-V;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-v.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-LT */ {
+  font-family: MJX-NCM-LT;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-lt.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-RB */ {
+  font-family: MJX-NCM-RB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-rb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-EM */ {
+  font-family: MJX-NCM-EM;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-em.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-B-a */ {
+  font-family: MJX-NCM-B-a;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-b-a.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-U */ {
+  font-family: MJX-NCM-U;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-u.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-U-a */ {
+  font-family: MJX-NCM-U-a;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-u-a.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S */ {
+  font-family: MJX-NCM-S;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SB */ {
+  font-family: MJX-NCM-SB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-sb.woff2") format("woff2");
+}
+
+mjx-c.mjx-c73 {
+  padding: 0.448em 0.394em 0.011em 0;
+}
+
+mjx-c.mjx-c69 {
+  padding: 0.657em 0.278em 0 0;
+}
+
+mjx-c.mjx-c6E {
+  padding: 0.442em 0.556em 0 0;
+}
+
+mjx-c.mjx-c2061 {
+  padding: 0 0 0 0;
+}
+
+mjx-c.mjx-c1D465 {
+  padding: 0.442em 0.572em 0.011em 0;
+}
+
+mjx-c.mjx-c221A {
+  padding: 0.04em 0.853em 0.96em 0;
+}
+
+mjx-c.mjx-c31 {
+  padding: 0.666em 0.5em 0 0;
+}
+
+mjx-c.mjx-c2B {
+  padding: 0.583em 0.778em 0.083em 0;
+}
+
+mjx-c.mjx-c32 {
+  padding: 0.666em 0.5em 0 0;
+}
+
+mjx-c.mjx-c28 {
+  padding: 0.748em 0.389em 0.248em 0;
+}
+
+mjx-c.mjx-c29 {
+  padding: 0.748em 0.389em 0.248em 0;
+}
+
+mjx-c.mjx-c63 {
+  padding: 0.448em 0.444em 0.011em 0;
+}
+
+mjx-c.mjx-c6F {
+  padding: 0.448em 0.5em 0.011em 0;
+}
+
+mjx-c.mjx-c74 {
+  padding: 0.615em 0.389em 0.011em 0;
+}
+
+mjx-c.mjx-c61 {
+  padding: 0.448em 0.5em 0.011em 0;
+}
+
+mjx-c.mjx-c1D453 {
+  padding: 0.705em 0.552em 0.205em 0;
+}
+
+mjx-c.mjx-c1D454 {
+  padding: 0.442em 0.477em 0.205em 0;
+}
+
+mjx-c.mjx-c72 {
+  padding: 0.442em 0.392em 0 0;
+}
+
+mjx-c.mjx-c6C {
+  padding: 0.694em 0.278em 0 0;
+}
+
+mjx-c.mjx-c210E {
+  padding: 0.694em 0.576em 0.011em 0;
+}
+
+mjx-c.mjx-c1D45B {
+  padding: 0.442em 0.6em 0.011em 0;
+}
+
+mjx-c.mjx-c1D452 {
+  padding: 0.442em 0.466em 0.011em 0;
+}
+
+mjx-c.mjx-c2212 {
+  padding: 0.583em 0.778em 0.083em 0;
+}
+
+mjx-c.mjx-c2E {
+  padding: 0.106em 0.278em 0 0;
+}
+
+mjx-c.mjx-c6D {
+  padding: 0.442em 0.833em 0 0;
+}
+
+mjx-c.mjx-c1D703 {
+  padding: 0.705em 0.469em 0.011em 0;
+}
+
+mjx-c.mjx-c2192 {
+  padding: 0.51em 1em 0.01em 0;
+}
+
+mjx-c.mjx-c30 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c2C {
+  padding: 0.106em 0.278em 0.193em 0;
+}
+
+mjx-c.mjx-c2F {
+  padding: 0.75em 0.5em 0.25em 0;
+}
+
+mjx-c.mjx-c3D {
+  padding: 0.367em 0.778em 0 0;
+}
+
+mjx-c.mjx-c1D434 {
+  padding: 0.716em 0.75em 0 0;
+}
+
+mjx-c.mjx-c1D435 {
+  padding: 0.683em 0.759em 0 0;
+}
+
+mjx-c.mjx-c2062 {
+  padding: 0 0 0 0;
+}
+
+mjx-c.mjx-c1D462 {
+  padding: 0.442em 0.572em 0.011em 0;
+}
+
+mjx-c.mjx-c1D463 {
+  padding: 0.442em 0.485em 0.011em 0;
+}
+
+mjx-c.mjx-c28.NCM-S4 {
+  padding: 1.146em 0.597em 0.646em 0;
+}
+
+mjx-c.mjx-c29.NCM-S4 {
+  padding: 1.146em 0.597em 0.646em 0;
+}
+
+mjx-c.mjx-c22C5 {
+  padding: 0.303em 0.278em 0 0;
+}
+
+mjx-c.mjx-c28.NCM-S3 {
+  padding: 0.972em 0.523em 0.472em 0;
+}
+
+mjx-c.mjx-c29.NCM-S3 {
+  padding: 0.972em 0.523em 0.472em 0;
+}
+
+mjx-c.mjx-c3E {
+  padding: 0.547em 0.778em 0.047em 0;
+}
+
+mjx-c.mjx-c3C {
+  padding: 0.547em 0.778em 0.052em 0;
+}
+
+mjx-c.mjx-c1D70B {
+  padding: 0.431em 0.57em 0.011em 0;
+}
+
+mjx-c.mjx-c2264 {
+  padding: 0.631em 0.778em 0.119em 0;
+}
+
+mjx-c.mjx-c1D436 {
+  padding: 0.705em 0.76em 0.022em 0;
+}
+
+mjx-c.mjx-c1D442 {
+  padding: 0.705em 0.763em 0.022em 0;
+}
+
+mjx-c.mjx-c222A {
+  padding: 0.604em 0.667em 0.02em 0;
+}
+
+mjx-c.mjx-c7C {
+  padding: 0.75em 0.278em 0.25em 0;
+}
+
+mjx-c.mjx-c2208 {
+  padding: 0.543em 0.667em 0.043em 0;
+}
+
+mjx-c.mjx-c211D.NCM-DS {
+  padding: 0.685em 0.722em 0 0;
+}
+
+mjx-c.mjx-c2223.NCM-S3 {
+  padding: 1.117em 0.333em 0.617em 0;
+}
+
+mjx-c.mjx-c2248 {
+  padding: 0.457em 0.773em 0 0;
+}
+
+mjx-c.mjx-c36 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c34 {
+  padding: 0.677em 0.5em 0 0;
+}
+
+mjx-c.mjx-c2218 {
+  padding: 0.4em 0.412em 0 0;
+}
+
+mjx-c.mjx-c38 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c1D451 {
+  padding: 0.694em 0.52em 0.011em 0;
+}
+
+mjx-c.mjx-c2032.NCM-V {
+  padding: 0.549em 0.407em 0 0;
+}
+
+mjx-c.mjx-c1D466 {
+  padding: 0.442em 0.49em 0.205em 0;
+}
+
+mjx-c.mjx-c65 {
+  padding: 0.448em 0.444em 0.011em 0;
+}
+
+mjx-c.mjx-c2260 {
+  padding: 0.73em 0.778em 0.23em 0;
+}
+
+mjx-c.mjx-c1D460 {
+  padding: 0.442em 0.469em 0.011em 0;
+}
+
+mjx-c.mjx-c1D461 {
+  padding: 0.626em 0.361em 0.011em 0;
+}
+
+mjx-c.mjx-c2033.NCM-V {
+  padding: 0.549em 0.647em 0 0;
+}
+
+mjx-c.mjx-c33 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c1D443 {
+  padding: 0.683em 0.754em 0 0;
+}
+
+mjx-c.mjx-c21A6 {
+  padding: 0.51em 0.977em 0.011em 0;
+}
+
+mjx-c.mjx-c1D45A {
+  padding: 0.442em 0.878em 0.011em 0;
+}
+
+mjx-c.mjx-c1D445 {
+  padding: 0.683em 0.759em 0.022em 0;
+}
+
+mjx-c.mjx-c27F6 {
+  padding: 0.51em 1.463em 0.01em 0;
+}
+
+mjx-c.mjx-c5B.NCM-LO {
+  padding: 0.85em 0.417em 0.35em 0;
+}
+
+mjx-c.mjx-c5D.NCM-LO {
+  padding: 0.85em 0.417em 0.35em 0;
+}
+
+mjx-c.mjx-c1D700 {
+  padding: 0.453em 0.466em 0.022em 0;
+}
+
+mjx-c.mjx-c1D6FF {
+  padding: 0.712em 0.452em 0.011em 0;
+}
+
+mjx-c.mjx-c1D6FC {
+  padding: 0.442em 0.64em 0.011em 0;
+}
+
+mjx-c.mjx-c2223.NCM-S5 {
+  padding: 1.502em 0.333em 1.002em 0;
+}
+
+mjx-c.mjx-c28.NCM-S6 {
+  padding: 1.446em 0.736em 0.946em 0;
+}
+
+mjx-c.mjx-c29.NCM-S6 {
+  padding: 1.446em 0.736em 0.946em 0;
+}
+
+mjx-c.mjx-c221A.NCM-SO {
+  padding: 0.85em 1.02em 0.35em 0;
+}
+
+mjx-c.mjx-c221A.NCM-S3 {
+  padding: 1.45em 1.02em 0.951em 0;
+}
+
+mjx-c.mjx-c28.NCM-S5 {
+  padding: 1.296em 0.663em 0.796em 0;
+}
+
+mjx-c.mjx-c29.NCM-S5 {
+  padding: 1.296em 0.663em 0.796em 0;
+}
+
+mjx-c.mjx-c5B {
+  padding: 0.75em 0.278em 0.25em 0;
+}
+
+mjx-c.mjx-c5D {
+  padding: 0.75em 0.278em 0.25em 0;
+}
+
+mjx-c.mjx-c1D43E {
+  padding: 0.684em 0.889em 0 0;
+}
+
+mjx-c.mjx-c1D448 {
+  padding: 0.683em 0.76em 0.022em 0;
+}
+
+mjx-c.mjx-c78 {
+  padding: 0.431em 0.528em 0 0;
+}
+
+mjx-c.mjx-c70 {
+  padding: 0.442em 0.556em 0.194em 0;
+}
+
+mjx-c.mjx-c1D44E {
+  padding: 0.442em 0.529em 0.011em 0;
+}
+
+mjx-c.mjx-c1D44F {
+  padding: 0.694em 0.429em 0.011em 0;
+}
+
+mjx-c.mjx-c1D44A {
+  padding: 0.683em 1.048em 0.022em 0;
+}
+
+mjx-c.mjx-c39 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-cB1 {
+  padding: 0.583em 0.778em 0.084em 0;
+}
+</style><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin=""><style>@page{size:309.64px 198px;margin:0}html,body{margin:0;padding:0;background:#fff;width:309.64px;height:198px;overflow:hidden;position:relative}.fx-neutral{display:block!important;position:static!important;margin:0!important;padding:0!important;border:0!important;outline:0!important;width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;min-height:0!important;max-height:none!important;transform:none!important;box-shadow:none!important;float:none!important;overflow:visible!important;text-align:left!important;background:none!important;columns:auto!important}.fx-target{position:absolute!important;left:1px!important;top:1px!important;margin:0!important;width:300px!important;height:196px!important;max-width:none!important;max-height:none!important;overflow:visible!important}</style></head><body class=""><div class="fx-neutral"><div class="sheet fx-neutral"><div class="sheet-body paper skin-hs vivid fx-neutral"><figure class="figure fx-neutral" data-fig="squeeze-limit"><div class="figure-art fx-neutral"><svg viewBox="0 0 300 196" style="width:300px" class="fig-svg fx-target" role="img" aria-label="Near theta equals zero, the constant one on top and cosine theta below both converge to one, squeezing the middle curve sine theta over theta to the value one." preserveAspectRatio="xMidYMid meet"><defs><marker id="pl1a" markerWidth="8" markerHeight="8" refX="5.4" refY="2.8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5.4,2.8 L0,5.6" fill="none" stroke="var(--c-axis)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></marker></defs><path d="M24.0,174.0 H283.0" class="axis" marker-end="url(#pl1a)"></path><path d="M154.0,174.0 V21.0" class="axis" marker-end="url(#pl1a)"></path><line x1="154.0" y1="171.0" x2="154.0" y2="177.0" class="axis"></line><line x1="151.0" y1="37.4" x2="157.0" y2="37.4" class="axis"></line><line x1="24.0" y1="37.4" x2="284.0" y2="37.4" class="refline"></line><path d="M38.32,162.18 L39.29,160.30 L40.25,158.43 L41.21,156.57 L42.18,154.72 L43.14,152.88 L44.11,151.05 L45.07,149.23 L46.03,147.42 L47.00,145.62 L47.96,143.83 L48.93,142.05 L49.89,140.28 L50.85,138.53 L51.82,136.78 L52.78,135.05 L53.75,133.33 L54.71,131.62 L55.67,129.92 L56.64,128.23 L57.60,126.56 L58.57,124.90 L59.53,123.25 L60.49,121.61 L61.46,119.99 L62.42,118.37 L63.39,116.77 L64.35,115.19 L65.31,113.61 L66.28,112.05 L67.24,110.51 L68.21,108.97 L69.17,107.45 L70.13,105.95 L71.10,104.46 L72.06,102.98 L73.03,101.51 L73.99,100.06 L74.95,98.63 L75.92,97.20 L76.88,95.80 L77.85,94.40 L78.81,93.03 L79.77,91.66 L80.74,90.31 L81.70,88.98 L82.67,87.66 L83.63,86.36 L84.59,85.07 L85.56,83.80 L86.52,82.54 L87.49,81.30 L88.45,80.07 L89.41,78.86 L90.38,77.67 L91.34,76.49 L92.31,75.33 L93.27,74.18 L94.23,73.05 L95.20,71.94 L96.16,70.84 L97.12,69.76 L98.09,68.69 L99.05,67.65 L100.02,66.61 L100.98,65.60 L101.94,64.60 L102.91,63.62 L103.87,62.66 L104.84,61.71 L105.80,60.78 L106.76,59.87 L107.73,58.97 L108.69,58.10 L109.66,57.24 L110.62,56.39 L111.58,55.57 L112.55,54.76 L113.51,53.97 L114.48,53.20 L115.44,52.45 L116.40,51.71 L117.37,50.99 L118.33,50.29 L119.30,49.61 L120.26,48.94 L121.22,48.30 L122.19,47.67 L123.15,47.06 L124.12,46.47 L125.08,45.90 L126.04,45.34 L127.01,44.80 L127.97,44.29 L128.94,43.79 L129.90,43.31 L130.86,42.84 L131.83,42.40 L132.79,41.98 L133.76,41.57 L134.72,41.18 L135.68,40.81 L136.65,40.46 L137.61,40.13 L138.58,39.82 L139.54,39.52 L140.50,39.25 L141.47,38.99 L142.43,38.76 L143.40,38.54 L144.36,38.34 L145.32,38.16 L146.29,38.00 L147.25,37.85 L148.22,37.73 L149.18,37.62 L150.14,37.54 L151.11,37.47 L152.07,37.43 L153.04,37.40 L154.00,37.39 L154.96,37.40 L155.93,37.43 L156.89,37.47 L157.86,37.54 L158.82,37.62 L159.78,37.73 L160.75,37.85 L161.71,38.00 L162.68,38.16 L163.64,38.34 L164.60,38.54 L165.57,38.76 L166.53,38.99 L167.50,39.25 L168.46,39.52 L169.42,39.82 L170.39,40.13 L171.35,40.46 L172.32,40.81 L173.28,41.18 L174.24,41.57 L175.21,41.98 L176.17,42.40 L177.14,42.84 L178.10,43.31 L179.06,43.79 L180.03,44.29 L180.99,44.80 L181.96,45.34 L182.92,45.90 L183.88,46.47 L184.85,47.06 L185.81,47.67 L186.78,48.30 L187.74,48.94 L188.70,49.61 L189.67,50.29 L190.63,50.99 L191.60,51.71 L192.56,52.45 L193.52,53.20 L194.49,53.97 L195.45,54.76 L196.42,55.57 L197.38,56.39 L198.34,57.24 L199.31,58.10 L200.27,58.97 L201.24,59.87 L202.20,60.78 L203.16,61.71 L204.13,62.66 L205.09,63.62 L206.06,64.60 L207.02,65.60 L207.98,66.61 L208.95,67.65 L209.91,68.69 L210.88,69.76 L211.84,70.84 L212.80,71.94 L213.77,73.05 L214.73,74.18 L215.69,75.33 L216.66,76.49 L217.62,77.67 L218.59,78.86 L219.55,80.07 L220.51,81.30 L221.48,82.54 L222.44,83.80 L223.41,85.07 L224.37,86.36 L225.33,87.66 L226.30,88.98 L227.26,90.31 L228.23,91.66 L229.19,93.03 L230.15,94.40 L231.12,95.80 L232.08,97.20 L233.05,98.63 L234.01,100.06 L234.97,101.51 L235.94,102.98 L236.90,104.46 L237.87,105.95 L238.83,107.45 L239.79,108.97 L240.76,110.51 L241.72,112.05 L242.69,113.61 L243.65,115.19 L244.61,116.77 L245.58,118.37 L246.54,119.99 L247.51,121.61 L248.47,123.25 L249.43,124.90 L250.40,126.56 L251.36,128.23 L252.33,129.92 L253.29,131.62 L254.25,133.33 L255.22,135.05 L256.18,136.78 L257.15,138.53 L258.11,140.28 L259.07,142.05 L260.04,143.83 L261.00,145.62 L261.97,147.42 L262.93,149.23 L263.89,151.05 L264.86,152.88 L265.82,154.72 L266.79,156.57 L267.75,158.43 L268.71,160.30 L269.68,162.18" class="refline"></path><path d="M38.32,80.58 L39.37,79.84 L40.43,79.10 L41.48,78.38 L42.53,77.65 L43.58,76.93 L44.63,76.22 L45.68,75.51 L46.73,74.81 L47.79,74.12 L48.84,73.43 L49.89,72.74 L50.94,72.06 L51.99,71.39 L53.04,70.72 L54.10,70.06 L55.15,69.40 L56.20,68.75 L57.25,68.10 L58.30,67.47 L59.35,66.83 L60.41,66.21 L61.46,65.58 L62.51,64.97 L63.56,64.36 L64.61,63.76 L65.66,63.16 L66.72,62.57 L67.77,61.98 L68.82,61.41 L69.87,60.83 L70.92,60.27 L71.97,59.71 L73.03,59.15 L74.08,58.61 L75.13,58.07 L76.18,57.53 L77.23,57.01 L78.28,56.48 L79.34,55.97 L80.39,55.46 L81.44,54.96 L82.49,54.47 L83.54,53.98 L84.59,53.49 L85.64,53.02 L86.70,52.55 L87.75,52.09 L88.80,51.63 L89.85,51.19 L90.90,50.75 L91.95,50.31 L93.01,49.88 L94.06,49.46 L95.11,49.05 L96.16,48.64 L97.21,48.24 L98.26,47.85 L99.32,47.46 L100.37,47.08 L101.42,46.71 L102.47,46.35 L103.52,45.99 L104.57,45.64 L105.63,45.29 L106.68,44.96 L107.73,44.63 L108.78,44.30 L109.83,43.99 L110.88,43.68 L111.94,43.38 L112.99,43.08 L114.04,42.80 L115.09,42.52 L116.14,42.25 L117.19,41.98 L118.24,41.72 L119.30,41.47 L120.35,41.23 L121.40,41.00 L122.45,40.77 L123.50,40.55 L124.55,40.33 L125.61,40.13 L126.66,39.93 L127.71,39.74 L128.76,39.55 L129.81,39.38 L130.86,39.21 L131.92,39.05 L132.97,38.89 L134.02,38.75 L135.07,38.61 L136.12,38.48 L137.17,38.35 L138.23,38.23 L139.28,38.13 L140.33,38.02 L141.38,37.93 L142.43,37.84 L143.48,37.76 L144.54,37.69 L145.59,37.63 L146.64,37.57 L147.69,37.52 L148.74,37.48 L149.79,37.45 L150.85,37.42 L151.90,37.40 L152.95,37.39 L154.00,37.39 L155.05,37.39 L156.10,37.40 L157.15,37.42 L158.21,37.45 L159.26,37.48 L160.31,37.52 L161.36,37.57 L162.41,37.63 L163.46,37.69 L164.52,37.76 L165.57,37.84 L166.62,37.93 L167.67,38.02 L168.72,38.13 L169.77,38.23 L170.83,38.35 L171.88,38.48 L172.93,38.61 L173.98,38.75 L175.03,38.89 L176.08,39.05 L177.14,39.21 L178.19,39.38 L179.24,39.55 L180.29,39.74 L181.34,39.93 L182.39,40.13 L183.45,40.33 L184.50,40.55 L185.55,40.77 L186.60,41.00 L187.65,41.23 L188.70,41.47 L189.76,41.72 L190.81,41.98 L191.86,42.25 L192.91,42.52 L193.96,42.80 L195.01,43.08 L196.06,43.38 L197.12,43.68 L198.17,43.99 L199.22,44.30 L200.27,44.63 L201.32,44.96 L202.37,45.29 L203.43,45.64 L204.48,45.99 L205.53,46.35 L206.58,46.71 L207.63,47.08 L208.68,47.46 L209.74,47.85 L210.79,48.24 L211.84,48.64 L212.89,49.05 L213.94,49.46 L214.99,49.88 L216.05,50.31 L217.10,50.75 L218.15,51.19 L219.20,51.63 L220.25,52.09 L221.30,52.55 L222.36,53.02 L223.41,53.49 L224.46,53.98 L225.51,54.47 L226.56,54.96 L227.61,55.46 L228.66,55.97 L229.72,56.48 L230.77,57.01 L231.82,57.53 L232.87,58.07 L233.92,58.61 L234.97,59.15 L236.03,59.71 L237.08,60.27 L238.13,60.83 L239.18,61.41 L240.23,61.98 L241.28,62.57 L242.34,63.16 L243.39,63.76 L244.44,64.36 L245.49,64.97 L246.54,65.58 L247.59,66.21 L248.65,66.83 L249.70,67.47 L250.75,68.10 L251.80,68.75 L252.85,69.40 L253.90,70.06 L254.96,70.72 L256.01,71.39 L257.06,72.06 L258.11,72.74 L259.16,73.43 L260.21,74.12 L261.27,74.81 L262.32,75.51 L263.37,76.22 L264.42,76.93 L265.47,77.65 L266.52,78.38 L267.57,79.10 L268.63,79.84 L269.68,80.58" class="curve"></path><circle cx="154.0" cy="37.4" r="3" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"></circle><foreignObject x="-52" y="-52" width="404" height="300" class="fig-fo" requiredExtensions="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml" class="fig-lyr"><span class="fig-lbl a-ax" style="left:337.0px;top:230.0px;transform:translate(0,0);font-size:13px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="127" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="theta" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; theta" data-speech-attached="true" data-semantic-braille="⠨⠹" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="\theta" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mi data-latex="\theta" data-semantic-type="identifier" data-semantic-role="greekletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:\theta" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="theta" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; theta" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠨⠹"><mjx-c class="mjx-c1D703">𝜃</mjx-c></mjx-mi></mjx-math><mjx-speech aria-label="theta, math" role="img" aria-roledescription="" aria-braillelabel="⠨⠹" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:206.0px;top:232.0px;transform:translate(-50%,0);font-size:12px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="128" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="0" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 0" data-speech-attached="true" data-semantic-braille="⠼⠴" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="0" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mn data-latex="0" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:0" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="0" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 0" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; number" data-semantic-braille="⠼⠴"><mjx-c class="mjx-c30">0</mjx-c></mjx-mn></mjx-math><mjx-speech aria-label="0, math" role="img" aria-roledescription="" aria-braillelabel="⠼⠴" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:200.0px;top:89.4px;transform:translate(-100%,-50%);font-size:12px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="129" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="1" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 1" data-speech-attached="true" data-semantic-braille="⠼⠂" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="1" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mn data-latex="1" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:1" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="1" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 1" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; number" data-semantic-braille="⠼⠂"><mjx-c class="mjx-c31">1</mjx-c></mjx-mn></mjx-math><mjx-speech aria-label="1, math" role="img" aria-roledescription="" aria-braillelabel="⠼⠂" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-curve" style="left:324.7px;top:132.6px;transform:translate(0,-50%);"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="130" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="sine theta over theta" data-semantic-speech="&lt;prosody rate=&quot;+25%&quot;&gt; &lt;mark name=&quot;0&quot;/&gt; sine &lt;mark name=&quot;2&quot;/&gt; theta &lt;/prosody&gt; &lt;mark name=&quot;5&quot;/&gt; over theta" data-speech-attached="true" data-semantic-braille="⠹⠎⠊⠝⠀⠨⠹⠌⠨⠹⠼" data-braille-attached="true" has-speech="true" style="font-size: 101.3%;"><mjx-math data-latex="\dfrac{\sin\theta}{\theta}" data-semantic-structure="(6 (4 0 3 2) 5)" class="NCM-N" aria-hidden="true"><mjx-mstyle data-latex="\dfrac{\sin\theta}{\theta}"><mjx-mfrac data-semantic-type="fraction" data-semantic-role="division" data-semantic-annotation="depth:1" data-semantic-id="6" data-semantic-children="4,5" data-semantic-attributes="latex:\dfrac{\sin\theta}{\theta}" data-semantic-owns="4 5" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="sine theta over theta" data-semantic-summary-none="fraction" data-semantic-speech="&lt;prosody rate=&quot;+25%&quot;&gt; &lt;mark name=&quot;0&quot;/&gt; sine &lt;mark name=&quot;2&quot;/&gt; theta &lt;/prosody&gt; &lt;mark name=&quot;5&quot;/&gt; over theta" data-semantic-summary="&lt;mark name=&quot;6&quot;/&gt; fraction" data-semantic-braille="⠹⠎⠊⠝⠀⠨⠹⠌⠨⠹⠼"><mjx-frac type="d"><mjx-num><mjx-nstrut type="d"></mjx-nstrut><mjx-mrow data-latex="\sin\theta" data-semantic-type="appl" data-semantic-role="prefix function" data-semantic-annotation="clearspeak:simple;depth:2" data-semantic-id="4" data-semantic-children="0,2" data-semantic-content="3,0" data-semantic-parent="6" data-semantic-attributes="latex:\sin\theta" data-semantic-owns="0 3 2" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="sine theta" data-semantic-prefix-none="Numerator" data-semantic-summary-none="functional expression identifier" data-semantic-speech="&lt;prosody rate=&quot;+25%&quot;&gt; &lt;mark name=&quot;0&quot;/&gt; sine &lt;mark name=&quot;2&quot;/&gt; theta &lt;/prosody&gt;" data-semantic-prefix="&lt;mark name=&quot;4&quot;/&gt; Numerator" data-semantic-summary="&lt;prosody rate=&quot;+25%&quot;&gt; &lt;mark name=&quot;0&quot;/&gt; functional expression &lt;mark name=&quot;2&quot;/&gt; identifier &lt;/prosody&gt;" data-semantic-braille="⠎⠊⠝⠀⠨⠹"><mjx-mi data-latex="\sin" data-semantic-type="function" data-semantic-role="prefix function" data-semantic-font="normal" data-semantic-annotation="nemeth:number;depth:3" data-semantic-id="0" data-semantic-parent="4" data-semantic-attributes="latex:\sin" data-semantic-operator="appl" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="sine" data-semantic-summary-none="functional expression" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; sine" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; functional expression" data-semantic-braille="⠎⠊⠝"><mjx-c class="mjx-c73" noic="true" style="padding-top: 0.657em;">s</mjx-c><mjx-c class="mjx-c69" noic="true" style="padding-top: 0.657em;">i</mjx-c><mjx-c class="mjx-c6E" style="padding-top: 0.657em;">n</mjx-c></mjx-mi><mjx-mo data-mjx-texclass="NONE" data-semantic-type="punctuation" data-semantic-role="application" data-semantic-annotation="nemeth:number;depth:3" data-semantic-id="3" data-semantic-parent="4" data-semantic-attributes="texclass:NONE" data-semantic-operator="appl" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="of" data-semantic-summary-none="of" data-semantic-speech="&lt;mark name=&quot;3&quot;/&gt; of" data-semantic-summary="&lt;mark name=&quot;3&quot;/&gt; of" data-semantic-braille="⠀"><mjx-c class="mjx-c2061">⁡</mjx-c></mjx-mo><mjx-mi space="2" data-latex="\theta" data-semantic-type="identifier" data-semantic-role="greekletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:3" data-semantic-id="2" data-semantic-parent="4" data-semantic-attributes="latex:\theta" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="theta" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;2&quot;/&gt; theta" data-semantic-summary="&lt;mark name=&quot;2&quot;/&gt; identifier" data-semantic-braille="⠨⠹"><mjx-c class="mjx-c1D703">𝜃</mjx-c></mjx-mi></mjx-mrow></mjx-num><mjx-dbox><mjx-dtable><mjx-line type="d"></mjx-line><mjx-row><mjx-den><mjx-dstrut type="d"></mjx-dstrut><mjx-mi data-latex="\theta" data-semantic-type="identifier" data-semantic-role="greekletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;depth:2" data-semantic-id="5" data-semantic-parent="6" data-semantic-attributes="latex:\theta" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="theta" data-semantic-prefix-none="Denominator" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;5&quot;/&gt; theta" data-semantic-prefix="&lt;mark name=&quot;5&quot;/&gt; Denominator" data-semantic-summary="&lt;mark name=&quot;5&quot;/&gt; identifier" data-semantic-braille="⠨⠹"><mjx-c class="mjx-c1D703">𝜃</mjx-c></mjx-mi></mjx-den></mjx-row></mjx-dtable></mjx-dbox></mjx-frac></mjx-mfrac></mjx-mstyle></mjx-math><mjx-speech aria-label="sine theta over theta, math" role="img" aria-roledescription="" aria-braillelabel="⠹⠎⠊⠝⠀⠨⠹⠌⠨⠹⠼" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-ref" style="left:324.7px;top:216.2px;transform:translate(0,-50%);"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="131" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="cosine theta" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; cosine &lt;mark name=&quot;2&quot;/&gt; theta" data-speech-attached="true" data-semantic-braille="⠉⠕⠎⠀⠨⠹" data-braille-attached="true" has-speech="true" style="font-size: 101.3%;"><mjx-math data-latex="\cos\theta" data-semantic-type="appl" data-semantic-role="prefix function" data-semantic-annotation="clearspeak:simple;depth:1" data-semantic-id="4" data-semantic-children="0,2" data-semantic-content="3,0" data-semantic-attributes="latex:\cos\theta" data-semantic-owns="0 3 2" data-semantic-level-number="0" data-semantic-structure="(4 0 3 2)" class="NCM-N" data-speech-node="true" data-semantic-speech-none="cosine theta" data-semantic-summary-none="functional expression identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; cosine &lt;mark name=&quot;2&quot;/&gt; theta" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; functional expression &lt;mark name=&quot;2&quot;/&gt; identifier" data-semantic-braille="⠉⠕⠎⠀⠨⠹" aria-hidden="true"><mjx-mi data-latex="\cos" data-semantic-type="function" data-semantic-role="prefix function" data-semantic-font="normal" data-semantic-annotation="nemeth:number;depth:2" data-semantic-id="0" data-semantic-parent="4" data-semantic-attributes="latex:\cos" data-semantic-operator="appl" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="cosine" data-semantic-summary-none="functional expression" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; cosine" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; functional expression" data-semantic-braille="⠉⠕⠎"><mjx-c class="mjx-c63" noic="true" style="padding-top: 0.448em;">c</mjx-c><mjx-c class="mjx-c6F" noic="true" style="padding-top: 0.448em;">o</mjx-c><mjx-c class="mjx-c73" style="padding-top: 0.448em;">s</mjx-c></mjx-mi><mjx-mo data-mjx-texclass="NONE" data-semantic-type="punctuation" data-semantic-role="application" data-semantic-annotation="nemeth:number;depth:2" data-semantic-id="3" data-semantic-parent="4" data-semantic-attributes="texclass:NONE" data-semantic-operator="appl" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="of" data-semantic-summary-none="of" data-semantic-speech="&lt;mark name=&quot;3&quot;/&gt; of" data-semantic-summary="&lt;mark name=&quot;3&quot;/&gt; of" data-semantic-braille="⠀"><mjx-c class="mjx-c2061">⁡</mjx-c></mjx-mo><mjx-mi space="2" data-latex="\theta" data-semantic-type="identifier" data-semantic-role="greekletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:2" data-semantic-id="2" data-semantic-parent="4" data-semantic-attributes="latex:\theta" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="theta" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;2&quot;/&gt; theta" data-semantic-summary="&lt;mark name=&quot;2&quot;/&gt; identifier" data-semantic-braille="⠨⠹"><mjx-c class="mjx-c1D703">𝜃</mjx-c></mjx-mi></mjx-math><mjx-speech aria-label="cosine theta, math" role="img" aria-roledescription="" aria-braillelabel="⠉⠕⠎⠀⠨⠹" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span></div></foreignObject></svg></div></figure></div></div></div></body></html>

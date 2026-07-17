@@ -1,0 +1,273 @@
+% ═══════════════════════════════════════════════════════════════════════════
+% preamble.tex — HTML→LaTeX pilot（KICKOFF-latex-pilot.md M-P3）
+%
+% 引擎＝lualatex（D4）。自 legacy/tex_handout/preamble/ 的六件式復活，但**大幅收斂**：
+% legacy 是 pdflatex＋newtx（Times）時代的東西，與拍板的 lualatex＋NewComputerModern 直接
+% 衝突，故 inputenc／fontenc／newtxtext／newtxmath 全數退場。以下每個包都是 ch03 實際用到的
+% （kickoff §4.4「不預裝用不到的」）。
+%
+% 刻意不載入，及其理由：
+%   booktabs        — ch03 沒有任何 <table>（DIALECT-ch03.md §3；「反三角總表」其實是 aligned）
+%   tikz / pgfplots — 圖改由 export_figs.mjs 產向量 PDF，LaTeX 只 \includegraphics
+%   hyperref/cleveref — D7：編號照抄字面，pilot 不做 \label/\ref 語意化
+%   tocloft / imakeidx / biblatex — §7 明列範圍外（TOC／index／bibliography）
+%   float / flafter — D8：圖就地 non-float，不進 float 機制
+%   caption         — 圖說是字面文字（D7），走 \hkfigcaption，不需 LaTeX caption 機制
+% ═══════════════════════════════════════════════════════════════════════════
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{needspace}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[most]{tcolorbox}
+
+% ── 幾何：A4，版心 150mm（2026-06-22 拍板；TYPESETTING_GUIDE §9）──────────────
+% 210 − 32 − 28 = 150mm。HTML 側實測版心 566.94px，圖的 px→mm 換算即以此為基準
+% （figures.json / DIALECT-ch03.md §5）。
+\usepackage[a4paper, left=32mm, right=28mm, top=22mm, bottom=24mm,
+            headheight=15pt, headsep=8mm, footskip=12mm]{geometry}
+
+% ── 字體：fontspec ＋ NewComputerModern ──────────────────────────────────────
+% NCM 對映 HTML 的 "WebCM Serif 10"（jsDelivr web-computer-modern，10pt optical size）
+% 與 MathJax 4 的 mathjax-newcm 數學字體——即講義 HTML 已在用的同一套字。
+% UI 面（env kicker、圖說）＝NewCM Sans。HTML 用的是 Inter，但裝桌面 Inter 屬新安裝
+% （CLAUDE.md「缺套件先問」），依 kickoff §4.4「不裝則以 NCM Sans 代替並記錄」辦理。
+% 已知後果：圖內標籤是 Inter（由 CDN 嵌進匯出的 PDF），圖說是 NCM Sans，兩者不同族。
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\setmainfont{NewCM10-Regular.otf}[
+  BoldFont       = NewCM10-Bold.otf,
+  ItalicFont     = NewCM10-Italic.otf,
+  BoldItalicFont = NewCM10-BoldItalic.otf,
+]
+\setsansfont{NewCMSans10-Regular.otf}[
+  BoldFont       = NewCMSans10-Bold.otf,
+  ItalicFont     = NewCMSans10-Oblique.otf,
+]
+\setmathfont{NewCMMath-Book.otf}
+
+% microtype 要在字體之後載入。protrusion＋expansion＝「出版級最後 5%」的來源之一
+% （kickoff §4.4）；lualatex 下 expansion 走 luaotfload。
+\usepackage{microtype}
+\microtypesetup{protrusion=true, expansion=true, tracking=true}
+
+% ── Leading（別照抄 CSS 數字）───────────────────────────────────────────────
+% HTML：12pt × line-height 1.55 ≈ 18.6pt 行距。
+% TeX：\linespread 是乘在預設 baselineskip 上，12pt class 的預設是 14.5pt。
+% 18.6 / 14.5 = 1.283 → \linespread{1.28}。以此為起點，視覺再微調（kickoff §4.4）。
+\linespread{1.28}
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{1.5em}   % 沿用 legacy layout.tex 的書本慣例（HTML 側是段距不縮排）
+\setlength{\emergencystretch}{1em}
+
+% ── 色盤 ───────────────────────────────────────────────────────────────────
+% 值＝從 chapter3-print-standalone.html 的 oklch() 實測解析出的 sRGB
+% （用 Chrome canvas 逐像素讀回，非手算換算）。必須與 HTML 一致：圖的 PDF 已經把
+% 這些顏色烤進去了，環境框若用別的色會與圖打架。
+% 來源 var 名稱標在右側，方便日後對帳。
+\definecolor{aConcept} {HTML}{994A00}   % --a-concept   definition
+\definecolor{aResult}  {HTML}{0068A7}   % --a-result    theorem / proposition / proof
+\definecolor{aPractice}{HTML}{04773B}   % --a-practice  example / solution
+\definecolor{aAside}   {HTML}{5D646F}   % --a-aside     remark
+\definecolor{aCaution} {HTML}{AA3333}   % --a-caution   caution
+\definecolor{aStrategy}{HTML}{6453A7}   % --a-strategy  strategy
+\definecolor{inkSoft}  {HTML}{565A63}   % --ink-soft
+\definecolor{inkFaint} {HTML}{8A8E98}   % --ink-faint
+\definecolor{hdrGrey}  {HTML}{9AA0AC}   % .sheet-header 的字色
+\definecolor{ftrGrey}  {HTML}{82868F}   % .sheet-footer 的字色
+
+% ── 標題 ───────────────────────────────────────────────────────────────────
+% 編號一律照抄字面（D7）：這些巨集收字串，不開 counter。
+\newcommand{\hkuiface}{\sffamily}
+% 標題一律 ragged-right：書的慣例，且 justify 的標題排不下就會 overfull
+% （實測：24pt 的章標題「Chain Rule and Trigonometric Derivatives」溢出 32.5pt）。
+\newcommand{\hkheadset}{\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000}
+
+\newcommand{\hkchapter}[2]{%
+  \clearpage
+  \thispagestyle{plain}%
+  \markboth{#1 \textperiodcentered\ #2}{#1 \textperiodcentered\ #2}%   % 頁首＝「Chapter 3 · 章名」
+  \vspace*{6mm}%
+  {\hkuiface\bfseries\fontsize{10}{12}\selectfont\color{aResult}%
+   \MakeUppercase{#1}\par}%
+  \vspace{2mm}%
+  % 2.5rem（root 16px）＝40px＝30pt，對映 .paper .chapter-head .ch-title。
+  % HTML 的 chapter-head 只有 margin-bottom，**沒有橫線**——先前這裡自作主張加了一條
+  % \rule，已移除：pilot 要讓使用者判斷的是「LaTeX 值不值得買單」，混進自創的樣式改動
+  % 會讓人分不清品質差異來自 TeX 還是來自改設計。
+  {\hkheadset\bfseries\fontsize{30}{33}\selectfont #2\par}%
+  \vspace{9mm}%
+}
+
+% \hksection{3.1}{Title} —— 編號是字面文字，不是 counter
+\newcommand{\hksection}[2]{%
+  \needspace{4\baselineskip}%
+  \vspace{8mm}%
+  % .sec-title { font-size: 2rem } ＝32px＝24pt，且**未覆寫 font-family → 繼承 serif**
+  % （.paper 的 --serif）。sec-no 走 --c-primary（＝aResult）。
+  {\hkheadset\bfseries\fontsize{24}{27}\selectfont
+   \textcolor{aResult}{#1}\hspace{0.5em}#2\par}%
+  \vspace{3.5mm}%
+  \noindent\ignorespaces
+}
+% .subsec-head { font-family: var(--ui); font-weight:600; font-size:1.08rem } ＝約 13pt sans，
+% 前面有個 18px×3px 的圓角藍條（::before）。
+\newcommand{\hksubsection}[1]{%
+  \needspace{3\baselineskip}%
+  \vspace{5.5mm}%
+  {\hkheadset\hkuiface\bfseries\fontsize{13}{16}\selectfont
+   \textcolor{aResult}{\rule[0.28ex]{4.8mm}{0.8mm}}\hspace{1.6mm}#1\par}%
+  \vspace{1.8mm}%
+  \noindent\ignorespaces
+}
+% .para-head { font-weight: 600 } —— 沒有 font-family 也沒有 font-size 覆寫，
+% 所以是 12pt **serif** 粗體（先前這裡誤做成 sans）。
+\newcommand{\hkparahead}[1]{%
+  \needspace{2\baselineskip}%
+  \vspace{3.5mm}%
+  {\hkheadset\bfseries\selectfont #1\par}%
+  \vspace{1mm}%
+  \noindent\ignorespaces
+}
+
+% ── 段落變體 ───────────────────────────────────────────────────────────────
+% .paper .lead { font-size: 1.05em } —— **只放大字級，不變色**。
+% 先前這裡上了 \color{inkSoft}（灰），是誤讀 HTML，已移除。1.05 × 12pt = 12.6pt；
+% 行距按 linespread 比例放大（12.6 × 1.55 ≈ 19.5pt）。
+\newenvironment{hklead}
+  {\par\vspace{1mm}\begingroup\fontsize{12.6}{19.5}\selectfont\noindent\ignorespaces}
+  {\par\endgroup\vspace{2mm}}
+\newenvironment{hkinformal}
+  {\par\begingroup\itshape\color{inkSoft}\noindent\ignorespaces}
+  {\par\endgroup}
+
+% ── 清單 ───────────────────────────────────────────────────────────────────
+\setlist{nosep, topsep=3pt, itemsep=3pt, parsep=0pt, leftmargin=1.6em}
+\newlist{hksteps}{enumerate}{1}
+\setlist[hksteps]{label=\textbf{\arabic*.}, leftmargin=1.9em, topsep=3pt, itemsep=4pt}
+
+% ── 環境 ───────────────────────────────────────────────────────────────────
+% HTML 視覺語言（skin-hs.vivid）：左側 accent 色條（3px、accent!70）＋16px 內縮；
+% env-head ＝ pill 狀 kicker（白字、accent 底、圓角）＋ accent 粗體字面編號
+% ＋ serif 斜體的 name；theorem/proposition 內文斜體（數學保持正體）。
+% caution／strategy ＝ accent!7 淡底實框、accent!22 細邊、左側 4px accent、圓角。
+% 目標是「書的樣子」而非像素複製（kickoff §4.4）。
+
+% pill：實心（definition/theorem/proposition/example）
+\newcommand{\hkpill}[2]{%
+  \tcbox[on line, colback=#1, colframe=#1, coltext=white, boxrule=0pt,
+         arc=1.6mm, boxsep=0pt, left=5pt, right=5pt, top=2pt, bottom=2pt]%
+        {\hkuiface\bfseries\fontsize{7.5}{9}\selectfont\addfontfeature{LetterSpace=8}%
+         \MakeUppercase{#2}}%
+}
+% pill：外框（proof/solution/remark —— HTML 用透明底＋accent 邊）
+\newcommand{\hkpillout}[2]{%
+  \tcbox[on line, colback=white, colframe=#1!45!white, coltext=#1, boxrule=0.4pt,
+         arc=1.6mm, boxsep=0pt, left=5pt, right=5pt, top=2pt, bottom=2pt]%
+        {\hkuiface\bfseries\fontsize{7.5}{9}\selectfont\addfontfeature{LetterSpace=8}%
+         \MakeUppercase{#2}}%
+}
+% env-head 一列：pill ＋ 字面編號 ＋ 選用斜體 name
+\newcommand{\hkenvhead}[5]{%
+  \noindent#1{#2}{#3}%
+  \ifx\relax#4\relax\else\hspace{0.5em}{\hkuiface\bfseries\color{#2}#4}\fi
+  \ifx\relax#5\relax\else\hspace{0.5em}{\itshape\color{inkSoft}#5}\fi
+  % 標頭後的第一段不縮排（書的慣例；HTML 的 env-body 也整段不縮排）。
+  % 後續段落照常縮排 1.5em。
+  \par\vspace{2mm}\noindent\ignorespaces
+}
+
+% 左側色條環境（breakable：環境可跨頁）
+\newtcolorbox{hkrule}[1]{
+  enhanced, breakable, blanker,
+  borderline west={2.2pt}{0pt}{#1!70!white},
+  left=12pt, right=0pt, top=3pt, bottom=3pt,
+  parbox=false, before skip=3.5mm, after skip=3.5mm,
+}
+% 實框環境（caution/strategy）
+\newtcolorbox{hkbox}[1]{
+  enhanced, breakable,
+  colback=#1!7!white, colframe=#1!22!white, boxrule=0.4pt,
+  borderline west={3pt}{0pt}{#1},
+  arc=2.2mm, left=12pt, right=12pt, top=8pt, bottom=8pt,
+  parbox=false, before skip=4mm, after skip=4mm,
+}
+
+% 每個環境的簽名一致：{kicker}{num}{name}（皆為字面字串，D7）
+\newenvironment{hkdefinition}[3]
+  {\begin{hkrule}{aConcept}\hkenvhead{\hkpill}{aConcept}{#1}{#2}{#3}}
+  {\end{hkrule}}
+\newenvironment{hktheorem}[3]
+  {\begin{hkrule}{aResult}\hkenvhead{\hkpill}{aResult}{#1}{#2}{#3}\itshape}
+  {\end{hkrule}}
+\newenvironment{hkproposition}[3]
+  {\begin{hkrule}{aResult}\hkenvhead{\hkpill}{aResult}{#1}{#2}{#3}\itshape}
+  {\end{hkrule}}
+% proof 以 □ 收尾（使用者裁決 F2：取「書的樣子」）。ch03 的 HTML proof 完全沒有 qed 標記，
+% 故這是 LaTeX 側刻意新增、HTML 沒有的東西——這是全書唯一一處刻意偏離 HTML 的樣式。
+% \unskip 吃掉末尾空白、\nobreak 防止 □ 被獨立斷到下一行。
+% 註：若某個 proof 以 display math 收尾，□ 會落在下一行——amsthm 用 \qedhere 解，但 HTML
+% 沒有 qed 標記可供對映（D7 的編號同理），故不引入。ch03 的 6 個 proof 皆以散文收尾，未觸發。
+% 用 amsthm 自己的 \qedsymbol（\openbox）——它由 \rule 組成，任何字體下都在，
+% 且語意正好是「證明結束記號」。不用 \square：那是 amssymb 的，為一個符號多載一個包不值得。
+\newcommand{\hkqed}{\unskip\nobreak\hfill\qedsymbol}
+\newenvironment{hkproof}[3]
+  {\begin{hkrule}{aResult}\hkenvhead{\hkpillout}{aResult}{#1}{#2}{#3}}
+  {\hkqed\end{hkrule}}
+% example／solution 自己不畫色條——它們永遠住在 workedexample 裡，由外層畫一條共用的
+% practice 色條（對映 HTML 的 .workedexample .env { padding-left:0; border-left:0 }）。
+% 這個前提是硬的：CONTRACT「no solo example」，且 ch03 盤點的 16＋16 個全在 workedexample
+% 內。convert.py 會強制檢查，違反即硬錯（否則這裡會靜默少畫一條）。
+\newenvironment{hkexample}[3]
+  {\par\hkenvhead{\hkpill}{aPractice}{#1}{#2}{#3}}
+  {\par\vspace{2mm}}
+\newenvironment{hksolution}[3]
+  {\par\hkenvhead{\hkpillout}{aPractice}{#1}{#2}{#3}}
+  {\par}
+\newenvironment{hkremark}[3]
+  {\begin{hkrule}{aAside}\hkenvhead{\hkpillout}{aAside}{#1}{#2}{#3}\color{inkSoft}\small}
+  {\end{hkrule}}
+\newenvironment{hkcaution}[3]
+  {\begin{hkbox}{aCaution}\hkenvhead{\hkpill}{aCaution}{#1}{#2}{#3}}
+  {\end{hkbox}}
+\newenvironment{hkstrategy}[3]
+  {\begin{hkbox}{aStrategy}\hkenvhead{\hkpill}{aStrategy}{#1}{#2}{#3}}
+  {\end{hkbox}}
+
+% workedexample：example＋solution 共用的那一條 practice 色條。
+% needspace 給 keep-together 傾向即可，別過度工程（kickoff §4.2）。
+\newenvironment{hkworkedexample}
+  {\needspace{5\baselineskip}\begin{hkrule}{aPractice}}
+  {\end{hkrule}}
+
+% ── 圖：就地 non-float（D8）─────────────────────────────────────────────────
+% 作者刻意把圖貼齊內容（「先文後圖」是既審事實），且圖號是字面固定的——讓 TeX float
+% 重排會破壞它。故不用 figure 環境。
+\graphicspath{{../figs/}}   % 自 shell/ 編譯：../figs/ch03/<id>.pdf（見 chapter3.tex 的建置指令）
+\newenvironment{hkfigure}
+  {\par\needspace{6\baselineskip}\vspace{4mm}\begin{center}}
+  {\end{center}\vspace{3mm}}
+\newcommand{\hkfigcaption}[2]{%
+  \par\vspace{2.5mm}%
+  {\hkuiface\fontsize{9.5}{13}\selectfont\color{inkSoft}%
+   \textbf{\color{black}#1}\hspace{0.4em}#2\par}%
+}
+
+% ── Running header／頁碼 ────────────────────────────────────────────────────
+% 對映現行 sheet-header／sheet-footer（章名＋頁碼）。
+% .sheet-header：左對齊「Chapter 3 · 章名」，8.5pt sans #9AA0AC，**無橫線、無頁碼**。
+% .sheet-footer：置中頁碼，9pt sans #82868F。
+% （先前這裡自作主張加了 headrule 並把頁碼放到頁首右側，與 HTML 不符，已改正。）
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\hkuiface\fontsize{8.5}{10.5}\selectfont\color{hdrGrey}%
+  \addfontfeature{LetterSpace=2}\nouppercase{\leftmark}}
+\fancyfoot[C]{\hkuiface\fontsize{9}{11}\selectfont\color{ftrGrey}\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}%
+  \fancyfoot[C]{\hkuiface\fontsize{9}{11}\selectfont\color{ftrGrey}\thepage}}

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<title>LaTeX pilot 對照報告 — Ch3</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+<style>
+ body{font:15px/1.75 "Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+      max-width:1180px;margin:0 auto;padding:32px 24px 80px;color:#1b1c1f}
+ h1{font-size:26px;margin:0 0 4px} h2{font-size:20px;margin:38px 0 12px;
+      padding-bottom:6px;border-bottom:2px solid #e5e7eb}
+ .sub{color:#82868f;margin:0 0 24px}
+ table{border-collapse:collapse;width:100%;margin:10px 0 18px}
+ th,td{border:1px solid #e5e7eb;padding:7px 10px;text-align:left;font-size:14px}
+ th{background:#f7f8fa} .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+ .g{color:#82868f} .ok{color:#04773b;font-weight:600}
+ .hero{display:flex;gap:22px;margin:18px 0}
+ .card{flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:16px 18px;background:#fbfcfd}
+ .card b{display:block;font-size:32px;color:#0068a7;font-variant-numeric:tabular-nums}
+ .card span{color:#565a63;font-size:13px}
+ .finding{border:1px solid #e5e7eb;border-left:4px solid #aa3333;border-radius:8px;
+      padding:12px 18px;margin:12px 0;background:#fdf7f7}
+ .finding h3{font-size:15px;margin:4px 0 6px}
+ .fid{background:#aa3333;color:#fff;border-radius:99px;padding:2px 9px;font-size:12px;margin-right:6px}
+ .ask{background:#fff;border-radius:6px;padding:8px 12px;margin:8px 0 4px;font-size:14px}
+ .pg{margin:26px 0;border-top:1px solid #eef0f3;padding-top:14px}
+ .pgno{font-weight:600;color:#82868f;font-size:13px;margin-bottom:8px}
+ .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+ .two figure{margin:0} .two img{width:100%;border:1px solid #e5e7eb;border-radius:4px;display:block}
+ .two figcaption{font-size:12px;color:#82868f;text-align:center;padding-top:5px}
+ .none{border:1px dashed #d7dae0;border-radius:4px;height:100%;min-height:300px;display:flex;
+      align-items:center;justify-content:center;color:#9aa0ac;font-size:13px}
+ code{background:#f1f3f5;border-radius:4px;padding:1px 5px;font-size:13px}
+ .note{background:#f7f8fa;border-left:3px solid #0068a7;padding:10px 16px;margin:14px 0;font-size:14px}
+</style></head><body>
+
+<h1>HTML→LaTeX 出版排版 pilot — Ch3 對照報告</h1>
+<p class="sub">KICKOFF-latex-pilot.md 的 M-P4 交付物 · 分支 <code>handout/latex-pilot</code> ·
+內容源＝<code>fragments/ch03/</code>（未改動一個字元）</p>
+
+<div class="note"><b>這份報告要你做的事：</b>看下面的逐頁對照，決定
+<b>GO（全面 rollout 到其他章）</b>或 <b>NO-GO（回兩階段案：HTML Tier-1 強化＋內容凍結後再轉）</b>。
+另有 5 條 finding（F1–F5）需要你個別裁決。</p>
+
+<h2>1. 一句話結論</h2>
+<p>同樣的內容、同樣的 150mm 版心、同樣的視覺設計語言，<b>LaTeX 用 24 頁排完 HTML 要 27 頁的內容</b>
+（密約 11%），且所有驗收閘全綠。密度來自 TeX 的全段斷行（Knuth–Plass）＋原生斷字＋microtype，
+不是把字縮小——兩側字級與版心完全相同。</p>
+
+<div class="hero">
+  <div class="card"><b>27 → 24</b><span>頁數（HTML → LaTeX），同內容同版心</span></div>
+  <div class="card"><b>605 / 605</b><span>數學恰好依序還原一次（pass-through 鐵律的封閉不變式）</span></div>
+  <div class="card"><b>0</b><span>overfull／missing char／散文落差</span></div>
+</div>
+
+<div class="note"><b>Codex gate-2 覆核紀錄：</b>第一輪判定「不能 sign-off」，列出 5 項真衝突——
+數學保護層不是封閉的不變式（同類分隔符巢狀會提早閉合、未配對不報錯、可用 <code>&amp;#xE000;</code>
+偽造占位符）、fail-loud 有靜默繞過（<code>&lt;ul&gt;DROP&lt;li&gt;</code> 的裸文字會被默默丟掉）、
+<code>\item [x]</code> 的 optional-argument 洞、測試與樹不同步、以及
+<b>export_figs 漏掉 Figure 3.6 兩格的 “larger h”／“smaller h”</b>（已實證的內容遺失）。
+五項皆已修並用測試鎖住（golden tests 36→52）。數學的保證也從「每段都是 .tex 的 substring」
+換成封閉不變式「<b>每段恰好被還原一次且依源順序</b>」——後者驗得到順序、重複與遺漏。</div>
+
+<h2>2. 驗收閘（kickoff §4.5）</h2>
+<table><tr><th>閘</th><th>判準</th><th>實測</th><th>結果</th></tr>
+<tr><td class="g">編譯閘</td><td>lualatex 0 error</td><td class="num">0</td><td class="ok">PASS</td></tr>
+<tr><td class="g">編譯閘</td><td>log 無 missing character</td><td class="num">0</td><td class="ok">PASS</td></tr>
+<tr><td class="g">版面閘</td><td>Overfull \hbox &gt; 2pt</td><td class="num">0</td><td class="ok">PASS</td></tr>
+<tr><td class="g">版面閘</td><td>Underfull \hbox</td><td class="num">0</td><td class="ok">PASS</td></tr>
+<tr><td class="g">完整性閘</td><td>轉換器節點交代率</td><td class="num">558 mapped / 0 skipped</td><td class="ok">PASS</td></tr>
+<tr><td class="g">完整性閘</td><td>數學恰好依序還原一次（封閉不變式）</td><td class="num">605 / 605</td><td class="ok">PASS</td></tr>
+<tr><td class="g">完整性閘</td><td>散文依序比對（4573 詞）</td><td class="num">0 處真落差</td><td class="ok">PASS</td></tr>
+<tr><td class="g">完整性閘</td><td>panel note 抵達 PDF</td><td class="num">2 / 2</td><td class="ok">PASS</td></tr>
+<tr><td class="g">圖</td><td>panel 匯出＋人眼過</td><td class="num">8 / 8</td><td class="ok">PASS</td></tr>
+<tr><td class="g">測試</td><td>golden tests</td><td class="num">58 / 58</td><td class="ok">PASS</td></tr>
+</table>
+
+<h2>3. 需要你裁決的事項</h2>
+<div class="finding"><h3><span class="fid">F1</span> 既有 HTML 瑕疵，會原樣進 PDF</h3><p><code>composed-mapping</code>（Figure 3.5）的標籤用 Unicode 下標零 <code>x₀</code>（U+2080），Inter 沒有這個字符，Chrome 就單獨對那一個字符掉到 <b>Times New Roman</b>。已用 CDP <code>CSS.getPlatformFontsForNode</code> 逐節點比對，<b>真實 HTML 頁面與匯出的 PDF 完全一致</b>（Inter×7 + Times×1），故非匯出失真，是既有 HTML 的既存瑕疵。依 D6「HTML 留檔不修」未動。</p><p class="ask"><b>需要你裁決：</b>要不要為出版級品質，把圖標籤的 <code>x₀</code> 改成 MathJax 標籤（需動 standalone 的 FIGS，屬 D6 已裁定「不修」的範圍，故請你裁決）？</p></div>
+<div class="finding"><h3><span class="fid">F2</span> LaTeX 側新增了 HTML 沒有的東西</h3><p>ch03 的 HTML proof 完全沒有 QED 記號（6 個 proof、16 個 solution 皆無），雖然 <code>CONTRACT-html-writing.md</code> 說 proof 應以 <code>&lt;span class="qed qed-proof"&gt;</code> 收尾。目前 LaTeX 側也<b>沒有</b>補 □（跟隨 HTML 現況）。</p><p class="ask"><b>需要你裁決：</b>要跟隨 HTML（維持無 QED），還是取「書的樣子」補上 □？</p></div>
+<div class="finding"><h3><span class="fid">F3</span> 字體不同族</h3><p>圖<b>內</b>的標籤是 <b>Inter</b>（由 CDN 載入、已嵌進匯出的 PDF），而圖說與 env kicker 是 <b>NCM Sans</b>。HTML 兩者都是 Inter。依 kickoff §4.4「裝字體屬新安裝，先問；不裝則以 NCM Sans 代替並記錄」，本輪未裝 Inter。</p><p class="ask"><b>需要你裁決：</b>要不要裝桌面版 Inter（新安裝，需你同意），讓 LaTeX 側的 UI 面與圖內標籤同族？</p></div>
+<div class="finding"><h3><span class="fid">F4</span> pair 圖的置中基準</h3><p>匯出的 page box 含標籤溢出，左右不對稱；LaTeX 置中的是墨水框，HTML 置中的是 SVG 框，故圖可能有數 px 級視覺位移。ch03 只有 <code>remainder-tangent</code>（Figure 3.6）一張 pair。</p><p class="ask"><b>需要你裁決：</b>人眼閘未發現可見差異，列此備查。</p></div>
+<div class="finding"><h3><span class="fid">F5</span> 圖內文字閘目前是循環的（已知極限，不擋 pilot）</h3><p><code>check_prose.py</code> 的 panel note 檢查，oracle 是 <b>exporter 自己申報的</b> <code>figures.json</code>。已實測此偽陰性：把 exporter 退回只 clone <code>&lt;svg&gt;</code>，它就不申報 notes，閘於是說「無 note 需檢查」而放行——正是它要抓的那個 bug。它能守的是「申報之後」的環節（manifest → convert.py → LaTeX → PDF）。另一個做法（HTML PDF vs LaTeX PDF 詞集比對）也實測被否決：note 是 “larger h”，而 “larger” 在課文散文裡也有（<i>the larger triangle OAC…</i>），詞集找得到就誤判成沒掉。</p><p class="ask"><b>需要你裁決：</b>rollout 前要補一個獨立於 exporter 的 oracle（只讀 live page 的 CDP 探針，或對 HTML 印出的 PDF 做 exact-phrase count）。目前 ch03 的 2 條 note 已用人眼＋<code>pdftotext</code> 逐條確認在 PDF 裡。</p></div>
+
+<h2>4. 圖：實測尺寸</h2>
+<p>7 個 figure／8 個 panel。寬度＝在 HTML 版心（實測 566.94px）量到的實際渲染寬，
+換算成 mm（<code>px ÷ 566.94 × 150mm</code>）。<b>不是</b> <code>\textwidth</code>——
+SVG 自帶 inline width，多數圖只佔約半欄，撐到 <code>\textwidth</code> 會把圖內標籤等比放大約一倍。</p>
+<table><tr><th>data-fig</th><th>page px</th><th>LaTeX 寬</th></tr>
+<tr><td><code>sector-inequality</code></td><td class="num">302×302</td><td class="num">79.9 mm</td></tr>
+<tr><td><code>squeeze-limit</code></td><td class="num">309.64×198</td><td class="num">81.92 mm</td></tr>
+<tr><td><code>sin-cos-slope</code></td><td class="num">208.13×123.45</td><td class="num">55.07 mm</td></tr>
+<tr><td><code>shm-triple</code></td><td class="num">302×302</td><td class="num">79.9 mm</td></tr>
+<tr><td><code>composed-mapping</code></td><td class="num">302×277</td><td class="num">79.9 mm</td></tr>
+<tr><td><code>remainder-tangent</code></td><td class="num">248×213.58</td><td class="num">65.62 mm</td></tr>
+<tr><td><code>remainder-tangent</code>（panel 2）</td><td class="num">248×213.58</td><td class="num">65.62 mm</td></tr>
+<tr><td><code>arcsin-vertical-tangent</code></td><td class="num">242×338</td><td class="num">64.03 mm</td></tr>
+</table>
+
+<h2>5. 逐頁對照（HTML 左／LaTeX 右）</h2>
+<p class="sub">兩側頁數不同是<b>預期的</b>——LaTeX 排得更密，所以同一序號的兩頁在後段會逐漸錯開，
+不是內容遺漏（完整性閘已證明散文 0 落差、數學 605/605 逐位元組相同）。</p>
+<div class="pg"><div class="pgno">第 1 頁</div><div class="two"><figure><img loading="lazy" src="img/html-01.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-01.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 2 頁</div><div class="two"><figure><img loading="lazy" src="img/html-02.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-02.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 3 頁</div><div class="two"><figure><img loading="lazy" src="img/html-03.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-03.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 4 頁</div><div class="two"><figure><img loading="lazy" src="img/html-04.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-04.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 5 頁</div><div class="two"><figure><img loading="lazy" src="img/html-05.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-05.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 6 頁</div><div class="two"><figure><img loading="lazy" src="img/html-06.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-06.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 7 頁</div><div class="two"><figure><img loading="lazy" src="img/html-07.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-07.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 8 頁</div><div class="two"><figure><img loading="lazy" src="img/html-08.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-08.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 9 頁</div><div class="two"><figure><img loading="lazy" src="img/html-09.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-09.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 10 頁</div><div class="two"><figure><img loading="lazy" src="img/html-10.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-10.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 11 頁</div><div class="two"><figure><img loading="lazy" src="img/html-11.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-11.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 12 頁</div><div class="two"><figure><img loading="lazy" src="img/html-12.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-12.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 13 頁</div><div class="two"><figure><img loading="lazy" src="img/html-13.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-13.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 14 頁</div><div class="two"><figure><img loading="lazy" src="img/html-14.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-14.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 15 頁</div><div class="two"><figure><img loading="lazy" src="img/html-15.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-15.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 16 頁</div><div class="two"><figure><img loading="lazy" src="img/html-16.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-16.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 17 頁</div><div class="two"><figure><img loading="lazy" src="img/html-17.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-17.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 18 頁</div><div class="two"><figure><img loading="lazy" src="img/html-18.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-18.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 19 頁</div><div class="two"><figure><img loading="lazy" src="img/html-19.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-19.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 20 頁</div><div class="two"><figure><img loading="lazy" src="img/html-20.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-20.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 21 頁</div><div class="two"><figure><img loading="lazy" src="img/html-21.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-21.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 22 頁</div><div class="two"><figure><img loading="lazy" src="img/html-22.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-22.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 23 頁</div><div class="two"><figure><img loading="lazy" src="img/html-23.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-23.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 24 頁</div><div class="two"><figure><img loading="lazy" src="img/html-24.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><img loading="lazy" src="img/tex-24.png"><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 25 頁</div><div class="two"><figure><img loading="lazy" src="img/html-25.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><div class="none">（LaTeX 側無此頁——內容已在前面排完）</div><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 26 頁</div><div class="two"><figure><img loading="lazy" src="img/html-26.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><div class="none">（LaTeX 側無此頁——內容已在前面排完）</div><figcaption>LaTeX（lualatex）</figcaption></figure></div></div><div class="pg"><div class="pgno">第 27 頁</div><div class="two"><figure><img loading="lazy" src="img/html-27.png"><figcaption>HTML（瀏覽器排版）</figcaption></figure><figure><div class="none">（LaTeX 側無此頁——內容已在前面排完）</div><figcaption>LaTeX（lualatex）</figcaption></figure></div></div>
+
+</body></html>

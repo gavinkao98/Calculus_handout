@@ -78,6 +78,7 @@ handout/chapterN-print-standalone.html（定稿講義的一節）
   - `handout/fragments/chNN/sec-*.html` — 章節源檔，每節一個 fragment。
   - `handout/build.py` — 組版器：產出 `handout/chapterN-print-standalone.html`（僅列印版；螢幕版已移除）。
   - `handout/TYPESETTING_GUIDE.md` — HTML 排版指南；`handout/CONTRACT-html-writing.md` — 權威性 HTML 標記契約。
+  - `handout/tex_export/` — **出版排版線（HTML→LaTeX；pilot GO 2026-07-17）**：`convert.py` 確定性轉換 fragment（數學逐位元組 pass-through、表外標記硬錯）→ `template/calcbook.sty`（memoir＋NewComputerModern＋vendored Inter）→ `latexmk -lualatex` 出 A4 PDF。權威文檔＝[`handout/KICKOFF-latex-pilot.md`](handout/KICKOFF-latex-pilot.md)（沿革＋rollout 計畫）、`tex_export/DIALECT-*.md`（方言凍結表）、`tex_export/template/M-B1-DECISIONS.md`（模板拍板紀錄）。
   - `handout/_audit/PROSE-AUDIT-RUBRIC.md` — 散文稽核 rubric（gate 1 契約）；`handout/_dev-archive/chNN/` — 各章編排檔（`PLAN-chNN.md`、`PROMPT-sNM-kickoff.md`、`brief_sNM.md`、`seed_chNN.md`）。
 - `authoring/` — 撰稿方法論與機制 R&D。六階方向層流程已畢業為頂層 [`CONTENT_DIRECTION.md`](CONTENT_DIRECTION.md)；`authoring/direction_layer/` 保留其端到端驗證紀錄（`ch01/`、`test/`），`authoring/seed_converge/` 為機制 R&D（`SYNTHESIS.md`、`PLAN_codex_subscription_loop.md`、`run.py`、`figure_critic.py`、`figure_fix.py`、`rules.md`）。
 - `problem_banks/` — 開放授權題庫的本地 clone 區（內容 gitignored，僅 README 進版控）。選題工作流程見 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md)。
@@ -100,6 +101,8 @@ handout/chapterN-print-standalone.html（定稿講義的一節）
 ## 輸出格式
 
 生產用講義的輸出是 `handout/chapterN-print-standalone.html`——由 `handout/build.py` 將各 fragment 組裝而成的列印用 standalone HTML，A4 分頁透過 JS paginator（`place()`）達成；數學以 MathJax／KaTeX CDN 渲染。設計為單張單頁列印、作為講義發送，而非裝訂成冊。版面與排版細節見 [`handout/TYPESETTING_GUIDE.md`](handout/TYPESETTING_GUIDE.md)。
+
+**出版排版（2026-07-17 pilot GO）**：出版級輸出走 `handout/tex_export/` 的 LaTeX 線——fragment 仍是唯一內容源（一字不改），`convert.py` 轉為 `template/calcbook.sty` 的語意指令，`latexmk -lualatex` 產 A4 PDF（appB 實測：同內容 HTML 20 頁 → LaTeX 14 頁，四閘全綠）。HTML standalone 自此定位為**撰稿預覽＋圖閘 render 載體**（kickoff 決策 D2／D6）；逐章 rollout 順序見 [`handout/KICKOFF-latex-pilot.md`](handout/KICKOFF-latex-pilot.md) §9。
 
 > **Legacy（LaTeX 講義）：** 已凍結的 LaTeX 版（`legacy/tex_handout/`）以 `\documentclass[a4paper,12pt,oneside]{book}` 產出單面 A4 PDF：`margin=3.3cm` 對稱、`\linespread{1.05}`、`\fancyhead`/`\fancyfoot` 單面 header／footer，並由 `main.tex` 以 `\ifprintbibliography` 與 `\ifincludescratchchapter` 開關控制參考書目與暫存章節。此路徑不再用於生產。
 

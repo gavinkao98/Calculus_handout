@@ -1,0 +1,294 @@
+﻿% ═══════════════════════════════════════════════════════════════════════════
+% calcbook.sty — LaTeX pilot v2 書籍模板（KICKOFF-latex-pilot.md M-B1）
+%
+% 地基＝memoir（M-B1 議題① 拍板）；引擎＝lualatex（D4）。
+% 結構＝兩層分離（D9）：
+%   【語意層】轉換器唯一可射的指令集，名稱凍結於 template/M-B1-DECISIONS.md §2
+%             （與 DIALECT-appB.md §4 對表）。args 一律字面照抄（D7，無 counter）。
+%   【樣式層】cb@ 前綴的內部實作。改設計只動這一層，不碰語意層簽名、不碰轉換器。
+%
+% 設計錨＝現行 HTML 視覺語彙（appendixB-print-standalone.html，skin-hs vivid），
+% 拍板紀錄＝template/M-B1-DECISIONS.md。與 HTML 的刻意偏離都標【judgment】，
+% 樣張拍板時逐條過。沿革：v1 shell/preamble.tex 的 NCM 載入、pill、tcolorbox
+% 寫法經 ch03 實編驗證，此處改造沿用。
+% ═══════════════════════════════════════════════════════════════════════════
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{calcbook}[2026/07/17 v0.2 handout LaTeX pilot v2 template]
+
+% ── 依賴（每個都是 appB/sampler 實際用到的；kickoff「不預裝用不到的」）────────
+\usepackage{amsmath}
+\usepackage{amsthm}        % 只取 \qedsymbol（\openbox）
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{graphicx}   % figure 語意層（non-float，D8；rollout 用、appB 無圖）
+\usepackage{xcolor}
+\usepackage{luacolor}   % 色彩改 attribute-based：修 LuaTeX 下 \color 跨 breakable box
+                        % 分頁遺失的已知問題（tcolorbox §19.2；Codex gate-2 A2）
+\usepackage[most]{tcolorbox}
+
+% ── 字體：NCM（本文＋數學）＋ vendored Inter（UI；議題⑦ 拍板）────────────────
+% NCM 對映 HTML 的 "WebCM Serif 10"＋MathJax 4 mathjax-newcm（v1 已驗證檔名載入）。
+% Inter 進 repo（fonts/inter/，OFL 授權隨附），fontspec Path= 載入——換機零安裝。
+% 路徑相對於編譯 CWD（＝template/；latexmk 從本目錄跑）。
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\setmainfont{NewCM10-Regular.otf}[
+  BoldFont       = NewCM10-Bold.otf,
+  ItalicFont     = NewCM10-Italic.otf,
+  BoldItalicFont = NewCM10-BoldItalic.otf,
+]
+\setmathfont{NewCMMath-Book.otf}
+\newfontfamily\cbuiregular{Inter-Regular.otf}[
+  Path = fonts/inter/, ItalicFont = Inter-Italic.otf, BoldFont = Inter-Bold.otf]
+\newfontfamily\cbuimedium{Inter-Medium.otf}[Path = fonts/inter/]
+\newfontfamily\cbuisemibold{Inter-SemiBold.otf}[Path = fonts/inter/]
+\newfontfamily\cbuibold{Inter-Bold.otf}[
+  Path = fonts/inter/, ItalicFont = Inter-BoldItalic.otf]
+
+% microtype 在字體之後。protrusion＋expansion＝出版級的「最後 5%」（kickoff §4.2）。
+\usepackage{microtype}
+\microtypesetup{protrusion=true, expansion=true, tracking=true}
+
+% ── Leading 與段落模型 ──────────────────────────────────────────────────────
+% 【2026-07-17 拍板：經典教科書對標】baselineskip 16pt（12pt 本文、倍率 1.33＝數學
+% 教科書正中帶，近 10/12 傳統比例）。HTML 的 18.6pt（1.55）是網頁閱讀節奏，捨之，
+% 換每頁 39→45 行（＋15% 密度）。16/14.5 → \linespread{1.103}。
+\linespread{1.103}
+% 【judgment】段落模型＝書籍慣例（縮排 1.5em＋零段距），沿 v1 裁量；HTML 是
+% 「段距不縮排」。§4.2 議題清單未列，列為樣張判斷點——翻回 HTML 模型只改這兩行。
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{1.5em}
+\setlength{\emergencystretch}{1em}
+
+% ── 版面：A4、版心 150mm（TYPESETTING_GUIDE §9 拍板；memoir 原生指令）─────────
+% 210 − 32 − 28 = 150mm；上下 20mm 對映 .sheet padding。
+% 頁眉對映 .sheet-header（top 11mm）、頁碼對映 .sheet-footer（bottom 8.5mm）。
+\setlrmarginsandblock{32mm}{28mm}{*}
+% 【2026-07-17 拍板】上 17／下 23mm（總 40mm 不變＝零密度成本）：書籍式配重，
+% 版心視覺中心上移、下緣加重；HTML 現況是均等 20／20（.sheet padding）。
+\setulmarginsandblock{17mm}{23mm}{*}
+\setheadfoot{15pt}{11.5mm}          % headheight / footskip（頁碼 baseline ≈ 底邊上 8.5mm）
+                                    % headheight 15pt：頁眉實高 14.5pt（gate-2 回歸 H1），14pt 會觸 memoir warning
+\setheaderspaces{*}{4.5mm}{*}       % headsep（頁眉 baseline ≈ 頂邊下 13mm，視覺微調點）
+\checkandfixthelayout[fixed]
+\raggedbottom
+
+% ── 色盤：v1 自 Chrome 實測解析的 sRGB（圖 PDF 已烤進同組色，必須一致）────────
+\definecolor{aConcept} {HTML}{994A00}   % --a-concept   definition
+\definecolor{aResult}  {HTML}{0068A7}   % --a-result    theorem/proposition/proof/主色
+\definecolor{aPractice}{HTML}{04773B}   % --a-practice  example/solution
+\definecolor{aAside}   {HTML}{5D646F}   % --a-aside     remark
+\definecolor{aCaution} {HTML}{AA3333}   % --a-caution   caution
+\definecolor{aStrategy}{HTML}{6453A7}   % --a-strategy  strategy
+\definecolor{inkSoft}  {HTML}{565A63}   % --ink-soft
+\definecolor{inkFaint} {HTML}{8A8E98}   % --ink-faint
+\definecolor{ruleGrey} {HTML}{E5E7EB}   % --rule（sec-head 上緣線）
+\definecolor{hdrGrey}  {HTML}{9AA0AC}   % .sheet-header 字色
+\definecolor{ftrGrey}  {HTML}{82868F}   % .sheet-footer 字色
+% 【judgment】本文字色＝純黑（HTML 是軟黑 #1B1C1F）：印刷以 K100 為正，避免
+% 出版時四色灰。樣張判斷點。
+
+% ═══════════════════════════════════════════════════════════════════════════
+% 樣式層（cb@ 內部；語意層在檔尾。.sty 內 @ 恆為字母，勿加 \makeatother）
+% ═══════════════════════════════════════════════════════════════════════════
+
+% 標題共用：ragged、禁斷字（v1 實測 justify 標題會 overfull）
+\newcommand{\cb@headset}{\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000}
+
+% keep-together：**不用 needspace 套件**。其實作＝「彈性膠水＋負 penalty」的誘餌斷點，
+% 在 raggedbottom 下是全頁唯一便宜的斷點（其他斷點 b=10000）——只要頁面在不可伸展的
+% 散文處溢出，斷點就被吸到它那裡，節標題被整頁推走（M-B3 以 \tracingpages 實測定位：
+% needspace 點 c=2161、其餘 c=100000）。改為無痕硬檢查：剩餘不足才 \newpage，
+% 足夠則不留任何 node，頁面成本地景不被污染。
+\newcommand{\cb@needspace}[1]{%
+  \par
+  \ifdim\pagegoal=\maxdimen\else
+    \ifdim\dimexpr\pagegoal-\pagetotal\relax<#1\newpage\fi
+  \fi}
+
+% ── 頁眉頁碼（議題⑧ 拍板：節級動態頁眉）────────────────────────────────────
+% \sechead 每次 \markright「節號 · 節題」；頁眉印 \rightmark＝**該頁第一個 mark**：
+% 頁面若有新節開始（含中段開始），頁眉顯示新節；整頁無新節才沿用前節。此為 LaTeX
+% 書籍標準慣例（Codex gate-2 B4 校正原註解——原寫「起於節中段沿用前節」與行為不符）。
+% 章首頁 openerpage：無頁眉、有頁碼。
+\newcommand{\cb@hdrfont}{\cbuimedium\fontsize{8.5}{10.5}\selectfont
+  \addfontfeature{LetterSpace=2}\color{hdrGrey}}
+\newcommand{\cb@ftrfont}{\cbuimedium\fontsize{9}{11}\selectfont\color{ftrGrey}}
+\makepagestyle{calcbook}
+\makeoddhead{calcbook}{{\cb@hdrfont\rightmark}}{}{}
+\makeevenhead{calcbook}{{\cb@hdrfont\rightmark}}{}{}
+\makeoddfoot{calcbook}{}{{\cb@ftrfont\thepage}}{}
+\makeevenfoot{calcbook}{}{{\cb@ftrfont\thepage}}{}
+\makepagestyle{openerpage}
+\makeoddfoot{openerpage}{}{{\cb@ftrfont\thepage}}{}
+\makeevenfoot{openerpage}{}{{\cb@ftrfont\thepage}}{}
+\pagestyle{calcbook}
+
+% ── 開場（議題② 拍板：緊湊對映）────────────────────────────────────────────
+% kicker（Inter 700 全大寫、字距 .18em→LetterSpace=18、aResult）＋標題（議題③
+% 拍板：26pt，自現行 30pt 收斂）＋連排接 lead；開場頁無頁眉。
+\newcommand{\cb@opener}[2]{%
+  \clearpage\thispagestyle{openerpage}%
+  \markboth{}{}%
+  % kicker 字級：HTML 換算 8.6pt 印刷上偏小（樣張 v1 使用者回饋），放大到 11pt。
+  % \noindent：kicker 是普通段落，會吃全域 \parindent 1.5em 而不與標題左齊
+  % （標題行的 \raggedright 會歸零縮排）——GO 檢視時使用者回報，修之。
+  {\noindent\cbuibold\fontsize{11}{13}\selectfont\addfontfeature{LetterSpace=18}%
+   \color{aResult}\MakeUppercase{#1}\par}%
+  \vspace{2.2mm}%
+  {\cb@headset\bfseries\fontsize{26}{29}\selectfont #2\par}%
+  \vspace{7mm}%
+  \noindent\ignorespaces}
+
+% ── 節標題（議題③ 拍板：溫和書籍化 20pt；rule＋藍號照舊）────────────────────
+% HTML 節奏 margin-top 2.7em／rule／padding-top 1.35em／title／margin-bottom 1.5em；
+% 頁首起頭時不畫 rule（對映 .sheet-body > .sec-head:first-child）——以 \pagetotal
+% 偵測「本頁尚無內容」。
+\newcommand{\cb@sechead}[2]{%
+  \par\cb@needspace{5\baselineskip}%
+  \ifdim\pagetotal<1pt
+    \vspace*{1mm}%
+  \else
+    \vspace{8.5mm}{\color{ruleGrey}\hrule height 0.5pt}\vspace{5mm}%
+  \fi
+  {\cb@headset\bfseries\fontsize{20}{23}\selectfont
+   \textcolor{aResult}{#1}\hspace{0.5em}#2\par}%
+  \vspace{4mm}%
+  \markright{#1 \textperiodcentered\ #2}%
+  \noindent\ignorespaces}
+
+% subsec（appB 未用；rollout 備）：Inter 600 ≈13pt＋藍色小橫槓（對映 ::before）
+\newcommand{\cb@subsechead}[1]{%
+  \par\cb@needspace{3\baselineskip}\vspace{5.5mm}%
+  {\cb@headset\cbuisemibold\fontsize{13}{16}\selectfont
+   \textcolor{aResult}{\rule[0.28ex]{4.8mm}{0.8mm}}\hspace{1.6mm}#1\par}%
+  \vspace{1.8mm}\noindent\ignorespaces}
+
+% ── kicker pill（vivid：.64rem≈7.7pt、LetterSpace .07em→7、圓角全圓）─────────
+\newcommand{\cb@pillfont}{\cbuibold\fontsize{7.7}{9.2}\selectfont
+  \addfontfeature{LetterSpace=7}}
+\newcommand{\cb@pill}[2]{%      實心：definition/theorem/proposition/example/caution/strategy
+  \tcbox[on line, colback=#1, colframe=#1, coltext=white, boxrule=0pt,
+         arc=2.1mm, boxsep=0pt, left=5pt, right=5pt, top=2.2pt, bottom=2.2pt]%
+        {\cb@pillfont\MakeUppercase{#2}}}
+\newcommand{\cb@pillout}[2]{%   外框：solution/remark（透明底、accent 字、45% 細框）
+  \tcbox[on line, colback=white, colframe=#1!45!white, coltext=#1, boxrule=0.5pt,
+         arc=2.1mm, boxsep=0pt, left=5pt, right=5pt, top=2.2pt, bottom=2.2pt]%
+        {\cb@pillfont\MakeUppercase{#2}}}
+\newcommand{\cb@pilloutit}[2]{% 外框斜體：proof（HTML .env-proof .env-kicker italic）
+  \tcbox[on line, colback=white, colframe=#1!45!white, coltext=#1, boxrule=0.5pt,
+         arc=2.1mm, boxsep=0pt, left=5pt, right=5pt, top=2.2pt, bottom=2.2pt]%
+        {\cb@pillfont\itshape\addfontfeature{LetterSpace=4}\MakeUppercase{#2}}}
+
+% env 標頭一列：pill＋字面編號（Inter 700 accent ≈11.3pt）＋選用 serif 斜體 name
+% #1 pill 巨集  #2 色  #3 kicker  #4 num（可空）  #5 name（可空）
+\newcommand{\cb@envhead}[5]{%
+  \noindent#1{#2}{#3}%
+  \if\relax\detokenize{#4}\relax\else
+    \hspace{0.55em}{\cbuibold\fontsize{11.3}{13}\selectfont\color{#2}#4}\fi
+  \if\relax\detokenize{#5}\relax\else
+    \hspace{0.55em}{\itshape\color{inkSoft}#5}\fi
+  \par\nobreak\vspace{2.2mm}\noindent\ignorespaces}
+
+% ── env 容器兩形（議題④ 拍板：忠實對映；⑤ 拍板：breakable）──────────────────
+% 左緣色線：3px（vivid）→2.25pt、70% 淡化、內縮 16px→12pt、外距 1.2em≈4.3mm
+\newtcolorbox{cb@leftrule}[1]{
+  enhanced, breakable, blanker,
+  borderline west={2.25pt}{0pt}{#1!70!white},
+  left=12pt, right=0pt, top=1pt, bottom=1pt,
+  before skip=4.3mm, after skip=4.3mm, parbox=false,
+}
+% 染色卡片（caution/strategy）：7% 底、22% 框 1px、左 4px 實色、圓角 8px→2.1mm、
+% 內距 15px 20px→11pt 15pt、外距 1.4em≈5mm
+\newtcolorbox{cb@card}[1]{
+  enhanced, breakable,
+  colback=#1!7!white, colframe=#1!22!white, boxrule=0.5pt,
+  borderline west={3pt}{0pt}{#1},
+  arc=2.1mm, left=15pt, right=15pt, top=11pt, bottom=11pt,
+  before skip=5mm, after skip=5mm, parbox=false,
+}
+
+% 語意環境共用建構器：\cb@mkenv{語意名}{容器}{色}{pill 巨集}{頭後鉤}
+% 簽名一致（M-B1-DECISIONS §2）：{kicker 字面}{num 字面可空}{name 可空}
+% ＝三個 mandatory（Codex gate-2 B1）：尾端 optional [name] 對機器 emitter 有歧義
+% ——body 首 token 是「[」會被吃成 name、name 含未分組「]」提早閉合。改 {kicker}{num}{name}
+% 皆必填（可空 {}），與 v1 convert.py 的輸出形一致。
+\newcommand{\cb@mkenv}[5]{%
+  \NewDocumentEnvironment{#1}{m m m}{%
+    \begin{#2}{#3}%
+    \cb@envhead{#4}{#3}{##1}{##2}{##3}%
+    #5%
+  }{\end{#2}}}
+
+% ═══════════════════════════════════════════════════════════════════════════
+% 語意層（轉換器 emitter 的目標語言；名稱凍結，見 M-B1-DECISIONS.md §2）
+% ═══════════════════════════════════════════════════════════════════════════
+
+% ── 開場與標題 ──────────────────────────────────────────────────────────────
+\newcommand{\chapteropener}[2]{\cb@opener{#1}{#2}}   % rollout：Chapter N
+\newcommand{\appendixopener}[2]{\cb@opener{#1}{#2}}  % appB：Appendix B
+\newcommand{\sechead}[2]{\cb@sechead{#1}{#2}}
+\newcommand{\subsechead}[1]{\cb@subsechead{#1}}
+\newcommand{\parahead}[1]{%   % p.para-head：12pt serif 粗體（不換 sans）
+  \par\cb@needspace{2\baselineskip}\vspace{3.2mm}%
+  {\cb@headset\bfseries #1\par}\vspace{1mm}\noindent\ignorespaces}
+
+% ── env 家族（10 類，含 rollout 的 theorem/corollary）：{kicker}{num}{name}，
+%    三參數皆必填、可空 {}（Codex gate-2 B1）；全部 breakable ───────────────────
+\cb@mkenv{envdefinition} {cb@leftrule}{aConcept} {\cb@pill}{}
+\cb@mkenv{envtheorem}    {cb@leftrule}{aResult}  {\cb@pill}{\itshape}      % 內文斜體
+\cb@mkenv{envproposition}{cb@leftrule}{aResult}  {\cb@pill}{\itshape}      % （數學自動正體）
+\cb@mkenv{envcorollary}  {cb@leftrule}{aResult}  {\cb@pill}{}              % HTML corollary 不斜
+\cb@mkenv{envproof}      {cb@leftrule}{aResult}  {\cb@pilloutit}{}         % qed 記號驅動，不自動補
+\cb@mkenv{envremark}     {cb@leftrule}{aAside}   {\cb@pillout}{\color{inkSoft}\small}
+\cb@mkenv{envcaution}    {cb@card}    {aCaution} {\cb@pill}{}
+\cb@mkenv{envstrategy}   {cb@card}    {aStrategy}{\cb@pill}{}
+% example／solution 不自畫色條——永遠住在 workedexample 的共用綠條裡
+% （CONTRACT「no solo example」，convert.py 硬性檢查）
+\NewDocumentEnvironment{envexample}{m m m}{%
+  \par\cb@envhead{\cb@pill}{aPractice}{#1}{#2}{#3}%
+}{\par\vspace{2.2mm}}
+\NewDocumentEnvironment{envsolution}{m m m}{%
+  \par\cb@envhead{\cb@pillout}{aPractice}{#1}{#2}{#3}%
+}{\par}
+\NewDocumentEnvironment{workedexample}{}{%   % ⑤ 拍板：可斷＋頭部保護
+  \cb@needspace{5\baselineskip}\begin{cb@leftrule}{aPractice}%
+}{\end{cb@leftrule}}
+
+% ── 段落級語意 ──────────────────────────────────────────────────────────────
+\NewDocumentEnvironment{lead}{}{%   % p.lead：1.05em＝12.6pt，行距隨 16pt 節奏等比（≈17pt）
+  \par\begingroup\fontsize{12.6}{17}\selectfont\noindent\ignorespaces
+}{\par\endgroup\vspace{1.5mm}}
+\NewDocumentEnvironment{informal}{}{%   % p.informal：斜體＋inkSoft
+  \par\begingroup\itshape\color{inkSoft}\noindent\ignorespaces
+}{\par\endgroup}
+\NewDocumentEnvironment{centerstatement}{}{%   % 置中陳述（appB 差集；可含 \\）
+  \par\begingroup\centering\noindent\ignorespaces
+}{\par\endgroup}
+\newcommand{\runin}[1]{\textbf{#1}}            % strong＝run-in 標籤（議題⑥）
+\newcommand{\readingtrack}[1]{\par{\itshape #1}\par}  % p><em 整段（ch01；sampler 展示）
+\newcommand{\qedmark}{\unskip\nobreak\hfill\qedsymbol}  % span.qed 記號驅動
+
+% ── 清單（議題⑥ 拍板：樸素＋懸掛；ul bullet＝aResult 藍，對映 ul::marker）────
+\setlist{topsep=3pt, itemsep=3pt, parsep=0pt}
+\setlist[itemize]{label=\textcolor{aResult}{\textbullet}, leftmargin=1.6em}
+\newlist{steps}{enumerate}{1}                  % ol.steps：粗體數字（NCM Bold）＋懸掛
+\setlist[steps]{label=\textbf{\arabic*.}, leftmargin=1.9em, itemsep=4pt}
+\newlist{bulletsteps}{itemize}{1}              % ul.steps（appB 差集）
+\setlist[bulletsteps]{label=\textcolor{aResult}{\textbullet}, leftmargin=1.6em, itemsep=4pt}
+\newlist{sollist}{itemize}{1}                  % ul.sol-list（env 內＋散文位置同式）
+\setlist[sollist]{label=\textcolor{aResult}{\textbullet}, leftmargin=1.6em, itemsep=3pt}
+\newlist{objectives}{itemize}{1}               % 開場 objectives 專用槽（D9：可獨立改樣式
+\setlist[objectives]{label=\textcolor{aResult}{\textbullet}, leftmargin=1.6em, itemsep=3pt}%  而不動 emitter；現與 itemize 同貌）
+
+% ── figure 語意層（D8：就地 non-float、字面 fig-no；appB 無圖、rollout 用）────
+% 尺寸由 emitter 依 figs/<ch>/figures.json 射 mm 絕對寬（DIALECT-ch03 §5 的教訓：
+% 不用 \textwidth 比例）。樣式沿 v1 shell/preamble.tex 的 hkfigure/hkfigcaption。
+\graphicspath{{../figs/}}
+\NewDocumentEnvironment{figureblock}{}{%
+  \par\cb@needspace{6\baselineskip}\vspace{4mm}\begin{center}%
+}{\end{center}\vspace{3mm}}
+\newcommand{\figcaption}[2]{%   % {字面 fig-no}{caption 散文}
+  \par\vspace{2.5mm}%
+  {\cbuiregular\fontsize{9.5}{13}\selectfont\color{inkSoft}%
+   {\cbuisemibold\color{black}#1}\hspace{0.4em}#2\par}}

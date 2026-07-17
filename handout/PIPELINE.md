@@ -72,6 +72,19 @@
 - **交付物「打開就能讀」**：含數學的待裁決/已套用報告產 standalone HTML（MathJax/KaTeX CDN、雙擊即開）。每完成一輪撰寫都產 `REVIEW-…-applied.html`。
 - **commit**：經授權才 commit；繁中、body 逐條記裁決（供 `git log --grep` 撈回）、結尾 `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`。
 
+## 出版排版線（HTML→LaTeX；pilot GO 2026-07-17）
+
+上面的內容 QA 閘鏈讀 **fragment 源**、與排版引擎無關；出版級排版是一條**下游線**在
+[`tex_export/`](tex_export/)：`convert.py`（確定性轉換：數學逐位元組 pass-through、
+表外標記硬錯、fragment 唯讀）→ `template/calcbook.sty`（memoir；語意層＋樣式層分離，
+模板拍板紀錄 [`tex_export/template/M-B1-DECISIONS.md`](tex_export/template/M-B1-DECISIONS.md)）→
+`latexmk -lualatex` 出 A4 PDF，四閘驗收（編譯／版面／完整性／人眼，kickoff §4.5）。
+appB pilot 已 GO（同內容 HTML 20 頁 → LaTeX 14 頁，四閘全綠）。**逐章 rollout**（建議順序
+ch03→ch01→ch06→其餘附錄；屆時另開計畫）每章＝方言差集盤點（`dialect_inventory.py`）→
+補 mapping（權威表 `DIALECT-<ch>.md`）→ 四閘；完整沿革與 rollout 預告見
+[`KICKOFF-latex-pilot.md`](KICKOFF-latex-pilot.md)。HTML standalone 自此定位＝
+**撰稿預覽＋圖閘 render 載體**（D2／D6），內容閘鏈照舊跑 fragment、不受影響。
+
 ## 工程注意：subagent 持久化
 
 `.claude/` 被根 `.gitignore` 整個擋掉。要讓 gate subagent 進版控（換機/未來重用），須 **`git add -f .claude/agents/<name>.md`**。目前 `.claude/agents/` 下 **12 個 subagent 皆應 force-add 追蹤**：

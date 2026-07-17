@@ -360,6 +360,41 @@ def check_tex_compiles() -> None:
         record(FAIL, "fonts", "Plex Tex 實編出空白（render 會崩）", fix)
 
 
+# ── ⑥c handout LaTeX 排版線（pilot v2：lualatex＋latexmk＋NCM＋vendored Inter）──
+
+def check_handout_latex() -> None:
+    """講義出版排版線（handout/tex_export/，KICKOFF-latex-pilot.md）：模板走 lualatex＋
+    memoir＋NewComputerModern，UI sans＝repo 內 vendored Inter（fontspec Path= 載入，
+    換機零安裝——git 帶著走，這裡只驗檔案在）；完整性閘 check_prose.py 需 pdftotext。"""
+    for name, why in (
+        ("lualatex", "模板引擎（D4 拍板；MiKTeX 內建）"),
+        ("latexmk", "建置驅動（MiKTeX 內建）"),
+        ("pdftotext", "check_prose.py 散文子序列閘（poppler）"),
+    ):
+        path = shutil.which(name)
+        if path:
+            record(PASS, "handout-tex", f"{name} 在 PATH", path)
+        else:
+            record(FAIL, "handout-tex", f"{name} 不在 PATH", f"{why}。裝 MiKTeX／poppler 後開新 shell")
+    if shutil.which("kpsewhich"):
+        rc, out = _run(["kpsewhich", "NewCM10-Regular.otf"])
+        if rc == 0 and out:
+            record(PASS, "handout-tex", "NewComputerModern otf 可尋", out.splitlines()[-1])
+        else:
+            record(FAIL, "handout-tex", "找不到 NewCM10-Regular.otf",
+                   "MiKTeX 首次編譯通常自動補裝 newcomputermodern；或 `mpm --install newcomputermodern`")
+    else:
+        record(WARN, "handout-tex", "kpsewhich 不在 PATH，略過 NCM 檢查", "裝 MiKTeX 後會進 PATH")
+    inter_dir = REPO / "handout" / "tex_export" / "template" / "fonts" / "inter"
+    missing = [f"Inter-{w}.otf" for w in ("Regular", "Italic", "Medium", "SemiBold", "Bold", "BoldItalic")
+               if not (inter_dir / f"Inter-{w}.otf").exists()]
+    if not missing:
+        record(PASS, "handout-tex", "vendored Inter 六字重齊備", str(inter_dir.relative_to(REPO)))
+    else:
+        record(FAIL, "handout-tex", f"vendored Inter 缺 {len(missing)} 檔（{', '.join(missing)}）",
+               "字體檔應隨 repo（git pull／checkout 即得）；來源＝rsms/inter release v4.1 的 extras/otf")
+
+
 # ── ⑦ API 金鑰（per-machine 祕鑰；未設不算錯，只是提示）────────────────
 
 _KEYS = [
@@ -425,6 +460,8 @@ def print_report(as_json: bool) -> int:
     print(f"  {'✅' if video_ok else '❌'} 影片完整 render→compose 成片（venv＋LaTeX＋ffmpeg＋ffprobe）")
     print(f"  {'✅' if handout_fig_ok else '❌'} handout 圖 render／figure 稽核（Node≥21＋Chrome）")
     print("  ✅ handout build.py（純 stdlib，任何 python 皆可）")
+    handout_tex_ok = not any(s == FAIL and a == "handout-tex" for s, a, *_ in _results)
+    print(f"  {'✅' if handout_tex_ok else '❌'} handout LaTeX 排版線（lualatex＋latexmk＋NCM＋vendored Inter＋pdftotext）")
     codex_ok = any(s == PASS and a == "codex" for s, a, *_ in _results)
     print(f"  {'✅' if codex_ok else '⚠️ '} codex 審核（Mode B 講義／video gate2；缺＝不擋產線）")
 
@@ -447,6 +484,7 @@ def main() -> int:
     check_assets()
     check_fonts()
     check_tex_compiles()
+    check_handout_latex()
     check_keys()
     return print_report(as_json)
 

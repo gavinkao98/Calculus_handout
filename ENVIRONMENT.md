@@ -88,7 +88,8 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   所有螢幕文字＋數學都走 LaTeX 以拿到 kerning）。MiKTeX 首次編譯會自動補裝這些套件。**硬約束：只能 pdflatex**——
   lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址，故排除需 fontspec 的 `newcomputermodern`。
   （`newtx` 已不再是 video 需求，但仍是 `legacy/tex_handout/` 的需求。）
-- handout 的 HTML 講義**不需要** LaTeX（數學走 MathJax/KaTeX CDN）；只有 `video/` render 需要。
+- handout 的 HTML 講義**不需要** LaTeX（數學走 MathJax/KaTeX CDN）；`video/` render 需要 pdflatex 路徑，
+  出版排版線（`handout/tex_export/`）另需 lualatex 路徑（見 ③b）——同一套 MiKTeX、兩條互不干擾。
 - **踩坑（2026-06-25）：Plex 文字 render 成空白／場景一開頭 `IndexError` 崩。** 症狀：含文字的場景 render 崩在
   `IndexError: too many indices for array`（標題 Tex 沒有任何點），或 latex 印 `'miktex-makemf.exe…plxSans-…mf'
   is not recognized`。**不是缺套件**——`kpsewhich plex-sans.sty` 找得到——而是這台 MiKTeX 的**字型檔名庫（FNDB）
@@ -101,6 +102,19 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   `doctor.py` 的「Plex Tex 實編非空」檢查（`check_tex_compiles`）會實 build 一個 Plex Tex 抓這個坑（kpsewhich 查
   `.sty` 在 ≠ 編得出字）。另：MiKTeX 一直印「you have not checked for updates as a MiKTeX user」是同源警告，
   開一次 MiKTeX Console → Check for updates 可消。
+
+### ③b handout LaTeX 出版排版線 — lualatex + memoir + NCM + vendored Inter
+- **這條線是講義的出版排版（`handout/tex_export/`，[`handout/KICKOFF-latex-pilot.md`](handout/KICKOFF-latex-pilot.md)）**：
+  fragment 經 `convert.py` 確定性轉換 → `template/calcbook.sty`（memoir）→ `latexmk -lualatex` 出 A4 PDF。
+  與 video 的「只能 pdflatex」硬約束**不衝突**——兩條線各走各的引擎，同一套 MiKTeX。
+- 需求全在 MiKTeX 內：`lualatex`／`latexmk` 內建；`newcomputermodern`（本文＋數學字體）首次編譯自動補裝；
+  `pdftotext`（完整性閘 `check_prose.py`）MiKTeX 也自帶（poppler 系工具）。
+- **UI sans＝vendored Inter（2026-07-16，M-B1 議題⑦ 拍板）**：字體檔在
+  `handout/tex_export/template/fonts/inter/`（六字重 OTF＋OFL 授權，來源＝rsms/inter release v4.1 的
+  `extras/otf`），`calcbook.sty` 以 `fontspec Path=` 載入。**隨 repo 走、換機零安裝**；對映 HTML 側的
+  Inter（圖內標籤已嵌同字體，本文側圖說用它才同族）。
+- `doctor.py` 的 `check_handout_latex`（區名 `handout-tex`）驗上述全部：lualatex／latexmk／pdftotext 在 PATH、
+  `kpsewhich NewCM10-Regular.otf` 可尋、vendored Inter 六檔在。
 
 ### ①b 影片字型 — 全走 LaTeX（Plex Sans/Mono 文字 + Latin Modern 數學）
 - Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**：文字 **IBM Plex Sans**（標題/內文）+ **IBM Plex Mono**
