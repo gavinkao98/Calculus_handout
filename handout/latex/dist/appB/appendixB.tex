@@ -82,7 +82,7 @@ A proof is an argument, and arguments come in shapes. A reader who knows the sha
 \begin{envstrategy}{Strategy}{B.2}{Recognizing the shape of a proof}
 \begin{bulletsteps}
   \item \runin{Direct.} Assume the hypothesis and move, one justified step at a time, to the conclusion. The default — try it first.
-  \item \runin{Contradiction.} Assume the claim \emph{fails}, and reason until something impossible appears. The tell: an opening like “suppose not” or “assume \(\sqrt{2}\) is rational” when the claim says the opposite. A near relative, \emph{contraposition}, proves “if \(P\) then \(Q\)” by proving its contrapositive “if not \(Q\) then not \(P\)” outright — see Proposition B.1.
+  \item \runin{Contradiction.} Assume the claim \emph{fails}, and reason until something impossible appears. The tell: an opening like “suppose not” or “assume \(\sqrt{2}\) is rational” when the claim says the opposite. Beware its look-alike, \emph{contraposition}, which proves “if \(P\) then \(Q\)” by proving its contrapositive “if not \(Q\) then not \(P\)” outright. It opens much the same way, but the chain that follows is direct and collides with nothing: it is the first shape above, aimed at an equivalent sentence rather than at the claim (§B.6). See Proposition B.1.
   \item \runin{Counterexample.} To \emph{disprove} a \emph{for all} claim, exhibit one object meeting the hypothesis but breaking the conclusion. Demolishes; never builds.
   \item \runin{Cases.} Split the objects into a few situations that together cover every possibility, and settle each. The tell: “if … ; if instead …”.
   \item \runin{Induction.} For a claim about every positive integer, prove the first case, then show each case forces the next. The tell: a statement indexed by \(n = 1, 2, 3, \ldots\).
@@ -96,7 +96,7 @@ If \(n\) is an odd integer, then \(n^{2}\) is odd.
 \begin{envproof}{Proof}{}{}
 By definition an odd integer has the form \(n = 2k + 1\) for some integer \(k\), just as an even one has the form \(2k\). Squaring, \[ n^{2} = (2k + 1)^{2} = 4k^{2} + 4k + 1 = 2\bigl(2k^{2} + 2k\bigr) + 1. \] The right-hand side is twice an integer plus one, which is exactly what it means to be odd. \qedmark
 \end{envproof}
-The small square at the end is the customary sign-off: it announces that the proof is finished, and you will meet it — or the older letters \emph{Q.E.D.} — at the close of proofs everywhere. As for the proof itself: nothing was assumed but the hypothesis, and each line followed from the one before — the signature of a direct proof. This one does double duty. The same proof also settles “if \(n^{2}\) is even, then \(n\) is even” — the claim dissected in Example B.1 — because that statement’s contrapositive is exactly “if \(n\) is odd, then \(n^{2}\) is odd”, which we have just proved. A statement and its contrapositive are logically equivalent, so proving the one proves the other. Deliberately proving the contrapositive in place of the original is a standard move of its own, \emph{proof by contraposition}, and the quiet cousin of the contradiction argument next.
+The small square at the end is the customary sign-off: it announces that the proof is finished, and you will meet it — or the older letters \emph{Q.E.D.} — at the close of proofs everywhere. As for the proof itself: nothing was assumed but the hypothesis, and each line followed from the one before — the signature of a direct proof. This one does double duty. The same proof also settles “if \(n^{2}\) is even, then \(n\) is even” — the claim dissected in Example B.1 — because that statement’s contrapositive is exactly “if \(n\) is odd, then \(n^{2}\) is odd”, which we have just proved. A statement and its contrapositive are logically equivalent, so proving the one proves the other. Deliberately proving the contrapositive in place of the original is a standard move of its own, \emph{proof by contraposition} — a direct argument still, aimed at an equivalent sentence rather than at the claim itself, as §B.6 sets out. The shape that follows really does leave the direct road.
 
 \runin{Proof by contradiction.} Sometimes the cleanest route to a claim is to suppose it false and watch the supposition collapse. To argue by \emph{contradiction}, assume the claim is false, reason until you reach something impossible — a statement that contradicts a hypothesis, a known fact, or itself — and conclude that the assumption could not have held. Why does that settle the matter? Because a true premise can never force an impossibility: if assuming the claim false leads somewhere that cannot be, then that assumption cannot stand, and the claim must be true. The most famous instance in all of mathematics is barely a paragraph.
 
@@ -414,7 +414,7 @@ Let \(r\) and \(s\) be rational numbers. By the definition of a rational number 
 The clause beginners drop is \(bd \neq 0\). It is one line, it is easy, and it is exactly the difference between exhibiting a candidate and verifying a witness: without it we have produced an expression, not a rational number. Notice also where the hypotheses went. The conditions \(b \neq 0\) and \(d \neq 0\) arrived with the definition and did their work in that single clause, and nowhere else. Strategy B.5 taught you to hunt for the line where each hypothesis earns its place when reading; when writing, you are the one who must put it there.
 \end{envsolution}
 \end{workedexample}
-So much for proofs that work. It is at least as instructive to take apart two that do not — and both of the following argue for claims that are perfectly true, which is what makes them worth the trouble. An invalid argument for a true statement is the hardest kind of error to see, because nothing at the end looks wrong.
+So much for proofs that work. It is at least as instructive to take apart three that do not. The first two argue for claims that are perfectly true, which is what makes them worth the trouble: an invalid argument for a true statement is the hardest kind of error to see, because nothing at the end looks wrong. The third goes wrong the other way round.
 
 \begin{workedexample}
 \begin{envexample}{Example}{B.9}{}
@@ -450,6 +450,26 @@ Three integers were checked. The claim ranges over every integer, of which there
 Compare Proposition B.3, which proves this claim by splitting into the cases \(n\) even and \(n\) odd. That argument reaches every integer at once, and it does so because the two cases \emph{together cover all of them} — completeness of the split, not a longer list of examples, is what does the work. Two well-chosen cases beat three thousand well-checked ones.
 
 The asymmetry here is worth carrying away: short of checking every object the claim ranges over — and over the integers you never can — no number of confirming examples establishes a \emph{for all}, while a single counterexample destroys one (§B.2). Examples are decisive when they refute; when they confirm, they are evidence, and over the integers never more than that.
+\end{envsolution}
+\end{workedexample}
+Those two reached true claims by routes that were not open to them. The last of the three reverses the arrangement: every step it puts on the page is valid, and the claim is false.
+
+\begin{workedexample}
+\begin{envexample}{Example}{B.11}{}
+The same request once more.
+
+\emph{Claim.} For every positive integer \(n\), \[ 1 + 2 + \cdots + n = \frac{n^{2} + n + 2}{2}. \]
+
+\emph{Proposed proof.} Suppose the formula holds for some positive integer \(k\), so that \(1 + 2 + \cdots + k = \frac{k^{2} + k + 2}{2}\). Adding \(k + 1\) to both sides, \[ 1 + 2 + \cdots + k + (k + 1) = \frac{k^{2} + k + 2}{2} + (k + 1) = \frac{k^{2} + 3k + 4}{2}, \] which is the formula with \(n = k + 1\), since \((k + 1)^{2} + (k + 1) + 2 = k^{2} + 3k + 4\). So the formula holds for every positive integer \(n\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Read the inductive step as closely as you like; it will not crack. Adding \(k + 1\) to \(\frac{k^{2} + k + 2}{2}\) really does give \(\frac{k^{2} + 3k + 4}{2}\), and that really is what the formula returns at \(n = k + 1\). The algebra is sound, every implication runs the way it is used — the first and fifth habits of Strategy B.5 pass it without a murmur.
+
+The flaw is not in a line that was written. It is in a line that was never written: there is no base case, and this formula has none to be found. At \(n = 1\) the left side is \(1\) while the right side is \(\frac{1 + 1 + 2}{2} = 2\). The dominoes are standing in a row, each one leaning on the next, and nobody ever pushed the first.
+
+Set the claim beside Proposition B.4, which proves \(1 + 2 + \cdots + n = \frac{n(n + 1)}{2}\) for the very same sum: \[ \frac{n^{2} + n + 2}{2} = \frac{n(n + 1)}{2} + 1. \] The formula is the true one plus \(1\) — so it fails not merely at \(n = 1\) but at every \(n\) there is. No inductive step could have caught that, and catching it was never the step's job: the step says only \emph{if here, then next}, and a formula uniformly one too large keeps that promise perfectly. Only the base case asks whether the chain is fastened to anything. Nor is there anything here to repair, which is where this example parts company with the other two: they were true claims with broken arguments, and this is a false claim. Proposition B.4 already holds the true formula.
+
+Hence the rule stated when the skeletons were laid out, and worth restating now that you have watched it break: an induction has two parts, and a step with no base case proves nothing whatever. Of the three failures in this section it is the easiest to commit and the hardest to catch by inspection, because there is no bad line in the step to find. Count the parts of an induction before you check its algebra.
 \end{envsolution}
 \end{workedexample}
 \begin{envcaution}{Caution}{}{}

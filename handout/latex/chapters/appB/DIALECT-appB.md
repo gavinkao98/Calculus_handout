@@ -11,17 +11,24 @@
 > **變更**：appB 新增 §B.6「Writing a Proof」（`sec-b-6.html`）並改動 sec-b-1..5；附錄改名
 > 「Reading Theorems and Proofs」→「**Reading and Writing Proofs**」。撰稿側閘鏈紀錄見
 > [`../../../html/_audit/REVIEW-appendixB-b6-applied.html`](../../../html/_audit/REVIEW-appendixB-b6-applied.html)。
+> **同日稍晚（r3，附錄定案）**：第三份第三方意見逐條裁決後落地兩項——① §B.2 的 contraposition
+> 歸類對齊 §B.6（純散文改寫：Strategy B.2 條目 2 的親緣子句改為 look-alike 消歧、Prop B.1 後的
+> 過渡句改口；**roster 仍 5 形狀、回馬槍不動**）② §B.6 新增 **Example B.11**（歸納法斷鏈：步驟有效、
+> 無 base case）＋其框架段落由「two／both … perfectly true」改為三分流。裁決稿見
+> [`../../../html/_audit/REVIEW-appendixB-r3-adjudication.html`](../../../html/_audit/REVIEW-appendixB-r3-adjudication.html)。
+> **r3 對本表的影響＝方言零成長**（兩項都刻意只用既有詞彙），僅計數與頁數變動。
 > **本表下方 §2 的逐項「次數」欄仍是 M-B0（5 節）的歷史凍結值；下表為現況權威。**
 >
-> | | M-B0 凍結（5 節、415 行） | **現況凍結（6 節、925 行）** |
-> |---|---|---|
-> | **tag＋class 組合** | 34 種 | **35 種——＋1**（見下） |
-> | 數學 inline `\(…\)` | 308 | **532** |
-> | 數學 display `\[…\]` | 9 | **13**（`aligned` 仍僅 1，在 sec-b-2） |
-> | inline `style=` | 5（僅 sec-b-3） | **5**（仍僅 sec-b-3，未新增） |
-> | 圖／表 | 0／0 | **0／0** |
-> | 活散文非 ASCII | `—`×98 `§`×14 `’`×4 | **`—`×171 `§`×31 `’`×17 `–`×1** |
-> | PDF 頁數 | 14（HTML 20） | **24** |
+> | | M-B0 凍結（5 節、415 行） | §B.6 定版（6 節、925 行） | **r3 現況凍結（6 節、1009 行）** |
+> |---|---|---|---|
+> | **tag＋class 組合** | 34 種 | 35 種——＋1（見下） | **35 種——r3 ＋0** |
+> | 數學 inline `\(…\)` | 308 | 532 | **550** |
+> | 數學 display `\[…\]` | 9 | 13 | **16**（`aligned` 仍僅 1，在 sec-b-2；r3 ＋3＝Ex B.11 的宣稱／歸納步驟／Prop B.4 對照式） |
+> | inline `style=` | 5（僅 sec-b-3） | 5 | **5**（仍僅 sec-b-3，未新增） |
+> | 圖／表 | 0／0 | 0／0 | **0／0** |
+> | 活散文非 ASCII | `—`×98 `§`×14 `’`×4 | `—`×171 `§`×31 `’`×17 `–`×1 | **`—`×173 `§`×33 `’`×17 `–`×1** |
+> | PDF 頁數 | 14（HTML 20） | 24 | **25** |
+> | `span.env-num` 編號帳 | — | 23 | **24**＝Definition 1＋Strategy 7＋Example **11**＋Proposition 5 |
 >
 > **§3 差集新增一項（M-B2 已補 mapping、已凍結正式名稱）：**
 >
@@ -37,11 +44,23 @@
 > （原僅 `div.env-body`）——§B.6 的 proof skeleton 直接住在散文裡、不在 env 盒內。已有先例
 > （§2 #15 的 `ul.sol-list` 早有「×1 直接在 article.sec」），但語意指令若假設 `steps` 必在 env 內就會踩到。
 >
-> **四閘（2026-07-17 重跑，全綠）**：編譯 0 error／0 missing char｜版面 0 overfull／0 underfull｜
+> **四閘（2026-07-17 §B.6 定版時重跑，全綠）**：編譯 0 error／0 missing char｜版面 0 overfull／0 underfull｜
 > 完整性 coverage 100%（695 mapped／0 skipped）＋`check_prose.py` PASS（4 處 pdftotext 抽取假象、
 > 0 真落差）＋數學逐位元組 81 測試全過｜人眼 24 頁逐頁。成品 `../../dist/appB/`（pdf＋自足 tex）已更新。
 > **模板連帶**：人眼閘抓到 `\cb@needspace` 的誤觸發（詳見 `../../template/calcbook.sty` 該處註解
 > 與 `../../template/M-B1-DECISIONS.md` 沿革），已修並回歸——25 頁→24 頁、近空白頁消失。
+>
+> **四閘（r3 重跑，全綠）**：編譯 0 error／0 missing char｜版面 0 overfull／0 underfull｜
+> 完整性 coverage 100%（**716** mapped／0 skipped）＋`check_prose.py` PASS（**14** 處 pdftotext
+> 抽取假象、**0 真落差**）＋數學逐位元組 **81 測試全過**｜人眼見下。`make_dist.py appB` 一把跑完，
+> 成品 `../../dist/appB/` 已更新（25 頁）。
+> **`test_convert.py` 的鎖實值同步**（ledger lock，非 bug）：`mapped` 695→**716**、`math` 545→**566**
+> ＝inline 550＋display 16。改動前這兩條會硬錯，正是它們該有的行為。
+> **人眼閘（r3 範圍說明，據實記載）**：FIX-1 使 p4 的 Strategy B.2 條目 2 長約 4 行，故 **p4 以後
+> 全篇位移**，不能宣稱「其餘頁未動」。實際做法＝① 改動落點逐頁看（**p4–5** FIX-1；**p20–23** FIX-2，
+> 含 Ex B.11 跨 p22–23 的 workedexample keep-together）② 全 25 頁做低密度掃描以攔上一輪那個
+> `\cb@needspace` 級失效（字元中位數 2125；唯一低密度頁＝**p25** 收束段 587 字元＝正常尾頁，
+> **中間無近空白頁**）。未逐頁重看全 25 頁。
 
 ## 1. 摘要
 

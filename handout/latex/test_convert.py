@@ -406,7 +406,9 @@ class AppBMappings(unittest.TestCase):
                 (HTML_LINE / "fragments" / "appB" / f"{f}.html").read_text(encoding="utf-8"))
         # 2026-07-17 定稿後重新盤點（原 317＝inline 308＋display 9，是 M-B0 的五節快照）。
         # 注意：本迴圈原本漏掉 sec-b-6 —— 新一節的數學因此未被逐位元組驗到；已補入。
-        self.assertEqual(len(src_math), 545, "數學區段數應為 545＝inline 532＋display 13")
+        # 2026-07-17（r3）545→566：§B.6 新增 Example B.11（歸納法斷鏈），display 13→16＝
+        # 該例的宣稱、歸納步驟、與 Prop B.4 的對照式各一。
+        self.assertEqual(len(src_math), 566, "數學區段數應為 566＝inline 550＋display 16")
         pos = 0
         for k, m in enumerate(src_math):
             j = tex.find(m, pos)
@@ -416,8 +418,8 @@ class AppBMappings(unittest.TestCase):
     def test_appB_converts_with_no_hard_errors(self):
         # M-B2 驗證點：appB 全節點 100% 交代（mapped 或硬錯；無表外標記）
         tex, stats = convert_chapter("appB", Path(__file__).parent / "chapters" / "appB" / "figs" / "figures.json")
-        self.assertEqual(stats["mapped"], 695)   # 鎖實值（gate-2 A2：>300 太弱）；2026-07-17 定稿後 440→695（新增 §B.6）
-        self.assertEqual(stats["math"], 545)
+        self.assertEqual(stats["mapped"], 716)   # 鎖實值（gate-2 A2：>300 太弱）；2026-07-17 定稿後 440→695（新增 §B.6）、695→716（r3 新增 Example B.11）
+        self.assertEqual(stats["math"], 566)
         # emitter 重定向的 aggregate 斷言：v1 book-class 詞彙（hk*）不得殘留
         self.assertIsNone(re.search(r"\\hk[a-z]", tex), "輸出殘留 v1 hk* 詞彙")
         for probe in (r"\appendixopener{Appendix B}", r"\begin{objectives}",

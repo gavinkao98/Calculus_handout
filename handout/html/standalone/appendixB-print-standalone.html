@@ -535,7 +535,52 @@ window.MathJax = {
      Math verified during authoring: (2k+1)^2 = 2(2k^2+2k)+1; a^2=2b^2 lowest-terms
      contradiction; p=2 prime and even; n(n+1) even by parity cases; induction step
      k(k+1)/2 + (k+1) = (k+1)(k+2)/2.
-     Record: handout/_audit/REVIEW-appendixB-applied.html. -->
+
+     2026-07-17 -- contraposition's two mentions here were re-pointed. Both were written
+     while §B.2 was the only section that named the move, and both filed it with the
+     contradiction argument ("A near relative" in the Strategy box; "the quiet cousin of the
+     contradiction argument next" closing the direct-proof discussion). §B.6 then settled the
+     question the other way, outright: "no contradiction anywhere in that skeleton -- and,
+     for that matter, nothing indirect about the reasoning either ... a plain direct chain
+     ... not a sixth shape, but THE FIRST shape aimed at the equivalent sentence". The first
+     shape is bullet 1 (Direct), so the two sections were assigning one move to two different
+     roster entries. Both mentions now say what §B.6 says.
+     The Strategy box's clause additionally changed JOB, from kinship to disambiguation, and
+     that is the point of it: bullet 2's own tell is "an opening like 'suppose not'", while a
+     contraposition opens "Assume not Q" -- so a reader applying the tell literally lands on
+     contradiction, which is precisely the error §B.6 closes with ("Announcing 'suppose, for
+     contradiction' over an argument that merely derives not P from not Q is confusing").
+     Kept as a look-alike warning inside bullet 2 rather than moved to bullet 1 because
+     bullet 2 is where that reader actually is. It makes bullet 2 roughly 83 words against
+     19-25 for the other four, and that asymmetry is accepted: bullet 2 is the only shape
+     with a look-alike, so it is the only one that needs a warning. The alternatives both
+     cost more than they save -- drop the "if not Q then not P" form and the box loses the
+     recognition cue it exists to give; move the warning out to prose and the box's own tell
+     misfires with no correction at the point of use, which is the whole defect being closed.
+
+     WORDING CONSTRAINT for that clause -- say "the FIRST shape above", not "the shape above",
+     and keep the colon where an em-dash would read more naturally. Both were prose-gate
+     findings against the first draft of this edit:
+       (a) an em-dash apposition after "collides with nothing" attaches to "nothing", so
+           "— the shape above" first parses as the thing it collides WITH -- the exact
+           opposite of the sentence's point, and the reader only unwinds it several words
+           later. The colon plus "it is" kills that garden path.
+       (b) a bare "the shape above" is deixis: it needs bullet 1 physically adjacent, and
+           that is NOT guaranteed. calcbook.sty's cb@card is `breakable` (see its L229 and
+           the note at L263), so on the LaTeX line -- appB's actual publication path -- this
+           box may split across a page and bullet 1 can end up on the previous one, leaving
+           "above" pointing past a page turn. Naming the list position is immune to that.
+           The HTML line does not have this exposure (the shell's SPLIT_ENVS excludes
+           .env-strategy, so the strategy box never splits) -- the two lines genuinely differ
+           here, so write for the one that can break.
+     "the first shape" also lands verbatim on §B.6's "the first shape aimed at the equivalent
+     sentence", which is the alignment this whole edit is for.
+     ROSTER UNTOUCHED -- still 5 (user decision 2026-07-04 stands, and §B.6 now supplies the
+     reason it stops at five). The Prop B.1 double-duty callback is intact; only the kinship
+     clause after it moved. Do NOT re-file contraposition under contradiction: §B.2 and §B.6
+     would then disagree about which shape it is, which is the defect this edit removed.
+     Record: handout/html/_audit/REVIEW-appendixB-r3-adjudication.html.
+     Record (first authoring): handout/_audit/REVIEW-appendixB-applied.html. -->
 
 <article class="sec" lang="en">
 
@@ -550,7 +595,7 @@ window.MathJax = {
     <div class="env-body">
       <ul class="steps">
         <li><strong>Direct.</strong> Assume the hypothesis and move, one justified step at a time, to the conclusion. The default — try it first.</li>
-        <li><strong>Contradiction.</strong> Assume the claim <em>fails</em>, and reason until something impossible appears. The tell: an opening like &ldquo;suppose not&rdquo; or &ldquo;assume \(\sqrt{2}\) is rational&rdquo; when the claim says the opposite. A near relative, <em>contraposition</em>, proves &ldquo;if \(P\) then \(Q\)&rdquo; by proving its contrapositive &ldquo;if not \(Q\) then not \(P\)&rdquo; outright — see Proposition B.1.</li>
+        <li><strong>Contradiction.</strong> Assume the claim <em>fails</em>, and reason until something impossible appears. The tell: an opening like &ldquo;suppose not&rdquo; or &ldquo;assume \(\sqrt{2}\) is rational&rdquo; when the claim says the opposite. Beware its look-alike, <em>contraposition</em>, which proves &ldquo;if \(P\) then \(Q\)&rdquo; by proving its contrapositive &ldquo;if not \(Q\) then not \(P\)&rdquo; outright. It opens much the same way, but the chain that follows is direct and collides with nothing: it is the first shape above, aimed at an equivalent sentence rather than at the claim (§B.6). See Proposition B.1.</li>
         <li><strong>Counterexample.</strong> To <em>disprove</em> a <em>for all</em> claim, exhibit one object meeting the hypothesis but breaking the conclusion. Demolishes; never builds.</li>
         <li><strong>Cases.</strong> Split the objects into a few situations that together cover every possibility, and settle each. The tell: &ldquo;if &hellip; ; if instead &hellip;&rdquo;.</li>
         <li><strong>Induction.</strong> For a claim about every positive integer, prove the first case, then show each case forces the next. The tell: a statement indexed by \(n = 1, 2, 3, \ldots\).</li>
@@ -576,7 +621,7 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>The small square at the end is the customary sign-off: it announces that the proof is finished, and you will meet it — or the older letters <em>Q.E.D.</em> — at the close of proofs everywhere. As for the proof itself: nothing was assumed but the hypothesis, and each line followed from the one before — the signature of a direct proof. This one does double duty. The same proof also settles &ldquo;if \(n^{2}\) is even, then \(n\) is even&rdquo; — the claim dissected in Example B.1 — because that statement’s contrapositive is exactly &ldquo;if \(n\) is odd, then \(n^{2}\) is odd&rdquo;, which we have just proved. A statement and its contrapositive are logically equivalent, so proving the one proves the other. Deliberately proving the contrapositive in place of the original is a standard move of its own, <em>proof by contraposition</em>, and the quiet cousin of the contradiction argument next.</p>
+  <p>The small square at the end is the customary sign-off: it announces that the proof is finished, and you will meet it — or the older letters <em>Q.E.D.</em> — at the close of proofs everywhere. As for the proof itself: nothing was assumed but the hypothesis, and each line followed from the one before — the signature of a direct proof. This one does double duty. The same proof also settles &ldquo;if \(n^{2}\) is even, then \(n\) is even&rdquo; — the claim dissected in Example B.1 — because that statement’s contrapositive is exactly &ldquo;if \(n\) is odd, then \(n^{2}\) is odd&rdquo;, which we have just proved. A statement and its contrapositive are logically equivalent, so proving the one proves the other. Deliberately proving the contrapositive in place of the original is a standard move of its own, <em>proof by contraposition</em> — a direct argument still, aimed at an equivalent sentence rather than at the claim itself, as §B.6 sets out. The shape that follows really does leave the direct road.</p>
 
   <p><strong>Proof by contradiction.</strong> Sometimes the cleanest route to a claim is to suppose it false and watch the supposition collapse. To argue by <em>contradiction</em>, assume the claim is false, reason until you reach something impossible — a statement that contradicts a hypothesis, a known fact, or itself — and conclude that the assumption could not have held. Why does that settle the matter? Because a true premise can never force an impossibility: if assuming the claim false leads somewhere that cannot be, then that assumption cannot stand, and the claim must be true. The most famous instance in all of mathematics is barely a paragraph.</p>
 
@@ -1076,7 +1121,8 @@ window.MathJax = {
      Strategy B.6 (from statement to proof); Strategy B.7 (revising your proof);
      Example B.7 (three layers: planning notes / weak draft / revised proof);
      Example B.8 (existence + witness); Example B.9 (flawed: uses the converse);
-     Example B.10 (flawed: examples do not prove a universal); Caution unnumbered
+     Example B.10 (flawed: examples do not prove a universal); Example B.11 (flawed:
+     valid inductive step, no base case); Caution unnumbered
      (assuming the conclusion); Pause box (env-remark, unnumbered, NO answers -- the
      §14-compliant practice mechanism established in sec-b-5, per user decision 2026-07-04).
      The Strategy numbers are a pure append (B.6-B.7 land after B.1-B.5). The EXAMPLE numbers
@@ -1094,6 +1140,9 @@ window.MathJax = {
                        + §B.5 Caution (=> is one-way). Three earlier threads collect here.
        Ex B.10 claim = Prop B.3, which proves the SAME claim properly by cases -- the fake
                        and the real proof of one statement can be compared directly.
+       Ex B.11 claim = Prop B.4's sum, and the fake formula is exactly Prop B.4's plus 1, so
+                       the pairing is Ex B.10's: fake and real side by side. The domino image
+                       it closes on is §B.2's, returned to at the moment it fails.
      Self-contained: no Ch1-4 refs; internal §B.x cross-refs allowed. No figures.
      MARKUP: only the existing appB vocabulary, so DIALECT-appB gains 0 new combinations
      (see latex/chapters/appB/DIALECT-appB.md, frozen 2026-07-16; appB is the LaTeX pilot
@@ -1106,6 +1155,10 @@ window.MathJax = {
      n^2 even does NOT yield n even via "n even => n^2 even" (that is the converse) --
      the honest route is the contrapositive n odd => n^2 odd = Prop B.1;
      1^2+1=2, 2^2+2=6, 3^2+3=12 all even = evidence only; Prop B.3 proves the universal.
+     Ex B.11: the step really is valid -- (k^2+k+2)/2 + (k+1) = (k^2+3k+4)/2, and
+     (k+1)^2+(k+1)+2 = k^2+3k+4, so both sides land on the same thing; base n=1 gives LHS 1
+     vs RHS (1+1+2)/2 = 2, so there is none. (n^2+n+2)/2 = n(n+1)/2 + 1 => the formula is
+     wrong at EVERY n, not only the first -- which is why the claim cannot be repaired.
      Pause: a,b even => a+b even (trap: reusing one letter k for both witnesses);
      n < n+1 < n+2 with n+1 in Z (trap: witness produced but not verified).
 
@@ -1130,11 +1183,49 @@ window.MathJax = {
      one to try first": the parenthesis naming the indirect route, and Strategy B.7's
      existence item. An earlier draft fixed the skeleton and left B.7 categorical, which
      put the section in contradiction with itself.
+     2026-07-17 (third review round; adjudication in the r3 record below) -- NEW Example B.11
+     = a broken induction: the claim 1+2+...+n = (n^2+n+2)/2, whose inductive step is
+     flawless and whose base case does not exist. Reason: the induction paragraph above warns
+     that "a base case with no step, or a step with no base case, proves nothing whatever",
+     and this section demonstrates its two other warnings (Ex B.9 the converse, Ex B.10
+     evidence-as-proof) while leaving that one asserted and never shown. It is also the only
+     one of the three with no bad line in it -- the flaw is an absent line, not a wrong one --
+     which is what earns it the space.
+     NUMBERING: pure append (B.11 lands after B.10), ZERO cascade -- unlike the sec-b-4
+     insertion recorded above. MARKUP: existing vocabulary only (div.workedexample +
+     env-example / env-solution, display math inside <p> exactly as Prop B.4 does) -- DIALECT
+     gains 0 combinations, so appB stays at 35.
+     CONSTRAINT -- Ex B.11 and the framing paragraph before Ex B.9 are ONE UNIT. That
+     paragraph used to read "take apart TWO that do not ... and BOTH of the following argue
+     for claims that are perfectly true". That framing cannot hold B.11, whose claim is
+     FALSE, and the "true claim, invalid argument" observation is too good to drop -- so the
+     paragraph now introduces three and splits them (first two = invalid argument for a true
+     claim; third = valid step for a false claim), with a bridge sentence before B.11 marking
+     the reversal. Move or remove B.11 and that paragraph moves with it; leave them out of
+     step and the section miscounts itself and mis-describes its own specimens.
+     Two wordings inside that split are load-bearing, and both were prose-gate findings
+     against the first draft of this edit -- the framing and B.11's closer had been written
+     separately and never reconciled:
+       - The framing keeps "the hardest kind of error to see" for the first two, so B.11's
+         closer says "the hardest to CATCH BY INSPECTION" instead of "the hardest to see".
+         Two superlatives of the same wording over overlapping sets leave the reader with no
+         consistent ranking, and the bridge sentence reactivates the framing immediately
+         before B.11, so the clash lands while it is still warm. The specimens deceive in
+         different places -- the first two at the conclusion, this one line by line -- and
+         the wording has to keep them apart.
+       - B.11's closer says there is no bad line "IN THE STEP" to find, not flatly "no bad
+         line". The fake proof's last sentence ("So the formula holds for every positive
+         integer n") IS a written line that does not follow, and a reader honestly obeying
+         the prompt lands on it and is RIGHT to. The flaw named in the solution's second
+         paragraph is the root -- no base case -- and that last line is its symptom, so the
+         paragraph stands; but the closer must not widen the claim back to every line, or
+         the section overstates in the one place it is teaching precision.
      Provenance and the reason behind a decision belong in this comment; audit results and
      findings lists do not -- they go to the record below. (Keep it that way: some reviewers
      of this file are meant to come to it cold, and a summary of what earlier reviewers
      found would tell them what to see.)
-     Record: handout/html/_audit/REVIEW-appendixB-b6-applied.html. -->
+     Record: handout/html/_audit/REVIEW-appendixB-b6-applied.html.
+     Record (r3): handout/html/_audit/REVIEW-appendixB-r3-adjudication.html. -->
 
 <article class="sec" lang="en">
 
@@ -1259,7 +1350,7 @@ window.MathJax = {
     </section>
   </div>
 
-  <p>So much for proofs that work. It is at least as instructive to take apart two that do not — and both of the following argue for claims that are perfectly true, which is what makes them worth the trouble. An invalid argument for a true statement is the hardest kind of error to see, because nothing at the end looks wrong.</p>
+  <p>So much for proofs that work. It is at least as instructive to take apart three that do not. The first two argue for claims that are perfectly true, which is what makes them worth the trouble: an invalid argument for a true statement is the hardest kind of error to see, because nothing at the end looks wrong. The third goes wrong the other way round.</p>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -1297,6 +1388,33 @@ window.MathJax = {
         <p>Three integers were checked. The claim ranges over every integer, of which there are infinitely many, and no finite list exhausts them. What the computation supplies is <em>evidence</em>: a good reason to believe the claim, and trying small cases before proving anything is a habit worth keeping — it is the third habit of Strategy B.5. But evidence is not proof. The distance between &ldquo;true in the cases I tried&rdquo; and &ldquo;true in all cases&rdquo; is precisely the distance a proof exists to cross, and here nothing crosses it. Had the three cases been the only integers, the argument would have been complete; the flaw is not the method but the mismatch between three objects and infinitely many.</p>
         <p>Compare Proposition B.3, which proves this claim by splitting into the cases \(n\) even and \(n\) odd. That argument reaches every integer at once, and it does so because the two cases <em>together cover all of them</em> — completeness of the split, not a longer list of examples, is what does the work. Two well-chosen cases beat three thousand well-checked ones.</p>
         <p>The asymmetry here is worth carrying away: short of checking every object the claim ranges over — and over the integers you never can — no number of confirming examples establishes a <em>for all</em>, while a single counterexample destroys one (§B.2). Examples are decisive when they refute; when they confirm, they are evidence, and over the integers never more than that.</p>
+      </div>
+    </section>
+  </div>
+
+  <p>Those two reached true claims by routes that were not open to them. The last of the three reverses the arrangement: every step it puts on the page is valid, and the claim is false.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">B.11</span></p>
+      <div class="env-body">
+        <p>The same request once more.</p>
+        <p><em>Claim.</em> For every positive integer \(n\),
+        \[ 1 + 2 + \cdots + n = \frac{n^{2} + n + 2}{2}. \]</p>
+        <p><em>Proposed proof.</em> Suppose the formula holds for some positive integer \(k\), so that \(1 + 2 + \cdots + k = \frac{k^{2} + k + 2}{2}\). Adding \(k + 1\) to both sides,
+        \[ 1 + 2 + \cdots + k + (k + 1) = \frac{k^{2} + k + 2}{2} + (k + 1) = \frac{k^{2} + 3k + 4}{2}, \]
+        which is the formula with \(n = k + 1\), since \((k + 1)^{2} + (k + 1) + 2 = k^{2} + 3k + 4\). So the formula holds for every positive integer \(n\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Read the inductive step as closely as you like; it will not crack. Adding \(k + 1\) to \(\frac{k^{2} + k + 2}{2}\) really does give \(\frac{k^{2} + 3k + 4}{2}\), and that really is what the formula returns at \(n = k + 1\). The algebra is sound, every implication runs the way it is used — the first and fifth habits of Strategy B.5 pass it without a murmur.</p>
+        <p>The flaw is not in a line that was written. It is in a line that was never written: there is no base case, and this formula has none to be found. At \(n = 1\) the left side is \(1\) while the right side is \(\frac{1 + 1 + 2}{2} = 2\). The dominoes are standing in a row, each one leaning on the next, and nobody ever pushed the first.</p>
+        <p>Set the claim beside Proposition B.4, which proves \(1 + 2 + \cdots + n = \frac{n(n + 1)}{2}\) for the very same sum:
+        \[ \frac{n^{2} + n + 2}{2} = \frac{n(n + 1)}{2} + 1. \]
+        The formula is the true one plus \(1\) — so it fails not merely at \(n = 1\) but at every \(n\) there is. No inductive step could have caught that, and catching it was never the step's job: the step says only <em>if here, then next</em>, and a formula uniformly one too large keeps that promise perfectly. Only the base case asks whether the chain is fastened to anything. Nor is there anything here to repair, which is where this example parts company with the other two: they were true claims with broken arguments, and this is a false claim. Proposition B.4 already holds the true formula.</p>
+        <p>Hence the rule stated when the skeletons were laid out, and worth restating now that you have watched it break: an induction has two parts, and a step with no base case proves nothing whatever. Of the three failures in this section it is the easiest to commit and the hardest to catch by inspection, because there is no bad line in the step to find. Count the parts of an induction before you check its algebra.</p>
       </div>
     </section>
   </div>
