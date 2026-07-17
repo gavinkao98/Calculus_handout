@@ -147,6 +147,11 @@ appB 無圖。`export_figs.mjs`＋`chapters/ch03/figs/` 保留原樣；正式驗
 
 ### 4.5 驗收 gates（pilot v2）
 
+> **閘 1／3／4 已接進 `make_dist.py`（2026-07-17）：產 dist 時自動跑，任一不過就不產成品。**
+> 理由——閘不能靠人記得跑：閘 1 一直是內嵌的，閘 3 卻要另外下指令，於是 Inter 印錯字 bug
+> 帶著「四閘全綠」進了 dist。閘 2（版面）與閘 5（人眼）本質需人判斷，仍為人工。
+> 各閘仍可單獨執行（除錯時直接跑 `python check_glyphs.py <pdf>` 看逐條 finding）。
+
 0. **sampler 拍板閘（前置，D10）**：使用者未拍板不進 M-B2。
 1. **編譯閘**：`latexmk -lualatex` 0 error；0 missing character。
 2. **版面閘**：overfull `\hbox` >2pt＝0；underfull 逐條目視。寬顯示式維持手動斷行政策。

@@ -35,7 +35,7 @@ latexmk -lualatex -auxdir=../../build/aux-appB appendixB.tex
 latex/
   README.md               # 本檔：線導覽＋章節狀態表
   KICKOFF-latex-pilot.md  # 沿革＋D1–D10 拍板＋rollout 計畫（權威）
-  make_dist.py            # 產成品夾：轉換＋內嵌＋編譯＋驗收 → dist/<ch>/ 兩檔
+  make_dist.py            # 產成品夾：轉換＋內嵌＋編譯＋三閘驗收（1/3/4）→ dist/<ch>/ 兩檔
   convert.py              # fragment → 語意層 LaTeX（數學逐位元組 pass-through、表外標記硬錯）
   test_convert.py         # golden tests＋數學逐位元組不變式
   dialect_inventory.py    # 方言盤點器（rollout 逐章：python dialect_inventory.py ch04）
