@@ -47,6 +47,18 @@
 > **rollout 注意**：任何在此修正前用本模板建的 PDF 都帶同樣的 bug（`build/` 下的 ch03、
 > sampler、diag 等開發產物即是），要用得重編。
 
+> **🔧 2026-07-18 兩類既有 gate 違規修復（HTML 內容側；2026-07-17 資料夾重整驗證時曝露，為既存內容問題、與重整無關）。**
+> 記於此因這批修改被另一並行 session 的 `commit -a` 掃進 **`4d7a632`**（訊息只講 §B.6），
+> `git log --grep` 撈不到本修復——故留錨於此。**① quote_lint（CONTENT_SPEC §8）**：散文 ASCII
+> 撇號/引號 24 處以 `quote_lint.py --fix` 轉曲引號（appB ×4、appD ×10、ch01 ×1、ch02 ×5、
+> ch04 ×1、ch06 ×3；逐條人眼過 diff，數學 prime 與 HTML 屬性引號未動）；`chapters/appB/DIALECT-appB.md`
+> §5 撇號條目同步（ASCII→`’`，LaTeX 輸出同形、無轉換風險——與該檔 2026-07-17 重新凍結段的
+> `’`×17 帳一致）。**② linebreak-gate（寬顯示式手動斷行）**：5 條被 MathJax 自動硬斷的顯示式改寫為
+> `aligned` 手動斷（appA ×3＝冪和/配方/絕對值不等式；appC ×2＝cross product 與 scalar triple 的
+> 行列式展開），`build.py` 重組裝後 gate 歸 0。**驗收（新鮮跑）**：`quote_lint` clean（52 檔）、
+> `linebreak-gate` 0 條/0 render error、`doc_lint` clean、`build.py` 冪等。**續補**：並行 session 之後新增的
+> `sec-b-6.html` 帶 1 條同類撇號違規，已由該 session 自行於 **`5eac672`** 修訖（非本 session 處理）。
+>
 > **給新 session 的開場**：本檔是 2026-07-15/16 兩輪討論的完整交接（v2）。接手流程——
 > ① 先讀本檔全文；② 再讀 [`../html/CONTRACT-html-writing.md`](../html/CONTRACT-html-writing.md)（輸入方言契約）、
 > [`../html/TYPESETTING_GUIDE.md`](../html/TYPESETTING_GUIDE.md) §9（版心／字體拍板）、[`../../CLAUDE.md`](../../CLAUDE.md)（行為準則，尤其「缺套件先問」「commit 需授權」）、
