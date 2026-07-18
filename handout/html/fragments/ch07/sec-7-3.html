@@ -1,0 +1,153 @@
+<!-- §7.3 Volumes by Cylindrical Shells. section-source: Stewart ET 9e §6.3; cross-checked Thomas 14e
+     §6.2, Rogawski 4e §6.4. Authored 2026-07-18 per PLAN-ch07 + brief-7-3 (canon-as-spine; ③ D5
+     resolved register). Numbering: mints Theorem 7.1 (The shell method), Strategy 7.2, Examples
+     7.9–7.11. Cautions UNNUMBERED.
+     SEAM GUARD (PLAN-ch07 + brief-7-3 + ③ D5/blocking#7): the shell-stack MODEL is named FIRST
+     (same modeling tier as §7.2's slabs, explicitly), THEN the midpoint algebra — and "exact"
+     describes ONLY the approximating annular cylinder of height f(x̄ᵢ), never the original solid's
+     radial band. Theorem hypotheses: f continuous, f ≥ 0, 0 ≤ a < b. Midpoints are legitimate
+     sample points via Def 6.2's any-choice clause; convergence via Thm 6.1. ONE comparison example
+     (same solid, both methods, numbers must agree — washer leg's inversion honest via monotonicity);
+     general washer↔shell equivalence DEFERRED (Ch8 parts / Ch15 change of variables), one line.
+     Shifted-axis: Strategy 7.2 line only (region one side of axis, radius |x−c|) — NO worked example.
+     NO Pappus. NO second motivating failure.
+     Counters handed to §7.4: Definition 7.3, Example 7.12, Strategy 7.3 (Def counter at 7.3; Thm at
+     7.2; Ex at 7.12).
+     Record: PLAN-ch07.md, brief-7-3.md, ch07_ch-direction-codex3-audit.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">7.3</span>Volumes by Cylindrical Shells</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: the motivating failure (washers fight the region); slicing DIRECTION is a choice; instantiate the schema with the nested slice -->
+  <p>Try to compute a volume with the last section’s tools and you will sometimes find the region fighting back. Rotate the region under \(y = 2x^{2} - x^{3}\), from \(x = 0\) to \(x = 2\), about the \(y\)-axis. Cross-sections perpendicular to the axis of rotation are washers, so we need the region described from the \(y\)-axis’s point of view: for each height \(y\), which \(x\)-values lie in the region? That means solving \(y = 2x^{2} - x^{3}\) for \(x\) — inverting a cubic, which has no pleasant answer. Yet the region itself could hardly be simpler: read <em>vertically</em>, it is just the strips under a graph. The lesson is that slicing is a <em>choice</em>, and the right choice is the one whose slices see the region simply. This section develops the other natural choice for solids of revolution: keep the vertical strip — the one that reads \(f\) directly — and let the rotation carry it <em>around</em> the axis. The strip sweeps out a thin-walled tube, a <em>cylindrical shell</em>, and the solid is built of nested shells the way a tree trunk is built of rings.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 (M2 coverage audit addition) tier-supporting — the motivating-failure region: horizontal strip fights the cubic, vertical strip reads f directly; registered in chapter7 FIGS as "shell-motivation"] -->
+  <figure class="figure" data-fig="shell-motivation">
+    <figcaption><span class="fig-no">Figure 7.9</span> The region under \(y = 2x^{2} - x^{3}\) resists perpendicular slicing: a horizontal strip’s two ends lie on the curve, so reading its radii means solving the cubic for \(x\). A vertical strip reads its height \(f(x)\) straight off the graph — the strip the shell method keeps.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">The shell method</h3>
+
+  <p>Let \(f\) be continuous with \(f \ge 0\) on \([a, b]\), where \(0 \le a &lt; b\), and rotate the region under \(y = f(x)\) about the \(y\)-axis. Cut \([a, b]\) into \(n\) strips of width \(\Delta x\) as usual. The strip over \([x_{i-1}, x_i]\), swept around the axis, produces a shell whose inner wall has radius \(x_{i-1}\) and whose outer wall has radius \(x_i\). As in §7.2, the modelling step comes first, and in the open: we take the solid’s volume to be the limit of the volumes of these shell stacks as the strips shrink — the same commitment, made for the same reason, as the slab model of Definition 7.2, only with the slices now nested around the axis instead of stacked along it.</p>
+
+  <p>What makes the shell decomposition so effective is a small algebraic accident. Approximate the shell over \([x_{i-1}, x_i]\) by an <em>annular cylinder</em> — constant height \(f(\bar x_i)\), where \(\bar x_i = \tfrac{1}{2}(x_{i-1} + x_i)\) is the strip’s midpoint. (The approximation is in the height: the solid’s actual wall follows the varying graph, while the cylinder’s wall is flat.) The annular cylinder’s volume we can compute exactly — outer cylinder minus inner hole — and the midpoint makes it collapse:</p>
+  <p>\[ \pi x_i^{2}\,f(\bar x_i) - \pi x_{i-1}^{2}\,f(\bar x_i) = \pi\,(x_i + x_{i-1})(x_i - x_{i-1})\,f(\bar x_i) = 2\pi\,\bar x_i\,f(\bar x_i)\,\Delta x, \]</p>
+  <p>since \(x_i + x_{i-1} = 2\bar x_i\) and \(x_i - x_{i-1} = \Delta x\). Radius times height times thickness, with a factor \(2\pi\): the shell’s worth is <em>circumference times height times thickness</em>, as if the shell had been slit open and unrolled into a flat slab of length \(2\pi \bar x_i\), height \(f(\bar x_i)\), and thickness \(\Delta x\).</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — strip→shell upright scene (y-axis vertical per the 2.5D pattern), radial arrow for x, Δx between walls, one nested shell dotted; registered in chapter7 FIGS as "strip-to-shell"] -->
+  <figure class="figure" data-fig="strip-to-shell">
+    <figcaption><span class="fig-no">Figure 7.10</span> The vertical strip at distance \(x\) from the axis, swept into a thin-walled cylindrical shell: radius \(x\) read <em>radially</em> from the axis, height \(f(x)\) read from the graph, thickness \(\Delta x\) between the walls. A shallower shell sits dotted inside — the solid is built of nested tubes, not stacked slices.</figcaption>
+  </figure>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-strong — the unrolled shell slab, 2πx̄ᵢ × f(x̄ᵢ) × Δx; as-if register, exactness stays with the midpoint identity display; registered in chapter7 FIGS as "shell-unrolled"] -->
+  <figure class="figure" data-fig="shell-unrolled">
+    <figcaption><span class="fig-no">Figure 7.11</span> The shell slit open and unrolled, <em>as if</em> its curved wall lay flat: a slab of length \(2\pi\,\bar x_i\) (the circumference), height \(f(\bar x_i)\), and thickness \(\Delta x\). The picture explains where the \(2\pi\) comes from; the exact statement is the midpoint identity displayed above, not the flattening itself.</figcaption>
+  </figure>
+
+  <p>Summing the stack gives \(\sum_{i=1}^{n} 2\pi\,\bar x_i\,f(\bar x_i)\,\Delta x\) — and this is precisely a Riemann sum for the function \(2\pi x\,f(x)\), sampled at the midpoints. Definition 6.2 permits <em>any</em> choice of sample point, midpoints included; and since \(2\pi x f(x)\) is continuous on \([a, b]\), Theorem 6.1 guarantees the sums converge to its integral, no matter how the strips shrink. The shell stacks therefore have a limit, and the model hands that limit to the solid:</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">7.1</span><span class="env-name">The shell method</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be continuous with \(f(x) \ge 0\) on \([a, b]\), where \(0 \le a &lt; b\). The solid obtained by rotating the region under \(y = f(x)\), \(a \le x \le b\), about the \(y\)-axis has volume</p>
+      <p>\[ V = \int_{a}^{b} 2\pi x\,f(x)\,dx. \]</p>
+    </div>
+  </section>
+
+  <!-- expansion:caution — the radius-direction trap: shell radius is the distance to the ROTATION axis (horizontal, for the y-axis), even though the strip itself is vertical; the mirror image of §7.2's caution -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>A shell’s radius is the distance from the strip to the <em>axis of rotation</em> — for rotation about the \(y\)-axis, that is the horizontal coordinate \(x\), even though the strip itself stands vertically. The height, meanwhile, is read from the graph as usual. Keep the two roles separate: radius says how far around the strip travels, height says how tall it is.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.9</span></p>
+      <div class="env-body">
+        <p>Find the volume of the solid obtained by rotating the region under \(y = 2x^{2} - x^{3}\), from \(x = 0\) to \(x = 2\), about the \(y\)-axis.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>This is the section’s opening problem. First check the theorem’s hypotheses: \(2x^{2} - x^{3} = x^{2}(2 - x)\) is continuous and non-negative on \([0, 2]\) (it vanishes at both ends and is positive between), and the interval sits in \(x \ge 0\). The shell at position \(x\) has radius \(x\) and height \(2x^{2} - x^{3}\), so Theorem 7.1 gives</p>
+        <p>\[ \begin{aligned}
+          V &= \int_{0}^{2} 2\pi x\,\bigl(2x^{2} - x^{3}\bigr)\,dx = 2\pi \int_{0}^{2} \bigl(2x^{3} - x^{4}\bigr)\,dx \\[2pt]
+            &= 2\pi \left[\frac{x^{4}}{2} - \frac{x^{5}}{5}\right]_{0}^{2} = 2\pi\left(8 - \frac{32}{5}\right) = \frac{16\pi}{5}.
+        \end{aligned} \]</p>
+        <p>The cubic never had to be inverted: the shell integral reads \(f\) exactly as the region presents it. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <p>When the rotated region lies between <em>two</em> graphs, the shell’s height is the gap between them — §7.1’s integrand returning in a new role. The solid is the difference of two under-a-graph solids, so by the linearity of the integral (Theorem 6.2) their shell integrals subtract, and the height \(f(x) - g(x)\) rides in place of \(f(x)\).</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.10</span></p>
+      <div class="env-body">
+        <p>Find the volume of the solid obtained by rotating the region enclosed by \(y = x\) and \(y = x^{2}\) about the \(y\)-axis.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The region is the one from Example 7.7: between \(x = 0\) and \(x = 1\), with \(y = x\) above and \(y = x^{2}\) below. The shell at position \(x\) has radius \(x\) and height \(x - x^{2}\), so</p>
+        <p>\[ V = 2\pi \int_{0}^{1} x\,\bigl(x - x^{2}\bigr)\,dx = 2\pi \int_{0}^{1} \bigl(x^{2} - x^{3}\bigr)\,dx = 2\pi\left(\frac{1}{3} - \frac{1}{4}\right) = \frac{\pi}{6}. \]</p>
+        <p>Note what changed from Example 7.7 and what did not. The region is the same, but the axis is different — there we rotated about the \(x\)-axis and sliced into washers; here the \(y\)-axis makes shells natural. Different axis, different solid, different volume. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Washer or shell?</h3>
+
+  <p>Both methods compute volumes of revolution; the craft is in choosing. The washer slices <em>perpendicular</em> to the axis of rotation and asks for the region’s boundaries as seen from that axis; the shell slices <em>parallel</em> to the axis and asks for them as the region naturally presents them. One question settles it: which strip has its length written directly in the given functions?</p>
+
+  <!-- expansion:strategy — distill the method choice; the section's portable decision ritual -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">7.2</span><span class="env-name">Washer or shell?</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li><em>Draw both strips.</em> Sketch the region with one strip perpendicular to the axis of rotation (a washer slice) and one parallel to it (a shell slice).</li>
+        <li><em>Pick the strip that reads the boundaries directly.</em> If a strip’s ends would require solving \(y = f(x)\) for \(x\) (or vice versa), the other strip is usually the better choice.</li>
+        <li><em>Assemble the integrand.</em> Washer: \(\pi\bigl(R^{2} - r^{2}\bigr)\), radii measured from the axis to the far and near boundaries. Shell: \(2\pi\,(\text{radius})(\text{height})\), radius from the axis to the strip, height the boundary gap.</li>
+        <li><em>Shifted axis.</em> If the axis of rotation is a line \(x = c\) rather than a coordinate axis, nothing changes except that every radius becomes a distance to that line, \(\lvert x - c\rvert\) — with the region kept entirely on one side of the axis.</li>
+      </ol>
+    </div>
+  </section>
+
+  <p>The two methods had better agree when both apply. The next example runs one solid through both computations.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.11</span></p>
+      <div class="env-body">
+        <p>The region under \(y = x^{2}\), from \(x = 0\) to \(x = 1\), is rotated about the \(y\)-axis. Find the volume of the resulting solid twice: once by shells, once by washers.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p><em>Shells.</em> The shell at position \(x\) has radius \(x\) and height \(x^{2}\):</p>
+        <p>\[ V = 2\pi \int_{0}^{1} x\cdot x^{2}\,dx = 2\pi\cdot\frac{1}{4} = \frac{\pi}{2}. \]</p>
+        <p><em>Washers.</em> Slice horizontally at height \(y\), with \(0 \le y \le 1\). The region at that height runs from the parabola out to the line \(x = 1\); since \(x^{2}\) is increasing on \([0, 1]\), solving \(y = x^{2}\) for the boundary honestly gives \(x = \sqrt{y}\) — the sideways description of §7.1. Rotated, the slice is a washer with outer radius \(R = 1\) and inner radius \(r = \sqrt{y}\):</p>
+        <p>\[ V = \int_{0}^{1} \pi\bigl(1^{2} - (\sqrt{y})^{2}\bigr)\,dy = \pi \int_{0}^{1} (1 - y)\,dy = \pi\left(1 - \frac{1}{2}\right) = \frac{\pi}{2}. \]</p>
+        <p>The two computations slice the same solid in perpendicular directions and meet at the same number, \(\tfrac{\pi}{2}\) — as they must if both models measure the one volume. That this agreement holds in general, for every solid both methods reach, is a fact we are not yet equipped to prove economically; the tools arrive with integration by parts in Chapter 8 and change of variables in Chapter 15. For now, each such pair of computations is its own check. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-supporting — Ex 7.11's solid twice, same base geometry, washer overlay vs shell overlay; no numeric answer printed; registered in chapter7 FIGS as "washer-vs-shell"] -->
+  <figure class="figure" data-fig="washer-vs-shell">
+    <figcaption><span class="fig-no">Figure 7.12</span> One solid, two slicings — the solid of Example 7.11, a cylinder with a paraboloid bowl carved from its top. A horizontal slice at height \(y\) is a washer from \(\sqrt{y}\) out to \(1\); a vertical slice at radius \(x\) is a shell of height \(x^{2}\). Both decompositions must — and do — measure the same volume.</figcaption>
+  </figure>
+
+  <!-- expansion:summary — close §7.3: the choice ritual + the modeling honesty; forward to §7.4 where the schema leaves geometry; no §7.4 mechanics -->
+  <p>The section’s addition to the toolkit is not a new integral but a new freedom: the direction of slicing is ours to choose, and Strategy 7.2 turns that choice into a two-line ritual. Underneath, the honesty is the same as ever — a modelling commitment stated once (solids are measured by their shell stacks), an exact computation for each approximating piece, and Chapter 6’s convergence machinery to close the limit. So far the schema has measured geometry: areas, and now volumes three ways. The next section takes it somewhere new — to a quantity from physics that accumulates along a motion rather than across a region — and the slicing will, for the first time, have to decide <em>what</em> to slice.</p>
+
+</article>

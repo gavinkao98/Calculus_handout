@@ -1,0 +1,175 @@
+<!-- §7.2 Volumes. section-source: Stewart ET 9e §6.2 (Volumes); cross-checked Thomas 14e §6.1,
+     Rogawski 4e §6.2–6.3. Authored 2026-07-18 per PLAN-ch07 + brief-7-2 (canon-as-spine).
+     Numbering: mints Definition 7.2 (Volume by cross-sections), Examples 7.5–7.8. No Theorem here
+     (disks/washers are INSTANCES of Def 7.2, per PLAN — no separate "disk theorem"). Cautions
+     UNNUMBERED (Ch1–6 convention).
+     SEAM GUARD (PLAN-ch07 + brief-7-2): the modeling step (slab ≈ cylinder; volume DEFINED by the
+     integral) is stated in daylight; existence via Thm 6.1 cited explicitly; consistency checks =
+     constant-A cylinder + sphere/pyramid sanity anchors (classical solid geometry recovered — the
+     Ch6 semicircle Ex 6.6 move). Washer subtraction grounded in linearity (Thm 6.2), with the
+     π(R²−r²) ≠ π(R−r)² caution. Shifted-axis rotation COMPRESSED to Ex 7.7's closing line (deliberate,
+     recorded in brief; M4 may upgrade). Do NOT do shells (→ §7.3, one-line forward fence), Pappus,
+     oblique cross-sections, wedge. No strategy box here (Strategy 7.1 owns setup ritual; §7.3's box
+     owns method choice).
+     Counters handed to §7.3: Definition 7.3, Example 7.9, Strategy 7.2, Theorem 7.1 (none minted yet).
+     Record: PLAN-ch07.md, brief-7-2.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">7.2</span>Volumes</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: instantiate the chapter schema one dimension up; the strip's gap becomes a slab's face; the only exact volume geometry supplies is the cylinder's -->
+  <p>From flat regions we turn to solids, and the slices are now cut from a solid body — the way a loaf of bread is cut into slices. What does geometry give us to work with? For areas it gave rectangles. For volumes it gives the <em>cylinder</em>: a solid with a flat base of area \(A\) swept straight up to height \(h\) has volume \(V = Ah\). (The base need not be a circle — a box is a cylinder over a rectangle.) A curved solid is not a cylinder anywhere; but each <em>thin</em> slice of it very nearly is, and that is all the slicing method needs.</p>
+
+  <h3 class="subsec-head">Volume by cross-sections</h3>
+
+  <p>Let \(S\) be a solid lying between the vertical planes \(x = a\) and \(x = b\). For each \(x\) in \([a, b]\), slice \(S\) by the plane through \(x\) perpendicular to the \(x\)-axis, and write \(A(x)\) for the area of the exposed face — the <em>cross-section</em> at \(x\). Now cut \([a, b]\) into \(n\) subintervals of width \(\Delta x\) and, in the \(i\)-th one, pick a sample point \(x_{i}^{*}\). The slab of \(S\) over that subinterval is nearly a cylinder with base area \(A(x_{i}^{*})\) and thickness \(\Delta x\), so the whole solid is approximated by</p>
+  <p>\[ V \approx \sum_{i=1}^{n} A(x_{i}^{*})\,\Delta x, \]</p>
+  <p>a Riemann sum for the function \(A\). If \(A\) is continuous, Theorem 6.1 guarantees these sums close on a single limit, independent of every choice made in the slicing. It is that limit we take the volume to <em>be</em>. Note the word: this is a definition, not a theorem. Geometry hands us the volume of a cylinder; that a curved solid’s volume should be the limit of its slab approximations is the modelling step, made once, in the open — just as §6.1 made it for area.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">7.2</span><span class="env-name">Volume by cross-sections</span></p>
+    <div class="env-body">
+      <p>Let \(S\) be a solid lying between the planes \(x = a\) and \(x = b\), and suppose its cross-section at \(x\), perpendicular to the \(x\)-axis, has area \(A(x)\), where \(A\) is continuous on \([a, b]\). The <em>volume</em> of \(S\) is</p>
+      <p>\[ V = \int_{a}^{b} A(x)\,dx. \]</p>
+    </div>
+  </section>
+
+  <p>The definition passes its first test at once: if the cross-section never changes — \(A(x) = A\) for all \(x\), as in an actual cylinder lying on its side with \(h = b - a\) — then \(V = \int_{a}^{b} A\,dx = A\,(b - a) = Ah\), the formula we started from. The examples below run harder tests: the definition will be asked to reproduce two volumes that classical geometry already knows.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — generic (non-revolution) solid with one slab, face A(x_i*), Δx bracket, end planes a/b on a dimension line; 2.5D pattern per ch07_25d-pattern-codex-audit; registered in chapter7 FIGS as "slab-face"] -->
+  <figure class="figure" data-fig="slab-face">
+    <figcaption><span class="fig-no">Figure 7.5</span> A solid sliced like a loaf: the slab at \(x_i^{*}\) is nearly a cylinder — a flat face of area \(A(x_i^{*})\) swept through the small thickness \(\Delta x\), here exaggerated for visibility. The solid is deliberately irregular: nothing in Definition 7.2 asks for symmetry, only for a measurable cross-section at each station between \(a\) and \(b\).</figcaption>
+  </figure>
+
+  <!-- expansion:history [source: standard calculus-textbook historical note] — Cavalieri's principle as the classical echo of the definition; one line, non-decorative -->
+  <p>The idea is older than the integral. In the seventeenth century Cavalieri argued that two solids whose cross-sections agree at every height must enclose the same volume — <em>Cavalieri’s principle</em>. Definition 7.2 is that principle made quantitative: the volume is determined by, and computed from, the cross-section areas alone.</p>
+
+  <h3 class="subsec-head">Solids of revolution: disks</h3>
+
+  <p>The richest supply of solids with computable cross-sections comes from <em>revolution</em>. Take the region under \(y = f(x)\) from \(a\) to \(b\) (with \(f\) continuous and \(f \ge 0\)) and rotate it about the \(x\)-axis. Each vertical strip of the region sweeps out a thin circular slab — a <em>disk</em> — and the cross-section of the resulting solid at \(x\) is a full circle whose radius is the height of the curve:</p>
+  <p>\[ A(x) = \pi \bigl[f(x)\bigr]^{2}. \]</p>
+  <p>Definition 7.2 then gives \(V = \int_{a}^{b} \pi \bigl[f(x)\bigr]^{2}\,dx\). No new formula is being introduced here — only a recipe for \(A(x)\).</p>
+
+  <!-- expansion:caution — the radius-reading trap: the disk's radius is the function VALUE, a length read vertically, then swept; students who memorise "πr²" hunt for a horizontal r -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>For rotation about the \(x\)-axis, the disk’s radius at \(x\) is the <em>function value</em> \(f(x)\) — the vertical distance from the axis to the curve, which the rotation then sweeps around. It is not a distance along the \(x\)-axis, and when the axis of rotation moves (as it will shortly), the radius is always measured from <em>that</em> axis, not from a coordinate axis out of habit.</p>
+    </div>
+  </section>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-strong — strip→disk before/after pair, same station, disk centred on the axis and extending below it; registered in chapter7 FIGS as "strip-to-disk"] -->
+  <figure class="figure" data-fig="strip-to-disk">
+    <figcaption><span class="fig-no">Figure 7.6</span> The same station twice: a vertical strip of height \(f(x)\), and the thin disk it sweeps out when the region rotates about the \(x\)-axis. The disk’s radius is the function value \(f(x)\), its centre sits on the axis, and the solid extends symmetrically below the axis.</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.5</span></p>
+      <div class="env-body">
+        <p>Show that a sphere of radius \(r\) has volume \(\dfrac{4}{3}\pi r^{3}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Generate the sphere by rotating the upper half-disk under \(y = \sqrt{r^{2} - x^{2}}\), \(-r \le x \le r\), about the \(x\)-axis. The cross-section at \(x\) is a disk of radius \(\sqrt{r^{2} - x^{2}}\), so</p>
+        <p>\[ A(x) = \pi \bigl(\sqrt{r^{2} - x^{2}}\bigr)^{2} = \pi \bigl(r^{2} - x^{2}\bigr), \]</p>
+        <p>which is continuous, and Definition 7.2 applies. The integrand is even, so Theorem 6.8 lets us integrate over \([0, r]\) and double:</p>
+        <p>\[ \begin{aligned}
+          V &= \int_{-r}^{r} \pi \bigl(r^{2} - x^{2}\bigr)\,dx = 2\pi \int_{0}^{r} \bigl(r^{2} - x^{2}\bigr)\,dx \\[2pt]
+            &= 2\pi \left[r^{2}x - \frac{x^{3}}{3}\right]_{0}^{r} = 2\pi\cdot\frac{2r^{3}}{3} = \frac{4}{3}\pi r^{3}.
+        \end{aligned} \]</p>
+        <p>This is the volume formula the Greeks knew — Definition 7.2 has reproduced a fact of classical geometry from nothing but slicing, the same reassurance §6.2 drew from the semicircle in Example 6.6. A definition that agrees with everything already known has earned some trust. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.6</span></p>
+      <div class="env-body">
+        <p>The region under \(y = \sqrt{x}\) from \(0\) to \(4\) is rotated about the \(x\)-axis. Find the volume of the resulting solid.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The cross-section at \(x\) is a disk of radius \(\sqrt{x}\), with area \(A(x) = \pi (\sqrt{x})^{2} = \pi x\) — continuous on \([0, 4]\). Hence</p>
+        <p>\[ V = \int_{0}^{4} \pi x\,dx = \pi \left[\frac{x^{2}}{2}\right]_{0}^{4} = 8\pi. \]</p>
+        <p>Squaring the radius <em>before</em> integrating is what makes this integral easy: the square root disappears into the disk area. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Washers</h3>
+
+  <p>Rotate the region <em>between</em> two curves and the solid acquires a hole. If \(f\) and \(g\) are continuous on \([a, b]\) with \(f(x) \ge g(x) \ge 0\), and the region between the graphs is rotated about the \(x\)-axis, the cross-section at \(x\) is an annulus — a <em>washer</em> — with outer radius \(R = f(x)\) and inner radius \(r = g(x)\). Its area is a difference of two disk areas,</p>
+  <p>\[ A(x) = \pi \bigl[f(x)\bigr]^{2} - \pi \bigl[g(x)\bigr]^{2} = \pi \Bigl(\bigl[f(x)\bigr]^{2} - \bigl[g(x)\bigr]^{2}\Bigr), \]</p>
+  <p>and by the linearity of the integral (Theorem 6.2) the volume splits the same way: the solid with the hole is the full solid minus the hole’s own volume. Where §7.1 subtracted <em>heights</em>, the washer subtracts <em>squared radii</em> — and the order of operations there is a genuine trap.</p>
+
+  <!-- expansion:caution — THE washer trap: subtract squares, not the radii; π(R²−r²) ≠ π(R−r)² -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>A washer’s area is \(\pi\bigl(R^{2} - r^{2}\bigr)\), <em>not</em> \(\pi (R - r)^{2}\): square each radius first, then subtract. Writing \(\pi\bigl(f(x) - g(x)\bigr)^{2}\) — squaring the gap, as if §7.1’s integrand could be recycled — is the most common volume error there is, and it is silent: the integral still computes, just to the wrong number.</p>
+    </div>
+  </section>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-strong — washer face-on: ring = big disk minus small disk, radii from the axis, interior station 0<r<R; registered in chapter7 FIGS as "washer-annulus"] -->
+  <figure class="figure" data-fig="washer-annulus">
+    <figcaption><span class="fig-no">Figure 7.7</span> A washer face-on: the ring between an outer circle of radius \(R\) and an inner one of radius \(r\), both measured from the axis of rotation at the centre. Its area is the big disk minus the small one, \(\pi\bigl(R^{2} - r^{2}\bigr)\) — visibly not the disk of radius \(R - r\).</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.7</span></p>
+      <div class="env-body">
+        <p>The region enclosed by \(y = x\) and \(y = x^{2}\) is rotated about the \(x\)-axis. Find the volume of the resulting solid.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The curves meet where \(x = x^{2}\), so \(x = 0\) or \(x = 1\), and between these values \(x \ge x^{2} \ge 0\) (at \(x = \tfrac12\): \(\tfrac12\) against \(\tfrac14\)). Rotating, the line is the outer boundary and the parabola the inner one: \(R = x\), \(r = x^{2}\), giving washers of area \(\pi\bigl(x^{2} - x^{4}\bigr)\). Hence</p>
+        <p>\[ V = \int_{0}^{1} \pi \bigl(x^{2} - x^{4}\bigr)\,dx = \pi \left[\frac{x^{3}}{3} - \frac{x^{5}}{5}\right]_{0}^{1} = \pi \left(\frac{1}{3} - \frac{1}{5}\right) = \frac{2\pi}{15}. \]</p>
+        <p>Had the same region been rotated about the line \(y = 2\) instead, nothing would change except where the radii are measured from: each radius becomes a distance to <em>that</em> line, and the parabola — now the boundary farther from the axis — supplies the outer radius \(R = 2 - x^{2}\), the line the inner \(r = 2 - x\). Set up the radii from the axis of rotation, and the washer formula does the rest. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Cross-sections without revolution</h3>
+
+  <p>Definition 7.2 never mentions revolution. Any solid whose cross-sections we can describe is fair game — and for many classical solids the description is a matter of similar triangles.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.8</span></p>
+      <div class="env-body">
+        <p>Find the volume of a pyramid whose base is a square of side \(b\) and whose height is \(h\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Place the apex at the origin with the pyramid’s central axis along the \(x\)-axis, so the base sits in the plane \(x = h\). The cross-section at \(x\) is a square; write \(s(x)\) for its side. Slicing the pyramid through its axis exposes a triangle with apex at the origin, and for \(0 &lt; x \le h\) the cross-section’s half-width at distance \(x\) relates to the base’s half-width by similar triangles:</p>
+        <p>\[ \frac{s(x)/2}{x} = \frac{b/2}{h}, \qquad\text{so}\qquad s(x) = \frac{b}{h}\,x. \]</p>
+        <p>At the apex itself \(s(0) = 0\), which the same formula reports — so \(s(x) = \tfrac{b}{h}x\) holds across all of \([0, h]\). Hence \(A(x) = s(x)^{2} = \dfrac{b^{2}}{h^{2}}\,x^{2}\), continuous on \([0, h]\), and</p>
+        <p>\[ V = \int_{0}^{h} \frac{b^{2}}{h^{2}}\,x^{2}\,dx = \frac{b^{2}}{h^{2}}\cdot\frac{h^{3}}{3} = \frac{1}{3}\,b^{2}h. \]</p>
+        <p>This is the classical one-third rule for pyramids — and the integral shows where the mysterious \(\tfrac13\) comes from: it is \(\int_{0}^{1} u^{2}\,du\), the price of cross-sections that grow like the <em>square</em> of the distance from the apex. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-supporting — pyramid via the 2D through-axis fallback (pattern consult preference): half-widths s(x)/2 and b/2 against the central axis, face-on inset square; registered in chapter7 FIGS as "pyramid-similar"] -->
+  <figure class="figure" data-fig="pyramid-similar">
+    <figcaption><span class="fig-no">Figure 7.8</span> The pyramid sliced through its central axis: apex at the origin, base at \(x = h\). The exposed triangle carries the whole solution — the half-widths \(s(x)/2\) and \(b/2\) stand over \(x\) and \(h\) in the same ratio — and the inset shows the square cross-section of side \(s(x)\) face-on.</figcaption>
+  </figure>
+
+  <!-- expansion:summary — close §7.2: definition passed its tests (cylinder, sphere, pyramid); the skill is finding A(x); forward fence to shells WITHOUT mechanics -->
+  <p>The section’s whole content is one definition and a habit. The definition: volume is the integral of cross-sectional area — the slicing schema with the strip’s gap promoted to a slab’s face. The habit: before integrating anything, describe the cross-section — disk, washer, or square — and let its geometry write the integrand. The definition repaid the trust we placed in it by reproducing the cylinder, the sphere, and the pyramid of classical geometry. But perpendicular slices are not always the natural cut: for some solids of revolution every washer requires solving for \(x\) in terms of \(y\), while a different decomposition — into thin cylindrical <em>shells</em> — falls out effortlessly. That method is the next section’s business.</p>
+
+</article>

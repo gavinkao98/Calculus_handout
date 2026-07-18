@@ -1,0 +1,144 @@
+<!-- §7.4 Work. section-source: Stewart ET 9e §6.4 (Work); cross-checked Thomas 14e §6.5, Rogawski 4e
+     §6.5. Authored 2026-07-18 per PLAN-ch07 + brief-7-4 (canon-as-spine; ③ D6 resolved: SI primary,
+     one ft-lb mention, EXACTLY 3 examples; ③ advisory #10: F = kx is the APPLIED force, restoring is
+     −kx; cable density given directly as WEIGHT density N/m). Numbering: mints Definition 7.3 (Work),
+     Strategy 7.3, Examples 7.12–7.14. Cautions UNNUMBERED.
+     SEAM GUARD (PLAN-ch07 + brief-7-4): the section's transferable skill = NAME THE SLICE before
+     integrating (spring slices the displacement; cable slices the rope; tank slices the water) —
+     each solution names its slice up front. Physics is NOT assumed: work = force × distance for
+     constant force is adopted as the modeling input with a gloss; J = N·m defined in place. Pumping
+     coordinate convention pinned at the top of the solution (y from the vertex UP). Do NOT do
+     hydrostatic pressure, centers of mass, gas/piston, variable-density rods, kinetic-energy
+     theorems, ft-lb worked examples.
+     Counters handed to §7.5: Definition 7.4, Theorem 7.2, Example 7.15 (Strategy counter closes at
+     7.3 for the chapter per PLAN).
+     Record: PLAN-ch07.md, brief-7-4.md, ch07_ch-direction-codex3-audit.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">7.4</span>Work</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: the schema leaves geometry; the collision is that force × distance is meaningless the moment force varies; the spring's last centimetre -->
+  <p>So far the slicing schema has measured geometry — areas and volumes. This section takes it somewhere new: to <em>work</em>, the physicist’s measure of the effort a force expends in moving something. When a constant force pushes an object through a distance, the work done is simply force times distance. But most forces of interest are not constant. Stretching a spring, you feel the resistance grow: the final centimetre costs more effort than the first, so no single product \(\text{force} \times \text{distance}\) can price the whole stretch. The remedy is the one this chapter keeps applying. Over a <em>thin slice</em> of the motion the force barely changes, the product is honest again, and summing the slices builds an integral.</p>
+
+  <p>We adopt the physics as our modelling input, the way §7.2 adopted the cylinder. When a constant force of magnitude \(F\) moves an object through a distance \(d\) along the force’s own direction, the <em>work done</em> is \(W = Fd\). In SI units force is measured in newtons (N) and distance in metres, so work carries the unit newton-metre, called the <em>joule</em> (J). (Imperial texts measure the same quantity in foot-pounds; we will stay with SI.) When the force varies along the line of motion — say the object moves along the \(x\)-axis from \(a\) to \(b\), pushed by a force whose component along the motion at position \(x\) is \(F(x)\) — we slice \([a, b]\) into strips of width \(\Delta x\), price each strip at \(F(x_i^{*})\,\Delta x\), and pass to the limit. The sums are Riemann sums of \(F\), so for continuous \(F\) Theorem 6.1 supplies the limit, and we take it as the definition.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">7.3</span><span class="env-name">Work</span></p>
+    <div class="env-body">
+      <p>Suppose an object moves along the \(x\)-axis from \(x = a\) to \(x = b\), acted on by a force whose component along the direction of motion is \(F(x)\) at position \(x\), with \(F\) continuous on \([a, b]\). The <em>work</em> done by the force is</p>
+      <p>\[ W = \int_{a}^{b} F(x)\,dx. \]</p>
+    </div>
+  </section>
+
+  <p>Read as in §6.4: work is the net change accumulated from its rate, and force is the rate at which work accrues per metre of progress. A force opposing the motion has negative component and contributes negative work — the sign convention comes free with the word <em>component</em>.</p>
+
+  <h3 class="subsec-head">Springs</h3>
+
+  <!-- expansion:application [source: Stewart ET 9e §6.4 / standard physics — Hooke's law as empirical model; applied vs restoring force distinction per ③ advisory] -->
+  <p>The classic varying force is a spring’s. <em>Hooke’s law</em> — an empirical model, accurate for stretches that are not too large — says that the force required to hold a spring stretched \(x\) units beyond its natural length is proportional to \(x\):</p>
+  <p>\[ F(x) = kx, \]</p>
+  <p>where \(k\), the <em>spring constant</em>, measures the spring’s stiffness in newtons per metre. Two readings of the same law are worth separating: \(kx\) is the force <em>we</em> apply to hold the stretch, while the spring itself pulls back with the opposite force \(-kx\). Computing \(\int F\,dx\) with \(F = kx\) therefore prices the work done <em>against</em> the spring — the effort of stretching it.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-strong — F = kx force–displacement graph, work = area under the line, one representative strip (Def 7.3's Riemann reading folded in); registered in chapter7 FIGS as "spring-force-area"] -->
+  <figure class="figure" data-fig="spring-force-area">
+    <figcaption><span class="fig-no">Figure 7.13</span> Hooke’s law drawn: the applied force \(F = kx\) against the stretch \(x\) beyond natural length. The work of stretching from \(a\) to \(b\) is the shaded area under the force line, accumulated strip by strip — and the strips grow taller toward \(b\), which is why the last centimetre costs the most.</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.12</span></p>
+      <div class="env-body">
+        <p>A force of \(30\) N is required to hold a spring stretched \(0.1\) m beyond its natural length. How much work is done in stretching it from \(0.1\) m to \(0.2\) m beyond its natural length?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here the slice is a slice of <em>displacement</em>: the moving end of the spring advances from \(x = 0.1\) to \(x = 0.2\), and the force varies as it goes. First pin down the model. Hooke’s law with the given data reads \(30 = k\,(0.1)\), so \(k = 300\) N/m and \(F(x) = 300x\). Then</p>
+        <p>\[ W = \int_{0.1}^{0.2} 300x\,dx = 150\bigl[x^{2}\bigr]_{0.1}^{0.2} = 150\,(0.04 - 0.01) = 4.5 \text{ J}. \]</p>
+        <p>For comparison, the first \(0.1\) m of stretch, from the natural length, costs only \(150\,(0.01) = 1.5\) J — the same distance at a third of the price. The force grows with the stretch, and the work grows faster than the distance. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">Lifting and pumping</h3>
+
+  <p>In the spring problem one object moved and the force on it varied. The next two problems are built differently: a cable, or a tankful of water, is an extended body whose parts each move a <em>different</em> distance. As with the spring, what we compute is work done <em>against</em> a resisting force — here gravity. To raise a slice steadily, the winch or pump applies an upward force whose magnitude equals the slice’s weight, and it is <em>that</em> applied force, pointing along the upward motion, whose work the integrals below price: (the slice’s weight) \(\times\) (the distance <em>it</em> rises). (Gravity itself, pulling against the motion, does the opposite, negative, work — that is what makes the lifting cost effort.) The force required on any one slice stays constant as it rises; what varies from slice to slice is the journey. So the slicing must follow the structure: slice the <em>material itself</em>, and price each slice’s lift. Deciding what to slice is the whole game, and it is the first sentence of each solution below.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.13</span></p>
+      <div class="env-body">
+        <p>A \(20\) m cable weighing \(2\) N per metre hangs straight down from a winch. How much work does the winch do in winding the whole cable up to the top?</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Slice the <em>cable</em>. Measure \(x\) downward from the winch, and consider the slice of cable between depths \(x\) and \(x + \Delta x\). Its weight is (weight density) \(\times\) (length) \(= 2\,\Delta x\) newtons — the given \(2\) N/m is already a weight per metre, so no conversion from mass is needed — and to reach the winch this slice must rise the distance \(x\) from its starting depth. Hauling it up steadily, the winch applies an upward force of that same magnitude, \(2\,\Delta x\) newtons, through the distance \(x\), contributing \(2x\,\Delta x\) joules of work against gravity; and the whole cable costs</p>
+        <p>\[ W = \int_{0}^{20} 2x\,dx = \bigl[x^{2}\bigr]_{0}^{20} = 400 \text{ J}. \]</p>
+        <p>The top of the cable rises almost no distance and contributes almost nothing; the bottom metre rises nearly the full \(20\) m and is the expensive part. The integral prices each slice by its own journey. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-supporting — one cable slice at depth x with its own lift arrow; pairs with the tank figure to show the coordinate direction is a choice; registered in chapter7 FIGS as "cable-slice"] -->
+  <figure class="figure" data-fig="cable-slice">
+    <figcaption><span class="fig-no">Figure 7.14</span> One slice of the hanging cable, at depth \(x\) below the winch. The winch carries its weight through the distance \(x\) that this slice alone must rise: slices near the bottom travel farthest and cost the most.</figcaption>
+  </figure>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.14</span></p>
+      <div class="env-body">
+        <p>A tank has the shape of an inverted circular cone (vertex at the bottom) of height \(4\) m and top radius \(2\) m. It is filled with water to a depth of \(3\) m. Find the work required to pump all the water out over the top rim. (Water weighs \(\rho g \approx 9800\) N per cubic metre: density \(\rho = 1000\) kg/m³ times \(g = 9.8\) m/s².)</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Slice the <em>water</em>, horizontally — each horizontal sheet of water rises as one piece, while sheets at different depths rise different amounts. Fix the coordinate first: let \(y\) run <em>upward from the vertex</em>, so the tank occupies \(0 \le y \le 4\), the rim sits at \(y = 4\), and the water fills \(0 \le y \le 3\).</p>
+        <p>The slab of water at height \(y\), of thickness \(\Delta y\), is a disk. Its radius \(r(y)\) comes from similar triangles in the cone’s side view, exactly as in Example 7.8: \(r(y)/y = 2/4\), so \(r(y) = y/2\). The slab’s volume is \(\pi\,(y/2)^{2}\,\Delta y = \tfrac{\pi}{4}y^{2}\,\Delta y\) cubic metres, so its weight is \(9800\cdot\tfrac{\pi}{4}y^{2}\,\Delta y\) newtons; raising it steadily to the rim takes an upward force of that magnitude acting from height \(y\) to height \(4\), through the lift distance \(4 - y\) metres. Summing the slabs’ work against gravity and refining,</p>
+        <p>\[ \begin{aligned}
+          W &= \int_{0}^{3} 9800\cdot\frac{\pi}{4}\,y^{2}\,(4 - y)\,dy = 2450\pi \int_{0}^{3} \bigl(4y^{2} - y^{3}\bigr)\,dy \\[2pt]
+            &= 2450\pi \left[\frac{4y^{3}}{3} - \frac{y^{4}}{4}\right]_{0}^{3} \\[2pt]
+            &= 2450\pi\left(36 - \frac{81}{4}\right) = 2450\pi\cdot\frac{63}{4} \approx 1.2 \times 10^{5} \text{ J}.
+        \end{aligned} \]</p>
+        <p>Every factor in the integrand earned its place from the slicing: \(\tfrac{\pi}{4}y^{2}\) is the slab’s cross-section (§7.2’s machinery on loan), \(9800\) converts volume to weight, and \(4 - y\) is that slab’s own lift. Note the two different numbers \(3\) and \(4\): the water surface bounds the <em>integral</em>, while the rim height enters the <em>distance</em>. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — conical tank side view: slab at height y (strictly inside 0<y<3), radius y/2, lift 4−y; the 3-vs-4 distinction visible; registered in chapter7 FIGS as "tank-pump"] -->
+  <figure class="figure" data-fig="tank-pump">
+    <figcaption><span class="fig-no">Figure 7.15</span> The conical tank in side view: vertex at height \(0\), rim at \(4\), water to depth \(3\). The slab at height \(y\) has radius \(y/2\) by similar triangles and rises \(4 - y\) to the rim — the water surface bounds the integral at \(3\), while the rim height \(4\) enters each slab’s distance.</figcaption>
+  </figure>
+
+  <!-- expansion:caution — the template trap: spring slices displacement (force varies, distance is dx); cable/tank slice the material (force per slice constant, distance varies); memorising one template misprices the other -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The three examples hide two different slicings. The spring slices the <em>displacement</em>: one object moves, the applied force on it varies, and \(dx\) is a bit of distance. The cable and the tank slice the <em>material</em>: the force required on each slice is constant (matching its weight), and what varies is the distance that slice travels. Memorising a single template — “weight times height” or “force times \(dx\)” — will misprice one of the two. Name what is being sliced first; the integrand then assembles itself.</p>
+    </div>
+  </section>
+
+  <!-- expansion:strategy — distill the section's setup ritual; the units line is the built-in error detector -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">7.3</span><span class="env-name">Setting up a work integral</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li><em>Name the slice.</em> Decide what is being cut into thin pieces: the displacement (a varying force on one moving object) or the material itself (each piece moving its own distance).</li>
+        <li><em>Price one slice.</em> Write the force on the slice and the distance that slice moves, with units attached to each factor.</li>
+        <li><em>Assemble the contribution.</em> The slice’s work is (force) \(\times\) (distance); check that its units come to newton-metres — joules.</li>
+        <li><em>Integrate over the slices.</em> The limits of integration describe where the slices <em>are</em> (the stretch traversed, the cable’s depths, the water’s heights) — not necessarily where they end up.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- expansion:summary — close §7.4: the schema priced motion; the slice-naming skill; forward to §7.5 (averages) with no mechanics -->
+  <p>The schema has now left geometry and priced a motion. Nothing in the machinery changed — the sums were Riemann sums as ever, and Theorem 6.1 closed each limit — but for the first time the slicing had to make a decision about <em>what</em> to slice, and Strategy 7.3 begins there. The next section asks the integral a different kind of question. Instead of accumulating a total — an area, a volume, a number of joules — it will distil a single representative number from a continuously varying function: its average.</p>
+
+</article>

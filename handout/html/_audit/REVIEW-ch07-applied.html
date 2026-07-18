@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>REVIEW — Ch7 Applications of Integration：M1 已套用報告（2026-07-18）</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif; max-width: 60rem; margin: 2rem auto; padding: 0 1.2rem; line-height: 1.65; color: #1a1a1a; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #1f4e79; padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; color: #1f4e79; margin-top: 2.2rem; border-left: 5px solid #1f4e79; padding-left: .6rem; }
+  h3 { font-size: 1.05rem; margin-top: 1.6rem; }
+  table { border-collapse: collapse; width: 100%; margin: .8rem 0; font-size: .92rem; }
+  th, td { border: 1px solid #c8c8c8; padding: .4rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #eef3f8; }
+  code { background: #f2f2f2; padding: .05rem .3rem; border-radius: 3px; font-size: .9em; }
+  .badge { display: inline-block; padding: .1rem .55rem; border-radius: 1rem; font-size: .8rem; font-weight: 700; color: #fff; }
+  .ok { background: #2e7d32; } .warn { background: #b26a00; } .pend { background: #757575; }
+  .num { font-variant-numeric: tabular-nums; }
+  .box { border: 1px solid #d0d7de; border-radius: 6px; padding: .8rem 1rem; margin: 1rem 0; background: #fafbfc; }
+  .fix { background: #fff8f0; border-left: 4px solid #b26a00; padding: .5rem .8rem; margin: .5rem 0; font-size: .92rem; }
+  blockquote { border-left: 4px solid #999; margin: .6rem 0; padding: .2rem .9rem; color: #444; background: #f7f7f7; }
+  .en { font-style: normal; }
+  ul { padding-left: 1.4rem; }
+  .small { font-size: .85rem; color: #555; }
+</style>
+</head>
+<body>
+
+<h1>Ch7 Applications of Integration — M1（Mode A′ canon 草擬）已套用報告</h1>
+<p class="small">2026-07-18 ｜ 產線：canon 5-milestone（Ch6 定版序列）｜ 本輪範圍：M1 全程（③ 章層方向 → 七節 brief＋擴寫＋逐節 Codex ⑤ → 章層收尾 sweep）｜ 撰寫 Claude、對抗審 Codex gpt-5.6-terra/xhigh（本對話經使用者授權 standing consent＋拍板委任 Claude⇄Codex 收斂）</p>
+
+<p><span class="badge ok">M1 完成</span>　七節全數 Codex ⑤ 收斂至 <strong>0 blocking</strong>（回歸全 clean）；章層 review <strong>M1–M8 八維全數 CLEAN、0 blocking／0 advisory</strong>；sympy 全例重算 <strong>48/48 PASS</strong>。M2（圖）、M3（散文＋難度）、M4（gap-check）、三閘 gate-2、M5 尚未跑。</p>
+
+<h2>一、關鍵數字</h2>
+<table>
+<tr><th>項目</th><th>數值</th></tr>
+<tr><td>節數／worked examples</td><td class="num">7 節；Ex 7.1–7.22（22 例，③ 上限 23）</td></tr>
+<tr><td>鑄號</td><td>Definition 7.1–7.6｜Theorem 7.1–7.4（其中 <strong>7.2、7.3、7.4 當場全證</strong>）｜Strategy 7.1–7.3｜Caution ×8（不編號）｜figure-opportunity 標記 ×19（圖留 M2；含 §7.6 ⑤ 補標的 ds 三角形）</td></tr>
+<tr><td>機械閘終值</td><td class="num">build ✔｜linebreak-gate 0｜quote lint clean ×7｜render math=813、KaTeX 錯誤 0｜sympy 48/48｜交叉引用 51 條 0 dangling｜四型 counter 連續</td></tr>
+<tr><td>⑤ 稽核戰績</td><td class="num">round-1 blocking 計 10（§7.1×2、§7.2×3、§7.4×1、§7.7×4）全修＋回歸 clean；§7.3、§7.5 一次過 0/0；§7.6 0 blocking＋1 advisory（補標記）</td></tr>
+<tr><td>Codex 用量</td><td class="num">9 call ≈ 1.41M tokens（③ 221k｜⑤ 105k–177k×7｜章層 sweep 213k）；另 3 call 因中途電腦重開機作廢重跑</td></tr>
+</table>
+
+<h2>二、③ 章層方向收斂（單輪定案）</h2>
+<p>七項提案 D1–D7 全數 agree／agree-with-modifications，修正案逐條核驗後全採納；Codex 另提 8 blocking＋5 advisory 獨立風險全數落地。完整轉錄：<code>_dev-archive/ch07/ch07_ch-direction-codex3-audit.md</code>。要點：</p>
+<ul>
+<li><strong>D1 roster</strong>：七節全保留（NTU 微積分甲涵蓋 Stewart 8.1–8.2）；例題硬上限 23；§7.7 併為 2 例；Schwarz lantern 不寫。</li>
+<li><strong>D2 積分 MVT</strong>：§7.5 新鑄 Theorem 7.2 全證——EVT 4.9(a) 取得 \(m, M\)、比較性質 Thm 6.2(4) 夾出 \(m \le f_{\text{ave}} \le M\)、分 \(m=M\)（常數）與 \(m<M\)（\(\alpha=\min\{x_m,x_M\}\)、\(\beta=\max\)，對 \([\alpha,\beta]\) 用 IVT 4.9(b)）。關閉 seam ledger 的「積分均值(EVT+IVT)」前提。</li>
+<li><strong>D3 C¹ 弧長</strong>：Definition 7.5（regular partition 內接多邊形極限）＋Theorem 7.3 全證（MVT 4.12 逐弦轉換 → Def 6.2 任意取樣點條款＋Thm 6.1 收尾）；\(C^1([a,b])\)／smooth 就地鑄詞（端點單側）。關閉「C¹ 弧長定理」前提。</li>
+<li><strong>D4 表面積（本輪最有價值的收斂）</strong>：我原提案掛「具名 uniform-continuity fence」；Codex 指出 App D 無對應 entry＝<em>無地址的證明債</em>，並給出更強方案——C¹ 下以 \(K=\max\lvert f'\rvert\)、\(B=\max\sqrt{1+f'^2}\)（EVT）做顯式誤差估計：高度改讀點的總誤差 \(\le 2\pi KB(b-a)\,\Delta x \to 0\)，<strong>Theorem 7.4 當場證完、全章零新增 fence</strong>。我獨立驗算後採納。</li>
+<li><strong>D5 殼法</strong>：Theorem 7.1 以 shell-stack model（與 §7.2 slab 同級、明講）＋中點恰等式 \(\pi(x_i^2-x_{i-1}^2)f(\bar x_i)=2\pi\bar x_i f(\bar x_i)\Delta x\)＋Def 6.2/Thm 6.1 收尾；「exact」僅指近似圓環柱。washer↔shell 一致性以 Ex 7.11 同解驗證（兩法皆 \(\pi/2\)），一般等價一句話遞延 Ch8/Ch15。</li>
+<li><strong>D6 選材</strong>：§7.4 恰 3 例（彈簧/吊纜/抽水）、SI 為主；no RMS；Stewart 8.3–8.5（流體壓力/質心/經濟/機率）維持不收。</li>
+<li><strong>D7 opener</strong>：slice–approximate–sum–refine schema 只在章 opener 具名一次，各節實例化不重述；學習成果 6 條→5 條（SPEC §4 上限）。</li>
+<li>獨立風險亮點：完整球面在極點違反 C¹（→ Ex 7.21 改 <em>spherical zone</em>，hat-box 定理；\(4\pi r^2\) 只作明示極限預告、fence 到 Ch8 瑕積分）；frustum 相減推導除以 \(r_2-r_1\) 漏圓柱退化（→ 補獨立展開驗證）；繞 \(y\) 軸限單側 \(0\le a<b\)。</li>
+</ul>
+
+<h2>三、逐節 as-built ＋ ⑤ 結果</h2>
+
+<h3>§7.1 Areas Between Curves（含章 opener）</h3>
+<p>Def 7.1（\(A=\int(f-g)\)，含 vs Def 6.1 一致性檢查與「同升不變」直覺）；交叉曲線 \(\int\lvert f-g\rvert\)（§6.4 位移/路程 echo）；水平切片；速度差應用（Net Change 讀法）；Strategy 7.1。Ex 7.1（\(e^x\) vs \(x\)，\(e-\tfrac32\)）、7.2（雙拋物線，\(\tfrac13\)）、7.3（sin/cos 交叉，\(2\sqrt2-2\)）、7.4（橫切＋Thm 6.8 對稱，\(\tfrac83\)）。</p>
+<div class="fix">⑤ r1＝2 blocking 已修：B1 速度差應用漏連續性假設且末句過度泛化（改以位置函數 \(s_A(0)=s_B(0)\)、連續速度框架套 Thm 6.5，交叉情形明確分流 \(\int\lvert v_A-v_B\rvert\) vs 淨差）；B2 水平切片一般式漏 \(f,g\) 連續。回歸 clean → <strong>CLOSED 0 blocking</strong>。</div>
+
+<h3>§7.2 Volumes</h3>
+<p>Def 7.2（截面積積分＝體積的<em>定義</em>，建模步驟白紙黑字；存在性 Thm 6.1）；圓柱一致性檢查；Cavalieri 一行史註；disk/washer 為定義的實例（不另立定理）；Ex 7.5（球 \(\tfrac43\pi r^3\)，經典幾何 sanity anchor）、7.6（\(8\pi\)）、7.7（washer \(\tfrac{2\pi}{15}\)＋繞 \(y=2\) 半徑改讀一句帶過）、7.8（金字塔 \(\tfrac13 b^2h\)，相似三角形）。Caution ×2（半徑＝函數值；\(\pi(R^2-r^2)\ne\pi(R-r)^2\)）。</p>
+<div class="fix">⑤ r1＝3 blocking 已修：DIR-01 opener 逐字重列四步 schema（違反 D7，刪；並自查出 §7.4 同型 contagion 一併修）；HYP-01 washer 一般式漏連續；HYP-02 相似三角形比例在頂點 \(x=0\) 為 \(0/0\)（限 \(0<x\le h\)＋\(s(0)=0\) 收）。回歸 clean → <strong>CLOSED 0 blocking</strong>。</div>
+
+<h3>§7.3 Volumes by Cylindrical Shells</h3>
+<p>動機失敗案（\(y=2x^2-x^3\) 繞 \(y\) 軸，washer 需反解三次式）；shell-stack model 先行、中點恰等式、展開讀法（\(2\pi x\)＝周長）；Theorem 7.1；Strategy 7.2（washer or shell?＋shifted-axis \(\lvert x-c\rvert\) 單側）；Ex 7.9（\(\tfrac{16\pi}{5}\)）、7.10（間隙高度，\(\tfrac{\pi}{6}\)）、7.11（同一固體兩法對算，皆 \(\tfrac{\pi}{2}\)）。</p>
+<div class="fix">⑤ r1＝<strong>一次過 0 blocking／0 advisory</strong>（含 §7.2 回歸 rider 4/4 clean）。</div>
+
+<h3>§7.4 Work</h3>
+<p>Def 7.3（\(W=\int F\)，\(F\)＝沿運動方向的有號分量；\(W=Fd\) 為建模輸入；J＝N·m 就地定義、ft-lb 一提）；Hooke 定律（施力 \(kx\) vs 回復力 \(-kx\)，經驗模型狀態明講）；Ex 7.12（彈簧 4.5 J）、7.13（吊纜 400 J，N/m 重量密度直給）、7.14（錐形水槽 \(2450\pi\cdot\tfrac{63}{4}\approx1.2\times10^5\) J，相似三角形借 §7.2、「3 與 4 兩個數」點破）；Caution（兩種切法別背模板）；Strategy 7.3（name the slice）。</p>
+<div class="fix">⑤ r1＝1 blocking 已修：7.4-B1 力主詞錯位——吊纜/抽水散文把正功記在「重量」頭上（重量向下、運動向上，其功為負）；改明講正積分計價的是<strong>逆重力的施力</strong>（大小等於重量、方向沿運動），重力自身做負功。回歸（rider R-74）clean → <strong>CLOSED 0 blocking</strong>。</div>
+
+<h3>§7.5 Average Value of a Function</h3>
+<p>取樣平均 \(\to\) 積分的動機（\(\tfrac1n\sum=\tfrac{1}{b-a}\sum f\,\Delta x\)）；Def 7.4（\(a<b\)）；「levelling height」幾何讀法；Caution（平均屬於函數＋區間這一<em>對</em>）；<strong>Theorem 7.2（Mean Value Theorem for Integrals）全證</strong>；FTC 路線一句帶過（Thm 6.3＋4.12）；Ex 7.15（\(f_{\text{ave}}=2\)）、7.16（同函數換區間 \(\tfrac43\)）、7.17（attainment \(c=\pm1\)、不宣稱唯一）。</p>
+<div class="fix">⑤ r1＝<strong>一次過 0 blocking／0 advisory</strong>（含 IVT「between」含端點值的邊界判定：無缺口）。</div>
+
+<h3>§7.6 Arc Length</h3>
+<p>內接多邊形 Def 7.5（有限極限、長度無號、退化 \(L=0\)）；smooth／\(C^1([a,b])\) 就地鑄詞（端點單側）；<strong>Theorem 7.3 全證</strong>（橋接句明示 blanket hypothesis 供 MVT 逐帶所需＋integrand 連續，MVT 給的取樣點由 Def 6.2 任意條款涵蓋）；integrand＝局部伸縮因子讀法；Ex 7.18（\(x^{3/2}\)，\(\tfrac{13\sqrt{13}-8}{27}\approx1.44>\sqrt2\) 弦檢查）、7.19（完全平方＋\(\sqrt{q^2}=\lvert q\rvert\) 明判，\(\tfrac{17}{12}\)）；弧長函數 \(s(x)\)（FTC-1）、\(ds\)（繫回 §5.3；\(ds^2=dx^2+dy^2\) 明標 mnemonic 地位）；Ex 7.20（\(s(x)=\tfrac{x^2-1}{8}+\ln x\)）；Caution（\(\lvert x\rvert\) 角點：定義仍可測、定理跨不過）。</p>
+<div class="fix">⑤ r1＝0 blocking＋1 advisory 已修：ADV-FIG-01 brief 承諾的第三個 figure 機會（\(ds\) 直角三角形）漏標→補標（caption 須註明 mnemonic 地位）。marker-only 免回歸 → <strong>CLOSED 0 blocking</strong>。稽核評語：「C¹ 弧長定理的完整證明數學嚴密，成功關閉跨章 seam。」</div>
+
+<h3>§7.7 Area of a Surface of Revolution（＋章末總結）</h3>
+<p>錐/frustum 引理（sector 展開 \(\pi r\ell\)；相似錐相減 \(\pi(r_1+r_2)\ell\)；<strong>\(r_1=r_2\) 圓柱另以展開矩形驗證</strong>；\(2\pi\bar r\ell\)）；Def 7.6（frustum band 極限）；<strong>Theorem 7.4 全證</strong>（弦步驟引 §7.6、K/B 顯式誤差估計、Riemann sum 收尾——D4 方案，零 fence）；\(S=\int 2\pi\rho\,ds\) 統一讀法（繞 \(y\) 軸限單側 \(0\le a<b\)）；Ex 7.21（<strong>球帶 zone</strong>：integrand 坍縮為 \(r\)、\(S=2\pi r(b-a)\) 只看寬度——Archimedes hat-box；\(4\pi r^2\) 作明示極限預告＋Ch8 fence）、7.22（\(y=x^2\) 繞 \(y\) 軸，\(\tfrac{\pi}{6}(5\sqrt5-1)\)）；章末總結（SPEC §4 三段式、八條核心公式、Ch8/10/13/15/16 前瞻）。</p>
+<div class="fix">⑤ r1＝4 blocking 已修（<strong>證明本體、兩例、frustum 引理 r1 即 clean</strong>）：B1「跨軸必掃兩次」過度普遍化（\(y=x\) 繞 \(y\) 軸＝上下兩錐僅頂點相接是反例；改「可能重疊或重覆覆蓋，一般情形需分割追蹤」）；B2 總結漏點名 Def 7.6；B3 總結「work against a varying force is \(\int F\)」重現剛修掉的力主詞歧義（改有號分量讀法）；B4「Two theorems」實列三個自相矛盾（改 Three）。回歸 4/4 clean（章層 review 承載）→ <strong>CLOSED 0 blocking</strong>。</div>
+
+<h2>四、章層收尾 sweep（三部分）</h2>
+<h3>1. sympy 全例重算 — 48/48 PASS</h3>
+<p>全 22 例答案＋承重輔助恆等式（中點恰等式、frustum 引理、完全平方、zone integrand 坍縮）逐一重算核對。兩處工具限制照 ch06 慣例記錄（Ex 7.21 根式合併需 \(r^2-x^2>0\) 假設——改平方恆等式＋數值抽點驗，非內容錯誤）。另跑交叉引用 lint：51 條散文引用 0 dangling、四型 counter 連續。</p>
+<h3>2. Hypothesis ledger 覆核 — clean</h3>
+<p>章寬彙整：每個定義/極限點的連續性（Thm 6.1）都有明文；次序/正負假設（\(f\ge g\)、\(f\ge0\)、\(0\le a<b\) 單側）齊備；\(a<b\) 在語義會壞掉之處（平均、長度、表面積）皆明定；smooth 的鑄造與球極點失效的誠實旗標；Ch4 存在性 import（EVT/IVT/MVT）全在假設內；退化情形（\(m=M\)、\(r_1=r_2\)、頂點 \(0/0\)、極點）全收；建模層各自一次、白紙黑字；<strong>零沉默建模步驟、零證明債</strong>。</p>
+<h3>3. 章層 Codex review — M1–M8 八維全數 CLEAN、0 blocking／0 advisory</h3>
+<blockquote>「章級 M1–M8 sweep 與 §7.7 四項回歸均通過；目前樹為 0 blocking、0 advisory。」</blockquote>
+<p>八維逐一明列（定義／定理／證明邏輯量詞／例題推理／定義域邊界／記號／跨節一致（含章末總結忠實回顧）／import 假設），詳 <code>_dev-archive/ch07/ch07_chapter-sweep-audit.md</code>。</p>
+
+<h2>五、後續（M2–M5，未跑）</h2>
+<table>
+<tr><th>Milestone</th><th>內容</th><th>備註</th></tr>
+<tr><td>M2 圖批次</td><td><strong>gate-1 側完成（2026-07-18）</strong>：機會覆核 23 張採納 → 2.5D pattern Codex 收斂 → Figure 7.1–7.23 全數繪製 → <strong>D1–D8 gate-1 23/23 視覺 blocking 歸零</strong>（首輪 3 blocking＋6 advisory 全修、§7.2 回歸 clean）</td><td>報告（23 圖內嵌）：REVIEW-ch07-figure-audit.html；圖視覺 gate-2 依「三閘 M4 後批次」規則留待後續</td></tr>
+<tr><td>M3 散文＋難度</td><td>S·A·V 散文閘＋≥3 份盲測 learner-sim 合一輪</td><td>—</td></tr>
+<tr><td>M4 Mode C gap-check</td><td>①補例＋②軟深度合一偵察（brief 覆蓋完整可跳過）</td><td>§7.2 的繞 \(y=2\) 完整例＝已記錄的候選升級點</td></tr>
+<tr><td>三閘 gate-2</td><td>數學 M1–M8／散文 S·A·V／圖視覺，全跑到 0 blocking</td><td>M4 後、M5 前批次</td></tr>
+<tr><td>M5 收尾</td><td>dashboard＋ROADMAP entry（Ch7 弧線層 open questions 收束）</td><td>—</td></tr>
+</table>
+
+<h2>六、待使用者過目／裁決</h2>
+<ul>
+<li><strong>本報告全部內容</strong>（M1 as-built＋③ 七項定案——特別是 D1 保留七節、D4 直接證明取代 fence、Ex 7.21 改球帶 zone 這三個內容層決策，均為本對話授權下 Claude⇄Codex 收斂的結果）。</li>
+<li><strong>commit 授權</strong>：依「經授權才 commit」，目前 Ch7 全部產出（7 fragments＋standalone＋build.py registry＋_dev-archive 11 檔＋PIPELINE dashboard＋本報告）都在工作樹未 commit。你先前 appB/LaTeX 線的未 commit 變更原樣未動、路徑不相交，可分開成 commit。</li>
+<li><strong>方法論自報</strong>：本輪我兩次把「還沒跑的閘」預填成已通過（PLAN 初版、§7.2 稽核檔的回歸段），均在寫入後自查抓到、立即改回真實狀態；最終所有狀態表都已對照實際稽核輸出重核。另：中途電腦重開機中斷三個 call，原 prompt 重跑、無資料損失。</li>
+</ul>
+
+<p class="small">紀錄索引：<code>PLAN-ch07.md</code>（章錨＋ledger）｜<code>ch07_ch-direction-codex3-audit.md</code>（③）｜<code>ch07_s7-1…7-7-codex5-audit.md</code>（⑤×7）｜<code>ch07_chapter-sweep-audit.md</code>（sweep）｜briefs <code>brief-7-1…7-7.md</code>。raw JSON 依規不進版控。</p>
+
+</body>
+</html>

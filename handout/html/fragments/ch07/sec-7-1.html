@@ -1,0 +1,202 @@
+<!-- Chapter 7 opener + §7.1 Areas Between Curves.
+     THIRD manuscript-free chapter. section-source: Stewart ET 9e §6.1 (Areas Between Curves);
+     cross-checked Thomas 14e §5.6, Rogawski 4e §6.1. Authored 2026-07-18 per PLAN-ch07 + brief-7-1
+     (canon-as-spine, full-gate tier; Codex at ③/⑤ per user 2026-07-06 grant + 2026-07-18 session grant).
+     §7.1 carries the Chapter 7 opener (first <article>: chapter-head + lead + "By the end"), mirroring
+     ch01–ch06. Numbering fresh for Ch7: §7.1 mints Definition 7.1 (Area between curves), Strategy 7.1,
+     Examples 7.1–7.4. No Theorem yet. Cautions UNNUMBERED (Ch1–6 convention).
+     SEAM GUARD (PLAN-ch07 + brief-7-1): area BETWEEN graphs is a NEW definition (Def 6.1 covers only
+     f ≥ 0 against the axis); consistency vs Def 6.1 when g = 0 stated in one sentence; existence via
+     Thm 6.1 cited explicitly. Do NOT do centroids/moments (dropped further-apps), parametric areas
+     (Ch10), improper regions or numerical estimates (Ch8). No second formal definition for horizontal
+     slicing (worked example + strategy line only). Ex 7.4 uses x=y² vs x=2−y² (cleaner curves than
+     Stewart's Example 6, same horizontal-slice teaching function — recorded in brief).
+     Counters handed to §7.2: Definition 7.2, Example 7.5, Strategy 7.2 (no Thm/Prop/Cor/Rem yet).
+     Record: PLAN-ch07.md, brief-7-1.md; CONTENT_ROADMAP.md Ch7 skeleton + seam ledger. -->
+
+<article class="sec" lang="en">
+  <header class="chapter-head">
+    <div class="ch-kicker">Chapter 7</div>
+    <h1 class="ch-title">Applications of Integration</h1>
+  </header>
+
+  <p class="lead">Chapter 6 built the machine. The definite integral was assembled from Riemann sums, and the Fundamental Theorem of Calculus turned its evaluation into a search for antiderivatives. This chapter puts the machine to work — on the area between two curves, the volume of a solid, the work done by a varying force, the average of a continuously varying quantity, the length of a curve, and the area of a curved surface. Six problems, and one method: <em>slice</em> the quantity into thin pieces, <em>approximate</em> each piece by a product — a value that is nearly constant across the slice, times the slice’s width — <em>sum</em> the pieces, and <em>refine</em>. Every time, the sums are Riemann sums, their limit is a definite integral, and the Fundamental Theorem evaluates it. What is genuinely new in this chapter is therefore not the integration but the setup: deciding what to slice, reading off what each thin slice contributes, and recognising the resulting limit as an integral we can compute. That modelling step — from a quantity to its integral — is the skill this chapter teaches, and it is the skill that the rest of calculus, from differential equations to the geometry of space, keeps drawing on.</p>
+
+  <p class="para-head">By the end of this chapter, you will be able to:</p>
+  <ul>
+    <li>compute the area of a region bounded by curves, slicing along either axis;</li>
+    <li>compute volumes by cross-sections, by disks and washers, and by cylindrical shells;</li>
+    <li>set up and evaluate work integrals for springs, cables, and pumping problems;</li>
+    <li>compute the average value of a function and locate a point where it is attained;</li>
+    <li>compute the length of a smooth curve and the area of a surface of revolution, and work with the arc length function.</li>
+  </ul>
+</article>
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">7.1</span>Areas Between Curves</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: instantiate the chapter schema with the two-curve strip; the load-bearing idea is that the strip's height is the GAP f−g, and the axis drops out -->
+  <p>Chapter 6 measured the region between a curve and the \(x\)-axis. Most regions are not like that: they are trapped between <em>two</em> curves — a curved roof and a curved floor. The chapter’s slicing schema handles them with one adjustment. Cut the region into thin vertical strips. Each strip runs from the lower curve up to the upper one, so its height is not the height of either graph above the axis but the <em>gap</em> between the graphs. Approximate the strip by a rectangle, gap times width; sum; refine. The axis has dropped out of the computation entirely — and that is precisely what makes the method robust.</p>
+
+  <h3 class="subsec-head">The area between two curves</h3>
+
+  <p>Let \(f\) and \(g\) be continuous on \([a, b]\) with \(f(x) \ge g(x)\) for all \(x\) in \([a, b]\), and let \(S\) be the region bounded above by \(y = f(x)\), below by \(y = g(x)\), and on the sides by the vertical lines \(x = a\) and \(x = b\). Divide \([a, b]\) into \(n\) strips of equal width \(\Delta x = \tfrac{b-a}{n}\), and in the \(i\)-th strip pick a sample point \(x_{i}^{*}\). The strip is approximated by a rectangle of width \(\Delta x\) and height \(f(x_{i}^{*}) - g(x_{i}^{*})\), so the region’s area is approximated by the sum</p>
+  <p>\[ \sum_{i=1}^{n} \bigl[f(x_{i}^{*}) - g(x_{i}^{*})\bigr]\,\Delta x. \]</p>
+  <p>This is a Riemann sum — not for \(f\) or for \(g\), but for the single function \(f - g\). Since \(f - g\) is continuous on \([a, b]\), Theorem 6.1 guarantees that as \(n \to \infty\) these sums converge to \(\int_{a}^{b} \bigl[f(x) - g(x)\bigr]\,dx\), no matter how the sample points are chosen. As in §6.1, we take the common limit as the <em>definition</em> of the area.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — region between two curves with one representative strip, height = the gap f−g, axis crossing the region; registered in chapter7 FIGS as "gap-strip"] -->
+  <figure class="figure" data-fig="gap-strip">
+    <figcaption><span class="fig-no">Figure 7.1</span> The region between an upper curve and a lower one, cut into vertical strips. The strip’s height is the gap \(f(x_i^{*}) - g(x_i^{*})\) between the graphs — not a height above the axis, which passes through the region without playing any role.</figcaption>
+  </figure>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">7.1</span><span class="env-name">Area between curves</span></p>
+    <div class="env-body">
+      <p>Let \(f\) and \(g\) be continuous on \([a, b]\) with \(f(x) \ge g(x)\) on \([a, b]\). The <em>area</em> of the region bounded by \(y = f(x)\) above, \(y = g(x)\) below, and the lines \(x = a\) and \(x = b\) is</p>
+      <p>\[ A = \int_{a}^{b} \bigl[f(x) - g(x)\bigr]\,dx. \]</p>
+    </div>
+  </section>
+
+  <p>Two checks tie the definition to what we already have. First, when \(g\) is the zero function and \(f \ge 0\), the region is the one under the graph of \(f\), and the formula collapses to \(\int_{a}^{b} f(x)\,dx\) — Definition 6.1 again. Second, the definition asks only that \(f\) stay <em>above</em> \(g\); neither curve is required to stay above the axis.</p>
+
+  <!-- expansion:intuition — sign-shift invariance: why negativity is harmless once you subtract the graphs; this is the one place the "gap not height" idea earns its formal keep -->
+  <p>That second point deserves a moment, because in §6.2 we saw that below the axis an integral counts area <em>negatively</em>. Why does no such caution attach here? Raise both curves by the same constant \(C\) — replace \(f\) by \(f + C\) and \(g\) by \(g + C\) with \(C\) large enough to lift the whole region above the axis. The region merely slides upward, so its area is unchanged; and the integrand is unchanged too, since \((f + C) - (g + C) = f - g\). The subtraction has already discarded the only thing the axis was ever needed for. Subtract the graphs first, and signs take care of themselves.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.1</span></p>
+      <div class="env-body">
+        <p>Find the area of the region bounded above by \(y = e^{x}\), below by \(y = x\), and on the sides by \(x = 0\) and \(x = 1\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>First confirm which curve is on top throughout the interval: \(e^{x}\) is increasing, so \(e^{x} \ge e^{0} = 1\) on \([0, 1]\), while \(x \le 1\) there; hence \(e^{x} \ge 1 \ge x\) across the whole interval. Definition 7.1 applies with \(f(x) = e^{x}\) and \(g(x) = x\), and the Fundamental Theorem (Theorem 6.4) evaluates the result:</p>
+        <p>\[ \begin{aligned}
+          A &= \int_{0}^{1} \bigl(e^{x} - x\bigr)\,dx = \left[e^{x} - \frac{x^{2}}{2}\right]_{0}^{1} \\[2pt]
+            &= \left(e - \frac{1}{2}\right) - (1 - 0) = e - \frac{3}{2} \approx 1.22.
+        \end{aligned} \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <p>In Example 7.1 the interval \([a, b]\) was handed to us. More often the region is <em>enclosed</em> by the curves themselves, and the first task is to find where they meet: the intersection points supply the limits of integration.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.2</span></p>
+      <div class="env-body">
+        <p>Find the area of the region enclosed by the parabolas \(y = x^{2}\) and \(y = 2x - x^{2}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The curves intersect where \(x^{2} = 2x - x^{2}\), that is, \(2x^{2} - 2x = 0\), so \(2x(x - 1) = 0\) and \(x = 0\) or \(x = 1\). The enclosed region lives over the interval \([0, 1]\). To see which parabola is on top there, test a point between the intersections: at \(x = \tfrac{1}{2}\), the first curve gives \(\tfrac{1}{4}\) and the second gives \(1 - \tfrac{1}{4} = \tfrac{3}{4}\). So \(y = 2x - x^{2}\) runs above \(y = x^{2}\), and</p>
+        <p>\[ \begin{aligned}
+          A &= \int_{0}^{1} \bigl[(2x - x^{2}) - x^{2}\bigr]\,dx = \int_{0}^{1} \bigl(2x - 2x^{2}\bigr)\,dx \\[2pt]
+            &= \left[x^{2} - \frac{2x^{3}}{3}\right]_{0}^{1} = 1 - \frac{2}{3} = \frac{1}{3}.
+        \end{aligned} \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 (M2 coverage audit addition) tier-supporting — the enclosed lens of Ex 7.2: sides collapsed to the two intersections, which become the limits; registered in chapter7 FIGS as "enclosed-lens"] -->
+  <figure class="figure" data-fig="enclosed-lens">
+    <figcaption><span class="fig-no">Figure 7.2</span> The region enclosed by \(y = x^{2}\) and \(y = 2x - x^{2}\). No vertical sides are given or needed: the two intersection points close the region by themselves, and they become the limits of integration.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">When the curves cross</h3>
+
+  <p>Definition 7.1 assumes one curve stays on top. When the curves cross inside the interval, the roles of roof and floor swap at each crossing, and the honest quantity to track is the size of the gap, \(\lvert f(x) - g(x)\rvert\). The total area between the graphs is</p>
+  <p>\[ A = \int_{a}^{b} \bigl\lvert f(x) - g(x)\bigr\rvert\,dx, \]</p>
+  <p>and when the crossings are finitely many — as they are in every example we will meet — we compute it by splitting the interval at the crossings and applying Definition 7.1 on each piece with the curves in their correct local order. This is the same move §6.4 made for total distance: displacement integrates \(v\), but distance travelled integrates \(\lvert v\rvert\), splitting where the velocity changes sign.</p>
+
+  <!-- expansion:caution — the trap: integrating one fixed order straight across a crossing computes a net, not the total; echoes §6.2 signed area / §6.4 displacement-vs-distance -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>If the curves cross inside \([a, b]\), the single integral \(\int_{a}^{b} (f - g)\,dx\) adds <em>signed</em> gaps: pieces where \(g\) is on top count negatively and cancel against the rest, exactly as signed area cancelled in §6.2. An answer that comes out negative, or suspiciously small, usually means a crossing was missed. Find every crossing first; then split, or integrate \(\lvert f - g\rvert\).</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.3</span></p>
+      <div class="env-body">
+        <p>Find the total area of the region between \(y = \sin x\) and \(y = \cos x\) for \(0 \le x \le \pi/2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The curves cross where \(\sin x = \cos x\). On \([0, \pi/2)\) the cosine is positive, so we may divide by it: \(\tan x = 1\), giving \(x = \pi/4\); and \(x = \pi/2\) is not a crossing since \(\sin\tfrac{\pi}{2} = 1 \ne 0 = \cos\tfrac{\pi}{2}\). At \(x = 0\) the cosine is on top (\(1 > 0\)), so \(\cos x \ge \sin x\) on \([0, \pi/4]\) and the order swaps on \([\pi/4, \pi/2]\). Split there:</p>
+        <p>\[ \begin{aligned}
+          A &= \int_{0}^{\pi/4} (\cos x - \sin x)\,dx + \int_{\pi/4}^{\pi/2} (\sin x - \cos x)\,dx \\[2pt]
+            &= \bigl[\sin x + \cos x\bigr]_{0}^{\pi/4} + \bigl[-\cos x - \sin x\bigr]_{\pi/4}^{\pi/2} \\[2pt]
+            &= \left(\tfrac{\sqrt{2}}{2} + \tfrac{\sqrt{2}}{2}\right) - (0 + 1) + (-0 - 1) + \left(\tfrac{\sqrt{2}}{2} + \tfrac{\sqrt{2}}{2}\right) \\[2pt]
+            &= \bigl(\sqrt{2} - 1\bigr) + \bigl(\sqrt{2} - 1\bigr) = 2\sqrt{2} - 2 \approx 0.83.
+        \end{aligned} \]</p>
+        <p>The two pieces came out equal, and that is no accident: the identity \(\cos x = \sin\bigl(\tfrac{\pi}{2} - x\bigr)\) reflects the second region onto the first across the line \(x = \pi/4\). Symmetries like this are worth a glance before integrating — here, one piece doubled would have done. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-strong — sin vs cos two lobes, roof/floor swap at π/4, mirror symmetry; registered in chapter7 FIGS as "sincos-lobes"] -->
+  <figure class="figure" data-fig="sincos-lobes">
+    <figcaption><span class="fig-no">Figure 7.3</span> The two lobes between \(y = \cos x\) and \(y = \sin x\) on \([0, \pi/2]\). The roles of roof and floor swap at the crossing \(x = \pi/4\), which is why one fixed order of subtraction would cancel; the identity \(\cos x = \sin\bigl(\tfrac{\pi}{2} - x\bigr)\) makes the second lobe the mirror image of the first.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">Slicing horizontally</h3>
+
+  <p>Nothing privileges vertical strips. If a region is bounded by curves that read more naturally as \(x\) in terms of \(y\) — a left boundary \(x = g(y)\) and a right boundary \(x = f(y)\), with \(f\) and \(g\) continuous on \([c, d]\) and \(f(y) \ge g(y)\) there — slice it horizontally instead. The strip at height \(y\) runs from the left curve to the right one, its length is the gap \(f(y) - g(y)\), and the same limit argument, resting on the same continuity, gives</p>
+  <p>\[ A = \int_{c}^{d} \bigl[f(y) - g(y)\bigr]\,dy, \]</p>
+  <p>with <em>right minus left</em> in place of top minus bottom. Choosing the slicing direction well can spare real work, as the next example shows.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.4</span></p>
+      <div class="env-body">
+        <p>Find the area of the region enclosed by the parabolas \(x = y^{2}\) and \(x = 2 - y^{2}\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Both curves give \(x\) directly in terms of \(y\): the first opens rightward from the origin, the second opens leftward from \((2, 0)\). They meet where \(y^{2} = 2 - y^{2}\), so \(y^{2} = 1\) and \(y = \pm 1\) — the points \((1, 1)\) and \((1, -1)\). Vertical strips would be awkward here: below \(x = 1\) a strip runs between the two branches of \(x = y^{2}\), beyond it between the branches of \(x = 2 - y^{2}\), forcing a split at \(x = 1\) and square roots throughout. A horizontal strip at height \(y\), by contrast, always enters the region on \(x = y^{2}\) and leaves it on \(x = 2 - y^{2}\). With right minus left,</p>
+        <p>\[ A = \int_{-1}^{1} \bigl[(2 - y^{2}) - y^{2}\bigr]\,dy = \int_{-1}^{1} \bigl(2 - 2y^{2}\bigr)\,dy. \]</p>
+        <p>The integrand is even, so by Theorem 6.8 the integral is twice its value over \([0, 1]\):</p>
+        <p>\[ A = 2\int_{0}^{1} \bigl(2 - 2y^{2}\bigr)\,dy = 2\left[2y - \frac{2y^{3}}{3}\right]_{0}^{1} = 2\left(2 - \frac{2}{3}\right) = \frac{8}{3}. \]<span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-strong — sideways parabolas with one horizontal strip; registered in chapter7 FIGS as "horizontal-slice"] -->
+  <figure class="figure" data-fig="horizontal-slice">
+    <figcaption><span class="fig-no">Figure 7.4</span> The region enclosed by \(x = y^{2}\) and \(x = 2 - y^{2}\), sliced horizontally. Every horizontal strip enters on one parabola and leaves on the other, whereas a vertical strip would change character at \(x = 1\).</figcaption>
+  </figure>
+
+  <!-- expansion:application [source: Stewart ET 9e §6.1 velocity-gap example, adapted] — the gap integrand read physically: area between velocity curves = lead built up; ties to Net Change §6.4, shows the integrand-as-gap reading is not merely geometric -->
+  <p>The gap between two curves need not be a geometric height at all. Suppose two runners leave the same start together — positions \(s_{A}(0) = s_{B}(0)\) — and run with continuous velocities \(v_{A} = s_{A}'\) and \(v_{B} = s_{B}'\) satisfying \(v_{A}(t) \ge v_{B}(t)\) over the first \(T\) seconds. Each thin time-slice contributes \(\bigl[v_{A}(t) - v_{B}(t)\bigr]\,\Delta t\) — the little bit of extra ground the faster runner gains during that instant — and applying the Net Change Theorem (Theorem 6.5) to the difference \(s_{A} - s_{B}\), whose derivative \(v_{A} - v_{B}\) is continuous, the integral \(\int_{0}^{T} \bigl[v_{A}(t) - v_{B}(t)\bigr]\,dt\) equals \(s_{A}(T) - s_{B}(T)\): the faster runner’s lead at time \(T\). On a shared velocity–time graph, that lead <em>is</em> the area between the two velocity curves. The same reading works for any two rates running side by side — two flow rates, two growth rates — <em>so long as one stays on top</em>: if the rate curves cross, the area between the graphs accumulates the absolute gap \(\int \lvert v_{A} - v_{B}\rvert\), while the net difference is the plain integral — the displacement-versus-distance distinction of §6.4 all over again.</p>
+
+  <!-- expansion:strategy — distill the section's method: the four moves every area-between-curves solution makes (Ex 7.1–7.4 all instantiate them) -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">7.1</span><span class="env-name">Setting up an area integral</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li><em>Find the boundaries.</em> Sketch the curves and find every intersection in the range of interest by solving \(f = g\); intersections supply the limits of integration when the region is enclosed.</li>
+        <li><em>Choose the slicing direction.</em> Slice so that each strip meets the same two boundary curves throughout: vertically when the boundaries are graphs \(y = f(x)\), \(y = g(x)\); horizontally when they read naturally as \(x\) in terms of \(y\).</li>
+        <li><em>Integrate the gap.</em> The integrand is top minus bottom (vertical strips) or right minus left (horizontal strips) — never a height above an axis.</li>
+        <li><em>Split at crossings.</em> If the boundary curves swap roles inside the interval, split there; the total area is \(\int \lvert f - g\rvert\), computed piece by piece.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- expansion:summary — close §7.1: the section's one move (subtract, then integrate) + hand off to volumes, where the slices become solid slabs; no mechanics of §7.2 -->
+  <p>One move carried this whole section: subtract the boundary graphs, and the machinery of Chapter 6 applies to the difference exactly as it stood — Riemann sums, the existence guarantee of Theorem 6.1, evaluation by the Fundamental Theorem. The area between curves is the integral of a gap, and the runners’ race shows the same reading paying off outside geometry. The next section keeps the slicing and changes the dimension: the slices become thin solid slabs, the gap becomes a cross-sectional area, and the same sum-and-refine limit measures volume.</p>
+
+</article>

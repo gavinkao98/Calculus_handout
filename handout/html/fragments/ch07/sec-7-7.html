@@ -1,0 +1,162 @@
+<!-- §7.7 Area of a Surface of Revolution + Chapter 7 summary. section-source: Stewart ET 9e §8.2;
+     cross-checked Thomas 14e §6.4, Rogawski 4e §8.3. Authored 2026-07-18 per PLAN-ch07 + brief-7-7
+     (canon-as-spine; ③ D4 resolved: FULLY PROVED via explicit C¹ error bound — the originally
+     proposed Proof-Track fence was DROPPED at ③ as an address-less proof debt). Numbering: mints
+     Definition 7.6 (Surface area of revolution), Theorem 7.4 (Surface Area Formula, PROVED),
+     Examples 7.21–7.22 (EXACTLY 2 per ③ D1 cap; the x³ u-sub example was cut, its job merged into
+     Ex 7.22). Cautions UNNUMBERED. Ch7 counters CLOSE: Def 7.1–7.6, Thm 7.1–7.4, Strategy 7.1–7.3,
+     Ex 7.1–7.22.
+     SEAM GUARD (PLAN-ch07 + brief-7-7 + ③ blocking #4/#5/#6): frustum lemma π(r₁+r₂)ℓ derived from
+     cone sectors AND the r₁=r₂ cylinder case verified separately by unrolling (the subtraction
+     divides by r₂−r₁). About the y-axis ONLY with the curve on one side (0 ≤ a < b): bare ∫2πx ds
+     goes negative for x<0 and cross-axis curves double-generate the surface — one honest clause.
+     Ex 7.21 = spherical ZONE (theorem-compliant; the full sphere fails C¹ at the poles — 4πr² only
+     as an explicitly-flagged limiting preview, honest fence to Ch8 improper integrals). NO Pappus,
+     NO general/parametric surfaces (Ch16 forward-ref only), NO Schwarz lantern. Terminology:
+     surface of REVOLUTION only. Chapter summary follows §7.7 content per SPEC §4 (unnumbered,
+     prose-led, 3 moves + 3–8 formulas).
+     Record: PLAN-ch07.md, brief-7-7.md, ch07_ch-direction-codex3-audit.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">7.7</span>Area of a Surface of Revolution</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: the skin, not the filling; the band is the slice with TWO length scales; definition goes through frustum bands built on the arc's chords -->
+  <p>Rotating a region about an axis gave us solids and their volumes. Rotate just the <em>curve</em> and what sweeps out is a surface — the skin, with none of the filling — and the natural question is its area. The slicing schema will serve once more, but the slice is the subtlest of the chapter. A curved surface cannot be flattened onto a plane (every mapmaker’s complaint about the globe), yet a thin <em>band</em> of it very nearly can. Cut the surface into narrow bands, flatten each, add up. Note what a band involves that no earlier slice did: it is long one way — all the way around the axis — and narrow the other way, along the curve. Two length scales, circumference and slant, and the integrand will have to carry both.</p>
+
+  <h3 class="subsec-head">Cones, frustums, and bands</h3>
+
+  <p>The flattenable model piece is a cone. Slit a cone of base radius \(r\) and slant height \(\ell\) down its side and unroll it: it lies flat as a circular sector of radius \(\ell\) whose arc has length \(2\pi r\) — the rim of the base. By the sector-area formula, its area is \(\tfrac{1}{2}(\text{arc})(\text{radius}) = \tfrac{1}{2}(2\pi r)\,\ell = \pi r \ell\). That is the cone’s lateral area.</p>
+
+  <p>Our bands are not full cones but <em>frustums</em> — cones with their tops cut off. Take a frustum of slant height \(\ell\) with end radii \(r_1 &lt; r_2\). Extending its side to the apex produces two cones with a common vertex: similar triangles give slant heights \(\ell_2 = \tfrac{r_2\,\ell}{r_2 - r_1}\) for the big one and \(\ell_1 = \tfrac{r_1\,\ell}{r_2 - r_1}\) for the small, and subtracting lateral areas,</p>
+  <p>\[ \pi r_2 \ell_2 - \pi r_1 \ell_1 = \pi\,\frac{r_2^{2} - r_1^{2}}{r_2 - r_1}\,\ell = \pi\,(r_1 + r_2)\,\ell. \]</p>
+  <p>The subtraction divided by \(r_2 - r_1\), so it says nothing about the case \(r_1 = r_2\) — but that case we can check directly: equal radii make the frustum a cylindrical band, which unrolls into a flat rectangle of length \(2\pi r\) and width \(\ell\), with area \(2\pi r \ell = \pi\,(r + r)\,\ell\). The same formula covers both cases, and it is worth compressing: writing \(\bar r = \tfrac{1}{2}(r_1 + r_2)\) for the <em>average radius</em>,</p>
+  <p>\[ \text{lateral area of a frustum} = 2\pi\,\bar r\,\ell. \]</p>
+  <p>Average radius around, slant height along: the frustum’s area is already “circumference times width”, read at the band’s middle.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 (M2 coverage audit; brief (b) staged but unlanded at M1) tier-strong — the unrolled frustum band = annular sector, midline 2πr̄, width ℓ; compression reading visualized, not re-derived; registered in chapter7 FIGS as "frustum-unrolled"] -->
+  <figure class="figure" data-fig="frustum-unrolled">
+    <figcaption><span class="fig-no">Figure 7.20</span> The frustum band slit open and unrolled: an annular sector, not a rectangle — its inner and outer edges keep different lengths. The dashed midline arc has length \(2\pi \bar r\), and midline times width \(\ell\) is exactly the band’s area; only the cylinder band (\(r_1 = r_2\)) unrolls into a true rectangle. A picture of the formula the cones already proved, not a second derivation.</figcaption>
+  </figure>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — chord→frustum band pair: lateral surface only, rims open, near generator IS the chord, r₁≠r₂; registered in chapter7 FIGS as "chord-to-band"] -->
+  <figure class="figure" data-fig="chord-to-band">
+    <figcaption><span class="fig-no">Figure 7.21</span> Definition 7.6’s approximant made visible: one chord \(P_{i-1}P_i\) of the curve, and the frustum band it sweeps about the \(x\)-axis. The band’s slant edge <em>is</em> the chord — not the arc — its end radii are the endpoint heights \(f(x_{i-1})\) and \(f(x_i)\), and its slant length is \(\ell = \lvert P_{i-1}P_i\rvert\).</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">The surface area of a surface of revolution</h3>
+
+  <p>Now rotate the graph of a continuous \(f \ge 0\) on \([a, b]\), \(a &lt; b\), about the \(x\)-axis. Mark the graph over the regular partition, as in §7.6, at the points \(P_i = \bigl(x_i, f(x_i)\bigr)\). Each chord \(P_{i-1}P_i\), swept around the axis, generates precisely a frustum band: end radii \(f(x_{i-1})\) and \(f(x_i)\), slant height \(\lvert P_{i-1}P_i\rvert\). The frustum formula prices each band exactly, and the sum of the bands approximates the surface. As with arc length, we let the definition say the rest.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">7.6</span><span class="env-name">Surface area of revolution</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be continuous with \(f \ge 0\) on \([a, b]\), \(a &lt; b\), and let \(P_0, \dots, P_n\) be the points of its graph over the regular partition. The <em>area</em> of the surface obtained by rotating the graph about the \(x\)-axis is</p>
+      <p>\[ S = \lim_{n \to \infty} \sum_{i=1}^{n} 2\pi\cdot\frac{f(x_{i-1}) + f(x_i)}{2}\cdot\bigl\lvert P_{i-1}P_i\bigr\rvert, \]</p>
+      <p>provided this limit exists as a finite number.</p>
+    </div>
+  </section>
+
+  <p>For smooth curves the limit not only exists but lands on an integral we can often evaluate — and this time the whole argument closes with tools already in hand.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">7.4</span><span class="env-name">Surface Area Formula</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be smooth on \([a, b]\) (§7.6) with \(f \ge 0\), \(a &lt; b\). Then the surface area of the surface obtained by rotating the graph of \(f\) about the \(x\)-axis exists, and</p>
+      <p>\[ S = \int_{a}^{b} 2\pi\,f(x)\,\sqrt{1 + \bigl[f'(x)\bigr]^{2}}\;dx. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span>
+    </p>
+    <div class="env-body">
+      <p>The chord conversion is already paid for: in the proof of Theorem 7.3, the Mean Value Theorem gave, for each strip, a point \(\xi_i\) in \((x_{i-1}, x_i)\) with \(\lvert P_{i-1}P_i\rvert = \sqrt{1 + [f'(\xi_i)]^{2}}\,\Delta x\). The \(i\)-th band’s area is therefore</p>
+      <p>\[ 2\pi\cdot\frac{f(x_{i-1}) + f(x_i)}{2}\cdot\sqrt{1 + \bigl[f'(\xi_i)\bigr]^{2}}\;\Delta x, \]</p>
+      <p>which reads the curve’s height at the strip’s two <em>ends</em> while reading its slope at the interior point \(\xi_i\). If the height were read at \(\xi_i\) as well, the band sum would be exactly a Riemann sum for \(2\pi f\sqrt{1 + f'^{2}}\); so we estimate the cost of moving the height reading, and show it vanishes in the limit.</p>
+      <p>Smoothness makes both \(\lvert f'\rvert\) and \(\sqrt{1 + f'^{2}}\) continuous on \([a, b]\), so by the Extreme Value Theorem (Theorem 4.9(a)) they attain maxima: say \(K = \max \lvert f'\rvert\) and \(B = \max \sqrt{1 + f'^{2}}\). For any point \(u\) in the \(i\)-th strip, the Mean Value Theorem bounds the height drift by the slope bound: \(\lvert f(u) - f(\xi_i)\rvert \le K\,\lvert u - \xi_i\rvert \le K\,\Delta x\). Applying this at \(u = x_{i-1}\) and \(u = x_i\) and averaging,</p>
+      <p>\[ \left\lvert \frac{f(x_{i-1}) + f(x_i)}{2} - f(\xi_i) \right\rvert \le K\,\Delta x, \]</p>
+      <p>so replacing the \(i\)-th band’s height reading changes that term by at most \(2\pi\,(K \Delta x)\,B\,\Delta x\). Across all \(n\) bands the total change is at most</p>
+      <p>\[ n \cdot 2\pi K B\,(\Delta x)^{2} = 2\pi K B\,(b - a)\,\Delta x \;\longrightarrow\; 0 \qquad (n \to \infty), \]</p>
+      <p>since \(n\,\Delta x = b - a\). The corrected sums \(\sum 2\pi f(\xi_i)\sqrt{1 + [f'(\xi_i)]^{2}}\,\Delta x\) are Riemann sums of the continuous function \(2\pi f \sqrt{1 + f'^{2}}\), and by Theorem 6.1 with Definition 6.2’s any-sample-point clause they converge to its integral. The band sums differ from them by an amount tending to \(0\), so they converge to the same integral — which is the claimed formula. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <p>The integrand rewards a second look: \(2\pi f(x)\) is the circumference of the circle the point \((x, f(x))\) travels, and \(\sqrt{1 + f'^{2}}\,dx\) is the arc element \(ds\) of §7.6 — the band’s two length scales, around and along, exactly as promised. In the differential shorthand the theorem compresses to</p>
+  <p>\[ S = \int 2\pi \rho\;ds, \]</p>
+  <p>where \(\rho\) is the distance from the moving point to the axis of rotation. About the \(x\)-axis, \(\rho = y = f(x)\). About the <em>\(y\)</em>-axis, \(\rho = x\) — with the curve kept entirely in \(x \ge 0\) (an interval \(0 \le a &lt; b\)): a signed \(x\) would count area negatively, and the two halves of a curve straddling the axis can overlap or re-cover parts of one surface, so the general case calls for splitting at the axis and tracking what each piece generates. One principle, two readings — and the same MVT argument, run with the radius \(x\) in place of \(f(x)\), proves the \(y\)-axis version.</p>
+
+  <!-- expansion:caution — the radius-reading trap, closing the chapter's radius discipline: ρ is the distance to the rotation axis, not a memorised pair of formulas -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Do not memorise \(2\pi y\,ds\) and \(2\pi x\,ds\) as two formulas. There is one: \(2\pi \rho\,ds\), with \(\rho\) the distance from the curve to the <em>axis of rotation</em> — the same discipline that set every washer and shell radius in §§7.2–7.3. Identify the axis first; \(\rho\) follows.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.21</span></p>
+      <div class="env-body">
+        <p>A <em>zone</em> of a sphere is the band cut from it by two parallel planes. Show that for the sphere of radius \(r\) generated by rotating \(y = \sqrt{r^{2} - x^{2}}\) about the \(x\)-axis, the zone between the planes \(x = a\) and \(x = b\) (where \(-r &lt; a &lt; b &lt; r\)) has area \(2\pi r\,(b - a)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>On \([a, b]\), safely inside \((-r, r)\), the function \(f(x) = \sqrt{r^{2} - x^{2}}\) is positive and its derivative \(f'(x) = -x/\sqrt{r^{2} - x^{2}}\) is continuous — the curve is smooth there, and Theorem 7.4 applies. Compute the integrand:</p>
+        <p>\[ \begin{aligned}
+          1 + \bigl[f'(x)\bigr]^{2} &= 1 + \frac{x^{2}}{r^{2} - x^{2}} = \frac{r^{2}}{r^{2} - x^{2}}, \\[2pt]
+          \text{so}\qquad f(x)\sqrt{1 + \bigl[f'(x)\bigr]^{2}} &= \sqrt{r^{2} - x^{2}}\cdot\frac{r}{\sqrt{r^{2} - x^{2}}} = r.
+        \end{aligned} \]</p>
+        <p>The heights and slopes conspire to cancel: where the sphere’s profile is low, it is steep, and the band’s area comes out the same everywhere. Hence</p>
+        <p>\[ S = \int_{a}^{b} 2\pi r\,dx = 2\pi r\,(b - a). \]</p>
+        <p>The zone’s area depends only on the <em>width</em> \(b - a\) of the slab that cuts it — not on where along the sphere the cut is made. A band of given thickness near a pole has exactly the same area as one at the equator. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:history [source: standard calculus-textbook historical note] — Archimedes' hat-box result: the zone/cylinder correspondence he had without limits; one line, non-decorative -->
+  <p>This width-only law is ancient: Archimedes knew that a sphere and its circumscribed cylinder trade areas band for band — slice both by the same pair of parallel planes and the two bands always match, which is why the result is remembered as his <em>hat-box theorem</em>. What the integral adds is the bookkeeping that makes the cancellation visible in two lines.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 (M2 coverage audit addition) tier-supporting — sphere zones of equal width, 2D profile per the pattern consult (Q(e)): two cut-pairs of the same width w, equator vs near-pole (strictly off the poles), emphasized profile arcs + radius guides; registered in chapter7 FIGS as "zone-bands"] -->
+  <figure class="figure" data-fig="zone-bands">
+    <figcaption><span class="fig-no">Figure 7.22</span> Two slabs of the same width \(w\) cut the sphere’s profile — one at the equator, one out toward the pole, both strictly inside \((-r, r)\). The polar arc is longer and steeper but sits at a smaller radius; the equatorial arc is shorter and flatter at a larger one. Swept about the axis, the two arcs generate zones of <em>equal</em> area: the compensation Example 7.21 computed.</figcaption>
+  </figure>
+
+  <!-- expansion:formula — the explicitly-flagged limiting preview to the full sphere; the poles fail the C¹ hypothesis; honest fence to Ch8 -->
+  <p>Letting the two cutting planes recede to the poles, \(a \to -r\) and \(b \to r\), the zone areas approach \(2\pi r \cdot 2r = 4\pi r^{2}\) — the classical area of the whole sphere. Honesty requires a flag here: at the poles themselves the profile has vertical tangents, \(f'\) blows up, and Theorem 7.4’s smoothness hypothesis fails on the full interval \([-r, r]\), so the full-sphere value is reached as a <em>limit of zones</em>, not by one application of the theorem. Taming endpoint blow-ups of exactly this kind is the business of improper integrals, in Chapter 8.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.22</span></p>
+      <div class="env-body">
+        <p>The arc of the parabola \(y = x^{2}\) from \((0, 0)\) to \((1, 1)\) is rotated about the \(y\)-axis. Find the area of the resulting surface.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The axis of rotation is the \(y\)-axis, so the radius is \(\rho = x\) — and the arc lives in \(0 \le x \le 1\), on one side of the axis, as the \(y\)-axis form requires. With \(y = x^{2}\), the arc element is \(ds = \sqrt{1 + (2x)^{2}}\,dx = \sqrt{1 + 4x^{2}}\,dx\), so</p>
+        <p>\[ S = \int 2\pi\,\rho\;ds = 2\pi \int_{0}^{1} x\,\sqrt{1 + 4x^{2}}\;dx. \]</p>
+        <p>Substitute \(u = 1 + 4x^{2}\), \(du = 8x\,dx\), with limits \(u = 1\) to \(u = 5\):</p>
+        <p>\[ S = \frac{2\pi}{8}\int_{1}^{5} \sqrt{u}\;du = \frac{\pi}{4}\cdot\frac{2}{3}\Bigl[u^{3/2}\Bigr]_{1}^{5} = \frac{\pi}{6}\bigl(5\sqrt{5} - 1\bigr) \approx 5.33. \]</p>
+        <p>Note where each ingredient came from: the radius \(x\) from the axis (not from the curve’s formula), the element \(ds\) from §7.6, and the substitution from §6.5 — three sections cooperating in four lines. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-supporting — dual-axis radius readout from one sample point; the ρ-discipline drawn; registered in chapter7 FIGS as "dual-axis-radius"] -->
+  <figure class="figure" data-fig="dual-axis-radius">
+    <figcaption><span class="fig-no">Figure 7.23</span> One point of the arc \(y = x^{2}\), two radii: rotation about the \(x\)-axis reads the vertical distance \(f(x)\), rotation about the \(y\)-axis reads the horizontal distance \(x\). The radius is always the distance to the axis of rotation — one principle, not a memorised pair.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">Chapter summary</h3>
+
+  <p>This chapter took the machine Chapter 6 built and taught it to measure. One schema ran through every section — slice the quantity, approximate each slice by a product, sum, and refine — and each section supplied its own slice. Section 7.1 sliced regions into strips whose height is a <em>gap</em>, defining the area between curves (Definition 7.1) as \(\int_a^b (f - g)\,dx\), with crossings handled by \(\int \lvert f - g\rvert\). Section 7.2 promoted the strip to a solid slab and volume to the integral of cross-sectional area (Definition 7.2), \(V = \int_a^b A(x)\,dx\), with disks and washers as the revolution instances — and the sphere and pyramid of classical geometry recovered as its first dividends. Section 7.3 sliced the other way, parallel to the axis, proving the shell method (Theorem 7.1), \(V = \int_a^b 2\pi x f(x)\,dx\), and distilling the washer-or-shell decision into Strategy 7.2. Section 7.4 left geometry: the work done by a varying force — read through its signed component \(F(x)\) along the motion — is \(W = \int_a^b F(x)\,dx\) (Definition 7.3), and the slicing learned to choose what to slice — displacement, cable, or water. Section 7.5 turned totals into averages, \(f_{\text{ave}} = \frac{1}{b-a}\int_a^b f\,dx\) (Definition 7.4), and proved the Mean Value Theorem for Integrals (Theorem 7.2): a continuous function passes through its own average. Section 7.6 measured the curve itself by refining chords (Definition 7.5) and proved the Arc Length Formula (Theorem 7.3), \(L = \int_a^b \sqrt{1 + [f'(x)]^{2}}\,dx\), minting the arc element \(ds\); and §7.7 wrapped the chords into frustum bands to define surface area (Definition 7.6) and prove the Surface Area Formula (Theorem 7.4), compressed as \(S = \int 2\pi \rho\,ds\).</p>
+
+  <p>Three theorems in the chapter were proved with the machinery of Chapter 4 — the Mean Value Theorem for Integrals leaning on the Extreme and Intermediate Value Theorems, and the two geometric formulas on the Mean Value Theorem — a first sustained payoff from owning those proofs rather than borrowing them. What the chapter leaves owing is plain from its own examples: the integrals that measure lengths and surfaces strain the small table of antiderivatives we possess, and the curves here were chosen to fit the toolkit rather than the other way round. Chapter 8 pays that debt with a systematic account of integration techniques — and with improper integrals, which will also settle the polar flag left in Example 7.21. Farther ahead, \(ds\) returns for parametric curves in Chapter 10 and for space curves in Chapter 13, the average value and the slicing of volumes reappear over two-dimensional regions in Chapter 15, and surfaces return in their full generality in Chapter 16. The slicing schema itself, though, is now complete — it is the way integrals meet the world, and the rest of the book will use it without ceremony.</p>
+
+</article>

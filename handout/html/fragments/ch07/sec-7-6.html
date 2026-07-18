@@ -1,0 +1,171 @@
+<!-- §7.6 Arc Length. section-source: Stewart ET 9e §8.1; cross-checked Thomas 14e §6.3, Rogawski 4e
+     §8.2. Authored 2026-07-18 per PLAN-ch07 + brief-7-6 (canon-as-spine; ③ D3 resolved register —
+     closes the seam-ledger premise "C¹ 弧長定理"). Numbering: mints Definition 7.5 (Arc length),
+     Theorem 7.3 (Arc Length Formula, PROVED), Examples 7.18–7.20. Cautions UNNUMBERED.
+     SEAM GUARD (PLAN-ch07 + brief-7-6 + ③ D3/blocking#2): Definition for the GRAPH of f continuous,
+     a<b, over REGULAR partitions; a FINITE limit if it exists; length unsigned, no reversed-limits
+     convention, degenerate interval L=0 (prose clause). Theorem hypotheses: a<b, f SMOOTH on [a,b] —
+     the C¹ notion DEFINED IN PLACE (f′ continuous on [a,b], one-sided at endpoints). Proof:
+     MVT 4.12 per strip (BRIDGE SENTENCE mandatory: blanket hypothesis grants closed-strip
+     continuity + open-strip differentiability), then Riemann sum of continuous √(1+f′²) → Thm 6.1 +
+     Def 6.2 any-sample-point clause. Examples toolkit-constrained (u-sub / perfect squares; NO trig
+     sub, NO ∫sec); √(q²)=|q| sign checks EXPLICIT (③ advisory #9). Arc length function s(x) via
+     FTC-1 (Thm 6.3); differential ds minted here (ties §5.3); ds²=dx²+dy² = MNEMONIC status, not a
+     derivation. Terminology: GRAPH arc length; Ch10 parametric / Ch13 space curves = forward-ref
+     only. NO curvature, NO x=g(y) worked example (one-line remark at most — omitted here entirely).
+     Counters handed to §7.7: Definition 7.6, Theorem 7.4, Example 7.21.
+     Record: PLAN-ch07.md, brief-7-6.md, ch07_ch-direction-codex3-audit.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">7.6</span>Arc Length</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: length has no formula until we make one; chords under-measure but hug; the first non-rectangle slice of the chapter -->
+  <p>What is the <em>length</em> of a curve? For segments of straight lines the distance formula answers at once; for anything curved, it is worth admitting that we have no formula at all — not a poor one, none. Physically the answer seems clear: lay a string along the curve, pull it straight, measure it. The mathematical translation of the string is the chapter’s schema with a new kind of slice. Mark points along the curve and join them by <em>chords</em>: the resulting polygonal path can be measured exactly, one distance formula per chord. The polygon cuts corners, so it under-measures every arc it spans — but as the marked points crowd together, the chords hug the curve ever more closely. For the first time this chapter, the slice is not a rectangle: it is a small straight segment standing in for a small piece of bend.</p>
+
+  <p>Make it precise for the graph of a function. Let \(f\) be continuous on \([a, b]\) with \(a &lt; b\), and divide \([a, b]\) by the usual regular partition \(x_0 = a, x_1, \dots, x_n = b\) with spacing \(\Delta x\). The partition marks the points \(P_i = \bigl(x_i, f(x_i)\bigr)\) on the curve, and the inscribed polygon \(P_0 P_1 \cdots P_n\) has length \(\sum_{i=1}^{n} \lvert P_{i-1}P_i\rvert\) — a number we can compute for every \(n\). Refining, we define:</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">7.5</span><span class="env-name">Arc length</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be continuous on \([a, b]\), \(a &lt; b\), and let \(P_i = \bigl(x_i, f(x_i)\bigr)\) be the points of the graph over the regular partition of \([a, b]\) into \(n\) pieces. The <em>arc length</em> of the graph of \(f\) from \(P_0\) to \(P_n\) is</p>
+      <p>\[ L = \lim_{n \to \infty} \sum_{i=1}^{n} \bigl\lvert P_{i-1}P_i \bigr\rvert, \]</p>
+      <p>provided this limit exists as a finite number.</p>
+    </div>
+  </section>
+
+  <p>Two housekeeping notes. Length is a size, not a signed quantity: no orientation convention accompanies it, and a degenerate “curve” over a single point has length \(0\). And the definition is a genuine commitment of the same kind as Definitions 7.2 and 7.6 will make — it declares the polygon limit to be what length <em>means</em> for a graph, with the clause “provided the limit exists” carrying the honesty.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — inscribed polygon, 4 then 8 chords (old nodes kept), regular x-spacing so chord lengths differ, single-bend window; registered in chapter7 FIGS as "polygon-refinement"] -->
+  <figure class="figure" data-fig="polygon-refinement">
+    <figcaption><span class="fig-no">Figure 7.17</span> Inscribed polygons hugging the curve. With the same horizontal spacing, chords come out long where the curve is steep and short where it is flat; doubling \(n\) keeps the old corners and visibly tightens the fit. The polygon under-measures every arc it cuts.</figcaption>
+  </figure>
+
+  <h3 class="subsec-head">The arc length formula</h3>
+
+  <p>When does the limit exist, and what is it? Each chord’s length is governed by how steeply the graph climbs across its strip, so the natural hypothesis is control over the <em>slope</em>. We say \(f\) is <em>smooth on \([a, b]\)</em> — in the standard notation, \(f \in C^{1}([a, b])\) — if \(f\) is differentiable on \([a, b]\) and its derivative \(f'\) is continuous there, the derivatives at the two endpoints being the one-sided ones. Smoothness is exactly the currency the next theorem trades in: it will hand each chord to the Mean Value Theorem and then hand the resulting sum to Chapter 6.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">7.3</span><span class="env-name">Arc Length Formula</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be smooth on \([a, b]\), \(a &lt; b\). Then the arc length of the graph of \(f\) over \([a, b]\) exists, and</p>
+      <p>\[ L = \int_{a}^{b} \sqrt{1 + \bigl[f'(x)\bigr]^{2}}\,dx. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>Write \(\Delta y_i = f(x_i) - f(x_{i-1})\) for the rise across the \(i\)-th strip. By the distance formula, the \(i\)-th chord has length</p>
+      <p>\[ \bigl\lvert P_{i-1}P_i \bigr\rvert = \sqrt{(\Delta x)^{2} + (\Delta y_i)^{2}}. \]</p>
+      <p>The blanket hypothesis pays out locally: since \(f'\) exists on all of \([a, b]\), the function \(f\) is continuous on each closed strip \([x_{i-1}, x_i]\) and differentiable on its interior, which is precisely what the Mean Value Theorem (Theorem 4.12) requires there. It supplies a point \(x_i^{*}\) in \((x_{i-1}, x_i)\) with</p>
+      <p>\[ \Delta y_i = f'(x_i^{*})\,\Delta x. \]</p>
+      <p>Substituting and pulling the positive factor \(\Delta x\) out of the square root,</p>
+      <p>\[ \bigl\lvert P_{i-1}P_i \bigr\rvert = \sqrt{(\Delta x)^{2} + \bigl[f'(x_i^{*})\bigr]^{2}(\Delta x)^{2}} = \sqrt{1 + \bigl[f'(x_i^{*})\bigr]^{2}}\;\Delta x, \]</p>
+      <p>so the whole polygon has length</p>
+      <p>\[ \sum_{i=1}^{n} \bigl\lvert P_{i-1}P_i \bigr\rvert = \sum_{i=1}^{n} \sqrt{1 + \bigl[f'(x_i^{*})\bigr]^{2}}\;\Delta x. \]</p>
+      <p>This is a Riemann sum for the function \(g(x) = \sqrt{1 + [f'(x)]^{2}}\) — with sample points we did not choose ourselves but received from the Mean Value Theorem. That is where the second half of the hypothesis earns its keep: \(f'\) is continuous on \([a, b]\), so \(g\) is continuous there, and Theorem 6.1 guarantees that the Riemann sums of \(g\) converge to \(\int_{a}^{b} g(x)\,dx\) for <em>every</em> choice of sample points (Definition 6.2) — the Mean Value Theorem’s choices included. The polygon lengths therefore converge, and their limit is the integral claimed. <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-strong — one proof strip: chord over Δx/Δy_i legs + MVT tangent parallel to the chord (echoes Ch4's MVT figure); registered in chapter7 FIGS as "mvt-chord-strip"] -->
+  <figure class="figure" data-fig="mvt-chord-strip">
+    <figcaption><span class="fig-no">Figure 7.18</span> One strip of the proof of Theorem 7.3. The chord is the hypotenuse over the legs \(\Delta x\) and \(\Delta y_i\), and the Mean Value Theorem supplies the interior point \(x_i^{*}\) whose tangent runs parallel to the chord — the picture of Theorem 4.12, now put to work strip by strip.</figcaption>
+  </figure>
+
+  <p>The integrand deserves a reading of its own. Where the graph runs flat, \(f' = 0\) and \(\sqrt{1 + f'^{2}} = 1\): arc length accrues at the same rate as horizontal distance. Where the graph is steep, the factor grows, and the curve packs more length above each unit of run. The integrand is the local <em>stretch factor</em> converting run into length — never less than \(1\), equal to \(1\) only where the curve is momentarily level.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.18</span></p>
+      <div class="env-body">
+        <p>Find the length of the curve \(y = x^{3/2}\) from \((0, 0)\) to \((1, 1)\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>First the hypothesis: \(f(x) = x^{3/2}\) has \(f'(x) = \tfrac{3}{2}x^{1/2}\), which is continuous on all of \([0, 1]\) — at the left endpoint the one-sided derivative is \(0\), and \(f'\) approaches it continuously — so \(f\) is smooth there and Theorem 7.3 applies:</p>
+        <p>\[ L = \int_{0}^{1} \sqrt{1 + \tfrac{9}{4}x}\;dx. \]</p>
+        <p>Substitute \(u = 1 + \tfrac{9}{4}x\), so \(du = \tfrac{9}{4}\,dx\) and \(dx = \tfrac{4}{9}\,du\), with limits \(u = 1\) to \(u = \tfrac{13}{4}\):</p>
+        <p>\[ \begin{aligned}
+          L &= \frac{4}{9}\int_{1}^{13/4} \sqrt{u}\;du = \frac{4}{9}\cdot\frac{2}{3}\Bigl[u^{3/2}\Bigr]_{1}^{13/4} \\[2pt]
+            &= \frac{8}{27}\left(\Bigl(\frac{13}{4}\Bigr)^{3/2} - 1\right) = \frac{13\sqrt{13} - 8}{27} \approx 1.44.
+        \end{aligned} \]</p>
+        <p>A quick sanity check: the straight chord from \((0,0)\) to \((1,1)\) has length \(\sqrt{2} \approx 1.41\), and the curve, which bends away from the chord, is a little longer — as an inscribed polygon with one chord would already predict. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.19</span></p>
+      <div class="env-body">
+        <p>Find the length of the curve \(y = \dfrac{x^{3}}{6} + \dfrac{1}{2x}\) from \(x = 1\) to \(x = 2\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>On \([1, 2]\) the function and its derivative \(f'(x) = \tfrac{x^{2}}{2} - \tfrac{1}{2x^{2}}\) are continuous (\(x = 0\) is safely outside the interval), so the formula applies. Squaring and adding \(1\) produces a perfect square:</p>
+        <p>\[ \begin{aligned}
+          1 + \bigl[f'(x)\bigr]^{2} &= 1 + \frac{x^{4}}{4} - \frac{1}{2} + \frac{1}{4x^{4}} \\[2pt]
+            &= \frac{x^{4}}{4} + \frac{1}{2} + \frac{1}{4x^{4}} = \left(\frac{x^{2}}{2} + \frac{1}{2x^{2}}\right)^{2}.
+        \end{aligned} \]</p>
+        <p>Taking the square root demands a sign check: \(\sqrt{q^{2}} = \lvert q\rvert\), and here \(q = \tfrac{x^{2}}{2} + \tfrac{1}{2x^{2}}\) is a sum of two positive terms on \([1, 2]\), so the absolute value opens without a sign change. Hence</p>
+        <p>\[ \begin{aligned}
+          L &= \int_{1}^{2} \left(\frac{x^{2}}{2} + \frac{1}{2x^{2}}\right) dx = \left[\frac{x^{3}}{6} - \frac{1}{2x}\right]_{1}^{2} \\[2pt]
+            &= \left(\frac{8}{6} - \frac{1}{4}\right) - \left(\frac{1}{6} - \frac{1}{2}\right) = \frac{17}{12}.
+        \end{aligned} \]</p>
+        <p>The curve was engineered so that \(1 + f'^{2}\) assembles into a square — that is why the answer is exact and tidy. For a curve chosen at random, \(\sqrt{1 + f'^{2}}\) rarely has an antiderivative among the functions we know; Chapter 8 will widen the toolkit, and where even that fails, its numerical methods take over. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">The arc length function and the differential \(ds\)</h3>
+
+  <p>Often what is wanted is not one length but length <em>as a running quantity</em> — how far along the curve we have travelled by the time we reach \(x\). For \(f\) smooth on \([a, b]\), define the <em>arc length function</em></p>
+  <p>\[ s(x) = \int_{a}^{x} \sqrt{1 + \bigl[f'(t)\bigr]^{2}}\;dt, \qquad a \le x \le b, \]</p>
+  <p>which measures the graph from its left end to the point above \(x\); thus \(s(a) = 0\) and \(s(b) = L\). Its integrand is continuous, so Part 1 of the Fundamental Theorem (Theorem 6.3) differentiates it on sight:</p>
+  <p>\[ \frac{ds}{dx} = \sqrt{1 + \left(\frac{dy}{dx}\right)^{2}} \;\ge\; 1. \]</p>
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 (⑤ ADV-FIG-01 marker) tier-supporting — the ds right triangle; caption states mnemonic status per the marker's mandate; registered in chapter7 FIGS as "ds-triangle"] -->
+  <figure class="figure" data-fig="ds-triangle">
+    <figcaption><span class="fig-no">Figure 7.19</span> The differential triangle: \(ds^{2} = dx^{2} + dy^{2}\). A memory device for the proved formula of Theorem 7.3 — the chord picture shrunk to a point — not a derivation of it.</figcaption>
+  </figure>
+  <p>The inequality repeats the stretch-factor reading — the curve always accumulates at least as fast as the run beneath it. In the language of differentials from §5.3, the same equation reads</p>
+  <p>\[ ds = \sqrt{1 + \left(\frac{dy}{dx}\right)^{2}}\;dx, \]</p>
+  <p>and squaring it gives the easily remembered <em>\(ds^{2} = dx^{2} + dy^{2}\)</em> — an infinitesimal Pythagorean theorem, the proof’s chord picture shrunk to a point. Its status is worth being precise about: it is a mnemonic <em>for</em> the proved formula, not a derivation of it — the honest argument is the one Theorem 7.3 already made. As a mnemonic it is excellent, and \(ds\) itself will be the working currency of the next section and of the later chapters that measure along curves.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.20</span></p>
+      <div class="env-body">
+        <p>Find the arc length function for the curve \(y = \dfrac{x^{2}}{8} - \ln x\), measured from the point \((1, \tfrac{1}{8})\), for \(x \ge 1\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(f'(x) = \tfrac{x}{4} - \tfrac{1}{x}\), continuous for \(x &gt; 0\), so \(f\) is smooth on every interval \([1, x]\). The perfect-square pattern of Example 7.19 repeats:</p>
+        <p>\[ 1 + \bigl[f'(t)\bigr]^{2} = 1 + \frac{t^{2}}{16} - \frac{1}{2} + \frac{1}{t^{2}} = \left(\frac{t}{4} + \frac{1}{t}\right)^{2}, \]</p>
+        <p>and the bracket \(\tfrac{t}{4} + \tfrac{1}{t}\) is positive for \(t \ge 1\), so the root opens cleanly. Using \(\int \tfrac{1}{t}\,dt = \ln\lvert t\rvert\) from §6.4 — with \(t &gt; 0\) here, so the absolute value is simply \(t\) —</p>
+        <p>\[ s(x) = \int_{1}^{x} \left(\frac{t}{4} + \frac{1}{t}\right) dt = \left[\frac{t^{2}}{8} + \ln t\right]_{1}^{x} = \frac{x^{2} - 1}{8} + \ln x. \]</p>
+        <p>The checks confirm it: \(s(1) = 0\), as a length measured from the starting point must be; and differentiating returns \(s'(x) = \tfrac{x}{4} + \tfrac{1}{x} = \sqrt{1 + [f'(x)]^{2}}\), the Fundamental Theorem closing the loop. For instance, \(s(2) = \tfrac{3}{8} + \ln 2 \approx 1.07\): by \(x = 2\), just over one unit of curve has unspooled. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:caution — smoothness is the THEOREM's hypothesis, not length's prerequisite: a corner breaks the derivation (MVT step), not the definition; split at the corner -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>Smoothness is the hypothesis of the <em>formula</em>, not of length itself. The graph of \(\lvert x\rvert\) on \([-1, 1]\) has a perfectly good length — Definition 7.5 measures it, and splitting at the corner gives \(2\sqrt{2}\) — but Theorem 7.3 cannot be applied across \(x = 0\), where no derivative exists for the Mean Value Theorem to use. At a corner, split the curve and add the pieces.</p>
+    </div>
+  </section>
+
+  <!-- expansion:summary — close §7.6: definition honest, theorem proved, s and ds minted; ds is the export; graph-scope note + forward refs, no mechanics -->
+  <p>The section ran the chapter’s schema at full honesty: a definition that says what length means (chords, refined), a theorem that computes it (the Mean Value Theorem converting each chord, Chapter 6 closing the limit), and a pair of working tools — the arc length function \(s\) and its differential \(ds\). Everything here concerns the graph of a function of \(x\); curves given by parametric equations must wait for Chapter 10, and curves through space for Chapter 13, where \(ds\) will reappear each time in suitably generalised dress. The next section puts \(ds\) straight to work: rotate a smooth curve about an axis, and ask not for the volume enclosed but for the <em>area of the surface</em> swept out.</p>
+
+</article>

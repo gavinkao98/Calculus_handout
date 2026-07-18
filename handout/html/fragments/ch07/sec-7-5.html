@@ -1,0 +1,133 @@
+<!-- §7.5 Average Value of a Function. section-source: Stewart ET 9e §6.5; cross-checked Thomas 14e
+     §6.1 (avg value subsection), Rogawski 4e §6.2. Authored 2026-07-18 per PLAN-ch07 + brief-7-5
+     (canon-as-spine; ③ D2 resolved register). Numbering: mints Definition 7.4 (Average value),
+     Theorem 7.2 (Mean Value Theorem for Integrals, PROVED — the chapter's first full theorem proof;
+     closes the seam-ledger premise "積分均值(EVT+IVT)"), Examples 7.15–7.17. Cautions UNNUMBERED.
+     SEAM GUARD (PLAN-ch07 + brief-7-5 + ③ D2/blocking#1): Definition AND Theorem both require a<b
+     (no reversed-limits convention imported into averages); conclusion c ∈ [a,b]. Proof structure
+     MANDATED: EVT 4.9(a) attained m=f(x_m), M=f(x_M); comparison Thm 6.2(4) → m ≤ f_ave ≤ M; case
+     m=M (f constant, any c); case m<M: α=min{x_m,x_M}, β=max{x_m,x_M}, IVT 4.9(b) on [α,β] — NO
+     ordering assumption on x_m, x_M. FTC-route = ONE remark sentence naming Thm 6.3 + Thm 4.12, no
+     second proof. Do NOT do RMS, weighted averages, probability/expected value, center of mass.
+     Uniqueness of c NOT claimed (Ex 7.17 exhibits two).
+     Counters handed to §7.6: Definition 7.5, Theorem 7.3, Example 7.18.
+     Record: PLAN-ch07.md, brief-7-5.md, ch07_ch-direction-codex3-audit.md. -->
+
+<article class="sec" lang="en">
+
+  <header class="sec-head">
+    <h2 class="sec-title"><span class="sec-no">7.5</span>Average Value of a Function</h2>
+  </header>
+
+  <!-- expansion:intuition — section opener: the collision is that "add them up and divide" has no n for a continuum; sampling settles toward a limit; the integral IS the sum, the width IS the count -->
+  <p>The average of finitely many numbers is a familiar recipe: add them, divide by how many there are. Now ask for the average temperature over a day. Temperature varies continuously — there are not finitely many values to add, and no “how many” to divide by. The natural move is to sample: read the thermometer at \(n\) evenly spaced moments and average the readings. Different sampling rates give slightly different answers, but as the sampling grows finer the answers settle toward a single number, and that settling is by now a familiar sight. Write it out. Sampling \(f\) at the points \(x_1, \dots, x_n\) of a regular partition of \([a, b]\), with spacing \(\Delta x = \tfrac{b-a}{n}\), the sampled mean is</p>
+  <p>\[ \frac{f(x_1) + \dots + f(x_n)}{n} = \frac{1}{b - a}\sum_{i=1}^{n} f(x_i)\,\Delta x, \]</p>
+  <p>since \(\tfrac{1}{n} = \tfrac{\Delta x}{b-a}\). The sampled mean <em>is</em> a Riemann sum, scaled by the interval’s width — so for continuous \(f\), Theorem 6.1 says the means converge, and their limit is an integral. The integral plays the role of “the sum of all the values”, and the width \(b - a\) plays the role of “how many”.</p>
+
+  <section class="env env-definition">
+    <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">7.4</span><span class="env-name">Average value of a function</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be continuous on \([a, b]\) with \(a &lt; b\). The <em>average value</em> of \(f\) on \([a, b]\) is</p>
+      <p>\[ f_{\text{ave}} = \frac{1}{b - a} \int_{a}^{b} f(x)\,dx. \]</p>
+    </div>
+  </section>
+
+  <p>The geometry behind the formula is worth keeping in view. Rewrite it as \(f_{\text{ave}}\,(b - a) = \int_{a}^{b} f(x)\,dx\): the rectangle over \([a, b]\) with height \(f_{\text{ave}}\) has the same (signed) area as the region under \(f\). The average is the <em>levelling height</em> — pour the region under the graph into a rectangular mould on the same base, and \(f_{\text{ave}}\) is where the surface comes to rest.</p>
+
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — the levelling rectangle: Def 7.4 and Thm 7.2 in one figure; deficit/surplus in contrasting tones, equal areas; crossings at ±1; registered in chapter7 FIGS as "levelling-rectangle"] -->
+  <figure class="figure" data-fig="levelling-rectangle">
+    <figcaption><span class="fig-no">Figure 7.16</span> Levelling the region under \(y = 1 + x^{2}\) on \([-1, 2]\): the rectangle of height \(f_{\text{ave}}\) holds the same area as the region under the curve — the deficit above the curve on \([-1, 1]\) exactly balances the surplus above the lid on \([1, 2]\). The curve crosses its own average at \(x = \pm 1\), the left crossing sitting at the interval’s left endpoint.</figcaption>
+  </figure>
+
+  <!-- expansion:caution — the interval-dependence trap: "the average of f" is meaningless until an interval is named; pairs with Ex 7.16 -->
+  <section class="env env-caution">
+    <p class="env-head"><span class="env-kicker">Caution</span></p>
+    <div class="env-body">
+      <p>The average value belongs to the <em>pair</em> — a function and an interval — not to the function alone. “The average of \(x^{2}\)” means nothing until the interval is named, and the same function averages differently over different stretches, as the next two examples show side by side.</p>
+    </div>
+  </section>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.15</span></p>
+      <div class="env-body">
+        <p>Find the average value of \(f(x) = 1 + x^{2}\) on the interval \([-1, 2]\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Here \(a = -1\) and \(b = 2\), so \(b - a = 3\) and</p>
+        <p>\[ \begin{aligned}
+          f_{\text{ave}} &= \frac{1}{3} \int_{-1}^{2} \bigl(1 + x^{2}\bigr)\,dx = \frac{1}{3}\left[x + \frac{x^{3}}{3}\right]_{-1}^{2} \\[2pt]
+            &= \frac{1}{3}\left(\left(2 + \frac{8}{3}\right) - \left(-1 - \frac{1}{3}\right)\right) = \frac{1}{3}\cdot 6 = 2.
+        \end{aligned} \]</p>
+        <p>The values of \(f\) on \([-1, 2]\) run from \(1\) up to \(5\), and their levelling height is \(2\) — closer to the low end, because the function spends most of the interval below its peak. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.16</span></p>
+      <div class="env-body">
+        <p>Find the average value of the same function, \(f(x) = 1 + x^{2}\), on the interval \([0, 1]\).</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Now \(b - a = 1\), and</p>
+        <p>\[ f_{\text{ave}} = \int_{0}^{1} \bigl(1 + x^{2}\bigr)\,dx = \left[x + \frac{x^{3}}{3}\right]_{0}^{1} = \frac{4}{3}. \]</p>
+        <p>Same function, different interval, different average: on \([0, 1]\) the function never rises above \(2\), and its levelling height drops to \(\tfrac{4}{3}\). The average is a property of \(f\) <em>together with</em> the interval — precisely the caution above. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <h3 class="subsec-head">The Mean Value Theorem for Integrals</h3>
+
+  <p>In Example 7.15 the average was \(2\), and the function actually <em>takes</em> the value \(2\) — at \(x = \pm 1\), where the curve crosses the top of its levelling rectangle. Is that a coincidence? For a finite list it can easily fail: the average of the two numbers \(1\) and \(3\) is \(2\), which is neither of them. A continuous function has no such escape. Its values form an unbroken range, and the average — trapped between the smallest and largest values — must itself be a value the function passes through. That is the content of the next theorem, and the machinery to prove it is exactly the pair of existence theorems Chapter 4 established for continuous functions on closed intervals.</p>
+
+  <section class="env env-theorem">
+    <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">7.2</span><span class="env-name">Mean Value Theorem for Integrals</span></p>
+    <div class="env-body">
+      <p>Let \(f\) be continuous on \([a, b]\) with \(a &lt; b\). Then there is a point \(c\) in \([a, b]\) at which \(f\) takes its average value:</p>
+      <p>\[ f(c) = f_{\text{ave}} = \frac{1}{b - a}\int_{a}^{b} f(x)\,dx. \]</p>
+    </div>
+  </section>
+
+  <section class="env env-proof">
+    <p class="env-head"><span class="env-kicker">Proof</span></p>
+    <div class="env-body">
+      <p>By the Extreme Value Theorem (Theorem 4.9(a)), \(f\) attains a minimum value \(m = f(x_m)\) and a maximum value \(M = f(x_M)\) at some points \(x_m, x_M\) of \([a, b]\). Since \(m \le f(x) \le M\) on \([a, b]\), the comparison property of the integral (Theorem 6.2, part 4) gives</p>
+      <p>\[ m\,(b - a) \le \int_{a}^{b} f(x)\,dx \le M\,(b - a), \]</p>
+      <p>and dividing by the positive number \(b - a\) traps the average: \(m \le f_{\text{ave}} \le M\).</p>
+      <p>If \(m = M\), the trap is already closed: \(f\) is constant on \([a, b]\), every value equals \(f_{\text{ave}}\), and any \(c\) in \([a, b]\) serves.</p>
+      <p>If \(m &lt; M\), let \(\alpha\) be the smaller of \(x_m, x_M\) and \(\beta\) the larger, so \([\alpha, \beta]\) is a genuine subinterval of \([a, b]\) whose endpoints carry the values \(m\) and \(M\) in one order or the other. The function \(f\) is continuous on \([\alpha, \beta]\), and \(f_{\text{ave}}\) lies between its endpoint values; so the Intermediate Value Theorem (Theorem 4.9(b)) supplies a point \(c\) in \([\alpha, \beta]\) — hence in \([a, b]\) — with \(f(c) = f_{\text{ave}}\). <span class="qed qed-proof"></span></p>
+    </div>
+  </section>
+
+  <!-- expansion:formula — the one-line FTC route, per ③ D2: name it, don't run it -->
+  <p>There is a second road to the same theorem, worth naming though not travelling: apply the Mean Value Theorem for derivatives (Theorem 4.12) to the accumulation function \(\int_{a}^{x} f(t)\,dt\), whose derivative is \(f\) by the Fundamental Theorem (Theorem 6.3) — the two mean value theorems are the same fact wearing different clothes.</p>
+
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.17</span></p>
+      <div class="env-body">
+        <p>For \(f(x) = 1 + x^{2}\) on \([-1, 2]\), find every point \(c\) whose existence Theorem 7.2 guarantees.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>Example 7.15 computed \(f_{\text{ave}} = 2\). We solve \(f(c) = 2\):</p>
+        <p>\[ 1 + c^{2} = 2 \quad\Longleftrightarrow\quad c^{2} = 1 \quad\Longleftrightarrow\quad c = \pm 1, \]</p>
+        <p>and both candidates lie in \([-1, 2]\). The theorem promises <em>at least one</em> such point and says nothing about uniqueness — here there are two, one at the interval’s left endpoint and one interior. Geometrically, they are the two crossings between the curve and the top of its levelling rectangle: the rectangle’s lid cuts the graph wherever the function passes through its own average. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:summary — close §7.5: what was minted and why it matters ahead; forward to §7.6 with no mechanics -->
+  <p>This section added one definition and one theorem, both small and both permanent. The average value \(\tfrac{1}{b-a}\int_a^b f\) is the honest limit of sampled means, and the Mean Value Theorem for Integrals says a continuous function must pass through its own average — the first payoff in this book from owning proved versions of the Extreme and Intermediate Value Theorems. Both results return when integration moves to higher dimensions, where regions replace intervals and the same questions arise again. The remaining two sections return the chapter to geometry, with the subtlest slicing yet: measuring the <em>length</em> of a curve, where the slices are not rectangles at all.</p>
+
+</article>
