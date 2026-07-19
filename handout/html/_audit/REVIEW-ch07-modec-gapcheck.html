@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REVIEW — Ch7 M4 Mode C gap-check（裁決稿）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root { --ink:#1a2230; --soft:#5a6675; --line:#dfe4ea; --bg:#f6f8fa; --card:#fff;
+          --blue:#1f4e79; --red:#c0392b; --green:#1e7a46; --gold:#8a6d00; --amber:#b06f00; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:30px 18px 90px; background:var(--bg); color:var(--ink);
+         font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","Microsoft JhengHei",sans-serif; line-height:1.7; }
+  .wrap { max-width:960px; margin:0 auto; }
+  h1 { font-size:1.5rem; margin:0 0 .15em; }
+  h2 { font-size:1.15rem; margin:1.6em 0 .5em; padding-bottom:.25em; border-bottom:2px solid var(--line); }
+  h3 { font-size:1rem; margin:1.1em 0 .4em; color:var(--blue); }
+  .sub { color:var(--soft); font-size:.9rem; margin:0 0 1.2em; }
+  .banner { background:#e7f4ec; border:1px solid #bfe3cd; border-radius:12px; padding:16px 20px; margin-bottom:8px; }
+  .banner .big { font-size:1.12rem; font-weight:700; color:var(--green); }
+  .banner .lede { font-size:.92rem; margin-top:.3em; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 20px;
+          margin-bottom:16px; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  table { border-collapse:collapse; width:100%; font-size:.87rem; margin:.4em 0; }
+  th,td { border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
+  th { background:#f0f3f6; font-weight:600; }
+  code { font-family:"SF Mono",Consolas,monospace; font-size:.85em; background:#eef1f5; padding:1px 5px; border-radius:4px; }
+  .tag { display:inline-block; font-size:.72rem; font-weight:700; padding:1px 8px; border-radius:999px; }
+  .t-adopt{background:#e7f4ec;color:var(--green);border:1px solid #bfe3cd}
+  .t-opt{background:#fff4d6;color:var(--amber);border:1px solid #eaddaa}
+  .t-decline{background:#eef1f5;color:var(--soft);border:1px solid var(--line)}
+  .t-high{background:#eaf1fb;color:var(--blue);border:1px solid #c4d8f0}
+  .cand { border-left:3px solid var(--line); padding:2px 0 2px 12px; margin:.9em 0; }
+  .cand.adopt{border-left-color:var(--green)} .cand.opt{border-left-color:var(--amber)} .cand.decline{border-left-color:var(--soft)}
+  .cand .hd { font-weight:600; font-size:.95rem; }
+  .warn { background:#fbf4e6; border:1px solid #ecdcb6; border-radius:8px; padding:9px 12px; margin:.5em 0; font-size:.87rem; }
+  .exbox { background:#fafbfc; border:1px solid var(--line); border-left:3px solid var(--blue); border-radius:8px; padding:10px 14px; margin:.5em 0; font-size:.9rem; }
+  .rec { font-size:.9rem; } ul { margin:.3em 0; padding-left:1.25em; } li { margin:.3em 0; font-size:.9rem; }
+  .mini { font-size:.83rem; color:var(--soft); }
+  .ok{color:var(--green);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Chapter 7 — M4：Mode C 條件式 gap-check（裁決稿）</h1>
+  <p class="sub">分支 <code>handout/latex-pilot</code> · 2026-07-18 · <code>mode-c-gapwalk</code>（軟深度②，4 候選）＋
+     <code>example-supplement</code>（補例①，1 候選），皆唯讀偵察、只提案。單一裁決稿（PIPELINE M4）。</p>
+
+  <div class="banner">
+    <div class="big">結果：大致飽和，僅零星缺口 — 1 例題候選 ＋ 4 軟深度候選（無 tier-1 空洞）</div>
+    <div class="lede">兩個 gate-1 agent **獨立收斂在同一處**：<b>§7.2 軸平移旋轉</b>是全章唯一站得住的真缺口——課文以 Caution ＋ Ex 7.7 收尾散文<b>兩度預告</b>、brief 自己標「M4 may upgrade」，卻始終沒有一個 worked example 把它算到底。其餘六節例題與軟深度覆蓋紮實。**我的建議：採 3 條**（1 例題＋2 軟深度），皆對症、低風險；此處即 ⛳ 逐條裁決點。</div>
+  </div>
+
+  <div class="card" style="border-left:4px solid var(--green);background:#f4fbf6;">
+    <b>更新 2026-07-18 — 已套用（使用者裁決：採 4/4，含選配 7.6-b）</b>
+    <div style="margin-top:.4em">
+    <span class="tag t-adopt">Ex 7.8</span> §7.2 繞 \(y=2\) washer（\(V=\tfrac{8\pi}{15}\)，sympy✓）＋ Ex 7.7 收尾收成 lead-in ·
+    <span class="tag t-adopt">7.5-a</span> avg-value↔avg-velocity 橋（§7.5，補 §6.4 迴圈）·
+    <span class="tag t-adopt">7.6-a</span> Neile 1657 史脈（§7.6，web 查證）·
+    <span class="tag t-adopt">7.6-b</span> <b>Strategy 7.4</b>（arc-length setup，§7.6）。
+    </div>
+    <div style="margin-top:.5em">
+    <b>編號 cascade：</b>Example 舊 8–22 → 9–23（<b>23＝硬上限</b>，連續 grep✓）＋Strategy 7.1–7.4；7 rendered cross-ref＋in-source ledger 全更新核對。
+    </div>
+    <div style="margin-top:.4em">
+    <b>回歸驗證：</b><span class="ok">scoped Mode B（4 新段）0 blocking</span>（G1-1 Strategy 7.4 step 4 條件化已套用；1 optional lead-in 未套；兩軟深度全乾淨）· <span class="ok">scoped 難度 sim（§7.2/7.5/7.6 盲測）0 blocking／0 stuck／0 B 類</span>（曲線 2.5/3/3.5＝M3 基線，Ex 7.8＝minor、三軟深度零新摩擦）。機械閘：build✔／linebreak 0／quote_lint clean×7／render <b>math=1030、katex 0</b>。
+    </div>
+    <div style="margin-top:.4em" class="mini">三閘 gate-2（含此批 M4 新內容）依「gate-2 全跑」政策排在 M5 之前批次。下方為原裁決稿全文。</div>
+  </div>
+
+  <div class="card">
+    <h3>我的建議（分層，供你勾選）</h3>
+    <table>
+      <tr><th>層級</th><th>項目</th><th>理由</th></tr>
+      <tr><td><b>建議採用</b>（3）</td><td>7.2-E1（例）、7.5-a（軟·application）、7.6-a（軟·history）</td><td>7.2-E1＝唯一 Layer-1 例題缺口、brief 已 earmark、sympy 驗過；7.5-a＝補回 §7.5 唯一斷掉的 §6.4 迴圈（average value＝average velocity 的連續版），零 cascade；7.6-a＝兌現 opener「根本沒有公式」的史脈（Neile 1657 首次 rectify 本節 Ex 曲線），<b>本輪已 web 查證</b>、零 cascade。</td></tr>
+      <tr><td><b>選配</b>（1）</td><td>7.6-b（軟·strategy box）</td><td>§15-item-6（2+ 例共用一法→strategy box，Ex 7.18–20 適用）；但核心 insight 已在散文、§7.6 已長。補了更整齊、不補不失核心。</td></tr>
+      <tr><td><b>建議不採</b>（1＋runner-up）</td><td>7.2-a（軟·caution）；§7.5 函數多樣性</td><td>7.2-a 與 7.2-E1 <b>重疊</b>（採了例題即含此對調示範）；§7.5「三例全 1+x²」屬刻意 reuse（凸顯 interval-dependence／MVT 找 c），且與 7.2-E1 爭同一名額——Layer-1 優先。</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>採用的成本（先看再決定）</h3>
+    <div class="warn"><b>① 編號 cascade（僅 7.2-E1 觸發；最大錯誤來源）：</b>插入新 <b>Example 7.8</b>（軸平移）於現 Ex 7.7 之後，會把其後<b>全部 Example 編號 +1</b>：現 7.8(角錐)→7.9、§7.3 7.9–11→7.10–12、§7.4 7.12–14→7.13–15、§7.5 7.15–17→7.16–18、§7.6 7.18–20→7.19–21、§7.7 7.21–22→7.22–23，**全章總數 22→23＝硬上限**。散文 cross-ref 連動（agent 標到 §7.4「exactly as in Example 7.8」→7.9；<b>落地前我會 grep 全部 <code>Example 7.x</code> 引用建完整編號地圖再動手，改完 grep 核對</b>）。<b>Figure 不變</b>（不加新圖，仍用 Fig 7.7）。<b>兩個軟深度（7.5-a／7.6-a）與 7.6-b 皆不編號＝零 cascade。</b></div>
+    <div class="warn"><b>② 解答 provenance：</b>本章 <code>problem_banks</code>：CLP-1 是<b>微分</b>題庫（對 Ch7 積分應用 inert）；Mooculus 的 <code>solidsOfRevolution/washersDifferentAxes1</code> 等雖對症、但為 Ximera <code>\answer{}</code> 互動 scaffold、無敘述完整解，僅<b>佐證此為標準缺口</b>、不直接匯入。故 7.2-E1 解答為<b>本次撰寫</b>（authored，同 Ex 7.1–7.22 的 provenance；對應 Stewart ET 9e §6.2 Example 4 的 y=2 情形）→ 已 <b>sympy 重算驗證</b>（見下）；未動用題庫版權文本，無 license 紅線。</div>
+  </div>
+
+  <h2>1 · 例題候選（<code>example-supplement</code>，1 條；§7.1/7.3/7.5/7.6 例題覆蓋足）</h2>
+  <div class="card">
+    <div class="cand adopt"><div class="hd">7.2-E1 · §7.2（落為新 Ex 7.8） · Layer-1 orphan <span class="tag t-high">HIGH</span> <span class="tag t-adopt">建議採用</span></div>
+      <div class="rec"><b>缺口：</b>軸平移（繞非座標軸如 \(y=2\)）的 washer 計算，課文以 Caution（「axis moves → radius measured from that axis」）＋Ex 7.7 收尾散文兩度<b>預告</b>，卻無 worked example 算到數字——這是 §§7.2–7.3 <b>唯一</b>的軸平移示範缺口，brief 明文「Shifted-axis rotation COMPRESSED… M4 may upgrade」。<b>新動作＝</b>兩半徑都改從非座標軸量、並在軸移動後重判外/內。經典 silent-error site（學生慣性從座標軸讀半徑）。
+        <div class="exbox"><b>擬補全文（authored，本書語域；<span class="ok">sympy 已驗 V=8π/15</span>）：</b><br>
+        <b>Example.</b> The region enclosed by \(y=x\) and \(y=x^{2}\) is rotated about the horizontal line \(y=2\). Find the volume.<br>
+        <b>Solution.</b> As in Example 7.7 the region runs over \([0,1]\) with \(y=x\) on top and \(y=x^{2}\) below, and lies entirely beneath \(y=2\). Rotating about that line, each radius is a <em>vertical distance to \(y=2\)</em>. The boundary farther from the axis is the lower curve, so it gives the outer radius \(R=2-x^{2}\); the nearer boundary gives the inner \(r=2-x\). Then
+        \[ V=\pi\int_{0}^{1}\!\bigl[(2-x^{2})^{2}-(2-x)^{2}\bigr]dx=\pi\int_{0}^{1}\!\bigl(x^{4}-5x^{2}+4x\bigr)dx=\pi\Bigl[\tfrac{x^{5}}{5}-\tfrac{5x^{3}}{3}+2x^{2}\Bigr]_{0}^{1}=\tfrac{8\pi}{15}. \]
+        The same region about the \(x\)-axis gave \(\tfrac{2\pi}{15}\) (Example 7.7); a different axis makes a different solid. Only where the radii were measured from changed — exactly the discipline the Caution insisted on.</div>
+        <b>落地連動：</b>把現 Ex 7.7 收尾那句軸平移<b>散文（我 M3 P-7.2-a 剛改過的那句）收成一句 lead-in</b>（「the same region about \(y=2\) makes a different solid — Example 7.8」），避免與新例重複；然後 cascade（上方 warn）。<b>圖：</b>prose＋現 Fig 7.7 已足懂；小 schematic（畫出 \(y=2\) 與兩條垂直半徑）可另作 M2 follow-up，非本 gate。</div></div>
+    <p class="mini"><b>runner-up（未選）：</b>§7.5 函數多樣性（Ex 7.15–17 全 \(1+x^2\)；opener「average temperature」未以非多項式兌現）＝真實 Layer-2 多樣性缺口，但屬刻意 reuse，且與 7.2-E1 爭唯一名額。若你寧可把名額給「函數多樣性」（如補一個 \(u\)-sub 或正弦的均值例）而非「軸平移」，這是唯一替代——但 7.5-a 的 application 橋已部分補上 §7.5 的「應用讀法」缺口，故我仍建議名額給 7.2-E1。</p>
+  </div>
+
+  <h2>2 · 軟深度候選（<code>mode-c-gapwalk</code>，4 條；皆不編號＝零 cascade）</h2>
+  <div class="card">
+    <div class="cand adopt"><div class="hd">7.5-a · §7.5 · application <span class="tag t-high">HIGH</span> <span class="tag t-adopt">建議採用</span></div>
+      <div class="rec"><b>缺口：</b>§7.5 是全章<b>唯一</b>斷掉 §6.4 Net Change 迴圈的節（§7.1 runners、§7.4「Read as in §6.4」都明接，§7.5 無 application 標記）；兩個 worked example 都抽象（\(1+x^2\)），opener 的 temperature 僅定性。<b>提案（levelling-height 段後或 Ex 7.16 後一句）：</b>
+        <div class="exbox">Take \(f=v\), the velocity of a moving object; then \(f_{\text{ave}}=\tfrac{1}{b-a}\int_a^b v\,dt=\tfrac{s(b)-s(a)}{b-a}\) by the Net Change Theorem (§6.4) — total displacement over elapsed time, exactly the <em>average velocity</em> of elementary kinematics. The levelling-height rectangle is that everyday average, read for a continuously varying quantity.</div>
+        <b>教學功能：</b>讓 average value 從「憑空公式」變「你早會的平均速度的連續版」，是讓定義 inevitable 的橋。純數學重述、無外部事實。<code>[pass: enrichment]</code>。</div></div>
+    <div class="cand adopt"><div class="hd">7.6-a · §7.6（Ex 7.18 後） · history <span class="tag t-high">HIGH（已查證）</span> <span class="tag t-adopt">建議採用</span></div>
+      <div class="rec"><b>缺口：</b>§7.6 opener 說「no formula at all — not a poor one, none」，但無 history 標記兌現此修辭；且未解釋 Ex 7.18 為何偏挑 \(y=x^{3/2}\)。<b>提案（Ex 7.18 solution 後一句）：</b>
+        <div class="exbox">The curve of Example 7.18 is no arbitrary choice. The graph of \(y=x^{3/2}\) is the <em>semicubical parabola</em> \(y^{2}=x^{3}\), and in 1657 the nineteen-year-old William Neile made it the first algebraic curve ever to have its length computed — a result published by his teacher Wallis. Descartes had held, in his <em>Géométrie</em>, that the ratio of a curved line to a straight one "cannot be discovered by human minds"; Neile's rectification found one such length exactly, just as this section's opening promised.</div>
+        <b>查證（本輪 web，confidence medium→high）：</b>Neile 1657、semicubical parabola \(y^2=x^3\)、首條被 rectify 的代數曲線、Wallis 出版（<i>De Cycloide</i> 1659）— 見 MacTutor／Wikipedia；Descartes 引句見 Stanford Encyclopedia（La Géométrie）。<code>[pass: enrichment] [source: Neile 1657 rectification (MacTutor); Descartes, La Géométrie (SEP)]</code>。</div></div>
+    <div class="cand opt"><div class="hd">7.6-b · §7.6 · strategy box <span class="tag t-opt">MEDIUM</span> <span class="tag t-opt">選配</span></div>
+      <div class="rec"><b>提案：</b>arc-length setup 五步框（①驗 smoothness ②組 \(1+[f']^2\) ③找 perfect-square/u-sub 結構 ④開根做 \(\sqrt{q^2}=|q|\) 符號檢查 ⑤積分）。<b>依據：</b>SPEC §15-item-6（Ex 7.18–20 三例共用一法）。<b>為何僅選配：</b>核心 insight 已在散文（「engineered so that \(1+f'^2\) assembles into a square」、sign-check、closed-form 罕有→Ch8），box 只是收攏；§7.6 已長。補了更整齊。</div></div>
+    <div class="cand decline"><div class="hd">7.2-a · §7.2 · caution <span class="tag t-decline">LOW</span> <span class="tag t-decline">建議不採（被 7.2-E1 吸收）</span></div>
+      <div class="rec">獨立 caution 提示軸平移半徑對調——但 Ex 7.7 收尾已逐字示範、既有 radius caution 已寫「axis moves → measured from that axis」，<b>且若採 7.2-E1，新例即完整示範此對調</b>，獨立 caution 邊際價值歸零。不採。</div></div>
+  </div>
+
+  <h2>3 · 考慮後駁回（透明——確認沒漏真缺口）</h2>
+  <div class="card">
+    <p class="rec"><b>example-supplement 掃過並駁回（除上方 runner-up）：</b></p>
+    <ul>
+      <li><b>§7.1 上邊界換手拆兩段積分</b>（Layer-2）— §7.1 已教拆分（Ex 7.3 交點拆）與選切向避拆（Ex 7.4），非新動作。</li>
+      <li><b>§7.3 繞 x-軸／平移垂直線 x=c 的 shell</b>（Layer-2）— 軸平移在 §7.2 washer 形式示範一次即足（兩半徑都要重測、較豐富）；1-名額上限。</li>
+      <li><b>§7.6 第二個 perfect-square 例／§7.2 三角形截面非旋轉體</b> — 純多樣性、非新動作；toolkit 禁 trig-sub 本就限制變化。</li>
+    </ul>
+    <p class="rec"><b>mode-c-gapwalk 判定飽和、無提案的節：</b>§7.1（軟深度六類全到位）、§7.3（method-choice／radius-trap／跨法驗證全在）、§7.4（本章最厚實）、§7.7（radius discipline 收束全章＋難度分流 signpost 已在）。intuition／summary 兩類<b>全章飽和、零提案</b>。</p>
+    <p class="mini">→ 若你傾向「覆蓋已足、本章 M4 不補」，亦為誠實可接受的結論（value judgment）。但兩 agent 對 §7.2 軸平移的獨立收斂 + brief 自標「M4 may upgrade」+ 零風險的兩條軟深度橋，令我建議至少採 7.2-E1＋7.5-a＋7.6-a 三條。</p>
+    <p class="mini"><b>採納後流程（PIPELINE M4）：</b>採納項落地 → 標 <code>[pass: enrichment]</code> → <b>範圍限定 Mode B</b>（對新增內容跑散文閘）→ 新例 <b>sympy 複驗</b>（7.2-E1 已先驗）→ 編號 cascade grep 核對 → 對改動節補跑 scoped 難度 sim。三閘 gate-2（含此批新內容）依政策排在 M4 之後、M5 之前批次。</p>
+  </div>
+
+  <p class="mini">agent 原始 transcript 屬 ephemeral；本裁決稿＋<code>PLAN-ch07.md</code> §M4 為 durable 紀錄。7.2-E1 volume 經 sympy 驗（8π/15）；7.6-a 史實經 web 查證（Neile 1657／Descartes Géométrie）。</p>
+</div>
+</body>
+</html>

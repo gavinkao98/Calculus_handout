@@ -409,7 +409,7 @@ window.MathJax = {
     <h1 class="ch-title">Applications of Integration</h1>
   </header>
 
-  <p class="lead">Chapter 6 built the machine. The definite integral was assembled from Riemann sums, and the Fundamental Theorem of Calculus turned its evaluation into a search for antiderivatives. This chapter puts the machine to work — on the area between two curves, the volume of a solid, the work done by a varying force, the average of a continuously varying quantity, the length of a curve, and the area of a curved surface. Six problems, and one method: <em>slice</em> the quantity into thin pieces, <em>approximate</em> each piece by a product — a value that is nearly constant across the slice, times the slice’s width — <em>sum</em> the pieces, and <em>refine</em>. Every time, the sums are Riemann sums, their limit is a definite integral, and the Fundamental Theorem evaluates it. What is genuinely new in this chapter is therefore not the integration but the setup: deciding what to slice, reading off what each thin slice contributes, and recognising the resulting limit as an integral we can compute. That modelling step — from a quantity to its integral — is the skill this chapter teaches, and it is the skill that the rest of calculus, from differential equations to the geometry of space, keeps drawing on.</p>
+  <p class="lead">Chapter 6 built the machine. The definite integral was assembled from Riemann sums, and the Fundamental Theorem of Calculus turned its evaluation into a search for antiderivatives. This chapter puts the machine to work — on the area between two curves, the volume of a solid, the work done by a varying force, the average of a continuously varying quantity, the length of a curve, and the area of a curved surface. Six problems, and one method: <em>slice</em> the quantity into thin pieces, <em>approximate</em> each piece by a product — a value that is nearly constant across the slice, times the slice’s width — <em>sum</em> the pieces, and <em>refine</em>. Every time, the sums are Riemann sums, their limit is a definite integral, and the Fundamental Theorem evaluates it. What is genuinely new in this chapter is therefore not the integration but the setup: deciding what to slice, reading off what each thin slice contributes, and recognizing the resulting limit as an integral we can compute. That modelling step — from a quantity to its integral — is the skill this chapter teaches, and it is the skill that the rest of calculus, from differential equations to the geometry of space, keeps drawing on.</p>
 
   <p class="para-head">By the end of this chapter, you will be able to:</p>
   <ul>
@@ -570,7 +570,7 @@ window.MathJax = {
   </figure>
 
   <!-- expansion:application [source: Stewart ET 9e §6.1 velocity-gap example, adapted] — the gap integrand read physically: area between velocity curves = lead built up; ties to Net Change §6.4, shows the integrand-as-gap reading is not merely geometric -->
-  <p>The gap between two curves need not be a geometric height at all. Suppose two runners leave the same start together — positions \(s_{A}(0) = s_{B}(0)\) — and run with continuous velocities \(v_{A} = s_{A}'\) and \(v_{B} = s_{B}'\) satisfying \(v_{A}(t) \ge v_{B}(t)\) over the first \(T\) seconds. Each thin time-slice contributes \(\bigl[v_{A}(t) - v_{B}(t)\bigr]\,\Delta t\) — the little bit of extra ground the faster runner gains during that instant — and applying the Net Change Theorem (Theorem 6.5) to the difference \(s_{A} - s_{B}\), whose derivative \(v_{A} - v_{B}\) is continuous, the integral \(\int_{0}^{T} \bigl[v_{A}(t) - v_{B}(t)\bigr]\,dt\) equals \(s_{A}(T) - s_{B}(T)\): the faster runner’s lead at time \(T\). On a shared velocity–time graph, that lead <em>is</em> the area between the two velocity curves. The same reading works for any two rates running side by side — two flow rates, two growth rates — <em>so long as one stays on top</em>: if the rate curves cross, the area between the graphs accumulates the absolute gap \(\int \lvert v_{A} - v_{B}\rvert\), while the net difference is the plain integral — the displacement-versus-distance distinction of §6.4 all over again.</p>
+  <p>The gap between two curves need not be a geometric height at all. Suppose two runners leave the same start together — positions \(s_{A}(0) = s_{B}(0)\) — and run with continuous velocities \(v_{A} = s_{A}'\) and \(v_{B} = s_{B}'\) satisfying \(v_{A}(t) \ge v_{B}(t)\) over the first \(T\) seconds. Each thin time-slice contributes \(\bigl[v_{A}(t) - v_{B}(t)\bigr]\,\Delta t\) — the little bit of extra ground the faster runner gains during that instant. Since \(s_{A} - s_{B}\) has continuous derivative \(v_{A} - v_{B}\), the Net Change Theorem (Theorem 6.5) gives \(\int_{0}^{T} \bigl[v_{A}(t) - v_{B}(t)\bigr]\,dt = s_{A}(T) - s_{B}(T)\) — the faster runner’s lead at time \(T\). On a shared velocity–time graph, that lead <em>is</em> the area between the two velocity curves. The same reading works for any two rates running side by side — two flow rates, two growth rates — <em>so long as one stays on top</em>: if the rate curves cross, the area between the graphs accumulates the absolute gap \(\int \lvert v_{A} - v_{B}\rvert\), while the net difference is the plain integral — the displacement-versus-distance distinction of §6.4 all over again.</p>
 
   <!-- expansion:strategy — distill the section's method: the four moves every area-between-curves solution makes (Ex 7.1–7.4 all instantiate them) -->
   <section class="env env-strategy">
@@ -594,18 +594,18 @@ window.MathJax = {
 <template id="frag-sec-7-2">
 <!-- §7.2 Volumes. section-source: Stewart ET 9e §6.2 (Volumes); cross-checked Thomas 14e §6.1,
      Rogawski 4e §6.2–6.3. Authored 2026-07-18 per PLAN-ch07 + brief-7-2 (canon-as-spine).
-     Numbering: mints Definition 7.2 (Volume by cross-sections), Examples 7.5–7.8. No Theorem here
+     Numbering: mints Definition 7.2 (Volume by cross-sections), Examples 7.5–7.9. No Theorem here
      (disks/washers are INSTANCES of Def 7.2, per PLAN — no separate "disk theorem"). Cautions
      UNNUMBERED (Ch1–6 convention).
      SEAM GUARD (PLAN-ch07 + brief-7-2): the modeling step (slab ≈ cylinder; volume DEFINED by the
      integral) is stated in daylight; existence via Thm 6.1 cited explicitly; consistency checks =
      constant-A cylinder + sphere/pyramid sanity anchors (classical solid geometry recovered — the
      Ch6 semicircle Ex 6.6 move). Washer subtraction grounded in linearity (Thm 6.2), with the
-     π(R²−r²) ≠ π(R−r)² caution. Shifted-axis rotation COMPRESSED to Ex 7.7's closing line (deliberate,
-     recorded in brief; M4 may upgrade). Do NOT do shells (→ §7.3, one-line forward fence), Pappus,
+     π(R²−r²) ≠ π(R−r)² caution. Shifted-axis rotation demonstrated as Ex 7.8
+     (M4 upgrade of Ex 7.7's closing line, 2026-07-18). Do NOT do shells (→ §7.3, one-line forward fence), Pappus,
      oblique cross-sections, wedge. No strategy box here (Strategy 7.1 owns setup ritual; §7.3's box
      owns method choice).
-     Counters handed to §7.3: Definition 7.3, Example 7.9, Strategy 7.2, Theorem 7.1 (none minted yet).
+     Counters handed to §7.3: Definition 7.3, Example 7.10, Strategy 7.2, Theorem 7.1 (none minted yet).
      Record: PLAN-ch07.md, brief-7-2.md. -->
 
 <article class="sec" lang="en">
@@ -647,7 +647,7 @@ window.MathJax = {
   <p>\[ A(x) = \pi \bigl[f(x)\bigr]^{2}. \]</p>
   <p>Definition 7.2 then gives \(V = \int_{a}^{b} \pi \bigl[f(x)\bigr]^{2}\,dx\). No new formula is being introduced here — only a recipe for \(A(x)\).</p>
 
-  <!-- expansion:caution — the radius-reading trap: the disk's radius is the function VALUE, a length read vertically, then swept; students who memorise "πr²" hunt for a horizontal r -->
+  <!-- expansion:caution — the radius-reading trap: the disk's radius is the function VALUE, a length read vertically, then swept; students who memorize "πr²" hunt for a horizontal r -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
@@ -730,7 +730,30 @@ window.MathJax = {
       <div class="env-body">
         <p>The curves meet where \(x = x^{2}\), so \(x = 0\) or \(x = 1\), and between these values \(x \ge x^{2} \ge 0\) (at \(x = \tfrac12\): \(\tfrac12\) against \(\tfrac14\)). Rotating, the line is the outer boundary and the parabola the inner one: \(R = x\), \(r = x^{2}\), giving washers of area \(\pi\bigl(x^{2} - x^{4}\bigr)\). Hence</p>
         <p>\[ V = \int_{0}^{1} \pi \bigl(x^{2} - x^{4}\bigr)\,dx = \pi \left[\frac{x^{3}}{3} - \frac{x^{5}}{5}\right]_{0}^{1} = \pi \left(\frac{1}{3} - \frac{1}{5}\right) = \frac{2\pi}{15}. \]</p>
-        <p>Had the same region been rotated about the line \(y = 2\) instead, nothing would change except where the radii are measured from: each radius becomes a distance to <em>that</em> line, and the parabola — now the boundary farther from the axis — supplies the outer radius \(R = 2 - x^{2}\), the line the inner \(r = 2 - x\). Set up the radii from the axis of rotation, and the washer formula does the rest. <span class="qed"></span></p>
+        <p>Had the same region been rotated about the line \(y = 2\) instead, only where the radii are measured from would change — each becomes a distance to <em>that</em> line, not to a coordinate axis out of habit. The next example carries that change through. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example [pass: enrichment] [source: M4 Mode C gap-check 2026-07-18; §7.2 Layer-1 shifted-axis gap earmarked in brief; authored soln (Stewart ET 9e §6.2 Ex 4 corroborated), sympy-verified V=8π/15] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.8</span></p>
+      <div class="env-body">
+        <p>The same region — enclosed by \(y = x\) and \(y = x^{2}\) — is now rotated about the horizontal line \(y = 2\). Find the volume of the resulting solid.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The region still runs over \([0, 1]\) with \(y = x\) on top and \(y = x^{2}\) below, and it lies entirely beneath the axis \(y = 2\). Rotating about that line, each radius is a <em>vertical distance to \(y = 2\)</em>. The boundary farther from the axis is now the lower curve \(y = x^{2}\), so it supplies the outer radius \(R = 2 - x^{2}\); the nearer boundary \(y = x\) supplies the inner radius \(r = 2 - x\). The washer at \(x\) has area</p>
+        <p>\[ \pi\bigl(R^{2} - r^{2}\bigr) = \pi\bigl[(2 - x^{2})^{2} - (2 - x)^{2}\bigr] = \pi\bigl(x^{4} - 5x^{2} + 4x\bigr), \]</p>
+        <p>so</p>
+        <p>\[ \begin{aligned}
+          V &= \pi\int_{0}^{1} \bigl(x^{4} - 5x^{2} + 4x\bigr)\,dx = \pi\left[\frac{x^{5}}{5} - \frac{5x^{3}}{3} + 2x^{2}\right]_{0}^{1} \\[2pt]
+            &= \pi\left(\frac{1}{5} - \frac{5}{3} + 2\right) = \frac{8\pi}{15}.
+        \end{aligned} \]</p>
+        <p>Rotating the same region about the \(x\)-axis gave \(\tfrac{2\pi}{15}\) (Example 7.7); about \(y = 2\) the solid is different, and larger. The only thing that changed was where the radii were measured from — exactly the discipline the Caution insisted on. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -741,7 +764,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.8</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.9</span></p>
       <div class="env-body">
         <p>Find the volume of a pyramid whose base is a square of side \(b\) and whose height is \(h\).</p>
       </div>
@@ -773,7 +796,7 @@ window.MathJax = {
 <!-- §7.3 Volumes by Cylindrical Shells. section-source: Stewart ET 9e §6.3; cross-checked Thomas 14e
      §6.2, Rogawski 4e §6.4. Authored 2026-07-18 per PLAN-ch07 + brief-7-3 (canon-as-spine; ③ D5
      resolved register). Numbering: mints Theorem 7.1 (The shell method), Strategy 7.2, Examples
-     7.9–7.11. Cautions UNNUMBERED.
+     7.10–7.12. Cautions UNNUMBERED.
      SEAM GUARD (PLAN-ch07 + brief-7-3 + ③ D5/blocking#7): the shell-stack MODEL is named FIRST
      (same modeling tier as §7.2's slabs, explicitly), THEN the midpoint algebra — and "exact"
      describes ONLY the approximating annular cylinder of height f(x̄ᵢ), never the original solid's
@@ -783,7 +806,7 @@ window.MathJax = {
      general washer↔shell equivalence DEFERRED (Ch8 parts / Ch15 change of variables), one line.
      Shifted-axis: Strategy 7.2 line only (region one side of axis, radius |x−c|) — NO worked example.
      NO Pappus. NO second motivating failure.
-     Counters handed to §7.4: Definition 7.3, Example 7.12, Strategy 7.3 (Def counter at 7.3; Thm at
+     Counters handed to §7.4: Definition 7.3, Example 7.13, Strategy 7.3 (Def counter at 7.3; Thm at
      7.2; Ex at 7.12).
      Record: PLAN-ch07.md, brief-7-3.md, ch07_ch-direction-codex3-audit.md. -->
 
@@ -839,7 +862,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.9</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.10</span></p>
       <div class="env-body">
         <p>Find the volume of the solid obtained by rotating the region under \(y = 2x^{2} - x^{3}\), from \(x = 0\) to \(x = 2\), about the \(y\)-axis.</p>
       </div>
@@ -861,7 +884,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.10</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.11</span></p>
       <div class="env-body">
         <p>Find the volume of the solid obtained by rotating the region enclosed by \(y = x\) and \(y = x^{2}\) about the \(y\)-axis.</p>
       </div>
@@ -897,7 +920,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.11</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.12</span></p>
       <div class="env-body">
         <p>The region under \(y = x^{2}\), from \(x = 0\) to \(x = 1\), is rotated about the \(y\)-axis. Find the volume of the resulting solid twice: once by shells, once by washers.</p>
       </div>
@@ -914,9 +937,9 @@ window.MathJax = {
     </section>
   </div>
 
-  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-supporting — Ex 7.11's solid twice, same base geometry, washer overlay vs shell overlay; no numeric answer printed; registered in chapter7 FIGS as "washer-vs-shell"] -->
+  <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-supporting — Ex 7.12's solid twice, same base geometry, washer overlay vs shell overlay; no numeric answer printed; registered in chapter7 FIGS as "washer-vs-shell"] -->
   <figure class="figure" data-fig="washer-vs-shell">
-    <figcaption><span class="fig-no">Figure 7.12</span> One solid, two slicings — the solid of Example 7.11, a cylinder with a paraboloid bowl carved from its top. A horizontal slice at height \(y\) is a washer from \(\sqrt{y}\) out to \(1\); a vertical slice at radius \(x\) is a shell of height \(x^{2}\). Both decompositions must — and do — measure the same volume.</figcaption>
+    <figcaption><span class="fig-no">Figure 7.12</span> One solid, two slicings — the solid of Example 7.12, a cylinder with a paraboloid bowl carved from its top. A horizontal slice at height \(y\) is a washer from \(\sqrt{y}\) out to \(1\); a vertical slice at radius \(x\) is a shell of height \(x^{2}\). Both decompositions must — and do — measure the same volume.</figcaption>
   </figure>
 
   <!-- expansion:summary — close §7.3: the choice ritual + the modeling honesty; forward to §7.4 where the schema leaves geometry; no §7.4 mechanics -->
@@ -930,7 +953,7 @@ window.MathJax = {
      §6.5. Authored 2026-07-18 per PLAN-ch07 + brief-7-4 (canon-as-spine; ③ D6 resolved: SI primary,
      one ft-lb mention, EXACTLY 3 examples; ③ advisory #10: F = kx is the APPLIED force, restoring is
      −kx; cable density given directly as WEIGHT density N/m). Numbering: mints Definition 7.3 (Work),
-     Strategy 7.3, Examples 7.12–7.14. Cautions UNNUMBERED.
+     Strategy 7.3, Examples 7.13–7.15. Cautions UNNUMBERED.
      SEAM GUARD (PLAN-ch07 + brief-7-4): the section's transferable skill = NAME THE SLICE before
      integrating (spring slices the displacement; cable slices the rope; tank slices the water) —
      each solution names its slice up front. Physics is NOT assumed: work = force × distance for
@@ -938,7 +961,7 @@ window.MathJax = {
      coordinate convention pinned at the top of the solution (y from the vertex UP). Do NOT do
      hydrostatic pressure, centers of mass, gas/piston, variable-density rods, kinetic-energy
      theorems, ft-lb worked examples.
-     Counters handed to §7.5: Definition 7.4, Theorem 7.2, Example 7.15 (Strategy counter closes at
+     Counters handed to §7.5: Definition 7.4, Theorem 7.2, Example 7.16 (Strategy counter closes at
      7.3 for the chapter per PLAN).
      Record: PLAN-ch07.md, brief-7-4.md, ch07_ch-direction-codex3-audit.md. -->
 
@@ -977,7 +1000,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.12</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.13</span></p>
       <div class="env-body">
         <p>A force of \(30\) N is required to hold a spring stretched \(0.1\) m beyond its natural length. How much work is done in stretching it from \(0.1\) m to \(0.2\) m beyond its natural length?</p>
       </div>
@@ -994,11 +1017,11 @@ window.MathJax = {
 
   <h3 class="subsec-head">Lifting and pumping</h3>
 
-  <p>In the spring problem one object moved and the force on it varied. The next two problems are built differently: a cable, or a tankful of water, is an extended body whose parts each move a <em>different</em> distance. As with the spring, what we compute is work done <em>against</em> a resisting force — here gravity. To raise a slice steadily, the winch or pump applies an upward force whose magnitude equals the slice’s weight, and it is <em>that</em> applied force, pointing along the upward motion, whose work the integrals below price: (the slice’s weight) \(\times\) (the distance <em>it</em> rises). (Gravity itself, pulling against the motion, does the opposite, negative, work — that is what makes the lifting cost effort.) The force required on any one slice stays constant as it rises; what varies from slice to slice is the journey. So the slicing must follow the structure: slice the <em>material itself</em>, and price each slice’s lift. Deciding what to slice is the whole game, and it is the first sentence of each solution below.</p>
+  <p>In the spring problem one object moved and the force on it varied. The next two problems are built differently: a cable, or a tankful of water, is an extended body whose parts each move a <em>different</em> distance. As with the spring, what we compute is work done <em>against</em> a resisting force — here gravity. To raise a slice steadily, the winch or pump applies an upward force whose magnitude equals the slice’s weight, and it is <em>that</em> applied force, pointing along the upward motion, whose work the integrals below price: (the slice’s weight) \(\times\) (the distance <em>it</em> rises). (Gravity itself pulls against the motion and therefore does negative work; overcoming it is what makes lifting require effort.) The force required on any one slice stays constant as it rises; what varies from slice to slice is the journey. So the slicing must follow the structure: slice the <em>material itself</em>, and price each slice’s lift. Deciding what to slice is the whole game, and it is the first sentence of each solution below.</p>
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.13</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.14</span></p>
       <div class="env-body">
         <p>A \(20\) m cable weighing \(2\) N per metre hangs straight down from a winch. How much work does the winch do in winding the whole cable up to the top?</p>
       </div>
@@ -1020,7 +1043,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.14</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.15</span></p>
       <div class="env-body">
         <p>A tank has the shape of an inverted circular cone (vertex at the bottom) of height \(4\) m and top radius \(2\) m. It is filled with water to a depth of \(3\) m. Find the work required to pump all the water out over the top rim. (Water weighs \(\rho g \approx 9800\) N per cubic metre: density \(\rho = 1000\) kg/m³ times \(g = 9.8\) m/s².)</p>
       </div>
@@ -1029,7 +1052,7 @@ window.MathJax = {
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
         <p>Slice the <em>water</em>, horizontally — each horizontal sheet of water rises as one piece, while sheets at different depths rise different amounts. Fix the coordinate first: let \(y\) run <em>upward from the vertex</em>, so the tank occupies \(0 \le y \le 4\), the rim sits at \(y = 4\), and the water fills \(0 \le y \le 3\).</p>
-        <p>The slab of water at height \(y\), of thickness \(\Delta y\), is a disk. Its radius \(r(y)\) comes from similar triangles in the cone’s side view, exactly as in Example 7.8: \(r(y)/y = 2/4\), so \(r(y) = y/2\). The slab’s volume is \(\pi\,(y/2)^{2}\,\Delta y = \tfrac{\pi}{4}y^{2}\,\Delta y\) cubic metres, so its weight is \(9800\cdot\tfrac{\pi}{4}y^{2}\,\Delta y\) newtons; raising it steadily to the rim takes an upward force of that magnitude acting from height \(y\) to height \(4\), through the lift distance \(4 - y\) metres. Summing the slabs’ work against gravity and refining,</p>
+        <p>The slab of water at height \(y\), of thickness \(\Delta y\), is a disk. Its radius \(r(y)\) comes from similar triangles in the cone’s side view, exactly as in Example 7.9: \(r(y)/2 = y/4\), so \(r(y) = y/2\). The slab’s volume is \(\pi\,(y/2)^{2}\,\Delta y = \tfrac{\pi}{4}y^{2}\,\Delta y\) cubic metres, so its weight is \(9800\cdot\tfrac{\pi}{4}y^{2}\,\Delta y\) newtons; raising it steadily to the rim takes an upward force of that magnitude acting from height \(y\) to height \(4\), through the lift distance \(4 - y\) metres. Summing the slabs’ work against gravity and refining,</p>
         <p>\[ \begin{aligned}
           W &= \int_{0}^{3} 9800\cdot\frac{\pi}{4}\,y^{2}\,(4 - y)\,dy = 2450\pi \int_{0}^{3} \bigl(4y^{2} - y^{3}\bigr)\,dy \\[2pt]
             &= 2450\pi \left[\frac{4y^{3}}{3} - \frac{y^{4}}{4}\right]_{0}^{3} \\[2pt]
@@ -1045,11 +1068,11 @@ window.MathJax = {
     <figcaption><span class="fig-no">Figure 7.15</span> The conical tank in side view: vertex at height \(0\), rim at \(4\), water to depth \(3\). The slab at height \(y\) has radius \(y/2\) by similar triangles and rises \(4 - y\) to the rim — the water surface bounds the integral at \(3\), while the rim height \(4\) enters each slab’s distance.</figcaption>
   </figure>
 
-  <!-- expansion:caution — the template trap: spring slices displacement (force varies, distance is dx); cable/tank slice the material (force per slice constant, distance varies); memorising one template misprices the other -->
+  <!-- expansion:caution — the template trap: spring slices displacement (force varies, distance is dx); cable/tank slice the material (force per slice constant, distance varies); memorizing one template misprices the other -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>The three examples hide two different slicings. The spring slices the <em>displacement</em>: one object moves, the applied force on it varies, and \(dx\) is a bit of distance. The cable and the tank slice the <em>material</em>: the force required on each slice is constant (matching its weight), and what varies is the distance that slice travels. Memorising a single template — “weight times height” or “force times \(dx\)” — will misprice one of the two. Name what is being sliced first; the integrand then assembles itself.</p>
+      <p>The three examples hide two different slicings. The spring slices the <em>displacement</em>: one object moves, the applied force on it varies, and \(dx\) is a bit of distance. The cable and the tank slice the <em>material</em>: the force required on each slice is constant (matching its weight), and what varies is the distance that slice travels. Memorizing a single template — “weight times height” or “force times \(dx\)” — will misprice one of the two. Name what is being sliced first; the integrand then assembles itself.</p>
     </div>
   </section>
 
@@ -1077,15 +1100,15 @@ window.MathJax = {
      §6.1 (avg value subsection), Rogawski 4e §6.2. Authored 2026-07-18 per PLAN-ch07 + brief-7-5
      (canon-as-spine; ③ D2 resolved register). Numbering: mints Definition 7.4 (Average value),
      Theorem 7.2 (Mean Value Theorem for Integrals, PROVED — the chapter's first full theorem proof;
-     closes the seam-ledger premise "積分均值(EVT+IVT)"), Examples 7.15–7.17. Cautions UNNUMBERED.
+     closes the seam-ledger premise "積分均值(EVT+IVT)"), Examples 7.16–7.18. Cautions UNNUMBERED.
      SEAM GUARD (PLAN-ch07 + brief-7-5 + ③ D2/blocking#1): Definition AND Theorem both require a<b
      (no reversed-limits convention imported into averages); conclusion c ∈ [a,b]. Proof structure
      MANDATED: EVT 4.9(a) attained m=f(x_m), M=f(x_M); comparison Thm 6.2(4) → m ≤ f_ave ≤ M; case
      m=M (f constant, any c); case m<M: α=min{x_m,x_M}, β=max{x_m,x_M}, IVT 4.9(b) on [α,β] — NO
      ordering assumption on x_m, x_M. FTC-route = ONE remark sentence naming Thm 6.3 + Thm 4.12, no
      second proof. Do NOT do RMS, weighted averages, probability/expected value, center of mass.
-     Uniqueness of c NOT claimed (Ex 7.17 exhibits two).
-     Counters handed to §7.6: Definition 7.5, Theorem 7.3, Example 7.18.
+     Uniqueness of c NOT claimed (Ex 7.18 exhibits two).
+     Counters handed to §7.6: Definition 7.5, Theorem 7.3, Example 7.19.
      Record: PLAN-ch07.md, brief-7-5.md, ch07_ch-direction-codex3-audit.md. -->
 
 <article class="sec" lang="en">
@@ -1095,7 +1118,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — section opener: the collision is that "add them up and divide" has no n for a continuum; sampling settles toward a limit; the integral IS the sum, the width IS the count -->
-  <p>The average of finitely many numbers is a familiar recipe: add them, divide by how many there are. Now ask for the average temperature over a day. Temperature varies continuously — there are not finitely many values to add, and no “how many” to divide by. The natural move is to sample: read the thermometer at \(n\) evenly spaced moments and average the readings. Different sampling rates give slightly different answers, but as the sampling grows finer the answers settle toward a single number, and that settling is by now a familiar sight. Write it out. Sampling \(f\) at the points \(x_1, \dots, x_n\) of a regular partition of \([a, b]\), with spacing \(\Delta x = \tfrac{b-a}{n}\), the sampled mean is</p>
+  <p>The average of finitely many numbers is a familiar recipe: add them, divide by how many there are. Now ask for the average temperature over a day. Temperature varies continuously — there are not finitely many values to add, and no “how many” to divide by. The natural move is to sample: read the thermometer at \(n\) evenly spaced moments and average the readings. Different sampling rates give slightly different answers, but as the sampling grows finer the answers settle toward a single number, and that settling is by now a familiar sight. Write it out. If we sample \(f\) at the points \(x_1, \dots, x_n\) of a regular partition of \([a, b]\), with spacing \(\Delta x = \tfrac{b-a}{n}\), the sampled mean is</p>
   <p>\[ \frac{f(x_1) + \dots + f(x_n)}{n} = \frac{1}{b - a}\sum_{i=1}^{n} f(x_i)\,\Delta x, \]</p>
   <p>since \(\tfrac{1}{n} = \tfrac{\Delta x}{b-a}\). The sampled mean <em>is</em> a Riemann sum, scaled by the interval’s width — so for continuous \(f\), Theorem 6.1 says the means converge, and their limit is an integral. The integral plays the role of “the sum of all the values”, and the width \(b - a\) plays the role of “how many”.</p>
 
@@ -1111,10 +1134,15 @@ window.MathJax = {
 
   <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — the levelling rectangle: Def 7.4 and Thm 7.2 in one figure; deficit/surplus in contrasting tones, equal areas; crossings at ±1; registered in chapter7 FIGS as "levelling-rectangle"] -->
   <figure class="figure" data-fig="levelling-rectangle">
-    <figcaption><span class="fig-no">Figure 7.16</span> Levelling the region under \(y = 1 + x^{2}\) on \([-1, 2]\): the rectangle of height \(f_{\text{ave}}\) holds the same area as the region under the curve — the deficit above the curve on \([-1, 1]\) exactly balances the surplus above the lid on \([1, 2]\). The curve crosses its own average at \(x = \pm 1\), the left crossing sitting at the interval’s left endpoint.</figcaption>
+    <figcaption><span class="fig-no">Figure 7.16</span> Levelling the region under \(y = 1 + x^{2}\) on \([-1, 2]\): the rectangle of height \(f_{\text{ave}}\) holds the same area as the region under the curve — the deficit above the curve on \([-1, 1]\) exactly balances the surplus above the lid on \([1, 2]\), so the levelling rectangle and the region hold the same area.</figcaption>
   </figure>
 
-  <!-- expansion:caution — the interval-dependence trap: "the average of f" is meaningless until an interval is named; pairs with Ex 7.16 -->
+  <!-- expansion:application [pass: enrichment] [source: M4 Mode C gap-check 2026-07-18; §7.5 sole broken §6.4 loop — average value = average velocity; canon Stewart ET 9e §6.5 standard reading] -->
+  <p>One everyday average is already an instance of this. Let \(f = v\) be the velocity of an object moving along a line; then its average value over \([a, b]\) is</p>
+  <p>\[ v_{\text{ave}} = \frac{1}{b - a}\int_{a}^{b} v(t)\,dt = \frac{s(b) - s(a)}{b - a}, \]</p>
+  <p>since the integral of velocity is the net change in position \(s\) — the Net Change Theorem of §6.4. That last ratio is total displacement over elapsed time: the <em>average velocity</em> of elementary kinematics. The levelling-height rectangle is that familiar average, read now for any continuously varying quantity.</p>
+
+  <!-- expansion:caution — the interval-dependence trap: "the average of f" is meaningless until an interval is named; pairs with Ex 7.17 -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
@@ -1124,7 +1152,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.15</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.16</span></p>
       <div class="env-body">
         <p>Find the average value of \(f(x) = 1 + x^{2}\) on the interval \([-1, 2]\).</p>
       </div>
@@ -1144,7 +1172,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.16</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.17</span></p>
       <div class="env-body">
         <p>Find the average value of the same function, \(f(x) = 1 + x^{2}\), on the interval \([0, 1]\).</p>
       </div>
@@ -1161,7 +1189,7 @@ window.MathJax = {
 
   <h3 class="subsec-head">The Mean Value Theorem for Integrals</h3>
 
-  <p>In Example 7.15 the average was \(2\), and the function actually <em>takes</em> the value \(2\) — at \(x = \pm 1\), where the curve crosses the top of its levelling rectangle. Is that a coincidence? For a finite list it can easily fail: the average of the two numbers \(1\) and \(3\) is \(2\), which is neither of them. A continuous function has no such escape. Its values form an unbroken range, and the average — trapped between the smallest and largest values — must itself be a value the function passes through. That is the content of the next theorem, and the machinery to prove it is exactly the pair of existence theorems Chapter 4 established for continuous functions on closed intervals.</p>
+  <p>In Example 7.16 the average was \(2\), and the function actually <em>takes</em> the value \(2\) — at \(x = \pm 1\), where the curve crosses the top of its levelling rectangle. Is that a coincidence? For a finite list it can easily fail: the average of the two numbers \(1\) and \(3\) is \(2\), which is neither of them. A continuous function has no such escape. Its values form an unbroken range, and the average — trapped between the smallest and largest values — must itself be a value the function passes through. That is the content of the next theorem, and the machinery to prove it is exactly the pair of existence theorems Chapter 4 established for continuous functions on closed intervals.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">7.2</span><span class="env-name">Mean Value Theorem for Integrals</span></p>
@@ -1178,7 +1206,7 @@ window.MathJax = {
       <p>\[ m\,(b - a) \le \int_{a}^{b} f(x)\,dx \le M\,(b - a), \]</p>
       <p>and dividing by the positive number \(b - a\) traps the average: \(m \le f_{\text{ave}} \le M\).</p>
       <p>If \(m = M\), the trap is already closed: \(f\) is constant on \([a, b]\), every value equals \(f_{\text{ave}}\), and any \(c\) in \([a, b]\) serves.</p>
-      <p>If \(m &lt; M\), let \(\alpha\) be the smaller of \(x_m, x_M\) and \(\beta\) the larger, so \([\alpha, \beta]\) is a genuine subinterval of \([a, b]\) whose endpoints carry the values \(m\) and \(M\) in one order or the other. The function \(f\) is continuous on \([\alpha, \beta]\), and \(f_{\text{ave}}\) lies between its endpoint values; so the Intermediate Value Theorem (Theorem 4.9(b)) supplies a point \(c\) in \([\alpha, \beta]\) — hence in \([a, b]\) — with \(f(c) = f_{\text{ave}}\). <span class="qed qed-proof"></span></p>
+      <p>If \(m &lt; M\), let \(\alpha\) be the smaller of \(x_m, x_M\) and \(\beta\) the larger. Then \([\alpha, \beta]\) is a genuine subinterval of \([a, b]\) whose endpoints carry the values \(m\) and \(M\) in one order or the other. Passing to this subinterval is what makes the next step work: the Intermediate Value Theorem needs an interval across which \(f\) runs from \(m\) to \(M\), and the endpoints \(a, b\) need not take those extreme values, whereas \(\alpha, \beta\) do. Since \(f\) is continuous on \([\alpha, \beta]\) and \(f_{\text{ave}}\) lies between its endpoint values, the Intermediate Value Theorem (Theorem 4.9(b)) supplies a point \(c\) in \([\alpha, \beta]\) — hence in \([a, b]\) — with \(f(c) = f_{\text{ave}}\). <span class="qed qed-proof"></span></p>
     </div>
   </section>
 
@@ -1187,7 +1215,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.17</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.18</span></p>
       <div class="env-body">
         <p>For \(f(x) = 1 + x^{2}\) on \([-1, 2]\), find every point \(c\) whose existence Theorem 7.2 guarantees.</p>
       </div>
@@ -1195,7 +1223,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Example 7.15 computed \(f_{\text{ave}} = 2\). We solve \(f(c) = 2\):</p>
+        <p>Example 7.16 computed \(f_{\text{ave}} = 2\). We solve \(f(c) = 2\):</p>
         <p>\[ 1 + c^{2} = 2 \quad\Longleftrightarrow\quad c^{2} = 1 \quad\Longleftrightarrow\quad c = \pm 1, \]</p>
         <p>and both candidates lie in \([-1, 2]\). The theorem promises <em>at least one</em> such point and says nothing about uniqueness — here there are two, one at the interval’s left endpoint and one interior. Geometrically, they are the two crossings between the curve and the top of its levelling rectangle: the rectangle’s lid cuts the graph wherever the function passes through its own average. <span class="qed"></span></p>
       </div>
@@ -1212,7 +1240,8 @@ window.MathJax = {
 <!-- §7.6 Arc Length. section-source: Stewart ET 9e §8.1; cross-checked Thomas 14e §6.3, Rogawski 4e
      §8.2. Authored 2026-07-18 per PLAN-ch07 + brief-7-6 (canon-as-spine; ③ D3 resolved register —
      closes the seam-ledger premise "C¹ 弧長定理"). Numbering: mints Definition 7.5 (Arc length),
-     Theorem 7.3 (Arc Length Formula, PROVED), Examples 7.18–7.20. Cautions UNNUMBERED.
+     Theorem 7.3 (Arc Length Formula, PROVED), Strategy 7.4 (Setting up an arc length integral),
+     Examples 7.19–7.21. Cautions UNNUMBERED.
      SEAM GUARD (PLAN-ch07 + brief-7-6 + ③ D3/blocking#2): Definition for the GRAPH of f continuous,
      a<b, over REGULAR partitions; a FINITE limit if it exists; length unsigned, no reversed-limits
      convention, degenerate interval L=0 (prose clause). Theorem hypotheses: a<b, f SMOOTH on [a,b] —
@@ -1224,7 +1253,7 @@ window.MathJax = {
      FTC-1 (Thm 6.3); differential ds minted here (ties §5.3); ds²=dx²+dy² = MNEMONIC status, not a
      derivation. Terminology: GRAPH arc length; Ch10 parametric / Ch13 space curves = forward-ref
      only. NO curvature, NO x=g(y) worked example (one-line remark at most — omitted here entirely).
-     Counters handed to §7.7: Definition 7.6, Theorem 7.4, Example 7.21.
+     Counters handed to §7.7: Definition 7.6, Theorem 7.4, Example 7.22.
      Record: PLAN-ch07.md, brief-7-6.md, ch07_ch-direction-codex3-audit.md. -->
 
 <article class="sec" lang="en">
@@ -1247,7 +1276,7 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>Two housekeeping notes. Length is a size, not a signed quantity: no orientation convention accompanies it, and a degenerate “curve” over a single point has length \(0\). And the definition is a genuine commitment of the same kind as Definitions 7.2 and 7.6 will make — it declares the polygon limit to be what length <em>means</em> for a graph, with the clause “provided the limit exists” carrying the honesty.</p>
+  <p>Two housekeeping notes. Length is a size, not a signed quantity: no orientation convention accompanies it, and a degenerate “curve” over a single point has length \(0\). And the definition makes the same kind of genuine commitment as Definition 7.2 and the forthcoming Definition 7.6. It declares the polygon limit to be what length <em>means</em> for a graph, with the clause “provided the limit exists” carrying the honesty.</p>
 
   <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — inscribed polygon, 4 then 8 chords (old nodes kept), regular x-spacing so chord lengths differ, single-bend window; registered in chapter7 FIGS as "polygon-refinement"] -->
   <figure class="figure" data-fig="polygon-refinement">
@@ -1290,7 +1319,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.18</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.19</span></p>
       <div class="env-body">
         <p>Find the length of the curve \(y = x^{3/2}\) from \((0, 0)\) to \((1, 1)\).</p>
       </div>
@@ -1310,9 +1339,12 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:history [pass: enrichment] [source: M4 Mode C gap-check 2026-07-18; Neile 1657 rectification of the semicubical parabola (MacTutor); Descartes, La Géométrie (Stanford Encyclopedia of Philosophy) — web-verified] -->
+  <p>The curve just measured is no arbitrary choice. The graph of \(y = x^{3/2}\) is the <em>semicubical parabola</em> \(y^{2} = x^{3}\), and in 1657 the nineteen-year-old William Neile made it the first algebraic curve ever to have its length computed — a result his teacher Wallis soon published. The feat carried weight because Descartes, in his <em>Géométrie</em>, had judged that the ratio of a curved line to a straight one “cannot be discovered by human minds”; Neile found one such length exactly, the first crack in that verdict.</p>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.19</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.20</span></p>
       <div class="env-body">
         <p>Find the length of the curve \(y = \dfrac{x^{3}}{6} + \dfrac{1}{2x}\) from \(x = 1\) to \(x = 2\).</p>
       </div>
@@ -1335,6 +1367,20 @@ window.MathJax = {
     </section>
   </div>
 
+  <!-- expansion:strategy [pass: enrichment] [source: M4 Mode C gap-check 2026-07-18; SPEC §15 item 6 — Examples 7.19/7.20 share the arc-length method; distils the recipe] -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">7.4</span><span class="env-name">Setting up an arc length integral</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li><em>Check smoothness.</em> Confirm \(f'\) is continuous on \([a, b]\); at a corner, split the curve and add the lengths of the pieces.</li>
+        <li><em>Form the integrand.</em> Write \(1 + \bigl[f'(x)\bigr]^{2}\) and simplify.</li>
+        <li><em>Find structure.</em> Look for what makes the root tractable — a substitution (as in Example 7.19) or a perfect square (Example 7.20); most other integrands wait for Chapter 8.</li>
+        <li><em>If it is a perfect square, open the root carefully.</em> Writing \(1 + \bigl[f'(x)\bigr]^{2} = q^{2}\), the root is \(\sqrt{q^{2}} = \lvert q\rvert\); confirm the sign of \(q\) on \([a, b]\) before dropping the bars.</li>
+        <li><em>Integrate.</em> Evaluate \(\int_{a}^{b}\sqrt{1 + [f'(x)]^{2}}\,dx\); where no elementary antiderivative exists, the length stands as a definite integral for the methods of Chapter 8.</li>
+      </ol>
+    </div>
+  </section>
+
   <h3 class="subsec-head">The arc length function and the differential \(ds\)</h3>
 
   <p>Often what is wanted is not one length but length <em>as a running quantity</em> — how far along the curve we have travelled by the time we reach \(x\). For \(f\) smooth on \([a, b]\), define the <em>arc length function</em></p>
@@ -1351,7 +1397,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.20</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.21</span></p>
       <div class="env-body">
         <p>Find the arc length function for the curve \(y = \dfrac{x^{2}}{8} - \ln x\), measured from the point \((1, \tfrac{1}{8})\), for \(x \ge 1\).</p>
       </div>
@@ -1359,7 +1405,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Here \(f'(x) = \tfrac{x}{4} - \tfrac{1}{x}\), continuous for \(x &gt; 0\), so \(f\) is smooth on every interval \([1, x]\). The perfect-square pattern of Example 7.19 repeats:</p>
+        <p>Here \(f'(x) = \tfrac{x}{4} - \tfrac{1}{x}\), continuous for \(x &gt; 0\), so \(f\) is smooth on every interval \([1, x]\). The perfect-square pattern of Example 7.20 repeats:</p>
         <p>\[ 1 + \bigl[f'(t)\bigr]^{2} = 1 + \frac{t^{2}}{16} - \frac{1}{2} + \frac{1}{t^{2}} = \left(\frac{t}{4} + \frac{1}{t}\right)^{2}, \]</p>
         <p>and the bracket \(\tfrac{t}{4} + \tfrac{1}{t}\) is positive for \(t \ge 1\), so the root opens cleanly. Using \(\int \tfrac{1}{t}\,dt = \ln\lvert t\rvert\) from §6.4 — with \(t &gt; 0\) here, so the absolute value is simply \(t\) —</p>
         <p>\[ s(x) = \int_{1}^{x} \left(\frac{t}{4} + \frac{1}{t}\right) dt = \left[\frac{t^{2}}{8} + \ln t\right]_{1}^{x} = \frac{x^{2} - 1}{8} + \ln x. \]</p>
@@ -1377,7 +1423,7 @@ window.MathJax = {
   </section>
 
   <!-- expansion:summary — close §7.6: definition honest, theorem proved, s and ds minted; ds is the export; graph-scope note + forward refs, no mechanics -->
-  <p>The section ran the chapter’s schema at full honesty: a definition that says what length means (chords, refined), a theorem that computes it (the Mean Value Theorem converting each chord, Chapter 6 closing the limit), and a pair of working tools — the arc length function \(s\) and its differential \(ds\). Everything here concerns the graph of a function of \(x\); curves given by parametric equations must wait for Chapter 10, and curves through space for Chapter 13, where \(ds\) will reappear each time in suitably generalised dress. The next section puts \(ds\) straight to work: rotate a smooth curve about an axis, and ask not for the volume enclosed but for the <em>area of the surface</em> swept out.</p>
+  <p>The section ran the chapter’s schema at full honesty: a definition that says what length means (chords, refined), a theorem that computes it (the Mean Value Theorem converting each chord, Chapter 6 closing the limit), and a pair of working tools — the arc length function \(s\) and its differential \(ds\). Everything here concerns the graph of a function of \(x\); curves given by parametric equations must wait for Chapter 10, and curves through space for Chapter 13, where \(ds\) will reappear each time in suitably generalized dress. The next section puts \(ds\) straight to work: rotate a smooth curve about an axis, and ask not for the volume enclosed but for the <em>area of the surface</em> swept out.</p>
 
 </article>
 </template>
@@ -1388,14 +1434,14 @@ window.MathJax = {
      (canon-as-spine; ③ D4 resolved: FULLY PROVED via explicit C¹ error bound — the originally
      proposed Proof-Track fence was DROPPED at ③ as an address-less proof debt). Numbering: mints
      Definition 7.6 (Surface area of revolution), Theorem 7.4 (Surface Area Formula, PROVED),
-     Examples 7.21–7.22 (EXACTLY 2 per ③ D1 cap; the x³ u-sub example was cut, its job merged into
-     Ex 7.22). Cautions UNNUMBERED. Ch7 counters CLOSE: Def 7.1–7.6, Thm 7.1–7.4, Strategy 7.1–7.3,
-     Ex 7.1–7.22.
+     Examples 7.22–7.23 (EXACTLY 2 per ③ D1 cap; the x³ u-sub example was cut, its job merged into
+     Ex 7.23). Cautions UNNUMBERED. Ch7 counters CLOSE: Def 7.1–7.6, Thm 7.1–7.4, Strategy 7.1–7.4,
+     Ex 7.1–7.23.
      SEAM GUARD (PLAN-ch07 + brief-7-7 + ③ blocking #4/#5/#6): frustum lemma π(r₁+r₂)ℓ derived from
      cone sectors AND the r₁=r₂ cylinder case verified separately by unrolling (the subtraction
      divides by r₂−r₁). About the y-axis ONLY with the curve on one side (0 ≤ a < b): bare ∫2πx ds
      goes negative for x<0 and cross-axis curves double-generate the surface — one honest clause.
-     Ex 7.21 = spherical ZONE (theorem-compliant; the full sphere fails C¹ at the poles — 4πr² only
+     Ex 7.22 = spherical ZONE (theorem-compliant; the full sphere fails C¹ at the poles — 4πr² only
      as an explicitly-flagged limiting preview, honest fence to Ch8 improper integrals). NO Pappus,
      NO general/parametric surfaces (Ch16 forward-ref only), NO Schwarz lantern. Terminology:
      surface of REVOLUTION only. Chapter summary follows §7.7 content per SPEC §4 (unnumbered,
@@ -1409,13 +1455,13 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — section opener: the skin, not the filling; the band is the slice with TWO length scales; definition goes through frustum bands built on the arc's chords -->
-  <p>Rotating a region about an axis gave us solids and their volumes. Rotate just the <em>curve</em> and what sweeps out is a surface — the skin, with none of the filling — and the natural question is its area. The slicing schema will serve once more, but the slice is the subtlest of the chapter. A curved surface cannot be flattened onto a plane (every mapmaker’s complaint about the globe), yet a thin <em>band</em> of it very nearly can. Cut the surface into narrow bands, flatten each, add up. Note what a band involves that no earlier slice did: it is long one way — all the way around the axis — and narrow the other way, along the curve. Two length scales, circumference and slant, and the integrand will have to carry both.</p>
+  <p>Rotating a region about an axis gave us solids and their volumes. Rotate just the <em>curve</em>, and what it sweeps out is a surface — the skin, with none of the filling — and the natural question is its area. The slicing schema will serve once more, but the slice is the subtlest of the chapter. A curved surface cannot be flattened onto a plane (every mapmaker’s complaint about the globe), yet a thin <em>band</em> of it very nearly can. Cut the surface into narrow bands, flatten each, add up. Note what a band involves that no earlier slice did: it is long one way — all the way around the axis — and narrow the other way, along the curve. Two length scales, circumference and slant, and the integrand will have to carry both.</p>
 
   <h3 class="subsec-head">Cones, frustums, and bands</h3>
 
   <p>The flattenable model piece is a cone. Slit a cone of base radius \(r\) and slant height \(\ell\) down its side and unroll it: it lies flat as a circular sector of radius \(\ell\) whose arc has length \(2\pi r\) — the rim of the base. By the sector-area formula, its area is \(\tfrac{1}{2}(\text{arc})(\text{radius}) = \tfrac{1}{2}(2\pi r)\,\ell = \pi r \ell\). That is the cone’s lateral area.</p>
 
-  <p>Our bands are not full cones but <em>frustums</em> — cones with their tops cut off. Take a frustum of slant height \(\ell\) with end radii \(r_1 &lt; r_2\). Extending its side to the apex produces two cones with a common vertex: similar triangles give slant heights \(\ell_2 = \tfrac{r_2\,\ell}{r_2 - r_1}\) for the big one and \(\ell_1 = \tfrac{r_1\,\ell}{r_2 - r_1}\) for the small, and subtracting lateral areas,</p>
+  <p>Our bands are not full cones but <em>frustums</em> — cones with their tops cut off. Take a frustum of slant height \(\ell\) with end radii \(r_1 &lt; r_2\). Extending its side to the apex produces two cones with a common vertex, of slant heights \(\ell_1 &lt; \ell_2\) with \(\ell_2 - \ell_1 = \ell\). The shared apex makes the two triangles similar, so \(\tfrac{\ell_1}{r_1} = \tfrac{\ell_2}{r_2}\). Hence \(\ell_2 = \tfrac{r_2}{r_1}\ell_1\). Substituting this into \(\ell_2 - \ell_1 = \ell\) gives \(\ell_1 = \tfrac{r_1\,\ell}{r_2 - r_1}\), and then \(\ell_2 = \tfrac{r_2\,\ell}{r_2 - r_1}\). Subtracting lateral areas,</p>
   <p>\[ \pi r_2 \ell_2 - \pi r_1 \ell_1 = \pi\,\frac{r_2^{2} - r_1^{2}}{r_2 - r_1}\,\ell = \pi\,(r_1 + r_2)\,\ell. \]</p>
   <p>The subtraction divided by \(r_2 - r_1\), so it says nothing about the case \(r_1 = r_2\) — but that case we can check directly: equal radii make the frustum a cylindrical band, which unrolls into a flat rectangle of length \(2\pi r\) and width \(\ell\), with area \(2\pi r \ell = \pi\,(r + r)\,\ell\). The same formula covers both cases, and it is worth compressing: writing \(\bar r = \tfrac{1}{2}(r_1 + r_2)\) for the <em>average radius</em>,</p>
   <p>\[ \text{lateral area of a frustum} = 2\pi\,\bar r\,\ell. \]</p>
@@ -1454,6 +1500,8 @@ window.MathJax = {
     </div>
   </section>
 
+  <p>The proof that follows is the most technical argument in the chapter. On a first reading it is enough to accept Theorem 7.4 and turn to the examples; the derivation is here for completeness, and it rewards a second pass.</p>
+
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span>
     </p>
@@ -1461,7 +1509,7 @@ window.MathJax = {
       <p>The chord conversion is already paid for: in the proof of Theorem 7.3, the Mean Value Theorem gave, for each strip, a point \(\xi_i\) in \((x_{i-1}, x_i)\) with \(\lvert P_{i-1}P_i\rvert = \sqrt{1 + [f'(\xi_i)]^{2}}\,\Delta x\). The \(i\)-th band’s area is therefore</p>
       <p>\[ 2\pi\cdot\frac{f(x_{i-1}) + f(x_i)}{2}\cdot\sqrt{1 + \bigl[f'(\xi_i)\bigr]^{2}}\;\Delta x, \]</p>
       <p>which reads the curve’s height at the strip’s two <em>ends</em> while reading its slope at the interior point \(\xi_i\). If the height were read at \(\xi_i\) as well, the band sum would be exactly a Riemann sum for \(2\pi f\sqrt{1 + f'^{2}}\); so we estimate the cost of moving the height reading, and show it vanishes in the limit.</p>
-      <p>Smoothness makes both \(\lvert f'\rvert\) and \(\sqrt{1 + f'^{2}}\) continuous on \([a, b]\), so by the Extreme Value Theorem (Theorem 4.9(a)) they attain maxima: say \(K = \max \lvert f'\rvert\) and \(B = \max \sqrt{1 + f'^{2}}\). For any point \(u\) in the \(i\)-th strip, the Mean Value Theorem bounds the height drift by the slope bound: \(\lvert f(u) - f(\xi_i)\rvert \le K\,\lvert u - \xi_i\rvert \le K\,\Delta x\). Applying this at \(u = x_{i-1}\) and \(u = x_i\) and averaging,</p>
+      <p>Smoothness makes both \(\lvert f'\rvert\) and \(\sqrt{1 + f'^{2}}\) continuous on \([a, b]\), so by the Extreme Value Theorem (Theorem 4.9(a)) they attain maxima: say \(K = \max \lvert f'\rvert\) and \(B = \max \sqrt{1 + f'^{2}}\). For any point \(u\) in the \(i\)-th strip, the Mean Value Theorem gives \(f(u) - f(\xi_i) = f'(\zeta)\,(u - \xi_i)\) for some \(\zeta\) between them, and \(\lvert f'(\zeta)\rvert \le K\); so it bounds the height drift by the slope bound: \(\lvert f(u) - f(\xi_i)\rvert \le K\,\lvert u - \xi_i\rvert \le K\,\Delta x\). Applying this at \(u = x_{i-1}\) and \(u = x_i\), each of the two endpoint drifts is at most \(K\,\Delta x\), so by the triangle inequality their average is too:</p>
       <p>\[ \left\lvert \frac{f(x_{i-1}) + f(x_i)}{2} - f(\xi_i) \right\rvert \le K\,\Delta x, \]</p>
       <p>so replacing the \(i\)-th band’s height reading changes that term by at most \(2\pi\,(K \Delta x)\,B\,\Delta x\). Across all \(n\) bands the total change is at most</p>
       <p>\[ n \cdot 2\pi K B\,(\Delta x)^{2} = 2\pi K B\,(b - a)\,\Delta x \;\longrightarrow\; 0 \qquad (n \to \infty), \]</p>
@@ -1471,19 +1519,19 @@ window.MathJax = {
 
   <p>The integrand rewards a second look: \(2\pi f(x)\) is the circumference of the circle the point \((x, f(x))\) travels, and \(\sqrt{1 + f'^{2}}\,dx\) is the arc element \(ds\) of §7.6 — the band’s two length scales, around and along, exactly as promised. In the differential shorthand the theorem compresses to</p>
   <p>\[ S = \int 2\pi \rho\;ds, \]</p>
-  <p>where \(\rho\) is the distance from the moving point to the axis of rotation. About the \(x\)-axis, \(\rho = y = f(x)\). About the <em>\(y\)</em>-axis, \(\rho = x\) — with the curve kept entirely in \(x \ge 0\) (an interval \(0 \le a &lt; b\)): a signed \(x\) would count area negatively, and the two halves of a curve straddling the axis can overlap or re-cover parts of one surface, so the general case calls for splitting at the axis and tracking what each piece generates. One principle, two readings — and the same MVT argument, run with the radius \(x\) in place of \(f(x)\), proves the \(y\)-axis version.</p>
+  <p>where \(\rho\) is the distance from the moving point to the axis of rotation. About the \(x\)-axis, \(\rho = y = f(x)\). About the <em>\(y\)</em>-axis, \(\rho = x\), with the curve kept entirely in \(x \ge 0\) (an interval \(0 \le a &lt; b\)). Two things force that restriction: a signed \(x\) would count area negatively, and the two halves of a curve straddling the axis can overlap or re-cover parts of one surface. The general case therefore calls for splitting at the axis and tracking what each piece generates. One principle, two readings — and the same MVT argument, run with the radius \(x\) in place of \(f(x)\), proves the \(y\)-axis version.</p>
 
-  <!-- expansion:caution — the radius-reading trap, closing the chapter's radius discipline: ρ is the distance to the rotation axis, not a memorised pair of formulas -->
+  <!-- expansion:caution — the radius-reading trap, closing the chapter's radius discipline: ρ is the distance to the rotation axis, not a memorized pair of formulas -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Do not memorise \(2\pi y\,ds\) and \(2\pi x\,ds\) as two formulas. There is one: \(2\pi \rho\,ds\), with \(\rho\) the distance from the curve to the <em>axis of rotation</em> — the same discipline that set every washer and shell radius in §§7.2–7.3. Identify the axis first; \(\rho\) follows.</p>
+      <p>Do not memorize \(2\pi y\,ds\) and \(2\pi x\,ds\) as two formulas. There is one: \(2\pi \rho\,ds\), with \(\rho\) the distance from the curve to the <em>axis of rotation</em> — the same discipline that set every washer and shell radius in §§7.2–7.3. Identify the axis first; \(\rho\) follows.</p>
     </div>
   </section>
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.21</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.22</span></p>
       <div class="env-body">
         <p>A <em>zone</em> of a sphere is the band cut from it by two parallel planes. Show that for the sphere of radius \(r\) generated by rotating \(y = \sqrt{r^{2} - x^{2}}\) about the \(x\)-axis, the zone between the planes \(x = a\) and \(x = b\) (where \(-r &lt; a &lt; b &lt; r\)) has area \(2\pi r\,(b - a)\).</p>
       </div>
@@ -1508,7 +1556,7 @@ window.MathJax = {
 
   <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 (M2 coverage audit addition) tier-supporting — sphere zones of equal width, 2D profile per the pattern consult (Q(e)): two cut-pairs of the same width w, equator vs near-pole (strictly off the poles), emphasized profile arcs + radius guides; registered in chapter7 FIGS as "zone-bands"] -->
   <figure class="figure" data-fig="zone-bands">
-    <figcaption><span class="fig-no">Figure 7.22</span> Two slabs of the same width \(w\) cut the sphere’s profile — one at the equator, one out toward the pole, both strictly inside \((-r, r)\). The polar arc is longer and steeper but sits at a smaller radius; the equatorial arc is shorter and flatter at a larger one. Swept about the axis, the two arcs generate zones of <em>equal</em> area: the compensation Example 7.21 computed.</figcaption>
+    <figcaption><span class="fig-no">Figure 7.22</span> Two slabs of the same width \(w\) cut the sphere’s profile — one at the equator, one out toward the pole, both strictly inside \((-r, r)\). The polar arc is longer and steeper but sits at a smaller radius; the equatorial arc is shorter and flatter at a larger one. Swept about the axis, the two arcs generate zones of <em>equal</em> area: the compensation Example 7.22 computed.</figcaption>
   </figure>
 
   <!-- expansion:formula — the explicitly-flagged limiting preview to the full sphere; the poles fail the C¹ hypothesis; honest fence to Ch8 -->
@@ -1516,7 +1564,7 @@ window.MathJax = {
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.22</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.23</span></p>
       <div class="env-body">
         <p>The arc of the parabola \(y = x^{2}\) from \((0, 0)\) to \((1, 1)\) is rotated about the \(y\)-axis. Find the area of the resulting surface.</p>
       </div>
@@ -1535,14 +1583,14 @@ window.MathJax = {
 
   <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-supporting — dual-axis radius readout from one sample point; the ρ-discipline drawn; registered in chapter7 FIGS as "dual-axis-radius"] -->
   <figure class="figure" data-fig="dual-axis-radius">
-    <figcaption><span class="fig-no">Figure 7.23</span> One point of the arc \(y = x^{2}\), two radii: rotation about the \(x\)-axis reads the vertical distance \(f(x)\), rotation about the \(y\)-axis reads the horizontal distance \(x\). The radius is always the distance to the axis of rotation — one principle, not a memorised pair.</figcaption>
+    <figcaption><span class="fig-no">Figure 7.23</span> One point of the arc \(y = x^{2}\), two radii: rotation about the \(x\)-axis reads the vertical distance \(f(x)\), rotation about the \(y\)-axis reads the horizontal distance \(x\). The radius is always the distance to the axis of rotation — one principle, not a memorized pair.</figcaption>
   </figure>
 
   <h3 class="subsec-head">Chapter summary</h3>
 
   <p>This chapter took the machine Chapter 6 built and taught it to measure. One schema ran through every section — slice the quantity, approximate each slice by a product, sum, and refine — and each section supplied its own slice. Section 7.1 sliced regions into strips whose height is a <em>gap</em>, defining the area between curves (Definition 7.1) as \(\int_a^b (f - g)\,dx\), with crossings handled by \(\int \lvert f - g\rvert\). Section 7.2 promoted the strip to a solid slab and volume to the integral of cross-sectional area (Definition 7.2), \(V = \int_a^b A(x)\,dx\), with disks and washers as the revolution instances — and the sphere and pyramid of classical geometry recovered as its first dividends. Section 7.3 sliced the other way, parallel to the axis, proving the shell method (Theorem 7.1), \(V = \int_a^b 2\pi x f(x)\,dx\), and distilling the washer-or-shell decision into Strategy 7.2. Section 7.4 left geometry: the work done by a varying force — read through its signed component \(F(x)\) along the motion — is \(W = \int_a^b F(x)\,dx\) (Definition 7.3), and the slicing learned to choose what to slice — displacement, cable, or water. Section 7.5 turned totals into averages, \(f_{\text{ave}} = \frac{1}{b-a}\int_a^b f\,dx\) (Definition 7.4), and proved the Mean Value Theorem for Integrals (Theorem 7.2): a continuous function passes through its own average. Section 7.6 measured the curve itself by refining chords (Definition 7.5) and proved the Arc Length Formula (Theorem 7.3), \(L = \int_a^b \sqrt{1 + [f'(x)]^{2}}\,dx\), minting the arc element \(ds\); and §7.7 wrapped the chords into frustum bands to define surface area (Definition 7.6) and prove the Surface Area Formula (Theorem 7.4), compressed as \(S = \int 2\pi \rho\,ds\).</p>
 
-  <p>Three theorems in the chapter were proved with the machinery of Chapter 4 — the Mean Value Theorem for Integrals leaning on the Extreme and Intermediate Value Theorems, and the two geometric formulas on the Mean Value Theorem — a first sustained payoff from owning those proofs rather than borrowing them. What the chapter leaves owing is plain from its own examples: the integrals that measure lengths and surfaces strain the small table of antiderivatives we possess, and the curves here were chosen to fit the toolkit rather than the other way round. Chapter 8 pays that debt with a systematic account of integration techniques — and with improper integrals, which will also settle the polar flag left in Example 7.21. Farther ahead, \(ds\) returns for parametric curves in Chapter 10 and for space curves in Chapter 13, the average value and the slicing of volumes reappear over two-dimensional regions in Chapter 15, and surfaces return in their full generality in Chapter 16. The slicing schema itself, though, is now complete — it is the way integrals meet the world, and the rest of the book will use it without ceremony.</p>
+  <p>Three theorems in the chapter were proved with the machinery of Chapter 4 — the Mean Value Theorem for Integrals leaning on the Extreme and Intermediate Value Theorems, and the two geometric formulas on the Mean Value Theorem — a first sustained payoff from owning those proofs rather than borrowing them. What the chapter leaves owing is plain from its own examples: the integrals that measure lengths and surfaces strain the small table of antiderivatives we possess, and the curves here were chosen to fit the toolkit rather than the other way round. Chapter 8 pays that debt with a systematic account of integration techniques — and with improper integrals, which will also settle the polar flag left in Example 7.22. Farther ahead, \(ds\) returns for parametric curves in Chapter 10 and for space curves in Chapter 13, the average value and the slicing of volumes reappear over two-dimensional regions in Chapter 15, and surfaces return in their full generality in Chapter 16. The slicing schema itself, though, is now complete — it is the way integrals meet the world, and the rest of the book will use it without ceremony.</p>
 
 </article>
 </template>

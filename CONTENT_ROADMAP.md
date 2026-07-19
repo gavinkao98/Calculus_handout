@@ -346,7 +346,7 @@ Chapter 4 為 Calc I 的微分章節收尾嚴謹基礎。Ch 2 非正式地引入
 
 **Ch6 Integrals** — *Role*：定積分與 FTC，接起微分與積分。含原函數/黎曼和/定積分/FTC/代換。*Prereq*：Ch5、Ch1 極限；附錄 GAP-A 冪次和（黎曼和從定義）。*對應*：Stewart 5。*深度*：**深理論核心**（FTC 當場證；最重的可積性刻畫 fence）。
 
-**Ch7 Applications of Integration** — *Role*：積分的幾何/物理應用。含面積/體積/弧長/表面積/平均值/功（併入 further applications，選材節制以免比 Ch5 腫）。*Prereq*：Ch6。*對應*：Stewart 6(+8)。*深度*：**標準嚴謹**。
+**Ch7 Applications of Integration** — *Role*：積分的幾何/物理應用。含面積/體積/弧長/表面積/平均值/功（併入 further applications，選材節制以免比 Ch5 腫）。*Prereq*：Ch6。*對應*：Stewart 6(+8)。*深度*：**標準嚴謹**。 **〔2026-07-18 全閘完成·定版，canon 第 3 章（繼 Ch5/Ch6）〕** 5-milestone 端到端＋三閘 gate-2 全跑 **0 blocking**。M1 就地全證三定理——積分 MVT §7.5（EVT+IVT）、C¹ 弧長 §7.6、表面積 §7.7（顯式 C¹ 誤差界，**零新增 fence**：原提的 named uniform-continuity fence 於 ③ D4 dropped）——**關閉 seam-ledger 的「積分均值(EVT+IVT)＋C¹弧長定理」兩前提**；further-app 選材（下方 open-items 表 Ch7 列）③ D1 定案＝保留 7 節、硬上限 23 例、§7.7 至多 2、Schwarz-lantern 不寫，**已收**。難度尖峰 §7.7 表面積證明 ≈Ch4 §4.2、全章 <4.5，**「標準嚴謹」深度成立、無弧線層異常**。閘狀態唯一表＝[`handout/PIPELINE.md`](handout/PIPELINE.md) dashboard；as-built ledger＝[`handout/html/_dev-archive/ch07/PLAN-ch07.md`](handout/html/_dev-archive/ch07/PLAN-ch07.md)；裁決/gate-2 報告在 `handout/html/_audit/REVIEW-ch07-*.html`。**Open questions：無懸而未決的方向叉路**（gate-2 findings 全屬 copyedit/notation advisory＋1 圖 D7 邊界項經使用者輕修 caption，非深度/弧線決策）。
 
 **Ch8 Techniques of Integration** — *Role*：符號積分工具箱。含分部/三角積分/三角代換/部分分式/瑕積分/數值積分；inverse hyperbolic 可放此。*Prereq*：Ch6；附錄 A.2（積化和差/降冪）、A.4（部分分式）、GAP-F（完全平方，三角代換）。*對應*：Stewart 7。*深度*：**標準/計算**。
 
@@ -408,7 +408,7 @@ $dy,\ \Delta y$（微分 vs 增量，Ch5 §5.3 新）｜$dy/dt$（對時間，Ch
 | GAP-E 絕對值不等式 | Ch11 | **已建**（新 §A.6「Absolute Value and Inequalities」、Prop A.8 三角不等式，2026-07-04） |
 | GAP-F 完全平方 | Ch8/10/15 | **已建**（併入 §A.5 收尾段，2026-07-04） |
 | 部分分式重編號 | Ch8 cite | §A.4 部分分式現為 **Prop A.7**（A.3 插入 Power sums Prop A.6 後移；本檔上文批二段的「Prop A.6」已 stale，Ch8 引用前以 as-built 為準） |
-| Ch7 further-app 選材／折 | Ch7 | Codex：surface area 最易折 |
+| Ch7 further-app 選材／折 | Ch7 | **已收（③ D1，2026-07-18）**：保留 7 節、硬上限 23 例、§7.4=3、§7.7≤2、Schwarz-lantern 不寫；Ch7 定版 |
 | Ch9 章名框 first-order | Ch9 | 建議採；Codex：勿混入二階/複數 |
 | Ch14 是否拆（sleeper） | Ch14 draft 後 | Codex 強化傾向**拆 14a 微分／14b 最佳化與約束**；最終拆否仍 JIT |
 | §1.2 反三角後移 | — | **維持現狀**（reconfirm keep 2026-07-06；兩輪仲裁已判主流放 Ch1） |

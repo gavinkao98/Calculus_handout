@@ -1,7 +1,8 @@
 <!-- §7.6 Arc Length. section-source: Stewart ET 9e §8.1; cross-checked Thomas 14e §6.3, Rogawski 4e
      §8.2. Authored 2026-07-18 per PLAN-ch07 + brief-7-6 (canon-as-spine; ③ D3 resolved register —
      closes the seam-ledger premise "C¹ 弧長定理"). Numbering: mints Definition 7.5 (Arc length),
-     Theorem 7.3 (Arc Length Formula, PROVED), Examples 7.18–7.20. Cautions UNNUMBERED.
+     Theorem 7.3 (Arc Length Formula, PROVED), Strategy 7.4 (Setting up an arc length integral),
+     Examples 7.19–7.21. Cautions UNNUMBERED.
      SEAM GUARD (PLAN-ch07 + brief-7-6 + ③ D3/blocking#2): Definition for the GRAPH of f continuous,
      a<b, over REGULAR partitions; a FINITE limit if it exists; length unsigned, no reversed-limits
      convention, degenerate interval L=0 (prose clause). Theorem hypotheses: a<b, f SMOOTH on [a,b] —
@@ -13,7 +14,7 @@
      FTC-1 (Thm 6.3); differential ds minted here (ties §5.3); ds²=dx²+dy² = MNEMONIC status, not a
      derivation. Terminology: GRAPH arc length; Ch10 parametric / Ch13 space curves = forward-ref
      only. NO curvature, NO x=g(y) worked example (one-line remark at most — omitted here entirely).
-     Counters handed to §7.7: Definition 7.6, Theorem 7.4, Example 7.21.
+     Counters handed to §7.7: Definition 7.6, Theorem 7.4, Example 7.22.
      Record: PLAN-ch07.md, brief-7-6.md, ch07_ch-direction-codex3-audit.md. -->
 
 <article class="sec" lang="en">
@@ -36,7 +37,7 @@
     </div>
   </section>
 
-  <p>Two housekeeping notes. Length is a size, not a signed quantity: no orientation convention accompanies it, and a degenerate “curve” over a single point has length \(0\). And the definition is a genuine commitment of the same kind as Definitions 7.2 and 7.6 will make — it declares the polygon limit to be what length <em>means</em> for a graph, with the clause “provided the limit exists” carrying the honesty.</p>
+  <p>Two housekeeping notes. Length is a size, not a signed quantity: no orientation convention accompanies it, and a degenerate “curve” over a single point has length \(0\). And the definition makes the same kind of genuine commitment as Definition 7.2 and the forthcoming Definition 7.6. It declares the polygon limit to be what length <em>means</em> for a graph, with the clause “provided the limit exists” carrying the honesty.</p>
 
   <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-18 tier-essential — inscribed polygon, 4 then 8 chords (old nodes kept), regular x-spacing so chord lengths differ, single-bend window; registered in chapter7 FIGS as "polygon-refinement"] -->
   <figure class="figure" data-fig="polygon-refinement">
@@ -79,7 +80,7 @@
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.18</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.19</span></p>
       <div class="env-body">
         <p>Find the length of the curve \(y = x^{3/2}\) from \((0, 0)\) to \((1, 1)\).</p>
       </div>
@@ -99,9 +100,12 @@
     </section>
   </div>
 
+  <!-- expansion:history [pass: enrichment] [source: M4 Mode C gap-check 2026-07-18; Neile 1657 rectification of the semicubical parabola (MacTutor); Descartes, La Géométrie (Stanford Encyclopedia of Philosophy) — web-verified] -->
+  <p>The curve just measured is no arbitrary choice. The graph of \(y = x^{3/2}\) is the <em>semicubical parabola</em> \(y^{2} = x^{3}\), and in 1657 the nineteen-year-old William Neile made it the first algebraic curve ever to have its length computed — a result his teacher Wallis soon published. The feat carried weight because Descartes, in his <em>Géométrie</em>, had judged that the ratio of a curved line to a straight one “cannot be discovered by human minds”; Neile found one such length exactly, the first crack in that verdict.</p>
+
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.19</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.20</span></p>
       <div class="env-body">
         <p>Find the length of the curve \(y = \dfrac{x^{3}}{6} + \dfrac{1}{2x}\) from \(x = 1\) to \(x = 2\).</p>
       </div>
@@ -124,6 +128,20 @@
     </section>
   </div>
 
+  <!-- expansion:strategy [pass: enrichment] [source: M4 Mode C gap-check 2026-07-18; SPEC §15 item 6 — Examples 7.19/7.20 share the arc-length method; distils the recipe] -->
+  <section class="env env-strategy">
+    <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">7.4</span><span class="env-name">Setting up an arc length integral</span></p>
+    <div class="env-body">
+      <ol class="steps">
+        <li><em>Check smoothness.</em> Confirm \(f'\) is continuous on \([a, b]\); at a corner, split the curve and add the lengths of the pieces.</li>
+        <li><em>Form the integrand.</em> Write \(1 + \bigl[f'(x)\bigr]^{2}\) and simplify.</li>
+        <li><em>Find structure.</em> Look for what makes the root tractable — a substitution (as in Example 7.19) or a perfect square (Example 7.20); most other integrands wait for Chapter 8.</li>
+        <li><em>If it is a perfect square, open the root carefully.</em> Writing \(1 + \bigl[f'(x)\bigr]^{2} = q^{2}\), the root is \(\sqrt{q^{2}} = \lvert q\rvert\); confirm the sign of \(q\) on \([a, b]\) before dropping the bars.</li>
+        <li><em>Integrate.</em> Evaluate \(\int_{a}^{b}\sqrt{1 + [f'(x)]^{2}}\,dx\); where no elementary antiderivative exists, the length stands as a definite integral for the methods of Chapter 8.</li>
+      </ol>
+    </div>
+  </section>
+
   <h3 class="subsec-head">The arc length function and the differential \(ds\)</h3>
 
   <p>Often what is wanted is not one length but length <em>as a running quantity</em> — how far along the curve we have travelled by the time we reach \(x\). For \(f\) smooth on \([a, b]\), define the <em>arc length function</em></p>
@@ -140,7 +158,7 @@
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.20</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.21</span></p>
       <div class="env-body">
         <p>Find the arc length function for the curve \(y = \dfrac{x^{2}}{8} - \ln x\), measured from the point \((1, \tfrac{1}{8})\), for \(x \ge 1\).</p>
       </div>
@@ -148,7 +166,7 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Here \(f'(x) = \tfrac{x}{4} - \tfrac{1}{x}\), continuous for \(x &gt; 0\), so \(f\) is smooth on every interval \([1, x]\). The perfect-square pattern of Example 7.19 repeats:</p>
+        <p>Here \(f'(x) = \tfrac{x}{4} - \tfrac{1}{x}\), continuous for \(x &gt; 0\), so \(f\) is smooth on every interval \([1, x]\). The perfect-square pattern of Example 7.20 repeats:</p>
         <p>\[ 1 + \bigl[f'(t)\bigr]^{2} = 1 + \frac{t^{2}}{16} - \frac{1}{2} + \frac{1}{t^{2}} = \left(\frac{t}{4} + \frac{1}{t}\right)^{2}, \]</p>
         <p>and the bracket \(\tfrac{t}{4} + \tfrac{1}{t}\) is positive for \(t \ge 1\), so the root opens cleanly. Using \(\int \tfrac{1}{t}\,dt = \ln\lvert t\rvert\) from §6.4 — with \(t &gt; 0\) here, so the absolute value is simply \(t\) —</p>
         <p>\[ s(x) = \int_{1}^{x} \left(\frac{t}{4} + \frac{1}{t}\right) dt = \left[\frac{t^{2}}{8} + \ln t\right]_{1}^{x} = \frac{x^{2} - 1}{8} + \ln x. \]</p>
@@ -166,6 +184,6 @@
   </section>
 
   <!-- expansion:summary — close §7.6: definition honest, theorem proved, s and ds minted; ds is the export; graph-scope note + forward refs, no mechanics -->
-  <p>The section ran the chapter’s schema at full honesty: a definition that says what length means (chords, refined), a theorem that computes it (the Mean Value Theorem converting each chord, Chapter 6 closing the limit), and a pair of working tools — the arc length function \(s\) and its differential \(ds\). Everything here concerns the graph of a function of \(x\); curves given by parametric equations must wait for Chapter 10, and curves through space for Chapter 13, where \(ds\) will reappear each time in suitably generalised dress. The next section puts \(ds\) straight to work: rotate a smooth curve about an axis, and ask not for the volume enclosed but for the <em>area of the surface</em> swept out.</p>
+  <p>The section ran the chapter’s schema at full honesty: a definition that says what length means (chords, refined), a theorem that computes it (the Mean Value Theorem converting each chord, Chapter 6 closing the limit), and a pair of working tools — the arc length function \(s\) and its differential \(ds\). Everything here concerns the graph of a function of \(x\); curves given by parametric equations must wait for Chapter 10, and curves through space for Chapter 13, where \(ds\) will reappear each time in suitably generalized dress. The next section puts \(ds\) straight to work: rotate a smooth curve about an axis, and ask not for the volume enclosed but for the <em>area of the surface</em> swept out.</p>
 
 </article>

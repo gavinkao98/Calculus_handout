@@ -1,17 +1,17 @@
 <!-- §7.2 Volumes. section-source: Stewart ET 9e §6.2 (Volumes); cross-checked Thomas 14e §6.1,
      Rogawski 4e §6.2–6.3. Authored 2026-07-18 per PLAN-ch07 + brief-7-2 (canon-as-spine).
-     Numbering: mints Definition 7.2 (Volume by cross-sections), Examples 7.5–7.8. No Theorem here
+     Numbering: mints Definition 7.2 (Volume by cross-sections), Examples 7.5–7.9. No Theorem here
      (disks/washers are INSTANCES of Def 7.2, per PLAN — no separate "disk theorem"). Cautions
      UNNUMBERED (Ch1–6 convention).
      SEAM GUARD (PLAN-ch07 + brief-7-2): the modeling step (slab ≈ cylinder; volume DEFINED by the
      integral) is stated in daylight; existence via Thm 6.1 cited explicitly; consistency checks =
      constant-A cylinder + sphere/pyramid sanity anchors (classical solid geometry recovered — the
      Ch6 semicircle Ex 6.6 move). Washer subtraction grounded in linearity (Thm 6.2), with the
-     π(R²−r²) ≠ π(R−r)² caution. Shifted-axis rotation COMPRESSED to Ex 7.7's closing line (deliberate,
-     recorded in brief; M4 may upgrade). Do NOT do shells (→ §7.3, one-line forward fence), Pappus,
+     π(R²−r²) ≠ π(R−r)² caution. Shifted-axis rotation demonstrated as Ex 7.8
+     (M4 upgrade of Ex 7.7's closing line, 2026-07-18). Do NOT do shells (→ §7.3, one-line forward fence), Pappus,
      oblique cross-sections, wedge. No strategy box here (Strategy 7.1 owns setup ritual; §7.3's box
      owns method choice).
-     Counters handed to §7.3: Definition 7.3, Example 7.9, Strategy 7.2, Theorem 7.1 (none minted yet).
+     Counters handed to §7.3: Definition 7.3, Example 7.10, Strategy 7.2, Theorem 7.1 (none minted yet).
      Record: PLAN-ch07.md, brief-7-2.md. -->
 
 <article class="sec" lang="en">
@@ -53,7 +53,7 @@
   <p>\[ A(x) = \pi \bigl[f(x)\bigr]^{2}. \]</p>
   <p>Definition 7.2 then gives \(V = \int_{a}^{b} \pi \bigl[f(x)\bigr]^{2}\,dx\). No new formula is being introduced here — only a recipe for \(A(x)\).</p>
 
-  <!-- expansion:caution — the radius-reading trap: the disk's radius is the function VALUE, a length read vertically, then swept; students who memorise "πr²" hunt for a horizontal r -->
+  <!-- expansion:caution — the radius-reading trap: the disk's radius is the function VALUE, a length read vertically, then swept; students who memorize "πr²" hunt for a horizontal r -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
@@ -136,7 +136,30 @@
       <div class="env-body">
         <p>The curves meet where \(x = x^{2}\), so \(x = 0\) or \(x = 1\), and between these values \(x \ge x^{2} \ge 0\) (at \(x = \tfrac12\): \(\tfrac12\) against \(\tfrac14\)). Rotating, the line is the outer boundary and the parabola the inner one: \(R = x\), \(r = x^{2}\), giving washers of area \(\pi\bigl(x^{2} - x^{4}\bigr)\). Hence</p>
         <p>\[ V = \int_{0}^{1} \pi \bigl(x^{2} - x^{4}\bigr)\,dx = \pi \left[\frac{x^{3}}{3} - \frac{x^{5}}{5}\right]_{0}^{1} = \pi \left(\frac{1}{3} - \frac{1}{5}\right) = \frac{2\pi}{15}. \]</p>
-        <p>Had the same region been rotated about the line \(y = 2\) instead, nothing would change except where the radii are measured from: each radius becomes a distance to <em>that</em> line, and the parabola — now the boundary farther from the axis — supplies the outer radius \(R = 2 - x^{2}\), the line the inner \(r = 2 - x\). Set up the radii from the axis of rotation, and the washer formula does the rest. <span class="qed"></span></p>
+        <p>Had the same region been rotated about the line \(y = 2\) instead, only where the radii are measured from would change — each becomes a distance to <em>that</em> line, not to a coordinate axis out of habit. The next example carries that change through. <span class="qed"></span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- expansion:example [pass: enrichment] [source: M4 Mode C gap-check 2026-07-18; §7.2 Layer-1 shifted-axis gap earmarked in brief; authored soln (Stewart ET 9e §6.2 Ex 4 corroborated), sympy-verified V=8π/15] -->
+  <div class="workedexample">
+    <section class="env env-example">
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.8</span></p>
+      <div class="env-body">
+        <p>The same region — enclosed by \(y = x\) and \(y = x^{2}\) — is now rotated about the horizontal line \(y = 2\). Find the volume of the resulting solid.</p>
+      </div>
+    </section>
+    <section class="env env-solution">
+      <p class="env-head"><span class="env-kicker">Solution</span></p>
+      <div class="env-body">
+        <p>The region still runs over \([0, 1]\) with \(y = x\) on top and \(y = x^{2}\) below, and it lies entirely beneath the axis \(y = 2\). Rotating about that line, each radius is a <em>vertical distance to \(y = 2\)</em>. The boundary farther from the axis is now the lower curve \(y = x^{2}\), so it supplies the outer radius \(R = 2 - x^{2}\); the nearer boundary \(y = x\) supplies the inner radius \(r = 2 - x\). The washer at \(x\) has area</p>
+        <p>\[ \pi\bigl(R^{2} - r^{2}\bigr) = \pi\bigl[(2 - x^{2})^{2} - (2 - x)^{2}\bigr] = \pi\bigl(x^{4} - 5x^{2} + 4x\bigr), \]</p>
+        <p>so</p>
+        <p>\[ \begin{aligned}
+          V &= \pi\int_{0}^{1} \bigl(x^{4} - 5x^{2} + 4x\bigr)\,dx = \pi\left[\frac{x^{5}}{5} - \frac{5x^{3}}{3} + 2x^{2}\right]_{0}^{1} \\[2pt]
+            &= \pi\left(\frac{1}{5} - \frac{5}{3} + 2\right) = \frac{8\pi}{15}.
+        \end{aligned} \]</p>
+        <p>Rotating the same region about the \(x\)-axis gave \(\tfrac{2\pi}{15}\) (Example 7.7); about \(y = 2\) the solid is different, and larger. The only thing that changed was where the radii were measured from — exactly the discipline the Caution insisted on. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -147,7 +170,7 @@
 
   <div class="workedexample">
     <section class="env env-example">
-      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.8</span></p>
+      <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">7.9</span></p>
       <div class="env-body">
         <p>Find the volume of a pyramid whose base is a square of side \(b\) and whose height is \(h\).</p>
       </div>
