@@ -64,6 +64,19 @@ def letters(seq):
     return re.sub(r"[^a-z]", "", " ".join(seq).lower())
 
 
+def _page_split(lost, ins):
+    """跨頁斷字判準：詞被頁邊界切成 prefix…suffix，中間夾著 pdftotext 抽到的 running
+    header／folio。normalize 的行末連字接合（`-\\n`）只處理**同頁**換行；跨頁時頁眉／頁碼
+    會插進兩截之間（實測 appB：`conditions` 抽成 `con` + `10 B.4 Steps That Come From
+    Nowhere` + `ditions`），故 `letters(lost) in letters(ins)` 的子字串判準看不到、會誤報真落差。
+    這裡補上：ins 以 lost 的某個 prefix 開頭、又以其餘 suffix 結尾＝詞在、只是被頁眉夾斷。
+    護欄 len>=5：跨頁只會斷長詞（LaTeX 不斷 is／of），短詞不走此路以免與真落差巧合。"""
+    l, g = letters(lost), letters(ins)
+    if len(l) < 5 or len(g) <= len(l):
+        return False
+    return any(g.startswith(l[:k]) and g.endswith(l[k:]) for k in range(1, len(l)))
+
+
 def fragment_prose(ch_id):
     words = []
     for frag in CHAPTERS[ch_id]["fragments"]:
@@ -165,14 +178,16 @@ def main():
             sys.exit(1)
         return
 
-    # 二次確認：詞流對不上、但純字母串仍包含 → pdftotext 抽取假象，非掉內容。
+    # 二次確認：詞流對不上、但純字母串仍包含（同頁）或被頁邊界夾斷（跨頁）→ pdftotext
+    # 抽取假象，非掉內容。
     real, artifacts = [], []
     for d in deletions:
-        (artifacts if letters(d[2]) and letters(d[2]) in letters(d[3]) else real).append(d)
+        L = letters(d[2])
+        (artifacts if L and (L in letters(d[3]) or _page_split(d[2], d[3])) else real).append(d)
 
     for i1, i2, lost, ins in artifacts:
         print(f"\n  [抽取假象] src[{i1}:{i2}] {' '.join(lost)!r}")
-        print(f"      PDF 抽成: {' '.join(ins)[:90]!r}  —— 純字母串仍含之，內容在")
+        print(f"      PDF 抽成: {' '.join(ins)[:90]!r}  —— 純字母串仍含之（或被頁眉夾斷），內容在")
     for i1, i2, lost, ins in real[:15]:
         ctx = " ".join(src[max(0, i1 - 6):i1])
         print(f"\n  [真落差] src[{i1}:{i2}]  …{ctx}…")

@@ -27,14 +27,14 @@
     <h1 class="ch-title">Reading and Writing Proofs</h1>
   </header>
 
-  <p class="lead">Calculus is, for many readers, the first place mathematics is written as a chain of <em>theorems</em> and <em>proofs</em> rather than a list of recipes to run. Reading that language — following an argument, and knowing when you have understood it — is a skill of its own, and one seldom taught head-on. This appendix is a short primer on it: how to take a statement apart (§B.1), the handful of proof shapes that recur (§B.2), the quantifiers that run through analysis (§B.3), the standard steps that seem to come from nowhere (§B.4), and how to read a proof actively rather than let it wash over you (§B.5). The last section turns the same habits around and points them at a blank page: planning, drafting, checking, and revising a short proof of your own (§B.6). That is enough structure to begin writing rigorous elementary proofs, though fluency here, as everywhere, comes from writing them and then writing them again. Everything is illustrated with small, classic examples — integers, primes, the irrationality of \(\sqrt{2}\) — so nothing here leans on calculus itself. Read it straight through, or reach for a section when a proof stops making sense.</p>
+  <p class="lead">Calculus is, for many readers, the first place mathematics is written as a chain of <em>theorems</em> and <em>proofs</em> rather than a list of recipes to run. Reading that language (following an argument, and knowing when you have understood it) is a skill of its own, and one seldom taught head-on. This appendix is a short primer on it: how to take a statement apart (§B.1), the handful of proof shapes that recur (§B.2), the quantifiers that run through analysis (§B.3), the standard steps that seem to come from nowhere (§B.4), and how to read a proof actively rather than let it wash over you (§B.5). The last section turns the same habits around and points them at a blank page: planning, drafting, checking, and revising a short proof of your own (§B.6). That is enough structure to begin writing rigorous elementary proofs, though fluency here, as everywhere, comes from writing them and then writing them again. Everything is illustrated with small, classic examples (integers, primes, the irrationality of \(\sqrt{2}\)), so nothing here leans on calculus itself. Read it straight through, or reach for a section when a proof stops making sense.</p>
 
   <p class="para-head">By the end of this appendix, you will be able to:</p>
   <ul>
     <li>take a statement apart into its hypothesis, conclusion, and quantifiers, and tell it apart from its converse;</li>
-    <li>recognize the five shapes you meet most often — the four that build a proof (direct, contradiction, cases, and induction) and the counterexample that tears one down;</li>
+    <li>recognize the five shapes you meet most often: the four that build a proof (direct, contradiction, cases, and induction) and the counterexample that tears one down;</li>
     <li>read the quantifiers \(\forall\) and \(\exists\), negate a quantified statement, and keep their order straight;</li>
-    <li>see the purpose behind the standard moves — adding and subtracting a term, splitting an \(\varepsilon\), taking a minimum, and the rest — that otherwise look like rabbits from a hat;</li>
+    <li>see the purpose behind the standard moves (adding and subtracting a term, splitting an \(\varepsilon\), taking a minimum, and the rest) that otherwise look like rabbits from a hat;</li>
     <li>read a proof actively: checking each step, locating where every hypothesis is used, and separating <em>why</em> a result is true from <em>how</em> it is proved;</li>
     <li>plan, draft, check, and revise a short elementary proof of your own;</li>
     <li>distinguish a promising argument from a complete proof.</li>
@@ -49,42 +49,42 @@
 
   <p>A theorem is a promise, and like any promise it comes with conditions. Before you can follow a proof — let alone trust it — you have to know exactly what is being claimed: what you are handed, what you must produce, and how much the statement really commits to. Reading the statement closely is the first of these skills, and the one that repays itself most often. A surprising share of the confusion inside a proof turns out to be confusion about the statement it is proving.</p>
 
-  <p>Most theorems can be put in the form <em>if \(P\), then \(Q\)</em>. The clause \(P\) is the <em>hypothesis</em> — what you are allowed to assume — and \(Q\) is the <em>conclusion</em> — what you are then obliged to establish. Even a theorem with no visible &ldquo;if&rdquo; usually has this skeleton inside it. &ldquo;Every integer divisible by \(6\) is divisible by \(3\)&rdquo; is the same claim as &ldquo;if an integer \(n\) is divisible by \(6\), then \(n\) is divisible by \(3\)&rdquo; wearing plainer clothes: the word <em>every</em> carries the unstated &ldquo;for all&rdquo;, while the hypothesis — that \(n\) is divisible by \(6\) — hides inside the description of the subject. Learning to hear the <em>if&ndash;then</em> inside an ordinary sentence is half of reading a statement.</p>
+  <p>Most theorems can be put in the form <em>if \(P\), then \(Q\)</em>. The clause \(P\) is the <em>hypothesis</em> (what you are allowed to assume) and \(Q\) is the <em>conclusion</em> (what you are then obliged to establish). Even a theorem with no visible &ldquo;if&rdquo; usually has this skeleton inside it. &ldquo;Every integer divisible by \(6\) is divisible by \(3\)&rdquo; is the same claim as &ldquo;if an integer \(n\) is divisible by \(6\), then \(n\) is divisible by \(3\)&rdquo; wearing plainer clothes: the word <em>every</em> carries the unstated &ldquo;for all&rdquo;, while the hypothesis (that \(n\) is divisible by \(6\)) hides inside the description of the subject. Learning to hear the <em>if&ndash;then</em> inside an ordinary sentence is half of reading a statement.</p>
 
-  <p>Once a statement is in <em>if \(P\), then \(Q\)</em> form, two rearrangements of it are worth naming — precisely because they are so easily mistaken for the original.</p>
+  <p>Once a statement is in <em>if \(P\), then \(Q\)</em> form, two rearrangements of it are worth naming, precisely because they are so easily mistaken for the original.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">B.1</span></p>
     <div class="env-body">
       <p>Given an implication <em>if \(P\), then \(Q\)</em>:</p>
       <ul>
-        <li>its <em>converse</em> is the implication <em>if \(Q\), then \(P\)</em> — hypothesis and conclusion swapped;</li>
-        <li>its <em>contrapositive</em> is the implication <em>if not \(Q\), then not \(P\)</em> — both parts negated <em>and</em> swapped.</li>
+        <li>its <em>converse</em> is the implication <em>if \(Q\), then \(P\)</em> (hypothesis and conclusion swapped);</li>
+        <li>its <em>contrapositive</em> is the implication <em>if not \(Q\), then not \(P\)</em> (both parts negated <em>and</em> swapped).</li>
       </ul>
     </div>
   </section>
 
-  <p>The contrapositive says the very same thing as the original, read from the other end: if \(Q\) must hold whenever \(P\) does, then a failure of \(Q\) leaves no room for \(P\) — so &ldquo;if \(P\) then \(Q\)&rdquo; and &ldquo;if not \(Q\) then not \(P\)&rdquo; stand or fall together. They are <em>logically equivalent</em> — each is true exactly when the other is — so proving one proves the other, a fact the indirect arguments of §B.2 lean on. The converse is a different matter: it is a genuinely new claim, which may be true or false on its own. Our sample statement &ldquo;if \(n\) is divisible by \(6\), then \(n\) is divisible by \(3\)&rdquo; is true, while its converse &ldquo;if \(n\) is divisible by \(3\), then \(n\) is divisible by \(6\)&rdquo; is false, as \(n = 9\) shows. Its contrapositive &ldquo;if \(n\) is not divisible by \(3\), then \(n\) is not divisible by \(6\)&rdquo; is true again, in lockstep with the original.</p>
+  <p>The contrapositive says the very same thing as the original, read from the other end: if \(Q\) must hold whenever \(P\) does, then a failure of \(Q\) leaves no room for \(P\), so &ldquo;if \(P\) then \(Q\)&rdquo; and &ldquo;if not \(Q\) then not \(P\)&rdquo; stand or fall together. They are <em>logically equivalent</em> (each is true exactly when the other is), so proving one proves the other, a fact the indirect arguments of §B.2 lean on. The converse is a different matter: it is a genuinely new claim, which may be true or false on its own. Our sample statement &ldquo;if \(n\) is divisible by \(6\), then \(n\) is divisible by \(3\)&rdquo; is true, while its converse &ldquo;if \(n\) is divisible by \(3\), then \(n\) is divisible by \(6\)&rdquo; is false, as \(n = 9\) shows. Its contrapositive &ldquo;if \(n\) is not divisible by \(3\), then \(n\) is not divisible by \(6\)&rdquo; is true again, in lockstep with the original.</p>
 
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>The single most common misreading of a theorem is to help yourself to its converse. &ldquo;If \(P\), then \(Q\)&rdquo; hands you \(Q\) whenever you have \(P\); it promises nothing when you instead have \(Q\), and nothing when you merely lack \(P\). A statement and its converse must be proved separately, and either can hold while the other fails. When a result really does run both ways — <em>\(P\) if and only if \(Q\)</em> — that is a strictly stronger claim, and it has to be earned in both directions.</p>
+      <p>The single most common misreading of a theorem is to help yourself to its converse. &ldquo;If \(P\), then \(Q\)&rdquo; hands you \(Q\) whenever you have \(P\); it promises nothing when you instead have \(Q\), and nothing when you merely lack \(P\). A statement and its converse must be proved separately, and either can hold while the other fails. When a result really does run both ways (<em>\(P\) if and only if \(Q\)</em>), that is a strictly stronger claim, and it has to be earned in both directions.</p>
     </div>
   </section>
 
-  <p>Two small words decide the meaning of most statements: <em>for all</em> and <em>there exists</em>. The first, written \(\forall\), claims something about <em>every</em> object in some collection; the second, written \(\exists\), claims only that <em>at least one</em> object works. They rarely announce themselves. &ldquo;Let \(n\) be an integer; then &hellip;&rdquo; is a <em>for all</em> in disguise — the claim must hold no matter which integer you were handed — while &ldquo;the equation has a solution&rdquo; is a <em>there exists</em>. A statement can stack the two, as in &ldquo;for every \(x\) there is a \(y\) such that &hellip;&rdquo;, and then, as §B.3 will insist, the order is not decoration — it changes the meaning. For now the goal is just to notice them: mark every <em>for all</em> and every <em>there exists</em>, stated or disguised, before you read on.</p>
+  <p>Two small words decide the meaning of most statements: <em>for all</em> and <em>there exists</em>. The first, written \(\forall\), claims something about <em>every</em> object in some collection; the second, written \(\exists\), claims only that <em>at least one</em> object works. They rarely announce themselves. &ldquo;Let \(n\) be an integer; then &hellip;&rdquo; is a <em>for all</em> in disguise (the claim must hold no matter which integer you were handed) while &ldquo;the equation has a solution&rdquo; is a <em>there exists</em>. A statement can stack the two, as in &ldquo;for every \(x\) there is a \(y\) such that &hellip;&rdquo;, and then, as §B.3 will insist, the order is not decoration: it changes the meaning. For now the goal is just to notice them: mark every <em>for all</em> and every <em>there exists</em>, stated or disguised, before you read on.</p>
 
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">B.1</span><span class="env-name">Taking a statement apart</span></p>
     <div class="env-body">
       <ol class="steps">
-        <li>Find the quantifiers. Rewrite any disguised ones — <em>let</em>, <em>any</em>, <em>some</em>, <em>there is</em> — as an explicit <em>for all</em> or <em>there exists</em>, and note the order in which they come.</li>
+        <li>Find the quantifiers. Rewrite any disguised ones (<em>let</em>, <em>any</em>, <em>some</em>, <em>there is</em>) as an explicit <em>for all</em> or <em>there exists</em>, and note the order in which they come.</li>
         <li>Find the <em>if&ndash;then</em> skeleton: name the hypothesis \(P\) (all you may assume) and the conclusion \(Q\) (all you must show).</li>
         <li>Write down the converse <em>if \(Q\), then \(P\)</em> and ask whether you actually believe it. This is the quickest way to see what the statement does <em>not</em> claim.</li>
         <li>Try the statement on one small object, to be sure you have read it the way its author meant.</li>
       </ol>
-      <p class="informal">The whole exercise takes under a minute and heads off the most expensive error there is — proving, or trusting, a different statement than the one in front of you.</p>
+      <p class="informal">The whole exercise takes under a minute and heads off the most expensive error there is: proving, or trusting, a different statement than the one in front of you.</p>
     </div>
   </section>
 
@@ -103,12 +103,12 @@
           <li><strong>Hypothesis and conclusion.</strong> With \(n\) fixed, \(P\) is &ldquo;\(n^{2}\) is even&rdquo; and \(Q\) is &ldquo;\(n\) is even&rdquo;.</li>
           <li><strong>Converse.</strong> <em>If \(n\) is even, then \(n^{2}\) is even</em> — a different statement. It happens to be true as well, but that is a separate fact to prove, not something the original grants for free.</li>
           <li><strong>Contrapositive.</strong> <em>If \(n\) is odd, then \(n^{2}\) is odd</em> — equivalent to the original, and, as it turns out, the more convenient direction to attack. Proposition B.1 proves exactly this.</li>
-          <li><strong>Small test.</strong> \(n = 6\) gives \(n^{2} = 36\), even, and \(n\) is even — consistent. What the statement forbids is an integer with \(n^{2}\) even yet \(n\) odd, and there is none.</li>
+          <li><strong>Small test.</strong> \(n = 6\) gives \(n^{2} = 36\), even, and \(n\) is even, which is consistent. What the statement forbids is an integer with \(n^{2}\) even yet \(n\) odd, and there is none.</li>
         </ul>
       </div>
     </section>
   </div>
 
-  <p>A statement read this way — quantifiers marked, hypothesis and conclusion named, converse held at arm’s length — is one you can prove, or look up, or use with confidence. The rest of this appendix assumes you have done this first; everything else is easier once the claim itself is pinned down.</p>
+  <p>A statement read this way (quantifiers marked, hypothesis and conclusion named, converse held at arm’s length) is one you can prove, or look up, or use with confidence. The rest of this appendix assumes you have done this first; everything else is easier once the claim itself is pinned down.</p>
 
 </article>

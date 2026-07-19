@@ -90,6 +90,7 @@
 
 - **推薦：advisory 線 = 每 500 字 ≥4 個散文 em-dash**（在 Ch1 上界之上，故基準不被判違規）；**單句 ≥3 個 em-dash** 為 local advisory trigger（命中 §1.6 line 89 那種）。
 - em-dash 僅在「**與其他 C-tell 合計**達高密度叢集」時才貢獻 blocking；單純 em-dash 偏多維持 advisory（它是合法插入語、Ch1 招牌節奏）。
+- **〔2026-07-20 更新〕** 此 4.0/500（＝8.0/1000）advisory 線是**以 Ch1 為基準**訂的，實測顯示它**本身高於真實數學課本**（OpenStax 0.38、APEX 0.30、CLP 3.40/1000；人類平均 3.23）。全書多數章節 5.5–13.2/1000，是可量測的 LLM 指紋。appB 已做首輪 de-dash（16.0→2.2/1000），其餘章節（含 ch01）待套用。真實教材基準實測、cut/keep 方法、逐單元 rollout 狀態見 [`REPORT-emdash-baseline-and-rollout.md`](REPORT-emdash-baseline-and-rollout.md)。
 
 ### 6.3 C1–C6 措辭（PLAN §6-3）
 
