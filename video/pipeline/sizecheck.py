@@ -556,6 +556,7 @@ def check_scenes(meta: dict, scenes: list[dict]) -> "list[tuple[str, str]]":
     content scenes only."""
     from pipeline.templates import build_blocks
     from pipeline.visuals import theme as T
+    from pipeline.schema import reveal_targets
 
     muted_hex = str(T.color("dark", "muted")).lower()
     issues: list[tuple[str, str]] = []
@@ -571,6 +572,16 @@ def check_scenes(meta: dict, scenes: list[dict]) -> "list[tuple[str, str]]":
 
         # -- overflow guard (every kind): clipped off-frame, or into safe margin --
         issues += _overflow_issues(scene, blocks)
+
+        # -- error (F9): a {show <target>} naming no built block. schema.py checks
+        # {show} SYNTAX only (target existence is explicitly out of its scope); here
+        # the blocks are built, so a typo'd target -- silently skipped by the player,
+        # then back-filled at scene end (wrong timing, no crash) -- is caught. --
+        ids = {str(b.id) for b in blocks}
+        for t in reveal_targets(scene.get("say", "")):
+            if t and t not in ids:   # bare {show} is a pure beat split -- skip
+                issues.append(("error", f"{scene.get('id')}: {{show {t}}} has no matching "
+                                        f"block (built ids: {sorted(ids)})"))
 
         # prose size + muted checks are about stacked prose -- content scenes only
         if kind != "content":

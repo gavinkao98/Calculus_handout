@@ -29,12 +29,12 @@ python tools\doctor.py
 | **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/html/_render/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](authoring/_archive/deai/PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
-| **⑤c forced alignment（選用）** | `video/experiments/forced_alignment_dean/` 的本機 word-level timestamps，將整段 Dean 音訊對回 storyboard beats：`stable-ts`（transcript-constrained，**計時來源**）＋`whisper_timestamped`（自由 ASR，**QA 探針**） | 每台全局安裝一次：`python -m pip install --upgrade whisper-timestamped stable-ts`；第一次跑 `base.en` 會下載 Whisper model cache。缺它不擋核心產線，`doctor.py` 只 WARN |
+| **⑤c forced alignment（narrated 成片正式依賴）** | scene-level TTS 的計時源＝[`video/pipeline/scene_align.py`](video/pipeline/scene_align.py) 的 `stable-ts`（transcript-constrained，**計時來源**）＋`whisper_timestamped`（自由 ASR，**QA 探針**）。`--unit auto` 全 content template 走此路。（`experiments/forced_alignment_dean/`＝歷史起源、非現役。） | 每台全局安裝一次：`python -m pip install --upgrade whisper-timestamped stable-ts`；第一次跑 `base.en` 下載 model cache。**mock 迭代不需要**（缺它 `doctor.py` 只 WARN），但**產 narrated 真旁白成片時必需** |
 | **祕鑰** | `MIMO_API_KEY` / `GEMINI_API_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` | per-machine 設環境變數；**不進版控**（計費 API，依 [`CLAUDE.md`](CLAUDE.md) 徵同意） |
 
 ## 一次性安裝（每台機器各做一次）
 
-本機驗證過的版本：Python 3.12.10、Node v24、MiKTeX、ffmpeg 8.1.1、Vale 3.15.1（選用）、whisper-timestamped 1.15.9 / openai-whisper 20250625 / stable-ts 2.19.1 / torchaudio 2.11.0（forced-alignment 實驗用）。
+本機驗證過的版本：Python 3.12.10、Node v24、MiKTeX、ffmpeg 8.1.1、Vale 3.15.1（選用）、whisper-timestamped 1.15.9 / openai-whisper 20250625 / stable-ts 2.19.1 / torchaudio 2.11.0（scene-level forced alignment 正式路線用，見 `video/pipeline/scene_align.py`）。
 
 ```powershell
 # Python（lock 以 3.12 凍結，請用 3.12 以免 wheel 不相容）

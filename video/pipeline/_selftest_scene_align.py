@@ -313,7 +313,7 @@ def test_fallback_ladder_budget_stops_before_overrun():
                ("beats", False, beats_ok)],      # beats is the always-allowed terminal
         budget=FB.RetryBudget(max_billed=1))     # only 1 billed retry allowed
     # resynth consumes the 1 billed retry and fails; chunk is billed but over budget -> skipped;
-    # ladder falls straight to the beats terminal (free, always runs).
+    # ladder falls straight to the beats terminal (budget-exempt, always runs).
     assert result["entry"]["narration_mode"] == "beats"
     assert any(h.get("skipped_over_budget") for h in result["history"])
 

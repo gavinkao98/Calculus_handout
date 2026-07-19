@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<title>場景轉場 A/B — content-content 邊界（T9）</title>
+<style>
+ body{font-family:system-ui,"Noto Sans TC",sans-serif;margin:1.5rem;max-width:64rem;color:#111;line-height:1.55}
+ h1{font-size:1.35rem} h2{font-size:1.05rem;margin-top:1.8rem}
+ .banner{background:#fff3cd;border:1px solid #e0c060;padding:.6rem .9rem;border-radius:6px;font-weight:600}
+ .grid{display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:1rem}
+ .col{flex:1;min-width:20rem;border:1px solid #ddd;border-radius:8px;padding:.9rem}
+ .col h3{margin:.2rem 0 .5rem} video{width:100%;background:#000;border-radius:4px}
+ code{background:#f0f0f0;padding:.1rem .3rem;border-radius:3px;font-size:.85em}
+ .sha{color:#777;font-size:.72rem;word-break:break-all}
+ table{border-collapse:collapse;margin-top:.6rem;font-size:.85rem}
+ th,td{border:1px solid #ddd;padding:.3rem .55rem;text-align:left}
+ .dim{color:#777}
+</style></head><body>
+<h1>場景轉場 A/B — content-content 邊界（T9）</h1>
+<p class="banner">狀態：<b>awaiting adjudication</b>（等使用者裁決）。裁決後由執行者把選定值設為 <code>make.py</code> 預設並更新 <code>DESIGN.md</code> 轉場節。</p>
+
+<h2>要決定什麼</h2>
+<p>目前所有場景邊界一律 <code>--transition</code>（每邊 0.2 秒淡入/淡出黑，邊界共 ~0.4 秒 dip through black），呼應 intro/outro 的 dark-handoff motif。本輪只問一件事：<b>同一個 act 內、兩個相鄰 content 場之間，要不要也淡黑？</b></p>
+<ul>
+ <li><b>版本 A（現行）</b>：content–content 邊界照樣淡黑（<code>--intra-act-transition</code> 預設＝<code>--transition</code>＝0.2）。</li>
+ <li><b>版本 B（提案）</b>：content–content 邊界<b>硬切</b>（<code>--intra-act-transition 0</code>）；只有碰到 brand frame（intro/outro/divider）的邊界與片頭片尾仍淡黑。</li>
+</ul>
+<p class="dim">機制：T9 把 <code>_fade_vf</code> 拆成 per-side fade，<code>compose()</code> 依相鄰場的 kind 用 <code>_segment_fades</code> 決定每個邊界的 fade 值（brand 邊界＋片頭尾用 <code>transition</code>、content–content 用 <code>intra_act</code>）。此為單一 fade 變數的 A/B；lead/tail 1s/1s 不在本輪動。</p>
+
+<h2>樣本</h2>
+<p>樣本 deck＝<code>storyboards/_demo_derivation.yml</code>（2 個 content 場 <code>slope_chain</code> → <code>capacity_probe</code>，mock 靜音、1080p 以下的 low 解析度預覽）。刻意選最小樣本以<b>隔離</b>那**一個** content–content 邊界（在 <b>32.0 秒</b>）——轉場行為與 deck 內容無關，看清這一個邊界即可判定。正式定案後可對真章（§3.1 整節重做時）複驗。</p>
+
+<div class="grid">
+ <div class="col">
+  <h3>A — 現行（content 間也淡黑）</h3>
+  <video controls preload="metadata" src="../output/_transition_ab/derivation_A_uniform.mp4"></video>
+  <p class="dim">在 <b>32.0 秒</b>（slope_chain 收尾）畫面淡到全黑再淡入下一場。</p>
+  <p class="sha">sha256: face1616b1082bd5619027cb1caffcff24fcd518e79610d87d90aa23c4c79867</p>
+ </div>
+ <div class="col">
+  <h3>B — 提案（content 間硬切）</h3>
+  <video controls preload="metadata" src="../output/_transition_ab/derivation_B_hardcut.mp4"></video>
+  <p class="dim">在 <b>32.0 秒</b>直接切到下一場、不經黑場（片頭片尾仍淡黑）。</p>
+  <p class="sha">sha256: 901830c83feb05e2d6dc5d251efa39d783a4a3585ffc49057b27307bca86c53f</p>
+ </div>
+</div>
+
+<h2>客觀差異（抽幀量測）</h2>
+<table>
+ <tr><th>量測</th><th>A（現行）</th><th>B（提案）</th></tr>
+ <tr><td>邊界前一幀（31.97s）YAVG 亮度</td><td>16（近黑、淡出中）</td><td>33.4（正常內容、不淡）</td></tr>
+ <tr><td>總時長</td><td>46.821s</td><td>46.821s（轉場不改時長）</td></tr>
+ <tr><td>檔案</td><td class="dim">output/_transition_ab/derivation_A_uniform.mp4（gitignored）</td><td class="dim">…derivation_B_hardcut.mp4（gitignored）</td></tr>
+</table>
+
+<h2>取捨（供裁決參考）</h2>
+<ul>
+ <li><b>A（淡黑）</b>：一致的呼吸感、每場都有清楚的起訖；但 act 內連續推導被反覆打斷、節奏偏慢。</li>
+ <li><b>B（硬切）</b>：act 內連續推導更流暢、資訊密度不被黑場稀釋；brand 邊界仍保留 dark-handoff，act 之間的段落感不變。</li>
+</ul>
+<p class="dim">mp4 在 gitignored 的 <code>video/output/</code>，不進版控（NA4）；本說明 HTML 在 tracked 的 <code>video/_audit/</code>。用相對路徑＋sha256 引用成片。</p>
+</body></html>

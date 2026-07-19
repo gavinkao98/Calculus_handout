@@ -29,7 +29,9 @@ _bootstrap.bootstrap()
 import yaml  # noqa: E402
 
 from pipeline.audio import concat_wavs, pcm_duration, silence_pcm, trim_silence, wav_duration, write_pcm_wav  # noqa: E402
+from pipeline.derived_check import check_derived_freshness  # noqa: E402  (manim-free, F11-safe)
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
+from pipeline.template_names import CONTENT_TEMPLATES  # noqa: E402  (manim-free single source, F11-safe)
 from pipeline.timing import text_hash  # noqa: E402
 
 
@@ -45,14 +47,15 @@ MIMO_VOICE = "Dean"            # default built-in voice
 MIMO_STYLE = ""                # no persona/style prompt on the built-in route
 
 
-# design §10 rollout allowlist for --unit auto. batch-2 (2026-07-06) extends it to the full
-# content-template set. Evidence = the first real deck (ch03 §3.1, all 21 scenes forced
-# --unit scene): derivation 6/6 scene-aligned, theorem_proof 3/5 (the other 2 auto-demote to
-# beats via the fallback ladder -- safe, and already accepted as beat-level); the batch-1 four
-# (graph/definition_math/callout/recap_cards) shipped earlier. An over-broad allowlist is safe:
-# a scene whose FA fails still falls back to beats -- at most a billed attempt, never a broken deck.
-SCENE_UNIT_TEMPLATES = frozenset({"definition_math", "graph", "callout", "recap_cards",
-                                  "derivation", "theorem_proof"})
+# --unit auto routes every KNOWN content template to scene-level TTS. History:
+# batch-1 four (2026-07-05), batch-2 six (2026-07-06); 2026-07-11 the hand-kept
+# list was found missing procedure_steps/value_table/sign_chart vs the registry,
+# so it now derives from pipeline/template_names.py (parity selftest guards it).
+# Unknown templates still fall back to beat. An over-broad allowlist is bounded but
+# NOT free: a scene whose FA fails demotes down the ladder to the beats terminal,
+# which under MiMo bills once PER non-empty beat (not "one attempt"); dry-run's
+# worst-case column already accounts for that fan-out.
+SCENE_UNIT_TEMPLATES = frozenset(CONTENT_TEMPLATES)
 
 
 def resolve_unit(unit: str, scene: dict[str, Any]) -> str:
@@ -127,8 +130,10 @@ class MockTTSBackend:
 
     def __init__(self, empty_seconds: float) -> None:
         self.empty_seconds = empty_seconds
+        self.stats = {"calls": 0, "retries": 0}
 
     def synthesize(self, request: TTSRequest) -> TTSResult:
+        self.stats["calls"] += 1
         seconds = self.empty_seconds if not request.text else estimate_seconds(request.text)
         return TTSResult(silence_pcm(seconds))
 
@@ -153,11 +158,13 @@ class MimoTTSBackend:
         self._timeout = timeout
         self._trim = trim          # MiMo pads each clip with ~0.4s trailing silence
         self._trim_pad = trim_pad
+        self.stats = {"calls": 0, "retries": 0}
 
     def synthesize(self, request: TTSRequest) -> TTSResult:
         import urllib.error
         import urllib.request
 
+        self.stats["calls"] += 1
         messages: list[dict[str, str]] = []
         if request.style:
             messages.append({"role": "user", "content": request.style})
@@ -192,11 +199,13 @@ class MimoTTSBackend:
                         f"(attempt {attempt + 1}/{self._max_retries})",
                         flush=True,
                     )
+                    self.stats["retries"] += 1
                     time.sleep(wait)
                     continue
                 raise
             except (urllib.error.URLError, TimeoutError):
                 if attempt < self._max_retries:
+                    self.stats["retries"] += 1
                     time.sleep((2 ** attempt) * 2)
                     continue
                 raise
@@ -260,7 +269,13 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--storyboard", required=True, type=Path)
     parser.add_argument("--scene", default="all", help="id, comma-separated ids, or 'all'")
-    parser.add_argument("--backend", choices=("mimo", "mock"), default="mimo")
+    parser.add_argument("--backend", choices=("mimo", "mock"), required=True,
+                        help="TTS backend; REQUIRED (no default) so a bare run can neither "
+                             "silently bill MiMo nor silently clobber real WAVs with mock")
+    parser.add_argument("--force-backend-switch", action="store_true",
+                        help="allow overwriting a manifest whose backend differs (only with --scene all)")
+    parser.add_argument("--force-clobber", action="store_true",
+                        help="overwrite a corrupt manifest or orphan WAVs (only with --scene all)")
     parser.add_argument("--model", default=os.environ.get("MIMO_TTS_MODEL", MIMO_MODEL))
     parser.add_argument("--voice", default=os.environ.get("MIMO_TTS_VOICE"))
     parser.add_argument("--style", default=os.environ.get("MIMO_TTS_STYLE", MIMO_STYLE))
@@ -317,6 +332,104 @@ def load_prior_manifest(path: Path) -> dict[str, Any] | None:
     except (OSError, ValueError) as exc:
         print(f"[tts] cannot read prior manifest for reuse ({path}): {exc}", flush=True)
         return None
+
+
+_IDENTITY_KEYS = ("deck_id", "backend", "model", "voice", "style",
+                  "sample_rate", "channels", "sample_width", "output_dir")
+
+
+def read_manifest_status(path: Path) -> tuple[dict | None, str]:
+    """('ok'|'absent'|'corrupt'). 'ok' is a PROMISE that every prior-manifest consumer
+    runs without crashing on a shape it assumed. Beyond the top level (dict + str
+    'backend' + list-of-dict 'scenes') we validate exactly the per-scene fields those
+    consumers dereference by TYPE (R3-B1, Codex option a -- bounded to real derefs,
+    not speculative):
+      - scene_id: str                    -> dict key in build_scene_reuse_index / merged_manifest
+      - beats (only if the KEY exists):  -> build_reuse_index does `for beat in scene["beats"]`
+          list of dicts, and each beat's audio_file (if present) a str  (Path(audio_file))
+          (test `"beats" in s`, NOT .get() -- explicit null must fail, since
+           scene.get("beats", []) returns None for a present-but-null key)
+      - audio_seconds (scene_aligned only, if present): a real number   (scene_reuse_ok float())
+    Anything else -- truncation, non-dict JSON, a wrong type above -- is 'corrupt'
+    (fail CLOSED). Beat text/hash/timing are NOT validated (nothing keys on their
+    type). Keep this in sync if a consumer starts dereferencing a new field."""
+    if not path.exists():
+        return None, "absent"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None, "corrupt"
+    scenes = data.get("scenes") if isinstance(data, dict) else None
+    if (not isinstance(data, dict) or not isinstance(data.get("backend"), str)
+            or not isinstance(scenes, list) or not all(isinstance(e, dict) for e in scenes)):
+        return None, "corrupt"
+    for s in scenes:
+        if not isinstance(s.get("scene_id"), str):
+            return None, "corrupt"
+        if "beats" in s:
+            beats = s["beats"]
+            if (not isinstance(beats, list) or not all(isinstance(b, dict) for b in beats)
+                    or any(b.get("audio_file") is not None
+                           and not isinstance(b.get("audio_file"), str) for b in beats)):
+                return None, "corrupt"
+        if s.get("narration_mode") == "scene_aligned":
+            secs = s.get("audio_seconds")
+            if secs is not None and (isinstance(secs, bool) or not isinstance(secs, (int, float))):
+                return None, "corrupt"
+    return data, "ok"
+
+
+def _has_audio(output_dir: Path) -> bool:
+    return any((output_dir / "scenes").glob("*.wav")) or any((output_dir / "beats").rglob("*.wav"))
+
+
+def overwrite_guard(*, status: str, existing: dict | None, intended: dict, scene_sel: str,
+                    output_dir: Path, force_backend_switch: bool, force_clobber: bool) -> str | None:
+    """Abort message (else None), computed BEFORE any synthesis/write so a bad run
+    never bills a call or clobbers a WAV first (NB1). `intended` = the identity this
+    run would write. Recovering a corrupt/orphaned output needs --force-clobber AND
+    --scene all (a forced subset would leave un-accounted WAVs; NB2)."""
+    need_full = "recovery needs --force-clobber AND --scene all"
+    if status == "corrupt":
+        if not force_clobber:
+            return ("manifest present but corrupt/semantically invalid; refusing to overwrite "
+                    "(it may still shadow real WAVs). Re-synthesize the whole deck or --force-clobber.")
+        return None if scene_sel == "all" else need_full
+    if status == "absent" and _has_audio(output_dir):
+        if not force_clobber:
+            return ("no valid manifest but WAVs already exist under the output dir; refusing to "
+                    "overwrite unmanaged audio. Pass --force-clobber (with --scene all).")
+        return None if scene_sel == "all" else need_full
+    if status == "ok":
+        diff = [k for k in _IDENTITY_KEYS if (existing or {}).get(k) != intended.get(k)]
+        if diff and scene_sel != "all":
+            return (f"this run's identity differs from the existing manifest on {diff}; a --scene "
+                    f"subset can't safely merge into it. Re-run --scene all to rebuild.")
+        if "backend" in diff and not force_backend_switch:
+            return (f"existing manifest backend={(existing or {}).get('backend')!r} != "
+                    f"{intended.get('backend')!r}; pass --force-backend-switch (with --scene all).")
+    return None
+
+
+def merged_manifest(prior: dict[str, Any] | None, fresh: dict[str, Any],
+                    storyboard_scene_ids: list[str]) -> dict[str, Any]:
+    """--scene subset merges INTO the prior manifest: fresh entries win per
+    scene_id, untouched prior entries survive, order follows the storyboard.
+    Backstop only (T2a preflight already blocked identity mismatch before any
+    synthesis): if identity somehow still differs, REFUSE rather than merge.
+    No prior manifest -> just the fresh subset."""
+    if not prior:
+        return fresh
+    mismatch = [k for k in _IDENTITY_KEYS if prior.get(k) != fresh.get(k)]
+    if mismatch:
+        raise SystemExit(
+            f"[tts] refusing to merge a --scene subset into a manifest that differs on "
+            f"{mismatch}; re-run the whole deck (--scene all) to rebuild it consistently.")
+    by_id = {e["scene_id"]: e for e in prior.get("scenes", []) if e.get("scene_id")}
+    by_id.update({e["scene_id"]: e for e in fresh.get("scenes", []) if e.get("scene_id")})
+    out = {**prior, **{k: v for k, v in fresh.items() if k != "scenes"}}
+    out["scenes"] = [by_id[sid] for sid in storyboard_scene_ids if sid in by_id]
+    return out
 
 
 def build_reuse_index(manifest: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
@@ -590,22 +703,23 @@ def _synth_scene_wav(backend: TTSBackend, plan: dict[str, Any], out_path: Path,
                   channels=result.channels, sample_width=result.sample_width)
 
 
-def _asr_probe_tokens(wav: Path, args: argparse.Namespace) -> list[str] | None:
-    """Free ASR (whisper-timestamped) -> normalized token list for the QA probe
-    (design §6). Advisory: returns None if the probe cannot run (missing dep/model),
-    so a probe failure never blocks synthesis."""
+def _asr_probe_tokens(wav: Path, args: argparse.Namespace) -> tuple[list | None, str]:
+    """Free ASR (whisper-timestamped) -> (normalized tokens, reason) for the QA probe
+    (design §6). Advisory: (None, reason) if the probe cannot run (missing dep/model),
+    so a probe failure never blocks synthesis -- but the reason is RECORDED (F8) so a
+    silent skip is never mistaken for a pass. success -> (tokens, "ran")."""
     from pipeline import scene_align as SA
     try:
         import whisper_timestamped as wt
     except ImportError:
-        return None
+        return None, "skipped: whisper_timestamped not installed"
     try:
         model = wt.load_model(args.aligner_model, device=args.aligner_device)
         result = wt.transcribe(model, str(wav), language="en")
-    except Exception:  # noqa: BLE001 - probe is advisory, never fatal
-        return None
+    except Exception as exc:  # noqa: BLE001 - probe is advisory, never fatal
+        return None, f"error: {exc}"
     text = " ".join(seg.get("text", "") for seg in result.get("segments", []))
-    return SA.tokenize(text)
+    return SA.tokenize(text), "ran"
 
 
 def _finalize_aligned(*, plan: dict[str, Any], words: list[dict[str, Any]],
@@ -622,13 +736,25 @@ def _finalize_aligned(*, plan: dict[str, Any], words: list[dict[str, Any]],
     from pipeline import atomicio
     beats = SA.map_to_beats(plan, words, audio_seconds, multi=multi)
     gates = SA.run_gates(plan, words, beats, audio_seconds)
-    if not getattr(args, "skip_qa", False) and qa_wav is not None:
-        asr = _asr_probe_tokens(qa_wav, args)
-        if asr is not None:
+    # QA probe outcome ALWAYS lands in gates["qa"] as one of ran/skipped/error (F8:
+    # previously the verdict was dropped and a missing dep skipped silently). Adv2
+    # policy: only an intentional --skip-qa is silent; any other "should have run but
+    # didn't" (no dep, exception, unexpectedly no qa wav) prints a loud "NOT a pass".
+    if getattr(args, "skip_qa", False):
+        gates = {**gates, "qa": {"status": "skipped", "reason": "--skip-qa (intentional)"}}
+    else:
+        asr, note = (None, "skipped: no qa wav on this path") if qa_wav is None \
+            else _asr_probe_tokens(qa_wav, args)
+        if asr is None:
+            status = "error" if note.startswith("error") else "skipped"
+            gates = {**gates, "qa": {"status": status, "reason": note}}
+            print(f"[tts] WARN {plan['scene_id']}: ASR QA probe did not run ({note}) -- "
+                  f"this is NOT a pass", flush=True)
+        else:
             fa_probs = [w.get("probability") for w in words]
             qa = SA.qa_diff(SA.tokenize(plan["transcript"]), asr, fa_probs,
                             weak_spans=SA.boundary_weak_spans(beats))
-            gates = {**gates, "qa": qa}
+            gates = {**gates, "qa": {"status": "ran", **qa}}
             if qa["verdict"] == "fail":
                 gates["status"] = "fail"
                 gates["failures"] = gates["failures"] + ["QA probe: suspect TTS misspeak"]
@@ -711,7 +837,8 @@ def _cleanup_chunk_temps(chunk_dir: Path, concat_tmp: Path) -> None:
 
 def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, plan, reuse_index):
     """Design §7 ladder rungs for one failed scene: arbiter (free small.en re-align) ->
-    resynth (1 billed call) -> chunk (sentence-chunk resynth+merge) -> beats (free terminal).
+    resynth (1 billed call) -> chunk (sentence-chunk resynth+merge) -> beats (budget-exempt
+    terminal -- still bills once per non-empty beat under MiMo, NOT free).
     Each rung callable takes the ctx dict from _synthesize_scene_aligned, which carries the
     RetryBudget. The chunk rung is declared NOT billed to run_ladder because it fans out to ONE
     TTS call per sentence and must account for that itself: it RESERVES N units of the budget up
@@ -847,7 +974,12 @@ def write_manifest(path: Path, manifest: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
+    if args.fallback_budget < 0:                       # NA2: unconditional, not just in dry-run
+        raise SystemExit("[tts] --fallback-budget must be >= 0")
     data = load_storyboard(args.storyboard)
+    stale = check_derived_freshness(args.storyboard.resolve(), data)
+    if stale:
+        raise SystemExit(f"[freshness] {stale}")
     meta = data["meta"]
     scenes = wanted_scenes(data["scenes"], args.scene)
     sec_dir = _bootstrap.section_output_dir(meta)
@@ -858,12 +990,24 @@ def main() -> int:
     ).resolve()
     manifest_path = (args.manifest or (output_dir / "manifest.json")).resolve()
     voice = args.voice or default_voice_for_model(meta)
-    prior_manifest = load_prior_manifest(manifest_path) if args.reuse_existing else None
-    reuse_index = build_reuse_index(prior_manifest)                 # per-beat (beat path)
-    scene_reuse_index = build_scene_reuse_index(prior_manifest)     # per-scene (scene path)
-    if args.reuse_existing and prior_manifest is None:
+    existing, status = read_manifest_status(manifest_path)
+    intended = {"deck_id": meta["id"], "backend": args.backend, "model": args.model,
+                "voice": voice, "style": args.style, "sample_rate": 24_000, "channels": 1,
+                "sample_width": 2, "output_dir": str(output_dir)}
+    abort = overwrite_guard(status=status, existing=existing, intended=intended,
+                            scene_sel=args.scene, output_dir=output_dir,
+                            force_backend_switch=args.force_backend_switch,
+                            force_clobber=args.force_clobber)
+    identity_diff = status == "ok" and any((existing or {}).get(k) != intended.get(k)
+                                           for k in _IDENTITY_KEYS)
+    # reuse index only when asked AND identity unchanged (R3-B2) AND not a dry-run
+    # (dry-run writes nothing and never reads these -- don't build unused indexes).
+    use_reuse = args.reuse_existing and not identity_diff and not args.dry_run
+    reuse_index = build_reuse_index(existing) if use_reuse else {}              # per-beat (beat path)
+    scene_reuse_index = build_scene_reuse_index(existing) if use_reuse else {}  # per-scene (scene path)
+    if args.reuse_existing and existing is None:
         print(
-            "[tts] --reuse-existing requested but no prior manifest was found; "
+            "[tts] --reuse-existing requested but no valid prior manifest was found; "
             "existing WAV files will not be trusted blindly.",
             flush=True,
         )
@@ -871,11 +1015,40 @@ def main() -> int:
     content_count = sum(1 for scene in scenes if scene.get("kind", "content") == "content")
     beat_count = sum(len(scene_beats(scene)) for scene in scenes if scene.get("kind", "content") == "content")
     if args.dry_run:
-        print(
-            f"Would synthesize {beat_count} beat(s) across {content_count} content scene(s) "
-            f"with backend={args.backend}, model={args.model}, voice={voice}."
-        )
+        # dry-run is read-only: never enforce the guard (R3-A1 -- the quote flow needs
+        # dry-run to still print an estimate), but surface that a real run WOULD abort.
+        if abort:
+            print(f"[dry-run] NOTE: a real run WOULD abort -> {abort}")
+        # planned = first-round calls; worst = incl. fallback ladder. Both IGNORE
+        # --reuse-existing (reuse can only lower actual calls; never overstate the quote).
+        # Empty beats write silence without hitting the backend (synthesize_beat:539),
+        # so they count 0 calls. Scene unit: 1 synth + budget billed rungs 2-3 + one
+        # billed beat per NON-EMPTY beat at the terminal (F6/T3-2).
+        rows, planned, worst, est_secs = [], 0, 0, 0.0
+        for scene in scenes:
+            if scene.get("kind", "content") != "content":
+                continue
+            unit = resolve_unit(args.unit, scene)
+            beats = scene_beats(scene)
+            nonempty = [b for b in beats if (b.get("text") or "").strip()]
+            est_secs += sum(estimate_seconds(b["text"]) if (b.get("text") or "").strip()
+                            else args.empty_beat_seconds for b in beats)
+            if unit == "scene":
+                p, wc = 1, 1 + args.fallback_budget + len(nonempty)
+            else:
+                p = wc = len(nonempty)
+            planned += p; worst += wc
+            rows.append((scene["id"], unit, len(beats), len(nonempty), p, wc))
+        print(f"[dry-run] backend={args.backend} model={args.model} voice={voice} unit={args.unit} "
+              f"(planned counts IGNORE --reuse-existing)")
+        print(f"[dry-run] {'scene':<30}{'unit':<7}{'beats':>6}{'calls':>6}{'plan':>5}{'worst':>7}")
+        for sid, unit, nb, nc, p, wc in rows:
+            print(f"[dry-run] {sid:<30}{unit:<7}{nb:>6}{nc:>6}{p:>5}{wc:>7}")
+        print(f"[dry-run] TOTAL content-scenes={len(rows)}  planned first-round calls={planned}  "
+              f"worst-case incl. fallback ladder={worst}  est narration ~{est_secs/60:.1f} min")
         return 0
+    if abort:
+        raise SystemExit(f"[tts] {abort}")
 
     backend = build_backend(args)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -916,6 +1089,23 @@ def main() -> int:
             )
         )
 
+    # Billing receipt for THIS run (added to the fresh manifest BEFORE any merge, so
+    # merged_manifest's fresh-top-level-wins keeps this run's numbers). beat mode:
+    # backend_calls == non-empty beats (empty beats never reach the backend).
+    manifest["receipt"] = {
+        "backend_calls": getattr(backend, "stats", {}).get("calls", 0),
+        "backend_retries": getattr(backend, "stats", {}).get("retries", 0),
+        "modes": {m: sum(1 for e in manifest["scenes"] if e.get("narration_mode") == m)
+                  for m in ("scene_aligned", "beats", "silent")},
+        "fallback_scenes": [e["scene_id"] for e in manifest["scenes"] if e.get("fallback_history")],
+    }
+    print(f"[tts] receipt: {json.dumps(manifest['receipt'], ensure_ascii=False)}", flush=True)
+
+    if args.scene != "all":
+        # F5: a subset run must merge into the prior manifest, not overwrite it whole
+        # (identity already vetted by the T2a preflight guard; merged_manifest re-checks
+        # as a backstop). `existing` is the prior manifest read at the top of main().
+        manifest = merged_manifest(existing, manifest, [s["id"] for s in all_scenes])
     write_manifest(manifest_path, manifest)
     print(f"[done] wrote {manifest_path}", flush=True)
     return 0

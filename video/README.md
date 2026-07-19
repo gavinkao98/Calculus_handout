@@ -157,7 +157,7 @@ manifest 為每 reveal beat 記一個 WAV、每內容場景記一個串接旁白
 - `pipeline/lint.py` — error：純文字欄含標記、`$` 不平衡；warn：散文手動 `\\`、空心點畫在曲線上。
 - `pipeline/sizecheck.py` — error：並排散文字級不一致、元素出框；warn：教學散文用 `muted`、超安全邊界、content 區塊重疊。
 
-**解析度慣例**：測試／預覽用 1080p（`make.py --quality high`，預設），正式交付才 4K（`--quality 4k`，依 `meta.video`，未設預設 4K60）。版面與解析度無關，1080p 測試與 4K master 構圖逐像素相同。
+**解析度慣例**：測試／預覽用 1080p（`make.py --quality high`，預設），正式交付才 4K（`--quality 4k`，依 `meta.video`，未設預設 4K60）。版面與解析度無關，1080p 測試與 4K master 構圖逐像素相同。（agent 預設一律 1080p、除非使用者要求，見根 [`CLAUDE.md`](../CLAUDE.md)；§3.1 真 4K final 另議見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)。）
 
 **仍待**：使用者試聽 [`pipeline/assets/audio/house/REVIEW-house-audio-candidates.html`](pipeline/assets/audio/house/REVIEW-house-audio-candidates.html) 後裁決 A/B/C，再將勝出的 house audio cues 接上 ducking/mux；視覺方向定後為 intro/outro 做最終節奏調整；`{show}` target-vs-payload 交叉驗證（task #6，需 manim）。
 
@@ -315,11 +315,12 @@ MiMo TTS（唯一旁白路線）預設使用 `mimo-v2.5-tts` 的 builtin voice `
 CLAUDE.md 批次前徵同意）。TTS CLI 亦有 `--backend mock`，不需網路／API 金鑰，適合驗
 manifest 與改模板時的快速無聲預覽。
 
-forced-alignment 實驗線在 `experiments/forced_alignment_dean/`。目前用全局安裝的
-`whisper_timestamped` CLI / Python package（`whisper-timestamped 1.15.9`、
-`openai-whisper 20250625`）替整段 Dean 音訊產生 word timestamps，再由
-`map_alignment_to_beats.py` 映回 storyboard beats。第一次跑 `base.en` 會下載約
-139 MB Whisper model cache；此線不影響正式 MiMo beat 成片流程。
+**forced alignment 現為正式路線**：計時源＝`pipeline/scene_align.py` 的 `stable-ts`
+transcript-constrained forced alignment（scene-level TTS 一場一次合成、回推每 beat reveal 時序），
+`whisper-timestamped` 降級為 ASR QA 探針（`--unit auto` 全 content template 走此路、過不了自動回退
+beat）。`experiments/forced_alignment_dean/`＝**歷史起源**（早期整段音訊＋alignment 的探索），僅供
+參照、非現役流程。第一次跑 aligner model（`base.en`）會下載約 139 MB model cache（`stable-ts`／
+`whisper-timestamped` 皆 production 依賴，見 `ENVIRONMENT.md`）。
 
 Render 註記：
 

@@ -74,6 +74,21 @@ def test_floor_issues_enforce_propagation():
     assert bool(meta_off.get("fontfloor_enforce")) is False
 
 
+def test_show_cross_check_flags_missing_target():   # T5 / F9: {show} target vs built block ids
+    meta = {"id": "demo", "section": "0.0", "title": "T", "chapter": "0", "sections": []}
+    bad = {"id": "xcheck", "kind": "content", "template": "definition_math",
+           "accent": "definition", "title": "T", "statement": "A statement.",
+           "math": ["a = b", "c = d"],                        # -> blocks math.0, math.1
+           "say": "one {show math.0} two {show math.9} three"}   # math.9 has NO block
+    xerrs = [m for s, m in S.check_scenes(meta, [bad])
+             if s == "error" and "no matching block" in m]
+    assert len(xerrs) == 1 and "math.9" in xerrs[0], xerrs
+    good = {**bad, "say": "one {show math.0} two {show math.1} three"}   # all targets exist
+    xerrs2 = [m for s, m in S.check_scenes(meta, [good])
+              if s == "error" and "no matching block" in m]
+    assert xerrs2 == [], xerrs2
+
+
 def test_clamp_no_shrink_when_fits():
     assert B._clamp_scale(3.0, 5.0, 40.0, 26.0) == 1.0
 
@@ -120,6 +135,7 @@ if __name__ == "__main__":
     test_floor_findings_empty_when_all_pass()
     test_floor_uses_theme_constant()
     test_floor_issues_enforce_propagation()
+    test_show_cross_check_flags_missing_target()
     test_clamp_no_shrink_when_fits()
     test_clamp_fits_when_result_above_floor()
     test_clamp_stops_at_floor()

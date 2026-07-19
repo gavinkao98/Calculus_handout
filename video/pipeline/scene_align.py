@@ -451,7 +451,7 @@ def build_scene_aligned_entry(*, scene_number, plan, beats, audio_seconds, audio
             "chunks": chunks,
         },
         "validation": {"status": gates["status"], "warnings": gates["warnings"],
-                       "metrics": gates["metrics"]},
+                       "metrics": gates["metrics"], "qa": gates.get("qa")},
         "fallback_history": fallback_history or [],
     }
 

@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import traceback
@@ -40,7 +41,10 @@ _bootstrap.bootstrap()  # must precede any manim / yaml import
 import yaml  # noqa: E402
 
 from pipeline.audio import concat_wavs, silence_pcm, wav_duration, write_pcm_wav  # noqa: E402
+from pipeline import captions  # noqa: E402
+from pipeline.derived_check import check_derived_freshness, text_sha256  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
+from pipeline.tts import read_manifest_status, _has_audio  # noqa: E402 (manim-free fail-closed guard reuse)
 from pipeline import house_audio  # noqa: E402
 from pipeline.timing import (  # noqa: E402
     SCENE_LEAD_SECONDS,
@@ -417,6 +421,43 @@ def _probe_duration(path: Path) -> float:
         return 0.0
 
 
+def _git_commit() -> str:
+    """Short HEAD for timeline provenance; 'unknown' if git is unavailable."""
+    try:
+        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                             capture_output=True, text=True, cwd=str(_bootstrap.REPO_ROOT))
+        return out.stdout.strip() or "unknown"
+    except Exception:  # noqa: BLE001 - provenance nicety, never fatal
+        return "unknown"
+
+
+def _write_text_atomic(path: Path, text: str) -> None:
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def _mock_synth_guard(*, status: str, existing: dict | None, audio_dir: Path,
+                      force_clobber: bool) -> str | None:
+    """Abort message (else None) BEFORE mock synth would overwrite audio -- mock silence
+    must never clobber real Dean WAVs. The old make.py guard only aborted on a VALID
+    non-mock backend string, so a corrupt manifest (json fails -> backend=None) or a
+    deleted manifest with WAVs still present fell through to synth() and overwrote real
+    audio. read_manifest_status catches both; this mirrors tts.py's overwrite_guard."""
+    if force_clobber:
+        return None
+    if status == "corrupt":
+        return ("manifest is corrupt/invalid and may shadow real WAVs; refusing to mock-overwrite. "
+                "Pass --reuse-audio, or --force-clobber to rebuild with mock.")
+    if status == "absent" and _has_audio(audio_dir):
+        return (f"no valid manifest but WAVs already exist under {audio_dir}; refusing to "
+                "mock-overwrite. Pass --reuse-audio, or --force-clobber.")
+    if status == "ok" and (existing or {}).get("backend") not in (None, "mock"):
+        return (f"existing manifest backend={(existing or {}).get('backend')!r} is real; refusing "
+                "to overwrite with mock. Pass --reuse-audio, or --force-clobber.")
+    return None
+
+
 def _audit_render_sync(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None],
                        *, lead: float) -> bool:
     """Return True if rendered scene lengths are compatible with manifest audio."""
@@ -469,25 +510,55 @@ def _audit_render_sync(scenes: list[dict], manifest: dict, rendered: dict[str, P
     return True
 
 
-def _fade_vf(video: Path, fade: float) -> str:
-    """Video filter: fade in from black at the start, fade out to black at the
-    end. Empty when fade<=0 or the clip is too short to carry both fades. Clips
-    faded this way then concatenated yield a ~2*fade dip through black at every
-    scene boundary (and open/close the film on black) -- the inter-scene
-    transition, applied uniformly at compose with no per-scene manim change,
-    matching the intro/outro dark-handoff motif.
-    """
-    if fade <= 0:
-        return ""
+def _fade_vf(video: Path, fade_in: float, fade_out: float) -> str:
+    """Video filter: fade in from black at the start (fade_in) and/or out to black at
+    the end (fade_out); either side may be 0 for a hard edge there. Per-boundary values
+    (T9) let brand-frame boundaries keep the dark handoff while content-content
+    boundaries are tightened independently. Empty when neither side fades or the clip is
+    too short to carry a requested fade. Concatenated, faded edges give a ~(in+out) dip
+    through black at each boundary (matching the intro/outro dark-handoff motif)."""
     dur = _probe_duration(video)
-    if dur <= 2.5 * fade:
-        return ""  # too short to fade cleanly -- leave a hard edge
-    return (f"fade=t=in:st=0:d={fade:.3f},"
-            f"fade=t=out:st={dur - fade:.3f}:d={fade:.3f}")
+    parts = []
+    if fade_in > 0 and dur > 2.5 * fade_in:
+        parts.append(f"fade=t=in:st=0:d={fade_in:.3f}")
+    if fade_out > 0 and dur > 2.5 * fade_out:
+        parts.append(f"fade=t=out:st={dur - fade_out:.3f}:d={fade_out:.3f}")
+    return ",".join(parts)
+
+
+_BRAND_KINDS = {"intro", "outro", "divider"}
+
+
+def _segment_fades(kinds: list[str], transition: float, intra_act: float) -> list[tuple[float, float]]:
+    """(fade_in, fade_out) per segment (T9). Every boundary touching a brand frame
+    (intro/outro/divider) and the film's own open/close uses `transition`; a
+    content-content boundary uses `intra_act`. Both sides of one boundary get the SAME
+    value, so the dip through black at that boundary is symmetric."""
+    n = len(kinds)
+
+    def boundary(a: int, b: int) -> float:
+        return transition if (kinds[a] in _BRAND_KINDS or kinds[b] in _BRAND_KINDS) else intra_act
+
+    return [(transition if i == 0 else boundary(i - 1, i),
+             transition if i == n - 1 else boundary(i, i + 1)) for i in range(n)]
+
+
+# Single, uniform video encode for every muxed segment (T8/F13). Encoding ONCE here
+# (even when there is no fade) lets _concat stream-copy instead of re-encoding, so the
+# chain is manim-render -> one mux encode -> concat copy, not up to three generations.
+# CRF 18 (visually lossless-ish), explicit BT.709 primaries/transfer/matrix (tag the
+# HD colour space instead of leaving it unspecified), yuv420p for broad playback.
+# The x264-params ARE needed on top of ffmpeg's -color_* flags: libx264 alone writes
+# only matrix_coefficients into the H.264 VUI, leaving colour_primaries/transfer
+# "unknown" (verified empirically); colorprim/transfer/colormatrix make all three land.
+ENCODE_V = ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
+            "-pix_fmt", "yuv420p", "-color_primaries", "bt709",
+            "-color_trc", "bt709", "-colorspace", "bt709",
+            "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709"]
 
 
 def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
-                 *, fade: float = 0.0) -> None:
+                 *, fade_in: float = 0.0, fade_out: float = 0.0) -> None:
     """Lay narration under video as a FULL-LENGTH track whose duration matches the
     video exactly: real silence for the lead-in (adelay), the narration, then
     silence padding out to the video's end (apad, capped by -shortest).
@@ -497,9 +568,8 @@ def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
     advances audio and video by each stream's own length, so the shortfall makes
     A/V drift apart scene by scene (and the gap grows with lead/tail). A
     video-length audio stream keeps every segment in sync, like _mux_silent."""
-    vf = _fade_vf(video, fade)
-    vcodec = (["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p"]
-              if vf else ["-c:v", "copy"])
+    vf = _fade_vf(video, fade_in, fade_out)
+    vcodec = ["-vf", vf, *ENCODE_V] if vf else [*ENCODE_V]   # always encode once (T8)
     lead_ms = max(int(round(lead * 1000)), 0)
     _ffmpeg([
         "ffmpeg", "-y", "-i", str(video), "-i", str(narration),
@@ -510,10 +580,9 @@ def _mux_content(video: Path, narration: Path, out: Path, lead: float, abr: str,
     ])
 
 
-def _mux_silent(video: Path, out: Path, abr: str, *, fade: float = 0.0) -> None:
-    vf = _fade_vf(video, fade)
-    vcodec = (["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p"]
-              if vf else ["-c:v", "copy"])
+def _mux_silent(video: Path, out: Path, abr: str, *, fade_in: float = 0.0, fade_out: float = 0.0) -> None:
+    vf = _fade_vf(video, fade_in, fade_out)
+    vcodec = ["-vf", vf, *ENCODE_V] if vf else [*ENCODE_V]   # always encode once (T8)
     _ffmpeg([
         "ffmpeg", "-y", "-i", str(video),
         "-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=48000",
@@ -524,7 +593,7 @@ def _mux_silent(video: Path, out: Path, abr: str, *, fade: float = 0.0) -> None:
 
 
 def _mux_cue(video: Path, cue: Path, out: Path, abr: str, *,
-             gain: float, fade_out: float, fade: float = 0.0) -> None:
+             gain: float, cue_fade_out: float, fade_in: float = 0.0, fade_out: float = 0.0) -> None:
     """Lay a house cue (intro/outro bed or divider stinger) under a brand scene
     that carries no narration. The cue is gained, faded out so it lands cleanly at
     the scene's end (beds run longer than the intro scene, so they must fade rather
@@ -532,12 +601,11 @@ def _mux_cue(video: Path, cue: Path, out: Path, abr: str, *,
     the same full-length-audio discipline as _mux_silent/_mux_content, so the
     concat demuxer keeps every segment in A/V sync. Cues are 48 kHz stereo (the
     output format), so no resample is needed."""
-    vf = _fade_vf(video, fade)
-    vcodec = (["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p"]
-              if vf else ["-c:v", "copy"])
-    fade_out_start = max(_probe_duration(video) - fade_out, 0.0)
+    vf = _fade_vf(video, fade_in, fade_out)
+    vcodec = ["-vf", vf, *ENCODE_V] if vf else [*ENCODE_V]   # always encode once (T8)
+    cue_fade_start = max(_probe_duration(video) - cue_fade_out, 0.0)
     afilter = (f"[1:a]volume={gain:.3f},"
-               f"afade=t=out:st={fade_out_start:.3f}:d={fade_out:.3f},apad[a]")
+               f"afade=t=out:st={cue_fade_start:.3f}:d={cue_fade_out:.3f},apad[a]")
     _ffmpeg([
         "ffmpeg", "-y", "-i", str(video), "-i", str(cue),
         "-filter_complex", afilter,
@@ -547,6 +615,38 @@ def _mux_cue(video: Path, cue: Path, out: Path, abr: str, *,
     ])
 
 
+# House integrated-loudness target (T10, adjudicated 2026-07-11): the final film's audio
+# is two-pass loudnorm'd to this LUFS (video stream-copied). TP ceiling + WARN tolerance.
+HOUSE_LUFS = -19.0
+LOUDNORM_TP = -1.5
+LOUDNORM_TOL_I = 1.0   # WARN when the delivered integrated loudness misses target by > this
+
+
+def _loudnorm_final(src: Path, out: Path, abr: str, target_i: float,
+                    target_tp: float = LOUDNORM_TP) -> dict:
+    """Two-pass loudnorm the AUDIO of `src` to target_i LUFS -> `out` (video stream-COPIED,
+    preserving the single T8 video encode; linear gain keeps A/V sync). Returns the output's
+    measured {I, TP} via ebur128, or {'error':...} with `out` left unwritten (caller falls
+    back to the un-normalized concat)."""
+    from pipeline.loudness_ab import _parse_loudnorm_json
+    from pipeline.listening_pack import measure_loudness
+    p1 = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-i", str(src), "-vn",
+         "-af", f"loudnorm=I={target_i}:TP={target_tp}:print_format=json", "-f", "null", "-"],
+        capture_output=True, text=True)
+    meas = _parse_loudnorm_json(p1.stderr or "")
+    if not all(k in meas for k in ("input_i", "input_tp", "input_lra", "input_thresh", "target_offset")):
+        return {"error": "loudnorm pass-1 measurement failed"}
+    af = (f"loudnorm=I={target_i}:TP={target_tp}:linear=true:"
+          f"measured_I={meas['input_i']}:measured_TP={meas['input_tp']}:"
+          f"measured_LRA={meas['input_lra']}:measured_thresh={meas['input_thresh']}:"
+          f"offset={meas['target_offset']}")
+    _ffmpeg(["ffmpeg", "-y", "-i", str(src), "-map", "0:v:0", "-map", "0:a:0",
+             "-c:v", "copy", "-af", af, "-c:a", "aac", "-b:a", abr,
+             "-ar", "48000", "-ac", "2", str(out)])
+    return measure_loudness(out)
+
+
 def _concat(segments: list[Path], out: Path, abr: str) -> None:
     list_file = out.parent / "_concat_av_list.txt"
     list_file.write_text(
@@ -554,51 +654,128 @@ def _concat(segments: list[Path], out: Path, abr: str) -> None:
         encoding="utf-8",
     )
     try:
+        # Every segment is already encoded identically (ENCODE_V) + AAC, so concat
+        # stream-copies -- no extra video generation -- and +faststart moves the moov
+        # atom to the front for progressive playback (T8/F13).
         _ffmpeg([
             "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(list_file),
-            "-c:v", "libx264", "-preset", "medium", "-pix_fmt", "yuv420p",
-            "-c:a", "aac", "-b:a", abr, str(out),
+            "-c", "copy", "-movflags", "+faststart", str(out),
         ])
     finally:
         list_file.unlink(missing_ok=True)
 
 
 def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None],
-            out_dir: Path, *, lead: float, abr: str, output: Path,
-            fade: float = 0.0) -> Path | None:
+            out_dir: Path, *, lead: float, abr: str, output: Path, transition: float = 0.0,
+            intra_act: float | None = None, meta: dict, quality: str,
+            storyboard_path: Path, manifest_path: Path,
+            apply_loudnorm: bool = False, loudness_target: float = HOUSE_LUFS) -> Path | None:
+    # NB4: --lead only shifts the muxed audio; render() does NOT take lead (LessonScene
+    # always waits SCENE_LEAD_SECONDS), so a non-default lead desyncs A/V and subtitles.
+    # We don't touch render here -- just warn loudly. Acceptance never ships a non-default lead.
+    if abs(lead - SCENE_LEAD_SECONDS) > 1e-6:
+        print(f"[compose] WARN: --lead {lead} != render lead {SCENE_LEAD_SECONDS}s; audio and "
+              f"subtitles will desync from on-screen reveals (render does not take lead)", flush=True)
+
+    # T9: per-boundary fade. intra_act defaults to `transition` (behaviour unchanged);
+    # an A/B pass can set --intra-act-transition 0 to tighten only content-content cuts.
+    intra = intra_act if intra_act is not None else transition
+    seg_fades = _segment_fades([s.get("kind", "content") for s in scenes], transition, intra)
+
     narration_by_scene: dict[str, Path] = {}
+    mode_by_scene: dict[str, str | None] = {}
     for s in manifest["scenes"]:
+        mode_by_scene[s["scene_id"]] = s.get("narration_mode")
         if s.get("narration_mode") in ("beats", "scene_aligned") and s.get("audio_file"):
             narration_by_scene[s["scene_id"]] = Path(s["audio_file"])
 
     av_dir = out_dir / "_av" / _safe_stem(output.stem)
     av_dir.mkdir(parents=True, exist_ok=True)
     segments: list[Path] = []
-    for scene in scenes:
+    timeline_scenes: list[dict] = []
+    offset = 0.0
+    for i, scene in enumerate(scenes):
         sid = scene["id"]
         video = rendered.get(sid)
         if video is None:
             print(f"[compose] missing rendered scene '{sid}'", flush=True)
             return None
         av = av_dir / f"{sid}.mp4"
+        fin, fout = seg_fades[i]
         narration = narration_by_scene.get(sid)
         cue = house_audio.cue_for_scene(scene)
         if narration and narration.exists():
             print(f"[compose] {sid}: narration under video", flush=True)
-            _mux_content(video, narration, av, lead, abr, fade=fade)
+            _mux_content(video, narration, av, lead, abr, fade_in=fin, fade_out=fout)
         elif cue is not None and cue.path.exists():
             print(f"[compose] {sid}: house cue {cue.path.name}", flush=True)
-            _mux_cue(video, cue.path, av, abr, gain=cue.gain, fade_out=cue.fade_out, fade=fade)
+            _mux_cue(video, cue.path, av, abr, gain=cue.gain, cue_fade_out=cue.fade_out,
+                     fade_in=fin, fade_out=fout)
         else:
             if cue is not None:
                 print(f"[compose] {sid}: house cue file missing ({cue.path}); silent", flush=True)
             print(f"[compose] {sid}: silent track", flush=True)
-            _mux_silent(video, av, abr, fade=fade)
+            _mux_silent(video, av, abr, fade_in=fin, fade_out=fout)
         segments.append(av)
+        seg_dur = _probe_duration(av)
+        timeline_scenes.append(captions.build_timeline_scene(
+            scene, meta, start=offset, end=offset + seg_dur,
+            narration_mode=mode_by_scene.get(sid)))
+        offset += seg_dur
 
     print(f"[compose] concat {len(segments)} scenes -> {output}", flush=True)
-    _concat(segments, output, abr)
+    if apply_loudnorm:
+        # T10: two-pass loudnorm the whole film to the house target (real-audio path only;
+        # mock silence is never normalized). video stays copy (single T8 encode); on failure
+        # fall back to the un-normalized concat rather than ship nothing.
+        concat_tmp = av_dir / "_concat_preloudnorm.mp4"
+        _concat(segments, concat_tmp, abr)
+        loud = _loudnorm_final(concat_tmp, output, abr, loudness_target)
+        concat_tmp.unlink(missing_ok=True)
+        if "error" in loud:
+            print(f"[loudness] WARN loudnorm failed ({loud['error']}); shipping un-normalized concat", flush=True)
+            _concat(segments, output, abr)
+        else:
+            i, tp = loud.get("I"), loud.get("TP")
+            print(f"[loudness] integrated I={i} LUFS  TP={tp} dBTP  (target {loudness_target} LUFS)", flush=True)
+            if i is not None and abs(i - loudness_target) > LOUDNORM_TOL_I:
+                print(f"[loudness] WARN: integrated {i} LUFS is outside +/-{LOUDNORM_TOL_I} LU of "
+                      f"target {loudness_target}", flush=True)
+            if tp is not None and tp > LOUDNORM_TP + 0.1:
+                print(f"[loudness] WARN: true peak {tp} dBTP exceeds {LOUDNORM_TP} ceiling", flush=True)
+    else:
+        _concat(segments, output, abr)
+
+    # sidecars (only after concat succeeds; atomic, so a failure leaves no half file).
+    # names bound to the OUTPUT STEM (B6) so a --scene subset / A-B run never clobbers
+    # another run's sidecars. lead_seconds is recorded so captions time off it, not the
+    # render's hard-coded lead (B6).
+    stem = output.with_suffix("")
+    timeline = {
+        "deck_id": meta.get("id"), "output": output.name, "quality": quality,
+        "lead_seconds": lead, "scenes": timeline_scenes,
+        "provenance": {
+            "storyboard_sha256": _safe_storyboard_sha(storyboard_path),
+            "manifest_path": str(manifest_path),
+            "git_commit": _git_commit(),
+        },
+    }
+    _write_text_atomic(Path(f"{stem}.timeline.json"),
+                       json.dumps(timeline, indent=2, ensure_ascii=False) + "\n")
+    _write_text_atomic(Path(f"{stem}.vtt"), captions.to_vtt(manifest, timeline))
+    chapters = captions.to_chapters(timeline)
+    if chapters.strip():
+        _write_text_atomic(Path(f"{stem}.chapters.txt"), chapters)
+    print(f"[compose] sidecars -> {stem.name}.timeline.json / .vtt"
+          f"{' / .chapters.txt' if chapters.strip() else ''}", flush=True)
     return output
+
+
+def _safe_storyboard_sha(path: Path) -> str:
+    try:
+        return text_sha256(Path(path))
+    except Exception:  # noqa: BLE001 - provenance nicety, never fatal
+        return "unknown"
 
 
 # ---- orchestrate --------------------------------------------------------
@@ -608,16 +785,31 @@ def main() -> int:
     parser.add_argument("--storyboard", required=True, type=Path)
     parser.add_argument("--backend", default="mock", choices=("mock",),
                         help="only mock (silent) is wired here; real audio = tts.py mimo + --reuse-audio")
+    parser.add_argument("--force-clobber", action="store_true",
+                        help="allow mock synth to overwrite a corrupt/real audio manifest or orphan "
+                             "WAVs (default: fail-closed so mock silence never clobbers real Dean audio)")
     parser.add_argument("--scene", default="all", help="id, 'a,b,c', or 'all'")
     parser.add_argument("--quality", default="high", choices=("low", "medium", "high", "4k"),
                         help="low/medium = fast scratch (480p/720p); high = 1080p testing "
                              "standard (default); 4k = final delivery")
     parser.add_argument("--lead", type=float, default=LEAD_SECONDS)
     parser.add_argument("--audio-bitrate", default="192k")
+    parser.add_argument("--loudness-target", type=float, default=HOUSE_LUFS,
+                        help=f"integrated-loudness target (LUFS) for the final two-pass loudnorm on "
+                             f"the real-audio (--reuse-audio) path (default: house {HOUSE_LUFS})")
+    parser.add_argument("--skip-loudnorm", action="store_true",
+                        help="skip the final loudness normalization even on the real-audio path")
     parser.add_argument("--transition", type=float, default=0.2,
                         help="per-side fade-through-black at every scene boundary, "
                              "in seconds (0 = hard cuts). The black dip between two "
                              "scenes is ~2x this; the film also opens/closes on black.")
+    parser.add_argument("--intra-act-transition", type=float, default=None,
+                        help="per-side fade at CONTENT-CONTENT boundaries only (default: "
+                             "same as --transition). Set 0 to hard-cut within an act while "
+                             "brand-frame boundaries keep --transition (T9 A/B knob).")
+    parser.add_argument("--output", type=Path, default=None,
+                        help="explicit output mp4 path (default: derived from meta.id / --scene; "
+                             "give distinct names for A/B builds so they don't overwrite).")
     parser.add_argument("--empty-beat-seconds", type=float, default=0.45)
     parser.add_argument("--reuse-audio", action="store_true",
                         help="skip synth; reuse the audio manifest already produced by "
@@ -631,6 +823,12 @@ def main() -> int:
     args = parser.parse_args()
 
     data = load_storyboard(args.storyboard)
+
+    # refuse a stale *_mimo.yml before any schema/render work (F2 drift guard);
+    # returns None for non-generated/malformed decks, so schema still owns those.
+    stale = check_derived_freshness(args.storyboard.resolve(), data)
+    if stale:
+        raise SystemExit(f"[freshness] {stale}")
 
     # validate structure first -- a malformed storyboard (missing meta/scenes, bad
     # scene kind, duplicate id, unclosed {show}) is caught before lint/render.
@@ -738,18 +936,12 @@ def main() -> int:
         _check_manifest_schema(manifest)
         _validate_reuse_manifest(meta, scenes, manifest)
     else:
-        # guard: don't silently overwrite real (billed) audio with mock silence.
-        if manifest_path.exists():
-            try:
-                prev_backend = json.loads(manifest_path.read_text(encoding="utf-8")).get("backend")
-            except (ValueError, OSError):
-                prev_backend = None
-            if prev_backend and prev_backend != "mock":
-                raise SystemExit(
-                    f"refusing to overwrite a real audio manifest (backend={prev_backend}) "
-                    f"at {manifest_path} with mock. Pass --reuse-audio to render with that "
-                    "audio, or delete the manifest first if you really want mock."
-                )
+        # Fail-closed (mirrors tts.py T2a): mock silence must never clobber real Dean WAVs.
+        existing, status = read_manifest_status(manifest_path)
+        abort = _mock_synth_guard(status=status, existing=existing, audio_dir=audio_dir,
+                                  force_clobber=args.force_clobber)
+        if abort:
+            raise SystemExit(f"[synth] {abort}")
         manifest = synth(meta, scenes, scene_numbers, audio_dir, args.backend,
                          empty_seconds=args.empty_beat_seconds)
         manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -768,7 +960,10 @@ def main() -> int:
 
     # compose
     sec_dir.mkdir(parents=True, exist_ok=True)
-    if args.scene == "all":
+    if args.output:
+        output = args.output
+        output.parent.mkdir(parents=True, exist_ok=True)
+    elif args.scene == "all":
         output = sec_dir / f"{meta['id']}.mp4"
     else:
         output = sec_dir / f"{meta['id']}__{_safe_stem(args.scene)}.mp4"
@@ -778,7 +973,11 @@ def main() -> int:
         )
     result = compose(scenes, manifest, rendered, out_dir,
                      lead=args.lead, abr=args.audio_bitrate, output=output,
-                     fade=args.transition)
+                     transition=args.transition, intra_act=args.intra_act_transition,
+                     meta=meta, quality=args.quality,
+                     storyboard_path=args.storyboard, manifest_path=manifest_path,
+                     apply_loudnorm=args.reuse_audio and not args.skip_loudnorm,
+                     loudness_target=args.loudness_target)
     if result is None:
         return 1
     print(f"[done] {result}", flush=True)

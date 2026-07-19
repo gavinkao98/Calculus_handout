@@ -30,6 +30,12 @@ meta:
     title: The Chain Rule
   - id: '3.3'
     title: Applications of the Chain Rule
+  derived_from:
+    inputs:
+    - path: ch03_trig_derivatives.yml
+      sha256: 52e8421cd1a288aa0c090b427e85bad5af51a7d0194fa948e1542db347d50d29
+    - path: ../content_scripts/ch03_trig_derivatives.spoken.yml
+      sha256: 60f63ffdd126f08a607036eda9294c90012253a049d8740809daa3169ab24225
 scenes:
 - id: intro
   kind: intro
@@ -333,7 +339,7 @@ scenes:
     straight out of it, which is what we do next.
 
     '
-  statement: $\sin x,\ \cos x$ are continuous at every $x_0$.
+  statement: At every point $x_0$, both $\sin x$ and $\cos x$ are continuous.
   proof:
   - $0\le|\sin\theta|\le|\theta|$ (chord $\le$ arc)
   - $|\theta|\to 0$, squeeze $\Rightarrow\ \sin\theta\to 0$
@@ -468,8 +474,8 @@ scenes:
     '
   axes:
     x_range:
-    - -1.5
-    - 1.5
+    - -1.85
+    - 1.85
     - 0.5
     y_range:
     - 0
@@ -478,41 +484,46 @@ scenes:
     y_ticks:
     - at: 1
       label: $1$
+    x_ticks:
+    - at: 1.5708
+      label: $\tfrac{\pi}{2}$
+    - at: -1.5708
+      label: $-\tfrac{\pi}{2}$
     x_length: 6.4
     y_length: 3.6
   plots:
   - kind: function
     expression: cos(x)
     x_range:
-    - -1.5
-    - 1.5
+    - -1.5708
+    - 1.5708
     color_role: muted
     dashed: true
     label: $\cos\theta$
     reveal: true
   - kind: line
     start:
-    - -1.5
+    - -1.72
     - 1
     end:
-    - 1.5
+    - 1.72
     - 1
     color_role: secondary
     label: $1$
     label_point:
-    - 1.25
+    - 1.15
     - 1.08
     reveal: true
   - kind: function
     expression: sin(x)/x
     x_range:
-    - -1.5
-    - 1.5
+    - -1.72
+    - 1.72
     color_role: accent
-    label: $\dfrac{\sin\theta}{\theta}$
+    label: $\tfrac{\sin\theta}{\theta}$
     label_point:
-    - 0.95
-    - 0.86
+    - -0.72
+    - 1.06
     reveal: true
   - kind: point
     point:
@@ -528,6 +539,7 @@ scenes:
   kind: content
   template: callout
   type: caution
+  sparse_ok: true
   ref: md:limit_not_identity
   source: chapter3-print-standalone.html SS3.1 . Caution (limit not identity)
   title: A Limit, Not an Identity
@@ -542,11 +554,12 @@ scenes:
     theta equals pi it is zero. The value one is reached only in the limit.
 
     '
-  body: 'The limit as $\theta\to 0$ is not an identity. At a fixed angle, $\dfrac{\sin\theta}{\theta}$ is generally not $1$: at $\theta=\tfrac{\pi}{2}$ it is $\dfrac{2}{\pi}\approx 0.64$, and at $\theta=\pi$ it is $0$.'
+  body: 'The limit as $\theta\to 0$ is not an identity. At a fixed angle, $\sin\theta/\theta$ is generally not $1$: at $\theta=\tfrac{\pi}{2}$ it is $2/\pi\approx 0.64$, and at $\theta=\pi$ it is $0$.'
 - id: radians_essential
   kind: content
   template: callout
   type: caution
+  sparse_ok: true
   ref: md:radians_essential
   source: chapter3-print-standalone.html SS3.1 . Caution (radian convention)
   title: Why Radians
@@ -563,7 +576,7 @@ scenes:
     cosine prime equals negative sine hold only in radians.
 
     '
-  body: Everything here needs radians. In degrees, $\displaystyle\lim_{x\to 0}\frac{\sin(x^{\circ})}{x}=\frac{\pi}{180}$, so $\dfrac{d}{dx}\sin(x^{\circ})=\dfrac{\pi}{180}\cos(x^{\circ})$ --- the clean $\sin'=\cos$ holds only in radians.
+  body: Everything here needs radians. In degrees, $\sin(x^{\circ})/x \to \pi/180$, so $\tfrac{d}{dx}\sin(x^{\circ})=\tfrac{\pi}{180}\cos(x^{\circ})$ --- the clean $\sin'=\cos$ holds only in radians.
 - id: divider_derivatives
   kind: divider
   accent: definition
@@ -736,6 +749,7 @@ scenes:
   kind: content
   template: definition_math
   accent: remark
+  hook: animations.ch03_trig_derivatives_hooks:derivative_cycle
   scene_role: remark
   ref: md:derivative_cycle
   scaffold:
@@ -793,7 +807,7 @@ scenes:
     motive: 'Bank a companion limit: $(1-\cos\theta)/\theta\to 0$.'
   source: chapter3-print-standalone.html SS3.1 . Example 3.1 (companion limit)
   title: A Companion Limit
-  prompt: Establish the companion limit $\lim_{\theta\to 0}\dfrac{1-\cos\theta}{\theta}=0$.
+  prompt: Establish the companion limit $(1-\cos\theta)/\theta \to 0$ as $\theta \to 0$.
   say: 'The fundamental limit has a companion worth knowing: the quantity one minus
 
     cosine theta, over theta tends to zero. It is again zero over zero, so we
@@ -1008,6 +1022,7 @@ scenes:
   kind: content
   template: definition_math
   accent: definition
+  hook: animations.ch03_trig_derivatives_hooks:toward_the_chain_rule
   scene_role: forward-ref
   ref: md:toward_the_chain_rule
   scaffold:
@@ -1071,7 +1086,7 @@ scenes:
 
     '
   points:
-  - 'Fundamental limit: $\displaystyle\lim_{\theta\to 0}\frac{\sin\theta}{\theta}=1$, proved by squeezing areas on the unit circle.'
+  - 'Fundamental limit: $\sin\theta/\theta \to 1$ as $\theta\to 0$, proved by squeezing areas on the unit circle.'
   - 'Two core derivatives: $\sin''=\cos$ and $\cos''=-\sin$.'
   - 'The quotient rule delivers all six trig derivatives: $\tan,\cot,\sec,\csc$.'
   - Derivatives of $\sin$ and $\cos$ cycle with period four; the entire framework requires radians.
