@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§3.1 重看標記表 — 品質補強輪 Step ①</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+:root{
+  --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --ink:#e6edf3; --muted:#8b98a8;
+  --line:#2b3444; --accent:#4c8dff; --ok:#2ea043; --flag:#d98a1f; --redo:#e5534b;
+  --chipvis:#3b5bdb; --chipped:#9c5cff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:15px;line-height:1.55}
+a{color:var(--accent)}
+.wrap{display:grid;grid-template-columns:minmax(360px,42%) 1fr;gap:0;height:100vh}
+@media(max-width:900px){.wrap{grid-template-columns:1fr;height:auto}}
+.left{position:sticky;top:0;height:100vh;overflow:auto;padding:16px;border-right:1px solid var(--line);background:var(--panel)}
+@media(max-width:900px){.left{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}}
+.right{overflow:auto;padding:16px 18px}
+h1{font-size:18px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:12px}
+video{width:100%;border-radius:8px;background:#000;border:1px solid var(--line)}
+.vidbar{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.pill{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--ink);font-size:12px}
+.now{font-weight:600;color:var(--accent)}
+.filebtn{font-size:12px}
+.legend{margin-top:12px;padding:10px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;font-size:12.5px;color:var(--muted)}
+.legend b{color:var(--ink)}
+.legend .k{display:inline-block;margin:2px 6px 2px 0}
+.progress{margin-top:10px;font-size:12.5px;color:var(--muted)}
+.bar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-top:4px}
+.bar > i{display:block;height:100%;background:var(--accent);width:0}
+.toolbar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+button.act{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:8px 12px;font-size:13px;cursor:pointer;font-weight:600}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:8px 12px;font-size:13px;cursor:pointer}
+button.ghost:hover{border-color:var(--accent)}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px;scroll-margin-top:12px}
+.card.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.card.ok{border-left:3px solid var(--ok)}
+.card.flag{border-left:3px solid var(--flag)}
+.card.divider{background:var(--panel2)}
+.chead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.tsbtn{font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent);cursor:pointer;background:none;border:none;font-size:15px;padding:0}
+.tsbtn:hover{text-decoration:underline}
+.cn{color:var(--muted);font-size:12px}
+.ctitle{font-weight:600}
+.tag{font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.tag.hook{color:#c9a6ff;border-color:#5a3ea0}
+.tag.fa{color:var(--redo);border-color:#7a2b28}
+.gist{color:var(--muted);font-size:13px;margin:7px 0 9px}
+.shows{font-size:11.5px;color:var(--muted);margin-bottom:9px}
+.shows code{background:var(--panel2);border-radius:3px;padding:0 4px;color:#a9c7ff}
+.mark{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:start}
+.face{font-size:12px;color:var(--muted);padding-top:4px;white-space:nowrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12px;border-radius:6px;padding:3px 9px;cursor:pointer;user-select:none;border:1px solid var(--line);background:var(--panel2);color:var(--muted)}
+.chip.v.on{background:var(--chipvis);color:#fff;border-color:var(--chipvis)}
+.chip.p.on{background:var(--chipped);color:#fff;border-color:var(--chipped)}
+.note{width:100%;margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;
+  color:var(--ink);padding:7px 9px;font-family:inherit;font-size:13px;resize:vertical;min-height:38px}
+.note::placeholder{color:#5c6achroma}
+.okbtn{font-size:11.5px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:3px 9px;cursor:pointer;margin-top:8px}
+.okbtn.on{background:var(--ok);color:#fff;border-color:var(--ok)}
+.row2{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:10px;max-width:760px;width:92%}
+dialog textarea{width:100%;height:340px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:7px;font-family:ui-monospace,Consolas,monospace;font-size:12px;padding:8px}
+.hint{color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="left">
+    <h1>§3.1 重看標記表</h1>
+    <div class="sub">品質補強輪 · Step ① 看片標記 · <code>ch03_trig_derivatives</code> · 27 場 · ~16:13</div>
+    <video id="vid" controls preload="metadata" src="../../output/ch03/s3.1/ch03_trig_derivatives_mimo.mp4"></video>
+    <div class="vidbar">
+      <span class="pill">目前 <span id="nowts" class="now">0:00</span></span>
+      <span class="pill" id="nowscene">—</span>
+      <label class="filebtn ghost" style="cursor:pointer;padding:4px 8px;border:1px solid var(--line);border-radius:6px">
+        影片沒出現？選檔<input id="filepick" type="file" accept="video/mp4" style="display:none">
+      </label>
+    </div>
+    <div class="progress">標記進度 <span id="pct">0</span>%（<span id="done">0</span>/27 場已標）
+      <div class="bar"><i id="barfill"></i></div>
+    </div>
+    <div class="toolbar">
+      <button class="act" id="export">匯出標記 →</button>
+      <button class="ghost" id="jumpnext">跳到下一個未標</button>
+      <button class="ghost" id="clearall">清空</button>
+    </div>
+    <div class="legend">
+      <b>怎麼標</b>（源自 grilling 定案的維度）：<br>
+      <span class="k"><b style="color:#8bb0ff">視覺</b> 藍籤</span>
+      <span class="k">動畫死板</span><span class="k">設計單調</span><span class="k">真缺陷(撞/出框/字小)</span><span class="k">缺圖</span><br>
+      <span class="k"><b style="color:#c9a6ff">教學</b> 紫籤</span>
+      <span class="k">缺鋪墊/動機</span><span class="k">粒度太快</span><span class="k">骨架/順序</span><span class="k">節奏/太長</span><br>
+      · 點 <b>時間戳</b> 影片跳到該場；播放時自動高亮當前場。<br>
+      · 覺得某場沒問題 → 按 <b>看過·OK</b>（區分「已看OK」與「還沒標」）。<br>
+      · <b>不滿／期望</b> 欄最重要：寫「哪裡不對」＋「你想變成怎樣」——這欄餵 Step ② 定水位。<br>
+      · <span style="color:var(--redo)">音訊降級</span> 標記＝該場旁白已知降級、<b>聽感不列本輪</b>，只標視覺／教學。
+    </div>
+    <div class="legend" style="margin-top:8px">
+      自動存於瀏覽器（localStorage），關掉再開不會掉。標完按「匯出標記」把結果貼回對話給我。
+    </div>
+  </div>
+  <div class="right" id="list"></div>
+</div>
+
+<dialog id="dlg">
+  <h3 style="margin-top:6px">匯出標記</h3>
+  <div class="hint">全選複製下面內容、貼回對話給我即可（含人類可讀摘要＋機器 JSON）。</div>
+  <textarea id="out" readonly></textarea>
+  <div class="row2" style="margin-top:8px">
+    <button class="act" id="copy">複製</button>
+    <button class="ghost" id="download">下載 .json</button>
+    <button class="ghost" id="close">關閉</button>
+  </div>
+</dialog>
+
+<script>
+const SCENES = [{"n": 1, "id": "intro", "kind": "intro", "title": "Intro", "ts": "0:00", "sec": 0.0, "tags": ["開場"], "gist": "開場字卡：How fast does sine change?", "shows": [], "nshow": 0, "fa": false}, {"n": 2, "id": "divider_limit", "kind": "divider", "title": "The Limit Behind the Slope", "ts": "0:06", "sec": 6.1, "tags": ["段落卡·Stage 1"], "gist": "段落卡 Stage 1 — The Limit Behind the Slope（拋出 $\\lim_{\\theta\\to0}\\sin\\theta/\\theta=?$）", "shows": [], "nshow": 0, "fa": false}, {"n": 3, "id": "why_trig_is_different", "kind": "content", "title": "A Limit No Algebra Can Crack", "ts": "0:10", "sec": 10.1, "tags": ["定義/敘述", "動機場"], "gist": "動機場：代數對多項式／$e^x$ 都有效，但三角函數差商卡在 $0/0$，整節收斂到 $\\sin\\theta/\\theta$ 這一個極限。", "shows": ["math.0", "math.1", "statement"], "nshow": 3, "fa": false}, {"n": 4, "id": "difference_quotient_for_sine", "kind": "content", "title": "The Difference Quotient for Sine", "ts": "1:18", "sec": 77.9, "tags": ["推導"], "gist": "推導：和差化積把 $\\sin(x+h)-\\sin x$ 變乘積，除以 $h$ 後拆成 $\\cos(x+\\tfrac h2)\\cdot\\frac{\\sin(h/2)}{h/2}$；導數只剩「連續性＋基本極限」兩件事。", "shows": ["step.0", "step.1", "step.2", "result"], "nshow": 4, "fa": false}, {"n": 5, "id": "divider_squeeze", "kind": "divider", "title": "A Geometric Squeeze", "ts": "2:34", "sec": 153.5, "tags": ["段落卡·Stage 2"], "gist": "段落卡 Stage 2 — A Geometric Squeeze（$\\tfrac12\\sin\\theta\\le\\tfrac12\\theta\\le\\tfrac12\\tan\\theta$）", "shows": [], "nshow": 0, "fa": false}, {"n": 6, "id": "sector_inequality", "kind": "content", "title": "A Squeeze on the Unit Circle", "ts": "2:38", "sec": 157.6, "tags": ["圖", "手工動畫"], "gist": "圖〔手工 hook〕：單位圓三塊面積 $\\tfrac12\\sin\\theta\\le\\tfrac12\\theta\\le\\tfrac12\\tan\\theta$，內三角形／扇形／外三角形逐一揭示。", "shows": ["tri_inner", "sector", "tri_outer", "ineq"], "nshow": 4, "fa": false}, {"n": 7, "id": "squeeze_to_the_bound", "kind": "content", "title": "Trapping the Ratio", "ts": "3:49", "sec": 228.9, "tags": ["推導"], "gist": "推導：把面積鏈變成夾擠界——乘 2、除 $\\sin\\theta$、取倒數翻轉，得 $\\cos\\theta\\le\\sin\\theta/\\theta\\le1$。", "shows": ["step.0", "step.1", "result", "check"], "nshow": 4, "fa": false}, {"n": 8, "id": "continuity_statement_sin_limit", "kind": "content", "title": "Sine and Cosine Are Continuous", "ts": "4:46", "sec": 286.5, "tags": ["定理/證明"], "gist": "定理／證明（命題 1/2）：用 $|\\sin\\theta|\\le|\\theta|$ 界＋夾擠證 $\\sin\\theta\\to0$。", "shows": ["statement", "proof.0", "proof.1", "qed"], "nshow": 4, "fa": false}, {"n": 9, "id": "continuity_argument", "kind": "content", "title": "Sine and Cosine Are Continuous", "ts": "5:43", "sec": 343.2, "tags": ["定理/證明"], "gist": "定理／證明（命題 2/2）：和差化積把 $\\sin\\theta\\to0$ 推成 $\\sin/\\cos$ 處處連續。", "shows": ["statement", "proof.0", "proof.1", "proof.2", "qed"], "nshow": 5, "fa": true}, {"n": 10, "id": "fundamental_limit", "kind": "content", "title": "The Fundamental Limit", "ts": "6:54", "sec": 414.2, "tags": ["定理/證明"], "gist": "定理／證明（命題）：收掉 $\\sin\\theta/\\theta\\to1$，夾擠＋偶函數補左極限——全節基石。", "shows": ["statement", "proof.0", "proof.1", "qed"], "nshow": 4, "fa": false}, {"n": 11, "id": "squeeze_graph", "kind": "content", "title": "The Squeeze, Drawn", "ts": "7:37", "sec": 457.3, "tags": ["圖"], "gist": "圖：$\\cos\\theta$（虛線地板）、常數 $1$（天花板）、$\\sin\\theta/\\theta$ 夾在中間，$\\theta=0$ 處空心點。", "shows": ["plot.0", "plot.1", "plot.2", "plot.3", "annotation.0"], "nshow": 5, "fa": false}, {"n": 12, "id": "limit_not_identity", "kind": "content", "title": "A Limit, Not an Identity", "ts": "8:15", "sec": 494.5, "tags": ["注意"], "gist": "注意：這是極限不是恆等式——$\\theta=\\pi/2$ 時值是 $2/\\pi\\approx0.64$。", "shows": ["body"], "nshow": 1, "fa": false}, {"n": 13, "id": "radians_essential", "kind": "content", "title": "Why Radians", "ts": "8:39", "sec": 518.6, "tags": ["注意"], "gist": "注意：整套依賴弧度；換成度數極限變 $\\pi/180$。", "shows": ["body"], "nshow": 1, "fa": false}, {"n": 14, "id": "divider_derivatives", "kind": "divider", "title": "The Two Derivatives", "ts": "9:05", "sec": 545.0, "tags": ["段落卡·Stage 3"], "gist": "段落卡 Stage 3 — The Two Derivatives（$\\tfrac{d}{dx}\\sin x=?\\ \\tfrac{d}{dx}\\cos x=?$）", "shows": [], "nshow": 0, "fa": false}, {"n": 15, "id": "derivative_of_sine", "kind": "content", "title": "The Derivative of Sine", "ts": "9:09", "sec": 549.0, "tags": ["定理/證明"], "gist": "定理／證明（定理）：兌現連續性＋基本極限，$\\sin'=\\cos$。", "shows": ["statement", "proof.0", "proof.1", "proof.2", "qed"], "nshow": 5, "fa": false}, {"n": 16, "id": "derivative_of_cosine", "kind": "content", "title": "The Derivative of Cosine", "ts": "9:49", "sec": 588.8, "tags": ["定理/證明"], "gist": "定理／證明（定理）：同機制、伴隨恆等式，$\\cos'=-\\sin$。", "shows": ["statement", "proof.0", "proof.1", "proof.2", "qed"], "nshow": 5, "fa": true}, {"n": 17, "id": "slope_equals_height", "kind": "content", "title": "Slope Equals Height", "ts": "10:30", "sec": 629.6, "tags": ["圖", "手工動畫"], "gist": "圖〔手工 hook〕：$y=\\sin x$ 在 $0,\\tfrac\\pi2,\\pi$ 的切線斜率 $1,0,-1$，疊上 $\\cos x$ 高度——「斜率＝高度」。", "shows": ["plot.0", "tan_0", "tan_halfpi", "tan_pi", "plot.1", "cos_dots"], "nshow": 6, "fa": false}, {"n": 18, "id": "derivative_cycle", "kind": "content", "title": "The Derivative Cycle", "ts": "11:05", "sec": 665.4, "tags": ["定義/敘述", "手工動畫"], "gist": "定義／敘述（remark〔手工 hook〕）：$\\sin\\to\\cos\\to-\\sin\\to-\\cos\\to\\sin$ 四循環，對比 $e^x$ 一步自我再生。", "shows": ["statement", "math.0", "math.1"], "nshow": 3, "fa": false}, {"n": 19, "id": "divider_apply", "kind": "divider", "title": "Consequences and Applications", "ts": "11:40", "sec": 700.5, "tags": ["段落卡·Stage 4"], "gist": "段落卡 Stage 4 — Consequences and Applications（$\\tfrac{d}{dx}\\tan x,\\sec x,\\cot x,\\csc x=?$）", "shows": [], "nshow": 0, "fa": false}, {"n": 20, "id": "companion_limit", "kind": "content", "title": "A Companion Limit", "ts": "11:45", "sec": 704.5, "tags": ["推導", "例題"], "gist": "推導（例題）：$(1-\\cos\\theta)/\\theta\\to0$——乘共軛、化 $\\sin^2$、拆兩因子取極限。", "shows": ["step.0", "step.1", "result"], "nshow": 3, "fa": false}, {"n": 21, "id": "all_six_tan_sec", "kind": "content", "title": "All Six Derivatives", "ts": "12:27", "sec": 746.7, "tags": ["推導", "例題"], "gist": "推導（例題 1/2）：商法則得 $\\tan'=\\sec^2$、$\\sec'=\\sec\\tan$。", "shows": ["step.0", "step.1", "step.2", "result"], "nshow": 4, "fa": false}, {"n": 22, "id": "all_six_cot_csc", "kind": "content", "title": "All Six Derivatives", "ts": "13:03", "sec": 782.6, "tags": ["推導", "例題"], "gist": "推導（例題 2/2）：同商法則得 $\\cot'=-\\csc^2$、$\\csc'=-\\csc\\cot$，六個導數到齊。", "shows": ["step.0", "step.1", "step.2", "result"], "nshow": 4, "fa": false}, {"n": 23, "id": "shm_compute", "kind": "content", "title": "A Weight on a Spring", "ts": "13:41", "sec": 821.3, "tags": ["推導", "例題"], "gist": "推導（例題）：$s(t)=\\sin t$ 的速度 $\\cos t$、加速度 $-\\sin t=-s(t)$——簡諧運動的簽名。", "shows": ["step.0", "step.1", "step.2", "result"], "nshow": 4, "fa": false}, {"n": 24, "id": "shm_stacked_graphs", "kind": "content", "title": "Height, Velocity, Acceleration", "ts": "14:17", "sec": 856.8, "tags": ["圖", "例題", "手工動畫"], "gist": "圖〔手工 hook〕：三圖疊在同一時間軸（高度／速度／加速度），底圖是頂圖上下翻轉。", "shows": ["g_s", "g_v", "g_a", "mirror"], "nshow": 4, "fa": true}, {"n": 25, "id": "toward_the_chain_rule", "kind": "content", "title": "Toward the Chain Rule", "ts": "14:54", "sec": 893.9, "tags": ["定義/敘述", "前引", "手工動畫"], "gist": "定義／敘述（前引〔手工 hook〕）：能導 $\\sin x$ 但還不能導 $\\sin(x^2)$、$\\sin(3x+1)$——引向 chain rule。", "shows": ["statement", "math.0"], "nshow": 2, "fa": false}, {"n": 26, "id": "recap", "kind": "content", "title": "Key Takeaways", "ts": "15:28", "sec": 928.2, "tags": ["回顧"], "gist": "回顧：四張卡總結（基本極限／兩個核心導數／商法則六個／四循環＋弧度前提）。", "shows": ["point.0", "point.1", "point.2", "point.3"], "nshow": 4, "fa": false}, {"n": 27, "id": "outro", "kind": "outro", "title": "Outro", "ts": "16:05", "sec": 965.2, "tags": ["結尾"], "gist": "結尾字卡：接 §3.2 The Chain Rule", "shows": [], "nshow": 0, "fa": false}];
+const VIS = [["a","動畫死板"],["d","設計單調"],["b","真缺陷"],["f","缺圖"]];
+const PED = [["m","缺鋪墊/動機"],["g","粒度太快"],["s","骨架/順序"],["t","節奏/太長"]];
+const LS = "mark_ch03_s31_v1";
+let state = JSON.parse(localStorage.getItem(LS) || "{}");
+function save(){ localStorage.setItem(LS, JSON.stringify(state)); render_progress(); }
+function st(id){ return state[id] || (state[id]={vis:[],ped:[],note:"",ok:false}); }
+
+const list = document.getElementById("list");
+SCENES.forEach(sc=>{
+  const s = st(sc.id);
+  const card = document.createElement("div");
+  card.className = "card " + (sc.kind==="divider"||sc.kind==="intro"||sc.kind==="outro" ? "divider":"");
+  card.id = "sc_"+sc.id;
+  card.dataset.id = sc.id; card.dataset.sec = sc.sec;
+  const tags = sc.tags.map(t=>`<span class="tag ${/hook|手工/.test(t)?'hook':''}">${t}</span>`).join(" ");
+  const fa = sc.fa ? `<span class="tag fa">音訊降級·不列本輪</span>` : "";
+  const shows = sc.nshow ? `<div class="shows">揭示 ${sc.nshow} 拍：${sc.shows.map(x=>`<code>${x}</code>`).join(" ")}</div>` : "";
+  let mark = "";
+  if(sc.kind==="content"){
+    const vchips = VIS.map(([k,lbl])=>`<span class="chip v" data-face="vis" data-k="${k}">${lbl}</span>`).join("");
+    const pchips = PED.map(([k,lbl])=>`<span class="chip p" data-face="ped" data-k="${k}">${lbl}</span>`).join("");
+    mark = `
+      <div class="mark">
+        <div class="face">視覺</div><div class="chips">${vchips}</div>
+        <div class="face">教學</div><div class="chips">${pchips}</div>
+      </div>
+      <textarea class="note" placeholder="不滿／期望：哪裡不對？你想變成怎樣？（例：sector 那場靜態太久，想要三塊面積逐步充填動畫）">${s.note||""}</textarea>
+      <div class="row2"><button class="okbtn">看過·OK（沒問題）</button></div>`;
+  } else {
+    mark = `<textarea class="note" placeholder="這場（${sc.kind}）想標什麼都可以，例如轉場/字卡/品牌感">${s.note||""}</textarea>
+      <div class="row2"><button class="okbtn">看過·OK（沒問題）</button></div>`;
+  }
+  card.innerHTML = `
+    <div class="chead">
+      <button class="tsbtn" data-sec="${sc.sec}">${sc.ts}</button>
+      <span class="cn">#${sc.n}</span>
+      <span class="ctitle">${sc.title}</span>
+      ${tags} ${fa}
+    </div>
+    <div class="gist">${sc.gist||""}</div>
+    ${shows}
+    ${mark}`;
+  list.appendChild(card);
+
+  // wire chips
+  card.querySelectorAll(".chip").forEach(ch=>{
+    const face = ch.dataset.face, k = ch.dataset.k;
+    if(s[face] && s[face].includes(k)) ch.classList.add("on");
+    ch.onclick = ()=>{
+      const arr = st(sc.id)[face];
+      const i = arr.indexOf(k);
+      if(i>=0){arr.splice(i,1); ch.classList.remove("on");}
+      else{arr.push(k); ch.classList.add("on"); st(sc.id).ok=false; syncOk(card,sc.id);}
+      save(); paint(card, sc.id);
+    };
+  });
+  // wire note
+  const note = card.querySelector(".note");
+  note.oninput = ()=>{ st(sc.id).note = note.value; save(); paint(card,sc.id); };
+  // wire OK
+  const okb = card.querySelector(".okbtn");
+  okb.onclick = ()=>{ const o=st(sc.id); o.ok=!o.ok; save(); syncOk(card,sc.id); paint(card,sc.id); };
+  syncOk(card, sc.id);
+  paint(card, sc.id);
+});
+
+function syncOk(card,id){ const o=st(id); const b=card.querySelector(".okbtn"); if(b){b.classList.toggle("on",!!o.ok); b.textContent = o.ok?"✓ 已標 OK":"看過·OK（沒問題）";} }
+function marked(id){ const o=state[id]; if(!o) return false; return o.ok || (o.vis&&o.vis.length) || (o.ped&&o.ped.length) || (o.note&&o.note.trim()); }
+function flagged(id){ const o=state[id]; if(!o) return false; return (o.vis&&o.vis.length)||(o.ped&&o.ped.length)||(o.note&&o.note.trim()); }
+function paint(card,id){ card.classList.toggle("flag", !!flagged(id)); card.classList.toggle("ok", !!(state[id]&&state[id].ok&&!flagged(id))); }
+
+function render_progress(){
+  const done = SCENES.filter(s=>marked(s.id)).length;
+  const pct = Math.round(done/SCENES.length*100);
+  document.getElementById("done").textContent = done;
+  document.getElementById("pct").textContent = pct;
+  document.getElementById("barfill").style.width = pct+"%";
+}
+render_progress();
+
+// video seek + current-scene highlight
+const vid = document.getElementById("vid");
+document.querySelectorAll(".tsbtn").forEach(b=> b.onclick=()=>{ vid.currentTime = parseFloat(b.dataset.sec); vid.play().catch(()=>{}); });
+function fmt(t){t=Math.floor(t);return Math.floor(t/60)+":"+String(t%60).padStart(2,"0");}
+let curId=null;
+vid.addEventListener("timeupdate", ()=>{
+  const t = vid.currentTime;
+  document.getElementById("nowts").textContent = fmt(t);
+  let cur=SCENES[0];
+  for(const s of SCENES){ if(s.sec<=t+0.05) cur=s; else break; }
+  if(cur.id!==curId){
+    curId=cur.id;
+    document.querySelectorAll(".card.cur").forEach(c=>c.classList.remove("cur"));
+    const el=document.getElementById("sc_"+cur.id); if(el) el.classList.add("cur");
+    document.getElementById("nowscene").textContent = "#"+cur.n+" "+cur.title;
+  }
+});
+document.getElementById("filepick").onchange = e=>{ const f=e.target.files[0]; if(f) vid.src=URL.createObjectURL(f); };
+
+// jump to next unmarked
+document.getElementById("jumpnext").onclick=()=>{
+  const nx = SCENES.find(s=>!marked(s.id));
+  if(nx){ const el=document.getElementById("sc_"+nx.id); el.scrollIntoView({behavior:"smooth",block:"center"}); el.querySelector(".note")?.focus(); }
+  else alert("全部 27 場都標過了 🎉");
+};
+document.getElementById("clearall").onclick=()=>{ if(confirm("清空所有標記？")){ state={}; localStorage.removeItem(LS); location.reload(); } };
+
+// export
+const VLB=Object.fromEntries(VIS), PLB=Object.fromEntries(PED);
+document.getElementById("export").onclick=()=>{
+  const rows=[];
+  const lines=["# §3.1 重看標記 — 品質補強輪 Step ①","", "影片：ch03_trig_derivatives_mimo.mp4（~16:13, 27 場）",""];
+  SCENES.forEach(s=>{
+    const o=state[s.id]; if(!o) return;
+    const vis=(o.vis||[]).map(k=>VLB[k]);
+    const ped=(o.ped||[]).map(k=>PLB[k]);
+    const note=(o.note||"").trim();
+    if(!o.ok && !vis.length && !ped.length && !note) return;
+    rows.push({n:s.n,ts:s.ts,id:s.id,title:s.title,ok:!!o.ok,vis,ped,note});
+    if(o.ok && !vis.length && !ped.length && !note){ lines.push(`## #${s.n} [${s.ts}] ${s.title} — ✓ OK`); return; }
+    lines.push(`## #${s.n} [${s.ts}] ${s.title}`);
+    if(vis.length) lines.push(`  視覺：${vis.join("、")}`);
+    if(ped.length) lines.push(`  教學：${ped.join("、")}`);
+    if(note) lines.push(`  不滿／期望：${note}`);
+  });
+  const flagged=rows.filter(r=>r.vis.length||r.ped.length||r.note).length;
+  const okc=rows.filter(r=>r.ok&&!r.vis.length&&!r.ped.length&&!r.note).length;
+  lines.splice(3,0,`已標 ${rows.length}/27（有意見 ${flagged}、標 OK ${okc}）`);
+  const payload = {deck:"ch03_trig_derivatives", round:"品質補強·Step①", total:27, marked:rows.length, rows};
+  const text = lines.join("\n") + "\n\n<!-- JSON -->\n```json\n" + JSON.stringify(payload,null,1) + "\n```\n";
+  document.getElementById("out").value = text;
+  document.getElementById("dlg").showModal();
+};
+document.getElementById("copy").onclick=()=>{ const t=document.getElementById("out"); t.select(); document.execCommand("copy"); };
+document.getElementById("download").onclick=()=>{
+  const blob=new Blob([document.getElementById("out").value],{type:"text/plain"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="ch03_s31_marking.txt"; a.click();
+};
+document.getElementById("close").onclick=()=>document.getElementById("dlg").close();
+</script>
+</body>
+</html>
