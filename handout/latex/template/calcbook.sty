@@ -239,11 +239,20 @@
 % ＝三個 mandatory（Codex gate-2 B1）：尾端 optional [name] 對機器 emitter 有歧義
 % ——body 首 token 是「[」會被吃成 name、name 含未分組「]」提早閉合。改 {kicker}{num}{name}
 % 皆必填（可空 {}），與 v1 convert.py 的輸出形一致。
+%
+% 尾端 \ignorespaces 必須在 #5（頭後鉤）之後：\cb@envhead 自帶的 \ignorespaces 在 #5 之前，
+% #5 非空時（envtheorem／envproposition 的 \itshape、envremark 的 \small、envproof 的
+% \cb@proofparstyle）會把 \cb@envhead 的 \ignorespaces 與 body 隔開，於是 body 行首空白
+% （\begin{env}{…} 後那個換行→空格）殘留成 ~4pt 行首縮排（實測；envremark 因 \small 為 ~3.6pt）。
+% 在 #5 後再補一個 \ignorespaces 收掉它——空鉤 env 早已由 \cb@envhead 的 \ignorespaces 收乾淨，
+% 此處對它們是無害重入（下一 token 非空白即 no-op），故 10 類一致、空鉤 env 輸出 byte-identical。
+% \cb@envhead 自帶的那個 \ignorespaces 不可移除：envexample／envsolution 直呼 \cb@envhead、
+% 不經本建構器，靠它收行首空白（勿因本處看似重複而清掉）。
 \newcommand{\cb@mkenv}[5]{%
   \NewDocumentEnvironment{#1}{m m m}{%
     \begin{#2}{#3}%
     \cb@envhead{#4}{#3}{##1}{##2}{##3}%
-    #5%
+    #5\ignorespaces%
   }{\end{#2}}}
 
 % ═══════════════════════════════════════════════════════════════════════════
@@ -259,13 +268,24 @@
   \par\cb@needspace{2\baselineskip}\vspace{3.2mm}%
   {\cb@headset\bfseries #1\par}\vspace{1mm}\noindent\ignorespaces}
 
+% proof 內文採「塊狀段落」：首行不縮排、段間留小空。本書全域是縮排式（§0：\parindent 1.5em、
+% \parskip 0），proof 首段本就由 env 標頭的 \noindent 貼左；但若 proof 有並列的具名分部（如
+% Prop B.4 歸納證明的 Base case／Inductive step 兩段），縮排式會讓第二段起吃到 1.5em 縮排，與
+% 貼左的首段不對稱，破壞兩分部的視覺並列。於 proof 環境內把 \parindent 歸零並給一點段間距，
+% 兩分部就都貼左、以小空分隔。作用域由 \begin/\end{envproof} 的群組界定，proof 結束即還原全域
+% 縮排式、不外洩；段間設定只作用於第二段起，故 appB 唯一的多段落 proof（Prop B.4）之外，其餘
+% 單段落 proof 一律 byte-identical，不受影響。
+% （首段 ~4pt 行首殘留空白的根治已上移到 \cb@mkenv 的 #5 後 \ignorespaces，對全部 env 一致，
+%   本鉤不再自帶 \ignorespaces。）
+\newcommand{\cb@proofparstyle}{\setlength{\parindent}{0pt}\setlength{\parskip}{\medskipamount}}
+
 % ── env 家族（10 類，含 rollout 的 theorem/corollary）：{kicker}{num}{name}，
 %    三參數皆必填、可空 {}（Codex gate-2 B1）；全部 breakable ───────────────────
 \cb@mkenv{envdefinition} {cb@leftrule}{aConcept} {\cb@pill}{}
 \cb@mkenv{envtheorem}    {cb@leftrule}{aResult}  {\cb@pill}{\itshape}      % 內文斜體
 \cb@mkenv{envproposition}{cb@leftrule}{aResult}  {\cb@pill}{\itshape}      % （數學自動正體）
 \cb@mkenv{envcorollary}  {cb@leftrule}{aResult}  {\cb@pill}{}              % HTML corollary 不斜
-\cb@mkenv{envproof}      {cb@leftrule}{aResult}  {\cb@pilloutit}{}         % qed 記號驅動，不自動補
+\cb@mkenv{envproof}      {cb@leftrule}{aResult}  {\cb@pilloutit}{\cb@proofparstyle}  % qed 記號驅動；內文塊狀段落（見 \cb@proofparstyle）
 \cb@mkenv{envremark}     {cb@leftrule}{aAside}   {\cb@pillout}{\color{inkSoft}\small}
 \cb@mkenv{envcaution}    {cb@card}    {aCaution} {\cb@pill}{}
 \cb@mkenv{envstrategy}   {cb@card}    {aStrategy}{\cb@pill}{}
@@ -291,6 +311,12 @@
 \NewDocumentEnvironment{centerstatement}{}{%   % 置中陳述（appB 差集；可含 \\）
   \par\begingroup\centering\noindent\ignorespaces
 }{\par\endgroup}
+\NewDocumentEnvironment{statementblock}{}{%   % p.statement：左對齊顯示陳述（可含 \\；appB §B.3 否定句）
+  % 置中（centerstatement）遇多行會逐行各自置中、短行浮右錯開；此塊改左對齊：兩行共用左緣、不錯開。
+  % \raggedright 先設（它會歸零 leftskip／parindent、並令 \\＝\@centercr），再用 leftskip 把整塊縮 1.5em
+  % （與 romanlist 的 labelindent 1.5em 同縮排，本節左對齊 display 家族一致）。
+  \par\begingroup\raggedright\leftskip=1.5em\noindent\ignorespaces
+}{\par\endgroup}
 \newcommand{\pagebreakbefore}{% p.page-break-before：此段之前強制換頁（M-B1 §2，2026-07-17 擴充）
   \par\ifdim\pagetotal>0pt\newpage\fi}     % 守衛對映 HTML 分頁器的 childElementCount>0：不製造前導空白頁
 \newcommand{\runin}[1]{\textbf{#1}}            % strong＝run-in 標籤（議題⑥）
@@ -308,6 +334,9 @@
 \setlist[sollist]{label=\textcolor{aResult}{\textbullet}, leftmargin=1.6em, itemsep=3pt}
 \newlist{objectives}{itemize}{1}               % 開場 objectives 專用槽（D9：可獨立改樣式
 \setlist[objectives]{label=\textcolor{aResult}{\textbullet}, leftmargin=1.6em, itemsep=3pt}%  而不動 emitter；現與 itemize 同貌）
+\newlist{romanlist}{enumerate}{1}              % ol.roman：(i)(ii)… 左對齊懸掛（appB §B.3 量詞對照對）
+\setlist[romanlist]{label=(\roman*), align=left, labelindent=1.5em, leftmargin=4.0em,
+                    labelsep=0.7em, itemsep=3pt, topsep=4pt}%  標號左對齊＋內文懸掛齊，整塊縮 1.5em
 
 % ── figure 語意層（D8：就地 non-float、字面 fig-no；appB 無圖、rollout 用）────
 % 尺寸由 emitter 依 figs/<ch>/figures.json 射 mm 絕對寬（DIALECT-ch03 §5 的教訓：

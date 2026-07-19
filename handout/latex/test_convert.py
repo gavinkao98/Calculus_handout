@@ -269,6 +269,16 @@ class Mappings(unittest.TestCase):
         out = conv(wrap('<ol class="steps"><li>one</li></ol>'))
         self.assertEqual(out, "\\begin{steps}\n  \\item one\n\\end{steps}")
 
+    def test_ol_roman(self):
+        # ol.roman → romanlist（(i)(ii)… 左對齊懸掛；appB §B.3 量詞對照對）
+        out = conv(wrap('<ol class="roman"><li>a</li><li>b</li></ol>'))
+        self.assertEqual(out, "\\begin{romanlist}\n  \\item a\n  \\item b\n\\end{romanlist}")
+
+    def test_p_statement(self):
+        # p.statement → statementblock（左對齊顯示陳述、可含 <br>；appB §B.3 否定句）
+        out = conv(wrap('<p class="statement">a<br>b</p>'))
+        self.assertEqual(out, "\\begin{statementblock}\na\\\\\nb\n\\end{statementblock}")
+
     def test_env_with_num_and_name(self):
         out = conv(wrap('<section class="env env-theorem"><p class="env-head">'
                         '<span class="env-kicker">Theorem</span><span class="env-num">3.4</span>'
@@ -418,7 +428,7 @@ class AppBMappings(unittest.TestCase):
     def test_appB_converts_with_no_hard_errors(self):
         # M-B2 驗證點：appB 全節點 100% 交代（mapped 或硬錯；無表外標記）
         tex, stats = convert_chapter("appB", Path(__file__).parent / "chapters" / "appB" / "figs" / "figures.json")
-        self.assertEqual(stats["mapped"], 717)   # 鎖實值（gate-2 A2：>300 太弱）；2026-07-17 定稿後 440→695（新增 §B.6）、695→716（r3 新增 Example B.11）、716→717（r3 二輪：§B.3 指路子句的 <em>if–then</em>）
+        self.assertEqual(stats["mapped"], 718)   # 鎖實值（gate-2 A2：>300 太弱）；2026-07-17 定稿後 440→695（新增 §B.6）、695→716（r3 新增 Example B.11）、716→717（r3 二輪：§B.3 指路子句的 <em>if–then</em>）；717→718（2026-07-18：§B.3 (i)/(ii) 兩 p.center → ol.roman＋2 li，淨 +1）；718 不變（2026-07-18 二次：§B.3 否定句 p.center → p.statement，同節點改標籤、無增減）
         self.assertEqual(stats["math"], 566)
         # emitter 重定向的 aggregate 斷言：v1 book-class 詞彙（hk*）不得殘留
         self.assertIsNone(re.search(r"\\hk[a-z]", tex), "輸出殘留 v1 hk* 詞彙")
@@ -426,7 +436,8 @@ class AppBMappings(unittest.TestCase):
                       r"\begin{envstrategy}{Strategy}{B.1}{Taking a statement apart}",
                       r"\begin{bulletsteps}", r"\begin{sollist}",
                       r"\begin{centerstatement}", r"\qedmark",
-                      r"\begin{envremark}{Pause}{}{}", r"\enspace{}"):
+                      r"\begin{envremark}{Pause}{}{}", r"\begin{romanlist}",
+                      r"\begin{statementblock}"):
             self.assertIn(probe, tex)
 
 

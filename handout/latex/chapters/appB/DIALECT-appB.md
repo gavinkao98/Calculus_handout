@@ -71,6 +71,72 @@
 > `\cb@needspace` 級失效（字元中位數 2125；唯一低密度頁＝**p25** 收束段 587 字元＝正常尾頁，
 > **中間無近空白頁**）。未逐頁重看全 25 頁。
 
+> ## 2026-07-18 §B.3 (i)/(ii) 量詞對照對：`p.center` → `ol.roman`（新方言 ＋1）
+>
+> **變更**：§B.3「Compare:」後那對量詞陳述原是**兩個 `<p style="text-align:center;">`**（`(i)&ensp;&ensp;…`
+> ／`(ii)&ensp;&ensp;…`，手打標號）。置中兩不同長度句會把 (i)/(ii) 錯開 ~16pt（實測 600dpi），
+> 而課文正要讀者**逐字對照**兩句（「same words… only the order differs」）→ 改成**左對齊並列清單**
+> `<ol class="roman">`＋2 `<li>`（標號自動 (i)(ii)、左對齊、內文懸掛齊）。使用者裁決落地。
+>
+> **新方言 `ol.roman`（tag＋class 組合 35→36）**：語意指令＝**`romanlist`**（模板 `\newlist{romanlist}{enumerate}`
+> ＋`\setlist` `label=(\roman*)`、`align=left`、`labelindent=1.5em`、`leftmargin=4em`——整塊縮 1.5em、
+> 標號左對齊、內文懸掛齊）。轉換器：`convert.py` 的 `<ol>` 白名單 ＋`roman`（`variant not in ("steps","roman")`
+> 才硬錯）、emitter `roman`→`romanlist`。`test_convert.py`：新增 `test_ol_roman` 正例鎖、appB probe 由
+> `\enspace{}` 換成 `\begin{romanlist}`（appB 已無 `&ensp;`）、mapped ledger **717→718**。
+>
+> **計數變動（覆蓋上表 r3 值）**：
+>
+> | 項 | r3 | **2026-07-18** | 說明 |
+> |---|---|---|---|
+> | tag＋class 組合 | 35 | **36** | ＋`ol.roman` |
+> | inline `style=` | 5 | **3** | 移除 2 個 `p[style="text-align:center;"]`（剩 3，皆 ε–δ，仍僅 sec-b-3） |
+> | `span.qed`／math inline `\(…\)`／display `\[…\]` | — | **不變**（550／16） | 數學段只從 `<p>` 搬進 `<li>`，逐位元組同序 |
+> | `&ensp;` U+2002（§5） | ×4 | **×0** | 4 個全在這兩句；appB 自此無 `\enspace`（映射仍在，`test_ensp_maps_to_enspace` 續守） |
+> | `centerstatement` | 5 | **3** | 剩 ε–δ 三句 |
+> | `li` | — | **＋2** | 新清單兩項 |
+> | mapped（ledger） | 717 | **718** | −2 `p.center` ＋1 `ol` ＋2 `li` ＝淨 ＋1 |
+> | PDF 頁數 | 25 | **25** | 不變 |
+>
+> **四閘（重跑全綠）**：`make_dist appB` 0 error／0 missing char｜**0／0** overfull/underfull｜完整性 PASS｜
+> 字形 PASS（361 字形）｜`test_convert.py` **82 passed**。**HTML 線同步**：fragment 已改，standalone
+> `.paper ol.roman` CSS 鏡射既有 `.warmup` 計數器（`content:"(" counter(...,lower-roman) ")"`、懸掛），
+> `build.py appB` 重建；HTML 與 LaTeX 同源同貌。
+
+> ## 2026-07-18（二次）§B.3 否定句顯示塊：`p.center` → `p.statement`（新方言 ＋1）
+>
+> **變更**：§B.3 Example B.3「the negation reads:」後那句**組合後的否定**，原是**一個
+> `<p style="text-align:center;">` 內含 `<br>`** 的兩行陳述。`centerstatement`（`\centering`）遇 `\\` 會
+> **逐行各自置中**——第一行長（約 80% 版寬）、第二行短，短行浮到中間、比長行更靠右，看起來像「第二行是
+> 第一行的縮排子項」；但它其實是**同一句話**（there exists ε>0 such that for every positive integer N，
+> there is some n≥N with aₙ≥ε），斷點只是寬度不夠。單行塞不下（整句約 90 字元，估 >版寬 150mm），
+> **非改對齊不可**。與同日 (i)/(ii) 量詞對是**同一種毛病**（置中會把本該對齊閱讀的相關行錯開）→ 使用者裁決
+> **方案 A：改左對齊塊**（兩行共用左緣，斷點落在「外層兩量詞 | 內層量詞＋kernel」的結構縫）。
+>
+> **新方言 `p.statement`（tag＋class 組合 36→37）**：語意指令＝**`statementblock`**（模板
+> `\NewDocumentEnvironment{statementblock}`＝`\raggedright`＋`\leftskip=1.5em`——先 `\raggedright` 歸零
+> leftskip／parindent 並令 `\\`＝`\@centercr`，再以 leftskip 縮 1.5em；與 `romanlist` 的 labelindent 1.5em
+> 同縮排，本節左對齊 display 家族一致）。轉換器：`convert.py` 的 `<p>` 分支＋`statement`（`allow_br=True`，
+> 因含 `<br>`）、emitter `statement`→`statementblock`；`<br>` 守衛訊息同步提及 `p.statement`。`test_convert.py`：
+> 新增 `test_p_statement` 正例鎖、appB probe 加 `\begin{statementblock}`、ledger **718 不變**（同節點改標籤、無增減）。
+>
+> **計數變動（覆蓋上表 romanlist 值）**：
+>
+> | 項 | romanlist 後 | **2026-07-18 二次** | 說明 |
+> |---|---|---|---|
+> | tag＋class 組合 | 36 | **37** | ＋`p.statement` |
+> | inline `style=` | 3 | **2** | 再移除 1 個 `p[style="text-align:center;"]`（否定句 → `p.statement`；剩 2，皆單行 ε–δ，仍僅 sec-b-3） |
+> | `centerstatement` | 3 | **2** | 否定句移出，剩 2 單行置中（未動、仍置中） |
+> | `statementblock` | — | **1** | 新 env |
+> | `<br>` | ×1 | **×1** | 不變（從 center-`<p>` 移進 `p.statement`，同一個） |
+> | inline `\(…\)`／display `\[…\]` | 550／16 | **不變** | 只換 `<p>` 標籤，數學逐位元組同序 |
+> | mapped（ledger） | 718 | **718** | 同節點改標籤、無增減 |
+> | PDF 頁數 | 25 | **25** | 不變 |
+>
+> **四閘（重跑全綠）**：`make_dist appB` 0 error／0 missing char｜**0／0** overfull/underfull｜完整性 PASS｜
+> 字形 PASS（361 字形）｜`test_convert.py` **83 passed**。**HTML 線同步**：fragment 已改，standalone
+> `.paper p.statement` CSS（`text-align:left`＋`margin-left:1.5em`）鏡射 LaTeX `statementblock`，
+> `build.py appB` 重建；HTML 與 LaTeX 同源同貌。
+
 ## 1. 摘要
 
 - **34 種 tag＋class 組合**。其中 29 種與 ch03 共用或屬 CONTRACT 既有詞彙；**5 種為 appB 新組合**（`strong`、`br`、`ul.steps`、`ul.sol-list`、`span.qed.qed-proof`），另有 **inline `style="text-align:center;"` ×5**（僅 sec-b-3）。後兩類含 CONTRACT 明文不允許的寫法（見 §7）——皆為樹上既成內容，依 D3（fragment 不改寫）由轉換器收編。

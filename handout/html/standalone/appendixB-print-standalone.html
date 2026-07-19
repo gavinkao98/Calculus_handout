@@ -151,6 +151,14 @@ window.MathJax = {
   position: absolute; left: 0; top: 0;
   font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
 }
+/* ol.roman：(i)(ii)… 量詞對照對（appB §B.3）——標號本體字（serif、正色），左對齊＋內文懸掛齊，
+   整塊縮 1.5em；對映 LaTeX romanlist（label=(\roman*)、labelindent 1.5em、leftmargin 4em） */
+.paper ol.roman { counter-reset: rn; list-style: none; padding-left: 0; margin: .55em 0 .9em 1.5em; }
+.paper ol.roman > li { counter-increment: rn; position: relative; padding-left: 2.5em; }
+.paper ol.roman > li::before { content: "(" counter(rn, lower-roman) ")"; position: absolute; left: 0; top: 0; }
+/* p.statement：左對齊顯示陳述（appB §B.3 否定句；可含 <br>）——整塊縮 1.5em、左對齊不錯開，
+   對映 LaTeX statementblock（raggedright＋leftskip 1.5em）；text-align:left 覆寫 skin-hs 的 justify */
+.paper p.statement { text-align: left; margin: .55em 0 .9em 1.5em; }
 .paper mjx-container[display="true"] { margin: .55em 0 !important; overflow-x: auto; overflow-y: hidden; }
 .paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
 .paper .qed { display: block; text-align: right; margin: -1.62em 0 0; height: 1.62em; pointer-events: none; }
@@ -811,8 +819,10 @@ window.MathJax = {
   <p>The two quantifiers <em>for all</em> and <em>there exists</em> — \(\forall\) and \(\exists\) — are the grammar of analysis. Nearly every definition and theorem past this point is built from them, often stacked two or three deep, and a statement’s whole meaning can turn on how they are arranged. Three skills make that grammar readable: keeping the <em>order</em> of quantifiers straight, <em>negating</em> a quantified statement cleanly, and recognizing the one nested pattern that organizes much of the subject. This section is a short toolbox for all three.</p>
 
   <p>The order of two <em>unlike</em> quantifiers is not interchangeable, and this is the most valuable single fact about them. Compare:</p>
-  <p style="text-align:center;">(i)&ensp;&ensp;for every integer \(x\) there is an integer \(y\) with \(y > x\),</p>
-  <p style="text-align:center;">(ii)&ensp;&ensp;there is an integer \(y\) such that for every integer \(x\), \(y > x\).</p>
+  <ol class="roman">
+    <li>for every integer \(x\) there is an integer \(y\) with \(y > x\),</li>
+    <li>there is an integer \(y\) such that for every integer \(x\), \(y > x\).</li>
+  </ol>
   <p>Statement (i) is true: given any \(x\), take \(y = x + 1\). Statement (ii) is false: it demands a <em>single</em> \(y\) larger than every integer at once, and there is no largest integer. The two sentences use the same words in the same breath; only the order of &ldquo;for every&rdquo; and &ldquo;there is&rdquo; differs, and that alone carries one from true to false.</p>
 
   <section class="env env-caution">
@@ -857,7 +867,7 @@ window.MathJax = {
           <li>the kernel \(a_n < \varepsilon\) negates to \(a_n \ge \varepsilon\).</li>
         </ul>
         <p>Assembling the pieces in the same order, the negation reads:</p>
-        <p style="text-align:center;">there exists \(\varepsilon > 0\) such that for every positive integer \(N\)<br>there is some \(n \ge N\) with \(a_n \ge \varepsilon\).</p>
+        <p class="statement">there exists \(\varepsilon > 0\) such that for every positive integer \(N\)<br>there is some \(n \ge N\) with \(a_n \ge \varepsilon\).</p>
         <p>In words: some fixed threshold \(\varepsilon\) that the sequence meets or exceeds again and again, no matter how far out you look. The quantifiers kept their left-to-right order; only their types flipped, and the final \(<\) became \(\ge\).</p>
       </div>
     </section>

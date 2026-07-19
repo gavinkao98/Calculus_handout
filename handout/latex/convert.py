@@ -169,7 +169,7 @@ class QedMark:
 @dataclass
 class Para:
     kids: list
-    variant: str = "normal"          # normal | lead | informal | para-head | center | page-break-before
+    variant: str = "normal"          # normal | lead | informal | para-head | center | page-break-before | statement
 
 
 @dataclass
@@ -383,7 +383,7 @@ class Builder:
             elif k.tag == "br" and not k.classes:
                 # appB 差集：手動斷行只出現在置中陳述內（sec-b-3:69）；其他位置硬錯
                 if not allow_br:
-                    self.err(k, "<br> 只允許出現在置中陳述（style=\"text-align:center;\" 的 <p>）內")
+                    self.err(k, "<br> 只允許出現在置中陳述（style=\"text-align:center;\" 的 <p>）或 <p class=\"statement\"> 塊內")
                 self.n_mapped += 1
                 out.append(Br())
             else:
@@ -429,17 +429,20 @@ class Builder:
             if not c:
                 return Para(self.inlines(el.kids, el))
             v = c[0]
+            if v == "statement" and len(c) == 1:
+                # p.statement：左對齊顯示陳述（可含 <br>，如 §B.3 否定句的多行結構縫）
+                return Para(self.inlines(el.kids, el, allow_br=True), variant="statement")
             if v in ("lead", "informal", "para-head", "page-break-before") and len(c) == 1:
                 return Para(self.inlines(el.kids, el), variant=v)
-            self.err(el, "<p> 只允許無 class 或 lead／informal／para-head／page-break-before")
+            self.err(el, "<p> 只允許無 class 或 lead／informal／para-head／page-break-before／statement")
 
         if t == "h3" and c == ("subsec-head",):
             return SubsecHead(self.inlines(el.kids, el))
 
         if t in ("ul", "ol"):
             variant = c[0] if c else ""
-            if t == "ol" and variant != "steps":
-                self.err(el, "<ol> 只允許 class=steps（ch03／appB 未用其他型）")
+            if t == "ol" and variant not in ("steps", "roman"):
+                self.err(el, "<ol> 只允許 class=steps／roman（appB §B.3 量詞對照對）")
             if t == "ul" and c not in ((), ("steps",), ("sol-list",)):
                 self.err(el, "<ul> 只允許無 class 或 steps／sol-list（appB 差集）")
             if "start" in el.attrs:
@@ -725,6 +728,8 @@ class LatexEmitter:
                 return f"\\parahead{{{t}}}"
             if b.variant == "center":
                 return f"\\begin{{centerstatement}}\n{t}\n\\end{{centerstatement}}"
+            if b.variant == "statement":
+                return f"\\begin{{statementblock}}\n{t}\n\\end{{statementblock}}"
             if b.variant == "page-break-before":
                 return f"\\pagebreakbefore\n{t}\n"
             return t + "\n"
@@ -736,6 +741,8 @@ class LatexEmitter:
                 envname = "sollist"
             elif b.variant == "objectives":
                 envname = "objectives"
+            elif b.variant == "roman":
+                envname = "romanlist"     # ol.roman：(i)(ii)… 左對齊懸掛（appB §B.3）
             else:
                 envname = "enumerate" if b.ordered else "itemize"
             # `\item [x]` 的 `[x]` 會被 LaTeX 當成 optional label 吃掉（bullet 變 x、正文少一截）。
