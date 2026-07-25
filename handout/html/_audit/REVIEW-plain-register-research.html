@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>課文英文平實化研究與方案 — 讓 LLM 寫出一般教科書語域</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #6b6b6b; --line: #e0e0e0;
+    --bg: #fbfbf9; --card: #ffffff;
+    --good: #1f7a44; --good-bg: #eaf6ee;
+    --warn: #9a5b00; --warn-bg: #fdf3e3;
+    --bad: #a3232a;  --bad-bg: #fbecec;
+    --code-bg: #f4f4f2; --accent: #2d5a8a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Inter", "Noto Sans TC", system-ui, -apple-system, sans-serif;
+    color: var(--ink); background: var(--bg); line-height: 1.65;
+    max-width: 960px; margin: 0 auto; padding: 2.4rem 1.6rem 5rem;
+  }
+  h1 { font-size: 1.55rem; line-height: 1.3; margin: 0 0 .3rem; }
+  .sub { color: var(--muted); font-size: .95rem; margin: 0 0 2rem; }
+  h2 { font-size: 1.2rem; margin: 2.4rem 0 .6rem; padding-bottom: .3rem;
+       border-bottom: 2px solid var(--line); }
+  h3 { font-size: 1.02rem; margin: 1.4rem 0 .4rem; }
+  code, .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+                font-size: .9em; background: var(--code-bg); padding: .08em .35em;
+                border-radius: 3px; }
+  table { border-collapse: collapse; width: 100%; margin: .8rem 0 1rem; font-size: .92rem; }
+  th, td { border: 1px solid var(--line); padding: .42rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #f0f0ee; font-weight: 600; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+          padding: 1rem 1.2rem; margin: 1rem 0; }
+  .tag { display: inline-block; font-size: .78rem; font-weight: 600; padding: .1rem .5rem;
+         border-radius: 999px; vertical-align: middle; }
+  .tag.good { color: var(--good); background: var(--good-bg); }
+  .tag.warn { color: var(--warn); background: var(--warn-bg); }
+  .tag.bad  { color: var(--bad);  background: var(--bad-bg); }
+  blockquote { margin: .6rem 0; padding: .5rem 1rem; border-left: 3px solid var(--accent);
+               background: #f3f6fa; color: #2a2a2a; }
+  .opt { border-radius: 10px; padding: 1.1rem 1.3rem; margin: 1rem 0; border: 1px solid var(--line); background: var(--card); }
+  .opt.rec { border: 2px solid var(--good); background: var(--good-bg); }
+  .opt h3 { margin-top: 0; }
+  .kv { color: var(--muted); font-size: .9rem; }
+  .small { font-size: .86rem; color: var(--muted); }
+  ul.tight { margin: .3rem 0 .6rem; padding-left: 1.3rem; }
+  ul.tight li { margin: .18rem 0; }
+  .en { font-style: italic; }
+  .hl { background: #fff3b0; padding: 0 .15em; border-radius: 2px; }
+  .src { font-size: .84rem; color: var(--muted); }
+  .src a { color: var(--accent); text-decoration: none; }
+  .src a:hover { text-decoration: underline; }
+  .foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line);
+          font-size: .85rem; color: var(--muted); }
+  .badnote { color: var(--bad); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>課文英文平實化：研究與方案簡報</h1>
+<p class="sub">問題：LLM 撰寫的課文英文「太文學」，不利非母語讀者 · 網路研究（三線並行）＋自家現症診斷 · 2026-07-25 · 純提案，未改任何規格檔 · <strong>Codex gate-2 已覆核：GO-with-changes（整合見 §7）</strong></p>
+
+<div class="card">
+  <strong>一句話結論：</strong>§3 的目標（Stewart 語域）本來就對，缺的是把「平實」<span class="hl">操作化成可執行的語言參數</span>——研究實證顯示：只給範文與形容詞式描述，LLM 語域必然回漂（這是 post-training 烙上的 house style）；而「操作化條款＋定向重寫一輪＋確定性偵測閘」是證據最強的組合。教育實證（Abedi／NCEE 線）同時給了定心丸：<strong>把語言壓平實，數學內容與強讀者體驗都不受損，弱讀者（含 EFL）顯著受益</strong>。
+</div>
+
+<div class="card" style="border-color:#2d5a8a">
+  <strong>Codex gate-2 覆核（2026-07-25，<code>codex exec -s read-only</code>，raw 全文見 <code>REPORT-plain-register-codex-gate2-raw.md</code>）：GO-with-changes。</strong>三大修正已整合進本報告（§7）：
+  ① 「禁手法清單」改為「<span class="hl">數學內容 MUST 字面化</span>」＋情境化 FLAG——cleft／數學物件作主詞等句式<em>本身</em>不是病（<span class="en">"What matters here is the sign of f&#8242;(x)."</span> 是好句），病的是「隱喻＋懸念＋不透明搭配」的組合；
+  ② <span class="hl">D（rubric）提前到 pilot 前</span>——沒有人工裁決的判準與標註資料，C 會把偏好硬化成規則；
+  ③ C 永遠只出高精度候選報告與分文體基線，<span class="hl">詞頻覆蓋率與粗 pattern 不得升格 blocking</span>（原「NGSL 覆蓋率 ≥95%」指標作廢——功能詞會灌高數字，改「內容詞 lemma 低頻風險詞每百詞提示」）。
+</div>
+
+<h2>§1 現症：自家例句診斷（ch06 §6.2，2026-07-10 撰）</h2>
+
+<p>以下五句全部出自 <code>handout/html/fragments/ch06/sec-6-2.html</code>。它們單看品質不差，但每一句都用了母語級文學手法，是 L2 讀者的額外負擔；「平實改寫示意」示範同樣內容的教科書寫法（<strong>僅示意，未入稿</strong>）。</p>
+
+<table>
+  <tr><th style="width:38%">原句</th><th style="width:24%">病灶</th><th style="width:38%">平實改寫示意</th></tr>
+  <tr>
+    <td class="en">"Section 6.1 ended on a coincidence too strong to be one."</td>
+    <td>悖論式修辭（too strong to be one），需要二次解析</td>
+    <td class="en">"In Section 6.1, two different problems led to the same limit. This is no coincidence."</td>
+  </tr>
+  <tr>
+    <td class="en">"The notation has outlived the shaky infinitesimals it was born with…"</td>
+    <td>擬人（born with、outlived）＋罕用形容詞搭配（shaky infinitesimals）</td>
+    <td class="en">"Leibniz based the notation on infinitesimals, an idea that was hard to make precise. The notation survived because it matches the limit in Definition 6.2."</td>
+  </tr>
+  <tr>
+    <td class="en">"What rescues the functions we actually meet is continuity."</td>
+    <td>cleft 強調句（What … is …）＋擬人動詞（rescues）</td>
+    <td class="en">"Fortunately, for continuous functions the limit always exists."</td>
+  </tr>
+  <tr>
+    <td class="en">"Definition 6.2 asks a great deal: one number approached by every choice of sample points."</td>
+    <td>定義被擬人化（asks a great deal）</td>
+    <td class="en">"Definition 6.2 is a strong requirement: every choice of sample points must give the same number."</td>
+  </tr>
+  <tr>
+    <td class="en">"This is the honest boundary of the chapter — everything else is earned in full."</td>
+    <td>警句式修辭收尾（earned in full），資訊量趨零</td>
+    <td class="en">"We prove every other result in this chapter."（或整句刪）</td>
+  </tr>
+</table>
+
+<div class="card">
+  <strong>關鍵觀察：</strong>這五個病句<span class="hl">全是短詞短句，Flesch 類可讀性公式全部放行</span>。本案的「難」不在音節數與句長，而在<strong>擬人／隱喻、cleft 句式、修辭收尾、罕見詞搭配</strong>——所以解法不能只靠可讀性公式，必須有針對句法／修辭 pattern 的偵測與規格條款（見 §4C）。
+</div>
+
+<h2>§2 病因：為什麼會這樣</h2>
+
+<h3>外因——這是 LLM 的 house style，不是偶然</h3>
+<ul class="tight">
+  <li><strong>PNAS（Reinhart et al. 2025）</strong>：以 Biber 語域特徵分析 LLM 與人類平行語料——LLM 的分詞子句（present participial clauses）是人類的 2–5 倍，偏好 nominalization 與修飾堆疊；<span class="hl">instruction-tuned 模型比 base 模型「離人類更遠」，模型變大也不消失</span>——文學腔是 post-training（RLHF）烙上的預設文風。</li>
+  <li><strong>COLING 2025（"Why Does ChatGPT 'Delve' So Much?"）</strong>＋<strong>Science Advances 2025（excess vocabulary）</strong>：LLM 詞彙過用（delve、intricate、pivotal…）已被大規模量化，證據指向人類回饋訓練——所以<strong>單靠「不要太文學」的負面指令壓不住</strong>，會回漂。</li>
+  <li><strong>Alignment Drift（2025 preprint）</strong>：CEFR 約束的 system prompt 起初有效，多輪後逐步漂回無約束行為——<span class="hl">語域約束需要「每次生成都在場」＋出口閘攔截</span>，不能只設一次。</li>
+</ul>
+
+<h3>內因——本專案管線的三個結構性缺口（對照 repo 現況）</h3>
+<ul class="tight">
+  <li><strong>規格層</strong>：<code>CONTENT_SPEC.md</code> §3 用「形容詞＋真人範文」定義語域（溫暖不話嘮、Stewart 校準），避免清單只列了口語 filler 與黑板縮寫——<span class="hl">全篇沒有詞彙層級、句長、修辭手法的任何可執行參數</span>。LLM 面對「溫暖」這個目標，預設就會用文學手段去實現。</li>
+  <li><strong>稽核層</strong>：<code>PROSE-AUDIT-RUBRIC.md</code> 三維度（U 易懂／F 流暢／S·A·V 語意聲音）沒有「語域平實」維度；triage 紀律還明文砍掉「吹毛求疵的詞彙替換」——<strong>用字難度在現行閘序裡是沒人管的象限</strong>。且 V1「可更暖也報」是單向棘輪：只會把語域往上推，沒有反向力。</li>
+  <li><strong>歷史路徑</strong>：先前的「readability 回填」（2026-06-28）處理的是首讀摩擦（reader-persona first-read）與 introduce-before-use——是<strong>理解結構</strong>線，不是<strong>詞彙語域</strong>線；appB 的去 em-dash 輪也只治了標點症狀。語域問題從未被立項。</li>
+</ul>
+
+<h2>§3 網路研究發現（三線）</h2>
+
+<h3>3.1 怎麼控制 LLM 的語域——按證據排序</h3>
+
+<table>
+  <tr><th>做法</th><th>實測效果</th><th>來源（抽查標記見文末）</th></tr>
+  <tr>
+    <td>只在 prompt 說「寫到 X 級／X 年級」</td>
+    <td>方向對、校準差：GPT-4 CEFR ControlError 3.66（平均偏約 1.9 級）；FRE 目標改寫 RMSE ≈19（偏 1–2 個帶）</td>
+    <td>Malik et al., ACL Findings 2024（Duolingo＋Stanford）✔；Farajidizaji et al., LREC-COLING 2024</td>
+  </tr>
+  <tr>
+    <td><span class="hl">把等級「操作化」成具體語言學描述</span>（句長、詞彙、句型逐條）</td>
+    <td><strong>單一最大跳升</strong>：ControlError 3.66 → 0.39（偏約 0.6 級）；Standardize（EMNLP 2024）同向：+40–100% 精準對齊</td>
+    <td>同上 ✔；Imperial et al., EMNLP 2024</td>
+  </tr>
+  <tr>
+    <td>再加 few-shot 範文</td>
+    <td>次階增益：0.39 → 0.28–0.30（範文是 tone 的可靠工具，但不如操作化描述）</td>
+    <td>同上；Anthropic 官方 prompting 文件</td>
+  </tr>
+  <tr>
+    <td>盲目「再改寫一次」（無定向）</td>
+    <td>幾乎無效（RMSE 僅 −0.2）</td>
+    <td>Farajidizaji et al. 2024</td>
+  </tr>
+  <tr>
+    <td><span class="hl">Checker 定向的重寫迴圈</span>（量測→指出哪裡違規→重寫）</td>
+    <td>有效且<strong>一輪就拿走大半增益</strong>；LLM 當可讀性量測器與人判相關 r=0.76；簡化管線讓讀者 MCQ 正確率 +3.9%（醫療域 +14.6%）</td>
+    <td>Feedback Dynamics 2025；Trott &amp; Rivière 2024；LLM-based Text Simplification user study 2025</td>
+  </tr>
+  <tr>
+    <td>負面禁令（"don't use X"）</td>
+    <td>實證弱點：negation 遵循一貫差；官方建議改正向指令（「要怎樣」而非「不要怎樣」）</td>
+    <td>García-Ferrero et al. 2023；Anthropic 官方文件</td>
+  </tr>
+  <tr>
+    <td>Finetune／RL（重武器）</td>
+    <td>最準（CALM ControlError 0.15，勝 GPT-4 prompting）但成本高、「Stewart 語域」無現成訓練訊號——<strong>本案不建議</strong></td>
+    <td>Malik et al. 2024 ✔</td>
+  </tr>
+</table>
+
+<h3>3.2 可量化標準、詞表與離線工具</h3>
+
+<div class="card">
+<strong>受控語言標準的可搬條款：</strong>
+<ul class="tight">
+  <li><strong>ASD-STE100</strong>（Simplified Technical English，Issue 9，2025-01，免費申請 ✔）：53 條規則＋約 900 核准詞；<span class="hl">敘述句 ≤25 詞、程序句 ≤20 詞、一句一主題、一段一主題且 ≤6 句、主動語態、一詞一義</span>；最可借鑑的設計是「<strong>術語豁免機制</strong>」——技術名詞不受詞表限制，其餘語言全部平白。這正是數學課文要的模式：derivative／integrable 照用，圍繞它們的散文用高頻詞。</li>
+  <li><strong>美國 Federal Plain Language Guidelines</strong>：一句一義、主詞-動詞-受詞緊鄰、<span class="hl">同一概念全文用同一個詞</span>（明言「聯邦寫作不是文學，不要為了趣味換同義詞」＝禁 elegant variation）、平均句長慣例 15–20 詞。</li>
+</ul>
+</div>
+
+<table>
+  <tr><th>詞表</th><th>規模</th><th>分級</th><th>授權／可否入 repo</th></tr>
+  <tr><td>NGSL（New General Service List）</td><td>2,809 詞</td><td>頻率序</td><td>原聲明 CC BY-SA 4.0 → 可入 repo。<span class="badnote">警告：官網網域 newgeneralservicelist.org 經本次實測已變質為賭博站，勿由該域下載；需另覓學術鏡像並重驗授權</span></td></tr>
+  <tr><td>NAWL（學術補集）</td><td>963 詞</td><td>—</td><td>同上（CC BY-SA 4.0 聲明；同一網域警告）</td></tr>
+  <tr><td>VOA Learning English Word Book</td><td>約 1,500 詞</td><td>—</td><td>Public domain，可入 repo ✔（VOA 官網可下載）</td></tr>
+  <tr><td>Oxford 3000／5000</td><td>3000＋2000</td><td>CEFR A1–C1</td><td>© OUP、無開放授權——只能人工參照，不可入 repo</td></tr>
+  <tr><td>Dale–Chall 3000</td><td>約 3,000</td><td>美制 4 年級熟詞</td><td>不必自帶——textstat 內建該公式</td></tr>
+  <tr><td>English Vocabulary Profile</td><td>逐詞義 CEFR</td><td>A1–C2</td><td>僅線上查詢；程式化需付費 Text Inspector（£360/年）——不採</td></tr>
+</table>
+
+<div class="card">
+<strong>工具（全部離線、可進 CI）：</strong>
+<ul class="tight">
+  <li><code>textstat</code> v0.7.13（MIT，2026-02 仍維護）：FRE／FKGL／SMOG／Dale-Chall 等全套公式。</li>
+  <li><code>wordfreq</code>（Apache-2.0＋CC 資料）：查詞的 Zipf 頻率（罕見詞偵測核心）。2024-09 作者封存（AI 污染語料＋API 關閉），但「判斷一個詞常不常見」用 2021 前資料完全夠用。</li>
+  <li><code>spaCy</code>（MIT）：斷句→句長分布；依存標記→被動語態、cleft、尾掛 -ing 子句偵測。</li>
+  <li><strong>Vale</strong>（本專案已在用）：literary 詞表、名詞串、elegant variation 等句式規則的天然載體；有現成 proselint／write-good 規則包。</li>
+  <li>可讀性公式對數學文本的<strong>已知失真</strong>：術語與符號會灌高難度分數（醫療域已有實證）→ 標準做法是<span class="hl">先剝離數學式（placeholder 代入）＋術語白名單，再量測；門檻以「對真教科書基線的相對值」為主</span>，慣例絕對值（FRE 60–70＝plain English）為輔。</li>
+</ul>
+</div>
+
+<h3>3.3 真實教科書語域畫像＋「簡化語言 ≠ 簡化數學」的實證</h3>
+
+<div class="card">
+<strong>Abedi 線（ELL 數學語言實證，測驗情境）：</strong>CRESST TR429（Abedi, Lord &amp; Plummer 1997；期刊版 Abedi &amp; Lord 2001，N≈1,174 八年級生）的七項 linguistic modification 準則——<strong>數學術語一律不動</strong>，只改圍繞語言：
+<ol class="tight">
+  <li>非數學詞彙改高頻常用詞</li>
+  <li>被動改主動</li>
+  <li>縮短名詞組（削前置修飾）</li>
+  <li>if 條件句拆句或前置</li>
+  <li>關係子句拆成獨立短句（句數變多沒關係，每句負荷下降）</li>
+  <li>疑問片語簡化</li>
+  <li>抽象改具體（給具名主詞）</li>
+</ol>
+效果：詞彙簡化項顯著（t=2.54, p&lt;.05）；低程度班改善 +10.4%、ESL 班 +4.9%；<span class="hl">高程度／榮譽班 −0.8%～+0.5%（≈零損失）</span>。大樣本複證（NCEE 2009-4079，隨機分派）：EL 學生 +0.16 SD（≈半年學業成長），English-proficient 學生差異 &lt;0.01 SD，<strong>與州測驗相關性不變＝所測數學 construct 不變</strong>。誠實註記：這是「測驗題目」研究，推及課文散文屬合理外推而非直接實證。
+</div>
+
+<div class="card">
+<strong>數學寫作正典同向：</strong>Halmos（1970）："simple declarative sentences are the best"、好文風是最不搶戲的（"the least obtrusive one"）、平行概念要<strong>逐字重複同樣措辭</strong>、好書靠內容組織文法而 "not showmanship"。Knuth《Mathematical Writing》（1989）：公式之間要 running commentary、定義用互補方式講兩次、句子去掉公式仍須通順、記號與措辭一致。開放教科書自述：OpenStax 只談 "clarity and rigor"／"accessible"；APEX 直言數學課本 "hard to read"、目標是更易讀而不多話——<strong>沒有任何一本把「文采」當目標</strong>。
+</div>
+
+<table>
+  <tr><th>參數</th><th>目標值</th><th>依據</th></tr>
+  <tr><td>句長</td><td>平均 15–22 詞；單句 ≥35 詞須拆或給理由；一句一義</td><td>STE 20/25、federal guidelines、Abedi 拆句準則（合成建議；無數學教科書 corpus 實測——搜尋多輪無果，誠實標注）</td></tr>
+  <tr><td>詞彙</td><td>非術語一律高頻詞；術語照用不簡化；<strong>同一概念全文同一個詞</strong></td><td>Abedi 準則1、STE 術語豁免、federal／Halmos 反 elegant variation</td></tr>
+  <tr><td>句型</td><td>主動、直述為主；if 前置或拆句；少關代堆疊；具體主詞</td><td>Abedi 準則 2–5、7；Halmos</td></tr>
+  <tr><td>路標語</td><td>"we" 同行、Notice that／In other words 等連接詞、公式間 running commentary——<strong>§3 現有規則全部保留</strong></td><td>Knuth rules 6/10/11；與 CONTENT_SPEC §3 既有條款一致</td></tr>
+  <tr><td>修辭密度</td><td>趨近零：不擬人、不新造隱喻、無 cleft 強調、無警句收尾（數學慣用語 approaches／vanishes／grows without bound 等白名單保留）</td><td>Halmos "not showmanship"（風格描述，無量化數據）；本案病句全落此類</td></tr>
+</table>
+
+<h2>§4 方案設計（A–E 五層，可獨立採用）</h2>
+
+<div class="opt rec">
+<h3>A. 規格層：CONTENT_SPEC §3 新增「平實英文條款」（plain-register clause）<span class="tag good">建議先做・零依賴</span></h3>
+<p>把 §3 的語域目標從「形容詞＋範文」升級為<strong>操作化條款</strong>（研究顯示這是單一最大增益來源）。草案要點：</p>
+<ul class="tight">
+  <li><strong>詞彙天花板</strong>：非數學術語預設用高頻常用詞（操作定義掛詞表；罕見詞需教學理由）；數學術語照用、首用即定義（既有 §16.2 B 類規則不變）。</li>
+  <li><strong>句長</strong>：敘述散文平均 ≤22 詞、單句 ≥35 詞須拆；一句一義。</li>
+  <li><strong>修辭約束（治本案病根的核心）</strong>：數學物件不當心理主體（定理不 ask／promise／rescue；改 is／says／gives／guarantees）；不用 cleft 強調句；不用警句式段落收尾；隱喻限教科書慣用白名單。</li>
+  <li><strong>同詞同義</strong>：同一概念全文用同一個詞（Halmos＋federal guidelines）。</li>
+  <li><strong>正向替代表</strong>：條款以「要怎樣＋X→改用 Y 對照表」書寫，不用純禁令（negation 遵循是實證弱點）。</li>
+</ul>
+<p class="kv">落點：<code>CONTENT_SPEC.md</code> §3（新小節）；證據：Malik 2024（3.66→0.39）、Standardize、STE、federal guidelines、Abedi 七準則。</p>
+</div>
+
+<div class="opt rec">
+<h3>B. 撰稿層：Mode A brief 內建條款＋出稿前「plain pass」<span class="tag good">建議先做・零依賴</span></h3>
+<ul class="tight">
+  <li>每次 Mode A 的 brief 內嵌 A 的操作化條款（<span class="hl">約束必須每次生成都在場</span>——Alignment Drift 證據）；svc-exemplars 真人範文錨照舊。</li>
+  <li>Mode A 完稿前加一道自我「plain pass」：逐段對照條款檢查改寫一次，語意與數學不動（checker 定向的一輪重寫＝大半增益）。</li>
+</ul>
+<p class="kv">落點：<code>CONTENT_AUTHORING_WORKFLOW.md</code> §Mode A；證據：Feedback Dynamics（首輪增益最大）、Farajidizaji（盲重寫無效——所以要「對條款」重寫）。</p>
+</div>
+
+<div class="opt">
+<h3>C. 自動閘層：離線 register linter（<code>tools/</code> 新腳本）<span class="tag warn">需裝 3 個 pip 套件・裝前另徵同意</span></h3>
+<ul class="tight">
+  <li><strong>前處理</strong>：fragment 抽散文 → 數學式以 placeholder 代入 → 術語白名單。</li>
+  <li><strong>量測</strong>：句長分布＋被動比例（spaCy）；FRE／FKGL（textstat，儀表板用）；詞彙覆蓋率（NGSL＋NAWL＋術語表，目標 ≥95%）＋表外詞 Zipf&lt;3 紅旗（wordfreq）。</li>
+  <li><strong>Pattern 偵測（主力）</strong>：cleft 句式、心理動詞×數學主語、尾掛 -ing 子句、negative parallelism、AI 癖詞表（Wikipedia Signs of AI writing 子集＋自建差分表）——<span class="hl">因為本案病句公式抓不到，pattern 層才是真正的閘</span>；句式規則可掛進已在用的 Vale。</li>
+  <li><strong>校準</strong>：同一管線先量 OpenStax／CLP-1 章節（CC 授權文本）建立「真教科書基線」，再量自家 ch01–ch06 得差距——<strong>門檻由真教科書數據定，不拍腦袋</strong>。</li>
+</ul>
+<p class="kv">依賴：<code>spacy</code>＋<code>textstat</code>＋<code>wordfreq</code>（全 MIT／Apache，離線零 API 成本；依 CLAUDE.md 裝前先徵同意）。詞表授權注意 NGSL 網域警告（§3.2）。</p>
+</div>
+
+<div class="opt">
+<h3>D. 稽核層：PROSE-AUDIT-RUBRIC 增補 R 維度（語域平實）<span class="tag warn">待 A 定案後跟進</span></h3>
+<ul class="tight">
+  <li>新增 R1 罕見詞（非術語）、R2 文學句法（擬人／cleft／修辭收尾）、R3 elegant variation；blocking 線建議：<strong>承載解釋只靠隱喻傳達</strong>＝blocking，其餘 advisory。</li>
+  <li>修 triage 慣例：帶詞表／頻率證據的詞彙替換<strong>不再算</strong>「吹毛求疵」。</li>
+  <li>給 V1 加一行邊界：「暖」＝結構性暖（動機、直接對讀者說話），<strong>不是</strong> lexical 修辭——防止 V1 寬報把語域往上推。</li>
+</ul>
+<p class="kv">落點：<code>handout/html/_audit/PROSE-AUDIT-RUBRIC.md</code>；連動 <code>.claude/agents/handout-prose-audit.md</code>。</p>
+</div>
+
+<div class="opt">
+<h3>E. 試點與回填：§6.2 pilot → 舊章分批 backfill<span class="tag warn">A＋B 落地後啟動</span></h3>
+<ul class="tight">
+  <li>Pilot：以新條款重寫 §6.2（本報告例句即素材）→ linter 前後對比＋OpenStax 基線對照 → 使用者盲讀裁決。</li>
+  <li>通過後：新章 Mode A 直接適用；舊章比照 readability backfill 前例（Ch1 先校準、逐章雙閘、propose-only）分批回填。</li>
+</ul>
+</div>
+
+<h2>§5 建議路徑（Codex 覆核後修訂版）</h2>
+
+<p class="small">原順序 A+B→pilot→C→D 經 Codex 覆核修訂：<strong>D 提前到 pilot 前</strong>（先有人工判準，才有資格談自動規則）；C 延後且 Vale 先行（pip 套件安裝時點跟著延後）。</p>
+
+<ol class="tight">
+  <li><strong>A＋D</strong>：最小規格條款（MUST／SHOULD／FLAG 三層，見 §7）＋ rubric R 維度與判準——零工具依賴、當天可落地。</li>
+  <li><strong>B</strong>：短而版本化的 style card（＋2–3 個數學散文正反例）內嵌 Mode A brief；出稿前「定向 plain pass」（鎖公式／術語／label／cross-ref，產可審 diff）。</li>
+  <li><strong>E-pilot</strong>：多文體試點（動機段＋正式定義＋推導＋例題，不只 §6.2 一種文體），<strong>成功條件預先寫死</strong>：數學無退化、EFL 理解不降、清晰度上升、A4 版面不炸。供你盲讀裁決。</li>
+  <li><strong>C</strong>：最小 linter——Vale 高精度 phrase rules＋術語白名單先行；再徵同意裝 spaCy／textstat／wordfreq 建分文體基線（永遠只出候選報告，不當裁判）。</li>
+  <li>依 pilot 數據修訂 A／D → 新章直接採用 → <strong>舊章分批回填</strong>（高負荷位置優先：章開場、定義前後、跨章過渡、例題說明；風險清單見 §7）。</li>
+</ol>
+
+<div class="card">
+<strong>明確不建議：</strong>
+<ul class="tight">
+  <li><strong>Finetune／RL</strong>——證據雖強（CALM 0.15）但成本高、無現成「Stewart 語域」訓練訊號，prompt＋閘門已可達務實目標。</li>
+  <li><strong>只靠可讀性公式當閘</strong>——本案病句全過得了 Flesch；公式只能當儀表板。</li>
+  <li><strong>純負面禁詞清單</strong>——negation 遵循是實證弱點；清單放偵測端（grep 百分之百可靠），生成端用正向替代對。</li>
+  <li><strong>追求一次生成即達標</strong>——house style 是 post-training 烙印，殘餘率必然存在；務實目標＝生成端壓低發生率＋閘門攔殘餘。</li>
+</ul>
+</div>
+
+<h2>§6 待裁決事項</h2>
+
+<p class="small">（Codex 覆核後三處連動：#1 的 A 條款改為 §7 的 MUST／SHOULD／FLAG 三層版並與 D 一起先做；#2 的 pilot 擴為多文體；#3 套件安裝時點延後到 pilot 之後、C 層 Vale 先行。）</p>
+
+<p class="small"><strong>裁決紀錄（2026-07-25，使用者）：#1 採納</strong>——照 Codex 修訂版落地 A＋D，已完成：CONTENT_SPEC <strong>v3.5</strong> §3 新增〈平實英文條款〉、PROSE-AUDIT-RUBRIC 新增 R 維度＋V1 邊界、agent／QUICKSTART／gate-2 模板同步。<strong>#2 pilot 物件改為 Appendix B</strong>——gate-1 走查已完成，見 <code>REVIEW-appB-plain-pilot.html</code>（R blocking 0、advisory 41 卡＋6 項政策裁決）。#3〜#5 待 pilot 結論後再議。</p>
+
+<table>
+  <tr><th style="width:6%">#</th><th>問題</th><th>建議</th></tr>
+  <tr><td>1</td><td>採不採 A（spec 平實條款）＋B（brief／plain pass）？條款強度（MUST／SHOULD）逐條可再議</td><td>採；修辭約束與同詞同義掛 SHOULD 起步，pilot 後再定 MUST 範圍</td></tr>
+  <tr><td>2</td><td>Pilot 選節</td><td>§6.2（本報告已診斷，素材現成）</td></tr>
+  <tr><td>3</td><td>C 層三個 pip 套件（spacy／textstat／wordfreq）核准安裝？</td><td>核准（全離線、無計費；照 CLAUDE.md 裝完更新 ENVIRONMENT.md／requirements.lock／doctor.py）</td></tr>
+  <tr><td>4</td><td>詞彙天花板用哪張表</td><td>NGSL＋NAWL＋自家術語白名單（授權可入 repo；先找可信鏡像重驗授權——原網域已淪陷）；VOA 1500（public domain）當備援</td></tr>
+  <tr><td>5</td><td>舊章回填範圍與時機</td><td>pilot 定案後，Ch1 先校準再逐章；appB 一併納入（em-dash 輪已處理標點，語域輪補完）</td></tr>
+</table>
+
+<h2>§7 Codex gate-2 第二意見與整合裁決</h2>
+
+<p>調用：<code>codex exec -s read-only</code>（2026-07-25，使用者授權本輪；材料 inline、未讓 Codex 讀檔）。raw 全文照登於 <code>REPORT-plain-register-codex-gate2-raw.md</code>。總裁決：<span class="tag good">GO-with-changes</span>。以下為逐項 triage（採納＝已改寫進本報告對應節）。</p>
+
+<table>
+  <tr><th style="width:34%">Codex 意見</th><th style="width:12%">Triage</th><th>整合結果</th></tr>
+  <tr>
+    <td><strong>診斷修正</strong>：病灶更準確說是「對 EFL 讀者不透明的詞義／搭配／慣用語／資訊結構」——<span class="en">rescues</span> 一詞不罕見，罕的是 <span class="en">continuity rescues functions</span> 這個搭配；<span class="en">"coincidence too strong to be one"</span> 的問題不只文學、還藏掉了實際數學 pattern。cleft 本身不是病。</td>
+    <td><span class="tag good">採納</span></td>
+    <td>核心判準從「禁手法」改為「<strong>數學內容字面化</strong>＋搭配可預測」；cleft／數學主詞句降為 FLAG。</td>
+  </tr>
+  <tr>
+    <td><strong>A 改三層</strong>：MUST（數學命題／量詞／條件／步驟不得只靠隱喻或慣用語傳達；關鍵位置陌生詞須直白或緊鄰釋義；同概念穩定措辭；≥35 詞句人工判定拆留並留理由）／SHOULD（平均 18–22 詞為監測值；P90 32–35 為審查區；主動優先但被動非錯；一句一個教學動作）／FLAG（cleft、尾掛 -ing、被動、數學物件作主詞——只送人工看）。</td>
+    <td><span class="tag good">採納</span></td>
+    <td>取代原 A 草案；「平均 ≤22 硬門檻」降為監測值，「P95」改 P90。</td>
+  </tr>
+  <tr>
+    <td><strong>撤 NGSL 覆蓋率 ≥95% 閘</strong>：功能詞會把 coverage 灌高到失去意義；改測「內容詞 lemma 的低頻風險詞每百詞量」，且只當提示。</td>
+    <td><span class="tag good">採納</span></td>
+    <td>C 層指標改寫；詞表仍用（NGSL＋NAWL＋術語白名單），但只出報告。</td>
+  </tr>
+  <tr>
+    <td><strong>B 落地細節</strong>：style card 要短、版本化＋2–3 個正反例（勿塞長篇政策稀釋重點）；plain pass 須定向（鎖公式／術語／label／cross-ref／編號）且產可審 diff，不是泛泛重寫。</td>
+    <td><span class="tag good">採納</span></td>
+    <td>寫入 §5 修訂版第 2 步。</td>
+  </tr>
+  <tr>
+    <td><strong>「暖」的可執行邊界</strong>：邏輯內容平實、教學導航可溫暖。暖句保留須同時過四條件：①有明確指涉②說明為何做這步／剛得到什麼③刪了損失導航或動機④數學條件已另有字面表述。<span class="en">"This is our first limit!"</span> 在前句已字面寫出極限關係時是合法的成果標記。</td>
+    <td><span class="tag good">採納</span></td>
+    <td>成為 A 條款的「暖句測試」；直接回答了「會不會壓成 Spivak 腔」——不會，砍的是懸念與擬人，不是讀者導向的聲音。</td>
+  </tr>
+  <tr>
+    <td><strong>D 提前＋R 維度重定義</strong>：R1 非術語詞彙／慣用語的可推測性、R2 字面傳達與明確指涉、R3 術語與指稱一致性；「關鍵定義／指令中一個不透明慣用語」也可 blocking；零星 advisory 一頁累積多條→觸發頁級複查；V1 從獎勵「更暖」改為獎勵「導航更清楚」。</td>
+    <td><span class="tag good">採納</span></td>
+    <td>D 移到第 1 步（與 A 同批）；R 維度照此重寫；補了「每句都不夠嚴重、整頁仍難讀」的漏洞。</td>
+  </tr>
+  <tr>
+    <td><strong>C 的假陽性風險</strong>：pattern 當判決器不可用、當候選清單有價值；每條規則先以人工標註樣本測採納率與每千詞警報量；negative parallelism 撤下（<span class="en">"…a rate of change, not a total change"</span> 是好教學句）；基線按文體分層（開場／解釋／定義／例題／證明各自取樣），OpenStax 與 CLP 不可合成單一金標；Vale 高精度規則先行，句切分驗證後才上 spaCy。</td>
+    <td><span class="tag good">採納<br>（一處保留）</span></td>
+    <td>C 層全面改寫如上。保留一處：<span class="en">"not just X, but Y"</span>（AI 癖的 negative parallelism 原型）仍留為低優先 FLAG——Codex 的反例是對比同位語（<span class="en">X, not Y</span>），與該 pattern 不同型，不衝突。</td>
+  </tr>
+  <tr>
+    <td><strong>Pilot 設計</strong>：不只 §6.2 一種文體，至少含動機段＋定義＋推導＋例題；成功條件預先寫死；另建議 12–20 段三臂小對照試驗（只換範文 vs style card vs style card＋plain pass），避免過度歸因 RLHF、找出最省的足夠干預。</td>
+    <td><span class="tag good">採納<br>（折衷）</span></td>
+    <td>多文體＋預寫成功條件照辦；三臂對照<strong>併入 pilot 內做輕量版</strong>（不另立流程）——同一批段落比較「僅 style card」與「style card＋plain pass」兩臂即可，避免流程過重。</td>
+  </tr>
+  <tr>
+    <td><strong>回填風險清單</strong>：改過段落須重過相關閘（舊 pass 失效）；動到環境／標題會 cascade 編號與 cross-ref；<span class="hl">短句化會增加行數→A4 分頁／孤行／圖文相鄰全會動</span>；平實化易在條件／量詞／因果方向引入微小數學錯→prose 後仍要 math gate；留變更帳。不要全書一鍵重寫。</td>
+    <td><span class="tag good">採納</span></td>
+    <td>寫入 §5 第 5 步；「重分頁」是本輪最有價值的新風險（先前完全沒想到）。</td>
+  </tr>
+  <tr>
+    <td><strong>盲點補遺</strong>：高頻≠好懂（<span class="en">only if／unless／respectively／arbitrary／at most</span> 是 EFL 高風險詞，要教、固定用法、給例，不是淘汰）；過度拆句提高整合負荷，短句須配明確連接詞；最好的平實化常是<strong>補一個具體例子／圖指涉／白話重述</strong>——文學腔有時在掩蓋缺中間解釋；linter 分文體模式（同一套 STE 規則套證明會傷害精確性）；詞表／例外需版本治理；LaTeX 線 report-only＋PDF 目檢；旁白線共享術語與禁忌但不逐字沿用；真人 EFL 盲讀是 LLM 閘之外的獨立證據（選配）；優先序＝數學正確與字面可理解 &gt; 流暢／聲音／暖。</td>
+    <td><span class="tag good">採納</span></td>
+    <td>「EFL 高風險功能詞小詞典」列為 A 條款附件候選；「文學腔＝缺解釋的遮羞布」與既有 U 維度（易懂性）打通——遇到病句先問「是不是少了一步解釋」，再問「要不要換詞」。</td>
+  </tr>
+</table>
+
+<div class="card">
+  <strong>整合後的最終建議（取代 §4 原始草案的三處）：</strong>
+  <ul class="tight">
+    <li><strong>A 條款＝三層</strong>：MUST（字面化底線）／SHOULD（監測值）／FLAG（人工候選）——不做任何「句式全面禁令」。</li>
+    <li><strong>順序＝A＋D → B → E-pilot（多文體、預寫成功條件、內含兩臂對照）→ C（Vale 先行）→ 修訂 → 回填</strong>。</li>
+    <li><strong>C 永遠是報告不是裁判</strong>；blocking 只存在於 rubric（人工判定）層。</li>
+  </ul>
+</div>
+
+<h2>來源清單</h2>
+<p class="small">✔＝本次由主線抽查開啟確認；其餘由研究子代理實際開啟或於搜尋結果確認存在。</p>
+
+<h3 class="small">一、LLM 語域控制</h3>
+<ul class="tight src">
+  <li>✔ Malik, Mayhew, Piech &amp; Bicknell, <span class="en">From Tarzan to Tolkien: Controlling the Language Proficiency Level of LLMs for Content Generation</span>, ACL Findings 2024 — <a href="https://aclanthology.org/2024.findings-acl.926/">aclanthology.org/2024.findings-acl.926</a></li>
+  <li>Farajidizaji, Raina &amp; Gales, <span class="en">Is it Possible to Modify Text to a Target Readability Level?</span>, LREC-COLING 2024 — <a href="https://aclanthology.org/2024.lrec-main.815/">aclanthology.org/2024.lrec-main.815</a></li>
+  <li>Imperial et al., <span class="en">Standardize: Aligning Language Models with Expert-Defined Standards</span>, EMNLP 2024 — <a href="https://aclanthology.org/2024.emnlp-main.94/">aclanthology.org/2024.emnlp-main.94</a></li>
+  <li>Imperial &amp; Tayyar Madabushi, <span class="en">Uniform Complexity for Text Generation</span>, EMNLP Findings 2023 — <a href="https://aclanthology.org/2023.findings-emnlp.805/">aclanthology.org/2023.findings-emnlp.805</a></li>
+  <li>Reinhart et al., <span class="en">Do LLMs write like humans?</span>, PNAS 2025 — <a href="https://www.pnas.org/doi/10.1073/pnas.2422455122">pnas.org/doi/10.1073/pnas.2422455122</a>（全文未開，摘要＋新聞稿）</li>
+  <li><span class="en">Why Does ChatGPT "Delve" So Much?</span>, COLING 2025 — <a href="https://aclanthology.org/2025.coling-main.426/">aclanthology.org/2025.coling-main.426</a></li>
+  <li>Kobak et al., <span class="en">Delving into LLM-assisted writing… through excess vocabulary</span>, Science Advances 2025 — <a href="https://www.science.org/doi/10.1126/sciadv.adt3813">science.org/doi/10.1126/sciadv.adt3813</a></li>
+  <li><span class="en">Alignment Drift in CEFR-prompted LLMs</span>, 2025 preprint — <a href="https://arxiv.org/abs/2505.08351">arxiv.org/abs/2505.08351</a></li>
+  <li>Trott &amp; Rivière, <span class="en">Measuring and Modifying the Readability of English Texts with GPT-4</span>, 2024 preprint — <a href="https://arxiv.org/abs/2410.14028">arxiv.org/abs/2410.14028</a></li>
+  <li><span class="en">LLM-based Text Simplification and its Effect on User Comprehension</span>, 2025 preprint — <a href="https://arxiv.org/abs/2505.01980">arxiv.org/abs/2505.01980</a></li>
+  <li>García-Ferrero et al.（negation 遵循弱點），2023 — <a href="https://arxiv.org/abs/2306.08189">arxiv.org/abs/2306.08189</a></li>
+  <li>Anthropic prompting best practices（官方）— <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices">platform.claude.com/docs/…/claude-prompting-best-practices</a></li>
+  <li>Duolingo：<span class="en">How Duolingo uses AI to create lessons faster</span>, 2023 — <a href="https://blog.duolingo.com/large-language-model-duolingo-lessons/">blog.duolingo.com/large-language-model-duolingo-lessons</a></li>
+  <li>Khan Academy：<span class="en">7-step approach to prompt engineering for Khanmigo</span> — <a href="https://blog.khanacademy.org/khan-academys-7-step-approach-to-prompt-engineering-for-khanmigo">blog.khanacademy.org/…khanmigo</a></li>
+  <li>Wikipedia:Signs of AI writing（WikiProject AI Cleanup）— <a href="https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing">en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing</a></li>
+</ul>
+
+<h3 class="small">二、標準・詞表・工具</h3>
+<ul class="tight src">
+  <li>✔ ASD-STE100 官網（Issue 9, 2025-01；53 rules／~900 approved words；免費申請）— <a href="https://www.asd-ste100.org/about_STE.html">asd-ste100.org/about_STE.html</a>；Issue 9 PDF（句長 20／25、每段 ≤6 句等規則原文）</li>
+  <li>Federal Plain Language Guidelines（2011）PDF — <a href="https://wid.org/wp-content/uploads/2022/03/FederalPLGuidelines.pdf">wid.org/…/FederalPLGuidelines.pdf</a>；digital.gov plain language guide — <a href="https://digital.gov/guides/plain-language">digital.gov/guides/plain-language</a></li>
+  <li>ISO 24495-1:2023（付費，僅摘要）— <a href="https://www.iplfederation.org/iso-standard/">iplfederation.org/iso-standard</a></li>
+  <li><span class="badnote">NGSL／NAWL：原官網 newgeneralservicelist.org 2026-07-25 實測已變質為賭博站——引用其歷史授權聲明（CC BY-SA 4.0），下載需另覓可信鏡像重驗</span></li>
+  <li>VOA Learning English Word Book（public domain）— <a href="https://learningenglish.voanews.com/a/voa-word-book/6607229.html">learningenglish.voanews.com/…/voa-word-book</a></li>
+  <li>Oxford 3000/5000（© OUP）— <a href="https://www.oxfordlearnersdictionaries.com/about/wordlists/oxford3000-5000">oxfordlearnersdictionaries.com/about/wordlists</a></li>
+  <li>textstat（PyPI，v0.7.13）— <a href="https://pypi.org/project/textstat/">pypi.org/project/textstat</a>；wordfreq（PyPI＋封存報導）— <a href="https://pypi.org/project/wordfreq/">pypi.org/project/wordfreq</a>、<a href="https://www.404media.co/project-analyzing-human-language-usage-shuts-down-because-generative-ai-has-polluted-the-data/">404media.co（2024-09 封存緣由）</a></li>
+  <li>spaCy — <a href="https://github.com/explosion/spaCy">github.com/explosion/spaCy</a>；Vale — <a href="https://vale.sh/">vale.sh</a>；AntWordProfiler — <a href="https://www.laurenceanthony.net/software/antwordprofiler/">laurenceanthony.net/software/antwordprofiler</a></li>
+  <li>可讀性公式數值慣例與技術文本失真：<a href="https://readable.com/readability/flesch-reading-ease-flesch-kincaid-grade-level/">readable.com（FRE 對照表）</a>、<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5355629/">PMC5355629（醫療域失真實證）</a>、<a href="https://readabilityformulas.com/articles/how-to-prepare-your-text-for-readability-formulas.php">readabilityformulas.com（量測前處理慣例）</a></li>
+</ul>
+
+<h3 class="small">三、教科書語域・ELL 實證</h3>
+<ul class="tight src">
+  <li>Abedi, Lord &amp; Plummer, CRESST Tech. Report 429（1997；七準則＋效果原文）— <a href="https://cresst.org/wp-content/uploads/TECH429.pdf">cresst.org/wp-content/uploads/TECH429.pdf</a>；期刊版 Abedi &amp; Lord 2001 — <a href="https://eric.ed.gov/?id=EJ636352">ERIC EJ636352</a></li>
+  <li>Sato, Rabinowitz, Gallagher &amp; Huang, NCEE 2009-4079（2010；隨機分派複證）— <a href="https://files.eric.ed.gov/fulltext/ED510556.pdf">files.eric.ed.gov/fulltext/ED510556.pdf</a></li>
+  <li>Haag et al. 2015（德國複證）— ERIC EJ1060407</li>
+  <li>Halmos, <span class="en">How to Write Mathematics</span>（1970）；Knuth, Larrabee &amp; Roberts, <span class="en">Mathematical Writing</span>（1989）— <a href="https://jmlr.csail.mit.edu/reviewing-papers/knuth_mathematical_writing.pdf">jmlr.csail.mit.edu/…/knuth_mathematical_writing.pdf</a></li>
+  <li>OpenStax Calculus Vol.1 Preface — <a href="https://openstax.org/books/calculus-volume-1/pages/preface">openstax.org/books/calculus-volume-1/pages/preface</a>；APEX Calculus Preface — <a href="https://opentext.uleth.ca/apex-calculus/apex-preface.html">opentext.uleth.ca/apex-calculus/apex-preface.html</a></li>
+  <li>digital.gov：<span class="en">Write short sentences／short, simple words</span> — <a href="https://digital.gov/guides/plain-language/writing/clear-short">digital.gov/guides/plain-language/writing/clear-short</a></li>
+</ul>
+
+<p class="foot">產出：Claude（主線）＋三個並行研究子代理（2026-07-25）；Codex gate-2 第二意見同日完成（<code>codex exec -s read-only</code>，codex-cli 0.144.1，raw 見 <code>REPORT-plain-register-codex-gate2-raw.md</code>），整合裁決見 §7。性質：純研究＋提案，未改任何規格檔／課文；所有方案（A–E）逐項待使用者裁決。關鍵量化數字（ControlError 3.66→0.39→0.28、+0.16 SD 等）出自子代理實際開啟之論文全文；主線另抽查三個承重來源（✔ 標記）。NGSL 網域淪陷為本次實測發現，採用前務必另行驗證鏡像與授權。</p>
+
+</body>
+</html>

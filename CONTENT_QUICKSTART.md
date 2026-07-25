@@ -12,6 +12,7 @@
 
 Stewart / Rogawski 語調：讓一位自學的高中生能讀懂，完整句子、連接詞明確、直覺先於形式化、溫暖但不話嘮。不是 Spivak，不是課堂速記。
 
+- **平實英文條款（2026-07-25）**：邏輯內容平實、教學導航可溫暖——數學命題／條件／步驟 MUST 字面化（隱喻、擬人、慣用語不得是唯一載體）、關鍵位置用直白詞、同概念同措辭；對數學物件用中性動詞（requires／guarantees，不用 rescues／asks a great deal）；cleft 等句式僅為人工複查線索、形式本身非缺陷。完整三層（MUST/SHOULD/FLAG）＋暖句四條件見 `CONTENT_SPEC.md` §3。
 - 預設代名詞：**we**。**you** 僅用於溫和提醒或前方引用（*"you will see this again in §4.2"*）。
 - 每個 formal statement（`definition`、`theorem`、`proposition`、`corollary`）**SHOULD** 在其前面有 1–2 段直覺散文，解釋為何值得引入這個概念以及它應該意味著什麼。
 - `definition` 主體 **MAY** 在結尾額外附加一句口語化的解說，格式為 *"Informally, ..."*。這是 definition 專屬的選項，不是對所有 formal environment 的通用要求。該解說 **MUST NOT** 引入範例、圖表或新記號。

@@ -1,6 +1,6 @@
 # 微積分講義：排版總規範
 
-**Version 3.3**——單點新增：§16「難度定位與先備知識基線」（2026-07-03 與使用者議定）——雙軸難度定位（深度軸允許向數學分析靠攏的誠實構造；語域軸維持 Stewart / Rogawski 由深入淺）＋ 108 課綱數A（不含選修數甲）的 A／B／C 三類先備清單（B 類首次使用必須就地建立，違者為 blocking）＋ precalculus 附錄收納政策＋新章（含無手稿自產）的深度決策程序；原 §16 Changelog 順延為 §17。其餘內容承襲 v3.2（習題移出講義本體）與 v3.1／v3.0——v3.0 是從零重寫取代 v1.x 和 v2.x，圍繞一個明確的產品定義重新組織規則書：一份 single-sided A4 英文講義，對象為準備自修大學微積分的高中生，搭配影片，以 Stewart / Rogawski 語域撰寫。Changelog（§17）列出具體差異。
+**Version 3.5**——單點新增：§3「平實英文條款」（plain register，2026-07-25 與使用者議定、Codex gate-2 覆核）——MUST 字面化底線／SHOULD 監測值／FLAG 人工候選三層＋暖句四條件測試，服務 §16.2 的 EFL 基線讀者；不改目標語域：「邏輯內容平實；教學導航可溫暖」。其餘承襲 v3.4／v3.3（§16 難度定位與先備知識基線——雙軸難度定位、108 課綱數A A／B／C 三類先備清單、B 類首次使用必須就地建立違者 blocking）、v3.2（習題移出講義本體）與 v3.1／v3.0——v3.0 是從零重寫取代 v1.x 和 v2.x，圍繞一個明確的產品定義重新組織規則書：一份 single-sided A4 英文講義，對象為準備自修大學微積分的高中生，搭配影片，以 Stewart / Rogawski 語域撰寫。Changelog（§17）列出具體差異。
 
 ---
 
@@ -116,6 +116,43 @@ Rationale：Stewart 語域加上自足的 handout 意味著讀者無法依賴老
 - 未解釋的邏輯跳躍；
 - 多句 "meta" commentary 談本章在做什麼（信任結構和 chapter opening 的 bullet list 來做這件事）；
 - prose 中的 inline abbreviation 如 *iff*、*w.r.t.*、*s.t.*——寫出來。
+
+### 平實英文條款（plain register）
+
+（2026-07-25 新增，Codex gate-2 覆核整合。緣起：LLM 撰稿的英文散文持續向文學腔漂移——擬人、隱喻、cleft 強調、警句收尾、不透明慣用搭配——對本書 EFL 基線讀者（§16.2）是額外負荷。研究證據與覆核全文：[`handout/html/_audit/REVIEW-plain-register-research.html`](handout/html/_audit/REVIEW-plain-register-research.html)、[`handout/html/_audit/REPORT-plain-register-codex-gate2-raw.md`](handout/html/_audit/REPORT-plain-register-codex-gate2-raw.md)。本條款**不改**本節目標語域：Stewart 的暖是**教學導航**的暖，不是文學修辭——「**邏輯內容平實；教學導航可溫暖**」。優先序：數學正確與字面可理解 > 流暢／聲音／暖。）
+
+**MUST（字面化底線）：**
+
+- 數學命題、量詞、條件、例外與操作步驟 **MUST** 以字面語言完整傳達；隱喻、擬人、慣用語**不得是唯一載體**（字面表述在場後，MAY 另加直覺補充）。
+- 在**關鍵位置**（定義、術語首次出現、操作指令、節內結論），非術語的陌生詞 **MUST** 換成直白詞、或緊鄰給一句平實釋義。
+- 同一概念在其說明範圍內 **MUST** 使用穩定的術語與代稱——不為變化而換同義詞（elegant variation）。正常文法變化（單複數、時態、代名詞回指）不在此限。
+- **一句承載一個完整想法。** 判準是「這句在推進一個步驟，還是把數件事黏在一起」——**句子長度本身不是缺陷，長短交錯是資產**。因此：≥30 詞**且**含黏接標點（冒號接子句、分號、破折號插入）的句子 **MUST** 逐句人工判定——承載單一複雜想法者**保留**；多個想法以標點串接者**拆開**。**MUST NOT** 設硬性句長上限、**MUST NOT** 機械拆句：過度拆句提高整合負荷，且句長過度均勻正是 AI 文風最典型的特徵之一。（2026-07-25 修訂：原條款只以 ≥35 詞為觸發，實測發現長度只是警報器——真正的負荷來自每句裝幾個想法；改以「詞數＋黏接標點」為觸發、以想法數為判準。）
+
+**SHOULD（監測值，非硬門檻）：**
+
+- 剝除公式、標題、列表後，散文平均句長以 18–22 詞為監測值（**非門檻**）；第 90 百分位 32–35 詞為審查區。超過 25 詞的句子占比宜 <10%。
+- **避免連續三句以上長度相近**——長—中—短的節奏是資產（比照 §3 型② 範文的 burstiness 說明）；平實化 MUST NOT 以犧牲節奏換取。
+- **符號密集段落（量詞操作、\(\varepsilon\)-\(\delta\)、記號建立）以獨立標準檢查**，不套用純散文的句長尺度——讀者在那裡同時解析英文句法與數學記號，負荷疊加；該處要削減的是「一句裡的記號數」與「符號與文字的交錯次數」，不是詞數。
+- 黏接標點本身宜節制：破折號插入、分號、冒號接子句都是「一句裝多個想法」的常見載具；改寫慣用語時 **MUST NOT** 反手用分號把兩個想法黏回一句（2026-07-25 實測教訓：appB 首輪去慣用語時淨增 4 個分號）。
+- 用常見、字面、可預測的搭配；主動語態優先（被動不是錯誤——受事者是主題時被動合法）。
+- 一句承載一個主要教學動作（可攜帶必要條件；不是「一句只能一個子句」）。
+- 對數學物件用中性動詞——*is*、*says*、*gives*、*shows*、*requires*、*guarantees*、*ensures*；避免情緒／戲劇動詞——*rescues*、*asks (a great deal)*、*promises*、*insists*。替代習慣（正向對照）：*asks a great deal* → *is a strong requirement*；*rescues* → *ensures*／*guarantees*。
+- EFL 高風險功能詞（*only if*、*unless*、*respectively*、*arbitrary*、*at most / at least*、*provided*）首次**承重**使用時 SHOULD 以句式讓語義自明、或就地一行釋義——教它，不是淘汰它（高頻 ≠ 好懂）。
+
+**FLAG（人工候選線索；形式本身不是缺陷）：**
+
+以下句式假陽性高，**MUST NOT** 僅因形式判為缺陷——它們只是散文閘 R 維度（[`handout/html/_audit/PROSE-AUDIT-RUBRIC.md`](handout/html/_audit/PROSE-AUDIT-RUBRIC.md)）的掃描線索，判定一律回到上方 MUST 的語義測試：cleft 強調句（*What matters here is the sign of \(f'(x)\).* 是好句）、尾掛 *-ing* 子句、被動語態、數學物件作主詞（*The definition requires …* 正常）、*not just X, but Y*。
+
+**暖句四條件測試**——動機、過渡、成果標記句同時通過以下四條即保留，否則改寫或刪：
+
+1. 讀者能在本句或相鄰句找到**明確指涉**（不懸念、不用模糊代詞掩蓋內容）；
+2. 它說明「**為何現在做這一步**」或「**剛剛得到什麼**」，不是只製造氣氛；
+3. 刪掉它會**損失導航或動機**，不只是少一句漂亮話；
+4. 其中的數學條件已另有**字面、可檢查**的表述。
+
+合法的結構性暖句模板：*To describe [phenomenon], we need a more precise definition.*／*The next example shows why this condition is necessary.*／*We now have a test that lets us decide whether [property] holds.*／（緊接明確推導後）*This gives our first example of a limit.*
+
+Rationale：現症病灶不是句長或音節（Flesch 類公式對病句全部放行），而是「對 EFL 讀者不透明」——罕見**搭配**（*continuity rescues functions*；*rescues* 一詞本身不罕見）、不透明慣用式（*asks a great deal*、*earned in full*）、把數學 pattern 藏進修辭（*a coincidence too strong to be one* 沒說出是哪個 pattern）。證據：把語域要求操作化成具體語言條款是實測最大單一增益（CEFR ControlError 3.66→0.39，Malik et al., ACL Findings 2024）；語言簡化不損數學（Abedi／NCEE 線：EL 學生 +0.16 SD、高程度學生零損失、所測 construct 不變）；ASD-STE100「術語豁免＋其餘平白」是同構的工業標準前例。另一個常見假象：文學腔有時在掩蓋「缺了一步中間解釋」——遇病句先問「是不是少解釋」（屬易懂性 U 維度，**補解釋優先**），再問「要不要換詞」。
 
 ### 語聲參考範文
 
@@ -1126,6 +1163,8 @@ Rationale：規則會演進。明確的 exception record 將偏離從 noise 變�
 **（2026-07-04：全 arc 已裁定深度政策 (B) 分章校準**——理論核心章［Ch4、Ch6 積分/FTC、Ch11 級數、Ch14 多變數可微性］上到 Ch4 級當場嚴格證；應用章標準嚴謹；最重的定理［Ch15 變數變換、Ch16 一般 Stokes/散度、Ch14 Clairaut］給嚴謹陳述＋簡單情形＋一般證明 fence。各章深度基調見 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) 「Ch5–16 弧線骨架」。fence 到的「補證處」是一個尚待立項的 Proof-track 附錄——見該處 roster。）
 
 ## 17. Changelog
+
+- **v3.5（2026-07-25）**——§3 新增「平實英文條款」（plain register）：MUST（數學內容字面化、關鍵位置直白詞、同概念同措辭、≥35 詞句人工判定拆留）／SHOULD（平均句長 18–22 監測值、P90 32–35 審查區、中性動詞對數學物件、EFL 高風險功能詞就地釋義）／FLAG（cleft、尾掛 -ing、被動、數學物件作主詞、not just X but Y——僅為人工候選線索，形式本身非缺陷）＋暖句四條件測試與合法暖句模板。同批：[`handout/html/_audit/PROSE-AUDIT-RUBRIC.md`](handout/html/_audit/PROSE-AUDIT-RUBRIC.md) 新增 R 維度（R1 可推測性／R2 字面傳達與明確指涉／R3 指稱一致性；部分 blocking＋頁級累積規則）與 V1 邊界修訂（暖＝導航清晰，非 lexical 修辭）。緣起：使用者反映 LLM 課文英文「太文學、不利非母語讀者」（2026-07-25）；網路研究三線＋現症診斷（ch06 §6.2 五句）＋ Codex gate-2 覆核（GO-with-changes）——全文見 [`handout/html/_audit/REVIEW-plain-register-research.html`](handout/html/_audit/REVIEW-plain-register-research.html)＋[`handout/html/_audit/REPORT-plain-register-codex-gate2-raw.md`](handout/html/_audit/REPORT-plain-register-codex-gate2-raw.md)。pilot＝Appendix B。（註：v3.4 條目當時未同步版本頭，本次版本頭自 3.3 直接跳 3.5。）
 
 - **v3.4（2026-07-04）**——§16.2 B 類新增三項（全 arc 章脊椎定案＋附錄從頭 clean-slate 設計後，使用者裁定）：冪次和 \(\sum k^2,\sum k^3\)（→ 附錄 §A.3，Ch6 黎曼和先備）、行列式 \(2\times2\)/\(3\times3\)（→ 新「線性代數」附錄，Calc III 叉積/Jacobian/旋度承重）、複數（→ Ch11 Euler 時鋪開）；C 類絕對值不等式加註「承重升 B」（Ch11 收斂半徑）。§16.1 新增「一句話定位」headline（分析骨架＋Stewart 血肉）；§16.3 加註全 arc 深度政策 (B) 分章校準。緣起與證據：章脊椎提案（[`handout/html/_audit/REVIEW-chapter-arc-proposal.html`](handout/html/_audit/REVIEW-chapter-arc-proposal.html)）＋附錄 clean-slate 設計（[`handout/html/_audit/REVIEW-appendix-clean-slate-design.html`](handout/html/_audit/REVIEW-appendix-clean-slate-design.html)），均經 Codex 覆核。同批在 `CONTENT_ROADMAP.md` 立項「線性代數」與「補證處（Proof-track，含定理假設表）」兩附錄。
 

@@ -40,6 +40,7 @@ PROSE-AUDIT-RUBRIC.md 為準（單一真相來源），本 prompt 不重述。
 # 怎麼做
 
 - 按 RUBRIC 兩維度（易懂性 U1–U5、流暢性 F1–F5）逐節走查；擋稿線見 RUBRIC（易懂性會卡讀者 → blocking；流暢性 polish → advisory）。
+- （2026-07-25 起 RUBRIC 增 **R 維度「語域平實」**（R1 可推測性／R2 字面傳達／R3 指稱一致；部分 blocking）——gate-2 若同時審 R，比照 RUBRIC §R 與 `CONTENT_SPEC.md` §3〈平實英文條款〉：FLAG 句式僅為線索，判定回語義測試。）
 - 你的特殊價值是「**另一個真實讀者**」：特別留意 gate 1（Claude）可能因「覺得顯而易見」而略過、但真實讀者會卡住的易懂性缺口（U1–U4）。
 - **嚴守 RUBRIC 的「§3-protected non-findings」**；遵守四級回報、**不 over-report**、乾淨章節是有效結果。
 
