@@ -13,7 +13,7 @@
     <h1 class="ch-title">Derivatives</h1>
   </header>
 
-  <p class="lead">The limit machinery of Chapter 1 was developed in part to make precise the idea of a function approaching a value as its input approaches some target. The principal payoff of that machinery, and the subject of this chapter, is the <em>derivative</em>: an operator that takes a function and returns another function describing how fast it is changing. Geometrically the derivative gives the slope of the tangent line at each point of a curve; physically it gives the instantaneous rate of change of a quantity that varies in time; algebraically it satisfies a small set of arithmetic rules that turn differentiation into a procedure rather than a per-problem invention. We meet the derivative first at a single point, as a limit of secant slopes, then as a function in its own right. A subtler point comes next: its existence at a point implies continuity, but continuity does not imply it. Finally we treat it as an operator we can compute on polynomials, on the natural exponential, and on products and quotients of differentiable functions.</p>
+  <p class="lead">The limit machinery of Chapter 1 was developed in part to make precise the idea of a function approaching a value as its input approaches some target. The main use of those limit methods, and the subject of this chapter, is the <em>derivative</em>: an operator that takes a function and returns another function describing how fast it is changing. Geometrically the derivative gives the slope of the tangent line at each point of a curve; physically it gives the instantaneous rate of change of a quantity that varies in time; algebraically it satisfies a small set of arithmetic rules that turn differentiation into a procedure rather than a per-problem invention. We meet the derivative first at a single point, as a limit of secant slopes, then as a function in its own right. A subtler point comes next: its existence at a point implies continuity, but continuity does not imply it. Finally we treat it as an operator we can compute on polynomials, on the natural exponential, and on products and quotients of differentiable functions.</p>
 
   <p class="para-head">By the end of this chapter, you will be able to:</p>
   <ul>
@@ -32,12 +32,12 @@
   </header>
 
   <!-- expansion:application — tangent-as-approximation anchor to open the section -->
-  <p>Suppose you need a quick estimate of \(\sqrt{4.01}\) without a calculator. The function \(f(x) = \sqrt{x}\) passes through the convenient point \((4, 2)\), and near that point the curve is almost straight — so a well-chosen line through \((4, 2)\) should give a good approximation. But which line? The answer is the <em>tangent line</em>: intuitively, the line that grazes the curve at that point, matching its direction. To pin down this line we need to determine its slope, and that quest leads directly to the central idea of differential calculus.</p>
+  <p>Suppose you need a quick estimate of \(\sqrt{4.01}\) without a calculator. The function \(f(x) = \sqrt{x}\) passes through the convenient point \((4, 2)\), and near that point the curve is almost straight, so a well-chosen line through \((4, 2)\) should give a good approximation. But which line? The answer is the <em>tangent line</em>: intuitively, the line through that point whose direction matches the curve there. To pin down this line we need to determine its slope, and that quest leads directly to the central idea of differential calculus.</p>
 
   <!-- expansion:intuition — "why can't we just measure the slope?" collision -->
   <h3 class="subsec-head">The problem with tangent lines</h3>
 
-  <p>Given a curve \(y = f(x)\) and a point \(P = (a,\, f(a))\) on it, we want the tangent line at \(P\). Since the line passes through \(P\), all we need is its slope. For a line through <em>two</em> points the slope is the familiar rise-over-run ratio — but for the tangent line at \(P\) we start with only the single point \(P\) itself. With no second point there is no rise and no run; trying to compute “slope \(= (f(a) - f(a))/(a - a)\)” gives the meaningless expression \(0/0\). We need a different strategy.</p>
+  <p>Given a curve \(y = f(x)\) and a point \(P = (a,\, f(a))\) on it, we want the tangent line at \(P\). Since the line passes through \(P\), all we need is its slope. For a line through <em>two</em> points the slope is the familiar rise-over-run ratio, but for the tangent line at \(P\) we start with only the single point \(P\) itself. With no second point there is no rise and no run; trying to compute “slope \(= (f(a) - f(a))/(a - a)\)” gives the meaningless expression \(0/0\). We need a different strategy.</p>
 
   <h3 class="subsec-head">Secant lines and the limiting slope</h3>
 
@@ -73,7 +73,7 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>A common slip is to read the numerator \(f(a + h) - f(a)\) as \(f(h)\). The symbol \(h\) is an <em>increment</em> — a small step away from the base point \(a\) — not an input in its own right. When you expand the difference quotient, substitute \(a + h\) into the function, writing \(f(a + h)\); never replace it with \(f(h)\) alone.</p>
+      <p>A common slip is to read the numerator \(f(a + h) - f(a)\) as \(f(h)\). The symbol \(h\) is an <em>increment</em>, a small step away from the base point \(a\). It is not an input in its own right. When you expand the difference quotient, substitute \(a + h\) into the function, writing \(f(a + h)\); never replace it with \(f(h)\) alone.</p>
     </div>
   </section>
 
@@ -87,13 +87,13 @@
 
   <p>\[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]</p>
 
-  <p>For now, \(f'(a)\) is simply a number — the slope of one tangent line at one specific point. In §2.2 we will let \(a\) vary and study \(f'\) as a function in its own right.</p>
+  <p>For now, \(f'(a)\) is simply a number, the slope of one tangent line at one specific point. In §2.2 we will let \(a\) vary and study \(f'\) as a function in its own right.</p>
 
   <!-- expansion:intuition — expand the seed's one-line zoom-in remark into local linearity -->
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.1</span><span class="env-name">Local linearity</span></p>
     <div class="env-body">
-      <p>If you zoom in on the curve at \(P\), the curve looks increasingly like a straight line — the tangent line. In other words, near \(P\) the function \(f\) behaves almost like the linear function \(f(a) + f'(a)(x - a)\). This is the principle of <em>local linearity</em>: a differentiable curve can be approximated by its tangent line near the point of tangency. The closer \(x\) is to \(a\), the better the approximation. We will return to this idea at the end of the section.</p>
+      <p>If you zoom in on the curve at \(P\), the curve looks increasingly like a straight line, namely the tangent line. In other words, near \(P\) the function \(f\) behaves almost like the linear function \(f(a) + f'(a)(x - a)\). This is the principle of <em>local linearity</em>: a differentiable curve can be approximated by its tangent line near the point of tangency. The closer \(x\) is to \(a\), the better the approximation. We will return to this idea at the end of the section.</p>
     </div>
   </section>
 
@@ -198,7 +198,7 @@
             <tbody><tr><td class="rowlab">secant slope \(\,2 + h\)</td><td>\(2.5\)</td><td>\(2.1\)</td><td>\(2.01\)</td></tr></tbody>
           </table>
         </div>
-        <p>The secant slopes march toward \(2\), and indeed \(\lim_{h \to 0}(2 + h) = 2\). The tangent slope at \(P\) is therefore \(2\) — the value the secants converge to, exactly the rotation of secants into the tangent pictured in Figure 2.1.</p>
+        <p>The secant slopes march toward \(2\), and indeed \(\lim_{h \to 0}(2 + h) = 2\). The tangent slope at \(P\) is therefore \(2\), the value the secant slopes converge to. Figure 2.1 shows the same convergence geometrically, with the secant lines rotating into the tangent.</p>
       </div>
     </section>
   </div>
@@ -216,7 +216,7 @@
       <div class="env-body">
         <p>First find the slope at \(x = 2\). With \(f(x) = 1/x\),
         \[ f'(2) = \lim_{h \to 0} \frac{\dfrac{1}{2 + h} - \dfrac{1}{2}}{h} = \lim_{h \to 0} \frac{-1}{2(2 + h)} = -\frac{1}{4}, \]
-        so the tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\) is \(y = \tfrac{1}{2} - \tfrac{1}{4}(x - 2)\). Near \(x = 2\) the curve hugs this line (local linearity, Remark 2.1), so substituting \(x = 2.05\) gives</p>
+        so the tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\) is \(y = \tfrac{1}{2} - \tfrac{1}{4}(x - 2)\). Near \(x = 2\) the curve stays close to this line (local linearity, Remark 2.1), so substituting \(x = 2.05\) gives</p>
         <p>\[ \frac{1}{2.05} \;\approx\; \tfrac{1}{2} - \tfrac{1}{4}(0.05) = 0.5 - 0.0125 = 0.4875. \]</p>
         <p>A calculator gives \(1/2.05 = 0.48780\ldots\), so the estimate is accurate to three decimal places.</p>
 
@@ -235,12 +235,12 @@
       \[ f'(4) = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} = \frac{1}{4} \]
       (the same conjugate technique as Example 2.3), so the tangent line is \(y = 2 + \tfrac{1}{4}(x - 4) = \tfrac{1}{4}x + 1\). Substituting \(x = 4.01\) gives
       \[ \sqrt{4.01} \;\approx\; \tfrac{1}{4}(4.01) + 1 = 2.0025. \]
-      A calculator confirms \(\sqrt{4.01} = 2.00249844\ldots\), so the tangent-line estimate is accurate to four decimal places. This is the tangent-line approximation of Example 2.5 — the principle of local linearity (Remark 2.1) — applied to the question we opened the section with.</p>
+      A calculator confirms \(\sqrt{4.01} = 2.00249844\ldots\), so the tangent-line estimate is accurate to four decimal places. This is the tangent-line approximation of Example 2.5, applied to the question that opened the section. It is the principle of local linearity (Remark 2.1) used for a numerical estimate.</p>
     </div>
   </section>
 
   <!-- expansion:application — the tangent line as linearization, used throughout applied mathematics [pass: enrichment] -->
-  <p>The move we just made — replacing a curve by its tangent line over a small range — is used throughout applied science and engineering, where it is called <em>linearization</em>. A navigation system linearizes the equations relating its position to satellite distances; a physicist replaces \(\sin\theta\) by \(\theta\) for the small swings of a pendulum; an economist treats a marginal cost as the slope of a cost curve. Each time, a hard curved problem is traded, near a point of interest, for an easy straight-line one — the practical payoff of local linearity.</p>
+  <p>Replacing a curve by its tangent line over a small range is used throughout applied science and engineering, where it is called <em>linearization</em>. A navigation system linearizes the equations relating its position to satellite distances; a physicist replaces \(\sin\theta\) by \(\theta\) for the small swings of a pendulum; an economist treats a marginal cost as the slope of a cost curve. In each case, a hard curved problem is replaced near a point of interest by an easy straight-line one. That is the practical value of local linearity.</p>
 
   <!-- expansion:summary — forward-ref to §2.2 -->
   <p>In the next section we turn the slope formula into a <em>function</em>: instead of computing the tangent slope at one fixed point \(a\), we let \(a\) vary and obtain a new function \(f'(x)\) that records the slope at every point where the limit exists.</p>
