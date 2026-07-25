@@ -37,6 +37,8 @@
   - **黏接句判準（2026-07-25 新增，同日經 Codex 覆核修訂；CONTENT_SPEC §3 平實英文條款連動）：** 對 EFL 讀者，殘餘難度的主要來源是「一句內塞兩個可獨立成立的推論或教學動作」。**判準是論述動作數，不是長度也不是子句數**——定義、條件＋結果、公式說明、平行列舉各自都算**一個**動作，這類長句**不算 finding**（不得因長度報 F4）。觸發器（≥30 詞＋黏接訊號：冒號接子句／分號／破折號／and-while-which 串接）只是**要人工看一眼**，不是拆句命令。
   - **不得報為 finding**：正式定義與定理陳述、平行列舉、路線圖句、引文；冒號後引清單／公式／標籤者不算「冒號接子句」。
   - **反向護欄**：改寫 MUST NOT 拆散量詞 scope、條件—結論、代名詞與先行詞；MUST NOT 造出連續三句長度相近的連續散文（以朗讀聽感判，排除列表與刻意平行）；MUST NOT 為維持句數而用任何標點把兩個獨立推論黏回一句。符號密集段落優先改 display／分行 skeleton／先立記號，而非按詞數切句。
+  - **成對破折號不歸本維度逐句判（2026-07-25 合併）：** em-dash 是**節級密度指標**（canonical 量測與目標見 CONTENT_SPEC §3「成對破折號與標點負載」、腳本 [`tools/prose_metrics.py`](../../../tools/prose_metrics.py)），**不得**當成 case-by-case finding 報。成對破折號依 §3 的四步仲裁決策序判；單破折號尾巴進 CUT palette。已有先例：`— far more often —` KEEP、`— only then —` 預設 KEEP。
+  - **原因標籤（合併 sweep 必附）：** 每個改點標 `DASH-CUT`／`DASH-KEEP`／`PLAIN-SPLIT`／`TIC-REBALANCE`／`R1-LEXICAL`，並在報告並列 em-dash／冒號接子句／分號／左括號／成對逗號的前後值（顯著＝raw ≥+3 且密度 ≥+0.5/1000 才須填理由）。
 - **F5 語域** — hedge、過度口語（*super easy*、*you guys*）、黑板縮寫（*iff*、*w.r.t.*、*s.t.*）、代名詞策略（*we* 預設；*you* 僅用於溫和提醒或 forward reference）。
 
 ### C. 語意／聲音 Substance／Altitude／Voice（S/A/V 語意層 critic；部分 BLOCKING）

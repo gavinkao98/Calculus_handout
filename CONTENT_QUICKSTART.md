@@ -12,6 +12,7 @@
 
 Stewart / Rogawski 語調：讓一位自學的高中生能讀懂，完整句子、連接詞明確、直覺先於形式化、溫暖但不話嘮。不是 Spivak，不是課堂速記。
 
+- **散文密度量測（2026-07-25）**：`python tools/prose_metrics.py`（canonical prose stream，em-dash 密度目標 ≤3.0/1000 ＋ tic guard 四項）；改動驗證 `python tools/verify_edits.py <file> <edits.txt>`（證明「HEAD ＋ 恰好這些替換」）。**去 em-dash 政策已併入 §3**，成對破折號依四步仲裁決策序判、不得只換成逗號。
 - **平實英文條款（2026-07-25）**：邏輯內容平實、教學導航可溫暖——數學命題／條件／步驟 MUST 字面化（隱喻、擬人、慣用語不得是唯一載體）、關鍵位置用直白詞、同概念同措辭；對數學物件用中性動詞（requires／guarantees，不用 rescues／asks a great deal）；cleft 等句式僅為人工複查線索、形式本身非缺陷。完整三層（MUST/SHOULD/FLAG）＋暖句四條件見 `CONTENT_SPEC.md` §3。
 - 預設代名詞：**we**。**you** 僅用於溫和提醒或前方引用（*"you will see this again in §4.2"*）。
 - 每個 formal statement（`definition`、`theorem`、`proposition`、`corollary`）**SHOULD** 在其前面有 1–2 段直覺散文，解釋為何值得引入這個概念以及它應該意味著什麼。

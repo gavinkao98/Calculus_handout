@@ -153,6 +153,24 @@ Rationale：Stewart 語域加上自足的 handout 意味著讀者無法依賴老
 
 以下句式假陽性高，**MUST NOT** 僅因形式判為缺陷——它們只是散文閘 R 維度（[`handout/html/_audit/PROSE-AUDIT-RUBRIC.md`](handout/html/_audit/PROSE-AUDIT-RUBRIC.md)）的掃描線索，判定一律回到上方 MUST 的語義測試：cleft 強調句（*What matters here is the sign of \(f'(x)\).* 是好句）、尾掛 *-ing* 子句、被動語態、數學物件作主詞（*The definition requires …* 正常）、*not just X, but Y*。
 
+**成對破折號與標點負載（2026-07-25 併入；原為獨立的「去 em-dash 線」，2026-07-20 立）**
+
+過量的散文 em-dash（`—`）是可量測的 LLM 撰稿指紋。此政策原為獨立規則線，因實測發現兩線互相抵銷而併入本條款——appB 的 de-dash 輪把 150 個破折號轉掉，代價是冒號接子句 +37、左括號 +37，隨後的平實輪又得清這些尾巴（證據與合併設計見 [`handout/html/_audit/REVIEW-merge-dedash-plain-proposal.html`](handout/html/_audit/REVIEW-merge-dedash-plain-proposal.html)，經 Codex 設計審查）。
+
+- **量測**：唯一真實來源為 [`tools/prose_metrics.py`](tools/prose_metrics.py) 的 canonical prose stream（納入段落與 environment 正文的連續自然語言；排除數學／標題／env-head／註解／屬性與 URL；清單、表格、figcaption 入副表不入主分母；entity 只解碼一次，逸出寫法不計）。**兩個 `/1000` 指標（em-dash 密度、家族命中密度）MUST 共用同一分母。**
+- **目標 `T_can` ≤ 3.0/1000（canonical stream）**。canonical 重測的真實教材基準：mooculus 0.0、APEX V5 0.5、CLP1 3.1（CLP 為五本中最口語者，即目標貼的上緣）。appB 定稿後 2.2，為現行唯一達標單元。**N < 1000 詞的單元 MUST 報 raw `n/N`，不單獨判定通過**（與鄰近單元合併後才判）。
+- **CUT（AI tell 主力）**：單破折號「子句 — 補述／改寫」尾巴 → 冒號（交付 payload）／逗號（鬆散同位語）／分句（後段是獨立子句）；可用括號的插入語 → 括號（尤其插入語本身含逗號或清單）。
+- **KEEP 與仲裁決策序（成對破折號）**：成對 em dash 的節拍式插入語 MAY 保留，**前提是移除插入語後主幹仍是一個教學動作，且插入語只修飾同一主張的程度、頻率、時點、必要條件或對比**；它 MUST NOT 另行提出可獨立表述的定義、理由、例外、推論、指令或結論。逐處依序判：
+  1. 拿掉 `— Y —`，檢查 `X Z` 主幹是否仍文法完整、量詞與 scope 不變；
+  2. 問 `Y` 脫離主幹後是否仍有獨立教學用途（**有限動詞本身不是充分條件**）；
+  3. `Y` 只是同一主張的修飾 → **保留成對 dash**；`Y` 是另一步理由、域別結論、例外或指令 → **重寫整句**；
+  4. 只有**單**破折號尾巴才進 CUT palette；**MUST NOT 只把成對破折號換成逗號**（表面去 dash，不換來可理解性）。
+  其餘 KEEP：引號內對白式停頓；註解標明「多處須平行」的措辭；worked-solution 的電報式 gloss／無動詞短句尾（改分句會變殘句）。
+  **先例（2026-07-25 Codex 裁決，具約束力）**：`— far more often —` 屬同一主張的頻率修飾 → **KEEP**（本輪一度改逗號，已 REVERT）；`— and over the integers you never can —` 若構成另一域別結論 → **整句重寫**，不得只逗號化；`— only then —` **預設 KEEP**，不得為一致性而動。
+- **不換 tic 護欄**：同一份報告 MUST 並列前後值：em-dash、冒號接子句、分號、左括號、**成對逗號插入語**（總 comma rate 太吵，只抓成對）。**「顯著上升」＝ raw ≥ +3 **且** 密度 ≥ +0.5/1000**，達此門檻 MUST 填理由。
+- **兩個閘門不可互相豁免**：逐例 KEEP MUST NOT 因為密度差幾個名額就被機械改成逗號；反之，KEEP 的存在 MUST NOT 默默豁免節級密度目標——仍超標時應另找安全改點、重寫真正的多動作句，或**明示節級例外**，不得逐筆討價還價。
+- **固定執行序（合併 sweep）**：① 範圍／數學安全 → ② 論述動作判讀 → ③ CUT／KEEP → ④ 節級密度閘 → ⑤ 不換 tic 檢查。每個改點 MUST 標原因標籤（`DASH-CUT`／`DASH-KEEP`／`PLAIN-SPLIT`／`TIC-REBALANCE`／`R1-LEXICAL`），報告同時列 raw count、`N`、密度與各標籤貢獻，以免一輪多面向後失去歸因。
+
 **暖句四條件測試**——動機、過渡、成果標記句同時通過以下四條即保留，否則改寫或刪：
 
 1. 讀者能在本句或相鄰句找到**明確指涉**（不懸念、不用模糊代詞掩蓋內容）；
@@ -710,7 +728,7 @@ Display math 中的所有 `\frac` 自動以 full size render；display math 中�
 
 - Hyphen（`-`）：連字詞如 *one-to-one*、*left-hand*、*real-valued*。
 - En dash（Unicode `–`）：數值和頁碼範圍如 *pages 12–15*。
-- Em dash（Unicode `—`）：散文中的插入語。**謹慎使用；comma 或一對括號通常更好。** 量化目標：**散文 em-dash ≤ ~3/1000 詞**（＝真實數學課本／人類寫作檔位；OpenStax 0.4、CLP 3.4、人類平均 3.23）。過量的 em-dash 是可量測的 LLM 撰稿指紋——主要 tell 是單破折號「子句 — 補述／改寫」尾巴反覆出現。基準實測、cut/keep 方法與全書 rollout 狀態見 [`handout/html/_audit/REPORT-emdash-baseline-and-rollout.md`](handout/html/_audit/REPORT-emdash-baseline-and-rollout.md)。
+- Em dash（Unicode `—`）：散文中的插入語。**謹慎使用；comma 或一對括號通常更好。** **政策（密度目標、cut／keep palette、成對插入語仲裁、不換 tic 護欄）已於 2026-07-25 併入 §3〈平實英文條款〉的「成對破折號與標點負載」小節**——本處只保留字元排印區辨，量化與判準一律以 §3 為準。基準實測與全書 rollout 狀態見 [`handout/html/_audit/REPORT-emdash-baseline-and-rollout.md`](handout/html/_audit/REPORT-emdash-baseline-and-rollout.md)。
 
 ### 省略號
 

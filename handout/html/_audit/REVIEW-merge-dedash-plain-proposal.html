@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>去 em-dash 與平實化能否合併 — 研究與提案</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2df; --bg:#fbfbf9; --card:#fff;
+    --good:#1f7a44; --good-bg:#f0f8f3; --good-line:#b8ddc7; --bad:#a3232a; --bad-bg:#fdf4f4;
+    --warn:#9a5b00; --warn-bg:#fdf3e3; --accent:#2d5a8a; --code-bg:#f4f4f2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Inter","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.6; max-width:960px; margin:0 auto; padding:2.4rem 1.5rem 5rem; }
+  h1 { font-size:1.45rem; line-height:1.3; margin:0 0 .3rem; }
+  .sub { color:var(--muted); font-size:.93rem; margin:0 0 1.6rem; }
+  h2 { font-size:1.14rem; margin:2.4rem 0 .7rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+  h3 { font-size:.98rem; margin:1.4rem 0 .45rem; color:var(--accent); }
+  code { font-family:Consolas,monospace; font-size:.87em; background:var(--code-bg); padding:.08em .35em; border-radius:3px; }
+  table { border-collapse:collapse; width:100%; margin:.7rem 0 1rem; font-size:.87rem; }
+  th,td { border:1px solid var(--line); padding:.38rem .5rem; text-align:left; vertical-align:top; }
+  th { background:#f0f0ee; font-weight:600; }
+  td.num,th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.9rem 1.15rem; margin:1rem 0; }
+  .card.bad { background:var(--bad-bg); border-color:#e8c9c9; }
+  .card.good { background:var(--good-bg); border-color:var(--good-line); }
+  .card.warn { background:var(--warn-bg); border-color:#e8d3a8; }
+  .tag { display:inline-block; font-size:.74rem; font-weight:600; padding:.08rem .45rem; border-radius:999px; }
+  .tag.good { color:var(--good); background:var(--good-bg); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); }
+  .tag.bad { color:var(--bad); background:var(--bad-bg); }
+  ul.tight { margin:.3rem 0 .7rem; padding-left:1.3rem; }
+  ul.tight li { margin:.22rem 0; }
+  .small { font-size:.85rem; color:var(--muted); }
+  .foot { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.84rem; color:var(--muted); }
+  .up { color:var(--good); font-weight:700; }
+  .dn { color:var(--bad); font-weight:700; }
+  .en { font-style:italic; }
+  .hl { background:#fff3b0; padding:0 .15em; border-radius:2px; }
+</style>
+</head>
+<body>
+
+<h1>去 em-dash 與平實化：能否合併</h1>
+<p class="sub">研究＋提案 · 2026-07-25 · 純提案，未改任何規格檔或課文</p>
+
+<div class="card bad">
+  <strong>一句話：該合併，而且不是為了省事——分開做已經在互相抵銷。</strong>
+  appB 的 de-dash 輪砍掉 150 個破折號，代價是<span class="hl">冒號接子句 +37、左括號 +37</span>；我今天的平實輪又把冒號接子句拉回 −11。<strong>兩輪在同一批標點上反向拉扯</strong>，而 de-dash 報告 §3 自己警告過這風險（「→ 冒號用太多會變新的冒號 tic」）卻沒有下游檢核來抓。更硬的證據：de-dash 的 KEEP 清單點名要保護三個破折號插入語，<strong>我今天拆掉了其中兩個</strong>。
+</div>
+
+<h2>§1 證據 A：標點負載被搬移，不是被消除</h2>
+<table>
+  <tr><th>appB 時點</th><th class="num">散文詞</th><th class="num">em-dash</th><th class="num">/1000</th><th class="num">冒號接子句</th><th class="num">分號</th><th class="num">左括號</th></tr>
+  <tr><td><code>4a97ba1^</code> de-dash 之前</td><td class="num">10188</td><td class="num">174</td><td class="num">17.1</td><td class="num">105</td><td class="num">65</td><td class="num">37</td></tr>
+  <tr><td><code>4a97ba1</code> de-dash 之後</td><td class="num">10188</td><td class="num"><span class="up">24</span></td><td class="num"><span class="up">2.4</span></td><td class="num"><span class="dn">142 (+37)</span></td><td class="num">65</td><td class="num"><span class="dn">74 (+37)</span></td></tr>
+  <tr><td><code>HEAD</code> 平實兩輪之後</td><td class="num">10186</td><td class="num">20</td><td class="num">2.0</td><td class="num">131 (−11)</td><td class="num">60 (−5)</td><td class="num">73</td></tr>
+</table>
+<p class="small">解讀：de-dash 達成了它的目標（17.1 → 2.4／1000，收進真實教材區間），但把負載搬到冒號與括號上；<strong>我的平實輪花了一部分力氣在清這些尾巴</strong>（appB 第二輪 20 個改點中，3 個是回收我自己造的分號、多處是把 de-dash 留下的冒號接子句拆開）。這是<strong>可量測的重工</strong>：同一批句子被兩輪各動一次。</p>
+
+<h2>§2 證據 B：規則直接衝突（不是理論風險，已發生）</h2>
+<div class="card warn">
+  <p>de-dash 的 <strong>KEEP 清單</strong>（<code>REPORT-emdash-baseline-and-rollout.md</code> §3）明文保護「句中對稱插入語（刻意打斷主句的強調節拍）」，並點名三個例子。我今天的平實輪處置如下：</p>
+  <table>
+    <tr><th style="width:46%">de-dash 要 KEEP 的</th><th>平實輪的實際處置</th></tr>
+    <tr><td class="en">— far more often —（§B.6）</td><td><span class="tag bad">已拆</span>A10 改成 <span class="en">, far more often ,</span>（Codex 判 PASS）</td></tr>
+    <tr><td class="en">— and over the integers you never can —（§B.6）</td><td><span class="tag bad">已拆</span>A13 先改逗號，Codex 判 FIX 後整句重寫</td></tr>
+    <tr><td class="en">— only then —</td><td><span class="tag good">仍在</span>未動</td></tr>
+  </table>
+  <p><strong>三個 KEEP 例句我動了兩個</strong>，而且 Codex 兩次都沒反對（一個 PASS、一個給了更好的改法）。這說明兩份規則對「同一個構造」給出相反指示，需要明文仲裁——不能靠執行者當下記得哪份文件說了什麼。</p>
+</div>
+
+<h2>§3 證據 C：兩把尺不一致，其中一個結論是錯的</h2>
+<table>
+  <tr><th>單元</th><th class="num">我量 em-dash</th><th class="num">我量散文詞</th><th class="num">我量 /1000</th><th class="num">報告值 /1000</th><th>差異來源</th></tr>
+  <tr><td>ch07</td><td class="num">180</td><td class="num">10484</td><td class="num">17.2</td><td class="num">13.2</td><td>dash 數<strong>完全相同</strong>，分母差 3172 詞 → <strong>散文詞的定義不同</strong></td></tr>
+  <tr><td>ch01</td><td class="num">58</td><td class="num">7070</td><td class="num">8.2</td><td class="num">5.5</td><td>同上（ch01 從未被動過）</td></tr>
+  <tr><td><strong>appD</strong></td><td class="num"><strong>24</strong></td><td class="num">1610</td><td class="num"><strong>13.7</strong></td><td class="num">0.9</td><td><span class="hl">報告漏數 <code>&amp;mdash;</code> entity</span>——appD 是全書唯一用 entity 寫破折號的單元（20 個 entity ＋ 4 個字面）</td></tr>
+</table>
+<div class="card bad">
+  <strong>rollout 報告 §2 的「appD 0.9，本就低，無需處理」是錯的。</strong>appD 實際有 24 個散文破折號（20 個寫成 <code>&amp;mdash;</code>、4 個字面），密度與其他待做單元同級。它被標成「免」，是因為當時的量測腳本只數字面 <code>—</code>。
+  <br><br>
+  其餘單元的差異則來自<strong>分母</strong>（散文詞定義不同：我剝掉所有行內數學內容，他們顯然保留了一部分），所以<strong>絕對值不可互比</strong>——但兩把尺的<strong>相對排序一致</strong>（ch07／appA／appC／ch02 最高、ch01 最低、appB 已收），結論方向不受影響。合併後必須用<strong>一支共用腳本</strong>，否則「達標了嗎」這件事會一直說不清。
+</div>
+
+<h2>§4 證據 D：LaTeX 線已經脫鉤</h2>
+<div class="card warn">
+  de-dash 那輪做了「HTML＋LaTeX 雙線同步」（<code>convert.py</code> → <code>make_dist.py</code>，dist 的 <code>.tex</code>／<code>.pdf</code> 一起重出）。<strong>我今天的兩輪都沒做</strong>：
+  <ul class="tight">
+    <li><code>handout/latex/dist/appB/</code> 最後一次變動＝<code>4a97ba1</code>（de-dash 輪）</li>
+    <li><code>handout/html/fragments/appB/</code> 最後一次變動＝<code>97884b7</code>（今天的平實輪）</li>
+  </ul>
+  → <strong>appB 的出版線產物現在對不上內容源</strong>（appB 是 LaTeX pilot GO 單元，這條線是要出版的）。合併流程必須把 dist 同步列進驗收清單，否則每輪都會累積這種脫鉤。
+</div>
+
+<h2>§5 提案：合併什麼、不合併什麼</h2>
+
+<h3>合併（三層）</h3>
+<table>
+  <tr><th style="width:16%">層</th><th>做法</th></tr>
+  <tr><td><strong>規則層</strong></td><td>em-dash 政策<strong>併入 <code>CONTENT_SPEC.md</code> §3〈平實英文條款〉</strong>的「黏接訊號」子條（那裡本來就列了「破折號插入」）：把量化目標（散文 em-dash ≤ ~3/1000，真實教材基準 0.09–3.40）與 cut/keep palette 從 REPORT 提升進 spec；<code>§8 破折號</code> 只留一行指標指向 §3（§8 是排版章，政策該跟語域條款放在一起）。</td></tr>
+  <tr><td><strong>仲裁條款</strong></td><td>新增一句解決 §2 的衝突：<strong>「句中對稱插入語」的 KEEP 前提是該句不同時構成多論述動作黏接句；兩條同時適用時以可理解性優先</strong>——依 §3 既有的優先序「數學正確與字面可理解 &gt; 流暢／聲音／暖」。（本輪 A10／A13 的處置即符合此仲裁，事後追認。）</td></tr>
+  <tr><td><strong>流程層</strong></td><td>一節一輪<strong>合併 sweep</strong>：① 詞彙家族（R1）② <strong>標點與黏接（含 em-dash 密度、冒號／分號／括號負載）</strong> ③ 段落層。<strong>一份走查稿、一份 applied、一個 commit</strong>。避免同一批句子被兩輪各動一次。</td></tr>
+</table>
+
+<h3>不合併（保持分開的兩件事）</h3>
+<ul class="tight">
+  <li><strong>em-dash 不降級成 R 維度的 case-by-case finding。</strong>它是機械可測的<strong>密度指標</strong>（有真實教材基準、有目標值），保持「密度目標＋palette」的形態；R 維度處理的是「這句對 EFL 讀者透不透明」，兩者判讀成本與精度完全不同。合併的是<strong>執行輪次</strong>，不是判準性質。</li>
+  <li><strong>兩份紀錄文件不合併。</strong><code>REPORT-emdash-baseline-and-rollout.md</code> 是基準與 rollout 帳本（要持續更新密度表），平實化的 walk／applied 是逐輪紀錄。合併後 rollout 表<strong>加欄位</strong>（家族命中/1000、段落離群數）即可，不必改成一份。</li>
+</ul>
+
+<h3>工程層：把 de-dash 那輪更強的做法吸收過來</h3>
+<div class="card good">
+  de-dash 的 §4 recipe 有兩件事<strong>比我今天的做法嚴格</strong>，應該成為合併流程的標準：
+  <ul class="tight">
+    <li><strong>交易式套用</strong>：每筆 <code>(old→new)</code> <code>assert</code> 只命中一次、逐檔全對才寫。（我今天是逐個 Edit，靠工具的唯一性檢查——等價，但沒有批次全對才寫的保證。）</li>
+    <li><strong>reverse-apply == HEAD 的 byte-for-byte 證明</strong>：把改動逆轉後與 HEAD 完全相同，證明「HEAD ＋ 恰好這些改動、其餘一字未動」。<strong>這比我用的「數學片段 diff 比對」更強</strong>——我的方法能證明數學沒變，它的方法能證明<em>整個檔案除了指定改動外</em>沒變。</li>
+  </ul>
+  反向也有一項我今天的做法該補進去：<strong>「不換 tic」的量化護欄</strong>——同一份報告同時列 em-dash／冒號接子句／分號／左括號四個數字的前後值，任一項顯著上升就要說明。這正是 §1 那個問題當初沒被抓到的原因。
+</div>
+
+<h2>§6 合併後的 rollout 順序（重排）</h2>
+<p class="small">原 rollout 只按 em-dash 密度排；合併後要看兩個維度。家族命中密度目前只有三節實測（appB 10.5、§6.2 14.7、§6.3 10.6 每千詞），其餘單元未測——所以順序先沿用 dash 密度，並在每輪順手補測家族密度。</p>
+<table>
+  <tr><th>批次</th><th>單元</th><th>理由</th></tr>
+  <tr><td><strong>先補</strong></td><td>appB dist 重出 ＋ appD 重測</td><td>§4 的脫鉤要先接回（appB 是出版 pilot）；appD 的 entity 量測 bug 要先修正才知道它該不該做</td></tr>
+  <tr><td>第 1</td><td>ch07（dash 17.2／180 個，全書最高）</td><td>兩個維度都最重；且 ch07 是最新章，改完可直接當「新章標準流程」的樣板</td></tr>
+  <tr><td>第 2</td><td>appA（18.0）、appC（16.2）</td><td>附錄，形狀近 appB，palette 可直接套</td></tr>
+  <tr><td>第 3</td><td>ch02（15.9）、ch05（14.1）</td><td>正文，量大</td></tr>
+  <tr><td>第 4</td><td>ch06 §6.1／§6.4／§6.5（13.0）</td><td>ch06 的 §6.2／§6.3 已做；<strong>§6.1 另有兩段 ≥150 詞的段落離群</strong>（§6.3 輪發現）</td></tr>
+  <tr><td>第 5</td><td>ch03（13.3）、ch04（12.7）、ch01（8.2）</td><td>ch01 最輕、且是去 AI 味簽核基準，放最後</td></tr>
+</table>
+
+<h2>§7 對「新增章節」的意義</h2>
+<div class="card">
+  你問的另一半——之後新增的章節怎麼辦。合併後答案很乾淨：<strong>這不是「回填清單」的一部分，而是 Mode A 的一部分</strong>。
+  <ul class="tight">
+    <li>新章撰稿時，§3 的平實條款（含併入的 em-dash 目標與 palette）本來就在 brief 裡＝生成端就受約束；</li>
+    <li>Mode A 完稿的自檢加一道<strong>合併 sweep</strong>（同一支腳本、同一份門檻），過了才進後續閘序；</li>
+    <li>這也正是規則升 v1.0 前缺的那塊驗證——<strong>下一個新節就是生成端兩臂對照的場地</strong>：一臂只給範文、一臂掛完整條款，比 dash 密度與家族密度。做完這件事，「新章還要不要另跑 de-dash 輪」就有答案了（預期：不用，因為約束在生成端就在場）。</li>
+  </ul>
+</div>
+
+<h2>§8 待裁決</h2>
+<table>
+  <tr><th style="width:6%">#</th><th>問題</th><th>我的建議</th></tr>
+  <tr><td>1</td><td>採不採合併方案（§5 三層＋工程層）？</td><td>採。三份實測證據（負載搬移、規則衝突、量尺不一）都指向分開做會重工且互相抵銷</td></tr>
+  <tr><td>2</td><td>要我現在把合併寫進 <code>CONTENT_SPEC.md</code> §3／§8 ＋ rubric ＋更新 rollout 報告嗎？</td><td>要。這是 RC 凍結前該一併定的事——否則 RC 凍的是半套規則</td></tr>
+  <tr><td>3</td><td>先補的兩件（appB dist 重出、appD 重測）</td><td>appD 重測我可以立刻做（純量測）；appB dist 重出需要跑 LaTeX 線（<code>convert.py</code>／<code>make_dist.py</code>），要確認你要現在做還是併進下一輪</td></tr>
+  <tr><td>4</td><td>第一批單元</td><td>ch07（兩個維度都最重、又是最新章可當樣板）</td></tr>
+  <tr><td>5</td><td>RC 標記的時點</td><td>合併寫完再標 RC——這樣凍結的是完整的一套（詞彙＋句法＋段落＋標點密度）</td></tr>
+</table>
+
+<p class="foot">產出：Claude（2026-07-25）。量測腳本存 scratchpad；appB 三時點數字由 <code>git show &lt;rev&gt;:&lt;path&gt;</code> 取歷史版本後以同一支腳本計算。引用來源：<code>REPORT-emdash-baseline-and-rollout.md</code>（2026-07-20，含真實教材基準實測與 cut/keep palette）、commit <code>4a97ba1</code>、本輪 <code>REVIEW-appB-syntax-round.html</code>／<code>REVIEW-ch06-sec-6-2/6-3-plain-applied.html</code>。純提案：未改任何規格檔或課文。</p>
+
+</body>
+</html>
