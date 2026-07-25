@@ -42,11 +42,11 @@
   </header>
 
   <!-- expansion:intuition — load-bearing intuition: rates multiply because local linear approximations compose; this carries the statement, the Leibniz mnemonic, and the proof strategy at once -->
-  <p>Section 3.1 gave us the derivatives of the trigonometric functions, but only in their bare form. We can differentiate \(\sin x\), yet nothing so far reaches \(\sin(x^{2})\) or \(\sqrt{1 + x^{2}}\), where one function is fed <em>into</em> another. Chapter 2 supplied rules for sums, products, and quotients — but not for <em>composition</em>, the operation of applying one function to the output of another. The chain rule fills exactly this gap, and it is the rule that finally completes the differentiation toolkit.</p>
+  <p>Section 3.1 gave us the derivatives of the trigonometric functions, but only in their bare form. We can differentiate \(\sin x\), yet nothing so far reaches \(\sin(x^{2})\) or \(\sqrt{1 + x^{2}}\), where one function is fed <em>into</em> another. Chapter 2 supplied rules for sums, products, and quotients, but not for <em>composition</em>, the operation of applying one function to the output of another. The chain rule fills exactly this gap, and it is the rule that finally completes the differentiation toolkit.</p>
 
-  <p>The idea behind it, pictured in Figure 3.5, fits in a single image. Near a point, a differentiable function behaves like its tangent line: it takes a small change in its input and scales it by its slope. The catch is only that this is approximate: there is an error, and it shrinks faster than the change itself. Now chain two such functions together. If \(g\) scales a small increment \(h\) by \(g'(x)\), and \(f\) then scales <em>that</em> by \(f'(g(x))\), the two magnifications stack — the composite scales \(h\) by the product \(f'(g(x))\,g'(x)\). That product is the chain rule, and the proof at the end of this section is nothing more than the careful check that the two error terms, once chained, are still negligible.</p>
+  <p>The idea behind it, pictured in Figure 3.5, fits in a single image. Near a point, a differentiable function behaves like its tangent line: it takes a small change in its input and scales it by its slope. The catch is only that this is approximate: there is an error, and it shrinks faster than the change itself. Now chain two such functions together. If \(g\) scales a small increment \(h\) by \(g'(x)\), and \(f\) then scales <em>that</em> by \(f'(g(x))\), the two magnifications stack. The composite scales \(h\) by the product \(f'(g(x))\,g'(x)\). That product is the chain rule, and the proof at the end of this section is nothing more than the careful check that the two error terms, once chained, are still negligible.</p>
 
-  <p>Alongside the chain rule, this section draws on two results that already belong to Chapter 2 — the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1). We take both as established and use them freely, without re-proving them here.</p>
+  <p>Alongside the chain rule, this section draws on two results that already belong to Chapter 2, the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1). We take both as established and use them freely, without re-proving them here.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">3.3</span><span class="env-name">The chain rule</span></p>
@@ -67,7 +67,7 @@
     <div class="env-body">
       <p>Writing \(u = g(x)\) for the inner variable and \(y = f(u)\) for the output, the chain rule takes the memorable Leibniz shape</p>
       <p>\[ \frac{dy}{dx} = \frac{dy}{du}\cdot\frac{du}{dx}. \]</p>
-      <p>This is the form most often used in practice, and it reads as “the rate of \(y\) per \(x\) equals the rate of \(y\) per \(u\) times the rate of \(u\) per \(x\).” The apparent cancellation of \(du\) is a useful memory aid, but it is <em>not</em> a proof: \(\dfrac{dy}{du}\) and \(\dfrac{du}{dx}\) are limits, not fractions with a common factor to strike out. What actually makes the rule true is the argument given below, where the controlled error terms — not a literal \(du/du = 1\) — do the work.</p>
+      <p>This is the form most often used in practice, and it reads as “the rate of \(y\) per \(x\) equals the rate of \(y\) per \(u\) times the rate of \(u\) per \(x\).” The apparent cancellation of \(du\) is a useful memory aid, but it is <em>not</em> a proof: \(\dfrac{dy}{du}\) and \(\dfrac{du}{dx}\) are limits, not fractions with a common factor to cancel. What actually makes the rule true is the argument given below, where the controlled error terms — not a literal \(du/du = 1\) — do the work.</p>
     </div>
   </section>
 
@@ -79,7 +79,7 @@
       <ol class="steps">
         <li>Identify the <em>outermost</em> operation — the last thing you would carry out if you evaluated the expression at a number. Call it the outer function \(f\).</li>
         <li>Whatever that operation is applied to is the inner function \(u = g(x)\).</li>
-        <li>Differentiate the outer function at the inner one, forming \(f'(g(x))\) — treat the inside as a single block and leave it untouched for now.</li>
+        <li>Differentiate the outer function at the inner one, forming \(f'(g(x))\) — treat the inside as a single block and do not differentiate it yet.</li>
         <li>Multiply by the derivative of the inside: the answer is \(f'(g(x))\cdot g'(x)\).</li>
         <li>If the inside is itself a composition, repeat steps 1–4 on it. Every layer contributes one slope factor, and the factors multiply.</li>
       </ol>
@@ -90,7 +90,7 @@
   <h3 class="subsec-head">Why the rule is true</h3>
 
   <!-- expansion:intuition — bridge: the rule is usable; to prove it we need the remainder form, which packages differentiability as a linear approximation that composes -->
-  <p>The rule is already usable — the rest of this section earns it. On a first reading you may jump straight to the subsection “Using the rule” below and return to this proof later; none of the examples depend on it. To prove that the two slopes really do multiply, we need to handle both functions’ linear approximations at once, and for that it helps to repackage what “differentiable” means. Chapter 2 defined \(f\) to be differentiable at \(x_{0}\) when the difference quotient \(\dfrac{f(x_{0}+h) - f(x_{0})}{h}\) has a limit as \(h \to 0\) (§2.2); that limit is \(f'(x_{0})\). The following form says the same thing, but as a statement about approximation by a straight line.</p>
+  <p>The rule is already usable. The rest of this section proves it. On a first reading you may jump straight to the subsection “Using the rule” below and return to this proof later; none of the examples depend on it. To prove that the two slopes really do multiply, we need to handle both functions’ linear approximations at once, and for that it helps to repackage what “differentiable” means. Chapter 2 defined \(f\) to be differentiable at \(x_{0}\) when the difference quotient \(\dfrac{f(x_{0}+h) - f(x_{0})}{h}\) has a limit as \(h \to 0\) (§2.2); that limit is \(f'(x_{0})\). The following form says the same thing, but as a statement about approximation by a straight line.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">3.1</span><span class="env-name">Differentiability, remainder form</span></p>
@@ -99,7 +99,7 @@
       <p>\[ f(x_{0} + h) = f(x_{0}) + m h + R(h), \qquad \lim_{h \to 0}\frac{R(h)}{h} = 0. \]</p>
       <p>The number \(m\) is the derivative \(f'(x_{0})\).</p>
       <!-- expansion:intuition — informal gloss on the remainder form; the seed's bare Def 2 carries no such gloss -->
-      <p class="informal">Informally, \(f(x_{0}+h)\) equals its tangent-line value \(f(x_{0}) + m h\) plus an error \(R(h)\) that dies away faster than \(h\) does — the tangent line is a good fit to first order (Figure 3.6).</p>
+      <p class="informal">Informally, \(f(x_{0}+h)\) equals its tangent-line value \(f(x_{0}) + m h\) plus an error \(R(h)\) that shrinks faster than \(h\) does. The tangent line is a good fit to first order (Figure 3.6).</p>
     </div>
   </section>
 
@@ -115,7 +115,7 @@
   <section class="env env-proposition">
     <p class="env-head"><span class="env-kicker">Proposition</span><span class="env-num">3.3</span><span class="env-name">Equivalence of the two forms</span></p>
     <div class="env-body">
-      <p>The limit form of differentiability (§2.2) and the remainder form (Definition 3.1) are equivalent: \(f\) satisfies one at \(x_{0}\) if and only if it satisfies the other, and the number \(m\) is the same in both — namely \(f'(x_{0})\).</p>
+      <p>The limit form of differentiability (§2.2) and the remainder form (Definition 3.1) are equivalent: \(f\) satisfies one at \(x_{0}\) if and only if it satisfies the other, and the number \(m\) is the same in both, namely \(f'(x_{0})\).</p>
     </div>
   </section>
 
@@ -132,7 +132,7 @@
   </section>
 
   <!-- expansion:intuition — orient the proof before the symbols: write both functions in remainder form, substitute, watch the linear parts multiply, collect the rest into one remainder -->
-  <p>With the remainder form available, the chain rule comes out by substitution. We expand \(g\) near \(x_{0}\) and \(f\) near \(g(x_{0})\), each as a linear part plus a small remainder; feeding one into the other, the linear parts multiply to give \(g'(x_{0})f'(g(x_{0}))\,h\), and everything left over gathers into a single remainder. The whole proof is then the one estimate that this leftover still vanishes faster than \(h\).</p>
+  <p>With the remainder form available, the chain rule comes out by substitution. We expand \(g\) near \(x_{0}\) and \(f\) near \(g(x_{0})\), each as a linear part plus a small remainder; substituting the expansion for \(g\) into the one for \(f\), the linear parts multiply to give \(g'(x_{0})f'(g(x_{0}))\,h\), and everything left over collects into a single remainder. The whole proof is then the one estimate that this leftover still vanishes faster than \(h\).</p>
 
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">of Theorem 3.3</span></p>
@@ -159,7 +159,7 @@
         <li>Since \(R_{2}(y)/y \to 0\), there is a \(\delta > 0\) with \(\left\lvert R_{2}(y)/y \right\rvert < \varepsilon\) whenever \(0 < \lvert y \rvert < \delta\).</li>
         <li>Since \(m_{1} h + R_{1}(h) \to 0\), there is an \(\alpha > 0\) with \(\lvert m_{1} h + R_{1}(h) \rvert < \delta\) whenever \(0 < \lvert h \rvert < \alpha\).</li>
       </ul>
-      <p>Now fix \(h\) with \(0 < \lvert h \rvert < \alpha\). If \(m_{1} h + R_{1}(h) = 0\), then \(R_{2}(m_{1} h + R_{1}(h)) = R_{2}(0) = 0\) — the remainder relation \(f(g(x_{0}) + y) = f(g(x_{0})) + m_{2} y + R_{2}(y)\) at \(y = 0\) forces \(R_{2}(0) = 0\) — and the quotient is \(0\). Otherwise \(0 < \lvert m_{1} h + R_{1}(h) \rvert < \delta\), and we factor</p>
+      <p>Now fix \(h\) with \(0 < \lvert h \rvert < \alpha\). Suppose first that \(m_{1} h + R_{1}(h) = 0\). Putting \(y = 0\) in the remainder relation \(f(g(x_{0}) + y) = f(g(x_{0})) + m_{2} y + R_{2}(y)\) forces \(R_{2}(0) = 0\), so \(R_{2}(m_{1} h + R_{1}(h)) = R_{2}(0) = 0\) and the quotient is \(0\). Otherwise \(0 < \lvert m_{1} h + R_{1}(h) \rvert < \delta\), and we factor</p>
       <p>\[ \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert h \rvert} = \frac{\lvert m_{1} h + R_{1}(h) \rvert}{\lvert h \rvert} \cdot \frac{\lvert R_{2}(m_{1} h + R_{1}(h)) \rvert}{\lvert m_{1} h + R_{1}(h) \rvert}. \]</p>
       <!-- expansion:formula — the manuscript jumps straight to the next bound; we supply the two standard steps (the ε bound from the first bullet, and the triangle inequality) it skips -->
       <p>By the first bullet the second factor is less than \(\varepsilon\); and by the triangle inequality the first factor satisfies \(\dfrac{\lvert m_{1} h + R_{1}(h) \rvert}{\lvert h \rvert} = \left\lvert m_{1} + \dfrac{R_{1}(h)}{h} \right\rvert \le \lvert m_{1} \rvert + \dfrac{\lvert R_{1}(h) \rvert}{\lvert h \rvert}\). Hence, in either case,</p>
@@ -196,7 +196,7 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>The most common mistake with the chain rule is to differentiate the outer function and forget the inner derivative — writing \(\dfrac{d}{dx}\sin(g(x)) = \cos(g(x))\) instead of the correct \(\cos(g(x))\cdot g'(x)\). The inner factor \(g'(x)\) — the \(2x\) in \(\sin(x^{2})\) above — is never optional.</p>
+      <p>The most common mistake with the chain rule is to differentiate the outer function and forget the inner derivative, writing \(\dfrac{d}{dx}\sin(g(x)) = \cos(g(x))\) instead of the correct \(\cos(g(x))\cdot g'(x)\). The inner factor \(g'(x)\) — the \(2x\) in \(\sin(x^{2})\) above — is never optional.</p>
     </div>
   </section>
 
@@ -218,7 +218,7 @@
             &= \frac{1}{2\sqrt{1 + \sin^{2} x}}\cdot 2\sin x\cdot \cos x \\[2pt]
             &= \frac{\sin x \cos x}{\sqrt{1 + \sin^{2} x}}.
         \end{aligned} \]</p>
-        <p>Each layer contributes exactly one factor: \(\tfrac12 u^{-1/2}\) from the square root, \(2\sin x\) from squaring, and \(\cos x\) from the sine. Their product is the derivative — the slopes multiply down the chain, just as Figure 3.5 pictures.</p>
+        <p>Each layer contributes exactly one factor: \(\tfrac12 u^{-1/2}\) from the square root, \(2\sin x\) from squaring, and \(\cos x\) from the sine. Their product is the derivative. The slopes multiply down the chain, just as Figure 3.5 pictures.</p>
       </div>
     </section>
   </div>
@@ -240,7 +240,7 @@
         <p>\[ \frac{d}{dx}\!\left(\frac{x - 1}{x + 2}\right) = \frac{(x + 2)\cdot 1 - (x - 1)\cdot 1}{(x + 2)^{2}} = \frac{3}{(x + 2)^{2}}. \]</p>
         <p>Substituting, and writing \(\dfrac{1}{2\sqrt{(x - 1)/(x + 2)}} = \dfrac{\sqrt{x + 2}}{2\sqrt{x - 1}}\),</p>
         <p>\[ \frac{d}{dx}\sqrt{\frac{x - 1}{x + 2}} = \frac{\sqrt{x + 2}}{2\sqrt{x - 1}}\cdot\frac{3}{(x + 2)^{2}} = \frac{3}{2\sqrt{x - 1}\,(x + 2)^{3/2}} \qquad (x > 1). \]</p>
-        <p>The chain rule does not finish the job by itself: the factor it asks for — the derivative of the inside — is a small problem of its own, here a quotient rule.</p>
+        <p>The chain rule does not finish the computation by itself. It requires the derivative of the inside, and here that derivative is itself a quotient-rule computation.</p>
       </div>
     </section>
   </div>
@@ -258,7 +258,7 @@
       <div class="env-body">
         <p>The outermost operation is a product, so begin with the product rule (§2.5):</p>
         <p>\[ y' = (2x)\cos^{2} x + (1 + x^{2})\,\frac{d}{dx}\bigl(\cos^{2} x\bigr). \]</p>
-        <p>The remaining derivative needs the chain rule, since \(\cos^{2} x = [\cos x]^{2}\) is a composition — outer function \((\,\cdot\,)^{2}\), inner function \(\cos x\):</p>
+        <p>The remaining derivative needs the chain rule, since \(\cos^{2} x = [\cos x]^{2}\) is a composition with outer function \((\,\cdot\,)^{2}\) and inner function \(\cos x\):</p>
         <p>\[ \frac{d}{dx}\bigl(\cos^{2} x\bigr) = 2\cos x\cdot(-\sin x) = -2\sin x\cos x. \]</p>
         <p>Therefore</p>
         <p>\[ y' = 2x\cos^{2} x - 2(1 + x^{2})\sin x\cos x. \]</p>
@@ -272,20 +272,20 @@
     <section class="env env-example">
       <p class="env-head"><span class="env-kicker">Example</span><span class="env-num">3.8</span></p>
       <div class="env-body">
-        <p>In a harbour, the amount of kelp \(K\) depends on the urchin population \(U\) — urchins eat kelp — and \(U\) in turn depends on the otter population \(O\), since otters eat urchins. Use the chain rule to decide whether \(\dfrac{dK}{dO}\) is positive or negative.</p>
+        <p>In a harbour, the amount of kelp \(K\) depends on the urchin population \(U\), since urchins eat kelp, and \(U\) in turn depends on the otter population \(O\), since otters eat urchins. Use the chain rule to decide whether \(\dfrac{dK}{dO}\) is positive or negative.</p>
       </div>
     </section>
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Read off the sign of each link first. More urchins means less kelp, so \(K\) decreases as \(U\) increases: \(\dfrac{dK}{dU} < 0\). More otters means fewer urchins, so \(\dfrac{dU}{dO} < 0\). The chain rule in Leibniz form (Remark 3.2) chains the two rates:</p>
+        <p>Determine the sign of each link first. More urchins means less kelp, so \(K\) decreases as \(U\) increases: \(\dfrac{dK}{dU} < 0\). More otters means fewer urchins, so \(\dfrac{dU}{dO} < 0\). The chain rule in Leibniz form (Remark 3.2) chains the two rates:</p>
         <p>\[ \frac{dK}{dO} = \frac{dK}{dU}\cdot\frac{dU}{dO}. \]</p>
-        <p>A product of two negative numbers is positive, so \(\dfrac{dK}{dO} > 0\): more otters ultimately means more kelp. This is the formal version of the two-step argument — otters thin out the urchins, and fewer urchins let the kelp recover — with each \(dy/du\) factor carrying the sign of one link and the signs multiplying along the chain.</p>
+        <p>A product of two negative numbers is positive, so \(\dfrac{dK}{dO} > 0\): more otters ultimately means more kelp. This is the formal version of the two-step argument that otters thin out the urchins and that fewer urchins let the kelp recover. Each \(dy/du\) factor carries the sign of one link, and the signs multiply along the chain.</p>
       </div>
     </section>
   </div>
 
   <!-- expansion:summary — forward-ref to §3.3: the chain rule unlocks inverse-function and logarithmic derivatives (D7: named, none worked here) -->
-  <p>With the chain rule in hand the differentiation toolkit is essentially complete: any function assembled by composing the elementary functions of Chapters 2 and 3 can now be differentiated mechanically. In the next section the rule does something new — it becomes the key that unlocks derivatives we could not otherwise reach, those of the inverse functions \(\ln x\), \(\arcsin x\), and \(\arctan x\), and, through logarithmic differentiation, of expressions such as \(x^{x}\).</p>
+  <p>With the chain rule in hand the differentiation toolkit is essentially complete: any function assembled by composing the elementary functions of Chapters 2 and 3 can now be differentiated mechanically. In the next section the rule does something new. It gives us derivatives we could not otherwise reach, those of the inverse functions \(\ln x\), \(\arcsin x\), and \(\arctan x\), and, through logarithmic differentiation, those of expressions such as \(x^{x}\).</p>
 
 </article>
