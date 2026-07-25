@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REVIEW — ch04 散文平實化回填（執行紀錄）</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+ options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+ :root{--fg:#1a1a1a;--mut:#666;--line:#e0e0e0;--delb:#d93025;--insb:#188038;}
+ *{box-sizing:border-box}
+ html,body{overflow-x:hidden}
+ body{font:16px/1.75 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+   color:var(--fg);max-width:960px;margin:0 auto;padding:2rem 1.2rem 6rem;background:#fff}
+ h1{font-size:1.6rem;margin:0 0 .3rem}
+ h2{font-size:1.25rem;margin:2.6rem 0 .8rem;padding-bottom:.3rem;border-bottom:2px solid var(--fg)}
+ h3.sech{font-size:1.05rem;margin:2rem 0 .8rem;padding:.35rem .6rem;background:#f5f5f5;border-left:4px solid #444}
+ .sub{color:var(--mut);margin:.2rem 0 1.4rem;font-size:.92rem}
+ .tw{overflow-x:auto;max-width:100%}
+ table{border-collapse:collapse;width:100%;margin:.8rem 0 1.4rem;font-size:.92rem}
+ th,td{border:1px solid var(--line);padding:.42rem .6rem;text-align:left}
+ th{background:#f5f5f5;font-weight:600} td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+ .ok{color:var(--insb);font-weight:700} .warn{color:#b06000;font-weight:700}
+ .card{border:1px solid var(--line);border-radius:4px;padding:.8rem 1rem;margin:.8rem 0}
+ .card.keep{border-left:4px solid #188038;background:#fafffb}
+ .card.para{border-left:4px solid #7b1fa2;background:#fdfaff}
+ .chead{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin-bottom:.45rem}
+ .cid{font:700 .82rem/1 ui-monospace,Menlo,monospace;background:#222;color:#fff;padding:.28rem .5rem;border-radius:3px}
+ .lab{font-size:.72rem;padding:.2rem .45rem;border-radius:10px;border:1px solid}
+ .d-g1{background:#eef;border-color:#99f;color:#225}
+ .d-ac{background:#e6f4ea;border-color:#7fc496;color:#0d652d}
+ .d-pa{background:#fff3e0;border-color:#e8a33d;color:#8a5200}
+ .d-dk{background:#fde8e8;border-color:#e08080;color:#8f1d1d}
+ .d-nw{background:#f3e8fd;border-color:#b47ce0;color:#5b1d8f}
+ .dcount{font-size:.74rem;color:#8a5200;font-weight:700}
+ .test{font-size:.78rem;color:var(--mut);margin-left:auto}
+ .why{margin:.3rem 0;font-size:.93rem;color:#333}
+ .why.codex{background:#f6f9ff;border-left:3px solid #7aa7f0;padding:.4rem .6rem;border-radius:3px}
+ .diff{overflow-x:auto}
+ .diff del,.diff ins{display:block;overflow-wrap:anywhere;padding:.55rem .75rem;text-decoration:none;border-radius:3px;
+   font:15px/1.7 Georgia,"Times New Roman",serif;margin:.25rem 0}
+ .diff del{background:#fff1f0;border-left:3px solid var(--delb)}
+ .diff ins{background:#f0fff4;border-left:3px solid var(--insb)}
+ .diff del::before{content:"原　";color:var(--delb);font:700 .78rem/1 sans-serif}
+ .diff ins::before{content:"改　";color:var(--insb);font:700 .78rem/1 sans-serif}
+ blockquote{margin:.3rem 0;padding:.55rem .75rem;background:#f6f6f6;border-left:3px solid #888;font:15px/1.7 Georgia,serif}
+ code{background:#f2f2f2;padding:.08rem .3rem;border-radius:3px;font-size:.9em}
+ .cnt{font-size:.8rem;color:var(--mut);font-weight:400}
+ .box{border:1px solid var(--line);border-left:4px solid #b06000;background:#fffbf2;padding:.9rem 1.1rem;margin:1.2rem 0;border-radius:3px}
+ .box h4{margin:0 0 .5rem;font-size:1rem}
+ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--mut);font-size:.85rem}
+</style></head><body>
+
+<h1>ch04 散文平實化回填（合併 sweep）——執行紀錄</h1>
+<p class="sub">分支 <code>handout/plain-ch04</code>｜2026-07-26｜判準 <code>CONTENT_SPEC.md</code> §3〈平實英文條款〉（RC）｜
+流程 <code>KICKOFF-plain-backfill.md</code> Gate 0–9｜
+走查稿 <a href="REVIEW-ch04-plain-walk.html">REVIEW-ch04-plain-walk.html</a>｜
+Codex raw <a href="REPORT-ch04-plain-codex-round1-raw.md">REPORT-ch04-plain-codex-round1-raw.md</a></p>
+
+<h2>一、驗收表（Gate 4–8）</h2>
+<table>
+<tr><th>閘</th><th>項目</th><th class=n>前</th><th class=n>後</th><th>結果</th></tr>
+<tr><td rowspan=7>Gate 4</td><td>canonical N</td><td class=n>6895</td><td class=n>6939</td><td>—</td></tr>
+<tr><td><strong>em-dash</strong></td><td class=n>92</td><td class=n><strong>16</strong></td><td>−76</td></tr>
+<tr><td><strong>密度 /1000</strong></td><td class=n>13.3</td><td class=n><strong>2.3</strong></td><td class="ok">PASS（T_can ≤3.0）</td></tr>
+<tr><td>冒號接子句</td><td class=n>68</td><td class=n>68</td><td class="ok">±0</td></tr>
+<tr><td>分號</td><td class=n>45</td><td class=n>43</td><td class="ok">−2</td></tr>
+<tr><td>左括號</td><td class=n>82</td><td class=n>82</td><td class="ok">±0（全書最高，一個沒加）</td></tr>
+<tr><td>成對逗號</td><td class=n>26</td><td class=n>27</td><td class="ok">+1，未達護欄門檻</td></tr>
+<tr><td>Gate 5</td><td>數學片段比對／cross-ref／標籤配對</td><td class=n colspan=2>見下節</td><td class="warn">8 處差異，逐條說明</td></tr>
+<tr><td>Gate 6</td><td>段落觸發器（≥150 詞或 &gt;20 式）</td><td class=n>4</td><td class=n><strong>0</strong></td><td class="ok">全部解除</td></tr>
+<tr><td>Gate 6</td><td>平均句長／P90／&gt;25 詞占比</td><td class=n>18.3／34／24%</td><td class=n>16.5／29／17%</td><td class="warn">見「誠實記錄」</td></tr>
+<tr><td>Gate 7</td><td>LaTeX 線</td><td class=n colspan=2>—</td><td class="warn"><strong>pending</strong>：<code>make_dist.py</code> 的 <code>NAMES</code> 沒有 ch04，依平行紀律不改</td></tr>
+<tr><td>Gate 8</td><td>分頁（A4）</td><td class=n>41 頁</td><td class=n><strong>41 頁</strong></td><td class="ok">不變；0 溢頁、0 頁尾孤標題</td></tr>
+</table>
+<p class="sub">交易式驗證：<code>tools/verify_edits.py</code> 對五個 fragment <strong>全部 PASS</strong>——
+「工作樹 == HEAD ＋ 恰好這 N 筆替換」，reverse-apply byte-for-byte 相同、未涵蓋差異 0 處
+（sec-4-1 16 筆／sec-4-2 30 筆／sec-4-3 8 筆／sec-4-4 24 筆／sec-4-5 19 筆）。
+拆段因替換字串跨行、無法用該工具的行式格式表達，改以 <code>git diff</code> 只見 <code>&lt;/p&gt;&lt;p&gt;</code> 插入
+＋數學片段比對證明。</p>
+
+<h2>二、Gate 5 的 8 處數學片段差異（逐條說明）</h2>
+<p class="sub">§4.1 零差異。§4.2 多重集合相同、僅句子重排造成順序變動，無公式增刪。其餘八處全部來自
+「把原本用代名詞或詞語指稱的數學物件改成明說」，<strong>沒有任何一處改變數學主張</strong>：</p>
+<table><tr><th>節</th><th>差異</th><th>來源</th><th>為什麼</th></tr>
+<tr><td>§4.3</td><td>＋ <code>\(0\)</code></td><td>N-07</td><td>原文 “all but the leading term seemed to <em>drop out</em>” 沒說出趨近哪個值；改成 “tend to \(0\)”。這正是 R2 要的字面化。</td></tr>
+<tr><td>§4.3</td><td>＋ <code>\(1\)</code></td><td>C4-43</td><td>原文 “The series makes <em>it</em> transparent” 的 it 指前句的「這個極限等於 1」；改成明說 “why the limit is \(1\)”，解掉代名詞。</td></tr>
+<tr><td>§4.4</td><td>− <code>\([a, b]\)</code></td><td>C4-54</td><td>改寫成 “Under its hypotheses”，區間已含在 Rolle 的前提裡；同時補回原改寫漏掉的常函數情形。</td></tr>
+<tr><td>§4.4</td><td>＋ <code>\(\mathbb{R}\)</code></td><td>C4-66</td><td>原文 “such a passage” 沒說是哪個轉換；改成 “Passing from bounded intervals to all of \(\mathbb{R}\)”。</td></tr>
+<tr><td>§4.4</td><td>＋ <code>\(e^{x}\)</code></td><td>C4-67</td><td>原文 “the result the chapter has been driving at” 沒說是哪個結果；改成明說 “proves that \(e^{x}\) is strictly increasing”。</td></tr>
+<tr><td>§4.5</td><td>− <code>\(x &gt; 0\)</code>、＋ <code>\(e^{x}\)</code>、＋ <code>\((0,\infty)\)</code></td><td>C4-68</td><td><strong>修正一處歸因錯誤</strong>：原文（與我的初稿）把反函數的<em>存在性</em>也歸給嚴格單調性，實際上存在性來自值域是 \((0,\infty)\)（IVT），單調性只給唯一性。改寫把兩者分開講，因此需要點名值域。</td></tr>
+</table>
+
+<h2>三、兩閘的裁決分布</h2>
+<table><tr><th>處置</th><th class=n>條數</th><th>說明</th></tr>
+<tr><td>gate 1 原案，gate 2 ADOPT</td><td class=n>42</td><td>兩閘一致，照原案執行</td></tr>
+<tr><td>gate 2 MODIFY，採納</td><td class=n>37</td><td>Codex 的改法更好，改用它的版本</td></tr>
+<tr><td>gate 2 MODIFY，部分採納</td><td class=n>4</td><td>採納指出的問題，但不採其改法（理由逐條記在下方卡片）</td></tr>
+<tr><td>gate 2 翻案（原判 KEEP）</td><td class=n>1</td><td>K-02：我誤用「手稿逐字」豁免四步仲裁</td></tr>
+<tr><td>gate 2 新增 finding</td><td class=n>13</td><td>gate 1 漏掉的 R1／R2／R3</td></tr>
+<tr><td>gate 2 REJECT，撤回</td><td class=n>1</td><td>C4-06：我把 F1 重複判過頭，該處成對破折號應保留</td></tr>
+<tr><td><strong>實際執行</strong></td><td class=n><strong>97</strong></td><td>—</td></tr>
+</table>
+<table><tr><th>節</th><th class=n>執行條數</th></tr><tr><td>§4.1 Construction of the Exponential Function</td><td class=n>16</td></tr><tr><td>§4.2 Continuity and the Exponent Law</td><td class=n>30</td></tr><tr><td>§4.3 The Derivative of e^x</td><td class=n>8</td></tr><tr><td>§4.4 Rolle’s Theorem and the MVT</td><td class=n>24</td></tr><tr><td>§4.5 Monotonicity and the Logarithm</td><td class=n>19</td></tr></table>
+
+<div class="box">
+<h4>Codex gate-2 抓到的真問題（值得記住的六條）</h4>
+<ol>
+<li><strong>C4-22（數學）</strong>——我把「絕對收斂為何蘊涵收斂」的直覺改成「絕對級數界定總量」，但<strong>全域上界不會讓部分和成為 Cauchy</strong>。正解要的是「夠後面的尾巴和可任意小」。已改用第三案。</li>
+<li><strong>C4-68（數學歸因）</strong>——反函數的存在性其實來自值域＝\((0,\infty)\)，不是嚴格單調性。原文與我的初稿都歸錯。</li>
+<li><strong>C4-70（數學）</strong>——「級數第一項之後每項為正」對 \(x&lt;0\) 是假的，必須限定 \(x&gt;0\)。</li>
+<li><strong>C4-54（數學）</strong>——我的改寫漏掉 Rolle 的常函數情形（證明的 Case 1）。</li>
+<li><strong>C4-06 REJECT ＋ §4.3 過頭</strong>——我用「改寫後標點自然消失」為由，把三處其實通過四步仲裁的成對破折號一起改掉，等於用改寫繞過 KEEP。已全部復原。</li>
+<li><strong>K-02</strong>——我把一處標成「手稿逐字」而豁免四步仲裁，但 Gate 0 自己的資料就顯示 ch04 只有 1.6% 逐字覆蓋，該處是重寫不是逐字。使用者的 ch01 裁決保護的是逐字插入語，不適用。</li>
+</ol>
+</div>
+
+<h2>四、保留清單（示範規則不誤傷）</h2>
+<div class="card keep"><div class="chead"><span class="cid">K-01</span>
+  <span class="lab d-ac">保留（兩閘一致）</span><span class="test">§4.1 Caution</span></div>
+  <blockquote>Every fact we want to use — that the sum is finite, that \(e^{x}\) is continuous, that \(e^{x} e^{y} = e^{x + y}\), that \((e^{x})' = e^{x}\) — must be &lt;em&gt;proved&lt;/em&gt; from this definition, not borrowed from earlier experience.</blockquote><p class="why">四步仲裁：拿掉插入語後主幹「Every fact we want to use must be proved from this definition」文法完整、量詞不變；插入語只是把 every fact 逐項列出，未另提定義／理由／例外 → step 3 KEEP。清單本身含四個逗號，改括號會把全書最高的括號負載（82）再往上推。</p>
+  <p class="why codex"><strong>gate 2：</strong>KEEP 正確。</p></div><div class="card keep"><div class="chead"><span class="cid">K-03</span>
+  <span class="lab d-ac">保留（兩閘一致）</span><span class="test">§4.2 指數律證明前</span></div>
+  <blockquote>the &lt;em&gt;product&lt;/em&gt; of two partial sums reorganizes — through the binomial theorem — into the partial sum of \(e^{x+y}\) plus a controllable remainder</blockquote><p class="why">四步仲裁：插入語是同一主張的<strong>手段</strong>修飾（用什麼定理重組），拿掉後主幹完整、量詞不變，且它不另提理由或結論 → step 3 KEEP，比照 `— far more often —` 先例。</p>
+  <p class="why codex"><strong>gate 2：</strong>KEEP 正確。</p></div><div class="card keep"><div class="chead"><span class="cid">K-04</span>
+  <span class="lab d-ac">保留（兩閘一致）</span><span class="test">§4.4 Theorem A 引言</span></div>
+  <blockquote>when an extreme value is attained strictly &lt;em&gt;inside&lt;/em&gt; the interval — not at an endpoint — the derivative there must vanish</blockquote><p class="why">四步仲裁：插入語是對 strictly inside 的<strong>對比修飾</strong>（澄清同一個條件），拿掉後主幹完整 → step 3 KEEP，形狀等同 `— only then —` 先例（預設 KEEP，不得為一致性而動）。</p>
+  <p class="why codex"><strong>gate 2：</strong>KEEP 正確。</p></div><div class="card keep"><div class="chead"><span class="cid">K-05</span>
+  <span class="lab d-ac">保留（兩閘一致）</span><span class="test">§4.5 應用收尾</span></div>
+  <blockquote>Everything this chapter built — the series definition, the exponent law, the rigorous derivatives, the inverse construction — is what makes these formulas genuinely well-defined rather than merely suggestive.</blockquote><p class="why"><strong>手稿逐字來源</strong>：手稿同處作「None of the equipment from this chapter — the series definition, the exponent law, the rigorous derivative, the inverse-function construction — is wasted」。結構與插入語同源 → 依 ch01 先例第 2 條保留。</p>
+  <p class="why codex"><strong>gate 2：</strong>KEEP 正確。</p></div>
+
+<h2>五、段落層四處離群的處置</h2>
+<div class="card para"><div class="chead"><span class="cid">P-01</span>
+  <span class="lab d-pa">段落層</span><span class="test">§4.1 章開場 lead｜152 詞／9 式（觸發器：≥150 詞）</span></div>
+  <p class="verdict">判定：<strong>拆為兩段</strong></p><p class="why">兩個論述動作：①「\(e^{x}\) 一直是賒帳在用的，本章把它建起來」②「路線經 Rolle／MVT，讀完會得到什麼保證」。第二段用一般 <code>&lt;p&gt;</code>（lead 樣式只留給第一段；同檔下一段本來就是一般 <code>&lt;p&gt;</code>，版式有前例）。</p>
+  <p class="why codex"><strong>gate 2：</strong>切點正確，沒有把單一論證從中間切斷。</p></div><div class="card para"><div class="chead"><span class="cid">P-02</span>
+  <span class="lab d-pa">段落層</span><span class="test">§4.4 Theorem 4.9 之後｜155 詞／4 式（觸發器：≥150 詞）</span></div>
+  <p class="verdict">判定：<strong>拆為兩段</strong></p><p class="why">SPEC §3 明列的「一段承載兩個以上可各自獨立成立的論證」：①兩部分都靠完備性、證明移到附錄 D ②兩部分各自的前提與反例。拆點正好在論證交界。</p>
+  <p class="why codex"><strong>gate 2：</strong>切點正確，沒有把單一論證從中間切斷。</p></div><div class="card para"><div class="chead"><span class="cid">P-03</span>
+  <span class="lab d-pa">段落層</span><span class="test">§4.5 節首｜153 詞／10 式（觸發器：≥150 詞）</span></div>
+  <p class="verdict">判定：<strong>拆為兩段</strong></p><p class="why">①§4.4 的結論＋反函數是誰＋嚴格單調的雙重角色 ②本節的三項工作與要結清的兩筆帳。後者是路線圖，自成一段更好查。</p>
+  <p class="why codex"><strong>gate 2：</strong>切點正確，沒有把單一論證從中間切斷。</p></div><div class="card para"><div class="chead"><span class="cid">P-04</span>
+  <span class="lab d-pa">段落層</span><span class="test">§4.5 值域論證段｜115 詞／&lt;strong&gt;25 個行內式&lt;/strong&gt;（觸發器：&gt;20 式，全書唯一）</span></div>
+  <p class="verdict">判定：<strong>拆為三段</strong></p><p class="why">SPEC §3 對符號密集段落的處置序是「先立記號／分行 skeleton／改 display」，<strong>MUST NOT 為降詞數按詞切句</strong>。這裡採段落層處置：依論證三步拆段（值域為正 → 取上下界 → IVT 收尾＋唯一性），行內式由 25 降到每段 8–10，不動任何數學、不拆句。</p>
+  <p class="why codex"><strong>gate 2：</strong>切點正確，沒有把單一論證從中間切斷。</p></div>
+
+<h2>六、逐條執行紀錄（97 條）</h2>
+<h3 class="sech">§4.1 Construction of the Exponential Function <span class="cnt">16 條</span></h3><div class="card" id="C4-01">
+  <div class="chead"><span class="cid">C4-01</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1</span></div>
+  <p class="why">擬人（函數「為我們做了很多工作」）＋兩個不透明片語動詞。「put to use」直接沿用 ch01／ch06 先例 puts to work→uses；「leaned on」同族。</p><p class="why codex"><strong>gate 2 裁決：</strong>Codex 版拆成三句、去掉分號，且 many times 比 a great deal 直白。</p>
+  <div class="diff"><del>The natural exponential function \(e^{x}\) has already done a great deal of work for us. It appeared in Chapter 2, where we wrote down its power series, computed its derivative \((e^{x})' = e^{x}\) by a quick term-by-term argument, and put it to use; in Chapter 3 we leaned on it again, alongside its inverse \(\ln x\).</del><ins>We have already used the natural exponential function \(e^{x}\) many times. It appeared in Chapter 2, where we wrote down its power series, computed its derivative \((e^{x})' = e^{x}\) by a quick term-by-term argument, and used it. In Chapter 3, we used it again alongside its inverse \(\ln x\).</ins></div>
+</div><div class="card" id="C4-02">
+  <div class="chead"><span class="cid">C4-02</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1</span></div>
+  <p class="why">品格詞配數學物件——直接沿用 ch06／ch01 先例 honest reciprocals→really are reciprocals。手稿此處原文即 “with an explicit error bound”。</p>
+  <div class="diff"><del>re-derive the derivative with an honest error bound</del><ins>re-derive the derivative with an explicit error bound</ins></div>
+</div><div class="card" id="C4-03">
+  <div class="chead"><span class="cid">C4-03</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3／R1</span></div>
+  <p class="why">插入語是「命名兩個定理」＝可獨立成立的教學動作，非同一主張的修飾 → 重寫整句。cornerstone 為裝飾性隱喻修飾語，刪之無損。</p><p class="why codex"><strong>gate 2 裁決：</strong>我只拿掉 cornerstone，Codex 指出 road…passes through 本身就是路徑隱喻。冒號後首字大寫，不計入冒號接子句。</p>
+  <div class="diff"><del>The road to the logarithm passes through two cornerstone existence theorems — Rolle’s theorem and the Mean Value Theorem — that will return again and again in the chapters on applications of the derivative.</del><ins>Before we define the logarithm, we need two existence theorems: Rolle’s theorem and the Mean Value Theorem. Later chapters use both in applications of the derivative.</ins></div>
+</div><div class="card" id="C4-04">
+  <div class="chead"><span class="cid">C4-04</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3／F5</span></div>
+  <p class="why">插入語是「foundation chapter」的定義（獨立教學動作）→ 重寫。for real 屬口語語域（SPEC §3 避免 casual filler）。credit 機制用語保留。</p><p class="why codex"><strong>gate 2 裁決：</strong>built 仍把「證明」藏在建造隱喻裡；results…finally proved 才是字面。</p>
+  <div class="diff"><del>This is the book’s &lt;em&gt;foundation chapter&lt;/em&gt; — the place where the tools used on credit since Chapter 2 are finally built for real — and more of its length is proof than computation.</del><ins>This is the book’s &lt;em&gt;foundation chapter&lt;/em&gt;, where the results used on credit since Chapter 2 are finally proved. More of this chapter is proof than computation.</ins></div>
+</div><div class="card" id="C4-05">
+  <div class="chead"><span class="cid">C4-05</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1</span></div>
+  <p class="why">honest 家族第 2 處（見 C4-02）。此處 honestly 對「已證明」無新增訊息。</p>
+  <div class="diff"><del>its derivative is itself, now proved honestly (§4.3)</del><ins>its derivative is itself, now proved (§4.3)</ins></div>
+</div><div class="card" id="C4-07">
+  <div class="chead"><span class="cid">C4-07</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">單破折號尾巴交付 payload。改寫後連逗號插入語都不需要，標點負載淨減。</p><p class="why codex"><strong>gate 2 裁決：</strong>as it always has 後掛且無資訊，直接刪更乾淨。</p>
+  <div class="diff"><del>the symbol \(a^{n}\) means what it always has — the product of \(n\) copies of \(a\).</del><ins>the symbol \(a^{n}\) means the product of \(n\) copies of \(a\).</ins></div>
+</div><div class="card" id="C4-08">
+  <div class="chead"><span class="cid">C4-08</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette（後段為獨立子句）</span></div>
+  <p class="why">破折號後是完整獨立子句（but this forces us…），依 palette 改分句。</p>
+  <div class="diff"><del>define \(a^{r}\) as the limit of \(a^{q_{n}}\) — but this forces us to prove that the limit exists and does not depend on which sequence we chose.</del><ins>define \(a^{r}\) as the limit of \(a^{q_{n}}\). But this forces us to prove that the limit exists and does not depend on which sequence we chose.</ins></div>
+</div><div class="card" id="C4-09">
+  <div class="chead"><span class="cid">C4-09</span><span class="lab d-pa">gate 2 部分採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">R2</span></div>
+  <p class="why">「the mirror statement」沒有把鏡像敘述說出來，讀者得自己反推；且尾巴是殘句。改為字面陳述。</p><p class="why codex"><strong>gate 2 裁決：</strong>採 Codex 的 corresponding statement 措辭，但<strong>不採</strong>它把 climbs steadily／ceiling 一併刪掉的建議——這句是 Theorem 4.1 之前的直覺鋪陳，SPEC §3 明文要 formal 之前有動機散文；ceiling 是常見詞、意象透明，不屬 R1 針對的不透明搭配。照 Codex 全刪會讓這句變成定理的重複。</p>
+  <div class="diff"><del>must approach a limiting value — and the mirror statement for decreasing sequences.</del><ins>must approach a limiting value. The corresponding statement, with the inequalities reversed, holds for a non-increasing sequence that is bounded below.</ins></div>
+</div><div class="card" id="C4-10">
+  <div class="chead"><span class="cid">C4-10</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">插入語是三個定理的列舉，主幹被切斷 24 個詞。改寫時「property 支撐 theorems」的方向必須保持不變（不可把清單搬到 property 後面，會誤讀成 property 的同位語）。</p>
+  <div class="diff"><del>Many of the existence theorems of calculus — that a bounded monotone sequence has a limit, that a continuous function on a closed interval attains a maximum, that \(x^{n} = a\) has a positive solution for \(a &gt; 0\) — ultimately trace back to this single property.</del><ins>Many of the existence theorems of calculus ultimately trace back to this single property. It is what guarantees that a bounded monotone sequence has a limit, that a continuous function on a closed interval attains a maximum, and that \(x^{n} = a\) has a positive solution for \(a &gt; 0\).</ins></div>
+</div><div class="card" id="C4-11">
+  <div class="chead"><span class="cid">C4-11</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／R1（earn 家族，⛳ 政策題）</span></div>
+  <p class="why">破折號後為獨立指令句 → 分句。earns 屬交易動詞配證明，全章 5 處（見政策題 P-A）。</p>
+  <div class="diff"><del>&lt;em&gt;Proof track: this argument earns the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof — on a first reading you may take both and move on.&lt;/em&gt;</del><ins>&lt;em&gt;Proof track: this argument proves the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof. On a first reading you may take both and move on.&lt;/em&gt;</ins></div>
+</div><div class="card" id="C4-12">
+  <div class="chead"><span class="cid">C4-12</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1／R3</span></div>
+  <p class="why">workhorse 隱喻；同一隱喻在 §4.2 再現一次（C4-34），統一為字面的 tool。</p>
+  <div class="diff"><del>it is the workhorse of the next section</del><ins>it is the main tool of the next section</ins></div>
+</div><div class="card" id="C4-13">
+  <div class="chead"><span class="cid">C4-13</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／SPEC §3 SHOULD</span></div>
+  <p class="why">promised by 是 SPEC §3 明文點名要避免的戲劇動詞（promises），且破折號後為獨立子句。</p><p class="why codex"><strong>gate 2 裁決：</strong>Codex 指出界限控制的是誤差上界。本例雖然實際 gap 也確實每項減半以上（P_k(1) 數值可驗），但寫成「界限每次減半」更精確且與 (*) 的 (1/2)^{k−n₀} 對應。順帶把 closing-in 一併換掉（見 N-03）。</p>
+  <div class="diff"><del>This is the rapid, geometric closing-in promised by the bound \((*)\) — each extra term cuts the remaining gap by more than half.</del><ins>The tail bound \((*)\) shows that the error decreases geometrically. Each additional term halves the displayed error bound.</ins></div>
+</div><div class="card" id="K-02">
+  <div class="chead"><span class="cid">K-02</span><span class="lab d-dk">gate 2 翻案（原 KEEP）</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3（gate 2 翻案）</span></div>
+  <p class="why"><strong>Codex 抓到真問題，我同意。</strong> 我把這處標成「手稿逐字」而豁免四步仲裁，但 Gate 0 自己的資料就否定了這個標籤——手稿作 “A different tool — the result that a series of terms whose absolute values converge is itself convergent — handles that case”，fragment 是重寫而非逐字。使用者的 ch01 裁決保護的是<strong>逐字</strong>插入語，不適用於此。回到四步仲裁：插入語本身就是一條獨立的定理敘述（Proposition 4.1），屬 step 3 的「另提可獨立表述的定義」→ 重寫整句。</p><p class="why codex"><strong>gate 2 裁決：</strong><strong>Codex 抓到真問題，我同意。</strong> 我把這處標成「手稿逐字」而豁免四步仲裁，但 Gate 0 自己的資料就否定了這個標籤——手稿作 “A different tool — the result that a series of terms whose absolute values converge is itself convergent — handles that case”，fragment 是重寫而非逐字。使用者的 ch01 裁決保護的是<strong>逐字</strong>插入語，不適用於此。回到四步仲裁：插入語本身就是一條獨立的定理敘述（Proposition 4.1），屬 step 3 的「另提可獨立表述的定義」→ 重寫整句。</p>
+  <div class="diff"><del>Handling it calls for a more flexible convergence tool — the fact that a series whose absolute values converge must itself converge — which, together with the uniform tail bound \((*)\) and a careful product argument, also yields the continuity of \(e^{x}\) and the exponent law.</del><ins>We need a more flexible convergence result. If a series of absolute values converges, then the original series converges. Together with the uniform tail bound \((*)\) and a careful product argument, this result also yields the continuity of \(e^{x}\) and the exponent law.</ins></div>
+</div><div class="card" id="N-01">
+  <div class="chead"><span class="cid">N-01</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1：read properties off it freely／turn that around 兩個不透明慣用語。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1：read properties off it freely／turn that around 兩個不透明慣用語。</p>
+  <div class="diff"><del>we treated its power series as a fact about an already-known function and read properties off it freely. In this chapter we turn that around.</del><ins>we treated its power series as a fact about an already-known function and inferred properties directly from it. In this chapter, we reverse that order.</ins></div>
+</div><div class="card" id="N-02">
+  <div class="chead"><span class="cid">N-02</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R2：trap…inside 與 Theorem 4.1 hands us the limit 把操作與定理的作用藏成隱喻。</p><p class="why codex"><strong>gate 2 裁決：</strong>R2：trap…inside 與 Theorem 4.1 hands us the limit 把操作與定理的作用藏成隱喻。</p>
+  <div class="diff"><del>The plan is to trap the tail of the series \(\sum x^{n}/n!\) inside a geometric series. Once the tail is controlled, the partial sums form a non-decreasing sequence that is bounded above, and Theorem 4.1 hands us the limit.</del><ins>The plan is to bound the tail of the series \(\sum x^{n}/n!\) by a geometric series. Once the tail is controlled, the partial sums are non-decreasing and bounded above, so Theorem 4.1 guarantees that they have a limit.</ins></div>
+</div><div class="card" id="N-03a">
+  <div class="chead"><span class="cid">N-03a</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1／R3：close in on 統一為 approach（本處為 §4.1 的兩處之一）。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1／R3：close in on 統一為 approach（本處為 §4.1 的兩處之一）。</p>
+  <div class="diff"><del>it measures how fast the partial sums close in on \(e^{x}\)</del><ins>it measures how fast the partial sums approach \(e^{x}\)</ins></div>
+</div><h3 class="sech">§4.2 Continuity and the Exponent Law <span class="cnt">30 條</span></h3><div class="card" id="C4-14">
+  <div class="chead"><span class="cid">C4-14</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1</span></div>
+  <p class="why">honest 家族第 3 處。「gave an honest existence」對 EFL 讀者是不透明搭配；字面意思是「證明了存在」。</p>
+  <div class="diff"><del>Section 4.1 gave \(e^{x}\) an honest existence:</del><ins>Section 4.1 established that \(e^{x}\) exists:</ins></div>
+</div><div class="card" id="C4-15">
+  <div class="chead"><span class="cid">C4-15</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">SPEC §3 SHOULD（promises）</span></div>
+  <p class="why">「符號承諾」是擬人；改為字面的「記號讓我們預期的性質」。</p>
+  <div class="diff"><del>behaves the way the symbol promises</del><ins>has the properties the notation leads us to expect</ins></div>
+</div><div class="card" id="C4-16">
+  <div class="chead"><span class="cid">C4-16</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1／R3</span></div>
+  <p class="why">engine 隱喻；§4.5 另有一處（C4-78）。統一改字面。</p>
+  <div class="diff"><del>The engine throughout is a single idea:</del><ins>The whole section rests on a single idea:</ins></div>
+</div><div class="card" id="C4-17">
+  <div class="chead"><span class="cid">C4-17</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3／R1</span></div>
+  <p class="why">插入語是「命名兩件機器」＝獨立教學動作。terrain（低頻）與 headline facts（新聞語域）換字面；改寫後冒號引出的是清單（首字大寫），不計入冒號接子句。</p><p class="why codex"><strong>gate 2 裁決：</strong>steepest／machinery 確實仍是隱喻。</p>
+  <div class="diff"><del>A word about the terrain before we set out. This is the steepest section of the book so far: it builds convergence machinery — Cauchy sequences and the Bolzano–Weierstrass theorem — that is usually first met in a dedicated analysis course, and it is all proofs, with no worked examples. What the rest of the book actually uses are the headline facts:</del><ins>A word about what is ahead. This is the most demanding section of the book so far. It introduces Cauchy sequences and the Bolzano–Weierstrass theorem, topics usually first met in a dedicated analysis course. It consists entirely of proofs, with no worked examples. What the rest of the book uses are four facts:</ins></div>
+</div><div class="card" id="C4-18">
+  <div class="chead"><span class="cid">C4-18</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1（交易隱喻）</span></div>
+  <p class="why">「machinery buys」把「用途」講成交易；字面是「這套機器是幹嘛用的」。</p><p class="why codex"><strong>gate 2 裁決：</strong>與 C4-23 的具體名詞一致。</p>
+  <div class="diff"><del>what this machinery buys</del><ins>how these results are used</ins></div>
+</div><div class="card" id="C4-19">
+  <div class="chead"><span class="cid">C4-19</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號後為獨立指令句（recall what it says）→ 分句。</p>
+  <div class="diff"><del>in the tail bound \((*)\) of §4.1 — recall what it says:</del><ins>in the tail bound \((*)\) of §4.1. Recall what it says:</ins></div>
+</div><div class="card" id="C4-20">
+  <div class="chead"><span class="cid">C4-20</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">插入語就是「這個慣例」的定義本體，拿掉後主幹（This convention recurs below）等於空句 → 重寫整句，把定義提為主詞。</p><p class="why codex"><strong>gate 2 裁決：</strong>not fussing over 仍是口語。</p>
+  <div class="diff"><del>This convention — collect a fixed number of \(\varepsilon\)-sized errors and do not fuss over the constant — recurs in the proofs below.)</del><ins>A convention used repeatedly in the proofs below is to allow a fixed number of \(\varepsilon\)-sized errors without tracking the exact constant.)</ins></div>
+</div><div class="card" id="C4-21">
+  <div class="chead"><span class="cid">C4-21</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1（lean on 家族，全章 6 處）</span></div>
+  <p class="why">lean on 為不透明片語動詞，字面即 use。</p>
+  <div class="diff"><del>We will lean on exactly this uniformity again</del><ins>We will use exactly this uniformity again</ins></div>
+</div><div class="card" id="C4-22">
+  <div class="chead"><span class="cid">C4-22</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">R2（⛳ 需覆核）</span></div>
+  <p class="why">破折號後的理由用 “accumulate any net oscillation … shown to be summable” 表述，對 EFL 讀者不透明，且不是絕對收斂的字面理由。改為字面版本。<strong>此條改動直覺說法的措辭，請 Codex gate-2 覆核數學上是否仍成立。</strong></p><p class="why codex"><strong>gate 2 裁決：</strong><strong>Codex 抓到真問題</strong>：我的版本（絕對級數界定總量）不足以推出收斂——全域上界不會讓部分和成為 Cauchy，要的是「夠後面的尾巴和可任意小」。採第三案，它同時預告了 Proposition 4.1 證明的核心不等式。</p>
+  <div class="diff"><del>the original series should converge too — its terms cannot accumulate any net oscillation that the absolute series has already shown to be summable.</del><ins>the original series should converge too, because the sum of the absolute values in any sufficiently late tail can be made as small as we wish.</ins></div>
+</div><div class="card" id="C4-23">
+  <div class="chead"><span class="cid">C4-23</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3／F1</span></div>
+  <p class="why">同一個同位語（Cauchy sequences and Bolzano–Weierstrass）在 §4.2 內第二次出現；直接讓兩者當主詞，同時去掉多餘的 machinery 抽象層。</p>
+  <div class="diff"><del>The machinery — Cauchy sequences and the Bolzano–Weierstrass theorem — is of independent importance</del><ins>Cauchy sequences and the Bolzano–Weierstrass theorem are of independent importance</ins></div>
+</div><div class="card" id="C4-24">
+  <div class="chead"><span class="cid">C4-24</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1</span></div>
+  <p class="why">fall back on 為不透明片語動詞。</p><p class="why codex"><strong>gate 2 裁決：</strong>use instead 的替代對象確實不清楚。</p>
+  <div class="diff"><del>no monotonicity to fall back on</del><ins>no monotonicity that we can use</ins></div>
+</div><div class="card" id="C4-25">
+  <div class="chead"><span class="cid">C4-25</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette（鬆散同位語）</span></div>
+  <p class="why">單破折號尾巴為省略式對比，依 palette 改逗號同位語；同時把 the terms’ closeness 改成句子式，較易讀。</p>
+  <div class="diff"><del>The definition mentions no limit value — only the terms’ closeness to one another.</del><ins>The definition mentions no limit value, only how close the terms are to one another.</ins></div>
+</div><div class="card" id="C4-26">
+  <div class="chead"><span class="cid">C4-26</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1</span></div>
+  <p class="why">huddle 為低頻擬人動詞；cluster 是同義的標準數學英語。</p><p class="why codex"><strong>gate 2 裁決：</strong>cluster 在分析語境會誤聯想 cluster point，這個顧慮成立。</p>
+  <div class="diff"><del>the terms eventually huddle together:</del><ins>the terms eventually become close to one another:</ins></div>
+</div><div class="card" id="C4-27">
+  <div class="chead"><span class="cid">C4-27</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／R1／R3</span></div>
+  <p class="why">破折號後為獨立子句。wearing a different costume 是承載說明的隱喻；且 §4.2 稍後又用 in disguise 講同一件事（R3 漂移），兩處統一為 in another form。</p>
+  <div class="diff"><del>because the proof exposes a dependency worth seeing — the equivalence is, in the end, the completeness of \(\mathbb{R}\) (Theorem 4.1) wearing a different costume.</del><ins>because the proof exposes a dependency worth seeing. The equivalence is, in the end, the completeness of \(\mathbb{R}\) (Theorem 4.1) in another form.</ins></div>
+</div><div class="card" id="C4-28">
+  <div class="chead"><span class="cid">C4-28</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／R1</span></div>
+  <p class="why">trades on 為不透明片語動詞；尾巴為無動詞附加語，改成完整句。</p><p class="why codex"><strong>gate 2 裁決：</strong>定理不會 use 一個現象——我的改寫把擬人從 trades on 換到 uses，沒解決根本問題。</p>
+  <div class="diff"><del>which converges even though the original sequence does not — exactly the phenomenon the theorem trades on.</del><ins>which converges even though the original sequence does not. That is exactly the phenomenon described by the theorem.</ins></div>
+</div><div class="card" id="C4-29">
+  <div class="chead"><span class="cid">C4-29</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號引出白話重述，改用 SPEC §3 鼓勵的連接詞 In other words 起新句。</p>
+  <div class="diff"><del>for every \(n &gt; p\) — that is, no later term ever exceeds \(a_{p}\).</del><ins>for every \(n &gt; p\). In other words, no later term ever exceeds \(a_{p}\).</ins></div>
+</div><div class="card" id="C4-30">
+  <div class="chead"><span class="cid">C4-30</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號後為獨立說明句（both demands can be met at once…）。</p>
+  <div class="diff"><del>— both demands can be met at once, since</del><ins>. Both demands can be met at once, since</ins></div>
+</div><div class="card" id="C4-31">
+  <div class="chead"><span class="cid">C4-31</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1／R3</span></div>
+  <p class="why">與 C4-27 同一隱喻的第二個變體（costume／disguise），統一為字面說法。</p>
+  <div class="diff"><del>it is completeness in disguise.</del><ins>it is completeness in another form.</ins></div>
+</div><div class="card" id="C4-32">
+  <div class="chead"><span class="cid">C4-32</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">兩個各自獨立的單破折號：前者後接獨立子句 → 分句；後者為括號內的同位語 → 逗號（括號 82 為全書最高，不得再往括號堆）。</p><p class="why codex"><strong>gate 2 裁決：</strong>every link breaks 仍把三個定理的失敗藏成隱喻。</p>
+  <div class="diff"><del>Over the rationals every link breaks — there are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach \(e\) — a number noted in §4.1 to be irrational).</del><ins>Over the rationals, none of these results holds. There are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach \(e\), a number noted in §4.1 to be irrational).</ins></div>
+</div><div class="card" id="C4-33">
+  <div class="chead"><span class="cid">C4-33</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號後為獨立解釋句。</p><p class="why codex"><strong>gate 2 裁決：</strong>the tail is the gap 沒說清楚是哪兩者之差。</p>
+  <div class="diff"><del>\lvert a_{k} \rvert &lt; \varepsilon\) — the tail is the gap</del><ins>\lvert a_{k} \rvert &lt; \varepsilon\). The tail bounds the difference between the partial sums</ins></div>
+</div><div class="card" id="C4-34">
+  <div class="chead"><span class="cid">C4-34</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1／R3</span></div>
+  <p class="why">workhorse 第 2 處，與 C4-12 統一。</p>
+  <div class="diff"><del>is the two-sided workhorse for the rest of the section:</del><ins>is the two-sided tool for the rest of the section:</ins></div>
+</div><div class="card" id="C4-35">
+  <div class="chead"><span class="cid">C4-35</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1</span></div>
+  <p class="why">writ large 是古語式慣用語，對 EFL 讀者不可推測（SPEC §3 R1 型病灶）。</p>
+  <div class="diff"><del>The proof is the continuity argument writ large:</del><ins>The proof is the continuity argument on a larger scale:</ins></div>
+</div><div class="card" id="C4-36">
+  <div class="chead"><span class="cid">C4-36</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">SPEC §3 SHOULD（中性動詞）</span></div>
+  <p class="why">sweep 為擬人動作動詞配式子；改中性動詞。</p><p class="why codex"><strong>gate 2 裁決：</strong>send the errors to zero 仍是擬人；show that…tend to zero 是字面。</p>
+  <div class="diff"><del>and let \((**)\) sweep the errors to zero.</del><ins>and use \((**)\) to show that the errors tend to zero.</ins></div>
+</div><div class="card" id="C4-37">
+  <div class="chead"><span class="cid">C4-37</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−4 個 —</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">第一對插入語是標籤指派（that is group (I)），第二對是理由；兩者都是可獨立成立的動作 → 重寫。改寫後為三個短句，且未新增冒號／括號。</p><p class="why codex"><strong>gate 2 裁決：</strong>assemble／carries／collapsed 三個承載數學內容的隱喻我都漏了。</p>
+  <div class="diff"><del>the degrees \(\ell \le 2\) assemble exactly \(1 + (x + y) + \tfrac{(x + y)^{2}}{2} = P_{2}(x + y)\) — that is group (I) — while the leftovers \(\tfrac{x^{2} y}{2} + \tfrac{x y^{2}}{2} + \tfrac{x^{2} y^{2}}{4}\) form group (II). Notice that (II)’s degree-\(3\) layer is incomplete — \(x^{3}\) and \(y^{3}\) are absent, since neither factor carries a power beyond \(2\) — which is why (II) can only be &lt;em&gt;bounded&lt;/em&gt; by a tail in Step 4, not collapsed by the binomial theorem.</del><ins>the terms of total degree \(\ell \le 2\) sum exactly to \(1 + (x + y) + \tfrac{(x + y)^{2}}{2} = P_{2}(x + y)\), which is group (I). The remaining terms \(\tfrac{x^{2} y}{2} + \tfrac{x y^{2}}{2} + \tfrac{x^{2} y^{2}}{4}\) form group (II). Notice that group (II) has an incomplete degree-\(3\) part. Neither factor contains a power higher than \(2\), so \(x^{3}\) and \(y^{3}\) are absent. Therefore group (II) can only be &lt;em&gt;bounded&lt;/em&gt; by a tail in Step 4, not rewritten by the binomial theorem.</ins></div>
+</div><div class="card" id="C4-38">
+  <div class="chead"><span class="cid">C4-38</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">尾巴是無動詞的分詞附加語，改成完整句。</p><p class="why codex"><strong>gate 2 裁決：</strong>reappears at every level 仍不字面。</p>
+  <div class="diff"><del>and Bolzano–Weierstrass (Theorem 4.4) — the completeness of \(\mathbb{R}\) reappearing at every level.</del><ins>and Bolzano–Weierstrass (Theorem 4.4). Both the Cauchy criterion and Bolzano–Weierstrass ultimately depend on the completeness of \(\mathbb{R}\).</ins></div>
+</div><div class="card" id="C4-39">
+  <div class="chead"><span class="cid">C4-39</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1（lean on 家族）</span></div>
+  <p class="why">同 C4-21。</p><p class="why codex"><strong>gate 2 裁決：</strong>只改 leans on 而留 machinery 確實不一致。</p>
+  <div class="diff"><del>which leans on the same partial-sum machinery</del><ins>which uses the same partial-sum argument</ins></div>
+</div><div class="card" id="N-03b">
+  <div class="chead"><span class="cid">N-03b</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1／R3：同 N-03a，§4.2 節首。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1／R3：同 N-03a，§4.2 節首。</p>
+  <div class="diff"><del>the partial sums \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) close in on it at a geometric rate</del><ins>the partial sums \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) approach it at a geometric rate</ins></div>
+</div><div class="card" id="N-04">
+  <div class="chead"><span class="cid">N-04</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1：bridge we need／without an explicit limit in hand／The hinge is 三處隱喻。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1：bridge we need／without an explicit limit in hand／The hinge is 三處隱喻。</p>
+  <div class="diff"><del>That a sequence converges exactly when it is Cauchy is the bridge we need: it lets us certify the convergence of \(\sum a_{n}\) without naming the sum.</del><ins>The equivalence between convergence and the Cauchy condition lets us prove that \(\sum a_{n}\) converges without first knowing its limit.</ins></div>
+</div><div class="card" id="N-05">
+  <div class="chead"><span class="cid">N-05</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1＋準確性：telescope 在此不是通常意義的 telescoping（沒有相鄰項相消），是插入再減去。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1＋準確性：telescope 在此不是通常意義的 telescoping（沒有相鄰項相消），是插入再減去。</p>
+  <div class="diff"><del>Step 5: telescope the difference.</del><ins>Step 5: insert and subtract the partial sums.</ins></div>
+</div><div class="card" id="N-06">
+  <div class="chead"><span class="cid">N-06</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1：extends verbatim 對 EFL 不透明。改用本檔既有的 word for word（§4.2 Theorem 4.6 的證明本來就這樣寫），順帶 R3 一致。<strong>不採</strong> Codex 的版本——它把 \(x > 0\) 這個限定拿掉了，讀者會不知道被延伸的是哪一個證明。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1：extends verbatim 對 EFL 不透明。改用本檔既有的 word for word（§4.2 Theorem 4.6 的證明本來就這樣寫），順帶 R3 一致。<strong>不採</strong> Codex 的版本——它把 \(x > 0\) 這個限定拿掉了，讀者會不知道被延伸的是哪一個證明。</p>
+  <div class="diff"><del>the continuity proof for \(x &gt; 0\) extends verbatim to every real base point.</del><ins>the continuity proof for \(x &gt; 0\) works word for word at every real base point.</ins></div>
+</div><h3 class="sech">§4.3 The Derivative of e^x <span class="cnt">8 條</span></h3><div class="card" id="C4-40">
+  <div class="chead"><span class="cid">C4-40</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／R1（交易隱喻）</span></div>
+  <p class="why">尾巴只有兩個詞的 payload；owed 屬交易隱喻。改寫後把主題（derivative）提前，零標點負載。</p>
+  <div class="diff"><del>One classical fact about it is still owed a rigorous proof — its derivative.</del><ins>Its derivative is the one classical fact about it that still needs a rigorous proof.</ins></div>
+</div><div class="card" id="C4-41">
+  <div class="chead"><span class="cid">C4-41</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">四步仲裁 step 3／R1</span></div>
+  <p class="why">插入語是三項的列舉；改寫後三項直接當受詞，破折號、冒號、括號都不需要。leaned on／honestly 各屬 lean 與 honest 家族。</p><p class="why codex"><strong>gate 2 裁決：</strong><strong>Codex 抓到真問題（3a）</strong>：這對破折號與 K-01 同型（清單界定 three properties），四步仲裁應 KEEP；我為了同時修 leaned on 而把它一起改掉，等於用改寫繞過 KEEP。保留破折號、只改詞彙。</p>
+  <div class="diff"><del>That argument was correct in spirit, yet it leaned on three properties — convergence, continuity, and the exponent law — that had not been established at the time. Now that all three are theorems, we can re-derive the formula honestly.</del><ins>That argument gave the correct result, yet it used three properties — convergence, continuity, and the exponent law — that had not been established at the time. Now that all three are theorems, we can re-derive the formula from them.</ins></div>
+</div><div class="card" id="C4-42">
+  <div class="chead"><span class="cid">C4-42</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette（鬆散同位語）</span></div>
+  <p class="why">單破折號尾巴為三字同位語，依 palette 改逗號。</p>
+  <div class="diff"><del>rests on a single algebraic move — the exponent law.</del><ins>rests on a single algebraic move, the exponent law.</ins></div>
+</div><div class="card" id="C4-43">
+  <div class="chead"><span class="cid">C4-43</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">「unlike the Chapter 2 pass」是對比修飾，本可 KEEP；但原句同時承載「級數讓極限透明」與「這回能給收斂速率」兩個動作，拆句後對比詞自然落在句首，標點負載歸零。</p><p class="why codex"><strong>gate 2 裁決：</strong><strong>Codex 抓到真問題（3a）</strong>：— unlike the Chapter 2 pass — 是規範明列可保留的對比修飾（`— only then —` 先例形狀）。兩個好處是同一個說明動作，我判成兩個動作是錯的。</p>
+  <div class="diff"><del>The series makes it transparent, and — unlike the Chapter 2 pass — it lets us put a number on the rate of approach.</del><ins>The series shows why the limit is \(1\), and — unlike the Chapter 2 derivation — also gives a numerical bound on the rate of approach.</ins></div>
+</div><div class="card" id="C4-44">
+  <div class="chead"><span class="cid">C4-44</span><span class="lab d-pa">gate 2 部分採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／四步仲裁</span></div>
+  <p class="why">三個破折號擠在兩句內（§4.3 密度 21.1／千詞，全書最高）。第一個是同位語 → 逗號；成對的一組是例子列舉，改成 such as 從句。</p><p class="why codex"><strong>gate 2 裁決：</strong><strong>Codex 抓到真問題（3a）</strong>：例子清單那對應 KEEP。同時 pinned 改成界限語言。但<strong>保留</strong>「a rate of convergence at least linear in \(h\)」這個 gloss——Codex 版把它整句刪了，那是在說明「線性收斂速率」是什麼意思的教學句，刪掉是內容損失，不是平實化。</p>
+  <div class="diff"><del>is pinned at no more than \(\lvert h \rvert\) — convergence at a rate at least linear in \(h\). For ordinary differentiation the qualitative statement suffices, but any later argument that must track the size of a derivative error — Taylor remainders, numerical estimates — uses the explicit bound, not the bare limit.</del><ins>is at most \(\lvert h \rvert\), a rate of convergence at least linear in \(h\). For ordinary differentiation, the qualitative statement suffices, but later arguments that must track the size of a derivative error — Taylor remainders and numerical estimates — use the explicit bound rather than the limit statement alone.</ins></div>
+</div><div class="card" id="C4-45">
+  <div class="chead"><span class="cid">C4-45</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">插入語是把式子翻成白話的 gloss——那是獨立的教學動作，值得自成一句，不該塞在主詞與述語之間。</p>
+  <div class="diff"><del>The identity \(\frac{d}{dx} e^{x} = e^{x}\) — slope equal to value at every point — is exactly the property that makes</del><ins>The identity \(\frac{d}{dx} e^{x} = e^{x}\) says that the slope equals the value at every point. That is exactly the property that makes</ins></div>
+</div><div class="card" id="C4-46">
+  <div class="chead"><span class="cid">C4-46</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">尾巴是定理的命名；改寫後名字先出現、描述當同位語，讀者不必等到句尾才知道在講誰。</p>
+  <div class="diff"><del>requires an existence result that converts the sign of the derivative into monotonic behavior of the function — the Mean Value Theorem.</del><ins>requires the Mean Value Theorem, an existence result that converts the sign of the derivative into monotonic behavior of the function.</ins></div>
+</div><div class="card" id="N-07">
+  <div class="chead"><span class="cid">N-07</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1：fed…into／drop out／collapses onto 三個承載操作的隱喻。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1：fed…into／drop out／collapses onto 三個承載操作的隱喻。</p>
+  <div class="diff"><del>by a casual term-by-term argument that fed the series into the difference quotient and observed that all but the leading term seemed to drop out as \(h \to 0\)</del><ins>by a casual term-by-term argument that substituted the series into the difference quotient and observed that the terms after the leading term tend to \(0\) as \(h \to 0\)</ins></div>
+</div><h3 class="sech">§4.4 Rolle’s Theorem and the MVT <span class="cnt">24 條</span></h3><div class="card" id="C4-47">
+  <div class="chead"><span class="cid">C4-47</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1</span></div>
+  <p class="why">promissory note 是金融術語，對 EFL 讀者遠比 on credit 難；且它不屬本書刻意貫穿的 credit／debt／repay 機制用語。</p><p class="why codex"><strong>gate 2 裁決：</strong>promise 仍是 SPEC 點名的擬人；claim that still needs proof 直接說出狀態。</p>
+  <div class="diff"><del>Section 4.3 ended with a promissory note:</del><ins>Section 4.3 ended with a claim that still needs proof:</ins></div>
+</div><div class="card" id="C4-48">
+  <div class="chead"><span class="cid">C4-48</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">F4 黏接／R1</span></div>
+  <p class="why">原句 30 詞、以 while＋and 串起「兩者是不同層次的資訊」與「目前沒有橋」兩個獨立論述動作 → 拆句。keystone 為隱喻。</p><p class="why codex"><strong>gate 2 裁決：</strong>bridge 我沒處理。</p>
+  <div class="diff"><del>is a statement about the function across a whole interval, and nothing built so far bridges the two. This section constructs that bridge. Its keystone is the &lt;em&gt;Mean Value Theorem&lt;/em&gt; (MVT)</del><ins>is a statement about the function across a whole interval. No result proved so far connects these two kinds of information. This section establishes that connection. The key result is the &lt;em&gt;Mean Value Theorem&lt;/em&gt; (MVT)</ins></div>
+</div><div class="card" id="C4-49">
+  <div class="chead"><span class="cid">C4-49</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">插入語本身含四個逗號、且列舉了兩個步驟＝兩個獨立教學動作 → 重寫。</p><p class="why codex"><strong>gate 2 裁決：</strong>where maxima and minima can sit → occur。</p>
+  <div class="diff"><del>We reach it in two steps — first &lt;em&gt;Rolle’s theorem&lt;/em&gt;, the special case where the average slope is zero, then the MVT itself — after one preparatory result about where maxima and minima can sit.</del><ins>After one preparatory result about where maxima and minima can occur, we reach it in two steps. The first is &lt;em&gt;Rolle’s theorem&lt;/em&gt;, the special case where the average slope is zero; the second is the MVT itself.</ins></div>
+</div><div class="card" id="C4-50">
+  <div class="chead"><span class="cid">C4-50</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號後為獨立子句（and, just as basic, …）。</p><p class="why codex"><strong>gate 2 裁決：</strong>skips no value 是 IVT 的關鍵內容，應字面說出。</p>
+  <div class="diff"><del>on a closed interval the answer is always yes — and, just as basic, a continuous function skips no value</del><ins>on a closed interval the answer is always yes. Just as importantly, a continuous function on an interval takes every value between two values that it attains.</ins></div>
+</div><div class="card" id="C4-51a">
+  <div class="chead"><span class="cid">C4-51a</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1</span></div>
+  <p class="why">earn their keep 是英語慣用語，對 EFL 讀者不可推測；字面意思是「兩部分各需要自己的前提」。</p><p class="why codex"><strong>gate 2 裁決：</strong>it needs them differently 指涉鬆散。</p>
+  <div class="diff"><del>The hypotheses earn their keep, and differently for the two parts.</del><ins>The two parts require different hypotheses.</ins></div>
+</div><div class="card" id="C4-51b">
+  <div class="chead"><span class="cid">C4-51b</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">插入語是「為何沒有最大值」的理由（獨立論證步驟），不是同一主張的修飾 → 重寫；理由改用 since 直接接上。</p>
+  <div class="diff"><del>attains no maximum — its values approach \(1\) without ever reaching it — and a discontinuous function can miss its extremes even on a closed interval.</del><ins>attains no maximum, since its values approach \(1\) without ever reaching it. A discontinuous function can miss its extremes even on a closed interval.</ins></div>
+</div><div class="card" id="C4-51c">
+  <div class="chead"><span class="cid">C4-51c</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1（lean on 家族）</span></div>
+  <p class="why">同 C4-21；此處字面意思是「只需要連續性」。</p><p class="why codex"><strong>gate 2 裁決：</strong>requires only continuity on an interval 更字面。</p>
+  <div class="diff"><del>The Intermediate Value Theorem (b) leans on continuity alone, over an interval:</del><ins>The Intermediate Value Theorem (b) requires only continuity on an interval:</ins></div>
+</div><div class="card" id="C4-51d">
+  <div class="chead"><span class="cid">C4-51d</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">R1</span></div>
+  <p class="why">deliver 作不及物動詞（「總是交得出貨」）是商業口語，且省略了受詞。</p>
+  <div class="diff"><del>where they always deliver.</del><ins>where both conclusions hold.</ins></div>
+</div><div class="card" id="C4-53">
+  <div class="chead"><span class="cid">C4-53</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／R1（⛳ 政策題 P-A）</span></div>
+  <p class="why">破折號後為獨立指令句；earn 家族第 2 處。</p>
+  <div class="diff"><del>the Mean Value Theorem) earn the section’s three existence theorems. Later material uses the statements, not the proofs — on a first reading</del><ins>the Mean Value Theorem) prove the section’s three existence theorems. Later material uses the statements, not the proofs. On a first reading</ins></div>
+</div><div class="card" id="C4-54">
+  <div class="chead"><span class="cid">C4-54</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3／R1</span></div>
+  <p class="why">marries 為擬人動詞。插入語 an extremum 是把「轉折點」接上 Theorem A 詞彙的關鍵一步，值得自成一句——拆開後「轉折點是極值 → 故導數為零」的推理鏈也才看得見。</p><p class="why codex"><strong>gate 2 裁決：</strong><strong>Codex 抓到真問題</strong>：我的改寫「必定轉向 → 該點是極值」漏掉了常函數情形（Rolle 證明的 Case 1）。Codex 版把「常數或有內部極值」寫全，數學上才完整。</p>
+  <div class="diff"><del>Rolle’s theorem marries the two results above. The picture: if a function leaves and returns to the same height over \([a, b]\), it must turn around somewhere inside, and at that interior turning point — an extremum — the derivative is zero.</del><ins>Rolle’s theorem combines the two results above. Under its hypotheses, a function with equal endpoint values is either constant or has an interior extremum. At that interior extremum, the derivative is zero.</ins></div>
+</div><div class="card" id="C4-55">
+  <div class="chead"><span class="cid">C4-55</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette（鬆散同位語）</span></div>
+  <p class="why">尾巴是同位語 gloss，依 palette 改逗號。</p>
+  <div class="diff"><del>rate of change \((f(b) - f(a))/(b - a)\) — the slope of the secant joining the two endpoints.</del><ins>rate of change \((f(b) - f(a))/(b - a)\), the slope of the secant joining the two endpoints.</ins></div>
+</div><div class="card" id="C4-56">
+  <div class="chead"><span class="cid">C4-56</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號後為獨立子句（yet we proved Rolle first…）。</p>
+  <div class="diff"><del>where the average slope is \(0\) — yet we proved Rolle &lt;em&gt;first&lt;/em&gt;</del><ins>where the average slope is \(0\). Yet we proved Rolle &lt;em&gt;first&lt;/em&gt;</ins></div>
+</div><div class="card" id="C4-57">
+  <div class="chead"><span class="cid">C4-57</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／R1</span></div>
+  <p class="why">load-bearing rung 是把梯子隱喻再疊一層建築隱喻；尾巴則是兩個使用場合的列舉，接成獨立句更清楚。lean on 家族第 4 處。</p><p class="why codex"><strong>gate 2 裁決：</strong><strong>Codex 抓到真問題</strong>：the one later chapters use 不當地排除了另兩個結果（Theorem A 與 Rolle 後面也會用）。Codex 版同時解掉我先前節奏預檢擔心的兩句等長問題。</p>
+  <div class="diff"><del>The MVT is the load-bearing rung. It is the standard device for turning pointwise information about \(f'\) into behavior of \(f\) across an interval, and it returns every time we make that move — immediately below to read monotonicity off the sign of \(f'\), and later for Taylor’s theorem and the error estimates that lean on it.</del><ins>Of the three, the MVT is used most often in later chapters. It converts information about \(f'\) at individual points into information about \(f\) on an interval. We use it whenever we make that conversion: immediately below to deduce monotonicity from the sign of \(f'\), and later in Taylor’s theorem and in error estimates.</ins></div>
+</div><div class="card" id="C4-58">
+  <div class="chead"><span class="cid">C4-58</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">SPEC §3 SHOULD（promises）</span></div>
+  <p class="why">SPEC 明列 promises 為要避免的戲劇動詞，guarantees 是其推薦替代。（此句在 <ol> 內，屬副表、不計入主分母。）</p>
+  <div class="diff"><del>The theorem promises existence only;</del><ins>The theorem guarantees existence only;</ins></div>
+</div><div class="card" id="C4-59">
+  <div class="chead"><span class="cid">C4-59</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1（副表）</span></div>
+  <p class="why">fair game 為不透明慣用語。</p><p class="why codex"><strong>gate 2 裁決：</strong>satisfies this step 指稱太弱。</p>
+  <div class="diff"><del>is fair game.)</del><ins>still satisfies the differentiability requirement.)</ins></div>
+</div><div class="card" id="C4-60">
+  <div class="chead"><span class="cid">C4-60</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／SHOULD 節奏</span></div>
+  <p class="why">破折號後是前句的直接結論，用 so 接即可。（初稿本來拆成獨立句，節奏預檢抓到那會讓 Strategy 4.2 的收尾變成連續三句 13／11／11 詞的平坦段——SPEC §3 明文 MUST NOT 因拆句造出連續三句長度相近，故改為不拆。）</p>
+  <div class="diff"><del>wherever it is defined and never \(0\) — there is no valid \(c\)</del><ins>wherever it is defined and never \(0\), so no valid \(c\) exists</ins></div>
+</div><div class="card" id="C4-61">
+  <div class="chead"><span class="cid">C4-61</span><span class="lab d-g1">gate 1 原案</span>
+    <span class="test">SPEC §3 SHOULD（promises）</span></div>
+  <p class="why">同 C4-58。</p>
+  <div class="diff"><del>The MVT promises a \(c \in (0, 2)\)</del><ins>The MVT guarantees a \(c \in (0, 2)\)</ins></div>
+</div><div class="card" id="C4-62">
+  <div class="chead"><span class="cid">C4-62</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">插入語提出的是一個更強的事實（在整個 \(\mathbb{R}\) 上可微），它其實是前面兩個前提的理由 → 重寫，把理由放前面、結論放後面。</p>
+  <div class="diff"><del>The function \(f(x) = \sin x\) is continuous on \([b, a]\) and differentiable on \((b, a)\) — it is differentiable on all of \(\mathbb{R}\) — so by the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with</del><ins>The function \(f(x) = \sin x\) is differentiable on all of \(\mathbb{R}\), so it is continuous on \([b, a]\) and differentiable on \((b, a)\). By the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with</ins></div>
+</div><div class="card" id="C4-63">
+  <div class="chead"><span class="cid">C4-63</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette（鬆散同位語）</span></div>
+  <p class="why">省略式對比，改逗號。</p>
+  <div class="diff"><del>We do not need to know which \(c\) — only that one exists.</del><ins>We do not need to know which \(c\), only that one exists.</ins></div>
+</div><div class="card" id="C4-64">
+  <div class="chead"><span class="cid">C4-64</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">尾巴是前一子句的直接後果，用 so 接更清楚。</p>
+  <div class="diff"><del>everywhere — \(f'\) is never zero.</del><ins>everywhere, so \(f'\) is never zero.</ins></div>
+</div><div class="card" id="C4-65">
+  <div class="chead"><span class="cid">C4-65</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號後為獨立子句。</p>
+  <div class="diff"><del>Two applications close the section — the second is the one we have been working toward.</del><ins>Two applications close the section. The second is the one we have been working toward.</ins></div>
+</div><div class="card" id="C4-66">
+  <div class="chead"><span class="cid">C4-66</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">插入語是一個例外（boundedness 會失守）＝可獨立成立的內容 → 重寫。</p><p class="why codex"><strong>gate 2 裁決：</strong>such a passage 沒說明轉換是什麼。</p>
+  <div class="diff"><del>Not every interval property survives such a passage — boundedness, for one, can be lost — but strict monotonicity does.)</del><ins>Passing from bounded intervals to all of \(\mathbb{R}\) does not preserve every property. For example, boundedness can be lost, but strict monotonicity is preserved.)</ins></div>
+</div><div class="card" id="C4-67">
+  <div class="chead"><span class="cid">C4-67</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1</span></div>
+  <p class="why">driving at 為不透明片語動詞；改字面且避免與上一句的 working toward 重複。</p><p class="why codex"><strong>gate 2 裁決：</strong>set out to reach 仍是旅程隱喻；Codex 版順帶把「哪個結果」說明白。</p>
+  <div class="diff"><del>That last example is the result the chapter has been driving at.</del><ins>That last example proves that \(e^{x}\) is strictly increasing, the result needed for the next section.</ins></div>
+</div><div class="card" id="N-09">
+  <div class="chead"><span class="cid">N-09</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R2：the three results form a ladder 把關鍵依賴關係藏成隱喻。</p><p class="why codex"><strong>gate 2 裁決：</strong>R2：the three results form a ladder 把關鍵依賴關係藏成隱喻。</p>
+  <div class="diff"><del>The three results form a ladder: Theorem A, a statement about the derivative at one point, supports Rolle; Rolle adds the equal-endpoints hypothesis, and Rolle in turn supports the MVT for arbitrary endpoints.</del><ins>Theorem A, a statement about the derivative at one point, is used to prove Rolle’s theorem; Rolle’s theorem, which adds the equal-endpoints hypothesis, is in turn used to prove the MVT for arbitrary endpoints.</ins></div>
+</div><h3 class="sech">§4.5 Monotonicity and the Logarithm <span class="cnt">19 條</span></h3><div class="card" id="C4-68">
+  <div class="chead"><span class="cid">C4-68</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／R1</span></div>
+  <p class="why">一段之內三個隱喻疊用（lever／powers／free gifts）。單破折號尾巴改逗號同位語。</p><p class="why codex"><strong>gate 2 裁決：</strong><strong>Codex 抓到真問題</strong>：我的版本把「存在性」也歸給嚴格單調性——存在性其實來自值域是 \((0,\infty)\)（IVT），單調性只給唯一性。這是數學歸因錯誤，不只是措辭。</p>
+  <div class="diff"><del>the inverse of the exponential is the function we are after — the &lt;em&gt;natural logarithm&lt;/em&gt;. Strict monotonicity is the lever throughout. It does the obvious work of &lt;em&gt;building&lt;/em&gt; the inverse, by making each value \(x &amp;gt; 0\) come from exactly one exponent. Less obviously, it also &lt;em&gt;powers&lt;/em&gt; everything we then prove about that inverse. The continuity of \(\ln\) and its differentiability are not free gifts that come with the definition;</del><ins>the inverse of the exponential is the &lt;em&gt;natural logarithm&lt;/em&gt;. Strict monotonicity gives the uniqueness we need: no value can come from two different exponents. Existence is a separate matter. Once we show that the range of \(e^{x}\) is \((0,\infty)\), every positive number has such an exponent. Strict monotonicity is also needed in every later proof about that inverse. The continuity and differentiability of \(\ln\) do not follow automatically from the definition;</ins></div>
+</div><div class="card" id="C4-69">
+  <div class="chead"><span class="cid">C4-69</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號後為獨立說明句。</p>
+  <div class="diff"><del>rigorously — this time without assuming in advance that \(\ln\) is differentiable, the assumption Chapter 3 made informally.</del><ins>rigorously. This time we do not assume in advance that \(\ln\) is differentiable, the assumption Chapter 3 made informally.</ins></div>
+</div><div class="card" id="C4-70">
+  <div class="chead"><span class="cid">C4-70</span><span class="lab d-pa">gate 2 部分採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3</span></div>
+  <p class="why">插入語是「為什麼 \(e^{x} > 1+x\)」的理由 → 重寫，把理由前置成因果鏈；同時拆掉原句用分號黏起的第二個推論，分號負載淨減 1。</p><p class="why codex"><strong>gate 2 裁決：</strong>採 Codex 的數學修正——<strong>它抓到真問題</strong>：我的版本沒限定 \(x>0\) 就說「級數第一項之後每項為正」，對 \(x<0\) 那是假的。但<strong>不採</strong>它把 exceeds／fall below 這兩句散文改寫成 \(e^{x} &gt; t\)／\(e^{x} &lt; t\)——那會新增兩個行內公式，踩到本輪「不動數學」的硬護欄，而且平實化的方向本來就是散文優先於符號。另：Codex 的原文用生的 &lt; &gt;，本檔慣例是 entity，一律改回。</p>
+  <div class="diff"><del>Since \(e^{x} &amp;gt; 1 + x\) for \(x &amp;gt; 0\) — every term of the series past the first is positive — \(e^{x}\) exceeds \(t\) once \(x\) is large enough; and since \(e^{-x} = 1/e^{x}\) (Theorem 4.7), the values \(e^{x}\) fall below \(t\) once \(x\) is sufficiently negative.</del><ins>For \(x &amp;gt; 0\), every term of the series after the first two is positive, so \(e^{x} &amp;gt; 1 + x\). Therefore \(e^{x}\) exceeds \(t\) once \(x\) is large enough. Since \(e^{-x} = 1/e^{x}\) (Theorem 4.7), the values \(e^{x}\) fall below \(t\) once \(x\) is sufficiently negative.</ins></div>
+</div><div class="card" id="C4-71">
+  <div class="chead"><span class="cid">C4-71</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號接 so，本就是逗號的位置。</p>
+  <div class="diff"><del>Strict monotonicity makes the exponent unique — so for every</del><ins>Strict monotonicity makes the exponent unique, so for every</ins></div>
+</div><div class="card" id="C4-72">
+  <div class="chead"><span class="cid">C4-72</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette（鬆散同位語）</span></div>
+  <p class="why">尾巴是分詞子句，改逗號。</p>
+  <div class="diff"><del>on the input side — contradicting the very fact</del><ins>on the input side, contradicting the very fact</ins></div>
+</div><div class="card" id="C4-73">
+  <div class="chead"><span class="cid">C4-73</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁／R1（⛳ 政策題 P-A）</span></div>
+  <p class="why">成對插入語只是把 the statement 說成 the continuity of ln；直接寫成 that 子句更短也更明確。earn 家族第 3 處。</p>
+  <div class="diff"><del>&lt;em&gt;Proof track: this argument earns the theorem. What follows uses only the statement — the continuity of \(\ln\) — so on a first reading you may take it and move on.&lt;/em&gt;</del><ins>&lt;em&gt;Proof track: this argument proves the theorem. What follows uses only the statement that \(\ln\) is continuous, so on a first reading you may take it and move on.&lt;/em&gt;</ins></div>
+</div><div class="card" id="C4-74">
+  <div class="chead"><span class="cid">C4-74</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號後為獨立的量詞敘述句；拆句不動量詞 scope。</p><p class="why codex"><strong>gate 2 裁決：</strong><strong>Codex 抓到真問題</strong>：句點會把 \(\exists\delta\,\forall d\) 的量詞 scope 切開——正是 SPEC「不得因減少長度而拆散量詞與其 scope」的反面護欄。改回冒號。</p>
+  <div class="diff"><del>that no input-closeness requirement can meet — for every \(d &amp;gt; 0\)</del><ins>that no input-closeness requirement can meet: for every \(d &amp;gt; 0\)</ins></div>
+</div><div class="card" id="C4-75">
+  <div class="chead"><span class="cid">C4-75</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號接 so，本就是逗號的位置。</p>
+  <div class="diff"><del>and \(\delta\) — so each of the two case bounds</del><ins>and \(\delta\), so each of the two case bounds</ins></div>
+</div><div class="card" id="C4-76">
+  <div class="chead"><span class="cid">C4-76</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／R1（⛳ 政策題 P-A）</span></div>
+  <p class="why">尾巴是非限定關係子句，改逗號。earn…honestly 同時踩 earn 與 honest 兩個家族；改寫後直接說出「不再需要那個假設」。</p><p class="why codex"><strong>gate 2 裁決：</strong>silently assumes 不字面。</p>
+  <div class="diff"><del>with the chain rule — which silently &lt;em&gt;assumes&lt;/em&gt; \(\ln\) is differentiable. We can now earn the formula honestly.</del><ins>with the chain rule, which assumes that \(\ln\) is differentiable without first proving it. We can now prove the formula without that assumption.</ins></div>
+</div><div class="card" id="C4-77">
+  <div class="chead"><span class="cid">C4-77</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette（鬆散同位語）</span></div>
+  <p class="why">尾巴是同位語，改逗號。</p><p class="why codex"><strong>gate 2 裁決：</strong>presupposes 是較難的字，assumes 已足夠。（注意：Codex 給的改寫句尾超出本條 old 錨點的範圍，直接照貼會把「\(\ln\) is differentiable」複製兩次——數學閘的片段比對抓到了，已截到錨點邊界。）</p>
+  <div class="diff"><del>to \(e^{\ln x} = x\) — a derivation that &lt;em&gt;presupposes&lt;/em&gt;</del><ins>to \(e^{\ln x} = x\), a derivation that &lt;em&gt;assumes&lt;/em&gt;</ins></div>
+</div><div class="card" id="C4-78">
+  <div class="chead"><span class="cid">C4-78</span><span class="lab d-ac">gate 2 採納</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette／R1／R3</span></div>
+  <p class="why">engine 隱喻第 2 處（見 C4-16）；尾巴改逗號同位語。</p><p class="why codex"><strong>gate 2 裁決：</strong>companion／borderline case 沒交代結論是什麼。</p>
+  <div class="diff"><del>The engine is a single extra consequence of the Mean Value Theorem — the companion of the monotonicity corollary, for the borderline case \(f' = 0\).</del><ins>The next result is another consequence of the Mean Value Theorem. It handles the case \(f' = 0\) on an interval, where the conclusion is that the function is constant.</ins></div>
+</div><div class="card" id="C4-79">
+  <div class="chead"><span class="cid">C4-79</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">破折號後為獨立的指令＋計算句。</p>
+  <div class="diff"><del>In general \(\ln(a + b) \ne \ln a + \ln b\) — take \(a = b = 1\), where the left side is \(\ln 2\) and the right side is \(0\).</del><ins>In general \(\ln(a + b) \ne \ln a + \ln b\). Taking \(a = b = 1\) gives \(\ln 2\) on the left and \(0\) on the right.</ins></div>
+</div><div class="card" id="C4-80">
+  <div class="chead"><span class="cid">C4-80</span><span class="lab d-ac">gate 2 採納</span>
+    <span class="test">R1（⛳ 政策題 P-A）</span></div>
+  <p class="why">一句內三個不透明表達：earns（交易）、grants no licence（法律慣用語）、look-alikes（口語）。</p><p class="why codex"><strong>gate 2 裁決：</strong>the one identity that holds 易誤讀成只有一條對數恆等式成立。</p>
+  <div class="diff"><del>The proof above earns the one identity that holds; it grants no licence to the look-alikes.</del><ins>The proof above establishes the product law. It does not justify the similar-looking formulas.</ins></div>
+</div><div class="card" id="C4-81">
+  <div class="chead"><span class="cid">C4-81</span><span class="lab d-g1">gate 1 原案</span><span class="dcount">−1 個 —</span>
+    <span class="test">CUT palette</span></div>
+  <p class="why">尾巴是回指 §4.1 的獨立說明，成句後指涉更明確。</p>
+  <div class="diff"><del>with arbitrary real exponents — the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</del><ins>with arbitrary real exponents. That is the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</ins></div>
+</div><div class="card" id="C4-82">
+  <div class="chead"><span class="cid">C4-82</span><span class="lab d-pa">gate 2 部分採納</span><span class="dcount">−2 個 —</span>
+    <span class="test">四步仲裁 step 3／R2</span></div>
+  <p class="why">成對插入語裡塞了一整段證明，而其後的第三個破折號尾巴「the model behind…」其先行詞落在 30 個詞之外，讀者會誤掛到剛剛的常數上。拆成三句後指涉明確。</p><p class="why codex"><strong>gate 2 裁決：</strong>採 Codex 的拆句與去掉 forces；<strong>不採</strong>它新增的「at \(t=0\), its value is \(y(0)\)」——那是補一個原本沒有的數學步驟（新增行內公式 \(t=0\)），與 N-08／N-12 同屬數學嚴謹度補強，本輪是 prose round，一併列為超出範圍的回報項，不在此擅自加。</p>
+  <div class="diff"><del>then \(y(t) = y(0)\,e^{kt}\) — because \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 forces \(y(t)e^{-kt}\) to be the constant \(y(0)\) — the model behind population growth</del><ins>then \(y(t) = y(0)\,e^{kt}\). To see this, note that \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 shows that \(y(t)e^{-kt}\) is the constant \(y(0)\). This model describes population growth</ins></div>
+</div><div class="card" id="N-10">
+  <div class="chead"><span class="cid">N-10</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1：land on 位於術語首次白話說明處（關鍵位置），MUST 換直白詞。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1：land on 位於術語首次白話說明處（關鍵位置），MUST 換直白詞。</p>
+  <div class="diff"><del>In words, \(\ln x\) is the exponent you must raise \(e\) to in order to land on \(x\).</del><ins>In words, \(\ln x\) is the exponent to which \(e\) must be raised to obtain \(x\).</ins></div>
+</div><div class="card" id="N-11">
+  <div class="chead"><span class="cid">N-11</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1：silently carries the assumption 位於域限制的關鍵位置。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1：silently carries the assumption 位於域限制的關鍵位置。</p>
+  <div class="diff"><del>Every formula in this section that contains \(\ln x\) silently carries the assumption \(x &amp;gt; 0\).</del><ins>Every formula in this section that contains \(\ln x\) is understood to require \(x &amp;gt; 0\).</ins></div>
+</div><div class="card" id="N-13a">
+  <div class="chead"><span class="cid">N-13a</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1：built → established（K-05 的破折號依 Codex 判定照留，只改詞）。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1：built → established（K-05 的破折號依 Codex 判定照留，只改詞）。</p>
+  <div class="diff"><del>Everything this chapter built — the series definition</del><ins>All the results established in this chapter — the series definition</ins></div>
+</div><div class="card" id="N-13b">
+  <div class="chead"><span class="cid">N-13b</span><span class="lab d-nw">gate 2 新增</span>
+    <span class="test">gate 2 新增</span></div>
+  <p class="why">R1：underwrites everything（章末摘要，在 <ul> 內、屬副表）。</p><p class="why codex"><strong>gate 2 裁決：</strong>R1：underwrites everything（章末摘要，在 <ul> 內、屬副表）。</p>
+  <div class="diff"><del>monotone bounded sequences converge — underwrites everything;</del><ins>monotone bounded sequences converge — provides the basis for the later results;</ins></div>
+</div>
+
+<h2>七、誠實記錄：未完成與待決</h2>
+<ul>
+<li><strong>Gate 7（LaTeX 線）pending。</strong><code>handout/latex/make_dist.py</code> 的 <code>NAMES</code> 表沒有 ch04；
+  平行輪紀律禁止本分支改它（會與別章衝突）。ch04 的 LaTeX 產物待合併回收時一次補。</li>
+<li><strong>句長分布掉到真人教材區間以下。</strong>平均 18.3 → 16.5（監測值 18–22 之外）、
+  &gt;25 詞占比 24% → 17%（已核准樣本的自然區間是 23–26%）。SPEC 明訂這些是監測值、且 MUST NOT 設硬性句長上限，
+  故不構成違規；但方向是「比範本更短」。若之後覺得讀起來太碎，優先回頭合併的是純為去 dash 而拆的那批
+  （C4-08／C4-19／C4-29／C4-30／C4-33 等），不是為「兩個獨立論述動作」而拆的那批。</li>
+<li><strong>節奏預檢：連續三句長度相近的區段 9 → 14 處。</strong>逐句看過，除了兩處（已修：C4-60 的 Strategy 4.2 收尾、
+  C4-68 的 §4.5 節首）之外全部跨環境邊界（定理陳述、proof skeleton、<code>&lt;ul&gt;</code>），
+  依 SPEC「只適用於連續散文，排除 proof skeleton 與刻意平行結構」不算違規。</li>
+<li><strong>§4.3 的節級密度為 raw 6/566（10.6/1000）。</strong>該節三處成對破折號經兩閘一致判定應 KEEP，
+  而 N=566 &lt; 1000，依 SPEC「N &lt; 1000 的單元報 raw n/N、不單獨判定通過」——判定看單元，ch04 合計 2.3 PASS。</li>
+<li><strong>超出本輪範圍、只回報不執行（3 條）：</strong>Codex 另外指出三處<strong>數學嚴謹度</strong>問題。
+  本輪是 prose round，依「外科手術式修改」不擅自擴大範圍：
+  <ul><li><strong>N-08</strong>（sec-4-4.html）——§4.4 Example 4.4 收尾的 “The pattern is general: a function whose derivative never vanishes has at most one root” 沒寫出 MVT／Rolle 所需的區間與正則性前提。Codex 建議補成「若 \(f\) 在區間上連續、在其內部可微、且 \(f'\) 在該處不為零，則 \(f\) 在該區間上至多一個根」。<strong>這是數學內容的補強，不是散文平實化</strong>——本輪是 prose round，依「外科手術式修改」不擅自擴大範圍，交你決定要不要另開一輪或併入下次數學閘。</li><li><strong>N-12</strong>（sec-4-5.html）——§4.5 Proposition 4.3（對數乘法律）的證明直接套 Corollary 4.4，沒有明說 \(f\) 在該閉區間上連續且可微這個前提。前提實際上成立（\(f\) 在 \((0,\infty)\) 上可微），但沒寫出來。Codex 建議在 “Applying Corollary 4.4 …” 前補一句。<strong>同樣是數學嚴謹度而非散文問題</strong>，同上處理。</li><li><strong>C4-82 附帶</strong>（sec-4-5.html）——§4.5 應用收尾說 Corollary 4.4「forces \(y(t)e^{-kt}\) to be the constant \(y(0)\)」，但 Corollary 4.4 只給「是常數」，常數等於 \(y(0)\) 需要代 \(t=0\) 這一步，原文與改寫都沒寫。Codex 建議補上。<strong>同屬補數學步驟</strong>，不在本輪執行。</li></ul></li>
+<li><strong>待併：rollout 帳本 §2 的 ch04 列</strong> — em-dash 92→16、密度 13.3→2.3、冒號 68→68、分號 45→43、
+  左括號 82→82、成對逗號 26→27。（平行紀律：本分支 MUST NOT 編輯
+  <code>REPORT-emdash-baseline-and-rollout.md</code>。）</li>
+</ul>
+
+<footer>
+Gate 0–9 完成（Gate 7 pending）。判準權威 <code>CONTENT_SPEC.md</code> §3（RC，2026-07-25 凍結）；
+流程權威 <code>handout/html/_audit/KICKOFF-plain-backfill.md</code>。
+Gate 2 為 <code>codex exec -s read-only</code>／<code>gpt-5.6-terra</code>／reasoning effort max，材料 116KB 全部 inline。
+</footer>
+</body></html>
