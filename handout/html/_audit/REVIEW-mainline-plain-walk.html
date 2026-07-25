@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>正文試點：§6.2 走查＋§1.4 對照 — 平實條款可移植性驗證</title>
+<script>
+  window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2df; --bg:#fbfbf9; --card:#fff;
+    --good:#1f7a44; --good-bg:#f0f8f3; --good-line:#b8ddc7; --bad:#a3232a; --bad-bg:#fdf4f4;
+    --bad-line:#e8c9c9; --warn:#9a5b00; --warn-bg:#fdf3e3; --accent:#2d5a8a; --code-bg:#f4f4f2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Inter","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.6; max-width:940px; margin:0 auto; padding:2.4rem 1.5rem 5rem; }
+  h1 { font-size:1.45rem; line-height:1.3; margin:0 0 .3rem; }
+  .sub { color:var(--muted); font-size:.93rem; margin:0 0 1.6rem; }
+  h2 { font-size:1.14rem; margin:2.4rem 0 .7rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+  h3 { font-size:.98rem; margin:1.5rem 0 .45rem; color:var(--accent); }
+  code { font-family:Consolas,monospace; font-size:.87em; background:var(--code-bg); padding:.08em .35em; border-radius:3px; }
+  table { border-collapse:collapse; width:100%; margin:.7rem 0 1rem; font-size:.88rem; }
+  th,td { border:1px solid var(--line); padding:.4rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f0f0ee; font-weight:600; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.9rem 1.15rem; margin:1rem 0; }
+  .card.warn { background:var(--warn-bg); border-color:#e8d3a8; }
+  .card.good { background:var(--good-bg); border-color:var(--good-line); }
+  .row { display:flex; gap:.55rem; padding:.45rem .6rem; border-radius:5px; margin-bottom:.3rem; }
+  .row .lbl { flex:0 0 3.6rem; font-size:.72rem; font-weight:700; padding-top:.18rem; }
+  .row .txt { flex:1; font-size:.94rem; line-height:1.55; }
+  .before { background:var(--bad-bg); border-left:3px solid var(--bad-line); }
+  .before .lbl { color:var(--bad); }
+  .after { background:var(--good-bg); border-left:3px solid var(--good-line); }
+  .after .lbl { color:var(--good); }
+  .pair { margin:.8rem 0 1.1rem; }
+  .pair .why { font-size:.85rem; color:var(--muted); margin:0 0 .3rem; }
+  .pair .why b { color:var(--ink); font-weight:600; }
+  .id { font-family:Consolas,monospace; font-size:.8em; font-weight:700; color:var(--accent); white-space:nowrap; }
+  .tag { display:inline-block; font-size:.74rem; font-weight:600; padding:.08rem .45rem; border-radius:999px; }
+  .tag.good { color:var(--good); background:var(--good-bg); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); }
+  .tag.bad { color:var(--bad); background:var(--bad-bg); }
+  ul.tight { margin:.3rem 0 .7rem; padding-left:1.3rem; }
+  ul.tight li { margin:.2rem 0; }
+  .small { font-size:.85rem; color:var(--muted); }
+  .foot { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.84rem; color:var(--muted); }
+  .en { font-style:italic; }
+</style>
+</head>
+<body>
+
+<h1>正文試點：§6.2 走查 ＋ §1.4 對照</h1>
+<p class="sub">CONTENT_SPEC v3.5 §3〈平實英文條款〉在<strong>正文</strong>的第一次驗證 · gate-1、propose-only（未改任何 fragment）· 2026-07-25</p>
+
+<div class="card good">
+  <strong>三個假設，全部驗證：</strong>
+  <ol class="tight">
+    <li><strong>規則可移植到正文</strong>——§6.2（canon 章、100% LLM 撰寫）詞彙層家族命中 <strong>30 處／2046 詞 ≈ 14.7 處每千詞</strong>，密度比 appB（≈10.5）<em>更高</em>。診斷不是附錄特例。</li>
+    <li><strong>假陽性率極低</strong>——對照組 §1.4（手稿章、真人作者）家族命中 <strong>2 處，兩處都是假陽性</strong>（<span class="en">we only want</span>／<span class="en">all we know</span>——主語是「我們」不是數學物件）。規則<strong>不會誤傷寫得好的散文</strong>，且順手量出「LLM 撰寫 vs 真人撰寫」的語域落差。</li>
+    <li><strong>正文有 appB 沒有的新問題</strong>——一段 <strong>294 詞塞 34 個行內數學式</strong>、一段做四件事；cross-ref 密度 23；&gt;40 詞句占 22%（appB 為 3%）。<span class="tag warn">這條讓「規則現在就定版」不成立</span>——見 §5。</li>
+  </ol>
+</div>
+
+<h2>§1 量化對照</h2>
+<table>
+  <tr><th>指標</th><th class="num">§6.2<br>（canon／LLM）</th><th class="num">§1.4<br>（手稿／真人）</th><th class="num">appB 原稿<br>（自產／LLM）</th><th>判讀</th></tr>
+  <tr><td>散文詞數</td><td class="num">2046</td><td class="num">1335</td><td class="num">7828</td><td>—</td></tr>
+  <tr><td><strong>詞彙層家族命中</strong></td><td class="num"><strong>30</strong></td><td class="num"><strong>2（皆假陽性）</strong></td><td class="num">82</td><td>每千詞 14.7 vs ≈0 vs 10.5</td></tr>
+  <tr><td>　交易隱喻</td><td class="num">3</td><td class="num">0</td><td class="num">14</td><td>§6.2 含全書機制用語 <span class="en">on credit</span>（見 W-13）</td></tr>
+  <tr><td>　擬人（數學物件作主語）</td><td class="num">12</td><td class="num">0</td><td class="num">—</td><td>正文最嚴重的一類</td></tr>
+  <tr><td>　慣用語／片語動詞</td><td class="num">6</td><td class="num">0</td><td class="num">—</td><td></td></tr>
+  <tr><td>　cleft／警句／低頻詞</td><td class="num">1／3／5</td><td class="num">0／0／0</td><td class="num">—</td><td></td></tr>
+  <tr><td>黏接長句（≥30 詞＋黏接標點）</td><td class="num">23</td><td class="num">5</td><td class="num">70</td><td>§1.4 的 5 句多屬正式定義與平行列舉</td></tr>
+  <tr><td>平均句長／中位</td><td class="num">27.0／25.5</td><td class="num">20.8／20</td><td class="num">19.4／17</td><td>§6.2 是三者中最重的</td></tr>
+  <tr><td>&gt;25 詞句占比</td><td class="num">50%</td><td class="num">23%</td><td class="num">28%</td><td></td></tr>
+  <tr><td><strong>&gt;40 詞句占比</strong></td><td class="num"><strong>22%</strong></td><td class="num">5%</td><td class="num">5%</td><td>正文特有（數學式參與計數）</td></tr>
+  <tr><td>單段最高記號數</td><td class="num"><strong>34 式／294 詞</strong></td><td class="num">11 式／76 詞</td><td class="num">—</td><td>appB 完全沒有這種形狀</td></tr>
+</table>
+<p class="small">量測：剝註解與標籤、display 式以 placeholder 代入、inline 式內容併入詞數（故正文句長數字天然偏高——這正是「符號密集段落須另立標準」的實證）。家族偵測用 appB 兩輪歸納出的關鍵詞表，逐條人工複核主語。</p>
+
+<h2>§2 §6.2 findings（17 條，propose-only）</h2>
+<p class="small">分類依 rubric R1（可推測性）／R2（字面傳達）／R3（一致性）／F4（黏接與段落）。<strong>未改任何 fragment</strong>；此處改寫為建議。</p>
+
+<h3>R2 blocking 候選：修辭承載了數學內容</h3>
+
+<div class="pair">
+  <p class="why"><span class="id">W-1</span> 節開場。悖論式修辭（<span class="en">too strong to be one</span>）＋冒號黏接。冒號後其實已說出 pattern，所以不是完全藏起來，但要求讀者先解析一個修辭反轉。 <b>36 詞</b></p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Section 6.1 ended on a coincidence too strong to be one: the area under a curve and the distance from a velocity were the <em>same</em> limit of the <em>same</em> kind of sum.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">In Section 6.1 two different problems led to the same limit of the same kind of sum: the area under a curve, and the distance travelled at a varying velocity. That is no coincidence.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">W-2</span> 定義前一句的擬人（<span class="en">Definition 6.2 asks a great deal</span>）——與 ch06 §6.2 最初被你點出的病句同一句。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Definition 6.2 asks a great deal: one number approached by <em>every</em> choice of sample points.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Definition 6.2 is a strong requirement: every choice of sample points must give the same number.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">W-3</span> cleft ＋擬人動詞（<span class="en">rescues</span>）；這句承載「為什麼連續性是關鍵」這個承重解釋。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">What rescues the functions we actually meet is continuity.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">For the functions we actually meet, continuity is enough: if \(f\) is continuous, the limit always exists.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">W-4</span> 兩個擬人（<span class="en">the demand fails</span>、<span class="en">samples steered onto and off the misbehaviour</span>）把「為何取樣點選法會影響答案」這個機制講成了戲劇。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">For a wild enough function the demand fails — recall the caution of §6.1, where samples steered onto and off the misbehaviour of \(f\) gave different answers.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">For a badly behaved function this fails. Recall the caution of §6.1: there, some choices of sample point landed on the values where \(f\) misbehaves and others avoided them, so different choices gave different answers.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">W-5</span> 擬人三連（<span class="en">outlived</span>／<span class="en">born with</span>／<span class="en">survives</span>）＋低頻搭配（<span class="en">shaky infinitesimals</span>）。歷史旁註，非承重，但密度最高。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The notation has outlived the shaky infinitesimals it was born with precisely because it survives translation into the honest limit of Definition 6.2.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Leibniz based the notation on infinitesimals, an idea that was hard to make precise. The notation is still in use because it translates directly into the limit of Definition 6.2.</span></div>
+</div>
+
+<h3>R1：不透明搭配與擬人（advisory）</h3>
+<table>
+  <tr><th style="width:7%">編號</th><th style="width:46%">現況</th><th>建議</th></tr>
+  <tr><td class="id">W-6</td><td class="en">A construction that keeps returning <b>deserves</b> a name and a symbol of its own.</td><td class="en">A construction that keeps reappearing is worth naming, and worth a symbol of its own.</td></tr>
+  <tr><td class="id">W-7</td><td class="en">it keeps the Riemann sum in view even after the limit has <b>erased</b> the individual rectangles</td><td class="en">it still shows the structure of the Riemann sum, even though the limit itself no longer refers to individual rectangles</td></tr>
+  <tr><td class="id">W-8</td><td class="en">the <b>surviving trace</b> of the width \(\Delta x\)</td><td class="en">what is left of the width \(\Delta x\)</td></tr>
+  <tr><td class="id">W-9</td><td class="en">Theorem 6.1 <b>promises</b> the limit exists and is <b>blind to</b> the choice of sample points</td><td class="en">Theorem 6.1 guarantees that the limit exists and that it does not depend on the choice of sample points</td></tr>
+  <tr><td class="id">W-10</td><td class="en">geometry <b>reads the integral off at sight</b> — no formula to <b>hunt down</b>, no limit of sums</td><td class="en">we can read the integral straight off the geometry, with no limit to compute</td></tr>
+  <tr><td class="id">W-11</td><td class="en">A single comparison, no limit computed, <b>pins</b> the integral to a <b>modest</b> range.</td><td class="en">A single comparison, with no limit computed, traps the integral between \(3\) and \(6\).</td></tr>
+  <tr><td class="id">W-12</td><td class="en">Only the smallest handful of integrals <b>yields to</b> either method. … removes the obstacle <b>at a stroke</b> … makes … <b>painless</b> to evaluate</td><td class="en">Only a few integrals can be evaluated either way. … removes this obstacle … makes … easy to evaluate</td></tr>
+</table>
+
+<h3>需要你裁決的政策題（appB 沒遇到）</h3>
+<div class="card warn">
+  <p><span class="id">W-13</span> <strong><span class="en">on credit</span> 是全書機制用語，不是零星隱喻。</strong>§6.2 Caution 寫 <span class="en">“We take the theorem <b>on credit</b> and use what it <b>grants</b>… everything else is <b>earned in full</b>.”</span>——其中 <span class="en">on credit</span> 對應 <code>CONTENT_SPEC §16.1</code> 的「on-credit fence（明文掛帳）」機制，全書多處使用。三個選項：</p>
+  <ul class="tight">
+    <li><strong>(a) 保留機制用語、只改周邊</strong>（推薦）：<span class="en">on credit</span> 留，但 <span class="en">what it grants</span> → <span class="en">what it gives us</span>、<span class="en">earned in full</span> → <span class="en">proved in full</span>，並在<strong>全書首次出現處</strong>加一句 gloss（<span class="en">we use it without proving it here</span>）。</li>
+    <li>(b) 全書統一改成字面說法（<span class="en">without proof</span>／<span class="en">taken as given</span>）——一致但要動 SPEC §16.1 與各章 fence。</li>
+    <li>(c) 現狀不動。</li>
+  </ul>
+  <p class="small">這正是第三方評估預測的「正文會出現附錄沒有的問題」之一：<strong>機制用語 vs 修辭隱喻的界線</strong>。不能由散文閘單方面判。</p>
+</div>
+
+<h3>F4：段落層是正文的真問題（比句子層嚴重）</h3>
+<div class="card">
+  <p><span class="id">W-14</span> <strong>Theorem 6.2 的性質證明速寫段：一段 294 詞、34 個行內數學式、做四件事</strong>（常數與純量律／線性／比較與夾擊／可加性），末尾還掛一個 66 詞的括號補述（切點在 \(c\) 的和式分割＋符號約定的延伸）。</p>
+  <ul class="tight">
+    <li>句層規則抓不到重點——它的問題不是某一句太長，而是<strong>一段裝四個獨立論證</strong>；讀者無處落腳、也無法回查「線性的理由在哪一行」。</li>
+    <li>建議（不是本輪執行）：按性質拆成四小段，每段開頭一個 <code>para-head</code> 或以斜體標名（<span class="en">Constant and scalar rules.</span> / <span class="en">Linearity.</span> / <span class="en">Comparison.</span> / <span class="en">Additivity.</span>）；66 詞括號提升為獨立段或 <code>remark</code>。<strong>語意與數學完全不動，只動分段。</strong></li>
+    <li>依據：STE Rule 6.5/6.6（一段一主題、每段 ≤6 句）、federal guidelines（段落 ≤150 詞）——皆已在 SPEC v3.5 §3 引用。</li>
+  </ul>
+  <p><span class="id">W-15</span> 另有 4 段落在 60–105 詞、8–11 個記號的區間（Ex 6.5 解、Ex 6.8 解、Fig 6.6 caption、§6.2 收尾段），屬可接受上限附近，本輪不動、僅記錄為基線。</p>
+</div>
+
+<div class="card">
+  <p><span class="id">W-16</span> <strong>&gt;40 詞句占 22%（appB 為 3%）</strong>：逐句看，多數是「數學式參與句子計數」造成的——例如 Theorem 6.1 的陳述（54 詞）本身是形式陳述、Theorem 6.2 part 4 的比較性質（41 詞）是三個不等式的平行列舉。<strong>這些不該按散文標準拆</strong>；它們正是 SPEC v3.5 新增條款「符號密集段落另立標準」要保護的對象。真正該處理的是 W-14 那類段落。</p>
+  <p><span class="id">W-17</span> cross-ref 23 處（Definition 6.1/6.2、Theorem 6.1/6.2 各部、Example 6.2/6.4、Figure 6.4–6.6、§6.1/§6.3、Theorem 1.2）——密度高但每處都是實指，<strong>非 finding</strong>；記錄於此是因為它是正文特有的負荷來源，回填時每改一句都要確認 cross-ref 未被改壞（appB 幾乎沒有這個風險）。</p>
+</div>
+
+<h2>§3 §1.4 對照組：規則沒有誤傷</h2>
+<div class="card good">
+  <p><strong>結果：R1／R2／R3 全 clean，家族命中 2 處且兩處都是假陽性。</strong></p>
+  <table>
+    <tr><th style="width:40%">命中</th><th>判定</th></tr>
+    <tr><td class="en">Sometimes we only <b>want</b> to consider one side of the approach to \(a\)</td><td><span class="tag good">假陽性</span>主語是 <span class="en">we</span>（人），不是數學物件；正常英語，<strong>不得 flag</strong></td></tr>
+    <tr><td class="en">If instead all we <b>know</b> is \(\lim_{x \to -2^{-}} f(x) = 16\)</td><td><span class="tag good">假陽性</span>同上</td></tr>
+  </table>
+  <p><strong>偵測器規則因此精修（Codex 早先的意見得到實證）：</strong>擬人偵測必須是「<strong>情緒／意志動詞 ＋ 數學物件作主語</strong>」的合取，不能只看動詞。§6.2 的 12 處全部符合（主語是 construction／limit／notation／Definition／demand／samples／Theorem／geometry），§1.4 的 2 處全部不符合（主語是 we）。這條合取在兩節之間乾淨切開，可以寫進未來的 linter 規則。</p>
+  <p>§1.4 的 5 個「黏接長句」逐句核：3 個是正式定義／Strategy 的平行列舉（Definition 1.12 的三種情形），2 個是單一複雜想法（\(\ln x\) 的定義域邊界說明）。<strong>依條款一律保留</strong>——這就是「不設硬性句長上限」在真實文本上的效果。</p>
+</div>
+<p class="small">附帶意義：§1.4 是手稿章（真人作者，<span class="en">Content verbatim from ch01_foundations.tex</span>），§6.2 是 canon 章（無手稿、100% LLM）。兩者在同一把尺下差 14.7 vs ≈0 每千詞——<strong>這是本專案第一份「LLM 語域漂移」的量化證據</strong>，也回答了「是不是我們規範太鬆」：不是，手稿章本來就在標準內，是 LLM 撰稿偏離了。</p>
+
+<h2>§4 建議的執行順序（尚未執行）</h2>
+<ol class="tight">
+  <li><strong>W-13 政策先裁</strong>（<span class="en">on credit</span>）——它牽動 SPEC §16.1 與全書 fence，不先定會反覆。</li>
+  <li><strong>W-1〜W-12</strong>：詞彙層改寫（12 條），與 appB 第一輪同型，可一次執行。</li>
+  <li><strong>W-14</strong>：段落拆分（純分段、不動語意數學），並據此把「符號密集／段落層標準」操作化寫進 SPEC（見 §5）。</li>
+  <li>改完 → <code>build.py ch06</code> → 範圍限定 Mode B ＋ <strong>math gate</strong>（平實化易在條件／量詞上引入微小錯誤，Codex 早先的警告）→ 產 applied 報告 → 你盲讀。</li>
+  <li>§1.4 <strong>不動</strong>（對照組保持原狀，才能持續當假陽性基準）。</li>
+</ol>
+
+<h2>§5 「規則可以定版了嗎？」——誠實評估</h2>
+<div class="card warn">
+  <p><strong>兩節做完後可以「凍結給回填用」，但還不能宣告 v1.0 定版，缺三件：</strong></p>
+  <ol class="tight">
+    <li><strong>段落層／符號密集標準尚未操作化。</strong>本輪才第一次看到 294 詞＋34 記號的段落——appB 沒有這種形狀。要定的數值（每段記號上限、段落詞數上限、何時該拆段而非拆句）需要<strong>至少再一節不同型的正文</strong>才敢寫成 MUST。候選：§6.3（含 proof×2、display 20 個，證明體）或 §5.1（平均句長 28.5，最重）。</li>
+    <li><strong>生成端（新撰）完全沒測。</strong>這兩節都是「已定稿章的回填」，測的是<em>稽核＋改寫</em>那一半。條款真正的目標是讓 LLM <strong>一開始就寫對</strong>——那要在下一個新節（Ch7 起）的 Mode A 跑 style card 兩臂對照才測得到（Codex 的 Q1 建議）。回填有效 ≠ 生成端有效。</li>
+    <li><strong>本輪自身還沒回歸審核。</strong>Codex 對第二輪（句法輪）的回歸審核正在跑，結果未回。若它指出我拆錯了地方，句法規則的措辭要先修。</li>
+  </ol>
+  <p><strong>建議的定版路徑：</strong>①§6.2 改稿執行＋你盲讀 → ②再跑一節不同型正文（§6.3 或 §5.1）把段落／符號標準補上 → 規則升為 <strong>RC（release candidate）並凍結給舊章回填用</strong> → ③下一個新章 Mode A 跑生成端兩臂對照 → ④宣告 <strong>v1.0 定版</strong>。第 ③ 步之前定版，等於用「改別人寫好的稿」的證據去承諾「新稿一次就對」。</p>
+</div>
+
+<p class="foot">產出：Claude gate-1（2026-07-25），propose-only——<strong>未改任何 fragment</strong>。依據 CONTENT_SPEC v3.5 §3〈平實英文條款〉＋ PROSE-AUDIT-RUBRIC R 維度／F4 黏接判準。量測腳本存 scratchpad（家族偵測＋黏接掃描＋段落記號密度），主語逐條人工複核。Codex 對第二輪的回歸審核同時在跑，結果另報。緣起鏈：REVIEW-plain-register-research.html → REVIEW-appB-plain-pilot/-applied/-beforeafter.html → REVIEW-appB-syntax-round.html → 本檔。</p>
+
+</body>
+</html>

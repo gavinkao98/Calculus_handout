@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>§6.2 平實化執行 ＋ appB 回歸修正 — applied</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2df; --bg:#fbfbf9; --card:#fff;
+    --good:#1f7a44; --good-bg:#f0f8f3; --good-line:#b8ddc7; --bad:#a3232a; --bad-bg:#fdf4f4;
+    --bad-line:#e8c9c9; --warn:#9a5b00; --warn-bg:#fdf3e3; --accent:#2d5a8a; --code-bg:#f4f4f2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Inter","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.6; max-width:940px; margin:0 auto; padding:2.4rem 1.5rem 5rem; }
+  h1 { font-size:1.45rem; line-height:1.3; margin:0 0 .3rem; }
+  .sub { color:var(--muted); font-size:.93rem; margin:0 0 1.6rem; }
+  h2 { font-size:1.14rem; margin:2.4rem 0 .7rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+  h3 { font-size:.98rem; margin:1.5rem 0 .45rem; color:var(--accent); }
+  code { font-family:Consolas,monospace; font-size:.87em; background:var(--code-bg); padding:.08em .35em; border-radius:3px; }
+  table { border-collapse:collapse; width:100%; margin:.7rem 0 1rem; font-size:.88rem; }
+  th,td { border:1px solid var(--line); padding:.4rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f0f0ee; font-weight:600; }
+  td.num,th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.9rem 1.15rem; margin:1rem 0; }
+  .card.good { background:var(--good-bg); border-color:var(--good-line); }
+  .card.warn { background:var(--warn-bg); border-color:#e8d3a8; }
+  .row { display:flex; gap:.55rem; padding:.45rem .6rem; border-radius:5px; margin-bottom:.3rem; }
+  .row .lbl { flex:0 0 3.4rem; font-size:.72rem; font-weight:700; padding-top:.18rem; }
+  .row .txt { flex:1; font-size:.94rem; line-height:1.55; }
+  .before { background:var(--bad-bg); border-left:3px solid var(--bad-line); }
+  .before .lbl { color:var(--bad); }
+  .after { background:var(--good-bg); border-left:3px solid var(--good-line); }
+  .after .lbl { color:var(--good); }
+  .pair { margin:.8rem 0 1.1rem; }
+  .pair .why { font-size:.85rem; color:var(--muted); margin:0 0 .3rem; }
+  .id { font-family:Consolas,monospace; font-size:.8em; font-weight:700; color:var(--accent); white-space:nowrap; }
+  .tag { display:inline-block; font-size:.74rem; font-weight:600; padding:.08rem .45rem; border-radius:999px; }
+  .tag.good { color:var(--good); background:var(--good-bg); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); }
+  ul.tight { margin:.3rem 0 .7rem; padding-left:1.3rem; }
+  ul.tight li { margin:.2rem 0; }
+  .small { font-size:.85rem; color:var(--muted); }
+  .foot { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.84rem; color:var(--muted); }
+  .up { color:var(--good); font-weight:700; }
+</style>
+</head>
+<body>
+
+<h1>§6.2 平實化執行 ＋ appB 回歸修正</h1>
+<p class="sub">Codex 回歸審核（第二輪）→ 5 個 FIX ＋ 規則修訂 → §6.2 執行 14 條 · 2026-07-25 · fragment 已改、appB 與 ch06 已重建</p>
+
+<div class="card good">
+  <strong>兩件事同時完成：</strong>
+  <ul class="tight">
+    <li><strong>appB 回歸</strong>：Codex 判 15 PASS／5 FIX（A4、A8、A13、A15、B3），FIX 全數採納；它同時抓到我 spec 裡一個<strong>真實的數值矛盾</strong>（見 §2），已修。節奏窗口 37 → 36（B3 的 FIX 正好解除它指出的節拍化）。</li>
+    <li><strong>§6.2 執行</strong>：詞彙層 12 條＋政策 1 條＋段落拆分 1 條＋執行中發現的殘留 1 條＝<strong>14 條</strong>。家族命中 <strong>30 → 3</strong>（3 條全部可接受）；單段最高記號數 <strong>34 式／294 詞 → 13 式／103 詞</strong>；&gt;40 詞句 <strong>22% → 15%</strong>。</li>
+  </ul>
+</div>
+
+<h2>§1 Codex 回歸審核結果（第二輪 20 改點）</h2>
+<table>
+  <tr><th style="width:10%">裁決</th><th style="width:14%">數量</th><th>項目</th></tr>
+  <tr><td><span class="tag good">PASS</span></td><td class="num">15</td><td>A1、A2、A3、A5、A6、A7、A9、A10、A11、A12、A14、B1、B2、C1、C2</td></tr>
+  <tr><td><span class="tag warn">FIX</span></td><td class="num">5</td><td>A4、A8、A13、A15、B3——<strong>全數採納</strong>，見下</td></tr>
+  <tr><td>REVERT</td><td class="num">0</td><td>——沒有一條被判「拆錯了、該還原」</td></tr>
+</table>
+<p class="small">另：Q2 明確確認我「不拆」的判斷<strong>全部正確</strong>（§B.2 兩處有 wording constraint 的冒號、lead 路線圖句、objectives 列舉、Definition B.1 的分號 bullet、B.4 平行範例、§B.3／§B.6 兩個收尾句）——「沒有一項應再拆」。A1 特別確認：hypothesis 藏在主語的限制性描述 <span style="font-style:italic">integer divisible by 6</span> 裡，不是藏在 <span style="font-style:italic">divisible</span> 一詞——即我駁回第三方示範句的判斷正確。</p>
+
+<h3>5 個 FIX 的處置</h3>
+
+<div class="pair">
+  <p class="why"><span class="id">A4</span> §B.3——<span style="font-style:italic">Explicit they already are</span> 是倒裝，<span style="font-style:italic">asks for them explicit</span> 對 EFL 偏生硬。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">Strategy B.1 asks for them explicit and in order. Explicit they already are. But English likes to trail a <em>for all</em> behind the clause it governs, so the last of the three has ended up sitting behind the kernel instead of in front of it.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">Strategy B.1 requires the quantifiers to be explicit and in order. They are already explicit. But English often places a <em>for all</em> after the clause it governs, so the last of the three appears after the kernel rather than before it.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">A8</span> §B.4——<span style="font-style:italic">must come to less</span> 缺明說的比較基準（less than <em>what</em>？）。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">The <em>split into thirds</em> set three allowances of \(\varepsilon/3\), which together come to exactly \(\varepsilon\), so the three pieces they cover must come to less.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">The <em>split into thirds</em> gave each of the three differences an allowance of \(\varepsilon/3\). Since those allowances add to exactly \(\varepsilon\), the three differences together come to less than \(\varepsilon\).</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">A13</span> §B.6——我拆掉兩個破折號後，<span style="font-style:italic">Short of …, and over the integers …</span> 的插入語句法鬆脫。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">Short of checking every object the claim ranges over, and over the integers you never can, no number of confirming examples establishes a <em>for all</em>.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">Over the integers, no number of confirming examples establishes a <em>for all</em>, because you can never check every object in its range.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">A15</span> §B.6——44 詞冒號句仍同時承載勸告、替代行為與後果。（第二輪原本只改了慣用語、沒拆。）</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">You can plan a proof before you can prove it, and should: the usual alternative is to start writing at the top of the page without a plan, which often leads to using at line one a fact that is only established at line ten.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">You can plan a proof before you can prove it, and you should. If you start writing at the top of the page without a plan, you may use at line one a fact that is only established at line ten.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">B3</span> §B.6——<strong>我拆過頭了</strong>：三個短宣告連續出現，正是 Q3 指出「讀起來像節拍器」的那一處。合回為一個單一複雜想法句。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">The indirectness of a contraposition is in <em>what</em> it establishes, not in <em>how</em>. You never argued about the original claim itself. You proved an equivalent sentence, and §B.1 carried the result across.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">Proof by contraposition is indirect only in <em>what</em> it establishes, not in <em>how</em>: you prove an equivalent sentence rather than the original claim, and §B.1 carries the result across.</span></div>
+  <p class="small">效果：appB 的節奏窗口 37 → 36。Codex 明確反對「為消除 +6 而機械重黏」——只合回這一處真正節拍化的。</p>
+</div>
+
+<h2>§2 規則修訂（Codex Q4 抓到的矛盾與八條精修）</h2>
+<div class="card warn">
+  <p><strong>真實矛盾：</strong>我原本同時寫了「&gt;25 詞句占比宜 &lt;10%」與「P90 32–35 詞為審查區」——<strong>數學上互斥</strong>（若九成句子 ≤25 詞，P90 不可能是 32–35）。而且我們自己的數據證明 &lt;10% 是錯的目標：<strong>手稿章 §1.4（真人作者、黃金標準）實測就是 23%</strong>，appB 定稿後 26%。</p>
+  <p><strong>處置：</strong>撤除「&lt;10%」，保留 P90 32–35 為審查區，並改寫為「<strong>&gt;25 詞占比不設絕對門檻，以已核准樣本校準</strong>（§1.4 的 23%、appB 的 26% 即真人教科書散文的自然區間）」。</p>
+</div>
+<table>
+  <tr><th style="width:30%">Codex 的精修</th><th>寫進 spec 的內容</th></tr>
+  <tr><td>判準應是「一個<strong>論述動作</strong>」，不是一個子句</td><td>MUST 改為「每句服務一個可辨識的論述動作」；明說定義、條件＋結果、公式說明、平行列舉<strong>各自都算一個</strong>動作</td></tr>
+  <tr><td>「≥30 詞＋黏接標點」是<strong>審核觸發器</strong>，不是拆句命令</td><td>明文寫入；拆的條件收緊為「讀者必須在同一句完成<strong>兩個可各自獨立成立</strong>的推論或教學動作」</td></tr>
+  <tr><td>須定義何謂「冒號接子句」</td><td>冒號後另起解釋／結果才計入；引清單、引文、公式、環境標籤<strong>不計入</strong></td></tr>
+  <tr><td>漏網：<em>and</em>／<em>while</em>／<em>which</em> 也能黏接</td><td>黏接訊號清單補入無標點的連接詞串接</td></tr>
+  <tr><td>量詞 scope、條件—結論、代名詞—先行詞不得因減長度而拆散</td><td>列為 MUST NOT</td></tr>
+  <tr><td>符號密集段落應優先改 display／分行 skeleton／先立記號</td><td>寫成處置順序，並明文 MUST NOT 為降詞數而按詞切句；段落層另加「一段一主題」</td></tr>
+  <tr><td>「連三句同長」應限連續散文、以朗讀聽感判</td><td>排除列表、proof skeleton、刻意平行、修辭三連；判定以朗讀為準而非統計窗口</td></tr>
+  <tr><td>「AI 文風最典型」語氣過強</td><td>改為「常見的 AI-like 徵象之一——讀感警訊，不是獨立的品質判準」</td></tr>
+  <tr><td>「不得反手用分號」太窄</td><td>改為「禁止<strong>為維持句數</strong>而把兩個獨立推論黏回同一句，不論用何標點」；單一對稱對比、正式定義的並列子句仍 MAY 用分號</td></tr>
+</table>
+
+<h2>§3 §6.2 執行（14 條）</h2>
+
+<h3>詞彙層代表例（W-1〜W-12 全數執行）</h3>
+
+<div class="pair">
+  <p class="why"><span class="id">W-1</span> 節開場：悖論修辭 → 先說事實，再說「這不是巧合」。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">Section 6.1 ended on a coincidence too strong to be one: the area under a curve and the distance from a velocity were the <em>same</em> limit of the <em>same</em> kind of sum. A construction that keeps returning <b>deserves</b> a name and a symbol of its own.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">In Section 6.1 two different problems led to the <em>same</em> limit of the <em>same</em> kind of sum: the area under a curve, and the distance travelled at a varying velocity. That is no coincidence. A construction that keeps reappearing <b>is worth naming</b>, and worth a symbol of its own.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">W-2</span>＋<span class="id">W-3</span>＋<span class="id">W-4</span> 同一段：定義擬人＋兩個擬人＋cleft，全部落在「為何需要連續性」這個承重解釋上。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">Definition 6.2 <b>asks a great deal</b>: one number approached by <em>every</em> choice of sample points. For a <b>wild enough</b> function <b>the demand fails</b> — recall the caution of §6.1, where samples <b>steered onto and off the misbehaviour</b> of \(f\) gave different answers. <b>What rescues the functions we actually meet is</b> continuity.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">Definition 6.2 <b>is a strong requirement</b>: <em>every</em> choice of sample points must give the same number. For a <b>badly behaved</b> function <b>this fails</b>. Recall the caution of §6.1: there, some choices of sample point landed on the values where \(f\) misbehaves and others avoided them, so different choices gave different answers. <b>For the functions we actually meet, continuity prevents this.</b></span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">W-5</span> Leibniz 旁註：擬人三連（outlived／born with／survives）＋罕見搭配。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">The notation has <b>outlived the shaky infinitesimals it was born with</b> precisely because it <b>survives translation</b> into the honest limit of Definition 6.2.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">He based the notation on infinitesimals, an idea that was hard to make precise. The notation is still in use because it <b>translates directly</b> into the limit of Definition 6.2.</span></div>
+</div>
+
+<table>
+  <tr><th style="width:7%">編號</th><th style="width:46%">前</th><th>後</th></tr>
+  <tr><td class="id">W-7</td><td>it keeps the Riemann sum in view even after the limit has <b>erased</b> the individual rectangles</td><td>it still shows the structure of the Riemann sum, even though the limit itself no longer refers to individual rectangles</td></tr>
+  <tr><td class="id">W-8</td><td>the <b>surviving trace</b> of the width \(\Delta x\)</td><td>what is left of the width \(\Delta x\)</td></tr>
+  <tr><td class="id">W-9</td><td>Theorem 6.1 <b>promises</b> the limit exists and is <b>blind to</b> the choice of sample points<b>;</b> we may therefore…</td><td>Theorem 6.1 guarantees that the limit exists and that it does not depend on the choice of sample points<b>.</b> We may therefore…</td></tr>
+  <tr><td class="id">W-10</td><td>geometry <b>reads the integral off at sight</b> — no formula to <b>hunt down</b>, no limit of sums</td><td>we can read the integral straight off the geometry, with no limit to compute</td></tr>
+  <tr><td class="id">W-11</td><td>A single comparison, no limit computed, <b>pins</b> the integral to a <b>modest range</b>.</td><td>A single comparison, with no limit computed, traps the integral between \(3\) and \(6\).</td></tr>
+  <tr><td class="id">W-12</td><td>Only the smallest handful of integrals <b>yields to</b> either method. … removes the obstacle <b>at a stroke</b> … <b>painless</b> to evaluate（另一處 <b>painless</b> to find）</td><td>Only a few integrals can be evaluated either way. … removes this obstacle … easy to evaluate（easy to find）</td></tr>
+  <tr><td class="id">W-18<br><span class="small">執行時發現</span></td><td>this reduces to the area of Definition 6.1<b>; the definite integral is the honest generalization</b>.</td><td>this reduces to the area of Definition 6.1<b>. The definite integral extends that idea to functions that change sign.</b></td></tr>
+</table>
+<p class="small">W-18 是走查時列在統計裡、但沒編進 findings 的殘留（<span style="font-style:italic">honest generalization</span>）。執行後掃描發現它是唯一還在的同家族用語，留著會違反 R3 一致性，故一併處理並補編號記錄。</p>
+
+<h3>W-13(a)：<span style="font-style:italic">on credit</span> 政策——保留機制用語、只改周邊</h3>
+<div class="card">
+  <div class="row before"><span class="lbl">前</span><span class="txt">We take the theorem <b>on credit</b> and use <b>what it grants</b>: … <b>This is the honest boundary of the chapter — everything else is earned in full.</b></span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">We take the theorem <b>on credit</b> and use <b>what it gives us</b>: … <b>Everything else in this chapter is proved in full.</b></span></div>
+  <p class="small">
+    <strong>執行時的發現，讓 (a) 更省：</strong>全書「on credit」共 5 處（ch02 §2.4 首見、ch04 §4.1×2、appD §D.1、ch06 §6.2、ch06 §6.5），而<strong>首見處早在 2026-07-03 就 gloss 過了</strong>——fragment 註解記載 <code>"on credit" idiom glossed (non-native stumble)</code>，是初學者模擬（learner-sim）抓到非母語卡點後補的：<span style="font-style:italic">“Everything about \(e^{x}\) in this section is on credit — borrowed now, to be repaid in Chapter 4.”</span> ch04 §4.1 接著寫 <span style="font-style:italic">“goes back and pays the debt”</span>、appD §D.1 寫 <span style="font-style:italic">“deferred — on credit — to here”</span>。這是<strong>全書刻意貫穿、首見已釋義的機制隱喻</strong>，故<strong>不需新增 gloss</strong>。
+    <br>另：刪掉「honest boundary」那半句是因為它與 Caution 開頭「Theorem 6.1 is the one result of this chapter we do not prove」重複（S3 刪除測試），不是單純去修辭。
+  </p>
+</div>
+
+<h3>W-14：段落拆分——正文的真問題</h3>
+<div class="card">
+  <p><strong>一段 294 詞、34 個行內數學式、做四件事</strong>（常數與純量律／線性／比較／可加性）＋末尾 66 詞括號補述 → <strong>拆成 5 段</strong>，每段一個主題，用 Theorem 6.2 既有的項目名做 run-in 標籤（<code>&lt;em&gt;Constant and scalar rules.&lt;/em&gt;</code>／<code>Linearity.</code>／<code>Comparison.</code>／<code>Additivity.</code>），符號約定那句獨立成段。</p>
+  <ul class="tight">
+    <li><strong>語意與數學完全不動</strong>——只動分段、把括號溶成正文句、兩處標點（<code>—</code>→<code>:</code>、<code>;</code>→<code>.</code>）。</li>
+    <li><strong>markup 零新增</strong>：run-in <code>&lt;em&gt;</code> 標籤與 Theorem 6.2 的 <code>ol</code> 項目用法相同（ch06 既有），不影響 LaTeX 線方言。</li>
+    <li>結果：單段最高記號數 <strong>34 → 13</strong>，最長段落 294 → 105 詞。</li>
+  </ul>
+</div>
+
+<h2>§4 驗算</h2>
+<table>
+  <tr><th>指標</th><th class="num">§6.2 改前</th><th class="num">§6.2 改後</th><th class="num">§1.4（對照，未動）</th></tr>
+  <tr><td>家族命中（詞彙層）</td><td class="num">30</td><td class="num"><span class="up">3</span></td><td class="num">2</td></tr>
+  <tr><td>　其中真正的隱喻／慣用語</td><td class="num">30</td><td class="num"><span class="up">0</span></td><td class="num">0</td></tr>
+  <tr><td>平均句長／中位</td><td class="num">27.0／25.5</td><td class="num">24.6／22.0</td><td class="num">20.8／20</td></tr>
+  <tr><td>&gt;25 詞句占比</td><td class="num">50%</td><td class="num">45%</td><td class="num">23%</td></tr>
+  <tr><td>&gt;40 詞句占比</td><td class="num">22%</td><td class="num"><span class="up">15%</span></td><td class="num">5%</td></tr>
+  <tr><td><strong>單段最高記號數</strong></td><td class="num">34 式／294 詞</td><td class="num"><span class="up">13 式／103 詞</span></td><td class="num">11 式／76 詞</td></tr>
+  <tr><td>黏接長句</td><td class="num">23</td><td class="num">20</td><td class="num">5</td></tr>
+</table>
+<p class="small">改後殘留的 3 個家族命中逐條核：<span style="font-style:italic">on credit</span>（政策保留，W-13(a)）、<span style="font-style:italic">we already know</span>（假陽性，主語是 we）、<span style="font-style:italic">proved in full</span>（字面說法，非慣用修辭）。<strong>真正該改的已歸零。</strong>黏接長句 23→20 只降 3，是因為 §6.2 剩下的多屬「數學式參與計數」的正式陳述（Theorem 6.1 的 54 詞陳述、Theorem 6.2 part 4 的三個不等式平行列舉）——依新條款這些<strong>不該拆</strong>，屬 SHOULD 的「符號密集段落另立標準」保護對象。</p>
+
+<div class="card warn">
+  <strong>驗收狀態：</strong>
+  <ul class="tight">
+    <li><span class="tag good">通過</span>數學／編號／cross-ref 未動（23 處 cross-ref 全數保留；W-14 只動分段）。</li>
+    <li><span class="tag good">通過</span><code>build.py appB</code>＋<code>build.py ch06</code> 皆重建成功；standalone 已含新段落與改後開場（grep 確認）。</li>
+    <li><span class="tag good">通過</span>appB 節奏窗口 37 → 36（B3 FIX 生效）。</li>
+    <li><span class="tag warn">未完成</span><strong>ch06 print 版的分頁目視檢查</strong>——瀏覽器面板本輪無法開啟 <code>chapter6-print-standalone.html</code>（appB 早前可以）。一段拆成五段會增加段距，<strong>ch06 可能多／少一頁</strong>，需你開檔目視或下次連同 §6.3 一起檢。</li>
+    <li><span class="tag warn">待跑</span><strong>math gate</strong>——Codex 早先警告「平實化易在條件／量詞／因果方向引入微小數學錯」。§6.2 這輪動到 Theorem 6.1 的敘述句、Theorem 6.2 的證明速寫分段、Ex 6.4/6.6/6.8 的解說句，建議跑一輪範圍限定的數學閘。</li>
+  </ul>
+</div>
+
+<h2>§4.5 Math gate（gate-1，範圍限定本輪改動句）</h2>
+<div class="card good">
+  <strong>裁決：M1–M8 全數通過，<span class="up">0 blocking</span>，2 advisory（皆已當場修正）。</strong>
+  <p><strong>最強的一項證據：</strong>與 <code>HEAD</code> 逐片段比對，§6.2 的數學片段 173 → 175 個，<strong>差異只有新增的 \(3\) 與 \(6\)</strong>（W-11 那句改寫把區間端點寫進句子），<strong>沒有任何一個既有數學片段被移除或改動</strong>。整輪確實只動散文與分段。</p>
+</div>
+<table>
+  <tr><th style="width:12%">維度</th><th>核對內容與結果</th></tr>
+  <tr><td>M1 定義</td><td>Definition 6.2 本文未動；W-2 的白話重述「every choice of sample points must give the same number」與定義條文（<span style="font-style:italic">takes the same value for every choice of the sample points</span>）一致 ✓</td></tr>
+  <tr><td>M2 定理陳述</td><td>Theorem 6.1／6.2 陳述均未動；W-9 的引用落在 Theorem 6.1 的保證範圍內（該定理另保證「任何切法」獨立性，此處只用到取樣點獨立性，非錯誤）✓</td></tr>
+  <tr><td>M3 量詞邏輯</td><td>W-2 保留 <em>every</em>；W-4 的「some choices … others …」對應 §6.1 的存在性敘述，未把存在誤寫為全稱 ✓</td></tr>
+  <tr><td>M4 推導步驟</td><td>W-14 拆段未觸及任何式子（差異比對證實）；四個性質的論證順序與依賴未變（Comparison 段內「Applying this to \(g-f\)」的先行詞仍在同段）✓</td></tr>
+  <tr><td>M5 邊界／定義域</td><td>Comparison 依賴 \(\Delta x>0\)（來自 Theorem 6.2 的 \(a \le b\) 假設）✓；Additivity 依賴 \(a \le c \le b\) ✓；末段的符號約定延伸條件（\(f\) 在 \(a,b,c\) 所張區間上連續）完整保留 ✓</td></tr>
+  <tr><td>M6 記號一致</td><td>無記號改動 ✓。<strong>advisory 1（已修）</strong>：W-4 初稿寫 <span style="font-style:italic">landed on the values where \(f\) misbehaves</span>，<span style="font-style:italic">values</span> 可能被讀成「函數值」而非「定義域上的點」→ 改為 <span style="font-style:italic">fell where \(f\) misbehaves and others steered clear of those places</span>（也更貼 §6.1 原文的 <span style="font-style:italic">steering clear</span>）</td></tr>
+  <tr><td>M7 跨節一致</td><td>逐項核對 ✓：(1) W-4 對照 §6.1 caution 原文（<span style="font-style:italic">driving every sample to where the function misbehaves … steering clear of those places gives another</span>）——改寫忠實；(2) §6.5 章末摘要寫 <span style="font-style:italic">Theorem 6.1, taken on credit</span>，與 §6.2 保留 <span style="font-style:italic">on credit</span> 一致；(3) 「Everything else in this chapter is proved in full」經全 ch06 grep 確認為真——只有 Theorem 6.1 一處掛帳（§6.1 的 caution 指同一結果，fenced to Proof Track），§6.3／§6.4／§6.5 無其他不證結果</td></tr>
+  <tr><td>M8／結構</td><td>標籤配對全平衡（<code>&lt;p&gt;</code> 61/61、<code>&lt;section&gt;</code> 14/14、<code>&lt;div&gt;</code> 19/19、inline 數學 165/165）；cross-ref 23 處全數在位（含 Theorem 1.2 limit laws）✓。<strong>advisory 2（已修）</strong>：W-14 的定點編輯吃掉冒號後空白，產生 <code>line:\(\sum</code>（會 render 成無空格）→ 已補回</td></tr>
+</table>
+<p class="small">本閘為 gate-1（Claude，範圍限定）。Codex gate-2 的獨立數學複核未跑——若要跑需另徵同意；考量本輪「零數學片段變動」已由程式化比對證實，優先度低。</p>
+
+<h2>§5 下一步</h2>
+<ol class="tight">
+  <li>你盲讀 §6.2（<code>handout/html/standalone/chapter6-print-standalone.html</code>）＋順便看分頁。</li>
+  <li>範圍限定 math gate（本輪改動句）＋ 範圍限定 Mode B（語意等價）。</li>
+  <li>再跑一節不同型正文（建議 §6.3，含 proof×2、display 20 個）把<strong>段落／符號密集標準的數值</strong>補上——這是規則升 RC 前的最後一塊。</li>
+  <li>之後：新章 Mode A 測生成端（style card 兩臂）→ 才宣告 v1.0。</li>
+</ol>
+
+<p class="foot">產出：Claude（2026-07-25）。Codex 回歸審核 raw 存 scratchpad（15 PASS／5 FIX／0 REVERT＋Q4 八條精修＋一個數值矛盾）。本輪改動：appB 5 處（Codex FIX）＋ ch06 §6.2 14 條；規格 CONTENT_SPEC §3 與 PROSE-AUDIT-RUBRIC F4 同步修訂。§1.4 保持原狀作為假陽性基準。尚未 commit。</p>
+
+</body>
+</html>
