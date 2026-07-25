@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Appendix B 平實化 pilot — R 維度走查裁決稿</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #6b6b6b; --line: #e0e0e0;
+    --bg: #fbfbf9; --card: #ffffff;
+    --good: #1f7a44; --good-bg: #eaf6ee;
+    --warn: #9a5b00; --warn-bg: #fdf3e3;
+    --bad: #a3232a;  --bad-bg: #fbecec;
+    --code-bg: #f4f4f2; --accent: #2d5a8a;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Inter", "Noto Sans TC", system-ui, -apple-system, sans-serif;
+    color: var(--ink); background: var(--bg); line-height: 1.65;
+    max-width: 1000px; margin: 0 auto; padding: 2.4rem 1.6rem 5rem; }
+  h1 { font-size: 1.5rem; line-height: 1.3; margin: 0 0 .3rem; }
+  .sub { color: var(--muted); font-size: .95rem; margin: 0 0 2rem; }
+  h2 { font-size: 1.18rem; margin: 2.4rem 0 .6rem; padding-bottom: .3rem; border-bottom: 2px solid var(--line); }
+  h3 { font-size: 1.0rem; margin: 1.3rem 0 .4rem; }
+  code { font-family: Consolas, monospace; font-size: .88em; background: var(--code-bg); padding: .08em .35em; border-radius: 3px; }
+  table { border-collapse: collapse; width: 100%; margin: .8rem 0 1rem; font-size: .9rem; }
+  th, td { border: 1px solid var(--line); padding: .4rem .55rem; text-align: left; vertical-align: top; }
+  th { background: #f0f0ee; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+  .tag { display: inline-block; font-size: .76rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; vertical-align: middle; }
+  .tag.good { color: var(--good); background: var(--good-bg); }
+  .tag.warn { color: var(--warn); background: var(--warn-bg); }
+  .tag.bad  { color: var(--bad);  background: var(--bad-bg); }
+  .en { font-style: italic; }
+  .hl { background: #fff3b0; padding: 0 .15em; border-radius: 2px; }
+  del { color: var(--bad); background: var(--bad-bg); text-decoration: line-through; }
+  ins { color: var(--good); background: var(--good-bg); text-decoration: none; }
+  ul.tight { margin: .3rem 0 .6rem; padding-left: 1.3rem; }
+  ul.tight li { margin: .18rem 0; }
+  .small { font-size: .85rem; color: var(--muted); }
+  .id { font-family: Consolas, monospace; font-size: .82em; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>Appendix B 平實化 pilot — R 維度走查裁決稿</h1>
+<p class="sub">CONTENT_SPEC v3.5 §3〈平實英文條款〉＋ PROSE-AUDIT-RUBRIC R 維度（今日新增）· 首次實戰走查 · 範圍：appB 全六節 · 2026-07-25 · <strong>propose-only：裁決前未改任何 fragment</strong></p>
+
+<div class="card" style="border:2px solid var(--good); background: var(--good-bg);">
+  <strong>〔已定案・已執行 2026-07-25〕</strong>使用者委任裁決：Codex 出意見（22 ADOPT／18 MODIFY／1 REJECT＋7 掃漏）、主線定奪後執行完畢——62 個改點、R-B2-2 撤回、4 項保留、句長留第二輪。改動總帳與驗收見 <code>REVIEW-appB-plain-applied.html</code>。本檔以下內容為裁決前的走查原稿，留檔不改。
+</div>
+
+<div class="card">
+  <strong>VERDICT：R blocking 0，R advisory 41 卡（節卡）＋ 6 項全附錄級政策裁決（G-1〜G-6）。</strong>
+  六節中五節（B.1–B.4、B.6）觸發「節級複查」累積規則（advisory ≳5），只有 B.5 接近乾淨——
+  <span class="hl">appB 的問題是文學手法的「密度」，不是「缺字面表述」</span>：本附錄的鷹架紀律其實很好，幾乎每個隱喻旁都有字面句（所以 0 blocking），
+  但慣用語／擬人／交易隱喻以每千詞 4–8 處的頻率出現，累積起來就是「太文學、EFL 讀者吃力」的體感。
+  <strong>建議裁決方式：先裁 G-1〜G-6 政策，再授權按政策一次性協調改寫全附錄</strong>（零星逐卡改會漏掉家族一致性）。
+</div>
+
+<h2>§0 成功條件（預先寫死，裁決後驗收用）</h2>
+<ol class="tight">
+  <li><strong>數學零改動</strong>：所有改寫不碰公式、量詞、條件、編號、cross-ref（本輪全部是散文詞句層）。</li>
+  <li><strong>語意保持</strong>：每卡附改寫，採納後由範圍限定 Mode B 複核「語意等價」。</li>
+  <li><strong>清晰度上升</strong>：你盲讀改後的 print 版，判定「更像一般教科書」與否——這是 pilot 的主判準。</li>
+  <li><strong>版面不炸</strong>：改寫以等長或更短為原則（詞句替換型），行數增量預期 ≈0；build 後抽查分頁。</li>
+  <li><strong>可量測</strong>:改後 idiom／擬人密度趨零（人工計數）；句長基線見 §1（C 層 linter 落地後改自動量）。</li>
+</ol>
+
+<h2>§1 基線統計（改寫前）</h2>
+<table>
+  <tr><th>節</th><th>散文字數</th><th>句數</th><th>平均句長</th><th>P90</th><th>≥35 詞句數</th><th>R advisory</th><th>節級複查</th></tr>
+  <tr><td>B.1 Reading a Statement</td><td class="num">1311</td><td class="num">51</td><td class="num">25.7</td><td class="num">37</td><td class="num">9</td><td class="num">10</td><td><span class="tag warn">觸發</span></td></tr>
+  <tr><td>B.2 The Main Proof Shapes</td><td class="num">1204</td><td class="num">62</td><td class="num">19.4</td><td class="num">36</td><td class="num">8</td><td class="num">7</td><td><span class="tag warn">觸發</span></td></tr>
+  <tr><td>B.3 A Quantifier Toolbox</td><td class="num">938</td><td class="num">32</td><td class="num">29.3</td><td class="num">36</td><td class="num">9</td><td class="num">7</td><td><span class="tag warn">觸發</span></td></tr>
+  <tr><td>B.4 Steps That Come From Nowhere</td><td class="num">1032</td><td class="num">48</td><td class="num">21.5</td><td class="num">38</td><td class="num">8</td><td class="num">5</td><td><span class="tag warn">觸發（臨界）</span></td></tr>
+  <tr><td>B.5 Reading Actively</td><td class="num">845</td><td class="num">50</td><td class="num">16.9</td><td class="num">32</td><td class="num">3</td><td class="num">3</td><td><span class="tag good">未觸發</span></td></tr>
+  <tr><td>B.6 Writing a Proof</td><td class="num">2970</td><td class="num">155</td><td class="num">19.2</td><td class="num">35</td><td class="num">18</td><td class="num">9</td><td><span class="tag warn">觸發</span></td></tr>
+</table>
+<p class="small">量測：剝 HTML 標籤／註解、數學式以 placeholder 代入、粗略斷句（stdlib 腳本）——數值供相對比較，非精密值。目標帶（SPEC §3 SHOULD）：平均 18–22、P90 32–35。<strong>B.1 與 B.3 連句長都超標</strong>（25.7／29.3），是最需要整節協調 pass 的兩節；≥35 詞句全附錄共 55 句，本輪不逐句列卡（MUST 條款是「人工判定拆或留」，將在協調改寫時逐句過，C 層 linter 之後接手量測）。</p>
+
+<h2>§2 全附錄級政策裁決（G-1〜G-6）——先裁這六項</h2>
+
+<table>
+  <tr><th style="width:8%">編號</th><th style="width:42%">現象（全部出處已錄）</th><th>建議</th></tr>
+  <tr>
+    <td class="id">G-1</td>
+    <td><span class="en">"The tell"</span> 作名詞（撲克行話「破綻」）共 5 處：B.2 Strategy 三個 bullet（<span class="en">"The tell: an opening like…"</span>×3）、B.4（<span class="en">"The tell is a function…"</span>）、B.6（<span class="en">"The tell, then, is what the outer argument ends with"</span>）。對 EFL 讀者這是不可推測的行話（R1）。</td>
+    <td><strong>全改</strong>為 <span class="en">"The sign to look for"</span>／<span class="en">"The sign:"</span>（5 處機械替換，語意不變）。次選：B.2 首用時 gloss 一次、其餘保留——但 5 處全改更省心智負擔。</td>
+  </tr>
+  <tr>
+    <td class="id">G-2</td>
+    <td><strong>交易隱喻家族</strong> earn／repay／owe／buy／cost／win 共 ≈14 處：<span class="en">"repays itself most often"</span>（B.1）、<span class="en">"has to be earned in both directions"</span>（B.1 Caution）、<span class="en">"what is it buying here?"</span>（B.4×3 系）、<span class="en">"earn its place"</span>／<span class="en">"repays every hour"</span>（B.5）、<span class="en">"not earned until line ten"</span>／<span class="en">"it would earn very little"</span>／<span class="en">"the inner skeleton owes a witness"</span>／<span class="en">"the converse has to be earned"</span>／<span class="en">"a step you have yet to earn"</span>（B.6）等。單處多半透明，<strong>累積起來是本附錄最大的「文學腔」來源</strong>，且與 ch06 §6.2 的 <span class="en">"earned in full"</span> 同一家族（全書性 tic）。</td>
+    <td><strong>政策：預設改字面</strong>（earned → proved／established；owes → must supply；buying → achieving），<strong>白名單保留 2 處</strong>透明且有 payoff 的：<span class="en">"it is a promise to write one"</span>（B.6 witness 段，妙且直白）、B.4 的 buy 系<em>若</em>你認為它一致且已被字面句配好（我方建議：也改，一致性優先）。逐處落點見各節卡。</td>
+  </tr>
+  <tr>
+    <td class="id">G-3</td>
+    <td><span class="en">"help yourself to / helps itself to"</span>（擅自取用）共 3 處：B.1 Caution（<span class="en">"help yourself to its converse"</span>）、B.6 Strategy informal（<span class="en">"helping themselves at line one…"</span>）、B.6 arbitrary 段（<span class="en">"quietly helps itself to a convenient x"</span>）。慣用語，EFL 不可推測（R1），且都落在承載紀律教學的位置。</td>
+    <td><strong>全改</strong>：<span class="en">"use its converse without proof"</span>／<span class="en">"using at line one a fact that is only established at line ten"</span>／<span class="en">"quietly assumes a convenient x"</span>。</td>
+  </tr>
+  <tr>
+    <td class="id">G-4</td>
+    <td><span class="en">"rabbits from a hat"</span>（魔術戲法）×2：附錄 objectives（<span class="en">"look like rabbits from a hat"</span>）、B.4 Ex B.5（<span class="en">"reads like a rabbit from a hat"</span>）。文化綁定慣用語；且 B.4 節標題本身就是現成的字面說法。</td>
+    <td><strong>全改</strong>為 <span class="en">"seem to come from nowhere"</span>——與節標題 <span class="en">"Steps That Come From Nowhere"</span> 自然呼應，反而更一致。</td>
+  </tr>
+  <tr>
+    <td class="id">G-5</td>
+    <td><span class="en">"A theorem is a promise"</span> 框架：B.1 開場句、B.6 負向推理教學（<span class="en">"§B.1 called a theorem a promise; ask what would break this one"</span>）、B.5／B.2 的 <span class="en">"promises"</span> 動詞散用。B.6 的否定教學<strong>靠這個框架承重</strong>（「什麼會毀約」→ P 真而 Q 假）。</td>
+    <td><strong>保留框架</strong>（條件式＝承諾是邏輯教學的常規類比、B.1 當場字面化、B.6 callback 有真教學功能）——這是「條款不是鏈鋸」的示範。僅微調：B.1 開場第二分句 <span class="en">"and like any promise it comes with conditions"</span> 可保留；B.2 的 <span class="en">"promises that every object…clears some bar"</span> 這種<em>散用</em>改字面（見 R-B2-4）。若你要全拆此框架，B.1＋B.6 兩處必須聯動改，工程較大、不建議。</td>
+  </tr>
+  <tr>
+    <td class="id">G-6</td>
+    <td><strong>已固化且有字面配套的 quasi-term 家族——明確 PASS 保護</strong>：collision／collide（矛盾的家用語，B.2 首用時字面定義過）、one-way street／travel／carry（蘊含方向，B.5 Caution 完整 cash out）、domino chain（歸納，B.2 字面兩步驟先行）、skeleton／machinery、ε-δ challenge–response contest（B.3，教學正典且有完整實算一輪）。</td>
+    <td><strong>不動</strong>。它們一致使用、每次都有字面說明相鄰，正是 FLAG 紀律要保護的「合法教學隱喻」。列在此防止協調改寫時誤殺。</td>
+  </tr>
+</table>
+
+<h2>§3 逐節卡片（R advisory；blocking = 0）</h2>
+<p class="small">格式：編號｜原句節錄｜診斷（踩哪測試＋一行為什麼）｜改寫示意。改寫全部保語意、不動數學。屬 G 家族者標（G-#），政策裁定後隨政策批次處理。</p>
+
+<h3>B.1 Reading a Statement — 10 卡<span class="tag warn" style="margin-left:.5em">節級複查：觸發</span></h3>
+<table>
+  <tr><th style="width:9%">編號</th><th style="width:37%">原句（節錄）</th><th style="width:27%">診斷</th><th>改寫示意</th></tr>
+  <tr><td class="id">R-B1-1</td><td class="en">"…read a proof actively rather than let it wash over you (§B.5)."</td><td>R1：<span class="en">wash over you</span> 慣用語，EFL 不可推測；位置在附錄 lead。</td><td class="en">…read a proof actively rather than passively (§B.5).</td></tr>
+  <tr><td class="id">R-B1-2</td><td class="en">"a skill…seldom taught head-on" ／ "turns the same habits around and points them at a blank page"</td><td>R1：lead 內兩處慣用／隱喻連發（head-on、points them at a blank page）。</td><td class="en">seldom taught directly ／ applies the same habits to writing: planning, drafting, checking, and revising a short proof of your own (§B.6)</td></tr>
+  <tr><td class="id">R-B1-3</td><td class="en">"the standard moves…that otherwise look like rabbits from a hat"</td><td>R1（G-4）：文化綁定慣用語，出現在 objectives（關鍵位置）。</td><td class="en">…that otherwise seem to come from nowhere</td></tr>
+  <tr><td class="id">R-B1-4</td><td class="en">"the first of these skills, and the one that repays itself most often"</td><td>R1（G-2）：交易隱喻。</td><td class="en">…and the one you will use most often</td></tr>
+  <tr><td class="id">R-B1-5</td><td class="en">"is the same claim as '…' wearing plainer clothes"</td><td>R1：衣著隱喻承載「同義改寫」關係；字面版更短。</td><td class="en">…is the same claim written in plainer words:</td></tr>
+  <tr><td class="id">R-B1-6</td><td class="en">"Learning to hear the if–then inside an ordinary sentence is half of reading a statement."</td><td>R1：<span class="en">hear</span> 通感隱喻＋<span class="en">is half of</span> 慣用式。</td><td class="en">Learning to find the if–then inside an ordinary sentence is a large part of reading a statement.</td></tr>
+  <tr><td class="id">R-B1-7</td><td class="en">"…is true again, in lockstep with the original"</td><td>R1：軍事行話 <span class="en">lockstep</span>，EFL 不可推測。</td><td class="en">…is true again, exactly when the original is</td></tr>
+  <tr><td class="id">R-B1-8</td><td class="en">Caution: "…is to help yourself to its converse" ／ "it has to be earned in both directions"</td><td>R1（G-3、G-2）：Caution＝關鍵位置，兩個慣用語；字面句雖相鄰（<span class="en">"hands you Q whenever you have P"</span>），密度過高。</td><td class="en">…is to use its converse without proof ／ and each direction must be proved separately</td></tr>
+  <tr><td class="id">R-B1-9</td><td class="en">"They rarely announce themselves." ／ "converse held at arm's length"</td><td>R1：量詞擬人＋慣用語（arm's length）。</td><td class="en">They are rarely written out explicitly. ／ converse kept separate</td></tr>
+  <tr><td class="id">R-B1-10</td><td class="en">"…heads off the most expensive error there is: proving, or trusting, a different statement…"</td><td>R1：<span class="en">heads off</span> phrasal＋<span class="en">expensive</span> 交易隱喻（Strategy informal＝白話槽位，最該平實）。</td><td class="en">…prevents the worst mistake there is: proving, or trusting, a different statement than the one in front of you.</td></tr>
+</table>
+<p class="small">B.1 另有 PASS 保護項：開場 <span class="en">"A theorem is a promise…"</span>（G-5 保留）；句長超標（平均 25.7）由協調 pass 一併拆長句。</p>
+
+<h3>B.2 The Main Proof Shapes — 7 卡<span class="tag warn" style="margin-left:.5em">節級複查：觸發</span></h3>
+<table>
+  <tr><th style="width:9%">編號</th><th style="width:37%">原句（節錄）</th><th style="width:27%">診斷</th><th>改寫示意</th></tr>
+  <tr><td class="id">R-B2-1</td><td class="en">"A reader who knows the shapes has a head start"</td><td>R1：賽跑慣用語，可推測性中等；開場句。</td><td class="en">A reader who knows the shapes has an advantage</td></tr>
+  <tr><td class="id">R-B2-2</td><td class="en">Strategy bullet 2: "the chain that follows is direct and collides with nothing"</td><td>R1：G-6 的 collision 家族在<em>否定式</em>用法下最不透明（「撞到空」＝推不出矛盾），且在 Strategy 關鍵位置。</td><td class="en">the chain that follows is direct and reaches no contradiction</td></tr>
+  <tr><td class="id">R-B2-3</td><td class="en">"The assumption…is therefore untenable."</td><td>R1：<span class="en">untenable</span> 低頻學術詞，proof 收尾位置。</td><td class="en">The assumption…therefore cannot hold.</td></tr>
+  <tr><td class="id">R-B2-4</td><td class="en">"A statement of the form for all promises that every object in its range clears some bar. To knock it down, you need just one object that does not"</td><td>R1＋R2：counterexample 概念引入段，連用三個慣用語（promises 散用、clears some bar、knock it down）；字面版本在 Strategy box 與例題裡，但本段自身該字面。</td><td class="en">A statement of the form for all claims that every object in its range satisfies the conclusion. To disprove it, you need just one object that does not</td></tr>
+  <tr><td class="id">R-B2-5</td><td class="en">"Induction proves it in two strokes"</td><td>R1：<span class="en">strokes</span>（划槳／筆畫）慣用，EFL 不可推測。</td><td class="en">Induction proves it in two steps</td></tr>
+  <tr><td class="id">R-B2-6</td><td class="en">"reducing the fraction to lowest terms is precisely what turns 'both even' into a contradiction rather than a shrug"</td><td>R2：<span class="en">a shrug</span> 把「不構成矛盾」藏進肢體語言隱喻；這句是假設用途的承載解釋。</td><td class="en">…into a contradiction: without lowest terms, "both even" would contradict nothing.</td></tr>
+  <tr><td class="id">R-B2-7</td><td class="en">"The shape that follows really does leave the direct road." ／ "turns a wall of text into a plan"</td><td>R1：道路隱喻承載過渡；<span class="en">wall of text</span> 網路口語。</td><td class="en">The next shape, unlike this one, is not a direct argument. ／ turns a long proof into a plan you can follow</td></tr>
+</table>
+<p class="small">B.2 PASS 保護項：domino 類比（字面兩步驟先行，G-6）、<span class="en">"Demolishes; never builds."</span>（Strategy box 電報體是版式慣例）、<span class="en">"watch the supposition collapse"</span>（字面法緊隨）。</p>
+
+<h3>B.3 A Quantifier Toolbox — 7 卡<span class="tag warn" style="margin-left:.5em">節級複查：觸發</span></h3>
+<table>
+  <tr><th style="width:9%">編號</th><th style="width:37%">原句（節錄）</th><th style="width:27%">診斷</th><th>改寫示意</th></tr>
+  <tr><td class="id">R-B3-1</td><td class="en">"a statement's whole meaning can turn on how they are arranged"</td><td>R1：<span class="en">turn on</span> phrasal（取決於），EFL 易誤讀成「開啟」。</td><td class="en">a statement's whole meaning can depend entirely on their order</td></tr>
+  <tr><td class="id">R-B3-2</td><td class="en">"The two sentences use the same words in the same breath; only the order…differs, and that alone carries one from true to false."</td><td>R1：<span class="en">in the same breath</span> 慣用語（此處語意還有點錯位）＋<span class="en">carries one from</span> 移動隱喻。</td><td class="en">The two sentences use exactly the same words; only the order of "for every" and "there is" differs, and that alone changes the statement from true to false.</td></tr>
+  <tr><td class="id">R-B3-3</td><td class="en">Caution: "the outer one is in charge, and the inner object may be retuned for each choice of the outer"</td><td>R1：擬人（in charge）＋機械隱喻（retuned）在 Caution 關鍵位置；字面句相鄰（<span class="en">"lets y depend on x"</span>）。</td><td class="en">the outer one comes first, and the inner object may be chosen anew for each choice of the outer</td></tr>
+  <tr><td class="id">R-B3-4</td><td class="en">"The second skill is denial." ＋全節 deny/denial 與 negate/negation 交替</td><td>R3：術語漂移——Strategy 標題用 negating，正文交替 denial/deny；同概念同措辭。</td><td>統一 negation／negate；保留一處首用 gloss：<span class="en">The second skill is negation — denying a statement correctly.</span></td></tr>
+  <tr><td class="id">R-B3-5</td><td class="en">informal: "to deny that everyone clears the bar is to claim that someone fails it… Negation trades the two quantifiers and moves the finish line."</td><td>R1：白話槽位（informal）反而用了兩個運動慣用語（clears the bar、finish line）——這正是給 EFL 讀者的保命句，必須字面。</td><td class="en">In words: to deny that every object satisfies the condition is to claim that at least one does not; to deny that some object does is to claim that none do. Negation swaps the two quantifiers, then negates the final condition.</td></tr>
+  <tr><td class="id">R-B3-6</td><td class="en">"One arrangement…recurs so relentlessly that it deserves to be known on sight."</td><td>R1：<span class="en">relentlessly</span> 文學副詞＋<span class="en">known on sight</span> 慣用。</td><td class="en">One arrangement…appears so often that you should learn to recognize it at once.</td></tr>
+  <tr><td class="id">R-B3-7</td><td class="en">"there is one stubborn ε&gt;0 for which every proposed δ fails" ／ "pin the one tolerance no response can satisfy"</td><td>R1：擬人形容詞塞在近正式重述內＋<span class="en">pin</span> 慣用。</td><td class="en">there is one fixed ε&gt;0 for which every proposed δ fails ／ exhibit the one tolerance no response can satisfy</td></tr>
+</table>
+<p class="small">B.3 PASS 保護項：ε-δ challenge–response contest 全框架（G-6，教學正典＋完整實算一輪）、<span class="en">"terseness is precision, not shorthand"</span>、收尾 <span class="en">"stops looking like code and starts reading like sentences"</span>（透明、過暖句四條件）。句長超標（平均 29.3）由協調 pass 拆。</p>
+
+<h3>B.4 Steps That Come From Nowhere — 5 卡<span class="tag warn" style="margin-left:.5em">節級複查：觸發（臨界）</span></h3>
+<table>
+  <tr><th style="width:9%">編號</th><th style="width:37%">原句（節錄）</th><th style="width:27%">診斷</th><th>改寫示意</th></tr>
+  <tr><td class="id">R-B4-1</td><td class="en">"a line appears that seems conjured from thin air" ／ "a tolerance is carved into thirds"</td><td>R1：魔術慣用語＋雕刻隱喻；後文自己就用字面（split the tolerance）。</td><td class="en">a line appears that seems to come from nowhere ／ a tolerance is split into thirds</td></tr>
+  <tr><td class="id">R-B4-2</td><td class="en">"We have no direct grip on a−d, so we manufacture one by inserting…"</td><td>R1：grip／manufacture 雙隱喻；字面操作緊隨其後。</td><td class="en">We cannot bound a−d directly, so we insert the intermediate values b and c…</td></tr>
+  <tr><td class="id">R-B4-3</td><td class="en">"The step δ = min{δ₁, δ₂} reads like a rabbit from a hat the first time"</td><td>R1（G-4）。</td><td class="en">The step δ = min{δ₁, δ₂} can seem to come from nowhere the first time</td></tr>
+  <tr><td class="id">R-B4-4</td><td class="en">"a proof will often introduce h = f − g out of the blue"</td><td>R1：<span class="en">out of the blue</span> 慣用語，EFL 不可推測。</td><td class="en">…introduce h = f − g with no visible motivation</td></tr>
+  <tr><td class="id">R-B4-5</td><td class="en">"the odds are strong that it is one of these five (or a close cousin)"</td><td>R1：賭博慣用＋親屬隱喻。</td><td class="en">it is very likely one of these five, or a small variation of one</td></tr>
+</table>
+<p class="small">B.4 的 <span class="en">"what is it buying here?"</span> buy 系（×3）依 G-2 政策處理（我方建議改 <span class="en">what is it achieving</span>，一致性優先）。PASS 保護項：<span class="en">"This costs nothing, since the inserted terms cancel"</span>（字面理由同句）、chain-of-approximations 隱喻（當場以 <span class="en">a near b near c near d</span> cash out）、<span class="en">"The tool was in your hands the whole time"</span>（字面版剛講完，作成果標記過四條件）。</p>
+
+<h3>B.5 Reading Actively — 3 卡<span class="tag good" style="margin-left:.5em">節級複查：未觸發（最乾淨的一節）</span></h3>
+<table>
+  <tr><th style="width:9%">編號</th><th style="width:37%">原句（節錄）</th><th style="width:27%">診斷</th><th>改寫示意</th></tr>
+  <tr><td class="id">R-B5-1</td><td class="en">"For every line, name the warrant: a definition, a hypothesis, an earlier line, a result already known."（另 B.6 步驟 5 "giving each step its warrant"、B.6 收尾 "find the warrant"，共 3 處）</td><td>R1：<span class="en">warrant</span> 論證學術語、低頻；雖有冒號 gloss，3 處統一換更省。</td><td class="en">name the justification: a definition, a hypothesis…（3 處聯動改 justification）；或保留 warrant＋首用 gloss——二選一</td></tr>
+  <tr><td class="id">R-B5-2</td><td class="en">"The inequality n+1 &gt; n is the whole engine."（另 B.2 "The engine of the argument is the collision…"）</td><td>R1：engine 機械隱喻 ×2；B.2 那句後半已字面（two consequences that cannot both hold）。</td><td class="en">The proof rests entirely on the inequality n+1 &gt; n. ／ B.2：The core of the argument is the contradiction at the end: two consequences that cannot both hold.</td></tr>
+  <tr><td class="id">R-B5-3</td><td class="en">"Proof literacy…is not a talent you are born with but a habit, and it repays every hour you spend on it."</td><td>R1（G-2）邊界案例：repays 透明度尚可、句子過暖句四條件。</td><td><strong>建議保留</strong>（或最小改 repays → rewards）。列出供你裁，示範 FLAG ≠ 缺陷。</td></tr>
+</table>
+<p class="small">B.5 PASS 保護項：<span class="en">"A proof is not prose to be read at prose speed."</span>（開場，字面且有力）、one-way street Caution 全段（G-6 正典）、<span class="en">"until the argument belongs to you and not only to its author"</span>（過四條件）。</p>
+
+<h3>B.6 Writing a Proof — 9 卡<span class="tag warn" style="margin-left:.5em">節級複查：觸發</span></h3>
+<table>
+  <tr><th style="width:9%">編號</th><th style="width:37%">原句（節錄）</th><th style="width:27%">診斷</th><th>改寫示意</th></tr>
+  <tr><td class="id">R-B6-1</td><td class="en">"the case that ate an hour before it collapsed…none of it belongs on the page, however hard it was won"</td><td>R1：擬人（ate an hour）＋交易慣用（hard won）。</td><td class="en">the case analysis that took an hour and then fell apart…none of it belongs on the page, however much work it took</td></tr>
+  <tr><td class="id">R-B6-2</td><td class="en">Strategy step 2: "Definitions are where a proof gets its handles: a word you have not unpacked is a door you have not tried."</td><td>R1：雙隱喻（handles、door）承載動機句，位於 Strategy 關鍵位置；指令本身（<span class="en">Turn every defined word into the condition it abbreviates</span>）已字面。</td><td class="en">Definitions are where most proofs start: a word you have not unpacked is a tool you have not used.（或更素：…is a resource you have not used.）</td></tr>
+  <tr><td class="id">R-B6-3</td><td class="en">informal: "…how proofs pick up their worst habit, helping themselves at line one to what is not earned until line ten."</td><td>R1（G-3、G-2）：informal 白話槽位連用兩個慣用。</td><td class="en">…which is how a proof ends up using at line one a fact that is only established at line ten.</td></tr>
+  <tr><td class="id">R-B6-4</td><td class="en">"A proof that quietly helps itself to a convenient x…" ／ "The last line is not a flourish either…it reminds you to check that you earned it."</td><td>R1（G-3、G-2）＋<span class="en">flourish</span> 低頻詞；arbitrary 的字面解釋已在前句（很好），這裡收殘餘慣用。</td><td class="en">A proof that quietly assumes a convenient x… ／ The last line is not decoration either…it reminds you to check that the argument used nothing about x beyond the hypothesis.</td></tr>
+  <tr><td class="id">R-B6-5</td><td class="en">"Where the witness came from is nobody's business: you may have found it by trial, by symmetry, or by luck, and none of that need appear."</td><td>R1：<span class="en">nobody's business</span> 口語慣用；且與後句字面版重複（S3 味）。</td><td class="en">You may have found the witness by trial, by symmetry, or by luck; none of that needs to appear. That it works must appear.（刪慣用語，保後兩句）</td></tr>
+  <tr><td class="id">R-B6-6</td><td class="en">"Two ways of reaching a claim without attacking it head-on" ／ "you never laid a finger on the original claim"</td><td>R1：head-on（lead 也用過）＋laid a finger 慣用。</td><td class="en">Two ways of proving a claim without arguing about it directly ／ you never argued about the original claim itself: you proved a different sentence, and §B.1's equivalence carries the result across</td></tr>
+  <tr><td class="id">R-B6-7</td><td class="en">Ex B.8 prompt: "…the notion that Proposition B.2 showed √2 escapes"</td><td>R1：<span class="en">escapes</span> 擬人在<strong>例題題幹</strong>（關鍵位置）；本輪最接近 blocking 的一條（字面定義幸好就在同括號前半）。</td><td class="en">— the property that Proposition B.2 showed √2 does not have</td></tr>
+  <tr><td class="id">R-B6-8</td><td class="en">Ex B.11: "Read the inductive step as closely as you like; it will not crack." ／ "pass it without a murmur" ／ "parts company with the other two"</td><td>R1：三個慣用語群聚在同一個 solution。</td><td class="en">Read the inductive step as closely as you like; you will find no error. ／ raise no objection ／ differs from the other two</td></tr>
+  <tr><td class="id">R-B6-9</td><td class="en">"Rigor, in the end, is the discipline of leaving nothing load-bearing unsaid"</td><td>R1 邊界案例：<span class="en">load-bearing</span> 建築半術語、尚屬透明；收尾段其餘皆字面且優秀。</td><td><strong>建議保留</strong>（或 load-bearing → essential）。列出供你裁。</td></tr>
+</table>
+<p class="small">B.6 PASS 保護項：<span class="en">"Discovery is allowed to be a mess; presentation is not."</span>、<span class="en">"'Clearly such an x exists' is not an existence proof; it is a promise to write one."</span>（G-2 白名單）、<span class="en">"The dominoes are standing in a row…and nobody ever pushed the first."</span>（G-6；字面句 <span class="en">there is no base case</span> 就在前一句——教科書級好句）、<span class="en">"The distance between 'true in the cases I tried' and 'true in all cases' is precisely the distance a proof exists to cross"</span>（透明且承重）、<span class="en">"Two well-chosen cases beat three thousand well-checked ones."</span>。</p>
+
+<h2>§4 PASS 展示（條款不殺的東西）</h2>
+<p>為證明〈平實英文條款〉不會把書壓成 Spivak 腔，本輪明確判 PASS 的代表句：</p>
+<table>
+  <tr><th style="width:55%">句子</th><th>為何 PASS</th></tr>
+  <tr><td class="en">"A theorem is a promise, and like any promise it comes with conditions."（B.1）</td><td>G-5：常規教學類比、次句即字面化、B.6 的否定教學靠它承重。</td></tr>
+  <tr><td class="en">ε-δ「challenge–response contest」全框架（B.3）</td><td>教學正典、完整實算一輪 cash out（暖句四條件全過）。</td></tr>
+  <tr><td class="en">"An implication P ⇒ Q is a one-way street."（B.5 Caution）</td><td>常規類比、同段字面展開（licenses the move from P to Q, never…）。</td></tr>
+  <tr><td class="en">"The dominoes are standing in a row…and nobody ever pushed the first."（B.6）</td><td>字面句（no base case）先行，隱喻是補充——MUST 條款的標準合法型。</td></tr>
+  <tr><td class="en">"Discovery is allowed to be a mess; presentation is not."（B.6）</td><td>字面、短句、有力——平實 ≠ 乾癟的示範。</td></tr>
+  <tr><td class="en">"This draft is not a bad discovery; it is a bad presentation of a good one."（B.6）</td><td>同上。</td></tr>
+</table>
+
+<h2>§5 裁決方式與後續程序</h2>
+<div class="card">
+<strong>建議的裁決粒度：</strong>
+<ol class="tight">
+  <li><strong>先裁 G-1〜G-6</strong>（六個政策決定，含兩個「保留」建議）。</li>
+  <li>節卡 41 條中，<strong>R-B5-3 與 R-B6-9 是「建議保留」的邊界案例</strong>，需要你明確點頭或否決；其餘 39 條若你認可方向，可整批授權「照卡改＋按 G 政策協調」，毋須逐條回覆（你也可點名任何一條否決）。</li>
+  <li>句長長尾（≥35 詞共 55 句、B.1／B.3 平均超標）授權我在同一輪協調 pass 中逐句「拆或留」（MUST 條款程序），拆句以不增行為原則。</li>
+</ol>
+<strong>採納後程序（比照 readability backfill 前例）：</strong>改 <code>fragments/appB/</code> → <code>python handout/html/build.py</code>（appB）→ 對改動句跑<strong>範圍限定 Mode B</strong>（語意等價複核）→ 產 <code>REVIEW-appB-plain-applied.html</code> 回歸報告（含前後對照與 §0 成功條件逐項驗收）→ 你盲讀 print 版定 pilot 結論。
+LaTeX 線注意：appB 是 LaTeX pilot GO 單元、DIALECT-appB 已凍結——本輪為純文字替換，<strong>新增 markup 組合＝0</strong>，不動 DIALECT；dist 重出等 pilot 定案後另批。
+</div>
+<div class="card">
+<strong>誠實範圍註記：</strong>
+<ul class="tight">
+  <li>本輪是 R 維度的 gate-1（Claude 自審）；Codex gate-2 獨立複核可於裁決後對 findings 抽樣、或對改後稿全跑（訂閱調用，屆時另徵同意）。</li>
+  <li>Codex 建議的「style card 兩臂對照」適用於<strong>新撰</strong>場景，將在下一個新節（如 Ch7）Mode A 時執行；本輪為回填型 pilot，測的是「條款＋人工協調改寫」這一臂。</li>
+  <li>真人 EFL 盲讀（LLM 閘之外的獨立證據）仍為選配——若你有目標讀者可借，改後版是現成材料。</li>
+</ul>
+</div>
+
+<p class="foot">產出：Claude gate-1（2026-07-25）· 依據：CONTENT_SPEC v3.5 §3〈平實英文條款〉＋ PROSE-AUDIT-RUBRIC R 維度（同日新增，Codex gate-2 覆核之修訂版設計）· 統計：stdlib 腳本粗測（剝標籤／數學 placeholder）· propose-only：裁決前 fragments 未動一字。緣起鏈：REVIEW-plain-register-research.html（研究）→ REPORT-plain-register-codex-gate2-raw.md（覆核）→ 本檔（pilot gate-1）。</p>
+
+</body>
+</html>

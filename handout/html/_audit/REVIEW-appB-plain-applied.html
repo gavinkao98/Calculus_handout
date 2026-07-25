@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Appendix B 平實化 pilot — applied 回歸報告</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #6b6b6b; --line: #e0e0e0;
+    --bg: #fbfbf9; --card: #ffffff;
+    --good: #1f7a44; --good-bg: #eaf6ee;
+    --warn: #9a5b00; --warn-bg: #fdf3e3;
+    --bad: #a3232a;  --bad-bg: #fbecec;
+    --code-bg: #f4f4f2; --accent: #2d5a8a;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Inter", "Noto Sans TC", system-ui, -apple-system, sans-serif;
+    color: var(--ink); background: var(--bg); line-height: 1.65;
+    max-width: 1020px; margin: 0 auto; padding: 2.4rem 1.6rem 5rem; }
+  h1 { font-size: 1.5rem; line-height: 1.3; margin: 0 0 .3rem; }
+  .sub { color: var(--muted); font-size: .95rem; margin: 0 0 2rem; }
+  h2 { font-size: 1.18rem; margin: 2.4rem 0 .6rem; padding-bottom: .3rem; border-bottom: 2px solid var(--line); }
+  h3 { font-size: 1.0rem; margin: 1.3rem 0 .4rem; }
+  code { font-family: Consolas, monospace; font-size: .88em; background: var(--code-bg); padding: .08em .35em; border-radius: 3px; }
+  table { border-collapse: collapse; width: 100%; margin: .8rem 0 1rem; font-size: .88rem; }
+  th, td { border: 1px solid var(--line); padding: .38rem .5rem; text-align: left; vertical-align: top; }
+  th { background: #f0f0ee; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+  .tag { display: inline-block; font-size: .76rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; vertical-align: middle; }
+  .tag.good { color: var(--good); background: var(--good-bg); }
+  .tag.warn { color: var(--warn); background: var(--warn-bg); }
+  .en { font-style: italic; }
+  del { color: var(--bad); background: var(--bad-bg); text-decoration: line-through; }
+  ins { color: var(--good); background: var(--good-bg); text-decoration: none; }
+  ul.tight { margin: .3rem 0 .6rem; padding-left: 1.3rem; }
+  ul.tight li { margin: .18rem 0; }
+  .small { font-size: .85rem; color: var(--muted); }
+  .foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>Appendix B 平實化 pilot — applied 回歸報告</h1>
+<p class="sub">裁決鏈：使用者授權委任（2026-07-25）→ Codex 裁決意見（<code>codex exec -s read-only</code>，raw 存 <code>scratchpad</code>，摘要見 §2）→ Claude 最後定奪 → 執行。fragment 已改、<code>build.py appB</code> 已重建、版面已截圖驗證。</p>
+
+<div class="card">
+  <strong>〔2026-07-25 更正〕</strong>下方「全數處置完畢」不準確：<strong>R-B6-7</strong>（Ex B.8 題幹的 <em>√2 escapes</em>，Codex 判 ADOPT）執行時漏改，於第二輪（句法輪）驗算時發現並補修——見 <code>REVIEW-appB-syntax-round.html</code> §3。實際本輪處置 45 項、改點 58 個。
+  <br><br>
+  <strong>結果一句話：</strong>46 個裁決項處置——<strong>執行 62 個改點</strong>（六節 fragment），<strong>1 條 finding 撤回</strong>（R-B2-2，Codex REJECT 成立），<strong>4 項明確保留</strong>（R-B5-3、R-B6-9、G-5 promise 框架、G-6 quasi-term 家族）＋ 1 條 Codex 補抓建議被我駁回（B.5 開場句）。
+  結構指標：<span class="tag good">句數不變（僅 +1 刻意拆句）、字數 ±26、print 版 35 頁 render 正常</span>。剩下的最終判準是你的盲讀（§5）。
+</div>
+
+<h2>§1 成功條件驗收（pilot §0 預先寫死的五條）</h2>
+<table>
+  <tr><th style="width:30%">條件</th><th style="width:12%">結果</th><th>證據</th></tr>
+  <tr><td>1. 數學零改動</td><td><span class="tag good">通過</span></td><td>全部改點是散文詞句層；公式、編號、cross-ref、環境未動。四個帶量詞語義的改寫（R-B2-4、R-B3-5、R-B6-4、R-B6-6）由 Codex＋主線雙重逐句核對（negation 方向、arbitrary 條件、等價敘述均無漂移）。</td></tr>
+  <tr><td>2. 語意保持</td><td><span class="tag good">通過</span></td><td>每個改寫先經 Codex 跨模型審查（ADOPT/MODIFY/REJECT 逐項），主線再定奪；分歧處逐條記錄於 §2。</td></tr>
+  <tr><td>3. 清晰度上升</td><td><span class="tag warn">待盲讀</span></td><td>本報告 §3 附完整 before/after 帳；請盲讀 print 版（<code>standalone/appendixB-print-standalone.html</code>）給 pilot 結論。</td></tr>
+  <tr><td>4. 版面不炸</td><td><span class="tag good">通過</span></td><td>六節句數 51/62/32/48/50/156（僅 B.6 +1，為刻意拆句）；字數合計 +23（0.3%）；重建後 35 頁 A4，首頁與 §B.1 截圖目檢正常。</td></tr>
+  <tr><td>5. idiom／擬人密度趨零</td><td><span class="tag good">通過</span></td><td>收尾 grep 掃殘留：家族詞全數清零或屬白名單（§4）；掃出並補修 2 個漏點（B.4 "The tell is…"、B.6 "a denial"）。</td></tr>
+</table>
+
+<p class="small">句長監測值（SHOULD 層，本輪不處理）：B.1 平均 25.6／B.3 29.2 仍超標、全附錄 ≥35 詞句約 55 句——依 Codex Q4 裁定<strong>留第二輪</strong>（先隔離「詞彙語域」變因供盲讀歸因；第二輪先 B.3 再 B.1，改後重測）。唯一例外：R-B6-4 改寫產生的一句 40 詞新長句，依 MUST 條款當場裁定拆為兩句（B.6 句數 +1 的來源）。</p>
+
+<h2>§2 Codex 裁決摘要與主線定奪（分歧全記錄）</h2>
+
+<p>Codex 逐項裁決：41 卡＝22 ADOPT／18 MODIFY（給出更自然措辭，多數被採用）／1 REJECT；G 政策：G-3/G-4/G-5/G-6 ADOPT、G-1/G-2 MODIFY；另補 7 個掃漏點；句長裁「留第二輪」。主線最後定奪與 Codex 不同之處：</p>
+
+<table>
+  <tr><th style="width:12%">項</th><th style="width:44%">Codex 意見</th><th>主線定奪與理由</th></tr>
+  <tr><td>R-B2-2</td><td>REJECT——<span class="en">collides with nothing</span> 屬 G-6 已定錨 collision 家族，改掉破壞一致性。</td><td><strong>接受撤回</strong>。原卡與我自己的 G-6 原則相牴觸，Codex 對。原文保留。</td></tr>
+  <tr><td>R-B1-4</td><td>改成 "…and the one that most often prevents later confusion in a proof."</td><td><strong>用原提案</strong>（"the one you will use most often"）——Codex 版與緊接的下一句（"A surprising share of the confusion…"）內容重複。</td></tr>
+  <tr><td>R-B1-10</td><td>"helps prevent a serious error"</td><td><strong>用原提案</strong>（"prevents the worst mistake there is"）——Codex 版把超級述詞弱化了；「最貴的錯」是實質內容，不是修辭。</td></tr>
+  <tr><td>G-1（B.6 落點）</td><td>"To distinguish them, look at the conclusion of the outer argument:"</td><td><strong>改用</strong> "To tell them apart, look at what the outer argument ends with:"——Codex 版的 "conclusion" 與數學術語 conclusion（Q）撞詞，恰好是這段在教的東西，會歧義。</td></tr>
+  <tr><td>R-B3-7 後半</td><td>"identify a fixed tolerance for which every proposed response fails"</td><td><strong>用</strong> "exhibit the one tolerance…"——exhibit 與 B.2 counterexample 段的 "exhibit one object" 用詞一致（R3 一致性）。</td></tr>
+  <tr><td>R-B6-1</td><td>整句改平鋪結構</td><td><strong>保留原三項式節奏</strong>、只換掉兩個慣用語——結構不是病灶，改最小面積。</td></tr>
+  <tr><td>R-B6-2</td><td>"Definitions make the conditions in a statement usable: until you unpack a defined word, you cannot use the condition it names."</td><td><strong>混合</strong>：前半用 Codex、後半保留格言平行結構（"a word you have not unpacked is a condition you cannot yet use"）。</td></tr>
+  <tr><td>Q2 補抓：B.5 開場句</td><td>"A proof is not prose to be read at prose speed." → 建議改寫</td><td><strong>駁回</strong>——全句 A1 詞彙、壓縮在句法不在詞彙，且是該節的錨句；與 Codex 自己 Q3「PASS 全數成立」自相矛盾，取 Q3。</td></tr>
+</table>
+
+<p class="small">Codex 其餘 MODIFY 均採納（含 4 個掃漏：第 4 個 <span class="en">warrant</span>、B.1 的 <span class="en">hands you</span>／<span class="en">grants for free</span>、B.6 的 <span class="en">hands you something sharper</span>、Ex B.8 的 <span class="en">arrived with the definition</span>；及 B.2 <span class="en">"Demolishes; never builds."</span>→<span class="en">"It disproves; it never proves."</span>、B.3 <span class="en">lean on</span>→<span class="en">depend on</span>、B.4 <span class="en">undisturbed by the swap</span>→<span class="en">unchanged by the swap</span>、B.6 <span class="en">whether the argument arrived</span>→<span class="en">whether the complete argument is on the page</span>）。</p>
+
+<h2>§3 改動總帳（62 改點，逐條 before → after）</h2>
+
+<h3>B.1（13）</h3>
+<table>
+  <tr><th style="width:50%">before</th><th>after</th></tr>
+  <tr><td class="en"><del>seldom taught head-on</del></td><td class="en"><ins>seldom taught directly</ins></td></tr>
+  <tr><td class="en"><del>rather than let it wash over you</del> / <del>turns the same habits around and points them at a blank page: planning, …</del></td><td class="en"><ins>rather than passively</ins> / <ins>shows how to use the same habits when planning, drafting, checking, and revising a short proof of your own</ins></td></tr>
+  <tr><td class="en"><del>look like rabbits from a hat</del>（objectives）</td><td class="en"><ins>seem to come from nowhere</ins></td></tr>
+  <tr><td class="en"><del>the one that repays itself most often</del></td><td class="en"><ins>the one you will use most often</ins></td></tr>
+  <tr><td class="en"><del>wearing plainer clothes:</del></td><td class="en"><ins>written in plainer words:</ins></td></tr>
+  <tr><td class="en"><del>Learning to hear the if–then … is half of reading a statement.</del></td><td class="en"><ins>Learning to find the if–then … is a large part of reading a statement.</ins></td></tr>
+  <tr><td class="en"><del>is true again, in lockstep with the original</del></td><td class="en"><ins>is true again, exactly when the original statement is true</ins></td></tr>
+  <tr><td class="en"><del>to help yourself to its converse</del> / <del>hands you Q</del>（Caution）</td><td class="en"><ins>to use its converse without proof</ins> / <ins>gives you Q</ins></td></tr>
+  <tr><td class="en"><del>it has to be earned in both directions</del></td><td class="en"><ins>each direction must be proved separately</ins></td></tr>
+  <tr><td class="en"><del>They rarely announce themselves.</del></td><td class="en"><ins>They are often implicit rather than stated explicitly.</ins></td></tr>
+  <tr><td class="en"><del>heads off the most expensive error there is</del></td><td class="en"><ins>prevents the worst mistake there is</ins></td></tr>
+  <tr><td class="en"><del>not something the original grants for free</del></td><td class="en"><ins>it does not follow from the original statement</ins></td></tr>
+  <tr><td class="en"><del>converse held at arm's length</del></td><td class="en"><ins>the converse kept separate</ins></td></tr>
+</table>
+
+<h3>B.2（11）</h3>
+<table>
+  <tr><th style="width:50%">before</th><th>after</th></tr>
+  <tr><td class="en"><del>has a head start</del></td><td class="en"><ins>has an advantage</ins></td></tr>
+  <tr><td class="en"><del>The tell:</del> ×3（Strategy 三個 bullet）</td><td class="en"><ins>The clue:</ins> ×3</td></tr>
+  <tr><td class="en"><del>Demolishes; never builds.</del></td><td class="en"><ins>It disproves; it never proves.</ins></td></tr>
+  <tr><td class="en"><del>is therefore untenable</del></td><td class="en"><ins>therefore cannot hold</ins></td></tr>
+  <tr><td class="en"><del>The engine of the argument is the collision…</del> / <del>…rather than a shrug</del></td><td class="en"><ins>The key point of the argument is the collision…</ins> / <ins>makes "both even" a contradiction; without it, "both even" would contradict nothing</ins></td></tr>
+  <tr><td class="en"><del>promises that every object in its range clears some bar. To knock it down,</del></td><td class="en"><ins>claims that every object in its range satisfies some condition. To disprove it,</ins></td></tr>
+  <tr><td class="en"><del>in two strokes</del></td><td class="en"><ins>in two steps</ins></td></tr>
+  <tr><td class="en"><del>The shape that follows really does leave the direct road.</del></td><td class="en"><ins>The next proof shape, unlike this one, is not a direct argument.</ins></td></tr>
+  <tr><td class="en"><del>turns a wall of text into a plan you can follow</del></td><td class="en"><ins>helps you see the plan in a long proof</ins></td></tr>
+</table>
+
+<h3>B.3（10）</h3>
+<table>
+  <tr><th style="width:50%">before</th><th>after</th></tr>
+  <tr><td class="en"><del>whole meaning can turn on how they are arranged</del></td><td class="en"><ins>whole meaning can depend on how they are arranged</ins></td></tr>
+  <tr><td class="en"><del>use the same words in the same breath; … carries one from true to false</del></td><td class="en"><ins>use exactly the same words; … changes the statement from true to false</ins></td></tr>
+  <tr><td class="en"><del>the outer one is in charge, … retuned for each choice</del>（Caution）</td><td class="en"><ins>the outer one comes first, … chosen anew for each choice</ins></td></tr>
+  <tr><td class="en"><del>The second skill is denial.</del>＋<del>the denial of</del> ×2（術語位）</td><td class="en"><ins>The second skill is negation.</ins>＋<ins>the negation of</ins> ×2</td></tr>
+  <tr><td class="en"><del>to deny that everyone clears the bar … moves the finish line</del>（informal）</td><td class="en"><ins>to negate "every object satisfies a condition" is to claim that at least one does not; … Negation changes each quantifier to the other type, keeps their order, and negates the final condition.</ins></td></tr>
+  <tr><td class="en"><del>recurs so relentlessly that it deserves to be known on sight</del></td><td class="en"><ins>appears so often that you should learn to recognize it at once</ins></td></tr>
+  <tr><td class="en"><del>how may the response lean on the challenge?</del></td><td class="en"><ins>how may the response depend on the challenge?</ins></td></tr>
+  <tr><td class="en"><del>one stubborn ε&gt;0</del> / <del>pin the one tolerance</del></td><td class="en"><ins>one fixed ε&gt;0</ins> / <ins>exhibit the one tolerance</ins></td></tr>
+</table>
+
+<h3>B.4（10）</h3>
+<table>
+  <tr><th style="width:50%">before</th><th>after</th></tr>
+  <tr><td class="en"><del>seems conjured from thin air</del> / <del>carved into thirds</del></td><td class="en"><ins>seems to come from nowhere</ins> / <ins>split into thirds</ins></td></tr>
+  <tr><td class="en"><del>what is it buying here?</del> / <del>what is it buying?</del>（結尾）</td><td class="en"><ins>what does it accomplish here?</ins> / <ins>what does it accomplish?</ins></td></tr>
+  <tr><td class="en"><del>We have no direct grip on a−d, so we manufacture one by inserting</del></td><td class="en"><ins>We cannot bound a−d directly, so we insert</ins></td></tr>
+  <tr><td class="en"><del>reads like a rabbit from a hat</del></td><td class="en"><ins>can seem to come from nowhere</ins></td></tr>
+  <tr><td class="en"><del>out of the blue</del></td><td class="en"><ins>with no visible motivation</ins></td></tr>
+  <tr><td class="en"><del>Notice what h bought</del></td><td class="en"><ins>Notice what introducing h made possible</ins></td></tr>
+  <tr><td class="en"><del>the claim, saying the same thing either way, is undisturbed by the swap</del></td><td class="en"><ins>the claim, which says the same thing either way, is unchanged by the swap</ins></td></tr>
+  <tr><td class="en"><del>the odds are strong that it is one of these five (or a close cousin)</del></td><td class="en"><ins>it is very likely one of these five (or a close variation)</ins></td></tr>
+  <tr><td class="en"><del>The tell is a function or quantity…</del>（grep 掃漏補修）</td><td class="en"><ins>The clue is a function or quantity…</ins></td></tr>
+</table>
+
+<h3>B.5（4）</h3>
+<table>
+  <tr><th style="width:50%">before</th><th>after</th></tr>
+  <tr><td class="en"><del>name the warrant:</del></td><td class="en"><ins>name the justification:</ins></td></tr>
+  <tr><td class="en"><del>should earn its place at some specific line</del></td><td class="en"><ins>should be used at some specific line</ins></td></tr>
+  <tr><td class="en"><del>There are only two inequalities to warrant.</del></td><td class="en"><ins>Only two inequalities need justification.</ins></td></tr>
+  <tr><td class="en"><del>The inequality n+1&gt;n is the whole engine.</del></td><td class="en"><ins>The contradiction depends on the inequality n+1&gt;n.</ins></td></tr>
+</table>
+
+<h3>B.6（14 改點＋1 拆句＋1 掃漏補修）</h3>
+<table>
+  <tr><th style="width:50%">before</th><th>after</th></tr>
+  <tr><td class="en"><del>the case that ate an hour before it collapsed</del> / <del>however hard it was won</del></td><td class="en"><ins>the case analysis that took an hour and then fell apart</ins> / <ins>however much work it took</ins></td></tr>
+  <tr><td class="en"><del>Definitions are where a proof gets its handles: … a door you have not tried.</del></td><td class="en"><ins>Definitions make the conditions in a statement usable: a word you have not unpacked is a condition you cannot yet use.</ins></td></tr>
+  <tr><td class="en"><del>giving each step its warrant</del></td><td class="en"><ins>giving each step its justification</ins></td></tr>
+  <tr><td class="en"><del>hope the argument arrives before the bottom, … helping themselves at line one to what is not earned until line ten</del></td><td class="en"><ins>start writing at the top of the page without a plan, which often leads to using at line one a fact that is only established at line ten</ins></td></tr>
+  <tr><td class="en"><del>quietly helps itself to a convenient x</del> / <del>not a flourish either … check that you earned it</del></td><td class="en"><ins>quietly chooses a convenient x</ins> / <ins>not decoration either … check that the argument used nothing about x beyond its membership in S and the hypothesis P(x)</ins>（後拆為兩句）</td></tr>
+  <tr><td class="en"><del>Where the witness came from is nobody's business: you may have found it…and none of that need appear.</del></td><td class="en"><ins>You may have found the witness by trial, by symmetry, or by luck; none of that needs to appear.</ins></td></tr>
+  <tr><td class="en"><del>reaching a claim without attacking it head-on … do not blur them</del></td><td class="en"><ins>proving a claim without arguing directly from P to Q … do not confuse them</ins></td></tr>
+  <tr><td class="en"><del>you never laid a finger on the original claim, you proved a different sentence and let §B.1 carry the result across</del></td><td class="en"><ins>you never argued about the original claim itself; you proved an equivalent sentence, and §B.1 carried the result across</ins></td></tr>
+  <tr><td class="en"><del>the negation hands you something sharper:</del></td><td class="en"><ins>the negation gives you something more specific:</ins></td></tr>
+  <tr><td class="en"><del>The tell, then, is what the outer argument ends with:</del></td><td class="en"><ins>To tell them apart, look at what the outer argument ends with:</ins></td></tr>
+  <tr><td class="en"><del>it would earn very little</del></td><td class="en"><ins>it would receive little credit as a proof</ins></td></tr>
+  <tr><td class="en"><del>the inner skeleton owes a witness</del></td><td class="en"><ins>the inner skeleton must supply a witness</ins></td></tr>
+  <tr><td class="en"><del>arrived with the definition and did their work</del> / <del>hunt for the line where each hypothesis earns its place</del></td><td class="en"><ins>came from the definition and were used</ins> / <ins>find the line at which each hypothesis is used</ins></td></tr>
+  <tr><td class="en"><del>the converse has to be earned</del></td><td class="en"><ins>the converse has to be proved</ins></td></tr>
+  <tr><td class="en"><del>it will not crack</del> / <del>pass it without a murmur</del> / <del>parts company with</del></td><td class="en"><ins>you will find no error in it</ins> / <ins>find nothing wrong with it</ins> / <ins>differs from</ins></td></tr>
+  <tr><td class="en"><del>a step you have yet to earn</del>（Caution）</td><td class="en"><ins>a step you have not yet justified</ins></td></tr>
+  <tr><td class="en"><del>find the warrant for every line</del> / <del>whether the argument arrived</del></td><td class="en"><ins>find the justification for every line</ins> / <ins>whether the complete argument is on the page</ins></td></tr>
+  <tr><td class="en"><del>the conclusion is itself a denial</del>（grep 掃漏補修）</td><td class="en"><ins>the conclusion is itself a negative statement</ins></td></tr>
+</table>
+
+<h2>§4 保留白名單（記錄供未來 C 層 linter 豁免）</h2>
+<ul class="tight">
+  <li><strong>G-5 promise 框架</strong>：B.1 <span class="en">"A theorem is a promise, and like any promise it comes with conditions."</span>、B.1 Caution <span class="en">"it promises nothing"</span>、B.6 <span class="en">"§B.1 called a theorem a promise"</span>、B.11 <span class="en">"keeps that promise perfectly"</span>、B.6 <span class="en">"it is a promise to write one"</span>。</li>
+  <li><strong>G-6 quasi-term 家族</strong>：collision／collide（含 B.2 Strategy 的 <span class="en">"collides with nothing"</span>——Codex REJECT 維持原文）、one-way street／travel、dominoes、skeleton、machinery、ε-δ challenge–response contest、<span class="en">"in disguise"</span>（量詞教學慣用）。</li>
+  <li><strong>個別保留</strong>：B.5 <span class="en">"it repays every hour you spend on it"</span>（R-B5-3）、B.6 <span class="en">"leaving nothing load-bearing unsaid"</span>（R-B6-9）、B.5 開場 <span class="en">"A proof is not prose to be read at prose speed."</span>、B.6 <span class="en">"Notice how little the repair costs"</span>。</li>
+</ul>
+
+<h2>§5 下一步</h2>
+<ol class="tight">
+  <li><strong>盲讀（pilot 主判準）</strong>：開 <code>handout/html/standalone/appendixB-print-standalone.html</code> 讀改後版，判「是否更像一般教科書英文」。若要前後對照，git diff 或本報告 §3 逐條帳皆可。</li>
+  <li><strong>pilot 定案後</strong>：句長第二輪（先 B.3、再 B.1，改後重測）；新章（Ch7 起）Mode A 直接掛 §3 條款＋style card 兩臂對照；舊章（ch01–ch06）分批回填比照本輪程序。</li>
+  <li><strong>LaTeX 線</strong>：本輪純文字替換、DIALECT-appB 新增組合＝0；dist 重出等 pilot 定案後另批。</li>
+  <li><strong>選配</strong>：Codex gate-2 對改後全文再跑一輪獨立複核（訂閱調用，屆時徵同意）；真人 EFL 讀者盲讀。</li>
+</ol>
+
+<p class="foot">產出：Claude（2026-07-25）。裁決鏈全紀錄：REVIEW-plain-register-research.html（研究＋Codex 覆核）→ REVIEW-appB-plain-pilot.html（gate-1 走查）→ Codex 裁決意見（本報告 §2 摘要）→ 本檔（applied）。規範依據：CONTENT_SPEC v3.5 §3〈平實英文條款〉＋ PROSE-AUDIT-RUBRIC R 維度。commit 未做（待使用者指示）。</p>
+
+</body>
+</html>

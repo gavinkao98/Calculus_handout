@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Appendix B 平實化 — 改前／改後全句對照（精簡版）</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #6b6b6b; --line: #e2e2df;
+    --bg: #fbfbf9; --card: #ffffff;
+    --good: #1f7a44; --good-bg: #f0f8f3; --good-line: #b8ddc7;
+    --bad: #a3232a;  --bad-bg: #fdf4f4; --bad-line: #e8c9c9;
+    --accent: #2d5a8a; --code-bg: #f4f4f2;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Inter", "Noto Sans TC", system-ui, -apple-system, sans-serif;
+    color: var(--ink); background: var(--bg); line-height: 1.6;
+    max-width: 900px; margin: 0 auto; padding: 2.4rem 1.5rem 5rem; }
+  h1 { font-size: 1.5rem; line-height: 1.3; margin: 0 0 .3rem; }
+  .sub { color: var(--muted); font-size: .93rem; margin: 0 0 1.8rem; }
+  h2 { font-size: 1.16rem; margin: 2.6rem 0 .8rem; padding-bottom: .3rem; border-bottom: 2px solid var(--line); }
+  h3 { font-size: 1rem; margin: 1.8rem 0 .5rem; color: var(--accent); }
+  code { font-family: Consolas, monospace; font-size: .87em; background: var(--code-bg); padding: .08em .35em; border-radius: 3px; }
+  table { border-collapse: collapse; width: 100%; margin: .7rem 0 1rem; font-size: .89rem; }
+  th, td { border: 1px solid var(--line); padding: .4rem .55rem; text-align: left; vertical-align: top; }
+  th { background: #f0f0ee; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .9rem 1.15rem; margin: 1rem 0; }
+  .pair { margin: .9rem 0 1.3rem; }
+  .pair .why { font-size: .85rem; color: var(--muted); margin: 0 0 .35rem; }
+  .pair .why b { color: var(--ink); font-weight: 600; }
+  .row { display: flex; gap: .55rem; align-items: flex-start; padding: .45rem .6rem; border-radius: 5px; margin-bottom: .3rem; }
+  .row .lbl { flex: 0 0 3.1rem; font-size: .72rem; font-weight: 700; letter-spacing: .04em; padding-top: .18rem; }
+  .row .txt { flex: 1; font-size: .95rem; line-height: 1.55; }
+  .before { background: var(--bad-bg); border-left: 3px solid var(--bad-line); }
+  .before .lbl { color: var(--bad); }
+  .after  { background: var(--good-bg); border-left: 3px solid var(--good-line); }
+  .after .lbl { color: var(--good); }
+  .txt em { font-style: italic; }
+  .mark-b { background: #f7d9d9; padding: 0 .1em; border-radius: 2px; }
+  .mark-a { background: #cfe9da; padding: 0 .1em; border-radius: 2px; }
+  .loc { font-size: .78rem; color: var(--muted); font-family: Consolas, monospace; }
+  ul.tight { margin: .3rem 0 .7rem; padding-left: 1.3rem; }
+  ul.tight li { margin: .2rem 0; }
+  .small { font-size: .85rem; color: var(--muted); }
+  .foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+  .tag { display: inline-block; font-size: .74rem; font-weight: 600; padding: .08rem .45rem; border-radius: 999px; background: var(--good-bg); color: var(--good); }
+</style>
+</head>
+<body>
+
+<h1>Appendix B 平實化：改前／改後全句對照</h1>
+<p class="sub">精簡版報告 · 2026-07-25 · 58 個改點落在 45 個句子上 · 句對由 <code>git</code> 逐句 diff 抽出（非人工重建）</p>
+
+<div class="card">
+  <strong>這輪的完整脈絡（四步）：</strong>
+  <ol class="tight">
+    <li><strong>研究</strong>問題根因（三線並行上網查證＋自家 ch06 §6.2 現症診斷）→ 結論：LLM 的文學腔是 post-training 烙印，光靠範文與形容詞式描述壓不住；<strong>把「平實」操作化成語言參數</strong>是實測最大單一增益。</li>
+    <li><strong>Codex 覆核</strong>方案（GO-with-changes）→ 三大修正：改為「數學內容字面化」的 MUST＋情境化 FLAG（不禁句式）、rubric 提前、自動 linter 只當報告不當裁判。</li>
+    <li><strong>落地規格</strong>（A＋D）：<code>CONTENT_SPEC.md</code> 升 v3.5、散文稽核 rubric 增 R 維度。</li>
+    <li><strong>Appendix B pilot</strong>：走查 → Codex 逐項裁決 → 我定奪 → 執行 58 改點 → build 驗證。</li>
+  </ol>
+</div>
+
+<h2>§1 病灶分五類，先看最有代表性的</h2>
+<p class="small">每組：<span style="color:var(--bad);font-weight:600">改前</span> → <span style="color:var(--good);font-weight:600">改後</span>，上方一行說明為什麼。標示色塊是實際變動處。</p>
+
+<h3>① 英語慣用語／俚語（EFL 讀者查字典也拼不出意思）</h3>
+
+<div class="pair">
+  <p class="why"><b>lockstep</b>（軍隊齊步）＝「完全同步」。改後直接說出數學關係。 <span class="loc">§B.1</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">Its contrapositive “if <em>n</em> is not divisible by 3, then <em>n</em> is not divisible by 6” is true again, <span class="mark-b">in lockstep with the original</span>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">Its contrapositive “if <em>n</em> is not divisible by 3, then <em>n</em> is not divisible by 6” is true again, <span class="mark-a">exactly when the original statement is true</span>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><b>help yourself to</b>（擅自取用）是道地口語，但這裡是 Caution 的承載句——最不該讓讀者猜。 <span class="loc">§B.1 Caution</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">The single most common misreading of a theorem is to <span class="mark-b">help yourself to</span> its converse.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">The single most common misreading of a theorem is to <span class="mark-a">use its converse without proof</span>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><b>rabbit from a hat</b>（魔術戲法）是文化綁定的比喻——而且本節標題 <em>Steps That Come From Nowhere</em> 早就給了現成的字面說法。 <span class="loc">§B.4</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">The step δ = min{δ₁, δ₂} <span class="mark-b">reads like a rabbit from a hat</span> the first time, but it says only this: …</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">The step δ = min{δ₁, δ₂} <span class="mark-a">can seem to come from nowhere</span> the first time, but it says only this: …</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><b>out of the blue</b>（突如其來）→ 說出實際情況：沒有可見的動機。 <span class="loc">§B.4</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">…a proof will often introduce <em>h = f − g</em> <span class="mark-b">out of the blue</span> and argue about <em>h</em> alone…</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">…a proof will often introduce <em>h = f − g</em> <span class="mark-a">with no visible motivation</span> and argue about <em>h</em> alone…</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">一句裡三個慣用語（<b>nobody's business</b>／by luck／need appear），而且後半跟下一句重複。刪掉慣用語後更短更清楚。 <span class="loc">§B.6</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt"><span class="mark-b">Where the witness came from is nobody’s business:</span> you may have found it by trial, by symmetry, or by luck, and none of that need appear.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt"><span class="mark-a">You may have found the witness</span> by trial, by symmetry, or by luck; none of that needs to appear.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">三個慣用語擠在同一段（<b>parts company with</b>、<b>will not crack</b>、<b>without a murmur</b>）。 <span class="loc">§B.6 Ex B.11</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">Read the inductive step as closely as you like; <span class="mark-b">it will not crack</span>. … The first and fifth habits of Strategy B.5 <span class="mark-b">pass it without a murmur</span>. … which is where this example <span class="mark-b">parts company with</span> the other two…</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">Read the inductive step as closely as you like; <span class="mark-a">you will find no error in it</span>. … The first and fifth habits of Strategy B.5 <span class="mark-a">find nothing wrong with it</span>. … which is where this example <span class="mark-a">differs from</span> the other two…</span></div>
+</div>
+
+<h3>② 擬人與隱喻（把數學物件寫成有意志的角色）</h3>
+
+<div class="pair">
+  <p class="why">量詞被寫成會「自我宣告」的角色。 <span class="loc">§B.1</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt"><span class="mark-b">They rarely announce themselves.</span></span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt"><span class="mark-a">They are often implicit rather than stated explicitly.</span></span></div>
+</div>
+
+<div class="pair">
+  <p class="why">量詞「當家作主」＋「重新調校」兩個隱喻疊在 Caution 裡。改後說的是同一件事，但用讀者能直接檢查的語言。 <span class="loc">§B.3 Caution</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">When quantifiers of different type meet, <span class="mark-b">the outer one is in charge</span>, and the inner object may be <span class="mark-b">retuned</span> for each choice of the outer.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">When quantifiers of different type meet, <span class="mark-a">the outer one comes first</span>, and the inner object may be <span class="mark-a">chosen anew</span> for each choice of the outer.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">案例被寫成「吃掉一小時」；證明被寫成「養成壞習慣、擅自取用」。 <span class="loc">§B.6</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">The false starts, <span class="mark-b">the case that ate an hour before it collapsed</span>, the algebra done three times: none of it belongs on the page, <span class="mark-b">however hard it was won</span>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">The false starts, <span class="mark-a">the case analysis that took an hour and then fell apart</span>, the algebra done three times: none of it belongs on the page, <span class="mark-a">however much work it took</span>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><b>attacking it head-on</b>／<b>laid a finger on</b>（動武比喻）→ 直接說「不從 P 直接推到 Q」。這段在教 contraposition 與 contradiction 的分野，最需要精準。 <span class="loc">§B.6</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">Two ways of <span class="mark-b">reaching a claim without attacking it head-on</span>, and it matters that you do not <span class="mark-b">blur</span> them. … <span class="mark-b">you never laid a finger on the original claim</span>, you proved a different sentence and let §B.1 carry the result across.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">Two ways of <span class="mark-a">proving a claim without arguing directly from P to Q</span>, and it matters that you do not <span class="mark-a">confuse</span> them. … <span class="mark-a">you never argued about the original claim itself; you proved an equivalent sentence</span>, and §B.1 carried the result across.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">定義被寫成「有把手」「有門可推」。改後保留格言節奏，但講的是可操作的事。 <span class="loc">§B.6 Strategy B.6</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt"><span class="mark-b">Definitions are where a proof gets its handles: a word you have not unpacked is a door you have not tried.</span></span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt"><span class="mark-a">Definitions make the conditions in a statement usable: a word you have not unpacked is a condition you cannot yet use.</span></span></div>
+</div>
+
+<h3>③ 交易隱喻家族（earn／repay／owe／buy）——全書性 tic，共 14 處</h3>
+<p class="small">單獨看每處都還算透明，累積起來就是「太文學」的主要來源；ch06 §6.2 的 <em>“everything else is earned in full”</em> 是同一家族。</p>
+
+<div class="pair">
+  <p class="why">技能被寫成「會回本」。 <span class="loc">§B.1</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">Reading the statement closely is the first of these skills, and <span class="mark-b">the one that repays itself most often</span>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">Reading the statement closely is the first of these skills, and <span class="mark-a">the one you will use most often</span>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">雙向蘊含被寫成「兩個方向都得掙來」→ 直接說：兩個方向各自要證。 <span class="loc">§B.1 Caution</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">…that is a strictly stronger claim, and <span class="mark-b">it has to be earned in both directions</span>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">…that is a strictly stronger claim, and <span class="mark-a">each direction must be proved separately</span>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">兩個交易隱喻（<b>buying</b>）＋一個擬人（h「買到」東西）。這節的主題正是「這一步在做什麼」，用字面說反而更貼題。 <span class="loc">§B.4，共 3 處</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">…turns into the far smaller “ah, that one again — <span class="mark-b">what is it buying here?</span>” … Notice <span class="mark-b">what h bought</span>, because that is the whole of the move.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">…turns into the far smaller “ah, that one again — <span class="mark-a">what does it accomplish here?</span>” … Notice <span class="mark-a">what introducing h made possible</span>, because that is the whole of the move.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">假設被寫成「掙得它的位置」（earn its place）→ 說出實際要求：被用到。 <span class="loc">§B.5 Strategy B.5、§B.6 各一處</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">Every assumption in the statement should <span class="mark-b">earn its place</span> at some specific line. ／ Strategy B.5 taught you to <span class="mark-b">hunt for the line where each hypothesis earns its place</span>…</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">Every assumption in the statement should <span class="mark-a">be used</span> at some specific line. ／ Strategy B.5 taught you to <span class="mark-a">find the line at which each hypothesis is used</span>…</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">Caution 的收尾句：「還沒掙到的一步」→「還沒證成的一步」。同段另一處 <em>the converse has to be earned</em> → <em>has to be proved</em>。 <span class="loc">§B.6 Caution</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">A step you want is a step <span class="mark-b">you have yet to earn</span>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">A step you want is a step <span class="mark-a">you have not yet justified</span>.</span></div>
+</div>
+
+<h3>④ 修辭遮住了數學內容（最該修的一類）</h3>
+
+<div class="pair">
+  <p class="why">給 EFL 讀者的白話保命句，卻用了兩個運動慣用語（<b>clears the bar</b>、<b>moves the finish line</b>），而且沒說出否定規則到底做了什麼。改後把規則三個動作說全：換量詞、保順序、否定條件。 <span class="loc">§B.3 Strategy B.3 白話欄</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">In words: to deny that <em>everyone</em> <span class="mark-b">clears the bar</span> is to claim that <em>someone</em> fails it; to deny that <em>someone</em> succeeds is to claim that <em>everyone</em> fails. Negation <span class="mark-b">trades the two quantifiers and moves the finish line</span>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">In words: to negate “<em>every</em> object satisfies a condition” is to claim that at least one does not; to negate “<em>some</em> object satisfies a condition” is to claim that no object does. Negation <span class="mark-a">changes each quantifier to the other type, keeps their order, and negates the final condition</span>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><b>a shrug</b>（聳肩）承載「不構成矛盾」這個關鍵判斷。改後把它說成可檢查的話。 <span class="loc">§B.2</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">…reducing the fraction to lowest terms is precisely what turns “both even” into <span class="mark-b">a contradiction rather than a shrug</span>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">…reducing the fraction to lowest terms is precisely what <span class="mark-a">makes “both even” a contradiction; without it, “both even” would contradict nothing</span>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">counterexample 的定義段連用三個比喻（promises／clears some bar／knock it down）。改後用的是本書自己的術語。 <span class="loc">§B.2</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">A statement of the form <em>for all</em> <span class="mark-b">promises that every object in its range clears some bar</span>. <span class="mark-b">To knock it down</span>, you need just one object that does not — a <em>counterexample</em>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">A statement of the form <em>for all</em> <span class="mark-a">claims that every object in its range satisfies some condition</span>. <span class="mark-a">To disprove it</span>, you need just one object that does not — a <em>counterexample</em>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">「arbitrary」的規矩本來只用「你掙到了嗎」暗示。改後<strong>把條件寫出來</strong>（不得使用 x 的任何額外性質），並拆成兩句。 <span class="loc">§B.6</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">The last line is not <span class="mark-b">a flourish</span> either. It is the step that converts one <span class="mark-b">anonymous</span> case into all of them, and it is worth writing precisely because it reminds you to check that <span class="mark-b">you earned it</span>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">The last line is not <span class="mark-a">decoration</span> either. It is the step that converts one <span class="mark-a">arbitrary</span> case into all of them. It is worth writing precisely because it reminds you to check that <span class="mark-a">the argument used nothing about x beyond its membership in S and the hypothesis P(x)</span>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">「希望論證在寫到頁底前抵達」是雙重擬人＋慣用語，而真正要講的規矩（第一行不能用第十行才成立的事）藏在後半。 <span class="loc">§B.6 Strategy B.6 白話欄</span></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">…the usual alternative is to start writing at the top of the page and <span class="mark-b">hope the argument arrives before the bottom, which is how proofs pick up their worst habit, helping themselves</span> at line one to what is <span class="mark-b">not earned</span> until line ten.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">…the usual alternative is to start writing at the top of the page <span class="mark-a">without a plan, which often leads to using</span> at line one a fact that is <span class="mark-a">only established at line ten</span>.</span></div>
+</div>
+
+<h3>⑤ 行話與術語漂移</h3>
+
+<table>
+  <tr><th style="width:26%">原用語</th><th style="width:26%">改後</th><th>為什麼</th></tr>
+  <tr><td class="en"><em>The tell:</em>（×5：§B.2 三處、§B.4、§B.6）</td><td class="en"><em>The clue:</em>／<em>To tell them apart, look at…</em></td><td>撲克行話（破綻）。原本想用 <em>The sign</em>，但會跟數學的 <em>sign of f′(x)</em> 撞詞，故用 clue。</td></tr>
+  <tr><td class="en"><em>warrant</em>（×4：§B.5 兩處、§B.6 兩處）</td><td class="en"><em>justification</em></td><td>論證學術語、低頻。全書四處一起換，維持一致。</td></tr>
+  <tr><td class="en"><em>denial / deny</em> 與 <em>negation / negate</em> 交替</td><td class="en">術語位一律 <em>negation / negate</em></td><td>同一個概念兩個名字（elegant variation），對 EFL 讀者是額外負擔——這節的主題就是這個操作。</td></tr>
+  <tr><td class="en"><em>untenable</em>／<em>relentlessly</em>／<em>stubborn ε</em>／<em>a head start</em>／<em>in two strokes</em>／<em>a wall of text</em>／<em>conjured from thin air</em>／<em>carved into thirds</em>／<em>no direct grip</em>／<em>a close cousin</em>／<em>the odds are strong</em>／<em>Demolishes; never builds.</em></td><td class="en"><em>cannot hold</em>／<em>appears so often</em>／<em>one fixed ε</em>／<em>an advantage</em>／<em>in two steps</em>／<em>a long proof</em>／<em>seems to come from nowhere</em>／<em>split into thirds</em>／<em>cannot bound … directly</em>／<em>a close variation</em>／<em>it is very likely</em>／<em>It disproves; it never proves.</em></td><td>低頻詞、比喻、電報體，逐一換成中性直白詞（各 1 處）。</td></tr>
+</table>
+
+<h2>§2 哪些<strong>沒有</strong>改（同樣重要）</h2>
+<p>條款的設計是「數學內容必須字面化」，不是「禁用一切修辭」。以下明確保留，因為它們旁邊都已有字面說明，且真的幫助理解：</p>
+<div class="card">
+  <ul class="tight">
+    <li><strong>定理＝承諾</strong>：<em>“A theorem is a promise, and like any promise it comes with conditions.”</em>——§B.6 教「什麼會讓定理毀約」時靠這個框架承重。</li>
+    <li><strong>骨牌</strong>：<em>“The dominoes are standing in a row … and nobody ever pushed the first.”</em>——前一句已字面寫出「沒有 base case」。</li>
+    <li><strong>ε-δ 攻防賽</strong>（挑戰者出 ε、你回 δ）：教學正典，且當場算了一整輪 δ = ε/2。</li>
+    <li><strong>單行道</strong>：<em>“An implication P ⇒ Q is a one-way street.”</em>——同段完整展開。</li>
+    <li><strong>collision（矛盾）</strong>：Codex 特別指出我原本想改的 <em>“collides with nothing”</em> 屬於已定錨的家族，改掉反而破壞一致性——<strong>我接受這條撤回</strong>。</li>
+    <li><em>“Discovery is allowed to be a mess; presentation is not.”</em>、<em>“Two well-chosen cases beat three thousand well-checked ones.”</em>、<em>“it is a promise to write one”</em>——平實不等於乾癟的示範。</li>
+  </ul>
+</div>
+
+<h2>§3 這輪改了哪些檔</h2>
+<table>
+  <tr><th style="width:44%">檔案</th><th>做了什麼</th></tr>
+  <tr><td><code>CONTENT_SPEC.md</code>（升 v3.5）</td><td>§3 新增〈平實英文條款〉：MUST（數學內容字面化、關鍵位置直白詞、同概念同措辭、≥35 詞句人工判定）／SHOULD（平均句長 18–22 為監測值、中性動詞、EFL 高風險功能詞）／FLAG（cleft 等句式只是線索）＋暖句四條件測試；§17 補 changelog。</td></tr>
+  <tr><td><code>handout/html/_audit/PROSE-AUDIT-RUBRIC.md</code></td><td>三維度→四維度，新增 <strong>R 維度</strong>（R1 可推測性／R2 字面傳達／R3 指稱一致）＋擋稿線＋「一節 advisory 累積觸發節級複查」；V1 加邊界（暖＝導航清晰，不得建議加隱喻）。</td></tr>
+  <tr><td><code>.claude/agents/handout-prose-audit.md</code>、<code>CONTENT_QUICKSTART.md</code>、<code>PROSE-AUDIT-PROMPT.template.md</code></td><td>同步 R 維度與條款摘要（稽核代理、日常速查、Codex gate-2 模板）。</td></tr>
+  <tr><td><code>handout/html/fragments/appB/sec-b-1…6.html</code></td><td>58 個改點（本報告即其對照）；<code>build.py appB</code> 已重建 standalone。</td></tr>
+  <tr><td>四份紀錄報告</td><td><code>REVIEW-plain-register-research.html</code>（研究＋Codex 覆核整合）、<code>REPORT-plain-register-codex-gate2-raw.md</code>（覆核 raw）、<code>REVIEW-appB-plain-pilot.html</code>（走查原稿）、<code>REVIEW-appB-plain-applied.html</code>（執行總帳＋驗收）。</td></tr>
+</table>
+
+<h2>§4 驗收狀態</h2>
+<table>
+  <tr><th style="width:34%">項目</th><th style="width:14%">狀態</th><th>說明</th></tr>
+  <tr><td>數學／編號／cross-ref 未動</td><td><span class="tag">通過</span></td><td>全部是散文詞句層；四個涉及量詞語義的改寫經 Codex＋我雙重逐句核對。</td></tr>
+  <tr><td>版面沒炸</td><td><span class="tag">通過</span></td><td>六節句數不變（B.6 +1 為刻意拆句）、字數 +23（0.3%）、重建後 35 頁 A4 截圖目檢正常。</td></tr>
+  <tr><td>慣用語／擬人密度</td><td><span class="tag">通過</span></td><td>grep 收尾掃描：家族詞清零（白名單除外），另補修 2 個漏點。</td></tr>
+  <tr><td>句長</td><td>留第二輪</td><td>B.3 平均 29.2、B.1 25.6（目標 18–22），全附錄 ≥35 詞句約 55 句。依 Codex 建議<strong>分輪處理</strong>，讓你這次的盲讀單純反映「用字」變因。</td></tr>
+  <tr><td><strong>讀起來像不像正常課本</strong></td><td><strong>待你判斷</strong></td><td>這是 pilot 的主判準——開 <code>handout/html/standalone/appendixB-print-standalone.html</code> 讀改後版。</td></tr>
+</table>
+
+<p class="foot">產出：Claude（2026-07-25）。句對由 <code>git show HEAD:&lt;file&gt;</code> 與工作區版本逐句 difflib 比對抽出，非人工重建。裁決鏈：研究報告 → Codex gate-2 覆核 → 規格 A＋D → pilot 走查 → Codex 逐項裁決（22 ADOPT／18 MODIFY／1 REJECT＋7 掃漏）→ Claude 定奪 → 執行。尚未 commit。</p>
+
+</body>
+</html>

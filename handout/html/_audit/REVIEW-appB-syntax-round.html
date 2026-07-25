@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Appendix B 第二輪：句法黏接 — 執行與驗算</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2df; --bg:#fbfbf9; --card:#fff;
+    --good:#1f7a44; --good-bg:#f0f8f3; --good-line:#b8ddc7; --bad:#a3232a; --bad-bg:#fdf4f4;
+    --bad-line:#e8c9c9; --warn:#9a5b00; --warn-bg:#fdf3e3; --accent:#2d5a8a; --code-bg:#f4f4f2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Inter","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.6; max-width:900px; margin:0 auto; padding:2.4rem 1.5rem 5rem; }
+  h1 { font-size:1.48rem; line-height:1.3; margin:0 0 .3rem; }
+  .sub { color:var(--muted); font-size:.93rem; margin:0 0 1.6rem; }
+  h2 { font-size:1.15rem; margin:2.4rem 0 .7rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+  h3 { font-size:.98rem; margin:1.5rem 0 .45rem; color:var(--accent); }
+  code { font-family:Consolas,monospace; font-size:.87em; background:var(--code-bg); padding:.08em .35em; border-radius:3px; }
+  table { border-collapse:collapse; width:100%; margin:.7rem 0 1rem; font-size:.88rem; }
+  th,td { border:1px solid var(--line); padding:.4rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f0f0ee; font-weight:600; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.9rem 1.15rem; margin:1rem 0; }
+  .card.warn { background:var(--warn-bg); border-color:#e8d3a8; }
+  .pair { margin:.85rem 0 1.25rem; }
+  .pair .why { font-size:.85rem; color:var(--muted); margin:0 0 .35rem; }
+  .pair .why b { color:var(--ink); font-weight:600; }
+  .row { display:flex; gap:.55rem; padding:.45rem .6rem; border-radius:5px; margin-bottom:.3rem; }
+  .row .lbl { flex:0 0 3.6rem; font-size:.72rem; font-weight:700; padding-top:.18rem; }
+  .row .txt { flex:1; font-size:.94rem; line-height:1.55; }
+  .before { background:var(--bad-bg); border-left:3px solid var(--bad-line); }
+  .before .lbl { color:var(--bad); }
+  .after { background:var(--good-bg); border-left:3px solid var(--good-line); }
+  .after .lbl { color:var(--good); }
+  .mark-a { background:#cfe9da; padding:0 .1em; border-radius:2px; }
+  .mark-b { background:#f7d9d9; padding:0 .1em; border-radius:2px; }
+  .up { color:var(--good); font-weight:700; }
+  .down { color:var(--bad); font-weight:700; }
+  .flat { color:var(--muted); }
+  ul.tight { margin:.3rem 0 .7rem; padding-left:1.3rem; }
+  ul.tight li { margin:.2rem 0; }
+  .small { font-size:.85rem; color:var(--muted); }
+  .foot { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.84rem; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>Appendix B 第二輪：句法黏接</h1>
+<p class="sub">緣起：第三方評估指出「剩餘障礙是多想法黏接的長句，不是句子太長」· 2026-07-25 · 20 個改點（15 拆句＋3 分號回收＋1 漏改補修＋1 術語標記）· 規則同步升級</p>
+
+<div class="card">
+  <strong>一句話：</strong>他的診斷成立，我照做了——<strong>黏接長句 70 → 56（−20%）、分號 64 → 59、破折號 24 → 20、冒號接子句 140 → 129、超過 40 詞的句子 5% → 3%，句長中位數維持 17 不動</strong>。同時認兩件事：<span class="hl">上一輪我把慣用語換成了 +4 個分號</span>（他抓到了，已回收）；<span class="hl">上一輪有一條裁決項（Ex B.8 的 <em>√2 escapes</em>）漏改</span>，而我當時宣稱「全數處置完畢」——那句話不準確，現已補修並更正紀錄。
+</div>
+
+<h2>§1 先驗算他的數字（我自己重跑）</h2>
+
+<table>
+  <tr><th>指標</th><th class="num">HEAD 原稿</th><th class="num">第一輪後</th><th class="num">現在</th><th>判讀</th></tr>
+  <tr><td>分號</td><td class="num">64</td><td class="num">68</td><td class="num">59</td><td><span class="up">已修正</span>——他抓到的 +4 是真的，我造的；本輪淨減 5</td></tr>
+  <tr><td>破折號插入</td><td class="num">24</td><td class="num">24</td><td class="num">20</td><td><span class="up">−4</span></td></tr>
+  <tr><td>冒號接子句</td><td class="num">140</td><td class="num">138</td><td class="num">129</td><td><span class="up">−11</span></td></tr>
+  <tr><td><strong>黏接長句</strong>（≥30 詞＋黏接標點）</td><td class="num">70</td><td class="num">70</td><td class="num"><strong>56</strong></td><td><span class="up">−20%</span>，本輪的主目標</td></tr>
+  <tr><td>&gt;40 詞句占比</td><td class="num">5%</td><td class="num">5%</td><td class="num">3%</td><td><span class="up">改善</span></td></tr>
+  <tr><td>平均句長</td><td class="num">19.4</td><td class="num">19.4</td><td class="num">18.6</td><td>小降（非目標）</td></tr>
+  <tr><td>句長中位數</td><td class="num">17</td><td class="num">17</td><td class="num">17</td><td><span class="flat">刻意不動</span>——他說「健康，勿動」，同意</td></tr>
+  <tr><td>節奏：連續 3 句長度相近的窗口</td><td class="num">31</td><td class="num">31</td><td class="num">37</td><td><span class="down">+6（成本）</span>，見 §4 誠實記帳</td></tr>
+</table>
+
+<p class="small">量測法與他略有差異（我把行內數學算入詞數），但趨勢與量級一致：他量分號 65→69、破折號 24→24，我量 64→68、24→24 ——<strong>他的量測站得住</strong>。他說的「53 句黏接」我的掃描器抓到 66，其中約 6 個是行內不等式 <code>&lt;</code> 被正規化吃掉造成的斷句假影，所以<strong>他的數字更接近真實</strong>。</p>
+
+<h2>§2 他報告中三處我不採納（附理由）</h2>
+<div class="card warn">
+<ol class="tight">
+  <li><strong>「改寫版擴充了原稿沒有的極限與 ε-δ 內容」——不成立。</strong>這輪零內容新增；§B.3 的 ε-δ 攻防賽與 δ=ε/2 的實算是 2026-07-17 就在的（該次改動有完整 authoring 紀錄）。他這條的比較基準不是我編輯的版本。（但他的量化欄位與我重算吻合，所以語料本身是對的，僅此結論有誤。）</li>
+  <li><strong><code>warrant</code> 被列進「應保留並首見標記」的術語清單——已過時。</strong>這輪 4 處全數換成 <code>justification</code> 了。他清單裡的 <code>kernel</code>、<code>tolerance</code>、<code>witness</code>、<code>arbitrary</code> 才是仍在的術語（處置見 §3 末）。</li>
+  <li><strong>他的示範改寫有教學錯誤，不可照抄。</strong>他寫 <em>The hypothesis is hidden inside the word "divisible"</em> ——但 hypothesis 藏在「divisible by 6」這個<strong>對主語的描述</strong>裡（<em>Every integer divisible by 6</em>），不是藏在 divisible 這個字裡；他的版本還把 \(n\) 丟了。<strong>結構建議採納、示範句重寫</strong>（見 §3 第一則）。</li>
+</ol>
+</div>
+
+<h2>§3 改動：拆的是「黏接」，不是「長度」</h2>
+<p class="small">全部 66 個候選中只拆 15 句。<strong>沒拆的理由</strong>：單一複雜想法的長句一律保留（他自己的判準）；平行列舉（Definition B.1 的兩個 bullet、B.4 的四個範例）保留；<strong>fragment 註解裡有明文 WORDING CONSTRAINT 的兩處保留</strong>（§B.2 Strategy bullet 2 的冒號是為避免 garden-path 而刻意選的；§B.2 「And a split can sometimes be avoided altogether:」屬該節 announce-then-deliver 節奏）；斷句假影 6 處不算。</p>
+
+<h3>他點名的旗艦句（56 詞 → 3 句）</h3>
+<div class="pair">
+  <p class="why">一個冒號把「同義改寫」「every 的作用」「hypothesis 藏在哪」三件事黏在一起，還套了引號中的引號。</p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">“Every integer divisible by 6 is divisible by 3” is the same claim as “if an integer <em>n</em> is divisible by 6, then <em>n</em> is divisible by 3” written in plainer words<span class="mark-b">:</span> the word <em>every</em> carries the unstated “for all”, <span class="mark-b">while</span> the hypothesis (that <em>n</em> is divisible by 6) hides inside the description of the subject.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">“Every integer divisible by 6 is divisible by 3” is the same claim as “if an integer <em>n</em> is divisible by 6, then <em>n</em> is divisible by 3”, written in plainer words<span class="mark-a">.</span> The word <em>every</em> carries the unstated “for all”<span class="mark-a">.</span> The hypothesis is hidden as well: <span class="mark-a">it sits inside the phrase that describes the subject, <em>every integer divisible by 6</em></span>.</span></div>
+  <p class="small">19＋11＋18 詞。第三句我改用「藏在描述主語的片語裡」並把該片語直接展示出來——比他的 <em>inside the word "divisible"</em> 準確，也比原文的抽象說法可檢查。</p>
+</div>
+
+<h3>其餘代表例</h3>
+
+<div class="pair">
+  <p class="why">冒號把「主張」與「三段推理鏈」黏起來。 <b>§B.1（48 詞 → 3 句）</b></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">The contrapositive says the very same thing as the original, read from the other end<span class="mark-b">:</span> if <em>Q</em> must hold whenever <em>P</em> does, then a failure of <em>Q</em> leaves no room for <em>P</em><span class="mark-b">, so</span> “if <em>P</em> then <em>Q</em>” and “if not <em>Q</em> then not <em>P</em>” stand or fall together.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">The contrapositive says the very same thing as the original, read from the other end<span class="mark-a">.</span> If <em>Q</em> must hold whenever <em>P</em> does, then a failure of <em>Q</em> leaves no room for <em>P</em><span class="mark-a">. So</span> “if <em>P</em> then <em>Q</em>” and “if not <em>Q</em> then not <em>P</em>” stand or fall together.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">分號＋三個子句，把「規則要求什麼」「現況如何」「英語習慣造成什麼」黏成一句。 <b>§B.3（45 詞 → 3 句）</b></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">Strategy B.1 asks for them explicit and in order<span class="mark-b">; explicit they already are, but</span> English likes to trail a <em>for all</em> behind the clause it governs, so the last of the three has ended up sitting behind the kernel instead of in front of it.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">Strategy B.1 asks for them explicit and in order<span class="mark-a">. Explicit they already are. But</span> English likes to trail a <em>for all</em> behind the clause it governs, so the last of the three has ended up sitting behind the kernel instead of in front of it.</span></div>
+  <p class="small">9＋5＋33 詞——刻意留下「長—極短—長」的落差，避免拍平節奏。</p>
+</div>
+
+<div class="pair">
+  <p class="why">冒號黏接「做法」與「它換到了什麼」。 <b>§B.4 輔助函數（56 詞 → 2 句）</b></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">…a proof will often introduce <em>h = f − g</em> with no visible motivation and argue about <em>h</em> alone<span class="mark-b">:</span> the two-object question “is <em>f</em> always at least <em>g</em>?” becomes the one-object question “is <em>h</em> always at least 0?”, which some fact already in hand can attack.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">…a proof will often introduce <em>h = f − g</em> with no visible motivation and argue about <em>h</em> alone<span class="mark-a">.</span> The two-object question “is <em>f</em> always at least <em>g</em>?” becomes the one-object question “is <em>h</em> always at least 0?”, which some fact already in hand can attack.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">「條件 → 機制 → 結論」三件事一句話。 <b>§B.4 WLOG（46 詞 → 3 句）</b></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">This is sound exactly when the cases are interchangeable by symmetry<span class="mark-b">:</span> if instead <em>a &gt; b</em>, swapping the names of <em>a</em> and <em>b</em> turns the situation into the one already handled<span class="mark-b">, and the claim, which says the same thing either way, is unchanged by the swap</span>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">This is sound exactly when the cases are interchangeable by symmetry<span class="mark-a">.</span> If instead <em>a &gt; b</em>, swapping the names of <em>a</em> and <em>b</em> turns the situation into the one already handled<span class="mark-a">. The claim says the same thing either way, so the swap leaves it unchanged.</span></span></div>
+</div>
+
+<div class="pair">
+  <p class="why">冒號＋兩個破折號＝一句四段。 <b>§B.6（47 詞 → 2 句，並清掉 2 個破折號）</b></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">Nearly every beginner’s proof confuses the two in one direction or the other<span class="mark-b">:</span> either the page becomes a diary of the search, or <span class="mark-b">—</span> far more often <span class="mark-b">—</span> the search is so vivid in the author’s mind that half of it never reaches the page at all.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">Nearly every beginner’s proof confuses the two in one direction or the other<span class="mark-a">.</span> Either the page becomes a diary of the search, or<span class="mark-a">,</span> far more often<span class="mark-a">,</span> the search is so vivid in the author’s mind that half of it never reaches the page at all.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">兩個記號說明（<em>S / P(x) / Q(x)</em> 與 <em>x ∈ S</em>）被分號黏成一句 49 詞——純記號交代，最適合拆。 <b>§B.6</b></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">Here <em>S</em> is whatever collection the claim ranges over (the integers, say) while <em>P(x)</em> and <em>Q(x)</em> are the <em>P</em> and <em>Q</em> of §B.1, now written with the object they speak about<span class="mark-b">; and <em>x ∈ S</em>, in the skeleton below, is</span> the usual shorthand for <em>x is in S</em>.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">Here <em>S</em> is whatever collection the claim ranges over (the integers, say), while <em>P(x)</em> and <em>Q(x)</em> are the <em>P</em> and <em>Q</em> of §B.1, now written with the object they speak about<span class="mark-a">. In the skeleton below, <em>x ∈ S</em> is</span> the usual shorthand for <em>x is in S</em>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why">分號＋冒號串三件事（頻率、機制、判斷）。 <b>§B.6 Caution（49 詞 → 3 句）</b></p>
+  <div class="row before"><span class="lbl">改前</span><span class="txt">It seldom looks as blunt as Example B.9<span class="mark-b">;</span> more often it slips in through notation, as when a proof about an unspecified integer <em>n</em> opens “let <em>n = 2k</em>”<span class="mark-b">:</span> a perfectly good line once you know <em>n</em> is even, and a fatal one while that is still the conclusion.</span></div>
+  <div class="row after"><span class="lbl">改後</span><span class="txt">It seldom looks as blunt as Example B.9<span class="mark-a">.</span> More often it slips in through notation, as when a proof about an unspecified integer <em>n</em> opens “let <em>n = 2k</em>”<span class="mark-a">. That is</span> a perfectly good line once you know <em>n</em> is even, and a fatal one while that is still the conclusion.</span></div>
+</div>
+
+<h3>回收上一輪自己造的分號（他抓到的 +4）</h3>
+<table>
+  <tr><th style="width:50%">第一輪（我把慣用語換成分號）</th><th>本輪回收</th></tr>
+  <tr><td>…a separate fact to prove<span class="mark-b">;</span> it does not follow from the original statement.</td><td>…a separate fact to prove<span class="mark-a">.</span> It does not follow from the original statement.</td></tr>
+  <tr><td>You may have found the witness by trial, by symmetry, or by luck<span class="mark-b">;</span> none of that needs to appear.</td><td>You may have found the witness by trial, by symmetry, or by luck<span class="mark-a">.</span> None of that needs to appear.</td></tr>
+  <tr><td>…not in <em>how</em>: you never argued about the original claim itself<span class="mark-b">;</span> you proved an equivalent sentence…</td><td>…not in <em>how</em><span class="mark-a">.</span> You never argued about the original claim itself<span class="mark-a">.</span> You proved an equivalent sentence…</td></tr>
+</table>
+
+<h3>兩則補修</h3>
+<ul class="tight">
+  <li><strong>上一輪漏改（Ex B.8 題幹）</strong>：<em>the notion that Proposition B.2 showed √2 <span class="mark-b">escapes</span></em> → <em>the <span class="mark-a">property</span> that Proposition B.2 showed √2 <span class="mark-a">does not have</span></em>。這條 Codex 判 ADOPT、我也標為「最接近 blocking」，卻在執行時漏掉；本輪驗算時自己抓到。<code>REVIEW-appB-plain-applied.html</code> 的「46 項全數處置完畢」已加註更正。</li>
+  <li><strong>術語首見標記</strong>（他的建議④）：查證後 <code>witness</code>／<code>arbitrary</code>／<code>kernel</code> 三者首見<strong>已</strong>斜體＋就地釋義；只有 <code>tolerance</code> 有釋義缺標記，已補 <code>&lt;em&gt;</code>。此項因此不需要專門一輪。</li>
+</ul>
+
+<h2>§4 誠實記帳：這輪的成本</h2>
+<div class="card">
+  <strong>節奏指標退了一點：</strong>「連續 3 句長度相近（±3 詞）」的窗口數 31 → <strong>37</strong>（+6，占全部窗口約 6%）。拆句必然在拆點附近產生相近長度的句子，這正是他警告、也是我剛寫進 spec 的反向風險。我判定<strong>可接受</strong>：增量集中在拆點、句長中位數與長短落差整體仍在（我在拆的時候刻意配了極短句，例如 §B.3 那組的「9＋5＋33」）。若你盲讀時覺得某處變得像節拍器，指出來我把那處合回去。
+  <br><br>
+  <strong>沒做的：</strong>符號密集段落（§B.3 現在 &gt;25 詞句仍占 46%，主要是記號 token 而非散文黏接）——這已按他的建議③寫成 spec 條款「另立標準檢查」，實作等你看過本輪效果再排。
+</div>
+
+<h2>§5 規則同步升級（這是他這份分析最大的貢獻）</h2>
+<table>
+  <tr><th style="width:30%">檔案</th><th>改了什麼</th></tr>
+  <tr><td><code>CONTENT_SPEC.md</code> §3</td><td>MUST 從「≥35 詞須人工判定」升級為 <strong>「一句承載一個完整想法」</strong>：觸發器＝<strong>≥30 詞且含黏接標點</strong>（冒號接子句／分號／破折號），判準＝想法數；明文 <strong>MUST NOT 設硬性句長上限、MUST NOT 機械拆句</strong>（句長過度均勻本身是 AI 味）。SHOULD 新增三條：18–22 為<strong>監測值非門檻</strong>＋&gt;25 詞占比宜 &lt;10%、<strong>避免連續三句長度相近</strong>、<strong>改寫慣用語時不得用分號把兩個想法黏回一句</strong>（附本輪實測教訓）、<strong>符號密集段落另立標準</strong>。</td></tr>
+  <tr><td><code>PROSE-AUDIT-RUBRIC.md</code> F4</td><td>新增「黏接句判準」：判準是想法數不是長度——<strong>單一複雜想法的長句不得因長度報 finding</strong>；反向護欄（不得造出連續三句長度相近、不得用分號回黏）。</td></tr>
+</table>
+
+<h2>§6 現況與下一步</h2>
+<ul class="tight">
+  <li><strong>已完成</strong>：① 裸露慣用語（第一輪 58 改點）② 多想法黏接（本輪 20 改點）③ 術語首見標記（查證後只需 1 處補修）。</li>
+  <li><strong>驗收</strong>：<code>build.py appB</code> 已重建、仍 35 頁 A4、截圖目檢正常；數學／編號／cross-ref 全程未動（本輪純斷句與標點）。</li>
+  <li><strong>待你判斷</strong>：開 <code>handout/html/standalone/appendixB-print-standalone.html</code> 盲讀。兩輪的差別現在應該很明顯——第一輪治「看不懂的詞」，這輪治「一口氣塞太多」。</li>
+  <li><strong>之後</strong>：符號密集段落（§B.3）另立標準實作 → 跑一節真正的正文（他這條但書完全正確，也與 Codex 的 Q5 一致：<strong>不要用附錄 B 單一樣本把規範定版</strong>）→ 再收斂成完整寫作規範 → 舊章分批回填。</li>
+</ul>
+
+<p class="foot">產出：Claude（2026-07-25）。句對與統計皆由 <code>git show HEAD:&lt;file&gt;</code> 對工作區版本程式化比對而得（腳本存 scratchpad），非人工重建。本輪緣起：使用者提供的第三方評估報告；其診斷採納、三處事實／示範錯誤已於 §2 更正。尚未 commit。</p>
+
+</body>
+</html>
