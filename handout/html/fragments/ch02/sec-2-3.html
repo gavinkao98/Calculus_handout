@@ -19,7 +19,7 @@
   </header>
 
   <!-- expansion:intuition — motivation: §2.2 assumed the limit always exists; it need not -->
-  <p>Throughout §2.2 we freely computed \(f'(x)\) by taking the limit of the difference quotient — but we never stopped to ask whether that limit <em>exists</em>. For the polynomial, root, and rational functions we worked with, it always did, and we might be tempted to believe that every function has a derivative at every point of its domain. This section shows that the temptation is wrong: at certain points the limit can fail, and recognizing those failures is an essential part of understanding what the derivative means. Along the way we prove the first theorem of the chapter — differentiability guarantees continuity — and extend the derivative idea to second, third, and higher orders.</p>
+  <p>Throughout §2.2 we freely computed \(f'(x)\) by taking the limit of the difference quotient, but we never stopped to ask whether that limit <em>exists</em>. For the polynomial, root, and rational functions we worked with, it always did, and we might be tempted to believe that every function has a derivative at every point of its domain. This section shows that the temptation is wrong: at certain points the limit can fail, and recognizing those failures is an essential part of understanding what the derivative means. Along the way we prove the first theorem of the chapter, which says that differentiability guarantees continuity. We also extend the derivative idea to second, third, and higher orders.</p>
 
   <h3 class="subsec-head">When does the derivative exist?</h3>
 
@@ -29,11 +29,11 @@
       <p>A function \(f\) is <em>differentiable at \(a\)</em> if the limit
       \[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} \]
       exists (as a finite number). We say \(f\) is <em>differentiable on an open interval \((a, b)\)</em> if it is differentiable at every point of that interval.</p>
-      <p class="informal">Informally, differentiability at a point means the graph has a single, well-defined tangent direction there — no sharp corner, no vertical spike, and no break.</p>
+      <p class="informal">Informally, differentiability at a point means the graph has a single, well-defined tangent direction there, with no sharp corner, no vertical spike, and no break.</p>
     </div>
   </section>
 
-  <p>The definition asks exactly what we have been computing: can the difference quotient settle on a single value as \(h \to 0\)? When it can, the function is differentiable and the derivative equals that value. When it cannot — because the left-hand and right-hand limits disagree, or because the quotient blows up — the function is <em>not</em> differentiable at that point. The simplest failure mode is a corner.</p>
+  <p>The definition requires exactly what we have been computing: does the difference quotient approach one finite value as \(h \to 0\)? When it can, the function is differentiable and the derivative equals that value. When it cannot, the function is <em>not</em> differentiable at that point. This can happen when the left-hand and right-hand limits disagree or when the quotient grows without bound. The simplest failure mode is a corner.</p>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -61,7 +61,7 @@
     </section>
   </div>
 
-  <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.5). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line — exactly the geometric meaning of non-differentiability.</p>
+  <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.5). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line. That is exactly the geometric meaning of non-differentiability.</p>
 
   <!-- expansion:example — a second failure mode distinct from the corner: a vertical tangent, where the difference quotient is unbounded [source: CLP-1 §2.2 prob_s2.2 vertical-tangent remark + standard textbook example; solution authored] -->
   <div class="workedexample">
@@ -76,10 +76,10 @@
       <div class="env-body">
         <p>We form the difference quotient at \(a = 0\):</p>
         <p>\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{h^{1/3} - 0}{h} \;=\; \frac{1}{h^{2/3}}. \]</p>
-        <p>Since \(h^{2/3} = \bigl(h^{1/3}\bigr)^{2} > 0\) for all \(h \ne 0\) — a cube root squared is positive whatever the sign of \(h\) — the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
+        <p>For every \(h \ne 0\), \(h^{2/3} = \bigl(h^{1/3}\bigr)^{2} > 0\), because the square of a nonzero cube root is positive whatever the sign of \(h\). Therefore the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
         <p>\[ \lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty. \]</p>
         <p>The limit does not exist as a <em>finite</em> number, so by Definition 2.3 the function is not differentiable at \(x = 0\).</p>
-        <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)); here both one-sided limits agree — they both tend to \(+\infty\) — so there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative demands a finite limit, so differentiability fails here for a different reason than at a corner.</p>
+        <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)). Here both one-sided limits tend to \(+\infty\), so they agree and there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative requires a finite limit, so differentiability fails here for a different reason than at a corner.</p>
 
         <!-- expansion:figure — ∛x vertical tangent: the non-corner differentiability failure of Example 2.12 (figure-opportunity F-2.3-A) [pass: enrichment] -->
         <figure class="figure" data-fig="cbrt-vertical-tangent">
@@ -119,7 +119,7 @@
   </section>
 
   <!-- expansion:intuition — the picture behind Theorem 2.1: a single tangent direction leaves no room to jump [pass: enrichment] -->
-  <p>The proof is short, but the picture behind it is worth keeping. To be differentiable at \(a\) is to have one definite tangent direction there, and a curve smooth enough to settle on a single tangent has no room to jump — so differentiability forces continuity. The converse fails because continuity asks far less: it only forbids breaks, and an unbroken curve is still free to have a sharp corner, where no single tangent direction exists.</p>
+  <p>The proof is short, but the picture behind it is worth keeping. If \(f\) is differentiable at \(a\), its difference quotient approaches one finite value, so the tangent line has a finite slope. A jump or any other discontinuity prevents such a finite limit, so differentiability implies continuity. The converse fails because continuity asks far less: it only forbids breaks, and an unbroken curve is still free to have a sharp corner, where no single tangent direction exists.</p>
 
   <figure class="figure" id="fig-diff-cont">
     <div class="figure-art">
@@ -157,10 +157,10 @@
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
         <p>Away from \(x = 2\) each piece is a polynomial and therefore differentiable, so the only point in question is \(x = 2\).</p>
-        <p><em>Step 1 — Continuity.</em> By Theorem 2.1, differentiability at \(x = 2\) requires continuity there, which forces the two pieces to meet:</p>
+        <p><em>Step 1: Continuity.</em> By Theorem 2.1, differentiability at \(x = 2\) requires continuity there, which forces the two pieces to meet:</p>
         <p>\[ \lim_{x \to 2^{-}} f(x) = 2^{2} = 4 \quad\text{and}\quad \lim_{x \to 2^{+}} f(x) = 2a + b, \]</p>
         <p>so we need \(2a + b = 4\).</p>
-        <p><em>Step 2 — Matching derivatives.</em> The left-hand derivative at \(x = 2\) uses the \(x^{2}\) branch, whose derivative \(2x\) follows in one line from the difference quotient (the same technique used in §2.2 Example 2.6); it gives slope \(4\) at \(x = 2\). The right-hand derivative uses the \(ax + b\) branch, whose derivative is the constant \(a\) (the slope of that line). For the two-sided limit of the difference quotient to exist, these must agree:</p>
+        <p><em>Step 2: Matching derivatives.</em> The left-hand derivative at \(x = 2\) uses the \(x^{2}\) branch, whose derivative \(2x\) follows in one line from the difference quotient (the same technique used in §2.2 Example 2.6); it gives slope \(4\) at \(x = 2\). The right-hand derivative uses the \(ax + b\) branch, whose derivative is the constant \(a\) (the slope of that line). For the two-sided limit of the difference quotient to exist, these must agree:</p>
         <p>\[ a = 4. \]</p>
         <p>Substituting \(a = 4\) into \(2a + b = 4\) gives \(b = -4\). With \(a = 4\) and \(b = -4\) the two pieces meet smoothly, and the difference quotient at \(x = 2\) has a well-defined limit equal to \(4\).</p>
       </div>
@@ -169,14 +169,14 @@
 
   <h3 class="subsec-head">Higher derivatives</h3>
 
-  <p>If \(f\) is differentiable, then its derivative \(f'\) is itself a function — and we can ask whether \(f'\) is differentiable. When it is, the derivative of \(f'\) is called the <em>second derivative</em> of \(f\), written \(f''\). Repeating the process gives the third derivative \(f'''\), the fourth derivative \(f^{(4)}\), and in general the \(n\)-th derivative \(f^{(n)}\):</p>
+  <p>If \(f\) is differentiable, then its derivative \(f'\) is itself a function, and we can ask whether \(f'\) is differentiable. When it is, the derivative of \(f'\) is called the <em>second derivative</em> of \(f\), written \(f''\). Repeating the process gives the third derivative \(f'''\), the fourth derivative \(f^{(4)}\), and in general the \(n\)-th derivative \(f^{(n)}\):</p>
 
   <p>\[ f,\quad f',\quad f'',\quad f''',\quad f^{(4)},\quad \ldots,\quad f^{(n)},\quad \ldots \]</p>
 
   <p>Each is obtained by differentiating the previous one. By convention, \(f^{(0)} = f\) and \(f^{(1)} = f'\).</p>
 
   <!-- expansion:intuition — physical meaning of higher derivatives: acceleration and jerk [pass: enrichment] -->
-  <p>Higher derivatives are more than a formal exercise in differentiating again; the low-order ones carry concrete meaning. If \(s(t)\) is the position of a moving object, the first derivative \(s'(t)\) is its velocity and the second derivative \(s''(t)\) is its <em>acceleration</em> — the rate at which the velocity changes, felt as the push that presses you back when a car speeds up. The third derivative \(s'''(t)\), the rate of change of acceleration, is called the <em>jerk</em>; engineers keep it small when designing elevators and trains so that changes in acceleration come on smoothly rather than as an abrupt lurch.</p>
+  <p>Higher derivatives are more than a formal exercise in differentiating again; the low-order ones carry concrete meaning. If \(s(t)\) is the position of a moving object, the first derivative \(s'(t)\) is its velocity and the second derivative \(s''(t)\) is its <em>acceleration</em>, the rate at which the velocity changes. You feel it as the push that presses you back when a car speeds up. The third derivative \(s'''(t)\), the rate of change of acceleration, is called the <em>jerk</em>; engineers keep it small when designing elevators and trains so that changes in acceleration are gradual rather than abrupt.</p>
 
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.5</span><span class="env-name">Higher-derivative notation</span></p>
@@ -185,7 +185,7 @@
       <p>\[ f''(x) \;=\; \frac{d^{2}y}{dx^{2}} \;=\; \frac{d^{2}f}{dx^{2}} \;=\; \frac{d^{2}}{dx^{2}}\,f(x), \]</p>
       <p>and in general the \(n\)-th derivative is</p>
       <p>\[ f^{(n)}(x) \;=\; \frac{d^{n}y}{dx^{n}}. \]</p>
-      <p>The superscript in \(d^{n}y/dx^{n}\) is <em>not</em> an exponent — it records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesized form \(f^{(n)}\) avoids a forest of primes.</p>
+      <p>The superscript in \(d^{n}y/dx^{n}\) is <em>not</em> an exponent. It records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesized form \(f^{(n)}\) avoids a long row of primes.</p>
     </div>
   </section>
 
@@ -193,7 +193,7 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\), and — as Remark 2.5 noted — the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\). The \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\); it does not mean \(d(x^{2})\), where the \(x\) itself would be squared. And it is not an algebraic denominator to cancel or split.</p>
+      <p>Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\). As Remark 2.5 noted, the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\). The \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\); it does not mean \(d(x^{2})\), where the \(x\) itself would be squared. And it is not an algebraic denominator to cancel or split.</p>
     </div>
   </section>
 
@@ -214,7 +214,7 @@
                  &= \lim_{h \to 0} \frac{\bigl[2(x + h) + 4\bigr] - \bigl[2x + 4\bigr]}{h} \\[2pt]
                  &= \lim_{h \to 0} \frac{2h}{h} = 2.
         \end{aligned} \]</p>
-        <p>The second derivative is the constant \(2\) — the slope of the linear function \(f'(x) = 2x + 4\). Differentiating once more,</p>
+        <p>The second derivative is the constant \(2\), the slope of the linear function \(f'(x) = 2x + 4\). Differentiating once more,</p>
         <p>\[ f'''(x) = \lim_{h \to 0} \frac{f''(x + h) - f''(x)}{h} = \lim_{h \to 0} \frac{2 - 2}{h} = 0. \]</p>
         <p>Every subsequent derivative is likewise \(0\): once we reach a constant function, further differentiation produces zero. In Leibniz notation, \(\dfrac{d^{2}y}{dx^{2}} = 2\) and \(\dfrac{d^{3}y}{dx^{3}} = 0\).</p>
       </div>
@@ -222,6 +222,6 @@
   </div>
 
   <!-- expansion:summary — forward-ref to differentiation rules -->
-  <p>With the concepts of differentiability, its tie to continuity, and higher-order derivatives in hand, we turn in the next sections to the rules that make differentiation <em>efficient</em> — systematic shortcuts that bypass the limit computation entirely.</p>
+  <p>Now that we have introduced differentiability, its connection to continuity, and higher-order derivatives, we turn in the next sections to rules that make differentiation <em>efficient</em>. These rules are systematic shortcuts that avoid computing each derivative from the limit definition.</p>
 
 </article>
