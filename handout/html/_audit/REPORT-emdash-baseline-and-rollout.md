@@ -122,7 +122,7 @@
 | 5 | ch06（§6.1／§6.4／§6.5） | 55 | §6.2／§6.3 已平實化但 dash 未做；**§6.1 另有兩段 ≥150 詞的段落離群** |
 | 6 | appA | 49 | |
 | 7 | ch03 | 42 | |
-| ~~8~~ | **ch01** | ~~37~~ | ✅ **2026-07-25 完成**（提前做：RC 後第一個回填單元，用它驗證條款在手稿章不誤傷）。執行 41 條、9.3→2.1/1000、數學片段零差異、分頁 53 頁不變、§1.4 對照組零改動；Codex gate-2 ADOPT 34／MODIFY 7／REJECT 1。**Gate 7（LaTeX）四閘全綠、成品已產出**：`NAMES` 補 ch01、九條方言 mapping、33 panel 圖匯出；閘 1 編譯（44 頁／0 error／0 missing char／0 overfull）、閘 3 完整性（0 真落差）、閘 3b 表格（新增，18 格）、閘 3c 圖內文字（13 條 note）、閘 4 字形（489 字形輪廓）全 PASS。`dist/ch01/` ＝ chapter1.tex ＋ chapter1.pdf。**餘一項人眼閘待辦**：多 panel 圖併排超出版心（Figure 1.1 150.7mm、Figure 1.17 274mm）→ emitter 需 grid 版面。紀錄 [`../../latex/chapters/ch01/DIALECT-ch01.md`](../../latex/chapters/ch01/DIALECT-ch01.md) |
+| ~~8~~ | **ch01** | ~~37~~ | ✅ **2026-07-25 完成**（提前做：RC 後第一個回填單元，用它驗證條款在手稿章不誤傷）。執行 41 條、9.3→2.1/1000、數學片段零差異、分頁 53 頁不變、§1.4 對照組零改動；Codex gate-2 ADOPT 34／MODIFY 7／REJECT 1。**Gate 7（LaTeX）四閘全綠、成品已產出**：`NAMES` 補 ch01、九條方言 mapping、33 panel 圖匯出；閘 1 編譯（44 頁／0 error／0 missing char／0 overfull）、閘 3 完整性（0 真落差）、閘 3b 表格（新增，18 格）、閘 3c 圖內文字（13 條 note）、閘 4 字形（489 字形輪廓）全 PASS。`dist/ch01/` ＝ chapter1.tex ＋ chapter1.pdf。多 panel 圖的 grid 版面 2026-07-26 補上（Figure 1.1 併成一列、Figure 1.17 排 2×2，圖說不再孤立）。紀錄 [`../../latex/chapters/ch01/DIALECT-ch01.md`](../../latex/chapters/ch01/DIALECT-ch01.md) |
 | 9 | appC | 20 | N<1000 附近，報 raw 並與鄰近單元合併判定 |
 | 10 | appD | 14 | 舊表誤標「免」，實需處理 |
 

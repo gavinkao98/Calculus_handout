@@ -62,7 +62,7 @@
 2. **`fig-map` 嵌入無法驗的 Times New Roman（閘 4 抓到）。** 字形閘只驗 CFF 輪廓，`DAAAAA+TimesNewRomanPSMT`（CID TrueType）判「無法驗」而擋稿。**真因**：Figure 1.2 的標籤 `f⁻¹` 用了 **U+207B／U+00B9**（全書活散文各僅此一處），而圖內標籤實際走的是 `--ui`＝**Inter**，Inter 沒有這兩個字 → Chrome 逐字 fallback 到系統 Times。**注意這代表 HTML 預覽本來也是用系統字型在畫這兩個字**。**修法（改源頭）**：`f⁻¹` → `f<tspan dy="-5" font-size="0.72em">-1</tspan>`（`handout/html/fragments/ch01/sec-1-1.html:224`），視覺等價、字元全在 Inter 字集內。修後 `fig-map.pdf` 只含 Inter 子集，全 33 panel 無任何 Times。
    - 途中試過、**已撤除**的做法（留紀錄免得再走）：用 `kpsewhich` 找模板的 NewCM OTF、注入 `@font-face` 給 wrapper。(a) `file://` 的字型抓取被 Chrome 當跨 opaque origin 擋掉（加 `--allow-file-access-from-files` 仍 `document.fonts.check==false`）；(b) 改 data: URI 後 face 狀態仍 `error`；(c) 而且方向本來就錯——那些標籤是 Inter、不是 serif。三次實測後改回源頭修。
 
-### 5.2 閘 2（版面／人眼）待處理：多 panel 圖併排超出版心
+### 5.2 多 panel 圖的 grid 版面（2026-07-26 已修）
 
 `convert.py` 的 figure emitter 對多 panel 圖是 `\hspace{6mm}` 併排，沒有 grid／minipage 版面（DIALECT-ch03 §3 早列 `figure-art--triple`／`--grid → minipage` 為「ch03 用不到、rollout 逐章補」）。ch01 實測：
 
@@ -74,7 +74,28 @@
 | `epsilon-delta-dynamic` | 2 × 64.03mm | 134.1mm | 放得下 |
 | `recip-x-vs-x2` | 2 × 53.45mm | 112.9mm | 放得下 |
 
-LaTeX **不報 Overfull**（`figureblock` 的 center 允許在 `\hspace` 處斷行），所以閘 1 全綠也看不到——這是人眼閘的守備範圍。**下一步**（另一輪）：emitter 依合計寬度決定 grid（例如 `one-sided-infinite` 排 2×2、`hlt` 縮到 ≤72mm 或改 2 列），並在 kickoff §4.4 補這條 mapping。
+LaTeX **不報 Overfull**（`figureblock` 的 center 允許在 `\hspace` 處斷行），所以閘 1 全綠也看不到——這是人眼閘才抓得到的一類。
+
+**修法（`LatexEmitter.panel_grid`）：寬度驅動的貪婪填列。**
+
+1. 一列裝得下就繼續裝，裝不下換列；判斷時用 `MIN_GAP_MM = 2mm`（不是預設的 6mm），好讓「只差一點就滿」的列留在同一列。
+2. 該列的實際間距 `gap = min(6mm, 剩餘空間/(n−1))`——**縮間距、不縮圖**。縮圖會等比改變圖內標籤字級，是 DIALECT-ch03 §5 明文禁止的。
+3. **版心安全邊 `SAFETY_MM = 1mm`**：一列**剛好等於** 150mm 時 LaTeX 仍會折行（需嚴格小於，且 mm→pt 有捨入、圖檔另有 side bearing）。實測 Figure 1.1 排到 150.00mm 仍被折成兩列，扣掉 1mm 後（間距 4.3mm、列寬 149.0mm）才真正併成一列。
+4. **多列圖整塊（含圖說）包進 `minipage` 禁止分頁**：模板 `figureblock` 的 `\cb@needspace{6\baselineskip}` 是按單列圖估的，兩列圖高一倍——實測 Figure 1.17 的 2×2 落在 p.24 而圖說被推到 p.25（孤立圖說）。單列圖仍走原路徑。
+
+**單 panel 圖與「本來就放得下的整列」輸出逐字元不變**，故 ch03 的 golden 不動（`remainder-tangent` 2×65.62＋6＝137.2mm 仍是一列、間距仍 6mm；`test_convert.py` 的 figure 相關 5 項全綠）。
+
+修後實測（`convert.py ch01` → `make_dist.py ch01`）：
+
+| 圖 | 排法 | 間距 | 最寬列 | 版面 |
+|---|---|--:|--:|---|
+| `hlt`（Figure 1.1） | 1 列 × 2 格 | 4.3mm | 149.0mm | 兩格＋兩個 note＋圖說同在 p.3 |
+| `limit-same-near-a`（1.12） | 1 列 × 3 格 | 6mm | 140.6mm | 不變 |
+| `recip-x-vs-x2`（1.16） | 1 列 × 2 格 | 6mm | 112.9mm | 不變 |
+| `one-sided-infinite`（1.17） | **2 列 × 2 格** | 6mm | 134.1mm | 四格＋四個 note＋圖說同在 p.25 |
+| `epsilon-delta-dynamic`（1.25） | 1 列 × 2 格 | 6mm | 134.1mm | 不變 |
+
+各圖的排法與 HTML 的 `figure-art--pair`／`--triple`／`--grid` 恰好一致（pair→1列2格、triple→1列3格、grid→2列2格）。四閘仍全綠、0 Overfull hbox、43→44 頁（Figure 1.17 改為不可分頁後多佔一頁，換掉的是原本被拆圖與孤立圖說）。
 
 ## 6. 已知極限（誠實記錄）
 

@@ -900,6 +900,62 @@ class LatexEmitter:
         body = "\n".join("  " + r for r in rows)
         return f"\\begin{{datatable}}{{{spec}}}\n{body}\n\\end{{datatable}}"
 
+    GAP_MM = 6.0          # panel 間預設間距（沿用 pilot 的 \hspace{6mm}）
+    MIN_GAP_MM = 2.0      # 判斷「這一列裝不裝得下」時允許收到的最小間距
+    # 版心安全邊：一列**剛好等於**版心時 LaTeX 仍會折行（需嚴格小於，且 mm→pt 有捨入、
+    # 圖檔本身還有 side bearing）。實測 Figure 1.1 排到 150.00mm／版心 150mm 仍被折成兩列。
+    SAFETY_MM = 1.0
+    ROW_SKIP = "6pt"      # 列與列之間的垂直間距
+
+    def panel_grid(self, panels):
+        r"""多 panel 圖排成**列**，不硬塞成一列（2026-07-25 ch01 rollout 補）。
+
+        為什麼要這條：原本一律 `\hspace{6mm}` 併排，超出版心時 LaTeX 會在 `\hspace` 處
+        默默折行——**不報 Overfull**（figureblock 是 center），所以編譯閘全綠也看不到。
+        ch01 實測兩個受害者：Figure 1.1（2×72.35＋6＝150.7mm，只超 0.7mm）被折成兩列、
+        跨頁且次頁幾乎空白；Figure 1.17（4×64.03＝274mm）折成不受控的 2＋2。
+
+        排法（貪婪填列，寬度驅動）：
+        - 一列裝得下就繼續裝；裝不下就換列。
+        - 該列只差一點就滿時**縮間距**（不縮圖）：`gap = min(6mm, 剩餘空間 /(n−1))`。
+          縮圖會等比放大／縮小圖內標籤字級，是 DIALECT-ch03 §5 明文禁止的。
+        - 單 panel 與「本來就放得下的整列」輸出與舊版**逐字元相同**，故 ch03 的 golden
+          不動（remainder-tangent 2×65.62＋6＝137.2mm 仍是一列、間距仍 6mm）。
+        現有各圖的排法與 HTML 的 `figure-art--pair`／`--triple`／`--grid` 恰好一致
+        （pair→1列2格、triple→1列3格、grid→2列2格）；若日後有圖不一致，以本函式的
+        寬度判斷為準（版心放不下就是放不下），並在該章 DIALECT 記一筆。
+        """
+        live = float(self.figs.get("liveWidthMm", 150)) - self.SAFETY_MM
+        img = (lambda p:
+               f"\\includegraphics[width={p['mm']}mm]{{{self.chapter}/figs/{Path(p['file']).stem}}}")
+        if len(panels) == 1:
+            return "  " + img(panels[0])
+
+        rows, cur = [], []
+        for p in panels:
+            trial = cur + [p]
+            # 判斷用 MIN_GAP：只差一點就滿的列（如 Figure 1.1 的 2×72.35＝144.7mm）應該
+            # 留在同一列、把間距收窄，而不是被推去下一列（那會拆成兩列、跨頁、次頁留白）。
+            need = sum(q["mm"] for q in trial) + self.MIN_GAP_MM * (len(trial) - 1)
+            if cur and need > live:
+                rows.append(cur)
+                cur = [p]
+            else:
+                cur = trial
+        if cur:
+            rows.append(cur)
+
+        out = []
+        for row in rows:
+            if len(row) == 1:
+                out.append("  " + img(row[0]))
+                continue
+            slack = live - sum(q["mm"] for q in row)
+            gap = min(self.GAP_MM, slack / (len(row) - 1))
+            gap_s = f"{gap:.2f}".rstrip("0").rstrip(".")
+            out.append("  " + f"\\hspace{{{gap_s}mm}}".join(img(q) for q in row))
+        return f"\\\\[{self.ROW_SKIP}]\n".join(out)
+
     def figure(self, f):
         panels = [p for p in self.figs["panels"] if p["id"] == f.fig_id]
         if not panels:
@@ -911,17 +967,17 @@ class LatexEmitter:
         # 沿用 2026-07-17 目錄重整前的 figs/<ch>/ 佈局，dist 從未編過有圖章故一直沒爆。
         # 寬度用實測 mm（DIALECT-ch03.md §5）。不可用 \textwidth：SVG 自帶 inline width，
         # 多數圖只佔約半欄，撐到 \textwidth 會把圖內標籤等比放大。
-        art = "\\\\[6pt]\n".join(
-            f"  \\includegraphics[width={p['mm']}mm]{{{self.chapter}/figs/{Path(p['file']).stem}}}"
-            for p in panels
-        ) if len(panels) == 1 else (
-            "\\hspace{6mm}".join(
-                f"\\includegraphics[width={p['mm']}mm]{{{self.chapter}/figs/{Path(p['file']).stem}}}"
-                for p in panels)
-        )
-        return (f"\\begin{{figureblock}}\n{art}\n"
-                f"\\figcaption{{{esc(f.fig_no)}}}{{{self.para_text(f.caption)}}}\n"
-                f"\\end{{figureblock}}")
+        art = self.panel_grid(panels)
+        cap = f"\\figcaption{{{esc(f.fig_no)}}}{{{self.para_text(f.caption)}}}"
+        if f"\\\\[{self.ROW_SKIP}]" in art:
+            # 多列圖：整塊（含圖說）包進 minipage 以禁止分頁。模板 figureblock 的
+            # \cb@needspace{6\baselineskip} 是按「單列圖」估的，兩列圖高一倍——實測
+            # Figure 1.17 的 2×2 落在 p.24，圖說被推到 p.25（孤立圖說）。單列圖仍走原路，
+            # 故 ch03／appB 的輸出逐字元不變。
+            art = ("  \\begin{minipage}{\\linewidth}\\centering\n"
+                   + art + "\n  " + cap + "\n  \\end{minipage}")
+            return f"\\begin{{figureblock}}\n{art}\n\\end{{figureblock}}"
+        return f"\\begin{{figureblock}}\n{art}\n{cap}\n\\end{{figureblock}}"
 
 
 # ── 驅動 ──────────────────────────────────────────────────────────────────────
