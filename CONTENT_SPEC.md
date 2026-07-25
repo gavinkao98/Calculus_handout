@@ -1,6 +1,6 @@
 # 微積分講義：排版總規範
 
-**Version 3.5**——單點新增：§3「平實英文條款」（plain register，2026-07-25 與使用者議定、Codex gate-2 覆核）——MUST 字面化底線／SHOULD 監測值／FLAG 人工候選三層＋暖句四條件測試，服務 §16.2 的 EFL 基線讀者；不改目標語域：「邏輯內容平實；教學導航可溫暖」。其餘承襲 v3.4／v3.3（§16 難度定位與先備知識基線——雙軸難度定位、108 課綱數A A／B／C 三類先備清單、B 類首次使用必須就地建立違者 blocking）、v3.2（習題移出講義本體）與 v3.1／v3.0——v3.0 是從零重寫取代 v1.x 和 v2.x，圍繞一個明確的產品定義重新組織規則書：一份 single-sided A4 英文講義，對象為準備自修大學微積分的高中生，搭配影片，以 Stewart / Rogawski 語域撰寫。Changelog（§17）列出具體差異。
+**Version 3.5-RC**——§3「平實英文條款」（plain register，2026-07-25 與使用者議定、Codex 三輪審核）**標記為 RC（凍結可用）**，並把原獨立的「去 em-dash 線」併入該條款（成對破折號與標點負載）；量尺定版為 [`tools/prose_metrics.py`](tools/prose_metrics.py)，回填流程見 [`handout/html/_audit/KICKOFF-plain-backfill.md`](handout/html/_audit/KICKOFF-plain-backfill.md)。條款內容——MUST 字面化底線／SHOULD 監測值／FLAG 人工候選三層＋暖句四條件測試，服務 §16.2 的 EFL 基線讀者；不改目標語域：「邏輯內容平實；教學導航可溫暖」。其餘承襲 v3.4／v3.3（§16 難度定位與先備知識基線——雙軸難度定位、108 課綱數A A／B／C 三類先備清單、B 類首次使用必須就地建立違者 blocking）、v3.2（習題移出講義本體）與 v3.1／v3.0——v3.0 是從零重寫取代 v1.x 和 v2.x，圍繞一個明確的產品定義重新組織規則書：一份 single-sided A4 英文講義，對象為準備自修大學微積分的高中生，搭配影片，以 Stewart / Rogawski 語域撰寫。Changelog（§17）列出具體差異。
 
 ---
 
@@ -118,6 +118,12 @@ Rationale：Stewart 語域加上自足的 handout 意味著讀者無法依賴老
 - prose 中的 inline abbreviation 如 *iff*、*w.r.t.*、*s.t.*——寫出來。
 
 ### 平實英文條款（plain register）
+
+> **狀態：RC（凍結可用），2026-07-25。** 驗證範圍＝appB（兩輪）＋ch06 §6.2／§6.3（正文兩節）＋ch01 §1.4 手稿章假陽性對照，量尺與工具定版（[`tools/prose_metrics.py`](tools/prose_metrics.py) 22 項 fixture 全綠、[`tools/verify_edits.py`](tools/verify_edits.py)），Codex 三輪審核完成（方案覆核、逐項裁決、回歸審核＋合併設計審查）。
+>
+> **凍結的意思：** 回填期間**判準不再逐節重議**——照本條款執行即可。單一節的個案爭議屬 finding 層逐條裁決，**不動條款**；只有「**同一條規則在三節以上反覆誤判或誤傷**」才夠格修訂。
+>
+> **待升 v1.0 的缺口：** 目前所有證據都來自「已定稿章回填」，測的是稽核＋改寫。條款真正的目標是讓 LLM **一開始就寫對**，須在下一個新節的 Mode A 跑 style card 兩臂對照（一臂只給範文、一臂掛完整條款）驗證生成端；另有 C 層離線 linter 與真人 EFL 盲讀（選配）。回填流程見 [`handout/html/_audit/KICKOFF-plain-backfill.md`](handout/html/_audit/KICKOFF-plain-backfill.md)。
 
 （2026-07-25 新增，Codex gate-2 覆核整合。緣起：LLM 撰稿的英文散文持續向文學腔漂移——擬人、隱喻、cleft 強調、警句收尾、不透明慣用搭配——對本書 EFL 基線讀者（§16.2）是額外負荷。研究證據與覆核全文：[`handout/html/_audit/REVIEW-plain-register-research.html`](handout/html/_audit/REVIEW-plain-register-research.html)、[`handout/html/_audit/REPORT-plain-register-codex-gate2-raw.md`](handout/html/_audit/REPORT-plain-register-codex-gate2-raw.md)。本條款**不改**本節目標語域：Stewart 的暖是**教學導航**的暖，不是文學修辭——「**邏輯內容平實；教學導航可溫暖**」。優先序：數學正確與字面可理解 > 流暢／聲音／暖。）
 
@@ -1191,6 +1197,8 @@ Rationale：規則會演進。明確的 exception record 將偏離從 noise 變�
 **（2026-07-04：全 arc 已裁定深度政策 (B) 分章校準**——理論核心章［Ch4、Ch6 積分/FTC、Ch11 級數、Ch14 多變數可微性］上到 Ch4 級當場嚴格證；應用章標準嚴謹；最重的定理［Ch15 變數變換、Ch16 一般 Stokes/散度、Ch14 Clairaut］給嚴謹陳述＋簡單情形＋一般證明 fence。各章深度基調見 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md) 「Ch5–16 弧線骨架」。fence 到的「補證處」是一個尚待立項的 Proof-track 附錄——見該處 roster。）
 
 ## 17. Changelog
+
+- **v3.5-RC（2026-07-25）**——§3〈平實英文條款〉標記為 **RC（凍結可用）**；同批把原獨立的「去 em-dash 線」併入本條款（新增「成對破折號與標點負載」小節：canonical 量測、目標 T_can ≤3.0/1000、CUT palette、四步仲裁決策序與具約束力先例、不換 tic 護欄、原因標籤、固定執行序、兩閘不可互相豁免），§8「破折號」降為字元排印區辨並指向 §3。量尺定版為 tools/prose_metrics.py（22 項 entity／格式 fixture 全綠，修正舊腳本漏數 &mdash; entity 導致 appD 被誤標「無需處理」的 bug）；新增 tools/verify_edits.py（交易式改動的 reverse-apply == HEAD 證明）。回填流程權威見 handout/html/_audit/KICKOFF-plain-backfill.md。經 Codex 設計審查（有條件通過），A10 依其裁決 REVERT。
 
 - **v3.5（2026-07-25）**——§3 新增「平實英文條款」（plain register）：MUST（數學內容字面化、關鍵位置直白詞、同概念同措辭、≥35 詞句人工判定拆留）／SHOULD（平均句長 18–22 監測值、P90 32–35 審查區、中性動詞對數學物件、EFL 高風險功能詞就地釋義）／FLAG（cleft、尾掛 -ing、被動、數學物件作主詞、not just X but Y——僅為人工候選線索，形式本身非缺陷）＋暖句四條件測試與合法暖句模板。同批：[`handout/html/_audit/PROSE-AUDIT-RUBRIC.md`](handout/html/_audit/PROSE-AUDIT-RUBRIC.md) 新增 R 維度（R1 可推測性／R2 字面傳達與明確指涉／R3 指稱一致性；部分 blocking＋頁級累積規則）與 V1 邊界修訂（暖＝導航清晰，非 lexical 修辭）。緣起：使用者反映 LLM 課文英文「太文學、不利非母語讀者」（2026-07-25）；網路研究三線＋現症診斷（ch06 §6.2 五句）＋ Codex gate-2 覆核（GO-with-changes）——全文見 [`handout/html/_audit/REVIEW-plain-register-research.html`](handout/html/_audit/REVIEW-plain-register-research.html)＋[`handout/html/_audit/REPORT-plain-register-codex-gate2-raw.md`](handout/html/_audit/REPORT-plain-register-codex-gate2-raw.md)。pilot＝Appendix B。（註：v3.4 條目當時未同步版本頭，本次版本頭自 3.3 直接跳 3.5。）
 
