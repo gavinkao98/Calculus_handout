@@ -4,7 +4,8 @@
     python check_prose.py ch03 build/chapter3.pdf
 
 判準＝**依序子序列**：把 fragment 的散文（去註解、去數學、去標籤、解 entity）切成詞流，
-檢查每個詞都依原順序出現在 `pdftotext` 的輸出裡。
+檢查每個詞都依原順序出現在 `pdftotext -raw` 的輸出裡（`-raw`＝PDF content-stream 順序
+＝LaTeX 實際的輸出順序；**不是** pdftotext 預設的幾何重建順序，理由見 `pdf_prose`）。
 
 為什麼不是逐字 diff：數學在兩側是不同的字符流（HTML 走 MathJax，PDF 走 NCM math），
 不可能相等；但散文詞必須一個不少、順序不變。這條能抓到**掉段與錯序**；PDF 側合法多出
@@ -102,7 +103,26 @@ def fragment_prose(ch_id):
 
 
 def pdf_prose(pdf):
-    out = subprocess.run(["pdftotext", "-enc", "UTF-8", str(pdf), "-"],
+    """`-raw`＝按 PDF content stream 的順序抽取，**不是** pdftotext 預設的幾何重建順序。
+
+    為什麼必須指定（2026-07-26，ch03 首建實證）：本閘的力量來自「依序」，所以它的 oracle
+    必須是**文件自己的輸出順序**。pdftotext 預設模式是照 y 座標把 glyph 重新分行分段，碰到
+    行內高聳數學就會拆錯——ch03 Figure 3.2 的 caption 內含 \\(\\dfrac{\\sin\\theta}{\\theta}\\)，
+    分數把該行撐成好幾條 y 帶，預設模式於是抽成
+        `A graphical reading of the squeeze in Proposition 3.2:` /
+        `with an open circle at 𝜃 = 0.` / `sin 𝜃 𝜃` / `sits between cos 𝜃 and 1,`
+    ——caption 後半被排到第二行之後，序列對齊把 `sits between and` 判成真落差。實際上 PDF
+    一字不缺（已以 pdftoppm 算圖目視確認 caption 完整），是 oracle 錯、不是內容掉。
+    `-raw` 下同一段抽成 `… Proposition 3.2:` / `sin 𝜃` / `𝜃 sits between` / `cos 𝜃 and` /
+    `1,` / `with an open circle at`，順序與源一致，落差消失。
+
+    這與 TBL_RE 註解記的是同一類病（預設模式的幾何重建 ≠ 源順序）；差別在表格那次是用
+    「主閘剝掉＋另立無序閘」繞過，這次直接把錯的 oracle 換掉。**沒有放寬判準**：依序仍是
+    依序，`-raw` 反而比幾何重建更忠實於「LaTeX 到底照什麼順序吐字」。
+    回歸（2026-07-26）：appB／ch01／ch03 三單元 × 三個子閘全綠；ch01 的 18 個表格詞與
+    13 條 panel note 不受影響；抽取假象數 appB 4→3、ch01 維持 6、ch03 3→2。
+    """
+    out = subprocess.run(["pdftotext", "-enc", "UTF-8", "-raw", str(pdf), "-"],
                          capture_output=True, text=True, encoding="utf-8")
     if out.returncode != 0:
         sys.exit(f"pdftotext 失敗：{out.stderr}")
