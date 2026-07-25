@@ -418,7 +418,12 @@ class AppBMappings(unittest.TestCase):
         # 注意：本迴圈原本漏掉 sec-b-6 —— 新一節的數學因此未被逐位元組驗到；已補入。
         # 2026-07-17（r3）545→566：§B.6 新增 Example B.11（歸納法斷鏈），display 13→16＝
         # 該例的宣稱、歸納步驟、與 Prop B.4 的對照式各一。
-        self.assertEqual(len(src_math), 566, "數學區段數應為 566＝inline 550＋display 16")
+        # 2026-07-25（平實化兩輪）566→571，逐段 multiset diff 確認全是**散文字面化的副產物**、
+        # 無既有公式被改：de7fac0（去慣用語 58 處＋拆黏接 20 處）在 §B.6 新增 \(x\)／\(S\)／
+        # \(P(x)\)／\(P\)／\(Q\) 五個單符號，同輪 §B.1 少一個 \(n\)（「the hypothesis
+        # (that \(n\) is divisible by \(6\))」改為直接引出句中片語）；97884b7（Codex 覆核修訂）
+        # §B.4 再 +\(arepsilon\)。淨 +5；display 仍 16（平實化不動 display 式）。
+        self.assertEqual(len(src_math), 571, "數學區段數應為 571＝inline 555＋display 16")
         pos = 0
         for k, m in enumerate(src_math):
             j = tex.find(m, pos)
@@ -429,7 +434,7 @@ class AppBMappings(unittest.TestCase):
         # M-B2 驗證點：appB 全節點 100% 交代（mapped 或硬錯；無表外標記）
         tex, stats = convert_chapter("appB", Path(__file__).parent / "chapters" / "appB" / "figs" / "figures.json")
         self.assertEqual(stats["mapped"], 718)   # 鎖實值（gate-2 A2：>300 太弱）；2026-07-17 定稿後 440→695（新增 §B.6）、695→716（r3 新增 Example B.11）、716→717（r3 二輪：§B.3 指路子句的 <em>if–then</em>）；717→718（2026-07-18：§B.3 (i)/(ii) 兩 p.center → ol.roman＋2 li，淨 +1）；718 不變（2026-07-18 二次：§B.3 否定句 p.center → p.statement，同節點改標籤、無增減）
-        self.assertEqual(stats["math"], 566)
+        self.assertEqual(stats["math"], 571)   # 566→571：平實化兩輪的字面化，見上一個測試的註解
         # emitter 重定向的 aggregate 斷言：v1 book-class 詞彙（hk*）不得殘留
         self.assertIsNone(re.search(r"\\hk[a-z]", tex), "輸出殘留 v1 hk* 詞彙")
         for probe in (r"\appendixopener{Appendix B}", r"\begin{objectives}",
