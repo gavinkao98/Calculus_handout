@@ -118,18 +118,25 @@ def table_check(ch_id, pdf):
     **已知極限**：無序＝抓不到「表格被排成錯的順序」（例如某欄數值互換）。要抓那個得比對
     cell 的相鄰關係，本閘不做；表格數值另有數學 pass-through 與人眼閘（gate 4）。
     """
+    # 比對必須**含數字**：表格格子幾乎全是數值（0.5263、0.999…），而 letters() 只留 a–z，
+    # 會把它們折成空字串、`"" in got` 恆真 ⇒ 閘變成空的。實測過：拿 appB 的 PDF 餵 ch01 的表格
+    # 也「PASS」。故本閘自己折 alnum，並以**整格字串**（如 05263）為單位比對——夠獨特，
+    # 掉一格就抓到；不用逐詞（"0"、"9" 這種到處都有）。
+    alnum = lambda seq: re.sub(r"[^a-z0-9]", "", " ".join(seq).lower())
     want = []
     for frag in CHAPTERS[ch_id]["fragments"]:
         raw = (HTML_LINE / "fragments" / ch_id / f"{frag}.html").read_text(encoding="utf-8")
         for tbl in TBL_RE.findall(COMMENT_RE.sub("", raw)):
             for cell in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", tbl, re.S):
                 txt = MATH_RE.sub(" ", cell)            # 數學走 pass-through，不在此閘
-                want += [(frag, w) for w in normalize(html_mod.unescape(TAG_RE.sub(" ", txt)))]
+                key = alnum(normalize(html_mod.unescape(TAG_RE.sub(" ", txt))))
+                if key:                                 # 純數學格（如 \(x\)）折完為空，跳過
+                    want.append((frag, key))
     if not want:
-        print("表格閘：本章無 table.tbl，略過")
+        print("表格閘：本章無 table.tbl（或所有格子都是數學），略過")
         return True
-    got = letters(pdf_prose(pdf))
-    missing = [(f, w) for f, w in want if letters([w]) not in got]
+    got = alnum(pdf_prose(pdf))
+    missing = [(f, w) for f, w in want if w not in got]
     if missing:
         print(f"\n表格閘 FAIL：{len(missing)}／{len(want)} 個表格詞沒抵達 PDF")
         for f, w in missing[:20]:
@@ -217,7 +224,10 @@ def main():
         print("完整性閘 PASS：fragment 的散文詞全部出現在 PDF，順序一致")
         # 這裡曾直接 return，於是散文完全乾淨時圖內文字閘根本不會跑（只因目前剛好有
         # 2 處 pdftotext 抽取假象才一直觸發到它）。閘不能因為別的閘過了就跳過。
+        ok = table_check(ch_id, pdf)
         if not figure_note_check(Path(__file__).parent / "chapters" / ch_id / "figs" / "figures.json", pdf):
+            ok = False
+        if not ok:
             sys.exit(1)
         return
 
@@ -242,7 +252,11 @@ def main():
         print(f"\n完整性閘 FAIL：{len(real)} 處真落差，共 {n} 個散文詞不在 PDF")
         sys.exit(1)
     print(f"\n完整性閘 PASS：{len(artifacts)} 處 pdftotext 抽取假象（已逐條確認內容在），0 處真落差")
+    # 三條都要跑完才決定 exit code——閘不能因為別的閘過了就跳過（同上方註解的既有教訓）
+    ok = table_check(ch_id, pdf)
     if not figure_note_check(Path(__file__).parent / "chapters" / ch_id / "figs" / "figures.json", pdf):
+        ok = False
+    if not ok:
         sys.exit(1)
 
 

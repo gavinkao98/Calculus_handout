@@ -161,6 +161,18 @@ const COLLECT = `(() => {
       const offX = rnd(tr.left - bx.l), offY = rnd(tr.top - bx.t);
       const clone = target.cloneNode(true);
       clone.setAttribute('class', (clone.getAttribute('class') || '') + ' fx-target');
+      // Re-assert the SVG's OWN measured size, not just the panel's. The live page can
+      // constrain an svg BELOW its inline width through a per-figure custom property
+      // (hydrateFigures wires --fig-N-M into --fig-w as an INLINE STYLE on <figure>), and the
+      // chain copy above keeps only class/data-fig — so that variable is absent in the wrapper
+      // and the svg falls back to its inline width. Measured on recip-x-vs-x2 (Figure 1.16):
+      // live 200x161 (max-width 200) vs inline width:244px, viewBox 244x196 → in the wrapper it
+      // rendered 244 wide, ~35px taller, which pushed the .fig-note "y = 1/x²" past the page
+      // box (sized from the LIVE ink box) and printed the panel with the note missing and the
+      // plot cropped. check_prose's figure-note gate caught it; the panel PDF had 1 text char.
+      const cloneSvg = clone.matches && clone.matches('svg.fig-svg')
+        ? clone : clone.querySelector('svg.fig-svg');
+      if (cloneSvg) cloneSvg.setAttribute('class', (cloneSvg.getAttribute('class') || '') + ' fx-svg');
       const doc = '<!doctype html><html lang="en"><head><meta charset="utf-8">' + head
         + '<style>@page{size:' + pw + 'px ' + ph + 'px;margin:0}'
         + 'html,body{margin:0;padding:0;background:#fff;width:' + pw + 'px;height:' + ph + 'px;'
@@ -178,6 +190,11 @@ const COLLECT = `(() => {
         + 'top:' + offY + 'px!important;'
         + 'margin:0!important;width:' + w + 'px!important;height:' + h + 'px!important;'
         + 'max-width:none!important;max-height:none!important;overflow:visible!important}'
+        // pin the svg at ITS measured size too (see fx-svg note above): 1:1 viewBox scale and
+        // the panel's interior (note under the plot) lays out exactly as measured.
+        + '.fx-svg{width:' + rnd(r.width) + 'px!important;height:' + rnd(r.height) + 'px!important;'
+        + 'min-width:0!important;max-width:none!important;max-height:none!important;'
+        + 'flex:none!important}'
         + '</style></head><body class="' + document.body.className + '">'
         + open + clone.outerHTML + close + '</body></html>';
       // 申報這個 panel 帶了哪些「文字」（非數學）標籤。check_prose.py 用它逐條驗證那些字

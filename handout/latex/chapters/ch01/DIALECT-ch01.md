@@ -48,12 +48,33 @@
 
 | 閘 | 結果 |
 |---|---|
-| 閘 1 編譯（log） | **PASS**：44 頁、0 error、0 missing character |
+| 閘 1 編譯（log） | **PASS**：44 頁、0 error、0 missing character、0 Overfull hbox |
 | 閘 3 完整性（`check_prose.py`） | **PASS**：0 處真落差（6 處 `pdftotext` 抽取假象已逐條確認內容在） |
-| 閘 3b 圖內文字（`figure_note_check`） | **FAIL — 1 個真缺陷**：`recip-x-vs-x2` 兩格的 panel note `y = 1/x²`／`y = 1/x` 沒抵達 PDF。已獨立驗證非比對假象：`figs/recip-x-vs-x2-1.pdf` 的文字層只有 1 個字元（對照 `hlt-1.pdf` 75、`precise-limit.pdf` 56）。**診斷**：該 panel 的匯出 page box（202px）比 panel 本身（261.97px）**窄**，note 被裁掉——`export_figs.mjs` 的墨水框聯集（svg ∪ `.fig-lbl` ∪ `.fig-note`）在 **pair layout** 下沒把 note 算進去。其餘 32 panel 的 page box 都 ≥ panel。 |
-| 閘 4 字形（`check_glyphs.py`） | 未執行（閘 3b 先擋） |
+| 閘 3b 表格（`table_check`，本輪新增） | **PASS**：18 個表格格子全數抵達 PDF |
+| 閘 3c 圖內文字（`figure_note_check`） | **PASS**：13 條 panel note 全數抵達 PDF |
+| 閘 4 字形（`check_glyphs.py`） | **PASS**：489 個嵌入字形的輪廓全數符合其 CID |
 
-**因此 `dist/ch01/` 未產出**（`make_dist.py` 契約：三閘任一不過就不產成品；本輪產生的中間 `.tex`／`.pdf` 已刪）。下一步＝修 `export_figs.mjs` 的 pair-layout 墨水框，重匯 `recip-x-vs-x2`，再跑 `python make_dist.py ch01` 收閘 3b／閘 4。
+**`dist/ch01/` 已產出**＝恰兩檔（`chapter1.tex` 84.6KB ＋ `chapter1.pdf` 1.79MB，44 頁）。
+
+### 5.1 為了收這兩道閘修掉的兩個真缺陷
+
+1. **panel 內的 `.fig-note` 被裁掉（閘 3c 抓到）。** 症狀：`recip-x-vs-x2` 兩格的 `y = 1/x²`／`y = 1/x` 沒抵達 PDF，該 panel 的 PDF 文字層只有 1 個字元。**真因不是墨水框**——墨水框（202×188px＝svg ∪ note）其實正確；問題在 wrapper 只把 **panel** 重申為實測尺寸，**沒重申 svg 自己的尺寸**。活頁面用 per-figure 自訂屬性（`hydrateFigures` 把 `--fig-N-M` 寫成 `<figure>` 的 **inline style**）把該 svg 壓到 `max-width:200px`（inline 卻寫 `width:244px`、viewBox 244×196）；wrapper 複製祖先鏈時**只保留 class／data-fig**，那個變數不在，於是 svg 以 244px 寬重繪、高約多 35px，把 note 推到 page box 之外。**修法**：clone 的 svg 加 `.fx-svg`，並以實測 `width`／`height` 釘死（與既有「panel 重申實測尺寸」同一原則）。修後兩格文字層 8／6 字元、視覺確認 note 回來且圖形回到 1:1。
+2. **`fig-map` 嵌入無法驗的 Times New Roman（閘 4 抓到）。** 字形閘只驗 CFF 輪廓，`DAAAAA+TimesNewRomanPSMT`（CID TrueType）判「無法驗」而擋稿。**真因**：Figure 1.2 的標籤 `f⁻¹` 用了 **U+207B／U+00B9**（全書活散文各僅此一處），而圖內標籤實際走的是 `--ui`＝**Inter**，Inter 沒有這兩個字 → Chrome 逐字 fallback 到系統 Times。**注意這代表 HTML 預覽本來也是用系統字型在畫這兩個字**。**修法（改源頭）**：`f⁻¹` → `f<tspan dy="-5" font-size="0.72em">-1</tspan>`（`handout/html/fragments/ch01/sec-1-1.html:224`），視覺等價、字元全在 Inter 字集內。修後 `fig-map.pdf` 只含 Inter 子集，全 33 panel 無任何 Times。
+   - 途中試過、**已撤除**的做法（留紀錄免得再走）：用 `kpsewhich` 找模板的 NewCM OTF、注入 `@font-face` 給 wrapper。(a) `file://` 的字型抓取被 Chrome 當跨 opaque origin 擋掉（加 `--allow-file-access-from-files` 仍 `document.fonts.check==false`）；(b) 改 data: URI 後 face 狀態仍 `error`；(c) 而且方向本來就錯——那些標籤是 Inter、不是 serif。三次實測後改回源頭修。
+
+### 5.2 閘 2（版面／人眼）待處理：多 panel 圖併排超出版心
+
+`convert.py` 的 figure emitter 對多 panel 圖是 `\hspace{6mm}` 併排，沒有 grid／minipage 版面（DIALECT-ch03 §3 早列 `figure-art--triple`／`--grid → minipage` 為「ch03 用不到、rollout 逐章補」）。ch01 實測：
+
+| 圖 | panel | 併排寬 | 判定 |
+|---|--:|--:|---|
+| `hlt`（Figure 1.1） | 2 × 72.35mm | **150.7mm** | 超出 150mm 版心 0.7mm → 第二格換行，**p.3／p.4 被拆開、p.4 幾乎空白** |
+| `one-sided-infinite`（Figure 1.17） | 4 × 64.03mm | **274.1mm** | 遠超 → 自動折行成 2＋2 |
+| `limit-same-near-a` | 3 × 42.86mm | 140.6mm | 放得下 |
+| `epsilon-delta-dynamic` | 2 × 64.03mm | 134.1mm | 放得下 |
+| `recip-x-vs-x2` | 2 × 53.45mm | 112.9mm | 放得下 |
+
+LaTeX **不報 Overfull**（`figureblock` 的 center 允許在 `\hspace` 處斷行），所以閘 1 全綠也看不到——這是人眼閘的守備範圍。**下一步**（另一輪）：emitter 依合計寬度決定 grid（例如 `one-sided-infinite` 排 2×2、`hlt` 縮到 ≤72mm 或改 2 列），並在 kickoff §4.4 補這條 mapping。
 
 ## 6. 已知極限（誠實記錄）
 
