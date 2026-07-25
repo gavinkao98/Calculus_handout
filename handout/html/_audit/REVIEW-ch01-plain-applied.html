@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ch01 散文平實化回填（合併 sweep）— applied</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2df; --bg:#fbfbf9; --card:#fff;
+    --good:#1f7a44; --good-bg:#f0f8f3; --good-line:#b8ddc7; --bad:#a3232a; --bad-bg:#fdf4f4;
+    --bad-line:#e8c9c9; --warn:#9a5b00; --warn-bg:#fdf3e3; --accent:#2d5a8a; --code-bg:#f4f4f2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Inter","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.6; max-width:980px; margin:0 auto; padding:2.4rem 1.5rem 5rem; }
+  h1 { font-size:1.45rem; line-height:1.3; margin:0 0 .3rem; }
+  .sub { color:var(--muted); font-size:.93rem; margin:0 0 1.6rem; }
+  h2 { font-size:1.14rem; margin:2.4rem 0 .7rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+  h3 { font-size:.98rem; margin:1.5rem 0 .45rem; color:var(--accent); }
+  code { font-family:Consolas,monospace; font-size:.87em; background:var(--code-bg); padding:.08em .35em; border-radius:3px; }
+  table { border-collapse:collapse; width:100%; margin:.7rem 0 1rem; font-size:.88rem; }
+  th,td { border:1px solid var(--line); padding:.4rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f0f0ee; font-weight:600; }
+  td.num,th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.9rem 1.15rem; margin:1rem 0; }
+  .card.good { background:var(--good-bg); border-color:var(--good-line); }
+  .card.warn { background:var(--warn-bg); border-color:#e8d3a8; }
+  .row { display:flex; gap:.55rem; padding:.45rem .6rem; border-radius:5px; margin-bottom:.3rem; }
+  .row .lbl { flex:0 0 3rem; font-size:.72rem; font-weight:700; padding-top:.18rem; }
+  .row .txt { flex:1; font-size:.94rem; line-height:1.55; }
+  .before { background:var(--bad-bg); border-left:3px solid var(--bad-line); }
+  .before .lbl { color:var(--bad); }
+  .after { background:var(--good-bg); border-left:3px solid var(--good-line); }
+  .after .lbl { color:var(--good); }
+  .pair { margin:.75rem 0 1.1rem; }
+  .pair .why { font-size:.85rem; color:var(--muted); margin:0 0 .3rem; }
+  .id { font-family:Consolas,monospace; font-size:.8em; font-weight:700; color:var(--accent); white-space:nowrap; }
+  .tag { display:inline-block; font-size:.72rem; font-weight:600; padding:.08rem .45rem; border-radius:999px; white-space:nowrap; }
+  .tag.good { color:var(--good); background:var(--good-bg); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); }
+  .tag.bad { color:var(--bad); background:var(--bad-bg); }
+  .tag.ms { color:#4a3a80; background:#f1eefb; }
+  ul.tight { margin:.3rem 0 .7rem; padding-left:1.3rem; }
+  ul.tight li { margin:.2rem 0; }
+  ol.tight { margin:.3rem 0 .7rem; padding-left:1.4rem; }
+  ol.tight li { margin:.2rem 0; }
+  .small { font-size:.85rem; color:var(--muted); }
+  .foot { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.84rem; color:var(--muted); }
+  .up { color:var(--good); font-weight:700; }
+  .dn { color:var(--bad); font-weight:700; }
+  .out { background:#fff3b0; padding:0 .2em; border-radius:2px; font-weight:600; }
+  .en { font-style:italic; }
+  b.hl { background:#fff3b0; font-weight:700; padding:0 .1em; }
+</style>
+</head>
+<body>
+
+<h1>ch01 散文平實化回填（合併 sweep）— applied</h1>
+<p class="sub">RC 凍結後第一個回填單元 · 執行 41 條 ＋ Codex gate-2 逐條裁決 ＋ Gate 4–8 驗收 · 2026-07-25 · 分支 <code>handout/plain-ch01</code></p>
+
+<div class="card good">
+  <strong>結果：em-dash 密度 9.3 → <span class="up">2.1/1000</span>（目標 <code>T_can</code> ≤3.0）、數學片段零差異、分頁 53 頁不變、§1.4 對照組零改動。</strong>
+  <ul class="tight">
+    <li>執行 <strong>41 條</strong>（走查 42 條 − Codex REJECT 1 條）；em-dash <strong>54 → 12</strong>（剩下的 12 ＝ 手稿逐字 8 ＋ §1.4 凍結 4）。副表（清單）em-dash <strong>4 → 1</strong>（僅剩 §1.4 內那一個）。</li>
+    <li><strong>Codex gate-2：ADOPT 34 / MODIFY 7 / REJECT 1</strong>，並抓到一個我沒抓到的<strong>數學不精確</strong>（§1.2 的 <code>arccos</code> 端點，見 §5 待裁決）。</li>
+    <li>五個檔全數 <code>verify_edits.py</code> <strong>PASS</strong>：工作樹 == HEAD ＋ 恰好這些替換（reverse-apply byte-for-byte，未涵蓋差異 0 處）。</li>
+  </ul>
+</div>
+
+<h2>§1 驗收表（Gate 4–8）</h2>
+<table>
+  <tr><th style="width:12%">閘</th><th style="width:44%">判準</th><th>結果</th></tr>
+  <tr><td><strong>Gate 3</strong><br>交易式套用</td><td><code>verify_edits.py</code>：每筆 old 在 HEAD 恰好命中一次；reverse-apply == HEAD</td><td><span class="tag good">PASS ×5</span>sec-1-1 8 筆／sec-1-2 11 筆／sec-1-3 6 筆／sec-1-5 2 筆／sec-1-6 14 筆，未涵蓋差異 0 處</td></tr>
+  <tr><td><strong>Gate 4</strong><br>build ＋量測</td><td><code>python handout/html/build.py ch01</code>；密度須 ≤3.0；tic guard 四項</td><td><span class="tag good">PASS</span>build 成功（<code>chapter1-print-standalone.html</code>）；密度 <strong>2.07/1000</strong>；tic guard 見 §2</td></tr>
+  <tr><td><strong>Gate 5</strong><br>math gate</td><td>數學片段對 HEAD 逐片段 diff；標籤／分隔符配對；cross-ref 全在位</td><td><span class="tag good">PASS</span>六節 <strong>零消失</strong>；唯一新增＝§1.6 兩個既有符號的重複（<code>\(\varepsilon\)</code>、<code>\(\delta\)</code>，來自 <span class="id">E6</span>）；cross-ref 132 處全數在位（15／30／8／21／15／43）；<code>&lt;p&gt;</code>／<code>&lt;section&gt;</code>／<code>&lt;div&gt;</code>／<code>\(…\)</code>／<code>\[…\]</code> 全配對</td></tr>
+  <tr><td><strong>Gate 6</strong><br>Mode B 語意等價</td><td>只審本輪改動句的 U／F／S·A·V／R；不拆散量詞 scope 與條件—結論；不造連續三句長度相近</td><td><span class="tag good">PASS</span>逐句在位重讀＋Codex Q2 覆核；節奏檢查見 §2 末</td></tr>
+  <tr><td><strong>Gate 7</strong><br>LaTeX 同步</td><td><code>make_dist.py &lt;unit&gt;</code> 三閘全綠</td><td><span class="tag warn">PENDING</span><code>handout/latex/make_dist.py</code> 的 <code>NAMES</code> 僅有 <code>appB</code>、<code>ch03</code>，<strong>ch01 不在表內</strong>——須先補表才跑得動，本輪明文記為 pending（不默默跳過）</td></tr>
+  <tr><td><strong>Gate 8</strong><br>版面目檢</td><td>孤行、溢頁、圖文相鄰</td><td><span class="tag good">PASS</span>程式化比對前後兩版 standalone（同一瀏覽器、同一檢查腳本）：<strong>53 頁 → 53 頁</strong>、溢頁 0、稀疏頁（&lt;55% 填充）0、頁緣單行段 1 處且<strong>前後皆同</strong>（p.13 底 <span class="en">The cosine function is one-to-one…</span>，屬既有狀態、非本輪造成）</td></tr>
+  <tr><td><strong>§1.4 對照組</strong></td><td><code>git diff</code> 須為空</td><td><span class="tag good">PASS</span><code>git diff HEAD -- sec-1-4.html</code> ＝ 無變更；量測值完全不動（N 733、em 4、句長 15.6／26／15%）</td></tr>
+</table>
+
+<h2>§2 量測回歸（canonical stream，前 → 後）</h2>
+<table>
+  <tr><th>指標</th><th class="num">前</th><th class="num">後</th><th class="num">raw Δ</th><th class="num">密度 Δ/1000</th><th>顯著判定（raw ≥+3 <strong>且</strong> 密度 ≥+0.5）</th></tr>
+  <tr><td>散文詞數 <code>N</code></td><td class="num">5792</td><td class="num">5811</td><td class="num">+19</td><td class="num">—</td><td>拆句與字面化淨增 19 詞</td></tr>
+  <tr><td><strong>em-dash</strong></td><td class="num">54</td><td class="num"><strong>12</strong></td><td class="num">−42</td><td class="num"><span class="up">−7.26</span></td><td><strong>9.32 → 2.07/1000</strong>，達 <code>T_can</code> ≤3.0</td></tr>
+  <tr><td>冒號接子句</td><td class="num">39</td><td class="num">42</td><td class="num">+3</td><td class="num">+0.494</td><td><span class="tag good">未達顯著</span>密度差 0.494 &lt; 0.5（差 0.006，屬臨界）→ 理由仍填於下方</td></tr>
+  <tr><td>分號</td><td class="num">22</td><td class="num">20</td><td class="num">−2</td><td class="num">−0.36</td><td>下降</td></tr>
+  <tr><td>左括號</td><td class="num">38</td><td class="num">37</td><td class="num">−1</td><td class="num">−0.19</td><td>下降（<span class="id">E8</span> 拆掉一組括號）</td></tr>
+  <tr><td>成對逗號插入語</td><td class="num">38</td><td class="num">41</td><td class="num">+3</td><td class="num">+0.495</td><td><span class="tag good">未達顯著</span>同屬臨界 → 理由仍填於下方</td></tr>
+  <tr><td>副表（清單／caption）</td><td class="num">1019 詞／4 dash</td><td class="num">1022 詞／<strong>1</strong> dash</td><td class="num">−3</td><td class="num">—</td><td>剩下的 1 個在凍結的 §1.4 內</td></tr>
+</table>
+
+<div class="card">
+  <strong>兩項臨界上升的理由（依 SPEC 護欄自願填寫）：</strong>
+  <ol class="tight">
+    <li><strong>冒號 +3</strong>＝<span class="id">A9</span>（<span class="en">yields \(x = \pm\sqrt{y}\): two values, not a function.</span>）、<span class="id">B5</span>（<span class="en">a <em>principal range</em>: the interval its output angle is restricted to.</span>）、<span class="id">C5</span>（<span class="en">…at \(t = 4\) (a form taken up systematically in §1.5): both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\).</span>）＋<span class="id">E11</span>，減去 <span class="id">E9</span> 移除的一個。**依 SPEC 對「冒號接子句」的界定**（冒號後另起解釋或結果才計入；引出清單／引文／公式／環境標籤不計入），真正計入的只有 <span class="id">C5</span> 與 <span class="id">E11</span>，A9／B5 是同位語短語。<strong>Codex 覆核了這個重數並修正我一半</strong>：它指出走查稿的 <span class="id">E12</span>／<span class="id">E13</span> 冒號後其實是完整定義子句、該計入（原案因此是 +4／+0.69，仍觸發 guard），採用它的改稿後那兩個冒號直接消失，才降到 +2。</li>
+    <li><strong>成對逗號 +3</strong>：來自 CUT palette 指定的「鬆散同位語 → 逗號」與平行列舉，例如 <span class="id">D2</span> 的三個並列結果（<span class="en">may be <em>any</em> number, may be infinite, or may fail to exist</span>）與 <span class="id">E6</span> 的引文（<span class="en">, “given any \(\varepsilon\),” and</span>）。<strong>沒有任何一處是把兩個獨立推論用逗號黏回同一句</strong>——那才是本護欄要防的事。</li>
+    <li>另已逐條確認：<strong>無任何一句出現雙冒號</strong>；<strong>沒有把括號堆在既有括號或 <code>\(…\)</code> 數學旁</strong>（<span class="id">E6</span> 改用逗號＋引文而非括號，故括號淨 −1）。</li>
+  </ol>
+</div>
+
+<table>
+  <tr><th>句長（監測值，非門檻）</th><th class="num">§1.1</th><th class="num">§1.2</th><th class="num">§1.3</th><th class="num">§1.4 基線</th><th class="num">§1.5</th><th class="num">§1.6</th></tr>
+  <tr><td>平均 前 → 後</td><td class="num">15.4→15.2</td><td class="num">16.2→15.2</td><td class="num">20.0→18.2</td><td class="num">15.6（不動）</td><td class="num">19.1→18.6</td><td class="num">16.9→15.3</td></tr>
+  <tr><td>P90 前 → 後</td><td class="num">29→26</td><td class="num">29→23</td><td class="num">33→<strong>24</strong></td><td class="num">26</td><td class="num">29→29</td><td class="num">35→<strong>26</strong></td></tr>
+  <tr><td>&gt;25 詞占比</td><td class="num">13%→11%</td><td class="num">13%→9%</td><td class="num">21%→12%</td><td class="num">15%</td><td class="num">26%→25%</td><td class="num">19%→11%</td></tr>
+  <tr><td>em-dash 密度</td><td class="num">10.6→1.6</td><td class="num">6.0→0.0</td><td class="num">13.7→3.4</td><td class="num">5.5（不動）</td><td class="num">4.1→0.0</td><td class="num">13.1→2.6</td></tr>
+</table>
+<p class="small">P90 全數退出 32–35 審查區。平均落在 15.2–18.6，與<strong>手稿對照組 §1.4 的 15.6 同一家族</strong>（SPEC 的 18–22 是監測值、非門檻；ch01 的真人基線本來就在 15–16）。<br>
+<strong>節奏（不得造出連續三句長度相近）</strong>：程式化比對前後「±3 詞窗口內連續 ≥3 句」的段落數——§1.1 2→2、§1.2 1→1、§1.4 0→0、§1.5 2→2；<strong>§1.3 1→2、§1.6 1→2</strong>，最長連續句數皆維持 3。逐段判讀這兩個新增：§1.6 的落在 Proposition 1.7 <strong>證明骨架</strong>（SPEC 明文排除 proof skeleton，且句間夾 display 式，朗讀聽感完全不同）；§1.3 的落在 Caution 1.5（14／16／16 詞，但第 3 句含 3 個行內式、下一句 23 詞打破節奏）——判定為統計窗口的假象，不改。</p>
+
+<h2>§3 Codex gate-2 裁決與折入（ADOPT 34 / MODIFY 7 / REJECT 1）</h2>
+<p class="small">raw 照登：<a href="REPORT-ch01-plain-codex-raw.md"><code>REPORT-ch01-plain-codex-raw.md</code></a>。下表只列「非 ADOPT」的 8 條與我的處置；34 條 ADOPT 依走查稿原案執行。</p>
+<table>
+  <tr><th style="width:6%">編號</th><th style="width:8%">Codex</th><th style="width:42%">Codex 的理由與提案</th><th>我的處置</th></tr>
+  <tr><td class="id">R3</td><td><span class="tag bad">REJECT</span></td><td><span class="en">everyday promise → requirement</span>：<span class="en">promise</span> 已由緊接冒號後的字面條件解開；換詞沒有 R1／R2 證據，且把「保證」語氣改成「約束」語氣。</td><td><span class="tag good">照接受，撤回</span>覆核後同意：這條是無證據的同義詞美化（rubric 明訂該砍的那一類），且 <span class="en">requirement</span> 確實改變語氣。<strong>該句原樣保留</strong>。</td></tr>
+  <tr><td class="id">A4</td><td><span class="tag warn">MODIFY</span></td><td>我的版本仍用較不字面的 <span class="en">reads as</span>；提案改為 <span class="en">For \(f\), the question is “…” For the inverse function, the question is “…”</span></td><td><span class="tag warn">部分採納</span>採它更字面的前半，但<strong>保留它刪掉的承重內容</strong> <span class="en">the same correspondence</span>——那是本段的重點（反函數讀的是<em>同一個</em>對應、只是方向相反），刪掉會讓後句「domain 與 range 互換」失去依據。</td></tr>
+  <tr><td class="id">D2</td><td><span class="tag warn">MODIFY</span></td><td>我的版本仍把 <span class="en">\(\tfrac{0}{0}\) 形式本身</span>說成可 <span class="en">equal anything</span>；提案改為明列「可能是任意數／可能無限／可能不存在」。</td><td><span class="tag good">採納（略緊）</span>三種結果正是同一題 Example 1.28 剛示範過的（\(10\)、\(c\)、\(\pm\infty\)、DNE），字面化後與例題對得上；保留一個 <code>&lt;em&gt;</code> 強調與 <span class="en">before judging</span> 收尾。</td></tr>
+  <tr><td class="id">E6</td><td><span class="tag warn">MODIFY</span></td><td>指出我這條「主要只是把 dash 換成括號」、量詞順序的說明仍不夠字面（正是 SPEC 第 4 步禁止的表面去 dash）；提案改為明講「定義必須從 <span class="en">given any \(\varepsilon\)</span> 開始、再給出對應的 \(\delta\)；錯誤版本讓 \(\varepsilon\) 依賴 \(\delta\)」。</td><td><span class="tag warn">採納其論點，改寫保留 <span class="en">\(y\)</span>-side 線索</span>它的版本刪掉 <span class="en">on the \(y\)-side</span>（連回幾何圖像的教學線索），故我改寫成保留該線索＋字面化診斷；括號因此不再 +1（淨 −1）。此條也是 §1.6 兩個新增數學符號的來源。</td></tr>
+  <tr><td class="id">E9</td><td><span class="tag warn">MODIFY</span></td><td>我只刪了尾巴，卻留下 <span class="en">borrowed inequality did all the work</span> 的隱喻；提案整句改字面。</td><td><span class="tag good">照接受</span>改為 <span class="en">The given inequality already provides the bound we need, so no factoring and no auxiliary bound are required.</span>（連帶少一個冒號）。</td></tr>
+  <tr><td class="id">E12</td><td><span class="tag warn">MODIFY</span></td><td>冒號後是完整的 <span class="en">means that …</span> 定義子句，<strong>不能因含公式就排除計數</strong>；提案改成 <span class="en">We began with the informal idea that …</span>（冒號消失）。</td><td><span class="tag good">照接受</span>這同時修正了我在走查稿 §量測 對冒號重數的判斷（見 §2 理由 1）。</td></tr>
+  <tr><td class="id">E13</td><td><span class="tag warn">MODIFY</span></td><td>同上；提案改成先點名 <span class="en">continuity</span>、再獨立一句給定義。</td><td><span class="tag good">照接受</span>「continuity」在本節前文已定義（<span class="en">then \(f\) is said to be continuous at \(a\)</span>），點名不造成先用後定義。</td></tr>
+  <tr><td class="id">S2</td><td><span class="tag warn">MODIFY</span></td><td><strong>抓到數學不精確</strong>：<span class="en">negative inputs to \(\arccos\) always do [land in the second quadrant]</span> 在端點 \(x=-1\) 不成立（\(\arccos(-1)=\pi\)，是象限界線而非第二象限內）；提案補上 \(-1 &lt; x &lt; 0\) 與端點說明。</td><td><span class="tag warn">本輪只做去 dash，數學不精確另案</span>已驗算 Codex 說得對。但它的改稿要<strong>新增數學敘述</strong>，超出本輪「不動數學」硬護欄與平實化範圍（rubric 亦明訂數學正確性不在散文閘）。本輪只套用去破折號的部分，<strong>不精確列為待裁決項</strong>（§5）。</td></tr>
+</table>
+<p class="small">Codex 對 Q1／Q4／Q5／Q6 的結論：沒有任何一條屬「拆過頭」；11 對 LLM 成對插入語<strong>無一應原樣 KEEP</strong>（承載的是定義、例子、理由或指令）；9 條詞彙層裡只有 R3 該砍、其餘皆有證據；完整散文中<strong>沒有其他值得另報的 R1 finding</strong>；「刻意未改」清單整體正確，且 §1.6 的 ε-δ 段落與 §1.2 的 principal range 段落<strong>沒有 U 維度 blocking</strong>。</p>
+
+<h2>§4 前後全句對照（依原因標籤分組，41 條）</h2>
+
+<h3>DASH-CUT：單破折號尾巴 → 分句／逗號／冒號（18 條）</h3>
+<table>
+  <tr><th style="width:6%">編號</th><th style="width:8%">locus</th><th style="width:43%">前</th><th>後</th></tr>
+  <tr><td class="id">A3</td><td>§1.1 Ex 1.3</td><td>so \(h\) is <em>not</em> one-to-one <b class="hl">—</b> even though its formula looks similar to \(x^{3}\).</td><td>so \(h\) is <em>not</em> one-to-one<b class="hl">,</b> even though its formula looks similar to \(x^{3}\).</td></tr>
+  <tr><td class="id">A5</td><td>§1.1 Ch4 fence</td><td>…the inverse of the exponential function <b class="hl">— and</b> its graph is exactly this kind of reflection.</td><td>…the inverse of the exponential function<b class="hl">.</b> Its graph is exactly this kind of reflection.</td></tr>
+  <tr><td class="id">A6</td><td>§1.1 Ex 1.5</td><td>why not every function can be reversed <b class="hl">—</b> and how restricting the domain repairs it.</td><td>why not every function can be reversed<b class="hl">,</b> and how restricting the domain repairs it.</td></tr>
+  <tr><td class="id">A7</td><td>§1.1 Ex 1.5</td><td>solving for \(x\) gives \(x = \sqrt{y}\) <b class="hl">—</b> the positive root, because \(x \ge 0\).</td><td>solving for \(x\) gives <b class="hl">the positive root</b> \(x = \sqrt{y}\)<b class="hl">, since</b> \(x \ge 0\).</td></tr>
+  <tr><td class="id">A9</td><td>§1.1 Strategy 1.1</td><td>yields \(x = \pm\sqrt{y}\) <b class="hl">—</b> two values, not a function.</td><td>yields \(x = \pm\sqrt{y}\)<b class="hl">:</b> two values, not a function.</td></tr>
+  <tr><td class="id">B1</td><td>§1.2 Ch3 fence</td><td>are computed <b class="hl">— and</b> the principal ranges fixed in this section are exactly what determine those formulas.</td><td>are computed<b class="hl">.</b> The principal ranges fixed in this section are exactly what determine those formulas.</td></tr>
+  <tr><td class="id">B2</td><td>§1.2 Strategy 1.2</td><td>of an inverse trigonometric expression <b class="hl">—</b> such as \(\tan(\arcsin x)\) or \(\cos(\arctan x)\):</td><td>of an inverse trigonometric expression<b class="hl">,</b> such as \(\tan(\arcsin x)\) or \(\cos(\arctan x)\):</td></tr>
+  <tr><td class="id">B3</td><td>§1.2 arccos 直覺</td><td>exactly once <b class="hl">—</b> the natural analogue of the choice …</td><td>exactly once<b class="hl">,</b> the natural analogue of the choice …</td></tr>
+  <tr><td class="id">B4</td><td>§1.2 Ex 1.11</td><td>only the principal value \(t = 0\) <b class="hl">— and</b> the particle is not even moving at \(t = 0\), since…</td><td>only the principal value \(t = 0\)<b class="hl">.</b> The particle is not even moving at \(t = 0\), since…</td></tr>
+  <tr><td class="id">B5</td><td>§1.2 其餘反三角</td><td>a <em>principal range</em> <b class="hl">—</b> the interval its output angle is restricted to<b class="hl">;</b> the corresponding input domains…</td><td>a <em>principal range</em><b class="hl">:</b> the interval its output angle is restricted to<b class="hl">.</b> The corresponding input domains…</td></tr>
+  <tr><td class="id">B6</td><td>§1.2 Ex 1.14</td><td>\(f(-1) = -\pi\) instead <b class="hl">—</b> a concrete instance of branch conventions changing answers, which is why…</td><td>\(f(-1) = -\pi\) instead<b class="hl">. This is</b> a concrete instance of branch conventions changing answers<b class="hl">, and it is</b> why…</td></tr>
+  <tr><td class="id">S2</td><td>§1.2 Ex 1.12（清單）</td><td>lands in the <em>second</em> quadrant <b class="hl">—</b> negative inputs to \(\arccos\) always do.</td><td>lands in the <em>second</em> quadrant<b class="hl">.</b> Negative inputs to \(\arccos\) always do.</td></tr>
+  <tr><td class="id">C3</td><td>§1.3 Caution 1.5</td><td>no matter how closely we zoom in <b class="hl">—</b> \(f\) runs through every value…</td><td>no matter how closely we zoom in<b class="hl">. The function</b> \(f\) runs through every value…</td></tr>
+  <tr><td class="id">C4</td><td>§1.3 Caution 1.5</td><td>sufficiently near \(0\) <b class="hl">—</b> not merely for a convenient list of samples.</td><td>sufficiently near \(0\)<b class="hl">,</b> not merely for a convenient list of samples.</td></tr>
+  <tr><td class="id">D2</td><td>§1.5 Ex 1.28</td><td>A \(\tfrac{0}{0}\) form can therefore equal <em>anything</em> <b class="hl">—</b> which is exactly why it is called indeterminate…</td><td><b class="hl">Therefore, when substitution gives</b> \(\tfrac{0}{0}\)<b class="hl">, the limit may be <em>any</em> number, may be infinite, or may fail to exist.</b> That is exactly why the form is called indeterminate…</td></tr>
+  <tr><td class="id">E1</td><td>§1.6 first-reading note</td><td>calls for the precise definition <b class="hl">—</b> the chain-rule proof of §3.2 is the first that does.</td><td>calls for the precise definition<b class="hl">.</b> The chain-rule proof of §3.2 is the first that does.</td></tr>
+  <tr><td class="id">E7</td><td>§1.6 Ex 1.38</td><td>implies \(|f(x) - L| &lt; \varepsilon\) <b class="hl">—</b> not the other way around.</td><td>implies \(|f(x) - L| &lt; \varepsilon\)<b class="hl">,</b> not the other way around.</td></tr>
+  <tr><td class="id">E10</td><td>§1.6 Ex 1.43</td><td>we have \(\lim_{x \to 0} \frac{1}{x^{2}} = \infty\) <b class="hl">—</b> the rigorous counterpart…</td><td>we have \(\lim_{x \to 0} \frac{1}{x^{2}} = \infty\)<b class="hl">. This is</b> the rigorous counterpart…</td></tr>
+</table>
+
+<h3>DASH-CUT ＋ PLAIN-SPLIT：LLM 成對插入語 → 整句重寫（11 對）</h3>
+<div class="pair">
+  <p class="why"><span class="id">A2</span> §1.1 節開場。釋義收進主幹的 of-片語，不增任何標點。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">The reverse process <b class="hl">—</b> recovering the input from the output <b class="hl">—</b> is the subject of this section.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">This section studies the reverse process <b class="hl">of</b> recovering the input from the output.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">A4</span> §1.1 role-swap 直覺段。<strong>Codex MODIFY 折入</strong>：改用更字面的 <span class="en">the question is</span>，但保留 <span class="en">the same correspondence</span>（後句「domain 與 range 互換」的依據）。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt"><b class="hl">Where</b> \(f\) <b class="hl">reads as a question —</b> “given the input \(x\), what is the output?” <b class="hl">—</b> the inverse reads the same correspondence <b class="hl">in reverse</b>: “given that output, which input produced it?”</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt"><b class="hl">For</b> \(f\)<b class="hl">, the question is</b> “given the input \(x\), what is the output?” The inverse reads the same correspondence <b class="hl">in the other direction</b>: “given that output, which input produced it?”</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">A8</span> §1.1 Ex 1.5 收尾（通往 §1.2 的 bridge）。把「the same idea＝X」的指稱迂迴拿掉，動作直接當主語。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt"><b class="hl">The same idea —</b> restrict first, then invert <b class="hl">—</b> is the key to the inverse trigonometric functions of the next section.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt"><b class="hl">Restricting first and then inverting</b> is the key to the inverse trigonometric functions of the next section.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">S1</span> §1.2 Strategy 1.2 步驟 2（清單內）。插入語是術語釋義（不符 KEEP 前提），故與 B 組同判法：拆成兩句、不用括號代換。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">Keep the sign separate, and use the principal-value interval <b class="hl">—</b> the range fixed in the inverse function’s definition <b class="hl">—</b> to settle it.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">Keep the sign separate, and use the principal-value interval to settle it<b class="hl">. That interval is</b> the range fixed in the inverse function’s definition.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">C2</span> §1.3 Ex 1.16 解。一句兩個<strong>指令</strong>（找曲線／移動單點）→ 拆兩句，舉例留在第一句句尾。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">Take any curve that approaches height \(10\) as \(x \to 3\) <b class="hl">—</b> for instance a straight line through \((3, 10)\) <b class="hl">— and then</b> move the single point at \(x = 3\) down to height \(0\), marking…</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">Take any curve that approaches height \(10\) as \(x \to 3\)<b class="hl">,</b> for instance a straight line through \((3, 10)\)<b class="hl">. Then</b> move the single point at \(x = 3\) down to height \(0\), marking…</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">C5</span> §1.3 instantaneous-velocity 收尾。插入語是「為何是 \(\tfrac{0}{0}\)」的獨立理由 → 冒號正面交付，結論獨立成句。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">…the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) (a form taken up systematically in §1.5) <b class="hl">—</b> both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\) <b class="hl">— so</b> the cancellation that produced \(-5(t - 2)\) was what made the limit accessible.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">…the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) (a form taken up systematically in §1.5)<b class="hl">:</b> both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\)<b class="hl">. The</b> cancellation that produced \(-5(t - 2)\) was what made the limit accessible.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">D1</span> §1.5 Caution 1.7。<span class="en">X — Y — not Z</span> 的對比骨架被插入語切斷，警告重點被推到句尾 → 改成「先講不是什麼、再講是什麼」。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">A resulting \(\tfrac{0}{0}\) is a signal to do more work <b class="hl">—</b> usually algebraic simplification, as in the examples below <b class="hl">—</b> not a verdict about the limit.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">A resulting \(\tfrac{0}{0}\) <b class="hl">is not a verdict about the limit. It is</b> a signal to do more work, usually algebraic simplification, as in the examples below.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">E5</span> §1.6 挑戰—回應直覺段。\(\varepsilon\) 的釋義改成分詞子句，「我們的回應」獨立成句，與後面既有的冒號 payload 不打架。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">A skeptic names a tolerance \(\varepsilon &gt; 0\) <b class="hl">—</b> how close to \(L\) they insist \(f(x)\) must be <b class="hl">— and</b> our job is to respond with a \(\delta &gt; 0\) that meets the demand: …</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">A skeptic names a tolerance \(\varepsilon &gt; 0\)<b class="hl">, stating</b> how close to \(L\) they insist \(f(x)\) must be<b class="hl">. Our</b> job is to respond with a \(\delta &gt; 0\) that meets the demand: …</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">E6</span> §1.6 Ex 1.38 解。<strong>Codex MODIFY 折入</strong>：走查稿只把 dash 換括號（它正確指出這是表面去 dash），改為字面說出量詞順序；保留 <span class="en">\(y\)</span>-side 的幾何線索。分號 −1、括號不再 +1。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">the challenge must come on the \(y\)-side <b class="hl">—</b> “given any \(\varepsilon\)” <b class="hl">—</b> and \(\delta\) is our response<b class="hl">;</b> the attempted version <b class="hl">lets us pick the easy quantity after seeing the hard one</b>.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">the challenge must come on the \(y\)-side<b class="hl">,</b> “given any \(\varepsilon\),” <b class="hl">and only then do we produce a</b> \(\delta\) <b class="hl">in response. The</b> attempted version <b class="hl">instead lets</b> \(\varepsilon\) <b class="hl">be chosen after</b> \(\delta\) <b class="hl">is known</b>.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">E11</span> §1.6 章摘要 ¶1。四步第①步即不成立（拿掉插入語後主幹不合文法）→ 整句重寫。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">A function can be run backwards exactly when it is <em>one-to-one</em> <b class="hl">—</b> distinct inputs give distinct outputs <b class="hl">—</b> a condition the horizontal line test reads straight off a graph.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">A function can be run backwards exactly when it is <em>one-to-one</em><b class="hl">:</b> distinct inputs give distinct outputs<b class="hl">. The horizontal line test reads this condition</b> straight off a graph.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">E12</span> §1.6 章摘要 ¶2。<strong>Codex MODIFY 折入</strong>：改用 <span class="en">the informal idea that …</span>，連冒號一起去掉；<span class="en">close enough to, but not equal to, \(a\)</span> 原封不動。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">We began informally <b class="hl">—</b> \(\lim_{x \to a} f(x) = L\) means \(f(x)\) is as close to \(L\) as we please once \(x\) is close enough to, but not equal to, \(a\) <b class="hl">— and</b> estimated limits from tables and graphs (§1.3).</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">We began <b class="hl">with the informal idea that</b> \(\lim_{x \to a} f(x) = L\) means <b class="hl">that</b> \(f(x)\) is as close to \(L\) as we please once \(x\) is close enough to, but not equal to, \(a\)<b class="hl">. We</b> estimated <b class="hl">such</b> limits from tables and graphs (§1.3).</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">E13</span> §1.6 章摘要收尾（全章最後一句）。<strong>Codex MODIFY 折入</strong>：先點名 continuity、定義獨立成句、cleft 改直述；末尾往 Ch2 的橋保留。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">The chapter closed by naming the property that limits make precise <b class="hl">—</b> \(f\) is continuous at \(a\) when \(\lim_{x \to a} f(x) = f(a)\) <b class="hl">— and it is on this machinery that Chapter 2 is built</b>: the derivative is itself a limit, the limit of secant slopes.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">The chapter closed by naming <b class="hl">continuity, the property that limits make precise. A function</b> \(f\) is continuous at \(a\) when \(\lim_{x \to a} f(x) = f(a)\)<b class="hl">. Chapter 2 is built on this machinery</b>: the derivative is itself a limit, the limit of secant slopes.</span></div>
+</div>
+
+<h3>R1-LEXICAL：詞彙層平實化（7 條，全 advisory）</h3>
+<table>
+  <tr><th style="width:6%">編號</th><th style="width:8%">locus</th><th style="width:38%">前</th><th style="width:30%">後</th><th>證據</th></tr>
+  <tr><td class="id">R1</td><td>§1.3 Def 1.9 後</td><td>the definition deliberately <b class="hl">sidesteps</b> \(f(a)\)</td><td>the definition deliberately <b class="hl">says nothing about</b> \(f(a)\)</td><td>數學物件作主語＋迴避隱喻；手稿此處原句無此開頭（LLM 後加）</td></tr>
+  <tr><td class="id">R2</td><td>§1.3 application</td><td>We can now <b class="hl">close the loop</b> opened at the start of the section.</td><td>We can now <b class="hl">answer the question raised</b> at the start of the section.</td><td>商務慣用語，字面義幫不上 EFL 讀者</td></tr>
+  <tr><td class="id">R5</td><td>§1.6 章摘要 ¶1</td><td>two foundations, and they <b class="hl">could hardly look less alike</b>.</td><td>two foundations <b class="hl">that look very different from each other</b>.</td><td>雙重否定曲言，需反轉兩次</td></tr>
+  <tr><td class="id">R6</td><td>§1.6 章摘要 ¶1</td><td><b class="hl">pinned down by</b> the identities</td><td><b class="hl">described exactly by</b> the identities</td><td>片語動詞；ch06 §6.2 同型已裁</td></tr>
+  <tr><td class="id">R7</td><td>§1.6 章摘要 ¶2</td><td><b class="hl">the gaps left by</b> the indeterminate form \(0/0\) <b class="hl">yield to</b> factoring…</td><td>the indeterminate form \(0/0\) <b class="hl">is handled by</b> factoring…</td><td>擬人（式子「屈服」）；沿用 ch06 W-12 先例</td></tr>
+  <tr><td class="id">R8</td><td>§1.2 reciprocal 段</td><td>\(\sec\) and \(\csc\) are <b class="hl">honest</b> reciprocals</td><td>\(\sec\) and \(\csc\) <b class="hl">really are</b> reciprocals</td><td>品格詞配數學物件</td></tr>
+  <tr><td class="id">R9</td><td>§1.2 reciprocal 段</td><td>which Example 1.13 <b class="hl">puts to work</b></td><td>which Example 1.13 <b class="hl">uses</b></td><td>片語動詞（tier 3，與 R8 同句群一起改）</td></tr>
+  <tr><td class="id">E9</td><td>§1.6 Ex 1.42</td><td>The <b class="hl">borrowed</b> inequality <b class="hl">did all the work</b>: no factoring, no auxiliary bound <b class="hl">— the bounding step was handed to us for free.</b></td><td>The <b class="hl">given</b> inequality <b class="hl">already provides the bound we need, so</b> no factoring <b class="hl">and</b> no auxiliary bound <b class="hl">are required.</b></td><td>慣用語＋重述（S1／S3）；Codex MODIFY 折入</td></tr>
+</table>
+
+<h3>PARA-SPLIT：純拆段（1 條）</h3>
+<div class="pair">
+  <p class="why"><span class="id">P1</span> §1.2 reciprocal 段（106 詞／11 式）：詞數與記號都在 SHOULD 之內，但一段承載五個可獨立成立的論述動作 → <strong>只拆段、一字未改</strong>。<span class="small">技術註記：<code>verify_edits.py</code> 逐行解析 <code>old ==&gt; new</code>，無法表達含換行的替換，故拆點寫成同一行的 <code>&lt;/p&gt;  &lt;p&gt;</code>；渲染與分頁結果相同（Gate 8 已驗證 53 頁不變），代價是原始碼少一個換行。</span></p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">…\(\sec\theta\) is the ratio hypotenuse over adjacent, and similarly for the other two. Dividing the Pythagorean identity …（同一段繼續）</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">…and similarly for the other two.<b class="hl">〔段落結束〕</b> <b class="hl">〔新段落〕</b>Dividing the Pythagorean identity …</span></div>
+</div>
+
+<h2>§5 待裁決／未完成（誠實記錄）</h2>
+<div class="card warn">
+  <ol class="tight">
+    <li><strong>§1.2 Example 1.12(a) 的數學不精確（Codex 抓到，本輪未修）。</strong>現況：<span class="en">Note the principal value lands in the <em>second</em> quadrant. Negative inputs to \(\arccos\) always do.</span>——在端點 \(x=-1\) 不成立（\(\arccos(-1)=\pi\)，落在象限界線上，不在第二象限內；已驗算）。本輪只做了去破折號，<strong>沒有動這個敘述</strong>，因為修它要新增數學條件、超出「不動數學」硬護欄與散文閘範圍。<strong>三個選項：</strong>(a) 改成 <span class="en">Negative inputs to \(\arccos\) always give a principal value greater than \(\tfrac{\pi}{2}\).</span>（最小修，不新增區間敘述）；(b) 照 Codex 提案補 \(-1 &lt; x &lt; 0\) 與端點說明（較完整、要走 math gate）；(c) 現狀不動。<strong>我建議 (a)。</strong></li>
+    <li><strong>Gate 7 LaTeX 線 pending</strong>：<code>make_dist.py</code> 的 <code>NAMES</code> 需先加 <code>"ch01": "chapter1"</code>，並盤點 ch01 的 DIALECT 差集，才跑得動三閘（log／完整性／字形）。ch01 也在 LaTeX rollout 的建議順序內（ch03→ch01→ch06），可另開一輪處理。</li>
+    <li><strong>§1.1 chapter lead 仍是 150 詞</strong>（唯一命中 ≥150 觸發器者）：手稿逐字＋chapter-opener 體例，本輪判 KEEP 並記錄；若日後要處理，屬 Mode A 方向層（章開場體例）而非平實化輪。</li>
+    <li><strong>手稿 4 對成對插入語保留</strong>（使用者裁決選項 B）：ch01 因此保有 8 個手稿 dash，日後若政策改為「全書一律走四步」，走查稿 §政策題已備好 MS-1／MS-2／MS-3 三條改寫稿。</li>
+    <li>§1.3 Caution 1.5 出現一組「±3 詞窗口內連續三句」的統計命中（14／16／16）：逐段判讀後認定非真正的節奏扁平（見 §2 末），不改；記錄供未來校準。</li>
+  </ol>
+</div>
+
+<h2>§6 刻意保留（規則不誤傷的證據）</h2>
+<div class="card">
+  <ul class="tight">
+    <li><strong>§1.4 全節</strong>——假陽性對照基準，<code>git diff</code> 證明零改動；量測值完全不動（em 4、N 733、句長 15.6／26／15%），可繼續當基線。</li>
+    <li><strong>手稿逐字 4 對成對插入語</strong>（§1.1 lead 的三項舉例、§1.3 的 instantaneous velocity 釋義、§1.6 的 infinitesimals 釋義與 <span class="en">— and, eventually, to prove the limit laws —</span>）。最後一對即使嚴格套四步也是 KEEP（同一主張的時點／目的修飾，與 <span class="en">— far more often —</span> 先例同型），Codex 覆核同意。</li>
+    <li><strong><span class="id">R3</span> 依 Codex REJECT 撤回</strong>：<span class="en">this everyday promise</span> 原樣保留——字面條件緊接在冒號後在場，換成 <span class="en">requirement</span> 會把「保證」改成「約束」。這是本輪唯一被跨模型判定為「無證據的同義詞美化」的提案，記錄下來作為未來詞彙層的煞車。</li>
+    <li><strong>作者用語不動</strong>（逐一去手稿比對確認）：<span class="en">rigorous footing</span>、<span class="en">eventually forced</span>、<span class="en">tool-kit</span>、<span class="en">reliable</span>、<span class="en">machinery</span>、<span class="en">run backwards</span>、<span class="en">reads straight off a graph</span>、<span class="en">blows up</span>。</li>
+    <li><strong>FLAG 句式不因形式報 finding</strong>：<span class="en">The key phrase is “for every \(\varepsilon &gt; 0\)”</span>（cleft）、<span class="en">It is useful to picture the definition as a challenge-and-response game</span>（明示直覺類比）、<span class="en">The definition requires …</span>、被動語態。</li>
+    <li><strong>squeeze theorem 的 <span class="en">trap／trapped</span></strong>——ch06 §6.2 正是用 <span class="en">traps … between</span> 當平實替代詞。</li>
+    <li><strong>正式定義與定理陳述的長句</strong>（Definition 1.13、Theorem 1.2 五條律、Strategy 1.4／1.5 步驟）：單一論述動作或平行列舉，不得因長度報 F4。</li>
+    <li><strong>§1.1 Ex 1.5 解（103 詞／12 式）與 §1.2 節開場（114 詞／7 式）</strong>：命中「多論證」觸發器邊緣，判為各自一條連續推線，不拆段（Codex 覆核同意）。</li>
+  </ul>
+</div>
+
+<p class="foot">產出：Claude（2026-07-25），分支 <code>handout/plain-ch01</code>。判準＝<code>CONTENT_SPEC.md</code> §3〈平實英文條款〉RC（2026-07-25 凍結）；流程＝<code>KICKOFF-plain-backfill.md</code> Gate 0–9；維度＝<code>PROSE-AUDIT-RUBRIC.md</code>。走查稿 <a href="REVIEW-ch01-plain-walk.html"><code>REVIEW-ch01-plain-walk.html</code></a>（Gate 0 基線＋provenance＋42 條提案）；Codex raw <a href="REPORT-ch01-plain-codex-raw.md"><code>REPORT-ch01-plain-codex-raw.md</code></a>。量測全部程式化：<code>tools/prose_metrics.py</code>（canonical stream）、<code>tools/verify_edits.py</code>（reverse-apply）、masked-source 破折號定位、手稿 provenance 比對、數學片段 diff、句長與節奏統計、瀏覽器內分頁檢查（前後兩版同腳本）；腳本存 scratchpad。緣起鏈：REVIEW-plain-register-research.html → appB 兩輪 → REVIEW-mainline-plain-walk.html → REVIEW-ch06-sec-6-2-plain-applied.html → REVIEW-ch06-sec-6-3-plain-applied.html → REVIEW-ch01-plain-walk.html → 本檔。</p>
+
+</body>
+</html>

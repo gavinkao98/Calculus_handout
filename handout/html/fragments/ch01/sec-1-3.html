@@ -28,7 +28,7 @@
   \[ f(x) \to L \qquad \text{as } x \to a, \]
   read “\(f(x)\) tends to \(L\) as \(x\) tends to \(a\).”</p>
 
-  <p>Notice that the definition deliberately sidesteps \(f(a)\): when we consider \(\lim_{x \to a} f(x)\), we are concerned with the values of \(f(x)\) for \(x\) near \(a\), not with the value of \(f(a)\). In particular, \(f(a)\) need not be defined at all. Figure 1.12 shows three functions whose values at \(a\) are different (and one is undefined), yet which all share the same limit as \(x \to a\).</p>
+  <p>Notice that the definition deliberately says nothing about \(f(a)\): when we consider \(\lim_{x \to a} f(x)\), we are concerned with the values of \(f(x)\) for \(x\) near \(a\), not with the value of \(f(a)\). In particular, \(f(a)\) need not be defined at all. Figure 1.12 shows three functions whose values at \(a\) are different (and one is undefined), yet which all share the same limit as \(x \to a\).</p>
 
   <figure class="figure" data-fig="limit-same-near-a">
     <figcaption><span class="fig-no">Figure 1.12</span> Three functions with the same limit as \(x \to a\).</figcaption>
@@ -73,7 +73,7 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Many answers are possible. Take any curve that approaches height \(10\) as \(x \to 3\) — for instance a straight line through \((3, 10)\) — and then move the single point at \(x = 3\) down to height \(0\), marking an open dot at \((3, 10)\) and a solid dot at \((3, 0)\). Near \(x = 3\), but not at it, the values approach \(10\), so \(\lim_{x \to 3} f(x) = 10\); the relocated point makes \(f(3) = 0\). The limit and the value at the point are independent, so nothing prevents this mismatch.</p>
+        <p>Many answers are possible. Take any curve that approaches height \(10\) as \(x \to 3\), for instance a straight line through \((3, 10)\). Then move the single point at \(x = 3\) down to height \(0\), marking an open dot at \((3, 10)\) and a solid dot at \((3, 0)\). Near \(x = 3\), but not at it, the values approach \(10\), so \(\lim_{x \to 3} f(x) = 10\); the relocated point makes \(f(3) = 0\). The limit and the value at the point are independent, so nothing prevents this mismatch.</p>
       </div>
     </section>
   </div>
@@ -139,12 +139,12 @@
     <p class="env-head"><span class="env-kicker">Caution</span><span class="env-num">1.5</span></p>
     <div class="env-body">
       <p class="ragged">A table of values can only ever <em>suggest</em> a limit; it can never confirm one, and it can mislead. Consider \(f(x) = \sin(\pi / x)\) as \(x \to 0\). Sampling \(x = 0.1, 0.01, 0.001, \dots\) gives \(\sin(10\pi), \sin(100\pi), \dots = 0\) every time, suggesting the limit is \(0\). But sampling \(x = 0.3, 0.03, 0.003, \dots\) gives \(\sin\!\left(\tfrac{10\pi}{3}\right), \sin\!\left(\tfrac{100\pi}{3}\right), \dots = -\tfrac{\sqrt{3}}{2}\) every time, suggesting \(-\tfrac{\sqrt{3}}{2}\).</p>
-      <p class="ragged">Because \(\pi / x\) grows without bound as \(x \to 0\), the sine runs through more and more complete cycles. In truth, near \(0\) the graph keeps oscillating between \(-1\) and \(1\), no matter how closely we zoom in — \(f\) runs through every value in \([-1, 1]\) infinitely often as \(x \to 0\), so the limit does not exist. The definition requires \(f(x)\) to be close to a single \(L\) for <em>all</em> \(x\) sufficiently near \(0\) — not merely for a convenient list of samples.</p>
+      <p class="ragged">Because \(\pi / x\) grows without bound as \(x \to 0\), the sine runs through more and more complete cycles. In truth, near \(0\) the graph keeps oscillating between \(-1\) and \(1\), no matter how closely we zoom in. The function \(f\) runs through every value in \([-1, 1]\) infinitely often as \(x \to 0\), so the limit does not exist. The definition requires \(f(x)\) to be close to a single \(L\) for <em>all</em> \(x\) sufficiently near \(0\), not merely for a convenient list of samples.</p>
     </div>
   </section>
 
   <!-- expansion:application — close the instantaneous-velocity thread opened at the start of the section [pass: enrichment] [source: Mooculus digInInstantaneousVelocity, ball example; units converted to SI] -->
-  <p>We can now close the loop opened at the start of the section. Suppose a ball thrown upward has height \(s(t) = 30t - 5t^{2}\) metres at time \(t\) seconds. Its average velocity over the interval from \(t\) to \(4\) is</p>
+  <p>We can now answer the question raised at the start of the section. Suppose a ball thrown upward has height \(s(t) = 30t - 5t^{2}\) metres at time \(t\) seconds. Its average velocity over the interval from \(t\) to \(4\) is</p>
   <p>\[ \begin{aligned}
     \frac{s(4) - s(t)}{4 - t}
       &= \frac{40 - (30t - 5t^{2})}{4 - t} \\[2pt]
@@ -154,7 +154,7 @@
   \end{aligned} \]</p>
   <p>The <em>instantaneous</em> velocity at \(t = 4\), written \(v(4)\), is the value this average approaches as the interval shrinks to nothing:</p>
   <p>\[ v(4) = \lim_{t \to 4} \frac{s(4) - s(t)}{4 - t} = \lim_{t \to 4} \bigl[-5(t - 2)\bigr] = -10 \text{ m/s}. \]</p>
-  <p>Notice that the original ratio has the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) (a form taken up systematically in §1.5) — both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\) — so the cancellation that produced \(-5(t - 2)\) was what made the limit accessible.</p>
+  <p>Notice that the original ratio has the indeterminate form \(\tfrac{0}{0}\) at \(t = 4\) (a form taken up systematically in §1.5): both \(s(4) - s(t)\) and \(4 - t\) tend to \(0\). The cancellation that produced \(-5(t - 2)\) was what made the limit accessible.</p>
 
   <p>The limits above were guessed by looking at function values near the point of interest. In the following sections, we will develop systematic methods for evaluating limits and study more subtle behavior such as one-sided limits and infinite limits.</p>
 
