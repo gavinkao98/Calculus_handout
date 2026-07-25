@@ -31,6 +31,17 @@ from build import CHAPTERS  # noqa: E402
 MATH_RE = re.compile(r"\\\[.*?\\\]|\\\(.*?\\\)", re.S)
 COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
 TAG_RE = re.compile(r"<[^>]*>", re.S)
+# div.figure-art＝寫在 fragment 裡的 inline SVG（ch01 Figure 1.2 是全書唯一一個）。它由
+# export_figs.mjs 匯成向量 PDF、以 \includegraphics 落地，**圖內文字因此不在 PDF 文字層**
+# ——與 data-fig 圖的標籤同理（那些標籤本來就不在 fragment 裡，故從未進本閘的期望串）。
+# 不排除的話：SVG 的 A／B／x／f(x) 會被判成「掉字」，還會讓後續比對錯位、連帶誤報表格。
+# 圖內文字的把關另有 figure_note_check（exporter 申報的 notes）與圖閘（視覺）。
+ART_RE = re.compile(r'<div class="figure-art">.*?</div>\s*', re.S)
+# div.tbl-wrap＝數值表（ch01 §1.3 的兩張）。內容必須抵達 PDF，但**順序不可比**：pdftotext
+# 對窄 tabular 是欄優先抽取（實測 ch01 抽成「0.9 0.5263 / 0.99 0.5025 …」），fragment 的
+# 詞流卻是列優先，依序子序列判準因此必然假紅（實測 11 個詞誤報為掉字，還讓後續比對錯位）。
+# 故：主閘剝掉表格，改由 table_check() 以「每格詞是否在 PDF 出現」的無序判準單獨把關。
+TBL_RE = re.compile(r'<div class="tbl-wrap">.*?</table>\s*</div>', re.S)
 
 # 兩側都會做的字元正規化：把排版變體收斂回同一個字
 FOLD = {
@@ -82,6 +93,8 @@ def fragment_prose(ch_id):
     for frag in CHAPTERS[ch_id]["fragments"]:
         raw = (HTML_LINE / "fragments" / ch_id / f"{frag}.html").read_text(encoding="utf-8")
         t = COMMENT_RE.sub("", raw)        # 註解不進 LaTeX
+        t = ART_RE.sub(" ", t)             # inline SVG 圖（見 ART_RE）：印刷側是圖，不是文字層
+        t = TBL_RE.sub(" ", t)             # 表格（見 TBL_RE）：改由 table_check 無序把關
         t = MATH_RE.sub(" ", t)            # 數學另有逐位元組保證，不在此閘
         t = TAG_RE.sub(" ", t)
         words += normalize(html_mod.unescape(t))
@@ -94,6 +107,36 @@ def pdf_prose(pdf):
     if out.returncode != 0:
         sys.exit(f"pdftotext 失敗：{out.stderr}")
     return normalize(out.stdout)
+
+
+def table_check(ch_id, pdf):
+    """表格閘：每個表格 cell 的散文／數值詞都必須出現在 PDF——**無序**判準（見 TBL_RE）。
+
+    為什麼與主閘分開：主閘的力量來自「依序」，但 pdftotext 對窄 tabular 是欄優先抽取，
+    表格的順序在 PDF 側本來就不等於源順序，硬要依序比只會製造假紅。拆出來之後兩邊都保有
+    該有的力量：主閘守散文的順序，本閘守表格內容不掉。
+    **已知極限**：無序＝抓不到「表格被排成錯的順序」（例如某欄數值互換）。要抓那個得比對
+    cell 的相鄰關係，本閘不做；表格數值另有數學 pass-through 與人眼閘（gate 4）。
+    """
+    want = []
+    for frag in CHAPTERS[ch_id]["fragments"]:
+        raw = (HTML_LINE / "fragments" / ch_id / f"{frag}.html").read_text(encoding="utf-8")
+        for tbl in TBL_RE.findall(COMMENT_RE.sub("", raw)):
+            for cell in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", tbl, re.S):
+                txt = MATH_RE.sub(" ", cell)            # 數學走 pass-through，不在此閘
+                want += [(frag, w) for w in normalize(html_mod.unescape(TAG_RE.sub(" ", txt)))]
+    if not want:
+        print("表格閘：本章無 table.tbl，略過")
+        return True
+    got = letters(pdf_prose(pdf))
+    missing = [(f, w) for f, w in want if letters([w]) not in got]
+    if missing:
+        print(f"\n表格閘 FAIL：{len(missing)}／{len(want)} 個表格詞沒抵達 PDF")
+        for f, w in missing[:20]:
+            print(f"    {f}: {w!r}")
+        return False
+    print(f"表格閘 PASS：{len(want)} 個表格詞全數抵達 PDF")
+    return True
 
 
 def figure_note_check(figs_json, pdf):

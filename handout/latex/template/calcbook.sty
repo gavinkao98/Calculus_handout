@@ -20,6 +20,14 @@
 \usepackage{amsthm}        % 只取 \qedsymbol（\openbox）
 \usepackage{mathtools}
 \usepackage{enumitem}
+\usepackage{booktabs}   % datatable 語意層（kickoff §4.2 列的 table.tbl 對映；ch01 起用到）
+
+% ── 數學 pass-through 的巨集對等（HTML 側由 MathJax `macros` 提供，見各 standalone 的
+% `window.MathJax.tex.macros`）。數學區段逐位元組照抄，故 LaTeX 側必須提供同名巨集，
+% 否則 `\arccsc` 之類會 Undefined control sequence（ch01 §1.2 三個反三角餘函數）。
+\providecommand{\arccsc}{\operatorname{arccsc}}
+\providecommand{\arcsec}{\operatorname{arcsec}}
+\providecommand{\arccot}{\operatorname{arccot}}
 \usepackage{graphicx}   % figure 語意層（non-float，D8；rollout 用、appB 無圖）
 \usepackage{xcolor}
 \usepackage{luacolor}   % 色彩改 attribute-based：修 LuaTeX 下 \color 跨 breakable box
@@ -322,6 +330,8 @@
 \newcommand{\runin}[1]{\textbf{#1}}            % strong＝run-in 標籤（議題⑥）
 \newcommand{\readingtrack}[1]{\par{\itshape #1}\par}  % p><em 整段（ch01；sampler 展示）
 \newcommand{\qedmark}{\unskip\nobreak\hfill\qedsymbol}  % span.qed 記號驅動
+% p.ragged（ch01 差集）：HTML 用 text-align:left 讓窄 measure 少斷字；印刷側同樣不齊右
+\NewDocumentEnvironment{raggedpara}{}{\par\raggedright}{\par}
 
 % ── 清單（議題⑥ 拍板：樸素＋懸掛；ul bullet＝aResult 藍，對映 ul::marker）────
 \setlist{topsep=3pt, itemsep=3pt, parsep=0pt}
@@ -334,6 +344,8 @@
 \setlist[sollist]{label=\textcolor{aResult}{\textbullet}, leftmargin=1.6em, itemsep=3pt}
 \newlist{objectives}{itemize}{1}               % 開場 objectives 專用槽（D9：可獨立改樣式
 \setlist[objectives]{label=\textcolor{aResult}{\textbullet}, leftmargin=1.6em, itemsep=3pt}%  而不動 emitter；現與 itemize 同貌）
+\newlist{warmuplist}{enumerate}{1}             % ol.warmup（ch01 §1.1 差集）：(a)(b) 小寫括號標號
+\setlist[warmuplist]{label=(\alph*), leftmargin=2.1em, itemsep=3pt}%  對映 HTML counter(wu, lower-alpha)
 \newlist{romanlist}{enumerate}{1}              % ol.roman：(i)(ii)… 左對齊懸掛（appB §B.3 量詞對照對）
 \setlist[romanlist]{label=(\roman*), align=left, labelindent=1.5em, leftmargin=4.0em,
                     labelsep=0.7em, itemsep=3pt, topsep=4pt}%  標號左對齊＋內文懸掛齊，整塊縮 1.5em
@@ -345,6 +357,12 @@
 \NewDocumentEnvironment{figureblock}{}{%
   \par\cb@needspace{6\baselineskip}\vspace{4mm}\begin{center}%
 }{\end{center}\vspace{3mm}}
+% ── 表格語意層（div.tbl-wrap > table.tbl；ch01 §1.3 的數值表）────────────────
+% 三線表（booktabs）＋置中＋小一級字，對映 HTML `.tbl` 的細上下線與 thead 下分隔線。
+% 欄規格由 emitter 供給（首欄 rowlab → r，其餘 c）。就地 non-float，同 D8。
+\NewDocumentEnvironment{datatable}{m}
+  {\par\vspace{3mm}\begin{center}\small\begin{tabular}{#1}\toprule}
+  {\bottomrule\end{tabular}\end{center}\vspace{2mm}}
 \newcommand{\figcaption}[2]{%   % {字面 fig-no}{caption 散文}
   \par\vspace{2.5mm}%
   {\cbuiregular\fontsize{9.5}{13}\selectfont\color{inkSoft}%

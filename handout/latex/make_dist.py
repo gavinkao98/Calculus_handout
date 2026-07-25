@@ -30,6 +30,7 @@ HERE = Path(__file__).resolve().parent
 # 單元 id → 成品檔名（與 chapters/<ch>/ driver 同名；rollout 逐章加）
 NAMES = {
     "appB": "appendixB",
+    "ch01": "chapter1",
     "ch03": "chapter3",
 }
 
@@ -46,6 +47,9 @@ HEADER = """% !TeX program = lualatex
 \\makeatletter\\def\\input@path{{{{../../template/}}}}\\makeatother
 \\def\\cbfontsdir{{../../template/fonts/inter/}}
 \\usepackage{{calcbook}}
+% 圖：emitter 射 `<ch>/<stem>`（見 convert.py），故 graphicspath 指向 chapters/ 上層。
+% 模板內的 {{../figs/}} 是 chapters/<ch>/ 為 CWD 時的路徑，dist/<ch>/ 需這一行覆寫。
+\\graphicspath{{{{../../chapters/}}}}
 \\begin{{document}}
 """
 

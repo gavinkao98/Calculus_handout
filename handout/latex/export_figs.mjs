@@ -102,8 +102,11 @@ const COLLECT = `(() => {
     return f ? f.getBoundingClientRect().width : null;
   })();
   const out = [];
-  for (const fig of document.querySelectorAll('figure.figure[data-fig]')) {
-    const id = fig.getAttribute('data-fig');
+  // Panels come from data-fig figures (drawn by the standalone's FIGS at load) AND from
+  // figures whose SVG is written inline in the fragment, keyed by their id instead
+  // (ch01 Figure 1.2, id fig-map, is the only one in the book; ch03 had none).
+  for (const fig of document.querySelectorAll('figure.figure[data-fig], figure.figure[id]')) {
+    const id = fig.getAttribute('data-fig') ?? fig.id;
     const svgs = [...fig.querySelectorAll('svg.fig-svg')];
     svgs.forEach((svg, i) => {
       const r = svg.getBoundingClientRect();

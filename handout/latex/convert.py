@@ -187,6 +187,7 @@ class SectionHead:
 @dataclass
 class SubsecHead:
     kids: list
+    pagebreak: bool = False          # h3 也帶 page-break-before（ch01 §1.1 差集）
 
 
 @dataclass
@@ -196,6 +197,15 @@ class Env:
     num: str
     name: list
     body: list
+    pagebreak: bool = False          # env 也帶 page-break-before（ch01 §1.1 Theorem 1.1）
+
+
+@dataclass
+class Table:
+    """div.tbl-wrap > table.tbl（ch01 §1.3 的兩張數值表；kickoff §4.2 列的 booktabs 對映）。"""
+    head: list = field(default_factory=list)   # 每列＝cell 的 inline 串列
+    body: list = field(default_factory=list)
+    rowlab_first: bool = False                 # 首欄是 td.rowlab（右對齊列標）
 
 
 @dataclass
@@ -272,10 +282,14 @@ class FragmentParser(HTMLParser):
                 f"{self.fname}:{self.getpos()[0]}: <{tag}> 屬性重複 {dups}——"
                 f"折疊會靜默丟棄前值，屬契約外標記")
         d = dict(attrs)
+        # div.figure-art 子樹＝寫在 fragment 裡的 inline SVG（ch01 Figure 1.2）。它整塊由
+        # export_figs.mjs 匯成向量 PDF，convert.py 從不轉譯其內容，故其中的 presentation
+        # 屬性（style／viewBox／stroke…）不在方言管轄內；Builder 端同樣整塊略過。
+        in_art = any(el.tag == "div" and el.classes == ("figure-art",) for el in self.stack)
         # style 白名單的**唯一收口**（DIALECT-appB §2 #7）：只有無 class 的 <p> 允許
         # 字面值 "text-align:center;"。收口放 parser 層＝所有節點（含結構節點 article／
         # env-head／li…）一體適用，不再靠散落在 Builder 各分支的 guard（gate-2 M-B3 blocking）。
-        if "style" in d and not (
+        if "style" in d and not in_art and not (
                 tag == "p" and not (d.get("class") or "").split()
                 and d["style"] == "text-align:center;"):
             raise ConversionError(
@@ -432,17 +446,20 @@ class Builder:
             if v == "statement" and len(c) == 1:
                 # p.statement：左對齊顯示陳述（可含 <br>，如 §B.3 否定句的多行結構縫）
                 return Para(self.inlines(el.kids, el, allow_br=True), variant="statement")
-            if v in ("lead", "informal", "para-head", "page-break-before") and len(c) == 1:
+            if v in ("lead", "informal", "para-head", "page-break-before", "ragged") and len(c) == 1:
                 return Para(self.inlines(el.kids, el), variant=v)
-            self.err(el, "<p> 只允許無 class 或 lead／informal／para-head／page-break-before／statement")
+            self.err(el, "<p> 只允許無 class 或 lead／informal／para-head／page-break-before／ragged／statement")
 
-        if t == "h3" and c == ("subsec-head",):
-            return SubsecHead(self.inlines(el.kids, el))
+        if t == "h3" and set(c) <= {"subsec-head", "page-break-before"} and "subsec-head" in c:
+            return SubsecHead(self.inlines(el.kids, el), pagebreak="page-break-before" in c)
+
+        if t == "div" and c == ("tbl-wrap",):
+            return self.table_wrap(el)
 
         if t in ("ul", "ol"):
             variant = c[0] if c else ""
-            if t == "ol" and variant not in ("steps", "roman"):
-                self.err(el, "<ol> 只允許 class=steps／roman（appB §B.3 量詞對照對）")
+            if t == "ol" and variant not in ("steps", "roman", "warmup", "prompt-list", "sol-list"):
+                self.err(el, "<ol> 只允許 class=steps／roman／warmup／prompt-list／sol-list")
             if t == "ul" and c not in ((), ("steps",), ("sol-list",)):
                 self.err(el, "<ul> 只允許無 class 或 steps／sol-list（appB 差集）")
             if "start" in el.attrs:
@@ -454,7 +471,7 @@ class Builder:
                 if k.tag != "li" or k.classes:
                     self.err(k, "清單子元素只允許無 class 的 <li>")
                 self.n_mapped += 1
-                node.items.append(self.inlines(k.kids, k))
+                node.items.append(self.li_content(k))
             return node
 
         if t == "section" and "env" in c:
@@ -463,8 +480,8 @@ class Builder:
                 self.err(el, f"env 必須恰有一個環境類別，得到 {c}")
             # class 必須恰好是 {env, env-<kind>}：多餘的 class 代表契約外的樣式，
             # 忽略它就是靜默丟掉作者的意圖
-            if set(c) != {"env", kinds[0]}:
-                self.err(el, f"env 的 class 必須恰為 env＋env-<kind>，得到 {list(c)}")
+            if set(c) - {"page-break-before"} != {"env", kinds[0]}:
+                self.err(el, f"env 的 class 必須恰為 env＋env-<kind>（可加 page-break-before），得到 {list(c)}")
             kind = kinds[0][4:]
             # example／solution 只能住在 workedexample 內（CONTRACT「no solo example」；
             # ch03 盤點的 16＋16 個全數如此）。preamble 依賴這個前提：內層不畫色條，
@@ -472,7 +489,7 @@ class Builder:
             if kind in ("example", "solution") and not self.in_we:
                 self.err(el, f"env-{kind} 落在 workedexample 之外——"
                              f"calcbook 的 env{kind} 不自畫色條，落單會靜默少畫")
-            return self.env(el, kind)
+            return self.env(el, kind, pagebreak="page-break-before" in c)
 
         if t == "div" and c == ("workedexample",):
             self.in_we = True
@@ -500,7 +517,7 @@ class Builder:
 
         self.err(el, "區塊位置的 mapping 表外標記")
 
-    def env(self, el, kind):
+    def env(self, el, kind, pagebreak=False):
         head = body = None
         seen = set()
         for k in el.kids:
@@ -538,19 +555,87 @@ class Builder:
                 name = self.inlines(k.kids, k)
             else:
                 self.err(k, "env-head 只允許 env-kicker／env-num／env-name")
-        return Env(kind, kicker, num, name, self.blocks(body.kids, body))
+        return Env(kind, kicker, num, name, self.blocks(body.kids, body), pagebreak)
+
+    def li_content(self, li):
+        """<li> 的內容：預設純 inline；ch01 的解法清單會在項目內嵌 <figure>（Fig 1.6／1.10），
+        故容許「inline 段落 ＋ Figure」交錯。回傳的串列元素為 inline 節點或 Figure。"""
+        parts, chunk = [], []
+        for k in li.kids:
+            if not isinstance(k, str) and k.tag == "figure" and k.classes == ("figure",):
+                if chunk:
+                    parts.extend(self.inlines(chunk, li))
+                    chunk = []
+                self.n_mapped += 1
+                parts.append(self.figure(k))
+            else:
+                chunk.append(k)
+        if chunk or not parts:
+            parts.extend(self.inlines(chunk, li))
+        return parts
+
+    def table_wrap(self, el):
+        """div.tbl-wrap 內恰一張 table.tbl；thead／tbody 各為列的容器。"""
+        tbl = None
+        for k in el.kids:
+            if self.bare(el, k):
+                continue
+            if k.tag == "table" and k.classes == ("tbl",) and tbl is None:
+                tbl = k
+            else:
+                self.err(k, "tbl-wrap 內只允許恰一個 table.tbl")
+        if tbl is None:
+            self.err(el, "tbl-wrap 必須含 table.tbl")
+        self.n_mapped += 2
+
+        node = Table()
+        for part in tbl.kids:
+            if self.bare(tbl, part):
+                continue
+            if part.tag not in ("thead", "tbody") or part.classes:
+                self.err(part, "table.tbl 只允許無 class 的 <thead>／<tbody>")
+            self.n_mapped += 1
+            rows = node.head if part.tag == "thead" else node.body
+            for tr in part.kids:
+                if self.bare(part, tr):
+                    continue
+                if tr.tag != "tr" or tr.classes:
+                    self.err(tr, "thead／tbody 只允許無 class 的 <tr>")
+                self.n_mapped += 1
+                cells = []
+                for cell in tr.kids:
+                    if self.bare(tr, cell):
+                        continue
+                    if cell.tag not in ("th", "td") or set(cell.classes) - {"rowlab"}:
+                        self.err(cell, "<tr> 只允許 <th>／<td>（td 可加 rowlab）")
+                    self.n_mapped += 1
+                    if "rowlab" in cell.classes:
+                        node.rowlab_first = True
+                    cells.append(self.inlines(cell.kids, cell))
+                rows.append(cells)
+        if not node.head and not node.body:
+            self.err(el, "table.tbl 沒有任何列")
+        widths = {len(r) for r in node.head + node.body}
+        if len(widths) != 1:
+            self.err(el, f"table.tbl 各列欄數不一致：{sorted(widths)}")
+        return node
 
     def figure(self, el):
-        if "data-fig" not in el.attrs:
-            self.err(el, "figure 必須有 data-fig")
+        # 圖鍵：data-fig（standalone 的 FIGS 畫）或 id（SVG 直接寫在 fragment 裡，
+        # ch01 Figure 1.2 是全書唯一一個）。兩者都由 export_figs.mjs 匯出成同名 panel。
+        if "data-fig" not in el.attrs and "id" not in el.attrs:
+            self.err(el, "figure 必須有 data-fig 或 id")
         cap = None
         for k in el.kids:
             if self.bare(el, k):
                 continue
             if k.tag == "figcaption" and not k.classes and cap is None:
                 cap = k
+            elif k.tag == "div" and k.classes == ("figure-art",):
+                # inline SVG 的容器：內容已由 export_figs 匯成向量 PDF，此處不轉譯 SVG
+                self.n_mapped += 1
             else:
-                self.err(k, "figure 內只允許恰一個無 class 的 <figcaption>")
+                self.err(k, "figure 內只允許恰一個無 class 的 <figcaption>（＋選用 div.figure-art）")
         if cap is None:
             self.err(el, "figure 必須有 figcaption")
         self.n_mapped += 1
@@ -568,7 +653,7 @@ class Builder:
                 rest.append(Emph(self.inlines(k.kids, k)))
             else:
                 self.err(k, "figcaption 只允許 span.fig-no／文字／無 class 的 <em>")
-        return Figure(el.attrs["data-fig"], fig_no, rest)
+        return Figure(el.attrs.get("data-fig") or el.attrs["id"], fig_no, rest)
 
     def chapter_head(self, el):
         kicker, title, seen = "", [], set()
@@ -716,7 +801,8 @@ class LatexEmitter:
             return f"\\sechead{{{esc(b.num)}}}{{{self.para_text(b.title)}}}"
 
         if isinstance(b, SubsecHead):
-            return f"\\subsechead{{{self.para_text(b.kids)}}}"
+            pb = "\\pagebreakbefore\n" if b.pagebreak else ""
+            return f"{pb}\\subsechead{{{self.para_text(b.kids)}}}"
 
         if isinstance(b, Para):
             t = self.para_text(b.kids)
@@ -732,13 +818,22 @@ class LatexEmitter:
                 return f"\\begin{{statementblock}}\n{t}\n\\end{{statementblock}}"
             if b.variant == "page-break-before":
                 return f"\\pagebreakbefore\n{t}\n"
+            if b.variant == "ragged":
+                # .ragged＝text-align:left（HTML 對窄 measure 的讓步；ch01 Caution 1.5）
+                return f"\\begin{{raggedpara}}\n{t}\n\\end{{raggedpara}}"
             return t + "\n"
 
         if isinstance(b, ListNode):
             if b.variant == "steps":
                 envname = "steps" if b.ordered else "bulletsteps"
             elif b.variant == "sol-list":
-                envname = "sollist"
+                # appB 的是 ul（bullet＝sollist）；ch01 的是 ol，HTML 無專屬 CSS → 十進位
+                # 編號，語意上就是 enumerate。同名 class 兩種標記，各走各的語意槽。
+                envname = "sollist" if not b.ordered else "enumerate"
+            elif b.variant == "prompt-list":
+                envname = "enumerate"          # ch01：題目子項，HTML 亦為預設 ol
+            elif b.variant == "warmup":
+                envname = "warmuplist"         # ch01 §1.1：(a)(b) 小寫括號標號
             elif b.variant == "objectives":
                 envname = "objectives"
             elif b.variant == "roman":
@@ -749,11 +844,14 @@ class LatexEmitter:
             # 這不是 ESC 表能解的——escape `[` 會讓它在數學外變成別的東西——而是 emitter
             # 要在 \item 之後解除 optional-argument 語境：\relax 一下即可。
             # para_text() 有副作用（記錄數學還原索引），每個 item 只能呼叫一次
-            texts = [self.para_text(i) for i in b.items]
+            texts = [self.item_text(i) for i in b.items]
             items = "\n".join(
                 r"  \item " + (r"\relax " if t.lstrip().startswith("[") else "") + t
                 for t in texts)
             return f"\\begin{{{envname}}}\n{items}\n\\end{{{envname}}}"
+
+        if isinstance(b, Table):
+            return self.table(b)
 
         if isinstance(b, Env):
             # name 必須在 body **之前**算：兩者都可能含數學，而 used 不變式要求還原順序
@@ -761,7 +859,8 @@ class LatexEmitter:
             # 明明輸出正確卻被不變式誤擋（偽陽性）。ch03 的 13 個 env-name 都沒數學才沒踩到。
             name = self.para_text(b.name) if b.name else ""
             inner = self.emit(b.body).strip()
-            return (f"\\begin{{env{b.kind}}}{{{esc(b.kicker)}}}{{{esc(b.num)}}}{{{name}}}\n"
+            pb = "\\pagebreakbefore\n" if b.pagebreak else ""
+            return (f"{pb}\\begin{{env{b.kind}}}{{{esc(b.kicker)}}}{{{esc(b.num)}}}{{{name}}}\n"
                     f"{inner}\n\\end{{env{b.kind}}}")
 
         if isinstance(b, WorkedExample):
@@ -773,20 +872,51 @@ class LatexEmitter:
 
         raise ConversionError(f"emitter: 未知區塊節點 {type(b).__name__}")
 
+    def item_text(self, item):
+        """清單項目：inline 段落與（ch01 差集）嵌在項目內的 Figure 交錯，依源順序輸出。
+        para_text() 的數學還原索引有副作用，故每段 inline 只走一次、順序即源順序。"""
+        out, run = [], []
+        for n in item:
+            if isinstance(n, Figure):
+                if run:
+                    out.append(self.para_text(run))
+                    run = []
+                out.append(self.figure(n))
+            else:
+                run.append(n)
+        if run or not out:
+            out.append(self.para_text(run))
+        return "\n".join(out)
+
+    def table(self, t):
+        """datatable 語意槽（booktapes 三線表）。首欄若是 rowlab 則右對齊，其餘置中——
+        對映 HTML `.tbl th/td{text-align:center}` ＋ `.rowlab{text-align:right}`。"""
+        ncol = len((t.head or t.body)[0])
+        spec = ("r" if t.rowlab_first else "c") + "c" * (ncol - 1)
+        rows = [" & ".join(self.para_text(c) for c in r) + r" \\" for r in t.head]
+        if t.head and t.body:
+            rows.append(r"\midrule")
+        rows += [" & ".join(self.para_text(c) for c in r) + r" \\" for r in t.body]
+        body = "\n".join("  " + r for r in rows)
+        return f"\\begin{{datatable}}{{{spec}}}\n{body}\n\\end{{datatable}}"
+
     def figure(self, f):
         panels = [p for p in self.figs["panels"] if p["id"] == f.fig_id]
         if not panels:
             raise ConversionError(
                 f"figure data-fig=\"{f.fig_id}\" 在 figures.json 找不到——"
                 f"先跑 export_figs.mjs 產圖")
+        # 圖名＝<ch>/figs/<stem>：資產在 chapters/<ch>/figs/，成品端 graphicspath 指到
+        # chapters/（make_dist HEADER）。2026-07-25 ch01 rollout 修正——舊形式 <ch>/<stem>
+        # 沿用 2026-07-17 目錄重整前的 figs/<ch>/ 佈局，dist 從未編過有圖章故一直沒爆。
         # 寬度用實測 mm（DIALECT-ch03.md §5）。不可用 \textwidth：SVG 自帶 inline width，
         # 多數圖只佔約半欄，撐到 \textwidth 會把圖內標籤等比放大。
         art = "\\\\[6pt]\n".join(
-            f"  \\includegraphics[width={p['mm']}mm]{{{self.chapter}/{Path(p['file']).stem}}}"
+            f"  \\includegraphics[width={p['mm']}mm]{{{self.chapter}/figs/{Path(p['file']).stem}}}"
             for p in panels
         ) if len(panels) == 1 else (
             "\\hspace{6mm}".join(
-                f"\\includegraphics[width={p['mm']}mm]{{{self.chapter}/{Path(p['file']).stem}}}"
+                f"\\includegraphics[width={p['mm']}mm]{{{self.chapter}/figs/{Path(p['file']).stem}}}"
                 for p in panels)
         )
         return (f"\\begin{{figureblock}}\n{art}\n"

@@ -323,15 +323,15 @@ class Mappings(unittest.TestCase):
                         '<span class="fig-no">Figure 3.1</span> The area comparison.</figcaption>'
                         '</figure>'))
         self.assertIn(r"\begin{figureblock}", out)
-        self.assertIn(r"\includegraphics[width=79.9mm]{ch03/sector-inequality}", out)
+        self.assertIn(r"\includegraphics[width=79.9mm]{ch03/figs/sector-inequality}", out)
         self.assertIn(r"\figcaption{Figure 3.1}{The area comparison.}", out)
         self.assertNotIn(r"\textwidth", out)
 
     def test_figure_pair_puts_two_panels_side_by_side(self):
         out = conv(wrap('<figure class="figure" data-fig="remainder-tangent"><figcaption>'
                         '<span class="fig-no">Figure 3.6</span> Two panels.</figcaption></figure>'))
-        self.assertIn(r"\includegraphics[width=65.62mm]{ch03/remainder-tangent-1}", out)
-        self.assertIn(r"\includegraphics[width=65.62mm]{ch03/remainder-tangent-2}", out)
+        self.assertIn(r"\includegraphics[width=65.62mm]{ch03/figs/remainder-tangent-1}", out)
+        self.assertIn(r"\includegraphics[width=65.62mm]{ch03/figs/remainder-tangent-2}", out)
         self.assertIn(r"\hspace{6mm}", out)
 
     def test_figure_caption_keeps_math(self):

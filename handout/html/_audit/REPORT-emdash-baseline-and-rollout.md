@@ -122,7 +122,7 @@
 | 5 | ch06（§6.1／§6.4／§6.5） | 55 | §6.2／§6.3 已平實化但 dash 未做；**§6.1 另有兩段 ≥150 詞的段落離群** |
 | 6 | appA | 49 | |
 | 7 | ch03 | 42 | |
-| ~~8~~ | **ch01** | ~~37~~ | ✅ **2026-07-25 完成**（提前做：RC 後第一個回填單元，用它驗證條款在手稿章不誤傷）。執行 41 條、9.3→2.1/1000、數學片段零差異、分頁 53 頁不變、§1.4 對照組零改動；Codex gate-2 ADOPT 34／MODIFY 7／REJECT 1。**Gate 7（LaTeX）pending：`make_dist.py` 的 `NAMES` 尚無 ch01。** |
+| ~~8~~ | **ch01** | ~~37~~ | ✅ **2026-07-25 完成**（提前做：RC 後第一個回填單元，用它驗證條款在手稿章不誤傷）。執行 41 條、9.3→2.1/1000、數學片段零差異、分頁 53 頁不變、§1.4 對照組零改動；Codex gate-2 ADOPT 34／MODIFY 7／REJECT 1。**Gate 7（LaTeX）已開跑、2/3 閘過**：`NAMES` 已補 ch01、九條方言 mapping＋33 panel 圖匯出完成，閘 1 編譯（44 頁／0 error／0 missing char）與閘 3 完整性（0 真落差）PASS；**閘 3b 圖內文字有 1 個真缺陷**（Figure 1.16 兩格 panel note 被 exporter 的 pair-layout 墨水框裁掉）→ `dist/ch01/` 未產出。紀錄 [`../../latex/chapters/ch01/DIALECT-ch01.md`](../../latex/chapters/ch01/DIALECT-ch01.md) |
 | 9 | appC | 20 | N<1000 附近，報 raw 並與鄰近單元合併判定 |
 | 10 | appD | 14 | 舊表誤標「免」，實需處理 |
 
