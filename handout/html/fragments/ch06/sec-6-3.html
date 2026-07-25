@@ -21,9 +21,9 @@
   </header>
 
   <!-- expansion:intuition — section opener: §6.2 made evaluation hard; the FTC ties the integral to the derivative and makes it easy. Name the two parts without proving them yet. -->
-  <p>Two sections of work have built the definite integral into a well-defined number, but left it laborious to compute: every value so far came from a limit of Riemann sums or from a picture. The <em>Fundamental Theorem of Calculus</em> ends that difficulty, and in doing so reveals why the subject is called <em>calculus</em> — a single method. It comes in two parts. The first says that integrating a continuous function and then differentiating recovers the function: differentiation undoes integration. The second turns that fact into a tool, evaluating a definite integral from any single antiderivative of the integrand, with no sums at all. The engine behind both is a function that measures accumulated area.</p>
+  <p>Two sections of work have built the definite integral into a well-defined number, but left it hard to compute. Every value so far came from a limit of Riemann sums or from a picture. The <em>Fundamental Theorem of Calculus</em> removes that difficulty, and it is the reason the subject is one method rather than two. It comes in two parts. The first says that integrating a continuous function and then differentiating recovers the function: differentiation undoes integration. The second turns that fact into a tool, evaluating a definite integral from any single antiderivative of the integrand, with no sums at all. Both parts rest on a single function: the one that measures accumulated area.</p>
 
-  <p>The reverse of differentiation earns a name of its own.</p>
+  <p>The reverse of differentiation has a name of its own.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.3</span><span class="env-name">Antiderivative</span></p>
@@ -71,7 +71,7 @@
       <p>\[ m_{h} = f(u_{h}) \to f(x) \qquad\text{and}\qquad M_{h} = f(v_{h}) \to f(x). \]</p>
       <p>The difference quotient is squeezed between two quantities both tending to \(f(x)\), so by the Squeeze Theorem (Theorem 1.3),</p>
       <p>\[ g'(x) = \lim_{h \to 0} \frac{g(x + h) - g(x)}{h} = f(x). \]</p>
-      <p>It remains to see that \(g\) is continuous on the whole closed interval, endpoints included. Since \(f\) is continuous on \([a, b]\) it is bounded there, say \(\lvert f\rvert \le M\) (Theorem 4.9(a)); then for \(x\) and \(x + h\) in \([a, b]\) the comparison bound gives \(\bigl\lvert g(x+h) - g(x)\bigr\rvert = \bigl\lvert\int_{x}^{x+h} f\bigr\rvert \le M\,\lvert h\rvert\), which tends to \(0\) with \(h\). So \(g\) is continuous at every point of \([a, b]\). <span class="qed qed-proof"></span></p>
+      <p>It remains to see that \(g\) is continuous on the whole closed interval, endpoints included. Since \(f\) is continuous on \([a, b]\) it is bounded there, say \(\lvert f\rvert \le M\) (Theorem 4.9(a)). Then for \(x\) and \(x + h\) in \([a, b]\) the comparison bound gives \(\bigl\lvert g(x+h) - g(x)\bigr\rvert = \bigl\lvert\int_{x}^{x+h} f\bigr\rvert \le M\,\lvert h\rvert\), which tends to \(0\) with \(h\). So \(g\) is continuous at every point of \([a, b]\). <span class="qed qed-proof"></span></p>
     </div>
   </section>
 
@@ -84,7 +84,7 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Two points. First, the letter under the integral sign is a placeholder — \(\int_{a}^{x} f(t)\,dt\) and \(\int_{a}^{x} f(s)\,ds\) are the same function of \(x\); writing \(\int_{a}^{x} f(x)\,dx\), with \(x\) doing double duty as both limit and dummy, is a genuine error. Second, Part 1 asks nothing of \(f\) beyond continuity, so it differentiates accumulation functions we cannot evaluate: \(g(x) = \int_{0}^{x} e^{-t^{2}}\,dt\) has \(g'(x) = e^{-x^{2}}\) exactly, even though \(e^{-t^{2}}\) has no antiderivative expressible in elementary functions. The theorem <em>constructs</em> an antiderivative where no formula for one exists.</p>
+      <p>Two points. First, the letter under the integral sign is a placeholder — \(\int_{a}^{x} f(t)\,dt\) and \(\int_{a}^{x} f(s)\,ds\) are the same function of \(x\). Writing \(\int_{a}^{x} f(x)\,dx\), with \(x\) doing double duty as both limit and dummy, is a genuine error. Second, Part 1 requires nothing of \(f\) beyond continuity, so it differentiates accumulation functions we cannot evaluate: \(g(x) = \int_{0}^{x} e^{-t^{2}}\,dt\) has \(g'(x) = e^{-x^{2}}\) exactly, even though \(e^{-t^{2}}\) has no antiderivative expressible in elementary functions. The theorem <em>constructs</em> an antiderivative where no formula for one exists.</p>
     </div>
   </section>
 
@@ -120,7 +120,7 @@
       <div class="env-body">
         <p>(a) The variable now sits in the <em>lower</em> limit. Reversing the limits flips the sign, \(g(x) = -\int_{1}^{x} \sqrt{1 + t^{2}}\,dt\), and Part 1 differentiates the reversed integral:</p>
         <p>\[ g'(x) = -\sqrt{1 + x^{2}}. \]</p>
-        <p>The minus sign is the whole point: advancing the <em>lower</em> limit eats into the accumulated area, so the rate of change is the negative of the integrand.</p>
+        <p>The minus sign matters: advancing the <em>lower</em> limit reduces the accumulated area, so the rate of change is the negative of the integrand.</p>
         <p>(b) Both limits are functions of \(x\). Split at any constant — \(0\) will do — into two variable-upper-limit pieces, \(h(x) = \int_{0}^{x^{3}} \cos t\,dt - \int_{0}^{x^{2}} \cos t\,dt\), and apply Part 1 with the chain rule to each end:</p>
         <p>\[ h'(x) = \cos(x^{3})\cdot 3x^{2} - \cos(x^{2})\cdot 2x = 3x^{2}\cos(x^{3}) - 2x\cos(x^{2}). \]</p>
         <p>Each end contributes the integrand evaluated at that limit, times the limit’s own derivative; the lower end enters with a minus. <span class="qed"></span></p>
@@ -130,7 +130,7 @@
 
   <h3 class="subsec-head">Evaluating integrals</h3>
 
-  <p>Part 1 built one antiderivative of \(f\) — the accumulation function. Part 2 turns the tables: it evaluates a definite integral from <em>any</em> antiderivative whatsoever, and most antiderivatives are far easier to write down than \(\int_{a}^{x} f\).</p>
+  <p>Part 1 built one antiderivative of \(f\) — the accumulation function. Part 2 does the reverse: it evaluates a definite integral from <em>any</em> antiderivative whatsoever, and most antiderivatives are far easier to write down than \(\int_{a}^{x} f\).</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.4</span><span class="env-name">Fundamental Theorem of Calculus, Part 2</span></p>
@@ -178,13 +178,13 @@
       <div class="env-body">
         <p>An antiderivative of \(x^{2}\) is \(\tfrac{1}{3}x^{3}\), so</p>
         <p>\[ \int_{0}^{1} x^{2}\,dx = \left[\frac{x^{3}}{3}\right]_{0}^{1} = \frac{1}{3} - 0 = \frac{1}{3}. \]</p>
-        <p>The whole limit-of-Riemann-sums computation of §6.1–6.2 collapses to one line. For the second, write \(\sqrt{x} = x^{1/2}\), whose antiderivative is \(\tfrac{x^{3/2}}{3/2} = \tfrac{2}{3}x^{3/2}\):</p>
+        <p>The whole limit-of-Riemann-sums computation of §6.1–6.2 reduces to one line. For the second, write \(\sqrt{x} = x^{1/2}\), whose antiderivative is \(\tfrac{x^{3/2}}{3/2} = \tfrac{2}{3}x^{3/2}\):</p>
         <p>\[ \begin{aligned}
           \int_{1}^{4} \sqrt{x}\,dx &= \left[\frac{2}{3}x^{3/2}\right]_{1}^{4}
                                      = \frac{2}{3}\bigl(4^{3/2} - 1^{3/2}\bigr) \\[2pt]
                                     &= \frac{2}{3}(8 - 1) = \frac{14}{3}.
         \end{aligned} \]</p>
-        <p>In Example 6.8 the bounding property could only pen this integral into the range \([3, 6]\); the Fundamental Theorem delivers the exact \(\tfrac{14}{3} \approx 4.67\), which indeed sits there. <span class="qed"></span></p>
+        <p>In Example 6.8 the bounding property could only confine this integral to the range \([3, 6]\); the Fundamental Theorem gives the exact value \(\tfrac{14}{3} \approx 4.67\), which indeed sits there. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -205,13 +205,13 @@
                                      = (-\cos \pi) - (-\cos 0) \\[2pt]
                                     &= -(-1) - (-1) = 2.
         \end{aligned} \]</p>
-        <p>The answer is positive, as it must be: over \([0, \pi]\) the sine curve rises in a single hump above the axis, so its signed area is a genuine, positive area. <span class="qed"></span></p>
+        <p>The answer is positive, as it must be: over \([0, \pi]\) the sine curve rises in a single hump above the axis, so its signed area is an ordinary positive area. <span class="qed"></span></p>
       </div>
     </section>
   </div>
 
   <!-- expansion:history [source: standard calculus-textbook historical note] — the FTC as Newton and Leibniz's central discovery, the inverse link making calculus one subject -->
-  <p>This inverse link is the discovery, made independently by Newton in the 1660s and Leibniz in the 1670s, that founded calculus as one subject rather than two. The area problem and the tangent problem had been studied for centuries in isolation; the recognition that they are inverse — that the derivative of an accumulated area is the height, and so an area is recovered from an antiderivative — is what turned a collection of clever area computations into a method.</p>
+  <p>This inverse link is the discovery, made independently by Newton in the 1660s and Leibniz in the 1670s, that founded calculus as one subject rather than two. The area problem and the tangent problem had been studied for centuries in isolation. The recognition that they are inverse — that the derivative of an accumulated area is the height, and so an area is recovered from an antiderivative — is what turned a collection of clever area computations into a method.</p>
 
   <!-- expansion:summary — close: the two parts are two faces of one inverse relationship; forward-fence to §6.4 (antiderivative notation + net change) WITHOUT its mechanics -->
   <p>The two parts are one statement seen from opposite ends. Part 1 differentiates an integral and returns the integrand; Part 2 integrates using an antiderivative and returns a difference of its values. Together they say that differentiation and integration are inverse processes — the central fact of the subject. What remains is to make antiderivatives easy to produce and to read. The next section sets up a notation for the whole family of antiderivatives of a function and reads the Fundamental Theorem as a statement about accumulated change.</p>

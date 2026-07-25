@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>§6.3 平實化 ＋ 段落／符號密集標準定值 — applied</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2df; --bg:#fbfbf9; --card:#fff;
+    --good:#1f7a44; --good-bg:#f0f8f3; --good-line:#b8ddc7; --bad:#a3232a; --bad-bg:#fdf4f4;
+    --bad-line:#e8c9c9; --warn:#9a5b00; --warn-bg:#fdf3e3; --accent:#2d5a8a; --code-bg:#f4f4f2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Inter","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.6; max-width:940px; margin:0 auto; padding:2.4rem 1.5rem 5rem; }
+  h1 { font-size:1.45rem; line-height:1.3; margin:0 0 .3rem; }
+  .sub { color:var(--muted); font-size:.93rem; margin:0 0 1.6rem; }
+  h2 { font-size:1.14rem; margin:2.4rem 0 .7rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+  h3 { font-size:.98rem; margin:1.5rem 0 .45rem; color:var(--accent); }
+  code { font-family:Consolas,monospace; font-size:.87em; background:var(--code-bg); padding:.08em .35em; border-radius:3px; }
+  table { border-collapse:collapse; width:100%; margin:.7rem 0 1rem; font-size:.88rem; }
+  th,td { border:1px solid var(--line); padding:.4rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f0f0ee; font-weight:600; }
+  td.num,th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.9rem 1.15rem; margin:1rem 0; }
+  .card.good { background:var(--good-bg); border-color:var(--good-line); }
+  .card.warn { background:var(--warn-bg); border-color:#e8d3a8; }
+  .row { display:flex; gap:.55rem; padding:.45rem .6rem; border-radius:5px; margin-bottom:.3rem; }
+  .row .lbl { flex:0 0 3rem; font-size:.72rem; font-weight:700; padding-top:.18rem; }
+  .row .txt { flex:1; font-size:.94rem; line-height:1.55; }
+  .before { background:var(--bad-bg); border-left:3px solid var(--bad-line); }
+  .before .lbl { color:var(--bad); }
+  .after { background:var(--good-bg); border-left:3px solid var(--good-line); }
+  .after .lbl { color:var(--good); }
+  .pair { margin:.75rem 0 1rem; }
+  .pair .why { font-size:.85rem; color:var(--muted); margin:0 0 .3rem; }
+  .id { font-family:Consolas,monospace; font-size:.8em; font-weight:700; color:var(--accent); white-space:nowrap; }
+  .tag { display:inline-block; font-size:.74rem; font-weight:600; padding:.08rem .45rem; border-radius:999px; }
+  .tag.good { color:var(--good); background:var(--good-bg); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); }
+  ul.tight { margin:.3rem 0 .7rem; padding-left:1.3rem; }
+  ul.tight li { margin:.2rem 0; }
+  .small { font-size:.85rem; color:var(--muted); }
+  .foot { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.84rem; color:var(--muted); }
+  .up { color:var(--good); font-weight:700; }
+  .out { background:#fff3b0; padding:0 .2em; border-radius:2px; font-weight:600; }
+</style>
+</head>
+<body>
+
+<h1>§6.3 平實化 ＋ 段落／符號密集標準定值</h1>
+<p class="sub">第二節正文（證明體）· 走查＋執行 11 條＋math gate ＋ 五節語料校準出段落層數值 · 2026-07-25 · ch06 已重建</p>
+
+<div class="card good">
+  <strong>這一節要交付的東西拿到了：段落／符號密集標準的<span class="up">數值</span></strong>，由五節實測校準（§1.4 手稿章＋§6.1／§6.2／§6.3／§6.4 canon 章）。同時 §6.3 執行 11 條，<strong>math gate 滿分：數學片段 189 → 189，零差異</strong>（連新增都沒有——本輪一個式子都沒動）。
+</div>
+
+<h2>§1 段落層標準（本輪主要成果）</h2>
+<table>
+  <tr><th>節</th><th class="num">段數</th><th class="num">最長段（詞）</th><th class="num">P75 段長</th><th class="num">最多記號／段</th><th class="num">≥150 詞段</th><th>性質</th></tr>
+  <tr><td>ch01 §1.4</td><td class="num">16</td><td class="num">88</td><td class="num">73</td><td class="num">11</td><td class="num">0</td><td>手稿章（真人逐字）＝黃金標準</td></tr>
+  <tr><td>ch06 §6.1</td><td class="num">29</td><td class="num"><span class="out">169</span></td><td class="num">66</td><td class="num">10</td><td class="num"><span class="out">2</span></td><td>canon；<strong>本輪新發現的離群</strong></td></tr>
+  <tr><td>ch06 §6.2（已改）</td><td class="num">32</td><td class="num">113</td><td class="num">59</td><td class="num">12</td><td class="num">0</td><td>canon；改前為 <span class="out">294 詞／34 式</span></td></tr>
+  <tr><td>ch06 §6.3</td><td class="num">27</td><td class="num">114</td><td class="num">80</td><td class="num">19</td><td class="num">0</td><td>canon，<strong>證明體</strong>（記號密度天然最高）</td></tr>
+  <tr><td>ch06 §6.4</td><td class="num">22</td><td class="num">117</td><td class="num">52</td><td class="num">11</td><td class="num">0</td><td>canon</td></tr>
+</table>
+
+<div class="card">
+  <strong>據此寫進 <code>CONTENT_SPEC.md</code> §3 的數值：</strong>
+  <ul class="tight">
+    <li><strong>SHOULD</strong>：散文段落 ≤120 詞；每段行內數學式 ≤20 個。（實測四節上界 88–117 詞、10–19 式，這兩個數字是「正常」的天花板而非理想值。）</li>
+    <li><strong>MUST 人工判定（觸發器，非拆段命令）</strong>：段落 ≥150 詞、或行內式 &gt;20 個、或<strong>一段承載兩個以上可各自獨立成立的論證</strong>——任一成立即須逐段判讀。判準與句層同源：<strong>看論述動作數，不看詞數</strong>。</li>
+  </ul>
+  <strong>這組數值的驗證力（為什麼可以定值）：</strong>它能區分兩個真實案例——
+  <ul class="tight">
+    <li>改寫前的 §6.2 性質證明段（<strong>294 詞／34 式／四個獨立論證</strong>）→ 三個觸發器全中，<strong>正確抓出</strong>（已拆為五段）。</li>
+    <li>§6.3 的 FTC-1 證明段（<strong>114 詞／19 式／單一論證</strong>）→ 落在 SHOULD 之內，<strong>正確放行</strong>——證明體不因記號多而被誤判。</li>
+  </ul>
+  <p class="small"><strong>順帶發現（本輪未處理）：ch06 §6.1 有兩段 ≥150 詞、最長 169 詞</strong>——它從未被走查過（診斷起點是 §6.2）。這是段落標準上線後第一個該回填的目標，記錄在此。</p>
+</div>
+
+<h2>§2 §6.3 走查與執行（11 條）</h2>
+<p class="small">家族命中 18 處／1698 詞 ≈ <strong>10.6 每千詞</strong>（§6.2 為 14.7、appB 為 10.5、手稿章 §1.4 ≈0）。逐條人工複核後判定 7 條為真、5 條為正則過度命中、其餘為 FLAG 案例（見 §3 保留清單）。另拆 3 句雙論證黏接句。</p>
+
+<h3>詞彙層（7 條）</h3>
+<div class="pair">
+  <p class="why"><span class="id">X-1</span> 節開場三處：低頻詞（<span style="font-style:italic">laborious</span>）＋宏大語（<span style="font-style:italic">reveals why the subject is called calculus</span>）＋機械隱喻（<span style="font-style:italic">The engine behind both</span>）；並拆掉一個 40 詞雙論證冒號句。</p>
+  <div class="row before"><span class="lbl">前</span><span class="txt">…built the definite integral into a well-defined number, but left it <b>laborious</b> to compute<b>:</b> every value so far came from a limit of Riemann sums or from a picture. The <em>Fundamental Theorem of Calculus</em> <b>ends that difficulty, and in doing so reveals why the subject is called <em>calculus</em> — a single method.</b> … <b>The engine behind both is</b> a function that measures accumulated area.</span></div>
+  <div class="row after"><span class="lbl">後</span><span class="txt">…built the definite integral into a well-defined number, but left it <b>hard</b> to compute<b>.</b> Every value so far came from a limit of Riemann sums or from a picture. The <em>Fundamental Theorem of Calculus</em> <b>removes that difficulty, and it is the reason the subject is one method rather than two.</b> … <b>Both parts rest on a single function:</b> the one that measures accumulated area.</span></div>
+</div>
+
+<table>
+  <tr><th style="width:7%">編號</th><th style="width:46%">前</th><th>後</th></tr>
+  <tr><td class="id">X-2</td><td>The reverse of differentiation <b>earns</b> a name of its own.</td><td>The reverse of differentiation <b>has</b> a name of its own.</td></tr>
+  <tr><td class="id">X-3</td><td>Part 1 <b>asks</b> nothing of \(f\) beyond continuity</td><td>Part 1 <b>requires</b> nothing of \(f\) beyond continuity</td></tr>
+  <tr><td class="id">X-4</td><td>Part 2 <b>turns the tables</b>: it evaluates a definite integral from <em>any</em> antiderivative</td><td>Part 2 <b>does the reverse</b>: it evaluates a definite integral from <em>any</em> antiderivative</td></tr>
+  <tr><td class="id">X-5</td><td>The minus sign is <b>the whole point</b>: advancing the <em>lower</em> limit <b>eats into</b> the accumulated area</td><td>The minus sign <b>matters</b>: advancing the <em>lower</em> limit <b>reduces</b> the accumulated area</td></tr>
+  <tr><td class="id">X-6</td><td>the whole limit-of-Riemann-sums computation … <b>collapses to</b> one line ／ the bounding property could only <b>pen this integral into</b> the range \([3,6]\); the Fundamental Theorem <b>delivers</b> the exact \(\tfrac{14}{3}\)</td><td>… <b>reduces to</b> one line ／ could only <b>confine this integral to</b> the range \([3,6]\); the Fundamental Theorem <b>gives the exact value</b> \(\tfrac{14}{3}\)</td></tr>
+  <tr><td class="id">X-7</td><td>so its signed area is a <b>genuine, positive</b> area</td><td>so its signed area is an <b>ordinary positive</b> area</td></tr>
+</table>
+
+<h3>黏接句（3 條，皆為「兩個可獨立成立的論述動作」）</h3>
+<table>
+  <tr><th style="width:7%">編號</th><th style="width:46%">前</th><th>後</th></tr>
+  <tr><td class="id">X-8</td><td>Caution：…are the same function of \(x\)<b>;</b> writing \(\int_{a}^{x} f(x)\,dx\), with \(x\) doing double duty…, is a genuine error.</td><td>…are the same function of \(x\)<b>.</b> Writing \(\int_{a}^{x} f(x)\,dx\), with \(x\) doing double duty…, is a genuine error.</td></tr>
+  <tr><td class="id">X-9</td><td>FTC-1 證明末段（50 詞）：…say \(\lvert f\rvert \le M\) (Theorem 4.9(a))<b>;</b> then for \(x\) and \(x+h\) in \([a,b]\) the comparison bound gives…</td><td>…say \(\lvert f\rvert \le M\) (Theorem 4.9(a))<b>.</b> Then for \(x\) and \(x+h\) in \([a,b]\) the comparison bound gives…</td></tr>
+  <tr><td class="id">X-10</td><td>歷史段（53 詞）：The area problem and the tangent problem had been studied for centuries in isolation<b>;</b> the recognition that they are inverse — … — is what turned…</td><td>…studied for centuries in isolation<b>.</b> The recognition that they are inverse — … — is what turned…</td></tr>
+</table>
+
+<h2>§3 刻意保留（示範規則不誤傷）</h2>
+<div class="card">
+  <ul class="tight">
+    <li><strong>cleft</strong>：<span style="font-style:italic">What remains is to make antiderivatives easy to produce and to read.</span>——FLAG 句式，語義透明，依條款<strong>不得因形式報 finding</strong>。</li>
+    <li><strong>歷史段的具體宏大語</strong>：<span style="font-style:italic">This inverse link is the discovery, made independently by Newton in the 1660s and Leibniz in the 1670s, that founded calculus as one subject rather than two.</span>——SPEC §3 型③ 禁的是「偉大天才／劃時代突破」式空泛語；此句指名了發現什麼、誰、何時，屬實質內容。</li>
+    <li><span style="font-style:italic">the central fact of the subject</span>、<span style="font-style:italic">far easier to write down</span>、<span style="font-style:italic">any added constant is pointless here</span>——正則命中但語義透明、可推測，判為<strong>非 finding</strong>（正則過度命中 5 處中的 3 處）。</li>
+    <li><strong>FTC-1 證明段（114 詞／19 式）</strong>——記號密度全語料最高，但承載<strong>單一論證</strong>（差商的夾擠），依段落標準<strong>放行不拆</strong>。</li>
+    <li>12 句剩餘黏接長句——多為定理陳述（Theorem 6.3 的 57 詞）與證明步驟，數學式參與計數，依「符號密集段落另立標準」保護。</li>
+  </ul>
+</div>
+
+<h2>§4 驗算</h2>
+<table>
+  <tr><th>指標</th><th class="num">§6.3 改前</th><th class="num">§6.3 改後</th><th class="num">§1.4 手稿基線</th></tr>
+  <tr><td><strong>數學片段（HEAD 對比）</strong></td><td class="num">189</td><td class="num"><span class="up">189（零差異）</span></td><td class="num">—</td></tr>
+  <tr><td>家族命中（真 finding）</td><td class="num">7</td><td class="num"><span class="up">0</span></td><td class="num">0</td></tr>
+  <tr><td>平均句長／中位</td><td class="num">26.1／23</td><td class="num">24.5／21</td><td class="num">20.8／20</td></tr>
+  <tr><td>&gt;25 詞句</td><td class="num">45%</td><td class="num">39%</td><td class="num">23%</td></tr>
+  <tr><td>&gt;40 詞句</td><td class="num">18%</td><td class="num"><span class="up">13%</span></td><td class="num">5%</td></tr>
+  <tr><td>黏接長句</td><td class="num">15</td><td class="num">12</td><td class="num">5</td></tr>
+</table>
+<div class="card good">
+  <strong>Math gate（gate-1，範圍限定）：0 blocking、0 advisory。</strong>
+  <ul class="tight">
+    <li><strong>數學片段 189 → 189，只在 HEAD／只在現在 各 0 個</strong>——本輪連一個新式子都沒加（§6.2 那輪至少新增了 \(3\)、\(6\)）。M1／M2／M4 因此無從違反。</li>
+    <li>M7 跨節：cross-ref 全數在位且未改（Corollary 4.4 ×2、Theorem 1.3／2.1／3.3／4.9(a)×2／6.2 ×2、Figure 6.7／6.8、Example 6.8）。X-9 拆句落在 FTC-1 證明的收尾步驟，前後依賴（\(f\) 有界 → comparison bound）順序未變。</li>
+    <li>M5：X-5 改寫 <span style="font-style:italic">eats into → reduces</span> 未改變「下限前進使累積面積減少」的方向性（符號約定 \(g(x)=-\int_{1}^{x}\)…仍在）。</li>
+    <li>結構健檢：p 70/70、section 15/15、div 19/19、inline 數學 173/173、黏連瑕疏 0。</li>
+  </ul>
+</div>
+
+<h2>§5 規則狀態：可以升 RC 了嗎</h2>
+<div class="card warn">
+  <p><strong>可以升 RC（release candidate）、凍結給舊章回填用——但 v1.0 仍差生成端那一步。</strong></p>
+  <ul class="tight">
+    <li><span class="tag good">已備齊</span>詞彙層判準（三節驗證：appB 10.5、§6.2 14.7、§6.3 10.6 每千詞；手稿對照 ≈0）；句層判準（論述動作＋觸發器，經 Codex 回歸審核修訂）；<strong>段落／符號密集層數值（本輪補上，五節校準，且能區分離群與正常）</strong>；假陽性基準（§1.4 未動，可持續複驗）。</li>
+    <li><span class="tag warn">仍缺</span><strong>生成端未測</strong>——三節都是「已定稿章回填」，測的是稽核＋改寫。條款真正的目標是讓 LLM 一開始就寫對，要在下一個新節（Ch7 起）Mode A 跑 style card 兩臂對照才測得到。</li>
+    <li><span class="tag warn">仍缺</span>C 層 linter（把這些數值變成離線報告）、真人 EFL 盲讀（LLM 閘之外的獨立證據，選配）。</li>
+  </ul>
+  <p><strong>建議：現在把規則標為 RC 並開始舊章回填</strong>（第一批目標：§6.1 的兩個 ≥150 詞段落＋ch01–ch05 走查），<strong>同時</strong>在下一個新節用 style card 測生成端；兩者都過再宣告 v1.0。</p>
+</div>
+
+<p class="foot">產出：Claude（2026-07-25）。走查、家族偵測、段落統計、math gate 皆為程式化量測（腳本存 scratchpad）；家族命中逐條人工複核主語與可推測性。§1.4 持續保持原狀作為假陽性基準。ch06 print 版分頁仍未目視檢查（瀏覽器面板本輪仍無法開啟 chapter6 檔）。緣起鏈：REVIEW-plain-register-research.html → appB 兩輪 → REVIEW-mainline-plain-walk.html → §6.2 applied → 本檔。</p>
+
+</body>
+</html>
