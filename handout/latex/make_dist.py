@@ -31,6 +31,7 @@ HERE = Path(__file__).resolve().parent
 NAMES = {
     "appB": "appendixB",
     "ch01": "chapter1",
+    "ch02": "chapter2",
     "ch03": "chapter3",
 }
 

@@ -23,14 +23,18 @@ CID／ToUnicode／charset 卻全對——四閘全綠。修法是模板給 Inter
 **這條閘的已知極限（別把它當成它不是的東西）**：
   - 只驗「輪廓對不對」，不驗「擺得對不對」。字距、letterspacing、定位、斷行壞掉，
     本閘一律看不到——那是閘 2 與人眼的範圍。
-  - 只驗 CFF（FontFile3／CIDFontType0C）。遇到非 CFF 或非 CID-keyed 的嵌入字型、或
+  - 逐 CID 輪廓比對只驗 CFF（FontFile3／CIDFontType0C）。非 CID-keyed 的嵌入子集、或
     找不到原始字型檔，一律 **FAIL 並指名**，不默默略過——silent skip 正是
     check_prose.py 的 figure_note_check 記錄過的偽陰性坑，不重蹈。
+  - **非 CFF 的嵌入字型走 `FIG_IMPORTED_OK` 具名白名單**（2026-07-26 ch02 rollout 立，
+    見該常數的註解）：那些是圖 PDF 帶進來的、不是 LaTeX 嵌的，本機沒有原始檔可比對，
+    故改問「是不是預期中的那幾套字型」。**白名單外仍是硬 FAIL 並指名**。
 """
 import io
 import re
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 import fitz
@@ -40,6 +44,28 @@ from fontTools.ttLib import TTFont
 
 VENDORED = Path(__file__).resolve().parent / "template" / "fonts" / "inter"
 SUBSET_TAG = re.compile(r"^\w{6}\+")            # 子集前綴 `IQGLBE+Inter-Bold`
+
+# ── 圖 PDF 帶進來的字型：具名 allow-list（2026-07-26，ch02 rollout 立）─────────
+#
+# 為什麼要分流：本閘的逐 CID 輪廓比對針對的是 **LaTeX 自己嵌的字型**——2026-07-17 那個
+# bug 是 LuaTeX node mode 以「字形名稱」索引字形的病。圖則是 export_figs.mjs 用 Chrome
+# 匯出的獨立 PDF，`\includegraphics` 只是把它整塊放進來：Chrome 的匯出路徑沒有 node-mode
+# 這個失效模式，而它嵌的是 CID TrueType（FontFile2），本閘的 CFF 比對讀不了，原始檔又在
+# CDN（standalone 的 @font-face 指向 web-computer-modern 的 woff2）本機沒有。
+# 「驗不了」在這裡不等於「有問題」。
+#
+# 所以對這一類改問另一個問題：**它是不是預期中的那幾套字型**。這不是 silent skip——
+# 白名單外一律 FAIL 並指名。ch02 rollout 當天就證明這條抓得到真缺陷：Figure 2.7 的 `√`
+# 因 Inter 缺 U+221A 被 Chrome 退回 MicrosoftJhengHeiUIRegular（Windows 系統 CJK 字型），
+# 字形本身沒錯、退錯字型才是缺陷——閘 1／閘 3 都看不到，正是被這個判準攔下的
+# （病灶與修法見 chapters/ch02/DIALECT-ch02.md §4）。
+#
+# 新增條目＝新增一個「這套字型可以出現在成品裡」的裁決，要連理由一起寫在這裡。
+FIG_IMPORTED_OK = (
+    "WebCM-Serif-10-",   # 本書襯線（New Computer Modern 的 web build）。standalone 的
+                         # `.paper .fig-lyr { font-family: var(--serif) }` 讓圖上的文字
+                         # 標註走正文同一個字體家族——與內文一致，是設計如此。
+)
 FONTNAME_RE = re.compile(r"/FontName\s*/([^\s/\[\]<>]+)")
 FONTFILE_RE = re.compile(r"/FontFile(\d?)\s+(\d+)\s+0\s+R")
 
@@ -139,10 +165,15 @@ def main():
         sys.exit(__doc__)
     doc = fitz.open(sys.argv[1])
 
-    total, failures, unchecked = 0, [], []
+    total, failures, unchecked, imported = 0, [], [], Counter()
     for basefont, kind, xref in embedded_fonts(doc):
         if kind != "3":
-            unchecked.append(f"{basefont}：FontFile{kind}（非 CFF）")
+            name = SUBSET_TAG.sub("", basefont)
+            if name.startswith(FIG_IMPORTED_OK):
+                imported[name] += 1
+            else:
+                unchecked.append(f"{basefont}：FontFile{kind}（非 CFF），"
+                                 f"且不在 FIG_IMPORTED_OK 白名單內")
             continue
         try:
             n, bad = audit(doc, basefont, doc.xref_stream(xref))
@@ -153,6 +184,8 @@ def main():
         print(f"  {SUBSET_TAG.sub('', basefont):22s} {n:3d} 字形 → {len(bad)} 個輪廓不符")
         failures += [(basefont, *b) for b in bad]
 
+    for name, n in sorted(imported.items()):
+        print(f"  [圖匯入] {name:22s} {n} 個子集（白名單內，不驗輪廓）")
     for u in unchecked:
         print(f"  [未驗] {u}")
     for basefont, cid, claims, looks in failures[:20]:
@@ -168,7 +201,9 @@ def main():
             why.append(f"{len(unchecked)} 個嵌入字型無法驗")
         print(f"\n字形閘 FAIL：{'；'.join(why)}")
         sys.exit(1)
-    print(f"\n字形閘 PASS：{total} 個嵌入字形的輪廓全數符合其 CID")
+    tail = (f"；另有 {sum(imported.values())} 個圖匯入子集在 FIG_IMPORTED_OK 白名單內"
+            if imported else "")
+    print(f"\n字形閘 PASS：{total} 個嵌入字形的輪廓全數符合其 CID{tail}")
 
 
 if __name__ == "__main__":
