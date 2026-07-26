@@ -71,7 +71,31 @@ unittest）：不得崩、`None` 須可區分、正常路徑仍相等、取整�
 [gate] 字形閘 PASS：570 個嵌入字形的輪廓全數符合其 CID       ← 閘 4
 ```
 
+**閘 2（版面）另跑，不在 `make_dist.py` 的自動化內**（KICKOFF §4.5 只把閘 1／3／4 接進去）：
+`build/aux-ch07/chapter7.log` 實測 **Overfull `\hbox` 0、Underfull `\hbox` 0、Overfull `\vbox` 0**，
+判準（overfull >2pt ＝ 0）通過。寬顯示式維持手動斷行政策，本章無需新增斷點。
+
 確定性：重跑 `make_dist.py ch07` 的 `.tex` byte-identical。
+
+## 4b. 閘 5（人眼閘）：39 頁全看過，抓到 3 條——全是平實化輪自己造成的
+
+KICKOFF §4.5 的閘 5 本質需人判斷，不在自動化內。實際逐頁看完後抓到三處，**都是** 2026-07-26
+平實化輪（`c337395`）折入 Codex MODIFY 時造成的，**在 HTML 線逐條看改點時都看不出來**：
+
+| # | 位置 | 症狀 | 來源 | 處置 |
+|---|---|---|---|---|
+| 1 | §7.2「Cross-sections without revolution」 | 連續兩句同開頭：<br>“Definition 7.2 never mentions revolution. **Definition 7.2** applies to any solid…” | `A-24`（Codex 要求把不透明的 <i>fair game</i> 換成明確指涉，但前一句已點名 Definition 7.2） | 後句改代名詞 <i>It applies to…</i> |
+| 2 | §7.3 shell 模型段 | 動詞重複拗口：“we **state** the modelling assumption first, and **state** it explicitly” | `A-29` | 改 “the modelling assumption comes first, and we state it explicitly”（保住 SEAM GUARD 要求的「model 先講」） |
+| 3 | **Figure 7.12 caption** | **整句重複**：“…is a cylinder with a paraboloid bowl carved from its top. **a cylinder with a paraboloid bowl carved from its top.** A horizontal slice…” | `E-08`——替換字串的 `old` 只吃到「the solid of Example 7.12,」，新句尾卻把後面原有的文字又講一遍 | 刪掉重複片段 |
+
+**第 3 條是真 bug，而且既有的閘全部掃不到它**：`verify_edits.py` 只證明「替換恰好套用一次」，
+證不出語意重複；`figcaption` 屬副表、不入 canonical 主分母，散文閘與密度閘都不看；
+HTML 側的分頁閘只數頁數與溢頁。是排成書頁、用眼睛讀才現形的——這正是閘 5 存在的理由。
+
+**補了一支程式化前哨**：[`../../../../tools/dup_scan.py`](../../../../tools/dup_scan.py)（掃「N 連續詞在近距離內重複」）。
+實測對 HEAD 版跑會把本 bug 抓成一串**間隔 10 詞的密集叢集**（6 個重疊 n-gram），修完後消失。
+全書掃過一遍：**其他單元沒有同型 bug**——各章的近距離重複都是定義↔重述、定理↔證明呼應、
+或刻意的平行句（rubric 明列的「刻意的教學重複」），特徵是跨越 environment 邊界而非留下不成句的殘段。
 
 **48 處抽取假象**（全書至今最多）幾乎全是同一型：`\(i\)th`／`\(x\)-axis` 這類
 「行內數學緊接純字母」被 `pdftotext` 抽成 `𝑖th`／`𝑥axis`，逐條確認內容都在。
