@@ -51,7 +51,7 @@ ch02 的兩個 inline SVG 帶了 ch01 沒有的子元素（`rect`／`line`／`ts
 | 閘 3c 圖內文字（`figure_note_check`） | n/a：ch02 無 panel note |
 | 閘 4 字形（`check_glyphs.py`） | **PASS**：**467 個嵌入字形的輪廓全數符合其 CID**（NCM／Inter 共 12 個子集）；另有 8 個圖匯入子集在 `FIG_IMPORTED_OK` 白名單內——判準的沿革與理由見 §5.1／§5.2 |
 | 轉換器測試 | **PASS**：`pytest test_convert.py` 83/83 |
-| **閘 5 人眼（KICKOFF §4.5）** | **⬜ 未做**：本質需人判斷（全頁看一遍、抽樣公式與 HTML render 並排）。本輪只做到結構性驗證——分頁 45→45 頁不變（HTML 側）、PDF 35 頁 0 error、10 張圖全 render、MathJax 908 容器 0 個未渲染。**交付使用者過目。** |
+| **閘 5 人眼（KICKOFF §4.5）** | **⬜ 未做**：本質需人判斷（全頁看一遍、抽樣公式與 HTML render 並排）。本輪只做到結構性驗證——分頁 45→45 頁不變（HTML 側；兩處 8px 溢出 p.13／p.39 在平實化前即存在）、PDF 35 頁 0 error、10 張圖全 render、MathJax 908 容器 0 個未渲染。**交付使用者過目。** |
 
 `dist/ch02/` ＝恰兩檔（`chapter2.tex` 76.4KB ＋ `chapter2.pdf` 1.40MB，35 頁）。
 
@@ -86,3 +86,18 @@ ch02 的兩個 inline SVG 帶了 ch01 沒有的子元素（`rect`／`line`／`ts
 
 ---
 *2026-07-26 建立。本輪的 HTML 內容側改動見 [`../../../html/_audit/REVIEW-ch02-plain-applied.html`](../../../html/_audit/REVIEW-ch02-plain-applied.html)（散文平實化回填 109 條）；§4 的圖字型修正與 §5.2 的閘 4 判準調整都是本 rollout 獨立發現、與平實化無關。*
+
+## 6. 收尾輪：兩項數學待辦結案（2026-07-26）
+
+ch02 平實化輪的 Codex gate-2 指出兩處屬數學內容、當時未執行，掛在 `PIPELINE.md` 的 Ch2 列。本輪逐條複查後結案。
+
+| # | locus | 複查結論 | 處置 |
+|---|---|---|---|
+| ① | §2.3 Theorem 2.1 後的直覺段末句 | **非缺陷。** 原句 `an unbroken curve is still free to have a sharp corner, where no single tangent direction exists` 只斷言「**角點**沒有單一切線方向」，這個方向的推論成立；它並未主張逆命題。Definition 2.3 的白話重述本就寫明「no sharp corner, **no vertical spike**, and no break」，全書一致。先前把 Codex 對 `S20` **原句**（`to be differentiable is to have one definite tangent direction` 這種 iff 式刻畫）的指正外推到了下一句 | 真正的缺口是**完整性**：該段緊接 Example 2.12（\(\sqrt[3]{x}\) 垂直切線）之後，講反向失敗卻只提角點。改為 `a sharp corner or a vertical tangent. In neither case does the difference quotient approach one finite value.`——用的是本章 `C06` 已定的措辭（`approach one finite value`），維持 R3 指稱一致；**不新增數學片段、不新增破折號** |
+| ② | §2.4 `\(y' = ky\)` 應用段 | 真有小缺口：`\(k\)` 從未說明是常數 | 補為 `for a constant \(k\)`。**未採** Codex 一併給 `\(Ce^{kx}\)` 的建議——微分 \(e^{kx}\) 需鏈鎖法則（Ch3），本章對 \(e^{x}\) 已有明示的 on-credit 借貸紀律，再塞一個當下無法驗證的斷言會抵銷該設計 |
+
+**驗收**：`verify_edits.py` 兩節皆 PASS（各 1 筆替換，reverse-apply byte-for-byte、未涵蓋差異 0 處）；
+散文 N 6992→7004、em-dash 維持 6、密度 0.86，tic guard 四項**零變動**；
+數學片段 §2.3 **零差異**、§2.4 **+1 個 `\(k\)`**（即本次刻意補的），其餘三節零差異、cross-ref 全在位；
+LaTeX 成品重產後四閘仍全綠（35 頁、0 error／0 missing char、Overfull 與 Underfull 皆 0、完整性 0 處真落差、
+字形 467+8）；HTML 分頁 45 頁不變。
