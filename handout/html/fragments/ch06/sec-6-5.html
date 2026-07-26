@@ -18,7 +18,7 @@
   </header>
 
   <!-- expansion:intuition — section opener: the table antidifferentiates only bare derivatives; substitution reverses the chain rule to handle an inner function -->
-  <p>The table of §6.4 antidifferentiates a function only when it recognizes it as some derivative written plainly. But most integrands wear a disguise: an inner function tucked inside another, the fingerprint of the chain rule. To integrate \(\int 2x\sqrt{1 + x^{2}}\,dx\) there is no table entry — yet the \(2x\) is exactly the derivative of the inside \(1 + x^{2}\), and that is no accident. Running the chain rule backwards strips the disguise. The technique is <em>substitution</em>, and it is the single most useful method of integration.</p>
+  <p>The table of §6.4 antidifferentiates a function directly only when the function is visibly a derivative written plainly. Many integrands contain an inner function inside another function, the pattern to which the chain rule applies. To integrate \(\int 2x\sqrt{1 + x^{2}}\,dx\) there is no direct table entry, yet \(2x\) is exactly the derivative of the inner expression \(1 + x^{2}\), and that is no accident. Applying the chain rule in reverse gives the method of <em>substitution</em>. It is the single most useful technique of integration.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.6</span><span class="env-name">The Substitution Rule</span></p>
@@ -62,7 +62,7 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>The inside of the square root is \(1 + x^{2}\), and its derivative \(2x\) stands ready in the integrand. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\). The integral becomes one the table knows:</p>
+        <p>The expression inside the square root is \(1 + x^{2}\), and its derivative \(2x\) is already present in the integrand. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\). The resulting integral is listed in the table:</p>
         <p>\[ \int 2x\sqrt{1 + x^{2}}\,dx = \int \sqrt{u}\,du = \frac{2}{3}u^{3/2} + C = \frac{2}{3}\bigl(1 + x^{2}\bigr)^{3/2} + C. \]</p>
         <p>Differentiating the answer returns \(2x\sqrt{1 + x^{2}}\), confirming it. <span class="qed"></span></p>
       </div>
@@ -97,7 +97,7 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>The derivative of the denominator is \(2x\), exactly the numerator — the fingerprint of a substitution whose result is a logarithm rather than a power. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\), and the integral becomes \(\int \tfrac{1}{u}\,du\):</p>
+        <p>The derivative of the denominator is \(2x\), exactly the numerator. That is the mark of a substitution whose result is a logarithm rather than a power. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\), and the integral becomes \(\int \tfrac{1}{u}\,du\):</p>
         <p>\[ \int \frac{2x}{1 + x^{2}}\,dx = \int \frac{du}{u} = \ln\lvert u\rvert + C = \ln\bigl(1 + x^{2}\bigr) + C, \]</p>
         <p>where the absolute value is dropped because \(1 + x^{2} > 0\) throughout. This is the pattern \(\int \dfrac{f'(x)}{f(x)}\,dx = \ln\lvert f(x)\rvert + C\): when the numerator is the derivative of the denominator, substitution collapses the integral to the logarithm introduced in §6.4. <span class="qed"></span></p>
       </div>
@@ -106,7 +106,7 @@
 
   <h3 class="subsec-head">Substitution in definite integrals</h3>
 
-  <p>A definite integral can be substituted just as an indefinite one, provided the limits are handled with care. There are two honest options: finish the antiderivative and restore \(x\) before applying the limits, or — usually cleaner — carry the substitution through the limits themselves.</p>
+  <p>A definite integral can be substituted just as an indefinite one, provided the limits are handled with care. There are two correct options: finish the antiderivative and restore \(x\) before applying the limits, or — usually cleaner — carry the substitution through the limits themselves.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.7</span><span class="env-name">Substitution in a definite integral</span></p>
@@ -132,7 +132,7 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>When a definite integral is converted to \(u\), the limits must be converted too. Writing \(\int_{a}^{b} \dots\,du\) with the <em>original</em> \(x\)-limits still attached to a \(u\)-integrand is a common and costly error: the numbers \(a\) and \(b\) are values of \(x\), not of \(u\). Either change the limits to \(g(a)\) and \(g(b)\) and evaluate in \(u\), or return to \(x\) first and use the original limits — but never blend the two.</p>
+      <p>When a definite integral is converted to \(u\), the limits must be converted too. Writing \(\int_{a}^{b} \dots\,du\) with the <em>original</em> \(x\)-limits still attached to a \(u\)-integrand is a common and costly error: the numbers \(a\) and \(b\) are values of \(x\), not of \(u\). Either change the limits to \(g(a)\) and \(g(b)\) and evaluate in \(u\), or return to \(x\) first and use the original limits. Never blend the two.</p>
     </div>
   </section>
 
@@ -156,10 +156,10 @@
   <h3 class="subsec-head">Symmetry</h3>
 
   <!-- expansion:intuition — symmetry as a substitution corollary: even/odd functions over [-a,a] -->
-  <p>When the interval is symmetric about the origin, the symmetry of the integrand — if it has any — can halve the work or eliminate it entirely. This is substitution in one of its tidiest applications.</p>
+  <p>When the interval is symmetric about the origin, the symmetry of the integrand — if it has any — can halve the work or eliminate it entirely.</p>
 
   <!-- expansion:intuition [pass: enrichment] [source: mode-c gap-check 2026-07-11 — Theorem 6.8 had the thinnest formal lead-in; add the even/odd geometric picture (mirror doubles, half-turn cancels) before the u=-x proof] -->
-  <p>Picture the two cases. An even function has the same graph on \([-a, 0]\) as on \([0, a]\), mirror-reflected across the vertical axis, so each thin strip on the left has an identical twin on the right — same height, hence the same sign — and the matched signed areas <em>add</em>: the integral is twice the integral over \([0, a]\). An odd function’s graph on \([-a, 0]\) is the \([0, a]\) graph turned a half-turn about the origin, so each left strip is the mirror of a right strip carrying the <em>opposite</em> sign; the matched contributions <em>cancel</em> and the integral is zero. The substitution \(u = -x\) below turns this picture into a proof.</p>
+  <p>Picture the two cases. For an even function, the graph on \([-a, 0]\) is the graph on \([0, a]\) reflected across the vertical axis. Each thin strip on the left therefore has a matching strip on the right with the same height and the same sign, so the matched signed areas <em>add</em>: the integral is twice the integral over \([0, a]\). An odd function’s graph on \([-a, 0]\) is the \([0, a]\) graph turned a half-turn about the origin, so each left strip is the mirror of a right strip carrying the <em>opposite</em> sign; the matched contributions <em>cancel</em> and the integral is zero. The substitution \(u = -x\) below turns this picture into a proof.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.8</span><span class="env-name">Integrals of symmetric functions</span></p>
@@ -193,23 +193,27 @@
       <div class="env-body">
         <p>The integrand splits into an even part and an odd part. Over the symmetric interval \([-1, 1]\), the even \(x^{4}\) doubles its integral over \([0, 1]\), while the odd \(x^{3}\) integrates to zero (Theorem 6.8):</p>
         <p>\[ \int_{-1}^{1} \bigl(x^{4} + x^{3}\bigr)\,dx = 2\int_{0}^{1} x^{4}\,dx + 0 = 2\left[\frac{x^{5}}{5}\right]_{0}^{1} = \frac{2}{5}. \]</p>
-        <p>The odd term contributes nothing at all — recognizing it saves the work of integrating it. <span class="qed"></span></p>
+        <p>The odd term contributes nothing at all, so recognizing this saves the work of integrating it. <span class="qed"></span></p>
       </div>
     </section>
   </div>
 
   <!-- expansion:summary — close §6.5: substitution is the first technique; the rest wait for Ch8. One-line fence, no mechanics. -->
-  <p>Substitution is the reverse of the chain rule, and the first entry in the toolkit of integration techniques. It reaches every integrand that hides a single inner function whose derivative is present — a wide class, but not all. Products of unrelated functions, powers of trigonometric functions, and rational functions each need their own device; those techniques, which begin where substitution leaves off, are the business of Chapter 8.</p>
+  <p>Substitution is the reverse of the chain rule, and the first entry in the toolkit of integration techniques. It applies to integrands with a single inner function whose derivative is present, up to a constant factor. This is a wide class, but it does not include all integrands. Products of unrelated functions, powers of trigonometric functions, and rational functions each require different techniques. Those techniques are the subject of Chapter 8.</p>
 
   <h3 class="subsec-head">Chapter summary</h3>
 
-  <p>This chapter built the integral from the ground up and bound it to the derivative. Section 6.1 met the area and distance problems and discovered them to be one limit of Riemann sums. Section 6.2 named that limit the <em>definite integral</em> \(\int_{a}^{b} f(x)\,dx\) (Definition 6.2), established that a continuous integrand is integrable (Theorem 6.1, taken on credit), read the integral as net signed area, and collected its properties (Theorem 6.2). Section 6.3 proved the <em>Fundamental Theorem of Calculus</em>: Part 1 (Theorem 6.3) shows the accumulation function \(\int_{a}^{x} f\) is an antiderivative of \(f\), so differentiating an integral returns the integrand; Part 2 (Theorem 6.4) evaluates any definite integral from a single antiderivative. That the derivative of an accumulated area is the height, and that an area is therefore recovered from an antiderivative, is the hinge on which calculus turns. Section 6.4 gave antiderivatives a notation — the indefinite integral (Definition 6.4) — and a working table, singled out \(\int \tfrac{1}{x}\,dx = \ln\lvert x\rvert + C\), and reread the theorem as the Net Change Theorem (Theorem 6.5). Section 6.5 turned the chain rule around into the Substitution Rule (Theorems 6.6–6.7) and used it to exploit symmetry (Theorem 6.8).</p>
+  <p>This chapter built the integral from the ground up and bound it to the derivative. Section 6.1 met the area and distance problems and discovered them to be one limit of Riemann sums. Section 6.2 named that limit the <em>definite integral</em> \(\int_{a}^{b} f(x)\,dx\) (Definition 6.2), established that a continuous integrand is integrable (Theorem 6.1, taken on credit), read the integral as net signed area, and collected its properties (Theorem 6.2).</p>
+
+  <p>Section 6.3 proved the <em>Fundamental Theorem of Calculus</em>: Part 1 (Theorem 6.3) shows the accumulation function \(\int_{a}^{x} f\) is an antiderivative of \(f\), so differentiating an integral returns the integrand; Part 2 (Theorem 6.4) evaluates any definite integral from a single antiderivative. That the derivative of an accumulated area is the height, and that an area is therefore recovered from an antiderivative, is the central fact of the subject.</p>
+
+  <p>Section 6.4 introduced the notation \(\int f(x)\,dx\) for the <em>indefinite integral</em> (Definition 6.4) and a working table, singled out \(\int \tfrac{1}{x}\,dx = \ln\lvert x\rvert + C\), and reread the theorem as the Net Change Theorem (Theorem 6.5). Section 6.5 turned the chain rule around into the Substitution Rule (Theorems 6.6–6.7) and used it to exploit symmetry (Theorem 6.8).</p>
 
   <p>The results worth carrying forward are few and central:</p>
   <p>\[ \int_{a}^{b} f(x)\,dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_{i}^{*})\,\Delta x, \qquad \frac{d}{dx}\int_{a}^{x} f(t)\,dt = f(x), \]</p>
   <p>\[ \int_{a}^{b} f(x)\,dx = F(b) - F(a), \qquad \int \frac{1}{x}\,dx = \ln\lvert x\rvert + C, \]</p>
   <p>\[ \int f\bigl(g(x)\bigr)g'(x)\,dx = \int f(u)\,du. \]</p>
 
-  <p>The debt the chapter leaves to the rest of the book is a single instrument used everywhere. Chapter 7 applies the Fundamental Theorem to areas between curves, volumes, and arc lengths; Chapter 8 extends substitution into a full set of techniques for finding the antiderivatives that evaluation demands; and the integral returns, transformed, in the study of series, of differential equations, and of the calculus of several variables. Every one of those chapters rests on the two theorems proved in §6.3.</p>
+  <p>The rest of the book uses the integral as a central tool. Chapter 7 applies the Fundamental Theorem to areas between curves, volumes, and arc lengths; Chapter 8 extends substitution into a full set of techniques for finding the antiderivatives that evaluation demands; and the integral returns, transformed, in the study of series, of differential equations, and of the calculus of several variables. Every one of those chapters rests on the two theorems proved in §6.3.</p>
 
 </article>

@@ -396,8 +396,11 @@ window.MathJax = {
      No Theorem/Strategy yet. Cautions UNNUMBERED (Ch1–5 convention).
      SEAM GUARD (full-arc Codex seam-hunt + brief-6-1): §6.1 is the MOTIVATION section — limits of
      Riemann sums for area and distance. Do NOT define the definite integral or introduce the ∫ symbol
-     (that is §6.2 — one-line forward fence only). Do NOT prove convergence/integrability (§6.2 states it;
-     the continuous⟹integrable proof is fenced to the Proof Track). Do NOT tease the FTC antiderivative
+     (that is §6.2 — one-line forward fence only). Do NOT prove convergence/integrability (§6.2 states it
+     and takes it ON CREDIT; per PLAN-ch06 §6.2 open decision, resolved 2026-07-10: **NO App D §D.4** —
+     the continuous⟹integrable proof is not written anywhere, so do NOT point the reader at one.
+     2026-07-26: this Caution used to say the proof "is given in the Proof-Track appendix", contradicting
+     both that decision and §6.2; fixed to on-credit wording). Do NOT tease the FTC antiderivative
      shortcut (§6.3) — §6.1 earns the limit honestly. INTRODUCE-BEFORE-USE: Σ and finite arithmetic sums
      are A-class (assumable); the power sum Σi² is B-class (SPEC §16.2) — one-line in-place bridge +
      cross-ref Appendix A §A.3 Proposition A.6 BEFORE Example 6.2 uses it.
@@ -413,7 +416,7 @@ window.MathJax = {
     <h1 class="ch-title">Integrals</h1>
   </header>
 
-  <p class="lead">The first five chapters were about the derivative — the instantaneous rate at which one quantity changes as another does. This chapter turns to the opposite question, and to a problem far older than the derivative: how to measure the <em>total</em> accumulated from a rate, or the <em>area</em> enclosed by a curve. The Greeks computed areas of curved regions by exhausting them with polygons; the same idea, sharpened into a limit, becomes the <em>definite integral</em>. We build it from the ground up as a limit of sums, and then — in the Fundamental Theorem of Calculus, the summit of the chapter and arguably of the whole subject — we discover that this process of summation and the derivative are two sides of a single coin, inverse to each other. That deep and unexpected link between areas and slopes is what ties the two halves of calculus together, and this chapter is where it is forged.</p>
+  <p class="lead">The first five chapters were about the derivative, the instantaneous rate at which one quantity changes as another does. This chapter turns to the opposite question, and to a problem far older than the derivative: how to measure the <em>total amount</em> accumulated from a rate, or the <em>area</em> enclosed by a curve. The Greeks computed areas of curved regions by approximating them ever more closely with polygons; the same idea, sharpened into a limit, becomes the <em>definite integral</em>. We build it from the ground up as a limit of sums. Then, in the Fundamental Theorem of Calculus, we discover that this process of summation and the derivative are inverse to each other. That link between areas and slopes ties the two halves of calculus together, and this chapter is where we prove it.</p>
 
   <p class="para-head">By the end of this chapter, you will be able to:</p>
   <ul>
@@ -433,7 +436,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — section opener: motivate the whole chapter from the area problem; the crux is trap-and-squeeze, and its twin (distance from velocity) is the same sum -->
-  <p>We know the area of a rectangle, a triangle, or any polygon: cut it into pieces whose areas we already have and add them up. But what is the area of a region with a <em>curved</em> boundary — the region under the parabola \(y = x^{2}\) from \(x = 0\) to \(x = 1\), say? There is no elementary formula, because there is no way to tile a curved region exactly with finitely many rectangles. The way forward is the oldest idea in the subject: <em>approximate</em> the region by rectangles we <em>can</em> measure, make the approximation finer, and see what number the areas approach. That number, when it exists, is what we <em>mean</em> by the area. The same manoeuvre — approximate by simple pieces, then refine to a limit — will, a little later, compute a distance from a record of velocities. The two problems turn out to be one.</p>
+  <p>We know the area of a rectangle, a triangle, or any polygon: cut it into pieces whose areas we already have and add them up. But what is the area of a region with a <em>curved</em> boundary, say the region under the parabola \(y = x^{2}\) from \(x = 0\) to \(x = 1\)? There is no elementary formula, because there is no way to tile a curved region exactly with finitely many rectangles. The way forward is the oldest idea in the subject: <em>approximate</em> the region by rectangles we <em>can</em> measure, make the approximation finer, and see what number the areas approach. That number, when it exists, is what we <em>mean</em> by the area. The same method will, a little later, compute a distance from a record of velocities. The two problems turn out to be one.</p>
 
   <h3 class="subsec-head">The area problem</h3>
 
@@ -441,7 +444,7 @@ window.MathJax = {
   <p>\[ \Delta x = \frac{b - a}{n}, \]</p>
   <p>by the points \(x_{0} = a,\ x_{1},\ x_{2},\ \dots,\ x_{n} = b\), where \(x_{i} = a + i\,\Delta x\). Over each strip \([x_{i-1}, x_{i}]\) build a rectangle whose height is the value of \(f\) at the <em>right</em> endpoint, \(f(x_{i})\). The combined area of these \(n\) rectangles is the <em>right endpoint sum</em></p>
   <p>\[ R_{n} = f(x_{1})\,\Delta x + f(x_{2})\,\Delta x + \dots + f(x_{n})\,\Delta x = \sum_{i=1}^{n} f(x_{i})\,\Delta x, \]</p>
-  <p>where \(\sum_{i=1}^{n}\) is the sigma notation for the sum of the listed terms as \(i\) runs from \(1\) to \(n\). Choosing instead the <em>left</em> endpoint of each strip gives the <em>left endpoint sum</em> \(L_{n} = \sum_{i=1}^{n} f(x_{i-1})\,\Delta x\). Each is a sum of rectangle areas — an approximation to the area of \(S\) that we expect to sharpen as the strips grow thinner.</p>
+  <p>where \(\sum_{i=1}^{n}\) is the sigma notation for the sum of the listed terms as \(i\) runs from \(1\) to \(n\). Choosing instead the <em>left</em> endpoint of each strip gives the <em>left endpoint sum</em> \(L_{n} = \sum_{i=1}^{n} f(x_{i-1})\,\Delta x\). Each is a sum of rectangle areas, an approximation to the area of \(S\) that we expect to sharpen as the strips grow thinner.</p>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -466,8 +469,8 @@ window.MathJax = {
         <p>Because \(x^{2}\) is increasing on \([0, 1]\), each right rectangle rises above the curve and each left rectangle falls below it, so the two sums bracket the true area \(A\):</p>
         <p>\[ 0.219 \approx L_{4} < A < R_{4} \approx 0.469. \]</p>
         <!-- expansion:caution [pass: enrichment] [source: mode-c gap-check 2026-07-11 — L/R over/under-estimation depends on monotonicity, not on which side; Ch6's two examples are both increasing, guard against over-generalizing] -->
-        <p>The direction of this bracket is a fact about the <em>increase</em> of \(x^{2}\), not about which endpoint is read: on an interval where \(f\) <em>decreases</em>, the roles swap — the right endpoints undershoot and the left endpoints overshoot — and where \(f\) both rises and falls, over- and under-estimation must be judged piece by piece.</p>
-        <p>Four rectangles give only a loose verdict. The bracket will tighten as \(n\) grows — and the next example takes \(n\) all the way to infinity. <span class="qed"></span></p>
+        <p>The direction of this bracket is a fact about the <em>increase</em> of \(x^{2}\), not about which endpoint is read. On an interval where \(f\) <em>decreases</em>, the roles swap: the right endpoints undershoot and the left endpoints overshoot. Where \(f\) both rises and falls, over- and under-estimation must be judged piece by piece.</p>
+        <p>With four rectangles, the left and right sums bracket the area only loosely. The bracket will tighten as \(n\) grows, and the next example takes \(n\) all the way to infinity. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -507,12 +510,12 @@ window.MathJax = {
         \end{aligned} \]</p>
         <p>As \(n \to \infty\), both \(\tfrac{1}{n}\) terms vanish, so</p>
         <p>\[ A = \lim_{n \to \infty} R_{n} = \frac{1}{6}\,(1)(2) = \frac{1}{3}. \]</p>
-        <p>The exact area is \(\tfrac{1}{3}\) — comfortably inside the bracket \(0.219 < A < 0.469\) from Example 6.1. The same limit results from the left endpoint sums \(L_{n}\): they differ from \(R_{n}\) by only the single end rectangle \(\tfrac{1}{n}\bigl(f(1) - f(0)\bigr) = \tfrac{1}{n}\), which itself tends to \(0\). Approaching the area from below or from above, we arrive at the one number. <span class="qed"></span></p>
+        <p>The exact area is \(\tfrac{1}{3}\), comfortably inside the bracket \(0.219 < A < 0.469\) from Example 6.1. The same limit results from the left endpoint sums \(L_{n}\): they differ from \(R_{n}\) by only the single end rectangle \(\tfrac{1}{n}\bigl(f(1) - f(0)\bigr) = \tfrac{1}{n}\), which itself tends to \(0\). Approaching the area from below or from above, we arrive at the one number. <span class="qed"></span></p>
       </div>
     </section>
   </div>
 
-  <p>That the left and right sums close on a single value is exactly what lets us <em>define</em> the area to be that value.</p>
+  <p>That the left and right sums converge to a single value is exactly what lets us <em>define</em> the area to be that value.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.1</span><span class="env-name">Area under a curve</span></p>
@@ -523,21 +526,25 @@ window.MathJax = {
     </div>
   </section>
 
-  <!-- expansion:caution — the honest fence: existence and choice-independence of the limit is asserted here, proved (as integrability) in §6.2 and the Proof Track; do not let the reader think it is free -->
+  <!-- expansion:caution — the honest fence: existence and choice-independence of the limit is asserted here,
+       stated as Theorem 6.1 in §6.2 and TAKEN ON CREDIT there (no proof anywhere — see SEAM GUARD above);
+       do not let the reader think it is free, and do not promise a proof we deliberately do not write -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>The clause “provided this limit exists” is not a formality. That the approximating sums converge at all — and that the choice of sample point cannot change the answer — is a genuine theorem, resting on the continuity of \(f\). We rely on it here to make the definition well posed, and the next section states it precisely (continuity guarantees the limit); its proof, which turns on how tightly a continuous function can be trapped on a closed interval, is carried in the Proof-Track appendix. For a badly discontinuous \(f\), sums built from different choices of sample point really can disagree — driving every sample to where the function misbehaves gives one value, steering clear of those places gives another — so no single limit, and hence no area, is defined. (For the equal-width left and right sums themselves the gap is only \(\bigl(f(b) - f(a)\bigr)\,\Delta x\), which closes regardless; it is the freedom in the sample points, not the side of the strip, that continuity has to tame.)</p>
+      <p>The clause “provided this limit exists” is not a formality. It rests on a genuine theorem. Continuity of \(f\) guarantees that the approximating sums converge to one limit, whatever sample points are chosen.</p>
+      <p>We rely on this guarantee here so that the definition gives one unambiguous value. The next section states the theorem precisely, says what its proof would need, and takes it on credit. It is the one result of this chapter we do not prove.</p>
+      <p>For a badly discontinuous \(f\), sums built from different choices of sample point really can disagree. Driving every sample to where the function misbehaves gives one value, and steering clear of those places gives another. No single limit exists, and hence no area is defined. (For the equal-width left and right sums themselves the gap is only \(\bigl(f(b) - f(a)\bigr)\,\Delta x\), which closes regardless. Continuity is needed to handle the freedom in the sample points, not the choice of side.)</p>
     </div>
   </section>
 
   <!-- expansion:history [source: standard calculus-textbook historical note] — Archimedes' quadrature of the parabola as the ancestor of the limit-of-sums, motivating (not decorating) the method -->
-  <p>The method is old. In the third century BCE Archimedes found the area of a parabolic segment by trapping it between inscribed and circumscribed rectilinear figures and squeezing them together — the same bracket, computed by hand, that Examples 6.1 and 6.2 tightened into a limit. What the seventeenth century added was not the idea but the machinery to carry the limit out in general, which is the business of this chapter.</p>
+  <p>The method is old. In the third century BCE, Archimedes found the area of a parabolic segment by trapping it between inscribed and circumscribed straight-sided figures, then bringing the two bounds together. That is the same bracket, computed by hand, that Examples 6.1 and 6.2 tightened into a limit. What the seventeenth century added was not the idea but the machinery to carry the limit out in general, which is what this chapter does.</p>
 
   <h3 class="subsec-head">The distance problem</h3>
 
   <!-- expansion:intuition — motivate the distance problem as the SAME sum, so the definite integral of §6.2 lands as the common answer to two questions, not one -->
-  <p>Suppose we know the <em>speed</em> of a moving object at every instant, but not its position, and we want the <em>total distance</em> it travels over a time interval. Speed is never negative — it measures how fast the object moves, whichever way it is heading — and we take it to vary continuously. If it were <em>constant</em>, the distance would be just speed times elapsed time. It is not constant — but over a <em>short</em> stretch of time it is nearly so, and on that stretch \(\text{speed} \times \text{time}\) is a good estimate of the distance covered. Add these estimates over the whole interval and the total distance is approximated by a sum of exactly the form \(\sum v(t_{i})\,\Delta t\) — a Riemann sum again, now with speed in place of \(f\) and elapsed time in place of width.</p>
+  <p>Suppose we know the <em>speed</em> of a moving object at every instant, but not its position, and we want the <em>total distance</em> it travels over a time interval. Speed is never negative, because it measures how fast the object moves, whichever way it is heading. We take it to vary continuously. If it were <em>constant</em>, the distance would be just speed times elapsed time. It is not constant, but over a <em>short</em> stretch of time it is nearly so, and on that stretch \(\text{speed} \times \text{time}\) is a good estimate of the distance covered. Add these estimates over the whole interval and the total distance is approximated by a sum of exactly the form \(\sum v(t_{i})\,\Delta t\), a Riemann sum again, now with speed in place of \(f\) and elapsed time in place of width.</p>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -555,7 +562,7 @@ window.MathJax = {
         <p>\[ L = 1\cdot(0 + 4 + 7 + 9 + 10) = 30 \text{ m}, \]</p>
         <p>while the speed at the <em>right</em> end of each interval (the readings at \(t = 1, 2, 3, 4, 5\)) gives the overestimate</p>
         <p>\[ R = 1\cdot(4 + 7 + 9 + 10 + 10) = 40 \text{ m}. \]</p>
-        <p>Because the speed never falls back, on each one-second stretch it stays no lower than the left reading and no higher than the right, so the left sum is a lower estimate of the distance and the right sum an upper one: the true distance lies between them, \(30 \text{ m} \le \text{distance} \le 40 \text{ m}\), about \(35\) metres. The readings alone fix only the sampled values; the bracket rests on the modelling assumption that the speed climbs without falling back between them. Readings taken every half-second, then every tenth of a second, would squeeze the two estimates together — the identical refinement that Example 6.2 carried to the limit. <span class="qed"></span></p>
+        <p>Because the speed never falls back, on each one-second stretch it stays no lower than the left reading and no higher than the right, so the left sum is a lower estimate of the distance and the right sum an upper one: the true distance lies between them, \(30 \text{ m} \le \text{distance} \le 40 \text{ m}\), about \(35\) metres. The readings alone fix only the sampled values; the bracket rests on the modelling assumption that the speed climbs without falling back between them. Readings taken every half-second, then every tenth of a second, would squeeze the two estimates together. That is the same refinement that Example 6.2 carried to the limit. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -566,7 +573,7 @@ window.MathJax = {
   </figure>
 
   <!-- expansion:summary — close: the two problems are one limit-of-sums; name-drop that §6.2 will christen it, WITHOUT introducing the integral symbol or its mechanics (seam guard) -->
-  <p>Set the two computations side by side. The area under a curve is \(\lim_{n\to\infty}\sum f(x_{i})\,\Delta x\); the distance from a speed is \(\lim_{n\to\infty}\sum v(t_{i})\,\Delta t\). They are the <em>same</em> limit of the <em>same</em> kind of sum, differing only in what the quantities are called — and indeed for a non-negative speed the distance is nothing but the area under the speed-versus-time graph. Whenever a quantity accumulates from a varying rate, the same construction returns: chop the interval, multiply rate by width, sum, and refine. The next section gives this common limit a name and a symbol of its own — the <em>definite integral</em> — and settles the promise made above that, for a continuous function, the limit is really there.</p>
+  <p>Set the two computations side by side. The area under a curve is \(\lim_{n\to\infty}\sum f(x_{i})\,\Delta x\); the distance from a speed is \(\lim_{n\to\infty}\sum v(t_{i})\,\Delta t\). They are the <em>same</em> limit of the <em>same</em> kind of sum, differing only in what the quantities are called. Indeed, for a non-negative speed the distance is exactly the area under the speed-versus-time graph. Whenever a quantity accumulates from a varying rate, the same construction returns: chop the interval, multiply rate by width, sum, and refine. The next section names this common limit the <em>definite integral</em> and introduces its symbol. It also states the theorem that guarantees the limit for every continuous function.</p>
 
 </article>
 </template>
@@ -595,7 +602,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — section opener: §6.1 produced a common limit for two problems; name it, and extend it from area (f≥0) to any continuous f, where it becomes net signed area -->
-  <p>In Section 6.1 two different problems led to the <em>same</em> limit of the <em>same</em> kind of sum: the area under a curve, and the distance travelled at a varying velocity. That is no coincidence. A construction that keeps reappearing is worth naming, and worth a symbol of its own. Here we give it both — the <em>definite integral</em> — and at the same time free it from the assumption that \(f\) is non-negative. For a function that dips below the axis the same limit still makes perfect sense; it simply measures area with a sign, and that signed quantity is what the integral records.</p>
+  <p>In Section 6.1 two different problems led to the <em>same</em> limit of the <em>same</em> kind of sum: the area under a curve, and the distance travelled at a varying velocity. That is no coincidence. A construction that keeps reappearing is worth naming, and worth a symbol of its own. Here we name the common limit the <em>definite integral</em> and introduce its symbol. We also remove the assumption that \(f\) is non-negative. For a function that dips below the axis the same limit still makes perfect sense; it simply measures area with a sign, and that signed quantity is what the integral records.</p>
 
   <p>Fix a function \(f\) on \([a, b]\). Exactly as before, cut \([a, b]\) into \(n\) strips of equal width \(\Delta x = (b - a)/n\) by points \(a = x_{0} < x_{1} < \dots < x_{n} = b\); but now, in each strip \([x_{i-1}, x_{i}]\), allow the height to be read at <em>any</em> point \(x_{i}^{*}\) of that strip, not just an endpoint. The resulting sum</p>
   <p>\[ \sum_{i=1}^{n} f(x_{i}^{*})\,\Delta x \]</p>
@@ -610,7 +617,7 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>The symbol \(\int\), an elongated \(S\) for <em>summa</em>, was Leibniz’s; it still shows the structure of the Riemann sum, even though the limit itself no longer refers to individual rectangles. In \(\displaystyle\int_{a}^{b} f(x)\,dx\), the numbers \(a\) and \(b\) are the <em>limits of integration</em> (lower and upper), \(f(x)\) is the <em>integrand</em>, and the \(dx\) marks the variable with respect to which we sum — what is left of the width \(\Delta x\). The integral is a <em>number</em>, not a function of \(x\); the \(x\) inside is a placeholder, so</p>
+  <p>The symbol \(\int\), an elongated \(S\) for <em>summa</em>, was Leibniz’s; it still shows the structure of the Riemann sum, even though the limit itself no longer refers to individual rectangles. In \(\displaystyle\int_{a}^{b} f(x)\,dx\), the numbers \(a\) and \(b\) are the <em>limits of integration</em> (lower and upper), \(f(x)\) is the <em>integrand</em>, and the \(dx\) marks the variable with respect to which we sum (what is left of the width \(\Delta x\)). The integral is a <em>number</em>, not a function of \(x\); the \(x\) inside is a placeholder, so</p>
   <p>\[ \int_{a}^{b} f(x)\,dx = \int_{a}^{b} f(t)\,dt = \int_{a}^{b} f(u)\,du. \]</p>
 
   <!-- expansion:history [source: standard calculus-textbook historical note] — Leibniz's 1675 elongated-S notation for the integral as "summa" -->
@@ -618,7 +625,7 @@ window.MathJax = {
 
   <p>To use the integral freely we extend it to the cases \(a = b\) and \(a > b\) by convention, so that the limits of integration may sit in either order:</p>
   <p>\[ \int_{a}^{a} f(x)\,dx = 0, \qquad \int_{b}^{a} f(x)\,dx = -\int_{a}^{b} f(x)\,dx. \]</p>
-  <p>Reversing the limits reverses the sign — natural, since running the strips from \(b\) back to \(a\) turns each width \(\Delta x\) into its negative.</p>
+  <p>Reversing the limits reverses the sign, since running the strips from \(b\) back to \(a\) turns each width \(\Delta x\) into its negative.</p>
 
   <h3 class="subsec-head">When does the limit exist?</h3>
 
@@ -627,7 +634,7 @@ window.MathJax = {
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.1</span><span class="env-name">Integrability of continuous functions</span></p>
     <div class="env-body">
-      <p>If \(f\) is continuous on \([a, b]\), then \(f\) is integrable on \([a, b]\): the Riemann sums approach a single limit — the same for every way of slicing \([a, b]\) into strips whose widths shrink to zero, and every choice of sample points within them. The same holds if \(f\) is bounded on \([a, b]\) and continuous there except at finitely many points.</p>
+      <p>If \(f\) is continuous on \([a, b]\), then \(f\) is integrable on \([a, b]\): the Riemann sums approach a single limit, the same for every way of slicing \([a, b]\) into strips whose widths shrink to zero, and every choice of sample points within them. The same holds if \(f\) is bounded on \([a, b]\) and continuous there except at finitely many points.</p>
     </div>
   </section>
 
@@ -635,7 +642,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Theorem 6.1 is the one result of this chapter we do not prove. Its proof turns on a property of a continuous function on a <em>closed</em> interval subtler than continuity at each point — <em>uniform</em> continuity, a single rate of continuity good across the whole interval — which forces the gap between the largest and smallest Riemann sums to shrink to zero as the strips narrow. We take the theorem on credit and use what it gives us: for a continuous integrand the limit is always there, and the sample points may be chosen for convenience. Everything else in this chapter is proved in full.</p>
+      <p>Theorem 6.1 is the one result of this chapter we do not prove. Its proof turns on a property of a continuous function on a <em>closed</em> interval that is subtler than continuity at each point. That property is <em>uniform</em> continuity, a single rate of continuity good across the whole interval, and it forces the gap between the largest and smallest Riemann sums to shrink to zero as the strips narrow. We take the theorem on credit and use what it gives us: for a continuous integrand the limit is always there, and the sample points may be chosen for convenience. Everything else in this chapter is proved in full.</p>
     </div>
   </section>
 
@@ -658,7 +665,7 @@ window.MathJax = {
       <div class="env-body">
         <p>The integrand \(x^{2}\) is continuous, so Theorem 6.1 guarantees that the limit exists and that it does not depend on the choice of sample points. We may therefore use the right-endpoint sums already computed in §6.1 (Example 6.2), where they were found to converge to \(\tfrac{1}{3}\). Hence</p>
         <p>\[ \int_{0}^{1} x^{2}\,dx = \frac{1}{3}. \]</p>
-        <p>What §6.1 called “the area under \(y = x^{2}\)” is now, with the axis label supplied, the value of a definite integral — and because \(x^{2} \ge 0\), the signed area is the plain area. <span class="qed"></span></p>
+        <p>What §6.1 called “the area under \(y = x^{2}\)” is now, with the axis label supplied, the value of a definite integral. Because \(x^{2} \ge 0\), the signed area is the plain area. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -751,7 +758,7 @@ window.MathJax = {
           \int_{0}^{1} \bigl(3x^{2} - 4\bigr)\,dx &= 3\int_{0}^{1} x^{2}\,dx - \int_{0}^{1} 4\,dx \\[2pt]
                                                    &= 3\cdot\tfrac{1}{3} - 4\,(1 - 0) = 1 - 4 = -3.
         \end{aligned} \]</p>
-        <p>No new Riemann sum was evaluated: the single value \(\int_{0}^{1} x^{2} = \tfrac{1}{3}\), run through linearity, settles it. This is how the integral is used in practice — most integrals are reached not from the definition but by reducing them to ones already known. <span class="qed"></span></p>
+        <p>No new Riemann sum was evaluated: the single value \(\int_{0}^{1} x^{2} = \tfrac{1}{3}\), run through linearity, settles it. This is how the integral is used in practice. Most integrals are reached not from the definition but by reducing them to ones already known. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -779,7 +786,7 @@ window.MathJax = {
   </figure>
 
   <!-- expansion:summary — close: the integral is now defined, guaranteed to exist for continuous integrands, and manipulable through its properties; but every value so far came from a limit or a picture. Forward-fence to §6.3 FTC WITHOUT its mechanics. -->
-  <p>We now have the definite integral on a firm footing: a number defined as a limit of Riemann sums, guaranteed to exist whenever the integrand is continuous, measuring net signed area, and obeying the linearity, additivity, and comparison rules that make it possible to reason about it. Yet every value we have produced has come the hard way — from a limit of sums, as in Example 6.4, or from a picture, as in Example 6.5. Only a few integrals can be evaluated either way. The next section removes this obstacle: the Fundamental Theorem of Calculus connects the definite integral to the derivative, and makes the great majority of integrals easy to evaluate.</p>
+  <p>We now have the definite integral on a firm footing: a number defined as a limit of Riemann sums, guaranteed to exist whenever the integrand is continuous, measuring net signed area, and obeying the linearity, additivity, and comparison rules that make it possible to reason about it. Yet every value we have produced has come the hard way, either from a limit of sums, as in Example 6.4, or from a picture, as in Example 6.5. Only a few integrals can be evaluated either way. The next section removes this obstacle: the Fundamental Theorem of Calculus connects the definite integral to the derivative, and makes the great majority of integrals easy to evaluate.</p>
 
 </article>
 </template>
@@ -826,11 +833,11 @@ window.MathJax = {
   <!-- expansion:intuition — the load-bearing intuition: g(x)=∫_a^x f accumulates area; its rate of change is the current height f(x). This IS FTC-1. -->
   <p>Fix a continuous function \(f\) on \([a, b]\) and, for each \(x\) in \([a, b]\), record the signed area accumulated from \(a\) up to \(x\):</p>
   <p>\[ g(x) = \int_{a}^{x} f(t)\,dt. \]</p>
-  <p>The variable of integration is written \(t\) to keep it distinct from the upper limit \(x\), which is now the input of a new function \(g\). As \(x\) advances, \(g(x)\) accumulates more area. How fast? Nudging \(x\) rightward by a small \(h\) appends a thin strip under the graph, of width \(h\) and height about \(f(x)\), so \(g\) gains roughly \(f(x)\,h\) — its rate of increase is the current height \(f(x)\). That guess is exactly right, and it is the first half of the theorem.</p>
+  <p>The variable of integration is written \(t\) to keep it distinct from the upper limit \(x\), which is now the input of a new function \(g\). As \(x\) advances, \(g(x)\) accumulates more area. How fast? Nudging \(x\) rightward by a small \(h\) appends a thin strip under the graph, of width \(h\) and height about \(f(x)\), so \(g\) gains roughly \(f(x)\,h\). Its rate of increase is the current height \(f(x)\). That guess is exactly right, and it is the first half of the theorem.</p>
 
   <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-10 tier-essential — accumulation function g(x) with the added sliver f(x)h (FTC-1 anchor); registered in chapter6 FIGS as "accumulation-sliver"] -->
   <figure class="figure" data-fig="accumulation-sliver">
-    <figcaption><span class="fig-no">Figure 6.7</span> The accumulation function \(g(x) = \int_{a}^{x} f(t)\,dt\) is the shaded area up to \(x\). Advancing \(x\) by a small \(h\) adds the thin strip over \([x, x + h]\), of width \(h\) and height about \(f(x)\), so \(g\) grows by roughly \(f(x)\,h\) — its rate of change is the current height \(f(x)\). The strip is widened for visibility.</figcaption>
+    <figcaption><span class="fig-no">Figure 6.7</span> The accumulation function \(g(x) = \int_{a}^{x} f(t)\,dt\) is the shaded area up to \(x\). Advancing \(x\) by a small \(h\) adds the thin strip over \([x, x + h]\), of width \(h\) and height about \(f(x)\), so \(g\) grows by roughly \(f(x)\,h\). Its rate of change is the current height \(f(x)\). The strip is widened for visibility.</figcaption>
   </figure>
 
   <section class="env env-theorem">
@@ -871,7 +878,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Two points. First, the letter under the integral sign is a placeholder — \(\int_{a}^{x} f(t)\,dt\) and \(\int_{a}^{x} f(s)\,ds\) are the same function of \(x\). Writing \(\int_{a}^{x} f(x)\,dx\), with \(x\) doing double duty as both limit and dummy, is a genuine error. Second, Part 1 requires nothing of \(f\) beyond continuity, so it differentiates accumulation functions we cannot evaluate: \(g(x) = \int_{0}^{x} e^{-t^{2}}\,dt\) has \(g'(x) = e^{-x^{2}}\) exactly, even though \(e^{-t^{2}}\) has no antiderivative expressible in elementary functions. The theorem <em>constructs</em> an antiderivative where no formula for one exists.</p>
+      <p>Two points. First, the letter under the integral sign is only a placeholder, so \(\int_{a}^{x} f(t)\,dt\) and \(\int_{a}^{x} f(s)\,ds\) are the same function of \(x\). Writing \(\int_{a}^{x} f(x)\,dx\), with \(x\) doing double duty as both limit and dummy, is a genuine error. Second, Part 1 requires nothing of \(f\) beyond continuity, so it differentiates accumulation functions we cannot evaluate: \(g(x) = \int_{0}^{x} e^{-t^{2}}\,dt\) has \(g'(x) = e^{-x^{2}}\) exactly, even though \(e^{-t^{2}}\) has no antiderivative expressible in elementary functions. The theorem <em>constructs</em> an antiderivative where no formula for one exists.</p>
     </div>
   </section>
 
@@ -917,7 +924,7 @@ window.MathJax = {
 
   <h3 class="subsec-head">Evaluating integrals</h3>
 
-  <p>Part 1 built one antiderivative of \(f\) — the accumulation function. Part 2 does the reverse: it evaluates a definite integral from <em>any</em> antiderivative whatsoever, and most antiderivatives are far easier to write down than \(\int_{a}^{x} f\).</p>
+  <p>Part 1 built one antiderivative of \(f\), the accumulation function. Part 2 does the reverse: it evaluates a definite integral from <em>any</em> antiderivative whatsoever, and most antiderivatives are far easier to write down than \(\int_{a}^{x} f\).</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.4</span><span class="env-name">Fundamental Theorem of Calculus, Part 2</span></p>
@@ -939,7 +946,7 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>The difference \(F(b) - F(a)\) is written \(\bigl[F(x)\bigr]_{a}^{b}\) (or \(F(x)\big|_{a}^{b}\)) when the antiderivative is displayed. Because any antiderivative serves, any added constant is pointless here — it cancels in the subtraction — so we take the simplest antiderivative available.</p>
+  <p>The difference \(F(b) - F(a)\) is written \(\bigl[F(x)\bigr]_{a}^{b}\) (or \(F(x)\big|_{a}^{b}\)) when the antiderivative is displayed. Any added constant is pointless here because it cancels in the subtraction. We therefore take the simplest antiderivative available.</p>
 
   <section class="env env-strategy">
     <p class="env-head"><span class="env-kicker">Strategy</span><span class="env-num">6.1</span><span class="env-name">Evaluating a definite integral</span></p>
@@ -998,10 +1005,10 @@ window.MathJax = {
   </div>
 
   <!-- expansion:history [source: standard calculus-textbook historical note] — the FTC as Newton and Leibniz's central discovery, the inverse link making calculus one subject -->
-  <p>This inverse link is the discovery, made independently by Newton in the 1660s and Leibniz in the 1670s, that founded calculus as one subject rather than two. The area problem and the tangent problem had been studied for centuries in isolation. The recognition that they are inverse — that the derivative of an accumulated area is the height, and so an area is recovered from an antiderivative — is what turned a collection of clever area computations into a method.</p>
+  <p>This inverse link is the discovery, made independently by Newton in the 1660s and Leibniz in the 1670s, that founded calculus as one subject rather than two. The area problem and the tangent problem had been studied for centuries in isolation. In fact they are inverse to each other. The derivative of an accumulated area is the height, and so an area is recovered from an antiderivative. Recognizing this connection turned a collection of clever area computations into a method.</p>
 
   <!-- expansion:summary — close: the two parts are two faces of one inverse relationship; forward-fence to §6.4 (antiderivative notation + net change) WITHOUT its mechanics -->
-  <p>The two parts are one statement seen from opposite ends. Part 1 differentiates an integral and returns the integrand; Part 2 integrates using an antiderivative and returns a difference of its values. Together they say that differentiation and integration are inverse processes — the central fact of the subject. What remains is to make antiderivatives easy to produce and to read. The next section sets up a notation for the whole family of antiderivatives of a function and reads the Fundamental Theorem as a statement about accumulated change.</p>
+  <p>The two parts are one statement seen from opposite ends. Part 1 differentiates an integral and returns the integrand; Part 2 integrates using an antiderivative and returns a difference of its values. Together they say that differentiation and integration are inverse processes, the central fact of the subject. What remains is to make antiderivatives easy to produce and to read. The next section sets up a notation for the whole family of antiderivatives of a function and reads the Fundamental Theorem as a statement about accumulated change.</p>
 
 </article>
 </template>
@@ -1028,14 +1035,14 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — section opener: FTC-2 needs an antiderivative; give the notation for the whole family of them, and reread the theorem as a net-change identity -->
-  <p>The Fundamental Theorem turns every definite integral into a hunt for an antiderivative, so antiderivatives now deserve a notation and a working table. This section supplies both, and then rereads the theorem itself in the language of accumulated change — the form in which it does most of its practical work.</p>
+  <p>The Fundamental Theorem reduces the evaluation of a definite integral to finding an antiderivative, so we now need a notation and a working table for antiderivatives. This section provides both, and then rereads the theorem as a statement about accumulated change, the form most useful in practice.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.4</span><span class="env-name">Indefinite integral</span></p>
     <div class="env-body">
       <p>The <em>indefinite integral</em> of \(f\), written \(\int f(x)\,dx\), denotes the family of all antiderivatives of \(f\). The statement</p>
       <p>\[ \int f(x)\,dx = F(x) + C \]</p>
-      <p>means that \(F' = f\), where \(C\) is an arbitrary constant — the <em>constant of integration</em>. As \(C\) ranges over all real numbers, \(F + C\) ranges over every antiderivative of \(f\) on the interval in question.</p>
+      <p>means that \(F' = f\), where \(C\) is an arbitrary constant, the <em>constant of integration</em>. As \(C\) ranges over all real numbers, \(F + C\) ranges over every antiderivative of \(f\) on the interval in question.</p>
     </div>
   </section>
 
@@ -1043,7 +1050,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Keep the two integrals apart. The <em>definite</em> integral \(\int_{a}^{b} f(x)\,dx\) is a <em>number</em>; the <em>indefinite</em> integral \(\int f(x)\,dx\) is a <em>family of functions</em>. They share a symbol because the Fundamental Theorem links them — the definite integral is evaluated <em>through</em> an antiderivative — but a number and a family of functions are not the same kind of object. The limits of integration \(a\) and \(b\) are what distinguish the two on the page.</p>
+      <p>Keep the two integrals apart. The <em>definite</em> integral \(\int_{a}^{b} f(x)\,dx\) is a <em>number</em>; the <em>indefinite</em> integral \(\int f(x)\,dx\) is a <em>family of functions</em>. They share a symbol because the Fundamental Theorem links them: the definite integral is evaluated <em>through</em> an antiderivative. But a number and a family of functions are not the same kind of object. The limits of integration \(a\) and \(b\) are what distinguish the two on the page.</p>
     </div>
   </section>
 
@@ -1057,7 +1064,7 @@ window.MathJax = {
     &\int \frac{1}{1 + x^{2}}\,dx = \arctan x, &\qquad &\int \frac{1}{\sqrt{1 - x^{2}}}\,dx = \arcsin x.
   \end{aligned} \]</p>
 
-  <p>The trigonometric and inverse-trigonometric entries are the Chapter 3 derivative rules read backwards — for instance \(\int \sec^{2} x\,dx = \tan x\) because \((\tan x)' = \sec^{2} x\), and \(\arctan\) and \(\arcsin\) likewise reverse the derivatives found there. Each identity holds on any interval where both the integrand and the stated antiderivative are defined: the \(\sec^{2}\) formula where \(\cos x \ne 0\), the \(\arcsin\) formula on \(-1 < x < 1\), and — for a negative or fractional exponent — the power rule on an interval avoiding the points where \(x^{n}\) is undefined. The power rule covers every exponent except \(n = -1\), where the formula \(\tfrac{x^{n+1}}{n+1}\) would divide by zero. That missing case is filled by the logarithm — and the reason an absolute value appears there is worth seeing.</p>
+  <p>The trigonometric and inverse-trigonometric entries are the Chapter 3 derivative rules read backwards. For instance, \(\int \sec^{2} x\,dx = \tan x\) because \((\tan x)' = \sec^{2} x\), and \(\arctan\) and \(\arcsin\) likewise reverse the derivatives found there. Each identity holds on any interval where both the integrand and the stated antiderivative are defined: the \(\sec^{2}\) formula where \(\cos x \ne 0\), the \(\arcsin\) formula on \(-1 < x < 1\), and — for a negative or fractional exponent — the power rule on an interval avoiding the points where \(x^{n}\) is undefined. The power rule covers every exponent except \(n = -1\), where the formula \(\tfrac{x^{n+1}}{n+1}\) would divide by zero. That missing case is filled by the logarithm. The reason an absolute value appears there is worth seeing.</p>
 
   <!-- expansion:formula — the ln|x| export: justify the absolute value via the x<0 branch, and flag the domain (x≠0, two branches) -->
   <p>For \(x > 0\), \(\lvert x\rvert = x\) and \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), as established in Chapter 4 (Theorem 4.14). For \(x < 0\), \(\lvert x\rvert = -x\), and the chain rule gives</p>
@@ -1078,7 +1085,7 @@ window.MathJax = {
       <div class="env-body">
         <p>Integrate term by term, using the table and the linearity that the derivative rules pass to antiderivatives. (a)</p>
         <p>\[ \int \bigl(x^{3} - 6x\bigr)\,dx = \frac{x^{4}}{4} - 6\cdot\frac{x^{2}}{2} + C = \frac{x^{4}}{4} - 3x^{2} + C. \]</p>
-        <p>(b) The term \(5/x\) draws on the logarithm:</p>
+        <p>(b) The term \(5/x\) uses the logarithm entry:</p>
         <p>\[ \int \left(2e^{x} - \frac{5}{x}\right)dx = 2e^{x} - 5\ln\lvert x\rvert + C. \]</p>
         <p>A single constant \(C\) absorbs the constants from every term. We can always check an indefinite integral by differentiating the answer: \(\dfrac{d}{dx}\bigl(2e^{x} - 5\ln\lvert x\rvert\bigr) = 2e^{x} - \dfrac{5}{x}\), as required. <span class="qed"></span></p>
       </div>
@@ -1113,9 +1120,9 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>The table records \(\int \dfrac{1}{1 + x^{2}}\,dx = \arctan x\) — the reverse of \((\arctan x)' = \dfrac{1}{1 + x^{2}}\) established in Chapter 3. By the Fundamental Theorem,</p>
+        <p>The table records \(\int \dfrac{1}{1 + x^{2}}\,dx = \arctan x\), the reverse of \((\arctan x)' = \dfrac{1}{1 + x^{2}}\) established in Chapter 3. By the Fundamental Theorem,</p>
         <p>\[ \int_{0}^{1} \frac{1}{1 + x^{2}}\,dx = \bigl[\arctan x\bigr]_{0}^{1} = \arctan 1 - \arctan 0 = \frac{\pi}{4}. \]</p>
-        <p>A rational integrand with no area to read off has produced the number \(\tfrac{\pi}{4}\) — one of the standard ways \(\pi\) arrives through integration. <span class="qed"></span></p>
+        <p>A rational integrand with no area to read off has produced the number \(\tfrac{\pi}{4}\), one of the standard ways of obtaining \(\pi\) from an integral. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -1134,12 +1141,12 @@ window.MathJax = {
     </div>
   </section>
 
-  <p>This is nothing more than Part 2 of the Fundamental Theorem (Theorem 6.4) with the integrand written as \(F'\): \(F\) is an antiderivative of \(F'\), so the theorem applies verbatim. Its value is in the reading. If \(V'(t)\) is the rate at which water flows into a tank, \(\int_{t_{1}}^{t_{2}} V'(t)\,dt\) is the net volume added; if \(C'(x)\) is a marginal cost, \(\int_{x_{1}}^{x_{2}} C'(x)\,dx\) is the added cost of raising production from \(x_{1}\) to \(x_{2}\). The most important case is motion.</p>
+  <p>This is nothing more than Part 2 of the Fundamental Theorem (Theorem 6.4) with the integrand written as \(F'\): \(F\) is an antiderivative of \(F'\), so the theorem applies verbatim. What is new is how we read it. If \(V'(t)\) is the rate at which water flows into a tank, \(\int_{t_{1}}^{t_{2}} V'(t)\,dt\) is the net volume added; if \(C'(x)\) is a marginal cost, \(\int_{x_{1}}^{x_{2}} C'(x)\,dx\) is the added cost of raising production from \(x_{1}\) to \(x_{2}\). The most important case is motion.</p>
 
   <!-- expansion:caution — displacement (∫v, signed) vs total distance (∫|v|); split at sign changes. Closes the §6.1 speed loop. -->
-  <p>For an object moving along a line with velocity \(v(t)\), position is an antiderivative of velocity, so the Net Change Theorem gives the <em>displacement</em> — the net change in position — as</p>
+  <p>For an object moving along a line with velocity \(v(t)\), position is an antiderivative of velocity. The <em>displacement</em> is the net change in position, and the Net Change Theorem gives it as</p>
   <p>\[ \text{displacement} = \int_{a}^{b} v(t)\,dt. \]</p>
-  <p>This is a signed quantity: motion in the negative direction subtracts. The <em>total distance travelled</em>, which never subtracts, integrates the <em>speed</em> \(\lvert v(t)\rvert\) instead — recovering the reading of §6.1:</p>
+  <p>This is a signed quantity: motion in the negative direction subtracts. The <em>total distance travelled</em>, which never subtracts, is found by integrating the <em>speed</em> \(\lvert v(t)\rvert\), as in §6.1:</p>
   <p>\[ \text{total distance} = \int_{a}^{b} \lvert v(t)\rvert\,dt. \]</p>
   <p>To compute the distance we split the interval at the instants where \(v\) changes sign, integrate \(v\) on each piece, and add the absolute values.</p>
 
@@ -1173,7 +1180,7 @@ window.MathJax = {
   </figure>
 
   <!-- expansion:summary — close: antiderivatives now have notation and a table; the FTC reads as net change. Forward-fence to §6.5 (substitution) WITHOUT its mechanics. -->
-  <p>The definite integral is now, in principle, a solved problem: find an antiderivative, subtract its values, and read the result as an area or a net change. In practice a gap remains. The table above antidifferentiates only functions that are visibly some derivative run backwards; a mild disguise — an inner function tucked inside another — defeats it. The next section restores the chain rule to the antiderivative side of the ledger, and with it the single most useful technique for finding antiderivatives that the table alone cannot.</p>
+  <p>The definite integral is now, in principle, a solved problem: find an antiderivative, subtract its values, and read the result as an area or a net change. In practice a gap remains. The table above applies directly only to functions that are visibly some derivative run backwards. An integrand with an inner function tucked inside another often has no direct entry there. The next section carries the chain rule over to the antiderivative side, and with it the single most useful technique for finding antiderivatives that the table alone cannot.</p>
 
 </article>
 </template>
@@ -1199,7 +1206,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — section opener: the table antidifferentiates only bare derivatives; substitution reverses the chain rule to handle an inner function -->
-  <p>The table of §6.4 antidifferentiates a function only when it recognizes it as some derivative written plainly. But most integrands wear a disguise: an inner function tucked inside another, the fingerprint of the chain rule. To integrate \(\int 2x\sqrt{1 + x^{2}}\,dx\) there is no table entry — yet the \(2x\) is exactly the derivative of the inside \(1 + x^{2}\), and that is no accident. Running the chain rule backwards strips the disguise. The technique is <em>substitution</em>, and it is the single most useful method of integration.</p>
+  <p>The table of §6.4 antidifferentiates a function directly only when the function is visibly a derivative written plainly. Many integrands contain an inner function inside another function, the pattern to which the chain rule applies. To integrate \(\int 2x\sqrt{1 + x^{2}}\,dx\) there is no direct table entry, yet \(2x\) is exactly the derivative of the inner expression \(1 + x^{2}\), and that is no accident. Applying the chain rule in reverse gives the method of <em>substitution</em>. It is the single most useful technique of integration.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.6</span><span class="env-name">The Substitution Rule</span></p>
@@ -1243,7 +1250,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>The inside of the square root is \(1 + x^{2}\), and its derivative \(2x\) stands ready in the integrand. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\). The integral becomes one the table knows:</p>
+        <p>The expression inside the square root is \(1 + x^{2}\), and its derivative \(2x\) is already present in the integrand. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\). The resulting integral is listed in the table:</p>
         <p>\[ \int 2x\sqrt{1 + x^{2}}\,dx = \int \sqrt{u}\,du = \frac{2}{3}u^{3/2} + C = \frac{2}{3}\bigl(1 + x^{2}\bigr)^{3/2} + C. \]</p>
         <p>Differentiating the answer returns \(2x\sqrt{1 + x^{2}}\), confirming it. <span class="qed"></span></p>
       </div>
@@ -1278,7 +1285,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>The derivative of the denominator is \(2x\), exactly the numerator — the fingerprint of a substitution whose result is a logarithm rather than a power. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\), and the integral becomes \(\int \tfrac{1}{u}\,du\):</p>
+        <p>The derivative of the denominator is \(2x\), exactly the numerator. That is the mark of a substitution whose result is a logarithm rather than a power. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\), and the integral becomes \(\int \tfrac{1}{u}\,du\):</p>
         <p>\[ \int \frac{2x}{1 + x^{2}}\,dx = \int \frac{du}{u} = \ln\lvert u\rvert + C = \ln\bigl(1 + x^{2}\bigr) + C, \]</p>
         <p>where the absolute value is dropped because \(1 + x^{2} > 0\) throughout. This is the pattern \(\int \dfrac{f'(x)}{f(x)}\,dx = \ln\lvert f(x)\rvert + C\): when the numerator is the derivative of the denominator, substitution collapses the integral to the logarithm introduced in §6.4. <span class="qed"></span></p>
       </div>
@@ -1287,7 +1294,7 @@ window.MathJax = {
 
   <h3 class="subsec-head">Substitution in definite integrals</h3>
 
-  <p>A definite integral can be substituted just as an indefinite one, provided the limits are handled with care. There are two honest options: finish the antiderivative and restore \(x\) before applying the limits, or — usually cleaner — carry the substitution through the limits themselves.</p>
+  <p>A definite integral can be substituted just as an indefinite one, provided the limits are handled with care. There are two correct options: finish the antiderivative and restore \(x\) before applying the limits, or — usually cleaner — carry the substitution through the limits themselves.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.7</span><span class="env-name">Substitution in a definite integral</span></p>
@@ -1313,7 +1320,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>When a definite integral is converted to \(u\), the limits must be converted too. Writing \(\int_{a}^{b} \dots\,du\) with the <em>original</em> \(x\)-limits still attached to a \(u\)-integrand is a common and costly error: the numbers \(a\) and \(b\) are values of \(x\), not of \(u\). Either change the limits to \(g(a)\) and \(g(b)\) and evaluate in \(u\), or return to \(x\) first and use the original limits — but never blend the two.</p>
+      <p>When a definite integral is converted to \(u\), the limits must be converted too. Writing \(\int_{a}^{b} \dots\,du\) with the <em>original</em> \(x\)-limits still attached to a \(u\)-integrand is a common and costly error: the numbers \(a\) and \(b\) are values of \(x\), not of \(u\). Either change the limits to \(g(a)\) and \(g(b)\) and evaluate in \(u\), or return to \(x\) first and use the original limits. Never blend the two.</p>
     </div>
   </section>
 
@@ -1337,10 +1344,10 @@ window.MathJax = {
   <h3 class="subsec-head">Symmetry</h3>
 
   <!-- expansion:intuition — symmetry as a substitution corollary: even/odd functions over [-a,a] -->
-  <p>When the interval is symmetric about the origin, the symmetry of the integrand — if it has any — can halve the work or eliminate it entirely. This is substitution in one of its tidiest applications.</p>
+  <p>When the interval is symmetric about the origin, the symmetry of the integrand — if it has any — can halve the work or eliminate it entirely.</p>
 
   <!-- expansion:intuition [pass: enrichment] [source: mode-c gap-check 2026-07-11 — Theorem 6.8 had the thinnest formal lead-in; add the even/odd geometric picture (mirror doubles, half-turn cancels) before the u=-x proof] -->
-  <p>Picture the two cases. An even function has the same graph on \([-a, 0]\) as on \([0, a]\), mirror-reflected across the vertical axis, so each thin strip on the left has an identical twin on the right — same height, hence the same sign — and the matched signed areas <em>add</em>: the integral is twice the integral over \([0, a]\). An odd function’s graph on \([-a, 0]\) is the \([0, a]\) graph turned a half-turn about the origin, so each left strip is the mirror of a right strip carrying the <em>opposite</em> sign; the matched contributions <em>cancel</em> and the integral is zero. The substitution \(u = -x\) below turns this picture into a proof.</p>
+  <p>Picture the two cases. For an even function, the graph on \([-a, 0]\) is the graph on \([0, a]\) reflected across the vertical axis. Each thin strip on the left therefore has a matching strip on the right with the same height and the same sign, so the matched signed areas <em>add</em>: the integral is twice the integral over \([0, a]\). An odd function’s graph on \([-a, 0]\) is the \([0, a]\) graph turned a half-turn about the origin, so each left strip is the mirror of a right strip carrying the <em>opposite</em> sign; the matched contributions <em>cancel</em> and the integral is zero. The substitution \(u = -x\) below turns this picture into a proof.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">6.8</span><span class="env-name">Integrals of symmetric functions</span></p>
@@ -1374,24 +1381,28 @@ window.MathJax = {
       <div class="env-body">
         <p>The integrand splits into an even part and an odd part. Over the symmetric interval \([-1, 1]\), the even \(x^{4}\) doubles its integral over \([0, 1]\), while the odd \(x^{3}\) integrates to zero (Theorem 6.8):</p>
         <p>\[ \int_{-1}^{1} \bigl(x^{4} + x^{3}\bigr)\,dx = 2\int_{0}^{1} x^{4}\,dx + 0 = 2\left[\frac{x^{5}}{5}\right]_{0}^{1} = \frac{2}{5}. \]</p>
-        <p>The odd term contributes nothing at all — recognizing it saves the work of integrating it. <span class="qed"></span></p>
+        <p>The odd term contributes nothing at all, so recognizing this saves the work of integrating it. <span class="qed"></span></p>
       </div>
     </section>
   </div>
 
   <!-- expansion:summary — close §6.5: substitution is the first technique; the rest wait for Ch8. One-line fence, no mechanics. -->
-  <p>Substitution is the reverse of the chain rule, and the first entry in the toolkit of integration techniques. It reaches every integrand that hides a single inner function whose derivative is present — a wide class, but not all. Products of unrelated functions, powers of trigonometric functions, and rational functions each need their own device; those techniques, which begin where substitution leaves off, are the business of Chapter 8.</p>
+  <p>Substitution is the reverse of the chain rule, and the first entry in the toolkit of integration techniques. It applies to integrands with a single inner function whose derivative is present, up to a constant factor. This is a wide class, but it does not include all integrands. Products of unrelated functions, powers of trigonometric functions, and rational functions each require different techniques. Those techniques are the subject of Chapter 8.</p>
 
   <h3 class="subsec-head">Chapter summary</h3>
 
-  <p>This chapter built the integral from the ground up and bound it to the derivative. Section 6.1 met the area and distance problems and discovered them to be one limit of Riemann sums. Section 6.2 named that limit the <em>definite integral</em> \(\int_{a}^{b} f(x)\,dx\) (Definition 6.2), established that a continuous integrand is integrable (Theorem 6.1, taken on credit), read the integral as net signed area, and collected its properties (Theorem 6.2). Section 6.3 proved the <em>Fundamental Theorem of Calculus</em>: Part 1 (Theorem 6.3) shows the accumulation function \(\int_{a}^{x} f\) is an antiderivative of \(f\), so differentiating an integral returns the integrand; Part 2 (Theorem 6.4) evaluates any definite integral from a single antiderivative. That the derivative of an accumulated area is the height, and that an area is therefore recovered from an antiderivative, is the hinge on which calculus turns. Section 6.4 gave antiderivatives a notation — the indefinite integral (Definition 6.4) — and a working table, singled out \(\int \tfrac{1}{x}\,dx = \ln\lvert x\rvert + C\), and reread the theorem as the Net Change Theorem (Theorem 6.5). Section 6.5 turned the chain rule around into the Substitution Rule (Theorems 6.6–6.7) and used it to exploit symmetry (Theorem 6.8).</p>
+  <p>This chapter built the integral from the ground up and bound it to the derivative. Section 6.1 met the area and distance problems and discovered them to be one limit of Riemann sums. Section 6.2 named that limit the <em>definite integral</em> \(\int_{a}^{b} f(x)\,dx\) (Definition 6.2), established that a continuous integrand is integrable (Theorem 6.1, taken on credit), read the integral as net signed area, and collected its properties (Theorem 6.2).</p>
+
+  <p>Section 6.3 proved the <em>Fundamental Theorem of Calculus</em>: Part 1 (Theorem 6.3) shows the accumulation function \(\int_{a}^{x} f\) is an antiderivative of \(f\), so differentiating an integral returns the integrand; Part 2 (Theorem 6.4) evaluates any definite integral from a single antiderivative. That the derivative of an accumulated area is the height, and that an area is therefore recovered from an antiderivative, is the central fact of the subject.</p>
+
+  <p>Section 6.4 introduced the notation \(\int f(x)\,dx\) for the <em>indefinite integral</em> (Definition 6.4) and a working table, singled out \(\int \tfrac{1}{x}\,dx = \ln\lvert x\rvert + C\), and reread the theorem as the Net Change Theorem (Theorem 6.5). Section 6.5 turned the chain rule around into the Substitution Rule (Theorems 6.6–6.7) and used it to exploit symmetry (Theorem 6.8).</p>
 
   <p>The results worth carrying forward are few and central:</p>
   <p>\[ \int_{a}^{b} f(x)\,dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_{i}^{*})\,\Delta x, \qquad \frac{d}{dx}\int_{a}^{x} f(t)\,dt = f(x), \]</p>
   <p>\[ \int_{a}^{b} f(x)\,dx = F(b) - F(a), \qquad \int \frac{1}{x}\,dx = \ln\lvert x\rvert + C, \]</p>
   <p>\[ \int f\bigl(g(x)\bigr)g'(x)\,dx = \int f(u)\,du. \]</p>
 
-  <p>The debt the chapter leaves to the rest of the book is a single instrument used everywhere. Chapter 7 applies the Fundamental Theorem to areas between curves, volumes, and arc lengths; Chapter 8 extends substitution into a full set of techniques for finding the antiderivatives that evaluation demands; and the integral returns, transformed, in the study of series, of differential equations, and of the calculus of several variables. Every one of those chapters rests on the two theorems proved in §6.3.</p>
+  <p>The rest of the book uses the integral as a central tool. Chapter 7 applies the Fundamental Theorem to areas between curves, volumes, and arc lengths; Chapter 8 extends substitution into a full set of techniques for finding the antiderivatives that evaluation demands; and the integral returns, transformed, in the study of series, of differential equations, and of the calculus of several variables. Every one of those chapters rests on the two theorems proved in §6.3.</p>
 
 </article>
 </template>
