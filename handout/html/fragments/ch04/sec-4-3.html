@@ -38,12 +38,12 @@
   </header>
 
   <!-- expansion:intuition — section opener: §4.2 gave continuity, positivity, exponent law; now harvest the derivative. Cross-ref Chapter 2's informal version (D-redundancy); Chapter 2 is not edited. -->
-  <p>With Section 4.2 finished, \(e^{x}\) is a fully legitimate function on \(\mathbb{R}\): defined by its power series, continuous, strictly positive, and obeying the exponent law \(e^{x} e^{y} = e^{x + y}\). One classical fact about it is still owed a rigorous proof — its derivative. Chapter 2 already computed \(\frac{d}{dx} e^{x} = e^{x}\), but by a casual term-by-term argument that fed the series into the difference quotient and observed that all but the leading term seemed to drop out as \(h \to 0\). That argument was correct in spirit, yet it leaned on three properties — convergence, continuity, and the exponent law — that had not been established at the time. Now that all three are theorems, we can re-derive the formula honestly. We also gain something the earlier pass skipped: an <em>explicit</em> bound that shows exactly how fast the difference quotient settles to its limit.</p>
+  <p>With Section 4.2 finished, \(e^{x}\) is a fully legitimate function on \(\mathbb{R}\): defined by its power series, continuous, strictly positive, and obeying the exponent law \(e^{x} e^{y} = e^{x + y}\). Its derivative is the one classical fact about it that still needs a rigorous proof. Chapter 2 already computed \(\frac{d}{dx} e^{x} = e^{x}\), but by a casual term-by-term argument that substituted the series into the difference quotient and observed that the terms after the leading term tend to \(0\) as \(h \to 0\). That argument gave the correct result, yet it used three properties — convergence, continuity, and the exponent law — that had not been established at the time. Now that all three are theorems, we can re-derive the formula from them. We also gain something the earlier pass skipped: an <em>explicit</em> bound that shows exactly how fast the difference quotient settles to its limit.</p>
 
   <h3 class="subsec-head">The difference quotient</h3>
 
   <!-- expansion:formula — the exponent law factors the difference quotient; e^x pulls out, reducing everything to one limit at 0 -->
-  <p>The entire calculation rests on a single algebraic move — the exponent law. For a fixed \(x\) and a nonzero increment \(h\), Theorem 4.7 gives \(e^{x + h} = e^{x} e^{h}\), so</p>
+  <p>The entire calculation rests on a single algebraic move, the exponent law. For a fixed \(x\) and a nonzero increment \(h\), Theorem 4.7 gives \(e^{x + h} = e^{x} e^{h}\), so</p>
 
   <p>\[ \frac{e^{x + h} - e^{x}}{h} = \frac{e^{x} e^{h} - e^{x}}{h} = \left( \frac{e^{h} - 1}{h} \right) e^{x}. \]</p>
 
@@ -51,7 +51,7 @@
 
   <p>\[ \frac{d}{dx} e^{x} = \left( \lim_{h \to 0} \frac{e^{h} - 1}{h} \right) e^{x}, \qquad \text{provided } \lim_{h \to 0} \frac{e^{h} - 1}{h} \text{ exists.} \]</p>
 
-  <p>Everything now hinges on showing that this limit equals \(1\). The series makes it transparent, and — unlike the Chapter 2 pass — it lets us put a number on the rate of approach.</p>
+  <p>Everything now hinges on showing that this limit equals \(1\). The series shows why the limit is \(1\), and — unlike the Chapter 2 derivation — also gives a numerical bound on the rate of approach.</p>
 
   <!-- expansion:intuition — Proposition 4.2: the explicit bound on (e^h−1)/h − 1. Supplies the manuscript's omitted "bracket ≤ 1" step via a geometric comparison (Strategy 4.1). -->
   <section class="env env-proposition">
@@ -81,7 +81,7 @@
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.3</span></p>
     <div class="env-body">
-      <p>Proposition 4.2 is precisely the quantitative content the Chapter 2 derivation left unstated. There the higher-order terms were said to “vanish as \(h \to 0\),” with no measure of how fast; here the deviation of \(\frac{e^{h} - 1}{h}\) from \(1\) is pinned at no more than \(\lvert h \rvert\) — convergence at a rate at least linear in \(h\). For ordinary differentiation the qualitative statement suffices, but any later argument that must track the size of a derivative error — Taylor remainders, numerical estimates — uses the explicit bound, not the bare limit.</p>
+      <p>Proposition 4.2 is precisely the quantitative content the Chapter 2 derivation left unstated. There the higher-order terms were said to “vanish as \(h \to 0\),” with no measure of how fast; here the deviation of \(\frac{e^{h} - 1}{h}\) from \(1\) is at most \(\lvert h \rvert\), a rate of convergence at least linear in \(h\). For ordinary differentiation, the qualitative statement suffices, but later arguments that must track the size of a derivative error — Taylor remainders and numerical estimates — use the explicit bound rather than the limit statement alone.</p>
     </div>
   </section>
 
@@ -126,6 +126,6 @@
   </section>
 
   <!-- expansion:summary — §C-4 application hook (one sentence, full treatment deferred) + forward to §4.4 (monotonicity needs the MVT) -->
-  <p>The identity \(\frac{d}{dx} e^{x} = e^{x}\) — slope equal to value at every point — is exactly the property that makes the exponential the natural model for any quantity whose rate of change is proportional to its current size: the relation \(y' = k\,y\), solved by \(y = y(0)\,e^{kt}\). We return to that application once the logarithm is in place. For now the formula hands us one immediate structural fact: since \(e^{x} > 0\) everywhere (Corollary 4.1), its derivative is everywhere positive. Intuitively a function with positive derivative ought to be increasing, which would let us invert \(e^{x}\) and finally build \(\ln x\). Turning that intuition into a theorem requires an existence result that converts the sign of the derivative into monotonic behavior of the function — the Mean Value Theorem. The next section develops it, by way of Rolle’s theorem.</p>
+  <p>The identity \(\frac{d}{dx} e^{x} = e^{x}\) says that the slope equals the value at every point. That is exactly the property that makes the exponential the natural model for any quantity whose rate of change is proportional to its current size: the relation \(y' = k\,y\), solved by \(y = y(0)\,e^{kt}\). We return to that application once the logarithm is in place. For now the formula hands us one immediate structural fact: since \(e^{x} > 0\) everywhere (Corollary 4.1), its derivative is everywhere positive. Intuitively a function with positive derivative ought to be increasing, which would let us invert \(e^{x}\) and finally build \(\ln x\). Turning that intuition into a theorem requires the Mean Value Theorem, an existence result that converts the sign of the derivative into monotonic behavior of the function. The next section develops it, by way of Rolle’s theorem.</p>
 
 </article>
