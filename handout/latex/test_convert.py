@@ -201,6 +201,26 @@ class MathScannerClosure(unittest.TestCase):
         self.assertIn(r"Body \(b\)", out)
         self.assertLess(out.index(r"\(a\)"), out.index(r"\(b\)"))
 
+    def test_env_kicker_math_is_restored(self):
+        # 自訂 proof 標籤會帶數學（ch05 §5.7 "Proof of the \(0/0\) case, \(a\) finite"、
+        # appD §D.3 同型）。kicker 原本只走 esc()，占位符不還原＝數學被丟掉，由不變式
+        # 擋下（ch05 rollout 實際觸發：sec-5-7 缺席 [65, 66]）。改走 restore(esc(...))。
+        out = conv(wrap('<section class="env env-proof"><p class="env-head">'
+                        r'<span class="env-kicker">Proof of the \(\tfrac{0}{0}\) case, \(a\) finite</span></p>'
+                        r'<div class="env-body"><p>Body \(b\)</p></div></section>'))
+        self.assertIn(r"{Proof of the \(\tfrac{0}{0}\) case, \(a\) finite}", out)
+        self.assertLess(out.index(r"\(a\)"), out.index(r"\(b\)"))
+
+    def test_env_kicker_math_ordering_before_env_name(self):
+        # kicker 與 name 同時帶數學時，還原順序須等同源順序（kicker 在 name 之前），
+        # 否則 used=[1,0] 會讓正確輸出被不變式誤擋。
+        out = conv(wrap('<section class="env env-theorem"><p class="env-head">'
+                        r'<span class="env-kicker">Case \(k\)</span>'
+                        r'<span class="env-name">Name \(n\)</span></p>'
+                        r'<div class="env-body"><p>Body \(b\)</p></div></section>'))
+        self.assertLess(out.index(r"\(k\)"), out.index(r"\(n\)"))
+        self.assertLess(out.index(r"\(n\)"), out.index(r"\(b\)"))
+
     def test_forged_sentinel_in_prose_is_caught(self):
         # 課文可用 &#xE000; 偽造占位符。不靠「不會有人這樣寫」，靠不變式擋。
         with self.assertRaises(ConversionError) as cm:

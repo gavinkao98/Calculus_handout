@@ -1,0 +1,944 @@
+% !TeX program = lualatex
+% ============================================================
+% chapter5.tex — ch05 出版成品（自動產生，勿手改）
+% 產生：cd handout/latex && python make_dist.py ch05
+%   內容源＝handout/html/fragments/ch05/（fragment 唯讀；數學逐位元組 pass-through）
+%   樣式源＝../../template/calcbook.sty（M-B1 拍板模板）
+% 直接重編（本資料夾為 CWD；aux 進 build/、資料夾保持兩檔）：
+%   latexmk -lualatex -auxdir=../../build/aux-ch05 chapter5.tex
+% ============================================================
+\documentclass[a4paper,12pt,oneside]{memoir}
+\makeatletter\def\input@path{{../../template/}}\makeatother
+\def\cbfontsdir{../../template/fonts/inter/}
+\usepackage{calcbook}
+% 圖：emitter 射 `<ch>/<stem>`（見 convert.py），故 graphicspath 指向 chapters/ 上層。
+% 模板內的 {../figs/} 是 chapters/<ch>/ 為 CWD 時的路徑，dist/<ch>/ 需這一行覆寫。
+\graphicspath{{../../chapters/}}
+\begin{document}
+\chapteropener{Chapter 5}{Applications of Differentiation}
+\begin{lead}
+Chapters 2 through 4 built the derivative and the rules for computing it: the limit definition, the power, product, quotient, and chain rules, the derivatives of the exponential, logarithm, and trigonometric functions, and the Mean Value Theorem that ties the sign of a derivative to the behaviour of the function. That machinery is now an instrument. This chapter turns it on the questions calculus was invented to answer: how fast one quantity changes when another does, how good a straight-line estimate of a curved function is, where a function is largest or smallest, which way it bends, how to read a graph off its formula, and how to locate a root you cannot solve for. The derivative stops being an object to compute and becomes a tool to think with.
+\end{lead}
+\parahead{By the end of this chapter, you will be able to:}
+\begin{objectives}
+  \item use implicit differentiation to find \(dy/dx\) for a curve defined by an equation;
+  \item solve related-rates problems by differentiating a relation with respect to time;
+  \item use linear approximation and differentials to estimate values and bound errors;
+  \item locate absolute and local extrema, and solve optimization problems;
+  \item determine concavity and inflection points, and apply the first- and second-derivative tests;
+  \item evaluate limits of indeterminate form with L’Hôpital’s rule;
+  \item sketch a curve from its analytic features;
+  \item approximate a root with Newton’s method.
+\end{objectives}
+\sechead{5.1}{Implicit Differentiation}
+Every function we have differentiated so far arrived as a formula \(y = f(x)\), with \(y\) served up explicitly in terms of \(x\). But a great many curves are given instead by an \emph{equation} relating \(x\) and \(y\), such as the circle \(x^{2} + y^{2} = 25\) or the looping curve \(x^{3} + y^{3} = 6xy\). For such a curve no single formula \(y = f(x)\) describes the whole picture. The circle fails the vertical-line test twice over; solving for \(y\) splits it into two half-circles \(y = \pm\sqrt{25 - x^{2}}\), and the second curve resists solving for \(y\) altogether. Yet each still has a tangent line at (almost) every point, and so a slope \(dy/dx\) worth computing.
+
+\emph{Implicit differentiation} computes that slope directly from the equation, without first solving for \(y\). The device is the chain rule. We regard \(y\) as an (unspecified) differentiable function of \(x\) on the stretch of curve we care about, and differentiate both sides of the equation with respect to \(x\). Every term built from \(y\) then carries a factor \(dy/dx\): since \(y\) depends on \(x\),
+
+\[ \frac{d}{dx}\bigl[y^{n}\bigr] = n\,y^{n-1}\,\frac{dy}{dx}, \qquad \frac{d}{dx}\bigl[\sin y\bigr] = \cos y\,\frac{dy}{dx}, \]
+
+and so on, exactly as the chain rule (Theorem 3.3) demands. The differentiated equation is then a \emph{linear} equation in the unknown \(dy/dx\), which we solve by ordinary algebra.
+
+\begin{envcaution}{Caution}{}{}
+The one indispensable habit is to attach \(dy/dx\) to every \(y\)-term. Differentiating \(x^{2}\) with respect to \(x\) gives \(2x\); differentiating \(y^{2}\) with respect to \(x\) gives \(2y\,\dfrac{dy}{dx}\), \emph{not} \(2y\). The extra factor is the chain rule registering that \(y\) is itself a function of \(x\). Dropping it is the standard mistake, and it silently corrupts every line below.
+\end{envcaution}
+\begin{envstrategy}{Strategy}{5.1}{Implicit differentiation}
+To find \(dy/dx\) for a curve given by an equation in \(x\) and \(y\):
+
+\begin{steps}
+  \item Differentiate both sides of the equation with respect to \(x\), treating \(y\) as a function of \(x\). Each \(y\)-term acquires a factor \(dy/dx\) through the chain rule; product and quotient terms such as \(xy\) still obey the product and quotient rules.
+  \item Gather every term containing \(dy/dx\) on one side and everything else on the other.
+  \item Factor out \(dy/dx\) and divide, solving for it. The result is generally an expression in \emph{both} \(x\) and \(y\). To get a numerical slope, substitute the coordinates of a point on the curve.
+\end{steps}
+\end{envstrategy}
+\begin{workedexample}
+\begin{envexample}{Example}{5.1}{}
+The circle \(x^{2} + y^{2} = 25\) passes through \((3, 4)\). Find \(dy/dx\), and the equation of the tangent line there.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Differentiate both sides with respect to \(x\). The term \(x^{2}\) gives \(2x\); the term \(y^{2}\) gives \(2y\,\dfrac{dy}{dx}\) by the chain rule; the constant \(25\) gives \(0\):
+
+\[ 2x + 2y\,\frac{dy}{dx} = 0. \]
+
+Solving for the derivative,
+
+\[ \frac{dy}{dx} = -\frac{x}{y}. \]
+
+The slope depends on both coordinates, as implicit differentiation usually delivers. At \((3, 4)\) it is \(dy/dx = -\tfrac{3}{4}\), so the tangent line is
+
+\[ y - 4 = -\tfrac{3}{4}(x - 3). \]
+
+The answer agrees with plain geometry: the radius to \((3, 4)\) has slope \(\tfrac{4}{3}\), and a tangent to a circle is perpendicular to the radius, so its slope is the negative reciprocal \(-\tfrac{3}{4}\), exactly as found. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{figureblock}
+  \includegraphics[width=77.26mm]{ch05/figs/tangent-radius-circle}
+\figcaption{Figure 5.1}{The circle \(x^{2} + y^{2} = 25\) with its tangent line at \((3, 4)\): the tangent is perpendicular to the radius, so its slope is the negative reciprocal of the radius’s slope \(\tfrac{4}{3}\).}
+\end{figureblock}
+\begin{workedexample}
+\begin{envexample}{Example}{5.2}{}
+Find the slope of the curve \(x^{3} + y^{3} = 6xy\) at the point \((3, 3)\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Here \(y\) cannot be isolated, but the method does not need it. Differentiate both sides with respect to \(x\). On the left, \(x^{3}\) gives \(3x^{2}\) and \(y^{3}\) gives \(3y^{2}\,\dfrac{dy}{dx}\). On the right, \(6xy\) is a product, so the product rule applies. The \(y\)-factor again carries its \(dy/dx\):
+
+\[ 3x^{2} + 3y^{2}\,\frac{dy}{dx} = 6\!\left(y + x\,\frac{dy}{dx}\right). \]
+
+Collect the \(dy/dx\) terms on the left and the rest on the right:
+
+\[ 3y^{2}\,\frac{dy}{dx} - 6x\,\frac{dy}{dx} = 6y - 3x^{2}, \qquad (3y^{2} - 6x)\,\frac{dy}{dx} = 6y - 3x^{2}. \]
+
+Dividing through (and cancelling the common factor \(3\)),
+
+\[ \frac{dy}{dx} = \frac{2y - x^{2}}{y^{2} - 2x}. \]
+
+At \((3, 3)\), which does lie on the curve since \(3^{3} + 3^{3} = 54 = 6\cdot 3\cdot 3\), this is
+
+\[ \frac{dy}{dx} = \frac{2(3) - 3^{2}}{3^{2} - 2(3)} = \frac{6 - 9}{9 - 6} = \frac{-3}{3} = -1. \]
+
+The tangent at \((3, 3)\) has slope \(-1\), a fact we could not have reached by solving for \(y\). \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{5.3}{}
+Recover the derivative of \(\arcsin x\) by implicit differentiation.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Write \(y = \arcsin x\), so that \(y\) is the angle in \([-\tfrac{\pi}{2}, \tfrac{\pi}{2}]\) with
+
+\[ \sin y = x. \]
+
+This is exactly the kind of relation implicit differentiation is built for. Differentiate both sides with respect to \(x\); the left side gives \(\cos y\,\dfrac{dy}{dx}\) by the chain rule:
+
+\[ \cos y\,\frac{dy}{dx} = 1, \qquad \frac{dy}{dx} = \frac{1}{\cos y}. \]
+
+To express this in \(x\), use \(\cos^{2} y = 1 - \sin^{2} y = 1 - x^{2}\). On the principal interval \([-\tfrac{\pi}{2}, \tfrac{\pi}{2}]\) cosine is non-negative, so \(\cos y = \sqrt{1 - x^{2}}\), and
+
+\[ \frac{d}{dx}\arcsin x = \frac{1}{\sqrt{1 - x^{2}}}, \qquad -1 < x < 1. \]
+
+Chapter 3 obtained this same derivative (Example 3.14) by following the \emph{composition-identity route} and differentiating the identity \(\arcsin(\sin x) = x\). Implicit differentiation is the general framework behind that method. For an inverse function, differentiate the relation that defines the inverse and solve for its derivative. This works on any branch where the inverse is differentiable and the division that solving requires is legitimate. The restriction to the open interval \((-1, 1)\) persists: at \(x = \pm 1\) the curve \(\sin y = x\) has a vertical tangent, and \(\cos y = 0\) makes \(1/\cos y\) undefined. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{envcaution}{Caution}{}{}
+Implicit differentiation assumes what it uses: that near the point in question, the curve \emph{is} the graph of some differentiable function \(y\) of \(x\). Where that fails, the formula for \(dy/dx\) does too. On the circle \(x^{2} + y^{2} = 25\) the point \((5, 0)\) has \(y = 0\), and \(dy/dx = -x/y\) is undefined. The tangent there is vertical, and no function \(y = f(x)\) describes the curve through that point. Use this as a practical check. A formula for \(dy/dx\) that is unbounded or has the form \(0/0\) is a warning that the branch assumption needs separate analysis. It may indicate a vertical tangent, a self-crossing, or another singular point, where the chosen branch may no longer be described by \(y\) as a function of \(x\). (The precise conditions under which an equation \(F(x, y) = 0\) does define \(y\) as a differentiable function of \(x\) belong to the multivariable calculus of Chapter 14; here we work on the branches where it plainly does.)
+\end{envcaution}
+\subsechead{Higher derivatives}
+The method can be applied to its own output: once \(dy/dx\) is known implicitly, differentiating again gives \(d^{2}y/dx^{2}\).
+
+\begin{workedexample}
+\begin{envexample}{Example}{5.4}{}
+For the circle \(x^{2} + y^{2} = 25\), find \(d^{2}y/dx^{2}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+From Example 5.1, \(dy/dx = -x/y\). Differentiate this quotient with respect to \(x\), remembering that \(y\) is a function of \(x\), so the quotient rule applies and \(y' = dy/dx\) reappears:
+
+\[ \frac{d^{2}y}{dx^{2}} = -\frac{d}{dx}\!\left(\frac{x}{y}\right) = -\frac{(1)\,y - x\,\dfrac{dy}{dx}}{y^{2}} = -\frac{\,y - x\!\left(-\dfrac{x}{y}\right)}{y^{2}}. \]
+
+Substituting \(dy/dx = -x/y\) has already cleared the derivative from the right-hand side. Simplify the numerator over the common denominator \(y\):
+
+\[ \frac{d^{2}y}{dx^{2}} = -\frac{\dfrac{y^{2} + x^{2}}{y}}{y^{2}} = -\frac{x^{2} + y^{2}}{y^{3}}. \]
+
+Finally, every point on the curve satisfies \(x^{2} + y^{2} = 25\), so the original equation simplifies the answer to
+
+\[ \frac{d^{2}y}{dx^{2}} = -\frac{25}{y^{3}}. \]
+
+Using the defining equation to simplify the result is typical of implicit differentiation: the constraint that pins the curve down is available at every stage. On the upper half-circle \(y > 0\) the second derivative is negative, recording that the arc bends downward, exactly as the picture of a circle’s top shows. §5.6 will call this shape \emph{concave down}. \qedmark
+\end{envsolution}
+\end{workedexample}
+Implicit differentiation is less a new rule than a new way to use an old one: the chain rule, applied to an equation instead of a formula. This use of the chain rule is what the next section needs. There, the variable tying the equation together is not \(x\) but time, and differentiating a relation with respect to \(t\) turns known rates of change into unknown ones.
+
+
+\sechead{5.2}{Related Rates}
+The previous section differentiated an equation with respect to \(x\). Nothing forces the differentiating variable to be \(x\). When several quantities are bound together by an equation and all of them drift with time, differentiating that equation \emph{with respect to time} binds their rates of change together in the same way. This is the setting of a \emph{related-rates} problem: one rate is known, another is wanted, and an equation of geometry or physics links the quantities themselves. The link between the quantities becomes, on differentiation, a link between their speeds.
+
+The mechanism is implicit differentiation, now with \(t\) as the differentiating variable. Each quantity is a function of time, so differentiating a term in it produces its rate through the chain rule: if \(V\) and \(r\) are related by \(V = \tfrac{4}{3}\pi r^{3}\), then
+
+\[ \frac{dV}{dt} = 4\pi r^{2}\,\frac{dr}{dt}, \]
+
+the factor \(dr/dt\) appearing because \(r\) depends on \(t\), for exactly the reason \(dy/dx\) appeared in §5.1. Read the equation as it stands and it relates a volume to a radius; differentiate it and it relates the rate the volume grows to the rate the radius grows. Here \(dx/dt\), \(dr/dt\), and their kin are \emph{rates with respect to time}, the derivative measuring how fast a quantity changes as the clock runs.
+
+\begin{envstrategy}{Strategy}{5.2}{Solving a related-rates problem}
+\begin{steps}
+  \item Name the changing quantities and give them variables. Record which rates are \emph{given} and which one is \emph{wanted}, each as a derivative with respect to \(t\).
+  \item Find an equation relating the quantities (from geometry, similar triangles, or a physical law). It must hold at \emph{every} instant, not only the one asked about.
+  \item Differentiate both sides with respect to \(t\). Each variable is a function of time, so the chain rule brings in its rate; the equation becomes a relation among the rates.
+  \item Now — and only now — substitute the numerical values that hold at the instant in question, and solve for the unknown rate.
+\end{steps}
+\end{envstrategy}
+\begin{envcaution}{Caution}{}{}
+Substitute the instant’s numbers only after differentiating, never before. A quantity that is changing must be carried as a variable through the differentiation. If you fix it to its momentary value first, you have frozen something that is actually moving, and its rate drops to zero without warning. That rate is exactly what the chain rule was about to produce. Plug in the numbers on the last line, not the first.
+\end{envcaution}
+\begin{workedexample}
+\begin{envexample}{Example}{5.5}{}
+A \(10\)-foot ladder leans against a wall. Its base is pulled away from the wall at \(1\) foot per second. How fast is the top sliding down when the base is \(6\) feet from the wall?
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Let \(x\) be the distance from the wall to the base and \(y\) the height of the top, both functions of time. The ladder’s length is fixed, so the Pythagorean relation holds at every instant:
+
+\[ x^{2} + y^{2} = 100. \]
+
+We are given \(dx/dt = 1\) and want \(dy/dt\) at the moment \(x = 6\). Differentiate the relation with respect to \(t\), \emph{before} putting in any numbers:
+
+\[ 2x\,\frac{dx}{dt} + 2y\,\frac{dy}{dt} = 0, \qquad \frac{dy}{dt} = -\frac{x}{y}\,\frac{dx}{dt}. \]
+
+At the instant \(x = 6\), the relation gives \(y = \sqrt{100 - 36} = 8\). Substituting \(x = 6\), \(y = 8\), and \(dx/dt = 1\),
+
+\[ \frac{dy}{dt} = -\frac{6}{8}\,(1) = -\frac{3}{4}. \]
+
+The top slides down at \(\tfrac{3}{4}\) foot per second. The minus sign records the geometry: as \(x\) grows, \(y\) shrinks, so \(dy/dt\) is negative. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{figureblock}
+  \includegraphics[width=74.61mm]{ch05/figs/ladder-triangle}
+\figcaption{Figure 5.2}{The sliding ladder of Example 5.5: wall, ground, and ladder form a right triangle with legs \(x\) and \(y\) and fixed hypotenuse \(10\); the base slides outward at \(1\ \text{ft/s}\) while the top slides down.}
+\end{figureblock}
+\begin{workedexample}
+\begin{envexample}{Example}{5.6}{}
+Air is pumped into a spherical balloon at \(100\) cubic centimetres per second. How fast is the radius growing when the radius is \(25\) centimetres?
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Let \(V\) and \(r\) be the volume and radius at time \(t\). They are related by the volume of a sphere,
+
+\[ V = \tfrac{4}{3}\pi r^{3}. \]
+
+We are given \(dV/dt = 100\) and want \(dr/dt\) when \(r = 25\). Differentiating with respect to \(t\),
+
+\[ \frac{dV}{dt} = 4\pi r^{2}\,\frac{dr}{dt}, \qquad \frac{dr}{dt} = \frac{1}{4\pi r^{2}}\,\frac{dV}{dt}. \]
+
+At \(r = 25\),
+
+\[ \frac{dr}{dt} = \frac{100}{4\pi (25)^{2}} = \frac{100}{2500\pi} = \frac{1}{25\pi} \ \text{cm/s} \approx 0.0127 \ \text{cm/s}. \]
+
+The radius grows slowly even though the volume is increasing quickly, because a thin outer shell of a large sphere already holds a lot of volume: the same \(100\ \text{cm}^{3}/\text{s}\) would inflate a small balloon far faster. The factor \(r^{2}\) in the denominator is that shell effect made precise. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{5.7}{}
+A street lamp is \(15\) feet tall. A person \(6\) feet tall walks away from the lamp at \(5\) feet per second. How fast is the person’s shadow lengthening, and how fast is the tip of the shadow moving?
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Let \(x\) be the person’s distance from the lamp and \(s\) the length of the shadow they cast beyond themselves. The lamp, the person, and the shadow’s tip form two similar right triangles: the large one from the lamp’s top down to the tip, base \(x + s\) and height \(15\); the small one from the person’s head to the tip, base \(s\) and height \(6\). Similar triangles equate the ratios of height to base:
+
+\[ \frac{15}{x + s} = \frac{6}{s}. \]
+
+Cross-multiplying, \(15s = 6(x + s)\), so \(15s = 6x + 6s\) and \(9s = 6x\); that is, \(s = \tfrac{2}{3}x\). This relation holds at all times, so differentiate with respect to \(t\):
+
+\[ \frac{ds}{dt} = \frac{2}{3}\,\frac{dx}{dt} = \frac{2}{3}\,(5) = \frac{10}{3} \ \text{ft/s}. \]
+
+The shadow lengthens at \(\tfrac{10}{3}\) feet per second. Notably, this rate does not depend on where the person is, since \(s\) is a fixed multiple of \(x\). The tip of the shadow sits at distance \(x + s\) from the lamp, so its speed is
+
+\[ \frac{d}{dt}(x + s) = \frac{dx}{dt} + \frac{ds}{dt} = 5 + \frac{10}{3} = \frac{25}{3} \ \text{ft/s}. \]
+
+The tip outruns the person: it carries the person’s own \(5\ \text{ft/s}\) plus the shadow’s growth. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{figureblock}
+  \includegraphics[width=79.9mm]{ch05/figs/streetlight-similar}
+\figcaption{Figure 5.3}{The streetlight of Example 5.7: the lamp of height \(15\), the walker of height \(6\), and the shadow tip line up, so the large triangle with base \(x + s\) and the small one with base \(s\) are similar.}
+\end{figureblock}
+Every problem here followed one pattern: a single equation, differentiated once with respect to time, turning a known rate into an unknown one. The chain rule is what made this work: differentiating brings out the rate of each quantity the relation involves. The next section stays local in a different sense. It asks how well the derivative, the rate at a single instant, approximates the function itself just next door.
+
+
+\sechead{5.3}{Linear Approximation and Differentials}
+A differentiable function, seen up close, looks straight. This is not a metaphor but the content of the derivative: Chapter 3 recorded differentiability at \(x_{0}\) in its remainder form (Definition 3.1),
+
+\[ f(x_{0} + h) = f(x_{0}) + f'(x_{0})\,h + R(h), \qquad \frac{R(h)}{h} \to 0 \ \text{ as } h \to 0, \]
+
+which says that the curve equals a straight line plus a remainder \(R(h)\) that dies away faster than \(h\) itself. The straight line is the one through \((x_{0}, f(x_{0}))\) with slope \(f'(x_{0})\). Drop the remainder and a usable approximation is left: near \(x_{0}\), the function is very nearly its tangent line. This section uses that idea to estimate values, and then restates it in the language of \emph{differentials}.
+
+\begin{figureblock}
+  \includegraphics[width=79.9mm]{ch05/figs/sqrt-linearization}
+\figcaption{Figure 5.4}{Linear approximation near \(x = 4\): the tangent line \(L\) is barely distinguishable from \(y = \sqrt{x}\) close to the point of tangency and drifts away far from it. Compare the two at \(x = 9\).}
+\end{figureblock}
+\subsechead{Linearization}
+\begin{envdefinition}{Definition}{5.1}{Linearization}
+Let \(f\) be differentiable at \(a\). The \emph{linearization} of \(f\) at \(a\) is the tangent-line function
+
+\[ L(x) = f(a) + f'(a)(x - a). \]
+
+The approximation \(f(x) \approx L(x)\), valid for \(x\) near \(a\), is the \emph{linear approximation} (or \emph{tangent-line approximation}) of \(f\) at \(a\).
+\end{envdefinition}
+Writing \(h = x - a\) turns \(L\) back into the remainder form: \(f(a + h) \approx f(a) + f'(a)h\), the equation above with \(R\) discarded. The approximation is good precisely when \(R(h)\) is negligible, which happens when \(x\) is close to \(a\). How close is close enough depends on how sharply the curve bends away from its tangent, a matter the second derivative will make quantitative in §5.6.
+
+\begin{workedexample}
+\begin{envexample}{Example}{5.8}{}
+Use a linear approximation to estimate \(\sqrt{4.05}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Take \(f(x) = \sqrt{x}\) and linearize at \(a = 4\), a nearby point where the value is exact: \(f(4) = 2\). Since \(f'(x) = \dfrac{1}{2\sqrt{x}}\), we have \(f'(4) = \dfrac{1}{4}\), so
+
+\[ L(x) = 2 + \tfrac{1}{4}(x - 4). \]
+
+Then
+
+\[ \sqrt{4.05} \approx L(4.05) = 2 + \tfrac{1}{4}(0.05) = 2 + 0.0125 = 2.0125. \]
+
+The true value is \(\sqrt{4.05} = 2.012461\ldots\), so the estimate is right to four decimal places. The work was one multiplication, and it succeeded because \(4.05\) sits close to the anchor \(4\), where the square-root curve barely departs from its tangent. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{5.9}{}
+Show that \((1 + x)^{n} \approx 1 + nx\) for \(x\) near \(0\), and use it to estimate \(\sqrt[3]{1.03}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Linearize \(f(x) = (1 + x)^{n}\) at \(a = 0\), for real \(n\) and \(x\) near \(0\) so that \(1 + x > 0\) and the power is defined. Here \(f(0) = 1\) and \(f'(x) = n(1 + x)^{n-1}\), so \(f'(0) = n\), giving
+
+\[ L(x) = 1 + nx, \qquad \text{so} \qquad (1 + x)^{n} \approx 1 + nx \ \text{ for } x \text{ near } 0. \]
+
+This one linearization serves every power at once. For \(\sqrt[3]{1.03}\), write it as \((1 + 0.03)^{1/3}\) and apply the rule with \(n = \tfrac{1}{3}\), \(x = 0.03\):
+
+\[ \sqrt[3]{1.03} \approx 1 + \tfrac{1}{3}(0.03) = 1.01. \]
+
+The true value is \(1.00990\ldots\). The rule \((1 + x)^{n} \approx 1 + nx\) is worth remembering; it is the linear approximation that underlies a great many quick estimates. \qedmark
+\end{envsolution}
+\end{workedexample}
+\subsechead{Differentials}
+The linear approximation has a classical notation that makes it portable. This is the language of \emph{differentials}, which turns the estimate into a statement about small changes. Suppose \(y = f(x)\). Let the input change by an amount we now call \(dx\), the \emph{differential of \(x\)}, a genuinely independent small number. The corresponding rise \emph{along the tangent line} is the \emph{differential of \(y\)}.
+
+\begin{envdefinition}{Definition}{5.2}{Differential}
+For a differentiable function \(y = f(x)\), the \emph{differential} \(dy\) is defined in terms of an independent differential \(dx\) by
+
+\[ dy = f'(x)\,dx. \]
+\end{envdefinition}
+The point of the notation is a contrast. The \emph{actual} change in \(y\) when \(x\) moves by \(dx = \Delta x\) is
+
+\[ \Delta y = f(x + \Delta x) - f(x), \]
+
+the rise along the \emph{curve}; the differential \(dy = f'(x)\,dx\) is the rise along the \emph{tangent}. They are not equal. They differ by exactly the remainder \(R\) of Definition 3.1 attached to the base point \(x\), but for small \(dx\) the difference is negligible, and \(dy \approx \Delta y\) is the linear approximation written in a new notation. This form is the natural one for propagating a measurement error: a small uncertainty \(dx\) in a measured quantity produces an uncertainty of about \(dy = f'(x)\,dx\) in anything computed from it.
+
+\begin{figureblock}
+  \includegraphics[width=79.9mm]{ch05/figs/dy-vs-deltay}
+\figcaption{Figure 5.5}{Over the same step \(dx\), the differential \(dy\) is the rise of the tangent line, while \(\Delta y\) is the rise of the curve; their gap is the remainder \(R\), which dies away faster than \(dx\).}
+\end{figureblock}
+The differential notation also settles a question left open earlier. When \(dy/dx\) first appeared, a caution in §2.2 was careful to call it a single symbol, suggestive but not a fraction. Definition 5.2 upgrades it: with \(dx\) an independent quantity and \(dy = f'(x)\,dx\) built from it, the quotient \(dy/dx\) is a genuine ratio of two numbers, and it equals the derivative exactly. This definition applies from this point onward, but it does not justify the earlier chain-rule manipulations that \emph{looked} like cancelling \(dx\)’s. Those manipulations were licensed by Theorem 3.3, not by this definition. From here on, \(dx\) may be treated as a real quantity when a computation is written out, and integral calculus uses this fact when a change of variable is expressed entirely through the differential.
+
+\begin{workedexample}
+\begin{envexample}{Example}{5.10}{}
+The radius of a sphere is measured as \(21\) cm, with a possible error of up to \(0.05\) cm. Use differentials to estimate the greatest resulting error in the computed volume, and the relative error.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The volume is \(V = \tfrac{4}{3}\pi r^{3}\), so \(dV = 4\pi r^{2}\,dr\). With \(r = 21\) and the error \(dr = 0.05\),
+
+\[ dV = 4\pi (21)^{2}(0.05) = 88.2\pi \approx 277 \ \text{cm}^{3}. \]
+
+So an error of half a millimetre in the radius swings the computed volume by nearly \(280\ \text{cm}^{3}\). The \emph{relative} error is more telling, and simpler:
+
+\[ \frac{dV}{V} = \frac{4\pi r^{2}\,dr}{\tfrac{4}{3}\pi r^{3}} = 3\,\frac{dr}{r} = 3\cdot\frac{0.05}{21} \approx 0.0071, \]
+
+about \(0.71\%\). The relative error in the volume is three times the relative error in the radius, with the exponent \(3\) as the multiplier. For any power law, the corresponding relative-error approximation uses the exponent as the multiplier. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{envcaution}{Caution}{}{}
+A linear approximation is reliable only \emph{locally}. Its error is the remainder \(R\); in the smooth cases we meet, that error typically grows as \(x\) moves away from the anchor \(a\), and it is larger where the graph bends sharply. Estimating \(\sqrt{4.05}\) from \(a = 4\) is excellent; estimating \(\sqrt{9}\) from the same \(a = 4\) would be poor, because \(9\) is nowhere near \(4\). Trust the tangent line only in the immediate neighbourhood of the point where it touches, and read §5.6 for what the second derivative says about how quickly that trust runs out.
+\end{envcaution}
+Linear approximation is the practical content of the definition of the derivative: the number \(f'(a)\) is not only a slope but a usable prediction of the function’s values nearby. Reading a function locally as its tangent line recurs throughout calculus and is generalized to curved approximations in Chapter 11 and to surfaces in Chapter 14. The next section changes the question entirely, from how a function behaves \emph{near} a point to where, across a whole interval, it takes its largest and smallest values.
+
+
+\sechead{5.4}{Maximum and Minimum Values}
+Of all the questions calculus answers, the one that comes up most often in practice is: where is a quantity largest or smallest? Maximum profit, minimum cost, least material, and greatest range all ask for an extreme value of a function, and the derivative helps us find them. The strategy rests on a simple observation made rigorous in Chapter 4: at a smooth peak or valley in the interior of a curve, the tangent is horizontal, so the derivative vanishes. Under these conditions, an extreme can occur only at one of a short list of places, and the work is to list and test them.
+
+Two kinds of extreme must be kept apart. Chapter 4 defined the \emph{absolute} (or global) maximum and minimum of a function on a domain (Definition 4.3): the single largest and smallest values it attains anywhere on that domain. Alongside these is the local notion of a value that is largest or smallest only in comparison with nearby points.
+
+\begin{envdefinition}{Definition}{5.3}{Local maximum and minimum}
+A function \(f\) has a \emph{local maximum} (or \emph{relative maximum}) at \(c\) if \(f(c) \ge f(x)\) for every \(x\) in the domain of \(f\) lying in some open interval around \(c\); it has a \emph{local minimum} at \(c\) if \(f(c) \le f(x)\) for every such \(x\).
+
+\begin{informal}
+A local maximum is a point that is highest \emph{in its own neighbourhood}, the top of one hill and not necessarily the highest hill. An absolute maximum is highest everywhere; a local one need only win locally.
+\end{informal}
+\end{envdefinition}
+\subsechead{Where extrema can occur: critical numbers}
+What narrows the search is Fermat’s theorem from Chapter 4 (Theorem 4.10): if \(f\) has a local extremum at an \emph{interior} point \(c\) and \(f'(c)\) exists, then \(f'(c) = 0\). Contrapositively, a local extremum in the interior can occur only where the derivative is zero or fails to exist. Those places deserve a name.
+
+\begin{envdefinition}{Definition}{5.4}{Critical number}
+A \emph{critical number} of \(f\) is a number \(c\) in the domain of \(f\) at which either \(f'(c) = 0\) or \(f'(c)\) does not exist.
+\end{envdefinition}
+Fermat’s theorem, recast, reads: every interior local extremum occurs at a critical number. Fermat’s theorem is the main tool for locating extrema. It reduces the search from a whole interval to a finite list of candidates.
+
+\begin{envcaution}{Caution}{}{}
+A critical number is a \emph{candidate}, not a guarantee. The converse of Fermat’s theorem is false: \(f'(c) = 0\) does not force an extremum at \(c\). The function \(f(x) = x^{3}\) has \(f'(0) = 0\), yet \(0\) is neither a maximum nor a minimum. The curve passes straight through \(0\) with a momentary flat spot. Critical numbers must always be tested, never assumed to be extrema.
+\end{envcaution}
+\begin{workedexample}
+\begin{envexample}{Example}{5.11}{}
+Find the critical numbers of \(f(x) = x^{3/5}(4 - x)\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Expand and differentiate: \(f(x) = 4x^{3/5} - x^{8/5}\), so
+
+\[ f'(x) = \tfrac{12}{5}x^{-2/5} - \tfrac{8}{5}x^{3/5} = \frac{4}{5}x^{-2/5}(3 - 2x) = \frac{4(3 - 2x)}{5\,x^{2/5}}. \]
+
+Two kinds of critical number appear. Setting the numerator to zero, \(f'(x) = 0\) when \(3 - 2x = 0\), that is \(x = \tfrac{3}{2}\). And \(f'(x)\) \emph{does not exist} where the denominator vanishes, at \(x = 0\). Yet \(x = 0\) is in the domain of \(f\) (indeed \(f(0) = 0\)), so it too is a critical number. The critical numbers are
+
+\[ x = 0 \quad\text{and}\quad x = \tfrac{3}{2}. \]
+
+Both must be kept: the first is where the tangent is vertical, the second where it is horizontal. Which, if either, is an extremum is a separate question, settled below. \qedmark
+\end{envsolution}
+\end{workedexample}
+\subsechead{Absolute extrema on a closed interval}
+On a closed interval the search closes completely. The Extreme Value Theorem (Theorem 4.9(a)) guarantees that a function continuous on \([a, b]\) \emph{attains} an absolute maximum and minimum there; Fermat’s theorem says each is either an interior critical number or an endpoint. So the absolute extremes are found by checking a finite list.
+
+\begin{envstrategy}{Strategy}{5.3}{The Closed Interval Method}
+To find the absolute maximum and minimum of a function \(f\) continuous on a closed interval \([a, b]\):
+
+\begin{steps}
+  \item Find the critical numbers of \(f\) that lie in the open interval \((a, b)\), and evaluate \(f\) at each.
+  \item Evaluate \(f\) at the two endpoints \(a\) and \(b\).
+  \item The largest of these values is the absolute maximum; the smallest is the absolute minimum.
+\end{steps}
+\end{envstrategy}
+\begin{workedexample}
+\begin{envexample}{Example}{5.12}{}
+Find the absolute maximum and minimum of \(f(x) = x^{3} - 3x^{2} + 1\) on \([-\tfrac{1}{2}, 4]\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The function is a polynomial, hence continuous on the closed interval, so the method applies. Its derivative is
+
+\[ f'(x) = 3x^{2} - 6x = 3x(x - 2), \]
+
+which is defined everywhere and zero at \(x = 0\) and \(x = 2\); both lie in \((-\tfrac{1}{2}, 4)\). Evaluate \(f\) at these critical numbers and at the endpoints:
+
+\[ f(-\tfrac{1}{2}) = \tfrac{1}{8}, \qquad f(0) = 1, \qquad f(2) = -3, \qquad f(4) = 17. \]
+
+The largest value is \(17\) and the smallest is \(-3\). So the absolute maximum is \(17\), attained at the endpoint \(x = 4\), and the absolute minimum is \(-3\), attained at the interior critical number \(x = 2\). Notice that the maximum sat at an endpoint, not a critical number. That is exactly why the endpoints must be checked. \qedmark
+\end{envsolution}
+\end{workedexample}
+\subsechead{Classifying local extrema: the First Derivative Test}
+The Closed Interval Method finds absolute extremes by evaluating a finite list, but it does not say whether an interior critical number is a local max, a local min, or neither. The sign of the derivative on either side settles it, and the Mean Value Theorem’s monotonicity corollary (Corollary 4.3) is what makes the reasoning rigorous.
+
+\begin{envtheorem}{Theorem}{5.1}{First Derivative Test}
+Suppose \(f\) is continuous at a critical number \(c\), and differentiable on an open interval around \(c\) except possibly at \(c\) itself.
+
+\begin{itemize}
+  \item If \(f'\) changes from positive to negative at \(c\) — positive just left, negative just right — then \(f\) has a \emph{local maximum} at \(c\).
+  \item If \(f'\) changes from negative to positive at \(c\), then \(f\) has a \emph{local minimum} at \(c\).
+  \item If \(f'\) does not change sign at \(c\) (positive on both sides, or negative on both), then \(f\) has neither.
+\end{itemize}
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Fix a point \(u\) just left of \(c\) and a point \(v\) just right, both close enough that the stated sign conditions hold, so \(u < c < v\). On each side, \(f\) is continuous on the closed piece — \([u, c]\) or \([c, v]\) — and differentiable on its interior, so Corollary 4.3 applies. Where \(f' > 0\), it governs \(f\) directly, so \(f\) strictly increases. Where \(f' < 0\), apply it to \(-f\): a negative derivative for \(f\) is a positive one for \(-f\), so \(-f\) strictly increases and \(f\) strictly decreases. Continuity of \(f\) at \(c\) lets each comparison reach the value \(f(c)\). The four sign patterns read off directly:
+
+\begin{itemize}
+  \item positive then negative: \(f\) strictly increases up to \(c\) and strictly decreases after, so \(f(u) < f(c)\) and \(f(v) < f(c)\) — a \emph{local maximum};
+  \item negative then positive: the reverse, \(f(u) > f(c)\) and \(f(v) > f(c)\) — a \emph{local minimum};
+  \item positive on both sides: \(f(u) < f(c) < f(v)\), so \(f\) climbs straight through \(c\) — neither;
+  \item negative on both sides: \(f(u) > f(c) > f(v)\), so \(f\) falls straight through — neither.
+\end{itemize}
+In the two changing cases \(f(c)\) is larger than its neighbours on both sides (or smaller on both), which gives the local extremum; in the two unchanging cases \(f\) passes monotonically through \(c\), which is therefore neither. \qedmark
+\end{envproof}
+\begin{workedexample}
+\begin{envexample}{Example}{5.13}{}
+Classify the local extrema of \(f(x) = x^{3} - 3x^{2} + 1\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+From \(f'(x) = 3x(x - 2)\), the critical numbers are \(x = 0\) and \(x = 2\). Track the sign of \(f'\) across them. The factors \(3x\) and \(x - 2\) give
+
+\[ f'(x) > 0 \text{ on } (-\infty, 0), \qquad f'(x) < 0 \text{ on } (0, 2), \qquad f'(x) > 0 \text{ on } (2, \infty). \]
+
+At \(x = 0\), \(f'\) changes from positive to negative: a \emph{local maximum}, with value \(f(0) = 1\). At \(x = 2\), \(f'\) changes from negative to positive: a \emph{local minimum}, with value \(f(2) = -3\). These are the same two interior values the Closed Interval Method turned up in Example 5.12. The First Derivative Test now explains their roles independently of any interval, showing a hill at \(x = 0\) and a valley at \(x = 2\). \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{5.14}{}
+Classify the critical numbers of \(f(x) = x^{3/5}(4 - x)\) found in Example 5.11.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Example 5.11 produced two critical numbers: \(x = \tfrac{3}{2}\), where \(f'\) vanishes, and \(x = 0\), where \(f'\) does not exist. The First Derivative Test handles both. Its hypotheses require only that \(f\) be continuous at the critical number and differentiable on either side, not at the point itself. From
+
+\[ f'(x) = \frac{4(3 - 2x)}{5x^{2/5}}, \]
+
+the denominator \(5x^{2/5} = 5\bigl(x^{1/5}\bigr)^{2}\) is positive for every \(x \ne 0\), so the sign of \(f'\) is the sign of \(3 - 2x\): positive on \((-\infty, 0)\), positive again on \((0, \tfrac{3}{2})\), and negative on \((\tfrac{3}{2}, \infty)\).
+
+At \(x = \tfrac{3}{2}\) the derivative changes from positive to negative, so \(f\) has a local maximum there, of value \(f\bigl(\tfrac{3}{2}\bigr) = \bigl(\tfrac{3}{2}\bigr)^{3/5} \cdot \tfrac{5}{2} \approx 3.19\). At \(x = 0\) the derivative does not change sign — positive on both sides — so \(x = 0\) is neither a maximum nor a minimum: the graph climbs through the origin with a vertical tangent and keeps climbing. A critical number can fail to be an extremum in two ways, and this function exhibits the second. It is not a flat spot on a rising curve (that was \(x^{3}\) at \(0\)) but a point of vertical tangency that the curve simply passes through. \qedmark
+\end{envsolution}
+\end{workedexample}
+The derivative has done its defining work: it flags where a function can turn, and its sign says which way. That is enough to solve genuine optimization problems, which the next section takes up. There the quantities to maximize or minimize are real ones, and the modelling turns a word problem into a function on an interval. Once concavity is available in §5.6, the sign of the \emph{second} derivative will give a second and sometimes faster way to classify a critical number.
+
+
+\sechead{5.5}{Optimization Problems}
+The previous section built the tools for finding extreme values; this one aims them at problems posed in words. A container is to hold a fixed volume with the least metal; a field is to enclose the most area with a fixed length of fence; a beam is to be as strong as the log allows. In every case a real quantity is to be made largest or smallest, and the calculus is the easy part. The work is the \emph{modelling}: turning the situation into a function of a single variable on a definite interval, at which point Section 5.4 takes over.
+
+\begin{envstrategy}{Strategy}{5.4}{Solving an optimization problem}
+\begin{steps}
+  \item Identify the quantity to be optimized and name it; identify the quantities it depends on and give them symbols. A diagram almost always helps.
+  \item Write the target quantity as a formula in those symbols.
+  \item Use the \emph{constraint} of the problem to eliminate all but one variable, so the target becomes a function of a single variable. Determine the interval of values that variable may take, the feasible domain.
+  \item Find the absolute extremum on that interval by the methods of §5.4: the Closed Interval Method when the domain is closed, or the sign of the derivative (with the behaviour at the ends) when it is open.
+  \item Translate the answer back into the terms of the original problem, and check that it is sensible.
+\end{steps}
+\end{envstrategy}
+\begin{envcaution}{Caution}{}{}
+The feasible domain is part of the problem, not a formality. A length or radius cannot be negative, a fraction of a sheet cannot exceed the sheet, and these limits fix the interval on which the extremum is sought. When that interval is open, as it is for a radius ranging over \(r > 0\), the Closed Interval Method does not apply directly. Instead, use the sign of the derivative around the single interior critical number to confirm that the extremum occurs there. Finally, check that, as the variable approaches either end of its range, the quantity does not approach a value larger than the value at that critical number when maximizing or smaller than it when minimizing.
+\end{envcaution}
+\begin{workedexample}
+\begin{envexample}{Example}{5.15}{}
+A farmer has \(2400\) feet of fencing and wants to enclose a rectangular field bordering a straight river, with no fence needed along the river. What dimensions enclose the greatest area?
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Let \(x\) be the length of each of the two sides perpendicular to the river and \(y\) the side parallel to it. Only three sides are fenced, so the constraint is
+
+\[ 2x + y = 2400. \]
+
+The area to maximize is \(A = xy\). Eliminate \(y\) with the constraint, \(y = 2400 - 2x\):
+
+\[ A(x) = x(2400 - 2x) = 2400x - 2x^{2}, \qquad 0 \le x \le 1200. \]
+
+The endpoints \(x = 0\) and \(x = 1200\) both give zero area (a degenerate rectangle), while interior values give positive area. The Extreme Value Theorem guarantees a maximum on this closed interval, so that maximum must be interior. Differentiating, \(A'(x) = 2400 - 4x\), which vanishes at \(x = 600\); and \(A'\) runs from positive to negative there, so by the First Derivative Test it is a maximum. Then \(y = 2400 - 1200 = 1200\), and
+
+\[ A(600) = 600 \cdot 1200 = 720{,}000 \ \text{ft}^{2}. \]
+
+The best field is \(600\) feet deep and \(1200\) feet along the river. The fence divides equally between the two directions: \(1200\) feet across the river side, and \(1200\) feet split between the two perpendicular sides. This balance recurs throughout these problems. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{figureblock}
+  \includegraphics[width=74.61mm]{ch05/figs/fence-river}
+\figcaption{Figure 5.6}{The riverside field of Example 5.15: only three sides are fenced — two of length \(x\) and one of length \(y\) — because the river bounds the fourth.}
+\end{figureblock}
+\begin{workedexample}
+\begin{envexample}{Example}{5.16}{}
+A cylindrical can is to hold a fixed volume \(V\). What proportions use the least metal (that is, minimize the total surface area)?
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Let \(r\) be the radius and \(h\) the height. The can has two circular ends and a curved wall, so its surface area is \(A = 2\pi r^{2} + 2\pi r h\), and its volume fixes the constraint \(V = \pi r^{2} h\). Solve the constraint for \(h = V/(\pi r^{2})\) and substitute, leaving a function of \(r\) alone on the open domain \(r > 0\):
+
+\[ A(r) = 2\pi r^{2} + 2\pi r \cdot \frac{V}{\pi r^{2}} = 2\pi r^{2} + \frac{2V}{r}. \]
+
+Differentiate and set to zero:
+
+\[ A'(r) = 4\pi r - \frac{2V}{r^{2}} = 0 \quad\Longrightarrow\quad 4\pi r^{3} = 2V \quad\Longrightarrow\quad r^{3} = \frac{V}{2\pi}. \]
+
+This lone critical number is the minimum: \(A'(r) < 0\) for smaller \(r\) and \(A'(r) > 0\) for larger, and \(A(r) \to \infty\) both as \(r \to 0^{+}\) (the \(2V/r\) term) and as \(r \to \infty\) (the \(2\pi r^{2}\) term), so neither end of the range gives a smaller area. To read off the shape, note \(V = 2\pi r^{3}\) at the optimum, hence
+
+\[ h = \frac{V}{\pi r^{2}} = \frac{2\pi r^{3}}{\pi r^{2}} = 2r. \]
+
+The most economical can is exactly as tall as it is wide: the height equals the diameter. (Real cans are usually taller, because the top and bottom seams cost extra metal that the bare-area model ignores. The answer is only as good as the quantity it optimizes.) \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{5.17}{}
+Find the dimensions of the rectangle of greatest area that can be inscribed in a semicircle of radius \(R\), with its base on the diameter.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Place the semicircle as the upper half of \(x^{2} + y^{2} = R^{2}\). Let the rectangle’s upper-right corner be \((x, y)\) on the arc, with \(0 \le x \le R\). By symmetry the rectangle has width \(2x\) and height \(y = \sqrt{R^{2} - x^{2}}\), so its area is
+
+\[ A(x) = 2x\sqrt{R^{2} - x^{2}}, \qquad 0 \le x \le R. \]
+
+Both endpoints give \(A = 0\) while interior values give positive area, so the maximum is interior. Differentiate by the product rule:
+
+\[ \begin{aligned}
+          A'(x) &= 2\sqrt{R^{2} - x^{2}} + 2x \cdot \frac{-x}{\sqrt{R^{2} - x^{2}}} \\
+          &= \frac{2(R^{2} - x^{2}) - 2x^{2}}{\sqrt{R^{2} - x^{2}}} = \frac{2(R^{2} - 2x^{2})}{\sqrt{R^{2} - x^{2}}}.
+        \end{aligned} \]
+
+On \((0, R)\) the denominator is positive, so the sign of \(A'\) is the sign of \(R^{2} - 2x^{2}\): positive for \(x < R/\sqrt{2}\), negative beyond. The derivative changes from positive to negative at \(x = R/\sqrt{2}\), a maximum. There the height is \(y = \sqrt{R^{2} - R^{2}/2} = R/\sqrt{2}\), so the rectangle is \(R\sqrt{2}\) wide and \(R/\sqrt{2}\) tall, with area
+
+\[ A = R\sqrt{2} \cdot \frac{R}{\sqrt{2}} = R^{2}. \]
+
+The largest inscribed rectangle has area \(R^{2}\), one quarter of the full circle’s \(2R \times 2R\) bounding square and equivalently half of the semicircle’s \(2R \times R\) bounding rectangle. It is twice as wide as it is tall. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{figureblock}
+  \includegraphics[width=79.9mm]{ch05/figs/semicircle-rectangle}
+\figcaption{Figure 5.7}{A rectangle inscribed in a semicircle of radius \(R\) (Example 5.17): the upper corner \((x, y)\) rides on the arc, so the width is \(2x\) and the height is \(y = \sqrt{R^{2} - x^{2}}\).}
+\end{figureblock}
+Every problem here reduced to the same two moves: model the quantity as a function on an interval, then locate its extreme with the derivative. The modelling changed from problem to problem; the calculus did not. Section 5.6 returns to the analytic side and adds the missing piece. The \emph{second} derivative records the way a curve bends, which both classifies extrema more quickly and, with everything gathered so far, lets a graph be read off its formula.
+
+
+\sechead{5.6}{Derivatives and the Shape of a Graph}
+The first derivative reports whether a graph rises or falls; it does not report the \emph{manner} of the rise. A curve can climb while easing off, bending like the top of a hill, or climb while steepening, cupped like the inside of a bowl. The way a graph bends is called \emph{concavity}, and it is exactly what the second derivative measures. With rise-and-fall from the first derivative and bend from the second, the qualitative shape of a graph is fully in hand.
+
+\subsechead{Concavity}
+Bending is a statement about how the slope changes. Where a graph is cupped upward, the tangent lines turn steadily counter-clockwise as you move right, so the slope \emph{increases}. Where it is cupped downward, the slope \emph{decreases}. Take that as the definition.
+
+\begin{envdefinition}{Definition}{5.5}{Concavity}
+Let \(f\) be differentiable on an open interval \(I\). The graph of \(f\) is \emph{concave up} on \(I\) if \(f'\) is increasing on \(I\), and \emph{concave down} on \(I\) if \(f'\) is decreasing on \(I\).
+
+\begin{informal}
+Equivalently: a concave-up graph lies \emph{above} each of its tangent lines (it cups upward, holding water), and a concave-down graph lies \emph{below} them (it sheds water). The tangent turning steadily one way is the slope moving steadily one way.
+\end{informal}
+\end{envdefinition}
+\begin{figureblock}
+  \includegraphics[width=72.35mm]{ch05/figs/concavity-tangents-1}\hspace{4.3mm}\includegraphics[width=72.35mm]{ch05/figs/concavity-tangents-2}
+\figcaption{Figure 5.8}{Concavity read from tangent lines: a concave-up arc lies above every tangent and its slopes increase from left to right; a concave-down arc lies below its tangents, with decreasing slopes.}
+\end{figureblock}
+We can test whether \(f'\) is increasing by looking at the sign of \((f')' = f''\). Thus concavity is determined from the second derivative.
+
+\begin{envtheorem}{Theorem}{5.2}{Concavity Test}
+Suppose \(f''\) exists on an open interval \(I\).
+
+\begin{itemize}
+  \item If \(f''(x) > 0\) for all \(x \in I\), then \(f\) is concave up on \(I\).
+  \item If \(f''(x) < 0\) for all \(x \in I\), then \(f\) is concave down on \(I\).
+\end{itemize}
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Suppose \(f''(x) > 0\) on \(I\). To show \(f'\) is increasing on \(I\), take any \(x_{1} < x_{2}\) in \(I\) and apply the monotonicity corollary (Corollary 4.3) to \(f'\) on the closed subinterval \([x_{1}, x_{2}]\): there \(f'\) is continuous and differentiable with derivative \((f')' = f'' > 0\), so \(f'(x_{1}) < f'(x_{2})\). Since this holds for every such pair, \(f'\) is increasing on \(I\), and by Definition 5.5 the graph is concave up. The concave-down case is the same argument applied to \(-f\). \qedmark
+\end{envproof}
+Where concavity switches from one sense to the other, the graph has a special point.
+
+\begin{envdefinition}{Definition}{5.6}{Inflection point}
+A point on the graph of \(f\), where \(f\) is continuous, is an \emph{inflection point} if the concavity changes there, from up to down or from down to up.
+\end{envdefinition}
+\begin{envcaution}{Caution}{}{}
+At an inflection point \(c\) where \(f''(c)\) exists, \(f''(c)\) must equal \(0\). For if the concavity changes at \(c\), then \(f'\) switches from increasing to decreasing (or the reverse) there, so \(f'\) has a local extremum at \(c\); Fermat’s theorem (Theorem 4.10) applied to \(f'\) then forces its derivative \(f''(c) = 0\). So the candidates for inflection are the points where \(f'' = 0\) or \(f''\) fails to exist. But \(f''(c) = 0\) alone does \emph{not} make an inflection: the concavity must genuinely change sign there. The function \(f(x) = x^{4}\) has \(f''(0) = 0\), yet it is concave up on both sides of \(0\), so there is no inflection point there. Always confirm the change, never infer it from \(f'' = 0\).
+\end{envcaution}
+\begin{workedexample}
+\begin{envexample}{Example}{5.18}{}
+Find the intervals of concavity and the inflection points of \(f(x) = x^{4} - 4x^{3}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Differentiate twice: \(f'(x) = 4x^{3} - 12x^{2}\), and
+
+\[ f''(x) = 12x^{2} - 24x = 12x(x - 2). \]
+
+The second derivative is zero at \(x = 0\) and \(x = 2\), the candidate inflection points. Its sign, from the factors \(12x\) and \(x - 2\), is
+
+\[ \begin{aligned}
+          &f''(x) > 0 \text{ on } (-\infty, 0), \qquad f''(x) < 0 \text{ on } (0, 2), \\
+          &f''(x) > 0 \text{ on } (2, \infty).
+        \end{aligned} \]
+
+So \(f\) is concave up on \((-\infty, 0)\), concave down on \((0, 2)\), and concave up again on \((2, \infty)\). The concavity genuinely changes at both candidates, so both are inflection points: \((0, 0)\) and \((2, -16)\), using \(f(2) = 16 - 32 = -16\). Near the origin, the curve is concave up, flattens, and becomes concave down. It remains concave down through the middle and is concave up once more past \(x = 2\). \qedmark
+\end{envsolution}
+\end{workedexample}
+\subsechead{The Second Derivative Test}
+Concavity gives a second way to classify a critical number, often faster than tracking the sign of \(f'\) across it. At a point where the tangent is horizontal, the concavity alone decides max or min: a horizontal tangent in a valley (concave up) is a minimum; on a ridge (concave down), a maximum.
+
+\begin{envtheorem}{Theorem}{5.3}{Second Derivative Test}
+Suppose \(f'(c) = 0\) and \(f''(c)\) exists.
+
+\begin{itemize}
+  \item If \(f''(c) > 0\), then \(f\) has a local minimum at \(c\).
+  \item If \(f''(c) < 0\), then \(f\) has a local maximum at \(c\).
+  \item If \(f''(c) = 0\), the test is inconclusive: \(c\) may be a local maximum, a local minimum, or neither.
+\end{itemize}
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Suppose \(f''(c) > 0\). By definition \(f''(c)\) is the derivative of \(f'\) at \(c\), and since \(f'(c) = 0\),
+
+\[ f''(c) = \lim_{h \to 0} \frac{f'(c + h) - f'(c)}{h} = \lim_{h \to 0} \frac{f'(c + h)}{h} > 0. \]
+
+A limit that is positive forces the quotient to be positive for all small nonzero \(h\): there is a \(\delta > 0\) with \(f'(c + h)/h > 0\) whenever \(0 < |h| < \delta\). So \(f'(c + h)\) has the same sign as \(h\), being negative for \(h < 0\) and positive for \(h > 0\). That is exactly \(f'\) changing from negative to positive at \(c\), and the First Derivative Test (Theorem 5.1) delivers a local minimum. The case \(f''(c) < 0\) is identical with signs reversed, giving a local maximum. \qedmark
+\end{envproof}
+\begin{envcaution}{Caution}{}{}
+When \(f''(c) = 0\) the test gives no information. This is a genuine gap, not mere caution. At \(x = 0\), the three functions \(x^{4}\), \(-x^{4}\), and \(x^{3}\) all have first and second derivatives zero, yet the first has a minimum, the second a maximum, and the third neither (an inflection with a horizontal tangent). No amount of staring at \(f''(0) = 0\) distinguishes them. When the second derivative vanishes at a critical number, abandon it and return to the First Derivative Test, checking the sign of \(f'\) on either side.
+\end{envcaution}
+\begin{workedexample}
+\begin{envexample}{Example}{5.19}{}
+Use the Second Derivative Test to classify the critical numbers of \(f(x) = x^{3} - 3x^{2} + 1\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The critical numbers are the zeros of \(f'(x) = 3x^{2} - 6x = 3x(x - 2)\), namely \(x = 0\) and \(x = 2\). The second derivative is \(f''(x) = 6x - 6\). Evaluate it at each critical number:
+
+\[ f''(0) = -6 < 0, \qquad f''(2) = 6 > 0. \]
+
+So \(x = 0\) is a local maximum (value \(f(0) = 1\)) and \(x = 2\) is a local minimum (value \(f(2) = -3\)). This is the same conclusion the First Derivative Test reached in Example 5.13, obtained here with two evaluations rather than a sign chart. When \(f''\) is easy to compute and nonzero, that is the advantage of the Second Derivative Test. \qedmark
+\end{envsolution}
+\end{workedexample}
+The first two derivatives provide the full vocabulary for the shape of a graph: rise and fall, peak and valley, cupping and inflection. Before assembling that vocabulary into a complete curve sketch, which §5.8 does, one gap remains: the behaviour of a graph far out and near its asymptotes is governed by limits that often arrive in indeterminate form. The next section supplies L’Hôpital’s rule, the tool for those limits. After that, every feature a sketch needs is computable.
+
+
+\sechead{5.7}{L’Hôpital’s Rule}
+Some limits cannot be read off directly. When \(x \to a\) drives both \(f(x)\) and \(g(x)\) to \(0\), the quotient \(f(x)/g(x)\) approaches the meaningless symbol \(\tfrac{0}{0}\): the answer could be anything, depending on how fast each part vanishes. The same difficulty arises when both tend to \(\infty\), giving \(\tfrac{\infty}{\infty}\). These are the \emph{indeterminate forms}. The ratio \(f'\!/g'\) compares the \emph{rates} at which numerator and denominator move, and that is exactly the extra information needed to decide the limit. \emph{L’Hôpital’s rule} makes that precise: under the right conditions, the limit of \(f/g\) equals the limit of \(f'\!/g'\). Proving it needs a two-function refinement of the Mean Value Theorem, which is useful in itself.
+
+\subsechead{The Generalized Mean Value Theorem}
+The Mean Value Theorem compares a function’s rise to the run of \(x\). The generalization compares the rises of \emph{two} functions to each other, as both traverse the same interval.
+
+\begin{envtheorem}{Theorem}{5.4}{Generalized Mean Value Theorem (Cauchy’s form)}
+If \(f\) and \(g\) are continuous on \([a, b]\) and differentiable on \((a, b)\), then there is a point \(c \in (a, b)\) with
+
+\[ \bigl[f(b) - f(a)\bigr]\,g'(c) = \bigl[g(b) - g(a)\bigr]\,f'(c). \]
+
+If moreover \(g'(x) \ne 0\) throughout \((a, b)\), then \(g(b) \ne g(a)\) and the conclusion can be written as a ratio,
+
+\[ \frac{f(b) - f(a)}{g(b) - g(a)} = \frac{f'(c)}{g'(c)}. \]
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Imitate the Mean Value Theorem’s proof, using an auxiliary function tuned to have equal endpoint values. Set
+
+\[ h(x) = \bigl[f(b) - f(a)\bigr]\,g(x) - \bigl[g(b) - g(a)\bigr]\,f(x). \]
+
+As a combination of \(f\) and \(g\), \(h\) is continuous on \([a, b]\) and differentiable on \((a, b)\). At the endpoints,
+
+\[ h(a) = f(b)g(a) - g(b)f(a) = h(b), \]
+
+as a short expansion of each side confirms, so \(h(a) = h(b)\). By Rolle’s theorem (Theorem 4.11) there is a \(c \in (a, b)\) with \(h'(c) = 0\). Since
+
+\[ h'(x) = \bigl[f(b) - f(a)\bigr]\,g'(x) - \bigl[g(b) - g(a)\bigr]\,f'(x), \]
+
+setting \(h'(c) = 0\) gives the stated identity. For the ratio form, if \(g'(x) \ne 0\) on \((a, b)\), then \(g(b) \ne g(a)\). If \(g(b) = g(a)\), Rolle’s theorem applied to \(g\) would give a point in \((a, b)\) where \(g'\) is zero, contradicting the hypothesis. Since \(c\) lies in \((a, b)\), both \(g(b) - g(a)\) and \(g'(c)\) are nonzero, so dividing by \([g(b) - g(a)]\,g'(c)\) is legitimate. \qedmark
+\end{envproof}
+\begin{informal}
+Taking \(g(x) = x\) recovers the ordinary Mean Value Theorem: \(g'(c) = 1\) and \(g(b) - g(a) = b - a\), and the identity becomes \(f(b) - f(a) = (b - a)f'(c)\). The generalization is the Mean Value Theorem with the run measured by a second function instead of by \(x\).
+\end{informal}
+\subsechead{L’Hôpital’s rule}
+\begin{envtheorem}{Theorem}{5.5}{L’Hôpital’s Rule}
+Suppose \(f\) and \(g\) are differentiable with \(g'(x) \ne 0\) near \(a\) (except possibly at \(a\)), where \(a\) may be a real number or \(\pm\infty\). Suppose further that
+
+\[ \lim_{x \to a} \frac{f'(x)}{g'(x)} = L \qquad (L \text{ finite or } \pm\infty). \]
+
+If either
+
+\begin{itemize}
+  \item \(\displaystyle \lim_{x \to a} f(x) = \lim_{x \to a} g(x) = 0\) (the form \(\tfrac{0}{0}\)), or
+  \item \(\displaystyle \lim_{x \to a} g(x) = \pm\infty\) (the form \(\tfrac{\ast}{\infty}\), including \(\tfrac{\infty}{\infty}\)),
+\end{itemize}
+then
+
+\[ \lim_{x \to a} \frac{f(x)}{g(x)} = L. \]
+\end{envtheorem}
+\begin{envproof}{Proof of the \(\tfrac{0}{0}\) case, \(a\) finite}{}{}
+Take \(a\) real and \(\lim_{x \to a} f = \lim_{x \to a} g = 0\). Because only the values near \(a\) matter, \emph{define} \(f(a) = g(a) = 0\); this makes \(f\) and \(g\) continuous at \(a\), matching their limits. Fix \(x\) slightly greater than \(a\). On \([a, x]\), both functions are continuous and differentiable, and \(g' \ne 0\) on \((a, x)\), so the Generalized Mean Value Theorem (Theorem 5.4) supplies a point \(c\) between \(a\) and \(x\) with
+
+\[ \frac{f(x)}{g(x)} = \frac{f(x) - f(a)}{g(x) - g(a)} = \frac{f'(c)}{g'(c)}, \]
+
+the first equality because \(f(a) = g(a) = 0\). As \(x \to a^{+}\), the trapped point \(c\) is squeezed to \(a\) as well, so \(f'(c)/g'(c) \to L\), and therefore \(f(x)/g(x) \to L\). The left-hand limit \(x \to a^{-}\) is identical, using intervals \([x, a]\); together they give the two-sided limit \(L\). \qedmark
+\end{envproof}
+The \(\tfrac{\ast}{\infty}\) case and the cases where \(a = \pm\infty\) hold under the same hypotheses, but their proofs are harder. The convenient substitution \(f(a) = g(a) = 0\) is unavailable when the functions grow without bound, and the estimates must be made directly. Following this handout’s proof-track policy of keeping the heaviest arguments out of the main line, we state these cases as part of Theorem 5.5 and defer their proof to the Proof-Track appendix (§D.3).
+
+\begin{envcaution}{Caution}{}{}
+Three cautions come with the rule. First, \emph{check the form}: L’Hôpital applies only to \(\tfrac{0}{0}\) and \(\tfrac{\ast}{\infty}\). If the numerator and denominator have finite limits and the denominator’s limit is nonzero, the limit is not indeterminate. Applying the rule is then unjustified and may give a wrong answer. Second, differentiate the numerator and denominator \emph{separately}: \(f'\!/g'\) is not the derivative of the quotient \(f/g\), and the quotient rule has no place here. Third, the rule is one-directional: if \(\lim f'\!/g'\) fails to exist, that says nothing about \(\lim f/g\), which may still exist. A failed application is therefore inconclusive, not a proof of divergence.
+\end{envcaution}
+\begin{envstrategy}{Strategy}{5.5}{Indeterminate forms}
+To evaluate an indeterminate limit:
+
+\begin{steps}
+  \item \runin{\(\tfrac{0}{0}\) or \(\tfrac{\ast}{\infty}\):} apply L’Hôpital’s rule directly. If the resulting limit is again indeterminate, apply it again, differentiating repeatedly until the quotient is no longer an indeterminate form.
+  \item \runin{\(0 \cdot \infty\):} rewrite the product \(f\cdot g\) as a quotient, \(\dfrac{f}{1/g}\) or \(\dfrac{g}{1/f}\), turning it into \(\tfrac{0}{0}\) or \(\tfrac{\infty}{\infty}\).
+  \item \runin{\(\infty - \infty\):} combine over a common denominator (or otherwise rearrange) to reach a single quotient.
+  \item \runin{\(1^{\infty}\), \(0^{0}\), \(\infty^{0}\):} take logarithms. If \(y = f^{g}\) with \(f > 0\) near the point, then \(\ln y = g\ln f\), a \(0 \cdot \infty\) form; find \(\lim \ln y\), then exponentiate: \(\lim y = e^{\lim \ln y}\).
+\end{steps}
+\end{envstrategy}
+\begin{workedexample}
+\begin{envexample}{Example}{5.20}{}
+Evaluate \(\displaystyle \lim_{x \to 0} \frac{e^{x} - 1 - x}{x^{2}}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+As \(x \to 0\), numerator and denominator both tend to \(0\): the form is \(\tfrac{0}{0}\). Apply L’Hôpital’s rule, differentiating top and bottom:
+
+\[ \lim_{x \to 0} \frac{e^{x} - 1 - x}{x^{2}} = \lim_{x \to 0} \frac{e^{x} - 1}{2x}. \]
+
+This is again \(\tfrac{0}{0}\), so apply the rule a second time:
+
+\[ \lim_{x \to 0} \frac{e^{x} - 1}{2x} = \lim_{x \to 0} \frac{e^{x}}{2} = \frac{1}{2}. \]
+
+So the limit is \(\tfrac{1}{2}\). Each application removed one order of vanishing; the answer records that \(e^{x} - 1 - x\) behaves like \(\tfrac{1}{2}x^{2}\) near \(0\), the same fact a second-order approximation would give. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{5.21}{}
+Evaluate \(\displaystyle \lim_{x \to \infty} \frac{\ln x}{x}\), and more generally \(\displaystyle \lim_{x \to \infty} \frac{\ln x}{x^{p}}\) for any \(p > 0\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Both \(\ln x\) and \(x\) tend to \(\infty\), the form \(\tfrac{\infty}{\infty}\). By L’Hôpital’s rule,
+
+\[ \lim_{x \to \infty} \frac{\ln x}{x} = \lim_{x \to \infty} \frac{1/x}{1} = \lim_{x \to \infty} \frac{1}{x} = 0. \]
+
+The same computation with \(x^{p}\) below gives \(\dfrac{1/x}{p\,x^{p-1}} = \dfrac{1}{p\,x^{p}} \to 0\). So
+
+\[ \lim_{x \to \infty} \frac{\ln x}{x^{p}} = 0 \qquad \text{for every } p > 0. \]
+
+This is a growth comparison worth naming: the logarithm grows more slowly than \emph{every} positive power of \(x\), however small the power. A parallel argument (apply the rule \(\lceil p \rceil\) times) shows \(x^{p}/e^{x} \to 0\), so the exponential in turn grows faster than any power. In shorthand,
+
+\[ \ln x \ \ll\ x^{p} \ \ll\ e^{x} \qquad (x \to \infty), \]
+
+an ordering that becomes useful whenever a curve to be sketched mixes logarithms, powers, and exponentials. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{5.22}{}
+Evaluate \(\displaystyle \lim_{x \to 0^{+}} \frac{\ln x}{x}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Check the form first. As \(x \to 0^{+}\) the numerator \(\ln x \to -\infty\) while the denominator \(x \to 0^{+}\): a hugely negative number divided by a tiny positive one. This is not an indeterminate form at all. As the numerator becomes arbitrarily negative while the denominator remains positive and approaches zero, the quotient becomes arbitrarily negative:
+
+\[ \lim_{x \to 0^{+}} \frac{\ln x}{x} = -\infty. \]
+
+Now watch what happens if the form-check is skipped. Differentiating top and bottom as though L’Hôpital’s rule applied would give \(\dfrac{1/x}{1} = \dfrac{1}{x} \to +\infty\), not merely the wrong magnitude but the wrong \emph{sign}. The hypotheses of Theorem 5.5 must be checked, not assumed. Note the contrast with Example 5.21: the same quotient \(\ln x / x\) taken at \(x \to \infty\) genuinely is \(\infty/\infty\), and there the rule legitimately gave \(0\). Whether the rule applies is a property of the \emph{point}, not of the formula. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{5.23}{}
+Evaluate \(\displaystyle \lim_{x \to 0^{+}} x \ln x\), and use it to find \(\displaystyle \lim_{x \to 0^{+}} x^{x}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+As \(x \to 0^{+}\), \(x \to 0\) while \(\ln x \to -\infty\): the product is the indeterminate form \(0 \cdot \infty\). Recast it as a quotient to obtain a form to which the rule applies. Put the \(\ln x\) on top and \(1/x\) below:
+
+\[ \lim_{x \to 0^{+}} x \ln x = \lim_{x \to 0^{+}} \frac{\ln x}{1/x}, \]
+
+now \(\tfrac{-\infty}{\infty}\). L’Hôpital’s rule gives
+
+\[ \lim_{x \to 0^{+}} \frac{\ln x}{1/x} = \lim_{x \to 0^{+}} \frac{1/x}{-1/x^{2}} = \lim_{x \to 0^{+}} (-x) = 0. \]
+
+So \(x \ln x \to 0\). For \(x^{x}\), the form is \(0^{0}\); take logarithms. Since \(\ln(x^{x}) = x \ln x \to 0\), and the exponential is continuous,
+
+\[ \lim_{x \to 0^{+}} x^{x} = \lim_{x \to 0^{+}} e^{x \ln x} = e^{0} = 1. \]
+
+The curve \(x^{x}\), whose derivative Chapter 3 found by logarithmic differentiation (Example 3.10), thus approaches \(1\) as \(x \to 0^{+}\). The bare form \(0^{0}\) alone does not determine that value. \qedmark
+\end{envsolution}
+\end{workedexample}
+L’Hôpital’s rule closes the last gap in the analytic toolkit. A graph’s rises and falls, its peaks and dips, its bends and inflections, and its behaviour far out and near its asymptotes are all now computable. The last of these comes from the indeterminate limits this section resolved. Section 5.8 gathers all of this into a single systematic procedure: reading a curve’s complete shape off its formula.
+
+
+\sechead{5.8}{Curve Sketching}
+Everything this chapter built now converges on a single task: drawing the graph of a function from its formula alone, without plotting a cloud of points. Each tool contributes one layer. The domain says where the curve lives; limits at the edges and at infinity give its asymptotes; the first derivative marks where it rises and falls and locates its peaks and valleys; the second derivative says which way it bends and where it changes. Laid over one another, these layers determine the shape completely. What remains is to run them in a fixed order, so that nothing is missed.
+
+\subsechead{Asymptotes}
+An \emph{asymptote} is a straight line the curve approaches arbitrarily closely as \(x\) or \(y\) runs off to infinity. Three kinds arise: vertical asymptotes are detected by the infinite limits of Chapter 1, horizontal and slant asymptotes by limits as \(x \to \pm\infty\).
+
+\begin{envdefinition}{Definition}{5.7}{Asymptotes}
+The line \(x = a\) is a \emph{vertical asymptote} of \(f\) if \(f(x) \to +\infty\) or \(-\infty\) as \(x \to a\) from one side or both.
+
+The line \(y = L\) is a \emph{horizontal asymptote} if \(f(x) \to L\) as \(x \to +\infty\) or \(x \to -\infty\).
+
+The line \(y = mx + b\) (with \(m \ne 0\)) is a \emph{slant asymptote} if \(f(x) - (mx + b) \to 0\) as \(x \to +\infty\) or \(x \to -\infty\): the curve draws ever closer to the line without leveling off.
+\end{envdefinition}
+Vertical-asymptote candidates come from zeros of a denominator, or from a logarithm’s argument approaching \(0\); confirm each by a one-sided infinite limit. A factor that cancels leaves a hole, not an asymptote. Horizontal asymptotes are read from the limit at infinity. A slant asymptote appears when a function grows linearly but is not itself a line. For a rational function this happens when the numerator’s degree is exactly one more than the denominator’s, so that dividing out leaves a linear part plus a remainder that decays.
+
+\begin{envstrategy}{Strategy}{5.6}{Sketching a curve}
+To sketch \(y = f(x)\), gather the following in order and then draw what they dictate:
+
+\begin{steps}
+  \item \runin{Domain.} Where is \(f\) defined?
+  \item \runin{Intercepts.} The \(y\)-intercept \(f(0)\), and the \(x\)-intercepts where \(f(x) = 0\), when they are easy to find.
+  \item \runin{Symmetry.} Is \(f\) even (\(f(-x) = f(x)\), symmetric across the \(y\)-axis), odd (\(f(-x) = -f(x)\), symmetric through the origin), or periodic? Any symmetry halves the work.
+  \item \runin{Asymptotes.} Vertical (where \(f \to \pm\infty\)), horizontal (\(\lim_{x \to \pm\infty} f\)), and slant.
+  \item \runin{Increase, decrease, and local extrema.} From the sign of \(f'\) (§5.4).
+  \item \runin{Concavity and inflection.} From the sign of \(f''\) (§5.6).
+  \item \runin{Assemble.} Plot the intercepts, extrema, and inflection points, draw the asymptotes as guide lines, and connect the pieces so the rise-fall and concavity data are honoured.
+\end{steps}
+\end{envstrategy}
+\begin{workedexample}
+\begin{envexample}{Example}{5.24}{}
+Sketch the curve \(y = \dfrac{x^{2}}{x^{2} - 1}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Run the checklist.
+
+\runin{Domain.} The denominator vanishes at \(x = \pm 1\), so the domain is all \(x\) with \(x \ne \pm 1\). \runin{Intercepts.} Both are at the origin: \(f(0) = 0\), and \(x^{2} = 0\) only at \(x = 0\). \runin{Symmetry.} Replacing \(x\) by \(-x\) leaves the function unchanged, so it is even, symmetric across the \(y\)-axis.
+
+\runin{Asymptotes.} Near \(x = 1\) and \(x = -1\) the denominator \(\to 0\) while the numerator \(\to 1\), so \(f \to \pm\infty\): vertical asymptotes \(x = \pm 1\). At infinity,
+
+\[ \lim_{x \to \pm\infty} \frac{x^{2}}{x^{2} - 1} = 1, \]
+
+so \(y = 1\) is a horizontal asymptote. \runin{First derivative.} By the quotient rule,
+
+\[ \begin{aligned}
+          f'(x) &= \frac{2x(x^{2} - 1) - x^{2}(2x)}{(x^{2} - 1)^{2}} = \frac{-2x}{(x^{2} - 1)^{2}}.
+        \end{aligned} \]
+
+The denominator is positive wherever it is defined, so \(f'\) has the sign of \(-2x\): positive for \(x < 0\), negative for \(x > 0\). Thus \(f\) increases on \((-\infty, -1)\) and \((-1, 0)\), decreases on \((0, 1)\) and \((1, \infty)\), with a local maximum at \((0, 0)\). \runin{Second derivative.} Differentiating again and simplifying,
+
+\[ f''(x) = \frac{2(3x^{2} + 1)}{(x^{2} - 1)^{3}}. \]
+
+The numerator is always positive, so \(f''\) has the sign of \((x^{2} - 1)^{3}\), that is, of \(x^{2} - 1\): concave up on \((-\infty, -1)\) and \((1, \infty)\), concave down on \((-1, 1)\). There is no inflection point, since \(x = \pm 1\) are outside the domain.
+
+\runin{Assemble.} Between the asymptotes lies an arch peaking at the origin and falling toward \(-\infty\) at both \(x = \pm 1\); outside them, two branches descend from \(+\infty\) at the asymptotes toward the horizontal line \(y = 1\), staying above it. The even symmetry mirrors the left half onto the right. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{figureblock}
+  \includegraphics[width=85.19mm]{ch05/figs/rational-asymptotes}
+\figcaption{Figure 5.9}{The completed graph of \(y = x^{2}/(x^{2} - 1)\) from Example 5.24: vertical asymptotes \(x = \pm 1\), horizontal asymptote \(y = 1\), a central arch with its local maximum at the origin, and two outer branches, all read off the checklist.}
+\end{figureblock}
+\begin{workedexample}
+\begin{envexample}{Example}{5.25}{}
+Sketch the curve \(y = x + \dfrac{1}{x}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+\runin{Domain.} All \(x \ne 0\). \runin{Intercepts.} None: \(f(0)\) is undefined, and \(x + 1/x = 0\) would need \(x^{2} = -1\). \runin{Symmetry.} \(f(-x) = -x - 1/x = -f(x)\), so \(f\) is odd, symmetric through the origin.
+
+\runin{Asymptotes.} As \(x \to 0\), the term \(1/x \to \pm\infty\), so \(x = 0\) is a vertical asymptote. There is no horizontal asymptote, but the function is already split into a linear part and a decaying remainder: \(f(x) - x = 1/x \to 0\) as \(x \to \pm\infty\), so \(y = x\) is a slant asymptote. \runin{First derivative.}
+
+\[ f'(x) = 1 - \frac{1}{x^{2}}, \]
+
+which is zero at \(x = \pm 1\), positive for \(|x| > 1\), and negative for \(0 < |x| < 1\). So \(f\) has a local maximum at \((-1, -2)\) and a local minimum at \((1, 2)\). The maximum value lies \emph{below} the minimum value, which is possible here because the two sit on branches separated by the asymptote. \runin{Second derivative.}
+
+\[ f''(x) = \frac{2}{x^{3}}, \]
+
+positive for \(x > 0\) and negative for \(x < 0\): concave up on the right, concave down on the left, with no inflection (the sign change is across the excluded point \(x = 0\)).
+
+\runin{Assemble.} For \(x > 0\) the curve falls from \(+\infty\) along the vertical asymptote to the minimum \((1, 2)\), then rises toward the slant line \(y = x\); the odd symmetry produces the mirror-image branch for \(x < 0\), rising to the maximum \((-1, -2)\) and dropping toward \(y = x\) from below. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{figureblock}
+  \includegraphics[width=79.9mm]{ch05/figs/slant-asymptote}
+\figcaption{Figure 5.10}{The graph of \(y = x + 1/x\) from Example 5.25 hugs the slant asymptote \(y = x\) at both ends, with the \(y\)-axis as its vertical asymptote; the local maximum value \(-2\) sits below the local minimum value \(2\).}
+\end{figureblock}
+\begin{envcaution}{Caution}{}{}
+An asymptote describes where a curve is \emph{heading}, not territory it may never touch. Both graphs in this section happen to stay on one side of their horizontal and slant asymptotes, which can suggest a false rule: nothing prevents a curve from crossing such an asymptote, even infinitely often. The graph of \(y = (\sin x)/x\) has the horizontal asymptote \(y = 0\), yet it crosses that line at every nonzero multiple of \(\pi\). Vertical asymptotes are different in kind: they mark places where the nearby values grow without bound, not lines the graph runs alongside. Usually the function is not even defined there, and assigning it an isolated value at that point changes nothing about that growth. Approach is a statement about the far end of the graph. On the way there, anything is allowed.
+\end{envcaution}
+With the checklist, a formula turns into a shape: no plotting, just the systematic reading of domain, limits, and two derivatives. This chapter asked about a function’s rates, its extremes, its bends, and its ends. Every one of those questions now has a computable answer, and the answers combine into a single picture. The final section reverses the direction. Instead of describing a known function, it asks how to \emph{find} a solution of \(f(x) = 0\) when the formula does not give that solution directly. It uses the tangent line as a tool for approximation.
+
+
+\sechead{5.9}{Newton’s Method}
+The chapter closes by turning the derivative to a new purpose: not describing a function, but \emph{solving} one. Many equations \(f(x) = 0\) have roots that are not given by a simple formula. The cubic \(x^{3} - x - 1 = 0\) cannot be solved by simple factoring, and a transcendental equation like \(\cos x = x\) has no elementary closed form at all. Yet the roots are real and can be located to any precision. \emph{Newton’s method} is how they are located, and it rests on the linear approximation of §5.3: near a point, a curve is almost its tangent line, and a line’s root is trivial to find. Follow the tangent to where it crosses the axis, and — from a good starting guess — you land nearer the curve’s own root; repeat, and you close in fast.
+
+Make it precise. Start with a guess \(x_{0}\) near the root. The tangent line to \(y = f(x)\) at \(\bigl(x_{0}, f(x_{0})\bigr)\) is
+
+\[ y - f(x_{0}) = f'(x_{0})(x - x_{0}). \]
+
+Set \(y = 0\) and solve for \(x\) to find where this tangent meets the axis; call it \(x_{1}\):
+
+\[ x_{1} = x_{0} - \frac{f(x_{0})}{f'(x_{0})}. \]
+
+Now \(x_{1}\) is a better guess. Repeating from \(x_{1}\) gives \(x_{2}\), and in general each guess produces the next by the same rule.
+
+\begin{figureblock}
+  \includegraphics[width=85.19mm]{ch05/figs/newton-step}
+\figcaption{Figure 5.11}{One step of Newton’s method: from the guess \(x_{0}\), slide down the tangent line to where it crosses the axis; that crossing \(x_{1}\) is already much closer to the root \(r\).}
+\end{figureblock}
+\begin{envstrategy}{Strategy}{5.7}{Newton’s method}
+To approximate a root of \(f(x) = 0\):
+
+\begin{steps}
+  \item Choose a starting value \(x_{0}\) reasonably near the root. A rough sketch or a sign change of \(f\) will locate one.
+  \item Generate successive approximations by the iteration
+\end{steps}
+\[ x_{n+1} = x_{n} - \frac{f(x_{n})}{f'(x_{n})}, \qquad n = 0, 1, 2, \dots \]
+
+Continue until consecutive values agree to the precision required; the common value is the root to that precision. The method needs \(f'(x_{n}) \ne 0\) at each step. A horizontal tangent has no finite intercept, so the process stops.
+\end{envstrategy}
+\begin{workedexample}
+\begin{envexample}{Example}{5.26}{}
+Use Newton’s method to approximate \(\sqrt{2}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The number \(\sqrt{2}\) is the positive root of \(f(x) = x^{2} - 2\). With \(f'(x) = 2x\), the iteration is
+
+\[ x_{n+1} = x_{n} - \frac{x_{n}^{2} - 2}{2x_{n}} = \frac{1}{2}\left(x_{n} + \frac{2}{x_{n}}\right), \]
+
+a formula that averages each guess with the number it divides into \(2\). Starting from \(x_{0} = 1.5\):
+
+\[ x_{1} = \tfrac{1}{2}\!\left(1.5 + \tfrac{2}{1.5}\right) = 1.41667, \quad x_{2} = 1.414216, \quad x_{3} = 1.4142136. \]
+
+Against the true value \(\sqrt{2} = 1.41421356\ldots\), the third step is already correct to seven decimals. The number of correct digits roughly \emph{doubles} at each step. That rapid doubling is characteristic of Newton’s method near a simple root. This particular iteration is ancient: it is the Babylonian rule for square roots, which turns out to be Newton’s method applied to \(x^{2} - 2\). \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{5.27}{}
+Approximate the real root of \(x^{3} - x - 1 = 0\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Let \(f(x) = x^{3} - x - 1\). Since \(f(1) = -1 < 0\) and \(f(2) = 5 > 0\), the Intermediate Value Theorem (Theorem 4.9(b)) guarantees a root between \(1\) and \(2\); a glance shows it is near \(1.3\). With \(f'(x) = 3x^{2} - 1\), the iteration is
+
+\[ x_{n+1} = x_{n} - \frac{x_{n}^{3} - x_{n} - 1}{3x_{n}^{2} - 1}. \]
+
+Starting from \(x_{0} = 1.5\):
+
+\[ x_{1} = 1.34783, \quad x_{2} = 1.32520, \quad x_{3} = 1.324718, \quad x_{4} = 1.324718. \]
+
+The values have settled by the fourth step, so the root is \(1.324718\) to six decimals. Simple factoring cannot produce this value, yet four steps of arithmetic have found it. The Intermediate Value Theorem certified that the root exists; Newton’s method located it. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{envcaution}{Caution}{}{}
+Newton’s method is fast but not always reliable. It requires \(f'(x_{n}) \ne 0\) at every step; a guess landing where the tangent is horizontal gives no next iterate. More subtly, the method is only \emph{locally} reliable: if the starting guess is too far from a root, or is in a region where the curve bends so that the tangent line crosses the \(x\)-axis beyond the root, the iterates can overshoot, wander off to infinity, or fall into a repeating cycle that never converges. The concavity of §5.6 is a reliable guide: on an arc where \(f''\) keeps one sign and \(f' \ne 0\), a guess started on the side where \(f\) and \(f''\) agree in sign closes in steadily, while a poorly placed start can move away from the root instead. In practice a rough sketch that gives a good first guess is worth more than any number of unguided iterations.
+\end{envcaution}
+\subsechead{Chapter summary}
+Chapter 5 set out to turn the derivative from an object of study into an instrument, and it did so along four strands.
+
+\begin{itemize}
+  \item \runin{Local tools.} Implicit differentiation freed the derivative from explicit formulas, differentiating equations and inverse relations directly (§5.1); related rates ran the same move with time as the variable, converting one known rate into another (§5.2); and linear approximation read the derivative as the function’s best straight-line stand-in, with differentials propagating small errors (§5.3).
+  \item \runin{Extremes and optimization.} Chapter 4’s Extreme Value Theorem guaranteed absolute extrema on closed intervals, and Fermat’s theorem narrowed interior extrema to critical numbers; the Closed Interval Method checked critical numbers and endpoints, and the First and Second Derivative Tests (§5.4, §5.6) classified the local extrema at critical numbers; and optimization applied the whole machinery to quantities worth making largest or smallest (§5.5).
+  \item \runin{Shape and indeterminate limits.} Concavity and inflection completed the reading of a graph (§5.6); L’Hôpital’s rule, powered by a generalized Mean Value Theorem, resolved the indeterminate limits that govern behaviour at infinity (§5.7); and curve sketching gathered every feature into one disciplined procedure (§5.8).
+  \item \runin{Numerical root-finding.} Newton’s method turned the tangent line into an engine for solving \(f(x) = 0\), reaching roots no formula can express (§5.9).
+\end{itemize}
+Underneath all four runs a single idea: the derivative, a statement about one instant, controls the behaviour of a function across whole intervals, including the function’s rise and fall, its extremes, its bends, and its roots. The next chapter reverses the direction of travel. Having spent three chapters taking functions apart with the derivative, it asks how to build a function up by accumulation. The Fundamental Theorem of Calculus then shows that the two operations are inverse to one another.
+\end{document}

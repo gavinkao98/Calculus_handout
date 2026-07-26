@@ -57,14 +57,14 @@
 <p class="sub">第一個 <strong>canon 章</strong>（無手稿、100% LLM 自產）· 執行 <strong>115 條</strong> · 2026-07-26 · 分支 <code>handout/plain-ch05</code> · 判準＝<code>CONTENT_SPEC.md</code> §3〈平實英文條款〉RC · 流程＝<code>KICKOFF-plain-backfill.md</code> · 走查稿見 <a href="REVIEW-ch05-plain-walk.html">REVIEW-ch05-plain-walk.html</a>、Codex raw 見 <a href="REPORT-ch05-plain-codex-raw.md"><code>REPORT-ch05-plain-codex-raw.md</code></a></p>
 
 <nav class="toc">
-  <a href="#sum">摘要</a><a href="#gate2">Gate 2</a><a href="#accept">驗收表</a><a href="#a1">§5.1</a><a href="#a2">§5.2</a><a href="#a3">§5.3</a><a href="#a4">§5.4</a><a href="#a5">§5.5</a><a href="#a6">§5.6</a><a href="#a7">§5.7</a><a href="#a8">§5.8</a><a href="#a9">§5.9</a><a href="#keep">保留清單</a><a href="#honest">未完成項</a>
+  <a href="#sum">摘要</a><a href="#gate2">Gate 2</a><a href="#accept">驗收表</a><a href="#a1">§5.1</a><a href="#a2">§5.2</a><a href="#a3">§5.3</a><a href="#a4">§5.4</a><a href="#a5">§5.5</a><a href="#a6">§5.6</a><a href="#a7">§5.7</a><a href="#a8">§5.8</a><a href="#a9">§5.9</a><a href="#keep">保留清單</a><a href="#gate7">Gate 7 補跑</a><a href="#honest">收尾狀態</a>
 </nav>
 
 <div class="card good" id="sum">
   <strong>結果：</strong>em-dash <strong>108 → 6</strong>（<strong>14.4 → 0.8/1000</strong>，<code>T_can</code> ≤3.0 達標）、副表 18 → 10；
   執行 <strong>115 條</strong>（走查 116 − Codex REJECT 1）；<strong>數學片段零移除、零改動</strong>（995 → 1003，8 個新增全部來自 Codex 指定的改寫）；
   <strong>分頁 46 頁不變</strong>、0 孤行、0 溢頁；tic guard 四項全部未達「顯著上升」門檻。
-  Codex gate-2 逐條裁決 <strong>ADOPT 90／MODIFY 24／REJECT 1</strong>，MODIFY 全數採納、REJECT 全數撤回。
+  Codex gate-2 逐條裁決 <strong>ADOPT 90／MODIFY 24／REJECT 1</strong>，MODIFY 全數採納、REJECT 全數撤回。<br><strong>2026-07-26 收尾：</strong>Gate 7 補跑<strong>四閘全綠</strong>（<code>dist/ch05/</code>，36 頁），途中逼出 1 項轉換器方言缺口與 1 個「U+2019 誤當 prime」的內容缺陷（只有 LaTeX 線看得見），皆已修；散文輪列的四項待辦全部收掉。
 </div>
 
 <h2 id="gate2">Gate 2 — Codex 獨立裁決（gpt-5.6-terra，reasoning max）</h2>
@@ -98,7 +98,7 @@
   <tr><td><strong>Gate 4</strong><br>build＋量測</td><td><span class="tag good">PASS</span></td><td><code>python handout/html/build.py ch05</code> 成功。<code>prose_metrics.py --unit ch05</code>：見下表。</td></tr>
   <tr><td><strong>Gate 5</strong><br>math gate</td><td><span class="tag good">PASS</span></td><td><strong>只在 HEAD 的數學片段 0 個</strong>（零移除、零改動）；新增 8 個，全部來自 Codex 指定改寫：<span class="id">G2</span> 的 Rolle 反證明示化 ×6（<code>(a, b)</code>×2、<code>g(b) = g(a)</code>、<code>c</code>、<code>g(b) - g(a)</code>、<code>g'(c)</code>）、<span class="id">D5</span> 的 <code>0</code>、<span class="id">JL3</span> 的 <code>x</code>。結構健檢：inline 分隔符全配對、cross-ref 零遺失零新增。</td></tr>
   <tr><td><strong>Gate 6</strong><br>Mode B</td><td><span class="tag good">PASS</span></td><td>本輪改動句由 Codex gate-2 逐條複審（U／F／S·A·V／R 四維度等價於其 ADOPT／MODIFY 判斷）；量詞 scope、條件—結論、代名詞先行詞未拆散（Q3 逐項確認）；節奏未造出需合回的段落（Q4）。</td></tr>
-  <tr><td><strong>Gate 7</strong><br>LaTeX</td><td><span class="tag warn">pending</span></td><td><code>make_dist.py</code> 的 <code>NAMES</code> 表<strong>沒有 ch05</strong>。依平行紀律<strong>不改 <code>NAMES</code></strong>（會與其他章 session 衝突）→ 記為 pending，留給合併回收那一輪。<strong>不是默默跳過。</strong></td></tr>
+  <tr><td><strong>Gate 7</strong><br>LaTeX</td><td><span class="tag good">PASS</span><br><span class="small">（2026-07-26 補跑）</span></td><td><strong>散文輪當下記為 pending</strong>——依平行紀律不改 <code>make_dist.py</code> 的 <code>NAMES</code>（會與其他章 session 衝突）。<strong>其後補跑並轉綠</strong>：<code>dist/ch05/</code>＝chapter5.pdf <strong>36 頁</strong>＋自足 .tex（1003 段數學 pass-through）；閘 1 error 0／missing char 0、完整性閘 PASS（11 處抽取假象、<strong>0 處真落差</strong>）、圖內文字閘 PASS、字形閘 PASS（514 個嵌入字形 0 個輪廓不符）。重跑 byte-identical。途中逼出 1 項轉換器方言缺口與 1 個內容缺陷，見下方「Gate 7 補跑」卡片與 <a href="../../latex/chapters/ch05/DIALECT-ch05.md"><code>DIALECT-ch05.md</code></a>。</td></tr>
   <tr><td><strong>Gate 8</strong><br>版面目檢</td><td><span class="tag good">PASS</span></td><td>分頁 <strong>46 頁 → 46 頁（不變）</strong>——以 HEAD 版 standalone 實際重跑分頁器比對得出。0 孤行、0 溢頁（逐 sheet 量 <code>scrollHeight − clientHeight</code>）。11 張圖、12 個 SVG 全數 hydrate；1044 個數學式渲染、0 個生 TeX 殘留。</td></tr>
 </table>
 
@@ -745,14 +745,54 @@
   <li>§5.4 Thm 5.1 證明段（81 詞／19 式）——<strong>Codex：</strong>「是一個論證 skeleton，未達段落 trigger，也不應機械拆分。」</li>
 </ul>
 
-<h2 id="honest">誠實記錄：未完成與待辦</h2>
+<h2 id="gate7">Gate 7 補跑（2026-07-26）— ch05 上 LaTeX 出版線</h2>
+<div class="card good">
+  <p><strong>四閘全綠，成品已產出。</strong>散文輪當下依平行紀律把 Gate 7 記為 pending；其後在同一分支補跑。</p>
+  <table>
+    <tr><th style="width:16%">閘</th><th style="width:10%">結果</th><th>證據</th></tr>
+    <tr><td>閘 1 編譯</td><td><span class="tag good">PASS</span></td><td><code>chapter5.pdf</code> <strong>36 頁</strong>、error <strong>0</strong>、missing character <strong>0</strong>；<code>chapter5.tex</code> 1003 段數學 pass-through（與 math gate 計數一致）</td></tr>
+    <tr><td>閘 3 完整性</td><td><span class="tag good">PASS</span></td><td>11 處 pdftotext 抽取假象（逐條確認內容在），<strong>0 處真落差</strong></td></tr>
+    <tr><td>圖內文字閘</td><td><span class="tag good">PASS</span></td><td>2 條 panel note 全數抵達 PDF（<code>concavity-tangents</code> 雙 panel）</td></tr>
+    <tr><td>閘 4 字形</td><td><span class="tag good">PASS</span></td><td><strong>514</strong> 個嵌入字形的輪廓全數符合其 CID</td></tr>
+    <tr><td>確定性</td><td><span class="tag good">PASS</span></td><td>重跑 <code>make_dist.py ch05</code> 的 <code>.tex</code> byte-identical</td></tr>
+    <tr><td>回歸</td><td><span class="tag good">PASS</span></td><td>轉換器改動對既有單元<strong>內容中性</strong>：appB 與 ch03 重跑後 <code>.tex</code> 與 committed 版零內容差異；ch03 另跑完整四閘（612 段數學、22 頁、三閘全 PASS）。<code>test_convert.py</code> <strong>90 tests OK</strong>（原 88 ＋ 新增 2）</td></tr>
+  </table>
+</div>
+
 <div class="card warn">
+  <p><strong>途中逼出一項轉換器方言缺口（ch05 是全書第一個踩到的）。</strong></p>
+  <p><code>span.env-kicker</code> 原本只走 <code>esc()</code>，不還原數學占位符。§5.7 的證明標題是<strong>自訂</strong>的
+  <span class="en">Proof of the \(\tfrac{0}{0}\) case, \(a\) finite</span>——全書第一個把數學寫進 env-kicker 的地方，
+  於是那兩段數學被丟掉，由 pass-through 不變式擋下（<code>sec-5-7.html: 缺席 [65, 66]</code>）。
+  處置：emitter 改走 <code>restore(esc(...))</code>（與 inline 文字同一條路徑），並移到 <code>name</code> 之前算以保源順序；
+  <code>num</code> 維持純 <code>esc</code>（編號帶數學屬體例錯誤，應由不變式擋下）。補 2 個測試。
+  <strong>appD §D.3 是同型的第二處</strong>（<span class="en">Proof of Theorem 5.5 (\(\tfrac{\ast}{\infty}\) case)</span>），該單元 rollout 時可直接受益。</p>
+</div>
+
+<div class="card bad">
+  <p><strong>也抓到一個內容缺陷——而且只有 LaTeX 線看得見。</strong></p>
+  <p>三段 display 數學用了<strong>排版右單引號 U+2019</strong> 而非 ASCII prime <code>'</code>：§5.5 Example 5.17 的
+  <code>A’(x)</code>、§5.6 Example 5.18 的 <code>f’’(x)</code>（3 處）、§5.8 Example 5.24 的 <code>f’(x)</code>，共 8 個字元。</p>
+  <p><strong>HTML 線為何看不出來：</strong>MathJax 把 <code>A’(x)</code> 與 <code>A'(x)</code> 渲染成<strong>完全相同</strong>的輸出
+  （實測 <code>tex2chtml</code> 兩者都產生 U+2032 PRIME，逐字元比對一致），所以螢幕與 print standalone 上都是正確的撇號，
+  既有的圖閘／散文閘也不會報。</p>
+  <p><strong>LaTeX 線才現形：</strong>lualatex 把 U+2019 當直立引號排出來，於是 §5.5 同一頁上，display 的 <code>A'(x)</code>
+  是直立撇號、正文 inline 的 \(A'\) 卻是正確的義大利體 \(A'\)——同一個符號兩種樣子。編譯不會失敗（0 missing character）、
+  字形閘也 PASS（那個引號字形本身嵌得好好的），<strong>是排版正確性問題，不是編譯問題</strong>。</p>
+  <p>已改為 ASCII prime 並目視確認 PDF 轉為正確 prime；改後字形閘的嵌入字形數 515 → <strong>514</strong>（直立引號那個字形不再需要）。
+  全書掃描確認此問題<strong>只出現在 ch05 這 8 個字元</strong>。<span class="small">數學段數 1003 不變——只換字元，未動任何一段的結構。</span></p>
+</div>
+
+<h2 id="honest">誠實記錄：收尾後的狀態</h2>
+<div class="card good">
+  <p><strong>散文輪列的四項待辦，已全部收掉：</strong></p>
   <ol class="tight">
-    <li><strong>Gate 7（LaTeX 線）＝ pending。</strong><code>handout/latex/make_dist.py</code> 的 <code>NAMES</code> 表只有 <code>appB</code>、<code>ch03</code>，沒有 ch05。依本輪平行紀律<strong>刻意不改 <code>NAMES</code></strong>（多章 session 同時寫必衝突），故 ch05 的三閘（log／<code>check_prose.py</code> 完整性／<code>check_glyphs.py</code> 字形）<strong>本輪未跑</strong>。這是已知缺口、不是遺漏。</li>
-    <li><strong>句長掉出監測帶</strong>（平均 16.9、&gt;25 詞 15%）。監測值非門檻，Codex Q4 也判定不需合回任何句子；但若日後 learner-sim 或真人盲讀回報「讀起來太碎」，第一個該回頭看的就是本輪的 14 條 PLAIN-SPLIT。</li>
-    <li><strong>本輪 MUST NOT 動、確實沒動的共用檔</strong>：<code>REPORT-emdash-baseline-and-rollout.md</code>（rollout 帳本）與 <code>make_dist.py</code> 的 <code>NAMES</code>。</li>
-    <li><strong>本輪範圍外、已記錄但未處理的兩項</strong>（見走查稿）：<code>sec-5-5.html</code> 的 Figure 5.6 <code>&lt;figure&gt;</code> 夾在 <code>env-body</code> 之外；同檔檔頭註解編號過期（寫 Examples 5.14–5.16、實為 5.15–5.17）。兩者都不是散文問題，未動。</li>
+    <li><s>Gate 7 pending</s> → <strong>已補跑，四閘全綠</strong>（見上）。<code>NAMES</code> 表已加 <code>"ch05": "chapter5"</code>。</li>
+    <li><s>rollout 帳本的 ch05 列</s> → <strong>已由 2026-07-26 的合併回收輪補齊</strong>（用的正是本輪交付的數字：6 / 7,667 / 0.8 / 79 / 42 / 44 / 29，標記 ✅ 已達標）。本輪確認無誤，未重複改動。</li>
+    <li><s><code>sec-5-5.html</code> 的 Figure 5.6 標記位置</s> → <strong>已修</strong>：<code>&lt;figure&gt;</code> 從 <code>env-solution</code> 內部（<code>env-body</code> 之外）移到 <code>workedexample</code> 之後，與其餘十張圖一致（全章 11 張圖現在都在 <code>article</code> 層）。</li>
+    <li><s>同檔檔頭註解編號過期</s> → <strong>已修</strong>：<span class="en">Examples 5.14–5.16</span> → <span class="en">5.15–5.17</span>，內文三個例題編號同步。</li>
   </ol>
+  <p><strong>仍為監測項（非缺口）：</strong>平均句長 16.9、&gt;25 詞 15%，低於 SHOULD 監測帶 18–22。Codex Q4 已判定不需為此合回任何句子；若日後 learner-sim 或真人盲讀回報「讀起來太碎」，第一個該回頭看的是本輪的 14 條 PLAIN-SPLIT。</p>
 </div>
 
 <div class="card good">

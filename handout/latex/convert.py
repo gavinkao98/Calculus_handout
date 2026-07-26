@@ -887,13 +887,19 @@ class LatexEmitter:
             return self.table(b)
 
         if isinstance(b, Env):
-            # name 必須在 body **之前**算：兩者都可能含數學，而 used 不變式要求還原順序
-            # 等同源順序（env-head 在 env-body 之前）。先算 body 會記成 used=[1,0]，
-            # 明明輸出正確卻被不變式誤擋（偽陽性）。ch03 的 13 個 env-name 都沒數學才沒踩到。
+            # kicker／name 必須在 body **之前**算，且依 kicker → name 的源順序：三者都
+            # 可能含數學，而 used 不變式要求還原順序等同源順序（env-head 在 env-body 之前、
+            # env-kicker 在 env-name 之前）。先算 body 會記成 used=[1,0]，明明輸出正確卻被
+            # 不變式誤擋（偽陽性）。ch03 的 13 個 env-name 都沒數學才沒踩到。
+            # kicker 走 restore(esc(...))（與 inline 文字同一條路徑）而非單純 esc：自訂
+            # proof 標籤會帶數學（ch05 §5.7 的 "Proof of the \(\tfrac{0}{0}\) case, \(a\)
+            # finite"、appD §D.3 同型），只 esc 會把占位符原樣印出、數學被丟掉。num 維持
+            # 純 esc——env-num 是編號（"5.5"），帶數學即屬體例錯誤，應由不變式擋下。
+            kicker = self.restore(esc(b.kicker))
             name = self.para_text(b.name) if b.name else ""
             inner = self.emit(b.body).strip()
             pb = "\\pagebreakbefore\n" if b.pagebreak else ""
-            return (f"{pb}\\begin{{env{b.kind}}}{{{esc(b.kicker)}}}{{{esc(b.num)}}}{{{name}}}\n"
+            return (f"{pb}\\begin{{env{b.kind}}}{{{kicker}}}{{{esc(b.num)}}}{{{name}}}\n"
                     f"{inner}\n\\end{{env{b.kind}}}")
 
         if isinstance(b, WorkedExample):
