@@ -69,7 +69,7 @@ Codex raw <a href="REPORT-ch04-plain-codex-round1-raw.md">REPORT-ch04-plain-code
 <tr><td>Gate 5</td><td>數學片段比對／cross-ref／標籤配對</td><td class=n colspan=2>見下節</td><td class="warn">8 處差異，逐條說明</td></tr>
 <tr><td>Gate 6</td><td>段落觸發器（≥150 詞或 &gt;20 式）</td><td class=n>4</td><td class=n><strong>0</strong></td><td class="ok">全部解除</td></tr>
 <tr><td>Gate 6</td><td>平均句長／P90／&gt;25 詞占比</td><td class=n>18.3／34／24%</td><td class=n>16.5／29／17%</td><td class="warn">見「誠實記錄」</td></tr>
-<tr><td>Gate 7</td><td>LaTeX 線</td><td class=n colspan=2>—</td><td class="warn"><strong>pending</strong>：<code>make_dist.py</code> 的 <code>NAMES</code> 沒有 ch04，依平行紀律不改</td></tr>
+<tr><td>Gate 7</td><td>LaTeX 線四閘</td><td class=n colspan=2>—</td><td class="ok">全綠（2026-07-26，commit b5db9c5）：32 頁／0 error／0 missing char；完整性閘 0 處真落差；字形閘 549 字形全符。詳見 <code>handout/latex/chapters/ch04/DIALECT-ch04.md</code></td></tr>
 <tr><td>Gate 8</td><td>分頁（A4）</td><td class=n>41 頁</td><td class=n><strong>41 頁</strong></td><td class="ok">不變；0 溢頁、0 頁尾孤標題</td></tr>
 </table>
 <p class="sub">交易式驗證：<code>tools/verify_edits.py</code> 對五個 fragment <strong>全部 PASS</strong>——
@@ -634,8 +634,7 @@ Codex raw <a href="REPORT-ch04-plain-codex-round1-raw.md">REPORT-ch04-plain-code
 
 <h2>七、誠實記錄：未完成與待決</h2>
 <ul>
-<li><strong>Gate 7（LaTeX 線）pending。</strong><code>handout/latex/make_dist.py</code> 的 <code>NAMES</code> 表沒有 ch04；
-  平行輪紀律禁止本分支改它（會與別章衝突）。ch04 的 LaTeX 產物待合併回收時一次補。</li>
+<li><strong>Gate 7（LaTeX 線）已完成</strong>（2026-07-26 使用者指示補做，commit <code>b5db9c5</code>）。rollout 途中逼出三個轉換器方言缺口（數學區段內的 <code>&amp;lt;</code>／<code>&amp;gt;</code> 未解碼、裸 <code>span.qed</code> 未凍結、<code>env-corollary</code> 不在白名單）與一個字形閘缺口（圖裡的 web 字型是 TrueType，原閘只驗 CFF），全部修掉並補回歸測試（88 tests OK）。四閘全綠，逐條紀錄見 <code>handout/latex/chapters/ch04/DIALECT-ch04.md</code>。</li>
 <li><strong>句長分布掉到真人教材區間以下——<span class="ok">2026-07-26 使用者裁決：不動</span>。</strong>
   平均 18.3 → 16.5（監測值 18–22 之外）、&gt;25 詞占比 24% → 17%（已核准樣本的自然區間是 23–26%）。
   SPEC 明訂這些是監測值、且 MUST NOT 設硬性句長上限，故不構成違規。本輪維持現狀，不回退。
