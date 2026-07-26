@@ -4,20 +4,22 @@
 > 本檔只記 **ch06 相對於這三者的差集**、圖資產清單、以及本輪對工具的改動。
 > 流程權威＝[`../../KICKOFF-latex-pilot.md`](../../KICKOFF-latex-pilot.md) §4.5 四閘；樣式權威＝[`../../template/calcbook.sty`](../../template/calcbook.sty)。
 > **狀態（2026-07-26）：四閘全綠、`dist/ch06/` 成品已產出。**
+>
+> ⚠ **本檔在 rollout 分支上寫成，合併 main 後有實質修訂。** ch06 的工作在 `handout/plain-ch06` 上進行時，main 同日並行完成了 ch02／ch03／ch04／ch05 四章 rollout；合併後發現**本輪原本以為的兩項「新增」其實 main 都已做過，且做得更好**——裸 `span.qed` 的 mapping（ch04 差集已補）與圖內字型的驗證（ch02 立具名白名單、ch04 vendored woff2 並加 glyf 比對路徑）。**§2／§4／§5 已依合併後的事實重寫**；本輪對工具的實際淨改動只剩 `NAMES` 一列。教訓＝PIPELINE「通用紀律」的「**開長閘前先從 main 更新**」（該條正是 ch04 實證後加的），本輪未照做。
 
 ## 1. 盤點結果
 
 `python dialect_inventory.py ch06`：五個 fragment、**33 種 tag+class 組合**（ch01 是 62）、行內數學 657＋display 66（轉換器實測 pass-through **723 段**）、圖 **9 個 `<figure>`／12 個 panel**、表 **0 張**。
 
-**ch06 是目前最單純的單元**：沒有表格、沒有 inline SVG、沒有 `page-break-before`、沒有 `ol.warmup`／`ol.prompt-list`／`ol.sol-list`／`p.ragged`、沒有「`figure` 出現在 `li` 內」。33 種組合中 **32 種**已由既有 mapping 覆蓋，**只有 1 種**是新的。
+**ch06 是目前最單純的單元**：沒有表格、沒有 inline SVG、沒有 `page-break-before`、沒有 `ol.warmup`／`ol.prompt-list`／`ol.sol-list`／`p.ragged`、沒有「`figure` 出現在 `li` 內」。33 種組合**全部**已由既有 mapping 覆蓋（見 §2）。
 
-## 2. ch06 專屬 mapping（本輪新增，僅 1 列）
+## 2. ch06 專屬 mapping：**0 列**
 
-| # | fragment 標記 | 次數 | LaTeX 語意 | 備註 |
-|---|---|--:|---|---|
-| 1 | `span.qed`（裸 class，無 `qed-proof`） | 21 | `\qedmark` | worked-solution 的收尾記號。appB 只有 `span.qed.qed-proof`（proof 變體，本章另有 5 個）。**HTML 側兩者都是空心方框，只差框線色**（`.qed::after` 用 `--ink-soft`；`.skin-hs .qed-proof::after` 覆寫為 `--ink`），LaTeX 同映到 `\qedmark`＝amsthm 的 `\qedsymbol`。模板該巨集本來就註明「`span.qed` 記號驅動」，語意槽早已備妥 |
+合併 main 後，ch06 的 33 種 tag+class 組合**全部**已被既有 mapping 覆蓋，本章沒有任何專屬差集。
 
-**這一列是被絆線接住的**：`test_convert.py::FailLoud::test_plain_qed_span_rejected` 原本明文斷言裸 `span.qed` 必須硬錯，註解寫著「素 qed（solution 變體）未凍結，哪天 fragment 加了要硬錯提醒補 mapping」。ch06 正是那個「哪天」。絆線已改寫為 `test_other_qed_variant_rejected`（守住「第三種 class 組合仍要硬錯」）＋兩條正向／空元素測試。
+分支上原本記為「唯一新增」的裸 `span.qed`（21 處，worked-solution 收尾記號），**main 的 ch04 rollout 同日已經補上**（`convert.py` 的 `k.classes in (("qed","qed-proof"), ("qed",))`），而且比分支版完整——main 另外處理了 **block-level** 的 `span.qed`（`env-body` 直接掛一個 qed span，非 `<p>` 句尾），分支版只做了 inline。故合併時 `convert.py`／`test_convert.py` 整檔取 main。
+
+兩邊是各自獨立撞到同一條絆線的：`test_convert.py::FailLoud::test_plain_qed_span_rejected` 原本明文斷言裸 `span.qed` 必須硬錯，註解寫著「哪天 fragment 加了要硬錯提醒補 mapping」。ch04 與 ch06 在同一天各自成為那個「哪天」，兩邊的修法與註解幾乎逐字相同。**這條絆線的設計是有效的**。
 
 **數學巨集對等**：ch06 的 standalone `macros` 表＝`arccsc`／`arcsec`／`arccot`，與 ch01 相同，`calcbook.sty` 早已以 `\providecommand` 提供，**無新增**。（此為 DIALECT-ch01 §2 定下的每章 Gate 0 例行對照。）
 
@@ -37,38 +39,38 @@
 - 目檢（PDF 第 4 頁）：n=4／n=8 同列、n=16 置中於次列，遞進順序仍照閱讀順序（左→右→換列），caption 緊接其下，無跨頁。**判定為可接受**。
 - ch01 的 `limit-same-near-a`×3 之所以能併成一列，是因為它每格只有 42.86mm（`3 × 42.86 + 2 × 6 = 140.6mm`，塞得下）。
 
-## 4. 本輪對工具的改動
+## 4. 本輪對工具的實際改動：`NAMES` 一列
 
 | 檔 | 改動 | 為什麼 |
 |---|---|---|
-| `convert.py` | inline 的 qed 分支由 `classes == ("qed","qed-proof")` 放寬為 `classes in (("qed",), ("qed","qed-proof"))` | §2 的唯一差集。**空元素檢查對兩個變體都保留** |
-| `make_dist.py` | `NAMES` 加 `ch06: chapter6`；字形閘多帶第二參數 `chapters/<ch>/figs` | rollout 新章例行；第二參數見下 |
-| `check_glyphs.py` | 新增 `figure_font_programs()` 與**圖內字型 pass-through 判準** | 見 §5 |
-| `test_convert.py` | 絆線改寫（見 §2）＋ 新增裸 qed 的正向與空元素測試 | 契約已變，測試跟著變。85 passed |
+| `make_dist.py` | `NAMES` 加 `ch06: chapter6` | rollout 新章例行。**這是本輪對工具的全部淨改動** |
 
-## 5. 字形閘的新判準：圖帶進來的字型（本輪唯一擋稿項，已解）
+分支上另外改過 `convert.py`／`test_convert.py`／`check_glyphs.py`／`.gitignore`，合併 main 時**四者全部整檔取 main**——見 §2（qed mapping）與 §5（字形閘）。
 
-**症狀**：閘 4 FAIL——`AAAAAA+WebCM-Serif-10-Regular：FontFile2（非 CFF）`，1 個嵌入字型無法驗。
+## 5. 圖帶進來的字型：分支上撞到、但 main 早已解掉（且解得更好）
 
-**根因**：`velocity-distance-steps`（Figure 6.3）的軸標是 `t\,(\text{s})` 與 `v\,(\text{m/s})`。MathJax 的 `\text{…}` 走**文字體**的 `@font-face`（New CM 的 WebCM-Serif-10），Chrome 把它嵌成 **CID TrueType**；純數學標籤則走 `mjx-ncm-*` 的 **Type 3**（Type 3 沒有 `/FontFile`，本來就不在閘 4 視野內）。**ch01 全 24 張圖都沒用過 `\text{}`，所以三輪 rollout 都沒撞到**；ch06 是第一例。這是通用缺口，**ch05／ch07 只要圖標籤帶單位就會再撞**。
+**分支上的症狀**：閘 4 FAIL——`AAAAAA+WebCM-Serif-10-Regular：FontFile2（非 CFF）`，1 個嵌入字型無法驗。
 
-**為什麼不能照原邏輯驗**：閘 4 的判準是「逐 CID 比對嵌入子集與**原始字型檔**的輪廓」。這個字型按定義沒有本機原始檔（MathJax webfont 走 CDN），而且是 TrueType 不是 CFF。
+**根因**：`velocity-distance-steps`（Figure 6.3）的軸標是 `t\,(	ext{s})` 與 `v\,(	ext{m/s})`。MathJax 的 `	ext{…}` 走**文字體**的 `@font-face`（New CM 的 WebCM-Serif-10），Chrome 把它嵌成 **CID TrueType**；純數學標籤則走 `mjx-ncm-*` 的 **Type 3**（Type 3 沒有 `/FontFile`，本來就不在閘 4 視野內）。ch01 全 24 張圖都沒用過 `	ext{}`，所以早期 rollout 沒撞到。
 
-**為什麼不該直接放行**：`check_glyphs.py` 的 docstring 明寫「silent skip 正是 check_prose.py 的 figure_note_check 記錄過的偽陰性坑，不重蹈」。
+**main 早已解掉，而且是兩層**（皆 2026-07-26，與本輪並行）：
 
-**採用的解法——改判 pass-through，而不是豁免**：這類字型改問「**它的字型程式是否與該章某個圖 PDF 裡的逐位元組相同**」。相同即證明 LuaTeX 只是原封轉貼、未經字形名索引重新編碼——而閘 4 要防的因果層（LuaTeX 以字形名索引 → 重複名塌陷 → 輪廓錯位，即 2026-07-17 的 Inter bug）正是發生在「LaTeX 自己嵌字型」那條路上，對 `\includegraphics` 帶進來的字型根本不適用。不同或找不到來源則**照舊 FAIL**。仍逐個列名（印成 `[圖內字型]`），不是 silent skip；圖內文字另有閘 3c 守著。
+1. **ch02 rollout** 立 `FIG_IMPORTED_OK` 具名白名單——裡面就明確列著 `WebCM-Serif-10-`。當天即證明這條抓得到真缺陷：Figure 2.7 的 `√` 因 Inter 缺 U+221A 被 Chrome 退回 `MicrosoftJhengHeiUI`（Windows 系統 CJK 字型），字形本身沒錯、**退錯字型**才是缺陷。
+2. **ch04 rollout** 把 WebCM 的原始 woff2 vendored 進 `template/fonts/webcm/`，並加**glyf（TrueType）逐 GID 輪廓比對**路徑。白名單自此降為 fallback——**能驗的一定要驗**。
 
-**實測結果**：`AAAAAA+WebCM-Serif-10-Regular` 與 `figs/velocity-distance-steps.pdf` 內的字型程式**逐位元組相同** → pass-through。回歸：appB 362 字形、ch01 489 字形，兩者輸出與改動前**完全不變**。
+**分支版的做法為何該丟**：分支上改判「字型程式是否與該章某個圖 PDF 逐位元組相同」。那只證明 LuaTeX 沒有重新編碼，**完全不管 Chrome 一開始有沒有挑對字型**——上面 ch02 的 `√` 退成 CJK 字型那個真缺陷，在分支版判準下會**靜默通過**（它確實是從圖 PDF 原封帶進來的）。main 的具名白名單擋得住，分支版擋不住。故合併時 `check_glyphs.py` 整檔取 main，`make_dist.py` 的字形閘呼叫也還原成單參數形式。
 
-## 6. 四閘現況（2026-07-26，全綠）
+**合併後實測**：ch06 的 WebCM 走 main 的 glyf 路徑**真的比對了輪廓**——字形閘由「504 驗過 ＋ 1 未驗 pass-through」變成 **507 個全數驗過、零 fallback**。
+
+## 6. 四閘現況（2026-07-26 合併 main 後重跑，全綠）
 
 | 閘 | 結果 |
 |---|---|
 | 1 編譯 | **PASS**：`chapter6.pdf` **28 頁**、0 error、0 missing character |
-| 3 完整性（`check_prose.py`） | **PASS**：11 處 `pdftotext` 抽取假象（逐條確認內容在），**0 處真落差** |
+| 3 完整性（`check_prose.py`） | **PASS**：9 處 `pdftotext` 抽取假象（逐條確認內容在），**0 處真落差**（分支上為 11 處；main 的抽取假象偵測更準） |
 | 3b 表格 | **略過**：本章無 `table.tbl` |
 | 3c 圖內文字 | **PASS**：6 條 panel note 全數抵達 PDF（`riemann-lr-x2` 的 Left／Right endpoints、`refinement-rn-x2` 的 n=4／8／16、`accumulation-sliver` 的 "The strip is drawn wide — not to scale."） |
-| 4 字形（`check_glyphs.py`） | **PASS**：**504** 個嵌入字形的輪廓全數符合其 CID；另 **1** 個圖內字型逐位元組 pass-through（見 §5） |
+| 4 字形（`check_glyphs.py`） | **PASS**：**507** 個嵌入字形的輪廓全數符合其 CID，**零未驗、零 fallback**（含圖內的 WebCM，走 main 的 glyf 路徑；見 §5） |
 
 **成品**：`dist/ch06/` ＝ `chapter6.tex` ＋ `chapter6.pdf`（恰兩檔）。
 

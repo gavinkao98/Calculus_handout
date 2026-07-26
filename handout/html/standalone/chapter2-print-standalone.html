@@ -413,7 +413,7 @@ window.MathJax = {
     <h1 class="ch-title">Derivatives</h1>
   </header>
 
-  <p class="lead">The limit machinery of Chapter 1 was developed in part to make precise the idea of a function approaching a value as its input approaches some target. The principal payoff of that machinery, and the subject of this chapter, is the <em>derivative</em>: an operator that takes a function and returns another function describing how fast it is changing. Geometrically the derivative gives the slope of the tangent line at each point of a curve; physically it gives the instantaneous rate of change of a quantity that varies in time; algebraically it satisfies a small set of arithmetic rules that turn differentiation into a procedure rather than a per-problem invention. We meet the derivative first at a single point, as a limit of secant slopes, then as a function in its own right. A subtler point comes next: its existence at a point implies continuity, but continuity does not imply it. Finally we treat it as an operator we can compute on polynomials, on the natural exponential, and on products and quotients of differentiable functions.</p>
+  <p class="lead">The limit machinery of Chapter 1 was developed in part to make precise the idea of a function approaching a value as its input approaches some target. The main use of those limit methods, and the subject of this chapter, is the <em>derivative</em>: an operator that takes a function and returns another function describing how fast it is changing. Geometrically the derivative gives the slope of the tangent line at each point of a curve; physically it gives the instantaneous rate of change of a quantity that varies in time; algebraically it satisfies a small set of arithmetic rules that turn differentiation into a procedure rather than a per-problem invention. We meet the derivative first at a single point, as a limit of secant slopes, then as a function in its own right. A subtler point comes next: its existence at a point implies continuity, but continuity does not imply it. Finally we treat it as an operator we can compute on polynomials, on the natural exponential, and on products and quotients of differentiable functions.</p>
 
   <p class="para-head">By the end of this chapter, you will be able to:</p>
   <ul>
@@ -432,12 +432,12 @@ window.MathJax = {
   </header>
 
   <!-- expansion:application — tangent-as-approximation anchor to open the section -->
-  <p>Suppose you need a quick estimate of \(\sqrt{4.01}\) without a calculator. The function \(f(x) = \sqrt{x}\) passes through the convenient point \((4, 2)\), and near that point the curve is almost straight — so a well-chosen line through \((4, 2)\) should give a good approximation. But which line? The answer is the <em>tangent line</em>: intuitively, the line that grazes the curve at that point, matching its direction. To pin down this line we need to determine its slope, and that quest leads directly to the central idea of differential calculus.</p>
+  <p>Suppose you need a quick estimate of \(\sqrt{4.01}\) without a calculator. The function \(f(x) = \sqrt{x}\) passes through the convenient point \((4, 2)\), and near that point the curve is almost straight, so a well-chosen line through \((4, 2)\) should give a good approximation. But which line? The answer is the <em>tangent line</em>: intuitively, the line through that point whose direction matches the curve there. To pin down this line we need to determine its slope, and that quest leads directly to the central idea of differential calculus.</p>
 
   <!-- expansion:intuition — "why can't we just measure the slope?" collision -->
   <h3 class="subsec-head">The problem with tangent lines</h3>
 
-  <p>Given a curve \(y = f(x)\) and a point \(P = (a,\, f(a))\) on it, we want the tangent line at \(P\). Since the line passes through \(P\), all we need is its slope. For a line through <em>two</em> points the slope is the familiar rise-over-run ratio — but for the tangent line at \(P\) we start with only the single point \(P\) itself. With no second point there is no rise and no run; trying to compute “slope \(= (f(a) - f(a))/(a - a)\)” gives the meaningless expression \(0/0\). We need a different strategy.</p>
+  <p>Given a curve \(y = f(x)\) and a point \(P = (a,\, f(a))\) on it, we want the tangent line at \(P\). Since the line passes through \(P\), all we need is its slope. For a line through <em>two</em> points the slope is the familiar rise-over-run ratio, but for the tangent line at \(P\) we start with only the single point \(P\) itself. With no second point there is no rise and no run; trying to compute “slope \(= (f(a) - f(a))/(a - a)\)” gives the meaningless expression \(0/0\). We need a different strategy.</p>
 
   <h3 class="subsec-head">Secant lines and the limiting slope</h3>
 
@@ -473,7 +473,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>A common slip is to read the numerator \(f(a + h) - f(a)\) as \(f(h)\). The symbol \(h\) is an <em>increment</em> — a small step away from the base point \(a\) — not an input in its own right. When you expand the difference quotient, substitute \(a + h\) into the function, writing \(f(a + h)\); never replace it with \(f(h)\) alone.</p>
+      <p>A common slip is to read the numerator \(f(a + h) - f(a)\) as \(f(h)\). The symbol \(h\) is an <em>increment</em>, a small step away from the base point \(a\). It is not an input in its own right. When you expand the difference quotient, substitute \(a + h\) into the function, writing \(f(a + h)\); never replace it with \(f(h)\) alone.</p>
     </div>
   </section>
 
@@ -487,13 +487,13 @@ window.MathJax = {
 
   <p>\[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]</p>
 
-  <p>For now, \(f'(a)\) is simply a number — the slope of one tangent line at one specific point. In §2.2 we will let \(a\) vary and study \(f'\) as a function in its own right.</p>
+  <p>For now, \(f'(a)\) is simply a number, the slope of one tangent line at one specific point. In §2.2 we will let \(a\) vary and study \(f'\) as a function in its own right.</p>
 
   <!-- expansion:intuition — expand the seed's one-line zoom-in remark into local linearity -->
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.1</span><span class="env-name">Local linearity</span></p>
     <div class="env-body">
-      <p>If you zoom in on the curve at \(P\), the curve looks increasingly like a straight line — the tangent line. In other words, near \(P\) the function \(f\) behaves almost like the linear function \(f(a) + f'(a)(x - a)\). This is the principle of <em>local linearity</em>: a differentiable curve can be approximated by its tangent line near the point of tangency. The closer \(x\) is to \(a\), the better the approximation. We will return to this idea at the end of the section.</p>
+      <p>If you zoom in on the curve at \(P\), the curve looks increasingly like a straight line, namely the tangent line. In other words, near \(P\) the function \(f\) behaves almost like the linear function \(f(a) + f'(a)(x - a)\). This is the principle of <em>local linearity</em>: a differentiable curve can be approximated by its tangent line near the point of tangency. The closer \(x\) is to \(a\), the better the approximation. We will return to this idea at the end of the section.</p>
     </div>
   </section>
 
@@ -598,7 +598,7 @@ window.MathJax = {
             <tbody><tr><td class="rowlab">secant slope \(\,2 + h\)</td><td>\(2.5\)</td><td>\(2.1\)</td><td>\(2.01\)</td></tr></tbody>
           </table>
         </div>
-        <p>The secant slopes march toward \(2\), and indeed \(\lim_{h \to 0}(2 + h) = 2\). The tangent slope at \(P\) is therefore \(2\) — the value the secants converge to, exactly the rotation of secants into the tangent pictured in Figure 2.1.</p>
+        <p>The secant slopes march toward \(2\), and indeed \(\lim_{h \to 0}(2 + h) = 2\). The tangent slope at \(P\) is therefore \(2\), the value the secant slopes converge to. Figure 2.1 shows the same convergence geometrically, with the secant lines rotating into the tangent.</p>
       </div>
     </section>
   </div>
@@ -616,7 +616,7 @@ window.MathJax = {
       <div class="env-body">
         <p>First find the slope at \(x = 2\). With \(f(x) = 1/x\),
         \[ f'(2) = \lim_{h \to 0} \frac{\dfrac{1}{2 + h} - \dfrac{1}{2}}{h} = \lim_{h \to 0} \frac{-1}{2(2 + h)} = -\frac{1}{4}, \]
-        so the tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\) is \(y = \tfrac{1}{2} - \tfrac{1}{4}(x - 2)\). Near \(x = 2\) the curve hugs this line (local linearity, Remark 2.1), so substituting \(x = 2.05\) gives</p>
+        so the tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\) is \(y = \tfrac{1}{2} - \tfrac{1}{4}(x - 2)\). Near \(x = 2\) the curve stays close to this line (local linearity, Remark 2.1), so substituting \(x = 2.05\) gives</p>
         <p>\[ \frac{1}{2.05} \;\approx\; \tfrac{1}{2} - \tfrac{1}{4}(0.05) = 0.5 - 0.0125 = 0.4875. \]</p>
         <p>A calculator gives \(1/2.05 = 0.48780\ldots\), so the estimate is accurate to three decimal places.</p>
 
@@ -635,12 +635,12 @@ window.MathJax = {
       \[ f'(4) = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} = \frac{1}{4} \]
       (the same conjugate technique as Example 2.3), so the tangent line is \(y = 2 + \tfrac{1}{4}(x - 4) = \tfrac{1}{4}x + 1\). Substituting \(x = 4.01\) gives
       \[ \sqrt{4.01} \;\approx\; \tfrac{1}{4}(4.01) + 1 = 2.0025. \]
-      A calculator confirms \(\sqrt{4.01} = 2.00249844\ldots\), so the tangent-line estimate is accurate to four decimal places. This is the tangent-line approximation of Example 2.5 — the principle of local linearity (Remark 2.1) — applied to the question we opened the section with.</p>
+      A calculator confirms \(\sqrt{4.01} = 2.00249844\ldots\), so the tangent-line estimate is accurate to four decimal places. This is the tangent-line approximation of Example 2.5, applied to the question that opened the section. It is the principle of local linearity (Remark 2.1) used for a numerical estimate.</p>
     </div>
   </section>
 
   <!-- expansion:application — the tangent line as linearization, used throughout applied mathematics [pass: enrichment] -->
-  <p>The move we just made — replacing a curve by its tangent line over a small range — is used throughout applied science and engineering, where it is called <em>linearization</em>. A navigation system linearizes the equations relating its position to satellite distances; a physicist replaces \(\sin\theta\) by \(\theta\) for the small swings of a pendulum; an economist treats a marginal cost as the slope of a cost curve. Each time, a hard curved problem is traded, near a point of interest, for an easy straight-line one — the practical payoff of local linearity.</p>
+  <p>Replacing a curve by its tangent line over a small range is used throughout applied science and engineering, where it is called <em>linearization</em>. A navigation system linearizes the equations relating its position to satellite distances; a physicist replaces \(\sin\theta\) by \(\theta\) for the small swings of a pendulum; an economist treats a marginal cost as the slope of a cost curve. In each case, a hard curved problem is replaced near a point of interest by an easy straight-line one. That is the practical value of local linearity.</p>
 
   <!-- expansion:summary — forward-ref to §2.2 -->
   <p>In the next section we turn the slope formula into a <em>function</em>: instead of computing the tangent slope at one fixed point \(a\), we let \(a\) vary and obtain a new function \(f'(x)\) that records the slope at every point where the limit exists.</p>
@@ -666,28 +666,28 @@ window.MathJax = {
   </header>
 
   <!-- expansion:application — velocity-as-a-function anchor to open the section -->
-  <p>Imagine a car moving along a straight road, its position at time \(t\) recorded as \(s(t)\). Over the short interval from \(t\) to \(t + h\), the car’s <em>average</em> velocity is the change in position divided by the elapsed time, \(\bigl(s(t+h) - s(t)\bigr)/h\) — exactly the difference quotient of §2.1. Letting \(h \to 0\) gives the <em>instantaneous</em> velocity at the single instant \(t\). But we rarely care about one instant in isolation; we want to know the velocity at <em>every</em> instant — that is, we want velocity as a <em>function</em> of time. Making this shift, from the derivative at one point to the derivative as a function, is the work of this section.</p>
+  <p>Imagine a car moving along a straight road, its position at time \(t\) recorded as \(s(t)\). Over the short interval from \(t\) to \(t + h\), the car’s <em>average</em> velocity is the change in position divided by the elapsed time: \(\bigl(s(t+h) - s(t)\bigr)/h\), exactly the difference quotient of §2.1. Letting \(h \to 0\) gives the <em>instantaneous</em> velocity at the single instant \(t\). But we rarely care about one instant in isolation. We want to know the velocity at <em>every</em> instant, which means treating velocity as a <em>function</em> of time. Making this shift, from the derivative at one point to the derivative as a function, is the work of this section.</p>
 
   <h3 class="subsec-head">From a number to a function</h3>
 
   <!-- expansion:intuition — load-bearing collision: point-by-point is endless; keep the point symbolic -->
-  <p>In §2.1 we fixed a point \(a\) and computed the derivative \(f'(a)\), a single number recording the slope of the tangent line — equivalently, the instantaneous rate of change of \(f\) — at that one point. To find the slope at a <em>different</em> point we would have to run the entire limit again, and to know the slope at <em>every</em> point we would have to repeat the computation infinitely many times. Worse, a table of separate values \(f'(2),\, f'(3),\, f'(\tfrac{7}{2}),\, \ldots\) never reveals the underlying <em>pattern</em>.</p>
+  <p>In §2.1 we fixed a point \(a\) and computed the derivative \(f'(a)\), a single number recording the slope of the tangent line at that one point, or equivalently the instantaneous rate of change of \(f\) there. To find the slope at a <em>different</em> point we would have to run the entire limit again, and to know the slope at <em>every</em> point we would have to repeat the computation infinitely many times. Worse, a table of separate values \(f'(2),\, f'(3),\, f'(\tfrac{7}{2}),\, \ldots\) never reveals the underlying <em>pattern</em>.</p>
 
-  <p>There is a far better way. Instead of substituting a specific number for the point, we leave it <em>symbolic</em> — call it \(x\) — and carry out the limit just once. The outcome is no longer a single number but a formula in \(x\): a brand-new function that returns the slope at every point at once. This function is called the <em>derivative of \(f\)</em>.</p>
+  <p>There is a far better way. Instead of substituting a specific number for the point, we keep the point <em>symbolic</em> and call it \(x\). Then we carry out the limit just once. The outcome is no longer a single number but a formula in \(x\): a brand-new function that returns the slope at every point at once. This function is called the <em>derivative of \(f\)</em>.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">2.2</span><span class="env-name">The derivative as a function</span></p>
     <div class="env-body">
       <p>Let \(f\) be a function. The <em>derivative of \(f\)</em> is the function \(f'\) defined by
       \[ f'(x) \;=\; \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}, \]
-      whose domain is the set of all \(x\) for which this limit exists. The value \(f'(x)\) is the slope of the tangent line to \(y = f(x)\) at \(\bigl(x,\, f(x)\bigr)\) — equivalently, the instantaneous rate of change of \(f\) at \(x\).</p>
+      whose domain is the set of all \(x\) for which this limit exists. The value \(f'(x)\) is the slope of the tangent line to \(y = f(x)\) at \(\bigl(x,\, f(x)\bigr)\). Equivalently, it is the instantaneous rate of change of \(f\) at \(x\).</p>
       <!-- expansion:intuition — "slope machine" informal gloss -->
       <p class="informal">Informally, \(f'\) is the “slope machine” of \(f\): feed it any input \(x\), and it returns the slope of \(f\) there.</p>
     </div>
   </section>
 
   <!-- expansion:intuition — the x→a form was established in §2.1; recall it, don't reprove -->
-  <p>This is the same limit we met in §2.1: the substitution \(x = a + h\) turns it into \(\lim_{x \to a}\bigl(f(x) - f(a)\bigr)/(x - a)\) with the fixed point renamed. The \(h\)-form above is usually the more convenient one to compute with, and the recipe is the same one we used at a single point — only now the point stays symbolic.</p>
+  <p>This is the same limit we met in §2.1: the substitution \(x = a + h\) turns it into \(\lim_{x \to a}\bigl(f(x) - f(a)\bigr)/(x - a)\) with the fixed point renamed. The \(h\)-form above is usually the more convenient one to compute with. The recipe is the same one we used at a single point, except that the point now stays symbolic.</p>
 
   <!-- expansion:strategy — ROADMAP places the 3-step limit-definition procedure in §2.2 -->
   <section class="env env-strategy">
@@ -698,7 +698,7 @@ window.MathJax = {
         <li>Simplify the quotient algebraically — by expanding, rationalizing, or combining fractions — until the \(h\) that makes the denominator vanish cancels.</li>
         <li>Evaluate the limit as \(h \to 0\) in the simplified expression.</li>
       </ol>
-      <p>These are the same three steps we used at a fixed point in §2.1; the only change is that \(x\) now stays symbolic, so the answer emerges as a function rather than a number. The algebra in step 2 takes a different form for each function — expansion, conjugates, common denominators — but its job is always to clear the \(0/0\); for the polynomial, root, and rational functions of this chapter a factor of \(h\) always cancels and leaves a limit we can evaluate.</p>
+      <p>These are the same three steps we used at a fixed point in §2.1; the only change is that \(x\) now stays symbolic, so the answer emerges as a function rather than a number. The algebra in step 2 takes a different form for each function (expansion, conjugates, common denominators), but its job is always to clear the \(0/0\). For the polynomial, root, and rational functions of this chapter, a factor of \(h\) always cancels and leaves a limit we can evaluate.</p>
     </div>
   </section>
 
@@ -721,7 +721,7 @@ window.MathJax = {
         \end{aligned} \]</p>
         <p>Hence
         \[ f'(x) = \lim_{h \to 0} (2x + h + 4) = 2x + 4. \]
-        Nothing in this computation relied on \(x\) being any particular number, so the single formula \(f'(x) = 2x + 4\) delivers the slope at every point: for instance \(f'(0) = 4\), while \(f'(-2) = 0\), signalling a horizontal tangent at \(x = -2\).</p>
+        Nothing in this computation relied on \(x\) being any particular number, so the single formula \(f'(x) = 2x + 4\) gives the slope at every point: for instance \(f'(0) = 4\), while \(f'(-2) = 0\), signalling a horizontal tangent at \(x = -2\).</p>
       </div>
     </section>
   </div>
@@ -746,7 +746,7 @@ window.MathJax = {
         \end{aligned} \]</p>
         <p>The denominator no longer vanishes as \(h \to 0\), so
         \[ f'(x) = \lim_{h \to 0} \frac{1}{\sqrt{x + h} + \sqrt{x}} = \frac{1}{2\sqrt{x}}. \]
-        As a check, at \(x = 4\) this gives \(f'(4) = 1/(2 \cdot 2) = \tfrac{1}{4}\) — precisely the slope we found for \(\sqrt{x}\) at \((4, 2)\) in §2.1 (Remark 2.2). The function \(f'(x) = 1/(2\sqrt{x})\) packages that slope, and the slope at every other positive \(x\), into one formula.</p>
+        As a check, at \(x = 4\) this gives \(f'(4) = 1/(2 \cdot 2) = \tfrac{1}{4}\), precisely the slope we found for \(\sqrt{x}\) at \((4, 2)\) in §2.1 (Remark 2.2). The function \(f'(x) = 1/(2\sqrt{x})\) packages that slope, and the slope at every other positive \(x\), into one formula.</p>
       </div>
     </section>
   </div>
@@ -772,7 +772,7 @@ window.MathJax = {
         \end{aligned} \]</p>
         <p>Letting \(h \to 0\),
         \[ f'(x) = \lim_{h \to 0} \frac{-1}{x(x + h)} = -\frac{1}{x^{2}}. \]
-        The manipulation is new — clear the fractions, then cancel the \(h\) — yet the three-step pattern is unchanged, and the result \(f'(x) = -1/x^{2}\) is once more a function, defined for all \(x \ne 0\). We will recover it in one line from the power and quotient rules of §2.4–§2.5.</p>
+        The manipulation is new. We clear the fractions, then cancel the \(h\). Yet the three-step pattern is unchanged, and the result \(f'(x) = -1/x^{2}\) is once more a function, defined for all \(x \ne 0\). We will recover it in one line from the power and quotient rules of §2.4–§2.5.</p>
       </div>
     </section>
   </div>
@@ -781,7 +781,7 @@ window.MathJax = {
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.3</span><span class="env-name">The domain of \(f'\)</span></p>
     <div class="env-body">
-      <p>Being a function in its own right, \(f'\) has its own domain, which may be <em>smaller</em> than that of \(f\). Although Example 2.7 worked with \(x > 0\), the square-root function is defined for all \(x \ge 0\), whereas its derivative \(f'(x) = 1/(2\sqrt{x})\) is defined only for \(x > 0\) — so the domain of \(f'\) can be a proper subset of the domain of \(f\). Precisely when a derivative fails to exist is taken up in §2.3.</p>
+      <p>Being a function in its own right, \(f'\) has its own domain, which may be <em>smaller</em> than that of \(f\). Although Example 2.7 worked with \(x > 0\), the square-root function is defined for all \(x \ge 0\), whereas its derivative \(f'(x) = 1/(2\sqrt{x})\) is defined only for \(x > 0\). The domain of \(f'\) can therefore be a proper subset of the domain of \(f\). Precisely when a derivative fails to exist is taken up in §2.3.</p>
     </div>
   </section>
 
@@ -798,7 +798,7 @@ window.MathJax = {
       <div class="env-body">
         <p>The slope of the tangent at \(x\) is the value of the derivative there, and from Example 2.6 we already have the derivative function \(f'(x) = 2x + 4\). We therefore want the input \(x\) at which</p>
         <p>\[ f'(x) = 2 \quad\Longrightarrow\quad 2x + 4 = 2 \quad\Longrightarrow\quad x = -1. \]</p>
-        <p>The point on the curve is \(\bigl(-1,\, f(-1)\bigr) = (-1,\, -5)\). Note the change of viewpoint: we did not compute a derivative here — we already had \(f'\) as a function and <em>solved</em> it for the input producing a prescribed slope. Being able to run \(f'\) forward (input \(\to\) slope) and backward (slope \(\to\) input) is precisely what having the derivative as a function buys us.</p>
+        <p>The point on the curve is \(\bigl(-1,\, f(-1)\bigr) = (-1,\, -5)\). Note the change of viewpoint: we did not compute a derivative here. We already had \(f'\) as a function and <em>solved</em> it for the input producing a prescribed slope. Having the derivative as a function is what lets us run \(f'\) both ways, forward (input \(\to\) slope) and backward (slope \(\to\) input).</p>
       </div>
     </section>
   </div>
@@ -810,13 +810,13 @@ window.MathJax = {
 
   <p>\[ f'(x) \;=\; y' \;=\; \frac{dy}{dx} \;=\; \frac{df}{dx} \;=\; \frac{d}{dx}\,f(x), \]</p>
 
-  <p>the last three being <em>Leibniz notation</em>. Here \(\dfrac{d}{dx}\) is an <em>operator</em> — it acts on a function and returns its derivative — and the symbol deliberately echoes the difference quotient \(\Delta y / \Delta x\), which becomes \(dy/dx\) as the increment \(\Delta x\) (our \(h\)) shrinks to zero. Leibniz notation has the merit of displaying the variable we differentiate with respect to, which becomes valuable once a problem involves more than one variable; prime notation is lighter when the variable is understood. We will use whichever is clearer, and we state the rules of the coming sections most often with \(\dfrac{d}{dx}\). Thus the two results above may equally be written \(\dfrac{d}{dx}(x^{2} + 4x - 2) = 2x + 4\) and \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\).</p>
+  <p>the last three being <em>Leibniz notation</em>. Here \(\dfrac{d}{dx}\) is an <em>operator</em>, meaning that it acts on a function and returns its derivative. The notation is chosen to recall the difference quotient \(\Delta y / \Delta x\), which becomes \(dy/dx\) as the increment \(\Delta x\) (our \(h\)) shrinks to zero. Leibniz notation has the merit of displaying the variable we differentiate with respect to, which becomes valuable once a problem involves more than one variable; prime notation is lighter when the variable is understood. We will use whichever is clearer, and we state the rules of the coming sections most often with \(\dfrac{d}{dx}\). Thus the two results above may equally be written \(\dfrac{d}{dx}(x^{2} + 4x - 2) = 2x + 4\) and \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\).</p>
 
   <!-- expansion:caution — dy/dx is one symbol for the derivative, not a fraction to split or cancel [pass: enrichment] -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>The symbol \(\dfrac{dy}{dx}\) names the derivative as a single object; it is <em>not</em> a fraction with numerator \(dy\) and denominator \(dx\). On its own, neither \(dy\) nor \(dx\) has been given a separate meaning here, so the pieces cannot be cancelled or cross-multiplied the way the parts of an ordinary fraction can. The notation is deliberately suggestive — it remembers that the derivative grew out of the quotient \(\Delta y / \Delta x\) — but until those parts are defined on their own (which we do not do in this book), read \(dy/dx\) as one indivisible name for \(f'(x)\).</p>
+      <p>The symbol \(\dfrac{dy}{dx}\) names the derivative as a single object; it is <em>not</em> a fraction with numerator \(dy\) and denominator \(dx\). On its own, neither \(dy\) nor \(dx\) has been given a separate meaning here, so the pieces cannot be cancelled or cross-multiplied the way the parts of an ordinary fraction can. The notation was chosen to reflect that the derivative is defined as the limit of the quotient \(\Delta y / \Delta x\). But until those parts are defined on their own (which we do not do in this book), read \(dy/dx\) as one indivisible name for \(f'(x)\).</p>
     </div>
   </section>
 
@@ -828,7 +828,7 @@ window.MathJax = {
   </figure>
 
   <!-- expansion:intuition — the sign-correspondence reading principle -->
-  <p>Drawing a derivative as a function in its own right exposes a vivid link between the graphs of \(f\) and \(f'\). Figure 2.4 places the parabola \(f(x) = x^{2} + 4x - 2\) of Example 2.6 directly above its derivative \(f'(x) = 2x + 4\). Since \(f'(x)\) is by definition the <em>slope of the tangent line</em> at \(x\), we can read its sign straight off the graph of \(f\):</p>
+  <p>Drawing a derivative as a function in its own right shows a direct link between the graphs of \(f\) and \(f'\). Figure 2.4 places the parabola \(f(x) = x^{2} + 4x - 2\) of Example 2.6 directly above its derivative \(f'(x) = 2x + 4\). Since \(f'(x)\) is by definition the <em>slope of the tangent line</em> at \(x\), we can read its sign straight off the graph of \(f\):</p>
 
   <ul>
     <li>where the tangent line slopes upward, \(f' > 0\);</li>
@@ -849,7 +849,7 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Reading the top graph: \(f\) falls until \(x = -2\), so its tangents slope downward and \(f' < 0\) there; the curve is momentarily flat at its lowest point \(x = -2\), so \(f'(-2) = 0\); and \(f\) rises for \(x > -2\), so \(f' > 0\). Uncovering the lower panel confirms it exactly — the line \(f'(x) = 2x + 4\) lies below the axis for \(x < -2\), crosses zero at \(x = -2\), and lies above it for \(x > -2\). We recovered the sign of \(f'\) everywhere from the <em>shape</em> of \(f\) alone.</p>
+        <p>Reading the top graph: \(f\) falls until \(x = -2\), so its tangents slope downward and \(f' < 0\) there; the curve is momentarily flat at its lowest point \(x = -2\), so \(f'(-2) = 0\); and \(f\) rises for \(x > -2\), so \(f' > 0\). Uncovering the lower panel confirms it exactly. The line \(f'(x) = 2x + 4\) lies below the axis for \(x < -2\), crosses zero at \(x = -2\), and lies above it for \(x > -2\). We recovered the sign of \(f'\) everywhere from the <em>shape</em> of \(f\) alone.</p>
       </div>
     </section>
   </div>
@@ -858,15 +858,15 @@ window.MathJax = {
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.4</span><span class="env-name">Derivative as rate of change</span></p>
     <div class="env-body">
-      <p>Return to the moving car of the opening. If \(s(t)\) is its position, the derivative function \(s'(t)\) is its <em>velocity</em> \(v(t)\) at every time \(t\). The slope reading and the rate-of-change reading are two faces of the same limit: \(f'(x)\) measures how fast the output of \(f\) changes per unit change in the input — whether that output is read as a height (slope) or a position (velocity). This is why the derivative function is one of the central objects of calculus: it turns any varying quantity into a record of how fast it varies.</p>
+      <p>Return to the moving car of the opening. If \(s(t)\) is its position, the derivative function \(s'(t)\) is its <em>velocity</em> \(v(t)\) at every time \(t\). The slope interpretation and the rate-of-change interpretation are two ways of reading the same limit: \(f'(x)\) measures how fast the output of \(f\) changes per unit change in the input, whether that output is read as a height (slope) or a position (velocity). This is why the derivative function is one of the central objects of calculus: it turns any varying quantity into a record of how fast it varies.</p>
     </div>
   </section>
 
   <!-- expansion:application — rate of change beyond velocity: acceleration, population growth, marginal cost [pass: enrichment] [source: CLP-1 §2.4 population-growth example; marginal cost standard] -->
-  <p>Velocity is only the most familiar of these rates. Whenever one quantity depends on another, the derivative measures a rate of change with its own meaning. If \(s(t)\) is position, the derivative of the velocity \(s'(t)\) is the <em>acceleration</em> \(s''(t)\), the rate at which velocity itself changes — a second derivative we take up in §2.3. If \(P(t)\) is the size of a population, then \(P'(t)\) is its growth rate, in individuals per unit time. If \(C(q)\) is the cost of producing \(q\) units of a good, then \(C'(q)\) is the <em>marginal cost</em>, the added cost of producing one more unit. One limit, read in different settings, becomes a velocity, an acceleration, a growth rate, or a marginal cost.</p>
+  <p>Velocity is only the most familiar of these rates. Whenever one quantity depends on another, the derivative measures a rate of change with its own meaning. If \(s(t)\) is position, the derivative of the velocity \(s'(t)\) is the <em>acceleration</em> \(s''(t)\), the rate at which velocity itself changes. This is a second derivative, taken up in §2.3. If \(P(t)\) is the size of a population, then \(P'(t)\) is its growth rate, in individuals per unit time. If \(C(q)\) is the cost of producing \(q\) units of a good, then \(C'(q)\) is the <em>marginal cost</em>, the added cost of producing one more unit. One limit, read in different settings, becomes a velocity, an acceleration, a growth rate, or a marginal cost.</p>
 
   <!-- expansion:summary — forward-ref to §2.3 -->
-  <p>Throughout this section we assumed the defining limit exists. It need not: at some points a function may have no well-defined slope at all. In the next section we ask precisely when \(f'\) exists — the question of <em>differentiability</em> — uncover its close tie to continuity, and form the derivative of a derivative.</p>
+  <p>Throughout this section we assumed the defining limit exists. It need not: at some points a function may have no well-defined slope at all. In the next section we ask precisely when \(f'\) exists, the question of <em>differentiability</em>. We also uncover its close tie to continuity and form the derivative of a derivative.</p>
 
 </article>
 </template>
@@ -893,7 +893,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — motivation: §2.2 assumed the limit always exists; it need not -->
-  <p>Throughout §2.2 we freely computed \(f'(x)\) by taking the limit of the difference quotient — but we never stopped to ask whether that limit <em>exists</em>. For the polynomial, root, and rational functions we worked with, it always did, and we might be tempted to believe that every function has a derivative at every point of its domain. This section shows that the temptation is wrong: at certain points the limit can fail, and recognizing those failures is an essential part of understanding what the derivative means. Along the way we prove the first theorem of the chapter — differentiability guarantees continuity — and extend the derivative idea to second, third, and higher orders.</p>
+  <p>Throughout §2.2 we freely computed \(f'(x)\) by taking the limit of the difference quotient, but we never stopped to ask whether that limit <em>exists</em>. For the polynomial, root, and rational functions we worked with, it always did, and we might be tempted to believe that every function has a derivative at every point of its domain. This section shows that the temptation is wrong: at certain points the limit can fail, and recognizing those failures is an essential part of understanding what the derivative means. Along the way we prove the first theorem of the chapter, which says that differentiability guarantees continuity. We also extend the derivative idea to second, third, and higher orders.</p>
 
   <h3 class="subsec-head">When does the derivative exist?</h3>
 
@@ -903,11 +903,11 @@ window.MathJax = {
       <p>A function \(f\) is <em>differentiable at \(a\)</em> if the limit
       \[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} \]
       exists (as a finite number). We say \(f\) is <em>differentiable on an open interval \((a, b)\)</em> if it is differentiable at every point of that interval.</p>
-      <p class="informal">Informally, differentiability at a point means the graph has a single, well-defined tangent direction there — no sharp corner, no vertical spike, and no break.</p>
+      <p class="informal">Informally, differentiability at a point means the graph has a single, well-defined tangent direction there, with no sharp corner, no vertical spike, and no break.</p>
     </div>
   </section>
 
-  <p>The definition asks exactly what we have been computing: can the difference quotient settle on a single value as \(h \to 0\)? When it can, the function is differentiable and the derivative equals that value. When it cannot — because the left-hand and right-hand limits disagree, or because the quotient blows up — the function is <em>not</em> differentiable at that point. The simplest failure mode is a corner.</p>
+  <p>The definition requires exactly what we have been computing: does the difference quotient approach one finite value as \(h \to 0\)? When it can, the function is differentiable and the derivative equals that value. When it cannot, the function is <em>not</em> differentiable at that point. This can happen when the left-hand and right-hand limits disagree or when the quotient grows without bound. The simplest failure mode is a corner.</p>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -935,7 +935,7 @@ window.MathJax = {
     </section>
   </div>
 
-  <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.5). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line — exactly the geometric meaning of non-differentiability.</p>
+  <p>Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.5). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line. That is exactly the geometric meaning of non-differentiability.</p>
 
   <!-- expansion:example — a second failure mode distinct from the corner: a vertical tangent, where the difference quotient is unbounded [source: CLP-1 §2.2 prob_s2.2 vertical-tangent remark + standard textbook example; solution authored] -->
   <div class="workedexample">
@@ -950,10 +950,10 @@ window.MathJax = {
       <div class="env-body">
         <p>We form the difference quotient at \(a = 0\):</p>
         <p>\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{h^{1/3} - 0}{h} \;=\; \frac{1}{h^{2/3}}. \]</p>
-        <p>Since \(h^{2/3} = \bigl(h^{1/3}\bigr)^{2} > 0\) for all \(h \ne 0\) — a cube root squared is positive whatever the sign of \(h\) — the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
+        <p>For every \(h \ne 0\), \(h^{2/3} = \bigl(h^{1/3}\bigr)^{2} > 0\), because the square of a nonzero cube root is positive whatever the sign of \(h\). Therefore the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so</p>
         <p>\[ \lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty. \]</p>
         <p>The limit does not exist as a <em>finite</em> number, so by Definition 2.3 the function is not differentiable at \(x = 0\).</p>
-        <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)); here both one-sided limits agree — they both tend to \(+\infty\) — so there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative demands a finite limit, so differentiability fails here for a different reason than at a corner.</p>
+        <p>Notice the contrast with Example 2.11. There the two one-sided limits existed but <em>disagreed</em> (\(+1\) versus \(-1\)). Here both one-sided limits tend to \(+\infty\), so they agree and there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a <em>vertical tangent</em> at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative requires a finite limit, so differentiability fails here for a different reason than at a corner.</p>
 
         <!-- expansion:figure — ∛x vertical tangent: the non-corner differentiability failure of Example 2.12 (figure-opportunity F-2.3-A) [pass: enrichment] -->
         <figure class="figure" data-fig="cbrt-vertical-tangent">
@@ -993,7 +993,7 @@ window.MathJax = {
   </section>
 
   <!-- expansion:intuition — the picture behind Theorem 2.1: a single tangent direction leaves no room to jump [pass: enrichment] -->
-  <p>The proof is short, but the picture behind it is worth keeping. To be differentiable at \(a\) is to have one definite tangent direction there, and a curve smooth enough to settle on a single tangent has no room to jump — so differentiability forces continuity. The converse fails because continuity asks far less: it only forbids breaks, and an unbroken curve is still free to have a sharp corner, where no single tangent direction exists.</p>
+  <p>The proof is short, but the picture behind it is worth keeping. If \(f\) is differentiable at \(a\), its difference quotient approaches one finite value, so the tangent line has a finite slope. A jump or any other discontinuity prevents such a finite limit, so differentiability implies continuity. The converse fails because continuity asks far less: it only forbids breaks, and an unbroken curve is still free to have a sharp corner or a vertical tangent. In neither case does the difference quotient approach one finite value.</p>
 
   <figure class="figure" id="fig-diff-cont">
     <div class="figure-art">
@@ -1002,7 +1002,10 @@ window.MathJax = {
         <ellipse cx="175" cy="105" rx="170" ry="88" fill="none" stroke="var(--c-primary)" stroke-width="1.5" stroke-dasharray="6 3"/>
         <ellipse cx="150" cy="108" rx="110" ry="62" fill="var(--c-primary)" fill-opacity="0.08" stroke="var(--c-primary)" stroke-width="1.5"/>
         <text x="150" y="104" text-anchor="middle" fill="var(--ink)" font-size="14" font-weight="500">Differentiable</text>
-        <text x="150" y="124" text-anchor="middle" fill="var(--ink-soft)" font-size="12" font-style="italic">x&#xB2;, &#x221A;x, e&#x02E3;</text>
+        <!-- 數學例示清單走 --serif（＝正文數學同一套 NCM）：Inter 沒有 U+221A，留在 --ui
+             會被瀏覽器退回系統 CJK 字型（Windows 實測退到 Microsoft JhengHei UI），
+             字面不對且換機器會變。2026-07-26 ch02 LaTeX rollout 的字形閘抓到。 -->
+        <text x="150" y="124" text-anchor="middle" fill="var(--ink-soft)" font-size="12" font-style="italic" style="font-family:var(--serif)">x&#xB2;, &#x221A;x, e&#x02E3;</text>
         <text x="175" y="4" text-anchor="middle" fill="var(--ink)" font-size="14" font-weight="500">Continuous</text>
         <text x="300" y="122" text-anchor="middle" fill="var(--c-caution)" font-size="12">|x| at x = 0</text>
       </svg>
@@ -1031,10 +1034,10 @@ window.MathJax = {
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
         <p>Away from \(x = 2\) each piece is a polynomial and therefore differentiable, so the only point in question is \(x = 2\).</p>
-        <p><em>Step 1 — Continuity.</em> By Theorem 2.1, differentiability at \(x = 2\) requires continuity there, which forces the two pieces to meet:</p>
+        <p><em>Step 1: Continuity.</em> By Theorem 2.1, differentiability at \(x = 2\) requires continuity there, which forces the two pieces to meet:</p>
         <p>\[ \lim_{x \to 2^{-}} f(x) = 2^{2} = 4 \quad\text{and}\quad \lim_{x \to 2^{+}} f(x) = 2a + b, \]</p>
         <p>so we need \(2a + b = 4\).</p>
-        <p><em>Step 2 — Matching derivatives.</em> The left-hand derivative at \(x = 2\) uses the \(x^{2}\) branch, whose derivative \(2x\) follows in one line from the difference quotient (the same technique used in §2.2 Example 2.6); it gives slope \(4\) at \(x = 2\). The right-hand derivative uses the \(ax + b\) branch, whose derivative is the constant \(a\) (the slope of that line). For the two-sided limit of the difference quotient to exist, these must agree:</p>
+        <p><em>Step 2: Matching derivatives.</em> The left-hand derivative at \(x = 2\) uses the \(x^{2}\) branch, whose derivative \(2x\) follows in one line from the difference quotient (the same technique used in §2.2 Example 2.6); it gives slope \(4\) at \(x = 2\). The right-hand derivative uses the \(ax + b\) branch, whose derivative is the constant \(a\) (the slope of that line). For the two-sided limit of the difference quotient to exist, these must agree:</p>
         <p>\[ a = 4. \]</p>
         <p>Substituting \(a = 4\) into \(2a + b = 4\) gives \(b = -4\). With \(a = 4\) and \(b = -4\) the two pieces meet smoothly, and the difference quotient at \(x = 2\) has a well-defined limit equal to \(4\).</p>
       </div>
@@ -1043,14 +1046,14 @@ window.MathJax = {
 
   <h3 class="subsec-head">Higher derivatives</h3>
 
-  <p>If \(f\) is differentiable, then its derivative \(f'\) is itself a function — and we can ask whether \(f'\) is differentiable. When it is, the derivative of \(f'\) is called the <em>second derivative</em> of \(f\), written \(f''\). Repeating the process gives the third derivative \(f'''\), the fourth derivative \(f^{(4)}\), and in general the \(n\)-th derivative \(f^{(n)}\):</p>
+  <p>If \(f\) is differentiable, then its derivative \(f'\) is itself a function, and we can ask whether \(f'\) is differentiable. When it is, the derivative of \(f'\) is called the <em>second derivative</em> of \(f\), written \(f''\). Repeating the process gives the third derivative \(f'''\), the fourth derivative \(f^{(4)}\), and in general the \(n\)-th derivative \(f^{(n)}\):</p>
 
   <p>\[ f,\quad f',\quad f'',\quad f''',\quad f^{(4)},\quad \ldots,\quad f^{(n)},\quad \ldots \]</p>
 
   <p>Each is obtained by differentiating the previous one. By convention, \(f^{(0)} = f\) and \(f^{(1)} = f'\).</p>
 
   <!-- expansion:intuition — physical meaning of higher derivatives: acceleration and jerk [pass: enrichment] -->
-  <p>Higher derivatives are more than a formal exercise in differentiating again; the low-order ones carry concrete meaning. If \(s(t)\) is the position of a moving object, the first derivative \(s'(t)\) is its velocity and the second derivative \(s''(t)\) is its <em>acceleration</em> — the rate at which the velocity changes, felt as the push that presses you back when a car speeds up. The third derivative \(s'''(t)\), the rate of change of acceleration, is called the <em>jerk</em>; engineers keep it small when designing elevators and trains so that changes in acceleration come on smoothly rather than as an abrupt lurch.</p>
+  <p>Higher derivatives are more than a formal exercise in differentiating again; the low-order ones carry concrete meaning. If \(s(t)\) is the position of a moving object, the first derivative \(s'(t)\) is its velocity and the second derivative \(s''(t)\) is its <em>acceleration</em>, the rate at which the velocity changes. You feel it as the push that presses you back when a car speeds up. The third derivative \(s'''(t)\), the rate of change of acceleration, is called the <em>jerk</em>; engineers keep it small when designing elevators and trains so that changes in acceleration are gradual rather than abrupt.</p>
 
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">2.5</span><span class="env-name">Higher-derivative notation</span></p>
@@ -1059,7 +1062,7 @@ window.MathJax = {
       <p>\[ f''(x) \;=\; \frac{d^{2}y}{dx^{2}} \;=\; \frac{d^{2}f}{dx^{2}} \;=\; \frac{d^{2}}{dx^{2}}\,f(x), \]</p>
       <p>and in general the \(n\)-th derivative is</p>
       <p>\[ f^{(n)}(x) \;=\; \frac{d^{n}y}{dx^{n}}. \]</p>
-      <p>The superscript in \(d^{n}y/dx^{n}\) is <em>not</em> an exponent — it records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesized form \(f^{(n)}\) avoids a forest of primes.</p>
+      <p>The superscript in \(d^{n}y/dx^{n}\) is <em>not</em> an exponent. It records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesized form \(f^{(n)}\) avoids a long row of primes.</p>
     </div>
   </section>
 
@@ -1067,7 +1070,7 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\), and — as Remark 2.5 noted — the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\). The \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\); it does not mean \(d(x^{2})\), where the \(x\) itself would be squared. And it is not an algebraic denominator to cancel or split.</p>
+      <p>Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\). As Remark 2.5 noted, the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\). The \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\); it does not mean \(d(x^{2})\), where the \(x\) itself would be squared. And it is not an algebraic denominator to cancel or split.</p>
     </div>
   </section>
 
@@ -1088,7 +1091,7 @@ window.MathJax = {
                  &= \lim_{h \to 0} \frac{\bigl[2(x + h) + 4\bigr] - \bigl[2x + 4\bigr]}{h} \\[2pt]
                  &= \lim_{h \to 0} \frac{2h}{h} = 2.
         \end{aligned} \]</p>
-        <p>The second derivative is the constant \(2\) — the slope of the linear function \(f'(x) = 2x + 4\). Differentiating once more,</p>
+        <p>The second derivative is the constant \(2\), the slope of the linear function \(f'(x) = 2x + 4\). Differentiating once more,</p>
         <p>\[ f'''(x) = \lim_{h \to 0} \frac{f''(x + h) - f''(x)}{h} = \lim_{h \to 0} \frac{2 - 2}{h} = 0. \]</p>
         <p>Every subsequent derivative is likewise \(0\): once we reach a constant function, further differentiation produces zero. In Leibniz notation, \(\dfrac{d^{2}y}{dx^{2}} = 2\) and \(\dfrac{d^{3}y}{dx^{3}} = 0\).</p>
       </div>
@@ -1096,7 +1099,7 @@ window.MathJax = {
   </div>
 
   <!-- expansion:summary — forward-ref to differentiation rules -->
-  <p>With the concepts of differentiability, its tie to continuity, and higher-order derivatives in hand, we turn in the next sections to the rules that make differentiation <em>efficient</em> — systematic shortcuts that bypass the limit computation entirely.</p>
+  <p>Now that we have introduced differentiability, its connection to continuity, and higher-order derivatives, we turn in the next sections to rules that make differentiation <em>efficient</em>. These rules are systematic shortcuts that avoid computing each derivative from the limit definition.</p>
 
 </article>
 </template>
@@ -1136,7 +1139,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — load-bearing intuition: prove each rule once, reuse it as algebra; the limit→shortcut payoff -->
-  <p>In the previous sections every derivative was earned the hard way — by forming the difference quotient and grinding the limit down to a value. That is bearable for one function, but imagine differentiating \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\) straight from the definition: we would expand \((x + h)^{4}\), cancel, and take a limit, only to face the same labor for the next polynomial, and the next. This section ends the drudgery. We prove, once and for all, a short list of differentiation <em>rules</em> — for constants, powers, sums, and constant multiples — each established from the limit definition but thereafter usable as a purely algebraic shortcut. With them, differentiating any polynomial collapses to a one-line, mechanical operation, and we never touch a limit again for these functions. We then turn the same lens on the natural exponential \(e^{x}\) and uncover its remarkable signature: it is its own derivative.</p>
+  <p>In the previous sections we computed every derivative the slow way, by forming the difference quotient and working the limit out in full. That is bearable for one function, but imagine differentiating \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\) straight from the definition: we would expand \((x + h)^{4}\), cancel, and take a limit, only to face the same labor for the next polynomial, and the next. This section ends the need to repeat that calculation. We prove, once and for all, a short list of differentiation <em>rules</em> (for constants, powers, sums, and constant multiples), each established from the limit definition but thereafter usable as a purely algebraic shortcut. With them, differentiating any polynomial collapses to a one-line, mechanical operation, and we never touch a limit again for these functions. We then apply the same rules to the natural exponential \(e^{x}\) and find its defining property: it is its own derivative.</p>
 
   <h3 class="subsec-head">The constant and power rules</h3>
 
@@ -1160,7 +1163,7 @@ window.MathJax = {
   </section>
 
   <!-- expansion:intuition — set up the power rule as the single formula behind the one-off cases of §2.2 -->
-  <p>Next come the power functions \(x^{n}\). We met a few of their derivatives one exponent at a time in §2.2 — for example \(\dfrac{d}{dx}x^{2} = 2x\) — but a single formula governs them all. For now we prove it for a positive integer exponent; the case of other exponents is discussed in the caution that follows.</p>
+  <p>Next come the power functions \(x^{n}\). We met a few of their derivatives one exponent at a time in §2.2, for example \(\dfrac{d}{dx}x^{2} = 2x\). A single formula covers them all. For now we prove it for a positive integer exponent; the case of other exponents is discussed in the caution that follows.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.3</span><span class="env-name">The power rule</span></p>
@@ -1171,10 +1174,10 @@ window.MathJax = {
   </section>
 
   <!-- expansion:intuition — spot the pattern n·x^(n-1) in the known cases before proving it [pass: enrichment] -->
-  <p>Before proving it, notice the pattern the rule records. List the first few cases: \(x\) has derivative \(1\), the function \(x^{2}\) has derivative \(2x\) (computed in §2.2), and \(x^{3}\) has derivative \(3x^{2}\). In each one the exponent drops to the front as a multiplier and the power itself decreases by one — exactly \(n\,x^{n-1}\). The power rule claims that this pattern never breaks, for every positive integer \(n\). Showing that it <em>must</em> continue, rather than merely holding for the small cases we can check by hand, is the work of the proofs.</p>
+  <p>Before proving it, notice the pattern the rule records. List the first few cases: \(x\) has derivative \(1\), the function \(x^{2}\) has derivative \(2x\) (computed in §2.2), and \(x^{3}\) has derivative \(3x^{2}\). In each one the exponent moves to the front as a multiplier and the power decreases by one, giving \(n\,x^{n-1}\). The power rule states that this formula holds for every positive integer \(n\). Showing that it <em>must</em> continue, rather than merely holding for the small cases we can check by hand, is the work of the proofs.</p>
 
   <!-- expansion:intuition — frame the manuscript's deliberate two-proof choice for the power rule -->
-  <p>There are two proofs, each lighting the result from a different angle; we give both.</p>
+  <p>There are two proofs, each establishing the result in a different way; we give both.</p>
 
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span><span class="env-name">factorization</span></p>
@@ -1206,25 +1209,25 @@ window.MathJax = {
   </section>
 
   <!-- expansion:history — two proofs, two 17th-century strands: Newton's binomial theorem (c.1665) and Fermat's increment method (1630s) [pass: enrichment] [source: standard history of calculus — Newton's generalized binomial theorem, c.1665; Fermat's method of adequality for tangents and extrema, 1636] -->
-  <p>The two proofs trace two strands in the early history of the derivative. The binomial-expansion argument rests on Newton’s generalized binomial theorem, which he developed around 1665 as part of the calculus he was then inventing; expanding \((x + h)^{n}\) and letting \(h \to 0\) is descended from the increment-and-discard method Fermat had used in the 1630s to find tangents and extrema. The factorization argument, by contrast, leans on no infinitesimal at all — it is ordinary algebra turned to the same purpose.</p>
+  <p>The two proofs trace two strands in the early history of the derivative. The binomial-expansion argument rests on Newton’s generalized binomial theorem, which he developed around 1665 as part of the calculus he was then inventing; expanding \((x + h)^{n}\) and letting \(h \to 0\) is descended from the increment-and-discard method Fermat had used in the 1630s to find tangents and extrema. The factorization argument, by contrast, uses no infinitesimal at all. It establishes the same result using ordinary algebra.</p>
 
   <!-- expansion:example — quick inline illustrations of the power rule -->
-  <p>The rule is now a reflex. For instance,</p>
+  <p>The rule is quick to apply. For instance,</p>
   <p>\[ \frac{d}{dx}\,x^{5} = 5x^{4}, \qquad \frac{d}{dx}\,x^{10} = 10x^{9}, \qquad \frac{d}{dx}\,x = 1, \]</p>
-  <p>the last because \(x = x^{1}\) has derivative \(1 \cdot x^{0} = 1\) — the slope of the line \(y = x\), as it must be.</p>
+  <p>the last because \(x = x^{1}\) has derivative \(1 \cdot x^{0} = 1\), which is the slope of the line \(y = x\), as it must be.</p>
 
   <!-- expansion:caution — ROADMAP pitfall: power-rule domain (positive integer proved; negative integer = manuscript exercise; full real exponent deferred) -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>So far the power rule is proved only for <em>positive integer</em> exponents. For a <em>negative</em> integer \(n = -1, -2, \ldots\) the identical formula \(\dfrac{d}{dx}x^{n} = n\,x^{n-1}\) still holds wherever \(x \ne 0\) — this can be checked by applying the same factorization idea to \(1/x^{m}\) (where \(m = -n > 0\)). The fully general statement \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for an <em>arbitrary real</em> exponent \(r\) holds as well — for \(x > 0\), where \(x^{r}\) is defined through the logarithm — but its proof needs the chain rule, so we defer it to a later chapter.</p>
+      <p>So far the power rule is proved only for <em>positive integer</em> exponents. For a <em>negative</em> integer \(n = -1, -2, \ldots\) the identical formula \(\dfrac{d}{dx}x^{n} = n\,x^{n-1}\) still holds wherever \(x \ne 0\). This can be checked by applying the same factorization idea to \(1/x^{m}\) (where \(m = -n > 0\)). The fully general statement \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) holds as well for an <em>arbitrary real</em> exponent \(r\) and every \(x > 0\), where \(x^{r}\) is defined through the logarithm. Its proof needs the chain rule, so we defer it to a later chapter.</p>
     </div>
   </section>
 
   <h3 class="subsec-head">The sum, constant-multiple, and polynomial rules</h3>
 
   <!-- expansion:intuition — motivate the two linearity rules as what lets us assemble building blocks into polynomials -->
-  <p>Constants and powers are the building blocks; to assemble them into polynomials we need to know how differentiation interacts with addition and with multiplication by a constant. Both behave as nicely as we could hope, and both follow at once from the matching limit laws of Chapter 1.</p>
+  <p>Constants and powers are the building blocks; to assemble them into polynomials we need to know how differentiation interacts with addition and with multiplication by a constant. Both are simple, and each follows directly from the corresponding limit law of Chapter 1.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.4</span><span class="env-name">The sum and constant-multiple rules</span></p>
@@ -1249,7 +1252,7 @@ window.MathJax = {
   </section>
 
   <!-- expansion:caution — one-line forward fence: addition is clean, multiplication is not; full product-rule caution lives in §2.5 -->
-  <p>Notice how cleanly differentiation distributes over addition and slips past constant factors. Multiplication is not so docile — in general \((fg)' \ne f'g'\) — and finding the correct rule for a product takes more care; that is the business of §2.5.</p>
+  <p>Notice that differentiation distributes over addition and that a constant factor remains outside the derivative. Multiplication does not behave so simply. In general, \((fg)' \ne f'g'\), so the correct rule for a product requires more care. We derive that rule in §2.5.</p>
 
   <!-- expansion:intuition — the three rules combine into term-by-term polynomial differentiation -->
   <p>Combining the three rules just proved, we can differentiate any polynomial in a single pass.</p>
@@ -1266,7 +1269,7 @@ window.MathJax = {
   <p>The reasoning is exactly the three rules acting in concert: the sum rule lets the derivative act term by term; the constant-multiple rule carries each coefficient \(a_{k}\) along untouched; and the power rule turns each \(x^{k}\) into \(k\,x^{k-1}\). The constant term \(a_{0}\) contributes \(0\), and the linear term \(a_{1}x\) contributes \(a_{1}\). Assembling the pieces gives the stated formula.</p>
 
   <!-- expansion:application — the polynomial rule as the workhorse of kinematics: position → velocity in one line [pass: enrichment] -->
-  <p>This corollary is the workhorse of kinematics. If a moving object has a polynomial position \(s(t) = a_{n}t^{n} + \cdots + a_{1}t + a_{0}\), its velocity \(s'(t)\) follows in a single line by the same term-by-term rule, each power of \(t\) dropping by one. The car of §2.2, whose velocity we could there describe only in principle, is now a function we can differentiate at sight.</p>
+  <p>This corollary is used frequently in kinematics. If a moving object has a polynomial position \(s(t) = a_{n}t^{n} + \cdots + a_{1}t + a_{0}\), its velocity \(s'(t)\) follows in a single line by the same term-by-term rule, each power of \(t\) dropping by one. The car of §2.2, whose velocity we could there describe only in principle, is now a function we can differentiate at sight.</p>
 
   <!-- expansion:example — apply power + constant-multiple + sum to a polynomial (approved 2026-06-08; new type: rule-application, not first-principles) -->
   <div class="workedexample">
@@ -1285,7 +1288,7 @@ window.MathJax = {
                 &= 3(4x^{3}) - 5(2x) + 2(1) - 0 \\[2pt]
                 &= 12x^{3} - 10x + 2.
         \end{aligned} \]</p>
-        <p>Not a single limit was computed — the rules did all the work, exactly the shortcut this section was built to deliver.</p>
+        <p>Not a single limit was computed, because the rules give the result directly without returning to the limit definition.</p>
       </div>
     </section>
   </div>
@@ -1306,7 +1309,7 @@ window.MathJax = {
           s'(t) &= 3 \cdot 4t^{3} + 5 \cdot 3t^{2} - (-1)\,t^{-2} \\[2pt]
                 &= 12t^{3} + 15t^{2} + \frac{1}{t^{2}}.
         \end{aligned} \]</p>
-        <p>The key step was rewriting \(1/t\) as \(t^{-1}\) so the power rule could act on it: the exponent drops by one (\(-1 \to -2\)) and the old exponent \(-1\) comes out front, producing the \(+1/t^{2}\) term — matching what we would obtain from the quotient rule (§2.5) or from the limit definition (§2.2 Example 2.8).</p>
+        <p>The key step was rewriting \(1/t\) as \(t^{-1}\) so the power rule could act on it: the exponent drops by one (\(-1 \to -2\)) and the old exponent \(-1\) comes out front, producing the \(+1/t^{2}\) term. That term matches what we would obtain from the quotient rule (§2.5) or from the limit definition (§2.2 Example 2.8).</p>
       </div>
     </section>
   </div>
@@ -1322,12 +1325,12 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>Writing \(\sqrt{x} = x^{1/2}\), we differentiate term by term. The power rule applies directly to \(3x^{2}\). For \(4\sqrt{x}\) the exponent \(\tfrac{1}{2}\) is not an integer — the very case the Caution above defers for a general proof — but this particular derivative is already secured: §2.2 Example 2.7 found \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\) straight from the definition. Using it,</p>
+        <p>Writing \(\sqrt{x} = x^{1/2}\), we differentiate term by term. The power rule applies directly to \(3x^{2}\). For \(4\sqrt{x}\), the exponent \(\tfrac{1}{2}\) is not an integer, a case for which the Caution above defers a general proof. This particular derivative has already been established: §2.2 Example 2.7 found \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\) straight from the definition. Using it,</p>
         <p>\[ \begin{aligned}
           f'(x) &= 3 \cdot 2x + 4 \cdot \tfrac{1}{2}\,x^{-1/2} \\[2pt]
                 &= 6x + \frac{2}{\sqrt{x}}.
         \end{aligned} \]</p>
-        <p>The power rule’s bookkeeping — drop the exponent by one (\(\tfrac{1}{2} \to -\tfrac{1}{2}\)) and bring the old exponent out front — reproduces in a single line exactly the value the limit gave in §2.2.</p>
+        <p>In a single line the power rule drops the exponent by one (\(\tfrac{1}{2} \to -\tfrac{1}{2}\)) and brings the old exponent out front, reproducing exactly the value the limit gave in §2.2.</p>
         <p>At \(x = 1\): \(f(1) = 3 + 4 = 7\) and \(f'(1) = 6 + 2 = 8\). The tangent line through \((1, 7)\) with slope \(8\) is</p>
         <p>\[ y - 7 = 8(x - 1), \quad\text{i.e.}\quad y = 8x - 1. \]</p>
       </div>
@@ -1337,21 +1340,21 @@ window.MathJax = {
   <h3 class="subsec-head">The derivative of the exponential function</h3>
 
   <!-- expansion:intuition — introduce the series definition (reader's first exposure; on-ramp for the infinite sum) and fence its rigorous construction to Ch4 -->
-  <p>We close with a function of a different stripe: the natural exponential \(e^{x}\). The base \(e \approx 2.718\) may or may not have appeared in your precalculus course — nothing here assumes it did. In this text the official definition of \(e^{x}\) is a formula of a kind we have not used before — an <em>infinite sum</em>, called a power series:</p>
+  <p>We close with a function of a different kind: the natural exponential \(e^{x}\). The base \(e \approx 2.718\) may or may not have appeared in your precalculus course. Nothing here assumes it did. In this text the official definition of \(e^{x}\) uses a formula of a kind we have not seen before, an <em>infinite sum</em> called a power series:</p>
 
   <p>\[ e^{x} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots + \frac{x^{n}}{n!} + \cdots. \]</p>
 
-  <p>Read the infinite sum the way the notation suggests: adding more and more terms produces ever-better approximations, and \(e^{x}\) is the value the running totals settle toward. For \(x = 1\), the totals are \(1,\ 2,\ 2.5,\ 2.66\ldots,\) closing in on \(e \approx 2.71828\). Making “settle toward” precise is a limit question, and we take the answer as given here — the caution below records exactly what is being borrowed.</p>
+  <p>Read the infinite sum the way the notation suggests: adding more and more terms produces ever-better approximations, and \(e^{x}\) is the value the running totals settle toward. For \(x = 1\), the totals are \(1,\ 2,\ 2.5,\ 2.66\ldots,\) closing in on \(e \approx 2.71828\). Making “settle toward” precise is a limit question, and we take the answer as given here. The caution below records exactly what is being borrowed.</p>
 
   <!-- 2026-07-03 reading-track: credit fence promoted from running prose to an unnumbered Caution box (author request: make the temporary-acceptance marking more prominent) -->
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Everything about \(e^{x}\) in this section is <em>on credit</em> — borrowed now, to be repaid in Chapter 4. We take the power-series definition as given: the convergence of the series and the careful construction of \(e^{x}\) are the business of Chapter 4 (§4.1–§4.2), and the term-by-term differentiation about to be used is made rigorous in §4.3, with the explicit bound \(\lvert (e^{h} - 1)/h - 1 \rvert \le \lvert h \rvert\) for \(0 < \lvert h \rvert < \tfrac{1}{2}\). Nothing in Chapters 2–3 depends on those deferred proofs — only on the facts stated here.</p>
+      <p>Everything about \(e^{x}\) in this section is <em>on credit</em>: borrowed now, to be repaid in Chapter 4. We take the power-series definition as given: the convergence of the series and the careful construction of \(e^{x}\) are the business of Chapter 4 (§4.1–§4.2), and the term-by-term differentiation about to be used is made rigorous in §4.3, with the explicit bound \(\lvert (e^{h} - 1)/h - 1 \rvert \le \lvert h \rvert\) for \(0 < \lvert h \rvert < \tfrac{1}{2}\). Nothing in Chapters 2–3 depends on those deferred proofs, only on the facts stated here.</p>
     </div>
   </section>
 
-  <p>Granting the series, the derivative falls out beautifully, by an informal term-by-term step.</p>
+  <p>Granting the series, the derivative follows in a few lines, by an informal term-by-term step.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">2.5</span><span class="env-name">Derivative of the natural exponential</span></p>
@@ -1380,10 +1383,10 @@ window.MathJax = {
   </figure>
 
   <!-- expansion:intuition — the takeaway: self-replication is what makes e^x "natural" -->
-  <p>Figure 2.8 shows this self-replicating property at two points: the tangent slope is \(1=e^{0}\) at \((0,1)\) and \(e=e^{1}\) at \((1,e)\). That same slope-equals-height rule is exactly what singles \(e^{x}\) out among all exponential functions and earns it the name <em>natural</em> exponential: at every point its rate of change equals its current value.</p>
+  <p>Figure 2.8 shows this self-replicating property at two points: the tangent slope is \(1=e^{0}\) at \((0,1)\) and \(e=e^{1}\) at \((1,e)\). That same slope-equals-height rule characterizes \(e^{x}\) among exponential functions. For this reason, it is called the <em>natural</em> exponential: at every point its rate of change equals its current value.</p>
 
   <!-- expansion:intuition — why e^x is everywhere: any quantity whose growth rate is proportional to its size (y'=ky) [pass: enrichment] -->
-  <p>That one property — rate of change equal to current size — is why \(e^{x}\) governs so much of the world. Any quantity whose growth rate is proportional to how much is already present obeys a relation of the form \(y' = ky\), and its solution is built from \(e^{x}\). Money under continuous compounding grows in proportion to the balance; a radioactive sample decays in proportion to the amount remaining; an unchecked population grows in proportion to its current size. In every case the rate is tied to the level, and \(e^{x}\) is the function that ties them.</p>
+  <p>Because its rate of change equals its current size, \(e^{x}\) appears in a great many settings. Any quantity whose growth rate is proportional to how much is already present obeys a relation of the form \(y' = ky\) for a constant \(k\), and its solution is built from \(e^{x}\). Money under continuous compounding grows in proportion to the balance; a radioactive sample decays in proportion to the amount remaining; an unchecked population grows in proportion to its current size. In every case the rate is tied to the level, and \(e^{x}\) is the function that ties them.</p>
 
   <!-- expansion:example — e^x with the linearity rules, plus higher derivatives showing e^x persists while the polynomial dies (approved 2026-06-08; new type) -->
   <div class="workedexample">
@@ -1398,13 +1401,13 @@ window.MathJax = {
       <div class="env-body">
         <p>The sum and constant-multiple rules let us differentiate term by term, using \(\dfrac{d}{dx}e^{x} = e^{x}\) for the exponential and the power rule for the rest:</p>
         <p>\[ g'(x) = 4e^{x} - 3x^{2} + 2. \]</p>
-        <p>Differentiating repeatedly, the polynomial part erodes by one degree each time while the exponential part is untouched:</p>
+        <p>Differentiating repeatedly, the polynomial part loses one degree each time while the exponential part is unchanged:</p>
         <p>\[ \begin{aligned}
           g''(x)   &= 4e^{x} - 6x, \\[2pt]
           g'''(x)  &= 4e^{x} - 6, \\[2pt]
           g^{(4)}(x) &= 4e^{x}.
         \end{aligned} \]</p>
-        <p>From the fourth derivative onward every \(g^{(n)}(x) = 4e^{x}\): the polynomial has been differentiated away to nothing, while the \(e^{x}\) term survives every round — a vivid reminder that \(e^{x}\) is its own derivative.</p>
+        <p>From the fourth derivative onward every \(g^{(n)}(x) = 4e^{x}\): The polynomial part eventually becomes zero under repeated differentiation, while the \(e^{x}\) term remains unchanged at every step. This again shows that \(e^{x}\) is its own derivative.</p>
       </div>
     </section>
   </div>
@@ -1415,7 +1418,7 @@ window.MathJax = {
     <div class="env-body">
       <p>For a general base \(b > 0\), the exponential \(b^{x}\) is differentiable too, with</p>
       <p>\[ \frac{d}{dx}\,b^{x} = b^{x}\,\ln b, \]</p>
-      <p>where \(\ln b = \log_{e} b\). We will be able to derive this cleanly once the chain rule is available (Chapter 3). Notice that the extra factor \(\ln b\) equals \(1\) precisely when \(b = e\) — yet another way of seeing why base \(e\) is the natural choice: only for it does the derivative arrive with no stray constant attached.</p>
+      <p>where \(\ln b = \log_{e} b\). We will be able to derive this cleanly once the chain rule is available (Chapter 3). Notice that the extra factor \(\ln b\) equals \(1\) precisely when \(b = e\). This is another way to see why base \(e\) is the natural choice: only for that base does the derivative equal the original exponential with no extra constant factor.</p>
     </div>
   </section>
 
@@ -1423,12 +1426,12 @@ window.MathJax = {
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Keep the exponential and power functions apart. In \(e^{x}\) the base is the fixed number \(e\) and the exponent varies, so it is an <em>exponential</em> function with \(\dfrac{d}{dx}e^{x} = e^{x}\). In \(x^{e}\) the exponent is the fixed number \(e \approx 2.718\) and the base varies, so it is a <em>power</em> function, differentiated by the power rule: \(\dfrac{d}{dx}x^{e} = e\,x^{e-1}\). The two obey different rules, and in particular \(\dfrac{d}{dx}x^{e} \ne x^{e}\). The general split is \(\dfrac{d}{dx}b^{x} = b^{x}\ln b\) for an exponential against \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for a power — decide which form you are looking at before you differentiate.</p>
+      <p>Keep the exponential and power functions apart. In \(e^{x}\) the base is the fixed number \(e\) and the exponent varies, so it is an <em>exponential</em> function with \(\dfrac{d}{dx}e^{x} = e^{x}\). In \(x^{e}\) the exponent is the fixed number \(e \approx 2.718\) and the base varies, so it is a <em>power</em> function, differentiated by the power rule: \(\dfrac{d}{dx}x^{e} = e\,x^{e-1}\). The two obey different rules, and in particular \(\dfrac{d}{dx}x^{e} \ne x^{e}\). The general split is \(\dfrac{d}{dx}b^{x} = b^{x}\ln b\) for an exponential against \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for a power. Decide which form you are looking at before you differentiate.</p>
     </div>
   </section>
 
   <!-- expansion:summary — forward-ref to §2.5 (product and quotient rules) -->
-  <p>We now have fast, limit-free derivatives for every polynomial and for the natural exponential. What we still lack are <em>general</em> rules for products and quotients of functions — and, as we saw, the naive guess \((fg)' = f'g'\) is wrong. Supplying those rules is the task of the next section.</p>
+  <p>We now have fast, limit-free derivatives for every polynomial and for the natural exponential. What we still lack are <em>general</em> rules for products and quotients of functions. As we saw, the naive guess \((fg)' = f'g'\) is wrong. Supplying those rules is the task of the next section.</p>
 
 </article>
 </template>
@@ -1467,7 +1470,7 @@ window.MathJax = {
   </header>
 
   <!-- expansion:intuition — open by recalling §2.4's clean sum/difference behavior, then flag that products and quotients are the unfinished business -->
-  <p>In §2.4 we learned that differentiation behaves beautifully with respect to addition: the derivative of a sum is the sum of the derivatives, and the same holds for differences, \((f \pm g)' = f' \pm g'\) (Theorem 2.4). It is tempting to hope that products and quotients are just as docile — that the derivative of a product is the product of the derivatives. This section shows that they are <em>not</em>, finds the correct rules, and so completes the toolkit of basic differentiation rules begun in §2.4. We treat the two cases in turn: first \(\dfrac{d}{dx}(fg)\), then \(\dfrac{d}{dx}\!\left(\dfrac{f}{g}\right)\).</p>
+  <p>In §2.4 we learned the addition rule for derivatives: the derivative of a sum is the sum of the derivatives, and the same holds for differences, \((f \pm g)' = f' \pm g'\) (Theorem 2.4). It is tempting to hope that products and quotients obey equally simple derivative rules, and in particular that the derivative of a product is the product of the derivatives. This section shows that they are <em>not</em>, finds the correct rules, and so completes the toolkit of basic differentiation rules begun in §2.4. We treat the two cases in turn: first \(\dfrac{d}{dx}(fg)\), then \(\dfrac{d}{dx}\!\left(\dfrac{f}{g}\right)\).</p>
 
   <h3 class="subsec-head">The product rule</h3>
 
@@ -1551,7 +1554,7 @@ window.MathJax = {
   </section>
 
   <!-- expansion:example — inline mini-application of the product rule, anchoring it before the manuscript's worked example -->
-  <p>The rule is quick to apply once it is in hand. For instance,</p>
+  <p>The rule is quick to apply once it is established. For instance,</p>
   <p>\[ \frac{d}{dx}\bigl(x^{2} e^{x}\bigr) = (2x)\,e^{x} + x^{2}\,e^{x} = x(x + 2)\,e^{x}, \]</p>
   <p>where we used the power rule (Theorem 2.3) for \(x^{2}\) and \((e^{x})' = e^{x}\) (Theorem 2.5) for the exponential factor. The next example isolates the same product-rule pattern.</p>
 
@@ -1567,13 +1570,13 @@ window.MathJax = {
       <div class="env-body">
         <p>Here \(h\) is a product of \(f(x) = x\) and \(g(x) = e^{x}\), with \(f'(x) = 1\) and \(g'(x) = e^{x}\) (Theorem 2.5). The product rule gives</p>
         <p>\[ h'(x) = f'(x)\,g(x) + f(x)\,g'(x) = (1)\,e^{x} + x\,e^{x} = e^{x}(1 + x). \]</p>
-        <p>Notice that neither factor alone produces the answer: the term \(e^{x}\) comes from differentiating \(x\) while keeping \(e^{x}\), and the term \(x\,e^{x}\) from keeping \(x\) while differentiating \(e^{x}\) — the two strips of Figure 2.9 in algebraic form.</p>
+        <p>Notice that neither factor alone produces the answer: the term \(e^{x}\) comes from differentiating \(x\) while keeping \(e^{x}\), and the term \(x\,e^{x}\) from keeping \(x\) while differentiating \(e^{x}\). These are the two strips of Figure 2.9 in algebraic form.</p>
       </div>
     </section>
   </div>
 
   <!-- expansion:application — product rule in economics: marginal revenue R'(q)=p'(q)q+p(q) [pass: enrichment] -->
-  <p>The product rule has a clean reading in economics. Suppose a firm sells \(q\) units at a price \(p(q)\) that depends on how many are sold; its revenue is the product \(R(q) = p(q)\,q\). The product rule gives the <em>marginal revenue</em> \(R'(q) = p'(q)\,q + p(q)\): selling one more unit changes revenue in two ways at once — through the price change \(p'(q)\) spread over all \(q\) units, and through the price \(p(q)\) fetched by the extra unit itself. The two strips of Figure 2.9 return here as two competing economic effects.</p>
+  <p>The product rule has a clean reading in economics. Suppose a firm sells \(q\) units at a price \(p(q)\) that depends on how many are sold; its revenue is the product \(R(q) = p(q)\,q\). The product rule gives the <em>marginal revenue</em> \(R'(q) = p'(q)\,q + p(q)\). Selling one more unit changes revenue in two ways at once: through the price change \(p'(q)\) spread over all \(q\) units, and through the price \(p(q)\) received for the extra unit itself. The two strips of Figure 2.9 return here as two competing economic effects.</p>
 
   <h3 class="subsec-head">The quotient rule</h3>
 
@@ -1597,7 +1600,7 @@ window.MathJax = {
   </section>
 
   <!-- expansion:intuition — why the quotient rule carries a minus sign and a g²: g sits in the denominator [pass: enrichment] -->
-  <p>Before the proof, it helps to see why the rule has this shape. Like the product rule, its numerator pairs each function with the derivative of the other — but joined by a <em>minus</em> sign instead of a plus, and the whole expression is divided by \(g^{2}\). The minus sign reflects that \(g\) sits in the denominator: making \(g\) larger makes the quotient \(f/g\) smaller, so the effect of \(g'\) is subtracted rather than added. The \(g^{2}\) is the footprint of differentiating \(1/g\): take the simplest denominator \(g(x) = x\) with numerator \(f(x) = 1\), so that \(f/g = 1/x\), whose derivative was \(-1/x^{2}\) in §2.2 — the same minus sign and the same square that the quotient rule carries in general.</p>
+  <p>Before the proof, it helps to see why the rule has this shape. Like the product rule, its numerator pairs each function with the derivative of the other, but the two terms are joined by a <em>minus</em> sign instead of a plus, and the whole expression is divided by \(g^{2}\). The minus sign reflects that \(g\) sits in the denominator: making \(g\) larger makes the quotient \(f/g\) smaller, so the effect of \(g'\) is subtracted rather than added. The \(g^{2}\) comes from differentiating \(1/g\): take the simplest denominator \(g(x) = x\) with numerator \(f(x) = 1\), so that \(f/g = 1/x\), whose derivative was \(-1/x^{2}\) in §2.2. That derivative already shows the same minus sign and the same square that the quotient rule has in general.</p>
 
   <!-- proof follows the manuscript: combine over a common denominator, add and subtract f(x)g(x) on the numerator, keep Δx notation; needs g continuous (so g(x+Δx)→g(x)) and g(x)≠0 (so the denominator tends to g(x)^2 ≠ 0) -->
   <section class="env env-proof">
@@ -1605,7 +1608,7 @@ window.MathJax = {
     <div class="env-body">
       <p>Combining the two fractions over a common denominator,</p>
       <p>\[ \frac{f(x+\Delta x)}{g(x+\Delta x)} - \frac{f(x)}{g(x)} = \frac{f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x)}{g(x+\Delta x)\,g(x)}. \]</p>
-      <p>On the numerator we play the same trick as before, now adding and subtracting \(f(x)\,g(x)\):</p>
+      <p>On the numerator we use the same trick as before, now adding and subtracting \(f(x)\,g(x)\):</p>
       <p>\[ \begin{aligned}
         &f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x) \\[2pt]
         &= \bigl[f(x+\Delta x)\,g(x) - f(x)\,g(x)\bigr] - \bigl[f(x)\,g(x+\Delta x) - f(x)\,g(x)\bigr] \\[2pt]
@@ -1629,7 +1632,7 @@ window.MathJax = {
   <!-- expansion:example — inline mini-application that fulfils the promise made in §2.2 (Example 2.8): recover (1/x)' = −1/x^2 in one line -->
   <p>As a first check, the quotient rule recovers a derivative we computed laboriously from first principles in §2.2. Taking the numerator to be the constant \(1\) and the denominator \(x\),</p>
   <p>\[ \frac{d}{dx}\!\left(\frac{1}{x}\right) = \frac{(0)(x) - (1)(1)}{x^{2}} = -\frac{1}{x^{2}}, \]</p>
-  <p>matching the derivative \(-1/x^{2}\) found in Example 2.8 — obtained here in a single line, exactly as promised there.</p>
+  <p>matching the derivative \(-1/x^{2}\) found in Example 2.8, obtained here in a single line, exactly as promised there.</p>
 
   <!-- expansion:example — new worked example (approved 2026-06-08, decision E/F): a genuine rational quotient that exercises the full formula and the numerator order -->
   <div class="workedexample">
@@ -1642,13 +1645,13 @@ window.MathJax = {
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>This is a genuine quotient — no algebra simplifies it to a power — so the quotient rule applies, with top \(x\) and bottom \(x^{2} + 1\). Their derivatives are \(1\) and \(2x\), and the bottom never vanishes, so the rule is valid for every \(x\). Taking care with the order of the numerator terms,</p>
+        <p>No algebra simplifies this to a power, so it is a genuine quotient. The quotient rule applies, with top \(x\) and bottom \(x^{2} + 1\). Their derivatives are \(1\) and \(2x\), and the bottom never vanishes, so the rule is valid for every \(x\). Taking care with the order of the numerator terms,</p>
         <p>\[ \begin{aligned}
           f'(x) &= \frac{(1)\bigl(x^{2} + 1\bigr) - (x)(2x)}{\bigl(x^{2} + 1\bigr)^{2}} \\[2pt]
                 &= \frac{x^{2} + 1 - 2x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}
                  = \frac{1 - x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}.
         \end{aligned} \]</p>
-        <p>Had we mistakenly written the numerator as \((x)(2x) - (1)(x^{2}+1)\), every sign would be wrong. As a sanity check on the result, \(f'(0) = 1 > 0\) (the curve rises through the origin) and \(f'(\pm 1) = 0\), the two points where \(x/(x^{2}+1)\) reaches its largest and smallest values.</p>
+        <p>Had we mistakenly written the numerator as \((x)(2x) - (1)(x^{2}+1)\), every sign would be wrong. As a check on the result, \(f'(0) = 1 > 0\) (the curve rises through the origin) and \(f'(\pm 1) = 0\), the two points where \(x/(x^{2}+1)\) reaches its largest and smallest values.</p>
 
         <figure class="figure" data-fig="quotient-example-graph">
           <figcaption><span class="fig-no">Figure 2.10</span> The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom), from Example 2.20.</figcaption>
@@ -1674,15 +1677,15 @@ window.MathJax = {
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
         <p>There are two errors.</p>
-        <p><em>Error 1 — wrong sign in the quotient rule.</em> The quotient rule carries a <em>minus</em> sign in the numerator,</p>
+        <p><em>Error 1: Wrong sign in the quotient rule.</em> The quotient rule carries a <em>minus</em> sign in the numerator,</p>
         <p>\[ \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \]</p>
         <p>but the student wrote a plus. With top \(2x\) and bottom \(x + 1\), the correct numerator is</p>
         <p>\[ (2)(x + 1) - (2x)(1) = 2x + 2 - 2x = 2, \]</p>
         <p>not \(2(x + 1) + 2x\).</p>
-        <p><em>Error 2 — incorrect simplification.</em> Even within the student’s own (wrong) numerator, \(2(x + 1) + 2x = 4x + 2\), not \(2(x + 1)\); the \(2x\) term was simply dropped.</p>
+        <p><em>Error 2: Incorrect simplification.</em> Even within the student’s own (wrong) numerator, \(2(x + 1) + 2x = 4x + 2\), not \(2(x + 1)\); the \(2x\) term was simply dropped.</p>
         <p>Carrying out the rule correctly,</p>
         <p>\[ f'(x) = \frac{(2)(x + 1) - (2x)(1)}{(x + 1)^{2}} = \frac{2}{(x + 1)^{2}}. \]</p>
-        <p>Note that the denominator is \((x + 1)^{2}\), not \((x + 1)\) — a third common slip the student was heading toward.</p>
+        <p>Note that the denominator is \((x + 1)^{2}\), not \((x + 1)\). Dropping the square is a third common slip.</p>
       </div>
     </section>
   </div>
@@ -1690,7 +1693,7 @@ window.MathJax = {
   <h3 class="subsec-head">Choosing the right rule</h3>
 
   <!-- expansion:intuition — motivate the strategy box: with several rules now available, the first task on any problem is to read its shape and pick the rule -->
-  <p>With the constant, power, sum, constant-multiple, product, and quotient rules all in hand, differentiating a given expression is now less about computing limits and more about <em>recognizing</em> which rule its structure calls for. Reading that structure — and simplifying first when possible — is the skill the next box organizes.</p>
+  <p>With the constant, power, sum, constant-multiple, product, and quotient rules all established, differentiating a given expression is now less about computing limits and more about <em>recognizing</em> which rule its structure calls for. The next box sets out how to read that structure and when to simplify first.</p>
 
   <!-- expansion:strategy — ROADMAP assigns "Selecting among the basic rules" to §2.5; 3 steps incl. the "simplify first" judgment (decision C) -->
   <section class="env env-strategy">
@@ -1727,7 +1730,7 @@ window.MathJax = {
       <div class="env-body">
         <p><em>(a)</em> A genuine product of \(x^{3}\) and \(e^{x}\); use the product rule:</p>
         <p>\[ y' = (3x^{2})\,e^{x} + x^{3}\,e^{x} = x^{2} e^{x}(3 + x). \]</p>
-        <p><em>(b)</em> This <em>looks</em> like a quotient, but it simplifies first — for \(x \ne 0\), \(\dfrac{x^{4} - x}{x} = x^{3} - 1\) — so the power rule finishes it with no quotient rule at all:</p>
+        <p><em>(b)</em> This <em>looks</em> like a quotient, but it simplifies first. For \(x \ne 0\), \(\dfrac{x^{4} - x}{x} = x^{3} - 1\), so the power rule finishes it with no quotient rule at all:</p>
         <p>\[ y' = 3x^{2}. \]</p>
         <p><em>(c)</em> A genuine quotient that does not simplify; use the quotient rule, with top \(x^{2}\) and bottom \(e^{x}\):</p>
         <p>\[ y' = \frac{(2x)\,e^{x} - x^{2}\,e^{x}}{\bigl(e^{x}\bigr)^{2}} = \frac{e^{x}\bigl(2x - x^{2}\bigr)}{e^{2x}} = \frac{2x - x^{2}}{e^{x}}. \]</p>
@@ -1759,22 +1762,22 @@ window.MathJax = {
   </div>
 
   <!-- expansion:summary — close the chapter's differentiation rules; one-line forward fence to Ch3 chain rule (no preview), per decision G -->
-  <p>The product and quotient rules complete the basic differentiation toolkit of this chapter: together with the constant, power, sum, and constant-multiple rules and the derivative of \(e^{x}\), they let us differentiate any algebraic or exponential combination built by adding, scaling, multiplying, and dividing. One important way of combining functions remains untouched — <em>composition</em>, forming \(f\bigl(g(x)\bigr)\) — and it needs a rule of its own, the chain rule, which opens the next chapter.</p>
+  <p>The product and quotient rules complete the basic differentiation toolkit of this chapter: together with the constant, power, sum, and constant-multiple rules and the derivative of \(e^{x}\), they let us differentiate any algebraic or exponential combination built by adding, scaling, multiplying, and dividing. One important way of combining functions remains untouched, namely <em>composition</em>, forming \(f\bigl(g(x)\bigr)\). It needs a rule of its own, the chain rule, which opens the next chapter.</p>
 
   <h3 class="subsec-head">Chapter summary</h3>
 
   <!-- expansion:summary — chapter-level summary (ch02's final section): point→function→existence→rules arc + forward fence to Ch3 (chain rule, integer-only power rule) and Ch4 (rigorous e^x) -->
   <p>Chapter 2 built the derivative in stages. At a single point it is a limit of secant slopes,
   \[ f'(a) = \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} = \lim_{x \to a} \frac{f(x) - f(a)}{x - a}, \]
-  the slope of the tangent line \(y - f(a) = f'(a)(x - a)\) and, read locally, the best linear approximation to \(f\) near \(a\) (§2.1). Letting the basepoint vary turns this number into a function \(f'\) — the derivative — recoverable from the graph of \(f\) and written interchangeably as \(f'\), \(\tfrac{df}{dx}\), or \(\tfrac{d}{dx}[f]\) (§2.2).</p>
+  the slope of the tangent line \(y - f(a) = f'(a)(x - a)\) and, read locally, the best linear approximation to \(f\) near \(a\) (§2.1). Letting the basepoint vary turns this number into the derivative \(f'\), recoverable from the graph of \(f\) and written interchangeably as \(f'\), \(\tfrac{df}{dx}\), or \(\tfrac{d}{dx}[f]\) (§2.2).</p>
 
   <p>Not every function has a derivative everywhere. The limit can fail at a corner (\(\lvert x \rvert\) at \(0\)), at a vertical tangent (\(\sqrt[3]{x}\) at \(0\)), or at any discontinuity, so differentiability is a genuinely stronger condition than continuity: differentiable \(\Rightarrow\) continuous (Theorem 2.1), but the converse is false. Iterating the operation gives the higher derivatives \(f''\), \(f'''\), \(\dots\), \(f^{(n)}\) (§2.3).</p>
 
-  <p>The rest of the chapter replaced the limit, case by case, with arithmetic. The constant rule \((c)' = 0\) (Theorem 2.2), the power rule \((x^{n})' = n x^{n - 1}\) for positive integers \(n\) (Theorem 2.3), and linearity — the sum and constant-multiple rules (Theorem 2.4) — together differentiate every polynomial term by term (Corollary 2.1). The natural exponential earned its defining property \((e^{x})' = e^{x}\) (Theorem 2.5), proved here from the series for \(e^{x}\) (§2.4); Chapter 4 will make that step fully rigorous. Products and quotients then closed the toolkit:
+  <p>The rest of the chapter replaced the limit, case by case, with arithmetic. The constant rule \((c)' = 0\) (Theorem 2.2), the power rule \((x^{n})' = n x^{n - 1}\) for positive integers \(n\) (Theorem 2.3), and the two linearity rules for sums and constant multiples (Theorem 2.4) together differentiate every polynomial term by term (Corollary 2.1). The natural exponential was shown to have the defining property \((e^{x})' = e^{x}\) (Theorem 2.5), proved here from the series for \(e^{x}\) (§2.4); Chapter 4 will make that step fully rigorous. Products and quotients then closed the toolkit:
   \[ (fg)' = f'g + fg', \qquad \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \]
   the first emphatically <em>not</em> \(f'g'\), the second sensitive to the order of its numerator (§2.5).</p>
 
-  <p>With these rules we can differentiate any function assembled from powers and the exponential by adding, scaling, multiplying, and dividing. Two things still lie outside their reach: <em>composition</em>, \(f\bigl(g(x)\bigr)\), which no rule here touches, and the power rule itself, so far secured only for integer exponents. Both are the business of Chapter 3, which opens with the rule for compositions — the chain rule — and uses it to extend the power rule and to differentiate the trigonometric, logarithmic, and inverse functions.</p>
+  <p>With these rules we can differentiate any function assembled from powers and the exponential by adding, scaling, multiplying, and dividing. They do not yet cover two things: <em>composition</em>, \(f\bigl(g(x)\bigr)\), for which this chapter has given no rule, and the power rule for exponents that are not integers. Both are addressed in Chapter 3, which begins with the chain rule for compositions and uses it to extend the power rule and to differentiate the trigonometric, logarithmic, and inverse functions.</p>
 
 </article>
 </template>

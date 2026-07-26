@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ch03 散文平實化回填（合併 sweep）— Gate 0 基線 ＋ Gate 1 走查</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2df; --bg:#fbfbf9; --card:#fff;
+    --good:#1f7a44; --good-bg:#f0f8f3; --good-line:#b8ddc7; --bad:#a3232a; --bad-bg:#fdf4f4;
+    --bad-line:#e8c9c9; --warn:#9a5b00; --warn-bg:#fdf3e3; --accent:#2d5a8a; --code-bg:#f4f4f2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Inter","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.6; max-width:980px; margin:0 auto; padding:2.4rem 1.5rem 5rem; }
+  h1 { font-size:1.45rem; line-height:1.3; margin:0 0 .3rem; }
+  .sub { color:var(--muted); font-size:.93rem; margin:0 0 1.6rem; }
+  h2 { font-size:1.14rem; margin:2.4rem 0 .7rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+  h3 { font-size:.98rem; margin:1.5rem 0 .45rem; color:var(--accent); }
+  code { font-family:Consolas,monospace; font-size:.87em; background:var(--code-bg); padding:.08em .35em; border-radius:3px; }
+  table { border-collapse:collapse; width:100%; margin:.7rem 0 1rem; font-size:.88rem; }
+  th,td { border:1px solid var(--line); padding:.4rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f0f0ee; font-weight:600; }
+  td.num,th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.9rem 1.15rem; margin:1rem 0; }
+  .card.good { background:var(--good-bg); border-color:var(--good-line); }
+  .card.warn { background:var(--warn-bg); border-color:#e8d3a8; }
+  .card.bad { background:var(--bad-bg); border-color:var(--bad-line); }
+  .row { display:flex; gap:.55rem; padding:.45rem .6rem; border-radius:5px; margin-bottom:.3rem; }
+  .row .lbl { flex:0 0 3rem; font-size:.72rem; font-weight:700; padding-top:.18rem; }
+  .row .txt { flex:1; font-size:.94rem; line-height:1.62; }
+  .before { background:var(--bad-bg); border-left:3px solid var(--bad-line); }
+  .before .lbl { color:var(--bad); }
+  .after { background:var(--good-bg); border-left:3px solid var(--good-line); }
+  .after .lbl { color:var(--good); }
+  .pair { margin:.75rem 0 1.3rem; }
+  .pair .why { font-size:.85rem; color:#555; margin:0 0 .35rem; line-height:1.5; }
+  .id { font-family:Consolas,monospace; font-size:.82em; font-weight:700; color:var(--accent); white-space:nowrap; }
+  .tag { display:inline-block; font-size:.68rem; font-weight:600; padding:.05rem .4rem; border-radius:999px; white-space:nowrap; }
+  .tag.good { color:var(--good); background:var(--good-bg); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); }
+  .tag.bad { color:var(--bad); background:var(--bad-bg); }
+  .tag.ms { color:#4a3a80; background:#f1eefb; }
+  ul.tight { margin:.3rem 0 .7rem; padding-left:1.3rem; }
+  ul.tight li { margin:.25rem 0; }
+  ol.tight { margin:.3rem 0 .7rem; padding-left:1.4rem; }
+  ol.tight li { margin:.25rem 0; }
+  .small { font-size:.85rem; color:var(--muted); }
+  .foot { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.84rem; color:var(--muted); }
+  .out { background:#fff3b0; padding:0 .2em; border-radius:2px; font-weight:600; }
+  .en { font-style:italic; }
+  b.hl { background:#fff3b0; font-weight:700; padding:0 .1em; border-radius:2px; }
+</style>
+</head>
+<body>
+<h1>ch03 散文平實化回填（合併 sweep）— Gate 0 基線 ＋ Gate 1 走查</h1>
+<p class="sub">gate-1、<strong>propose-only（未改任何 fragment）</strong> · 2026-07-25 · 分支 <code>handout/plain-ch03</code> · 判準＝<code>CONTENT_SPEC.md</code> §3〈平實英文條款〉RC · 流程＝<code>KICKOFF-plain-backfill.md</code> · kickoff＝<code>PROMPT-plain-backfill-ch02-ch07.md</code> §ch03</p>
+<div class="card bad">
+<strong>⛳ 先講一件會改變本輪走法的事：kickoff 給 ch03 的兩條前提，實測不成立。</strong>
+<p>kickoff 說「ch02／ch03／ch04 是手稿章 → <strong>手稿逐字的成對插入語保留</strong>」「預期詞彙層 findings 遠少於 canon 章」。
+Gate 0 把 <code>legacy/tex_handout/chapters/ch03_chain_rule.tex</code> 拿來比對，結果是：</p>
+<ul class="tight">
+  <li><strong>fragment 的 54 個破折號，沒有一個能追溯到手稿逐字</strong>；反過來，<strong>手稿自己的 14 個破折號也沒有一個存活到 fragment</strong>（左右各 6 詞正規化窗口，雙向比對皆 0 命中）。</li>
+  <li>根因是散文重疊率：ch03 的 fragment 對手稿 <strong>6-gram 重疊只有 0.7%</strong>（8-gram 0.1%）。同一支腳本量 <strong>ch01 是 38.2%</strong>——ch01 才是「逐字沿用手稿散文」的那一章。</li>
+  <li>也就是說：<strong>ch03 的數學內容取自手稿，英文散文則是 LLM 重寫的。</strong>「手稿逐字保留」這條規則在 ch03 <strong>沒有適用對象</strong>，54 個破折號全部可動；詞彙層也要按 canon 章的預期來看，不能按「手稿章 findings 很少」預設。</li>
+</ul>
+<p><strong>對平行輪的外溢：</strong>同一支腳本量到 <strong>ch02 3.2%、ch04 3.2%</strong>——這兩章的 session 大概會遇到同樣情形。建議 ch02／ch04 開跑時把「Gate 0 先量重疊率」放在比對之前，別直接照 ch01 先例假設手稿逐字。（本輪不改 kickoff 檔，避免跟平行 session 撞。）</p>
+</div>
+<div class="card good">
+<strong>走查結論（一句話）：</strong>50 條改點 ＋ 3 對逐例 KEEP，破折號 <strong>54 → 6</strong>、密度 <strong>14.0 → 1.6/1000</strong>（<code>T_can</code> ≤3.0），
+逐節 §3.1 1.6／§3.2 3.0／§3.3 0.0 全數達標；冒號 −2、分號 −1、括號 ±0，
+<strong>唯一觸發「須填理由」的是成對逗號 +7</strong>（見 §5，已填）。數學片段程式化預跑：<strong>內容改動 0 處</strong>。
+</div>
+<h2>Gate 0 — 基線與地雷勘查（唯讀）</h2>
+<h3>逐節 canonical 量測（<code>tools/prose_metrics.py</code> 同一分母）</h3>
+<table>
+<tr><th>節</th><th class="num">N</th><th class="num">em-dash</th><th class="num">/1000</th><th class="num">冒號</th><th class="num">分號</th><th class="num">括號</th><th class="num">雙逗號</th><th>備註</th></tr>
+<tr><td>§3.1 三角函數導數</td><td class="num">1242</td><td class="num">16</td><td class="num">12.9</td><td class="num">11</td><td class="num">5</td><td class="num">20</td><td class="num">10</td><td>—</td></tr>
+<tr><td>§3.2 鏈鎖法則</td><td class="num">1341</td><td class="num">22</td><td class="num"><span class="out">16.4</span></td><td class="num">13</td><td class="num">7</td><td class="num">17</td><td class="num">10</td><td>密度最高</td></tr>
+<tr><td>§3.3 鏈鎖法則的應用</td><td class="num">1272</td><td class="num">16</td><td class="num">12.6</td><td class="num">12</td><td class="num">8</td><td class="num">23</td><td class="num">8</td><td>—</td></tr>
+<tr><td><strong>全章</strong></td><td class="num"><strong>3855</strong></td><td class="num"><strong>54</strong></td><td class="num"><strong>14.0</strong></td><td class="num">36</td><td class="num">20</td><td class="num"><span class="out">60</span></td><td class="num">28</td><td>副表（清單／caption）N=312、—=4</td></tr>
+</table>
+<p class="small">與 kickoff 的起跑基線逐項相符（N=3855、54、14.0、冒號 36／分號 20／括號 60／雙逗 28）。目標 <code>T_can</code> ≤3.0/1000 ⇒ 全章配額 ≈11.6 個，<strong>超額約 42 件</strong>。
+括號 60／3855＝<strong>全書相對最高</strong>（kickoff 明列：去 dash 時 MUST NOT 再往括號堆）——本輪括號淨變動 <strong>±0</strong>。</p>
+<h3>手稿比對（本輪的核心 Gate 0 產出）</h3>
+<table>
+<tr><th>語料</th><th class="num">N</th><th class="num">em-dash</th><th class="num">/1000</th><th>判讀</th></tr>
+<tr><td>手稿 <code>ch03_chain_rule.tex</code>（<code>latex_stream</code>，<code>---</code> 計為 em-dash）</td><td class="num">3052</td><td class="num">14</td><td class="num">4.59</td><td>手稿自己也略超 <code>T_can</code>——但與本輪無關，因為<strong>一個都沒進 fragment</strong></td></tr>
+<tr><td>ch03 fragment 現況</td><td class="num">3855</td><td class="num">54</td><td class="num">14.0</td><td>＝手稿的 3.0 倍</td></tr>
+</table>
+<table>
+<tr><th>章</th><th class="num">fragment 6-gram 落在手稿的比例</th><th class="num">8-gram</th><th>判讀</th></tr>
+<tr><td><strong>ch01</strong></td><td class="num"><strong>38.2%</strong></td><td class="num">34.6%</td><td><span class="tag ms">真手稿章</span>散文大量逐字沿用 → ch01 先例的「手稿逐字保留」有實體對象</td></tr>
+<tr><td>ch02</td><td class="num">3.2%</td><td class="num">2.5%</td><td>散文已重寫</td></tr>
+<tr><td><strong>ch03</strong></td><td class="num"><strong>0.7%</strong></td><td class="num">0.1%</td><td><span class="tag bad">本輪</span>散文幾乎完全重寫 → <strong>無手稿逐字可保留</strong></td></tr>
+<tr><td>ch04</td><td class="num">3.2%</td><td class="num">1.5%</td><td>散文已重寫</td></tr>
+</table>
+<div class="card">
+<strong>對照證據（同一句的兩個版本）。</strong>
+<div class="row before"><span class="lbl">手稿</span><span class="txt en">Chapter 2 built the limit definition of the derivative and the elementary algebraic rules: constant, power, sum, constant-multiple, product, quotient, and the self-derivative property of the natural exponential.</span></div>
+<div class="row after"><span class="lbl">fragment</span><span class="txt en">Chapter 2 built the derivative from the ground up — as the limit of a difference quotient — and turned it into a working toolkit: rules for constants, powers, sums, products, quotients, and the exponential.</span></div>
+<p class="small" style="margin:.5rem 0 0">同一個教學動作、同一份數學，措辭全部換掉——連那對破折號都是重寫時加的。ch03 全章都是這個型態。</p>
+</div>
+<p class="small">判定法：以 canonical stream 定位 fragment 的 54 個 <code>—</code>（與 <code>prose_metrics.py</code> 完全一致），取左右各 7／4 詞正規化窗口去手稿全文比對；反向再以手稿 14 個 <code>---</code> 的左右 6 詞窗口比對 fragment。兩向皆 0 命中。腳本輸出留在本輪 scratchpad，數字可用 <code>tools/prose_metrics.py</code> 復現。</p>
+<h3>段落層（觸發器檢查）</h3>
+<table>
+<tr><th>節</th><th class="num">最長段</th><th class="num">最多行內式／段</th><th class="num">≥150 詞段</th><th class="num">&gt;120 詞段</th><th>判讀</th></tr>
+<tr><td>§3.1</td><td class="num">130</td><td class="num">15</td><td class="num">0</td><td class="num">2</td><td>130 詞＝章 lead；127 詞＝節開場</td></tr>
+<tr><td>§3.2</td><td class="num">116</td><td class="num">10</td><td class="num">0</td><td class="num">0</td><td>—</td></tr>
+<tr><td>§3.3</td><td class="num">108</td><td class="num">9</td><td class="num">0</td><td class="num">0</td><td>—</td></tr>
+</table>
+<ul class="tight">
+<li><strong>SPEC §3 的三個 MUST 人工判定觸發器（≥150 詞／&gt;20 式／一段多論證）全部沒有命中。</strong>本輪<strong>不提任何拆段</strong>。</li>
+<li>兩段超過 SHOULD 的 ≤120 詞（章 lead 130、§3.1 節開場 127），逐段判讀後皆為<strong>單一論證</strong>（lead＝本章路線圖；節開場＝「三角函數的差商擋在代數之外」一件事）→ 依 §6.3 的 114 詞／19 式先例，<strong>保留不拆</strong>。</li>
+<li>符號最密的一段是 §3.1 的 72 詞／15 式（和差化積代換），未達 &gt;20 觸發器；依 SPEC「符號密集段落另立標準」<strong>不按詞切句</strong>。</li>
+</ul>
+<h3>地雷勘查</h3>
+<div class="card warn">
+<ul class="tight">
+<li><strong>三節都沒有 <code>CONSTRAINT</code>／<code>WORDING CONSTRAINT</code> 標記</strong>（<code>grep</code> 全章 0 命中）。</li>
+<li>但檔頭註解記了<strong>已裁決的設計</strong>，本輪有四處改到它們附近的句子，逐一確認未動到裁決本身：
+<table>
+<tr><th>已裁決的設計</th><th>本輪改點</th><th>影響</th></tr>
+<tr><td>§3.1 檔頭 D3：even/odd 在 Chapter 1 未定義，<strong>就地建立</strong>；2026-07-03 難度緩解：和差化積在兩處用到之處補角和推導</td><td><span class="id">W-06</span> <span class="id">W-07</span></td><td>even 的就地建立<strong>保留並升為獨立句</strong>（原本塞在插入語裡）；和差化積的 identity、代換式 <code>u/v</code>、展開結論<strong>逐字未動</strong>，只改散文外框</td></tr>
+<tr><td>§3.2 檔頭 D5：只鑄 remainder form 為 Definition 3.1，§2.2 極限定義以散文 cross-ref</td><td><span class="id">W-20</span> <span class="id">W-21</span></td><td>Definition 3.1 與 Proposition 3.3 的<strong>命題文字與數學一字未動</strong>，只動標點與 <span class="en">dies away → shrinks</span></td></tr>
+<tr><td>§3.2 檔頭 2026-07-03 難度緩解：證明前的「首讀可跳過」許可</td><td><span class="id">W-19</span></td><td>跳過許可（可先看 “Using the rule”、例題不依賴證明）<strong>整句保留</strong>，只改前一句的 <span class="en">earns it</span></td></tr>
+<tr><td>§3.3 檔頭 D8：<code>ln</code> 在本章informal，嚴謹構造 fence 到 Ch4 §4.5</td><td><span class="id">W-34</span></td><td>fence 三要素（informally／inverse of exp／deferred to §4.5）<strong>全數保留</strong>，只把誤掛的同位語補回主詞</td></tr>
+</table></li>
+<li><strong>Gate 7 有一件事要先講：</strong><code>make_dist.py</code> 的 <code>NAMES</code> 確實有 <code>ch03</code>（表內為 appB／ch01／ch03；<code>KICKOFF</code> 寫「只有 appB、ch03」已過時），<strong>但 <code>handout/latex/dist/</code> 目前只有 <code>appB</code>、<code>ch01</code>——ch03 從未建過</strong>。所以本輪的 Gate 7 是 ch03 的<strong>首建</strong>，不是回歸；三閘若亮紅，可能是既有問題而非本輪造成。這點在動手前先講明，免得事後把首建債算到平實化頭上。</li>
+<li>既有閘狀態：Ch1–Ch4 依手稿時代 gate 0–8 全跑完成（<code>PIPELINE.md</code>）。故 Gate 5（math）／Gate 6（Mode B）<strong>只審本輪改動句</strong>；圖閘、example 選題、learner-sim 不重跑。</li>
+</ul>
+</div>
+<h2>Gate 1 走查 — 50 條改點 ＋ 3 對 KEEP（propose-only）</h2>
+<p class="small">依 SPEC §3 固定執行序：① 範圍／數學安全 → ② 論述動作判讀 → ③ CUT／KEEP → ④ 節級密度閘 → ⑤ 不換 tic 檢查。每條附<strong>原因標籤</strong>、踩到的測試、一行理由。所有「現況」字串已程式化驗證<strong>在該檔恰好出現一次</strong>（50 條全過），Gate 3 可交易式套用。黃底＝變動處。</p>
+<h3>A. 成對插入語 → 四步仲裁：10 對判「整句重寫」</h3>
+<p class="small">四步：① 拿掉 <code>— Y —</code>，主幹是否仍文法完整、量詞 scope 不變 → ② <code>Y</code> 脫離主幹是否仍有獨立教學用途 → ③ 只修飾同一主張（程度／頻率／時點／必要條件／對比）＝KEEP；是另一步定義／理由／例外／推論／指令／結論＝<strong>整句重寫</strong> → ④ 成對者不進 CUT palette、<strong>MUST NOT 只換成逗號</strong>。下列 10 對全部止於步驟 ③ 的後半。</p>
+<div class="pair">
+  <p class="why"><span class="id">W-01</span> <strong>§3.1</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">R1-LEXICAL</span><br>章 lead。四步②：Y＝定義式回顧，是可獨立表述的定義 → 整句重寫（不逗號化）。順手去掉 from the ground up 這個不透明慣用語。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Chapter 2 built the derivative from <b class="hl">the</b> <b class="hl">ground up —</b> as the limit of a difference <b class="hl">quotient —</b> and turned it into a working toolkit: rules for constants, powers, sums, products, quotients, and the exponential.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Chapter 2 built the derivative from <b class="hl">its</b> <b class="hl">definition</b> as the limit of a difference <b class="hl">quotient,</b> and turned it into a working toolkit: rules for constants, powers, sums, products, quotients, and the exponential.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-07</span> <strong>§3.1</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">PLAIN-SPLIT</span><br>四步②：Y 是術語 even 的**首次命名**（檔頭註解記明「Chapter 1 不定義 even/odd，本處就地建立」）＝可獨立表述的定義 → ③ 整句重寫。命名改為獨立句，術語不再塞在插入語裡。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">the ratio \(\sin\theta/\theta\) is <b class="hl">unchanged</b> <b class="hl">—</b> <b class="hl">it</b> is <b class="hl">an</b> <em>even</em><b class="hl"> function —</b> so it is enough to treat \(\theta > 0\), shrinking to \(0\).</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">the ratio \(\sin\theta/\theta\) is <b class="hl">unchanged.</b> <b class="hl">A</b> <b class="hl">function with this property</b> is <b class="hl">called</b> <em>even</em><b class="hl">,</b> so it is enough to treat \(\theta > 0\), shrinking to \(0\).</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-10</span> <strong>§3.1</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">PLAIN-SPLIT</span><br>四步②：Y 把主詞擴成第二個承載命題（「極限也依賴弧度」），是另一個可獨立成立的結論 → ③ 整句重寫。Caution 是關鍵位置，兩個依賴關係分開講更清楚。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The sector area <b class="hl">\(\tfrac12\theta\) — and with it the limit \(\sin\theta/\theta \to 1\) — </b>uses<b class="hl"> the</b> radian measure, for which the arc cut off on the unit circle has length exactly \(\theta\).</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The<b class="hl"> formula \(\tfrac12\theta\) for the</b> sector area uses radian measure, for which the arc cut off on the unit circle has length exactly \(\theta\).<b class="hl"> The limit \(\sin\theta/\theta \to 1\) rests on that formula, so it depends on radians too.</b></span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-13</span> <strong>§3.1</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">PLAIN-SPLIT</span> <span class="tag warn">R1-LEXICAL</span><br>一句兩個動作（命名 SHM／解釋 sin·cos 為何是振盪模型）→ 拆句。it is no accident that 是警句式修辭，把 pattern 藏起來（R2）；改字面陳述。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em> (Figure <b class="hl">3.4),</b> <b class="hl">and it is no accident that sine</b> and cosine <b class="hl">—</b> the functions whose second derivative is their own <b class="hl">negative</b> <b class="hl">—</b> are<b class="hl"> precisely</b> the ones <b class="hl">that</b> describe oscillation.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">This relation \(s'' = -s\) is the signature of <em>simple harmonic motion</em> (Figure <b class="hl">3.4).</b> <b class="hl">Sine</b> and cosine <b class="hl">are</b> the functions whose second derivative is their own <b class="hl">negative,</b> <b class="hl">and that is why they</b> are the ones <b class="hl">used to</b> describe oscillation.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-22</span> <strong>§3.2</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">PLAIN-SPLIT</span><br>四步②：Y 是**另一步理由**（為何 R₂(0)=0）→ ③ 整句重寫。符號密集段落依 SPEC 走「先立理由再用結論」的 skeleton 重排，不按詞切句；每個數學片段逐字保留、條件—結論不拆散。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Now fix \(h\) with \(0 < \lvert h \rvert < \alpha\). <b class="hl">If</b> \(m_{1} h + R_{1}(h) = 0\)<b class="hl">,</b> <b class="hl">then</b> <b class="hl">\(R_{2}(m_{1} h + R_{1}(h)) = R_{2}(0) = 0\)</b> <b class="hl">—</b> the remainder relation \(f(g(x_{0}) + y) = f(g(x_{0})) + m_{2} y + R_{2}(y)\) <b class="hl">at \(y = 0\) </b>forces \(R_{2}(0) = 0\) <b class="hl">—</b> and the quotient is \(0\). Otherwise \(0 < \lvert m_{1} h + R_{1}(h) \rvert < \delta\), and we factor</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Now fix \(h\) with \(0 < \lvert h \rvert < \alpha\). <b class="hl">Suppose first that</b> \(m_{1} h + R_{1}(h) = 0\)<b class="hl">.</b> <b class="hl">Putting</b> <b class="hl">\(y = 0\)</b> <b class="hl">in</b> the remainder relation \(f(g(x_{0}) + y) = f(g(x_{0})) + m_{2} y + R_{2}(y)\) forces \(R_{2}(0) = 0\)<b class="hl">,</b> <b class="hl">so \(R_{2}(m_{1} h + R_{1}(h)) = R_{2}(0) = 0\)</b> and the quotient is \(0\). Otherwise \(0 < \lvert m_{1} h + R_{1}(h) \rvert < \delta\), and we factor</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-25</span> <strong>§3.2</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">R1-LEXICAL</span> <span class="tag warn">TIC-REBALANCE</span><br>四步②：Y 只是同位語，但整句另有兩個問題——the rule asks for 是 SPEC 明列的擬人（asks），且冒號接子句。整句重寫（非逗號化）：改中性 requires、冒號 −1。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The chain rule does not finish the <b class="hl">job</b> by <b class="hl">itself:</b> <b class="hl">the</b> <b class="hl">factor it asks for —</b> the derivative of the <b class="hl">inside</b> <b class="hl">—</b> is a small problem of its own, here a quotient rule.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The chain rule does not finish the <b class="hl">computation</b> by <b class="hl">itself.</b> <b class="hl">It</b> <b class="hl">requires</b> the derivative of the <b class="hl">inside,</b> <b class="hl">and finding that derivative</b> is a small problem of its own, here a quotient rule.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-27</span> <strong>§3.2</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">PLAIN-SPLIT</span><br>四步②：Y 是該依賴關係的**理由**（另一步推論）→ ③ 重寫。改成與後半完全平行的 since 子句——同句後段本來就這樣寫，平行化反而更好讀。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">the amount of kelp \(K\) depends on the urchin population \(U\) <b class="hl">—</b> urchins eat <b class="hl">kelp —</b> and \(U\) in turn depends on the otter population \(O\), since otters eat urchins.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">the amount of kelp \(K\) depends on the urchin population \(U\)<b class="hl">,</b> <b class="hl">since</b> urchins eat <b class="hl">kelp,</b> and \(U\) in turn depends on the otter population \(O\), since otters eat urchins.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-28</span> <strong>§3.2</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">PLAIN-SPLIT</span><br>四步②：Y 是兩個有限子句、可獨立成立 → ③ 重寫。原句同時做兩個動作（複述非形式論證／說明符號如何對應）→ 拆為兩句。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">This is the formal version of the two-step argument <b class="hl">—</b> otters thin out the <b class="hl">urchins,</b> and fewer urchins let the kelp <b class="hl">recover</b> <b class="hl">— with each</b> \(dy/du\) factor <b class="hl">carrying</b> the sign of one <b class="hl">link</b> and the signs <b class="hl">multiplying</b> along the chain.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">This is the formal version of the two-step argument <b class="hl">that</b> otters thin out the <b class="hl">urchins</b> and<b class="hl"> that</b> fewer urchins let the kelp <b class="hl">recover.</b> <b class="hl">Each</b> \(dy/du\) factor <b class="hl">carries</b> the sign of one <b class="hl">link,</b> and the signs <b class="hl">multiply</b> along the chain.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-35</span> <strong>§3.3</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">PLAIN-SPLIT</span><br>四步②：Y＝「外函數是 exp、內函數是 ln x」是**分解動作**（Strategy 3.1 步驟 1–2 的執行），可獨立成立 → ③ 整句重寫。原句主幹被插入語切成兩半後還要接 so 子句，是本節最難解析的一句。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The left side is a <b class="hl">composition</b> <b class="hl">— the</b> outer function <b class="hl">is</b> <b class="hl">\(\exp\), the</b> inner <b class="hl">is</b> \(\ln x\) <b class="hl">— so by</b> the chain rule (Theorem 3.3), using \(\dfrac{d}{du}e^{u} = e^{u}\) (Chapter 2, §2.4, Theorem 2.5),</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The left side is a <b class="hl">composition,</b> <b class="hl">with</b> outer function <b class="hl">\(\exp\)</b> <b class="hl">and</b> inner <b class="hl">function</b> \(\ln x\)<b class="hl">.</b> <b class="hl">By</b> the chain rule (Theorem 3.3), using \(\dfrac{d}{du}e^{u} = e^{u}\) (Chapter 2, §2.4, Theorem 2.5),</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-47</span> <strong>§3.3</strong> <span class="tag warn">DASH-CUT</span> <span class="tag warn">PLAIN-SPLIT</span><br>四步②：Y 是含內部逗號的**清單**。palette 的括號選項被 ch03 的括號護欄擋下（見 §5）→ 拆為兩句：主幹恢復乾淨的三動詞平行，清單自成一句。順手把模糊的 their kin 換成明確的 \(\arccos\)／\(\arctan\)（R2 明確指涉）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">In every case we found a known identity the function <b class="hl">satisfies — \(e^{\ln x} = x\), \(\ln(x^{x}) = x\ln x\), \(\arcsin(\sin x) = x\) on its branch, and their kin —</b> differentiated it by the chain rule, and solved for the one unknown.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">In every case we found a known identity the function <b class="hl">satisfies,</b> differentiated it by the chain rule, and solved for the one unknown.<b class="hl"> The identities were \(e^{\ln x} = x\), \(\ln(x^{x}) = x\ln x\), and \(\arcsin(\sin x) = x\) on its branch, together with the matching identities for \(\arccos\) and \(\arctan\).</b></span></div>
+</div>
+<h3>B. 逐例 KEEP：3 對成對插入語保留</h3>
+<p class="small">兩閘不可互相豁免：這 3 對<strong>不因密度差幾個名額被機械改掉</strong>；反過來，保留它們也沒有豁免節級密度——§3.1／§3.2／§3.3 改後仍分別是 1.6／3.0／0.0，全數 ≤3.0，不需要動用節級例外。</p>
+<div class="pair">
+  <p class="why"><span class="id">K-1</span> <strong>§3.1</strong> <span class="tag good">DASH-KEEP</span><br>Y＝provided \(\cos\) is continuous，是同一主張的**必要條件**（SPEC KEEP 條列明文允許）。①拿掉後主幹文法完整、量詞 scope 不變；②該條件的字面表述已在下一句（So the derivative rests on two facts…）→ ③ 保留成對 dash。</p>
+  <div class="row after"><span class="lbl">保留</span><span class="txt">The factor \(\cos\bigl(x + \tfrac{h}{2}\bigr)\) ought to tend to \(\cos x\) — provided \(\cos\) is continuous — and the factor</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">K-2</span> <strong>§3.2</strong> <span class="tag good">DASH-KEEP</span><br>Y＝not a literal \(du/du = 1\)，是同一主張的**對比**（SPEC KEEP 條列明文允許），也正是 Remark 3.2 存在的理由（記憶術不是證明）。與 <code>— far more often —</code> 先例同型 → 保留。</p>
+  <div class="row after"><span class="lbl">保留</span><span class="txt">where the controlled error terms — not a literal \(du/du = 1\) — do the work</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">K-3</span> <strong>§3.2</strong> <span class="tag good">DASH-KEEP</span><br>Y＝the \(2x\) in \(\sin(x^{2})\) above，是同一物件的**具體指認**（節拍式插入語）。①主幹 The inner factor \(g'(x)\) is never optional. 完整；②脫離主幹沒有獨立教學動作 → ③ 保留。Caution 是關鍵位置，就地指回剛算過的例子對讀者最有用。</p>
+  <div class="row after"><span class="lbl">保留</span><span class="txt">The inner factor \(g'(x)\) — the \(2x\) in \(\sin(x^{2})\) above — is never optional.</span></div>
+</div>
+<h3>C. 單破折號尾巴 → CUT palette：28 條</h3>
+<p class="small">palette：後段是獨立子句 → <strong>分句</strong>；鬆散同位語／對比 → <strong>逗號</strong>；交付 payload → 冒號。<strong>本輪一律不取冒號、不取括號</strong>——ch03 括號 60 是全書相對最高（kickoff 護欄），冒號則有 appB 首輪「把負載從 dash 搬到冒號、事後再清一次」的教訓。</p>
+<table><tr><th style="width:6%">編號</th><th style="width:5%">節</th><th style="width:14%">標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+<tr><td class="id">W-04</td><td>§3.1</td><td><span class="small">DASH-CUT</span></td><td>No algebraic identity cancels the \(h\) in the denominator against the <b class="hl">numerator</b> <b class="hl">—</b> \(\sin(x + h)\) does not break into pieces that conveniently subtract.</td><td>No algebraic identity cancels the \(h\) in the denominator against the <b class="hl">numerator.</b> <b class="hl">The expansion of</b> \(\sin(x + h)\) does not break into pieces that conveniently subtract.</td></tr>
+<tr><td class="id">W-05</td><td>§3.1</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>That one limit, once secured, <b class="hl">unlocks</b> the derivatives of <em>both</em> \(\sin\) and \(\cos\)<b class="hl"> —</b> and through them the rest of the trigonometric functions.</td><td>That one limit, once secured, <b class="hl">gives</b> the derivatives of <em>both</em> \(\sin\) and \(\cos\)<b class="hl">,</b> and through them the rest of the trigonometric functions.</td></tr>
+<tr><td class="id">W-08</td><td>§3.1</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>In particular \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) for \(\lvert \theta \rvert < \tfrac{\pi}{2}\)<b class="hl"> —</b> a bound we <b class="hl">lean on</b> repeatedly below.</td><td>In particular \(0 \le \lvert \sin\theta \rvert \le \lvert \theta \rvert\) for \(\lvert \theta \rvert < \tfrac{\pi}{2}\)<b class="hl">,</b> a bound we <b class="hl">use</b> repeatedly below.</td></tr>
+<tr><td class="id">W-12</td><td>§3.1</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td><b class="hl">Cosine yields to the very</b> same <b class="hl">machinery,</b> this time through the companion identity \(\cos A - \cos B = -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}\)<b class="hl"> —</b> obtained just like the sine <b class="hl">version,</b> by expanding \(\cos(u + v) - \cos(u - v)\) with the angle-sum formulas.</td><td><b class="hl">The</b> same <b class="hl">machinery handles cosine,</b> this time through the companion identity \(\cos A - \cos B = -2 \sin\frac{A + B}{2} \sin\frac{A - B}{2}\)<b class="hl">,</b> obtained just like the sine <b class="hl">version</b> by expanding \(\cos(u + v) - \cos(u - v)\) with the angle-sum formulas.</td></tr>
+<tr><td class="id">W-14</td><td>§3.1</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>Where \(e^{x}\) reproduces itself in a single step (§2.4), sine and cosine reproduce themselves in a cycle of <b class="hl">four</b> <b class="hl">—</b> the same <b class="hl">self-renewal</b> <b class="hl">that</b> <b class="hl">lets</b> \(s'' = -s\) <b class="hl">describe</b> <b class="hl">an</b> <b class="hl">oscillation that never winds down.</b></td><td>Where \(e^{x}\) reproduces itself in a single step (§2.4), sine and cosine reproduce themselves in a cycle of <b class="hl">four.</b> <b class="hl">That is</b> the same <b class="hl">repetition</b> <b class="hl">behind</b> <b class="hl">the relation</b> \(s'' = -s\) <b class="hl">of</b> <b class="hl">Example</b> <b class="hl">3.3.</b></td></tr>
+<tr><td class="id">W-15</td><td>§3.1</td><td><span class="small">DASH-CUT</span></td><td>We can now differentiate every trigonometric <b class="hl">function —</b> but only in its bare form, \(\sin x\) rather than \(\sin(x^{2})\) or \(\sin(3x + 1)\).</td><td>We can now differentiate every trigonometric <b class="hl">function,</b> but only in its bare form, \(\sin x\) rather than \(\sin(x^{2})\) or \(\sin(3x + 1)\).</td></tr>
+<tr><td class="id">W-16</td><td>§3.2</td><td><span class="small">DASH-CUT</span></td><td>Chapter 2 supplied rules for sums, products, and <b class="hl">quotients —</b> but not for <em>composition</em>, the operation of applying one function to the output of another.</td><td>Chapter 2 supplied rules for sums, products, and <b class="hl">quotients,</b> but not for <em>composition</em>, the operation of applying one function to the output of another.</td></tr>
+<tr><td class="id">W-17</td><td>§3.2</td><td><span class="small">DASH-CUT</span></td><td>the two magnifications <b class="hl">stack</b> <b class="hl">— the</b> composite scales \(h\) by the product \(f'(g(x))\,g'(x)\).</td><td>the two magnifications <b class="hl">stack.</b> <b class="hl">The</b> composite scales \(h\) by the product \(f'(g(x))\,g'(x)\).</td></tr>
+<tr><td class="id">W-18</td><td>§3.2</td><td><span class="small">DASH-CUT</span></td><td>Alongside the chain rule, this section draws on two results that already belong to Chapter <b class="hl">2 —</b> the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1).</td><td>Alongside the chain rule, this section draws on two results that already belong to Chapter <b class="hl">2,</b> the product rule (§2.5) and the fact that a differentiable function is continuous (§2.3, Theorem 2.1).</td></tr>
+<tr><td class="id">W-19</td><td>§3.2</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>The rule is already <b class="hl">usable</b> <b class="hl">— the</b> rest of this section <b class="hl">earns</b> it.</td><td>The rule is already <b class="hl">usable.</b> <b class="hl">The</b> rest of this section <b class="hl">proves</b> it.</td></tr>
+<tr><td class="id">W-20</td><td>§3.2</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>plus an error \(R(h)\) that <b class="hl">dies away</b> faster than \(h\) <b class="hl">does</b> <b class="hl">— the</b> tangent line is a good fit to first order (Figure 3.6).</td><td>plus an error \(R(h)\) that <b class="hl">shrinks</b> faster than \(h\) <b class="hl">does.</b> <b class="hl">The</b> tangent line is a good fit to first order (Figure 3.6).</td></tr>
+<tr><td class="id">W-21</td><td>§3.2</td><td><span class="small">DASH-CUT</span></td><td>and the number \(m\) is the same in <b class="hl">both —</b> namely \(f'(x_{0})\).</td><td>and the number \(m\) is the same in <b class="hl">both,</b> namely \(f'(x_{0})\).</td></tr>
+<tr><td class="id">W-23</td><td>§3.2</td><td><span class="small">DASH-CUT</span></td><td>is to differentiate the outer function and forget the inner <b class="hl">derivative —</b> writing \(\dfrac{d}{dx}\sin(g(x)) = \cos(g(x))\) instead of the correct \(\cos(g(x))\cdot g'(x)\).</td><td>is to differentiate the outer function and forget the inner <b class="hl">derivative,</b> writing \(\dfrac{d}{dx}\sin(g(x)) = \cos(g(x))\) instead of the correct \(\cos(g(x))\cdot g'(x)\).</td></tr>
+<tr><td class="id">W-24</td><td>§3.2</td><td><span class="small">DASH-CUT</span></td><td>Their product is the <b class="hl">derivative</b> <b class="hl">— the</b> slopes multiply down the chain, just as Figure 3.5 pictures.</td><td>Their product is the <b class="hl">derivative.</b> <b class="hl">The</b> slopes multiply down the chain, just as Figure 3.5 pictures.</td></tr>
+<tr><td class="id">W-26</td><td>§3.2</td><td><span class="small">DASH-CUT</span></td><td>since \(\cos^{2} x = [\cos x]^{2}\) is a composition <b class="hl">—</b> outer function \((\,\cdot\,)^{2}\)<b class="hl">,</b> inner function \(\cos x\):</td><td>since \(\cos^{2} x = [\cos x]^{2}\) is a composition <b class="hl">with</b> outer function \((\,\cdot\,)^{2}\)<b class="hl"> and</b> inner function \(\cos x\):</td></tr>
+<tr><td class="id">W-29</td><td>§3.2</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>In the next section the rule does something <b class="hl">new</b> <b class="hl">—</b> <b class="hl">it</b> <b class="hl">becomes the key that unlocks</b> derivatives we could not otherwise reach, those of the inverse functions \(\ln x\), \(\arcsin x\), and \(\arctan x\), and, through logarithmic differentiation, of expressions such as \(x^{x}\).</td><td>In the next section the rule does something <b class="hl">new.</b> <b class="hl">It</b> <b class="hl">gives</b> <b class="hl">us</b> derivatives we could not otherwise reach, those of the inverse functions \(\ln x\), \(\arcsin x\), and \(\arctan x\), and, through logarithmic differentiation, <b class="hl">those </b>of expressions such as \(x^{x}\).</td></tr>
+<tr><td class="id">W-31</td><td>§3.3</td><td><span class="small">DASH-CUT</span></td><td>We have no formula for \(\ln x\) to <b class="hl">differentiate</b> <b class="hl">— it</b> is known only as the function that undoes \(e^{x}\).</td><td>We have no formula for \(\ln x\) to <b class="hl">differentiate.</b> <b class="hl">It</b> is known only as the function that undoes \(e^{x}\).</td></tr>
+<tr><td class="id">W-33</td><td>§3.3</td><td><span class="small">DASH-CUT</span><br><span class="small">PLAIN-SPLIT</span></td><td>It is the chain rule run <b class="hl">backward</b> <b class="hl">— instead</b> of pushing a known derivative forward through a composition (Strategy 3.1), we apply the chain rule to a known relation and read off the one derivative we do not yet have.</td><td>It is the chain rule run <b class="hl">backward.</b> <b class="hl">Instead</b> of pushing a known derivative forward through a composition (Strategy 3.1), we apply the chain rule to a known relation and read off the one derivative we do not yet have.</td></tr>
+<tr><td class="id">W-34</td><td>§3.3</td><td><span class="small">DASH-CUT</span><br><span class="small">PLAIN-SPLIT</span></td><td>Throughout this section we use \(\ln x\) informally, as the inverse of the exponential <b class="hl">function</b> <b class="hl">—</b> the number whose exponential is \(x\), so that \(e^{\ln x} = x\) for every \(x > 0\).</td><td>Throughout this section we use \(\ln x\) informally, as the inverse of the exponential <b class="hl">function.</b> <b class="hl">That is, \(\ln x\) is</b> the number whose exponential is \(x\), so that \(e^{\ln x} = x\) for every \(x > 0\).</td></tr>
+<tr><td class="id">W-37</td><td>§3.3</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>The derivative of the logarithm is more than one more entry in a <b class="hl">table</b> <b class="hl">—</b> <b class="hl">it</b> <b class="hl">powers</b> a <b class="hl">technique.</b></td><td>The derivative of the logarithm is more than one more entry in a <b class="hl">table.</b> <b class="hl">It</b> <b class="hl">also</b> <b class="hl">makes</b> a <b class="hl">general technique possible.</b></td></tr>
+<tr><td class="id">W-39</td><td>§3.3</td><td><span class="small">DASH-CUT</span></td><td>To differentiate a complicated positive expression \(y = f(x)\)<b class="hl"> —</b> especially one with the variable in an exponent:</td><td>To differentiate a complicated positive expression \(y = f(x)\)<b class="hl">,</b> especially one with the variable in an exponent:</td></tr>
+<tr><td class="id">W-40</td><td>§3.3</td><td><span class="small">DASH-CUT</span></td><td>we have \(2^{x} = e^{x\ln 2}\)<b class="hl"> —</b> a composition with inner function \(x\ln 2\) (a constant times \(x\)) and outer function \(\exp\).</td><td>we have \(2^{x} = e^{x\ln 2}\)<b class="hl">,</b> a composition with inner function \(x\ln 2\) (a constant times \(x\)) and outer function \(\exp\).</td></tr>
+<tr><td class="id">W-41</td><td>§3.3</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>The derivative is exactly \(\ln x\)<b class="hl"> —</b> so \(x\ln x - x\) is an <em>antiderivative</em> of \(\ln x\), a fact worth <b class="hl">filing away</b> for when we turn to integration.</td><td>The derivative is exactly \(\ln x\)<b class="hl">,</b> so \(x\ln x - x\) is an <em>antiderivative</em> of \(\ln x\), a fact worth <b class="hl">remembering</b> for when we turn to integration.</td></tr>
+<tr><td class="id">W-42</td><td>§3.3</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>The inverse trigonometric <b class="hl">functions yield to exactly the same lever —</b> only now the identity comes from trigonometry.</td><td>The<b class="hl"> same method works for the</b> inverse trigonometric <b class="hl">functions,</b> only now the identity comes from trigonometry.</td></tr>
+<tr><td class="id">W-44</td><td>§3.3</td><td><span class="small">DASH-CUT</span></td><td>valid where \(\cos x \neq 0\)<b class="hl"> —</b> that is, on the <em>open</em> interior \(x \in \bigl(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr)\), where \(\cos x > 0\).</td><td>valid where \(\cos x \neq 0\)<b class="hl">,</b> that is, on the <em>open</em> interior \(x \in \bigl(-\tfrac{\pi}{2}, \tfrac{\pi}{2}\bigr)\), where \(\cos x > 0\).</td></tr>
+<tr><td class="id">W-45</td><td>§3.3</td><td><span class="small">DASH-CUT</span></td><td>and there \(\cos x = \sqrt{1 - \sin^{2} x} = \sqrt{1 - y^{2}}\)<b class="hl"> —</b> the positive root selected by \(\cos x > 0\).</td><td>and there \(\cos x = \sqrt{1 - \sin^{2} x} = \sqrt{1 - y^{2}}\)<b class="hl">,</b> the positive root selected by \(\cos x > 0\).</td></tr>
+<tr><td class="id">W-46</td><td>§3.3</td><td><span class="small">DASH-CUT</span></td><td>or an inverse trigonometric function <em>directly</em> <b class="hl">— there</b> was no rule to do so.</td><td>or an inverse trigonometric function <em>directly</em><b class="hl">.</b> <b class="hl">There</b> was no rule to do so.</td></tr>
+<tr><td class="id">W-50</td><td>§3.3</td><td><span class="small">DASH-CUT</span><br><span class="small">R1-LEXICAL</span></td><td>and it proves the Mean Value Theorem <b class="hl">(§4.4) —</b> the result that finally lets us define \(\ln x\) as the inverse of the strictly increasing exponential and recover \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) <b class="hl">on solid ground</b> (§4.5).</td><td>and it proves the Mean Value Theorem <b class="hl">(§4.4),</b> the result that finally lets us define \(\ln x\) as the inverse of the strictly increasing exponential and recover \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) <b class="hl">rigorously</b> (§4.5).</td></tr>
+</table>
+<p class="small">理由逐條：<span class="id">W-04</span> 單破折號尾巴，後段是獨立子句 → CUT palette 取分句（不取冒號，避免 tic 位移）。；<span class="id">W-05</span> 單尾巴＝鬆散並列 → 逗號。unlocks 為戲劇動詞（本章散文 3 處：章 lead、此處、W-29），改中性 gives；章 lead 那處刻意保留，見保留清單。；<span class="id">W-08</span> 單尾巴＝鬆散同位語 → 逗號。lean on 片語動詞（同 ch01 puts to work → uses 先例）改 use。；<span class="id">W-12</span> 單尾巴＝分詞同位語 → 逗號。yields to 直接命中 ch01／ch06 先例（→ is handled by），此處改主動語序 the same machinery handles。；<span class="id">W-14</span> 單尾巴。self-renewal／never winds down 是文學語域且不透明；改為明確回指 Example 3.3（R2 明確指涉）。；<span class="id">W-15</span> 單尾巴＝對比 → 逗號。；<span class="id">W-16</span> 單尾巴＝對比 → 逗號。；<span class="id">W-17</span> 單尾巴，後段是獨立子句（交付 payload）→ 分句；不取冒號（§3.2 冒號 13，本輪不往冒號堆）。；<span class="id">W-18</span> 單尾巴＝同位清單 → 逗號（palette 的冒號選項被 tic 護欄擋下，見 §5）。；<span class="id">W-19</span> 單尾巴 → 分句。earns 屬 SPEC 點名的交易隱喻家族（earn／owe／grant／buy），且「一節 earn 一條規則」對 EFL 讀者不可推測；字面義就是 proves。；<span class="id">W-20</span> Definition 3.1 的 informal gloss＝關鍵位置。單尾巴 → 分句；dies away 改中性 shrinks。；<span class="id">W-21</span> Proposition 3.3 陳述內的單尾巴＝同位語 → 逗號。命題文字與數學一字未動。；<span class="id">W-23</span> Caution 內的單尾巴＝分詞同位語 → 逗號。；<span class="id">W-24</span> 單尾巴，後段獨立子句 → 分句。；<span class="id">W-26</span> 單尾巴 → 併入主幹的介系詞片語（比逗號更貼，因為它就是 composition 的規格）。；<span class="id">W-29</span> 單尾巴 → 分句。becomes the key that unlocks 是隱喻疊加；改中性 gives（與 W-05 同族處置）。末段 of expressions → those of expressions 補回平行的先行詞。；<span class="id">W-31</span> 單尾巴，後段獨立子句 → 分句。；<span class="id">W-33</span> 單尾巴後接 34 詞獨立子句（命名／對照兩個動作）→ 分句。；<span class="id">W-34</span> D8 forward fence＝關鍵位置。原句尾巴緊接在 the exponential function 之後，字面上像在解釋**指數函數**（F3 修飾語誤掛）；補回主詞 \(\ln x\) 消歧。That is 為 §3 鼓勵的連接詞。；<span class="id">W-37</span> 單尾巴 → 分句。powers a technique 為不透明搭配（powers 作動詞）。；<span class="id">W-39</span> Strategy 3.2 的操作指令頭（關鍵位置）：單尾巴＝補述 → 逗號。；<span class="id">W-40</span> 單尾巴＝同位語 → 逗號。；<span class="id">W-41</span> 單尾巴，但後段由 so 連接＝並列子句 → 逗號合法。filing away 片語動詞改 remembering。；<span class="id">W-42</span> 單尾巴 → 逗號。yield to 命中 ch01／ch06 先例；lever 見下方 ⛳ 政策題（全節 3 處＋Remark 標題）。；<span class="id">W-44</span> 單尾巴＋that is 已是釋義標記 → 逗號即可。；<span class="id">W-45</span> 單尾巴＝同位語 → 逗號。取根的條件（\(\cos x > 0\)）一字未動。；<span class="id">W-46</span> 單尾巴，後段獨立子句 → 分句。；<span class="id">W-50</span> 單尾巴＝同位語 → 逗號。on solid ground 慣用語 → rigorously。</p>
+<h3>D. 詞彙／句法層（不含破折號）：12 條</h3>
+<p class="small">全部帶 R1／R2 證據（指出不透明處＋給改寫），非無證據的同義詞美化。<strong>沿用已裁先例、不重開裁決：</strong>擬人 <span class="en">yield to</span> → <span class="en">is handled by</span>（<span class="id">W-03</span> <span class="id">W-12</span> <span class="id">W-42</span>）、片語動詞 <span class="en">puts to work</span> → <span class="en">uses</span> 同型（<span class="id">W-08</span> <span class="id">W-30</span>）、交易隱喻家族 <span class="en">earn／spend</span>（<span class="id">W-19</span> <span class="id">W-30</span>）。</p>
+<div class="pair">
+  <p class="why"><span class="id">W-02</span> <strong>§3.1</strong> <span class="tag warn">R1-LEXICAL</span><br>R1：crack／break through 是戲劇動詞配數學物件；SPEC SHOULD 要求中性動詞。字面義（algebra cannot evaluate）在同句補上。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">First we differentiate the trigonometric functions, which forces us to confront a limit <b class="hl">no</b> algebra <b class="hl">can</b> <b class="hl">crack</b> and to <b class="hl">break through</b> it with a piece of geometry.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">First we differentiate the trigonometric functions, which forces us to confront a limit <b class="hl">that</b> algebra <b class="hl">cannot</b> <b class="hl">evaluate</b> and to <b class="hl">settle</b> it with a piece of geometry.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-03</span> <strong>§3.1</strong> <span class="tag warn">R1-LEXICAL</span><br>R1：yield to 擬人，直接引用 ch01／ch06 已裁先例（yield to → is handled by）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">So far <b class="hl">every derivative</b> has <b class="hl">yielded</b> to <b class="hl">algebra.</b></span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">So far <b class="hl">algebra</b> has <b class="hl">been enough</b> to <b class="hl">compute every derivative.</b></span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-06</span> <strong>§3.1</strong> <span class="tag warn">PLAIN-SPLIT</span> <span class="tag warn">R1-LEXICAL</span> <span class="tag warn">TIC-REBALANCE</span><br>≥30 詞＋冒號接子句＋分號，三個可獨立成立的動作（宣告來源／設定代換／執行展開）→ 拆為三句。at your fingertips／in disguise 兩個不透明慣用語同時清掉。冒號 −1、分號 −1。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">If this identity is not <b class="hl">at your fingertips,</b> it <b class="hl">is</b> the angle-sum <b class="hl">formulas</b> <b class="hl">in disguise: set</b> \(u = \frac{A + B}{2}\) and \(v = \frac{A - B}{2}\), so that \(A = u + v\) and \(B = u - v\)<b class="hl">;</b> <b class="hl">expanding</b> \(\sin(u + v) - \sin(u - v)\) by the angle-sum formulas cancels the \(\sin u \cos v\) terms and leaves exactly \(2 \cos u \sin v\).</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">If this identity is not <b class="hl">familiar,</b> it <b class="hl">follows from</b> the angle-sum <b class="hl">formulas.</b> <b class="hl">Set</b> \(u = \frac{A + B}{2}\) and \(v = \frac{A - B}{2}\), so that \(A = u + v\) and \(B = u - v\)<b class="hl">.</b> <b class="hl">Expanding</b> \(\sin(u + v) - \sin(u - v)\) by the angle-sum formulas cancels the \(\sin u \cos v\) terms and leaves exactly \(2 \cos u \sin v\).</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-09</span> <strong>§3.1</strong> <span class="tag warn">R1-LEXICAL</span><br>F2 贅字 in order to（rubric 明列）＋ settle to 擬人；改中性 approach。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Continuity is exactly what the two factors of the difference quotient need <b class="hl">in order </b>to <b class="hl">settle to</b> their values as \(h \to 0\), so we establish it now.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Continuity is exactly what the two factors of the difference quotient need to <b class="hl">approach</b> their values as \(h \to 0\), so we establish it now.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-11</span> <strong>§3.1</strong> <span class="tag warn">R1-LEXICAL</span><br>R1：all but 對 EFL 讀者是高風險功能詞（字面像「幾乎不」，實為「幾乎完全」）；evaluates itself 擬人。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">With continuity and the fundamental limit <b class="hl">in hand,</b> the difference quotient for \(\sin\) <b class="hl">all</b> <b class="hl">but</b> <b class="hl">evaluates</b> <b class="hl">itself.</b></span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">With continuity and the fundamental limit <b class="hl">established,</b> the difference quotient for \(\sin\) <b class="hl">is</b> <b class="hl">now</b> <b class="hl">easy</b> <b class="hl">to evaluate.</b></span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-30</span> <strong>§3.3</strong> <span class="tag warn">R1-LEXICAL</span><br>spends 屬交易隱喻家族，且與 machinery 混喻（機器不能被「花掉」）。引用 ch01 puts to work → uses 先例。分號保留（單一對稱對比，SPEC 允許）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Sections 3.1 and 3.2 built the machinery; this section <b class="hl">spends</b> it.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Sections 3.1 and 3.2 built the machinery; this section <b class="hl">uses</b> it.</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-32</span> <strong>§3.3</strong> <span class="tag warn">R1-LEXICAL</span><br>R1 關鍵位置：這是本節唯一以斜體標出的**方法陳述**，attack head-on 是不透明慣用語且無緊鄰釋義（rubric R 擋稿線②）。改字面 no rule … directly，與前段 no rule of Chapter 2 can touch directly 用語一致（R3）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt"><em><b class="hl">to</b> <b class="hl">differentiate</b> a function <b class="hl">you cannot attack head-on,</b> differentiate an identity it satisfies, then solve for the derivative you want.</em></span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt"><em><b class="hl">when</b> <b class="hl">no rule differentiates</b> a function <b class="hl">directly,</b> differentiate an identity it satisfies, then solve for the derivative you want.</em></span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-36</span> <strong>§3.3</strong> <span class="tag warn">R1-LEXICAL</span><br>trapped／set it free 是擬人＋戲劇動詞（SPEC SHOULD 的中性動詞條）；isolated 正是數學上在做的事。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The unknown derivative <b class="hl">was trapped</b> inside a relation we could differentiate; one application of the chain rule and <b class="hl">a</b> division <b class="hl">set</b> <b class="hl">it free.</b></span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The unknown derivative <b class="hl">sat</b> inside a relation we could differentiate; one application of the chain rule and <b class="hl">one</b> division <b class="hl">isolated</b> <b class="hl">it.</b></span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-38</span> <strong>§3.3</strong> <span class="tag warn">R1-LEXICAL</span><br>sprawling 為低頻文學詞，對 EFL 讀者不可推測；語意就是 long。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">or is a <b class="hl">sprawling</b> product and quotient of many factors,</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">or is a <b class="hl">long</b> product and quotient of many factors,</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-43</span> <strong>§3.3</strong> <span class="tag warn">R1-LEXICAL</span><br>gave way 擬人＋不透明（字面是「讓路／崩塌」）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt"><b class="hl">The</b> logarithm<b class="hl"> gave way</b> because it is the inverse of \(e^{x}\): we differentiated the relation \(e^{\ln x} = x\).</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt"><b class="hl">We could differentiate the</b> logarithm because it is the inverse of \(e^{x}\): we differentiated the relation \(e^{\ln x} = x\).</span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-48</span> <strong>§3.3</strong> <span class="tag warn">R1-LEXICAL</span><br>見 ⛳ 政策題（lever 母題，本節 3 處＋Remark 3.3 標題）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Once more the same <b class="hl">lever.</b></span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Once more the same <b class="hl">method.</b></span></div>
+</div>
+<div class="pair">
+  <p class="why"><span class="id">W-49</span> <strong>§3.3</strong> <span class="tag warn">R1-LEXICAL</span><br>章節收束句：a lever that pries loose 是罕見搭配（pries loose）；字面義已在前句完整給出，故只換詞、不補述。見 ⛳ 政策題。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The chain rule is not only a tool for pushing derivatives forward through a composition; turned on an identity, it <b class="hl">is</b> <b class="hl">a</b> <b class="hl">lever that pries loose</b> derivatives we could reach in no other way.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The chain rule is not only a tool for pushing derivatives forward through a composition; turned on an identity, it <b class="hl">also</b> <b class="hl">gives</b> <b class="hl">us</b> derivatives we could reach in no other way.</span></div>
+</div>
+<h2>④ 節級密度閘 ＋ ⑤ 不換 tic（記憶體模擬預測，Gate 4 將實測覆核）</h2>
+<table>
+<tr><th>節</th><th class="num">— 前</th><th class="num">— 後</th><th class="num">/1000 前</th><th class="num">/1000 後</th><th>達標</th></tr>
+<tr><td>§3.1</td><td class="num">16</td><td class="num">2</td><td class="num">12.9</td><td class="num"><strong>1.6</strong></td><td><span class="tag good">✔ ≤3.0</span>（留 <span class="id">K-1</span>）</td></tr>
+<tr><td>§3.2</td><td class="num">22</td><td class="num">4</td><td class="num">16.4</td><td class="num"><strong>3.0</strong></td><td><span class="tag good">✔ ≤3.0</span>（留 <span class="id">K-2</span> <span class="id">K-3</span>；2.97，餘裕最小）</td></tr>
+<tr><td>§3.3</td><td class="num">16</td><td class="num">0</td><td class="num">12.6</td><td class="num"><strong>0.0</strong></td><td><span class="tag good">✔</span></td></tr>
+<tr><td><strong>全章</strong></td><td class="num"><strong>54</strong></td><td class="num"><strong>6</strong></td><td class="num"><strong>14.0</strong></td><td class="num"><strong>1.6</strong></td><td><span class="tag good">✔ 遠低於 T_can</span></td></tr>
+</table>
+<table>
+<tr><th>tic</th><th class="num">前</th><th class="num">後</th><th class="num">raw Δ</th><th class="num">密度 Δ/1000</th><th>門檻（raw ≥+3 <em>且</em> 密度 ≥+0.5）</th></tr>
+<tr><td>冒號接子句</td><td class="num">36</td><td class="num">34</td><td class="num">−2</td><td class="num">−0.55</td><td><span class="tag good">未觸發（下降）</span></td></tr>
+<tr><td>分號</td><td class="num">20</td><td class="num">19</td><td class="num">−1</td><td class="num">−0.27</td><td><span class="tag good">未觸發（下降）</span></td></tr>
+<tr><td>左括號</td><td class="num">60</td><td class="num">60</td><td class="num">±0</td><td class="num">−0.05</td><td><span class="tag good">未觸發（持平）</span></td></tr>
+<tr><td><strong>成對逗號</strong></td><td class="num">28</td><td class="num">35</td><td class="num"><span class="out">+7</span></td><td class="num"><span class="out">+1.79</span></td><td><span class="tag bad">★ 觸發，須填理由</span></td></tr>
+</table>
+<div class="card warn">
+<strong>成對逗號 +7 的理由（護欄要求）</strong>
+<ol class="tight">
+<li><strong>落點被兩條既有護欄夾窄。</strong>CUT palette 有三個落點：冒號、括號、逗號／分句。ch03 的括號 60 是全書相對最高（kickoff 明令不得再堆）；冒號有 appB 首輪的教訓（把負載從 dash 搬到冒號、事後得再清一次）。本輪 28 個單尾巴裡已<strong>盡量取分句（12 條）</strong>，其餘 16 條只剩逗號可用。</li>
+<li><strong>逐條歸因後，真正新增的「逗號成對插入語」只有 2 處</strong>——<span class="id">W-12</span>（<span class="en">, obtained just like the sine version…</span>）與 <span class="id">W-40</span>（<span class="en">, a composition with inner function…</span>），都是 palette 指定的同位語落點。
+腳本 +7 中其餘 5 處是<strong>並列／連接用逗號</strong>：<span class="id">W-05</span>（<span class="en">, and</span>）、<span class="id">W-07</span>（<span class="en">, so</span>）、<span class="id">W-16</span>（<span class="en">, but</span>）、<span class="id">W-34</span>（<span class="en">. That is,</span>）、<span class="id">W-41</span>（<span class="en">, so</span>）。
+<code>paired_comma</code> 的正規式 <code>,\s+(\w+\s+){1,6}?,\s+</code> 是<strong>代理指標</strong>，非重疊掃描下前一個逗號位置一變會連鎖改變後續配對，因而把這些並列逗號一併計入。</li>
+<li><strong>三項真正的 tic 全部下降或持平</strong>（冒號 −2、分號 −1、括號 ±0）——沒有把負載從 dash 搬到別處，這正是護欄要防的事。</li>
+<li><strong>應變方案（若你認為仍太高）：</strong>把 <span class="id">W-16</span>、<span class="id">W-41</span> 兩條由逗號改為分句，可再降 2；代價是 §3.2 開場與 §3.3 Example 3.12 各多一個短句，節奏更趨均勻（SPEC 提醒「避免連續三句長度相近」）。<strong>預設不做</strong>，等你的裁決。</li>
+</ol>
+</div>
+<h2>Gate 5 預跑 — 數學片段程式化比對</h2>
+<table>
+<tr><th>檔</th><th class="num">片段數 前 → 後</th><th class="num">內容改動</th><th class="num">新增</th><th>判讀</th></tr>
+<tr><td><code>sec-3-1.html</code></td><td class="num">216 → 216</td><td class="num"><strong>0</strong></td><td class="num">0</td><td><span class="tag good">零差異</span></td></tr>
+<tr><td><code>sec-3-2.html</code></td><td class="num">202 → 202</td><td class="num"><strong>0</strong></td><td class="num">0</td><td><span class="tag good">零差異</span></td></tr>
+<tr><td><code>sec-3-3.html</code></td><td class="num">187 → 190</td><td class="num"><strong>0</strong></td><td class="num">3</td><td>新增皆為<strong>既有符號的再指涉</strong>，見下</td></tr>
+</table>
+<ul class="tight">
+<li><strong>沒有任何一個既有數學片段被改動</strong>（multiset 比對，含 display）。§3.1／§3.2 的差異只是<strong>順序</strong>（<span class="id">W-10</span> <span class="id">W-22</span> 重排句子），multiset 完全相同。</li>
+<li>§3.3 新增 3 個行內式：<span class="id">W-34</span> 補一個 \(\ln x\)（把誤掛的同位語補回主詞），<span class="id">W-47</span> 補 \(\arccos\)、\(\arctan\)（把模糊的 <span class="en">their kin</span> 換成明確指涉）。三者都是<strong>已在本節出現過的記號</strong>，不引入新記號、不改任何公式。</li>
+<li>公式編號、<code>\tag{1}</code>、cross-ref（Theorem 3.1–3.3／Proposition 3.1–3.3／Example 3.1–3.16／Figure 3.1–3.7／§1.5／§2.3／§2.4／§2.5／§4.3／§4.4／§4.5）<strong>一律未碰</strong>。</li>
+</ul>
+<h2>保留清單（示範規則不誤傷；刻意不動）</h2>
+<ol class="tight">
+<li><strong><span class="id">K-1</span> <span class="id">K-2</span> <span class="id">K-3</span> 三對成對插入語</strong>——四步仲裁判 KEEP（必要條件／對比／具體指認），理由見上。</li>
+<li><strong>章 lead 的 <span class="en">use it to unlock the derivatives of…</span></strong>（<code>sec-3-1.html</code> 第 42 行）——<span class="en">unlock</span> 家族本輪在 <span class="id">W-05</span>／<span class="id">W-29</span> 已改中性動詞，但 <strong>lead 這處刻意留一個導航隱喻</strong>：依 SPEC「邏輯內容平實；教學導航可溫暖」，章開場是導航位置，字面義在同段其他句已完整給出。全章改完仍有此一處，是<strong>設計選擇不是遺漏</strong>。</li>
+<li><strong>§3.1 和差化積的就地推導</strong>（kickoff 專屬前提）——identity、代換 \(u = \tfrac{A+B}{2}\)／\(v = \tfrac{A-B}{2}\)、展開結論全部逐字保留；<span class="id">W-06</span> 只拆散文外框。</li>
+<li><strong>§3.2 鏈鎖法則證明的 ε-δ skeleton</strong>——只動 <span class="id">W-22</span> 一句（把「為何 \(R_{2}(0)=0\)」的理由從插入語升為獨立句），其餘推導、bullet、估計式逐字保留；未拆散量詞 scope 與條件—結論。</li>
+<li><strong>FLAG 句式一律不因形式報 finding</strong>（SPEC 明文）——例：§3.2 的 <span class="en">What actually makes the rule true is the argument given below</span> 是好 cleft、§3.2 的 <span class="en">The definition requires…</span> 型數學物件作主詞屬正常，皆保留。</li>
+<li><strong>§3 鼓勵的連接詞、<span class="en">Informally, …</span> gloss、<span class="en">we</span> 代名詞、教學重複、topic-term recurrence</strong>——rubric 明列非 finding，未動。</li>
+<li><strong>不提任何拆段</strong>——三個 MUST 觸發器皆未命中（見 Gate 0 段落層）。</li>
+</ol>
+<h2>⛳ 需要你裁決的三件事</h2>
+<div class="card warn">
+<p><strong>(1) <span class="en">lever</span> 母題要不要連標題一起改？</strong></p>
+<p>§3.3 用 <span class="en">lever</span>（槓桿）當全節的連接母題，散文 3 處＋<strong>Remark 3.3 的 env-name「One lever for many derivatives」</strong>。
+本輪已提議把散文 3 處換成字面說法（<span class="id">W-42</span> <span class="id">W-48</span> <span class="id">W-49</span>）——理由是 <span class="en">a lever that pries loose</span> 屬罕見搭配（R1），且字面義在鄰句已完整給出。
+但<strong>標題我沒動</strong>：env-name 屬結構性文字，改它會讓「章內回查用的標題」與既有紀錄脫鉤。三個選項：</p>
+<table>
+<tr><th>選項</th><th>做法</th><th>取捨</th></tr>
+<tr><td><strong>(a) 散文改、標題留</strong><br><span class="tag good">預設</span></td><td>照走查執行，Remark 3.3 標題維持 <span class="en">One lever for many derivatives</span></td><td>標題是唯一殘留的隱喻，位置醒目但不承載邏輯內容；改動最小</td></tr>
+<tr><td>(b) 散文改、標題連動</td><td>標題改 <span class="en">One method, many derivatives</span></td><td>語域最一致；代價是動到結構性文字，需一併確認無他處引用該標題</td></tr>
+<tr><td>(c) 全部保留 lever</td><td>撤回 <span class="id">W-42</span> <span class="id">W-48</span> <span class="id">W-49</span> 的換詞（破折號處置仍照做）</td><td>保住作者刻意經營的母題；代價是 <span class="en">pries loose</span> 這個罕見搭配留著</td></tr>
+</table>
+</div>
+<div class="card warn">
+<p><strong>(2) 成對逗號 +7 接不接受？</strong>理由已填在上節。若要壓低，應變方案是把 <span class="id">W-16</span>、<span class="id">W-41</span> 改為分句（−2）。<strong>預設接受現況</strong>。</p>
+</div>
+<div class="card warn">
+<p><strong>(3) 要不要跑 Gate 2（Codex 跨模型獨立裁決）？</strong>依 <code>CLAUDE.md</code>，Codex 唯讀調用<strong>需逐次徵同意</strong>，我不會自行呼叫。
+ch01 那輪的 Gate 2 產出 ADOPT 34／MODIFY 7／REJECT 1——<strong>抓到一條不該改的</strong>，值回票價。ch03 這輪有 50 條、且推翻了 kickoff 前提，建議跑。
+材料一律 inline 進 prompt（本機讓 Codex 自讀 fragment 會 UTF-8 亂碼），prompt 會偏大 → 背景執行、約 10–15 分鐘。</p>
+</div>
+<h2>順帶記一行（非本輪 finding，不動）</h2>
+<ul class="tight">
+<li>章 lead 寫 <span class="en">use it to unlock the derivatives of inverse and <strong>implicitly defined</strong> functions</span>，而 <code>sec-3-2.html</code> 檔頭 D10 記明本章<strong>不引入 implicit differentiation 的框架與詞彙</strong>。lead 用的是描述性說法（arcsin／ln 確實由 identity 隱式定義），不算違反 D10，但兩處用語的距離值得下次 Mode B 順手看一眼。<strong>本輪不動。</strong></li>
+<li><code>KICKOFF-plain-backfill.md</code> Gate 7 寫「目前 <code>NAMES</code> 表只有 appB、ch03」，實際已含 ch01（ch01 輪加的）。<strong>discoverability gap，非衝突</strong>；本輪依平行紀律不改共用檔，留給合併回收時一併更新。</li>
+</ul>
+<h2>下一步（等你裁決後才動手）</h2>
+<ol class="tight">
+<li>你裁決三件事（lever 標題／成對逗號／Gate 2）。</li>
+<li>（若同意）Gate 2 Codex 逐項 ADOPT／MODIFY／REJECT，產 <code>REPORT-ch03-plain-codex-raw.md</code>。</li>
+<li>Gate 3 交易式套用 → <code>tools/verify_edits.py</code> 須 PASS（工作樹 == HEAD ＋ 恰好這些替換，未涵蓋差異 0 處）。</li>
+<li>Gate 4 <code>python handout/html/build.py ch03</code> ＋ <code>prose_metrics.py --unit ch03</code> 實測覆核。</li>
+<li>Gate 5／6 只審改動句；Gate 7 <code>cd handout/latex &amp;&amp; python make_dist.py ch03</code>（<strong>ch03 首建</strong>，三閘全綠）；Gate 8 分頁目檢。</li>
+<li>Gate 9 產 <code>REVIEW-ch03-plain-applied.html</code>，末尾留「待併：rollout 帳本 §2 的 ch03 列」；commit 到 <code>handout/plain-ch03</code>。</li>
+</ol>
+<p class="foot">本檔為 <strong>Gate 1 走查、propose-only</strong>——產出時<strong>尚未修改任何 fragment</strong>（<code>git status</code> 乾淨可查）。
+判準權威＝<code>CONTENT_SPEC.md</code> §3〈平實英文條款〉（RC，2026-07-25 凍結）；流程權威＝<code>handout/html/_audit/KICKOFF-plain-backfill.md</code>。
+平行紀律：本輪未編輯 <code>REPORT-emdash-baseline-and-rollout.md</code>，未編輯 <code>make_dist.py</code> 的 <code>NAMES</code>（ch03 本來就在表內，不需改）。</p>
+</body></html>

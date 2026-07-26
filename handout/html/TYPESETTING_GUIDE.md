@@ -286,6 +286,19 @@ el.style.setProperty("--fig-w", "var(--fig-1-5)");
 - `--serif` 退路鏈：`"New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif`。
 - 字級：`.sheet-body.paper { font-size: 12pt; line-height: 1.55; }`。改 `line-height` 須同步改 `.qed` 的負 margin（綁定 `1.55em`）。
 
+#### 印刷線的字型來源與螢幕不同（2026-07-26，ch03 首建實測）
+
+上表講的是**螢幕**的 standalone。圖匯進 LaTeX 時（`handout/latex/export_figs.mjs`）**刻意換掉其中一個來源**，兩者不是同一份檔案：
+
+| 字型 | 螢幕 standalone | 圖匯出（印刷線） | 為什麼不同 |
+|---|---|---|---|
+| Inter | Google Fonts CDN | **repo 內附的完整 OTF**（`handout/latex/template/fonts/inter/`） | Google Fonts 送的是**子集**，不含 `U+2080` 下標零。`x₀`／`u₀`／`y₀` 這種 label 因此字母印 Inter、下標逐字元後備到 **Times New Roman**（Windows 的最後手段後備），還連帶讓字形閘擋稿 |
+| New Computer Modern | jsDelivr CDN（`web-computer-modern`） | **仍走 CDN** | 不能改用 TeX 樹那份 `NewCM10-*.otf`：Chrome 的 OTS **拒收**它——`OTS parsing error: CFF : Failed validating CharStrings INDEX`（Regular 與 Italic 失敗，Bold／BoldItalic 反而通過） |
+
+- **機制：** exporter 起一個本機 http 伺服器把 wrapper 與字型一起供稿。**不能用 `file://` 或 data URI**——webfont 是 CORS 檢查的 subresource，而 `file://` 頁面是 opaque origin，三種注入方式（`file://`、單發 data URI、分塊 data URI）實測全部 `NetworkError: A network error occurred.`，加 `--allow-file-access-from-files` 也無效。
+- **殘留：** 圖匯出**仍需連網**（只為 NCM）。圖 PDF 帶進最終 PDF 的 `WebCM-Serif-10-*` 子集是 TrueType，本機無原始檔可比對，由字形閘的 `FIG_IMPORTED_OK` 具名白名單放行（`handout/latex/check_glyphs.py`，ch02 rollout 立）。
+- **教訓：** 「兩條線用同一個字型」在這裡曾經只是**名字相同**。要真的相同，得確認送到瀏覽器的是哪一份檔案——子集與完整檔的差別可以只是一個字元，而症狀是別的字體悄悄混進版面。
+
 ### 9.2 版心（measure）
 
 - **版心寬 150mm**（講義型取向）：A4 210mm，`.sheet { padding: 20mm 28mm 20mm 32mm; }`（左 32／右 28，留 4mm 裝訂偏移）。

@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REVIEW — ch04 散文平實化回填（Gate 1 走查稿）</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+                   options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+ :root{--fg:#1a1a1a;--mut:#666;--line:#e0e0e0;--del:#fff1f0;--ins:#f0fff4;--delb:#d93025;--insb:#188038;}
+ *{box-sizing:border-box}
+ body{font:16px/1.75 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+      color:var(--fg);max-width:960px;margin:0 auto;padding:2rem 1.2rem 6rem;background:#fff}
+ h1{font-size:1.6rem;margin:0 0 .3rem}
+ h2{font-size:1.25rem;margin:2.6rem 0 .8rem;padding-bottom:.3rem;border-bottom:2px solid var(--fg)}
+ h3.sech{font-size:1.05rem;margin:2rem 0 .8rem;padding:.35rem .6rem;background:#f5f5f5;border-left:4px solid #444}
+ .sub{color:var(--mut);margin:.2rem 0 1.4rem;font-size:.92rem}
+ table{border-collapse:collapse;width:100%;margin:.8rem 0 1.4rem;font-size:.92rem}
+ th,td{border:1px solid var(--line);padding:.42rem .6rem;text-align:left}
+ th{background:#f5f5f5;font-weight:600}
+ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+ .ok{color:var(--insb);font-weight:700} .warn{color:#b06000;font-weight:700}
+ .box{border:1px solid var(--line);border-left:4px solid #b06000;background:#fffbf2;padding:.9rem 1.1rem;margin:1.2rem 0;border-radius:3px}
+ .box.info{border-left-color:#1a73e8;background:#f4f8ff}
+ .box h4{margin:0 0 .5rem;font-size:1rem}
+ .card{border:1px solid var(--line);border-radius:4px;padding:.8rem 1rem;margin:.8rem 0}
+ .card.keep{border-left:4px solid #188038;background:#fafffb}
+ .card.para{border-left:4px solid #7b1fa2;background:#fdfaff}
+ .card.policy{border-left:4px solid #b06000;background:#fffbf2}
+ .chead{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin-bottom:.45rem}
+ .cid{font:700 .82rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;background:#222;color:#fff;
+       padding:.28rem .5rem;border-radius:3px}
+ .lab{font-size:.72rem;padding:.2rem .45rem;border-radius:10px;border:1px solid}
+ .l-dash{background:#fff3e0;border-color:#e8a33d;color:#8a5200}
+ .l-split{background:#e8f0fe;border-color:#7aa7f0;color:#12468f}
+ .l-lex{background:#f3e8fd;border-color:#b47ce0;color:#5b1d8f}
+ .l-keep,.l-para,.l-pol{background:#e6f4ea;border-color:#7fc496;color:#0d652d}
+ .l-para{background:#f6e8fd;border-color:#b47ce0;color:#5b1d8f}
+ .l-pol{background:#fff3e0;border-color:#e8a33d;color:#8a5200}
+ .l-r2,.l-r3,.l-f1,.l-other{background:#eee;border-color:#bbb;color:#444}
+ .dcount{font-size:.74rem;color:#8a5200;font-weight:700}
+ .test{font-size:.78rem;color:var(--mut);margin-left:auto}
+ .why{margin:.35rem 0 .6rem;font-size:.93rem;color:#333}
+ .verdict{margin:.3rem 0;font-size:.95rem}
+ .diff del,.diff ins{display:block;padding:.55rem .75rem;text-decoration:none;border-radius:3px;
+      font:15px/1.7 Georgia,"Times New Roman",serif;margin:.25rem 0}
+ .diff del{background:var(--del);border-left:3px solid var(--delb)}
+ .diff ins{background:var(--ins);border-left:3px solid var(--insb)}
+ .diff del::before{content:"原　";color:var(--delb);font:700 .78rem/1 sans-serif}
+ .diff ins::before{content:"改　";color:var(--insb);font:700 .78rem/1 sans-serif}
+ blockquote{margin:.3rem 0;padding:.55rem .75rem;background:#f6f6f6;border-left:3px solid #888;
+      font:15px/1.7 Georgia,serif}
+ code{background:#f2f2f2;padding:.08rem .3rem;border-radius:3px;font-size:.9em}
+ q{font-family:Georgia,serif}
+ .cnt{font-size:.8rem;color:var(--mut);font-weight:400}
+ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--mut);font-size:.85rem}
+</style></head><body>
+
+<h1>ch04 散文平實化回填（合併 sweep）——Gate 1 走查稿</h1>
+<p class="sub">分支 <code>handout/plain-ch04</code>｜2026-07-25｜狀態：<strong>propose-only，尚未改動任何 fragment</strong>｜
+判準＝<code>CONTENT_SPEC.md</code> §3〈平實英文條款〉（RC）｜流程＝<code>KICKOFF-plain-backfill.md</code> Gate 0–9</p>
+
+<div class="box">
+<h4>⚠ Gate 0 的前提修正：ch04 的 fragment 並非「手稿逐字」</h4>
+<p>kickoff 依 ch01 先例假定 ch02–ch04 是手稿章、「內容逐字取自手稿」，因此預期詞彙層 findings 遠少於 canon 章。
+<strong>對 ch04 這個前提不成立。</strong>把 fragment 與手稿
+<code>legacy/tex_handout/chapters/ch04_exponential_logarithm.tex</code> 做 8-gram 逐字覆蓋比對：</p>
+<table><tr><th>單元</th><th class=n>fragment N</th><th class=n>手稿 N</th><th class=n>8-gram 逐字覆蓋</th><th>判讀</th></tr>
+<tr><td>ch01</td><td class=n>6039</td><td class=n>6142</td><td class=n><strong>34.7%</strong></td><td>真正的手稿逐字章（ch01 先例的來源）</td></tr>
+<tr><td>ch02</td><td class=n>7181</td><td class=n>5731</td><td class=n>2.4%</td><td>依手稿內容重寫</td></tr>
+<tr><td>ch03</td><td class=n>4024</td><td class=n>3435</td><td class=n>0.1%</td><td>依手稿內容重寫</td></tr>
+<tr><td><strong>ch04</strong></td><td class=n>7179</td><td class=n>6347</td><td class=n><strong>1.6%</strong></td><td><strong>依手稿內容重寫，散文是 LLM 自產</strong></td></tr></table>
+<p>逐 dash 比對同向：手稿本身 25 個 em-dash（4.31/1000，本身也超標，與 ch01 手稿的 2.42 不同），
+而 fragment 的 92 個裡只有 <strong>1 個逐字沿用、4 個結構同源，其餘 87 個是 LLM 增補</strong>。
+實際讀下來也如此——手稿開頭是 <q>The natural exponential function appeared informally in Chapter 2…</q>，
+fragment 是 <q>The natural exponential function \(e^{x}\) has already done a great deal of work for us…</q>。</p>
+<p><strong>對本輪的影響：</strong>詞彙層 findings 的預期量要照 canon 章而非手稿章估。實測 ch04 的 R1 家族命中約
+7/千詞，落在 ch01 §1.4（≈0）與 ch06 §6.2（14.7）之間——合理，因為內容骨架來自手稿、散文是 LLM 寫的。
+本走查因此列了 40 條詞彙層 findings；這不是湊數，每條都附 R1／R2／R3 證據與改寫。
+<strong>ch02／ch03 的平行 session 也適用同一修正</strong>（覆蓋率 2.4%／0.1%，同樣不能預期「乾淨」）。
+「手稿逐字的成對插入語保留」這條裁決仍然有效，只是在 ch04 只命中 2 處（K-02、K-05）。</p>
+</div>
+
+<h2>一、Gate 0 前值與 Gate 1 提案後的投影</h2>
+<table>
+<tr><th>指標</th><th class=n>Gate 0 前值</th><th class=n>提案後（乾跑）</th><th class=n>變化</th><th>判定</th></tr>
+<tr><td>canonical N</td><td class=n>6895</td><td class=n>6907</td><td class=n>+12</td><td>—</td></tr>
+<tr><td><strong>em-dash</strong></td><td class=n>92</td><td class=n><strong>10</strong></td><td class=n>−82</td><td>—</td></tr>
+<tr><td><strong>密度 /1000</strong></td><td class=n>13.3</td><td class=n><strong>1.45</strong></td><td class=n>−11.9</td><td class="ok">PASS（T_can ≤3.0）</td></tr>
+<tr><td>冒號接子句</td><td class=n>68</td><td class=n>67</td><td class=n>−1</td><td class="ok">未上升</td></tr>
+<tr><td>分號</td><td class=n>45</td><td class=n>44</td><td class=n>−1</td><td class="ok">未上升</td></tr>
+<tr><td>左括號</td><td class=n>82</td><td class=n>82</td><td class=n>±0</td><td class="ok">全書最高，一個沒加</td></tr>
+<tr><td>成對逗號</td><td class=n>26</td><td class=n>29</td><td class=n>+3</td><td class="warn">見下方說明</td></tr>
+</table>
+<p class="sub">護欄門檻＝raw ≥+3 <strong>且</strong> 密度 ≥+0.5/1000 才須填理由。成對逗號 raw +3、密度 +0.4/1000，
+未同時達標，但仍照實記錄：三筆新增全是 <code>prose_metrics.py</code> 的近似式（<code>,\s+(\w+\s+){1,6}?,\s+</code>）
+在數學被剝除後把「句首狀語逗號＋關係子句逗號」誤計為插入語，<strong>不是真的成對逗號插入語</strong>——
+逐筆是 C4-37 的 <q>Sorted by total degree, … , which is group (I)</q>、C4-70 的 <q>…is positive, so … , and therefore…</q>、
+C4-82 的 <q>To see this, note that … , so Corollary 4.4…</q>。護欄的用意（別把負載從破折號搬去逗號插入語）沒有被違反。</p>
+
+<h3 class="sech">逐節</h3>
+<table>
+<tr><th>節</th><th class=n>N</th><th class=n>— 前</th><th class=n>— 後</th><th class=n>/1000 前</th><th class=n>/1000 後</th></tr>
+<tr><td>§4.1</td><td class=n>1395</td><td class=n>17</td><td class=n>4</td><td class=n>12.1</td><td class=n>2.9</td></tr>
+<tr><td>§4.2</td><td class=n>1863</td><td class=n>23</td><td class=n>2</td><td class=n>12.3</td><td class=n>1.1</td></tr>
+<tr><td>§4.3</td><td class=n>576</td><td class=n>12</td><td class=n>0</td><td class=n>21.1</td><td class=n>0.0</td></tr>
+<tr><td>§4.4</td><td class=n>1811</td><td class=n>21</td><td class=n>2</td><td class=n>11.7</td><td class=n>1.1</td></tr>
+<tr><td>§4.5</td><td class=n>1262</td><td class=n>19</td><td class=n>2</td><td class=n>15.2</td><td class=n>1.6</td></tr>
+</table>
+<p class="sub">§4.3 歸零不是機械清光：該節 12 個 dash 逐條走四步仲裁後，
+唯一夠格 KEEP 的一處（<q>three properties — convergence, continuity, and the exponent law —</q>）
+在同時要修 <em>leaned on</em> 這個詞彙 finding 時，改寫成「三項直接當受詞」反而連逗號都不必加（C4-41），
+於是自然歸零。§4.3 N=576 &lt;1000，依 SPEC 只報 raw 0/576、不單獨判定通過，判定看 ch04 合計。</p>
+
+<h3 class="sech">提案條數與 dash 削減</h3>
+<table><tr><th>節</th><th class=n>提案條數</th><th class=n>削減 dash</th></tr>
+<tr><td>§4.1 Construction of the Exponential Function</td><td class=n>13</td><td class=n>−13</td></tr>
+<tr><td>§4.2 Continuity and the Exponent Law</td><td class=n>26</td><td class=n>−21</td></tr>
+<tr><td>§4.3 The Derivative of e^x</td><td class=n>7</td><td class=n>−12</td></tr>
+<tr><td>§4.4 Rolle’s Theorem and the MVT</td><td class=n>23</td><td class=n>−19</td></tr>
+<tr><td>§4.5 Monotonicity and the Logarithm</td><td class=n>15</td><td class=n>−17</td></tr>
+<tr><td><strong>合計</strong></td><td class=n><strong>84</strong></td><td class=n><strong>−82</strong></td></tr></table>
+
+<h2>二、⛳ 三個政策題（請先裁決，再進 Gate 2）</h2>
+<div class="card policy" id="P-A">
+  <div class="chead"><span class="cid">P-A</span><span class="lab l-pol">⛳ 需裁決</span>
+    <span class="test">earn／owe／grant 這批交易動詞要不要一起改？</span></div>
+  <p class="why">kickoff 明訂 credit／debt／repay 是全書刻意貫穿、首見已 gloss 的機制隱喻，<strong>一律保留</strong>。本輪照辦（§4.1 lead 的 on credit／pays the debt、§4.1 route map 的 debt paid in full、§4.5 的 settles two debts、章末的 borrowed on faith，全部不動）。但另有一批<strong>不屬該機制</strong>的交易動詞：earn（5 處：C4-11／C4-53／C4-73／C4-76／C4-80）、owed（C4-40）、grants no licence（C4-80）、machinery buys（C4-18）、earn their keep（C4-51a）。SPEC §3 的 R1 病灶示例就明列 <em>earned in full</em> 為不透明慣用式，故本走查一律提議改為字面動詞。<strong>請裁決：</strong>（甲）照提案全改；（乙）只改 earn their keep／grants no licence 這兩個真慣用語，單純的 earn/owe 保留；（丙）全部保留。本走查預設（甲）。</p>
+</div><div class="card policy" id="P-B">
+  <div class="chead"><span class="cid">P-B</span><span class="lab l-pol">⛳ 需裁決</span>
+    <span class="test">C4-22 改寫了「絕對收斂為何蘊涵收斂」的直覺說法</span></div>
+  <p class="why">原句：<q>its terms cannot accumulate any net oscillation that the absolute series has already shown to be summable</q>。這句對 EFL 讀者不透明（R1），但病根可能是<strong>缺一步解釋</strong>而非用詞（rubric R2：補解釋優先）。本走查提的替代是 <q>since the absolute series already bounds the total size of all the later terms</q>——字面、且與其後 Proposition 4.1 的證明（用尾部和界定 Cauchy）一致。<strong>這是本輪唯一動到數學直覺表述的改動，已標記請 Codex gate-2 逐字覆核。</strong>若覆核認為原句更準確，改回原句、只在後面補一句解釋亦可。</p>
+</div><div class="card policy" id="P-C">
+  <div class="chead"><span class="cid">P-C</span><span class="lab l-pol">⛳ 需裁決</span>
+    <span class="test">四處段落離群的拆段（P-01–P-04）要不要做？</span></div>
+  <p class="why">拆段會改變 HTML 結構（插入 <code>&lt;/p&gt;&lt;p&gt;</code>），因此<strong>與逐句改寫分成兩趟提交</strong>：第一趟（逐句）用 <code>tools/verify_edits.py</code> 做 reverse-apply byte-for-byte 證明；第二趟（拆段）因為替換字串跨行、無法用該工具的行式格式表達，改以 <code>git diff</code> 只見標籤插入 ＋ Gate 5 數學片段零差異來證。拆段也會增加行數、可能影響分頁（Gate 8 必檢）。<strong>請裁決是否照 P-01–P-04 執行。</strong></p>
+</div>
+
+<h2>三、保留清單（DASH-KEEP，示範規則不誤傷）</h2>
+<p class="sub">依 SPEC §3「兩個閘門不可互相豁免」：以下五處逐例通過四步仲裁決策序，
+<strong>不因密度差幾個名額而被機械改成逗號</strong>；反過來，保留它們也沒有讓節級密度豁免——
+ch04 合計 1.45/1000，本來就在 T_can 內。</p>
+<div class="card keep" id="K-01">
+  <div class="chead"><span class="cid">K-01</span><span class="lab l-keep">DASH-KEEP</span>
+    <span class="test">§4.1 Caution</span></div>
+  <blockquote>Every fact we want to use — that the sum is finite, that \(e^{x}\) is continuous, that \(e^{x} e^{y} = e^{x + y}\), that \((e^{x})' = e^{x}\) — must be &lt;em&gt;proved&lt;/em&gt; from this definition, not borrowed from earlier experience.</blockquote>
+  <p class="why">四步仲裁：拿掉插入語後主幹「Every fact we want to use must be proved from this definition」文法完整、量詞不變；插入語只是把 every fact 逐項列出，未另提定義／理由／例外 → step 3 KEEP。清單本身含四個逗號，改括號會把全書最高的括號負載（82）再往上推。</p>
+</div><div class="card keep" id="K-02">
+  <div class="chead"><span class="cid">K-02</span><span class="lab l-keep">DASH-KEEP</span>
+    <span class="test">§4.1 節末</span></div>
+  <blockquote>Handling it calls for a more flexible convergence tool — the fact that a series whose absolute values converge must itself converge — which, together with the uniform tail bound \((*)\) and a careful product argument, also yields the continuity of \(e^{x}\) and the exponent law.</blockquote>
+  <p class="why"><strong>手稿逐字來源</strong>：手稿同處作「A different tool — the result that a series of terms whose absolute values converge is itself convergent — handles that case」（`ch04_exponential_logarithm.tex`）。依 ch01 先例第 2 條，手稿逐字的成對插入語保留。</p>
+</div><div class="card keep" id="K-03">
+  <div class="chead"><span class="cid">K-03</span><span class="lab l-keep">DASH-KEEP</span>
+    <span class="test">§4.2 指數律證明前</span></div>
+  <blockquote>the &lt;em&gt;product&lt;/em&gt; of two partial sums reorganizes — through the binomial theorem — into the partial sum of \(e^{x+y}\) plus a controllable remainder</blockquote>
+  <p class="why">四步仲裁：插入語是同一主張的<strong>手段</strong>修飾（用什麼定理重組），拿掉後主幹完整、量詞不變，且它不另提理由或結論 → step 3 KEEP，比照 `— far more often —` 先例。</p>
+</div><div class="card keep" id="K-04">
+  <div class="chead"><span class="cid">K-04</span><span class="lab l-keep">DASH-KEEP</span>
+    <span class="test">§4.4 Theorem A 引言</span></div>
+  <blockquote>when an extreme value is attained strictly &lt;em&gt;inside&lt;/em&gt; the interval — not at an endpoint — the derivative there must vanish</blockquote>
+  <p class="why">四步仲裁：插入語是對 strictly inside 的<strong>對比修飾</strong>（澄清同一個條件），拿掉後主幹完整 → step 3 KEEP，形狀等同 `— only then —` 先例（預設 KEEP，不得為一致性而動）。</p>
+</div><div class="card keep" id="K-05">
+  <div class="chead"><span class="cid">K-05</span><span class="lab l-keep">DASH-KEEP</span>
+    <span class="test">§4.5 應用收尾</span></div>
+  <blockquote>Everything this chapter built — the series definition, the exponent law, the rigorous derivatives, the inverse construction — is what makes these formulas genuinely well-defined rather than merely suggestive.</blockquote>
+  <p class="why"><strong>手稿逐字來源</strong>：手稿同處作「None of the equipment from this chapter — the series definition, the exponent law, the rigorous derivative, the inverse-function construction — is wasted」。結構與插入語同源 → 依 ch01 先例第 2 條保留。</p>
+</div>
+
+<h2>四、段落層四處離群的人工判定</h2>
+<p class="sub">SPEC §3 段落層：≥150 詞、或 &gt;20 個行內式、或一段多論證 → <strong>MUST 人工判定</strong>（觸發器，不是拆段命令）；
+判準是論述動作數，不是詞數。拆段而非拆句，不動數學。</p>
+<div class="card para" id="P-01">
+  <div class="chead"><span class="cid">P-01</span><span class="lab l-para">段落層</span>
+    <span class="test">§4.1 章開場 lead｜152 詞／9 式（觸發器：≥150 詞）</span></div>
+  <p class="verdict">判定：<strong>拆為兩段</strong>　拆點：The road to the logarithm…</p>
+  <p class="why">兩個論述動作：①「\(e^{x}\) 一直是賒帳在用的，本章把它建起來」②「路線經 Rolle／MVT，讀完會得到什麼保證」。第二段用一般 <code>&lt;p&gt;</code>（lead 樣式只留給第一段；同檔下一段本來就是一般 <code>&lt;p&gt;</code>，版式有前例）。</p>
+</div><div class="card para" id="P-02">
+  <div class="chead"><span class="cid">P-02</span><span class="lab l-para">段落層</span>
+    <span class="test">§4.4 Theorem 4.9 之後｜155 詞／4 式（觸發器：≥150 詞）</span></div>
+  <p class="verdict">判定：<strong>拆為兩段</strong>　拆點：Each part needs its hypotheses…（C4-51a 改寫後）</p>
+  <p class="why">SPEC §3 明列的「一段承載兩個以上可各自獨立成立的論證」：①兩部分都靠完備性、證明移到附錄 D ②兩部分各自的前提與反例。拆點正好在論證交界。</p>
+</div><div class="card para" id="P-03">
+  <div class="chead"><span class="cid">P-03</span><span class="lab l-para">段落層</span>
+    <span class="test">§4.5 節首｜153 詞／10 式（觸發器：≥150 詞）</span></div>
+  <p class="verdict">判定：<strong>拆為兩段</strong>　拆點：This section defines \(\ln x\)…</p>
+  <p class="why">①§4.4 的結論＋反函數是誰＋嚴格單調的雙重角色 ②本節的三項工作與要結清的兩筆帳。後者是路線圖，自成一段更好查。</p>
+</div><div class="card para" id="P-04">
+  <div class="chead"><span class="cid">P-04</span><span class="lab l-para">段落層</span>
+    <span class="test">§4.5 值域論證段｜115 詞／&lt;strong&gt;25 個行內式&lt;/strong&gt;（觸發器：&gt;20 式，全書唯一）</span></div>
+  <p class="verdict">判定：<strong>拆為三段</strong>　拆點：Pick points \(p &lt; q\)… 與 Strict monotonicity makes the exponent unique…</p>
+  <p class="why">SPEC §3 對符號密集段落的處置序是「先立記號／分行 skeleton／改 display」，<strong>MUST NOT 為降詞數按詞切句</strong>。這裡採段落層處置：依論證三步拆段（值域為正 → 取上下界 → IVT 收尾＋唯一性），行內式由 25 降到每段 8–10，不動任何數學、不拆句。</p>
+</div>
+
+<h2>五、逐條提案（84 條）</h2>
+<p class="sub">依 SPEC §3 固定執行序產出：① 範圍／數學安全 → ② 論述動作判讀 → ③ CUT／KEEP → ④ 節級密度閘 → ⑤ 不換 tic 檢查。
+每條標原因標籤、踩哪個測試、一行為什麼，以及 <del>原</del>／<ins>改</ins> 全句對照。
+所有 <code>old</code> 字串已程式驗過在 HEAD 中各命中一次（<code>tools/verify_edits.py</code> 的確定性前提）。
+數學（<code>\(…\)</code>／<code>\[…\]</code>）、編號、cross-ref 一律未動。</p>
+<h3 class="sech" id="sec-4-1">§4.1 Construction of the Exponential Function <span class="cnt">13 條</span></h3><div class="card" id="C4-01">
+  <div class="chead"><span class="cid">C4-01</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">擬人（函數「為我們做了很多工作」）＋兩個不透明片語動詞。「put to use」直接沿用 ch01／ch06 先例 puts to work→uses；「leaned on」同族。</p>
+  <div class="diff"><del>The natural exponential function \(e^{x}\) has already done a great deal of work for us. It appeared in Chapter 2, where we wrote down its power series, computed its derivative \((e^{x})' = e^{x}\) by a quick term-by-term argument, and put it to use; in Chapter 3 we leaned on it again, alongside its inverse \(\ln x\).</del><ins>We have already used the natural exponential function \(e^{x}\) a great deal. It appeared in Chapter 2, where we wrote down its power series, computed its derivative \((e^{x})' = e^{x}\) by a quick term-by-term argument, and used it freely; in Chapter 3 we used it again, alongside its inverse \(\ln x\).</ins></div>
+</div><div class="card" id="C4-02">
+  <div class="chead"><span class="cid">C4-02</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">品格詞配數學物件——直接沿用 ch06／ch01 先例 honest reciprocals→really are reciprocals。手稿此處原文即 “with an explicit error bound”。</p>
+  <div class="diff"><del>re-derive the derivative with an honest error bound</del><ins>re-derive the derivative with an explicit error bound</ins></div>
+</div><div class="card" id="C4-03">
+  <div class="chead"><span class="cid">C4-03</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3／R1</span></div>
+  <p class="why">插入語是「命名兩個定理」＝可獨立成立的教學動作，非同一主張的修飾 → 重寫整句。cornerstone 為裝飾性隱喻修飾語，刪之無損。</p>
+  <div class="diff"><del>The road to the logarithm passes through two cornerstone existence theorems — Rolle’s theorem and the Mean Value Theorem — that will return again and again in the chapters on applications of the derivative.</del><ins>The road to the logarithm passes through two existence theorems, Rolle’s theorem and the Mean Value Theorem. Both return again and again in the chapters on applications of the derivative.</ins></div>
+</div><div class="card" id="C4-04">
+  <div class="chead"><span class="cid">C4-04</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3／F5</span></div>
+  <p class="why">插入語是「foundation chapter」的定義（獨立教學動作）→ 重寫。for real 屬口語語域（SPEC §3 避免 casual filler）。credit 機制用語保留。</p>
+  <div class="diff"><del>This is the book’s &lt;em&gt;foundation chapter&lt;/em&gt; — the place where the tools used on credit since Chapter 2 are finally built for real — and more of its length is proof than computation.</del><ins>This is the book’s &lt;em&gt;foundation chapter&lt;/em&gt;, where the tools used on credit since Chapter 2 are finally built. More of its length is proof than computation.</ins></div>
+</div><div class="card" id="C4-05">
+  <div class="chead"><span class="cid">C4-05</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">honest 家族第 2 處（見 C4-02）。此處 honestly 對「已證明」無新增訊息。</p>
+  <div class="diff"><del>its derivative is itself, now proved honestly (§4.3)</del><ins>its derivative is itself, now proved (§4.3)</ins></div>
+</div><div class="card" id="C4-06">
+  <div class="chead"><span class="cid">C4-06</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-f1">F1</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁／F1</span></div>
+  <p class="why">同一份三項清單在 28 行後的 Caution 內以四項完整重列。節首只需概括，清單留在 Caution（該處成對破折號依四步仲裁 KEEP）。</p>
+  <div class="diff"><del>everything we are used to assuming — that the series adds up to a finite number at all, that the function is continuous, that \(e^{x} e^{y} = e^{x + y}\) — becomes a claim that must be proved.</del><ins>every property we are used to assuming becomes a claim that must be proved.</ins></div>
+</div><div class="card" id="C4-07">
+  <div class="chead"><span class="cid">C4-07</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">單破折號尾巴交付 payload。改寫後連逗號插入語都不需要，標點負載淨減。</p>
+  <div class="diff"><del>the symbol \(a^{n}\) means what it always has — the product of \(n\) copies of \(a\).</del><ins>the symbol \(a^{n}\) means the product of \(n\) copies of \(a\), as it always has.</ins></div>
+</div><div class="card" id="C4-08">
+  <div class="chead"><span class="cid">C4-08</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette（後段為獨立子句）</span></div>
+  <p class="why">破折號後是完整獨立子句（but this forces us…），依 palette 改分句。</p>
+  <div class="diff"><del>define \(a^{r}\) as the limit of \(a^{q_{n}}\) — but this forces us to prove that the limit exists and does not depend on which sequence we chose.</del><ins>define \(a^{r}\) as the limit of \(a^{q_{n}}\). But this forces us to prove that the limit exists and does not depend on which sequence we chose.</ins></div>
+</div><div class="card" id="C4-09">
+  <div class="chead"><span class="cid">C4-09</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-r2">R2</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：R2</span></div>
+  <p class="why">「the mirror statement」沒有把鏡像敘述說出來，讀者得自己反推；且尾巴是殘句。改為字面陳述。</p>
+  <div class="diff"><del>must approach a limiting value — and the mirror statement for decreasing sequences.</del><ins>must approach a limiting value. The same is true, with the inequalities reversed, for a decreasing sequence that is held above some floor.</ins></div>
+</div><div class="card" id="C4-10">
+  <div class="chead"><span class="cid">C4-10</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">插入語是三個定理的列舉，主幹被切斷 24 個詞。改寫時「property 支撐 theorems」的方向必須保持不變（不可把清單搬到 property 後面，會誤讀成 property 的同位語）。</p>
+  <div class="diff"><del>Many of the existence theorems of calculus — that a bounded monotone sequence has a limit, that a continuous function on a closed interval attains a maximum, that \(x^{n} = a\) has a positive solution for \(a &gt; 0\) — ultimately trace back to this single property.</del><ins>Many of the existence theorems of calculus ultimately trace back to this single property. It is what guarantees that a bounded monotone sequence has a limit, that a continuous function on a closed interval attains a maximum, and that \(x^{n} = a\) has a positive solution for \(a &gt; 0\).</ins></div>
+</div><div class="card" id="C4-11">
+  <div class="chead"><span class="cid">C4-11</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／R1（earn 家族，⛳ 政策題）</span></div>
+  <p class="why">破折號後為獨立指令句 → 分句。earns 屬交易動詞配證明，全章 5 處（見政策題 P-A）。</p>
+  <div class="diff"><del>&lt;em&gt;Proof track: this argument earns the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof — on a first reading you may take both and move on.&lt;/em&gt;</del><ins>&lt;em&gt;Proof track: this argument proves the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof. On a first reading you may take both and move on.&lt;/em&gt;</ins></div>
+</div><div class="card" id="C4-12">
+  <div class="chead"><span class="cid">C4-12</span><span class="lab l-lex">R1-LEXICAL</span><span class="lab l-r3">R3</span>
+    <span class="test">踩：R1／R3</span></div>
+  <p class="why">workhorse 隱喻；同一隱喻在 §4.2 再現一次（C4-34），統一為字面的 tool。</p>
+  <div class="diff"><del>it is the workhorse of the next section</del><ins>it is the main tool of the next section</ins></div>
+</div><div class="card" id="C4-13">
+  <div class="chead"><span class="cid">C4-13</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／SPEC §3 SHOULD</span></div>
+  <p class="why">promised by 是 SPEC §3 明文點名要避免的戲劇動詞（promises），且破折號後為獨立子句。</p>
+  <div class="diff"><del>This is the rapid, geometric closing-in promised by the bound \((*)\) — each extra term cuts the remaining gap by more than half.</del><ins>This is the rapid, geometric closing-in that the bound \((*)\) predicts. Each extra term cuts the remaining gap by more than half.</ins></div>
+</div><h3 class="sech" id="sec-4-2">§4.2 Continuity and the Exponent Law <span class="cnt">26 條</span></h3><div class="card" id="C4-14">
+  <div class="chead"><span class="cid">C4-14</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">honest 家族第 3 處。「gave an honest existence」對 EFL 讀者是不透明搭配；字面意思是「證明了存在」。</p>
+  <div class="diff"><del>Section 4.1 gave \(e^{x}\) an honest existence:</del><ins>Section 4.1 established that \(e^{x}\) exists:</ins></div>
+</div><div class="card" id="C4-15">
+  <div class="chead"><span class="cid">C4-15</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：SPEC §3 SHOULD（promises）</span></div>
+  <p class="why">「符號承諾」是擬人；改為字面的「記號讓我們預期的性質」。</p>
+  <div class="diff"><del>behaves the way the symbol promises</del><ins>has the properties the notation leads us to expect</ins></div>
+</div><div class="card" id="C4-16">
+  <div class="chead"><span class="cid">C4-16</span><span class="lab l-lex">R1-LEXICAL</span><span class="lab l-r3">R3</span>
+    <span class="test">踩：R1／R3</span></div>
+  <p class="why">engine 隱喻；§4.5 另有一處（C4-78）。統一改字面。</p>
+  <div class="diff"><del>The engine throughout is a single idea:</del><ins>The whole section rests on a single idea:</ins></div>
+</div><div class="card" id="C4-17">
+  <div class="chead"><span class="cid">C4-17</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3／R1</span></div>
+  <p class="why">插入語是「命名兩件機器」＝獨立教學動作。terrain（低頻）與 headline facts（新聞語域）換字面；改寫後冒號引出的是清單（首字大寫），不計入冒號接子句。</p>
+  <div class="diff"><del>A word about the terrain before we set out. This is the steepest section of the book so far: it builds convergence machinery — Cauchy sequences and the Bolzano–Weierstrass theorem — that is usually first met in a dedicated analysis course, and it is all proofs, with no worked examples. What the rest of the book actually uses are the headline facts:</del><ins>A word about what is ahead. This is the steepest section of the book so far. It builds convergence machinery usually first met in a dedicated analysis course: Cauchy sequences and the Bolzano–Weierstrass theorem. It is all proofs, with no worked examples. What the rest of the book actually uses are four facts:</ins></div>
+</div><div class="card" id="C4-18">
+  <div class="chead"><span class="cid">C4-18</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1（交易隱喻）</span></div>
+  <p class="why">「machinery buys」把「用途」講成交易；字面是「這套機器是幹嘛用的」。</p>
+  <div class="diff"><del>what this machinery buys</del><ins>what this machinery is for</ins></div>
+</div><div class="card" id="C4-19">
+  <div class="chead"><span class="cid">C4-19</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立指令句（recall what it says）→ 分句。</p>
+  <div class="diff"><del>in the tail bound \((*)\) of §4.1 — recall what it says:</del><ins>in the tail bound \((*)\) of §4.1. Recall what it says:</ins></div>
+</div><div class="card" id="C4-20">
+  <div class="chead"><span class="cid">C4-20</span><span class="lab l-dash">DASH-CUT×2</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">插入語就是「這個慣例」的定義本體，拿掉後主幹（This convention recurs below）等於空句 → 重寫整句，把定義提為主詞。</p>
+  <div class="diff"><del>This convention — collect a fixed number of \(\varepsilon\)-sized errors and do not fuss over the constant — recurs in the proofs below.)</del><ins>Collecting a fixed number of \(\varepsilon\)-sized errors and not fussing over the constant is a convention that recurs in the proofs below.)</ins></div>
+</div><div class="card" id="C4-21">
+  <div class="chead"><span class="cid">C4-21</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1（lean on 家族，全章 6 處）</span></div>
+  <p class="why">lean on 為不透明片語動詞，字面即 use。</p>
+  <div class="diff"><del>We will lean on exactly this uniformity again</del><ins>We will use exactly this uniformity again</ins></div>
+</div><div class="card" id="C4-22">
+  <div class="chead"><span class="cid">C4-22</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-r2">R2</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：R2（⛳ 需覆核）</span></div>
+  <p class="why">破折號後的理由用 “accumulate any net oscillation … shown to be summable” 表述，對 EFL 讀者不透明，且不是絕對收斂的字面理由。改為字面版本。<strong>此條改動直覺說法的措辭，請 Codex gate-2 覆核數學上是否仍成立。</strong></p>
+  <div class="diff"><del>the original series should converge too — its terms cannot accumulate any net oscillation that the absolute series has already shown to be summable.</del><ins>the original series should converge too, since the absolute series already bounds the total size of all the later terms.</ins></div>
+</div><div class="card" id="C4-23">
+  <div class="chead"><span class="cid">C4-23</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-f1">F1</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3／F1</span></div>
+  <p class="why">同一個同位語（Cauchy sequences and Bolzano–Weierstrass）在 §4.2 內第二次出現；直接讓兩者當主詞，同時去掉多餘的 machinery 抽象層。</p>
+  <div class="diff"><del>The machinery — Cauchy sequences and the Bolzano–Weierstrass theorem — is of independent importance</del><ins>Cauchy sequences and the Bolzano–Weierstrass theorem are of independent importance</ins></div>
+</div><div class="card" id="C4-24">
+  <div class="chead"><span class="cid">C4-24</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">fall back on 為不透明片語動詞。</p>
+  <div class="diff"><del>no monotonicity to fall back on</del><ins>no monotonicity to use instead</ins></div>
+</div><div class="card" id="C4-25">
+  <div class="chead"><span class="cid">C4-25</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette（鬆散同位語）</span></div>
+  <p class="why">單破折號尾巴為省略式對比，依 palette 改逗號同位語；同時把 the terms’ closeness 改成句子式，較易讀。</p>
+  <div class="diff"><del>The definition mentions no limit value — only the terms’ closeness to one another.</del><ins>The definition mentions no limit value, only how close the terms are to one another.</ins></div>
+</div><div class="card" id="C4-26">
+  <div class="chead"><span class="cid">C4-26</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">huddle 為低頻擬人動詞；cluster 是同義的標準數學英語。</p>
+  <div class="diff"><del>the terms eventually huddle together:</del><ins>the terms eventually cluster together:</ins></div>
+</div><div class="card" id="C4-27">
+  <div class="chead"><span class="cid">C4-27</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="lab l-r3">R3</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／R1／R3</span></div>
+  <p class="why">破折號後為獨立子句。wearing a different costume 是承載說明的隱喻；且 §4.2 稍後又用 in disguise 講同一件事（R3 漂移），兩處統一為 in another form。</p>
+  <div class="diff"><del>because the proof exposes a dependency worth seeing — the equivalence is, in the end, the completeness of \(\mathbb{R}\) (Theorem 4.1) wearing a different costume.</del><ins>because the proof exposes a dependency worth seeing. The equivalence is, in the end, the completeness of \(\mathbb{R}\) (Theorem 4.1) in another form.</ins></div>
+</div><div class="card" id="C4-28">
+  <div class="chead"><span class="cid">C4-28</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／R1</span></div>
+  <p class="why">trades on 為不透明片語動詞；尾巴為無動詞附加語，改成完整句。</p>
+  <div class="diff"><del>which converges even though the original sequence does not — exactly the phenomenon the theorem trades on.</del><ins>which converges even though the original sequence does not. That is exactly what the theorem uses.</ins></div>
+</div><div class="card" id="C4-29">
+  <div class="chead"><span class="cid">C4-29</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號引出白話重述，改用 SPEC §3 鼓勵的連接詞 In other words 起新句。</p>
+  <div class="diff"><del>for every \(n &gt; p\) — that is, no later term ever exceeds \(a_{p}\).</del><ins>for every \(n &gt; p\). In other words, no later term ever exceeds \(a_{p}\).</ins></div>
+</div><div class="card" id="C4-30">
+  <div class="chead"><span class="cid">C4-30</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立說明句（both demands can be met at once…）。</p>
+  <div class="diff"><del>— both demands can be met at once, since</del><ins>. Both demands can be met at once, since</ins></div>
+</div><div class="card" id="C4-31">
+  <div class="chead"><span class="cid">C4-31</span><span class="lab l-lex">R1-LEXICAL</span><span class="lab l-r3">R3</span>
+    <span class="test">踩：R1／R3</span></div>
+  <p class="why">與 C4-27 同一隱喻的第二個變體（costume／disguise），統一為字面說法。</p>
+  <div class="diff"><del>it is completeness in disguise.</del><ins>it is completeness in another form.</ins></div>
+</div><div class="card" id="C4-32">
+  <div class="chead"><span class="cid">C4-32</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">兩個各自獨立的單破折號：前者後接獨立子句 → 分句；後者為括號內的同位語 → 逗號（括號 82 為全書最高，不得再往括號堆）。</p>
+  <div class="diff"><del>Over the rationals every link breaks — there are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach \(e\) — a number noted in §4.1 to be irrational).</del><ins>Over the rationals every link breaks. There are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach \(e\), a number noted in §4.1 to be irrational).</ins></div>
+</div><div class="card" id="C4-33">
+  <div class="chead"><span class="cid">C4-33</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立解釋句。</p>
+  <div class="diff"><del>\lvert a_{k} \rvert &lt; \varepsilon\) — the tail is the gap</del><ins>\lvert a_{k} \rvert &lt; \varepsilon\). The tail is the gap</ins></div>
+</div><div class="card" id="C4-34">
+  <div class="chead"><span class="cid">C4-34</span><span class="lab l-lex">R1-LEXICAL</span><span class="lab l-r3">R3</span>
+    <span class="test">踩：R1／R3</span></div>
+  <p class="why">workhorse 第 2 處，與 C4-12 統一。</p>
+  <div class="diff"><del>is the two-sided workhorse for the rest of the section:</del><ins>is the two-sided tool for the rest of the section:</ins></div>
+</div><div class="card" id="C4-35">
+  <div class="chead"><span class="cid">C4-35</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">writ large 是古語式慣用語，對 EFL 讀者不可推測（SPEC §3 R1 型病灶）。</p>
+  <div class="diff"><del>The proof is the continuity argument writ large:</del><ins>The proof is the continuity argument on a larger scale:</ins></div>
+</div><div class="card" id="C4-36">
+  <div class="chead"><span class="cid">C4-36</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：SPEC §3 SHOULD（中性動詞）</span></div>
+  <p class="why">sweep 為擬人動作動詞配式子；改中性動詞。</p>
+  <div class="diff"><del>and let \((**)\) sweep the errors to zero.</del><ins>and use \((**)\) to send the errors to zero.</ins></div>
+</div><div class="card" id="C4-37">
+  <div class="chead"><span class="cid">C4-37</span><span class="lab l-dash">DASH-CUT×4</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−4 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">第一對插入語是標籤指派（that is group (I)），第二對是理由；兩者都是可獨立成立的動作 → 重寫。改寫後為三個短句，且未新增冒號／括號。</p>
+  <div class="diff"><del>the degrees \(\ell \le 2\) assemble exactly \(1 + (x + y) + \tfrac{(x + y)^{2}}{2} = P_{2}(x + y)\) — that is group (I) — while the leftovers \(\tfrac{x^{2} y}{2} + \tfrac{x y^{2}}{2} + \tfrac{x^{2} y^{2}}{4}\) form group (II). Notice that (II)’s degree-\(3\) layer is incomplete — \(x^{3}\) and \(y^{3}\) are absent, since neither factor carries a power beyond \(2\) — which is why (II) can only be &lt;em&gt;bounded&lt;/em&gt; by a tail in Step 4, not collapsed by the binomial theorem.</del><ins>the degrees \(\ell \le 2\) assemble exactly \(1 + (x + y) + \tfrac{(x + y)^{2}}{2} = P_{2}(x + y)\), which is group (I). The leftovers \(\tfrac{x^{2} y}{2} + \tfrac{x y^{2}}{2} + \tfrac{x^{2} y^{2}}{4}\) form group (II). Notice that (II)’s degree-\(3\) layer is incomplete. Neither factor carries a power beyond \(2\), so \(x^{3}\) and \(y^{3}\) are absent. That is why (II) can only be &lt;em&gt;bounded&lt;/em&gt; by a tail in Step 4, not collapsed by the binomial theorem.</ins></div>
+</div><div class="card" id="C4-38">
+  <div class="chead"><span class="cid">C4-38</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">尾巴是無動詞的分詞附加語，改成完整句。</p>
+  <div class="diff"><del>and Bolzano–Weierstrass (Theorem 4.4) — the completeness of \(\mathbb{R}\) reappearing at every level.</del><ins>and Bolzano–Weierstrass (Theorem 4.4). The completeness of \(\mathbb{R}\) reappears at every level.</ins></div>
+</div><div class="card" id="C4-39">
+  <div class="chead"><span class="cid">C4-39</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1（lean on 家族）</span></div>
+  <p class="why">同 C4-21。</p>
+  <div class="diff"><del>which leans on the same partial-sum machinery</del><ins>which uses the same partial-sum machinery</ins></div>
+</div><h3 class="sech" id="sec-4-3">§4.3 The Derivative of e^x <span class="cnt">7 條</span></h3><div class="card" id="C4-40">
+  <div class="chead"><span class="cid">C4-40</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／R1（交易隱喻）</span></div>
+  <p class="why">尾巴只有兩個詞的 payload；owed 屬交易隱喻。改寫後把主題（derivative）提前，零標點負載。</p>
+  <div class="diff"><del>One classical fact about it is still owed a rigorous proof — its derivative.</del><ins>Its derivative is the one classical fact about it that still needs a rigorous proof.</ins></div>
+</div><div class="card" id="C4-41">
+  <div class="chead"><span class="cid">C4-41</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3／R1</span></div>
+  <p class="why">插入語是三項的列舉；改寫後三項直接當受詞，破折號、冒號、括號都不需要。leaned on／honestly 各屬 lean 與 honest 家族。</p>
+  <div class="diff"><del>That argument was correct in spirit, yet it leaned on three properties — convergence, continuity, and the exponent law — that had not been established at the time. Now that all three are theorems, we can re-derive the formula honestly.</del><ins>That argument was correct in spirit, yet it used convergence, continuity, and the exponent law, none of which had been established at the time. Now that all three are theorems, we can re-derive the formula from them.</ins></div>
+</div><div class="card" id="C4-42">
+  <div class="chead"><span class="cid">C4-42</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette（鬆散同位語）</span></div>
+  <p class="why">單破折號尾巴為三字同位語，依 palette 改逗號。</p>
+  <div class="diff"><del>rests on a single algebraic move — the exponent law.</del><ins>rests on a single algebraic move, the exponent law.</ins></div>
+</div><div class="card" id="C4-43">
+  <div class="chead"><span class="cid">C4-43</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">「unlike the Chapter 2 pass」是對比修飾，本可 KEEP；但原句同時承載「級數讓極限透明」與「這回能給收斂速率」兩個動作，拆句後對比詞自然落在句首，標點負載歸零。</p>
+  <div class="diff"><del>The series makes it transparent, and — unlike the Chapter 2 pass — it lets us put a number on the rate of approach.</del><ins>The series makes it transparent. Unlike the Chapter 2 pass, it also lets us put a number on the rate of approach.</ins></div>
+</div><div class="card" id="C4-44">
+  <div class="chead"><span class="cid">C4-44</span><span class="lab l-dash">DASH-CUT×3</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−3 個 —</span>
+    <span class="test">踩：CUT palette／四步仲裁</span></div>
+  <p class="why">三個破折號擠在兩句內（§4.3 密度 21.1／千詞，全書最高）。第一個是同位語 → 逗號；成對的一組是例子列舉，改成 such as 從句。</p>
+  <div class="diff"><del>is pinned at no more than \(\lvert h \rvert\) — convergence at a rate at least linear in \(h\). For ordinary differentiation the qualitative statement suffices, but any later argument that must track the size of a derivative error — Taylor remainders, numerical estimates — uses the explicit bound, not the bare limit.</del><ins>is pinned at no more than \(\lvert h \rvert\), a rate of convergence at least linear in \(h\). For ordinary differentiation the qualitative statement suffices. Later arguments that must track the size of a derivative error, such as Taylor remainders and numerical estimates, use the explicit bound rather than the bare limit.</ins></div>
+</div><div class="card" id="C4-45">
+  <div class="chead"><span class="cid">C4-45</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">插入語是把式子翻成白話的 gloss——那是獨立的教學動作，值得自成一句，不該塞在主詞與述語之間。</p>
+  <div class="diff"><del>The identity \(\frac{d}{dx} e^{x} = e^{x}\) — slope equal to value at every point — is exactly the property that makes</del><ins>The identity \(\frac{d}{dx} e^{x} = e^{x}\) says that the slope equals the value at every point. That is exactly the property that makes</ins></div>
+</div><div class="card" id="C4-46">
+  <div class="chead"><span class="cid">C4-46</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">尾巴是定理的命名；改寫後名字先出現、描述當同位語，讀者不必等到句尾才知道在講誰。</p>
+  <div class="diff"><del>requires an existence result that converts the sign of the derivative into monotonic behavior of the function — the Mean Value Theorem.</del><ins>requires the Mean Value Theorem, an existence result that converts the sign of the derivative into monotonic behavior of the function.</ins></div>
+</div><h3 class="sech" id="sec-4-4">§4.4 Rolle’s Theorem and the MVT <span class="cnt">23 條</span></h3><div class="card" id="C4-47">
+  <div class="chead"><span class="cid">C4-47</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">promissory note 是金融術語，對 EFL 讀者遠比 on credit 難；且它不屬本書刻意貫穿的 credit／debt／repay 機制用語。</p>
+  <div class="diff"><del>Section 4.3 ended with a promissory note:</del><ins>Section 4.3 ended with a promise:</ins></div>
+</div><div class="card" id="C4-48">
+  <div class="chead"><span class="cid">C4-48</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：F4 黏接／R1</span></div>
+  <p class="why">原句 30 詞、以 while＋and 串起「兩者是不同層次的資訊」與「目前沒有橋」兩個獨立論述動作 → 拆句。keystone 為隱喻。</p>
+  <div class="diff"><del>is a statement about the function across a whole interval, and nothing built so far bridges the two. This section constructs that bridge. Its keystone is the &lt;em&gt;Mean Value Theorem&lt;/em&gt; (MVT)</del><ins>is a statement about the function across a whole interval. Nothing built so far bridges the two. This section constructs that bridge. The key result is the &lt;em&gt;Mean Value Theorem&lt;/em&gt; (MVT)</ins></div>
+</div><div class="card" id="C4-49">
+  <div class="chead"><span class="cid">C4-49</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">插入語本身含四個逗號、且列舉了兩個步驟＝兩個獨立教學動作 → 重寫。</p>
+  <div class="diff"><del>We reach it in two steps — first &lt;em&gt;Rolle’s theorem&lt;/em&gt;, the special case where the average slope is zero, then the MVT itself — after one preparatory result about where maxima and minima can sit.</del><ins>We reach it in two steps, after one preparatory result about where maxima and minima can sit. The first step is &lt;em&gt;Rolle’s theorem&lt;/em&gt;, the special case where the average slope is zero; the second is the MVT itself.</ins></div>
+</div><div class="card" id="C4-50">
+  <div class="chead"><span class="cid">C4-50</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立子句（and, just as basic, …）。</p>
+  <div class="diff"><del>on a closed interval the answer is always yes — and, just as basic, a continuous function skips no value</del><ins>on a closed interval the answer is always yes. Just as basic, a continuous function skips no value</ins></div>
+</div><div class="card" id="C4-51a">
+  <div class="chead"><span class="cid">C4-51a</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">earn their keep 是英語慣用語，對 EFL 讀者不可推測；字面意思是「兩部分各需要自己的前提」。</p>
+  <div class="diff"><del>The hypotheses earn their keep, and differently for the two parts.</del><ins>Each part needs its hypotheses, and it needs them differently.</ins></div>
+</div><div class="card" id="C4-51b">
+  <div class="chead"><span class="cid">C4-51b</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">插入語是「為何沒有最大值」的理由（獨立論證步驟），不是同一主張的修飾 → 重寫；理由改用 since 直接接上。</p>
+  <div class="diff"><del>attains no maximum — its values approach \(1\) without ever reaching it — and a discontinuous function can miss its extremes even on a closed interval.</del><ins>attains no maximum, since its values approach \(1\) without ever reaching it. A discontinuous function can miss its extremes even on a closed interval.</ins></div>
+</div><div class="card" id="C4-51c">
+  <div class="chead"><span class="cid">C4-51c</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1（lean on 家族）</span></div>
+  <p class="why">同 C4-21；此處字面意思是「只需要連續性」。</p>
+  <div class="diff"><del>The Intermediate Value Theorem (b) leans on continuity alone, over an interval:</del><ins>The Intermediate Value Theorem (b) needs only continuity, over an interval:</ins></div>
+</div><div class="card" id="C4-51d">
+  <div class="chead"><span class="cid">C4-51d</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">deliver 作不及物動詞（「總是交得出貨」）是商業口語，且省略了受詞。</p>
+  <div class="diff"><del>where they always deliver.</del><ins>where both conclusions hold.</ins></div>
+</div><div class="card" id="C4-53">
+  <div class="chead"><span class="cid">C4-53</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／R1（⛳ 政策題 P-A）</span></div>
+  <p class="why">破折號後為獨立指令句；earn 家族第 2 處。</p>
+  <div class="diff"><del>the Mean Value Theorem) earn the section’s three existence theorems. Later material uses the statements, not the proofs — on a first reading</del><ins>the Mean Value Theorem) prove the section’s three existence theorems. Later material uses the statements, not the proofs. On a first reading</ins></div>
+</div><div class="card" id="C4-54">
+  <div class="chead"><span class="cid">C4-54</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3／R1</span></div>
+  <p class="why">marries 為擬人動詞。插入語 an extremum 是把「轉折點」接上 Theorem A 詞彙的關鍵一步，值得自成一句——拆開後「轉折點是極值 → 故導數為零」的推理鏈也才看得見。</p>
+  <div class="diff"><del>Rolle’s theorem marries the two results above. The picture: if a function leaves and returns to the same height over \([a, b]\), it must turn around somewhere inside, and at that interior turning point — an extremum — the derivative is zero.</del><ins>Rolle’s theorem combines the two results above. The picture: if a function leaves and returns to the same height over \([a, b]\), it must turn around somewhere inside. That interior turning point is an extremum, so the derivative there is zero.</ins></div>
+</div><div class="card" id="C4-55">
+  <div class="chead"><span class="cid">C4-55</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette（鬆散同位語）</span></div>
+  <p class="why">尾巴是同位語 gloss，依 palette 改逗號。</p>
+  <div class="diff"><del>rate of change \((f(b) - f(a))/(b - a)\) — the slope of the secant joining the two endpoints.</del><ins>rate of change \((f(b) - f(a))/(b - a)\), the slope of the secant joining the two endpoints.</ins></div>
+</div><div class="card" id="C4-56">
+  <div class="chead"><span class="cid">C4-56</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立子句（yet we proved Rolle first…）。</p>
+  <div class="diff"><del>where the average slope is \(0\) — yet we proved Rolle &lt;em&gt;first&lt;/em&gt;</del><ins>where the average slope is \(0\). Yet we proved Rolle &lt;em&gt;first&lt;/em&gt;</ins></div>
+</div><div class="card" id="C4-57">
+  <div class="chead"><span class="cid">C4-57</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／R1</span></div>
+  <p class="why">load-bearing rung 是把梯子隱喻再疊一層建築隱喻；尾巴則是兩個使用場合的列舉，接成獨立句更清楚。lean on 家族第 4 處。</p>
+  <div class="diff"><del>The MVT is the load-bearing rung. It is the standard device for turning pointwise information about \(f'\) into behavior of \(f\) across an interval, and it returns every time we make that move — immediately below to read monotonicity off the sign of \(f'\), and later for Taylor’s theorem and the error estimates that lean on it.</del><ins>Of the three, the MVT is the one later chapters use. It is the standard device for turning pointwise information about \(f'\) into behavior of \(f\) across an interval, and it returns every time we make that move. We use it immediately below to read monotonicity off the sign of \(f'\), and again later for Taylor’s theorem and the error estimates that rely on it.</ins></div>
+</div><div class="card" id="C4-58">
+  <div class="chead"><span class="cid">C4-58</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：SPEC §3 SHOULD（promises）</span></div>
+  <p class="why">SPEC 明列 promises 為要避免的戲劇動詞，guarantees 是其推薦替代。（此句在 <ol> 內，屬副表、不計入主分母。）</p>
+  <div class="diff"><del>The theorem promises existence only;</del><ins>The theorem guarantees existence only;</ins></div>
+</div><div class="card" id="C4-59">
+  <div class="chead"><span class="cid">C4-59</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1（副表）</span></div>
+  <p class="why">fair game 為不透明慣用語。</p>
+  <div class="diff"><del>is fair game.)</del><ins>still satisfies this step.)</ins></div>
+</div><div class="card" id="C4-60">
+  <div class="chead"><span class="cid">C4-60</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立結論句。</p>
+  <div class="diff"><del>wherever it is defined and never \(0\) — there is no valid \(c\)</del><ins>wherever it is defined and never \(0\). There is no valid \(c\)</ins></div>
+</div><div class="card" id="C4-61">
+  <div class="chead"><span class="cid">C4-61</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：SPEC §3 SHOULD（promises）</span></div>
+  <p class="why">同 C4-58。</p>
+  <div class="diff"><del>The MVT promises a \(c \in (0, 2)\)</del><ins>The MVT guarantees a \(c \in (0, 2)\)</ins></div>
+</div><div class="card" id="C4-62">
+  <div class="chead"><span class="cid">C4-62</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">插入語提出的是一個更強的事實（在整個 \(\mathbb{R}\) 上可微），它其實是前面兩個前提的理由 → 重寫，把理由放前面、結論放後面。</p>
+  <div class="diff"><del>The function \(f(x) = \sin x\) is continuous on \([b, a]\) and differentiable on \((b, a)\) — it is differentiable on all of \(\mathbb{R}\) — so by the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with</del><ins>The function \(f(x) = \sin x\) is differentiable on all of \(\mathbb{R}\), so it is continuous on \([b, a]\) and differentiable on \((b, a)\). By the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with</ins></div>
+</div><div class="card" id="C4-63">
+  <div class="chead"><span class="cid">C4-63</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette（鬆散同位語）</span></div>
+  <p class="why">省略式對比，改逗號。</p>
+  <div class="diff"><del>We do not need to know which \(c\) — only that one exists.</del><ins>We do not need to know which \(c\), only that one exists.</ins></div>
+</div><div class="card" id="C4-64">
+  <div class="chead"><span class="cid">C4-64</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">尾巴是前一子句的直接後果，用 so 接更清楚。</p>
+  <div class="diff"><del>everywhere — \(f'\) is never zero.</del><ins>everywhere, so \(f'\) is never zero.</ins></div>
+</div><div class="card" id="C4-65">
+  <div class="chead"><span class="cid">C4-65</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立子句。</p>
+  <div class="diff"><del>Two applications close the section — the second is the one we have been working toward.</del><ins>Two applications close the section. The second is the one we have been working toward.</ins></div>
+</div><div class="card" id="C4-66">
+  <div class="chead"><span class="cid">C4-66</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">插入語是一個例外（boundedness 會失守）＝可獨立成立的內容 → 重寫。</p>
+  <div class="diff"><del>Not every interval property survives such a passage — boundedness, for one, can be lost — but strict monotonicity does.)</del><ins>Not every interval property survives such a passage. Boundedness, for one, can be lost, but strict monotonicity survives.)</ins></div>
+</div><div class="card" id="C4-67">
+  <div class="chead"><span class="cid">C4-67</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1</span></div>
+  <p class="why">driving at 為不透明片語動詞；改字面且避免與上一句的 working toward 重複。</p>
+  <div class="diff"><del>That last example is the result the chapter has been driving at.</del><ins>That last example is the result the chapter set out to reach.</ins></div>
+</div><h3 class="sech" id="sec-4-5">§4.5 Monotonicity and the Logarithm <span class="cnt">15 條</span></h3><div class="card" id="C4-68">
+  <div class="chead"><span class="cid">C4-68</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／R1</span></div>
+  <p class="why">一段之內三個隱喻疊用（lever／powers／free gifts）。單破折號尾巴改逗號同位語。</p>
+  <div class="diff"><del>the inverse of the exponential is the function we are after — the &lt;em&gt;natural logarithm&lt;/em&gt;. Strict monotonicity is the lever throughout. It does the obvious work of &lt;em&gt;building&lt;/em&gt; the inverse, by making each value \(x &amp;gt; 0\) come from exactly one exponent. Less obviously, it also &lt;em&gt;powers&lt;/em&gt; everything we then prove about that inverse. The continuity of \(\ln\) and its differentiability are not free gifts that come with the definition;</del><ins>the inverse of the exponential is the function we are after, the &lt;em&gt;natural logarithm&lt;/em&gt;. Strict monotonicity is what makes all of this work. It does the obvious job of &lt;em&gt;building&lt;/em&gt; the inverse, by making each value \(x &amp;gt; 0\) come from exactly one exponent. Less obviously, every later proof about that inverse also depends on it. The continuity of \(\ln\) and its differentiability do not come free with the definition;</ins></div>
+</div><div class="card" id="C4-69">
+  <div class="chead"><span class="cid">C4-69</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立說明句。</p>
+  <div class="diff"><del>rigorously — this time without assuming in advance that \(\ln\) is differentiable, the assumption Chapter 3 made informally.</del><ins>rigorously. This time we do not assume in advance that \(\ln\) is differentiable, the assumption Chapter 3 made informally.</ins></div>
+</div><div class="card" id="C4-70">
+  <div class="chead"><span class="cid">C4-70</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3</span></div>
+  <p class="why">插入語是「為什麼 \(e^{x} > 1+x\)」的理由 → 重寫，把理由前置成因果鏈；同時拆掉原句用分號黏起的第二個推論，分號負載淨減 1。</p>
+  <div class="diff"><del>Since \(e^{x} &amp;gt; 1 + x\) for \(x &amp;gt; 0\) — every term of the series past the first is positive — \(e^{x}\) exceeds \(t\) once \(x\) is large enough; and since \(e^{-x} = 1/e^{x}\) (Theorem 4.7), the values \(e^{x}\) fall below \(t\) once \(x\) is sufficiently negative.</del><ins>Every term of the series past the first is positive, so \(e^{x} &amp;gt; 1 + x\) for \(x &amp;gt; 0\), and therefore \(e^{x}\) exceeds \(t\) once \(x\) is large enough. Since \(e^{-x} = 1/e^{x}\) (Theorem 4.7), the values \(e^{x}\) fall below \(t\) once \(x\) is sufficiently negative.</ins></div>
+</div><div class="card" id="C4-71">
+  <div class="chead"><span class="cid">C4-71</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號接 so，本就是逗號的位置。</p>
+  <div class="diff"><del>Strict monotonicity makes the exponent unique — so for every</del><ins>Strict monotonicity makes the exponent unique, so for every</ins></div>
+</div><div class="card" id="C4-72">
+  <div class="chead"><span class="cid">C4-72</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette（鬆散同位語）</span></div>
+  <p class="why">尾巴是分詞子句，改逗號。</p>
+  <div class="diff"><del>on the input side — contradicting the very fact</del><ins>on the input side, contradicting the very fact</ins></div>
+</div><div class="card" id="C4-73">
+  <div class="chead"><span class="cid">C4-73</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁／R1（⛳ 政策題 P-A）</span></div>
+  <p class="why">成對插入語只是把 the statement 說成 the continuity of ln；直接寫成 that 子句更短也更明確。earn 家族第 3 處。</p>
+  <div class="diff"><del>&lt;em&gt;Proof track: this argument earns the theorem. What follows uses only the statement — the continuity of \(\ln\) — so on a first reading you may take it and move on.&lt;/em&gt;</del><ins>&lt;em&gt;Proof track: this argument proves the theorem. What follows uses only the statement that \(\ln\) is continuous, so on a first reading you may take it and move on.&lt;/em&gt;</ins></div>
+</div><div class="card" id="C4-74">
+  <div class="chead"><span class="cid">C4-74</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立的量詞敘述句；拆句不動量詞 scope。</p>
+  <div class="diff"><del>that no input-closeness requirement can meet — for every \(d &amp;gt; 0\)</del><ins>that no input-closeness requirement can meet. For every \(d &amp;gt; 0\)</ins></div>
+</div><div class="card" id="C4-75">
+  <div class="chead"><span class="cid">C4-75</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號接 so，本就是逗號的位置。</p>
+  <div class="diff"><del>and \(\delta\) — so each of the two case bounds</del><ins>and \(\delta\), so each of the two case bounds</ins></div>
+</div><div class="card" id="C4-76">
+  <div class="chead"><span class="cid">C4-76</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-lex">R1-LEXICAL</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／R1（⛳ 政策題 P-A）</span></div>
+  <p class="why">尾巴是非限定關係子句，改逗號。earn…honestly 同時踩 earn 與 honest 兩個家族；改寫後直接說出「不再需要那個假設」。</p>
+  <div class="diff"><del>with the chain rule — which silently &lt;em&gt;assumes&lt;/em&gt; \(\ln\) is differentiable. We can now earn the formula honestly.</del><ins>with the chain rule, which silently &lt;em&gt;assumes&lt;/em&gt; \(\ln\) is differentiable. We can now prove the formula without that assumption.</ins></div>
+</div><div class="card" id="C4-77">
+  <div class="chead"><span class="cid">C4-77</span><span class="lab l-dash">DASH-CUT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette（鬆散同位語）</span></div>
+  <p class="why">尾巴是同位語，改逗號。</p>
+  <div class="diff"><del>to \(e^{\ln x} = x\) — a derivation that &lt;em&gt;presupposes&lt;/em&gt;</del><ins>to \(e^{\ln x} = x\), a derivation that &lt;em&gt;presupposes&lt;/em&gt;</ins></div>
+</div><div class="card" id="C4-78">
+  <div class="chead"><span class="cid">C4-78</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-lex">R1-LEXICAL</span><span class="lab l-r3">R3</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette／R1／R3</span></div>
+  <p class="why">engine 隱喻第 2 處（見 C4-16）；尾巴改逗號同位語。</p>
+  <div class="diff"><del>The engine is a single extra consequence of the Mean Value Theorem — the companion of the monotonicity corollary, for the borderline case \(f' = 0\).</del><ins>We need one more consequence of the Mean Value Theorem, the companion of the monotonicity corollary for the borderline case \(f' = 0\).</ins></div>
+</div><div class="card" id="C4-79">
+  <div class="chead"><span class="cid">C4-79</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">破折號後為獨立的指令＋計算句。</p>
+  <div class="diff"><del>In general \(\ln(a + b) \ne \ln a + \ln b\) — take \(a = b = 1\), where the left side is \(\ln 2\) and the right side is \(0\).</del><ins>In general \(\ln(a + b) \ne \ln a + \ln b\). Taking \(a = b = 1\) gives \(\ln 2\) on the left and \(0\) on the right.</ins></div>
+</div><div class="card" id="C4-80">
+  <div class="chead"><span class="cid">C4-80</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-lex">R1-LEXICAL</span>
+    <span class="test">踩：R1（⛳ 政策題 P-A）</span></div>
+  <p class="why">一句內三個不透明表達：earns（交易）、grants no licence（法律慣用語）、look-alikes（口語）。</p>
+  <div class="diff"><del>The proof above earns the one identity that holds; it grants no licence to the look-alikes.</del><ins>The proof above establishes the one identity that holds. It says nothing about the similar-looking formulas.</ins></div>
+</div><div class="card" id="C4-81">
+  <div class="chead"><span class="cid">C4-81</span><span class="lab l-dash">DASH-CUT</span><span class="lab l-split">PLAIN-SPLIT</span><span class="dcount">−1 個 —</span>
+    <span class="test">踩：CUT palette</span></div>
+  <p class="why">尾巴是回指 §4.1 的獨立說明，成句後指涉更明確。</p>
+  <div class="diff"><del>with arbitrary real exponents — the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</del><ins>with arbitrary real exponents. That is the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</ins></div>
+</div><div class="card" id="C4-82">
+  <div class="chead"><span class="cid">C4-82</span><span class="lab l-dash">DASH-CUT×2</span><span class="lab l-split">PLAIN-SPLIT</span><span class="lab l-r2">R2</span><span class="dcount">−2 個 —</span>
+    <span class="test">踩：四步仲裁 step 3／R2</span></div>
+  <p class="why">成對插入語裡塞了一整段證明，而其後的第三個破折號尾巴「the model behind…」其先行詞落在 30 個詞之外，讀者會誤掛到剛剛的常數上。拆成三句後指涉明確。</p>
+  <div class="diff"><del>then \(y(t) = y(0)\,e^{kt}\) — because \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 forces \(y(t)e^{-kt}\) to be the constant \(y(0)\) — the model behind population growth</del><ins>then \(y(t) = y(0)\,e^{kt}\). To see this, note that \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 forces \(y(t)e^{-kt}\) to be the constant \(y(0)\). This is the model behind population growth</ins></div>
+</div>
+
+<h2>六、看過但不列為 finding（tier 3–4，不 over-report）</h2>
+<ul>
+<li><strong>credit／debt／repay 機制用語</strong>——<q>All of that was on credit</q>、<q>pays the debt</q>、
+  <q>watch the debt being paid in full</q>、<q>settles two debts left earlier</q>、<q>borrowed on faith</q>：
+  全書刻意貫穿、首見已 gloss，依 kickoff 一律保留，一個字未動。</li>
+<li><strong>machinery（4 處）、bridge（3 處）、ladder／rung（§4.4）</strong>——教學用的結構隱喻，且字面內容都在旁邊說清楚了
+  （如 Theorem A → Rolle → MVT 的依賴鏈就寫在同一段）。只動了疊在 ladder 上的第二層隱喻 <em>load-bearing rung</em>（C4-57）。</li>
+<li><strong>cleft 句</strong>——<q>What we have not yet shown is that…</q>、<q>What the rest of the book actually uses are…</q>、
+  <q>…is what makes these formulas genuinely well-defined</q>：SPEC 明列 cleft 為 FLAG（掃描線索）而非缺陷，
+  這幾句都言之有物，<strong>MUST NOT 僅因形式報 finding</strong>。</li>
+<li><strong>路線圖長句</strong>——如 §4.1 的 <q>This section takes the first two steps: it motivates…, and then it proves…</q>（38 詞）：
+  rubric 明文「路線圖句不得報為 F4」。</li>
+<li><strong>教學性重複</strong>——「完備性」在 §4.1／§4.2／章末摘要各出現一次：§1 lookup-friendliness 要的重述，不算 F1。</li>
+<li><strong>§4.2 <q>The bound delivers the limit at once</q></strong>——deliver 在此為及物、受詞明確，是標準數學英語；
+  只改了 §4.4 那個不及物、省略受詞的 <q>where they always deliver</q>（C4-51d）。</li>
+</ul>
+
+<h2>七、下一步</h2>
+<ol>
+<li><strong>使用者裁決三個政策題</strong>（P-A earn 家族、P-B C4-22 的直覺改寫、P-C 四處拆段）。</li>
+<li><strong>Gate 2 — Codex 獨立裁決（需逐次徵同意）</strong>：<code>codex exec -s read-only</code>，材料 inline 進 prompt
+  （本機讓 Codex 自讀 fragment 會把 UTF-8 解成亂碼）。逐條要 ADOPT／MODIFY／REJECT，
+  並特別問三件事：(a) 五處 DASH-KEEP 判得對不對；(b) §4.3 歸零是否過頭、有沒有不該改的；
+  (c) C4-22 的直覺改寫數學上站不站得住。預估 prompt &gt;70KB，走背景執行。</li>
+<li>Gate 3 套用 → <code>tools/verify_edits.py</code> reverse-apply byte-for-byte；拆段另走第二趟。</li>
+<li>Gate 4 build（<code>python handout/html/build.py ch04</code>，<strong>一定帶參數</strong>）＋量測回歸。</li>
+<li>Gate 5 數學片段程式化比對（目標零差異）→ Gate 6 Mode B → Gate 7 <strong>pending</strong>
+  （<code>make_dist.py</code> 的 <code>NAMES</code> 表沒有 ch04，依平行紀律不改）→ Gate 8 分頁目檢 → Gate 9 紀錄與提交。</li>
+</ol>
+
+<footer>
+Gate 1 走查稿，propose-only。判準權威 <code>CONTENT_SPEC.md</code> §3（RC，2026-07-25 凍結）；
+流程權威 <code>handout/html/_audit/KICKOFF-plain-backfill.md</code>。
+平行紀律：本分支不編輯 <code>REPORT-emdash-baseline-and-rollout.md</code> 與 <code>make_dist.py</code> 的 <code>NAMES</code>。
+待併：rollout 帳本 §2 的 ch04 列 — em-dash 92→10、密度 13.3→1.45、冒號 68→67、分號 45→44、括號 82→82、成對逗號 26→29。
+</footer>
+</body></html>

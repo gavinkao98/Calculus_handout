@@ -71,7 +71,7 @@
   </header>
 
   <!-- expansion:intuition — section opener: pivot from §4.3's closing fence (monotonicity needs an existence theorem). Frame the MVT as the bridge from pointwise derivative to interval behavior. -->
-  <p>Section 4.3 ended with a promissory note: \(e^{x}\) has positive derivative everywhere, so it <em>ought</em> to be increasing, and once we know that we can invert it to build \(\ln x\). But “positive derivative” is information at a single point, while “increasing” is a statement about the function across a whole interval, and nothing built so far bridges the two. This section constructs that bridge. Its keystone is the <em>Mean Value Theorem</em> (MVT), the central existence theorem of differential calculus: on any interval where a function is continuous and differentiable inside, some interior point carries an instantaneous slope equal to the average slope across the interval. We reach it in two steps — first <em>Rolle’s theorem</em>, the special case where the average slope is zero, then the MVT itself — after one preparatory result about where maxima and minima can sit.</p>
+  <p>Section 4.3 ended with a claim that still needs proof: \(e^{x}\) has positive derivative everywhere, so it <em>ought</em> to be increasing, and once we know that we can invert it to build \(\ln x\). But “positive derivative” is information at a single point, while “increasing” is a statement about the function across a whole interval. No result proved so far connects these two kinds of information. This section establishes that connection. The key result is the <em>Mean Value Theorem</em> (MVT), the central existence theorem of differential calculus: on any interval where a function is continuous and differentiable inside, some interior point carries an instantaneous slope equal to the average slope across the interval. After one preparatory result about where maxima and minima can occur, we reach it in two steps. The first is <em>Rolle’s theorem</em>, the special case where the average slope is zero; the second is the MVT itself.</p>
 
   <!-- expansion:history [source: standard calculus-textbook historical note] — one-sentence attribution; not in the manuscript -->
   <p>The special case is named for Michel Rolle, who stated it for polynomials in 1691; the general theorem and its modern proof belong to the nineteenth-century analysts, Cauchy among them, who made the derivative rigorous.</p>
@@ -90,7 +90,7 @@
 
   <p>For instance, \(x_{0} = 0\) is a maximum point of \(\cos x\) on \(\mathbb{R}\), with maximum value \(1\), since \(1 = \cos 0 \ge \cos x\) for every real \(x\).</p>
 
-  <p>Whether a function attains its extremes at all is a delicate matter on a general domain, but on a closed interval the answer is always yes — and, just as basic, a continuous function skips no value on the way from one height to another. These two facts about continuity on a closed interval, the foundation for everything below, are gathered in the next theorem.</p>
+  <p>Whether a function attains its extremes at all is a delicate matter on a general domain, but on a closed interval the answer is always yes. Just as importantly, a continuous function on an interval takes every value between two values that it attains. on the way from one height to another. These two facts about continuity on a closed interval, the foundation for everything below, are gathered in the next theorem.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.9</span><span class="env-name">Extreme and Intermediate Value Theorems</span></p>
@@ -103,7 +103,9 @@
   </section>
 
   <!-- expansion:intuition — both parts rest on completeness (Thm 4.1); proofs fenced to Appendix D (Proof Track). Hypotheses each part needs differ. IVT part (b) added 2026-07-06 (full-arc seam fix — previously used unproved in §4.5); EVT proof, formerly a bare black box, now has a real home. Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html -->
-  <p>Both parts rest on the completeness of \(\mathbb{R}\) (Theorem 4.1), and their proofs are exactly the kind of self-contained analytic construction we keep out of the main line. We therefore state them here and defer the proofs to the <em>Proof-Track appendix</em> (Appendix D), which derives them from completeness by way of a least-upper-bound lemma and the Bolzano–Weierstrass theorem. The hypotheses earn their keep, and differently for the two parts. The Extreme Value Theorem (a) needs continuity <em>and</em> a closed, bounded interval: on the <em>open</em> interval \((0, 1)\) the function \(f(x) = x\) attains no maximum — its values approach \(1\) without ever reaching it — and a discontinuous function can miss its extremes even on a closed interval. The Intermediate Value Theorem (b) leans on continuity alone, over an interval: a function with a jump can step over a value without ever equalling it, which is precisely what continuity forbids. We apply both only to continuous functions on closed intervals, where they always deliver.</p>
+  <p>Both parts rest on the completeness of \(\mathbb{R}\) (Theorem 4.1), and their proofs are exactly the kind of self-contained analytic construction we keep out of the main line. We therefore state them here and defer the proofs to the <em>Proof-Track appendix</em> (Appendix D), which derives them from completeness by way of a least-upper-bound lemma and the Bolzano–Weierstrass theorem. The two parts require different hypotheses.</p>
+
+  <p>The Extreme Value Theorem (a) needs continuity <em>and</em> a closed, bounded interval: on the <em>open</em> interval \((0, 1)\) the function \(f(x) = x\) attains no maximum, since its values approach \(1\) without ever reaching it. A discontinuous function can miss its extremes even on a closed interval. The Intermediate Value Theorem (b) requires only continuity on an interval: a function with a jump can step over a value without ever equalling it, which is precisely what continuity forbids. We apply both only to continuous functions on closed intervals, where both conclusions hold.</p>
 
   <h3 class="subsec-head">Interior extrema: Theorem A</h3>
 
@@ -117,7 +119,7 @@
   </section>
 
   <!-- 2026-07-03 reading-track: one Proof-track note covers the section's three-proof ladder (Theorem A → Rolle → MVT). Record: handout/_audit/REVIEW-ch01-ch04-difficulty-mitigation-applied.html -->
-  <p><em>Proof track: this proof and the two after it (Rolle’s theorem, the Mean Value Theorem) earn the section’s three existence theorems. Later material uses the statements, not the proofs — on a first reading you may take the results and go straight to Strategy 4.2 and the examples.</em></p>
+  <p><em>Proof track: this proof and the two after it (Rolle’s theorem, the Mean Value Theorem) prove the section’s three existence theorems. Later material uses the statements, not the proofs. On a first reading you may take the results and go straight to Strategy 4.2 and the examples.</em></p>
 
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
@@ -155,7 +157,7 @@
 
   <h3 class="subsec-head">Rolle’s theorem</h3>
 
-  <p>Rolle’s theorem marries the two results above. The picture: if a function leaves and returns to the same height over \([a, b]\), it must turn around somewhere inside, and at that interior turning point — an extremum — the derivative is zero.</p>
+  <p>Rolle’s theorem combines the two results above. Under its hypotheses, a function with equal endpoint values is either constant or has an interior extremum. At that interior extremum, the derivative is zero.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.11</span><span class="env-name">Rolle’s theorem</span></p>
@@ -177,7 +179,7 @@
 
   <h3 class="subsec-head">The Mean Value Theorem</h3>
 
-  <p>The MVT lifts the equal-endpoints restriction. Allow any two endpoint values, and the conclusion becomes that the derivative somewhere equals the <em>average</em> rate of change \((f(b) - f(a))/(b - a)\) — the slope of the secant joining the two endpoints.</p>
+  <p>The MVT lifts the equal-endpoints restriction. Allow any two endpoint values, and the conclusion becomes that the derivative somewhere equals the <em>average</em> rate of change \((f(b) - f(a))/(b - a)\), the slope of the secant joining the two endpoints.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.12</span><span class="env-name">Mean Value Theorem</span></p>
@@ -214,7 +216,7 @@
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.4</span></p>
     <div class="env-body">
-      <p>Rolle’s theorem is precisely the MVT in the case \(f(a) = f(b)\), where the average slope is \(0\) — yet we proved Rolle <em>first</em> and recovered the MVT from it, because subtracting the secant always tilts the general situation back to level endpoints. The three results form a ladder: Theorem A, a statement about the derivative at one point, supports Rolle; Rolle adds the equal-endpoints hypothesis, and Rolle in turn supports the MVT for arbitrary endpoints. The MVT is the load-bearing rung. It is the standard device for turning pointwise information about \(f'\) into behavior of \(f\) across an interval, and it returns every time we make that move — immediately below to read monotonicity off the sign of \(f'\), and later for Taylor’s theorem and the error estimates that lean on it.</p>
+      <p>Rolle’s theorem is precisely the MVT in the case \(f(a) = f(b)\), where the average slope is \(0\). Yet we proved Rolle <em>first</em> and recovered the MVT from it, because subtracting the secant always tilts the general situation back to level endpoints. Theorem A, a statement about the derivative at one point, is used to prove Rolle’s theorem; Rolle’s theorem, which adds the equal-endpoints hypothesis, is in turn used to prove the MVT for arbitrary endpoints. Of the three, the MVT is used most often in later chapters. It converts information about \(f'\) at individual points into information about \(f\) on an interval. We use it whenever we make that conversion: immediately below to deduce monotonicity from the sign of \(f'\), and later in Taylor’s theorem and in error estimates.</p>
     </div>
   </section>
 
@@ -225,10 +227,10 @@
       <p>To extract information about \(f'\) on an interval \([a, b]\) from the MVT:</p>
       <ol class="steps">
         <li>Check that \(f\) is continuous on the <em>closed</em> interval \([a, b]\) — endpoints included. Continuity at the endpoints is what lets the proof call on the extreme value theorem, which needs a closed interval.</li>
-        <li>Check that \(f\) is differentiable on the <em>open</em> interval \((a, b)\) — endpoints excluded. The endpoints need no derivative, since Rolle’s theorem only ever touched the derivative at an interior point. (So \(f(x) = \sqrt{x}\) on \([0, 1]\), differentiable on \((0, 1)\) despite its vertical tangent at \(0\), is fair game.)</li>
-        <li>Read off the conclusion: there <em>exists</em> a \(c \in (a, b)\) with \(f'(c) = (f(b) - f(a))/(b - a)\). The theorem promises existence only; it does not say which \(c\), so any further argument may rely on the existence of such a \(c\), but not on any specific value.</li>
+        <li>Check that \(f\) is differentiable on the <em>open</em> interval \((a, b)\) — endpoints excluded. The endpoints need no derivative, since Rolle’s theorem only ever touched the derivative at an interior point. (So \(f(x) = \sqrt{x}\) on \([0, 1]\), differentiable on \((0, 1)\) despite its vertical tangent at \(0\), still satisfies the differentiability requirement.)</li>
+        <li>Read off the conclusion: there <em>exists</em> a \(c \in (a, b)\) with \(f'(c) = (f(b) - f(a))/(b - a)\). The theorem guarantees existence only; it does not say which \(c\), so any further argument may rely on the existence of such a \(c\), but not on any specific value.</li>
       </ol>
-      <p>Skipping the checks is the usual mistake, and the conclusion can then be false. Take \(\lvert x \rvert\) on \([-1, 1]\): it is continuous everywhere but not differentiable at \(0\), so step 2 fails. The secant slope is \((\lvert 1 \rvert - \lvert -1 \rvert)/(1 - (-1)) = 0\), yet \(\lvert x \rvert' = \pm 1\) wherever it is defined and never \(0\) — there is no valid \(c\), exactly because the differentiability hypothesis was missing.</p>
+      <p>Skipping the checks is the usual mistake, and the conclusion can then be false. Take \(\lvert x \rvert\) on \([-1, 1]\): it is continuous everywhere but not differentiable at \(0\), so step 2 fails. The secant slope is \((\lvert 1 \rvert - \lvert -1 \rvert)/(1 - (-1)) = 0\), yet \(\lvert x \rvert' = \pm 1\) wherever it is defined and never \(0\), so no valid \(c\) exists, exactly because the differentiability hypothesis was missing.</p>
     </div>
   </section>
 
@@ -245,7 +247,7 @@
       <div class="env-body">
         <p>The function \(x^{2}\) is continuous on \([0, 2]\) and differentiable on \((0, 2)\), so both hypotheses hold. The average rate of change is</p>
         <p>\[ \frac{f(2) - f(0)}{2 - 0} = \frac{4 - 0}{2} = 2. \]</p>
-        <p>The MVT promises a \(c \in (0, 2)\) with \(f'(c) = 2\). Here \(f'(x) = 2x\), so \(2c = 2\) gives \(c = 1\), which indeed lies in \((0, 2)\). For this simple \(f\) we could solve for \(c\) outright; in general the theorem hands us only the existence of such a \(c\), and the arguments below are built to need nothing more. <span class="qed"></span></p>
+        <p>The MVT guarantees a \(c \in (0, 2)\) with \(f'(c) = 2\). Here \(f'(x) = 2x\), so \(2c = 2\) gives \(c = 1\), which indeed lies in \((0, 2)\). For this simple \(f\) we could solve for \(c\) outright; in general the theorem hands us only the existence of such a \(c\), and the arguments below are built to need nothing more. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -261,9 +263,9 @@
     <section class="env env-solution">
       <p class="env-head"><span class="env-kicker">Solution</span></p>
       <div class="env-body">
-        <p>If \(a = b\) both sides are \(0\) and there is nothing to prove, so assume \(a \ne b\); relabel if necessary so that \(b &lt; a\). The function \(f(x) = \sin x\) is continuous on \([b, a]\) and differentiable on \((b, a)\) — it is differentiable on all of \(\mathbb{R}\) — so by the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with</p>
+        <p>If \(a = b\) both sides are \(0\) and there is nothing to prove, so assume \(a \ne b\); relabel if necessary so that \(b &lt; a\). The function \(f(x) = \sin x\) is differentiable on all of \(\mathbb{R}\), so it is continuous on \([b, a]\) and differentiable on \((b, a)\). By the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with</p>
         <p>\[ \frac{\sin a - \sin b}{a - b} = f'(c) = \cos c. \]</p>
-        <p>We do not need to know which \(c\) — only that one exists. Multiplying across and taking absolute values,</p>
+        <p>We do not need to know which \(c\), only that one exists. Multiplying across and taking absolute values,</p>
         <p>\[ \lvert \sin a - \sin b \rvert = \lvert \cos c \rvert \,\lvert a - b \rvert. \]</p>
         <p>Since \(\lvert \cos c \rvert \le 1\) for every real \(c\), this gives \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\), as claimed. The same argument bounds the change of any function by a bound on its derivative: if \(\lvert f' \rvert \le K\) throughout an interval, then \(\lvert f(a) - f(b) \rvert \le K \lvert a - b \rvert\) for any two points in it. <span class="qed"></span></p>
       </div>
@@ -283,8 +285,8 @@
       <div class="env-body">
         <p>By inspection \(f(0) = 3 \cdot 0 - \sin 0 = 0\), so \(x = 0\) is a root; \(f\) has at least one. The question is whether there could be a second. Suppose, for contradiction, that \(f\) had a second root \(a \ne 0\). Then \(f(0) = f(a) = 0\), and \(f\) is continuous and differentiable on all of \(\mathbb{R}\), so Rolle’s theorem (Theorem 4.11) applied to the interval between \(0\) and \(a\) would supply a point \(c\) strictly between them with \(f'(c) = 0\). But</p>
         <p>\[ f'(x) = 3 - \cos x, \]</p>
-        <p>and since \(\cos x \le 1 &lt; 3\) for every real \(x\), we have \(f'(x) \ge 3 - 1 = 2 &gt; 0\) everywhere — \(f'\) is never zero. No such \(c\) can exist, so the assumed second root is impossible.</p>
-        <p>Therefore \(f(x) = 3x - \sin x\) has exactly one real root, namely \(x = 0\). The pattern is general: a function whose derivative never vanishes has at most one root, since two roots would force a zero of \(f'\) between them. <span class="qed"></span></p>
+        <p>and since \(\cos x \le 1 &lt; 3\) for every real \(x\), we have \(f'(x) \ge 3 - 1 = 2 &gt; 0\) everywhere, so \(f'\) is never zero. No such \(c\) can exist, so the assumed second root is impossible.</p>
+        <p>Therefore \(f(x) = 3x - \sin x\) has exactly one real root, namely \(x = 0\). The pattern is general: if \(f\) is continuous on an interval and differentiable inside it, and \(f'\) is never zero there, then \(f\) has at most one root in that interval, since two roots would force a zero of \(f'\) between them. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -322,7 +324,7 @@
     </div>
   </section>
 
-  <p>Two applications close the section — the second is the one we have been working toward.</p>
+  <p>Two applications close the section. The second is the one we have been working toward.</p>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -351,12 +353,12 @@
       <div class="env-body">
         <p>By Theorem 4.8, \((e^{x})' = e^{x}\). This derivative is positive everywhere: for \(x > 0\) every term of \(\sum x^{n}/n!\) is positive, at \(x = 0\) the sum is \(e^{0} = 1 > 0\), and for \(x < 0\) the exponent law (Theorem 4.7) gives \(e^{x} = 1/e^{-x} > 0\). So on any closed interval \([x_{1}, x_{2}]\) the strict half of Corollary 4.3 applies and yields \(e^{x_{1}} < e^{x_{2}}\).</p>
         <!-- expansion:intuition — §C-6c: the every-[a,b] ⟹ all-of-ℝ extension, noted in one line -->
-        <p>Because any two reals \(x_{1} < x_{2}\) lie in some such closed interval, this holds for every pair, and \(e^{x}\) is strictly increasing on \(\mathbb{R}\). (Strict monotonicity passes from every closed interval to the whole line this way. Not every interval property survives such a passage — boundedness, for one, can be lost — but strict monotonicity does.) <span class="qed"></span></p>
+        <p>Because any two reals \(x_{1} < x_{2}\) lie in some such closed interval, this holds for every pair, and \(e^{x}\) is strictly increasing on \(\mathbb{R}\). (Strict monotonicity passes from every closed interval to the whole line this way. Passing from bounded intervals to all of \(\mathbb{R}\) does not preserve every property. For example, boundedness can be lost, but strict monotonicity is preserved.) <span class="qed"></span></p>
       </div>
     </section>
   </div>
 
   <!-- expansion:summary — close: e^x strictly increasing ⟹ injective ⟹ §4.5 can define ln x as its inverse (minimal hand-off only; §4.5's continuity/derivative program is NOT previewed — gate-2 §4.5-scope-leak fix) -->
-  <p>That last example is the result the chapter has been driving at. A strictly increasing function is one-to-one, so \(e^{x}\) has a genuine inverse on its range; the next section defines that inverse, the natural logarithm \(\ln x\).</p>
+  <p>That last example proves that \(e^{x}\) is strictly increasing, the result needed for the next section. A strictly increasing function is one-to-one, so \(e^{x}\) has a genuine inverse on its range; the next section defines that inverse, the natural logarithm \(\ln x\).</p>
 
 </article>

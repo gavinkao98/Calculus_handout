@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ch07 散文平實化回填（合併 sweep）— Gate 0 基線 ＋ Gate 1 走查</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2df; --bg:#fbfbf9; --card:#fff;
+    --good:#1f7a44; --good-bg:#f0f8f3; --good-line:#b8ddc7; --bad:#a3232a; --bad-bg:#fdf4f4;
+    --bad-line:#e8c9c9; --warn:#9a5b00; --warn-bg:#fdf3e3; --accent:#2d5a8a; --code-bg:#f4f4f2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Inter","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.6; max-width:1040px; margin:0 auto; padding:2.4rem 1.5rem 5rem; }
+  h1 { font-size:1.45rem; line-height:1.3; margin:0 0 .3rem; }
+  .sub { color:var(--muted); font-size:.93rem; margin:0 0 1.6rem; }
+  h2 { font-size:1.14rem; margin:2.6rem 0 .7rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+  h3 { font-size:.98rem; margin:1.6rem 0 .45rem; color:var(--accent); }
+  h4 { font-size:.9rem; margin:1.2rem 0 .35rem; color:#444; }
+  code { font-family:Consolas,monospace; font-size:.87em; background:var(--code-bg); padding:.08em .35em; border-radius:3px; }
+  table { border-collapse:collapse; width:100%; margin:.7rem 0 1rem; font-size:.86rem; }
+  th,td { border:1px solid var(--line); padding:.38rem .5rem; text-align:left; vertical-align:top; }
+  th { background:#f0f0ee; font-weight:600; }
+  td.num,th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.9rem 1.15rem; margin:1rem 0; }
+  .card.good { background:var(--good-bg); border-color:var(--good-line); }
+  .card.warn { background:var(--warn-bg); border-color:#e8d3a8; }
+  .card.bad { background:var(--bad-bg); border-color:var(--bad-line); }
+  .row { display:flex; gap:.55rem; padding:.42rem .6rem; border-radius:5px; margin-bottom:.28rem; }
+  .row .lbl { flex:0 0 2.4rem; font-size:.7rem; font-weight:700; padding-top:.2rem; }
+  .row .txt { flex:1; font-size:.92rem; line-height:1.55; }
+  .before { background:var(--bad-bg); border-left:3px solid var(--bad-line); }
+  .before .lbl { color:var(--bad); }
+  .after { background:var(--good-bg); border-left:3px solid var(--good-line); }
+  .after .lbl { color:var(--good); }
+  .keep { background:#f1eefb; border-left:3px solid #c9bff0; }
+  .keep .lbl { color:#4a3a80; }
+  .pair { margin:.7rem 0 1.15rem; padding-left:.1rem; }
+  .pair .why { font-size:.84rem; color:#555; margin:0 0 .32rem; }
+  .id { font-family:Consolas,monospace; font-size:.8em; font-weight:700; color:var(--accent); white-space:nowrap; }
+  .tag { display:inline-block; font-size:.71rem; font-weight:600; padding:.06rem .42rem; border-radius:999px; white-space:nowrap; }
+  .tag.good { color:var(--good); background:var(--good-bg); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); }
+  .tag.bad { color:var(--bad); background:var(--bad-bg); }
+  .tag.ms { color:#4a3a80; background:#f1eefb; }
+  ul.tight { margin:.3rem 0 .7rem; padding-left:1.3rem; }
+  ul.tight li { margin:.22rem 0; }
+  ol.tight { margin:.3rem 0 .7rem; padding-left:1.4rem; }
+  ol.tight li { margin:.28rem 0; }
+  .small { font-size:.85rem; color:var(--muted); }
+  .foot { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.84rem; color:var(--muted); }
+  .up { color:var(--good); font-weight:700; }
+  .dn { color:var(--bad); font-weight:700; }
+  b.hl { background:#fff3b0; font-weight:700; padding:0 .12em; border-radius:2px; }
+  .en { font-style:italic; }
+  .toc { font-size:.88rem; columns:2; column-gap:2rem; }
+</style>
+</head>
+<body>
+
+<h1>ch07 散文平實化回填（合併 sweep）— Gate 0 基線 ＋ Gate 1 走查</h1>
+<p class="sub">全書超額件數最多的單元（128 件）·<strong>gate-1、propose-only：本檔產出時沒有動過任何 fragment</strong> · 2026-07-26 ·
+判準＝<code>CONTENT_SPEC.md</code> §3〈平實英文條款〉RC · 流程＝<code>KICKOFF-plain-backfill.md</code> · 分支 <code>handout/plain-ch07</code></p>
+
+<div class="card good" style="margin-bottom:1.4rem">
+<strong>本檔的後續（2026-07-26 使用者裁決）：</strong>「<b>跑 Codex Gate 2，副表一併處理，其餘照我的判定</b>」。
+因此六條政策題的結果是——①§7.5 拆兩句 <b>照拆</b>、②章末總結 <b>拆成四段</b>、③章開場 lead <b>不拆</b>、
+④<code>C-11</code> 的 trust／earn／repay <b>判定不屬 credit／debt 機制線、可改</b>、
+⑤副表 <b>一併處理</b>（E 組 22 條落成具體提案）、⑥<b>跑 Codex Gate 2</b>。
+C 組原本 9 條純提案也依「其餘照你的判定」一併落成執行提案（<code>C-10</code> 併入 <code>A-84</code>）。
+提案總數因此從 123 條增為 <b>155 條</b>。
+<span class="small">本檔保留為裁決前的走查紀錄，逐條內容不回頭改寫；E／C 兩組的完整前後對照見 applied 報告。</span>
+</div>
+<div class="card good">
+<strong>一句話結論：</strong>154 個 canonical 破折號裡，<b>84 個是單破折號尾巴</b>（SPEC 點名的 AI tell 主力），
+<b>34 對是成對插入語</b>。單尾全部進 CUT palette；34 對逐對走四步仲裁後 <b>10 對保留、24 對整句重寫</b>。
+投影結果：<b>154 → 20</b>，密度 <b>17.5 → 2.25/1000</b>（<code>T_can</code> ≤3.0 ✓）。
+<br><br>
+<strong>本章最該注意的一件事已經達成：</strong>冒號接子句 102 是全書最高，prompt 明令「去 dash 時 MUST NOT 再往冒號推」——
+投影後 <b>冒號接子句 102 → 92（−10）</b>、分號 37 → 36、左括號 56 → 56 不變。負載沒有搬家，是真的減少了。
+唯一上升的是成對逗號（32 → 43），那正是 CUT palette 指定給「鬆散同位語」的落點，理由見 §⑤。
+</div>
+<div class="card">
+<strong>本檔導覽</strong>
+<div class="toc"><ul class="tight">
+<li><a href="#g0">Gate 0 — 基線與地雷勘查</a></li>
+<li><a href="#policy">⛳ 你要裁的政策題（6 條）</a></li>
+<li><a href="#gA">A. 單破折號尾巴 → CUT（84 條）</a></li>
+<li><a href="#gB">B. 成對插入語 → 四步仲裁（34 對）</a></li>
+<li><a href="#gC">C. R 維度詞彙層（13 條）</a></li>
+<li><a href="#gD">D. 段落層（5 條）</a></li>
+<li><a href="#gE">E. 副表：清單與 caption（26 處，可選）</a></li>
+<li><a href="#gate45">④ 節級密度閘 ＋ ⑤ 不換 tic 檢查</a></li>
+<li><a href="#math">數學安全（Gate 5 預檢）</a></li>
+<li><a href="#keep">刻意保留清單</a></li>
+<li><a href="#todo">本輪還沒做的事（誠實記錄）</a></li>
+</ul></div></div>
+<h2 id="g0">Gate 0 — 基線與地雷勘查</h2>
+<h3>逐節 canonical 量測（<code>tools/prose_metrics.py</code> 的 stream 定義，逐節腳本）</h3>
+<table><tr><th>節</th><th class='num'>N</th><th class='num'>—</th><th class='num'>/1000</th><th class='num'>冒號接子句</th><th class='num'>分號</th><th class='num'>左括號</th><th class='num'>成對逗號</th><th class='num'>副表 N／—</th></tr>
+<tr><td>§7.1</td><td class='num'>1367</td><td class='num'>24</td><td class='num'>17.6</td><td class='num'>14</td><td class='num'>7</td><td class='num'>3</td><td class='num'>7</td><td class='num'>313／2</td></tr>
+<tr><td>§7.2</td><td class='num'>1263</td><td class='num'>30</td><td class='num'>23.8</td><td class='num'>14</td><td class='num'>5</td><td class='num'>6</td><td class='num'>3</td><td class='num'>179／4</td></tr>
+<tr><td>§7.3</td><td class='num'>1068</td><td class='num'>16</td><td class='num'>15.0</td><td class='num'>15</td><td class='num'>6</td><td class='num'>4</td><td class='num'>7</td><td class='num'>297／6</td></tr>
+<tr><td>§7.4</td><td class='num'>1237</td><td class='num'>18</td><td class='num'>14.6</td><td class='num'>15</td><td class='num'>7</td><td class='num'>12</td><td class='num'>5</td><td class='num'>222／4</td></tr>
+<tr><td>§7.5</td><td class='num'>916</td><td class='num'>16</td><td class='num'>17.5</td><td class='num'>12</td><td class='num'>1</td><td class='num'>8</td><td class='num'>2</td><td class='num'>45／1</td></tr>
+<tr><td>§7.6</td><td class='num'>1297</td><td class='num'>22</td><td class='num'>17.0</td><td class='num'>15</td><td class='num'>6</td><td class='num'>6</td><td class='num'>4</td><td class='num'>204／4</td></tr>
+<tr><td>§7.7</td><td class='num'>1647</td><td class='num'>28</td><td class='num'>17.0</td><td class='num'>17</td><td class='num'>5</td><td class='num'>17</td><td class='num'>4</td><td class='num'>206／5</td></tr>
+<tr><th>ch07</th><th class='num'>8795</th><th class='num'>154</th><th class='num'>17.5</th><th class='num'>102</th><th class='num'>37</th><th class='num'>56</th><th class='num'>32</th><th class='num'>1466／26</th></tr></table>
+<p class='small'>與 <code>KICKOFF-plain-backfill.md</code> §ch07 起跑資料完全吻合（N 8795、— 154、17.5/1000、冒號 102／分號 37／括號 56／雙逗 32、副表 1466／26）。逐節密度最高的是 <b>§7.2 的 23.8</b>（prompt 記為 §7.2 30 個），全書單節最高。</p>
+<h3>破折號的結構分佈（決定本輪走法的一個事實）</h3>
+<div class="card good">
+ch02–ch04 是手稿章，Gate 0 要比對手稿把每個 dash 分成「手稿逐字」與「LLM 增補」。
+<b>ch07 沒有手稿</b>（canon 章、100% LLM 自產），所以沒有那條保護線可用；取而代之的分類線是 <b>結構</b>：
+<table style="margin-top:.6rem">
+<tr><th>型別</th><th class="num">處數</th><th class="num">佔破折號</th><th>SPEC 的規定</th></tr>
+<tr><td><b>單破折號尾巴</b>「子句 — 補述／改寫」</td><td class="num">84</td><td class="num">84</td>
+    <td>SPEC 明列為 <b>CUT（AI tell 主力）</b>；進 palette（冒號／逗號／分句／括號）</td></tr>
+<tr><td><b>成對插入語</b>「X — Y — Z」</td><td class="num">34 對</td><td class="num">68</td>
+    <td>逐對走 <b>四步仲裁決策序</b>；MUST NOT 只換成逗號</td></tr>
+<tr><td>（其中夾在成對句裡的額外單尾）</td><td class="num">2</td><td class="num">2</td><td>隨該句整句重寫一併處理</td></tr>
+<tr><th>合計</th><th class="num"></th><th class="num">154</th><th></th></tr>
+</table>
+<b>對照 ch01：</b>ch01 的 20 個單尾<b>全部</b>是 LLM 寫的、手稿作者在正文只用成對插入語。ch07 沒有手稿可比，
+但單尾佔比 <b>55%</b>（84/154）比 ch01 的 37%（20/54）還高——與「canon 章的 LLM 指紋更重」的預期一致。
+</div>
+<h3>段落層與句長（觸發器檢查）</h3>
+<table><tr><th>locus</th><th class='num'>詞數</th><th class='num'>行內式</th><th>觸發</th><th>判定</th></tr><tr><td>§7.1 章開場 <code>&lt;p class="lead"&gt;</code></td><td class='num'>197</td><td class='num'>0</td><td>≥150 詞</td><td><b>不拆</b>（D-01，見下）</td></tr><tr><td>§7.3 節開場（動機失敗）</td><td class='num'>165</td><td class='num'>10</td><td>≥150 詞</td><td>拆兩段（D-02）</td></tr><tr><td>§7.4 Lifting and pumping 引言</td><td class='num'>171</td><td class='num'>1</td><td>≥150 詞</td><td>拆兩段（D-03）</td></tr><tr><td>§7.7 Chapter summary ①</td><td class='num'>214</td><td class='num'>10</td><td>≥150 詞（<b>全書第二大段</b>）</td><td>拆兩段（D-04）</td></tr><tr><td>§7.7 Chapter summary ②</td><td class='num'>179</td><td class='num'>1</td><td>≥150 詞</td><td>拆兩段（D-05）</td></tr></table><p class='small'>另外 §7.4 p02（135 詞）、§7.6 p01（144 詞）、§7.2 p44（111 詞／5 dash）超過 SHOULD 的 120 詞但未達 150 的 MUST 觸發器，本輪只在句層處理、不拆段。<b>行內式沒有任何一段超過 20 個</b>（最高是 §7.5 證明段的 20 個，正好在 SHOULD 上緣，判為單一論證、不動）。prompt 給的詞數（204／174／173／247／190）與本檔略有差異，是 tokenizer 的計法不同，指到的是同五段。</p>
+<h3>地雷勘查（fragment 註解）</h3>
+<div class="card warn">
+<b>ch07 七個 fragment 裡沒有任何 <code>CONSTRAINT</code>／<code>WORDING CONSTRAINT</code> 註解</b>（appB §B.2／§B.6 那種「不得動的措辭」）。
+但每個檔頭都有一段 <b><code>SEAM GUARD</code></b> 撰稿約束，效力等同——它們規定的是內容邊界，本輪 <b>全部遵守</b>。與本輪改動有交集的四條：
+<ul class="tight">
+<li><b>§7.3</b>「<i>“exact” describes ONLY the approximating annular cylinder … never the original solid’s radial band</i>」
+    → <code>B-15</code> 重寫時保留 “The annular cylinder’s volume we can compute exactly”，exact 仍只修飾近似圓柱。</li>
+<li><b>§7.5</b>「<i>FTC-route = <b>ONE remark sentence</b> naming Thm 6.3 + Thm 4.12, no second proof</i>」
+    → <code>A-51</code> 把它拆成兩句（仍在同一段、仍沒有第二個證明）。<b>這是 ⛳ 政策題①</b>。</li>
+<li><b>§7.6</b>「<i>√(q²)=|q| sign checks EXPLICIT</i>」→ <code>B-28</code> 正是把埋在插入語裡的 sign check 提成獨立句，方向一致。</li>
+<li><b>§7.4</b>「<i>F = kx is the APPLIED force</i>」「<i>cable density given directly as WEIGHT density</i>」
+    → <code>B-18</code>／<code>B-19</code> 都把這兩個界定從插入語提成獨立句，方向一致。</li>
+</ul>
+另外全章 <b>沒有 <code>on credit</code> 機制用語</b>（那在 §2.4／§4.1）；ch07 只有一處 credit／debt 家族的用法：
+§7.7 章末「Chapter 8 <b>pays that debt</b>」——依 ch04 §4.1 先例<b>保留</b>（<code>A-83</code> 只動破折號）。
+</div>
+<h2 id="policy">⛳ 你要裁的政策題（6 條）</h2>
+<ol class="tight">
+<li><b>§7.5 的 SEAM GUARD「ONE remark sentence」。</b><code>A-51</code> 把 FTC 第二條路那句從一句拆成兩句
+（原句 45 詞、含冒號接子句、末尾又掛一個承載結論的隱喻尾巴）。拆後仍是同一段、仍只是 naming、沒有第二個證明。
+<b>我的判斷：不違反 guard 的目的（禁的是第二個證明），可以拆。</b>要不要照拆請你確認。</li>
+
+<li><b>章末總結拆段（<code>D-04</code>／<code>D-05</code>）：2 段 → 4 段。</b>
+ch07 的 214＋179 詞是全書章末總結唯一的離群；已完成的 ch01 是三段（99／115／72）、ch02 是四段（54／48／81／78）。
+拆完 ch07 是四段（約 115／105／50／135 詞）。SPEC §4 要求章末總結是<b>連續散文</b>——拆段不違反（拆成清單才違反）。</li>
+
+<li><b>章開場 lead 判定不拆（<code>D-01</code>）。</b>197 詞觸發 MUST 人工判定，但全書七章的 lead 一律是單一
+<code>&lt;p class="lead"&gt;</code>（129／130／150／152／152／173／197 詞）。拆 ch07 一章會破壞全書一致的開場形式，
+故判定<b>不拆</b>、改以句層處理。如果你要一致地把「lead 可以兩段」立為全書規則，那是另一個範圍。</li>
+
+<li><b><code>C-11</code>：<i>earned some trust</i>／<i>repaid the trust</i> 算不算全書的 credit 機制隱喻？</b>
+我判定<b>不算</b>（那條線講的是「延後償還的證明債」，這兩處講的是「定義值不值得信」），因此列為可改的 advisory。
+若你認為屬同一家族，兩處都保留、本條作廢。</li>
+
+<li><b>副表 26 處（<code>E</code> 組）要不要一併處理？</b>清單與 figcaption 不入主分母，密度閘不受影響。
+ch01 那輪你的裁決是「副表一併處理」；ch07 我<b>沒有</b>先做，等你決定。</li>
+
+<li><b>Gate 2 要不要跑 Codex？</b>依 CLAUDE.md，Codex 唯讀調用需逐次徵同意。本輪 123 筆、其中 34 對是判斷題，
+我建議跑（ch01 那輪 Codex 抓到 1 條該撤回、7 條該改寫）。材料會 inline 進 prompt、背景執行。</li>
+</ol>
+<h2 id="gA">A. 單破折號尾巴 → CUT（84 條）</h2>
+<p class='small'>SPEC §3 的 CUT palette：<b>冒號</b>（交付 payload）／<b>逗號</b>（鬆散同位語）／<b>分句</b>（後段是獨立子句）／<b>括號</b>（插入語含逗號或清單）。本章冒號 102 為全書最高，因此 <b>84 條裡只有 2 條用冒號</b>（且都是引清單的冒號，SPEC 明定不計入負載），括號 <b>0 條</b>，其餘全部走逗號或分句。</p>
+<h3>§7.1 Areas Between Curves（11 條）</h3>
+<table><tr><th style='width:4.2rem'>ID</th><th style='width:11rem'>palette／原因</th><th>前 → 後</th></tr>
+<tr><td><span class='id'>A-01</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（清單前綴）<br>破折號後是本章六個問題的清單，屬鬆散同位；刪掉標點句子即完整，不需要替代符號。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>This chapter puts the machine to work <b class='hl'>—</b> on the area between two curves,</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>This chapter puts the machine to work on the area between two curves,</span></div></td></tr>
+<tr><td><span class='id'>A-02</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>「a curved roof and a curved floor」是 two curves 的同位補述，逗號即可；句中已有冒號，不再加標點負載。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>they are trapped between <em>two</em> curves <b class='hl'>—</b> a curved roof and a curved floor.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>they are trapped between <em>two</em> curves, a curved roof and a curved floor.</span></div></td></tr>
+<tr><td><span class='id'>A-03</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>破折號後是完整獨立子句，依 palette 改分句；用逗號＋and 保留原本的連結、不新增 tic。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>The axis has dropped out of the computation entirely <b class='hl'>—</b> and that is precisely what makes the method robust.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>The axis has dropped out of the computation entirely, and that is precisely what makes the method robust.</span></div></td></tr>
+<tr><td><span class='id'>A-04</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>not…but… 是對 Riemann sum 的同位修正，逗號是英文本來就會用的標點。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>This is a Riemann sum <b class='hl'>—</b> not for \(f\) or for \(g\), but for the single function \(f - g\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>This is a Riemann sum, not for \(f\) or for \(g\), but for the single function \(f - g\).</span></div></td></tr>
+<tr><td><span class='id'>A-05</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（交付 payload）<br>尾巴是「這條公式就是 Definition 6.1」的判讀；改成關係子句把等同關係字面說出，比破折號明確。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>and the formula collapses to \(\int_{a}^{b} f(x)\,dx\) <b class='hl'>—</b> Definition 6.1 again.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>and the formula collapses to \(\int_{a}^{b} f(x)\,dx\), which is Definition 6.1 again.</span></div></td></tr>
+<tr><td><span class='id'>A-06</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立祈使句）<br>破折號後是另一個獨立操作指令；改分句，補 That is 讓「這是前句的具體作法」字面化。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>Raise both curves by the same constant \(C\) <b class='hl'>—</b> replace \(f\) by \(f + C\) and \(g\) by \(g + C\) with \(C\) large enough to lift the whole region above the axis.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>Raise both curves by the same constant \(C\). That is, replace \(f\) by \(f + C\) and \(g\) by \(g + C\) with \(C\) large enough to lift the whole region above the axis.</span></div></td></tr>
+<tr><td><span class='id'>A-07</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立的觀察句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>Symmetries like this are worth a glance before integrating <b class='hl'>—</b> here, one piece doubled would have done.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>Symmetries like this are worth a glance before integrating. Here, one piece doubled would have done.</span></div></td></tr>
+<tr><td><span class='id'>A-08</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是交點座標的同位補述；改成 giving，讓「由此得到」的關係字面化。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>so \(y^{2} = 1\) and \(y = \pm 1\) <b class='hl'>—</b> the points \((1, 1)\) and \((1, -1)\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>so \(y^{2} = 1\) and \(y = \pm 1\), giving the points \((1, 1)\) and \((1, -1)\).</span></div></td></tr>
+<tr><td><span class='id'>A-09</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是對被積量的白話同位釋義，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>\Delta t\) <b class='hl'>—</b> the little bit of extra ground the faster runner gains during that instant.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>\Delta t\), the little bit of extra ground the faster runner gains during that instant.</span></div></td></tr>
+<tr><td><span class='id'>A-10</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴同位釋義積分值的物理意義，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>s_{A}(T) - s_{B}(T)\) <b class='hl'>—</b> the faster runner’s lead at time \(T\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>s_{A}(T) - s_{B}(T)\), the faster runner’s lead at time \(T\).</span></div></td></tr>
+<tr><td><span class='id'>A-11</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（清單前綴）＋TIC-REBALANCE<br>尾巴引出三項機件清單 → 改用引清單的冒號；同時把原本的冒號接子句升為句號，冒號接子句淨 −1。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>One move carried this whole section: subtract the boundary graphs, and the machinery of Chapter 6 applies to the difference exactly as it stood <b class='hl'>—</b> Riemann sums,</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>One move carried this whole section. Subtract the boundary graphs, and the machinery of Chapter 6 applies to the difference exactly as it stood: Riemann sums,</span></div></td></tr>
+</table>
+<h3>§7.2 Volumes（16 條）</h3>
+<table><tr><th style='width:4.2rem'>ID</th><th style='width:11rem'>palette／原因</th><th>前 → 後</th></tr>
+<tr><td><span class='id'>A-12</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是比喻式同位補述，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>the slices are now cut from a solid body <b class='hl'>—</b> the way a loaf of bread is cut into slices.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>the slices are now cut from a solid body, the way a loaf of bread is cut into slices.</span></div></td></tr>
+<tr><td><span class='id'>A-13</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>括號內破折號後是完整獨立句，改分句；括號數不變、不新增任何 tic。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>(The base need not be a circle <b class='hl'>—</b> a box is a cylinder over a rectangle.)</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>(The base need not be a circle. A box is a cylinder over a rectangle.)</span></div></td></tr>
+<tr><td><span class='id'>A-14</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（術語首見）・R2<br>此處是 cross-section 的術語首見命名，破折號讓「命名」變成暗示；補 called 把命名動作字面說出。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>for the area of the exposed face <b class='hl'>—</b> the <em>cross-section</em> at \(x\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>for the area of the exposed face, called the <em>cross-section</em> at \(x\).</span></div></td></tr>
+<tr><td><span class='id'>A-15</span><br><span class='small'>DASH-CUT</span></td><td class='small'>PLAIN-SPLIT・TIC-REBALANCE<br>一句做兩件事：幾何只給圓柱體積、取極限是 modelling step，中間用分號黏接 → 拆兩句，分號 −1、破折號 −1。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>Geometry hands us the volume of a cylinder; that a curved solid’s volume should be the limit of its slab approximations is the modelling step, made once, in the open <b class='hl'>—</b> just as §6.1 made it for area.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>Geometry hands us the volume of a cylinder. That a curved solid’s volume should be the limit of its slab approximations is the modelling step, made once and in the open, just as §6.1 made it for area.</span></div></td></tr>
+<tr><td><span class='id'>A-16</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（術語命名）<br>尾巴是為前句命名，改分句並用 This is 把命名動作字面化。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>must enclose the same volume <b class='hl'>—</b> <em>Cavalieri’s principle</em>.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>must enclose the same volume. This is <em>Cavalieri’s principle</em>.</span></div></td></tr>
+<tr><td><span class='id'>A-17</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是對前句的否定式同位補述，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>No new formula is being introduced here <b class='hl'>—</b> only a recipe for \(A(x)\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>No new formula is being introduced here, only a recipe for \(A(x)\).</span></div></td></tr>
+<tr><td><span class='id'>A-18</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段自帶關係子句）<br>尾巴自帶 which 子句，改逗號會疊成三層修飾；改分句最清楚。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>is the <em>function value</em> \(f(x)\) <b class='hl'>—</b> the vertical distance from the axis to the curve, which the rotation then sweeps around.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>is the <em>function value</em> \(f(x)\). That is the vertical distance from the axis to the curve, which the rotation then sweeps around.</span></div></td></tr>
+<tr><td><span class='id'>A-19</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是完整獨立句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>This is the volume formula the Greeks knew <b class='hl'>—</b> Definition 7.2 has reproduced a fact</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>This is the volume formula the Greeks knew. Definition 7.2 has reproduced a fact</span></div></td></tr>
+<tr><td><span class='id'>A-20</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴補述被積函數的連續性，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>\pi (\sqrt{x})^{2} = \pi x\) <b class='hl'>—</b> continuous on \([0, 4]\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>\pi (\sqrt{x})^{2} = \pi x\), continuous on \([0, 4]\).</span></div></td></tr>
+<tr><td><span class='id'>A-21</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立警語子句，改逗號＋and 保留轉折、不新增 tic。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>the washer subtracts <em>squared radii</em> <b class='hl'>—</b> and the order of operations there is a genuine trap.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>the washer subtracts <em>squared radii</em>, and the order of operations there is a genuine trap.</span></div></td></tr>
+<tr><td><span class='id'>A-22</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是完整獨立句，改分句並把主詞字面化（each → Each radius）。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>only where the radii are measured from would change <b class='hl'>—</b> each becomes a distance to <em>that</em> line, not to a coordinate axis out of habit.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>only where the radii are measured from would change. Each radius becomes a distance to <em>that</em> line, not to a coordinate axis out of habit.</span></div></td></tr>
+<tr><td><span class='id'>A-23</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是對前句的同位評語，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>was where the radii were measured from <b class='hl'>—</b> exactly the discipline the Caution insisted on.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>was where the radii were measured from, exactly the discipline the Caution insisted on.</span></div></td></tr>
+<tr><td><span class='id'>A-24</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）＋R1-LEXICAL<br>尾巴是獨立子句 → 逗號＋and；同句 <em>fair game</em> 是不透明慣用語，且整句的教學主張只靠它承載（見 C-01）→ 一併字面化。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>Any solid whose cross-sections we can describe is fair game <b class='hl'>—</b> and for many classical solids the description is a matter of similar triangles.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>Any solid whose cross-sections we can describe can be handled the same way, and for many classical solids the description is a matter of similar triangles.</span></div></td></tr>
+<tr><td><span class='id'>A-25</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立結論子句，改逗號＋so。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>which the same formula reports <b class='hl'>—</b> so \(s(x) = \tfrac{b}{h}x\) holds across all of \([0, h]\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>which the same formula reports, so \(s(x) = \tfrac{b}{h}x\) holds across all of \([0, h]\).</span></div></td></tr>
+<tr><td><span class='id'>A-26</span><br><span class='small'>DASH-CUT</span></td><td class='small'>PLAIN-SPLIT・CUT・單尾（後段獨立子句）<br>一句做兩件事：命名古典 one-third rule、解釋 1/3 的來源，尾巴後還接冒號 payload → 拆兩句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>This is the classical one-third rule for pyramids <b class='hl'>—</b> and the integral shows where the mysterious \(\tfrac13\) comes from:</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>This is the classical one-third rule for pyramids. The integral also shows where the mysterious \(\tfrac13\) comes from:</span></div></td></tr>
+<tr><td><span class='id'>A-27</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴同位釋義前句，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>volume is the integral of cross-sectional area <b class='hl'>—</b> the slicing schema with the strip’s gap promoted to a slab’s face.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>volume is the integral of cross-sectional area, the slicing schema with the strip’s gap promoted to a slab’s face.</span></div></td></tr>
+</table>
+<h3>§7.3 Volumes by Cylindrical Shells（10 條）</h3>
+<table><tr><th style='width:4.2rem'>ID</th><th style='width:11rem'>palette／原因</th><th>前 → 後</th></tr>
+<tr><td><span class='id'>A-28</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立評斷句，改分句；順帶把「inverting a cubic」提成主詞，主張更字面。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>That means solving \(y = 2x^{2} - x^{3}\) for \(x\) <b class='hl'>—</b> inverting a cubic, which has no pleasant answer.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>That means solving \(y = 2x^{2} - x^{3}\) for \(x\). Inverting a cubic has no pleasant answer.</span></div></td></tr>
+<tr><td><span class='id'>A-29</span><br><span class='small'>DASH-CUT</span></td><td class='small'>PLAIN-SPLIT・TIC-REBALANCE<br>一句 55 詞、冒號接子句＋長尾同位，做兩件事：宣告 modelling step、與 §7.2 的 slab model 比較 → 拆三句，冒號接子句 −1。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>As in §7.2, the modelling step comes first, and in the open: we take the solid’s volume to be the limit of the volumes of these shell stacks as the strips shrink <b class='hl'>—</b> the same commitment, made for the same reason, as the slab model of Definition 7.2, only with the slices now nested around the axis instead of stacked along it.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>As in §7.2, the modelling step comes first, and in the open. We take the solid’s volume to be the limit of the volumes of these shell stacks as the strips shrink. This is the same commitment, made for the same reason, as the slab model of Definition 7.2, only with the slices now nested around the axis instead of stacked along it.</span></div></td></tr>
+<tr><td><span class='id'>A-30</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴補述 annular cylinder 的定義性質，逗號＋of 即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>by an <em>annular cylinder</em> <b class='hl'>—</b> constant height \(f(\bar x_i)\), where</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>by an <em>annular cylinder</em> of constant height \(f(\bar x_i)\), where</span></div></td></tr>
+<tr><td><span class='id'>A-31</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立子句，改逗號＋and。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>\Delta x\) <b class='hl'>—</b> and this is precisely a Riemann sum for the function</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>\Delta x\), and this is precisely a Riemann sum for the function</span></div></td></tr>
+<tr><td><span class='id'>A-32</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是完整獨立句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>the <em>axis of rotation</em> <b class='hl'>—</b> for rotation about the \(y\)-axis, that is the horizontal coordinate \(x\), even though the strip itself stands vertically.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>the <em>axis of rotation</em>. For rotation about the \(y\)-axis, that is the horizontal coordinate \(x\), even though the strip itself stands vertically.</span></div></td></tr>
+<tr><td><span class='id'>A-33</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴同位指認被積式的身分，改成 which is 把等同關係字面說出。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>the shell’s height is the gap between them <b class='hl'>—</b> §7.1’s integrand returning in a new role.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>the shell’s height is the gap between them, which is §7.1’s integrand returning in a new role.</span></div></td></tr>
+<tr><td><span class='id'>A-34</span><br><span class='small'>DASH-CUT</span></td><td class='small'>PLAIN-SPLIT・CUT・單尾（後段獨立子句）<br>一句做兩件事：指出差異、逐一說明兩處差異（後段已用分號自成對照）→ 破折號處改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>The region is the same, but the axis is different <b class='hl'>—</b> there we rotated about the \(x\)-axis and sliced into washers; here the \(y\)-axis makes shells natural.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>The region is the same, but the axis is different. There we rotated about the \(x\)-axis and sliced into washers; here the \(y\)-axis makes shells natural.</span></div></td></tr>
+<tr><td><span class='id'>A-35</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴同位指認 \(x=\sqrt y\) 的身分，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>honestly gives \(x = \sqrt{y}\) <b class='hl'>—</b> the sideways description of §7.1.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>honestly gives \(x = \sqrt{y}\), the sideways description of §7.1.</span></div></td></tr>
+<tr><td><span class='id'>A-36</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是條件補述，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>meet at the same number, \(\tfrac{\pi}{2}\) <b class='hl'>—</b> as they must if both models measure the one volume.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>meet at the same number, \(\tfrac{\pi}{2}\), as they must if both models measure the one volume.</span></div></td></tr>
+<tr><td><span class='id'>A-37</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（清單前綴）<br>尾巴引出三項清單。本章冒號接子句 102 為全書最高，不再往冒號堆 → 改分句、用 There is 起頭。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>the honesty is the same as ever <b class='hl'>—</b> a modelling commitment stated once</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>the honesty is the same as ever. There is a modelling commitment stated once</span></div></td></tr>
+</table>
+<h3>§7.4 Work（6 條）</h3>
+<table><tr><th style='width:4.2rem'>ID</th><th style='width:11rem'>palette／原因</th><th>前 → 後</th></tr>
+<tr><td><span class='id'>A-38</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴列舉 geometry 指的是什麼；用逗號＋first…then 把兩節的順序也一併字面化。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>So far the slicing schema has measured geometry <b class='hl'>—</b> areas and volumes.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>So far the slicing schema has measured geometry, first areas and then volumes.</span></div></td></tr>
+<tr><td><span class='id'>A-39</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）＋R1-LEXICAL<br>尾巴是完整獨立句 → 改分句；同時 <em>comes free with</em> 是不透明慣用語（見 C-04），改為字面的 is built into。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>contributes negative work <b class='hl'>—</b> the sign convention comes free with the word <em>component</em>.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>contributes negative work. The sign convention is built into the word <em>component</em>.</span></div></td></tr>
+<tr><td><span class='id'>A-40</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴同位釋義「work done against the spring」，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>prices the work done <em>against</em> the spring <b class='hl'>—</b> the effort of stretching it.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>prices the work done <em>against</em> the spring, the effort of stretching it.</span></div></td></tr>
+<tr><td><span class='id'>A-41</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立的對照句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>costs only \(150\,(0.01) = 1.5\) J <b class='hl'>—</b> the same distance at a third of the price.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>costs only \(150\,(0.01) = 1.5\) J. That is the same distance at a third of the price.</span></div></td></tr>
+<tr><td><span class='id'>A-42</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴指認 resisting force 是什麼，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>work done <em>against</em> a resisting force <b class='hl'>—</b> here gravity.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>work done <em>against</em> a resisting force, here gravity.</span></div></td></tr>
+<tr><td><span class='id'>A-43</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是完整獨立句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>Slice the <em>water</em>, horizontally <b class='hl'>—</b> each horizontal sheet of water rises as one piece, while sheets at different depths rise different amounts.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>Slice the <em>water</em>, horizontally. Each horizontal sheet of water rises as one piece, while sheets at different depths rise different amounts.</span></div></td></tr>
+</table>
+<h3>§7.5 Average Value of a Function（10 條）</h3>
+<table><tr><th style='width:4.2rem'>ID</th><th style='width:11rem'>palette／原因</th><th>前 → 後</th></tr>
+<tr><td><span class='id'>A-44</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是完整獨立句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>Temperature varies continuously <b class='hl'>—</b> there are not finitely many values to add, and no “how many” to divide by.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>Temperature varies continuously. There are not finitely many values to add, and no “how many” to divide by.</span></div></td></tr>
+<tr><td><span class='id'>A-45</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是同一推論鏈的結論，改逗號＋so，不新增 tic。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>scaled by the interval’s width <b class='hl'>—</b> so for continuous \(f\), Theorem 6.1 says the means converge</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>scaled by the interval’s width. So for continuous \(f\), Theorem 6.1 says the means converge</span></div></td></tr>
+<tr><td><span class='id'>A-46</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立祈使句）<br>尾巴是獨立的祈使＋結論句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>The average is the <em>levelling height</em> <b class='hl'>—</b> pour the region under the graph into a rectangular mould on the same base,</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>The average is the <em>levelling height</em>. Pour the region under the graph into a rectangular mould on the same base,</span></div></td></tr>
+<tr><td><span class='id'>A-47</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴指認所引定理，改成 by 讓依據關係字面化。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>the net change in position \(s\) <b class='hl'>—</b> the Net Change Theorem of §6.4.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>the net change in position \(s\), by the Net Change Theorem of §6.4.</span></div></td></tr>
+<tr><td><span class='id'>A-48</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立說明句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>their levelling height is \(2\) <b class='hl'>—</b> closer to the low end, because the function spends most of the interval below its peak.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>their levelling height is \(2\). That is closer to the low end, because the function spends most of the interval below its peak.</span></div></td></tr>
+<tr><td><span class='id'>A-49</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是回指前面 Caution 的同位語，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'><em>together with</em> the interval <b class='hl'>—</b> precisely the caution above.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'><em>together with</em> the interval, precisely the caution above.</span></div></td></tr>
+<tr><td><span class='id'>A-50</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴補述取到平均值的位置，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>actually <em>takes</em> the value \(2\) <b class='hl'>—</b> at \(x = \pm 1\), where the curve crosses the top of its levelling rectangle.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>actually <em>takes</em> the value \(2\) at \(x = \pm 1\), where the curve crosses the top of its levelling rectangle.</span></div></td></tr>
+<tr><td><span class='id'>A-51</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）＋R1-LEXICAL<br>尾巴是獨立子句 → 改分句；同時 <em>wearing different clothes</em> 是隱喻承載結論（見 C-05），改為字面表述。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>whose derivative is \(f\) by the Fundamental Theorem (Theorem 6.3) <b class='hl'>—</b> the two mean value theorems are the same fact wearing different clothes.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>whose derivative is \(f\) by the Fundamental Theorem (Theorem 6.3). Seen this way, the two mean value theorems are two statements of one fact.</span></div></td></tr>
+<tr><td><span class='id'>A-52</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立的觀察句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>and says nothing about uniqueness <b class='hl'>—</b> here there are two, one at the interval’s left endpoint and one interior.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>and says nothing about uniqueness. Here there are two, one at the interval’s left endpoint and one interior.</span></div></td></tr>
+<tr><td><span class='id'>A-53</span><br><span class='small'>DASH-CUT</span></td><td class='small'>PLAIN-SPLIT・CUT・單尾（鬆散同位語）<br>一句 45 詞做兩件事：陳述兩個結果、評價其意義 → 拆兩句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>says a continuous function must pass through its own average <b class='hl'>—</b> the first payoff in this book from owning proved versions of the Extreme and Intermediate Value Theorems.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>says a continuous function must pass through its own average. That theorem is the first payoff in this book from owning proved versions of the Extreme and Intermediate Value Theorems.</span></div></td></tr>
+</table>
+<h3>§7.6 Arc Length（14 條）</h3>
+<table><tr><th style='width:4.2rem'>ID</th><th style='width:11rem'>palette／原因</th><th>前 → 後</th></tr>
+<tr><td><span class='id'>A-54</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是強調式同位補述，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>we have no formula at all <b class='hl'>—</b> not a poor one, none.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>we have no formula at all, not a poor one, none.</span></div></td></tr>
+<tr><td><span class='id'>A-55</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立轉折句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>so it under-measures every arc it spans <b class='hl'>—</b> but as the marked points crowd together, the chords hug the curve ever more closely.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>so it under-measures every arc it spans. But as the marked points crowd together, the chords hug the curve ever more closely.</span></div></td></tr>
+<tr><td><span class='id'>A-56</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴同位補述多邊形長度的可計算性，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>\lvert P_{i-1}P_i\rvert\) <b class='hl'>—</b> a number we can compute for every \(n\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>\lvert P_{i-1}P_i\rvert\), a number we can compute for every \(n\).</span></div></td></tr>
+<tr><td><span class='id'>A-57</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴補述取樣點的來源，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>\(g(x) = \sqrt{1 + [f'(x)]^{2}}\) <b class='hl'>—</b> with sample points we did not choose ourselves but received from the Mean Value Theorem.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>\(g(x) = \sqrt{1 + [f'(x)]^{2}}\), with sample points we did not choose ourselves but received from the Mean Value Theorem.</span></div></td></tr>
+<tr><td><span class='id'>A-58</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴補述「MVT 挑的取樣點也算在內」，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>for <em>every</em> choice of sample points (Definition 6.2) <b class='hl'>—</b> the Mean Value Theorem’s choices included.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>for <em>every</em> choice of sample points (Definition 6.2), the Mean Value Theorem’s choices included.</span></div></td></tr>
+<tr><td><span class='id'>A-59</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴補述 stretch factor 的界，逗號即可（並補 and 讓兩個補述平行）。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>converting run into length <b class='hl'>—</b> never less than \(1\), equal to \(1\) only where the curve is momentarily level.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>converting run into length, never less than \(1\), and equal to \(1\) only where the curve is momentarily level.</span></div></td></tr>
+<tr><td><span class='id'>A-60</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴補述這個 sanity check 的依據，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>is a little longer <b class='hl'>—</b> as an inscribed polygon with one chord would already predict.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>is a little longer, as an inscribed polygon with one chord would already predict.</span></div></td></tr>
+<tr><td><span class='id'>A-61</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴補述後續史實，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>the first algebraic curve ever to have its length computed <b class='hl'>—</b> a result his teacher Wallis soon published.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>the first algebraic curve ever to have its length computed, a result his teacher Wallis soon published.</span></div></td></tr>
+<tr><td><span class='id'>A-62</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立解釋句，改成 which is 的關係子句即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>assembles into a square <b class='hl'>—</b> that is why the answer is exact and tidy.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>assembles into a square, which is why the answer is exact and tidy.</span></div></td></tr>
+<tr><td><span class='id'>A-63</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是對 running quantity 的白話釋義，補 that is 讓釋義關係字面化。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>but length <em>as a running quantity</em> <b class='hl'>—</b> how far along the curve we have travelled by the time we reach \(x\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>but length <em>as a running quantity</em>, that is, how far along the curve we have travelled by the time we reach \(x\).</span></div></td></tr>
+<tr><td><span class='id'>A-64</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是完整獨立句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>The inequality repeats the stretch-factor reading <b class='hl'>—</b> the curve always accumulates at least as fast as the run beneath it.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>The inequality repeats the stretch-factor reading. The curve always accumulates at least as fast as the run beneath it.</span></div></td></tr>
+<tr><td><span class='id'>A-65</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴同位釋義該記憶式，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'><em>\(ds^{2} = dx^{2} + dy^{2}\)</em> <b class='hl'>—</b> an infinitesimal Pythagorean theorem, the proof’s chord picture shrunk to a point.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'><em>\(ds^{2} = dx^{2} + dy^{2}\)</em>, an infinitesimal Pythagorean theorem, the proof’s chord picture shrunk to a point.</span></div></td></tr>
+<tr><td><span class='id'>A-66</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是完整獨立句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>not a derivation of it <b class='hl'>—</b> the honest argument is the one Theorem 7.3 already made.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>not a derivation of it. The honest argument is the one Theorem 7.3 already made.</span></div></td></tr>
+<tr><td><span class='id'>A-67</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴列出那 pair of tools 是哪兩個，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>and a pair of working tools <b class='hl'>—</b> the arc length function \(s\) and its differential \(ds\).</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>and a pair of working tools, the arc length function \(s\) and its differential \(ds\).</span></div></td></tr>
+</table>
+<h3>§7.7 Area of a Surface of Revolution ＋ Chapter summary（17 條）</h3>
+<table><tr><th style='width:4.2rem'>ID</th><th style='width:11rem'>palette／原因</th><th>前 → 後</th></tr>
+<tr><td><span class='id'>A-68</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴同位指認 \(2\pi r\) 是什麼，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>whose arc has length \(2\pi r\) <b class='hl'>—</b> the rim of the base.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>whose arc has length \(2\pi r\), the rim of the base.</span></div></td></tr>
+<tr><td><span class='id'>A-69</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（術語首見）・R2<br>frustum 的術語首見釋義；改成 which are 把釋義關係字面說出。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>Our bands are not full cones but <em>frustums</em> <b class='hl'>—</b> cones with their tops cut off.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>Our bands are not full cones but <em>frustums</em>, which are cones with their tops cut off.</span></div></td></tr>
+<tr><td><span class='id'>A-70</span><br><span class='small'>DASH-CUT</span></td><td class='small'>PLAIN-SPLIT・TIC-REBALANCE<br>一句 45 詞做兩件事：指出推導對 \(r_1=r_2\) 無效、直接驗證該情形；尾巴後還接冒號 payload → 拆三句，冒號接子句 −1。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>so it says nothing about the case \(r_1 = r_2\) <b class='hl'>—</b> but that case we can check directly: equal radii make the frustum a cylindrical band,</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>so it says nothing about the case \(r_1 = r_2\). But that case we can check directly. Equal radii make the frustum a cylindrical band,</span></div></td></tr>
+<tr><td><span class='id'>A-71</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立子句，改逗號＋and。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>lands on an integral we can often evaluate <b class='hl'>—</b> and this time the whole argument closes with tools already in hand.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>lands on an integral we can often evaluate, and this time the whole argument closes with tools already in hand.</span></div></td></tr>
+<tr><td><span class='id'>A-72</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是關係子句，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>so they converge to the same integral <b class='hl'>—</b> which is the claimed formula.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>so they converge to the same integral, which is the claimed formula.</span></div></td></tr>
+<tr><td><span class='id'>A-73</span><br><span class='small'>DASH-CUT</span></td><td class='small'>PLAIN-SPLIT・TIC-REBALANCE<br>一句 45 詞做兩件事：逐項判讀被積式、總結兩個長度尺度；句首還有冒號接子句 → 拆三句，冒號接子句 −1。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>The integrand rewards a second look: \(2\pi f(x)\) is the circumference of the circle the point \((x, f(x))\) travels, and \(\sqrt{1 + f'^{2}}\,dx\) is the arc element \(ds\) of §7.6 <b class='hl'>—</b> the band’s two length scales, around and along, exactly as promised.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>The integrand rewards a second look. Here \(2\pi f(x)\) is the circumference of the circle the point \((x, f(x))\) travels, and \(\sqrt{1 + f'^{2}}\,dx\) is the arc element \(ds\) of §7.6. These are the band’s two length scales, around and along, exactly as promised.</span></div></td></tr>
+<tr><td><span class='id'>A-74</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是完整獨立句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>One principle, two readings <b class='hl'>—</b> and the same MVT argument, run with the radius \(x\) in place of \(f(x)\), proves the \(y\)-axis version.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>One principle, two readings. The same MVT argument, run with the radius \(x\) in place of \(f(x)\), proves the \(y\)-axis version.</span></div></td></tr>
+<tr><td><span class='id'>A-75</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立評語句；此處已有一個冒號，改分句最清楚。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>the distance from the curve to the <em>axis of rotation</em> <b class='hl'>—</b> the same discipline that set every washer and shell radius in §§7.2–7.3.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>the distance from the curve to the <em>axis of rotation</em>. This is the same discipline that set every washer and shell radius in §§7.2–7.3.</span></div></td></tr>
+<tr><td><span class='id'>A-76</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是完整獨立句，改分句。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>is continuous <b class='hl'>—</b> the curve is smooth there, and Theorem 7.4 applies.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>is continuous. The curve is smooth there, and Theorem 7.4 applies.</span></div></td></tr>
+<tr><td><span class='id'>A-77</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是對照補述，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>of the slab that cuts it <b class='hl'>—</b> not on where along the sphere the cut is made.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>of the slab that cuts it, not on where along the sphere the cut is made.</span></div></td></tr>
+<tr><td><span class='id'>A-78</span><br><span class='small'>DASH-CUT</span></td><td class='small'>PLAIN-SPLIT・TIC-REBALANCE<br>一句 45 詞做兩件事：Archimedes 的結果、為何叫 hat-box theorem；句首還有冒號接子句 → 拆三句，冒號接子句 −1。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>This width-only law is ancient: Archimedes knew that a sphere and its circumscribed cylinder trade areas band for band <b class='hl'>—</b> slice both by the same pair of parallel planes and the two bands always match, which is why the result is remembered as his <em>hat-box theorem</em>.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>This width-only law is ancient. Archimedes knew that a sphere and its circumscribed cylinder trade areas band for band. Slice both by the same pair of parallel planes, and the two bands always match, which is why the result is remembered as his <em>hat-box theorem</em>.</span></div></td></tr>
+<tr><td><span class='id'>A-79</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴同位指認 \(4\pi r^2\) 是什麼，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>the zone areas approach \(2\pi r \cdot 2r = 4\pi r^{2}\) <b class='hl'>—</b> the classical area of the whole sphere.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>the zone areas approach \(2\pi r \cdot 2r = 4\pi r^{2}\), the classical area of the whole sphere.</span></div></td></tr>
+<tr><td><span class='id'>A-80</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立子句，改逗號＋and。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>so the radius is \(\rho = x\) <b class='hl'>—</b> and the arc lives in \(0 \le x \le 1\),</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>so the radius is \(\rho = x\), and the arc lives in \(0 \le x \le 1\),</span></div></td></tr>
+<tr><td><span class='id'>A-81</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（鬆散同位語）<br>尾巴是對三項來源的總結同位語，逗號即可。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>and the substitution from §6.5 <b class='hl'>—</b> three sections cooperating in four lines.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>and the substitution from §6.5, three sections cooperating in four lines.</span></div></td></tr>
+<tr><td><span class='id'>A-82</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立子句，改逗號＋and。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>with disks and washers as the revolution instances <b class='hl'>—</b> and the sphere and pyramid of classical geometry recovered as its first dividends.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>with disks and washers as the revolution instances, and the sphere and pyramid of classical geometry recovered as its first dividends.</span></div></td></tr>
+<tr><td><span class='id'>A-83</span><br><span class='small'>DASH-CUT</span></td><td class='small'>CUT・單尾（後段獨立子句）<br>尾巴是獨立子句，改逗號＋and。credit／debt 是全書刻意貫穿的機制隱喻，pays that debt 依 ch04 §4.1 先例保留。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>a systematic account of integration techniques <b class='hl'>—</b> and with improper integrals, which will also settle the polar flag left in Example 7.22.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>a systematic account of integration techniques, and with improper integrals, which will also settle the flag raised at the poles after Example 7.22.</span></div></td></tr>
+<tr><td><span class='id'>A-84</span><br><span class='small'>DASH-CUT ＋ R1-LEXICAL</span></td><td class='small'>CUT・單尾（後段獨立子句）＋R1（併入 C-10）<br>尾巴是完整獨立句 → 改分句；同句的 <em>without ceremony</em> 是不透明慣用語（C-10），使用者授權後一併字面化。</td><td><div class='row before'><span class='lbl'>前</span><span class='txt'>is now complete <b class='hl'>—</b> it is the way integrals meet the world, and the rest of the book will use it without ceremony.</span></div><div class='row after'><span class='lbl'>後</span><span class='txt'>is now complete. It is the way integrals meet the world, and the rest of the book will use it without further comment.</span></div></td></tr>
+</table>
+<h2 id="gB">B. 成對插入語 → 四步仲裁決策序（34 對）</h2>
+<div class="card">
+<b>SPEC §3 的四步（逐對照跑，結果只有兩種：KEEP 或整句重寫，<span class="dn">不得只換成逗號</span>）：</b>
+<ol class="tight">
+<li>拿掉 <code>— Y —</code>，檢查 <code>X Z</code> 主幹是否仍文法完整、量詞與 scope 不變；</li>
+<li>問 <code>Y</code> 脫離主幹後是否仍有獨立教學用途（<b>有限動詞本身不是充分條件</b>）；</li>
+<li><code>Y</code> 只是同一主張的修飾 → <b>保留成對 dash</b>；<code>Y</code> 是另一步理由、域別結論、例外或指令 → <b>重寫整句</b>；</li>
+<li>只有單破折號尾巴才進 CUT palette。</li>
+</ol>
+<b>結果：10 對 KEEP、24 對整句重寫。</b>重寫的 24 對裡，最常見的兩類是
+<b>(a) 插入語在建立記號或裝條件</b>（SPEC 對符號密集段的處置是「先立記號再使用」；條件 MUST 字面完整傳達）＝ 9 對，
+<b>(b) 插入語是術語命名</b>（ch01 Gate 2 已裁：術語釋義不符 KEEP 前提）＝ 4 對。
+</div>
+<h3>§7.1 Areas Between Curves（6 對：KEEP 2／重寫 4）</h3>
+<div class='pair'><p class='why'><span class='id'>B-01</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・R2<br>插入語是 product 的定義（兩個因子各是什麼），脫離主幹後仍是獨立教學動作 → step 3 整句重寫，把定義提成獨立句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'><em>approximate</em> each piece by a product <b class='hl'>—</b> a value that is nearly constant across the slice, times the slice’s width <b class='hl'>—</b> <em>sum</em> the pieces, and <em>refine</em>.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'><em>approximate</em> each piece by a product, <em>sum</em> the pieces, and <em>refine</em>. The product is a value that is nearly constant across the slice, times the slice’s width.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-02</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 1–3<br>拿掉插入語主幹仍完整（That modelling step is the skill…）；插入語只指明「哪一個 modelling step」，無獨立教學動作 → 保留成對破折號。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>That modelling step <b class='hl'>—</b> from a quantity to its integral <b class='hl'>—</b> is the skill</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-03</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 3・已裁先例<br>插入語只修飾同一主張的適用頻率（本書每個例子都成立），與先例 <code>— far more often —</code> 同型 → 保留。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>and when the crossings are finitely many <b class='hl'>—</b> as they are in every example we will meet <b class='hl'>—</b> we compute it</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-04</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・SPEC MUST（條件字面化）<br>插入語裝的是整組假設（左右邊界、連續性、\(f\ge g\)）。條件 MUST 字面完整傳達、不得埋在插入語 → 整句重寫成「先立假設、再下指令」。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>If a region is bounded by curves that read more naturally as \(x\) in terms of \(y\) <b class='hl'>—</b> a left boundary \(x = g(y)\) and a right boundary \(x = f(y)\), with \(f\) and \(g\) continuous on \([c, d]\) and \(f(y) \ge g(y)\) there <b class='hl'>—</b> slice it horizontally instead.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Suppose a region has a left boundary \(x = g(y)\) and a right boundary \(x = f(y)\), with \(f\) and \(g\) continuous on \([c, d]\) and \(f(y) \ge g(y)\) there. Curves like these read more naturally as \(x\) in terms of \(y\), so slice the region horizontally instead.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-05</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・SPEC 符號密集段（先立記號）<br>插入語在建立記號 \(s_A, s_B\)，主幹隨後就用它們。SPEC 對符號密集處的處置是「先立記號再使用」→ 拆兩句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>Suppose two runners leave the same start together <b class='hl'>—</b> positions \(s_{A}(0) = s_{B}(0)\) <b class='hl'>—</b> and run with continuous velocities \(v_{A} = s_{A}'\) and \(v_{B} = s_{B}'\) satisfying \(v_{A}(t) \ge v_{B}(t)\) over the first \(T\) seconds.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Suppose two runners leave the same start together, so that \(s_{A}(0) = s_{B}(0)\). They run with continuous velocities \(v_{A} = s_{A}'\) and \(v_{B} = s_{B}'\), with \(v_{A}(t) \ge v_{B}(t)\) over the first \(T\) seconds.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-06</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・F4 黏接（≥30 詞＋冒號接子句）<br>一句同時做三件事：推廣到任意兩個 rate、給前提（one stays on top）、處理交叉情形，末尾還掛一個單尾 → 整句重寫成三句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>The same reading works for any two rates running side by side <b class='hl'>—</b> two flow rates, two growth rates <b class='hl'>—</b> <em>so long as one stays on top</em>: if the rate curves cross, the area between the graphs accumulates the absolute gap \(\int \lvert v_{A} - v_{B}\rvert\), while the net difference is the plain integral <b class='hl'>—</b> the displacement-versus-distance distinction of §6.4 all over again.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>The same reading works for any two rates running side by side, such as two flow rates or two growth rates, <em>so long as one stays on top</em>. If the rate curves cross, the area between the graphs accumulates the absolute gap \(\int \lvert v_{A} - v_{B}\rvert\), while the net difference is the plain integral. That is the displacement-versus-distance distinction of §6.4 all over again.</span></div>
+</div>
+<h3>§7.2 Volumes（7 對：KEEP 2／重寫 5）</h3>
+<div class='pair'><p class='why'><span class='id'>B-07</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・TIC-REBALANCE<br>插入語不只修飾：它給出符號假設 \(A(x)=A\) 與 \(h=b-a\) 的定義，而 \(h\) 在主幹結論 \(Ah\) 被用到 → 整句重寫；順帶把冒號接子句升為句號。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>The definition passes its first test at once: if the cross-section never changes <b class='hl'>—</b> \(A(x) = A\) for all \(x\), as in an actual cylinder lying on its side with \(h = b - a\) <b class='hl'>—</b> then \(V = \int_{a}^{b} A\,dx = A\,(b - a) = Ah\), the formula we started from.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>The definition passes its first test at once. Suppose the cross-section never changes, so that \(A(x) = A\) for all \(x\), as in an actual cylinder lying on its side with height \(h = b - a\). Then \(V = \int_{a}^{b} A\,dx = A\,(b - a) = Ah\), the formula we started from.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-08</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・ch01 先例（術語釋義不符 KEEP 前提）<br>插入語是 disk 的術語命名。ch01 Gate 2 已裁：術語釋義型插入語不符 KEEP 前提，拆成兩句、不用括號代換。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>Each vertical strip of the region sweeps out a thin circular slab <b class='hl'>—</b> a <em>disk</em> <b class='hl'>—</b> and the cross-section of the resulting solid at \(x\) is a full circle whose radius is the height of the curve:</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Each vertical strip of the region sweeps out a thin circular slab, called a <em>disk</em>. The cross-section of the resulting solid at \(x\) is a full circle whose radius is the height of the curve:</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-09</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・ch01 先例（術語釋義）<br>插入語是 washer 的命名，與 B-08 同型；改成先給幾何內容、再獨立命名。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>the cross-section at \(x\) is an annulus <b class='hl'>—</b> a <em>washer</em> <b class='hl'>—</b> with outer radius \(R = f(x)\) and inner radius \(r = g(x)\). Its area is a difference of two disk areas,</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>the cross-section at \(x\) is an annulus with outer radius \(R = f(x)\) and inner radius \(r = g(x)\). We call such a ring a <em>washer</em>. Its area is a difference of two disk areas,</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-10</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・TIC-REBALANCE<br>插入語在診斷「為何學生會這樣寫」（把 §7.1 的被積式套過來），是獨立教學動作；同句還有冒號接子句 → 重寫三句，冒號接子句 −1。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>Writing \(\pi\bigl(f(x) - g(x)\bigr)^{2}\) <b class='hl'>—</b> squaring the gap, as if §7.1’s integrand could be recycled <b class='hl'>—</b> is the most common volume error there is, and it is silent: the integral still computes, just to the wrong number.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Writing \(\pi\bigl(f(x) - g(x)\bigr)^{2}\) squares the gap, as if §7.1’s integrand could be recycled. It is the most common volume error there is, and it is a silent one. The integral still computes, just to the wrong number.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-11</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 1–3<br>拿掉插入語主幹仍完整；插入語只指明「哪一塊區域」、無獨立教學動作。此處在 Example 題幹，指明區域是自足性所需 → 保留。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>The same region <b class='hl'>—</b> enclosed by \(y = x\) and \(y = x^{2}\) <b class='hl'>—</b> is now rotated</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-12</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 1–3<br>拿掉插入語主幹仍完整（describe the cross-section and let its geometry…）；插入語只列舉同一主張的三種情形 → 保留。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>describe the cross-section <b class='hl'>—</b> disk, washer, or square <b class='hl'>—</b> and let its geometry write the integrand.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-13</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・TIC-REBALANCE<br>插入語同時命名 shells 並指出分解方式（術語釋義，不符 KEEP 前提）；同句還有冒號接子句與兩個論述動作 → 重寫。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>But perpendicular slices are not always the natural cut: for some solids of revolution every washer requires solving for \(x\) in terms of \(y\), while a different decomposition <b class='hl'>—</b> into thin cylindrical <em>shells</em> <b class='hl'>—</b> falls out effortlessly.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>But perpendicular slices are not always the natural cut. For some solids of revolution every washer requires solving for \(x\) in terms of \(y\), while a decomposition into thin cylindrical <em>shells</em> falls out effortlessly.</span></div>
+</div>
+<h3>§7.3 Volumes by Cylindrical Shells（3 對：KEEP 1／重寫 2）</h3>
+<div class='pair'><p class='why'><span class='id'>B-14</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 1–3<br>拿掉插入語主幹仍完整（keep the vertical strip and let the rotation carry it around the axis）；插入語只指明「哪一種 strip」→ 保留。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>keep the vertical strip <b class='hl'>—</b> the one that reads \(f\) directly <b class='hl'>—</b> and let the rotation carry it <em>around</em> the axis.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-15</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・F4 黏接（and 串兩個獨立陳述）<br>主幹本身用 and 黏了兩個獨立陳述（可精確算出體積／中點讓它塌縮），插入語又補上算法 → 整句重寫成兩句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>The annular cylinder’s volume we can compute exactly <b class='hl'>—</b> outer cylinder minus inner hole <b class='hl'>—</b> and the midpoint makes it collapse:</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>The annular cylinder’s volume we can compute exactly, as the outer cylinder minus the inner hole. The midpoint then makes it collapse:</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-16</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・F4 黏接（and 串兩個獨立陳述）<br>主幹用 and 黏了兩個獨立陳述（下一節去哪裡／切法首次要做決定）→ 整句重寫成兩句，插入語降為同位語。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>The next section takes it somewhere new <b class='hl'>—</b> to a quantity from physics that accumulates along a motion rather than across a region <b class='hl'>—</b> and the slicing will, for the first time, have to decide <em>what</em> to slice.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>The next section takes it somewhere new, to a quantity from physics that accumulates along a motion rather than across a region. There, for the first time, the slicing will have to decide <em>what</em> to slice.</span></div>
+</div>
+<h3>§7.4 Work（6 對：KEEP 2／重寫 4）</h3>
+<div class='pair'><p class='why'><span class='id'>B-17</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・SPEC 符號密集段（先立記號）<br>插入語在建立整組記號（\(a, b, F(x)\)），主幹隨即使用；SPEC 對符號密集處的處置是先立記號再使用 → 拆兩句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>When the force varies along the line of motion <b class='hl'>—</b> say the object moves along the \(x\)-axis from \(a\) to \(b\), pushed by a force whose component along the motion at position \(x\) is \(F(x)\) <b class='hl'>—</b> we slice \([a, b]\) into strips of width \(\Delta x\), price each strip at \(F(x_i^{*})\,\Delta x\), and pass to the limit.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Now let the force vary along the line of motion. Say the object moves along the \(x\)-axis from \(a\) to \(b\), pushed by a force whose component along the motion at position \(x\) is \(F(x)\). We slice \([a, b]\) into strips of width \(\Delta x\), price each strip at \(F(x_i^{*})\,\Delta x\), and pass to the limit.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-18</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・SPEC MUST（適用範圍字面化）<br>插入語說的是 Hooke 定律的「地位與適用範圍」（經驗模型、僅在小形變準確）——這是條件，不得埋在插入語 → 提成獨立句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'><em>Hooke’s law</em> <b class='hl'>—</b> an empirical model, accurate for stretches that are not too large <b class='hl'>—</b> says that the force required to hold a spring stretched \(x\) units beyond its natural length is proportional to \(x\):</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'><em>Hooke’s law</em> is an empirical model, accurate for stretches that are not too large. It says that the force required to hold a spring stretched \(x\) units beyond its natural length is proportional to \(x\):</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-19</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3（插入語自帶理由與結論）<br>插入語是一段獨立論證（給定的是 weight density，所以不需要從質量換算），有自己的主詞與結論 → step 3 整句重寫。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>Its weight is (weight density) \(\times\) (length) \(= 2\,\Delta x\) newtons <b class='hl'>—</b> the given \(2\) N/m is already a weight per metre, so no conversion from mass is needed <b class='hl'>—</b> and to reach the winch this slice must rise the distance \(x\) from its starting depth.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Its weight is (weight density) \(\times\) (length) \(= 2\,\Delta x\) newtons. The given \(2\) N/m is already a weight per metre, so no conversion from mass is needed. To reach the winch this slice must rise the distance \(x\) from its starting depth.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-20</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 1–3・KEEP 條款（引號內）<br>拿掉插入語主幹仍完整（Memorizing a single template will misprice one of the two）；插入語只列舉同一主張的兩個引號模板 → 保留。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>Memorizing a single template <b class='hl'>—</b> “weight times height” or “force times \(dx\)” <b class='hl'>—</b> will misprice one of the two.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-21</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3（插入語自帶兩個有限動詞陳述）<br>插入語是兩個獨立陳述（和數皆為 Riemann sum／Theorem 6.1 收掉每個極限），有自己的內容 → 提成獨立句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>Nothing in the machinery changed <b class='hl'>—</b> the sums were Riemann sums as ever, and Theorem 6.1 closed each limit <b class='hl'>—</b> but for the first time the slicing had to make a decision about <em>what</em> to slice, and Strategy 7.3 begins there.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Nothing in the machinery changed. The sums were Riemann sums as ever, and Theorem 6.1 closed each limit. But for the first time the slicing had to make a decision about <em>what</em> to slice, and Strategy 7.3 begins there.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-22</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 1–3<br>拿掉插入語主幹仍完整（Instead of accumulating a total it will distil…）；插入語只列舉同一主張的三種 total → 保留。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>Instead of accumulating a total <b class='hl'>—</b> an area, a volume, a number of joules <b class='hl'>—</b> it will distil</span></div>
+</div>
+<h3>§7.5 Average Value of a Function（3 對：KEEP 1／重寫 2）</h3>
+<div class='pair'><p class='why'><span class='id'>B-23</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2・ch01 先例（術語釋義）＋R3<br>插入語是把 <em>pair</em> 這個代稱就地釋義（術語釋義不符 KEEP 前提）。改成與 §7.5 稍後「a property of \(f\) together with the interval」同一措辭，指稱一致性也一併修好。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>The average value belongs to the <em>pair</em> <b class='hl'>—</b> a function and an interval <b class='hl'>—</b> not to the function alone.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>The average value belongs to the function and the interval <em>together</em>, not to the function alone.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-24</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3（插入語是推理的關鍵一步）<br>插入語給的是理由（平均值介於最小與最大值之間），正是這段論證的關鍵步驟，不是修飾 → 提成主幹的一環並拆句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>and the average <b class='hl'>—</b> trapped between the smallest and largest values <b class='hl'>—</b> must itself be a value the function passes through.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>and the average lies between the smallest and the largest of them. So the average must itself be a value the function passes through.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-25</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 3・先例（<code>— only then —</code> 預設 KEEP）<br>插入語是同一主張的範圍註記（\([\alpha,\beta]\subseteq[a,b]\)），三字節拍式；且位於已過閘的證明體內 → 保留。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>supplies a point \(c\) in \([\alpha, \beta]\) <b class='hl'>—</b> hence in \([a, b]\) <b class='hl'>—</b> with \(f(c) = f_{\text{ave}}\).</span></div>
+</div>
+<h3>§7.6 Arc Length（4 對：KEEP 0／重寫 4）</h3>
+<div class='pair'><p class='why'><span class='id'>B-26</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・SPEC MUST（定義關鍵位置）＋先立記號<br>這是 smooth 的正式定義句，插入語塞入標準記號 \(C^1\)。定義屬關鍵位置、記號屬獨立教學動作 → 先給定義、再給記號。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>We say \(f\) is <em>smooth on \([a, b]\)</em> <b class='hl'>—</b> in the standard notation, \(f \in C^{1}([a, b])\) <b class='hl'>—</b> if \(f\) is differentiable on \([a, b]\) and its derivative \(f'\) is continuous there, the derivatives at the two endpoints being the one-sided ones.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>We say \(f\) is <em>smooth on \([a, b]\)</em> if \(f\) is differentiable on \([a, b]\) and its derivative \(f'\) is continuous there, the derivatives at the two endpoints being the one-sided ones. In the standard notation, this is written \(f \in C^{1}([a, b])\).</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-27</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3（插入語是獨立的端點檢查）＋TIC-REBALANCE<br>插入語是端點可微性的獨立檢查（有自己的主詞與結論）→ 提成獨立句；順帶把「First the hypothesis:」的冒號接子句升為句號。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>First the hypothesis: \(f(x) = x^{3/2}\) has \(f'(x) = \tfrac{3}{2}x^{1/2}\), which is continuous on all of \([0, 1]\) <b class='hl'>—</b> at the left endpoint the one-sided derivative is \(0\), and \(f'\) approaches it continuously <b class='hl'>—</b> so \(f\) is smooth there and Theorem 7.3 applies:</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>First the hypothesis. Here \(f(x) = x^{3/2}\), so \(f'(x) = \tfrac{3}{2}x^{1/2}\), which is continuous on all of \([0, 1]\). At the left endpoint the one-sided derivative is \(0\), and \(f'\) approaches it continuously. So \(f\) is smooth there and Theorem 7.3 applies:</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-28</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3（插入語是獨立的符號檢查）<br>插入語是絕對值的 sign check（有前提與結論），fragment 的 SEAM GUARD 明令此類檢查要 EXPLICIT → 提成獨立句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>Using \(\int \tfrac{1}{t}\,dt = \ln\lvert t\rvert\) from §6.4 <b class='hl'>—</b> with \(t &gt; 0\) here, so the absolute value is simply \(t\) <b class='hl'>—</b></span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Here \(t &gt; 0\), so the absolute value in \(\int \tfrac{1}{t}\,dt = \ln\lvert t\rvert\) from §6.4 is simply \(t\). Hence</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-29</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3（插入語自帶兩個陳述與一個計算值）<br>插入語是兩個獨立陳述（Definition 7.5 量得到／在角點拆開得 \(2\sqrt2\)），含一個計算結果 → 提成獨立句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>has a perfectly good length <b class='hl'>—</b> Definition 7.5 measures it, and splitting at the corner gives \(2\sqrt{2}\) <b class='hl'>—</b> but Theorem 7.3 cannot be applied across \(x = 0\), where no derivative exists for the Mean Value Theorem to use.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>has a perfectly good length. Definition 7.5 measures it, and splitting at the corner gives \(2\sqrt{2}\). But Theorem 7.3 cannot be applied across \(x = 0\), where no derivative exists for the Mean Value Theorem to use.</span></div>
+</div>
+<h3>§7.7 Area of a Surface of Revolution ＋ Chapter summary（5 對：KEEP 2／重寫 3）</h3>
+<div class='pair'><p class='why'><span class='id'>B-30</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 1–3<br>拿掉插入語主幹仍完整；插入語只修飾同一主張（surface 指的是外皮而非內容物），字面詞 surface 在場、非唯一載體 → 保留。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>what it sweeps out is a surface <b class='hl'>—</b> the skin, with none of the filling <b class='hl'>—</b> and the natural question is its area.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-31</span> <span class='tag ms'>KEEP</span> <code>DASH-KEEP</code> · 四步仲裁 step 1–3<br>拿掉插入語主幹仍完整（it is long one way and narrow the other way, along the curve）；插入語只指明「哪一個方向」→ 保留。</p>
+<div class='row keep'><span class='lbl'>留</span><span class='txt'>it is long one way <b class='hl'>—</b> all the way around the axis <b class='hl'>—</b> and narrow the other way, along the curve.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-32</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3（插入語是本章的四步方法本身）<br>插入語裝的是全章 schema 的四個步驟——章末總結是讀者的永久參考頁，這四步 MUST 字面獨立呈現，不該藏在插入語裡 → 提成獨立句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>One schema ran through every section <b class='hl'>—</b> slice the quantity, approximate each slice by a product, sum, and refine <b class='hl'>—</b> and each section supplied its own slice.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>One schema ran through every section. Slice the quantity, approximate each slice by a product, sum, and refine. Each section supplied its own slice.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-33</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3・F4 黏接（冒號接子句＋3 個破折號）<br>一句 45 詞塞三個破折號、兩個論述動作（Def 7.3 的內容／切法要做選擇），\(F(x)\) 的界定又埋在插入語 → 整句重寫成三句，冒號接子句 −1。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>Section 7.4 left geometry: the work done by a varying force <b class='hl'>—</b> read through its signed component \(F(x)\) along the motion <b class='hl'>—</b> is \(W = \int_a^b F(x)\,dx\) (Definition 7.3), and the slicing learned to choose what to slice <b class='hl'>—</b> displacement, cable, or water.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Section 7.4 left geometry. The work done by a varying force is \(W = \int_a^b F(x)\,dx\) (Definition 7.3), where \(F(x)\) is the signed component of the force along the motion. The slicing also learned to choose what to slice, whether displacement, cable, or water.</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>B-34</span> <span class='tag warn'>整句重寫</span> <code>PLAIN-SPLIT</code> · 四步仲裁 step 2／3（插入語自帶兩項對應關係）<br>插入語列出「哪個定理靠哪些定理」的兩項對應，是獨立內容；其後還掛一個單尾同位語 → 整句重寫成三句。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>Three theorems in the chapter were proved with the machinery of Chapter 4 <b class='hl'>—</b> the Mean Value Theorem for Integrals leaning on the Extreme and Intermediate Value Theorems, and the two geometric formulas on the Mean Value Theorem <b class='hl'>—</b> a first sustained payoff from owning those proofs rather than borrowing them.</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>Three theorems in the chapter were proved with the machinery of Chapter 4. The Mean Value Theorem for Integrals leans on the Extreme and Intermediate Value Theorems, and the two geometric formulas lean on the Mean Value Theorem. This is a first sustained payoff from owning those proofs rather than borrowing them.</span></div>
+</div>
+<h2 id="gC">C. R 維度詞彙層（13 條：1 blocking ＋ 12 advisory）</h2>
+<p class='small'>canon 章的預期就是詞彙層 findings 較多（實測 ch06 §6.2 為 14.7／千詞、手稿章 §1.4 ≈0）。每條都附 R1／R2 測試＋一行「為何對 EFL 讀者不透明」＋平實改寫。其中 <b>4 條（C-01／C-04／C-05／C-13）已順帶併入 A 組執行</b>——因為它們剛好落在同一句的破折號上，分開改會動同一句兩次。其餘 9 條是<b>純提案</b>，本輪沒有動。</p>
+<table><tr><th style='width:4rem'>ID</th><th style='width:3rem'>節</th><th style='width:6rem'>測試</th><th style='width:5rem'>級別</th><th>問題與改寫</th></tr>
+<tr><td><span class='id'>C-01</span></td><td>§7.2</td><td class='small'>R1 ＋ R2</td><td><span class='tag bad'>blocking</span></td><td><b class='hl'>fair game</b><br><span class='small'>「Any solid whose cross-sections we can describe <u>is fair game</u>」——整句的教學主張（此法適用於任何可描述截面的立體）<b>只靠這個不透明慣用語承載</b>，字面表述缺席，踩 R 擋稿線①。EFL 讀者查字典會得到「公平的獵物」。</span><br>→ <i>can be handled the same way</i>（已併入 <code>A-24</code> 一起執行）</td></tr>
+<tr><td><span class='id'>C-02</span></td><td>§7.3</td><td class='small'>R1</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>the region fighting back</b><br><span class='small'>「you will sometimes find the region <u>fighting back</u>」——數學物件當主語＋戲劇動詞，SPEC SHOULD 明列要用中性動詞。字面內容在後兩句（要解三次方程式）已補上，故非 blocking。</span><br>→ <i>…and you will sometimes find that they do not suit the region.</i><br><span class='small'>⚠ Figure 7.9 的 caption 也寫 “The region … <u>resists</u> perpendicular slicing”。要改請兩處一起改，否則指稱漂移（R3）。</span></td></tr>
+<tr><td><span class='id'>C-03</span></td><td>§7.4</td><td class='small'>R1</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>is the whole game</b><br><span class='small'>「Deciding what to slice <u>is the whole game</u>」——不透明慣用語承載一個教學結論。同段前兩句已有字面說法，故 advisory。</span><br>→ <i>is the step that shapes the rest of the solution</i></td></tr>
+<tr><td><span class='id'>C-04</span></td><td>§7.4</td><td class='small'>R1</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>comes free with</b><br><span class='small'>「the sign convention <u>comes free with</u> the word <i>component</i>」——慣用語，EFL 讀者無法從字面推。</span><br>→ <i>is built into the word</i>（已併入 <code>A-39</code>）</td></tr>
+<tr><td><span class='id'>C-05</span></td><td>§7.5</td><td class='small'>R1 ＋ R2</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>wearing different clothes</b><br><span class='small'>「the two mean value theorems are the same fact <u>wearing different clothes</u>」——隱喻掛在一個已字面成立的主張上。</span><br>→ <i>are two statements of one fact</i>（已併入 <code>A-51</code>）</td></tr>
+<tr><td><span class='id'>C-06</span></td><td>§7.6</td><td class='small'>R1</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>The polygon cuts corners</b><br><span class='small'>英語 <i>cut corners</i> 的常用義是「偷工減料」，這裡要的是字面幾何義（多邊形抄過彎角）。兩義相撞，EFL 讀者難分；字面內容在同句後半（under-measures every arc）已在，故 advisory。</span><br>→ <i>The polygon takes a straight shortcut across every bend, so it under-measures…</i></td></tr>
+<tr><td><span class='id'>C-07</span></td><td>§7.6</td><td class='small'>R1</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>the currency the next theorem trades in</b><br><span class='small'>「Smoothness is exactly <u>the currency the next theorem trades in</u>」——交易隱喻配數學物件；字面意思只是「這是下個定理需要的假設」。</span><br>→ <i>Smoothness is exactly what the next theorem needs.</i></td></tr>
+<tr><td><span class='id'>C-08</span></td><td>§7.6</td><td class='small'>R1</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>earns its keep</b><br><span class='small'>「the second half of the hypothesis <u>earns its keep</u>」——不透明慣用語（＝證明自己值得留下）。</span><br>→ <i>does its work</i></td></tr>
+<tr><td><span class='id'>C-09</span></td><td>§7.4</td><td class='small'>R1</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>distil</b><br><span class='small'>「it will <u>distil</u> a single representative number」——低頻文學動詞（蒸餾）用在數學操作上。</span><br>→ <i>extract</i></td></tr>
+<tr><td><span class='id'>C-10</span></td><td>§7.7</td><td class='small'>R1</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>without ceremony</b><br><span class='small'>「the rest of the book will use it <u>without ceremony</u>」——不透明慣用語。本輪 <code>A-84</code> 只動破折號、刻意<b>沒有</b>順手改這個詞，等你裁。</span><br>→ <i>without further comment</i></td></tr>
+<tr><td><span class='id'>C-11</span></td><td>§7.2</td><td class='small'>R1（擬人＋交易隱喻）</td><td><span class='tag warn'>advisory ⛳</span></td><td><b class='hl'>earned some trust／repaid the trust</b><br><span class='small'>兩處同族：「A definition that agrees with everything already known <u>has earned some trust</u>.」（Ex 7.5 解末）與「The definition <u>repaid the trust we placed in it</u> by reproducing…」（§7.2 收束）。定義被寫成能賺取／償還信任的主體。兩處互相一致（R3 穩定），要改請一起改。</span><br>→ <i>deserves some confidence</i> ／ <i>justified that confidence by reproducing…</i><br><span class='small'>⛳ 政策題：credit／debt 是全書刻意貫穿、首見已 gloss 的機制隱喻（ch04 §4.1「一律保留」）。本輪判定 trust／earn／repay <b>不屬</b>那條機制線（它講的是定義的可信度，不是延後償還的證明債），故列為可改；若你認為屬同一家族，就兩處都保留。</span></td></tr>
+<tr><td><span class='id'>C-12</span></td><td>§7.5</td><td class='small'>R1</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>has no such escape</b><br><span class='small'>「A continuous function <u>has no such escape</u>.」——擬人（函數想逃卻逃不掉）。字面內容在後兩句。</span><br>→ <i>For a continuous function this cannot happen.</i></td></tr>
+<tr><td><span class='id'>C-13</span></td><td>§7.7</td><td class='small'>R2</td><td><span class='tag warn'>advisory</span></td><td><b class='hl'>the polar flag left in Example 7.22</b><br><span class='small'>兩個問題：(a) 那個 flag 其實在 Example 7.22 <b>之後</b>的段落（“Honesty requires a flag here…”），不在例題內；(b) “polar flag” 對 EFL 是壓縮指稱，讀者無從還原是什麼 flag。</span><br>→ <i>the flag raised at the poles after Example 7.22</i>（已併入 <code>A-83</code>）</td></tr>
+</table>
+<p class='small'><b>頁級累積規則檢查：</b>rubric 規定「一節內 R advisory ≳5 條 SHOULD 升一條節級複查」。逐節計數為 §7.2 三條、§7.4 三條、§7.6 三條、§7.5 兩條、§7.7 兩條、§7.3 一條、§7.1 零條——<b>沒有任何一節達到 5 條，不需升節級複查</b>。</p>
+<h2 id="gD">D. 段落層（5 條）</h2>
+<p class='small'>SPEC §3 段落層：≤120 詞／≤20 式為 SHOULD；<b>≥150 詞或 &gt;20 式或一段兩個以上獨立論證 → MUST 人工判定</b>。判準與句層同源：<b>看論述動作數，不看詞數</b>；處置是<b>拆段而非拆句</b>，且不動數學。前例：ch06 §6.2 的 294 詞／34 式／四個獨立論證拆為五段（W-14）；§6.3 的 114 詞／19 式判為單一論證、保留不拆。</p>
+<div class='pair'><p class='why'><span class='id'>D-01</span> <span class='tag ms'>判定不拆</span> <b>§7.1</b> · 段落觸發器 ≥150 詞 → 人工判定：**不拆**<br>章開場 lead 197 詞觸發人工判定。判定不拆：全書七章的 lead 一律是單一 <code>&lt;p class="lead"&gt;</code>（實測 129／130／150／152／152／173／197 詞），SPEC §4 雖允許 1–2 段，但拆這一章會破壞全書一致的章開場形式；本輪改以句層處理（A-01／B-01／B-02 把最擁擠的一句拆開）。</p>
+</div>
+<div class='pair'><p class='why'><span class='id'>D-02</span> <span class='tag warn'>拆段</span> <b>§7.3</b> · 段落觸發器 ≥150 詞（165 詞／10 式）→ 拆兩段<br>一段承載四個可各自獨立成立的動作：動機失敗（cubic 反解不了）→ 教訓（slicing 是選擇）→ 本節的另一個選擇 → shell 的圖像。依 SPEC §3「拆段而非拆句」，在「教訓」與「本節做什麼」之間斷開。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>The lesson is that slicing is a <em>choice</em>, and the right choice is the one whose slices see the region simply. This section develops</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>The lesson is that slicing is a <em>choice</em>, and the right choice is the one whose slices see the region simply.&lt;/p&gt; &lt;p&gt;This section develops</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>D-03</span> <span class='tag warn'>拆段</span> <b>§7.4</b> · 段落觸發器 ≥150 詞（171 詞）→ 拆兩段<br>一段先講「這兩題和彈簧不同在哪、我們算的是抗力做的功」，再講「每片受力固定、行程不同 → 所以要切材料」。兩個獨立論證，在重力括號註記之後斷開。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>makes lifting require effort.) The force required on any one slice</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>makes lifting require effort.)&lt;/p&gt; &lt;p&gt;The force required on any one slice</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>D-04</span> <span class='tag warn'>拆段</span> <b>§7.7</b> · 段落觸發器 ≥150 詞（214 詞／10 式，全書第二大段）→ 拆兩段<br>章末總結是讀者的永久參考頁。全書已完成的章末總結是 ch01 三段（99／115／72 詞）、ch02 四段（54／48／81／78 詞）；ch07 的 214＋179 是唯一的離群。在 §7.3 與 §7.4 之間斷開（幾何三節／離開幾何之後）。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>distilling the washer-or-shell decision into Strategy 7.2. </span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>distilling the washer-or-shell decision into Strategy 7.2.&lt;/p&gt; &lt;p&gt;</span></div>
+</div>
+<div class='pair'><p class='why'><span class='id'>D-05</span> <span class='tag warn'>拆段</span> <b>§7.7</b> · 段落觸發器 ≥150 詞（179 詞）→ 拆兩段<br>同上一段：前半是「三個定理靠 Ch4 的機件證出來」，後半是「本章欠了什麼、Ch8 之後怎麼還」。在「三定理」與「欠債」之間斷開，四段後每段落在 90–140 詞，貼齊 ch01／ch02 的章末總結形狀。</p>
+<div class='row before'><span class='lbl'>前</span><span class='txt'>What the chapter leaves owing is plain from its own examples:</span></div>
+<div class='row after'><span class='lbl'>後</span><span class='txt'>&lt;/p&gt; &lt;p&gt;What the chapter leaves owing is plain from its own examples:</span></div>
+</div>
+<p class='small'>拆完之後，<b>ch07 的 ≥150 詞段落從 5 段降到 1 段</b>（只剩刻意保留的章開場 lead 200 詞）；章末總結變成四段，形狀貼齊 ch01（三段）／ch02（四段）。</p>
+<h2 id="gE">E. 副表：清單與 figcaption（26 處，⛳ 可選）</h2>
+<p class='small'>這些不入主分母（<code>prose_metrics.py</code> 的 canonical stream 把 <code>ul/ol</code>、<code>figcaption</code>、表格另計），所以<b>處不處理都不影響密度閘</b>。但讀者一樣會讀到。副表現況：N=1466、— 26。逐處如下（本輪未動）：</p>
+<table><tr><th style='width:3rem'>節</th><th style='width:11rem'>locus</th><th>片段</th></tr>
+<tr><td>§7.1</td><td class='small'>Figure 7.1 caption</td><td class='small'>the gap \(f(x_i^{*}) - g(x_i^{*})\) between the graphs <b class='hl'>—</b> not a height above the axis…</td></tr>
+<tr><td>§7.1</td><td class='small'>Strategy 7.1 步驟 3</td><td class='small'>(horizontal strips) <b class='hl'>—</b> never a height above an axis.</td></tr>
+<tr><td>§7.2</td><td class='small'>Figure 7.5 caption</td><td class='small'>the slab at \(x_i^{*}\) is nearly a cylinder <b class='hl'>—</b> a flat face of area…</td></tr>
+<tr><td>§7.2</td><td class='small'>Figure 7.7 caption</td><td class='small'>\(\pi(R^{2}-r^{2})\) <b class='hl'>—</b> visibly not the disk of radius \(R-r\).</td></tr>
+<tr><td>§7.2</td><td class='small'>Figure 7.8 caption</td><td class='small'>The exposed triangle carries the whole solution <b class='hl'>—</b> the half-widths … in the same ratio <b class='hl'>—</b> and the inset shows…</td></tr>
+<tr><td>§7.3</td><td class='small'>Figure 7.9 caption</td><td class='small'>reads its height \(f(x)\) straight off the graph <b class='hl'>—</b> the strip the shell method keeps.</td></tr>
+<tr><td>§7.3</td><td class='small'>Figure 7.10 caption</td><td class='small'>A shallower shell sits dotted inside <b class='hl'>—</b> the solid is built of nested tubes…</td></tr>
+<tr><td>§7.3</td><td class='small'>Figure 7.12 caption</td><td class='small'>One solid, two slicings <b class='hl'>—</b> the solid of Example 7.12… ／ Both decompositions must <b class='hl'>—</b> and do <b class='hl'>—</b> measure the same volume.</td></tr>
+<tr><td>§7.3</td><td class='small'>Strategy 7.2 步驟 4</td><td class='small'>every radius becomes a distance to that line, \(\lvert x-c\rvert\) <b class='hl'>—</b> with the region kept entirely on one side…</td></tr>
+<tr><td>§7.4</td><td class='small'>Figure 7.13 caption</td><td class='small'>accumulated strip by strip <b class='hl'>—</b> and the strips grow taller toward \(b\)…</td></tr>
+<tr><td>§7.4</td><td class='small'>Figure 7.15 caption</td><td class='small'>rises \(4-y\) to the rim <b class='hl'>—</b> the water surface bounds the integral at \(3\)…</td></tr>
+<tr><td>§7.4</td><td class='small'>Strategy 7.3 步驟 3</td><td class='small'>check that its units come to newton-metres <b class='hl'>—</b> joules.</td></tr>
+<tr><td>§7.4</td><td class='small'>Strategy 7.3 步驟 4</td><td class='small'>(the stretch traversed, the cable’s depths, the water’s heights) <b class='hl'>—</b> not necessarily where they end up.</td></tr>
+<tr><td>§7.5</td><td class='small'>Figure 7.16 caption</td><td class='small'>the same area as the region under the curve <b class='hl'>—</b> the deficit above the curve…</td></tr>
+<tr><td>§7.6</td><td class='small'>Figure 7.18 caption</td><td class='small'>whose tangent runs parallel to the chord <b class='hl'>—</b> the picture of Theorem 4.12…</td></tr>
+<tr><td>§7.6</td><td class='small'>Figure 7.19 caption</td><td class='small'>A memory device for the proved formula of Theorem 7.3 <b class='hl'>—</b> the chord picture shrunk to a point <b class='hl'>—</b> not a derivation of it.</td></tr>
+<tr><td>§7.6</td><td class='small'>Strategy 7.4 步驟 3</td><td class='small'>Look for what makes the root tractable <b class='hl'>—</b> a substitution … or a perfect square…</td></tr>
+<tr><td>§7.7</td><td class='small'>Figure 7.20 caption</td><td class='small'>an annular sector, not a rectangle <b class='hl'>—</b> its inner and outer edges keep different lengths.</td></tr>
+<tr><td>§7.7</td><td class='small'>Figure 7.21 caption</td><td class='small'>The band’s slant edge <i>is</i> the chord <b class='hl'>—</b> not the arc <b class='hl'>—</b> its end radii are…</td></tr>
+<tr><td>§7.7</td><td class='small'>Figure 7.22 caption</td><td class='small'>Two slabs of the same width \(w\) cut the sphere’s profile <b class='hl'>—</b> one at the equator, one out toward the pole…</td></tr>
+<tr><td>§7.7</td><td class='small'>Figure 7.23 caption</td><td class='small'>The radius is always the distance to the axis of rotation <b class='hl'>—</b> one principle, not a memorized pair.</td></tr>
+</table>
+<p class='small'>其中 <b>Strategy 7.1／7.2／7.3／7.4 的四個步驟清單</b>（5 處）最值得處理——它們是操作指令，SPEC MUST 要求「操作步驟以字面語言完整傳達」；<b>figure caption 的 16 處</b>多半是同位補述，改逗號即可。Figure 7.12 的「Both decompositions must — and do — measure the same volume.」是成對插入語，要走四步仲裁（我的初判是 KEEP）。</p>
+<h2 id="gate45">④ 節級密度閘 ＋ ⑤ 不換 tic 檢查（投影值）</h2>
+<h3>④ 密度（canonical）</h3>
+<table><tr><th>節</th><th class='num'>— 前</th><th class='num'>— 後</th><th class='num'>N 後</th><th class='num'>/1000 前</th><th class='num'>/1000 後</th><th>判定</th></tr>
+<tr><td>7.1</td><td class='num'>24</td><td class='num'>4</td><td class='num'>1382</td><td class='num'>17.6</td><td class='num'>2.89</td><td><span class='up'>✓</span></td></tr>
+<tr><td>7.2</td><td class='num'>30</td><td class='num'>4</td><td class='num'>1278</td><td class='num'>23.8</td><td class='num'>3.13</td><td><span class='dn'>節級 &gt;3.0（見下方說明）</span></td></tr>
+<tr><td>7.3</td><td class='num'>16</td><td class='num'>2</td><td class='num'>1080</td><td class='num'>15.0</td><td class='num'>1.85</td><td><span class='up'>✓</span></td></tr>
+<tr><td>7.4</td><td class='num'>18</td><td class='num'>4</td><td class='num'>1249</td><td class='num'>14.6</td><td class='num'>3.20</td><td><span class='dn'>節級 &gt;3.0（見下方說明）</span></td></tr>
+<tr><td>7.5</td><td class='num'>16</td><td class='num'>2</td><td class='num'>928</td><td class='num'>17.5</td><td class='num'>2.16</td><td><span class='up'>✓</span></td></tr>
+<tr><td>7.6</td><td class='num'>22</td><td class='num'>0</td><td class='num'>1307</td><td class='num'>17.0</td><td class='num'>0.00</td><td><span class='up'>✓</span></td></tr>
+<tr><td>7.7</td><td class='num'>28</td><td class='num'>4</td><td class='num'>1662</td><td class='num'>17.0</td><td class='num'>2.41</td><td><span class='up'>✓</span></td></tr>
+<tr><th>ch07</th><th class='num'>154</th><th class='num'>20</th><th class='num'>8886</th><th class='num'>17.5</th><th class='num'>2.25</th><th><span class='up'>✓ T_can ≤3.0 達標</span></th></tr></table>
+<div class="card warn">
+<b>明示節級例外（SPEC 要求：仍超標時「另找安全改點、重寫真正的多動作句，或<u>明示節級例外</u>」，不得逐筆討價還價）。</b>
+§7.2（3.12）與 §7.4（3.22）在節級略高於 3.0，各自來自兩對通過四步仲裁的 KEEP：
+<ul class="tight">
+<li><b>§7.2</b>：<code>B-11</code>（Example 7.8 題幹指明是哪塊區域）＋<code>B-12</code>（disk／washer／square 三情形列舉）。</li>
+<li><b>§7.4</b>：<code>B-20</code>（兩個引號模板的列舉）＋<code>B-22</code>（area／volume／joules 三種 total 的列舉）。</li>
+</ul>
+四對都是「同一主張的列舉或指認」，正是 step 3 明文要保留的型別。
+SPEC 同時規定「<b>逐例 KEEP MUST NOT 因為密度差幾個名額就被機械改成逗號</b>」，
+而<b>綁定的閘是單元級</b>（ch07 全章 2.25 ✓）。故此二節<b>以節級例外記錄，不再往下砍</b>。
+<br><br><b>反向也照做了：</b>我一開始判 KEEP 的三對（§7.1 runners 的記號、§7.3 annular cylinder 的 and 黏接、§7.3 §7.4 預告句），
+複判時發現它們其實各自黏了兩個獨立論述動作，於是改判重寫——<b>那是依判準改的，不是為了湊名額</b>（見 B-05／B-15／B-16 的理由欄）。
+</div>
+<h3>⑤ 不換 tic（門檻：raw ≥ +3 <u>且</u> 密度 ≥ +0.5/1000 才須填理由）</h3>
+<table><tr><th>指標</th><th class='num'>前</th><th class='num'>後</th><th class='num'>Δ raw</th><th class='num'>Δ /1000</th><th>判定／理由</th></tr>
+<tr><td>冒號接子句</td><td class='num'>102</td><td class='num'>92</td><td class='num'>-10</td><td class='num'>-1.24</td><td class='small'><span class='up'>−10。本章 102 是全書最高、prompt 明令不得再往冒號推——實際是<b>降下來</b>：11 條把原本的冒號接子句升成句號。</span></td></tr>
+<tr><td>分號</td><td class='num'>37</td><td class='num'>36</td><td class='num'>-1</td><td class='num'>-0.16</td><td class='small'><span class='up'>−1（A-15）。全輪<b>沒有新增任何分號</b>——appB 首輪去慣用語時淨增 4 個分號，本輪刻意避開。</span></td></tr>
+<tr><td>左括號</td><td class='num'>56</td><td class='num'>56</td><td class='num'>+0</td><td class='num'>-0.07</td><td class='small'><span class='up'>±0。CUT palette 的括號分支<b>一條都沒用</b>；ch01 Gate 2 已裁「把 dash 換括號」＝表面去 dash。</span></td></tr>
+<tr><td>成對逗號插入語</td><td class='num'>32</td><td class='num'>43</td><td class='num'>+11</td><td class='num'>+1.20</td><td class='small'><b>達門檻，理由：</b>這正是 palette 指定給「鬆散同位語」的落點——84 條單尾裡有 11 條落成<code>…, 同位語, …</code>，被此指標計為成對逗號。三個較重的 tic（冒號／分號／括號）同時<b>下降或持平</b>，所以負載沒有搬家。走查中我另外把 4 條原本會多加一個逗號的改寫（A-06／A-30／A-45／A-50）改成分句或直接刪破折號，把 +15 壓到 +11。</td></tr>
+<tr><td>em-dash</td><td class='num'>154</td><td class='num'>20</td><td class='num'>-134</td><td class='num'>-15.26</td><td class='small'><span class='up'>17.51 → 2.25/1000</span></td></tr>
+<tr><td>N（canonical 詞數）</td><td class='num'>8795</td><td class='num'>8886</td><td class='num'>+91</td><td class='num'>—</td><td class='small'>+0.9%。拆句會補回主詞與連接詞，屬預期；SPEC 對詞數沒有門檻。</td></tr>
+</table>
+<h2 id="math">數學安全（Gate 5 預檢，程式化比對）</h2>
+<table><tr><th>節</th><th class='num'>數學片段 前</th><th class='num'>後</th><th>multiset</th><th>順序</th></tr>
+<tr><td>7.1</td><td class='num'>161</td><td class='num'>161</td><td><span class="up">相同</span></td><td>有搬動</td></tr>
+<tr><td>7.2</td><td class='num'>153</td><td class='num'>153</td><td><span class="up">相同</span></td><td>相同</td></tr>
+<tr><td>7.3</td><td class='num'>114</td><td class='num'>114</td><td><span class="up">相同</span></td><td>相同</td></tr>
+<tr><td>7.4</td><td class='num'>101</td><td class='num'>101</td><td><span class="up">相同</span></td><td>相同</td></tr>
+<tr><td>7.5</td><td class='num'>108</td><td class='num'>108</td><td><span class="up">相同</span></td><td>相同</td></tr>
+<tr><td>7.6</td><td class='num'>144</td><td class='num'>144</td><td><span class="up">相同</span></td><td>有搬動</td></tr>
+<tr><td>7.7</td><td class='num'>160</td><td class='num'>160</td><td><span class="up">相同</span></td><td>有搬動</td></tr>
+<tr><th>ch07</th><th class='num'>941</th><th class='num'>941</th><th><span class='up'>全部相同</span></th><th>3 節有搬動</th></tr></table>
+<div class="card good">
+<b>941 個數學片段逐一比對，multiset 完全相同、零新增零刪除零改字。</b>
+三節顯示「順序有搬動」，來源只有三筆、都是刻意的<b>先立記號</b>改寫，公式本身一字未改：
+<ul class="tight">
+<li><code>B-04</code>（§7.1）：把 <code>\(x = g(y)\)</code>、<code>\(x = f(y)\)</code> 等假設從插入語提到句首，<code>\(x\) in terms of \(y\)</code> 移到後句。</li>
+<li><code>B-26</code>（§7.6）：把 <code>\(f \in C^{1}([a,b])\)</code> 從定義句中間移到定義之後。</li>
+<li><code>B-33</code>（§7.7）：把 <code>\(W = \int_a^b F(x)\,dx\)</code> 提前、<code>\(F(x)\)</code> 的界定改成 where 子句。</li>
+</ul>
+另外：<b>公式編號、Definition／Theorem／Example／Strategy 編號、cross-ref（§、Theorem 6.1、Example 7.7…）一處未動</b>；
+所有改動都在 <code>&lt;p&gt;</code> 的散文裡，沒有碰 <code>env-head</code>、<code>&lt;figure&gt;</code>、<code>data-fig</code>、display block。
+</div>
+<h2 id="keep">刻意保留清單（規則沒有誤傷的證據）</h2>
+<ul class='tight'><li><b>10 對成對插入語</b>（見 B 組的 KEEP 卡）——含已裁先例同型的 <code>B-03</code>（頻率修飾，比照 <code>— far more often —</code>）與 <code>B-25</code>（證明體內的三字節拍式範圍註記，比照 <code>— only then —</code> 預設 KEEP）。</li><li><b><code>pays that debt</code></b>（§7.7 章末）——credit／debt 是全書刻意貫穿、首見已 gloss 的機制隱喻，依 ch04 §4.1 先例保留。</li><li><b>§7.5 證明體</b>——除 <code>B-25</code> 判 KEEP 外，Theorem 7.2 的證明散文一字未動。</li><li><b>§3 鼓勵的銜接語</b>——<i>Notice that</i>／<i>Observe that</i>／<i>In other words</i> 一個沒砍。</li><li><b>刻意的教學重複</b>——radius discipline 在 §7.2／§7.3／§7.7 反覆出現（topic-term recurrence），不算 F1。</li><li><b>符號密集段沒有按詞切句</b>——§7.5 證明段（84 詞／20 式）判為單一論證，不拆；§7.4 p02（135 詞／13 式）只在記號建立處拆，不機械切。</li><li><b><code>C-10</code>（without ceremony）刻意沒順手改</b>——它跟 <code>A-84</code> 在同一句，但那是純詞彙裁量，留給你裁。</li></ul>
+<h2 id="todo">本輪還沒做的事（誠實記錄）</h2>
+<ul class="tight">
+<li><b>Gate 2（Codex 跨模型裁決）未跑</b>——需逐次徵同意，見政策題⑥。</li>
+<li><b>Gate 3 起全部未執行</b>：本檔是 propose-only，<b>七個 fragment 一個字都沒改</b>（<code>git status</code> 乾淨）。
+    上面所有「後」欄與投影數字都是在記憶體裡套用後重算的，不是既成事實。</li>
+<li><b>Gate 7（LaTeX 線）記 pending</b>：<code>handout/latex/make_dist.py</code> 的 <code>NAMES</code> 表目前只有 appB、ch03，<b>沒有 ch07</b>。
+    依平行紀律<b>不改 NAMES</b>（會與別章的平行輪衝突），本輪記為 pending，留給合併回收那一輪一次補完。</li>
+<li><b>副表 26 處未動</b>（E 組，⛳ 待裁）。</li>
+<li><b>C 組 9 條純詞彙提案未動</b>（C-02／03／06／07／08／09／10／11／12）。</li>
+<li><b>rollout 帳本未動</b>：依平行紀律 MUST NOT 編輯 <code>REPORT-emdash-baseline-and-rollout.md</code>；
+    數字會寫進本輪的 applied 報告末尾「待併」欄。</li>
+<li><b>本輪不重跑 ch07 已過的其他閘</b>（圖閘、example 選題、learner-sim、數學閘）——只對<b>改動句</b>跑 Gate 5／Gate 6。
+    唯一要留意的是 <code>C-02</code> 若採納，Figure 7.9 的 caption 語義要一起改（會踩到圖閘範圍），已在該條標註。</li>
+</ul>
+<p class="foot">
+本檔為 <b>Gate 1 走查稿（propose-only）</b>，2026-07-26 產出，分支 <code>handout/plain-ch07</code>。
+判準權威＝<code>CONTENT_SPEC.md</code> §3〈平實英文條款〉（RC，2026-07-25 凍結）；流程權威＝<code>handout/html/_audit/KICKOFF-plain-backfill.md</code>。
+量測工具＝<code>tools/prose_metrics.py</code>（canonical stream 單一真實來源）。
+提案總數 <b>155</b> 筆（A 84／B 34／
+D 5，另 C 組 13 條詞彙提案、E 組 21 處副表 locus）。
+</p>
+</body>
+</html>

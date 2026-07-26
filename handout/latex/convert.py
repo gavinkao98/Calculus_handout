@@ -58,6 +58,28 @@ def _line_of(raw, i):
     return raw.count("\n", 0, i) + 1
 
 
+# 數學區段內允許的 HTML entity（ch04 差集）。HTML 的文字節點裡不能寫裸 `<`，所以
+# `\(m &lt; M\)` 是**正確**的 fragment 寫法——MathJax 拿到的是解碼後的 `m < M`。數學是
+# 逐位元組 pass-through，若不在此解碼，LaTeX 會收到字面的 `&lt;`，`&` 被當成 alignment
+# tab 而編譯失敗（ch04 rollout 首次遇到；appB／ch01／ch03 的真數學區段內零 entity）。
+# 白名單外的 entity 一律硬錯——理由同上方 entity 反斜線的守衛：瀏覽器解碼、轉換器不解，
+# 兩邊語義會分岔。要支援新的就更新這張表，不要靜默放行。
+MATH_ENTITIES = {"&lt;": "<", "&gt;": ">"}
+_MATH_ENTITY_ANY = re.compile(r"&(?:[a-zA-Z][a-zA-Z0-9]*|#\d+|#[xX][0-9a-fA-F]+);")
+
+
+def _decode_math_entities(seg, raw, pos, fname):
+    bad = [m.group(0) for m in _MATH_ENTITY_ANY.finditer(seg) if m.group(0) not in MATH_ENTITIES]
+    if bad:
+        raise MathScanError(
+            f"{fname}:{_line_of(raw, pos)}: 數學區段含未凍結的 entity {sorted(set(bad))}——"
+            f"瀏覽器會解碼它、轉換器不會，兩邊語義分岔。目前只凍結 "
+            f"{sorted(MATH_ENTITIES)}；要支援請更新 MATH_ENTITIES 與該章 DIALECT 表。")
+    for k, v in MATH_ENTITIES.items():
+        seg = seg.replace(k, v)
+    return seg
+
+
 def extract_math(raw, fname="<input>"):
     """單趟 scanner：把數學挖成占位符。回傳 (帶占位符的 HTML, 數學原文清單)。
 
@@ -119,7 +141,7 @@ def extract_math(raw, fname="<input>"):
                 continue
             f = raw[k + 1] if k + 1 < n else ""
             if f == close:
-                seg = raw[start:k + 2]
+                seg = _decode_math_entities(raw[start:k + 2], raw, start, fname)
                 store.append(seg)
                 pad = "\n" * seg.count("\n")
                 out.append(f"{S_OPEN}{len(store) - 1}{S_CLOSE}")
@@ -335,8 +357,9 @@ class FragmentParser(HTMLParser):
 
 # ── 方言 -> IR ────────────────────────────────────────────────────────────────
 ENV_KINDS = {
-    "env-definition", "env-theorem", "env-proposition", "env-proof",
+    "env-definition", "env-theorem", "env-proposition", "env-corollary", "env-proof",
     "env-example", "env-solution", "env-remark", "env-caution", "env-strategy",
+    "env-corollary",   # ch04 差集：×4（模板早已備妥 envcorollary，見 calcbook.sty §env 家族）
 }
 
 
@@ -388,11 +411,11 @@ class Builder:
             elif k.tag == "strong" and not k.classes:   # appB 差集：run-in 粗體標籤
                 self.n_mapped += 1
                 out.append(Strong(self.inlines(k.kids, k, allow_br)))
-            elif k.tag == "span" and k.classes in (("qed",), ("qed", "qed-proof")):
-                # 收尾記號。appB 只有 proof 變體；ch06 差集：worked-solution 用裸
-                # `span.qed`（HTML 側兩者都是空心方框，只差框線 --ink-soft／--ink，
-                # LaTeX 同映到 \qedmark＝\qedsymbol；模板該巨集本就註明「span.qed 記號驅動」）。
-                # 必須是空元素（有內文＝契約外，硬錯）
+            elif k.tag == "span" and k.classes in (("qed", "qed-proof"), ("qed",)):
+                # appB 差集：proof 收尾記號 qed-proof。
+                # ch04 差集：worked-solution 的收尾用裸 span.qed（×6 在句尾，同樣渲染 QED
+                # 符號，只是不屬 proof 環境；第 7 個在區塊位置，見 block()）。
+                # 兩者都必須是空元素（有內文＝契約外，硬錯）
                 if any(isinstance(x, str) and x.strip() or not isinstance(x, str) for x in k.kids):
                     self.err(k, "qed 記號必須是空元素")
                 self.n_mapped += 1
@@ -455,6 +478,13 @@ class Builder:
 
         if t == "h3" and set(c) <= {"subsec-head", "page-break-before"} and "subsec-head" in c:
             return SubsecHead(self.inlines(el.kids, el), pagebreak="page-break-before" in c)
+
+        if t == "span" and c == ("qed",):
+            # ch04 差集：Example 4.1 的 solution 把收尾記號放成 env-body 的區塊子元素
+            # （同章其餘 6 個都在 <p> 句尾，走 inline 路徑）。渲染同為右靠的 QED 符號。
+            if any(isinstance(x, str) and x.strip() or not isinstance(x, str) for x in el.kids):
+                self.err(el, "qed 記號必須是空元素")
+            return Para([QedMark()])
 
         if t == "div" and c == ("tbl-wrap",):
             return self.table_wrap(el)
@@ -857,13 +887,19 @@ class LatexEmitter:
             return self.table(b)
 
         if isinstance(b, Env):
-            # name 必須在 body **之前**算：兩者都可能含數學，而 used 不變式要求還原順序
-            # 等同源順序（env-head 在 env-body 之前）。先算 body 會記成 used=[1,0]，
-            # 明明輸出正確卻被不變式誤擋（偽陽性）。ch03 的 13 個 env-name 都沒數學才沒踩到。
+            # kicker／name 必須在 body **之前**算，且依 kicker → name 的源順序：三者都
+            # 可能含數學，而 used 不變式要求還原順序等同源順序（env-head 在 env-body 之前、
+            # env-kicker 在 env-name 之前）。先算 body 會記成 used=[1,0]，明明輸出正確卻被
+            # 不變式誤擋（偽陽性）。ch03 的 13 個 env-name 都沒數學才沒踩到。
+            # kicker 走 restore(esc(...))（與 inline 文字同一條路徑）而非單純 esc：自訂
+            # proof 標籤會帶數學（ch05 §5.7 的 "Proof of the \(\tfrac{0}{0}\) case, \(a\)
+            # finite"、appD §D.3 同型），只 esc 會把占位符原樣印出、數學被丟掉。num 維持
+            # 純 esc——env-num 是編號（"5.5"），帶數學即屬體例錯誤，應由不變式擋下。
+            kicker = self.restore(esc(b.kicker))
             name = self.para_text(b.name) if b.name else ""
             inner = self.emit(b.body).strip()
             pb = "\\pagebreakbefore\n" if b.pagebreak else ""
-            return (f"{pb}\\begin{{env{b.kind}}}{{{esc(b.kicker)}}}{{{esc(b.num)}}}{{{name}}}\n"
+            return (f"{pb}\\begin{{env{b.kind}}}{{{kicker}}}{{{esc(b.num)}}}{{{name}}}\n"
                     f"{inner}\n\\end{{env{b.kind}}}")
 
         if isinstance(b, WorkedExample):

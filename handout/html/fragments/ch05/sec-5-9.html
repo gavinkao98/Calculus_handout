@@ -18,7 +18,7 @@
   </header>
 
   <!-- expansion:intuition — section opener: solving f(x)=0 when no formula gives the root; the tangent line as an engine -->
-  <p>The chapter closes by turning the derivative to a new purpose: not describing a function, but <em>solving</em> one. Many equations \(f(x) = 0\) have roots that resist an explicit formula — the cubic \(x^{3} - x - 1 = 0\) yields nothing to simple factoring, and a transcendental equation like \(\cos x = x\) has no elementary closed form at all — yet the roots are real and can be pinned down to any precision. <em>Newton’s method</em> does the pinning, and its engine is the linear approximation of §5.3: near a point, a curve is almost its tangent line, and a line’s root is trivial to find. Follow the tangent to where it crosses the axis, and — from a good starting guess — you land nearer the curve’s own root; repeat, and you close in fast.</p>
+  <p>The chapter closes by turning the derivative to a new purpose: not describing a function, but <em>solving</em> one. Many equations \(f(x) = 0\) have roots that are not given by a simple formula. The cubic \(x^{3} - x - 1 = 0\) cannot be solved by simple factoring, and a transcendental equation like \(\cos x = x\) has no elementary closed form at all. Yet the roots are real and can be located to any precision. <em>Newton’s method</em> is how they are located, and it rests on the linear approximation of §5.3: near a point, a curve is almost its tangent line, and a line’s root is trivial to find. Follow the tangent to where it crosses the axis, and — from a good starting guess — you land nearer the curve’s own root; repeat, and you close in fast.</p>
 
   <p>Make it precise. Start with a guess \(x_{0}\) near the root. The tangent line to \(y = f(x)\) at \(\bigl(x_{0}, f(x_{0})\bigr)\) is</p>
   <p>\[ y - f(x_{0}) = f'(x_{0})(x - x_{0}). \]</p>
@@ -36,11 +36,11 @@
     <div class="env-body">
       <p>To approximate a root of \(f(x) = 0\):</p>
       <ol class="steps">
-        <li>Choose a starting value \(x_{0}\) reasonably near the root — a rough sketch or a sign change of \(f\) will locate one.</li>
+        <li>Choose a starting value \(x_{0}\) reasonably near the root. A rough sketch or a sign change of \(f\) will locate one.</li>
         <li>Generate successive approximations by the iteration</li>
       </ol>
       <p>\[ x_{n+1} = x_{n} - \frac{f(x_{n})}{f'(x_{n})}, \qquad n = 0, 1, 2, \dots \]</p>
-      <p>Continue until consecutive values agree to the precision required; the common value is the root to that precision. The method needs \(f'(x_{n}) \ne 0\) at each step — a horizontal tangent has no finite intercept and stalls the process.</p>
+      <p>Continue until consecutive values agree to the precision required; the common value is the root to that precision. The method needs \(f'(x_{n}) \ne 0\) at each step. A horizontal tangent has no finite intercept, so the process stops.</p>
     </div>
   </section>
 
@@ -59,7 +59,7 @@
         <p>\[ x_{n+1} = x_{n} - \frac{x_{n}^{2} - 2}{2x_{n}} = \frac{1}{2}\left(x_{n} + \frac{2}{x_{n}}\right), \]</p>
         <p>a formula that averages each guess with the number it divides into \(2\). Starting from \(x_{0} = 1.5\):</p>
         <p>\[ x_{1} = \tfrac{1}{2}\!\left(1.5 + \tfrac{2}{1.5}\right) = 1.41667, \quad x_{2} = 1.414216, \quad x_{3} = 1.4142136. \]</p>
-        <p>Against the true value \(\sqrt{2} = 1.41421356\ldots\), the third step is already correct to seven decimals. The number of correct digits roughly <em>doubles</em> at each step — the hallmark of Newton’s method near a simple root. This particular iteration is ancient: it is the Babylonian rule for square roots, which turns out to be Newton’s method applied to \(x^{2} - 2\). <span class="qed"></span></p>
+        <p>Against the true value \(\sqrt{2} = 1.41421356\ldots\), the third step is already correct to seven decimals. The number of correct digits roughly <em>doubles</em> at each step. That rapid doubling is characteristic of Newton’s method near a simple root. This particular iteration is ancient: it is the Babylonian rule for square roots, which turns out to be Newton’s method applied to \(x^{2} - 2\). <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -79,7 +79,7 @@
         <p>\[ x_{n+1} = x_{n} - \frac{x_{n}^{3} - x_{n} - 1}{3x_{n}^{2} - 1}. \]</p>
         <p>Starting from \(x_{0} = 1.5\):</p>
         <p>\[ x_{1} = 1.34783, \quad x_{2} = 1.32520, \quad x_{3} = 1.324718, \quad x_{4} = 1.324718. \]</p>
-        <p>The values have settled by the fourth step, so the root is \(1.324718\) to six decimals — a value beyond the reach of simple factoring, yet found in four steps of arithmetic. The Intermediate Value Theorem certified that the root exists; Newton’s method located it. <span class="qed"></span></p>
+        <p>The values have settled by the fourth step, so the root is \(1.324718\) to six decimals. Simple factoring cannot produce this value, yet four steps of arithmetic have found it. The Intermediate Value Theorem certified that the root exists; Newton’s method located it. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -88,7 +88,7 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>Newton’s method is fast but not foolproof. It requires \(f'(x_{n}) \ne 0\) at every step; a guess landing where the tangent is horizontal has nowhere to go. More subtly, the method is only <em>locally</em> reliable: started too far from a root, or near a point where the curve turns the wrong way, the iterates can overshoot, wander off to infinity, or fall into a repeating cycle that never converges. The concavity of §5.6 is a reliable guide: on an arc where \(f''\) keeps one sign and \(f' \ne 0\), a guess started on the side where \(f\) and \(f''\) agree in sign closes in steadily, while a poorly placed start can be thrown clear. In practice a rough sketch to seed the first guess is worth more than any number of blind iterations.</p>
+      <p>Newton’s method is fast but not always reliable. It requires \(f'(x_{n}) \ne 0\) at every step; a guess landing where the tangent is horizontal gives no next iterate. More subtly, the method is only <em>locally</em> reliable: if the starting guess is too far from a root, or is in a region where the curve bends so that the tangent line crosses the \(x\)-axis beyond the root, the iterates can overshoot, wander off to infinity, or fall into a repeating cycle that never converges. The concavity of §5.6 is a reliable guide: on an arc where \(f''\) keeps one sign and \(f' \ne 0\), a guess started on the side where \(f\) and \(f''\) agree in sign closes in steadily, while a poorly placed start can move away from the root instead. In practice a rough sketch that gives a good first guess is worth more than any number of unguided iterations.</p>
     </div>
   </section>
 
@@ -102,6 +102,6 @@
     <li><strong>Shape and indeterminate limits.</strong> Concavity and inflection completed the reading of a graph (§5.6); L’Hôpital’s rule, powered by a generalized Mean Value Theorem, resolved the indeterminate limits that govern behaviour at infinity (§5.7); and curve sketching gathered every feature into one disciplined procedure (§5.8).</li>
     <li><strong>Numerical root-finding.</strong> Newton’s method turned the tangent line into an engine for solving \(f(x) = 0\), reaching roots no formula can express (§5.9).</li>
   </ul>
-  <p>Underneath all four runs a single idea: the derivative, a statement about one instant, controls the behaviour of a function across whole intervals — its rise and fall, its extremes, its bends, its roots. The next chapter reverses the direction of travel. Having spent three chapters taking functions apart with the derivative, it asks the opposite question — how to build a function up by accumulation — and finds, in the Fundamental Theorem of Calculus, that the two operations are inverse to one another.</p>
+  <p>Underneath all four runs a single idea: the derivative, a statement about one instant, controls the behaviour of a function across whole intervals, including the function’s rise and fall, its extremes, its bends, and its roots. The next chapter reverses the direction of travel. Having spent three chapters taking functions apart with the derivative, it asks how to build a function up by accumulation. The Fundamental Theorem of Calculus then shows that the two operations are inverse to one another.</p>
 
 </article>

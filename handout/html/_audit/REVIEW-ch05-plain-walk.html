@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ch05 散文平實化回填（合併 sweep）— Gate 0 基線 ＋ Gate 1 走查</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2df; --bg:#fbfbf9; --card:#fff;
+    --good:#1f7a44; --good-bg:#f0f8f3; --good-line:#b8ddc7; --bad:#a3232a; --bad-bg:#fdf4f4;
+    --bad-line:#e8c9c9; --warn:#9a5b00; --warn-bg:#fdf3e3; --accent:#2d5a8a; --code-bg:#f4f4f2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Inter","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.6; max-width:1020px; margin:0 auto; padding:2.4rem 1.5rem 5rem; }
+  h1 { font-size:1.45rem; line-height:1.3; margin:0 0 .3rem; }
+  .sub { color:var(--muted); font-size:.93rem; margin:0 0 1.6rem; }
+  h2 { font-size:1.14rem; margin:2.4rem 0 .7rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+  h3 { font-size:.98rem; margin:1.5rem 0 .45rem; color:var(--accent); }
+  code { font-family:Consolas,monospace; font-size:.87em; background:var(--code-bg); padding:.08em .35em; border-radius:3px; }
+  table { border-collapse:collapse; width:100%; margin:.7rem 0 1rem; font-size:.88rem; }
+  th,td { border:1px solid var(--line); padding:.4rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#f0f0ee; font-weight:600; }
+  td.num,th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.9rem 1.15rem; margin:1rem 0; }
+  .card.good { background:var(--good-bg); border-color:var(--good-line); }
+  .card.warn { background:var(--warn-bg); border-color:#e8d3a8; }
+  .card.bad { background:var(--bad-bg); border-color:var(--bad-line); }
+  .row { display:flex; gap:.55rem; padding:.45rem .6rem; border-radius:5px; margin-bottom:.3rem; }
+  .row .lbl { flex:0 0 3rem; font-size:.72rem; font-weight:700; padding-top:.18rem; }
+  .row .txt { flex:1; font-size:.94rem; line-height:1.55; }
+  .before { background:var(--bad-bg); border-left:3px solid var(--bad-line); }
+  .before .lbl { color:var(--bad); }
+  .after { background:var(--good-bg); border-left:3px solid var(--good-line); }
+  .after .lbl { color:var(--good); }
+  .pair { margin:.75rem 0 1.1rem; }
+  .pair .why { font-size:.85rem; color:var(--muted); margin:0 0 .3rem; }
+  .id { font-family:Consolas,monospace; font-size:.8em; font-weight:700; color:var(--accent); white-space:nowrap; }
+  .tag { display:inline-block; font-size:.72rem; font-weight:600; padding:.08rem .45rem; border-radius:999px; white-space:nowrap; }
+  .tag.good { color:var(--good); background:var(--good-bg); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); }
+  .tag.bad { color:var(--bad); background:var(--bad-bg); }
+  .tag.ms { color:#4a3a80; background:#f1eefb; }
+  ul.tight { margin:.3rem 0 .7rem; padding-left:1.3rem; }
+  ul.tight li { margin:.2rem 0; }
+  ol.tight { margin:.3rem 0 .7rem; padding-left:1.4rem; }
+  ol.tight li { margin:.2rem 0; }
+  .small { font-size:.85rem; color:var(--muted); }
+  .foot { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.84rem; color:var(--muted); }
+  .out { background:#fff3b0; padding:0 .2em; border-radius:2px; font-weight:600; }
+  .en { font-style:italic; }
+  b.hl { background:#fff3b0; font-weight:700; padding:0 .1em; }
+  nav.toc { position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--line);
+    padding:.5rem 0; margin:0 0 1rem; font-size:.84rem; z-index:5; }
+  nav.toc a { color:var(--accent); text-decoration:none; margin-right:.7rem; white-space:nowrap; }
+  nav.toc a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<h1>ch05 散文平實化回填（合併 sweep）— Gate 0 基線 ＋ Gate 1 走查</h1>
+<p class="sub">第一個 <strong>canon 章</strong>（無手稿、100% LLM 自產）· gate-1、<strong>propose-only（未改任何 fragment）</strong> · 2026-07-26 · 分支 <code>handout/plain-ch05</code>（worktree <code>.claude/worktrees/plain-ch05</code>）· 判準＝<code>CONTENT_SPEC.md</code> §3〈平實英文條款〉RC · 流程＝<code>KICKOFF-plain-backfill.md</code></p>
+
+<nav class="toc">
+  <a href="#g0">Gate 0</a><a href="#policy">⛳ 政策題</a><a href="#s1">§5.1</a><a href="#s2">§5.2</a><a href="#s3">§5.3</a><a href="#s4">§5.4</a><a href="#s5">§5.5</a><a href="#s6">§5.6</a><a href="#s7">§5.7</a><a href="#s8">§5.8</a><a href="#s9">§5.9</a><a href="#sub">副表</a><a href="#density">密度／tic</a><a href="#keep">保留清單</a><a href="#oos">範圍外</a>
+</nav>
+
+<div class="card good">
+  <strong>一句話結論：</strong>ch05 的 108 個散文破折號中，<strong>102 個判 CUT／重寫、6 個依四步仲裁 KEEP</strong>，密度 <strong>14.4 → 0.8/1000</strong>（<code>T_can</code> ≤3.0，達標且有大量餘裕）。
+  詞彙層如 canon 章預期地多：家族掃描 <strong>141 命中／18.8 每千詞</strong>（ch06 §6.2 為 14.7、手稿章 ≈0），人工複核後提 <strong>34 條 R1／R2 findings</strong>，其中 <strong>7 條直接引用 ch06／ch01 已裁先例</strong>（<span class="en">honest</span>、<span class="en">puts to work</span>、<span class="en">yields to</span>、<span class="en">asks</span>）。
+  另有 <strong>9 條 PLAIN-SPLIT</strong>（雙論述動作黏接句，最嚴重者 §5.8 一句 81 詞／2 破折號／2 分號／三個獨立教學動作）。
+  段落層<strong>零觸發器</strong>（最長 129 詞、最多 19 式、≥150 詞 0 段），與 kickoff 預告的「無段落離群」一致。
+</div>
+
+<h2 id="g0">Gate 0 — 基線與地雷勘查（唯讀）</h2>
+
+<h3>逐節 canonical 量測（<code>python tools/prose_metrics.py --unit ch05</code> ＋逐節腳本）</h3>
+<table>
+  <tr><th>節</th><th class="num">N</th><th class="num">em-dash</th><th class="num">/1000</th><th class="num">冒號</th><th class="num">分號</th><th class="num">括號</th><th class="num">雙逗號</th><th>備註</th></tr>
+  <tr><td>§5.1 隱函數微分</td><td class="num">978</td><td class="num">12</td><td class="num">12.3</td><td class="num">10</td><td class="num">6</td><td class="num">6</td><td class="num">4</td><td>含章開場 lead</td></tr>
+  <tr><td>§5.2 相關變率</td><td class="num">710</td><td class="num">6</td><td class="num">8.5</td><td class="num">7</td><td class="num">4</td><td class="num">0</td><td class="num">2</td><td>全章密度最低</td></tr>
+  <tr><td>§5.3 線性近似</td><td class="num">822</td><td class="num">12</td><td class="num">14.6</td><td class="num">5</td><td class="num">4</td><td class="num">2</td><td class="num">4</td><td>交易隱喻密集</td></tr>
+  <tr><td>§5.4 極大與極小</td><td class="num">1103</td><td class="num"><span class="out">19</span></td><td class="num"><span class="out">17.2</span></td><td class="num">13</td><td class="num">6</td><td class="num">10</td><td class="num">4</td><td>件數最多</td></tr>
+  <tr><td>§5.5 最佳化問題</td><td class="num">732</td><td class="num">10</td><td class="num">13.7</td><td class="num">5</td><td class="num">6</td><td class="num">4</td><td class="num">1</td><td>詞彙層最乾淨</td></tr>
+  <tr><td>§5.6 導數與圖形</td><td class="num">838</td><td class="num">13</td><td class="num">15.5</td><td class="num">7</td><td class="num">3</td><td class="num">11</td><td class="num">5</td><td>—</td></tr>
+  <tr><td>§5.7 L’Hôpital</td><td class="num">902</td><td class="num">15</td><td class="num">16.6</td><td class="num">12</td><td class="num">4</td><td class="num">6</td><td class="num">4</td><td>家族命中最高（24.4）</td></tr>
+  <tr><td>§5.8 描繪曲線</td><td class="num">825</td><td class="num">11</td><td class="num">13.3</td><td class="num">12</td><td class="num">8</td><td class="num">2</td><td class="num">4</td><td>含 81 詞離群句</td></tr>
+  <tr><td>§5.9 牛頓法</td><td class="num">592</td><td class="num">10</td><td class="num"><span class="out">16.9</span></td><td class="num">6</td><td class="num">6</td><td class="num">2</td><td class="num">0</td><td>含章摘要</td></tr>
+  <tr><td><strong>全章</strong></td><td class="num"><strong>7502</strong></td><td class="num"><strong>108</strong></td><td class="num"><strong>14.4</strong></td><td class="num"><strong>77</strong></td><td class="num"><strong>47</strong></td><td class="num"><strong>43</strong></td><td class="num"><strong>28</strong></td><td>超額 <code>108 − 3×7502/1000</code> ≈ <strong>85.5</strong></td></tr>
+  <tr><td class="small">副表（清單／caption）</td><td class="num small">1208</td><td class="num small">18</td><td class="num small">—</td><td class="num small" colspan="5">不入主分母，另計監測</td></tr>
+</table>
+<p class="small">與 kickoff 起跑基線逐項相符（N=7502／108／14.4／77／47／43／28）。目標 <code>T_can</code> ≤3.0/1000 ⇒ 全章配額 ≈<strong>22.5 個</strong>。</p>
+
+<h3>段落層與句長（觸發器檢查）</h3>
+<table>
+  <tr><th>指標</th><th class="num">ch05 實測</th><th>SPEC §3 判準</th><th>判讀</th></tr>
+  <tr><td>散文段數（≥5 詞）</td><td class="num">204</td><td>—</td><td>—</td></tr>
+  <tr><td>最長段落</td><td class="num">129 詞</td><td>SHOULD ≤120；MUST 人工判定 ≥150</td><td><span class="tag good">未觸發器</span>4 段落在 121–129（§5.1 ×2、§5.8、§5.9），僅輕過 SHOULD</td></tr>
+  <tr><td>每段最多行內式</td><td class="num">19</td><td>SHOULD ≤20；MUST 人工判定 &gt;20</td><td><span class="tag good">未觸發器</span>19 式者為 §5.4 First Derivative Test 證明段（81 詞／19 式，<strong>單一論證</strong>）——與 §6.3 的 FTC-1 證明段（114 詞／19 式）同型，依既有裁決<strong>放行不拆</strong></td></tr>
+  <tr><td>≥150 詞段數</td><td class="num">0</td><td>觸發器</td><td><span class="tag good">clean</span></td></tr>
+  <tr><td>平均／中位句長</td><td class="num">19.1／18.0</td><td>監測值 18–22（非門檻）</td><td><span class="tag good">帶內</span></td></tr>
+  <tr><td>P90 句長</td><td class="num">34</td><td>審查區 32–35</td><td>落在審查區上緣，逐句判讀（見 PLAIN-SPLIT 各條）</td></tr>
+  <tr><td>&gt;25 詞句占比</td><td class="num">23%</td><td>不設絕對門檻，以已核准樣本校準</td><td>與手稿章 §1.4 的 23%、appB 定稿 26% <strong>完全同區間</strong></td></tr>
+  <tr><td>最長句</td><td class="num"><span class="out">81 詞</span></td><td>≥30 詞＋黏接訊號 ⇒ MUST 人工判讀</td><td><strong>§5.8 漸近線段</strong>：81 詞、2 破折號、2 分號、<strong>三個可各自獨立成立的教學動作</strong> → <span class="id">H1</span> PLAIN-SPLIT</td></tr>
+</table>
+
+<h3>詞彙層家族掃描（canon 章的預期病灶）</h3>
+<table>
+  <tr><th>節</th><th class="num">N</th><th class="num">家族命中</th><th class="num">/1000</th><th>主要家族</th></tr>
+  <tr><td>§5.1</td><td class="num">978</td><td class="num">18</td><td class="num">18.4</td><td>機械隱喻（machinery／instrument／device／manoeuvre）、不透明慣用（squares with／rule of thumb／hallmark／liberty）</td></tr>
+  <tr><td>§5.2</td><td class="num">710</td><td class="num">16</td><td class="num">22.5</td><td>擬人動詞群（drift／creeps／hides／outruns／ferrying）、driving seat</td></tr>
+  <tr><td>§5.3</td><td class="num">822</td><td class="num">15</td><td class="num">18.2</td><td><strong>交易隱喻</strong>（settles an old account／bookkeeping／cashing in／honest）、at face value／puts it to work</td></tr>
+  <tr><td>§5.4</td><td class="num">1103</td><td class="num">17</td><td class="num">15.4</td><td>狩獵隱喻（hunt／suspects／workhorse／engine）、insistent／waits</td></tr>
+  <tr><td>§5.5</td><td class="num">732</td><td class="num">6</td><td class="num">8.2</td><td><span class="tag good">最乾淨</span>competes／divides itself</td></tr>
+  <tr><td>§5.6</td><td class="num">838</td><td class="num">17</td><td class="num">20.3</td><td>形狀動詞（cups／sags／rolls over）＋ steadily／genuinely 副詞群（多為正則過度命中）</td></tr>
+  <tr><td>§5.7</td><td class="num">902</td><td class="num">22</td><td class="num"><span class="out">24.4</span></td><td>refuse／race／impasse／break the tie／nothing competes／runs away／peeled off</td></tr>
+  <tr><td>§5.8</td><td class="num">825</td><td class="num">12</td><td class="num">14.5</td><td>conceals／surrenders／engine／unfolds／en route</td></tr>
+  <tr><td>§5.9</td><td class="num">592</td><td class="num">18</td><td class="num"><span class="out">30.4</span></td><td>resist／yields nothing／does the pinning／foolproof／thrown clear／closes in</td></tr>
+  <tr><td><strong>全章</strong></td><td class="num"><strong>7502</strong></td><td class="num"><strong>141</strong></td><td class="num"><strong>18.8</strong></td><td>對照：ch06 §6.2 <strong>14.7</strong>、§6.3 <strong>10.6</strong>、appB <strong>10.5</strong>、手稿章 §1.4 <strong>≈0</strong></td></tr>
+</table>
+<p class="small">掃描是<strong>線索</strong>不是判定（SPEC §3 FLAG 層）。141 命中逐條人工複核後：<strong>34 條判為真 finding</strong>（提出改寫）、<strong>約 60 條為正則過度命中</strong>（<span class="en">we want \(dy/dt\)</span> 的 want、<span class="en">genuinely changes</span>、<span class="en">cost</span> 用於實際成本等）、其餘為語義透明可推測、依條款<strong>不得因形式報 finding</strong>（見保留清單）。ch05 的 18.8 高於 ch06 §6.2 的 14.7，符合 kickoff「canon 章預期較多」的預告。</p>
+
+<h3>地雷勘查（fragment 註解）</h3>
+<div class="card">
+  <p><strong>ch05 九節<span class="tag good">都沒有</span> <code>CONSTRAINT</code>／<code>WORDING CONSTRAINT</code> 標記</strong>（<code>grep -c CONSTRAINT</code> ＝ 0）。但每個檔頭註解都記了<strong>已裁決的設計</strong>，本輪有五處必須先聲明不碰：</p>
+  <table>
+    <tr><th style="width:32%">已裁決的設計（檔頭註解）</th><th style="width:18%">本輪碰到</th><th>影響</th></tr>
+    <tr><td>§5.1 <code>SEAM GUARD</code>：不得寫出 <span class="en">dy/dx = −F_x/F_y</span>（需 Ch14 偏導數），只走 operational／branch-based</td><td><span class="id">A6</span>／<span class="id">A7</span>／<span class="id">A8</span></td><td>branch 假設、vertical tangent、Ch14 括號 fence <strong>一字未動</strong>；只改破折號與 <span class="en">rule of thumb</span>／<span class="en">manoeuvre</span> 的措辭</td></tr>
+    <tr><td>§5.3 <code>SEAM GUARD</code>：線性近似＝Ch3 餘項形式（Def 3.1），<strong>cross-ref、不得重推</strong></td><td><span class="id">C1</span>／<span class="id">C4</span>／<span class="id">C6</span></td><td>Definition 3.1 的 cross-ref 與 <span class="en">R(h)</span> 敘述全數保留；<span class="id">C1</span> 只把「哪一條直線」的識別語從插入語升成獨立句</td></tr>
+    <tr><td>§5.3 <code>expansion:intuition [pass: enrichment]</code>：Leibniz 記號 closure，<strong>2026-07-07 Codex M4 gap-check ADOPT</strong></td><td><span class="id">C6</span>／<span class="id">C7</span></td><td>「<span class="en">dy/dx</span> 現在是真正的比值」這個<strong>結論保留</strong>；只刪去重述句 <span class="en">Leibniz’s fraction bar is now honest</span>（S3 刪除測試）並平實化 <span class="en">settles an old account</span></td></tr>
+    <tr><td>§5.7 <code>SEAM</code>：<span class="en">\(\ast/\infty\)</span> 與 <span class="en">\(a=\pm\infty\)</span> 兩例 <strong>fenced 到 §D.3</strong>（proof-track 政策）</td><td><span class="id">G3</span></td><td>fence 本身（政策說明＋§D.3 指路）<strong>完整保留</strong>，只改 <span class="en">delicate／tidy／blow up</span> 三個詞</td></tr>
+    <tr><td>§5.4 Ex 5.14／§5.7 Ex 5.22／§5.8 Caution：三處 <strong>2026-07-07 Codex M4 gap-check ADOPT</strong> 的增補</td><td><span class="id">D11</span>–<span class="id">D13</span>／<span class="id">G6</span>–<span class="id">G7</span>／<span class="id">H5</span>–<span class="id">H6</span></td><td>三處增補的<strong>教學論點全部保留</strong>（FDT 可處理 <span class="en">f' DNE</span>、形式檢查是 point 的性質、漸近線可被穿越）；只動承載這些論點的措辭</td></tr>
+  </table>
+  <p class="small"><strong>既有閘狀態：</strong>Ch5 依 <code>PIPELINE.md</code> 的 5-milestone 閘序完成（M1–M5，含 2026-07-07 Codex M4 gap-check）。故本輪 Gate 5（math）／Gate 6（Mode B 語意等價）<strong>只審本輪改動句</strong>；圖閘、example 選題、learner-sim 不重跑。<strong>Gate 7（LaTeX）：<code>make_dist.py</code> 的 <code>NAMES</code> 表沒有 ch05 → 記 pending</strong>（依平行紀律不改 <code>NAMES</code>）。</p>
+</div>
+
+<h2 id="policy">⛳ 三個要你裁決的問題</h2>
+
+<div class="card warn">
+  <p><strong>① 走查產出合併成一份，沒有照 kickoff 建議分兩批。</strong></p>
+  <p>kickoff 建議「依 dash 數分兩批走查，避免一份報告過長」。我改成<strong>一份、加逐節導覽列</strong>，理由：本輪判準在九節之間高度重複（同一個 <span class="en">hallmark</span> 出現在 §5.1 與 §5.9、<span class="en">blow up</span> 在 §5.7 與 §5.8、<span class="en">engine</span> 三處），<strong>分兩批會讓 R3 指稱一致性無法一次判</strong>——你會在第一批看不到第二批的同型詞。若你仍偏好分批裁決，可只回覆前四節（§5.1–§5.4）的編號，其餘留到下一輪。</p>
+</div>
+
+<div class="card warn">
+  <p><strong>② 殘留密度 0.8/1000 是否過低？（要不要多留幾對節拍）</strong></p>
+  <p>四步仲裁跑完，主 stream 只有 <strong>6 個</strong>破折號通過 KEEP（§5.4 四個、§5.9 兩個），密度 <strong>0.8</strong>——低於 appB 定稿的 2.2 與 ch01 的 2.1。<strong>差別有結構性原因</strong>：那兩個單元的殘留主要是「手稿逐字」與「§1.4 凍結」，ch05 是 canon 章，<strong>沒有真人語聲要保護</strong>，四步仲裁沒有理由停在半路。真實教材基準也支持這個數字（mooculus 0.0、APEX 0.5）。</p>
+  <table>
+    <tr><th>選項</th><th>做法</th><th class="num">全章 dash</th><th class="num">密度</th><th>取捨</th></tr>
+    <tr><td><strong>(A) 照四步仲裁</strong><br><span class="tag good">建議</span></td><td>CUT 102／KEEP 6</td><td class="num">6</td><td class="num"><strong>0.8</strong></td><td>條款字面最一致；canon 章無手稿語聲成本</td></tr>
+    <tr><td>(B) 加留三對節拍</td><td>再把 <span class="id">B2</span>（<span class="en">— the very thing the chain rule was about to produce —</span>）、<span class="id">D3</span>、<span class="id">F5</span> 改判 KEEP</td><td class="num">12</td><td class="num">1.6</td><td>貼近 ch01／appB 的殘留手感；代價是 <span class="id">B2</span> 那句仍是 48 詞＋分號的雙動作句（PLAIN-SPLIT 得另做）</td></tr>
+  </table>
+</div>
+
+<div class="card warn">
+  <p><strong>③ 副表（清單／figcaption）18 個破折號要不要一併處理？</strong></p>
+  <p>ch01 那輪你裁的是「<strong>副表一併處理</strong>」。本輪照此預設：副表 18 個中判 <strong>CUT 8／KEEP 10</strong>（KEEP 的十個是 Theorem 5.1 條列的成對 gloss ×2、證明四條列的電報式尾巴 ×4、Strategy 5.2 的 <span class="en">— and only now —</span> ×2、Figure 5.6 caption 的規格插入語 ×2）。副表不入主分母，<strong>不影響達標</strong>，純為體例一致。若你要維持 ch01 的裁決，直接照做即可；若不處理，全章結論不變。</p>
+</div>
+
+<h2 id="s1">§5.1 隱函數微分 — 12 個破折號，全數 CUT</h2>
+<p class="small">四步仲裁：3 對成對插入語（<span class="id">A2</span>／<span class="id">A6</span>／<span class="id">A9</span>）全部落在「舉例／指令／命名」＝<strong>可獨立表述的內容</strong>，依 SPEC §3 步驟③ <strong>整句重寫</strong>，不得只換逗號。另 6 個單破折號尾巴走 CUT palette。</p>
+
+<h3>單破折號尾巴（CUT palette）</h3>
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:11%">原因標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">A1</td><td>章開場 lead</td><td>DASH-CUT<br><span class="small">→冒號（引出清單，不計 tic）</span></td><td>…built the derivative and the rules for computing it <b class="hl">—</b> the limit definition, the power, product, quotient, and chain rules, …</td><td>…built the derivative and the rules for computing it<b class="hl">:</b> the limit definition, the power, product, quotient, and chain rules, …</td></tr>
+  <tr><td class="id">A4</td><td>Ex 5.2 解</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>\(6xy\) is a product, so the product rule applies <b class="hl">— and</b> the \(y\)-factor again carries its \(dy/dx\):</td><td>\(6xy\) is a product, so the product rule applies<b class="hl">.</b> The \(y\)-factor again carries its \(dy/dx\):</td></tr>
+  <tr><td class="id">A5</td><td>Ex 5.3 解</td><td>DASH-CUT<br><span class="small">→逗號（命名同位語）</span></td><td>by differentiating the identity \(\arcsin(\sin x) = x\) <b class="hl">—</b> the <em>composition-identity route</em>.</td><td>by differentiating the identity \(\arcsin(\sin x) = x\)<b class="hl">,</b> the <em>composition-identity route</em>.</td></tr>
+  <tr><td class="id">A7</td><td>Caution（branch 假設）</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>\(dy/dx = -x/y\) is undefined <b class="hl">—</b> the tangent there is vertical, and no function \(y = f(x)\) describes the curve through that point.</td><td>\(dy/dx = -x/y\) is undefined<b class="hl">.</b> The tangent there is vertical, and no function \(y = f(x)\) describes the curve through that point.</td></tr>
+</table>
+
+<h3>成對插入語與詞彙層（逐條卡片）</h3>
+
+<div class="pair">
+  <p class="why"><span class="id">A2</span> §5.1 節開場。<strong>DASH-CUT（四步→重寫）</strong>。四步：① 拿掉 <code>— Y —</code> 主幹仍完整 ✓ → ② <code>Y</code>＝兩條<strong>舉例曲線</strong>（且是 Ex 5.1／Ex 5.2 的 running example，脫離主幹仍有獨立教學用途）→ ③ <strong>舉例不在「程度／頻率／時點／必要條件／對比」清單內 → 整句重寫</strong>（ch01 <span class="id">C2</span> 先例）。改後兩個教學動作各自成句，插入語不再切斷主幹。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">But a great many curves are given instead by an <em>equation</em> relating \(x\) and \(y\) <b class="hl">—</b> the circle \(x^{2} + y^{2} = 25\), say, or the looping curve \(x^{3} + y^{3} = 6xy\) <b class="hl">—</b> where no single formula \(y = f(x)\) describes the whole picture.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">But a great many curves are given instead by an <em>equation</em> relating \(x\) and \(y\)<b class="hl">, such as</b> the circle \(x^{2} + y^{2} = 25\) or the looping curve \(x^{3} + y^{3} = 6xy\)<b class="hl">. For such a curve</b> no single formula \(y = f(x)\) describes the whole picture.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">A3</span> Ex 5.1 解收尾。<strong>DASH-CUT ＋ R1-LEXICAL</strong>：<span class="en">squares with</span> 是不透明慣用語（EFL 讀者查 <em>square</em> 得到「正方形／平方」，查不到「相符」）；同時尾巴 <span class="en">— the negative reciprocal</span> 只是把前面已寫出的 \(-\tfrac{3}{4}\) 再說一次 → 併進主句、不另立尾巴。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The answer <b class="hl">squares with</b> plain geometry: the radius to \((3, 4)\) has slope \(\tfrac{4}{3}\), and a tangent to a circle is perpendicular to the radius, with slope \(-\tfrac{3}{4}\) <b class="hl">—</b> the negative reciprocal, exactly as found.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The answer <b class="hl">agrees with</b> plain geometry: the radius to \((3, 4)\) has slope \(\tfrac{4}{3}\), and a tangent to a circle is perpendicular to the radius, <b class="hl">so its slope is</b> the negative reciprocal \(-\tfrac{3}{4}\), exactly as found.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">A6</span> Ex 5.3 解（框架段）。<strong>DASH-CUT（四步→重寫）＋ R1-LEXICAL ＋ PLAIN-SPLIT</strong>。② <code>Y</code>＝<span class="en">differentiate the relation and solve</span> 是<strong>祈使指令</strong> → ③ 指令 → 整句重寫。詞彙：<span class="en">manoeuvre</span>（低頻文學詞）→ <span class="en">method</span>；<span class="en">yields its derivative</span> 擬人 → <span class="en">give</span>（<strong>引用 ch06 <span class="id">W-12</span> 先例</strong>：<span class="en">yields to either method</span> → <span class="en">can be evaluated either way</span>）。46 詞單句 → 三句，並把懸空代名詞 <span class="en">it</span> 具名為 <span class="en">the inverse</span>（R3）。<strong>seam guard 不受影響</strong>：仍是 branch-based 敘述，未出現 \(F_x/F_y\)。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Implicit differentiation is the general framework behind that <b class="hl">manoeuvre</b>: an inverse function, defined by a relation its defining function satisfies, <b class="hl">yields</b> its derivative the same way <b class="hl">—</b> differentiate the relation and solve <b class="hl">—</b> on any branch where <b class="hl">it</b> is differentiable and the division that solving requires is legitimate.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Implicit differentiation is the general framework behind that <b class="hl">method</b>. An inverse function is defined by a relation that its defining function satisfies, and the same two steps <b class="hl">give</b> its derivative<b class="hl">:</b> differentiate the relation and solve. <b class="hl">This works</b> on any branch where <b class="hl">the inverse</b> is differentiable and the division that solving requires is legitimate.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">A8</span> Caution（branch 假設）。<strong>DASH-CUT ＋ R1-LEXICAL ＋ TIC-REBALANCE（冒號 −1）</strong>：<span class="en">The rule of thumb:</span> 既是不透明慣用語（<em>thumb</em> 與規則無關），又是一個冒號接子句。45 詞單句拆成三句後，警告本身站在句首。<strong>Ch14 fence 那句括號完全不動。</strong></p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt"><b class="hl">The rule of thumb:</b> a formula for \(dy/dx\) that goes infinite or turns into \(0/0\) is a warning that the branch assumption needs separate analysis <b class="hl">—</b> it may signal a vertical tangent, a self-crossing, or another singular point, a place where “\(y\) as a function of \(x\)” has broken down.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt"><b class="hl">Use this as a working rule.</b> A formula for \(dy/dx\) that goes infinite or turns into \(0/0\) is a warning that the branch assumption needs separate analysis<b class="hl">.</b> It may signal a vertical tangent, a self-crossing, or another singular point, a place where “\(y\) as a function of \(x\)” has broken down.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">A9</span> Ex 5.4 解收尾。<strong>DASH-CUT（四步→重寫）＋ R1-LEXICAL</strong>。② <code>Y</code>＝<span class="en">the shape §5.6 will call concave down</span> 是<strong>前向術語命名</strong>（獨立教學用途）→ ③ 重寫。詞彙：<span class="en">as the picture … demands</span> 擬人（SPEC 明列避免的情緒／意志動詞）→ <span class="en">shows</span>。前向 cross-ref（§5.6）獨立成句後更醒目。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">On the upper half-circle \(y > 0\) the second derivative is negative, recording that the arc bends downward <b class="hl">—</b> the shape §5.6 will call concave down <b class="hl">—</b> as the picture of a circle’s top <b class="hl">demands</b>.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">On the upper half-circle \(y > 0\) the second derivative is negative, recording that the arc bends downward, exactly as the picture of a circle’s top <b class="hl">shows</b>. <b class="hl">§5.6 will call this shape <em>concave down</em>.</b></span></div>
+</div>
+
+<h3>詞彙層（不含破折號）</h3>
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:10%">測試</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">AL1</td><td>Higher derivatives 引句</td><td>R1</td><td>The method <b class="hl">feeds on its own output</b>: once \(dy/dx\) is known implicitly, differentiating again gives \(d^{2}y/dx^{2}\).</td><td>The method <b class="hl">can be applied to its own output</b>: once \(dy/dx\) is known implicitly, differentiating again gives \(d^{2}y/dx^{2}\).</td></tr>
+  <tr><td class="id">AL2</td><td>Ex 5.4 解</td><td>R1<br>R3<span class="small">（與 <span class="id">JL2</span> 同詞）</span></td><td>Using the defining equation to tidy the result is a <b class="hl">hallmark</b> of implicit differentiation</td><td>Using the defining equation to simplify the result is <b class="hl">typical</b> of implicit differentiation</td></tr>
+  <tr><td class="id">AL3</td><td>§5.1 收尾（兩處同詞）</td><td>R1<br>R3</td><td>Implicit differentiation is less a new rule than a new <b class="hl">liberty</b>: the chain rule, applied to an equation instead of a formula. That <b class="hl">liberty</b> is what the next section needs.</td><td>Implicit differentiation is less a new rule than a new <b class="hl">way to use an old one</b>: the chain rule, applied to an equation instead of a formula. <b class="hl">That</b> is what the next section needs.</td></tr>
+  <tr><td class="id">AL4</td><td>章開場 lead</td><td>R1<br>R3<span class="small">（與 <span class="id">D4</span> 同家族）</span></td><td>and how to <b class="hl">hunt down</b> a root you cannot solve for</td><td>and how to <b class="hl">locate</b> a root you cannot solve for</td></tr>
+</table>
+
+<h2 id="s2">§5.2 相關變率 — 6 個破折號，全數 CUT（副表另 3 個，其中 1 對 KEEP）</h2>
+
+<div class="pair">
+  <p class="why"><span class="id">B1</span> 節開場機制段。<strong>DASH-CUT →重排</strong>：尾巴 <span class="en">\(r\) depends on \(t\)</span> 是理由，改成 <span class="en">because</span> 前置即可，<strong>不新增冒號</strong>（ch05 冒號已 77，不往那邊堆）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">the factor \(dr/dt\) appearing for exactly the reason \(dy/dx\) appeared in §5.1 <b class="hl">—</b> \(r\) depends on \(t\).</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">the factor \(dr/dt\) appearing <b class="hl">because \(r\) depends on \(t\)</b>, for exactly the reason \(dy/dx\) appeared in §5.1.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">B2</span> Caution（related-rates 頭號陷阱）。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT ＋ TIC-REBALANCE（分號 −1）＋ R1-LEXICAL</strong>。② <code>Y</code>＝<span class="en">the very thing the chain rule was about to produce</span> ——這是<strong>邊界案</strong>：形式上像強調同位語，但它其實在說「為什麼這個損失致命」＝一個獨立理由。48 詞句另有分號黏接兩個教學動作，兩項合起來判重寫。<span class="en">silently</span> → <span class="en">without warning</span>（平實）。<span class="small">＊若你選政策題 ② 的 (B)，本條改判 KEEP，但 PLAIN-SPLIT 部分仍要做。</span></p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">A quantity that is changing must be carried as a variable through the differentiation<b class="hl">;</b> if you fix it to its momentary value first, you have frozen something that is actually moving, and its rate <b class="hl">—</b> the very thing the chain rule was about to produce <b class="hl">— silently</b> drops to zero.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">A quantity that is changing must be carried as a variable through the differentiation<b class="hl">.</b> If you fix it to its momentary value first, you have frozen something that is actually moving, and its rate drops to zero <b class="hl">without warning. That rate is exactly what the chain rule was about to produce.</b></span></div>
+</div>
+
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:11%">原因標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">B3</td><td>Ex 5.5 解</td><td>DASH-CUT<br><span class="small">→逗號（強調修飾）</span></td><td>Differentiate the relation with respect to \(t\) <b class="hl">—</b> <em>before</em> putting in any numbers:</td><td>Differentiate the relation with respect to \(t\)<b class="hl">,</b> <em>before</em> putting in any numbers:</td></tr>
+  <tr><td class="id">B4</td><td>Ex 5.7 解</td><td>DASH-CUT<br><span class="small">→分句（雙逗號 −1）</span></td><td>The shadow lengthens at \(\tfrac{10}{3}\) feet per second <b class="hl">— and, notably,</b> this rate does not depend on where the person is, since…</td><td>The shadow lengthens at \(\tfrac{10}{3}\) feet per second<b class="hl">. Notably,</b> this rate does not depend on where the person is, since…</td></tr>
+  <tr><td class="id">B5</td><td>§5.2 收尾</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>The next section stays local in a different sense <b class="hl">—</b> it asks how well the derivative, the rate at a single instant, approximates the function itself just next door.</td><td>The next section stays local in a different sense<b class="hl">.</b> It asks how well the derivative, the rate at a single instant, approximates the function itself just next door.</td></tr>
+</table>
+
+<h3>詞彙層</h3>
+
+<div class="pair">
+  <p class="why"><span class="id">BL1</span> Ex 5.6 解。<strong>R1-LEXICAL</strong>：一句四個擬人／戲劇動詞（<span class="en">creeps／pours in／hides／swell</span>），且 <span class="en">a great deal</span> 是 SPEC 明列的不透明慣用式家族。物理內容（薄殼吃掉體積）本身完全可以字面說出。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The radius <b class="hl">creeps</b> outward even as the volume <b class="hl">pours in</b> quickly, because a large sphere <b class="hl">hides a great deal of</b> volume in a thin outer shell: the same \(100\ \text{cm}^{3}/\text{s}\) would <b class="hl">swell</b> a small balloon far faster.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The radius <b class="hl">grows slowly even though</b> the volume <b class="hl">is increasing</b> quickly, because a thin outer shell of a large sphere <b class="hl">already holds a lot of</b> volume: the same \(100\ \text{cm}^{3}/\text{s}\) would <b class="hl">inflate</b> a small balloon far faster.</span></div>
+</div>
+
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:10%">測試</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">BL2</td><td>節開場</td><td>R1</td><td>The mechanism is implicit differentiation with \(t\) <b class="hl">in the driving seat</b>.</td><td>The mechanism is implicit differentiation, now with \(t\) <b class="hl">as the differentiating variable</b>.</td></tr>
+  <tr><td class="id">BL3</td><td>Ex 5.5 解</td><td>R1</td><td>The minus sign <b class="hl">is the geometry speaking</b>: as \(x\) grows, \(y\) shrinks, so \(dy/dt\) is negative.</td><td>The minus sign <b class="hl">records the geometry</b>: as \(x\) grows, \(y\) shrinks, so \(dy/dt\) is negative.</td></tr>
+  <tr><td class="id">BL4</td><td>§5.2 收尾</td><td>R1<br>R2</td><td>What made it work was the chain rule <b class="hl">ferrying</b> each rate out of the relation that <b class="hl">hid</b> it.</td><td>The chain rule is what made this work: <b class="hl">differentiating brings out the rate of each quantity the relation involves</b>.</td></tr>
+</table>
+
+<h2 id="s3">§5.3 線性近似與微分 — 12 個破折號，全數 CUT</h2>
+<p class="small">本節是<strong>交易隱喻最密集</strong>的一節（<span class="en">settles an old account／bookkeeping／cashing in／honest</span>）。<span class="en">honest</span> 與 <span class="en">puts to work</span> 兩處<strong>直接引用 ch06／ch01 已裁先例</strong>，不另開裁決。</p>
+
+<div class="pair">
+  <p class="why"><span class="id">C1</span> 節開場（Def 3.1 餘項形式）。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT</strong>。② <code>Y</code>＝<span class="en">the one through \((x_0,f(x_0))\) with slope \(f'(x_0)\)</span> 是<strong>那條直線的識別（定義）</strong>，且數學上不可省 → ③ 重寫。43 詞句拆兩句後，「等式在說什麼」與「那條線是哪一條」各自成句。<strong>Def 3.1 的 cross-ref 與 \(R(h)\) 敘述未動</strong>（seam guard）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">which says that the curve equals a straight line <b class="hl">—</b> the one through \((x_{0}, f(x_{0}))\) with slope \(f'(x_{0})\) <b class="hl">—</b> plus a remainder \(R(h)\) that dies away faster than \(h\) itself.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">which says that the curve equals a straight line plus a remainder \(R(h)\) that dies away faster than \(h\) itself<b class="hl">. The straight line is</b> the one through \((x_{0}, f(x_{0}))\) with slope \(f'(x_{0})\).</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">C4</span> Definition 5.2 之後的對比段。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT ＋ R1-LEXICAL</strong>。② <code>Y</code>＝<span class="en">they differ by exactly the remainder \(R\)…</span> 是<strong>獨立數學事實</strong>（把差量定量）→ ③ 重寫。<span class="en">wearing new clothes</span> 是不透明慣用語 → 字面說法。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">They are not equal <b class="hl">—</b> they differ by exactly the remainder \(R\) of Definition 3.1 attached to the base point \(x\) <b class="hl">—</b> but for small \(dx\) the difference is negligible, and \(dy \approx \Delta y\) is the linear approximation <b class="hl">wearing new clothes</b>.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">They are not equal<b class="hl">. They</b> differ by exactly the remainder \(R\) of Definition 3.1 attached to the base point \(x\), but for small \(dx\) the difference is negligible, and \(dy \approx \Delta y\) is the linear approximation <b class="hl">written in a new notation</b>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">C5</span>＋<span class="id">C7</span> Leibniz 記號段（<strong>2026-07-07 Codex ADOPT 的 enrichment</strong>）。<strong>DASH-CUT ＋ R1-LEXICAL ＋ S3（刪除測試）</strong>。三件事：(a) <span class="en">settles an old account</span> 交易慣用語 → 字面；(b) 單破折號尾巴 <span class="en">— suggestive, but not a fraction</span> → 逗號對比（ch01 <span class="id">C4</span>／<span class="id">E7</span> 先例）；(c) <span class="en">Leibniz’s fraction bar is now honest</span> ——<strong>引用 ch06／ch01 <span class="en">honest</span> 先例</strong>，且它只是前句「is a genuine ratio of two numbers, and it equals the derivative exactly」的重述（S1 無新洞見／S3 刪之無損）→ <strong>依 rubric 建議【刪】而非改寫</strong>。<strong>該 enrichment 的結論（\(dy/dx\) 現在是真比值）完整保留在前一句。</strong></p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The differential notation also <b class="hl">settles an old account</b>. When \(dy/dx\) first appeared, a caution in §2.2 was careful to call it a single symbol <b class="hl">—</b> suggestive, but not a fraction. Definition 5.2 upgrades it: with \(dx\) an independent quantity and \(dy = f'(x)\,dx\) built from it, the quotient \(dy/dx\) is a genuine ratio of two numbers, and it equals the derivative exactly. <b class="hl">Leibniz’s fraction bar is now honest.</b></span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The differential notation also <b class="hl">settles a question left open earlier</b>. When \(dy/dx\) first appeared, a caution in §2.2 was careful to call it a single symbol<b class="hl">,</b> suggestive but not a fraction. Definition 5.2 upgrades it: with \(dx\) an independent quantity and \(dy = f'(x)\,dx\) built from it, the quotient \(dy/dx\) is a genuine ratio of two numbers, and it equals the derivative exactly.<b class="hl"> 〔末句刪〕</b></span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">C6</span> 同段後半。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT ＋ R1-LEXICAL</strong>。55 詞、成對插入語內含<strong>獨立主張＋cross-ref</strong>（Theorem 3.3 才是 chain rule 操作的依據）→ ③ 重寫。詞彙：<span class="en">bookkeeping power／lean on it heavily／rides entirely on</span> 三個隱喻疊在同一句尾。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The upgrade works forward, not backward <b class="hl">—</b> the chain-rule manipulations that <em>looked</em> like cancelling \(dx\)’s were licensed by Theorem 3.3, not by this definition <b class="hl">—</b> but from here on the <b class="hl">bookkeeping power</b> of treating \(dx\) as a real quantity is available, and integral calculus will <b class="hl">lean on it heavily</b> when a change of variable <b class="hl">rides entirely on</b> the differential.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The upgrade works forward, not backward<b class="hl">.</b> The chain-rule manipulations that <em>looked</em> like cancelling \(dx\)’s were licensed by Theorem 3.3, not by this definition<b class="hl">. From here on, though, \(dx\) may be treated as a real quantity when a computation is written out, and integral calculus uses that freedom heavily, since a change of variable is carried entirely by the differential.</b></span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">C9</span> §5.3 收尾。<strong>DASH-CUT（四步→重寫）＋ R2</strong>。② <code>Y</code>＝<span class="en">the function as its tangent line</span> 是「that local reading」的<strong>指稱釋義</strong> → ③ 重寫（ch01 <span class="id">A8</span> 先例：把「the same idea — X —」的迂迴拿掉，讓動作當主語）。順帶解掉一個模糊指稱。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">That local reading <b class="hl">—</b> the function as its tangent line <b class="hl">—</b> recurs throughout calculus, generalized to curved approximations in Chapter 11 and to surfaces in Chapter 14.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt"><b class="hl">Reading the function as its tangent line</b> recurs throughout calculus, generalized to curved approximations in Chapter 11 and to surfaces in Chapter 14.</span></div>
+</div>
+
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:11%">原因標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">C2</td><td>Def 5.1 後</td><td>DASH-CUT<br><span class="small">→重排（不加 tic）</span></td><td>The approximation is good precisely when \(R(h)\) is negligible <b class="hl">—</b> that is, when \(x\) is close to \(a\).</td><td>The approximation is good precisely when \(R(h)\) is negligible<b class="hl">, which happens</b> when \(x\) is close to \(a\).</td></tr>
+  <tr><td class="id">C3</td><td>Differentials 開場</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>a classical notation that makes it portable <b class="hl">—</b> the language of <em>differentials</em>, which turns the estimate into a statement about small changes.</td><td>a classical notation that makes it portable<b class="hl">. This is</b> the language of <em>differentials</em>, which turns the estimate into a statement about small changes.</td></tr>
+  <tr><td class="id">C8</td><td>Ex 5.10 解</td><td>DASH-CUT<br><span class="small">→分句</span><br>R1・R3</td><td>three times the relative error in the radius <b class="hl">—</b> the exponent \(3\) surfacing as a multiplier, a <b class="hl">rule of thumb</b> that holds for any power law.</td><td>three times the relative error in the radius<b class="hl">. The</b> exponent \(3\) surfaces as a multiplier, <b class="hl">and the same holds</b> for any power law.</td></tr>
+  <tr><td class="id">CL1</td><td>節開場</td><td>R1<br><span class="small">（ch01／ch06 先例）</span></td><td>This section takes that idea <b class="hl">at face value</b> and <b class="hl">puts it to work</b> estimating values, and then <b class="hl">repackages</b> it in the language of <em>differentials</em>.</td><td>This section <b class="hl">uses</b> that idea to estimate values, and then <b class="hl">restates</b> it in the language of <em>differentials</em>.</td></tr>
+  <tr><td class="id">CL2</td><td>Caution</td><td>R1<br><span class="small">（SPEC 明列避免 <span class="en">promises</span>）</span></td><td>A linear approximation is only a <em>local</em> <b class="hl">promise</b>.</td><td>A linear approximation is <b class="hl">reliable only <em>locally</em></b>.</td></tr>
+  <tr><td class="id">CL3</td><td>§5.3 收尾</td><td>R1</td><td>Linear approximation is the derivative <b class="hl">cashing in its definition</b>: the number \(f'(a)\) is not only a slope but a working <b class="hl">forecast</b> of the function’s values nearby.</td><td>Linear approximation is <b class="hl">the practical content of the definition of the derivative</b>: the number \(f'(a)\) is not only a slope but a usable <b class="hl">prediction</b> of the function’s values nearby.</td></tr>
+  <tr><td class="id">CL4</td><td>Ex 5.9 解</td><td>PLAIN-SPLIT<br><span class="small">分號 −1</span></td><td>The rule \((1+x)^{n} \approx 1+nx\) is worth remembering<b class="hl">;</b> it is the linear approximation that underlies a great many quick estimates.</td><td>The rule \((1+x)^{n} \approx 1+nx\) is worth remembering<b class="hl">.</b> It is the linear approximation behind a great many quick estimates.</td></tr>
+</table>
+
+<h2 id="s4">§5.4 極大與極小 — 19 個破折號，CUT 15／<span class="tag good">KEEP 4</span></h2>
+<p class="small">全章件數最多的一節，也是<strong>唯一有 KEEP 的正文節</strong>：兩處成對插入語是「同一主張的規格說明」，通過四步仲裁（詳見保留清單 <span class="id">K1</span>／<span class="id">K2</span>）。</p>
+
+<h3>單破折號尾巴（CUT palette）</h3>
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:11%">原因標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">D3</td><td>Def 5.3 informal gloss</td><td>DASH-CUT<br><span class="small">→逗號（類比 gloss）</span></td><td>a point that is highest <em>in its own neighbourhood</em> <b class="hl">—</b> the top of one hill, not necessarily the highest hill.</td><td>a point that is highest <em>in its own neighbourhood</em><b class="hl">,</b> the top of one hill <b class="hl">and</b> not necessarily the highest hill.</td></tr>
+  <tr><td class="id">D5</td><td>Caution（\(x^{3}\)）</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>yet \(0\) is neither a maximum nor a minimum <b class="hl">—</b> the curve passes straight through with a momentary flat spot.</td><td>yet \(0\) is neither a maximum nor a minimum<b class="hl">.</b> The curve passes straight through \(0\) with a momentary flat spot.</td></tr>
+  <tr><td class="id">D6</td><td>Ex 5.11 解</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>where the denominator vanishes, at \(x = 0\) <b class="hl">— yet</b> \(x = 0\) is in the domain of \(f\) (indeed \(f(0) = 0\)), so it too is a critical number.</td><td>where the denominator vanishes, at \(x = 0\)<b class="hl">. Yet</b> \(x = 0\) is in the domain of \(f\) (indeed \(f(0) = 0\)), so it too is a critical number.</td></tr>
+  <tr><td class="id">D7</td><td>Ex 5.12 解</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>the maximum sat at an endpoint, not a critical number <b class="hl">— which</b> is exactly why the endpoints must be checked.</td><td>the maximum sat at an endpoint, not a critical number<b class="hl">. That</b> is exactly why the endpoints must be checked.</td></tr>
+  <tr><td class="id">D11</td><td>Ex 5.14 解</td><td>DASH-CUT<br><span class="small">→分句</span><br>R1<span class="small">（ch06 <span class="id">X-3</span> 先例）</span></td><td>The First Derivative Test handles both <b class="hl">—</b> its hypotheses <b class="hl">ask</b> only that \(f\) be continuous…</td><td>The First Derivative Test handles both<b class="hl">.</b> Its hypotheses <b class="hl">require</b> only that \(f\) be continuous…</td></tr>
+  <tr><td class="id">D13</td><td>Ex 5.14 解收尾</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>this function exhibits the second <b class="hl">—</b> not a flat spot on a rising curve (that was \(x^{3}\) at \(0\)), but a point of vertical tangency the curve simply passes through.</td><td>this function exhibits the second<b class="hl">. It is</b> not a flat spot on a rising curve (that was \(x^{3}\) at \(0\)) but a point of vertical tangency that the curve simply passes through.</td></tr>
+  <tr><td class="id">D14</td><td>§5.4 收尾</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>which the next section takes up <b class="hl">—</b> real quantities to maximize or minimize, with the modelling that turns a word problem into a function on an interval.</td><td>which the next section takes up<b class="hl">. There the quantities to maximize or minimize are real ones, and the modelling</b> turns a word problem into a function on an interval.</td></tr>
+</table>
+
+<h3>重排與重寫（逐條卡片）</h3>
+
+<div class="pair">
+  <p class="why"><span class="id">D1</span> 節開場前兩句。<strong>DASH-CUT →重排 ＋ R1-LEXICAL</strong>：句首清單後掛破折號的句型，改成清單直接當主語即可（<strong>不新增冒號</strong>）。詞彙：<span class="en">insistent</span>（把情緒加給「問題」）→ 字面的出現頻率；<span class="en">Extremes … hide</span> 擬人 → <span class="en">can occur only at</span>（同時把 Fermat 的內容說得更準）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Of all the questions calculus answers, the most <b class="hl">insistent</b> in practice is: where is a quantity largest or smallest? Maximum profit, minimum cost, least material, greatest range <b class="hl">—</b> each asks for an extreme value of a function, and the derivative is built to find them. … Extremes therefore <b class="hl">hide at</b> a short list of places, and the work is to enumerate the list and test it.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Of all the questions calculus answers, the one that <b class="hl">comes up most often</b> in practice is: where is a quantity largest or smallest? Maximum profit, minimum cost, least material, greatest range <b class="hl">all ask</b> for an extreme value of a function, and the derivative is built to find them. … Extremes <b class="hl">can therefore occur only at</b> a short list of places, and the work is to enumerate the list and test it.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">D2</span> 兩種極值的區分段。<strong>DASH-CUT →重排</strong>：尾巴是 <span class="en">a local notion</span> 的釋義，改成關係子句掛回主句，<strong>不新增冒號</strong>（若改冒號，工具會計入「冒號接子句」）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Alongside these sits a local notion <b class="hl">—</b> largest or smallest only in comparison with nearby points.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Alongside these sits a local notion<b class="hl">, which calls a value</b> largest or smallest only in comparison with nearby points.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">D4</span> Fermat 定理改述段。<strong>DASH-CUT ＋ R1-LEXICAL</strong>：一句三個隱喻（<span class="en">workhorse／hunt／suspects</span>）。改後的 <span class="en">candidates</span> 同時<strong>修好一個 R3 指稱漂移</strong>——下一段 Caution 開頭就寫 <span class="en">A critical number is a <em>candidate</em>, not a guarantee</span>，本句卻叫它 <span class="en">suspects</span>。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">This is the <b class="hl">workhorse</b> <b class="hl">—</b> it shrinks the <b class="hl">hunt</b> for extrema from a whole interval to a finite list of <b class="hl">suspects</b>.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">This is the <b class="hl">main tool for locating extrema. It reduces the search</b> from a whole interval to a finite list of <b class="hl">candidates</b>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">D8</span> First Derivative Test 引句。<strong>DASH-CUT →重排 ＋ R1-LEXICAL</strong>：<span class="en">brute evaluation</span> 對 EFL 讀者不透明（<em>brute</em> ＝野獸／蠻力，此處指「逐一代入」）；尾巴的三選一 gloss 併回主句即可，<strong>不新增冒號</strong>。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The Closed Interval Method finds absolute extremes by <b class="hl">brute evaluation</b>, but says nothing about the <em>character</em> of an interior critical number <b class="hl">—</b> whether it is a local max, a local min, or neither.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The Closed Interval Method finds absolute extremes <b class="hl">by evaluating a finite list</b>, but <b class="hl">it does not say</b> whether an interior critical number is a local max, a local min, or neither.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">D10</span> Ex 5.13 解收尾。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT ＋ TIC-REBALANCE（分號 −1）</strong>。② <code>Y</code>＝<span class="en">the hill at \(x=0\) and the valley at \(x=2\)</span> <strong>就是本例的答案</strong>（獨立內容）→ ③ 重寫。34 詞、分號黏接兩個教學動作（「這是同兩個值」＋「FDT 解釋它們的角色」）→ 拆句。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">These are the same two interior values the Closed Interval Method turned up in Example 5.12<b class="hl">;</b> the First Derivative Test now explains their roles <b class="hl">—</b> the hill at \(x = 0\) and the valley at \(x = 2\) <b class="hl">—</b> independently of any interval.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">These are the same two interior values the Closed Interval Method turned up in Example 5.12<b class="hl">.</b> The First Derivative Test now explains their roles independently of any interval<b class="hl">, showing a hill at \(x = 0\) and a valley at \(x = 2\)</b>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">D15</span> §5.4 收尾。<strong>DASH-CUT（四步→重寫）＋ R1-LEXICAL</strong>。② <code>Y</code>＝<span class="en">the sign of the second derivative</span> <strong>就是那個分類器是什麼</strong>（獨立內容）→ ③ 重寫。詞彙：<span class="en">waits until</span> 擬人、<span class="en">in hand</span> 慣用語。改後條件前置、主語直接是那個分類器，對 EFL 更好解析。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">A second, sometimes faster classifier <b class="hl">—</b> the sign of the <em>second</em> derivative <b class="hl">— waits until</b> §5.6, once concavity is <b class="hl">in hand</b>.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt"><b class="hl">Once concavity is available in §5.6, the sign of the <em>second</em> derivative will give a second and sometimes faster way to classify a critical number.</b></span></div>
+</div>
+
+<h3>詞彙層</h3>
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:10%">測試</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">DL1</td><td>critical numbers 引句</td><td>R1<br>R3<span class="small">（engine 全章三處）</span></td><td>The <b class="hl">engine that narrows</b> the search is Fermat’s theorem from Chapter 4 (Theorem 4.10)</td><td><b class="hl">What narrows</b> the search is Fermat’s theorem from Chapter 4 (Theorem 4.10)</td></tr>
+  <tr><td class="id">DL2</td><td>Thm 5.1 證明收尾</td><td>R1</td><td>In the two changing cases \(f(c)\) <b class="hl">beats its neighbours</b> on both sides (or is beaten on both), <b class="hl">delivering</b> the local extremum</td><td>In the two changing cases \(f(c)\) <b class="hl">is larger than its neighbours</b> on both sides (or smaller on both), <b class="hl">which gives</b> the local extremum</td></tr>
+</table>
+
+<h2 id="s5">§5.5 最佳化問題 — 10 個破折號，全數 CUT</h2>
+<p class="small">詞彙層全章最乾淨（8.2／千詞）。破折號則以「成對插入語」為主，四步仲裁後 5 對全部落在舉例／獨立理由。</p>
+
+<div class="pair">
+  <p class="why"><span class="id">E1</span> Caution（可行域）。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT ＋ TIC-REBALANCE（分號 −1）＋ R1</strong>。56 詞、成對插入語是<strong>舉例</strong>（ch01 <span class="id">C2</span> 先例），分號後另接兩個指令。<span class="en">does not do better</span> 對 EFL 是不透明比較（better 相對什麼？＝ ch06 <span class="id">A8</span> 同型問題）→ 說出「更極端的值」。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">When that interval is open <b class="hl">—</b> a radius ranging over \(r > 0\), say <b class="hl">—</b> the Closed Interval Method does not apply directly<b class="hl">;</b> instead confirm that the single interior critical number is the extremum by the sign of the derivative around it, and check that the quantity <b class="hl">does not do better</b> as the variable runs to the ends of its range.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">When that interval is open<b class="hl">, as it is for</b> a radius ranging over \(r > 0\), the Closed Interval Method does not apply directly<b class="hl">. Instead,</b> confirm by the sign of the derivative around it that the single interior critical number is the extremum, and check that the quantity <b class="hl">does not approach a more extreme value</b> as the variable runs to the ends of its range.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">E2</span> Ex 5.15 解。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT</strong>。② <code>Y</code>＝<span class="en">which the Extreme Value Theorem guarantees on this closed interval</span> 是<strong>獨立的存在性論證</strong>（引一條定理）→ ③ 重寫。改後 EVT 成為自己的句子，證據鏈（端點值 → EVT 保證存在 → 故在內部）讀得出順序。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The endpoints \(x = 0\) and \(x = 1200\) both give zero area (a degenerate rectangle), while interior values give positive area, so the maximum <b class="hl">—</b> which the Extreme Value Theorem guarantees on this closed interval <b class="hl">—</b> must be interior.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The endpoints \(x = 0\) and \(x = 1200\) both give zero area (a degenerate rectangle), while interior values give positive area<b class="hl">. The Extreme Value Theorem guarantees a maximum on this closed interval, so that maximum</b> must be interior.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">E3</span> Ex 5.15 解收尾。<strong>DASH-CUT（①步即失敗→重寫）＋ R1-LEXICAL</strong>：句型是 <code>X — Y — Z</code> 而 <code>Z</code>（<span class="en">a balance that recurs…</span>）本身又是同位語，<strong>拿掉 Y 主幹不合文法</strong>（ch01 <span class="id">E11</span> 同型）→ 直接重寫。<span class="en">divides itself</span> 擬人 → <span class="en">divides</span>。冒號後接數學式，依 SPEC 不計入「冒號接子句」。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The fence <b class="hl">divides itself</b> equally between the two directions <b class="hl">—</b> \(1200\) feet across the river side, \(1200\) feet split between the two perpendicular sides <b class="hl">—</b> a balance that recurs throughout these problems.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The fence <b class="hl">divides</b> equally between the two directions<b class="hl">:</b> \(1200\) feet across the river side, and \(1200\) feet split between the two perpendicular sides<b class="hl">. This balance recurs</b> throughout these problems.</span></div>
+</div>
+
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:11%">原因標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">E4</td><td>Ex 5.16 題目</td><td>DASH-CUT<br><span class="small">→括號（括號 +1）</span></td><td>What proportions use the least metal <b class="hl">—</b> that is, minimize the total surface area?</td><td>What proportions use the least metal <b class="hl">(</b>that is, minimize the total surface area<b class="hl">)</b>?</td></tr>
+  <tr><td class="id">E5</td><td>Ex 5.16 解收尾</td><td>DASH-CUT<br><span class="small">→分句（括號內）</span></td><td>(…seams cost extra metal the bare-area model ignores <b class="hl">—</b> a reminder that the answer is only as good as the quantity it optimizes.)</td><td>(…seams cost extra metal <b class="hl">that</b> the bare-area model ignores<b class="hl">. The</b> answer is only as good as the quantity it optimizes.)</td></tr>
+  <tr><td class="id">E6</td><td>Ex 5.17 解收尾</td><td>DASH-CUT<br><span class="small">→逗號同位語＋分句</span></td><td>has area \(R^{2}\) <b class="hl">—</b> one quarter of the full circle’s \(2R \times 2R\) bounding square, equivalently half of the semicircle’s \(2R \times R\) bounding rectangle, and twice as wide as it is tall.</td><td>has area \(R^{2}\)<b class="hl">,</b> one quarter of the full circle’s \(2R \times 2R\) bounding square and equivalently half of the semicircle’s \(2R \times R\) bounding rectangle<b class="hl">. It is</b> twice as wide as it is tall.</td></tr>
+  <tr><td class="id">E7</td><td>§5.5 收尾</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>adds the missing piece <b class="hl">—</b> how the <em>second</em> derivative records the way a curve bends, which both classifies extrema more quickly and…</td><td>adds the missing piece<b class="hl">. The</b> <em>second</em> derivative records the way a curve bends, which both classifies extrema more quickly and…</td></tr>
+  <tr><td class="id">EL1</td><td>Ex 5.16 解</td><td>R1</td><td>and \(A(r) \to \infty\) both as \(r \to 0^{+}\)… and as \(r \to \infty\)…, so no boundary value <b class="hl">competes</b>.</td><td>and \(A(r) \to \infty\) both as \(r \to 0^{+}\)… and as \(r \to \infty\)…, so <b class="hl">neither end of the range gives a smaller area</b>.</td></tr>
+</table>
+
+<h2 id="s6">§5.6 導數與圖形 — 13 個破折號，全數 CUT</h2>
+
+<div class="pair">
+  <p class="why"><span class="id">F1</span> 節開場。<strong>DASH-CUT（四步→重寫）＋ R2</strong>。② <code>Y</code>＝<span class="en">the way a graph bends</span> 是 <span class="en">That distinction</span> 的<strong>指稱釋義</strong> → ③ 重寫（ch01 <span class="id">A2</span>／<span class="id">A8</span> 先例）。改後同時解掉 <span class="en">That distinction</span> 這個模糊回指——術語首見處直接說「什麼叫 concavity」。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">That distinction <b class="hl">—</b> the way a graph bends <b class="hl">—</b> is <em>concavity</em>, and it is exactly what the second derivative measures.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt"><b class="hl">The way a graph bends is called</b> <em>concavity</em>, and it is exactly what the second derivative measures.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">F3</span> Concavity Test 引句。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT</strong>。② <code>Y</code>＝<span class="en">apply the sign of \((f')' = f''\)</span> 是<strong>祈使指令</strong> → ③ 重寫。改後「可測試」與「所以讀二階導數」分成兩步，中間不再插話。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Since “\(f'\) increasing” is itself a statement the derivative can test <b class="hl">—</b> apply the sign of \((f')' = f''\) <b class="hl">—</b> concavity is read directly off the second derivative.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The statement “\(f'\) is increasing” is itself something the derivative can test<b class="hl">, by the sign of</b> \((f')' = f''\)<b class="hl">. So</b> concavity is read directly off the second derivative.</span></div>
+</div>
+
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:11%">原因標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">F2</td><td>Concavity 開場</td><td>DASH-CUT<br><span class="small">→重排（不加 tic）</span></td><td>the tangent lines turn steadily counter-clockwise as you move right <b class="hl">—</b> the slope <em>increases</em>.</td><td>the tangent lines turn steadily counter-clockwise as you move right<b class="hl">, so</b> the slope <em>increases</em>.</td></tr>
+  <tr><td class="id">F4</td><td><strong>Definition 5.6</strong></td><td>DASH-CUT<br><span class="small">→逗號（定義措辭只動標點）</span></td><td>is an <em>inflection point</em> if the concavity changes there <b class="hl">—</b> from up to down, or from down to up.</td><td>is an <em>inflection point</em> if the concavity changes there<b class="hl">,</b> from up to down or from down to up.</td></tr>
+  <tr><td class="id">F5</td><td>Caution（\(x^{4}\)）</td><td>DASH-CUT<br><span class="small">→重排（避免殘句）</span></td><td>yet it is concave up on both sides of \(0\) <b class="hl">—</b> no inflection.</td><td>yet it is concave up on both sides of \(0\)<b class="hl">, so there is no inflection point there</b>.</td></tr>
+  <tr><td class="id">F6</td><td>Thm 5.3 證明</td><td>DASH-CUT<br><span class="small">→重排</span><br>R1</td><td>So \(f'(c + h)\) <b class="hl">shares the sign of</b> \(h\) <b class="hl">—</b> it is negative for \(h &lt; 0\) and positive for \(h &gt; 0\).</td><td>So \(f'(c + h)\) <b class="hl">has the same sign as</b> \(h\)<b class="hl">, being</b> negative for \(h &lt; 0\) and positive for \(h &gt; 0\).</td></tr>
+  <tr><td class="id">F7</td><td>Caution（\(f''(c)=0\)）</td><td>DASH-CUT<br><span class="small">→分句</span><br>R1</td><td>When \(f''(c) = 0\) the test is <b class="hl">silent —</b> genuinely so, not merely cautious.</td><td>When \(f''(c) = 0\) the test <b class="hl">gives no information. This is a genuine gap, not mere caution.</b></td></tr>
+  <tr><td class="id">F8</td><td>Ex 5.19 解</td><td>DASH-CUT<br><span class="small">→分句</span><br>R1</td><td>rather than a sign chart <b class="hl">—</b> the trade the Second Derivative Test <b class="hl">offers</b> when \(f''\) is easy to compute and nonzero.</td><td>rather than a sign chart<b class="hl">. When \(f''\) is easy to compute and nonzero, that is the advantage of the Second Derivative Test.</b></td></tr>
+  <tr><td class="id">F9</td><td>§5.6 收尾</td><td>DASH-CUT<br><span class="small">→重排（不加 tic）</span></td><td>Rise and fall, peak and valley, cupping and inflection <b class="hl">—</b> the first two derivatives supply the entire vocabulary for the shape of a graph.</td><td>Rise and fall, peak and valley, cupping and inflection <b class="hl">are</b> the entire vocabulary for the shape of a graph<b class="hl">, and the first two derivatives supply all of it</b>.</td></tr>
+  <tr><td class="id">F10</td><td>§5.6 收尾</td><td>DASH-CUT<br><span class="small">（四步→重寫）</span></td><td>The next section supplies the tool for those <b class="hl">—</b> L’Hôpital’s rule <b class="hl">—</b> after which every feature a sketch needs is computable.</td><td>The next section supplies <b class="hl">L’Hôpital’s rule, the tool for those limits. After that,</b> every feature a sketch needs is computable.</td></tr>
+  <tr><td class="id">FL1</td><td>Ex 5.18 解收尾</td><td>R1<br>R3</td><td>The curve cups upward, flattens and <b class="hl">rolls over</b> near the origin, <b class="hl">sags</b> through the middle, and cups upward once more past \(x = 2\).</td><td>The curve cups upward, flattens and <b class="hl">turns</b> near the origin, <b class="hl">cups downward</b> through the middle, and cups upward once more past \(x = 2\).<br><span class="small">改後與本節既有的 <span class="en">cupped upward／downward</span> 用語一致（R3）</span></td></tr>
+</table>
+
+<h2 id="s7">§5.7 L’Hôpital 法則 — 15 個破折號，全數 CUT</h2>
+<p class="small">家族命中密度全章最高（24.4／千詞）。<span class="en">honest</span> 一詞在此第二次出現（§5.3 已一次），<strong>引用 ch06／ch01 先例</strong>一併處理。</p>
+
+<div class="pair">
+  <p class="why"><span class="id">G1</span> 節開場。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT ＋ R1-LEXICAL</strong>。② <code>Y</code>＝<span class="en">the ratio of the <em>rates</em> at which numerator and denominator move</span> 是 \(f'/g'\) 的<strong>定義式釋義</strong> → ③ 重寫（ch01 <span class="id">A2</span> 先例）。<span class="en">break the tie</span> 是體育／投票的不透明慣用語。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">These are the <em>indeterminate forms</em>, and \(f'\!/g'\) <b class="hl">—</b> the ratio of the <em>rates</em> at which numerator and denominator move <b class="hl">—</b> is exactly the extra information needed to <b class="hl">break the tie</b>.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">These are the <em>indeterminate forms</em><b class="hl">. The ratio \(f'\!/g'\) compares</b> the <em>rates</em> at which numerator and denominator move, and that is exactly the extra information needed to <b class="hl">decide the limit</b>.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">G2</span> Theorem 5.4 證明收尾。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT</strong>。② <code>Y</code>＝<span class="en">otherwise Rolle applied to \(g\) alone would produce a zero of \(g'\)</span> 是<strong>一個獨立的證明步驟</strong>（反證）→ ③ 重寫。改後三個證明動作各自一句，<strong>邏輯順序與依賴未變</strong>：\(g' \ne 0 \Rightarrow g(b) \ne g(a)\)（理由：否則 Rolle 給出 \(g'\) 的零點）⇒ 可除。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">For the ratio form, note that if \(g'(x) \ne 0\) on \((a, b)\) then \(g(b) \ne g(a)\) <b class="hl">—</b> otherwise Rolle applied to \(g\) alone would produce a zero of \(g'\) <b class="hl">—</b> so dividing by \([g(b) - g(a)]\,g'(c)\) is legitimate.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">For the ratio form, note that if \(g'(x) \ne 0\) on \((a, b)\) then \(g(b) \ne g(a)\)<b class="hl">. If instead \(g(b) = g(a)\), Rolle’s theorem applied to \(g\) alone would produce a zero of \(g'\). Dividing by</b> \([g(b) - g(a)]\,g'(c)\) <b class="hl">is therefore</b> legitimate.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">G4</span> Caution 第一則（檢查形式）。<strong>DASH-CUT（四步→重寫）＋ R1-LEXICAL</strong>。② <code>Y</code>＝<span class="en">where the numerator and denominator have honest finite limits</span> 是「不是不定式」的<strong>定義式釋義</strong> → ③ 重寫。<span class="en">honest</span> <strong>直接引用 ch06 <span class="id">W-18</span>／ch01 先例</strong>（<span class="en">honest generalization</span> → 字面說法）。改後<strong>條件前置</strong>，對 EFL 更好解析。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Applied to a limit that is not indeterminate <b class="hl">—</b> where the numerator and denominator have <b class="hl">honest</b> finite limits <b class="hl">—</b> it is unjustified and may give a wrong answer.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt"><b class="hl">If the numerator and denominator both have ordinary finite limits, the limit is not indeterminate, and applying the rule is</b> unjustified and may give a wrong answer.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">G6</span> Ex 5.22 解（<strong>2026-07-07 Codex ADOPT 的 CLP-1 增補</strong>）。<strong>DASH-CUT（四步→重寫）＋ R1-LEXICAL ＋ R2</strong>。② <code>Y</code>＝<span class="en">nothing competes</span> 是<strong>理由</strong>（為何不是不定式），且用比喻表達 → ③ 重寫，並依 R2「把 pattern 字面說出來」。<strong>該增補的教學論點（先檢查形式）完整保留</strong>。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">This is not an indeterminate form at all <b class="hl">— nothing competes —</b> so the quotient simply <b class="hl">runs away</b>:</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">This is not an indeterminate form at all<b class="hl">. A large negative numerator over a small positive denominator can only give a large negative quotient</b>:</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">G10</span> §5.7 收尾。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT</strong>。①步表面成立，但拿掉 <code>Y</code> 之後 <span class="en">the last of these</span> <strong>失去先行詞</strong>（Y 就是那個清單）→ 重寫。改後清單前置當主語，<strong>不新增冒號</strong>。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Every feature a graph can show <b class="hl">—</b> where it rises and falls, peaks and dips, bends and inflects, and how it behaves far out and near its asymptotes <b class="hl">—</b> is now computable, the last of these through the indeterminate limits this section resolved.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt"><b class="hl">A graph’s rises and falls, its peaks and dips, its bends and inflections, and its behaviour far out and near its asymptotes are all now computable. The last of these comes from</b> the indeterminate limits this section resolved.</span></div>
+</div>
+
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:11%">原因標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">G3</td><td>§D.3 proof fence</td><td>DASH-CUT<br><span class="small">→分句</span><br>R1</td><td>but their proofs are more <b class="hl">delicate —</b> the <b class="hl">tidy</b> substitution \(f(a) = g(a) = 0\) is unavailable when the functions <b class="hl">blow up</b>, and the estimate must be managed <b class="hl">by hand</b>.</td><td>but their proofs are <b class="hl">harder. The convenient</b> substitution \(f(a) = g(a) = 0\) is unavailable when the functions <b class="hl">grow without bound</b>, and the estimates must be made <b class="hl">directly</b>.<br><span class="small">fence 本身（proof-track 政策＋§D.3 指路）未動</span></td></tr>
+  <tr><td class="id">G5</td><td>Caution 第三則</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>which may still exist <b class="hl">— so</b> a failed application is inconclusive, not a proof of divergence.</td><td>which may still exist<b class="hl">. A</b> failed application <b class="hl">is therefore</b> inconclusive, not a proof of divergence.</td></tr>
+  <tr><td class="id">G7</td><td>Ex 5.22 解</td><td>DASH-CUT<br><span class="small">→逗號（對比）</span></td><td>would give \(\dfrac{1/x}{1} = \dfrac{1}{x} \to +\infty\) <b class="hl">—</b> not merely the wrong magnitude but the wrong <em>sign</em>.</td><td>would give \(\dfrac{1/x}{1} = \dfrac{1}{x} \to +\infty\)<b class="hl">,</b> not merely the wrong magnitude but the wrong <em>sign</em>.</td></tr>
+  <tr><td class="id">G8</td><td>Ex 5.23 解</td><td>DASH-CUT<br><span class="small">→分句（指令）</span></td><td>Recast it as a quotient to expose a form the rule accepts <b class="hl">—</b> put the \(\ln x\) on top and \(1/x\) below:</td><td>Recast it as a quotient to expose a form the rule accepts<b class="hl">. Put</b> the \(\ln x\) on top and \(1/x\) below:</td></tr>
+  <tr><td class="id">G9</td><td>Ex 5.23 解收尾</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>thus approaches \(1\) as \(x \to 0^{+}\) <b class="hl">—</b> a value the bare form \(0^{0}\) could <b class="hl">never</b> have predicted.</td><td>thus approaches \(1\) as \(x \to 0^{+}\)<b class="hl">. The bare form \(0^{0}\) could not have predicted that value.</b></td></tr>
+  <tr><td class="id">GL1</td><td>節開場首句</td><td>R1</td><td>Some limits <b class="hl">refuse to be read off</b>.</td><td>Some limits <b class="hl">cannot be read off directly</b>.</td></tr>
+  <tr><td class="id">GL2</td><td>節開場</td><td>R1</td><td>The same <b class="hl">impasse</b> arises when both <b class="hl">race to</b> \(\infty\)</td><td>The same <b class="hl">difficulty</b> arises when both <b class="hl">tend to</b> \(\infty\)</td></tr>
+  <tr><td class="id">GL3</td><td>節開場收尾</td><td>R1</td><td>which is worth having <b class="hl">in its own right</b>.</td><td>which is <b class="hl">useful in itself</b>.</td></tr>
+  <tr><td class="id">GL4</td><td>Caution 引句</td><td>R1</td><td>Three cautions <b class="hl">travel with</b> the rule.</td><td>Three cautions <b class="hl">come with</b> the rule.</td></tr>
+  <tr><td class="id">GL5</td><td>Ex 5.20 解收尾</td><td>R1</td><td>Each pass <b class="hl">peeled off</b> one order of vanishing</td><td>Each <b class="hl">application removed</b> one order of vanishing</td></tr>
+  <tr><td class="id">GL6</td><td>Ex 5.21 解</td><td>R1<br>R3</td><td>so any power is in turn <b class="hl">outpaced by</b> the exponential</td><td>so the exponential in turn <b class="hl">grows faster than</b> any power<br><span class="small">與前一句 <span class="en">grows more slowly than</span> 同一套說法（R3）</span></td></tr>
+  <tr><td class="id">GL7</td><td>Ex 5.22 解</td><td>R1</td><td>The hypotheses of Theorem 5.5 <b class="hl">are not decoration</b>.</td><td>The hypotheses of Theorem 5.5 <b class="hl">must be checked, not assumed</b>.</td></tr>
+  <tr><td class="id">GL8</td><td>§5.7 收尾</td><td>R1</td><td>Section 5.8 gathers the whole <b class="hl">apparatus</b> into a single <b class="hl">disciplined</b> procedure</td><td>Section 5.8 gathers <b class="hl">all of this</b> into a single <b class="hl">systematic</b> procedure</td></tr>
+</table>
+
+<h2 id="s8">§5.8 描繪曲線 — 11 個破折號，全數 CUT</h2>
+
+<div class="pair">
+  <p class="why"><span class="id">H1</span> 漸近線判定段。<strong>全章最嚴重的一句：81 詞／2 破折號／2 分號／三個可各自獨立成立的教學動作</strong>（垂直、水平、斜漸近線各一）。<strong>PLAIN-SPLIT ＋ DASH-CUT ＋ TIC-REBALANCE（分號 2→1）</strong>。SPEC §3：≥30 詞＋黏接訊號 ⇒ MUST 人工判讀；三個動作 ⇒ 拆。數學內容一字未改，只重新分句。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Vertical-asymptote candidates come from zeros of a denominator or a logarithm’s argument approaching \(0\), confirmed by a one-sided infinite limit <b class="hl">—</b> a factor that cancels leaves a hole, not an asymptote<b class="hl">;</b> horizontal ones are read from the limit at infinity<b class="hl">;</b> a slant asymptote appears when a function grows linearly but is not itself a line <b class="hl">—</b> for a rational function, when the numerator’s degree is exactly one more than the denominator’s, so that dividing out leaves a linear part plus a remainder that decays.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Vertical-asymptote candidates come from zeros of a denominator, or from a logarithm’s argument approaching \(0\)<b class="hl">; confirm each</b> by a one-sided infinite limit. <b class="hl">A</b> factor that cancels leaves a hole, not an asymptote. <b class="hl">Horizontal asymptotes are</b> read from the limit at infinity. <b class="hl">A</b> slant asymptote appears when a function grows linearly but is not itself a line. <b class="hl">For a rational function this happens</b> when the numerator’s degree is exactly one more than the denominator’s, so that dividing out leaves a linear part plus a remainder that decays.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">H7</span> §5.8 收尾。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT</strong>。② <code>Y</code>＝四項清單，是「這章問了什麼」的實質內容 → ③ 重寫。清單前置成主語即可，<strong>不新增冒號</strong>。<span class="small">＊注意：同一組四項清單在 §5.9 章摘要又出現一次（<span class="en">its rise and fall, its extremes, its bends, its roots</span>）——見 <span class="id">J6</span>，兩處措辭刻意保持平行。</span></p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Every question this chapter posed about a function’s behaviour <b class="hl">—</b> its rates, its extremes, its bends, its ends <b class="hl">—</b> now has a computable answer, and they combine into a single picture.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt"><b class="hl">This chapter asked about a function’s rates, its extremes, its bends, and its ends. Every one of those questions</b> now has a computable answer, and <b class="hl">the answers</b> combine into a single picture.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">H8</span> §5.8 收尾（往 §5.9 的 bridge）。<strong>DASH-CUT（四步→重寫）＋ R1-LEXICAL</strong>：一句裡有 <span class="en">conceals</span>／<span class="en">surrenders</span> 兩個擬人動詞、<span class="en">putting … to work</span>（<strong>ch01／ch06 已裁先例：<span class="en">puts to work</span> → <span class="en">uses</span></strong>）、以及 <span class="en">engine</span>（全章第三處）。② <code>Y</code>＝<span class="en">a solution of \(f(x)=0\)…</span> 就是「要找什麼」的實質內容 → ③ 重寫。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Instead of describing a known function, it asks how to <em>find</em> something a function <b class="hl">conceals</b> <b class="hl">—</b> a solution of \(f(x) = 0\) that no formula <b class="hl">surrenders</b> <b class="hl">—</b> by <b class="hl">putting the tangent line to work as an engine of</b> approximation.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Instead of describing a known function, it asks how to <em>find</em> <b class="hl">a solution of \(f(x) = 0\) that no formula gives, using the tangent line as a tool for</b> approximation.</span></div>
+</div>
+
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:11%">原因標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">H2</td><td>Ex 5.24 解</td><td>DASH-CUT<br><span class="small">→逗號（gloss）</span></td><td>so it is even <b class="hl">—</b> symmetric across the \(y\)-axis.</td><td>so it is even<b class="hl">,</b> symmetric across the \(y\)-axis.</td></tr>
+  <tr><td class="id">H3</td><td>Ex 5.25 解</td><td>DASH-CUT<br><span class="small">→逗號（gloss，與 <span class="id">H2</span> 平行）</span></td><td>so \(f\) is odd <b class="hl">—</b> symmetric through the origin.</td><td>so \(f\) is odd<b class="hl">,</b> symmetric through the origin.</td></tr>
+  <tr><td class="id">H4</td><td>Ex 5.25 解</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>and a local minimum at \((1, 2)\) <b class="hl">—</b> the maximum value lying <em>below</em> the minimum value, which is possible here because…</td><td>and a local minimum at \((1, 2)\)<b class="hl">. The</b> maximum value <b class="hl">lies</b> <em>below</em> the minimum value, which is possible here because…</td></tr>
+  <tr><td class="id">H5</td><td>Caution<span class="small">（M4 增補）</span></td><td>DASH-CUT<br><span class="small">→逗號</span><br>R1</td><td>which can <b class="hl">plant a false rule</b>: nothing prevents a curve from crossing such an asymptote <b class="hl">—</b> even infinitely often.</td><td>which can <b class="hl">suggest a false rule</b>: nothing prevents a curve from crossing such an asymptote<b class="hl">,</b> even infinitely often.</td></tr>
+  <tr><td class="id">H6</td><td>Caution<span class="small">（M4 增補）</span></td><td>DASH-CUT<br><span class="small">→分句</span><br>R1・R3</td><td>they mark places where the nearby values <b class="hl">blow up</b>, not lines the graph runs alongside <b class="hl">—</b> usually the function is not even defined there, and an isolated value assigned at that point changes nothing about the <b class="hl">blow-up</b>.</td><td>they mark places where the nearby values <b class="hl">grow without bound</b>, not lines the graph runs alongside<b class="hl">. Usually</b> the function is not even defined there, and <b class="hl">assigning it an isolated value</b> at that point changes nothing about <b class="hl">that growth</b>.</td></tr>
+  <tr><td class="id">HL1</td><td>Caution 收尾</td><td>R1<br>PLAIN-SPLIT<br><span class="small">分號 −1</span></td><td>Approach is a statement about the far end of the graph<b class="hl">; en route,</b> anything is allowed.</td><td>Approach is a statement about the far end of the graph<b class="hl">. On the way there,</b> anything is allowed.</td></tr>
+  <tr><td class="id">HL2</td><td>§5.8 收尾</td><td>R1<br>R3<span class="small">（machinery 三處）</span></td><td>With the checklist, a formula <b class="hl">unfolds into</b> a shape … The final section turns the <b class="hl">machinery</b> around.</td><td>With the checklist, a formula <b class="hl">turns into</b> a shape … The final section <b class="hl">reverses the direction</b>.</td></tr>
+</table>
+
+<h2 id="s9">§5.9 牛頓法 — 10 個破折號，CUT 8／<span class="tag good">KEEP 2</span></h2>
+<p class="small">家族命中密度全章最高（30.4／千詞，592 詞的小節）。本節也帶章摘要。</p>
+
+<div class="pair">
+  <p class="why"><span class="id">J1</span> 節開場前兩句。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT ＋ R1-LEXICAL</strong>。② <code>Y</code>＝兩條<strong>舉例方程</strong>（獨立內容）→ ③ 重寫。詞彙四處：<span class="en">resist</span>／<span class="en">yields nothing to</span>（<strong>ch06 <span class="id">W-12</span> 先例：<span class="en">yields to</span> → <span class="en">can be evaluated</span></strong>）／<span class="en">pinned down</span>／<span class="en">does the pinning</span>／<span class="en">engine</span>。<strong>數學安全：</strong>改寫刻意寫 <span class="en">cannot be solved by simple factoring</span>（照原文的 <span class="en">simple factoring</span> 範圍），不寫「無法求解」——三次式有 Cardano 公式，不可誤述。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">Many equations \(f(x) = 0\) have roots that <b class="hl">resist</b> an explicit formula <b class="hl">—</b> the cubic \(x^{3} - x - 1 = 0\) <b class="hl">yields nothing to</b> simple factoring, and a transcendental equation like \(\cos x = x\) has no elementary closed form at all <b class="hl">—</b> yet the roots are real and can be <b class="hl">pinned down</b> to any precision. <em>Newton’s method</em> <b class="hl">does the pinning, and its engine is</b> the linear approximation of §5.3…</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">Many equations \(f(x) = 0\) have roots that <b class="hl">no explicit formula gives. The</b> cubic \(x^{3} - x - 1 = 0\) <b class="hl">cannot be solved by</b> simple factoring, and a transcendental equation like \(\cos x = x\) has no elementary closed form at all<b class="hl">. Yet</b> the roots are real and can be <b class="hl">located</b> to any precision. <em>Newton’s method</em> <b class="hl">is how they are located, and it rests on</b> the linear approximation of §5.3…</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">J6</span> 章摘要收尾。<strong>DASH-CUT →重排</strong>：尾巴是四項清單，改用 <span class="en">including</span> 掛回主句即可，<strong>不新增任何 tic</strong>。冒號（<span class="en">a single idea:</span>）保留——它引出的是同一命題的交付，且本句是章摘要的骨幹。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">the derivative, a statement about one instant, controls the behaviour of a function across whole intervals <b class="hl">—</b> its rise and fall, its extremes, its bends, its roots.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">the derivative, a statement about one instant, controls the behaviour of a function across whole intervals<b class="hl">, including</b> its rise and fall, its extremes, its bends, and its roots.</span></div>
+</div>
+
+<div class="pair">
+  <p class="why"><span class="id">J7</span> 章末往 Ch6 的 bridge。<strong>DASH-CUT（四步→重寫）＋ PLAIN-SPLIT ＋ R3</strong>。② <code>Y</code>＝<span class="en">how to build a function up by accumulation</span> <strong>就是那個「相反的問題」是什麼</strong> → ③ 重寫。同時把懸空的 <span class="en">it</span> 具名（R3：兩句之隔的 <span class="en">The next chapter</span>）。<span class="en">the opposite question</span> 一語可刪——前句 <span class="en">reverses the direction of travel</span> 已經說了（S1／S3）。</p>
+  <div class="row before"><span class="lbl">現況</span><span class="txt">The next chapter reverses the direction of travel. Having spent three chapters taking functions apart with the derivative, <b class="hl">it</b> asks the opposite question <b class="hl">—</b> how to build a function up by accumulation <b class="hl">—</b> and finds, in the Fundamental Theorem of Calculus, that the two operations are inverse to one another.</span></div>
+  <div class="row after"><span class="lbl">建議</span><span class="txt">The next chapter reverses the direction of travel. Having spent three chapters taking functions apart with the derivative, <b class="hl">it asks how to build a function up by accumulation. The</b> Fundamental Theorem of Calculus <b class="hl">then shows</b> that the two operations are inverse to one another.</span></div>
+</div>
+
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:12%">locus</th><th style="width:11%">原因標籤</th><th style="width:36%">現況</th><th>建議</th></tr>
+  <tr><td class="id">J3</td><td>Strategy 5.7 收尾</td><td>DASH-CUT<br><span class="small">→分句</span><br>R1</td><td>The method needs \(f'(x_{n}) \ne 0\) at each step <b class="hl">—</b> a horizontal tangent has no finite intercept and <b class="hl">stalls the process</b>.</td><td>The method needs \(f'(x_{n}) \ne 0\) at each step<b class="hl">. A</b> horizontal tangent has no finite intercept, <b class="hl">so the process stops</b>.</td></tr>
+  <tr><td class="id">J4</td><td>Ex 5.26 解</td><td>DASH-CUT<br><span class="small">→分句</span><br>R1・R3<span class="small">（與 <span class="id">AL2</span> 同詞）</span></td><td>The number of correct digits roughly <em>doubles</em> at each step <b class="hl">—</b> the <b class="hl">hallmark</b> of Newton’s method near a simple root.</td><td>The number of correct digits roughly <em>doubles</em> at each step<b class="hl">. That rapid doubling is characteristic of</b> Newton’s method near a simple root.</td></tr>
+  <tr><td class="id">J5</td><td>Ex 5.27 解</td><td>DASH-CUT<br><span class="small">→分句</span><br>R1</td><td>the root is \(1.324718\) to six decimals <b class="hl">—</b> a value <b class="hl">beyond the reach of</b> simple factoring, yet found in four steps of arithmetic.</td><td>the root is \(1.324718\) to six decimals<b class="hl">. Simple factoring cannot produce this value</b>, yet four steps of arithmetic have found it.</td></tr>
+  <tr><td class="id">JL1</td><td>Caution</td><td>R1</td><td>Newton’s method is fast but not <b class="hl">foolproof</b>.</td><td>Newton’s method is fast but <b class="hl">not always reliable</b>.</td></tr>
+  <tr><td class="id">JL2</td><td>Caution</td><td>R1</td><td>a guess landing where the tangent is horizontal <b class="hl">has nowhere to go</b>.</td><td>a guess landing where the tangent is horizontal <b class="hl">gives no next iterate</b>.</td></tr>
+  <tr><td class="id">JL3</td><td>Caution</td><td><strong>R2</strong><br>S3</td><td>started too far from a root, <b class="hl">or near a point where the curve turns the wrong way,</b> the iterates can overshoot…</td><td>started too far from a root, the iterates can overshoot…<br><span class="small"><strong>【刪】</strong>：<span class="en">turns the wrong way</span> 沒說出是哪個方向（R2 未字面傳達），而下一句已給出精確條件（\(f''\) 保持同號、\(f\) 與 \(f''\) 同號側起步）→ 刪之無損（S3）</span></td></tr>
+  <tr><td class="id">JL4</td><td>Caution</td><td>R1</td><td>while a poorly placed start can be <b class="hl">thrown clear</b>.</td><td>while a poorly placed start can <b class="hl">move away from the root instead</b>.</td></tr>
+  <tr><td class="id">JL5</td><td>Caution 收尾</td><td>R1</td><td>a rough sketch to <b class="hl">seed</b> the first guess is worth more than any number of <b class="hl">blind</b> iterations.</td><td>a rough sketch <b class="hl">that gives a good</b> first guess is worth more than any number of <b class="hl">unguided</b> iterations.</td></tr>
+</table>
+
+<h2 id="sub">副表（清單／figcaption）— 18 個破折號，CUT 8／<span class="tag good">KEEP 10</span></h2>
+<p class="small">副表不入主分母、<strong>不影響達標</strong>；本節依 ch01 那輪「副表一併處理」的裁決預設處理（政策題 ③）。</p>
+<table>
+  <tr><th style="width:5%">編號</th><th style="width:14%">locus</th><th style="width:11%">原因標籤</th><th style="width:34%">現況</th><th>建議</th></tr>
+  <tr><td class="id">S1</td><td>Strategy 5.1 步驟 3</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>an expression in <em>both</em> \(x\) and \(y\) <b class="hl">—</b> to get a numerical slope, substitute the coordinates of a point on the curve.</td><td>an expression in <em>both</em> \(x\) and \(y\)<b class="hl">. To</b> get a numerical slope, substitute the coordinates of a point on the curve.</td></tr>
+  <tr><td class="id">S2</td><td>Strategy 5.2 步驟 2</td><td>DASH-CUT<br><span class="small">→括號（插入語含清單）</span></td><td>Find an equation relating the quantities <b class="hl">—</b> from geometry, similar triangles, or a physical law.</td><td>Find an equation relating the quantities <b class="hl">(</b>from geometry, similar triangles, or a physical law<b class="hl">)</b>.</td></tr>
+  <tr><td class="id">S3</td><td>Figure 5.4 caption</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>and drifts away far from it <b class="hl">—</b> compare the two at \(x = 9\).</td><td>and drifts away far from it<b class="hl">. Compare</b> the two at \(x = 9\).</td></tr>
+  <tr><td class="id">S4</td><td>Strategy 5.4 步驟 3</td><td>DASH-CUT<br><span class="small">→逗號（命名）</span></td><td>Determine the interval of values that variable may take <b class="hl">—</b> the feasible domain.</td><td>Determine the interval of values that variable may take<b class="hl">,</b> the feasible domain.</td></tr>
+  <tr><td class="id">S5</td><td>Strategy 5.5 步驟 1</td><td>DASH-CUT<br><span class="small">→逗號</span></td><td>apply it again <b class="hl">—</b> differentiating repeatedly until an answer emerges.</td><td>apply it again<b class="hl">,</b> differentiating repeatedly until an answer emerges.</td></tr>
+  <tr><td class="id">S6</td><td>Strategy 5.5 步驟 4</td><td>DASH-CUT<br><span class="small">→冒號（引出公式，不計 tic）</span></td><td>find \(\lim \ln y\), then exponentiate <b class="hl">—</b> \(\lim y = e^{\lim \ln y}\).</td><td>find \(\lim \ln y\), then exponentiate<b class="hl">:</b> \(\lim y = e^{\lim \ln y}\).</td></tr>
+  <tr><td class="id">S7</td><td>Figure 5.9 caption</td><td>DASH-CUT<br><span class="small">→逗號</span></td><td>and two outer branches <b class="hl">—</b> all read off the checklist.</td><td>and two outer branches<b class="hl">,</b> all read off the checklist.</td></tr>
+  <tr><td class="id">S8</td><td>Strategy 5.7 步驟 1</td><td>DASH-CUT<br><span class="small">→分句</span></td><td>reasonably near the root <b class="hl">—</b> a rough sketch or a sign change of \(f\) will locate one.</td><td>reasonably near the root<b class="hl">. A</b> rough sketch or a sign change of \(f\) will locate one.</td></tr>
+</table>
+
+<h2 id="density">④ 節級密度閘 ＋ ⑤ 不換 tic 檢查</h2>
+
+<h3>密度投影（主 stream）</h3>
+<table>
+  <tr><th>節</th><th class="num">現況 —</th><th class="num">CUT</th><th class="num">KEEP</th><th class="num">改後 —</th><th class="num">改後 /1000</th><th>判定</th></tr>
+  <tr><td>§5.1</td><td class="num">12</td><td class="num">12</td><td class="num">0</td><td class="num">0</td><td class="num">0.0</td><td><span class="tag good">達標</span></td></tr>
+  <tr><td>§5.2</td><td class="num">6</td><td class="num">6</td><td class="num">0</td><td class="num">0</td><td class="num">0.0</td><td><span class="tag good">達標</span></td></tr>
+  <tr><td>§5.3</td><td class="num">12</td><td class="num">12</td><td class="num">0</td><td class="num">0</td><td class="num">0.0</td><td><span class="tag good">達標</span></td></tr>
+  <tr><td>§5.4</td><td class="num">19</td><td class="num">15</td><td class="num">4</td><td class="num">4</td><td class="num">3.6</td><td><span class="tag good">達標</span><span class="small">（KEEP 佔滿本節配額 3.3，見下註）</span></td></tr>
+  <tr><td>§5.5</td><td class="num">10</td><td class="num">10</td><td class="num">0</td><td class="num">0</td><td class="num">0.0</td><td><span class="tag good">達標</span></td></tr>
+  <tr><td>§5.6</td><td class="num">13</td><td class="num">13</td><td class="num">0</td><td class="num">0</td><td class="num">0.0</td><td><span class="tag good">達標</span></td></tr>
+  <tr><td>§5.7</td><td class="num">15</td><td class="num">15</td><td class="num">0</td><td class="num">0</td><td class="num">0.0</td><td><span class="tag good">達標</span></td></tr>
+  <tr><td>§5.8</td><td class="num">11</td><td class="num">11</td><td class="num">0</td><td class="num">0</td><td class="num">0.0</td><td><span class="tag good">達標</span></td></tr>
+  <tr><td>§5.9</td><td class="num">10</td><td class="num">8</td><td class="num">2</td><td class="num">2</td><td class="num">3.4</td><td><span class="tag good">達標</span><span class="small">（同上）</span></td></tr>
+  <tr><td><strong>全章</strong></td><td class="num"><strong>108</strong></td><td class="num"><strong>102</strong></td><td class="num"><strong>6</strong></td><td class="num"><strong>6</strong></td><td class="num"><strong>0.8</strong></td><td><span class="tag good">達標</span>配額 22.5，用 6</td></tr>
+</table>
+<div class="card">
+  <p><strong>兩閘不可互相豁免的處理（SPEC §3）。</strong>§5.4（1103 詞）與 §5.9（592 詞）逐節配額分別是 3.3 與 1.8 個，而 KEEP 各佔 4 與 2 ——<strong>逐節看是踩線的</strong>。依條款這時不得「為湊名額把 KEEP 機械改掉」，也不得默默豁免；正確處置是<strong>另找安全改點</strong>——本輪那兩節的其他破折號已 100% 處理完（§5.4 CUT 15／§5.9 CUT 8），沒有剩餘的安全改點。<strong>因此本輪對這兩節明示節級例外</strong>：以全章 0.8/1000 判定通過，逐節殘值 3.6／3.4 屬四步仲裁的必然結果，理由逐條記在保留清單。<span class="small">（§5.9 只有 592 詞，依 SPEC「N &lt; 1000 的單元報 raw、與鄰近單元合併判定」，本來就不單獨判定。）</span></p>
+</div>
+
+<h3>不換 tic 護欄（顯著＝raw ≥ +3 <strong>且</strong> 密度 ≥ +0.5/1000）</h3>
+<table>
+  <tr><th>指標</th><th class="num">Gate 0 前值</th><th class="num">投影後</th><th class="num">Δ raw</th><th>來源與判定</th></tr>
+  <tr><td>em-dash</td><td class="num">108</td><td class="num">6</td><td class="num">−102</td><td>本輪目標</td></tr>
+  <tr><td>冒號接子句</td><td class="num">77</td><td class="num">≈76</td><td class="num">−1</td><td><span class="id">A8</span> 拆掉一個（<span class="en">The rule of thumb:</span>）；新增的冒號都落在「引出清單／公式」（<span class="id">A1</span>／<span class="id">E3</span>／<span class="id">S6</span>），依 SPEC 不計入。<strong>刻意避開冒號</strong>：<span class="id">D2</span>／<span class="id">D8</span>／<span class="id">F2</span>／<span class="id">F9</span>／<span class="id">G10</span>／<span class="id">H7</span> 六處都改用重排而非冒號。</td></tr>
+  <tr><td>分號</td><td class="num">47</td><td class="num">≈41</td><td class="num">−6</td><td><span class="id">B2</span>／<span class="id">D10</span>／<span class="id">E1</span>／<span class="id">CL4</span>／<span class="id">H1</span>／<span class="id">HL1</span> 各 −1</td></tr>
+  <tr><td>左括號</td><td class="num">43</td><td class="num">≈45</td><td class="num">+2</td><td><span class="id">E4</span>／<span class="id">S2</span>（插入語本身含清單，屬 CUT palette 的括號選項）。<strong>未達 +3 門檻</strong>；且 ch05 括號密度 5.7/1000 為全書最低（ch04 為 11.9、ch03 為 15.6），有餘裕</td></tr>
+  <tr><td>成對逗號插入語</td><td class="num">28</td><td class="num">≈28</td><td class="num">±0</td><td><span class="id">B4</span> −1（<span class="en">— and, notably,</span> → 句首）；<span class="id">D3</span>／<span class="id">H2</span>／<span class="id">H3</span> 等逗號同位語多落在句尾（後接句號），不構成成對</td></tr>
+</table>
+<p class="small"><strong>四項全部未達「顯著上升」門檻，無須填理由。</strong>實際數字須 Gate 4 重跑 <code>prose_metrics.py</code> 確認（本表為投影）。</p>
+
+<h2 id="keep">刻意保留清單（示範規則不誤傷）</h2>
+<table>
+  <tr><th style="width:6%">編號</th><th style="width:14%">locus</th><th style="width:30%">保留的東西</th><th>四步仲裁／條款依據</th></tr>
+  <tr><td class="id">K1</td><td>§5.4 Thm 5.1 證明</td><td><span class="en">\(f\) is continuous on the closed piece <b class="hl">—</b> \([u, c]\) or \([c, v]\) <b class="hl">—</b> and differentiable on its interior</span></td><td>①拿掉後主幹仍完整、量詞 scope 不變 ✓ → ②插入語無有限動詞、脫離主幹<strong>無獨立教學用途</strong>（純記號規格）→ ③只修飾同一主張的<strong>必要條件</strong> ⇒ <strong>KEEP</strong>。改成巢狀括號會與式內括號打架</td></tr>
+  <tr><td class="id">K2</td><td>§5.4 Ex 5.14 解</td><td><span class="en">the derivative does not change sign <b class="hl">—</b> positive on both sides <b class="hl">—</b> so \(x = 0\) is neither…</span></td><td>③同一主張的<strong>規格說明</strong>（「怎樣的不變號」）⇒ <strong>KEEP</strong>。且與副表 <span class="id">K4</span>（Theorem 5.1 條列）同型，<strong>R3 一致性要求同判</strong></td></tr>
+  <tr><td class="id">K3</td><td>§5.9 節開場</td><td><span class="en">and <b class="hl">—</b> from a good starting guess <b class="hl">—</b> you land nearer the curve’s own root</span></td><td>③<strong>必要條件修飾</strong>（收斂要靠好的起始猜測），明確落在 KEEP 清單允許項；與 <code>— only then —</code> <strong>預設 KEEP 先例</strong>同型 ⇒ <strong>KEEP</strong></td></tr>
+  <tr><td class="id">K4</td><td>§5.4 Theorem 5.1 條列<span class="small">（副表）</span></td><td><span class="en">If \(f'\) changes from positive to negative at \(c\) <b class="hl">—</b> positive just left, negative just right <b class="hl">—</b> then…</span></td><td>③<strong>定理陳述</strong>內的必要條件 gloss；且 rubric 明訂「正式定義與定理陳述不得報為 finding」⇒ <strong>KEEP</strong></td></tr>
+  <tr><td class="id">K5</td><td>§5.4 Thm 5.1 證明四條列<span class="small">（副表，4 個）</span></td><td><span class="en">…so \(f(u) &lt; f(c)\) and \(f(v) &lt; f(c)\) <b class="hl">—</b> a <em>local maximum</em>;</span> 等四條平行尾巴</td><td>SPEC KEEP 明列：<strong>worked-solution 的電報式 gloss／無動詞短句尾</strong>（改分句會變殘句），且四條<strong>刻意平行</strong>，逐條改會破壞平行結構 ⇒ <strong>KEEP</strong></td></tr>
+  <tr><td class="id">K6</td><td>§5.2 Strategy 5.2 步驟 4<span class="small">（副表）</span></td><td><span class="en">Now <b class="hl">—</b> and only now <b class="hl">—</b> substitute the numerical values…</span></td><td>③<strong>時點修飾</strong>；<code>— only then —</code> <strong>預設 KEEP 先例</strong>的字面同型，SPEC 明文「不得為一致性而動」⇒ <strong>KEEP</strong></td></tr>
+  <tr><td class="id">K7</td><td>§5.5 Figure 5.6 caption<span class="small">（副表）</span></td><td><span class="en">only three sides are fenced <b class="hl">—</b> two of length \(x\) and one of length \(y\) <b class="hl">—</b> because the river bounds the fourth</span></td><td>③同一主張的<strong>規格說明</strong>；caption 求緊湊，改分句會拉長 ⇒ <strong>KEEP</strong></td></tr>
+</table>
+
+<h3>詞彙層刻意不報（正則命中但語義透明；<strong>乾淨是有效結果</strong>）</h3>
+<ul class="tight">
+  <li><span class="en">the second curve <b>resists</b> solving for \(y\) altogether</span>（§5.1）——<strong>不動，且理由是數學安全</strong>：\(x^{3}+y^{3}=6xy\) 用三次公式其實解得出來（只是不可用），原文的 <span class="en">resists</span> 正在做這個 hedge；改成 <span class="en">cannot be solved</span> 會<strong>把數學說錯</strong>。這是「文學腔有時在承載一個真實的保留」的實例。</li>
+  <li><span class="en">it cups upward, <b>holding water</b> … it <b>sheds water</b></span>（§5.6 Def 5.5 informal gloss）——真實教材通用的具體記憶法，可觸摸、可推測，屬 §3 鼓勵的白話 gloss。</li>
+  <li><span class="en">Whether the rule applies is a property of the <em>point</em>, not of the formula.</span>（§5.7 Ex 5.22）——警句式收尾但<strong>言之有物</strong>（說出了一個真實且非顯然的區別），暖句四條件全過。</li>
+  <li><span class="en">The derivative stops being an object to compute and becomes a tool to think with.</span>（章開場 lead）——結構性暖句，四條件全過（有明確指涉、說明本章要做什麼、刪之損失導航、數學另有字面表述）。</li>
+  <li><span class="en">the calculus is the easy part. The work is the <em>modelling</em></span>（§5.5 開場）——具體且是本節真正的教學重點，非通用填充。</li>
+  <li><span class="en">The tip <b>outruns</b> the person</span>（§5.2）、<span class="en">a <b>momentary flat spot</b></span>（§5.4）、<span class="en">the constraint that <b>pins the curve down</b></span>（§5.1）——擬人／隱喻家族命中，但語義對 EFL 可推測，且緊鄰都有字面表述，依條款<strong>不得僅因形式報 finding</strong>。</li>
+  <li>cleft 句式（<span class="en">What made it work was…</span>、<span class="en">What remains is…</span>）——FLAG 掃描線索，不得因形式報缺陷；本輪只在<strong>另有 R1 證據</strong>時一併改（<span class="id">BL4</span>），其餘不動。</li>
+  <li>§5.4 Thm 5.1 證明段（81 詞／<strong>19 式</strong>，全章記號密度最高）——<strong>單一論證</strong>（Cor 4.3 分兩側套用），與 §6.3 的 FTC-1 證明段（114 詞／19 式）同判，<strong>放行不拆</strong>。</li>
+</ul>
+
+<h2 id="oos">本輪範圍外的觀察（不改，只記錄）</h2>
+<div class="card warn">
+  <ol class="tight">
+    <li><strong><code>sec-5-5.html</code> 的 Figure 5.6 標記位置有誤。</strong>該 <code>&lt;figure&gt;</code> 落在 Example 5.15 <code>env-solution</code> 的 <code>&lt;/div&gt;</code>（env-body 收尾）與 <code>&lt;/section&gt;</code> 之間，等於夾在 solution 內部但在 env-body 之外；其餘八張圖都在 <code>workedexample</code> 之後。<strong>不是本輪的散文問題</strong>（Karpathy §3：只動非動不可的），但會影響版面與 LaTeX 轉換，建議另開一輪處理。</li>
+    <li><strong><code>sec-5-5.html</code> 檔頭註解的編號過期。</strong>註解寫 <span class="en">§5.5 mints Strategy 5.4, Examples 5.14–5.16</span>，實際是 <strong>Examples 5.15–5.17</strong>（因 §5.4 在 2026-07-07 的 M4 gap-check 增補了 Example 5.14）。純註解，不影響輸出。</li>
+    <li><strong>Gate 7（LaTeX）pending。</strong><code>handout/latex/make_dist.py</code> 的 <code>NAMES</code> 表目前只有 <code>appB</code>、<code>ch03</code>，<strong>沒有 ch05</strong>。依平行紀律本輪<strong>不改 <code>NAMES</code></strong>（會與其他章的 session 衝突），記為 pending，留給合併回收那一輪一次補齊。</li>
+  </ol>
+</div>
+
+<h2>本輪統計與下一步</h2>
+<div class="card bad">
+  <strong>更正（2026-07-26 事後加註，走查稿其餘內容依例保留為裁決前紀錄、不回頭改寫）：</strong>
+  <ul class="tight">
+    <li>下表的「候選總計 <strong>117 條</strong>」<strong>多算一條，實際為 116 條</strong>。原因是統計時把 §5.5 <span class="id">E3</span> 卡片裡引用的 <strong>ch01 先例編號</strong> <span class="id">E11</span> 一起掃進了 ch05 的編號集合。116 − Codex REJECT 1（<span class="id">CL4</span>）＝<strong>執行 115 條</strong>，這個數字在 <a href="REVIEW-ch05-plain-applied.html">applied 報告</a>與 commit body 裡都是對的。</li>
+    <li>「密度／tic 投影」表把冒號接子句預估為 <strong>−1</strong>，<strong>實測為 +2</strong>（77 → 79）。三處新增中兩處是 SPEC 明訂不計入的「引出清單／公式」冒號（<span class="id">A1</span>、<span class="id">F9</span>），只是 <code>prose_metrics.py</code> 在剝掉數學後把它們看成子句——工具假陽性；真正新增的子句冒號只有 <span class="id">BL4</span> 一個。<strong>四項 tic 全部仍未達「raw ≥ +3 且密度 ≥ +0.5/1000」的顯著門檻</strong>，結論不變。</li>
+  </ul>
+</div>
+<table>
+  <tr><th>項目</th><th class="num">數量</th><th>說明</th></tr>
+  <tr><td>破折號候選（主 stream）</td><td class="num">79 條</td><td>涵蓋 108 個破折號中的 102 個 CUT</td></tr>
+  <tr><td>破折號候選（副表）</td><td class="num">8 條</td><td>涵蓋 18 個中的 8 個 CUT</td></tr>
+  <tr><td>純詞彙層候選（R1／R2／R3）</td><td class="num">30 條</td><td><code>AL/BL/CL/DL/EL/FL/GL/HL/JL</code> 系列</td></tr>
+  <tr><td><strong>候選總計</strong></td><td class="num"><strong>117 條</strong></td><td>另 <strong>KEEP 7 組</strong>（主 3／副 4）</td></tr>
+  <tr><td>其中 PLAIN-SPLIT</td><td class="num">14 條</td><td>雙／三論述動作黏接句</td></tr>
+  <tr><td>其中引用已裁先例</td><td class="num">7 條</td><td><span class="en">honest</span>×2、<span class="en">puts to work</span>、<span class="en">yields to</span>×2、<span class="en">asks</span>、<span class="en">only then</span></td></tr>
+  <tr><td>建議【刪】</td><td class="num">2 條</td><td><span class="id">C5/C7</span>（<span class="en">Leibniz’s fraction bar is now honest</span>）、<span class="id">JL3</span>（<span class="en">turns the wrong way</span>）——皆過 S3 刪除測試</td></tr>
+</table>
+
+<div class="card good">
+  <p><strong>下一步（等你裁決）：</strong></p>
+  <ol class="tight">
+    <li>回覆三個政策題（<a href="#policy">⛳ 區塊</a>）＋逐條編號的 <code>ADOPT／MODIFY／REJECT</code>（整批授權也可）。</li>
+    <li><strong>Gate 2：Codex 獨立裁決</strong>——依 <code>CLAUDE.md</code>「Codex 唯讀調用逐次徵同意」，<strong>需要你另外同意才會跑</strong>。材料 inline 進 prompt（本機自讀 fragment 會亂碼），預估 &gt;70KB、10–15 分鐘，背景執行。</li>
+    <li>Gate 3 套用 ＋ <code>verify_edits.py</code>（必須 PASS：工作樹 == HEAD ＋ 恰好這些替換）。</li>
+    <li>Gate 4 <code>python handout/html/build.py ch05</code> ＋ 量測回歸；Gate 5 math gate（數學片段程式化比對，理想零差異）；Gate 6 Mode B；Gate 7 記 pending；Gate 8 分頁目檢；Gate 9 產 <code>REVIEW-ch05-plain-applied.html</code> ＋ commit 到 <code>handout/plain-ch05</code>。</li>
+  </ol>
+</div>
+
+<p class="foot">
+  產出：Claude（2026-07-26），gate-1、<strong>propose-only——本檔完成時 <code>git status</code> 對 <code>handout/html/fragments/ch05/</code> 為乾淨</strong>。
+  量測皆為程式化（<code>tools/prose_metrics.py</code> canonical stream ＋逐節／段落／家族掃描腳本，存 scratchpad）；141 個家族命中逐條人工複核主語與可推測性。
+  分支 <code>handout/plain-ch05</code>（worktree <code>.claude/worktrees/plain-ch05</code>），未動 <code>REPORT-emdash-baseline-and-rollout.md</code> 與 <code>make_dist.py</code> 的 <code>NAMES</code>（平行紀律）。
+  <strong>待併：rollout 帳本 §2 的 ch05 列</strong>——em-dash 108 → 6（14.4 → 0.8/1000）、冒號 77 → ≈76、分號 47 → ≈41、括號 43 → ≈45、雙逗號 28 → ≈28（實際值以 Gate 4 重測為準）。
+  緣起鏈：<code>REVIEW-plain-register-research.html</code> → appB 兩輪 → <code>REVIEW-ch06-sec-6-2/6-3-plain-applied.html</code> → <code>REVIEW-ch01-plain-walk.html</code> → 本檔。
+</p>
+
+</body>
+</html>

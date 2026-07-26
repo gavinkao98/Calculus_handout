@@ -62,12 +62,18 @@
   </header>
 
   <!-- expansion:intuition — opener: pick up §4.4's closing fact (e^x strictly increasing ⟹ one-to-one); strict monotonicity is the engine that both builds and powers the inverse; lists the section's program and the two fences it closes (§C-11) -->
-  <p>Section 4.4 closed with the fact this section is built on: \(e^{x}\) is strictly increasing on \(\mathbb{R}\), and a strictly increasing function is one-to-one. A one-to-one function can be inverted, and the inverse of the exponential is the function we are after — the <em>natural logarithm</em>. Strict monotonicity is the lever throughout. It does the obvious work of <em>building</em> the inverse, by making each value \(x &gt; 0\) come from exactly one exponent. Less obviously, it also <em>powers</em> everything we then prove about that inverse. The continuity of \(\ln\) and its differentiability are not free gifts that come with the definition; each needs its own argument, and both reach back to the strict monotonicity of \(e^{x}\). This section defines \(\ln x\), proves it is continuous, and derives \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) rigorously — this time without assuming in advance that \(\ln\) is differentiable, the assumption Chapter 3 made informally. Along the way it settles two debts left earlier: the informal logarithm of §3.3 and the meaning of \(a^{r}\) for irrational \(r\), deferred back in §4.1.</p>
+  <p>Section 4.4 closed with the fact this section is built on: \(e^{x}\) is strictly increasing on \(\mathbb{R}\), and a strictly increasing function is one-to-one. A one-to-one function can be inverted, and the inverse of the exponential is the <em>natural logarithm</em>. Strict monotonicity gives the uniqueness we need: no value can come from two different exponents. Existence is a separate matter. Once we show that the range of \(e^{x}\) is \((0,\infty)\), every positive number has such an exponent. Strict monotonicity is also needed in every later proof about that inverse. The continuity and differentiability of \(\ln\) do not follow automatically from the definition; each needs its own argument, and both reach back to the strict monotonicity of \(e^{x}\).</p>
+
+  <p>This section defines \(\ln x\), proves it is continuous, and derives \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) rigorously. This time we do not assume in advance that \(\ln\) is differentiable, the assumption Chapter 3 made informally. Along the way it settles two debts left earlier: the informal logarithm of §3.3 and the meaning of \(a^{r}\) for irrational \(r\), deferred back in §4.1.</p>
 
   <h3 class="subsec-head">Defining the natural logarithm</h3>
 
   <!-- expansion:formula — §C-1 upgraded 2026-07-06 (full-arc seam fix): the range of e^x is (0,∞), now PROVED via IVT (Theorem 4.9(b), added §4.4) rather than asserted. Uses e^x>0 (Cor 4.1), e^{-x}=1/e^x (Thm 4.7), continuity (Thm 4.6), IVT (Thm 4.9(b)). Record: handout/_audit/REVIEW-fullarc-seam-skeleton.html -->
-  <p>To invert \(e^{x}\) we need to know exactly which values it takes. First, \(e^{x} &gt; 0\) for every real \(x\) (Corollary 4.1), so its values are positive. They range over <em>all</em> positive numbers, and the Intermediate Value Theorem makes that precise. Fix any target \(t &gt; 0\). Since \(e^{x} &gt; 1 + x\) for \(x &gt; 0\) — every term of the series past the first is positive — \(e^{x}\) exceeds \(t\) once \(x\) is large enough; and since \(e^{-x} = 1/e^{x}\) (Theorem 4.7), the values \(e^{x}\) fall below \(t\) once \(x\) is sufficiently negative. Pick points \(p &lt; q\) with \(e^{p} &lt; t &lt; e^{q}\). On \([p, q]\) the function \(e^{x}\) is continuous (Theorem 4.6), so by the Intermediate Value Theorem (Theorem 4.9(b)) there is a \(c \in [p, q]\) with \(e^{c} = t\). Every positive \(t\) is therefore attained, and the range of \(e^{x}\) is exactly the open interval \((0, \infty)\). Strict monotonicity makes the exponent unique — so for every \(x &gt; 0\) there is exactly one \(a\) with \(e^{a} = x\).</p>
+  <p>To invert \(e^{x}\) we need to know exactly which values it takes. First, \(e^{x} &gt; 0\) for every real \(x\) (Corollary 4.1), so its values are positive. They range over <em>all</em> positive numbers, and the Intermediate Value Theorem makes that precise.</p>
+
+  <p>Fix any target \(t &gt; 0\). For \(x &gt; 0\), every term of the series after the first two is positive, so \(e^{x} &gt; 1 + x\). Therefore \(e^{x}\) exceeds \(t\) once \(x\) is large enough. Since \(e^{-x} = 1/e^{x}\) (Theorem 4.7), the values \(e^{x}\) fall below \(t\) once \(x\) is sufficiently negative.</p>
+
+  <p>Pick points \(p &lt; q\) with \(e^{p} &lt; t &lt; e^{q}\). On \([p, q]\) the function \(e^{x}\) is continuous (Theorem 4.6), so by the Intermediate Value Theorem (Theorem 4.9(b)) there is a \(c \in [p, q]\) with \(e^{c} = t\). Every positive \(t\) is therefore attained, and the range of \(e^{x}\) is exactly the open interval \((0, \infty)\). Strict monotonicity makes the exponent unique, so for every \(x &gt; 0\) there is exactly one \(a\) with \(e^{a} = x\).</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">4.4</span><span class="env-name">Natural logarithm</span></p>
@@ -76,7 +82,7 @@
       <p>\[ e^{a} = x. \]</p>
       <p>Equivalently, \(\ln x\) is the inverse function of \(e^{x}\) on \((0, \infty)\): it is characterized by the two identities</p>
       <p>\[ e^{\ln x} = x \quad (x &gt; 0), \qquad \ln(e^{x}) = x \quad (x \in \mathbb{R}). \]</p>
-      <p class="informal">In words, \(\ln x\) is the exponent you must raise \(e\) to in order to land on \(x\). The strict monotonicity of \(e^{x}\) makes that exponent unique; its range being \((0, \infty)\) makes the exponent exist for every positive \(x\).</p>
+      <p class="informal">In words, \(\ln x\) is the exponent to which \(e\) must be raised to obtain \(x\). The strict monotonicity of \(e^{x}\) makes that exponent unique; its range being \((0, \infty)\) makes the exponent exist for every positive \(x\).</p>
     </div>
   </section>
 
@@ -84,7 +90,7 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>The logarithm is defined only for \(x &gt; 0\). The symbols \(\ln 0\) and \(\ln(-1)\) have no meaning here: \(\ln 0\) would require \(e^{a} = 0\) and \(\ln(-1)\) would require \(e^{a} = -1\), and neither is possible, because \(e^{a} &gt; 0\) for every real \(a\). Every formula in this section that contains \(\ln x\) silently carries the assumption \(x &gt; 0\).</p>
+      <p>The logarithm is defined only for \(x &gt; 0\). The symbols \(\ln 0\) and \(\ln(-1)\) have no meaning here: \(\ln 0\) would require \(e^{a} = 0\) and \(\ln(-1)\) would require \(e^{a} = -1\), and neither is possible, because \(e^{a} &gt; 0\) for every real \(a\). Every formula in this section that contains \(\ln x\) is understood to require \(x &gt; 0\).</p>
     </div>
   </section>
 
@@ -96,7 +102,7 @@
   <h3 class="subsec-head">Continuity of the logarithm</h3>
 
   <!-- expansion:intuition — lead into the continuity proof; the indirect argument leans on strict monotonicity -->
-  <p>That \(\ln\) is continuous is not automatic and takes a short argument. The idea is indirect: if some sequence of inputs approached \(x_{0}\) while their logarithms stayed away from \(\ln x_{0}\), then applying the strictly increasing \(e^{x}\) would re-open a fixed gap on the input side — contradicting the very fact that the inputs converged.</p>
+  <p>That \(\ln\) is continuous is not automatic and takes a short argument. The idea is indirect: if some sequence of inputs approached \(x_{0}\) while their logarithms stayed away from \(\ln x_{0}\), then applying the strictly increasing \(e^{x}\) would re-open a fixed gap on the input side, contradicting the very fact that the inputs converged.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.13</span></p>
@@ -105,14 +111,14 @@
     </div>
   </section>
 
-  <p><em>Proof track: this argument earns the theorem. What follows uses only the statement — the continuity of \(\ln\) — so on a first reading you may take it and move on.</em></p>
+  <p><em>Proof track: this argument proves the theorem. What follows uses only the statement that \(\ln\) is continuous, so on a first reading you may take it and move on.</em></p>
 
   <section class="env env-proof">
     <p class="env-head"><span class="env-kicker">Proof</span></p>
     <div class="env-body">
       <p>Fix \(x_{0} &gt; 0\) and suppose, for contradiction, that \(\ln\) is <em>not</em> continuous at \(x_{0}\). Then \(\lim_{x \to x_{0}} \ln x\) either fails to exist or exists but differs from \(\ln x_{0}\). In either case the failure is witnessed by a sequence: there is a number \(\delta &gt; 0\) and points \(y_{j} \to x_{0}\) (all in \((0, \infty)\)) with</p>
       <p>\[ \lvert \ln y_{j} - \ln x_{0} \rvert \ge \delta \qquad \text{for every } j = 1, 2, 3, \dots \]</p>
-      <p>(To see why failure is witnessed this way, negate the limit statement of §1.6: if \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) fails, there is some tolerance \(\delta &gt; 0\) that no input-closeness requirement can meet — for every \(d &gt; 0\), some point \(y\) with \(0 &lt; \lvert y - x_{0} \rvert &lt; d\) has \(\lvert \ln y - \ln x_{0} \rvert \ge \delta\). Picking one such point \(y_{j}\) for each \(d = \tfrac{1}{j}\) produces the sequence, and for small \(d\) these points stay inside \((0, \infty)\).)</p>
+      <p>(To see why failure is witnessed this way, negate the limit statement of §1.6: if \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) fails, there is some tolerance \(\delta &gt; 0\) that no input-closeness requirement can meet: for every \(d &gt; 0\), some point \(y\) with \(0 &lt; \lvert y - x_{0} \rvert &lt; d\) has \(\lvert \ln y - \ln x_{0} \rvert \ge \delta\). Picking one such point \(y_{j}\) for each \(d = \tfrac{1}{j}\) produces the sequence, and for small \(d\) these points stay inside \((0, \infty)\).)</p>
       <p>For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.6), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):</p>
       <ul>
         <li>if \(\ln y_{j} \le \ln x_{0} - \delta\), then \(x_{0} - y_{j} = e^{\ln x_{0}} - e^{\ln y_{j}} \ge e^{\ln x_{0}} - e^{\ln x_{0} - \delta} &gt; 0\);</li>
@@ -120,7 +126,7 @@
       </ul>
       <p>Let</p>
       <p>\[ \varepsilon = \min\!\left\{\, e^{\ln x_{0}} - e^{\ln x_{0} - \delta}, \; e^{\ln x_{0} + \delta} - e^{\ln x_{0}} \,\right\} &gt; 0, \]</p>
-      <p>a single positive number depending only on \(x_{0}\) and \(\delta\) — so each of the two case bounds above is at least \(\varepsilon\). In both cases \(\lvert y_{j} - x_{0} \rvert = \lvert e^{\ln y_{j}} - e^{\ln x_{0}} \rvert \ge \varepsilon\), so</p>
+      <p>a single positive number depending only on \(x_{0}\) and \(\delta\), so each of the two case bounds above is at least \(\varepsilon\). In both cases \(\lvert y_{j} - x_{0} \rvert = \lvert e^{\ln y_{j}} - e^{\ln x_{0}} \rvert \ge \varepsilon\), so</p>
       <p>\[ \lvert y_{j} - x_{0} \rvert \ge \varepsilon \qquad \text{for every } j. \]</p>
       <p>But this contradicts \(y_{j} \to x_{0}\), which forces \(\lvert y_{j} - x_{0} \rvert\) below \(\varepsilon\) for large \(j\). The assumption of discontinuity is untenable, so \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) and \(\ln\) is continuous at \(x_{0}\). <span class="qed qed-proof"></span></p>
     </div>
@@ -129,7 +135,7 @@
   <h3 class="subsec-head">The derivative of the logarithm</h3>
 
   <!-- expansion:intuition — lead: contrast with Ch3 §3.3's chain-rule pass; the inverse-function technique extracts the derivative without assuming it -->
-  <p>Chapter 3 already wrote down \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), but it did so by differentiating \(e^{\ln x} = x\) with the chain rule — which silently <em>assumes</em> \(\ln\) is differentiable. We can now earn the formula honestly. The inverse-function technique flips the logarithm’s difference quotient into a difference quotient for \(e^{x}\), whose derivative we already control, and lets continuity carry the limit across.</p>
+  <p>Chapter 3 already wrote down \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), but it did so by differentiating \(e^{\ln x} = x\) with the chain rule, which assumes that \(\ln\) is differentiable without first proving it. We can now prove the formula without that assumption. The inverse-function technique flips the logarithm’s difference quotient into a difference quotient for \(e^{x}\), whose derivative we already control, and lets continuity carry the limit across.</p>
 
   <section class="env env-theorem">
     <p class="env-head"><span class="env-kicker">Theorem</span><span class="env-num">4.14</span></p>
@@ -166,14 +172,14 @@
   <section class="env env-remark">
     <p class="env-head"><span class="env-kicker">Remark</span><span class="env-num">4.5</span></p>
     <div class="env-body">
-      <p>This closes a loop opened in Chapter 3. There (§3.3) the same formula \((\ln x)' = 1/x\) was obtained quickly by applying the chain rule to \(e^{\ln x} = x\) — a derivation that <em>presupposes</em> \(\ln\) is differentiable. The proof above presupposes no such thing: it extracts differentiability from the difference quotient, using only the continuity of \(\ln\) (Theorem 4.13) and the derivative of \(e^{x}\) (Theorem 4.8). The chain-rule route is faster and perfectly good once differentiability is known; the inverse-function route is the one that establishes differentiability in the first place, and so is the one the foundations rest on.</p>
+      <p>This closes a loop opened in Chapter 3. There (§3.3) the same formula \((\ln x)' = 1/x\) was obtained quickly by applying the chain rule to \(e^{\ln x} = x\), a derivation that <em>assumes</em> \(\ln\) is differentiable. The proof above presupposes no such thing: it extracts differentiability from the difference quotient, using only the continuity of \(\ln\) (Theorem 4.13) and the derivative of \(e^{x}\) (Theorem 4.8). The chain-rule route is faster and perfectly good once differentiability is known; the inverse-function route is the one that establishes differentiability in the first place, and so is the one the foundations rest on.</p>
     </div>
   </section>
 
   <h3 class="subsec-head">Logarithm laws and general powers</h3>
 
   <!-- expansion:intuition — lead: harvest the algebraic properties; first one more MVT consequence (§C-5, HW1 → Corollary 4.4) -->
-  <p>With the derivative in hand we can read off the algebra of the logarithm. The engine is a single extra consequence of the Mean Value Theorem — the companion of the monotonicity corollary, for the borderline case \(f' = 0\).</p>
+  <p>With the derivative in hand we can read off the algebra of the logarithm. The next result is another consequence of the Mean Value Theorem. It handles the case \(f' = 0\) on an interval, where the conclusion is that the function is constant.</p>
 
   <!-- expansion:formula — Corollary 4.4 (§C-5): HW1, f'=0 ⟹ constant -->
   <section class="env env-corollary">
@@ -208,7 +214,7 @@
       <p>\[ f(x) = \ln(ax) - \ln x. \]</p>
       <p>By the chain rule together with Theorem 4.14,</p>
       <p>\[ f'(x) = a \cdot \frac{1}{ax} - \frac{1}{x} = \frac{1}{x} - \frac{1}{x} = 0 \qquad \text{for every } x &gt; 0. \]</p>
-      <p>So \(f'\) vanishes identically. Applying Corollary 4.4 on the closed interval with endpoints \(1\) and any \(x &gt; 0\) gives \(f(x) = f(1)\). But \(f(1) = \ln a - \ln 1 = \ln a\), since \(\ln 1 = 0\) (because \(e^{0} = 1\)). Hence \(f(x) = \ln a\) for all \(x &gt; 0\); that is, \(\ln(ax) - \ln x = \ln a\). Setting \(x = b\) gives \(\ln(ab) - \ln b = \ln a\), which rearranges to \(\ln(ab) = \ln a + \ln b\). <span class="qed qed-proof"></span></p>
+      <p>So \(f'\) vanishes identically. On every closed interval contained in \((0, \infty)\), \(f\) is differentiable and therefore continuous, so Corollary 4.4 applies. Taking the interval with endpoints \(1\) and any \(x &gt; 0\) gives \(f(x) = f(1)\). But \(f(1) = \ln a - \ln 1 = \ln a\), since \(\ln 1 = 0\) (because \(e^{0} = 1\)). Hence \(f(x) = \ln a\) for all \(x &gt; 0\); that is, \(\ln(ax) - \ln x = \ln a\). Setting \(x = b\) gives \(\ln(ab) - \ln b = \ln a\), which rearranges to \(\ln(ab) = \ln a + \ln b\). <span class="qed qed-proof"></span></p>
     </div>
   </section>
 
@@ -216,12 +222,12 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>The product law converts a product <em>inside</em> the logarithm into a sum <em>outside</em> it: \(\ln(ab) = \ln a + \ln b\). It says nothing about a sum inside. In general \(\ln(a + b) \ne \ln a + \ln b\) — take \(a = b = 1\), where the left side is \(\ln 2\) and the right side is \(0\). Likewise \(\ln(a/b)\) is \(\ln a - \ln b\), not \(\ln a / \ln b\). The proof above earns the one identity that holds; it grants no licence to the look-alikes.</p>
+      <p>The product law converts a product <em>inside</em> the logarithm into a sum <em>outside</em> it: \(\ln(ab) = \ln a + \ln b\). It says nothing about a sum inside. In general \(\ln(a + b) \ne \ln a + \ln b\). Taking \(a = b = 1\) gives \(\ln 2\) on the left and \(0\) on the right. Likewise \(\ln(a/b)\) is \(\ln a - \ln b\), not \(\ln a / \ln b\). The proof above establishes the product law. It does not justify the similar-looking formulas.</p>
     </div>
   </section>
 
   <!-- expansion:example — Example 4.5 (§C-7, HW4): general powers a^x := e^{x ln a}; closes §4.1's deferred a^r question (D6) -->
-  <p>The product law is exactly what is needed to define powers with arbitrary real exponents — the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</p>
+  <p>The product law is exactly what is needed to define powers with arbitrary real exponents. That is the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.</p>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -256,7 +262,7 @@
   <h3 class="subsec-head">Why these functions are unavoidable</h3>
 
   <!-- expansion:application [pass: enrichment] — short capstone (§C-10, add-on taken): exponential growth/decay, half-life; ties the chapter's rigour back to why e^x and ln x matter -->
-  <p>The defining feature of the exponential, \((e^{x})' = e^{x}\), is exactly what makes it the right function for any quantity whose rate of change is proportional to its current size. If \(y(t)\) obeys \(y'(t) = k\,y(t)\) for a constant \(k\), then \(y(t) = y(0)\,e^{kt}\) — because \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 forces \(y(t)e^{-kt}\) to be the constant \(y(0)\) — the model behind population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), and continuously compounded interest. The logarithm enters the moment one inverts: for positive quantities and \(k \ne 0\), solving \(y(t) = y_{\ast}\) for the time gives \(t = (\ln y_{\ast} - \ln y(0))/k\). The radioactive half-life \(t_{1/2} = \ln 2 / \lvert k \rvert\) is just the case \(y_{\ast} = y(0)/2\). Everything this chapter built — the series definition, the exponent law, the rigorous derivatives, the inverse construction — is what makes these formulas genuinely well-defined rather than merely suggestive.</p>
+  <p>The defining feature of the exponential, \((e^{x})' = e^{x}\), is exactly what makes it the right function for any quantity whose rate of change is proportional to its current size. If \(y(t)\) obeys \(y'(t) = k\,y(t)\) for a constant \(k\), then \(y(t) = y(0)\,e^{kt}\). To see this, note that \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 shows that \(y(t)e^{-kt}\) is constant. Setting \(t = 0\) identifies that constant as \(y(0)\). This model describes population growth (\(k &gt; 0\)), radioactive decay (\(k &lt; 0\)), and continuously compounded interest. The logarithm enters the moment one inverts: for positive quantities and \(k \ne 0\), solving \(y(t) = y_{\ast}\) for the time gives \(t = (\ln y_{\ast} - \ln y(0))/k\). The radioactive half-life \(t_{1/2} = \ln 2 / \lvert k \rvert\) is just the case \(y_{\ast} = y(0)/2\). All the results established in this chapter — the series definition, the exponent law, the rigorous derivatives, the inverse construction — is what makes these formulas genuinely well-defined rather than merely suggestive.</p>
 
   <h3 class="subsec-head">Chapter summary</h3>
 
@@ -264,7 +270,7 @@
   <p>Chapter 4 set out to put \(e^{x}\) and \(\ln x\) on rigorous foundations, replacing the informal handling of Chapters 2 and 3 with theorems and proofs. Four strands ran through it.</p>
   <ul>
     <li><strong>The exponential function.</strong> \(e^{x} := \sum_{n=0}^{\infty} x^{n}/n!\) is defined by a power series (§4.1), shown convergent for every real \(x\) by geometric tail bounds; it is continuous on \(\mathbb{R}\) and obeys the exponent law \(e^{x}e^{y} = e^{x+y}\) (§4.2); and its derivative is itself, \((e^{x})' = e^{x}\), proved with the explicit bound \(\lvert (e^{h}-1)/h - 1 \rvert \le \lvert h \rvert\) for \(\lvert h \rvert &lt; \tfrac{1}{2}\) (§4.3).</li>
-    <li><strong>Real-analysis machinery.</strong> The completeness of \(\mathbb{R}\) — monotone bounded sequences converge — underwrites everything; from it follow the equivalence of convergence and the Cauchy condition (via Bolzano–Weierstrass) used to define \(e^{x}\), and the extreme value theorem used to launch the existence theorems.</li>
+    <li><strong>Real-analysis machinery.</strong> The completeness of \(\mathbb{R}\) — monotone bounded sequences converge — provides the basis for the later results; from it follow the equivalence of convergence and the Cauchy condition (via Bolzano–Weierstrass) used to define \(e^{x}\), and the extreme value theorem used to launch the existence theorems.</li>
     <li><strong>Existence theorems for differentiation.</strong> Theorem A locates the vanishing of the derivative at interior extrema; Rolle’s theorem follows; and the Mean Value Theorem follows from Rolle (§4.4). The MVT converts the sign of \(f'\) into monotonicity, and its borderline case \(f' = 0\) into constancy.</li>
     <li><strong>The logarithm.</strong> Because \(e^{x}\) is strictly increasing, it has an inverse \(\ln x\) on \((0, \infty)\) (§4.5); \(\ln\) is continuous, its derivative is \(1/x\), it converts products to sums, and through \(a^{x} = e^{x\ln a}\) it finally gives meaning to arbitrary real powers.</li>
   </ul>

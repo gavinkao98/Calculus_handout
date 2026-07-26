@@ -20,8 +20,9 @@
 // read --fig-N-* for this (in ch03 they are all `100%`, while the SVGs carry their own
 // inline width) — see out/figures.json.
 import { spawn } from "node:child_process";
-import { writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { resolve, join } from "node:path";
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from "node:fs";
+import { createServer } from "node:http";
+import { resolve, join, basename } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const CHROME = process.env.CHROME ?? [
@@ -45,6 +46,80 @@ mkdirSync(WRAPDIR, { recursive: true });
 
 const PORT = 9700 + (process.pid % 250);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// ── Local fonts, served over http (2026-07-26) ──────────────────────────────────────────
+// The standalone pulls its two typefaces from CDNs: Inter from Google Fonts and
+// New Computer Modern from jsDelivr (TYPESETTING_GUIDE §9.1). For SCREEN that is fine, but
+// for the print line it caused a measured defect: Google Fonts serves a SUBSET of Inter, and
+// U+2080 SUBSCRIPT ZERO is not in it. ch03's composed-mapping labels `x₀`/`u₀`/`y₀` therefore
+// printed the letter in Inter and the subscript in Times New Roman (Windows' last-resort
+// fallback), and the stray Times subsets then failed the glyph gate, which verifies CFF only
+// and refuses to silently skip what it cannot verify.
+// The repo already ships the COMPLETE Inter OTFs for LaTeX (template/fonts/inter/, U+2080
+// present in all six weights) and the LaTeX body text already uses the local NewCM10 OTFs.
+// So the two lines were only nominally on "the same font". Serving those same files to the
+// exporter makes them genuinely the same file, and as a side effect the export stops needing
+// the network at all.
+// Why an http server rather than file:// or data: URIs — a webfont is a CORS-checked
+// subresource and a file:// page is an opaque origin, so both fail with
+// "NetworkError: A network error occurred." even under --allow-file-access-from-files
+// (all three measured). http://127.0.0.1 is a normal origin, so the fonts just load.
+const INTER_DIR = resolve(new URL(".", import.meta.url).pathname.replace(/^\//, ""), "template/fonts/inter");
+const FONT_ROUTES = new Map();
+
+function route(file, abs) {
+  if (!existsSync(abs)) {
+    console.error(`font not found: ${abs}\nThe print line needs it; see TYPESETTING_GUIDE §9.1.`);
+    process.exit(1);
+  }
+  FONT_ROUTES.set("/fonts/" + file, abs);
+  return "/fonts/" + file;
+}
+
+// Inter only. New Computer Modern deliberately stays on the CDN: Chrome's OpenType
+// Sanitizer REJECTS the TeX-tree NewCM10 OTFs that LuaTeX uses —
+//     OTS parsing error: CFF : Failed validating CharStrings INDEX
+// for NewCM10-Regular.otf and NewCM10-Italic.otf (Bold and BoldItalic happen to pass).
+// So the browser cannot be pointed at the same NCM file the body text uses, and jsDelivr's
+// web-sanitised woff2 build of the same typeface remains the only thing it will accept.
+// That is also why the glyph gate still sees one unverifiable TrueType subset
+// (WebCM-Serif-10-Regular, used by the .fig-lyr annotations) — see REVIEW-ch03-plain-applied.
+const INTER = [["Regular", 400, "normal"], ["Medium", 500, "normal"], ["SemiBold", 600, "normal"],
+               ["Bold", 700, "normal"], ["Italic", 400, "italic"], ["BoldItalic", 700, "italic"]];
+
+const LOCAL_FONT_CSS = INTER.map(([name, wght, style]) => {
+  const url = route(`Inter-${name}.otf`, join(INTER_DIR, `Inter-${name}.otf`));
+  return `@font-face{font-family:"Inter";font-style:${style};font-weight:${wght};`
+    + `font-display:block;src:url("${url}") format("opentype")}`;
+}).join("");
+
+// Drop Google's Inter and install the complete local one. Both halves are required: leaving
+// Google's faces in place keeps their unicode-range-scoped subsets winning for latin, which
+// is precisely the half-local state that produced the Times fallback for U+2080.
+// jsDelivr (New Computer Modern) is deliberately left alone — see the note above.
+const GF_LINK = /<link[^>]*(?:googleapis|gstatic)[^>]*>/gi;
+const localize = (doc) => doc.replace(GF_LINK, "")
+  .replace("</head>", `<style>${LOCAL_FONT_CSS}</style></head>`);
+
+const FILE_PORT = PORT + 250;
+const server = createServer((req, res) => {
+  const path = decodeURIComponent(req.url.split("?")[0]);
+  if (FONT_ROUTES.has(path)) {
+    res.writeHead(200, { "content-type": "font/otf" });
+    res.end(readFileSync(FONT_ROUTES.get(path)));
+    return;
+  }
+  if (path.startsWith("/w/") && path.endsWith(".html")) {
+    const f = join(WRAPDIR, basename(path));
+    if (existsSync(f)) {
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      res.end(readFileSync(f));
+      return;
+    }
+  }
+  res.writeHead(404); res.end("not found");
+});
+await new Promise((r) => server.listen(FILE_PORT, "127.0.0.1", r));
 
 const proc = spawn(CHROME, [
   "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
@@ -80,6 +155,15 @@ const evalJs = async (expression) =>
 
 await cmd("Page.enable");
 await cmd("Runtime.enable");
+// Font rejections surface only here: a face that Chrome's sanitizer refuses reports a bare
+// "NetworkError" to FontFace.load(), while the reason ("Failed to decode downloaded font: …
+// OTS parsing error: …") goes to the browser log. Without this the failure is unguessable.
+const browserLog = [];
+ws.addEventListener("message", (ev) => {
+  const m = JSON.parse(ev.data);
+  if (m.method === "Log.entryAdded") browserLog.push(m.params.entry.text);
+});
+await cmd("Log.enable");
 
 // Same readiness signal as shot.mjs: #boot is dropped only after fragments assemble,
 // MathJax typesets, figures hydrate and pagination runs. readyState guards the window
@@ -87,7 +171,7 @@ await cmd("Runtime.enable");
 const readyExpr = "document.readyState!=='loading' && !document.getElementById('boot')";
 let ok = false;
 for (let i = 0; i < 240; i++) { if (await evalJs(readyExpr)) { ok = true; break; } await sleep(200); }
-if (!ok) { console.error("page never became ready"); proc.kill(); process.exit(1); }
+if (!ok) { console.error("page never became ready"); proc.kill(); server.close(); process.exit(1); }
 await evalJs("document.fonts.ready");   // webfonts decide text metrics -> measure after
 await sleep(400);
 
@@ -215,15 +299,16 @@ console.log(`column width = ${colWidth}px   panels = ${panels.length}`);
 const wanted = ONLY.length ? panels.filter((p) => ONLY.includes(p.id)) : panels;
 if (ONLY.length && wanted.length === 0) {
   console.error("no panel matched:", ONLY.join(", "));
-  proc.kill(); process.exit(1);
+  proc.kill(); server.close(); process.exit(1);
 }
 
 const manifest = [];
 for (const p of wanted) {
   const base = p.id + (panels.filter((q) => q.id === p.id).length > 1 ? "-" + (p.panel + 1) : "");
   const wrapFile = join(WRAPDIR, base + ".html");
-  writeFileSync(wrapFile, p.doc, "utf-8");
-  await cmd("Page.navigate", { url: pathToFileURL(resolve(wrapFile)).href });
+  writeFileSync(wrapFile, localize(p.doc), "utf-8");
+  // Served over http (not file://) so the local @font-face URLs above can actually load.
+  await cmd("Page.navigate", { url: `http://127.0.0.1:${FILE_PORT}/w/${base}.html` });
   await sleep(250);
   // Force every declared @font-face to actually load before printing. Awaiting
   // document.fonts.ready alone is NOT enough — measured: with the forced load removed,
@@ -237,14 +322,19 @@ for (const p of wanted) {
     return JSON.stringify({
       ncm: document.fonts.check('italic 12px "New Computer Modern"'),
       inter: document.fonts.check('12px Inter'),
+      // Per-face status: without it a false above says only "something is wrong", and the
+      // family/weight/style that actually failed is exactly what you need to fix it.
+      faces: [...document.fonts].map(f => f.family + '/' + f.style + '/' + f.weight + '=' + f.status),
     });
   })()`);
   const fs_ = JSON.parse(fontsOk);
   if (!fs_.ncm || !fs_.inter) {
     console.error(`  FAIL ${base}: webfont not loaded (NCM=${fs_.ncm} Inter=${fs_.inter}) — ` +
-      "figure text would silently fall back to Times/system sans. Check network access to " +
-      "cdn.jsdelivr.net and fonts.googleapis.com.");
-    proc.kill(); process.exit(1);
+      "figure text would silently fall back to Times/system sans. The faces are served from " +
+      "the local routes above; per-face status:\n    " +
+      (fs_.faces || []).filter((f) => /Computer|Inter/.test(f)).join("\n    ") +
+      (browserLog.length ? "\n  browser log:\n    " + browserLog.slice(-6).join("\n    ") : ""));
+    proc.kill(); server.close(); process.exit(1);
   }
   await sleep(150);
   const { data } = (await cmd("Page.printToPDF", {
@@ -269,5 +359,5 @@ for (const p of wanted) {
 writeFileSync(join(OUTDIR, "figures.json"),
   JSON.stringify({ colWidthPx: colWidth, liveWidthMm: 150, panels: manifest }, null, 2), "utf-8");
 console.log("manifest: " + join(OUTDIR, "figures.json"));
-proc.kill();
+proc.kill(); server.close();
 process.exit(0);

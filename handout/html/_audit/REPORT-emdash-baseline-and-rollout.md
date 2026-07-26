@@ -48,25 +48,28 @@
 
 **結論：** 五本真實課本落在 **0.09–3.40/1000**；數學書尤其貼近人類寫作的**地板**（改用括號／冒號／分號／短句——實測 APEX 248k 詞裡有 66,419 個 `(`、破折號幾乎為零）。**本書任何一章的 em-dash 密度都超過其中四本、多數超過全部五本**（見 §2）。這不是「差一點」，是差一到兩個數量級的 AI 指紋。
 
-## 2. 全書現況（canonical 重測，2026-07-25）
+## 2. 全書現況（canonical 重測；2026-07-26 合併回收後）
 
 `python tools/prose_metrics.py`。tic guard 四項（冒號接子句／分號／左括號／成對逗號）一併記為基線，供每輪比對。
 
 | 單元 | em-dash | canonical N | **/1000** | 冒號 | 分號 | 括號 | 雙逗號 | 狀態 |
 |---|--:|--:|--:|--:|--:|--:|--:|---|
+| **ch05** | 6 | 7,667 | **0.8** | 79 | 42 | 44 | 29 | ✅ 已達標（原 14.4；執行 115 條）——[`REVIEW-ch05-plain-applied.html`](REVIEW-ch05-plain-applied.html) |
+| **ch02** | 6 | 6,992 | **0.9** | 58 | 39 | 68 | 24 | ✅ 已達標（原 16.7；執行 109 條，Codex ADOPT 74／MODIFY 25／REJECT 1）——剩 3 對 KEEP；**LaTeX 線四閘全綠、`dist/ch02/` 已產出**。[`REVIEW-ch02-plain-applied.html`](REVIEW-ch02-plain-applied.html)、[`DIALECT-ch02.md`](../../latex/chapters/ch02/DIALECT-ch02.md) |
+| **ch06** | 8 | 5,742 | **1.4** | 41 | 33 | 52 | 35 | ✅ 已達標（原 12.5；2026-07-26 合併 sweep 落地 62 筆＋事後 1 筆 fence 措辭修正）——剩下 8 個＝**四處成對 KEEP**（`— \(0\) will do —`／`— for a negative or fractional exponent —`／`— usually cleaner —`／`— if it has any —`，Codex gate-2 Q4 四步判定全數確認）。**§6.5 節級 3.9 > 3.0 走明示節級例外**（使用者 2026-07-26 裁決）；成對逗號 +3 的理由見 applied §2。紀錄 [`REVIEW-ch06-plain-applied.html`](REVIEW-ch06-plain-applied.html) |
+| **ch03** | 6 | 3,855 | **1.6** | 33 | 18 | 59 | 34 | ✅ 已達標（原 14.0；執行 66 條）——[`REVIEW-ch03-plain-applied.html`](REVIEW-ch03-plain-applied.html) |
+| **ch07** | 14 | 8,937 | **1.6** | 92 | 36 | 56 | 43 | ✅ 已達標（原 17.5，全書超額最多的單元；執行 146 條）——[`REVIEW-ch07-plain-applied.html`](REVIEW-ch07-plain-applied.html) |
+| **ch01** | 12 | 5,810 | **2.1** | 42 | 20 | 37 | 41 | ✅ 已達標（原 9.3；執行 41 條）——剩下 12 個＝**手稿逐字 8**（4 對成對插入語，使用者裁決比照 §1.4 保留）＋**§1.4 凍結 4**；[`REVIEW-ch01-plain-applied.html`](REVIEW-ch01-plain-applied.html) |
 | **appB** | 17 | 7,793 | **2.2** | 99 | 32 | 48 | 25 | ✅ 已達標（原 17.1；~~舊尺 2.2~~） |
-| **ch01** | 12 | 5,811 | **2.1** | 42 | 20 | 37 | 41 | ✅ 已達標（原 9.3；2026-07-25 合併 sweep 執行 41 條）——剩下 12 個＝**手稿逐字 8**（4 對成對插入語，使用者裁決比照 §1.4 保留）＋**§1.4 凍結 4**；紀錄 [`REVIEW-ch01-plain-applied.html`](REVIEW-ch01-plain-applied.html) |
-| **ch06** | 8 | 5,750 | **1.4** | 41 | 33 | 52 | 35 | ✅ 已達標（原 12.5；2026-07-26 合併 sweep 落地 62 筆）——剩下 8 個＝**四處成對 KEEP**（`— \(0\) will do —`／`— for a negative or fractional exponent —`／`— usually cleaner —`／`— if it has any —`，Codex gate-2 Q4 四步判定全數確認）。**§6.5 節級 3.9 > 3.0 走明示節級例外**（使用者 2026-07-26 裁決）；成對逗號 +3 的理由見 applied §2。紀錄 [`REVIEW-ch06-plain-applied.html`](REVIEW-ch06-plain-applied.html) |
+| **ch04** | 16 | 6,967 | **2.3** | 68 | 43 | 82 | 27 | ✅ 已達標（原 13.3；執行 97 條）——[`REVIEW-ch04-plain-applied.html`](REVIEW-ch04-plain-applied.html) |
 | **appD** | 18 | 1,363 | **13.2** | 18 | 13 | 17 | 6 | ⏳ 待做——~~舊表誤標「0.9 無需處理」~~（entity bug） |
-| ch04 | 92 | 6,895 | 13.3 | 68 | 45 | 82 | 26 | ⏳ 待做（~~舊尺 8.1~~） |
-| ch03 | 54 | 3,855 | 14.0 | 36 | 20 | 60 | 28 | ⏳ 待做（~~舊尺 8.0~~） |
-| ch05 | 108 | 7,502 | 14.4 | 77 | 47 | 43 | 28 | ⏳ 待做（~~舊尺 10.7~~） |
-| ch02 | 116 | 6,942 | 16.7 | 58 | 43 | 66 | 21 | ⏳ 待做（~~舊尺 11.1~~） |
-| ch07 | 154 | 8,795 | 17.5 | 102 | 37 | 56 | 32 | ⏳ 待做（~~舊尺 13.2~~） |
 | appC | 24 | 1,347 | 17.8 | 8 | 15 | 7 | 3 | ⏳ 待做；**N<1000 附近，報 raw 24/1347**（~~舊尺 11.4~~） |
 | appA | 58 | 3,081 | 18.8 | 32 | 24 | 18 | 8 | ⏳ 待做，全書最高（~~舊尺 12.8~~） |
 
-**目標值 `T_can` ≤ 3.0/1000（canonical stream）。** 依據＝canonical 重測的真實教材基準（§1）：mooculus 0.0、APEX V5 0.5、CLP1 3.1。目標貼 CLP1（五本中最口語者）的上緣；已達標單元為 **appB 2.2** 與 **ch01 2.1**，兩者都落在 APEX 與 CLP1 之間。
+**進度：11 個單元中 7 個達標**（appB／ch01–ch05／ch07），剩 ch06（進行中）＋appA／appC／appD 三個附錄。
+2026-07-26 的合併回收一次併回六輪成果（ch02／ch03／ch04／ch05／ch07 五條分支，無衝突），**全書複測無任何單元回退**。
+
+**目標值 `T_can` ≤ 3.0/1000（canonical stream）。** 依據＝canonical 重測的真實教材基準（§1）：mooculus 0.0、APEX V5 0.5、CLP1 3.1。目標貼 CLP1（五本中最口語者）的上緣；已達標的七個單元落在 **0.8–2.3**，全數在 APEX（0.5）與 CLP1（3.1）之間。
 
 **ch01 順帶量到的手稿基線（2026-07-25，本線第一份真人對照）：** 手稿 [`legacy/tex_handout/chapters/ch01_foundations.tex`](../../../legacy/tex_handout/chapters/ch01_foundations.tex) 的**散文**（排除 itemize，與 canonical 同分母）em-dash **11／4,541 詞＝2.42/1000**，本來就在 `T_can` 之內；fragment 的 9.3 幾乎全來自 LLM 增補段落（54 處中手稿逐字僅 9，且**20 個單破折號尾巴全部是 LLM 寫的**）。這推翻了「ch01 的破折號節奏是作者招牌」的舊說法，也是「改用真實教材基準」政策轉向最強的一次驗證（詳見 [`REVIEW-ch01-plain-walk.html`](REVIEW-ch01-plain-walk.html) Gate 0）。
 
@@ -118,10 +121,10 @@
 | 1 | ch07 | 128 | 最新章，改完可當「新章標準流程」樣板 |
 | 2 | ch02 | 95 | |
 | 3 | ch05 | 86 | |
-| 4 | ch04 | 71 | |
-| ~~5~~ | **ch06** | ~~55~~ | ✅ **2026-07-26 完成**（第一個 canon 章＝無手稿、100% LLM 自產，用它驗證條款在無「作者聲音」豁免時的行為）。落地 62 筆、12.5→**1.4/1000**、**數學片段內容變動 0**（727→728，唯一新增 `\(\int f(x)\,dx\)`）、cross-ref 73→73 零遺失、分頁 36 頁 0 溢頁、9 張圖全部與首次提及同頁。段落層兩個離群已拆：§6.1 Caution 159→32/48/75、§6.5 章末摘要 167→63/61/43；§6.1 章 lead 152→133（不再觸發）。Codex gate-2 **ADOPT 38／MODIFY 21／REJECT 0**，抓到兩個我漏掉的真缺陷（`filling` 與同節「no way to tile」矛盾；`the table no longer applies` 被 arctan 那一列證偽）。Gate 6 自審另修回我自己引入的一處數學漏前提（`on a closed interval`）。**Gate 7（LaTeX）同日補做、四閘全綠、成品已產出**：`NAMES` 補 ch06、方言差集**只有 1 列**（裸 `span.qed` → `\qedmark`，由既有絆線測試接住）、12 panel 圖匯出；閘 1 編譯（28 頁／0 error／0 missing char）、閘 3 完整性（0 真落差）、閘 3c 圖內文字（6 條 note）、閘 4 字形（504 字形輪廓＋1 個圖內字型 pass-through）全 PASS。`dist/ch06/` ＝ chapter6.tex ＋ chapter6.pdf。**順帶修掉一個通用缺口**：圖標籤用 `\text{…}` 會讓 Chrome 把 MathJax 文字體嵌成 CID TrueType，字形閘只驗 CFF ⇒ 擋稿；已改為「與圖 PDF 逐位元組相同即判 pass-through」（ch05／ch07 會再撞）。紀錄 [`REVIEW-ch06-plain-applied.html`](REVIEW-ch06-plain-applied.html)、[`../../latex/chapters/ch06/DIALECT-ch06.md`](../../latex/chapters/ch06/DIALECT-ch06.md) |
+| ~~4~~ | **ch04** | ~~71~~ | ✅ **2026-07-26 完成**。97 條（gate 1 走查 84 → Codex gate-2 42 ADOPT／41 MODIFY／1 REJECT／13 new → triage）、13.3→2.3/1000、tic guard 無一上升、段落觸發器 4→0、HTML 分頁 41 頁不變。**Gate 0 推翻「手稿逐字」前提**：ch04 的 8-gram 逐字覆蓋率僅 1.6%（ch01 為 34.7%）。**Gate 7 四閘全綠**：`NAMES` 補 ch04、三個方言差集（數學區段內 `&lt;`／`&gt;` entity 未解碼〔全書首見〕、裸 `span.qed`、`env-corollary`）、6 panel 圖匯出；字形閘新增 glyf 比對路徑。`dist/ch04/` ＝ chapter4.tex ＋ chapter4.pdf（32 頁）。另補正 3 處數學嚴謹度缺口（N-08／N-12／y(0) 代 t=0）。紀錄 [`../../latex/chapters/ch04/DIALECT-ch04.md`](../../latex/chapters/ch04/DIALECT-ch04.md) |
+| ~~5~~ | **ch06** | ~~55~~ | ✅ **2026-07-26 完成**（canon 章＝無手稿、100% LLM 自產）。落地 62 筆、12.5→**1.4/1000**、**數學片段內容變動 0**（722→723，唯一新增 `\(\int f(x)\,dx\)`）、cross-ref 73→73 零遺失、HTML 分頁 36 頁 0 溢頁。段落層兩個離群已拆：§6.1 Caution 159→32/48/75、§6.5 章末摘要 167→63/61/43；§6.1 章 lead 152→133（不再觸發）。Codex gate-2 **ADOPT 38／MODIFY 21／REJECT 0**，抓到兩個我漏掉的真缺陷（`filling` 與同節「no way to tile」矛盾；`the table no longer applies` 被 arctan 那一列證偽）。Gate 6 自審另修回一處數學漏前提（`on a closed interval`）。**事後另修一處 fence 措辭**：§6.1 Caution 原承諾「proof … is given in the Proof-Track appendix」，但 PLAN-ch06 已於 2026-07-10 裁定「NO §D.4」，該證明依決策不存在——改為與 §6.2 一致的 on-credit 措辭。**Gate 7 四閘全綠**：`NAMES` 補 ch06、12 panel 圖匯出、方言差集 0（裸 `span.qed` 已由 ch04 那輪補上）。`dist/ch06/` ＝ chapter6.tex ＋ chapter6.pdf。紀錄 [`../../latex/chapters/ch06/DIALECT-ch06.md`](../../latex/chapters/ch06/DIALECT-ch06.md) |
 | 6 | appA | 49 | |
-| 7 | ch03 | 42 | |
+| ~~7~~ | **ch03** | ~~42~~ | ✅ **2026-07-25 完成**。執行 66 條（走查 50＋Codex Q6 第二波 16）、14.0→1.6/1000、既有數學片段零改動、分頁 27 頁不變；Codex gate-2 ADOPT 38／MODIFY 12／REJECT 0（抓到一處既有課文錯誤：continuity 只管差商的第一個因子）。**Gate 7（LaTeX）四閘全綠、`dist/ch03/` 成品已產出**（完整性閘的假紅修法＝`check_prose.py` 改用 `pdftotext -raw`；字形閘的 Times 後備修法＝圖匯出改用 repo 內附的完整 Inter，Google Fonts 的子集不含 U+2080）。紀錄 [`REVIEW-ch03-plain-applied.html`](REVIEW-ch03-plain-applied.html) |
 | ~~8~~ | **ch01** | ~~37~~ | ✅ **2026-07-25 完成**（提前做：RC 後第一個回填單元，用它驗證條款在手稿章不誤傷）。執行 41 條、9.3→2.1/1000、數學片段零差異、分頁 53 頁不變、§1.4 對照組零改動；Codex gate-2 ADOPT 34／MODIFY 7／REJECT 1。**Gate 7（LaTeX）四閘全綠、成品已產出**：`NAMES` 補 ch01、九條方言 mapping、33 panel 圖匯出；閘 1 編譯（44 頁／0 error／0 missing char／0 overfull）、閘 3 完整性（0 真落差）、閘 3b 表格（新增，18 格）、閘 3c 圖內文字（13 條 note）、閘 4 字形（489 字形輪廓）全 PASS。`dist/ch01/` ＝ chapter1.tex ＋ chapter1.pdf。多 panel 圖的 grid 版面 2026-07-26 補上（Figure 1.1 併成一列、Figure 1.17 排 2×2，圖說不再孤立）。紀錄 [`../../latex/chapters/ch01/DIALECT-ch01.md`](../../latex/chapters/ch01/DIALECT-ch01.md) |
 | 9 | appC | 20 | N<1000 附近，報 raw 並與鄰近單元合併判定 |
 | 10 | appD | 14 | 舊表誤標「免」，實需處理 |

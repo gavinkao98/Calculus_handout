@@ -124,7 +124,15 @@ class MathPassthrough(unittest.TestCase):
         for f in ("sec-3-1", "sec-3-2", "sec-3-3"):
             src_math += naive_scan_math(
                 (HTML_LINE / "fragments" / "ch03" / f"{f}.html").read_text(encoding="utf-8"))
-        self.assertEqual(len(src_math), 605, "數學區段數應為 605（M-P0 盤點）")
+        # 普查錨：防止下面的「依序、恰好一次」不變式被空集合／縮水的集合空洗過關。
+        # 內容合法增減時要跟著更新，並在此記錄原因（否則下次沒人知道數字為何變）。
+        #   605 = M-P0 盤點（2026-07-16）
+        #   612 = 2026-07-26 ch03 散文平實化回填後：淨 +7 個行內式，全部是既有記號的再指涉
+        #         （W-04 把 \(\sin(x+h)\) 改成差商真正的分子 \(\sin(x+h)-\sin x\)；C-03／C-04
+        #          寫出實際代數結果；W-34／W-43 補主詞；W-47 以實際 identity 取代 "their kin"；
+        #          C-09 補代入方向的 \(g\)／\(f\)）。既有式子 0 處改動，display 式數量不變。
+        #         證據：handout/html/_audit/REVIEW-ch03-plain-applied.html「Gate 5」節。
+        self.assertEqual(len(src_math), 612, "數學區段數應為 612（見上方普查錨沿革）")
 
         # 依序：每段必須出現在前一段之後（驗得到順序，也驗得到遺漏）
         pos = 0
@@ -192,6 +200,26 @@ class MathScannerClosure(unittest.TestCase):
         self.assertIn(r"{Name \(a\)}", out)
         self.assertIn(r"Body \(b\)", out)
         self.assertLess(out.index(r"\(a\)"), out.index(r"\(b\)"))
+
+    def test_env_kicker_math_is_restored(self):
+        # 自訂 proof 標籤會帶數學（ch05 §5.7 "Proof of the \(0/0\) case, \(a\) finite"、
+        # appD §D.3 同型）。kicker 原本只走 esc()，占位符不還原＝數學被丟掉，由不變式
+        # 擋下（ch05 rollout 實際觸發：sec-5-7 缺席 [65, 66]）。改走 restore(esc(...))。
+        out = conv(wrap('<section class="env env-proof"><p class="env-head">'
+                        r'<span class="env-kicker">Proof of the \(\tfrac{0}{0}\) case, \(a\) finite</span></p>'
+                        r'<div class="env-body"><p>Body \(b\)</p></div></section>'))
+        self.assertIn(r"{Proof of the \(\tfrac{0}{0}\) case, \(a\) finite}", out)
+        self.assertLess(out.index(r"\(a\)"), out.index(r"\(b\)"))
+
+    def test_env_kicker_math_ordering_before_env_name(self):
+        # kicker 與 name 同時帶數學時，還原順序須等同源順序（kicker 在 name 之前），
+        # 否則 used=[1,0] 會讓正確輸出被不變式誤擋。
+        out = conv(wrap('<section class="env env-theorem"><p class="env-head">'
+                        r'<span class="env-kicker">Case \(k\)</span>'
+                        r'<span class="env-name">Name \(n\)</span></p>'
+                        r'<div class="env-body"><p>Body \(b\)</p></div></section>'))
+        self.assertLess(out.index(r"\(k\)"), out.index(r"\(n\)"))
+        self.assertLess(out.index(r"\(n\)"), out.index(r"\(b\)"))
 
     def test_forged_sentinel_in_prose_is_caught(self):
         # 課文可用 &#xE000; 偽造占位符。不靠「不會有人這樣寫」，靠不變式擋。
@@ -376,6 +404,38 @@ class AppBMappings(unittest.TestCase):
         out = conv(wrap('<p style="text-align:center;">(i)&ensp;&ensp;for every</p>'))
         self.assertIn(r"(i)\enspace{}\enspace{}for every", out)
 
+    def test_plain_qed_span_inline(self):
+        # ch04 差集：worked-solution 的收尾用素 qed（×6 在 <p> 句尾）。原本的
+        # test_plain_qed_span_rejected 是哨兵（「哪天 fragment 加了要硬錯提醒補 mapping」），
+        # ch04 rollout 觸發後 mapping 已凍結，哨兵改為正面測試。
+        out = conv(wrap('<p>done <span class="qed"></span></p>'))
+        self.assertIn(r"done \qedmark", out)
+
+    def test_plain_qed_span_block(self):
+        # ch04 §4.1 Example 4.1：收尾記號放在 env-body 的區塊位置（不在 <p> 內）
+        out = conv(wrap('<section class="env env-remark"><p class="env-head">'
+                        '<span class="env-kicker">Remark</span></p>'
+                        '<div class="env-body"><p>done.</p><span class="qed"></span>'
+                        '</div></section>'))
+        self.assertIn(r"\qedmark", out)
+
+    def test_env_corollary(self):
+        # ch04 差集：×4（模板早有 envcorollary）
+        out = conv(wrap('<section class="env env-corollary"><p class="env-head">'
+                        '<span class="env-kicker">Corollary</span>'
+                        '<span class="env-num">4.1</span></p>'
+                        '<div class="env-body"><p>x.</p></div></section>'))
+        self.assertIn(r"\begin{envcorollary}{Corollary}{4.1}{}", out)
+
+    def test_math_entity_decoded(self):
+        # ch04 差集：HTML 文字節點不能寫裸 `<`，故 fragment 寫 &lt;／&gt;；MathJax 收到的是
+        # 解碼後的字元，轉換器也必須解碼，否則 LaTeX 拿到 `&` 會當成 alignment tab 而炸掉。
+        out = conv(wrap(r'<p>Case 2: \(m &lt; M\) and \(a &gt; b\).</p>'))
+        self.assertIn(r"\(m < M\)", out)
+        self.assertIn(r"\(a > b\)", out)
+        self.assertNotIn("&lt;", out)
+        self.assertNotIn("&gt;", out)
+
     def test_qed_proof_marker(self):
         out = conv(wrap('<section class="env env-proof"><p class="env-head">'
                         '<span class="env-kicker">Proof</span></p>'
@@ -383,12 +443,6 @@ class AppBMappings(unittest.TestCase):
                         '</div></section>'))
         self.assertIn("done. \\qedmark", out)
         self.assertIn(r"\begin{envproof}{Proof}{}{}", out)
-
-    def test_plain_qed_marker(self):
-        # ch06 差集：worked-solution 收尾用素 `span.qed`（HTML 側與 qed-proof 都是空心
-        # 方框，只差框線色）。兩變體同映 \qedmark。
-        out = conv(wrap('<p>done. <span class="qed"></span></p>'))
-        self.assertIn("done. \\qedmark", out)
 
     def test_opener_ul_becomes_objectives(self):
         out = conv(wrap('<header class="chapter-head"><div class="ch-kicker">Appendix B</div>'
@@ -475,16 +529,18 @@ class FailLoud(unittest.TestCase):
         # 素 <strong> 自 M-B2 起是 appB 差集的 run-in 標籤；帶 class 的仍屬表外
         self.assertRejects('<p>a <strong class="mystery">b</strong></p>', "inline")
 
-    def test_other_qed_variant_rejected(self):
-        # 凍結的只有 qed 與 qed qed-proof 兩個變體；第三種 class 組合仍要硬錯提醒補 mapping
-        # （原 test_plain_qed_span_rejected 是「素 qed 未凍結」的絆線，ch06 觸發後已補 mapping）
-        self.assertRejects('<p>done <span class="qed qed-solution"></span></p>', "span")
-
     def test_qed_span_with_content_rejected(self):
         self.assertRejects('<p>done <span class="qed qed-proof">x</span></p>', "空元素")
 
     def test_plain_qed_span_with_content_rejected(self):
+        # ch04 差集的素 qed 同樣必須是空元素
         self.assertRejects('<p>done <span class="qed">x</span></p>', "空元素")
+
+    def test_math_unfrozen_entity_rejected(self):
+        # 白名單外的 entity 硬錯——理由同 entity 反斜線守衛：瀏覽器解碼、轉換器不解，語義分岔
+        with self.assertRaises(MathScanError) as cm:
+            conv(wrap(r'<p>\(x &amp; y\)</p>'))
+        self.assertIn("未凍結的 entity", str(cm.exception))
 
     def test_br_outside_center_rejected(self):
         self.assertRejects("<p>a<br>b</p>", "br")

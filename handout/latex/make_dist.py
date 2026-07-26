@@ -31,7 +31,10 @@ HERE = Path(__file__).resolve().parent
 NAMES = {
     "appB": "appendixB",
     "ch01": "chapter1",
+    "ch02": "chapter2",
     "ch03": "chapter3",
+    "ch04": "chapter4",
+    "ch05": "chapter5",
     "ch06": "chapter6",
 }
 
@@ -109,8 +112,7 @@ def make(ch_id):
     # 閘 3 讀 ToUnicode 文字層、閘 4 讀嵌入字形輪廓，三個維度互不覆蓋）。
     pdf = out_dir / f"{name}.pdf"
     gate("完整性閘", ["check_prose.py", ch_id, str(pdf)])
-    # 第二參數＝該章圖資產夾：圖 PDF 帶進來的字型走 pass-through 判準（見 check_glyphs 說明）
-    gate("字形閘", ["check_glyphs.py", str(pdf), str(HERE / "chapters" / ch_id / "figs")])
+    gate("字形閘", ["check_glyphs.py", str(pdf)])
 
     # 資料夾潔癖：任何落在成品夾的編譯殘渣都清掉（成品夾永遠只有 .tex＋.pdf）
     for p in out_dir.iterdir():
