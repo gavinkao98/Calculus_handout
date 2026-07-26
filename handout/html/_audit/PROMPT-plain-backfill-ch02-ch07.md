@@ -26,7 +26,18 @@
 
 ## 平行執行的三條紀律（每個 session 都必須遵守）
 
-1. **一章一分支**：`handout/plain-chNN`。不要 commit 到 `main`，也不要跟別章共用分支。
+1. **一章一 worktree**（原寫「一章一分支」，2026-07-26 ch03 輪實證修正）：
+   `git worktree add .claude/worktrees/plain-chNN handout/plain-chNN`，在**自己的目錄裡**做。
+   ⚠️ **分支不是隔離機制。** 多個 session 共用同一個工作目錄時 **HEAD 只有一個**：ch03 那輪開跑時
+   建了 `handout/plain-ch03`，執行途中 HEAD 被別的 session 切成 `plain-ch04`、再切成 `main`，
+   工作樹裡的 ch03 fragment 也被換成別的版本，**寫進工作樹但尚未 commit 的修改直接消失**
+   （當時是 `check_prose.py` 與 `test_convert.py` 兩個檔）。已 commit 的不會丟，但「編輯 → 驗證 → 提交」
+   這段窗口完全不受保護，而那正是一輪裡最長的一段。
+   不得已要共用工作樹時：用 `git commit-tree`／`update-ref` 這種**不動 HEAD 與 index** 的方式提交，
+   且每次寫檔前後重新確認 `git rev-parse --abbrev-ref HEAD`。
+   另注意：以自己的分支為基底提交前，先確認該分支**不落後 `main`**——ch03 那輪第一次提交時
+   `plain-ch03` 的基底比 main 舊，於是把別條線對 `check_prose.py`／`test_convert.py` 的修改
+   一起夾帶進了自己的 commit，事後得重建整條鏈才修好。
 2. **不動共用檔**：**MUST NOT** 編輯 `handout/html/_audit/REPORT-emdash-baseline-and-rollout.md`（rollout 帳本）與 `handout/latex/make_dist.py` 的 `NAMES` 表——這兩處平行寫必衝突。把新的密度與 tic guard 數字**寫進自己的 applied 報告**，並在報告末尾留一行「待併：rollout 帳本 §2 的 chNN 列」。
 3. **build 一定帶參數**：`python handout/html/build.py chNN`。無參數版會重建全部 standalone、蓋掉別章成果。
 
