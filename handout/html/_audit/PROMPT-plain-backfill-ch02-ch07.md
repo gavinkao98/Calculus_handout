@@ -3,6 +3,27 @@
 > 每章一段，各自貼進**不同的新對話**。ch01 見 [`PROMPT-plain-backfill-ch01.md`](PROMPT-plain-backfill-ch01.md)。
 > 流程權威＝[`KICKOFF-plain-backfill.md`](KICKOFF-plain-backfill.md)；判準權威＝[`CONTENT_SPEC.md`](../../../CONTENT_SPEC.md) §3〈平實英文條款〉（RC，2026-07-25 凍結）。本檔只給**各章的 delta**：專屬前提＋起跑基線。
 
+> ## ⚠️ 2026-07-26 前提修正：ch02／ch03／ch04 的 fragment **不是**手稿逐字
+>
+> 本檔下方 ch02／ch03／ch04 三段都寫著「是手稿章（內容逐字取自手稿）→ 預期詞彙層 findings 遠少於 canon 章」。
+> **三輪各自獨立實測後推翻**——fragment 的散文早已被重寫，手稿只提供了數學與結構：
+>
+> | 章 | fragment 對手稿的 6-gram 重疊 | 8-gram | 手稿逐字的 dash | 判讀 |
+> |---|--:|--:|--:|---|
+> | ch01 | 38.2% | 34.6% | 8／54 | **真手稿章**——ch01 先例的「手稿逐字保留」有實體對象 |
+> | ch02 | 3.2% | 2.5% | **0／116** | 散文已重寫 |
+> | ch03 | 0.7% | 0.1% | **0／54** | 散文幾乎完全重寫 |
+> | ch04 | 3.2% | 1.5% | 2／92 | 散文已重寫（僅 2 對成對插入語命中，K-02／K-05） |
+>
+> **對後續輪次的教訓（appA／appC／appD 與任何新單元照此辦理）**：
+> **Gate 0 要先量重疊率，再決定要不要套「手稿逐字保留」**，不要照 ch01 先例直接假設 provenance。
+> 「手稿逐字的成對插入語保留」這條使用者裁決**本身仍然有效**，只是在 ch02／ch03 沒有適用對象、ch04 只有兩處。
+> 詞彙層 findings 也要按 **canon 章**的預期看（ch02 實測 29 條 R1、ch03 與 ch04 同量級），乾淨不是預設值。
+>
+> 證據：各章 walk 報告的 Gate 0 段（[`REVIEW-ch02-plain-walk.html`](REVIEW-ch02-plain-walk.html)、
+> [`REVIEW-ch03-plain-walk.html`](REVIEW-ch03-plain-walk.html)、[`REVIEW-ch04-plain-walk.html`](REVIEW-ch04-plain-walk.html)）。
+> 下方各章 prompt 保留原貌（已執行完畢的歷史紀錄），**不回頭改寫**；以本框為準。
+
 ## 平行執行的三條紀律（每個 session 都必須遵守）
 
 1. **一章一分支**：`handout/plain-chNN`。不要 commit 到 `main`，也不要跟別章共用分支。
@@ -243,14 +264,25 @@ build 一定帶參數（python handout/html/build.py ch07）。
 
 ---
 
-## 合併回收（各章跑完後由一個 session 統一做）
+## 合併回收（各章跑完後由一個 session 統一做） — ✅ 2026-07-26 執行完畢
 
-平行輪刻意讓各 session **不動** rollout 帳本與 `NAMES` 表，因此收尾要有人一次補齊：
+平行輪刻意讓各 session **不動** rollout 帳本與 `NAMES` 表，收尾由一個 session 一次補齊。本輪結果：
 
-1. 依序把 `handout/plain-chNN` 各分支併回 `main`（衝突只可能出現在 standalone，各章不同檔，實際應為 ff 或無衝突）。
-2. 用各章 applied 報告末尾的「待併」數字，一次更新 `REPORT-emdash-baseline-and-rollout.md` §2 的密度與 tic guard 四項並打勾。
-3. 若要讓 ch02／ch04–ch07 進 LaTeX 線，補 `make_dist.py` 的 `NAMES` 表（一次補完，之後逐章跑三閘）。
-4. 全書複測：`python tools/prose_metrics.py`，確認每章 ≤3.0/1000、無單元回退。
+1. **合併**：`handout/plain-ch02`／`-ch03`／`-ch04`／`-ch05`／`-ch07` 五條分支以 `--no-ff` 併回 `main`，**全部無衝突**。
+   兩組重複 patch 如預期自行化解：`1f139e3`＝`2214786`（完整性閘 oracle 修正，ch02 從 ch03 cherry-pick）為同一 patch-id；
+   ch04 的 applied 報告有 `a7afbcc`／`df3b30e` 兩個同名 commit，最終內容相同。
+   **`handout/plain-ch06` 未併**——該輪只有走查與 Codex raw（未追蹤），尚無內容 commit；併它只會帶進一個 ch04 的 doc commit。
+2. **rollout 帳本**：`REPORT-emdash-baseline-and-rollout.md` §2 已改寫為合併後的實測值並打勾（11 個單元中 7 個達標）。
+3. **`NAMES` 表：刻意只補到 ch02，不預先補 ch04–ch07。** 理由：ch02 的 rollout 實證每章都要真做一輪
+   （方言差集、圖匯出、字形閘），只加 `NAMES` 而沒有 `chapters/<ch>/figs/` 與 mapping，`make_dist.py` 會在
+   fail-loud 的地方硬錯，等於留一個假的「已支援」訊號。ch04 的 rollout 正由另一個 session 進行中
+   （其 worktree 有未提交的 `convert.py`／`make_dist.py`／`test_convert.py` 與 `dist/ch04/`），
+   由該輪自己補 `NAMES` 才不會兩邊搶同一行。現況＝`appB`／`ch01`／`ch02`／`ch03`。
+4. **全書複測**：`python tools/prose_metrics.py` — **無任何單元回退**，已達標七個單元落在 0.8–2.3。
+   LaTeX 線整合回歸同時跑過：轉換器 83/83、字形閘（appB 362／ch01 489／ch02 467+8）全 PASS、
+   完整性閘三單元 0 處真落差。
+
+**剩餘工作**：ch06（進行中）＋ appA 18.8／appC 17.8／appD 13.2。
 
 ---
 *本檔 2026-07-25 建立。判準變更一律改 `CONTENT_SPEC.md` §3（RC 凍結，需「同一規則在三節以上反覆誤判」才夠格），不在本檔另立規則。*
