@@ -77,6 +77,11 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   KICKOFF §4.5 閘 4）：fonttools 讀原始字型輪廓、pymupdf 讀 PDF 嵌入字型。缺了閘跑不動，
   而該閘擋的是「PDF 文字層全對、印出來是別的字」這種 pdftotext 驗不出來的病（沿革見 KICKOFF
   狀態區塊的 Inter node-mode bug）——別因為它們在 doctor 裡標 optional 就跳過不裝。
+  **2026-07-26 再加 `Brotli`**（ch04 首個把襯線標籤帶進圖的章）：圖由 headless Chrome 重繪，
+  面板標籤用 standalone 的 web New Computer Modern，那份 woff2 是 TrueType-flavored，
+  於是圖 PDF 嵌的是 FontFile2；字形閘為此加了 glyf 比對路徑，而它的基準是 vendored 的
+  woff2（[`handout/latex/template/fonts/webcm/`](handout/latex/template/fonts/webcm/)），
+  fontTools 要解 woff2 就需要 Brotli。缺它 → 字形閘對圖裡的字型 FAIL 並指名（不會靜默略過）。
 
 ### ② ffmpeg / ffprobe — 裝真正的全套（策略 A）
 - `make.py` 的 compose 與 `critic.py` 抽幀用**裸名** `ffmpeg`／`ffprobe` 呼叫，必須在 PATH 上。

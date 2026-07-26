@@ -1,0 +1,788 @@
+% !TeX program = lualatex
+% ============================================================
+% chapter4.tex — ch04 出版成品（自動產生，勿手改）
+% 產生：cd handout/latex && python make_dist.py ch04
+%   內容源＝handout/html/fragments/ch04/（fragment 唯讀；數學逐位元組 pass-through）
+%   樣式源＝../../template/calcbook.sty（M-B1 拍板模板）
+% 直接重編（本資料夾為 CWD；aux 進 build/、資料夾保持兩檔）：
+%   latexmk -lualatex -auxdir=../../build/aux-ch04 chapter4.tex
+% ============================================================
+\documentclass[a4paper,12pt,oneside]{memoir}
+\makeatletter\def\input@path{{../../template/}}\makeatother
+\def\cbfontsdir{../../template/fonts/inter/}
+\usepackage{calcbook}
+% 圖：emitter 射 `<ch>/<stem>`（見 convert.py），故 graphicspath 指向 chapters/ 上層。
+% 模板內的 {../figs/} 是 chapters/<ch>/ 為 CWD 時的路徑，dist/<ch>/ 需這一行覆寫。
+\graphicspath{{../../chapters/}}
+\begin{document}
+\chapteropener{Chapter 4}{The Exponential and Logarithmic Functions}
+\begin{lead}
+We have already used the natural exponential function \(e^{x}\) many times. It appeared in Chapter 2, where we wrote down its power series, computed its derivative \((e^{x})' = e^{x}\) by a quick term-by-term argument, and used it. In Chapter 3, we used it again alongside its inverse \(\ln x\). All of that was on credit. This chapter goes back and pays the debt: we \emph{define} \(e^{x}\) by its power series, prove that the series converges using the completeness of the real numbers, establish continuity and the exponent law \(e^{x} e^{y} = e^{x + y}\) as theorems, re-derive the derivative with an explicit error bound, and finally build \(\ln x\) as the inverse of \(e^{x}\).
+\end{lead}
+Before we define the logarithm, we need two existence theorems: Rolle’s theorem and the Mean Value Theorem. Later chapters use both in applications of the derivative. By the end, every property of \(e^{x}\) and \(\ln x\) we have used so far will rest on a proof.
+
+\parahead{By the end of this chapter, you will be able to:}
+\begin{objectives}
+  \item state the power-series definition of \(e^{x}\) and bound the tail of the series to prove it converges on all of \(\mathbb{R}\);
+  \item prove that \(e^{x}\) is continuous on \(\mathbb{R}\) and satisfies the exponent law \(e^{x} e^{y} = e^{x + y}\);
+  \item re-derive \(\dfrac{d}{dx} e^{x} = e^{x}\) rigorously, using the bound \(\bigl\lvert \tfrac{e^{h} - 1}{h} - 1 \bigr\rvert \le \lvert h \rvert\) near \(h = 0\);
+  \item state and prove Rolle’s theorem and the Mean Value Theorem;
+  \item use the Mean Value Theorem to show that \(f' \ge 0\) on an interval forces \(f\) to be increasing there;
+  \item define \(\ln x\) as the inverse of \(e^{x}\), prove its continuity, and derive \(\dfrac{d}{dx} \ln x = \dfrac{1}{x}\) without circular reasoning.
+\end{objectives}
+A note on how to read this chapter. This is the book’s \emph{foundation chapter}, where the results used on credit since Chapter 2 are finally proved. More of this chapter is proof than computation. The results to carry forward are few: \(e^{x}\) exists, is continuous, and obeys \(e^{x} e^{y} = e^{x + y}\) (§4.1–§4.2); its derivative is itself, now proved (§4.3); the Mean Value Theorem and its monotonicity consequences (§4.4); and the logarithm with \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) (§4.5). \emph{Proof track} notes in the sections below mark the long arguments that can wait for a second pass: on a first reading, take the statements, work the examples of §4.4–§4.5, and come back later to watch the debt being paid in full.
+
+\sechead{4.1}{Construction of the Exponential Function}
+When \(e^{x}\) first appeared, we treated its power series as a fact about an already-known function and inferred properties directly from it. In this chapter, we reverse that order. We take the series itself as the \emph{definition} of \(e^{x}\), and then everything we are used to assuming — that the series adds up to a finite number at all, that the function is continuous, that \(e^{x} e^{y} = e^{x + y}\) — becomes a claim that must be proved. This section takes the first two steps: it motivates the series definition by building up powers \(a^{q}\) for rational \(q\), and then it proves that the series converges when \(x > 0\), using the completeness of the real numbers. Continuity and the exponent law wait until §4.2; the rigorous derivative waits until §4.3.
+
+\subsechead{From rational exponents to the series definition}
+For a base \(a > 0\) and a positive integer \(n\), the symbol \(a^{n}\) means the product of \(n\) copies of \(a\). To make sense of a root, we define \(a^{1/m}\), for a positive integer \(m\), to be the unique positive real number \(x\) satisfying \(x^{m} = a\); that is, the positive \(m\)-th root of \(a\). Combining the two, for a positive rational \(q = n/m\) we set
+
+\[ a^{q} = \bigl(a^{1/m}\bigr)^{n}. \]
+
+With this definition the familiar laws of exponents, \(a^{q_{1}} a^{q_{2}} = a^{q_{1} + q_{2}}\) and \(\bigl(a^{q_{1}}\bigr)^{q_{2}} = a^{q_{1} q_{2}}\), hold for all rational exponents.
+
+This leaves a natural question: how should we define \(a^{r}\) when the exponent \(r\) is \emph{irrational}? One option is to approximate \(r\) by a sequence of rationals \(q_{n} \to r\) and define \(a^{r}\) as the limit of \(a^{q_{n}}\). But this forces us to prove that the limit exists and does not depend on which sequence we chose. A cleaner path, and the one this chapter follows, is to define a single function \(e^{x}\) directly by a power series, and then recover general powers through \(a^{x} = e^{x \ln a}\). The construction of \(\ln a\) is the subject of §4.5; for now we concentrate on \(e^{x}\) itself.
+
+\begin{envdefinition}{Definition}{4.1}{}
+For \(x > 0\), the \emph{natural exponential function} is defined by the power series \[ e^{x} = \sum_{n = 0}^{\infty} \frac{x^{n}}{n!} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots, \] where by convention \(0! = 1\) and \(n! = 1 \cdot 2 \cdot 3 \cdots n\). (The same series turns out to converge for every real \(x\); we establish the case \(x > 0\) here and extend it to all of \(\mathbb{R}\) in §4.2.)
+
+\begin{informal}
+Informally, we are promoting the power series that elementary calculus \emph{derives} for \(e^{x}\) to the status of a \emph{definition}. Nothing about \(e^{x}\) is assumed in advance; every property we want must be recovered from this one formula.
+\end{informal}
+\end{envdefinition}
+\begin{envcaution}{Caution}{}{}
+The series \emph{defines} \(e^{x}\); it is not a property of some independently known function that we are merely recording. Every fact we want to use — that the sum is finite, that \(e^{x}\) is continuous, that \(e^{x} e^{y} = e^{x + y}\), that \((e^{x})' = e^{x}\) — must be \emph{proved} from this definition, not borrowed from earlier experience. The casual derivation of the derivative back in Chapter 2 used the series in exactly this role but set the convergence and continuity questions aside; this chapter settles them.
+\end{envcaution}
+The first thing to check is that the series in Definition 4.1 actually adds up to a finite number. The argument rests on a structural property of the real numbers, which we record next.
+
+\subsechead{The completeness of the real numbers}
+A series is the limit of its partial sums, and to know that a limit exists we need some guarantee built into the number system itself. The guarantee we use is that a sequence which climbs steadily but is held below some ceiling must approach a limiting value. The corresponding statement, with the inequalities reversed, holds for a non-increasing sequence that is bounded below.
+
+\begin{envtheorem}{Theorem}{4.1}{Completeness of the real numbers}
+Let \(\{a_{n}\}_{n = 1}^{\infty}\) be a sequence of real numbers.
+
+\begin{warmuplist}
+  \item If \(a_{1} \le a_{2} \le \cdots \le a_{n} \le \cdots \le M\) is non-decreasing and bounded above by some \(M \in \mathbb{R}\), then \(\displaystyle\lim_{n \to \infty} a_{n}\) exists.
+  \item If \(a_{1} \ge a_{2} \ge \cdots \ge a_{n} \ge \cdots \ge L\) is non-increasing and bounded below by some \(L \in \mathbb{R}\), then \(\displaystyle\lim_{n \to \infty} a_{n}\) exists.
+\end{warmuplist}
+(This is a basic structural \emph{property} of \(\mathbb{R}\); we take it as a stated theorem and do not prove it here.)
+\end{envtheorem}
+\begin{envremark}{Remark}{4.1}{}
+Completeness is precisely what distinguishes \(\mathbb{R}\) from \(\mathbb{Q}\). Within the rationals the statement is false: the sequence \(3,\ 3.1,\ 3.14,\ 3.141,\ \dots\) is non-decreasing and bounded above by \(4\), yet it has no rational limit (its limit, \(\pi\), is irrational). Many of the existence theorems of calculus ultimately trace back to this single property. It is what guarantees that a bounded monotone sequence has a limit, that a continuous function on a closed interval attains a maximum, and that \(x^{n} = a\) has a positive solution for \(a > 0\). Here we use it to manufacture the value of an infinite series.
+\end{envremark}
+Figure 4.1 pictures the real-number side of this principle: the sequence terms are isolated dots approaching a limiting level, not points on a continuous curve.
+
+\begin{figureblock}
+  \includegraphics[width=85.72mm]{ch04/figs/completeness-bound}
+\figcaption{Figure 4.1}{A monotone bounded sequence in \(\mathbb{R}\): the terms climb toward a limiting level \(L\) while staying below \(M\).}
+\end{figureblock}
+\subsechead{Convergence of the series for \(x > 0\)}
+The plan is to bound the tail of the series \(\sum x^{n}/n!\) by a geometric series. Once the tail is controlled, the partial sums are non-decreasing and bounded above, so Theorem 4.1 guarantees that they have a limit. The technique is worth isolating, because it returns several times in this section and the next.
+
+\begin{envstrategy}{Strategy}{4.1}{Bounding a series by a geometric tail}
+To show that a series of positive terms \(\sum a_{n}\) converges:
+
+\begin{steps}
+  \item Find an index \(n_{0}\) beyond which the ratio of consecutive terms is at most some constant \(r < 1\): that is, \(a_{n + 1}/a_{n} \le r\) for \(n \ge n_{0}\).
+  \item Conclude that the terms decay geometrically: \(a_{n} \le a_{n_{0}} \, r^{\,n - n_{0}}\) for \(n \ge n_{0}\).
+  \item Bound the tail by the geometric series \(\sum_{n > n_{0}} a_{n} \le a_{n_{0}} \sum_{k \ge 1} r^{k} = a_{n_{0}} \cdot \dfrac{r}{1 - r} < \infty\). (If the infinite geometric sum is new to you: the finite sum is \(r + r^{2} + \cdots + r^{m} = \frac{r(1 - r^{m})}{1 - r}\) — multiply by \(1 - r\) and watch the telescoping — and since \(0 < r < 1\), the power \(r^{m}\) dies away as \(m\) grows, leaving \(\frac{r}{1 - r}\). Appendix A.3 gives the full account.)
+  \item The partial sums are then bounded above, and (being a sum of positive terms) non-decreasing, so Theorem 4.1 gives the limit.
+\end{steps}
+\end{envstrategy}
+\begin{envtheorem}{Theorem}{4.2}{}
+For every \(x > 0\), the series \(\displaystyle\sum_{n = 0}^{\infty} \frac{x^{n}}{n!}\) converges to a finite real number.
+\end{envtheorem}
+\emph{Proof track: this argument proves the theorem. Later sections use the convergence itself and the tail bound \((*)\) recorded just after the proof. On a first reading you may take both and move on.}
+
+\begin{envproof}{Proof}{}{}
+Fix \(x > 0\) and choose a positive integer \(n_{0}\) with \(n_{0} > 2x\). The ratio of successive terms is \[ \frac{x^{n + 1}/(n + 1)!}{x^{n}/n!} = \frac{x}{n + 1}, \] and for \(n \ge n_{0}\) this is at most \(\dfrac{x}{n_{0} + 1} < \dfrac{x}{n_{0}} < \dfrac{1}{2}\), by the choice of \(n_{0}\). Iterating from \(n_{0}\), every later term obeys \[ \frac{x^{n}}{n!} \le \frac{x^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{n - n_{0}} \qquad (n > n_{0}). \] Split a partial sum at the index \(n_{0}\): \[ \sum_{n = 0}^{N} \frac{x^{n}}{n!} = \underbrace{\sum_{n = 0}^{n_{0}} \frac{x^{n}}{n!}}_{\text{(I)}} + \underbrace{\sum_{n = n_{0} + 1}^{N} \frac{x^{n}}{n!}}_{\text{(II)}}. \] Piece (I) is a fixed finite sum. Piece (II) is bounded, using the geometric estimate above, by \[ \text{(II)} \le \frac{x^{n_{0}}}{n_{0}!} \sum_{n = n_{0} + 1}^{\infty} \left(\frac{1}{2}\right)^{n - n_{0}} = \frac{x^{n_{0}}}{n_{0}!}. \] Therefore \[ \sum_{n = 0}^{N} \frac{x^{n}}{n!} \le \sum_{n = 0}^{n_{0}} \frac{x^{n}}{n!} + \frac{x^{n_{0}}}{n_{0}!} \qquad \text{for every } N > n_{0}. \] The right-hand side is a fixed real number, independent of \(N\). The partial sums on the left are non-decreasing (each new term is positive) and bounded above, so by Theorem 4.1 the series converges to a finite real number. \qedmark
+\end{envproof}
+It is convenient to name the truncations of the series. Write
+
+\[ P_{k}(x) = \sum_{n = 0}^{k} \frac{x^{n}}{n!} \]
+
+for the \(k\)-th partial sum. The estimate inside the proof does more than establish convergence: it measures how fast the partial sums approach \(e^{x}\). Now fix an interval \(0 < x < L\) and pick \(n_{0} > 2L\) once, so the same threshold serves every such \(x\); bounding each term by \(x^{n}/n! \le L^{n}/n!\) and repeating the geometric collapse from the proof gives, for \(k > n_{0}\),
+
+\[ 0 \le e^{x} - P_{k}(x) \le \frac{L^{k}}{k!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$*$} \]
+
+Because the bound \((*)\) shrinks geometrically in \(k\) while staying uniform over the whole interval \(0 < x < L\), it is the main tool of the next section, where the same single polynomial \(P_{k}\) is used to approximate \(e^{x}\) at two nearby points at once.
+
+\subsechead{The value of \(e\)}
+The definition becomes concrete at \(x = 1\), where the series produces a specific real number that we name:
+
+\[ e = e^{1} = \sum_{n = 0}^{\infty} \frac{1}{n!} = 1 + 1 + \frac{1}{2} + \frac{1}{6} + \frac{1}{24} + \cdots \approx 2.71828. \]
+
+The number \(e\) is known to be both irrational and transcendental, though we prove neither fact here. What we \emph{can} see at once is how quickly the partial sums settle, exactly as the tail bound \((*)\) predicts.
+
+\begin{workedexample}
+\begin{envexample}{Example}{4.1}{}
+Compute the partial sums \(P_{k}(1) = \displaystyle\sum_{n = 0}^{k} \frac{1}{n!}\) for \(k = 0, 1, \dots, 5\), and compare with \(e\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Adding one term at a time:
+
+\[ \begin{array}{c|cccccc} k & 0 & 1 & 2 & 3 & 4 & 5 \\ \hline P_{k}(1) & 1.0000 & 2.0000 & 2.5000 & 2.6667 & 2.7083 & 2.7167 \end{array} \]
+
+The partial sums climb toward \(e \approx 2.7183\) from below, and they do so fast: already \(P_{10}(1) \approx 2.7182818\), so by the tenth term all four decimal places are correct. The tail bound \((*)\) shows that the error decreases geometrically. Each additional term halves the displayed error bound.
+
+\qedmark
+\end{envsolution}
+\end{workedexample}
+Figure 4.2 shows the same closing-in as functions of \(x\): \(P_{1}, \dots, P_{4}\) are polynomial approximations to \(e^{x}\), with higher-degree sums staying close over a wider range.
+
+\begin{figureblock}
+  \includegraphics[width=79.9mm]{ch04/figs/partial-sums-exp}
+\figcaption{Figure 4.2}{Polynomial partial sums \(P_{1}, \dots, P_{4}\) compared with the exponential curve \(e^{x}\).}
+\end{figureblock}
+Theorem 4.2 shows that \(e^{x}\) is well defined for every \(x > 0\). The case \(x < 0\) is genuinely harder: the terms then alternate in sign, the partial sums are no longer non-decreasing, and Theorem 4.1 does not apply directly. We need a more flexible convergence result. If a series of absolute values converges, then the original series converges. Together with the uniform tail bound \((*)\) and a careful product argument, this result also yields the continuity of \(e^{x}\) and the exponent law. The next section assembles all three.
+
+
+\sechead{4.2}{Continuity and the Exponent Law for \(e^{x}\)}
+Section 4.1 established that \(e^{x}\) exists: for \(x > 0\) the defining series converges to a finite number, and the partial sums \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) approach it at a geometric rate, captured by the tail bound \((*)\). What we have \emph{not} yet shown is that \(e^{x}\) has the properties the notation leads us to expect. Three things remain: that it is continuous; that it obeys \(e^{x} e^{y} = e^{x + y}\); and that it even makes sense for \(x \le 0\). This section settles all three. The whole section rests on a single idea: approximate the transcendental function \(e^{x}\) by the polynomial \(P_{k}(x)\), and use \((*)\) to make the error uniformly small. Once the error is controlled, the polynomial carries the argument. The one genuinely new tool we need is a convergence test that survives sign changes, since the partial sums for \(x < 0\) are no longer monotone.
+
+A word about what is ahead. This is the most demanding section of the book so far. It introduces Cauchy sequences and the Bolzano–Weierstrass theorem, topics usually first met in a dedicated analysis course. It consists entirely of proofs, with no worked examples. What the rest of the book uses are four facts: the definition of \(e^{x}\) extended to all of \(\mathbb{R}\), continuity (Theorem 4.6), the exponent law (Theorem 4.7), and positivity (Corollary 4.1). So on a first reading it is perfectly legitimate to read each statement carefully, skim its proof for the shape of the argument, and return for a full pass once the rest of the chapter has shown you how these results are used.
+
+\subsechead{Continuity for \(x > 0\)}
+Fix a base point \(x_{0} > 0\). We want \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). The difficulty is that \(e^{x}\) is an infinite series, not a polynomial; but its partial sum \(P_{k}\) \emph{is} a polynomial, hence continuous, and the bound \((*)\) says \(P_{k}\) is uniformly close to \(e^{x}\) for every \(x\) in a fixed interval at once. The proof simply routes the comparison \(e^{x}\) versus \(e^{x_{0}}\) through \(P_{k}\) at both points.
+
+\begin{envtheorem}{Theorem}{4.3}{}
+The function \(e^{x}\) is continuous at every \(x_{0} > 0\).
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Let \(x_{0} > 0\) and let \(\varepsilon > 0\) be given. Work on the interval \(0 < x < x_{0} + 1\), so we may take \(L = x_{0} + 1\) in the tail bound \((*)\) of §4.1. Recall what it says: \(0 \le e^{x} - P_{k}(x) \le \dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\) for every \(x\) in \((0, L)\), provided \(k > n_{0} > 2L\). Choose integers \(k > n_{0} > 2(x_{0} + 1)\) large enough that
+
+\[ \frac{(x_{0} + 1)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} < \varepsilon. \]
+
+This is possible because the left-hand side tends to \(0\) as \(k \to \infty\). With \(k\) now fixed, \(P_{k}(x) = \sum_{n=0}^{k} x^{n}/n!\) is a polynomial, and every polynomial is continuous, so there is a \(\delta > 0\), which we may take smaller than \(\min\{x_{0}/2,\ 1/2\}\) (the first bound keeps \(x > 0\), the second keeps \(x < x_{0} + 1\)), such that
+
+\[ \lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon \qquad \text{whenever } \lvert x - x_{0} \rvert < \delta. \]
+
+Now split the difference \(e^{x} - e^{x_{0}}\) by inserting and removing the common polynomial:
+
+\[ e^{x} - e^{x_{0}} = \bigl(e^{x} - P_{k}(x)\bigr) + \bigl(P_{k}(x) - P_{k}(x_{0})\bigr) + \bigl(P_{k}(x_{0}) - e^{x_{0}}\bigr). \]
+
+Suppose \(\lvert x - x_{0} \rvert < \delta\). Since \(\delta < x_{0}/2\), we have \(x > x_{0} - \delta > \tfrac{x_{0}}{2} > 0\) and \(x < x_{0} + \tfrac{1}{2} < x_{0} + 1\), so both \(x\) and \(x_{0}\) lie in \((0,\ x_{0} + 1)\); the bound \((*)\) controls the two outer terms, and the choice of \(\delta\) controls the middle one. By the triangle inequality,
+
+\[ \lvert e^{x} - e^{x_{0}} \rvert \le \underbrace{\lvert e^{x} - P_{k}(x) \rvert}_{< \varepsilon} + \underbrace{\lvert P_{k}(x) - P_{k}(x_{0}) \rvert}_{< \varepsilon} + \underbrace{\lvert P_{k}(x_{0}) - e^{x_{0}} \rvert}_{< \varepsilon} < 3\varepsilon. \]
+
+(A bound of \(3\varepsilon\) for every \(\varepsilon > 0\) is exactly as good as a bound of \(\varepsilon\): to land on \(\varepsilon\) itself, run the same argument with \(\varepsilon/3\) in its place. A convention used repeatedly in the proofs below is to allow a fixed number of \(\varepsilon\)-sized errors without tracking the exact constant.) Since \(\varepsilon > 0\) was arbitrary, \(\lim_{x \to x_{0}} e^{x} = e^{x_{0}}\). Thus \(e^{x}\) is continuous at every \(x_{0} > 0\). \qedmark
+\end{envproof}
+The whole proof turned on one feature of \((*)\): it is \emph{uniform}. The same fixed polynomial \(P_{k}\) approximates \(e^{x}\) at \(x\) and at \(x_{0}\) simultaneously, so the two outer errors are small together. We will use exactly this uniformity again when we multiply two exponentials.
+
+\subsechead{A convergence test that survives sign changes}
+\begin{envremark}{Remark}{4.2}{}
+For \(x < 0\) the terms \(x^{n}/n!\) alternate in sign, so the partial sums no longer increase steadily, and the monotone-bounded argument behind Theorem 4.2 simply does not apply. We need a convergence criterion that ignores signs. The natural one is: if the series of \emph{absolute values} converges, the original series should converge too, because the sum of the absolute values in any sufficiently late tail can be made as small as we wish.
+\end{envremark}
+We record this principle, then build the machinery that proves it. Cauchy sequences and the Bolzano–Weierstrass theorem are of independent importance and will be reused whenever convergence must be established without an explicit limit in hand.
+
+\begin{envproposition}{Proposition}{4.1}{Absolute convergence implies convergence}
+Let \(\{a_{n}\}_{n=1}^{\infty}\) be a sequence of real numbers. If \(\displaystyle\sum_{n=1}^{\infty} \lvert a_{n} \rvert < \infty\), then \(\displaystyle\sum_{n=1}^{\infty} a_{n}\) converges.
+\end{envproposition}
+To say that \(\sum_{n=1}^{\infty} a_{n}\) \emph{converges} means precisely that its sequence of partial sums \(S_{k} = \sum_{n=1}^{k} a_{n}\) has a limit, i.e. \(\lim_{k \to \infty} S_{k}\) exists. The trouble is that for a series with mixed signs we have no candidate value for that limit and no monotonicity that we can use. The way out is to recognize convergence from the \emph{internal} behavior of the partial sums alone.
+
+\begin{envdefinition}{Definition}{4.2}{}
+A sequence \(\{a_{n}\}_{n=1}^{\infty}\) is a \emph{Cauchy sequence} if for every \(\varepsilon > 0\) there is an \(N_{0} \in \mathbb{N}\) such that
+
+\[ \lvert a_{m} - a_{n} \rvert < \varepsilon \qquad \text{for all } m, n \ge N_{0}. \]
+
+\begin{informal}
+Informally, the terms eventually become close to one another: past some point, any two of them differ by less than \(\varepsilon\). The definition mentions no limit value, only how close the terms are to one another.
+\end{informal}
+\end{envdefinition}
+The equivalence between convergence and the Cauchy condition lets us prove that \(\sum a_{n}\) converges without first knowing its limit. This equivalence is often taken for granted and used directly; we prove it here instead, because the proof exposes a dependency worth seeing. The equivalence is, in the end, the completeness of \(\mathbb{R}\) (Theorem 4.1) in another form. The hinge is a classical existence theorem.
+
+The theorem below speaks of a \emph{subsequence}: the sequence that remains when we keep only some of the terms of \(\{a_{n}\}\), in their original order. Formally, choose infinitely many indices \(n_{1} < n_{2} < n_{3} < \cdots\); the subsequence is \(\{a_{n_{j}}\}_{j = 1}^{\infty}\), and the double subscript simply reads “the term of the original sequence sitting at position \(n_{j}\).” For instance, keeping the even-indexed terms of \(a_{n} = (-1)^{n}\) gives the constant subsequence \(a_{2j} = 1\), which converges even though the original sequence does not. That is exactly the phenomenon described by the theorem.
+
+\begin{envtheorem}{Theorem}{4.4}{Bolzano–Weierstrass}
+Every bounded sequence of real numbers has a convergent subsequence.
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+We first extract a \emph{monotone} subsequence, then invoke completeness. Call an index \(p\) a \emph{peak} of the sequence \(\{a_{n}\}\) if \(a_{p} \ge a_{n}\) for every \(n > p\). In other words, no later term ever exceeds \(a_{p}\). There are two cases.
+
+\parahead{Infinitely many peaks.}
+List the peaks in increasing order \(p_{1} < p_{2} < p_{3} < \cdots\). By the defining property of a peak, \(a_{p_{1}} \ge a_{p_{2}} \ge a_{p_{3}} \ge \cdots\), so \(\{a_{p_{j}}\}\) is a non-increasing subsequence. It is bounded below (the whole sequence is bounded), so by part (2) of Theorem 4.1 it converges.
+
+\parahead{Only finitely many peaks.}
+Let \(p_{*}\) be larger than every peak, so no index \(\ge p_{*}\) is a peak. Pick any \(n_{1} \ge p_{*}\). Since \(n_{1}\) is not a peak, some \(n_{2} > n_{1}\) has \(a_{n_{2}} > a_{n_{1}}\); since \(n_{2}\) is not a peak, some \(n_{3} > n_{2}\) has \(a_{n_{3}} > a_{n_{2}}\); continuing, we obtain a strictly increasing subsequence \(a_{n_{1}} < a_{n_{2}} < a_{n_{3}} < \cdots\). It is bounded above, so by part (1) of Theorem 4.1 it converges.
+
+In either case the bounded sequence has a convergent (indeed monotone) subsequence. \qedmark
+\end{envproof}
+With Bolzano–Weierstrass in hand, the Cauchy criterion follows.
+
+\begin{envtheorem}{Theorem}{4.5}{Cauchy criterion}
+A sequence \(\{a_{n}\}_{n=1}^{\infty}\) of real numbers converges if and only if it is a Cauchy sequence.
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+\parahead{Convergent \(\Rightarrow\) Cauchy.}
+Suppose \(a_{n} \to A\). Given \(\varepsilon > 0\), choose \(N_{0}\) with \(\lvert a_{n} - A \rvert < \varepsilon/2\) for all \(n \ge N_{0}\). Then for \(m, n \ge N_{0}\),
+
+\[ \lvert a_{m} - a_{n} \rvert \le \lvert a_{m} - A \rvert + \lvert A - a_{n} \rvert < \tfrac{\varepsilon}{2} + \tfrac{\varepsilon}{2} = \varepsilon, \]
+
+so the sequence is Cauchy.
+
+\parahead{Cauchy \(\Rightarrow\) convergent.}
+Suppose \(\{a_{n}\}\) is Cauchy. First it is bounded: taking \(\varepsilon = 1\), there is an \(N\) with \(\lvert a_{n} - a_{N} \rvert < 1\) for \(n \ge N\), hence \(\lvert a_{n} \rvert < \lvert a_{N} \rvert + 1\) for \(n \ge N\), and the finitely many earlier terms are bounded as well. By Bolzano–Weierstrass (Theorem 4.4) some subsequence converges, say \(a_{n_{j}} \to A\). We claim the whole sequence converges to \(A\). Given \(\varepsilon > 0\), choose \(N_{0}\) with \(\lvert a_{m} - a_{n} \rvert < \varepsilon/2\) for \(m, n \ge N_{0}\), and choose an index \(n_{j} \ge N_{0}\) with \(\lvert a_{n_{j}} - A \rvert < \varepsilon/2\) . Both demands can be met at once, since \(a_{n_{j}} \to A\) gives the closeness for all large \(j\), while the strictly increasing indices \(n_{j}\) eventually exceed \(N_{0}\). Then for every \(n \ge N_{0}\),
+
+\[ \lvert a_{n} - A \rvert \le \lvert a_{n} - a_{n_{j}} \rvert + \lvert a_{n_{j}} - A \rvert < \tfrac{\varepsilon}{2} + \tfrac{\varepsilon}{2} = \varepsilon. \]
+
+Hence \(a_{n} \to A\). \qedmark
+\end{envproof}
+\begin{envcaution}{Caution}{}{}
+The Cauchy criterion is not an extra axiom; it is completeness in another form. Trace the chain: Theorem 4.5 rests on Bolzano–Weierstrass (Theorem 4.4), which rests on the monotone-convergence property of \(\mathbb{R}\) (Theorem 4.1). Over the rationals, none of these results holds. There are bounded \(\mathbb{Q}\)-sequences that are Cauchy yet converge to no rational number (for instance, the partial sums of \(\sum 1/n!\), which approach \(e\), a number noted in §4.1 to be irrational). So “Cauchy \(\Rightarrow\) convergent” is a statement about \(\mathbb{R}\) specifically, logically equivalent to its completeness.
+\end{envcaution}
+We can now discharge the deferred proof.
+
+\begin{envproof}{Proof}{}{of Proposition 4.1}
+Set \(S_{n} = \sum_{k=1}^{n} a_{k}\) and assume \(\sum_{k=1}^{\infty} \lvert a_{k} \rvert < \infty\). By Theorem 4.5 it suffices to show \(\{S_{n}\}\) is Cauchy. Given \(\varepsilon > 0\), convergence of the absolute series gives an \(N_{0}\) with \(\sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon\). The tail bounds the difference between the partial sums between the full sum and the \(N_{0}\)-th partial sum, and partial sums close that gap. Then for any \(m > n \ge N_{0}\), the triangle inequality yields
+
+\[ \lvert S_{m} - S_{n} \rvert = \Bigl\lvert \sum_{k = n + 1}^{m} a_{k} \Bigr\rvert \le \sum_{k = n + 1}^{m} \lvert a_{k} \rvert \le \sum_{k = N_{0} + 1}^{\infty} \lvert a_{k} \rvert < \varepsilon. \]
+
+So \(\{S_{n}\}\) is Cauchy, hence convergent, which is what it means for \(\sum_{k=1}^{\infty} a_{k}\) to converge. \qedmark
+\end{envproof}
+\subsechead{Extending \(e^{x}\) to all of \(\mathbb{R}\)}
+The convergence test does exactly the job we set it. For any real \(x\), the series of absolute values is \(\sum_{n=0}^{\infty} \lvert x \rvert^{n}/n! = e^{\lvert x \rvert}\), which is finite by Theorem 4.2 (or equals \(1\) when \(x = 0\)). Proposition 4.1 then guarantees that \(\sum_{n=0}^{\infty} x^{n}/n!\) itself converges. This defines
+
+\[ e^{x} = \sum_{n=0}^{\infty} \frac{x^{n}}{n!} \qquad \text{for every } x \in \mathbb{R}, \]
+
+in agreement with Definition 4.1 when \(x > 0\), and giving \(e^{0} = 1\). Moreover the tail bound upgrades to absolute values with no extra work: for \(\lvert x \rvert \le L\) and any \(k > n_{0} > 2L\), bounding each term of the remainder by its absolute value and reusing the geometric-tail estimate of \((*)\) (Strategy 4.1) gives
+
+\[ \lvert e^{x} - P_{k}(x) \rvert \le \sum_{n = k + 1}^{\infty} \frac{\lvert x \rvert^{n}}{n!} \le \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \tag{$**$} \]
+
+The bound \((**)\) is the two-sided tool for the rest of the section: it is uniform over the whole symmetric interval \(\lvert x \rvert \le L\) and shrinks geometrically in \(k\). With it, the continuity proof for \(x > 0\) works word for word at every real base point.
+
+\begin{envtheorem}{Theorem}{4.6}{}
+The function \(e^{x}\) is continuous on all of \(\mathbb{R}\).
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Fix any \(x_{0} \in \mathbb{R}\) and set \(L = \lvert x_{0} \rvert + 1\), so that every \(x\) with \(\lvert x - x_{0} \rvert < 1\) satisfies \(\lvert x \rvert \le L\). Repeat the argument of Theorem 4.3 word for word, with the one-sided bound \((*)\) replaced by its two-sided form \((**)\): given \(\varepsilon > 0\), choose \(k > n_{0} > 2L\) so that \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}} < \varepsilon\), then use the continuity of the polynomial \(P_{k}\) to get \(\delta \in (0, 1)\) with \(\lvert P_{k}(x) - P_{k}(x_{0}) \rvert < \varepsilon\) whenever \(\lvert x - x_{0} \rvert < \delta\). The same three-term split gives \(\lvert e^{x} - e^{x_{0}} \rvert < 3\varepsilon\). Hence \(e^{x}\) is continuous at \(x_{0}\), and \(x_{0}\) was arbitrary. \qedmark
+\end{envproof}
+\subsechead{The exponent law}
+Everything is now in place for the multiplicative identity \(e^{x} e^{y} = e^{x + y}\). The proof is the continuity argument on a larger scale: replace each exponential by its polynomial partial sum, recognize that the \emph{product} of two partial sums reorganizes — through the binomial theorem — into the partial sum of \(e^{x+y}\) plus a controllable remainder, and use \((**)\) to show that the errors tend to zero.
+
+\begin{envtheorem}{Theorem}{4.7}{Exponent law}
+For all real numbers \(x\) and \(y\), \(\; e^{x} e^{y} = e^{x + y}\).
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Fix \(x, y \in \mathbb{R}\) and choose \(L\) with \(\lvert x \rvert, \lvert y \rvert \le L\); throughout, take \(k > n_{0} > 8L\) (the factor \(8\) is calibrated in Step 4, where it forces the tail ratio below \(\tfrac{1}{2}\)). Recall \(P_{k}(t) = \sum_{n=0}^{k} t^{n}/n!\).
+
+\parahead{Step 1: two estimates.}
+From \((**)\), both \(\lvert e^{x} - P_{k}(x) \rvert\) and \(\lvert e^{y} - P_{k}(y) \rvert\) are at most \(\dfrac{L^{n_{0}}}{n_{0}!}\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\). Also \(\lvert e^{y} \rvert \le \sum_{n=0}^{\infty} \lvert y \rvert^{n}/n! = e^{\lvert y \rvert} \le e^{L}\) (term by term, since \(\lvert y \rvert \le L\) gives \(\lvert y \rvert^{n} \le L^{n}\); monotonicity of \(e^{t}\) is not yet available), and likewise \(\lvert P_{k}(x) \rvert \le e^{L}\).
+
+\parahead{Step 2: split the product.}
+Multiplying the two finite sums and grouping the terms \(x^{i} y^{j}/(i!\,j!)\) by their total degree \(\ell = i + j\),
+
+\[ P_{k}(x)\, P_{k}(y) = \underbrace{\sum_{\ell = 0}^{k} \; \sum_{m = 0}^{\ell} \frac{x^{m} y^{\ell - m}}{m!\,(\ell - m)!}}_{\text{(I)}} \; + \; \underbrace{\sum_{\ell = k + 1}^{2k} \; \sum_{\substack{i + j = \ell \\ 0 \le i, j \le k}} \frac{x^{i} y^{j}}{i!\, j!}}_{\text{(II)}}. \]
+
+Group (I) collects every degree \(\ell \le k\), where no term is missing; group (II) collects the leftover high-degree terms \(k < \ell \le 2k\).
+
+To see the split concretely, take \(k = 2\): multiplying out \(P_{2}(x)\,P_{2}(y) = \bigl(1 + x + \tfrac{x^{2}}{2}\bigr)\bigl(1 + y + \tfrac{y^{2}}{2}\bigr)\) gives nine terms. Sorted by total degree, the terms of total degree \(\ell \le 2\) sum exactly to \(1 + (x + y) + \tfrac{(x + y)^{2}}{2} = P_{2}(x + y)\), which is group (I). The remaining terms \(\tfrac{x^{2} y}{2} + \tfrac{x y^{2}}{2} + \tfrac{x^{2} y^{2}}{4}\) form group (II). Notice that group (II) has an incomplete degree-\(3\) part. Neither factor contains a power higher than \(2\), so \(x^{3}\) and \(y^{3}\) are absent. Therefore group (II) can only be \emph{bounded} by a tail in Step 4, not rewritten by the binomial theorem.
+
+\parahead{Step 3: the binomial theorem collapses (I).}
+Writing \(\dfrac{1}{m!\,(\ell - m)!} = \dfrac{1}{\ell!}\dbinom{\ell}{m}\) and applying the binomial theorem \((x + y)^{\ell} = \sum_{m=0}^{\ell} \binom{\ell}{m} x^{m} y^{\ell - m}\) (also written \(\binom{\ell}{m} = C^{\ell}_{m}\) in older notation),
+
+\[ \text{(I)} = \sum_{\ell = 0}^{k} \frac{1}{\ell!} (x + y)^{\ell} = P_{k}(x + y). \]
+
+\parahead{Step 4: the leftover (II) is a tail.}
+Enlarging the inner sum in (II) to all \(m\) with \(0 \le m \le \ell\) and passing to absolute values can only increase it, so
+
+\[ \lvert \text{(II)} \rvert \le \sum_{\ell = k + 1}^{2k} \frac{1}{\ell!} \sum_{m = 0}^{\ell} \binom{\ell}{m} \lvert x \rvert^{m} \lvert y \rvert^{\ell - m} = \sum_{\ell = k + 1}^{2k} \frac{(\lvert x \rvert + \lvert y \rvert)^{\ell}}{\ell!} \le \sum_{\ell = k + 1}^{\infty} \frac{(2L)^{\ell}}{\ell!}. \]
+
+Since \(\ell > n_{0} > 8L\), each ratio \((2L)/\ell < \tfrac{1}{4} < \tfrac{1}{2}\), so the same geometric estimate that produced \((*)\) gives
+
+\[ \begin{aligned}
+        &\lvert \text{(II)} \rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}, \\[2pt]
+        &\text{hence}\quad \bigl\lvert P_{k}(x) P_{k}(y) - P_{k}(x + y) \bigr\rvert \le \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}.
+      \end{aligned} \]
+
+\parahead{Step 5: insert and subtract the partial sums.}
+Insert and remove the partial sums to compare \(e^{x} e^{y}\) with \(e^{x + y}\):
+
+\[ \begin{aligned} e^{x} e^{y} - e^{x + y} = {}&\bigl(e^{x} - P_{k}(x)\bigr) e^{y} + P_{k}(x)\bigl(e^{y} - P_{k}(y)\bigr) \\ &+ \bigl(P_{k}(x) P_{k}(y) - P_{k}(x + y)\bigr) + \bigl(P_{k}(x + y) - e^{x + y}\bigr). \end{aligned} \]
+
+Apply Step 1, Step 4, and the bound \((**)\) at \(x + y\) (valid since \(\lvert x + y \rvert \le 2L\), enlarging \(L\) to \(2L\) there). Each of the four pieces is at most a fixed constant times \(\bigl(\tfrac{1}{2}\bigr)^{k - n_{0}}\):
+
+\[ \lvert e^{x} e^{y} - e^{x + y} \rvert \le 2\, e^{L}\, \frac{L^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}} + 2\, \frac{(2L)^{n_{0}}}{n_{0}!} \left(\frac{1}{2}\right)^{k - n_{0}}. \]
+
+\parahead{Step 6: let \(k \to \infty\).}
+The right-hand side is independent of how the left-hand side was formed and tends to \(0\) as \(k \to \infty\), while the left-hand side does not depend on \(k\) at all. Therefore \(\lvert e^{x} e^{y} - e^{x + y} \rvert = 0\), i.e. \(e^{x} e^{y} = e^{x + y}\), for the pair \(x, y\) fixed at the outset. Since \(x\) and \(y\) were arbitrary, the identity holds for all \(x, y \in \mathbb{R}\). \qedmark
+\end{envproof}
+One loose end from the extension to negative arguments closes immediately.
+
+\begin{envcorollary}{Corollary}{4.1}{}
+\(e^{x} > 0\) for every real \(x\).
+\end{envcorollary}
+\begin{envproof}{Proof}{}{}
+By the exponent law, \(e^{x} = e^{x/2}\, e^{x/2} = \bigl(e^{x/2}\bigr)^{2} \ge 0\). And \(e^{x}\) is never zero, since \(e^{x} e^{-x} = e^{0} = 1\). Hence \(e^{x} > 0\). \qedmark
+\end{envproof}
+Collecting the results of this section: the series
+
+\[ e^{x} = \sum_{n=0}^{\infty} \frac{x^{n}}{n!}, \qquad x \in \mathbb{R}, \]
+
+defines a function that is continuous on all of \(\mathbb{R}\) (Theorem 4.6), strictly positive (Corollary 4.1), and satisfies the exponent law \(e^{x} e^{y} = e^{x + y}\) (Theorem 4.7). The convergence that makes the definition legitimate for \(x < 0\) came from absolute convergence (Proposition 4.1), and that in turn from the Cauchy criterion (Theorem 4.5) and Bolzano–Weierstrass (Theorem 4.4). Both the Cauchy criterion and Bolzano–Weierstrass ultimately depend on the completeness of \(\mathbb{R}\). With \(e^{x}\) now established as a bona fide continuous, multiplicative, positive function, we are ready to return to the question that Chapter 2 answered only informally: its derivative. That rigorous re-derivation is the subject of §4.3, which uses the same partial-sum argument developed here.
+
+
+\sechead{4.3}{The Derivative of \(e^{x}\)}
+With Section 4.2 finished, \(e^{x}\) is a fully legitimate function on \(\mathbb{R}\): defined by its power series, continuous, strictly positive, and obeying the exponent law \(e^{x} e^{y} = e^{x + y}\). Its derivative is the one classical fact about it that still needs a rigorous proof. Chapter 2 already computed \(\frac{d}{dx} e^{x} = e^{x}\), but by a casual term-by-term argument that substituted the series into the difference quotient and observed that the terms after the leading term tend to \(0\) as \(h \to 0\). That argument gave the correct result, yet it used three properties — convergence, continuity, and the exponent law — that had not been established at the time. Now that all three are theorems, we can re-derive the formula from them. We also gain something the earlier pass skipped: an \emph{explicit} bound that shows exactly how fast the difference quotient settles to its limit.
+
+\subsechead{The difference quotient}
+The entire calculation rests on a single algebraic move, the exponent law. For a fixed \(x\) and a nonzero increment \(h\), Theorem 4.7 gives \(e^{x + h} = e^{x} e^{h}\), so
+
+\[ \frac{e^{x + h} - e^{x}}{h} = \frac{e^{x} e^{h} - e^{x}}{h} = \left( \frac{e^{h} - 1}{h} \right) e^{x}. \]
+
+The factor \(e^{x}\) does not depend on \(h\). The whole derivative therefore collapses onto one limit, taken at the single point \(0\):
+
+\[ \frac{d}{dx} e^{x} = \left( \lim_{h \to 0} \frac{e^{h} - 1}{h} \right) e^{x}, \qquad \text{provided } \lim_{h \to 0} \frac{e^{h} - 1}{h} \text{ exists.} \]
+
+Everything now hinges on showing that this limit equals \(1\). The series shows why the limit is \(1\), and — unlike the Chapter 2 derivation — also gives a numerical bound on the rate of approach.
+
+\begin{envproposition}{Proposition}{4.2}{}
+For every nonzero \(h\) with \(\lvert h \rvert < \tfrac{1}{2}\),
+
+\[ \left\lvert \frac{e^{h} - 1}{h} - 1 \right\rvert \le \lvert h \rvert. \]
+\end{envproposition}
+\begin{envproof}{Proof}{}{}
+By the series definition, valid for every real \(h\) since Section 4.2,
+
+\[ e^{h} = \sum_{n=0}^{\infty} \frac{h^{n}}{n!} = 1 + h + \frac{h^{2}}{2!} + \frac{h^{3}}{3!} + \cdots. \]
+
+Subtracting \(1\) and dividing by \(h \ne 0\) shifts every index down by one, and the constant term \(1\) then cancels the \(-1\):
+
+\[ \frac{e^{h} - 1}{h} - 1 = \sum_{n=2}^{\infty} \frac{h^{n - 1}}{n!} = \frac{h}{2!} + \frac{h^{2}}{3!} + \frac{h^{3}}{4!} + \cdots. \]
+
+Take absolute values term by term and factor out one power of \(\lvert h \rvert\):
+
+\[ \left\lvert \frac{e^{h} - 1}{h} - 1 \right\rvert \le \sum_{n=2}^{\infty} \frac{\lvert h \rvert^{n - 1}}{n!} = \lvert h \rvert \sum_{n=2}^{\infty} \frac{\lvert h \rvert^{n - 2}}{n!}. \]
+
+It remains to see that the trailing sum is at most \(1\). Since \(\lvert h \rvert < \tfrac{1}{2} < 1\) and \(n - 2 \ge 0\), every factor \(\lvert h \rvert^{n - 2} \le 1\), so the sum is bounded by \(\sum_{n=2}^{\infty} 1/n!\). The same geometric comparison behind Strategy 4.1 controls that constant: \(n! = 2 \cdot 3 \cdots n \ge 2^{n - 1}\), hence
+
+\[ \sum_{n=2}^{\infty} \frac{1}{n!} \le \sum_{n=2}^{\infty} \frac{1}{2^{n - 1}} = \frac{1}{2} + \frac{1}{4} + \frac{1}{8} + \cdots = 1. \]
+
+Therefore \(\sum_{n=2}^{\infty} \lvert h \rvert^{n - 2}/n! \le 1\), and the displayed inequality gives \(\left\lvert (e^{h} - 1)/h - 1 \right\rvert \le \lvert h \rvert\). \qedmark
+\end{envproof}
+\begin{envremark}{Remark}{4.3}{}
+Proposition 4.2 is precisely the quantitative content the Chapter 2 derivation left unstated. There the higher-order terms were said to “vanish as \(h \to 0\),” with no measure of how fast; here the deviation of \(\frac{e^{h} - 1}{h}\) from \(1\) is at most \(\lvert h \rvert\), a rate of convergence at least linear in \(h\). For ordinary differentiation, the qualitative statement suffices, but later arguments that must track the size of a derivative error — Taylor remainders and numerical estimates — use the explicit bound rather than the limit statement alone.
+\end{envremark}
+\subsechead{The derivative formula}
+The bound delivers the limit at once, and with it the derivative.
+
+\begin{envtheorem}{Theorem}{4.8}{}
+The function \(e^{x}\) is differentiable at every real \(x\), and
+
+\[ \frac{d}{dx} e^{x} = e^{x}. \]
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+By Proposition 4.2, for \(0 < \lvert h \rvert < \tfrac{1}{2}\) we have \(\bigl\lvert \tfrac{e^{h} - 1}{h} - 1 \bigr\rvert \le \lvert h \rvert\), and the right-hand side tends to \(0\) as \(h \to 0\). Hence
+
+\[ \lim_{h \to 0} \frac{e^{h} - 1}{h} = 1. \]
+
+Returning to the difference quotient and pulling the \(h\)-independent factor \(e^{x}\) out of the limit,
+
+\[ \lim_{h \to 0} \frac{e^{x + h} - e^{x}}{h} = \lim_{h \to 0} \left( \frac{e^{h} - 1}{h} \right) e^{x} = 1 \cdot e^{x} = e^{x}. \]
+
+The limit exists for every \(x\), so \(e^{x}\) is differentiable on \(\mathbb{R}\) with \(\frac{d}{dx} e^{x} = e^{x}\). \qedmark
+\end{envproof}
+Because differentiating \(e^{x}\) returns \(e^{x}\) unchanged, the process can be repeated without end.
+
+\begin{envcorollary}{Corollary}{4.2}{}
+Every higher derivative of \(e^{x}\) is again \(e^{x}\): for every positive integer \(n\), \(\bigl(e^{x}\bigr)^{(n)} = e^{x}\).
+\end{envcorollary}
+\begin{envproof}{Proof}{}{}
+Induct on \(n\). The case \(n = 1\) is Theorem 4.8. If \(\bigl(e^{x}\bigr)^{(n)} = e^{x}\), then differentiating once more and using Theorem 4.8 again gives \(\bigl(e^{x}\bigr)^{(n + 1)} = \bigl(e^{x}\bigr)' = e^{x}\). \qedmark
+\end{envproof}
+The identity \(\frac{d}{dx} e^{x} = e^{x}\) says that the slope equals the value at every point. That is exactly the property that makes the exponential the natural model for any quantity whose rate of change is proportional to its current size: the relation \(y' = k\,y\), solved by \(y = y(0)\,e^{kt}\). We return to that application once the logarithm is in place. For now the formula hands us one immediate structural fact: since \(e^{x} > 0\) everywhere (Corollary 4.1), its derivative is everywhere positive. Intuitively a function with positive derivative ought to be increasing, which would let us invert \(e^{x}\) and finally build \(\ln x\). Turning that intuition into a theorem requires the Mean Value Theorem, an existence result that converts the sign of the derivative into monotonic behavior of the function. The next section develops it, by way of Rolle’s theorem.
+
+
+\sechead{4.4}{Rolle’s Theorem and the Mean Value Theorem}
+Section 4.3 ended with a claim that still needs proof: \(e^{x}\) has positive derivative everywhere, so it \emph{ought} to be increasing, and once we know that we can invert it to build \(\ln x\). But “positive derivative” is information at a single point, while “increasing” is a statement about the function across a whole interval. No result proved so far connects these two kinds of information. This section establishes that connection. The key result is the \emph{Mean Value Theorem} (MVT), the central existence theorem of differential calculus: on any interval where a function is continuous and differentiable inside, some interior point carries an instantaneous slope equal to the average slope across the interval. After one preparatory result about where maxima and minima can occur, we reach it in two steps. The first is \emph{Rolle’s theorem}, the special case where the average slope is zero; the second is the MVT itself.
+
+The special case is named for Michel Rolle, who stated it for polynomials in 1691; the general theorem and its modern proof belong to the nineteenth-century analysts, Cauchy among them, who made the derivative rigorous.
+
+\subsechead{Maxima, minima, and two existence theorems}
+\begin{envdefinition}{Definition}{4.3}{}
+Let \(f\) be defined on a domain \(D \subseteq \mathbb{R}\), and let \(x_{0} \in D\). We call \(x_{0}\) a \emph{maximum point} of \(f\) on \(D\) (and \(f(x_{0})\) the \emph{maximum value}) if
+
+\[ f(x_{0}) \ge f(x) \qquad \text{for every } x \in D, \]
+
+and a \emph{minimum point} (with \emph{minimum value} \(f(x_{0})\)) if instead \(f(x_{0}) \le f(x)\) for every \(x \in D\).
+
+\begin{informal}
+A maximum point is where \(f\) attains its largest value on \(D\), a minimum point where it attains its smallest. A function may have several maximum points sharing one maximum value, or none at all when \(D\) is unbounded or open and \(f\) runs off to \(\pm\infty\).
+\end{informal}
+\end{envdefinition}
+For instance, \(x_{0} = 0\) is a maximum point of \(\cos x\) on \(\mathbb{R}\), with maximum value \(1\), since \(1 = \cos 0 \ge \cos x\) for every real \(x\).
+
+Whether a function attains its extremes at all is a delicate matter on a general domain, but on a closed interval the answer is always yes. Just as importantly, a continuous function on an interval takes every value between two values that it attains. on the way from one height to another. These two facts about continuity on a closed interval, the foundation for everything below, are gathered in the next theorem.
+
+\begin{envtheorem}{Theorem}{4.9}{Extreme and Intermediate Value Theorems}
+Let \(f\) be continuous on a closed interval \([a, b]\).
+
+\runin{(a) Extreme Value Theorem.} \(f\) attains both a maximum and a minimum on \([a, b]\): there exist points \(x_{M}, x_{m} \in [a, b]\) with
+
+\[ f(x_{m}) \le f(x) \le f(x_{M}) \qquad \text{for every } x \in [a, b]. \]
+
+\runin{(b) Intermediate Value Theorem.} \(f\) takes every value between its endpoint values: if \(y\) lies between \(f(a)\) and \(f(b)\), then \(f(c) = y\) for some \(c \in [a, b]\).
+\end{envtheorem}
+Both parts rest on the completeness of \(\mathbb{R}\) (Theorem 4.1), and their proofs are exactly the kind of self-contained analytic construction we keep out of the main line. We therefore state them here and defer the proofs to the \emph{Proof-Track appendix} (Appendix D), which derives them from completeness by way of a least-upper-bound lemma and the Bolzano–Weierstrass theorem. The two parts require different hypotheses.
+
+The Extreme Value Theorem (a) needs continuity \emph{and} a closed, bounded interval: on the \emph{open} interval \((0, 1)\) the function \(f(x) = x\) attains no maximum, since its values approach \(1\) without ever reaching it. A discontinuous function can miss its extremes even on a closed interval. The Intermediate Value Theorem (b) requires only continuity on an interval: a function with a jump can step over a value without ever equalling it, which is precisely what continuity forbids. We apply both only to continuous functions on closed intervals, where both conclusions hold.
+
+\subsechead{Interior extrema: Theorem A}
+The differential-calculus content is the next theorem: when an extreme value is attained strictly \emph{inside} the interval — not at an endpoint — the derivative there must vanish.
+
+\begin{envtheorem}{Theorem}{4.10}{Interior extremum (Theorem A)}
+Suppose \(f\) is defined on \([a, b]\), the point \(x_{M} \in (a, b)\) is a maximum (or minimum) point of \(f\) on \([a, b]\), and \(f'(x_{M})\) exists. Then \(f'(x_{M}) = 0\).
+\end{envtheorem}
+\emph{Proof track: this proof and the two after it (Rolle’s theorem, the Mean Value Theorem) prove the section’s three existence theorems. Later material uses the statements, not the proofs. On a first reading you may take the results and go straight to Strategy 4.2 and the examples.}
+
+\begin{envproof}{Proof}{}{}
+Take \(x_{M}\) to be a maximum point; the minimum case is identical with the inequalities reversed. Since \(f(x_{M}) \ge f(x)\) for all \(x \in [a, b]\),
+
+\[ f(x_{M} + h) - f(x_{M}) \le 0 \]
+
+for every increment \(h\) small enough that \(x_{M} + h\) stays in \([a, b]\). Because \(x_{M}\) lies in the open interior \((a, b)\), both small positive and small negative \(h\) are allowed. Dividing by \(h\) and watching the sign of the denominator:
+
+\[ \begin{aligned}
+        &\frac{f(x_{M} + h) - f(x_{M})}{h} \le 0 \quad (h > 0), \\[2pt]
+        &\frac{f(x_{M} + h) - f(x_{M})}{h} \ge 0 \quad (h < 0).
+      \end{aligned} \]
+
+The derivative \(f'(x_{M})\) exists, so the one-sided limits both equal it. Letting \(h \to 0^{+}\) through positive values keeps the quotient \(\le 0\), and letting \(h \to 0^{-}\) through negative values keeps it \(\ge 0\):
+
+\[ \begin{aligned}
+        &f'(x_{M}) = \lim_{h \to 0^{+}} \frac{f(x_{M} + h) - f(x_{M})}{h} \le 0, \\[2pt]
+        &f'(x_{M}) = \lim_{h \to 0^{-}} \frac{f(x_{M} + h) - f(x_{M})}{h} \ge 0.
+      \end{aligned} \]
+
+A single number that is both \(\le 0\) and \(\ge 0\) is \(0\), so \(f'(x_{M}) = 0\). \qedmark
+\end{envproof}
+Figure 4.3 packages the maximum case of the proof: the left and right secants approach the same derivative from opposite sides.
+
+\begin{figureblock}
+  \includegraphics[width=85.72mm]{ch04/figs/interior-extremum-squeeze}
+\figcaption{Figure 4.3}{Two-sided secants at an interior maximum, forcing the tangent slope to be \(0\).}
+\end{figureblock}
+\begin{envcaution}{Caution}{}{}
+Theorem 4.10 needs \(x_{M}\) in the \emph{open} interior \((a, b)\). At an endpoint the conclusion can fail: \(f(x) = x\) on \([0, 1]\) takes its minimum at \(x = 0\) and its maximum at \(x = 1\), yet \(f'(x) = 1 \ne 0\) everywhere. An endpoint offers only a one-sided increment, so the two-sided squeeze that forced \(f'(x_{M}) = 0\) is unavailable.
+\end{envcaution}
+\subsechead{Rolle’s theorem}
+Rolle’s theorem combines the two results above. Under its hypotheses, a function with equal endpoint values is either constant or has an interior extremum. At that interior extremum, the derivative is zero.
+
+\begin{envtheorem}{Theorem}{4.11}{Rolle’s theorem}
+Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\), with \(f(a) = f(b)\). Then there exists a point \(c \in (a, b)\) such that \(f'(c) = 0\).
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+By the Extreme Value Theorem (Theorem 4.9(a)), \(f\) attains a maximum at some \(x_{M} \in [a, b]\) and a minimum at some \(x_{m} \in [a, b]\), with \(f(x_{m}) \le f(x) \le f(x_{M})\) for all \(x \in [a, b]\). Write \(m = f(x_{m})\) and \(M = f(x_{M})\).
+
+\runin{Case 1: \(m = M\).} Together with \(f(a) = f(b)\) this forces \(m = M = f(a) = f(b)\), so the bounds \(m \le f(x) \le M\) collapse and \(f\) is constant on \([a, b]\). Then \(f'(c) = 0\) for every \(c \in (a, b)\); choose any.
+
+\runin{Case 2: \(m < M\).} Since \(f(a)\) is a value of \(f\), the bounds give \(m \le f(a) \le M\). As \(f(a) = f(b)\) and \(m < M\), the values \(m\) and \(M\) cannot both equal that common endpoint value, so at least one of
+
+\[ f(x_{M}) > f(a) \qquad \text{or} \qquad f(x_{m}) < f(a) \]
+
+holds. If \(f(x_{M}) > f(a) = f(b)\), then \(x_{M}\) is neither endpoint, so \(x_{M} \in (a, b)\); by Theorem 4.10, \(f'(x_{M}) = 0\), and we set \(c = x_{M}\). Otherwise \(f(x_{m}) < f(a) = f(b)\), the same argument places \(x_{m} \in (a, b)\), and Theorem 4.10 gives \(f'(x_{m}) = 0\) with \(c = x_{m}\). Either way an interior \(c\) with \(f'(c) = 0\) exists. \qedmark
+\end{envproof}
+\subsechead{The Mean Value Theorem}
+The MVT lifts the equal-endpoints restriction. Allow any two endpoint values, and the conclusion becomes that the derivative somewhere equals the \emph{average} rate of change \((f(b) - f(a))/(b - a)\), the slope of the secant joining the two endpoints.
+
+\begin{envtheorem}{Theorem}{4.12}{Mean Value Theorem}
+Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\). Then there exists a point \(c \in (a, b)\) such that
+
+\[ f'(c) = \frac{f(b) - f(a)}{b - a}. \]
+\end{envtheorem}
+Figure 4.4 is the picture to keep in mind: one average slope across \([a,b]\), matched by one tangent slope inside.
+
+\begin{figureblock}
+  \includegraphics[width=85.19mm]{ch04/figs/mvt-secant-tangent}
+\figcaption{Figure 4.4}{The MVT secant–tangent picture: an interior tangent parallel to the secant through the endpoints.}
+\end{figureblock}
+\begin{envproof}{Proof}{}{}
+Subtract the secant line from \(f\). Define the auxiliary function
+
+\[ g(x) = f(x) - \left[ f(a) + \frac{f(b) - f(a)}{b - a} (x - a) \right]. \]
+
+The bracketed term is exactly the secant line through \((a, f(a))\) and \((b, f(b))\), so \(g(x)\) measures the vertical gap between the curve and that secant. It inherits the hypotheses of Rolle’s theorem:
+
+\begin{itemize}
+  \item \(g\) is continuous on \([a, b]\) and differentiable on \((a, b)\), being \(f\) minus a linear function;
+  \item \(g(a) = f(a) - f(a) = 0\) and \(g(b) = f(b) - f(b) = 0\), so \(g(a) = g(b)\).
+\end{itemize}
+By Rolle’s theorem (Theorem 4.11) there is a \(c \in (a, b)\) with \(g'(c) = 0\). Differentiating \(g\), the linear bracket contributes its constant slope, so
+
+\[ 0 = g'(c) = f'(c) - \frac{f(b) - f(a)}{b - a}, \]
+
+which rearranges to \(f'(c) = (f(b) - f(a))/(b - a)\). \qedmark
+\end{envproof}
+\begin{envremark}{Remark}{4.4}{}
+Rolle’s theorem is precisely the MVT in the case \(f(a) = f(b)\), where the average slope is \(0\). Yet we proved Rolle \emph{first} and recovered the MVT from it, because subtracting the secant always tilts the general situation back to level endpoints. Theorem A, a statement about the derivative at one point, is used to prove Rolle’s theorem; Rolle’s theorem, which adds the equal-endpoints hypothesis, is in turn used to prove the MVT for arbitrary endpoints. Of the three, the MVT is used most often in later chapters. It converts information about \(f'\) at individual points into information about \(f\) on an interval. We use it whenever we make that conversion: immediately below to deduce monotonicity from the sign of \(f'\), and later in Taylor’s theorem and in error estimates.
+\end{envremark}
+\begin{envstrategy}{Strategy}{4.2}{Applying the Mean Value Theorem}
+To extract information about \(f'\) on an interval \([a, b]\) from the MVT:
+
+\begin{steps}
+  \item Check that \(f\) is continuous on the \emph{closed} interval \([a, b]\) — endpoints included. Continuity at the endpoints is what lets the proof call on the extreme value theorem, which needs a closed interval.
+  \item Check that \(f\) is differentiable on the \emph{open} interval \((a, b)\) — endpoints excluded. The endpoints need no derivative, since Rolle’s theorem only ever touched the derivative at an interior point. (So \(f(x) = \sqrt{x}\) on \([0, 1]\), differentiable on \((0, 1)\) despite its vertical tangent at \(0\), still satisfies the differentiability requirement.)
+  \item Read off the conclusion: there \emph{exists} a \(c \in (a, b)\) with \(f'(c) = (f(b) - f(a))/(b - a)\). The theorem guarantees existence only; it does not say which \(c\), so any further argument may rely on the existence of such a \(c\), but not on any specific value.
+\end{steps}
+Skipping the checks is the usual mistake, and the conclusion can then be false. Take \(\lvert x \rvert\) on \([-1, 1]\): it is continuous everywhere but not differentiable at \(0\), so step 2 fails. The secant slope is \((\lvert 1 \rvert - \lvert -1 \rvert)/(1 - (-1)) = 0\), yet \(\lvert x \rvert' = \pm 1\) wherever it is defined and never \(0\), so no valid \(c\) exists, exactly because the differentiability hypothesis was missing.
+\end{envstrategy}
+\begin{workedexample}
+\begin{envexample}{Example}{4.2}{}
+Apply the Mean Value Theorem to \(f(x) = x^{2}\) on \([0, 2]\), and locate a point \(c\) it guarantees.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The function \(x^{2}\) is continuous on \([0, 2]\) and differentiable on \((0, 2)\), so both hypotheses hold. The average rate of change is
+
+\[ \frac{f(2) - f(0)}{2 - 0} = \frac{4 - 0}{2} = 2. \]
+
+The MVT guarantees a \(c \in (0, 2)\) with \(f'(c) = 2\). Here \(f'(x) = 2x\), so \(2c = 2\) gives \(c = 1\), which indeed lies in \((0, 2)\). For this simple \(f\) we could solve for \(c\) outright; in general the theorem hands us only the existence of such a \(c\), and the arguments below are built to need nothing more. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{4.3}{}
+Use the Mean Value Theorem to show that \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\) for all real numbers \(a\) and \(b\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+If \(a = b\) both sides are \(0\) and there is nothing to prove, so assume \(a \ne b\); relabel if necessary so that \(b < a\). The function \(f(x) = \sin x\) is differentiable on all of \(\mathbb{R}\), so it is continuous on \([b, a]\) and differentiable on \((b, a)\). By the Mean Value Theorem (Theorem 4.12) there is a point \(c \in (b, a)\) with
+
+\[ \frac{\sin a - \sin b}{a - b} = f'(c) = \cos c. \]
+
+We do not need to know which \(c\), only that one exists. Multiplying across and taking absolute values,
+
+\[ \lvert \sin a - \sin b \rvert = \lvert \cos c \rvert \,\lvert a - b \rvert. \]
+
+Since \(\lvert \cos c \rvert \le 1\) for every real \(c\), this gives \(\lvert \sin a - \sin b \rvert \le \lvert a - b \rvert\), as claimed. The same argument bounds the change of any function by a bound on its derivative: if \(\lvert f' \rvert \le K\) throughout an interval, then \(\lvert f(a) - f(b) \rvert \le K \lvert a - b \rvert\) for any two points in it. \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{4.4}{}
+How many real roots does \(f(x) = 3x - \sin x\) have? Show that your count is exact.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+By inspection \(f(0) = 3 \cdot 0 - \sin 0 = 0\), so \(x = 0\) is a root; \(f\) has at least one. The question is whether there could be a second. Suppose, for contradiction, that \(f\) had a second root \(a \ne 0\). Then \(f(0) = f(a) = 0\), and \(f\) is continuous and differentiable on all of \(\mathbb{R}\), so Rolle’s theorem (Theorem 4.11) applied to the interval between \(0\) and \(a\) would supply a point \(c\) strictly between them with \(f'(c) = 0\). But
+
+\[ f'(x) = 3 - \cos x, \]
+
+and since \(\cos x \le 1 < 3\) for every real \(x\), we have \(f'(x) \ge 3 - 1 = 2 > 0\) everywhere, so \(f'\) is never zero. No such \(c\) can exist, so the assumed second root is impossible.
+
+Therefore \(f(x) = 3x - \sin x\) has exactly one real root, namely \(x = 0\). The pattern is general: if \(f\) is continuous on an interval and differentiable inside it, and \(f'\) is never zero there, then \(f\) has at most one root in that interval, since two roots would force a zero of \(f'\) between them. \qedmark
+\end{envsolution}
+\end{workedexample}
+\subsechead{Monotonicity from the sign of the derivative}
+Now the payoff. The MVT converts the sign of the derivative directly into monotonic behavior, turning the qualitative slogan “positive derivative means increasing” into a theorem.
+
+\begin{envcorollary}{Corollary}{4.3}{Monotonicity from the sign of \(f'\)}
+Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\).
+
+\begin{itemize}
+  \item If \(f'(c) \ge 0\) for every \(c \in (a, b)\), then \(f(x_{1}) \le f(x_{2})\) whenever \(a \le x_{1} < x_{2} \le b\): \(f\) is non-decreasing on \([a, b]\).
+  \item If \(f'(c) > 0\) for every \(c \in (a, b)\), then \(f(x_{1}) < f(x_{2})\) whenever \(a \le x_{1} < x_{2} \le b\): \(f\) is strictly increasing on \([a, b]\).
+\end{itemize}
+\end{envcorollary}
+\begin{envproof}{Proof}{}{}
+Fix \(x_{1} < x_{2}\) in \([a, b]\). The hypotheses hold on the subinterval \([x_{1}, x_{2}]\) as well, so by the MVT (Theorem 4.12) there is a \(c \in (x_{1}, x_{2})\) with
+
+\[ \frac{f(x_{2}) - f(x_{1})}{x_{2} - x_{1}} = f'(c). \]
+
+The denominator \(x_{2} - x_{1}\) is positive. If \(f'(c) \ge 0\) the numerator \(f(x_{2}) - f(x_{1})\) is \(\ge 0\), giving \(f(x_{1}) \le f(x_{2})\); if \(f'(c) > 0\) it is strictly positive, giving \(f(x_{1}) < f(x_{2})\). \qedmark
+\end{envproof}
+\begin{envcaution}{Caution}{}{}
+Corollary 4.3 runs in one direction only: a positive derivative forces strict increase, not the reverse. A strictly increasing function need \emph{not} have a strictly positive derivative everywhere. The function \(f(x) = x^{3}\) is strictly increasing on all of \(\mathbb{R}\), yet \(f'(0) = 0\); the derivative is allowed to touch zero at isolated points without spoiling strict monotonicity. The corollary is a sufficient test, not a characterisation.
+\end{envcaution}
+Two applications close the section. The second is the one we have been working toward.
+
+\begin{workedexample}
+\begin{envexample}{Example}{4.5}{}
+Show that \(\sin x\) is strictly increasing on \([0, \tfrac{\pi}{4}]\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+On \((0, \tfrac{\pi}{4})\) the derivative \((\sin x)' = \cos x\) is positive, since cosine is positive on \((0, \tfrac{\pi}{2})\). By the strict half of Corollary 4.3, \(\sin x\) is strictly increasing on \([0, \tfrac{\pi}{4}]\): for \(0 \le x_{1} < x_{2} \le \tfrac{\pi}{4}\), \(\sin x_{1} < \sin x_{2}\). \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{4.6}{}
+Show that \(e^{x}\) is strictly increasing on all of \(\mathbb{R}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+By Theorem 4.8, \((e^{x})' = e^{x}\). This derivative is positive everywhere: for \(x > 0\) every term of \(\sum x^{n}/n!\) is positive, at \(x = 0\) the sum is \(e^{0} = 1 > 0\), and for \(x < 0\) the exponent law (Theorem 4.7) gives \(e^{x} = 1/e^{-x} > 0\). So on any closed interval \([x_{1}, x_{2}]\) the strict half of Corollary 4.3 applies and yields \(e^{x_{1}} < e^{x_{2}}\).
+
+Because any two reals \(x_{1} < x_{2}\) lie in some such closed interval, this holds for every pair, and \(e^{x}\) is strictly increasing on \(\mathbb{R}\). (Strict monotonicity passes from every closed interval to the whole line this way. Passing from bounded intervals to all of \(\mathbb{R}\) does not preserve every property. For example, boundedness can be lost, but strict monotonicity is preserved.) \qedmark
+\end{envsolution}
+\end{workedexample}
+That last example proves that \(e^{x}\) is strictly increasing, the result needed for the next section. A strictly increasing function is one-to-one, so \(e^{x}\) has a genuine inverse on its range; the next section defines that inverse, the natural logarithm \(\ln x\).
+
+
+\sechead{4.5}{Monotonicity and the Logarithmic Function}
+Section 4.4 closed with the fact this section is built on: \(e^{x}\) is strictly increasing on \(\mathbb{R}\), and a strictly increasing function is one-to-one. A one-to-one function can be inverted, and the inverse of the exponential is the \emph{natural logarithm}. Strict monotonicity gives the uniqueness we need: no value can come from two different exponents. Existence is a separate matter. Once we show that the range of \(e^{x}\) is \((0,\infty)\), every positive number has such an exponent. Strict monotonicity is also needed in every later proof about that inverse. The continuity and differentiability of \(\ln\) do not follow automatically from the definition; each needs its own argument, and both reach back to the strict monotonicity of \(e^{x}\).
+
+This section defines \(\ln x\), proves it is continuous, and derives \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\) rigorously. This time we do not assume in advance that \(\ln\) is differentiable, the assumption Chapter 3 made informally. Along the way it settles two debts left earlier: the informal logarithm of §3.3 and the meaning of \(a^{r}\) for irrational \(r\), deferred back in §4.1.
+
+\subsechead{Defining the natural logarithm}
+To invert \(e^{x}\) we need to know exactly which values it takes. First, \(e^{x} > 0\) for every real \(x\) (Corollary 4.1), so its values are positive. They range over \emph{all} positive numbers, and the Intermediate Value Theorem makes that precise.
+
+Fix any target \(t > 0\). For \(x > 0\), every term of the series after the first two is positive, so \(e^{x} > 1 + x\). Therefore \(e^{x}\) exceeds \(t\) once \(x\) is large enough. Since \(e^{-x} = 1/e^{x}\) (Theorem 4.7), the values \(e^{x}\) fall below \(t\) once \(x\) is sufficiently negative.
+
+Pick points \(p < q\) with \(e^{p} < t < e^{q}\). On \([p, q]\) the function \(e^{x}\) is continuous (Theorem 4.6), so by the Intermediate Value Theorem (Theorem 4.9(b)) there is a \(c \in [p, q]\) with \(e^{c} = t\). Every positive \(t\) is therefore attained, and the range of \(e^{x}\) is exactly the open interval \((0, \infty)\). Strict monotonicity makes the exponent unique, so for every \(x > 0\) there is exactly one \(a\) with \(e^{a} = x\).
+
+\begin{envdefinition}{Definition}{4.4}{Natural logarithm}
+For \(x \in (0, \infty)\), the \emph{natural logarithm} of \(x\), written \(\ln x\), is the unique real number \(a\) satisfying
+
+\[ e^{a} = x. \]
+
+Equivalently, \(\ln x\) is the inverse function of \(e^{x}\) on \((0, \infty)\): it is characterized by the two identities
+
+\[ e^{\ln x} = x \quad (x > 0), \qquad \ln(e^{x}) = x \quad (x \in \mathbb{R}). \]
+
+\begin{informal}
+In words, \(\ln x\) is the exponent to which \(e\) must be raised to obtain \(x\). The strict monotonicity of \(e^{x}\) makes that exponent unique; its range being \((0, \infty)\) makes the exponent exist for every positive \(x\).
+\end{informal}
+\end{envdefinition}
+\begin{envcaution}{Caution}{}{}
+The logarithm is defined only for \(x > 0\). The symbols \(\ln 0\) and \(\ln(-1)\) have no meaning here: \(\ln 0\) would require \(e^{a} = 0\) and \(\ln(-1)\) would require \(e^{a} = -1\), and neither is possible, because \(e^{a} > 0\) for every real \(a\). Every formula in this section that contains \(\ln x\) is understood to require \(x > 0\).
+\end{envcaution}
+\begin{figureblock}
+  \includegraphics[width=80.9mm]{ch04/figs/exp-log-reflection}
+\figcaption{Figure 4.5}{The inverse relationship between \(e^{x}\) and \(\ln x\) appears as reflection across \(y = x\); \((0,1)\) reflects to \((1,0)\).}
+\end{figureblock}
+\subsechead{Continuity of the logarithm}
+That \(\ln\) is continuous is not automatic and takes a short argument. The idea is indirect: if some sequence of inputs approached \(x_{0}\) while their logarithms stayed away from \(\ln x_{0}\), then applying the strictly increasing \(e^{x}\) would re-open a fixed gap on the input side, contradicting the very fact that the inputs converged.
+
+\begin{envtheorem}{Theorem}{4.13}{}
+\(\ln x\) is continuous at every \(x_{0} > 0\).
+\end{envtheorem}
+\emph{Proof track: this argument proves the theorem. What follows uses only the statement that \(\ln\) is continuous, so on a first reading you may take it and move on.}
+
+\begin{envproof}{Proof}{}{}
+Fix \(x_{0} > 0\) and suppose, for contradiction, that \(\ln\) is \emph{not} continuous at \(x_{0}\). Then \(\lim_{x \to x_{0}} \ln x\) either fails to exist or exists but differs from \(\ln x_{0}\). In either case the failure is witnessed by a sequence: there is a number \(\delta > 0\) and points \(y_{j} \to x_{0}\) (all in \((0, \infty)\)) with
+
+\[ \lvert \ln y_{j} - \ln x_{0} \rvert \ge \delta \qquad \text{for every } j = 1, 2, 3, \dots \]
+
+(To see why failure is witnessed this way, negate the limit statement of §1.6: if \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) fails, there is some tolerance \(\delta > 0\) that no input-closeness requirement can meet: for every \(d > 0\), some point \(y\) with \(0 < \lvert y - x_{0} \rvert < d\) has \(\lvert \ln y - \ln x_{0} \rvert \ge \delta\). Picking one such point \(y_{j}\) for each \(d = \tfrac{1}{j}\) produces the sequence, and for small \(d\) these points stay inside \((0, \infty)\).)
+
+For each \(j\) this means \(\ln y_{j} \le \ln x_{0} - \delta\) or \(\ln y_{j} \ge \ln x_{0} + \delta\). Apply \(e^{x}\), which is strictly increasing (Example 4.6), to each case. Writing \(y_{j} = e^{\ln y_{j}}\) and \(x_{0} = e^{\ln x_{0}}\):
+
+\begin{itemize}
+  \item if \(\ln y_{j} \le \ln x_{0} - \delta\), then \(x_{0} - y_{j} = e^{\ln x_{0}} - e^{\ln y_{j}} \ge e^{\ln x_{0}} - e^{\ln x_{0} - \delta} > 0\);
+  \item if \(\ln y_{j} \ge \ln x_{0} + \delta\), then \(y_{j} - x_{0} = e^{\ln y_{j}} - e^{\ln x_{0}} \ge e^{\ln x_{0} + \delta} - e^{\ln x_{0}} > 0\).
+\end{itemize}
+Let
+
+\[ \varepsilon = \min\!\left\{\, e^{\ln x_{0}} - e^{\ln x_{0} - \delta}, \; e^{\ln x_{0} + \delta} - e^{\ln x_{0}} \,\right\} > 0, \]
+
+a single positive number depending only on \(x_{0}\) and \(\delta\), so each of the two case bounds above is at least \(\varepsilon\). In both cases \(\lvert y_{j} - x_{0} \rvert = \lvert e^{\ln y_{j}} - e^{\ln x_{0}} \rvert \ge \varepsilon\), so
+
+\[ \lvert y_{j} - x_{0} \rvert \ge \varepsilon \qquad \text{for every } j. \]
+
+But this contradicts \(y_{j} \to x_{0}\), which forces \(\lvert y_{j} - x_{0} \rvert\) below \(\varepsilon\) for large \(j\). The assumption of discontinuity is untenable, so \(\lim_{x \to x_{0}} \ln x = \ln x_{0}\) and \(\ln\) is continuous at \(x_{0}\). \qedmark
+\end{envproof}
+\subsechead{The derivative of the logarithm}
+Chapter 3 already wrote down \(\dfrac{d}{dx}\ln x = \dfrac{1}{x}\), but it did so by differentiating \(e^{\ln x} = x\) with the chain rule, which assumes that \(\ln\) is differentiable without first proving it. We can now prove the formula without that assumption. The inverse-function technique flips the logarithm’s difference quotient into a difference quotient for \(e^{x}\), whose derivative we already control, and lets continuity carry the limit across.
+
+\begin{envtheorem}{Theorem}{4.14}{}
+For every \(x > 0\),
+
+\[ \frac{d}{dx}\ln x = \frac{1}{x}. \]
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Fix \(x > 0\) and take \(h \ne 0\) small enough that \(x + h > 0\). Set
+
+\[ y_{0} = \ln x, \qquad y = \ln(x + h), \]
+
+so that \(e^{y_{0}} = x\) and \(e^{y} = x + h\); subtracting, \(e^{y} - e^{y_{0}} = (x + h) - x = h\). Substituting this for \(h\) and flipping the quotient,
+
+\[ \frac{\ln(x + h) - \ln x}{h} = \frac{y - y_{0}}{e^{y} - e^{y_{0}}} = \frac{1}{\dfrac{e^{y} - e^{y_{0}}}{y - y_{0}}}. \]
+
+The division is legitimate because \(y \ne y_{0}\): the logarithm is strictly increasing, being the inverse of the strictly increasing \(e^{x}\), so \(h \ne 0\) forces \(\ln(x + h) \ne \ln x\).
+
+Now let \(h \to 0\). By continuity of \(\ln\) (Theorem 4.13), \(y = \ln(x + h) \to \ln x = y_{0}\), and \(y \ne y_{0}\) all the while. The denominator is precisely the difference quotient of \(e^{y}\) at \(y_{0}\), so
+
+\[ \lim_{h \to 0} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \lim_{y \to y_{0}} \frac{e^{y} - e^{y_{0}}}{y - y_{0}} = \left.\frac{d}{dy} e^{y}\right|_{y = y_{0}} = e^{y_{0}} = e^{\ln x} = x, \]
+
+using \((e^{y})' = e^{y}\) from Theorem 4.8. Taking the reciprocal,
+
+\[ \frac{d}{dx}\ln x = \lim_{h \to 0} \frac{\ln(x + h) - \ln x}{h} = \frac{1}{x}. \]
+
+\qedmark
+\end{envproof}
+Figure 4.6 turns that reciprocal into geometry: reflecting an inverse function swaps rise and run for corresponding tangents.
+
+\begin{figureblock}
+  \includegraphics[width=80.5mm]{ch04/figs/reciprocal-slope-log}
+\figcaption{Figure 4.6}{Corresponding tangent slopes under reflection: slope \(2\) on \(e^{x}\) becomes slope \(\tfrac12\) on \(\ln x\).}
+\end{figureblock}
+\begin{envremark}{Remark}{4.5}{}
+This closes a loop opened in Chapter 3. There (§3.3) the same formula \((\ln x)' = 1/x\) was obtained quickly by applying the chain rule to \(e^{\ln x} = x\), a derivation that \emph{assumes} \(\ln\) is differentiable. The proof above presupposes no such thing: it extracts differentiability from the difference quotient, using only the continuity of \(\ln\) (Theorem 4.13) and the derivative of \(e^{x}\) (Theorem 4.8). The chain-rule route is faster and perfectly good once differentiability is known; the inverse-function route is the one that establishes differentiability in the first place, and so is the one the foundations rest on.
+\end{envremark}
+\subsechead{Logarithm laws and general powers}
+With the derivative in hand we can read off the algebra of the logarithm. The next result is another consequence of the Mean Value Theorem. It handles the case \(f' = 0\) on an interval, where the conclusion is that the function is constant.
+
+\begin{envcorollary}{Corollary}{4.4}{Vanishing derivative}
+Suppose \(f\) is continuous on \([a, b]\) and differentiable on \((a, b)\). If \(f'(c) = 0\) for every \(c \in (a, b)\), then \(f\) is constant on \([a, b]\).
+\end{envcorollary}
+\begin{envproof}{Proof}{}{}
+Take any two points \(x_{1} < x_{2}\) in \([a, b]\). The Mean Value Theorem (Theorem 4.12) on \([x_{1}, x_{2}]\) supplies a \(c \in (x_{1}, x_{2})\) with
+
+\[ f(x_{2}) - f(x_{1}) = f'(c)\,(x_{2} - x_{1}) = 0 \cdot (x_{2} - x_{1}) = 0, \]
+
+so \(f(x_{2}) = f(x_{1})\). As \(x_{1}, x_{2}\) were arbitrary, \(f\) takes a single value throughout \([a, b]\). \qedmark
+\end{envproof}
+\begin{envproposition}{Proposition}{4.3}{Logarithm product law}
+For all \(a, b > 0\),
+
+\[ \ln(ab) = \ln a + \ln b. \]
+\end{envproposition}
+\begin{envproof}{Proof}{}{}
+Fix \(a > 0\) and define, for \(x > 0\),
+
+\[ f(x) = \ln(ax) - \ln x. \]
+
+By the chain rule together with Theorem 4.14,
+
+\[ f'(x) = a \cdot \frac{1}{ax} - \frac{1}{x} = \frac{1}{x} - \frac{1}{x} = 0 \qquad \text{for every } x > 0. \]
+
+So \(f'\) vanishes identically. On every closed interval contained in \((0, \infty)\), \(f\) is differentiable and therefore continuous, so Corollary 4.4 applies. Taking the interval with endpoints \(1\) and any \(x > 0\) gives \(f(x) = f(1)\). But \(f(1) = \ln a - \ln 1 = \ln a\), since \(\ln 1 = 0\) (because \(e^{0} = 1\)). Hence \(f(x) = \ln a\) for all \(x > 0\); that is, \(\ln(ax) - \ln x = \ln a\). Setting \(x = b\) gives \(\ln(ab) - \ln b = \ln a\), which rearranges to \(\ln(ab) = \ln a + \ln b\). \qedmark
+\end{envproof}
+\begin{envcaution}{Caution}{}{}
+The product law converts a product \emph{inside} the logarithm into a sum \emph{outside} it: \(\ln(ab) = \ln a + \ln b\). It says nothing about a sum inside. In general \(\ln(a + b) \ne \ln a + \ln b\). Taking \(a = b = 1\) gives \(\ln 2\) on the left and \(0\) on the right. Likewise \(\ln(a/b)\) is \(\ln a - \ln b\), not \(\ln a / \ln b\). The proof above establishes the product law. It does not justify the similar-looking formulas.
+\end{envcaution}
+The product law is exactly what is needed to define powers with arbitrary real exponents. That is the question §4.1 raised about \(a^{r}\) for irrational \(r\) and then deferred.
+
+\begin{workedexample}
+\begin{envexample}{Example}{4.7}{General powers}
+For \(a > 0\), \emph{define} the power \(a^{x}\) for every real \(x\) by
+
+\[ a^{x} = e^{x \ln a}. \]
+
+This agrees with the usual meaning when \(x\) is rational and extends it to all real \(x\). Verify, for \(a, b > 0\), the two exponent laws
+
+\[ \text{(i)}\quad a^{x} b^{x} = (ab)^{x}, \qquad\qquad \text{(ii)}\quad (a^{x})^{y} = a^{xy} = (a^{y})^{x}. \]
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+For \runin{(i)}, multiply and collect exponents with the exponent law for \(e\) (Theorem 4.7), then use the product law just proved:
+
+\[ a^{x} b^{x} = e^{x \ln a}\, e^{x \ln b} = e^{x \ln a + x \ln b} = e^{x(\ln a + \ln b)} = e^{x \ln(ab)} = (ab)^{x}. \]
+
+For \runin{(ii)}, first note \(\ln(a^{x}) = \ln\!\left(e^{x \ln a}\right) = x \ln a\), using \(\ln(e^{t}) = t\). Therefore
+
+\[ (a^{x})^{y} = e^{y \ln(a^{x})} = e^{y \,\cdot\, x \ln a} = e^{xy \ln a} = a^{xy}. \]
+
+The middle expression \(e^{xy \ln a}\) is symmetric in \(x\) and \(y\), so running the same computation with the roles swapped gives \((a^{y})^{x} = e^{xy \ln a} = a^{xy}\) as well. Hence \((a^{x})^{y} = a^{xy} = (a^{y})^{x}\). \qedmark
+\end{envsolution}
+\end{workedexample}
+\begin{envremark}{Remark}{4.6}{}
+The exponent law has a converse worth noting: the exponential is the \emph{only} continuous function \(g \colon \mathbb{R} \to (0, \infty)\) satisfying \(g(x)\,g(y) = g(x + y)\) for all \(x, y\) together with the normalization \(g(1) = e\); the proof is omitted.
+\end{envremark}
+\subsechead{Why these functions are unavoidable}
+The defining feature of the exponential, \((e^{x})' = e^{x}\), is exactly what makes it the right function for any quantity whose rate of change is proportional to its current size. If \(y(t)\) obeys \(y'(t) = k\,y(t)\) for a constant \(k\), then \(y(t) = y(0)\,e^{kt}\). To see this, note that \((y(t)e^{-kt})' = (y'(t) - k\,y(t))e^{-kt} = 0\), so Corollary 4.4 shows that \(y(t)e^{-kt}\) is constant. Setting \(t = 0\) identifies that constant as \(y(0)\). This model describes population growth (\(k > 0\)), radioactive decay (\(k < 0\)), and continuously compounded interest. The logarithm enters the moment one inverts: for positive quantities and \(k \ne 0\), solving \(y(t) = y_{\ast}\) for the time gives \(t = (\ln y_{\ast} - \ln y(0))/k\). The radioactive half-life \(t_{1/2} = \ln 2 / \lvert k \rvert\) is just the case \(y_{\ast} = y(0)/2\). All the results established in this chapter — the series definition, the exponent law, the rigorous derivatives, the inverse construction — is what makes these formulas genuinely well-defined rather than merely suggestive.
+
+\subsechead{Chapter summary}
+Chapter 4 set out to put \(e^{x}\) and \(\ln x\) on rigorous foundations, replacing the informal handling of Chapters 2 and 3 with theorems and proofs. Four strands ran through it.
+
+\begin{itemize}
+  \item \runin{The exponential function.} \(e^{x} := \sum_{n=0}^{\infty} x^{n}/n!\) is defined by a power series (§4.1), shown convergent for every real \(x\) by geometric tail bounds; it is continuous on \(\mathbb{R}\) and obeys the exponent law \(e^{x}e^{y} = e^{x+y}\) (§4.2); and its derivative is itself, \((e^{x})' = e^{x}\), proved with the explicit bound \(\lvert (e^{h}-1)/h - 1 \rvert \le \lvert h \rvert\) for \(\lvert h \rvert < \tfrac{1}{2}\) (§4.3).
+  \item \runin{Real-analysis machinery.} The completeness of \(\mathbb{R}\) — monotone bounded sequences converge — provides the basis for the later results; from it follow the equivalence of convergence and the Cauchy condition (via Bolzano–Weierstrass) used to define \(e^{x}\), and the extreme value theorem used to launch the existence theorems.
+  \item \runin{Existence theorems for differentiation.} Theorem A locates the vanishing of the derivative at interior extrema; Rolle’s theorem follows; and the Mean Value Theorem follows from Rolle (§4.4). The MVT converts the sign of \(f'\) into monotonicity, and its borderline case \(f' = 0\) into constancy.
+  \item \runin{The logarithm.} Because \(e^{x}\) is strictly increasing, it has an inverse \(\ln x\) on \((0, \infty)\) (§4.5); \(\ln\) is continuous, its derivative is \(1/x\), it converts products to sums, and through \(a^{x} = e^{x\ln a}\) it finally gives meaning to arbitrary real powers.
+\end{itemize}
+Every property of \(e^{x}\) and \(\ln x\) borrowed on faith in earlier chapters has now been turned into a theorem with a proof, and later chapters may use these functions freely.
+\end{document}

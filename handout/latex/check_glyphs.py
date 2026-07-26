@@ -23,12 +23,16 @@ CID／ToUnicode／charset 卻全對——四閘全綠。修法是模板給 Inter
 **這條閘的已知極限（別把它當成它不是的東西）**：
   - 只驗「輪廓對不對」，不驗「擺得對不對」。字距、letterspacing、定位、斷行壞掉，
     本閘一律看不到——那是閘 2 與人眼的範圍。
-  - 逐 CID 輪廓比對只驗 CFF（FontFile3／CIDFontType0C）。非 CID-keyed 的嵌入子集、或
-    找不到原始字型檔，一律 **FAIL 並指名**，不默默略過——silent skip 正是
-    check_prose.py 的 figure_note_check 記錄過的偽陰性坑，不重蹈。
-  - **非 CFF 的嵌入字型走 `FIG_IMPORTED_OK` 具名白名單**（2026-07-26 ch02 rollout 立，
-    見該常數的註解）：那些是圖 PDF 帶進來的、不是 LaTeX 嵌的，本機沒有原始檔可比對，
-    故改問「是不是預期中的那幾套字型」。**白名單外仍是硬 FAIL 並指名**。
+  - 逐輪廓比對涵蓋兩種嵌入格式：**CFF**（FontFile3／CIDFontType0C，比 CID）與
+    **glyf**（FontFile2／TrueType，比 GID）。glyf 那條路是 2026-07-26 ch04 rollout 加的：
+    圖由 headless Chrome 重繪，面板上的襯線標籤用 standalone 的 web New Computer Modern，
+    那份 woff2 是 TrueType-flavored，於是圖 PDF 裡是 FontFile2（見 audit_glyf 的說明與
+    template/fonts/webcm/README.md）。非 CID-keyed 的 CFF 子集、其餘格式，一律 **FAIL 並指名**，
+    不默默略過——silent skip 正是 check_prose.py 的 figure_note_check 記錄過的偽陰性坑。
+  - **驗不了時才退回 `FIG_IMPORTED_OK` 具名白名單**（2026-07-26 ch02 rollout 立，見該常數的
+    註解）：那是圖 PDF 帶進來、本機沒有原始檔可比對的字型，只能問「是不是預期中的那幾套」。
+    ch04 rollout 把 WebCM 的原始 woff2 vendored 進來之後，它已升級成真的比對輪廓；
+    白名單自此是 **fallback 而非 shortcut**——能驗的一定要驗。**白名單外仍是硬 FAIL 並指名**。
 """
 import io
 import re
@@ -43,6 +47,9 @@ from fontTools.pens.recordingPen import RecordingPen
 from fontTools.ttLib import TTFont
 
 VENDORED = Path(__file__).resolve().parent / "template" / "fonts" / "inter"
+# 圖裡的 web 字型（Chrome 從 standalone 的 @font-face 嵌進圖 PDF 的子集）比對基準。
+# 與 VENDORED 分開放：那裡是排版用的 Inter，這裡的字型不參與排版，只當閘的原始字型。
+VENDORED_WEB = Path(__file__).resolve().parent / "template" / "fonts" / "webcm"
 SUBSET_TAG = re.compile(r"^\w{6}\+")            # 子集前綴 `IQGLBE+Inter-Bold`
 
 # ── 圖 PDF 帶進來的字型：具名 allow-list（2026-07-26，ch02 rollout 立）─────────
@@ -82,6 +89,9 @@ def find_original(basefont):
     vendored = VENDORED / f"{name}.otf"
     if vendored.exists():
         return vendored
+    web = VENDORED_WEB / f"{name}.woff2"       # 圖裡的 web 字型（見 template/fonts/webcm/README.md）
+    if web.exists():
+        return web
     out = subprocess.run(["kpsewhich", f"{name}.otf"], capture_output=True, text=True)
     found = Path(out.stdout.strip()) if out.stdout.strip() else None
     return found if found and found.exists() else None
@@ -147,6 +157,53 @@ def audit(doc, basefont, data):
     return len(td.charset) - 1, bad
 
 
+def _glyf_outline(glyphset, name):
+    """glyf 輪廓 → 可比對的 tuple。取整同 outline()，理由見該函式（子集器的浮點噪音）。"""
+    pen = RecordingPen()
+    glyphset[name].draw(pen)
+    return tuple((op, tuple(round(c, 1) for pt in args for c in pt)) for op, args in pen.value)
+
+
+def audit_glyf(basefont, data):
+    """FontFile2（TrueType／glyf）子集：逐 GID 比對輪廓。回傳 (檢查數, 錯誤清單)。
+
+    誰會走這條路：圖。export_figs.mjs 用 headless Chrome 把面板重繪成向量 PDF，面板上的
+    襯線標籤用 standalone `@font-face` 宣告的 web 版 New Computer Modern；那份 woff2 是
+    **TrueType-flavored**（`glyf` 輪廓），所以 Chrome 嵌進圖 PDF 的是 FontFile2 而非 CFF。
+    ch04 是全書第一個把襯線／數學標籤帶進圖的章，也就是第一個踩到的單元（ch01 的 26 張圖
+    沒有襯線文字，其 PDF 裡零 WebCM 字型）。
+
+    為什麼可以「同一 GID 比輪廓」：實測 Chrome 的子集器**保留原字型的 GID 編號**，未用到的
+    位置填空字形（ch04 實測 numGlyphs 88／93，`a`=GID 68、`x`=GID 91 與原字型完全一致，
+    輪廓亦逐一相符）。故判準與 CFF 路徑同源，不必靠 cmap 反查，也就不受子集 cmap 是否完整
+    影響。原字型 GID 數必然 ≥ 子集（3502 vs 88）。
+
+    空字形一律跳過：那是子集器為了保住 GID 編號而填的洞，不是「印出來是空白」。真的該印卻
+    沒印，是完整性閘（check_prose.py 讀文字層）的範圍。
+    """
+    path = find_original(basefont)
+    if path is None:
+        raise LookupError(
+            f"找不到 {SUBSET_TAG.sub('', basefont)}.woff2（template/fonts/webcm/ 沒有）——"
+            f"圖裡的 web 字型要 vendor 進來才驗得了，見該資料夾的 README")
+    sub = TTFont(io.BytesIO(data), lazy=True)
+    orig = TTFont(path, lazy=True)
+    sgs, ogs = sub.getGlyphSet(), orig.getGlyphSet()
+    sorder, oorder = sub.getGlyphOrder(), orig.getGlyphOrder()
+    if len(oorder) < len(sorder):
+        raise LookupError(f"{basefont} 的原字型字形數（{len(oorder)}）少於子集（{len(sorder)}），GID 對不起來")
+
+    bad, n = [], 0
+    for gid in range(1, len(sorder)):            # [0] 恆為 .notdef
+        got = _glyf_outline(sgs, sorder[gid])
+        if not got:                              # 子集為了保住 GID 編號而填的空洞
+            continue
+        n += 1
+        if got != _glyf_outline(ogs, oorder[gid]):
+            bad.append((gid, oorder[gid], "?"))
+    return n, bad
+
+
 def _utf8_console():
     """Windows 主控台預設 cp950，一印到字形名（Œ、ß…）就 UnicodeEncodeError。
     文件寫的是 `python check_glyphs.py …`，不該逼人自己記得設 PYTHONIOENCODING。"""
@@ -167,18 +224,23 @@ def main():
 
     total, failures, unchecked, imported = 0, [], [], Counter()
     for basefont, kind, xref in embedded_fonts(doc):
-        if kind != "3":
-            name = SUBSET_TAG.sub("", basefont)
-            if name.startswith(FIG_IMPORTED_OK):
-                imported[name] += 1
-            else:
-                unchecked.append(f"{basefont}：FontFile{kind}（非 CFF），"
-                                 f"且不在 FIG_IMPORTED_OK 白名單內")
+        name = SUBSET_TAG.sub("", basefont)
+        if kind not in ("2", "3"):
+            unchecked.append(f"{basefont}：FontFile{kind}（既非 CFF 也非 glyf）")
             continue
         try:
-            n, bad = audit(doc, basefont, doc.xref_stream(xref))
+            if kind == "3":
+                n, bad = audit(doc, basefont, doc.xref_stream(xref))
+            else:
+                n, bad = audit_glyf(basefont, doc.xref_stream(xref))
         except LookupError as e:
-            unchecked.append(f"{basefont}：{e}")
+            # 驗不了才退回 FIG_IMPORTED_OK 白名單（ch02 rollout 立的安全網）。順序不能反：
+            # 白名單只問「是不是預期中的那套字型」，比對輪廓才問「印出來對不對」——
+            # 能驗就一定要驗，白名單是 fallback 不是 shortcut。
+            if kind == "2" and name.startswith(FIG_IMPORTED_OK):
+                imported[name] += 1
+            else:
+                unchecked.append(f"{basefont}：{e}")
             continue
         total += n
         print(f"  {SUBSET_TAG.sub('', basefont):22s} {n:3d} 字形 → {len(bad)} 個輪廓不符")

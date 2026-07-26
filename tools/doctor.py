@@ -71,6 +71,7 @@ _VENV_MODS = [
     ("imageio-ffmpeg", "imageio_ffmpeg", "optional", "內附 ffmpeg 二進位（裝了系統 ffmpeg 後非必要）"),
     ("fonttools", "fontTools", "optional", "LaTeX 字形閘讀原始字型輪廓（handout/latex/check_glyphs.py）；產 logo 外框 SVG"),
     ("pymupdf", "fitz", "optional", "LaTeX 字形閘讀 PDF 嵌入字型（handout/latex/check_glyphs.py）；authoring 圖稽核轉點陣"),
+    ("Brotli", "brotli", "optional", "LaTeX 字形閘讀圖裡 web 字型的 woff2 基準（fontTools 解 woff2 需要；template/fonts/webcm/）"),
 ]
 
 

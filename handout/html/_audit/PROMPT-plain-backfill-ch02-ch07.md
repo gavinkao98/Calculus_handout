@@ -288,12 +288,13 @@ build 一定帶參數（python handout/html/build.py ch07）。
    （方言差集、圖匯出、字形閘），只加 `NAMES` 而沒有 `chapters/<ch>/figs/` 與 mapping，`make_dist.py` 會在
    fail-loud 的地方硬錯，等於留一個假的「已支援」訊號。ch04 的 rollout 正由另一個 session 進行中
    （其 worktree 有未提交的 `convert.py`／`make_dist.py`／`test_convert.py` 與 `dist/ch04/`），
-   由該輪自己補 `NAMES` 才不會兩邊搶同一行。現況＝`appB`／`ch01`／`ch02`／`ch03`。
+   由該輪自己補 `NAMES` 才不會兩邊搶同一行。現況＝`appB`／`ch01`／`ch02`／`ch03`／**`ch04`**。
+   **（2026-07-26 更新）ch04 的 rollout 已完成並併入**：`NAMES` 補了 `"ch04": "chapter4"`，四閘全綠、`dist/ch04/` 兩檔已產出。該輪另外逼出三個轉換器方言差集與一個字形閘缺口，逐條紀錄見 [`../../latex/chapters/ch04/DIALECT-ch04.md`](../../latex/chapters/ch04/DIALECT-ch04.md)。
 4. **全書複測**：`python tools/prose_metrics.py` — **無任何單元回退**，已達標七個單元落在 0.8–2.3。
    LaTeX 線整合回歸同時跑過：轉換器 83/83、字形閘（appB 362／ch01 489／ch02 467+8）全 PASS、
    完整性閘三單元 0 處真落差。
 
-**剩餘工作**：ch06（進行中）＋ appA 18.8／appC 17.8／appD 13.2。
+**剩餘工作**：ch06（進行中）＋ appA 18.8／appC 17.8／appD 13.2。LaTeX 線已 rollout：appB／ch01／ch02／ch03／ch04。
 
 ---
 *本檔 2026-07-25 建立。判準變更一律改 `CONTENT_SPEC.md` §3（RC 凍結，需「同一規則在三節以上反覆誤判」才夠格），不在本檔另立規則。*

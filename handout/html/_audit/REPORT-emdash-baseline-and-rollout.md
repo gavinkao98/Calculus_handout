@@ -60,7 +60,7 @@
 | **ch07** | 14 | 8,937 | **1.6** | 92 | 36 | 56 | 43 | ✅ 已達標（原 17.5，全書超額最多的單元；執行 146 條）——[`REVIEW-ch07-plain-applied.html`](REVIEW-ch07-plain-applied.html) |
 | **ch01** | 12 | 5,810 | **2.1** | 42 | 20 | 37 | 41 | ✅ 已達標（原 9.3；執行 41 條）——剩下 12 個＝**手稿逐字 8**（4 對成對插入語，使用者裁決比照 §1.4 保留）＋**§1.4 凍結 4**；[`REVIEW-ch01-plain-applied.html`](REVIEW-ch01-plain-applied.html) |
 | **appB** | 17 | 7,793 | **2.2** | 99 | 32 | 48 | 25 | ✅ 已達標（原 17.1；~~舊尺 2.2~~） |
-| **ch04** | 16 | 6,939 | **2.3** | 68 | 43 | 82 | 27 | ✅ 已達標（原 13.3；執行 97 條）——[`REVIEW-ch04-plain-applied.html`](REVIEW-ch04-plain-applied.html) |
+| **ch04** | 16 | 6,967 | **2.3** | 68 | 43 | 82 | 27 | ✅ 已達標（原 13.3；執行 97 條）——[`REVIEW-ch04-plain-applied.html`](REVIEW-ch04-plain-applied.html) |
 | ch06 | 72 | 5,770 | 12.5 | 41 | 37 | 52 | 32 | ⏳ **進行中**（走查與 Codex gate-2 已產出、尚未提交）；§6.2／§6.3 早先已平實化但 dash 未做 |
 | **appD** | 18 | 1,363 | **13.2** | 18 | 13 | 17 | 6 | ⏳ 待做——~~舊表誤標「0.9 無需處理」~~（entity bug） |
 | appC | 24 | 1,347 | 17.8 | 8 | 15 | 7 | 3 | ⏳ 待做；**N<1000 附近，報 raw 24/1347**（~~舊尺 11.4~~） |
@@ -121,7 +121,7 @@
 | 1 | ch07 | 128 | 最新章，改完可當「新章標準流程」樣板 |
 | 2 | ch02 | 95 | |
 | 3 | ch05 | 86 | |
-| 4 | ch04 | 71 | |
+| ~~4~~ | **ch04** | ~~71~~ | ✅ **2026-07-26 完成**。97 條（gate 1 走查 84 → Codex gate-2 42 ADOPT／41 MODIFY／1 REJECT／13 new → triage）、13.3→2.3/1000、tic guard 無一上升、段落觸發器 4→0、HTML 分頁 41 頁不變。**Gate 0 推翻「手稿逐字」前提**：ch04 的 8-gram 逐字覆蓋率僅 1.6%（ch01 為 34.7%）。**Gate 7 四閘全綠**：`NAMES` 補 ch04、三個方言差集（數學區段內 `&lt;`／`&gt;` entity 未解碼〔全書首見〕、裸 `span.qed`、`env-corollary`）、6 panel 圖匯出；字形閘新增 glyf 比對路徑。`dist/ch04/` ＝ chapter4.tex ＋ chapter4.pdf（32 頁）。另補正 3 處數學嚴謹度缺口（N-08／N-12／y(0) 代 t=0）。紀錄 [`../../latex/chapters/ch04/DIALECT-ch04.md`](../../latex/chapters/ch04/DIALECT-ch04.md) |
 | 5 | ch06（§6.1／§6.4／§6.5） | 55 | §6.2／§6.3 已平實化但 dash 未做；**§6.1 另有兩段 ≥150 詞的段落離群** |
 | 6 | appA | 49 | |
 | ~~7~~ | **ch03** | ~~42~~ | ✅ **2026-07-25 完成**。執行 66 條（走查 50＋Codex Q6 第二波 16）、14.0→1.6/1000、既有數學片段零改動、分頁 27 頁不變；Codex gate-2 ADOPT 38／MODIFY 12／REJECT 0（抓到一處既有課文錯誤：continuity 只管差商的第一個因子）。**Gate 7（LaTeX）四閘全綠、`dist/ch03/` 成品已產出**（完整性閘的假紅修法＝`check_prose.py` 改用 `pdftotext -raw`；字形閘的 Times 後備修法＝圖匯出改用 repo 內附的完整 Inter，Google Fonts 的子集不含 U+2080）。紀錄 [`REVIEW-ch03-plain-applied.html`](REVIEW-ch03-plain-applied.html) |
