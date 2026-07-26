@@ -16,6 +16,11 @@ byte-for-byte 證明比「數學片段 diff」更強：把改動逆轉後與 HEA
 edits.txt 範例：
     or, far more often, the search ==> or — far more often — the search
 
+**換行以 `{{NL}}` 表示**（2026-07-26 加，ch06 拆段需要）：逐行格式本身表達不了
+含換行的替換，而拆段（一個 `<p>` 拆成三個）正需要。不用 `\n` 當跳脫，因為課文
+的行內數學有 `\ne`、`\notin`、`\nabla` 等會被誤傷；`{{NL}}` 不出現在課文中。
+不含該 sentinel 的 edits 檔行為完全不變。
+
 判定：
   * 每筆 old 在 rev 版本中 MUST 恰好命中一次（命中 0 或 ≥2 → 判 FAIL，
     因為那代表替換不具確定性）；
@@ -27,6 +32,8 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
+
+NL = "{{NL}}"  # edits 檔中代表換行（見 docstring）
 
 
 def read_rev(rev: str, path: str) -> str:
@@ -50,7 +57,7 @@ def parse_edits(path: str) -> list[tuple[str, str]]:
                 old, new = line.split(" ==> ", 1)
             else:
                 sys.exit(f"edits 第 {ln} 行無分隔符（用 tab 或 ' ==> '）：{line[:60]}")
-            out.append((old, new))
+            out.append((old.replace(NL, "\n"), new.replace(NL, "\n")))
     if not out:
         sys.exit("edits 檔沒有任何替換")
     return out

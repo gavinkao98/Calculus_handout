@@ -56,7 +56,7 @@
 |---|--:|--:|--:|--:|--:|--:|--:|---|
 | **appB** | 17 | 7,793 | **2.2** | 99 | 32 | 48 | 25 | ✅ 已達標（原 17.1；~~舊尺 2.2~~） |
 | **ch01** | 12 | 5,811 | **2.1** | 42 | 20 | 37 | 41 | ✅ 已達標（原 9.3；2026-07-25 合併 sweep 執行 41 條）——剩下 12 個＝**手稿逐字 8**（4 對成對插入語，使用者裁決比照 §1.4 保留）＋**§1.4 凍結 4**；紀錄 [`REVIEW-ch01-plain-applied.html`](REVIEW-ch01-plain-applied.html) |
-| ch06 | 72 | 5,770 | 12.5 | 41 | 37 | 52 | 32 | ⏳ §6.2／§6.3 已平實化，dash 未做（~~舊尺 9.6~~） |
+| **ch06** | 8 | 5,750 | **1.4** | 41 | 33 | 52 | 35 | ✅ 已達標（原 12.5；2026-07-26 合併 sweep 落地 62 筆）——剩下 8 個＝**四處成對 KEEP**（`— \(0\) will do —`／`— for a negative or fractional exponent —`／`— usually cleaner —`／`— if it has any —`，Codex gate-2 Q4 四步判定全數確認）。**§6.5 節級 3.9 > 3.0 走明示節級例外**（使用者 2026-07-26 裁決）；成對逗號 +3 的理由見 applied §2。紀錄 [`REVIEW-ch06-plain-applied.html`](REVIEW-ch06-plain-applied.html) |
 | **appD** | 18 | 1,363 | **13.2** | 18 | 13 | 17 | 6 | ⏳ 待做——~~舊表誤標「0.9 無需處理」~~（entity bug） |
 | ch04 | 92 | 6,895 | 13.3 | 68 | 45 | 82 | 26 | ⏳ 待做（~~舊尺 8.1~~） |
 | ch03 | 54 | 3,855 | 14.0 | 36 | 20 | 60 | 28 | ⏳ 待做（~~舊尺 8.0~~） |
@@ -119,7 +119,7 @@
 | 2 | ch02 | 95 | |
 | 3 | ch05 | 86 | |
 | 4 | ch04 | 71 | |
-| 5 | ch06（§6.1／§6.4／§6.5） | 55 | §6.2／§6.3 已平實化但 dash 未做；**§6.1 另有兩段 ≥150 詞的段落離群** |
+| ~~5~~ | **ch06** | ~~55~~ | ✅ **2026-07-26 完成**（第一個 canon 章＝無手稿、100% LLM 自產，用它驗證條款在無「作者聲音」豁免時的行為）。落地 62 筆、12.5→**1.4/1000**、**數學片段內容變動 0**（727→728，唯一新增 `\(\int f(x)\,dx\)`）、cross-ref 73→73 零遺失、分頁 36 頁 0 溢頁、9 張圖全部與首次提及同頁。段落層兩個離群已拆：§6.1 Caution 159→32/48/75、§6.5 章末摘要 167→63/61/43；§6.1 章 lead 152→133（不再觸發）。Codex gate-2 **ADOPT 38／MODIFY 21／REJECT 0**，抓到兩個我漏掉的真缺陷（`filling` 與同節「no way to tile」矛盾；`the table no longer applies` 被 arctan 那一列證偽）。Gate 6 自審另修回我自己引入的一處數學漏前提（`on a closed interval`）。**Gate 7（LaTeX）＝ pending**：ch06 不在 `NAMES` 表內。紀錄 [`REVIEW-ch06-plain-applied.html`](REVIEW-ch06-plain-applied.html) |
 | 6 | appA | 49 | |
 | 7 | ch03 | 42 | |
 | ~~8~~ | **ch01** | ~~37~~ | ✅ **2026-07-25 完成**（提前做：RC 後第一個回填單元，用它驗證條款在手稿章不誤傷）。執行 41 條、9.3→2.1/1000、數學片段零差異、分頁 53 頁不變、§1.4 對照組零改動；Codex gate-2 ADOPT 34／MODIFY 7／REJECT 1。**Gate 7（LaTeX）四閘全綠、成品已產出**：`NAMES` 補 ch01、九條方言 mapping、33 panel 圖匯出；閘 1 編譯（44 頁／0 error／0 missing char／0 overfull）、閘 3 完整性（0 真落差）、閘 3b 表格（新增，18 格）、閘 3c 圖內文字（13 條 note）、閘 4 字形（489 字形輪廓）全 PASS。`dist/ch01/` ＝ chapter1.tex ＋ chapter1.pdf。多 panel 圖的 grid 版面 2026-07-26 補上（Figure 1.1 併成一列、Figure 1.17 排 2×2，圖說不再孤立）。紀錄 [`../../latex/chapters/ch01/DIALECT-ch01.md`](../../latex/chapters/ch01/DIALECT-ch01.md) |

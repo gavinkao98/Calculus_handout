@@ -24,7 +24,7 @@
     <h1 class="ch-title">Integrals</h1>
   </header>
 
-  <p class="lead">The first five chapters were about the derivative — the instantaneous rate at which one quantity changes as another does. This chapter turns to the opposite question, and to a problem far older than the derivative: how to measure the <em>total</em> accumulated from a rate, or the <em>area</em> enclosed by a curve. The Greeks computed areas of curved regions by exhausting them with polygons; the same idea, sharpened into a limit, becomes the <em>definite integral</em>. We build it from the ground up as a limit of sums, and then — in the Fundamental Theorem of Calculus, the summit of the chapter and arguably of the whole subject — we discover that this process of summation and the derivative are two sides of a single coin, inverse to each other. That deep and unexpected link between areas and slopes is what ties the two halves of calculus together, and this chapter is where it is forged.</p>
+  <p class="lead">The first five chapters were about the derivative, the instantaneous rate at which one quantity changes as another does. This chapter turns to the opposite question, and to a problem far older than the derivative: how to measure the <em>total amount</em> accumulated from a rate, or the <em>area</em> enclosed by a curve. The Greeks computed areas of curved regions by approximating them ever more closely with polygons; the same idea, sharpened into a limit, becomes the <em>definite integral</em>. We build it from the ground up as a limit of sums. Then, in the Fundamental Theorem of Calculus, we discover that this process of summation and the derivative are inverse to each other. That link between areas and slopes ties the two halves of calculus together, and this chapter is where we prove it.</p>
 
   <p class="para-head">By the end of this chapter, you will be able to:</p>
   <ul>
@@ -44,7 +44,7 @@
   </header>
 
   <!-- expansion:intuition — section opener: motivate the whole chapter from the area problem; the crux is trap-and-squeeze, and its twin (distance from velocity) is the same sum -->
-  <p>We know the area of a rectangle, a triangle, or any polygon: cut it into pieces whose areas we already have and add them up. But what is the area of a region with a <em>curved</em> boundary — the region under the parabola \(y = x^{2}\) from \(x = 0\) to \(x = 1\), say? There is no elementary formula, because there is no way to tile a curved region exactly with finitely many rectangles. The way forward is the oldest idea in the subject: <em>approximate</em> the region by rectangles we <em>can</em> measure, make the approximation finer, and see what number the areas approach. That number, when it exists, is what we <em>mean</em> by the area. The same manoeuvre — approximate by simple pieces, then refine to a limit — will, a little later, compute a distance from a record of velocities. The two problems turn out to be one.</p>
+  <p>We know the area of a rectangle, a triangle, or any polygon: cut it into pieces whose areas we already have and add them up. But what is the area of a region with a <em>curved</em> boundary, say the region under the parabola \(y = x^{2}\) from \(x = 0\) to \(x = 1\)? There is no elementary formula, because there is no way to tile a curved region exactly with finitely many rectangles. The way forward is the oldest idea in the subject: <em>approximate</em> the region by rectangles we <em>can</em> measure, make the approximation finer, and see what number the areas approach. That number, when it exists, is what we <em>mean</em> by the area. The same method will, a little later, compute a distance from a record of velocities. The two problems turn out to be one.</p>
 
   <h3 class="subsec-head">The area problem</h3>
 
@@ -52,7 +52,7 @@
   <p>\[ \Delta x = \frac{b - a}{n}, \]</p>
   <p>by the points \(x_{0} = a,\ x_{1},\ x_{2},\ \dots,\ x_{n} = b\), where \(x_{i} = a + i\,\Delta x\). Over each strip \([x_{i-1}, x_{i}]\) build a rectangle whose height is the value of \(f\) at the <em>right</em> endpoint, \(f(x_{i})\). The combined area of these \(n\) rectangles is the <em>right endpoint sum</em></p>
   <p>\[ R_{n} = f(x_{1})\,\Delta x + f(x_{2})\,\Delta x + \dots + f(x_{n})\,\Delta x = \sum_{i=1}^{n} f(x_{i})\,\Delta x, \]</p>
-  <p>where \(\sum_{i=1}^{n}\) is the sigma notation for the sum of the listed terms as \(i\) runs from \(1\) to \(n\). Choosing instead the <em>left</em> endpoint of each strip gives the <em>left endpoint sum</em> \(L_{n} = \sum_{i=1}^{n} f(x_{i-1})\,\Delta x\). Each is a sum of rectangle areas — an approximation to the area of \(S\) that we expect to sharpen as the strips grow thinner.</p>
+  <p>where \(\sum_{i=1}^{n}\) is the sigma notation for the sum of the listed terms as \(i\) runs from \(1\) to \(n\). Choosing instead the <em>left</em> endpoint of each strip gives the <em>left endpoint sum</em> \(L_{n} = \sum_{i=1}^{n} f(x_{i-1})\,\Delta x\). Each is a sum of rectangle areas, an approximation to the area of \(S\) that we expect to sharpen as the strips grow thinner.</p>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -77,8 +77,8 @@
         <p>Because \(x^{2}\) is increasing on \([0, 1]\), each right rectangle rises above the curve and each left rectangle falls below it, so the two sums bracket the true area \(A\):</p>
         <p>\[ 0.219 \approx L_{4} < A < R_{4} \approx 0.469. \]</p>
         <!-- expansion:caution [pass: enrichment] [source: mode-c gap-check 2026-07-11 — L/R over/under-estimation depends on monotonicity, not on which side; Ch6's two examples are both increasing, guard against over-generalizing] -->
-        <p>The direction of this bracket is a fact about the <em>increase</em> of \(x^{2}\), not about which endpoint is read: on an interval where \(f\) <em>decreases</em>, the roles swap — the right endpoints undershoot and the left endpoints overshoot — and where \(f\) both rises and falls, over- and under-estimation must be judged piece by piece.</p>
-        <p>Four rectangles give only a loose verdict. The bracket will tighten as \(n\) grows — and the next example takes \(n\) all the way to infinity. <span class="qed"></span></p>
+        <p>The direction of this bracket is a fact about the <em>increase</em> of \(x^{2}\), not about which endpoint is read. On an interval where \(f\) <em>decreases</em>, the roles swap: the right endpoints undershoot and the left endpoints overshoot. Where \(f\) both rises and falls, over- and under-estimation must be judged piece by piece.</p>
+        <p>With four rectangles, the left and right sums bracket the area only loosely. The bracket will tighten as \(n\) grows, and the next example takes \(n\) all the way to infinity. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -118,12 +118,12 @@
         \end{aligned} \]</p>
         <p>As \(n \to \infty\), both \(\tfrac{1}{n}\) terms vanish, so</p>
         <p>\[ A = \lim_{n \to \infty} R_{n} = \frac{1}{6}\,(1)(2) = \frac{1}{3}. \]</p>
-        <p>The exact area is \(\tfrac{1}{3}\) — comfortably inside the bracket \(0.219 < A < 0.469\) from Example 6.1. The same limit results from the left endpoint sums \(L_{n}\): they differ from \(R_{n}\) by only the single end rectangle \(\tfrac{1}{n}\bigl(f(1) - f(0)\bigr) = \tfrac{1}{n}\), which itself tends to \(0\). Approaching the area from below or from above, we arrive at the one number. <span class="qed"></span></p>
+        <p>The exact area is \(\tfrac{1}{3}\), comfortably inside the bracket \(0.219 < A < 0.469\) from Example 6.1. The same limit results from the left endpoint sums \(L_{n}\): they differ from \(R_{n}\) by only the single end rectangle \(\tfrac{1}{n}\bigl(f(1) - f(0)\bigr) = \tfrac{1}{n}\), which itself tends to \(0\). Approaching the area from below or from above, we arrive at the one number. <span class="qed"></span></p>
       </div>
     </section>
   </div>
 
-  <p>That the left and right sums close on a single value is exactly what lets us <em>define</em> the area to be that value.</p>
+  <p>That the left and right sums converge to a single value is exactly what lets us <em>define</em> the area to be that value.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">6.1</span><span class="env-name">Area under a curve</span></p>
@@ -138,17 +138,19 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>The clause “provided this limit exists” is not a formality. That the approximating sums converge at all — and that the choice of sample point cannot change the answer — is a genuine theorem, resting on the continuity of \(f\). We rely on it here to make the definition well posed, and the next section states it precisely (continuity guarantees the limit); its proof, which turns on how tightly a continuous function can be trapped on a closed interval, is carried in the Proof-Track appendix. For a badly discontinuous \(f\), sums built from different choices of sample point really can disagree — driving every sample to where the function misbehaves gives one value, steering clear of those places gives another — so no single limit, and hence no area, is defined. (For the equal-width left and right sums themselves the gap is only \(\bigl(f(b) - f(a)\bigr)\,\Delta x\), which closes regardless; it is the freedom in the sample points, not the side of the strip, that continuity has to tame.)</p>
+      <p>The clause “provided this limit exists” is not a formality. It rests on a genuine theorem. Continuity of \(f\) guarantees that the approximating sums converge to one limit, whatever sample points are chosen.</p>
+      <p>We rely on this guarantee here so that the definition gives one unambiguous value, and the next section states the theorem precisely. Its proof, which uses the fact that a continuous function on a closed interval changes by only a small amount on sufficiently short subintervals, is given in the Proof-Track appendix.</p>
+      <p>For a badly discontinuous \(f\), sums built from different choices of sample point really can disagree. Driving every sample to where the function misbehaves gives one value, and steering clear of those places gives another. No single limit exists, and hence no area is defined. (For the equal-width left and right sums themselves the gap is only \(\bigl(f(b) - f(a)\bigr)\,\Delta x\), which closes regardless. Continuity is needed to handle the freedom in the sample points, not the choice of side.)</p>
     </div>
   </section>
 
   <!-- expansion:history [source: standard calculus-textbook historical note] — Archimedes' quadrature of the parabola as the ancestor of the limit-of-sums, motivating (not decorating) the method -->
-  <p>The method is old. In the third century BCE Archimedes found the area of a parabolic segment by trapping it between inscribed and circumscribed rectilinear figures and squeezing them together — the same bracket, computed by hand, that Examples 6.1 and 6.2 tightened into a limit. What the seventeenth century added was not the idea but the machinery to carry the limit out in general, which is the business of this chapter.</p>
+  <p>The method is old. In the third century BCE, Archimedes found the area of a parabolic segment by trapping it between inscribed and circumscribed straight-sided figures, then bringing the two bounds together. That is the same bracket, computed by hand, that Examples 6.1 and 6.2 tightened into a limit. What the seventeenth century added was not the idea but the machinery to carry the limit out in general, which is what this chapter does.</p>
 
   <h3 class="subsec-head">The distance problem</h3>
 
   <!-- expansion:intuition — motivate the distance problem as the SAME sum, so the definite integral of §6.2 lands as the common answer to two questions, not one -->
-  <p>Suppose we know the <em>speed</em> of a moving object at every instant, but not its position, and we want the <em>total distance</em> it travels over a time interval. Speed is never negative — it measures how fast the object moves, whichever way it is heading — and we take it to vary continuously. If it were <em>constant</em>, the distance would be just speed times elapsed time. It is not constant — but over a <em>short</em> stretch of time it is nearly so, and on that stretch \(\text{speed} \times \text{time}\) is a good estimate of the distance covered. Add these estimates over the whole interval and the total distance is approximated by a sum of exactly the form \(\sum v(t_{i})\,\Delta t\) — a Riemann sum again, now with speed in place of \(f\) and elapsed time in place of width.</p>
+  <p>Suppose we know the <em>speed</em> of a moving object at every instant, but not its position, and we want the <em>total distance</em> it travels over a time interval. Speed is never negative, because it measures how fast the object moves, whichever way it is heading. We take it to vary continuously. If it were <em>constant</em>, the distance would be just speed times elapsed time. It is not constant, but over a <em>short</em> stretch of time it is nearly so, and on that stretch \(\text{speed} \times \text{time}\) is a good estimate of the distance covered. Add these estimates over the whole interval and the total distance is approximated by a sum of exactly the form \(\sum v(t_{i})\,\Delta t\), a Riemann sum again, now with speed in place of \(f\) and elapsed time in place of width.</p>
 
   <div class="workedexample">
     <section class="env env-example">
@@ -166,7 +168,7 @@
         <p>\[ L = 1\cdot(0 + 4 + 7 + 9 + 10) = 30 \text{ m}, \]</p>
         <p>while the speed at the <em>right</em> end of each interval (the readings at \(t = 1, 2, 3, 4, 5\)) gives the overestimate</p>
         <p>\[ R = 1\cdot(4 + 7 + 9 + 10 + 10) = 40 \text{ m}. \]</p>
-        <p>Because the speed never falls back, on each one-second stretch it stays no lower than the left reading and no higher than the right, so the left sum is a lower estimate of the distance and the right sum an upper one: the true distance lies between them, \(30 \text{ m} \le \text{distance} \le 40 \text{ m}\), about \(35\) metres. The readings alone fix only the sampled values; the bracket rests on the modelling assumption that the speed climbs without falling back between them. Readings taken every half-second, then every tenth of a second, would squeeze the two estimates together — the identical refinement that Example 6.2 carried to the limit. <span class="qed"></span></p>
+        <p>Because the speed never falls back, on each one-second stretch it stays no lower than the left reading and no higher than the right, so the left sum is a lower estimate of the distance and the right sum an upper one: the true distance lies between them, \(30 \text{ m} \le \text{distance} \le 40 \text{ m}\), about \(35\) metres. The readings alone fix only the sampled values; the bracket rests on the modelling assumption that the speed climbs without falling back between them. Readings taken every half-second, then every tenth of a second, would squeeze the two estimates together. That is the same refinement that Example 6.2 carried to the limit. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -177,6 +179,6 @@
   </figure>
 
   <!-- expansion:summary — close: the two problems are one limit-of-sums; name-drop that §6.2 will christen it, WITHOUT introducing the integral symbol or its mechanics (seam guard) -->
-  <p>Set the two computations side by side. The area under a curve is \(\lim_{n\to\infty}\sum f(x_{i})\,\Delta x\); the distance from a speed is \(\lim_{n\to\infty}\sum v(t_{i})\,\Delta t\). They are the <em>same</em> limit of the <em>same</em> kind of sum, differing only in what the quantities are called — and indeed for a non-negative speed the distance is nothing but the area under the speed-versus-time graph. Whenever a quantity accumulates from a varying rate, the same construction returns: chop the interval, multiply rate by width, sum, and refine. The next section gives this common limit a name and a symbol of its own — the <em>definite integral</em> — and settles the promise made above that, for a continuous function, the limit is really there.</p>
+  <p>Set the two computations side by side. The area under a curve is \(\lim_{n\to\infty}\sum f(x_{i})\,\Delta x\); the distance from a speed is \(\lim_{n\to\infty}\sum v(t_{i})\,\Delta t\). They are the <em>same</em> limit of the <em>same</em> kind of sum, differing only in what the quantities are called. Indeed, for a non-negative speed the distance is exactly the area under the speed-versus-time graph. Whenever a quantity accumulates from a varying rate, the same construction returns: chop the interval, multiply rate by width, sum, and refine. The next section names this common limit the <em>definite integral</em> and introduces its symbol. It also states the theorem that guarantees the limit for every continuous function.</p>
 
 </article>

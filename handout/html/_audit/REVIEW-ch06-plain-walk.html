@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>ch06 散文平實化回填（合併 sweep）— Gate 1 走查</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+                   options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{--fg:#16181d;--bg:#fbfbf9;--mut:#5d6470;--line:#dcdcd4;--cut:#b3261e;--keep:#1b5e20;
+        --split:#0b4f8a;--lex:#7a4a00;--card:#fff;--warn:#8a5a00}
+  *{box-sizing:border-box}
+  body{margin:0;padding:2.2rem 1.2rem 5rem;background:var(--bg);color:var(--fg);
+       font:16px/1.75 "Noto Serif TC","Songti TC",Georgia,serif;}
+  .wrap{max-width:56rem;margin:0 auto}
+  h1{font-size:1.65rem;line-height:1.35;margin:0 0 .3rem}
+  .sub{color:var(--mut);font-size:.92rem;margin-bottom:2rem}
+  h2{font-size:1.22rem;margin:2.6rem 0 .8rem;padding-bottom:.35rem;border-bottom:2px solid var(--line)}
+  h3{font-size:1.02rem;margin:1.8rem 0 .6rem;color:#2b3038}
+  table{border-collapse:collapse;width:100%;margin:.9rem 0 1.4rem;font-size:.88rem}
+  th,td{border:1px solid var(--line);padding:.4rem .55rem;text-align:left;vertical-align:top}
+  th{background:#f0efe9;font-weight:600}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .ok{color:var(--keep);font-weight:600}
+  .bad{color:var(--cut);font-weight:600}
+  .card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--mut);
+        border-radius:3px;padding:.75rem .95rem;margin:.75rem 0}
+  .card.cut{border-left-color:var(--cut)}
+  .card.keep{border-left-color:var(--keep)}
+  .card.split{border-left-color:var(--split)}
+  .card.lex{border-left-color:var(--lex)}
+  .cid{font:600 .82rem/1 ui-monospace,Consolas,monospace;background:#eceae2;padding:.16rem .4rem;
+       border-radius:3px;margin-right:.45rem}
+  .tag{font:600 .72rem/1 ui-monospace,Consolas,monospace;border:1px solid currentColor;
+       border-radius:3px;padding:.16rem .35rem;margin-right:.3rem;white-space:nowrap}
+  .t-cut{color:var(--cut)} .t-keep{color:var(--keep)} .t-split{color:var(--split)}
+  .t-lex{color:var(--lex)} .t-tic{color:var(--warn)}
+  .why{color:var(--mut);font-size:.9rem;margin:.35rem 0 .5rem}
+  .en{font-family:Georgia,"Times New Roman",serif}
+  del{background:#fdeaea;color:#7a1c16;text-decoration:line-through;text-decoration-thickness:1px}
+  ins{background:#e8f4e9;color:#14431b;text-decoration:none}
+  .ba{margin:.4rem 0;padding:.5rem .65rem;background:#faf9f5;border:1px solid var(--line);border-radius:3px}
+  .ba .lbl{font:600 .74rem/1.6 ui-monospace,Consolas,monospace;color:var(--mut);display:block}
+  .note{background:#fff8e8;border:1px solid #e6d9b4;border-radius:3px;padding:.7rem .95rem;margin:1rem 0;font-size:.92rem}
+  .stop{background:#fdf2f2;border:1px solid #e8c6c3;border-radius:3px;padding:.7rem .95rem;margin:1rem 0;font-size:.92rem}
+  ul,ol{padding-left:1.35rem} li{margin:.3rem 0}
+  code{font:.86em ui-monospace,Consolas,monospace;background:#eceae2;padding:.1rem .3rem;border-radius:3px}
+  .foot{margin-top:3.5rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--mut);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>ch06 散文平實化回填（合併 sweep）— Gate 1 走查</h1>
+<p class="sub">分支 <code>handout/plain-ch06</code>　·　2026-07-26　·　<strong>propose-only：本輪尚未改動任何 fragment</strong><br>
+流程權威 <code>KICKOFF-plain-backfill.md</code>　判準權威 <code>CONTENT_SPEC.md</code> §3〈平實英文條款〉（RC）　維度契約 <code>PROSE-AUDIT-RUBRIC.md</code></p>
+
+<div class="note">
+<strong>本章的範圍與別章不同（依 kickoff 指定）：</strong>
+<ul style="margin:.4rem 0 0">
+<li><strong>§6.2／§6.3</strong>：詞彙層＋句法層＋段落層已於 2026-07-25 完成（14 條／11 條）。本輪<strong>只做 em-dash 與標點負載</strong>，已裁決的保留清單（<span class="en">on credit</span>、<span class="en">the central fact of the subject</span>、<span class="en">any added constant is pointless here</span>、cleft <span class="en">What remains is…</span>、FTC-1 證明段不拆）<strong>一律尊重</strong>。</li>
+<li><strong>§6.1／§6.4／§6.5</strong>：完整一輪（詞彙＋句法＋段落＋dash）。</li>
+</ul>
+</div>
+
+<h2>§0　驗收摘要（Gate 1 提案值）</h2>
+
+<table>
+<tr><th>節</th><th class="num">N</th><th class="num">— 現值</th><th class="num">/1000</th><th class="num">節級上限<br>(3.0/1000)</th><th class="num">提案後 —</th><th class="num">提案後<br>/1000</th><th>本輪範圍</th></tr>
+<tr><td>§6.1</td><td class="num">1439</td><td class="num">24</td><td class="num">16.7</td><td class="num">4</td><td class="num ok">0</td><td class="num ok">0.0</td><td>完整一輪</td></tr>
+<tr><td>§6.2</td><td class="num">1372</td><td class="num">10</td><td class="num">7.3</td><td class="num">4</td><td class="num ok">0</td><td class="num ok">0.0</td><td>dash／標點</td></tr>
+<tr><td>§6.3</td><td class="num">1095</td><td class="num">10</td><td class="num">9.1</td><td class="num">3</td><td class="num ok">2</td><td class="num ok">1.8</td><td>dash／標點</td></tr>
+<tr><td>§6.4</td><td class="num">836</td><td class="num">15</td><td class="num">17.9</td><td class="num">2</td><td class="num ok">2</td><td class="num ok">2.4</td><td>完整一輪</td></tr>
+<tr><td>§6.5</td><td class="num">1028</td><td class="num">13</td><td class="num">12.6</td><td class="num">3</td><td class="num bad">4</td><td class="num bad">3.9</td><td>完整一輪</td></tr>
+<tr style="background:#f0efe9;font-weight:600">
+  <td>ch06 全章</td><td class="num">5770</td><td class="num">72</td><td class="num">12.5</td><td class="num">17</td><td class="num ok">8</td><td class="num ok">1.4</td><td>—</td></tr>
+</table>
+
+<p>提案共 <strong>59 張卡片</strong>（多數同時掛兩個以上標籤——同一句的 dash 與詞彙一併處置，故標籤數大於卡片數）：</p>
+<table>
+<tr><th>原因標籤</th><th class="num">卡片數</th><th>貢獻</th></tr>
+<tr><td><span class="tag t-cut">DASH-CUT</span></td><td class="num">47</td><td>em-dash 字元 72 → 8（−64）</td></tr>
+<tr><td><span class="tag t-split">PLAIN-SPLIT</span></td><td class="num">17</td><td>句層 15、<strong>段落層 2</strong>（§6.1 Caution 159 詞、§6.5 章末摘要 167 詞）</td></tr>
+<tr><td><span class="tag t-lex">R1-LEXICAL</span></td><td class="num">17</td><td>涵蓋 23 條真 R finding（家族正則命中 51 處，複核後 28 處判為過度命中或前例已裁）</td></tr>
+<tr><td><span class="tag t-keep">DASH-KEEP</span></td><td class="num">4</td><td>保留 8 個 dash 字元中的 6 個（4 對成對插入語）</td></tr>
+<tr><td><span class="tag t-tic">TIC-REBALANCE</span></td><td class="num">1</td><td>分號 −1（§6.1 Caution）</td></tr>
+</table>
+
+<div class="stop">
+<strong>唯一沒有全綠的格子：§6.5 節級密度 3.9 &gt; 3.0 → 已裁決為<u>明示節級例外</u>（2026-07-26，見 §8 P-1）。</strong>
+原因是該節有 <strong>兩處真 KEEP</strong>（<span class="en">— usually cleaner —</span>、<span class="en">— if it has any —</span>），恰好就是 SPEC §3 明訂具約束力的 <span class="en">— far more often —</span>／<span class="en">— only then —</span> 同型。
+依 SPEC「兩個閘門不可互相豁免」，這兩處<strong>不</strong>因密度差名額而被機械改成逗號；三條合法出路中採「明示節級例外」，全章 1.4/1000 達標，其餘四節皆在 3.0 內。
+</div>
+
+<h2>§1　Gate 0：基線與地雷勘查（唯讀）</h2>
+
+<h3>1.1 canonical 量測（<code>tools/prose_metrics.py --unit ch06</code>）</h3>
+<table>
+<tr><th>指標</th><th class="num">前值</th><th>備註</th></tr>
+<tr><td>canonical N（主 stream）</td><td class="num">5770</td><td>與 kickoff 起跑基線一致</td></tr>
+<tr><td>em-dash</td><td class="num">72</td><td>12.5/1000；超額 55 件</td></tr>
+<tr><td>tic guard：冒號接子句</td><td class="num">41</td><td rowspan="4">四項為 Gate 4 的不換 tic 對照基準</td></tr>
+<tr><td>tic guard：分號</td><td class="num">37</td></tr>
+<tr><td>tic guard：左括號</td><td class="num">52</td></tr>
+<tr><td>tic guard：成對逗號</td><td class="num">32</td></tr>
+<tr><td>副表（清單／figcaption）</td><td class="num">N=569，— 13</td><td>不入主分母；§6.3 figcaption 4、§6.4 figcaption 3、§6.5 Strategy 6.2 清單 6</td></tr>
+</table>
+
+<h3>1.2 段落層（三個 ≥150 詞觸發器）</h3>
+<p>SPEC §3 段落層：≥150 詞／&gt;20 行內式／一段多論證，任一成立即須逐段判讀（<strong>觸發器不是拆段命令</strong>）。ch06 全章 <strong>0 段</strong>行內式 &gt;20（最高 §6.4 一段 11 式）。三個詞數觸發器逐段判定如下：</p>
+<table>
+<tr><th>位置</th><th class="num">詞數</th><th>類型</th><th>同類基準（canonical 實測）</th><th>判定</th></tr>
+<tr><td>§6.1 章 lead</td><td class="num">152</td><td>章開場 roadmap</td><td>ch01 150／ch02 173／ch03 130／ch04 152／ch05 129／<strong>ch06 152</strong>／ch07 197</td><td class="ok">保留不拆<br>（單一論述動作＝章路線圖，且落在全書 lead 區間正中）</td></tr>
+<tr><td>§6.1 Caution（“provided this limit exists”）</td><td class="num">159</td><td>解拆／警示</td><td>該節其他段 99–138</td><td class="bad">拆（<code>A-12</code>）<br>承載四個可各自獨立成立的論證</td></tr>
+<tr><td>§6.5 Chapter summary 首段</td><td class="num">167</td><td>章末摘要</td><td>ch01 [99,115,72]／ch02 [54,48,81,78]／ch03 [27,81,68]／ch04 [25,28]／ch05 [22,81]／<strong>ch06 [167,78]</strong>／ch07 [214,179]</td><td class="bad">拆（<code>E-10</code>）<br>ch01–ch05 摘要段上界 115 詞，本段把五節塞成一段</td></tr>
+</table>
+
+<h3>1.3 CONSTRAINT 掃描</h3>
+<p><code>grep -i CONSTRAINT handout/html/fragments/ch06/*.html</code> → <strong>0 命中</strong>。ch06 五個 fragment 的 HTML 註解只有 <code>section-source</code>／<code>SEAM GUARD</code>／<code>expansion:*</code> 標記，<strong>沒有「不得動的措辭」鎖定</strong>（appB §B.2／§B.6 那種）。SEAM GUARD 只約束「不得提前寫什麼內容」，不約束措辭，本輪不動內容故不觸及。</p>
+
+<h3>1.4 該單元既有閘的狀態（決定 Gate 5–6 範圍）</h3>
+<ul>
+<li><strong>圖閘</strong>：Figure 6.1–6.9 全數過 gate-1 D1–D8 ＋ gate-2，0 blocking。本輪<strong>不改任何 figcaption 語義</strong>（<code>C-1</code> 的 figcaption companion 只動標點與一個詞，需你確認是否要動；不動亦可），故不重跑。</li>
+<li><strong>example 選題／learner-sim／Mode C</strong>：已過，本輪不重跑。</li>
+<li><strong>math gate</strong>：§6.2（173→175 片段）、§6.3（189→189）已跑過並歸零。本輪動到 §6.2 Theorem 6.1 陳述句、§6.4 Definition 6.4 內文、§6.3 Caution，Gate 5 須<strong>範圍限定重跑</strong>（程式化片段比對，理想零差異）。</li>
+<li><strong>Gate 7（LaTeX）</strong>：<code>make_dist.py</code> 的 <code>NAMES</code> 表<strong>沒有 ch06</strong> → 記 <strong>pending</strong>，本輪不改 NAMES（平行輪會衝突）。</li>
+<li><strong>Gate 8（分頁目檢）</strong>：ch06 print 版<strong>從未目視檢查過</strong>（前兩輪瀏覽器打不開該檔）。本輪拆 2 段＋新增約 20 個句點，行數會變，這關必做。</li>
+</ul>
+
+<h3>1.5 R 維度家族掃描（唯讀預標，非判定）</h3>
+<table>
+<tr><th>節</th><th class="num">正則命中</th><th class="num">/千詞</th><th class="num">人工複核後<br>真 finding</th><th>備註</th></tr>
+<tr><td>§6.1</td><td class="num">26</td><td class="num">18.1</td><td class="num">9</td><td>lead 的宏大語群佔 6 命中；<span class="en">we know／we see／we want</span> 4 個主語是 we，過度命中</td></tr>
+<tr><td>§6.2（已做過）</td><td class="num">9</td><td class="num">6.6</td><td class="num">—</td><td>本輪不重審；改前為 30 命中／14.7 千詞</td></tr>
+<tr><td>§6.3（已做過）</td><td class="num">5</td><td class="num">4.6</td><td class="num">—</td><td>本輪不重審；改前 18 命中／10.6 千詞</td></tr>
+<tr><td>§6.4</td><td class="num">7</td><td class="num">8.4</td><td class="num">5</td><td></td></tr>
+<tr><td>§6.5</td><td class="num">18</td><td class="num">17.5</td><td class="num">9</td><td>disguise／fingerprint 隱喻群佔 5 命中</td></tr>
+</table>
+<p class="why">§6.1／§6.5 的 17–18 每千詞落在 canon 章的預期區間（§6.2 改前 14.7、§6.3 改前 10.6；手稿章 §1.4 ≈0），與「canon 章詞彙層 findings 較多」的預期一致。<strong>正則命中一律逐條複核主語與可推測性後才升為 finding</strong>——26 命中裡有 17 條被判為過度命中或前例已裁的非 finding，逐條列在 §4 保留清單。</p>
+
+<h2>§2　走查逐條（§6.1）— 完整一輪</h2>
+
+<h3>2.1 章 lead（152 詞，3 個 dash）</h3>
+
+<div class="card cut">
+<p><span class="cid">A-1</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝鬆散同位語 → 逗號（CUT palette）</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The first five chapters were about the derivative <del>—</del> the instantaneous rate at which one quantity changes as another does.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The first five chapters were about the derivative<ins>,</ins> the instantaneous rate at which one quantity changes as another does.</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">A-2</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 成對破折號，走四步仲裁</p>
+<p class="why">① 拿掉 <span class="en">— Y —</span>，主幹 <span class="en">We build it … and then we discover that …</span> 文法完整、量詞不變 ✓　② Y 除了「在哪一個定理裡」之外，另外提出一個<strong>可獨立表述的評價</strong>（<span class="en">the summit of the chapter and arguably of the whole subject</span>）→ 不是同一主張的程度／時點修飾　③ → <strong>重寫整句</strong>（不得只換逗號）。同句還有兩個論述動作（建構過程／發現互逆），故一併拆。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">We build it from the ground up as a limit of sums, and then <del>— in the Fundamental Theorem of Calculus, the summit of the chapter and arguably of the whole subject —</del> we discover that this process of summation and the derivative are <del>two sides of a single coin,</del> inverse to each other.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">We build it from the ground up as a limit of sums. <ins>Then, in the Fundamental Theorem of Calculus, we discover that this process of summation and the derivative are inverse to each other.</ins></span></div>
+</div>
+
+<div class="card lex">
+<p><span class="cid">A-3</span><span class="tag t-lex">R1-LEXICAL</span>（advisory）宏大語群＋不透明搭配</p>
+<p class="why">R1／S1：<span class="en">the summit of the chapter and arguably of the whole subject</span> 是純評價、無可檢查內容（SPEC §3 型③ 禁的正是這種空泛宏大語；§6.3 保留的那句歷史宏大語之所以合法，是因為它指名了誰、何時、發現什麼）。<span class="en">two sides of a single coin</span> 是慣用語，且字面表述 <span class="en">inverse to each other</span> 就在旁邊，隱喻不承載任何內容。兩者刪除後讀者零損失。</p>
+<div class="ba"><span class="lbl">處置</span>【刪】兩處（已併入 <code>A-2</code> 的改寫）。若你要保留「這是本章高點」的導航訊號，替代方案：在 <code>A-2</code> 後補一句 <span class="en"><ins>It is the central result of the chapter.</ins></span></div>
+</div>
+
+<div class="card lex">
+<p><span class="cid">A-4</span><span class="tag t-lex">R1-LEXICAL</span>（advisory）lead 收尾：隱喻＋評價填充＋cleft</p>
+<p class="why">R1：<span class="en">forged</span>（鍛造）對 EFL 是不透明搭配；<span class="en">deep and unexpected</span> 是評價填充（S1 無新資訊）；<span class="en">is what ties</span> 的 cleft 本身不是缺陷，但此處拆掉更直白。語意完全保留。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">That <del>deep and unexpected</del> link between areas and slopes <del>is what ties</del> the two halves of calculus together, and this chapter is where <del>it is forged</del>.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">That link between areas and slopes <ins>ties</ins> the two halves of calculus together, and this chapter is where <ins>we build it</ins>.</span></div>
+</div>
+
+<div class="card lex">
+<p><span class="cid">A-5</span><span class="tag t-lex">R1-LEXICAL</span>（advisory）</p>
+<p class="why">R1：<span class="en">exhausting them with polygons</span>——<span class="en">exhaust</span> 的日常義是「使疲憊」，術語義（窮竭法）在此<strong>沒有被引入也沒有 gloss</strong>，EFL 首讀會誤解。Archimedes 的窮竭法在本節後面另有專段，此處不需要術語名。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The Greeks computed areas of curved regions by <del>exhausting</del> them with polygons</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The Greeks computed areas of curved regions by <ins>filling</ins> them with polygons</span></div>
+</div>
+
+<h3>2.2 §6.1 開場段（138 詞，3 個 dash）</h3>
+
+<div class="card cut">
+<p><span class="cid">A-6</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝舉例同位語 → 逗號＋前移 <span class="en">say</span></p>
+<div class="ba"><span class="lbl">前</span><span class="en">But what is the area of a region with a <em>curved</em> boundary <del>—</del> the region under the parabola \(y = x^{2}\) from \(x = 0\) to \(x = 1\)<del>, say</del>?</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">But what is the area of a region with a <em>curved</em> boundary<ins>, say</ins> the region under the parabola \(y = x^{2}\) from \(x = 0\) to \(x = 1\)?</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">A-7</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-lex">R1-LEXICAL</span> 成對破折號＋低頻詞</p>
+<p class="why">四步：① 主幹 <span class="en">The same manoeuvre will … compute a distance …</span> 文法完整 ✓　② Y＝<span class="en">approximate by simple pieces, then refine to a limit</span> 是<strong>可獨立表述的方法定義</strong>，不是程度／頻率修飾 → ③ 重寫整句。<br>
+重寫時發現 Y 是 F1 局部冗餘：前兩句已完整寫過同一件事（<span class="en">approximate the region by rectangles we can measure, make the approximation finer, and see what number the areas approach</span>），刪之無損。<br>
+R1：<span class="en">manoeuvre</span>（軍事／舞步）配數學方法屬罕見搭配，且是英式拼寫，本書其他章一律用 <span class="en">method</span>。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The same <del>manoeuvre — approximate by simple pieces, then refine to a limit —</del> will, a little later, compute a distance from a record of velocities.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The same <ins>method</ins> will, a little later, compute a distance from a record of velocities.</span></div>
+<div class="ba"><span class="lbl">若你要保留那句方法複述</span><span class="en">The same method <ins>(approximate by simple pieces, then refine to a limit)</ins> will, a little later, compute a distance from a record of velocities.</span>（左括號 +1）</div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">A-8</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝鬆散同位語 → 逗號</p>
+<div class="ba"><span class="lbl">前</span><span class="en">Each is a sum of rectangle areas <del>—</del> an approximation to the area of \(S\) that we expect to sharpen as the strips grow thinner.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">Each is a sum of rectangle areas<ins>,</ins> an approximation to the area of \(S\) that we expect to sharpen as the strips grow thinner.</span></div>
+</div>
+
+<h3>2.3 Example 6.1 解說（2 個 dash）</h3>
+
+<div class="card split">
+<p><span class="cid">A-9</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 一句三個論述動作</p>
+<p class="why">觸發器：51 詞＋冒號接子句＋成對破折號＋<span class="en">and</span> 串接。四步：② Y＝<span class="en">the right endpoints undershoot and the left endpoints overshoot</span> 說出「角色互換」的<strong>實質內容</strong>（可獨立成立的推論），非程度修飾 → ③ 重寫。同句另外把「遞減情形」與「有升有降情形」兩個獨立結論黏在一起 → 拆成三句。<strong>冒號數不變</strong>（原本就有一個，改後仍是一個，只是搬到承載 payload 的位置）。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The direction of this bracket is a fact about the <em>increase</em> of \(x^{2}\), not about which endpoint is read<del>:</del> on an interval where \(f\) <em>decreases</em>, the roles swap <del>—</del> the right endpoints undershoot and the left endpoints overshoot <del>— and</del> where \(f\) both rises and falls, over- and under-estimation must be judged piece by piece.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The direction of this bracket is a fact about the <em>increase</em> of \(x^{2}\), not about which endpoint is read<ins>.</ins> <ins>O</ins>n an interval where \(f\) <em>decreases</em>, the roles swap<ins>:</ins> the right endpoints undershoot and the left endpoints overshoot<ins>. W</ins>here \(f\) both rises and falls, over- and under-estimation must be judged piece by piece.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">A-10</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-lex">R1-LEXICAL</span>（R3 指稱漂移）</p>
+<p class="why">R3：本節的穩定術語是 <span class="en">bracket</span>（<span class="en">the two sums bracket the true area</span>／<span class="en">the direction of this bracket</span>／<span class="en">the bracket will tighten</span>），此處忽然改用 <span class="en">verdict</span>（法庭判決）＝為變化而換同義詞。R1：<span class="en">verdict</span> 配數學估計是罕見搭配。<br>
+DASH：單破折號尾巴接<strong>獨立子句</strong> → CUT palette 的「分句」；此處改逗號＋<span class="en">and</span> 最小。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">Four rectangles give only a loose <del>verdict</del>. The bracket will tighten as \(n\) grows <del>—</del> and the next example takes \(n\) all the way to infinity.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">Four rectangles <ins>bracket the area only loosely</ins>. The bracket will tighten as \(n\) grows<ins>,</ins> and the next example takes \(n\) all the way to infinity.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">A-11</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝鬆散評註 → 逗號</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The exact area is \(\tfrac{1}{3}\) <del>—</del> comfortably inside the bracket \(0.219 &lt; A &lt; 0.469\) from Example 6.1.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The exact area is \(\tfrac{1}{3}\)<ins>,</ins> comfortably inside the bracket \(0.219 &lt; A &lt; 0.469\) from Example 6.1.</span></div>
+</div>
+
+<h3>2.4 Caution 段（159 詞，段落層觸發器，4 個 dash）</h3>
+
+<div class="card split">
+<p><span class="cid">A-12</span><span class="tag t-split">PLAIN-SPLIT</span>（段落層）159 詞、四個可各自獨立成立的論證 → 拆三段</p>
+<p class="why">四個論證：(a)「provided this limit exists」其實藏著兩個定理；(b) 我們在哪裡用它、它在哪裡被證；(c) 不連續時會怎麼壞掉；(d) 等寬左右和的差距與取樣點自由度不是同一回事。依 SPEC §3「看論述動作數，不看詞數」→ 拆段、<strong>不拆句、不動數學</strong>。拆點＝(a)｜(b)｜(c)+(d)。</p>
+</div>
+
+<div class="card split">
+<p><span class="cid">A-13</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 成對破折號</p>
+<p class="why">四步：① 主幹 <span class="en">That the approximating sums converge at all is a genuine theorem…</span> 文法完整 ✓　② Y＝<span class="en">and that the choice of sample point cannot change the answer</span> 是<strong>第二個被斷言的命題</strong>（不是修飾）→ ③ 重寫。<br>
+改寫保住原句的單數 <span class="en">is a genuine theorem</span> 語意（兩個宣稱<strong>合起來</strong>是一個定理＝§6.2 Theorem 6.1），不誤寫成「兩個定理」。冒號為<strong>引清單型</strong>，依 SPEC 不計入「冒號接子句」。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">That the approximating sums converge at all <del>—</del> and that the choice of sample point cannot change the answer <del>—</del> is a genuine theorem, resting on the continuity of \(f\).</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en"><ins>It makes two claims: that the approximating sums converge at all, and that the choice of sample point cannot change the answer. Together these form a genuine theorem, resting on the continuity of \(f\).</ins></span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">A-14</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 成對破折號＋逗號黏接</p>
+<p class="why">四步：② Y＝<span class="en">driving every sample to where the function misbehaves gives one value, steering clear of those places gives another</span> 是<strong>兩個完整獨立子句</strong>（且原文以逗號相黏，是 comma splice）→ ③ 重寫。改後順帶修掉那個 comma splice。<span class="en">misbehaves</span> 是 §6.2 W-4 已裁定的既有房規用語，<strong>維持不動</strong>（R3 一致）。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…sums built from different choices of sample point really can disagree <del>—</del> driving every sample to where the function misbehaves gives one value<del>,</del> steering clear of those places gives another <del>—</del> so no single limit, and hence no area, is defined.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…sums built from different choices of sample point really can disagree<ins>.</ins> <ins>D</ins>riving every sample to where the function misbehaves gives one value<ins>, and</ins> steering clear of those places gives another<ins>. N</ins>o single limit exists, <ins>and</ins> hence no area is defined.</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">A-15</span><span class="tag t-tic">TIC-REBALANCE</span><span class="tag t-split">PLAIN-SPLIT</span>（advisory）分號黏接兩個獨立宣告</p>
+<p class="why">「我們在此依賴它／下一節精確陳述它」與「它的證明放在哪裡」是兩個獨立導航動作，用分號黏在一句。拆開後<strong>分號 −1</strong>（有助 Gate 4 的不換 tic）。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">We rely on it here to make the definition well posed, and the next section states it precisely (continuity guarantees the limit)<del>;</del> its proof, which turns on how tightly a continuous function can be trapped on a closed interval, is carried in the Proof-Track appendix.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">We rely on it here to make the definition well posed, and the next section states it precisely (continuity guarantees the limit)<ins>. I</ins>ts proof, which turns on how tightly a continuous function can be trapped on a closed interval, is carried in the Proof-Track appendix.</span></div>
+</div>
+
+<div class="card lex">
+<p><span class="cid">A-16</span><span class="tag t-lex">R1-LEXICAL</span>（advisory）擬人／戲劇動詞配數學主語</p>
+<p class="why">R1：<span class="en">continuity has to tame</span>——<span class="en">tame</span>（馴服野獸）是情緒／戲劇動詞，SPEC 明列的替代習慣是改用中性動詞。cleft 句式本身<strong>不報 finding</strong>（FLAG 句式，語義透明）。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">it is the freedom in the sample points, not the side of the strip, that continuity has to <del>tame</del>.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">it is the freedom in the sample points, not the side of the strip, that continuity has to <ins>control</ins>.</span></div>
+</div>
+
+<h3>2.5 歷史段與距離問題（4 個 dash）</h3>
+
+<div class="card cut">
+<p><span class="cid">A-17</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴，Y 內已有成對逗號 → 改逗號會泥濘，走「分句」</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…by trapping it between inscribed and circumscribed rectilinear figures and squeezing them together <del>—</del> the same bracket, computed by hand, that Examples 6.1 and 6.2 tightened into a limit.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…by trapping it between inscribed and circumscribed straight-sided figures and squeezing them together<ins>. That is</ins> the same bracket, computed by hand, that Examples 6.1 and 6.2 tightened into a limit.</span></div>
+</div>
+
+<div class="card lex">
+<p><span class="cid">A-18</span><span class="tag t-lex">R1-LEXICAL</span>（advisory）<span class="en">rectilinear</span> → <span class="en">straight-sided</span>（已併入 <code>A-17</code> 的後文）</p>
+<p class="why">R1：<span class="en">rectilinear</span> 不是本書術語、未定義、對 EFL 不可推測；<span class="en">straight-sided</span> 字面可解且與同句的 <span class="en">inscribed／circumscribed</span> 對讀者負荷相稱。</p>
+</div>
+
+<div class="card split">
+<p><span class="cid">A-19</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 成對破折號</p>
+<p class="why">四步：② Y＝<span class="en">it measures how fast the object moves, whichever way it is heading</span> 是<strong>「為何速率非負」的理由</strong>（可獨立表述）→ ③ 重寫。改用 <span class="en">because</span> 把理由字面化，同時把「連續變化」這個獨立假設拆成自己的句子。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">Speed is never negative <del>—</del> it measures how fast the object moves, whichever way it is heading <del>— and</del> we take it to vary continuously.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">Speed is never negative<ins>, because</ins> it measures how fast the object moves, whichever way it is heading<ins>. W</ins>e take it to vary continuously.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">A-20</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴接獨立子句 → 逗號</p>
+<div class="ba"><span class="lbl">前</span><span class="en">It is not constant <del>—</del> but over a <em>short</em> stretch of time it is nearly so…</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">It is not constant<ins>,</ins> but over a <em>short</em> stretch of time it is nearly so…</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">A-21</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝鬆散同位語 → 逗號</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…approximated by a sum of exactly the form \(\sum v(t_{i})\,\Delta t\) <del>—</del> a Riemann sum again, now with speed in place of \(f\) and elapsed time in place of width.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…approximated by a sum of exactly the form \(\sum v(t_{i})\,\Delta t\)<ins>,</ins> a Riemann sum again, now with speed in place of \(f\) and elapsed time in place of width.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">A-22</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-lex">R1-LEXICAL</span>（R3）</p>
+<p class="why">DASH：單破折號尾巴，Y 內已有成對逗號 → 分句。R3：<span class="en">the identical refinement</span> 中的 <span class="en">identical</span> 是本段 <span class="en">same</span> 的同義變換（同段前面剛用過 <span class="en">the same</span> ×2）。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…would squeeze the two estimates together <del>—</del> the <del>identical</del> refinement that Example 6.2 carried to the limit.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…would squeeze the two estimates together<ins>. That is the same</ins> refinement that Example 6.2 carried to the limit.</span></div>
+</div>
+
+<h3>2.6 §6.1 收尾段（111 詞，3 個 dash）</h3>
+
+<div class="card cut">
+<p><span class="cid">A-23</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-lex">R1-LEXICAL</span></p>
+<p class="why">DASH：單破折號＋<span class="en">and indeed</span>＋獨立子句 → 分句。R1：<span class="en">nothing but</span> 對 EFL 讀者容易讀成否定（「除了…什麼都不是」），本處要說的是「就<strong>正好等於</strong>」。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…differing only in what the quantities are called <del>— and indeed</del> for a non-negative speed the distance is <del>nothing but</del> the area under the speed-versus-time graph.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…differing only in what the quantities are called<ins>. Indeed,</ins> for a non-negative speed the distance is <ins>exactly</ins> the area under the speed-versus-time graph.</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">A-24</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span><span class="tag t-lex">R1-LEXICAL</span></p>
+<p class="why">四步：② Y＝<span class="en">the definite integral</span> 是純命名同位語，脫離主幹<strong>沒有</strong>獨立教學用途 → 本身是 KEEP 候選。<strong>但主句另有兩個獨立教學動作</strong>（命名／兌現前面的承諾），依句層 PLAIN-SPLIT 本來就該拆；拆完插入語自然落回句尾的逗號同位語。<strong>這不是把成對破折號換逗號，觸發點是句子拆分。</strong><br>
+R1：<span class="en">settles the promise</span> 搭配錯誤（settle 用於 debt／question；promise 的自然搭配是 keep）。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The next section gives this common limit a name and a symbol of its own <del>—</del> the <em>definite integral</em> <del>— and settles</del> the promise made above that, for a continuous function, the limit is really there.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The next section gives this common limit a name and a symbol of its own<ins>,</ins> the <em>definite integral</em><ins>. It also keeps</ins> the promise made above that, for a continuous function, the limit is really there.</span></div>
+</div>
+
+<h2>§3　走查逐條（§6.2、§6.3）— 只做 dash 與標點負載</h2>
+
+<div class="note">下列卡片<strong>一律不碰</strong> 2026-07-25 已裁的措辭：<span class="en">on credit</span>、<span class="en">what is left of the width</span>（W-8）、<span class="en">is a strong requirement</span>（W-2）、<span class="en">guarantees</span>（W-9）、<span class="en">any added constant is pointless here</span>、<span class="en">the central fact of the subject</span>、cleft <span class="en">What remains is…</span>。改的只有標點與句界。</div>
+
+<h3>3.1 §6.2（10 → 0）</h3>
+
+<div class="card split">
+<p><span class="cid">B-1</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span></p>
+<p class="why">四步：② Y＝<span class="en">the definite integral</span> 純命名同位語（KEEP 候選），但主句同時做兩件事（給名字與符號／解除 \(f \ge 0\) 假設）→ 句層拆分，插入語隨之溶解。與 <code>A-24</code> 同型。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">Here we give it both <del>—</del> the <em>definite integral</em> <del>— and at the same time free</del> it from the assumption that \(f\) is non-negative.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">Here we give it both<ins>, and we call it</ins> the <em>definite integral</em><ins>. At the same time we free</ins> it from the assumption that \(f\) is non-negative.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">B-2</span><span class="tag t-cut">DASH-CUT</span> → 括號（CUT palette：可用括號的插入語）</p>
+<p class="why">同句已經是三項並列的清單（<span class="en">a and b are…, f(x) is…, and the dx marks…</span>），改逗號會被讀成第四個並列項。同句前面已有 <span class="en">(lower and upper)</span> 的括號慣例，改括號與既有版面一致。左括號 +1。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…the \(dx\) marks the variable with respect to which we sum <del>—</del> what is left of the width \(\Delta x\)<del>.</del></span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…the \(dx\) marks the variable with respect to which we sum <ins>(</ins>what is left of the width \(\Delta x\)<ins>).</ins></span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">B-3</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝理由子句 → 逗號＋<span class="en">since</span></p>
+<p class="why">原文的 <span class="en">natural,</span> 是評價填充（S3：刪之無損），刪掉後理由本身直接接上，句子反而更字面。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">Reversing the limits reverses the sign <del>— natural,</del> since running the strips from \(b\) back to \(a\) turns each width \(\Delta x\) into its negative.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">Reversing the limits reverses the sign<ins>,</ins> since running the strips from \(b\) back to \(a\) turns each width \(\Delta x\) into its negative.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">B-4</span><span class="tag t-cut">DASH-CUT</span>（<strong>定理陳述句，Gate 5 必查</strong>）單破折號尾巴＝同位語 → 逗號</p>
+<p class="why">只改標點，<strong>一個字不動</strong>；Theorem 6.1 的兩個獨立性宣稱（切法任意、取樣點任意）原封不動。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…the Riemann sums approach a single limit <del>—</del> the same for every way of slicing \([a, b]\) into strips whose widths shrink to zero, and every choice of sample points within them.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…the Riemann sums approach a single limit<ins>,</ins> the same for every way of slicing \([a, b]\) into strips whose widths shrink to zero, and every choice of sample points within them.</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">B-5</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 成對破折號（45 詞＋尾掛 which 子句）</p>
+<p class="why">四步：① 拿掉 Y 後主幹缺逗號、不成句　② Y＝<span class="en">uniform continuity, a single rate of continuity good across the whole interval</span> <strong>命名一個新術語並就地釋義</strong>＝可獨立表述的定義 → ③ 重寫整句。改後 <span class="en">uniform continuity</span> 這個新術語在自己的句子裡被介紹，然後才被使用（introduce-before-use）。<strong>不新增冒號</strong>。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">Its proof turns on a property of a continuous function on a <em>closed</em> interval subtler than continuity at each point <del>—</del> <em>uniform</em> continuity, a single rate of continuity good across the whole interval <del>— which forces</del> the gap between the largest and smallest Riemann sums to shrink to zero as the strips narrow.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">Its proof turns on a property of a continuous function on a <em>closed</em> interval <ins>that is</ins> subtler than continuity at each point<ins>. That property is</ins> <em>uniform</em> continuity, a single rate of continuity good across the whole interval<ins>, and it forces</ins> the gap between the largest and smallest Riemann sums to shrink to zero as the strips narrow.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">B-6</span><span class="tag t-cut">DASH-CUT</span> 單破折號＋<span class="en">and</span>＋獨立子句 → 分句</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…is now, with the axis label supplied, the value of a definite integral <del>— and because</del> \(x^{2} \ge 0\), the signed area is the plain area.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…is now, with the axis label supplied, the value of a definite integral<ins>. Because</ins> \(x^{2} \ge 0\), the signed area is the plain area.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">B-7</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝獨立子句 → 分句（不推去冒號，§6.2 冒號 12 已偏高）</p>
+<div class="ba"><span class="lbl">前</span><span class="en">This is how the integral is used in practice <del>—</del> most integrals are reached not from the definition but by reducing them to ones already known.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">This is how the integral is used in practice<ins>. M</ins>ost integrals are reached not from the definition but by reducing them to ones already known.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">B-8</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝並列介系詞片語 → 逗號＋<span class="en">either</span>（避免推去冒號）</p>
+<div class="ba"><span class="lbl">前</span><span class="en">Yet every value we have produced has come the hard way <del>—</del> from a limit of sums, as in Example 6.4, or from a picture, as in Example 6.5.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">Yet every value we have produced has come the hard way<ins>, either</ins> from a limit of sums, as in Example 6.4, or from a picture, as in Example 6.5.</span></div>
+<p class="why">附註（本輪不處理）：<span class="en">come the hard way</span> 是慣用語，但 §6.2 的詞彙層已於 2026-07-25 結案，依 kickoff 指定的範圍不重開。若你要一併平實化，改法是 <span class="en">has been won by hand</span>→<span class="en">has taken real work</span> 一類；<strong>需你點頭才做</strong>（決策 P-2）。</p>
+</div>
+
+<h3>3.2 §6.3（10 → 2，含 1 處 KEEP）</h3>
+
+<div class="card cut">
+<p><span class="cid">C-1</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝獨立子句（正是 FTC-1 的承重直覺）→ 分句</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…so \(g\) gains roughly \(f(x)\,h\) <del>—</del> its rate of increase is the current height \(f(x)\).</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…so \(g\) gains roughly \(f(x)\,h\)<ins>. I</ins>ts rate of increase is the current height \(f(x)\).</span></div>
+<p class="why">R3 連動（<strong>需你裁決是否一併改</strong>）：Figure 6.7 的 figcaption 有同一句型 <span class="en">so \(g\) grows by roughly \(f(x)\,h\) — its rate of change is the current height</span>。figcaption 入副表、不入主分母，且圖閘已過；<strong>語義不動、只改標點</strong>的話不需重跑圖閘。</p>
+</div>
+
+<div class="card cut">
+<p><span class="cid">C-2</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝獨立子句 → <span class="en">so</span> 把推論字面化（不新增冒號）</p>
+<div class="ba"><span class="lbl">前</span><span class="en">First, the letter under the integral sign is a placeholder <del>—</del> \(\int_{a}^{x} f(t)\,dt\) and \(\int_{a}^{x} f(s)\,ds\) are the same function of \(x\).</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">First, the letter under the integral sign is <ins>only</ins> a placeholder<ins>, so</ins> \(\int_{a}^{x} f(t)\,dt\) and \(\int_{a}^{x} f(s)\,ds\) are the same function of \(x\).</span></div>
+</div>
+
+<div class="card keep">
+<p><span class="cid">C-3</span><span class="tag t-keep">DASH-KEEP</span> 成對破折號，四步判定<strong>保留</strong>（2 個 dash）</p>
+<p class="why">① 拿掉 <span class="en">— \(0\) will do —</span>，主幹 <span class="en">Split at any constant into two variable-upper-limit pieces</span> 文法完整、量詞 <span class="en">any</span> 的 scope 不變 ✓　② Y 只是對「哪個常數」給一個具體取值，<strong>沒有</strong>另提定義／理由／例外／推論／結論（有限動詞本身不構成充分條件）　③ → 保留成對 dash。同時落在「worked-solution 的電報式 gloss」既有 KEEP 類別。</p>
+<div class="ba"><span class="lbl">維持原狀</span><span class="en">Split at any constant — \(0\) will do — into two variable-upper-limit pieces, …</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">C-4</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝命名同位語（句尾）→ 逗號</p>
+<div class="ba"><span class="lbl">前</span><span class="en">Part 1 built one antiderivative of \(f\) <del>—</del> the accumulation function.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">Part 1 built one antiderivative of \(f\)<ins>,</ins> the accumulation function.</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">C-5</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 成對破折號</p>
+<p class="why">四步：② Y＝<span class="en">it cancels in the subtraction</span> 是<strong>理由</strong>（可獨立表述）→ ③ 重寫。<span class="en">any added constant is pointless here</span> 是 §6.3 已裁的非 finding，<strong>措辭不動</strong>。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">Because any antiderivative serves, any added constant is pointless here <del>—</del> it cancels in the subtraction <del>— so</del> we take the simplest antiderivative available.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">Because any antiderivative serves, any added constant is pointless here<ins>, since</ins> it cancels in the subtraction<ins>. So</ins> we take the simplest antiderivative available.</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">C-6</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 成對破折號（歷史段）</p>
+<p class="why">四步：② Y＝<span class="en">that the derivative of an accumulated area is the height, and so an area is recovered from an antiderivative</span> 是<strong>「互逆」的實質內容＋一步推論</strong>（<span class="en">and so</span>）→ ③ 重寫。§6.3 保留清單裡的那句歷史宏大語（Newton／Leibniz 那句）<strong>不在本卡範圍</strong>、原封不動。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The recognition that they are inverse <del>—</del> that the derivative of an accumulated area is the height, and so an area is recovered from an antiderivative <del>— is what turned</del> a collection of clever area computations into a method.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en"><ins>They are inverse to each other. T</ins>he derivative of an accumulated area is the height, and so an area is recovered from an antiderivative<ins>. Recognizing that is what turned</ins> a collection of clever area computations into a method.</span></div>
+<p class="why">（刻意不用冒號：§6.3 冒號已有 8，且本輪全章冒號淨增須壓在 +3 以下——見 §7。）</p>
+</div>
+
+<div class="card cut">
+<p><span class="cid">C-7</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝同位語（句尾）→ 逗號。<span class="en">the central fact of the subject</span> 是已裁的非 finding，措辭不動。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…differentiation and integration are inverse processes <del>—</del> the central fact of the subject.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…differentiation and integration are inverse processes<ins>,</ins> the central fact of the subject.</span></div>
+</div>
+
+<h2>§4　走查逐條（§6.4）— 完整一輪（15 → 2）</h2>
+
+<div class="card split">
+<p><span class="cid">D-1</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-lex">R1-LEXICAL</span> 節開場：擬人 ×2 ＋ 單破折號尾巴</p>
+<p class="why">R1：<span class="en">a hunt for an antiderivative</span>（狩獵隱喻）與 <span class="en">antiderivatives now deserve a notation</span>（deserve＝道德性擬人）。後者與 §6.3 X-2（<span class="en">earns a name of its own</span>→<span class="en">has a name of its own</span>）、§6.2 W-1（<span class="en">deserves a name</span>→<span class="en">is worth naming</span>）<strong>同型，直接引用前例，不重開裁決</strong>。<br>DASH：單破折號尾巴＝同位語 → 逗號。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The Fundamental Theorem turns every definite integral into a <del>hunt for</del> an antiderivative, so antiderivatives now <del>deserve</del> a notation and a working table. This section supplies both, and then rereads the theorem itself in the language of accumulated change <del>—</del> the form in which it does most of its practical work.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The Fundamental Theorem turns every definite integral into <ins>the problem of finding</ins> an antiderivative, so antiderivatives now <ins>need</ins> a notation and a working table. This section supplies both, and then rereads the theorem itself in the language of accumulated change<ins>,</ins> the form in which it does most of its practical work.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">D-2</span><span class="tag t-cut">DASH-CUT</span>（<strong>Definition 6.4 內文，Gate 5 必查</strong>）命名同位語（句尾）→ 逗號，一個字不動</p>
+<div class="ba"><span class="lbl">前</span><span class="en">means that \(F' = f\), where \(C\) is an arbitrary constant <del>—</del> the <em>constant of integration</em>.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">means that \(F' = f\), where \(C\) is an arbitrary constant<ins>,</ins> the <em>constant of integration</em>.</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">D-3</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 成對破折號（Caution）</p>
+<p class="why">四步：② Y＝<span class="en">the definite integral is evaluated <em>through</em> an antiderivative</span> 是<strong>「怎麼連結」的獨立說明</strong> → ③ 重寫。此處冒號是承載 payload 的正當用法（+1）。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">They share a symbol because the Fundamental Theorem links them <del>—</del> the definite integral is evaluated <em>through</em> an antiderivative <del>— but</del> a number and a family of functions are not the same kind of object.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">They share a symbol because the Fundamental Theorem links them<ins>:</ins> the definite integral is evaluated <em>through</em> an antiderivative<ins>. But</ins> a number and a family of functions are not the same kind of object.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">D-4</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝舉例 → 分句</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The trigonometric and inverse-trigonometric entries are the Chapter 3 derivative rules read backwards <del>— for instance</del> \(\int \sec^{2} x\,dx = \tan x\) because \((\tan x)' = \sec^{2} x\), and…</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The trigonometric and inverse-trigonometric entries are the Chapter 3 derivative rules read backwards<ins>. For instance,</ins> \(\int \sec^{2} x\,dx = \tan x\) because \((\tan x)' = \sec^{2} x\), and…</span></div>
+</div>
+
+<div class="card keep">
+<p><span class="cid">D-5</span><span class="tag t-keep">DASH-KEEP</span> 成對破折號，四步判定<strong>保留</strong>（2 個 dash）</p>
+<p class="why">① 拿掉 <span class="en">— for a negative or fractional exponent —</span>，主幹 <span class="en">…, and the power rule on an interval avoiding the points where \(x^{n}\) is undefined</span> 文法完整 ✓　② Y 是<strong>同一主張的必要條件修飾</strong>（哪種指數才需要這個限制），無有限動詞、無獨立教學動作　③ → 保留。<br>此處尤其不能改逗號：整句本來就是三項逗號並列（<span class="en">the \(\sec^{2}\) formula where…, the \(\arcsin\) formula on…, and … the power rule on…</span>），改逗號會讓條件被讀成第四個並列項。</p>
+<div class="ba"><span class="lbl">維持原狀</span><span class="en">…, the \(\arcsin\) formula on \(-1 &lt; x &lt; 1\), and — for a negative or fractional exponent — the power rule on an interval avoiding the points where \(x^{n}\) is undefined.</span></div>
+<div class="ba"><span class="lbl">若你要 §6.4 進 0 個 dash</span><span class="en">…, and <ins>(</ins>for a negative or fractional exponent<ins>)</ins> the power rule on…</span>（左括號 +1；<strong>決策 P-1 的一部分</strong>）</div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">D-6</span><span class="tag t-cut">DASH-CUT</span> 單破折號＋<span class="en">and</span>＋獨立子句 → 分句</p>
+<div class="ba"><span class="lbl">前</span><span class="en">That missing case is filled by the logarithm <del>— and the</del> reason an absolute value appears there is worth seeing.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">That missing case is filled by the logarithm<ins>. The</ins> reason an absolute value appears there is worth seeing.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">D-7</span><span class="tag t-cut">DASH-CUT</span>（Example 6.15，兩處）單破折號尾巴＝同位語 → 逗號</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The table records \(\int \dfrac{1}{1 + x^{2}}\,dx = \arctan x\) <del>—</del> the reverse of \((\arctan x)' = \dfrac{1}{1 + x^{2}}\) established in Chapter 3.</span><br>
+<span class="en">A rational integrand with no area to read off has produced the number \(\tfrac{\pi}{4}\) <del>—</del> one of the standard ways \(\pi\) arrives through integration.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The table records \(\int \dfrac{1}{1 + x^{2}}\,dx = \arctan x\)<ins>,</ins> the reverse of \((\arctan x)' = \dfrac{1}{1 + x^{2}}\) established in Chapter 3.</span><br>
+<span class="en">A rational integrand with no area to read off has produced the number \(\tfrac{\pi}{4}\)<ins>,</ins> one of the standard ways \(\pi\) arrives through integration.</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">D-8</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span> 成對破折號＝術語就地定義</p>
+<p class="why">四步：② Y＝<span class="en">the net change in position</span> 是<strong>被引入術語 <span class="en">displacement</span> 的定義</strong>，依 KEEP 前提「MUST NOT 另行提出可獨立表述的定義」→ ③ 重寫。改後 displacement 在自己的主句裡被定義，比塞在插入語裡更符合 §3「關鍵位置給平實釋義」。後面的 display 式接續不變。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">For an object moving along a line with velocity \(v(t)\), position is an antiderivative of velocity, so the Net Change Theorem gives the <em>displacement</em> <del>—</del> the net change in position <del>—</del> as</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">For an object moving along a line with velocity \(v(t)\), position is an antiderivative of velocity<ins>. The <em>displacement</em> is</ins> the net change in position<ins>, and the Net Change Theorem gives it</ins> as</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">D-9</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝尾掛 -ing 子句 → 逗號</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…integrates the <em>speed</em> \(\lvert v(t)\rvert\) instead <del>—</del> recovering the reading of §6.1:</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…integrates the <em>speed</em> \(\lvert v(t)\rvert\) instead<ins>,</ins> recovering the reading of §6.1:</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">D-10</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span><span class="tag t-lex">R1-LEXICAL</span> 節收尾：隱喻群＋成對破折號＋分號黏接</p>
+<p class="why">四步：② Y＝<span class="en">an inner function tucked inside another</span> 是 <span class="en">a mild disguise</span> 的定義 → ③ 重寫。<br>
+R1：<span class="en">a mild disguise … defeats it</span> 是「偽裝／擊敗」的擬人隱喻對；字面內容（表格只認得「明擺著是某個導函數」的被積函數）雖然在場，但整句的邏輯要靠隱喻串起來。<span class="en">the antiderivative side of the ledger</span>（帳簿）是不透明的會計隱喻，且與本書 <span class="en">on credit</span> 機制用語<strong>不同義</strong>，留著會混淆。<br>分號 −1。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The table above antidifferentiates only functions that are visibly some derivative run backwards<del>; a mild disguise — an inner function tucked inside another — defeats it</del>. The next section <del>restores</del> the chain rule to the antiderivative side <del>of the ledger</del>, and with it the single most useful technique for finding antiderivatives that the table alone cannot.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The table above antidifferentiates only functions that are visibly some derivative run backwards<ins>. If an inner function is tucked inside another, the table no longer applies</ins>. The next section <ins>carries</ins> the chain rule <ins>over</ins> to the antiderivative side, and with it the single most useful technique for finding antiderivatives that the table alone cannot.</span></div>
+</div>
+
+<h2>§5　走查逐條（§6.5）— 完整一輪（13 → 4）</h2>
+
+<div class="card split">
+<p><span class="cid">E-1</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-lex">R1-LEXICAL</span> 節開場：偽裝隱喻群（本節 5 命中之首）＋擬人</p>
+<p class="why">R1：<span class="en">the table … recognizes it</span>／<span class="en">integrands wear a disguise</span>／<span class="en">strips the disguise</span>＝表格與被積函數被擬人化，「偽裝」承擔了本節的核心說明。字面內容（<span class="en">an inner function tucked inside another</span>）在場，故<strong>非 blocking</strong>，但五處同族用語密集，依 R 維度「頁級累積規則」升為節級複查。<span class="en">fingerprint</span> 同時是本節第二個隱喻族。<br>DASH：單破折號＋<span class="en">yet</span>＋獨立子句 → 逗號。<br><strong>刻意保留</strong> <span class="en">that is no accident</span>——§6.2 W-1 的改寫產物正是 <span class="en">That is no coincidence.</span>，同型已裁為可接受。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The table of §6.4 antidifferentiates a function only when it <del>recognizes it as</del> some derivative written plainly. But most integrands <del>wear a disguise:</del> an inner function tucked inside another, the <del>fingerprint</del> of the chain rule. To integrate \(\int 2x\sqrt{1 + x^{2}}\,dx\) there is no table entry <del>—</del> yet the \(2x\) is exactly the derivative of the inside \(1 + x^{2}\), and that is no accident. Running the chain rule backwards <del>strips the disguise</del>.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The table of §6.4 antidifferentiates a function only when <ins>the function is visibly</ins> some derivative written plainly. But <ins>in</ins> most integrands <ins>the derivative is hidden:</ins> an inner function <ins>sits</ins> inside another, the <ins>mark</ins> of the chain rule. To integrate \(\int 2x\sqrt{1 + x^{2}}\,dx\) there is no table entry<ins>,</ins> yet the \(2x\) is exactly the derivative of the inside \(1 + x^{2}\), and that is no accident. Running the chain rule backwards <ins>undoes the composition</ins>.</span></div>
+</div>
+
+<div class="card keep">
+<p><span class="cid">E-2</span><span class="tag t-keep">DASH-KEEP</span><span class="tag t-lex">R1-LEXICAL</span> 成對破折號<strong>保留</strong>（2 個 dash）＋一個獨立的詞彙 finding</p>
+<p class="why">四步：① 拿掉 <span class="en">— usually cleaner —</span>，主幹 <span class="en">…, or carry the substitution through the limits themselves</span> 文法完整 ✓　② Y 是<strong>對同一主張的程度／偏好修飾</strong>，無獨立教學動作　③ → 保留。<strong>這正是 SPEC §3 具約束力的 <span class="en">— far more often —</span> 同型先例。</strong><br>
+R1（獨立於 dash）：<span class="en">two honest options</span>——<span class="en">honest</span> 配「做法」是不透明搭配，與 §6.3 X-7（<span class="en">a genuine, positive area</span>→<span class="en">an ordinary positive area</span>）、§6.2 W-18（<span class="en">the honest generalization</span>）同族，前例已裁。</p>
+<div class="ba"><span class="lbl">建議（保 dash，只改詞）</span><span class="en">There are two <del>honest</del> <ins>correct</ins> options: finish the antiderivative and restore \(x\) before applying the limits, or — usually cleaner — carry the substitution through the limits themselves.</span></div>
+<div class="ba"><span class="lbl">替代（決策 P-1：若你要 §6.5 也進 3.0/1000）</span><span class="en">There are two correct options. You can finish the antiderivative and restore \(x\) before applying the limits, or you can carry the substitution through the limits themselves<ins>, which is usually cleaner</ins>.</span><br>
+<span style="color:var(--mut);font-size:.88rem">——這是<strong>因 R1「honest options」而重寫整句</strong>後插入語自然溶解，不是為了湊密度名額把成對破折號改成逗號。</span></div>
+</div>
+
+<div class="card lex">
+<p><span class="cid">E-3</span><span class="tag t-lex">R1-LEXICAL</span>（Example 6.17）擬人 ×2</p>
+<p class="why">R1：<span class="en">its derivative \(2x\) stands ready in the integrand</span>（待命）與 <span class="en">one the table knows</span>（表格「知道」）都是數學物件配意志／認知動詞，SPEC 明列改用中性動詞。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The inside of the square root is \(1 + x^{2}\), and its derivative \(2x\) <del>stands ready</del> in the integrand. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\). The integral becomes one the table <del>knows</del>:</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The inside of the square root is \(1 + x^{2}\), and its derivative \(2x\) <ins>is already present</ins> in the integrand. Put \(u = 1 + x^{2}\), so \(du = 2x\,dx\). The integral becomes one the table <ins>covers</ins>:</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">E-4</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-lex">R1-LEXICAL</span>（Example 6.19）</p>
+<p class="why">DASH：單破折號尾巴＝同位語，但同句已有成對逗號 → 走分句。R1：<span class="en">fingerprint</span> 同 <code>E-1</code>，改 <span class="en">mark</span>（R3 一致）。<br>另（advisory）：<span class="en">substitution <del>collapses</del> the integral to the logarithm</span> → <span class="en">reduces</span>，與 §6.3 X-6 已裁的 <span class="en">collapses to one line</span>→<span class="en">reduces to one line</span> 同族。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">The derivative of the denominator is \(2x\), exactly the numerator <del>—</del> the <del>fingerprint</del> of a substitution whose result is a logarithm rather than a power.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The derivative of the denominator is \(2x\), exactly the numerator<ins>. That is the mark</ins> of a substitution whose result is a logarithm rather than a power.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">E-5</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝獨立的操作指令 → 分句（Caution 的禁令自己成句，更醒目）</p>
+<div class="ba"><span class="lbl">前</span><span class="en">…or return to \(x\) first and use the original limits <del>— but</del> never blend the two.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">…or return to \(x\) first and use the original limits<ins>. N</ins>ever blend the two.</span></div>
+</div>
+
+<div class="card keep">
+<p><span class="cid">E-6</span><span class="tag t-keep">DASH-KEEP</span> 成對破折號<strong>保留</strong>（2 個 dash）＋同段一條 S3 刪除</p>
+<p class="why">四步：① 拿掉 <span class="en">— if it has any —</span>，主幹 <span class="en">…the symmetry of the integrand can halve the work or eliminate it entirely</span> 文法完整 ✓　② Y 是<strong>條件修飾</strong>（有沒有對稱性），無獨立教學動作　③ → 保留。<strong><span class="en">— only then —</span> 預設 KEEP 的同型。</strong><br>
+另一條（advisory，S3 刪除測試）：<span class="en">This is substitution in one of its tidiest applications.</span>——純評價，前一句已說「可以省一半功夫或完全省掉」，刪之讀者零損失；<span class="en">tidiest</span> 也是低頻評價詞。</p>
+<div class="ba"><span class="lbl">維持原狀</span><span class="en">When the interval is symmetric about the origin, the symmetry of the integrand — if it has any — can halve the work or eliminate it entirely.</span></div>
+<div class="ba"><span class="lbl">建議刪</span><span class="en"><del>This is substitution in one of its tidiest applications.</del></span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">E-7</span><span class="tag t-cut">DASH-CUT</span><span class="tag t-split">PLAIN-SPLIT</span><span class="tag t-lex">R1-LEXICAL</span>（偶函數／奇函數的幾何圖像段，99 詞）</p>
+<p class="why">四步：② Y＝<span class="en">same height, hence the same sign</span> 含 <span class="en">hence</span> 的<strong>一步推論</strong>（而且正是「相加」那個結論的依據）→ ③ 重寫。同句把「鏡射」與「因此同號故相加」兩個獨立推理黏在一起 → 拆句。<br>R1／R3：<span class="en">an identical twin</span>（雙胞胎）是擬人化，且 <span class="en">identical</span> 與本段的 <span class="en">same</span> 是同義變換。<strong>奇函數那半句完全不動</strong>（分號是單一對稱對比，SPEC 明列 MAY 保留）。</p>
+<div class="ba"><span class="lbl">前</span><span class="en">An even function has the same graph on \([-a, 0]\) as on \([0, a]\), mirror-reflected across the vertical axis, <del>so</del> each thin strip on the left has an <del>identical twin</del> on the right <del>—</del> same height, hence the same sign <del>—</del> and the matched signed areas <em>add</em>: the integral is twice the integral over \([0, a]\).</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">An even function has the same graph on \([-a, 0]\) as on \([0, a]\), mirror-reflected across the vertical axis<ins>. E</ins>ach thin strip on the left <ins>therefore has a partner</ins> on the right <ins>of the</ins> same height, <ins>and so of</ins> the same sign, and the matched signed areas <em>add</em>: the integral is twice the integral over \([0, a]\).</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">E-8</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝獨立子句 → 逗號＋<span class="en">and</span></p>
+<div class="ba"><span class="lbl">前</span><span class="en">The odd term contributes nothing at all <del>—</del> recognizing it saves the work of integrating it.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">The odd term contributes nothing at all<ins>, and</ins> recognizing it saves the work of integrating it.</span></div>
+</div>
+
+<div class="card cut">
+<p><span class="cid">E-9</span><span class="tag t-cut">DASH-CUT</span> 單破折號尾巴＝同位語＋內含逗號 → 分句</p>
+<div class="ba"><span class="lbl">前</span><span class="en">It reaches every integrand that hides a single inner function whose derivative is present <del>—</del> a wide class, but not all.</span></div>
+<div class="ba"><span class="lbl">後</span><span class="en">It reaches every integrand that hides a single inner function whose derivative is present<ins>. That is</ins> a wide class, but not all<ins> integrands</ins>.</span></div>
+</div>
+
+<div class="card split">
+<p><span class="cid">E-10</span><span class="tag t-split">PLAIN-SPLIT</span>（段落層）<span class="tag t-cut">DASH-CUT</span><span class="tag t-lex">R1-LEXICAL</span> 章末摘要 167 詞 → 拆三段</p>
+<p class="why">段落層：167 詞把五節摘要塞成一段；ch01–ch05 的摘要段上界是 115 詞。<strong>拆段不拆句、不動數學、不動任何交叉引用編號</strong>，拆點＝〔引言＋§6.1＋§6.2〕｜〔§6.3＋互逆總結〕｜〔§6.4＋§6.5〕。<br>
+DASH：<span class="en">— the indefinite integral (Definition 6.4) —</span> 是命名同位語（KEEP 候選），但插入語內部已有括號 → 依 CUT palette「插入語本身含括號／清單者改括號」處理，語義零變動。<br>
+R1：<span class="en">the hinge on which calculus turns</span>（門軸）→ 改用 §6.3 收尾<strong>已裁定保留</strong>的同義說法 <span class="en">the central fact of the subject</span>，一舉解決 R1 與 R3。<br>
+R2（<strong>本節最值得看的一條</strong>）：<span class="en">The debt the chapter leaves to the rest of the book…</span>——本書的 <span class="en">debt／on credit</span> 是<strong>專指「未證而先用的結果」</strong>（ch02 §2.4 首見已 gloss、ch04 §4.1 還債、§6.2 Theorem 6.1 掛帳）。此處的 <span class="en">debt</span> 卻是指「本章交給後面各章的工具」＝<strong>意思相反</strong>，會讓讀者以為第 7 章起還欠著什麼。改成字面說法。</p>
+<div class="ba"><span class="lbl">前（單段）</span><span class="en">…That the derivative of an accumulated area is the height, and that an area is therefore recovered from an antiderivative, is <del>the hinge on which calculus turns</del>. Section 6.4 gave antiderivatives a notation <del>—</del> the indefinite integral (Definition 6.4) <del>—</del> and a working table, …</span><br>
+<span class="en">The <del>debt</del> the chapter <del>leaves to</del> the rest of the book is a single instrument used everywhere.</span></div>
+<div class="ba"><span class="lbl">後（三段＋兩處措辭）</span><span class="en">…That the derivative of an accumulated area is the height, and that an area is therefore recovered from an antiderivative, is <ins>the central fact of the subject</ins>.</span><br>
+<span class="en">〔新段〕Section 6.4 gave antiderivatives a notation <ins>(</ins>the indefinite integral, Definition 6.4<ins>)</ins> and a working table, …</span><br>
+<span class="en">What the chapter <ins>hands to</ins> the rest of the book is a single instrument used everywhere.</span></div>
+</div>
+
+<h2>§6　刻意保留（示範規則不誤傷）</h2>
+
+<h3>6.1 成對破折號 KEEP（4 處＝8 個 dash 中的 6 個）</h3>
+<table>
+<tr><th>位置</th><th>插入語</th><th>四步判定</th><th>先例</th></tr>
+<tr><td>§6.3 Ex 6.10(b)</td><td class="en">— \(0\) will do —</td><td>同一指令的取值示例，無獨立教學動作</td><td>worked-solution 電報式 gloss（既有 KEEP 類別）</td></tr>
+<tr><td>§6.4 反導表段</td><td class="en">— for a negative or fractional exponent —</td><td>同一主張的必要條件修飾；改逗號會被讀成第四個並列項</td><td class="en">— only then —</td></tr>
+<tr><td>§6.5 定積分代換</td><td class="en">— usually cleaner —</td><td>同一主張的程度／偏好修飾</td><td class="en">— far more often —（具約束力）</td></tr>
+<tr><td>§6.5 對稱性</td><td class="en">— if it has any —</td><td>同一主張的條件修飾</td><td class="en">— only then —（預設 KEEP）</td></tr>
+</table>
+
+<h3>6.2 正則命中但判為非 finding（17 條，不改）</h3>
+<ul>
+<li><strong>主語是 <span class="en">we</span> 的認知動詞</strong>（4）：<span class="en">we know the area of a rectangle</span>／<span class="en">see what number the areas approach</span>／<span class="en">we know the speed</span>／<span class="en">we want the total distance</span>——擬人的判準是「數學物件作主語＋情緒／意志動詞」，<span class="en">we</span> 不是數學物件。</li>
+<li><span class="en">misbehaves</span>（§6.1）——§6.2 W-4 的定稿用語，R3 一致性要求保持同詞。</li>
+<li><span class="en">read off</span>（§6.1 Ex 6.1 題幹、§6.4 Ex 6.15）——§6.2 W-10 的改寫產物就是 <span class="en">read the integral straight off the geometry</span>，前例已裁為可接受的教科書慣用動詞片語。</li>
+<li><span class="en">that is no accident</span>（§6.5）——§6.2 W-1 的改寫產物是 <span class="en">That is no coincidence.</span>，同型已裁。</li>
+<li><span class="en">all the way to infinity</span>／<span class="en">computed by hand</span>／<span class="en">sharpened into a limit</span>／<span class="en">sharpen as the strips grow thinner</span>——字面透明、可推測，且 <span class="en">sharpen</span> 在 §6.1 兩處同義使用（非漂移）。</li>
+<li><span class="en">yields</span>（§6.2／§6.3 推導句，2）——數學推導的標準用法（<span class="en">dividing by \(h\) yields …</span>），非情緒動詞。</li>
+<li><span class="en">collapses onto \(x\)</span>（§6.3 證明）——區間收縮的標準說法，且屬 §6.3 已結案範圍。</li>
+<li><span class="en">Leibniz settled on the elongated \(S\)</span>（§6.2）——主語是人。</li>
+<li><span class="en">taken on credit</span>（§6.2／§6.5）——全書機制用語，首見處（ch02 §2.4）已 gloss，W-13(a) 政策保留。</li>
+<li>cleft 句式（<span class="en">it is the freedom in the sample points … that continuity has to control</span>、<span class="en">What remains is …</span>、<span class="en">is what turned …</span>）——FLAG 句式，MUST NOT 僅因形式報 finding；語義透明。</li>
+</ul>
+
+<h3>6.3 段落層：觸發但判定放行</h3>
+<ul>
+<li><strong>§6.1 章 lead（152 詞）</strong>——單一論述動作（章路線圖），且是全書 lead 區間（129–197 詞）的正中值。拆它會破壞七章一致的開場體例。</li>
+<li><strong>§6.3 FTC-1 證明段（114 詞／19 式）</strong>——§6.3 那輪已判定為單一論證、放行，本輪沿用，不重開。</li>
+<li>全章 <strong>0 段</strong>行內式 &gt;20（最高 11 式，在 §6.4 的反導表段），符號密集觸發器未啟動。</li>
+</ul>
+
+<h2>§7　節級密度閘＋不換 tic 檢查（Gate 1 的④⑤，預估值）</h2>
+
+<table>
+<tr><th>tic</th><th class="num">Gate 0 前值</th><th class="num">提案後（估）</th><th class="num">Δ raw</th><th class="num">Δ 密度/1000</th><th>是否達「顯著上升」門檻<br>(raw ≥+3 <strong>且</strong> 密度 ≥+0.5)</th></tr>
+<tr><td>em-dash</td><td class="num">72</td><td class="num">8</td><td class="num ok">−64</td><td class="num ok">−11.1</td><td class="ok">達標（1.4 ≤ 3.0）</td></tr>
+<tr><td>冒號接子句</td><td class="num">41</td><td class="num">43</td><td class="num">+2</td><td class="num">+0.35</td><td class="ok">否（raw &lt;+3）</td></tr>
+<tr><td>分號</td><td class="num">37</td><td class="num">35</td><td class="num ok">−2</td><td class="num ok">−0.35</td><td class="ok">否（下降）</td></tr>
+<tr><td>左括號</td><td class="num">52</td><td class="num">53</td><td class="num">+1</td><td class="num">+0.17</td><td class="ok">否</td></tr>
+<tr><td>成對逗號插入語</td><td class="num">32</td><td class="num">32±2</td><td class="num">≈0</td><td class="num">≈0</td><td class="ok">否（新增的同位語逗號多在句尾，不構成成對）</td></tr>
+</table>
+<p class="why">刻意的設計：de-dash 的負載<strong>沒有</strong>被推去冒號或括號。47 張 CUT 卡片的 palette 分佈是——<strong>分句 27</strong>、<strong>逗號同位語 16</strong>、括號 2（<code>B-2</code>、<code>E-10</code>）、冒號 2（<code>A-13</code> 引清單型、<code>D-3</code> payload 型）、整段刪除 2（<code>A-3</code>、<code>A-7</code>）。這是針對 appB 首輪教訓（去 dash 換來冒號 +37／左括號 +37，下一輪還得再清一次）刻意做的配置。<strong>實際值以 Gate 4 重測為準。</strong></p>
+
+<h2>§8　裁決紀錄（2026-07-26，使用者）</h2>
+
+<div class="note">
+<p><strong>P-1（節級密度 vs 逐例 KEEP）—— 裁決：走「明示節級例外」。</strong></p>
+<p>§6.5 保留兩處先例型 KEEP（<span class="en">— usually cleaner —</span>、<span class="en">— if it has any —</span>）後節級密度 <strong>3.9 &gt; 3.0</strong>，記為<strong>明示節級例外</strong>，不採 <code>E-2</code> 的溶解式改寫、也不把 KEEP 機械改成逗號。<br>
+依據＝SPEC §3「兩個閘門不可互相豁免」三條合法出路中的第三條（明示節級例外）；全章 <strong>1.4/1000</strong> 達標，§6.1／§6.2／§6.3／§6.4 四節皆在 3.0 內。<br>
+連帶：<code>C-3</code>（§6.3）與 <code>D-5</code>（§6.4）的 KEEP 同樣維持原狀，不改括號。<br>
+<strong>待併：</strong>rollout 帳本 §2 的 ch06 列須記下這個節級例外，不可只填全章密度。</p>
+</div>
+
+<div class="note">
+<p><strong>P-2（§6.2／§6.3 詞彙層）—— 未指定，照預設：不動。</strong></p>
+<p>§6.2 的 <span class="en">come the hard way</span>、<span class="en">obeying the … rules</span> 維持原狀，尊重 2026-07-25 的結案範圍。<span class="en">the hinge on which calculus turns</span> 因為人在 §6.5，仍由 <code>E-10</code> 處理。</p>
+</div>
+
+<div class="note">
+<p><strong>P-3（Codex gate-2）—— 裁決：跑。</strong></p>
+<p><code>codex exec -s read-only</code>，模型走 <code>~/.codex/config.toml</code> 預設 gpt-5.6-terra，codex-cli 0.144.1。材料<strong>全 inline</strong>（prompt 91.5 KB，遵循 2026-06-28 的自讀編碼坑紀律），背景執行。逐項要 ADOPT／MODIFY／REJECT ＋ Q1–Q7（含「A-24／B-1 是不是用拆句當藉口做表面去 dash」、「§6.5 節級例外站不站得住」、「冒號接子句我有沒有漏算」、「範圍切法在 gate 邏輯上對不對」）。<br>raw 輸出將照登於 <code>REPORT-ch06-plain-codex-raw.md</code>。</p>
+</div>
+
+<div class="note">
+<p><strong>P-4（figcaption 連動）—— 未指定，照預設。</strong></p>
+<p>Figure 6.7 的 figcaption 一併改標點（語義不動，不需重跑圖閘）；§6.5 Strategy 6.2 清單裡的 6 個 dash（<span class="en">Choose \(u = g(x)\) — usually an inner function…</span>／<span class="en">If \(f\) is even — that is, \(f(-x)=f(x)\) — then…</span>）同屬副表且型態上都是條件／取值修飾的 KEEP，<strong>不動</strong>。</p>
+</div>
+
+<h2>§9　本輪尚未做的（誠實記錄）</h2>
+<ul>
+<li><strong>Gate 2（Codex 獨立裁決）</strong>——<strong>已完成</strong>（2026-07-26）：<code>ADOPT 38／MODIFY 21／REJECT 0</code>。raw 照登於 <a href="REPORT-ch06-plain-codex-raw.md"><code>REPORT-ch06-plain-codex-raw.md</code></a>；逐條折入與我未照收的 10 條理由見 <a href="REVIEW-ch06-plain-applied.html"><code>REVIEW-ch06-plain-applied.html</code></a> §1。<strong>Gate 3–6、8 已跑完並通過，Gate 7（LaTeX）記為 pending</strong>（ch06 不在 <code>NAMES</code> 表內）。</li>
+<li><strong>Gate 3–4</strong>——裁決前 propose-only，<strong>fragment 一個字都沒改</strong>；<code>build.py ch06</code> 尚未跑。</li>
+<li><strong>Gate 5（math gate）</strong>——待改動後跑範圍限定版。已標出三個必查點：<code>B-4</code>（Theorem 6.1 陳述）、<code>D-2</code>（Definition 6.4 內文）、<code>C-2</code>／<code>C-5</code>（§6.3 Caution 與 FTC-2 後的說明句）。程式化片段比對的目標是<strong>零差異</strong>（§6.3 那輪 189→189 是可達成的）。</li>
+<li><strong>Gate 7（LaTeX）</strong>——<code>make_dist.py</code> 的 <code>NAMES</code> 表無 ch06 → <strong>pending</strong>，本輪不改 NAMES（平行輪衝突）。</li>
+<li><strong>Gate 8（分頁目檢）</strong>——ch06 print 版從未目視檢查過；本輪 +2 拆段、+17 個句點會改變行數，這關必做。</li>
+<li><strong>rollout 帳本</strong>——依平行紀律 MUST NOT 編輯 <code>REPORT-emdash-baseline-and-rollout.md</code>；數字會寫進 applied 報告末尾的「待併」欄。</li>
+</ul>
+
+<p class="foot">
+產出：Claude，2026-07-26，分支 <code>handout/plain-ch06</code>（worktree <code>.claude/worktrees/plain-ch06</code>）。
+量測全部程式化：<code>tools/prose_metrics.py --unit ch06</code>（canonical stream 單一真實來源）＋逐節／逐段／家族掃描腳本（存 scratchpad，沿用 <code>prose_metrics</code> 的 stream 定義，不另立分母）。
+家族命中逐條人工複核主語與可推測性後才升為 finding（§6.1 26 ＋ §6.4 7 ＋ §6.5 18 ＝ 51 命中 → 23 條真 finding；§6.2／§6.3 的 14 命中屬已結案範圍，本輪不重審）。
+<strong>待併：rollout 帳本 §2 的 ch06 列。</strong>
+</p>
+
+</div>
+</body>
+</html>
