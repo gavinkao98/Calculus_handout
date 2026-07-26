@@ -36,6 +36,7 @@ NAMES = {
     "ch04": "chapter4",
     "ch05": "chapter5",
     "ch06": "chapter6",
+    "ch07": "chapter7",
 }
 
 HEADER = """% !TeX program = lualatex
