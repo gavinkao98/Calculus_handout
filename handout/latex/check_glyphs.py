@@ -158,10 +158,22 @@ def audit(doc, basefont, data):
 
 
 def _glyf_outline(glyphset, name):
-    """glyf 輪廓 → 可比對的 tuple。取整同 outline()，理由見該函式（子集器的浮點噪音）。"""
+    """glyf 輪廓 → 可比對的 tuple。取整同 outline()，理由見該函式（子集器的浮點噪音）。
+
+    `args` 裡可能出現 `None`：TrueType 允許一整條輪廓**全是 off-curve 點**（相鄰兩點的
+    中點即為隱含的 on-curve 點），fontTools 的 pen protocol 用 `qCurveTo(p1…pn, None)`
+    表示這種閉合輪廓。WebCM-Serif 的 `?`／`!`／`.`／`:`／`;`／`·` 等 68 個字形的圓點正是
+    這樣畫的，ch07 是全書第一個把 `?` 帶進圖面板的單元（2026-07-26 實測：子集裡 GID 34
+    `question` 命中，此前各章的面板文字剛好都沒有這幾個字元）。
+
+    `None` MUST 保留成可區分的值，不可過濾掉——兩條輪廓若只差在「最後一點是不是隱含
+    on-curve」，濾掉 None 會讓它們比成相等，等於在本閘上開一個洞。
+    """
     pen = RecordingPen()
     glyphset[name].draw(pen)
-    return tuple((op, tuple(round(c, 1) for pt in args for c in pt)) for op, args in pen.value)
+    return tuple(
+        (op, tuple(None if pt is None else tuple(round(c, 1) for c in pt) for pt in args))
+        for op, args in pen.value)
 
 
 def audit_glyf(basefont, data):

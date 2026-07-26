@@ -12,9 +12,17 @@
 
 | 單元 | 狀態 | 成品夾 | 工作資產（中間物） |
 |---|---|---|---|
-| appB | ✅ **pilot GO**（14 頁，四閘全綠） | [`dist/appB/`](dist/appB/)：`appendixB.pdf`＋`appendixB.tex` | [`chapters/appB/`](chapters/appB/)：DIALECT、driver、對照報告 |
-| ch03 | 🔶 v1 參照（轉換過、模板已換代，rollout 首發候選） | —（rollout 定版後產） | [`chapters/ch03/`](chapters/ch03/)：DIALECT、figs（7 張向量 PDF）、對照報告 |
-| ch01–ch02、ch04–ch06、appA/C/D | ⬜ 未轉換（rollout 依定稿排程；建議順序見 KICKOFF §9） | 屆時 `dist/<ch>/` | 屆時 `chapters/<ch>/` |
+| appB | ✅ **pilot GO**（25 頁，四閘全綠） | [`dist/appB/`](dist/appB/)：`appendixB.pdf`＋`appendixB.tex` | [`chapters/appB/`](chapters/appB/)：DIALECT、driver、對照報告 |
+| ch01 | ✅ 四閘全綠（44 頁） | [`dist/ch01/`](dist/ch01/) | [`chapters/ch01/`](chapters/ch01/) |
+| ch02 | ✅ 四閘全綠（35 頁） | [`dist/ch02/`](dist/ch02/) | [`chapters/ch02/`](chapters/ch02/) |
+| ch03 | ✅ 四閘全綠（22 頁） | [`dist/ch03/`](dist/ch03/) | [`chapters/ch03/`](chapters/ch03/) |
+| ch04 | ✅ 四閘全綠（32 頁） | [`dist/ch04/`](dist/ch04/) | [`chapters/ch04/`](chapters/ch04/) |
+| ch05 | ✅ 四閘全綠（36 頁） | [`dist/ch05/`](dist/ch05/) | [`chapters/ch05/`](chapters/ch05/) |
+| ch06 | ✅ 四閘全綠（28 頁） | [`dist/ch06/`](dist/ch06/) | [`chapters/ch06/`](chapters/ch06/) |
+| ch07 | ✅ 四閘全綠（39 頁） | [`dist/ch07/`](dist/ch07/) | [`chapters/ch07/`](chapters/ch07/) |
+| appA／appC／appD | ⬜ 未轉換（rollout 依定稿排程；建議順序見 KICKOFF §9） | 屆時 `dist/<ch>/` | 屆時 `chapters/<ch>/` |
+
+> 上線日與各章的方言差集／已知坑，以 [`../PIPELINE.md`](../PIPELINE.md) 的 rollout 現況表為準（那份是唯一速查）。
 
 **重編成品**（改了 fragment 之後）：
 

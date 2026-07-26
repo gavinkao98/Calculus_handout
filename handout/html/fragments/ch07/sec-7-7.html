@@ -7,8 +7,11 @@
      Ex 7.23). Cautions UNNUMBERED. Ch7 counters CLOSE: Def 7.1–7.6, Thm 7.1–7.4, Strategy 7.1–7.4,
      Ex 7.1–7.23.
      SEAM GUARD (PLAN-ch07 + brief-7-7 + ③ blocking #4/#5/#6): frustum lemma π(r₁+r₂)ℓ derived from
-     cone sectors AND the r₁=r₂ cylinder case verified separately by unrolling (the subtraction
-     divides by r₂−r₁). About the y-axis ONLY with the curve on one side (0 ≤ a < b): bare ∫2πx ds
+     cone sectors under 0 < r₁ < r₂, AND BOTH excluded cases verified separately — r₁=r₂ (cylinder
+     band, by unrolling; the subtraction divides by r₂−r₁) and r₁=0 (the cone itself, whose πr₂ℓ is
+     what π(r₁+r₂)ℓ gives; the similar-triangles step divides by r₁). r₁=0 really occurs under
+     Def 7.6, where band radii are f(x_{i-1}), f(x_i) ≥ 0 — e.g. Ex 7.23 about the y-axis at x=0.
+     (r₁=0 coverage added 2026-07-26, Codex gate-2 out-of-scope finding; see commit 16e1ae0.) About the y-axis ONLY with the curve on one side (0 ≤ a < b): bare ∫2πx ds
      goes negative for x<0 and cross-axis curves double-generate the surface — one honest clause.
      Ex 7.22 = spherical ZONE (theorem-compliant; the full sphere fails C¹ at the poles — 4πr² only
      as an explicitly-flagged limiting preview, honest fence to Ch8 improper integrals). NO Pappus,
@@ -30,9 +33,9 @@
 
   <p>The flattenable model piece is a cone. Slit a cone of base radius \(r\) and slant height \(\ell\) down its side and unroll it: it lies flat as a circular sector of radius \(\ell\) whose arc has length \(2\pi r\), the rim of the base. By the sector-area formula, its area is \(\tfrac{1}{2}(\text{arc})(\text{radius}) = \tfrac{1}{2}(2\pi r)\,\ell = \pi r \ell\). That is the cone’s lateral area.</p>
 
-  <p>Our bands are not full cones but <em>frustums</em>, which are cones with their tops cut off. Take a frustum of slant height \(\ell\) with end radii \(r_1 &lt; r_2\). Extending its side to the apex produces two cones with a common vertex, of slant heights \(\ell_1 &lt; \ell_2\) with \(\ell_2 - \ell_1 = \ell\). The shared apex makes the two triangles similar, so \(\tfrac{\ell_1}{r_1} = \tfrac{\ell_2}{r_2}\). Hence \(\ell_2 = \tfrac{r_2}{r_1}\ell_1\). Substituting this into \(\ell_2 - \ell_1 = \ell\) gives \(\ell_1 = \tfrac{r_1\,\ell}{r_2 - r_1}\), and then \(\ell_2 = \tfrac{r_2\,\ell}{r_2 - r_1}\). Subtracting lateral areas,</p>
+  <p>Our bands are not full cones but <em>frustums</em>, which are cones with their tops cut off. Take a frustum of slant height \(\ell\) with end radii \(0 &lt; r_1 &lt; r_2\). Extending its side to the apex produces two cones with a common vertex, of slant heights \(\ell_1 &lt; \ell_2\) with \(\ell_2 - \ell_1 = \ell\). The shared apex makes the two triangles similar, so \(\tfrac{\ell_1}{r_1} = \tfrac{\ell_2}{r_2}\). Hence \(\ell_2 = \tfrac{r_2}{r_1}\ell_1\). Substituting this into \(\ell_2 - \ell_1 = \ell\) gives \(\ell_1 = \tfrac{r_1\,\ell}{r_2 - r_1}\), and then \(\ell_2 = \tfrac{r_2\,\ell}{r_2 - r_1}\). Subtracting lateral areas,</p>
   <p>\[ \pi r_2 \ell_2 - \pi r_1 \ell_1 = \pi\,\frac{r_2^{2} - r_1^{2}}{r_2 - r_1}\,\ell = \pi\,(r_1 + r_2)\,\ell. \]</p>
-  <p>The subtraction divided by \(r_2 - r_1\), so it says nothing about the case \(r_1 = r_2\). We can check that case directly. Equal radii make the frustum a cylindrical band, which unrolls into a flat rectangle of length \(2\pi r\) and width \(\ell\), with area \(2\pi r \ell = \pi\,(r + r)\,\ell\). The same formula covers both cases, and it is worth compressing: writing \(\bar r = \tfrac{1}{2}(r_1 + r_2)\) for the <em>average radius</em>,</p>
+  <p>The derivation assumed \(0 &lt; r_1 &lt; r_2\), because it divided by \(r_1\) to relate the two slant heights and by \(r_2 - r_1\) at the end. The two excluded cases can be checked directly. Equal radii make the frustum a cylindrical band, which unrolls into a flat rectangle of length \(2\pi r\) and width \(\ell\), with area \(2\pi r \ell = \pi\,(r + r)\,\ell\). And \(r_1 = 0\) makes it the cone itself, whose lateral area \(\pi r_2 \ell\) is what \(\pi\,(r_1 + r_2)\,\ell\) gives when \(r_1 = 0\). The same formula covers all three cases, and it is worth compressing: writing \(\bar r = \tfrac{1}{2}(r_1 + r_2)\) for the <em>average radius</em>,</p>
   <p>\[ \text{lateral area of a frustum} = 2\pi\,\bar r\,\ell. \]</p>
   <p>Average radius around, slant height along: the frustum’s area is already “circumference times width”, read at the band’s middle.</p>
 

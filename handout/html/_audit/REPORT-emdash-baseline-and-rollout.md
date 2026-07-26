@@ -58,7 +58,7 @@
 | **ch02** | 6 | 6,992 | **0.9** | 58 | 39 | 68 | 24 | ✅ 已達標（原 16.7；執行 109 條，Codex ADOPT 74／MODIFY 25／REJECT 1）——剩 3 對 KEEP；**LaTeX 線四閘全綠、`dist/ch02/` 已產出**。[`REVIEW-ch02-plain-applied.html`](REVIEW-ch02-plain-applied.html)、[`DIALECT-ch02.md`](../../latex/chapters/ch02/DIALECT-ch02.md) |
 | **ch06** | 8 | 5,742 | **1.4** | 41 | 33 | 52 | 35 | ✅ 已達標（原 12.5；2026-07-26 合併 sweep 落地 62 筆＋事後 1 筆 fence 措辭修正）——剩下 8 個＝**四處成對 KEEP**（`— \(0\) will do —`／`— for a negative or fractional exponent —`／`— usually cleaner —`／`— if it has any —`，Codex gate-2 Q4 四步判定全數確認）。**§6.5 節級 3.9 > 3.0 走明示節級例外**（使用者 2026-07-26 裁決）；成對逗號 +3 的理由見 applied §2。紀錄 [`REVIEW-ch06-plain-applied.html`](REVIEW-ch06-plain-applied.html) |
 | **ch03** | 6 | 3,855 | **1.6** | 33 | 18 | 59 | 34 | ✅ 已達標（原 14.0；執行 66 條）——[`REVIEW-ch03-plain-applied.html`](REVIEW-ch03-plain-applied.html) |
-| **ch07** | 14 | 8,937 | **1.6** | 92 | 36 | 56 | 43 | ✅ 已達標（原 17.5，全書超額最多的單元；執行 146 條）——[`REVIEW-ch07-plain-applied.html`](REVIEW-ch07-plain-applied.html) |
+| **ch07** | 14 | 8,960 | **1.6** | 92 | 36 | 56 | 43 | ✅ 已達標（原 17.5，全書超額最多的單元；執行 146 條）——[`REVIEW-ch07-plain-applied.html`](REVIEW-ch07-plain-applied.html) |
 | **ch01** | 12 | 5,810 | **2.1** | 42 | 20 | 37 | 41 | ✅ 已達標（原 9.3；執行 41 條）——剩下 12 個＝**手稿逐字 8**（4 對成對插入語，使用者裁決比照 §1.4 保留）＋**§1.4 凍結 4**；[`REVIEW-ch01-plain-applied.html`](REVIEW-ch01-plain-applied.html) |
 | **appB** | 17 | 7,793 | **2.2** | 99 | 32 | 48 | 25 | ✅ 已達標（原 17.1；~~舊尺 2.2~~） |
 | **ch04** | 16 | 6,967 | **2.3** | 68 | 43 | 82 | 27 | ✅ 已達標（原 13.3；執行 97 條）——[`REVIEW-ch04-plain-applied.html`](REVIEW-ch04-plain-applied.html) |
@@ -66,7 +66,7 @@
 | appC | 24 | 1,347 | 17.8 | 8 | 15 | 7 | 3 | ⏳ 待做；**N<1000 附近，報 raw 24/1347**（~~舊尺 11.4~~） |
 | appA | 58 | 3,081 | 18.8 | 32 | 24 | 18 | 8 | ⏳ 待做，全書最高（~~舊尺 12.8~~） |
 
-**進度：11 個單元中 7 個達標**（appB／ch01–ch05／ch07），剩 ch06（進行中）＋appA／appC／appD 三個附錄。
+**進度：11 個單元中 8 個達標**（appB／ch01–ch07），剩 appA／appC／appD 三個附錄。（2026-07-26 更正：本行原寫「剩 ch06（進行中）」，但同頁 §2 表格早已記 ch06 ✅ 1.4——摘要行漏更新。）
 2026-07-26 的合併回收一次併回六輪成果（ch02／ch03／ch04／ch05／ch07 五條分支，無衝突），**全書複測無任何單元回退**。
 
 **目標值 `T_can` ≤ 3.0/1000（canonical stream）。** 依據＝canonical 重測的真實教材基準（§1）：mooculus 0.0、APEX V5 0.5、CLP1 3.1。目標貼 CLP1（五本中最口語者）的上緣；已達標的七個單元落在 **0.8–2.3**，全數在 APEX（0.5）與 CLP1（3.1）之間。
