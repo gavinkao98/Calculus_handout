@@ -388,8 +388,11 @@ class Builder:
             elif k.tag == "strong" and not k.classes:   # appB 差集：run-in 粗體標籤
                 self.n_mapped += 1
                 out.append(Strong(self.inlines(k.kids, k, allow_br)))
-            elif k.tag == "span" and k.classes == ("qed", "qed-proof"):
-                # appB 差集：proof 收尾記號。必須是空元素（有內文＝契約外，硬錯）
+            elif k.tag == "span" and k.classes in (("qed",), ("qed", "qed-proof")):
+                # 收尾記號。appB 只有 proof 變體；ch06 差集：worked-solution 用裸
+                # `span.qed`（HTML 側兩者都是空心方框，只差框線 --ink-soft／--ink，
+                # LaTeX 同映到 \qedmark＝\qedsymbol；模板該巨集本就註明「span.qed 記號驅動」）。
+                # 必須是空元素（有內文＝契約外，硬錯）
                 if any(isinstance(x, str) and x.strip() or not isinstance(x, str) for x in k.kids):
                     self.err(k, "qed 記號必須是空元素")
                 self.n_mapped += 1

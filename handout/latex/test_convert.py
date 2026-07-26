@@ -384,6 +384,12 @@ class AppBMappings(unittest.TestCase):
         self.assertIn("done. \\qedmark", out)
         self.assertIn(r"\begin{envproof}{Proof}{}{}", out)
 
+    def test_plain_qed_marker(self):
+        # ch06 差集：worked-solution 收尾用素 `span.qed`（HTML 側與 qed-proof 都是空心
+        # 方框，只差框線色）。兩變體同映 \qedmark。
+        out = conv(wrap('<p>done. <span class="qed"></span></p>'))
+        self.assertIn("done. \\qedmark", out)
+
     def test_opener_ul_becomes_objectives(self):
         out = conv(wrap('<header class="chapter-head"><div class="ch-kicker">Appendix B</div>'
                         '<h1 class="ch-title">T</h1></header>'
@@ -469,13 +475,16 @@ class FailLoud(unittest.TestCase):
         # 素 <strong> 自 M-B2 起是 appB 差集的 run-in 標籤；帶 class 的仍屬表外
         self.assertRejects('<p>a <strong class="mystery">b</strong></p>', "inline")
 
-    def test_plain_qed_span_rejected(self):
-        # appB 方言只凍結 qed qed-proof（proof 收尾）；素 qed（solution 變體）未凍結，
-        # 哪天 fragment 加了要硬錯提醒補 mapping
-        self.assertRejects('<p>done <span class="qed"></span></p>', "span")
+    def test_other_qed_variant_rejected(self):
+        # 凍結的只有 qed 與 qed qed-proof 兩個變體；第三種 class 組合仍要硬錯提醒補 mapping
+        # （原 test_plain_qed_span_rejected 是「素 qed 未凍結」的絆線，ch06 觸發後已補 mapping）
+        self.assertRejects('<p>done <span class="qed qed-solution"></span></p>', "span")
 
     def test_qed_span_with_content_rejected(self):
         self.assertRejects('<p>done <span class="qed qed-proof">x</span></p>', "空元素")
+
+    def test_plain_qed_span_with_content_rejected(self):
+        self.assertRejects('<p>done <span class="qed">x</span></p>', "空元素")
 
     def test_br_outside_center_rejected(self):
         self.assertRejects("<p>a<br>b</p>", "br")

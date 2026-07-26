@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """字形閘：PDF 印出來的字形，是不是它宣稱的那個字（KICKOFF-latex-pilot.md §4.5 閘 4）。
 
-    python check_glyphs.py dist/appB/appendixB.pdf
+    python check_glyphs.py dist/appB/appendixB.pdf [chapters/<ch>/figs]
 
 判準＝**逐 CID 比對輪廓**：PDF 每個嵌入子集的每個 CID，其字形輪廓必須與原始字型同一
 GID 的輪廓相同（Identity-H＋CIDFontType0C 的 CID 恰為原字型 GID）。比的是 pen 畫出來的
@@ -26,6 +26,16 @@ CID／ToUnicode／charset 卻全對——四閘全綠。修法是模板給 Inter
   - 只驗 CFF（FontFile3／CIDFontType0C）。遇到非 CFF 或非 CID-keyed 的嵌入字型、或
     找不到原始字型檔，一律 **FAIL 並指名**，不默默略過——silent skip 正是
     check_prose.py 的 figure_note_check 記錄過的偽陰性坑，不重蹈。
+  - **圖帶進來的字型走 pass-through 判準**（2026-07-26，ch06 rollout 補）：`\includegraphics`
+    的圖 PDF 由 Chrome 產生，其字型是 LuaTeX 原封轉貼、不經字形名索引，故本閘的因果層
+    （LuaTeX 以字形名索引 → 重複名塌陷 → 輪廓錯位）根本不適用；而且按定義沒有本機原始檔
+    可比（MathJax webfont 走 CDN）。這類字型改判「**字型程式是否與該章某個圖 PDF 逐位元組
+    相同**」——相同即證明 LuaTeX 未重新編碼，報 `[圖內字型]` 且不擋稿；不同或找不到來源
+    則照舊 FAIL。**仍不是 silent skip**：逐個列名，且圖內文字另有 check_prose.py 的
+    圖內文字閘（閘 3c）守著。
+    觸發場合：圖標籤用了 `\text{…}`（MathJax 的文字體是另一個 @font-face，Chrome 嵌成
+    CID TrueType；純數學標籤則走 Type 3，Type 3 沒有 FontFile、本來就不在本閘視野內）。
+    ch01 全 24 張圖都沒用 `\text{}` 故未撞到；ch06 Figure 6.3 的 `t\,(\text{s})` 是第一例。
 """
 import io
 import re
@@ -92,6 +102,20 @@ def embedded_fonts(doc):
             yield name.group(1), ff.group(1), int(ff.group(2))
 
 
+def figure_font_programs(figs_dir):
+    """該章圖 PDF 裡所有嵌入字型程式的位元組集合（給 pass-through 判準用）。"""
+    progs = set()
+    d = Path(figs_dir)
+    if not d.is_dir():
+        return progs
+    for p in sorted(d.glob("*.pdf")):
+        fig = fitz.open(p)
+        for _, _, xref in embedded_fonts(fig):
+            progs.add(fig.xref_stream(xref))
+        fig.close()
+    return progs
+
+
 def audit(doc, basefont, data):
     """回傳 (檢查數, 錯誤清單)；錯誤為 (cid, 宣稱字形, 實際看起來是什麼)。"""
     path = find_original(basefont)
@@ -135,24 +159,35 @@ def _utf8_console():
 
 def main():
     _utf8_console()
-    if len(sys.argv) != 2:
+    if not 2 <= len(sys.argv) <= 3:
         sys.exit(__doc__)
     doc = fitz.open(sys.argv[1])
+    fig_progs = figure_font_programs(sys.argv[2]) if len(sys.argv) == 3 else set()
 
-    total, failures, unchecked = 0, [], []
+    total, failures, unchecked, passthrough = 0, [], [], []
     for basefont, kind, xref in embedded_fonts(doc):
+        data = doc.xref_stream(xref)
         if kind != "3":
-            unchecked.append(f"{basefont}：FontFile{kind}（非 CFF）")
+            # 非 CFF：先問是不是圖 PDF 原封帶進來的（見 docstring「已知極限」第三點）
+            if data in fig_progs:
+                passthrough.append(f"{basefont}：FontFile{kind}，與圖 PDF 逐位元組相同")
+            else:
+                unchecked.append(f"{basefont}：FontFile{kind}（非 CFF）")
             continue
         try:
-            n, bad = audit(doc, basefont, doc.xref_stream(xref))
+            n, bad = audit(doc, basefont, data)
         except LookupError as e:
-            unchecked.append(f"{basefont}：{e}")
+            if data in fig_progs:
+                passthrough.append(f"{basefont}：{e}；但與圖 PDF 逐位元組相同")
+            else:
+                unchecked.append(f"{basefont}：{e}")
             continue
         total += n
         print(f"  {SUBSET_TAG.sub('', basefont):22s} {n:3d} 字形 → {len(bad)} 個輪廓不符")
         failures += [(basefont, *b) for b in bad]
 
+    for p in passthrough:
+        print(f"  [圖內字型] {p}")
     for u in unchecked:
         print(f"  [未驗] {u}")
     for basefont, cid, claims, looks in failures[:20]:
@@ -168,7 +203,8 @@ def main():
             why.append(f"{len(unchecked)} 個嵌入字型無法驗")
         print(f"\n字形閘 FAIL：{'；'.join(why)}")
         sys.exit(1)
-    print(f"\n字形閘 PASS：{total} 個嵌入字形的輪廓全數符合其 CID")
+    tail = f"；另 {len(passthrough)} 個圖內字型逐位元組 pass-through" if passthrough else ""
+    print(f"\n字形閘 PASS：{total} 個嵌入字形的輪廓全數符合其 CID{tail}")
 
 
 if __name__ == "__main__":
