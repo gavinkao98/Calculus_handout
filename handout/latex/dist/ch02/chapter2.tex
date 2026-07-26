@@ -1,0 +1,928 @@
+% !TeX program = lualatex
+% ============================================================
+% chapter2.tex — ch02 出版成品（自動產生，勿手改）
+% 產生：cd handout/latex && python make_dist.py ch02
+%   內容源＝handout/html/fragments/ch02/（fragment 唯讀；數學逐位元組 pass-through）
+%   樣式源＝../../template/calcbook.sty（M-B1 拍板模板）
+% 直接重編（本資料夾為 CWD；aux 進 build/、資料夾保持兩檔）：
+%   latexmk -lualatex -auxdir=../../build/aux-ch02 chapter2.tex
+% ============================================================
+\documentclass[a4paper,12pt,oneside]{memoir}
+\makeatletter\def\input@path{{../../template/}}\makeatother
+\def\cbfontsdir{../../template/fonts/inter/}
+\usepackage{calcbook}
+% 圖：emitter 射 `<ch>/<stem>`（見 convert.py），故 graphicspath 指向 chapters/ 上層。
+% 模板內的 {../figs/} 是 chapters/<ch>/ 為 CWD 時的路徑，dist/<ch>/ 需這一行覆寫。
+\graphicspath{{../../chapters/}}
+\begin{document}
+\chapteropener{Chapter 2}{Derivatives}
+\begin{lead}
+The limit machinery of Chapter 1 was developed in part to make precise the idea of a function approaching a value as its input approaches some target. The main use of those limit methods, and the subject of this chapter, is the \emph{derivative}: an operator that takes a function and returns another function describing how fast it is changing. Geometrically the derivative gives the slope of the tangent line at each point of a curve; physically it gives the instantaneous rate of change of a quantity that varies in time; algebraically it satisfies a small set of arithmetic rules that turn differentiation into a procedure rather than a per-problem invention. We meet the derivative first at a single point, as a limit of secant slopes, then as a function in its own right. A subtler point comes next: its existence at a point implies continuity, but continuity does not imply it. Finally we treat it as an operator we can compute on polynomials, on the natural exponential, and on products and quotients of differentiable functions.
+\end{lead}
+\parahead{By the end of this chapter, you will be able to:}
+\begin{objectives}
+  \item state the limit definition of the derivative, move fluently between the equivalent forms \(\lim_{x \to a} \tfrac{f(x) - f(a)}{x - a}\) and \(\lim_{h \to 0} \tfrac{f(a + h) - f(a)}{h}\), and apply it to compute derivatives from first principles for polynomial, root, and exponential functions;
+  \item read the derivative as the slope of the tangent line, and pass from the derivative at a point to the derivative as a function;
+  \item recognize where a function fails to be differentiable, and explain why differentiability implies continuity but not the reverse;
+  \item differentiate any polynomial and the exponential function \(e^{x}\) using the power rule, the constant-multiple rule, the sum rule, and the series-based derivation of \((e^{x})' = e^{x}\), and compute higher-order derivatives \(f''\), \(f'''\), \(f^{(n)}\);
+  \item differentiate products and quotients of differentiable functions using the product and quotient rules.
+\end{objectives}
+\sechead{2.1}{The Tangent Line and the Derivative at a Point}
+Suppose you need a quick estimate of \(\sqrt{4.01}\) without a calculator. The function \(f(x) = \sqrt{x}\) passes through the convenient point \((4, 2)\), and near that point the curve is almost straight, so a well-chosen line through \((4, 2)\) should give a good approximation. But which line? The answer is the \emph{tangent line}: intuitively, the line through that point whose direction matches the curve there. To pin down this line we need to determine its slope, and that quest leads directly to the central idea of differential calculus.
+
+\subsechead{The problem with tangent lines}
+Given a curve \(y = f(x)\) and a point \(P = (a,\, f(a))\) on it, we want the tangent line at \(P\). Since the line passes through \(P\), all we need is its slope. For a line through \emph{two} points the slope is the familiar rise-over-run ratio, but for the tangent line at \(P\) we start with only the single point \(P\) itself. With no second point there is no rise and no run; trying to compute “slope \(= (f(a) - f(a))/(a - a)\)” gives the meaningless expression \(0/0\). We need a different strategy.
+
+\subsechead{Secant lines and the limiting slope}
+The idea is to use a nearby point as a temporary stand-in. Pick a second point \(Q = (x,\, f(x))\) on the curve, with \(x \ne a\). The line through \(P\) and \(Q\) is called a \emph{secant line}, and its slope is the \emph{difference quotient}
+
+\[ m_{PQ} \;=\; \frac{f(x) - f(a)}{x - a}. \]
+
+As \(Q\) slides along the curve toward \(P\) — that is, as \(x \to a\) — the secant line rotates and approaches a limiting position. If that limiting position exists, it is the tangent line we are after, and its slope is the limit of the difference quotients.
+
+\begin{figureblock}
+  \includegraphics[width=122.24mm]{ch02/figs/secant-to-tangent}
+\figcaption{Figure 2.1}{Secant lines \(PQ\) approaching the tangent line at \(P\).}
+\end{figureblock}
+\begin{envdefinition}{Definition}{2.1}{Tangent line}
+The \emph{tangent line} to the curve \(y = f(x)\) at the point \(P = (a,\, f(a))\) is the line through \(P\) with slope \[ m \;=\; \lim_{x \to a} \frac{f(x) - f(a)}{x - a}, \] provided this limit exists.
+\end{envdefinition}
+\subsechead{The \(h\)-form of the slope}
+Since \(x\) is near \(a\), we can write \(x = a + h\), where \(h\) is a small increment (\(h \ne 0\)). Then \(x - a = h\) and \(x \to a\) becomes \(h \to 0\), so the tangent slope takes the equivalent form
+
+\[ m \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]
+
+This “\(h\)-form” is often more convenient for computation: expand \(f(a + h)\), subtract \(f(a)\), cancel the factor of \(h\) from the denominator, then let \(h \to 0\).
+
+\begin{envcaution}{Caution}{}{}
+A common slip is to read the numerator \(f(a + h) - f(a)\) as \(f(h)\). The symbol \(h\) is an \emph{increment}, a small step away from the base point \(a\). It is not an input in its own right. When you expand the difference quotient, substitute \(a + h\) into the function, writing \(f(a + h)\); never replace it with \(f(h)\) alone.
+\end{envcaution}
+\begin{figureblock}
+  \includegraphics[width=116.94mm]{ch02/figs/difference-quotient-anatomy}
+\figcaption{Figure 2.2}{The \(h\)-form difference quotient on one secant: run \(h\), rise \(f(a+h)-f(a)\).}
+\end{figureblock}
+When this limit exists, the slope of the tangent line at \((a, f(a))\) is called the \emph{derivative of \(f\) at \(a\)} and is written \(f'(a)\) (read “\(f\) prime of \(a\)”). Thus
+
+\[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}. \]
+
+For now, \(f'(a)\) is simply a number, the slope of one tangent line at one specific point. In §2.2 we will let \(a\) vary and study \(f'\) as a function in its own right.
+
+\begin{envremark}{Remark}{2.1}{Local linearity}
+If you zoom in on the curve at \(P\), the curve looks increasingly like a straight line, namely the tangent line. In other words, near \(P\) the function \(f\) behaves almost like the linear function \(f(a) + f'(a)(x - a)\). This is the principle of \emph{local linearity}: a differentiable curve can be approximated by its tangent line near the point of tangency. The closer \(x\) is to \(a\), the better the approximation. We will return to this idea at the end of the section.
+\end{envremark}
+We now practice computing tangent lines from the definition. The routine is the same each time: form the difference quotient, simplify algebraically until the factor that makes the denominator zero cancels, then take the limit.
+
+\begin{workedexample}
+\begin{envexample}{Example}{2.1}{}
+Find the equation of the tangent line to \(y = x^{2} - 3x\) at the point \((2,\, -2)\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Here \(f(x) = x^{2} - 3x\) and \(a = 2\). The slope is
+
+\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{f(2 + h) - f(2)}{h} \\
+            &= \lim_{h \to 0} \frac{\bigl[(2+h)^{2} - 3(2+h)\bigr] - [4 - 6]}{h} \\
+            &= \lim_{h \to 0} \frac{(4 + 4h + h^{2} - 6 - 3h) - (-2)}{h} \\
+            &= \lim_{h \to 0} \frac{h + h^{2}}{h}
+             = \lim_{h \to 0} (1 + h) = 1.
+        \end{aligned} \]
+
+The tangent line passes through \((2, -2)\) with slope \(1\): \[ y - (-2) = 1 \cdot (x - 2), \quad \text{i.e.} \quad y = x - 4. \]
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.2}{}
+Find the equation of the tangent line to \(y = \dfrac{3}{x}\), \(x > 0\), at the point \((3,\, 1)\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+With \(f(x) = 3/x\) and \(a = 3\),
+
+\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{f(3 + h) - f(3)}{h}
+             = \lim_{h \to 0} \frac{\dfrac{3}{3 + h} - 1}{h} \\[6pt]
+            &= \lim_{h \to 0} \frac{\dfrac{3 - (3 + h)}{3 + h}}{h}
+             = \lim_{h \to 0} \frac{\dfrac{-h}{3 + h}}{h} \\[6pt]
+            &= \lim_{h \to 0} \frac{-1}{3 + h} = -\frac{1}{3}.
+        \end{aligned} \]
+
+The tangent line through \((3, 1)\) with slope \(-\tfrac{1}{3}\) is \[ y - 1 = -\tfrac{1}{3}(x - 3), \quad \text{i.e.} \quad x + 3y - 6 = 0. \]
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.3}{}
+Find the equation of the tangent line to \(y = \sqrt{x + 1}\) at the point \((3,\, 2)\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Here \(f(x) = \sqrt{x + 1}\) and \(a = 3\). To handle the square root, we multiply numerator and denominator by the conjugate:
+
+\[ \begin{aligned}
+          m &= \lim_{h \to 0} \frac{\sqrt{(3+h)+1} - \sqrt{3+1}}{h}
+             = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} \\[6pt]
+            &= \lim_{h \to 0}
+               \frac{(\sqrt{4+h}-2)(\sqrt{4+h}+2)}
+                    {h\,(\sqrt{4+h}+2)}
+             = \lim_{h \to 0}
+               \frac{(4+h)-4}{h\,(\sqrt{4+h}+2)} \\[6pt]
+            &= \lim_{h \to 0} \frac{1}{\sqrt{4+h}+2}
+             = \frac{1}{4}.
+        \end{aligned} \]
+
+The tangent line is \[ y - 2 = \tfrac{1}{4}(x - 3), \quad \text{i.e.} \quad y = \tfrac{1}{4}x + \tfrac{5}{4}. \]
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.4}{}
+For \(y = x^{2}\) and \(P = (1, 1)\), compute the slope of the secant line through \(P\) and the nearby point \(\bigl(1 + h,\, (1 + h)^{2}\bigr)\) for \(h = 0.5,\ 0.1,\ 0.01\). What value do the secant slopes approach, and what is the slope of the tangent at \(P\)?
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The secant slope is the difference quotient, which simplifies even before we take a limit:
+
+\[ \frac{(1 + h)^{2} - 1}{h} = \frac{2h + h^{2}}{h} = 2 + h. \]
+
+Tabulating \(2 + h\) as \(h\) shrinks:
+
+\begin{datatable}{rccc}
+  \(h\) & \(0.5\) & \(0.1\) & \(0.01\) \\
+  \midrule
+  secant slope \(\,2 + h\) & \(2.5\) & \(2.1\) & \(2.01\) \\
+\end{datatable}
+The secant slopes march toward \(2\), and indeed \(\lim_{h \to 0}(2 + h) = 2\). The tangent slope at \(P\) is therefore \(2\), the value the secant slopes converge to. Figure 2.1 shows the same convergence geometrically, with the secant lines rotating into the tangent.
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.5}{}
+Use the tangent line to \(y = \dfrac{1}{x}\) at \(\bigl(2,\, \tfrac{1}{2}\bigr)\) to estimate \(\dfrac{1}{2.05}\) without a calculator.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+First find the slope at \(x = 2\). With \(f(x) = 1/x\), \[ f'(2) = \lim_{h \to 0} \frac{\dfrac{1}{2 + h} - \dfrac{1}{2}}{h} = \lim_{h \to 0} \frac{-1}{2(2 + h)} = -\frac{1}{4}, \] so the tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\) is \(y = \tfrac{1}{2} - \tfrac{1}{4}(x - 2)\). Near \(x = 2\) the curve stays close to this line (local linearity, Remark 2.1), so substituting \(x = 2.05\) gives
+
+\[ \frac{1}{2.05} \;\approx\; \tfrac{1}{2} - \tfrac{1}{4}(0.05) = 0.5 - 0.0125 = 0.4875. \]
+
+A calculator gives \(1/2.05 = 0.48780\ldots\), so the estimate is accurate to three decimal places.
+
+\begin{figureblock}
+  \includegraphics[width=101.07mm]{ch02/figs/tangent-approx}
+\figcaption{Figure 2.3}{The curve \(y = \tfrac{1}{x}\) and its tangent line at \(\bigl(2, \tfrac{1}{2}\bigr)\), used for the approximation in Example 2.5.}
+\end{figureblock}
+\end{envsolution}
+\end{workedexample}
+\begin{envremark}{Remark}{2.2}{Tangent-line approximation}
+We can now answer the opening question. The tangent line to \(y = \sqrt{x}\) at \((4,\, 2)\) has slope \[ f'(4) = \lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h} = \frac{1}{4} \] (the same conjugate technique as Example 2.3), so the tangent line is \(y = 2 + \tfrac{1}{4}(x - 4) = \tfrac{1}{4}x + 1\). Substituting \(x = 4.01\) gives \[ \sqrt{4.01} \;\approx\; \tfrac{1}{4}(4.01) + 1 = 2.0025. \] A calculator confirms \(\sqrt{4.01} = 2.00249844\ldots\), so the tangent-line estimate is accurate to four decimal places. This is the tangent-line approximation of Example 2.5, applied to the question that opened the section. It is the principle of local linearity (Remark 2.1) used for a numerical estimate.
+\end{envremark}
+Replacing a curve by its tangent line over a small range is used throughout applied science and engineering, where it is called \emph{linearization}. A navigation system linearizes the equations relating its position to satellite distances; a physicist replaces \(\sin\theta\) by \(\theta\) for the small swings of a pendulum; an economist treats a marginal cost as the slope of a cost curve. In each case, a hard curved problem is replaced near a point of interest by an easy straight-line one. That is the practical value of local linearity.
+
+In the next section we turn the slope formula into a \emph{function}: instead of computing the tangent slope at one fixed point \(a\), we let \(a\) vary and obtain a new function \(f'(x)\) that records the slope at every point where the limit exists.
+
+
+\sechead{2.2}{The Derivative as a Function}
+Imagine a car moving along a straight road, its position at time \(t\) recorded as \(s(t)\). Over the short interval from \(t\) to \(t + h\), the car’s \emph{average} velocity is the change in position divided by the elapsed time: \(\bigl(s(t+h) - s(t)\bigr)/h\), exactly the difference quotient of §2.1. Letting \(h \to 0\) gives the \emph{instantaneous} velocity at the single instant \(t\). But we rarely care about one instant in isolation. We want to know the velocity at \emph{every} instant, which means treating velocity as a \emph{function} of time. Making this shift, from the derivative at one point to the derivative as a function, is the work of this section.
+
+\subsechead{From a number to a function}
+In §2.1 we fixed a point \(a\) and computed the derivative \(f'(a)\), a single number recording the slope of the tangent line at that one point, or equivalently the instantaneous rate of change of \(f\) there. To find the slope at a \emph{different} point we would have to run the entire limit again, and to know the slope at \emph{every} point we would have to repeat the computation infinitely many times. Worse, a table of separate values \(f'(2),\, f'(3),\, f'(\tfrac{7}{2}),\, \ldots\) never reveals the underlying \emph{pattern}.
+
+There is a far better way. Instead of substituting a specific number for the point, we keep the point \emph{symbolic} and call it \(x\). Then we carry out the limit just once. The outcome is no longer a single number but a formula in \(x\): a brand-new function that returns the slope at every point at once. This function is called the \emph{derivative of \(f\)}.
+
+\begin{envdefinition}{Definition}{2.2}{The derivative as a function}
+Let \(f\) be a function. The \emph{derivative of \(f\)} is the function \(f'\) defined by \[ f'(x) \;=\; \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}, \] whose domain is the set of all \(x\) for which this limit exists. The value \(f'(x)\) is the slope of the tangent line to \(y = f(x)\) at \(\bigl(x,\, f(x)\bigr)\). Equivalently, it is the instantaneous rate of change of \(f\) at \(x\).
+
+\begin{informal}
+Informally, \(f'\) is the “slope machine” of \(f\): feed it any input \(x\), and it returns the slope of \(f\) there.
+\end{informal}
+\end{envdefinition}
+This is the same limit we met in §2.1: the substitution \(x = a + h\) turns it into \(\lim_{x \to a}\bigl(f(x) - f(a)\bigr)/(x - a)\) with the fixed point renamed. The \(h\)-form above is usually the more convenient one to compute with. The recipe is the same one we used at a single point, except that the point now stays symbolic.
+
+\begin{envstrategy}{Strategy}{2.1}{Computing a derivative from the definition}
+\begin{steps}
+  \item Form the difference quotient \(\dfrac{f(x + h) - f(x)}{h}\), expanding \(f(x + h)\).
+  \item Simplify the quotient algebraically — by expanding, rationalizing, or combining fractions — until the \(h\) that makes the denominator vanish cancels.
+  \item Evaluate the limit as \(h \to 0\) in the simplified expression.
+\end{steps}
+These are the same three steps we used at a fixed point in §2.1; the only change is that \(x\) now stays symbolic, so the answer emerges as a function rather than a number. The algebra in step 2 takes a different form for each function (expansion, conjugates, common denominators), but its job is always to clear the \(0/0\). For the polynomial, root, and rational functions of this chapter, a factor of \(h\) always cancels and leaves a limit we can evaluate.
+\end{envstrategy}
+\begin{workedexample}
+\begin{envexample}{Example}{2.6}{}
+Find the derivative of \(f(x) = x^{2} + 4x - 2\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Following the three steps,
+
+\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{\bigl[(x + h)^{2} + 4(x + h) - 2\bigr] - \bigl[x^{2} + 4x - 2\bigr]}{h} \\[2pt]
+            &= \frac{\bigl(x^{2} + 2xh + h^{2} + 4x + 4h - 2\bigr) - \bigl(x^{2} + 4x - 2\bigr)}{h} \\[2pt]
+            &= \frac{2xh + h^{2} + 4h}{h} \;=\; 2x + h + 4.
+        \end{aligned} \]
+
+Hence \[ f'(x) = \lim_{h \to 0} (2x + h + 4) = 2x + 4. \] Nothing in this computation relied on \(x\) being any particular number, so the single formula \(f'(x) = 2x + 4\) gives the slope at every point: for instance \(f'(0) = 4\), while \(f'(-2) = 0\), signalling a horizontal tangent at \(x = -2\).
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.7}{}
+Find the derivative of \(f(x) = \sqrt{x}\), \(x > 0\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The difference quotient contains a difference of square roots, which we clear by multiplying by the conjugate \(\sqrt{x + h} + \sqrt{x}\):
+
+\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{\sqrt{x + h} - \sqrt{x}}{h} \\[4pt]
+            &= \frac{\bigl(\sqrt{x + h} - \sqrt{x}\bigr)\bigl(\sqrt{x + h} + \sqrt{x}\bigr)}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)} \\[4pt]
+            &= \frac{(x + h) - x}{h\bigl(\sqrt{x + h} + \sqrt{x}\bigr)} \\[4pt]
+            &= \frac{1}{\sqrt{x + h} + \sqrt{x}}.
+        \end{aligned} \]
+
+The denominator no longer vanishes as \(h \to 0\), so \[ f'(x) = \lim_{h \to 0} \frac{1}{\sqrt{x + h} + \sqrt{x}} = \frac{1}{2\sqrt{x}}. \] As a check, at \(x = 4\) this gives \(f'(4) = 1/(2 \cdot 2) = \tfrac{1}{4}\), precisely the slope we found for \(\sqrt{x}\) at \((4, 2)\) in §2.1 (Remark 2.2). The function \(f'(x) = 1/(2\sqrt{x})\) packages that slope, and the slope at every other positive \(x\), into one formula.
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.8}{}
+Find the derivative of \(f(x) = \dfrac{1}{x}\), \(x \ne 0\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+This time the difference quotient is a difference of fractions, which we combine over a common denominator:
+
+\[ \begin{aligned}
+          \frac{f(x + h) - f(x)}{h}
+            &= \frac{1}{h}\left( \frac{1}{x + h} - \frac{1}{x} \right)
+             = \frac{1}{h} \cdot \frac{x - (x + h)}{x(x + h)} \\[4pt]
+            &= \frac{1}{h} \cdot \frac{-h}{x(x + h)}
+             = \frac{-1}{x(x + h)}.
+        \end{aligned} \]
+
+Letting \(h \to 0\), \[ f'(x) = \lim_{h \to 0} \frac{-1}{x(x + h)} = -\frac{1}{x^{2}}. \] The manipulation is new. We clear the fractions, then cancel the \(h\). Yet the three-step pattern is unchanged, and the result \(f'(x) = -1/x^{2}\) is once more a function, defined for all \(x \ne 0\). We will recover it in one line from the power and quotient rules of §2.4–§2.5.
+\end{envsolution}
+\end{workedexample}
+\begin{envremark}{Remark}{2.3}{The domain of \(f'\)}
+Being a function in its own right, \(f'\) has its own domain, which may be \emph{smaller} than that of \(f\). Although Example 2.7 worked with \(x > 0\), the square-root function is defined for all \(x \ge 0\), whereas its derivative \(f'(x) = 1/(2\sqrt{x})\) is defined only for \(x > 0\). The domain of \(f'\) can therefore be a proper subset of the domain of \(f\). Precisely when a derivative fails to exist is taken up in §2.3.
+\end{envremark}
+\begin{workedexample}
+\begin{envexample}{Example}{2.9}{}
+For \(f(x) = x^{2} + 4x - 2\), find the point on the curve at which the tangent line has slope \(2\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The slope of the tangent at \(x\) is the value of the derivative there, and from Example 2.6 we already have the derivative function \(f'(x) = 2x + 4\). We therefore want the input \(x\) at which
+
+\[ f'(x) = 2 \quad\Longrightarrow\quad 2x + 4 = 2 \quad\Longrightarrow\quad x = -1. \]
+
+The point on the curve is \(\bigl(-1,\, f(-1)\bigr) = (-1,\, -5)\). Note the change of viewpoint: we did not compute a derivative here. We already had \(f'\) as a function and \emph{solved} it for the input producing a prescribed slope. Having the derivative as a function is what lets us run \(f'\) both ways, forward (input \(\to\) slope) and backward (slope \(\to\) input).
+\end{envsolution}
+\end{workedexample}
+\subsechead{Notation}
+So far we have written the derivative as \(f'(x)\), the compact \emph{prime notation}. When \(y = f(x)\), the same derivative is also written
+
+\[ f'(x) \;=\; y' \;=\; \frac{dy}{dx} \;=\; \frac{df}{dx} \;=\; \frac{d}{dx}\,f(x), \]
+
+the last three being \emph{Leibniz notation}. Here \(\dfrac{d}{dx}\) is an \emph{operator}, meaning that it acts on a function and returns its derivative. The notation is chosen to recall the difference quotient \(\Delta y / \Delta x\), which becomes \(dy/dx\) as the increment \(\Delta x\) (our \(h\)) shrinks to zero. Leibniz notation has the merit of displaying the variable we differentiate with respect to, which becomes valuable once a problem involves more than one variable; prime notation is lighter when the variable is understood. We will use whichever is clearer, and we state the rules of the coming sections most often with \(\dfrac{d}{dx}\). Thus the two results above may equally be written \(\dfrac{d}{dx}(x^{2} + 4x - 2) = 2x + 4\) and \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\).
+
+\begin{envcaution}{Caution}{}{}
+The symbol \(\dfrac{dy}{dx}\) names the derivative as a single object; it is \emph{not} a fraction with numerator \(dy\) and denominator \(dx\). On its own, neither \(dy\) nor \(dx\) has been given a separate meaning here, so the pieces cannot be cancelled or cross-multiplied the way the parts of an ordinary fraction can. The notation was chosen to reflect that the derivative is defined as the limit of the quotient \(\Delta y / \Delta x\). But until those parts are defined on their own (which we do not do in this book), read \(dy/dx\) as one indivisible name for \(f'(x)\).
+\end{envcaution}
+\subsechead{Reading \(f'\) from the graph of \(f\)}
+\begin{figureblock}
+  \begin{minipage}{\linewidth}\centering
+  \includegraphics[width=103.1mm]{ch02/figs/f-and-fprime-1}\\[6pt]
+  \includegraphics[width=103.1mm]{ch02/figs/f-and-fprime-2}
+  \figcaption{Figure 2.4}{The graph of \(f(x) = x^{2} + 4x - 2\) above its derivative \(f'(x) = 2x + 4\), aligned at \(x = -2\).}
+  \end{minipage}
+\end{figureblock}
+Drawing a derivative as a function in its own right shows a direct link between the graphs of \(f\) and \(f'\). Figure 2.4 places the parabola \(f(x) = x^{2} + 4x - 2\) of Example 2.6 directly above its derivative \(f'(x) = 2x + 4\). Since \(f'(x)\) is by definition the \emph{slope of the tangent line} at \(x\), we can read its sign straight off the graph of \(f\):
+
+\begin{itemize}
+  \item where the tangent line slopes upward, \(f' > 0\);
+  \item where the tangent line slopes downward, \(f' < 0\);
+  \item where the tangent line is horizontal, \(f' = 0\) — as at the lowest point of the parabola, \(x = -2\).
+\end{itemize}
+The link runs the other way too: where \(f' > 0\) the graph of \(f\) rises, and where \(f' < 0\) it falls. So we can sketch the shape of \(f'\) straight from the graph of \(f\), with no formula at all.
+
+\begin{workedexample}
+\begin{envexample}{Example}{2.10}{}
+Cover the lower panel of Figure 2.4 and look only at the graph of \(f\) on top. Using its shape alone — not the formula — say where \(f'\) is positive, where it is negative, and where it is zero. Then uncover the lower panel and check.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Reading the top graph: \(f\) falls until \(x = -2\), so its tangents slope downward and \(f' < 0\) there; the curve is momentarily flat at its lowest point \(x = -2\), so \(f'(-2) = 0\); and \(f\) rises for \(x > -2\), so \(f' > 0\). Uncovering the lower panel confirms it exactly. The line \(f'(x) = 2x + 4\) lies below the axis for \(x < -2\), crosses zero at \(x = -2\), and lies above it for \(x > -2\). We recovered the sign of \(f'\) everywhere from the \emph{shape} of \(f\) alone.
+\end{envsolution}
+\end{workedexample}
+\begin{envremark}{Remark}{2.4}{Derivative as rate of change}
+Return to the moving car of the opening. If \(s(t)\) is its position, the derivative function \(s'(t)\) is its \emph{velocity} \(v(t)\) at every time \(t\). The slope interpretation and the rate-of-change interpretation are two ways of reading the same limit: \(f'(x)\) measures how fast the output of \(f\) changes per unit change in the input, whether that output is read as a height (slope) or a position (velocity). This is why the derivative function is one of the central objects of calculus: it turns any varying quantity into a record of how fast it varies.
+\end{envremark}
+Velocity is only the most familiar of these rates. Whenever one quantity depends on another, the derivative measures a rate of change with its own meaning. If \(s(t)\) is position, the derivative of the velocity \(s'(t)\) is the \emph{acceleration} \(s''(t)\), the rate at which velocity itself changes. This is a second derivative, taken up in §2.3. If \(P(t)\) is the size of a population, then \(P'(t)\) is its growth rate, in individuals per unit time. If \(C(q)\) is the cost of producing \(q\) units of a good, then \(C'(q)\) is the \emph{marginal cost}, the added cost of producing one more unit. One limit, read in different settings, becomes a velocity, an acceleration, a growth rate, or a marginal cost.
+
+Throughout this section we assumed the defining limit exists. It need not: at some points a function may have no well-defined slope at all. In the next section we ask precisely when \(f'\) exists, the question of \emph{differentiability}. We also uncover its close tie to continuity and form the derivative of a derivative.
+
+
+\sechead{2.3}{Differentiability, Continuity, and Higher Derivatives}
+Throughout §2.2 we freely computed \(f'(x)\) by taking the limit of the difference quotient, but we never stopped to ask whether that limit \emph{exists}. For the polynomial, root, and rational functions we worked with, it always did, and we might be tempted to believe that every function has a derivative at every point of its domain. This section shows that the temptation is wrong: at certain points the limit can fail, and recognizing those failures is an essential part of understanding what the derivative means. Along the way we prove the first theorem of the chapter, which says that differentiability guarantees continuity. We also extend the derivative idea to second, third, and higher orders.
+
+\subsechead{When does the derivative exist?}
+\begin{envdefinition}{Definition}{2.3}{Differentiable}
+A function \(f\) is \emph{differentiable at \(a\)} if the limit \[ f'(a) \;=\; \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} \] exists (as a finite number). We say \(f\) is \emph{differentiable on an open interval \((a, b)\)} if it is differentiable at every point of that interval.
+
+\begin{informal}
+Informally, differentiability at a point means the graph has a single, well-defined tangent direction there, with no sharp corner, no vertical spike, and no break.
+\end{informal}
+\end{envdefinition}
+The definition requires exactly what we have been computing: does the difference quotient approach one finite value as \(h \to 0\)? When it can, the function is differentiable and the derivative equals that value. When it cannot, the function is \emph{not} differentiable at that point. This can happen when the left-hand and right-hand limits disagree or when the quotient grows without bound. The simplest failure mode is a corner.
+
+\begin{workedexample}
+\begin{envexample}{Example}{2.11}{A corner: \(f(x) = \lvert x \rvert\) at \(x = 0\)}
+Show that \(f(x) = \lvert x \rvert\) is not differentiable at \(x = 0\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+We form the difference quotient at \(a = 0\):
+
+\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{\lvert h \rvert - 0}{h} \;=\; \frac{\lvert h \rvert}{h}. \]
+
+Now examine the one-sided limits separately. For \(h > 0\) we have \(\lvert h \rvert = h\), so
+
+\[ \lim_{h \to 0^{+}} \frac{\lvert h \rvert}{h} = \lim_{h \to 0^{+}} \frac{h}{h} = 1. \]
+
+For \(h < 0\) we have \(\lvert h \rvert = -h\), so
+
+\[ \lim_{h \to 0^{-}} \frac{\lvert h \rvert}{h} = \lim_{h \to 0^{-}} \frac{-h}{h} = -1. \]
+
+Since the right-hand limit (\(1\)) and the left-hand limit (\(-1\)) are not equal, the two-sided limit \(\lim_{h \to 0} \lvert h \rvert / h\) does not exist. By Definition 2.3, \(f(x) = \lvert x \rvert\) is \emph{not} differentiable at \(x = 0\).
+
+\begin{figureblock}
+  \includegraphics[width=111.65mm]{ch02/figs/abs-corner}
+\figcaption{Figure 2.5}{The graph of \(f(x) = \lvert x \rvert\) near the origin, with secant lines from each side.}
+\end{figureblock}
+\end{envsolution}
+\end{workedexample}
+Geometrically, the graph of \(\lvert x \rvert\) forms a V-shape at the origin (Figure 2.5). Approaching from the right, the secant lines all have slope \(+1\); approaching from the left, they all have slope \(-1\). The two families converge to different directions, so there is no single tangent line. That is exactly the geometric meaning of non-differentiability.
+
+\begin{workedexample}
+\begin{envexample}{Example}{2.12}{A vertical tangent: \(f(x) = \sqrt[3]{x}\) at \(x = 0\)}
+Show that \(f(x) = \sqrt[3]{x} = x^{1/3}\) is \emph{not} differentiable at \(x = 0\), even though its graph has no corner there.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+We form the difference quotient at \(a = 0\):
+
+\[ \frac{f(0 + h) - f(0)}{h} \;=\; \frac{h^{1/3} - 0}{h} \;=\; \frac{1}{h^{2/3}}. \]
+
+For every \(h \ne 0\), \(h^{2/3} = \bigl(h^{1/3}\bigr)^{2} > 0\), because the square of a nonzero cube root is positive whatever the sign of \(h\). Therefore the quotient is always positive. As \(h \to 0\) the denominator \(h^{2/3} \to 0\), so
+
+\[ \lim_{h \to 0} \frac{1}{h^{2/3}} = +\infty. \]
+
+The limit does not exist as a \emph{finite} number, so by Definition 2.3 the function is not differentiable at \(x = 0\).
+
+Notice the contrast with Example 2.11. There the two one-sided limits existed but \emph{disagreed} (\(+1\) versus \(-1\)). Here both one-sided limits tend to \(+\infty\), so they agree and there is no corner. Instead the graph of \(\sqrt[3]{x}\) has a \emph{vertical tangent} at the origin: the secant lines all steepen without bound as \(h \to 0\). A vertical line has no finite slope, and the derivative requires a finite limit, so differentiability fails here for a different reason than at a corner.
+
+\begin{figureblock}
+  \includegraphics[width=111.65mm]{ch02/figs/cbrt-vertical-tangent}
+\figcaption{Figure 2.6}{The graph of \(f(x) = \sqrt[3]{x}\) near the origin, with secants steepening toward a vertical tangent.}
+\end{figureblock}
+\end{envsolution}
+\end{workedexample}
+\subsechead{Differentiability and continuity}
+We now ask: what does differentiability \emph{give} us beyond just having a tangent line? The answer is a clean logical relationship with continuity.
+
+\begin{envtheorem}{Theorem}{2.1}{Differentiable implies continuous}
+If \(f\) is differentiable at \(a\), then \(f\) is continuous at \(a\).
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+We must show \(\displaystyle\lim_{x \to a} f(x) = f(a)\), which is equivalent to showing \(\displaystyle\lim_{x \to a} \bigl[f(x) - f(a)\bigr] = 0\).
+
+For \(x \ne a\), write
+
+\[ f(x) - f(a) \;=\; \frac{f(x) - f(a)}{x - a} \;\cdot\; (x - a). \]
+
+As \(x \to a\), both factors on the right have limits that exist:
+
+\begin{itemize}
+  \item \(\displaystyle\lim_{x \to a} \frac{f(x) - f(a)}{x - a} = f'(a)\) (by hypothesis, since \(f\) is differentiable at \(a\));
+  \item \(\displaystyle\lim_{x \to a} (x - a) = 0\).
+\end{itemize}
+By the product rule for limits,
+
+\[ \lim_{x \to a} \bigl[f(x) - f(a)\bigr] = f'(a) \cdot 0 = 0. \]
+
+Hence \(\lim_{x \to a} f(x) = f(a)\), so \(f\) is continuous at \(a\).
+\end{envproof}
+The proof is short, but the picture behind it is worth keeping. If \(f\) is differentiable at \(a\), its difference quotient approaches one finite value, so the tangent line has a finite slope. A jump or any other discontinuity prevents such a finite limit, so differentiability implies continuity. The converse fails because continuity asks far less: it only forbids breaks, and an unbroken curve is still free to have a sharp corner, where no single tangent direction exists.
+
+\begin{figureblock}
+  \includegraphics[width=101.07mm]{ch02/figs/fig-diff-cont}
+\figcaption{Figure 2.7}{Differentiable functions sit inside the continuous functions; \(\lvert x \rvert\) at \(x = 0\) marks the continuous-but-not-differentiable case.}
+\end{figureblock}
+\begin{envcaution}{Caution}{}{}
+The converse of Theorem 2.1 is \emph{false}: continuity does \emph{not} imply differentiability. The function \(f(x) = \lvert x \rvert\) is continuous at \(x = 0\) (the left and right limits both equal \(f(0) = 0\)), yet Example 2.11 shows it is not differentiable there. Differentiability is a strictly stronger condition than continuity.
+\end{envcaution}
+\begin{workedexample}
+\begin{envexample}{Example}{2.13}{}
+Find the values of the constants \(a\) and \(b\) for which the function \[ f(x) = \begin{cases} x^{2} & x \le 2, \\ ax + b & x > 2 \end{cases} \] is differentiable everywhere.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Away from \(x = 2\) each piece is a polynomial and therefore differentiable, so the only point in question is \(x = 2\).
+
+\emph{Step 1: Continuity.} By Theorem 2.1, differentiability at \(x = 2\) requires continuity there, which forces the two pieces to meet:
+
+\[ \lim_{x \to 2^{-}} f(x) = 2^{2} = 4 \quad\text{and}\quad \lim_{x \to 2^{+}} f(x) = 2a + b, \]
+
+so we need \(2a + b = 4\).
+
+\emph{Step 2: Matching derivatives.} The left-hand derivative at \(x = 2\) uses the \(x^{2}\) branch, whose derivative \(2x\) follows in one line from the difference quotient (the same technique used in §2.2 Example 2.6); it gives slope \(4\) at \(x = 2\). The right-hand derivative uses the \(ax + b\) branch, whose derivative is the constant \(a\) (the slope of that line). For the two-sided limit of the difference quotient to exist, these must agree:
+
+\[ a = 4. \]
+
+Substituting \(a = 4\) into \(2a + b = 4\) gives \(b = -4\). With \(a = 4\) and \(b = -4\) the two pieces meet smoothly, and the difference quotient at \(x = 2\) has a well-defined limit equal to \(4\).
+\end{envsolution}
+\end{workedexample}
+\subsechead{Higher derivatives}
+If \(f\) is differentiable, then its derivative \(f'\) is itself a function, and we can ask whether \(f'\) is differentiable. When it is, the derivative of \(f'\) is called the \emph{second derivative} of \(f\), written \(f''\). Repeating the process gives the third derivative \(f'''\), the fourth derivative \(f^{(4)}\), and in general the \(n\)-th derivative \(f^{(n)}\):
+
+\[ f,\quad f',\quad f'',\quad f''',\quad f^{(4)},\quad \ldots,\quad f^{(n)},\quad \ldots \]
+
+Each is obtained by differentiating the previous one. By convention, \(f^{(0)} = f\) and \(f^{(1)} = f'\).
+
+Higher derivatives are more than a formal exercise in differentiating again; the low-order ones carry concrete meaning. If \(s(t)\) is the position of a moving object, the first derivative \(s'(t)\) is its velocity and the second derivative \(s''(t)\) is its \emph{acceleration}, the rate at which the velocity changes. You feel it as the push that presses you back when a car speeds up. The third derivative \(s'''(t)\), the rate of change of acceleration, is called the \emph{jerk}; engineers keep it small when designing elevators and trains so that changes in acceleration are gradual rather than abrupt.
+
+\begin{envremark}{Remark}{2.5}{Higher-derivative notation}
+In Leibniz notation the second derivative of \(y = f(x)\) is written
+
+\[ f''(x) \;=\; \frac{d^{2}y}{dx^{2}} \;=\; \frac{d^{2}f}{dx^{2}} \;=\; \frac{d^{2}}{dx^{2}}\,f(x), \]
+
+and in general the \(n\)-th derivative is
+
+\[ f^{(n)}(x) \;=\; \frac{d^{n}y}{dx^{n}}. \]
+
+The superscript in \(d^{n}y/dx^{n}\) is \emph{not} an exponent. It records how many times the differentiation operator \(d/dx\) has been applied. Prime notation \(f'', f'''\) is convenient for low orders; for \(n \ge 4\) the parenthesized form \(f^{(n)}\) avoids a long row of primes.
+\end{envremark}
+\begin{envcaution}{Caution}{}{}
+Read the second-derivative symbol as a single unit, not as a fraction to pull apart. The whole expression \(\dfrac{d^{2}y}{dx^{2}}\) stands for the operator \(\dfrac{d}{dx}\) applied twice to \(y\). As Remark 2.5 noted, the small \(2\)’s only count how many times we differentiate; they are not exponents. So \(d^{2}y\) means “\(d\) applied to \(y\) twice,” not \(d\) times \(2y\). The \(dx^{2}\) is part of the symbol for differentiating twice with respect to \(x\); it does not mean \(d(x^{2})\), where the \(x\) itself would be squared. And it is not an algebraic denominator to cancel or split.
+\end{envcaution}
+\begin{workedexample}
+\begin{envexample}{Example}{2.14}{}
+Find \(f''(x)\) and \(f'''(x)\) for \(f(x) = x^{2} + 4x - 2\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+In Example 2.6 we found \(f'(x) = 2x + 4\). To get the second derivative, we differentiate \(f'\) from the definition:
+
+\[ \begin{aligned}
+          f''(x) &= \lim_{h \to 0} \frac{f'(x + h) - f'(x)}{h} \\[2pt]
+                 &= \lim_{h \to 0} \frac{\bigl[2(x + h) + 4\bigr] - \bigl[2x + 4\bigr]}{h} \\[2pt]
+                 &= \lim_{h \to 0} \frac{2h}{h} = 2.
+        \end{aligned} \]
+
+The second derivative is the constant \(2\), the slope of the linear function \(f'(x) = 2x + 4\). Differentiating once more,
+
+\[ f'''(x) = \lim_{h \to 0} \frac{f''(x + h) - f''(x)}{h} = \lim_{h \to 0} \frac{2 - 2}{h} = 0. \]
+
+Every subsequent derivative is likewise \(0\): once we reach a constant function, further differentiation produces zero. In Leibniz notation, \(\dfrac{d^{2}y}{dx^{2}} = 2\) and \(\dfrac{d^{3}y}{dx^{3}} = 0\).
+\end{envsolution}
+\end{workedexample}
+Now that we have introduced differentiability, its connection to continuity, and higher-order derivatives, we turn in the next sections to rules that make differentiation \emph{efficient}. These rules are systematic shortcuts that avoid computing each derivative from the limit definition.
+
+
+\sechead{2.4}{Derivatives of Polynomials and the Exponential Function}
+In the previous sections we computed every derivative the slow way, by forming the difference quotient and working the limit out in full. That is bearable for one function, but imagine differentiating \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\) straight from the definition: we would expand \((x + h)^{4}\), cancel, and take a limit, only to face the same labor for the next polynomial, and the next. This section ends the need to repeat that calculation. We prove, once and for all, a short list of differentiation \emph{rules} (for constants, powers, sums, and constant multiples), each established from the limit definition but thereafter usable as a purely algebraic shortcut. With them, differentiating any polynomial collapses to a one-line, mechanical operation, and we never touch a limit again for these functions. We then apply the same rules to the natural exponential \(e^{x}\) and find its defining property: it is its own derivative.
+
+\subsechead{The constant and power rules}
+The simplest function of all is a constant, \(f(x) = c\), whose graph is a horizontal line. A horizontal line has slope zero everywhere, so we should expect its derivative to vanish identically. The definition confirms it immediately.
+
+\begin{envtheorem}{Theorem}{2.2}{Derivative of a constant}
+If \(f(x) = c\) for a constant \(c\), then \(f\) is differentiable everywhere and \(f'(x) = 0\).
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Straight from the definition,
+
+\[ f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} = \lim_{h \to 0} \frac{c - c}{h} = \lim_{h \to 0} 0 = 0. \]
+
+The difference quotient is identically zero before we even take the limit.
+\end{envproof}
+Next come the power functions \(x^{n}\). We met a few of their derivatives one exponent at a time in §2.2, for example \(\dfrac{d}{dx}x^{2} = 2x\). A single formula covers them all. For now we prove it for a positive integer exponent; the case of other exponents is discussed in the caution that follows.
+
+\begin{envtheorem}{Theorem}{2.3}{The power rule}
+For every positive integer \(n = 1, 2, 3, \ldots\), \[ \frac{d}{dx}\,x^{n} = n\,x^{n-1}. \]
+\end{envtheorem}
+Before proving it, notice the pattern the rule records. List the first few cases: \(x\) has derivative \(1\), the function \(x^{2}\) has derivative \(2x\) (computed in §2.2), and \(x^{3}\) has derivative \(3x^{2}\). In each one the exponent moves to the front as a multiplier and the power decreases by one, giving \(n\,x^{n-1}\). The power rule states that this formula holds for every positive integer \(n\). Showing that it \emph{must} continue, rather than merely holding for the small cases we can check by hand, is the work of the proofs.
+
+There are two proofs, each establishing the result in a different way; we give both.
+
+\begin{envproof}{Proof}{}{factorization}
+We use the equivalent \(x \to a\) form of the derivative (§2.1) together with the algebraic factorization
+
+\[ x^{n} - a^{n} = (x - a)\bigl(x^{n-1} + a\,x^{n-2} + a^{2}x^{n-3} + \cdots + a^{n-1}\bigr). \]
+
+(To verify the factorization, multiply out the right-hand side: all the cross terms cancel in pairs, leaving only \(x^{n} - a^{n}\). The case \(n = 2\) is the familiar difference of squares \((x - a)(x + a)\).)
+
+Dividing by \(x - a\) cancels the factor that would make the quotient \(0/0\), and letting \(x \to a\),
+
+\[ \begin{aligned}
+        f'(a) &= \lim_{x \to a} \frac{x^{n} - a^{n}}{x - a} \\[2pt]
+              &= \lim_{x \to a} \bigl(x^{n-1} + a\,x^{n-2} + \cdots + a^{n-1}\bigr) \\[2pt]
+              &= \underbrace{a^{n-1} + a^{n-1} + \cdots + a^{n-1}}_{n \text{ equal terms}} = n\,a^{n-1}.
+      \end{aligned} \]
+
+Since the point \(a\) was arbitrary, \(f'(x) = n\,x^{n-1}\).
+\end{envproof}
+\begin{envproof}{Proof}{}{alternative — binomial expansion}
+This time we use the \(h\)-form together with the binomial theorem (a precalculus prerequisite), which expands
+
+\[ (x + h)^{n} = x^{n} + \binom{n}{1} x^{n-1} h + \binom{n}{2} x^{n-2} h^{2} + \cdots + h^{n}. \]
+
+Subtracting \(x^{n}\) and dividing by \(h\),
+
+\[ \frac{(x + h)^{n} - x^{n}}{h} = \binom{n}{1} x^{n-1} + \binom{n}{2} x^{n-2} h + \cdots + h^{n-1}. \]
+
+Every term after the first carries a factor of \(h\), so all of them vanish as \(h \to 0\), leaving
+
+\[ f'(x) = \binom{n}{1} x^{n-1} = n\,x^{n-1}, \]
+
+since \(\binom{n}{1} = n\).
+\end{envproof}
+The two proofs trace two strands in the early history of the derivative. The binomial-expansion argument rests on Newton’s generalized binomial theorem, which he developed around 1665 as part of the calculus he was then inventing; expanding \((x + h)^{n}\) and letting \(h \to 0\) is descended from the increment-and-discard method Fermat had used in the 1630s to find tangents and extrema. The factorization argument, by contrast, uses no infinitesimal at all. It establishes the same result using ordinary algebra.
+
+The rule is quick to apply. For instance,
+
+\[ \frac{d}{dx}\,x^{5} = 5x^{4}, \qquad \frac{d}{dx}\,x^{10} = 10x^{9}, \qquad \frac{d}{dx}\,x = 1, \]
+
+the last because \(x = x^{1}\) has derivative \(1 \cdot x^{0} = 1\), which is the slope of the line \(y = x\), as it must be.
+
+\begin{envcaution}{Caution}{}{}
+So far the power rule is proved only for \emph{positive integer} exponents. For a \emph{negative} integer \(n = -1, -2, \ldots\) the identical formula \(\dfrac{d}{dx}x^{n} = n\,x^{n-1}\) still holds wherever \(x \ne 0\). This can be checked by applying the same factorization idea to \(1/x^{m}\) (where \(m = -n > 0\)). The fully general statement \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) holds as well for an \emph{arbitrary real} exponent \(r\) and every \(x > 0\), where \(x^{r}\) is defined through the logarithm. Its proof needs the chain rule, so we defer it to a later chapter.
+\end{envcaution}
+\subsechead{The sum, constant-multiple, and polynomial rules}
+Constants and powers are the building blocks; to assemble them into polynomials we need to know how differentiation interacts with addition and with multiplication by a constant. Both are simple, and each follows directly from the corresponding limit law of Chapter 1.
+
+\begin{envtheorem}{Theorem}{2.4}{The sum and constant-multiple rules}
+If \(f\) and \(g\) are differentiable and \(c\) is a constant, then \(f + g\) and \(cf\) are differentiable, and
+
+\[ (f + g)'(x) = f'(x) + g'(x), \qquad (cf)'(x) = c\,f'(x). \]
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+Both are read straight off the limit laws. For the sum rule, the difference quotient of \(f + g\) splits into two:
+
+\[ \begin{aligned}
+        (f + g)'(x) &= \lim_{h \to 0} \frac{\bigl[f(x+h) + g(x+h)\bigr] - \bigl[f(x) + g(x)\bigr]}{h} \\[2pt]
+        &= \lim_{h \to 0} \left( \frac{f(x+h) - f(x)}{h} + \frac{g(x+h) - g(x)}{h} \right) \\[2pt]
+        &= f'(x) + g'(x),
+      \end{aligned} \]
+
+using the law that the limit of a sum is the sum of the limits. For the constant-multiple rule, the constant factors out of the quotient and then out of the limit:
+
+\[ (cf)'(x) = \lim_{h \to 0} \frac{c\,f(x+h) - c\,f(x)}{h} = c \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} = c\,f'(x). \]
+\end{envproof}
+Notice that differentiation distributes over addition and that a constant factor remains outside the derivative. Multiplication does not behave so simply. In general, \((fg)' \ne f'g'\), so the correct rule for a product requires more care. We derive that rule in §2.5.
+
+Combining the three rules just proved, we can differentiate any polynomial in a single pass.
+
+\begin{envcorollary}{Corollary}{2.1}{Derivative of a polynomial}
+If \(f(x) = a_{n}x^{n} + a_{n-1}x^{n-1} + \cdots + a_{1}x + a_{0}\), then
+
+\[ f'(x) = n\,a_{n}x^{n-1} + (n-1)\,a_{n-1}x^{n-2} + \cdots + a_{1}. \]
+\end{envcorollary}
+The reasoning is exactly the three rules acting in concert: the sum rule lets the derivative act term by term; the constant-multiple rule carries each coefficient \(a_{k}\) along untouched; and the power rule turns each \(x^{k}\) into \(k\,x^{k-1}\). The constant term \(a_{0}\) contributes \(0\), and the linear term \(a_{1}x\) contributes \(a_{1}\). Assembling the pieces gives the stated formula.
+
+This corollary is used frequently in kinematics. If a moving object has a polynomial position \(s(t) = a_{n}t^{n} + \cdots + a_{1}t + a_{0}\), its velocity \(s'(t)\) follows in a single line by the same term-by-term rule, each power of \(t\) dropping by one. The car of §2.2, whose velocity we could there describe only in principle, is now a function we can differentiate at sight.
+
+\begin{workedexample}
+\begin{envexample}{Example}{2.15}{}
+Differentiate \(f(x) = 3x^{4} - 5x^{2} + 2x - 7\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+We apply the power rule to each term, letting the sum and constant-multiple rules split the expression and carry the coefficients; the constant \(-7\) differentiates to \(0\):
+
+\[ \begin{aligned}
+          f'(x) &= 3\cdot\frac{d}{dx}x^{4} \;-\; 5\cdot\frac{d}{dx}x^{2} \;+\; 2\cdot\frac{d}{dx}x \;-\; \frac{d}{dx}\,7 \\[2pt]
+                &= 3(4x^{3}) - 5(2x) + 2(1) - 0 \\[2pt]
+                &= 12x^{3} - 10x + 2.
+        \end{aligned} \]
+
+Not a single limit was computed, because the rules give the result directly without returning to the limit definition.
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.16}{}
+Differentiate \(s(t) = 3t^{4} + 5t^{3} - \dfrac{1}{t}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+To use the power rule on every term, we first rewrite \(1/t\) as a power: \(s(t) = 3t^{4} + 5t^{3} - t^{-1}\). Applying the power rule — including the negative-exponent case noted in the Caution above — to each term,
+
+\[ \begin{aligned}
+          s'(t) &= 3 \cdot 4t^{3} + 5 \cdot 3t^{2} - (-1)\,t^{-2} \\[2pt]
+                &= 12t^{3} + 15t^{2} + \frac{1}{t^{2}}.
+        \end{aligned} \]
+
+The key step was rewriting \(1/t\) as \(t^{-1}\) so the power rule could act on it: the exponent drops by one (\(-1 \to -2\)) and the old exponent \(-1\) comes out front, producing the \(+1/t^{2}\) term. That term matches what we would obtain from the quotient rule (§2.5) or from the limit definition (§2.2 Example 2.8).
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.17}{}
+Differentiate \(f(x) = 3x^{2} + 4\sqrt{x}\) for \(x > 0\), and find the equation of the tangent line at \(x = 1\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Writing \(\sqrt{x} = x^{1/2}\), we differentiate term by term. The power rule applies directly to \(3x^{2}\). For \(4\sqrt{x}\), the exponent \(\tfrac{1}{2}\) is not an integer, a case for which the Caution above defers a general proof. This particular derivative has already been established: §2.2 Example 2.7 found \(\dfrac{d}{dx}\sqrt{x} = \dfrac{1}{2\sqrt{x}}\) straight from the definition. Using it,
+
+\[ \begin{aligned}
+          f'(x) &= 3 \cdot 2x + 4 \cdot \tfrac{1}{2}\,x^{-1/2} \\[2pt]
+                &= 6x + \frac{2}{\sqrt{x}}.
+        \end{aligned} \]
+
+In a single line the power rule drops the exponent by one (\(\tfrac{1}{2} \to -\tfrac{1}{2}\)) and brings the old exponent out front, reproducing exactly the value the limit gave in §2.2.
+
+At \(x = 1\): \(f(1) = 3 + 4 = 7\) and \(f'(1) = 6 + 2 = 8\). The tangent line through \((1, 7)\) with slope \(8\) is
+
+\[ y - 7 = 8(x - 1), \quad\text{i.e.}\quad y = 8x - 1. \]
+\end{envsolution}
+\end{workedexample}
+\subsechead{The derivative of the exponential function}
+We close with a function of a different kind: the natural exponential \(e^{x}\). The base \(e \approx 2.718\) may or may not have appeared in your precalculus course. Nothing here assumes it did. In this text the official definition of \(e^{x}\) uses a formula of a kind we have not seen before, an \emph{infinite sum} called a power series:
+
+\[ e^{x} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots + \frac{x^{n}}{n!} + \cdots. \]
+
+Read the infinite sum the way the notation suggests: adding more and more terms produces ever-better approximations, and \(e^{x}\) is the value the running totals settle toward. For \(x = 1\), the totals are \(1,\ 2,\ 2.5,\ 2.66\ldots,\) closing in on \(e \approx 2.71828\). Making “settle toward” precise is a limit question, and we take the answer as given here. The caution below records exactly what is being borrowed.
+
+\begin{envcaution}{Caution}{}{}
+Everything about \(e^{x}\) in this section is \emph{on credit}: borrowed now, to be repaid in Chapter 4. We take the power-series definition as given: the convergence of the series and the careful construction of \(e^{x}\) are the business of Chapter 4 (§4.1–§4.2), and the term-by-term differentiation about to be used is made rigorous in §4.3, with the explicit bound \(\lvert (e^{h} - 1)/h - 1 \rvert \le \lvert h \rvert\) for \(0 < \lvert h \rvert < \tfrac{1}{2}\). Nothing in Chapters 2–3 depends on those deferred proofs, only on the facts stated here.
+\end{envcaution}
+Granting the series, the derivative follows in a few lines, by an informal term-by-term step.
+
+\begin{envtheorem}{Theorem}{2.5}{Derivative of the natural exponential}
+The natural exponential function is its own derivative: \[ \frac{d}{dx}\,e^{x} = e^{x}. \] Consequently every higher derivative is \(e^{x}\) as well: \(f^{(n)}(x) = e^{x}\) for all \(n\).
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+From the definition, and factoring out \(e^{x}\) (which does not depend on \(h\)),
+
+\[ \frac{d}{dx}\,e^{x} = \lim_{h \to 0} \frac{e^{x+h} - e^{x}}{h} = \lim_{h \to 0} \frac{e^{x}\bigl(e^{h} - 1\bigr)}{h} = e^{x} \lim_{h \to 0} \frac{e^{h} - 1}{h}. \]
+
+It remains to evaluate that last limit. Using the series for \(e^{h}\),
+
+\[ e^{h} - 1 = h + \frac{h^{2}}{2!} + \frac{h^{3}}{3!} + \cdots, \qquad\text{so}\qquad \frac{e^{h} - 1}{h} = 1 + \frac{h}{2!} + \frac{h^{2}}{3!} + \cdots. \]
+
+Every term past the first carries a factor of \(h\), so as \(h \to 0\) they all vanish and the limit equals \(1\). Therefore
+
+\[ \frac{d}{dx}\,e^{x} = e^{x} \cdot 1 = e^{x}. \]
+
+Differentiating again returns \(e^{x}\) unchanged, so \(f''(x) = e^{x}\), and by repetition \(f^{(n)}(x) = e^{x}\) for every \(n\).
+\end{envproof}
+\begin{figureblock}
+  \includegraphics[width=106.36mm]{ch02/figs/exp-self-derivative}
+\figcaption{Figure 2.8}{The graph of \(y = e^{x}\) with tangent lines at \(x = 0\) and \(x = 1\).}
+\end{figureblock}
+Figure 2.8 shows this self-replicating property at two points: the tangent slope is \(1=e^{0}\) at \((0,1)\) and \(e=e^{1}\) at \((1,e)\). That same slope-equals-height rule characterizes \(e^{x}\) among exponential functions. For this reason, it is called the \emph{natural} exponential: at every point its rate of change equals its current value.
+
+Because its rate of change equals its current size, \(e^{x}\) appears in a great many settings. Any quantity whose growth rate is proportional to how much is already present obeys a relation of the form \(y' = ky\), and its solution is built from \(e^{x}\). Money under continuous compounding grows in proportion to the balance; a radioactive sample decays in proportion to the amount remaining; an unchecked population grows in proportion to its current size. In every case the rate is tied to the level, and \(e^{x}\) is the function that ties them.
+
+\begin{workedexample}
+\begin{envexample}{Example}{2.18}{}
+Let \(g(x) = 4e^{x} - x^{3} + 2x\). Find \(g'(x)\), and then compute \(g''(x)\), \(g'''(x)\), and \(g^{(4)}(x)\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The sum and constant-multiple rules let us differentiate term by term, using \(\dfrac{d}{dx}e^{x} = e^{x}\) for the exponential and the power rule for the rest:
+
+\[ g'(x) = 4e^{x} - 3x^{2} + 2. \]
+
+Differentiating repeatedly, the polynomial part loses one degree each time while the exponential part is unchanged:
+
+\[ \begin{aligned}
+          g''(x)   &= 4e^{x} - 6x, \\[2pt]
+          g'''(x)  &= 4e^{x} - 6, \\[2pt]
+          g^{(4)}(x) &= 4e^{x}.
+        \end{aligned} \]
+
+From the fourth derivative onward every \(g^{(n)}(x) = 4e^{x}\): The polynomial part eventually becomes zero under repeated differentiation, while the \(e^{x}\) term remains unchanged at every step. This again shows that \(e^{x}\) is its own derivative.
+\end{envsolution}
+\end{workedexample}
+\begin{envremark}{Remark}{2.6}{Derivative of \(b^{x}\)}
+For a general base \(b > 0\), the exponential \(b^{x}\) is differentiable too, with
+
+\[ \frac{d}{dx}\,b^{x} = b^{x}\,\ln b, \]
+
+where \(\ln b = \log_{e} b\). We will be able to derive this cleanly once the chain rule is available (Chapter 3). Notice that the extra factor \(\ln b\) equals \(1\) precisely when \(b = e\). This is another way to see why base \(e\) is the natural choice: only for that base does the derivative equal the original exponential with no extra constant factor.
+\end{envremark}
+\begin{envcaution}{Caution}{}{}
+Keep the exponential and power functions apart. In \(e^{x}\) the base is the fixed number \(e\) and the exponent varies, so it is an \emph{exponential} function with \(\dfrac{d}{dx}e^{x} = e^{x}\). In \(x^{e}\) the exponent is the fixed number \(e \approx 2.718\) and the base varies, so it is a \emph{power} function, differentiated by the power rule: \(\dfrac{d}{dx}x^{e} = e\,x^{e-1}\). The two obey different rules, and in particular \(\dfrac{d}{dx}x^{e} \ne x^{e}\). The general split is \(\dfrac{d}{dx}b^{x} = b^{x}\ln b\) for an exponential against \(\dfrac{d}{dx}x^{r} = r\,x^{r-1}\) for a power. Decide which form you are looking at before you differentiate.
+\end{envcaution}
+We now have fast, limit-free derivatives for every polynomial and for the natural exponential. What we still lack are \emph{general} rules for products and quotients of functions. As we saw, the naive guess \((fg)' = f'g'\) is wrong. Supplying those rules is the task of the next section.
+
+
+\sechead{2.5}{The Product and Quotient Rules}
+In §2.4 we learned the addition rule for derivatives: the derivative of a sum is the sum of the derivatives, and the same holds for differences, \((f \pm g)' = f' \pm g'\) (Theorem 2.4). It is tempting to hope that products and quotients obey equally simple derivative rules, and in particular that the derivative of a product is the product of the derivatives. This section shows that they are \emph{not}, finds the correct rules, and so completes the toolkit of basic differentiation rules begun in §2.4. We treat the two cases in turn: first \(\dfrac{d}{dx}(fg)\), then \(\dfrac{d}{dx}\!\left(\dfrac{f}{g}\right)\).
+
+\subsechead{The product rule}
+The cleanest guess one could make is that derivatives pass through a product untouched, \((fg)' = f'g'\). A single example shows this is false.
+
+\begin{envcaution}{Caution}{}{}
+In general \((fg)' \ne f'g'\). Take \(f(x) = x\) and \(g(x) = x^{2}\), so that \(fg = x^{3}\). Then \((fg)' = 3x^{2}\), whereas
+
+\[ f'(x)\,g'(x) = (1)(2x) = 2x \ne 3x^{2}. \]
+
+Differentiating a product is \emph{not} a term-by-term operation. This is the single most common error with the rules of this chapter; the correct rule is below.
+\end{envcaution}
+To see where the correct rule comes from, picture \(f(x)\) and \(g(x)\) as the two side lengths of a rectangle, so that the product \(f(x)\,g(x)\) is its area. Increase \(x\) by a small amount \(h\): the width grows by \(\Delta f = f(x+h) - f(x)\) and the height by \(\Delta g = g(x+h) - g(x)\). The extra area is an L-shaped border made of three pieces (Figure 2.9): a strip \(g\,\Delta f\) along one side, a strip \(f\,\Delta g\) along the other, and a small corner \(\Delta f\,\Delta g\).
+
+\begin{figureblock}
+  \includegraphics[width=87.84mm]{ch02/figs/fig-product-area}
+\figcaption{Figure 2.9}{Area model for the product rule: base \(fg\), two strips, and the corner \(\Delta f\,\Delta g\).}
+\end{figureblock}
+Dividing the added area by \(h\) and letting \(h \to 0\), the two strips contribute \(g\,\dfrac{\Delta f}{h} \to g\,f'\) and \(f\,\dfrac{\Delta g}{h} \to f\,g'\). The corner contributes \(\dfrac{\Delta f\,\Delta g}{h} = \dfrac{\Delta f}{h}\,\Delta g \to f' \cdot 0 = 0\), since \(\Delta f/h\) stays finite (tending to \(f'\)) while \(\Delta g \to 0\). The surviving pieces are exactly the two terms of the product rule.
+
+\begin{envtheorem}{Theorem}{2.6}{The product rule}
+If \(f\) and \(g\) are differentiable at \(x\), then their product \(fg\) is differentiable at \(x\), and
+
+\[ \begin{aligned}
+        &(fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x), \\[2pt]
+        &\text{i.e.}\quad \frac{d}{dx}(fg) = \left(\frac{d}{dx}f\right)g + f\left(\frac{d}{dx}g\right).
+      \end{aligned} \]
+\end{envtheorem}
+\begin{envproof}{Proof}{}{}
+We start from the definition and apply a useful trick: add and subtract \(f(x)\,g(x+h)\) in the numerator, which lets us isolate the change in \(f\) from the change in \(g\):
+
+\[ \begin{aligned}
+        &f(x+h)g(x+h) - f(x)g(x) \\
+        &= \bigl[f(x+h)g(x+h) - f(x)g(x+h)\bigr] + \bigl[f(x)g(x+h) - f(x)g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+h) - f(x)\bigr]\,g(x+h) + f(x)\,\bigl[g(x+h) - g(x)\bigr].
+      \end{aligned} \]
+
+Dividing by \(h\),
+
+\[ \begin{aligned}
+        &\frac{f(x+h)g(x+h) - f(x)g(x)}{h} \\[2pt]
+        &= \frac{f(x+h) - f(x)}{h}\,g(x+h) \;+\; f(x)\,\frac{g(x+h) - g(x)}{h}.
+      \end{aligned} \]
+
+Now let \(h \to 0\) and evaluate each piece with the limit laws of §1.5. The two difference quotients tend to \(f'(x)\) and \(g'(x)\). For the remaining factor, \(g(x+h) \to g(x)\): this is exactly the statement that \(g\) is continuous at \(x\), which holds because \(g\), being differentiable at \(x\), is continuous there (Theorem 2.1, §2.3). Therefore
+
+\[ (fg)'(x) = f'(x)\,g(x) + f(x)\,g'(x). \]
+\end{envproof}
+The rule is quick to apply once it is established. For instance,
+
+\[ \frac{d}{dx}\bigl(x^{2} e^{x}\bigr) = (2x)\,e^{x} + x^{2}\,e^{x} = x(x + 2)\,e^{x}, \]
+
+where we used the power rule (Theorem 2.3) for \(x^{2}\) and \((e^{x})' = e^{x}\) (Theorem 2.5) for the exponential factor. The next example isolates the same product-rule pattern.
+
+\begin{workedexample}
+\begin{envexample}{Example}{2.19}{}
+Differentiate \(h(x) = x\,e^{x}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+Here \(h\) is a product of \(f(x) = x\) and \(g(x) = e^{x}\), with \(f'(x) = 1\) and \(g'(x) = e^{x}\) (Theorem 2.5). The product rule gives
+
+\[ h'(x) = f'(x)\,g(x) + f(x)\,g'(x) = (1)\,e^{x} + x\,e^{x} = e^{x}(1 + x). \]
+
+Notice that neither factor alone produces the answer: the term \(e^{x}\) comes from differentiating \(x\) while keeping \(e^{x}\), and the term \(x\,e^{x}\) from keeping \(x\) while differentiating \(e^{x}\). These are the two strips of Figure 2.9 in algebraic form.
+\end{envsolution}
+\end{workedexample}
+The product rule has a clean reading in economics. Suppose a firm sells \(q\) units at a price \(p(q)\) that depends on how many are sold; its revenue is the product \(R(q) = p(q)\,q\). The product rule gives the \emph{marginal revenue} \(R'(q) = p'(q)\,q + p(q)\). Selling one more unit changes revenue in two ways at once: through the price change \(p'(q)\) spread over all \(q\) units, and through the price \(p(q)\) received for the extra unit itself. The two strips of Figure 2.9 return here as two competing economic effects.
+
+\subsechead{The quotient rule}
+The same add-and-subtract idea handles a quotient \(f/g\). From here we write the increment as \(\Delta x\) rather than \(h\); the two symbols mean the same thing, as the next caution records.
+
+\begin{envcaution}{Caution}{}{}
+The increment in the variable is written either \(h\) or \(\Delta x\); in derivative computations the two are synonymous. Reading \(\Delta x\) as “a small change in \(x\),” the difference quotient \(\bigl(f(x + \Delta x) - f(x)\bigr)/\Delta x\) is identical to the \(h\)-form, and \(\Delta x \to 0\) means the same as \(h \to 0\). We use \(\Delta x\) below; it is the same increment, just a different letter.
+\end{envcaution}
+\begin{envtheorem}{Theorem}{2.7}{The quotient rule}
+If \(f\) and \(g\) are differentiable at \(x\) and \(g(x) \ne 0\), then the quotient \(f/g\) is differentiable at \(x\), and
+
+\[ \left(\frac{f}{g}\right)'(x) = \frac{f'(x)\,g(x) - f(x)\,g'(x)}{\bigl[g(x)\bigr]^{2}}. \]
+\end{envtheorem}
+Before the proof, it helps to see why the rule has this shape. Like the product rule, its numerator pairs each function with the derivative of the other, but the two terms are joined by a \emph{minus} sign instead of a plus, and the whole expression is divided by \(g^{2}\). The minus sign reflects that \(g\) sits in the denominator: making \(g\) larger makes the quotient \(f/g\) smaller, so the effect of \(g'\) is subtracted rather than added. The \(g^{2}\) comes from differentiating \(1/g\): take the simplest denominator \(g(x) = x\) with numerator \(f(x) = 1\), so that \(f/g = 1/x\), whose derivative was \(-1/x^{2}\) in §2.2. That derivative already shows the same minus sign and the same square that the quotient rule has in general.
+
+\begin{envproof}{Proof}{}{}
+Combining the two fractions over a common denominator,
+
+\[ \frac{f(x+\Delta x)}{g(x+\Delta x)} - \frac{f(x)}{g(x)} = \frac{f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x)}{g(x+\Delta x)\,g(x)}. \]
+
+On the numerator we use the same trick as before, now adding and subtracting \(f(x)\,g(x)\):
+
+\[ \begin{aligned}
+        &f(x+\Delta x)\,g(x) - f(x)\,g(x+\Delta x) \\[2pt]
+        &= \bigl[f(x+\Delta x)\,g(x) - f(x)\,g(x)\bigr] - \bigl[f(x)\,g(x+\Delta x) - f(x)\,g(x)\bigr] \\[2pt]
+        &= \bigl[f(x+\Delta x) - f(x)\bigr]\,g(x) - f(x)\,\bigl[g(x+\Delta x) - g(x)\bigr].
+      \end{aligned} \]
+
+Dividing the whole difference by \(\Delta x\), the difference quotient becomes
+
+\[ \frac{1}{g(x+\Delta x)\,g(x)}\left( \frac{f(x+\Delta x) - f(x)}{\Delta x}\,g(x) - f(x)\,\frac{g(x+\Delta x) - g(x)}{\Delta x} \right). \]
+
+Let \(\Delta x \to 0\). The two difference quotients tend to \(f'(x)\) and \(g'(x)\); and \(g(x+\Delta x) \to g(x)\) because \(g\) is continuous at \(x\) (Theorem 2.1, §2.3), so the denominator tends to \(g(x)\,g(x) = \bigl[g(x)\bigr]^{2}\), which is nonzero since \(g(x) \ne 0\). Hence
+
+\[ \left(\frac{f}{g}\right)'(x) = \frac{f'(x)\,g(x) - f(x)\,g'(x)}{\bigl[g(x)\bigr]^{2}}. \]
+\end{envproof}
+\begin{envcaution}{Caution}{}{}
+Unlike the product rule, the quotient rule is \emph{not} symmetric in \(f\) and \(g\): the numerator is \(f'g - f g'\), with the derivative of the \emph{top} coming first. Swapping the order to \(f g' - f' g\) flips the sign of the whole derivative, and forgetting the \(g^{2}\) in the denominator changes the answer entirely. A reliable mnemonic reads the numerator as “(derivative of top)(bottom) minus (top)(derivative of bottom), all over bottom squared.”
+\end{envcaution}
+As a first check, the quotient rule recovers a derivative we computed laboriously from first principles in §2.2. Taking the numerator to be the constant \(1\) and the denominator \(x\),
+
+\[ \frac{d}{dx}\!\left(\frac{1}{x}\right) = \frac{(0)(x) - (1)(1)}{x^{2}} = -\frac{1}{x^{2}}, \]
+
+matching the derivative \(-1/x^{2}\) found in Example 2.8, obtained here in a single line, exactly as promised there.
+
+\begin{workedexample}
+\begin{envexample}{Example}{2.20}{}
+Differentiate \(f(x) = \dfrac{x}{x^{2} + 1}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+No algebra simplifies this to a power, so it is a genuine quotient. The quotient rule applies, with top \(x\) and bottom \(x^{2} + 1\). Their derivatives are \(1\) and \(2x\), and the bottom never vanishes, so the rule is valid for every \(x\). Taking care with the order of the numerator terms,
+
+\[ \begin{aligned}
+          f'(x) &= \frac{(1)\bigl(x^{2} + 1\bigr) - (x)(2x)}{\bigl(x^{2} + 1\bigr)^{2}} \\[2pt]
+                &= \frac{x^{2} + 1 - 2x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}
+                 = \frac{1 - x^{2}}{\bigl(x^{2} + 1\bigr)^{2}}.
+        \end{aligned} \]
+
+Had we mistakenly written the numerator as \((x)(2x) - (1)(x^{2}+1)\), every sign would be wrong. As a check on the result, \(f'(0) = 1 > 0\) (the curve rises through the origin) and \(f'(\pm 1) = 0\), the two points where \(x/(x^{2}+1)\) reaches its largest and smallest values.
+
+\begin{figureblock}
+  \begin{minipage}{\linewidth}\centering
+  \includegraphics[width=111.65mm]{ch02/figs/quotient-example-graph-1}\\[6pt]
+  \includegraphics[width=111.65mm]{ch02/figs/quotient-example-graph-2}
+  \figcaption{Figure 2.10}{The function \(f(x) = \dfrac{x}{x^{2}+1}\) (top) and its derivative \(f'(x) = \dfrac{1-x^{2}}{(x^{2}+1)^{2}}\) (bottom), from Example 2.20.}
+  \end{minipage}
+\end{figureblock}
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.21}{}
+A student differentiates \(f(x) = \dfrac{2x}{x + 1}\) as follows:
+
+\[ \begin{aligned}
+          f'(x) &= \frac{2(x + 1) + 2x}{(x + 1)^{2}} \\[4pt]
+                &= \frac{2(x + 1)}{(x + 1)^{2}} = \frac{2}{x + 1}.
+        \end{aligned} \]
+
+Spot \emph{all} the errors in this work, and give the correct derivative.
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+There are two errors.
+
+\emph{Error 1: Wrong sign in the quotient rule.} The quotient rule carries a \emph{minus} sign in the numerator,
+
+\[ \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \]
+
+but the student wrote a plus. With top \(2x\) and bottom \(x + 1\), the correct numerator is
+
+\[ (2)(x + 1) - (2x)(1) = 2x + 2 - 2x = 2, \]
+
+not \(2(x + 1) + 2x\).
+
+\emph{Error 2: Incorrect simplification.} Even within the student’s own (wrong) numerator, \(2(x + 1) + 2x = 4x + 2\), not \(2(x + 1)\); the \(2x\) term was simply dropped.
+
+Carrying out the rule correctly,
+
+\[ f'(x) = \frac{(2)(x + 1) - (2x)(1)}{(x + 1)^{2}} = \frac{2}{(x + 1)^{2}}. \]
+
+Note that the denominator is \((x + 1)^{2}\), not \((x + 1)\). Dropping the square is a third common slip.
+\end{envsolution}
+\end{workedexample}
+\subsechead{Choosing the right rule}
+With the constant, power, sum, constant-multiple, product, and quotient rules all established, differentiating a given expression is now less about computing limits and more about \emph{recognizing} which rule its structure calls for. The next box sets out how to read that structure and when to simplify first.
+
+\begin{envstrategy}{Strategy}{2.2}{Selecting among the basic rules}
+\begin{steps}
+  \item Read the \emph{outermost} structure of the expression. Is it a single power or polynomial, a sum or difference, a product of two functions, or a quotient of two functions?
+  \item Before reaching for the product or quotient rule, ask whether algebra simplifies the expression first: a quotient like \(\dfrac{x^{4} - x}{x}\) becomes the polynomial \(x^{3} - 1\), and a product like \(x^{2}\cdot x^{3}\) becomes \(x^{5}\). A rule you can avoid is a rule you cannot misapply.
+  \item Apply the matching rule: the power, sum, and constant-multiple rules for polynomials and powers; the product rule (Theorem 2.6) for a genuine product; the quotient rule (Theorem 2.7) for a genuine quotient. For compound expressions, the rules combine — a sum of products, a product with a polynomial factor, and so on.
+\end{steps}
+The point is to spend a moment on the shape of the problem before computing: the same expression can be far easier under one rule than another, and some apparent quotients are not quotients at all once simplified.
+\end{envstrategy}
+\begin{envcaution}{Caution}{}{}
+Not every product or quotient on the page calls for the product or quotient rule. A constant factor is handled by the constant-multiple rule: \(\dfrac{d}{dx}(5x^{3}) = 5 \cdot 3x^{2} = 15x^{2}\), with no need to “differentiate” the \(5\). A constant denominator is likewise just a constant multiple, since \(\dfrac{x^{2}}{3} = \tfrac{1}{3}x^{2}\) gives \(\dfrac{d}{dx}\dfrac{x^{2}}{3} = \tfrac{2}{3}x\). The product and quotient rules are needed only when \emph{both} parts genuinely depend on \(x\); using them when one part is constant still reaches the answer, but by a longer route with more chances to slip.
+\end{envcaution}
+\begin{workedexample}
+\begin{envexample}{Example}{2.22}{}
+For each function, first decide which rule applies, then differentiate: \[ \text{(a)}\ \ y = x^{3} e^{x}, \qquad \text{(b)}\ \ y = \frac{x^{4} - x}{x}, \qquad \text{(c)}\ \ y = \frac{x^{2}}{e^{x}}. \]
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+\emph{(a)} A genuine product of \(x^{3}\) and \(e^{x}\); use the product rule:
+
+\[ y' = (3x^{2})\,e^{x} + x^{3}\,e^{x} = x^{2} e^{x}(3 + x). \]
+
+\emph{(b)} This \emph{looks} like a quotient, but it simplifies first. For \(x \ne 0\), \(\dfrac{x^{4} - x}{x} = x^{3} - 1\), so the power rule finishes it with no quotient rule at all:
+
+\[ y' = 3x^{2}. \]
+
+\emph{(c)} A genuine quotient that does not simplify; use the quotient rule, with top \(x^{2}\) and bottom \(e^{x}\):
+
+\[ y' = \frac{(2x)\,e^{x} - x^{2}\,e^{x}}{\bigl(e^{x}\bigr)^{2}} = \frac{e^{x}\bigl(2x - x^{2}\bigr)}{e^{2x}} = \frac{2x - x^{2}}{e^{x}}. \]
+
+The three parts share no single rule; the work was choosing correctly, and in (b) recognizing that the cleanest move was not to use the quotient rule at all.
+\end{envsolution}
+\end{workedexample}
+\begin{workedexample}
+\begin{envexample}{Example}{2.23}{}
+Differentiate \(f(x) = \dfrac{e^{x}}{2x}\).
+\end{envexample}
+\begin{envsolution}{Solution}{}{}
+The quotient rule with top \(e^{x}\) and bottom \(2x\) gives
+
+\[ \begin{aligned}
+          f'(x) &= \frac{(e^{x})(2x) - (e^{x})(2)}{(2x)^{2}} \\[2pt]
+                &= \frac{2e^{x}(x - 1)}{4x^{2}}
+                 = \frac{(x - 1)\,e^{x}}{2x^{2}}.
+        \end{aligned} \]
+
+The derivative of the top is again \(e^{x}\) (Theorem 2.5), and the derivative of the bottom is just \(2\). The sign of \(f'(x)\) changes at \(x = 1\): for \(0 < x < 1\) we have \(f'(x) < 0\) (the function is decreasing), while for \(x > 1\) we have \(f'(x) > 0\) (the function is increasing).
+\end{envsolution}
+\end{workedexample}
+The product and quotient rules complete the basic differentiation toolkit of this chapter: together with the constant, power, sum, and constant-multiple rules and the derivative of \(e^{x}\), they let us differentiate any algebraic or exponential combination built by adding, scaling, multiplying, and dividing. One important way of combining functions remains untouched, namely \emph{composition}, forming \(f\bigl(g(x)\bigr)\). It needs a rule of its own, the chain rule, which opens the next chapter.
+
+\subsechead{Chapter summary}
+Chapter 2 built the derivative in stages. At a single point it is a limit of secant slopes, \[ f'(a) = \lim_{h \to 0} \frac{f(a + h) - f(a)}{h} = \lim_{x \to a} \frac{f(x) - f(a)}{x - a}, \] the slope of the tangent line \(y - f(a) = f'(a)(x - a)\) and, read locally, the best linear approximation to \(f\) near \(a\) (§2.1). Letting the basepoint vary turns this number into the derivative \(f'\), recoverable from the graph of \(f\) and written interchangeably as \(f'\), \(\tfrac{df}{dx}\), or \(\tfrac{d}{dx}[f]\) (§2.2).
+
+Not every function has a derivative everywhere. The limit can fail at a corner (\(\lvert x \rvert\) at \(0\)), at a vertical tangent (\(\sqrt[3]{x}\) at \(0\)), or at any discontinuity, so differentiability is a genuinely stronger condition than continuity: differentiable \(\Rightarrow\) continuous (Theorem 2.1), but the converse is false. Iterating the operation gives the higher derivatives \(f''\), \(f'''\), \(\dots\), \(f^{(n)}\) (§2.3).
+
+The rest of the chapter replaced the limit, case by case, with arithmetic. The constant rule \((c)' = 0\) (Theorem 2.2), the power rule \((x^{n})' = n x^{n - 1}\) for positive integers \(n\) (Theorem 2.3), and the two linearity rules for sums and constant multiples (Theorem 2.4) together differentiate every polynomial term by term (Corollary 2.1). The natural exponential was shown to have the defining property \((e^{x})' = e^{x}\) (Theorem 2.5), proved here from the series for \(e^{x}\) (§2.4); Chapter 4 will make that step fully rigorous. Products and quotients then closed the toolkit: \[ (fg)' = f'g + fg', \qquad \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}, \] the first emphatically \emph{not} \(f'g'\), the second sensitive to the order of its numerator (§2.5).
+
+With these rules we can differentiate any function assembled from powers and the exponential by adding, scaling, multiplying, and dividing. They do not yet cover two things: \emph{composition}, \(f\bigl(g(x)\bigr)\), for which this chapter has given no rule, and the power rule for exponents that are not integers. Both are addressed in Chapter 3, which begins with the chain rule for compositions and uses it to extend the power rule and to differentiate the trigonometric, logarithmic, and inverse functions.
+\end{document}

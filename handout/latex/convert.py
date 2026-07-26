@@ -335,7 +335,7 @@ class FragmentParser(HTMLParser):
 
 # ── 方言 -> IR ────────────────────────────────────────────────────────────────
 ENV_KINDS = {
-    "env-definition", "env-theorem", "env-proposition", "env-proof",
+    "env-definition", "env-theorem", "env-proposition", "env-corollary", "env-proof",
     "env-example", "env-solution", "env-remark", "env-caution", "env-strategy",
 }
 
