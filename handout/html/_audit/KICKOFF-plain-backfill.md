@@ -69,7 +69,13 @@
 ### Gate 7 — LaTeX 線同步（若該單元在 LaTeX rollout 內）
 
 - `cd handout/latex && python make_dist.py <unit>` → 三閘全綠：log（0 error／0 missing char）＋完整性閘（`check_prose.py`，**0 處真落差**）＋字形閘（`check_glyphs.py`）。
-- 目前 `NAMES` 表只有 appB、ch03；**其他單元先補表**。不在表內者記為 pending，不可默默跳過（appB 曾因此脫鉤兩輪）。
+- **另外要手動跑 `python handout/latex/test_convert.py`**（2026-07-26 補；`make_dist.py` **不會**跑它）。
+  原因：golden tests 裡有**逐章的數學段數普查錨**（目前 ch03 612、appB 571），本輪只要淨增減行內式就會紅。
+  它已經連續踩中兩次——appB 一次（`942ccea`，566→571）、ch03 一次（`c849bca`，605→612），
+  而且兩次都因為 Gate 7 卡在前面的閘就中止、golden tests 又不在三閘定義內，所以**當下沒被發現**。
+  錨的用途是防止「依序、恰好一次」的不變式被縮水的集合空洗，**內容合法增減時它就該跟著更新**，
+  並在原地寫下沿革（數字為何變）。
+- 目前 `NAMES` 表有 appB、ch01、ch02、ch03；**其他單元先補表**。不在表內者記為 pending，不可默默跳過（appB 曾因此脫鉤兩輪）。
 
 ### Gate 8 — 版面目檢
 
