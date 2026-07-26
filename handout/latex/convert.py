@@ -58,6 +58,28 @@ def _line_of(raw, i):
     return raw.count("\n", 0, i) + 1
 
 
+# 數學區段內允許的 HTML entity（ch04 差集）。HTML 的文字節點裡不能寫裸 `<`，所以
+# `\(m &lt; M\)` 是**正確**的 fragment 寫法——MathJax 拿到的是解碼後的 `m < M`。數學是
+# 逐位元組 pass-through，若不在此解碼，LaTeX 會收到字面的 `&lt;`，`&` 被當成 alignment
+# tab 而編譯失敗（ch04 rollout 首次遇到；appB／ch01／ch03 的真數學區段內零 entity）。
+# 白名單外的 entity 一律硬錯——理由同上方 entity 反斜線的守衛：瀏覽器解碼、轉換器不解，
+# 兩邊語義會分岔。要支援新的就更新這張表，不要靜默放行。
+MATH_ENTITIES = {"&lt;": "<", "&gt;": ">"}
+_MATH_ENTITY_ANY = re.compile(r"&(?:[a-zA-Z][a-zA-Z0-9]*|#\d+|#[xX][0-9a-fA-F]+);")
+
+
+def _decode_math_entities(seg, raw, pos, fname):
+    bad = [m.group(0) for m in _MATH_ENTITY_ANY.finditer(seg) if m.group(0) not in MATH_ENTITIES]
+    if bad:
+        raise MathScanError(
+            f"{fname}:{_line_of(raw, pos)}: 數學區段含未凍結的 entity {sorted(set(bad))}——"
+            f"瀏覽器會解碼它、轉換器不會，兩邊語義分岔。目前只凍結 "
+            f"{sorted(MATH_ENTITIES)}；要支援請更新 MATH_ENTITIES 與該章 DIALECT 表。")
+    for k, v in MATH_ENTITIES.items():
+        seg = seg.replace(k, v)
+    return seg
+
+
 def extract_math(raw, fname="<input>"):
     """單趟 scanner：把數學挖成占位符。回傳 (帶占位符的 HTML, 數學原文清單)。
 
@@ -119,7 +141,7 @@ def extract_math(raw, fname="<input>"):
                 continue
             f = raw[k + 1] if k + 1 < n else ""
             if f == close:
-                seg = raw[start:k + 2]
+                seg = _decode_math_entities(raw[start:k + 2], raw, start, fname)
                 store.append(seg)
                 pad = "\n" * seg.count("\n")
                 out.append(f"{S_OPEN}{len(store) - 1}{S_CLOSE}")
@@ -337,6 +359,7 @@ class FragmentParser(HTMLParser):
 ENV_KINDS = {
     "env-definition", "env-theorem", "env-proposition", "env-proof",
     "env-example", "env-solution", "env-remark", "env-caution", "env-strategy",
+    "env-corollary",   # ch04 差集：×4（模板早已備妥 envcorollary，見 calcbook.sty §env 家族）
 }
 
 
@@ -388,8 +411,11 @@ class Builder:
             elif k.tag == "strong" and not k.classes:   # appB 差集：run-in 粗體標籤
                 self.n_mapped += 1
                 out.append(Strong(self.inlines(k.kids, k, allow_br)))
-            elif k.tag == "span" and k.classes == ("qed", "qed-proof"):
-                # appB 差集：proof 收尾記號。必須是空元素（有內文＝契約外，硬錯）
+            elif k.tag == "span" and k.classes in (("qed", "qed-proof"), ("qed",)):
+                # appB 差集：proof 收尾記號 qed-proof。
+                # ch04 差集：worked-solution 的收尾用裸 span.qed（×6 在句尾，同樣渲染 QED
+                # 符號，只是不屬 proof 環境；第 7 個在區塊位置，見 block()）。
+                # 兩者都必須是空元素（有內文＝契約外，硬錯）
                 if any(isinstance(x, str) and x.strip() or not isinstance(x, str) for x in k.kids):
                     self.err(k, "qed 記號必須是空元素")
                 self.n_mapped += 1
@@ -452,6 +478,13 @@ class Builder:
 
         if t == "h3" and set(c) <= {"subsec-head", "page-break-before"} and "subsec-head" in c:
             return SubsecHead(self.inlines(el.kids, el), pagebreak="page-break-before" in c)
+
+        if t == "span" and c == ("qed",):
+            # ch04 差集：Example 4.1 的 solution 把收尾記號放成 env-body 的區塊子元素
+            # （同章其餘 6 個都在 <p> 句尾，走 inline 路徑）。渲染同為右靠的 QED 符號。
+            if any(isinstance(x, str) and x.strip() or not isinstance(x, str) for x in el.kids):
+                self.err(el, "qed 記號必須是空元素")
+            return Para([QedMark()])
 
         if t == "div" and c == ("tbl-wrap",):
             return self.table_wrap(el)

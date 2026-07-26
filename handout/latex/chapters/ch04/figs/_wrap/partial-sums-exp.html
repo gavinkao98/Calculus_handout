@@ -1,0 +1,2313 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><style>
+:root {
+  --fig-4-1:  100%;    /* Figure 4.1  Completeness bound */
+  --fig-4-2:  100%;    /* Figure 4.2  Partial sums converging to e^x */
+  --fig-4-3:  100%;    /* Figure 4.3  Interior extremum squeeze */
+  --fig-4-4:  100%;    /* Figure 4.4  MVT secant-tangent */
+  --fig-4-5:  100%;    /* Figure 4.5  e^x / ln x reflection */
+  --fig-4-6:  100%;    /* Figure 4.6  Reciprocal-slope geometry */
+}
+
+.paper figure[data-fig="completeness-bound"] { --fig-w: var(--fig-4-1); }
+.paper figure[data-fig="partial-sums-exp"] { --fig-w: var(--fig-4-2); }
+.paper figure[data-fig="interior-extremum-squeeze"] { --fig-w: var(--fig-4-3); }
+.paper figure[data-fig="mvt-secant-tangent"] { --fig-w: var(--fig-4-4); }
+.paper figure[data-fig="exp-log-reflection"] { --fig-w: var(--fig-4-5); }
+.paper figure[data-fig="reciprocal-slope-log"] { --fig-w: var(--fig-4-6); }
+</style>
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+<style>
+/* ============================================================
+   skin-hs.css — inlined + modified: Times New Roman + MathJax
+   ============================================================ */
+.paper {
+  --c-primary: oklch(0.50 0.13 245);
+  --c-caution: oklch(0.50 0.155 25);
+  --c-aux: oklch(0.55 0.01 260);
+  --c-axis: #474b54;
+  --ink: #1b1c1f;
+  --ink-soft: #565a63;
+  --ink-faint: #8a8e98;
+  --paper: #ffffff;
+  --rule: #e5e7eb;
+  --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
+  --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
+  /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
+  --ui: "Inter", -apple-system, system-ui, sans-serif;
+  --a-concept:  oklch(0.50 0.13 55);
+  --a-result:   oklch(0.50 0.13 245);
+  --a-practice: oklch(0.50 0.13 152);
+  --a-aside:    oklch(0.50 0.02 260);
+  --a-caution:  oklch(0.50 0.155 25);
+  --a-strategy: oklch(0.50 0.13 290);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-base, 17.5px);
+  line-height: var(--lh-base, 1.62);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+.paper *, .paper *::before, .paper *::after { box-sizing: border-box; }
+.paper .page { padding: 52px 58px 64px; max-width: 760px; margin: 0 auto; }
+.skin-hs .page { hyphens: auto; -webkit-hyphens: auto; }
+.skin-hs p, .skin-hs li { text-align: justify; text-justify: inter-word; }
+.paper p { margin: 0 0 .85em; text-wrap: pretty; }
+.paper em { font-style: italic; }
+.paper .informal { font-style: italic; color: var(--ink-soft); }
+.paper ol { margin: .2em 0 .9em; padding-left: 1.5em; }
+.paper li { margin: .35em 0; text-wrap: pretty; }
+.paper .warmup { counter-reset: wu; list-style: none; padding-left: 0; }
+.paper .warmup > li { counter-increment: wu; position: relative; padding-left: 2.1em; }
+.paper .warmup > li::before {
+  content: "(" counter(wu, lower-alpha) ")";
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
+}
+.paper mjx-container[display="true"] { margin: .55em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
+.paper .qed { display: block; text-align: right; margin: -1.62em 0 0; height: 1.62em; pointer-events: none; }
+.paper .qed::after {
+  content: ""; display: inline-block; width: .56em; height: .56em;
+  border: 1.3px solid var(--ink-soft);
+}
+.paper .env-body > :has(+ .qed) { margin-bottom: 0; display: flow-root; }
+.paper .env-body::after { content: ""; display: block; clear: both; }
+.paper .sec-head {
+  margin-top: 2.7em; padding-top: 1.35em;
+  border-top: 1px solid var(--rule); margin-bottom: 1.5em;
+}
+.sheet-body > .sec-head:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.paper .sec-kicker {
+  font-family: var(--ui); font-size: .7rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--c-primary); font-weight: 700; margin-bottom: .55em;
+}
+.paper .sec-title { font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -.012em; margin: 0; }
+.paper .sec-no { color: var(--c-primary); margin-right: .5em; font-weight: 600; }
+.paper .subsec-head {
+  font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
+  display: flex; align-items: center; gap: .55em; color: var(--ink);
+}
+.paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
+.paper .figure { margin: 1.7em 0; text-align: center; }
+.paper .figure-art { display: flex; justify-content: center; }
+.paper .figure-art--pair { gap: 26px; }
+.paper .fig-svg { width: 100%; max-width: var(--fig-w, var(--fig-w-pair)); height: auto; }
+.paper .figure-art:not(.figure-art--pair) .fig-svg { max-width: var(--fig-w, var(--fig-w-single)); }
+.paper figcaption {
+  font-family: var(--ui); font-size: .8em; line-height: 1.5;
+  color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
+}
+.paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
+.paper figcaption mjx-container { font-size: .95em; }
+.paper .axis { stroke: var(--c-axis); stroke-width: 1.25; fill: none; stroke-linecap: round; }
+.paper .curve { stroke: var(--c-primary); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .secant { stroke: var(--c-aux); stroke-width: 1.6; stroke-dasharray: 5 3.5; fill: none; stroke-linecap: round; }
+.paper .tangent { stroke: var(--c-caution); stroke-width: 2; fill: none; stroke-linecap: round; }
+.paper .curve-log { stroke: var(--c-caution); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .idline { stroke: var(--c-aux); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .dot { fill: var(--ink); }
+.paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
+.paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
+.paper .arrow-bwd { stroke: var(--c-caution); stroke-width: 2; fill: none; }
+.paper .fig-svg text { font-family: var(--ui); font-size: 13px; }
+.paper .axlab { fill: var(--c-aux); font-style: italic; }
+.paper .lab-curve { fill: var(--c-primary); font-style: italic; }
+.paper .lab-ref, .paper .lab-ref-b { fill: var(--c-caution); }
+.paper .ptlab { fill: var(--ink-soft); font-size: 12px; }
+.paper .setlab { fill: var(--ink); font-weight: 600; font-size: 14.5px; text-anchor: middle; }
+
+/* env blocks */
+.skin-hs .env {
+  --accent: var(--a-aside);
+  margin: 1.2em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--accent) 38%, var(--paper));
+}
+.skin-hs .env-definition  { --accent: var(--a-concept); }
+.skin-hs .env-theorem, .skin-hs .env-proposition, .skin-hs .env-corollary { --accent: var(--a-result); }
+.skin-hs .env-example, .skin-hs .env-solution, .skin-hs .env-exercise { --accent: var(--a-practice); }
+.skin-hs .env-remark { --accent: var(--a-aside); }
+.skin-hs .env-head {
+  display: flex; align-items: baseline; gap: .5em; flex-wrap: wrap;
+  margin: 0 0 .55em; font-family: var(--ui);
+}
+.skin-hs .env-kicker {
+  font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--accent); padding: 3px 10px; border-radius: 999px; line-height: 1.5;
+}
+.skin-hs .env-num { font-weight: 700; color: var(--accent); font-size: .94em; }
+.skin-hs .env-name { font-style: italic; font-weight: 400; color: var(--ink-soft); font-family: var(--serif); font-size: 1em; }
+.skin-hs .env-body > p:first-child { margin-top: 0; }
+.skin-hs .env-body > :last-child { margin-bottom: 0; }
+.skin-hs .env-theorem .env-body, .skin-hs .env-proposition .env-body { font-style: italic; }
+.skin-hs .env-theorem .env-body mjx-container, .skin-hs .env-proposition .env-body mjx-container { font-style: normal; }
+.skin-hs .env-definition em { font-style: italic; }
+.skin-hs .env-remark { color: var(--ink-soft); font-size: .97em; }
+.skin-hs .env-remark .env-kicker { background: transparent; color: var(--a-aside); border: 1px solid color-mix(in srgb, var(--a-aside) 45%, var(--paper)); }
+.skin-hs .env-proof { --accent: var(--a-result); }
+.skin-hs .env-proof .env-kicker {
+  background: transparent; color: var(--a-result); font-style: italic; letter-spacing: .04em;
+  border: 1px solid color-mix(in srgb, var(--a-result) 45%, var(--paper));
+}
+.skin-hs .qed-proof::after { border-color: var(--ink); }
+.skin-hs .workedexample {
+  margin: 1.6em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--a-practice) 38%, var(--paper));
+  display: flow-root;
+}
+.skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
+.skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
+.skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
+.skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
+.skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
+.skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
+.skin-hs .env-exercise .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid var(--a-practice); }
+.skin-hs .env-caution, .skin-hs .env-strategy {
+  padding: 15px 20px; border-radius: 8px; margin: 1.4em 0;
+  border-left-width: 4px; border-left-style: solid;
+}
+.skin-hs .env-caution {
+  --accent: var(--a-caution);
+  background: color-mix(in srgb, var(--a-caution) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-caution) 22%, var(--paper));
+  border-left-color: var(--a-caution);
+}
+.skin-hs .env-strategy {
+  --accent: var(--a-strategy);
+  background: color-mix(in srgb, var(--a-strategy) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-strategy) 22%, var(--paper));
+  border-left-color: var(--a-strategy);
+}
+.skin-hs .env-caution .env-name, .skin-hs .env-strategy .env-name { color: var(--ink-soft); }
+.skin-hs .env-strategy .steps { margin-bottom: 0; }
+.skin-hs.vivid .env { border-left-color: color-mix(in srgb, var(--accent) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .workedexample { border-left-color: color-mix(in srgb, var(--a-practice) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .env-kicker { font-size: .64rem; padding: 3.5px 11px; }
+
+/* ============================================================
+   figs.css — inlined + modified for MathJax
+   ============================================================ */
+.paper .fig-svg { height: auto; max-width: 100%; overflow: visible; }
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note mjx-container { font-size: .98em; }
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr { position: relative; width: 100%; height: 100%; font-family: var(--serif); }
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl mjx-container { font-size: 1em; }
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl mjx-container { font-size: .98em; }
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+
+/* ============================================================
+   print.css — inlined (A4 sheet layout + paginator)
+   ============================================================ */
+@page { size: A4; margin: 0; }
+.sheet {
+  position: relative; box-sizing: border-box;
+  width: 210mm; height: 297mm;
+  padding: 20mm 28mm 20mm 32mm;
+  background: #fff; overflow: hidden;
+}
+.sheet-header {
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
+  font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
+}
+.sheet-footer {
+  position: absolute; bottom: 8.5mm; left: 0; right: 0;
+  text-align: center; font: 500 9pt "Inter", sans-serif; color: #82868f;
+}
+.sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
+.sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
+.sheet-body .page { padding: 0; max-width: none; margin: 0; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
+.sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet-body > :first-child { margin-top: 0 !important; }
+.sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
+.sheet-body .qed { margin-top: -1.55em; height: 1.55em; }
+.sheet-body .env-body::after { display: none; content: none; }
+.sheet-body .env-cont { margin-top: 0; }
+.sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+@media screen {
+  body { background: #6f727b; margin: 0; }
+  .sheet { box-shadow: 0 3px 18px rgba(0,0,0,.3); margin: 9mm auto; }
+}
+@media print {
+  body { background: #fff; margin: 0; }
+  .sheet { box-shadow: none; margin: 0; break-after: page; }
+  .sheet:last-child { break-after: auto; }
+  .print-toolbar, #boot { display: none !important; }
+}
+
+/* ============================================================
+   page-level
+   ============================================================ */
+.print-toolbar {
+  position: fixed; top: 14px; right: 16px; z-index: 1000;
+  display: flex; align-items: center; gap: 10px; font-family: "Inter", system-ui, sans-serif;
+}
+.print-toolbar button {
+  font: 600 13px "Inter", sans-serif; color: #fff; background: oklch(0.50 0.13 245);
+  border: 0; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.print-toolbar button:disabled { opacity: .5; cursor: default; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
+.print-toolbar .status {
+  font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
+  padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
+}
+#boot {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
+}
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
+</style>
+<style>:root {
+  --mjx-fg-red: 255, 0, 0;
+  --mjx-fg-green: 0, 255, 0;
+  --mjx-fg-blue: 0, 0, 255;
+  --mjx-fg-yellow: 255, 255, 0;
+  --mjx-fg-cyan: 0, 255, 255;
+  --mjx-fg-magenta: 255, 0, 255;
+  --mjx-fg-white: 255, 255, 255;
+  --mjx-fg-black: 0, 0, 0;
+  --mjx-bg-red: 255, 0, 0;
+  --mjx-bg-green: 0, 255, 0;
+  --mjx-bg-blue: 0, 0, 255;
+  --mjx-bg-yellow: 255, 255, 0;
+  --mjx-bg-cyan: 0, 255, 255;
+  --mjx-bg-magenta: 255, 0, 255;
+  --mjx-bg-white: 255, 255, 255;
+  --mjx-bg-black: 0, 0, 0;
+  --mjx-live-bg-color: white;
+  --mjx-live-shadow-color: #888;
+  --mjx-live-border-color: #CCCCCC;
+  --mjx-bg1-color: rgba(var(--mjx-bg-blue), var(--mjx-bg1-alpha));
+  --mjx-fg1-color: rgba(var(--mjx-fg-black), 1);
+  --mjx-bg2-color: rgba(var(--mjx-bg-red), 1);
+  --mjx-fg2-color: rgba(var(--mjx-fg-black), 1);
+  --mjx-bg1-alpha: 0.2;
+  --mjx-fg1-alpha: 1;
+  --mjx-bg2-alpha: 1;
+  --mjx-fg2-alpha: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mjx-bg-blue: 132, 132, 255;
+      --mjx-bg-white: 0, 0, 0;
+      --mjx-bg-black: 255, 255, 255;
+      --mjx-fg-white: 0, 0, 0;
+      --mjx-fg-black: 255, 255, 255;
+      --mjx-live-bg-color: #222025;
+      --mjx-live-shadow-color: black;
+      --mjx-live-border-color: #7C7C7C;
+      --mjx-bg1-alpha: 0.3;
+      --mjx-fg1-alpha: 1;
+      --mjx-bg2-alpha: 1;
+      --mjx-fg2-alpha: 1;
+  }
+}
+
+.MJX_LiveRegion {
+  position: absolute;
+  top: 0;
+  display: none;
+  width: auto;
+  height: auto;
+  padding: 0;
+  opacity: 1;
+  z-index: 202;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: var(--mjx-live-bg-color);
+  box-shadow: 0px 5px 20px var(--mjx-live-shadow-color);
+  border: 2px solid var(--mjx-live-border-color);
+}
+
+.MJX_LiveRegion_Show {
+  display: block;
+}
+
+.MJX_LiveRegion > div {
+  color: var(--mjx-fg1-color);
+  background-color: var(--mjx-bg1-color);
+}
+
+mjx-container [data-sre-highlight-1]:not([data-mjx-collapsed], rect) {
+  color: var(--mjx-fg1-color) ! important;
+  fill: var(--mjx-fg1-color) ! important;
+}
+
+mjx-container:not([data-mjx-clone-container]) [data-sre-highlight-1]:not([data-sre-enclosed], rect) {
+  background-color: var(--mjx-bg1-color) ! important;
+}
+
+mjx-container rect[data-sre-highlight-1]:not([data-sre-enclosed]) {
+  fill: var(--mjx-bg1-color) ! important;
+}
+
+mjx-container [data-sre-highlight-2] {
+  color: var(--mjx-fg2-color) ! important;
+  background-color: var(--mjx-bg2-color) ! important;
+  fill: var(--mjx-fg2-color) ! important;
+}
+
+mjx-container rect[data-sre-highlight-2] {
+  fill: var(--mjx-bg2-color) ! important;
+}</style>
+<style>.MJX_HoverRegion {
+  display: block;
+  position: absolute;
+  width: max-content;
+  height: auto;
+  padding: 0;
+  opacity: 1;
+  z-index: 202;
+  margin: 0 auto;
+  background-color: white;
+  line-height: 0;
+  box-shadow: 0px 10px 20px #888;
+  border: 2px solid #CCCCCC;
+}
+
+.MJX_HoverRegion > div {
+  overflow: hidden;
+  color: var(--mjx-fg1-color);
+  background-color: var(--mjx-bg1-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .MJX_HoverRegion {
+    background-color: #222025;
+      box-shadow: 0px 5px 20px #000;
+      border: 1px solid #7C7C7C;
+  }
+}
+
+mjx-container[data-mjx-clone-container] {
+  padding: 2px ! important;
+}
+
+mjx-math > mjx-mlabeledtr {
+  display: inline-block;
+  margin-right: .5em ! important;
+}
+
+mjx-math > mjx-mtd {
+  float: right;
+}</style>
+<style>.MJX_ToolTip {
+  width: auto;
+  height: auto;
+  opacity: 1;
+  text-align: center;
+  border-radius: 4px;
+  padding: 0;
+  border-bottom: 1px dotted black;
+  position: absolute;
+  display: inline-block;
+  background-color: white;
+  z-index: 202;
+}
+
+.MJX_ToolTip > div {
+  border-radius: inherit;
+  padding: 0 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .MJX_ToolTip {
+    background-color: #222025;
+      box-shadow: 0px 5px 20px #000;
+      border: 1px solid #7C7C7C;
+  }
+}</style>
+<style>.CtxtMenu_Menu {
+  position: absolute;
+  background-color: white;
+  color: black;
+  width: auto;
+  padding: 5px 0px;
+  border: 1px solid #CCCCCC;
+  margin: 0;
+  cursor: default;
+  font: menu;
+  text-align: left;
+  text-indent: 0;
+  text-transform: none;
+  line-height: normal;
+  letter-spacing: normal;
+  word-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  float: none;
+  z-index: 1001;
+  border-radius: 5px;
+  box-shadow: 0px 10px 20px #808080;
+}
+.CtxtMenu_MenuItem {
+  padding: 1px 2em;
+  background: transparent;
+}
+.CtxtMenu_MenuArrow {
+  position: absolute;
+  right: 0.5em;
+  padding-top: 0.25em;
+  color: #666666;
+  font-family: null;
+  font-size: 0.75em;
+}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {
+  color: white;
+}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {
+  left: 0.5em;
+  right: auto;
+}
+.CtxtMenu_MenuCheck {
+  position: absolute;
+  left: 0.7em;
+  font-family: null;
+}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL {
+  right: 0.7em;
+  left: auto;
+}
+.CtxtMenu_MenuRadioCheck {
+  position: absolute;
+  left: 0.7em;
+}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {
+  right: 0.7em;
+  left: auto;
+}
+.CtxtMenu_MenuInputBox {
+  padding-left: 1em;
+  right: 0.5em;
+  color: #666666;
+  font-family: null;
+}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {
+  left: 0.1em;
+}
+.CtxtMenu_MenuComboBox {
+  left: 0.1em;
+  padding-bottom: 0.5em;
+}
+.CtxtMenu_MenuSlider {
+  left: 0.1em;
+}
+.CtxtMenu_SliderValue {
+  position: absolute;
+  right: 0.1em;
+  padding-top: 0.25em;
+  color: #333333;
+  font-size: 0.75em;
+}
+.CtxtMenu_MenuActive .CtxtMenu_SliderValue {
+  color: #DDDDDD;
+}
+.CtxtMenu_SliderBar {
+  outline: none;
+  background: #D3D3D3;
+}
+.CtxtMenu_MenuLabel {
+  padding: 1px 2em 3px 1.33em;
+  font-style: italic;
+}
+.CtxtMenu_MenuRule {
+  border-top: 1px solid #DDDDDD;
+  margin: 4px 3px;
+}
+.CtxtMenu_MenuDisabled {
+  color: #999;
+}
+.CtxtMenu_MenuActive {
+  background-color: #606872;
+  color: white;
+}
+.CtxtMenu_MenuDisabled:focus {
+  background-color: #E8E8E8;
+}
+.CtxtMenu_MenuLabel:focus {
+  background-color: #E8E8E8;
+}
+.CtxtMenu_ContextMenu:focus {
+  outline: none;
+}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {
+  outline: none;
+}
+.CtxtMenu_SelectionMenu {
+  position: relative;
+  float: left;
+  border-bottom: none;
+  box-shadow: none ! important;
+  border-radius: 0px !important;
+}
+.CtxtMenu_SelectionItem {
+  padding-right: 1em;
+}
+.CtxtMenu_Selection {
+  right: 40%;
+  width: 50%;
+}
+.CtxtMenu_SelectionBox {
+  padding: 0em;
+  max-height: 20em;
+  max-width: none;
+  background-color: #FFFFFF;
+}
+.CtxtMenu_SelectionDivider {
+  clear: both;
+  border-top: 2px solid #000000;
+}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {
+  top: -10px;
+  left: -10px;
+}
+@media (prefers-color-scheme: dark) /* menu */ {
+  .CtxtMenu_Menu {
+  color: #E0E0E0;
+  background-color: #242436;
+  box-shadow: 0px 10px 20px #000;
+  border: 1px solid #808080;
+}
+  .CtxtMenu_SliderValue {
+  color: #D0D0D0;
+}
+  .CtxtMenu_MenuDisabled:focus {
+  background-color: #383838;
+}
+  .CtxtMenu_MenuLabel:focus {
+  background-color: #585858;
+}
+  .CtxtMenu_MenuRule {
+  border-top: 1px solid #808080;
+}
+  .CtxtMenu_SelectionDivider {
+  border-top: 2px solid #808080;
+};
+}
+.CtxtMenu_MenuClose {
+  position: absolute;
+  cursor: pointer;
+  display: inline-block;
+  border: 2px solid #AAA;
+  border-radius: 18px;
+  font-family:  "Courier New", Courier;
+  font-size: 24px;
+  color: #F0F0F0;
+}
+.CtxtMenu_MenuClose span {
+  display: block;
+  background-color: #AAA;
+  border: 1.5px solid;
+  border-radius: 18px;
+  line-height: 0;
+  padding: 8px 0 6px;
+}
+.CtxtMenu_MenuClose:hover {
+  color: white !important;
+  border: 2px solid #CCC !important;
+}
+.CtxtMenu_MenuClose:hover span {
+  background-color: #CCC !important;
+}
+.CtxtMenu_MenuClose:hover:focus {
+  outline: none;
+}</style>
+<style>
+mjx-container[overflow="scroll"][display] {
+  overflow: auto clip;
+  min-width: initial !important;
+}
+
+mjx-container[overflow="truncate"][display] {
+  overflow: hidden clip;
+  min-width: initial !important;
+}
+
+mjx-container[display] {
+  display: block;
+  text-align: center;
+  justify-content: center;
+  margin: .7em 0;
+  padding: .3em 2px;
+}
+
+mjx-container[display][width="full"] {
+  display: flex;
+}
+
+mjx-container[justify="left"] {
+  text-align: left;
+  justify-content: left;
+}
+
+mjx-container[justify="right"] {
+  text-align: right;
+  justify-content: right;
+}
+
+mjx-container[jax="CHTML"] {
+  white-space: nowrap;
+}
+
+mjx-mo > mjx-c, mjx-mi > mjx-c, mjx-mn > mjx-c, mjx-ms > mjx-c, mjx-mtext > mjx-c {
+  clip-path: padding-box polygon(-1em -2px, calc(100% + 1em) -2px, calc(100% + 1em) calc(100% + 2px), -1em calc(100% + 2px));
+}
+
+mjx-stretchy-h {
+  clip-path: padding-box polygon(0 -2px, 100% -2px, 100% calc(100% + 2px), 0 calc(100% + 2px));
+  display: inline-block;
+}
+
+mjx-stretchy-v {
+  clip-path: padding-box polygon(-2px 0, calc(100% + 2px) 0, calc(100% + 2px) 100%, -2px 100%);
+  display: inline-block;
+  text-align: center;
+}
+
+mjx-container [space="1"] {
+  margin-left: .111em;
+}
+
+mjx-container [space="2"] {
+  margin-left: .167em;
+}
+
+mjx-container [space="3"] {
+  margin-left: .222em;
+}
+
+mjx-container [space="4"] {
+  margin-left: .278em;
+}
+
+mjx-container [space="5"] {
+  margin-left: .333em;
+}
+
+mjx-container [rspace="1"] {
+  margin-right: .111em;
+}
+
+mjx-container [rspace="2"] {
+  margin-right: .167em;
+}
+
+mjx-container [rspace="3"] {
+  margin-right: .222em;
+}
+
+mjx-container [rspace="4"] {
+  margin-right: .278em;
+}
+
+mjx-container [rspace="5"] {
+  margin-right: .333em;
+}
+
+mjx-container [size="s"] {
+  font-size: 70.7%;
+}
+
+mjx-container [size="ss"] {
+  font-size: 50%;
+}
+
+mjx-container [size="Tn"] {
+  font-size: 60%;
+}
+
+mjx-container [size="sm"] {
+  font-size: 85%;
+}
+
+mjx-container [size="lg"] {
+  font-size: 120%;
+}
+
+mjx-container [size="Lg"] {
+  font-size: 144%;
+}
+
+mjx-container [size="LG"] {
+  font-size: 173%;
+}
+
+mjx-container [size="hg"] {
+  font-size: 207%;
+}
+
+mjx-container [size="HG"] {
+  font-size: 249%;
+}
+
+mjx-container [width="full"] {
+  width: 100%;
+}
+
+mjx-box {
+  display: inline-block;
+}
+
+mjx-block {
+  display: block;
+}
+
+mjx-itable {
+  display: inline-table;
+}
+
+mjx-row {
+  display: table-row;
+}
+
+mjx-row > mjx-cell, mjx-row > mjx-base, mjx-row > mjx-under, mjx-row > mjx-over, mjx-row > mjx-den {
+  display: table-cell;
+}
+
+mjx-container [inline-breaks] {
+  display: inline;
+}
+
+mjx-container .mjx-selected {
+  outline: 2px solid black;
+}
+
+@media (prefers-color-scheme: dark) {
+  mjx-container .mjx-selected {
+    outline: 2px solid #C8C8C8;
+  }
+}
+
+mjx-mtext {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mstyle {
+  display: inline-block;
+}
+
+mjx-merror {
+  display: inline-block;
+  color: red;
+  background-color: yellow;
+}
+
+mjx-mphantom {
+  visibility: hidden;
+}
+
+mjx-container[has-speech="true"] {
+  position: relative;
+  cursor: default;
+}
+
+mjx-speech {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+}
+
+mjx-speech:focus {
+  outline: none;
+}
+
+mjx-container a[data-mjx-href] {
+  color: LinkText;
+  cursor: pointer;
+}
+
+mjx-container a[data-mjx-href].mjx-visited {
+  color: VisitedText;
+}
+
+mjx-container > mjx-help {
+  display: none;
+  position: absolute;
+  top: -.3em;
+  right: -.5em;
+  width: .6em;
+  height: .6em;
+  cursor: pointer;
+}
+
+mjx-container[display="true"] > mjx-help {
+  position: sticky;
+  inset: -100% 0 100% 0;
+  margin: -.3em -.5em 0 -.1em;
+  right: 0;
+  top: initial;
+}
+
+mjx-help > svg {
+  stroke: black;
+  width: 100%;
+  height: 100%;
+}
+
+mjx-help > svg > circle {
+  stroke-width: 1.5px;
+  cx: 9px;
+  cy: 9px;
+  r: 9px;
+  fill: white;
+}
+
+mjx-help > svg > circle:nth-child(2) {
+  fill: var(--mjx-bg1-color);
+  r: 7px;
+}
+
+mjx-help > svg > line {
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+}
+
+mjx-help:hover > svg > circle:nth-child(2) {
+  fill: white;
+}
+
+mjx-container.mjx-explorer-active > mjx-help {
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (prefers-color-scheme: dark) /* explorer */ {
+  mjx-help > svg {
+    stroke: #E0E0E0;
+  }
+  mjx-help > svg > circle {
+    fill: #404040;
+  }
+  mjx-help > svg > circle:nth-child(2) {
+    fill: rgba(132, 132, 255, .3);
+  }
+  mjx-help:hover > svg > circle:nth-child(2) {
+    stroke: #AAAAAA;
+      fill: #404040;
+  }
+}
+
+mjx-math {
+  display: inline-block;
+  text-align: left;
+  line-height: 0;
+  text-indent: 0;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 100%;
+  font-size-adjust: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  word-spacing: normal;
+  direction: ltr;
+  padding: 1px 0;
+}
+
+mjx-container[jax="CHTML"][display="true"] mjx-math {
+  padding: 0;
+}
+
+mjx-math[breakable] {
+  display: inline;
+}
+
+mjx-container[jax="CHTML"] mjx-break {
+  white-space: normal;
+  line-height: 0;
+  clip-path: rect(0 0 0 0);
+  font-family: MJX-BRK !important;
+}
+
+mjx-break[size="0"] {
+  letter-spacing: -0.999em;
+}
+
+mjx-break[size="1"] {
+  letter-spacing: -0.889em;
+}
+
+mjx-break[size="2"] {
+  letter-spacing: -0.833em;
+}
+
+mjx-break[size="3"] {
+  letter-spacing: -0.778em;
+}
+
+mjx-break[size="4"] {
+  letter-spacing: -0.722em;
+}
+
+mjx-break[size="5"] {
+  letter-spacing: -0.667em;
+}
+
+mjx-msup {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-msubsup {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-script {
+  display: inline-block;
+  padding-right: .05em;
+  padding-left: .033em;
+}
+
+mjx-script > mjx-spacer {
+  display: block;
+}
+
+mjx-mi {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-c {
+  display: inline-block;
+  width: 0;
+  text-align: right;
+}
+
+mjx-utext {
+  display: inline-block;
+  padding: .75em 0 .2em 0;
+}
+
+mjx-TeXAtom {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mrow {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-linestack, mjx-mrow[break-top] {
+  display: inline-table;
+  width: 100%;
+}
+
+mjx-linestack[break-align="bottom"], mjx-mrow[break-top][break-align="bottom"] {
+  display: inline-block;
+}
+
+mjx-linestack[break-align="middle"], mjx-mrow[break-top][break-align="middle"] {
+  vertical-align: middle;
+}
+
+mjx-linestack[break-align="center"], mjx-mrow[break-top][break-align="center"] {
+  vertical-align: middle;
+}
+
+mjx-linestack[breakable] {
+  display: inline;
+}
+
+mjx-linestack[breakable] > mjx-linebox {
+  display: inline;
+}
+
+mjx-linestack[breakable] > mjx-linebox::before {
+  white-space: pre;
+  content: "\A";
+}
+
+mjx-linestack[breakable] > mjx-linebox::after {
+  white-space: normal;
+  content: " ";
+  letter-spacing: -.999em;
+  font-family: MJX-BRK;
+}
+
+mjx-linestack[breakable] > mjx-linebox:first-of-type::before {
+  display: none;
+}
+
+mjx-linestack[breakable] > mjx-linebox:last-of-type::after {
+  display: none;
+}
+
+mjx-linebox {
+  display: block;
+}
+
+mjx-linebox[align="left"] {
+  text-align: left;
+}
+
+mjx-linebox[align="center"] {
+  text-align: center;
+}
+
+mjx-linebox[align="right"] {
+  text-align: right;
+}
+
+mjx-linestrut {
+  display: inline-block;
+  height: 1em;
+  vertical-align: -.25em;
+}
+
+mjx-mo {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-stretchy-h > mjx-beg, mjx-stretchy-h > mjx-ext, mjx-stretchy-h > mjx-end, mjx-stretchy-h > mjx-mid {
+  display: inline-block;
+  width: 0;
+  text-align: right;
+}
+
+mjx-stretchy-h > mjx-ext {
+  clip-path: padding-box polygon(0 -1em, 100% -1em, 100% calc(100% + 1em), 0 calc(100% + 1em));
+  width: 100%;
+  border: 0px solid transparent;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+mjx-stretchy-v > mjx-beg, mjx-stretchy-v > mjx-ext, mjx-stretchy-v > mjx-end, mjx-stretchy-v > mjx-mid {
+  display: block;
+  height: 0;
+  margin: 0 auto;
+}
+
+mjx-stretchy-v > mjx-ext > mjx-spacer {
+  display: block;
+}
+
+mjx-stretchy-v > mjx-ext {
+  clip-path: padding-box polygon(-1em 0, calc(100% + 1em) 0, calc(100% + 1em) 100%, -1em 100%);
+  height: 100%;
+  border: 0.1px solid transparent;
+  box-sizing: border-box;
+  white-space: pre;
+}
+
+mjx-mark {
+  display: inline-block;
+  height: 0;
+}
+
+mjx-mfrac {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-frac {
+  display: inline-block;
+  vertical-align: 0.17em;
+  padding: 0 .22em;
+}
+
+mjx-frac[type="d"] {
+  vertical-align: .04em;
+}
+
+mjx-frac[delims] {
+  padding: 0 .1em;
+}
+
+mjx-frac[atop] {
+  padding: 0 .12em;
+}
+
+mjx-frac[atop][delims] {
+  padding: 0;
+}
+
+mjx-dtable {
+  display: inline-table;
+  width: 100%;
+}
+
+mjx-dtable > mjx-line, mjx-dtable > mjx-row {
+  font-size: 2000%;
+}
+
+mjx-dbox {
+  display: block;
+  font-size: 5%;
+}
+
+mjx-num {
+  display: block;
+  text-align: center;
+}
+
+mjx-den {
+  display: block;
+  text-align: center;
+}
+
+mjx-mfrac[bevelled] > mjx-num {
+  display: inline-block;
+}
+
+mjx-mfrac[bevelled] > mjx-den {
+  display: inline-block;
+}
+
+mjx-den[align="right"], mjx-num[align="right"] {
+  text-align: right;
+}
+
+mjx-den[align="left"], mjx-num[align="left"] {
+  text-align: left;
+}
+
+mjx-nstrut {
+  display: inline-block;
+  height: .054em;
+  width: 0;
+  vertical-align: -.054em;
+}
+
+mjx-nstrut[type="d"] {
+  height: .217em;
+  vertical-align: -.217em;
+}
+
+mjx-dstrut {
+  display: inline-block;
+  height: .505em;
+  width: 0;
+}
+
+mjx-dstrut[type="d"] {
+  height: .726em;
+}
+
+mjx-line {
+  display: block;
+  box-sizing: border-box;
+  min-height: 1px;
+  height: .06em;
+  border-top: .075em solid;
+  margin: .06em -.1em;
+  overflow: hidden;
+}
+
+mjx-line[type="d"] {
+  margin: .18em -.1em;
+}
+
+mjx-mn {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-msub {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-munderover {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-munderover:not([limits="false"]) {
+  padding-top: .1em;
+}
+
+mjx-munderover:not([limits="false"]) > mjx-over, mjx-munderover:not([limits="false"]) > mjx-box {
+  display: block;
+}
+
+mjx-munder {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-over {
+  text-align: left;
+}
+
+mjx-munder:not([limits="false"]) {
+  display: inline-table;
+}
+
+mjx-munder > mjx-row {
+  text-align: left;
+}
+
+mjx-under {
+  padding-bottom: .1em;
+}
+
+mjx-mspace {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mtable {
+  display: inline-block;
+  text-align: center;
+  vertical-align: .25em;
+  position: relative;
+  box-sizing: border-box;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+mjx-mstyle[size="s"] mjx-mtable {
+  vertical-align: .354em;
+}
+
+mjx-labels {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+mjx-table {
+  display: inline-block;
+  vertical-align: -.5ex;
+  box-sizing: border-box;
+}
+
+mjx-table > mjx-itable {
+  vertical-align: middle;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+mjx-labels > mjx-itable {
+  position: absolute;
+  top: 0;
+}
+
+mjx-mtable[justify="left"] {
+  text-align: left;
+}
+
+mjx-mtable[justify="right"] {
+  text-align: right;
+}
+
+mjx-mtable[justify="left"][side="left"] {
+  padding-right: 0 ! important;
+}
+
+mjx-mtable[justify="left"][side="right"] {
+  padding-left: 0 ! important;
+}
+
+mjx-mtable[justify="right"][side="left"] {
+  padding-right: 0 ! important;
+}
+
+mjx-mtable[justify="right"][side="right"] {
+  padding-left: 0 ! important;
+}
+
+mjx-mtable[align] {
+  vertical-align: baseline;
+}
+
+mjx-mtable[align="top"] > mjx-table {
+  vertical-align: top;
+}
+
+mjx-mtable[align="bottom"] > mjx-table {
+  vertical-align: bottom;
+}
+
+mjx-mtable[side="right"] mjx-labels {
+  min-width: 100%;
+}
+
+mjx-mlabeledtr {
+  display: table-row;
+  text-align: left;
+}
+
+mjx-mlabeledtr[rowalign="top"] > mjx-mtd {
+  vertical-align: top;
+}
+
+mjx-mlabeledtr[rowalign="center"] > mjx-mtd {
+  vertical-align: middle;
+}
+
+mjx-mlabeledtr[rowalign="bottom"] > mjx-mtd {
+  vertical-align: bottom;
+}
+
+mjx-mlabeledtr[rowalign="baseline"] > mjx-mtd {
+  vertical-align: baseline;
+}
+
+mjx-mlabeledtr[rowalign="axis"] > mjx-mtd {
+  vertical-align: .25em;
+}
+
+mjx-mtr {
+  display: table-row;
+  text-align: left;
+}
+
+mjx-mtr[rowalign="top"] > mjx-mtd {
+  vertical-align: top;
+}
+
+mjx-mtr[rowalign="center"] > mjx-mtd {
+  vertical-align: middle;
+}
+
+mjx-mtr[rowalign="bottom"] > mjx-mtd {
+  vertical-align: bottom;
+}
+
+mjx-mtr[rowalign="baseline"] > mjx-mtd {
+  vertical-align: baseline;
+}
+
+mjx-mtr[rowalign="axis"] > mjx-mtd {
+  vertical-align: .25em;
+}
+
+mjx-mtd {
+  display: table-cell;
+  text-align: center;
+  padding: .215em .4em;
+}
+
+mjx-mtd:first-child {
+  padding-left: 0;
+}
+
+mjx-mtd:last-child {
+  padding-right: 0;
+}
+
+mjx-mtable > * > mjx-itable > *:first-child > mjx-mtd {
+  padding-top: 0;
+}
+
+mjx-mtable > * > mjx-itable > *:last-child > mjx-mtd {
+  padding-bottom: 0;
+}
+
+mjx-tstrut {
+  display: inline-block;
+  height: 1em;
+  vertical-align: -.25em;
+}
+
+mjx-labels[align="left"] > mjx-mtr > mjx-mtd {
+  text-align: left;
+}
+
+mjx-labels[align="right"] > mjx-mtr > mjx-mtd {
+  text-align: right;
+}
+
+mjx-mtd[extra] {
+  padding: 0;
+}
+
+mjx-mtd[rowalign="top"] {
+  vertical-align: top;
+}
+
+mjx-mtd[rowalign="center"] {
+  vertical-align: middle;
+}
+
+mjx-mtd[rowalign="bottom"] {
+  vertical-align: bottom;
+}
+
+mjx-mtd[rowalign="baseline"] {
+  vertical-align: baseline;
+}
+
+mjx-mtd[rowalign="axis"] {
+  vertical-align: .25em;
+}
+
+mjx-msqrt {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-root {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+mjx-surd {
+  display: inline-block;
+  vertical-align: top;
+}
+
+mjx-sqrt {
+  display: inline-block;
+  padding-top: .075em;
+}
+
+mjx-sqrt > mjx-box {
+  border-top: .075em solid;
+  padding-left: .03em;
+  margin-left: -.03em;
+}
+
+mjx-sqrt.mjx-tall > mjx-box {
+  padding-left: .3em;
+  margin-left: -.3em;
+}
+
+mjx-container[jax="CHTML"] > mjx-math.NCM-N[breakable] > * {
+  font-family: MJX-NCM-ZERO, MJX-NCM-N;
+}
+
+.NCM-N {
+  font-family: MJX-NCM-ZERO, MJX-NCM-N;
+}
+
+.NCM-B {
+  font-family: MJX-NCM-ZERO, MJX-NCM-B;
+}
+
+.NCM-I {
+  font-family: MJX-NCM-ZERO, MJX-NCM-I;
+}
+
+.NCM-BI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-BI;
+}
+
+.NCM-DS {
+  font-family: MJX-NCM-ZERO, MJX-NCM-DS;
+}
+
+.NCM-F {
+  font-family: MJX-NCM-ZERO, MJX-NCM-F;
+}
+
+.NCM-FB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-FB;
+}
+
+.NCM-SS {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SS;
+}
+
+.NCM-SSB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SSB;
+}
+
+.NCM-SSI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SSI;
+}
+
+.NCM-SSBI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SSBI;
+}
+
+.NCM-M {
+  font-family: MJX-NCM-ZERO, MJX-NCM-M;
+}
+
+.NCM-SO {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SO;
+}
+
+.NCM-LO {
+  font-family: MJX-NCM-ZERO, MJX-NCM-LO;
+}
+
+.NCM-S3 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S3;
+}
+
+.NCM-S4 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S4;
+}
+
+.NCM-S5 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S5;
+}
+
+.NCM-S6 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S6;
+}
+
+.NCM-S7 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S7;
+}
+
+.NCM-MI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-MI;
+}
+
+.NCM-C {
+  font-family: MJX-NCM-ZERO, MJX-NCM-C;
+}
+
+.NCM-CB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-CB;
+}
+
+.NCM-OS {
+  font-family: MJX-NCM-ZERO, MJX-NCM-OS;
+}
+
+.NCM-OB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-OB;
+}
+
+.NCM-V {
+  font-family: MJX-NCM-ZERO, MJX-NCM-V;
+}
+
+.NCM-LT {
+  font-family: MJX-NCM-ZERO, MJX-NCM-LT;
+}
+
+.NCM-RB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-RB;
+}
+
+.NCM-EM {
+  font-family: MJX-NCM-ZERO, MJX-NCM-EM;
+}
+
+.NCM-B-a {
+  font-family: MJX-NCM-ZERO, MJX-NCM-B-a;
+}
+
+.NCM-U {
+  font-family: MJX-NCM-ZERO, MJX-NCM-U;
+}
+
+.NCM-U-a {
+  font-family: MJX-NCM-ZERO, MJX-NCM-U-a;
+}
+
+.NCM-S {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S;
+}
+
+.NCM-SB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SB;
+}
+
+@font-face /* MJX-NCM-ZERO */ {
+  font-family: MJX-NCM-ZERO;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-zero.woff2") format("woff2");
+}
+
+@font-face /* MJX-BRK */ {
+  font-family: MJX-BRK;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-brk.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-N */ {
+  font-family: MJX-NCM-N;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-n.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-B */ {
+  font-family: MJX-NCM-B;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-b.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-I */ {
+  font-family: MJX-NCM-I;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-i.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-BI */ {
+  font-family: MJX-NCM-BI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-bi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-DS */ {
+  font-family: MJX-NCM-DS;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ds.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-F */ {
+  font-family: MJX-NCM-F;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-f.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-FB */ {
+  font-family: MJX-NCM-FB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-fb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SS */ {
+  font-family: MJX-NCM-SS;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ss.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SSB */ {
+  font-family: MJX-NCM-SSB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ssb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SSI */ {
+  font-family: MJX-NCM-SSI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ssi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SSBI */ {
+  font-family: MJX-NCM-SSBI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ssbi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-M */ {
+  font-family: MJX-NCM-M;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-m.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SO */ {
+  font-family: MJX-NCM-SO;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-so.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-LO */ {
+  font-family: MJX-NCM-LO;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-lo.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S3 */ {
+  font-family: MJX-NCM-S3;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s3.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S4 */ {
+  font-family: MJX-NCM-S4;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s4.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S5 */ {
+  font-family: MJX-NCM-S5;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s5.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S6 */ {
+  font-family: MJX-NCM-S6;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s6.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S7 */ {
+  font-family: MJX-NCM-S7;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s7.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-MI */ {
+  font-family: MJX-NCM-MI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-mi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-C */ {
+  font-family: MJX-NCM-C;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-c.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-CB */ {
+  font-family: MJX-NCM-CB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-cb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-OS */ {
+  font-family: MJX-NCM-OS;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-os.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-OB */ {
+  font-family: MJX-NCM-OB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ob.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-V */ {
+  font-family: MJX-NCM-V;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-v.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-LT */ {
+  font-family: MJX-NCM-LT;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-lt.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-RB */ {
+  font-family: MJX-NCM-RB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-rb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-EM */ {
+  font-family: MJX-NCM-EM;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-em.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-B-a */ {
+  font-family: MJX-NCM-B-a;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-b-a.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-U */ {
+  font-family: MJX-NCM-U;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-u.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-U-a */ {
+  font-family: MJX-NCM-U-a;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-u-a.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S */ {
+  font-family: MJX-NCM-S;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SB */ {
+  font-family: MJX-NCM-SB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-sb.woff2") format("woff2");
+}
+
+mjx-stretchy-h.mjx-c23DF > mjx-beg {
+  padding: 0 1.002em 0.377em 0;
+  margin-right: -1.002em;
+}
+
+mjx-stretchy-h.mjx-c23DF > mjx-ext > mjx-spacer {
+  margin-left: -0.497em;
+}
+
+mjx-stretchy-h.mjx-c23DF > mjx-ext {
+  padding: 0 0 0.377em 0;
+}
+
+mjx-stretchy-h.mjx-c23DF > mjx-end {
+  padding: 0 1.001em 0.377em 0;
+  margin-left: -1.001em;
+}
+
+mjx-stretchy-h.mjx-c23DF > mjx-mid {
+  padding: 0 2.003em 0.377em 0;
+  margin: 0 -1.002em;
+}
+
+mjx-stretchy-h.mjx-c23DF > mjx-ext:first-of-type {
+  width: 50%;
+  border-width: 0 0.972em 0 0.972em;
+}
+
+mjx-stretchy-h.mjx-c23DF > mjx-ext:last-of-type {
+  width: 50%;
+  border-width: 0 0.971em 0 0.972em;
+}
+
+mjx-c.mjx-c1D452 {
+  padding: 0.442em 0.466em 0.011em 0;
+}
+
+mjx-c.mjx-c1D465 {
+  padding: 0.442em 0.572em 0.011em 0;
+}
+
+mjx-c.mjx-c28 {
+  padding: 0.748em 0.389em 0.248em 0;
+}
+
+mjx-c.mjx-c29 {
+  padding: 0.748em 0.389em 0.248em 0;
+}
+
+mjx-c.mjx-c2032.NCM-V {
+  padding: 0.549em 0.407em 0 0;
+}
+
+mjx-c.mjx-c3D {
+  padding: 0.367em 0.778em 0 0;
+}
+
+mjx-c.mjx-c6C {
+  padding: 0.694em 0.278em 0 0;
+}
+
+mjx-c.mjx-c6E {
+  padding: 0.442em 0.556em 0 0;
+}
+
+mjx-c.mjx-c2061 {
+  padding: 0 0 0 0;
+}
+
+mjx-c.mjx-c2062 {
+  padding: 0 0 0 0;
+}
+
+mjx-c.mjx-c1D466 {
+  padding: 0.442em 0.49em 0.205em 0;
+}
+
+mjx-c.mjx-c2B {
+  padding: 0.583em 0.778em 0.083em 0;
+}
+
+mjx-c.mjx-c211D.NCM-DS {
+  padding: 0.685em 0.722em 0 0;
+}
+
+mjx-c.mjx-c1D451 {
+  padding: 0.694em 0.52em 0.011em 0;
+}
+
+mjx-c.mjx-c2223.NCM-SO {
+  padding: 0.851em 0.333em 0.351em 0;
+}
+
+mjx-c.mjx-c210E {
+  padding: 0.694em 0.576em 0.011em 0;
+}
+
+mjx-c.mjx-c2212 {
+  padding: 0.583em 0.778em 0.083em 0;
+}
+
+mjx-c.mjx-c31 {
+  padding: 0.666em 0.5em 0 0;
+}
+
+mjx-c.mjx-c2264 {
+  padding: 0.631em 0.778em 0.119em 0;
+}
+
+mjx-c.mjx-c7C {
+  padding: 0.75em 0.278em 0.25em 0;
+}
+
+mjx-c.mjx-c30 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c1D453 {
+  padding: 0.705em 0.552em 0.205em 0;
+}
+
+mjx-c.mjx-c2265 {
+  padding: 0.631em 0.778em 0.119em 0;
+}
+
+mjx-c.mjx-c1D44E {
+  padding: 0.442em 0.529em 0.011em 0;
+}
+
+mjx-c.mjx-c1D45E {
+  padding: 0.442em 0.452em 0.194em 0;
+}
+
+mjx-c.mjx-c3E {
+  padding: 0.547em 0.778em 0.047em 0;
+}
+
+mjx-c.mjx-c1D45B {
+  padding: 0.442em 0.6em 0.011em 0;
+}
+
+mjx-c.mjx-c2F {
+  padding: 0.75em 0.5em 0.25em 0;
+}
+
+mjx-c.mjx-c1D45A {
+  padding: 0.442em 0.878em 0.011em 0;
+}
+
+mjx-c.mjx-c28.NCM-S3 {
+  padding: 0.972em 0.523em 0.472em 0;
+}
+
+mjx-c.mjx-c29.NCM-S3 {
+  padding: 0.972em 0.523em 0.472em 0;
+}
+
+mjx-c.mjx-c2E {
+  padding: 0.106em 0.278em 0 0;
+}
+
+mjx-c.mjx-c32 {
+  padding: 0.666em 0.5em 0 0;
+}
+
+mjx-c.mjx-c1D45F {
+  padding: 0.442em 0.451em 0.011em 0;
+}
+
+mjx-c.mjx-c2192 {
+  padding: 0.51em 1em 0.01em 0;
+}
+
+mjx-c.mjx-c221E {
+  padding: 0.442em 1em 0.011em 0;
+}
+
+mjx-c.mjx-c2211.NCM-LO {
+  padding: 0.95em 1.444em 0.45em 0;
+}
+
+mjx-c.mjx-c21 {
+  padding: 0.716em 0.278em 0 0;
+}
+
+mjx-c.mjx-c33 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c22EF {
+  padding: 0.303em 0.776em 0 0;
+}
+
+mjx-c.mjx-c2C {
+  padding: 0.106em 0.278em 0.193em 0;
+}
+
+mjx-c.mjx-c22C5 {
+  padding: 0.303em 0.278em 0 0;
+}
+
+mjx-c.mjx-c7B {
+  padding: 0.75em 0.5em 0.25em 0;
+}
+
+mjx-c.mjx-c7D {
+  padding: 0.75em 0.5em 0.25em 0;
+}
+
+mjx-c.mjx-c1D440 {
+  padding: 0.683em 1.044em 0 0;
+}
+
+mjx-c.mjx-c2208 {
+  padding: 0.543em 0.667em 0.043em 0;
+}
+
+mjx-c.mjx-c69 {
+  padding: 0.657em 0.278em 0 0;
+}
+
+mjx-c.mjx-c6D {
+  padding: 0.442em 0.833em 0 0;
+}
+
+mjx-c.mjx-c1D43F {
+  padding: 0.684em 0.681em 0 0;
+}
+
+mjx-c.mjx-c211A.NCM-DS {
+  padding: 0.704em 0.777em 0.179em 0;
+}
+
+mjx-c.mjx-c34 {
+  padding: 0.677em 0.5em 0 0;
+}
+
+mjx-c.mjx-c2026 {
+  padding: 0.106em 0.837em 0 0;
+}
+
+mjx-c.mjx-c1D70B {
+  padding: 0.431em 0.57em 0.011em 0;
+}
+
+mjx-c.mjx-c2211 {
+  padding: 0.75em 1.056em 0.25em 0;
+}
+
+mjx-c.mjx-c3C {
+  padding: 0.547em 0.778em 0.052em 0;
+}
+
+mjx-c.mjx-c1D458 {
+  padding: 0.694em 0.521em 0.011em 0;
+}
+
+mjx-c.mjx-c2217 {
+  padding: 0.462em 0.5em 0 0;
+}
+
+mjx-c.mjx-c28.NCM-S5 {
+  padding: 1.296em 0.663em 0.796em 0;
+}
+
+mjx-c.mjx-c29.NCM-S5 {
+  padding: 1.296em 0.663em 0.796em 0;
+}
+
+mjx-c.mjx-c1D441 {
+  padding: 0.683em 0.881em 0 0;
+}
+
+mjx-c.mjx-c23DF.NCM-S5 {
+  padding: 0 3em 0.408em 0;
+}
+
+mjx-c.mjx-c23DF.NCM-S7 {
+  padding: 0 4.006em 0.423em 0;
+}
+
+mjx-c.mjx-c1D443 {
+  padding: 0.683em 0.754em 0 0;
+}
+
+mjx-c.mjx-c36 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c2248 {
+  padding: 0.457em 0.773em 0 0;
+}
+
+mjx-c.mjx-c37 {
+  padding: 0.676em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c38 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c35 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c1D700 {
+  padding: 0.453em 0.466em 0.022em 0;
+}
+
+mjx-c.mjx-c1D6FF {
+  padding: 0.712em 0.452em 0.011em 0;
+}
+
+mjx-c.mjx-c1D446 {
+  padding: 0.705em 0.645em 0.022em 0;
+}
+
+mjx-c.mjx-c2115.NCM-DS {
+  padding: 0.685em 0.722em 0.019em 0;
+}
+
+mjx-c.mjx-c1D457 {
+  padding: 0.661em 0.412em 0.205em 0;
+}
+
+mjx-c.mjx-c1D45D {
+  padding: 0.442em 0.503em 0.194em 0;
+}
+
+mjx-c.mjx-c21D2 {
+  padding: 0.52em 1em 0.02em 0;
+}
+
+mjx-c.mjx-c1D434 {
+  padding: 0.716em 0.75em 0 0;
+}
+
+mjx-c.mjx-c2223.NCM-S3 {
+  padding: 1.117em 0.333em 0.617em 0;
+}
+
+mjx-c.mjx-c1D461 {
+  padding: 0.626em 0.361em 0.011em 0;
+}
+
+mjx-c.mjx-c1D456 {
+  padding: 0.661em 0.345em 0.011em 0;
+}
+
+mjx-c.mjx-c2113.NCM-S {
+  padding: 0.705em 0.417em 0.012em 0;
+}
+
+mjx-c.mjx-c1D436 {
+  padding: 0.705em 0.76em 0.022em 0;
+}
+
+mjx-c.mjx-c28.NCM-S6 {
+  padding: 1.446em 0.736em 0.946em 0;
+}
+
+mjx-c.mjx-c29.NCM-S6 {
+  padding: 1.446em 0.736em 0.946em 0;
+}
+
+mjx-c.mjx-c2223.NCM-S5 {
+  padding: 1.502em 0.333em 1.002em 0;
+}
+
+mjx-c.mjx-c2260 {
+  padding: 0.73em 0.778em 0.23em 0;
+}
+
+mjx-c.mjx-c1D437 {
+  padding: 0.683em 0.828em 0 0;
+}
+
+mjx-c.mjx-c2286 {
+  padding: 0.627em 0.778em 0.127em 0;
+}
+
+mjx-c.mjx-cB1 {
+  padding: 0.583em 0.778em 0.084em 0;
+}
+
+mjx-c.mjx-c63 {
+  padding: 0.448em 0.444em 0.011em 0;
+}
+
+mjx-c.mjx-c6F {
+  padding: 0.448em 0.5em 0.011em 0;
+}
+
+mjx-c.mjx-c73 {
+  padding: 0.448em 0.394em 0.011em 0;
+}
+
+mjx-c.mjx-c5B {
+  padding: 0.75em 0.278em 0.25em 0;
+}
+
+mjx-c.mjx-c1D44F {
+  padding: 0.694em 0.429em 0.011em 0;
+}
+
+mjx-c.mjx-c5D {
+  padding: 0.75em 0.278em 0.25em 0;
+}
+
+mjx-c.mjx-c1D450 {
+  padding: 0.442em 0.433em 0.011em 0;
+}
+
+mjx-c.mjx-c1D454 {
+  padding: 0.442em 0.477em 0.205em 0;
+}
+
+mjx-c.mjx-c5B.NCM-S6 {
+  padding: 1.45em 0.528em 0.95em 0;
+}
+
+mjx-c.mjx-c5D.NCM-S6 {
+  padding: 1.45em 0.528em 0.95em 0;
+}
+
+mjx-c.mjx-c221A {
+  padding: 0.04em 0.853em 0.96em 0;
+}
+
+mjx-c.mjx-c1D43E {
+  padding: 0.684em 0.889em 0 0;
+}
+
+mjx-c.mjx-c7B.NCM-LO {
+  padding: 0.85em 0.583em 0.35em 0;
+}
+
+mjx-c.mjx-c7D.NCM-LO {
+  padding: 0.85em 0.583em 0.35em 0;
+}
+
+mjx-c.mjx-c2223.NCM-S4 {
+  padding: 1.292em 0.333em 0.792em 0;
+}
+
+mjx-c.mjx-c28.NCM-SO {
+  padding: 0.797em 0.422em 0.297em 0;
+}
+
+mjx-c.mjx-c29.NCM-SO {
+  padding: 0.797em 0.422em 0.297em 0;
+}
+
+mjx-c.mjx-c3A {
+  padding: 0.431em 0.278em 0 0;
+}
+</style><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin=""><style>@page{size:302px 252px;margin:0}html,body{margin:0;padding:0;background:#fff;width:302px;height:252px;overflow:hidden;position:relative}.fx-neutral{display:block!important;position:static!important;margin:0!important;padding:0!important;border:0!important;outline:0!important;width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;min-height:0!important;max-height:none!important;transform:none!important;box-shadow:none!important;float:none!important;overflow:visible!important;text-align:left!important;background:none!important;columns:auto!important}.fx-target{position:absolute!important;left:1px!important;top:1px!important;margin:0!important;width:300px!important;height:250px!important;max-width:none!important;max-height:none!important;overflow:visible!important}.fx-svg{width:300px!important;height:250px!important;min-width:0!important;max-width:none!important;max-height:none!important;flex:none!important}</style></head><body class=""><div class="fx-neutral"><div class="sheet fx-neutral"><div class="sheet-body paper skin-hs vivid fx-neutral"><figure class="figure fx-neutral" data-fig="partial-sums-exp"><div class="figure-art fx-neutral"><svg viewBox="0 0 300 250" style="width:300px" class="fig-svg fx-target fx-svg" role="img" aria-label="Polynomial partial sums P k of the exponential series for k = 1 to 4, in gray, rising to meet the smooth blue exponential curve e to the x. All pass through the point (0, 1). Near x = 0 they hug the curve; higher-order sums stay close over a wider range, while for x &lt; 0 the low-order sums oscillate around the curve." preserveAspectRatio="xMidYMid meet"><defs><marker id="pl2a" markerWidth="8" markerHeight="8" refX="5.4" refY="2.8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5.4,2.8 L0,5.6" fill="none" stroke="var(--c-axis)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></marker></defs><path d="M22.0,205.3 H281.0" class="axis" marker-end="url(#pl2a)"></path><path d="M171.6,230.0 V17.0" class="axis" marker-end="url(#pl2a)"></path><line x1="29.1" y1="202.3" x2="29.1" y2="208.3" class="axis"></line><line x1="100.4" y1="202.3" x2="100.4" y2="208.3" class="axis"></line><line x1="242.8" y1="202.3" x2="242.8" y2="208.3" class="axis"></line><line x1="168.6" y1="164.2" x2="174.6" y2="164.2" class="axis"></line><line x1="168.6" y1="123.0" x2="174.6" y2="123.0" class="axis"></line><line x1="168.6" y1="81.8" x2="174.6" y2="81.8" class="axis"></line><line x1="168.6" y1="40.7" x2="174.6" y2="40.7" class="axis"></line><path d="M44.75,237.43 L48.00,235.56 L51.25,233.68 L54.50,231.80 L57.75,229.92 L61.00,228.05 L64.25,226.17 L67.50,224.29 L70.75,222.41 L74.00,220.53 L77.25,218.66 L80.50,216.78 L83.75,214.90 L87.00,213.02 L90.25,211.15 L93.50,209.27 L96.75,207.39 L100.00,205.51 L103.25,203.64 L106.50,201.76 L109.75,199.88 L113.00,198.00 L116.25,196.13 L119.50,194.25 L122.75,192.37 L126.00,190.49 L129.25,188.61 L132.50,186.74 L135.75,184.86 L139.00,182.98 L142.25,181.10 L145.50,179.23 L148.75,177.35 L152.00,175.47 L155.25,173.59 L158.50,171.72 L161.75,169.84 L165.00,167.96 L168.25,166.08 L171.50,164.21 L174.75,162.33 L178.00,160.45 L181.25,158.57 L184.50,156.69 L187.75,154.82 L191.00,152.94 L194.25,151.06 L197.50,149.18 L200.75,147.31 L204.00,145.43 L207.25,143.55 L210.50,141.67 L213.75,139.80 L217.00,137.92 L220.25,136.04 L223.50,134.16 L226.75,132.29 L230.00,130.41 L233.25,128.53 L236.50,126.65 L239.75,124.77 L243.00,122.90 L246.25,121.02 L249.50,119.14 L252.75,117.26 L256.00,115.39 L259.25,113.51 L262.50,111.63 L265.75,109.75 L269.00,107.88 L272.25,106.00 L275.50,104.12 L278.75,102.24 L282.00,100.37" class="bubble"></path><path d="M22.00,159.83 L23.63,160.85 L25.25,161.86 L26.87,162.83 L28.50,163.79 L30.12,164.73 L31.75,165.64 L33.38,166.54 L35.00,167.41 L36.63,168.26 L38.25,169.09 L39.88,169.90 L41.50,170.68 L43.13,171.45 L44.75,172.19 L46.38,172.91 L48.00,173.61 L49.62,174.29 L51.25,174.95 L52.88,175.59 L54.50,176.20 L56.12,176.80 L57.75,177.37 L59.38,177.92 L61.00,178.45 L62.62,178.96 L64.25,179.44 L65.88,179.91 L67.50,180.35 L69.13,180.78 L70.75,181.18 L72.38,181.56 L74.00,181.91 L75.63,182.25 L77.25,182.57 L78.88,182.86 L80.50,183.13 L82.13,183.38 L83.75,183.61 L85.38,183.82 L87.00,184.01 L88.63,184.17 L90.25,184.32 L91.88,184.44 L93.50,184.54 L95.13,184.62 L96.75,184.68 L98.38,184.71 L100.00,184.73 L101.63,184.72 L103.25,184.70 L104.88,184.65 L106.50,184.58 L108.13,184.49 L109.75,184.37 L111.38,184.24 L113.00,184.08 L114.63,183.91 L116.25,183.71 L117.88,183.49 L119.50,183.24 L121.13,182.98 L122.75,182.70 L124.38,182.39 L126.00,182.06 L127.63,181.72 L129.25,181.35 L130.88,180.95 L132.50,180.54 L134.13,180.11 L135.75,179.65 L137.38,179.17 L139.00,178.67 L140.63,178.15 L142.25,177.61 L143.88,177.05 L145.50,176.47 L147.13,175.86 L148.75,175.23 L150.38,174.58 L152.00,173.92 L153.63,173.22 L155.25,172.51 L156.88,171.78 L158.50,171.02 L160.13,170.24 L161.75,169.45 L163.38,168.63 L165.00,167.78 L166.63,166.92 L168.25,166.04 L169.88,165.13 L171.50,164.21 L173.13,163.26 L174.75,162.29 L176.38,161.30 L178.00,160.28 L179.63,159.25 L181.25,158.19 L182.88,157.12 L184.50,156.02 L186.13,154.90 L187.75,153.76 L189.38,152.60 L191.00,151.41 L192.63,150.21 L194.25,148.98 L195.88,147.73 L197.50,146.46 L199.13,145.17 L200.75,143.86 L202.38,142.52 L204.00,141.17 L205.63,139.79 L207.25,138.39 L208.88,136.97 L210.50,135.53 L212.12,134.07 L213.75,132.59 L215.37,131.08 L217.00,129.56 L218.63,128.01 L220.25,126.44 L221.88,124.85 L223.50,123.24 L225.13,121.60 L226.75,119.95 L228.38,118.27 L230.00,116.57 L231.63,114.85 L233.25,113.11 L234.88,111.35 L236.50,109.57 L238.13,107.76 L239.75,105.93 L241.38,104.09 L243.00,102.22 L244.63,100.33 L246.25,98.41 L247.88,96.48 L249.50,94.53 L251.13,92.55 L252.75,90.55 L254.38,88.53 L256.00,86.49 L257.63,84.43 L259.25,82.35 L260.88,80.24 L262.50,78.12 L264.13,75.97 L265.75,73.80 L267.38,71.61 L269.00,69.40 L270.63,67.16 L272.25,64.91 L273.88,62.63 L275.50,60.33 L277.13,58.01 L278.75,55.67 L280.38,53.31 L282.00,50.93" class="bubble"></path><path d="M22.00,223.35 L23.63,222.33 L25.25,221.33 L26.87,220.35 L28.50,219.39 L30.12,218.45 L31.75,217.54 L33.38,216.64 L35.00,215.77 L36.63,214.91 L38.25,214.08 L39.88,213.26 L41.50,212.46 L43.13,211.68 L44.75,210.92 L46.38,210.17 L48.00,209.44 L49.62,208.72 L51.25,208.02 L52.88,207.34 L54.50,206.67 L56.12,206.01 L57.75,205.37 L59.38,204.73 L61.00,204.12 L62.62,203.51 L64.25,202.91 L65.88,202.33 L67.50,201.75 L69.13,201.19 L70.75,200.63 L72.38,200.09 L74.00,199.55 L75.63,199.02 L77.25,198.50 L78.88,197.98 L80.50,197.47 L82.13,196.97 L83.75,196.47 L85.38,195.98 L87.00,195.49 L88.63,195.01 L90.25,194.53 L91.88,194.05 L93.50,193.58 L95.13,193.10 L96.75,192.63 L98.38,192.16 L100.00,191.69 L101.63,191.22 L103.25,190.75 L104.88,190.28 L106.50,189.81 L108.13,189.34 L109.75,188.86 L111.38,188.38 L113.00,187.90 L114.63,187.41 L116.25,186.92 L117.88,186.43 L119.50,185.93 L121.13,185.42 L122.75,184.91 L124.38,184.39 L126.00,183.86 L127.63,183.33 L129.25,182.79 L130.88,182.23 L132.50,181.67 L134.13,181.10 L135.75,180.52 L137.38,179.93 L139.00,179.33 L140.63,178.72 L142.25,178.09 L143.88,177.45 L145.50,176.80 L147.13,176.14 L148.75,175.46 L150.38,174.77 L152.00,174.06 L153.63,173.33 L155.25,172.59 L156.88,171.84 L158.50,171.06 L160.13,170.27 L161.75,169.46 L163.38,168.64 L165.00,167.79 L166.63,166.92 L168.25,166.04 L169.88,165.13 L171.50,164.21 L173.13,163.26 L174.75,162.29 L176.38,161.29 L178.00,160.28 L179.63,159.24 L181.25,158.18 L182.88,157.09 L184.50,155.98 L186.13,154.84 L187.75,153.68 L189.38,152.49 L191.00,151.27 L192.63,150.03 L194.25,148.76 L195.88,147.46 L197.50,146.13 L199.13,144.77 L200.75,143.39 L202.38,141.97 L204.00,140.52 L205.63,139.04 L207.25,137.53 L208.88,135.99 L210.50,134.42 L212.12,132.81 L213.75,131.17 L215.37,129.49 L217.00,127.78 L218.63,126.03 L220.25,124.25 L221.88,122.43 L223.50,120.58 L225.13,118.69 L226.75,116.76 L228.38,114.79 L230.00,112.79 L231.63,110.75 L233.25,108.66 L234.88,106.54 L236.50,104.38 L238.13,102.17 L239.75,99.93 L241.38,97.64 L243.00,95.31 L244.63,92.93 L246.25,90.52 L247.88,88.06 L249.50,85.55 L251.13,83.00 L252.75,80.41 L254.38,77.77 L256.00,75.08 L257.63,72.34 L259.25,69.56 L260.88,66.73 L262.50,63.86 L264.13,60.93 L265.75,57.96 L267.38,54.93 L269.00,51.86 L270.63,48.73 L272.25,45.55 L273.88,42.32 L275.50,39.04 L277.13,35.71 L278.75,32.32 L280.38,28.88 L282.00,25.39" class="bubble"></path><path d="M22.00,190.01 L23.63,190.41 L25.25,190.78 L26.87,191.14 L28.50,191.47 L30.12,191.78 L31.75,192.07 L33.38,192.34 L35.00,192.59 L36.63,192.81 L38.25,193.02 L39.88,193.21 L41.50,193.39 L43.13,193.54 L44.75,193.68 L46.38,193.80 L48.00,193.90 L49.62,193.99 L51.25,194.06 L52.88,194.11 L54.50,194.15 L56.12,194.17 L57.75,194.18 L59.38,194.17 L61.00,194.15 L62.62,194.12 L64.25,194.07 L65.88,194.01 L67.50,193.94 L69.13,193.85 L70.75,193.75 L72.38,193.64 L74.00,193.51 L75.63,193.37 L77.25,193.22 L78.88,193.06 L80.50,192.89 L82.13,192.70 L83.75,192.51 L85.38,192.30 L87.00,192.08 L88.63,191.85 L90.25,191.61 L91.88,191.36 L93.50,191.10 L95.13,190.83 L96.75,190.54 L98.38,190.25 L100.00,189.94 L101.63,189.63 L103.25,189.30 L104.88,188.96 L106.50,188.62 L108.13,188.26 L109.75,187.89 L111.38,187.51 L113.00,187.11 L114.63,186.71 L116.25,186.30 L117.88,185.87 L119.50,185.44 L121.13,184.99 L122.75,184.53 L124.38,184.06 L126.00,183.57 L127.63,183.08 L129.25,182.57 L130.88,182.05 L132.50,181.52 L134.13,180.97 L135.75,180.41 L137.38,179.84 L139.00,179.26 L140.63,178.66 L142.25,178.04 L143.88,177.42 L145.50,176.77 L147.13,176.11 L148.75,175.44 L150.38,174.75 L152.00,174.05 L153.63,173.33 L155.25,172.59 L156.88,171.83 L158.50,171.06 L160.13,170.27 L161.75,169.46 L163.38,168.64 L165.00,167.79 L166.63,166.92 L168.25,166.04 L169.88,165.13 L171.50,164.21 L173.13,163.26 L174.75,162.29 L176.38,161.29 L178.00,160.28 L179.63,159.24 L181.25,158.18 L182.88,157.09 L184.50,155.98 L186.13,154.84 L187.75,153.67 L189.38,152.48 L191.00,151.26 L192.63,150.02 L194.25,148.74 L195.88,147.44 L197.50,146.10 L199.13,144.74 L200.75,143.34 L202.38,141.91 L204.00,140.45 L205.63,138.95 L207.25,137.43 L208.88,135.86 L210.50,134.26 L212.12,132.63 L213.75,130.95 L215.37,129.24 L217.00,127.50 L218.63,125.71 L220.25,123.88 L221.88,122.01 L223.50,120.10 L225.13,118.14 L226.75,116.14 L228.38,114.10 L230.00,112.01 L231.63,109.88 L233.25,107.70 L234.88,105.47 L236.50,103.19 L238.13,100.87 L239.75,98.49 L241.38,96.06 L243.00,93.57 L244.63,91.04 L246.25,88.45 L247.88,85.80 L249.50,83.10 L251.13,80.34 L252.75,77.52 L254.38,74.64 L256.00,71.70 L257.63,68.70 L259.25,65.63 L260.88,62.50 L262.50,59.31 L264.13,56.05 L265.75,52.72 L267.38,49.32 L269.00,45.86 L270.63,42.32 L272.25,38.71 L273.88,35.03 L275.50,31.28 L277.13,27.45 L278.75,23.54 L280.38,19.55 L282.00,15.49" class="bubble"></path><path d="M22.00,200.27 L23.30,200.18 L24.60,200.08 L25.90,199.98 L27.20,199.89 L28.50,199.79 L29.80,199.68 L31.10,199.58 L32.40,199.48 L33.70,199.37 L35.00,199.26 L36.30,199.15 L37.60,199.03 L38.90,198.92 L40.20,198.80 L41.50,198.68 L42.80,198.56 L44.10,198.43 L45.40,198.31 L46.70,198.18 L48.00,198.05 L49.30,197.91 L50.60,197.78 L51.90,197.64 L53.20,197.50 L54.50,197.35 L55.80,197.21 L57.10,197.06 L58.40,196.91 L59.70,196.75 L61.00,196.59 L62.30,196.43 L63.60,196.27 L64.90,196.10 L66.20,195.93 L67.50,195.76 L68.80,195.59 L70.10,195.41 L71.40,195.23 L72.70,195.04 L74.00,194.85 L75.30,194.66 L76.60,194.46 L77.90,194.26 L79.20,194.06 L80.50,193.85 L81.80,193.64 L83.10,193.43 L84.40,193.21 L85.70,192.98 L87.00,192.76 L88.30,192.53 L89.60,192.29 L90.90,192.05 L92.20,191.81 L93.50,191.56 L94.80,191.30 L96.10,191.05 L97.40,190.78 L98.70,190.52 L100.00,190.24 L101.30,189.97 L102.60,189.68 L103.90,189.40 L105.20,189.10 L106.50,188.80 L107.80,188.50 L109.10,188.19 L110.40,187.88 L111.70,187.55 L113.00,187.23 L114.30,186.89 L115.60,186.56 L116.90,186.21 L118.20,185.86 L119.50,185.50 L120.80,185.14 L122.10,184.76 L123.40,184.39 L124.70,184.00 L126.00,183.61 L127.30,183.21 L128.60,182.80 L129.90,182.39 L131.20,181.96 L132.50,181.53 L133.80,181.10 L135.10,180.65 L136.40,180.20 L137.70,179.73 L139.00,179.26 L140.30,178.78 L141.60,178.29 L142.90,177.80 L144.20,177.29 L145.50,176.77 L146.80,176.25 L148.10,175.71 L149.40,175.17 L150.70,174.61 L152.00,174.05 L153.30,173.47 L154.60,172.89 L155.90,172.29 L157.20,171.68 L158.50,171.06 L159.80,170.43 L161.10,169.79 L162.40,169.13 L163.70,168.47 L165.00,167.79 L166.30,167.10 L167.60,166.40 L168.90,165.68 L170.20,164.95 L171.50,164.21 L172.80,163.45 L174.10,162.68 L175.40,161.89 L176.70,161.09 L178.00,160.28 L179.30,159.45 L180.60,158.60 L181.90,157.74 L183.20,156.87 L184.50,155.98 L185.80,155.07 L187.10,154.14 L188.40,153.20 L189.70,152.24 L191.00,151.26 L192.30,150.27 L193.60,149.25 L194.90,148.22 L196.20,147.17 L197.50,146.10 L198.80,145.01 L200.10,143.90 L201.40,142.77 L202.70,141.62 L204.00,140.44 L205.30,139.25 L206.60,138.03 L207.90,136.79 L209.20,135.53 L210.50,134.24 L211.80,132.94 L213.10,131.60 L214.40,130.25 L215.70,128.86 L217.00,127.46 L218.30,126.02 L219.60,124.56 L220.90,123.07 L222.20,121.56 L223.50,120.02 L224.80,118.45 L226.10,116.85 L227.40,115.22 L228.70,113.56 L230.00,111.87 L231.30,110.15 L232.60,108.39 L233.90,106.61 L235.20,104.79 L236.50,102.94 L237.80,101.06 L239.10,99.13 L240.40,97.18 L241.70,95.19 L243.00,93.16 L244.30,91.09 L245.60,88.99 L246.90,86.85 L248.20,84.67 L249.50,82.45 L250.80,80.18 L252.10,77.88 L253.40,75.53 L254.70,73.14 L256.00,70.71 L257.30,68.23 L258.60,65.70 L259.90,63.13 L261.20,60.51 L262.50,57.85 L263.80,55.13 L265.10,52.36 L266.40,49.55 L267.70,46.68 L269.00,43.76 L270.30,40.78 L271.60,37.75 L272.90,34.67 L274.20,31.52 L275.50,28.32 L276.80,25.06 L278.10,21.74 L279.40,18.36 L280.70,14.92 L282.00,11.41" class="curve"></path><circle cx="171.6" cy="164.2" r="2.5" class="dot"></circle><foreignObject x="-52" y="-52" width="404" height="354" class="fig-fo" requiredExtensions="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml" class="fig-lyr"><span class="fig-lbl a-ax" style="left:335.0px;top:261.3px;transform:translate(0,0);font-size:13px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="155" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="x" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-speech-attached="true" data-semantic-braille="⠭" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="x" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mi data-latex="x" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:x" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="x" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠭"><mjx-c class="mjx-c1D465">𝑥</mjx-c></mjx-mi></mjx-math><mjx-speech aria-label="x, math" role="img" aria-roledescription="" aria-braillelabel="⠭" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-ax" style="left:218.6px;top:69.0px;transform:translate(-100%,0);font-size:13px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="156" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="y" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;y&lt;/say-as&gt;" data-speech-attached="true" data-semantic-braille="⠽" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="y" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mi data-latex="y" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:y" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="y" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;y&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠽"><mjx-c class="mjx-c1D466">𝑦</mjx-c></mjx-mi></mjx-math><mjx-speech aria-label="y, math" role="img" aria-roledescription="" aria-braillelabel="⠽" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:81.1px;top:263.3px;transform:translate(-50%,0);font-size:12px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="157" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="negative 2" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; negative &lt;mark name=&quot;1&quot;/&gt; 2" data-speech-attached="true" data-semantic-braille="⠤⠼⠆" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="-2" data-semantic-type="prefixop" data-semantic-role="negative" data-semantic-annotation="clearspeak:simple;depth:1" data-semantic-id="2" data-semantic-children="1" data-semantic-content="0" data-semantic-attributes="latex:-2" data-semantic-owns="0 1" data-semantic-level-number="0" data-semantic-structure="(2 0 1)" class="NCM-N" data-speech-node="true" data-semantic-speech-none="negative 2" data-semantic-summary-none="negative number" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; negative &lt;mark name=&quot;1&quot;/&gt; 2" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; negative &lt;mark name=&quot;1&quot;/&gt; number" data-semantic-braille="⠤⠼⠆" aria-hidden="true"><mjx-mo data-latex="-" data-semantic-type="operator" data-semantic-role="subtraction" data-semantic-annotation="nemeth:number;depth:2" data-semantic-id="0" data-semantic-parent="2" data-semantic-attributes="latex:-" data-semantic-operator="prefixop,−" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="minus" data-semantic-summary-none="minus" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; minus" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; minus" data-semantic-braille="⠤"><mjx-c class="mjx-c2212">−</mjx-c></mjx-mo><mjx-mn data-latex="2" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:2" data-semantic-id="1" data-semantic-parent="2" data-semantic-attributes="latex:2" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="2" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;1&quot;/&gt; 2" data-semantic-summary="&lt;mark name=&quot;1&quot;/&gt; number" data-semantic-braille="⠼⠆"><mjx-c class="mjx-c32">2</mjx-c></mjx-mn></mjx-math><mjx-speech aria-label="negative 2, math" role="img" aria-roledescription="" aria-braillelabel="⠤⠼⠆" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:152.4px;top:263.3px;transform:translate(-50%,0);font-size:12px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="158" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="negative 1" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; negative &lt;mark name=&quot;1&quot;/&gt; 1" data-speech-attached="true" data-semantic-braille="⠤⠼⠂" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="-1" data-semantic-type="prefixop" data-semantic-role="negative" data-semantic-annotation="clearspeak:simple;depth:1" data-semantic-id="2" data-semantic-children="1" data-semantic-content="0" data-semantic-attributes="latex:-1" data-semantic-owns="0 1" data-semantic-level-number="0" data-semantic-structure="(2 0 1)" class="NCM-N" data-speech-node="true" data-semantic-speech-none="negative 1" data-semantic-summary-none="negative number" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; negative &lt;mark name=&quot;1&quot;/&gt; 1" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; negative &lt;mark name=&quot;1&quot;/&gt; number" data-semantic-braille="⠤⠼⠂" aria-hidden="true"><mjx-mo data-latex="-" data-semantic-type="operator" data-semantic-role="subtraction" data-semantic-annotation="nemeth:number;depth:2" data-semantic-id="0" data-semantic-parent="2" data-semantic-attributes="latex:-" data-semantic-operator="prefixop,−" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="minus" data-semantic-summary-none="minus" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; minus" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; minus" data-semantic-braille="⠤"><mjx-c class="mjx-c2212">−</mjx-c></mjx-mo><mjx-mn data-latex="1" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:2" data-semantic-id="1" data-semantic-parent="2" data-semantic-attributes="latex:1" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="1" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;1&quot;/&gt; 1" data-semantic-summary="&lt;mark name=&quot;1&quot;/&gt; number" data-semantic-braille="⠼⠂"><mjx-c class="mjx-c31">1</mjx-c></mjx-mn></mjx-math><mjx-speech aria-label="negative 1, math" role="img" aria-roledescription="" aria-braillelabel="⠤⠼⠂" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:294.8px;top:263.3px;transform:translate(-50%,0);font-size:12px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="159" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="1" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 1" data-speech-attached="true" data-semantic-braille="⠼⠂" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="1" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mn data-latex="1" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:1" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="1" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 1" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; number" data-semantic-braille="⠼⠂"><mjx-c class="mjx-c31">1</mjx-c></mjx-mn></mjx-math><mjx-speech aria-label="1, math" role="img" aria-roledescription="" aria-braillelabel="⠼⠂" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:217.6px;top:216.2px;transform:translate(-100%,-50%);font-size:12px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="160" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="1" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 1" data-speech-attached="true" data-semantic-braille="⠼⠂" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="1" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mn data-latex="1" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:1" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="1" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 1" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; number" data-semantic-braille="⠼⠂"><mjx-c class="mjx-c31">1</mjx-c></mjx-mn></mjx-math><mjx-speech aria-label="1, math" role="img" aria-roledescription="" aria-braillelabel="⠼⠂" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:217.6px;top:175.0px;transform:translate(-100%,-50%);font-size:12px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="161" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="2" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 2" data-speech-attached="true" data-semantic-braille="⠼⠆" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="2" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mn data-latex="2" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:2" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="2" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 2" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; number" data-semantic-braille="⠼⠆"><mjx-c class="mjx-c32">2</mjx-c></mjx-mn></mjx-math><mjx-speech aria-label="2, math" role="img" aria-roledescription="" aria-braillelabel="⠼⠆" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:217.6px;top:133.8px;transform:translate(-100%,-50%);font-size:12px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="162" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="3" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 3" data-speech-attached="true" data-semantic-braille="⠼⠒" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="3" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mn data-latex="3" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:3" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="3" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 3" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; number" data-semantic-braille="⠼⠒"><mjx-c class="mjx-c33">3</mjx-c></mjx-mn></mjx-math><mjx-speech aria-label="3, math" role="img" aria-roledescription="" aria-braillelabel="⠼⠒" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:217.6px;top:92.7px;transform:translate(-100%,-50%);font-size:12px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="163" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="4" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 4" data-speech-attached="true" data-semantic-braille="⠼⠲" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="4" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mn data-latex="4" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:4" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="4" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; 4" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; number" data-semantic-braille="⠼⠲"><mjx-c class="mjx-c34">4</mjx-c></mjx-mn></mjx-math><mjx-speech aria-label="4, math" role="img" aria-roledescription="" aria-braillelabel="⠼⠲" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-curve" style="left:330.4px;top:74.9px;transform:translate(-100%,-100%);"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="164" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="e to the x-th power" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;e&lt;/say-as&gt; &lt;mark name=&quot;1&quot;/&gt; to the x-th &lt;mark name=&quot;2&quot; kind=&quot;LAST&quot;/&gt; power" data-speech-attached="true" data-semantic-braille="⠑⠘⠭" data-braille-attached="true" has-speech="true" style="font-size: 101.3%;"><mjx-math data-latex="e^{x}" data-semantic-structure="(2 0 1)" class="NCM-N" aria-hidden="true"><mjx-msup data-latex="e^{x}" data-semantic-type="superscript" data-semantic-role="latinletter" data-semantic-annotation="depth:1" data-semantic-id="2" data-semantic-children="0,1" data-semantic-attributes="latex:e^{x}" data-semantic-owns="0 1" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="e to the x-th power" data-semantic-summary-none="power" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;e&lt;/say-as&gt; &lt;mark name=&quot;1&quot;/&gt; to the x-th &lt;mark name=&quot;2&quot; kind=&quot;LAST&quot;/&gt; power" data-semantic-summary="&lt;mark name=&quot;2&quot;/&gt; power" data-semantic-braille="⠑⠘⠭"><mjx-mi data-latex="e" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:2" data-semantic-id="0" data-semantic-parent="2" data-semantic-attributes="latex:e" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="e" data-semantic-prefix-none="Base" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;e&lt;/say-as&gt;" data-semantic-prefix="&lt;mark name=&quot;0&quot;/&gt; Base" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠑"><mjx-c class="mjx-c1D452">𝑒</mjx-c></mjx-mi><mjx-script style="vertical-align: 0.363em;"><mjx-texatom size="s" data-mjx-texclass="ORD" data-latex="{x}" texclass="ORD"><mjx-mi data-latex="x" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;depth:2" data-semantic-id="1" data-semantic-parent="2" data-semantic-attributes="latex:{x};texclass:ORD" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="x-th" data-semantic-prefix-none="Exponent" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;1&quot;/&gt; x-th" data-semantic-prefix="&lt;mark name=&quot;1&quot;/&gt; Exponent" data-semantic-summary="&lt;mark name=&quot;1&quot;/&gt; identifier" data-semantic-braille="⠭"><mjx-c class="mjx-c1D465">𝑥</mjx-c></mjx-mi></mjx-texatom></mjx-script></mjx-msup></mjx-math><mjx-speech aria-label="e to the x-th power, math" role="img" aria-roledescription="" aria-braillelabel="⠑⠘⠭" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-pt" style="left:334.0px;top:152.4px;transform:translate(0,-50%);"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="165" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="P sub 1" data-semantic-speech="&lt;prosody pitch=&quot;+30%&quot;&gt; &lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;P&lt;/say-as&gt; &lt;/prosody&gt; &lt;mark name=&quot;1&quot;/&gt; sub 1" data-speech-attached="true" data-semantic-braille="⠠⠏⠂" data-braille-attached="true" has-speech="true" style="font-size: 101.3%;"><mjx-math data-latex="P_{1}" data-semantic-structure="(2 0 1)" class="NCM-N" aria-hidden="true"><mjx-msub data-latex="P_{1}" data-semantic-type="subscript" data-semantic-role="latinletter" data-semantic-annotation="depth:1" data-semantic-id="2" data-semantic-children="0,1" data-semantic-attributes="latex:P_{1}" data-semantic-owns="0 1" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="P sub 1" data-semantic-summary-none="subscript" data-semantic-speech="&lt;prosody pitch=&quot;+30%&quot;&gt; &lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;P&lt;/say-as&gt; &lt;/prosody&gt; &lt;mark name=&quot;1&quot;/&gt; sub 1" data-semantic-summary="&lt;mark name=&quot;2&quot;/&gt; subscript" data-semantic-braille="⠠⠏⠂"><mjx-mi data-latex="P" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:2" data-semantic-id="0" data-semantic-parent="2" data-semantic-attributes="latex:P" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="P" data-semantic-prefix-none="Base" data-semantic-summary-none="identifier" data-semantic-speech="&lt;prosody pitch=&quot;+30%&quot;&gt; &lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;P&lt;/say-as&gt; &lt;/prosody&gt;" data-semantic-prefix="&lt;mark name=&quot;0&quot;/&gt; Base" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠠⠏"><mjx-c class="mjx-c1D443">𝑃</mjx-c></mjx-mi><mjx-script style="vertical-align: -0.15em; margin-left: -0.112em;"><mjx-texatom size="s" data-mjx-texclass="ORD" data-latex="{1}" texclass="ORD"><mjx-mn data-latex="1" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;depth:2" data-semantic-id="1" data-semantic-parent="2" data-semantic-attributes="latex:{1};texclass:ORD" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="1" data-semantic-prefix-none="Subscript" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;1&quot;/&gt; 1" data-semantic-prefix="&lt;mark name=&quot;1&quot;/&gt; Subscript" data-semantic-summary="&lt;mark name=&quot;1&quot;/&gt; number" data-semantic-braille="⠂"><mjx-c class="mjx-c31">1</mjx-c></mjx-mn></mjx-texatom></mjx-script></mjx-msub></mjx-math><mjx-speech aria-label="P sub 1, math" role="img" aria-roledescription="" aria-braillelabel="⠠⠏⠂" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span></div></foreignObject></svg></div></figure></div></div></div></body></html>

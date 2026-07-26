@@ -376,6 +376,38 @@ class AppBMappings(unittest.TestCase):
         out = conv(wrap('<p style="text-align:center;">(i)&ensp;&ensp;for every</p>'))
         self.assertIn(r"(i)\enspace{}\enspace{}for every", out)
 
+    def test_plain_qed_span_inline(self):
+        # ch04 差集：worked-solution 的收尾用素 qed（×6 在 <p> 句尾）。原本的
+        # test_plain_qed_span_rejected 是哨兵（「哪天 fragment 加了要硬錯提醒補 mapping」），
+        # ch04 rollout 觸發後 mapping 已凍結，哨兵改為正面測試。
+        out = conv(wrap('<p>done <span class="qed"></span></p>'))
+        self.assertIn(r"done \qedmark", out)
+
+    def test_plain_qed_span_block(self):
+        # ch04 §4.1 Example 4.1：收尾記號放在 env-body 的區塊位置（不在 <p> 內）
+        out = conv(wrap('<section class="env env-remark"><p class="env-head">'
+                        '<span class="env-kicker">Remark</span></p>'
+                        '<div class="env-body"><p>done.</p><span class="qed"></span>'
+                        '</div></section>'))
+        self.assertIn(r"\qedmark", out)
+
+    def test_env_corollary(self):
+        # ch04 差集：×4（模板早有 envcorollary）
+        out = conv(wrap('<section class="env env-corollary"><p class="env-head">'
+                        '<span class="env-kicker">Corollary</span>'
+                        '<span class="env-num">4.1</span></p>'
+                        '<div class="env-body"><p>x.</p></div></section>'))
+        self.assertIn(r"\begin{envcorollary}{Corollary}{4.1}{}", out)
+
+    def test_math_entity_decoded(self):
+        # ch04 差集：HTML 文字節點不能寫裸 `<`，故 fragment 寫 &lt;／&gt;；MathJax 收到的是
+        # 解碼後的字元，轉換器也必須解碼，否則 LaTeX 拿到 `&` 會當成 alignment tab 而炸掉。
+        out = conv(wrap(r'<p>Case 2: \(m &lt; M\) and \(a &gt; b\).</p>'))
+        self.assertIn(r"\(m < M\)", out)
+        self.assertIn(r"\(a > b\)", out)
+        self.assertNotIn("&lt;", out)
+        self.assertNotIn("&gt;", out)
+
     def test_qed_proof_marker(self):
         out = conv(wrap('<section class="env env-proof"><p class="env-head">'
                         '<span class="env-kicker">Proof</span></p>'
@@ -469,13 +501,18 @@ class FailLoud(unittest.TestCase):
         # 素 <strong> 自 M-B2 起是 appB 差集的 run-in 標籤；帶 class 的仍屬表外
         self.assertRejects('<p>a <strong class="mystery">b</strong></p>', "inline")
 
-    def test_plain_qed_span_rejected(self):
-        # appB 方言只凍結 qed qed-proof（proof 收尾）；素 qed（solution 變體）未凍結，
-        # 哪天 fragment 加了要硬錯提醒補 mapping
-        self.assertRejects('<p>done <span class="qed"></span></p>', "span")
-
     def test_qed_span_with_content_rejected(self):
         self.assertRejects('<p>done <span class="qed qed-proof">x</span></p>', "空元素")
+
+    def test_plain_qed_span_with_content_rejected(self):
+        # ch04 差集的素 qed 同樣必須是空元素
+        self.assertRejects('<p>done <span class="qed">x</span></p>', "空元素")
+
+    def test_math_unfrozen_entity_rejected(self):
+        # 白名單外的 entity 硬錯——理由同 entity 反斜線守衛：瀏覽器解碼、轉換器不解，語義分岔
+        with self.assertRaises(MathScanError) as cm:
+            conv(wrap(r'<p>\(x &amp; y\)</p>'))
+        self.assertIn("未凍結的 entity", str(cm.exception))
 
     def test_br_outside_center_rejected(self):
         self.assertRejects("<p>a<br>b</p>", "br")
