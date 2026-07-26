@@ -1,0 +1,2268 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><style>
+:root {
+  --fig-1-1:  250px;   /* Figure 1.1  horizontal line test (pair) */
+  --fig-1-2:  340px;   /* Figure 1.2  inverse mapping diagram */
+  --fig-1-3:  280px;   /* Figure 1.3  restricted x^2, sqrt x, y=x */
+  --fig-1-4:  500px;   /* Figure 1.4  sine not one-to-one (SVG 620×220, wide) */
+  --fig-1-5:  340px;   /* Figure 1.5  restricted sine (SVG 380×260) */
+  --fig-1-6:  200px;   /* Figure 1.6  arcsin right triangle (SVG 300×130) */
+  --fig-1-7:  340px;   /* Figure 1.7  restricted cosine (SVG 380×200) */
+  --fig-1-8:  300px;   /* Figure 1.8  restricted tangent (SVG 320×320) */
+  --fig-1-9:  500px;   /* Figure 1.9  arctan reflection */
+  --fig-1-10: 200px;   /* Figure 1.10 arctan 10 right triangle (SVG 240×180) */
+  --fig-1-11: 100%;    /* Figure 1.11 arctan x right triangle (SVG 240×180) */
+  --fig-1-12: 380px;   /* Figure 1.12 three functions, same limit (triple layout) */
+  --fig-1-13: 380px;   /* Figure 1.13 read-off-the-graph example */
+  --fig-1-14: 340px;   /* Figure 1.14 left/right limits differ */
+  --fig-1-15: 100%;    /* Figure 1.15 piecewise jump */
+  --fig-1-16: 200px;   /* Figure 1.16 1/x^2 vs 1/x */
+  --fig-1-17: 340px;   /* Figure 1.17 four one-sided infinite limits (grid layout) */
+  --fig-1-18: 360px;   /* Figure 1.18 vertical asymptote */
+  --fig-1-19: 400px;   /* Figure 1.19 ln asymptote */
+  --fig-1-20: 380px;   /* Figure 1.20 removable hole */
+  --fig-1-21: 350px;   /* Figure 1.21 floor function */
+  --fig-1-22: 420px;   /* Figure 1.22 squeeze theorem */
+  --fig-1-23: 400px;   /* Figure 1.23 x^2 sin(1/x) squeeze */
+  --fig-1-24: 360px;   /* Figure 1.24 epsilon-delta geometry */
+  --fig-1-25: 100%;    /* Figure 1.25 epsilon-delta dynamic pair */
+}
+</style>
+<style>
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic; font-weight: 700; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/web-computer-modern@1.1.0-new-cm-7-0-2/woff2/WebCM%20Serif%2010%20BoldItalic.woff2") format("woff2");
+}
+</style>
+<style>
+/* ============================================================
+   skin-hs.css — inlined + modified: Times New Roman + MathJax
+   ============================================================ */
+.paper {
+  --c-primary: oklch(0.50 0.13 245);
+  --c-caution: oklch(0.50 0.155 25);
+  --c-aux: oklch(0.55 0.01 260);
+  --c-axis: #474b54;
+  --ink: #1b1c1f;
+  --ink-soft: #565a63;
+  --ink-faint: #8a8e98;
+  --paper: #ffffff;
+  --rule: #e5e7eb;
+  --fig-w-pair: 250px;     /* 並排(pair)圖每張的預設寬度（整體一次調） */
+  --fig-w-single: 100%;    /* 單張/triple/grid 圖的預設最大寬度（整體一次調） */
+  /* 個別覆寫：在任一 <figure> 標籤加 style="--fig-w: 320px" 即可只改那一張 */
+  --serif: "New Computer Modern", "Latin Modern Roman", "Times New Roman", Times, Georgia, serif;
+  --ui: "Inter", -apple-system, system-ui, sans-serif;
+  --a-concept:  oklch(0.50 0.13 55);
+  --a-result:   oklch(0.50 0.13 245);
+  --a-practice: oklch(0.50 0.13 152);
+  --a-aside:    oklch(0.50 0.02 260);
+  --a-caution:  oklch(0.50 0.155 25);
+  --a-strategy: oklch(0.50 0.13 290);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-base, 17.5px);
+  line-height: var(--lh-base, 1.62);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+.paper *, .paper *::before, .paper *::after { box-sizing: border-box; }
+.paper .page { padding: 52px 58px 64px; max-width: 760px; margin: 0 auto; }
+.skin-hs .page { hyphens: auto; -webkit-hyphens: auto; }
+.skin-hs p, .skin-hs li { text-align: justify; text-justify: inter-word; }
+.paper .ragged { text-align: left; }
+.paper p { margin: 0 0 .85em; text-wrap: pretty; }
+.paper em { font-style: italic; }
+.paper .informal { font-style: italic; color: var(--ink-soft); }
+.paper ol { margin: .2em 0 .9em; padding-left: 1.5em; }
+.paper li { margin: .35em 0; text-wrap: pretty; }
+.paper .warmup { counter-reset: wu; list-style: none; padding-left: 0; }
+.paper .warmup > li { counter-increment: wu; position: relative; padding-left: 2.1em; }
+.paper .warmup > li::before {
+  content: "(" counter(wu, lower-alpha) ")";
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ui); font-size: .82em; color: var(--ink-faint); line-height: 1.85;
+}
+.paper mjx-container[display="true"] { margin: .55em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.paper mjx-container[display="true"]::-webkit-scrollbar { display: none; }
+.paper .qed { display: block; text-align: right; margin: -1.62em 0 0; height: 1.62em; pointer-events: none; }
+.paper .qed::after {
+  content: ""; display: inline-block; width: .56em; height: .56em;
+  border: 1.3px solid var(--ink-soft);
+}
+.paper .env-body > :has(+ .qed) { margin-bottom: 0; display: flow-root; }
+.paper .env-body::after { content: ""; display: block; clear: both; }
+.paper .sec-head {
+  margin-top: 2.7em; padding-top: 1.35em;
+  border-top: 1px solid var(--rule); margin-bottom: 1.5em;
+}
+.sheet-body > .sec-head:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.paper .sec-kicker {
+  font-family: var(--ui); font-size: .7rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--c-primary); font-weight: 700; margin-bottom: .55em;
+}
+.paper .sec-title { font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -.012em; margin: 0; }
+.paper .sec-no { color: var(--c-primary); margin-right: .5em; font-weight: 600; }
+.paper .subsec-head {
+  font-family: var(--ui); font-weight: 600; font-size: 1.08rem; margin: 1.9em 0 .65em;
+  display: flex; align-items: center; gap: .55em; color: var(--ink);
+}
+.paper .page-break-before { break-before: page; page-break-before: always; }
+.paper .subsec-head::before { content: ""; width: 18px; height: 3px; background: var(--c-primary); border-radius: 2px; }
+.paper .figure { margin: 1.7em 0; text-align: center; }
+.paper .figure-art { display: flex; justify-content: center; }
+.paper .figure-art--pair { gap: 26px; }
+.paper .fig-svg { width: 100%; max-width: var(--fig-w, var(--fig-w-pair)); height: auto; }
+.paper .figure-art:not(.figure-art--pair) .fig-svg { max-width: var(--fig-w, var(--fig-w-single)); }
+.paper figcaption {
+  font-family: var(--ui); font-size: .8em; line-height: 1.5;
+  color: var(--ink-soft); margin-top: .7em; text-wrap: pretty;
+  max-width: none; text-align: left; display: table; margin-inline: auto;
+}
+.paper .fig-no { font-weight: 600; color: var(--ink); margin-right: .4em; }
+.paper figcaption mjx-container { font-size: .95em; }
+.paper .axis { stroke: var(--c-axis); stroke-width: 1.25; fill: none; stroke-linecap: round; }
+.paper .curve { stroke: var(--c-primary); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.paper .refline { stroke: var(--c-caution); stroke-width: 1.3; stroke-dasharray: 4.5 3.5; fill: none; stroke-linecap: round; opacity: .85; }
+.paper .dot { fill: var(--ink); }
+.paper .bubble { stroke: var(--c-aux); stroke-width: 1.4; fill: none; }
+.paper .arrow-fwd { stroke: var(--c-primary); stroke-width: 2; fill: none; }
+.paper .arrow-bwd { stroke: var(--c-caution); stroke-width: 2; fill: none; }
+.paper .fig-svg text { font-family: var(--ui); font-size: 13px; }
+.paper .axlab { fill: var(--c-aux); font-style: italic; }
+.paper .lab-curve { fill: var(--c-primary); font-style: italic; }
+.paper .lab-ref, .paper .lab-ref-b { fill: var(--c-caution); }
+.paper .ptlab { fill: var(--ink-soft); font-size: 12px; }
+.paper .setlab { fill: var(--ink); font-weight: 600; font-size: 14.5px; text-anchor: middle; }
+
+/* env blocks */
+.skin-hs .env {
+  --accent: var(--a-aside);
+  margin: 1.2em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--accent) 38%, var(--paper));
+}
+.skin-hs .env-definition  { --accent: var(--a-concept); }
+.skin-hs .env-theorem, .skin-hs .env-proposition, .skin-hs .env-corollary { --accent: var(--a-result); }
+.skin-hs .env-example, .skin-hs .env-solution, .skin-hs .env-exercise { --accent: var(--a-practice); }
+.skin-hs .env-remark { --accent: var(--a-aside); }
+.skin-hs .env-head {
+  display: flex; align-items: baseline; gap: .5em; flex-wrap: wrap;
+  margin: 0 0 .55em; font-family: var(--ui);
+}
+.skin-hs .env-kicker {
+  font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--accent); padding: 3px 10px; border-radius: 999px; line-height: 1.5;
+}
+.skin-hs .env-num { font-weight: 700; color: var(--accent); font-size: .94em; }
+.skin-hs .env-name { font-style: italic; font-weight: 400; color: var(--ink-soft); font-family: var(--serif); font-size: 1em; }
+.skin-hs .env-body > p:first-child { margin-top: 0; }
+.skin-hs .env-body > :last-child { margin-bottom: 0; }
+.skin-hs .env-theorem .env-body, .skin-hs .env-proposition .env-body { font-style: italic; }
+.skin-hs .env-theorem .env-body mjx-container, .skin-hs .env-proposition .env-body mjx-container { font-style: normal; }
+.skin-hs .env-definition em { font-style: italic; }
+.skin-hs .env-remark { color: var(--ink-soft); font-size: .97em; }
+.skin-hs .env-remark .env-kicker { background: transparent; color: var(--a-aside); border: 1px solid color-mix(in srgb, var(--a-aside) 45%, var(--paper)); }
+.skin-hs .env-proof { --accent: var(--a-result); }
+.skin-hs .env-proof .env-kicker {
+  background: transparent; color: var(--a-result); font-style: italic; letter-spacing: .04em;
+  border: 1px solid color-mix(in srgb, var(--a-result) 45%, var(--paper));
+}
+.skin-hs .qed-proof::after { border-color: var(--ink); }
+.skin-hs .workedexample {
+  margin: 1.6em 0; padding-left: 16px;
+  border-left: 2.5px solid color-mix(in srgb, var(--a-practice) 38%, var(--paper));
+  display: flow-root;
+}
+.skin-hs .workedexample .env { margin: .7em 0; padding-left: 0; border-left: 0; }
+.skin-hs .env-solution .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid color-mix(in srgb, var(--a-practice) 45%, var(--paper)); }
+.skin-hs > .env-cont { margin-top: 0; padding-top: .82em; }
+.skin-hs > .env:has(+ .env-cont) { margin-bottom: 0; display: flow-root; }
+.skin-hs > .env-example:has(+ .env-solution) { margin-bottom: 0; }
+.skin-hs > .env-example + .env-solution { margin-top: 0; padding-top: .72em; }
+.skin-hs > .env-cont, .skin-hs > .env-example, .skin-hs > .env-solution { display: flow-root; }
+.skin-hs .env-exercise .env-kicker { background: transparent; color: var(--a-practice); border: 1px solid var(--a-practice); }
+.skin-hs .env-caution, .skin-hs .env-strategy {
+  padding: 15px 20px; border-radius: 8px; margin: 1.4em 0;
+  border-left-width: 4px; border-left-style: solid;
+}
+.skin-hs .env-caution {
+  --accent: var(--a-caution);
+  background: color-mix(in srgb, var(--a-caution) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-caution) 22%, var(--paper));
+  border-left-color: var(--a-caution);
+}
+.skin-hs .env-strategy {
+  --accent: var(--a-strategy);
+  background: color-mix(in srgb, var(--a-strategy) 7%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--a-strategy) 22%, var(--paper));
+  border-left-color: var(--a-strategy);
+}
+.skin-hs .env-caution .env-name, .skin-hs .env-strategy .env-name { color: var(--ink-soft); }
+.skin-hs .env-strategy .steps { margin-bottom: 0; }
+.skin-hs.vivid .env { border-left-color: color-mix(in srgb, var(--accent) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .workedexample { border-left-color: color-mix(in srgb, var(--a-practice) 70%, var(--paper)); border-left-width: 3px; }
+.skin-hs.vivid .env-kicker { font-size: .64rem; padding: 3.5px 11px; }
+
+/* ============================================================
+   figs.css — inlined + modified for MathJax
+   ============================================================ */
+.paper .fig-svg { height: auto; overflow: visible; }
+.paper .figure-art { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.paper .figure-art--pair { gap: 24px; }
+.paper .figure-art--pair .fig-panel { flex: 1 1 220px; max-width: 300px; }
+.paper .figure-art--triple { gap: 18px; }
+.paper .figure-art--triple .fig-panel { flex: 1 1 190px; max-width: 240px; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple { gap: 28px; flex-wrap: nowrap; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-panel { flex: 0 1 160px; max-width: 160px; min-width: 0; }
+.paper figure[data-fig="limit-same-near-a"] .figure-art--triple .fig-svg { width: 100% !important; max-width: 100%; }
+.paper .figure-art--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; justify-items: center; }
+.paper .figure-art--grid .fig-panel { max-width: 240px; }
+.paper .fig-panel { display: flex; flex-direction: column; align-items: center; }
+.paper .fig-note {
+  font-family: var(--ui); font-size: .8em; line-height: 1.45;
+  color: var(--ink-soft); margin-top: .55em; text-align: center; text-wrap: pretty;
+}
+.paper .fig-note mjx-container { font-size: .98em; }
+.paper .fig-fo { overflow: visible; }
+.paper .fig-lyr { position: relative; width: 100%; height: 100%; font-family: var(--serif); }
+.paper .fig-lbl {
+  position: absolute; white-space: nowrap; line-height: 1; font-size: 15px;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper);
+}
+.paper .fig-lbl mjx-container { font-size: 1em; }
+.paper .fig-lbl.a-curve { color: var(--c-primary); }
+.paper .fig-lbl.a-ref   { color: var(--c-caution); }
+.paper .fig-lbl.a-ax    { color: var(--ink-soft); }
+.paper .fig-lbl.a-pt    { color: var(--ink); }
+.paper .tbl-wrap { overflow-x: auto; overflow-y: hidden; margin: 1em 0; }
+.paper table.tbl {
+  border-collapse: collapse; margin: 0 auto; font-family: var(--ui); font-size: .96em;
+  border-top: 1.7px solid var(--ink); border-bottom: 1.7px solid var(--ink);
+}
+.paper table.tbl th, .paper table.tbl td { padding: .3em .8em; text-align: center; white-space: nowrap; }
+.paper table.tbl thead th { border-bottom: 1.1px solid var(--ink-soft); font-weight: 500; }
+.paper table.tbl .rowlab { text-align: right; padding-right: 1em; color: var(--ink-soft); }
+.paper table.tbl mjx-container { font-size: .98em; }
+.paper .sec + .sec { margin-top: 2.6em; padding-top: 2.2em; border-top: 1px solid var(--rule); }
+.paper .para-head { font-weight: 600; margin: 1.1em 0 .4em; }
+.paper ul { margin: .3em 0 .95em; padding-left: 1.3em; }
+.paper ul li { margin: .35em 0; text-align: justify; }
+.paper ul li::marker { color: var(--a-result); }
+.paper .chapter-head { margin-bottom: 1.6em; }
+.paper .chapter-head .ch-kicker {
+  font-family: var(--ui); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--a-result); font-weight: 700; margin-bottom: .6em;
+}
+.paper .chapter-head .ch-title { font-weight: 600; font-size: 2.5rem; line-height: 1.08; letter-spacing: -.02em; margin: 0; }
+.paper .lead { font-size: 1.05em; }
+
+/* ============================================================
+   print.css — inlined (A4 sheet layout + paginator)
+   ============================================================ */
+@page { size: A4; margin: 0; }
+.sheet {
+  position: relative; box-sizing: border-box;
+  width: 210mm; height: 297mm;
+  padding: 20mm 28mm 20mm 32mm;
+  background: #fff; overflow: hidden;
+}
+.sheet-header {
+  position: absolute; top: 11mm; left: 32mm; right: 28mm;
+  font: 500 8.5pt "Inter", sans-serif; color: #9aa0ac; letter-spacing: .02em;
+}
+.sheet-footer {
+  position: absolute; bottom: 8.5mm; left: 0; right: 0;
+  text-align: center; font: 500 9pt "Inter", sans-serif; color: #82868f;
+}
+.sheet-body { height: 100%; --accent: oklch(0.50 0.13 245); }
+.sheet-body.paper { box-shadow: none; border-radius: 0; max-width: none; background: #fff; }
+.sheet-body .page { padding: 0; max-width: none; margin: 0; }
+.sheet-body.paper { font-size: 12pt; line-height: 1.55; }
+.sheet, .sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet-body > :first-child { margin-top: 0 !important; }
+.sheet-body .sec + .sec { border-top: 0; margin-top: 0; padding-top: 0; }
+.sheet-body .qed { margin-top: -1.55em; height: 1.55em; }
+.sheet-body .env-body::after { display: none; content: none; }
+.sheet-body .env-cont { margin-top: 0; }
+.sheet-body .env-cont > .env-body > :first-child { margin-top: 0; }
+@media screen {
+  body { background: #6f727b; margin: 0; }
+  .sheet { box-shadow: 0 3px 18px rgba(0,0,0,.3); margin: 9mm auto; }
+}
+@media print {
+  body { background: #fff; margin: 0; }
+  .sheet { box-shadow: none; margin: 0; break-after: page; }
+  .sheet:last-child { break-after: auto; }
+  .print-toolbar, #boot { display: none !important; }
+}
+
+/* ============================================================
+   page-level
+   ============================================================ */
+.print-toolbar {
+  position: fixed; top: 14px; right: 16px; z-index: 1000;
+  display: flex; align-items: center; gap: 10px; font-family: "Inter", system-ui, sans-serif;
+}
+.print-toolbar button {
+  font: 600 13px "Inter", sans-serif; color: #fff; background: oklch(0.50 0.13 245);
+  border: 0; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.print-toolbar button:disabled { opacity: .5; cursor: default; }
+.print-toolbar button:not(:disabled):hover { background: oklch(0.45 0.13 245); }
+.print-toolbar .status {
+  font-size: 12px; color: #e8eaf0; background: rgba(0,0,0,.4);
+  padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px);
+}
+#boot {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "Inter", system-ui, sans-serif; color: #cdd2dc; background: #6f727b; z-index: 900;
+}
+#source { position: absolute; left: -10000px; top: 0; width: 683px; }
+</style>
+<style>:root {
+  --mjx-fg-red: 255, 0, 0;
+  --mjx-fg-green: 0, 255, 0;
+  --mjx-fg-blue: 0, 0, 255;
+  --mjx-fg-yellow: 255, 255, 0;
+  --mjx-fg-cyan: 0, 255, 255;
+  --mjx-fg-magenta: 255, 0, 255;
+  --mjx-fg-white: 255, 255, 255;
+  --mjx-fg-black: 0, 0, 0;
+  --mjx-bg-red: 255, 0, 0;
+  --mjx-bg-green: 0, 255, 0;
+  --mjx-bg-blue: 0, 0, 255;
+  --mjx-bg-yellow: 255, 255, 0;
+  --mjx-bg-cyan: 0, 255, 255;
+  --mjx-bg-magenta: 255, 0, 255;
+  --mjx-bg-white: 255, 255, 255;
+  --mjx-bg-black: 0, 0, 0;
+  --mjx-live-bg-color: white;
+  --mjx-live-shadow-color: #888;
+  --mjx-live-border-color: #CCCCCC;
+  --mjx-bg1-color: rgba(var(--mjx-bg-blue), var(--mjx-bg1-alpha));
+  --mjx-fg1-color: rgba(var(--mjx-fg-black), 1);
+  --mjx-bg2-color: rgba(var(--mjx-bg-red), 1);
+  --mjx-fg2-color: rgba(var(--mjx-fg-black), 1);
+  --mjx-bg1-alpha: 0.2;
+  --mjx-fg1-alpha: 1;
+  --mjx-bg2-alpha: 1;
+  --mjx-fg2-alpha: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mjx-bg-blue: 132, 132, 255;
+      --mjx-bg-white: 0, 0, 0;
+      --mjx-bg-black: 255, 255, 255;
+      --mjx-fg-white: 0, 0, 0;
+      --mjx-fg-black: 255, 255, 255;
+      --mjx-live-bg-color: #222025;
+      --mjx-live-shadow-color: black;
+      --mjx-live-border-color: #7C7C7C;
+      --mjx-bg1-alpha: 0.3;
+      --mjx-fg1-alpha: 1;
+      --mjx-bg2-alpha: 1;
+      --mjx-fg2-alpha: 1;
+  }
+}
+
+.MJX_LiveRegion {
+  position: absolute;
+  top: 0;
+  display: none;
+  width: auto;
+  height: auto;
+  padding: 0;
+  opacity: 1;
+  z-index: 202;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: var(--mjx-live-bg-color);
+  box-shadow: 0px 5px 20px var(--mjx-live-shadow-color);
+  border: 2px solid var(--mjx-live-border-color);
+}
+
+.MJX_LiveRegion_Show {
+  display: block;
+}
+
+.MJX_LiveRegion > div {
+  color: var(--mjx-fg1-color);
+  background-color: var(--mjx-bg1-color);
+}
+
+mjx-container [data-sre-highlight-1]:not([data-mjx-collapsed], rect) {
+  color: var(--mjx-fg1-color) ! important;
+  fill: var(--mjx-fg1-color) ! important;
+}
+
+mjx-container:not([data-mjx-clone-container]) [data-sre-highlight-1]:not([data-sre-enclosed], rect) {
+  background-color: var(--mjx-bg1-color) ! important;
+}
+
+mjx-container rect[data-sre-highlight-1]:not([data-sre-enclosed]) {
+  fill: var(--mjx-bg1-color) ! important;
+}
+
+mjx-container [data-sre-highlight-2] {
+  color: var(--mjx-fg2-color) ! important;
+  background-color: var(--mjx-bg2-color) ! important;
+  fill: var(--mjx-fg2-color) ! important;
+}
+
+mjx-container rect[data-sre-highlight-2] {
+  fill: var(--mjx-bg2-color) ! important;
+}</style>
+<style>.MJX_HoverRegion {
+  display: block;
+  position: absolute;
+  width: max-content;
+  height: auto;
+  padding: 0;
+  opacity: 1;
+  z-index: 202;
+  margin: 0 auto;
+  background-color: white;
+  line-height: 0;
+  box-shadow: 0px 10px 20px #888;
+  border: 2px solid #CCCCCC;
+}
+
+.MJX_HoverRegion > div {
+  overflow: hidden;
+  color: var(--mjx-fg1-color);
+  background-color: var(--mjx-bg1-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .MJX_HoverRegion {
+    background-color: #222025;
+      box-shadow: 0px 5px 20px #000;
+      border: 1px solid #7C7C7C;
+  }
+}
+
+mjx-container[data-mjx-clone-container] {
+  padding: 2px ! important;
+}
+
+mjx-math > mjx-mlabeledtr {
+  display: inline-block;
+  margin-right: .5em ! important;
+}
+
+mjx-math > mjx-mtd {
+  float: right;
+}</style>
+<style>.MJX_ToolTip {
+  width: auto;
+  height: auto;
+  opacity: 1;
+  text-align: center;
+  border-radius: 4px;
+  padding: 0;
+  border-bottom: 1px dotted black;
+  position: absolute;
+  display: inline-block;
+  background-color: white;
+  z-index: 202;
+}
+
+.MJX_ToolTip > div {
+  border-radius: inherit;
+  padding: 0 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .MJX_ToolTip {
+    background-color: #222025;
+      box-shadow: 0px 5px 20px #000;
+      border: 1px solid #7C7C7C;
+  }
+}</style>
+<style>.CtxtMenu_Menu {
+  position: absolute;
+  background-color: white;
+  color: black;
+  width: auto;
+  padding: 5px 0px;
+  border: 1px solid #CCCCCC;
+  margin: 0;
+  cursor: default;
+  font: menu;
+  text-align: left;
+  text-indent: 0;
+  text-transform: none;
+  line-height: normal;
+  letter-spacing: normal;
+  word-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  float: none;
+  z-index: 1001;
+  border-radius: 5px;
+  box-shadow: 0px 10px 20px #808080;
+}
+.CtxtMenu_MenuItem {
+  padding: 1px 2em;
+  background: transparent;
+}
+.CtxtMenu_MenuArrow {
+  position: absolute;
+  right: 0.5em;
+  padding-top: 0.25em;
+  color: #666666;
+  font-family: null;
+  font-size: 0.75em;
+}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {
+  color: white;
+}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {
+  left: 0.5em;
+  right: auto;
+}
+.CtxtMenu_MenuCheck {
+  position: absolute;
+  left: 0.7em;
+  font-family: null;
+}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL {
+  right: 0.7em;
+  left: auto;
+}
+.CtxtMenu_MenuRadioCheck {
+  position: absolute;
+  left: 0.7em;
+}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {
+  right: 0.7em;
+  left: auto;
+}
+.CtxtMenu_MenuInputBox {
+  padding-left: 1em;
+  right: 0.5em;
+  color: #666666;
+  font-family: null;
+}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {
+  left: 0.1em;
+}
+.CtxtMenu_MenuComboBox {
+  left: 0.1em;
+  padding-bottom: 0.5em;
+}
+.CtxtMenu_MenuSlider {
+  left: 0.1em;
+}
+.CtxtMenu_SliderValue {
+  position: absolute;
+  right: 0.1em;
+  padding-top: 0.25em;
+  color: #333333;
+  font-size: 0.75em;
+}
+.CtxtMenu_MenuActive .CtxtMenu_SliderValue {
+  color: #DDDDDD;
+}
+.CtxtMenu_SliderBar {
+  outline: none;
+  background: #D3D3D3;
+}
+.CtxtMenu_MenuLabel {
+  padding: 1px 2em 3px 1.33em;
+  font-style: italic;
+}
+.CtxtMenu_MenuRule {
+  border-top: 1px solid #DDDDDD;
+  margin: 4px 3px;
+}
+.CtxtMenu_MenuDisabled {
+  color: #999;
+}
+.CtxtMenu_MenuActive {
+  background-color: #606872;
+  color: white;
+}
+.CtxtMenu_MenuDisabled:focus {
+  background-color: #E8E8E8;
+}
+.CtxtMenu_MenuLabel:focus {
+  background-color: #E8E8E8;
+}
+.CtxtMenu_ContextMenu:focus {
+  outline: none;
+}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {
+  outline: none;
+}
+.CtxtMenu_SelectionMenu {
+  position: relative;
+  float: left;
+  border-bottom: none;
+  box-shadow: none ! important;
+  border-radius: 0px !important;
+}
+.CtxtMenu_SelectionItem {
+  padding-right: 1em;
+}
+.CtxtMenu_Selection {
+  right: 40%;
+  width: 50%;
+}
+.CtxtMenu_SelectionBox {
+  padding: 0em;
+  max-height: 20em;
+  max-width: none;
+  background-color: #FFFFFF;
+}
+.CtxtMenu_SelectionDivider {
+  clear: both;
+  border-top: 2px solid #000000;
+}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {
+  top: -10px;
+  left: -10px;
+}
+@media (prefers-color-scheme: dark) /* menu */ {
+  .CtxtMenu_Menu {
+  color: #E0E0E0;
+  background-color: #242436;
+  box-shadow: 0px 10px 20px #000;
+  border: 1px solid #808080;
+}
+  .CtxtMenu_SliderValue {
+  color: #D0D0D0;
+}
+  .CtxtMenu_MenuDisabled:focus {
+  background-color: #383838;
+}
+  .CtxtMenu_MenuLabel:focus {
+  background-color: #585858;
+}
+  .CtxtMenu_MenuRule {
+  border-top: 1px solid #808080;
+}
+  .CtxtMenu_SelectionDivider {
+  border-top: 2px solid #808080;
+};
+}
+.CtxtMenu_MenuClose {
+  position: absolute;
+  cursor: pointer;
+  display: inline-block;
+  border: 2px solid #AAA;
+  border-radius: 18px;
+  font-family:  "Courier New", Courier;
+  font-size: 24px;
+  color: #F0F0F0;
+}
+.CtxtMenu_MenuClose span {
+  display: block;
+  background-color: #AAA;
+  border: 1.5px solid;
+  border-radius: 18px;
+  line-height: 0;
+  padding: 8px 0 6px;
+}
+.CtxtMenu_MenuClose:hover {
+  color: white !important;
+  border: 2px solid #CCC !important;
+}
+.CtxtMenu_MenuClose:hover span {
+  background-color: #CCC !important;
+}
+.CtxtMenu_MenuClose:hover:focus {
+  outline: none;
+}</style>
+<style>
+mjx-container[overflow="scroll"][display] {
+  overflow: auto clip;
+  min-width: initial !important;
+}
+
+mjx-container[overflow="truncate"][display] {
+  overflow: hidden clip;
+  min-width: initial !important;
+}
+
+mjx-container[display] {
+  display: block;
+  text-align: center;
+  justify-content: center;
+  margin: .7em 0;
+  padding: .3em 2px;
+}
+
+mjx-container[display][width="full"] {
+  display: flex;
+}
+
+mjx-container[justify="left"] {
+  text-align: left;
+  justify-content: left;
+}
+
+mjx-container[justify="right"] {
+  text-align: right;
+  justify-content: right;
+}
+
+mjx-container[jax="CHTML"] {
+  white-space: nowrap;
+}
+
+mjx-mo > mjx-c, mjx-mi > mjx-c, mjx-mn > mjx-c, mjx-ms > mjx-c, mjx-mtext > mjx-c {
+  clip-path: padding-box polygon(-1em -2px, calc(100% + 1em) -2px, calc(100% + 1em) calc(100% + 2px), -1em calc(100% + 2px));
+}
+
+mjx-stretchy-h {
+  clip-path: padding-box polygon(0 -2px, 100% -2px, 100% calc(100% + 2px), 0 calc(100% + 2px));
+  display: inline-block;
+}
+
+mjx-stretchy-v {
+  clip-path: padding-box polygon(-2px 0, calc(100% + 2px) 0, calc(100% + 2px) 100%, -2px 100%);
+  display: inline-block;
+  text-align: center;
+}
+
+mjx-container [space="1"] {
+  margin-left: .111em;
+}
+
+mjx-container [space="2"] {
+  margin-left: .167em;
+}
+
+mjx-container [space="3"] {
+  margin-left: .222em;
+}
+
+mjx-container [space="4"] {
+  margin-left: .278em;
+}
+
+mjx-container [space="5"] {
+  margin-left: .333em;
+}
+
+mjx-container [rspace="1"] {
+  margin-right: .111em;
+}
+
+mjx-container [rspace="2"] {
+  margin-right: .167em;
+}
+
+mjx-container [rspace="3"] {
+  margin-right: .222em;
+}
+
+mjx-container [rspace="4"] {
+  margin-right: .278em;
+}
+
+mjx-container [rspace="5"] {
+  margin-right: .333em;
+}
+
+mjx-container [size="s"] {
+  font-size: 70.7%;
+}
+
+mjx-container [size="ss"] {
+  font-size: 50%;
+}
+
+mjx-container [size="Tn"] {
+  font-size: 60%;
+}
+
+mjx-container [size="sm"] {
+  font-size: 85%;
+}
+
+mjx-container [size="lg"] {
+  font-size: 120%;
+}
+
+mjx-container [size="Lg"] {
+  font-size: 144%;
+}
+
+mjx-container [size="LG"] {
+  font-size: 173%;
+}
+
+mjx-container [size="hg"] {
+  font-size: 207%;
+}
+
+mjx-container [size="HG"] {
+  font-size: 249%;
+}
+
+mjx-container [width="full"] {
+  width: 100%;
+}
+
+mjx-box {
+  display: inline-block;
+}
+
+mjx-block {
+  display: block;
+}
+
+mjx-itable {
+  display: inline-table;
+}
+
+mjx-row {
+  display: table-row;
+}
+
+mjx-row > mjx-cell, mjx-row > mjx-base, mjx-row > mjx-under, mjx-row > mjx-over, mjx-row > mjx-den {
+  display: table-cell;
+}
+
+mjx-container [inline-breaks] {
+  display: inline;
+}
+
+mjx-container .mjx-selected {
+  outline: 2px solid black;
+}
+
+@media (prefers-color-scheme: dark) {
+  mjx-container .mjx-selected {
+    outline: 2px solid #C8C8C8;
+  }
+}
+
+mjx-mtext {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mstyle {
+  display: inline-block;
+}
+
+mjx-merror {
+  display: inline-block;
+  color: red;
+  background-color: yellow;
+}
+
+mjx-mphantom {
+  visibility: hidden;
+}
+
+mjx-container[has-speech="true"] {
+  position: relative;
+  cursor: default;
+}
+
+mjx-speech {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+}
+
+mjx-speech:focus {
+  outline: none;
+}
+
+mjx-container a[data-mjx-href] {
+  color: LinkText;
+  cursor: pointer;
+}
+
+mjx-container a[data-mjx-href].mjx-visited {
+  color: VisitedText;
+}
+
+mjx-container > mjx-help {
+  display: none;
+  position: absolute;
+  top: -.3em;
+  right: -.5em;
+  width: .6em;
+  height: .6em;
+  cursor: pointer;
+}
+
+mjx-container[display="true"] > mjx-help {
+  position: sticky;
+  inset: -100% 0 100% 0;
+  margin: -.3em -.5em 0 -.1em;
+  right: 0;
+  top: initial;
+}
+
+mjx-help > svg {
+  stroke: black;
+  width: 100%;
+  height: 100%;
+}
+
+mjx-help > svg > circle {
+  stroke-width: 1.5px;
+  cx: 9px;
+  cy: 9px;
+  r: 9px;
+  fill: white;
+}
+
+mjx-help > svg > circle:nth-child(2) {
+  fill: var(--mjx-bg1-color);
+  r: 7px;
+}
+
+mjx-help > svg > line {
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+}
+
+mjx-help:hover > svg > circle:nth-child(2) {
+  fill: white;
+}
+
+mjx-container.mjx-explorer-active > mjx-help {
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (prefers-color-scheme: dark) /* explorer */ {
+  mjx-help > svg {
+    stroke: #E0E0E0;
+  }
+  mjx-help > svg > circle {
+    fill: #404040;
+  }
+  mjx-help > svg > circle:nth-child(2) {
+    fill: rgba(132, 132, 255, .3);
+  }
+  mjx-help:hover > svg > circle:nth-child(2) {
+    stroke: #AAAAAA;
+      fill: #404040;
+  }
+}
+
+mjx-math {
+  display: inline-block;
+  text-align: left;
+  line-height: 0;
+  text-indent: 0;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 100%;
+  font-size-adjust: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  word-spacing: normal;
+  direction: ltr;
+  padding: 1px 0;
+}
+
+mjx-container[jax="CHTML"][display="true"] mjx-math {
+  padding: 0;
+}
+
+mjx-math[breakable] {
+  display: inline;
+}
+
+mjx-container[jax="CHTML"] mjx-break {
+  white-space: normal;
+  line-height: 0;
+  clip-path: rect(0 0 0 0);
+  font-family: MJX-BRK !important;
+}
+
+mjx-break[size="0"] {
+  letter-spacing: -0.999em;
+}
+
+mjx-break[size="1"] {
+  letter-spacing: -0.889em;
+}
+
+mjx-break[size="2"] {
+  letter-spacing: -0.833em;
+}
+
+mjx-break[size="3"] {
+  letter-spacing: -0.778em;
+}
+
+mjx-break[size="4"] {
+  letter-spacing: -0.722em;
+}
+
+mjx-break[size="5"] {
+  letter-spacing: -0.667em;
+}
+
+mjx-mi {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-c {
+  display: inline-block;
+  width: 0;
+  text-align: right;
+}
+
+mjx-utext {
+  display: inline-block;
+  padding: .75em 0 .2em 0;
+}
+
+mjx-mrow {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-linestack, mjx-mrow[break-top] {
+  display: inline-table;
+  width: 100%;
+}
+
+mjx-linestack[break-align="bottom"], mjx-mrow[break-top][break-align="bottom"] {
+  display: inline-block;
+}
+
+mjx-linestack[break-align="middle"], mjx-mrow[break-top][break-align="middle"] {
+  vertical-align: middle;
+}
+
+mjx-linestack[break-align="center"], mjx-mrow[break-top][break-align="center"] {
+  vertical-align: middle;
+}
+
+mjx-linestack[breakable] {
+  display: inline;
+}
+
+mjx-linestack[breakable] > mjx-linebox {
+  display: inline;
+}
+
+mjx-linestack[breakable] > mjx-linebox::before {
+  white-space: pre;
+  content: "\A";
+}
+
+mjx-linestack[breakable] > mjx-linebox::after {
+  white-space: normal;
+  content: " ";
+  letter-spacing: -.999em;
+  font-family: MJX-BRK;
+}
+
+mjx-linestack[breakable] > mjx-linebox:first-of-type::before {
+  display: none;
+}
+
+mjx-linestack[breakable] > mjx-linebox:last-of-type::after {
+  display: none;
+}
+
+mjx-linebox {
+  display: block;
+}
+
+mjx-linebox[align="left"] {
+  text-align: left;
+}
+
+mjx-linebox[align="center"] {
+  text-align: center;
+}
+
+mjx-linebox[align="right"] {
+  text-align: right;
+}
+
+mjx-linestrut {
+  display: inline-block;
+  height: 1em;
+  vertical-align: -.25em;
+}
+
+mjx-mo {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-stretchy-h > mjx-beg, mjx-stretchy-h > mjx-ext, mjx-stretchy-h > mjx-end, mjx-stretchy-h > mjx-mid {
+  display: inline-block;
+  width: 0;
+  text-align: right;
+}
+
+mjx-stretchy-h > mjx-ext {
+  clip-path: padding-box polygon(0 -1em, 100% -1em, 100% calc(100% + 1em), 0 calc(100% + 1em));
+  width: 100%;
+  border: 0px solid transparent;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+mjx-stretchy-v > mjx-beg, mjx-stretchy-v > mjx-ext, mjx-stretchy-v > mjx-end, mjx-stretchy-v > mjx-mid {
+  display: block;
+  height: 0;
+  margin: 0 auto;
+}
+
+mjx-stretchy-v > mjx-ext > mjx-spacer {
+  display: block;
+}
+
+mjx-stretchy-v > mjx-ext {
+  clip-path: padding-box polygon(-1em 0, calc(100% + 1em) 0, calc(100% + 1em) 100%, -1em 100%);
+  height: 100%;
+  border: 0.1px solid transparent;
+  box-sizing: border-box;
+  white-space: pre;
+}
+
+mjx-mark {
+  display: inline-block;
+  height: 0;
+}
+
+mjx-mn {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mfrac {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-frac {
+  display: inline-block;
+  vertical-align: 0.17em;
+  padding: 0 .22em;
+}
+
+mjx-frac[type="d"] {
+  vertical-align: .04em;
+}
+
+mjx-frac[delims] {
+  padding: 0 .1em;
+}
+
+mjx-frac[atop] {
+  padding: 0 .12em;
+}
+
+mjx-frac[atop][delims] {
+  padding: 0;
+}
+
+mjx-dtable {
+  display: inline-table;
+  width: 100%;
+}
+
+mjx-dtable > mjx-line, mjx-dtable > mjx-row {
+  font-size: 2000%;
+}
+
+mjx-dbox {
+  display: block;
+  font-size: 5%;
+}
+
+mjx-num {
+  display: block;
+  text-align: center;
+}
+
+mjx-den {
+  display: block;
+  text-align: center;
+}
+
+mjx-mfrac[bevelled] > mjx-num {
+  display: inline-block;
+}
+
+mjx-mfrac[bevelled] > mjx-den {
+  display: inline-block;
+}
+
+mjx-den[align="right"], mjx-num[align="right"] {
+  text-align: right;
+}
+
+mjx-den[align="left"], mjx-num[align="left"] {
+  text-align: left;
+}
+
+mjx-nstrut {
+  display: inline-block;
+  height: .054em;
+  width: 0;
+  vertical-align: -.054em;
+}
+
+mjx-nstrut[type="d"] {
+  height: .217em;
+  vertical-align: -.217em;
+}
+
+mjx-dstrut {
+  display: inline-block;
+  height: .505em;
+  width: 0;
+}
+
+mjx-dstrut[type="d"] {
+  height: .726em;
+}
+
+mjx-line {
+  display: block;
+  box-sizing: border-box;
+  min-height: 1px;
+  height: .06em;
+  border-top: .075em solid;
+  margin: .06em -.1em;
+  overflow: hidden;
+}
+
+mjx-line[type="d"] {
+  margin: .18em -.1em;
+}
+
+mjx-msup {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-msubsup {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-script {
+  display: inline-block;
+  padding-right: .05em;
+  padding-left: .033em;
+}
+
+mjx-script > mjx-spacer {
+  display: block;
+}
+
+mjx-TeXAtom {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-msub {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mspace {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-mtable {
+  display: inline-block;
+  text-align: center;
+  vertical-align: .25em;
+  position: relative;
+  box-sizing: border-box;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+mjx-mstyle[size="s"] mjx-mtable {
+  vertical-align: .354em;
+}
+
+mjx-labels {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+mjx-table {
+  display: inline-block;
+  vertical-align: -.5ex;
+  box-sizing: border-box;
+}
+
+mjx-table > mjx-itable {
+  vertical-align: middle;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+mjx-labels > mjx-itable {
+  position: absolute;
+  top: 0;
+}
+
+mjx-mtable[justify="left"] {
+  text-align: left;
+}
+
+mjx-mtable[justify="right"] {
+  text-align: right;
+}
+
+mjx-mtable[justify="left"][side="left"] {
+  padding-right: 0 ! important;
+}
+
+mjx-mtable[justify="left"][side="right"] {
+  padding-left: 0 ! important;
+}
+
+mjx-mtable[justify="right"][side="left"] {
+  padding-right: 0 ! important;
+}
+
+mjx-mtable[justify="right"][side="right"] {
+  padding-left: 0 ! important;
+}
+
+mjx-mtable[align] {
+  vertical-align: baseline;
+}
+
+mjx-mtable[align="top"] > mjx-table {
+  vertical-align: top;
+}
+
+mjx-mtable[align="bottom"] > mjx-table {
+  vertical-align: bottom;
+}
+
+mjx-mtable[side="right"] mjx-labels {
+  min-width: 100%;
+}
+
+mjx-mtr {
+  display: table-row;
+  text-align: left;
+}
+
+mjx-mtr[rowalign="top"] > mjx-mtd {
+  vertical-align: top;
+}
+
+mjx-mtr[rowalign="center"] > mjx-mtd {
+  vertical-align: middle;
+}
+
+mjx-mtr[rowalign="bottom"] > mjx-mtd {
+  vertical-align: bottom;
+}
+
+mjx-mtr[rowalign="baseline"] > mjx-mtd {
+  vertical-align: baseline;
+}
+
+mjx-mtr[rowalign="axis"] > mjx-mtd {
+  vertical-align: .25em;
+}
+
+mjx-mtd {
+  display: table-cell;
+  text-align: center;
+  padding: .215em .4em;
+}
+
+mjx-mtd:first-child {
+  padding-left: 0;
+}
+
+mjx-mtd:last-child {
+  padding-right: 0;
+}
+
+mjx-mtable > * > mjx-itable > *:first-child > mjx-mtd {
+  padding-top: 0;
+}
+
+mjx-mtable > * > mjx-itable > *:last-child > mjx-mtd {
+  padding-bottom: 0;
+}
+
+mjx-tstrut {
+  display: inline-block;
+  height: 1em;
+  vertical-align: -.25em;
+}
+
+mjx-labels[align="left"] > mjx-mtr > mjx-mtd {
+  text-align: left;
+}
+
+mjx-labels[align="right"] > mjx-mtr > mjx-mtd {
+  text-align: right;
+}
+
+mjx-mtd[extra] {
+  padding: 0;
+}
+
+mjx-mtd[rowalign="top"] {
+  vertical-align: top;
+}
+
+mjx-mtd[rowalign="center"] {
+  vertical-align: middle;
+}
+
+mjx-mtd[rowalign="bottom"] {
+  vertical-align: bottom;
+}
+
+mjx-mtd[rowalign="baseline"] {
+  vertical-align: baseline;
+}
+
+mjx-mtd[rowalign="axis"] {
+  vertical-align: .25em;
+}
+
+mjx-mroot {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-root {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+mjx-surd {
+  display: inline-block;
+  vertical-align: top;
+}
+
+mjx-sqrt {
+  display: inline-block;
+  padding-top: .075em;
+}
+
+mjx-sqrt > mjx-box {
+  border-top: .075em solid;
+  padding-left: .03em;
+  margin-left: -.03em;
+}
+
+mjx-sqrt.mjx-tall > mjx-box {
+  padding-left: .3em;
+  margin-left: -.3em;
+}
+
+mjx-msqrt {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-munder {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-over {
+  text-align: left;
+}
+
+mjx-munder:not([limits="false"]) {
+  display: inline-table;
+}
+
+mjx-munder > mjx-row {
+  text-align: left;
+}
+
+mjx-under {
+  padding-bottom: .1em;
+}
+
+mjx-container[jax="CHTML"] > mjx-math.NCM-N[breakable] > * {
+  font-family: MJX-NCM-ZERO, MJX-NCM-N;
+}
+
+.NCM-N {
+  font-family: MJX-NCM-ZERO, MJX-NCM-N;
+}
+
+.NCM-B {
+  font-family: MJX-NCM-ZERO, MJX-NCM-B;
+}
+
+.NCM-I {
+  font-family: MJX-NCM-ZERO, MJX-NCM-I;
+}
+
+.NCM-BI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-BI;
+}
+
+.NCM-DS {
+  font-family: MJX-NCM-ZERO, MJX-NCM-DS;
+}
+
+.NCM-F {
+  font-family: MJX-NCM-ZERO, MJX-NCM-F;
+}
+
+.NCM-FB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-FB;
+}
+
+.NCM-SS {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SS;
+}
+
+.NCM-SSB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SSB;
+}
+
+.NCM-SSI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SSI;
+}
+
+.NCM-SSBI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SSBI;
+}
+
+.NCM-M {
+  font-family: MJX-NCM-ZERO, MJX-NCM-M;
+}
+
+.NCM-SO {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SO;
+}
+
+.NCM-LO {
+  font-family: MJX-NCM-ZERO, MJX-NCM-LO;
+}
+
+.NCM-S3 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S3;
+}
+
+.NCM-S4 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S4;
+}
+
+.NCM-S5 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S5;
+}
+
+.NCM-S6 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S6;
+}
+
+.NCM-S7 {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S7;
+}
+
+.NCM-MI {
+  font-family: MJX-NCM-ZERO, MJX-NCM-MI;
+}
+
+.NCM-C {
+  font-family: MJX-NCM-ZERO, MJX-NCM-C;
+}
+
+.NCM-CB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-CB;
+}
+
+.NCM-OS {
+  font-family: MJX-NCM-ZERO, MJX-NCM-OS;
+}
+
+.NCM-OB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-OB;
+}
+
+.NCM-V {
+  font-family: MJX-NCM-ZERO, MJX-NCM-V;
+}
+
+.NCM-LT {
+  font-family: MJX-NCM-ZERO, MJX-NCM-LT;
+}
+
+.NCM-RB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-RB;
+}
+
+.NCM-EM {
+  font-family: MJX-NCM-ZERO, MJX-NCM-EM;
+}
+
+.NCM-B-a {
+  font-family: MJX-NCM-ZERO, MJX-NCM-B-a;
+}
+
+.NCM-U {
+  font-family: MJX-NCM-ZERO, MJX-NCM-U;
+}
+
+.NCM-U-a {
+  font-family: MJX-NCM-ZERO, MJX-NCM-U-a;
+}
+
+.NCM-S {
+  font-family: MJX-NCM-ZERO, MJX-NCM-S;
+}
+
+.NCM-SB {
+  font-family: MJX-NCM-ZERO, MJX-NCM-SB;
+}
+
+@font-face /* MJX-NCM-ZERO */ {
+  font-family: MJX-NCM-ZERO;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-zero.woff2") format("woff2");
+}
+
+@font-face /* MJX-BRK */ {
+  font-family: MJX-BRK;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-brk.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-N */ {
+  font-family: MJX-NCM-N;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-n.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-B */ {
+  font-family: MJX-NCM-B;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-b.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-I */ {
+  font-family: MJX-NCM-I;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-i.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-BI */ {
+  font-family: MJX-NCM-BI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-bi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-DS */ {
+  font-family: MJX-NCM-DS;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ds.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-F */ {
+  font-family: MJX-NCM-F;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-f.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-FB */ {
+  font-family: MJX-NCM-FB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-fb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SS */ {
+  font-family: MJX-NCM-SS;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ss.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SSB */ {
+  font-family: MJX-NCM-SSB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ssb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SSI */ {
+  font-family: MJX-NCM-SSI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ssi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SSBI */ {
+  font-family: MJX-NCM-SSBI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ssbi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-M */ {
+  font-family: MJX-NCM-M;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-m.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SO */ {
+  font-family: MJX-NCM-SO;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-so.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-LO */ {
+  font-family: MJX-NCM-LO;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-lo.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S3 */ {
+  font-family: MJX-NCM-S3;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s3.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S4 */ {
+  font-family: MJX-NCM-S4;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s4.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S5 */ {
+  font-family: MJX-NCM-S5;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s5.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S6 */ {
+  font-family: MJX-NCM-S6;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s6.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S7 */ {
+  font-family: MJX-NCM-S7;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s7.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-MI */ {
+  font-family: MJX-NCM-MI;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-mi.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-C */ {
+  font-family: MJX-NCM-C;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-c.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-CB */ {
+  font-family: MJX-NCM-CB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-cb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-OS */ {
+  font-family: MJX-NCM-OS;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-os.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-OB */ {
+  font-family: MJX-NCM-OB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-ob.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-V */ {
+  font-family: MJX-NCM-V;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-v.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-LT */ {
+  font-family: MJX-NCM-LT;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-lt.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-RB */ {
+  font-family: MJX-NCM-RB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-rb.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-EM */ {
+  font-family: MJX-NCM-EM;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-em.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-B-a */ {
+  font-family: MJX-NCM-B-a;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-b-a.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-U */ {
+  font-family: MJX-NCM-U;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-u.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-U-a */ {
+  font-family: MJX-NCM-U-a;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-u-a.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-S */ {
+  font-family: MJX-NCM-S;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-s.woff2") format("woff2");
+}
+
+@font-face /* MJX-NCM-SB */ {
+  font-family: MJX-NCM-SB;
+  src: url("https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/chtml/woff2/mjx-ncm-sb.woff2") format("woff2");
+}
+
+mjx-c.mjx-c1D700 {
+  padding: 0.453em 0.466em 0.022em 0;
+}
+
+mjx-c.mjx-c1D6FF {
+  padding: 0.712em 0.452em 0.011em 0;
+}
+
+mjx-c.mjx-c61 {
+  padding: 0.448em 0.5em 0.011em 0;
+}
+
+mjx-c.mjx-c72 {
+  padding: 0.442em 0.392em 0 0;
+}
+
+mjx-c.mjx-c63 {
+  padding: 0.448em 0.444em 0.011em 0;
+}
+
+mjx-c.mjx-c73 {
+  padding: 0.448em 0.394em 0.011em 0;
+}
+
+mjx-c.mjx-c69 {
+  padding: 0.657em 0.278em 0 0;
+}
+
+mjx-c.mjx-c6E {
+  padding: 0.442em 0.556em 0 0;
+}
+
+mjx-c.mjx-c6F {
+  padding: 0.448em 0.5em 0.011em 0;
+}
+
+mjx-c.mjx-c74 {
+  padding: 0.615em 0.389em 0.011em 0;
+}
+
+mjx-c.mjx-c1D453 {
+  padding: 0.705em 0.552em 0.205em 0;
+}
+
+mjx-c.mjx-c2061 {
+  padding: 0 0 0 0;
+}
+
+mjx-c.mjx-c28 {
+  padding: 0.748em 0.389em 0.248em 0;
+}
+
+mjx-c.mjx-c1D465 {
+  padding: 0.442em 0.572em 0.011em 0;
+}
+
+mjx-c.mjx-c29 {
+  padding: 0.748em 0.389em 0.248em 0;
+}
+
+mjx-c.mjx-c3D {
+  padding: 0.367em 0.778em 0 0;
+}
+
+mjx-c.mjx-c5B {
+  padding: 0.75em 0.278em 0.25em 0;
+}
+
+mjx-c.mjx-c30 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c2C {
+  padding: 0.106em 0.278em 0.193em 0;
+}
+
+mjx-c.mjx-c31 {
+  padding: 0.666em 0.5em 0 0;
+}
+
+mjx-c.mjx-c5D {
+  padding: 0.75em 0.278em 0.25em 0;
+}
+
+mjx-c.mjx-c32 {
+  padding: 0.666em 0.5em 0 0;
+}
+
+mjx-c.mjx-c38 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c2212 {
+  padding: 0.583em 0.778em 0.083em 0;
+}
+
+mjx-c.mjx-c34 {
+  padding: 0.677em 0.5em 0 0;
+}
+
+mjx-c.mjx-c1D434 {
+  padding: 0.716em 0.75em 0 0;
+}
+
+mjx-c.mjx-c2260 {
+  padding: 0.73em 0.778em 0.23em 0;
+}
+
+mjx-c.mjx-c2E {
+  padding: 0.106em 0.278em 0 0;
+}
+
+mjx-c.mjx-c27F9 {
+  padding: 0.52em 1.457em 0.02em 0;
+}
+
+mjx-c.mjx-c75 {
+  padding: 0.442em 0.556em 0.011em 0;
+}
+
+mjx-c.mjx-c64 {
+  padding: 0.694em 0.556em 0.011em 0;
+}
+
+mjx-c.mjx-c65 {
+  padding: 0.448em 0.444em 0.011em 0;
+}
+
+mjx-c.mjx-c2208 {
+  padding: 0.543em 0.667em 0.043em 0;
+}
+
+mjx-c.mjx-c1D454 {
+  padding: 0.442em 0.477em 0.205em 0;
+}
+
+mjx-c.mjx-c28.NCM-LO {
+  padding: 0.847em 0.458em 0.347em 0;
+}
+
+mjx-c.mjx-c29.NCM-LO {
+  padding: 0.847em 0.458em 0.347em 0;
+}
+
+mjx-c.mjx-c211D.NCM-DS {
+  padding: 0.685em 0.722em 0 0;
+}
+
+mjx-c.mjx-c210E {
+  padding: 0.694em 0.576em 0.011em 0;
+}
+
+mjx-c.mjx-c33 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c2062 {
+  padding: 0 0 0 0;
+}
+
+mjx-c.mjx-c1D458 {
+  padding: 0.694em 0.521em 0.011em 0;
+}
+
+mjx-c.mjx-c2B {
+  padding: 0.583em 0.778em 0.083em 0;
+}
+
+mjx-c.mjx-c1D466 {
+  padding: 0.442em 0.49em 0.205em 0;
+}
+
+mjx-c.mjx-c1D450 {
+  padding: 0.442em 0.433em 0.011em 0;
+}
+
+mjx-c.mjx-c1D435 {
+  padding: 0.683em 0.759em 0 0;
+}
+
+mjx-c.mjx-c27FA {
+  padding: 0.52em 1.534em 0.02em 0;
+}
+
+mjx-c.mjx-c28.NCM-S3 {
+  padding: 0.972em 0.523em 0.472em 0;
+}
+
+mjx-c.mjx-c29.NCM-S3 {
+  padding: 0.972em 0.523em 0.472em 0;
+}
+
+mjx-c.mjx-c2F {
+  padding: 0.75em 0.5em 0.25em 0;
+}
+
+mjx-c.mjx-c21A6 {
+  padding: 0.51em 0.977em 0.011em 0;
+}
+
+mjx-c.mjx-c3A {
+  padding: 0.431em 0.278em 0 0;
+}
+
+mjx-c.mjx-c2192 {
+  padding: 0.51em 1em 0.01em 0;
+}
+
+mjx-c.mjx-c221A {
+  padding: 0.04em 0.853em 0.96em 0;
+}
+
+mjx-c.mjx-c1D44E {
+  padding: 0.442em 0.529em 0.011em 0;
+}
+
+mjx-c.mjx-c1D44F {
+  padding: 0.694em 0.429em 0.011em 0;
+}
+
+mjx-c.mjx-c221E {
+  padding: 0.442em 1em 0.011em 0;
+}
+
+mjx-c.mjx-c2265 {
+  padding: 0.631em 0.778em 0.119em 0;
+}
+
+mjx-c.mjx-cB1 {
+  padding: 0.583em 0.778em 0.084em 0;
+}
+
+mjx-c.mjx-c221A.NCM-SO {
+  padding: 0.85em 1.02em 0.35em 0;
+}
+
+mjx-c.mjx-c35 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c1D461 {
+  padding: 0.626em 0.361em 0.011em 0;
+}
+
+mjx-c.mjx-c39 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c22C5 {
+  padding: 0.303em 0.278em 0 0;
+}
+
+mjx-c.mjx-c1D70B {
+  padding: 0.431em 0.57em 0.011em 0;
+}
+
+mjx-c.mjx-c2264 {
+  padding: 0.631em 0.778em 0.119em 0;
+}
+
+mjx-c.mjx-c5B.NCM-SO {
+  padding: 0.8em 0.34em 0.3em 0;
+}
+
+mjx-c.mjx-c5D.NCM-SO {
+  padding: 0.8em 0.34em 0.3em 0;
+}
+
+mjx-c.mjx-c1D703 {
+  padding: 0.705em 0.469em 0.011em 0;
+}
+
+mjx-c.mjx-c36 {
+  padding: 0.666em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c3E {
+  padding: 0.547em 0.778em 0.047em 0;
+}
+
+mjx-c.mjx-c1D45B {
+  padding: 0.442em 0.6em 0.011em 0;
+}
+
+mjx-c.mjx-c28.NCM-SO {
+  padding: 0.797em 0.422em 0.297em 0;
+}
+
+mjx-c.mjx-c29.NCM-SO {
+  padding: 0.797em 0.422em 0.297em 0;
+}
+
+mjx-c.mjx-c3C {
+  padding: 0.547em 0.778em 0.052em 0;
+}
+
+mjx-c.mjx-c221A.NCM-LO {
+  padding: 1.15em 1.02em 0.651em 0;
+}
+
+mjx-c.mjx-c222A {
+  padding: 0.604em 0.667em 0.02em 0;
+}
+
+mjx-c.mjx-c5D.NCM-LO {
+  padding: 0.85em 0.417em 0.35em 0;
+}
+
+mjx-c.mjx-c5B.NCM-LO {
+  padding: 0.85em 0.417em 0.35em 0;
+}
+
+mjx-c.mjx-c7C {
+  padding: 0.75em 0.278em 0.25em 0;
+}
+
+mjx-c.mjx-c1D460 {
+  padding: 0.442em 0.469em 0.011em 0;
+}
+
+mjx-c.mjx-c6C {
+  padding: 0.694em 0.278em 0 0;
+}
+
+mjx-c.mjx-c6D {
+  padding: 0.442em 0.833em 0 0;
+}
+
+mjx-c.mjx-c1D43F {
+  padding: 0.684em 0.681em 0 0;
+}
+
+mjx-c.mjx-c2026 {
+  padding: 0.106em 0.837em 0 0;
+}
+
+mjx-c.mjx-c22EF {
+  padding: 0.303em 0.776em 0 0;
+}
+
+mjx-c.mjx-c1D463 {
+  padding: 0.442em 0.485em 0.011em 0;
+}
+
+mjx-c.mjx-c7B.NCM-S6 {
+  padding: 1.45em 0.75em 0.95em 0;
+}
+
+mjx-c.mjx-c1D452 {
+  padding: 0.442em 0.466em 0.011em 0;
+}
+
+mjx-c.mjx-c2248 {
+  padding: 0.457em 0.773em 0 0;
+}
+
+mjx-c.mjx-c37 {
+  padding: 0.676em 0.5em 0.022em 0;
+}
+
+mjx-c.mjx-c1D440 {
+  padding: 0.683em 1.044em 0 0;
+}
+
+mjx-c.mjx-c28.NCM-S4 {
+  padding: 1.146em 0.597em 0.646em 0;
+}
+
+mjx-c.mjx-c29.NCM-S4 {
+  padding: 1.146em 0.597em 0.646em 0;
+}
+
+mjx-c.mjx-c5B.NCM-S4 {
+  padding: 1.15em 0.472em 0.65em 0;
+}
+
+mjx-c.mjx-c5D.NCM-S4 {
+  padding: 1.15em 0.472em 0.65em 0;
+}
+
+mjx-c.mjx-c1D45D {
+  padding: 0.442em 0.503em 0.194em 0;
+}
+
+mjx-c.mjx-c1D45F {
+  padding: 0.442em 0.451em 0.011em 0;
+}
+
+mjx-c.mjx-c230A {
+  padding: 0.75em 0.444em 0.25em 0;
+}
+
+mjx-c.mjx-c230B {
+  padding: 0.75em 0.444em 0.25em 0;
+}
+
+mjx-c.mjx-c28.NCM-S5 {
+  padding: 1.296em 0.663em 0.796em 0;
+}
+
+mjx-c.mjx-c29.NCM-S5 {
+  padding: 1.296em 0.663em 0.796em 0;
+}
+
+mjx-c.mjx-c2223.NCM-S4 {
+  padding: 1.292em 0.333em 0.792em 0;
+}
+
+mjx-c.mjx-c7B {
+  padding: 0.75em 0.5em 0.25em 0;
+}
+
+mjx-c.mjx-c7D {
+  padding: 0.75em 0.5em 0.25em 0;
+}
+
+mjx-c.mjx-c1D45E {
+  padding: 0.442em 0.452em 0.194em 0;
+}
+
+mjx-c.mjx-c7B.NCM-SO {
+  padding: 0.801em 0.54em 0.301em 0;
+}
+
+mjx-c.mjx-c7D.NCM-SO {
+  padding: 0.801em 0.54em 0.301em 0;
+}
+
+mjx-c.mjx-c1D441 {
+  padding: 0.683em 0.881em 0 0;
+}
+</style><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin=""><style>@page{size:330.27px 282px;margin:0}html,body{margin:0;padding:0;background:#fff;width:330.27px;height:282px;overflow:hidden;position:relative}.fx-neutral{display:block!important;position:static!important;margin:0!important;padding:0!important;border:0!important;outline:0!important;width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;min-height:0!important;max-height:none!important;transform:none!important;box-shadow:none!important;float:none!important;overflow:visible!important;text-align:left!important;background:none!important;columns:auto!important}.fx-target{position:absolute!important;left:1px!important;top:1px!important;margin:0!important;width:280px!important;height:280px!important;max-width:none!important;max-height:none!important;overflow:visible!important}.fx-svg{width:280px!important;height:280px!important;min-width:0!important;max-width:none!important;max-height:none!important;flex:none!important}</style></head><body class=""><div class="fx-neutral"><div class="sheet fx-neutral"><div class="sheet-body paper skin-hs vivid fx-neutral"><section class="env env-solution env-cont fx-neutral"><div class="env-body fx-neutral"><figure class="figure fx-neutral" data-fig="restrict-x2"><div class="figure-art fx-neutral"><svg viewBox="0 0 300 300" style="width:300px" class="fig-svg fx-target fx-svg" role="img" aria-label="The squaring function restricted to the nonnegative reals, its inverse square root, and the mirror line y equals x." preserveAspectRatio="xMidYMid meet"><defs><marker id="pl3a" markerWidth="8" markerHeight="8" refX="5.4" refY="2.8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5.4,2.8 L0,5.6" fill="none" stroke="var(--c-axis)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></marker></defs><path d="M22.0,245.9 H281.0" class="axis" marker-end="url(#pl3a)"></path><path d="M55.5,280.0 V17.0" class="axis" marker-end="url(#pl3a)"></path><path d="M55.55,245.94 L56.42,245.05 L57.30,244.16 L58.17,243.27 L59.04,242.39 L59.92,241.50 L60.79,240.61 L61.66,239.73 L62.54,238.84 L63.41,237.95 L64.28,237.06 L65.16,236.18 L66.03,235.29 L66.91,234.40 L67.78,233.52 L68.65,232.63 L69.53,231.74 L70.40,230.85 L71.27,229.97 L72.15,229.08 L73.02,228.19 L73.90,227.31 L74.77,226.42 L75.64,225.53 L76.52,224.65 L77.39,223.76 L78.26,222.87 L79.14,221.98 L80.01,221.10 L80.88,220.21 L81.76,219.32 L82.63,218.44 L83.51,217.55 L84.38,216.66 L85.25,215.77 L86.13,214.89 L87.00,214.00 L87.87,213.11 L88.75,212.23 L89.62,211.34 L90.49,210.45 L91.37,209.56 L92.24,208.68 L93.12,207.79 L93.99,206.90 L94.86,206.02 L95.74,205.13 L96.61,204.24 L97.48,203.35 L98.36,202.47 L99.23,201.58 L100.10,200.69 L100.98,199.81 L101.85,198.92 L102.73,198.03 L103.60,197.15 L104.47,196.26 L105.35,195.37 L106.22,194.48 L107.09,193.60 L107.97,192.71 L108.84,191.82 L109.72,190.94 L110.59,190.05 L111.46,189.16 L112.34,188.27 L113.21,187.39 L114.08,186.50 L114.96,185.61 L115.83,184.73 L116.70,183.84 L117.58,182.95 L118.45,182.06 L119.33,181.18 L120.20,180.29 L121.07,179.40 L121.95,178.52 L122.82,177.63 L123.69,176.74 L124.57,175.85 L125.44,174.97 L126.31,174.08 L127.19,173.19 L128.06,172.31 L128.94,171.42 L129.81,170.53 L130.68,169.65 L131.56,168.76 L132.43,167.87 L133.30,166.98 L134.18,166.10 L135.05,165.21 L135.92,164.32 L136.80,163.44 L137.67,162.55 L138.55,161.66 L139.42,160.77 L140.29,159.89 L141.17,159.00 L142.04,158.11 L142.91,157.23 L143.79,156.34 L144.66,155.45 L145.53,154.56 L146.41,153.68 L147.28,152.79 L148.16,151.90 L149.03,151.02 L149.90,150.13 L150.78,149.24 L151.65,148.35 L152.52,147.47 L153.40,146.58 L154.27,145.69 L155.15,144.81 L156.02,143.92 L156.89,143.03 L157.77,142.15 L158.64,141.26 L159.51,140.37 L160.39,139.48 L161.26,138.60 L162.13,137.71 L163.01,136.82 L163.88,135.94 L164.76,135.05 L165.63,134.16 L166.50,133.27 L167.38,132.39 L168.25,131.50 L169.12,130.61 L170.00,129.73 L170.87,128.84 L171.74,127.95 L172.62,127.06 L173.49,126.18 L174.37,125.29 L175.24,124.40 L176.11,123.52 L176.99,122.63 L177.86,121.74 L178.73,120.85 L179.61,119.97 L180.48,119.08 L181.35,118.19 L182.23,117.31 L183.10,116.42 L183.98,115.53 L184.85,114.65 L185.72,113.76 L186.60,112.87 L187.47,111.98 L188.34,111.10 L189.22,110.21 L190.09,109.32 L190.97,108.44 L191.84,107.55 L192.71,106.66 L193.59,105.77 L194.46,104.89 L195.33,104.00 L196.21,103.11 L197.08,102.23 L197.95,101.34 L198.83,100.45 L199.70,99.56 L200.58,98.68 L201.45,97.79 L202.32,96.90 L203.20,96.02 L204.07,95.13 L204.94,94.24 L205.82,93.35 L206.69,92.47 L207.56,91.58 L208.44,90.69 L209.31,89.81 L210.19,88.92 L211.06,88.03 L211.93,87.15 L212.81,86.26 L213.68,85.37 L214.55,84.48 L215.43,83.60 L216.30,82.71 L217.17,81.82 L218.05,80.94 L218.92,80.05 L219.80,79.16 L220.67,78.27 L221.54,77.39 L222.42,76.50 L223.29,75.61 L224.16,74.73 L225.04,73.84 L225.91,72.95 L226.78,72.06 L227.66,71.18 L228.53,70.29 L229.41,69.40 L230.28,68.52 L231.15,67.63 L232.03,66.74 L232.90,65.85 L233.77,64.97 L234.65,64.08 L235.52,63.19 L236.40,62.31 L237.27,61.42 L238.14,60.53 L239.02,59.65 L239.89,58.76 L240.76,57.87 L241.64,56.98 L242.51,56.10 L243.38,55.21 L244.26,54.32 L245.13,53.44 L246.01,52.55 L246.88,51.66 L247.75,50.77 L248.63,49.89 L249.50,49.00 L250.37,48.11 L251.25,47.23 L252.12,46.34 L252.99,45.45 L253.87,44.56 L254.74,43.68 L255.62,42.79 L256.49,41.90 L257.36,41.02 L258.24,40.13 L259.11,39.24 L259.98,38.35 L260.86,37.47 L261.73,36.58 L262.60,35.69 L263.48,34.81 L264.35,33.92 L265.23,33.03" class="refline"></path><path d="M55.55,245.94 L56.11,245.93 L56.67,245.92 L57.23,245.90 L57.78,245.87 L58.34,245.84 L58.90,245.80 L59.46,245.75 L60.02,245.69 L60.58,245.63 L61.14,245.56 L61.70,245.48 L62.26,245.39 L62.82,245.30 L63.38,245.19 L63.94,245.08 L64.49,244.97 L65.05,244.84 L65.61,244.71 L66.17,244.57 L66.73,244.42 L67.29,244.27 L67.85,244.10 L68.41,243.93 L68.97,243.76 L69.53,243.57 L70.09,243.38 L70.65,243.18 L71.20,242.97 L71.76,242.75 L72.32,242.53 L72.88,242.30 L73.44,242.06 L74.00,241.81 L74.56,241.56 L75.12,241.30 L75.68,241.03 L76.24,240.75 L76.80,240.47 L77.35,240.18 L77.91,239.88 L78.47,239.57 L79.03,239.26 L79.59,238.94 L80.15,238.61 L80.71,238.27 L81.27,237.93 L81.83,237.57 L82.39,237.21 L82.95,236.85 L83.51,236.47 L84.06,236.09 L84.62,235.70 L85.18,235.30 L85.74,234.90 L86.30,234.49 L86.86,234.07 L87.42,233.64 L87.98,233.20 L88.54,232.76 L89.10,232.31 L89.66,231.85 L90.22,231.39 L90.77,230.91 L91.33,230.43 L91.89,229.94 L92.45,229.45 L93.01,228.94 L93.57,228.43 L94.13,227.92 L94.69,227.39 L95.25,226.86 L95.81,226.31 L96.37,225.77 L96.92,225.21 L97.48,224.65 L98.04,224.07 L98.60,223.49 L99.16,222.91 L99.72,222.31 L100.28,221.71 L100.84,221.10 L101.40,220.49 L101.96,219.86 L102.52,219.23 L103.08,218.59 L103.63,217.94 L104.19,217.29 L104.75,216.62 L105.31,215.95 L105.87,215.28 L106.43,214.59 L106.99,213.90 L107.55,213.20 L108.11,212.49 L108.67,211.78 L109.23,211.05 L109.78,210.32 L110.34,209.58 L110.90,208.84 L111.46,208.09 L112.02,207.33 L112.58,206.56 L113.14,205.78 L113.70,205.00 L114.26,204.21 L114.82,203.41 L115.38,202.60 L115.94,201.79 L116.49,200.97 L117.05,200.14 L117.61,199.30 L118.17,198.46 L118.73,197.61 L119.29,196.75 L119.85,195.88 L120.41,195.01 L120.97,194.12 L121.53,193.23 L122.09,192.34 L122.65,191.43 L123.20,190.52 L123.76,189.60 L124.32,188.67 L124.88,187.74 L125.44,186.80 L126.00,185.85 L126.56,184.89 L127.12,183.92 L127.68,182.95 L128.24,181.97 L128.80,180.98 L129.35,179.99 L129.91,178.98 L130.47,177.97 L131.03,176.95 L131.59,175.93 L132.15,174.90 L132.71,173.85 L133.27,172.81 L133.83,171.75 L134.39,170.69 L134.95,169.62 L135.51,168.54 L136.06,167.45 L136.62,166.36 L137.18,165.26 L137.74,164.15 L138.30,163.03 L138.86,161.91 L139.42,160.77 L139.98,159.63 L140.54,158.49 L141.10,157.33 L141.66,156.17 L142.22,155.00 L142.77,153.83 L143.33,152.64 L143.89,151.45 L144.45,150.25 L145.01,149.04 L145.57,147.83 L146.13,146.60 L146.69,145.37 L147.25,144.14 L147.81,142.89 L148.37,141.64 L148.92,140.38 L149.48,139.11 L150.04,137.83 L150.60,136.55 L151.16,135.26 L151.72,133.96 L152.28,132.66 L152.84,131.34 L153.40,130.02 L153.96,128.69 L154.52,127.36 L155.08,126.01 L155.63,124.66 L156.19,123.30 L156.75,121.94 L157.31,120.56 L157.87,119.18 L158.43,117.79 L158.99,116.40 L159.55,114.99 L160.11,113.58 L160.67,112.16 L161.23,110.73 L161.78,109.30 L162.34,107.86 L162.90,106.41 L163.46,104.95 L164.02,103.49 L164.58,102.01 L165.14,100.53 L165.70,99.05 L166.26,97.55 L166.82,96.05 L167.38,94.54 L167.94,93.02 L168.49,91.49 L169.05,89.96 L169.61,88.42 L170.17,86.87 L170.73,85.32 L171.29,83.75 L171.85,82.18 L172.41,80.61 L172.97,79.02 L173.53,77.43 L174.09,75.82 L174.65,74.22 L175.20,72.60 L175.76,70.98 L176.32,69.35 L176.88,67.71 L177.44,66.06 L178.00,64.41 L178.56,62.74 L179.12,61.07 L179.68,59.40 L180.24,57.71 L180.80,56.02 L181.35,54.32 L181.91,52.62 L182.47,50.90 L183.03,49.18 L183.59,47.45 L184.15,45.71 L184.71,43.97 L185.27,42.21 L185.83,40.45 L186.39,38.69 L186.95,36.91 L187.51,35.13 L188.06,33.34 L188.62,31.54 L189.18,29.74 L189.74,27.92" class="curve"></path><path d="M55.55,245.94 L56.42,237.24 L57.30,233.64 L58.17,230.88 L59.04,228.55 L59.92,226.50 L60.79,224.65 L61.66,222.94 L62.54,221.35 L63.41,219.86 L64.28,218.45 L65.16,217.11 L66.03,215.83 L66.91,214.60 L67.78,213.41 L68.65,212.27 L69.53,211.17 L70.40,210.10 L71.27,209.06 L72.15,208.05 L73.02,207.06 L73.90,206.10 L74.77,205.17 L75.64,204.25 L76.52,203.35 L77.39,202.48 L78.26,201.62 L79.14,200.77 L80.01,199.94 L80.88,199.13 L81.76,198.33 L82.63,197.54 L83.51,196.77 L84.38,196.01 L85.25,195.25 L86.13,194.51 L87.00,193.79 L87.87,193.07 L88.75,192.36 L89.62,191.66 L90.49,190.96 L91.37,190.28 L92.24,189.61 L93.12,188.94 L93.99,188.28 L94.86,187.63 L95.74,186.99 L96.61,186.35 L97.48,185.72 L98.36,185.09 L99.23,184.48 L100.10,183.86 L100.98,183.26 L101.85,182.66 L102.73,182.06 L103.60,181.48 L104.47,180.89 L105.35,180.31 L106.22,179.74 L107.09,179.17 L107.97,178.61 L108.84,178.05 L109.72,177.50 L110.59,176.95 L111.46,176.40 L112.34,175.86 L113.21,175.32 L114.08,174.79 L114.96,174.26 L115.83,173.74 L116.70,173.22 L117.58,172.70 L118.45,172.18 L119.33,171.67 L120.20,171.17 L121.07,170.66 L121.95,170.16 L122.82,169.67 L123.69,169.17 L124.57,168.68 L125.44,168.19 L126.31,167.71 L127.19,167.23 L128.06,166.75 L128.94,166.27 L129.81,165.80 L130.68,165.33 L131.56,164.86 L132.43,164.40 L133.30,163.94 L134.18,163.48 L135.05,163.02 L135.92,162.57 L136.80,162.12 L137.67,161.67 L138.55,161.22 L139.42,160.77 L140.29,160.33 L141.17,159.89 L142.04,159.45 L142.91,159.02 L143.79,158.58 L144.66,158.15 L145.53,157.72 L146.41,157.30 L147.28,156.87 L148.16,156.45 L149.03,156.03 L149.90,155.61 L150.78,155.19 L151.65,154.78 L152.52,154.36 L153.40,153.95 L154.27,153.54 L155.15,153.13 L156.02,152.73 L156.89,152.32 L157.77,151.92 L158.64,151.52 L159.51,151.12 L160.39,150.72 L161.26,150.33 L162.13,149.93 L163.01,149.54 L163.88,149.15 L164.76,148.76 L165.63,148.37 L166.50,147.98 L167.38,147.60 L168.25,147.22 L169.12,146.83 L170.00,146.45 L170.87,146.08 L171.74,145.70 L172.62,145.32 L173.49,144.95 L174.37,144.57 L175.24,144.20 L176.11,143.83 L176.99,143.46 L177.86,143.09 L178.73,142.73 L179.61,142.36 L180.48,142.00 L181.35,141.63 L182.23,141.27 L183.10,140.91 L183.98,140.55 L184.85,140.20 L185.72,139.84 L186.60,139.48 L187.47,139.13 L188.34,138.78 L189.22,138.42 L190.09,138.07 L190.97,137.72 L191.84,137.38 L192.71,137.03 L193.59,136.68 L194.46,136.34 L195.33,135.99 L196.21,135.65 L197.08,135.31 L197.95,134.97 L198.83,134.63 L199.70,134.29 L200.58,133.95 L201.45,133.61 L202.32,133.28 L203.20,132.94 L204.07,132.61 L204.94,132.28 L205.82,131.94 L206.69,131.61 L207.56,131.28 L208.44,130.95 L209.31,130.63 L210.19,130.30 L211.06,129.97 L211.93,129.65 L212.81,129.32 L213.68,129.00 L214.55,128.68 L215.43,128.36 L216.30,128.04 L217.17,127.72 L218.05,127.40 L218.92,127.08 L219.80,126.76 L220.67,126.44 L221.54,126.13 L222.42,125.81 L223.29,125.50 L224.16,125.19 L225.04,124.87 L225.91,124.56 L226.78,124.25 L227.66,123.94 L228.53,123.63 L229.41,123.32 L230.28,123.02 L231.15,122.71 L232.03,122.40 L232.90,122.10 L233.77,121.79 L234.65,121.49 L235.52,121.19 L236.40,120.88 L237.27,120.58 L238.14,120.28 L239.02,119.98 L239.89,119.68 L240.76,119.38 L241.64,119.08 L242.51,118.79 L243.38,118.49 L244.26,118.19 L245.13,117.90 L246.01,117.60 L246.88,117.31 L247.75,117.02 L248.63,116.72 L249.50,116.43 L250.37,116.14 L251.25,115.85 L252.12,115.56 L252.99,115.27 L253.87,114.98 L254.74,114.69 L255.62,114.41 L256.49,114.12 L257.36,113.83 L258.24,113.55 L259.11,113.26 L259.98,112.98 L260.86,112.69 L261.73,112.41 L262.60,112.13 L263.48,111.85 L264.35,111.56 L265.23,111.28" class="curve"></path><foreignObject x="-52" y="-52" width="404" height="404" class="fig-fo" requiredExtensions="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml" class="fig-lyr"><span class="fig-lbl a-ax" style="left:335.0px;top:301.9px;transform:translate(0,0);font-size:13px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="159" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="x" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-speech-attached="true" data-semantic-braille="⠭" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="x" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mi data-latex="x" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:x" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="x" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠭"><mjx-c class="mjx-c1D465">𝑥</mjx-c></mjx-mi></mjx-math><mjx-speech aria-label="x, math" role="img" aria-roledescription="" aria-braillelabel="⠭" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-ax" style="left:102.5px;top:69.0px;transform:translate(-100%,0);font-size:13px;"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="160" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="y" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;y&lt;/say-as&gt;" data-speech-attached="true" data-semantic-braille="⠽" data-braille-attached="true" has-speech="true" style="font-size: 101.2%;"><mjx-math data-latex="y" data-semantic-structure="0" class="NCM-N" aria-hidden="true"><mjx-mi data-latex="y" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:1" data-semantic-id="0" data-semantic-attributes="latex:y" data-semantic-level-number="0" data-speech-node="true" data-semantic-speech-none="y" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;y&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠽"><mjx-c class="mjx-c1D466">𝑦</mjx-c></mjx-mi></mjx-math><mjx-speech aria-label="y, math" role="img" aria-roledescription="" aria-braillelabel="⠽" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-curve" style="left:193.1px;top:106.3px;transform:translate(-100%,-50%);"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="161" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="f of x equals x squared" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;f&lt;/say-as&gt; &lt;mark name=&quot;8&quot;/&gt; of &lt;mark name=&quot;2&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt; &lt;break time=&quot;250ms&quot;/&gt; &lt;mark name=&quot;4&quot;/&gt; equals &lt;mark name=&quot;5&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt; &lt;mark name=&quot;6&quot;/&gt; squared" data-speech-attached="true" data-semantic-braille="⠋⠷⠭⠾⠀⠨⠅⠀⠭⠘⠆" data-braille-attached="true" has-speech="true" style="font-size: 101.3%;"><mjx-math data-latex="f(x)=x^{2}" data-semantic-type="relseq" data-semantic-role="equality" data-semantic-annotation="depth:1" data-semantic-id="11" data-semantic-children="10,7" data-semantic-content="4" data-semantic-attributes="latex:f(x)=x^{2}" data-semantic-owns="10 4 7" data-semantic-level-number="0" data-semantic-structure="(11 (10 0 9 (8 1 2 3)) 4 (7 5 6))" breakable="true" class="NCM-N" data-speech-node="true" data-semantic-speech-none="f of x equals x squared" data-semantic-summary-none="equality" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;f&lt;/say-as&gt; &lt;mark name=&quot;8&quot;/&gt; of &lt;mark name=&quot;2&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt; &lt;break time=&quot;250ms&quot;/&gt; &lt;mark name=&quot;4&quot;/&gt; equals &lt;mark name=&quot;5&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt; &lt;mark name=&quot;6&quot;/&gt; squared" data-semantic-summary="&lt;mark name=&quot;11&quot;/&gt; equality" data-semantic-braille="⠋⠷⠭⠾⠀⠨⠅⠀⠭⠘⠆" aria-hidden="true"><mjx-mrow data-semantic-added="true" data-semantic-type="appl" data-semantic-role="simple function" data-semantic-annotation="clearspeak:simple;depth:2" data-semantic-id="10" data-semantic-children="0,8" data-semantic-content="9,0" data-semantic-parent="11" data-semantic-owns="0 9 8" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="f of x" data-semantic-summary-none="identifier of identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;f&lt;/say-as&gt; &lt;mark name=&quot;8&quot;/&gt; of &lt;mark name=&quot;2&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier &lt;mark name=&quot;8&quot;/&gt; of &lt;mark name=&quot;2&quot;/&gt; identifier" data-semantic-braille="⠋⠷⠭⠾"><mjx-mi data-latex="f" data-semantic-type="identifier" data-semantic-role="simple function" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:3" data-semantic-id="0" data-semantic-parent="10" data-semantic-attributes="latex:f" data-semantic-operator="appl" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="f" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;f&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠋"><mjx-c class="mjx-c1D453">𝑓</mjx-c></mjx-mi><mjx-mo data-semantic-type="punctuation" data-semantic-role="application" data-semantic-annotation="nemeth:number;depth:3" data-semantic-id="9" data-semantic-parent="10" data-semantic-added="true" data-semantic-operator="appl" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="of" data-semantic-summary-none="of" data-semantic-speech="&lt;mark name=&quot;9&quot;/&gt; of" data-semantic-summary="&lt;mark name=&quot;9&quot;/&gt; of" data-semantic-braille="⠀"><mjx-c class="mjx-c2061">⁡</mjx-c></mjx-mo><mjx-mrow data-semantic-added="true" data-semantic-type="fenced" data-semantic-role="leftright" data-semantic-annotation="fences:paren;depth:3" data-semantic-id="8" data-semantic-children="2" data-semantic-content="1,3" data-semantic-parent="10" data-semantic-owns="1 2 3" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="x" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;2&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;2&quot;/&gt; identifier" data-semantic-braille="⠷⠭⠾"><mjx-mo data-latex="(" data-semantic-type="fence" data-semantic-role="open" data-semantic-annotation="depth:4" data-semantic-id="1" data-semantic-parent="8" data-semantic-attributes="latex:(" data-semantic-operator="fenced" data-semantic-level-number="3" data-speech-node="true" data-semantic-speech-none="open paren" data-semantic-summary-none="open paren" data-semantic-speech="&lt;mark name=&quot;1&quot;/&gt; open paren" data-semantic-summary="&lt;mark name=&quot;1&quot;/&gt; open paren" data-semantic-braille="⠷"><mjx-c class="mjx-c28">(</mjx-c></mjx-mo><mjx-mi data-latex="x" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;depth:4" data-semantic-id="2" data-semantic-parent="8" data-semantic-attributes="latex:x" data-semantic-level-number="3" data-speech-node="true" data-semantic-speech-none="x" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;2&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;2&quot;/&gt; identifier" data-semantic-braille="⠭"><mjx-c class="mjx-c1D465">𝑥</mjx-c></mjx-mi><mjx-mo data-latex=")" data-semantic-type="fence" data-semantic-role="close" data-semantic-annotation="depth:4" data-semantic-id="3" data-semantic-parent="8" data-semantic-attributes="latex:)" data-semantic-operator="fenced" data-semantic-level-number="3" data-speech-node="true" data-semantic-speech-none="close paren" data-semantic-summary-none="close paren" data-semantic-speech="&lt;mark name=&quot;3&quot;/&gt; close paren" data-semantic-summary="&lt;mark name=&quot;3&quot;/&gt; close paren" data-semantic-braille="⠾"><mjx-c class="mjx-c29">)</mjx-c></mjx-mo></mjx-mrow></mjx-mrow><mjx-break size="4"> </mjx-break><mjx-mo data-latex="=" data-semantic-type="relation" data-semantic-role="equality" data-semantic-annotation="nemeth:number;depth:2" data-semantic-id="4" data-semantic-parent="11" data-semantic-attributes="latex:=" data-semantic-operator="relseq,=" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="equals" data-semantic-summary-none="equals" data-semantic-speech="&lt;mark name=&quot;4&quot;/&gt; equals" data-semantic-summary="&lt;mark name=&quot;4&quot;/&gt; equals" data-semantic-braille="⠨⠅"><mjx-c class="mjx-c3D">=</mjx-c></mjx-mo><mjx-msup space="4" data-latex="x^{2}" data-semantic-type="superscript" data-semantic-role="latinletter" data-semantic-annotation="depth:2" data-semantic-id="7" data-semantic-children="5,6" data-semantic-parent="11" data-semantic-attributes="latex:x^{2}" data-semantic-owns="5 6" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="x squared" data-semantic-summary-none="power" data-semantic-speech="&lt;mark name=&quot;5&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt; &lt;mark name=&quot;6&quot;/&gt; squared" data-semantic-summary="&lt;mark name=&quot;7&quot;/&gt; power" data-semantic-braille="⠭⠘⠆"><mjx-mi data-latex="x" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:3" data-semantic-id="5" data-semantic-parent="7" data-semantic-attributes="latex:x" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="x" data-semantic-prefix-none="Base" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;5&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-prefix="&lt;mark name=&quot;5&quot;/&gt; Base" data-semantic-summary="&lt;mark name=&quot;5&quot;/&gt; identifier" data-semantic-braille="⠭"><mjx-c class="mjx-c1D465">𝑥</mjx-c></mjx-mi><mjx-script style="vertical-align: 0.363em;"><mjx-texatom size="s" data-mjx-texclass="ORD" data-latex="{2}" texclass="ORD"><mjx-mn data-latex="2" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;depth:3" data-semantic-id="6" data-semantic-parent="7" data-semantic-attributes="latex:{2};texclass:ORD" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="2" data-semantic-prefix-none="Exponent" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;6&quot;/&gt; 2" data-semantic-prefix="&lt;mark name=&quot;6&quot;/&gt; Exponent" data-semantic-summary="&lt;mark name=&quot;6&quot;/&gt; number" data-semantic-braille="⠆"><mjx-c class="mjx-c32">2</mjx-c></mjx-mn></mjx-texatom></mjx-script></mjx-msup></mjx-math><mjx-speech aria-label="f of x equals x squared, math" role="img" aria-roledescription="" aria-braillelabel="⠋⠷⠭⠾⠀⠨⠅⠀⠭⠘⠆" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-curve" style="left:317.2px;top:170.2px;transform:translate(0,-50%);"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="162" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="f inverse of x equals the square root of x" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;f&lt;/say-as&gt; &lt;mark name=&quot;4&quot; kind=&quot;LAST&quot;/&gt; inverse &lt;mark name=&quot;11&quot;/&gt; of &lt;mark name=&quot;6&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt; &lt;break time=&quot;250ms&quot;/&gt; &lt;mark name=&quot;8&quot;/&gt; equals &lt;mark name=&quot;10&quot;/&gt; the square root of &lt;mark name=&quot;9&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-speech-attached="true" data-semantic-braille="⠋⠘⠤⠂⠐⠷⠭⠾⠀⠨⠅⠀⠜⠭⠻" data-braille-attached="true" has-speech="true" style="font-size: 101.3%;"><mjx-math data-latex="f^{-1}(x)=\sqrt{x}" data-semantic-type="relseq" data-semantic-role="equality" data-semantic-annotation="depth:1" data-semantic-id="14" data-semantic-children="13,10" data-semantic-content="8" data-semantic-attributes="latex:f^{-1}(x)=\sqrt{x}" data-semantic-owns="13 8 10" data-semantic-level-number="0" data-semantic-structure="(14 (13 (4 0 (3 1 2)) 12 (11 5 6 7)) 8 (10 9))" breakable="true" class="NCM-N" data-speech-node="true" data-semantic-speech-none="f inverse of x equals the square root of x" data-semantic-summary-none="equality" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;f&lt;/say-as&gt; &lt;mark name=&quot;4&quot; kind=&quot;LAST&quot;/&gt; inverse &lt;mark name=&quot;11&quot;/&gt; of &lt;mark name=&quot;6&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt; &lt;break time=&quot;250ms&quot;/&gt; &lt;mark name=&quot;8&quot;/&gt; equals &lt;mark name=&quot;10&quot;/&gt; the square root of &lt;mark name=&quot;9&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;14&quot;/&gt; equality" data-semantic-braille="⠋⠘⠤⠂⠐⠷⠭⠾⠀⠨⠅⠀⠜⠭⠻" aria-hidden="true"><mjx-mrow data-semantic-added="true" data-semantic-type="appl" data-semantic-role="simple function" data-semantic-annotation="clearspeak:simple;depth:2" data-semantic-id="13" data-semantic-children="4,11" data-semantic-content="12,0" data-semantic-parent="14" data-semantic-owns="4 12 11" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="f inverse of x" data-semantic-summary-none="power of identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;f&lt;/say-as&gt; &lt;mark name=&quot;4&quot; kind=&quot;LAST&quot;/&gt; inverse &lt;mark name=&quot;11&quot;/&gt; of &lt;mark name=&quot;6&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;4&quot;/&gt; power &lt;mark name=&quot;11&quot;/&gt; of &lt;mark name=&quot;6&quot;/&gt; identifier" data-semantic-braille="⠋⠘⠤⠂⠐⠷⠭⠾"><mjx-msup data-latex="f^{-1}" data-semantic-type="superscript" data-semantic-role="simple function" data-semantic-annotation="depth:3" data-semantic-id="4" data-semantic-children="0,3" data-semantic-parent="13" data-semantic-attributes="latex:f^{-1}" data-semantic-owns="0 3" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="f inverse" data-semantic-summary-none="power" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;f&lt;/say-as&gt; &lt;mark name=&quot;4&quot; kind=&quot;LAST&quot;/&gt; inverse" data-semantic-summary="&lt;mark name=&quot;4&quot;/&gt; power" data-semantic-braille="⠋⠘⠤⠂⠐"><mjx-mi data-latex="f" data-semantic-type="identifier" data-semantic-role="simple function" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:4" data-semantic-id="0" data-semantic-parent="4" data-semantic-attributes="latex:f" data-semantic-operator="appl" data-semantic-level-number="3" data-speech-node="true" data-semantic-speech-none="f" data-semantic-prefix-none="Base" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;f&lt;/say-as&gt;" data-semantic-prefix="&lt;mark name=&quot;0&quot;/&gt; Base" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠋"><mjx-c class="mjx-c1D453">𝑓</mjx-c></mjx-mi><mjx-script style="vertical-align: 0.363em; margin-left: 0.053em;"><mjx-texatom size="s" data-mjx-texclass="ORD" data-latex="{-1}" data-semantic-type="prefixop" data-semantic-role="negative" data-semantic-annotation="clearspeak:simple;depth:4" data-semantic-id="3" data-semantic-children="2" data-semantic-content="1" data-semantic-parent="4" data-semantic-attributes="latex:{-1};texclass:ORD" data-semantic-owns="1 2" data-semantic-level-number="3" texclass="ORD" data-speech-node="true" data-semantic-speech-none="negative 1" data-semantic-prefix-none="Exponent" data-semantic-summary-none="negative number" data-semantic-speech="&lt;mark name=&quot;1&quot;/&gt; negative &lt;mark name=&quot;2&quot;/&gt; 1" data-semantic-prefix="&lt;mark name=&quot;3&quot;/&gt; Exponent" data-semantic-summary="&lt;mark name=&quot;1&quot;/&gt; negative &lt;mark name=&quot;2&quot;/&gt; number" data-semantic-braille="⠤⠂"><mjx-mo data-latex="-" data-semantic-type="operator" data-semantic-role="subtraction" data-semantic-annotation="depth:5" data-semantic-id="1" data-semantic-parent="3" data-semantic-attributes="latex:-" data-semantic-operator="prefixop,−" data-semantic-level-number="4" data-speech-node="true" data-semantic-speech-none="minus" data-semantic-summary-none="minus" data-semantic-speech="&lt;mark name=&quot;1&quot;/&gt; minus" data-semantic-summary="&lt;mark name=&quot;1&quot;/&gt; minus" data-semantic-braille="⠤"><mjx-c class="mjx-c2212">−</mjx-c></mjx-mo><mjx-mn data-latex="1" data-semantic-type="number" data-semantic-role="integer" data-semantic-font="normal" data-semantic-annotation="clearspeak:simple;depth:5" data-semantic-id="2" data-semantic-parent="3" data-semantic-attributes="latex:1" data-semantic-level-number="4" data-speech-node="true" data-semantic-speech-none="1" data-semantic-summary-none="number" data-semantic-speech="&lt;mark name=&quot;2&quot;/&gt; 1" data-semantic-summary="&lt;mark name=&quot;2&quot;/&gt; number" data-semantic-braille="⠂"><mjx-c class="mjx-c31">1</mjx-c></mjx-mn></mjx-texatom></mjx-script></mjx-msup><mjx-mo data-semantic-type="punctuation" data-semantic-role="application" data-semantic-annotation="nemeth:number;depth:3" data-semantic-id="12" data-semantic-parent="13" data-semantic-added="true" data-semantic-operator="appl" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="of" data-semantic-summary-none="of" data-semantic-speech="&lt;mark name=&quot;12&quot;/&gt; of" data-semantic-summary="&lt;mark name=&quot;12&quot;/&gt; of" data-semantic-braille="⠀"><mjx-c class="mjx-c2061">⁡</mjx-c></mjx-mo><mjx-mrow data-semantic-added="true" data-semantic-type="fenced" data-semantic-role="leftright" data-semantic-annotation="fences:paren;depth:3" data-semantic-id="11" data-semantic-children="6" data-semantic-content="5,7" data-semantic-parent="13" data-semantic-owns="5 6 7" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="x" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;6&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;6&quot;/&gt; identifier" data-semantic-braille="⠷⠭⠾"><mjx-mo data-latex="(" data-semantic-type="fence" data-semantic-role="open" data-semantic-annotation="depth:4" data-semantic-id="5" data-semantic-parent="11" data-semantic-attributes="latex:(" data-semantic-operator="fenced" data-semantic-level-number="3" data-speech-node="true" data-semantic-speech-none="open paren" data-semantic-summary-none="open paren" data-semantic-speech="&lt;mark name=&quot;5&quot;/&gt; open paren" data-semantic-summary="&lt;mark name=&quot;5&quot;/&gt; open paren" data-semantic-braille="⠷"><mjx-c class="mjx-c28">(</mjx-c></mjx-mo><mjx-mi data-latex="x" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;depth:4" data-semantic-id="6" data-semantic-parent="11" data-semantic-attributes="latex:x" data-semantic-level-number="3" data-speech-node="true" data-semantic-speech-none="x" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;6&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;6&quot;/&gt; identifier" data-semantic-braille="⠭"><mjx-c class="mjx-c1D465">𝑥</mjx-c></mjx-mi><mjx-mo data-latex=")" data-semantic-type="fence" data-semantic-role="close" data-semantic-annotation="depth:4" data-semantic-id="7" data-semantic-parent="11" data-semantic-attributes="latex:)" data-semantic-operator="fenced" data-semantic-level-number="3" data-speech-node="true" data-semantic-speech-none="close paren" data-semantic-summary-none="close paren" data-semantic-speech="&lt;mark name=&quot;7&quot;/&gt; close paren" data-semantic-summary="&lt;mark name=&quot;7&quot;/&gt; close paren" data-semantic-braille="⠾"><mjx-c class="mjx-c29">)</mjx-c></mjx-mo></mjx-mrow></mjx-mrow><mjx-break size="4"> </mjx-break><mjx-mo data-latex="=" data-semantic-type="relation" data-semantic-role="equality" data-semantic-annotation="nemeth:number;depth:2" data-semantic-id="8" data-semantic-parent="14" data-semantic-attributes="latex:=" data-semantic-operator="relseq,=" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="equals" data-semantic-summary-none="equals" data-semantic-speech="&lt;mark name=&quot;8&quot;/&gt; equals" data-semantic-summary="&lt;mark name=&quot;8&quot;/&gt; equals" data-semantic-braille="⠨⠅"><mjx-c class="mjx-c3D">=</mjx-c></mjx-mo><mjx-msqrt space="4" data-latex="\sqrt{x}" data-semantic-type="sqrt" data-semantic-role="unknown" data-semantic-annotation="depth:2" data-semantic-id="10" data-semantic-children="9" data-semantic-parent="14" data-semantic-attributes="latex:\sqrt{x}" data-semantic-owns="9" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="the square root of x" data-semantic-summary-none="square root" data-semantic-speech="&lt;mark name=&quot;10&quot;/&gt; the square root of &lt;mark name=&quot;9&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;10&quot;/&gt; square root" data-semantic-braille="⠜⠭⠻"><mjx-sqrt><mjx-surd><mjx-mo><mjx-c class="mjx-c221A">√</mjx-c></mjx-mo></mjx-surd><mjx-box style="padding-top: 0.281em;"><mjx-mi data-latex="x" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:3" data-semantic-id="9" data-semantic-parent="10" data-semantic-attributes="latex:x" data-semantic-level-number="2" data-speech-node="true" data-semantic-speech-none="x" data-semantic-prefix-none="Radicand" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;9&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-prefix="&lt;mark name=&quot;9&quot;/&gt; Radicand" data-semantic-summary="&lt;mark name=&quot;9&quot;/&gt; identifier" data-semantic-braille="⠭"><mjx-c class="mjx-c1D465">𝑥</mjx-c></mjx-mi></mjx-box></mjx-sqrt></mjx-msqrt></mjx-math><mjx-speech aria-label="f inverse of x equals the square root of x, math" role="img" aria-roledescription="" aria-braillelabel="⠋⠘⠤⠂⠐⠷⠭⠾⠀⠨⠅⠀⠜⠭⠻" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span><span class="fig-lbl a-ref" style="left:302.1px;top:85.0px;transform:translate(0,-50%);"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" overflow="linebreak" tabindex="0" ctxtmenu_counter="163" data-semantic-locale="en" data-semantic-domain="clearspeak" data-semantic-style="default" data-semantic-domain2style="mathspeak:default,clearspeak:default" data-semantic-collapsible="collapsible" data-semantic-expandable="expandable" data-semantic-level="Level" data-semantic-speech-none="y equals x" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;y&lt;/say-as&gt; &lt;mark name=&quot;1&quot;/&gt; equals &lt;mark name=&quot;2&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-speech-attached="true" data-semantic-braille="⠽⠀⠨⠅⠀⠭" data-braille-attached="true" has-speech="true" style="font-size: 101.3%;"><mjx-math data-latex="y=x" data-semantic-type="relseq" data-semantic-role="equality" data-semantic-annotation="depth:1" data-semantic-id="3" data-semantic-children="0,2" data-semantic-content="1" data-semantic-attributes="latex:y=x" data-semantic-owns="0 1 2" data-semantic-level-number="0" data-semantic-structure="(3 0 1 2)" breakable="true" class="NCM-N" data-speech-node="true" data-semantic-speech-none="y equals x" data-semantic-summary-none="equality" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;y&lt;/say-as&gt; &lt;mark name=&quot;1&quot;/&gt; equals &lt;mark name=&quot;2&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;3&quot;/&gt; equality" data-semantic-braille="⠽⠀⠨⠅⠀⠭" aria-hidden="true"><mjx-mi data-latex="y" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:2" data-semantic-id="0" data-semantic-parent="3" data-semantic-attributes="latex:y" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="y" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;0&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;y&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;0&quot;/&gt; identifier" data-semantic-braille="⠽"><mjx-c class="mjx-c1D466">𝑦</mjx-c></mjx-mi><mjx-break size="4"> </mjx-break><mjx-mo data-latex="=" data-semantic-type="relation" data-semantic-role="equality" data-semantic-annotation="nemeth:number;depth:2" data-semantic-id="1" data-semantic-parent="3" data-semantic-attributes="latex:=" data-semantic-operator="relseq,=" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="equals" data-semantic-summary-none="equals" data-semantic-speech="&lt;mark name=&quot;1&quot;/&gt; equals" data-semantic-summary="&lt;mark name=&quot;1&quot;/&gt; equals" data-semantic-braille="⠨⠅"><mjx-c class="mjx-c3D">=</mjx-c></mjx-mo><mjx-mi space="4" data-latex="x" data-semantic-type="identifier" data-semantic-role="latinletter" data-semantic-font="italic" data-semantic-annotation="clearspeak:simple;nemeth:number;depth:2" data-semantic-id="2" data-semantic-parent="3" data-semantic-attributes="latex:x" data-semantic-level-number="1" data-speech-node="true" data-semantic-speech-none="x" data-semantic-summary-none="identifier" data-semantic-speech="&lt;mark name=&quot;2&quot;/&gt; &lt;say-as interpret-as=&quot;character&quot;&gt;x&lt;/say-as&gt;" data-semantic-summary="&lt;mark name=&quot;2&quot;/&gt; identifier" data-semantic-braille="⠭"><mjx-c class="mjx-c1D465">𝑥</mjx-c></mjx-mi></mjx-math><mjx-speech aria-label="y equals x, math" role="img" aria-roledescription="" aria-braillelabel="⠽⠀⠨⠅⠀⠭" aria-brailleroledescription="⠀"></mjx-speech></mjx-container></span></div></foreignObject></svg></div></figure></div></section></div></div></div></body></html>

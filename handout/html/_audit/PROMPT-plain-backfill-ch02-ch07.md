@@ -249,8 +249,25 @@ build 一定帶參數（python handout/html/build.py ch07）。
 
 1. 依序把 `handout/plain-chNN` 各分支併回 `main`（衝突只可能出現在 standalone，各章不同檔，實際應為 ff 或無衝突）。
 2. 用各章 applied 報告末尾的「待併」數字，一次更新 `REPORT-emdash-baseline-and-rollout.md` §2 的密度與 tic guard 四項並打勾。
-3. 若要讓 ch02／ch04–ch07 進 LaTeX 線，補 `make_dist.py` 的 `NAMES` 表（一次補完，之後逐章跑三閘）。
+3. 若要讓 ch02／ch05–ch07 進 LaTeX 線，補 `make_dist.py` 的 `NAMES` 表（一次補完，之後逐章跑三閘）。
+   **ch04 已補並跑完四閘**（`handout/plain-ch04` 的 `b5db9c5`；`NAMES` 已含 `"ch04": "chapter4"`），
+   合併時該表會與其他章的補列相鄰，注意別互相覆蓋。
 4. 全書複測：`python tools/prose_metrics.py`，確認每章 ≤3.0/1000、無單元回退。
+
+### ⚠ 已知的一處合併衝突（2026-07-26，起因與解法都已釐清）
+
+`handout/plain-ch05` 與 `handout/plain-ch06` 的 base 帶著一筆 **`a7afbcc`
+`docs(handout/ch04): 記錄兩項使用者裁決`**。那是 ch04 session 的失誤——當時共用 checkout 的
+HEAD 被切到 `main`，該筆 commit 落在 `main` 上；`main` 已重置回 `942ccea`，但 ch05／ch06
+兩個 worktree 是在重置前開的，於是把它留在自己的歷史裡（ch05 之後又在其上疊了自己的工作，
+**不可改寫**）。
+
+- **會衝到哪兩個檔**：`handout/html/_audit/REVIEW-ch04-plain-applied.html`
+  與 `handout/PIPELINE.md`。
+- **怎麼解**：一律取 **`handout/plain-ch04` 那一側**。`a7afbcc` 帶的是該報告
+  Gate 7 轉綠前的舊版；plain-ch04 上的 `f3b6cea` 才是最終版（Gate 7 已全綠、dashboard 同步）。
+  `PIPELINE.md` 同理：plain-ch04 側的 Ch4 列同時含「數學欄待辦」與「LaTeX 線四閘全綠」。
+- 其餘檔案不受影響（`a7afbcc` 只動這兩個）。
 
 ---
 *本檔 2026-07-25 建立。判準變更一律改 `CONTENT_SPEC.md` §3（RC 凍結，需「同一規則在三節以上反覆誤判」才夠格），不在本檔另立規則。*
