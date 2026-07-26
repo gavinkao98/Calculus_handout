@@ -20,11 +20,11 @@
   <!-- expansion:intuition — section opener: the tangent line is the best straight-line stand-in near a point; this is exactly Ch3's remainder form read forward (seam: cross-ref Def 3.1, not new) -->
   <p>A differentiable function, seen up close, looks straight. This is not a metaphor but the content of the derivative: Chapter 3 recorded differentiability at \(x_{0}\) in its remainder form (Definition 3.1),</p>
   <p>\[ f(x_{0} + h) = f(x_{0}) + f'(x_{0})\,h + R(h), \qquad \frac{R(h)}{h} \to 0 \ \text{ as } h \to 0, \]</p>
-  <p>which says that the curve equals a straight line — the one through \((x_{0}, f(x_{0}))\) with slope \(f'(x_{0})\) — plus a remainder \(R(h)\) that dies away faster than \(h\) itself. Drop the remainder and a usable approximation is left: near \(x_{0}\), the function is very nearly its tangent line. This section takes that idea at face value and puts it to work estimating values, and then repackages it in the language of <em>differentials</em>.</p>
+  <p>which says that the curve equals a straight line plus a remainder \(R(h)\) that dies away faster than \(h\) itself. The straight line is the one through \((x_{0}, f(x_{0}))\) with slope \(f'(x_{0})\). Drop the remainder and a usable approximation is left: near \(x_{0}\), the function is very nearly its tangent line. This section uses that idea to estimate values, and then restates it in the language of <em>differentials</em>.</p>
 
   <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — tangent-line approximation of sqrt(x) at 4 (Def 5.1 / Ex 5.8); registered in chapter5 FIGS as "sqrt-linearization"] -->
   <figure class="figure" data-fig="sqrt-linearization">
-    <figcaption><span class="fig-no">Figure 5.4</span> Linear approximation near \(x = 4\): the tangent line \(L\) is barely distinguishable from \(y = \sqrt{x}\) close to the point of tangency and drifts away far from it — compare the two at \(x = 9\).</figcaption>
+    <figcaption><span class="fig-no">Figure 5.4</span> Linear approximation near \(x = 4\): the tangent line \(L\) is barely distinguishable from \(y = \sqrt{x}\) close to the point of tangency and drifts away far from it. Compare the two at \(x = 9\).</figcaption>
   </figure>
 
   <h3 class="subsec-head">Linearization</h3>
@@ -38,7 +38,7 @@
     </div>
   </section>
 
-  <p>Writing \(h = x - a\) turns \(L\) back into the remainder form: \(f(a + h) \approx f(a) + f'(a)h\), the equation above with \(R\) discarded. The approximation is good precisely when \(R(h)\) is negligible — that is, when \(x\) is close to \(a\). How close is close enough depends on how sharply the curve bends away from its tangent, a matter the second derivative will make quantitative in §5.6.</p>
+  <p>Writing \(h = x - a\) turns \(L\) back into the remainder form: \(f(a + h) \approx f(a) + f'(a)h\), the equation above with \(R\) discarded. The approximation is good precisely when \(R(h)\) is negligible, which happens when \(x\) is close to \(a\). How close is close enough depends on how sharply the curve bends away from its tangent, a matter the second derivative will make quantitative in §5.6.</p>
 
   <!-- expansion:example — Example 5.8: the archetypal use — estimate a root by linearizing at a nearby exact value -->
   <div class="workedexample">
@@ -83,7 +83,7 @@
   <h3 class="subsec-head">Differentials</h3>
 
   <!-- expansion:intuition — the differential is the tangent-line rise; distinguish dy (along tangent) from Δy (along curve) -->
-  <p>The linear approximation has a classical notation that makes it portable — the language of <em>differentials</em>, which turns the estimate into a statement about small changes. Suppose \(y = f(x)\). Let the input change by an amount we now call \(dx\), the <em>differential of \(x\)</em>, a genuinely independent small number. The corresponding rise <em>along the tangent line</em> is the <em>differential of \(y\)</em>.</p>
+  <p>The linear approximation has a classical notation that makes it portable. This is the language of <em>differentials</em>, which turns the estimate into a statement about small changes. Suppose \(y = f(x)\). Let the input change by an amount we now call \(dx\), the <em>differential of \(x\)</em>, a genuinely independent small number. The corresponding rise <em>along the tangent line</em> is the <em>differential of \(y\)</em>.</p>
 
   <section class="env env-definition">
     <p class="env-head"><span class="env-kicker">Definition</span><span class="env-num">5.2</span><span class="env-name">Differential</span></p>
@@ -95,7 +95,7 @@
 
   <p>The point of the notation is a contrast. The <em>actual</em> change in \(y\) when \(x\) moves by \(dx = \Delta x\) is</p>
   <p>\[ \Delta y = f(x + \Delta x) - f(x), \]</p>
-  <p>the rise along the <em>curve</em>; the differential \(dy = f'(x)\,dx\) is the rise along the <em>tangent</em>. They are not equal — they differ by exactly the remainder \(R\) of Definition 3.1 attached to the base point \(x\) — but for small \(dx\) the difference is negligible, and \(dy \approx \Delta y\) is the linear approximation wearing new clothes. This form is the natural one for propagating a measurement error: a small uncertainty \(dx\) in a measured quantity produces an uncertainty of about \(dy = f'(x)\,dx\) in anything computed from it.</p>
+  <p>the rise along the <em>curve</em>; the differential \(dy = f'(x)\,dx\) is the rise along the <em>tangent</em>. They are not equal. They differ by exactly the remainder \(R\) of Definition 3.1 attached to the base point \(x\), but for small \(dx\) the difference is negligible, and \(dy \approx \Delta y\) is the linear approximation written in a new notation. This form is the natural one for propagating a measurement error: a small uncertainty \(dx\) in a measured quantity produces an uncertainty of about \(dy = f'(x)\,dx\) in anything computed from it.</p>
 
   <!-- expansion:figure [pass: enrichment] [source: figure-opportunity gate 2026-07-06 tier-1/2 — dy along tangent vs Delta-y along curve (Def 5.2); registered in chapter5 FIGS as "dy-vs-deltay"] -->
   <figure class="figure" data-fig="dy-vs-deltay">
@@ -103,7 +103,7 @@
   </figure>
 
   <!-- expansion:intuition [pass: enrichment] — Leibniz-notation closure: with Definition 5.2, dy/dx is an honest ratio of differentials (recalls the §2.2 caution that names dy/dx a single symbol; forward seam to the substitution method's du); adjudicated ADOPT in the M4 gap-check (Codex, 2026-07-07) -->
-  <p>The differential notation also settles an old account. When \(dy/dx\) first appeared, a caution in §2.2 was careful to call it a single symbol — suggestive, but not a fraction. Definition 5.2 upgrades it: with \(dx\) an independent quantity and \(dy = f'(x)\,dx\) built from it, the quotient \(dy/dx\) is a genuine ratio of two numbers, and it equals the derivative exactly. Leibniz’s fraction bar is now honest. The upgrade works forward, not backward — the chain-rule manipulations that <em>looked</em> like cancelling \(dx\)’s were licensed by Theorem 3.3, not by this definition — but from here on the bookkeeping power of treating \(dx\) as a real quantity is available, and integral calculus will lean on it heavily when a change of variable rides entirely on the differential.</p>
+  <p>The differential notation also settles a question left open earlier. When \(dy/dx\) first appeared, a caution in §2.2 was careful to call it a single symbol, suggestive but not a fraction. Definition 5.2 upgrades it: with \(dx\) an independent quantity and \(dy = f'(x)\,dx\) built from it, the quotient \(dy/dx\) is a genuine ratio of two numbers, and it equals the derivative exactly. This definition applies from this point onward, but it does not justify the earlier chain-rule manipulations that <em>looked</em> like cancelling \(dx\)’s. Those manipulations were licensed by Theorem 3.3, not by this definition. From here on, \(dx\) may be treated as a real quantity when a computation is written out, and integral calculus uses this fact when a change of variable is expressed entirely through the differential.</p>
 
   <!-- expansion:example — Example 5.10 (differentials): error propagation, the canonical use of differentials -->
   <div class="workedexample">
@@ -120,7 +120,7 @@
         <p>\[ dV = 4\pi (21)^{2}(0.05) = 88.2\pi \approx 277 \ \text{cm}^{3}. \]</p>
         <p>So an error of half a millimetre in the radius swings the computed volume by nearly \(280\ \text{cm}^{3}\). The <em>relative</em> error is more telling, and simpler:</p>
         <p>\[ \frac{dV}{V} = \frac{4\pi r^{2}\,dr}{\tfrac{4}{3}\pi r^{3}} = 3\,\frac{dr}{r} = 3\cdot\frac{0.05}{21} \approx 0.0071, \]</p>
-        <p>about \(0.71\%\). The relative error in the volume is three times the relative error in the radius — the exponent \(3\) surfacing as a multiplier, a rule of thumb that holds for any power law. <span class="qed"></span></p>
+        <p>about \(0.71\%\). The relative error in the volume is three times the relative error in the radius, with the exponent \(3\) as the multiplier. For any power law, the corresponding relative-error approximation uses the exponent as the multiplier. <span class="qed"></span></p>
       </div>
     </section>
   </div>
@@ -129,11 +129,11 @@
   <section class="env env-caution">
     <p class="env-head"><span class="env-kicker">Caution</span></p>
     <div class="env-body">
-      <p>A linear approximation is only a <em>local</em> promise. Its error is the remainder \(R\); in the smooth cases we meet, that error typically grows as \(x\) moves away from the anchor \(a\), and it is larger where the graph bends sharply. Estimating \(\sqrt{4.05}\) from \(a = 4\) is excellent; estimating \(\sqrt{9}\) from the same \(a = 4\) would be poor, because \(9\) is nowhere near \(4\). Trust the tangent line only in the immediate neighbourhood of the point where it touches, and read §5.6 for what the second derivative says about how quickly that trust runs out.</p>
+      <p>A linear approximation is reliable only <em>locally</em>. Its error is the remainder \(R\); in the smooth cases we meet, that error typically grows as \(x\) moves away from the anchor \(a\), and it is larger where the graph bends sharply. Estimating \(\sqrt{4.05}\) from \(a = 4\) is excellent; estimating \(\sqrt{9}\) from the same \(a = 4\) would be poor, because \(9\) is nowhere near \(4\). Trust the tangent line only in the immediate neighbourhood of the point where it touches, and read §5.6 for what the second derivative says about how quickly that trust runs out.</p>
     </div>
   </section>
 
   <!-- expansion:summary — close: linear approximation = derivative as local model; §5.4 turns from local behavior to the global question of largest/smallest -->
-  <p>Linear approximation is the derivative cashing in its definition: the number \(f'(a)\) is not only a slope but a working forecast of the function’s values nearby. That local reading — the function as its tangent line — recurs throughout calculus, generalized to curved approximations in Chapter 11 and to surfaces in Chapter 14. The next section changes the question entirely, from how a function behaves <em>near</em> a point to where, across a whole interval, it takes its largest and smallest values.</p>
+  <p>Linear approximation is the practical content of the definition of the derivative: the number \(f'(a)\) is not only a slope but a usable prediction of the function’s values nearby. Reading a function locally as its tangent line recurs throughout calculus and is generalized to curved approximations in Chapter 11 and to surfaces in Chapter 14. The next section changes the question entirely, from how a function behaves <em>near</em> a point to where, across a whole interval, it takes its largest and smallest values.</p>
 
 </article>
