@@ -62,11 +62,11 @@
 | **ch01** | 12 | 5,810 | **2.1** | 42 | 20 | 37 | 41 | ✅ 已達標（原 9.3；執行 41 條）——剩下 12 個＝**手稿逐字 8**（4 對成對插入語，使用者裁決比照 §1.4 保留）＋**§1.4 凍結 4**；[`REVIEW-ch01-plain-applied.html`](REVIEW-ch01-plain-applied.html) |
 | **appB** | 17 | 7,793 | **2.2** | 99 | 32 | 48 | 25 | ✅ 已達標（原 17.1；~~舊尺 2.2~~） |
 | **ch04** | 16 | 6,967 | **2.3** | 68 | 43 | 82 | 27 | ✅ 已達標（原 13.3；執行 97 條）——[`REVIEW-ch04-plain-applied.html`](REVIEW-ch04-plain-applied.html) |
-| **appD** | 18 | 1,363 | **13.2** | 18 | 13 | 17 | 6 | ⏳ 待做——~~舊表誤標「0.9 無需處理」~~（entity bug） |
-| appC | 24 | 1,347 | 17.8 | 8 | 15 | 7 | 3 | ⏳ 待做；**N<1000 附近，報 raw 24/1347**（~~舊尺 11.4~~） |
-| appA | 58 | 3,081 | 18.8 | 32 | 24 | 18 | 8 | ⏳ 待做，全書最高（~~舊尺 12.8~~） |
+| **appD** | 18 | 1,363 | **13.2** | 18 | 13 | 17 | 6 | ⏸ **暫緩**（2026-07-26 使用者裁決）——~~舊表誤標「0.9 無需處理」~~（entity bug） |
+| appC | 24 | 1,347 | 17.8 | 8 | 15 | 7 | 3 | ⏸ **暫緩**（2026-07-26 使用者裁決）；**N<1000 附近，報 raw 24/1347**（~~舊尺 11.4~~） |
+| appA | 58 | 3,081 | 18.8 | 32 | 24 | 18 | 8 | ⏸ **暫緩**（2026-07-26 使用者裁決），全書最高（~~舊尺 12.8~~） |
 
-**進度：11 個單元中 8 個達標**（appB／ch01–ch07），剩 appA／appC／appD 三個附錄。（2026-07-26 更正：本行原寫「剩 ch06（進行中）」，但同頁 §2 表格早已記 ch06 ✅ 1.4——摘要行漏更新。）
+**進度：11 個單元中 8 個達標**（appB／ch01–ch07），剩 appA／appC／appD 三個附錄——**2026-07-26 使用者裁決：三附錄暫緩執行**（先開新章驗證生成端條款；重啟時依下方排序表 appA→appC→appD）。（2026-07-26 更正：本行原寫「剩 ch06（進行中）」，但同頁 §2 表格早已記 ch06 ✅ 1.4——摘要行漏更新。）
 2026-07-26 的合併回收一次併回六輪成果（ch02／ch03／ch04／ch05／ch07 五條分支，無衝突），**全書複測無任何單元回退**。
 
 **目標值 `T_can` ≤ 3.0/1000（canonical stream）。** 依據＝canonical 重測的真實教材基準（§1）：mooculus 0.0、APEX V5 0.5、CLP1 3.1。目標貼 CLP1（五本中最口語者）的上緣；已達標的七個單元落在 **0.8–2.3**，全數在 APEX（0.5）與 CLP1（3.1）之間。
@@ -117,17 +117,17 @@
 
 | 批次 | 單元 | 超額件數 `n − 3N/1000` | 備註 |
 |---|---|--:|---|
-| **blocker** | appB dist 重出 | — | 產物脫鉤：`dist/appB/` 停在 de-dash commit，fragment 已被平實兩輪改過（appB 是 LaTeX pilot GO 單元） |
+| ~~blocker~~ | **appB dist 重出** | — | ✅ **已解**（2026-07-26）：`d33cedc` 併條款輪已重出 dist、`e0c5fad` 補上 HEADER 缺的 `\graphicspath`（四閘全綠、PDF 未變）。原問題＝產物脫鉤：`dist/appB/` 停在 de-dash commit，fragment 已被平實兩輪改過 |
 | 1 | ch07 | 128 | 最新章，改完可當「新章標準流程」樣板 |
 | 2 | ch02 | 95 | |
 | 3 | ch05 | 86 | |
 | ~~4~~ | **ch04** | ~~71~~ | ✅ **2026-07-26 完成**。97 條（gate 1 走查 84 → Codex gate-2 42 ADOPT／41 MODIFY／1 REJECT／13 new → triage）、13.3→2.3/1000、tic guard 無一上升、段落觸發器 4→0、HTML 分頁 41 頁不變。**Gate 0 推翻「手稿逐字」前提**：ch04 的 8-gram 逐字覆蓋率僅 1.6%（ch01 為 34.7%）。**Gate 7 四閘全綠**：`NAMES` 補 ch04、三個方言差集（數學區段內 `&lt;`／`&gt;` entity 未解碼〔全書首見〕、裸 `span.qed`、`env-corollary`）、6 panel 圖匯出；字形閘新增 glyf 比對路徑。`dist/ch04/` ＝ chapter4.tex ＋ chapter4.pdf（32 頁）。另補正 3 處數學嚴謹度缺口（N-08／N-12／y(0) 代 t=0）。紀錄 [`../../latex/chapters/ch04/DIALECT-ch04.md`](../../latex/chapters/ch04/DIALECT-ch04.md) |
 | ~~5~~ | **ch06** | ~~55~~ | ✅ **2026-07-26 完成**（canon 章＝無手稿、100% LLM 自產）。落地 62 筆、12.5→**1.4/1000**、**數學片段內容變動 0**（722→723，唯一新增 `\(\int f(x)\,dx\)`）、cross-ref 73→73 零遺失、HTML 分頁 36 頁 0 溢頁。段落層兩個離群已拆：§6.1 Caution 159→32/48/75、§6.5 章末摘要 167→63/61/43；§6.1 章 lead 152→133（不再觸發）。Codex gate-2 **ADOPT 38／MODIFY 21／REJECT 0**，抓到兩個我漏掉的真缺陷（`filling` 與同節「no way to tile」矛盾；`the table no longer applies` 被 arctan 那一列證偽）。Gate 6 自審另修回一處數學漏前提（`on a closed interval`）。**事後另修一處 fence 措辭**：§6.1 Caution 原承諾「proof … is given in the Proof-Track appendix」，但 PLAN-ch06 已於 2026-07-10 裁定「NO §D.4」，該證明依決策不存在——改為與 §6.2 一致的 on-credit 措辭。**Gate 7 四閘全綠**：`NAMES` 補 ch06、12 panel 圖匯出、方言差集 0（裸 `span.qed` 已由 ch04 那輪補上）。`dist/ch06/` ＝ chapter6.tex ＋ chapter6.pdf。紀錄 [`../../latex/chapters/ch06/DIALECT-ch06.md`](../../latex/chapters/ch06/DIALECT-ch06.md) |
-| 6 | appA | 49 | |
+| 6 | appA | 49 | ⏸ 暫緩（2026-07-26 使用者裁決） |
 | ~~7~~ | **ch03** | ~~42~~ | ✅ **2026-07-25 完成**。執行 66 條（走查 50＋Codex Q6 第二波 16）、14.0→1.6/1000、既有數學片段零改動、分頁 27 頁不變；Codex gate-2 ADOPT 38／MODIFY 12／REJECT 0（抓到一處既有課文錯誤：continuity 只管差商的第一個因子）。**Gate 7（LaTeX）四閘全綠、`dist/ch03/` 成品已產出**（完整性閘的假紅修法＝`check_prose.py` 改用 `pdftotext -raw`；字形閘的 Times 後備修法＝圖匯出改用 repo 內附的完整 Inter，Google Fonts 的子集不含 U+2080）。紀錄 [`REVIEW-ch03-plain-applied.html`](REVIEW-ch03-plain-applied.html) |
 | ~~8~~ | **ch01** | ~~37~~ | ✅ **2026-07-25 完成**（提前做：RC 後第一個回填單元，用它驗證條款在手稿章不誤傷）。執行 41 條、9.3→2.1/1000、數學片段零差異、分頁 53 頁不變、§1.4 對照組零改動；Codex gate-2 ADOPT 34／MODIFY 7／REJECT 1。**Gate 7（LaTeX）四閘全綠、成品已產出**：`NAMES` 補 ch01、九條方言 mapping、33 panel 圖匯出；閘 1 編譯（44 頁／0 error／0 missing char／0 overfull）、閘 3 完整性（0 真落差）、閘 3b 表格（新增，18 格）、閘 3c 圖內文字（13 條 note）、閘 4 字形（489 字形輪廓）全 PASS。`dist/ch01/` ＝ chapter1.tex ＋ chapter1.pdf。多 panel 圖的 grid 版面 2026-07-26 補上（Figure 1.1 併成一列、Figure 1.17 排 2×2，圖說不再孤立）。紀錄 [`../../latex/chapters/ch01/DIALECT-ch01.md`](../../latex/chapters/ch01/DIALECT-ch01.md) |
-| 9 | appC | 20 | N<1000 附近，報 raw 並與鄰近單元合併判定 |
-| 10 | appD | 14 | 舊表誤標「免」，實需處理 |
+| 9 | appC | 20 | ⏸ 暫緩（2026-07-26 使用者裁決）；N<1000 附近，報 raw 並與鄰近單元合併判定 |
+| 10 | appD | 14 | ⏸ 暫緩（2026-07-26 使用者裁決）；舊表誤標「免」，實需處理 |
 
 - **新增章節不進本清單**：合併後 em-dash 目標與 palette 已在 §3，Mode A 的 brief 與完稿自檢直接呼叫 `tools/prose_metrics.py`＝**生成端就受約束**。下一個新節同時作為「生成端兩臂對照」的場地（一臂只給範文、一臂掛完整條款），用以驗證新章是否還需要回填輪。
 - 每輪完成後於 §2 表更新密度與 tic guard 四項並打勾。
