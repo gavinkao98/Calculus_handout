@@ -124,7 +124,15 @@ class MathPassthrough(unittest.TestCase):
         for f in ("sec-3-1", "sec-3-2", "sec-3-3"):
             src_math += naive_scan_math(
                 (HTML_LINE / "fragments" / "ch03" / f"{f}.html").read_text(encoding="utf-8"))
-        self.assertEqual(len(src_math), 605, "數學區段數應為 605（M-P0 盤點）")
+        # 普查錨：防止下面的「依序、恰好一次」不變式被空集合／縮水的集合空洗過關。
+        # 內容合法增減時要跟著更新，並在此記錄原因（否則下次沒人知道數字為何變）。
+        #   605 = M-P0 盤點（2026-07-16）
+        #   612 = 2026-07-26 ch03 散文平實化回填後：淨 +7 個行內式，全部是既有記號的再指涉
+        #         （W-04 把 \(\sin(x+h)\) 改成差商真正的分子 \(\sin(x+h)-\sin x\)；C-03／C-04
+        #          寫出實際代數結果；W-34／W-43 補主詞；W-47 以實際 identity 取代 "their kin"；
+        #          C-09 補代入方向的 \(g\)／\(f\)）。既有式子 0 處改動，display 式數量不變。
+        #         證據：handout/html/_audit/REVIEW-ch03-plain-applied.html「Gate 5」節。
+        self.assertEqual(len(src_math), 612, "數學區段數應為 612（見上方普查錨沿革）")
 
         # 依序：每段必須出現在前一段之後（驗得到順序，也驗得到遺漏）
         pos = 0
