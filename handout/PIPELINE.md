@@ -82,7 +82,16 @@
 appB pilot 已 GO（收案當時：同內容 HTML 20 頁 → LaTeX 14 頁，四閘全綠）；**2026-07-17 appB 加 §B.6 後重跑並重新凍結＝24 頁、四閘仍全綠**，成品 `latex/dist/appB/` 已更新（沿革見 [`latex/KICKOFF-latex-pilot.md`](latex/KICKOFF-latex-pilot.md) 頭段）。**逐章 rollout**（建議順序
 ch03→ch01→ch06→其餘附錄；屆時另開計畫）每章＝方言差集盤點（`dialect_inventory.py`）→
 補 mapping（權威表 `chapters/<ch>/DIALECT-<ch>.md`）→ 四閘；完整沿革與 rollout 預告見
-[`latex/KICKOFF-latex-pilot.md`](latex/KICKOFF-latex-pilot.md)。HTML standalone 自此定位＝
+[`latex/KICKOFF-latex-pilot.md`](latex/KICKOFF-latex-pilot.md)。
+
+**rollout 現況（成品有無，唯一速查）**：
+
+| 單元 | DIALECT | `dist/` 成品 | 備註 |
+|---|---|---|---|
+| appB | ✅ | ✅ 24 頁 | pilot GO；2026-07-17 加 §B.6 後重新凍結 |
+| ch01 | ✅ | ✅ 44 頁 | 2026-07-25；多 panel 圖 grid 版面於 2026-07-26 補上 |
+| **ch06** | ✅ | ✅ **28 頁** | 2026-07-26；方言差集僅 1 列（裸 `span.qed`）。**字形閘本輪補了通用判準**：圖標籤用 `\text{…}` 會讓 Chrome 把 MathJax 文字體嵌成 CID TrueType（閘 4 只驗 CFF），改判「與圖 PDF 逐位元組相同即 pass-through」——ch05／ch07 圖標籤帶單位時會再撞 |
+| ch03 | ✅ | ⬜ **未產** | rollout 建議順序的第一章，DIALECT 已備但從未跑 `make_dist.py`；`NAMES` 表已有 `ch03` |HTML standalone 自此定位＝
 **撰稿預覽＋圖閘 render 載體**（D2／D6），內容閘鏈照舊跑 fragment、不受影響。
 
 > **兩線分工拍板（2026-07-17 使用者裁決）**：**整體仍先做 HTML 講義**（`html/`＝撰稿製作線，
@@ -111,6 +120,6 @@ handout 線 6 個（`example-supplement`、`handout-prose-audit`、`handout-figu
 | Ch4 | ✅ 手稿六階 | ✅ 雙閘（gate-2 173.7k tok）／**⬜ 待辦：下次數學閘併入 3 處嚴謹度缺口**（2026-07-26 使用者裁決）——N-08 Example 4.4 收尾的一般化缺 MVT 區間／可微前提、N-12 Proposition 4.3 證明未寫出 Corollary 4.4 的前提、§4.5 應用段「常數＝\(y(0)\)」未代 \(t=0\)；三者由 ch04 平實化輪的 Codex gate-2 指出，屬數學內容故未在該散文輪執行。證據：[`html/_audit/REPORT-ch04-plain-codex-round1-raw.md`](html/_audit/REPORT-ch04-plain-codex-round1-raw.md) §(4)、[`html/_audit/REVIEW-ch04-plain-applied.html`](html/_audit/REVIEW-ch04-plain-applied.html) §七 | ✅／✅ | ✅ gate-1+2（154.7k tok） | ✅ | ✅ ①② | **全閘完成** |
 | Ch5 | ✅ **canon M1**（2026-07-06） | ✅ M1 sweep＋**gate-2 全章**（1 blocking [M7] 修＋回歸→0；2026-07-07） | ✅／✅ **Figure 5.1–5.11**（D1–D8 gate-1 0/0；**視覺 gate-2 全跑 0/0**，2026-07-10） | ✅ **M3 gate-1**（三組 0 blocking；36 tighten/14 opt/2 voice 全 advisory）＋**S·A·V gate-2 0 blocking**（1 adv F4 已套用；2026-07-10） | ✅ **M3**（3 盲測 0 blocking/0 B類；均值≈3.2、尖峰 §5.7=4<§4.2 的 4.5） | ✅ **M4**（ADOPT 4：Ex 5.14/5.22＋2 軟深度；Ex 5.1–5.27） | **全閘完成·三閘 gate-2 全跑定版（canon 首例）** |
 | App A–D | ✅ 自撰（無手稿先例） | A/B math-register gate-2 ✅ | — | — | — | — | 服務性附錄，按需維護 |
-| Ch6 | ✅ **canon M1**（2026-07-10；深理論核心，FTC 兩部就地證） | ✅ M1 sweep **sympy 29/29**＋章層 review＋**三閘數學 gate-2**（1 blocking [Fig 6.2 caption overshoot 機制誤述] 修＋回歸→0；1 adv induction→telescoping；sol/max 2026-07-11） | ✅／✅ **Figure 6.1–6.9**（D1–D8 gate-1 0/0；**視覺 gate-2 全跑 0/0**，含 M4 semicircle；1 false-positive 複核駁回；2026-07-11） | ✅ **M3 gate-1**（5 節 0 blocking，§6.3 全乾淨）＋**S·A·V gate-2 0 blocking**（4 adv，3 客觀套用；2026-07-11） | ✅ **M3**（3 盲測 0 blocking／0 B類；曲線 [2,3,4,3,3]，尖峰 §6.3 FTC=4，≤§4.2 的 4.5） | ✅ **M4**（ADOPT 7/8：5 例題＋2 軟深度＋1 圖；Ex 6.1–6.21） | **全閘完成·三閘 gate-2 全跑定版·首個全程 5-milestone 試點章** |
+| Ch6 | ✅ **canon M1**（2026-07-10；深理論核心，FTC 兩部就地證） | ✅ M1 sweep **sympy 29/29**＋章層 review＋**三閘數學 gate-2**（1 blocking [Fig 6.2 caption overshoot 機制誤述] 修＋回歸→0；1 adv induction→telescoping；sol/max 2026-07-11） | ✅／✅ **Figure 6.1–6.9**（D1–D8 gate-1 0/0；**視覺 gate-2 全跑 0/0**，含 M4 semicircle；1 false-positive 複核駁回；2026-07-11） | ✅ **M3 gate-1**（5 節 0 blocking，§6.3 全乾淨）＋**S·A·V gate-2 0 blocking**（4 adv，3 客觀套用；2026-07-11） | ✅ **M3**（3 盲測 0 blocking／0 B類；曲線 [2,3,4,3,3]，尖峰 §6.3 FTC=4，≤§4.2 的 4.5） | ✅ **M4**（ADOPT 7/8：5 例題＋2 軟深度＋1 圖；Ex 6.1–6.21） | **全閘完成·三閘 gate-2 全跑定版·首個全程 5-milestone 試點章**（2026-07-11）。**下游兩線亦已收（2026-07-26）**：平實化回填 em-dash 12.5→**1.4**/1000（[`html/_audit/REVIEW-ch06-plain-applied.html`](html/_audit/REVIEW-ch06-plain-applied.html)）＋LaTeX 出版線四閘全綠、成品 `latex/dist/ch06/`（[`latex/chapters/ch06/DIALECT-ch06.md`](latex/chapters/ch06/DIALECT-ch06.md)） |
 | Ch7 | ✅ **canon M1**（2026-07-18；標準嚴謹，積分 MVT／C¹ 弧長／表面積三定理就地全證，零新增 fence） | M1 側 ✅：**sympy 48/48**＋逐節 ⑤ 0 blocking＋章層 review **M1–M8 全維 CLEAN 0/0**＋**數學 gate-2（sol/max）0 blocking**（23 例最終答案＋Thm 7.1–7.4 四證皆對；1 adv Ex 7.15 端點退化精確化已套） | ✅ gate-1／⬜ gate-2：機會覆核（7 subagent，23 張採納）→ 2.5D pattern Codex 收斂 → **Figure 7.1–7.23 全繪**→ **D1–D8 gate-1 23/23 歸零**（首輪 3 blocking＋6 advisory 全修＋回歸 clean；2026-07-18；`REVIEW-ch07-figure-audit.html`）；**視覺 gate-2 0 blocking**（23 PNG 餵 Codex；1 D7 Fig 7.16 定義圖 spoiler→使用者裁 (B) 輕修 caption、22 clean） | ✅ **M3 gate-1（applied）**（7 節 0 blocking；17+1 修補套用）＋**S·A·V gate-2 0 blocking**（確認 M3/M4 橋接；4 adv F3/F4 套用） | ✅ **M3**（3 盲測 0 stuck／0 B 類；曲線 [2,3,3,3.5–4,3,3.5–4,4–4.5]、尖峰 §7.7 表面積證明 ≈Ch4 §4.2；scoped 回歸 0 stuck） | ✅ **M4**（ADOPT 4/4：Ex 7.8 §7.2 shifted-axis＋3 軟深度〔avg-velocity 橋／Neile 史脈／Strategy 7.4〕；Example 7.1–7.23＝cap；scoped Mode B＋sim 皆 0 blocking／0 stuck） | **全閘完成·三閘 gate-2 全跑 0 blocking·定版**（2026-07-18；canon 第 3 章，繼 Ch5/Ch6）；as-built ledger 見 [`html/_dev-archive/ch07/PLAN-ch07.md`](html/_dev-archive/ch07/PLAN-ch07.md) |
 | Ch8+ | 未開章（依 [`../CONTENT_ROADMAP.md`](../CONTENT_ROADMAP.md) 弧線骨架） | | | | | | |
