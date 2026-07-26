@@ -45,11 +45,13 @@ ch02 的兩個 inline SVG 帶了 ch01 沒有的子元素（`rect`／`line`／`ts
 | 閘 | 結果 |
 |---|---|
 | 閘 1 編譯（log） | **PASS**：**35 頁**、0 error、0 missing character |
+| 閘 2 版面（log，人工） | **PASS**：Overfull \hbox 0、Underfull \hbox 0、Overfull \vbox 0（2026-07-26 補驗——首次交付時漏記此閘） |
 | 閘 3 完整性（`check_prose.py`） | **PASS**：fragment 散文 7944 詞 vs PDF 12020 詞，**0 處真落差**（9 處 `pdftotext` 抽取假象已逐條確認內容在） |
 | 閘 3b 表格（`table_check`） | **PASS**：1 個表格詞全數抵達 PDF（Example 2.4 的割線斜率表） |
 | 閘 3c 圖內文字（`figure_note_check`） | n/a：ch02 無 panel note |
 | 閘 4 字形（`check_glyphs.py`） | **PASS**：**467 個嵌入字形的輪廓全數符合其 CID**（NCM／Inter 共 12 個子集）；另有 8 個圖匯入子集在 `FIG_IMPORTED_OK` 白名單內——判準的沿革與理由見 §5.1／§5.2 |
 | 轉換器測試 | **PASS**：`pytest test_convert.py` 83/83 |
+| **閘 5 人眼（KICKOFF §4.5）** | **⬜ 未做**：本質需人判斷（全頁看一遍、抽樣公式與 HTML render 並排）。本輪只做到結構性驗證——分頁 45→45 頁不變（HTML 側）、PDF 35 頁 0 error、10 張圖全 render、MathJax 908 容器 0 個未渲染。**交付使用者過目。** |
 
 `dist/ch02/` ＝恰兩檔（`chapter2.tex` 76.4KB ＋ `chapter2.pdf` 1.40MB，35 頁）。
 
