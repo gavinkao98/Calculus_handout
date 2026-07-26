@@ -3,7 +3,7 @@
 > 基底＝[`../ch03/DIALECT-ch03.md`](../ch03/DIALECT-ch03.md)（30 列 mapping）＋ [`../appB/DIALECT-appB.md`](../appB/DIALECT-appB.md)（附錄差集）＋ [`../ch01/DIALECT-ch01.md`](../ch01/DIALECT-ch01.md)（27 列 ch01 專屬）。
 > 本檔只記 **ch02 相對於這三者的差集**、圖資產清單、以及本輪對工具與內容的改動。
 > 流程權威＝[`../../KICKOFF-latex-pilot.md`](../../KICKOFF-latex-pilot.md) §4.5 四閘；樣式權威＝[`../../template/calcbook.sty`](../../template/calcbook.sty)。
-> **狀態（2026-07-26）：四閘全綠，`dist/ch02/` 已產出（`chapter2.pdf` 35 頁＋自足 `chapter2.tex`）。** 見 §5。
+> **狀態（2026-07-26）：五閘全過（編譯／版面／完整性／字形／人眼）＋轉換器測試，`dist/ch02/` 已產出（`chapter2.pdf` 35 頁＋自足 `chapter2.tex`）；§6 的兩項數學待辦亦已結清。****ch02 於本線收尾完成。** 見 §5、§6。
 
 ## 1. 盤點結果
 
@@ -51,7 +51,7 @@ ch02 的兩個 inline SVG 帶了 ch01 沒有的子元素（`rect`／`line`／`ts
 | 閘 3c 圖內文字（`figure_note_check`） | n/a：ch02 無 panel note |
 | 閘 4 字形（`check_glyphs.py`） | **PASS**：**467 個嵌入字形的輪廓全數符合其 CID**（NCM／Inter 共 12 個子集）；另有 8 個圖匯入子集在 `FIG_IMPORTED_OK` 白名單內——判準的沿革與理由見 §5.1／§5.2 |
 | 轉換器測試 | **PASS**：`pytest test_convert.py` 83/83 |
-| **閘 5 人眼（KICKOFF §4.5）** | **⬜ 未做**：本質需人判斷（全頁看一遍、抽樣公式與 HTML render 並排）。本輪只做到結構性驗證——分頁 45→45 頁不變（HTML 側；兩處 8px 溢出 p.13／p.39 在平實化前即存在）、PDF 35 頁 0 error、10 張圖全 render、MathJax 908 容器 0 個未渲染。**交付使用者過目。** |
+| **閘 5 人眼（KICKOFF §4.5）** | **✅ PASS**（2026-07-26 使用者過目 `dist/ch02/chapter2.pdf` 35 頁後回報通過）。本質需人判斷，機器側只做到結構性驗證：分頁 45→45 頁不變（HTML 側；兩處 8px 溢出 p.13／p.39 在平實化前即存在）、PDF 35 頁 0 error、10 張圖全 render、MathJax 908 容器 0 個未渲染 |
 
 `dist/ch02/` ＝恰兩檔（`chapter2.tex` 76.4KB ＋ `chapter2.pdf` 1.40MB，35 頁）。
 
