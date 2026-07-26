@@ -96,7 +96,7 @@ ch03→ch01→ch06→其餘附錄；屆時另開計畫）每章＝方言差集�
 | ch04 | ✅ | 32 頁 | 2026-07-26（字形閘加 glyf 比對路徑） |
 | ch05 | ✅ | 36 頁 | 2026-07-26 |
 | **ch06** | ✅ | **28 頁** | 2026-07-26（方言差集 0——裸 `span.qed` 已由 ch04 那輪補上） |
-| **ch07** | ✅ | **39 頁** | 2026-07-26（**五閘全過含人眼閘**；方言差集 0；全書圖最多的一章＝23 圖／27 panel。**修共用工具一項**：字形閘在「整條輪廓全 off-curve」的合法 TrueType 構造上 crash，觸發者是圖面板文字裡的 `?`——見 [`latex/chapters/ch07/DIALECT-ch07.md`](latex/chapters/ch07/DIALECT-ch07.md) §3）。**人眼閘抓到 3 條**平實化輪造成、HTML 線看不出來的缺陷（含一處 figcaption 整句重複），已修並補程式化前哨 `tools/dup_scan.py`——見同檔 §4b |
+| **ch07** | ✅ | **39 頁** | 2026-07-26（**六閘全過**——含人眼閘與**使用者 GO**（2026-07-26）；方言差集 0；全書圖最多的一章＝23 圖／27 panel。**修共用工具一項**：字形閘在「整條輪廓全 off-curve」的合法 TrueType 構造上 crash，觸發者是圖面板文字裡的 `?`——見 [`latex/chapters/ch07/DIALECT-ch07.md`](latex/chapters/ch07/DIALECT-ch07.md) §3）。**人眼閘抓到 3 條**平實化輪造成、HTML 線看不出來的缺陷（含一處 figcaption 整句重複），已修並補程式化前哨 `tools/dup_scan.py`——見同檔 §4b |
 | appA／appC／appD | ⬜ | — | 未上線 |
 
 HTML standalone 自此定位＝
