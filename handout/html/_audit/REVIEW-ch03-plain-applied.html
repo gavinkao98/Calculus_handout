@@ -55,7 +55,7 @@
 <strong>執行 66 條</strong>＝走查 50 條（Codex ADOPT 38／MODIFY 12，<strong>REJECT 0</strong>）＋ Codex Q6 第二波 16 條（提名 16 → triage 採 16、退 7）。
 逐例 KEEP 3 對。<strong>em-dash 54 → 6、密度 14.0 → 1.6/1000</strong>；冒號 −3、分號 −2、括號 −1。
 數學片段<strong>零內容改動</strong>；分頁 <strong>27 頁不變</strong>（溢頁與短段位置逐項相同）。
-<strong>Gate 7（LaTeX）仍 pending</strong>——log 與完整性兩閘已綠（完整性閘的假紅已於 2026-07-26 修掉，commit <code>1f139e3</code>），卡在字形閘；診斷與三個處理方向見下方誠實記錄。
+<strong>Gate 7（LaTeX）四閘全綠、成品已產出</strong>（2026-07-26 收尾；<code>dist/ch03/</code> ＝ chapter3.pdf ＋ chapter3.tex）。中途兩次診斷錯誤與最後的修法見下方記錄。
 </div>
 <h2>驗收表（Gate 3–8）</h2>
 <table>
@@ -64,7 +64,7 @@
 <tr><td><strong>4</strong> build ＋ 量測</td><td><span class="tag good">PASS</span></td><td><code>python handout/html/build.py ch03</code>；<code>prose_metrics.py --unit ch03</code>：N 3855、em-dash <strong>6</strong>、<strong>1.6/1000</strong>（<code>T_can</code> ≤3.0）。逐節 §3.1 1.6／§3.2 3.0／§3.3 0.0。</td></tr>
 <tr><td><strong>5</strong> math gate</td><td><span class="tag good">PASS</span></td><td>vs <code>git show HEAD</code> multiset 比對：<strong>既有數學片段 0 處內容改動</strong>；display 式數量 20／22／19 <strong>完全不變</strong>；cross-ref 53／62／78 <strong>全數在位</strong>；標籤與分隔符平衡；<code>env-num</code>／<code>fig-no</code>／<code>&lt;figure</code>／<code>data-fig</code> 數量不變。行內式淨 +7，逐條說明見下。</td></tr>
 <tr><td><strong>6</strong> Mode B 語意等價</td><td><span class="tag good">PASS</span></td><td>Codex Q1／Q2 覆核「無機械拆句、無量詞 scope／條件—結論／先行詞被拆散」。節奏自查抓到 <span class="id">W-25</span> 折入 Codex 三句版後成 10/7/8 詞三連短句 → <strong>已回修為 10/18</strong>；複測無連續三句長度相近。全章句長平均 15.9、P90 28、&gt;25 詞 14%。</td></tr>
-<tr><td><strong>7</strong> LaTeX 線</td><td><span class="tag warn">pending</span></td><td>log 閘 ✅（22 頁／0 error／0 missing char）、完整性閘 ✅（原本的「真落差」是 <code>pdftotext</code> 幾何重建造成的假紅，已改 <code>-raw</code> 修掉）、<strong>字形閘 ❌</strong>（圖 PDF 內嵌 3 個 TrueType，該閘只驗 CFF 且刻意 fail-loud）。詳見下方誠實記錄。</td></tr>
+<tr><td><strong>7</strong> LaTeX 線</td><td><span class="tag good">PASS</span></td><td><code>make_dist.py ch03</code> 四閘全綠：log（22 頁／0 error／0 missing char）、完整性閘（0 真落差）、圖內文字閘（2 條 panel note）、字形閘（428 個字形輪廓全符，另 1 個圖匯入子集在 <code>FIG_IMPORTED_OK</code> 白名單內）。<code>dist/ch03/</code> 恰兩檔。commit <code>1f139e3</code>（完整性閘 oracle）＋<code>e443070</code>（圖匯出字型）。</td></tr>
 <tr><td><strong>8</strong> 版面目檢</td><td><span class="tag good">PASS</span></td><td>瀏覽器實測 <code>chapter3-print-standalone.html</code>：<strong>27 頁，與 HEAD 完全相同</strong>；溢頁 <code>3:8px, 4:5px, 27:8px</code> 逐項相同；短段位置 <code>1tail,5head,7head,8head,10head,12tail,12head,16head,18head,26head</code> 逐項相同；7 張圖 SVG 全數 hydrate、圖文未拆散；無水平溢出。</td></tr>
 </table>
 <h2>量測前後（不換 tic 護欄）</h2>
@@ -88,8 +88,8 @@
 <tr><td>§3.3</td><td>新增 <code>\(\ln x\)</code>、<code>\(\ln\)</code>、<code>\(\arccos(\cos x) = x\)</code>、<code>\(\arctan(\tan x) = x\)</code></td><td><span class="id">W-34</span> <span class="id">W-43</span> <span class="id">W-47</span></td><td>前二為消除修飾語誤掛所補的主詞；後二是 Example 3.15／3.16 已建立的 identity，用以取代模糊的 <span class="en">their kin</span>。</td></tr>
 </table>
 <p class="small"><strong>沒有任何既有公式被改寫</strong>；display 式數量三節皆不變（20／22／19）。§3.1／§3.2 的 multiset 差異只有上述指涉更正，其餘全為順序位移（<span class="id">W-10</span>／<span class="id">W-22</span> 重排句子）。</p>
-<h2>⚠ 誠實記錄：Gate 7（LaTeX 線）仍未過——本節 2026-07-26 更正</h2>
-<div class="card warn">
+<h2>Gate 7（LaTeX 線）的完整經過——兩次診斷錯誤與最後的修法</h2>
+<div class="card good">
 <p><strong>更正原本的診斷。</strong>本節初版寫「Gate 7 FAIL＝Figure 3.2 的 caption 沒抵達 PDF」。<strong>那個判斷是錯的</strong>：
 以 <code>pdftoppm</code> 算圖目視確認，caption 在 PDF 裡<strong>一字不缺</strong>
 （<span class="en">… Proposition 3.2: \(	frac{\sin	heta}{	heta}\) sits between \(\cos	heta\) and \(1\), with an open circle at \(	heta = 0\).</span>）。
@@ -124,11 +124,18 @@
 <code>NetworkError</code>／<code>error</code>。根因是 webfont 屬 CORS 檢查的 subresource，而匯出用的 wrapper 是 <code>file://</code> 頁面（opaque origin），加 <code>--allow-file-access-from-files</code> 也無效。三次失敗同一個架構性成因，故停手不再試第四次。</li>
 </ol>
 
-<p><strong>ch03 的 Gate 7 記為 pending。</strong>可行的三個方向（待裁決）：
-(a) 讓 exporter 起一個 <code>http://127.0.0.1</code> 靜態伺服器供稿，本機字型即可載入——最完整，但為 build 工具新增基礎設施；
-(b) 把字形閘的範圍明文限縮為「LuaTeX 內嵌的字型」，included 圖 PDF 內的字型改由圖閘（視覺）把關——它們本來就無原檔可比對，且今天只有在恰好是 Type 3 時才「通過」；
-(c) 只修 <code>₀</code>（讓該 label 不用 U+2080 字面字元），去掉 Times 後備，但 WebCM 的 TrueType 仍過不了閘，須與 (b) 併用。</p>
-<p class="small"><strong>已清理：</strong>失敗建置在 <code>handout/latex/dist/ch03/</code> 留下的 pdf／tex 已刪除；重匯圖時順手改到的 8 個 <code>_wrap/*.html</code> 已還原。</p>
+<p><strong>最後真正有效的修法（commit <code>e443070</code>）：讓圖匯出改用 repo 內附的完整 Inter。</strong>
+逐字元查證後確認，那兩個 Times 子集<strong>各只畫一個字元 <code>₀</code></strong>，而圖上其餘的字都是 Inter——
+問題不在 NCM，而在<strong>送到瀏覽器的是哪一份 Inter</strong>：standalone 從 Google Fonts 載，Google 送的是<strong>子集</strong>、不含 U+2080；
+repo 內附給 LaTeX 用的完整 Inter OTF 六個字重則都有。兩條線先前只是「字型名稱相同」，不是同一份檔案。
+<code>export_figs.mjs</code> 因此起一個本機 http 伺服器供稿（file:// 與 data URI 都被 CORS 擋死，見上），
+並在 wrapper 裡拿掉 Google Fonts 的 <code>&lt;link&gt;</code>、換成指向本機的 <code>@font-face</code>。</p>
+<p><strong>驗證：</strong>composed-mapping 的 TrueType <strong>3 → 0</strong>、<code>₀</code> 改由 Inter 畫（算圖目視確認）；
+拿修正前的舊圖餵 <code>check_glyphs.py</code> 仍 FAIL 並指名「Times 不在 <code>FIG_IMPORTED_OK</code> 白名單內」，
+證明白名單本身不足以放行；<code>figures.json</code> 與版控版逐位元組相同，<strong>幾何未漂移</strong>；golden tests 83 項全過。</p>
+<p><strong>殘留（已記入 <code>TYPESETTING_GUIDE</code> §9.1）：</strong>New Computer Modern 仍走 CDN——Chrome 的 OTS 拒收 TeX 樹那份
+<code>NewCM10-Regular/Italic.otf</code>（<code>CFF : Failed validating CharStrings INDEX</code>；Bold 兩支反而通過），
+所以圖匯出仍需連網；圖 PDF 帶進來的 <code>WebCM-Serif-10-*</code> 子集由字形閘的白名單放行（ch02 rollout 所立）。</p>
 </div>
 <h2>Codex gate-2 整合</h2>
 <div class="card">

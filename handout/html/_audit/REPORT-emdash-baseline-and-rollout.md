@@ -124,7 +124,7 @@
 | 4 | ch04 | 71 | |
 | 5 | ch06（§6.1／§6.4／§6.5） | 55 | §6.2／§6.3 已平實化但 dash 未做；**§6.1 另有兩段 ≥150 詞的段落離群** |
 | 6 | appA | 49 | |
-| ~~7~~ | **ch03** | ~~42~~ | ✅ **2026-07-25 完成**。執行 66 條（走查 50＋Codex Q6 第二波 16）、14.0→1.6/1000、既有數學片段零改動、分頁 27 頁不變；Codex gate-2 ADOPT 38／MODIFY 12／REJECT 0（抓到一處既有課文錯誤：continuity 只管差商的第一個因子）。**Gate 7（LaTeX）pending**——log 與完整性兩閘綠（完整性閘的假紅已修，`check_prose.py` 改用 `pdftotext -raw`），卡在字形閘：圖 PDF 內嵌 3 個 TrueType（`composed-mapping` 的 `₀` 因 WebCM 缺 U+2080 後備到 Times）。紀錄 [`REVIEW-ch03-plain-applied.html`](REVIEW-ch03-plain-applied.html) |
+| ~~7~~ | **ch03** | ~~42~~ | ✅ **2026-07-25 完成**。執行 66 條（走查 50＋Codex Q6 第二波 16）、14.0→1.6/1000、既有數學片段零改動、分頁 27 頁不變；Codex gate-2 ADOPT 38／MODIFY 12／REJECT 0（抓到一處既有課文錯誤：continuity 只管差商的第一個因子）。**Gate 7（LaTeX）四閘全綠、`dist/ch03/` 成品已產出**（完整性閘的假紅修法＝`check_prose.py` 改用 `pdftotext -raw`；字形閘的 Times 後備修法＝圖匯出改用 repo 內附的完整 Inter，Google Fonts 的子集不含 U+2080）。紀錄 [`REVIEW-ch03-plain-applied.html`](REVIEW-ch03-plain-applied.html) |
 | ~~8~~ | **ch01** | ~~37~~ | ✅ **2026-07-25 完成**（提前做：RC 後第一個回填單元，用它驗證條款在手稿章不誤傷）。執行 41 條、9.3→2.1/1000、數學片段零差異、分頁 53 頁不變、§1.4 對照組零改動；Codex gate-2 ADOPT 34／MODIFY 7／REJECT 1。**Gate 7（LaTeX）四閘全綠、成品已產出**：`NAMES` 補 ch01、九條方言 mapping、33 panel 圖匯出；閘 1 編譯（44 頁／0 error／0 missing char／0 overfull）、閘 3 完整性（0 真落差）、閘 3b 表格（新增，18 格）、閘 3c 圖內文字（13 條 note）、閘 4 字形（489 字形輪廓）全 PASS。`dist/ch01/` ＝ chapter1.tex ＋ chapter1.pdf。多 panel 圖的 grid 版面 2026-07-26 補上（Figure 1.1 併成一列、Figure 1.17 排 2×2，圖說不再孤立）。紀錄 [`../../latex/chapters/ch01/DIALECT-ch01.md`](../../latex/chapters/ch01/DIALECT-ch01.md) |
 | 9 | appC | 20 | N<1000 附近，報 raw 並與鄰近單元合併判定 |
 | 10 | appD | 14 | 舊表誤標「免」，實需處理 |
