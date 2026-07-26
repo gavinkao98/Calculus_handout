@@ -55,7 +55,7 @@
 <strong>執行 66 條</strong>＝走查 50 條（Codex ADOPT 38／MODIFY 12，<strong>REJECT 0</strong>）＋ Codex Q6 第二波 16 條（提名 16 → triage 採 16、退 7）。
 逐例 KEEP 3 對。<strong>em-dash 54 → 6、密度 14.0 → 1.6/1000</strong>；冒號 −3、分號 −2、括號 −1。
 數學片段<strong>零內容改動</strong>；分頁 <strong>27 頁不變</strong>（溢頁與短段位置逐項相同）。
-<strong>Gate 7（LaTeX）FAIL——已證明是既有債，非本輪造成</strong>，見下方誠實記錄。
+<strong>Gate 7（LaTeX）仍 pending</strong>——log 與完整性兩閘已綠（完整性閘的假紅已於 2026-07-26 修掉，commit <code>1f139e3</code>），卡在字形閘；診斷與三個處理方向見下方誠實記錄。
 </div>
 <h2>驗收表（Gate 3–8）</h2>
 <table>
@@ -64,7 +64,7 @@
 <tr><td><strong>4</strong> build ＋ 量測</td><td><span class="tag good">PASS</span></td><td><code>python handout/html/build.py ch03</code>；<code>prose_metrics.py --unit ch03</code>：N 3855、em-dash <strong>6</strong>、<strong>1.6/1000</strong>（<code>T_can</code> ≤3.0）。逐節 §3.1 1.6／§3.2 3.0／§3.3 0.0。</td></tr>
 <tr><td><strong>5</strong> math gate</td><td><span class="tag good">PASS</span></td><td>vs <code>git show HEAD</code> multiset 比對：<strong>既有數學片段 0 處內容改動</strong>；display 式數量 20／22／19 <strong>完全不變</strong>；cross-ref 53／62／78 <strong>全數在位</strong>；標籤與分隔符平衡；<code>env-num</code>／<code>fig-no</code>／<code>&lt;figure</code>／<code>data-fig</code> 數量不變。行內式淨 +7，逐條說明見下。</td></tr>
 <tr><td><strong>6</strong> Mode B 語意等價</td><td><span class="tag good">PASS</span></td><td>Codex Q1／Q2 覆核「無機械拆句、無量詞 scope／條件—結論／先行詞被拆散」。節奏自查抓到 <span class="id">W-25</span> 折入 Codex 三句版後成 10/7/8 詞三連短句 → <strong>已回修為 10/18</strong>；複測無連續三句長度相近。全章句長平均 15.9、P90 28、&gt;25 詞 14%。</td></tr>
-<tr><td><strong>7</strong> LaTeX 線</td><td><span class="tag bad">FAIL（既有債）</span></td><td>見下方「誠實記錄」。</td></tr>
+<tr><td><strong>7</strong> LaTeX 線</td><td><span class="tag warn">pending</span></td><td>log 閘 ✅（22 頁／0 error／0 missing char）、完整性閘 ✅（原本的「真落差」是 <code>pdftotext</code> 幾何重建造成的假紅，已改 <code>-raw</code> 修掉）、<strong>字形閘 ❌</strong>（圖 PDF 內嵌 3 個 TrueType，該閘只驗 CFF 且刻意 fail-loud）。詳見下方誠實記錄。</td></tr>
 <tr><td><strong>8</strong> 版面目檢</td><td><span class="tag good">PASS</span></td><td>瀏覽器實測 <code>chapter3-print-standalone.html</code>：<strong>27 頁，與 HEAD 完全相同</strong>；溢頁 <code>3:8px, 4:5px, 27:8px</code> 逐項相同；短段位置 <code>1tail,5head,7head,8head,10head,12tail,12head,16head,18head,26head</code> 逐項相同；7 張圖 SVG 全數 hydrate、圖文未拆散；無水平溢出。</td></tr>
 </table>
 <h2>量測前後（不換 tic 護欄）</h2>
@@ -88,22 +88,47 @@
 <tr><td>§3.3</td><td>新增 <code>\(\ln x\)</code>、<code>\(\ln\)</code>、<code>\(\arccos(\cos x) = x\)</code>、<code>\(\arctan(\tan x) = x\)</code></td><td><span class="id">W-34</span> <span class="id">W-43</span> <span class="id">W-47</span></td><td>前二為消除修飾語誤掛所補的主詞；後二是 Example 3.15／3.16 已建立的 identity，用以取代模糊的 <span class="en">their kin</span>。</td></tr>
 </table>
 <p class="small"><strong>沒有任何既有公式被改寫</strong>；display 式數量三節皆不變（20／22／19）。§3.1／§3.2 的 multiset 差異只有上述指涉更正，其餘全為順序位移（<span class="id">W-10</span>／<span class="id">W-22</span> 重排句子）。</p>
-<h2>⚠ 誠實記錄：Gate 7（LaTeX 線）未過，但不是本輪造成的</h2>
-<div class="card bad">
-<p><code>cd handout/latex &amp;&amp; python make_dist.py ch03</code>（<strong>ch03 史上第一次 LaTeX 建置</strong>——<code>NAMES</code> 表有 ch03，但 <code>dist/</code> 只有 appB、ch01）：</p>
+<h2>⚠ 誠實記錄：Gate 7（LaTeX 線）仍未過——本節 2026-07-26 更正</h2>
+<div class="card warn">
+<p><strong>更正原本的診斷。</strong>本節初版寫「Gate 7 FAIL＝Figure 3.2 的 caption 沒抵達 PDF」。<strong>那個判斷是錯的</strong>：
+以 <code>pdftoppm</code> 算圖目視確認，caption 在 PDF 裡<strong>一字不缺</strong>
+（<span class="en">… Proposition 3.2: \(	frac{\sin	heta}{	heta}\) sits between \(\cos	heta\) and \(1\), with an open circle at \(	heta = 0\).</span>）。
+真正的原因是<strong>完整性閘的 oracle 用錯了</strong>：<code>pdftotext</code> 預設模式依 y 座標<strong>幾何重建</strong>閱讀順序，
+而 caption 內的 display-style <code>\dfrac</code> 把該行撐成好幾條 y 帶，後半 <span class="en">sits between … and</span> 因此被排到第二行之後，
+「依序子序列」判準自然報成落差。<strong>已修</strong>：<code>check_prose.py</code> 的 <code>pdf_prose()</code> 改用
+<code>pdftotext -raw</code>（PDF content-stream 順序＝LaTeX 實際吐字的順序），判準未放寬。
+回歸：appB／ch01／ch03 三單元 × 三個子閘全綠。commit <code>1f139e3</code>。</p>
+
+<p><strong>Gate 7 的阻塞因此換了一個。</strong>三閘現況：</p>
 <ul class="tight">
 <li>log 閘 <span class="tag good">綠</span>：22 頁、<strong>error 0、missing char 0</strong>。</li>
-<li>字形閘 <span class="tag good">綠</span>。</li>
-<li><strong>完整性閘 <span class="tag bad">FAIL</span></strong>：1 處真落差——<strong>Figure 3.2 的 caption 中段沒有進 PDF</strong>。</li>
+<li>完整性閘 <span class="tag good">綠</span>（上述修正後）。</li>
+<li><strong>字形閘 <span class="tag bad">FAIL</span></strong>：ch03 的圖 PDF 嵌了 3 個 <strong>TrueType</strong> 字型，而該閘只驗 CFF，
+且<strong>刻意</strong>對驗不到的字型 FAIL（不默默略過）。</li>
 </ul>
-<p><strong>隔離證明：</strong>把三個 fragment <code>git checkout HEAD --</code> 還原成本輪之前的版本後<strong>重跑，同一處以同樣方式 FAIL</strong>（src[909:912] vs 本輪的 src[916:919]，位移僅因詞數變動）。→ <strong>既有債，與本輪改動無關</strong>。這正是 Gate 0 事前示警的情形。</p>
-<p><strong>缺陷內容：</strong>fragment 的 caption 是<br>
-<span class="en">A graphical reading of the squeeze in Proposition 3.2: \(\dfrac{\sin\theta}{\theta}\) sits between \(\cos\theta\) and \(1\), with an open circle at \(\theta = 0\).</span><br>
-產出的 <code>chapter3.tex</code> 的 <code>\figcaption{...}</code> <strong>內容完整</strong>，但 PDF 文字層只剩<br>
-<span class="en">“A graphical reading of the squeeze in Proposition 3.2:” + “with an open circle at = 0.”</span><br>
-——中段 <span class="en">\(\dfrac{\sin\theta}{\theta}\) sits between \(\cos\theta\) and \(1\),</span> 整段從版面消失。<strong>病灶在 caption 內的 <code>\dfrac</code>（display 式分數塞進單行 caption 盒）</strong>，屬 <code>convert.py</code>／<code>calcbook.sty</code> 的 <code>\figcaption</code> 層，不在 fragment。</p>
-<p><strong>為何本輪不修：</strong>①它是既有債，修它不屬本輪範圍（<code>CLAUDE.md</code> 外科手術式修改）；②修點在 <code>handout/latex/</code>，而該目錄同時有 ch01 LaTeX 線的未提交變更，動它會把兩條線纏在一起；③同樣的 <code>\dfrac</code>-in-figcaption 也出現在 <strong>ch02 §2.5 Figure 2.10</strong>，是<strong>跨章的模板層問題</strong>，該由 LaTeX 線一次處理。</p>
-<p><strong>已清理：</strong>該次失敗建置在 <code>handout/latex/dist/ch03/</code> 留下的 pdf／tex（且是用 HEAD 版 fragment 產的）<strong>已刪除</strong>，未留污染。<strong>ch03 的 Gate 7 記為 pending，待 LaTeX 線修掉 caption 缺陷後重跑。</strong></p>
+
+<p><strong>那 3 個 TrueType 是什麼（逐字元查證）：</strong></p>
+<table>
+<tr><th>圖</th><th>字型</th><th>實際畫了哪些字元</th><th>判讀</th></tr>
+<tr><td><code>arcsin-vertical-tangent</code></td><td>WebCM-Serif-10-Regular</td><td><span class="en">vertical tangent</span>（11 字元）</td><td><strong>正是預期字型</strong>——standalone 的 <code>--serif</code> 首選 New Computer Modern，由 CDN webfont 提供，只是 Chrome 內嵌為 TrueType</td></tr>
+<tr><td rowspan="2"><code>composed-mapping</code></td><td>TimesNewRomanPS-ItalicMT</td><td>只有 <code>₀</code>（U+2080）</td><td rowspan="2"><strong>真瑕疵</strong>：WebCM Serif 10 <strong>沒有 U+2080</strong>，故 <span class="en">x₀／u₀／y₀</span> 的下標零逐字元後備到 Times——字母印 CM、下標印 Times</td></tr>
+<tr><td>TimesNewRomanPSMT</td><td>只有 <code>₀</code>（U+2080）</td></tr>
+</table>
+<p class="small">同圖其餘字元（<span class="en">h u x y</span>／<span class="en">f g x</span>／<span class="en">( ) × ′</span>）都是 Type 3，字型正確。
+本報告初版曾說「x、u、y、h、x₀… 全是 Times 斜體」——<strong>那是錯的，只有下標零</strong>。</p>
+
+<p><strong>試過但無效的兩條路（留紀錄，免得再走一遍）：</strong></p>
+<ol class="tight">
+<li><strong>重匯 ch03 的圖</strong>（假設圖停在舊 exporter）——<strong>完全 no-op</strong>：8 張 PDF 大小逐一相同、兩張問題圖算圖後 md5 相同、<code>figures.json</code> 零差異。ch01 的圖之所以乾淨不是因為 exporter 較新，而是它的 label 全走 MathJax（Type 3），根本不碰 <code>--serif</code>。</li>
+<li><strong>讓 exporter 改用本機 NewCM10 OTF</strong>（CFF、含 U+2080、字形閘可用 <code>kpsewhich</code> 找到原檔，可同時解掉兩件事）——<strong>被 Chrome 擋死</strong>：<code>file://</code> URL、單發 data URI、分塊 data URI 三種注入方式都得到
+<code>NetworkError</code>／<code>error</code>。根因是 webfont 屬 CORS 檢查的 subresource，而匯出用的 wrapper 是 <code>file://</code> 頁面（opaque origin），加 <code>--allow-file-access-from-files</code> 也無效。三次失敗同一個架構性成因，故停手不再試第四次。</li>
+</ol>
+
+<p><strong>ch03 的 Gate 7 記為 pending。</strong>可行的三個方向（待裁決）：
+(a) 讓 exporter 起一個 <code>http://127.0.0.1</code> 靜態伺服器供稿，本機字型即可載入——最完整，但為 build 工具新增基礎設施；
+(b) 把字形閘的範圍明文限縮為「LuaTeX 內嵌的字型」，included 圖 PDF 內的字型改由圖閘（視覺）把關——它們本來就無原檔可比對，且今天只有在恰好是 Type 3 時才「通過」；
+(c) 只修 <code>₀</code>（讓該 label 不用 U+2080 字面字元），去掉 Times 後備，但 WebCM 的 TrueType 仍過不了閘，須與 (b) 併用。</p>
+<p class="small"><strong>已清理：</strong>失敗建置在 <code>handout/latex/dist/ch03/</code> 留下的 pdf／tex 已刪除；重匯圖時順手改到的 8 個 <code>_wrap/*.html</code> 已還原。</p>
 </div>
 <h2>Codex gate-2 整合</h2>
 <div class="card">
