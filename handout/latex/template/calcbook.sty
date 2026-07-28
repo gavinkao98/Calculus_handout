@@ -201,28 +201,87 @@
 % ── kicker pill（vivid：.64rem≈7.7pt、LetterSpace .07em→7、圓角全圓）─────────
 \newcommand{\cb@pillfont}{\cbuibold\fontsize{7.7}{9.2}\selectfont
   \addfontfeature{LetterSpace=7}}
+% ── pill 度量：三個值彼此有算術關係，一律由 \cb@pillfont 推導，不寫死 ──────────
+% 【為什麼要 strut】HTML .env-kicker 的盒高＝line-height(1.5)＋padding，不是「墨水高＋
+% padding」：半行距與字型 ascent/descent 超出大寫字高的部分也算在內。而 TeX 的 hbox 高深
+% ＝實際字的墨水包絡，kicker 十類全大寫、`\dp`＝0pt，於是基線以下只剩 padding——pill 會矮
+% 40%（10.1pt vs 設計值 16.79pt）、基線下只有 2.2pt vs 5.89pt，字級 11.3pt 的編號（字高
+% 8.2pt）便戳出 pill 上緣，看起來像沒對齊。strut 把內容盒的高深鎖成與實際字無關，正是 CSS
+% 行盒的行為；`\tcbox` 的 `on line`＝`tcbox raise base` 由 `\dp` 反推基線，故給了 depth，
+% pill 底緣自動落到基線下，不必另外位移。
+% 【為什麼寫 em 不寫 pt】em 在 `\cb@pillfont` 下解析為 7.7pt（實測；外層是 12pt），於是改
+% 字級時 strut 自動跟著走。原本寫死 8.27pt/3.26pt 與字級無任何連結，改字級會無聲失衡。
+% 值由 HTML content-box 對基線的分割反推：11.00px/4.34px @10.24px＝1.0742em/0.4238em。
+% 【padding 維持絕對值】CSS 那邊本來就是絕對 `3.5px`、不隨字級縮放，換算 2.63pt（與
+% .64rem→7.7pt 同一 px→pt 比）。改成 em 反而失真，故不動。
+% 【arc 必須 ≤ 半高】**tcolorbox 不會把 arc 夾到半高**（實測：pill 高 16.79pt＝5.92mm 時，
+% arc 5mm 已破形、10mm 以上整個爆掉）。所以 arc 不是「越大越圓」，而是必須跟著 pill 高走。
+% 這裡取內容盒半高——外框型 pill 的 boxrule 在框外側，故此值略小於實際半高，而偏小只是圓
+% 角略欠、偏大才破形，安全方向正確。
+% 【印刷用的兩項刻意偏離 HTML】（2026-07-27 使用者看實物對照張後裁決；沿革 v10）
+%  ⒜ 份量 \cb@pilltight：CSS 的 line-height 1.5 是螢幕節奏，搬到 12pt 襯線內文的頁面上，
+%     這顆膠囊會變成區塊裡最重的物件、與左色線和章節橫槓搶注意力。收緊到 85%（pill 高
+%     16.79→15.06pt）。再緊（72%／13.6pt）大寫字周圍開始緊繃、圓角也不成膠囊，故止於 85%。
+%  ⒝ 對齊 \cb@pillraise：HTML 是 baseline 對齊（flex `align-items: baseline` 的自然行為），
+%     但膠囊基線以下那塊是空的，眼睛讀到的是色塊的**形心**而非內部字的基線，於是編號看起來
+%     浮高。「DEFINITION 1.1」在閱讀上是一個整體，故改為視覺置中：把膠囊上抬到形心對齊編號
+%     的字高中心。上抬量＝(編號墨水高 − (strut高 − strut深))/2，隨兩者自動走。
+%     編號墨水高−深＝0.72×字級（Inter 數字 ink ascent .7275em／descent .0075em，瀏覽器實測）。
+%  此二者使 M-B1 議題④「忠實對映」在此處讓位給印刷可讀性——沿革 v2（開場 kicker 8.6→11pt，
+%  理由「HTML 換算值印刷上過小」）已有同性質先例。
+\def\cb@numsizeval{11.3}    % 編號字級：字面值（供 \fontsize）與長度同一來源，勿各寫一份
+\newlength{\cb@numsize}     \setlength{\cb@numsize}{\cb@numsizeval pt}
+\newcommand{\cb@pilltight}{85}    % pill 行盒相對 HTML line-height 1.5 的百分比
+\newlength{\cb@pillpad}     \setlength{\cb@pillpad}{2.63pt}   % ＝CSS padding 3.5px
+\newlength{\cb@pillstrutht} \newlength{\cb@pillstrutdp}
+\newlength{\cb@pilldp}      \newlength{\cb@pillarc}  \newlength{\cb@pillraise}
+\AtBeginDocument{%   em 需字型已選定，故延到 begin document 才求值
+  \begingroup\cb@pillfont
+    \global\cb@pillstrutht=\dimexpr1.0742em*\cb@pilltight/100\relax
+    \global\cb@pillstrutdp=\dimexpr0.4238em*\cb@pilltight/100\relax
+  \endgroup
+  \global\cb@pillarc  =\dimexpr(\cb@pillstrutht+\cb@pillstrutdp+\cb@pillpad*2)/2\relax
+  \global\cb@pillraise=\dimexpr(\cb@numsize*72/100-\cb@pillstrutht+\cb@pillstrutdp)/2\relax
+  % 上抬後基線以下的實際深度——\cb@envhead 的間距式與行盒高度都靠它
+  \global\cb@pilldp   =\dimexpr\cb@pillstrutdp+\cb@pillpad-\cb@pillraise\relax}
+\newcommand{\cb@pillstrut}{%
+  \vrule width0pt height\dimexpr\cb@pillstrutht\relax depth\dimexpr\cb@pillstrutdp\relax\relax}
 \newcommand{\cb@pill}[2]{%      實心：definition/theorem/proposition/example/caution/strategy
+  \raisebox{\cb@pillraise}{%
   \tcbox[on line, colback=#1, colframe=#1, coltext=white, boxrule=0pt,
-         arc=2.1mm, boxsep=0pt, left=5pt, right=5pt, top=2.2pt, bottom=2.2pt]%
-        {\cb@pillfont\MakeUppercase{#2}}}
+         arc=\the\cb@pillarc, boxsep=0pt, left=5pt, right=5pt,
+         top=\the\cb@pillpad, bottom=\the\cb@pillpad]%
+        {\cb@pillfont\cb@pillstrut\MakeUppercase{#2}}}}
 \newcommand{\cb@pillout}[2]{%   外框：solution/remark（透明底、accent 字、45% 細框）
+  \raisebox{\cb@pillraise}{%
   \tcbox[on line, colback=white, colframe=#1!45!white, coltext=#1, boxrule=0.5pt,
-         arc=2.1mm, boxsep=0pt, left=5pt, right=5pt, top=2.2pt, bottom=2.2pt]%
-        {\cb@pillfont\MakeUppercase{#2}}}
+         arc=\the\cb@pillarc, boxsep=0pt, left=5pt, right=5pt,
+         top=\the\cb@pillpad, bottom=\the\cb@pillpad]%
+        {\cb@pillfont\cb@pillstrut\MakeUppercase{#2}}}}
 \newcommand{\cb@pilloutit}[2]{% 外框斜體：proof（HTML .env-proof .env-kicker italic）
+  \raisebox{\cb@pillraise}{%
   \tcbox[on line, colback=white, colframe=#1!45!white, coltext=#1, boxrule=0.5pt,
-         arc=2.1mm, boxsep=0pt, left=5pt, right=5pt, top=2.2pt, bottom=2.2pt]%
-        {\cb@pillfont\itshape\addfontfeature{LetterSpace=4}\MakeUppercase{#2}}}
+         arc=\the\cb@pillarc, boxsep=0pt, left=5pt, right=5pt,
+         top=\the\cb@pillpad, bottom=\the\cb@pillpad]%
+        {\cb@pillfont\itshape\addfontfeature{LetterSpace=4}\cb@pillstrut\MakeUppercase{#2}}}}
 
 % env 標頭一列：pill＋字面編號（Inter 700 accent ≈11.3pt）＋選用 serif 斜體 name
 % #1 pill 巨集  #2 色  #3 kicker  #4 num（可空）  #5 name（可空）
+\newlength{\cb@envheadgap}\setlength{\cb@envheadgap}{19.96pt}  % pill 底緣→內文首行基線
 \newcommand{\cb@envhead}[5]{%
   \noindent#1{#2}{#3}%
   \if\relax\detokenize{#4}\relax\else
-    \hspace{0.55em}{\cbuibold\fontsize{11.3}{13}\selectfont\color{#2}#4}\fi
+    \hspace{0.55em}{\cbuibold\fontsize{\cb@numsizeval}{13}\selectfont\color{#2}#4}\fi
   \if\relax\detokenize{#5}\relax\else
     \hspace{0.55em}{\itshape\color{inkSoft}#5}\fi
-  \par\nobreak\vspace{2.2mm}\noindent\ignorespaces}
+  % 標頭→內文的間距寫成「目標值」而非「固定 vspace」。理由：TeX 插的行間膠水是
+  % \baselineskip−\prevdepth−下一行高，保證的是**基線距**固定，pill 深度不參與；於是
+  %     gap（pill 底緣→內文首行基線）＝ V ＋ \baselineskip − \cb@pilldp
+  % pill 一加深，gap 就等量被吃掉（加 strut 時實測 19.90pt→16.30pt）。反解 V 讓 gap 成為
+  % 被宣告的量，pill 度量與行距（v4 拍板曾改 18.6→16pt）任一變動都自動吸收。
+  % 19.96pt 由現值反解而得（V＝2.2mm＋3.6pt 時的 gap），即此式對既有版面是恆等改寫。
+  \par\nobreak\vspace{\dimexpr\cb@envheadgap+\cb@pilldp-\baselineskip\relax}%
+  \noindent\ignorespaces}
 
 % ── env 容器兩形（議題④ 拍板：忠實對映；⑤ 拍板：breakable）──────────────────
 % 左緣色線：3px（vivid）→2.25pt、70% 淡化、內縮 16px→12pt、外距 1.2em≈4.3mm
