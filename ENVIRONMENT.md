@@ -118,6 +118,13 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   與 video 的「只能 pdflatex」硬約束**不衝突**——兩條線各走各的引擎，同一套 MiKTeX。
 - 需求全在 MiKTeX 內：`lualatex`／`latexmk` 內建；`newcomputermodern`（本文＋數學字體）首次編譯自動補裝；
   `pdftotext`（完整性閘 `check_prose.py`）MiKTeX 也自帶（poppler 系工具）。
+- **`pdftotext` 要抓到 poppler 版，不是「在 PATH 就好」（2026-07-27）**：Git for Windows 的
+  `mingw64/bin` 內附 **Xpdf 4.00**（Glyph & Cog）同名執行檔，且在多數 Windows 機器上排在 MiKTeX
+  之前。Xpdf 版對 `-enc UTF-8` 吐出非 UTF-8 位元組，`check_prose.py` 會崩在
+  `normalize(out.stdout)` 的 `AttributeError: 'NoneType' object has no attribute 'replace'`——
+  訊息完全看不出病因。解法＝把 `C:\Program Files\MiKTeX\miktex\bin\x64` 排到 Git 的 mingw64 之前
+  （或該次呼叫前置 PATH）。`doctor.py` 的 `handout-tex` 區已加版本檢查（比對橫幅含 `poppler`；
+  注意 poppler 自己的橫幅也含 "Glyph & Cog"，不可反向排除）。
 - **UI sans＝vendored Inter（2026-07-16，M-B1 議題⑦ 拍板）**：字體檔在
   `handout/latex/template/fonts/inter/`（六字重 OTF＋OFL 授權，來源＝rsms/inter release v4.1 的
   `extras/otf`），`calcbook.sty` 以 `fontspec Path=` 載入。**隨 repo 走、換機零安裝**；對映 HTML 側的

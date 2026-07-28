@@ -382,6 +382,20 @@ def check_handout_latex() -> None:
             record(PASS, "handout-tex", f"{name} 在 PATH", path)
         else:
             record(FAIL, "handout-tex", f"{name} 不在 PATH", f"{why}。裝 MiKTeX／poppler 後開新 shell")
+    # pdftotext 有兩種實作，只驗「在 PATH」不夠：poppler 版才正確處理 `-enc UTF-8`；
+    # Git for Windows 內附的是 Xpdf 4.00（Glyph & Cog），同旗標吐出非 UTF-8 位元組，
+    # check_prose.py 會崩在 `normalize(out.stdout)` 的 `NoneType.replace`——錯誤訊息完全
+    # 看不出病因。Windows 上 Git 的 mingw64 常排在 MiKTeX 之前，於是「裝好了卻跑不動」。
+    # 註：poppler 自己的橫幅也含 "Glyph & Cog"，故正面比對 "poppler"、不可反向排除。
+    if shutil.which("pdftotext"):
+        _, ver = _run(["pdftotext", "-v"])
+        first = ver.splitlines()[0] if ver else ""
+        if "poppler" in ver.lower():
+            record(PASS, "handout-tex", "pdftotext 是 poppler 版", first)
+        else:
+            record(FAIL, "handout-tex", f"pdftotext 不是 poppler 版（{first or '版本不明'}）",
+                   "完整性閘會崩。把 MiKTeX 的 bin 排到 Git 的 mingw64 之前"
+                   "（如 C:\\Program Files\\MiKTeX\\miktex\\bin\\x64），或改裝 poppler")
     if shutil.which("kpsewhich"):
         rc, out = _run(["kpsewhich", "NewCM10-Regular.otf"])
         if rc == 0 and out:
