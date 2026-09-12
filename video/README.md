@@ -134,6 +134,17 @@ video/
 - **`kind: sweep`**（`graph` 的 `plots[]`）——游標沿 x 掃描，可在多條曲線上掛點、
   在兩條曲線之間拉半透明色帶。另修好 `dashed: true` 對 `kind: function` 失效的問題。
 
+四輪（2026-09-13，依 [SPEC-motion-language.md](SPEC-motion-language.md) 五條規則補的缺口；
+kickoff [KICKOFF-motion-language-gaps.md](KICKOFF-motion-language-gaps.md)）：
+
+- **`meta.color_map`**（deck 級）——tex token → palette role，同一個變數在每條式子、graph 軸標與
+  曲線標籤裡同色（規則 5）。
+- **`{{…}}` 分段／`anim: cancel`／`frame: true`**（`derivation` 列）——分段後 transform 走
+  token 對位；`cancel: [段索引]` 兩段式消去；`frame` 在變動前先框住上一列（規則 2、3）。
+- **`focus[].indicate`**／**graph `inset:`**——強調閃爍；主圖不縮放的放大鏡，sweep 時鏡片內游標同步（規則 3）。
+- **`carry:`／`exit:`**（場級）——上一場的 block 這一場開場就在（keep 或飛去角落），場界改硬切；
+  `exit` 在場尾把不帶走的東西淡出（規則 1）。
+
 目前生效的設計決策：
 
 - intro/outro 使用淺色紙張底；教學場景使用暗色藍圖底。

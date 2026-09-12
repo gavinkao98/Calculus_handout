@@ -12,11 +12,11 @@
 
 | # | 規則 | 一句話 | 已有機制（DESIGN.md） | 缺口（待建） | 驗收信號 |
 |---|---|---|---|---|---|
-| 1 | **一場一張畫布** | 承重物件在一幕裡只建一次，換步驟用位移／縮放／複製搬去新佈局；臨時標註縮小加淡出退場 | `color_role`（顏色延續）、`{show scaffold.*}`（版面不變、晚到） | 物件跨場攜帶、複本飛去角落當 inset、收尾歸位 | 每幕至少一個承重物件跨場延續；R2「一場一張卡」finding＝0 |
-| 2 | **畫出來，只動變的 token** | 曲線由點走出、文字逐字寫、式子只動變的 token；整行 FadeOut 再 FadeIn 是反模式 | `anim: transform`、`paced:`（隨旁白書寫）、`seconds: beat` | token 級插入（鄰居讓位）、兩段式消去、graph 物件 Create 而非 Fade | 新稿 derivation 場整塊淡入 ≤ 1 次（首列） |
-| 3 | **框、放大鏡、調暗，不靠鏡頭** | 注意力用框選預備、inset 放大（主圖不縮放）、主圖降亮；2D 場不以 zoom 為第一選擇 | `focus:`（壓暗與還原）、transform 自動把來源列退為 muted | inset 放大鏡、變動前框選、強調閃爍（Indicate） | 每個 derivation 結果拍與 graph 關鍵拍有 focus 宣告；R2「找不到重點」finding＝0 |
+| 1 | **一場一張畫布** | 承重物件在一幕裡只建一次，換步驟用位移／縮放／複製搬去新佈局；臨時標註縮小加淡出退場 | `color_role`（顏色延續）、`{show scaffold.*}`（版面不變、晚到）、**`carry:`（keep／飛去角落）＋場界零淡黑＋`exit:`（2026-09-13 落地）** | 收尾歸位＝手工用 `carry` 帶回 recap 場；交叉溶接不做（硬切＋同位置已達目的） | 每幕至少一個承重物件跨場延續；R2 ML1 finding＝0 |
+| 2 | **畫出來，只動變的 token** | 曲線由點走出、文字逐字寫、式子只動變的 token；整行 FadeOut 再 FadeIn 是反模式 | `anim: transform`、`paced:`（隨旁白書寫）、`seconds: beat`、**`{{…}}` 分段＋對位 `TransformMatchingTex`＋`anim: cancel` 兩段式消去（2026-09-13 落地）**；graph function plot 本就 `create` | hook 自建的 MathTex 不經 `math_line`，不吃分段（試點發現） | 新稿 derivation 場整塊淡入 ≤ 1 次（首列）；R2 ML2 finding＝0 |
+| 3 | **框、放大鏡、調暗，不靠鏡頭** | 注意力用框選預備、inset 放大（主圖不縮放）、主圖降亮；2D 場不以 zoom 為第一選擇 | `focus:`（壓暗與還原）、transform 自動把來源列退為 muted、**`focus[].indicate` 閃爍、graph `inset:` 放大鏡、`frame: true` 變動前框選（2026-09-13 落地）** | inset 只鏡射 plot spec，hook 手繪幾何鏡不到 | 每個 derivation 結果拍與 graph 關鍵拍有 focus 宣告；R2 ML3 finding＝0 |
 | 4 | **靜止是設計出來的** | 每段超過 6 s 的靜止 MUST 是宣告的（`pauses:`）或被 paced／sweep 填滿；動作只在步驟切換時發生 | `pauses:`、`paced:`、`seconds: beat`、⑧ 的 12 s 線、**`[stillness]` advisory（`make.py`＋`pipeline/stillness.py`，2026-09-13 接線）** | R4 rubric 門檻對齊（kickoff T5） | `longest_still_seconds` ≤ 12 s（沿用）＋未宣告靜止 > 6 s＝0 |
-| 5 | **語意色貫穿圖與式** | 同一變數在圖、括號、軸標、填色、式子 token 用同色；卡類型色與箭頭色本身就是語意 | `color_role`（derivation 列、graph plot）、Direction B 色軸（accent）、**VISUAL-FRAME V10（2026-09-13 接線）** | deck 級變數色表、MathTex token 上色、箭頭色＝目標色（kickoff T1） | 同一節內同一變數不得出現兩種色；V10 blocking＝0 |
+| 5 | **語意色貫穿圖與式** | 同一變數在圖、括號、軸標、填色、式子 token 用同色；卡類型色與箭頭色本身就是語意 | `color_role`（derivation 列、graph plot）、Direction B 色軸（accent）、**VISUAL-FRAME V10（2026-09-13 接線）**、**`meta.color_map` deck 級變數色表＋token 級上色（2026-09-13 落地；`pipeline/texparts.py`）** | 混排句（`Tex` 路徑）與 hook 自建 MathTex 不吃色表；箭頭色＝目標色未做 | 同一節內同一變數不得出現兩種色；V10 blocking＝0 |
 
 ## 1. 依據（一段講完）
 

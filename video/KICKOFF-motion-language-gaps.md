@@ -55,16 +55,16 @@
 
 ## 4. Phase 0 — 基線（~20 分鐘）
 
-- [ ] **P0-1** `python tools/doctor.py --smoke`、`python video/pipeline/run_selftests.py` 全綠（2026-09-13 基線：smoke 9/9、selftest 33 份含 `_selftest_stillness`）。
-- [ ] **P0-2** `git log -1 -- video/pipeline/rewatch_pack.py video/pipeline/templates/graph.py video/pipeline/templates/derivation.py` 確認 §2 行號仍對；漂了就 grep 更新本檔。
-- [ ] **P0-3** 三場試點 mock render 現況：`python video/make.py --storyboard video/storyboards/ch03_trig_derivatives_mimo.yml --backend mock --scene sector_inequality,difference_quotient_for_sine,slope_equals_height --quality low` 過全部閘；把 `[stillness]` 行留底當 before。
-- [ ] **P0-4** `rewatch_pack_before` 已存在（⑬ 用過）；若被覆寫就重跑一次留底。
+- [x] **P0-1** `python tools/doctor.py --smoke`、`python video/pipeline/run_selftests.py` 全綠（2026-09-13 基線：smoke 9/9、selftest 33 份含 `_selftest_stillness`）。
+- [x] **P0-2** `git log -1 -- video/pipeline/rewatch_pack.py video/pipeline/templates/graph.py video/pipeline/templates/derivation.py` 確認 §2 行號仍對；漂了就 grep 更新本檔。
+- [x] **P0-3** 三場試點 mock render 現況：`python video/make.py --storyboard video/storyboards/ch03_trig_derivatives_mimo.yml --backend mock --scene sector_inequality,difference_quotient_for_sine,slope_equals_height --quality low` 過全部閘；把 `[stillness]` 行留底當 before。
+- [x] **P0-4** `rewatch_pack_before` 已存在（⑬ 用過）；若被覆寫就重跑一次留底。
 
 ## 5. Tasks
 
 ### T1 規則 5 — deck 級變數色表（token 級語意色）
 
-- [ ] **T1-1 `meta.color_map`（deck 級，opt-in）。**
+- [x] **T1-1 `meta.color_map`（deck 級，opt-in）。**
   ```yaml
   meta:
     color_map:                 # 變數／幾何量 → palette role；值只能是 theme 已有的 role 名
@@ -73,16 +73,16 @@
       "\\sin": result
   ```
   `schema.py` 新增 `_color_map_issues(meta)`：mapping、key 非空字串、value 是 `theme.palette("dark")` 的 key（warn-default，`meta.color_map_enforce` 才 error）——比照 `pedagogy.assumptions_registry_issues`。**未知 role 不能再靜默退 primary**：這裡要明說。
-- [ ] **T1-2 `brand.math_line` 讀色表。** 有 `color_map` 時改建 `MathTex(tex, tex_to_color_map={k: T.color(ground, role)})`（manim 的 `tex_to_color_map` 走 `substrings_to_isolate` 語意，**只能對「不切壞巨集」的 token**——`\frac` 內部不切）。先寫 selftest：`\frac{\sin(h/2)}{h/2}` 加色表後仍能編譯、`\theta` 子 mobject 顏色＝role 色；`\frac` 本身不在色表時整式仍為單色。**編譯失敗就退回單色並 warn**（不炸 render）。呼叫端：`derivation._eq_mob`、`theorem_proof` 的 proof 行、`definition_math` 的 math 行都經 `math_line`，改一處全通。
-- [ ] **T1-3 graph 讀同一張表。** 軸標 `x`／`y`（`graph.py:134-135`）、annotations（`:609,:703`）改為「文字含色表 key 時逐 token 上色」；plot 的 `color_role` 缺省時若 `label` 含色表 key 就用該 role。填色（band／sweep gap）沿 plot 的 role，不另加欄位。
-- [ ] **T1-4 selftest `_selftest_color_map.py`**（manim env）：三案例（有表／無表／壞 role），加 schema 案例。`_selftest_semantic_palette.py` 不得受影響。
-- [ ] **T1-5 試點：** `ch03_trig_derivatives.yml` `meta.color_map` 只放 `\theta`、`h`、`\sin`、`\cos` 四個，render 04 與 16 看 V10 是否成立（同一 θ 在圖與式子同色）。
+- [x] **T1-2 `brand.math_line` 讀色表。** 有 `color_map` 時改建 `MathTex(tex, tex_to_color_map={k: T.color(ground, role)})`（manim 的 `tex_to_color_map` 走 `substrings_to_isolate` 語意，**只能對「不切壞巨集」的 token**——`\frac` 內部不切）。先寫 selftest：`\frac{\sin(h/2)}{h/2}` 加色表後仍能編譯、`\theta` 子 mobject 顏色＝role 色；`\frac` 本身不在色表時整式仍為單色。**編譯失敗就退回單色並 warn**（不炸 render）。呼叫端：`derivation._eq_mob`、`theorem_proof` 的 proof 行、`definition_math` 的 math 行都經 `math_line`，改一處全通。
+- [x] **T1-3 graph 讀同一張表。** 軸標 `x`／`y`（`graph.py:134-135`）、annotations（`:609,:703`）改為「文字含色表 key 時逐 token 上色」；plot 的 `color_role` 缺省時若 `label` 含色表 key 就用該 role。填色（band／sweep gap）沿 plot 的 role，不另加欄位。
+- [x] **T1-4 selftest `_selftest_color_map.py`**（manim env）：三案例（有表／無表／壞 role），加 schema 案例。`_selftest_semantic_palette.py` 不得受影響。
+- [x] **T1-5 試點：** `ch03_trig_derivatives.yml` `meta.color_map` 只放 `\theta`、`h`、`\sin`、`\cos` 四個，render 04 與 16 看 V10 是否成立（同一 θ 在圖與式子同色）。
 
 ### T2 規則 3 — inset 放大鏡、變動前框選、強調閃爍
 
-- [ ] **T2-1 `focus[].indicate`（閃爍變體）。** `focus:` 每筆新增選填 `indicate: [<block id>…]`：那一拍 reveal 後，對這些 block 播 `Indicate(mob, scale_factor=1.15, color=T.color(ground, accent_role(spec)+"_ink"))` 0.8 s，接在 `focus.apply` 的同一個 `scene.play` 裡（`focus.py:65-77`）或緊接其後（`scene.py:95-97`）；`consumed` 加上秒數。schema：id 必須存在（sizecheck 交叉檢查比照 `dim`）。**Indicate 與 `.animate` 混在同一 `play` 的行為先用 mock render 驗過再定放哪**（§2 未確認項）。
-- [ ] **T2-2 變動前框選。** `derivation` 的 `anim: transform` 加選填 `frame: true`：morph 前 0.4 s 先在**上一列即將變動的部分**畫 `SurroundingRectangle`（先整列，token 級等 T3），morph 時同步 FadeOut；`anim_seconds` 加 0.4。零行為改變：預設 false。
-- [ ] **T2-3 graph `inset:`（主圖不縮放的放大鏡）。**
+- [x] **T2-1 `focus[].indicate`（閃爍變體）。** `focus:` 每筆新增選填 `indicate: [<block id>…]`：那一拍 reveal 後，對這些 block 播 `Indicate(mob, scale_factor=1.15, color=T.color(ground, accent_role(spec)+"_ink"))` 0.8 s，接在 `focus.apply` 的同一個 `scene.play` 裡（`focus.py:65-77`）或緊接其後（`scene.py:95-97`）；`consumed` 加上秒數。schema：id 必須存在（sizecheck 交叉檢查比照 `dim`）。**Indicate 與 `.animate` 混在同一 `play` 的行為先用 mock render 驗過再定放哪**（§2 未確認項）。
+- [x] **T2-2 變動前框選。** `derivation` 的 `anim: transform` 加選填 `frame: true`：morph 前 0.4 s 先在**上一列即將變動的部分**畫 `SurroundingRectangle`（先整列，token 級等 T3），morph 時同步 FadeOut；`anim_seconds` 加 0.4。零行為改變：預設 false。
+- [x] **T2-3 graph `inset:`（主圖不縮放的放大鏡）。**
   ```yaml
   inset:                       # graph single 模式，opt-in
     x: [0.0, 0.6]              # 資料座標矩形
@@ -91,19 +91,19 @@
     follow: true               # 主圖的 plot／sweep 更新時 inset 跟著（always_redraw）
   ```
   實作：第二組 `Axes` 用同一批 plot spec 重建但 `x_range`／`y_range` 換成矩形、`include_ticks=False`；主圖上畫矩形框（`hairline_strong`）＋兩條虛線導引到 inset；inset 白邊框。整組是 `Block("inset", …, layer="graph", static=False)`，`{show inset}` 才進場。`_fit_graph_to_safe_zone` 要把 inset 排除在 group 外（它固定在角落，不隨主圖縮）。selftest：build 出來、id 對、`_fit` 前後主圖 bbox 不變。
-- [ ] **T2-4 試點：** 06 `sector_inequality` 加 `inset`（單位圓上 θ 附近的小區域）＋`indicate` 那三塊面積；04 加 `frame: true`。
+- [x] **T2-4 試點：** 06 `sector_inequality` 加 `inset`（單位圓上 θ 附近的小區域）＋`indicate` 那三塊面積；04 加 `frame: true`。
 
 ### T3 規則 2 — token 級變形、兩段式消去
 
-- [ ] **T3-1 作者分段語法。** derivation 的 `math` 允許 `{{…}}` 分段（同 Motion Canvas／Manim `MathTex(*parts)` 語意）：`"{{\\sin(x+h) - \\sin x}} = {{2\\cos(x+h/2)}} {{\\sin(h/2)}}"`。`brand.math_line` 遇到 `{{` 就 `MathTex(*parts)`（每段一個 submobject；段內巨集完整，不會切壞 `\frac`）。無 `{{` 時行為不變。selftest：分段數＝submobject 數；混色表（T1）時段內再套 `tex_to_color_map`。
-- [ ] **T3-2 `anim: transform` 升級為對位。** 兩列都有分段時用 `TransformMatchingTex(ghost, this_eq, transform_mismatches=True)`（key＝段的 tex 字串），否則沿用 `TransformMatchingShapes`。新段 `FadeIn`、消失段 `FadeOut`、其餘平移——這就是 C1 的「只動變的 token、鄰居讓位」。run_time 仍 1.2 s。
-- [ ] **T3-3 `anim: cancel`（兩段式消去）。** `steps[i]: {math: …, anim: cancel, cancel: [1, 3]}`：先把上一列第 1、3 段 `FadeOut`（0.4 s，位置不動，讓讀者確認是哪兩項互消），再對剩餘段做 T3-2 的對位變形到本列（0.8 s）；`anim_seconds` 1.2。
-- [ ] **T3-4 graph 曲線「畫出來」。** 純 authoring：SPEC 規則 2 要求 function plot 用 `reveal: true`＋`anim: create`（既有機制，`graph.py` plot anim=create|fade|grow）；本 task 只在 `DESIGN.md` 的 graph 段加一句「新稿預設 create」，並把 `_demo_graph_reveal.yml` 改成 create 當範本。無 code。
-- [ ] **T3-5 試點：** 04 `difference_quotient_for_sine` 四列改分段＋`transform`，最後一列 `cancel`（消 h/2 那對）。
+- [x] **T3-1 作者分段語法。** derivation 的 `math` 允許 `{{…}}` 分段（同 Motion Canvas／Manim `MathTex(*parts)` 語意）：`"{{\\sin(x+h) - \\sin x}} = {{2\\cos(x+h/2)}} {{\\sin(h/2)}}"`。`brand.math_line` 遇到 `{{` 就 `MathTex(*parts)`（每段一個 submobject；段內巨集完整，不會切壞 `\frac`）。無 `{{` 時行為不變。selftest：分段數＝submobject 數；混色表（T1）時段內再套 `tex_to_color_map`。
+- [x] **T3-2 `anim: transform` 升級為對位。** 兩列都有分段時用 `TransformMatchingTex(ghost, this_eq, transform_mismatches=True)`（key＝段的 tex 字串），否則沿用 `TransformMatchingShapes`。新段 `FadeIn`、消失段 `FadeOut`、其餘平移——這就是 C1 的「只動變的 token、鄰居讓位」。run_time 仍 1.2 s。
+- [x] **T3-3 `anim: cancel`（兩段式消去）。** `steps[i]: {math: …, anim: cancel, cancel: [1, 3]}`：先把上一列第 1、3 段 `FadeOut`（0.4 s，位置不動，讓讀者確認是哪兩項互消），再對剩餘段做 T3-2 的對位變形到本列（0.8 s）；`anim_seconds` 1.2。
+- [x] **T3-4 graph 曲線「畫出來」。** 純 authoring：SPEC 規則 2 要求 function plot 用 `reveal: true`＋`anim: create`（既有機制，`graph.py` plot anim=create|fade|grow）；本 task 只在 `DESIGN.md` 的 graph 段加一句「新稿預設 create」，並把 `_demo_graph_reveal.yml` 改成 create 當範本。無 code。
+- [x] **T3-5 試點：** 04 `difference_quotient_for_sine` 四列改分段＋`transform`，最後一列 `cancel`（消 h/2 那對）。
 
 ### T4 規則 1 — 跨場攜帶（物件面的原語 5）
 
-- [ ] **T4-1 `carry:`（場級，opt-in）。**
+- [x] **T4-1 `carry:`（場級，opt-in）。**
   ```yaml
   carry:                       # content 場；被攜帶的物件在本場開場就在
     - from: sector_inequality  # 前一個 content 場（同一幕內）
@@ -112,14 +112,14 @@
       to: keep                 # keep＝原位；或 {corner: top_right, scale: 0.35}（複本飛去角落當 inset，在 {show as} 那拍飛）
   ```
   實作（`templates/__init__.py` 新的後處理 `_apply_carry(spec, ctx, blocks)`，放在 hook 之前）：`ctx["scenes_by_id"]`（`make.py` 與 `sizecheck` 建 ctx 時塞進整個 deck 的 scenes）→ 對 `from` 場 `build_blocks(prev_spec, ctx)` → 取 `block` 的 mobject `copy()`（終態＝版面決定性，§2）→ `restore()` 到未壓暗（focus 場末已還原；transform 的 muted 0.55 要在複本上 `set_opacity(1)`）→ `to: keep` 時 static 加進 blocks；`to: {corner, scale}` 時 dynamic，anim callable＝`mob.animate.scale(s).to_corner(...)` 0.8 s。**遞迴上限一層**（from 的場不再展開它自己的 carry）。
-- [ ] **T4-2 場界零淡黑。** `make.py _segment_fades`：若下一段的 spec 有 `carry` 且 `from` 是上一段，這條邊界兩側 fade＝0（硬切；被攜帶物件位置相同就看不出切）。其餘邊界不變。selftest 用 `_selftest_make_transition.py` 既有慣例加案例。
-- [ ] **T4-3 `exit:`（選填）。** 場級 `exit: [<block id>…]`：場尾 `SCENE_TAIL_SECONDS` 內把這些 block `FadeOut`（0.5 s），讓沒被攜帶的物件在切場前退場、被攜帶的留著。無 `exit` 行為不變。
-- [ ] **T4-4 schema／sizecheck。** `_carry_issues`：`from` 必須是同一幕（divider 之間）且緊接的前一個 content 場、`as` 不與本場 block 重複、`to` 形狀合法（error）；sizecheck 交叉檢查 `block` 在 `from` 場 build 得出來（error）。這就是 SPEC §4 第四項「攜帶宣告存在性」。
-- [ ] **T4-5 試點：** 06 → 07 `squeeze_to_the_bound`：把單位圓與三塊面積 `carry` 到 07 並飛去右上角當 inset；07 → 08 再 keep。這正是 A2 65 s 與 C1 675–750 s 的手法。
+- [x] **T4-2 場界零淡黑。** `make.py _segment_fades`：若下一段的 spec 有 `carry` 且 `from` 是上一段，這條邊界兩側 fade＝0（硬切；被攜帶物件位置相同就看不出切）。其餘邊界不變。selftest 用 `_selftest_make_transition.py` 既有慣例加案例。
+- [x] **T4-3 `exit:`（選填）。** 場級 `exit: [<block id>…]`：場尾 `SCENE_TAIL_SECONDS` 內把這些 block `FadeOut`（0.5 s），讓沒被攜帶的物件在切場前退場、被攜帶的留著。無 `exit` 行為不變。
+- [x] **T4-4 schema／sizecheck。** `_carry_issues`：`from` 必須是同一幕（divider 之間）且緊接的前一個 content 場、`as` 不與本場 block 重複、`to` 形狀合法（error）；sizecheck 交叉檢查 `block` 在 `from` 場 build 得出來（error）。這就是 SPEC §4 第四項「攜帶宣告存在性」。
+- [x] **T4-5 試點：** 06 → 07 `squeeze_to_the_bound`：把單位圓與三塊面積 `carry` 到 07 並飛去右上角當 inset；07 → 08 再 keep。這正是 A2 65 s 與 C1 675–750 s 的手法。
 
 ### T5 三個門檻對齊（純文檔，一次做）
 
-- [ ] REWATCH rubric R4 `T-still` 的「超過 15 秒」改「超過 12 秒」（與 ⑧ 驗收線一致；`T-beat` 25 s 維持，它量的是「沒有 reveal」不是靜止）；在 rubric 加一句三層門檻的分工：**6 s＝authoring advisory（未宣告靜止）、12 s＝量測閘（`longest_still_seconds`）、R4 模型判讀沿用 12 s**。同步 `SPEC-motion-language.md` 規則 4 落地段。
+- [x] REWATCH rubric R4 `T-still` 的「超過 15 秒」改「超過 12 秒」（與 ⑧ 驗收線一致；`T-beat` 25 s 維持，它量的是「沒有 reveal」不是靜止）；在 rubric 加一句三層門檻的分工：**6 s＝authoring advisory（未宣告靜止）、12 s＝量測閘（`longest_still_seconds`）、R4 模型判讀沿用 12 s**。同步 `SPEC-motion-language.md` 規則 4 落地段。
 
 ## 6. 驗收迴圈（Phase 收尾；機器閘免費、人閘一個）
 

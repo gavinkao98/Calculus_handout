@@ -857,6 +857,136 @@ hook 換掉的 mobject 也吃得到）。**只升級 stock reveal**：anim 已�
 `templates/__init__._scaffold_reveal_timing`，所以每個 template 一體適用；**版面不變**
 （那一行始終佔著它的位置，只是晚到）。
 
+### motion primitive：`focus[].indicate`／graph `inset:`（2026-09-13 四輪；[`SPEC-motion-language.md`](SPEC-motion-language.md) 規則 3）
+
+**`focus[].indicate`（場級 `focus:` 的閃爍變體）——強調不加框不加字，物件短暫換色微放大再回復。**
+
+```yaml
+focus:
+  - { at: ineq, dim: [], indicate: [sector, tri_outer] }
+```
+
+那一拍 reveal→壓暗之後，對 `indicate` 的 block 播 `Indicate`（換 accent 的 `*_ink` 色、放大 15%、回復）
+0.8 s，接在 `focus.apply` 之後**各自一個 `scene.play`**（同一個 play 只有一個 run_time，0.4 s 淡化與
+0.8 s 閃爍長度不同）；`consumed` 加上秒數。它是一次性動作不是狀態：沒有東西要還原，`dim` 語意不變
+（每筆仍取代壓暗集合，要保留就重列）。`schema._focus_issues` 擋非 list、同一筆 `dim`∩`indicate`；
+`sizecheck` 擋不存在的 id（比照 `dim`）。實作 [`pipeline/focus.py`](pipeline/focus.py) `scene_indicate`／`indicate`。
+
+**`inset:`（graph single 模式）——主圖不縮放的放大鏡。**
+
+```yaml
+inset:
+  x: [0.7, 1.05]         # 資料座標矩形
+  y: [0.35, 0.7]
+  corner: top_right      # top_right | top_left | bottom_right | bottom_left；固定 3.2×2.0 u
+  follow: true           # 主圖 sweep 播放時鏡片內游標／點／色帶跟著（預設 true）
+```
+
+第二組 axes 蓋在矩形上、固定在版面角落（安全區內），同一批 `plots[]` **裁到矩形**重畫（function／line／
+band／point／sweep；不畫 label）；主圖上 `hairline_strong` 框標出區域、兩條虛線導引到 panel；panel 白邊＋
+不透明底、整組 z_index 最高（之後才揭示的 plot 不會畫在鏡片上）。`Block("inset", …, anim="fade",
+static=False, layer="graph")`，`{show inset}` 才進場；**建在 `_fit_graph_to_safe_zone` 之後、不進它的
+group，所以主圖零縮放零位移**，建好就在角落（sizecheck 量到的就是終態）。`follow: true` 讀主圖 sweep 的
+tracker，且**主圖 sweep 播了鏡片才有游標**（播前鏡片不能有主圖沒有的東西）。缺 `x`／`y`、`lo ≥ hi`、
+`corner` 非法、2up 模式寫 `inset` 一律 build 時 raise（sizecheck 轉 error）。已知限制：鏡片內容是 plot
+spec 的靜態終態——`reveal: true` 的 plot 在鏡片裡不等主圖揭示就在（把 `{show inset}` 排在它們之後）；
+hook 手繪的物件（如 06 `sector_inequality` 的 `plots: []`＋hook）鏡片看不到；`focus` 壓暗不鏡射進鏡片。
+實作 [`pipeline/templates/graph.py`](pipeline/templates/graph.py) `_inset_block`；範例
+[`storyboards/_demo_inset.yml`](storyboards/_demo_inset.yml)。
+
+### motion primitive：`meta.color_map`／`{{…}}` 分段／`anim: cancel`／`frame: true`（2026-09-13 四輪；規則 5 與規則 2）
+
+**`meta.color_map`（deck 級）——同一個變數在圖與式子裡同一色（規則 5）。**
+
+```yaml
+meta:
+  color_map:                 # tex token → palette role（theme.DARK 的 key）；opt-in
+    "\\theta": concept
+    "h": caution
+    "\\sin": result
+```
+
+`templates.build_blocks` 開頭把表設進 `brand`（模組狀態，每場重設），deck 內每一條經 `brand.math_line`
+的 MathTex 都讀同一張：derivation 列（`_eq_mob` 現經 `math_line`）、definition_math／theorem_proof／
+sign_chart／value_table／procedure_steps 的數學行、graph 的軸標 `x`／`y`、刻度標、曲線標籤、**純數學**的
+annotation。key 只對整個 **token** 配對（`\macro`、`\x`、單字元；最長 key 優先；[`pipeline/texparts.py`](pipeline/texparts.py)
+自寫 macro-aware 分詞——manim 的 `tex_to_color_map` 是 raw 子字串配對，`h` 會切到 `\theta`／`\right`），所以
+`h` 不會碰到 `\theta`／`\cosh`。命中的 token 在該行內切成自己的 part 上色（manim 0.20 以 dvisvgm group
+一次編譯，`\frac{…}` 引數內的 token 也切得動）；**沒命中就是原本的單色 `MathTex`，逐 byte 相同**。graph 的
+plot 沒寫 `color`／`color_role` 而 `label` 含表中 token 時，預設 role 取該 token 的 role（`$y=\sin x$` →
+sin 的色），曲線與標籤一起變；明寫的 role 不動。`color_role` 決定整列底色，色表只覆蓋命中的 token。
+`schema._color_map_issues`：表必須是 mapping、key 非空、value 是 palette role——`theme.color` 對未知 role
+**靜默退 `primary`**，這裡把它講出來；warn-default，`meta.color_map_enforce: true` 才擋 render。
+**已知限制：** (a) 混排句不上色（多個 `$…$` 的 `Tex` 路徑、`_prose_lines`、`heading_rich`）。(b) 表中 token
+若是 `\frac`／`\sqrt` 的**無括號**引數（`\frac h2`），LaTeX 拒編 → 該行退回單色並印一行 `[color_map] …
+rendered in one colour`（每個 src 一次，不炸 render）；寫 `\frac{h}{2}`。
+
+**`{{…}}` 分段（derivation 列的 `math`）——一段一個 submobject。** 例：
+`"{{\sin(x+h) - \sin x}} = {{2\cos(x+h/2)}} {{\sin(h/2)}}"`。規則同 manim：`{{` 只在字串開頭或**空白之後**
+才算開段（`{{a}}={{b}}` 第二段不會切，要寫 `{{a}} = {{b}}`）、`}}` 在內層大括號深度 0 收段、括號外的文字
+（如 `=`）也各自一段、純空白不算段。`brand.math_line` 建 `MathTex(*segments)` 並在 mobject 上留
+`_ml_parts=True`；分段＋色表同時存在時色片巢在段內，頂層仍是作者段（`paced:` 走的是段）。幾何逐 byte 不變。
+
+**`anim: transform` 升級為對位。** 上一列與本列**都**分段時改用 `TransformMatchingTex(ghost, this_eq,
+transform_mismatches=True)`（key＝各段 tex：同名段原位 morph、其餘段兩兩變形），否則沿用
+`TransformMatchingShapes`。run_time 仍 `STOCK_ANIM_SECONDS["transform"]`。
+
+**`anim: cancel`（steps[i]／result）——兩段式消去（規則 2，B1 419 s）。**
+
+```yaml
+steps:
+  - { math: "{{\\lim_{h\\to 0}}} {{\\frac{h}{h}}} \\cdot {{(1+h)}}", anim: transform }
+  - { math: "{{\\lim_{h\\to 0}}} {{(1+h)}}", anim: cancel, cancel: [1, 2] }   # 指上一列的段，0 起算
+```
+
+0.4 s：上一列的 ghost 把被消段 `FadeOut`（位置不動），同時**整個上一列退到 muted 0.55**——被消 token 讀成
+「亮→暗」、存活段還亮著；0.8 s：存活段對位變形到本列。終態與一般 transform 相同（上一列整列 muted 當歷史），
+sizecheck 量到的幀不變。`STOCK_ANIM_SECONDS["cancel"]=1.2`、`Block.anim_seconds=1.2`。上一列沒分段（或
+LaTeX 退回單色）時降級為 transform。`schema._derivation_issues`（error）：索引落在上一列段數內、要有上一列
+且上一列有分段、`cancel` 是非空 int list、`cancel:` 必須配 `anim: cancel`；`lines[]` 舊寫法也收。
+
+**`frame: true`（transform／cancel 專用）——變動前框選（規則 3，C1 335 s）。** morph 前 0.4 s 先在上一列的
+**式子**（不含 rail）畫 `SurroundingRectangle`（`hairline_strong`，buff 0.08），morph 那個 play 同步
+`FadeOut`；`anim_seconds` 加 0.4；預設 false；配到非 transform／cancel 的列＝schema error。
+
+**graph 段補一句：** function plot 的揭示在 code 裡固定是 `create`（`graph.py` `_plot_blocks`），新稿要
+「曲線畫出來」只要 `reveal: true`；沒有 per-plot 的 `anim:` 欄位可寫。範例
+[`storyboards/_demo_color_map.yml`](storyboards/_demo_color_map.yml)、[`_demo_tex_parts.yml`](storyboards/_demo_tex_parts.yml)。
+
+### motion primitive：`carry:`／`exit:`（2026-09-13 四輪；[`SPEC-motion-language.md`](SPEC-motion-language.md) 規則 1）
+
+**`carry:`（場級）——上一場建的物件，這一場開場就在。**
+
+```yaml
+carry:                        # content 場專用，opt-in
+  - from: sector_inequality   # 同一幕（divider 之間）緊接的前一個 content 場（schema 擋其他）
+    block: circle             # 該場 build 出的 block id（含 hook 換過的）
+    as: carried.circle        # 本場的 id；{show carried.circle} 可指
+    to: keep                  # keep＝原位 static；或 {corner: top_right, scale: 0.35}
+```
+
+沒有任何跨 render 的序列化：`templates._apply_carry` 對 `from` 場再 `build_blocks` 一次（含它的
+hook／paced），取該 block 的 mobject `.copy().clear_updaters()`（快照——sweep 的 always_redraw
+否則會帶著上一場的 tracker 重畫）。版面是決定性的，複本落在上一場末幀的同一位置；`make.py`
+`_segment_fades` 對這條邊界**兩側 fade＝0（硬切）**，物件同位置就看不出切場。接在 `scene_spine`
+之後、hook 之前，所以 hook 可以改被攜帶物件。鏈可以跨整幕（08 keep 07 從 06 帶來的複本）：終止
+靠「`from` 必須比本場早」，代價是鏈長 k 時 sizecheck 多建 k(k−1)/2 場。
+`to: keep` → static block、layer 沿用來源；**`say` 不可再 `{show <as>}`**（schema error）。
+`to: {corner, scale}` → **建在終態**（角落＋縮放；sizecheck 量的是場末那幀，同 sweep「tracker
+建在終點」），`Block.pre_play=restore` 讓 `scene._stage` 開播前把它退回原位，`{show <as>}` 那拍
+`.animate.scale().move_to()` 飛去角落 0.8 s（`timing.STOCK_ANIM_SECONDS["carry"]`）；沒寫
+marker 就落在場末補揭示（schema warn）。被攜帶 block 沿用來源 layer：graph 層在角落不做
+overlap 檢查（只查出框）。呼叫 `build_blocks` 的一方要在 ctx 給 `scenes_by_id`（整個 deck；
+make.py／sizecheck／scratch_frames／critic 都已佈線），缺了而場有 carry → 直接 raise。
+
+**`exit: [<block id>…]`（場級）——切場前把不帶走的東西退場。**
+場尾 `SCENE_TAIL_SECONDS` 內先 `FadeOut` 0.5 s（`timing.EXIT_FADE_SECONDS`）再等剩餘，
+總長不變（render/audio sync 閘看不到差異）。**注意：`critic.py --dry-run` 與 `scratch_frames.py`
+抽的是最後一幀，有 `exit` 的場拿到的是 exit 之後的幀、不是最滿幀。**
+`schema._carry_issues`／`_exit_issues` 擋形狀與幕／相鄰規則；`sizecheck` 擋 `exit` 不存在的 id，
+`carry.block` 不存在／`as` 撞 id 以「could not build scene」報 error。回歸樣本
+`storyboards/_demo_carry.yml`（graph → derivation 飛角落 → callout keep）。
+
 ### Text rendering：prose vs math（no garble）
 
 **Route A（2026-06-24 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以拿到正確 kerning——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**。根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。字體在 TeX preamble 設定（`_bootstrap.apply_tex_template`：`plex-sans`＋`plex-mono`＋`lmodern`＋`microtype`，`familydefault=\sfdefault`，`\everymath{\displaystyle}`），所以本模組不再出現任何 Pango family 名。硬約束：只能 pdflatex（lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址）。計畫見 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。

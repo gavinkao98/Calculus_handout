@@ -106,7 +106,11 @@ class LessonScene(Scene):
         durations = self.beat_durations
         focus_plan = focus.scene_focus(self.spec)
         indicate_plan = focus.scene_indicate(self.spec)
-        indicate_color = T.color(ground, f"{accent_role(self.spec)}_ink")
+        # A scene that declares no `accent` (graph / hook scenes) resolves to `aside_ink`, and a
+        # grey flash reads as "dimming" -- the opposite of emphasis (ch03 06, 2026-09-13 pilot).
+        # Those flash in the amber highlight ink instead.
+        indicate_color = T.color(ground, f"{accent_role(self.spec)}_ink" if self.spec.get("accent")
+                                 else "amber_ink")
         dimmed: set[str] = set()
         for index, beat in enumerate(beats):
             target = beat.reveal
