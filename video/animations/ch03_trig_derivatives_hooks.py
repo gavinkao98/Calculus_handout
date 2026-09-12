@@ -623,7 +623,7 @@ def derivative_cycle(spec, ctx, blocks):
     node_h = max(n.height for n in nodes)
 
     HALF_W = 4.30                         # the ring is the scene's subject: span the frame
-    ARROW_GAP = 0.62                       # vertical-arrow run, and the d/dx label's home
+    ARROW_GAP = 0.78                       # vertical-arrow run, and the d/dx label's home
     HALF_H = (node_h + ARROW_GAP) / 2
     corners = {
         "TL": np.array([-HALF_W, HALF_H, 0.0]),
@@ -673,16 +673,23 @@ def derivative_cycle(spec, ctx, blocks):
     # arrow at once (which is what the narration says -- "writing an arrow for one
     # derivative"), and it costs the ring no extra height, so all of the band goes to the
     # diagram instead of to a label stacked on top of it.
-    ddx = brand.math_line(r"\frac{d}{dx}", ground, role="text", size="label")
+    # math_sm, the node size: it was the smallest ink inside the ring at `label`, and the
+    # first thing to fail at phone width (regression audit, A6 med).
+    ddx = brand.math_line(r"\frac{d}{dx}", ground, role="text", size="math_sm")
     ddx.move_to(VGroup(*nodes).get_center())
 
-    ring = VGroup(arrows, *nodes, ddx)
+    # ddx is deliberately OUTSIDE the group the fit clamp below measures and scales. It
+    # adds no height (it lives in the loop's empty middle), and it is the one element whose
+    # size is load-bearing -- letting the clamp shrink it is exactly how it ended up under
+    # the font floor in the first place. The same audit flagged the durability: the ring
+    # cleared the clamp by only 0.02u, so a three-line statement would have shrunk it again.
+    ring = VGroup(arrows, *nodes)
 
     # The ring is this scene's subject, and it was living in the thinnest band on the
     # frame while ~1.3u sat empty BELOW math.1 (same audit, A7: "主角最小最暗、配角最大").
     # Drop math.1 into that dead space to widen the ring's gap; it still clears the
     # bottom safe margin with room to spare.
-    MATH1_DROP = 0.75
+    MATH1_DROP = 0.95
     math_1.shift(MATH1_DROP * DOWN)
 
     # Hard clamp to whatever room actually exists between statement's bottom
@@ -701,8 +708,9 @@ def derivative_cycle(spec, ctx, blocks):
     # statement/math.1 above and below it; vertically centred in the gap.
     ring.move_to(old_math.get_left(), aligned_edge=LEFT)
     ring.set_y((gap_top + gap_bottom) / 2)
+    ddx.move_to(ring.get_center())          # re-centre after the ring has been placed
 
-    ids["math.0"].mobject = ring
+    ids["math.0"].mobject = VGroup(ring, ddx)
     return blocks
 
 

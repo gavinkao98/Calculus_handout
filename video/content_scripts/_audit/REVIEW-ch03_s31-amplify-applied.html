@@ -241,8 +241,8 @@ chip 列一張一個 card、derivation 的「式子／leader／註解」三件�
 <p><b>修法：</b><code>\frac</code> ＋ <code>text</code> 墨色；<code>d/dx</code> 移到<b>環心</b>
 （它名的是四個箭頭而不是其中一個，且不再佔環的高度預算）；<code>math.1</code> 下移 0.75u 進入死區
 把縫拉開；節點字級 <code>label</code> → <code>math_sm</code>；垂直箭頭 0.22u → 0.62u；半寬 3.35u → 4.30u。
-<b>量測結果：<code>d/dx</code> 23.6 px → 60.7 px，環高 0.99u → 1.65u</b>，環成為畫面上最大的元素。</p>
-<p class="note"><b>回歸稽核：</b>（結果待補）</p>
+<b>量測結果：<code>d/dx</code> 23.6 px → 81 px，環高 0.99u → 1.81u</b>，環成為畫面上最大的元素。</p>
+<p><b>回歸稽核（同一 gate、重抽幀後獨立複驗）：0 blocking，未引入任何新的 V 級問題。</b>逐項核過：環與上方 statement 淨空 36 px、與下方 <code>math.1</code> 14 px（皆無重疊）、<code>math.1</code> 距底部安全邊界 0.57u、<code>d/dx</code> 置於環心與上下兩條水平箭頭等距（讀作「四個箭頭都是 d/dx」而非黏在某一條上，且即使誤讀成貼著下邊那條，敘述仍數學正確）、四條箭頭 tip 方向全對、兩條垂直箭頭不再是零長殘段。原 A7 high「階層被倒轉」降級為 low-med，原 A4 med「chip 比對照場小 40%」在字級上關閉。</p><p class="note">回歸稽核另開兩條，都是<b>我這次修正自己造成的耐久性問題</b>，已在同一輪處理：(a) <code>d/dx</code> 仍是環內最小的墨、手機寬最先失守 → 升到 <code>math_sm</code>（60.7 → <b>81 px</b>）；(b) 環高只差 0.02u 就會再次觸發 fit clamp，statement 若改成三行就會把剛關閉的 V4 打回 → <code>d/dx</code> 移出被 clamp 量測的群組（它不佔高度，卻是唯一尺寸承重的元素），並把 <code>math.1</code> 多下移 0.2u、垂直箭頭加長到 0.78u，headroom 0.02u → <b>0.12u</b>。剩下一條 advisory 未動：節點色條的規則不自洽（<code>-sin</code> 換色而 <code>-cos</code> 不換），交裁決。</p>
 </div>
 <p><b>其餘 6 條 advisory（未動，交裁決）：</b></p>
 <ul>
