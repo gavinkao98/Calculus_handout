@@ -1,0 +1,342 @@
+{
+ "film": {
+  "overall": "全片邏輯鏈條清楚，從差商→極限→導數→應用的敘事順序合理，recap也補強了記憶點。但中段（scenes 06–10）是初學者的主要壓力區：幾何論證後緊接三段代數壓縮，畫面幾乎沒有動，narration語速穩定但對初學者來說資訊量已到頂。Scenes 15–17 的payoff段落是全片最暢快、最容易跟上的地方。",
+  "patterns": [
+   "全片95%以上靜態率，中段數場靜止超過15–38秒，初學者容易走神或失去方向感。",
+   "幾何圖（scene 06）是全片唯一有空間感的視覺輔助，非常有效，但只出現一次；代數推導場景完全以文字/公式呈現，缺乏輔助動線。",
+   "敘事常說「我們已經做過這一步」回指前場，初學者若跟不上中段會在後段累積欠帳。",
+   "Scene 09（continuity argument）對初學者來說是最難跨越的隘口——sum-to-product 的代數密度最高、動機最不明顯。",
+   "Scenes 15–17 payoff 段落的視覺與敘事節奏是全片最好的，初學者在這裡最容易有恍然大悟感。"
+  ],
+  "strongest_scenes": [
+   "17_slope_equals_height",
+   "11_squeeze_graph",
+   "15_derivative_of_sine",
+   "26_recap",
+   "23_shm_compute"
+  ],
+  "weakest_scenes": [
+   "09_continuity_argument",
+   "06_sector_inequality",
+   "07_squeeze_to_the_bound",
+   "20_companion_limit",
+   "04_difference_quotient_for_sine"
+  ]
+ },
+ "lens": "R1a",
+ "scenes": [
+  {
+   "findings": [],
+   "id": "01_intro",
+   "verdict": "ok"
+  },
+  {
+   "findings": [],
+   "id": "02_divider_limit",
+   "verdict": "ok"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-attention",
+     "evidence": "tile 02–03（+1.7s、+9.8s）畫面完全不變，narration 說「binomial theorem handed us a factor of h to cancel; for e to the x the power series did the same job」",
+     "problem": "初學者在 17.6s 內只看到靜止畫面，對 e^x 用 power series 的說明沒有任何公式出現，可能在腦中形成空白。",
+     "proposal": "在 beat 1 期間，在畫面上依序短暫顯示 (x+h)^n 展開式與 e^x 的 power series 摘要（1-2 行），讓眼睛有東西跟著走，而不只是純聽。",
+     "severity": "nice",
+     "where": "03_why_trig_is_different beat 1, +1.0s–+18.6s（共 17.6s）"
+    }
+   ],
+   "id": "03_why_trig_is_different",
+   "note": "動機陳述清楚：先說代數失效、再指出目標極限、再預告工具。三段遞進有效。唯 beat 1 長達 17.6s 沒有新畫面，初學者可能在聽文字描述時沒有視覺支撐。",
+   "verdict": "ok"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-why",
+     "evidence": "tile 07（+33.6s）畫面出現 (sin(x+h)−sin x)/h = cos(x+h/2)·sin(h/2)/(h/2)，旁白說「here is the small trick that makes everything line up: write h as two times h over two」",
+     "problem": "為什麼要把 h 換成 2*(h/2)？動機只有 narration 一句，畫面上看不到「目標是讓分子分母出現同一個 h/2」的過程。初學者很可能跟著公式走但不理解為何這樣做。",
+     "proposal": "在 step.2 reveal 之前，先用一個過渡標注（如紅框或箭頭）在分子的 sin(h/2) 旁邊標示「想讓這個 h/2 和分母的 h 搭上」，再顯示把 h 拆成 2·(h/2) 的步驟，讓目的視覺化。",
+     "severity": "must",
+     "where": "04_difference_quotient_for_sine beat 4, +32.9s–+53.7s（reveal step.2）"
+    },
+    {
+     "dim": "L-attention",
+     "evidence": "tile 01–03（+0.5s、+1.7s、+7.4s）畫面全空，narration 說「transform that difference quotient ... sum-to-product ... turns a difference of sines into a product」",
+     "problem": "初學者在聽「sum-to-product」時沒有看到公式，腦中無法定錨這個 identity 是什麼形式，等 beat 2 才看到公式時需要往回追。",
+     "proposal": "在 beat 1 開始（+1.0s）就讓 sum-to-product 公式出現在旁邊（淡入或半透明），讓 narration 指著它說，而不是等到 beat 2 才 reveal。",
+     "severity": "should",
+     "where": "04_difference_quotient_for_sine beat 1, +1.0s–+13.9s（13.9s 無新 reveal）"
+    }
+   ],
+   "id": "04_difference_quotient_for_sine",
+   "note": "sum-to-product 識別 → h 寫成 2*(h/2) 的「小技巧」對初學者是最大的認知跳躍。Beat 4 的動機（為什麼要把 h 拆成 2*(h/2)）只用旁白說，沒有視覺強調，容易讓人跟不上那一步的意圖。",
+   "verdict": "weak"
+  },
+  {
+   "findings": [],
+   "id": "05_divider_squeeze",
+   "verdict": "ok"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-attention",
+     "evidence": "tile 02（+1.7s）、tile 03（+19.8s）畫面相同——unit circle 上有 O, A, B, C 的標記但所有區域同色，narration 說「A is at (1,0), B is the point at angle theta, and extending the radius to the tangent at A gives C」",
+     "problem": "初學者面對一張沒有任何顏色分區的幾何圖，需要在腦中邊聽 narration 邊定位 A、B、C 三點，認知負擔很高；偶函數的簡化論證夾在前段，更容易讓人不知道現在在說什麼。",
+     "proposal": "把偶函數簡化（「Replacing θ by −θ...」）做成一個快速的前置卡片（5–8s）獨立顯示，然後進入幾何，同時從開場就讓 A、B、C 三點高亮並標名，不要等到 beat 2 才開始 reveal 顏色區域。",
+     "severity": "must",
+     "where": "06_sector_inequality beat 1, +1.0s–+38.6s（37.6s 無 reveal）"
+    },
+    {
+     "dim": "L-why",
+     "evidence": "narration 說「Here is that new tool. We compare three areas on a circle of radius one.」但沒有說明為什麼「面積比較」可以推出極限值。",
+     "problem": "初學者知道「要比較面積」，但不知道「面積比較怎麼會和 sinθ/θ 扯上關係」——連結點要到 scene 07 才出現，這場的前提動機不夠明確。",
+     "proposal": "在 beat 1 開頭加一句銜接語（或在畫面上顯示）：「目標是夾住 sinθ/θ，所以我們先看三個面積的大小關係」，讓初學者知道為什麼要做這件事。",
+     "severity": "should",
+     "where": "06_sector_inequality beat 1 開頭, +1.0s–+5.0s"
+    }
+   ],
+   "id": "06_sector_inequality",
+   "note": "幾何圖是全片最重要的視覺錨點，出現後效果很好（colored regions 在 tile 04–07 逐步顯現很清楚）。但 beat 1 長達 37.6s，前 38s 畫面只有靜止幾何圖、沒有任何區域被高亮，narration 卻在說「偶函數簡化」和幾何設定，初學者只能對著一張無色示意圖聽說明。",
+   "verdict": "weak"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-picture",
+     "evidence": "tile 06（+26.6s）畫面顯示 cosθ ≤ sinθ/θ ≤ 1，旁邊有「RECIPROCATE – REVERSES」文字，narration 說「flipping positives reverses the inequalities, so the chain turns around」",
+     "problem": "不等號方向從「1 ≤ θ/sinθ ≤ 1/cosθ」變成「cosθ ≤ sinθ/θ ≤ 1」的翻轉過程只靠文字描述，初學者容易不確定「為什麼 reciprocal 會讓方向反過來」。",
+     "proposal": "在 result reveal 時，用動畫或分欄並排顯示翻轉前後的不等式，並在原式上畫出箭頭或顏色標示「原來的左邊變右邊」，讓方向反轉的效果可視化。",
+     "severity": "should",
+     "where": "07_squeeze_to_the_bound beat 4, +25.9s–+42.4s（reveal result）"
+    },
+    {
+     "dim": "L-follow",
+     "evidence": "tile 08（+43.1s）新增 0 ≤ |sinθ| ≤ |θ|，旁邊標「kept for later」，narration 說「a bound we lean on twice in a moment」",
+     "problem": "初學者在這裡不知道「kept for later」是要在哪裡用，只能暗記這個結果，後續才會回想。若最後沒對應到使用點，可能會覺得這行多餘。",
+     "proposal": "在「kept for later」標注旁加一個小提示，例如「→ used in scenes 08–09」，讓初學者知道這不是廢棄的結論，而是馬上要用的工具。",
+     "severity": "nice",
+     "where": "07_squeeze_to_the_bound beat 5, +42.4s–+56.0s（reveal check）"
+    }
+   ],
+   "id": "07_squeeze_to_the_bound",
+   "note": "代數步驟在 sheet 中以 step.0→step.1→result→check 四段呈現，文字推導清晰。唯「取倒數反轉不等號」這一步（beat 4）對初學者是認知坎，narration 說「flipping positives reverses the inequalities」但畫面上的 RECIPROCATE-REVERSES 標記（tile 06）只是文字提示，沒有動態演示方向翻轉。",
+   "verdict": "ok"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-attention",
+     "evidence": "tile 02（+1.7s）、tile 03（+14.4s）畫面完全相同，narration 說「nudge the angle a little, and sine and cosine move only a little; they never jump」",
+     "problem": "Beat 1 有 26.7s 沒有任何視覺變化，初學者在聽 continuity 的直觀描述時沒有圖示輔助，可能難以具象化「nudge angle → small change in sine」的意象。",
+     "proposal": "在 beat 1 期間顯示一個簡單的 unit circle 動態示意（angle 微調，chord 長微小變化），或至少顯示 sinθ 的圖形並在小 δ 區間高亮，讓「微小改變→微小輸出」有視覺對應。",
+     "severity": "should",
+     "where": "08_continuity_statement_sin_limit beat 1, +1.0s–+27.7s（26.7s 無 reveal）"
+    }
+   ],
+   "id": "08_continuity_statement_sin_limit",
+   "note": "這場的任務是「先說清楚 continuity 是什麼感覺，再呈現命題」，敘事順序對初學者友善。Beat 1 長達 26.7s 無新畫面，但 narration 用具體的幾何感覺（「nudge the angle, sine and cosine move only a little」）說明 continuity，比純 epsilon-delta 好很多。",
+   "verdict": "ok"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-why",
+     "evidence": "tile 04（+11.6s）顯示 cos x − cos x₀ = −2sin((x−x₀)/2)·sin((x+x₀)/2)，narration 說「Sum-to-product answers both at once. For cosine, cosine x minus cosine x sub zero is negative two sine...」",
+     "problem": "初學者不知道為什麼要對 cos x − cos x₀ 用 sum-to-product——動機是「要讓差值被 |sin(小角)| ≤ |小角| 這個 bound 套住」，但這個連結沒有在畫面或 narration 中明說。初學者只看到一個複雜的代數等式，不知道它的功能。",
+     "proposal": "在 proof.0 reveal 前，先顯示一句目標句：「我們想讓 |cos x − cos x₀| 被某個趨近於 0 的量控住」，然後再顯示 sum-to-product 展開，讓學生理解這是在找 bound，而不是在做無緣由的計算。",
+     "severity": "must",
+     "where": "09_continuity_argument beat 2, +10.9s–+26.1s（reveal proof.0）"
+    },
+    {
+     "dim": "L-follow",
+     "evidence": "tile 06–08（+26.8s–+43.5s）依序顯示 sin x − sin x₀ 的展開、然後兩者合並被 2|sin((x−x₀)/2)| 上界控住",
+     "problem": "連續兩個 reveal（proof.1、proof.2）都是新的代數式，中間沒有任何視覺停頓或「到目前為止我們知道了什麼」的整理，初學者在看到 proof.2 時可能已經不記得 proof.0 的結構。",
+     "proposal": "在 proof.2 reveal（beat 4）前，用一行總結文字顯示「目前：cos 和 sin 的變化量都 ≤ 2|sin((x−x₀)/2)|」，再繼續說明趨近於 0 的過程；讓學生有一個中繼的認知停靠點。",
+     "severity": "must",
+     "where": "09_continuity_argument beat 3–4, +26.1s–+54.0s"
+    },
+    {
+     "dim": "L-attention",
+     "evidence": "motion profile `▆ ▂ ▂ ▂ ▂ ▄`，多個 11–16s 靜止段，6 個 reveal 在 70.3s 內",
+     "problem": "70s 內連續 6 個代數 reveal，場均每個 reveal 停留超過 10s，初學者在密集代數中容易走神或直接放棄跟讀。",
+     "proposal": "考慮在兩個主要 reveal 之間插入一個短暫的圖示（如 unit circle 上的 chord ≤ arc 示意），讓眼睛有非代數的呼吸點，再回到下一個代數步驟。",
+     "severity": "should",
+     "where": "09_continuity_argument 整場"
+    }
+   ],
+   "id": "09_continuity_argument",
+   "note": "這是全片對初學者認知負擔最重的一場。sum-to-product 被用來同時處理 cos 和 sin 的 continuity，代數密度高（每個 reveal 都是一個新的多項式等式），且動機（為什麼用 sum-to-product 而不用別的）沒有解釋。初學者很可能在這場看到公式但不知道自己在跟著做什麼。",
+   "verdict": "weak"
+  },
+  {
+   "findings": [],
+   "id": "10_fundamental_limit",
+   "note": "這場節奏好——「宣告→建構→squeeze→結論」四步每步都很短（平均 8s），畫面 reveal 和 narration 高度同步。初學者在這裡應該能跟上：前幾場打好的 squeez inequality 在這裡被直接引用，收尾感強。",
+   "verdict": "good"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-picture",
+     "evidence": "tile 03（+4.0s）只有 cos θ 曲線；tile 04（+7.3s）加上 y=1 的水平線，narration 分兩步說「Here runs cosine theta, the dashed floor」和「the ceiling -- the constant line at height one」",
+     "problem": "Floor 和 ceiling 各用 3s reveal，對初學者來說節奏很快；第一次看時可能沒有清楚意識到這是 squeeze 的兩個 bounds。",
+     "proposal": "在 plot.0 reveal 旁標記「floor（下界）」，在 plot.1 reveal 旁標記「ceiling（上界）」，讓學生的眼睛看到 bounds 的角色標示，而不只是兩條曲線。",
+     "severity": "nice",
+     "where": "11_squeeze_graph beat 2–3, +3.3s–+9.5s（reveal plot.0、plot.1）"
+    }
+   ],
+   "id": "11_squeeze_graph",
+   "note": "最有「恍然大悟」感的一場。逐步畫出 cos θ（floor）→ 1（ceiling）→ sin θ/θ（中間曲線）的視覺建構非常清晰，open circle 在 θ=0 的解釋（scene 11 beat 6）也是初學者常見誤解的好預防措施。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "12_limit_not_identity",
+   "note": "非常有用的「caution」場。用具體數值（θ=π/2 給出 2/π≈0.64，θ=π 給出 0）說明這不是 identity，對初學者是很好的錯誤預防。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "13_radians_essential",
+   "note": "結構性 caution 說明清楚，特別是「switch to degrees, limit becomes π/180」這個量化說明讓學生理解為什麼 radians 不只是慣例。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "14_divider_derivatives",
+   "verdict": "ok"
+  },
+  {
+   "findings": [],
+   "id": "15_derivative_of_sine",
+   "note": "「Now the payoff, and it falls into our hands」的開場定調很好，讓初學者知道前幾場的苦功在這裡收割。六個 beat 節奏緊湊但清楚，每個 reveal 都對應一個推導步驟，無廢棄步驟。",
+   "verdict": "good"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-follow",
+     "evidence": "tile 04（+11.3s）顯示「This time use the companion sum-to-product formula」，narration 也這樣說，但沒有顯示「companion」公式是哪一個",
+     "problem": "初學者可能不記得「companion sum-to-product」指的是 cos 版的那個公式（scene 04 中用來處理 cos 差的版本），只聽到「companion」可能模糊。",
+     "proposal": "在 proof.0 reveal 時，讓 companion 公式 cos A − cos B = … 簡短出現一行，而不是留給記憶。",
+     "severity": "nice",
+     "where": "16_derivative_of_cosine beat 3, +10.6s–+14.0s（reveal proof.0）"
+    }
+   ],
+   "id": "16_derivative_of_cosine",
+   "note": "以「only the identity changes, so we go quickly」為前提壓縮了場長，對初學者來說是合理的——因為 scene 15 已經建立了範本，這裡只需要跟著對比。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "17_slope_equals_height",
+   "note": "全片最直觀的場。sin x 的 tangent slope 在三個點（0, π/2, π）一一顯示，然後 cos x 疊上去，高度與斜率的數值（1, 0, −1）完全吻合。初學者在這裡有強烈的「原來如此」感。畫面建構邏輯和 narration 節奏完美吻合。",
+   "verdict": "good"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-picture",
+     "evidence": "tile 04（+11.8s）顯示 sin x → cos x → −sin x → −cos x → sin x 的箭頭鏈",
+     "problem": "箭頭鏈是線性排列的文字，對初學者來說閉合成環的感覺（最後回到 sin x）可能不如圓圈圖示直觀。",
+     "proposal": "用圓圈排列四個節點（sin x、cos x、−sin x、−cos x）並加四個有向箭頭，比直線箭頭更直接呈現「cycle of four」的感覺。",
+     "severity": "nice",
+     "where": "18_derivative_cycle beat 3, +11.1s–+19.8s（reveal math.0）"
+    }
+   ],
+   "id": "18_derivative_cycle",
+   "note": "「Four derivatives and you are home」的 cycle 概念形象，和 e^x「reproduces itself in one step」的對比也有效。初學者在這裡應該能記住 cycle 的模式。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "19_divider_apply",
+   "verdict": "ok"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-why",
+     "evidence": "narration 說「The fundamental limit has a companion worth knowing」，但沒有說明「在哪裡用到它」",
+     "problem": "初學者聽到「worth knowing」但沒有看到用途，可能把這場視為旁支而非必要知識，降低注意力。",
+     "proposal": "在 beat 1 加一句前向提示，例如「This limit appears when you differentiate sin²x or compute arc length」，讓初學者知道這個工具有具體用途，而不只是「順便知道」。",
+     "severity": "should",
+     "where": "20_companion_limit beat 1, +1.0s–+12.9s"
+    }
+   ],
+   "id": "20_companion_limit",
+   "note": "(1−cosθ)/θ→0 的推導步驟清楚（conjugate multiply → sin²θ → split），但動機交代不夠：初學者不清楚這個 companion limit 後續在哪裡被用到（事實上在這個影片中它沒有被明確地在後續場景引用）。",
+   "verdict": "ok"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-follow",
+     "evidence": "tile 03（+7.4s）顯示 tan x = sin x / cos x 和 quotient rule 結果，narration 說「The quotient rule gives this」",
+     "problem": "quotient rule 的實際計算過程（分子展開的兩項）被跳過，初學者需要自己驗算才能確認畫面上的公式正確，若有疑問會停頓。",
+     "proposal": "在 step.0 reveal 時顯示 quotient rule 展開的中間式（(cos²x + sin²x)/cos²x），再化簡成 sec²x；多一行但讓初學者能追上每一步。",
+     "severity": "nice",
+     "where": "21_all_six_tan_sec beat 2, +6.7s–+13.1s（reveal step.0）"
+    }
+   ],
+   "id": "21_all_six_tan_sec",
+   "note": "節奏快，用 quotient rule 推導 tan 和 sec 的步驟是例行性的，初學者跟得上，因為 quotient rule 是已知工具。但 beat 2「The quotient rule gives this」後直接 reveal 結果，中間步驟沒有展示。",
+   "verdict": "ok"
+  },
+  {
+   "findings": [],
+   "id": "22_all_six_cot_csc",
+   "note": "與 scene 21 平行，結構清楚。Beat 5「all six are done」的收尾有儀式感，初學者能感受到階段完成。",
+   "verdict": "ok"
+  },
+  {
+   "findings": [],
+   "id": "23_shm_compute",
+   "note": "應用場景（彈簧）對初學者非常有吸引力，三行推導（s, s', s''）結構清晰，最後指出 s''=−s 是 SHM 的特徵方程式，收尾有洞見感。",
+   "verdict": "good"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-attention",
+     "evidence": "tile 07（+24.9s）後靜止 11.5s，narration 說「hold the bottom graph against the top: it is the top one flipped upside down」",
+     "problem": "這個 23.8s 的靜止段是全片最長的單次靜止，初學者在聽「flipped upside down」這個說法時，需要自己在腦中比對頂層和底層的圖形。",
+     "proposal": "在 mirror reveal 時，用一個動態覆蓋或半透明疊圖短暫演示底圖翻轉覆蓋在頂圖上，讓「upside down」的意思直接可見，而不只是靜態讓兩圖並排。",
+     "severity": "nice",
+     "where": "24_shm_stacked_graphs beat 5, +24.2s–+35.7s（reveal mirror）"
+    }
+   ],
+   "id": "24_shm_stacked_graphs",
+   "note": "三層堆疊圖（高度、速度、加速度）在視覺上非常有力。Beat 4「Watch where height hits a peak -- there velocity passes through zero」是初學者能自己核對的直觀說明。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "25_toward_the_chain_rule",
+   "note": "Forward pointer 結構清晰：先說「我們只會裸形式」，再用 sin(x²) 和 sin(3x+1) 作為例子說明不夠用，然後引入 chain rule 作為下一章的預告。初學者在這裡知道今天學到哪、還缺什麼。",
+   "verdict": "good"
+  },
+  {
+   "findings": [
+    {
+     "dim": "L-recall",
+     "evidence": "narration 說「keep the cycle in mind -- four derivatives of sine or cosine bring you home -- with the fine print that it all depends on radians」",
+     "problem": "「cycle」和「radians」被放在同一個 beat 裡，兩個不同維度的提醒（週期性 vs. 量測單位）合在一起，若初學者只記住一個，可能遺漏另一個。",
+     "proposal": "把 cycle 和 radians 分成兩個獨立 beat，每個有自己的 reveal，讓兩個記憶點各自清晰。",
+     "severity": "nice",
+     "where": "26_recap beat 5, +27.1s–+35.7s（reveal point.3）"
+    }
+   ],
+   "id": "26_recap",
+   "note": "五個要點按「極限→連續性→兩個導數→其餘六個→cycle+radians」的邏輯排列，每個 reveal 間距約 7–9s，節奏適合記憶。對初學者是有效的出口。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "27_outro",
+   "verdict": "ok"
+  }
+ ]
+}

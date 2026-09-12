@@ -1,0 +1,565 @@
+{
+  "lens": "R2 動畫導演（Director）",
+  "film": {
+    "overall": "這部片的視覺語言是「卡片＋逐行淡入」的投影片語法，不是動畫語法。27 場平均靜止 93%，其中 23 場的最長靜止超過 10 秒，最極端是 sector_inequality 的 38.2s、continuity_statement_sin_limit 的 27.2s、shm_stacked_graphs 的 23.8s、squeeze_graph 與 difference_quotient_for_sine 的 20.2s。全片「不屬於 reveal 的變化」只有 13 次，且多半落在 intro／outro；也就是說，正片幾乎沒有任何一個數學動作是被演出來的——代入、乘開、取倒數、翻轉不等號、把因子放大成 1、把圖上下翻轉，全部以「再多一行文字淡入」處理。真正用畫面在教的只有三場：slope_equals_height（最好）、squeeze_graph、shm_stacked_graphs。片子的骨架、分頁（1/2、2/2）、divider 進度點與右側 dotted-leader 註解都做得很好，缺的是把這套靜態版面「動起來」的那一層：讓圖跟著旁白長出來、讓算式原地變形、讓兩場之間的顏色與圖形延續。做到這件事，這部片會從「可讀的講義影片」變成「會教的動畫影片」，而且大部分改動都只需要 1–3 秒的動作。",
+    "patterns": [
+      "reveal 只有一種型態：整塊文字／整行算式淡入。全片找不到一次 transform（原地變形）動畫。證據：difference_quotient_for_sine tile 05、07；squeeze_to_the_bound tile 06；continuity_argument tile 08；companion_limit tile 04。",
+      "旁白在描述動作，畫面卻凍結。sector_inequality「extending the radius... gives C」（圖早就畫完）、squeeze_graph「As theta slides toward zero」（靜止 20.2s）、shm_stacked_graphs「flipped upside down」（只多一個標籤）、shm_compute「something moving」（全場沒有任何東西在動）。",
+      "結論先於旁白出現：claim／statement 卡片在 +0.5s 就在畫面上，等旁白講到它時畫面毫無變化。continuity_statement_sin_limit（+27.7s 的 reveal 前後兩幀肉眼無差）、fundamental_limit（+4.6s）、derivative_of_sine（+4.5s）、derivative_cycle（+4.4s）、toward_the_chain_rule（+6.6s）、companion_limit（答案在 SOLUTION 第一行就寫好）。",
+      "開場長段無畫面：8 場的第一個 beat 完全沒有 reveal，最長 37.6s（sector_inequality，117 字）與 26.7s（continuity_statement_sin_limit，83 字）。這些段落往往正是在建立動機與圖形構造，卻只能用聽的。",
+      "版面只用左半：幾乎每一場的內容都壓在畫面左側 55–65%，右側與下方長期大片留白，而這些留白正好是可以放圖、放對照、放上一場延續圖形的地方（why_trig_is_different、continuity_statement_sin_limit、derivative_of_cosine、limit_not_identity、toward_the_chain_rule 尤其明顯）。",
+      "場與場之間缺乏視覺延續：sector_inequality 用藍／橘／綠標好的三個區域，到 squeeze_to_the_bound 的不等式鏈全變回白字；continuity_statement_sin_limit 明講要看單位圓上的弦與弧，圖卻沒回來；derivative_of_sine → derivative_of_cosine 的「同一台機器、只差一個負號」沒有並排。",
+      "缺少總結性圖像：all_six_tan_sec／all_six_cot_csc 標題叫 All Six Derivatives、旁白收在 all six are done，畫面卻從未把六個結果並置；derivative_cycle 講「四次回家」的環，畫成一條由左到右的直線箭頭鏈。",
+      "值得擴散的既有優點：右側 dotted-leader 註解（squeeze_to_the_bound 的 RECIPROCATE – REVERSES、companion_limit 的 THE LIMIT, THEN CONTINUITY、shm_compute 的 SIMPLE HARMONIC MOTION）是全片最有效的教學裝置；divider 的 stage 進度點與 1/2、2/2 分頁建立了清楚的結構感。"
+    ],
+    "strongest_scenes": ["slope_equals_height", "squeeze_graph", "shm_stacked_graphs", "recap"],
+    "weakest_scenes": ["sector_inequality", "continuity_statement_sin_limit", "why_trig_is_different", "shm_compute", "radians_essential"]
+  },
+  "scenes": [
+    {
+      "id": "intro",
+      "verdict": "good",
+      "note": "10.3s 的無聲片頭，logo → course map → 章節卡三段式，節奏乾淨，60% 靜止對片頭是合理的。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "nice",
+          "where": "intro tile 05（+6.9s）",
+          "evidence": "course map 上 3.1 有完整標題「Derivatives of the Sine and Cosine Functions」，3.2 與 3.3 只剩下兩顆灰點與編號，沒有任何文字。",
+          "problem": "叫 COURSE MAP 卻只標了一站，觀眾看不出這一節在整章的哪個位置、前後是什麼。",
+          "proposal": "讓 3.2、3.3 的標題以 35% 不透明度與 3.1 同時淡入（0.6s），再用 0.4s 讓 3.1 那一列亮到 100% 並把圓點放大——地圖先給全貌，再點名今天的站。"
+        }
+      ]
+    },
+    {
+      "id": "divider_limit",
+      "verdict": "ok",
+      "note": "四張 divider（stage 1–4）的模板、進度點與背景曲線一致，結構訊號很好。",
+      "findings": [
+        {
+          "dim": "D-dwell",
+          "severity": "nice",
+          "where": "divider_limit tile 01–07（+0.5s 至 +5.4s）",
+          "evidence": "整張卡在 +0.25s 一次淡入後完全不動，最長靜止 5.2s、全場靜止 91%，七格取樣畫面完全相同。",
+          "problem": "6 秒的無聲停頓對節奏是好的，但這 6 秒目前只是一張截圖；四張 divider 加起來有 24 秒的凍結畫面。",
+          "proposal": "讓卡片分兩拍進場：標題與副標先淡入，0.8s 後再讓 lim sinθ/θ = ? 的「?」用 0.4s 彈跳寫入並閃一次；背景那條藍曲線改成 1.5s 由左向右畫出，讓 divider 本身也有一次呼吸。"
+        }
+      ]
+    },
+    {
+      "id": "why_trig_is_different",
+      "verdict": "weak",
+      "note": "67 秒、只有 3 個 reveal、96% 靜止；本節的動機（代數以前行得通、現在行不通）整段靠聽。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "must",
+          "where": "why_trig_is_different beat 1（+1.0s→+18.6s），tile 02 與 tile 03",
+          "evidence": "tile 02（+1.7s）與 tile 03（+9.8s）畫面完全相同（標題＋ASSUMES pill＋一行「Every trigonometric derivative funnels down to a single limit.」），期間旁白說完「For a polynomial we expanded the quantity x plus h, to the n, and the binomial theorem handed us a factor of h to cancel; for e to the x the power series did the same job.」",
+          "problem": "17.6 秒、52 個字講了三個具體對照（多項式、e 的 x 次方、三角函數），畫面一個字都沒給。初學者在全片的第一段教學內容就只能純聽，很容易一開始就掉隊。",
+          "proposal": "把 beat 1 拆成兩個 3 秒動作：(a) 寫出 ((x+h)^n − x^n)/h，讓展開式裡的 h 與分母的 h 同時變黃、1.5s 內互相劃掉消去；(b) 同一版位換成 (sin(x+h) − sin x)/h，分母的 h 閃紅、分子找不到可消的對象，0.8s 打一個紅叉。兩個動作就把「以前可以、現在不行」演完。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "should",
+          "where": "why_trig_is_different tile 01（+0.5s）對照 tile 08–10（+49.5s 至 +66.4s）",
+          "evidence": "ASSUMES「angles in radians (arc = θ)」的 pill 從 +0.5s 就在畫面上；旁白要到 beat 4 尾段（約 +60s）才說「throughout, angles are measured in radians -- an assumption that turns out to be essential」，而 tile 08、09、10 三格畫面完全相同，該 pill 沒有任何變化。",
+          "problem": "最重要的前提被提前一分鐘擺出來，等到旁白真的講它時畫面毫無回應，觀眾不會把兩者連起來；pill 因此退化成裝飾。",
+          "proposal": "開場不要放這張 pill；改成旁白念到「angles are measured in radians」時，讓它從畫面右側滑入（0.5s）、邊框閃一次琥珀色再定住，之後整片沿用同一張 pill 做前提記號。"
+        },
+        {
+          "dim": "D-composition",
+          "severity": "should",
+          "where": "why_trig_is_different tile 10（+66.4s，全場最滿的一幀）",
+          "evidence": "最終幀的所有內容（標題、pill、一行敘述、兩行算式）只佔畫面左側約 55%，右半在 67 秒裡始終全黑。",
+          "problem": "一整場都在浪費一半畫面，而這一場正好在預告「a geometric comparison of areas on the unit circle」——最該用圖的位置空著。",
+          "proposal": "把右半留給 beat 4：在 +48.8s 讓單位圓略圖（圓、半徑、θ）用 1.2s 從圓心畫出來當預告，停留到場末，下一場 sector_inequality 直接從這張圖長大，順便把版面撐起來。"
+        }
+      ]
+    },
+    {
+      "id": "difference_quotient_for_sine",
+      "verdict": "weak",
+      "note": "四行推導逐行堆疊、右側有 dotted-leader 註解，結構清楚；問題全在「每一步都只是新的一行，沒有一步是演出來的」。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "must",
+          "where": "difference_quotient_for_sine beat 4（+32.9s→+53.7s），tile 07（+33.6s）",
+          "evidence": "旁白說「here is the small trick that makes everything line up: write h as two times h over two, so the denominator carries the very h over two inside the sine」，畫面在 +33.0s 一次淡入整行 (sin(x+h)−sin x)/h = cos(x+h/2)·sin(h/2)/(h/2)，然後靜止 20.2s（tile 07 與 tile 08 相同）。",
+          "problem": "這是本場唯一的「決定性一步」，也是最容易卡住初學者的地方（h 怎麼就變成 h/2 了？）。畫面把它當成又一行結果貼出來，再停 20 秒，觀眾沒有機會看到中間發生了什麼。",
+          "proposal": "三個連續動作共 3 秒：分母的 h 先高亮，0.8s 內裂成 2·(h/2)；前面的 2 與分子 2cos… 的 2 同時變灰並消失（0.6s）；剩下的 h/2 滑到 sin(h/2) 正下方對齊成分數（0.8s），此時再把整行定稿。"
+        },
+        {
+          "dim": "D-motion",
+          "severity": "should",
+          "where": "difference_quotient_for_sine beat 3，tile 04（+14.6s）→ tile 05（+22.4s）",
+          "evidence": "tile 04 只有通式 sin A − sin B = 2cos((A+B)/2)sin((A−B)/2)；tile 05 在其下方整行淡入代入結果，右側小字註 A = x+h, B = x，旁白同時說「Put A equals x plus h and B equals x」。",
+          "problem": "代入是一個動作，畫面卻用「再寫一行」表示，觀眾得自己在兩行之間目視比對 A、B 各自跑到哪裡去了。",
+          "proposal": "讓上一行的 A 標藍、B 標橘；旁白念到時用 1.2s 的 transform 把 A 原地換成 x+h、B 換成 x（顏色保留），再把整行往下複製成第二行——代入變成看得見的替換，而不是兩行之間的謎題。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "should",
+          "where": "difference_quotient_for_sine beat 5（+53.7s→+74.0s），tile 09（+54.4s）與 tile 10（+63.9s）",
+          "evidence": "旁白逐一點名「The first slides to cosine x... the second is exactly sine theta over theta with theta equals h over two」，而 tile 09 與 tile 10 畫面完全相同，result 行的兩個因子沒有任何高亮或指示。",
+          "problem": "20.2 秒的結論段裡，畫面不告訴觀眾「第一個因子」「第二個因子」分別是哪一塊，兩個極限來源（連續性／基本極限）也沒有和式子對上。",
+          "proposal": "講到 first 時把 cos(x+h/2) 打亮、其餘壓暗到 40%（1.5s）；講到 second 時換成 sin(h/2)/(h/2) 打亮；同時讓右側 CONTINUITY 與 THE LIMIT 兩個字各自在對應時刻亮起，形成兩條明確的對照。"
+        }
+      ]
+    },
+    {
+      "id": "divider_squeeze",
+      "verdict": "ok",
+      "note": "stage 2，進度點正確前進到第二顆，與 divider_limit 完全一致，視覺延續良好；靜態問題已在 divider_limit 提出，此處不重複。",
+      "findings": []
+    },
+    {
+      "id": "sector_inequality",
+      "verdict": "weak",
+      "note": "全片最重要的幾何場，也是最長的凍結場（38.2s）。圖本身畫得漂亮（三個區域分色、抽出成對照圖形），問題全在時間軸與動作。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "must",
+          "where": "sector_inequality beat 1（+1.0s→+38.6s），frame f_02_+001.7s 與 tile 03（+19.8s）",
+          "evidence": "f_02_+001.7s 顯示整張圖（弧、O、A、B、C、sinθ、tanθ、θ、1）在旁白開口時就已全部畫好；tile 03（+19.8s）與之完全相同，畫面連續靜止 38.2s。這 37.6 秒 117 字的旁白裡包含偶函數論證（「Replacing theta by negative theta flips the sign of both theta and sine theta」）與整段構圖（「A is at the point with coordinates one and zero, B is the point at angle theta, and extending the radius to the tangent at A gives C」）。",
+          "problem": "旁白正在「一步一步造圖」，圖卻早就造完了——構圖敘述沒有任何視覺對應，等於白講；偶函數那 20 秒更是完全沒有畫面。這是全片最嚴重的動畫缺席。",
+          "proposal": "圖改成跟著旁白長：(1) 畫單位圓與半徑 OA、標 A（1s）；(2) 角 θ 從 x 軸掃出到 OB、B 點落下（1.5s）；(3) 半徑延長交 A 的切線得 C，tanθ 線段自 A 向上長出（1.5s）。偶函數那段則在同一張圖下方掃出 −θ 的鏡射射線，讓 sinθ 與 −sinθ 同時標出並上下對翻一次（2s）。"
+        },
+        {
+          "dim": "D-motion",
+          "severity": "should",
+          "where": "sector_inequality frame f_05_+046.1s 與 f_06_+052.6s",
+          "evidence": "f_05（+46.1s，旁白正說 The sector O A B）：橘色扇形停在主圖與 ① 欄位之間的半空中，編號徽章「1」下方是空的，藍色三角被擠到它的右邊；f_06（+52.6s）：綠色大三角與藍色三角重疊在同一個位置，共用下方標籤「½ sin θ」。",
+          "problem": "每新增一個抽出圖形，整列就重新置中，已經放好的圖形跟著橫移，編號與標籤短暫地對到錯的圖形。觀眾的眼睛被迫追著會滑動的東西跑，還可能在那 1 秒內把綠色三角讀成 ½ sin θ。",
+          "proposal": "一開始就保留三個固定欄位（以 15% 不透明度的灰色框預留），每個圖形採「從主圖對應區域複製後平移到自己的欄位」（0.8s，位置固定），其他欄位完全不動；編號徽章與標籤跟著各自的圖形一起進場。"
+        },
+        {
+          "dim": "D-carry",
+          "severity": "should",
+          "where": "sector_inequality beat 5（+58.6s→+69.6s），frame f_09_+069.9s",
+          "evidence": "旁白說「Each region sits inside the next, so the areas line up in order」，畫面卻是三個等距並排、彼此分離的圖形（①藍三角、②橘扇形、③綠三角）加一行不等式。",
+          "problem": "整個論證的關鍵是「包含」，畫面呈現的卻是「並排」。三個面積為什麼有大小順序，只能從旁白得知。",
+          "proposal": "念到這句時，讓三個圖形以各自的 O 點為基準平移疊合（1.2s），維持 1.5s 讓包含關係看清楚（外層半透明、內層實色），再散回三欄並同時寫出 ½sinθ ≤ ½θ ≤ ½tanθ。"
+        }
+      ]
+    },
+    {
+      "id": "squeeze_to_the_bound",
+      "verdict": "ok",
+      "note": "四行不等式鏈＋右側 dotted-leader 註解（multiply areas by 2／÷ sinθ／RECIPROCATE – REVERSES／kept for later）是全片最好的「靜態註解」設計，可跟得上。",
+      "findings": [
+        {
+          "dim": "D-motion",
+          "severity": "should",
+          "where": "squeeze_to_the_bound beat 4（+25.9s→+42.4s），tile 05（+19.8s）→ tile 06（+26.6s）",
+          "evidence": "tile 05 只有兩行；tile 06 第三行 cosθ ≤ sinθ/θ ≤ 1 (0 < θ < π/2) 整塊淡入，右側註 RECIPROCATE – REVERSES，之後靜止 15.5s（tile 06 與 tile 07 相同）。",
+          "problem": "「取倒數會把不等號翻向」是本場唯一的概念性動作，畫面用「再多一行」表示，翻向這件事本身沒有被看見。",
+          "proposal": "讓第二行的三項原地取倒數（1.2s morph：1 → 1、θ/sinθ → sinθ/θ、1/cosθ → cosθ），同時兩個 ≤ 符號各自旋轉 180° 並閃一次紅（0.4s），最後三項左右對調滑到新位置（0.8s）——翻向用旋轉演出來，比註解文字有力得多。"
+        },
+        {
+          "dim": "D-continuity",
+          "severity": "should",
+          "where": "squeeze_to_the_bound tile 03（+8.1s）對照 sector_inequality frame f_09_+069.9s",
+          "evidence": "上一場的三個面積用藍／橘／綠三色並附①②③編號；本場第一行 sinθ ≤ θ ≤ tanθ 以及其後三行全部是單色白字。",
+          "problem": "上一場辛苦建立的顏色編碼在換場的瞬間全部丟掉，觀眾無法追蹤「哪一項是從哪個區域來的」，四行代數就變成純符號操作。",
+          "proposal": "讓三項沿用上一場的藍／橘／綠，整條推導鏈四行都維持同色（即使被倒數、被除，顏色跟著該項走），一路追到 cosθ ≤ sinθ/θ ≤ 1；換場時讓三個彩色圖形縮小飛入第一行的三個位置（1s）。"
+        }
+      ]
+    },
+    {
+      "id": "continuity_statement_sin_limit",
+      "verdict": "weak",
+      "note": "27.2s 靜止＋一個看不出變化的 reveal＋一欄空了 35 秒的 PROOF，是全片版面問題最集中的一場。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "must",
+          "where": "continuity_statement_sin_limit beat 1（+1.0s→+27.7s），tile 03（+14.4s）",
+          "evidence": "旁白說「on the unit circle the half-chord sine theta is always shorter than the arc theta above it, which is just the absolute value of sine theta at most the absolute value of theta read geometrically」，畫面（f_03_+014.4s）只有標題、副標、左側孤零零的 PROOF 字樣與右側命題卡，沒有任何圓、弦或弧。",
+          "problem": "旁白明講「read geometrically」，畫面卻沒有幾何。這個弦短於弧的圖三場之前才畫過，卻沒有被帶回來，26.7 秒的關鍵直覺完全落空。",
+          "proposal": "把 sector_inequality 的單位圓縮圖調回畫面左側（1s 淡入）；講到 half-chord 時讓 sinθ 的半弦與 θ 的弧同時高亮成兩種顏色，再讓弧「拉直」成一段線段與弦並排比長度（1.5s），最後定格成 |sin θ| ≤ |θ|。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "should",
+          "where": "continuity_statement_sin_limit frame f_03_+014.4s 與 f_04_+028.4s",
+          "evidence": "命題卡「sin x, cos x are continuous at every x₀」在 +0.5s 就已在畫面右側；標示為 statement 的 reveal 發生在 +27.7s，但 +14.4s 與 +28.4s 兩幀肉眼完全相同。",
+          "problem": "旁白說「So here is the claim, made precise」時，畫面上什麼也沒發生——那張卡 27 秒前就擺好了。reveal 名存實亡，觀眾的注意力沒有被帶到該看的地方。",
+          "proposal": "開場不顯示該卡；等旁白說到 here is the claim 時讓它從右側滑入（0.5s）並沿邊框跑一圈亮線（0.4s）定住，讓「宣告」這個動作真的發生在宣告的那一秒。"
+        },
+        {
+          "dim": "D-composition",
+          "severity": "should",
+          "where": "continuity_statement_sin_limit tile 01–04（+0.5s 至 +28.4s）",
+          "evidence": "左欄的「PROOF」小標從 +0.5s 就在畫面上，其下方一直空白到 +36.1s 才出現第一行 0 ≤ |sin θ| ≤ |θ| (chord ≤ arc)。",
+          "problem": "一個標題掛在那裡空等 35 秒，畫面看起來像還沒載入完；同時整個左欄的空間被白白佔住。",
+          "proposal": "PROOF 標籤與它的第一行證明同時淡入；空出來的 35 秒改放上一條的單位圓圖（弦 vs 弧），讓左欄在該講幾何時就是幾何、該講證明時才變證明。"
+        }
+      ]
+    },
+    {
+      "id": "continuity_argument",
+      "verdict": "ok",
+      "note": "節奏比前一場好（+1.0s 就有 reveal、之後每 11–17s 一行），右側提問卡「Fix x₀: how far can cos x, sin x move?」是有效的定錨。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "should",
+          "where": "continuity_argument beat 3 尾段與 beat 4（+42.8s→+54.0s），tile 07（+34.4s）→ tile 08（+43.5s）",
+          "evidence": "旁白說「the half-sum factor never exceeds one in size. Drop it to its largest size, one」，畫面在 +43.0s 整塊淡入第三行 |cos x−cos x₀|, |sin x−sin x₀| ≤ 2|sin((x−x₀)/2)|。",
+          "problem": "「把某個因子放大成 1」是這段唯一的估計技巧，也是兩行式子突然變成一個不等式的原因；畫面沒有指出被放大的是哪個因子，觀眾得自己在三行之間找。",
+          "proposal": "在前兩行中把 sin((x+x₀)/2) 與 cos((x+x₀)/2) 同時框起來變黃（0.5s），0.8s 內原地變成「1」，再讓兩行各自收斂、合併成第三行（1s）——放大這個動作就看得見了。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "nice",
+          "where": "continuity_argument tile 10–12（+54.7s 至 +69.7s）",
+          "evidence": "右側提問卡自 +1.0s 起亮度、邊框、位置全程不變；beat 5 的 qed 行（x→x₀ ⇒ cos x→cos x₀, sin x→sin x₀）出現時，該卡沒有任何回應。",
+          "problem": "場景用一張卡提問、用最後一行回答，但兩者在畫面上從未連起來，問答的閉環沒有被演出來。",
+          "proposal": "qed 行出現的同時，讓提問卡邊框由琥珀轉綠並打上一個勾（0.5s），卡片輕微放大再回復——一個小動作就把「問題已解決」說完。"
+        }
+      ]
+    },
+    {
+      "id": "fundamental_limit",
+      "verdict": "ok",
+      "note": "42.6s、4 個 reveal、最長靜止 11.8s，是文字堆疊型場次裡節奏最好的一場。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "should",
+          "where": "fundamental_limit beat 5（+33.7s→+41.6s），tile 08（+34.4s）",
+          "evidence": "旁白說「because the ratio is even, its left limit matches its right, so the two-sided limit is one as well」，畫面只多出一行綠字 even ⇒ two-sided limit = 1。這是全片第二次用偶函數（第一次在 sector_inequality beat 1，同樣沒有畫面）。",
+          "problem": "偶函數＝左右對稱，是天生該用畫面講的事；講了兩次、兩次都只有文字，觀眾始終沒看過那個對稱。",
+          "proposal": "借用下一場的 sinθ/θ 曲線縮圖放在右側，念到 even 時讓右半段曲線沿 y 軸鏡射掃到左邊（1.2s），兩側完全重合時閃一次，再打上 even 標籤——順便為下一場的完整圖鋪路。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "nice",
+          "where": "fundamental_limit tile 01（+0.5s）對照 tile 03（+5.3s）",
+          "evidence": "命題卡 lim θ→0 sinθ/θ = 1 在 +0.5s 已在畫面右側；旁白 +4.6s 才說「The claim is as clean as it gets」。",
+          "problem": "與 continuity_statement_sin_limit 同一個毛病：結論先行，宣告的那一刻畫面沒有動作。",
+          "proposal": "把卡片改成在 +4.6s 滑入並描邊一次（0.5s）；前 4.6 秒讓畫面保持只有標題與副標，把注意力留給「終於要收尾了」這句話。"
+        }
+      ]
+    },
+    {
+      "id": "squeeze_graph",
+      "verdict": "ok",
+      "note": "全片少數真正用圖教學的場：空軸 → cos θ → 水平線 1 → 比值曲線 → 空心圓 → 註解，前 10 秒的分拍很好。",
+      "findings": [
+        {
+          "dim": "D-motion",
+          "severity": "must",
+          "where": "squeeze_graph beat 4（+9.5s→+23.1s），tile 05（+10.2s）／tile 06（+16.3s）／tile 07（+23.8s）",
+          "evidence": "旁白說「As theta slides toward zero the floor rises to one and the ceiling already is one, so the curve is squeezed right to one」，而畫面自 +9.5s 起連續靜止 20.2s，上述三格取樣畫面（除空心圓外）完全相同。",
+          "problem": "這一段旁白全是動詞——slides、rises、squeezed——而畫面是一張靜止的三線圖。「夾擠」這個全節的核心動作，在唯一畫得出它的場次裡沒有被演出來。",
+          "proposal": "放一條垂直游標從 x≈2 等速滑向 0（3s），游標上同時掛兩個點（cos θ 上與 y=1 上）並即時顯示兩者的縫隙；縫隙區域填半透明藍色帶，隨游標推進而收窄，收到 0 時整條帶子閃一次白，比值曲線上的點同步被推到高度 1。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "nice",
+          "where": "squeeze_graph frame f_09_+036.3s，旁白 beat 2「Here runs cosine theta, the dashed floor.」",
+          "evidence": "最終幀中 cos θ 是一條連續的灰色實線（非虛線），而且是三條曲線裡最暗的一條。",
+          "problem": "旁白叫觀眾找「the dashed floor」，畫面上沒有虛線；而且地板比被夾的主角還暗，第一次看的人要花時間才能確定在指哪一條。",
+          "proposal": "把 cos θ 改成虛線（與旁白一致）並提亮一階；beat 2 讓這條虛線由左向右畫出 1.2s，再定住當地板。"
+        }
+      ]
+    },
+    {
+      "id": "limit_not_identity",
+      "verdict": "weak",
+      "note": "23.8s 的場只有一個 reveal，之後靜止 18.0s，整場是一段被朗讀的散文。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "should",
+          "where": "limit_not_identity beat 2（+4.9s→+22.9s），tile 04（+13.9s）",
+          "evidence": "旁白正念「at theta equals pi over two it is two over pi, about zero point six four, and at theta equals pi it is zero」，畫面是自 +5.2s 起就沒變過的同一段兩行文字。",
+          "problem": "這一場的警告（極限不是恆等式）有兩個現成的具體數字，而畫出它們的曲線上一場才剛畫完；不把它們放回曲線上，觀眾只能記住兩個抽象的數字。",
+          "proposal": "右側放 squeeze_graph 的曲線縮圖；念到 π/2 時在曲線上落一個點並拉出高度 0.64 的水平虛線（1s），念到 π 時再落一個點掉到 0（1s），最後把 θ→0 那一端的 1 與這兩個點並置閃一次——「只有在極限才是 1」用畫面說完。"
+        },
+        {
+          "dim": "D-composition",
+          "severity": "nice",
+          "where": "limit_not_identity tile 05（+23.2s）",
+          "evidence": "全場唯一的內容是一整段兩行長句一次淡入，畫面下方約 60% 全空。",
+          "problem": "整段一次出現，觀眾的眼睛沒有落點，也無法跟著旁白走到哪一句。",
+          "proposal": "拆成三拍：先「The limit as θ→0 is not an identity.」，再兩個數值 chip（θ=π/2 → 2/π ≈ 0.64；θ=π → 0）各自淡入，最後結論句。"
+        }
+      ]
+    },
+    {
+      "id": "radians_essential",
+      "verdict": "weak",
+      "note": "26.1s、1 個 reveal、最長靜止 21.0s，與前一場同型的散文卡。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "should",
+          "where": "radians_essential beat 2（+4.2s→+25.1s），tile 04（+14.6s）",
+          "evidence": "旁白說「Switch to degrees and the limit is pi over one hundred eighty, not one, so the derivative drags that factor along」，畫面自 +4.9s 起就是同一段含 lim sin(x°)/x = π/180 的文字，靜止 21.0s。",
+          "problem": "這是一個對照（弧度 vs 角度），對照最該用並排的兩張圖；現在兩種情形都被壓成同一段散文，觀眾感覺不到 π/180 有多小、曲線被壓得多扁。",
+          "proposal": "左右並排兩張同尺寸小圖：左為弧度版 sinθ/θ 逼近 1、右為角度版。念到 switch to degrees 時，讓右圖由左圖用 0.8s 垂直壓縮變形過去（斜率從 1 掉到 0.0175），並在旁邊同步把 sin′ = cos 改寫成 sin′ = (π/180)cos。"
+        },
+        {
+          "dim": "D-dwell",
+          "severity": "nice",
+          "where": "radians_essential motion profile 與 tile 04→05（+14.6s→+25.5s）",
+          "evidence": "motion profile 為 `▄ ▅          `：+4.25s 之後到場末沒有任何變化事件，兩格取樣畫面相同。",
+          "problem": "一整段三句話的警告一次上完，最後 21 秒是純朗讀。",
+          "proposal": "至少拆成兩個 reveal：先出角度版的極限式，旁白講到 derivative drags that factor along 時再出 d/dx sin(x°) = (π/180)cos(x°) 那一行。"
+        }
+      ]
+    },
+    {
+      "id": "divider_derivatives",
+      "verdict": "ok",
+      "note": "stage 3，模板與進度點延續正確（第三顆亮），並把本段的兩個問句 d/dx sin x = ?、d/dx cos x = ? 掛在標題下，方向感清楚。",
+      "findings": []
+    },
+    {
+      "id": "derivative_of_sine",
+      "verdict": "ok",
+      "note": "39.3s、5 個 reveal、最長靜止 9.5s，是全片節奏最穩的推導場；每一行都有明確的敘述對應。",
+      "findings": [
+        {
+          "dim": "D-continuity",
+          "severity": "should",
+          "where": "derivative_of_sine beat 4（+14.6s→+24.6s），tile 05（+15.3s）",
+          "evidence": "旁白說「But we already did the hard algebra」，畫面直接淡入 = lim h→0 cos(x+h/2)·sin(h/2)/(h/2)——這一行與六分鐘前 difference_quotient_for_sine 的結論行完全相同，但沒有任何視覺標記說明它是舊識。",
+          "problem": "「我們早就算過了」是一句安慰，觀眾若沒把它認出來，只會覺得又冒出一行複雜式子；跨場的複用沒有被視覺兌現。",
+          "proposal": "讓這一行從畫面右緣滑入（0.6s）並掛一個小標籤「from §The Difference Quotient」，標籤閃一次後 1.5s 淡出；若要更強，可在滑入前用 0.5s 閃一張該場最終幀的縮圖。"
+        },
+        {
+          "dim": "D-composition",
+          "severity": "nice",
+          "where": "derivative_of_sine tile 09（+38.7s）",
+          "evidence": "四行證明全部擠在左側約 55% 寬度，右側除了一張結果卡外整片空白。",
+          "problem": "式子偏小、留白偏大，最後的 qed 行與右上的結果卡距離很遠，兩者其實是同一件事。",
+          "proposal": "把結果卡下移到與最後一行 ⇒ cos x · 1 = cos x 同一水平，qed 出現時讓兩者之間畫一條 0.5s 的細連線，證明與宣稱在畫面上真的接上。"
+        }
+      ]
+    },
+    {
+      "id": "derivative_of_cosine",
+      "verdict": "ok",
+      "note": "與 derivative_of_sine 完全平行的版面與節奏，這個刻意的鏡像結構本身就是好設計。",
+      "findings": [
+        {
+          "dim": "D-continuity",
+          "severity": "should",
+          "where": "derivative_of_cosine tile 05–09（+14.7s 至 +39.7s）",
+          "evidence": "旁白 beat 1 說「Cosine falls to the very same machinery -- only the identity changes」、beat 6 收在「Same two tools, one extra minus sign」；畫面右側除了結果卡外全空，上一場的 sine 版推導沒有出現。",
+          "problem": "「同一台機器」是這一場存在的理由，但畫面把 cosine 版當成全新的一場從頭寫，觀眾只能靠記憶做比對。",
+          "proposal": "右欄以 40% 不透明度重貼 derivative_of_sine 的三行 sine 推導；cosine 版每寫一行，就讓對應的 sine 行亮一下（0.4s），只有差異處（cos↔sin、多出的負號）以實色顯示——同與不同一眼看完。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "should",
+          "where": "derivative_of_cosine beat 6（+32.5s→+39.4s），tile 08（+33.2s）",
+          "evidence": "最後一行 ⇒ −sin x · 1 = −sin x 與前面三行裡的所有負號都是與其他符號相同的白色；旁白此時正說「The leading minus sign comes along」。",
+          "problem": "整場的唯一差異就是那個負號，畫面卻沒有讓它突出過一次；這正是最容易被學生漏抄、漏記的地方。",
+          "proposal": "三行裡每個負號在其出現的當下閃一次琥珀色（0.3s）並保持琥珀；qed 行的負號額外放大 1.2 倍再回復，讓「多出來的那一個負號」成為畫面上最亮的東西。"
+        }
+      ]
+    },
+    {
+      "id": "slope_equals_height",
+      "verdict": "good",
+      "note": "全片最好的一場：35s 內 6 個 reveal，先畫 sin x，再依序在 0、π/2、π 三點放切線並標 m = 1、0、−1，最後疊上 cos x 並在同樣三點放點。畫面確實在教，不是在展示。",
+      "findings": [
+        {
+          "dim": "D-focus",
+          "severity": "should",
+          "where": "slope_equals_height beat 7（+24.1s→+34.4s），tile 08（+24.8s）與 tile 09（+29.3s）",
+          "evidence": "旁白說「read its heights at those same points: one, zero, minus one. They match exactly」，畫面上三個綠色 m 標籤與 cos 曲線上三個橘色點同時存在，但兩者之間沒有任何連線、也沒有同步強調；兩格取樣畫面相同。",
+          "problem": "「斜率＝高度」這個結論的證據是三組配對，畫面把兩邊都畫出來了，卻沒有把配對關係演出來，最後一步仍要觀眾自己在腦中連線。",
+          "proposal": "念到 one、zero、minus one 時，依序為每一組畫一條垂直虛線把 sin 上的切點接到 cos 上的對應點（各 0.4s），同時讓該組的 m 標籤與該點同步閃成同一顏色（0.3s）——三次配對做完，結論自然成立。"
+        },
+        {
+          "dim": "D-motion",
+          "severity": "nice",
+          "where": "slope_equals_height tile 04–06（+9.6s 至 +18.7s）",
+          "evidence": "三條切線分別在 +8.9s、+12.0s、+18.0s 以靜態線段淡入，切線本身從未移動。",
+          "problem": "三個取樣點已經足夠說明，但「斜率隨 x 連續變化」這層意思仍停在三個離散快照。",
+          "proposal": "三點講完後補一段 2.5s：讓一條切線沿 sin 曲線由 0 滑到 π，底下同步讓一個點在 cos 曲線上滑行，兩者的傾斜與高度即時對應——用一次滑行把三個快照串成一個定理。"
+        }
+      ]
+    },
+    {
+      "id": "derivative_cycle",
+      "verdict": "ok",
+      "note": "34.7s、3 個 reveal；內容本身很有魅力（四次回家、與 e^x 對照），畫面卻用最平的方式呈現。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "should",
+          "where": "derivative_cycle beat 3（+11.1s→+19.8s），tile 05（+15.5s）",
+          "evidence": "場名是 The Derivative Cycle、旁白說「Four derivatives and you are home」，畫面上是一行由左到右的直線箭頭鏈 sin x → cos x → −sin x → −cos x → sin x，末項只是把 sin x 再寫一次。",
+          "problem": "環狀結構被畫成直線，「回到原點」只能靠重複寫同一個符號來暗示；這是全片最容易用畫面一擊命中、卻沒有出手的教學點。",
+          "proposal": "改成四節點的圓環（12/3/6/9 點鐘擺 sin x、cos x、−sin x、−cos x）；旁白每念一項就沿圓弧畫出一段箭頭（各 0.6s），第四段箭頭接回 12 點鐘時讓起點的 sin x 放大閃一次——四次回家用畫面說完，再把 d⁴/dx⁴ sin x = sin x 寫在環心。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "nice",
+          "where": "derivative_cycle tile 05（+15.5s），旁白 beat 2「with a minus sign that turns over every second step」",
+          "evidence": "鏈上 −sin x 與 −cos x 的兩個負號與其他符號同色同大小，沒有任何標示。",
+          "problem": "「每兩步翻一次號」這個規律，畫面沒有給任何視覺節拍。",
+          "proposal": "兩個負號改用琥珀色，並在環（或鏈）的第 2、4 段箭頭上各放一個小小的「−」標記，讓翻號的節拍在圖上看得出來。"
+        }
+      ]
+    },
+    {
+      "id": "divider_apply",
+      "verdict": "ok",
+      "note": "stage 4，四張 divider 的進度點完整走完一輪，段落結構清楚。",
+      "findings": []
+    },
+    {
+      "id": "companion_limit",
+      "verdict": "ok",
+      "note": "41.7s、3 個 reveal，每行右側都有註解（multiply by 1+cos θ／1−cos²θ = sin²θ／THE LIMIT, THEN CONTINUITY），可跟得上。",
+      "findings": [
+        {
+          "dim": "D-motion",
+          "severity": "should",
+          "where": "companion_limit beat 2（+12.9s→+22.2s），tile 04（+13.6s）",
+          "evidence": "旁白說「Multiply top and bottom by the conjugate one plus cosine theta; the numerator becomes a difference of squares」，畫面在 +13.25s 一次淡入整條三段等式 (1−cosθ)/θ = (1−cosθ)(1+cosθ)/(θ(1+cosθ)) = (1−cos²θ)/(θ(1+cosθ))。",
+          "problem": "乘共軛與化成平方差是兩個動作，被壓成一次淡入的一長行；行又長又密，觀眾第一眼要先找到「新增的是哪一塊」。",
+          "proposal": "拆成兩拍：先讓兩份 (1+cosθ) 分別從右側飛入、一份貼到分子、一份貼到分母（0.8s，飛入時上色）；停 1s 後再讓分子用 0.6s 收成 1−cos²θ，右側註解同步寫上。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "nice",
+          "where": "companion_limit tile 01（+0.5s）對照 beat 1 尾段（+12.9s）",
+          "evidence": "SOLUTION 第一行「Bank a companion limit: (1−cosθ)/θ → 0.」在 +0.5s 就已寫在畫面上；旁白到 +12s 還在說「It is again zero over zero, so we need a way in」。",
+          "problem": "答案先寫在解答欄的第一行，接下來 12 秒的懸念（我們還沒有辦法）在畫面上是自相矛盾的。",
+          "proposal": "開場只留題目卡（Establish the companion limit…），這一行改到 result 出現後才寫上，並讓它與最後一行的 0 同時閃一次。"
+        }
+      ]
+    },
+    {
+      "id": "all_six_tan_sec",
+      "verdict": "ok",
+      "note": "35.5s、4 個 reveal、最長靜止 9.0s；兩個小題（tan、sec）節奏都穩，右側註解到位。",
+      "findings": [
+        {
+          "dim": "D-composition",
+          "severity": "should",
+          "where": "all_six_tan_sec tile 06（+23.4s）與 tile 08（+34.9s）",
+          "evidence": "第三行 d/dx sec x = … 直接接在 tan 的結論行下面，四行等距排列，中間沒有任何分隔；畫面下方約 40% 全空。",
+          "problem": "tan 與 sec 是兩個獨立的小題，畫面把它們排成一串連續推導，觀眾容易把第三行誤讀成第二行的下一步。",
+          "proposal": "在 sec 段出現前畫一條 0.6s 由左至右的細分隔線（或把 tan／sec 分成左右兩欄各自成組）；同時把整組內容下移並放大約 15%，用掉下方留白。"
+        }
+      ]
+    },
+    {
+      "id": "all_six_cot_csc",
+      "verdict": "ok",
+      "note": "與前一場完全平行（2/2 分頁、同樣的四行結構），延續性良好。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "should",
+          "where": "all_six_cot_csc beat 5（+25.5s→+37.3s），tile 08（+31.4s）",
+          "evidence": "旁白說「and all six are done, every one built on sine prime equals cosine and cosine prime equals negative sine」，而畫面（含最終幀 tile 09）只有 cot／csc 的四行推導，六個結果從未同時出現過；兩場的標題都叫 All Six Derivatives。",
+          "problem": "承諾了「六個」，畫面從頭到尾只給了分散在兩場裡的四個推導；觀眾得不到那張可以帶走的總表。",
+          "proposal": "beat 5 收尾時讓一個 2×3 表格從畫面下方升起（1.2s）：已推過的四個結果從各自的推導行飛到對應格（各 0.4s），sin′ = cos 與 cos′ = −sin 兩格直接淡入並用不同底色標成「這兩個是根」，全表停留到場末。"
+        }
+      ]
+    },
+    {
+      "id": "shm_compute",
+      "verdict": "weak",
+      "note": "35.1s、4 個 reveal；算式節奏其實不差，但一場宣稱在講運動的戲，畫面上沒有任何東西在動。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "should",
+          "where": "shm_compute beat 1（+1.0s→+4.2s）與全場，tile 02（+1.7s）／tile 08（+34.5s）",
+          "evidence": "旁白開場說「Let us put the new derivatives to work on something moving」，tile 02 畫面只有題目卡；全場最滿的一幀 tile 08 仍只是四行文字（s(t)=sin t／s′(t)=cos t／s″(t)=−sin t／s″=−s），沒有彈簧、沒有重物、沒有任何位移。",
+          "problem": "全片唯一的物理應用，被做成一張純文字解答卡。「每一刻都被推回平衡點」這個直覺完全沒有畫面，SHM 的意義只能靠想像。",
+          "proposal": "左側放一個簡單的彈簧＋方塊，整場以 s(t)=sin t 持續上下振盪（循環動畫）；講 velocity 時在方塊上長出速度箭頭（隨運動變長變短），講 acceleration 時長出反向的加速度箭頭，最後讓兩個箭頭同時顯示並在 s″=−s 那一行出現時，讓加速度箭頭閃一次並始終指回中線。"
+        },
+        {
+          "dim": "D-dwell",
+          "severity": "nice",
+          "where": "shm_compute beat 5（+18.6s→+34.1s），tile 06（+19.3s）／tile 07（+26.4s）／tile 08（+34.5s）",
+          "evidence": "result 行在 +18.75s 出現後畫面靜止 15.5s，三格取樣完全相同，而旁白在這段裡講了兩件事（−sin t 就是 −s(t)；s″=−s 是簡諧運動的特徵）。",
+          "problem": "一個 reveal 撐 15.5 秒的兩層意思，後半段畫面等於停格。",
+          "proposal": "把 beat 5 拆成兩個 reveal：先寫 s″(t) = −sin t = −s(t)，約 6s 後再讓右側的 SIMPLE HARMONIC MOTION 標籤與一行定義（s″ = −s）淡入並描邊。"
+        }
+      ]
+    },
+    {
+      "id": "shm_stacked_graphs",
+      "verdict": "ok",
+      "note": "三張圖依序堆疊、共用時間軸，是好構想；但 96% 靜止、最長靜止 23.8s，兩個最關鍵的動作都沒有做。",
+      "findings": [
+        {
+          "dim": "D-motion",
+          "severity": "should",
+          "where": "shm_stacked_graphs beat 5（+24.2s→+35.7s），tile 07（+24.9s）與 tile 08（+30.0s）",
+          "evidence": "旁白說「hold the bottom graph against the top: it is the top one flipped upside down」，畫面只多了兩條垂直虛線與一個小標籤 s″ = −s；三張曲線自 +12.25s 起就沒有再變過。",
+          "problem": "「上下翻轉後完全重合」是本場的結論，也是唯一需要動作才能成立的主張，畫面卻用一個靜態標籤代替。",
+          "proposal": "複製最上面的 height 曲線，讓副本以自己的水平軸為軸翻轉 180°（1.2s），再平移到最下面那張圖上（1s），完全貼合時整條線閃一次白並淡出，留下 s″ = −s 的標籤——三秒把結論演完。"
+        },
+        {
+          "dim": "D-focus",
+          "severity": "should",
+          "where": "shm_stacked_graphs beat 4（+11.9s→+24.2s），tile 06（+18.0s）對照 tile 07（+24.9s）",
+          "evidence": "旁白在 +18s 左右說「Watch where the height hits a peak or a trough -- there the velocity passes through zero」，tile 06 畫面上沒有任何對齊線；兩條垂直虛線要到 tile 07（+24.9s，下一個 beat 的 mirror reveal）才出現。",
+          "problem": "指引線比它要指的那句話晚了約 7 秒，出現時旁白已經在講別的事；等於觀眾被叫去「看」的當下沒有東西可看。",
+          "proposal": "把兩條虛線提前到 +14s，讓它們從 height 的峰與谷往下掃到底（各 0.5s），並在 velocity 曲線與虛線的交點上各放一個閃一次的點，之後虛線留著給 mirror 那一拍繼續用。"
+        }
+      ]
+    },
+    {
+      "id": "toward_the_chain_rule",
+      "verdict": "weak",
+      "note": "33.9s、2 個 reveal、最後 16.8s 完全靜止；而且兩個 reveal 的內容幾乎重複。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "should",
+          "where": "toward_the_chain_rule tile 01（+0.5s）與 tile 05（+16.9s）",
+          "evidence": "句子「We can differentiate sin x — but not yet sin(x²) or sin(3x+1).」在 +0.5s 就已在畫面上；+16.25s 的 math.0 reveal 只是把同樣三個式子改寫成一行 sin x ✓　sin(x²)?　sin(3x+1)?。旁白此時說的是「where the angle is itself a function tucked inside」。",
+          "problem": "唯一的教學點是「角度本身是一個被塞在裡面的函數」，畫面卻只把同一句話換一種排版再說一次，嵌套關係從未被畫出來。",
+          "proposal": "把 sin(x²) 的 x² 用色框框住並拉出來，讓畫面同時出現 sin(□) 與 □ = x²（1.2s）；停 1s 後把 □ 換成 3x+1 做第二個例子（0.8s）。✓／? 標記留到最後一拍再貼上，讓它變成結論而不是重複。"
+        },
+        {
+          "dim": "D-dwell",
+          "severity": "nice",
+          "where": "toward_the_chain_rule beat 3（+16.2s→+33.0s），tile 06（+24.6s）與 tile 07（+33.3s）",
+          "evidence": "兩格取樣畫面完全相同，最長靜止 16.8s，期間旁白講了 45 個字（需要新規則、那就是 chain rule、今天的每個導數都會變成一整族的種子）。",
+          "problem": "全片最後一個教學場以近 17 秒的停格結束，收尾的能量掉下來。",
+          "proposal": "為 beat 3 補一個 reveal：畫一個空的 d/dx[ f(g(x)) ] = ? 佔位框（0.8s 描邊寫入），旁白說到 that is the chain rule 時讓框閃一次並打上 §3.2 的指標，把懸念交給下一節。"
+        }
+      ]
+    },
+    {
+      "id": "recap",
+      "verdict": "good",
+      "note": "四個編號要點各配一拍（最長靜止 8.8s），是文字型場次裡分拍最好的一場，結構與旁白完全對齊。",
+      "findings": [
+        {
+          "dim": "D-carry",
+          "severity": "nice",
+          "where": "recap tile 09（+36.0s）",
+          "evidence": "四點文字集中在畫面左側約 55%，右側約 45% 全程空白；四點分別對應到片中四張已經畫過的圖（單位圓三區域、sin/cos 斜率圖、六個導數、四步循環），但都只有文字。",
+          "problem": "回顧本來就該喚回視覺記憶，現在只喚回文字；觀眾帶走的是四句話，而不是四張圖。",
+          "proposal": "每一點淡入時，右側同步淡入對應的微縮圖（各 0.5s）：①單位圓三個彩色區域、②sin 曲線＋三條切線、③六個導數的 2×3 小表、④四節點的環；新圖進場時把前一張縮到 60% 往上堆疊，場末四張同時在畫面上。"
+        }
+      ]
+    },
+    {
+      "id": "outro",
+      "verdict": "good",
+      "note": "7s 內 logo → END OF SECTION 3.1 → 標題 → Next §3.2 The Chain Rule 四段分拍進場（67% 靜止，全片最低），收尾乾淨且明確指向下一節。",
+      "findings": []
+    }
+  ]
+}

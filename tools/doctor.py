@@ -214,6 +214,27 @@ def check_codex() -> None:
                r"把 tools\codex.cmd 複製進任一已在持久 PATH 的目錄（如 %APPDATA%\npm）")
 
 
+# ── ⑤c agy（Antigravity CLI；多模型唯讀評審；選用）─────────────────────────
+
+def check_agy() -> None:
+    """agy 本體固定在 %LOCALAPPDATA%\\agy\\bin\\agy.exe、不進 PATH（`agy install` 會改 shell 設定，
+    不用）；shim tools/agy.cmd 比照 codex。缺它不擋核心產線（只影響多鏡評審拉模型家族），WARN 不 FAIL。"""
+    exe = Path(os.path.expandvars(r"%LOCALAPPDATA%\agy\bin\agy.exe"))
+    ver = ""
+    if exe.exists():
+        rc, out = _run([str(exe), "--version"])
+        ver = out.splitlines()[0].strip() if (rc == 0 and out) else ""
+    onpath = shutil.which("agy")
+    if onpath:
+        record(PASS, "agy", "agy 在 PATH（多模型唯讀評審可用）", f"{ver or '?'}  ←{onpath}")
+    elif exe.exists():
+        record(WARN, "agy", f"agy 已裝（{ver or '?'}）但不在 PATH",
+               r'部署 shim：copy tools\agy.cmd "%APPDATA%\npm\agy.cmd"（或跑 tools\setup.ps1）')
+    else:
+        record(WARN, "agy", "agy 未安裝（選用，多模型唯讀評審才需要）",
+               r"由 Antigravity IDE 安裝 CLI（落在 %LOCALAPPDATA%\agy\bin），再部署 tools\agy.cmd；見 ENVIRONMENT.md ⑤c")
+
+
 # ── ⑤b Vale prose linter（去 AI 味 lint 引擎；PLAN-deai-flavor；選用、flag-only）──
 
 def check_vale() -> None:
@@ -544,6 +565,7 @@ def main() -> int:
     check_latex()
     check_node_and_chrome()
     check_codex()
+    check_agy()
     check_vale()
     check_forced_alignment()
     check_assets()

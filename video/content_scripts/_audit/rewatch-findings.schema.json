@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "REWATCH lens output (see REWATCH-REVIEW-RUBRIC.md)",
+  "type": "object",
+  "required": ["lens", "film", "scenes"],
+  "additionalProperties": false,
+  "properties": {
+    "lens": {"type": "string"},
+    "film": {
+      "type": "object",
+      "required": ["overall", "patterns", "strongest_scenes", "weakest_scenes"],
+      "additionalProperties": false,
+      "properties": {
+        "overall": {"type": "string"},
+        "patterns": {"type": "array", "items": {"type": "string"}},
+        "strongest_scenes": {"type": "array", "items": {"type": "string"}},
+        "weakest_scenes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "verdict", "findings"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string"},
+          "verdict": {"type": "string", "enum": ["good", "ok", "weak", "bad"]},
+          "note": {"type": "string"},
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["dim", "severity", "where", "evidence", "problem", "proposal"],
+              "additionalProperties": false,
+              "properties": {
+                "dim": {"type": "string"},
+                "severity": {"type": "string", "enum": ["must", "should", "nice"]},
+                "where": {"type": "string"},
+                "evidence": {"type": "string"},
+                "problem": {"type": "string"},
+                "proposal": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

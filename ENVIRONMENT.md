@@ -34,6 +34,7 @@ deck 閘失敗也算 `[FAIL]`——工具鏈綠不等於產線綠（2026-08-10 �
 | **①b 影片字型** | **全走 LaTeX**：文字 IBM Plex Sans/Mono、數學 Latin Modern（套件見 ③）。**不再用 Pango 系統字型**（Times/Courier 已棄） | 無需安裝系統字型；只要 ③ 的 MiKTeX 套件在即可（`doctor.py` 以 kpsewhich 驗）。video 不 vendored 任何字型 |
 | **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/figkit/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
+| **⑤c agy（Antigravity CLI，多模型唯讀評審，選用）** | 看片多鏡評審等要拉開模型家族（Gemini／Claude 4.6）的唯讀評審；走 Antigravity 訂閱 | 本體隨 Antigravity IDE 裝在 `%LOCALAPPDATA%\agy\bin\`（安裝程式通常已加進使用者 PATH）；找不到時部署版控 shim [`tools/agy.cmd`](tools/agy.cmd)；見下方 ⑤c |
 | **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](authoring/_archive/deai/PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
 | **⑤c forced alignment（narrated 成片正式依賴）** | scene-level TTS 的計時源＝[`video/pipeline/scene_align.py`](video/pipeline/scene_align.py) 的 `stable-ts`（transcript-constrained，**計時來源**）＋`whisper_timestamped`（自由 ASR，**QA 探針**）。`--unit auto` 全 content template 走此路。（`experiments/forced_alignment_dean/`＝歷史起源、非現役。） | 每台全局安裝一次：`python -m pip install --upgrade whisper-timestamped stable-ts`；第一次跑 `base.en` 下載 model cache。**mock 迭代不需要**（缺它 `doctor.py` 只 WARN），但**產 narrated 真旁白成片時必需** |
 | **祕鑰** | `MIMO_API_KEY` / `GEMINI_API_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` | per-machine 設環境變數；**不進版控**（計費 API，依 [`CLAUDE.md`](CLAUDE.md) 徵同意） |
@@ -174,6 +175,20 @@ copy tools\codex.cmd "%APPDATA%\npm\codex.cmd"
 - 兩台機器這條指令**一模一樣**（`%APPDATA%`／`%LOCALAPPDATA%` 都按使用者展開），所以**不必管實際路徑差異**。
 - codex 本體走它自己的安裝／自更新管道（自更新到 `%LOCALAPPDATA%\OpenAI\Codex\bin`）；shim 只負責「找得到 ＋ 找最新」。
 - 換機後 `python tools\doctor.py` 會判定 codex 是「在 PATH／裝了但沒部署 shim／沒裝」哪一種，並給對應補法。
+
+### ⑤c agy — Antigravity CLI（多模型唯讀評審，選用）
+
+Antigravity IDE 附的 CLI，本體固定在 `%LOCALAPPDATA%\agy\bin\agy.exe`。安裝程式通常已把該目錄加進**使用者 PATH**（本機 2026-09-12 驗證：`which agy` 找得到、`doctor` 判「在 PATH」）；若換機後找不到，**不要**跑 `agy install`（它會改 shell 設定），比照 codex 部署版控 shim：
+
+```powershell
+# 只在 agy 不在 PATH 時需要；tools\setup.ps1 會自動判斷並做這步。
+copy tools\agy.cmd "%APPDATA%\npm\agy.cmd"
+```
+
+- 它會**自我更新**（binary 隨時換版；2026-09-12 一天內 1.1.27→1.2.2），與 codex 同性質——不要寫死版本。
+- 登入沿用 Antigravity IDE 的帳號（同一機器共用）；`agy models` 列出帳號可用模型（2026-09-12：Gemini 3.8／3.7／3.6 Flash 三檔、Gemini 3.1 Pro 兩檔、Claude Sonnet 4.6、Claude Opus 4.6 Thinking、GPT-OSS 120B）。
+- 呼叫紀律與已驗證的 headless 旗標（唯讀 `--mode plan`、逐次徵同意、隔離工作區、`--json-schema`）在根 `CLAUDE.md`「付費 API」節；首用＝[`video/content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md`](video/content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)。
+- `python tools\doctor.py` 判定 agy 是「在 PATH／裝了但沒部署 shim／沒裝」（WARN 不 FAIL，缺它不擋產線）。
 
 ### ⑤b Vale — 去 AI 味散文 lint（選用、flag-only）
 

@@ -35,6 +35,7 @@ video/
     provenance.py      OTF 確定性層：`md:`／`doc:` ref 解析（doc 錨池＝凍結 legacy standalone ∪ `.tex` label key）
     source_rev.py      內容稿↔講義源 freshness stamp（LOCKED 稿標頭 `source_rev`；drift 只 WARN＝§8 觸發器）
     run_selftests.py   從任一 cwd 跑全部 `_selftest_*.py`（統一 `-m pipeline.<name>`），任一紅即非零 exit
+    rewatch_pack.py    看片評審輸入：成片 → 逐場 contact sheet（每格標時間＋此刻旁白）＋時間軸 md＋靜止統計（REWATCH 多鏡評審共用；離線）
     _selftest_*.py     各模組離線自測（平鋪 assert、無 pytest；`_selftest_capacity.py`＝容量契約回歸網）
     critic.py          render 後視覺 gate2：抽幀 → MiMo-V2.5 依 VISUAL-FRAME 判定（外部 API、公測免費）
     review_pack.py     工程鏡 packet 組裝（gate1 Claude／gate2 Codex 讀；離線、無 API）
@@ -170,6 +171,8 @@ python tools\doctor.py --smoke                                # 環境健檢＋�
 ```
 
 > 為何兩支都要：doctor 原本只驗工具鏈，2026-08-10 佈局重構後正典 deck 過不了自己的 provenance 閘、一個 selftest 同因變紅，doctor 卻仍報影片線 ✅（[`_audit/REVIEW-pipeline-assessment-2026-09-07.html`](_audit/REVIEW-pipeline-assessment-2026-09-07.html) F1／F4）。`--smoke` 抓 deck 級閘、runner 抓模組級回歸；兩者都綠才算「產線綠」。
+
+**看片評審（REWATCH，2026-09-12 試行、尚未常設）**——render 後、以觀眾的方式審成片品質（時間、停留、畫面有沒有動、跟不跟得上）：`python video/pipeline/rewatch_pack.py --deck <deck>` 先把成片翻成模型讀得了的 pack（`output/<ch>/<sec>/rewatch_pack/`），再依 [`content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md) 派五鏡（初學者×2／動畫導演／教學設計／節奏剪輯／講師，跨 Gemini／Claude 模型家族，agy＋subagent）獨立盲審，合成為 standalone HTML 供裁決。advisory、永不 blocking。
 
 **解析度慣例**：測試／預覽用 1080p（`make.py --quality high`，預設），正式交付才 4K（`--quality 4k`，依 `meta.video`，未設預設 4K60）。版面與解析度無關，1080p 測試與 4K master 構圖逐像素相同。（agent 預設一律 1080p、除非使用者要求，見根 [`CLAUDE.md`](../CLAUDE.md)；§3.1 真 4K final 另議見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)。）
 

@@ -1,0 +1,212 @@
+{
+ "film": {
+  "overall": "本節微積分教學在核心架構上非常高明，採用「和差化積」公式避開了傳統教材以加法定理推導正弦導數時對兩個極限的繁瑣依賴，使得整個主線邏輯極度緊湊。全片對初學者經典迷思（如極限當恆等式、0處可否直接代入、弧度制必要性、餘函數負號規律）的預防與打擊尤為出色，Scene 11 的空心點標示、Scene 12 的反例破除以及 Scene 17 斜率與高度的幾何動態對照皆屬頂級教學示範。整體而言僅有三處教學節奏需要微調：Scene 06 開場幾何直觀尚未建立便過早陷入代數對稱性檢驗、Scene 13 在正式求導前過早給出含度數係數的求導公式，以及 Scene 20 推導伴隨極限後未在後續架構中獲得教學呼應與定位。整體教學水準極高，瑕不掩瑜。",
+  "patterns": [
+   "重整幾何夾擠時序，先直觀後代數：Scene 06 開場應直接以第一象限三塊圖形的面積包含關係（內接三角形 <= 扇形 <= 外切三角形）切入，不要在學生尚未看見區域前先花 38 秒講負角奇偶性對稱檢驗；負角論證留到建立好正角夾擠或 Scene 10 雙邊極限再補齊。",
+   "避免度數求導公式早洩：Scene 13 說明弧度必要性時，應聚焦於極限值 lim (sin x°)/x = pi/180 != 1 與弧長公式依賴弧度；不要在尚未正式推導 sin' = cos 之前就提前丟出 d/dx sin(x°) = (pi/180) cos(x°)，避免分散焦點並削弱後續推導的核心體驗。",
+   "為伴隨極限補充教學動機與幾何定位：Scene 20 推導 lim (1-cos theta)/theta = 0 之後完全未在後續章節使用，成了孤立懸案；應補充說明「若使用傳統加法定理推導正弦導數則非它不可」的教學背景，或點出其幾何意義即為「餘弦在 0 處切線斜率為 0」，讓學生明白為何此時要學它。"
+  ],
+  "strongest_scenes": [
+   "11_squeeze_graph",
+   "12_limit_not_identity",
+   "17_slope_equals_height"
+  ],
+  "weakest_scenes": [
+   "06_sector_inequality",
+   "13_radians_essential",
+   "20_companion_limit"
+  ]
+ },
+ "lens": "R5",
+ "scenes": [
+  {
+   "findings": [],
+   "id": "01_intro",
+   "note": "開場節奏俐落，無多餘廢話。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "02_divider_limit",
+   "note": "清楚標定第一階段任務：求出基礎三角極限。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "03_why_trig_is_different",
+   "note": "很好地強調了代數技巧（因式分解、有理化）在三角函數失效的痛點，自然帶出幾何求極限的必要性。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "04_difference_quotient_for_sine",
+   "note": "採用和差化積公式將差商化為單一乘積 cos(x+h/2) * (sin(h/2)/(h/2))，大幅精簡求導依賴的極限個數。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "05_divider_squeeze",
+   "note": "轉折明確，進入夾擠定理的幾何構造階段。",
+   "verdict": "good"
+  },
+  {
+   "findings": [
+    {
+     "dim": "I-timing",
+     "evidence": "旁白在幾何圖形尚未標註三個區域時，先花了近 30 秒說明負角對稱性：'We only need positive theta: flipping the sign of theta flips the signs of both sine theta and theta...'，畫面停滯在靜態圓圖形長達 38 秒。",
+     "problem": "教學時序倒置。初學者尚未看見三塊面積的包含關係（內接三角形 <= 扇形 <= 外切三角形），過早插入代數對稱性檢驗會分散直觀注意力，且負角極限在 Scene 10 本就會透過奇偶性收尾。",
+     "proposal": "將 beat 1 的負角對稱性說明移至夾擠不等式建立之後（或留到 Scene 10），開場直接引導學生觀察第一象限內三塊圖形的幾何面積大小關係，讓幾何直觀第一時間建立。",
+     "severity": "should",
+     "where": "tile 02-03, +1.0s to +38.6s (beat 1)"
+    }
+   ],
+   "id": "06_sector_inequality",
+   "note": "幾何面積包含關係很直觀，但開場對稱性鋪陳略顯冗長與停滯。",
+   "verdict": "ok"
+  },
+  {
+   "findings": [],
+   "id": "07_squeeze_to_the_bound",
+   "note": "不等式取倒數變號與除以正數的說明非常嚴謹且到位，成功阻斷學生常見的符號錯誤。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "08_continuity_statement_sin_limit",
+   "note": "以弦長小於弧長直觀夾出 sin(theta) -> 0，並點出連續性在後續求導代入極限的關鍵地位。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "09_continuity_argument",
+   "note": "利用和差化積與 |sin u| <= |u| 嚴密證明正餘弦的連續性，為後續代入差商極限奠定扎實基礎。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "10_fundamental_limit",
+   "note": "左右極限與夾擠定理收尾完整，雙邊極限論證無懈可擊。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "11_squeeze_graph",
+   "note": "圖形上特意標出 (0, 1) 的空心點（open circle），及時阻斷學生誤以為 sin(0)/0 = 1 可以在 0 直接代入的經典迷思，教學示範極佳。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "12_limit_not_identity",
+   "note": "精準打擊初學者最容易犯的「把極限當成恆等式」迷思，代入 pi/2 與 pi 舉反例極具說服力。",
+   "verdict": "good"
+  },
+  {
+   "findings": [
+    {
+     "dim": "I-timing",
+     "evidence": "旁白在尚未正式推導 sin 導函數之前，直接給出度數求導公式：'the derivative of sine of x degrees would be pi over 180 times cosine of x degrees, and sine prime equals cosine, cosine prime equals negative sine would break.'",
+     "problem": "公式提早洩漏（Premature reveal）。學生在 Scene 14/15 才要正式進入導函數推導，在此處提前拋出含 pi/180 係數的度數求導公式，增加了不必要的認知負荷，也削弱了 Scene 15 正式推導出 sin' = cos 的教學張力。",
+     "proposal": "Scene 13 應聚焦於度數極限 lim (sin x°)/x = pi/180 != 1 與弧長公式依賴弧度；將度數求導公式 d/dx sin(x°) = (pi/180) cos(x°) 移至 Scene 15 或 Scene 26 總結時作為延伸對比。",
+     "severity": "should",
+     "where": "tile 03-04, +11.4s to +38.6s (beat 2)"
+    }
+   ],
+   "id": "13_radians_essential",
+   "note": "清楚說明弧度制的不可替代性，但公式出現時機稍嫌超前。",
+   "verdict": "ok"
+  },
+  {
+   "findings": [],
+   "id": "14_divider_derivatives",
+   "note": "清楚宣示進入核心求導階段。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "15_derivative_of_sine",
+   "note": "前後呼應極佳，將 Scene 04 的差商、Scene 09 的連續性與 Scene 10 的基礎極限無縫接軌，乾淨俐落完成 sin' = cos 的推導。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "16_derivative_of_cosine",
+   "note": "對稱推導 cos' = -sin，特別強調負號來源，與正弦求導形成完美對照。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "17_slope_equals_height",
+   "note": "將切線斜率動態對應到餘弦函數高度，在 0、pi/2、pi 的關鍵點逐一核對，是微積分幾何教學的教科書級示範。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "18_derivative_cycle",
+   "note": "將四階週期循環與指數函數 e^x 的一階自守對比，並自然鋪陳簡諧運動（SHM）的二階微分方程，視角開闊。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "19_divider_apply",
+   "note": "清楚引導觀眾進入第四階段：推廣至其餘四個三角函數與物理應用。",
+   "verdict": "good"
+  },
+  {
+   "findings": [
+    {
+     "dim": "I-emphasis",
+     "evidence": "影片在進入 Stage 4 後突然插入伴隨極限推導：'Before leaving the trigonometric limits behind, bank one more companion limit...'，但全片後續（Scene 21-26）完全沒有任何地方使用到該極限。",
+     "problem": "孤立知識點缺少教學動機與定位。本片前面採用和差化積巧妙避開了加法定理對 (1-cos theta)/theta 的依賴，使得該極限在此處淪為無後續引用的孤兒公式，學生難以理解為何此時要特地計算它。",
+     "proposal": "補強該極限的教學動機與幾何意涵：(1) 明確說明若使用傳統加法定理證明 sin' = cos 則必須用到此極限；(2) 點出其幾何意涵即為 cos 在 0 處的導數為 0（水平切線）；或將其移至 Stage 1/2 與 sin(theta)/theta 一併處理。",
+     "severity": "should",
+     "where": "tile 01-08, +1.0s to +54.5s"
+    }
+   ],
+   "id": "20_companion_limit",
+   "note": "推導本身嚴密，但與前後文脈絡脫節，缺乏教學動機說明。",
+   "verdict": "weak"
+  },
+  {
+   "findings": [],
+   "id": "21_all_six_tan_sec",
+   "note": "利用商法則嚴謹推導 tan x 與 sec x 的導函數，代數化簡層次分明。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "22_all_six_cot_csc",
+   "note": "特別強調所有「餘函數（co-functions）」求導必帶負號的規律，有效預防學生在符號上的經典失誤。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "23_shm_compute",
+   "note": "將二階導數緊密結合簡諧運動與虎克定律，物理意義明確，計算俐落。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "24_shm_stacked_graphs",
+   "note": "三圖疊置的幾何可視化非常精彩，將極值點速度為零與加速度為負位移的物理直觀展現得淋漓盡致。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "25_toward_the_chain_rule",
+   "note": "精準界定本節知識邊界，透過 sin(x^2) 與 sin(3x+1) 有效阻斷學生胡亂推廣公式的迷思，並為下一節連鎖律埋下漂亮伏筆。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "26_recap",
+   "note": "四點總結提綱挈領，脈絡清晰，邏輯閉環。",
+   "verdict": "good"
+  },
+  {
+   "findings": [],
+   "id": "27_outro",
+   "note": "收尾俐落。",
+   "verdict": "good"
+  }
+ ]
+}

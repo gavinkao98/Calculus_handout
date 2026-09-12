@@ -1,0 +1,292 @@
+{
+  "lens": "R4 節奏剪輯",
+  "film": {
+    "overall": "全片節奏分布相對均衡，但存在多個嚴重的 T-dwell 與 T-still 問題。幾何推導的關鍵介紹段落（場 03、06、08）長期缺乏視覺支撑，會讓初學者在最需要視覺引導的地方陷入困頓。平均每 reveal 間隔 4.0–6.5 秒，整體節奏快速，但不均勻——建立概念的長段落常在視覺上『靜止』，而應用段落則有充足的視覺變化。",
+    "patterns": [
+      "承重的設定與介紹段落（beat 1 常無 reveal）往往長達 6–37 秒，導致最長靜止時間與段落長度對應，反映了旁白的信息密度不被視覺節奏追蹤",
+      "Reveals 的分布不均：前 9 個場景中，有 5 個首個 reveal 出現在 +18s 或更晚，而後 18 個場景中絕大多數在 +6s 以內出現",
+      "超過 20 秒的靜止段落（場 06、08、24）都對應於承重的數學論述或關鍵概念（幾何比較、連續性、堆疊圖表），而非閑散內容",
+      "短場景（6s 分隔符）與中等場景（35–40s）的比例接近，長場景（65–75s）共 4 個，均勻分佈在結構的關鍵節點"
+    ],
+    "strongest_scenes": [
+      "09_continuity_argument — 所有 5 個 beats 都有對應的 reveal，首個 reveal 在 +1.0s，最長靜止僅 16.2s。複雜的連續性證明靠密集的視覺跟蹤達到清晰",
+      "26_recap — 4 個 reveals 均勻分佈（+3.1s、+10.8s、+19.8s、+27.3s），最長靜止 8.8s，節奏緊湊且不重複"
+    ],
+    "weakest_scenes": [
+      "06_sector_inequality — Beat 1 長 37.6 秒、117 字無 reveal，建立單位圓上三角形與扇形的幾何背景；最長靜止 38.2 秒；初學者需要視覺支撑此時最缺",
+      "08_continuity_statement — Beat 1 長 26.7 秒、83 字無 reveal，建立連續性的直觀概念；最長靜止 27.2 秒",
+      "03_why_trig_is_different — Beat 1 長 17.6 秒無 reveal，解釋為何三角函數不同；有未綁定 reveal 的多餘動作（+48.8s），顯示時間軸錯位"
+    ]
+  },
+  "scenes": [
+    {
+      "id": "01_intro",
+      "verdict": "good",
+      "findings": []
+    },
+    {
+      "id": "02_divider_limit",
+      "verdict": "good",
+      "findings": []
+    },
+    {
+      "id": "03_why_trig_is_different",
+      "verdict": "weak",
+      "findings": [
+        {
+          "dim": "T-dwell",
+          "severity": "must",
+          "where": "beat 1（+1.0s 至 +18.6s）",
+          "evidence": "17.6 秒長的段落念出 52 字（3.0 字/秒），解釋多項式、e^x、三角函數的差異。首個 reveal 直到 +18.6s 才出現，留下 17.6 秒的無視覺支撑。幀樣本顯示 beat 1 末尾的旁白『refuse to play along』時仍無畫面變化。",
+          "problem": "承重的概念對比（為什麼三角函數問題不同）缺乏視覺錨點。初學者必須靠純旁白理解三種函數的差異，認知負荷過重。",
+          "proposal": "在 beat 1 中分段加入視覺：(1) +1s 引入時，簡短標示『polynomial』，(2) +6s 處顯示二項式展開的簡略動畫，(3) +11s 處並排對比「有明顯因子可消」vs「無法消」，(4) +17s 處預告『新工具：幾何』。將 17.6s 段落拆成 3–4 個視覺里程碑，每隔 4–5s 一個 reveal，總計增加 3–4 個小 reveal。"
+        },
+        {
+          "dim": "T-beat",
+          "severity": "nice",
+          "where": "beat 4（+48.8s 至 +66.1s）",
+          "evidence": "Motion change event at +48.8s 不綁定任何 reveal（『NOT tied to a reveal』），表示存在未預期的動畫或編輯變化。",
+          "problem": "時間軸對齐問題，導致動作與旁白的關聯不清。",
+          "proposal": "檢查 +48.8s 的動畫觸發點，確認其是否應綁定到 beat 4 開始或應刪除。若是誤觸發，移除；若為關鍵轉場，納入 reveal。"
+        }
+      ]
+    },
+    {
+      "id": "04_difference_quotient_for_sine",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-beat",
+          "severity": "should",
+          "where": "beat 4（+32.9s 至 +53.7s，20.9 秒）與 beat 5（+53.7s 至 +74.0s，20.2 秒）",
+          "evidence": "兩個長段落分別有 reveal，但每段都超過 20s 且內部無新 reveal。Beat 4 從 h 的代換、分母整理、一直到最後形式，無中間停頓；beat 5 講述極限的因式分解及其重要性，同樣無中間視覺里程碑。",
+          "problem": "複雜的代數推導（sum-to-product 恆等式→重新組織分式→認出極限形式）跨越 40 秒，即使有 reveals 也缺乏中間視覺確認。初學者難以跟蹤每一步的邏輯。",
+          "proposal": "在 beat 4 和 beat 5 中各增加一個中段 reveal：(1) beat 4 在 +42s 附近突出『h/2 在分子與分母同時出現』的關鍵對齐步驟，(2) beat 5 在 +63s 附近標記『這正是 sinθ/θ』的認出時刻。預計各增加 1–2 個細粒度 reveal。"
+        }
+      ]
+    },
+    {
+      "id": "05_divider_squeeze",
+      "verdict": "good",
+      "findings": []
+    },
+    {
+      "id": "06_sector_inequality",
+      "verdict": "bad",
+      "findings": [
+        {
+          "dim": "T-dwell + T-still",
+          "severity": "must",
+          "where": "beat 1（+1.0s 至 +38.6s，37.6 秒）",
+          "evidence": "首個 beat 長達 37.6 秒，講述 117 字（3.1 字/秒）的幾何設定：單位圓、三個區域（內三角形、扇形、外三角形）、為何只需考慮正角。直到 +38.6s 才出現首個 reveal（tri_inner）。最長靜止時間 38.2 秒幾乎完全涵蓋此段。幀樣本顯示 beat 1 中段（+19.8s）『hold for negative ones』、末尾（+39.3s）『triangle O A B』時的靜默。",
+          "problem": "這是全片最關鍵的幾何直覺段落——説明為何要比較三個區域、三個區域的定義、它們的相對位置關係。缺乏任何視覺支撑，初學者無法同步構建幾何圖像，必然跟丟。",
+          "proposal": "將 beat 1 分為 4–5 個視覺段落，每個長 8–9 秒、伴隨漸進的視覺搭建：(1) +1s，引入單位圓、標記原點 O 與點 A，(2) +9s，出現角 θ、點 B，說明『我們只看正角』，(3) +18s，加入點 C 與切線，三個點就位，(4) +28s，突出內三角形 OAB，顯示『面積 = ½sinθ』，(5) +34s，疊加扇形與外三角形，展示三重嵌套。每段新增一個 reveal，預計增加 4–5 個 reveal，細粒度 6–10s。"
+        }
+      ]
+    },
+    {
+      "id": "07_squeeze_to_the_bound",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-still",
+          "severity": "should",
+          "where": "beat 4（+25.9s 至 +42.4s，16.4 秒）",
+          "evidence": "長段落講述倒數與不等號反向的代數步驟（『take reciprocals... flipping positives reverses the inequalities』）。Reveal 在 +25.9s，之後無新 reveal 直到 beat 5（+42.4s）。最長靜止 15.5 秒涵蓋此段大部。",
+          "problem": "代數轉換複雜，跨越『倒數』『不等號方向』兩個易混淆的操作。靜止段落使初學者難以逐步驗證每一步。",
+          "proposal": "在 beat 4 中段（約 +34s）加入一個中段 reveal，重點標示『取倒數後不等號反向』的關鍵轉折，配合不等式的視覺翻轉（例如符號顏色變化或箭頭方向改變）。預計增加 1 個 reveal。"
+        }
+      ]
+    },
+    {
+      "id": "08_continuity_statement_sin_limit",
+      "verdict": "weak",
+      "findings": [
+        {
+          "dim": "T-dwell + T-still",
+          "severity": "must",
+          "where": "beat 1（+1.0s 至 +27.7s，26.7 秒）",
+          "evidence": "首個 beat 長 26.7 秒、83 字（3.1 字/秒），建立連續性的直觀定義：『nudge the angle a little, and sine and cosine move only a little』，並導出幾何邊界『|sinθ| ≤ |θ|』。直到 +27.7s 才出現首個 reveal（statement）。最長靜止 27.2 秒。幀樣本顯示 beat 1 開始（+1.7s）『little bound』、中段（+14.4s）『tool that says so』、末尾（+28.4s）『made precise』時無畫面變化。",
+          "problem": "連續性是微積分的基礎概念，但此段採用純文字敍述幾何直覺（半弦總短於弧）。無動畫或圖示示意，初學者難以視覺化『nudge』與『move only a little』的含義。",
+          "proposal": "在 beat 1 中加入 2–3 個漸進的視覺介入：(1) +1s，標示單位圓上的一點與相應的角；(2) +10s，動畫展示『nudge θ』（θ 稍微變化），同時突出對應的 sinθ 與 cosθ 值也只有小變化；(3) +20s，側邊並列半弦與弧，動畫強調『|sinθ| ≤ |θ|』的幾何關係。預計增加 2–3 個 reveal，每段 8–10s。"
+        }
+      ]
+    },
+    {
+      "id": "09_continuity_argument",
+      "verdict": "good",
+      "findings": []
+    },
+    {
+      "id": "10_fundamental_limit",
+      "verdict": "ok",
+      "findings": []
+    },
+    {
+      "id": "11_squeeze_graph",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-beat",
+          "severity": "nice",
+          "where": "change events at +3.2s 與 +9.5s",
+          "evidence": "兩個 motion change events 不綁定 reveal。+3.2s 與 +9.5s 在 beat 1～beat 2、beat 2～beat 3 的邊界附近，可能是轉場的多餘動作。",
+          "problem": "未預期的動作可能造成視覺噪音，分散學生的注意力。",
+          "proposal": "檢查 +3.2s 與 +9.5s 的動畫內容：若為無關動作，刪除；若為必要轉場，明確綁定到相鄰 beat 的開始或結束。"
+        }
+      ]
+    },
+    {
+      "id": "12_limit_not_identity",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-still",
+          "severity": "should",
+          "where": "beat 2（+4.9s 至 +22.9s，17.9 秒）",
+          "evidence": "長段落講述『極限不是恆等式』：在 θ=π/2 時比值為 2/π≈0.64，θ=π 時為 0。Reveal 在 +4.9s，之後無新 reveal。最長靜止 18.0 秒。",
+          "problem": "具體的反例（不同角度下的數值）缺乏視覺對應，初學者不清楚『比值變化』的直觀樣貌。",
+          "proposal": "在 beat 2 中加入一個動態圖表：(1) 原點標示θ=0 附近，顯示 sinθ/θ→1；(2) 動畫移至 θ=π/2，標示值為 2/π；(3) 進一步移至 θ=π，顯示值為 0。預計增加 1–2 個中段 reveal。"
+        }
+      ]
+    },
+    {
+      "id": "13_radians_essential",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-still",
+          "severity": "should",
+          "where": "beat 2（+4.2s 至 +25.1s，20.9 秒）",
+          "evidence": "長段落解釋弧度的必要性：扇形面積 ½θ 使用弧度，轉換為角度則極限變為 π/180。Reveal 在 +4.2s，之後無新 reveal。最長靜止 21.0 秒。",
+          "problem": "『弧度 vs 角度』的對比是抽象的，純旁白難以傳達公式如何變化。初學者可能記住結論但不理解原因。",
+          "proposal": "在 beat 2 中段（約 +13s）加入一個對比動畫：左側顯示弧度版『limit = 1』，右側顯示角度版『limit = π/180』，動態推導展示面積公式在兩個單位下的差異。預計增加 1 個中段 reveal。"
+        }
+      ]
+    },
+    {
+      "id": "14_divider_derivatives",
+      "verdict": "good",
+      "findings": []
+    },
+    {
+      "id": "15_derivative_of_sine",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-beat",
+          "severity": "nice",
+          "where": "change event at +4.5s",
+          "evidence": "Motion change at +4.5s 不綁定 reveal。此時對應 beat 1 末尾到 beat 2 reveal 的轉場。",
+          "problem": "未預期的動作可能造成編輯感知錯位。",
+          "proposal": "確認 +4.5s 的動作是否應綁定到 beat 2 開始（sin(x) 的公式出現）或應刪除。"
+        }
+      ]
+    },
+    {
+      "id": "16_derivative_of_cosine",
+      "verdict": "ok",
+      "findings": []
+    },
+    {
+      "id": "17_slope_equals_height",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-beat",
+          "severity": "nice",
+          "where": "change event at +21.2s",
+          "evidence": "Motion change at +21.2s 不綁定 reveal。此時在 beat 4 中段，講述『導數等於高度』的視覺驗證。",
+          "problem": "未預期的動作可能為視覺強調，但時序上隱含。",
+          "proposal": "若 +21.2s 的動作是為了突出切線斜率與半弦高度的對應關係，應明確標記為一個關鍵點；若為誤觸發，刪除。"
+        }
+      ]
+    },
+    {
+      "id": "18_derivative_cycle",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-beat",
+          "severity": "should",
+          "where": "beat 4（+4.4s 至 +34.7s，30.3 秒），3 個 reveals 覆蓋 5 beats",
+          "evidence": "此場景只有 3 個 reveals 但 4 個 beat：beat 1 +4.4s reveal，beat 2 +11.3s reveal（無），beat 3 +19.8s reveal，beat 4 +34.7s reveal（無）。Beat 2 與 beat 4 分別長 7.1s 與 15.0s，缺乏視覺里程碑。",
+          "problem": "導數循環（sine → cosine → -sine → -cosine → sine）是結構化的週期關係，但視覺節點稀疏，初學者難以跟蹤四階導數的循環。",
+          "proposal": "為 beat 2 與 beat 4 各增加一個 reveal，突出循環中的每一步：beat 2 中顯示『sin' = cos』的公式，beat 4 中突出『四階回到原點』的對稱性。預計增加 2 個 reveal。"
+        }
+      ]
+    },
+    {
+      "id": "19_divider_apply",
+      "verdict": "good",
+      "findings": []
+    },
+    {
+      "id": "20_companion_limit",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-dwell",
+          "severity": "should",
+          "where": "beat 1（+1.0s 至 +12.9s，11.9 秒）",
+          "evidence": "首個 beat 長 11.9 秒無 reveal，引入伴隨極限（cosθ/sinθ 當 θ→0 時的行為）。之後 3 個 beats 都有 reveals，最長靜止 12.8s。",
+          "problem": "伴隨極限的motivation（為何需要它）缺乏視覺支撑。初學者需要理解『另一個比值的行為』，但無圖形或公式輔助。",
+          "proposal": "在 beat 1 中段（+6s）加入一個小 reveal，並排對比『之前的 sinθ/θ』與『現在的 cosθ/sinθ』，標示兩者的用途。預計增加 1 個 reveal。"
+        }
+      ]
+    },
+    {
+      "id": "21_all_six_tan_sec",
+      "verdict": "ok",
+      "findings": []
+    },
+    {
+      "id": "22_all_six_cot_csc",
+      "verdict": "ok",
+      "findings": []
+    },
+    {
+      "id": "23_shm_compute",
+      "verdict": "ok",
+      "findings": []
+    },
+    {
+      "id": "24_shm_stacked_graphs",
+      "verdict": "ok",
+      "findings": [
+        {
+          "dim": "T-still",
+          "severity": "should",
+          "where": "beat 4 末尾至 beat 5（+12.2s 至 +35.7s，23.5 秒無新 reveal）",
+          "evidence": "Beat 4 reveal at +11.9s（加速度圖），講述『速度在極值點通過零』，然後無新 reveal。Beat 5 reveal at +24.2s（鏡像），講述『加速度是頂部圖的翻轉』。之間 12 秒無視覺變化。最長靜止 23.8 秒。",
+          "problem": "堆疊圖表已經顯示了三個曲線，但在講述『極值點對應零速度』與『鏡像對稱』這兩個關鍵觀察時，缺乏動畫突出對應的點或區域。初學者可能看到圖但無法追蹤論述。",
+          "proposal": "在 beat 4 與 beat 5 之間加入 1–2 個中段 reveal，動畫突出：(1) +17s 時，在高度圖上標記極值點，在速度圖上同時高亮對應的零點，(2) +27s 時，用箭頭或顏色匹配連接底部加速度圖與頂部高度圖的對應點，強調『翻轉』關係。預計增加 2 個細粒度 reveal。"
+        }
+      ]
+    },
+    {
+      "id": "25_toward_the_chain_rule",
+      "verdict": "weak",
+      "findings": [
+        {
+          "dim": "T-still + T-beat",
+          "severity": "should",
+          "where": "beat 3（+16.2s 至 +33.0s，16.8 秒）",
+          "evidence": "Beat 3 長 16.8 秒、45 字（2.7 字/秒），全面闡述『為何需要鍊式法則』，但無新 reveal（math.0 reveal 在 +16.2s，之後無變化）。最長靜止恰好 16.8 秒。Change event at +6.5s 不綁定 reveal，表示前面有未預期的動作。",
+          "problem": "Beat 3 跨越『已知如何微分 sinx』→『不知如何微分 sin(x²)』→『需要新規則』的邏輯橋接，這是驅動下一主題的關鍵motivation，但視覺上毫無變化。",
+          "proposal": "在 beat 3 中加入 2–3 個進階 reveal：(1) +18s，顯示『可行』的例子 sin(x) 的導數公式；(2) +23s，出現『不可行』的例子 sin(x²) 或 sin(3x+1)，標示問題所在；(3) +28s，預告『鍊式法則的概念』。預計增加 2–3 個 reveal。同時檢查 +6.5s 的多餘動作，確認是否應刪除。"
+        }
+      ]
+    },
+    {
+      "id": "26_recap",
+      "verdict": "good",
+      "findings": []
+    },
+    {
+      "id": "27_outro",
+      "verdict": "good",
+      "findings": []
+    }
+  ]
+}

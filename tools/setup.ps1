@@ -35,6 +35,13 @@ if (-not (Get-Command codex -ErrorAction SilentlyContinue) -and (Test-Path $npmD
     Write-Host "[setup] 已部署 codex shim → $npmDir\codex.cmd" -ForegroundColor Cyan
 }
 
+# 部署 agy（Antigravity CLI）shim（agy 已裝、還不在 PATH、npm 目錄存在時）——多模型唯讀評審用；見 ENVIRONMENT.md ⑤c
+$agyExe = Join-Path $env:LOCALAPPDATA "agy\bin\agy.exe"
+if ((Test-Path $agyExe) -and -not (Get-Command agy -ErrorAction SilentlyContinue) -and (Test-Path $npmDir)) {
+    Copy-Item (Join-Path $repo "tools\agy.cmd") (Join-Path $npmDir "agy.cmd") -Force
+    Write-Host "[setup] 已部署 agy shim → $npmDir\agy.cmd" -ForegroundColor Cyan
+}
+
 Write-Host "`n[setup] Python 端就緒。跑環境健檢：`n" -ForegroundColor Green
 & $py (Join-Path $repo "tools\doctor.py")
 Write-Host "`n[setup] 系統層（ffmpeg／LaTeX／Node／Chrome）若上面有 [FAIL]，照印出的 winget 指令裝完即可。" -ForegroundColor Yellow
