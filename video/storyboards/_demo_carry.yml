@@ -1,0 +1,88 @@
+# 跨場攜帶 demo／回歸樣本（非正式節，檔名底線前綴）
+#
+# 目的：驗證 `carry:`／`exit:`（SPEC-motion-language 規則 1「一場一張畫布」；KICKOFF-motion-language-gaps T4）——
+#   scene 1 curve_first : graph。曲線 plot.0 從開場就在、一個點 {show plot.1} 進場；場尾 `exit` 把軸、刻度、
+#                          點淡出（SCENE_TAIL_SECONDS 內），只留曲線給下一場。
+#   scene 2 curve_flies : derivation。`carry` 把 plot.0 帶進來（開場就在原位、與上一場末幀同位置），
+#                          `{show carried.curve}` 那拍飛去右上角縮成 0.35 的 inset；推導列照常進場。
+#   scene 3 curve_stays : callout。再把 inset `keep` 在原位（鏈：3 從 2 拿的正是 2 從 1 帶來的複本）。
+# 兩個 content-content 邊界都應是硬切（make.py _segment_fades 對 carry 邊界 fade=0）：被攜帶的曲線在
+# 邊界兩側同一位置，切場看不出來。demo 專用，不屬任何正式節；驗證後留作模板範例。
+#
+#   python video/make.py --storyboard video/storyboards/_demo_carry.yml --backend mock --quality low
+
+meta:
+  id: demo_carry
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Carry Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Carry Demo" }
+
+scenes:
+
+  # 1 ------------------ 曲線建一次；場尾 exit 把不帶走的東西淡出
+  - id: curve_first
+    kind: content
+    template: graph
+    mode: single
+    accent: definition
+    source: "合成例（跨場攜帶機制驗證）"
+    title: "One Curve for the Whole Act"
+    say: |
+      Here is a curve we will keep on screen for three scenes.
+      {show plot.1} And the one point on it that matters.
+      Everything else leaves before the cut; the curve stays.
+    exit: [axes, ticks, plot.1]
+    axes:
+      x_range: [0, 3.4, 1]
+      y_range: [-0.2, 1.3, 0.5]
+      x_length: 7.0
+      y_length: 3.6
+      x_ticks:
+        - { at: 1.5708, label: "$\\tfrac{\\pi}{2}$" }
+      y_ticks:
+        - { at: 1, label: "$1$" }
+    plots:
+      - { kind: function, expression: "sin(x)", x_range: [0, 3.14159], color_role: secondary }
+      - { kind: point, point: [1.5708, 1.0], hollow: false, color_role: accent, reveal: true }
+
+  # 2 ------------------ 曲線帶進來（原位），{show carried.curve} 那拍飛去右上角
+  - id: curve_flies
+    kind: content
+    template: derivation
+    accent: derivation
+    source: "合成例（跨場攜帶機制驗證）"
+    title: "The Curve Flies to the Corner"
+    carry:
+      - { from: curve_first, block: plot.0, as: carried.curve, to: { corner: top_right, scale: 0.35 } }
+    say: |
+      The curve is still here, exactly where the last scene left it.
+      {show carried.curve} Now it flies to the corner and waits there as a reminder.
+      {show step.0} Meanwhile the algebra takes the stage.
+      {show result} And lands on the bound we wanted.
+    steps:
+      - { math: "\\sin x \\;\\le\\; x", reason: "for $x \\ge 0$" }
+    result:
+      math: "\\frac{\\sin x}{x} \\;\\le\\; 1"
+      reason: "divide by $x$"
+
+  # 3 ------------------ inset 再 keep 一場（鏈）
+  - id: curve_stays
+    kind: content
+    template: callout
+    type: note
+    source: "合成例（跨場攜帶機制驗證）"
+    title: "The Corner Copy Stays"
+    sparse_ok: true     # 一句話的收尾場；留白是刻意的
+    carry:
+      - { from: curve_flies, block: carried.curve, as: carried.curve, to: keep }
+    say: |
+      The inset carries over once more, and nothing re-enters.
+      {show body} A closing remark under the same picture.
+    body: "Three scenes, one curve: built once, carried twice."
