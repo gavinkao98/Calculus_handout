@@ -39,6 +39,8 @@ def main() -> int:
     data = yaml.safe_load(args.storyboard.read_text(encoding="utf-8"))
     meta = data["meta"]
     scenes = data["scenes"]
+    # the whole deck, so a `carry:` scene can rebuild the one it carries from
+    LessonScene.scenes_by_id = {s["id"]: s for s in scenes}
     if args.scene != "all":
         want = [s.strip() for s in args.scene.split(",") if s.strip()]
         by_id = {s["id"]: s for s in scenes}

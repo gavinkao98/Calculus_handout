@@ -268,7 +268,7 @@ def _label_region(nx: float, ny: float) -> str:
     return f"{v}-{h}"
 
 
-def graph_label_geometry(meta: dict, scene: dict) -> "dict | None":
+def graph_label_geometry(meta: dict, scene: dict, scenes_by_id: "dict | None" = None) -> "dict | None":
     """Deterministic geometry of a graph scene's equation labels, for the critic's
     VLM context (B.1b). Reuses the SAME _graph_labels machinery as the overlap guard
     so the critic is grounded on exactly what the guard sees.
@@ -283,7 +283,7 @@ def graph_label_geometry(meta: dict, scene: dict) -> "dict | None":
     from pipeline.visuals import theme as T
 
     try:
-        blocks = build_blocks(scene, {"ground": "dark", "meta": meta})
+        blocks = build_blocks(scene, {"ground": "dark", "meta": meta, "scenes_by_id": scenes_by_id})
     except Exception:  # noqa: BLE001
         return None
 
@@ -547,23 +547,29 @@ def _floor_issues(scene: dict, blocks, enforce: bool) -> "list[tuple[str, str]]"
     return _floor_findings(scene.get("id"), sizes, T.MIN_FONT_FLOOR, enforce)
 
 
-def check_scenes(meta: dict, scenes: list[dict]) -> "list[tuple[str, str]]":
+def check_scenes(meta: dict, scenes: list[dict], deck: "list[dict] | None" = None) -> "list[tuple[str, str]]":
     """Return (severity, message) tuples for the given scenes.
     'error' = stacked-prose size mismatch, or an element clipped off-frame (both
     abort the render); 'warn' = teaching prose in muted, an element spilling past
     the broadcast-safe margin, or two content blocks overlapping. Overflow is
     checked on every scene kind; the prose size / muted / overlap checks apply to
-    content scenes only."""
+    content scenes only.
+
+    `deck` is the WHOLE storyboard's scene list when `scenes` is a subset (make.py
+    --scene): a `carry:` rebuilds the scene it carries from, which may not be among the
+    scenes being checked. Defaults to `scenes`."""
     from pipeline.templates import build_blocks
     from pipeline.visuals import theme as T
     from pipeline.schema import reveal_targets
 
     muted_hex = str(T.color("dark", "muted")).lower()
+    scenes_by_id = {s["id"]: s for s in (scenes if deck is None else deck)
+                    if isinstance(s, dict) and s.get("id")}
     issues: list[tuple[str, str]] = []
     for scene in scenes:
         kind = scene.get("kind", "content")
         ground = "light" if kind in ("intro", "outro") else "dark"
-        ctx = {"ground": ground, "meta": meta}
+        ctx = {"ground": ground, "meta": meta, "scenes_by_id": scenes_by_id}
         try:
             blocks = build_blocks(scene, ctx)
         except Exception as exc:  # noqa: BLE001
@@ -595,6 +601,15 @@ def check_scenes(meta: dict, scenes: list[dict]) -> "list[tuple[str, str]]":
                 if str(d) not in ids:
                     issues.append(("error", f"{scene.get('id')}.focus[{j}].dim {d!r}: no "
                                             f"matching block (built ids: {sorted(ids)})"))
+
+        # Same check for `exit:` (scene.py _tail): a typo'd id is skipped there, so the
+        # block meant to leave before the cut would simply stay -- no crash, wrong picture.
+        # (`carry.block` / `as` are checked while building: templates._apply_carry raises,
+        # and the "could not build scene" error above carries its message.)
+        for e in scene.get("exit") or []:
+            if str(e) not in ids:
+                issues.append(("error", f"{scene.get('id')}.exit {e!r}: no matching block "
+                                        f"(built ids: {sorted(ids)})"))
 
         # prose size + muted checks are about stacked prose -- content scenes only
         if kind != "content":

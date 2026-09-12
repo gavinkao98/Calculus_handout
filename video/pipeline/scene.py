@@ -20,7 +20,8 @@ from . import focus
 from .blocks import play_block
 from .narration import estimate_seconds, parse_say
 from .templates import build_blocks
-from .timing import MIN_BEAT_HOLD_SECONDS, SCENE_LEAD_SECONDS, SCENE_TAIL_SECONDS
+from .timing import (EXIT_FADE_SECONDS, MIN_BEAT_HOLD_SECONDS, SCENE_LEAD_SECONDS,
+                     SCENE_TAIL_SECONDS)
 from .visuals import theme as T
 
 LIGHT_KINDS = {"intro", "outro"}
@@ -31,6 +32,9 @@ class LessonScene(Scene):
     spec: dict[str, Any] | None = None
     meta: dict[str, Any] | None = None
     beat_durations: list[float] | None = None  # per-beat narration seconds, in say order
+    # The whole deck, {scene id: spec}, so a `carry:` can rebuild the scene it carries from
+    # (templates._apply_carry). Injected by make.py / scratch_frames.py next to `spec`.
+    scenes_by_id: dict[str, dict[str, Any]] | None = None
     # The CURRENT beat's narration seconds while _play_content walks the beats, None
     # outside one. A block animation that should last as long as the narration it serves
     # ("圖跟旁白長") reads this via timing.beat_run_time(); every stock animation ignores
@@ -51,13 +55,11 @@ class LessonScene(Scene):
         ground = "light" if kind in LIGHT_KINDS else "dark"
         self.camera.background_color = T.color(ground, "bg")
 
-        ctx = {"ground": ground, "meta": self.meta or {}}
+        ctx = {"ground": ground, "meta": self.meta or {}, "scenes_by_id": self.scenes_by_id}
         blocks = build_blocks(self.spec, ctx)
         by_id = {b.id: b for b in blocks}
 
-        for block in blocks:
-            if block.static:
-                self.add(block.mobject)
+        self._stage(blocks)
 
         self.wait(SCENE_LEAD_SECONDS)
 
@@ -70,7 +72,33 @@ class LessonScene(Scene):
         else:
             self._play_timed(blocks, ground, float(self.spec.get("duration", 3.0)))
 
-        self.wait(SCENE_TAIL_SECONDS)
+        self._tail(kind, by_id)
+
+    def _stage(self, blocks) -> None:
+        """The opening frame: every static block, plus any dynamic block with a
+        `pre_play` (a carried object waiting at its carried-in position -- see
+        blocks.Block.pre_play), rewound first and then added."""
+        for block in blocks:
+            if block.static:
+                self.add(block.mobject)
+            elif block.pre_play is not None:
+                block.pre_play(block.mobject)
+                self.add(block.mobject)
+
+    def _tail(self, kind, by_id) -> None:
+        """The SCENE_TAIL_SECONDS hold. `exit: [<block id>...]` (content scenes) fades those
+        blocks out INSIDE the hold (EXIT_FADE_SECONDS), so what the next scene does not
+        carry leaves before the cut while the clip length -- what the render/audio sync
+        audit measures -- is unchanged. NB: the LAST frame, which critic.py / scratch_frames
+        read as the scene's "fullest frame", is then the post-exit frame. An id naming no
+        block is skipped (sizecheck errors on it before render, as for focus.dim)."""
+        exits = (self.spec.get("exit") or []) if kind == "content" else []
+        mobs = [by_id[i].mobject for i in exits if i in by_id]
+        if mobs:
+            self.play(*[FadeOut(m) for m in mobs], run_time=EXIT_FADE_SECONDS)
+            self.wait(SCENE_TAIL_SECONDS - EXIT_FADE_SECONDS)
+        else:
+            self.wait(SCENE_TAIL_SECONDS)
 
     def _play_content(self, blocks, by_id, ground) -> None:
         revealed: set[str] = set()
