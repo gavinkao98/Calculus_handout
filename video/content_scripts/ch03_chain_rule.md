@@ -442,6 +442,7 @@ id: example_single_composition
 source: chapter3-print-standalone.html §3.2 · Example 3.4 (a)(b)（√(1+x²)、sin(x²)）
 learning_goal: 用 Strategy 套兩個一層合成：√(1+x²) 與 sin(x²)，明確標出內導數因子 2x。
 kind: example
+examples: ex:3.4
 narration: |
   Time to use it — two quick ones. For $\sqrt{1+x^2}$, the outermost operation
   is the square root, so the outer function is $u^{1/2}$ and the inner is
@@ -494,6 +495,7 @@ id: example_nested_three_layers
 source: chapter3-print-standalone.html §3.2 · Example 3.5（√(1+sin²x)，三層合成）
 learning_goal: 把 Strategy 迭代到三層合成 √(1+sin²x)，看每層各出一個斜率因子相乘。
 kind: example
+examples: ex:3.5
 narration: |
   Now let the inside be a composition too. Take $\sqrt{1+\sin^2 x}$ — three
   layers deep, because $\sin^2 x$ is itself $(\sin x)^2$. Peel from the outside:
@@ -521,6 +523,7 @@ id: example_chain_times_quotient
 source: chapter3-print-standalone.html §3.2 · Example 3.6（√((x−1)/(x+2))，x>1；鏈式×商法則）
 learning_goal: 看連鎖律的內導數本身是商法則計算——兩規則接力。
 kind: example
+examples: ex:3.6
 narration: |
   Sometimes the inner derivative is a small problem of its own. Differentiate
   $\sqrt{\dfrac{x-1}{x+2}}$, for $x>1$. The outer operation is the square root
@@ -550,6 +553,7 @@ id: example_chain_times_product
 source: chapter3-print-standalone.html §3.2 · Example 3.7（(1+x²)cos²x；積法則×鏈式）
 learning_goal: 看積法則與連鎖律協作——外層是積、其中一個因子 cos²x 要鏈式。
 kind: example
+examples: ex:3.7
 narration: |
   Same story, a different partner rule. Differentiate $y=(1+x^2)\cos^2 x$. The
   outermost operation here is a product, so start with the product rule:
@@ -577,6 +581,7 @@ id: example_leibniz_rates
 source: chapter3-print-standalone.html §3.2 · Example 3.8（kelp/urchin/otter；Leibniz 形式、符號沿鏈相乘）
 learning_goal: 用 Leibniz 形式把「一連串依賴關係」的符號沿鏈相乘，判斷 dK/dO 的正負。
 kind: example
+examples: ex:3.8
 narration: |
   Here is the Leibniz form earning its keep. In a harbour, the amount of kelp
   $K$ depends on the urchin population $U$ — urchins eat kelp — and $U$ depends

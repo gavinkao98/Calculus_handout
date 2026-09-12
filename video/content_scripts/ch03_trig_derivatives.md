@@ -591,6 +591,7 @@ id: companion_limit
 source: chapter3-print-standalone.html §3.1 · Example 3.1（伴隨極限 (1−cosθ)/θ → 0）
 learning_goal: 用「乘 1+cosθ」把另一個 0/0 極限化成基本極限的形式，得 0。
 kind: example
+examples: ex:3.1
 narration: |
   The fundamental limit has a companion worth knowing:
   $\lim_{\theta\to 0}\dfrac{1-\cos\theta}{\theta}=0$. It is again of the form
@@ -632,6 +633,7 @@ id: all_six_trig_derivatives
 source: chapter3-print-standalone.html §3.1 · Example 3.2（tan'、sec'、cot'、csc' 全用商法則逐步）
 learning_goal: 用商法則把 sin'/cos' 推到其餘四個三角函數，補齊全部六個導數。
 kind: example
+examples: ex:3.2
 narration: |
   With sine and cosine in hand, the other four trig functions cost almost
   nothing — they are all just the quotient rule. Take $\tan x$, which is
@@ -701,6 +703,7 @@ id: shm_compute
 source: chapter3-print-standalone.html §3.1 · Example 3.3（彈簧 s(t)=sin t，求 s'、s''，得 s''=−s）
 learning_goal: 只用 sin'/cos' 算出速度與加速度，發現加速度等於負的高度——簡諧運動的簽名。
 kind: example
+examples: ex:3.3
 narration: |
   Let us put the new derivatives to work on something that moves. A weight
   bobbing on a spring sits at height $s(t)=\sin t$ above its rest level.

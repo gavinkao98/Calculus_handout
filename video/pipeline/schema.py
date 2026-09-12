@@ -249,13 +249,16 @@ def main(argv: "list[str] | None" = None) -> int:
     # unit ('no screen_contract'); found by doctor --smoke 2026-09-12.
     deck_md = _prov.content_script_for(meta, repo_root)
     contracts = {}
+    md_units: list = []
     if deck_md.exists():
         try:
-            for u in _rp.parse_content_script(deck_md).get("units", []):
+            md_units = _rp.parse_content_script(deck_md).get("units", [])
+            for u in md_units:
                 if u.get("id") and u.get("screen_contract"):
                     contracts[u["id"]] = u["screen_contract"]
         except Exception:
             contracts = {}     # fail-closed: unreadable .md -> no contracts -> no SC noise
+            md_units = []
     cov_issues = _cov.coverage_issues(data, contracts, enforce=cov_enforce)
     if cov_issues:
         cov_err = sum(1 for s, _ in cov_issues if s == "error")
@@ -265,6 +268,31 @@ def main(argv: "list[str] | None" = None) -> int:
             print(f"  {'ERROR' if sev == 'error' else 'WARN '}  {msg}")
         if cov_err:
             errors = errors + [m for s, m in cov_issues if s == "error"]
+
+    # -- EX: 例題折疊宣告閘 (example_coverage.py). Declarations live in the .md next to
+    # the screen_contracts above; the storyboard is deliberately NOT read (scene order and
+    # splitting are the video's business -- CONTENT_METHODOLOGY.md §1 分工). Wired HERE
+    # only, not in make.py: SC is the precedent (make.py repeats provenance/source_rev/
+    # pedagogy but never coverage), and which examples to teach is an authoring-time
+    # decision that should not block a render. Clean -> prints nothing.
+    # A deck with NO .md is skipped entirely (same as SC): ch01_inverse_functions is a
+    # gen-1 layout-regression deck with no content script, so "zero declarations" there
+    # means "nobody has written one yet", not "8 examples were dropped" -- running the
+    # gate on it would fire one EX1 per handout example and say nothing true.
+    from pipeline import example_coverage as _ex
+    ex_enforce = bool(meta.get("example_coverage_enforce"))
+    ex_issues = [] if not deck_md.exists() else _ex.example_issues(
+        str(meta.get("section", "")).strip(),
+        _ex.examples_for_deck(meta, repo_root),
+        md_units, enforce=ex_enforce)
+    if ex_issues:
+        ex_err = sum(1 for s, _ in ex_issues if s == "error")
+        print(f"[example_coverage] {args.storyboard.name}: {len(ex_issues)} finding(s)"
+              f"{' (ENFORCED)' if ex_enforce else ' (warn-only; set meta.example_coverage_enforce to gate)'}")
+        for sev, msg in ex_issues:
+            print(f"  {'ERROR' if sev == 'error' else 'WARN '}  {msg}")
+        if ex_err:
+            errors = errors + [m for s, m in ex_issues if s == "error"]
 
     if args.list and not errors:
         print(f"[schema] {args.storyboard.name}: reveal targets per content scene")

@@ -33,16 +33,37 @@
 - **一個單元一個教學重點（one teaching idea per unit）。** 一段 narration 若需要兩個主題句，就拆成兩個單元。
 - **內容忠實於講義（faithful to the handout）。** 數學內容與範圍跟著講義 HTML（handout kit；各章權威檔見 [`README.md`](README.md)「輸入」）這一節走——不漏環境、不加入新的數學、不脫離；每個承載數學的單元 MUST 可回溯到講義的某個環境／手寫編號。**但呈現為教學服務**：場景**順序可為教學自由重排**（見 §3），且 MAY 增補書本沒有的單元（intro／outro、把散文裡的幾何主張變成視覺／動畫單元）。重排與增補的是**呈現**，不是內容——不因重排而增刪任何數學。
 
+### 分工：講義治「什麼」，影片治「怎麼呈現」（2026-09-12 拍板）
+
+上一條的「呈現為教學服務」在此寫成通則。**這不是新規則，是把散在 §2／§3 的既有做法升格成一句話的治權劃分**，並補上它一直缺的邊界與 owner。
+
+| 誰治 | 治什麼 | 由什麼守 |
+|---|---|---|
+| **講義** | **涵蓋**（每個 `definition`／`theorem`／`proposition`；每個不同教學模式的 `example`）、**正確性**（定義與定理陳述、數學事實）、**可回溯**（每段上畫面文字有來源） | `provenance` OF1/OF2、`step_coverage` SC1/SC2、`example_coverage` EX1/EX2（§2、§6）、NFA、`source_rev` |
+| **影片** | **順序**、**切分**、**節奏**、**畫面構成**、**視覺發明** | **無確定性閘**——這是創作決定。owner 依序：鎖稿前 §7「順序自檢」（免費）→ gate-1 `pedagogy-firstlearner-audit`（PD1／L2 脈絡）→ render 後 REWATCH R3 `A-bridge`（advisory；是否常設為閘另議） |
+
+兩條操作規則：
+
+- **重排不需要理由，漏掉才需要。**（[`pipeline/step_coverage.py`](pipeline/step_coverage.py) 既有語義的升格：*"Merging/re-layout is free … only dropping a must-show step is a finding."*）
+- **重排不得違反數學依賴序**——不得在證明／建立之前使用某結果。
+
+**範圍：本規則管新稿的「場級」順序。** 已鎖稿內容的 beat 級順序（鎖在 LOCKED narration 內，動它＝重 derive＋重 TTS＝計費）不在此，走 §8 的 post-lock 外科修改。
+
+**為什麼依賴序不設機器閘。** (1) 依賴已被 narration 自己表面化——每場開頭的回指句（"that little bound"／"we already did the hard algebra"）一旦違序就會變成**沒有先行詞的句子**，那是 gate-1 與 R3 `A-bridge` 看得見的；(2) 步驟級依賴已有 `screen_contract.required_steps[].depends_on` ＋ `recap_required`（見 [`SPEC-pedagogy-firstlearner-expansion.md`](SPEC-pedagogy-firstlearner-expansion.md) §4），場級再加一套是第二套真相；(3) `PD4`／`scaffold.assumes`／`SC2` 三個代理已在守相鄰的事；(4) 零實際案例。**若日後真要做，欄位名用 `order_depends_on`**——`depends_on` 已被 `required_steps[]` 佔用。
+與此相對，§2 的例題折疊**有**閘（EX1/EX2）：那是純書記（宣告存在與否），機器查得了；順序是語意判斷，機器查不了。兩者的不對稱是刻意的，判準是「這件事機器查得了嗎」，不是「這件事重不重要」。
+
 ---
 
 ## 2. 影片的單位與範圍（Scope）
 
-- **一節 = 一支影片。**（gen-2：一節一片；小節之間不另做過場片。）
+- **一節 = 一支影片。**（gen-2：一節一片；小節之間不另做過場片。**節內導航靠成片 sidecar `<stem>.chapters.txt`**——`make.py` compose 每次都寫，intro 的 tagline 在 0:00＋每個 divider 一個跳轉點，YouTube 章節格式；2026-09-12 裁決**不做**分幕獨立檔，理由與重開條件見 [`PROPOSAL-scope-packaging-coverage.md`](PROPOSAL-scope-packaging-coverage.md) §3。）
 - **每支必有 intro 與 outro**（gen-2 first-class，純動畫、**無 narration**）：
   - **intro** — Section Gate 開場（章節地圖 → 聚焦本節 → 標題字卡）。內容稿只需提供本節在章內的定位：章、章名、節、節標題，以及一句引導問題 `tagline`。
   - **outro** — 收尾的品牌字卡（暗轉亮橋接 → 最終 logo 字卡，**無 takeaways**）。Key Takeaways 是獨立的 recap 單元（→ `recap_cards` 場景，有旁白），不在 outro。
 - **一定納入（MUST）：** 每個 `definition` / `theorem` / `proposition`；書本明確編號的 procedure／strategy；承載教學的圖。
 - **例題：代表式涵蓋（MUST cover every distinct pattern; MAY fold repeats）。** 每個**不同教學模式**的 `example`（+`solution`）——帶來新技巧、新陷阱、或新情形的——MUST 有代表單元；**同型重複**的例題（同一手法的第二、三個 drill）MAY 折疊成一個代表＋一句「同手法，留給你在講義練」，並在內容稿就近**註明折疊了哪個、為何**（MUST NOT silently drop）。判準是「這個例題有沒有帶來新東西」，不是固定數量——影片是線性計時的一堂課、講義是隨機存取的參考書，忠實靠「涵蓋每個概念／技巧且不牴觸」達成，不必把每個 drill 重演。保留的同型第二例仍套 §4 repeat-pattern 省 setup。（2026-06-13 使用者拍板，取代原「每個 example 一律 MUST 納入」。）
+  **宣告語法（2026-09-12）：** 代表單元用 `examples:` 列出它教到的講義例題 label key、用 `folds:` 列出折疊進來的同型例題＋理由（每行一筆，語法見 §6）。[`pipeline/example_coverage.py`](pipeline/example_coverage.py) 對 `.tex` 逐節比對：既沒 `examples:` 也沒 `folds:` 的例題 → **EX1**（這就是「MUST NOT silently drop」的機器版）；宣告不成立（key 不屬本節、fold 沒理由、同一 key 既教又折）→ **EX2**。warn-default，`meta.example_coverage_enforce` 才 gating。
+  **閘只查宣告存不存在——不判折疊得對不對，也不判教得好不好。** 判準「這個例題有沒有帶來新東西」是語意問題，歸 gate-1（`PEDAGOGY-FIRSTLEARNER` 的 `EX-adv`）與 REWATCH R5。現成反例：§3.1 的 `ex:3.1` 有代表單元、閘判乾淨，但四鏡同指它是孤兒（後段與 recap 都沒再回用）。**看到 EX 全綠不等於例題沒問題。**
 - **一定略過（MUST NOT 進影片）：** `env-exercise`（習題只屬書本）、指向本節**外**的交叉引用（kit 為手寫編號的 prose 引用，如 “by Theorem 4.2”——改用白話轉述，觀眾沒有頁可翻）、純裝飾的圖。
 - **視情況納入：** `proof`（短、有啟發、或書本已寫就收；冗長或純技術就略）、`remark`（升格為**具名規則**如「水平線測試」才獨立成單元，否則併入鄰段 narration）。
 
@@ -239,8 +260,14 @@ pedagogy／OTF 閘與 six-lens **界定不重疊的切片**：`.md` 內容是否
 | `narration` | 口語完整稿（英文；數學依 §4 口語化原則；intro／outro 無此欄）。 |
 | `visual_need` | 此單元需要的**靜態視覺**（內容層描述，不指定 template／payload）。 |
 | `animation_cue` | （選用）概念適合**動態演示**時的自然語言動畫建議（＝交給 Claude 的教學意圖規格）→ **Claude 依此生成客製 manim code**，認可後接入工程稿 `# HOOK`。 |
+| `examples` | （選用；EX 層）本單元**教到**的講義例題 label key，逗號或空白分隔：`examples: ex:3.2` / `examples: ex:3.1, ex:3.3`。 |
+| `folds` | （選用；EX 層）**折疊進本單元**的同型例題，block scalar、**一行一筆**、格式 `<ex:key> <理由>`（分隔符 `—`／`-`／`:` 可有可無，理由必填）：<br>`folds: \|`<br>`  ex:3.6 — 同 quotient rule 手法，留給講義練` |
 
 > 刻意**不含** `template` / `{show}` marker / `accent` / 視覺 payload——那些是第二階段把內容稿「模板化」時才填。
+
+> **`examples` / `folds` 的 parser 契約。** 兩者都在 [`pipeline/review_pack.py`](pipeline/review_pack.py) 的 `_FIELD_KEYS` 白名單裡；**沒註冊的 key 會被 parser 靜默丟棄**，閘因此看到「零宣告」、對整節每個例題吐 EX1。改這兩欄的格式時 MUST 同步該白名單。另：`folds` 與 `screen_contract` 一樣**保留原始行**（不走預設的空白 join），否則多筆折疊會被併成一個字串、第二筆的 key 會被讀成第一筆理由的一部分。
+>
+> **不適用時整欄省略，不要寫 `（無——…）` 佔位。** 其他欄位的括號佔位慣例在這兩欄**不適用**——`（無）` 會被當成一個 key 去比對而產生 EX2，而該單元教到的題又變成 EX1。沒有例題的單元就不要寫這兩欄。同理：一行一筆，不要用逗號在 `folds:` 裡併兩筆；分隔符前後留空白（`ex:3.6 — 理由`，不是 `ex:3.6—理由`）。這三種寫法都會**大聲失敗並在訊息裡引出肇事字串**（warn-only，不擋 render），照著訊息改即可。
 
 **檔案級結構（parser 契約）：** 每個單元寫成 `### unit: <id>` 標題 ＋ 緊接一個圍欄 ` ``` ` 區塊，區塊內逐欄 `field: value`（多行散文用 `field: |` block scalar、續行縮 2 空格）；單元間以 `---` 分隔；所有教學單元之後以一個 `## ` 段（如 `## §7 拆解註記…`）收尾。「不適用」欄位寫成單一括號註記 `（無——…）`／`（由…模板處理）`（會被視為空；但 `（選用）…後接內容` 是正常 content，不算空）。[`pipeline/review_pack.py`](pipeline/review_pack.py) 的 `parse_content_script` 以這三個分界（`### unit:` 標題、圍欄、`## ` 段界）切單元並組 engineering packet——**維持此結構**，改動格式時同步該 parser。
 
@@ -303,7 +330,8 @@ animation_cue: |
 
 定稿一節內容稿前，逐項過（**只列內容層；工程檢核屬第二階段**）：
 
-- [ ] 每個 `definition` / `theorem` / `proposition` 都有單元覆蓋；每個**不同模式**的 `example` 有代表單元，折疊掉的同型重複都就近註明（§2 代表式涵蓋）。
+- [ ] 每個 `definition` / `theorem` / `proposition` 都有單元覆蓋；每個**不同模式**的 `example` 有代表單元，折疊掉的同型重複都就近註明（§2 代表式涵蓋）。**機器面：** `examples:` ／`folds:` 已宣告，且 `python video/pipeline/schema.py <deck>.yml` 的 `[example_coverage]` 區塊不印（0 EX1／0 EX2）。
+- [ ] **順序自檢**（§1 分工；機器查不了，只能在這裡攔）：本節有沒有在推導出某結果**之前**就把它的結論式放上畫面？那是刻意的 advance organizer，還是洩題？（§3.1 場 13 學費：度數導數公式在 `sin′=cos` 推出前就印出來了。）以及——有沒有把「為什麼現在做這個」的鋪陳擋在它要服務的圖／式**前面**？（§3.1 場 06 學費：對稱論證講了 38 秒，學生還沒看到那三塊圖形。）
 - [ ] 沒有 `exercise` 內容洩入。
 - [ ] intro 與 outro 齊備（intro 有定位資訊 + tagline；recap 單元有 takeaway 清單；outro 無 takeaways）。
 - [ ] 每個散文裡的幾何主張都有視覺單元（或就近註明刻意略過）；symbol-heavy 節套 §5 例外。

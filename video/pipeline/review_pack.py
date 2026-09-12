@@ -72,7 +72,14 @@ _UNIT_HEADER = re.compile(r"^###\s+unit:\s+(\S+)")
 _SECTION = re.compile(r"^##\s")              # an h2 header ends the unit region
 _FENCE = re.compile(r"^```")
 _FIELD = re.compile(r"^([A-Za-z_]+):\s?(.*)$")
-_FIELD_KEYS = ("id", "source", "learning_goal", "kind", "narration", "visual_need", "animation_cue")
+_FIELD_KEYS = ("id", "source", "learning_goal", "kind", "narration", "visual_need",
+               "animation_cue",
+               # EX layer (example_coverage.py): which handout worked examples this unit
+               # teaches, and which same-pattern ones it folds in. Unregistered keys are
+               # dropped silently below, which the gate would read as "zero declarations"
+               # and fire EX1 on every example -- so this tuple and the .md format must
+               # move together (CONTENT_METHODOLOGY.md §6).
+               "examples", "folds")
 
 from pipeline import _screen_contract
 
@@ -108,6 +115,8 @@ def parse_content_script(md_path: Path) -> dict:
                 if isinstance(v, list):
                     if k == "screen_contract":
                         cur[k] = _screen_contract.parse_block(v)
+                    elif k == "folds":
+                        cur[k] = [s.strip() for s in v if s.strip()]
                     else:
                         cur[k] = " ".join(s.strip() for s in v).strip()
 

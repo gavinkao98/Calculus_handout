@@ -31,7 +31,8 @@ video/
     scene.py           所有模板共用的 Manim player（reveal 時序由音訊時長驅動）
     lint.py            render 前守門員：亂碼／不平衡 `$`／散文手動 `\\`／空心點
     sizecheck.py       render 前守門員：並排字級、出框、安全邊界、content 區塊重疊
-    schema.py          render 前守門員：storyboard 結構驗證＋列舉 `{show}` 目標（並跑 provenance／source_rev／pedagogy／coverage）
+    schema.py          render 前守門員：storyboard 結構驗證＋列舉 `{show}` 目標（並跑 provenance／source_rev／pedagogy／coverage／example_coverage）
+    example_coverage.py  EX 層：講義該節 worked example ↔ 內容稿 `examples:`／`folds:` 宣告比對（只擋 silent drop）
     provenance.py      OTF 確定性層：`md:`／`doc:` ref 解析（doc 錨池＝凍結 legacy standalone ∪ `.tex` label key）
     source_rev.py      內容稿↔講義源 freshness stamp（LOCKED 稿標頭 `source_rev`；drift 只 WARN＝§8 觸發器）
     run_selftests.py   從任一 cwd 跑全部 `_selftest_*.py`（統一 `-m pipeline.<name>`），任一紅即非零 exit
@@ -171,7 +172,7 @@ manifest 為每 reveal beat 記一個 WAV、每內容場景記一個串接旁白
 
 **自動守門員**（`make.py` render 前依序執行；兩級 **error 擋下 / warn 提示**）：
 
-- `pipeline/schema.py` — error：meta.id/section 缺、scene kind 不合法、id 重複、content 缺 template/say、`{show}` 不閉合；`--list` 另印每場 reveal 目標。並跑 `provenance`（`doc:`／`md:` ref 可解析；`meta.otf_enforce` 開才 error）、`pedagogy`、`coverage`（各自 `*_enforce` 開才 error），以及 **`source_rev`（LOCKED 內容稿 vs 講義源 stamp；永遠 warn-only，WARN＝走 CONTENT_METHODOLOGY §8）**。
+- `pipeline/schema.py` — error：meta.id/section 缺、scene kind 不合法、id 重複、content 缺 template/say、`{show}` 不閉合；`--list` 另印每場 reveal 目標。並跑 `provenance`（`doc:`／`md:` ref 可解析；`meta.otf_enforce` 開才 error）、`pedagogy`、`coverage`（各自 `*_enforce` 開才 error），以及 **`source_rev`（LOCKED 內容稿 vs 講義源 stamp；永遠 warn-only，WARN＝走 CONTENT_METHODOLOGY §8）** 與 **`example_coverage`（EX1/EX2 例題折疊宣告；`meta.example_coverage_enforce` 開才 error；deck 無 `.md` 則整個跳過）**。
 - `pipeline/lint.py` — error：純文字欄含標記、`$` 不平衡；warn：散文手動 `\\`、空心點畫在曲線上。
 - `pipeline/sizecheck.py` — error：並排散文字級不一致、元素出框；warn：教學散文用 `muted`、超安全邊界、content 區塊重疊。
 

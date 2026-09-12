@@ -11,7 +11,7 @@
 本閘在 render 相位跑（隨閘跑、含後鎖），一次讀齊三件：
 
 1. **本節的 `storyboards/<deck>.yml`** — 畫面文字 SSOT：`statement` / `scaffold(motive·problem·flag)` / `annotations` / divider 文字 / callout `body` / step·result `reason` 等全部上畫面教學文字，以及 `meta.pedagogy_profile`、`assumptions` registry、各欄的 `ref:` / `refs:`，以及場級 `covers:`（SC 覆蓋宣告）。
-2. **`content_scripts/<deck>.md`** 裡被 cite 的 `.md` 單元 — 上畫面文字的核准源（`md:<unit_id>` 解析到此），**含該單元的 `screen_contract.required_steps`（SC 的承重步驟契約）**。
+2. **`content_scripts/<deck>.md`** 裡被 cite 的 `.md` 單元 — 上畫面文字的核准源（`md:<unit_id>` 解析到此），**含該單元的 `screen_contract.required_steps`（SC 的承重步驟契約）**，以及 **`examples:`／`folds:`（EX 的例題宣告；`EX-adv` 讀 `folds:` 的理由）**。
 3. **handout anchor** — `doc:<handout-anchor>` 解析到該章**兩個講義源之一**（[`pipeline/provenance.py`](../../pipeline/provenance.py) 取聯集）：既有 deck 的 `frag-sec-*`／`data-fig="*"` → 凍結 `legacy/html_handout/standalone/chapter<N>-print-standalone.html`；2026-08-09 起新 deck 的 calcbook label key（`sec:N.M`／`thm:…`／`def:…`／`ex:…`／`fig:…`）→ `handout/latex/src/ch<NN>/*.tex`（唯一活源）。OF1 讀「被指到的那一處」源文字。
 
 讀 `meta.pedagogy_profile`（預設 `first_time`）與 deck 級 `CONTENT_APPROVED`（yes/no）。
@@ -60,6 +60,16 @@
 - **SC-honesty（blocking，agent 判斷，evidence-based）。** 某場 `covers:` 宣告某 id、但其上畫面 payload（`statement`／`proof.N`／`qed`／`steps[].math`…）語義上**沒有**該步驟 → blocking。**每條 finding 必 cite 確切可見欄位／reveal target（如 `proof.0`），非泛稱。** 這是把「`covers:` 當橡皮圖章」補實的守門——**`coverage_enforce` sign-off 前不可略過**。這是 **gate-1 自有 SC blocking**。
 - **SC-adv（advisory，agent 判斷）。** 拿 `required_steps`／`covers` 對 **handout** 承重步驟比，疑似「併過頭、少了承重動作、初學者恐失脈絡」→ 建議加 `required_step`。**最終校準是作者的**（不 blocking）。與 `L1` 不同切片：SC-adv 問「screen contract 對初學者夠不夠」，非「`.md` 忠不忠於講義」。
 - **生命週期／收斂：** 同 OF——`md:` 契約在 deck `CONTENT_APPROVED=yes` 才 gating；DRAFT 期 dry-run。收斂＝**SC blocking（＝SC-honesty）== 0**（opt-in 後）。
+
+### EX-adv — 例題折疊的正當性（advisory，agent 判斷）
+
+[`../../pipeline/example_coverage.py`](../../pipeline/example_coverage.py)（EX1/EX2）是**書記閘**：它只查「宣告存不存在」，**不判折疊得對不對，也不判教得好不好**。語意那一半在這裡：
+
+- 讀 cited `.md` 單元的 `examples:`（本單元教到哪幾題）與 `folds:`（折疊了哪幾題＋理由）。
+- 對每一筆 `folds:`，問 `CONTENT_METHODOLOGY.md` §2 的判準：**被折的那題真的沒有帶來新東西嗎**（新技巧／新陷阱／新情形）？理由寫的是「同手法」還是只是「篇幅不夠」？疑似把一個**不同模式**的例題當同型折掉 → advisory finding，**建議升回代表單元**。
+- 對 `examples:` 宣告的題，順帶看它在影片裡有沒有**被回用**——一題教完就再也不出現、recap 也不提，是**孤兒**（§3.1 的 `ex:3.1` 伴隨極限即是：四鏡同指、EX 閘卻全綠）。孤兒歸 `PD2`／`scaffold.motive` 或 REWATCH R5，此處 surface 即可。
+- **不 blocking**（同 SC-adv，最終校準是作者的），**不計入 VERDICT 整數**。
+- 提醒自己與讀報告的人：**EX 全綠只代表沒有默默丟題，不代表例題選對、教好了。**
 
 ## 邊界與不重疊（§10）
 

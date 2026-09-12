@@ -8,7 +8,11 @@ built this HTML by hand; this generator makes §3.2/§3.3 (and re-builds after e
 audit) deterministic and drift-proof.
 
 The parser below MIRRORS the canonical `review_pack.parse_content_script`
-contract (CONTENT_METHODOLOGY.md §6 "parser 契約"): `### unit: <id>` header +
+STRUCTURE, not its field list: it keeps only the fields narration review needs, so
+`_FIELD_KEYS` here is deliberately a subset (review_pack also carries `screen_contract`
+for SC and `examples`/`folds` for EX -- neither is narration, and adding them here
+would change nothing). Match the structure; do NOT sync the field tuple.
+Contract (CONTENT_METHODOLOGY.md §6 "parser 契約"): `### unit: <id>` header +
 a fenced ``` block of `field: value` lines, `field: |` block scalars whose
 continuation lines are 2-space indented; the unit region ends at the first `## `
 h2. It is re-implemented (not imported) only to stay dependency-free -- importing
