@@ -40,6 +40,45 @@ def reveal_targets(say: str) -> list[str]:
     return [m.group(1).strip().replace("[", ".").replace("]", "") for m in _SHOW.finditer(say)]
 
 
+def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
+    """`focus:` dims everything the narration is not on right now (pipeline/focus.py).
+    `at` must name a reveal this scene makes -- same reasoning as `pauses.after`: a focus
+    keyed to a beat that never happens is invisible with no other symptom. The `dim` ids
+    are NOT checked here (block ids only exist once the template has built; sizecheck
+    catches a typo'd one, exactly as it does for `{show}` targets)."""
+    if "focus" not in scene:
+        return []
+    entries = scene.get("focus")
+    if not isinstance(entries, list):
+        return [("error", f"{sid}.focus: must be a list of {{at, dim}}")]
+    revealed = set(reveal_targets(say) if isinstance(say, str) else [])
+    issues: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for j, item in enumerate(entries):
+        where = f"{sid}.focus[{j}]"
+        if not isinstance(item, dict):
+            issues.append(("error", f"{where}: not a mapping (expected {{at, dim}})"))
+            continue
+        at = item.get("at")
+        dim = item.get("dim")
+        if not isinstance(at, str) or not at:
+            issues.append(("error", f"{where}.at: required non-empty reveal id"))
+        elif at not in revealed:
+            issues.append(("error", f"{where}.at {at!r}: `say` never does "
+                                    f"{{show {at}}} (revealed here: {sorted(revealed)})"))
+        elif at in seen:
+            issues.append(("error", f"{where}.at {at!r}: already focused by an earlier "
+                                    f"entry (one focus per beat; later one would win)"))
+        else:
+            seen.add(at)
+        if not isinstance(dim, list):
+            issues.append(("error", f"{where}.dim: required list of block ids "
+                                    f"(use [] to restore everything)"))
+        elif any(not isinstance(d, str) or not d for d in dim):
+            issues.append(("error", f"{where}.dim: every entry must be a non-empty block id"))
+    return issues
+
+
 def _pause_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
     """`pauses:` is an authored silent hold after a reveal (pipeline/pauses.py). Its
     `after` must name a reveal this scene actually makes -- a typo'd one would otherwise
@@ -133,8 +172,12 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
                     if not t:
                         issues.append(("warn", f"{sid}: empty {{show}} target (reveals nothing)"))
             issues += _pause_issues(sid, scene, scene.get("say"))
+            issues += _focus_issues(sid, scene, scene.get("say"))
         elif "pauses" in scene:
             issues.append(("error", f"{sid}: 'pauses' is a content-scene field "
+                                    f"(this scene is kind={kind!r})"))
+        elif "focus" in scene:
+            issues.append(("error", f"{sid}: 'focus' is a content-scene field "
                                     f"(this scene is kind={kind!r})"))
 
         if kind in ("intro", "outro"):

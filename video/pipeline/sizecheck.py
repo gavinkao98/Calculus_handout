@@ -583,6 +583,19 @@ def check_scenes(meta: dict, scenes: list[dict]) -> "list[tuple[str, str]]":
                 issues.append(("error", f"{scene.get('id')}: {{show {t}}} has no matching "
                                         f"block (built ids: {sorted(ids)})"))
 
+        # Same check for `focus[].dim` (pipeline/focus.py): a typo'd id is silently
+        # skipped by focus.apply -- the beat plays with nothing dimmed and looks merely
+        # "a bit flat", which is exactly the kind of nothing-happened the focus primitive
+        # exists to fix. schema.py validates `at` (it can read `say`); ids need the
+        # built blocks, so they land here.
+        for j, item in enumerate(scene.get("focus") or []):
+            if not isinstance(item, dict):
+                continue
+            for d in item.get("dim") or []:
+                if str(d) not in ids:
+                    issues.append(("error", f"{scene.get('id')}.focus[{j}].dim {d!r}: no "
+                                            f"matching block (built ids: {sorted(ids)})"))
+
         # prose size + muted checks are about stacked prose -- content scenes only
         if kind != "content":
             continue

@@ -27,6 +27,28 @@ STOCK_ANIM_SECONDS = {
 }
 
 
+# "圖跟旁白長" (motion primitive 6). A stock reveal is 0.45-1.4 s, which is the right
+# length for "a thing appeared" and the wrong length for a 20-second beat: the §3.1 pilot
+# measured that the only primitive to move the needle was the one that ran for a whole
+# beat (sweep, 8.1 s), while a 1.2 s transform left the water level untouched.
+BEAT_PACED_TAIL_SECONDS = 0.6    # let the finished figure sit before the beat ends
+BEAT_PACED_MIN_SECONDS = 0.8     # never compress a paced animation below a readable speed
+
+
+def beat_run_time(scene: Any, fallback: float) -> float:
+    """How long an animation should run to last its beat.
+
+    *fallback* is used whenever the beat length is unknown -- outside a beat (the
+    end-of-scene sweep-up), or when a caller plays a block directly (selftests, the
+    timed intro/outro path). Reserves BEAT_PACED_TAIL_SECONDS so the completed figure
+    holds for a moment instead of finishing exactly as the narration stops.
+    """
+    seconds = getattr(scene, "beat_seconds", None)
+    if seconds is None:
+        return float(fallback)
+    return max(float(seconds) - BEAT_PACED_TAIL_SECONDS, BEAT_PACED_MIN_SECONDS)
+
+
 def text_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 

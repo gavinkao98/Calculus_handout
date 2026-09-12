@@ -16,6 +16,7 @@ from typing import Any
 from manim import DOWN, UP, FadeIn, FadeOut, Rectangle, Scene
 
 from . import _bootstrap
+from . import focus
 from .blocks import play_block
 from .narration import estimate_seconds, parse_say
 from .templates import build_blocks
@@ -30,6 +31,11 @@ class LessonScene(Scene):
     spec: dict[str, Any] | None = None
     meta: dict[str, Any] | None = None
     beat_durations: list[float] | None = None  # per-beat narration seconds, in say order
+    # The CURRENT beat's narration seconds while _play_content walks the beats, None
+    # outside one. A block animation that should last as long as the narration it serves
+    # ("圖跟旁白長") reads this via timing.beat_run_time(); every stock animation ignores
+    # it and keeps its fixed duration.
+    beat_seconds: float | None = None
 
     def construct(self) -> None:
         if self.spec is None:
@@ -70,19 +76,36 @@ class LessonScene(Scene):
         revealed: set[str] = set()
         beats = parse_say(self.spec.get("say", ""))
         durations = self.beat_durations
+        focus_plan = focus.scene_focus(self.spec)
+        dimmed: set[str] = set()
         for index, beat in enumerate(beats):
             target = beat.reveal
             consumed = 0.0
-            if target and target in by_id and target not in revealed:
-                consumed = play_block(self, by_id[target], ground)
-                revealed.add(target)
+            # Resolve THIS beat's length before playing it: an animation that wants to
+            # run for the whole beat ("圖跟旁白長") reads it off the scene. Pure reorder
+            # -- target_seconds never depended on play_block. `beat_seconds` is None
+            # outside a beat (the end-of-scene sweep-up below), so a paced animation
+            # falls back to its own default there.
             if durations is not None and index < len(durations):
                 target_seconds = durations[index]
             else:
                 target_seconds = estimate_seconds(beat.text)
+            self.beat_seconds = target_seconds
+            if target and target in by_id and target not in revealed:
+                consumed = play_block(self, by_id[target], ground)
+                revealed.add(target)
+            if target in focus_plan:
+                before = dimmed
+                dimmed = focus.apply(self, by_id, focus_plan[target], dimmed)
+                if dimmed != before:
+                    consumed += focus.FADE_SECONDS
             # Each beat's video length should equal its narration clip; the reveal
             # animation already ran inside that window, so only hold the remainder.
             self.wait(max(target_seconds - consumed, MIN_HOLD))
+        self.beat_seconds = None
+        # Leave the scene un-focused: the final frame (what the visual gates read, and
+        # what a viewer sits on through the tail) must match the un-focused render.
+        focus.apply(self, by_id, [], dimmed)
         for block in blocks:
             if not block.static and block.id not in revealed:
                 play_block(self, block, ground)

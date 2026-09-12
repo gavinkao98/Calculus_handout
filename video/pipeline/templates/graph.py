@@ -38,6 +38,7 @@ from manim import (
 
 from .. import brand
 from ..blocks import Block
+from .. import timing as TM
 from ..visuals import theme as T
 from ..visuals.graph_utils import safe_eval_expression
 from ._common import motif_corner
@@ -45,6 +46,11 @@ from ._common import motif_corner
 _SIDE = {"up": UP, "down": DOWN, "left": LEFT, "right": RIGHT}
 _TITLE_GRAPH_GAP = 0.45
 _GRAPH_ANNOTATION_GAP = 0.35
+# `seconds: beat` has no fixed length -- the real run_time is read off the scene at play
+# time. This stands in for it wherever a NUMBER is required before rendering: Block
+# .anim_seconds (make.py's short-beat warning) and the capacity/layout gates. It is
+# deliberately a plausible mid-range sweep, never used as an actual run_time on a beat.
+_BEAT_PACED_NOMINAL = 3.0
 
 
 def _range(values: list[float] | tuple[float, ...], default_step: float) -> list[float]:
@@ -300,7 +306,14 @@ def _sweep_block(plot: dict[str, Any], index: int, prior: list[dict[str, Any]],
         if plot.get(key) is None:
             raise ValueError(f"plots[{index}] kind=sweep needs '{key}'")
     x_from, x_to = float(plot["x_from"]), float(plot["x_to"])
-    seconds = float(plot["seconds"])
+    # `seconds: beat` = run for the whole narration beat this sweep is revealed on
+    # (motion primitive 6). A number is a fixed run_time, as before.
+    raw_seconds = plot["seconds"]
+    beat_paced = isinstance(raw_seconds, str) and raw_seconds.strip().lower() == "beat"
+    if beat_paced:
+        seconds = _BEAT_PACED_NOMINAL      # only a placeholder for the layout gates
+    else:
+        seconds = float(raw_seconds)
     col = _role_color(ground, plot, "accent")
 
     def curve_at(j: int):
@@ -357,13 +370,14 @@ def _sweep_block(plot: dict[str, Any], index: int, prior: list[dict[str, Any]],
     leave = str(plot.get("leave", "cursor"))
 
     def anim(scene, mob, _ground) -> float:
+        run_time = TM.beat_run_time(scene, seconds) if beat_paced else seconds
         tracker.set_value(x_from)
         scene.add(mob)
-        scene.play(tracker.animate.set_value(x_to), run_time=seconds, rate_func=linear)
+        scene.play(tracker.animate.set_value(x_to), run_time=run_time, rate_func=linear)
         if leave == "none":
             scene.play(FadeOut(mob), run_time=0.3)
-            return seconds + 0.3
-        return seconds
+            return run_time + 0.3
+        return run_time
 
     return Block(f"plot.{index}", group, anim=anim, anim_seconds=seconds, static=False)
 

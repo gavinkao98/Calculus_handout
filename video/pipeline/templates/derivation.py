@@ -68,12 +68,13 @@ def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
             st = st if isinstance(st, dict) else {"math": st}
             rows.append({"math": str(st.get("math", "")), "reason": st.get("reason"),
                          "kind": "step", "rid": f"step.{i}", "anim": st.get("anim") or "write",
-                         "mark": st.get("mark")})
+                         "mark": st.get("mark"), "color_role": st.get("color_role")})
         if spec.get("result") is not None:
             r = spec["result"]
             r = r if isinstance(r, dict) else {"math": r}
             rows.append({"math": str(r.get("math", "")), "reason": r.get("reason"),
-                         "kind": "result", "rid": "result", "anim": r.get("anim") or "write_glow"})
+                         "kind": "result", "rid": "result", "anim": r.get("anim") or "write_glow",
+                         "color_role": r.get("color_role")})
         if spec.get("check") is not None:
             c = spec["check"]
             c = c if isinstance(c, dict) else {"math": c}
@@ -93,14 +94,25 @@ def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
 
 def _eq_mob(row: dict, ground: str, *, role: str):
     """The equation mobject for a row, coloured + sized by kind; check rows get a
-    trailing green checkmark."""
+    trailing green checkmark.
+
+    A row MAY override its colour with `color_role:` -- that is motion primitive 5
+    (跨場延續) in its cheapest form: the figure that motivated this algebra already names
+    its parts by colour role (`graph` plots have had `color_role` all along), so a row can
+    carry the SAME name and the viewer sees that this line is about the orange half-chord
+    they were just shown. The rewatch review's complaint was exactly this: "三個區域用
+    藍/橘/綠標好了，到不等式鏈全變回白字."
+    """
+    override = row.get("color_role")
     if row["kind"] == "result":
+        role = str(override) if override else role
         eq = MathTex(row["math"].strip(), color=T.color(ground, role), font_size=T.fs(54))
         # crisper halo (was 3.0/0.45): Codex read the heavy amber glow as fuzzy/embossed.
         return brand.text_glow(eq, ground, role=role, width=2.2, opacity=0.38)
     # a check row is a PASS, not a struck-out aside: render it as bright as the steps
     # (was role="muted"/ink_3, which read as disabled/greyed-out -- 2026-06-21 A2 finding).
-    eq = MathTex(row["math"].strip(), color=T.color(ground, "primary"), font_size=T.fs("math"))
+    eq = MathTex(row["math"].strip(), color=T.color(ground, str(override) if override else "primary"),
+                 font_size=T.fs("math"))
     # a trailing verdict glyph: check rows + steps marked ok -> green check; bad -> red cross.
     # The ok check is the verdict marker, so it reads at full math size with a soft green
     # glow (was scale 0.8, too small to register as the "it works" payoff).

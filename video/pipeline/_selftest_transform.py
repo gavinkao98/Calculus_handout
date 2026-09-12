@@ -146,6 +146,49 @@ def test_transform_dims_the_whole_previous_row_not_just_its_equation():
         "dimming the bare equation would leave its rail annotation at full ink"
 
 
+def test_row_color_role_overrides_the_scene_accent():
+    """Motion primitive 5 (跨場延續) in its cheapest form: a row can carry the colour the
+    figure that motivated it used, so the algebra visibly belongs to the picture. Without
+    it a step is always `primary` ink and a result is always the scene accent -- which is
+    what made the rewatch review say '三個區域用藍/橘/綠標好了，到不等式鏈全變回白字'."""
+    from pipeline.visuals import theme as T
+    spec = _spec(transform=False)
+    spec["steps"][1]["color_role"] = "practice"
+    spec["result"]["color_role"] = "caution"
+    blocks = build_blocks(spec, {"ground": "dark", "meta": _META})
+
+    plain = _colors(_b(blocks, "step.0").mobject)
+    tinted = _colors(_b(blocks, "step.1").mobject)
+    assert T.color("dark", "primary").lower() in plain, plain
+    assert T.color("dark", "practice").lower() in tinted, tinted
+    assert T.color("dark", "practice").lower() not in plain, "colour leaked to a plain row"
+
+    result = _colors(_b(blocks, "result").mobject)
+    assert T.color("dark", "caution").lower() in result, result
+
+    # and the default is untouched: no color_role -> the scene accent, as before
+    dflt = _colors(_b(build_blocks(_spec(transform=False), {"ground": "dark", "meta": _META}),
+                      "result").mobject)
+    assert T.color("dark", "concept").lower() in dflt, dflt
+
+
+def _colors(mob) -> "set[str]":
+    """Every MathTex colour in a row group. A row holds the equation AND its reason rail
+    (and a result row nests the equation one level deeper), so membership is the honest
+    assertion -- picking "the first MathTex" would silently read the rail."""
+    from manim import MathTex
+    out: set[str] = set()
+
+    def walk(m):
+        if isinstance(m, MathTex):
+            out.add(str(m.get_color()).lower())
+        for s in getattr(m, "submobjects", []):
+            walk(s)
+    walk(mob)
+    assert out, "no MathTex found in row mobject"
+    return out
+
+
 if __name__ == "__main__":
     import sys, traceback
     fails = 0
