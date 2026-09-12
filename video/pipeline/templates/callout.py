@@ -70,7 +70,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     # Wire the accent family from `type` so BOTH scene_head (below) and the centrally
     # added scene_spine (templates.build_blocks, after this returns) colour to the type.
-    # ACCENT_ROLE already maps caution->warning / remark->secondary / note->accent.
+    # ACCENT_ROLE maps caution->caution (red) / remark->aside (slate) / note->aside.
     spec["accent"] = ctype
     role = accent_role(spec)
 

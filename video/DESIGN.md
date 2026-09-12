@@ -147,7 +147,7 @@ scenes:
 | 欄位 | 必填 | 意義 |
 |---|---|---|
 | `template` | yes | 使用哪個 scene template（見下方 "Template catalog"） |
-| `accent` | definition-family 必填 | 色彩角色：`definition` / `theorem` / `proposition` / `example` / `warning` / `procedure` / `recap`。取代舊的 `content_type`。**只管顏色**，不管 eyebrow 字卡（見下 §Eyebrow 字卡 resolver）。 |
+| `accent` | definition-family 必填 | 色彩角色：`definition` / `theorem` / `proposition` / `corollary` / `proof` / `example` / `solution` / `procedure` / `strategy` / `caution` / `warning` / `remark` / `note` / `recap`。取代舊的 `content_type`。**只管顏色**，不管 eyebrow 字卡（見下 §Eyebrow 字卡 resolver）。未設或不認得的值 → 中性 slate（見下 §語意色軸）。 |
 | `scene_role` | no | eyebrow 字卡的**教學 beat 軸**（與 `accent` 顏色軸正交）。exposition beat（`motivation`/`intuition`/`bridge`/`forward-ref`/`setup`/`roadmap`）→ **無字卡**；形式物件（`definition`/`theorem`/`remark`/…）→ 對應字卡。省略＝沿用模板/`accent` 預設字卡（見下 §Eyebrow 字卡 resolver）。 |
 | `title` | yes | 螢幕上的 scene title；可使用 `$...$` 表示數學 |
 | `say` | yes | 單一 narration 欄位（見下方） |
@@ -179,6 +179,38 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 | ~~`graph_focus` / `graph_compare`~~ | **deprecated alias → `graph` + `mode: single`/`2up`**（payload 不變；舊 scene 仍可渲） | — | — |
 
 **全 content 模板共用的選用欄位（上表各列不再重複）：** `scene_role`（eyebrow 字卡的 beat 軸，含「無字卡」；見下 §Eyebrow 字卡 resolver）、`kicker`（覆寫 eyebrow 標籤字、保留 accent 配色）、`part: {current, total}`（多頁分頁指示器，右上角）、`hook`（custom-animation factory，見上 §`content` scene 欄位）。`definition_math`／`theorem_proof` 另支援 `aside`（L3 右 rail enrichment 卡：主內容夠稀疏才展開成雙欄、過密自動收掉）。
+
+### 語意色軸＝講義的色軸（Direction B「對位」；2026-09-12 使用者裁決）
+
+**契約：同一個概念在 PDF 與影片是同一個色相。** 影片的語意色不再自訂，改**對位**到講義
+[`handout/latex/template/calcbook.sty`](../handout/latex/template/calcbook.sty) 的 `\definecolor` 軸；
+`LIGHT`（紙張底，與 PDF 同底）逐字沿用講義 hex，`DARK` 保持**色相不變**、只為深藍底提亮。
+
+| `accent` 值 | palette role | 講義來源 | LIGHT（＝講義） | DARK（提亮） |
+|---|---|---|---|---|
+| `definition` | `concept` | `aConcept` | `#994a00` 赭 | `#d98f3c` |
+| `theorem` / `proposition` / `corollary` / `proof` / `recap` | `result` | `aResult` | `#0068a7` 藍 | `#4fa6de` |
+| `example` / `solution` | `practice` | `aPractice` | `#04773b` 綠 | `#3ebe7c` |
+| `caution` / `warning` | `caution` | `aCaution` | `#aa3333` 紅 | `#d96b6b` |
+| `procedure` / `strategy` | `strategy` | `aStrategy` | `#6453a7` 紫 | `#a493e6` |
+| `remark` / `note` | `aside` | `aAside` | `#5d646f` 灰 | `#96a0ae` |
+
+**改了什麼（相對 Direction D）：** `definition` 與 `theorem` 的顏色**原本是對調的**——講義說
+definition＝赭、theorem＝藍，影片卻是 definition＝藍、theorem＝琥珀。另外 `caution`／`remark`／
+`note` 原本與不相干的族群共用顏色（`warning`／`secondary`／`accent`），現在各自獨立。
+
+**未標記場＝中性，不是繼承語意。** `blocks.DEFAULT_ROLE = "aside"`：`accent` 未設或不認得時給
+中性 slate 家具。（舊行為是退回 `definition`，在 definition 還是中性藍時無害；definition 現在
+是帶標記的赭，再繼承就等於替作者宣告了一個他沒寫的語意。）
+
+**模板不得寫死 accent。** 場內所有語意家具（`scene_head` eyebrow、spine cap、`theorem_proof`
+的 statement 卡色條、`derivation` 的 result 行與其 leader、`recap_cards` 的序號、
+`definition_math` 的 `anim: highlight` 行）一律走 `blocks.accent_role(spec)`。**例外＝
+`intro`／`outro` 的淺色品牌幀**：那裡的 `role="accent"` 是品牌紅，不是場語意，不要改。
+
+**閘：** [`_selftest_semantic_palette.py`](pipeline/_selftest_semantic_palette.py) 重讀
+`calcbook.sty` 並比對色相（DARK 容差 4°）——**任一條產線動了自己的色軸，這支會紅**，不會讓兩線
+靜默漂開。
 
 ### Eyebrow 字卡 resolver（`scene_role`；2026-07-01）
 

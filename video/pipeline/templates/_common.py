@@ -413,7 +413,10 @@ def example_head(spec: dict[str, Any], ctx: dict[str, Any]) -> tuple[list[Block]
 
 _ASIDE_INK = {"secondary": "blue_ink", "accent": "amber_ink", "success": "green_ink",
               "warning": "red_ink", "blue": "blue_ink", "amber": "amber_ink",
-              "green": "green_ink", "red": "red_ink"}
+              "green": "green_ink", "red": "red_ink",
+              # semantic roles (Direction B) -- each has its own ink tint in theme.py
+              "concept": "concept_ink", "result": "result_ink", "practice": "practice_ink",
+              "caution": "caution_ink", "strategy": "strategy_ink", "aside": "aside_ink"}
 
 
 def build_aside(aside, ground: str, *, max_width: float):

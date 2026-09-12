@@ -531,10 +531,15 @@ def text_glow(mob, ground: str, *, role: str = "accent", width: float = 2.0,
 
 
 def _glow_name(role: str) -> str:
-    """Map a semantic role (secondary/accent/success/warning) -> a GLOW key."""
-    return {"secondary": "blue", "accent": "amber", "success": "green",
-            "warning": "red", "blue": "blue", "amber": "amber", "green": "green",
-            "red": "red", "violet": "violet"}.get(role, "blue")
+    """Map a colour role -> a GLOW key (the halo hue under a crisp stroke)."""
+    return {# the handout's semantic axis (Direction B)
+            "concept": "amber", "result": "blue", "practice": "green",
+            "caution": "red", "strategy": "violet", "aside": "slate",
+            # legacy role names
+            "secondary": "blue", "accent": "amber", "success": "green", "warning": "red",
+            # hue names
+            "blue": "blue", "amber": "amber", "green": "green", "red": "red",
+            "violet": "violet", "slate": "slate"}.get(role, "blue")
 
 
 def dotted_leader(length: float, ground: str, *, role: str = "hairline_strong",

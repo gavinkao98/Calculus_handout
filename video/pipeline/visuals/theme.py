@@ -109,11 +109,26 @@ DARK: dict[str, str] = {
     # the recurring "muted teaching text" finding. Still clearly below ink_1 (lum .62 vs .89)
     # so the primary↔secondary hierarchy holds; ink_3 (muted=decoration only) is unchanged.
     "ink_1": "#eef2fb", "ink_2": "#c6cedd", "ink_3": "#6b748a", "ink_faint": "#444c5e",
-    # accents (4 working + 1 reserved)
-    "blue": "#5cc8ec", "amber": "#f2b13c", "green": "#54d199", "red": "#fb6a5d",
-    "violet": "#9d8cf2",
+    # accents. 2026-09-12 Direction B ("對位"): every hue is now HUE-MATCHED to the
+    # handout's own semantic axis in handout/latex/template/calcbook.sty, with lightness
+    # raised for this navy ground. Previously the two production lines disagreed -- the
+    # PDF said definition=ochre/theorem=blue, the video said definition=blue/theorem=amber,
+    # so the same concept was a different colour in each medium. Hue is the contract;
+    # `_selftest_semantic_palette.py` re-reads calcbook.sty and fails if either side drifts.
+    "blue": "#4fa6de", "amber": "#d98f3c", "green": "#3ebe7c", "red": "#d96b6b",
+    "violet": "#a493e6", "slate": "#96a0ae",
     # accent ink-tints (text on dark, slightly lifted)
-    "blue_ink": "#8fdcf6", "amber_ink": "#f7c469", "green_ink": "#79e0b4", "red_ink": "#ff8f86",
+    "blue_ink": "#79bfe8", "amber_ink": "#e8ab63", "green_ink": "#66d19a", "red_ink": "#e88f8f",
+    "violet_ink": "#bfb1ef", "slate_ink": "#b3bbc7",
+    # ---- semantic roles (the handout axis; these are what ACCENT_ROLE targets) ----
+    "concept":  "#d98f3c",  # calcbook aConcept  #994a00 -- definition
+    "result":   "#4fa6de",  # calcbook aResult   #0068a7 -- theorem/proposition/corollary/proof
+    "practice": "#3ebe7c",  # calcbook aPractice #04773b -- example/solution
+    "caution":  "#d96b6b",  # calcbook aCaution  #aa3333 -- caution
+    "strategy": "#a493e6",  # calcbook aStrategy #6453a7 -- strategy/procedure
+    "aside":    "#96a0ae",  # calcbook aAside    #5d646f -- remark
+    "concept_ink": "#e8ab63", "result_ink": "#79bfe8", "practice_ink": "#66d19a",
+    "caution_ink": "#e88f8f", "strategy_ink": "#bfb1ef", "aside_ink": "#b3bbc7",
     # hairlines (low-alpha ink flattened over navy bg #0a1322; retuned with the navy ground)
     "hairline": "#22324f", "hairline_strong": "#33456a", "hairline_faint": "#1a2840",
     # brand (theme-independent constants; used on paper frames + carried for continuity)
@@ -140,9 +155,20 @@ LIGHT: dict[str, str] = {
     "panel": "#ffffff", "panel_2": "#faf7ef",
     "ink_1": "#161a22", "ink_2": "#444b59", "ink_3": "#767d8c", "ink_faint": "#aab0bd",
     # accents darkened so they read on light paper
-    "blue": "#1f8fc0", "amber": "#c98414", "green": "#1ba272", "red": "#d8453b",
-    "violet": "#6a55c8",
-    "blue_ink": "#1f8fc0", "amber_ink": "#c98414", "green_ink": "#1ba272", "red_ink": "#d8453b",
+    "blue": "#0068a7", "amber": "#994a00", "green": "#04773b", "red": "#aa3333",
+    "violet": "#6453a7", "slate": "#5d646f",
+    "blue_ink": "#0068a7", "amber_ink": "#994a00", "green_ink": "#04773b", "red_ink": "#aa3333",
+    "violet_ink": "#6453a7", "slate_ink": "#5d646f",
+    # ---- semantic roles. This is a PAPER ground, the same as the PDF, so these carry the
+    #      handout's hexes VERBATIM -- no lifting. (Direction B, 2026-09-12.) ----
+    "concept":  "#994a00",  # calcbook aConcept
+    "result":   "#0068a7",  # calcbook aResult
+    "practice": "#04773b",  # calcbook aPractice
+    "caution":  "#aa3333",  # calcbook aCaution
+    "strategy": "#6453a7",  # calcbook aStrategy
+    "aside":    "#5d646f",  # calcbook aAside
+    "concept_ink": "#994a00", "result_ink": "#0068a7", "practice_ink": "#04773b",
+    "caution_ink": "#aa3333", "strategy_ink": "#6453a7", "aside_ink": "#5d646f",
     "hairline": "#dad8d2", "hairline_strong": "#c9c7c2", "hairline_faint": "#e7e4dd",
     "brand_red": "#ba0c2f", "brand_red_bright": "#d8453b",
     "brand_navy": "#16294e", "brand_gold": "#b6892b",
@@ -165,9 +191,9 @@ LIGHT: dict[str, str] = {
 # manim set_stroke wants (color, opacity) separately, not a single rgba. A curve gets
 # a wide low-alpha halo under a crisp stroke; emphasised text gets a tighter halo.
 GLOW: dict[str, tuple[str, float]] = {
-    "blue": ("#5cc8ec", 0.45), "amber": ("#f2b13c", 0.42),
-    "green": ("#54d199", 0.40), "red": ("#fb6a5d", 0.42),
-    "violet": ("#9d8cf2", 0.40),
+    "blue": ("#4fa6de", 0.45), "amber": ("#d98f3c", 0.42),
+    "green": ("#3ebe7c", 0.40), "red": ("#d96b6b", 0.42),
+    "violet": ("#a493e6", 0.40), "slate": ("#96a0ae", 0.38),
 }
 ACCENT_DIM = 0.22       # sub-emphasis fill/stroke opacity (column tint, leaders)
 GLOW_HALO_RATIO = 2.7   # halo stroke width = crisp width * this (6px crisp -> ~16px halo)

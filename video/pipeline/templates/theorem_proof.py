@@ -35,7 +35,7 @@ from typing import Any
 from manim import DOWN, FadeIn, LEFT, RIGHT, UP, MathTex, Rectangle, RoundedRectangle, Tex, VGroup
 
 from .. import brand
-from ..blocks import Block
+from ..blocks import Block, accent_role
 from ..timing import STOCK_ANIM_SECONDS
 from ..visuals import theme as T
 from ._common import (scene_head, motif_corner, center_in_zone, build_aside, render_scaffold,
@@ -99,7 +99,7 @@ def _statement_content(stmt_text: str, is_formula: bool, ground: str, max_width:
     return brand.prose(stmt_text, ground, role="primary", size="statement", max_width=max_width, align="LEFT")
 
 
-def _band_card(stmt_text: str, is_formula: bool, ground: str):
+def _band_card(stmt_text: str, is_formula: bool, ground: str, *, role: str):
     """A FULL-WIDTH statement band: a transparent full-width spacer forces the card to span
     CONTENT_W (accent_panel would otherwise shrink-wrap to the text) with its LEFT edge on the spine,
     so it shares the proof's round(left) column and _capacity_issues measures the two STACKED (Codex
@@ -112,15 +112,15 @@ def _band_card(stmt_text: str, is_formula: bool, ground: str):
         content.move_to(spacer)
     else:
         content.move_to(spacer.get_left(), aligned_edge=LEFT)
-    return brand.accent_panel(VGroup(spacer, content), ground, bar_role="accent",
+    return brand.accent_panel(VGroup(spacer, content), ground, bar_role=role,
                               fill_role="panel", pad=0.34, pad_x=band_pad_x)
 
 
-def _rail_card(stmt_text: str, is_formula: bool, ground: str):
+def _rail_card(stmt_text: str, is_formula: bool, ground: str, *, role: str):
     """A compact TOP-RIGHT rail card, shrink-wrapped to its content (no full-rail spacer) so a short
     statement reads tight; the caller hangs its right edge on the gutter."""
     content = _statement_content(stmt_text, is_formula, ground, RAIL_W - 2 * _CARD_PAD_X)
-    return brand.accent_panel(content, ground, bar_role="accent", fill_role="panel",
+    return brand.accent_panel(content, ground, bar_role=role, fill_role="panel",
                               pad=0.34, pad_x=_CARD_PAD_X)
 
 
@@ -188,8 +188,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     if use_aside:
         statement = brand.prose(spec.get("statement", ""), ground, role="primary",
                                 size="h2", max_width=PRIMARY_W - 0.3)
-        card = brand.accent_panel(statement, ground, bar_role="accent", fill_role="panel",
-                                  pad=0.42, pad_x=0.6)
+        card = brand.accent_panel(statement, ground, bar_role=accent_role(spec),
+                                  fill_role="panel", pad=0.42, pad_x=0.6)
         aside = build_aside(spec["aside"], ground, max_width=RAIL_W)
         card.move_to([left + card.width / 2, 0, 0])
         aside.move_to([RAIL_X, 0, 0], aligned_edge=LEFT)
@@ -223,7 +223,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     promote_pref, _n_lines, is_formula = statement_regime(spec, ground)
     promote = promote_pref
-    card = _band_card(stmt_text, is_formula, ground) if promote_pref else None
+    card = (_band_card(stmt_text, is_formula, ground, role=accent_role(spec))
+            if promote_pref else None)
     if promote and card.height + 0.4 + proof_stack_h > zone_h:
         promote = False                                 # band would overflow -> keep the two columns
 
@@ -231,7 +232,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         card.move_to([SPINE_X + card.width / 2, zone_top - card.height / 2, 0])
         proof_top = card.get_bottom()[1] - 0.4          # proof stacks BELOW the full-width band
     else:
-        card = _rail_card(stmt_text, is_formula, ground)
+        card = _rail_card(stmt_text, is_formula, ground, role=accent_role(spec))
         card.move_to([SPINE_X + CONTENT_W - card.width / 2, zone_top - card.height / 2, 0])
         proof_top = zone_top                            # proof sits BESIDE the card
     blocks.append(_statement_block(spec, card))

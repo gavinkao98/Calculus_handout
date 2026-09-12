@@ -42,7 +42,7 @@ from typing import Any
 from manim import DOWN, LEFT, RIGHT, FadeIn, MathTex, TransformMatchingShapes, VGroup
 
 from .. import brand
-from ..blocks import Block
+from ..blocks import Block, accent_role
 from ..timing import STOCK_ANIM_SECONDS
 from ..visuals import theme as T
 from ._common import (scene_head, example_head, motif_corner, place_body, body_zone,
@@ -91,13 +91,13 @@ def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
     return rows
 
 
-def _eq_mob(row: dict, ground: str):
+def _eq_mob(row: dict, ground: str, *, role: str):
     """The equation mobject for a row, coloured + sized by kind; check rows get a
     trailing green checkmark."""
     if row["kind"] == "result":
-        eq = MathTex(row["math"].strip(), color=T.color(ground, "accent"), font_size=T.fs(54))
+        eq = MathTex(row["math"].strip(), color=T.color(ground, role), font_size=T.fs(54))
         # crisper halo (was 3.0/0.45): Codex read the heavy amber glow as fuzzy/embossed.
-        return brand.text_glow(eq, ground, role="accent", width=2.2, opacity=0.38)
+        return brand.text_glow(eq, ground, role=role, width=2.2, opacity=0.38)
     # a check row is a PASS, not a struck-out aside: render it as bright as the steps
     # (was role="muted"/ink_3, which read as disabled/greyed-out -- 2026-06-21 A2 finding).
     eq = MathTex(row["math"].strip(), color=T.color(ground, "primary"), font_size=T.fs("math"))
@@ -209,7 +209,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
                                 max_width=content_w, align="LEFT")
 
     rows = _rows_from_spec(spec)
-    eqs = [_eq_mob(r, ground) for r in rows]
+    eqs = [_eq_mob(r, ground, role=accent_role(spec)) for r in rows]
     reasons = [_reason_mob(r, ground) for r in rows]
 
     # Reasons snap to the FIXED Lectern rail column (was: floating at
@@ -266,7 +266,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             if lead_end - lead_start > 0.12:
                 leader = brand.dotted_leader(
                     lead_end - lead_start, ground,
-                    role="accent" if r["kind"] == "result" else "hairline_strong",
+                    role=accent_role(spec) if r["kind"] == "result" else "hairline_strong",
                     opacity=0.6 if r["kind"] == "result" else 0.7)
                 leader.move_to([(lead_start + lead_end) / 2, y, 0])
                 group += [leader, reason]

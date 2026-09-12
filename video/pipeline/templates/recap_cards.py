@@ -23,7 +23,7 @@ from typing import Any
 from manim import LEFT, UL, UP, VGroup
 
 from .. import brand
-from ..blocks import Block
+from ..blocks import Block, accent_role
 from ._common import scene_head, motif_corner, center_in_zone, ColumnPlan, SPINE_X, CONTENT_W
 
 
@@ -49,8 +49,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     max_w = CONTENT_W - 1.2   # full content width minus numeral + buffer
     for i, t in enumerate(points):
         idx = brand.text_glow(
-            brand.heading(f"{i+1:02d}", ground, role="accent", size="h3"),
-            ground, role="accent", width=1.6, opacity=0.3)
+            brand.heading(f"{i+1:02d}", ground, role=accent_role(spec), size="h3"),
+            ground, role=accent_role(spec), width=1.6, opacity=0.3)
         txt = brand.prose(t, ground, role="text", size="prose", max_width=max_w, align="LEFT")
         first_line = txt.submobjects[0] if isinstance(txt, VGroup) and txt.submobjects else txt
         idx.next_to(first_line, LEFT, buff=0.34)

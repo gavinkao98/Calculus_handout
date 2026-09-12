@@ -30,6 +30,11 @@ class Block:
     # use this to choreograph bespoke manim while keeping the audio-driven
     # beat alignment -- play_block just reports what the animation spent.
     anim: Any = "write"      # write|fade|create|grow|slide|highlight|flash_in|write_glow|slide_pop|callable
+    # Nominal seconds for a CALLABLE anim. A hook's cost is invisible to
+    # timing.stock_animation_seconds (it can only read the stock table), so make.py's
+    # short-beat warning silently skips callables; a template that knows how long its
+    # custom animation runs declares it here and the warning keeps working.
+    anim_seconds: float | None = None
     static: bool = False
     # Overlap-guard scope (sizecheck._overlap_issues): only "content" blocks are
     # tested for screen-space collision against each other. "graph" = axes-space
@@ -42,23 +47,38 @@ class Block:
 
 # Direction D: 4 semantic accents. The role names map (via theme aliases) to hues:
 # secondary->blue, accent->amber, warning->red, success->green.
+# 2026-09-12 Direction B ("對位"): the semantic axis is now the handout's own
+# (handout/latex/template/calcbook.sty), so a concept carries the same hue in the PDF and
+# on screen. The targets are the semantic role keys in theme.DARK / theme.LIGHT.
+# What moved: definition was blue and theorem amber -- i.e. SWAPPED relative to the
+# handout, which says definition=ochre and theorem=blue. caution / remark / note also
+# stop sharing their colours with unrelated families.
 ACCENT_ROLE = {
-    "definition": "secondary",   # blue
-    "theorem": "accent",         # amber
-    "proposition": "secondary",  # blue
-    "example": "secondary",      # blue  (was "math"/electric; math is bright ink now)
-    "warning": "warning",        # red
-    "procedure": "secondary",    # blue (frame eyebrow + numeral are var(--accent)=blue)
-    "recap": "secondary",        # blue
-    # callout types (new template)
-    "remark": "secondary",       # blue
-    "caution": "warning",        # red
-    "note": "accent",            # amber
+    "definition":  "concept",    # ochre  -- calcbook aConcept
+    "theorem":     "result",     # blue   -- calcbook aResult
+    "proposition": "result",
+    "corollary":   "result",
+    "proof":       "result",
+    "recap":       "result",     # a recap restates results
+    "example":     "practice",   # green  -- calcbook aPractice
+    "solution":    "practice",
+    "procedure":   "strategy",   # violet -- calcbook aStrategy
+    "strategy":    "strategy",
+    "caution":     "caution",    # red    -- calcbook aCaution
+    "warning":     "caution",
+    "remark":      "aside",      # slate  -- calcbook aAside
+    "note":        "aside",
 }
+
+# An unmarked (or unrecognised) scene gets NEUTRAL furniture, not a semantic claim. It
+# used to fall back to blue via `accent="definition"`, which was harmless while definition
+# WAS the neutral blue; definition is now a marked ochre, so inheriting it would assert a
+# semantics the author never wrote. This is a resolved palette role, not an accent value.
+DEFAULT_ROLE = "aside"
 
 
 def accent_role(spec: dict[str, Any]) -> str:
-    return ACCENT_ROLE.get(spec.get("accent", "definition"), "secondary")
+    return ACCENT_ROLE.get(spec.get("accent"), DEFAULT_ROLE)
 
 
 def play_block(scene, block: Block, ground: str) -> float:

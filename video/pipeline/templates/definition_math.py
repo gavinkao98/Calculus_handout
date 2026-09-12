@@ -22,7 +22,7 @@ from typing import Any
 from manim import DOWN, LEFT, VGroup
 
 from .. import brand
-from ..blocks import Block
+from ..blocks import Block, accent_role
 from ..visuals import theme as T
 from ._common import (scene_head, motif_corner, place_body, body_zone, build_aside,
                       render_scaffold, ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
@@ -49,10 +49,13 @@ def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
 def _math_blocks(spec: dict[str, Any], ground: str):
     """Build the math line mobjects + their reveal anims.
 
-    The key line (`anim: highlight`) is amber + persistent text-shadow glow, revealed
-    with a flash; everything else is bright ink. The raw string goes to math_line
-    unstripped of `$` -- it auto-detects pure-math vs mixed text+inline `$math$` and
-    picks MathTex / Tex (stripping `$` broke "$a$ whenever $b$")."""
+    The key line (`anim: highlight`) carries THE SCENE'S OWN semantic colour + a
+    persistent text-shadow glow, revealed with a flash; everything else is bright ink.
+    (It used to be a fixed amber regardless of `accent:`, so a definition scene showed a
+    blue eyebrow and bar over an amber key line -- Direction B, 2026-09-12.) The raw
+    string goes to math_line unstripped of `$` -- it auto-detects pure-math vs mixed
+    text+inline `$math$` and picks MathTex / Tex (stripping `$` broke "$a$ whenever $b$")."""
+    role = accent_role(spec)
     math_mobs, anims = [], []
     for entry in spec.get("math", []):
         if isinstance(entry, dict):
@@ -60,8 +63,8 @@ def _math_blocks(spec: dict[str, Any], ground: str):
         else:
             tex, anim = entry, "write"
         if anim == "highlight":
-            mob = brand.text_glow(brand.math_line(tex.strip(), ground, role="accent"),
-                                  ground, role="accent")
+            mob = brand.text_glow(brand.math_line(tex.strip(), ground, role=role),
+                                  ground, role=role)
             anim = "write_glow"
         else:
             mob = brand.math_line(tex.strip(), ground, role="primary")
