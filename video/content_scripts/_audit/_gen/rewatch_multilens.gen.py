@@ -17,6 +17,8 @@ import io
 import json
 from pathlib import Path
 
+from rewatch_merge import rule_counts
+
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
 
@@ -25,6 +27,8 @@ CHECK = {"confirmed": ("✔ 核實", "c-ok"), "plausible": ("◐ 合理", "c-pl"
          "dup": ("≡ 重複", "c-dup"), None: ("· 未核", "c-none"), "": ("· 未核", "c-none")}
 SEV_ORDER = {"must": 0, "should": 1, "nice": 2, "note": 3}
 LENS_NAME = {"R1": "初學者", "R2": "動畫導演", "R3": "教學設計", "R4": "節奏剪輯", "R5": "講師"}
+RULE_NAME = {"ML1": "一場一張畫布", "ML2": "畫出來，只動變的 token", "ML3": "框、放大鏡、調暗，不靠鏡頭",
+             "ML4": "靜止是設計出來的", "ML5": "語意色貫穿圖與式", "unlabeled": "未標"}
 
 
 def esc(s) -> str:
@@ -129,6 +133,15 @@ def render(digest: dict, pack_dir: Path, embed: bool) -> str:
                    f'<td>{s["duration"]:.0f}</td><td>{s["motion"]["static_ratio"] * 100:.0f}%</td>{cells}'
                    f'<td>{chip(s.get("level") or "—", "lens")}</td><td class="left">{esc(s.get("one_change", ""))}</td></tr>')
     out.append("</tbody></table>")
+    # finding x motion-language rule (rubric `rule`; digest by_rule, recomputed for digests that predate it)
+    total = digest.get("by_rule") or rule_counts([f for s in scenes for f in s["findings"]])
+    per = {s["n"]: (s.get("by_rule") or rule_counts(s["findings"])) for s in scenes}
+    out.append("<h3>finding × 畫面語法規則</h3><p class=\"small\"><code>rule</code> 欄位（SPEC-motion-language.md §0；R2 MUST、其他鏡 MAY）；不計 ✖ 駁回／≡ 重複與 note。</p>"
+               "<table><thead><tr><th>代號</th><th>規則</th><th>合計</th><th>各場（場號 ×條數）</th></tr></thead><tbody>")
+    for code, n in total.items():
+        where = "、".join(f"{k:02d}×{c[code]}" for k, c in per.items() if c.get(code))
+        out.append(f"<tr><td><code>{esc(code)}</code></td><td>{esc(RULE_NAME.get(code, code))}</td><td>{n}</td><td class=\"small\">{esc(where)}</td></tr>")
+    out.append("</tbody></table>")
     # per-lens film verdicts
     out.append("<h2>二、各鏡總評（原文，未經合成）</h2>")
     for r in runs:
@@ -158,7 +171,7 @@ def render(digest: dict, pack_dir: Path, embed: bool) -> str:
             ck_label, ck_cls = CHECK.get(f.get("check"), CHECK[None])
             cls = "finding refuted" if f.get("check") in ("refuted", "dup") else "finding"
             hd = (chip(f["run"] + " " + LENS_NAME[f["lens"]], "lens") + chip(f["severity"], "sev-" + f["severity"])
-                  + (chip(f["dim"], "lens") if f["dim"] else "") + chip(ck_label, ck_cls)
+                  + (chip(f["dim"], "lens") if f["dim"] else "") + (chip(f["rule"], "lens") if f.get("rule") else "") + chip(ck_label, ck_cls)
                   + f'<span class="where">{esc(f["fid"])} · {esc(f["where"])}</span>')
             body = ""
             if f["evidence"]:

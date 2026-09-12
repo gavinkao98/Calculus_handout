@@ -26,6 +26,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
 RUN_LENS = {"R1a": "R1", "R1b": "R1", "R2": "R2", "R3": "R3", "R4": "R4", "R5": "R5"}
+RULES = ("ML1", "ML2", "ML3", "ML4", "ML5")   # motion-language rule codes (rubric `rule`; SPEC-motion-language.md §0)
 DEFAULT_MODELS = ("R1a=Gemini 3.1 Pro (high) · agy:agy,R1b=Claude Sonnet 4.6 · agy:agy,R2=Claude Opus 5 · subagent:sub,"
                   "R3=Claude Sonnet 5 · subagent:sub,R4=Claude Haiku 4.5 · subagent:sub,R5=Gemini 3.8 Flash (high) · agy:agy")
 
@@ -42,6 +43,16 @@ def load_run(d: Path, source: str):
         (d / "result.json").write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
         return data, usage
     return json.loads((d / "result.json").read_text(encoding="utf-8")), usage
+
+
+def rule_counts(findings: list[dict]) -> dict[str, int]:
+    """finding x rule: count per ML code + "unlabeled"; notes and refuted/dup findings are not counted."""
+    counts = {r: 0 for r in (*RULES, "unlabeled")}
+    for f in findings:
+        if f.get("dim") != "note" and f.get("check") not in ("refuted", "dup"):
+            key = f.get("rule") or "unlabeled"
+            counts[key] = counts.get(key, 0) + 1
+    return counts
 
 
 def main() -> int:
@@ -86,7 +97,7 @@ def main() -> int:
             verdicts[run] = sc.get("verdict", "—")
             for k, f in enumerate(sc.get("findings", []), 1):
                 findings.append({"fid": f"{run}.{n:02d}.{k}", "run": run, "lens": L["lens"],
-                                 **{key: f.get(key, "") for key in ("dim", "severity", "where", "evidence", "problem", "proposal")},
+                                 **{key: f.get(key, "") for key in ("dim", "severity", "rule", "where", "evidence", "problem", "proposal")},
                                  "check": None, "check_note": ""})
             if sc.get("note"):
                 findings.append({"fid": f"{run}.{n:02d}.note", "run": run, "lens": L["lens"], "dim": "note", "severity": "note",
@@ -102,12 +113,14 @@ def main() -> int:
                 c = verify.get("checks", {}).get(f["fid"])
                 if c:
                     f["check"], f["check_note"] = c.get("check"), c.get("note", "")
+        rec["by_rule"] = rule_counts(rec["findings"])
         scenes.append(rec)
 
     digest = {"deck": pack["deck"], "film_path": pack["film"], "total_seconds": pack["total_seconds"],
               "date": args.date, "rubric": "video/content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md",
               "lenses": {run: {k: v for k, v in L.items() if k != "by_id"} for run, L in lenses.items()},
-              "missing_runs": missing, "scenes": scenes, "film": (verify or {}).get("film", {})}
+              "missing_runs": missing, "scenes": scenes, "film": (verify or {}).get("film", {}),
+              "by_rule": rule_counts([f for s in scenes for f in s["findings"]])}
     args.out.write_text(json.dumps(digest, ensure_ascii=False, indent=1), encoding="utf-8")
     nf = sum(1 for s in scenes for f in s["findings"] if f["dim"] != "note")
     unchecked = [f["fid"] for s in scenes for f in s["findings"] if f["dim"] != "note" and not f["check"]]

@@ -8,6 +8,7 @@ One reviewer = one lens. The orchestrator assembles a per-lens prompt from this 
   {{PACK_DIR}}      path of the rewatch pack the reviewer may read
   {{EXTRA_INPUTS}}  lens-specific extra inputs (R3: the handout section .tex) or "（無）"
   {{OUTPUT_SCHEMA}} the JSON schema text (rewatch-findings.schema.json)
+  {{RULE_FIELD}}    the rubric's "### `rule`" sub-section (motion-language rule codes ML1–ML5), verbatim
 The assembled prompt is NOT committed (it duplicates the rubric); it lives in the gitignored
 scratchpad workspace of that run. External runs (agy) get the assembled prompt as PROMPT.md in
 an isolated workspace: agy --print "Read PROMPT.md and do exactly what it says" --mode plan ...
@@ -45,3 +46,5 @@ an isolated workspace: agy --print "Read PROMPT.md and do exactly what it says" 
 ```json
 {{OUTPUT_SCHEMA}}
 ```
+
+{{RULE_FIELD}}

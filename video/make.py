@@ -47,6 +47,7 @@ from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 from pipeline.tts import read_manifest_status, _has_audio  # noqa: E402 (manim-free fail-closed guard reuse)
 from pipeline import house_audio  # noqa: E402
 from pipeline import pauses  # noqa: E402
+from pipeline.stillness import UNDECLARED_STILL_SECONDS, undeclared_still_beats  # noqa: E402
 from pipeline.timing import (  # noqa: E402
     SCENE_LEAD_SECONDS,
     SCENE_TAIL_SECONDS,
@@ -345,6 +346,39 @@ def _warn_short_beats(meta: dict, scenes: list[dict], manifest: dict) -> None:
         print("[sync] consider merging consecutive {show} markers into a narrated beat.", flush=True)
     else:
         print("[sync] beat timing clean", flush=True)
+
+
+def _warn_undeclared_stillness(meta: dict, scenes: list[dict], manifest: dict) -> None:
+    """SPEC-motion-language rule 4 advisory: a beat still for > 6 s with nothing declared
+    (no `paced:` / `pauses:` / callable animation). Same inputs as _warn_short_beats;
+    warn-only, never blocks the render."""
+    from pipeline.templates import build_blocks  # deferred: imports manim objects
+
+    durations = _beat_durations(manifest)
+    hits: list[str] = []
+    for scene in scenes:
+        if scene.get("kind", "content") != "content":
+            continue
+        sid = scene["id"]
+        beat_seconds = durations.get(sid)
+        if not beat_seconds:
+            continue
+        blocks = build_blocks(scene, {"ground": "dark", "meta": meta})
+        # callable anim (hook / sweep / `seconds: beat` / `anim: transform`) -> None: the
+        # picture moves by itself. Static blocks stay out, so their reveal counts as no motion.
+        anim_seconds = {b.id: stock_animation_seconds(b.anim) for b in blocks if not b.static}
+        beats = [{"index": i, "reveal": beat.reveal, "seconds": float(beat_seconds[i - 1])}
+                 for i, beat in enumerate(parse_say(scene.get("say", "")), start=1)
+                 if i <= len(beat_seconds)]
+        for index, still, reveal in undeclared_still_beats(
+                beats, anim_seconds, set(scene.get("paced") or []),
+                {p["after"] for p in scene.get("pauses") or []}):
+            hits.append(f"[stillness] {sid}: beat {index:02d} holds {still:.1f}s with nothing "
+                        f"declared (reveal={reveal!r}); add paced:/pauses:/sweep or split the beat")
+    for line in hits:
+        print(line, flush=True)
+    if not hits:
+        print(f"[stillness] no undeclared still > {UNDECLARED_STILL_SECONDS:g}s", flush=True)
 
 
 def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, quality: str):
@@ -969,6 +1003,7 @@ def main() -> int:
     manifest = pauses.apply_pauses(scenes, manifest, audio_dir / "paused")
 
     _warn_short_beats(meta, scenes, manifest)
+    _warn_undeclared_stillness(meta, scenes, manifest)
 
     # render
     rendered, failures = render(meta, scenes, manifest, out_dir, args.quality)

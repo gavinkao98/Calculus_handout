@@ -52,7 +52,7 @@
   - `D-composition` 版面：留白、層次、字量、圖與字的關係。
   - `D-continuity` 場與場之間的視覺連貫（同一個圖形換場後有沒有延續）。
   - `D-dwell` reveal 之後的停留：夠看完嗎、還是停太久變成投影片？
-- **輸出重點**：每場 verdict ＋ findings；`film.patterns` 寫全片的視覺語言診斷；對每一場給**一個最值得做的動作**（proposal 要具體到「什麼東西怎麼動、幾秒」）。
+- **輸出重點**：每場 verdict ＋ findings；`film.patterns` 寫全片的視覺語言診斷；對每一場給**一個最值得做的動作**（proposal 要具體到「什麼東西怎麼動、幾秒」）。finding 對得上畫面語法規則就標 `rule`（`ML1`–`ML5`，定義見「輸出格式」的 `rule` 小節）。
 
 ### R3 教學設計（Lesson-arc designer）
 
@@ -110,6 +110,7 @@
         {
           "dim": "<本鏡的維度代碼>",
           "severity": "should",
+          "rule": "ML2",
           "where": "tile 05 (+46.1s)",
           "evidence": "旁白念「…引文…」時，畫面上…（描述你實際看到的）",
           "problem": "為什麼這對觀眾是問題",
@@ -123,6 +124,19 @@
 
 - `scenes` 必須 27 場齊全（順序同 INDEX），乾淨場 `findings: []`。
 - `where` 一律含格號或秒數；`evidence` 一律含引文或畫面描述。
+- `rule`（選填）＝這條 finding 違反的畫面語法規則代號，見下節；未標的在 digest 歸「未標」。
+
+### `rule`：畫面語法規則代號（選填；R2 MUST、其他鏡 MAY）
+
+值域＝[`../../SPEC-motion-language.md`](../../SPEC-motion-language.md) §0 的五條規則，代號 `ML1`–`ML5`（ML＝motion language；不用 R1–R5，免與鏡頭編號撞名）。**R2 動畫導演鏡 MUST 標**——finding 對得上規則就標，對不上留空；**其他鏡 MAY 標**。合成後 digest 按它計數（`by_rule`：總計＋每場），HTML 出「finding × 規則」小表。
+
+| 代號 | 規則 | 一句話（SPEC §0） | 對位機制（DESIGN.md） |
+|---|---|---|---|
+| `ML1` | 一場一張畫布 | 承重物件在一幕裡只建一次，換步驟用位移／縮放／複製搬去新佈局；臨時標註縮小加淡出退場 | 原語 5（跨場延續） |
+| `ML2` | 畫出來，只動變的 token | 曲線由點走出、文字逐字寫、式子只動變的 token；整行 FadeOut 再 FadeIn 是反模式 | `anim: transform`、`paced:` |
+| `ML3` | 框、放大鏡、調暗，不靠鏡頭 | 注意力用框選預備、inset 放大（主圖不縮放）、主圖降亮；2D 場不以 zoom 為第一選擇 | `focus:` |
+| `ML4` | 靜止是設計出來的 | 每段超過 6 s 的靜止 MUST 是宣告的（`pauses:`）或被 paced／sweep 填滿；動作只在步驟切換時發生 | `pauses:`、`paced:`、`seconds: beat`、12 s 驗收線 |
+| `ML5` | 語意色貫穿圖與式 | 同一變數在圖、括號、軸標、填色、式子 token 用同色；卡類型色與箭頭色本身就是語意 | `color_role` |
 
 ## 編排（orchestrator 的事，評審員不必讀）
 

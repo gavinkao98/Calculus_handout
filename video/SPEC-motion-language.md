@@ -15,8 +15,8 @@
 | 1 | **一場一張畫布** | 承重物件在一幕裡只建一次，換步驟用位移／縮放／複製搬去新佈局；臨時標註縮小加淡出退場 | `color_role`（顏色延續）、`{show scaffold.*}`（版面不變、晚到） | 物件跨場攜帶、複本飛去角落當 inset、收尾歸位 | 每幕至少一個承重物件跨場延續；R2「一場一張卡」finding＝0 |
 | 2 | **畫出來，只動變的 token** | 曲線由點走出、文字逐字寫、式子只動變的 token；整行 FadeOut 再 FadeIn 是反模式 | `anim: transform`、`paced:`（隨旁白書寫）、`seconds: beat` | token 級插入（鄰居讓位）、兩段式消去、graph 物件 Create 而非 Fade | 新稿 derivation 場整塊淡入 ≤ 1 次（首列） |
 | 3 | **框、放大鏡、調暗，不靠鏡頭** | 注意力用框選預備、inset 放大（主圖不縮放）、主圖降亮；2D 場不以 zoom 為第一選擇 | `focus:`（壓暗與還原）、transform 自動把來源列退為 muted | inset 放大鏡、變動前框選、強調閃爍（Indicate） | 每個 derivation 結果拍與 graph 關鍵拍有 focus 宣告；R2「找不到重點」finding＝0 |
-| 4 | **靜止是設計出來的** | 每段超過 6 s 的靜止 MUST 是宣告的（`pauses:`）或被 paced／sweep 填滿；動作只在步驟切換時發生 | `pauses:`、`paced:`、`seconds: beat`、⑧ 的 12 s 線 | 「未宣告靜止 > 6 s」advisory lint | `longest_still_seconds` ≤ 12 s（沿用）＋未宣告靜止 > 6 s＝0 |
-| 5 | **語意色貫穿圖與式** | 同一變數在圖、括號、軸標、填色、式子 token 用同色；卡類型色與箭頭色本身就是語意 | `color_role`（derivation 列、graph plot）、Direction B 色軸（accent） | deck 級變數色表、MathTex token 上色、箭頭色＝目標色 | 同一節內同一變數不得出現兩種色；visual-frame-audit 增一條 |
+| 4 | **靜止是設計出來的** | 每段超過 6 s 的靜止 MUST 是宣告的（`pauses:`）或被 paced／sweep 填滿；動作只在步驟切換時發生 | `pauses:`、`paced:`、`seconds: beat`、⑧ 的 12 s 線、**`[stillness]` advisory（`make.py`＋`pipeline/stillness.py`，2026-09-13 接線）** | R4 rubric 門檻對齊（kickoff T5） | `longest_still_seconds` ≤ 12 s（沿用）＋未宣告靜止 > 6 s＝0 |
+| 5 | **語意色貫穿圖與式** | 同一變數在圖、括號、軸標、填色、式子 token 用同色；卡類型色與箭頭色本身就是語意 | `color_role`（derivation 列、graph plot）、Direction B 色軸（accent）、**VISUAL-FRAME V10（2026-09-13 接線）** | deck 級變數色表、MathTex token 上色、箭頭色＝目標色（kickoff T1） | 同一節內同一變數不得出現兩種色；V10 blocking＝0 |
 
 ## 1. 依據（一段講完）
 
@@ -88,7 +88,7 @@
 
 **落地。**
 - 已有：`pauses:`（純旁白變換，插靜音）、`paced:`（逐段攤在整拍）、`seconds: beat`、`rewatch_pack` 的 `longest_still_seconds`。
-- 缺：schema／lint 的 advisory「本場有 > 6 s 的拍既無 paced／sweep／`seconds: beat`、也無 `pauses:`」，讓作者在 render 前就看到。
+- 已接線（2026-09-13）：`make.py` 的 `[stillness]` advisory——「本場有 > 6 s 的拍既無 paced／sweep／`seconds: beat`、也無 `pauses:`」在 render 前就印出來；callable 動畫一律視為畫面自己在動（含 `anim: transform`，此為已知盲點）。
 
 **驗收。** `longest_still_seconds` ≤ 12 s（沿用）；未宣告靜止 > 6 s 的拍＝0。
 
@@ -111,12 +111,14 @@
 
 B1 證明只用四種動作（cross-dissolve、appear、箭頭 wipe、單段平移）就能撐起一致的 60 支，代價是放棄規則一到三。這給「模板層普遍有動」定了下限：**規則四與五是每場零成本的模板行為，MUST 全書一致；規則一到三每場至少做一處，其餘比照分段揭示**（B1 子代理的建議）。要往 A1／C1 靠的招牌場，再把規則一到三做滿。R7 兩級製作的裁決屆時以此為分界。
 
-## 4. 驗收接線（待做，另案）
+## 4. 驗收接線（2026-09-13 狀態）
 
-- REWATCH R2 導演鏡 rubric：finding 標規則編號（R1 到 R5），讓 digest 能按規則統計。
-- `visual-frame-audit`：規則 5 的色一致性檢查。
-- schema／lint：規則 4 的未宣告靜止 advisory；規則 1 的攜帶宣告存在性。
+- ✅ REWATCH rubric：finding 可標規則代號 **`rule: ML1`–`ML5`**（motion language；`R1–R5` 是鏡頭編號、`G1–G6` 是容量契約，故另取前綴；選填，R2 導演鏡 MUST 標、其他鏡 MAY），定義表在 [`REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)「輸出格式」的 `rule` 小節並逐字注入每鏡 prompt；`rewatch-findings.schema.json`／`rewatch_merge.py`（`by_rule`，不計 refuted／dup）／`rewatch_multilens.gen.py`（finding × 規則小表＋chip）同步。
+- ✅ `visual-frame-audit`：規則 5 的色一致性＝VISUAL-FRAME **V10**（結論式 token 色對不上圖上物件＝blocking）；agent 提示、REVIEW_GATES、`critic.py` 的 V 範圍同步到 V1–V10。
+- ✅ 規則 4 的未宣告靜止 advisory＝`make.py` `[stillness]`（`pipeline/stillness.py`，6 s，warn-only；DESIGN.md「motion primitive：`pauses:`」節）。
+- ⏳ 規則 1 的攜帶宣告存在性：依附於尚未建的 `carry:` 欄位，併入 [`KICKOFF-motion-language-gaps.md`](KICKOFF-motion-language-gaps.md) T4-4。
 - `rewatch_pack`：兩個門檻（0.2%／0.05%）並列輸出，已在 ⑬ 註明。
+- **code 缺口（規則 1 到 3、規則 5 的變數色表）＝[`KICKOFF-motion-language-gaps.md`](KICKOFF-motion-language-gaps.md)**（T1 色表、T2 inset／框選／閃爍、T3 token 級變形與兩段式消去、T4 跨場攜帶、T5 三門檻對齊）。
 
 ## 附錄 A　替代方案研究摘要（2026-09-12）
 

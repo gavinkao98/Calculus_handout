@@ -67,6 +67,7 @@ def main() -> int:
     schema = (AUD / "rewatch-findings.schema.json").read_text(encoding="utf-8")
     common = section(rubric, "## 共同規則", ["## 五鏡"]).split("\n", 1)[1].strip()
     lens_sections = {k: section(rubric, f"### {k} ", ["### R", "## 輸出格式"]) for k in ("R1", "R2", "R3", "R4", "R5")}
+    rule_field = section(rubric, "### `rule`", ["## 編排"])
 
     ws = args.ws.resolve()
     copy_pack(args.pack.resolve(), ws / "pack")
@@ -87,7 +88,8 @@ def main() -> int:
                 .replace("{{COMMON_RULES}}", common)
                 .replace("{{PACK_DIR}}", str(ws / "pack"))
                 .replace("{{EXTRA_INPUTS}}", extra[lens] + scope)
-                .replace("{{OUTPUT_SCHEMA}}", schema.strip()))
+                .replace("{{OUTPUT_SCHEMA}}", schema.strip())
+                .replace("{{RULE_FIELD}}", rule_field))
         if lens == "R4":
             body = body.replace("每場：先看 sheet（整張看過每一格與標籤），再讀 md（時間軸與數字）",
                                 "每場：只讀 md（時間軸與數字；本鏡不看圖）")

@@ -753,6 +753,20 @@ pauses:                      # content 場專用，opt-in
 reuse／freshness 都對它做雜湊；變換只作用於 make.py 記憶體中的副本。
 `schema.py` 擋 `after` 指到 `say` 沒揭示過的 id（指錯的 pause 一定是 typo）。
 
+**未宣告靜止 advisory（[`SPEC-motion-language.md`](SPEC-motion-language.md) 規則 4；2026-09-13）。**
+`make.py` 在 `pauses.apply_pauses` 之後、render 之前多印一道 `[stillness]`：每個 content 場、每一拍算
+「靜止秒數」＝拍長（pauses 已折入）− 該拍揭示 block 的 stock 動畫秒數；沒揭示任何東西的拍（典型＝首拍）
+整拍算靜止。靜止 > 6 s（[`pipeline/stillness.py`](pipeline/stillness.py) `UNDECLARED_STILL_SECONDS`）且該拍的
+reveal 既不在 `paced:`、也沒有 `pauses:` 條目、動畫也不是 callable（hook／sweep／`seconds: beat`／
+`anim: transform` 一律視為畫面自己在動）就報一行
+`[stillness] <scene>: beat NN holds X.Xs with nothing declared (reveal=...); add paced:/pauses:/sweep or split the beat`。
+純 advisory：不改 exit code、不擋 render，讓作者在花一次 render 前就看到六鏡抓到的「一次揭示＋18 秒不動」
+與「首拍無 reveal 37.6 s」。判定函式 `stillness.undeclared_still_beats` 是 manim-free 純函式，
+`_selftest_stillness.py` 釘住七個案例。**已知盲點：** callable 一律免檢，故 1.2 s 的 `transform` 接長 hold
+不會被抓——beat-paced sweep 的 `Block.anim_seconds` 是佈局 placeholder 3.0，不能拿來當真實動畫長度。
+三個門檻的分工：**6 s＝這道 authoring advisory、12 s＝`rewatch_pack` 量測閘（品質補強輪 ⑧）、REWATCH R4
+模型判讀**（對齊見 [`KICKOFF-motion-language-gaps.md`](KICKOFF-motion-language-gaps.md) T5）。
+
 **`anim: transform`（derivation 的 `steps[i]` / `result`）——原地改寫。**
 不是淡入一行寫好的式子，而是把**上一列的式子變形成這一列**，並把來源那列退為
 muted（opacity 0.55）。用 `TransformMatchingShapes` 逐字形配對，**不是**

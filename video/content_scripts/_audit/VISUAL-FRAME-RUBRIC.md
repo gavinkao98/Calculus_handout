@@ -10,7 +10,7 @@
 
 幀稽核分兩層，各司其職：
 
-- **Layer 1 — Blocking gate（V1–V9）：對錯／可讀性**，二元 Blocking/Advisory；**收斂判準＝視覺 blocking==0**。
+- **Layer 1 — Blocking gate（V1–V10）：對錯／可讀性**，二元 Blocking/Advisory；**收斂判準＝視覺 blocking==0**。
 - **Layer 2 — AES magnitude（A1–A7）：美學 polish**，每維 0–100＋具體缺陷（severity low/med/high）；**驅動「判→採→重 render→複驗」迴圈的優先序**，本身不 gate 收斂（低分＝advisory，不單獨擋稿）。
 
 **兩層重疊怎麼判（escalation rule，比照 figure-audit「蓋住資訊→Blocking／輕微→advisory」）：** 同一個觀察——**會丟資訊／矛盾／亂碼 → 升 Layer 1 的 V-blocking；只是擠／不夠清楚／不夠美 → 扣 Layer 2 的 A 分。**
@@ -29,6 +29,7 @@
 - **V7 reveal 同步（影片特有）。** 每個元素**跟著它的 narration beat 出現**——不早（劇透學生要算的答案）、不晚（旁白提到還沒出現的東西）。破壞教學 → **Blocking**；輕微時序 → advisory。
 - **V8 視覺數學正確 vs 源（限「幀上可見」）。** 畫出來且**看得到的**座標／數值／形狀與底層數學相符。可見量值不符 → **Blocking**；**刻意示意比例（標籤數學正確、形狀近似）→ advisory**（沿用 figure A1/D6 慣例）。
   - **邊界：** V8 只查**幀上看得到的**；hook code 的數學保真（看不到的座標、生成邏輯）歸**工程鏡**（`review_pack.py`，待修），兩邊各管一半。
+- **V10 語意色一致（畫面語法規則 5；2026-09-13 加）。** 同一節內同一個變數或幾何量（$\theta$、$d\theta$、「那條 $\sin$ 曲線」、被夾的扇形…）在圖、括號、軸標、填色、讀數框與式子 token 上**用同一色**。**結論式的 token 色與圖上對應物件的色對不上**、或**同一幀內同一個量出現兩種色** → **Blocking**（讀者得重新對應，等同丟資訊）；色相一致但飽和度／亮度分層不清 → advisory（改扣 A4）。**不是 finding：** 刻意的分層（`focus:` 壓暗、`anim: transform` 把來源列退為 muted、退場物件降飽和）；deck 尚未宣告變數色表時，只查幀上看得到的衝突，不對整節追一張色表。依據 [`../../SPEC-motion-language.md`](../../SPEC-motion-language.md) 規則 5；機制＝`color_role`（graph plot／derivation 列）。
 - **V9 量化讀值的尺度（gap A）。** 當旁白／標題要觀眾從圖上**讀出某個具體座標或數值**（「在 $x=a$」「值為 $L$」「從 $1$ 降到 $-1$」），那個值必須**讀得到**——靠軸刻度（teaching-tick）／標在點線上的數值標籤／軸數字其一。**完全無從讀到**（無刻度、無數值標籤、無標記）→ **Blocking**（丟資訊，等同沒給數據）。值由標記點／標籤**間接**傳達但缺軸尺度 → **Advisory**（改扣 A1）。**純定性圖**（只談形狀／趨勢／對稱／單調，不要求讀任何具體值）維持無刻度 → **不是 finding**。判準依 DESIGN.md graph「座標軸刻度／級距：何時該標」的 qualitative／quantitative 兩分。
 
 ## Layer 2 — AES magnitude 維（每維 0–100；驅動重 render 優先序）
@@ -59,7 +60,7 @@
 
 ## 收斂與回報
 
-- **收斂判準：** 該節視覺通過 ＝ **視覺 blocking（V1–V9）== 0**。A 分（A1–A7）驅動「先重 render 哪個／夠不夠 polished」但**不 gate 收斂**；advisory 由使用者逐筆裁。
+- **收斂判準：** 該節視覺通過 ＝ **視覺 blocking（V1–V10）== 0**。A 分（A1–A7）驅動「先重 render 哪個／夠不夠 polished」但**不 gate 收斂**；advisory 由使用者逐筆裁。
 - **回報格式（沿用 `critic.py` 的機器可整理 JSON＋人讀報告）：**
   - 首行 `VERDICT: <X> visual blocking`（V 維）。
   - **V 維 findings：** `- [Blocking|Advisory] [V#] scene/frame — 證據（座標/觀察/位置）→ 為何 → 建議修法`。
