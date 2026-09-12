@@ -32,7 +32,7 @@ deck 閘失敗也算 `[FAIL]`——工具鏈綠不等於產線綠（2026-08-10 �
 | **② 系統 binary** | `ffmpeg`、`ffprobe` | 每台 `winget install --id Gyan.FFmpeg -e`（**含 ffprobe**） |
 | **③ LaTeX** | MiKTeX：`latex`、`dvisvgm` + `plex-sans`/`plex-mono`/`lmodern`/`microtype`（Route A：video 文字＋數學皆走 LaTeX；MiKTeX 首編自動補裝） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法） |
 | **①b 影片字型** | **全走 LaTeX**：文字 IBM Plex Sans/Mono、數學 Latin Modern（套件見 ③）。**不再用 Pango 系統字型**（Times/Courier 已棄） | 無需安裝系統字型；只要 ③ 的 MiKTeX 套件在即可（`doctor.py` 以 kpsewhich 驗）。video 不 vendored 任何字型 |
-| **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/figkit/shot.mjs` 截圖） | 每台裝 Node LTS + Chrome |
+| **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/figkit/shot.mjs` 截圖、`video/experiments/reference_frames/yt_frames.mjs` 抓 YouTube 幀） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **⑤c agy（Antigravity CLI，多模型唯讀評審，選用）** | 看片多鏡評審等要拉開模型家族（Gemini／Claude 4.6）的唯讀評審；走 Antigravity 訂閱 | 本體隨 Antigravity IDE 裝在 `%LOCALAPPDATA%\agy\bin\`（安裝程式通常已加進使用者 PATH）；找不到時部署版控 shim [`tools/agy.cmd`](tools/agy.cmd)；見下方 ⑤c |
 | **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](authoring/_archive/deai/PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
@@ -148,7 +148,7 @@ python -m pip install --upgrade whisper-timestamped stable-ts
 - **影片不 vendored 任何字型。** Direction D 的 vendored 設計字型早於 2026-06-20 清理移除；`fonttools` 仍是依賴（logo 外框工具
   `pipeline/assets/_outline_text.py` 用）。
 
-### ④ Node + Chrome — 只給 handout 圖 render 用
+### ④ Node + Chrome — 給 handout 圖 render 與 `video/experiments/reference_frames/` 抓 YouTube 幀用
 - [`legacy/html_handout/build.py`](legacy/html_handout/build.py) 組裝 HTML 是**純 Python stdlib**，任何 python 都能跑、無額外需求。
 - [`handout/figkit/shot.mjs`](handout/figkit/shot.mjs)（render `.sheet` 成 PNG 餵 figure 稽核）需要
   **Node ≥21**（global WebSocket/fetch）＋ **Google Chrome**。Chrome 路徑現在會先讀 `CHROME` 環境變數、

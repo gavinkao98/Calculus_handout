@@ -17,6 +17,7 @@ video/
   CONTENT_METHODOLOGY.md   Stage-1 內容稿撰寫方法論（拆解、narration、來源標註）
   REBUILD_STATUS.md    跨對話進度錨（逐節狀態以此為準）
   REVIEW_GATES.md / REVIEW_MODEL_DECISIONS.md / RUNBOOK-*.md   審核層／決策／流程
+  SPEC-motion-language.md   畫面語法五條規則（motion primitive 的設計語言層；依據＝參考影片逐幀拆解，2026-09-13）
   make.py              單一入口 orchestrator：parse → synth → render → compose（離線、不計費）
   requirements.txt     pinned 依賴
   pipeline/            產線引擎（全部進版控）
@@ -56,7 +57,7 @@ video/
   storyboards/         Stage 2 工程稿（進版控）
     _demo_*.yml        模板示範／回歸樣本（asymptote／derivation／graph_compare／sign_chart／…）
     <deck>.yml         逐節正式 storyboard（依方法論產生）
-  experiments/         實驗線（不碰成熟產線；forced_alignment_dean 測整段音訊＋alignment）
+  experiments/         實驗線（不碰成熟產線；forced_alignment_dean 測整段音訊＋alignment；reference_frames＝YouTube 參考影片抓幀／拆解／對照表工具，2026-09-13）
   pipeline/assets/brand/  NTU logo 向量源（icon／lockup ×3 色；進版控）
   output/              ★ render 成品（gitignored，可重生），按 ch<NN>/s<X.Y>/ 歸類
     ch01/s1.1/         一節成品——mp4、audio/、critic/frames/、review/packets/
