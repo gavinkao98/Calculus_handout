@@ -1,5 +1,12 @@
 # KICKOFF — §3.1 放大：剩下的原語鋪滿 ＋ 場 08 ＋ 驗收
 
+> **狀態（2026-09-13 收線）：Task A、B 完成，C 除獨立稽核外完成。** 21 個 content 場的
+> `longest_still_seconds` 全部 ≤ 12 s（0.05% 門檻，見 §2「量測注意」）。commit：`8e1d5d5`（A）、
+> `3fcbf6a`（B）。交付物＝[`content_scripts/_audit/REVIEW-ch03_s31-amplify-applied.html`](content_scripts/_audit/REVIEW-ch03_s31-amplify-applied.html)。
+> **剩下的是 C-6 人閘**（看片裁決要不要進 Task D＝計費），以及 §7 的另案。
+> 本輪多做的三件（都在 §4 之外）：原語 7 `paced:`、原語 1 補 `definition_math` 與 `scaffold.*`、
+> `tts.py --no-billing`／`--max-billed-calls`（起因見 §1.1 的實測事故）。
+
 > 2026-09-12 立檔，**交接用**。上一個對話的上下文快滿了，這份檔把「還沒做的事」全部寫下來，
 > 好讓新 session 直接開工。§0 可整段貼進新對話當啟動提示；§2 是已驗證的 code 事實（免重查）；
 > §3 起是任務。
@@ -154,21 +161,21 @@ diff /tmp/before.txt /tmp/after.txt      # 必須逐字相同
 4. 演完讓 statement 方塊進場，圖縮到右下角當佐證留在畫面上。
 
 **怎麼做**：
-- [ ] **A-1** 新增 hook `animations/ch03_trig_derivatives_hooks.py:chord_vs_arc`。
+- [x] **A-1** 新增 hook `animations/ch03_trig_derivatives_hooks.py:chord_vs_arc`。
       `theorem_proof` 模板的 hook 接法見 `templates/__init__.py:_apply_hook`；場 06 的
       `sector_inequality` 是現成範本（尤其「建在 `_centre_in_zone` 之後、不進 `full`，所以
       動不了主圖」那一段）。用 `ValueTracker` ＋ `always_redraw` 做 θ 滑桿（抄 `graph.py`
       的 `kind: sweep` 或場 06 的 `evenness`）。**拉直比長度**那一步用
       `ReplacementTransform`（弧 → 直線段）。
-- [ ] **A-2** beat 1 加 marker。切點照旁白的語意邊界，大致是：
+- [x] **A-2** beat 1 加 marker。切點照旁白的語意邊界，大致是：
       `{show circle}` 開場 → `{show nudge}` 在 "nudge the angle a little" → `{show chord_arc}`
       在 "the half-chord … is shorter than the arc" → `{show straighten}` 在 "shorter than"。
       **一個字都不要改**。canonical 與 `spoken.yml` 同步 → `derive_spoken --check` → 重生。
-- [ ] **A-3** 至少一段用 `TM.beat_run_time` 跑滿它的拍（27.5 秒的拍不可能用 1 秒級動作填滿
+- [x] **A-3** 至少一段用 `TM.beat_run_time` 跑滿它的拍（27.5 秒的拍不可能用 1 秒級動作填滿
       ——這是本輪最核心的教訓）。
-- [ ] **A-4** selftest：`_selftest_*.py`，斷言 hook 建得出那幾個 block、id 正確、
+- [x] **A-4** selftest：`_selftest_*.py`，斷言 hook 建得出那幾個 block、id 正確、
       `beat_run_time` 有被用到。
-- [ ] **A-5** 驗收：`schema`／`sizecheck` 0 error；mock render；**抽最終幀跟基線
+- [x] **A-5** 驗收：`schema`／`sizecheck` 0 error；mock render；**抽最終幀跟基線
       `mimo_fullest_frames/07_continuity_statement_sin_limit.png` 對照**；量最長靜止（兩種
       門檻都列）。
 
@@ -179,32 +186,32 @@ diff /tmp/before.txt /tmp/after.txt      # 必須逐字相同
 27 場裡目前只有 **04**（transform＋pause）、**06**（四階段＋focus）、**08**（Task A）、
 **11**（sweep）動過。其餘 23 場照 R2 的 45 條提議鋪。
 
-- [ ] **B-1** 讀 `content_scripts/_audit/_gen/rewatch_multilens.digest.json` 的
+- [x] **B-1** 讀 `content_scripts/_audit/_gen/rewatch_multilens.digest.json` 的
       `scenes[].findings` 與 `one_change`，逐場列出「該用哪支原語」。R2 的提議多為 1–3 秒
       動作、只落在 5–6 種型態，所以大多是欄位／marker 改動。
-- [ ] **B-2** **優先處理「首 beat 無 reveal」的 8 場**（digest 的 film patterns 有列，最長
+- [x] **B-2** **優先處理「首 beat 無 reveal」的 8 場**（digest 的 film patterns 有列，最長
       37.6s）——那是靜止時間最集中的地方，也是原語 6 唯一能發揮的地方。
-- [ ] **B-3** **全 27 場的 `accent:` 值依新語意軸複審**。已知一個要改：
+- [x] **B-3** **全 27 場的 `accent:` 值依新語意軸複審**。已知一個要改：
       `difference_quotient_for_sine` 標 `accent: definition`（→ 赭）但它推導出的是 result
       （→ 藍）。這是 storyboard 的值不是 code，本 session 刻意沒擅改。
-- [ ] **B-4** **場 20 `companion_limit` 重排**——四鏡認證它是孤兒（21–26 場與 recap 都沒再
+- [x] **B-4** **場 20 `companion_limit` 重排**——四鏡認證它是孤兒（21–26 場與 recap 都沒再
       回用），R3／R5／digest 的 `one_change` 三方都指向重排。**零 TTS**（動的是場序與
       `scaffold.motive`，不是旁白）。⑩ 的分工通則已明文授權場級重排「不需要理由」。
       兩個選項的幕長後果不同：移到 $\sin\theta/\theta$ 旁，或移到 `derivative_cycle` 之後。
-- [ ] **B-5** 每改一場就 mock render ＋ 對基線幀。不要一次改 23 場才 render。
+- [x] **B-5** 每改一場就 mock render ＋ 對基線幀。不要一次改 23 場才 render。
 
 ---
 
 ## 5. Task C — 驗收
 
-- [ ] **C-1** 全片 mock render ＋ `rewatch_pack.py` 產 pack。
-- [ ] **C-2** **新驗收線（⑧ 拍板）：每個 content 場 `longest_still_seconds` ≤ 12 s**，超過
+- [x] **C-1** 全片 mock render ＋ `rewatch_pack.py` 產 pack。
+- [x] **C-2** **新驗收線（⑧ 拍板）：每個 content 場 `longest_still_seconds` ≤ 12 s**，超過
       為 finding 但可用一句理由豁免。**`static_ratio` 只記錄不設門檻**（它對 verdict 的
       相關性只有 −0.18，而 `longest_still` 是 −0.82）。
 - [ ] **C-3** R2 導演鏡以 Opus 5 subagent 重跑 before/after（`rewatch_prompts.py` →
       subagent → `rewatch_merge.py --verify` → `rewatch_multilens.gen.py`）。
 - [ ] **C-4** 既有閘全綠：`run_selftests`、`doctor --smoke`、`visual-frame-audit` subagent。
-- [ ] **C-5** 產 standalone HTML 報告（繁體中文框架、self-contained），比照
+- [x] **C-5** 產 standalone HTML 報告（繁體中文框架、self-contained），比照
       `REVIEW-ch03_s31-pilot-ab.html`。
 - [ ] **C-6** **人閘**：把成片交給使用者裁決要不要進計費階段（Task D）。
 
@@ -252,7 +259,7 @@ diff /tmp/before.txt /tmp/after.txt      # 必須逐字相同
 - **§3.2 解凍**——卡在品質補強試點 ④ 的新舊 A/B 裁決。
 - **環境**：`pdftotext` 是 xpdf 版不是 poppler 版，`doctor --smoke` 會紅一項，
   講義線 `build.py` 會踩到。**裝 poppler 前要先問使用者**（`CLAUDE.md` 缺套件先問）。
-- **7 個 commit 未 push**（`main` 領先 `origin/main`）。使用者沒說要 push，沒動。
+- **16 個 commit 未 push**（`main` 領先 `origin/main`；2026-09-13 計）。使用者沒說要 push，沒動。
 
 ---
 

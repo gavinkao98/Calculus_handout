@@ -55,6 +55,12 @@ POST_REVEAL = 0.7          # seconds after a reveal (past the 0.45-0.8 s fade-in
 LONG_BEAT = 8.0            # beats longer than this also get a midpoint sample
 MOTION_FPS = 4
 CHANGE_FRAC = 0.002        # >0.2 % of pixels changed (|d|>12/255) => the picture moved
+# The same measure at a finer threshold. At 192x108 a glyph is ~2x3 px, so a formula
+# written stroke by stroke across a beat moves far fewer than 0.2 % of pixels and the
+# coarse threshold calls it still -- which is how a blind lens came to read a paced-write
+# scene as "41 s motionless" when it was changing 28 % of the time (2026-09-13). Report
+# both: coarse first (so older packs stay comparable), fine alongside it.
+FINE_CHANGE_FRAC = 0.0005  # >0.05 % (~10 px) => catches thin lines and written text
 _SHOW = re.compile(r"\{show[^}]*\}")
 
 
@@ -127,6 +133,8 @@ def motion_stats(av: Path, duration: float, reveal_times: list[float]) -> dict:
     frames = np.frombuffer(raw[: n * 192 * 108], dtype=np.uint8).reshape(n, 108, 192).astype(np.int16)
     if n < 2:
         return {"static_ratio": 1.0, "moving_seconds": 0.0, "longest_still_seconds": duration,
+                "fine_static_ratio": 1.0, "fine_moving_seconds": 0.0,
+                "fine_longest_still_seconds": duration,
                 "events": [], "non_reveal_events": [], "profile": ""}
     d = np.abs(frames[1:] - frames[:-1])
     frac = (d > 12).mean(axis=(1, 2))                      # fraction of pixels that changed
@@ -150,10 +158,18 @@ def motion_stats(av: Path, duration: float, reveal_times: list[float]) -> dict:
     for i in range(0, len(frac), win):
         f = float(frac[i:i + win].max()) if len(frac[i:i + win]) else 0.0
         levels.append(0 if f <= CHANGE_FRAC else min(8, 1 + int(np.log10(f / CHANGE_FRAC) * 3)))
+    fine = frac > FINE_CHANGE_FRAC
+    f_longest = f_run = 0
+    for m in fine:
+        f_run = 0 if m else f_run + 1
+        f_longest = max(f_longest, f_run)
     return {
         "static_ratio": round(float(1 - moving.mean()), 3),
         "moving_seconds": round(float(moving.sum() * dt), 1),
         "longest_still_seconds": round(longest * dt, 1),
+        "fine_static_ratio": round(float(1 - fine.mean()), 3),
+        "fine_moving_seconds": round(float(fine.sum() * dt), 1),
+        "fine_longest_still_seconds": round(f_longest * dt, 1),
         "events": events,
         "non_reveal_events": [round(t, 1) for t in non_reveal],
         "profile": "".join(glyphs[l] for l in levels),   # text form (markdown); the sheet draws bars
@@ -346,8 +362,12 @@ def main() -> int:
                  f"- global {fmt(g0)} → {fmt(g0 + dur)}  (duration {dur:.1f} s; scene {n}/{len(scenes)})",
                  f"- narration: {mode}; {len(beats)} beats; {len(reveal_times)} on-screen reveals"
                  + (f"; first reveal at +{reveal_times[0]:.1f}s" if reveal_times else ""),
-                 f"- picture: static {mot['static_ratio'] * 100:.0f}% of the time; moving {mot['moving_seconds']} s; "
-                 f"longest still stretch {mot['longest_still_seconds']} s; change events at "
+                 f"- picture (coarse, >0.2% of pixels): static {mot['static_ratio'] * 100:.0f}% of the time; "
+                 f"moving {mot['moving_seconds']} s; longest still stretch {mot['longest_still_seconds']} s",
+                 f"- picture (fine, >0.05% -- catches thin lines and text being written): static "
+                 f"{mot['fine_static_ratio'] * 100:.0f}% of the time; moving {mot['fine_moving_seconds']} s; "
+                 f"longest still stretch {mot['fine_longest_still_seconds']} s",
+                 f"- change events at "
                  + (", ".join(f"+{e}" for e in mot["events"]) or "none")
                  + (f"; NOT tied to a reveal: {', '.join(f'+{e}' for e in mot['non_reveal_events'])}"
                     if mot["non_reveal_events"] else "; every change is a reveal fade-in"),
@@ -388,16 +408,20 @@ def main() -> int:
            "Each scene has a contact sheet (`NN_<scene>.sheet.jpg`: sampled frames labelled with the time and the words "
            "being spoken at that instant), a transcript timeline (`NN_<scene>.md`: every beat with its on-screen reveal, "
            "seconds and words/sec, plus motion statistics), and the sampled frames at full resolution (`NN_<scene>/`).",
-           "", "How to read the motion numbers: the picture is sampled 4× per second in low resolution; a sample counts as "
-           "*moving* when more than 0.2 % of pixels changed. `static` = share of the scene where nothing on screen changed; "
+           "", "How to read the motion numbers: the picture is sampled 4× per second in low resolution (192×108). "
+           "TWO thresholds are reported because one is not enough: *coarse* counts a sample as moving when more than "
+           "0.2 % of pixels changed, *fine* when more than 0.05 %. At this resolution a glyph is about 2×3 px, so text "
+           "being written or a thin line being drawn moves far too few pixels for the coarse threshold and reads as "
+           "STILL there while the fine one sees it. **When the two disagree, believe the fine one and look at the "
+           "frames.** `static` = share of the scene where nothing on screen changed; "
            "`change events` = moments something started changing; events *not tied to a reveal* mean motion beyond the "
            "fade-in of new text (i.e. an animation). The 2-s profile is a tiny bar chart of change over the scene.", "",
-           "| # | scene | title | global start | secs | reveals | static | longest still | changes not tied to reveals |",
+           "| # | scene | title | global start | secs | reveals | static (coarse / fine) | longest still (coarse / fine) | changes not tied to reveals |",
            "|---|---|---|---|---|---|---|---|---|"]
     for r in records:
         m = r["motion"]
         idx.append(f"| {r['n']:02d} | `{r['id']}` | {r['title']} | {fmt(r['global_start'])} | {r['duration']:.0f} | {r['reveals']} "
-                   f"| {m['static_ratio'] * 100:.0f}% | {m['longest_still_seconds']}s | {len(m['non_reveal_events'])} |")
+                   f"| {m['static_ratio'] * 100:.0f}% / {m['fine_static_ratio'] * 100:.0f}% | {m['longest_still_seconds']}s / {m['fine_longest_still_seconds']}s | {len(m['non_reveal_events'])} |")
     (out / "INDEX.md").write_text("\n".join(idx) + "\n", encoding="utf-8")
     prod = ["# Production view (NOT for blind lenses)", "", "| # | scene | kind | template | hook | narration mode |", "|---|---|---|---|---|---|"]
     prod += [f"| {r['n']:02d} | `{r['id']}` | {r['kind']} | {r['template'] or '—'} | {r['hook'] or '—'} | {r['mode']} |" for r in records]

@@ -604,7 +604,10 @@ def derivative_cycle(spec, ctx, blocks):
     # to zero in an earlier pass. label-size keeps all four formulas legible
     # while leaving an actual gap between the top and bottom row to draw
     # into.
-    NODE_SIZE, NODE_PAD, NODE_PAD_X = "label", 0.14, 0.22
+    # 2026-09-13: the gap is no longer short (math.1 drops into the dead band below, see
+    # MATH1_DROP), so the nodes get the readable math_sm size and the two rows get a real
+    # arrow run between them instead of the stubs the old cramped band forced.
+    NODE_SIZE, NODE_PAD, NODE_PAD_X = "math_sm", 0.16, 0.26
 
     def _node(tex, role):
         label = brand.math_line(tex, ground, role="primary", size=NODE_SIZE)
@@ -619,8 +622,8 @@ def derivative_cycle(spec, ctx, blocks):
     nodes = [_node(tex, role) for tex, _, role in node_specs]
     node_h = max(n.height for n in nodes)
 
-    HALF_W = 3.35
-    ARROW_GAP = 0.22                      # visible vertical-arrow length between rows
+    HALF_W = 4.30                         # the ring is the scene's subject: span the frame
+    ARROW_GAP = 0.62                       # vertical-arrow run, and the d/dx label's home
     HALF_H = (node_h + ARROW_GAP) / 2
     corners = {
         "TL": np.array([-HALF_W, HALF_H, 0.0]),
@@ -658,10 +661,29 @@ def derivative_cycle(spec, ctx, blocks):
 
     # one d/dx label on the top edge (sin -> cos) suffices to name what every
     # arrow means without crowding all four edges with the same tag.
-    ddx = MathTex(r"\tfrac{d}{dx}", color=mut, font_size=T.fs("label"))
-    ddx.next_to(arrows[0], UP, buff=0.08)
+    #
+    # It is `\frac` in TEXT ink, not `\tfrac` in muted: this
+    # label is the ONLY thing on the frame that says what an arrow means ("Writing an
+    # arrow for one derivative"), and it was being shrunk three times over -- \tfrac
+    # inside an already label-sized MathTex, then again by the ring's fit clamp --
+    # landing at ~10 px per row, under half the 26 px font floor, in the dimmest ink on
+    # the frame. The visual-frame audit (2026-09-13) read it as a blocking V4: the ring
+    # degenerates into four boxes and some arrows.
+    # It sits in the MIDDLE of the loop, not above the top edge: centred it names every
+    # arrow at once (which is what the narration says -- "writing an arrow for one
+    # derivative"), and it costs the ring no extra height, so all of the band goes to the
+    # diagram instead of to a label stacked on top of it.
+    ddx = brand.math_line(r"\frac{d}{dx}", ground, role="text", size="label")
+    ddx.move_to(VGroup(*nodes).get_center())
 
     ring = VGroup(arrows, *nodes, ddx)
+
+    # The ring is this scene's subject, and it was living in the thinnest band on the
+    # frame while ~1.3u sat empty BELOW math.1 (same audit, A7: "主角最小最暗、配角最大").
+    # Drop math.1 into that dead space to widen the ring's gap; it still clears the
+    # bottom safe margin with room to spare.
+    MATH1_DROP = 0.75
+    math_1.shift(MATH1_DROP * DOWN)
 
     # Hard clamp to whatever room actually exists between statement's bottom
     # and math.1's top (measured on the REAL, already-built neighbours, not
