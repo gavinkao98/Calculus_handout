@@ -4,6 +4,9 @@
 > `longest_still_seconds` 全部 ≤ 12 s（0.05% 門檻，見 §2「量測注意」）。commit：`8e1d5d5`（A）、
 > `3fcbf6a`（B）。交付物＝[`content_scripts/_audit/REVIEW-ch03_s31-amplify-applied.html`](content_scripts/_audit/REVIEW-ch03_s31-amplify-applied.html)。
 > **剩下的是 C-6 人閘**（看片裁決要不要進 Task D＝計費），以及 §7 的另案。
+> **C-3 的 DoD 第 2 項未達成**：R2 重跑 must 5→2、基線 5 條全關，但新增 2 條 must
+> （場 09／場 12，都是「這裡該有圖」的內容提案，各需新 hook），未自行動手、交裁決。
+> C-4 視覺幀稽核 1 blocking（場 18）已修並回歸 0 blocking；6 條 advisory 未動。
 > 本輪多做的三件（都在 §4 之外）：原語 7 `paced:`、原語 1 補 `definition_math` 與 `scaffold.*`、
 > `tts.py --no-billing`／`--max-billed-calls`（起因見 §1.1 的實測事故）。
 
@@ -208,9 +211,9 @@ diff /tmp/before.txt /tmp/after.txt      # 必須逐字相同
 - [x] **C-2** **新驗收線（⑧ 拍板）：每個 content 場 `longest_still_seconds` ≤ 12 s**，超過
       為 finding 但可用一句理由豁免。**`static_ratio` 只記錄不設門檻**（它對 verdict 的
       相關性只有 −0.18，而 `longest_still` 是 −0.82）。
-- [ ] **C-3** R2 導演鏡以 Opus 5 subagent 重跑 before/after（`rewatch_prompts.py` →
+- [x] **C-3** R2 導演鏡以 Opus 5 subagent 重跑 before/after（`rewatch_prompts.py` →
       subagent → `rewatch_merge.py --verify` → `rewatch_multilens.gen.py`）。
-- [ ] **C-4** 既有閘全綠：`run_selftests`、`doctor --smoke`、`visual-frame-audit` subagent。
+- [x] **C-4** 既有閘全綠：`run_selftests`、`doctor --smoke`、`visual-frame-audit` subagent。
 - [x] **C-5** 產 standalone HTML 報告（繁體中文框架、self-contained），比照
       `REVIEW-ch03_s31-pilot-ab.html`。
 - [ ] **C-6** **人閘**：把成片交給使用者裁決要不要進計費階段（Task D）。
