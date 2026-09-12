@@ -1,0 +1,68 @@
+# graph `inset:`＋`focus[].indicate` demo／回歸樣本（非正式節，檔名底線前綴）
+#
+# 目的：驗證 SPEC-motion-language 規則 3 的兩個 code 缺口（kickoff T2-1／T2-3）——
+#   * `inset:`：主圖不縮放的放大鏡。指定資料座標矩形，右上角開第二組 axes 顯示同一批
+#     plot 裁到矩形內的樣子；主圖上有 hairline 框＋兩條虛線導引；`{show inset}` 才進場；
+#     `follow: true` 時 sweep 的游標／點在鏡片裡跟著主圖的 tracker 動。
+#   * `focus[].indicate`：那一拍 reveal 之後對指定 block 閃一下（換 accent ink 色、放大 15%、
+#     回復），接在 focus 壓暗之後、各自一個 scene.play。
+# 教學情境取 §3.1 單位圓夾擠圖的局部：四分之一單位圓、到 B 的半徑、B 的高 sin θ、
+# 沿弧掃向 B 的游標。demo 專用，不屬任何正式節；驗證後留作模板範例。
+
+meta:
+  id: demo_inset
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Graph Inset Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Graph Inset Demo" }
+
+scenes:
+
+  # 1 ---------------- 四分之一單位圓 → B 進場並閃一下 → 開鏡片 → 游標掃向 B（鏡片跟著）
+  - id: quarter_circle_inset
+    kind: content
+    template: graph
+    accent: definition
+    source: "合成例（取 §3.1 單位圓夾擠圖的局部放大）"
+    title: "A Closer Look at the Point $B$"
+    focus:
+      - { at: plot.3, dim: [], indicate: [plot.3] }          # B 進場那一拍閃一下
+      - { at: plot.4, dim: [plot.1, plot.2] }                 # 掃描時把半徑與高壓暗
+      - { at: annotation.0, dim: [] }
+    say: |
+      Here is a quarter of the unit circle, with the radius out to the point at
+      angle theta and the vertical drop from that point back to the axis.
+      {show plot.3} Call that point B. Everything we care about happens in a small
+      neighbourhood of B.
+      {show inset} So open a lens on that neighbourhood. The frame on the main
+      picture marks the region, and the panel in the corner shows it magnified:
+      the same arc, the same radius, the same height.
+      {show plot.4} Now slide a cursor along the arc toward B, and watch the lens
+      follow it.
+      {show annotation.0} The main picture never moves; only the lens adds detail.
+    axes:
+      x_range: [-0.3, 1.4, 0.5]
+      y_range: [-0.3, 1.4, 0.5]
+      x_length: 5.4
+      y_length: 5.4
+      x_ticks: [1]
+      y_ticks: [1]
+    plots:
+      - { kind: function, expression: "sqrt(1 - x*x)", x_range: [0, 1], color_role: result, label: "$x^2+y^2=1$", label_x: 0.35 }
+      - { kind: line, start: [0, 0], end: [0.8253, 0.5646], color_role: concept }
+      - { kind: line, start: [0.8253, 0], end: [0.8253, 0.5646], color_role: practice, dashed: true, label: "$\\sin\\theta$", label_point: [0.86, 0.25] }
+      - { kind: point, point: [0.8253, 0.5646], color_role: concept, label: "$B$", label_side: up, reveal: true }
+      - { kind: sweep, x_from: 1.0, x_to: 0.8253, seconds: 3.0, follow: [0] }
+    inset:
+      x: [0.7, 1.05]
+      y: [0.35, 0.7]
+      corner: top_right
+      follow: true
+    annotations:
+      - "The main picture never moves; the lens adds the detail."

@@ -17,10 +17,14 @@ import math
 from typing import Any
 
 from manim import (
+    DL,
     DOWN,
+    DR,
     LEFT,
     RIGHT,
+    UL,
     UP,
+    UR,
     Axes,
     Circle,
     DashedLine,
@@ -29,6 +33,7 @@ from manim import (
     FadeOut,
     Line,
     Polygon,
+    Rectangle,
     ValueTracker,
     VGroup,
     VMobject,
@@ -367,15 +372,19 @@ def _sweep_block(plot: dict[str, Any], index: int, prior: list[dict[str, Any]],
         parts.append(always_redraw(lambda f=fn: dot(f)))
 
     group = VGroup(*parts)
+    group._sweep_tracker = tracker      # an `inset:` with follow: true rides this ...
+    group._sweep_live = False           # ... and draws no cursor until the sweep has played
     leave = str(plot.get("leave", "cursor"))
 
     def anim(scene, mob, _ground) -> float:
         run_time = TM.beat_run_time(scene, seconds) if beat_paced else seconds
         tracker.set_value(x_from)
+        mob._sweep_live = True
         scene.add(mob)
         scene.play(tracker.animate.set_value(x_to), run_time=run_time, rate_func=linear)
         if leave == "none":
             scene.play(FadeOut(mob), run_time=0.3)
+            mob._sweep_live = False
             return run_time + 0.3
         return run_time
 
@@ -530,6 +539,228 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
     return blocks, labels
 
 
+# ---- inset: the magnifier (SPEC-motion-language rule 3; kickoff T2-3) ----------
+#
+#   inset:                 # single mode, opt-in; {show inset} brings it in
+#     x: [0.7, 1.05]       # data-coordinate rectangle of the main plot
+#     y: [0.35, 0.7]
+#     corner: top_right    # top_right | top_left | bottom_right | bottom_left
+#     follow: true         # a sweep's cursor / dots / band in the lens ride the MAIN tracker
+#
+# A second Axes over that rectangle at a fixed 3.2 x 2.0 u panel in the corner, holding the
+# same plots CLIPPED to the rectangle (no labels); a hairline frame on the main axes marks
+# the region and two dashed guides lead to the panel. The main graph is not scaled or moved
+# (the block is built AFTER _fit_graph_to_safe_zone and never joins its group). The panel
+# sits above everything (z_index) so a plot revealed later cannot draw over the lens.
+_INSET_W, _INSET_H = 3.2, 2.0
+_INSET_Z = 10                        # hooks go up to 8 (ch03 badges); the lens stays on top
+_INSET_CORNERS = {"top_right": (1, 1), "top_left": (-1, 1),
+                  "bottom_right": (1, -1), "bottom_left": (-1, -1)}
+# which two corners of the frame the guides leave from: the pair that is NOT the corner
+# facing the panel nor its opposite, so the two lines never cross each other.
+_INSET_GUIDES = {"top_right": (UL, DR), "top_left": (UR, DL),
+                 "bottom_right": (UR, DL), "bottom_left": (UL, DR)}
+
+
+def _clip_segment(p, q, x0, x1, y0, y1):
+    """Liang-Barsky: the part of data-space segment p->q inside the box, or None."""
+    (px, py), (qx, qy) = p, q
+    dx, dy = qx - px, qy - py
+    t0, t1 = 0.0, 1.0
+    for num, den in ((px - x0, -dx), (x1 - px, dx), (py - y0, -dy), (y1 - py, dy)):
+        if abs(den) < 1e-12:
+            if num < 0:
+                return None
+            continue
+        t = num / den
+        if den < 0:
+            t0 = max(t0, t)
+        else:
+            t1 = min(t1, t)
+    if t0 > t1:
+        return None
+    return (px + t0 * dx, py + t0 * dy), (px + t1 * dx, py + t1 * dy)
+
+
+def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], ground: str) -> Block:
+    ins = spec["inset"]
+    if not isinstance(ins, dict):
+        raise ValueError("inset: must be a mapping {x, y, corner, follow}")
+    rng = {}
+    for key in ("x", "y"):
+        v = ins.get(key)
+        if not isinstance(v, (list, tuple)) or len(v) != 2 or float(v[0]) >= float(v[1]):
+            raise ValueError(f"inset.{key}: needs [lo, hi] in data coordinates with lo < hi")
+        rng[key] = (float(v[0]), float(v[1]))
+    (x0, x1), (y0, y1) = rng["x"], rng["y"]
+    corner = str(ins.get("corner", "top_right")).lower()
+    if corner not in _INSET_CORNERS:
+        raise ValueError(f"inset.corner: {corner!r} not one of {sorted(_INSET_CORNERS)}")
+    follow = bool(ins.get("follow", True))
+
+    # -- the lens: a second Axes over the rectangle, parked in the corner --
+    lens = Axes(x_range=[x0, x1, x1 - x0], y_range=[y0, y1, y1 - y0],
+                x_length=_INSET_W, y_length=_INSET_H, tips=False,
+                axis_config={"color": T.color(ground, "muted"), "stroke_width": 2.0,
+                             "include_ticks": False, "include_numbers": False})
+    sx, sy = _INSET_CORNERS[corner]
+    centre = [sx * (T.FRAME_W / 2 - T.SIDE_GUTTER - _INSET_W / 2),
+              sy * (T.FRAME_H / 2 - T.SAFE_MARGIN - _INSET_H / 2), 0]
+    lens.shift(centre - (lens.c2p(x0, y0) + lens.c2p(x1, y1)) / 2)
+    border = Rectangle(width=_INSET_W, height=_INSET_H, stroke_color=T.color(ground, "ink_1"),
+                       stroke_width=2.0, fill_color=T.color(ground, "bg"), fill_opacity=1.0)
+    border.move_to(centre)
+
+    def inside(x: float, y: float) -> bool:
+        return x0 <= x <= x1 and y0 <= y <= y1
+
+    def clamp_y(v: float) -> float:
+        return min(max(v, y0), y1)
+
+    def z(m):
+        return m.set_z_index(_INSET_Z)   # redrawn pieces are new mobjects each frame
+
+    ac = spec["axes"]
+    x_range = _range(ac["x_range"], 0.5)
+    y_range = _range(ac["y_range"], 0.25)
+    all_plots = spec.get("plots", [])
+    pieces: list[Any] = []
+    for i, plot in enumerate(all_plots):
+        kind = plot.get("kind")
+        col = _role_color(ground, plot, "accent" if kind == "sweep" else "secondary")
+
+        if kind == "function":
+            xr = _range(plot.get("x_range", x_range[:2]), x_range[2])
+            xa, xb = max(xr[0], x0), min(xr[1], x1)
+            if xb <= xa:
+                continue
+            n = max(int(int(plot.get("samples", 900)) * (xb - xa) / (xr[1] - xr[0])), 24)
+            sw = float(plot.get("stroke_width", 5.0))
+            curve = _clipped_function_curve(lens, plot["expression"], [xa, xb], y0, y1, col, sw, n)
+            if plot.get("dashed"):
+                curve = VGroup(*[_dashed_curve(seg) for seg in curve])
+            glow = curve.copy().set_stroke(col, width=12, opacity=0.24)
+            pieces.append(VGroup(glow, curve))
+
+        elif kind == "line":
+            seg = _clip_segment(tuple(map(float, plot["start"])), tuple(map(float, plot["end"])),
+                                x0, x1, y0, y1)
+            if seg is None:
+                continue
+            line_cls = DashedLine if plot.get("dashed") else Line
+            pieces.append(line_cls(lens.c2p(*seg[0]), lens.c2p(*seg[1]), color=col,
+                                   stroke_width=float(plot.get("stroke_width", 2.5))))
+
+        elif kind == "band":
+            lo, hi = sorted((float(plot["from"]), float(plot["to"])))
+            if str(plot.get("orientation", "horizontal")).lower().startswith("h"):
+                lo, hi = max(lo, y0), min(hi, y1)
+                corners = [(x0, lo), (x1, lo), (x1, hi), (x0, hi)]
+            else:
+                lo, hi = max(lo, x0), min(hi, x1)
+                corners = [(lo, y0), (hi, y0), (hi, y1), (lo, y1)]
+            if hi <= lo:
+                continue
+            pieces.append(Polygon(*[lens.c2p(*c) for c in corners], stroke_width=0, color=col,
+                                  fill_color=col, fill_opacity=float(plot.get("opacity", 0.14))))
+
+        elif kind == "point":
+            px, py = float(plot["point"][0]), float(plot["point"][1])
+            if not inside(px, py):
+                continue
+            radius = float(plot.get("radius", 0.08))
+            if plot.get("hollow"):
+                dot = Circle(radius=radius, color=col, stroke_width=float(plot.get("stroke_width", 3.5)))
+                dot.set_fill(T.color(ground, "bg"), opacity=1.0).move_to(lens.c2p(px, py))
+            else:
+                dot = Dot(lens.c2p(px, py), color=col, radius=radius)
+            pieces.append(dot)
+
+        elif kind == "sweep":
+            # same cursor / dots / band as _sweep_block, clipped to the rectangle. With
+            # follow: true the pieces are always_redraw on the MAIN sweep's tracker, so
+            # they move when {show plot.N} plays -- and show nothing before it has played
+            # (`_sweep_live`), so the lens never holds a cursor the main picture lacks.
+            # Otherwise they are the static terminal state.
+            prior = all_plots[:i]
+            x_from, x_to = float(plot["x_from"]), float(plot["x_to"])
+            follow_fns = [_follow_fn(prior[int(j)], int(j)) for j in plot.get("follow", [])]
+            gap = [_follow_fn(prior[int(j)], int(j)) for j in (plot.get("gap") or [])]
+            main_mob, tracker = None, None
+            if follow:
+                main = next((b for b in plot_blocks if b.id == f"plot.{i}"), None)
+                main_mob = getattr(main, "mobject", None)
+                tracker = getattr(main_mob, "_sweep_tracker", None)
+
+            def x_of(tracker=tracker, main_mob=main_mob, x_to=x_to):
+                """cursor x in data coords, or None while there is no cursor to mirror"""
+                if tracker is None:
+                    return x_to
+                return tracker.get_value() if getattr(main_mob, "_sweep_live", True) else None
+
+            live = (lambda fn: always_redraw(lambda: z(fn()))) if tracker is not None else (lambda fn: z(fn()))
+
+            def nothing():
+                # "no cursor" is an INVISIBLE dot inside the panel, never an empty VMobject:
+                # become() on an emptied always_redraw wrapper pushes the next frame's points
+                # into a fresh VectorizedPoint submobject (z_index 0, default stroke width
+                # 4, parked at the frame origin) -- hidden under the panel's opaque ground
+                # and a stray speck mid-frame. A point-bearing piece keeps the wrapper's
+                # structure (and z_index) stable across every redraw.
+                return Dot(centre, radius=1e-3, fill_opacity=0.0, stroke_width=0.0)
+
+            if gap:
+                top_fn, bot_fn = gap
+
+                def band():
+                    x = x_of()
+                    if x is None:
+                        return nothing()
+                    lo, hi = max(min(x_from, x), x0), min(max(x_from, x), x1)
+                    if hi - lo < 1e-6:
+                        return nothing()
+                    xs = [lo + (hi - lo) * k / 24 for k in range(25)]
+                    xs = [t for t in xs if _finite(top_fn, t) and _finite(bot_fn, t)]
+                    if len(xs) < 2:
+                        return nothing()
+                    pts = ([lens.c2p(t, clamp_y(top_fn(t))) for t in xs]
+                           + [lens.c2p(t, clamp_y(bot_fn(t))) for t in reversed(xs)])
+                    return Polygon(*pts, stroke_width=0, color=col, fill_color=col,
+                                   fill_opacity=float(plot.get("opacity", 0.16)))
+                pieces.append(live(band))
+
+            def rule():
+                x = x_of()
+                if x is None or not x0 <= x <= x1:
+                    return nothing()
+                return Line(lens.c2p(x, y0), lens.c2p(x, y1), color=col,
+                            stroke_width=2.0).set_opacity(0.75)
+            pieces.append(live(rule))
+
+            for fn in follow_fns:
+                def dot(f=fn):
+                    x = x_of()
+                    if x is not None and _finite(f, x) and inside(x, f(x)):
+                        return Dot(lens.c2p(x, f(x)), color=col, radius=0.07)
+                    return nothing()
+                pieces.append(live(dot))
+
+    panel = VGroup(border, lens, *pieces)
+
+    # -- on the main axes: the region frame + two dashed guides to the panel --
+    p00, p11 = axes.c2p(x0, y0), axes.c2p(x1, y1)
+    hair = T.color(ground, "hairline_strong")
+    frame = Rectangle(width=float(p11[0] - p00[0]), height=float(p11[1] - p00[1]),
+                      stroke_color=hair, stroke_width=1.5).move_to((p00 + p11) / 2)
+    guides = VGroup(*[DashedLine(frame.get_corner(c), border.get_corner(c), color=hair,
+                                 stroke_width=1.5) for c in _INSET_GUIDES[corner]])
+
+    group = VGroup(frame, guides, panel).set_z_index(_INSET_Z)
+    group._inset_panel = panel     # selftest / critic handles
+    group._inset_frame = frame
+    return Block("inset", group, anim="fade", static=False, layer="graph")
+
+
 def _fit_graph_to_safe_zone(graph_group: VGroup, title, annotation_group) -> None:
     """Keep the graph out of the title and bottom annotation zones."""
     zone_top = title.get_bottom()[1] - _TITLE_GRAPH_GAP
@@ -620,6 +851,11 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     graph_group = VGroup(axes, *[b.mobject for b in plot_blocks])
     _fit_graph_to_safe_zone(graph_group, title, group)
 
+    # after the fit: the inset's frame reads the main axes' FINAL position, and the
+    # panel is outside graph_group so the main plot is never scaled to make room for it.
+    if "inset" in spec:
+        blocks.append(_inset_block(spec, axes, plot_blocks, ground))
+
     if group is not None:
         for i, ann in enumerate(annotations):
             blocks.append(Block(f"annotation.{i}", ann, anim="fade", static=False))
@@ -682,6 +918,10 @@ def _panel(side_spec: dict[str, Any], ground: str, prefix: str) -> tuple[list[Bl
 def _build_compare(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
+    if "inset" in spec:
+        # loud, not silent: a field that would do nothing is always an authoring mistake
+        # (same reasoning as a focus/pauses id that points nowhere). sizecheck reports it.
+        raise ValueError("inset: graph single mode only (a 2up panel has no inset)")
 
     title = _title(spec.get("title", ""), ground)
     # left-anchor to the shared spine gutter (see _build_single) so the 2-up title
