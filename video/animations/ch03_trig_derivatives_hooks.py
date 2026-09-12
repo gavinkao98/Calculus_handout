@@ -35,15 +35,21 @@ from manim import (
     DashedLine,
     Dot,
     FadeIn,
+    FadeOut,
     Line,
     MathTex,
     Polygon,
     ReplacementTransform,
     VGroup,
+    ValueTracker,
+    always_redraw,
+    linear,
     smooth,
+    there_and_back,
 )
 
 from pipeline import brand
+from pipeline import timing as TM
 from pipeline.blocks import Block
 from pipeline.visuals import theme as T
 
@@ -143,7 +149,11 @@ def sector_inequality(spec, ctx, blocks):
     yaxis = Line(O + 0.25 * DOWN, O + np.array([0.0, R + 0.5, 0.0]),
                  color=mut, stroke_width=1.5)
     tangent = DashedLine(A, C, color=mut, stroke_width=2.0, dash_length=0.08)
-    radius_OC = Line(O, C, color=text, stroke_width=2.0)
+    # O->C split at B: the narration introduces B ("the point at angle theta") and only
+    # THEN extends the radius to the tangent ("...gives C"). Two collinear segments of the
+    # same colour/width render identically to the old single line once both are up.
+    radius_OB = Line(O, B, color=text, stroke_width=2.0)
+    ext_BC = Line(B, C, color=text, stroke_width=2.0)
     chord_OA = Line(O, A, color=text, stroke_width=2.0)
 
     dots = VGroup(*[Dot(p, radius=0.045, color=text) for p in (O, A, B, C)])
@@ -171,10 +181,22 @@ def sector_inequality(spec, ctx, blocks):
     l_tan = MathTex(r"\tan\theta", color=text, font_size=T.fs("label")).next_to(tan_anchor, RIGHT, buff=0.12)
     dim = (l_base, drop_sin, l_sin, l_tan)
 
-    for m in (radius_OC, chord_OA, dots, lO, lA, lB, lC, arc_th, lth, *dim):
+    for m in (radius_OB, ext_BC, chord_OA, dots, lO, lA, lB, lC, arc_th, lth, *dim):
         m.set_z_index(5)
-    scaffold = VGroup(quarter, xaxis, yaxis, tangent, radius_OC, chord_OA,
-                      dots, lO, lA, lB, lC, arc_th, lth, *dim)
+    # The construction is no longer one static slab. Beat 0 of this scene used to be 37.6
+    # seconds of narration over a finished picture -- the longest still in the whole film
+    # (six-lens review, level (1)). It is now built in the order the narration builds it:
+    #   stage_circle : "we compare three areas on a circle of radius one"
+    #   (evenness)   : the theta <-> -theta aside, below
+    #   stage_frame  : "A is at (1,0), B is the point at angle theta"
+    #   stage_apex   : "extending the radius to the tangent at A gives C"
+    # `scaffold` stays assembled for layout (centring + the gates measure the same figure).
+    dotO, dotA, dotB, dotC = dots
+    stage_circle = VGroup(quarter, xaxis, yaxis)
+    stage_frame = VGroup(chord_OA, radius_OB, dotO, dotA, dotB, lO, lA, lB,
+                         arc_th, lth, l_base, drop_sin, l_sin)
+    stage_apex = VGroup(ext_BC, tangent, dotC, lC, l_tan)
+    scaffold = VGroup(stage_circle, stage_frame, stage_apex)
 
     # z-order LARGEST region first (bottom) so each later, smaller, opaque fill
     # fully covers the part of the bigger one it sits inside -- outer (z=1)
@@ -245,6 +267,59 @@ def sector_inequality(spec, ctx, blocks):
                   chip_inner, chip_sector, chip_outer, dst1, dst2, dst3, ineq)
     _centre_in_zone(title, full)
 
+    # -- the evenness aside (beat 0, stage 2; motion primitives 6 + 3) ------------
+    # 19 seconds of narration explaining that sin(theta)/theta is EVEN used to play over a
+    # finished, motionless picture -- part of what made beat 0 the longest still in the
+    # film (37.6 s). Here the angle actually swings from +theta to -theta and back with
+    # both half-chords tracking it, so "both flip sign, so the ratio does not" is something
+    # the viewer WATCHES. Built after _centre_in_zone and kept OUT of `full`, so it hangs
+    # off the final layout without being able to move the main figure; it occupies the
+    # right half, which is empty until the peeled copies arrive on the later beats.
+    er = 1.05
+    eO = row.get_center() + 0.30 * UP
+    e_circle = Circle(radius=er, color=mut, stroke_width=1.8).move_to(eO)
+    e_axis = Line(eO + (er + 0.35) * LEFT, eO + (er + 0.35) * RIGHT,
+                  color=mut, stroke_width=1.4)
+    e_ang = ValueTracker(th)
+
+    def _e_point():
+        a = e_ang.get_value()
+        return eO + er * np.array([np.cos(a), np.sin(a), 0.0])
+
+    def _e_radius():
+        return Line(eO, _e_point(), color=text, stroke_width=2.2)
+
+    def _e_height():
+        pt = _e_point()
+        foot = np.array([pt[0], eO[1], 0.0])
+        col = blue if e_ang.get_value() >= 0 else green
+        return Line(foot, pt, color=col, stroke_width=4.0)
+
+    def _e_dot():
+        return Dot(_e_point(), radius=0.05, color=text)
+
+    e_live = VGroup(always_redraw(_e_radius), always_redraw(_e_height),
+                    always_redraw(_e_dot))
+    e_caption = brand.math_line(
+        r"\dfrac{\sin(-\theta)}{-\theta} \;=\; \dfrac{\sin\theta}{\theta}",
+        ground, role="text", size="math_sm")
+    e_caption.next_to(e_circle, DOWN, buff=0.42)
+    evenness = VGroup(e_circle, e_axis, e_live, e_caption)
+
+    def _evenness_anim(scene, mob, _ground) -> float:
+        """Swing +theta -> -theta -> +theta, twice, filling whatever beat this lands on."""
+        total = TM.beat_run_time(scene, 6.0)
+        scene.play(FadeIn(e_circle), FadeIn(e_axis), run_time=0.4)
+        scene.add(e_live)
+        scene.play(FadeIn(e_caption), run_time=0.3)
+        swing = max((total - 0.7) / 2.0, 0.8)
+        for _ in range(2):
+            scene.play(e_ang.animate.set_value(-th), run_time=swing,
+                       rate_func=there_and_back)
+        # the aside has done its job; the geometry beats need the space back
+        scene.play(FadeOut(mob), run_time=0.35)
+        return total + 0.35
+
     def _peel(src, chip):
         def anim(scene, mob, ground):
             shape, label, badge = mob[0], mob[1], mob[2]
@@ -260,7 +335,10 @@ def sector_inequality(spec, ctx, blocks):
             return 1.52
         return anim
 
-    out.append(Block("scaffold", scaffold, static=True, layer="graph"))
+    out.append(Block("circle", stage_circle, anim=_draw, static=False, layer="graph"))
+    out.append(Block("evenness", evenness, anim=_evenness_anim, static=False, layer="graph"))
+    out.append(Block("frame", stage_frame, anim=_draw, static=False, layer="graph"))
+    out.append(Block("apex", stage_apex, anim=_draw, static=False, layer="graph"))
     out.append(Block("tri_inner", dst1, anim=_peel(src_inner, chip_inner), static=False, layer="graph"))
     out.append(Block("sector", dst2, anim=_peel(src_sector, chip_sector), static=False, layer="graph"))
     out.append(Block("tri_outer", dst3, anim=_peel(src_outer, chip_outer), static=False, layer="graph"))

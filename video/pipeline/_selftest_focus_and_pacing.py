@@ -15,18 +15,32 @@ from pipeline import schema as S       # noqa: E402
 
 
 class FakeMob:
-    def __init__(self):
+    """Mirrors the manim contract focus.apply relies on: set_opacity / save_state /
+    restore. `hollow` stands in for any deliberately-transparent part (the (1)(2)(3)
+    badge rings): set_opacity clobbers it, restore must bring it back."""
+    def __init__(self, hollow=0.0):
         self.opacity = 1.0
+        self.hollow = hollow
+        self._saved = None
         self.animate = self
 
     def set_opacity(self, v):
         self.opacity = v
+        self.hollow = v            # manim sets fill AND stroke on the whole family
         return ("set_opacity", self, v)
+
+    def save_state(self):
+        self._saved = (self.opacity, self.hollow)
+
+    def restore(self):
+        assert self._saved is not None, "restore() before save_state()"
+        self.opacity, self.hollow = self._saved
+        return ("restore", self)
 
 
 class FakeBlock:
-    def __init__(self):
-        self.mobject = FakeMob()
+    def __init__(self, hollow=0.0):
+        self.mobject = FakeMob(hollow=hollow)
 
 
 class FakeScene:
@@ -102,6 +116,20 @@ def test_apply_restores_what_is_no_longer_wanted():
     assert by_id["b"].mobject.opacity == F.DIM_OPACITY
 
 
+def test_restore_brings_back_the_original_opacities_not_a_flat_one():
+    """The regression this primitive shipped with on its first render: restoring with
+    set_opacity(1.0) fills in anything deliberately hollow (the region badges are rings
+    with fill_opacity=0), so two of the three (1)(2)(3) badges came back as solid discs
+    with their digits buried. Restore must be save_state/restore, not a flat value."""
+    by_id = {"ring": FakeBlock(hollow=0.0)}
+    scene = FakeScene(10.0)
+    dimmed = F.apply(scene, by_id, ["ring"], set())
+    assert by_id["ring"].mobject.hollow == F.DIM_OPACITY, "dim touches the hollow part"
+    F.apply(scene, by_id, [], dimmed)
+    assert by_id["ring"].mobject.opacity == 1.0
+    assert by_id["ring"].mobject.hollow == 0.0, "a hollow part must come back hollow"
+
+
 def test_empty_dim_restores_everything():
     by_id = _by_id("a", "b")
     scene = FakeScene(10.0)
@@ -173,6 +201,7 @@ if __name__ == "__main__":
     test_scene_focus_reads_entries_and_empty_dim_means_restore()
     test_apply_dims_only_the_named_blocks()
     test_apply_restores_what_is_no_longer_wanted()
+    test_restore_brings_back_the_original_opacities_not_a_flat_one()
     test_empty_dim_restores_everything()
     test_apply_is_a_no_op_when_nothing_changes()
     test_unknown_block_id_is_ignored_at_play_time()

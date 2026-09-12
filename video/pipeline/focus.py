@@ -62,7 +62,17 @@ def apply(scene, by_id: "dict[str, Any]", wanted: "list[str]",
     if not to_dim and not to_restore:
         return currently_dimmed
 
-    anims = [by_id[b].mobject.animate.set_opacity(DIM_OPACITY) for b in sorted(to_dim)]
-    anims += [by_id[b].mobject.animate.set_opacity(1.0) for b in sorted(to_restore)]
+    anims = []
+    for b in sorted(to_dim):
+        mob = by_id[b].mobject
+        # Snapshot BEFORE dimming and restore from that, never `set_opacity(1.0)`:
+        # set_opacity forces fill AND stroke to the given value on every family member,
+        # so restoring to 1.0 would fill in anything deliberately hollow. Caught on the
+        # first render of this primitive -- the (1)(2)(3) region badges are rings drawn
+        # with fill_opacity=0, and "restoring" them turned two of them into solid discs
+        # with their digits buried.
+        mob.save_state()
+        anims.append(mob.animate.set_opacity(DIM_OPACITY))
+    anims += [by_id[b].mobject.animate.restore() for b in sorted(to_restore)]
     scene.play(*anims, run_time=FADE_SECONDS)
     return target
