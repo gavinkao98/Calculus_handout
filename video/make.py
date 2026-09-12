@@ -301,11 +301,20 @@ def _validate_reuse_manifest(meta: dict, scenes: list[dict], manifest: dict) -> 
         )
 
 
-def _warn_short_beats(meta: dict, scenes: list[dict], manifest: dict) -> None:
+def _scenes_by_id(scenes: list[dict], deck: "list[dict] | None") -> dict[str, dict]:
+    """{id: spec} of the WHOLE deck (or of `scenes` when no deck is given), for
+    templates._apply_carry: a `carry:` rebuilds the scene it carries from, which a --scene
+    subset may not contain."""
+    return {s["id"]: s for s in (scenes if deck is None else deck)}
+
+
+def _warn_short_beats(meta: dict, scenes: list[dict], manifest: dict,
+                      deck: "list[dict] | None" = None) -> None:
     """Warn when scene.py must pad a beat because reveal animation exceeds audio."""
     from pipeline.templates import build_blocks  # deferred: imports manim objects
 
     durations = _beat_durations(manifest)
+    scenes_by_id = _scenes_by_id(scenes, deck)
     issues: list[str] = []
     for scene in scenes:
         if scene.get("kind", "content") != "content":
@@ -315,7 +324,7 @@ def _warn_short_beats(meta: dict, scenes: list[dict], manifest: dict) -> None:
         if not beat_seconds:
             continue
         ground = "dark"
-        blocks = build_blocks(scene, {"ground": ground, "meta": meta})
+        blocks = build_blocks(scene, {"ground": ground, "meta": meta, "scenes_by_id": scenes_by_id})
         by_id = {b.id: b for b in blocks}
         for index, beat in enumerate(parse_say(scene.get("say", "")), start=1):
             if index > len(beat_seconds) or not beat.reveal:
@@ -348,13 +357,15 @@ def _warn_short_beats(meta: dict, scenes: list[dict], manifest: dict) -> None:
         print("[sync] beat timing clean", flush=True)
 
 
-def _warn_undeclared_stillness(meta: dict, scenes: list[dict], manifest: dict) -> None:
+def _warn_undeclared_stillness(meta: dict, scenes: list[dict], manifest: dict,
+                               deck: "list[dict] | None" = None) -> None:
     """SPEC-motion-language rule 4 advisory: a beat still for > 6 s with nothing declared
     (no `paced:` / `pauses:` / callable animation). Same inputs as _warn_short_beats;
     warn-only, never blocks the render."""
     from pipeline.templates import build_blocks  # deferred: imports manim objects
 
     durations = _beat_durations(manifest)
+    scenes_by_id = _scenes_by_id(scenes, deck)
     hits: list[str] = []
     for scene in scenes:
         if scene.get("kind", "content") != "content":
@@ -363,7 +374,7 @@ def _warn_undeclared_stillness(meta: dict, scenes: list[dict], manifest: dict) -
         beat_seconds = durations.get(sid)
         if not beat_seconds:
             continue
-        blocks = build_blocks(scene, {"ground": "dark", "meta": meta})
+        blocks = build_blocks(scene, {"ground": "dark", "meta": meta, "scenes_by_id": scenes_by_id})
         # callable anim (hook / sweep / `seconds: beat` / `anim: transform`) -> None: the
         # picture moves by itself. Static blocks stay out, so their reveal counts as no motion.
         anim_seconds = {b.id: stock_animation_seconds(b.anim) for b in blocks if not b.static}
@@ -381,8 +392,11 @@ def _warn_undeclared_stillness(meta: dict, scenes: list[dict], manifest: dict) -
         print(f"[stillness] no undeclared still > {UNDECLARED_STILL_SECONDS:g}s", flush=True)
 
 
-def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, quality: str):
-    """Manim renders each scene silent; reuses scene.LessonScene align core."""
+def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, quality: str,
+           deck: "list[dict] | None" = None):
+    """Manim renders each scene silent; reuses scene.LessonScene align core. `deck` is the
+    whole storyboard's scene list when `scenes` is a --scene subset (a `carry:` scene
+    rebuilds the one it carries from)."""
     from manim import tempconfig  # deferred: manim import is slow
     from pipeline.scene import LessonScene
 
@@ -390,6 +404,7 @@ def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, qualit
     media_dir = out_dir / "_media"
     rendered: dict[str, Path | None] = {}
     failures = 0
+    LessonScene.scenes_by_id = _scenes_by_id(scenes, deck)
     for scene in scenes:
         sid = scene["id"]
         print(f"[render] {sid} ...", flush=True)
@@ -568,14 +583,32 @@ def _fade_vf(video: Path, fade_in: float, fade_out: float) -> str:
 _BRAND_KINDS = {"intro", "outro", "divider"}
 
 
-def _segment_fades(kinds: list[str], transition: float, intra_act: float) -> list[tuple[float, float]]:
+def _carry_boundaries(scenes: list[dict]) -> set[int]:
+    """Segment indices whose `carry:` names the segment right before them as `from`
+    (SPEC-motion-language rule 1): an object persists across that cut, so
+    _segment_fades hard-cuts it -- same position on both sides, the cut is invisible.
+    A --scene subset that dropped the source scene has no handoff there, so no cut."""
+    out: set[int] = set()
+    for i in range(1, len(scenes)):
+        entries = scenes[i].get("carry")
+        if isinstance(entries, list) and any(
+                isinstance(e, dict) and e.get("from") == scenes[i - 1].get("id") for e in entries):
+            out.add(i)
+    return out
+
+
+def _segment_fades(kinds: list[str], transition: float, intra_act: float,
+                   carried: "set[int] | frozenset[int]" = frozenset()) -> list[tuple[float, float]]:
     """(fade_in, fade_out) per segment (T9). Every boundary touching a brand frame
     (intro/outro/divider) and the film's own open/close uses `transition`; a
     content-content boundary uses `intra_act`. Both sides of one boundary get the SAME
-    value, so the dip through black at that boundary is symmetric."""
+    value, so the dip through black at that boundary is symmetric. A boundary INTO a
+    segment in `carried` (_carry_boundaries) is a hard cut: fade 0 on both sides."""
     n = len(kinds)
 
     def boundary(a: int, b: int) -> float:
+        if b in carried:
+            return 0.0
         return transition if (kinds[a] in _BRAND_KINDS or kinds[b] in _BRAND_KINDS) else intra_act
 
     return [(transition if i == 0 else boundary(i - 1, i),
@@ -719,7 +752,8 @@ def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None]
     # T9: per-boundary fade. intra_act defaults to `transition` (behaviour unchanged);
     # an A/B pass can set --intra-act-transition 0 to tighten only content-content cuts.
     intra = intra_act if intra_act is not None else transition
-    seg_fades = _segment_fades([s.get("kind", "content") for s in scenes], transition, intra)
+    seg_fades = _segment_fades([s.get("kind", "content") for s in scenes], transition, intra,
+                               _carry_boundaries(scenes))
 
     narration_by_scene: dict[str, Path] = {}
     mode_by_scene: dict[str, str | None] = {}
@@ -954,7 +988,7 @@ def main() -> int:
     # no video), so a regression of "wrap, don't shrink" is caught before render.
     if not args.skip_sizecheck:
         from pipeline.sizecheck import check_scenes
-        issues = check_scenes(meta, scenes)
+        issues = check_scenes(meta, scenes, deck=all_scenes)
         errors = [m for s, m in issues if s == "error"]
         warns = [m for s, m in issues if s == "warn"]
         for msg in warns:
@@ -1002,11 +1036,11 @@ def main() -> int:
     # so the picture and the narration cannot drift apart. No-op for decks without the field.
     manifest = pauses.apply_pauses(scenes, manifest, audio_dir / "paused")
 
-    _warn_short_beats(meta, scenes, manifest)
-    _warn_undeclared_stillness(meta, scenes, manifest)
+    _warn_short_beats(meta, scenes, manifest, deck=all_scenes)
+    _warn_undeclared_stillness(meta, scenes, manifest, deck=all_scenes)
 
     # render
-    rendered, failures = render(meta, scenes, manifest, out_dir, args.quality)
+    rendered, failures = render(meta, scenes, manifest, out_dir, args.quality, deck=all_scenes)
     if failures:
         print(f"[render] {failures} scene(s) failed; aborting before compose", flush=True)
         return 1

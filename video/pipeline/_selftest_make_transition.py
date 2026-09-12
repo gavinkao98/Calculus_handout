@@ -42,6 +42,26 @@ def test_segment_fades_single_and_divider():
         (0.2, 0.2), (0.2, 0.2), (0.2, 0.2)]
 
 
+def test_carry_boundaries_are_the_segments_that_carry_from_the_one_before():
+    # SPEC-motion-language rule 1: a segment whose `carry.from` IS the previous segment
+    # shares an object with it across the cut, so that boundary is a hard cut.
+    a, b, c = {"id": "a"}, {"id": "b", "carry": [{"from": "a", "block": "x", "as": "y"}]}, {"id": "c"}
+    assert make._carry_boundaries([a, b, c]) == {1}
+    assert make._carry_boundaries([b, c]) == set(), "a --scene subset without the source: no handoff"
+    assert make._carry_boundaries([a, c, b]) == set(), "from must be the segment right before"
+    assert make._carry_boundaries([a, {"id": "z", "carry": "junk"}]) == set()
+
+
+def test_segment_fades_carry_boundary_is_a_hard_cut_both_sides():
+    kinds = ["divider", "content", "content", "content", "outro"]
+    assert make._segment_fades(kinds, 0.2, 0.2, carried={2}) == [
+        (0.2, 0.2), (0.2, 0.0), (0.0, 0.2), (0.2, 0.2), (0.2, 0.2)]
+    # every other boundary (brand or content-content) is exactly as before
+    assert make._segment_fades(kinds, 0.2, 0.2) == [(0.2, 0.2)] * 5
+    assert make._segment_fades(kinds, 0.2, 0.0, carried={2, 3}) == [
+        (0.2, 0.2), (0.2, 0.0), (0.0, 0.0), (0.0, 0.2), (0.2, 0.2)]
+
+
 if __name__ == "__main__":
     for name in sorted(n for n in dir() if n.startswith("test_")):
         globals()[name]()
