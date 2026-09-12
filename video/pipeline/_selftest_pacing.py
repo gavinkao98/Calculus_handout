@@ -124,6 +124,17 @@ def test_apply_rewires_only_the_named_dynamic_blocks():
     assert blocks[0].anim_seconds == P.FADE_SECONDS * 2
 
 
+def test_declared_seconds_are_the_floor_not_the_natural_length():
+    """make.py's short-beat warning reads `anim_seconds` and tells the author scene.py
+    will PAD the beat. An atomic write is capped at its beat by `write_seconds`, so it can
+    never pad -- declaring its uncapped natural length made that warning fire on every
+    long written row and name seconds that were never added."""
+    blocks = [FakeBlock("row", _mob(1))]
+    P.apply({"paced": ["row"]}, blocks)
+    assert blocks[0].anim_seconds == TM.BEAT_PACED_MIN_SECONDS
+    assert blocks[0].anim_seconds < P.write_seconds(blocks[0].mobject, float("inf"))
+
+
 def test_apply_is_a_no_op_without_the_field():
     blocks = [FakeBlock("body", _mob(2))]
     P.apply({}, blocks)
@@ -180,6 +191,7 @@ if __name__ == "__main__":
     test_a_two_part_block_does_not_strand_the_back_half()
     test_off_beat_it_falls_back_to_plain_reveals()
     test_apply_rewires_only_the_named_dynamic_blocks()
+    test_declared_seconds_are_the_floor_not_the_natural_length()
     test_apply_is_a_no_op_without_the_field()
     test_apply_never_touches_a_static_block()
     test_apply_never_overwrites_a_choreography()

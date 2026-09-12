@@ -102,6 +102,12 @@ def apply(spec: dict[str, Any], blocks: "list") -> "list":
         if b.id in want and not b.static and not callable(b.anim):
             n = len(block_parts(b.mobject))
             b.anim = paced_reveal
-            b.anim_seconds = (FADE_SECONDS * n if n > 1
-                              else write_seconds(b.mobject, float("inf")))
+            # `anim_seconds` is what make.py's short-beat warning compares against the
+            # beat's audio, so it must be the LEAST this reveal can cost, not the most.
+            # The walk's floor is its n fades (which a very short beat really can overrun).
+            # The atomic write has no floor of its own -- `write_seconds` caps it at the
+            # beat -- so its floor is the paced minimum; declaring the uncapped natural
+            # length instead made the warning fire on every long written row and claim
+            # scene.py was padding seconds it never padded.
+            b.anim_seconds = FADE_SECONDS * n if n > 1 else TM.BEAT_PACED_MIN_SECONDS
     return blocks
