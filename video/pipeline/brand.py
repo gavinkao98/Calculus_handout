@@ -39,7 +39,9 @@ from manim import (
     Tex,
     VGroup,
 )
+from manim.mobject.text.tex_mobject import MathTexPart
 
+from . import texparts
 from .visuals import theme as T
 
 FRAME_W = T.FRAME_W
@@ -462,6 +464,82 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
     return mob
 
 
+# -- deck-level variable colour table (meta.color_map; SPEC-motion-language rule 5) ----------
+#
+# "The same variable is the same colour in the figure, the axis label and the formula token."
+# templates.build_blocks sets the table from the scene's meta before any template builds, so
+# every math_line in the deck reads one table -- and a deck without one reads an empty table,
+# which is the old single-colour MathTex byte for byte. Module state rather than a parameter:
+# math_line has a dozen call sites across the templates and none of them carries ctx.
+
+_COLOR_MAP: dict[str, str] = {}      # tex token -> palette role
+_warned_splits: set[str] = set()
+
+
+def set_color_map(mapping) -> None:
+    global _COLOR_MAP
+    _COLOR_MAP = ({str(k): str(v) for k, v in mapping.items()}
+                  if isinstance(mapping, dict) else {})
+
+
+def mapped_role(text: str) -> "str | None":
+    """The palette role of the first colour-mapped token in *text*, or None. graph reads it to
+    default a plot's colour from its label (kickoff T1-3)."""
+    for _piece, key in texparts.split_tokens(text, list(_COLOR_MAP)):
+        if key is not None:
+            return _COLOR_MAP[key]
+    return None
+
+
+def _math_tex(src: str, ground: str, col: str, fsz: float):
+    """MathTex for one math line, cut where the motion language needs it: the author's
+    ``{{...}}`` segments become one submobject each (derivation's transform / cancel key on
+    them), and inside a segment every colour-mapped token becomes a part in its role colour.
+    Neither present -> plain ``MathTex(src)``, exactly as before.
+
+    Parts, not manim's ``tex_to_color_map``: that matches raw substrings, so a key ``h`` cuts
+    ``\\theta`` / ``\\right`` in half and LaTeX fails. Tokens are matched whole in texparts and
+    handed to manim as ``*parts`` -- which manim 0.20 marks with dvisvgm groups inside ONE
+    compile, so a part may sit inside a ``\\frac`` argument (parity + \\frac cases pinned in
+    _selftest_color_map). A cut LaTeX still rejects (a mapped token as ``\\frac``'s unbraced
+    argument, ``\\frac h2``) falls back to one colour with one printed warning."""
+    segments = texparts.split_segments(src)
+    keys = list(_COLOR_MAP)
+    pieces = [(i, piece, key) for i, seg in enumerate(segments)
+              for piece, key in texparts.split_tokens(seg, keys)]
+    if len(segments) == 1 and all(key is None for _, _, key in pieces):
+        return MathTex(src, color=col, font_size=fsz)
+    try:
+        mob = MathTex(*[piece for _, piece, _ in pieces], color=col, font_size=fsz)
+        if len(mob.submobjects) != len(pieces):
+            raise ValueError(f"expected {len(pieces)} parts, manim built {len(mob.submobjects)}")
+    except ValueError as exc:
+        if src not in _warned_splits:
+            _warned_splits.add(src)
+            print(f"[color_map] {src}: LaTeX refused the segment/token split "
+                  f"({type(exc).__name__}); rendered in one colour")
+        mob = MathTex(src, color=col, font_size=fsz)
+        if len(segments) > 1 and len(mob.submobjects) == len(segments):
+            mob._ml_parts = True
+        return mob
+    for part, (_, _, key) in zip(mob.submobjects, pieces):
+        if key is not None:
+            part.set_color(T.color(ground, _COLOR_MAP[key]))
+    if len(pieces) != len(segments):
+        # colour cuts nest INSIDE the author's segments: the top level stays one part per
+        # segment (transform/cancel key on it, pacing walks it), the tinted token one level down
+        groups = []
+        for i, seg in enumerate(segments):
+            g = MathTexPart()
+            g.tex_string = seg
+            g.add(*[part for part, (j, _, _) in zip(mob.submobjects, pieces) if j == i])
+            groups.append(g)
+        mob.submobjects = groups
+    if len(segments) > 1:
+        mob._ml_parts = True
+    return mob
+
+
 def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math"):
     """A math (or math+text) line, recoloured. newtx (Times) serif.
 
@@ -473,15 +551,19 @@ def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math"):
     - Multiple '$...$' spans mixed with text (e.g. "if $f(x)=0$ then $x=a$")
       -> Tex (text mode).  Passing this to MathTex would nest math mode inside
       align* and crash ("Missing }"), which is the bug this guards against.
+
+    The two MathTex forms honour ``{{...}}`` segments and the deck's colour table (see
+    _math_tex); the Tex form does not -- a cut inside a ``$...$`` span leaves the delimiters
+    unbalanced, so a sentence with inline math stays one colour.
     """
     col = T.color(ground, role)
     fsz = T.fs(size)
     stripped = tex.strip()
     if stripped.startswith("$") and stripped.endswith("$") and stripped.count("$") == 2:
-        return MathTex(stripped[1:-1], color=col, font_size=fsz)
+        return _math_tex(stripped[1:-1], ground, col, fsz)
     if "$" in tex:
         return Tex(tex, color=col, font_size=fsz)
-    return MathTex(tex, color=col, font_size=fsz)
+    return _math_tex(tex, ground, col, fsz)
 
 
 # -- math card ------------------------------------------------------------

@@ -1,0 +1,50 @@
+# {{…}} 分段＋anim: transform 對位＋anim: cancel 兩段式消去＋frame: true demo／驗證稿
+# （非正式節，檔名底線前綴）
+#
+# 目的：驗證 derivation 的 token 級變形（SPEC-motion-language 規則 2、規則 3；
+# KICKOFF-motion-language-gaps T3-1～T3-3、T2-2）——
+#   step.0 → step.1  anim: transform ＋ frame: true：morph 前 0.4 s 先框住上一列，兩列都分段，
+#                     所以是段對段（TransformMatchingTex）而不是字形配對；只有變的段在動。
+#   step.1 → step.2  anim: cancel, cancel: [1, 2]：上一列第 1、2 段（\frac{h}{h} 與 \cdot）
+#                     先原地退場 0.4 s，剩下的段再對位變形 0.8 s。
+#   step.2 → result  anim: transform：= 1 是新段，淡入；其餘平移。
+# 同時開 color_map（h → caution）驗證「分段＋色表」可以疊：段內的 h 上色、段仍是段。
+# 寫法注意：{{ 前要有空白（同 manim：{{a}} = {{b}}，不要 {{a}}={{b}}）；cancel 的索引指
+# 上一列的段（0 起算，括號外的文字如 \cdot 也算一段）。
+# demo 專用，不屬任何正式節；驗證後留作模板範例。
+
+meta:
+  id: demo_tex_parts
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Tex Parts Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Tex Parts Demo" }
+  color_map:
+    "h": caution
+
+scenes:
+
+  # 1 ---------------- 分段推導鏈：transform＋frame → cancel → transform
+  - id: cancel_the_h
+    kind: content
+    template: derivation
+    accent: example
+    source: "合成例（取 _demo_derivation slope chain 的最後兩步）"
+    title: "Only the Changing Token Moves"
+    say: |
+      Four rows, and only what changes should move.
+      {show step.0} The numerator has a common factor of h.
+      {show step.1} Pull it out as its own fraction -- the frame says this row is about to change.
+      {show step.2} Those two cancel: watch them go first, then the rest closes up.
+      {show result} And the limit is one.
+    steps:
+      - { math: "{{\\lim_{h\\to 0}}} {{\\frac{h + h^2}{h}}}", reason: "difference quotient" }
+      - { math: "{{\\lim_{h\\to 0}}} {{\\frac{h}{h}}} \\cdot {{(1+h)}}", reason: "factor", anim: transform, frame: true }
+      - { math: "{{\\lim_{h\\to 0}}} {{(1+h)}}", reason: "cancel", anim: cancel, cancel: [1, 2] }
+    result: { math: "{{\\lim_{h\\to 0}}} {{(1+h)}} = 1", reason: "let h go", anim: transform }

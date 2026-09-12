@@ -28,6 +28,9 @@ STOCK_ANIM_SECONDS = {
     # its corner on `{show <as>}`. A Block CALLABLE, like transform, so this entry is the
     # single source of its nominal length.
     "carry": 0.8,
+    # two-stage elimination (derivation `anim: cancel`): 0.4 s the cancelled segments fade in
+    # place, then 0.8 s the survivors morph into the new row. Same callable contract as transform.
+    "cancel": 1.2,
 }
 
 # `exit: [<block id>...]` (scene.py _tail): the named blocks fade out INSIDE the
