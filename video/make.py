@@ -865,6 +865,16 @@ def main() -> int:
             print(f"[provenance] {_p_err} error(s) -- aborting (fix refs or unset meta.otf_enforce):", flush=True)
             return 2
 
+    # source_rev freshness (warn-only, never gates; mirrors schema.py): the LOCKED content script
+    # vs the handout source it was stamped against -- drift = CONTENT_METHODOLOGY.md §8 trigger
+    # (assessment F2, 2026-09-07).
+    from pipeline import source_rev as _srev
+    _srev_issues = _srev.check_source_rev(_srev.md_for_deck(_meta, _repo_root), _repo_root)
+    if _srev_issues:
+        print(f"[source_rev] {len(_srev_issues)} finding(s) (warn-only)", flush=True)
+        for _sev, _msg in _srev_issues:
+            print(f"  WARN   {_msg}", flush=True)
+
     # Pedagogy structural checks (warn-default; gates only when meta.pedagogy_enforce is True)
     from pipeline import pedagogy as _ped
     _ped_enforce = bool(_meta.get("pedagogy_enforce"))

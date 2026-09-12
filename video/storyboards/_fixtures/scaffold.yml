@@ -1,13 +1,16 @@
+# meta.id binds content_scripts/_fixture_pedagogy.md for md:<unit> resolution; no chapter ->
+# md-only, hermetic (same pattern as pedagogy_audit.yml). Before 2026-09-12 this fixture
+# leaned on the REAL handout via doc:frag-sec-3-1, so a handout path move turned the
+# pedagogy selftest red for a reason unrelated to pedagogy (assessment F1).
 meta:
-  id: _fixture_scaffold
+  id: _fixture_pedagogy
   section: "0.0"
-  chapter: "Chapter 3"
   pedagogy_profile: first_time
   assumptions:
     - id: radians
       text: "$\\theta$ in radians (arc length $=\\theta$)"
       first_use_unit: uses_radians
-      source: "doc:frag-sec-3-1"
+      source: "md:unit_squeeze"
 scenes:
   - id: thm_no_motive
     kind: content
@@ -17,7 +20,7 @@ scenes:
   - id: uses_radians
     kind: content
     template: derivation
-    ref: "doc:frag-sec-3-1"
+    ref: "md:unit_squeeze"
     scaffold: { motive: "set up the squeeze", flag: radians }
     say: "{show statement}"
     statement: "has motive + first-use flag for radians"

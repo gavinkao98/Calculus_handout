@@ -5,7 +5,7 @@
 
 - **改了什麼、為什麼：** [DESIGN.md](DESIGN.md)
 - **所有審核閘一覽（七層 + meta-gate + 各節狀態）：** [REVIEW_GATES.md](REVIEW_GATES.md)
-- **輸入：** 講義 **LaTeX 線**（[`../handout/latex/`](../handout/latex/)）的各節（由人閱讀、手寫產出內容稿）。**各章權威檔＝`../handout/latex/src/<ch>/<name>.tex`（唯一內容源；閱讀版＝`dist/<ch>/<name>.pdf`）**——2026-08-09 LaTeX 統一拍板（U5，[`../handout/latex/KICKOFF-latex-unification.md`](../handout/latex/KICKOFF-latex-unification.md)）。沿革：2026-06-10 前輸入為第一代 `../chapters/*.tex`（§1.1/§1.6 原型基於它）→ 2026-06-10 換 HTML standalone（ch01 拍板檔＝`chapter1-print-standalone.html`，其 `source:` 錨沿用於既有內容稿，屬歷史紀錄不改）→ 2026-08-09 換回 LaTeX（源升格）。既有內容稿／storyboard 的 `source:` 錨照舊；**新內容稿一律錨 `<name>.tex`**（格式見 [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md) §6）。
+- **輸入：** 講義 **LaTeX 線**（[`../handout/latex/`](../handout/latex/)）的各節（由人閱讀、手寫產出內容稿）。**各章權威檔＝`../handout/latex/src/<ch>/<name>.tex`（唯一內容源；閱讀版＝`dist/<ch>/<name>.pdf`）**——2026-08-09 LaTeX 統一拍板（U5，[`../handout/latex/KICKOFF-latex-unification.md`](../handout/latex/KICKOFF-latex-unification.md)）。沿革：2026-06-10 前輸入為第一代 `../chapters/*.tex`（§1.1/§1.6 原型基於它）→ 2026-06-10 換 HTML standalone（ch01 拍板檔＝`chapter1-print-standalone.html`，其 `source:` 錨沿用於既有內容稿，屬歷史紀錄不改）→ 2026-08-09 換回 LaTeX（源升格）。既有內容稿／storyboard 的 `source:` 錨照舊；**新內容稿一律錨 `<name>.tex`**（格式見 [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md) §6）。**機器可解析的錨文法（2026-09-12 收尾）：** storyboard `ref:`／`refs:` 的 `doc:` 對 `.tex` 用 calcbook label key——`doc:sec:3.1`／`doc:thm:3.1`／`doc:def:3.1`／`doc:fig:3.1`（`pipeline/provenance.py` 直接讀 `.tex` 解析；既有 deck 的 `doc:frag-sec-*`／`data-fig` 仍解析到凍結 `legacy/` standalone）；**LOCKED 內容稿標頭 MUST 帶 `source_rev` 講義源 stamp**（`python video/pipeline/source_rev.py <源檔>` 產生；preflight 比對不符即 `[source_rev]` WARN＝走 §8）。
 - **輸出：** `output/`（gitignored）
 
 ## 結構
@@ -31,7 +31,11 @@ video/
     scene.py           所有模板共用的 Manim player（reveal 時序由音訊時長驅動）
     lint.py            render 前守門員：亂碼／不平衡 `$`／散文手動 `\\`／空心點
     sizecheck.py       render 前守門員：並排字級、出框、安全邊界、content 區塊重疊
-    schema.py          render 前守門員：storyboard 結構驗證＋列舉 `{show}` 目標
+    schema.py          render 前守門員：storyboard 結構驗證＋列舉 `{show}` 目標（並跑 provenance／source_rev／pedagogy／coverage）
+    provenance.py      OTF 確定性層：`md:`／`doc:` ref 解析（doc 錨池＝凍結 legacy standalone ∪ `.tex` label key）
+    source_rev.py      內容稿↔講義源 freshness stamp（LOCKED 稿標頭 `source_rev`；drift 只 WARN＝§8 觸發器）
+    run_selftests.py   從任一 cwd 跑全部 `_selftest_*.py`（統一 `-m pipeline.<name>`），任一紅即非零 exit
+    _selftest_*.py     各模組離線自測（平鋪 assert、無 pytest；`_selftest_capacity.py`＝容量契約回歸網）
     critic.py          render 後視覺 gate2：抽幀 → MiMo-V2.5 依 VISUAL-FRAME 判定（外部 API、公測免費）
     review_pack.py     工程鏡 packet 組裝（gate1 Claude／gate2 Codex 讀；離線、無 API）
     tts.py             MiMo TTS（唯一真旁白路線；Gemini 已退場 2026-06-16）
@@ -88,7 +92,7 @@ video/
 
 - **TTS＝MiMo builtin voice `Dean` 單一路線**（Gemini/Charon 已退場 2026-06-16；voice-design／「Calm Professor」persona 2026-07-05 退役）；**scene-level TTS＋forced alignment（stable-ts）為正式路線**，`--unit auto` 涵蓋全部 content template。
 - **文字渲染＝Route A（全 LaTeX/pdflatex，2026-06-25 落地）**：內文/標題 IBM Plex Sans、eyebrow IBM Plex Mono、數學 Latin Modern（見下方「文字渲染」節與 [DESIGN.md](DESIGN.md)）。
-- 引擎完整：`make.py` orchestrator、**五道 render 前確定性檢查（schema → provenance → pedagogy → lint → sizecheck，後兩者 warn-default）**、模板 catalog＋容量契約 G1–G6、`hook:` 機制、MiMo TTS、`timing.py` 同步守衛、**七份判斷閘 SSOT rubric**（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering／pedagogy-firstlearner／amplification）。
+- 引擎完整：`make.py` orchestrator、**五道 render 前確定性檢查（schema → provenance → pedagogy → lint → sizecheck，後兩者 warn-default；另掛 `source_rev` 講義源 freshness，永遠 warn-only）**、模板 catalog＋容量契約 G1–G6、`hook:` 機制、MiMo TTS、`timing.py` 同步守衛、**七份判斷閘 SSOT rubric**（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering／pedagogy-firstlearner／amplification）。
 - 音訊驅動對齊（beat-level：每 beat 影片長度＝該 beat 音檔長度；scene-level：FA 逐字對位映回 beat）為產線核心；mock 路徑（`make.py --backend mock`）離線、不計費，供版面／時序迭代。`video/output/` 是 gitignored。
 - 舊 ch01 練習產物（內容稿／旁白／per-deck 稽核報告）已於 2026-06-16 刪除；**`storyboards/ch01_inverse_functions.yml`＋`animations/ch01_inverse_functions_hooks.py` 保留作版面回歸 deck**（G1–G6／Step 0 回歸即用它），正式 ch01 影片屆時仍從講義逐節重跑。
 
@@ -153,9 +157,19 @@ manifest 為每 reveal beat 記一個 WAV、每內容場景記一個串接旁白
 
 **自動守門員**（`make.py` render 前依序執行；兩級 **error 擋下 / warn 提示**）：
 
-- `pipeline/schema.py` — error：meta.id/section 缺、scene kind 不合法、id 重複、content 缺 template/say、`{show}` 不閉合；`--list` 另印每場 reveal 目標。
+- `pipeline/schema.py` — error：meta.id/section 缺、scene kind 不合法、id 重複、content 缺 template/say、`{show}` 不閉合；`--list` 另印每場 reveal 目標。並跑 `provenance`（`doc:`／`md:` ref 可解析；`meta.otf_enforce` 開才 error）、`pedagogy`、`coverage`（各自 `*_enforce` 開才 error），以及 **`source_rev`（LOCKED 內容稿 vs 講義源 stamp；永遠 warn-only，WARN＝走 CONTENT_METHODOLOGY §8）**。
 - `pipeline/lint.py` — error：純文字欄含標記、`$` 不平衡；warn：散文手動 `\\`、空心點畫在曲線上。
 - `pipeline/sizecheck.py` — error：並排散文字級不一致、元素出框；warn：教學散文用 `muted`、超安全邊界、content 區塊重疊。
+
+**離線自測與 smoke（2026-09-12 起；零計費、不 render）**——改 code 後跑、換機後跑、Phase 收尾跑：
+
+```powershell
+.venv\Scripts\python video\pipeline\run_selftests.py          # 全部 pipeline/_selftest_*.py（manim 類要幾分鐘）；任一紅即 exit 1
+.venv\Scripts\python video\pipeline\run_selftests.py -k lint  # 只跑名字含 lint 的
+python tools\doctor.py --smoke                                # 環境健檢＋正典 deck 的 schema／lint／derive --check（幾秒）
+```
+
+> 為何兩支都要：doctor 原本只驗工具鏈，2026-08-10 佈局重構後正典 deck 過不了自己的 provenance 閘、一個 selftest 同因變紅，doctor 卻仍報影片線 ✅（[`_audit/REVIEW-pipeline-assessment-2026-09-07.html`](_audit/REVIEW-pipeline-assessment-2026-09-07.html) F1／F4）。`--smoke` 抓 deck 級閘、runner 抓模組級回歸；兩者都綠才算「產線綠」。
 
 **解析度慣例**：測試／預覽用 1080p（`make.py --quality high`，預設），正式交付才 4K（`--quality 4k`，依 `meta.video`，未設預設 4K60）。版面與解析度無關，1080p 測試與 4K master 構圖逐像素相同。（agent 預設一律 1080p、除非使用者要求，見根 [`CLAUDE.md`](../CLAUDE.md)；§3.1 真 4K final 另議見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)。）
 

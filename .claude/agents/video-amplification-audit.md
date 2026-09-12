@@ -20,7 +20,7 @@ model: inherit
 2. handout `expansion:*` 標記的權威定義：`README.md` §撰稿工作流程。
 
 # 你要審什麼（一次讀齊）
-1. **handout fragment**：`legacy/html_handout/fragments/chNN/sec-*.html`——盤點該節所有 `<!-- expansion:intuition|application … -->` 標記所承載的直覺（＝候選來源池），**並另掃 `expansion:caution`**（僅為把 correctness-critical 者路由到末段假設清單，**不當 intuition 候選**）。
+1. **handout 的 `expansion:*` 標記（＝候選來源池）**，依 rubric §錨與範圍的取法：先掃該節 LaTeX 源 `handout/latex/src/chNN/chapterN.tex` 的 `% expansion:intuition|application …` 註解；**該節 `.tex` 為 0 筆時（歷史章皆如此）改用同節凍結 fragment** `legacy/html_handout/fragments/chNN/sec-*.html` 的 `<!-- expansion:… -->`，並逐筆確認其直覺在現行 `.tex` 仍在（不在者標 `[stale-in-tex]`、不當候選）。報告首段**明寫池來源與標記數**，兩處皆 0 要明說、不得默默出空報告。**另掃 `expansion:caution`**（僅為把 correctness-critical 者路由到末段假設清單，**不當 intuition 候選**）。
 2. **影片 storyboard**：`video/storyboards/<deck>.yml`——各場**上畫面文字**（`statement`／`annotations`／`scaffold`／divider 文字／callout `body`…）＋ **`say`（旁白）** ＋ **`# HOOK`／animation（視覺）**。
 3. **cited `.md`**：`video/content_scripts/<deck>.md`——單元 `narration`／`visual_need`，佐證某直覺是否已在旁白／視覺承載。
 

@@ -163,6 +163,11 @@ def main() -> int:
             print(f"  - {p}", flush=True)
         return 1
     print("[derive_spoken] parity OK", flush=True)
+    # source_rev freshness (warn-only): the content script this deck derives from vs the handout
+    # source it was stamped against (assessment F2, 2026-09-07). Drift -> CONTENT_METHODOLOGY.md §8.
+    from pipeline.source_rev import check_source_rev
+    for _sev, msg in check_source_rev(CONTENT / f"{args.deck}.md", _bootstrap.REPO_ROOT):
+        print(f"[source_rev] WARN  {msg}", flush=True)
     if args.check:
         return 0
 

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>影片產線評估 2026-09-07</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+:root{--ink:#1a2233;--muted:#5a6b85;--line:#dce3ee;--bg:#f6f8fc;--navy:#0a1322;--card:#fff;
+ --t1:#b3261e;--t1bg:#fdecea;--t2:#9a6a12;--t2bg:#fdf4e3;--t3:#20609b;--t3bg:#e8f0fa;--t4:#1f7a4d;--t4bg:#e9f6ef;--accent:#b0792a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:34px 22px 90px}
+header.top{background:var(--navy);color:#fff;border-radius:14px;padding:26px 30px;margin-bottom:18px}
+header .eyebrow{font:600 12px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:#8fb0e6}
+header h1{margin:.35em 0 .2em;font-size:25px}
+header .sub{color:#c4d2ec}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;font:13px/1.5 ui-monospace,Consolas,monospace;color:#c4d2ec}
+.tldr{background:#12203a;border:1px solid #24406e;border-radius:10px;margin-top:16px;padding:14px 18px}
+.tldr p{margin:.4em 0;color:#e6edf3}
+.tldr b{color:#7ee0a8}
+h2{font-size:18px;margin:34px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+h3{font-size:15.5px;margin:22px 0 8px}
+p{margin:.55em 0}
+table{border-collapse:collapse;width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13.5px;margin:10px 0}
+th,td{text-align:left;vertical-align:top;padding:9px 11px;border-bottom:1px solid var(--line)}
+th{background:#eef2f9;font:600 12px/1.3 ui-monospace,Consolas,monospace;color:#33415c;text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:none}
+code{font:12.5px/1.4 ui-monospace,Consolas,monospace;background:#eef1f7;padding:1px 4px;border-radius:3px;color:#33415c}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:12px 14px;overflow-x:auto;font:12.5px/1.5 ui-monospace,Consolas,monospace}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0}
+.card.t1{border-left:5px solid var(--t1)}.card.t2{border-left:5px solid var(--t2)}.card.t3{border-left:5px solid var(--t3)}.card.t4{border-left:5px solid var(--t4)}
+.chip{display:inline-block;font:600 11.5px/1.35 ui-monospace,Consolas,monospace;padding:2px 8px;border-radius:20px;white-space:nowrap;border:1px solid;margin-right:6px;vertical-align:middle}
+.c1{color:var(--t1);background:var(--t1bg);border-color:#f1b8b3}.c2{color:var(--t2);background:var(--t2bg);border-color:#ecd6a8}
+.c3{color:var(--t3);background:var(--t3bg);border-color:#c3d8f0}.c4{color:var(--t4);background:var(--t4bg);border-color:#bfe3cf}
+.fid{font:700 12.5px/1.4 ui-monospace,Consolas,monospace;color:var(--navy)}
+.ev{color:var(--muted);font-size:13px;margin-top:6px}
+.ev b{color:#33415c}
+ul,ol{margin:6px 0;padding-left:22px}li{margin:4px 0}
+.note{font-size:13px;color:var(--muted);margin:14px 2px;padding:11px 15px;border-left:3px solid var(--accent);background:#fff8ec;border-radius:4px}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;font-size:13.5px}
+.kv div:nth-child(odd){color:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+.foot{margin-top:30px;font-size:12.5px;color:var(--muted);font-style:italic}
+.rec{counter-reset:none}
+.rec h3 span{color:var(--accent);font-family:ui-monospace,Consolas,monospace;font-size:13px;margin-right:8px}
+.small{font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">video · pipeline assessment · read-only</div>
+  <h1>影片製作流程評估</h1>
+  <div class="sub">研究對象：<code>video/</code> 第二代產線（講義 → 內容稿 → 旁白 → storyboard → MiMo TTS → Manim → 成片）。本稿只回報與提議，未改任何產線檔案。</div>
+  <div class="meta">
+    <span>日期：2026-09-07</span><span>樹：<code>main @ 82eeea3</code>（clean）</span>
+    <span>方法：讀 11 份文檔＋rubric／跑離線閘與 selftest／git 考古</span><span>作者：Claude（研究），裁決權在你</span><span>回歸審核：2026-09-12 修復輪（見末節「回歸審核」）</span>
+  </div>
+  <div class="tldr">
+    <p><b>一句話：</b>這條產線的「防錯」層（忠實、數學正確、計費、freshness）做得很扎實，但「產好課」層幾乎沒有機制，而且目前<b>正典 deck 過不了自己的 render 閘</b>（2026-08-10 佈局重構後的路徑漂移，一行 code）。</p>
+    <p><b>三件最該先知道的事：</b>① <code>make.py</code> 在 §3.1 正典 deck 上會於 provenance 閘中止，一個 selftest 同因變紅；② 兩份已 LOCK 的內容稿所引用的講義文字，在 lock 之後已被改動（§3.1 約 100 行、§3.2 約 80 行 word-diff），且無任何機制會發現；③ 你對成片「動畫死板」的不滿是<b>架構結果</b>：9 個 content 模板＋scene player＋block 派發器裡，連續動畫原語（ValueTracker／updater／animate）的使用數是 <b>0</b>，而視覺閘審的是靜幀、結構上看不見動態。</p>
+  </div>
+</header>
+
+<div class="note">
+  <b>分級沿用 CLAUDE.md 的四級紀律：</b>① 真衝突／損壞（要修）　② discoverability／文檔缺口（補文件或小工具）　③ 結構性觀察（不是 bug，但是根因）　④ 非 finding／做得好的。
+  每條發現附證據與重現指令（附錄）。意見與建議放在最後一節，明標「這是我的判斷」。
+</div>
+
+<!-- ============================================================ -->
+<h2>一、現況快照（事實）</h2>
+
+<table>
+<tr><th>面向</th><th>現況</th><th>證據</th></tr>
+<tr><td>唯一完工節</td><td>ch03 §3.1（<code>ch03_trig_derivatives</code>）：27 場（21 content）、約 16.2 分、1080p、Dean scene-level FA；使用者看過後對<b>視覺與教學兩面不滿</b></td><td><code>REBUILD_STATUS.md</code>；storyboard 統計（見附錄 A）</td></tr>
+<tr><td>第二節</td><td>§3.2 Stage-1 LOCKED（2026-06-29），<b>凍結</b>至品質補強試點裁決</td><td><code>content_scripts/ch03_chain_rule.md</code> 標頭</td></tr>
+<tr><td>影片線最後實質動作</td><td>2026-07-20（品質補強輪定案文檔）。之後只有 08-09／08-10 兩筆因講義線重構而連動的路徑改動。<b>停擺約 7 週</b>，卡點＝「等使用者發動 ①看片標記」（27 場逐場標記）</td><td><code>git log -- video/</code></td></tr>
+<tr><td>同期講義線</td><td>Ch1–8＋App A–D 全數 LaTeX 定稿（2026-07-26／08-09）；ch03 於 07-03 難度緩解、07-06 revise、07-26 平實化 66 條；08-09 LaTeX 成唯一源；08-10 HTML 封存至 <code>legacy/</code></td><td><code>handout/PIPELINE.md</code> dashboard；git log</td></tr>
+<tr><td>工程量</td><td>267 個 commit 觸及 <code>video/</code>（2026-05-31 → 08-10）；約 5,200 行流程文檔＋800 行歸檔日誌；7 份 SSOT rubric；12 個具名 subagent（其中 7 個屬影片線）；21 個 selftest；9 個 content 模板；13 個 pipeline 模組</td><td><code>wc -l</code>；<code>.claude/agents/</code></td></tr>
+<tr><td>離線閘健康度（本次實跑）</td><td><code>derive_spoken --check</code> parity OK；<code>lint</code> 0 error／1 warn；抽跑 5 個 selftest → 4 綠 <b>1 紅</b>；<code>schema</code>（含 provenance）在正典 deck <b>4 ERROR，ENFORCED</b></td><td>附錄 B</td></tr>
+<tr><td>環境</td><td><code>tools/doctor.py</code> 報「✅ 影片完整 render→compose」；1 項 FAIL 屬講義 LaTeX 線（pdftotext 非 poppler 版），與影片無關</td><td>doctor 輸出</td></tr>
+</table>
+
+<h3>§3.1 的成本剖面（唯一資料點）</h3>
+<table>
+<tr><th>項目</th><th>量</th><th>備註</th></tr>
+<tr><td>場數／模板</td><td>27 場：intro 1、divider 4、content 21、outro 1；content ＝ derivation 6、theorem_proof 5、graph 4、definition_math 3、callout 2、recap 1</td><td>storyboard 715 行</td></tr>
+<tr><td>旁白</td><td>2,098 字、79 個 <code>{show}</code> beat；spoken.yml 手寫 295 行</td><td>150 wpm 估 14 分，實成 16.2 分</td></tr>
+<tr><td>客製 hook</td><td>5 場、603 行 manim code；6 項創意 hook subagent 各約 80k–216k tokens</td><td>歸檔日誌 2026-07-05</td></tr>
+<tr><td>真 TTS</td><td>約 36 個 billed call（21 primary＋3 resynth＋3 降級場 beats）</td><td>歸檔日誌成本記帳</td></tr>
+<tr><td>commit／回歸</td><td>31 個 commit 提到 §3.1；回歸輪數 3+；render 多輪（Step 0／capacity v2 含 48 場）</td><td><code>REBUILD_STATUS.md</code> 成本表</td></tr>
+<tr><td>時程</td><td>Stage-1 lock 06-28 → 重 lock（detail-redo）06-29 → Stage-2 storyboard 06-29 → 打磨至 07-05 → spoken／NFA 07-06；07-11 產線硬化 T1–T11；07-19 定案「整節重做」</td><td>git log</td></tr>
+</table>
+<p class="small">全書 Ch1–8 已定稿、Ch9+ 尚未開章；REBUILD_STATUS 自己的框架是「30+ 節量產」。以上述剖面線性外推，這是以年計的工作量。這不是批評，是後面建議的前提。</p>
+
+<!-- ============================================================ -->
+<h2>二、發現（依四級分）</h2>
+
+<h3>① 真衝突／損壞（已實測重現）</h3>
+
+<div class="card t1">
+  <span class="chip c1">① 損壞</span><span class="fid">F1 · 正典 deck 過不了 render 閘：<code>provenance.py</code> 仍指向已搬走的 HTML</span>
+  <p><code>pipeline/provenance.py:82</code> 解析 <code>doc:frag-sec-*</code> 錨時讀 <code>handout/html/standalone/chapter&lt;N&gt;-print-standalone.html</code>。該檔於 2026-08-10 佈局重構（<code>22b60fc</code>）移到 <code>legacy/html_handout/standalone/</code>。§3.1 storyboard 有 4 個 divider 的 <code>scaffold.problem</code> 用 <code>doc:frag-sec-3-1</code>，且 <code>meta.otf_enforce: true</code> → schema 閘 4 ERROR → <code>make.py</code> 印「aborting」。<b>今天沒有人能在不加 <code>--skip-schema</code> 或關掉 enforce 的情況下重 render §3.1。</b></p>
+  <p>同一根因讓 <code>_selftest_pedagogy.py::test_schema_integration</code> 變紅（fixture 的 <code>doc:frag-sec-3-1</code> 解析失敗 → 多印一行 provenance WARN，撞到斷言）。</p>
+  <p class="ev"><b>對照：</b>subagent 提示 <code>.claude/agents/pedagogy-firstlearner-audit.md</code> 已在同一次重構改寫成「既有 deck 錨指歷史 standalone（legacy/…）」，但 code 沒跟——正是 T1 硬化想殺的「文檔與 code 漂移」，只是這次漂在 code 側。<b>修法：</b>一行路徑改 legacy，或改為「legacy HTML → 若無則 <code>latex/src</code>」雙來源；順手讓 fixture 不依賴真檔。</p>
+</div>
+
+<div class="card t1">
+  <span class="chip c1">① 衝突</span><span class="fid">F2 · 兩份 LOCKED 內容稿的講義來源已在 lock 後改動，且無機制會發現</span>
+  <p>§3.1／§3.2 內容稿與 storyboard 的權威來源皆為 <code>legacy/html_handout/fragments/ch03/sec-3-{1,2}.html</code>（lock 於 2026-06-28／29）。之後該兩檔各被改了三次（07-03 難度緩解、07-06 revise ch01-04、07-26 平實化 66 條），word-diff 變動約 <b>100 行（§3.1）／80 行（§3.2）</b>。08-09 起講義唯一源又換成 <code>latex/src/ch03/chapter3.tex</code>。</p>
+  <ul>
+    <li>影片 <code>why_trig_is_different</code> 單元的 <code>source:</code> 欄引用講義原句「So far every derivative has yielded to algebra … funnels down to a single limit」——這兩句<b>在現行 HTML 與 .tex 都已不存在</b>（lock 版有、現版無）。旁白仍照舊版講義寫。</li>
+    <li>07-03 難度緩解在講義補上了和差化積的角和推導（註記原文：「identity was load-bearing three times but never derived」）。影片 <code>difference_quotient_for_sine</code> 場仍把該恆等式當已知（「Here it is」）。這是<b>內容層</b>的分歧：同一節，學生看影片與讀講義得到不同的處理深度。</li>
+  </ul>
+  <p class="ev"><b>為何是 ①：</b><code>CONTENT_METHODOLOGY.md</code> §8 明定「講義改動 → diff → 外科修改 → scoped NFA」，但這條規則沒被觸發，因為沒有任何 stamp 把內容稿綁到講義的某個版本（對照 T1 對 storyboard↔spoken.yml 做的 <code>derived_from</code> sha 章）。NFA／OF／six-lens 的 rubric 都寫「權威＝講義 fragment」，現在有兩個講義（legacy HTML 與 .tex）、文字不同——稽核結果取決於 agent 開哪一個檔。</p>
+</div>
+
+<div class="card t1">
+  <span class="chip c1">① 衝突</span><span class="fid">F3 · AMP 敘述放大稽核的錨（<code>expansion:*</code> 標記）在 LaTeX 源中不存在</span>
+  <p><code>AMPLIFICATION-RUBRIC.md</code> 與 <code>video-amplification-audit</code> subagent 都以講義 HTML 註解 <code>&lt;!-- expansion:intuition|application … --&gt;</code> 為候選來源池（§3.1 fragment 有 17 個）。<code>chapter3.tex</code> 中 <code>expansion</code> 的命中數為 0（唯一一筆是英文單字）。README 已規定「新內容稿一律錨 <code>.tex</code>」——照做的第一個新 deck，這道閘就沒有輸入，會靜默變成空跑。</p>
+  <p class="ev"><b>修法二選一（由你裁）：</b>把 <code>expansion:*</code> 以 LaTeX 註解移植進 <code>.tex</code>（講義線的事），或宣告 AMP 對 tex-anchored deck 退役、改由內容稿的 <code>learning_goal</code>／<code>kind: motivation</code> 當錨。</p>
+</div>
+
+<h3>② discoverability／文檔與工具缺口</h3>
+
+<div class="card t2">
+  <span class="chip c2">② 缺口</span><span class="fid">F4 · 21 個 selftest 沒有統一 runner；doctor 綠不代表產線綠</span>
+  <p>kickoff 自己記載「呼叫慣例是混的、無單一 cwd 能跑全部」（4 個要從 <code>video/</code> 用 <code>-m</code>，1 個要從 repo root），當時用 scratchpad 的臨時 shell 腳本繞過，該腳本不在版控。08-10 重構若有一支 <code>run_selftests.py</code> 在 pre-commit 或 doctor 裡，F1 當場就會被抓到。<code>doctor.py</code> 只驗工具鏈（venv／LaTeX／ffmpeg），不跑任何閘，所以「✅ 影片完整 render→compose」與「正典 deck 中止」並存。</p>
+  <p class="ev"><b>修法：</b>10 行 runner＋doctor 加一個 <code>--smoke</code>（對所有正典 deck 跑 schema＋lint＋derive --check，不 render）。</p>
+</div>
+
+<div class="card t2">
+  <span class="chip c2">② 缺口</span><span class="fid">F5 · 「講義」一詞在影片線文檔裡有兩個指涉</span>
+  <p>README「輸入」節說權威是 <code>.tex</code>；但 NFA／SIXLENS／PEDAGOGY／AMP 四份 rubric 與 5 個 subagent 提示仍寫 HTML fragment／standalone 為權威（部分已加「既有 deck 指 legacy、新 deck 指 .tex」的雙軌註）。內容稿 <code>source:</code> 欄與 storyboard <code>doc:</code> 錨的文法只認 HTML anchor（<code>frag-sec-*</code>／<code>data-fig</code>），<code>.tex</code> 沒有對應的錨文法。這不是矛盾，是 LaTeX 統一在影片線的收尾還沒做完（README 那一筆是 P4「錨改 .tex」，但錨的<b>解析器</b>與<b>文法</b>沒有跟上）。</p>
+</div>
+
+<div class="card t2">
+  <span class="chip c2">② 缺口</span><span class="fid">F6 · 雜項（低優先）</span>
+  <ul>
+    <li><code>video/scratch_{frames,isolate,mathtex,split}.py</code> 是 06-21／06-23 進版控的臨時工具，留在 <code>video/</code> 根目錄；<code>capacity_selftest.py</code> 也在根目錄而其他 21 個在 <code>pipeline/</code>。建議歸位或進 <code>_archive/</code>（不要順手刪，先問）。</li>
+    <li>lint 在 §3.1 有一條 G4 widow advisory（<code>continuity_argument.statement</code> 尾字「move」）未處理——屬既知 advisory，非 finding。</li>
+    <li>「MiMo-V2.5 公測免費＝$0」是 2026-06 的 dated 事實，本次離線無法驗證仍成立；下次真調用前值得再確認。</li>
+  </ul>
+</div>
+
+<h3>③ 結構性觀察（不是 bug；是你不滿的根因）</h3>
+
+<div class="card t3">
+  <span class="chip c3">③ 結構</span><span class="fid">F7 · 揭示模型純累加、零連續動畫——「動畫死板」是架構結果，不是打磨不足</span>
+  <p><code>scene.py::_play_content</code> 的全部邏輯：對每個 beat，若有 <code>{show}</code> 目標就 <code>play_block</code>（FadeIn／Write，0.45–0.8 s），然後 <code>wait</code> 到該 beat 音檔長度；場末把沒揭示的補揭示。<code>blocks.py::play_block</code> 的 9 種 <code>anim</code> 值全是入場淡入或 Write 的變體（三種原本帶 Flash 的已依你 06-29 裁決移除）。畫面上的東西<b>一旦出現就不再動、不變形、不退場、不被再度強調</b>，也沒有鏡頭運動。</p>
+  <div class="kv">
+    <div>9 個 content 模板＋scene.py＋blocks.py</div><div>ValueTracker／always_redraw／add_updater／<code>.animate</code>：<b>0</b> 處</div>
+    <div>§3.1 五個客製 hook（603 行）</div><div>只用 FadeIn 6、Create 2、Transform 2、<code>scene.play</code> 5——仍是「出現」，沒有「運動」</div>
+    <div>全 video/ 唯一連續動畫</div><div><code>intro.py</code>（章節地圖）與 ch01 練習 hook 的 MoveAlongPath</div>
+  </div>
+  <p class="ev"><b>推論：</b>27 場×「文字出現、停住」＝有旁白的投影片。<code>CONTENT_METHODOLOGY.md</code> §5 寫的願景（「曲線 trace 出來、測試線 sweep 進來、極限逐步逼近」）在工程層<b>沒有任何一個模板承載</b>，只能靠每場 80k–216k tokens 的客製 hook 手寫——而 hook 目前也只寫出「出現」。kickoff §8 把「motion primitives 共用庫」以 rule-of-three 延後；我認為門檻已達：5 個 hook 各自重寫入場編排，正因為基底除了淡入什麼都沒有。</p>
+</div>
+
+<div class="card t3">
+  <span class="chip c3">③ 結構</span><span class="fid">F8 · 視覺閘審靜幀，結構上看不見動態；教學閘驗「存在」不驗「品質」</span>
+  <p>VISUAL-FRAME V1–V9／A1–A7 的被審物是「每場最滿一幀」；唯一時間維是 V7（reveal 是否對上 beat）。因此 F7 這類問題<b>不可能</b>被視覺閘報出——§3.1 視覺 blocking 歸零與你看片不滿並不矛盾。教學閘 PD2／PD3／PD4／OF2／SC1／SC2 皆為確定性存在檢查（有沒有 motive 欄、divider 有沒有 problem、步驤有沒有被 covers 蓋到）；gate-1 自有判斷只剩 PD1（一 beat 多動作）、OF1（超出源）、SC-honesty。rubric 自己也把「可以更有動機／更慢／更清楚」一律劃為 advisory。07-19 grilling 的診斷「閘驗存在、不驗品質」我逐條對過 rubric 後認為成立。</p>
+</div>
+
+<div class="card t3">
+  <span class="chip c3">③ 結構</span><span class="fid">F9 · 時間模型＝旁白長度；難步得不到額外停留</span>
+  <p>beat 的畫面長度嚴格等於該 beat 音檔長度（scene-level 則由 FA 回推）。沒有「靜默 beat」的作者文法——唯一的無旁白 beat 是連續 <code>{show a}{show b}</code> 造成的 0.45 s reveal-only beat，且被 sync guard 當 warning。結果：一個承重推導步驄在畫面停留的時間，恰等於把它唸出來的時間。REBUILD_STATUS 列「時間分配無人管」待驗證——從 code 看不需要再驗，這是定義使然。</p>
+</div>
+
+<div class="card t3">
+  <span class="chip c3">③ 結構</span><span class="fid">F10 · 課的骨架＝講義環境表的轉錄</span>
+  <p>§3「環境 → 教學單元」表把第一刀切在講義環境上（一個 definition 一單元、theorem＋proof 一或兩單元、每個 example 一單元…），再允許重排。six-lens L2／L6 進一步要求每個環境都有單元覆蓋、不得 silent drop。這保證了完整與忠實，也保證了<b>課的形狀就是書的形狀</b>；scaffold 的 motive／problem／flag 是事後貼在這個形狀上的補丁。07-19 你已押這個病灶，我同意，並補一點：這不是「忠實教義」本身的錯，而是<b>忠實被套用在「結構」層而非「宣稱」層</b>——每個數學宣稱 source-bound 是對的，每個環境都要有場是多的。</p>
+</div>
+
+<div class="card t3">
+  <span class="chip c3">③ 結構</span><span class="fid">F11 · 人是流程中的單點：停點多、每個都等你</span>
+  <p>一節從開稿到成片，設計上的 ⛳ 停點包括：six-lens 裁決、copyedit 採納、旁白 sign-off（lock）、storyboard 過目、hook code 過目、視覺 advisory 逐條裁、A/B 裁決（T9／T10）、看片標記、定水位、重設計授權範圖……每個 session 幾乎都以「等使用者發動」結束。對數學正確與忠實，這是對的；對設計品質的<b>迭代</b>，這是吞吐量的天花板——現在整條線停了 7 週，等的是一份 27 場的看片作業。</p>
+</div>
+
+<div class="card t3">
+  <span class="chip c3">③ 結構</span><span class="fid">F12 · 非決定性 TTS＋「滿意的 take 不重合成」＋講義持續演進 ＝ 影片永遠略落後講義</span>
+  <p>MiMo 每次合成是不同 take（±10%），scene-level 一場一 WAV，改一個字＝整場重合成＋重 NFA。講義線這三個月對 ch03 改了三輪。兩者相乘：任何「讓影片追上講義」的動作都是計費且不可局部的。這支持一個排程結論：<b>講義某章完全定版之後才開該章影片</b>——而 Ch1–8 現在正好都定版了，是影片線過去三個月從未有過的好起點。</p>
+</div>
+
+<h3>④ 非 finding／做得好的（請保留，別在重做時丟掉）</h3>
+
+<div class="card t4">
+  <span class="chip c4">④ 保留</span>
+  <ul>
+    <li><b>單一 <code>say</code> 內嵌 <code>{show}</code>＋音訊驅動揭示</b>是正確的核心抽象；換 TTS 不換對齊模型，已被驗證。</li>
+    <li><b>scene-level TTS＋transcript-constrained forced alignment（stable-ts）</b>的拍板與「自由 ASR 只當 QA 探針」的教訓是紮實的工程判斷；fallback ladder＋budget 自檢設計得好。</li>
+    <li><b>計費紀律</b>（<code>--backend</code> 必填、dry-run planned/worst 報表、manifest receipt、fail-closed preflight）在同類專案中少見地完整。</li>
+    <li><b>rubric SSOT＋thin prompt＋gate-1 免費迭代／gate-2 計費單次</b>的不對稱成本設計正確；2026-07-07 的 gate-2 頻率矯正方向也對。</li>
+    <li><b>L5 隔離盲算、NFA D7</b>：對教科書衍生產品，數學正確性用兩個獨立讀者是值得的成本。</li>
+    <li><b>Route A LaTeX 文字、Lectern grid、容量契約 G1–G6</b>：靜態設計系統已成熟，字形與版面問題基本清零。</li>
+    <li><b>REBUILD_STATUS ≤50 行快照＋歸檔</b>、self-contained HTML 報告、版控紀律：新 session 能無痛接手，本次研究即受益。</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<h2>三、意見與建議（依槓桿排序；每條都是我的判斷，由你裁決）</h2>
+
+<div class="rec">
+
+<h3><span>R1</span>先修 F1，並補一支統一 selftest runner（半天內；不需計費）</h3>
+<p>這是唯一「今天就壞」的東西。路徑改 legacy 或雙來源，fixture 改不依賴真檔，21 個 selftest 用一支 runner 從任一 cwd 跑完，doctor 加 <code>--smoke</code>。這不是新功能，是把 kickoff P0-3 當時用 scratchpad 繞過的東西補進版控。</p>
+
+<h3><span>R2</span>不要再等 27 場看片作業；用證據直接做「水位」決定</h3>
+<p>07-19 定的執行序是 ①看片標記 → ②定水位 → ③重做。我的看法：F7／F8／F9 已經從 code 層回答了①想問的問題——動畫問題不在哪幾場，在每一場。建議把①縮成<b>三場</b>（一場 derivation、一場 theorem_proof、一場 graph hook）或直接跳到②。②的三個選項裡，「現系統內打磨」在 F7 之下<b>無法</b>解決「動畫死板」，因為系統內沒有動畫可打磨；剩下的真正分岔是「每節少數招牌場」vs「模板層普遍有動」。我偏向後者（見 R4），理由是成本結構。</p>
+
+<h3><span>R3</span>把講義版本綁進內容稿，並把影片線真正收到 LaTeX 上</h3>
+<ul>
+  <li>內容稿標頭加 <code>source_rev:</code>（該節 <code>.tex</code> 文字的 LF 正規化 sha，或 git blob）；<code>derive</code>／<code>schema</code> preflight 比對 HEAD，不符即 WARN「講義已變、需走 §8」。這是 T1 的同一招，往上搬一層。</li>
+  <li>給 <code>.tex</code> 一套錨文法（<code>\label</code> 已由 P2 編號語意化落地，可直接用 <code>doc:thm:3.1</code>／<code>doc:sec:3.1</code> 這類 label），provenance 解析器讀 <code>\label{}</code>；legacy HTML 錨只保留給既有兩個 deck。</li>
+  <li>AMP：裁 F3 的二選一。</li>
+  <li>§3.1／§3.2 既有稿：對 07-03 補推導那一處做一次 §8 的 diff→外科修改（這正好是重做試點會重寫的單元，可併入）。</li>
+</ul>
+
+<h3><span>R4</span>動畫：加 3–4 個模板層 motion primitive，而不是更多 per-scene hook</h3>
+<p>hook 是成本驅動者（每個 80k–216k tokens、每節數個）且目前只產出「出現」。我建議在 <code>blocks.py</code>／模板層加少量可由 storyboard 宣告的原語，讓多數場<b>不寫 hook 就有動</b>：</p>
+<ul>
+  <li><code>derivation</code>：step N → N+1 用 TransformMatchingTex（讓「這一步從上一步變出來」看得見），前一步自動退為 muted（A7 的 focus 目前只存在於靜態配色）。</li>
+  <li><code>theorem_proof</code>：qed 時 statement 卡回閃一次（closure），而不是只多出一個綠點。</li>
+  <li><code>graph</code>：ValueTracker 驅動的點沿曲線移動／切線掃過（<code>plots[].sweep: {from,to}</code>），這是 §5 願景裡最常被點名、也最能承載教學點的一種。</li>
+  <li>通用：<code>{hide X}</code>／<code>{focus X}</code> 標記，讓場能「演化」而非只「累加」。</li>
+</ul>
+<p class="small">這些都在 reveal 模型內：每個原語回傳耗時，<code>play_block</code> 已支援 callable anim 並扣除 hold。風險在 sizecheck（建 scene 不 render）對動態終態的覆蓋，需要為每個原語定義「最滿幀」。</p>
+
+<h3><span>R5</span>時間模型：加一個靜默 beat 文法</h3>
+<p><code>{pause 1.5}</code> 或 <code>{dwell}</code>——parser 已按標記切 beat；manifest 已有 <code>narration_mode: silent</code>（場級），下放到 beat 級即可；FA 不受影響（靜默 beat 不進 transcript）。這是 F9 的直接解法，成本極低，對「難步停留」的教學槓桿高。</p>
+
+<h3><span>R6</span>Stage-1 重設計：把第一刀從「環境表」換成「課的弧線」</h3>
+<p>試點的「重設計授權」我建議明講為：先寫一頁<b>lesson arc</b>（引導問題 → 探索／直覺 → 形式化 → 鞏固／回顧，每段列它要回答的問題），<b>再</b>把講義環境對映進去；對映不到的環境不強迫成場，改為「就近註明刻意併入或略過」。L1／L5 原樣保留（每個數學宣稱仍 source-bound）；L2／L6 的「每個環境都有單元」改為「每個承重想法都有單元」。這維持你 07-19 的邊界（無習題外洩、不加新數學），只換切法。</p>
+
+<h3><span>R7</span>吞吐量：定義兩個製作等級，否則 30+ 節到不了</h3>
+<p>比照 07-07 gate-2 頻率矩陣的思路，把<b>製作本身</b>也分級：「標準節」＝模板＋R4 原語、零或一個 hook、gate-1 全跑、VLM 抽樣；「招牌節」＝現在 §3.1 的全套。每章挑 1–2 節做招牌。成本表要記兩行，才有資料決定招牌比例。</p>
+
+<h3><span>R8</span>停點瘦身：你只親裁「數學／忠實」與「成片」，其餘交 gate-1＋VLM 收斂</h3>
+<p>保留旁白 sign-off（lock）與最終看片兩個人工閘；storyboard／hook／視覉 advisory 的迭代讓 gate-1 subagent 與 critic 在「blocking==0 且 A 分不降」下自行收斂，回報你一張 contact sheet（每場最滿幀＋一段 30 秒 motion 抽樣）而非逐項裁決。這是流程意見，與你偏好謹慎的取捨有張力，所以列在最後、明標由你定。</p>
+
+</div>
+
+<div class="note">
+<b>順序建議：</b>R1（修壞的）→ R2（做決定）→ R3（把源鎖住）→ R4＋R5（工程，可離線、零計費）→ R6（試點重做，走新 mandate）→ R7／R8（量產前）。R1 與 R3 的第一小點各是一個下午；R4／R5 約一到兩週離線工作；R6 就是原本的 §3.1 重做試點，只是先有了 R4／R5 的底。
+</div>
+
+<!-- ============================================================ -->
+<h2>附錄 A · §3.1 storyboard 統計（本次計算）</h2>
+<pre>scenes 27 {'intro': 1, 'divider': 4, 'content': 21, 'outro': 1}
+templates {'definition_math': 3, 'derivation': 6, 'graph': 4, 'theorem_proof': 5, 'callout': 2, 'recap_cards': 1}
+hooked scenes 5 ['sector_inequality', 'slope_equals_height', 'derivative_cycle', 'shm_stacked_graphs', 'toward_the_chain_rule']
+narration words 2098 | {show} beats 79 | est minutes @150wpm 14.0</pre>
+
+<h2>附錄 B · 重現指令與實得輸出</h2>
+<pre># F1 — 正典 deck 過閘（repo root，.venv）
+.venv\Scripts\python video\pipeline\schema.py video\storyboards\ch03_trig_derivatives.yml
+#   [schema] ch03_trig_derivatives.yml: structure OK
+#   [provenance] ch03_trig_derivatives.yml: 4 finding(s) (ENFORCED)
+#     ERROR  divider_limit.scaffold.problem: provenance ref 'doc:frag-sec-3-1' does not resolve ...
+#     (divider_squeeze / divider_derivatives / divider_apply 同)
+
+.venv\Scripts\python video\make.py --storyboard video\storyboards\ch03_trig_derivatives.yml --scene intro --backend mock --quality low
+#   ... [provenance] 4 error(s) -- aborting (fix refs or unset meta.otf_enforce):
+
+# F1 — 同因 selftest 紅
+.venv\Scripts\python video\pipeline\_selftest_pedagogy.py
+#   AssertionError at test_schema_integration: assert "uses_radians" not in out.stdout
+#   (fixture 的 doc:frag-sec-3-1 解析失敗 → 多印 provenance WARN)
+
+# 其他離線閘（綠）
+.venv\Scripts\python video\pipeline\derive_spoken.py --deck ch03_trig_derivatives --check   # parity OK
+.venv\Scripts\python video\pipeline\lint.py video\storyboards\ch03_trig_derivatives.yml     # 0 error, 1 warn
+# _selftest_provenance / _selftest_derived_check / _selftest_template_registry / _selftest_coverage: OK
+
+# F2 — 講義漂移（lock 版 1f95298 vs HEAD）
+git diff --stat 1f95298 HEAD -- legacy/html_handout/fragments/ch03/sec-3-1.html   # 22 insertions(+), 18 deletions(-)
+# word-diff porcelain 變動行：sec-3-1 ≈ 100、sec-3-2 ≈ 80
+# 'yielded to algebra' / 'funnels down to a single limit'：lock 版 1／現 HTML 0／.tex 0
+
+# F3 — AMP 錨
+grep -c "expansion" legacy/html_handout/fragments/ch03/sec-3-1.html   # 17
+grep -n "expansion" handout/latex/src/ch03/chapter3.tex               # 1（英文單字，非標記）
+
+# F7 — 連續動畫原語盤點
+grep -rln "ValueTracker\|always_redraw\|add_updater\|\.animate\b\|MoveAlongPath" video/pipeline/templates/*.py video/animations/*.py video/pipeline/scene.py
+#   video/pipeline/templates/intro.py
+#   video/animations/ch01_inverse_functions_hooks.py
+#   （9 個 content 模板、scene.py、blocks.py、ch03 兩支 hook：無）</pre>
+
+<h2>附錄 C · 本次讀過的檔案</h2>
+<p class="small"><code>video/README.md</code>、<code>DESIGN.md</code>、<code>CONTENT_METHODOLOGY.md</code>、<code>REVIEW_GATES.md</code>、<code>REVIEW_MODEL_DECISIONS.md</code>、<code>RUNBOOK-mimo-narration-route.md</code>、<code>REBUILD_STATUS.md</code>、<code>_archive/REBUILD_LOG-2026-05-to-07.md</code>（2026-07 各節）、<code>KICKOFF-pipeline-hardening.md</code>（§0–2、§8–9）、<code>CODE2VIDEO_STUDY.md</code>（Part A–C）、rubric ×3（VISUAL-FRAME／PEDAGOGY-FIRSTLEARNER／CONTENT-SIXLENS）＋AMP 節錄；<code>make.py</code>、<code>scene.py</code>、<code>blocks.py</code>、<code>provenance.py</code>、<code>tts.py</code>（結構）、<code>_selftest_pedagogy.py</code>；ch03 兩節的內容稿標頭、storyboard、spoken.yml、hooks；<code>handout/PIPELINE.md</code> dashboard；<code>.claude/agents/</code>；<code>tools/doctor.py</code> 輸出。未做：真 render、任何計費調用、Codex。</p>
+
+<p class="foot">本稿（2026-09-07 研究部分）為研究與意見，propose-not-act：未改任何產線檔案、未 commit。所有 ① 級發現皆可用附錄 B 重現；③ 級為結構判讀，歡迎反駁。</p>
+
+<!-- ============================================================ -->
+<h2>回歸審核 · 2026-09-12 修復輪</h2>
+<div class="note">
+  <b>本節由修復輪追加</b>（依 CLAUDE.md「修完 finding 必須回歸審核、結果附在原稽核文檔」）。樹：<code>main @ 82eeea3</code> ＋ 本輪工作樹變更（<b>未 commit</b>，等你過目）。原則：① 級全部修正並重跑附錄 B 的重現指令；② 級補齊工具與文檔；③ 級是設計裁決、本輪不動；F3 的二選一仍由你裁，只先把「靜默空跑」止血。修復途中新工具 <code>doctor --smoke</code> 另抓到一條報告未列的 ① 級問題（<span class="fid">F13</span>），一併修正。全程離線、零計費、未動講義源 <code>.tex</code>、未動任何 LOCKED 稿的 narration。
+</div>
+
+<table>
+<thead><tr><th style="width:9%">發現</th><th style="width:11%">裁決</th><th>做了什麼</th><th style="width:30%">回歸證據（本輪實跑）</th></tr></thead>
+<tbody>
+<tr><td><span class="fid">F1</span></td><td><span class="chip c4">已修</span></td>
+<td><code>pipeline/provenance.py</code> <code>_handout_anchors</code> 改<b>雙來源</b>：凍結 <code>legacy/html_handout/standalone/chapter&lt;N&gt;-print-standalone.html</code>（<code>frag-sec-*</code>／<code>data-fig</code>）∪ <code>handout/latex/src/ch&lt;NN&gt;/*.tex</code> 的 calcbook label key（<code>sec:N.M</code>／<code>thm:</code>／<code>def:</code>／<code>ex:</code>／<code>fig:</code>…；只認<b>定義位置</b>，<code>\ref{}</code> 不算）。<code>_selftest_pedagogy</code> 的 fixture <code>scaffold.yml</code> 改綁 <code>_fixture_pedagogy.md</code>（無 chapter → md-only、hermetic，同 <code>pedagogy_audit.yml</code> 慣例）。<code>_selftest_provenance</code> 加 <code>test_tex_anchors</code>（純函式）＋ <code>test_handout_anchors_real_repo</code>（刻意對真檔，F1 的回歸網）。</td>
+<td><code>schema.py ch03_trig_derivatives.yml</code> → <code>structure OK</code>、0 provenance finding、exit 0（原 4 ERROR）。<code>make.py --scene intro --backend mock --quality low</code> → schema／provenance／lint／sizecheck 過 → render → compose → exit 0（原在 provenance 中止）。<code>_selftest_pedagogy</code>／<code>_selftest_provenance</code> 綠。</td></tr>
+
+<tr><td><span class="fid">F2</span></td><td><span class="chip c4">機制已補</span><br><span class="chip c2">內容對齊未做</span></td>
+<td>新 <code>pipeline/source_rev.py</code>：內容稿標頭一行 <code>source_rev</code> stamp（repo 相對路徑＋LF 正規化 sha256，與 T1 <code>derived_check</code> 同哈希）；<code>check_source_rev</code> 掛進 <code>schema.py</code>／<code>make.py</code>／<code>derive_spoken.py</code>，<b>永遠 warn-only</b>（漂移是內容決策不是 build 錯）；LOCKED 卻無 stamp 也 WARN；<code>_</code> 前綴 fixture 免檢；stamp 指 <code>legacy/</code> 時另提示活源是 <code>.tex</code>。§3.1／§3.2 標頭回補 <b>lock 時</b> fragment 的 sha（<code>5f3e7ea</code>／<code>b3860bc</code> 的 blob，非現檔）。CLI <code>python video/pipeline/source_rev.py &lt;源檔&gt;</code> 印可貼的標頭行。METHODOLOGY §6 標頭契約＋§8 步驟 0 觸發器。</td>
+<td>三個入口對 §3.1／§3.2 都印 <code>[source_rev] WARN … changed since the content script was stamped (stamp is the frozen legacy HTML; the live source is …tex)</code>——F2 的漂移<b>現在會被看見</b>，且不擋 render。<code>_selftest_source_rev</code> 9 案綠（fresh／drift／missing／LOCKED 無 stamp／DRAFT／fixture 免檢／legacy／CRLF＝LF／<code>_mimo</code> 剝後綴）。<b>內容層對齊未做</b>：§8 diff→外科修改→scoped NFA→重 derive→重 TTS（計費）屬 LOCKED 稿 post-lock 改稿，併入 §3.1 重做試點／§3.2 解凍（REBUILD_STATUS 已記）。</td></tr>
+
+<tr><td><span class="fid">F3</span></td><td><span class="chip c2">待你裁</span><br><span class="chip c4">先止血</span></td>
+<td>查證：講義線契約 <code>CONTRACT-latex-writing.md</code> §Marking expansion 早已定「增量在 <code>.tex</code> 用 <code>% expansion:</code> 註解、<b>存量 provenance 的家＝凍結 fragment</b>（轉換時未帶進）」——所以 <code>.tex</code> 為 0 不是漏，是既定政策。本輪把 AMP rubric＋agent 改成：先掃該節 <code>.tex</code> 的 <code>% expansion:intuition|application</code>，<b>為 0 時退回同節凍結 fragment 當候選池</b>、逐筆確認直覺仍在現行 <code>.tex</code>（不在者標 <code>[stale-in-tex]</code>）、報告<b>必須明寫池來源與標記數</b>——不再靜默空跑。<b>二選一（存量 472 筆回填 <code>.tex</code> vs 就此雙載體）仍由你裁</b>；本輪未動任何 <code>.tex</code>。</td>
+<td>rubric／agent diff；<code>grep -c expansion</code> 數字不變（fragment §3.1＝17、<code>.tex</code>＝0，全書 fragment 472）。</td></tr>
+
+<tr><td><span class="fid">F4</span></td><td><span class="chip c4">已補</span></td>
+<td>新 <code>pipeline/run_selftests.py</code>：任一 cwd 跑全部 <code>_selftest_*.py</code>（統一 <code>&lt;venv python&gt; -m pipeline.&lt;name&gt;</code>、cwd=<code>video/</code>；<code>-k</code> 過濾、<code>--list</code>；任一紅 exit 1、印紅者輸出尾 12 行）。<code>_selftest_coverage</code> pin cwd（原本是唯一 cwd 相依者）。<code>tools/doctor.py --smoke</code>：對每個正典 deck 跑 <code>schema.py</code>（含 provenance／source_rev／pedagogy／coverage）＋<code>lint.py</code>＋（有 <code>.spoken.yml</code>）<code>derive_spoken --check</code>，deck 閘失敗計入 exit code、能力摘要多一行。ENVIRONMENT／README／KICKOFF P0-3 補指標。</td>
+<td>runner 第一次全跑 23 個：22 綠、1 紅（<code>_selftest_capacity</code>＝本輪搬檔後 fixture 相對路徑、已修、單跑 14/14 綠）；第二次全跑（修 fixture 路徑後）：<b>23/23 綠、exit 0</b>。<code>doctor --smoke</code>：video-smoke 9/9 PASS（4 deck × schema／lint ＋ 1 derive --check），能力摘要新行 ✅。</td></tr>
+
+<tr><td><span class="fid">F5</span></td><td><span class="chip c4">已補</span></td>
+<td>「講義」雙指涉收尾（code 側 F1 已把兩源都接上，文檔跟上）：METHODOLOGY §5 OTF 文法（兩源聯集＋<code>.tex</code> label key 形式）／§6（<code>source_rev</code> 標頭契約）／§8（觸發器＋legacy-stamp deck 的 diff 做法）；README 輸入段（錨文法＋stamp）＋結構樹（<code>provenance</code>／<code>source_rev</code>／<code>run_selftests</code>／<code>_selftest_*</code>）＋守門員段＋新「離線自測與 smoke」段；REVIEW_GATES <code>schema.py</code> 行；PEDAGOGY-FIRSTLEARNER rubric 第 3 讀物、CONTENT-SIXLENS 被審物、AMP rubric 錨與 provenance；pedagogy／AMP agent prompt。</td>
+<td>全 <code>video/</code>、<code>tools/</code>、<code>.claude/agents/</code>（排除 <code>_archive</code>）grep <code>handout/html/standalone</code> ＝ 0 筆。</td></tr>
+
+<tr><td><span class="fid">F6</span></td><td><span class="chip c4">已歸位</span><br><span class="chip c3">一項刻意不動</span></td>
+<td><code>scratch_{isolate,mathtex,split}.py</code>（寫死 <code>c:\Users\Kao\…</code> 的一次性腳本）→ <code>video/_archive/scratch/</code>；<code>capacity_selftest.py</code> → <code>pipeline/_selftest_capacity.py</code>（<code>sys.path</code>／fixture 路徑改 <code>parent.parent</code>；DESIGN.md 兩處＋<code>_demo_capacity.yml</code> 註解同步；runner 自動納入）。皆 <code>git mv</code>、可逆。<b><code>scratch_frames.py</code> 留原位</b>：它是現役離線抽幀 QA 工具（DESIGN.md「每景重套 template」、<code>_bootstrap.py</code> 註解、多份 PLAN 引用），不是臨時檔——報告把四個 scratch 一起點名，這一個我不同意歸檔。G4 widow advisory＝報告自判非 finding，不動；MiMo「公測免費」離線無法驗證，仍待下次真調用前確認。</td>
+<td><code>git status</code>：3 個 <code>R</code>（archive）＋1 個 <code>RM</code>（capacity）；runner 清單含 <code>_selftest_capacity</code>。</td></tr>
+
+<tr><td><span class="fid">F13</span><br><span class="small">新</span></td><td><span class="chip c1">①</span> <span class="chip c4">已修</span></td>
+<td><b><code>--smoke</code> 抓到、報告未列：</b><code>schema.py</code> 的 SC step-coverage 查 <code>.md</code> 用 <code>meta.id</code> 原字，生成 deck <code>ch03_trig_derivatives_mimo</code> 找不到 <code>…_mimo.md</code> → 0 contract → <code>coverage_enforce: true</code> 下每個 proof/derivation 單元 ERROR（10 條）。<code>make.py</code> 不跑 SC，所以過去 <code>_mimo</code> 的 render 沒受影響，只有 <code>schema.py</code> 單跑（＝<code>--smoke</code>）看得到——正是 F4 想補的那種盲區。修：新 <code>provenance.content_script_for(meta, repo_root)</code>（<code>&lt;deck&gt;_mimo</code>→<code>&lt;deck&gt;.md</code>）為<b>唯一</b>剝後綴 helper，<code>Loci.from_deck</code>／<code>source_rev.md_for_deck</code>／schema SC 三處共用（原本 <code>from_deck</code> 有自己的一份、schema 沒有）。</td>
+<td><code>schema.py ch03_trig_derivatives_mimo.yml</code> → <code>structure OK</code>、0 SC finding、exit 0（原 10 ERROR）。<code>test_content_script_for</code>（含「只剝後綴、<code>mimo_first</code> 不動」）綠；<code>_selftest_coverage</code> 綠；<code>--smoke</code> 該 deck PASS。</td></tr>
+
+<tr><td><span class="fid">F7–F12</span></td><td><span class="chip c3">③ 不動</span></td>
+<td>結構性觀察全屬設計裁決（R2 水位決定／R4 模板層 motion primitive／R5 靜默 beat 文法／R6 lesson arc／R7 兩級製作／R8 停點瘦身），報告本意就是「由你裁」；本輪不寫投機 code（Karpathy §2）。R4／R5 是可離線零計費的工程，你點頭即可開工。</td>
+<td>—</td></tr>
+</tbody>
+</table>
+
+<h3>重跑附錄 B（修後實得）</h3>
+<pre># F1 — 正典 deck 過閘
+.venv\Scripts\python video\pipeline\schema.py video\storyboards\ch03_trig_derivatives.yml
+#   [schema] ch03_trig_derivatives.yml: structure OK
+#   [source_rev] ch03_trig_derivatives.yml: 1 finding(s) (warn-only)
+#     WARN   ch03_trig_derivatives.md: handout source legacy/html_handout/fragments/ch03/sec-3-1.html changed since the
+#            content script was stamped (stamp is the frozen legacy HTML; the live source is handout/latex/src/&lt;ch&gt;/*.tex) -- ...section 8...
+#   exit 0                                   ← 原：4 provenance ERROR、exit 1
+
+.venv\Scripts\python video\make.py --storyboard video\storyboards\ch03_trig_derivatives.yml --scene intro --backend mock --quality low
+#   [schema] structure OK → [source_rev] 1 finding(s) (warn-only) → [lint] clean (1 warning(s)) → [sizecheck] consistent
+#   → [render] intro ... → [compose] concat 1 scenes -> output\ch03\s3.1\ch03_trig_derivatives__intro.mp4 → exit 0
+#                                            ← 原：[provenance] 4 error(s) -- aborting
+
+# F1 — 同因 selftest
+.venv\Scripts\python video\pipeline\_selftest_pedagogy.py     # OK pedagogy self-test   ← 原：AssertionError
+.venv\Scripts\python video\pipeline\_selftest_provenance.py   # OK provenance self-test（含 test_tex_anchors／test_handout_anchors_real_repo／test_content_script_for）
+
+# F13 — 生成 deck 的 SC
+.venv\Scripts\python video\pipeline\schema.py video\storyboards\ch03_trig_derivatives_mimo.yml
+#   [schema] ch03_trig_derivatives_mimo.yml: structure OK  + 1 source_rev WARN → exit 0   ← 原：[coverage] 10 ERROR (ENFORCED)、exit 1
+
+# F2 — 機制
+.venv\Scripts\python video\pipeline\derive_spoken.py --deck ch03_trig_derivatives --check
+#   [derive_spoken] parity OK
+#   [source_rev] WARN  ch03_trig_derivatives.md: handout source ... changed since the content script was stamped ...
+.venv\Scripts\python video\pipeline\_selftest_source_rev.py   # OK source_rev self-test
+.venv\Scripts\python video\pipeline\source_rev.py handout\latex\src\ch03\chapter3.tex   # 印出可貼的 stamp 行（現行 .tex 的 sha）
+
+# F4 — 統一 runner ＋ smoke
+.venv\Scripts\python video\pipeline\run_selftests.py          # [run_selftests] all 23 green（第一次 22/23，紅的是搬檔後的 capacity fixture 路徑，已修）
+python tools\doctor.py --smoke                                # video-smoke 9/9 [ OK ]；能力摘要「✅ 影片線正典 deck 離線閘 --smoke」
+
+# F5 — 舊路徑殘留
+grep -rn "handout/html/standalone" video tools .claude/agents --include=*.py --include=*.md --include=*.yml | grep -v _archive   # 0</pre>
+
+<div class="card t3">
+  <div><span class="chip c3">未動／待你裁</span> <b>本輪刻意沒做的事</b></div>
+  <ul>
+    <li><b>F2 內容對齊</b>：§3.1／§3.2 narration 對現行講義的 §8 外科修改（含「和差化積角和推導」處理深度差、已刪引句）——LOCKED 稿 post-lock 改稿＋重 TTS 計費，併入重做試點。</li>
+    <li><b>F3 二選一</b>：存量 472 筆 <code>&lt;!-- expansion --&gt;</code> 是否回填 <code>.tex</code>（講義線的事）。AMP 已改為明示池來源、不靜默空跑。</li>
+    <li><b>F7–F12 / R2–R8</b>：設計裁決。</li>
+    <li><b>commit</b>：本輪所有變更留在工作樹（含 <code>git mv</code> 的 staged rename），等你過目後再 commit；建議 subject：<code>fix(video): 產線評估 F1–F6 修復——provenance 雙來源、source_rev stamp、selftest runner＋doctor --smoke</code>。</li>
+  </ul>
+</div>
+
+<p class="small"><b>本輪動到的檔案：</b>code＝<code>video/pipeline/provenance.py</code>、<code>schema.py</code>、<code>derive_spoken.py</code>、<code>video/make.py</code>、<code>tools/doctor.py</code>、新 <code>pipeline/source_rev.py</code>、<code>pipeline/run_selftests.py</code>；selftest＝<code>_selftest_provenance.py</code>、<code>_selftest_coverage.py</code>、新 <code>_selftest_source_rev.py</code>、<code>_selftest_capacity.py</code>（自 <code>video/capacity_selftest.py</code> 搬入）、fixture <code>storyboards/_fixtures/scaffold.yml</code>；內容稿標頭＝<code>content_scripts/ch03_trig_derivatives.md</code>、<code>ch03_chain_rule.md</code>（只加 <code>source_rev</code> 一行，narration 未動）；文檔＝<code>video/README.md</code>、<code>CONTENT_METHODOLOGY.md</code>、<code>REVIEW_GATES.md</code>、<code>REBUILD_STATUS.md</code>、<code>DESIGN.md</code>、<code>KICKOFF-pipeline-hardening.md</code>、<code>ENVIRONMENT.md</code>、rubric ×3（PEDAGOGY／SIXLENS／AMP）、agent ×2（pedagogy／AMP）、<code>storyboards/_demo_capacity.yml</code> 註解；歸檔＝<code>video/_archive/scratch/</code> ×3。</p>
+
+</div>
+</body>
+</html>

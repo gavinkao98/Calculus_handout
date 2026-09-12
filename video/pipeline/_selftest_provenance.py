@@ -9,6 +9,7 @@ def test_parse_ref():
     assert P.parse_ref("md:why_trig") == ("md", "why_trig")
     assert P.parse_ref("doc:frag-sec-3-1") == ("doc", "frag-sec-3-1")
     assert P.parse_ref("doc:sector-inequality") == ("doc", "sector-inequality")
+    assert P.parse_ref("doc:thm:3.1") == ("doc", "thm:3.1")     # LaTeX label key (':' inside token)
     assert P.parse_ref("nope:x") is None
     assert P.parse_ref("plain string") is None
     assert P.parse_ref("") is None
@@ -130,6 +131,46 @@ def test_provenance_issues():
     assert len(nwarns) == 1
 
 
+def test_tex_anchors():
+    # only label-DEFINING positions: env num arg with ':', \figcaption key, \sechead number;
+    # a literal env number and a \ref to a foreign label define nothing.
+    tex = "\n".join([
+        r"\sechead{3.1}{Derivatives of the Sine and Cosine Functions}",
+        r"\begin{envtheorem}{Theorem}{thm:3.1}{Derivative of sine}",
+        r"\begin{envexample}{Example}{3.2}{literal number, no label}",
+        r"\figcaption{fig:3.1}{The unit-circle area comparison.}",
+        r"Theorem \ref{thm:9.9} is a cross-ref, not a label.",
+    ])
+    assert P.tex_anchors(tex) == {"sec:3.1", "thm:3.1", "fig:3.1"}, P.tex_anchors(tex)
+    assert P.tex_anchors("") == set()
+
+
+def test_handout_anchors_real_repo():
+    # F1 regression (2026-09-07 assessment): the canonical ch03 deck's `doc:` refs must
+    # resolve against the REAL handout files. The legacy standalone moved in the
+    # 2026-08-10 layout refactor and the resolver kept the old path -- every other
+    # selftest was hermetic, so nothing turned red. Both sources are checked on purpose.
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    loci = P.Loci.from_deck({"id": "_fixture_otf", "chapter": "Chapter 3"}, repo_root)
+    assert loci.resolves("doc:frag-sec-3-1")        # legacy HTML standalone: section anchor
+    assert loci.resolves("doc:sector-inequality")   # legacy HTML standalone: data-fig
+    assert loci.resolves("doc:sec:3.1")             # .tex: \sechead{3.1}
+    assert loci.resolves("doc:thm:3.1")             # .tex: envtheorem label key
+    assert loci.resolves("doc:fig:3.1")             # .tex: \figcaption{fig:3.1}
+    assert not loci.resolves("doc:thm:99.99")
+    assert P.Loci.from_deck({"id": "_fixture_otf"}, repo_root).handout_anchors == set()  # no chapter -> md-only
+
+
+def test_content_script_for():
+    root = Path("/repo")
+    # the ONE strip rule shared by md: resolution, SC contracts (schema.py) and source_rev
+    assert P.content_script_for({"id": "ch03_trig_derivatives_mimo"}, root).name == "ch03_trig_derivatives.md"
+    assert P.content_script_for({"id": "ch03_trig_derivatives"}, root).name == "ch03_trig_derivatives.md"
+    assert P.content_script_for({"id": "mimo_first"}, root).name == "mimo_first.md"   # only the SUFFIX is stripped
+    assert P.content_script_for({}, root).name == ".md"                               # empty id -> non-existent path
+    assert P.content_script_for(None, root).name == ".md"                             # malformed meta never raises
+
+
 def test_from_deck_strips_mimo_suffix():
     # A generated spoken deck "<deck>_mimo" (derive_spoken.py) has no .md of its
     # own; from_deck must resolve its md: refs against the base "<deck>.md", or the
@@ -177,5 +218,8 @@ if __name__ == "__main__":
     test_scene_text_refs()
     test_provenance_issues()
     test_from_deck_strips_mimo_suffix()
+    test_tex_anchors()
+    test_handout_anchors_real_repo()
+    test_content_script_for()
     test_schema_integration()
     print("OK provenance self-test")

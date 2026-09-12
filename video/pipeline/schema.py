@@ -183,6 +183,16 @@ def main(argv: "list[str] | None" = None) -> int:
         if p_err:
             errors = errors + [m for s, m in prov if s == "error"]
 
+    # source_rev freshness (warn-only, never gates): the LOCKED content script vs the handout
+    # source it was stamped against. Drift is the CONTENT_METHODOLOGY.md §8 trigger (assessment
+    # F2, 2026-09-07: §3.1/§3.2 sources were edited three times after lock and nothing said so).
+    from pipeline import source_rev as _srev
+    srev = _srev.check_source_rev(_srev.md_for_deck(meta, repo_root), repo_root)
+    if srev:
+        print(f"[source_rev] {args.storyboard.name}: {len(srev)} finding(s) (warn-only)")
+        for _sev, msg in srev:
+            print(f"  WARN   {msg}")
+
     # Pedagogy structural checks (warn-default; gates only when meta.pedagogy_enforce is True)
     from pipeline import pedagogy as _ped
     ped_enforce = bool(meta.get("pedagogy_enforce"))
@@ -200,7 +210,10 @@ def main(argv: "list[str] | None" = None) -> int:
     from pipeline import step_coverage as _cov
     from pipeline import review_pack as _rp
     cov_enforce = bool(meta.get("coverage_enforce"))
-    deck_md = repo_root / "video" / "content_scripts" / f"{meta.get('id', '')}.md"
+    # "<deck>_mimo" shares the base deck's .md (and thus its screen_contracts) -- the
+    # un-stripped lookup here made the generated canonical deck fail SC on every proof
+    # unit ('no screen_contract'); found by doctor --smoke 2026-09-12.
+    deck_md = _prov.content_script_for(meta, repo_root)
     contracts = {}
     if deck_md.exists():
         try:

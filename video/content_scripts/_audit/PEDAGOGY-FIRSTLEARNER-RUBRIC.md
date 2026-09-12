@@ -12,7 +12,7 @@
 
 1. **本節的 `storyboards/<deck>.yml`** — 畫面文字 SSOT：`statement` / `scaffold(motive·problem·flag)` / `annotations` / divider 文字 / callout `body` / step·result `reason` 等全部上畫面教學文字，以及 `meta.pedagogy_profile`、`assumptions` registry、各欄的 `ref:` / `refs:`，以及場級 `covers:`（SC 覆蓋宣告）。
 2. **`content_scripts/<deck>.md`** 裡被 cite 的 `.md` 單元 — 上畫面文字的核准源（`md:<unit_id>` 解析到此），**含該單元的 `screen_contract.required_steps`（SC 的承重步驟契約）**。
-3. **handout `chapter<N>-print-standalone.html`** 的 anchor — `doc:<handout-anchor>` 解析到此（`id="frag-sec-*"`／`data-fig="*"`）。
+3. **handout anchor** — `doc:<handout-anchor>` 解析到該章**兩個講義源之一**（[`pipeline/provenance.py`](../../pipeline/provenance.py) 取聯集）：既有 deck 的 `frag-sec-*`／`data-fig="*"` → 凍結 `legacy/html_handout/standalone/chapter<N>-print-standalone.html`；2026-08-09 起新 deck 的 calcbook label key（`sec:N.M`／`thm:…`／`def:…`／`ex:…`／`fig:…`）→ `handout/latex/src/ch<NN>/*.tex`（唯一活源）。OF1 讀「被指到的那一處」源文字。
 
 讀 `meta.pedagogy_profile`（預設 `first_time`）與 deck 級 `CONTENT_APPROVED`（yes/no）。
 

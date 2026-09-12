@@ -214,7 +214,7 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 
 所有**上畫面教學文字**（`statement`／`scaffold`／`annotations`／`reason`／`problem`／…）應可回溯到核准源。provenance 用**新欄位** `ref:`（單一）／`refs:`（多筆、欄級覆寫），**與 freeform `source:` 分離**——`source:` 是給人讀的標籤、provenance 不解析它，**不要寫成「`scaffold`／文字以 `source:`／`from:` 帶 provenance」**。
 
-- **文法（[`pipeline/provenance.py`](pipeline/provenance.py)）：** ref 為 `md:<unit_id>`（指 `.md` 的某個 narration 單元 id）或 `doc:<frag-sec-*|data-fig>`（指 handout 的 section／figure anchor）。確定性層只查 ref **解析得到**（指到存在的 `.md` 單元或 handout anchor），**不做文字語意比對**。
+- **文法（[`pipeline/provenance.py`](pipeline/provenance.py)）：** ref 為 `md:<unit_id>`（指 `.md` 的某個 narration 單元 id）或 `doc:<anchor>`（指 handout 的 section／環境／figure anchor）。`doc:` 的 anchor 池＝該章**兩個講義源的聯集**（2026-09-12 起）：**(a) 凍結 legacy HTML standalone** `legacy/html_handout/standalone/chapter<N>-print-standalone.html` 的 `frag-sec-*`／`data-fig="*"`（既有 deck 的錨，如 `doc:frag-sec-3-1`）；**(b) LaTeX 源** `handout/latex/src/ch<NN>/*.tex` 的 calcbook 語意 label key——環境 num 參數含 `:` 者（`doc:thm:3.1`／`doc:def:3.1`／`doc:ex:3.4`…）、`\figcaption{fig:…}`（`doc:fig:3.1`）、以及每個 `\sechead{N.M}` 合成的 `doc:sec:N.M`。**新 deck 一律用 (b)**（與 §6 `source` 欄錨 `.tex` 一致）。確定性層只查 ref **解析得到**（指到存在的 `.md` 單元或 handout anchor），**不做文字語意比對**。
 - **場級繼承 + 欄級覆寫：** 場景設一個 `ref:`，所有上畫面文字欄位**預設繼承**；某欄要引不同源／跨單元綜合／提高風險斷言時，才用 `refs:` 覆寫。`refs:` 是一個 **flat map**，key 是欄位路徑**字串**（**非巢狀物件**），如 `refs: { scaffold.motive: 'md:<unit_id>', statement: 'doc:<anchor>' }`——不可寫成巢狀 `refs: { scaffold: { motive: … } }`（會 silently 漏掉）。缺欄級 ref 的欄位繼承場級。（權威範例見 [`CALIBRATION-pedagogy-firstlearner.md`](content_scripts/_audit/CALIBRATION-pedagogy-firstlearner.md)：`refs:` 以欄位路徑為 key、非 dotted scalar。）
 - **落地行為（零行為改變）：** provenance 檢查 **warn-only**，唯有 `meta.otf_enforce: true` 才 gating；`intro`／`outro` 場**豁免**（只在 `content`／`divider` 場觸發）。忠實的**語意**比對歸判斷層 `OF1`（gate-1 讀真正解析到的源、判是否被支持），確定性層只查 ref 可解析。
 - **source-adequacy + 生命週期：** 當場景 `ref:` 過寬、藏住某欄該有的覆寫時，`OF1` 要求補一個**更 specific 的 `refs:` 欄級覆寫**。OF 忠實 finding **僅當所引源 `CONTENT_APPROVED=yes` 時才 blocking**（源還是 `DRAFT` → dry-run／advisory）；`md:<unit>` ref 繼承該 deck 的核准狀態，`doc:<anchor>` ref 一旦解析即可 gate。
@@ -243,6 +243,14 @@ pedagogy／OTF 閘與 six-lens **界定不重疊的切片**：`.md` 內容是否
 > 刻意**不含** `template` / `{show}` marker / `accent` / 視覺 payload——那些是第二階段把內容稿「模板化」時才填。
 
 **檔案級結構（parser 契約）：** 每個單元寫成 `### unit: <id>` 標題 ＋ 緊接一個圍欄 ` ``` ` 區塊，區塊內逐欄 `field: value`（多行散文用 `field: |` block scalar、續行縮 2 空格）；單元間以 `---` 分隔；所有教學單元之後以一個 `## ` 段（如 `## §7 拆解註記…`）收尾。「不適用」欄位寫成單一括號註記 `（無——…）`／`（由…模板處理）`（會被視為空；但 `（選用）…後接內容` 是正常 content，不算空）。[`pipeline/review_pack.py`](pipeline/review_pack.py) 的 `parse_content_script` 以這三個分界（`### unit:` 標題、圍欄、`## ` 段界）切單元並組 engineering packet——**維持此結構**，改動格式時同步該 parser。
+
+**標頭契約：`source_rev` 講義源 stamp（2026-09-12 起；LOCKED 內容稿 MUST 帶）。** 標頭（第一個 `### unit:` 之前）放一行
+
+```
+> **source_rev：** `handout/latex/src/ch03/chapter3.tex` `sha256:<64 hex>` — <自由說明>
+```
+
+＝這份內容稿**撰稿／lock 時所依講義源檔**的 repo 相對路徑＋其 **LF 正規化 sha256**（與 `derived_check.py` 對 `_mimo.yml` 的 stamp 同一套哈希）。產生：`python video/pipeline/source_rev.py handout/latex/src/ch03/chapter3.tex`，貼進標頭即可。`schema.py`／`make.py`／`derive_spoken.py` 的 preflight 會重算現檔哈希，不符即印 `[source_rev] WARN`（**warn-only、永不擋 render**——講義漂移是內容決策不是 build 錯誤），這就是 §8 的觸發器；LOCKED 卻沒 stamp 也 WARN。既有 §3.1／§3.2 稿的 stamp 指向凍結 legacy fragment 的 lock 時版本（2026-09-12 回補），故現在持續 WARN——§8 對齊到 `.tex` 後改 stamp 該 `.tex`。（動機：產線評估 2026-09-07 F2——兩份 LOCKED 稿的講義源在 lock 後被改三輪、且無任何機制會發現。）
 
 ### 交付形式：`.md` 為源、編譯 HTML 為審核稿（2026-06-14 使用者指示）
 
@@ -320,9 +328,10 @@ narration 草稿成形、**鎖稿並 derive 成 HTML／口語版之前**，跑�
 
 ## 8. 講義變動時的維護
 
-當講義 HTML 改動已寫過內容稿的一節：
+當講義源（2026-08-09 起＝`handout/latex/src/<ch>/<name>.tex`；既有 deck 的 stamp 仍指凍結 fragment）改動已寫過內容稿的一節：
 
-1. **Diff 這一節**，認出哪些環境被加／刪／改寫。
+0. **觸發器＝`[source_rev]` WARN**（§6 標頭契約）：`schema.py`／`make.py`／`derive_spoken.py --check` 任一 preflight 印出「handout source … changed since the content script was stamped」即進入本節；**不要**關掉 WARN 了事。做完 1–5 後用 `python video/pipeline/source_rev.py <源檔>` 重蓋 stamp（既有 legacy-stamp 的 deck 改蓋 `.tex`）。
+1. **Diff 這一節**，認出哪些環境被加／刪／改寫（legacy-stamp 的 deck：`git diff <lock commit> HEAD -- legacy/html_handout/fragments/chNN/sec-N-M.html` 看 lock 後 HTML 的變動，再對照現行 `.tex`）。
 2. **外科式修改**受影響的單元，不要整份重寫。
 3. **重念受影響的 narration**：若記號改了，引用該記號的 narration 也要跟著改。
 4. **內容稿是 source of truth**，MUST NOT 從別處（舊 storyboard、deck）重生覆蓋——重生會丟掉所有人工撰寫。

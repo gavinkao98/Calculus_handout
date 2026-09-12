@@ -7,8 +7,11 @@
 
     python tools/doctor.py            # 全部檢查
     python tools/doctor.py --json     # 機器可讀（給 agent 解析）
+    python tools/doctor.py --smoke    # 加跑影片線正典 deck 的離線 render 前閘（schema／lint／derive --check；不 render、不計費）
 
 退出碼：所有「必要」項通過＝0；有任何 [FAIL]＝1（[WARN]／[INFO] 不影響）。
+`--smoke` 的 deck 閘失敗也算 [FAIL]——工具鏈綠不代表產線綠（2026-08-10 佈局重構後正典 deck 過不了
+自己的 provenance 閘，doctor 卻仍報影片線 ✅；見 video/_audit/REVIEW-pipeline-assessment-2026-09-07.html F1／F4）。
 
 權威說明見 repo 根的 ENVIRONMENT.md；本檔是它的可執行版。
 """
@@ -433,6 +436,42 @@ def check_keys() -> None:
             record(INFO, "keys", f"{key} 未設", f"需要時才設（離線路徑不需要）：{use}")
 
 
+# ── ⑧ --smoke：影片線正典 deck 的離線 render 前閘（不 render、不計費）──────────
+
+def check_video_smoke() -> None:
+    """對每個正典 storyboard（video/storyboards/*.yml；底線開頭的 demo／fixture 除外）跑
+    schema.py（含 provenance／source_rev／pedagogy／coverage）＋lint.py，有 .spoken.yml 的 deck
+    再跑 derive_spoken --check（parity）。全部離線、純檢查、幾秒完成。為何要有：doctor 原本只驗
+    工具鏈，所以「✅ 影片完整 render→compose」與「正典 deck 在 provenance 閘中止」曾同時成立
+    （產線評估 2026-09-07 F1／F4）。selftest 全套另跑 `python video/pipeline/run_selftests.py`
+    （manim 類要幾分鐘，故不併進 doctor）。"""
+    if not VENV_PY.exists():
+        record(INFO, "video-smoke", "略過：無 .venv", "先跑 tools/setup.ps1 建環境再 --smoke")
+        return
+    pipeline = REPO / "video" / "pipeline"
+    decks = sorted(p for p in (REPO / "video" / "storyboards").glob("*.yml") if not p.name.startswith("_"))
+    if not decks:
+        record(WARN, "video-smoke", "找不到正典 storyboard", str(REPO / "video" / "storyboards"))
+        return
+
+    def _record_gate(label: str, rc: int, out: str) -> None:
+        lines = [ln for ln in out.splitlines() if ln.strip()]
+        if rc == 0:
+            warns = sum(1 for ln in lines if "WARN" in ln)
+            record(PASS, "video-smoke", label, f"{warns} 個 WARN（warn-only，不擋）" if warns else "")
+        else:
+            record(FAIL, "video-smoke", label, " | ".join(lines[-3:]) or f"exit {rc}")
+
+    for deck in decks:
+        for gate in ("schema", "lint"):
+            rc, out = _run([str(VENV_PY), str(pipeline / f"{gate}.py"), str(deck)], timeout=120)
+            _record_gate(f"{gate} {deck.name}", rc, out)
+        if (REPO / "video" / "content_scripts" / f"{deck.stem}.spoken.yml").exists():
+            rc, out = _run([str(VENV_PY), str(pipeline / "derive_spoken.py"), "--deck", deck.stem, "--check"],
+                           timeout=120)
+            _record_gate(f"derive --check {deck.stem}", rc, out)
+
+
 # ── 報表 ──────────────────────────────────────────────────────────────
 
 def _has(area: str, label_sub: str, status: str) -> bool:
@@ -484,6 +523,11 @@ def print_report(as_json: bool) -> int:
     print(f"  {'✅' if handout_tex_ok else '❌'} handout LaTeX 排版線（lualatex＋latexmk＋NCM＋vendored Inter＋pdftotext）")
     codex_ok = any(s == PASS and a == "codex" for s, a, *_ in _results)
     print(f"  {'✅' if codex_ok else '⚠️ '} codex 審核（Mode B 講義／video gate2；缺＝不擋產線）")
+    if any(a == "video-smoke" for _, a, *_ in _results):
+        smoke_ok = not any(s == FAIL and a == "video-smoke" for s, a, *_ in _results)
+        print(f"  {'✅' if smoke_ok else '❌'} 影片線正典 deck 離線閘 --smoke（schema＋provenance＋lint＋derive --check；不 render）")
+    else:
+        print("  ·  影片線正典 deck 離線閘未跑（加 --smoke；selftest 全套＝python video/pipeline/run_selftests.py）")
 
     print("\n" + "─" * 64)
     verdict = "全部必要項通過 ✅" if fails == 0 else f"{fails} 項必要缺漏 ❌（見上方 [FAIL]）"
@@ -494,6 +538,7 @@ def print_report(as_json: bool) -> int:
 
 def main() -> int:
     as_json = "--json" in sys.argv[1:]
+    smoke = "--smoke" in sys.argv[1:]
     check_python_and_venv()
     check_ffmpeg()
     check_latex()
@@ -506,6 +551,8 @@ def main() -> int:
     check_tex_compiles()
     check_handout_latex()
     check_keys()
+    if smoke:
+        check_video_smoke()
     return print_report(as_json)
 
 

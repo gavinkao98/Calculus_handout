@@ -2,7 +2,7 @@
 
 > 本檔是「Stage-1 內容稿六鏡稽核（six-lens content audit）」的契約與**單一真相來源**。六鏡在**撰稿 DRAFT 階段**跑（內容稿成形、鎖稿前），是產線**最前面**的判斷閘。維度／收斂線**只在這裡改一次**。
 >
-> **被審物：** 一節的內容稿 [`content_scripts/<deck>.md`](.)（純內容中間產物：`id`／`source`／`learning_goal`／`kind`／`narration`／`visual_need`／`animation_cue`）＋ 其權威來源講義 fragment。**規範權威**見 [`../../CONTENT_METHODOLOGY.md`](../../CONTENT_METHODOLOGY.md)（§1 核心理念與硬規則、§2 scope、§3 拆解、§4 narration/register、§5 視覺、§7 品質檢核）；本檔只定「審哪六鏡、哪些擋稿、哪些不算 finding、怎麼回報、怎麼跑」，**不重述**方法論。
+> **被審物：** 一節的內容稿 [`content_scripts/<deck>.md`](.)（純內容中間產物：`id`／`source`／`learning_goal`／`kind`／`narration`／`visual_need`／`animation_cue`）＋ 其權威來源講義該節（**2026-08-09 起＝`handout/latex/src/<ch>/<name>.tex`**；既有 deck 的稿寫於 HTML 時代、標頭 `source_rev` stamp 指凍結 `legacy/html_handout/fragments/**`——審既有稿時以 stamp 所指版本為忠實對象，`[source_rev]` WARN 表示講義已漂移、走 §8 而非在六鏡裡翻案）。**規範權威**見 [`../../CONTENT_METHODOLOGY.md`](../../CONTENT_METHODOLOGY.md)（§1 核心理念與硬規則、§2 scope、§3 拆解、§4 narration/register、§5 視覺、§7 品質檢核）；本檔只定「審哪六鏡、哪些擋稿、哪些不算 finding、怎麼回報、怎麼跑」，**不重述**方法論。
 >
 > **與另一套「lens」分清楚：** 本檔是**內容稿**的**六**鏡（layer 2）。`review_pack.py` 的**四**鏡（忠實／語域／拆解／**工程**）審的是 manim hook **code**（layer 5），是不同產物的不同閘，勿混。
 

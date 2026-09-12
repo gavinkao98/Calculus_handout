@@ -1,11 +1,12 @@
-"""capacity_selftest.py -- regression net for the L1/L2 capacity contract.
+"""_selftest_capacity.py -- regression net for the L1/L2 capacity contract.
 
 Runs sizecheck over storyboards/_demo_capacity.yml and asserts each scene's
 predictive split-warning status against EXPECT. A template's placement change that
 breaks the capacity prediction (the stack/span height model, the per-column pitch,
 the reserved bottom band) turns this red. See DESIGN.md "內容分量變異:容量契約三層架構".
 
-Run:  python video/capacity_selftest.py        (exit 0 = all pass, 1 = mismatch)
+Run:  python video/pipeline/_selftest_capacity.py   (exit 0 = all pass, 1 = mismatch; also under run_selftests.py)
+(was video/capacity_selftest.py until 2026-09-12 -- moved next to the other selftests, assessment F6)
 
 This needs manim (sizecheck builds the blocks to measure them), so it is a LOCAL
 check, not part of the manim-free handout CI. Pair it with a template edit.
@@ -15,7 +16,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline import _bootstrap
 
@@ -46,7 +47,7 @@ EXPECT = {
     "value_table_over": True,
 }
 
-_FIXTURE = Path(__file__).resolve().parent / "storyboards" / "_demo_capacity.yml"
+_FIXTURE = Path(__file__).resolve().parent.parent / "storyboards" / "_demo_capacity.yml"   # video/storyboards (file moved into pipeline/ 2026-09-12)
 
 
 def _has_split_warn(issues) -> bool:

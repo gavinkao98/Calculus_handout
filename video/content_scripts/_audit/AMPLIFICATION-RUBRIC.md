@@ -6,7 +6,10 @@
 
 ## 錨與範圍
 
-- **錨＝ handout 的 `expansion:*` 標記**（HTML 註解 `<!-- expansion:<cat> … -->`，權威定義見 [`../../../README.md`](../../../README.md) §撰稿工作流程）。系統性遍布 `legacy/html_handout/fragments/**`（`intuition`／`example`／`figure`／`caution`／`application`／`formula`／`strategy`／`summary`／`history`）。
+- **錨＝ handout 的 `expansion:*` 標記**（權威定義見 [`../../../README.md`](../../../README.md) §撰稿工作流程；類別 `intuition`／`example`／`figure`／`caution`／`application`／`formula`／`strategy`／`summary`／`history`）。**兩種載體、一套規則（2026-09-12 依產線評估 F3 明定）：**
+  - **HTML 時代（存量）**：`<!-- expansion:<cat> … -->` 註解，系統性遍布凍結的 `legacy/html_handout/fragments/**`（全書 472 筆）。**轉換進 `.tex` 時未帶過去**（[`../../../handout/latex/CONTRACT-latex-writing.md`](../../../handout/latex/CONTRACT-latex-writing.md) §Marking expansion：「存量 provenance 的家＝凍結 fragment」）。
+  - **LaTeX 時代（增量）**：`% expansion:<cat> [pass:] [source:] — …` LaTeX 註解，2026-08-09 起的新增才有。
+  - **候選池的取法（防「靜默空跑」）：** 先掃該節 `.tex` 的 `% expansion:intuition|application`；**若該節 `.tex` 為 0 筆（歷史章皆如此），候選池＝同節凍結 fragment 的 `<!-- expansion:… -->`**，並對每筆確認其直覺在現行 `.tex` 仍存在（散文已刪者標 `[stale-in-tex]`、不當候選）。報告**必須明寫**「本次候選池來源＝`.tex`／fragment、標記數 N」；池為空要明說是「兩處皆 0」，**不得**默默產空報告。存量標記是否回填進 `.tex` 屬講義線政策，本審不裁。
 - **本審只主管兩類承重敘述：**
   - **`intuition`（最高優先）**：白話直覺、動機、informal gloss——讓初學者先有畫面再看形式。
   - **`application`**：真實情境／應用例。
@@ -28,7 +31,7 @@
 
 - **只有 `missing`（三模態都沒有）的承重直覺成為 AMP1 提議。** 這是防過度觸發的核心——大量 handout 直覺本就該在旁白、不必上畫面；`narration-only`／`visual-only` 一律**不計入提議**（見上表）。
 - **判 surfaced 的權威＝ storyboard**（上畫面文字／`say`／`# HOOK`·animation）。`.md` 的 `narration`／`visual_need` 只作**交叉佐證／詮釋**，**不單獨當「已 surface」的證據**——`visual_need` 是意圖、非 storyboard 已實作的證明（Codex R6）。
-- 每筆提議帶 **provenance `doc:frag-sec-*`**，但 **anchor 是節級、非標記級**（同節多個 `expansion:` 共用同一 `frag-sec`）→ 故**必附該標記的短引文／行**以定位是哪一筆（Codex R6）。這讓補進來的敘述可過 OTF、**不違反忠實層**。
+- 每筆提議帶 **provenance `doc:` 錨**——既有 deck 用 `doc:frag-sec-*`，`.tex` 錨的 deck 用 `doc:sec:N.M`（或更準的 `doc:thm:…`／`doc:fig:…` label key；文法見 [`../../CONTENT_METHODOLOGY.md`](../../CONTENT_METHODOLOGY.md) §5 OTF）——但 **anchor 是節級、非標記級**（同節多個 `expansion:` 共用同一 `frag-sec`／`sec:`）→ 故**必附該標記的短引文／行**以定位是哪一筆（Codex R6）。這讓補進來的敘述可過 OTF、**不違反忠實層**。
 
 ## 硬紀律
 

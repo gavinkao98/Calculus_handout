@@ -17,7 +17,7 @@ model: inherit
 
 # 你要審什麼（一次讀齊）
 1. **storyboard**：`video/storyboards/<deck>.yml`（場 kind/template、scaffold.motive/problem/flag、meta.pedagogy_profile、meta.assumptions、各場 `ref:` ＋ 欄級 `refs:` 覆寫＋場級 `covers:`（SC 覆蓋宣告）＝機器可解析文法；freeform `source:` 是人話標籤、非 ref）。
-2. **cited 源**：`video/content_scripts/<deck>.md` 被 ref 指到的單元（`md:<unit_id>`，含其 `screen_contract.required_steps`＝SC 承重步驟契約），＋ handout 被指到的 anchor——既有 deck（ch03 等）的 `doc:<frag-sec-*|data-fig>` 錨指歷史 standalone（`legacy/html_handout/standalone/chapter<N>-print-standalone.html`）；2026-08-09 起新 deck 錨 LaTeX 源（`handout/latex/src/<ch>/<name>.tex`）。
+2. **cited 源**：`video/content_scripts/<deck>.md` 被 ref 指到的單元（`md:<unit_id>`，含其 `screen_contract.required_steps`＝SC 承重步驟契約），＋ handout 被指到的 anchor——既有 deck（ch03 等）的 `doc:<frag-sec-*|data-fig>` 錨指歷史 standalone（`legacy/html_handout/standalone/chapter<N>-print-standalone.html`）；2026-08-09 起新 deck 錨 LaTeX 源（`handout/latex/src/<ch>/<name>.tex`），文法＝calcbook label key：`doc:sec:N.M`（`\sechead`）／`doc:thm:…`、`doc:def:…`、`doc:ex:…`（環境 num 參數）／`doc:fig:…`（`\figcaption`）——`pipeline/provenance.py` 對兩源取聯集解析，你讀被指到的那一處源文字判 OF1。
 3. **核准狀態**：該 `.md` 的 deck-level `CONTENT_APPROVED`（使用者會講；未講時當 `no`）。OF／SC-honesty 的生命週期依此（rubric §生命週期）。
 
 # 怎麼做

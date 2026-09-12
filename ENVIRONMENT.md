@@ -13,10 +13,16 @@ powershell -ExecutionPolicy Bypass -File tools\setup.ps1
 
 # 2) 任何時候想知道「這台缺什麼、怎麼補」
 python tools\doctor.py
+
+# 3) 影片線：環境綠之外再驗「產線綠」——正典 deck 的離線 render 前閘（schema／lint／derive --check；不 render、不計費）
+python tools\doctor.py --smoke
 ```
 
 `doctor.py` 是**純 stdlib、任何 python 都能跑**（venv 還沒建也能跑），會逐項印 `[ OK ]／[WARN]／[FAIL]`
 與**確切補法**，最後給「能力摘要」告訴你現在哪些工作流跑得動。有 `[FAIL]` 時退出碼為 1。
+`--smoke` 另對 `video/storyboards/` 每個正典 deck 跑 `schema.py`（含 provenance／source_rev／pedagogy／coverage）＋`lint.py`＋（有 `.spoken.yml` 者）`derive_spoken --check`，
+deck 閘失敗也算 `[FAIL]`——工具鏈綠不等於產線綠（2026-08-10 佈局重構後正典 deck 過不了自己的 provenance 閘、doctor 卻全綠，見
+`video/_audit/REVIEW-pipeline-assessment-2026-09-07.html`）。模組級 selftest 全套＝`.venv\Scripts\python video\pipeline\run_selftests.py`（manim 類要幾分鐘，故不併進 doctor）。
 
 ## 環境分層（四層核心 ＋ 審核工具）
 

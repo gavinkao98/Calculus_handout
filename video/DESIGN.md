@@ -543,7 +543,7 @@ derivation/definition `capacity_meta`、`sizecheck._capacity_issues` 優先讀 `
 合法內容零誤報、derivation/definition 不變、超量異質場景正確 warn（recap 7 點 ~17u、procedure 6 步 ~8u、
 theorem 5 步 ~7.6u），`_demo_tall_rows::proof_tall` 邊界 warn 與反應式 spill 互相佐證】**
 → ③ 容量回歸網 **【已完成 2026-06-21：[`storyboards/_demo_capacity.yml`](storyboards/_demo_capacity.yml)
-每模板 fit+over 各一場景（含 value_table）＋ [`video/capacity_selftest.py`](capacity_selftest.py) 斷言 EXPECT 表，
+每模板 fit+over 各一場景（含 value_table）＋ [`video/pipeline/_selftest_capacity.py`](pipeline/_selftest_capacity.py) 斷言 EXPECT 表，
 12/12 通過；本地跑（需 manim、非 handout CI），改模板若破壞容量預測即紅】**
 → ④ L3 enrichment slot **【已完成 2026-06-21：`_common.build_aside`（rail 卡片）＋ `definition_math` 的可選
 `aside` 欄（稀疏→兩欄 primary＋rail key-idea 卡、密集→自動收合回滿寬單欄）；§1.1 render 19/19 MD5 相同、
@@ -616,7 +616,7 @@ slope-from-definition computation）需要 7–9：
 ### Authoring Playbook：內容形狀 → 模板 → 單頁容量預算 → 超量／稀疏動作（2026-07-05 拍板）
 
 寫 storyboard 時對照選模板、預估分頁；寫完跑 schema→lint→sizecheck→mock render→visual gate 即收斂。
-預算與 `_demo_capacity.yml`／`capacity_selftest.py` 的 fit/over EXPECT 對齊，fixture 調整需同步本表。
+預算與 `_demo_capacity.yml`／`pipeline/_selftest_capacity.py` 的 fit/over EXPECT 對齊，fixture 調整需同步本表。
 
 | 內容形狀 | 模板 | 單頁容量預算 | 超量動作（DENSE） | 稀疏動作（SPARSE） |
 |---|---|---|---|---|

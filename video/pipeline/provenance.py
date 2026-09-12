@@ -2,10 +2,19 @@
 + the warn-only storyboard provenance check. Pure stdlib; no model calls.
 
 Grammar (see PLAN-pedagogy-firstlearner-sp1-foundation.md): a resolvable ref is
-"md:<unit_id>" (a content-script unit) or "doc:<anchor>" (a handout frag-sec-* /
-data-fig anchor). Scene-level `ref:` is inherited by on-screen teaching-text
-fields; a `refs:` map overrides per field. This layer checks RESOLUTION only --
-text-vs-source faithfulness (OF1) is the gate-1 agent (Plan 3).
+"md:<unit_id>" (a content-script unit) or "doc:<anchor>" (a handout anchor). Two
+handout sources are unioned per chapter (2026-09-12, assessment F1/F5):
+  * frozen legacy HTML standalone (legacy/html_handout/standalone/chapter<N>-print-
+    standalone.html): `frag-sec-*` template ids and `data-fig="*"` -- the anchors
+    of the decks authored before the 2026-08-09 LaTeX unification;
+  * LaTeX source (handout/latex/src/ch<NN>/*.tex, the sole handout source since
+    2026-08-09): calcbook.sty semantic label keys -- env num arg with ':'
+    (`thm:3.1`, `def:...`, `ex:...`), `\\figcaption{fig:...}`, plus a synthesized
+    `sec:<n>` per `\\sechead{<n>}` -- so a new deck writes `doc:sec:3.1` /
+    `doc:thm:3.1` / `doc:fig:3.1`.
+Scene-level `ref:` is inherited by on-screen teaching-text fields; a `refs:` map
+overrides per field. This layer checks RESOLUTION only -- text-vs-source
+faithfulness (OF1) is the gate-1 agent (Plan 3).
 """
 from __future__ import annotations
 
@@ -38,6 +47,33 @@ from pathlib import Path
 
 _FRAG = re.compile(r'<template\s+id="(frag-sec-[\w-]+)"')
 _DFIG = re.compile(r'data-fig="([\w-]+)"')
+# LaTeX-source anchors: only LABEL-DEFINING positions count (env opener's num arg,
+# \figcaption's first arg, \sechead's number) -- a `\ref{thm:x}` to a label that does
+# not exist must NOT make `doc:thm:x` resolve.
+_TEX_ENV_KEY = re.compile(r"\\begin\{env[a-z]+\}\{[^}]*\}\{([a-z]+:[^}\s]+)\}")
+_TEX_FIG_KEY = re.compile(r"\\figcaption\{(fig:[^}\s]+)\}")
+_TEX_SECHEAD = re.compile(r"\\sechead\{(\d+\.\d+)\}")
+
+
+def tex_anchors(text: str) -> "set[str]":
+    """Resolvable `doc:` tokens defined by one LaTeX chapter source: its label keys
+    (`thm:3.1`, `fig:3.1`, ...) plus `sec:<n>` for every `\\sechead{<n>}`."""
+    keys = set(_TEX_ENV_KEY.findall(text)) | set(_TEX_FIG_KEY.findall(text))
+    keys |= {f"sec:{n}" for n in _TEX_SECHEAD.findall(text)}
+    return keys
+
+
+def content_script_for(meta: dict, repo_root: Path) -> Path:
+    """The content script a storyboard derives from. A GENERATED spoken deck
+    "<deck>_mimo" (derive_spoken.py) has no .md of its own -- it shares the base
+    deck's units, contracts and source stamp -- so every per-deck lookup (md: refs,
+    SC screen_contracts, source_rev) must resolve against "<deck>.md". One helper so
+    the strip cannot drift between callers (2026-09-12: schema.py's coverage lookup
+    had its own un-stripped copy and the canonical _mimo deck failed SC with
+    'no screen_contract' on every proof unit -- surfaced by doctor --smoke)."""
+    deck_id = str(meta.get("id", "")) if isinstance(meta, dict) else ""
+    base_id = deck_id[:-len("_mimo")] if deck_id.endswith("_mimo") else deck_id
+    return repo_root / "video" / "content_scripts" / f"{base_id}.md"
 
 
 @dataclass
@@ -58,11 +94,7 @@ class Loci:
     @classmethod
     def from_deck(cls, meta: dict, repo_root: Path) -> "Loci":
         from pipeline import review_pack
-        deck_id = str(meta.get("id", ""))
-        # A generated spoken deck "<deck>_mimo" (derive_spoken.py) shares the base
-        # deck's content-script units, so resolve its md: refs against "<deck>.md".
-        base_id = deck_id[:-len("_mimo")] if deck_id.endswith("_mimo") else deck_id
-        md = repo_root / "video" / "content_scripts" / f"{base_id}.md"
+        md = content_script_for(meta, repo_root)   # "<deck>_mimo" -> "<deck>.md"
         unit_ids: set[str] = set()
         if md.exists():
             try:
@@ -75,15 +107,25 @@ class Loci:
 
     @staticmethod
     def _handout_anchors(meta: dict, repo_root: Path) -> "set[str]":
-        # chapter "Chapter 3" -> legacy/html_handout/standalone/chapter3-print-standalone.html
+        """Union of BOTH handout sources for the deck's chapter ("Chapter 3" -> 3):
+        the frozen legacy HTML standalone (frag-sec-* / data-fig; existing decks) and
+        the LaTeX source (label keys; decks authored 2026-08-09+). A missing file
+        contributes nothing -- never raises. (F1, 2026-09-07 assessment: the legacy
+        standalone moved in the 2026-08-10 layout refactor and this path did not
+        follow, so the canonical ch03 deck failed its own render gate.)"""
         m = re.search(r"(\d+)", str(meta.get("chapter", "")))
         if not m:
             return set()
-        html = repo_root / "handout" / "html" / "standalone" / f"chapter{m.group(1)}-print-standalone.html"
-        if not html.exists():
-            return set()
-        text = html.read_text(encoding="utf-8", errors="replace")
-        return set(_FRAG.findall(text)) | set(_DFIG.findall(text))
+        n = int(m.group(1))
+        anchors: set[str] = set()
+        html = (repo_root / "legacy" / "html_handout" / "standalone"
+                / f"chapter{n}-print-standalone.html")
+        if html.exists():
+            text = html.read_text(encoding="utf-8", errors="replace")
+            anchors |= set(_FRAG.findall(text)) | set(_DFIG.findall(text))
+        for tex in sorted((repo_root / "handout" / "latex" / "src" / f"ch{n:02d}").glob("*.tex")):
+            anchors |= tex_anchors(tex.read_text(encoding="utf-8", errors="replace"))
+        return anchors
 
 
 def _present_text_fields(scene: dict) -> "list[str]":
