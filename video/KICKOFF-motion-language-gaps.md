@@ -123,6 +123,8 @@
 
 ## 6. 驗收迴圈（Phase 收尾；機器閘免費、人閘一個）
 
+> **2026-09-13 執行結果：** 1 ✅ selftest 38/38、smoke 9/9、三個非試點 deck 閘報表逐字相同；2 ✅ 視覺閘首輪 1 blocking（06 V10）→ 修後回歸 0；3 ✅ `rewatch_pack_after14` 最長靜止 04 9.0／06 9.0／07 11.2／11 7.2 s；4 ⚠ R2 重跑 06 good／11 good／04 ok／07 ok，`by_rule` ML1 2／ML2 5／ML3 1／ML4 2／ML5 3——規則 finding 未歸零（多為 should，唯一 must 在 04 的 hook lane），DoD 第 4 項只達「無新 must、verdict ≥ ok」；5 ⏳ 四場短片已交使用者。試點場次改為 04／06／07／11（理由見 §8 首段與 commit `9ce0429`）。
+
 1. `run_selftests.py` 全綠、`doctor --smoke` 9/9、三個非試點 deck mock render＋sizecheck 與 P0 相同（零行為改變證據）。
 2. 三場試點 mock render → `visual-frame-audit` subagent 看 fullest frames：V1–V10 0 blocking（**V10 必看**：θ 在 04 的式子與 16 的圖同色）。
 3. `rewatch_pack.py --deck ch03_trig_derivatives_mimo --scene sector_inequality,difference_quotient_for_sine,slope_equals_height --out …/rewatch_pack_after`：`fine_longest_still_seconds` ≤ 12 s；06 的 `non_reveal_events` > 0（inset／indicate 在動）。
@@ -135,6 +137,16 @@
 - 之後：四 task 鋪滿 §3.1 27 場 → 六鏡再審＋新舊 A/B → 教義定案、§3.2 解凍；R7 兩級製作以 SPEC §3 為分界。
 
 ## 8. Backlog（本輪發現、不在本輪修）
+
+**試點驗收（2026-09-13 視覺閘回歸 0 blocking、R2 重跑）留下的 advisory／should，下一輪放大階段處理：**
+- 04 `difference_quotient_for_sine`（hook lane）：step.0 列一次寫完後靜止 9 s（ML4，改 paced 或逐 token 亮起）；beat 6 的兩個因式應從上一列複製搬下來而不是重打（ML1）；`write h = 2·h/2` 註記比它指的分母晚 11 s 才出現（ML3）。
+- 06 `sector_inequality`（hook lane）：主圖太小（430×400 px），beat 3–4 的 `frame`／`apex` 揭示在變化偵測裡無對應項——R2 must（ML3），處方＝beat 3–4 期間主圖放大約 2 倍再縮回；`sin θ`／`θ` 標籤落在 0.88 不透明青填色上對比 1.1–1.5:1（A6 high，加 `bg` 底板）；點 B 標籤貼在弧上（V2 advisory，`next_to(B, LEFT)`）；總結不等式三項未繼承三區塊色（ML5；需 `{{}}` 段級 role，見下）。
+- 07 `squeeze_to_the_bound`：縮圖 0.35 倍下標籤 7–9 px 讀不到（A6 med；carry 只帶幾何或 scale ≥ 0.5，待裁決）；R2 want「三個部位就地取倒數、兩個 ≤ 原地旋轉 180°」（ML4 should，token 級旋轉是 T3 的下一步）。
+- 11 `squeeze_graph`：annotation 第二行只剩 `θ = 0.` 孤行（A6 med，改寫尾句）；plot.3 那拍「Notice the open circle」畫面無新動作 6.8 s（ML4 should；空心圈延到該拍才畫）；inset 把 `reveal: true` 的空心圈提早顯示（β 已知限制）。
+- **`{{}}` 段級 role**：色表是 token 級，「½ sin θ 青／½ θ 金／½ tan θ 綠」這種「一段一色」需要 `math_line` 收 `roles: [..]` 對段上色（T1 延伸）。
+- **hook 自建 MathTex 不吃色表**：06 三個標籤已改走 `brand.math_line`，其他 hook（04 的 `inter`／`parts_eq`、08 chord_vs_arc、16、18）尚未；hook 撰寫規則應寫進 CONTENT_METHODOLOGY §5：凡文字一律經 `brand.math_line`／`brand.prose`。
+- **palette 觀察（待裁決）**：`accent` 琥珀 `#f2b13c` 與 `concept` 赭 `#d98f3c` 色相幾乎相同，θ 的專屬色在 accent 物件旁失去辨識力；規則 5 只要求同量同色，這是 Direction B 色軸的取捨問題。
+- `[stillness]` advisory 對 callable 免檢的盲點在試點真的咬到（07 首跑 result 拍 16 s 只有 1.2 s transform 沒被抓）：可讓 template 對 transform／cancel／carry 回報真實 `anim_seconds` 而非免檢。
 
 - `blocks.py` `play_block` run_time 與 `timing.STOCK_ANIM_SECONDS` 四處不一致；`blocks.py:100` dead local。
 - `derivation.py` `check` 列與 `lines` 列不收 `color_role`。
