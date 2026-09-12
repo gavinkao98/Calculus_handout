@@ -21,6 +21,17 @@ STATE MODEL: each entry replaces the dim-set from its beat onward, so `dim: []` 
 Everything is restored at the end of the scene, which keeps the LAST frame identical to
 the un-focused render -- the layout gates measure the built (un-rendered) snapshot and the
 visual gates read the final frame, so neither sees a focus at all.
+
+`indicate:` (SPEC-motion-language rule 3, the flash variant) rides on the same entry:
+
+      - at: ineq
+        dim: []
+        indicate: [sector, tri_outer]   # these flash once (tint + 15% grow, then back)
+
+It is a one-shot on that beat, not state: nothing to restore, and `dim` keeps its own
+meaning (an entry still replaces the dim-set, so repeat the list to keep it). A block
+cannot be in both `dim` and `indicate` of one entry (schema error) -- two animations on
+one mobject in one beat, the later silently winning.
 """
 from __future__ import annotations
 
@@ -29,6 +40,8 @@ from typing import Any
 DIM_OPACITY = 0.35       # what a dimmed element fades back to (R2 asked for "40% 壓暗")
 FADE_SECONDS = 0.4       # long enough to read as a shift of attention, short enough to
                          # stay inside the beat it belongs to
+INDICATE_SECONDS = 0.8   # rule 3: "短暫換高亮色並微放大再回復（約 1 s）"
+INDICATE_SCALE = 1.15
 
 
 def scene_focus(scene: dict[str, Any]) -> "dict[str, list[str]]":
@@ -76,3 +89,33 @@ def apply(scene, by_id: "dict[str, Any]", wanted: "list[str]",
     anims += [by_id[b].mobject.animate.restore() for b in sorted(to_restore)]
     scene.play(*anims, run_time=FADE_SECONDS)
     return target
+
+
+def scene_indicate(scene: dict[str, Any]) -> "dict[str, list[str]]":
+    """`{reveal id: [block ids to flash]}` for the entries that carry `indicate`."""
+    out: dict[str, list[str]] = {}
+    for item in scene.get("focus") or []:
+        if not isinstance(item, dict):
+            continue
+        at, ids = item.get("at"), item.get("indicate")
+        if isinstance(at, str) and at and isinstance(ids, (list, tuple)):
+            out[at] = [str(i) for i in ids if str(i)]
+    return out
+
+
+def indicate(scene, by_id: "dict[str, Any]", wanted: "list[str]", color: str) -> float:
+    """Flash *wanted* once (manim `Indicate`: tint to *color*, grow INDICATE_SCALE, back).
+
+    Its own `scene.play`, played right after `apply`, not folded into it: mixing an
+    Indicate with the `.animate` opacity changes in one play works (mock-rendered
+    2026-09-13), but a play has ONE run_time and the two moves want different ones
+    (FADE_SECONDS vs INDICATE_SECONDS). Returns the seconds spent, 0 when nothing to flash.
+    """
+    mobs = [by_id[b].mobject for b in wanted if b in by_id]
+    if not mobs:
+        return 0.0
+    from manim import Indicate   # deferred: this module stays importable without manim
+
+    scene.play(*[Indicate(m, scale_factor=INDICATE_SCALE, color=color) for m in mobs],
+               run_time=INDICATE_SECONDS)
+    return INDICATE_SECONDS

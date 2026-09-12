@@ -601,6 +601,11 @@ def check_scenes(meta: dict, scenes: list[dict], deck: "list[dict] | None" = Non
                 if str(d) not in ids:
                     issues.append(("error", f"{scene.get('id')}.focus[{j}].dim {d!r}: no "
                                             f"matching block (built ids: {sorted(ids)})"))
+            # `focus[].indicate` (the flash variant): same reasoning, same check.
+            for d in item.get("indicate") or []:
+                if str(d) not in ids:
+                    issues.append(("error", f"{scene.get('id')}.focus[{j}].indicate {d!r}: "
+                                            f"no matching block (built ids: {sorted(ids)})"))
 
         # Same check for `exit:` (scene.py _tail): a typo'd id is skipped there, so the
         # block meant to leave before the cut would simply stay -- no crash, wrong picture.

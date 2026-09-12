@@ -17,7 +17,7 @@ from manim import DOWN, UP, FadeIn, FadeOut, Rectangle, Scene
 
 from . import _bootstrap
 from . import focus
-from .blocks import play_block
+from .blocks import accent_role, play_block
 from .narration import estimate_seconds, parse_say
 from .templates import build_blocks
 from .timing import (EXIT_FADE_SECONDS, MIN_BEAT_HOLD_SECONDS, SCENE_LEAD_SECONDS,
@@ -105,6 +105,8 @@ class LessonScene(Scene):
         beats = parse_say(self.spec.get("say", ""))
         durations = self.beat_durations
         focus_plan = focus.scene_focus(self.spec)
+        indicate_plan = focus.scene_indicate(self.spec)
+        indicate_color = T.color(ground, f"{accent_role(self.spec)}_ink")
         dimmed: set[str] = set()
         for index, beat in enumerate(beats):
             target = beat.reveal
@@ -127,6 +129,8 @@ class LessonScene(Scene):
                 dimmed = focus.apply(self, by_id, focus_plan[target], dimmed)
                 if dimmed != before:
                     consumed += focus.FADE_SECONDS
+            if target in indicate_plan:
+                consumed += focus.indicate(self, by_id, indicate_plan[target], indicate_color)
             # Each beat's video length should equal its narration clip; the reveal
             # animation already ran inside that window, so only hold the remainder.
             self.wait(max(target_seconds - consumed, MIN_HOLD))

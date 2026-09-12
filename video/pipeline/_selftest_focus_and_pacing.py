@@ -49,9 +49,11 @@ class FakeScene:
     def __init__(self, beat_seconds=None):
         self.beat_seconds = beat_seconds
         self.plays = []
+        self.anims = []        # the animation objects themselves (indicate tests look inside)
 
     def play(self, *anims, **kw):
         self.plays.append((len(anims), kw.get("run_time")))
+        self.anims.append(anims)
 
 
 def _by_id(*names):
@@ -157,10 +159,77 @@ def test_unknown_block_id_is_ignored_at_play_time():
     assert dimmed == {"a"}
 
 
+# -- focus[].indicate: the flash variant (SPEC-motion-language rule 3) -----------
+
+def test_scene_indicate_reads_only_entries_that_flash():
+    spec = {"focus": [{"at": "ineq", "dim": [], "indicate": ["sector", "tri_outer"]},
+                      {"at": "sector", "dim": ["tri_inner"]}]}
+    assert F.scene_indicate(spec) == {"ineq": ["sector", "tri_outer"]}
+    assert F.scene_indicate({}) == {}
+    assert F.scene_indicate({"focus": None}) == {}
+    # `indicate` never leaks into the dim plan
+    assert F.scene_focus(spec) == {"ineq": [], "sector": ["tri_inner"]}
+
+
+def _square_blocks(*names):
+    from manim import Square
+
+    class B:
+        def __init__(self):
+            self.mobject = Square()
+    return {n: B() for n in names}
+
+
+def test_indicate_plays_one_flash_for_the_whole_list_and_charges_for_it():
+    from manim import Indicate
+    by_id = _square_blocks("a", "b", "c")
+    scene = FakeScene(10.0)
+    secs = F.indicate(scene, by_id, ["a", "b"], "#e8ab63")
+    assert secs == F.INDICATE_SECONDS
+    assert len(scene.plays) == 1 and scene.plays[0] == (2, F.INDICATE_SECONDS)
+    anims = scene.anims[0]
+    assert all(isinstance(a, Indicate) for a in anims)
+    assert [a.mobject for a in anims] == [by_id["a"].mobject, by_id["b"].mobject]
+    assert all(a.scale_factor == F.INDICATE_SCALE for a in anims)
+    assert all(str(a.color).lower() == "#e8ab63" for a in anims)
+
+
+def test_indicate_is_free_when_nothing_matches():
+    """Mirror of the dim rule: sizecheck errors on a typo'd id before render; at play time
+    an unknown id is skipped and must not burn INDICATE_SECONDS of the beat."""
+    scene = FakeScene(10.0)
+    assert F.indicate(scene, _square_blocks("a"), ["nope"], "#ffffff") == 0.0
+    assert F.indicate(scene, _square_blocks("a"), [], "#ffffff") == 0.0
+    assert scene.plays == []
+
+
 # -- schema validation -----------------------------------------------------------
 
 def _focus_errs(scene, say):
     return [m for sev, m in S._focus_issues("s1", scene, say) if sev == "error"]
+
+
+def test_schema_accepts_indicate_next_to_dim():
+    say = "One {show result} two"
+    scene = {"focus": [{"at": "result", "dim": ["step.0"], "indicate": ["result"]}]}
+    assert _focus_errs(scene, say) == []
+
+
+def test_schema_rejects_a_malformed_indicate():
+    say = "One {show result} two"
+    errs = _focus_errs({"focus": [{"at": "result", "dim": [], "indicate": "result"}]}, say)
+    assert any("indicate" in e and "list" in e for e in errs), errs
+    errs = _focus_errs({"focus": [{"at": "result", "dim": [], "indicate": ["", "x"]}]}, say)
+    assert any("indicate" in e for e in errs), errs
+
+
+def test_schema_rejects_indicating_a_block_the_same_entry_dims():
+    """Flashing and dimming the same block in one beat is two animations fighting over one
+    mobject; the later one wins silently. Always an authoring mistake."""
+    say = "One {show result} two"
+    errs = _focus_errs({"focus": [{"at": "result", "dim": ["step.0", "step.1"],
+                                   "indicate": ["step.1"]}]}, say)
+    assert len(errs) == 1 and "step.1" in errs[0] and "dim" in errs[0], errs
 
 
 def test_schema_accepts_a_well_formed_focus():
@@ -205,6 +274,12 @@ if __name__ == "__main__":
     test_empty_dim_restores_everything()
     test_apply_is_a_no_op_when_nothing_changes()
     test_unknown_block_id_is_ignored_at_play_time()
+    test_scene_indicate_reads_only_entries_that_flash()
+    test_indicate_plays_one_flash_for_the_whole_list_and_charges_for_it()
+    test_indicate_is_free_when_nothing_matches()
+    test_schema_accepts_indicate_next_to_dim()
+    test_schema_rejects_a_malformed_indicate()
+    test_schema_rejects_indicating_a_block_the_same_entry_dims()
     test_schema_accepts_a_well_formed_focus()
     test_schema_rejects_an_at_that_is_never_revealed()
     test_schema_rejects_a_duplicate_at()

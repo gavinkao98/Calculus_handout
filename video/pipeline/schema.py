@@ -76,6 +76,17 @@ def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
                                     f"(use [] to restore everything)"))
         elif any(not isinstance(d, str) or not d for d in dim):
             issues.append(("error", f"{where}.dim: every entry must be a non-empty block id"))
+        # `indicate` (the rule-3 flash variant, focus.py): optional; ids exist only once
+        # the template has built, so like `dim` they are cross-checked in sizecheck.
+        if "indicate" in item:
+            ind = item.get("indicate")
+            if not isinstance(ind, list) or any(not isinstance(i, str) or not i for i in ind):
+                issues.append(("error", f"{where}.indicate: must be a list of non-empty "
+                                        f"block ids"))
+            elif isinstance(dim, list):
+                for both in [i for i in ind if i in dim]:
+                    issues.append(("error", f"{where}.indicate {both!r}: also in this entry's "
+                                            f"dim (cannot flash and dim one block in one beat)"))
     return issues
 
 
