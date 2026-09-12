@@ -128,6 +128,94 @@ def _pause_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
     return issues
 
 
+_CARRY_CORNERS = ("top_left", "top_right", "bottom_left", "bottom_right")
+
+
+def _prev_content_in_act(scenes: list, index: int) -> "str | None":
+    """Id of the content scene right before scenes[index] inside the same act, or None
+    when this scene opens its act. An act is what lies between two brand frames, so the
+    first scene met walking back is either that content scene or a boundary."""
+    for s in reversed(scenes[:index]):
+        if isinstance(s, dict):
+            return s.get("id") if s.get("kind") == "content" else None
+    return None
+
+
+def _carry_issues(sid: str, scene: dict, say, scenes: list, index: int) -> "list[tuple[str, str]]":
+    """`carry:` brings a block the PREVIOUS content scene built into this one
+    (templates._apply_carry; SPEC-motion-language rule 1). `from` must be exactly that
+    scene -- the one right before this inside the same act -- because a carried object only
+    reads as "the same object" across the cut make.py hard-cuts for it (_segment_fades),
+    and a divider between them is a new canvas by definition. `block` existence needs the
+    built blocks, so sizecheck owns it (as for {show} targets and focus.dim); `as` is
+    checked against the scene's own blocks there too."""
+    if "carry" not in scene:
+        return []
+    entries = scene.get("carry")
+    if not isinstance(entries, list):
+        return [("error", f"{sid}.carry: must be a list of {{from, block, as, to}}")]
+    prev = _prev_content_in_act(scenes, index)
+    revealed = set(reveal_targets(say) if isinstance(say, str) else [])
+    issues: list[tuple[str, str]] = []
+    seen_as: set[str] = set()
+    for j, item in enumerate(entries):
+        where = f"{sid}.carry[{j}]"
+        if not isinstance(item, dict):
+            issues.append(("error", f"{where}: not a mapping (expected {{from, block, as, to}})"))
+            continue
+        src = item.get("from")
+        if not isinstance(src, str) or not src:
+            issues.append(("error", f"{where}.from: required non-empty scene id"))
+        elif prev is None:
+            issues.append(("error", f"{where}.from {src!r}: this scene opens its act (no content "
+                                    f"scene since the last divider) -- nothing to carry from"))
+        elif src != prev:
+            issues.append(("error", f"{where}.from {src!r}: must be the content scene right "
+                                    f"before this one in the same act ({prev!r})"))
+        if not isinstance(item.get("block"), str) or not item.get("block"):
+            issues.append(("error", f"{where}.block: required non-empty block id"))
+        as_id = item.get("as")
+        if not isinstance(as_id, str) or not as_id:
+            issues.append(("error", f"{where}.as: required non-empty block id"))
+            as_id = None
+        elif as_id in seen_as:
+            issues.append(("error", f"{where}.as {as_id!r}: duplicate (another entry already "
+                                    f"carries under that id)"))
+        else:
+            seen_as.add(as_id)
+        to = item.get("to", "keep")
+        if to == "keep":
+            if as_id in revealed:
+                issues.append(("error", f"{where}: `to: keep` puts {as_id!r} on screen from t=0, "
+                                        f"but `say` does {{show {as_id}}} -- drop the marker or "
+                                        f"use `to: {{corner, scale}}`"))
+        elif isinstance(to, dict):
+            if to.get("corner") not in _CARRY_CORNERS:
+                issues.append(("error", f"{where}.to.corner: required one of {list(_CARRY_CORNERS)}"))
+            scale = to.get("scale", 1.0)
+            if not isinstance(scale, (int, float)) or isinstance(scale, bool) or scale <= 0:
+                issues.append(("error", f"{where}.to.scale: must be a positive number"))
+            if as_id is not None and as_id not in revealed:
+                issues.append(("warn", f"{where}: `say` never does {{show {as_id}}}, so the flight "
+                                       f"to the corner runs at scene end (after the last beat)"))
+        else:
+            issues.append(("error", f"{where}.to: 'keep' or a mapping {{corner, scale}}"))
+    return issues
+
+
+def _exit_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
+    """`exit:` fades the named blocks out in the scene's tail (scene.py _tail). Shape only;
+    the ids need the built blocks, so sizecheck cross-checks them (as for focus.dim)."""
+    if "exit" not in scene:
+        return []
+    entries = scene.get("exit")
+    if not isinstance(entries, list) or any(not isinstance(e, str) or not e for e in entries):
+        return [("error", f"{sid}.exit: must be a list of block ids")]
+    if len(set(entries)) != len(entries):
+        return [("error", f"{sid}.exit: duplicate id")]
+    return []
+
+
 def schema_storyboard(data) -> "list[tuple[str, str]]":
     """Return a list of (severity, message); severity is 'error' or 'warn'.
     'error' aborts the render (broken / unparseable structure); 'warn' is advisory."""
@@ -194,11 +282,19 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
             issues += _pause_issues(sid, scene, scene.get("say"))
             issues += _focus_issues(sid, scene, scene.get("say"))
             issues += _paced_issues(sid, scene, scene.get("say"))
+            issues += _carry_issues(sid, scene, scene.get("say"), scenes, i)
+            issues += _exit_issues(sid, scene)
         elif "pauses" in scene:
             issues.append(("error", f"{sid}: 'pauses' is a content-scene field "
                                     f"(this scene is kind={kind!r})"))
         elif "focus" in scene:
             issues.append(("error", f"{sid}: 'focus' is a content-scene field "
+                                    f"(this scene is kind={kind!r})"))
+        elif "carry" in scene:
+            issues.append(("error", f"{sid}: 'carry' is a content-scene field "
+                                    f"(this scene is kind={kind!r})"))
+        elif "exit" in scene:
+            issues.append(("error", f"{sid}: 'exit' is a content-scene field "
                                     f"(this scene is kind={kind!r})"))
 
         if kind in ("intro", "outro"):
