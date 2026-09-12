@@ -43,6 +43,13 @@ class Block:
     # rules / reference guides that deliberately sit beside content; "background"
     # = a full card behind content. The last three are exempt from the check.
     layer: str = "content"   # content|graph|decoration|background
+    # Opening-frame rewind for a DYNAMIC block that is on screen from t=0 in a state
+    # other than the one it was built in: scene.py calls pre_play(mobject) and then adds
+    # the mobject before the lead wait. The one user is `carry: to: {corner, scale}`
+    # (templates._apply_carry): the copy is BUILT at its corner so the layout gates
+    # measure the frame the scene ends on, and pre_play restores it to where the previous
+    # scene left it; the reveal then flies it to the corner. None for every other block.
+    pre_play: Any = None
 
 
 # Direction D: 4 semantic accents. The role names map (via theme aliases) to hues:

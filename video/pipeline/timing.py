@@ -24,7 +24,16 @@ STOCK_ANIM_SECONDS = {
     # one. Played by a Block CALLABLE, so this entry is the single source of its nominal
     # length -- the template reads it into Block.anim_seconds.
     "transform": 1.2,
+    # `carry: to: {corner, scale}` flight (templates._apply_carry): the carried copy flies to
+    # its corner on `{show <as>}`. A Block CALLABLE, like transform, so this entry is the
+    # single source of its nominal length.
+    "carry": 0.8,
 }
+
+# `exit: [<block id>...]` (scene.py _tail): the named blocks fade out INSIDE the
+# SCENE_TAIL_SECONDS hold, so the clip length is unchanged and the sync audit sees no
+# difference. Must stay below SCENE_TAIL_SECONDS.
+EXIT_FADE_SECONDS = 0.5
 
 
 # "圖跟旁白長" (motion primitive 6). A stock reveal is 0.45-1.4 s, which is the right

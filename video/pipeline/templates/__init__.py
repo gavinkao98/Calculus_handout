@@ -13,8 +13,12 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from manim import DL, DR, UL, UR
+
 from .. import narration
 from ..blocks import Block
+from ..timing import STOCK_ANIM_SECONDS
+from ..visuals import theme as T
 from . import (
     callout,
     definition_math,
@@ -65,10 +69,91 @@ def build_blocks(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     if ctx.get("ground") != "light":
         from ._common import scene_spine
         blocks = [scene_spine(spec, ctx, blocks)] + blocks
+    # `carry:` (motion primitive 5, object side) runs BEFORE the hook, so a hook can still
+    # replace or re-animate the carried block.
+    blocks = _apply_carry(spec, ctx, blocks)
     # `paced:` (motion primitive 7) runs AFTER the hook, so a hook that replaces a block's
     # mobject with a multi-part one still gets its parts walked across the beat.
     from .. import pacing
     return pacing.apply(spec, _scaffold_reveal_timing(spec, _apply_hook(spec, ctx, blocks)))
+
+
+# `carry: to: {corner: ...}` targets (manim corner vectors), buffered to the safe margin.
+_CARRY_CORNERS = {"top_left": UL, "top_right": UR, "bottom_left": DL, "bottom_right": DR}
+
+
+def _apply_carry(spec: dict[str, Any], ctx: dict[str, Any], blocks: "list[Block]") -> "list[Block]":
+    """`carry:` -- put a block the previous content scene built into this scene's opening
+    frame (SPEC-motion-language rule 1, 一場一張畫布).
+
+        carry:
+          - from: sector_inequality   # the content scene right before this one (schema)
+            block: plot.0             # a block id THAT scene builds (hook-replaced ones too)
+            as: carried.circle        # this scene's id for it; {show carried.circle} may name it
+            to: keep                  # keep = static, where it was; or {corner, scale}
+
+    Nothing is serialised between renders: the source scene is REBUILT here (hook and all)
+    and the block's mobject copied. Layout is deterministic, so the copy sits exactly where
+    the previous scene's last frame left it, and make.py hard-cuts that boundary
+    (_segment_fades), so the object simply persists across the cut. The copy is a snapshot
+    (updaters cleared): a sweep's always_redraw parts would otherwise keep redrawing from the
+    previous scene's tracker at the previous scene's axes.
+
+    A carried scene may itself carry (a chain across an act): `from` must be EARLIER in the
+    deck, so the recursion always terminates; each hop rebuilds one more scene, the price of
+    not caching mobjects across scenes. One rebuild per source scene, not per entry.
+
+    `to: {corner, scale}`: the copy is BUILT at its terminal place (corner, scaled) so the
+    layout gates measure the frame the scene ends on (same reasoning as sweep's tracker);
+    Block.pre_play rewinds it to the carried-in position before the scene starts, and the
+    reveal at `{show <as>}` flies it there (STOCK_ANIM_SECONDS["carry"]). With no marker
+    the flight happens in the end-of-scene sweep-up, like any unrevealed block."""
+    entries = spec.get("carry")
+    if not entries:
+        return blocks
+    sid = spec.get("id")
+    scenes_by_id = ctx.get("scenes_by_id")
+    if scenes_by_id is None:
+        raise ValueError(f"Scene '{sid}' declares carry: but ctx has no 'scenes_by_id' -- "
+                         f"the caller must pass the whole deck so the carried scene can be built")
+    order = list(scenes_by_id)
+    ids = {b.id for b in blocks}
+    out = list(blocks)
+    built: dict[str, list[Block]] = {}
+    for j, item in enumerate(entries):
+        where = f"{sid}.carry[{j}]"
+        src, block_id, as_id = item["from"], item["block"], item["as"]
+        if src not in scenes_by_id:
+            raise ValueError(f"{where}.from {src!r}: not a scene of this deck")
+        if sid not in scenes_by_id or order.index(src) >= order.index(sid):
+            raise ValueError(f"{where}.from {src!r}: must be a scene earlier than '{sid}' in the deck")
+        if src not in built:
+            built[src] = build_blocks(scenes_by_id[src], ctx)
+        source = next((b for b in built[src] if b.id == block_id), None)
+        if source is None:
+            raise ValueError(f"{where}.block {block_id!r}: '{src}' builds no such block "
+                             f"(built ids: {sorted(b.id for b in built[src])})")
+        if as_id in ids:
+            raise ValueError(f"{where}.as {as_id!r}: this scene already builds a block with that id")
+        ids.add(as_id)
+        mob = source.mobject.copy().clear_updaters()
+        to = item.get("to", "keep")
+        if to == "keep":
+            out.append(Block(as_id, mob, anim="fade", static=True, layer=source.layer))
+            continue
+        scale = float(to.get("scale", 1.0))
+        seconds = STOCK_ANIM_SECONDS["carry"]
+        mob.save_state()          # the carried-in state: where the previous scene left it
+        mob.scale(scale).to_corner(_CARRY_CORNERS[to["corner"]], buff=T.SAFE_MARGIN)
+        target = mob.get_center()
+
+        def flight(scene, m, _ground, *, s=scale, c=target, t=seconds) -> float:
+            scene.play(m.animate.scale(s).move_to(c), run_time=t)
+            return t
+
+        out.append(Block(as_id, mob, anim=flight, anim_seconds=seconds, static=False,
+                         layer=source.layer, pre_play=lambda m: m.restore()))
+    return out
 
 
 def _scaffold_reveal_timing(spec: dict[str, Any], blocks: "list[Block]") -> "list[Block]":

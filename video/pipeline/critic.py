@@ -188,7 +188,7 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
             # ground the VLM's V2/A1 judgment (only the fullest frame is judged, so
             # the final layout the labels settle into is the right one to describe).
             try:
-                geom = graph_label_geometry(meta, scenes_by_id.get(sid, {}))
+                geom = graph_label_geometry(meta, scenes_by_id.get(sid, {}), scenes_by_id)
             except Exception:  # noqa: BLE001
                 geom = None
             if geom:
