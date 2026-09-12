@@ -149,6 +149,14 @@ def test_carry_must_be_a_list_of_mappings():
     assert any("not a mapping" in m for m in _errors(_content("a"), _content("b", carry=["a"])))
 
 
+def test_block_may_be_a_list_of_ids():
+    assert _errors(_content("a"), _content("b", carry=[_carry("a", block=["p", "q"])])) == []
+    assert any(".block: a list must hold" in m
+               for m in _errors(_content("a"), _content("b", carry=[_carry("a", block=[])])))
+    assert any(".block: a list must hold" in m
+               for m in _errors(_content("a"), _content("b", carry=[_carry("a", block=["p", ""])])))
+
+
 if __name__ == "__main__":
     for name in sorted(n for n in dir() if n.startswith("test_")):
         globals()[name]()

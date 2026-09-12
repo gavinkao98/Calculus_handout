@@ -257,6 +257,28 @@ def test_tail_without_exit_is_the_plain_hold():
     assert fake.played == [], "exit is a content-scene field; other kinds ignore it"
 
 
+def test_block_list_is_carried_as_one_group():
+    """`block: [a, b]` -> one Block whose mobject groups a copy of each; the group flies as
+    one, so the parts keep their relative layout (a figure the hook built as circle + frame +
+    apex must not scatter into three corner copies)."""
+    spec = {**_DER, "carry": [{**_DER["carry"][0], "block": ["plot.0", "plot.1"]}]}
+    got = _b(build_blocks(spec, _ctx()), "carried.curve")
+    assert len(got.mobject.submobjects) == 2, "one group holding one copy per listed block"
+    src = build_blocks(_GRAPH, _ctx())
+    got.pre_play(got.mobject)
+    x0, x1, y0, y1 = _bbox(got.mobject)
+    boxes = [_bbox(_b(src, bid).mobject) for bid in ("plot.0", "plot.1")]
+    assert abs(x0 - min(b[0] for b in boxes)) < 1e-6 and abs(x1 - max(b[1] for b in boxes)) < 1e-6
+    assert abs(y0 - min(b[2] for b in boxes)) < 1e-6 and abs(y1 - max(b[3] for b in boxes)) < 1e-6, \
+        "rewound group covers exactly the union of the sources' boxes -- internal layout kept"
+    bad = {**_DER, "carry": [{**_DER["carry"][0], "block": ["plot.0", "plot.9"]}]}
+    try:
+        build_blocks(bad, _ctx())
+        assert False, "an unknown id inside the list must raise like a bare unknown id"
+    except ValueError as e:
+        assert "plot.9" in str(e) and "built ids" in str(e)
+
+
 if __name__ == "__main__":
     for name in sorted(n for n in dir() if n.startswith("test_")):
         globals()[name]()

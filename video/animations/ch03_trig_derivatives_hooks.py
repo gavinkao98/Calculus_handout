@@ -166,7 +166,10 @@ def sector_inequality(spec, ctx, blocks):
     lC = MathTex("C", color=text, font_size=T.fs("label")).next_to(C, RIGHT, buff=0.10)
     arc_th = Arc(radius=0.34, start_angle=0.0, angle=th, arc_center=O,
                  color=text, stroke_width=2.0)
-    lth = MathTex(r"\theta", color=text, font_size=T.fs("label")).move_to(
+    # the three theta-carrying labels go through brand.math_line so the deck's
+    # meta.color_map (theta -> concept) reaches them -- a bare MathTex(color=text) left the
+    # figure's theta white while every equation's theta was ochre (V10 blocking, 2026-09-13).
+    lth = brand.math_line(r"\theta", ground, role="text", size="label").move_to(
         O + 0.55 * np.array([np.cos(th / 2), np.sin(th / 2), 0.0]))
 
     # dimension labels on the source construction so a paused viewer can see WHY
@@ -176,12 +179,12 @@ def sector_inequality(spec, ctx, blocks):
     l_base = MathTex("1", color=text, font_size=T.fs("label")).next_to(mid_OA, DOWN, buff=0.14)
     footB = np.array([B[0], O[1], 0.0])
     drop_sin = DashedLine(B, footB, color=mut, stroke_width=1.6, dash_length=0.06)
-    l_sin = MathTex(r"\sin\theta", color=text, font_size=T.fs("label")).next_to(drop_sin, LEFT, buff=0.05)
+    l_sin = brand.math_line(r"\sin\theta", ground, role="text", size="label").next_to(drop_sin, LEFT, buff=0.05)
     # sits on AC's outer (right) edge, below C's own label so the two never
     # crowd each other -- 0.62*(A->C) instead of the true midpoint leaves lC
     # (near the top, at C) and l_tan clearly separated.
     tan_anchor = A + 0.62 * (C - A)
-    l_tan = MathTex(r"\tan\theta", color=text, font_size=T.fs("label")).next_to(tan_anchor, RIGHT, buff=0.12)
+    l_tan = brand.math_line(r"\tan\theta", ground, role="text", size="label").next_to(tan_anchor, RIGHT, buff=0.12)
     dim = (l_base, drop_sin, l_sin, l_tan)
 
     for m in (radius_OB, ext_BC, chord_OA, dots, lO, lA, lB, lC, arc_th, lth, *dim):

@@ -183,8 +183,13 @@ def _carry_issues(sid: str, scene: dict, say, scenes: list, index: int) -> "list
         elif src != prev:
             issues.append(("error", f"{where}.from {src!r}: must be the content scene right "
                                     f"before this one in the same act ({prev!r})"))
-        if not isinstance(item.get("block"), str) or not item.get("block"):
-            issues.append(("error", f"{where}.block: required non-empty block id"))
+        blk = item.get("block")
+        if isinstance(blk, list):
+            if not blk or any(not isinstance(b, str) or not b for b in blk):
+                issues.append(("error", f"{where}.block: a list must hold non-empty block ids"))
+        elif not isinstance(blk, str) or not blk:
+            issues.append(("error", f"{where}.block: required non-empty block id (or a list of ids "
+                                    f"carried as one group)"))
         as_id = item.get("as")
         if not isinstance(as_id, str) or not as_id:
             issues.append(("error", f"{where}.as: required non-empty block id"))

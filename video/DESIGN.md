@@ -960,7 +960,7 @@ LaTeX 退回單色）時降級為 transform。`schema._derivation_issues`（erro
 ```yaml
 carry:                        # content 場專用，opt-in
   - from: sector_inequality   # 同一幕（divider 之間）緊接的前一個 content 場（schema 擋其他）
-    block: circle             # 該場 build 出的 block id（含 hook 換過的）
+    block: [circle, frame, apex]   # 該場 build 出的 block id（含 hook 換過的）；list＝當一組帶走
     as: carried.circle        # 本場的 id；{show carried.circle} 可指
     to: keep                  # keep＝原位 static；或 {corner: top_right, scale: 0.35}
 ```

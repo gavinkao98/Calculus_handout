@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from manim import DL, DR, UL, UR
+from manim import DL, DR, UL, UR, VGroup
 
 from .. import brand
 from .. import narration
@@ -93,7 +93,8 @@ def _apply_carry(spec: dict[str, Any], ctx: dict[str, Any], blocks: "list[Block]
 
         carry:
           - from: sector_inequality   # the content scene right before this one (schema)
-            block: plot.0             # a block id THAT scene builds (hook-replaced ones too)
+            block: plot.0             # a block id THAT scene builds (hook-replaced ones too);
+                                      # or a list [circle, frame, apex] carried as ONE group
             as: carried.circle        # this scene's id for it; {show carried.circle} may name it
             to: keep                  # keep = static, where it was; or {corner, scale}
 
@@ -134,14 +135,23 @@ def _apply_carry(spec: dict[str, Any], ctx: dict[str, Any], blocks: "list[Block]
             raise ValueError(f"{where}.from {src!r}: must be a scene earlier than '{sid}' in the deck")
         if src not in built:
             built[src] = build_blocks(scenes_by_id[src], ctx)
-        source = next((b for b in built[src] if b.id == block_id), None)
-        if source is None:
-            raise ValueError(f"{where}.block {block_id!r}: '{src}' builds no such block "
-                             f"(built ids: {sorted(b.id for b in built[src])})")
+        # `block:` may be a list -- a composite (a figure the hook built as several blocks:
+        # circle + frame + apex) travels as ONE group, so a corner flight keeps its internal
+        # layout; carrying the parts as separate entries would fly each to the corner on its own.
+        block_ids = block_id if isinstance(block_id, list) else [block_id]
+        sources = []
+        for bid in block_ids:
+            b = next((b for b in built[src] if b.id == bid), None)
+            if b is None:
+                raise ValueError(f"{where}.block {bid!r}: '{src}' builds no such block "
+                                 f"(built ids: {sorted(b.id for b in built[src])})")
+            sources.append(b)
+        source = sources[0]
         if as_id in ids:
             raise ValueError(f"{where}.as {as_id!r}: this scene already builds a block with that id")
         ids.add(as_id)
-        mob = source.mobject.copy().clear_updaters()
+        copies = [b.mobject.copy().clear_updaters() for b in sources]
+        mob = copies[0] if len(copies) == 1 else VGroup(*copies)
         to = item.get("to", "keep")
         if to == "keep":
             out.append(Block(as_id, mob, anim="fade", static=True, layer=source.layer))

@@ -214,7 +214,7 @@ scenes:
     # 跨場攜帶（原語 5 物件面；SPEC-motion-language 規則 1）：06 的單位圓不重生——開場就在
     # 上一場末幀的位置，第一拍飛去右上角縮成 inset，當這一列列不等式的「那張圖」常駐提醒。
     carry:
-      - { from: sector_inequality, block: circle, as: carried.circle, to: { corner: top_right, scale: 0.35 } }
+      - { from: sector_inequality, block: [circle, frame, apex], as: carried.circle, to: { corner: top_right, scale: 0.35 } }
     scaffold: { motive: "Turn the chain of areas into bounds on $\\sin\\theta/\\theta$." }
     source: "chapter3-print-standalone.html SS3.1 . algebra after Figure 3.1 (inequality 1)"
     title: "Trapping the Ratio"
@@ -380,7 +380,9 @@ scenes:
       # above says so), so the dot would have nowhere to rest there. x_from stays inside the
       # cos curve's own x_range: past pi/2 cos goes negative, and the shaded gap would run off
       # the bottom of the plot chasing a curve that is not drawn there.
-      - { kind: sweep, x_from: 1.55, x_to: 0.02, seconds: 7.5, follow: [0, 1, 2], gap: [1, 0], leave: cursor, color_role: accent }
+      # x_to 0.02→0.12（2026-09-13）：inset 把停在 0.02 的實心追蹤點放大成「蓋住空心圈」，正好
+      # 與旁白「the ratio is undefined there」相反（R2 must）；停在 0.12 讓點與空心圈在鏡片裡分開。
+      - { kind: sweep, x_from: 1.55, x_to: 0.12, seconds: 7.5, follow: [0, 1, 2], gap: [1, 0], leave: cursor, color_role: accent }
     # 規則 3 試點：放大鏡看 θ→0 附近的夾縫（主圖不縮放）；sweep 播放時鏡片內游標同步。
     # 已知：鏡片是 plot 的靜態終態，(0,1) 的空心點會比主圖早出現在鏡片裡。
     inset:
