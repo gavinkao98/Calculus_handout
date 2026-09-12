@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; }
+    a { color: #0068A7; } a:hover { color: #004E7D; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 1600px; height: 1180px; background: #FBFAF7; color: #1A1D23; padding: 52px 62px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px;">
+
+  <div style="display: flex; flex-direction: column; gap: 7px;">
+    <div class="mono" style="font-size: 14px; letter-spacing: 0.14em; color: #0068A7; text-transform: uppercase;">依據 01 &nbsp;/&nbsp; 內容型別盤點</div>
+    <div style="font-size: 40px; font-weight: 700; letter-spacing: -0.01em;">影片模板必須服務什麼</div>
+    <div style="font-size: 15.5px; color: #565A63; max-width: 1180px; line-height: 1.6;">
+      掃過 <span class="mono" style="font-size: 13.5px;">handout/latex/src/</span> 全部 12 章／附錄（66 節、124 小節），數出講義實際使用的語意環境。
+      現有 12 個影片模板是從 ch01＋ch03 的經驗長出來的——下表是它們對全書的覆蓋率。
+      <span style="color: #82868F;">例與解永遠成對住在同一個 <span class="mono" style="font-size: 13px;">workedexample</span> 容器裡（講義的 no-solo-example 契約），故計為一個單元。</span>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 16px;">
+    <div style="flex-grow: 1; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; padding: 16px 20px; display: flex; flex-direction: column; gap: 3px;">
+      <div style="font-size: 12.5px; color: #82868F; letter-spacing: 0.04em;">全書語意塊</div>
+      <div style="font-size: 29px; font-weight: 700; font-variant-numeric: tabular-nums;">935</div>
+    </div>
+    <div style="flex-grow: 1; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; padding: 16px 20px; display: flex; flex-direction: column; gap: 3px;">
+      <div style="font-size: 12.5px; color: #82868F; letter-spacing: 0.04em;">模板完整覆蓋</div>
+      <div style="font-size: 29px; font-weight: 700; color: #04773B; font-variant-numeric: tabular-nums;">361 <span style="font-size: 16px; font-weight: 500; color: #565A63;">／ 39%</span></div>
+    </div>
+    <div style="flex-grow: 1; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; padding: 16px 20px; display: flex; flex-direction: column; gap: 3px;">
+      <div style="font-size: 12.5px; color: #82868F; letter-spacing: 0.04em;">擠在錯的模板裡</div>
+      <div style="font-size: 29px; font-weight: 700; color: #994A00; font-variant-numeric: tabular-nums;">248 <span style="font-size: 16px; font-weight: 500; color: #565A63;">／ 27%</span></div>
+    </div>
+    <div style="flex-grow: 1; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; padding: 16px 20px; display: flex; flex-direction: column; gap: 3px;">
+      <div style="font-size: 12.5px; color: #82868F; letter-spacing: 0.04em;">完全沒有模板</div>
+      <div style="font-size: 29px; font-weight: 700; color: #AA3333; font-variant-numeric: tabular-nums;">302 <span style="font-size: 16px; font-weight: 500; color: #565A63;">／ 32%</span></div>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; overflow: hidden;">
+    <div style="display: grid; grid-template-columns: 268px 78px 1fr 246px 132px; gap: 0; align-items: end; padding: 12px 22px 11px; background: #F4F3EF; border-bottom: 1px solid #E5E7EB; font-size: 12px; letter-spacing: 0.07em; color: #565A63; text-transform: uppercase; font-weight: 600;">
+      <div>講義單元型別</div>
+      <div style="text-align: right;">全書</div>
+      <div style="padding-left: 24px;">分布　<span style="letter-spacing: 0; text-transform: none; font-weight: 400; color: #9AA0AC;">ch01 → ch08 · appA → appD</span></div>
+      <div style="padding-left: 12px;">現有影片模板</div>
+      <div>判定</div>
+    </div>
+
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="15">
+      <div style="display: grid; grid-template-columns: 268px 78px 1fr 246px 132px; gap: 0; align-items: center; padding: 8px 22px; border-bottom: 1px solid #F1F0EC; font-size: 14px;">
+        <div style="display: flex; align-items: center; gap: 9px;">
+          <span style="width: 3px; height: 16px; border-radius: 2px; background: {{r.hue}}; flex-shrink: 0;"></span>
+          <span class="mono" style="font-size: 13px;">{{r.name}}</span>
+          <span style="font-size: 12px; color: #9AA0AC;">{{r.note}}</span>
+        </div>
+        <div style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 15px;">{{r.n}}</div>
+        <div style="padding-left: 24px; display: flex; align-items: flex-end; gap: 3px; height: 24px;">
+          <sc-for list="{{r.bars}}" as="b" hint-placeholder-count="12">
+            <span style="width: 14px; background: {{b.fill}}; height: {{b.h}};"></span>
+          </sc-for>
+        </div>
+        <div style="padding-left: 12px; color: #565A63; font-size: 13px;">{{r.tmpl}}</div>
+        <div>
+          <span style="font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; padding: 3px 9px; border-radius: 3px; background: {{r.vbg}}; color: {{r.vfg}};">{{r.verdict}}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;">
+    <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #AA3333; border-radius: 0 4px 4px 0; padding: 14px 18px; display: flex; flex-direction: column; gap: 5px;">
+      <div style="font-size: 13.5px; font-weight: 700;">① worked example 是最大缺口</div>
+      <div style="font-size: 13px; color: #565A63; line-height: 1.55;">220 個例＋解佔全書 24%，單一最大宗。§3.1 的 27 場一個例題場都沒有——不是那節沒例題（有 16 個），是沒模板可放。</div>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #AA3333; border-radius: 0 4px 4px 0; padding: 14px 18px; display: flex; flex-direction: column; gap: 5px;">
+      <div style="font-size: 13.5px; font-weight: 700;">② 章與章的體質差太多</div>
+      <div style="font-size: 13px; color: #565A63; line-height: 1.55;">ch04＝14 定理／19 證明（理論重）、ch01＝43 例題（操作重）、ch07＝23 張圖（視覺重）。一套固定版面比例服務不了這三種。</div>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #994A00; border-radius: 0 4px 4px 0; padding: 14px 18px; display: flex; flex-direction: column; gap: 5px;">
+      <div style="font-size: 13.5px; font-weight: 700;">③ 三種語意擠成一個 callout</div>
+      <div style="font-size: 13px; color: #565A63; line-height: 1.55;">caution 78＋strategy 39＋remark 23＝140 個單元共用一個 <span class="mono" style="font-size: 12px;">callout</span>，而講義給了它們兩種容器形狀與三種顏色。</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    // per = [ch01..ch08, appA, appB, appC, appD] -- counted from handout/latex/src/*/*.tex
+    const data = [
+      { name: 'workedexample', note: '例＋解', hue: '#04773B', per: [43,23,16,7,27,21,23,38,7,11,4,0], tmpl: '—', verdict: '無模板', v: 'bad' },
+      { name: 'aligned',        note: '',      hue: '#0068A7', per: [28,20,9,4,3,11,12,13,9,1,2,0],    tmpl: 'derivation', verdict: '覆蓋', v: 'ok' },
+      { name: 'figureblock',    note: '',      hue: '#0068A7', per: [25,10,7,6,11,9,23,13,4,0,0,0],    tmpl: 'graph（僅函數圖）', verdict: '部分', v: 'warn' },
+      { name: 'envcaution',     note: '',      hue: '#AA3333', per: [8,11,4,6,11,5,8,17,4,4,0,0],      tmpl: 'callout（三者共用）', verdict: '擠壓', v: 'warn' },
+      { name: 'envproof',       note: '',      hue: '#0068A7', per: [2,8,6,19,5,5,3,5,7,5,1,4],        tmpl: 'theorem_proof', verdict: '覆蓋', v: 'ok' },
+      { name: 'envtheorem',     note: '',      hue: '#0068A7', per: [3,7,3,14,5,8,4,4,0,0,0,1],        tmpl: 'theorem_proof', verdict: '覆蓋', v: 'ok' },
+      { name: 'envdefinition',  note: '',      hue: '#994A00', per: [14,3,1,4,7,4,6,2,1,1,3,0],        tmpl: 'definition_math', verdict: '覆蓋', v: 'ok' },
+      { name: 'steps',          note: '',      hue: '#6453A7', per: [5,2,2,2,7,4,4,6,2,11,0,0],        tmpl: 'procedure_steps', verdict: '覆蓋', v: 'ok' },
+      { name: 'envstrategy',    note: '',      hue: '#6453A7', per: [5,2,2,2,7,2,4,6,2,7,0,0],         tmpl: 'callout（三者共用）', verdict: '擠壓', v: 'warn' },
+      { name: 'envproposition', note: '',      hue: '#0068A7', per: [7,0,3,3,0,0,0,2,8,5,3,0],         tmpl: 'theorem_proof', verdict: '覆蓋', v: 'ok' },
+      { name: 'envremark',      note: '',      hue: '#5D646F', per: [6,6,3,6,0,0,0,0,0,2,0,0],         tmpl: 'callout（三者共用）', verdict: '擠壓', v: 'warn' },
+      { name: 'enumerate / itemize', note: '', hue: '#5D646F', per: [14,2,2,4,6,0,0,0,9,1,0,2],        tmpl: '—', verdict: '無模板', v: 'bad' },
+      { name: 'informal',       note: '斜體旁語', hue: '#5D646F', per: [2,2,1,4,3,0,0,1,3,4,0,1],      tmpl: '—', verdict: '無模板', v: 'bad' },
+      { name: 'vmatrix / array', note: '矩陣',  hue: '#994A00', per: [0,0,0,1,0,1,0,0,0,0,15,0],       tmpl: '—', verdict: '無模板', v: 'bad' },
+      { name: 'envcorollary',   note: '',      hue: '#0068A7', per: [0,1,0,4,0,0,0,0,0,0,0,0],         tmpl: 'theorem_proof', verdict: '覆蓋', v: 'ok' },
+      { name: 'cases',          note: '分段函數', hue: '#994A00', per: [3,1,0,0,0,0,0,0,0,0,0,0],      tmpl: '—', verdict: '無模板', v: 'bad' },
+      { name: 'datatable',      note: '',      hue: '#994A00', per: [2,1,0,0,0,0,0,0,0,0,0,0],         tmpl: 'value_table', verdict: '覆蓋', v: 'ok' },
+    ];
+    const V = {
+      ok:   { bg: 'rgba(4,119,59,0.10)',  fg: '#04773B' },
+      warn: { bg: 'rgba(153,74,0,0.12)',  fg: '#994A00' },
+      bad:  { bg: 'rgba(170,51,51,0.12)', fg: '#AA3333' },
+    };
+    const maxN = 43;
+    const rows = data.map((d) => ({
+      name: d.name,
+      note: d.note,
+      hue: d.hue,
+      n: d.per.reduce((a, b) => a + b, 0),
+      tmpl: d.tmpl,
+      verdict: d.verdict,
+      vbg: V[d.v].bg,
+      vfg: V[d.v].fg,
+      bars: d.per.map((v) => ({
+        h: Math.max(2, Math.round((v / maxN) * 22)) + 'px',
+        fill: v === 0 ? '#EDECE8' : d.hue,
+      })),
+    }));
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>

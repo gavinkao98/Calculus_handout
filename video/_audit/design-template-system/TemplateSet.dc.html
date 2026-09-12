@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; }
+    a { color: #0068A7; } a:hover { color: #004E7D; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 1720px; height: 1200px; background: #FBFAF7; color: #1A1D23; box-sizing: border-box; padding: 52px 62px; display: flex; flex-direction: column; gap: 24px;">
+
+  <div style="display: flex; align-items: flex-end; justify-content: space-between;">
+    <div style="display: flex; flex-direction: column; gap: 7px;">
+      <div class="mono" style="font-size: 14px; letter-spacing: 0.14em; color: #0068A7; text-transform: uppercase;">規範 03 &nbsp;/&nbsp; 模板集合</div>
+      <div style="font-size: 38px; font-weight: 700; letter-spacing: -0.01em;">13 個模板，不是 20 個</div>
+      <div style="font-size: 15px; color: #565A63; max-width: 1080px; line-height: 1.6;">
+        盤點跑出 18 種講義單元，但不該長成 18 個模板。關鍵是把<span style="font-weight: 600; color: #1A1D23;">「語意」從模板抽出來當參數</span>——caution／strategy／remark 是同一個骨架配不同語意色與容器形狀，不是三個模板。
+      </div>
+    </div>
+    <div style="display: flex; gap: 14px; flex-shrink: 0;">
+      <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; padding: 14px 20px; display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-size: 12px; color: #82868F; letter-spacing: 0.04em;">覆蓋率　現況</div>
+        <div style="font-size: 26px; font-weight: 700; color: #AA3333;">39%</div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; padding: 14px 20px; display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-size: 12px; color: #82868F; letter-spacing: 0.04em;">覆蓋率　提案</div>
+        <div style="font-size: 26px; font-weight: 700; color: #04773B;">89%<span style="font-size: 14px; font-weight: 500; color: #565A63;"> ＋原語 11%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 13px; flex-grow: 1;">
+    <sc-for list="{{layers}}" as="L" hint-placeholder-count="6">
+      <div style="display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 22px; align-items: stretch;">
+        <div style="display: flex; flex-direction: column; gap: 4px; justify-content: center; border-right: 2px solid {{L.hue}}; padding-right: 20px; text-align: right;">
+          <div style="font-size: 17px; font-weight: 700; color: {{L.hue}};">{{L.name}}</div>
+          <div style="font-size: 12.5px; color: #82868F;">{{L.sub}}</div>
+        </div>
+        <div style="display: flex; gap: 13px;">
+          <sc-for list="{{L.items}}" as="t" hint-placeholder-count="3">
+            <div style="flex-grow: 1; background: #FFFFFF; border: 1px solid {{t.border}}; border-radius: 4px; padding: 14px 17px; display: flex; flex-direction: column; gap: 7px; min-width: 0;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px;">
+                <span class="mono" style="font-size: 14.5px; font-weight: 500; color: #1A1D23;">{{t.id}}</span>
+                <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; padding: 2px 7px; border-radius: 3px; background: {{t.tagbg}}; color: {{t.tagfg}};">{{t.tag}}</span>
+              </div>
+              <div style="font-size: 12.5px; color: #565A63; line-height: 1.5;">{{t.serves}}</div>
+              <div style="display: flex; align-items: baseline; gap: 6px; margin-top: auto; padding-top: 4px;">
+                <span style="font-size: 19px; font-weight: 700; color: {{t.hue}}; font-variant-numeric: tabular-nums;">{{t.n}}</span>
+                <span style="font-size: 11.5px; color: #9AA0AC;">單元</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; padding: 18px 24px; display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 22px; align-items: center;">
+    <div style="text-align: right; padding-right: 20px; border-right: 2px solid #5D646F;">
+      <div style="font-size: 17px; font-weight: 700; color: #5D646F;">區塊原語</div>
+      <div style="font-size: 12.5px; color: #82868F;">每個模板都能用</div>
+    </div>
+    <div style="display: flex; gap: 26px; align-items: center;">
+      <div style="display: flex; flex-direction: column; gap: 3px;"><span class="mono" style="font-size: 14px;">list</span><span style="font-size: 12px; color: #82868F;">itemize / enumerate　40</span></div>
+      <div style="display: flex; flex-direction: column; gap: 3px;"><span class="mono" style="font-size: 14px;">matrix</span><span style="font-size: 12px; color: #82868F;">vmatrix / array　17</span></div>
+      <div style="display: flex; flex-direction: column; gap: 3px;"><span class="mono" style="font-size: 14px;">piecewise</span><span style="font-size: 12px; color: #82868F;">cases　4</span></div>
+      <div style="display: flex; flex-direction: column; gap: 3px;"><span class="mono" style="font-size: 14px;">aside_note</span><span style="font-size: 12px; color: #82868F;">informal　21</span></div>
+      <div style="flex-grow: 1; font-size: 13px; color: #565A63; line-height: 1.5; border-left: 1px solid #EDECE8; padding-left: 22px;">
+        這四種在講義裡幾乎都<span style="font-weight: 600;">巢狀出現在別的環境內部</span>（證明裡的列表、定義裡的分段式），所以是區塊原語不是模板——任何模板的 payload 都能放。
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    const TAG = {
+      keep: { bg: 'rgba(90,100,111,0.10)', fg: '#5D646F', border: '#E5E7EB' },
+      new:  { bg: 'rgba(170,51,51,0.12)',  fg: '#AA3333', border: '#E6C9C9' },
+      mod:  { bg: 'rgba(153,74,0,0.12)',   fg: '#994A00', border: '#E8D6C2' },
+    };
+    const mk = (id, tag, serves, n, hue) => ({
+      id, tag: tag === 'keep' ? '保留' : tag === 'new' ? '新增' : '改動',
+      serves, n, hue,
+      tagbg: TAG[tag].bg, tagfg: TAG[tag].fg, border: TAG[tag].border,
+    });
+    return {
+      layers: [
+        { name: '結構層', sub: '不承載數學', hue: '#5D646F', items: [
+          mk('intro', 'keep', '章節地圖、lead、objectives', '—', '#5D646F'),
+          mk('divider', 'keep', '階段分場卡＋進度點', '—', '#5D646F'),
+          mk('outro', 'keep', '節末 logo 字卡', '—', '#5D646F'),
+        ]},
+        { name: '陳述層', sub: '亮出一個形式物件', hue: '#0068A7', items: [
+          mk('definition_math', 'keep', 'envdefinition', 46, '#994A00'),
+          mk('theorem_proof', 'mod', 'envtheorem · envproposition · envcorollary · envproof', 155, '#0068A7'),
+        ]},
+        { name: '推演層', sub: '把一件事做出來', hue: '#0068A7', items: [
+          mk('derivation', 'mod', 'aligned 多行推導鏈', 112, '#0068A7'),
+          mk('procedure_steps', 'keep', 'steps 程序', 45, '#6453A7'),
+          mk('worked_example', 'new', 'workedexample（例＋解＋答）', 220, '#04773B'),
+        ]},
+        { name: '證據層', sub: '把它畫出來', hue: '#04773B', items: [
+          mk('graph', 'mod', 'figureblock 的函數圖／sign chart', 62, '#0068A7'),
+          mk('figure_plate', 'new', 'figureblock 的幾何圖／示意圖', 46, '#0068A7'),
+          mk('value_table', 'keep', 'datatable', 3, '#994A00'),
+        ]},
+        { name: '旁註層', sub: '一個骨架三種語意', hue: '#AA3333', items: [
+          mk('note · caution', 'new', 'envcaution — 填色卡容器', 78, '#AA3333'),
+          mk('note · strategy', 'new', 'envstrategy — 填色卡容器', 39, '#6453A7'),
+          mk('note · remark', 'new', 'envremark — 左色條容器', 23, '#5D646F'),
+        ]},
+        { name: '收束層', sub: '把弧線收回來', hue: '#04773B', items: [
+          mk('recap_cards', 'keep', '節末 key takeaways', '—', '#04773B'),
+        ]},
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

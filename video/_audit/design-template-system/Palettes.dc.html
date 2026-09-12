@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;600;700&family=Archivo:wght@400;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&family=IBM+Plex+Mono:wght@400;500&display=swap');
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; }
+    a { color: #0068A7; } a:hover { color: #004E7D; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 1720px; height: 1220px; background: #FBFAF7; color: #1A1D23; box-sizing: border-box; padding: 52px 62px; display: flex; flex-direction: column; gap: 24px;">
+
+  <div style="display: flex; flex-direction: column; gap: 7px;">
+    <div class="mono" style="font-size: 14px; letter-spacing: 0.14em; color: #0068A7; text-transform: uppercase;">方向 &nbsp;/&nbsp; 色盤與字體</div>
+    <div style="font-size: 38px; font-weight: 700; letter-spacing: -0.01em;">三個方向，軸是「影片與講義的關係」</div>
+    <div style="font-size: 15px; color: #565A63; max-width: 1300px; line-height: 1.6;">
+      現行影片色盤與講義的語意色<span style="font-weight: 600; color: #AA3333;">對不上</span>——講義 definition＝赭、theorem＝藍；影片 definition＝藍、theorem＝琥珀。學生在 PDF 與影片看到同一個概念是不同顏色。三個方向是三種解法，不是三種色調。
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; flex-grow: 1;">
+    <sc-for list="{{dirs}}" as="d" hint-placeholder-count="3">
+      <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-top: 4px solid {{d.mark}}; border-radius: 0 0 5px 5px; display: flex; flex-direction: column;">
+
+        <div style="padding: 22px 26px 18px; display: flex; flex-direction: column; gap: 9px; border-bottom: 1px solid #F1F0EC;">
+          <div style="display: flex; align-items: baseline; gap: 11px;">
+            <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.11em; color: {{d.mark}};">{{d.key}}</span>
+            <span style="font-size: 25px; font-weight: 700;">{{d.name}}</span>
+          </div>
+          <div style="font-size: 14px; color: #565A63; line-height: 1.55;">{{d.pitch}}</div>
+        </div>
+
+        <div style="padding: 20px 26px; display: flex; flex-direction: column; gap: 15px; border-bottom: 1px solid #F1F0EC;">
+          <div style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; color: #9AA0AC;">語意色軸</div>
+          <div style="display: flex; flex-direction: column; gap: 7px;">
+            <sc-for list="{{d.roles}}" as="r" hint-placeholder-count="6">
+              <div style="display: flex; align-items: center; gap: 11px;">
+                <span style="width: 30px; height: 30px; border-radius: 4px; background: {{r.hex}}; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(0,0,0,0.07) inset;"></span>
+                <span style="font-size: 13.5px; font-weight: 500; width: 96px;">{{r.role}}</span>
+                <span class="mono" style="font-size: 12px; color: #82868F;">{{r.hex}}</span>
+                <span style="font-size: 11.5px; color: {{r.dfg}}; margin-left: auto;">{{r.delta}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="padding: 20px 26px; display: flex; flex-direction: column; gap: 13px; border-bottom: 1px solid #F1F0EC; background: {{d.bg}};">
+          <div style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; color: {{d.sub}};">字體配對</div>
+          <div style="font-family: {{d.sansStack}}; font-size: 30px; font-weight: 700; color: {{d.ink}}; letter-spacing: -0.015em;">Continuity</div>
+          <div style="font-family: {{d.serifStack}}; font-size: 30px; color: {{d.ink}};"><span style="font-style: normal;">sin</span>&thinsp;<span style="font-style: italic;">θ</span> <span style="font-style: normal;">&#8804;</span> <span style="font-style: italic;">θ</span> <span style="font-style: normal;">&#8804;</span> <span style="font-style: normal;">tan</span>&thinsp;<span style="font-style: italic;">θ</span></div>
+          <div style="display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; color: {{d.sub}};">
+            <span>{{d.sansName}}　<span style="opacity: 0.7;">標題・結構</span></span>
+            <span>{{d.serifName}}　<span style="opacity: 0.7;">數學・引文</span></span>
+          </div>
+        </div>
+
+        <div style="padding: 20px 26px 24px; display: flex; flex-direction: column; gap: 13px; margin-top: auto;">
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <div style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; color: #04773B;">得到</div>
+            <div style="font-size: 13.5px; color: #565A63; line-height: 1.55;">{{d.pro}}</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <div style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; color: #AA3333;">代價</div>
+            <div style="font-size: 13.5px; color: #565A63; line-height: 1.55;">{{d.con}}</div>
+          </div>
+        </div>
+
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    const same = { dfg: '#04773B', delta: '＝講義' };
+    const lift = { dfg: '#994A00', delta: '同色相提亮' };
+    const none = { dfg: '#9AA0AC', delta: '—' };
+    return {
+      dirs: [
+        {
+          key: 'A', name: '同語', mark: '#0068A7',
+          pitch: '影片直接採用講義的視覺文法：淺色紙、六色語意軸、serif 數學。學生在兩個媒介看到的是同一套符號。',
+          roles: [
+            { role: 'definition', hex: '#994A00', ...same },
+            { role: 'theorem/proof', hex: '#0068A7', ...same },
+            { role: 'example', hex: '#04773B', ...same },
+            { role: 'caution', hex: '#AA3333', ...same },
+            { role: 'strategy', hex: '#6453A7', ...same },
+            { role: 'remark', hex: '#5D646F', ...same },
+          ],
+          bg: '#FBFAF7', ink: '#1A1D23', sub: '#82868F',
+          sansStack: 'Inter, sans-serif', serifStack: "'Source Serif 4', Georgia, serif",
+          sansName: 'Inter', serifName: 'Source Serif 4',
+          pro: '認知成本最低——顏色、pill、色條、字體全部一致。講義已調校過的東西直接繼承，不必重新驗證。',
+          con: '放棄深色螢幕的優勢：投影對比、發光強調、圖形在暗底上的清晰度全部讓出。而且淺底大面積白光長時間觀看較累。',
+        },
+        {
+          key: 'B', name: '對位', mark: '#4FA6DE',
+          pitch: '保留深色舞台，但把六個語意色一一對位到講義的色相——同一個概念在兩個媒介是同一個色相，只是為暗底提亮。',
+          roles: [
+            { role: 'definition', hex: '#D98F3C', ...lift },
+            { role: 'theorem/proof', hex: '#4FA6DE', ...lift },
+            { role: 'example', hex: '#3EBE7C', ...lift },
+            { role: 'caution', hex: '#E5726A', ...lift },
+            { role: 'strategy', hex: '#A493E6', ...lift },
+            { role: 'remark', hex: '#96A0AE', ...lift },
+          ],
+          bg: '#0F1720', ink: '#ECF1F7', sub: '#8B97A6',
+          sansStack: "'Instrument Sans', sans-serif", serifStack: "'Source Serif 4', Georgia, serif",
+          sansName: 'Instrument Sans', serifName: 'Source Serif 4',
+          pro: '兩邊語意可互譯，又保住深色的對比與發光。改動最小——現行深色底、字級階、safe zone 全部沿用，只換色票與混排規則。',
+          con: '仍要維護兩套色值（紙用一組、螢幕用一組），色相對位要有人守。六色對動畫是負擔：顏色已被語意佔滿，強調只能靠亮度。',
+        },
+        {
+          key: 'C', name: '分工', mark: '#E86A4B',
+          pitch: '影片自成一格：語意由容器形狀與固定版位編碼，顏色只留兩個——一個標「現在在講的」，一個標「結論」。',
+          roles: [
+            { role: 'live／強調', hex: '#E86A4B', ...none },
+            { role: 'result／結論', hex: '#5CC79C', ...none },
+            { role: 'ink', hex: '#F2EFE9', ...none },
+            { role: 'ink-2', hex: '#A8A29A', ...none },
+            { role: 'rule', hex: '#2A2621', ...none },
+            { role: 'ground', hex: '#14120F', ...none },
+          ],
+          bg: '#14120F', ink: '#F2EFE9', sub: '#A8A29A',
+          sansStack: 'Archivo, sans-serif', serifStack: 'Newsreader, Georgia, serif',
+          sansName: 'Archivo', serifName: 'Newsreader',
+          pro: '顏色被釋放回動畫——畫面上唯一有色的東西就是此刻該看的東西，這正是六鏡 13 條 L-attention must 要的。版面最乾淨，動畫最好做。',
+          con: '學生要學兩套視覺文法。語意靠版位編碼＝版位不能亂動，模板自由度反而更低。且與講義的一致性只剩字體與結構。',
+        },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

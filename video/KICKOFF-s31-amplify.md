@@ -221,9 +221,9 @@ diff /tmp/before.txt /tmp/after.txt      # 必須逐字相同
 
 ### 7.1 模板系統重新設計的其餘部分（品質補強輪 ⑨ 未竟項）
 
-設計畫布：<https://claude.ai/code/artifact/b6bbb677-135e-48fc-8d0d-9ff13cca05ca>
-（3 頁 9 artboard；`.dc.html` 工作檔在上個 session 的 scratchpad，**未進版控**——要續做得先
-重建或重新產）。
+設計畫布：<https://claude.ai/code/artifact/b6bbb677-135e-48fc-8d0d-9ff13cca05ca>（3 頁 9 artboard）。
+**`.dc.html` 工作檔已進版控**：[`_audit/design-template-system/`](_audit/design-template-system/)
+（含 README：怎麼改、怎麼重新發布回同一個畫布、為什麼只收源不收 2.5 MB 的成品）。
 
 - **版面構成 4 條規則**（page-3）：① 結論必須是畫面上最重的元素 ② 下三分之一不得長期空置
   ③ 右欄（`aside`）有條件展開——**27 場一次都沒用過** ④ 三種佔比依章的體質選。

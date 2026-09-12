@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&display=swap');
+    body { margin: 0; font-family: 'Instrument Sans', system-ui, sans-serif; }
+    a { color: #4FA6DE; } a:hover { color: #7CC0EA; }
+    .m  { font-family: 'Source Serif 4', Georgia, serif; font-style: italic; }
+    .mu { font-family: 'Source Serif 4', Georgia, serif; font-style: normal; }
+    .sr { font-family: 'Source Serif 4', Georgia, serif; }
+    .frac { display: inline-flex; flex-direction: column; vertical-align: -0.46em; text-align: center; line-height: 1.15; }
+    .frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 0.32em 0.05em; }
+    .frac > span:last-child  { padding: 0.05em 0.32em 0; }
+    .lim { display: inline-flex; flex-direction: column; align-items: center; vertical-align: -0.4em; line-height: 1.02; font-style: normal; }
+    .lim > span:last-child { font-size: 0.54em; }
+  </style>
+</helmet>
+
+<div style="width: 1920px; height: 1080px; background: #0F1720; color: #ECF1F7; box-sizing: border-box; padding: 66px 96px 0; display: flex; flex-direction: column;">
+
+  <!-- problem band: stays on screen for the whole scene -->
+  <div style="border-left: 3px solid #3EBE7C; padding-left: 26px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 26px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span style="background: #3EBE7C; color: #0F1720; font-size: 17px; font-weight: 700; letter-spacing: 0.1em; padding: 5px 14px; border-radius: 4px;">EXAMPLE</span>
+      <span style="color: #3EBE7C; font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums;">3.1</span>
+      <span style="color: #566373; font-size: 20px; margin-left: 6px;">the companion limit</span>
+    </div>
+    <div class="sr" style="font-size: 46px; color: #ECF1F7;">
+      Establish &nbsp;
+      <span class="lim"><span class="mu">lim</span><span class="m">θ&rarr;0</span></span>&thinsp;
+      <span class="frac"><span>1 &minus; <span class="mu">cos</span>&thinsp;<span class="m">θ</span></span><span><span class="m">θ</span></span></span>
+      &nbsp;= 0.
+    </div>
+  </div>
+
+  <div style="height: 1px; background: #22303F;"></div>
+
+  <!-- solution: steps left, strategy rail right -->
+  <div style="flex-grow: 1; display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 56px; padding-top: 28px;">
+
+    <div style="display: flex; flex-direction: column; gap: 20px; min-width: 0;">
+      <span style="align-self: flex-start; border: 1.5px solid #3EBE7C; color: #3EBE7C; font-size: 15px; font-weight: 700; letter-spacing: 0.11em; padding: 4px 12px; border-radius: 4px;">SOLUTION</span>
+
+      <div style="display: grid; grid-template-columns: auto auto 1fr; gap: 0 16px; align-items: baseline; font-family: 'Source Serif 4', Georgia, serif; font-size: 38px; row-gap: 20px;">
+
+        <span><span class="frac"><span>1 &minus; <span class="mu">cos</span>&thinsp;<span class="m">θ</span></span><span><span class="m">θ</span></span></span></span>
+        <span>=</span>
+        <span><span class="frac"><span>(1 &minus; <span class="mu">cos</span>&thinsp;<span class="m">θ</span>)(1 + <span class="mu">cos</span>&thinsp;<span class="m">θ</span>)</span><span><span class="m">θ</span>&thinsp;(1 + <span class="mu">cos</span>&thinsp;<span class="m">θ</span>)</span></span></span>
+
+        <span></span>
+        <span>=</span>
+        <span style="color: #8B97A6;"><span class="frac"><span>1 &minus; <span class="mu">cos</span><sup style="font-size: 0.62em;">2</sup>&thinsp;<span class="m">θ</span></span><span><span class="m">θ</span>&thinsp;(1 + <span class="mu">cos</span>&thinsp;<span class="m">θ</span>)</span></span></span>
+
+        <span></span>
+        <span>=</span>
+        <span style="color: #8B97A6;"><span class="frac"><span><span class="mu">sin</span><sup style="font-size: 0.62em;">2</sup>&thinsp;<span class="m">θ</span></span><span><span class="m">θ</span>&thinsp;(1 + <span class="mu">cos</span>&thinsp;<span class="m">θ</span>)</span></span></span>
+
+        <span></span>
+        <span>=</span>
+        <span><span class="frac"><span><span class="mu">sin</span>&thinsp;<span class="m">θ</span></span><span><span class="m">θ</span></span></span> &nbsp;&middot;&nbsp; <span class="frac"><span><span class="mu">sin</span>&thinsp;<span class="m">θ</span></span><span>1 + <span class="mu">cos</span>&thinsp;<span class="m">θ</span></span></span></span>
+      </div>
+    </div>
+
+    <!-- strategy + provenance rail -->
+    <div style="display: flex; flex-direction: column; gap: 22px; border-left: 1px solid #22303F; padding-left: 34px;">
+      <div style="display: flex; flex-direction: column; gap: 9px;">
+        <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.14em; color: #A493E6;">STRATEGY</div>
+        <div style="font-size: 22px; color: #C8D0DA; line-height: 1.45;">Multiply by the conjugate — it turns the numerator into a square.</div>
+      </div>
+
+      <div style="height: 1px; background: #22303F;"></div>
+
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.14em; color: #566373;">WHAT EACH FACTOR DOES</div>
+        <div style="display: flex; align-items: baseline; gap: 14px;">
+          <span class="sr" style="font-size: 26px; color: #ECF1F7;"><span class="frac" style="font-size: 0.9em;"><span><span class="mu">sin</span>&thinsp;<span class="m">θ</span></span><span><span class="m">θ</span></span></span></span>
+          <span style="font-size: 17px; color: #8B97A6;">&rarr; 1</span>
+          <span style="font-size: 14px; color: #4FA6DE; margin-left: auto;">PROP 3.2</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px;">
+          <span class="sr" style="font-size: 26px; color: #ECF1F7;"><span class="frac" style="font-size: 0.9em;"><span><span class="mu">sin</span>&thinsp;<span class="m">θ</span></span><span>1 + <span class="mu">cos</span>&thinsp;<span class="m">θ</span></span></span></span>
+          <span style="font-size: 17px; color: #8B97A6;">&rarr; 0</span>
+          <span style="font-size: 14px; color: #4FA6DE; margin-left: auto;">PROP 3.1</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- answer band: heaviest element, lower third -->
+  <div style="background: linear-gradient(180deg, rgba(62,190,124,0.11), rgba(62,190,124,0.03)); border: 1px solid rgba(62,190,124,0.34); border-radius: 6px; padding: 26px 36px 30px; margin-bottom: 44px; display: flex; align-items: baseline; justify-content: space-between;">
+    <div class="sr" style="font-size: 56px; color: #3EBE7C; text-shadow: 0 0 32px rgba(62,190,124,0.28);">
+      <span class="lim"><span class="mu">lim</span><span class="m">θ&rarr;0</span></span>&thinsp;
+      <span class="frac"><span>1 &minus; <span class="mu">cos</span>&thinsp;<span class="m">θ</span></span><span><span class="m">θ</span></span></span>
+      &nbsp;= 1 &middot; 0 = 0
+    </div>
+    <div style="font-size: 14px; font-weight: 600; letter-spacing: 0.12em; color: #3EBE7C;">ANSWER</div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>
