@@ -14,6 +14,9 @@ patched smallest-first.
 The four hooks (scene id -> Figure -> cue):
   sector_inequality    Figure 3.1  nested unit-circle areas  (tri_inner, sector,
                                    tri_outer, ineq)
+  chord_vs_arc         (no book figure) half-chord vs arc on the unit circle, laid
+                                   down side by side (circle, nudge, chord_arc,
+                                   straighten)
   slope_equals_height  Figure 3.3  sin tangents vs cos heights (tan_0,
                                    tan_halfpi, tan_pi, cos_dots)
   shm_stacked_graphs   Figure 3.4  s/s'/s'' over one time axis, s''=-s
@@ -679,3 +682,226 @@ def derivative_cycle(spec, ctx, blocks):
 
     ids["math.0"].mobject = ring
     return blocks
+
+
+# ================================================================ hook 6
+# chord_vs_arc (scene 08) -- the picture the narration talks about but never showed.
+# Beat 0 is 26.7 s of spoken geometry ("on the unit circle the half-chord sin theta is
+# always shorter than the arc theta above it") over an EMPTY body zone: the statement
+# card, the proof chain and the QED are all {show}-timed and land later, so nothing at
+# all is on screen while that sentence is read. The hook puts the unit circle back and
+# walks it in the order the narration walks it:
+#   circle     : the circle, the axes, the radius at angle theta, the angle mark
+#   nudge      : the two legs appear and theta actually wobbles (+-0.15 rad) -- this is
+#                "nudge the angle a little ... they never jump", paced to fill its beat
+#   chord_arc  : the half-chord thickens as it is named, then the arc traces over it
+#   straighten : congruent copies of both peel off, lie down on one baseline, and the
+#                length ordering becomes |sin theta| <= |theta|
+# The figure is built in the empty RIGHT-HAND region theorem_proof leaves (under the
+# statement band, right of the proof chain) and is zoomed out to the middle of the body
+# zone for the opening act, docking back home on {show statement} -- R2's "perform it
+# big, then keep it in the corner as evidence". Zoom/dock is a pure similarity transform,
+# so nothing is re-typeset and the FINAL frame is exactly the built layout.
+
+
+def chord_vs_arc(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    out = list(blocks)
+
+    text = T.color(ground, "text")
+    mut = T.color(ground, "muted")
+    blue = T.color(ground, "secondary")
+    amber = T.color(ground, "accent")
+    green = T.color(ground, "success")
+
+    R = 2.00
+    TH = 1.25            # resting angle (~72 deg): chord/arc differ by 24%, which reads
+                         # as "shorter" once the two lie side by side
+    NUDGE = 0.20         # the "little" nudge; the swing stays inside [1.05, 1.45] so the
+                         # foot never reaches the static sin label
+    ZOOM = 1.60          # opening size; capped by the bars' (still invisible) slot having
+                         # to stay on frame while the circle holds OPEN_X
+    OPEN_X = -1.20       # where the circle sits while it is alone on screen
+
+    def _u(a):
+        return np.array([np.cos(a), np.sin(a), 0.0])
+
+    # -- stage 1: the circle, the radius, the angle ------------------------------------
+    # First quadrant only -- the same idiom scene 06 uses two scenes earlier (motion
+    # primitive 5: the viewer recognises the picture), and the lower half would be dead
+    # space that costs the radius 40% of its size in this height budget.
+    circ = Arc(radius=R, start_angle=0.0, angle=PI / 2, color=mut, stroke_width=2.0)
+    xax = Line(0.30 * LEFT, (R + 0.55) * RIGHT, color=mut, stroke_width=1.4)
+    yax = Line(0.30 * DOWN, (R + 0.45) * UP, color=mut, stroke_width=1.4)
+    dotA = Dot(R * RIGHT, radius=0.05, color=text)
+    labA = brand.math_line("1", ground, role="muted", size="label").next_to(dotA, DR, buff=0.12)
+    radius = Line(np.zeros(3), R * _u(TH), color=text, stroke_width=2.4)
+    dotP = Dot(R * _u(TH), radius=0.055, color=text)
+    ang = Arc(radius=0.36, start_angle=0.0, angle=TH, color=text, stroke_width=2.0)
+    lab_th = brand.math_line(r"\theta", ground, role="text", size="label")
+    lab_th.move_to(0.58 * _u(TH / 2))
+    stage_circle = VGroup(xax, yax, circ, dotA, labA, radius, dotP, ang, lab_th)
+
+    # -- stage 2: the two legs, live under the theta tracker ---------------------------
+    th = ValueTracker(TH)
+    foot = np.array([R * np.cos(TH), 0.0, 0.0])
+    sin_leg = Line(foot, R * _u(TH), color=blue, stroke_width=6.0)
+    cos_leg = Line(np.zeros(3), foot, color=green, stroke_width=6.0)
+    # both labels sit where NO swing position can reach them (right of the widest foot /
+    # below the axis), so they never need an updater and never cross the arc.
+    lab_sin = brand.math_line(r"\sin\theta", ground, role="secondary", size="label")
+    lab_sin.move_to(np.array([R * np.cos(TH - NUDGE) + 0.42, 0.80, 0.0]))
+    lab_cos = brand.math_line(r"\cos\theta", ground, role="success", size="label")
+    lab_cos.move_to(np.array([0.50, -0.40, 0.0]))
+    stage_nudge = VGroup(cos_leg, sin_leg, lab_sin, lab_cos)
+
+    # -- stage 3: the arc above the chord ----------------------------------------------
+    arc = Arc(radius=R, start_angle=0.0, angle=TH, color=amber, stroke_width=6.0)
+    lab_arc = brand.math_line(r"\theta", ground, role="accent", size="label")
+    lab_arc.move_to((R + 0.40) * _u(TH / 2))
+    stage_arc = VGroup(arc, lab_arc)
+
+    # -- stage 4: both laid down on one baseline, at their true lengths -----------------
+    BAR_X = 2.95
+    base = DashedLine(np.array([BAR_X, 1.70, 0.0]), np.array([BAR_X, 0.30, 0.0]),
+                      color=mut, stroke_width=1.4, dash_length=0.06)
+    bar_chord = Line(np.array([BAR_X, 1.34, 0.0]),
+                     np.array([BAR_X + R * np.sin(TH), 1.34, 0.0]),
+                     color=blue, stroke_width=7.0)
+    bar_arc = Line(np.array([BAR_X, 0.68, 0.0]),
+                   np.array([BAR_X + R * TH, 0.68, 0.0]), color=amber, stroke_width=7.0)
+    lab_bc = brand.math_line(r"|\sin\theta|", ground, role="secondary", size="label")
+    lab_bc.next_to(bar_chord, RIGHT, buff=0.16)
+    lab_ba = brand.math_line(r"|\theta|", ground, role="accent", size="label")
+    lab_ba.next_to(bar_arc, RIGHT, buff=0.16)
+    ineq = brand.math_line(r"|\sin\theta| \le |\theta|", ground, role="text", size="math_sm")
+    ineq.next_to(bar_arc, DOWN, buff=0.55).align_to(base, LEFT)
+    stage_bars = VGroup(base, bar_chord, bar_arc, lab_bc, lab_ba, ineq)
+
+    # -- placement: home slot, and the zoomed-out opening position ----------------------
+    parts = (stage_circle, stage_nudge, stage_arc, stage_bars)
+    full = VGroup(*parts)
+    card = ids["statement"].mobject
+    proof_right = max(ids[k].mobject.get_right()[0]
+                      for k in ids if k.startswith("proof.") or k == "qed")
+    box_l, box_r = proof_right + 0.55, T.FRAME_W / 2 - T.SIDE_GUTTER
+    box_b, box_t = -T.FRAME_H / 2 + T.SAFE_MARGIN, card.get_bottom()[1] - 0.35
+    full.move_to([(box_l + box_r) / 2, (box_b + box_t) / 2, 0])
+    home_c = full.get_center().copy()
+    body_ref = ids["scaffold.motive"].mobject if "scaffold.motive" in ids else ids["title"].mobject
+    big_c = np.array([0.0, (body_ref.get_bottom()[1] - T.TITLE_GAP + box_b) / 2, 0.0])
+
+    # Opening staging. For the ~26 s before the statement card exists the figure owns the
+    # frame: zoomed up, and centred on the CIRCLE (the bars' half of it is still empty, so
+    # centring the whole group would park the drawing in the left third). `straighten`
+    # slides that offset back out as the bars arrive, and the statement's own reveal docks
+    # the figure home. All of it is cued by {show statement}; without that marker the card
+    # is part of the opening frame, there is no beat to dock on, and the figure simply
+    # stays home at full size.
+    docks = not ids["statement"].static
+    stage_shift = np.zeros(3)
+    if docks:
+        for p in parts:
+            p.scale(ZOOM, about_point=home_c).shift(big_c - home_c)
+        stage_shift = np.array([OPEN_X, big_c[1], 0.0]) - stage_circle.get_center()
+        for p in parts:
+            p.shift(stage_shift)
+
+    # The live geometry reads its frame off mobjects that do NOT move with theta: the two
+    # axes give the origin and dotA gives the current radius. (Not circ.get_center()/width
+    # -- circ is a quarter Arc, whose bounding box is neither centred on O nor 2R wide.)
+    def _O():
+        return np.array([yax.get_center()[0], xax.get_center()[1], 0.0])
+
+    def _r():
+        return dotA.get_center()[0] - _O()[0]  # R at the current zoom, so updaters track it
+
+    def _s():
+        return _r() / R
+
+    def _P():
+        return _O() + _r() * _u(th.get_value())
+
+    def _F():
+        p = _P()
+        return np.array([p[0], _O()[1], 0.0])
+
+    def _circle_anim(scene, mob, _ground) -> float:
+        total = TM.beat_run_time(scene, 2.6)
+        a, b = total * 0.45, total * 0.32
+        c = max(total - a - b, 0.3)
+        scene.play(FadeIn(VGroup(xax, yax)), Create(circ), run_time=a)
+        scene.play(Create(radius), FadeIn(dotP), FadeIn(dotA), FadeIn(labA), run_time=b)
+        scene.play(Create(ang), FadeIn(lab_th), run_time=c)
+        scene.add(mob)
+        return total
+
+    def _nudge_anim(scene, mob, _ground) -> float:
+        """Swing theta about its resting value for the whole beat -- the narration's
+        'nudge the angle a little ... they never jump' actually happens on screen."""
+        total = TM.beat_run_time(scene, 6.0)
+        scene.play(FadeIn(mob), run_time=0.5)
+        radius.add_updater(lambda m: m.put_start_and_end_on(_O(), _P()))
+        dotP.add_updater(lambda m: m.move_to(_P()))
+        sin_leg.add_updater(lambda m: m.put_start_and_end_on(_F(), _P()))
+        cos_leg.add_updater(lambda m: m.put_start_and_end_on(_O(), _F()))
+        ang.add_updater(lambda m: m.become(
+            Arc(radius=0.34 * _s(), start_angle=0.0, angle=th.get_value(),
+                arc_center=_O(), color=text, stroke_width=2.0)))
+        lab_th.add_updater(lambda m: m.move_to(_O() + 0.58 * _s() * _u(th.get_value() / 2)))
+        swing = max((total - 0.5) / 3.0, 0.8)
+        for delta in (-NUDGE, NUDGE, -NUDGE):
+            scene.play(th.animate.set_value(TH + delta), run_time=swing,
+                       rate_func=there_and_back)
+        for m in (radius, dotP, sin_leg, cos_leg, ang, lab_th):
+            m.clear_updaters()                 # the geometry beats need a still figure
+        return 0.5 + 3 * swing
+
+    def _arc_anim(scene, mob, _ground) -> float:
+        total = TM.beat_run_time(scene, 3.6)
+        a, b = total * 0.26, total * 0.46
+        c = max(total - a - b, 0.3)
+        scene.play(sin_leg.animate.set_stroke(width=8.0), run_time=a)   # "the half-chord"
+        scene.play(Create(arc), run_time=b)                             # "...than the arc"
+        scene.play(FadeIn(lab_arc), run_time=c)
+        scene.add(mob)
+        return total
+
+    def _straighten_anim(scene, mob, _ground) -> float:
+        """Congruent copies of the chord and the arc lie down on one baseline: same
+        lengths, now directly comparable, and the inequality reads straight off them."""
+        total = TM.beat_run_time(scene, 4.2)
+        slide = total * 0.16 if docks else 0.0
+        a, b = total * 0.40, total * 0.16
+        c = max(total - slide - a - b, 0.4)
+        if docks:
+            mob.shift(-stage_shift)      # still invisible: the slot travels with the rest
+            scene.play(*[p.animate.shift(-stage_shift)
+                         for p in (stage_circle, stage_nudge, stage_arc)], run_time=slide)
+        scene.play(FadeIn(base),
+                   ReplacementTransform(sin_leg.copy(), bar_chord),
+                   ReplacementTransform(arc.copy(), bar_arc), run_time=a, rate_func=smooth)
+        scene.play(FadeIn(lab_bc), FadeIn(lab_ba), run_time=b)
+        scene.play(FadeIn(ineq, shift=0.1 * UP), run_time=c)
+        scene.add(mob)
+        return total
+
+    def _dock(scene, mob, _ground) -> float:
+        """The statement card's own reveal, doubling as the figure's cue to shrink back
+        into its home slot and stay there as evidence under the proof."""
+        scene.play(FadeIn(mob, shift=0.35 * RIGHT),
+                   *[p.animate.scale(1.0 / ZOOM, about_point=big_c).shift(home_c - big_c)
+                     for p in parts], run_time=0.9)
+        scene.add(mob)
+        return 0.9
+
+    if docks:
+        stmt = ids["statement"]
+        out[out.index(stmt)] = Block("statement", stmt.mobject, anim=_dock,
+                                     anim_seconds=0.9, static=False, layer=stmt.layer)
+    out.append(Block("circle", stage_circle, anim=_circle_anim, static=False, layer="graph"))
+    out.append(Block("nudge", stage_nudge, anim=_nudge_anim, static=False, layer="graph"))
+    out.append(Block("chord_arc", stage_arc, anim=_arc_anim, static=False, layer="graph"))
+    out.append(Block("straighten", stage_bars, anim=_straighten_anim, static=False, layer="graph"))
+    return out
