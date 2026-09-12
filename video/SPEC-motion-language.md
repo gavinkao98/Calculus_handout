@@ -89,6 +89,7 @@
 **落地。**
 - 已有：`pauses:`（純旁白變換，插靜音）、`paced:`（逐段攤在整拍）、`seconds: beat`、`rewatch_pack` 的 `longest_still_seconds`。
 - 已接線（2026-09-13）：`make.py` 的 `[stillness]` advisory——「本場有 > 6 s 的拍既無 paced／sweep／`seconds: beat`、也無 `pauses:`」在 render 前就印出來；callable 動畫一律視為畫面自己在動（含 `anim: transform`，此為已知盲點）。
+- 三層門檻分工（2026-09-13 對齊）：**6 s＝authoring advisory**（`[stillness]`，作者改稿時看）；**12 s＝量測閘**（`rewatch_pack` 的 `longest_still_seconds`，⑧）；**REWATCH R4 `T-still` 判讀線同為 12 s**（原 15 s，已改）。`T-beat` 25 s 維持，它量的是「沒有 reveal」不是靜止。
 
 **驗收。** `longest_still_seconds` ≤ 12 s（沿用）；未宣告靜止 > 6 s 的拍＝0。
 

@@ -72,7 +72,7 @@
 - **維度**：
   - `T-rate` 每秒字數與 reveal 密度：念得快又長時間沒新東西上畫面的段落。
   - `T-dwell` 承重步驟（證明的關鍵一步、結論式）之後有沒有停留？停多久？
-  - `T-still` 最長不動秒數；超過 15 秒的靜止段落逐一列出並說明此時旁白在講什麼。
+  - `T-still` 最長不動秒數；超過 **12 秒**的靜止段落逐一列出並說明此時旁白在講什麼（2026-09-13 由 15 秒改為 12 秒，對齊品質補強輪 ⑧ 的量測驗收線 `longest_still_seconds` ≤ 12 s；三層門檻分工：6 s＝`make.py` `[stillness]` authoring advisory、12 s＝`rewatch_pack` 量測閘＝本鏡判讀線，見 `SPEC-motion-language.md` 規則 4）。
   - `T-beat` 超過 25 秒沒有 reveal 的 beat。
   - `T-balance` 場長分布：哪幾場相對其內容過長／過短？
 - **輸出重點**：每條 finding 都帶數字（現況幾秒、建議幾秒）；`film.patterns` 給全片的節奏診斷（例如「平均每 X 秒一個 reveal，難步驟後平均停留 Y 秒」）。
