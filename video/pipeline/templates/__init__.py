@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from .. import brand
 from .. import narration
 from ..blocks import Block
 from . import (
@@ -49,6 +50,10 @@ REGISTRY: dict[str, Builder] = {
 
 
 def build_blocks(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
+    # meta.color_map (SPEC-motion-language rule 5) reaches brand.math_line as module state: set
+    # it from THIS scene's meta before anything builds -- ahead of the intro/outro/divider early
+    # return too -- so no scene renders with the previous scene's table.
+    brand.set_color_map((ctx.get("meta") or {}).get("color_map"))
     kind = spec.get("kind", "content")
     if kind in ("intro", "outro", "divider"):
         return REGISTRY[kind](spec, ctx)

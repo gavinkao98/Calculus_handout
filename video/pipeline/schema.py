@@ -128,6 +128,84 @@ def _pause_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
     return issues
 
 
+def _color_map_issues(meta: dict) -> "list[tuple[str, str]]":
+    """`meta.color_map` (SPEC-motion-language rule 5; kickoff T1-1): tex token -> palette role,
+    read by brand.math_line for every math line in the deck. theme.color() falls back to
+    `primary` on a role it does not know -- silently -- so a typo'd role would render as plain
+    ink with no other symptom; this is where it gets said. warn-default, error under
+    meta.color_map_enforce (the pedagogy.assumptions_registry_issues shape)."""
+    if "color_map" not in meta:
+        return []
+    sev = "error" if meta.get("color_map_enforce") else "warn"
+    cmap = meta.get("color_map")
+    if not isinstance(cmap, dict):
+        return [(sev, "meta.color_map: must be a mapping {tex token: palette role}")]
+    from pipeline.visuals import theme
+    roles = theme.palette("dark")
+    issues: list[tuple[str, str]] = []
+    for key, role in cmap.items():
+        if not isinstance(key, str) or not key.strip():
+            issues.append((sev, f"meta.color_map[{key!r}]: key must be a non-empty tex token "
+                                f"(e.g. '\\\\theta', 'h')"))
+        elif not isinstance(role, str) or role not in roles:
+            issues.append((sev, f"meta.color_map[{key!r}]: {role!r} is not a palette role "
+                                f"(theme.color would silently fall back to primary); "
+                                f"use a key of theme.DARK, e.g. concept / result / caution"))
+    return issues
+
+
+def _derivation_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
+    """derivation rows' `anim: cancel` + `cancel: [i, ...]` and `frame: true` (kickoff T3-3 /
+    T2-2). A cancel index points into the PREVIOUS row's `{{...}}` segments, so it needs a
+    previous row, that row needs segments, and every index must fall inside them -- an index
+    that misses is an IndexError mid-render, a `cancel:` without `anim: cancel` (or a `frame`
+    on a plain reveal) is silently inert. Errors: each is always a mistake."""
+    if scene.get("template") != "derivation":
+        return []
+    from pipeline import texparts
+    rows: list[tuple[str, dict]] = []      # (where, row) in the template's order; check has a fixed reveal
+    if scene.get("steps") is not None or scene.get("result") is not None:
+        for j, st in enumerate(scene.get("steps") or []):
+            rows.append((f"{sid}.steps[{j}]", st if isinstance(st, dict) else {"math": st}))
+        if scene.get("result") is not None:
+            r = scene["result"]
+            rows.append((f"{sid}.result", r if isinstance(r, dict) else {"math": r}))
+    else:
+        for j, ln in enumerate(scene.get("lines") or []):
+            ln = ln if isinstance(ln, dict) else {"tex": ln}
+            rows.append((f"{sid}.lines[{j}]", {**ln, "math": ln.get("tex", "")}))
+    issues: list[tuple[str, str]] = []
+    for j, (where, row) in enumerate(rows):
+        anim = row.get("anim")
+        cancel = row.get("cancel")
+        if row.get("frame") and anim not in ("transform", "cancel"):
+            issues.append(("error", f"{where}.frame: only applies with anim: transform | cancel "
+                                    f"(this row: {anim!r})"))
+        if cancel is not None and anim != "cancel":
+            issues.append(("error", f"{where}.cancel: needs anim: cancel (this row: {anim!r})"))
+        if anim != "cancel":
+            continue
+        if j == 0:
+            issues.append(("error", f"{where}: anim: cancel has no previous row to cancel from"))
+            continue
+        prev = str(rows[j - 1][1].get("math", ""))
+        if not texparts.has_segments(prev):
+            issues.append(("error", f"{where}: anim: cancel needs the previous row cut into "
+                                    f"{{{{...}}}} segments to point at"))
+            continue
+        n = len(texparts.split_segments(prev))
+        if (not isinstance(cancel, list) or not cancel
+                or any(isinstance(c, bool) or not isinstance(c, int) for c in cancel)):
+            issues.append(("error", f"{where}.cancel: required list of segment indexes into the "
+                                    f"previous row (0..{n - 1})"))
+            continue
+        for c in cancel:
+            if not 0 <= c < n:
+                issues.append(("error", f"{where}.cancel[{c}]: previous row has {n} segment(s) "
+                                        f"(0..{n - 1})"))
+    return issues
+
+
 def schema_storyboard(data) -> "list[tuple[str, str]]":
     """Return a list of (severity, message); severity is 'error' or 'warn'.
     'error' aborts the render (broken / unparseable structure); 'warn' is advisory."""
@@ -153,6 +231,7 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
             for key in ("w", "h", "fps"):
                 if not isinstance(video.get(key), (int, float)) or isinstance(video.get(key), bool):
                     issues.append(("error", f"meta.video.{key}: required number"))
+    issues += _color_map_issues(meta)
 
     scenes = data.get("scenes")
     if not isinstance(scenes, list) or not scenes:
@@ -194,6 +273,7 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
             issues += _pause_issues(sid, scene, scene.get("say"))
             issues += _focus_issues(sid, scene, scene.get("say"))
             issues += _paced_issues(sid, scene, scene.get("say"))
+            issues += _derivation_issues(sid, scene)
         elif "pauses" in scene:
             issues.append(("error", f"{sid}: 'pauses' is a content-scene field "
                                     f"(this scene is kind={kind!r})"))

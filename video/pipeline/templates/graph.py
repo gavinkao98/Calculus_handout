@@ -393,6 +393,13 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
     all_plots = spec.get("plots", [])
     for i, plot in enumerate(all_plots):
         kind = plot.get("kind")
+        # A plot with no colour of its own whose label names a colour-mapped token takes that
+        # token's role (meta.color_map; SPEC rule 5): the sine curve is drawn in sine's colour.
+        # Only the DEFAULT is affected -- an explicit color / color_role is the author's.
+        if "color" not in plot and "color_role" not in plot and plot.get("label"):
+            role = brand.mapped_role(str(plot["label"]))
+            if role:
+                plot = dict(plot, color_role=role)
         col = _role_color(ground, plot, "secondary")
         # reveal: true -> dynamic block, waits for {show plot.N}; its label is
         # folded into the same block so one marker reveals both (see docstring).

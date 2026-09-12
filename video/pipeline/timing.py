@@ -24,6 +24,9 @@ STOCK_ANIM_SECONDS = {
     # one. Played by a Block CALLABLE, so this entry is the single source of its nominal
     # length -- the template reads it into Block.anim_seconds.
     "transform": 1.2,
+    # two-stage elimination (derivation `anim: cancel`): 0.4 s the cancelled segments fade in
+    # place, then 0.8 s the survivors morph into the new row. Same callable contract as transform.
+    "cancel": 1.2,
 }
 
 

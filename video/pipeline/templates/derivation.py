@@ -34,12 +34,20 @@ A row may ask for `anim: transform` (steps[i] / result): instead of fading the f
 line in, it morphs the PREVIOUS row's equation into this one glyph by glyph, and mutes the
 row it came from -- so an algebraic rewrite reads as one line changing rather than a new
 line appearing.
+
+A row's math may be cut into `{{...}}` SEGMENTS (brand.math_line; kickoff T3): each segment
+is one submobject, and a transform between two segmented rows matches segment to segment
+instead of glyph to glyph -- only the changed segment morphs, its neighbours slide.
+`anim: cancel` + `cancel: [i, j]` (indexes into the PREVIOUS row's segments) fades those
+segments first, then morphs the survivors: the two-stage elimination. `frame: true` on a
+transform / cancel row boxes the previous row's equation for 0.4 s before it moves.
 """
 from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, FadeIn, MathTex, TransformMatchingShapes, VGroup
+from manim import (DOWN, LEFT, RIGHT, Create, FadeIn, FadeOut, MathTex, SurroundingRectangle,
+                   TransformMatchingShapes, TransformMatchingTex, VGroup)
 
 from .. import brand
 from ..blocks import Block, accent_role
@@ -68,13 +76,15 @@ def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
             st = st if isinstance(st, dict) else {"math": st}
             rows.append({"math": str(st.get("math", "")), "reason": st.get("reason"),
                          "kind": "step", "rid": f"step.{i}", "anim": st.get("anim") or "write",
-                         "mark": st.get("mark"), "color_role": st.get("color_role")})
+                         "mark": st.get("mark"), "color_role": st.get("color_role"),
+                         "cancel": st.get("cancel"), "frame": st.get("frame")})
         if spec.get("result") is not None:
             r = spec["result"]
             r = r if isinstance(r, dict) else {"math": r}
             rows.append({"math": str(r.get("math", "")), "reason": r.get("reason"),
                          "kind": "result", "rid": "result", "anim": r.get("anim") or "write_glow",
-                         "color_role": r.get("color_role")})
+                         "color_role": r.get("color_role"),
+                         "cancel": r.get("cancel"), "frame": r.get("frame")})
         if spec.get("check") is not None:
             c = spec["check"]
             c = c if isinstance(c, dict) else {"math": c}
@@ -84,11 +94,14 @@ def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
         for i, entry in enumerate(spec.get("lines", [])):
             if isinstance(entry, dict):
                 tex, anim, reason = entry.get("tex", ""), entry.get("anim", "write"), entry.get("reason")
+                cancel, frame = entry.get("cancel"), entry.get("frame")
             else:
                 tex, anim, reason = entry, "write", None
+                cancel = frame = None
             kind = "result" if anim == "highlight" else "step"
             rows.append({"math": str(tex), "reason": reason, "kind": kind,
-                         "rid": f"line.{i}", "anim": "write_glow" if kind == "result" else anim})
+                         "rid": f"line.{i}", "anim": "write_glow" if kind == "result" else anim,
+                         "cancel": cancel, "frame": frame})
     return rows
 
 
@@ -102,17 +115,19 @@ def _eq_mob(row: dict, ground: str, *, role: str):
     carry the SAME name and the viewer sees that this line is about the orange half-chord
     they were just shown. The rewatch review's complaint was exactly this: "三個區域用
     藍/橘/綠標好了，到不等式鏈全變回白字."
+
+    Both equations go through brand.math_line (same MathTex, same size), so the deck's
+    meta.color_map and the row's `{{...}}` segments apply here.
     """
     override = row.get("color_role")
     if row["kind"] == "result":
         role = str(override) if override else role
-        eq = MathTex(row["math"].strip(), color=T.color(ground, role), font_size=T.fs(54))
+        eq = brand.math_line(row["math"].strip(), ground, role=role, size=54)
         # crisper halo (was 3.0/0.45): Codex read the heavy amber glow as fuzzy/embossed.
         return brand.text_glow(eq, ground, role=role, width=2.2, opacity=0.38)
     # a check row is a PASS, not a struck-out aside: render it as bright as the steps
     # (was role="muted"/ink_3, which read as disabled/greyed-out -- 2026-06-21 A2 finding).
-    eq = MathTex(row["math"].strip(), color=T.color(ground, str(override) if override else "primary"),
-                 font_size=T.fs("math"))
+    eq = brand.math_line(row["math"].strip(), ground, role=str(override) if override else "primary")
     # a trailing verdict glyph: check rows + steps marked ok -> green check; bad -> red cross.
     # The ok check is the verdict marker, so it reads at full math size with a soft green
     # glow (was scale 0.8, too small to register as the "it works" payoff).
@@ -128,6 +143,9 @@ def _eq_mob(row: dict, ground: str, *, role: str):
 
 
 TRANSFORM_SECONDS = STOCK_ANIM_SECONDS["transform"]
+CANCEL_SECONDS = STOCK_ANIM_SECONDS["cancel"]
+CANCEL_FADE_SECONDS = 0.4   # `anim: cancel` stage 1: the eliminated segments fade, in place
+FRAME_SECONDS = 0.4         # `frame: true`: the pre-morph frame around the row about to change
 MUTED_OPACITY = 0.55     # what the row a transform came FROM fades back to
 _DEFAULT_ANIM = {"step": "write", "result": "write_glow", "check": "write"}
 
@@ -145,28 +163,76 @@ def _eq_core(mob):
     return None
 
 
-def _transform_anim(prev_eq, prev_row, this_eq):
+def _frame(scene, target, ground):
+    """`frame: true` (SPEC rule 3, kickoff T2-2): 0.4 s before a row changes, draw a hairline
+    frame around it as the "this is what is about to move" cue (C1 335 s boxes the coefficient
+    before substituting). Returns the rectangle so the morph can fade it out in the same play.
+    Whole equation for now; token-level framing waits for the segment work to settle."""
+    rect = SurroundingRectangle(target, color=T.color(ground, "hairline_strong"), buff=0.08,
+                                stroke_width=2.0)
+    scene.play(Create(rect), run_time=FRAME_SECONDS)
+    return rect
+
+
+def _matching(source, target):
+    """Part matching (TransformMatchingTex, key = each `{{...}}` segment's tex) when BOTH rows
+    are segmented -- the author named the units that move, so only the changed segment morphs
+    and its neighbours slide (SPEC rule 2, C1 700 s). Otherwise glyph matching, unchanged. The
+    old objection to tex matching -- `substrings_to_isolate` cutting `\\frac` from its arguments
+    -- does not apply to author segments, which are whole by construction."""
+    if getattr(source, "_ml_parts", False) and getattr(target, "_ml_parts", False):
+        return TransformMatchingTex(source, target, transform_mismatches=True)
+    return TransformMatchingShapes(source, target)
+
+
+def _transform_anim(prev_eq, prev_row, this_eq, *, frame: bool = False):
     """An in-place rewrite: the previous row's equation morphs into this one, and the row it
-    came from dims. Glyph-matching (TransformMatchingShapes), not term-matching: splitting the
-    tex with `substrings_to_isolate` to get named parts breaks any row using `\\frac` (the macro
-    is cut from its arguments and LaTeX refuses to compile), and it would perturb the spacing of
-    the very rows it touched. Shape matching needs no change to how the row is built, so the
-    terminal frame is byte-identical to the un-transformed one.
+    came from dims. Glyph matching unless both rows are segmented (see _matching); either way
+    the row is built exactly as an un-transformed one, so the terminal frame is byte-identical
+    to it.
 
     The WHOLE previous row dims -- equation, leader and reason together. Dimming only the
     equation inverted the hierarchy: a spent row's rail annotation stayed at full ink and so
     read brighter than the equation it annotates (visual-frame audit, 2026-09-12)."""
     def anim(scene, mob, ground) -> float:
+        rect = _frame(scene, prev_eq, ground) if frame else None
         ghost = prev_eq.copy()
         scene.add(ghost)
         rail = VGroup(*[m for m in mob.submobjects if m is not this_eq])
         scene.play(
-            TransformMatchingShapes(ghost, this_eq),
+            _matching(ghost, this_eq),
             prev_row.animate.set_opacity(MUTED_OPACITY),
             *([FadeIn(rail)] if rail.submobjects else []),
+            *([FadeOut(rect)] if rect is not None else []),
             run_time=TRANSFORM_SECONDS,
         )
-        return TRANSFORM_SECONDS
+        return TRANSFORM_SECONDS + (FRAME_SECONDS if rect is not None else 0.0)
+    return anim
+
+
+def _cancel_anim(prev_eq, prev_row, this_eq, cancel: "list[int]", *, frame: bool = False):
+    """Two-stage elimination (SPEC rule 2, B1 419 s): the cancelled segments of the previous
+    row go first, in place, so the reader confirms WHICH terms cancel; then the survivors morph
+    into this row. Stage 1 fades a ghost's segments while the row underneath drops to muted, so
+    the cancelled tokens read bright -> muted and the survivors stay bright until they move;
+    the previous row keeps its full content as (muted) history and the terminal frame is the
+    same as a plain transform's."""
+    def anim(scene, mob, ground) -> float:
+        rect = _frame(scene, prev_eq, ground) if frame else None
+        ghost = prev_eq.copy()
+        scene.add(ghost)
+        gone = [ghost.submobjects[i] for i in cancel]
+        scene.play(FadeOut(VGroup(*gone)), prev_row.animate.set_opacity(MUTED_OPACITY),
+                   run_time=CANCEL_FADE_SECONDS)
+        ghost.remove(*gone)          # stage 2 morphs the survivors only
+        rail = VGroup(*[m for m in mob.submobjects if m is not this_eq])
+        scene.play(
+            TransformMatchingTex(ghost, this_eq, transform_mismatches=True),
+            *([FadeIn(rail)] if rail.submobjects else []),
+            *([FadeOut(rect)] if rect is not None else []),
+            run_time=CANCEL_SECONDS - CANCEL_FADE_SECONDS,
+        )
+        return CANCEL_SECONDS + (FRAME_SECONDS if rect is not None else 0.0)
     return anim
 
 
@@ -320,17 +386,31 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         else:
             blocks.append(Block("statement", statement, anim="fade", static=True))
     for i, (r, group, eq) in enumerate(row_mobs):
-        # `anim: transform` morphs the row ABOVE into this one. The first row has nothing to
-        # morph from, so it keeps its stock reveal -- silently, since "transform the opening
-        # line" is a reasonable thing for an author to write and there is nothing to fix.
+        # `anim: transform` / `anim: cancel` morph the row ABOVE into this one. The first row
+        # has nothing to morph from, so it keeps its stock reveal -- silently, since "transform
+        # the opening line" is a reasonable thing for an author to write and there is nothing
+        # to fix. A cancel whose previous row did not split into segments (no `{{...}}`, or the
+        # LaTeX fallback in brand.math_line -- schema reports both) degrades to a plain
+        # transform rather than an IndexError mid-render.
         prev_eq = _eq_core(row_mobs[i - 1][2]) if i else None
         this_eq = _eq_core(eq)
-        if r["anim"] == "transform" and prev_eq is not None and this_eq is not None:
-            blocks.append(Block(r["rid"], group,
-                                anim=_transform_anim(prev_eq, row_mobs[i - 1][1], this_eq),
-                                anim_seconds=TRANSFORM_SECONDS, static=False))
+        anim = r["anim"]
+        if anim == "cancel" and not getattr(prev_eq, "_ml_parts", False):
+            anim = "transform"
+        if anim in ("transform", "cancel") and prev_eq is not None and this_eq is not None:
+            frame = bool(r.get("frame"))
+            prev_row = row_mobs[i - 1][1]
+            if anim == "cancel":
+                fn = _cancel_anim(prev_eq, prev_row, this_eq, list(r.get("cancel") or []), frame=frame)
+                seconds = CANCEL_SECONDS
+            else:
+                fn = _transform_anim(prev_eq, prev_row, this_eq, frame=frame)
+                seconds = TRANSFORM_SECONDS
+            blocks.append(Block(r["rid"], group, anim=fn,
+                                anim_seconds=seconds + (FRAME_SECONDS if frame else 0.0),
+                                static=False))
         else:
-            anim = _DEFAULT_ANIM[r["kind"]] if r["anim"] == "transform" else r["anim"]
+            anim = _DEFAULT_ANIM[r["kind"]] if anim in ("transform", "cancel") else anim
             blocks.append(Block(r["rid"], group, anim=anim, static=False))
 
     blocks.append(motif_corner(ground))
