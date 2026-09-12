@@ -170,13 +170,20 @@ def _transform_anim(prev_eq, prev_row, this_eq):
     return anim
 
 
-def _reason_mob(row: dict, ground: str):
-    """The rail reason: result -> mono uppercase amber-ink tag; else faded upright prose."""
+def _reason_mob(row: dict, ground: str, *, role: str = "concept"):
+    """The rail reason: result -> mono uppercase tag in the scene's accent ink; else faded
+    upright prose.
+
+    The tag's ink follows `accent:` like the result row and its leader already do. It used
+    to be a hardcoded amber regardless of the scene's accent -- the last of the four
+    written-in accents Direction B (quality round ⑨) set out to remove, and invisible until
+    §3.1's derivations stopped being tagged `definition` (ochre) in the 2026-09-13 accent
+    review: a blue result line under an amber tag reads as two different claims."""
     reason = row.get("reason")
     if not reason:
         return None
     if row["kind"] == "result":
-        return brand.eyebrow(str(reason), ground, role="amber_ink", size="tag")
+        return brand.eyebrow(str(reason), ground, role=f"{role}_ink", size="tag")
     # role="text" (ink_2), not "muted" (ink_3): the rail carries the reasoning the old
     # two-column walkthrough spent a whole column on -- it is teaching content, so it
     # must be readable. The smaller size + the dotted leader keep it subordinate to the
@@ -222,7 +229,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     rows = _rows_from_spec(spec)
     eqs = [_eq_mob(r, ground, role=accent_role(spec)) for r in rows]
-    reasons = [_reason_mob(r, ground) for r in rows]
+    reasons = [_reason_mob(r, ground, role=accent_role(spec)) for r in rows]
 
     # Reasons snap to the FIXED Lectern rail column (was: floating at
     # left_x + eq_col_w, so the rail x drifted scene-to-scene and never aligned

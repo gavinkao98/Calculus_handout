@@ -75,6 +75,21 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   beat 仍一次 call、非免費)**；scene-level 合成報價時要把 fallback 預算一併列入：
   預設 `--fallback-budget 2` 只夠 resynth，**要啟用 chunk 救援得把 budget 調到覆蓋 fan-out（1＋該場句數），句數即 billed
   sub-synth 數、須併入報價**——chunk 會自檢 budget、不足即 decline 退 beats（不偷跑爆預算）。
+- **只改 `{show}` marker、要重對映 beat 時，`--reuse-existing` 是必要的，漏掉就整批重合成。**
+  `tts.py:1054` 的 `use_reuse = args.reuse_existing and …` 決定要不要建 reuse index；**沒下這個旗標，
+  index 是空的，`scene_reuse_ok` 根本不會被問到**，每一個被 `--scene` 選到的場都會從頭合成——與
+  `scene_text_hash` 相不相同無關。2026-09-12 實測代價：5 場（hash 全部逐字未變）**13 次 billed call**，
+  其中一場再降到 beats 終端（`--fallback-budget` 只管 rungs 2–3，管不到終端）。正確寫法：
+  `tts.py --backend mimo --reuse-existing --scene <ids> --no-billing`——補上 `--reuse-existing` 後
+  同一個 deck 實測 `backend_calls: 0`。
+- **`--no-billing` / `--max-billed-calls N`（2026-09-12 新增）＝把「這次應該不花錢」變成保證而非預期。**
+  上限涵蓋整個 run（含 beats 終端）；超過的那一次呼叫直接中止。因為 WAV 要等該場閘全過才 promote，
+  中止時 manifest 與既有音檔原封不動，可以安全重試。
+- **ASR QA 探針對「逐字母唸讀」會誤報。** `sector_inequality` 把點唸成 `O A B`／`O A C`，ASR 轉成
+  `OAB`／`OAC`（另有 `disc`→`disk`、`one`→`1`），`qa_diff` 讀成 3-token replace ⇒ verdict `fail` ⇒
+  整場被判 fail 而去重合成。該場需要 `--skip-qa`（manifest 會誠實記成 `qa.status=skipped,
+  reason=--skip-qa (intentional)`）。判斷是不是誤報：離線跑 `SA.align_scene` + `run_gates`，對齊
+  本身過就是探針誤報，不是 take 有問題。
 - `make.py --reuse-audio` 會先驗 manifest freshness（deck id、scene、beat count、`{show}`、
   `text_hash`、WAV 存在/時長；`scene_aligned` 另驗 scene WAV＋words/aligned 檔＋`validation.status`），再 render；
   若報 stale/incomplete，不要硬跳過，先重跑該 storyboard 的 `tts.py` 或確認是不是選錯 `<deck>_mimo.yml`。

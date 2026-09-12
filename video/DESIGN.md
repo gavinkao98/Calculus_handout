@@ -147,11 +147,13 @@ scenes:
 | 欄位 | 必填 | 意義 |
 |---|---|---|
 | `template` | yes | 使用哪個 scene template（見下方 "Template catalog"） |
-| `accent` | definition-family 必填 | 色彩角色：`definition` / `theorem` / `proposition` / `corollary` / `proof` / `example` / `solution` / `procedure` / `strategy` / `caution` / `warning` / `remark` / `note` / `recap`。取代舊的 `content_type`。**只管顏色**，不管 eyebrow 字卡（見下 §Eyebrow 字卡 resolver）。未設或不認得的值 → 中性 slate（見下 §語意色軸）。 |
+| `accent` | definition-family 必填 | 色彩角色：`definition` / `theorem` / `proposition` / `corollary` / `proof` / `derivation` / `example` / `solution` / `procedure` / `strategy` / `caution` / `warning` / `remark` / `note` / `recap`。取代舊的 `content_type`。**只管顏色**，不管 eyebrow 字卡（見下 §Eyebrow 字卡 resolver）。未設或不認得的值 → 中性 slate（見下 §語意色軸）。 |
 | `scene_role` | no | eyebrow 字卡的**教學 beat 軸**（與 `accent` 顏色軸正交）。exposition beat（`motivation`/`intuition`/`bridge`/`forward-ref`/`setup`/`roadmap`）→ **無字卡**；形式物件（`definition`/`theorem`/`remark`/…）→ 對應字卡。省略＝沿用模板/`accent` 預設字卡（見下 §Eyebrow 字卡 resolver）。 |
 | `title` | yes | 螢幕上的 scene title；可使用 `$...$` 表示數學 |
 | `say` | yes | 單一 narration 欄位（見下方） |
 | `statement`、`math`、`steps`、`plots`、… | per template | 螢幕上的 visual payload |
+| `paced` | no | reveal id 的 list：這些 block 的揭示**攤開在整拍**上（多段的逐段淡入、單行式子隨旁白書寫），而不是一次 0.45 s 的淡入。opt-in，其餘 block 照舊；anim 已是 callable 的（hook／`anim: transform`）一律跳過。見下方 motion primitive 節與 [`pipeline/pacing.py`](pipeline/pacing.py)。 |
+| `focus` | no | `[{at: <reveal id>, dim: [<block id>…]}]`：那一拍起把 `dim` 的 block 壓暗，`dim: []` 還原；場末一律全部還原。見下方 motion primitive 節與 [`pipeline/focus.py`](pipeline/focus.py)。 |
 | `hook` | no | `"<module>:<fn>"` custom-animation factory，可從 `video/` import（例如 `"animations.ch01_inverse_functions_hooks:can_we_go_backwards"`）。Factory 接收 `(spec, ctx, template_blocks)` 並回傳最終的 block list：替換 block 的 mobject **但保留其 reveal id**（使 `{show ...}` marker 和已核准的 narration 不受影響）、將 static element defer 到一個 beat、或附加一個 callable anim `(scene, mobject, ground) -> seconds spent`（`pipeline/blocks.py`）。Storyboard 中的 template payload 保留為 no-hook fallback——刪掉 `hook:` 行即恢復 stock scene。在 `pipeline/templates/__init__.py:_apply_hook` 中接線。 |
 
 ### Template catalog（content scene）
@@ -189,7 +191,7 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 | `accent` 值 | palette role | 講義來源 | LIGHT（＝講義） | DARK（提亮） |
 |---|---|---|---|---|
 | `definition` | `concept` | `aConcept` | `#994a00` 赭 | `#d98f3c` |
-| `theorem` / `proposition` / `corollary` / `proof` / `recap` | `result` | `aResult` | `#0068a7` 藍 | `#4fa6de` |
+| `theorem` / `proposition` / `corollary` / `proof` / `recap` / `derivation` | `result` | `aResult` | `#0068a7` 藍 | `#4fa6de` |
 | `example` / `solution` | `practice` | `aPractice` | `#04773b` 綠 | `#3ebe7c` |
 | `caution` / `warning` | `caution` | `aCaution` | `#aa3333` 紅 | `#d96b6b` |
 | `procedure` / `strategy` | `strategy` | `aStrategy` | `#6453a7` 紫 | `#a493e6` |
@@ -198,6 +200,14 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 **改了什麼（相對 Direction D）：** `definition` 與 `theorem` 的顏色**原本是對調的**——講義說
 definition＝赭、theorem＝藍，影片卻是 definition＝藍、theorem＝琥珀。另外 `caution`／`remark`／
 `note` 原本與不相干的族群共用顏色（`warning`／`secondary`／`accent`），現在各自獨立。
+
+**`derivation`（2026-09-13 加）＝講義正文的主色。** `calcbook.sty:96` 的註解把 `aResult` 寫成
+「theorem/proposition/proof/**主色**」——正文的 kicker、規線、項目符號都用它。一個 derivation 場
+在講義裡不被任何有色環境包住，但它推導出來的那一行 **是** result，而 `derivation` 模板正是用
+`accent:` 上那一行的色。起因是 §3.1 的 accent 複審：`chapter3.tex` 第 30–207 行（§3.1）**一個
+`envdefinition` 都沒有**（第一個在 §3.2，第 246 行），而影片有 7 場標著 `accent: definition`——
+全是 definition 還等於中性藍時留下的舊帳。散文／Figure 場改為**不標 accent**（沒有有色環境可對位，
+標了等於替作者宣告他沒寫的語意），derivation 場改標 `derivation`。
 
 **未標記場＝中性，不是繼承語意。** `blocks.DEFAULT_ROLE = "aside"`：`accent` 未設或不認得時給
 中性 slate 家具。（舊行為是退回 `definition`，在 definition 還是中性藍時無害；definition 現在
@@ -772,6 +782,66 @@ render，停在起點的 tracker 會把「影片從不會停在的那一幀」�
 
 **附帶修正：`dashed: true` 現在對 `kind: function` 生效**（以前只有 `kind: line` 認它，
 function 靜默忽略，於是作者標了虛線的參考曲線畫出來是實線——與它要襯托的主曲線分不出來）。
+
+### motion primitive：`focus:`／`color_role`／`seconds: beat`（2026-09-12 次輪）
+
+**`focus:`（場級）——旁白講到誰，畫面就只亮誰。**
+
+```yaml
+focus:                       # content 場專用，opt-in
+  - at: sector               # 這個 reveal 的那一拍起
+    dim: [tri_inner]         # 把這些 block id 壓暗
+  - at: ineq
+    dim: []                  # 空 list ＝還原全部
+```
+
+每一筆**取代**（不是累加）該拍起的壓暗集合；場末一律全部還原，所以視覺閘讀到的最終幀
+就是沒有任何壓暗的那一幀。實作 [`pipeline/focus.py`](pipeline/focus.py)。
+**還原一定用 `save_state()`/`restore()`，絕不可用 `set_opacity(1.0)`**——manim 的
+`set_opacity` 會把整個 family 的 fill 與 stroke 一律設成該值，於是「刻意透明」的部分
+（`fill_opacity=0` 的空心編號環）會被填成實心色塊。`schema._focus_issues` 擋 `at` 指到
+`say` 沒揭示過的 id 與重複的 `at`；`sizecheck` 擋 `dim` 裡不存在的 block id。
+
+**`color_role`（derivation 的 `steps[i]` / `result`）——跨場延續。** 圖已經用顏色替各部分
+命名了（`graph` 的 plot 一直有 `color_role`），推導列寫同一個 role，讀者就看得出這一行講的
+是剛才那條橘色半弦。六鏡的抱怨正是「三色標好了，到不等式鏈全變回白字」。
+
+**`seconds: beat`（graph 的 sweep）／`TM.beat_run_time(scene, fallback)`（hook 內）——
+圖跟旁白一樣長。** `scene.beat_seconds` 由 `scene._play_content` 在每拍開始前設好（拍外
+為 `None`），`timing.beat_run_time` 讀它、保留 `BEAT_PACED_TAIL_SECONDS=0.6` 的尾巴、
+不低於 `BEAT_PACED_MIN_SECONDS=0.8`。callable 簽章沒變，既有 hook 不受影響。
+**這是唯一能填滿 20 秒長拍的一類原語**（品質補強輪 ⑧：`longest_still_seconds` 與 verdict
+的相關性 −0.82，而 `static_ratio` 只有 −0.18）。
+
+### motion primitive：`paced:`／`{show scaffold.*}`（2026-09-13 三輪）
+
+**`paced:`（場級）——一個 block 的揭示攤開在整拍上。**
+
+```yaml
+paced: [body, result]        # reveal id；其餘照舊
+```
+
+多段的 block（wrapped prose 一行一個 Tex、chip 列一張一個 card、derivation 的
+「式子／leader／註解」三件）**逐段淡入、平均分佈在整拍**，於是「一次揭示 + 18 秒不動」
+變成「每 5 秒一次揭示」。`n` 段就切 `n` 個間隔（**不是 n−1**）——只切段間的話，兩段的
+block 會在前半拍放完、後半拍整片靜止，等於把病灶搬家而不是治好。
+**沒有段可走的 block（單行式子）改為「隨旁白書寫」**：`Write` 跨整拍畫出來，速率有上限
+（`WRITE_SECONDS_PER_GLYPH`），短式子落在長拍上不會被拖成慢動作，剩下的時間照常是 hold。
+實作 [`pipeline/pacing.py`](pipeline/pacing.py)，接在 `build_blocks` 的 hook 之後（所以
+hook 換掉的 mobject 也吃得到）。**只升級 stock reveal**：anim 已經是 callable 的（hook、
+`anim: transform`）一律跳過，否則通用的走法會把那支編舞靜靜吃掉。
+`schema._paced_issues` 擋 `say` 沒揭示過的 id 與重複 id。
+
+> **量測注意：** `rewatch_pack` 把畫面縮成 192×108 灰階再比對，0.2% 門檻 ≈ 400 px。
+> 一個字形在那個尺度只有 2×3 px，所以**「隨旁白書寫」這一支對 0.2% 門檻近乎隱形**——
+> 它會把那個數字報得更糟，而 0.05% 門檻（≈10 px）才看得見。引用靜止秒數時兩個門檻都列。
+
+**`{show scaffold.motive}`／`{show scaffold.flag.<id>}`——scaffold 行也照原語 1 進場。**
+`scaffold.*` 預設是開場畫面的一部分，於是「把結論寫在 motive 上」的場會在 t=0 就劇透、
+`ASSUMES` pill 會比旁白提到它早一分鐘出現（六鏡 R2 D-focus：「最重要的前提被提前一分鐘
+擺出來…pill 因此退化成裝飾」）。`say` 寫了對應 marker 的場改為該拍滑入。集中實作在
+`templates/__init__._scaffold_reveal_timing`，所以每個 template 一體適用；**版面不變**
+（那一行始終佔著它的位置，只是晚到）。
 
 ### Text rendering：prose vs math（no garble）
 

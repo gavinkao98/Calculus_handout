@@ -79,6 +79,26 @@ def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
     return issues
 
 
+def _paced_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
+    """`paced:` walks a block's parts across its whole beat (pipeline/pacing.py). Same
+    reasoning as `focus.at` / `pauses.after`: a paced id the narration never reveals is
+    silently inert, so require it to name a reveal this scene makes."""
+    if "paced" not in scene:
+        return []
+    entries = scene.get("paced")
+    if not isinstance(entries, list) or any(not isinstance(e, str) or not e for e in entries):
+        return [("error", f"{sid}.paced: must be a list of reveal ids")]
+    revealed = set(reveal_targets(say) if isinstance(say, str) else [])
+    issues: list[tuple[str, str]] = []
+    for bid in entries:
+        if bid not in revealed:
+            issues.append(("error", f"{sid}.paced {bid!r}: `say` never does {{show {bid}}} "
+                                    f"(revealed here: {sorted(revealed)})"))
+    if len(set(entries)) != len(entries):
+        issues.append(("error", f"{sid}.paced: duplicate id"))
+    return issues
+
+
 def _pause_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
     """`pauses:` is an authored silent hold after a reveal (pipeline/pauses.py). Its
     `after` must name a reveal this scene actually makes -- a typo'd one would otherwise
@@ -173,6 +193,7 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
                         issues.append(("warn", f"{sid}: empty {{show}} target (reveals nothing)"))
             issues += _pause_issues(sid, scene, scene.get("say"))
             issues += _focus_issues(sid, scene, scene.get("say"))
+            issues += _paced_issues(sid, scene, scene.get("say"))
         elif "pauses" in scene:
             issues.append(("error", f"{sid}: 'pauses' is a content-scene field "
                                     f"(this scene is kind={kind!r})"))

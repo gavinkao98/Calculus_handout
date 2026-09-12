@@ -33,9 +33,9 @@ meta:
   derived_from:
     inputs:
     - path: ch03_trig_derivatives.yml
-      sha256: 9e038393b93035fe5945f1d487baaef8f79c900f36dc05256e2a6ae9c5c561b5
+      sha256: a47462fd0d42ff7d630b40ada0ebc07e3a55b61abbe20ccb585e1b5bccb52309
     - path: ../content_scripts/ch03_trig_derivatives.spoken.yml
-      sha256: c62eb792c20c561b668dff30bc39cc314e3470e4afd5f5ee4cfedb4173bf26a1
+      sha256: 8cf896ec88ba7837428a18ad6ac1d188712874e3cb53034bf6535c2e22d9c5c9
 scenes:
 - id: intro
   kind: intro
@@ -58,14 +58,18 @@ scenes:
 - id: why_trig_is_different
   kind: content
   template: definition_math
-  accent: definition
   scene_role: motivation
+  hook: animations.ch03_trig_derivatives_hooks:why_trig_is_different
   ref: md:why_trig_is_different
   scaffold:
     flag: radians
+  paced:
+  - math.0
+  - math.1
+  - statement
   source: chapter3-print-standalone.html SS3.1 . opening prose (funnels to sin/theta over theta)
   title: A Limit No Algebra Can Crack
-  say: 'Every derivative so far has yielded to algebra. For a polynomial we
+  say: 'Every derivative so far has yielded to algebra. {show cancels} For a polynomial we
 
     expanded the quantity x plus h, to the n, and the binomial theorem handed
 
@@ -95,7 +99,7 @@ scenes:
 
     it unlocks the derivatives of both sine and cosine at once. One ground
 
-    rule, though: throughout, angles are measured in radians -- an assumption
+    rule, though: {show scaffold.flag.radians} throughout, angles are measured in radians -- an assumption
 
     that turns out to be essential.
 
@@ -108,8 +112,9 @@ scenes:
 - id: difference_quotient_for_sine
   kind: content
   template: derivation
-  accent: definition
+  accent: derivation
   kicker: derivation
+  hook: animations.ch03_trig_derivatives_hooks:difference_quotient_for_sine
   ref: md:difference_quotient_for_sine
   covers:
   - identity
@@ -122,7 +127,7 @@ scenes:
   title: The Difference Quotient for Sine
   say: 'So let us transform that difference quotient instead of fighting it
 
-    head-on. The decisive step is one trigonometric identity -- sum-to-product
+    head-on. {show scaffold.motive} The decisive step is one trigonometric identity -- sum-to-product
 
     -- which turns a difference of sines into a product.
 
@@ -191,7 +196,6 @@ scenes:
   kind: content
   template: graph
   mode: single
-  accent: definition
   hook: animations.ch03_trig_derivatives_hooks:sector_inequality
   focus:
   - at: sector
@@ -257,7 +261,7 @@ scenes:
 - id: squeeze_to_the_bound
   kind: content
   template: derivation
-  accent: definition
+  accent: derivation
   kicker: derivation
   ref: md:squeeze_to_the_bound
   covers:
@@ -265,6 +269,10 @@ scenes:
   - divide_sin
   - bound
   - abs_bound
+  paced:
+  - step.1
+  - result
+  - check
   scaffold:
     motive: Turn the chain of areas into bounds on $\sin\theta/\theta$.
   source: chapter3-print-standalone.html SS3.1 . algebra after Figure 3.1 (inequality 1)
@@ -378,6 +386,10 @@ scenes:
   - sin_identity
   - bound
   - qed
+  paced:
+  - proof.0
+  - proof.1
+  - qed
   scaffold:
     motive: Turn $\sin\theta\to 0$ into full continuity, everywhere.
   source: chapter3-print-standalone.html SS3.1 . Proposition 3.1 . Proof (sum-to-product bound + squeeze)
@@ -467,7 +479,6 @@ scenes:
   kind: content
   template: graph
   mode: single
-  accent: definition
   ref: md:squeeze_graph
   source: chapter3-print-standalone.html SS3.1 . Figure 3.2 (squeeze-limit)
   title: The Squeeze, Drawn
@@ -576,6 +587,8 @@ scenes:
   type: caution
   sparse_ok: true
   ref: md:limit_not_identity
+  paced:
+  - body
   source: chapter3-print-standalone.html SS3.1 . Caution (limit not identity)
   title: A Limit, Not an Identity
   say: 'One caution, because this result is easy to over-read.
@@ -596,6 +609,8 @@ scenes:
   type: caution
   sparse_ok: true
   ref: md:radians_essential
+  paced:
+  - body
   source: chapter3-print-standalone.html SS3.1 . Caution (radian convention)
   title: Why Radians
   say: 'A second caution, and this one is structural.
@@ -612,6 +627,51 @@ scenes:
 
     '
   body: Everything here needs radians. In degrees, $\sin(x^{\circ})/x \to \pi/180$, so $\tfrac{d}{dx}\sin(x^{\circ})=\tfrac{\pi}{180}\cos(x^{\circ})$ --- the clean $\sin'=\cos$ holds only in radians.
+- id: companion_limit
+  kind: content
+  template: derivation
+  accent: example
+  ref: md:companion_limit
+  covers:
+  - conjugate
+  - split
+  - evaluate
+  scaffold:
+    motive: 'Bank a companion limit: $(1-\cos\theta)/\theta\to 0$.'
+  source: chapter3-print-standalone.html SS3.1 . Example 3.1 (companion limit)
+  title: A Companion Limit
+  prompt: Establish the companion limit $(1-\cos\theta)/\theta \to 0$ as $\theta \to 0$.
+  say: 'The fundamental limit has a companion worth knowing: the quantity one minus
+
+    cosine theta, over theta tends to zero. {show scaffold.motive} It is again zero over zero, so we
+
+    need a way in.
+
+    {show step.0} Multiply top and bottom by the conjugate one plus cosine
+
+    theta; the numerator becomes a difference of squares, one minus cosine
+
+    squared theta.
+
+    {show step.1} And one minus cosine squared theta is just sine squared
+
+    theta, so the whole thing splits into sine theta over theta times sine
+
+    theta over the quantity one plus cosine theta.
+
+    {show result} Let theta go to zero: the first factor goes to one, the
+
+    second to zero over two. One times zero is zero.
+
+    '
+  steps:
+  - math: \frac{1-\cos\theta}{\theta} = \frac{(1-\cos\theta)(1+\cos\theta)}{\theta\,(1+\cos\theta)} = \frac{1-\cos^{2}\theta}{\theta\,(1+\cos\theta)}
+    reason: multiply by $1+\cos\theta$
+  - math: = \frac{\sin^{2}\theta}{\theta\,(1+\cos\theta)} = \frac{\sin\theta}{\theta}\cdot\frac{\sin\theta}{1+\cos\theta}
+    reason: $1-\cos^{2}\theta=\sin^{2}\theta$
+  result:
+    math: \longrightarrow\ 1\cdot\frac{0}{1+1} = 0
+    reason: the limit, then continuity
 - id: divider_derivatives
   kind: divider
   accent: definition
@@ -718,7 +778,6 @@ scenes:
   kind: content
   template: graph
   mode: single
-  accent: definition
   hook: animations.ch03_trig_derivatives_hooks:slope_equals_height
   source: chapter3-print-standalone.html SS3.1 . Figure 3.3 (sin-cos-slope)
   title: Slope Equals Height
@@ -786,6 +845,8 @@ scenes:
   accent: remark
   hook: animations.ch03_trig_derivatives_hooks:derivative_cycle
   scene_role: remark
+  paced:
+  - math.1
   ref: md:derivative_cycle
   scaffold:
     motive: 'Step back: what pattern do these two derivatives make together?'
@@ -829,51 +890,6 @@ scenes:
     current: 4
     total: 4
   duration: 4.0
-- id: companion_limit
-  kind: content
-  template: derivation
-  accent: example
-  ref: md:companion_limit
-  covers:
-  - conjugate
-  - split
-  - evaluate
-  scaffold:
-    motive: 'Bank a companion limit: $(1-\cos\theta)/\theta\to 0$.'
-  source: chapter3-print-standalone.html SS3.1 . Example 3.1 (companion limit)
-  title: A Companion Limit
-  prompt: Establish the companion limit $(1-\cos\theta)/\theta \to 0$ as $\theta \to 0$.
-  say: 'The fundamental limit has a companion worth knowing: the quantity one minus
-
-    cosine theta, over theta tends to zero. It is again zero over zero, so we
-
-    need a way in.
-
-    {show step.0} Multiply top and bottom by the conjugate one plus cosine
-
-    theta; the numerator becomes a difference of squares, one minus cosine
-
-    squared theta.
-
-    {show step.1} And one minus cosine squared theta is just sine squared
-
-    theta, so the whole thing splits into sine theta over theta times sine
-
-    theta over the quantity one plus cosine theta.
-
-    {show result} Let theta go to zero: the first factor goes to one, the
-
-    second to zero over two. One times zero is zero.
-
-    '
-  steps:
-  - math: \frac{1-\cos\theta}{\theta} = \frac{(1-\cos\theta)(1+\cos\theta)}{\theta\,(1+\cos\theta)} = \frac{1-\cos^{2}\theta}{\theta\,(1+\cos\theta)}
-    reason: multiply by $1+\cos\theta$
-  - math: = \frac{\sin^{2}\theta}{\theta\,(1+\cos\theta)} = \frac{\sin\theta}{\theta}\cdot\frac{\sin\theta}{1+\cos\theta}
-    reason: $1-\cos^{2}\theta=\sin^{2}\theta$
-  result:
-    math: \longrightarrow\ 1\cdot\frac{0}{1+1} = 0
-    reason: the limit, then continuity
 - id: all_six_tan_sec
   kind: content
   template: derivation
@@ -978,6 +994,8 @@ scenes:
   - velocity
   - acceleration
   - shm
+  paced:
+  - result
   scaffold:
     motive: 'Put the new derivatives to work: a weight on a spring.'
   source: chapter3-print-standalone.html SS3.1 . Example 3.3 (simple harmonic motion)
@@ -1016,7 +1034,6 @@ scenes:
   kind: content
   template: graph
   mode: single
-  accent: example
   hook: animations.ch03_trig_derivatives_hooks:shm_stacked_graphs
   source: chapter3-print-standalone.html SS3.1 . Figure 3.4 (shm-triple)
   title: Height, Velocity, Acceleration
@@ -1056,9 +1073,10 @@ scenes:
 - id: toward_the_chain_rule
   kind: content
   template: definition_math
-  accent: definition
   hook: animations.ch03_trig_derivatives_hooks:toward_the_chain_rule
   scene_role: forward-ref
+  paced:
+  - math.0
   ref: md:toward_the_chain_rule
   scaffold:
     motive: We can do bare trig functions -- but not yet composed ones.

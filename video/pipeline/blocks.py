@@ -60,6 +60,13 @@ ACCENT_ROLE = {
     "corollary":   "result",
     "proof":       "result",
     "recap":       "result",     # a recap restates results
+    # A derivation is the handout's PLAIN BODY -- calcbook.sty:96 calls aResult the
+    # "主色", the colour the running text's kickers, rules and bullets already carry, and a
+    # derivation's payoff row is a result even though no environment wraps it. Added
+    # 2026-09-13 for the §3.1 accent review: that section contains no `envdefinition` at
+    # all (the first one is in §3.2), so its 7 `accent: definition` scenes were all
+    # mis-tagged -- a leftover from when `definition` WAS the neutral blue.
+    "derivation":  "result",
     "example":     "practice",   # green  -- calcbook aPractice
     "solution":    "practice",
     "procedure":   "strategy",   # violet -- calcbook aStrategy

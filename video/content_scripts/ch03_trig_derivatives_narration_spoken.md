@@ -68,19 +68,19 @@ One caution, because this result is easy to over-read. The statement is about th
 ### u13 · radians_essential
 A second caution, and this one is structural. Everything here depends on radians. The sector area one half theta -- and with it the limit -- uses radian measure. Switch to degrees and the limit is pi over one hundred eighty, not one, so the derivative drags that factor along. The clean formulas sine prime equals cosine and cosine prime equals negative sine hold only in radians.
 
-### u15 · derivative_of_sine
+### u16 · derivative_of_sine
 Now the payoff, and it falls into our hands. The claim: the derivative of sine x is cosine x, for every real x. Start from the definition -- the derivative is the limit of the difference quotient. But we already did the hard algebra: that quotient is cosine of the quantity x plus one half h, times sine of h over two, all over h over two. Let h go to zero: the first factor tends to cosine x by continuity, the second to one by the fundamental limit. A continuous thing times a limit -- the product is cosine x times one, just cosine x.
 
-### u16 · derivative_of_cosine
+### u17 · derivative_of_cosine
 Cosine falls to the very same machinery -- only the identity changes, so we go quickly. The claim: the derivative of cosine x is negative sine x. This time use the companion sum-to-product formula. The same division by h turns the difference quotient into negative sine of the quantity x plus one half h, times sine of h over two, all over h over two. Send h to zero: the sine factor tends to sine x by continuity, the second to one by the fundamental limit. The leading minus sign comes along -- leaving negative sine x. Same two tools, one extra minus sign.
 
-### u17 · slope_equals_height
+### u18 · slope_equals_height
 Here is what that theorem looks like on the graph. Draw y equals sine x, and check the slope of its tangent at a few points. At x equals zero it is climbing at slope one. At x equals pi over two, the top of the hump, the tangent is flat -- slope zero. At x equals pi it is falling at slope minus one. Now lay y equals cosine x on top, and read its heights at those same points: one, zero, minus one. They match exactly -- the slope of sine is the height of cosine, the theorem drawn.
 
-### u18 · derivative_cycle
+### u19 · derivative_cycle
 Step back and watch the pattern these two derivatives make. Differentiation sends sine and cosine into each other, with a minus sign that turns over every second step. Writing an arrow for one derivative: sine x to cosine x to negative sine x to negative cosine x, and back to sine x. Four derivatives and you are home -- the fourth derivative of sine is sine again. Where e to the x reproduces itself in a single step, these do it in a cycle of four: the self-renewal that lets them oscillate forever without winding down.
 
-### u20 · companion_limit
+### u14 · companion_limit
 The fundamental limit has a companion worth knowing: the quantity one minus cosine theta, over theta tends to zero. It is again zero over zero, so we need a way in. Multiply top and bottom by the conjugate one plus cosine theta; the numerator becomes a difference of squares, one minus cosine squared theta. And one minus cosine squared theta is just sine squared theta, so the whole thing splits into sine theta over theta times sine theta over the quantity one plus cosine theta. Let theta go to zero: the first factor goes to one, the second to zero over two. One times zero is zero.
 
 ### u21 · all_six_tan_sec

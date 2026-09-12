@@ -905,3 +905,158 @@ def chord_vs_arc(spec, ctx, blocks):
     out.append(Block("chord_arc", stage_arc, anim=_arc_anim, static=False, layer="graph"))
     out.append(Block("straighten", stage_bars, anim=_straighten_anim, static=False, layer="graph"))
     return out
+
+
+# ================================================================ hook 7
+# difference_quotient_for_sine (scene 04) -- the film's longest still (21.0 s) and the one
+# the six-lens review flags hardest: three `must`s on the same two beats.
+#   beat 4 (20.9 s, step.2) is "the decisive step" -- write h as 2*(h/2) so the denominator
+#     carries the very h/2 that is inside the sine. The stock row posts the FINISHED line
+#     and holds: "畫面把它當成又一行結果貼出來，再停 20 秒，觀眾沒有機會看到中間發生了什麼"
+#     (R2 D-carry must; R1b L-why must: "為什麼要把 h 換成 2*(h/2)？"). So the row now arrives
+#     as the intermediate the narration actually describes and the 2s cancel on screen.
+#   beat 5 (20.2 s, result) names two factors in turn ("The first slides to cos x ... the
+#     second is exactly sin theta / theta") over one finished line (R2 D-focus). The row is
+#     rebuilt as three addressable parts so each factor lands on the words that name it.
+# Both are paced across their beat (motion primitive 6). `anim: transform` in the storyboard
+# is overridden here: a 1.2 s glyph morph is the right length for a 5 s beat and invisible
+# in a 20 s one, which is the finding this hook exists to close.
+
+
+def difference_quotient_for_sine(spec, ctx, blocks):
+    from pipeline.templates.derivation import MUTED_OPACITY
+
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    FADE = 0.5
+
+    def _core(mob):
+        """The MathTex inside a row's equation mob (mirrors derivation._eq_core)."""
+        if isinstance(mob, MathTex):
+            return mob
+        for sub in getattr(mob, "submobjects", []):
+            found = _core(sub)
+            if found is not None:
+                return found
+        return None
+
+    def _rail(row, eq_wrap):
+        return VGroup(*[m for m in row.submobjects if m is not eq_wrap])
+
+    # -- beat 4: the intermediate line, then the 2s cancel ------------------------------
+    step1_row, step2_row = ids["step.1"].mobject, ids["step.2"].mobject
+    step2_eq = _core(step2_row)
+    step2_wrap = step2_row.submobjects[0]
+    # Exactly the line the narration dictates -- "write h as 2 times h/2, so the denominator
+    # carries the very h/2 inside the sine" -- so nothing new is asserted, only shown.
+    inter = MathTex(r"\frac{\sin(x+h)-\sin x}{h} = "
+                    r"\frac{2\cos\!\left(x+\frac h2\right)\sin\frac h2}{2\cdot\frac h2}",
+                    color=step2_eq.get_color(), font_size=step2_eq.font_size)
+    if inter.height > step2_eq.height * 1.7:      # a two-storey fraction must not reach the
+        inter.scale_to_fit_height(step2_eq.height * 1.7)   # rows above and below it
+    inter.move_to(step2_eq.get_left(), aligned_edge=LEFT)
+
+    def _step2_anim(scene, mob, _ground) -> float:
+        total = TM.beat_run_time(scene, 4.2)
+        a, b = total * 0.36, total * 0.34
+        c = max(total - a - b, 0.6)
+        scene.play(FadeIn(inter, shift=0.1 * UP),
+                   step1_row.animate.set_opacity(MUTED_OPACITY), run_time=FADE)
+        scene.wait(max(a - FADE, 0.0))
+        morph = min(1.4, b)
+        scene.play(ReplacementTransform(inter, step2_eq), run_time=morph)   # the 2s cancel
+        scene.wait(max(b - morph, 0.0))
+        rail = _rail(mob, step2_wrap)
+        if rail.submobjects:
+            scene.play(FadeIn(rail), run_time=FADE)
+        scene.wait(max(c - FADE, 0.0))
+        scene.add(mob)
+        return total
+
+    # -- beat 5: one factor per clause --------------------------------------------------
+    result_row = ids["result"].mobject
+    result_wrap = result_row.submobjects[0]
+    result_eq = _core(result_row)
+    # Same LaTeX, split at the clause the narration splits it at: MathTex concatenates its
+    # args, so the rendered line is identical to the single-string one it replaces.
+    parts_eq = MathTex(r"\cos\!\left(x+\frac h2\right)\to\cos x",
+                       r"\quad\text{and}\quad",
+                       r"\frac{\sin(h/2)}{h/2}\to 1",
+                       color=result_eq.get_color(), font_size=result_eq.font_size)
+    parts_eq.move_to(result_eq.get_left(), aligned_edge=LEFT)
+    result_wrap.submobjects = [parts_eq]
+
+    def _result_anim(scene, mob, _ground) -> float:
+        rail = _rail(mob, result_wrap)
+        slots = len(parts_eq.submobjects) + (1 if rail.submobjects else 0)
+        total = TM.beat_run_time(scene, FADE * slots)
+        share = total / slots
+        scene.play(FadeIn(parts_eq[0], shift=0.1 * UP),
+                   step2_row.animate.set_opacity(MUTED_OPACITY), run_time=FADE)
+        scene.wait(max(share - FADE, 0.0))
+        for part in parts_eq.submobjects[1:]:
+            scene.play(FadeIn(part, shift=0.1 * UP), run_time=FADE)
+            scene.wait(max(share - FADE, 0.0))
+        if rail.submobjects:
+            scene.play(FadeIn(rail), run_time=FADE)
+            scene.wait(max(share - FADE, 0.0))
+        scene.add(mob)
+        return total
+
+    ids["step.2"].anim, ids["step.2"].anim_seconds = _step2_anim, FADE * 3
+    ids["result"].anim, ids["result"].anim_seconds = _result_anim, FADE * 4
+    return blocks
+
+
+# ================================================================ hook 8
+# why_trig_is_different (scene 03) -- the film's first teaching beat, and 17.6 s of it is
+# spoken over an empty right half. The narration contrasts two difference quotients ("the
+# binomial theorem handed us a factor of h to cancel ... the trigonometric functions refuse
+# to play along") and the screen shows neither: four lenses land on it (R1a L-attention
+# must, R2 D-carry must "17.6 秒、52 個字…畫面一個字都沒給", R4 T-dwell must, plus R2
+# D-composition "一整場都在浪費一半畫面"). The hook puts the polynomial case in that empty
+# half and CANCELS the h on screen, so the trig row that follows (math.0, already there,
+# already ending in 0/0) reads as the contrast it is meant to be. Same device as hook 7's
+# step.2: the line the narration describes, morphed into the line it becomes.
+
+
+def why_trig_is_different(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    out = list(blocks)
+
+    # The band above the statement is free all scene; the ASSUMES pill lands in its LEFT
+    # half at the very last beat, so the exhibit sits right of centre and the two balance
+    # instead of colliding.
+    MAX_W = 7.2
+    CENTRE = np.array([2.55, 1.25, 0.0])
+
+    tag = brand.eyebrow("polynomial", ground, role="muted", size="tag")
+    before = brand.math_line(r"\frac{(x+h)^n-x^n}{h}=\frac{h\left[nx^{n-1}+\cdots\right]}{h}",
+                             ground, role="text", size="math")
+    after = brand.math_line(r"\frac{(x+h)^n-x^n}{h}=nx^{n-1}+\cdots",
+                            ground, role="text", size="math")
+    for m in (before, after):
+        if m.width > MAX_W:
+            m.scale_to_fit_width(MAX_W)
+    # `after` is what stays on screen, so IT owns the slot; `before` is a transient that
+    # occupies the same left edge and baseline so the cancellation reads as one line
+    # rewriting itself rather than two lines swapping places.
+    body = VGroup(tag, after).arrange(DOWN, buff=0.26, aligned_edge=LEFT)
+    body.move_to(CENTRE)
+    before.move_to(after.get_left(), aligned_edge=LEFT)
+
+    def _cancels_anim(scene, mob, _ground) -> float:
+        """Write the quotient the binomial theorem hands us, then let the h cancel."""
+        total = TM.beat_run_time(scene, 4.0)
+        a = total * 0.42
+        morph = min(1.3, total * 0.22)
+        scene.play(FadeIn(tag), FadeIn(before, shift=0.1 * UP), run_time=0.55)
+        scene.wait(max(a - 0.55, 0.0))
+        scene.play(ReplacementTransform(before, after), run_time=morph)
+        scene.wait(max(total - a - morph, 0.0))
+        scene.add(mob)
+        return total
+
+    out.append(Block("cancels", body, anim=_cancels_anim, static=False))
+    return out

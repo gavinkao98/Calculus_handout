@@ -138,6 +138,42 @@ class MockTTSBackend:
         return TTSResult(silence_pcm(seconds))
 
 
+class BudgetedBackend:
+    """``--max-billed-calls N`` (``--no-billing`` == 0): a hard cap on synthesis calls.
+
+    Why a cap and not just care: a run that "should" cost nothing has several ways to cost
+    something, and none of them announce themselves up front. Measured 2026-09-12: a
+    marker-only re-map of five scenes, every text hash verified unchanged, billed 13 calls
+    -- because `--reuse-existing` was omitted, so `use_reuse` was False, the reuse index
+    was empty and `scene_reuse_ok` was never even consulted; one scene then demoted to the
+    beats terminal, which `--fallback-budget` does not bound (it bounds ladder rungs 2-3
+    only). A cap bounds the WHOLE run, terminal included: the call that would exceed it
+    aborts, and since a scene's WAV is only promoted after its gates pass, an abort leaves
+    the prior manifest and audio untouched, so the run can be fixed and retried.
+    """
+
+    def __init__(self, inner, limit: int) -> None:
+        self._inner = inner
+        self._limit = limit
+        self._spent = 0
+        self.name = inner.name
+        self.stats = inner.stats
+
+    def synthesize(self, request: "TTSRequest") -> "TTSResult":
+        if self._spent >= self._limit:
+            raise SystemExit(
+                f"[tts] --max-billed-calls {self._limit}: this run needed synthesis call "
+                f"#{self._spent + 1} and stopped before making it. Either the existing "
+                f"audio could not be reused / re-aligned against the current beat "
+                f"boundaries (typically a {{show ...}} marker that now splits a beat "
+                f"mid-phrase -- move it to a boundary the aligner can place), or the cap "
+                f"is simply lower than this run needs. Nothing was promoted, so the prior "
+                f"manifest and WAVs are untouched."
+            )
+        self._spent += 1
+        return self._inner.synthesize(request)
+
+
 class MimoTTSBackend:
     """Xiaomi MiMo-V2.5-TTS backend (OpenAI-compatible /chat/completions).
 
@@ -292,6 +328,15 @@ def parse_args() -> argparse.Namespace:
                         help="skip the whisper-timestamped ASR QA probe (design §6)")
     parser.add_argument("--aligner-model", default="base.en")
     parser.add_argument("--aligner-device", default="cpu")
+    parser.add_argument("--no-billing", action="store_true",
+                        help="abort instead of making ANY synthesis call (== "
+                             "--max-billed-calls 0): for marker-only edits, where the "
+                             "intent is to re-map beats onto existing audio")
+    parser.add_argument("--max-billed-calls", type=int, default=None,
+                        help="hard cap on synthesis calls for the WHOLE run, beats "
+                             "terminal included (--fallback-budget bounds only ladder "
+                             "rungs 2-3). The call that would exceed it aborts before it "
+                             "is made; nothing is promoted, so prior audio is untouched")
     parser.add_argument("--fallback-budget", type=int, default=2,
                         help="max extra BILLED retries per scene across ladder rungs 2-3 "
                              "(design §7; the consent quote pre-approves this)")
@@ -525,9 +570,11 @@ def build_backend(args: argparse.Namespace) -> TTSBackend:
     api_key = os.environ.get("MIMO_API_KEY")
     if not api_key:
         raise SystemExit("[tts] --backend mimo needs the API key in env MIMO_API_KEY.")
-    return MimoTTSBackend(
+    backend = MimoTTSBackend(
         base_url=args.base_url, api_key=api_key, max_retries=args.max_retries
     )
+    cap = 0 if getattr(args, "no_billing", False) else getattr(args, "max_billed_calls", None)
+    return BudgetedBackend(backend, cap) if cap is not None else backend
 
 
 def scene_beats(scene: dict[str, Any]) -> list[dict[str, Any]]:

@@ -25,7 +25,8 @@ from .. import brand
 from ..blocks import Block, accent_role
 from ..visuals import theme as T
 from ._common import (scene_head, motif_corner, place_body, body_zone, build_aside,
-                      render_scaffold, ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
+                      render_scaffold, reveals, ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W,
+                      RAIL_X, RAIL_W)
 
 LABEL = {
     "definition": "[ definition ]", "theorem": "[ theorem ]",
@@ -131,7 +132,15 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         place_body(content, title, SPINE_X)
 
     if statement is not None:
-        blocks.append(Block("statement", statement, anim="fade", static=True))
+        # Motion primitive 1 (揭示時序), the same contract theorem_proof/derivation got in
+        # quality round ⑦ and this template was missed by: a scene whose `say` names
+        # {show statement} has the line SLIDE IN on that beat; with no marker it stays
+        # part of the opening frame as before. Without this the marker re-played a fade
+        # on an already-visible line -- a reveal with no frame-to-frame difference.
+        if reveals(spec, "statement"):
+            blocks.append(Block("statement", statement, anim="slide", static=False))
+        else:
+            blocks.append(Block("statement", statement, anim="fade", static=True))
     for i, (mob, anim) in enumerate(zip(math_mobs, anims)):
         blocks.append(Block(f"math.{i}", mob, anim=anim, static=False))
 

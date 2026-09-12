@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from .. import narration
 from ..blocks import Block
 from . import (
     callout,
@@ -64,7 +65,29 @@ def build_blocks(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     if ctx.get("ground") != "light":
         from ._common import scene_spine
         blocks = [scene_spine(spec, ctx, blocks)] + blocks
-    return _apply_hook(spec, ctx, blocks)
+    # `paced:` (motion primitive 7) runs AFTER the hook, so a hook that replaces a block's
+    # mobject with a multi-part one still gets its parts walked across the beat.
+    from .. import pacing
+    return pacing.apply(spec, _scaffold_reveal_timing(spec, _apply_hook(spec, ctx, blocks)))
+
+
+def _scaffold_reveal_timing(spec: dict[str, Any], blocks: "list[Block]") -> "list[Block]":
+    """Motion primitive 1 (揭示時序) for the scaffold line, centrally for every template.
+
+    `scaffold.motive` / `scaffold.problem` / `scaffold.flag.<id>` are part of the opening
+    frame by default -- which means a motive that states the scene's conclusion ("Bank a
+    companion limit: (1-cos t)/t -> 0") and an ASSUMES pill are on screen from t=0, up to a
+    minute before the narration reaches them (rewatch R2 2026-09-12, D-focus: "最重要的前提
+    被提前一分鐘擺出來…pill 因此退化成裝飾"). A scene whose `say` names the block instead has
+    it slide in on that beat. Opt-in by marker, so every existing deck is unchanged; the
+    LAYOUT is untouched either way (the line always occupies its slot, it only arrives late).
+    """
+    targets = set(narration.list_reveal_targets(spec.get("say", "")))
+    for b in blocks:
+        if b.id.startswith("scaffold.") and b.static and b.id in targets:
+            b.static = False
+            b.anim = "slide"
+    return blocks
 
 
 def _apply_hook(spec: dict[str, Any], ctx: dict[str, Any], blocks: "list[Block]") -> "list[Block]":

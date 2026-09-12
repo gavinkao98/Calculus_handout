@@ -36,6 +36,12 @@ _DER_BASE = {
     "steps": [{"math": "a = b", "reason": "given"}],
     "result": {"math": "a = c", "reason": "so"},
 }
+_DEF_BASE = {
+    "id": "def", "kind": "content", "template": "definition_math", "accent": "definition",
+    "title": "A Definition",
+    "statement": "A thing is nice when it behaves.",
+    "math": ["$a = b$"],
+}
 
 
 def _build(base: dict, say: str):
@@ -85,6 +91,23 @@ def test_derivation_statement_static_without_marker():
 
 def test_derivation_statement_dynamic_with_marker():
     b = _block(_build(_DER_BASE, "Words. {show statement} The setup. {show step.0} More."),
+               "statement")
+    assert b.static is False and b.anim == "slide"
+
+
+# -- definition_math --------------------------------------------------------
+# This template was missed when ⑦ wired the primitive into theorem_proof/derivation, so
+# the 13 scenes across three decks that DO write {show statement} were re-fading a card
+# already on screen (ch03 §3.1: why_trig_is_different / derivative_cycle /
+# toward_the_chain_rule -- 17.3 s, 6.8 s and 9.6 s of narration with no frame change).
+
+def test_definition_statement_static_without_marker():
+    b = _block(_build(_DEF_BASE, "Words. {show math.0} More."), "statement")
+    assert b.static is True and b.anim == "fade"
+
+
+def test_definition_statement_dynamic_with_marker():
+    b = _block(_build(_DEF_BASE, "Words. {show statement} The claim. {show math.0} More."),
                "statement")
     assert b.static is False and b.anim == "slide"
 

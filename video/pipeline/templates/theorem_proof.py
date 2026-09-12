@@ -127,11 +127,19 @@ def _rail_card(stmt_text: str, is_formula: bool, ground: str, *, role: str):
 _LABEL_FADE_SECONDS = STOCK_ANIM_SECONDS["fade"]
 
 
-def _reveal_with_label(label):
-    """proof.0's reveal, bringing the PROOF eyebrow in with it."""
-    def anim(scene, mob, _ground) -> float:
-        scene.play(FadeIn(label), FadeIn(mob, shift=0.1 * UP), run_time=_LABEL_FADE_SECONDS)
-        return _LABEL_FADE_SECONDS
+def _reveal_with_label(label, inner=None):
+    """proof.0's reveal, bringing the PROOF eyebrow in with it.
+
+    *inner* is the row's own reveal when the scene paces it (`paced:`, motion primitive 7):
+    the eyebrow still rides this beat, but the row is then walked/written across the beat
+    instead of being pinned to one 0.45 s fade. Without it the eyebrow fold would be the
+    one place `paced:` could not reach, because it makes proof.0's anim a callable."""
+    def anim(scene, mob, ground) -> float:
+        if inner is None:
+            scene.play(FadeIn(label), FadeIn(mob, shift=0.1 * UP), run_time=_LABEL_FADE_SECONDS)
+            return _LABEL_FADE_SECONDS
+        scene.play(FadeIn(label), run_time=_LABEL_FADE_SECONDS)
+        return _LABEL_FADE_SECONDS + inner(scene, mob, ground)
     return anim
 
 
@@ -263,7 +271,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             # and _overlap_issues / _capacity_issues would read that empty span as content
             # (it warned on _demo_tall_rows). This way the measured geometry is the bare row,
             # exactly as before.
-            blocks.append(Block(f"proof.{i}", m, anim=_reveal_with_label(proof_label),
+            from .. import pacing
+            inner = pacing.paced_reveal if f"proof.{i}" in (spec.get("paced") or []) else None
+            blocks.append(Block(f"proof.{i}", m, anim=_reveal_with_label(proof_label, inner),
                                 anim_seconds=_LABEL_FADE_SECONDS, static=False))
         else:
             blocks.append(Block(f"proof.{i}", m, anim="fade", static=False))

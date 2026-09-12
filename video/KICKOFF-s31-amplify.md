@@ -24,8 +24,17 @@
 
 ## 1. 全域護欄
 
-1. **旁白一個字不改。** 加減 `{show}` marker 是免費的（`tts.scene_reuse_ok` 比對的
-   `scene_text_hash` 是**剝掉 marker 後的口語全文**），改一個字就要重 TTS＝計費。
+1. **旁白一個字不改。** 加減 `{show}` marker 本身不改 `scene_text_hash`，所以**可以**零計費重對映——
+   但**必須把 `--reuse-existing` 下下去**，否則整批重合成。改一個字就要重 TTS＝計費。
+   **2026-09-12 踩到的坑（代價 13 次 call）：** `tts.py:1054` 的
+   `use_reuse = args.reuse_existing and …` 才會去建 reuse index；**漏了這個旗標，index 是空的、
+   `scene_reuse_ok` 根本不會被問到**，5 場 hash 逐字未變的場全部從頭合成，其中 `sector_inequality`
+   再掉到 beats 終端（`--fallback-budget` 只管 ladder rungs 2–3）。補上旗標後同一個 deck 實測
+   `backend_calls: 0`。**正確指令：**
+   `tts.py --backend mimo --reuse-existing --scene <ids> --no-billing`
+   （`--no-billing`／`--max-billed-calls N` 是本輪新增的硬上限，涵蓋整個 run 含 beats 終端；
+   中止時什麼都沒 promote，可安全重試。）
+   另：`sector_inequality` 逐字母唸 `O A B`，ASR QA 探針會誤報 misspeak ⇒ 該場要加 `--skip-qa`。
    改完 marker 一定要：`derive_spoken.py --deck <deck> --check`（parity）→
    `derive_spoken.py --deck <deck>`（重生 `_mimo.yml`，不重生 `make.py` 會 STALE 拒跑）。
    **驗證 reuse 的正確方法**：`tts.py --dry-run` 的 planned counts **永遠報最壞情況、不看

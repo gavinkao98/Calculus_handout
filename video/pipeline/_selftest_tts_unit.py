@@ -211,6 +211,46 @@ def test_mock_backend_counts_calls():
 
 # ---- T4: ASR QA verdict persists into manifest (F8), three-state, loud on silent skip ----
 
+def test_no_billing_wraps_the_billed_backend_and_refuses_to_spend():
+    """--no-billing is the guarantee behind "a marker edit costs nothing" -- which is
+    otherwise only a hope: 2026-09-12 a marker-only re-map of 5 scenes billed 13 calls
+    because --reuse-existing was omitted, so the reuse index was empty and scene_reuse_ok
+    was never consulted. --fallback-budget would not have caught it either (the beats
+    terminal is budget-exempt); this flag does."""
+    inner = tts.MockTTSBackend(0.4)
+    guarded = tts.BudgetedBackend(inner, 0)
+    assert guarded.name == inner.name and guarded.stats is inner.stats
+    try:
+        guarded.synthesize(tts.TTSRequest(text="hi", model="m", voice="v", style=""))
+    except SystemExit as exc:
+        assert "--max-billed-calls 0" in str(exc)
+    else:
+        raise AssertionError("--no-billing must abort instead of synthesizing")
+    assert inner.stats["calls"] == 0, "the guard must refuse BEFORE the backend is reached"
+
+
+def test_the_cap_allows_exactly_n_calls_then_aborts():
+    """--max-billed-calls N is the bound on a RECOVERY run ("spend a few more"), and it
+    covers the beats terminal too, which --fallback-budget does not."""
+    inner = tts.MockTTSBackend(0.4)
+    guarded = tts.BudgetedBackend(inner, 2)
+    req = tts.TTSRequest(text="hi", model="m", voice="v", style="")
+    guarded.synthesize(req)
+    guarded.synthesize(req)
+    try:
+        guarded.synthesize(req)
+    except SystemExit as exc:
+        assert "call #3" in str(exc)
+    else:
+        raise AssertionError("the cap must abort on the call that would exceed it")
+    assert inner.stats["calls"] == 2
+
+
+def test_no_billing_is_off_by_default_and_never_wraps_mock():
+    args = argparse.Namespace(backend="mock", empty_beat_seconds=0.4)
+    assert isinstance(tts.build_backend(args), tts.MockTTSBackend)
+
+
 def test_build_entry_carries_qa():   # T4-3 serialization: qa lands in validation
     from pipeline import scene_align as SA
     entry = SA.build_scene_aligned_entry(
@@ -278,6 +318,9 @@ if __name__ == "__main__":
     test_scene_subset_merges_into_prior_manifest()
     test_merge_refuses_identity_mismatch()
     test_mock_backend_counts_calls()
+    test_no_billing_wraps_the_billed_backend_and_refuses_to_spend()
+    test_the_cap_allows_exactly_n_calls_then_aborts()
+    test_no_billing_is_off_by_default_and_never_wraps_mock()
     test_build_entry_carries_qa()
     test_finalize_records_qa_state()
     print("OK tts unit-routing self-test (Task 8)")
